@@ -1,38 +1,45 @@
 .#{$cui-conf-globalPrefix}titleBar
-	--padding-horizontal: #{$cui-gap * 4}
-	--padding-vertical: #{$cui-gap * 4}
+	--cui-padding-top: var(--cui-layout-page-padding-top)
+	--cui-padding-left: var(--cui-layout-page-padding-left)
+	--cui-padding-right: var(--cui-layout-page-padding-right)
+	--cui-title-bar-gap: calc(var(--cui-layout-section-gap) / 2)
 
 	align-items: stretch
-	background-color: $cui-light-body-background
-	border-bottom: $cui-light-panel-border
+	background-color: var(--cui-background-color)
 	display: flex
 	flex-direction: column
-	flex-wrap: wrap
-	gap: $cui-gap * 2
-	padding: $cui-gap * 4
+	gap: var(--cui-title-bar-gap)
+	padding-bottom: var(--cui-padding-bottom)
+	padding-left: var(--cui-padding-left)
+	padding-right: var(--cui-padding-right)
+	padding-top: var(--cui-padding-top)
 	position: sticky
 	top: 0
 	z-index: 2
 
-	&-navigation
-		flex: 1 0 100%
+	&::after
+		content: ""
+		display: block
+		position: absolute
+		left: var(--cui-edge-offset-left)
+		right: var(--cui-edge-offset-right)
+		bottom: 0
+		border-bottom: 1px solid var(--cui-color--lower)
+
 	&-in
 		align-items: center
 		display: flex
 		flex-wrap: wrap
-		gap: $cui-gap * 2
+		gap: calc(var(--cui-gap) * 2)
 	&-navigation + &-in
 		margin-top: 0
 
 	&-heading
-		flex: 1 1 auto
+		flex: 1
 		padding-right: .5em
 	&-actions
-		flex: 0 0 auto
 		margin-left: auto
 
-	@media (min-width: $min-width-break-point-tablet)
-		--padding-horizontal: #{$cui-gap * 8}
-
-		padding: ($cui-gap * 4) ($cui-gap * 8)
-		gap: $cui-gap * 4
+	@media (max-width: $breakpoint-max-medium)
+		background: linear-gradient(to bottom, var(--cui-background-color), var(--cui-background-color--below))
+		border-bottom-color: transparent

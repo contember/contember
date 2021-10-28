@@ -9,28 +9,24 @@
 		user-select: none
 
 	&-item
-		color: $cui-breadcrumbs-text-color
+		color: var(--cui-color)
 
 		&:before
 			content: '›'
 			display: inline-block
 			margin: 0 .5em
-			color: $cui-breadcrumbs-sep-color
+			color: var(--cui-color--low)
 
 		&:first-child:before
 			display: none
 
 		a
 			border-radius: .25em
-			color: $cui-breadcrumbs-link-color
 			font-weight: $cui-breadcrumbs-link-font-weight
 			margin: -.25em
 			padding: .25em
 			text-decoration: none
 
-			&:hover
-				color: $cui-breadcrumbs-link-hover-color
-
 			&:focus
-				background-color: $cui-breadcrumbs-link-focus-background-color
+				background-color: var(--cui-toned-control-background-color)
 				outline: none

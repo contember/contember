@@ -1,5 +1,5 @@
 import { Component, EntityAccessor } from '@contember/binding'
-import { Box, Table, TableCell, TableProps, TableRow, TableRowProps } from '@contember/ui'
+import { Table, TableCell, TableProps, TableRow, TableRowProps } from '@contember/ui'
 import { memo, ReactElement, ReactNode } from 'react'
 import { DeleteEntityButton, EmptyMessage, RepeaterContainerProps, RepeaterItemProps } from '../collections'
 import { ImmutableContentLayoutRenderer, ImmutableContentLayoutRendererProps } from './ImmutableContentLayoutRenderer'
@@ -65,9 +65,7 @@ export const TableRenderer = Component(
 ) => ReactElement
 
 const EmptyTable = memo((props: { children: ReactNode }) => (
-	<Box>
-		<EmptyMessage>{props.children}</EmptyMessage>
-	</Box>
+	<EmptyMessage>{props.children}</EmptyMessage>
 ))
 EmptyTable.displayName = 'EmptyTable'
 

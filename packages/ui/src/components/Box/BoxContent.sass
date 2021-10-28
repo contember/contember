@@ -1,0 +1,15 @@
+@import 'boxContentMixin'
+
+.#{$cui-conf-globalPrefix}box-content
+	+boxContentMixin
+	grid-column: 1 / 3
+	width: 100%
+
+	&.view-seamless
+		box-shadow: none
+		background: inherit
+		border: 0
+		padding: 0
+		border-radius: unset
+	&.view-no-padding
+		--cui-box-content-padding: 0

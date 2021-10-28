@@ -1,0 +1,34 @@
+.#{$cui-conf-globalPrefix}section
+  --cui-section-padding-bottom: var(--cui-layout-section-padding-bottom)
+  --cui-section-padding-left: var(--cui-layout-section-padding-left)
+  --cui-section-padding-right: var(--cui-layout-section-padding-right)
+  --cui-section-padding-top: var(--cui-layout-section-padding-top)
+  --cui-section-border-width: 1px
+
+  border-top: var(--cui-section-border-width) solid var(--cui-color--lower)
+  display: flex
+  flex-direction: column
+  gap: $cui-gap * 6
+  margin-left: calc(-1 * var(--cui-section-padding-left))
+  margin-right: calc(-1 * var(--cui-section-padding-right))
+  padding-bottom: var(--cui-section-padding-bottom)
+  padding-left: var(--cui-section-padding-left)
+  padding-right: var(--cui-section-padding-right)
+  padding-top: var(--cui-section-padding-top)
+  scroll-margin-top: 6em // TODO: This is approximate, e.g. use some --cui-custom-property
+  &:first-child
+    margin-top: calc(-1 * var(--cui-section-padding-top, 0em))
+    border-color: transparent
+  & + &
+    margin-bottom: 0
+    margin-top: calc(-1 * var(--cui-layout-section-gap, 0em))
+  &:last-child:not(:first-child)
+    margin-bottom: calc(-1 * var(--cui-layout-section-gap, 0em))
+
+  .message--nesting-warning
+    display: none
+  .sideDimensions-dimensions-dimension & .message--nesting-warning
+    display: unset
+
+  @media (min-width: $breakpoint-large)
+    scroll-margin-top: 0

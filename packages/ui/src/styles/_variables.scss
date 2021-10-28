@@ -5,10 +5,39 @@
 $extra-optical-size-rounded-rectangle: 0.2146;
 $extra-optical-size-circle: 0.1284;
 
-$min-width-break-point-tablet: 768px;
-$max-width-break-point-tablet: 767.98px;
-$min-width-break-point-desktop: 1200px;
-$max-width-break-point-desktop: 1199.98px;
+// The maximum value is reduced by 0.02px to work around the limitations of
+// `min-` and `max-` prefixes and viewports with fractional widths.
+// See https://www.w3.org/TR/mediaqueries-4/#mq-min-max
+// Uses 0.02px rather than 0.01px to work around a current rounding bug in Safari.
+// See https://bugs.webkit.org/show_bug.cgi?id=178261
+//
+//    min-width: 798px
+//    max-width: 767.98px
+$breakpoint-max-offset: -0.02px;
+
+$breakpoint-xsmall: 320px;
+$breakpoint-small: 480px;
+$breakpoint-medium: 768px;
+$breakpoint-large: 1024px;
+$breakpoint-xlarge: 1280px;
+$breakpoint-xxlarge: 1366px;
+$breakpoint-xxxlarge: 1600px;
+
+$breakpoint-min-xsmall: $breakpoint-xsmall;
+$breakpoint-min-small: $breakpoint-small;
+$breakpoint-min-medium: $breakpoint-medium;
+$breakpoint-min-large: $breakpoint-large;
+$breakpoint-min-xlarge: $breakpoint-xlarge;
+$breakpoint-min-xxlarge: $breakpoint-xxlarge;
+$breakpoint-min-xxxlarge: $breakpoint-xxxlarge;
+
+$breakpoint-max-xsmall: $breakpoint-min-xsmall + $breakpoint-max-offset;
+$breakpoint-max-small: $breakpoint-min-small + $breakpoint-max-offset;
+$breakpoint-max-medium: $breakpoint-min-medium + $breakpoint-max-offset;
+$breakpoint-max-large: $breakpoint-min-large + $breakpoint-max-offset;
+$breakpoint-max-xlarge: $breakpoint-min-xlarge + $breakpoint-max-offset;
+$breakpoint-max-xxlarge: $breakpoint-min-xxlarge + $breakpoint-max-offset;
+$breakpoint-max-xxxlarge: $breakpoint-min-xxxlarge + $breakpoint-max-offset;
 
 // "CUI" stands for Contember UI
 
@@ -18,8 +47,7 @@ $cui-conf-rootSelector: ':root'; // Override this if you need to scope CUI custo
 $cui-conf-defaultView: default !default;
 
 // Global values
-$cui-color-blue: #0094FF !default;
-$cui-color-pink: #FF25C3 !default;
+$cui-color-blue: #3DA9EB !default;
 $cui-color-purple: #9013FE !default;
 $cui-color-green: #7ED321 !default;
 $cui-color-yellow: #FFC416 !default;
@@ -36,20 +64,13 @@ $cui-color-gray-6: #6F6F6F !default;
 $cui-color-gray-7: #525252 !default;
 $cui-color-gray-8: #393939 !default;
 $cui-color-gray-9: #262626 !default;
-$cui-color-gray-10: #161616 !default;
 $cui-color-black: #000000 !default;
 
-
-$cui-color-bland: $cui-color-gray-3 !default;
-$cui-color-primary: $cui-color-blue !default;
-$cui-color-secondary: $cui-color-pink !default;
-$cui-color-tertiary: $cui-color-purple !default;
+$cui-color-primary: #15009C !default;
 $cui-color-success: $cui-color-green !default;
 $cui-color-warn: $cui-color-orange !default;
 $cui-color-danger: $cui-color-red !default;
 $cui-color-info: $cui-color-blue !default;
-$cui-color-dark: $cui-color-gray-8 !default;
-$cui-color-inactive: $cui-color-gray-6 !default;
 
 // Common, super-global settings
 
@@ -58,11 +79,7 @@ $cui-base-lineHeight: 1.2 !default; // In order for computations to work, keep t
 // - Global controls
 $cui-effect-transition-duration: .3s !default;
 
-$cui-control-border-width: em(1px) !default;
-$cui-control-border-radius: em(5px) !default;
-
 $cui-control-focus-opacity: 0.3 !default;
-
 $cui-control-view-default-color: $cui-color-gray-7 !default;
 $cui-control-view-default-background: $cui-color-white !default;
 $cui-control-view-default-border-color: $cui-color-gray-2 !default;
@@ -99,284 +116,9 @@ $cui-control-validation: map_merge((
 	'invalid': $cui-control-validation-invalid,
 ), $cui-control-validation);
 
-
-$cui-control-small-height: 1.5em !default;
-$cui-control-default-height: 2em !default;
-$cui-control-large-height: 2.5em !default;
-
-$cui-control-small-font-size: .9em !default;
-$cui-control-default-font-size: 1em !default;
-$cui-control-large-font-size: 1.3em !default;
-
-$cui-control-size-small: (
-	'height': $cui-control-small-height,
-	'fontSize': $cui-control-small-font-size,
-) !default;
-
-$cui-control-size-default: (
-	'height': $cui-control-default-height,
-	'fontSize': $cui-control-default-font-size,
-) !default;
-
-$cui-control-size-large: (
-	'height': $cui-control-large-height,
-	'fontSize': $cui-control-large-font-size,
-) !default;
-
-$cui-control-sizes: () !default;
-$cui-control-sizes: map_merge((
-	$cui-conf-defaultView: $cui-control-size-default,
-	'small': $cui-control-size-small,
-	'large': $cui-control-size-large,
-), $cui-control-sizes);
-
-
-$cui-control-inactive-opacity: .6 !default;
-
-// Aether
-$cui-aether-background: #F7F7F7 !default;
-
 // Select
-$cui-select-chevron-background: $cui-color-gray-2 !default;
-$cui-select-hover-chevron-background: $cui-color-gray-3 !default;
+
 $cui-select-chevron-height: .5em !default;
-
-
-// Buttons
-$cui-button-effect-transition-duration: .15s !default;
-
-$cui-button-bland-opacity: .75 !default;
-$cui-button-disabled-background-color: $cui-color-gray-2 !default;
-$cui-button-disabled-border-color: $cui-color-gray-2 !default;
-$cui-button-disabled-color: $cui-color-gray-5 !default;
-
-$cui-button-view-default-color: $cui-color-gray-7 !default;
-$cui-button-view-default-background: $cui-color-gray-1 !default;
-$cui-button-view-default-border-color: $cui-color-gray-2 !default;
-$cui-button-view-default-focus-color: $cui-control-view-default-distinction-color !default;
-$cui-button-view-default-distinction-color: $cui-color-gray-7 !default;
-$cui-button-view-default: (
-	'color': $cui-button-view-default-color,
-	'background': $cui-button-view-default-background,
-	'borderColor': $cui-button-view-default-border-color,
-	'focusColor': $cui-button-view-default-focus-color,
-	'distinctionColor': $cui-button-view-default-distinction-color,
-) !default;
-
-$cui-button-view-primary-color: $cui-color-white !default;
-$cui-button-view-primary-background: $cui-color-primary !default;
-$cui-button-view-primary-border-color: darken($cui-color-primary, 10) !default;
-$cui-button-view-primary-focus-color: $cui-color-primary !default;
-$cui-button-view-primary-distinction-color: $cui-color-primary !default;
-$cui-button-view-primary: (
-	'color': $cui-button-view-primary-color,
-	'background': $cui-button-view-primary-background,
-	'borderColor': $cui-button-view-primary-border-color,
-	'focusColor': $cui-button-view-primary-focus-color,
-	'distinctionColor': $cui-button-view-primary-distinction-color,
-) !default;
-
-$cui-button-view-secondary-color: $cui-color-white !default;
-$cui-button-view-secondary-background: $cui-color-secondary !default;
-$cui-button-view-secondary-border-color: darken($cui-color-secondary, 15) !default;
-$cui-button-view-secondary-focus-color: $cui-color-secondary !default;
-$cui-button-view-secondary-distinction-color: $cui-color-secondary !default;
-$cui-button-view-secondary: (
-	'color': $cui-button-view-secondary-color,
-	'background': $cui-button-view-secondary-background,
-	'borderColor': $cui-button-view-secondary-border-color,
-	'focusColor': $cui-button-view-secondary-focus-color,
-	'distinctionColor': $cui-button-view-secondary-distinction-color,
-) !default;
-
-$cui-button-view-tertiary-color: $cui-color-white !default;
-$cui-button-view-tertiary-background: $cui-color-tertiary !default;
-$cui-button-view-tertiary-border-color: darken($cui-color-tertiary, 15) !default;
-$cui-button-view-tertiary-focus-color: $cui-color-tertiary !default;
-$cui-button-view-tertiary-distinction-color: $cui-color-tertiary !default;
-$cui-button-view-tertiary: (
-	'color': $cui-button-view-tertiary-color,
-	'background': $cui-button-view-tertiary-background,
-	'borderColor': $cui-button-view-tertiary-border-color,
-	'focusColor': $cui-button-view-tertiary-focus-color,
-	'distinctionColor': $cui-button-view-tertiary-distinction-color,
-) !default;
-
-$cui-button-view-success-color: $cui-color-white !default;
-$cui-button-view-success-background: darken($cui-color-success, 10) !default;
-$cui-button-view-success-border-color: darken($cui-color-success, 15) !default;
-$cui-button-view-success-focus-color: darken($cui-color-success, 10) !default;
-$cui-button-view-success-distinction-color: darken($cui-color-success, 10) !default;
-$cui-button-view-success: (
-	'color': $cui-button-view-success-color,
-	'background': $cui-button-view-success-background,
-	'borderColor': $cui-button-view-success-border-color,
-	'focusColor': $cui-button-view-success-focus-color,
-	'distinctionColor': $cui-button-view-success-distinction-color,
-) !default;
-
-$cui-button-view-warn-color: $cui-color-white !default;
-$cui-button-view-warn-background: $cui-color-warn !default;
-$cui-button-view-warn-border-color: darken($cui-color-warn, 10) !default;
-$cui-button-view-warn-focus-color: $cui-color-warn !default;
-$cui-button-view-warn-distinction-color: $cui-color-warn !default;
-$cui-button-view-warn: (
-	'color': $cui-button-view-warn-color,
-	'background': $cui-button-view-warn-background,
-	'borderColor': $cui-button-view-warn-border-color,
-	'focusColor': $cui-button-view-warn-focus-color,
-	'distinctionColor': $cui-button-view-warn-distinction-color,
-) !default;
-
-$cui-button-view-danger-color: $cui-color-white !default;
-$cui-button-view-danger-background: $cui-color-danger !default;
-$cui-button-view-danger-border-color: darken($cui-color-danger, 15) !default;
-$cui-button-view-danger-focus-color: $cui-color-danger !default;
-$cui-button-view-danger-distinction-color: $cui-color-danger !default;
-$cui-button-view-danger: (
-	'color': $cui-button-view-danger-color,
-	'background': $cui-button-view-danger-background,
-	'borderColor': $cui-button-view-danger-border-color,
-	'focusColor': $cui-button-view-danger-focus-color,
-	'distinctionColor': $cui-button-view-danger-distinction-color,
-) !default;
-
-$cui-button-view-dark-color: $cui-color-gray-2 !default;
-$cui-button-view-dark-background: $cui-color-dark !default;
-$cui-button-view-dark-border-color: darken($cui-color-dark, 15) !default;
-$cui-button-view-dark-focus-color: $cui-color-dark !default;
-$cui-button-view-dark-distinction-color: $cui-color-dark !default;
-$cui-button-view-dark: (
-	'color': $cui-button-view-dark-color,
-	'background': $cui-button-view-dark-background,
-	'borderColor': $cui-button-view-dark-border-color,
-	'focusColor': $cui-button-view-dark-focus-color,
-	'distinctionColor': $cui-button-view-dark-distinction-color,
-) !default;
-
-
-$cui-button-variants: () !default;
-$cui-button-variants: map_merge((
-	$cui-conf-defaultView: $cui-button-view-default,
-	'primary': $cui-button-view-primary,
-	'secondary': $cui-button-view-secondary,
-	'tertiary': $cui-button-view-tertiary,
-	'success': $cui-button-view-success,
-	'warn': $cui-button-view-warn,
-	'danger': $cui-button-view-danger,
-	'dark': $cui-button-view-dark,
-), $cui-button-variants);
-
-
-$cui-button-small-height: $cui-control-small-height !default;
-$cui-button-small-font-size: $cui-control-small-font-size !default;
-$cui-button-size-small: (
-	'height': $cui-button-small-height,
-	'fontSize': $cui-button-small-font-size,
-) !default;
-
-$cui-button-default-height: $cui-control-default-height !default;
-$cui-button-default-font-size: $cui-control-default-font-size !default;
-$cui-button-size-default: (
-	'height': $cui-button-default-height,
-	'fontSize': $cui-button-default-font-size,
-) !default;
-
-$cui-button-large-height: $cui-control-large-height !default;
-$cui-button-large-font-size: $cui-control-large-font-size !default;
-$cui-button-size-large: (
-	'height': $cui-button-large-height,
-	'fontSize': $cui-button-large-font-size,
-) !default;
-
-
-$cui-button-sizes: () !default;
-$cui-button-sizes: map_merge((
-	$cui-conf-defaultView: $cui-button-size-default,
-	'small': $cui-button-size-small,
-	'large': $cui-button-size-large,
-), $cui-button-sizes);
-
-
-$cui-button-list-separation-x: .5em !default;
-$cui-button-list-separation-y: .5em !default;
-
-// Message
-$cui-message-size-small: .8em !default;
-$cui-message-size-default: 1em !default;
-$cui-message-size-large: 1.2em !default;
-
-$cui-message-sizes: () !default;
-$cui-message-sizes: map_merge((
-	$cui-conf-defaultView: $cui-message-size-default,
-	'small': $cui-message-size-small,
-	'large': $cui-message-size-large,
-), $cui-message-sizes);
-
-
-$cui-message-common-boxShadow: 0 em(4px) em(6px) rgba($cui-color-black, .1), 0 em(8px) em(12px) rgba($cui-color-black, .1), 0 em(16px) em(24px) rgba($cui-color-black, .1) !default;
-
-$cui-message-default-defaultColor: $cui-color-gray-5 !default;
-$cui-message-default-strikingColor: $cui-color-white !default;
-$cui-message-default-background: $cui-color-gray-4 !default;
-$cui-message-default-boxShadow: $cui-message-common-boxShadow !default;
-
-$cui-message-success-defaultColor: $cui-color-success !default;
-$cui-message-success-strikingColor: $cui-color-white !default;
-$cui-message-success-background: $cui-color-success !default;
-$cui-message-success-boxShadow: $cui-message-default-boxShadow !default;
-
-$cui-message-info-defaultColor: $cui-color-info !default;
-$cui-message-info-strikingColor: $cui-color-white !default;
-$cui-message-info-background: $cui-color-info !default;
-$cui-message-info-boxShadow: $cui-message-default-boxShadow !default;
-
-$cui-message-warn-defaultColor: $cui-color-warn !default;
-$cui-message-warn-strikingColor: $cui-color-white !default;
-$cui-message-warn-background: $cui-color-warn !default;
-$cui-message-warn-boxShadow: $cui-message-default-boxShadow !default;
-
-$cui-message-danger-defaultColor: $cui-color-danger !default;
-$cui-message-danger-strikingColor: $cui-color-white !default;
-$cui-message-danger-background: $cui-color-danger !default;
-$cui-message-danger-boxShadow: $cui-message-default-boxShadow !default;
-
-
-$cui-message-border-radius: .3em !default;
-
-$cui-message-variants: () !default;
-$cui-message-variants: map_merge((
-	$cui-conf-defaultView: (
-		'defaultColor': $cui-message-default-defaultColor,
-		'strikingColor': $cui-message-default-strikingColor,
-		'background': $cui-message-default-background,
-		'boxShadow': $cui-message-default-boxShadow,
-	),
-	'success': (
-		'defaultColor': $cui-message-success-defaultColor,
-		'strikingColor': $cui-message-success-strikingColor,
-		'background': $cui-message-success-background,
-		'boxShadow': $cui-message-success-boxShadow,
-	),
-	'info': (
-		'defaultColor': $cui-message-info-defaultColor,
-		'strikingColor': $cui-message-info-strikingColor,
-		'background': $cui-message-info-background,
-		'boxShadow': $cui-message-info-boxShadow,
-	),
-	'warn': (
-		'defaultColor': $cui-message-warn-defaultColor,
-		'strikingColor': $cui-message-warn-strikingColor,
-		'background': $cui-message-warn-background,
-		'boxShadow': $cui-message-warn-boxShadow,
-	),
-	'danger': (
-		'defaultColor': $cui-message-danger-defaultColor,
-		'strikingColor': $cui-message-danger-strikingColor,
-		'background': $cui-message-danger-background,
-		'boxShadow': $cui-message-danger-boxShadow,
-	),
-), $cui-message-variants);
 
 // FormGroup
 $cui-formGroup-label-color: $cui-color-gray-8 !default;
@@ -393,11 +135,6 @@ $cui-formGroup-sizes: map_merge((
 	'small': $cui-formGroup-size-small,
 	'large': $cui-formGroup-size-large,
 ), $cui-formGroup-sizes);
-
-
-// Collapsible
-$cui-collapsible-transition-duration: .2s !default;
-
 
 // Heading
 $cui-heading-color: $cui-color-gray-9 !default;
@@ -444,7 +181,6 @@ $cui-panel-paddingY: $cui-gap;
 $cui-panel-paddingX: $cui-gap;
 $cui-light-panel-background: $cui-color-white;
 $cui-light-body-background: #f8f8f8;
-$cui-light-panel-border: $cui-control-border-width solid $cui-color-gray-2 !default;
 
 // Icon
 $cui-icon-default-size: 1em !default;
@@ -462,7 +198,7 @@ $cui-icon-sizes: map_merge((
 
 // Navigation
 $cui-navigation-text-color: $cui-color-gray-8 !default;
-$cui-navigation-title-font-size: rem(12px) !default;
+$cui-navigation-title-font-size: rem(14px) !default;
 $cui-navigation-title-font-weight: $fw-bold;
 $cui-navigation-inactive-opacity: .8 !default;
 $cui-navigation-active-color: darken($cui-color-primary, 5) !default;
@@ -479,29 +215,9 @@ $cui-breadcrumbs-link-focus-background-color: $cui-navigation-focus-background-c
 $cui-breadcrumbs-link-font-weight: $cui-navigation-title-font-weight;
 $cui-breadcrumbs-sep-color: $cui-color-gray-7;
 
-// Menu
-$cui-menu-vertical-padding: rem(6px) !default;
-$cui-menu-horizontal-padding: rem(20px) !default;
-$cui-menu-group-title-font-size: rem(10px) !default;
-$cui-menu-group-color: $cui-color-gray-4 !default;
-$cui-menu-subgroup-title-font-size: $cui-navigation-title-font-size;
-$cui-menu-subgroup-hover-color: $cui-navigation-hover-color;
-$cui-menu-subgroup-active-color: $cui-navigation-active-color;
-$cui-menu-subgroup-inactive-color: $cui-color-gray-8 !default;
-$cui-menu-hover-background: $cui-color-gray-1 !default;
-$cui-menu-action-active-font-weight: $cui-navigation-title-font-weight;
-$cui-menu-action-title-font-size: $cui-navigation-title-font-size;
-$cui-menu-action-inactive-opacity: .8 !default;
-$cui-menu-action-hover-color: $cui-navigation-hover-color;
-$cui-menu-action-active-color: $cui-navigation-active-color;
-$cui-menu-action-inactive-color: $cui-navigation-inactive-color;
-$cui-menu-action-focus-background-color: $cui-navigation-focus-background-color;
-$cui-menu-caret-transition-duration: $cui-collapsible-transition-duration !default;
-
 // Spinner
 $cui-spinner-softColor: currentColor !default;
 $cui-spinner-accentColor: transparent !default;
-$cui-spinner-period: .6s !default;
 
 // Container spinner
 $cui-containerSpinner-default-size: 2.5em !default;
@@ -520,9 +236,6 @@ $cui-containerSpinner-sizes: map_merge((
 $cui-dropdown-zIndex: 100 !default;
 $cui-dropdown-content-color: $cui-color-black !default;
 $cui-dropdown-content-background: $cui-color-white !default;
-$cui-dropdown-content-boxShadow: 0 0 0 em(1px) rgba($cui-color-gray-8, .05), 0 em(1px) em(3px) 0 rgba($cui-color-gray-8, .15) !default;
-$cui-dropdown-content-border-radius: $cui-control-border-radius + $cui-control-border-width !default;
-$cui-dropdown-button-content-gap-size: .3em !default;
 $cui-dropdown-transition-duration: .1s !default;
 
 
@@ -561,14 +274,6 @@ $cui-tag-remove-color-focused: $cui-color-white;
 // DimensionSwitcher
 $cui-dimensionSwitcher-border: solid 1px #E5E5E5;
 $cui-dimensionSwitcher-spacing: 1em;
-
-
-// Layout
-$cui-layout-background: #FFFFFF;
-$cui-layout-border: solid 1px #E5E5EC;
-$cui-layout-sidebar-width: em(300px);
-$cui-editable-width: 60em;
-$cui-topBar-right-safeSpace: 14em;
 
 // ProgressBar
 $cui-progressBar-background-color: #444444;

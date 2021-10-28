@@ -1,5 +1,5 @@
 import { Component, Entity, EntityListBaseProps, EntityName, Filter } from '@contember/binding'
-import { Button, ButtonList, Table, TableCell, TableRow } from '@contember/ui'
+import { Button, ButtonList, Stack, Table, TableCell, TableRow } from '@contember/ui'
 import type { ComponentType, FunctionComponent, ReactNode } from 'react'
 import { useMessageFormatter } from '../../../../../i18n'
 import { EmptyMessage, EmptyMessageProps } from '../../helpers'
@@ -82,8 +82,8 @@ export const DataGridContainer: FunctionComponent<DataGridContainerProps> = Comp
 		)
 
 		return (
-			<div>
-				<div style={{ display: 'flex', justifyContent: 'space-between', gap: '1em', flexWrap: 'wrap' }}>
+			<Stack direction="vertical">
+				<Stack direction="horizontal" justify="space-between" style={{ flexWrap: 'wrap' }}>
 					<div>{pagingSummary}</div>
 					<ButtonList>
 						{allowColumnVisibilityControls !== false && (
@@ -102,7 +102,7 @@ export const DataGridContainer: FunctionComponent<DataGridContainerProps> = Comp
 							/>
 						)}
 					</ButtonList>
-				</div>
+				</Stack>
 				<Table
 					tableHead={
 						<TableRow>
@@ -178,9 +178,9 @@ export const DataGridContainer: FunctionComponent<DataGridContainerProps> = Comp
 					)}
 				</Table>
 				{!!normalizedItemCount && (
-					<div style={{ margin: '1em 0', display: 'flex', justifyContent: 'space-between' }}>
+					<Stack direction="horizontal" justify="space-between" style={{ flexWrap: 'wrap' }}>
 						<div>{pagingSummary}</div>
-						<div style={{ display: 'flex', gap: '.5em' }}>
+						<Stack direction="horizontal" justify="space-between" gap="small">
 							<Button
 								distinction="seamless"
 								disabled={pageIndex === 0}
@@ -210,10 +210,10 @@ export const DataGridContainer: FunctionComponent<DataGridContainerProps> = Comp
 									</Button>
 								</>
 							)}
-						</div>
-					</div>
+						</Stack>
+					</Stack>
 				)}
-			</div>
+			</Stack>
 		)
 	},
 	props => <>{props.children}</>,

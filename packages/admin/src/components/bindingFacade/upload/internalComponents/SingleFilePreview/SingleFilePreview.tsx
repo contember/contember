@@ -1,6 +1,6 @@
 import { BindingError, Entity, EntityAccessor } from '@contember/binding'
 import type { FileId, SingleFileUploadState } from '@contember/react-client'
-import { ActionableBox, Box } from '@contember/ui'
+import { ActionableBox, Box, toEnumViewClass } from '@contember/ui'
 import { memo, ReactElement, useMemo } from 'react'
 import type { MessageFormatter } from '../../../../../i18n'
 import type { FullFileKind } from '../../interfaces'
@@ -19,6 +19,14 @@ export interface SingleFilePreviewProps {
 	removeFile: ((fileId: FileId) => void) | undefined
 	uploadState: SingleFileUploadState | undefined
 	fileKinds: ResolvedFileKinds
+}
+
+const viewFromMimeTypeRegExp = new RegExp(/^(\w+).*/)
+
+function viewFromMimeType(mimeType: string | string[] | undefined | null) {
+	if (!mimeType) return
+
+	return (Array.isArray(mimeType) ? mimeType[0] : mimeType).replace(viewFromMimeTypeRegExp, '$1')
 }
 
 export const SingleFilePreview = memo(
@@ -79,7 +87,7 @@ export const SingleFilePreview = memo(
 
 		return (
 			<Entity accessor={containingEntity}>
-				<ActionableBox onRemove={onRemove} editContents={editContents}>
+				<ActionableBox className={toEnumViewClass(viewFromMimeType(fileKind?.acceptMimeTypes))} onRemove={onRemove} editContents={editContents}>
 					{preview}
 				</ActionableBox>
 			</Entity>

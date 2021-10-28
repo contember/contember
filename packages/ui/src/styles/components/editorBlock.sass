@@ -1,25 +1,58 @@
 .#{$cui-conf-globalPrefix}editorBlock
 	$root: &
 
+	--cui-editor-canvas-element-handle-size: 28px
+
+	--cui-editor-canvas-element-padding-bottom: calc(2 * var(--cui-gap-vertical))
+	--cui-editor-canvas-element-padding-left: var(--cui-editor-canvas-element-handle-size)
+	--cui-editor-canvas-element-padding-right: calc(3 * var(--cui-gap-horizontal))
+	--cui-editor-canvas-element-padding-top: calc(2 * var(--cui-gap-vertical))
+
+	*[contenteditable="true"] &-inner
+		//
+
 	&-inner
-		position: relative
 		display: flex
-		margin-left: -20px
+		padding-bottom: var(--cui-editor-canvas-element-padding-bottom)
+		padding-left: var(--cui-editor-canvas-element-padding-left)
+		padding-right: var(--cui-editor-canvas-element-padding-right)
+		padding-top: var(--cui-editor-canvas-element-padding-top)
+		position: relative
 
 	&-content
 		flex: 1 1 auto
+		& > *
+			margin-bottom: 0
+			margin-top: 0
 
 	&-dragHandle
-		flex: 0 0 20px
-		opacity: 0.1
 		align-self: center
 		cursor: move
+		flex: 0
+		left: 0 // calc(-1 * var(--cui-editor-canvas-element-handle-size))
+		opacity: 0.1
+		position: absolute
+		text-align: center
+		width: var(--cui-editor-canvas-element-handle-size)
 
-	&.is-dragged #{$root}-dragHandle, &-dragHandle:hover
+	&.is-dragged #{$root}-dragHandle,
+	&-dragHandle:hover
+		opacity: 1
+
+	*:hover > & #{$root}-dragHandle
+		opacity: 1
+
+	// Split rule due Safari bug
+	*:focus:focus-within > & #{$root}-dragHandle
+		opacity: 1
+
+	// Touch devices like mobiles
+	@media (hover: none) and (pointer: coarse)
+		#{$root}-dragHandle
 			opacity: 1
 
 	&.is-dragged
-		z-index: 1
+		z-index: 2
 
 		#{$root}-content
 			opacity: 0.5

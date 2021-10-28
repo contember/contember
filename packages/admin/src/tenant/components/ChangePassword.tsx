@@ -1,8 +1,8 @@
-import { Box, Button, FormGroup, TextInput } from '@contember/ui'
+import { Button, FormGroup, LayoutPage, TextInput } from '@contember/ui'
 import { FC, useCallback } from 'react'
+import { useShowToast } from '../../components'
 import { useChangePassword } from '../hooks'
 import { useForm } from './useForm'
-import { useShowToast } from '../../components'
 
 const initialValues = {
 	currentPassword: '',
@@ -41,7 +41,7 @@ export const ChangePassword: FC<{}> = ({}) => {
 	}, [addToast, changePassword]))
 
 	return (
-			<Box heading={'Change your password'}>
+			<LayoutPage title="Change your password">
 				<form onSubmit={onSubmit}>
 					<FormGroup
 						label="Current password"
@@ -81,6 +81,6 @@ export const ChangePassword: FC<{}> = ({}) => {
 						Change password
 					</Button>
 				</form>
-			</Box>
+			</LayoutPage>
 	)
 }

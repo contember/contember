@@ -2,10 +2,11 @@
 
 .#{$cui-conf-globalPrefix}editorToolbar
 	display: inline-flex
-	background: #3F3F3F
-	color: #FFFFFF
+	background: var(--cui-filled-control-background-color)
+	color: var(--cui-filled-control-color)
 	border-radius: 5em
 	padding: em(14px) em(20px)
+	box-shadow: 0 0 3em -1.5em var(--cui-control-border-color)
 
 	&-groups, &-group
 		display: flex
@@ -23,6 +24,9 @@
 	&.view-layout-list
 		background: #000000
 		border-radius: em(30px)
+
+	&.view-layout-bar
+		overflow-x: auto
 
 	&.view-layout-bar &
 		&-group

@@ -1,9 +1,35 @@
 @import '../common'
 
+a.#{$cui-conf-globalPrefix}menu
+	&-group,
+	&-subgroup,
+	&-action,
+	&-tooDeep
+		&-title
+			color: var(--cui-control-color)
+			&:hover,
+			&:active,
+			.is-active &
+				color: var(--cui-control-color--highlighted)
+
 .#{$cui-conf-globalPrefix}menu
-	padding: $cui-menu-vertical-padding 0 0
+	$caret-size: 0.4em
+	$padding-coeficient: 1.5
+
 	line-height: 1.5
 	text-align: left
+
+	.#{$cui-conf-globalPrefix}label
+		background-color: inherit
+		border-radius: var(--cui-control-border-radius)
+		color: inherit
+		flex-grow: 1
+		&.is-active
+			background-color: var(--cui-toned-control-background-color--highlighted)
+			color: var(--cui-toned-control-color--highlighted)
+
+	button
+		font-size: 1em
 
 	&-group,
 	&-subgroup,
@@ -19,10 +45,19 @@
 		&,
 		&-list
 			margin: 0
-
-		&-list
 			padding: 0
 			list-style-type: none
+
+	&-subgroup,
+	&-tooDeep,
+	&-action
+		&-list
+			padding: 0 0 0 calc(var(--cui-gap) * 3)
+
+	&-subgroup.is-expanded:not(:first-child)
+		margin-top: var(--cui-gap-vertical)
+	&-subgroup.is-expanded:not(:last-child)
+		margin-bottom: var(--cui-gap-vertical)
 
 	&-group,
 	&-subgroup,
@@ -32,16 +67,33 @@
 			display: flex
 			align-items: center
 			line-height: inherit // TODO: Requied for button to inherit line-height
-			width: 100%
 			transition: background-color ease-in-out .5s
+			width: 100%
 
 	&-group
+		padding-bottom: calc(var(--cui-padding-vertical) / 2)
+		margin-left: var(--cui-edge-offset-left)
+		padding-right: 0
+		padding-top: calc(var(--cui-padding-vertical) / 2)
+		position: relative
+
+		&::after
+			border-bottom: 1px solid var(--cui-color--lower)
+			content: ""
+			display: block
+			left: var(--cui-padding-left)
+			position: absolute
+			right: 0
+			top: 0
+
 		&-title
-			color: $cui-menu-group-color
-			font-size: $cui-menu-group-title-font-size
+			font-weight: 600
 			letter-spacing: 0.125em
-			margin: (4 * $cui-menu-vertical-padding) 0 $cui-menu-vertical-padding
-			padding: 0 $cui-menu-horizontal-padding
+			margin: var(--cui-gap) 0
+			padding-bottom: var(--cui-gap-vertical)
+			padding-left: var(--cui-padding-left)
+			padding-right: var(--cui-padding-right)
+			padding-top: var(--cui-gap-vertical)
 			font-weight: $fw-extraBold
 			text-transform: uppercase
 
@@ -51,9 +103,10 @@
 	&-subgroup
 		&-title
 			margin: 0
-			color: $cui-menu-subgroup-inactive-color
-			font-size: $cui-menu-subgroup-title-font-size
-			padding: $cui-menu-vertical-padding $cui-menu-horizontal-padding
+			padding-bottom: calc(#{$padding-coeficient} * var(--cui-gap-vertical))
+			padding-left: var(--cui-padding-left)
+			padding-right: var(--cui-padding-right)
+			padding-top: calc(#{$padding-coeficient} * var(--cui-gap-vertical))
 			text-align: inherit
 			text-decoration: none
 			border: none
@@ -62,94 +115,60 @@
 			font-family: inherit
 
 		&-list
-			padding-bottom: ($cui-menu-vertical-padding * 0.5)
+			padding-bottom: calc(var(--cui-gap-vertical) / 2)
 
-	&.view-showCaret &-subgroup
-
-		&.is-expanded .#{$cui-conf-globalPrefix}menu-subgroup,
-		&.is-collapsed .#{$cui-conf-globalPrefix}menu-subgroup
-			&-title::after
-				content: ''
-				display: inline-block
-				margin-top: -0.2em
-				width: .5em
-				height: .5em
-				margin-left: .5em
-				border-bottom: rem(2px) solid
-				border-right: rem(2px) solid
-				opacity: .5
-				transition: transform var(--cui-menu-caret-transition-duration)
-				transform-origin: 70% 70%
-				transform: rotate(45deg)
-
-		&.is-collapsed .#{$cui-conf-globalPrefix}menu-subgroup
-			&-title::after
-				transform: rotate(-45deg)
+	&.view-showCaret .has-children
+		position: relative
+		&::before
+			content: ''
+			display: inline-block
+			margin-top: -0.2em
+			width: $caret-size
+			height: $caret-size
+			top: 0
+			bottom: 0
+			margin-top: auto
+			margin-bottom: auto
+			left: calc(var(--cui-padding-left) / 2 - #{($caret-size * 0.5)})
+			border-bottom: rem(1.75px) solid var(--cui-color--high)
+			border-right: rem(1.75px) solid var(--cui-color--high)
+			position: absolute
+			transition: transform var(--cui-transition-duration--fast)
+			transform-origin: 70% 70%
+			transform: rotate(45deg)
+		&.is-collapsed::before
+			transform: rotate(-45deg)
 
 	&-action
-		font-size: $cui-menu-action-title-font-size
-
 		&-title
 			margin: 0
-			color: $cui-menu-action-inactive-color
-			padding: rem(2px) $cui-menu-horizontal-padding rem(2px) (1.5 * $cui-menu-horizontal-padding)
+			padding-bottom: calc(#{$padding-coeficient} * var(--cui-gap-vertical))
+			padding-left: var(--cui-padding-left)
+			padding-right: var(--cui-padding-right)
+			padding-top: calc(#{$padding-coeficient} * var(--cui-gap-vertical))
 			text-decoration: none
-
-		&-list
-			padding: 0 0 ($cui-menu-vertical-padding * 0.5) ($cui-menu-horizontal-padding * 2)
 
 	&-tooDeep
 		font-size: .9em
 		list-style-type: none
 
-		&-title,
-		&-list
-			padding-left: 1em
-
 		&-title
 			margin: 0
-			color: $cui-menu-action-inactive-color
 			text-decoration: none
-			padding: rem(1px) $cui-menu-horizontal-padding rem(1px) 0
-
-		&-list
-			//
+			padding-bottom: var(--cui-gap-vertical)
+			padding-left: var(--cui-padding-left)
+			padding-right: var(--cui-padding-right)
+			padding-top: var(--cui-gap-vertical)
 
 	a#{&},
 	button#{&}
 		&-subgroup-title
 			cursor: pointer
-			&:hover
-				color: $cui-menu-subgroup-hover-color
 
 		&-subgroup,
 		&-action,
 		&-tooDeep
 			&-title
-				&:focus
+				&:focus:focus-visible
 					@extend %implementsCustomFocusEffects
-					background: $cui-menu-action-focus-background-color
-				&:hover
-					color: $cui-menu-action-active-color
-
-	&-subgroup,
-	&-action,
-	&-tooDeep
-		&.is-active > &-title
-			color: $cui-menu-action-active-color
-			font-weight: $cui-menu-action-active-font-weight
-			&:hover
-				color: $cui-menu-action-hover-color
-
-	&-subgroup
-		&.is-active > &-title
-			color: $cui-menu-action-active-color
-			&:hover
-				color: $cui-menu-action-hover-color
-
-	&-action,
-	&-tooDeep
-		&.is-active > &-title
-			color: $cui-menu-action-active-color
-			&:hover
-				color: $cui-menu-action-hover-color
+					background-color: var(--cui-theme-primary-interactive-semitransparent)

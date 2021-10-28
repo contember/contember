@@ -18,7 +18,7 @@ import { useClassNamePrefix, useRawCloseOnEscapeOrClickOutside } from '../auxili
 import type { DropdownAlignment } from '../types'
 import { assertNever, toViewClass } from '../utils'
 import { Collapsible } from './Collapsible'
-import { Button, ButtonProps } from './forms'
+import { Button, ButtonProps } from './Forms'
 import { Portal } from './Portal'
 
 export interface DropdownRenderProps {

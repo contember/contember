@@ -22,15 +22,30 @@
     &-stretch
       align-items: stretch
 
-  &.view-depth-1
-    gap: $cui-gap * 16
-  &.view-depth-2
-    gap: $cui-gap * 8
-  &.view-depth-3
-    gap: $cui-gap * 6
-  &.view-depth-4
-    gap: $cui-gap * 4
-  &.view-depth-5
-    gap: $cui-gap * 2
-  &.view-depth-6
-    gap: $cui-gap
+  &.view-justify
+    &-center
+      justify-content: center
+    &-start
+      justify-content: flex-start
+    &-end
+      justify-content: flex-end
+    &-space-between
+      justify-content: space-between
+    &-space-around
+      justify-content: space-around
+    &-space-evenly
+      justify-content: space-evenly
+    &-stretch
+      justify-content: stretch
+    &-inherit
+      justify-content: inherit
+    &-initial
+      justify-content: initial
+    &-revert
+      justify-content: revert
+
+  gap: calc(var(--cui-gap) * 4)
+  &.view-small
+    gap: calc(var(--cui-gap) * 2)
+  &.view-large
+    gap: calc(var(--cui-gap) * 6)

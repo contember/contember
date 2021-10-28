@@ -1,4 +1,4 @@
-import { Layout, Logotype, Menu, Pages } from '@contember/admin'
+import { ContemberLogoImage, Layout, Logo, Menu, Pages } from '@contember/admin'
 import { FC } from 'react'
 import * as pages from './pages'
 
@@ -6,7 +6,7 @@ const SandboxLayout: FC = props => {
 	return (
 		<Layout
 			children={props.children}
-			sidebarHeader={<Logotype>Contember</Logotype>}
+			sidebarHeader={<Logo image={<ContemberLogoImage withLabel />}>Contember</Logo>}
 			navigation={<Menu>
 				<Menu.Item title="Dashboard" to={'dashboard'}>
 					<Menu.Item title="Inputs" to="inputs" />

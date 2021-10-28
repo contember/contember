@@ -1,4 +1,5 @@
 import { Environment, EnvironmentContext, useEnvironment } from '@contember/binding'
+import { Message } from '@contember/ui'
 import {
 	ComponentType,
 	Fragment,
@@ -9,10 +10,9 @@ import {
 	useMemo,
 	useRef,
 } from 'react'
-import { PageErrorBoundary } from './PageErrorBoundary'
 import { useCurrentRequest } from '../../routing'
-import { Message } from '@contember/ui'
 import { MiscPageLayout } from '../MiscPageLayout'
+import { PageErrorBoundary } from './PageErrorBoundary'
 
 export type PageProvider<P> = ComponentType & {
 	getPageName(props: P): string
@@ -60,7 +60,7 @@ export const Pages = (props: PagesProps) => {
 	if (request === null || page === undefined) {
 		return (
 			<MiscPageLayout>
-				<Message type="danger" size="large">Page not found</Message>
+				<Message intent="danger" size="large">Page not found</Message>
 			</MiscPageLayout>
 		)
 	}

@@ -49,7 +49,7 @@ export const RepeaterContainer = memo(
 		return <FormGroup label={label} useLabelElement={false}>
 			<Stack
 				direction="vertical"
-				depth={5}
+				gap="small"
 			>
 				<AccessorErrors accessor={accessor} />
 				{isEmpty && (

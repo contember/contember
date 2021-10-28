@@ -2,17 +2,104 @@
 @import 'common'
 
 =customProperties()
-	--cui-control-borderRadius: #{$cui-control-border-radius}
+	--cui-transition-duration--immediate: 100ms
+	--cui-transition-duration--fast: 200ms
+	--cui-transition-duration: 300ms
+	--cui-transition-duration--slow: 600ms
+	--cui-transition-duration--slowest: 800ms
 
-	--cui-button-effect-transition-duration: #{$cui-button-effect-transition-duration}
+	--cui-font-size-heading: #{rem(16px)}
+	--cui-font-size-body: #{rem(14px)}
+	--cui-font-size-label: #{rem(13px)}
+	--cui-font-size-note: #{rem(11px)}
 
-	--cui-spinner-period: #{$cui-spinner-period}
+	--cui-logo-size: #{rem(18px)}
+	--cui-logo-size--small: #{rem(18px * 0.75)}
+	--cui-logo-size--large: #{rem(18px * 2)}
 
-	--cui-menu-caret-transition-duration: #{$cui-menu-caret-transition-duration}
+	--cui-gap-horizontal: #{em(4px)}
+	--cui-gap-vertical: #{em(4px)}
+	// TODO: Not yet possible to detech writing mode using the @media query
+	// Maybe use JS detection: https://stackoverflow.com/questions/56942964/is-it-possible-to-get-the-writing-mode-and-writing-direction-of-the-user
+	--cui-gap: var(--cui-gap-horizontal)
+
+	--cui-padding-horizontal: calc(var(--cui-gap-horizontal) * 3)
+	--cui-padding-left: var(--cui-padding-horizontal)
+	--cui-padding-right: var(--cui-padding-horizontal)
+
+	--cui-edge-offset-horizontal: 0em
+	--cui-edge-offset-left: var(--cui-edge-offset-horizontal)
+	--cui-edge-offset-right: var(--cui-edge-offset-horizontal)
+
+	@media (min-width: $breakpoint-min-small)
+		--cui-gap-horizontal: #{em(5px)}
+		--cui-padding-horizontal: calc(var(--cui-gap-horizontal) * 4)
+		--cui-edge-offset-horizontal: calc(var(--cui-gap-horizontal) * 1)
+	@media (min-width: $breakpoint-min-medium)
+		--cui-padding-horizontal: calc(var(--cui-gap-horizontal) * 5)
+		--cui-edge-offset-horizontal: calc(var(--cui-gap-horizontal) * 2)
+	@media (min-width: $breakpoint-min-large)
+		--cui-gap-horizontal: #{em(6px)}
+		--cui-edge-offset-horizontal: calc(var(--cui-gap-horizontal) * 3)
+	@media (min-width: $breakpoint-min-xlarge)
+		--cui-padding-horizontal: calc(var(--cui-gap-horizontal) * 6)
+		--cui-edge-offset-horizontal: calc(var(--cui-gap-horizontal) * 4)
+
+	--cui-padding-vertical: calc(var(--cui-gap-vertical) * 3)
+	--cui-padding-bottom: var(--cui-padding-vertical)
+	--cui-padding-top: var(--cui-padding-vertical)
+
+	--cui-edge-offset-vertical: calc(var(--cui-gap-vertical) * 2)
+	--cui-edge-offset-bottom: var(--cui-edge-offset-vertical)
+	--cui-edge-offset-top: var(--cui-edge-offset-vertical)
+
+	@media (min-height: $breakpoint-min-small)
+		--cui-padding-vertical: calc(var(--cui-gap-vertical) * 4)
+	@media (min-height: $breakpoint-min-medium)
+		--cui-gap-vertical: #{em(5px)}
+		--cui-padding-vertical: calc(var(--cui-gap-vertical) * 5)
+	@media (min-height: $breakpoint-min-large)
+		--cui-gap-vertical: #{em(6px)}
+		--cui-edge-offset-vertical: calc(var(--cui-gap-vertical) * 3)
+	@media (min-height: $breakpoint-min-xlarge)
+		--cui-padding-vertical: calc(var(--cui-gap-vertical) * 6)
+		--cui-edge-offset-vertical: calc(var(--cui-gap-vertical) * 4)
+
+	--cui-control-font-size--small: 0.9em
+	--cui-control-font-size--large: 1.5em
+
+	--cui-message-font-size-small: 0.8em
+	--cui-message-font-size-large: 1.2em
+
+	--cui-control-border-radius: var(--cui-gap)
+	--cui-control-border-width: #{em(1px)}
+
+	// 22px on Mac OS
+	// 44px on iOS
+	--cui-tap-target-size: #{em(22px)}
+	--cui-control-height--small: calc(var(--cui-tap-target-size) * 1.25)
+	--cui-control-height: calc(var(--cui-tap-target-size) * 1.75)
+	--cui-control-height--large: calc(var(--cui-tap-target-size) * 2)
+
+	// Touch devices like mobiles
+	@media (hover: none) and (pointer: coarse)
+		--cui-font-size-heading: #{rem(18px)}
+		--cui-font-size-body: #{rem(16px)}
+		--cui-font-size-label: #{rem(14px)}
+		--cui-font-size-note: #{rem(12px)}
+
+		--cui-control-height--small: calc(var(--cui-tap-target-size) * 1.5 )
+		--cui-control-height: calc(var(--cui-tap-target-size) * 2)
+		--cui-control-height--large: calc(var(--cui-tap-target-size) * 2.5)
 
 	@media (prefers-reduced-motion: reduce)
-		--cui-button-effect-transition-duration: 0s
+		--cui-transition-duration--immediate: 0s
+		--cui-transition-duration--fast: 0s
+		--cui-transition-duration: 0s
+		--cui-transition-duration--slow: 0s
+		--cui-transition-duration--slowest: 0s
 
-		--cui-spinner-period: #{math.div($cui-spinner-period, 3)}
-
-		--cui-menu-caret-transition-duration: 0s
+	@media (min-width: $breakpoint-min-large)
+		--cui-logo-size: #{rem(25px)}
+		--cui-logo-size--small: #{rem(25px * 0.75)}
+		--cui-logo-size--large: #{rem(25px * 2)}

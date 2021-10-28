@@ -1,11 +1,12 @@
-import { memo, MouseEvent as ReactMouseEvent, ReactNode } from 'react'
+import classNames from 'classnames'
+import { HTMLAttributes, memo, MouseEvent as ReactMouseEvent, ReactNode } from 'react'
 import { useClassNamePrefix } from '../auxiliary'
-import { BoxContent } from './Containers'
+import { BoxContent } from './Box'
 import { Dropdown } from './Dropdown'
-import { Button, ButtonOwnProps } from './forms'
+import { Button, ButtonOwnProps } from './Forms'
 import { Icon, IconProps } from './Icon'
 
-export interface ActionableBoxProps {
+export interface ActionableBoxProps extends HTMLAttributes<HTMLDivElement> {
 	editContents?: ReactNode
 	onRemove?: (e: ReactMouseEvent<HTMLButtonElement>) => void
 	children: ReactNode
@@ -19,7 +20,7 @@ const commonIconProps: IconProps = {
 	size: 'small',
 }
 
-export const ActionableBox = memo(({ children, editContents, onRemove }: ActionableBoxProps) => {
+export const ActionableBox = memo(({ className, children, editContents, onRemove }: ActionableBoxProps) => {
 	const prefix = useClassNamePrefix()
 
 	if (editContents === undefined && onRemove === undefined) {
@@ -27,7 +28,10 @@ export const ActionableBox = memo(({ children, editContents, onRemove }: Actiona
 	}
 
 	return (
-		<BoxContent depth={2} className={`${prefix}actionableBox`}>
+		<BoxContent className={classNames(
+			`${prefix}actionableBox`,
+			className,
+		)}>
 			<div className={`${prefix}actionableBox-contents`}>{children}</div>
 			<ul className={`${prefix}actionableBox-actions`} contentEditable={false}>
 				{editContents && (
@@ -44,7 +48,7 @@ export const ActionableBox = memo(({ children, editContents, onRemove }: Actiona
 				)}
 				{onRemove && (
 					<li className={`${prefix}actionableBox-action`}>
-						<Button {...commonButtonProps} onClick={onRemove}>
+						<Button intent="danger" {...commonButtonProps} onClick={onRemove}>
 							<Icon {...commonIconProps} blueprintIcon="trash" />
 						</Button>
 					</li>

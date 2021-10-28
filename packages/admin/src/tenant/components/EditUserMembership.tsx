@@ -1,8 +1,8 @@
-import { Membership, VariableSelector } from './VariableSelector'
+import { Box, BoxSection, Button, FormGroup, Icon, Select, SelectOption } from '@contember/ui'
 import { ComponentType, Dispatch, FC, SetStateAction, useCallback } from 'react'
 import { useListRolesQuery } from '../hooks'
-import { Box, BoxSection, Button, FormGroup, Heading, Icon, Select, SelectOption } from '@contember/ui'
 import { QueryLoader } from './QueryLoader'
+import { Membership, VariableSelector } from './VariableSelector'
 
 interface VariableConfig {
 	render: ComponentType<{ value: string[]; onChange: (newValues: string[]) => void }>
@@ -42,7 +42,7 @@ export const EditUserMembership: FC<EditUserMembershipProps> = ({ project, membe
 				const rolesToShow = rolesConfig ? roleDefinitions.filter(({ name }) => name in rolesConfig) : roleDefinitions
 				return (
 					<>
-						<Box heading={'Roles'}>
+						<Box heading={'Roles'} distinction="seamless">
 							{memberships.map((membership, membershipIndex) => {
 								const roleDefinition = membership && roleDefinitions.find(def => def.name === membership.role)
 

@@ -184,6 +184,7 @@ export function DimensionsRenderer(props: DimensionsRendererProps) {
 	return (
 		<Dropdown
 			buttonProps={{
+				size: 'small',
 				...props.buttonProps,
 				children: renderSelected(selectedDimensions),
 			}}

@@ -14,11 +14,10 @@ const Template: ComponentStory<typeof ButtonGroup> = args => <ButtonGroup {...ar
   <Button>Default</Button>
   <Button intent="primary">Primary</Button>
   <Button intent="secondary">Secondary</Button>
-  <Button intent="tertiary">Tertiary</Button>
+  <Button disabled intent="tertiary">Tertiary</Button>
   <Button intent="success">Success</Button>
   <Button intent="warn">Warn</Button>
   <Button intent="danger">Danger</Button>
-  <Button intent="dark">Dark</Button>
 </ButtonGroup>
 
 export const Default = Template.bind({})

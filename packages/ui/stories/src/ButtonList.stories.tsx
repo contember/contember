@@ -15,7 +15,6 @@ const Template: ComponentStory<typeof ButtonList> = args => <ButtonList {...args
   <Button intent="success">Success</Button>
   <Button intent="warn">Warn</Button>
   <Button intent="danger">Danger</Button>
-  <Button intent="dark">Dark</Button>
 </ButtonList>
 
 export const Default = Template.bind({})

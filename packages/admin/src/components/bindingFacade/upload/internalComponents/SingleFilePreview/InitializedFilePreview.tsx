@@ -110,7 +110,7 @@ export function InitializedFilePreview({
 			}
 		}
 		if (uploadState.readyState === 'error' || extractionState.name === 'error') {
-			return <Message type="danger">{formatMessage('upload.fileState.failedUpload')}</Message>
+			return <Message intent="danger">{formatMessage('upload.fileState.failedUpload')}</Message>
 		}
 		if (uploadState.readyState === 'success') {
 			if (extractionState.name === 'success') {

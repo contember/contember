@@ -1,0 +1,40 @@
+@import '../../styles/common'
+
+.#{$cui-conf-globalPrefix}label
+	--cui-inset: var(--cui-gap)
+
+	background-color: transparent
+	border: none
+	border-radius: var(--cui-gap)
+	color: inherit
+	font-family: inherit
+	font-size: $cui-navigation-title-font-size
+	font-weight: inherit
+	line-height: 1em
+	margin: calc(-1 * var(--cui-inset))
+	padding: var(--cui-inset)
+	position: relative
+	text-align: inherit
+	text-decoration: none
+	text-transform: inherit
+	z-index: 0
+
+	&.view-small
+		color: var(--cui-color--medium)
+		font-weight: bold
+		font-size: $cui-navigation-title-font-size - rem(2px)
+
+	&.is-active
+		color: var(--cui-control-color--highlighted)
+		font-weight: 700
+		z-index: 1
+	a:focus:focus-visible &,
+	button:focus:focus-visible &,
+	&.is-focused
+		color: var(--cui-control-color--highlighted)
+		z-index: 2
+	a:hover &,
+	button:hover &,
+	&.is-hover
+		color: var(--cui-control-color--highlighted)
+		z-index: 3

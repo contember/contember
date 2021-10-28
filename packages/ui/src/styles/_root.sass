@@ -14,3 +14,24 @@ $cui-buildState-alreadyOutputRoot: false !default
 		*::before,
 		*::after
 			box-sizing: inherit
+
+		background-color: var(--cui-background-color)
+		color: var(--cui-color)
+		font-size: var(--cui-font-size-body)
+
+	a, button
+		color: var(--cui-control-color)
+		font-weight: 600
+		&:hover
+			color: var(--cui-control-color--highlighted)
+		&:focus:focus-visible
+			color: var(--cui-control-color--highlighted)
+		&:active
+			color: var(--cui-control-color--pressed)
+	button
+		cursor: pointer
+		background-color: var(--cui-control-background-color)
+	button[disabled]
+		cursor: not-allowed
+
+@import 'themeSchemes'

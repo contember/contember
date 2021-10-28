@@ -6,5 +6,5 @@ export interface PortalProps {
 	children: ReactNode
 }
 
-export const Portal = memo((props: PortalProps) => ReactDOM.createPortal(props.children, props.to ?? document.body))
+export const Portal = memo((props: PortalProps) => ReactDOM.createPortal(props.children, props.to ?? document.getElementById('portal-root') ?? document.body))
 Portal.displayName = 'Portal'

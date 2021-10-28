@@ -21,7 +21,7 @@ export function ErrorFilePreview({ uploadState, formatMessage }: ErrorFilePrevie
 				endUserMessages.length ? (
 					<ErrorList errors={endUserMessages} />
 				) : (
-					<Message type="danger">{formatMessage('upload.fileState.invalidFile')}</Message>
+					<Message intent="danger">{formatMessage('upload.fileState.invalidFile')}</Message>
 				)
 			}
 		/>

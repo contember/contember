@@ -1,0 +1,36 @@
+@import 'boxContentMixin'
+
+.#{$cui-conf-globalPrefix}box
+	$root: &
+
+	--cui-box-background-focused-overlay: linear-gradient(rgba(var(--cui-controls-1000), 0.01), rgba(var(--cui-controls-1000), 0.01))
+	color: var(--cui-box-content-color)
+	display: grid
+	grid-template-columns: 1fr auto
+	grid-template-rows: auto
+	gap: calc(var(--cui-gap) * 3)
+
+	&-heading
+		align-items: center
+		display: flex
+		font-weight: 600
+		flex-grow: 1
+
+	&:not(.is-active):not(:focus-within) &-heading
+		color: var(--cui-color--high)
+
+	&-actions
+		grid-column: 2
+
+	&.is-active,
+	&:focus-within
+		color: var(--cui-control-color)
+		background-image: var(--cui-box-background-focused-overlay)
+		// border-color: var(--cui-control-border-color)
+		// box-shadow: 0 0 1em -.5em var(--cui-control-border-color)
+		transition: box-shadow .15s
+		z-index: 2
+	&.is-active,
+	&:focus-within
+		#{$root}-content
+			background-image: var(--cui-box-background-focused-overlay)

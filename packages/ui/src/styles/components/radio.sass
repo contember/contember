@@ -9,19 +9,22 @@
 	$t-background: .08s
 	$gap-between: .75em
 
+	--cui-font-size: 1em
+
 	&-group
-		--radio-color: #{$cui-control-view-default-border-color}
+		--cui-radio-color: var(--cui-control-color)
 		display: flex
 		flex-direction: column
 		gap: $gap-between
+		font-size: var(--cui-font-size)
 		&.view-horizontal
 			flex-direction: row
 			flex-wrap: wrap
 			gap: $gap-between
 		&.view-small
-			font-size: $cui-control-small-font-size
+			--cui-font-size: var(--cui-control-font-size--small)
 		&.view-large
-			font-size: $cui-control-large-font-size
+			--cui-font-size: var(--cui-control-font-size--large)
 
 	&-option
 		align-items: flex-start
@@ -29,11 +32,11 @@
 		flex-direction: row
 		position: relative
 		&.is-checked
-			--radio-color: #{$cui-control-view-default-distinction-color}
+			--cui-radio-color: var(--cui-control-color--highlighted)
 		&.is-checked.is-readonly
-			--radio-color: #{$cui-control-view-default-border-color}
+			--cui-radio-color: var(--cui-color--medium)
 		&.is-invalid
-			--radio-color: #{$cui-control-validation-invalid-color}
+			--cui-radio-color: red
 		&.is-disabled
 			cursor: not-allowed
 			opacity: 0.5
@@ -43,7 +46,7 @@
 		min-width: $size
 		height: $size
 		border-radius: 50%
-		border: $cui-control-border-width solid var(--radio-color) // TODO: A11Y issue: Too light grey colour
+		border: var(--cui-control-border-width) solid var(--cui-radio-color)
 		margin-inline-end: $gap
 		position: relative
 		transition-property: background-color, border-color, box-shadow
@@ -76,19 +79,19 @@
 		padding-bottom: (($size - $cui-base-lineHeight * .8) * 0.5)
 		padding-top: (($size - $cui-base-lineHeight * .8) * 0.5)
 		&-main
-			color: $cui-formGroup-label-color
+			color: var(--cui-color--high)
 			font-weight: $fw-medium
 			font-size: .8em
 			line-height: $cui-base-lineHeight
 		&-description
 			font-weight: $fw-normal
 			font-size: .76em
-			color: $cui-formGroup-labelDescription-color
+			color: var(--cui-color--medium)
 			display: inline-block
 			line-height: $cui-base-lineHeight
 
 	&-option.is-checked &-control::after
-		background-color: var(--radio-color)
+		background-color: var(--cui-radio-color)
 	&-option.is-focused &-control::before
 		box-shadow: 0 0 0 .2em rgba($cui-control-view-default-distinction-color, $cui-control-focus-opacity)
 	&-option.is-focused:not(.is-checked) &-control::before

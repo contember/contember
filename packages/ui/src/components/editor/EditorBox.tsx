@@ -1,11 +1,10 @@
 import cn from 'classnames'
-import { memo, ReactNode, useContext } from 'react'
-import { IncreaseBoxDepth, IncreaseHeadingDepth, useClassNamePrefix } from '../../auxiliary'
-import { BoxDepthContext, HeadingDepthContext } from '../../contexts'
+import { memo, ReactNode } from 'react'
+import { useClassNamePrefix } from '../../auxiliary'
 import type { NativeProps } from '../../types'
 import { toStateClass } from '../../utils'
-import { Heading } from '../Heading'
 import { Stack } from '../Stack'
+import { Heading } from '../Typography/Heading'
 
 export interface EditorBoxOwnProps {
 	heading?: ReactNode
@@ -23,23 +22,19 @@ export const EditorBox = memo(function EditorBox({
 	...divProps
 }: EditorBoxProps) {
 	const prefix = useClassNamePrefix()
-	const boxDepth = useContext(BoxDepthContext)
-	const headingDepth = useContext(HeadingDepthContext)
 
 	return (
 		<div className={cn(`${prefix}editorBox`, toStateClass('active', isActive), className)} {...divProps}>
 			{heading !== undefined && (
 				<div className={`${prefix}editorBox-heading`} contentEditable={false}>
-					<Heading depth={headingDepth} size="small" /*distinction="subtle"*/>
+					<Heading size="small">
 						{heading}
 					</Heading>
 				</div>
 			)}
 			{children !== undefined && (
-				<Stack direction="vertical" depth={3} className={`${prefix}editorBox-content`}>
-					<IncreaseHeadingDepth currentDepth={headingDepth} onlyIf={heading !== undefined}>
-						<IncreaseBoxDepth currentDepth={boxDepth}>{children}</IncreaseBoxDepth>
-					</IncreaseHeadingDepth>
+				<Stack direction="vertical" className={`${prefix}editorBox-content`}>
+					{children}
 				</Stack>
 			)}
 		</div>

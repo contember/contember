@@ -4,6 +4,7 @@ import { FunctionComponent, memo } from 'react'
 import type { Props as SelectProps } from 'react-select'
 import AsyncSelect from 'react-select/async'
 import { ChoiceField, ChoiceFieldData, DynamicSingleChoiceFieldProps, StaticSingleChoiceFieldProps } from '../ChoiceField'
+import { selectStyles } from './commonStyles'
 import { useCommonReactSelectAsyncProps } from './useCommonReactSelectAsyncProps'
 
 export type SelectFieldProps =
@@ -79,6 +80,7 @@ export const SelectFieldInner = memo(
 					{...asyncProps}
 					isClearable={allowNull === true}
 					value={data[currentValue]}
+					styles={selectStyles as Object} // TODO: Too complex to fix styling related typesafety
 					onChange={(newValue, actionMeta) => {
 						const value = newValue as ChoiceFieldData.SingleDatum<FieldValue | undefined>
 						switch (actionMeta.action) {

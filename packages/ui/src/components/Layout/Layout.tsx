@@ -3,7 +3,7 @@ import { memo } from 'react'
 import { useClassNamePrefix } from '../../auxiliary'
 import { LayoutChrome, LayoutChromeProps } from './LayoutChrome'
 
-interface LayoutProps extends LayoutChromeProps {
+export interface LayoutProps extends LayoutChromeProps {
   className?: string
 }
 
@@ -14,6 +14,14 @@ export const Layout = memo(({
   sidebarFooter,
   switchers,
   navigation,
+  scheme,
+  theme,
+  themeContent,
+  themeControls,
+  pageScheme,
+  pageTheme,
+  pageThemeContent,
+  pageThemeControls,
 }: LayoutProps) => {
 	const prefix = useClassNamePrefix()
   const classList = classNames(
@@ -28,6 +36,14 @@ export const Layout = memo(({
         sidebarFooter={sidebarFooter}
         navigation={navigation}
         switchers={switchers}
+        scheme={scheme}
+        theme={theme}
+        themeContent={themeContent}
+        themeControls={themeControls}
+        pageScheme={pageScheme}
+        pageTheme={pageTheme}
+        pageThemeContent={pageThemeContent}
+        pageThemeControls={pageThemeControls}
       >
         {children}
       </LayoutChrome>

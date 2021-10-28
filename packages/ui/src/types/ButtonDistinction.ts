@@ -1,3 +1,3 @@
 import type { Default } from './Default'
 
-export type ButtonDistinction = Default | 'outlined' | 'seamless'
+export type ButtonDistinction = Default | 'toned' | 'outlined' | 'seamless'

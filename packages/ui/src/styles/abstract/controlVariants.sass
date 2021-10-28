@@ -1,38 +1,34 @@
 %controlVariants
 	@each $name, $settings in $cui-control-variants
-		$color: map_get($settings, color)
-		$background: map_get($settings, background)
-		$borderColor: map_get($settings, borderColor)
-		$distinctionColor: map_get($settings, distinctionColor)
-
 		$view: toView($name)
 
 		&#{$view}
-			color: $color
-			background: $background
-			border-color: $borderColor
+			color: var(--cui-color--high)
+			background: var(--cui-background-color--above)
+			border-color: var(--cui-color--lower)
 
-			+disableWebkitAutoFill($background)
+			+disableWebkitAutoFill(var(--cui-control-background-color))
 
 			&:hover
-				border-color: darken($borderColor, 5)
+				border-color: var(--cui-color--low)
 
 			&:focus
 				@extend %implementsCustomFocusEffects
-				border-color: lighten($distinctionColor, 10)
-				box-shadow: 0 0 0 .2em rgba($distinctionColor, .3)
+				border-color: var(--cui-control-border-color)
+			&:focus:focus-visible
+				box-shadow: 0 0 0 .2em var(--cui-control-border-color)
 
 			&::placeholder
-				color: lighten($color, 15)
+				color: var(--cui-color--low)
 
 			&[disabled],
 			&[readonly]
 				cursor: not-allowed
-				opacity: $cui-control-inactive-opacity
+				opacity: var(--cui-opacity--medium)
 
 				&,
 				&::placeholder
-					color: lighten($color, 25)
+					color: var(--cui-color--low)
 
 			&.view-seamless
 				background: transparent
@@ -43,5 +39,5 @@
 				&:focus
 					box-shadow: none
 				&:hover,
-				&:focus
-					background: $background
+				&:focus:focus-visible
+					background: var(--cui-filled-control-background-color--highlighted)

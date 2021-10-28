@@ -1,7 +1,7 @@
 import { Component, Entity, EntityAccessor } from '@contember/binding'
+import { Message } from '@contember/ui'
 import type { FunctionComponent } from 'react'
 import { MutableContentLayoutRenderer, MutableContentLayoutRendererProps } from './MutableContentLayoutRenderer'
-import { Message } from '@contember/ui'
 
 export interface MutableSingleEntityRendererProps extends MutableContentLayoutRendererProps {
 	accessor: EntityAccessor
@@ -10,7 +10,7 @@ export interface MutableSingleEntityRendererProps extends MutableContentLayoutRe
 export const MutableSingleEntityRenderer: FunctionComponent<MutableSingleEntityRendererProps> = Component(
 	({ accessor, children, ...contentLayoutProps }) => {
 		if (accessor.environment.getSystemVariable('rootShouldExists') === 'yes' && !accessor.existsOnServer) {
-			return <Message type="danger">Requested entity of type {accessor.name} was not found</Message>
+			return <Message intent="danger">Requested entity of type {accessor.name} was not found</Message>
 		}
 		return (
 			<Entity accessor={accessor}>

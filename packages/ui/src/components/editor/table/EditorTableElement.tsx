@@ -3,7 +3,7 @@ import { CSSProperties, Fragment, memo, ReactNode } from 'react'
 import { useClassNamePrefix } from '../../../auxiliary'
 import { toStateClass } from '../../../utils'
 import { Dropdown } from '../../Dropdown'
-import { Button, ButtonGroup } from '../../forms'
+import { Button, ButtonGroup } from '../../Forms'
 import { Icon } from '../../Icon'
 
 export interface EditorTableElementProps {

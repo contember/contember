@@ -1,6 +1,4 @@
-import 'manrope/latin-extended/font.css'
 import '../../storybook/index.sass'
-
 import './components/ActionableBox'
 import './components/Aether'
 import './components/Box'

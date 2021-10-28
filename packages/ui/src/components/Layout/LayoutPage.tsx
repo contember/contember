@@ -66,7 +66,7 @@ const Aside = memo(({ children }: { children: ReactNode }) => {
 		}
 	})
 
-	return <div ref={element} id="meta-section-aside" className={`${prefix}layout-page-aside`}>
+	return <div ref={element} id={metaTab.id} className={`${prefix}layout-page-aside`}>
 		<Stack depth={2} direction="vertical">
 			{children}
 		</Stack>

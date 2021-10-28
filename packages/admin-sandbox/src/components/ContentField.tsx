@@ -140,6 +140,7 @@ export const ContentField = Component<ContentFieldProps>(
 			referenceDiscriminationField="type"
 			field={`${field}.blocks`}
 			inlineButtons={fullEditorInlineButtons}
+			itemLabel="Content"
 			label="Content"
 			contentField="json"
 			sortableBy="order"

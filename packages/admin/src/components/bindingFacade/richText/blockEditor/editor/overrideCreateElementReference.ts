@@ -7,7 +7,7 @@ import {
 } from '@contember/binding'
 import type { MutableRefObject } from 'react'
 import { Editor } from 'slate'
-import type { BlockSlateEditor } from './BlockSlateEditor'
+import type { EditorWithBlocks } from './EditorWithBlocks'
 
 export interface OverrideCreateElementReferenceOptions {
 	bindingOperations: BindingOperations
@@ -17,7 +17,7 @@ export interface OverrideCreateElementReferenceOptions {
 	sortedBlocksRef: MutableRefObject<EntityAccessor[]>
 }
 
-export const overrideCreateElementReference = <E extends BlockSlateEditor>(
+export const overrideCreateElementReference = <E extends EditorWithBlocks>(
 	editor: E,
 	options: OverrideCreateElementReferenceOptions,
 ) => {

@@ -3,7 +3,7 @@ import { Descendant, Element as SlateElement, Node as SlateNode, Text } from 'sl
 import type { ResolvedDiscriminatedDatum } from '../../../discrimination'
 import { ReferenceElement, referenceElementType } from '../elements'
 import type { EmbedHandler, NormalizedEmbedHandlers } from '../embed'
-import type { BlockSlateEditor } from './BlockSlateEditor'
+import type { EditorWithBlocks } from './EditorWithBlocks'
 import { parseUrl } from '../../utils'
 
 export interface OverrideInsertDataOptions {
@@ -12,7 +12,7 @@ export interface OverrideInsertDataOptions {
 	embedContentDiscriminationField: RelativeSingleField | undefined
 }
 
-export const overrideInsertData = <E extends BlockSlateEditor>(editor: E, options: OverrideInsertDataOptions) => {
+export const overrideInsertData = <E extends EditorWithBlocks>(editor: E, options: OverrideInsertDataOptions) => {
 	const { insertData, insertFragment } = editor
 
 	const stripNodeReferences = (nodes: SlateNode[]): SlateNode[] =>

@@ -2,7 +2,7 @@ import type { EntityAccessor, EntityListAccessor, RelativeEntityList, RelativeSi
 import type { MutableRefObject } from 'react'
 import { Editor, Element, Element as SlateElement, PathRef } from 'slate'
 import { assertNever } from '../../../../../utils'
-import type { BlockSlateEditor } from './BlockSlateEditor'
+import type { EditorWithBlocks } from './EditorWithBlocks'
 
 export interface OverrideOnChangeOptions {
 	blockContentField: RelativeSingleField
@@ -14,7 +14,7 @@ export interface OverrideOnChangeOptions {
 	sortedBlocksRef: MutableRefObject<EntityAccessor[]>
 }
 
-export const overrideSlateOnChange = <E extends BlockSlateEditor>(
+export const overrideSlateOnChange = <E extends EditorWithBlocks>(
 	editor: E,
 	{
 		blockContentField,

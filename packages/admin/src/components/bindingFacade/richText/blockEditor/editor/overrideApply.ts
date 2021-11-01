@@ -2,14 +2,14 @@ import type { BindingOperations } from '@contember/binding'
 import type { MutableRefObject } from 'react'
 import { Element as SlateElement, Node, Operation } from 'slate'
 import { isElementWithReference } from '../elements'
-import type { BlockSlateEditor } from './BlockSlateEditor'
+import type { EditorWithBlocks } from './EditorWithBlocks'
 
 export interface OverrideApplyOptions {
 	bindingOperations: BindingOperations
 	isMutatingRef: MutableRefObject<boolean>
 }
 
-export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: OverrideApplyOptions) => {
+export const overrideApply = <E extends EditorWithBlocks>(editor: E, options: OverrideApplyOptions) => {
 	const { apply } = editor
 	const { bindingOperations, isMutatingRef } = options
 

@@ -8,7 +8,7 @@ import {
 	SugaredRelativeEntityList,
 } from '@contember/binding'
 import type { MutableRefObject } from 'react'
-import type { BlockSlateEditor } from './BlockSlateEditor'
+import type { EditorWithBlocks } from './EditorWithBlocks'
 
 export interface OverrideGetReferencedEntityOptions {
 	bindingOperations: BindingOperations
@@ -19,7 +19,7 @@ export interface OverrideGetReferencedEntityOptions {
 	referencesField: string | SugaredRelativeEntityList | undefined
 }
 
-export const overrideGetReferencedEntity = <E extends BlockSlateEditor>(
+export const overrideGetReferencedEntity = <E extends EditorWithBlocks>(
 	editor: E,
 	{
 		bindingOperations,

@@ -22,6 +22,4 @@ export interface WithBlockElements {
 	slateOnChange: () => void
 }
 
-export type EditorWithBlockElements<E extends SlateEditor = SlateEditor> = E & WithBlockElements
-
-export type BlockSlateEditor = Editor & EditorWithBlockElements<SlateEditor>
+export type EditorWithBlocks = Editor & WithBlockElements

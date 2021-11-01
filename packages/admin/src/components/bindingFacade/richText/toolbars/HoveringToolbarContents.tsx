@@ -3,7 +3,7 @@ import { EditorToolbar, ToolbarGroup, useDialog } from '@contember/ui'
 import { memo, MouseEvent as ReactMouseEvent } from 'react'
 import { Transforms } from 'slate'
 import { useSlate } from 'slate-react'
-import type { BlockSlateEditor } from '../blockEditor'
+import type { EditorWithBlocks } from '../blockEditor'
 import type { ToolbarButtonSpec } from './ToolbarButtonSpec'
 
 export interface HoveringToolbarContentsProps {
@@ -11,7 +11,7 @@ export interface HoveringToolbarContentsProps {
 }
 
 export const HoveringToolbarContents = memo(({ buttons: rawButtons }: HoveringToolbarContentsProps) => {
-	const editor = useSlate() as BlockSlateEditor
+	const editor = useSlate() as EditorWithBlocks
 	const { openDialog } = useDialog()
 	const environment = useEnvironment()
 

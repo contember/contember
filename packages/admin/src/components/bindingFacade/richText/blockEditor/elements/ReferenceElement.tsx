@@ -4,7 +4,7 @@ import { CustomElementPlugin } from '../../baseEditor'
 import { ReferenceElementRenderer } from '../renderers'
 import { BindingError, FieldValue, RelativeSingleField } from '@contember/binding'
 import { getDiscriminatedDatum } from '../../../discrimination'
-import { BlockSlateEditor, EditorWithBlockElements } from '../editor'
+import { EditorWithBlocks } from '../editor'
 import { EditorReferenceBlocks } from '../templating'
 import { NormalizedEmbedHandlers } from '../embed'
 import { NormalizedBlocks } from '../../../blocks'
@@ -42,7 +42,7 @@ export const createReferenceElementPlugin = (args: ReferenceElementOptions): Cus
 			if (args.referenceDiscriminationField === undefined) {
 				throw new BindingError()
 			}
-			const blockEditor = editor as EditorWithBlockElements
+			const blockEditor = editor as EditorWithBlocks
 			const referencedEntity = blockEditor.getReferencedEntity(element)
 			const discriminationField = referencedEntity.getRelativeSingleField(args.referenceDiscriminationField)
 			const selectedReference = getDiscriminatedDatum(args.editorReferenceBlocks, discriminationField)?.datum
@@ -56,7 +56,7 @@ export const createReferenceElementPlugin = (args: ReferenceElementOptions): Cus
 		normalizeNode: ({ editor, element, path }) => {
 			const referenceId = element.referenceId
 			try {
-				(editor as BlockSlateEditor).getReferencedEntity(element)
+				(editor as EditorWithBlocks).getReferencedEntity(element)
 			} catch {
 				console.warn(`Removing a node linking a non-existent reference id '${referenceId}'.`)
 				Transforms.delete(editor, { at: path })

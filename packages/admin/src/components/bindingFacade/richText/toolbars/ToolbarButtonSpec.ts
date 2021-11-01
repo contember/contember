@@ -5,7 +5,7 @@ import type { Range as SlateRange } from 'slate'
 import { Element as SlateElement, Text as SlateText } from 'slate'
 import type { SugaredDiscriminateBy } from '../../discrimination'
 import type { TextSpecifics } from '../baseEditor'
-import type { BlockSlateEditor } from '../blockEditor'
+import type { EditorWithBlocks } from '../blockEditor'
 
 export interface MarkSpecificToolbarButton<T extends SlateText> {
 	marks: TextSpecifics<T>
@@ -18,7 +18,7 @@ export interface ElementSpecificToolbarButton<E extends SlateElement> {
 
 export interface InitializeReferenceContentProps {
 	referenceId: string
-	editor: BlockSlateEditor
+	editor: EditorWithBlocks
 	selection: SlateRange | null
 	onSuccess: () => void
 	onCancel: () => void

@@ -4,11 +4,9 @@ import { memo, MouseEvent as ReactMouseEvent, useMemo } from 'react'
 import { useSlateStatic } from 'slate-react'
 import { getDiscriminatedDatum, SugaredDiscriminateBy } from '../../discrimination'
 import type { ElementSpecificToolbarButton } from '../toolbars'
-import type { BlockSlateEditor } from './editor'
+import type { EditorWithBlocks } from './editor'
 import { ReferenceElement, referenceElementType } from './elements'
 import type { EditorReferenceBlocks } from './templating'
-import { Editor } from 'slate'
-import { EditorWithBlockElements } from './editor'
 
 export type BlockHoveringToolbarConfig = IconSourceSpecification & {
 	title?: string
@@ -29,7 +27,7 @@ function toToolbarGroups(
 	editorReferenceBlocks: EditorReferenceBlocks,
 	buttons: BlockHoveringToolbarContentsProps['blockButtons'],
 	environment: Environment,
-	editor: BlockSlateEditor,
+	editor: EditorWithBlocks,
 ): ToolbarGroup[] {
 	if (!buttons) {
 		return []
@@ -83,7 +81,7 @@ function toToolbarGroups(
 }
 
 export const BlockHoveringToolbarContents = memo((props: BlockHoveringToolbarContentsProps) => {
-	const editor = useSlateStatic() as EditorWithBlockElements<Editor>
+	const editor = useSlateStatic() as EditorWithBlocks
 	const environment = useEnvironment()
 
 	const { editorReferenceBlocks, blockButtons, otherBlockButtons } = props

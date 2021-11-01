@@ -7,7 +7,7 @@ import { paragraphElementType } from '../../plugins'
 import {
 	createReferenceElementPlugin, ReferenceElementOptions,
 } from '../elements'
-import type { BlockSlateEditor } from './BlockSlateEditor'
+import type { EditorWithBlocks } from './EditorWithBlocks'
 import { overrideApply, OverrideApplyOptions } from './overrideApply'
 import { overrideCreateElementReference, OverrideCreateElementReferenceOptions } from './overrideCreateElementReference'
 import { overrideGetReferencedEntity, OverrideGetReferencedEntityOptions } from './overrideGetReferencedEntity'
@@ -43,7 +43,7 @@ export const createBlockEditor = (options: CreateEditorOptions) => {
 		augmentEditorBuiltins: options.augmentEditorBuiltins,
 
 		addEditorBuiltins: editor => {
-			const e = editor as BlockSlateEditor
+			const e = editor as EditorWithBlocks
 			e.registerElement(createReferenceElementPlugin(options))
 
 			e.prepareElementForInsertion = () => {
@@ -92,5 +92,5 @@ export const createBlockEditor = (options: CreateEditorOptions) => {
 			return e
 		},
 		defaultElementType: paragraphElementType,
-	}) as BlockSlateEditor
+	}) as EditorWithBlocks
 }

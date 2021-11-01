@@ -10,13 +10,13 @@ import {
 	Transforms,
 } from 'slate'
 import { ContemberEditor } from '../../ContemberEditor'
-import type { BlockSlateEditor } from './BlockSlateEditor'
+import type { EditorWithBlocks } from './EditorWithBlocks'
 import { isReferenceElement } from '../elements'
 
 export interface OverridePrepareElementForInsertionOptions {
 }
 
-export const overridePrepareElementForInsertion = <E extends BlockSlateEditor>(
+export const overridePrepareElementForInsertion = <E extends EditorWithBlocks>(
 	editor: E,
 	options: OverridePrepareElementForInsertionOptions,
 ) => {

@@ -9,7 +9,7 @@ import { BlockElement } from '../../baseEditor'
 import type { ReferenceElement } from '../elements'
 import { ReferenceElementOptions } from '../elements'
 import type { EmbedHandler } from '../embed'
-import { EditorWithBlockElements } from '../editor'
+import { EditorWithBlocks } from '../editor'
 
 export interface ReferenceElementRendererProps extends RenderElementProps, ReferenceElementOptions {
 	element: ReferenceElement
@@ -17,7 +17,7 @@ export interface ReferenceElementRendererProps extends RenderElementProps, Refer
 }
 
 export const ReferenceElementRenderer = memo((props: ReferenceElementRendererProps) => {
-	const editor = useSlateStatic() as EditorWithBlockElements
+	const editor = useSlateStatic() as EditorWithBlocks
 	const selected = useSelected()
 
 	const referencedEntity = editor.getReferencedEntity(props.element)

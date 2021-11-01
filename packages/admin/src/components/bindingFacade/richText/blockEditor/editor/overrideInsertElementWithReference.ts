@@ -9,7 +9,7 @@ import {
 import type { MutableRefObject } from 'react'
 import { Editor, Element as SlateElement, PathRef, Transforms } from 'slate'
 import type { ElementWithReference } from '../elements'
-import type { BlockSlateEditor } from './BlockSlateEditor'
+import type { EditorWithBlocks } from './EditorWithBlocks'
 
 export interface OverrideInsertElementWithReferenceOptions {
 	bindingOperations: BindingOperations
@@ -24,7 +24,7 @@ export interface OverrideInsertElementWithReferenceOptions {
 	sortedBlocksRef: MutableRefObject<EntityAccessor[]>
 }
 
-export const overrideInsertElementWithReference = <E extends BlockSlateEditor>(
+export const overrideInsertElementWithReference = <E extends EditorWithBlocks>(
 	editor: E,
 	options: OverrideInsertElementWithReferenceOptions,
 ) => {

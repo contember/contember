@@ -1,9 +1,9 @@
 import { Editor, Node as SlateNode, Range as SlateRange } from 'slate'
-import type { BlockSlateEditor } from './BlockSlateEditor'
+import type { EditorWithBlocks } from './EditorWithBlocks'
 
 export interface OverrideInsertBreakOptions {}
 
-export const overrideInsertBreak = <E extends BlockSlateEditor>(editor: E, options: OverrideInsertBreakOptions) => {
+export const overrideInsertBreak = <E extends EditorWithBlocks>(editor: E, options: OverrideInsertBreakOptions) => {
 	const { insertBreak } = editor
 
 	editor.insertBreak = () => {

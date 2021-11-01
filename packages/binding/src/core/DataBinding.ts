@@ -167,7 +167,7 @@ export class DataBinding {
 						const allSubMutationsOk = aliases.every(item => mutationData[item].ok)
 
 						if (allSubMutationsOk) {
-							const persistedEntityIds = aliases.map(alias => mutationData[alias].node.id)
+							const persistedEntityIds = aliases.map(alias => mutationData[alias].node?.id).filter(id => id !== undefined)
 							const result: SuccessfulPersistResult = {
 								type: 'justSuccess',
 								persistedEntityIds,

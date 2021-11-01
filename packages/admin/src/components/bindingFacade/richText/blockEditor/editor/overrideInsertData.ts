@@ -4,6 +4,7 @@ import type { ResolvedDiscriminatedDatum } from '../../../discrimination'
 import { ReferenceElement, referenceElementType } from '../elements'
 import type { EmbedHandler, NormalizedEmbedHandlers } from '../embed'
 import type { BlockSlateEditor } from './BlockSlateEditor'
+import { parseUrl } from '../../utils'
 
 export interface OverrideInsertDataOptions {
 	embedHandlers: NormalizedEmbedHandlers | undefined
@@ -72,15 +73,7 @@ export const overrideInsertData = <E extends BlockSlateEditor>(editor: E, option
 			return insertData(data)
 		}
 
-		let url: URL | undefined = undefined
-
-		if (text.length >= 4) {
-			// See isUrl(). This branch is just a quick bailout
-
-			try {
-				url = new URL(text)
-			} catch {}
-		}
+		const url = parseUrl(text)
 
 		;(async () => {
 			for (const [, handler] of options.embedHandlers!) {

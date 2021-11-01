@@ -1,8 +1,8 @@
 import { Editor } from 'slate'
-import { isUrl } from './isUrl'
 import { AnchorModifications } from './AnchorModifications'
 import { anchorElementPlugin } from './AnchorElement'
 import { anchorHtmlDeserializer } from './AnchorHtmlDeserializer'
+import { parseUrl } from '../../../utils'
 
 export const withAnchors = <E extends Editor>(editor: E): E => {
 	const { insertText } = editor
@@ -11,7 +11,7 @@ export const withAnchors = <E extends Editor>(editor: E): E => {
 	editor.htmlDeserializer.registerPlugin(anchorHtmlDeserializer)
 
 	editor.insertText = text => {
-		if (text && isUrl(text)) {
+		if (text && parseUrl(text) !== undefined) {
 			AnchorModifications.wrapAnchor(editor, text)
 		} else {
 			insertText(text)

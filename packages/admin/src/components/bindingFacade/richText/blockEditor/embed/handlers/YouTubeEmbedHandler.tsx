@@ -2,6 +2,7 @@ import { SugaredField, SugaredFieldProps, useField } from '@contember/binding'
 import { memo, ReactNode } from 'react'
 import type { SugaredDiscriminateBy } from '../../../../discrimination'
 import type { EmbedHandler, PopulateEmbedDataOptions } from '../core'
+import { parseUrl } from '../../../utils'
 
 class YouTubeEmbedHandler implements EmbedHandler<string> {
 	public readonly debugName = 'YouTube'
@@ -24,9 +25,8 @@ class YouTubeEmbedHandler implements EmbedHandler<string> {
 			if (source.startsWith('www.')) {
 				source = `https://${source}`
 			}
-			try {
-				url = new URL(source)
-			} catch {
+			url = parseUrl(source)
+			if (!url) {
 				return undefined
 			}
 		}

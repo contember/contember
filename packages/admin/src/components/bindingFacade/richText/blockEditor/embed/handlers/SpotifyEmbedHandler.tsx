@@ -2,6 +2,7 @@ import { SugaredField, SugaredFieldProps, useField } from '@contember/binding'
 import { memo, ReactNode } from 'react'
 import type { SugaredDiscriminateBy } from '../../../../discrimination'
 import type { EmbedHandler, PopulateEmbedDataOptions } from '../core'
+import { parseIframeSrc, parseUrl } from '../../../utils'
 
 class SpotifyEmbedHandler implements EmbedHandler<SpotifyEmbedHandler.Artifacts> {
 	public readonly debugName = 'Spotify'
@@ -23,41 +24,29 @@ class SpotifyEmbedHandler implements EmbedHandler<SpotifyEmbedHandler.Artifacts>
 	public handleSource(source: string, url: URL | undefined): undefined | SpotifyEmbedHandler.Artifacts {
 		// This method deliberately biases towards the liberal and permissive.
 		if (!url) {
-			if (source.startsWith('<iframe')) {
-				const parser = new DOMParser()
-				try {
-					const { body } = parser.parseFromString(source, 'text/html')
-					if (body.children.length === 1 && body.children[0] instanceof HTMLIFrameElement) {
-						const iFrame = body.children[0]
-						source = iFrame.src
-					}
-				} catch {
-					return undefined
-				}
-			}
+			source = parseIframeSrc(source) ?? source
 			if (source.startsWith('open.spotify.com')) {
 				source = `https://${source}`
 			}
-			try {
-				url = new URL(source)
-			} catch {
+			url = parseUrl(source)
+			if (!url) {
 				return undefined
 			}
 		}
 
 		if (url.host.endsWith('open.spotify.com')) {
-			const matches = url.pathname.match(/^\/(embed\/)?(.+)\/(.+)$/)
-
-			if (!matches) {
-				return undefined
-			}
-			return {
-				type: matches[2],
-				id: matches[3],
-			}
+			return undefined
 		}
 
-		return undefined
+		const matches = url.pathname.match(/^\/(embed\/)?(.+)\/(.+)$/)
+
+		if (!matches) {
+			return undefined
+		}
+		return {
+			type: matches[2],
+			id: matches[3],
+		}
 	}
 
 	public renderEmbed() {

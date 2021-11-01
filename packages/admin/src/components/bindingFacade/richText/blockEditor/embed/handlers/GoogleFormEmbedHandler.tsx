@@ -15,7 +15,7 @@ class GoogleFormEmbedHandler implements EmbedHandler<string> {
 		return <SugaredField field={this.options.googleFormIdField} />
 	}
 
-	public canHandleSource(source: string, url: URL | undefined): boolean | string {
+	public handleSource(source: string, url: URL | undefined): undefined | string {
 		// This method deliberately biases towards the liberal and permissive.
 		if (!url) {
 			if (source.startsWith('<iframe')) {
@@ -26,8 +26,8 @@ class GoogleFormEmbedHandler implements EmbedHandler<string> {
 						const iFrame = body.children[0]
 						source = iFrame.src
 					}
-				} catch (_) {
-					return false
+				} catch {
+					return undefined
 				}
 			}
 			if (source.startsWith('docs.google.com')) {
@@ -36,7 +36,7 @@ class GoogleFormEmbedHandler implements EmbedHandler<string> {
 			try {
 				url = new URL(source)
 			} catch {
-				return false
+				return undefined
 			}
 		}
 
@@ -44,7 +44,7 @@ class GoogleFormEmbedHandler implements EmbedHandler<string> {
 			const matches = url.pathname.match(/^\/forms\/d(\/e)?\/([^\/]+).*$/)
 
 			if (!matches) {
-				return false
+				return undefined
 			}
 			if (matches[1] === undefined) {
 				alert(
@@ -52,12 +52,12 @@ class GoogleFormEmbedHandler implements EmbedHandler<string> {
 						'Detected a Google Form but the link supplied cannot be reliably embedded.\n\n' +
 							"If you wish to embed the form, please return to Google Forms and use the 'Send' button in the top right corner to get a correct link.",
 				)
-				return false
+				return undefined
 			}
 			return matches[2]
 		}
 
-		return false
+		return undefined
 	}
 
 	public renderEmbed() {

@@ -24,6 +24,25 @@ export const overrideInsertData = <E extends BlockSlateEditor>(editor: E, option
 		return
 	}
 
+	const insertEmbed = <T>(embedHandler: ResolvedDiscriminatedDatum<EmbedHandler<T>>, embedArtifacts: T, source: string) => {
+		const partialEmbedReference: Omit<ReferenceElement, 'referenceId'> = {
+			type: referenceElementType,
+			children: [{ text: '' }],
+		}
+
+		return editor.insertElementWithReference(partialEmbedReference, embedReferenceDiscriminateBy, getEmbedReference => {
+			getEmbedReference()
+				.getRelativeSingleField(embedContentDiscriminationField)
+				.updateValue(embedHandler!.discriminateBy)
+			const reference = getEmbedReference()
+			embedHandler!.datum.populateEmbedData({
+				embedArtifacts,
+				source,
+				entity: reference,
+			})
+		})
+	}
+
 	editor.insertData = data => {
 		const fragment = data.getData('application/x-slate-fragment')
 
@@ -69,37 +88,14 @@ export const overrideInsertData = <E extends BlockSlateEditor>(editor: E, option
 			} catch {}
 		}
 
-		let embedHandler: ResolvedDiscriminatedDatum<EmbedHandler> | undefined = undefined
-		let embedArtifacts: any = undefined
-
-		for (const [, handler] of options.embedHandlers!) {
-			const result = handler.datum.canHandleSource(text, url)
-			if (result !== false) {
-				embedHandler = handler
-				embedArtifacts = result
-				break
+		;(async () => {
+			for (const [, handler] of options.embedHandlers!) {
+				const result = await handler.datum.handleSource(text, url)
+				if (result !== undefined) {
+					return insertEmbed(handler, result, text)
+				}
 			}
-		}
-
-		if (embedHandler === undefined) {
-			return insertData(data)
-		}
-
-		const partialEmbedReference: Omit<ReferenceElement, 'referenceId'> = {
-			type: referenceElementType,
-			children: [{ text: '' }],
-		}
-
-		return editor.insertElementWithReference(partialEmbedReference, embedReferenceDiscriminateBy, getEmbedReference => {
-			getEmbedReference()
-				.getRelativeSingleField(embedContentDiscriminationField)
-				.updateValue(embedHandler!.discriminateBy)
-			const reference = getEmbedReference()
-			embedHandler!.datum.populateEmbedData({
-				embedArtifacts,
-				source: text,
-				entity: reference,
-			})
-		})
+			insertData(data)
+		})()
 	}
 }

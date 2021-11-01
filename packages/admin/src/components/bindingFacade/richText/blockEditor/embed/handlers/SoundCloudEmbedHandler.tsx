@@ -15,10 +15,10 @@ class SoundCloudEmbedHandler implements EmbedHandler<string> {
 		return <SugaredField field={this.options.soundCloudIdField} />
 	}
 
-	public canHandleSource(source: string, url: URL | undefined): boolean | string {
+	public handleSource(source: string, url: URL | undefined): undefined | string {
 		// Regular url from url bar is ignored intentionally since it doesn't contain track id required for embed/iframe src attribute
 		if (url) {
-			return false
+			return undefined
 		}
 
 		if (source.startsWith('<iframe')) {
@@ -29,14 +29,14 @@ class SoundCloudEmbedHandler implements EmbedHandler<string> {
 				if (iFrame instanceof HTMLIFrameElement) {
 					source = iFrame.src
 				}
-			} catch (_) {
-				return false
+			} catch {
+				return undefined
 			}
 		}
 		try {
 			url = new URL(source)
 		} catch {
-			return false
+			return undefined
 		}
 
 		if (url.host.endsWith('w.soundcloud.com')) {
@@ -44,12 +44,12 @@ class SoundCloudEmbedHandler implements EmbedHandler<string> {
 			const matches = trackUrl.match(/^https:\/\/api\.soundcloud\.com\/tracks\/([^\/]*)$/)
 
 			if (!matches) {
-				return false
+				return undefined
 			}
 			return matches[1]
 		}
 
-		return false
+		return undefined
 	}
 
 	public renderEmbed() {

@@ -15,7 +15,7 @@ class YouTubeEmbedHandler implements EmbedHandler<string> {
 		return <SugaredField field={this.options.youTubeIdField} />
 	}
 
-	public canHandleSource(source: string, url: URL | undefined): boolean | string {
+	public handleSource(source: string, url: URL | undefined): undefined | string {
 		// This method deliberately biases towards the liberal and permissive.
 		if (!url) {
 			if (source.startsWith('youtu')) {
@@ -27,19 +27,19 @@ class YouTubeEmbedHandler implements EmbedHandler<string> {
 			try {
 				url = new URL(source)
 			} catch {
-				return false
+				return undefined
 			}
 		}
 
 		if (url.host.endsWith('youtube.com')) {
 			const id = url.searchParams.get('v')
 
-			return id ?? false
+			return id ?? undefined
 		} else if (url.host.endsWith('youtu.be')) {
 			return url.pathname.substr(1)
 		}
 
-		return false
+		return undefined
 	}
 
 	public renderEmbed() {

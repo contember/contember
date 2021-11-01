@@ -16,7 +16,7 @@ class VimeoEmbedHandler implements EmbedHandler<string> {
 		return <SugaredField field={this.options.vimeoIdField} />
 	}
 
-	public canHandleSource(source: string, url: URL | undefined): boolean | string {
+	public handleSource(source: string, url: URL | undefined): undefined | string {
 		// This method deliberately biases towards the liberal and permissive.
 		if (!url) {
 			if (source.startsWith('vimeo.com')) {
@@ -28,19 +28,19 @@ class VimeoEmbedHandler implements EmbedHandler<string> {
 			try {
 				url = new URL(source)
 			} catch {
-				return false
+				return undefined
 			}
 		}
 
 		if (url.host.endsWith('vimeo.com')) {
 			const matches = url.pathname.substr(1).match(/^(\d+)/)
 			if (matches === null) {
-				return false
+				return undefined
 			}
 			return matches[1]
 		}
 
-		return false
+		return undefined
 	}
 
 	public renderEmbed() {

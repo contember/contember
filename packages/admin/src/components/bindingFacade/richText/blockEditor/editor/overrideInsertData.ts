@@ -12,7 +12,26 @@ export interface OverrideInsertDataOptions {
 }
 
 export const overrideInsertData = <E extends BlockSlateEditor>(editor: E, options: OverrideInsertDataOptions) => {
-	const { insertData } = editor
+	const { insertData, insertFragment } = editor
+
+	const stripNodeReferences = (nodes: SlateNode[]): SlateNode[] =>
+		nodes.flatMap(node => {
+			if (Text.isText(node)) {
+				return node as SlateNode
+			}
+			if (SlateElement.isElement(node) && 'referenceId' in node) {
+				// Essentially unwrapping the node.
+				return stripNodeReferences((node as SlateElement).children)
+			}
+			return {
+				...node,
+				children: stripNodeReferences(node.children),
+			} as Descendant
+		})
+
+	editor.insertFragment = fragment => {
+		insertFragment(stripNodeReferences(fragment))
+	}
 
 	const { embedReferenceDiscriminateBy, embedHandlers, embedContentDiscriminationField } = options
 
@@ -44,36 +63,11 @@ export const overrideInsertData = <E extends BlockSlateEditor>(editor: E, option
 	}
 
 	editor.insertData = data => {
-		const fragment = data.getData('application/x-slate-fragment')
-
-		if (fragment) {
-			const decoded = decodeURIComponent(window.atob(fragment))
-			const nodes = JSON.parse(decoded) as SlateNode[]
-
-			// This may result in invalid nodes. We're relying on normalization here.
-			const stripNodeReferences = (nodes: SlateNode[]): SlateNode[] =>
-				nodes.flatMap(node => {
-					if (Text.isText(node)) {
-						return node as SlateNode
-					}
-					if (SlateElement.isElement(node) && 'referenceId' in node) {
-						// Essentially unwrapping the node.
-						return stripNodeReferences((node as SlateElement).children)
-					}
-					return {
-						...node,
-						children: stripNodeReferences(node.children),
-					} as Descendant
-				})
-
-			const nodesWithoutReferences = stripNodeReferences(nodes)
-
-			editor.insertFragment(nodesWithoutReferences)
-			return
+		if (data.getData('application/x-slate-fragment')) {
+			return insertData(data)
 		}
 
 		const text = data.getData('text/plain').trim()
-
 		if (!text) {
 			return insertData(data)
 		}

@@ -111,8 +111,8 @@ export const RichTextField: FunctionComponent<RichTextFieldProps> = Component(
 				getParent().batchUpdates(getAccessor => {
 					const fieldAccessor = getAccessor().getRelativeSingleField(desugaredField)
 
-					if (SlateNode.string({ children: value }) === '') {
-						fieldAccessor.updateValue(fieldAccessor.valueOnServer === null ? null : '')
+					if (SlateNode.string({ children: value }) === '' && fieldAccessor.valueOnServer === null) {
+						fieldAccessor.updateValue(null)
 						return
 					}
 

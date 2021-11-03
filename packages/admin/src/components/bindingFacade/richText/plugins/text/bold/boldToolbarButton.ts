@@ -1,5 +1,5 @@
 import type { ToolbarButtonSpec } from '../../../toolbars'
-import { boldMark } from './withBold'
+import { boldMark } from './boldMark'
 
 export const boldToolbarButton: ToolbarButtonSpec = {
 	marks: { [boldMark]: true },

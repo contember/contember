@@ -1,5 +1,5 @@
 import type { ToolbarButtonSpec } from '../../../toolbars'
-import { underlineMark } from './withUnderline'
+import { underlineMark } from './underlineMark'
 
 export const underlineToolbarButton: ToolbarButtonSpec = {
 	marks: { [underlineMark]: true },

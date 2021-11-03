@@ -1,0 +1,88 @@
+{
+	"formatVersion": 3,
+	"modifications": [
+		{
+			"modification": "createColumn",
+			"entityName": "Homepage",
+			"field": {
+				"name": "title",
+				"columnName": "title",
+				"nullable": true,
+				"type": "String",
+				"columnType": "text"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "Homepage",
+			"field": {
+				"name": "lead",
+				"columnName": "lead",
+				"nullable": true,
+				"type": "String",
+				"columnType": "text"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "Homepage",
+			"field": {
+				"name": "footer",
+				"columnName": "footer",
+				"nullable": true,
+				"type": "String",
+				"columnType": "text"
+			}
+		},
+		{
+			"modification": "patchAclSchema",
+			"patch": [
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/Homepage/operations/create/title",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/Homepage/operations/create/lead",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/Homepage/operations/create/footer",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/Homepage/operations/read/title",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/Homepage/operations/read/lead",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/Homepage/operations/read/footer",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/Homepage/operations/update/title",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/Homepage/operations/update/lead",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/Homepage/operations/update/footer",
+					"value": true
+				}
+			]
+		}
+	]
+}

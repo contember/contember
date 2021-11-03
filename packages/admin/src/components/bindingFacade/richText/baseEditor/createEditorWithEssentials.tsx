@@ -1,21 +1,36 @@
-import { createElement } from 'react'
-import { createEditor, Editor, Element as SlateElement, Path, Range as SlateRange, Transforms } from 'slate'
+import { createElement, ReactElement } from 'react'
+import {
+	createEditor,
+	Descendant,
+	Editor,
+	Element as SlateElement,
+	Path,
+	Range as SlateRange,
+	Text as SlateText,
+	Transforms,
+} from 'slate'
 import { withHistory } from 'slate-history'
-import { withReact } from 'slate-react'
+import { ReactEditor, withReact } from 'slate-react'
 import { ContemberEditor } from '../ContemberEditor'
-import type { BaseEditor } from './BaseEditor'
 import { DefaultElement } from './DefaultElement'
-import type { ElementNode, ElementSpecifics, TextNode, TextSpecifics, UnderlyingEditor } from './Node'
+import type { TextSpecifics } from './Node'
 import { overrideDeleteBackward, withPaste } from './overrides'
+import { CustomElementPlugin } from './CustomElementPlugin'
+import { CustomMarkPlugin } from './CustomMarkPlugin'
 
-export const createEditorWithEssentials = (defaultElementType: string): BaseEditor => {
-	const underlyingEditor: UnderlyingEditor = withHistory(withReact(createEditor())) as BaseEditor
-	const editorWithEssentials = underlyingEditor as BaseEditor
+export const createEditorWithEssentials = (defaultElementType: string): Editor => {
+	const underlyingEditor = withHistory(withReact(createEditor() as ReactEditor))
 
-	Object.assign<BaseEditor, Partial<BaseEditor>>(editorWithEssentials, {
+	const editor = underlyingEditor as unknown as Editor
+	const { normalizeNode, isInline, isVoid } = editor
+
+	const elements = new Map<string, CustomElementPlugin<any>>()
+	const marks = new Map<string, CustomMarkPlugin>()
+
+	Object.assign<Editor, Partial<Editor>>(editor, {
 		formatVersion: 1,
 		defaultElementType,
-		isDefaultElement: element => element.type === defaultElementType,
+		isDefaultElement: element => 'type' in element && (element as any).type === defaultElementType,
 		createDefaultElement: children => ({
 			type: defaultElementType,
 			children,
@@ -23,62 +38,115 @@ export const createEditorWithEssentials = (defaultElementType: string): BaseEdit
 		insertBetweenBlocks: ([element, path], edge) => {
 			const edgeOffset = edge === 'before' ? 0 : 1
 			const targetPath = path.slice(0, -1).concat(path[path.length - 1] + edgeOffset)
-			Transforms.insertNodes(editorWithEssentials, editorWithEssentials.createDefaultElement([{ text: '' }]), {
+			Transforms.insertNodes(editor, editor.createDefaultElement([{ text: '' }]), {
 				at: targetPath,
 				select: true,
 			})
 		},
 
 		canToggleMarks: () => true,
-		canToggleElement: <E extends ElementNode>() => true,
+		canToggleElement: <E extends SlateElement>() => true,
 
-		hasMarks: <T extends TextNode>(marks: TextSpecifics<T>) => ContemberEditor.hasMarks(editorWithEssentials, marks),
+		hasMarks: <T extends SlateText>(marks: TextSpecifics<T>) => ContemberEditor.hasMarks(editor, marks),
 
 		// TODO in the following function, we need to conditionally trim the selection so that it doesn't potentially
 		// 	include empty strings at the edges of top-level elements.
-		isElementActive: <E extends ElementNode>(elementType: E['type'], suchThat?: ElementSpecifics<E>) =>
-			Array.from(ContemberEditor.topLevelNodes(editorWithEssentials)).every(([node]) =>
-				ContemberEditor.isElementType(node, elementType, suchThat),
-			),
+		isElementActive: <E extends SlateElement>(elementType: E['type'], suchThat?: Partial<E>) => {
+			return (
+				elements.get(elementType)?.isActive?.({ editor, suchThat })
+				?? Array.from(ContemberEditor.topLevelNodes(editor))
+						.every(([node]) => ContemberEditor.isElementType(node, elementType, suchThat))
+			)
+		},
 
-		toggleMarks: <T extends TextNode>(marks: TextSpecifics<T>) => {
-			if (!editorWithEssentials.canToggleMarks(marks)) {
+		toggleMarks: <T extends SlateText>(marks: TextSpecifics<T>) => {
+			if (!editor.canToggleMarks(marks)) {
 				return
 			}
-			const isActive = editorWithEssentials.hasMarks(marks)
+			const isActive = editor.hasMarks(marks)
 			if (isActive) {
-				ContemberEditor.removeMarks(editorWithEssentials, marks)
+				ContemberEditor.removeMarks(editor, marks)
 				return false
 			}
-			ContemberEditor.addMarks(editorWithEssentials, marks)
+			ContemberEditor.addMarks(editor, marks)
 			return true
 		},
-		toggleElement: <E extends ElementNode>(elementType: E['type'], suchThat?: ElementSpecifics<E>) => {}, // TODO
+		toggleElement: <E extends SlateElement>(elementType: E['type'], suchThat?: Partial<E>) => {
+			elements.get(elementType)?.toggleElement?.({
+				editor,
+				suchThat,
+			})
+		},
 
-		canContainAnyBlocks: element => !editorWithEssentials.isInline(element) && !editorWithEssentials.isVoid(element),
+		isInline: element => {
+			return elements.get(element.type)?.isInline ?? isInline(element)
+		},
 
-		serializeNodes: (nodes, errorMessage) => ContemberEditor.serializeNodes(editorWithEssentials, nodes, errorMessage),
+		isVoid: element => {
+			const elIsVoid = elements.get(element.type)?.isVoid
+			if (elIsVoid === undefined) {
+				return isVoid(element)
+			}
+			if (typeof elIsVoid === 'boolean') {
+				return elIsVoid
+			}
+			return elIsVoid({ editor, element })
+		},
+
+		canContainAnyBlocks: element => {
+			if (Editor.isEditor(element)) {
+				return true
+			}
+			return !editor.isInline(element)
+				&& !editor.isVoid(element)
+				&& (elements.has(element.type) ? elements.get(element.type)!.canContainAnyBlocks ?? false : true)
+		},
+
+		serializeNodes: (nodes, errorMessage) => ContemberEditor.serializeNodes(editor, nodes, errorMessage),
 		deserializeNodes: (serializedNodes, errorMessage) =>
-			ContemberEditor.permissivelyDeserializeNodes(editorWithEssentials, serializedNodes, errorMessage),
+			ContemberEditor.permissivelyDeserializeNodes(editor, serializedNodes, errorMessage),
 
 		upgradeFormatBySingleVersion: (node, oldVersion) => {
 			if (SlateElement.isElement(node)) {
 				return {
 					...node,
-					children: node.children.map(child => editorWithEssentials.upgradeFormatBySingleVersion(child, oldVersion)),
+					children: node.children.map(child => editor.upgradeFormatBySingleVersion(child, oldVersion) as Descendant),
 				}
 			}
 			return node
 		},
 
-		renderElement: props => createElement(DefaultElement, props),
+		renderElement: props => {
+			return createElement(elements.get(props.element.type)?.render ?? DefaultElement, props)
+		},
 
 		renderLeafChildren: props => props.children,
-		renderLeaf: props => createElement('span', props.attributes, editorWithEssentials.renderLeafChildren(props)),
+
+		renderLeaf: props => {
+			let el = createElement('span', props.attributes, editor.renderLeafChildren(props))
+			for (const [, mark] of marks) {
+				if (props.leaf[mark.type] === true) {
+					const markerEl = mark.render({ ...props, children: el })
+					if (markerEl !== null) {
+						el = markerEl
+					}
+				}
+			}
+			return el
+		},
 
 		// Just noop functions so that other plugins can safely bubble-call
 		onDOMBeforeInput: () => {},
 		onKeyDown: e => {
+			for (const [, mark] of marks) {
+				if (mark.isHotKey(e.nativeEvent)) {
+					editor.toggleMarks({ [mark.type]: true })
+					e.preventDefault()
+					return
+				}
+			}
+
+
 			// Inline void nodes cannot be deleted by default: https://github.com/ianstormtaylor/slate/issues/3456
 			// This is a hack to get around this issue. The problem is that when an inline void node is selected, Slate's
 			// beforeInput handler doesn't get triggered. However, when we put the caret right after the inline void
@@ -89,10 +157,10 @@ export const createEditorWithEssentials = (defaultElementType: string): BaseEdit
 			if (e.key !== 'Delete' && e.key !== 'Backspace') {
 				return
 			}
-			const selection = editorWithEssentials.selection
+			const selection = editor.selection
 
 			if (selection && SlateRange.isCollapsed(selection)) {
-				const voidEntry = Editor.void(editorWithEssentials, {
+				const voidEntry = Editor.void(editor, {
 					at: selection,
 					mode: 'lowest',
 					voids: true,
@@ -101,26 +169,51 @@ export const createEditorWithEssentials = (defaultElementType: string): BaseEdit
 					return
 				}
 				const [node, nodePath] = voidEntry
-				if (editorWithEssentials.isInline(node)) {
+				if (editor.isInline(node)) {
 					const adjacentPoint =
 						e.key === 'Backspace'
-							? Editor.point(editorWithEssentials, Path.next(nodePath), {
+							? Editor.point(editor, Path.next(nodePath), {
 									edge: 'start',
 							  })
-							: Editor.point(editorWithEssentials, Path.previous(nodePath), {
+							: Editor.point(editor, Path.previous(nodePath), {
 									edge: 'end',
 							  })
-					Transforms.select(editorWithEssentials, adjacentPoint)
+					Transforms.select(editor, adjacentPoint)
 				}
 			}
 		},
 		onFocus: () => {},
 		onBlur: () => {},
+		normalizeNode: ([node, path]) => {
+			if (!SlateElement.isElement(node)) {
+				normalizeNode([node, path])
+				return
+			}
+			const plugin = elements.get(node.type)
+			if (plugin?.normalizeNode) {
+				const result = plugin.normalizeNode({
+					element: node,
+					path,
+					editor,
+				})
+				if (result === true) {
+					normalizeNode([node, path])
+				}
+			} else {
+				normalizeNode([node, path])
+			}
+		},
+		registerElement: plugin => {
+			elements.set(plugin.type, plugin)
+		},
+		registerMark: plugin => {
+			marks.set(plugin.type, plugin)
+		},
 	})
 
-	overrideDeleteBackward(editorWithEssentials)
+	overrideDeleteBackward(editor)
 
-	withPaste(editorWithEssentials)
+	withPaste(editor)
 
-	return editorWithEssentials as BaseEditor
+	return editor
 }

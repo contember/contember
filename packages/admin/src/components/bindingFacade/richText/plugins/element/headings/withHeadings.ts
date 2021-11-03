@@ -1,42 +1,24 @@
-import { createElement } from 'react'
-import {
-	Editor,
-	Editor as SlateEditor,
-	Element as SlateElement,
-	Node as SlateNode,
-	Path as SlatePath,
-	Point,
-	Range as SlateRange,
-	Transforms,
-} from 'slate'
-import type { BaseEditor, ElementNode, ElementSpecifics, WithAnotherNodeType } from '../../../baseEditor'
+import { Editor, Editor as SlateEditor, Element as SlateElement, Point, Range as SlateRange, Transforms } from 'slate'
 import { ContemberEditor } from '../../../ContemberEditor'
-import type { EditorWithHeadings, WithHeadings } from './EditorWithHeadings'
-import { HeadingElement, headingElementType } from './HeadingElement'
-import { HeadingRenderer, HeadingRendererProps } from './HeadingRenderer'
+import {
+	ejectHeadingElement,
+	HeadingElement,
+	headingElementPlugin,
+	headingElementType,
+	isHeadingElement,
+} from './HeadingElement'
+import { headingHtmlDeserializer } from './HeadingHtmlDeserializer'
 
-export const withHeadings = <E extends BaseEditor>(editor: E): EditorWithHeadings<E> => {
-	const e: E & Partial<WithHeadings<WithAnotherNodeType<E, HeadingElement>>> = editor
+export const withHeadings = <E extends Editor>(editor: E): E => {
 	const {
 		canToggleElement,
-		canContainAnyBlocks,
-		renderElement,
 		insertBreak,
-		toggleElement,
 		deleteBackward,
-		processBlockPaste,
 	} = editor
 
-	const isHeading = (
-		element: SlateNode | ElementNode,
-		suchThat?: Partial<ElementSpecifics<HeadingElement>>,
-	): element is HeadingElement => ContemberEditor.isElementType(element, headingElementType, suchThat)
-	const ejectHeading = (elementPath: SlatePath) => {
-		ContemberEditor.ejectElement(e, elementPath)
-		Transforms.setNodes(e, { type: e.defaultElementType }, { at: elementPath })
-	}
 
-	e.isHeading = isHeading
+	editor.registerElement(headingElementPlugin)
+	editor.htmlDeserializer.registerPlugin(headingHtmlDeserializer)
 
 	// T O D O cache this
 	// e.getNumberedHeadingSection = function recurse(element): number[] {
@@ -65,7 +47,7 @@ export const withHeadings = <E extends BaseEditor>(editor: E): EditorWithHeading
 	// 	return normalizedPrevious.map(level => Math.max(level, 1))
 	// }
 
-	e.canToggleElement = (elementType, suchThat) => {
+	editor.canToggleElement = (elementType, suchThat) => {
 		if (elementType !== headingElementType) {
 			return canToggleElement(elementType, suchThat)
 		}
@@ -79,79 +61,41 @@ export const withHeadings = <E extends BaseEditor>(editor: E): EditorWithHeading
 		const [closestBlockElement, closestBlockPath] = closestBlockEntry
 
 		return (
-			closestBlockPath.length === 1 && (e.isDefaultElement(closestBlockElement) || e.isHeading!(closestBlockElement))
+			closestBlockPath.length === 1 && SlateElement.isElement(closestBlockElement) && (editor.isDefaultElement(closestBlockElement) || isHeadingElement(closestBlockElement))
 		)
 	}
 
-	// TODO in the following function, we need to conditionally trim the selection so that it doesn't potentially
-	// 	include empty strings at the edges of top-level elements.
-	e.toggleElement = (elementType, suchThat) => {
-		if (elementType === headingElementType) {
-			SlateEditor.withoutNormalizing(e, () => {
-				const topLevelNodes = Array.from(ContemberEditor.topLevelNodes(e))
 
-				if (topLevelNodes.every(([node]) => isHeading(node, suchThat))) {
-					for (const [, path] of topLevelNodes) {
-						ejectHeading(path)
-					}
-				} else {
-					for (const [node, path] of topLevelNodes) {
-						if (isHeading(node, suchThat)) {
-							continue
-						}
-						ContemberEditor.ejectElement(e, path)
-						const newProps: Partial<HeadingElement> = {
-							...suchThat,
-							type: headingElementType,
-						}
-						Transforms.setNodes(e, newProps, {
-							at: path,
-						})
-					}
-				}
-			})
-		}
-		return toggleElement(elementType, suchThat)
-	}
 
-	e.canContainAnyBlocks = element => (element.type === headingElementType ? false : canContainAnyBlocks(element))
-
-	e.renderElement = props => {
-		if (isHeading(props.element)) {
-			return createElement(HeadingRenderer, props as HeadingRendererProps)
-		}
-		return renderElement(props)
-	}
-
-	e.insertBreak = () => {
-		SlateEditor.withoutNormalizing(e, () => {
+	editor.insertBreak = () => {
+		SlateEditor.withoutNormalizing(editor, () => {
 			insertBreak()
 
-			const { selection } = e
+			const { selection } = editor
 
 			if (selection === null || SlateRange.isExpanded(selection)) {
 				return
 			}
-			const [topLevelElement, path] = SlateEditor.node(e, selection, {
+			const [topLevelElement, path] = SlateEditor.node(editor, selection, {
 				depth: 1,
 			})
 			// TODO this is too naive. If the next sibling already was a heading, this will ruin it.
-			if (isHeading(topLevelElement)) {
-				ejectHeading(path)
+			if (isHeadingElement(topLevelElement)) {
+				ejectHeadingElement(editor, path)
 			}
 		})
 	}
 
-	e.deleteBackward = unit => {
-		const selection = e.selection
+	editor.deleteBackward = unit => {
+		const selection = editor.selection
 		if (unit !== 'character' || !selection || !SlateRange.isCollapsed(selection) || selection.focus.offset !== 0) {
 			return deleteBackward(unit)
 		}
 		// The offset being zero doesn't necessarily imply that selection refers to the start of a heading.
 		// It's just a way to early-exit.
 
-		const closestNumberedEntry = Editor.above<HeadingElement>(e, {
-			match: node => SlateElement.isElement(node) && isHeading(node, { isNumbered: true }),
+		const closestNumberedEntry = Editor.above<HeadingElement>(editor, {
+			match: node => SlateElement.isElement(node) && isHeadingElement(node, { isNumbered: true }),
 		})
 		if (closestNumberedEntry === undefined) {
 			return deleteBackward(unit)
@@ -169,20 +113,5 @@ export const withHeadings = <E extends BaseEditor>(editor: E): EditorWithHeading
 		)
 	}
 
-	e.processBlockPaste = (element, next, cumulativeTextAttrs) => {
-		const match = element.nodeName.match(/^H(?<level>[1-6])$/)
-		if (match !== null) {
-			const isNumbered = (element.getAttribute('style')?.match(/mso-list:\w+ level\d+ \w+/) ?? null) !== null
-			const children = isNumbered ? editor.wordPasteListItemContent(element.childNodes) : element.childNodes
-			return {
-				type: headingElementType,
-				level: parseInt(match.groups!.level),
-				children: next(children, cumulativeTextAttrs),
-				isNumbered,
-			}
-		}
-		return processBlockPaste(element, next, cumulativeTextAttrs)
-	}
-
-	return e as unknown as EditorWithHeadings<E>
+	return editor
 }

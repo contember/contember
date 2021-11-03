@@ -2,6 +2,7 @@ import { SugaredField, SugaredFieldProps, useField } from '@contember/binding'
 import { memo, ReactNode } from 'react'
 import type { SugaredDiscriminateBy } from '../../../../discrimination'
 import type { EmbedHandler, PopulateEmbedDataOptions } from '../core'
+import { parseIframeSrc, parseUrl } from '../../../utils'
 
 class GoogleFormEmbedHandler implements EmbedHandler<string> {
 	public readonly debugName = 'GoogleForm'
@@ -15,49 +16,37 @@ class GoogleFormEmbedHandler implements EmbedHandler<string> {
 		return <SugaredField field={this.options.googleFormIdField} />
 	}
 
-	public canHandleSource(source: string, url: URL | undefined): boolean | string {
+	public handleSource(source: string, url: URL | undefined): undefined | string {
 		// This method deliberately biases towards the liberal and permissive.
 		if (!url) {
-			if (source.startsWith('<iframe')) {
-				const parser = new DOMParser()
-				try {
-					const { body } = parser.parseFromString(source, 'text/html')
-					if (body.children.length === 1 && body.children[0] instanceof HTMLIFrameElement) {
-						const iFrame = body.children[0]
-						source = iFrame.src
-					}
-				} catch (_) {
-					return false
-				}
-			}
+			source = parseIframeSrc(source) ?? source
 			if (source.startsWith('docs.google.com')) {
 				source = `https://${source}`
 			}
-			try {
-				url = new URL(source)
-			} catch {
-				return false
+			url = parseUrl(source)
+			if (!url) {
+				return undefined
 			}
 		}
 
-		if (url.host.endsWith('docs.google.com')) {
-			const matches = url.pathname.match(/^\/forms\/d(\/e)?\/([^\/]+).*$/)
-
-			if (!matches) {
-				return false
-			}
-			if (matches[1] === undefined) {
-				alert(
-					this.options.nonEmbedLinkWarning ??
-						'Detected a Google Form but the link supplied cannot be reliably embedded.\n\n' +
-							"If you wish to embed the form, please return to Google Forms and use the 'Send' button in the top right corner to get a correct link.",
-				)
-				return false
-			}
-			return matches[2]
+		if (!url.host.endsWith('docs.google.com')) {
+			return undefined
 		}
+		const matches = url.pathname.match(/^\/forms\/d(\/e)?\/([^\/]+).*$/)
 
-		return false
+		if (!matches) {
+			return undefined
+		}
+		if (matches[1] === undefined) {
+			alert(
+				this.options.nonEmbedLinkWarning ??
+					'Detected a Google Form but the link supplied cannot be reliably embedded.\n\n' +
+						"If you wish to embed the form, please return to Google Forms and use the 'Send' button in the top right corner to get a correct link.",
+			)
+			return undefined
+		}
+		return matches[2]
+
 	}
 
 	public renderEmbed() {

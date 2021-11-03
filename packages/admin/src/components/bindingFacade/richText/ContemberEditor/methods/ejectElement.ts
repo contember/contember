@@ -1,7 +1,6 @@
-import { Element as SlateElement, Node as SlateNode, Path, Transforms } from 'slate'
-import type { BaseEditor } from '../../baseEditor'
+import { Editor as SlateEditor, Element as SlateElement, Node as SlateNode, Path, Transforms } from 'slate'
 
-export const ejectElement = <E extends BaseEditor>(editor: E, path: Path) => {
+export const ejectElement = <E extends SlateEditor>(editor: E, path: Path) => {
 	const element = SlateNode.get(editor, path)
 
 	if (!SlateElement.isElement(element)) {

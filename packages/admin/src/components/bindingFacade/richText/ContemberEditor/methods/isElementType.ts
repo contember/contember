@@ -1,10 +1,9 @@
 import { Element as SlateElement, Node as SlateNode } from 'slate'
-import type { ElementNode, ElementSpecifics } from '../../baseEditor'
 
-export const isElementType = <Element extends ElementNode>(
-	element: SlateNode | ElementNode,
+export const isElementType = <Element extends SlateElement>(
+	element: SlateNode,
 	type: Element['type'],
-	suchThat?: ElementSpecifics<Element>,
+	suchThat?: Partial<Element>,
 ): boolean => {
 	if (!SlateElement.isElement(element) || element.type !== type) {
 		return false
@@ -14,7 +13,7 @@ export const isElementType = <Element extends ElementNode>(
 	}
 
 	for (const prop in suchThat) {
-		const propValue = suchThat[prop as keyof ElementSpecifics<Element>]
+		const propValue = suchThat[prop]
 		const propPresent = prop in element
 
 		if (!propValue && !propPresent) {

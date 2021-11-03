@@ -2,6 +2,7 @@ import { SugaredField, SugaredFieldProps, useField } from '@contember/binding'
 import { memo, ReactNode } from 'react'
 import type { SugaredDiscriminateBy } from '../../../../discrimination'
 import type { EmbedHandler, PopulateEmbedDataOptions } from '../core'
+import { parseUrl } from '../../../utils'
 
 class YouTubeEmbedHandler implements EmbedHandler<string> {
 	public readonly debugName = 'YouTube'
@@ -15,7 +16,7 @@ class YouTubeEmbedHandler implements EmbedHandler<string> {
 		return <SugaredField field={this.options.youTubeIdField} />
 	}
 
-	public canHandleSource(source: string, url: URL | undefined): boolean | string {
+	public handleSource(source: string, url: URL | undefined): undefined | string {
 		// This method deliberately biases towards the liberal and permissive.
 		if (!url) {
 			if (source.startsWith('youtu')) {
@@ -24,22 +25,21 @@ class YouTubeEmbedHandler implements EmbedHandler<string> {
 			if (source.startsWith('www.')) {
 				source = `https://${source}`
 			}
-			try {
-				url = new URL(source)
-			} catch {
-				return false
+			url = parseUrl(source)
+			if (!url) {
+				return undefined
 			}
 		}
 
 		if (url.host.endsWith('youtube.com')) {
 			const id = url.searchParams.get('v')
 
-			return id ?? false
+			return id ?? undefined
 		} else if (url.host.endsWith('youtu.be')) {
 			return url.pathname.substr(1)
 		}
 
-		return false
+		return undefined
 	}
 
 	public renderEmbed() {

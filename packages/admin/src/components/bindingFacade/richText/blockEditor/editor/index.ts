@@ -1,3 +1,2 @@
-export * from './BlockSlateEditor'
+export * from './EditorWithBlocks'
 export * from './createBlockEditor'
-export * from './Unstable_BlockEditorDiagnostics'

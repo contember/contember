@@ -1,7 +1,7 @@
-import { Node as SlateNode, Path } from 'slate'
-import type { BaseEditor, TextNode, TextSpecifics } from '../../baseEditor'
+import { Editor as SlateEditor, Node as SlateNode, Path, Text as SlateText } from 'slate'
+import type { TextSpecifics } from '../../baseEditor'
 
-export const hasMarks = <T extends TextNode, E extends BaseEditor>(
+export const hasMarks = <T extends SlateText, E extends SlateEditor>(
 	editor: E,
 	marks: TextSpecifics<T>,
 	options: {

@@ -1,42 +1,21 @@
-import { BindingError, EntityAccessor, FieldAccessor, RelativeSingleField } from '@contember/binding'
+import { BindingError, EntityAccessor, RelativeSingleField } from '@contember/binding'
 import type { ReactNode } from 'react'
 import { Editor, Element as SlateElement, PathRef } from 'slate'
-import type { ElementNode } from '../baseEditor'
-import type { BlockSlateEditor } from './editor'
-import {
-	ContemberContentPlaceholderElement,
-	contemberContentPlaceholderType,
-	ContemberFieldElement,
-	contemberFieldElementType,
-} from './elements'
-import type { FieldBackedElement } from './FieldBackedElement'
 
 export interface UseBlockEditorSlateNodesOptions {
-	editor: BlockSlateEditor
-	blockElementCache: WeakMap<EntityAccessor, ElementNode>
+	editor: Editor
+	blockElementCache: WeakMap<EntityAccessor, SlateElement>
 	blockElementPathRefs: Map<string, PathRef>
-	contemberFieldElementCache: WeakMap<FieldAccessor<string>, ContemberFieldElement>
 	blockContentField: RelativeSingleField
 	topLevelBlocks: EntityAccessor[]
-	leadingFieldBackedElements: FieldBackedElement[]
-	trailingFieldBackedElements: FieldBackedElement[]
-	leadingFieldBackedAccessors: FieldAccessor<string>[]
-	trailingFieldBackedAccessors: FieldAccessor<string>[]
-	placeholder: ReactNode
 }
 
 export const useBlockEditorSlateNodes = ({
 	editor,
 	blockElementCache,
 	blockElementPathRefs,
-	contemberFieldElementCache,
 	blockContentField,
 	topLevelBlocks,
-	leadingFieldBackedElements,
-	trailingFieldBackedElements,
-	leadingFieldBackedAccessors,
-	trailingFieldBackedAccessors,
-	placeholder,
 }: UseBlockEditorSlateNodesOptions): SlateElement[] => {
 	if (editor.operations.length) {
 		// This is *ABSOLUTELY CRUCIAL*!
@@ -50,50 +29,18 @@ export const useBlockEditorSlateNodes = ({
 		return editor.children as SlateElement[]
 	}
 
-	const adjacentAccessorsToElements = (
-		elements: FieldBackedElement[],
-		accessors: FieldAccessor<string>[],
-	): SlateElement[] =>
-		elements.map((normalizedElement, index) => {
-			const accessor = accessors[index]
-			const existingElement = contemberFieldElementCache.get(accessor)
-			if (existingElement) {
-				return existingElement
-			}
-
-			let element: ContemberFieldElement
-			const fieldValue = accessor.value
-
-			if (fieldValue === null || fieldValue === '' || normalizedElement.format === 'plainText') {
-				element = {
-					type: contemberFieldElementType,
-					children: [{ text: fieldValue || '' }],
-				}
-			} else {
-				const deserialized = editor.deserializeNodes(fieldValue)
-				element = {
-					type: contemberFieldElementType,
-					children: deserialized,
-				}
-			}
-			contemberFieldElementCache.set(accessor, element)
-			return element
-		})
-
 	const topLevelBlockElements = topLevelBlocks.length
 		? topLevelBlocks.map((entity, index) => {
 				const existingBlockElement = blockElementCache.get(entity)
 
 				const blockPathRef = blockElementPathRefs.get(entity.id)
-				const desiredIndex = index + leadingFieldBackedElements.length
-
 				if (blockPathRef === undefined) {
-					blockElementPathRefs.set(entity.id, Editor.pathRef(editor, [desiredIndex], { affinity: 'backward' }))
+					blockElementPathRefs.set(entity.id, Editor.pathRef(editor, [index], { affinity: 'backward' }))
 				} else {
 					const current = blockPathRef.current
-					if (current === null || current.length !== 1 || current[0] !== desiredIndex) {
+					if (current === null || current.length !== 1 || current[0] !== index) {
 						blockPathRef.unref()
-						blockElementPathRefs.set(entity.id, Editor.pathRef(editor, [desiredIndex], { affinity: 'backward' }))
+						blockElementPathRefs.set(entity.id, Editor.pathRef(editor, [index], { affinity: 'backward' }))
 					}
 				}
 
@@ -102,7 +49,7 @@ export const useBlockEditorSlateNodes = ({
 				}
 				const contentField = entity.getRelativeSingleField(blockContentField)
 
-				let blockElement: ElementNode
+				let blockElement: SlateElement
 
 				if (contentField.value === null || contentField.value === '') {
 					blockElement = editor.createDefaultElement([{ text: '' }])
@@ -112,21 +59,13 @@ export const useBlockEditorSlateNodes = ({
 					blockElement = editor.deserializeNodes(
 						contentField.value,
 						`BlockEditor: The 'contentField' of a block contains invalid data.`,
-					)[0] as ElementNode
+					)[0] as SlateElement
 				}
 				blockElementCache.set(entity, blockElement)
 				return blockElement
 		  })
 		: [
-				{
-					type: contemberContentPlaceholderType,
-					children: [{ text: '' }],
-					placeholder,
-				} as ContemberContentPlaceholderElement,
+				editor.createDefaultElement([{ text: '' }]),
 		  ]
-	return ([] as SlateElement[]).concat(
-		adjacentAccessorsToElements(leadingFieldBackedElements, leadingFieldBackedAccessors),
-		topLevelBlockElements,
-		adjacentAccessorsToElements(trailingFieldBackedElements, trailingFieldBackedAccessors),
-	)
+	return topLevelBlockElements
 }

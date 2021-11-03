@@ -1,5 +1,6 @@
 import {
 	Editor,
+	Element as SlateElement,
 	Location,
 	Node as SlateNode,
 	NodeEntry,
@@ -8,24 +9,19 @@ import {
 	Range as SlateRange,
 	Transforms,
 } from 'slate'
-import type { ElementNode } from '../../baseEditor'
 import { ContemberEditor } from '../../ContemberEditor'
-import type { FieldBackedElement } from '../FieldBackedElement'
-import type { BlockSlateEditor } from './BlockSlateEditor'
+import type { EditorWithBlocks } from './EditorWithBlocks'
+import { isReferenceElement } from '../elements'
 
 export interface OverridePrepareElementForInsertionOptions {
-	leadingFields: FieldBackedElement[]
-	trailingFields: FieldBackedElement[]
 }
 
-export const overridePrepareElementForInsertion = <E extends BlockSlateEditor>(
+export const overridePrepareElementForInsertion = <E extends EditorWithBlocks>(
 	editor: E,
 	options: OverridePrepareElementForInsertionOptions,
 ) => {
 	// No need to call the implementation underneath. By default, it just throws anyway.
 	// const { prepareElementForInsertion } = editor
-
-	const { leadingFields, trailingFields } = options
 
 	editor.prepareElementForInsertion = node => {
 		const selection = editor.selection
@@ -54,7 +50,7 @@ export const overridePrepareElementForInsertion = <E extends BlockSlateEditor>(
 		const targetPoint = targetLocation
 
 		// TODO maybe introduce some sort of a systemic handling for top-level-only elements like this.
-		if (!editor.isReferenceElement(node)) {
+		if (!isReferenceElement(node)) {
 			if (targetPoint.offset === 0) {
 				return targetPoint.path
 			}
@@ -66,24 +62,13 @@ export const overridePrepareElementForInsertion = <E extends BlockSlateEditor>(
 
 		const [closestBlockElement, closestBlockPath] = ContemberEditor.closestBlockEntry(editor, {
 			at: targetPoint,
-		})! as NodeEntry<ElementNode>
+		})! as NodeEntry<SlateElement>
 
 		if (editor.canContainAnyBlocks(closestBlockElement)) {
 			return targetPoint.path
 		}
 
-		if (editor.isContemberFieldElement(closestBlockElement)) {
-			const topLevelIndex = closestBlockPath[0]
-			if (topLevelIndex < leadingFields.length) {
-				return [leadingFields.length] // Place it after the leading fields
-			}
-			if (editor.children.length - trailingFields.length <= topLevelIndex) {
-				return [editor.children.length - trailingFields.length - 1] // Place it before the trailing fields
-			}
-			// Should probably throw from here
-		}
-
-		if (editor.isReferenceElement(closestBlockElement)) {
+		if (isReferenceElement(closestBlockElement)) {
 			const newPath = SlatePath.next(closestBlockPath)
 			Promise.resolve().then(() => {
 				Transforms.select(editor, newPath)

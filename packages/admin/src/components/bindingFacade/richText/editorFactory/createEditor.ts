@@ -1,5 +1,5 @@
 import { identityFunction } from '@contember/react-utils'
-import { BaseEditor, createEditorWithEssentials } from '../baseEditor'
+import { createEditorWithEssentials } from '../baseEditor'
 import {
 	withAnchors,
 	withBold,
@@ -18,9 +18,10 @@ import {
 } from '../plugins'
 import type { BuiltinEditorPlugins } from './BuiltinEditorPlugins'
 import { defaultEditorPluginPreset } from './presets'
+import { Editor as SlateEditor } from 'slate'
 
 const pluginAugmenters: {
-	[pluginName in BuiltinEditorPlugins]: (editor: BaseEditor) => BaseEditor
+	[pluginName in BuiltinEditorPlugins]: (editor: SlateEditor) => SlateEditor
 } = {
 	anchor: withAnchors,
 	paragraph: withParagraphs,
@@ -41,13 +42,13 @@ const pluginAugmenters: {
 
 export interface CreateEditorPublicOptions {
 	plugins?: BuiltinEditorPlugins[]
-	augmentEditor?: (baseEditor: BaseEditor) => BaseEditor
-	augmentEditorBuiltins?: (editor: BaseEditor) => BaseEditor
+	augmentEditor?: (baseEditor: SlateEditor) => SlateEditor
+	augmentEditorBuiltins?: (editor: SlateEditor) => SlateEditor
 }
 
 export interface CreateEditorOptions extends CreateEditorPublicOptions {
 	defaultElementType: string
-	addEditorBuiltins: (augmentedBaseEditor: BaseEditor) => BaseEditor
+	addEditorBuiltins: (augmentedBaseEditor: SlateEditor) => SlateEditor
 }
 
 export const createEditor = ({
@@ -57,7 +58,7 @@ export const createEditor = ({
 	addEditorBuiltins,
 	augmentEditor = identityFunction,
 }: CreateEditorOptions) => {
-	let baseEditor: BaseEditor = createEditorWithEssentials(defaultElementType)
+	let baseEditor: SlateEditor = createEditorWithEssentials(defaultElementType)
 
 	for (const plugin of new Set(plugins)) {
 		baseEditor = pluginAugmenters[plugin](baseEditor)

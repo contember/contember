@@ -1,17 +1,17 @@
 import { BindingError, FieldAccessor } from '@contember/binding'
-import type { BaseEditor, ElementNode } from '../baseEditor'
+import { Descendant, Editor } from 'slate'
 
 export interface UseRichTextFieldEditorNodeOptions {
-	editor: BaseEditor
+	editor: Editor
 	fieldAccessor: FieldAccessor<string>
-	contemberFieldElementCache: WeakMap<FieldAccessor<string>, ElementNode[]>
+	contemberFieldElementCache: WeakMap<FieldAccessor<string>, Descendant[]>
 }
 
 export const useRichTextFieldNodes = ({
 	editor,
 	fieldAccessor,
 	contemberFieldElementCache,
-}: UseRichTextFieldEditorNodeOptions): ElementNode[] => {
+}: UseRichTextFieldEditorNodeOptions): Descendant[] => {
 	if (contemberFieldElementCache.has(fieldAccessor)) {
 		return contemberFieldElementCache.get(fieldAccessor)!
 	}
@@ -21,7 +21,7 @@ export const useRichTextFieldNodes = ({
 		throw new BindingError(`RichTextField: the underlying field does not contain a string value.`)
 	}
 
-	const elements: ElementNode[] =
+	const elements: Descendant[] =
 		fieldValue === null || fieldValue === ''
 			? [editor.createDefaultElement([{ text: '' }])]
 			: [
@@ -29,7 +29,7 @@ export const useRichTextFieldNodes = ({
 						editor.deserializeNodes(
 							fieldValue,
 							`RichTextField: the underlying field contains invalid JSON.`,
-						) as ElementNode[],
+						) as Descendant[],
 					),
 			  ]
 	contemberFieldElementCache.set(fieldAccessor, elements)

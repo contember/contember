@@ -25,6 +25,6 @@
 		"test:with-coverage": "jest --coverage=true"
 	},
 	"dependencies": {
-		"@contember/schema": "^0.11.3"
+		"@contember/schema": "^0.11.5"
 	}
 }

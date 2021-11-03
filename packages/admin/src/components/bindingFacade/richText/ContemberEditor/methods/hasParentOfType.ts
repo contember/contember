@@ -1,12 +1,11 @@
-import { Node as SlateNode, NodeEntry, Path as SlatePath } from 'slate'
-import type { BaseEditor, ElementNode, ElementSpecifics } from '../../baseEditor'
+import { Editor as SlateEditor, Element as SlateElement, Node as SlateNode, NodeEntry, Path as SlatePath } from 'slate'
 import { ContemberEditor } from '../index'
 
-export const hasParentOfType = <Editor extends BaseEditor, Element extends ElementNode>(
+export const hasParentOfType = <Editor extends SlateEditor, Element extends SlateElement>(
 	editor: Editor,
-	nodeEntry: NodeEntry<SlateNode | ElementNode>,
+	nodeEntry: NodeEntry<SlateNode | SlateElement>,
 	type: Element['type'],
-	suchThat?: ElementSpecifics<Element>,
+	suchThat?: Partial<Element>,
 ): boolean => {
 	const [, path] = nodeEntry
 	if (path.length === 1) {

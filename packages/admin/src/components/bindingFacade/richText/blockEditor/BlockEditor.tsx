@@ -3,10 +3,8 @@ import {
 	Component,
 	EntityAccessor,
 	EntityId,
-	EntityListSubTree,
 	EntityRealmKey,
 	Environment,
-	FieldAccessor,
 	FieldValue,
 	HasMany,
 	SugaredField,
@@ -16,17 +14,15 @@ import {
 	useDesugaredRelativeEntityList,
 	useDesugaredRelativeSingleField,
 	useEntity,
-	useEntityBeforePersist,
 	useEntityBeforeUpdate,
 	useEntityList,
 	useEntityPersistSuccess,
 	useEnvironment,
-	useField,
 	useSortedEntities,
 	VariableInputTransformer,
 } from '@contember/binding'
-import { emptyArray, noop, useConstantLengthInvariant } from '@contember/react-utils'
-import { EditorCanvas } from '@contember/ui'
+import { emptyArray, noop } from '@contember/react-utils'
+import { EditorCanvas, EditorCanvasSize } from '@contember/ui'
 import {
 	Fragment,
 	FunctionComponent,
@@ -38,12 +34,11 @@ import {
 	useRef,
 	useState,
 } from 'react'
-import { Editor, PathRef, Range as SlateRange } from 'slate'
-import { Editable, Slate } from 'slate-react'
+import { Editor, Element as SlateElement, PathRef, Range as SlateRange } from 'slate'
+import { Slate } from 'slate-react'
 import { getDiscriminatedBlock, useNormalizedBlocks } from '../../blocks'
 import { Repeater } from '../../collections'
 import { SugaredDiscriminateBy, useDiscriminatedData } from '../../discrimination'
-import type { ElementNode } from '../baseEditor'
 import type { CreateEditorPublicOptions } from '../editorFactory'
 import { RichEditor } from '../RichEditor'
 import {
@@ -53,18 +48,21 @@ import {
 	ToolbarButtonSpec,
 } from '../toolbars'
 import { BlockHoveringToolbarContents, BlockHoveringToolbarContentsProps } from './BlockHoveringToolbarContents'
-import { createBlockEditor, Unstable_BlockEditorDiagnostics } from './editor'
-import type { ContemberFieldElement } from './elements'
+import { createBlockEditor } from './editor'
 import type { EmbedHandler } from './embed'
 import type { FieldBackedElement } from './FieldBackedElement'
 import { ContentOutlet, ContentOutletProps, useEditorReferenceBlocks } from './templating'
 import { useBlockEditorSlateNodes } from './useBlockEditorSlateNodes'
+import { EditableCanvas } from '../baseEditor/EditableCanvas'
+import { TextField } from '../../fields'
+import { RichTextField } from '../RichTextField'
 
 export interface BlockEditorProps extends SugaredRelativeEntityList, CreateEditorPublicOptions {
-	label: ReactNode
+	label: string
 	contentField: SugaredFieldProps['field']
 	sortableBy: SugaredFieldProps['field']
 	children?: ReactNode
+	size?: EditorCanvasSize
 
 	leadingFieldBackedElements?: FieldBackedElement[]
 	trailingFieldBackedElements?: FieldBackedElement[]
@@ -81,11 +79,8 @@ export interface BlockEditorProps extends SugaredRelativeEntityList, CreateEdito
 	inlineButtons?: HoveringToolbarsProps['inlineButtons']
 	blockButtons?: BlockHoveringToolbarContentsProps['blockButtons']
 	otherBlockButtons?: BlockHoveringToolbarContentsProps['otherBlockButtons']
-
-	unstable_diagnosticLog?: Unstable_BlockEditorDiagnostics
 }
 
-// TODO enforce that leadingFieldBackedElements and trailingFieldBackedElements always have the same length
 const BlockEditorComponent: FunctionComponent<BlockEditorProps> = Component(
 	props => {
 		const environment = useEnvironment()
@@ -100,6 +95,7 @@ const BlockEditorComponent: FunctionComponent<BlockEditorProps> = Component(
 			contentField,
 			sortableBy,
 			children,
+			size,
 
 			leadingFieldBackedElements = emptyArray,
 			trailingFieldBackedElements = emptyArray,
@@ -118,8 +114,6 @@ const BlockEditorComponent: FunctionComponent<BlockEditorProps> = Component(
 			plugins,
 			augmentEditor,
 			augmentEditorBuiltins,
-
-			unstable_diagnosticLog,
 
 			...blockListProps
 		} = props
@@ -140,10 +134,6 @@ const BlockEditorComponent: FunctionComponent<BlockEditorProps> = Component(
 		const desugaredReferenceDiscriminationField = useDesugaredRelativeSingleField(referenceDiscriminationField)
 		const desugaredEmbedContentDiscriminationField = useDesugaredRelativeSingleField(embedContentDiscriminationField)
 
-		//
-
-		const leadingAccessors = useFieldBackedElements(parentEntity, leadingFieldBackedElements)
-		const trailingAccessors = useFieldBackedElements(parentEntity, trailingFieldBackedElements)
 
 		const editorReferenceBlocks = useEditorReferenceBlocks(children)
 		const { entities: topLevelBlocks } = useSortedEntities(blockList, sortableBy)
@@ -164,9 +154,7 @@ const BlockEditorComponent: FunctionComponent<BlockEditorProps> = Component(
 		)
 
 		//
-
-		const [contemberFieldElementCache] = useState(() => new WeakMap<FieldAccessor<string>, ContemberFieldElement>())
-		const [blockElementCache] = useState(() => new WeakMap<EntityAccessor, ElementNode>())
+		const [blockElementCache] = useState(() => new WeakMap<EntityAccessor, SlateElement>())
 		const [blockElementPathRefs] = useState(() => new Map<string, PathRef>())
 		const [referencedEntityCache] = useState(() => new Map<EntityId, EntityRealmKey>())
 
@@ -190,7 +178,6 @@ const BlockEditorComponent: FunctionComponent<BlockEditorProps> = Component(
 				blockContentField: desugaredBlockContentField,
 				blockElementCache,
 				blockElementPathRefs,
-				contemberFieldElementCache,
 				createMonolithicReference: referenceList
 					? initialize => referenceList.getAccessor().createNewEntity(initialize)
 					: undefined,
@@ -205,17 +192,12 @@ const BlockEditorComponent: FunctionComponent<BlockEditorProps> = Component(
 					: undefined,
 				getParentEntityRef,
 				isMutatingRef,
-				leadingFields: leadingFieldBackedElements,
-				trailingFields: trailingFieldBackedElements,
-				placeholder: label,
 				plugins,
 				referencedEntityCache,
 				referenceDiscriminationField: desugaredReferenceDiscriminationField,
 				referencesField,
 				sortableByField: desugaredSortableByField,
 				sortedBlocksRef,
-
-				unstable_diagnosticLog,
 			}),
 		)
 
@@ -230,27 +212,21 @@ const BlockEditorComponent: FunctionComponent<BlockEditorProps> = Component(
 					}
 					blockElementPathRefs.clear()
 					const blocks = getEntity().getEntityList(blockListProps)
-					let blockIndex = leadingFieldBackedElements.length
+					let blockIndex = 0
 					for (const topLevelBlock of blocks) {
 						blockElementPathRefs.set(topLevelBlock.id, Editor.pathRef(editor, [blockIndex++], { affinity: 'backward' }))
 					}
 				},
-				[referencedEntityCache, blockElementPathRefs, blockListProps, leadingFieldBackedElements.length, editor],
+				[referencedEntityCache, blockElementPathRefs, blockListProps, editor],
 			),
 		)
 
 		const nodes = useBlockEditorSlateNodes({
-			placeholder: label,
 			editor,
 			blockElementCache,
 			blockElementPathRefs,
 			blockContentField: desugaredBlockContentField,
-			contemberFieldElementCache,
 			topLevelBlocks,
-			leadingFieldBackedElements,
-			trailingFieldBackedElements,
-			leadingFieldBackedAccessors: leadingAccessors,
-			trailingFieldBackedAccessors: trailingAccessors,
 		})
 
 		useEntityBeforeUpdate(
@@ -270,8 +246,7 @@ const BlockEditorComponent: FunctionComponent<BlockEditorProps> = Component(
 							continue
 						}
 						const blockIndex =
-							blockEntity.getRelativeSingleField<number>(desugaredSortableByField).value! +
-							leadingFieldBackedElements.length
+							blockEntity.getRelativeSingleField<number>(desugaredSortableByField).value!
 						if (editor.children.length < blockIndex) {
 							continue
 						}
@@ -288,85 +263,30 @@ const BlockEditorComponent: FunctionComponent<BlockEditorProps> = Component(
 						const currentNode = editor.deserializeNodes(
 							contentField.value!,
 							`BlockEditor: The 'contentField' of a block contains invalid data.`,
-						)[0] as ElementNode
-						if (JSON.stringify(previousNode) === JSON.stringify(currentNode)) {
-							blockElementCache.set(blockEntity, previousNode as ElementNode)
+						)[0]
+						if (SlateElement.isElement(previousNode) && JSON.stringify(previousNode) === JSON.stringify(currentNode)) {
+							blockElementCache.set(blockEntity, previousNode)
 						}
 					}
 				},
-				[
-					blockElementCache,
-					blockListProps,
-					desugaredBlockContentField,
-					desugaredSortableByField,
-					editor,
-					leadingFieldBackedElements.length,
-					props.monolithicReferencesMode,
-				],
+				[blockElementCache, blockListProps, desugaredBlockContentField, desugaredSortableByField, editor, props.monolithicReferencesMode],
 			),
 		)
 
-		if (unstable_diagnosticLog) {
-			useEntityBeforePersist(
-				useCallback(
-					(getParentAccessor, options) => {
-						if (!editor.unstable_diagnosticOperationLog.length) {
-							return
-						}
-
-						const subTree = options.getEntityListSubTree({
-							entities: unstable_diagnosticLog.entities,
-							isCreating: true,
-						})
-						subTree.createNewEntity((getNewLogEntity, options) => {
-							getNewLogEntity()
-								.getField<string>(unstable_diagnosticLog.persistedAtField)
-								.updateValue(new Date().toISOString())
-							getNewLogEntity()
-								.getField<string>(unstable_diagnosticLog.operationsField)
-								.updateValue(JSON.stringify(editor.unstable_diagnosticOperationLog))
-							unstable_diagnosticLog.identify(getParentAccessor, getNewLogEntity, options)
-						})
-					},
-					[editor.unstable_diagnosticOperationLog, unstable_diagnosticLog],
-				),
-			)
-			useEntityPersistSuccess(
-				useCallback(() => {
-					editor.unstable_diagnosticOperationLog.length = 0
-				}, [editor.unstable_diagnosticOperationLog]),
-			)
-		}
-
-		// TODO this is a bit of a hack.
 		const shouldDisplayInlineToolbar = useCallback(() => {
 			const selection = editor.selection
+			return !(!selection || SlateRange.isCollapsed(selection))
+		}, [editor])
 
-			if (!selection || SlateRange.isCollapsed(selection)) {
-				return false
-			}
-			if (leadingFieldBackedElements.length === 0) {
-				return true
-			}
 
-			// TODO This shouldn't be hardcoded like this.
-			const rangeOfFieldBacked: SlateRange = {
-				anchor: Editor.start(editor, [0]),
-				focus: Editor.end(editor, [leadingFieldBackedElements.length - 1]),
-			}
-			const intersection = SlateRange.intersection(selection, rangeOfFieldBacked)
-
-			// This is a bit of set theory. If A is a subset of B if and only if their intersection is equal to A.
-			// We don't want to disable the toolbar if some part of the selection is outside of rangeOfFieldBacked,
-			// and so we disable the toolbar only if the entirety of the selection is contained within rangeOfFieldBacked.
-			return intersection === null || !SlateRange.equals(selection, intersection)
-		}, [editor, leadingFieldBackedElements.length])
+		const leadingElements = useFieldBackedElementFields(leadingFieldBackedElements)
+		const trailingElements = useFieldBackedElementFields(trailingFieldBackedElements)
 
 		// TODO label?
 		return (
 			<Slate editor={editor} value={nodes} onChange={editor.slateOnChange}>
 				<EditorCanvas
-					underlyingComponent={Editable}
+					underlyingComponent={EditableCanvas}
 					componentProps={{
 						renderElement: editor.renderElement,
 						renderLeaf: editor.renderLeaf,
@@ -374,8 +294,14 @@ const BlockEditorComponent: FunctionComponent<BlockEditorProps> = Component(
 						onFocusCapture: editor.onFocus,
 						onBlurCapture: editor.onBlur,
 						onDOMBeforeInput: editor.onDOMBeforeInput,
+						onDrop: (e => {
+							e.preventDefault()
+						}),
+						placeholder: label,
+						leading: leadingElements,
+						trailing: trailingElements,
 					}}
-					size="large"
+					size={size ?? 'large'}
 				>
 					{useMemo(
 						() => (
@@ -447,13 +373,6 @@ const BlockEditorComponent: FunctionComponent<BlockEditorProps> = Component(
 					{!props.monolithicReferencesMode && references}
 				</Repeater>
 				{props.monolithicReferencesMode && references}
-				{props.unstable_diagnosticLog && (
-					<EntityListSubTree entities={props.unstable_diagnosticLog.entities} isCreating>
-						<SugaredField field={props.unstable_diagnosticLog.operationsField} />
-						<SugaredField field={props.unstable_diagnosticLog.persistedAtField} />
-						{props.unstable_diagnosticLog.identificationStaticRender}
-					</EntityListSubTree>
-				)}
 			</>
 		)
 	},
@@ -470,18 +389,19 @@ export const BlockEditor = Object.assign<
 	ContentOutlet,
 })
 
-const useFieldBackedElements = (entity: EntityAccessor, original: FieldBackedElement[]): FieldAccessor<string>[] => {
-	useConstantLengthInvariant(
-		original,
-		'The number of leading/trailing field-backed elements must remain constant between renders.',
-	)
-	const unstableAccessorArray = original.map(fieldBackedElement => {
-		// eslint-disable-next-line react-hooks/rules-of-hooks
-		return useField<string>(fieldBackedElement.field)
-	})
 
-	// eslint-disable-next-line react-hooks/exhaustive-deps
-	return useMemo(() => unstableAccessorArray, unstableAccessorArray)
+const useFieldBackedElementFields = (elements: FieldBackedElement[]) => {
+	return <>
+		{elements.map(el => {
+			if (el.format === 'plainText') {
+				return (
+					<TextField field={el.field} label={undefined} placeholder={el.placeholder} distinction={'seamless'}
+										 size={el.size} />
+				)
+			}
+			return <RichTextField field={el.field} label={undefined} placeholder={el.placeholder} distinction={'seamless'} />
+		})}
+	</>
 }
 
 const assertStaticBlockEditorInvariants = (props: BlockEditorProps, environment: Environment) => {

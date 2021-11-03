@@ -9,3 +9,5 @@ export * from './RichEditor'
 export * from './RichTextField'
 
 export * from './legacyDeprecatedEditorFormerlyKnownAsRichTextField'
+export * from './slate-types'
+export * from './slate-reexport'

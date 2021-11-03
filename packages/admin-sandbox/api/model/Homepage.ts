@@ -4,5 +4,8 @@ import { Content } from './Content'
 
 export class Homepage {
 	unique = d.enumColumn(One).notNull().unique()
+	title = d.stringColumn()
+	lead = d.stringColumn()
 	content = d.oneHasOne(Content)
+	footer = d.stringColumn()
 }

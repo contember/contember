@@ -2,22 +2,23 @@ import type { EntityAccessor } from '@contember/binding'
 import type { IconSourceSpecification } from '@contember/ui'
 import type { FunctionComponent, ReactNode } from 'react'
 import type { Range as SlateRange } from 'slate'
+import { Element as SlateElement, Text as SlateText } from 'slate'
 import type { SugaredDiscriminateBy } from '../../discrimination'
-import type { ElementNode, ElementSpecifics, TextNode, TextSpecifics } from '../baseEditor'
-import type { BlockSlateEditor } from '../blockEditor'
+import type { TextSpecifics } from '../baseEditor'
+import type { EditorWithBlocks } from '../blockEditor'
 
-export interface MarkSpecificToolbarButton<T extends TextNode> {
+export interface MarkSpecificToolbarButton<T extends SlateText> {
 	marks: TextSpecifics<T>
 }
 
-export interface ElementSpecificToolbarButton<E extends ElementNode> {
+export interface ElementSpecificToolbarButton<E extends SlateElement> {
 	elementType: E['type']
-	suchThat?: ElementSpecifics<E>
+	suchThat?: Partial<E>
 }
 
 export interface InitializeReferenceContentProps {
 	referenceId: string
-	editor: BlockSlateEditor
+	editor: EditorWithBlocks
 	selection: SlateRange | null
 	onSuccess: () => void
 	onCancel: () => void
@@ -34,8 +35,8 @@ export interface CommonToolbarButton extends IconSourceSpecification {
 	title?: string
 }
 
-export type ElementToolbarButton<E extends ElementNode> = CommonToolbarButton & ElementSpecificToolbarButton<E>
-export type MarkToolbarButton<T extends TextNode> = CommonToolbarButton & MarkSpecificToolbarButton<T>
+export type ElementToolbarButton<E extends SlateElement> = CommonToolbarButton & ElementSpecificToolbarButton<E>
+export type MarkToolbarButton<T extends SlateText> = CommonToolbarButton & MarkSpecificToolbarButton<T>
 export type InitializeReferenceToolbarButton = CommonToolbarButton & InitializeReferenceSpecificToolbarButton
 
 export type ToolbarButtonSpec = ElementToolbarButton<any> | MarkToolbarButton<any> | InitializeReferenceToolbarButton

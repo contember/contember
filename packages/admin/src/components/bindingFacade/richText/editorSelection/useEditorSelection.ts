@@ -1,12 +1,12 @@
 import { debounce } from 'debounce'
-import { useReducer, useRef, useCallback, useEffect } from 'react'
+import { useCallback, useEffect, useReducer, useRef } from 'react'
 import { Editor, Range as SlateRange } from 'slate'
-import { ReactEditor, useEditor } from 'slate-react'
+import { ReactEditor, useSlateStatic } from 'slate-react'
 import { defaultEditorSelectionState, editorSelectionReducer } from './editorSelectionReducer'
 import type { EditorSelectionState } from './EditorSelectionState'
 
 export const useEditorSelection = (maxInterval: number = 100): EditorSelectionState => {
-	const editor = useEditor()
+	const editor = useSlateStatic()
 	const [selectionState, dispatch] = useReducer(editorSelectionReducer, defaultEditorSelectionState)
 	const selectionStateRef = useRef<EditorSelectionState>(selectionState)
 
@@ -27,8 +27,8 @@ export const useEditorSelection = (maxInterval: number = 100): EditorSelectionSt
 					!domSelection!.isCollapsed &&
 					selectionStateRef.current.selection
 				) {
-					const stateSelectionRange = ReactEditor.toSlateRange(editor, selectionStateRef.current.selection)
-					const domSelectionRange = ReactEditor.toSlateRange(editor, domSelection!)
+					const stateSelectionRange = ReactEditor.toSlateRange(editor, selectionStateRef.current.selection, { exactMatch: false, suppressThrow: false })
+					const domSelectionRange = ReactEditor.toSlateRange(editor, domSelection!, { exactMatch: false, suppressThrow: false })
 
 					if (
 						SlateRange.equals(stateSelectionRange, domSelectionRange) &&

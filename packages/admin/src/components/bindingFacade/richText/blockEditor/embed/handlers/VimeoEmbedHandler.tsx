@@ -2,6 +2,7 @@ import { SugaredField, SugaredFieldProps, useField } from '@contember/binding'
 import { memo, ReactNode } from 'react'
 import type { SugaredDiscriminateBy } from '../../../../discrimination'
 import type { EmbedHandler, PopulateEmbedDataOptions } from '../core'
+import { parseUrl } from '../../../utils'
 
 class VimeoEmbedHandler implements EmbedHandler<string> {
 	public readonly debugName = 'Vimeo'
@@ -16,7 +17,7 @@ class VimeoEmbedHandler implements EmbedHandler<string> {
 		return <SugaredField field={this.options.vimeoIdField} />
 	}
 
-	public canHandleSource(source: string, url: URL | undefined): boolean | string {
+	public handleSource(source: string, url: URL | undefined): undefined | string {
 		// This method deliberately biases towards the liberal and permissive.
 		if (!url) {
 			if (source.startsWith('vimeo.com')) {
@@ -25,22 +26,20 @@ class VimeoEmbedHandler implements EmbedHandler<string> {
 			if (source.startsWith('www.')) {
 				source = `https://${source}`
 			}
-			try {
-				url = new URL(source)
-			} catch {
-				return false
+			url = parseUrl(source)
+			if (!url) {
+				return undefined
 			}
 		}
 
-		if (url.host.endsWith('vimeo.com')) {
-			const matches = url.pathname.substr(1).match(/^(\d+)/)
-			if (matches === null) {
-				return false
-			}
-			return matches[1]
+		if (!url.host.endsWith('vimeo.com')) {
+			return undefined
 		}
-
-		return false
+		const matches = url.pathname.substr(1).match(/^(\d+)/)
+		if (matches === null) {
+			return undefined
+		}
+		return matches[1]
 	}
 
 	public renderEmbed() {

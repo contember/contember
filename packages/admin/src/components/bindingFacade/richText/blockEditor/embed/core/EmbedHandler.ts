@@ -12,7 +12,7 @@ export interface EmbedHandler<EmbedArtifacts = any> {
 	debugName: string // Optional for error messages
 
 	staticRender: (environment: Environment) => ReactNode
-	canHandleSource: (source: string, url: URL | undefined) => boolean | EmbedArtifacts
+	handleSource: (source: string, url: URL | undefined) => undefined | EmbedArtifacts | Promise<EmbedArtifacts | undefined>
 	renderEmbed: () => ReactNode
 	populateEmbedData: (options: PopulateEmbedDataOptions<EmbedArtifacts>) => void
 	discriminateBy: SugaredDiscriminateBy

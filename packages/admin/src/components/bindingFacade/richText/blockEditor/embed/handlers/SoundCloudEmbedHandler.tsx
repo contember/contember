@@ -2,6 +2,7 @@ import { SugaredField, SugaredFieldProps, useField } from '@contember/binding'
 import { memo, ReactNode } from 'react'
 import type { SugaredDiscriminateBy } from '../../../../discrimination'
 import type { EmbedHandler, PopulateEmbedDataOptions } from '../core'
+import { parseIframeSrc, parseUrl } from '../../../utils'
 
 class SoundCloudEmbedHandler implements EmbedHandler<string> {
 	public readonly debugName = 'SoundCloud'
@@ -15,41 +16,27 @@ class SoundCloudEmbedHandler implements EmbedHandler<string> {
 		return <SugaredField field={this.options.soundCloudIdField} />
 	}
 
-	public canHandleSource(source: string, url: URL | undefined): boolean | string {
+	public handleSource(source: string, url: URL | undefined): undefined | string {
 		// Regular url from url bar is ignored intentionally since it doesn't contain track id required for embed/iframe src attribute
 		if (url) {
-			return false
+			return undefined
+		}
+		const iframeSrc = parseIframeSrc(source)
+		const iframeUrl = iframeSrc ? parseUrl(iframeSrc) : undefined
+		if (!iframeUrl) {
+			return undefined
 		}
 
-		if (source.startsWith('<iframe')) {
-			const parser = new DOMParser()
-			try {
-				const { body } = parser.parseFromString(source, 'text/html')
-				const iFrame = body.querySelector('iframe')
-				if (iFrame instanceof HTMLIFrameElement) {
-					source = iFrame.src
-				}
-			} catch (_) {
-				return false
-			}
+		if (!iframeUrl.host.endsWith('w.soundcloud.com')) {
+			return undefined
 		}
-		try {
-			url = new URL(source)
-		} catch {
-			return false
+		const trackUrl = iframeUrl.searchParams.get('url') || ''
+		const matches = trackUrl.match(/^https:\/\/api\.soundcloud\.com\/tracks\/([^\/]*)$/)
+
+		if (!matches) {
+			return undefined
 		}
-
-		if (url.host.endsWith('w.soundcloud.com')) {
-			const trackUrl = url.searchParams.get('url') || ''
-			const matches = trackUrl.match(/^https:\/\/api\.soundcloud\.com\/tracks\/([^\/]*)$/)
-
-			if (!matches) {
-				return false
-			}
-			return matches[1]
-		}
-
-		return false
+		return matches[1]
 	}
 
 	public renderEmbed() {

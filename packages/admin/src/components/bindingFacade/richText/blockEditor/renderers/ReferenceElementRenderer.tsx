@@ -1,32 +1,26 @@
-import { BindingError, Entity, FieldValue, RelativeSingleField, useEntity } from '@contember/binding'
+import { BindingError, Entity, RelativeSingleField } from '@contember/binding'
 import { ActionableBox, Box, EditorBox } from '@contember/ui'
 import { memo, MouseEvent as ReactMouseEvent, ReactNode, useCallback } from 'react'
 import { Transforms } from 'slate'
-import { ReactEditor, RenderElementProps, useEditor, useSelected } from 'slate-react'
-import { BlockProps, getDiscriminatedBlock, NormalizedBlocks } from '../../../blocks'
+import { ReactEditor, RenderElementProps, useSelected, useSlateStatic } from 'slate-react'
+import { BlockProps, getDiscriminatedBlock } from '../../../blocks'
 import { getDiscriminatedDatum } from '../../../discrimination'
 import { BlockElement } from '../../baseEditor'
-import type { BlockSlateEditor } from '../editor'
 import type { ReferenceElement } from '../elements'
-import type { EmbedHandler, NormalizedEmbedHandlers } from '../embed'
-import type { EditorReferenceBlocks } from '../templating'
+import { ReferenceElementOptions } from '../elements'
+import type { EmbedHandler } from '../embed'
+import { EditorWithBlocks } from '../editor'
 
-export interface ReferenceElementRendererProps extends RenderElementProps {
+export interface ReferenceElementRendererProps extends RenderElementProps, ReferenceElementOptions {
 	element: ReferenceElement
 	referenceDiscriminationField: RelativeSingleField
-	editorReferenceBlocks: EditorReferenceBlocks
-
-	embedHandlers: NormalizedEmbedHandlers | undefined
-	embedReferenceDiscriminateBy: FieldValue | undefined
-	embedContentDiscriminationField: RelativeSingleField | undefined
-	embedSubBlocks: NormalizedBlocks | undefined
 }
 
 export const ReferenceElementRenderer = memo((props: ReferenceElementRendererProps) => {
-	const editor = useEditor() as BlockSlateEditor
+	const editor = useSlateStatic() as EditorWithBlocks
 	const selected = useSelected()
 
-	const referencedEntity = useEntity()
+	const referencedEntity = editor.getReferencedEntity(props.element)
 
 	const discriminationField = referencedEntity.getRelativeSingleField(props.referenceDiscriminationField)
 	const selectedReference = getDiscriminatedDatum(props.editorReferenceBlocks, discriminationField)?.datum

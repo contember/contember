@@ -7,26 +7,23 @@ import {
 } from '@contember/binding'
 import type { MutableRefObject } from 'react'
 import { Editor } from 'slate'
-import type { FieldBackedElement } from '../FieldBackedElement'
-import type { BlockSlateEditor } from './BlockSlateEditor'
+import type { EditorWithBlocks } from './EditorWithBlocks'
 
 export interface OverrideCreateElementReferenceOptions {
 	bindingOperations: BindingOperations
 	createMonolithicReference: ((initialize: EntityAccessor.BatchUpdatesHandler) => void) | undefined
-	leadingFields: FieldBackedElement[]
 	referenceDiscriminationField: RelativeSingleField | undefined
 	referencesField: string | SugaredRelativeEntityList | undefined
 	sortedBlocksRef: MutableRefObject<EntityAccessor[]>
 }
 
-export const overrideCreateElementReference = <E extends BlockSlateEditor>(
+export const overrideCreateElementReference = <E extends EditorWithBlocks>(
 	editor: E,
 	options: OverrideCreateElementReferenceOptions,
 ) => {
 	const {
 		bindingOperations,
 		createMonolithicReference,
-		leadingFields,
 		referenceDiscriminationField,
 		referencesField,
 		sortedBlocksRef,
@@ -56,7 +53,7 @@ export const overrideCreateElementReference = <E extends BlockSlateEditor>(
 					throw new BindingError()
 				}
 
-				const blockIndex = targetPath[0] - leadingFields.length
+				const blockIndex = targetPath[0]
 				const sortedBlocks = sortedBlocksRef.current
 				const containingBlock = sortedBlocks[blockIndex]
 				const referenceList = containingBlock.getEntityList(referencesField)

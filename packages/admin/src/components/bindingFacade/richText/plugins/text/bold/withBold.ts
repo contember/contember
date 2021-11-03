@@ -1,46 +1,17 @@
-import isHotkey from 'is-hotkey'
-import { createElement } from 'react'
-import type { BaseEditor } from '../../../baseEditor'
+import { Editor as SlateEditor } from 'slate'
+import { boldMark, boldMarkPlugin } from './boldMark'
+import { createMarkHtmlDeserializer } from '../../../baseEditor'
 
-export const boldMark = 'isBold'
 
-export const withBold = <E extends BaseEditor>(editor: E): E => {
-	const { onKeyDown, renderLeafChildren, processAttributesPaste, processInlinePaste } = editor
-
-	const isBoldHotkey = isHotkey('mod+b')
-
-	editor.renderLeafChildren = props => {
-		const children = renderLeafChildren(props)
-
-		if (props.leaf[boldMark] === true) {
-			return createElement('b', undefined, children)
-		}
-		return children
-	}
-
-	editor.onKeyDown = event => {
-		// TODO use onDOMBeforeInput for this
-		if (isBoldHotkey(event.nativeEvent)) {
-			editor.toggleMarks({ [boldMark]: true })
-			event.preventDefault()
-		}
-		onKeyDown(event)
-	}
-
-	editor.processAttributesPaste = (element, cta) => {
-		if (element.style.fontWeight) {
-			const isBold = ['700', '800', '900', 'bold', 'bolder'].includes(element.style.fontWeight)
-			cta = { ...cta, [boldMark]: isBold }
-		}
-		return processAttributesPaste(element, cta)
-	}
-
-	editor.processInlinePaste = (element, next, cumulativeTextAttrs) => {
-		if (element.nodeName === 'STRONG' || (element.nodeName === 'B' && !element.id.startsWith('docs-internal-guid'))) {
-			return next(element.childNodes, { ...cumulativeTextAttrs, [boldMark]: true })
-		}
-		return processInlinePaste(element, next, cumulativeTextAttrs)
-	}
+export const withBold = <E extends SlateEditor>(editor: E): E => {
+	editor.registerMark(boldMarkPlugin)
+	editor.htmlDeserializer.registerPlugin(
+		createMarkHtmlDeserializer(
+			boldMark,
+			el => el.nodeName === 'STRONG' || (el.nodeName === 'B' && !el.id.startsWith('docs-internal-guid')),
+			el => ['italic', 'oblique'].includes(el.style.fontWeight),
+		),
+	)
 
 	return editor
 }

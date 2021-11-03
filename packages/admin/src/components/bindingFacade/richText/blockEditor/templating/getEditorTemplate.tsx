@@ -13,9 +13,7 @@ export interface EditorTemplateAtom<Value> {
 export type EditorTemplate =
 	| undefined
 	| {
-			//leading: EditorTemplateAtom<TextFieldProps>[]
 			blockContent: EditorTemplateAtom<ContentOutletProps> | undefined
-			//trailing: EditorTemplateAtom<TextFieldProps>[]
 	  }
 
 export const getEditorTemplate = (blockContents: ReactNode, env: Environment): EditorTemplate => {

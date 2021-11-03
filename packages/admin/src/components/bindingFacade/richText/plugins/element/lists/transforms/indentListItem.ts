@@ -7,19 +7,17 @@ import {
 	Text,
 	Transforms,
 } from 'slate'
-import type { BaseEditor } from '../../../../baseEditor'
 import { ContemberEditor } from '../../../../ContemberEditor'
-import type { EditorWithLists } from '../EditorWithLists'
 import type { ListItemElement } from '../ListItemElement'
 import type { OrderedListElement } from '../OrderedListElement'
 import type { UnorderedListElement } from '../UnorderedListElement'
 
 export const indentListItem = (
-	editor: EditorWithLists<BaseEditor>,
+	editor: Editor,
 	listItem: ListItemElement,
 	listItemPath: SlatePath,
 ): boolean => {
-	const previousListEntry = ContemberEditor.getPreviousSibling<EditorWithLists<BaseEditor>, ListItemElement>(
+	const previousListEntry = ContemberEditor.getPreviousSibling<Editor, ListItemElement>(
 		editor,
 		listItem,
 		listItemPath,
@@ -40,7 +38,7 @@ export const indentListItem = (
 			ContemberEditor.isElementType(
 				lastPreviousListItemChild,
 				parentListElement.type,
-				ContemberEditor.elementToSpecifics(parentListElement),
+				ContemberEditor.elementToSpecifics(parentListElement) as any,
 			)
 
 		if (previousEndsWithCompatibleList) {
@@ -59,7 +57,7 @@ export const indentListItem = (
 			if (previousContainsInlines) {
 				const [previousStart, previousEnd] = Editor.edges(editor, previousListItemPath)
 				Transforms.wrapNodes(editor, editor.createDefaultElement([]), {
-					match: node => Text.isText(node) || editor.isInline(node),
+					match: node => Text.isText(node) || (SlateElement.isElement(node) && editor.isInline(node)),
 					at: {
 						anchor: previousStart,
 						focus: previousEnd,

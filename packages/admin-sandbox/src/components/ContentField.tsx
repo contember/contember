@@ -4,10 +4,19 @@ import {
 	BlockEditorProps,
 	CheckboxField,
 	Component,
-	HasOne, ImageUploadField,
-	RichEditor, RichTextField,
+	HasOne,
+	horizontalRuleToolbarButton,
+	ImageUploadField,
+	orderedListToolbarButton,
+	paragraphNumberedToolbarButton,
+	paragraphToolbarButton,
+	RichEditor,
+	RichTextField,
+	scrollTargetToolbarButton,
 	SelectField,
+	tableToolbarButton,
 	TextField,
+	unorderedListToolbarButton,
 } from '@contember/admin'
 
 const RB = RichEditor.buttons
@@ -31,11 +40,33 @@ const homepageSpecificBlockButtons: NonNullable<BlockEditorProps['blockButtons']
 
 export const ContentField = Component<ContentFieldProps>(
 	({ field }) => (
-		<HasOne field={field}>
 			<BlockEditor
+				leadingFieldBackedElements={[
+					{
+						field: 'title',
+						placeholder: 'Title',
+						format: 'plainText',
+						size: 'large',
+						render: props => <h1 style={{ fontSize: '2.5em', fontWeight: 600 }}>{props.children}</h1>,
+					},
+					{
+						field: 'lead',
+						placeholder: 'Lead',
+						format: 'richText',
+						render: props => <p>{props.children}</p>,
+					},
+				]}
+				trailingFieldBackedElements={[
+					{
+						field: 'footer',
+						placeholder: 'Footer',
+						format: 'richText',
+						render: props => <p>{props.children}</p>,
+					},
+				]}
 				referencesField="references"
 				referenceDiscriminationField="type"
-				field="blocks"
+				field={`${field}.blocks`}
 				inlineButtons={fullEditorInlineButtons}
 				label="Content"
 				contentField="json"
@@ -51,6 +82,11 @@ export const ContentField = Component<ContentFieldProps>(
 						discriminateBy: 'quote',
 						title: 'Quote',
 					},
+					tableToolbarButton,
+					scrollTargetToolbarButton,
+					paragraphToolbarButton,
+					paragraphNumberedToolbarButton,
+					horizontalRuleToolbarButton,
 				]}
 			>
 				<Block discriminateBy="image" label="Image">
@@ -66,11 +102,11 @@ export const ContentField = Component<ContentFieldProps>(
 					/>
 				</Block>
 				<Block discriminateBy="quote" label="Quote">
+					<BlockEditor.ContentOutlet/>
 					<TextField field="primaryText" label="Quote" />
 					<TextField field="secondaryText" label="Author" />
 				</Block>
 			</BlockEditor>
-		</HasOne>
 	),
 	'ContentField',
 )

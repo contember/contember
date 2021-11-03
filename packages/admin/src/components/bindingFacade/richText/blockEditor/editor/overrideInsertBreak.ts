@@ -1,10 +1,9 @@
-import { Editor, Node as SlateNode, Path as SlatePath, Point, Range as SlateRange, Transforms } from 'slate'
-import { ContemberEditor } from '../../ContemberEditor'
-import type { BlockSlateEditor } from './BlockSlateEditor'
+import { Editor, Node as SlateNode, Range as SlateRange } from 'slate'
+import type { EditorWithBlocks } from './EditorWithBlocks'
 
 export interface OverrideInsertBreakOptions {}
 
-export const overrideInsertBreak = <E extends BlockSlateEditor>(editor: E, options: OverrideInsertBreakOptions) => {
+export const overrideInsertBreak = <E extends EditorWithBlocks>(editor: E, options: OverrideInsertBreakOptions) => {
 	const { insertBreak } = editor
 
 	editor.insertBreak = () => {
@@ -20,28 +19,6 @@ export const overrideInsertBreak = <E extends BlockSlateEditor>(editor: E, optio
 				break
 			}
 		}
-
-		const closestBlockEntry = ContemberEditor.closestBlockEntry(editor)
-
-		if (closestBlockEntry === undefined) {
-			return insertBreak()
-		}
-		const [fieldBackedElement, path] = closestBlockEntry
-		if (
-			!editor.isContemberFieldElement(fieldBackedElement) ||
-			!Point.equals(editor.selection.focus, Editor.end(editor, path))
-		) {
-			return insertBreak()
-		}
-		const nextSiblingPath = SlatePath.next(path)
-		const nextSibling = SlateNode.get(editor, nextSiblingPath)
-
-		if (!editor.isContemberFieldElement(nextSibling) && SlateNode.string(nextSibling) !== '') {
-			return insertBreak()
-		}
-
-		const nextSiblingEnd = Editor.end(editor, nextSiblingPath)
-
-		return Transforms.select(editor, nextSiblingEnd)
+		return insertBreak()
 	}
 }

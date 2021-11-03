@@ -9,10 +9,9 @@ import {
 } from '@contember/binding'
 import { EditorCanvas, FormGroup, FormGroupProps } from '@contember/ui'
 import { FunctionComponent, useCallback, useMemo, useState } from 'react'
-import { Node as SlateNode } from 'slate'
+import { Descendant, Node as SlateNode } from 'slate'
 import { Editable, Slate } from 'slate-react'
 import { useAccessorErrors } from '../../errors'
-import type { ElementNode } from '../baseEditor'
 import { createEditor, CreateEditorPublicOptions } from '../editorFactory'
 import { paragraphElementType } from '../plugins'
 import { RichEditor } from '../RichEditor'
@@ -42,7 +41,7 @@ export const LegacyDeprecatedEditorFormerlyKnownAsRichTextField: FunctionCompone
 			)
 
 			// The cache is questionable, really.
-			const [contemberFieldElementCache] = useState(() => new WeakMap<FieldAccessor<string>, ElementNode[]>())
+			const [contemberFieldElementCache] = useState(() => new WeakMap<FieldAccessor<string>, Descendant[]>())
 			const isMutating = useMutationState()
 
 			const [editor] = useState(() => {
@@ -63,17 +62,17 @@ export const LegacyDeprecatedEditorFormerlyKnownAsRichTextField: FunctionCompone
 
 			const serialize = editor.serializeNodes
 			const onChange = useCallback(
-				(value: SlateNode[]) => {
+				(value: Descendant[]) => {
 					getParent().batchUpdates(getAccessor => {
 						const fieldAccessor = getAccessor().getRelativeSingleField(desugaredField)
 
-						if (SlateNode.string({ children: value }) === '') {
+						if (SlateNode.string({ type: 'dummy', children: value }) === '') {
 							fieldAccessor.updateValue(fieldAccessor.valueOnServer === null ? null : '')
 							return
 						}
 
-						fieldAccessor.updateValue(serialize(value as ElementNode[]))
-						contemberFieldElementCache.set(getAccessor().getRelativeSingleField(desugaredField), value as ElementNode[])
+						fieldAccessor.updateValue(serialize(value))
+						contemberFieldElementCache.set(getAccessor().getRelativeSingleField(desugaredField), value)
 					})
 				},
 				[getParent, contemberFieldElementCache, desugaredField, serialize],

@@ -78,7 +78,7 @@ export class ProjectMemberManager {
 		identity: { id: string; roles?: string[] },
 		verifier: AccessVerifier | undefined,
 	): Promise<readonly Membership[]> {
-		if (identity.roles?.includes(TenantRole.SUPER_ADMIN)) {
+		if (identity.roles?.includes(TenantRole.SUPER_ADMIN) || identity.roles?.includes(TenantRole.PROJECT_ADMIN)) {
 			return [{ role: ProjectRole.ADMIN, variables: [] }]
 		}
 		const memberships = await dbContext.queryHandler.fetch(

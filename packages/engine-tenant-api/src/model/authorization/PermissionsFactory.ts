@@ -19,7 +19,7 @@ class PermissionsFactory {
 
 		permissions.allow(TenantRole.PROJECT_MEMBER, PermissionActions.PROJECT_VIEW)
 
-		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.API_KEY_CREATE)
+		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.PROJECT_VIEW)
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.API_KEY_CREATE)
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.API_KEY_DISABLE)
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.PROJECT_VIEW_MEMBER([]))

@@ -21,8 +21,8 @@ export class HtmlDeserializer {
 	) {
 	}
 
-	registerPlugin(plugin: HtmlDeserializerPlugin) {
-		this.plugins.push(plugin)
+	registerPlugin(plugin: HtmlDeserializerPlugin, prepend: boolean = true) {
+		prepend ? this.plugins.unshift(plugin) : this.plugins.push(plugin)
 	}
 
 	public processNodeListPaste(nodeList: Node[], cumulativeTextAttrs: TextAttrs) {

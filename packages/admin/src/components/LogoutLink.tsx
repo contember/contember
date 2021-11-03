@@ -18,14 +18,8 @@ const defaultComponent: FunctionComponent<InnerProps> = ({ onClick, children }) 
 
 export const LogoutLink = memo<LogoutLinkProps>(props => {
 	const onLogout = useLogout()
-	const onClick = useCallback(async () => {
-		if (navigator.credentials && navigator.credentials.preventSilentAccess) {
-			await navigator.credentials.preventSilentAccess()
-		}
-		onLogout()
-	}, [onLogout])
 	const Component = props.Component || defaultComponent
-	return <Component onClick={onClick} children={props.children} />
+	return <Component onClick={onLogout} children={props.children} />
 })
 
 LogoutLink.displayName = 'LogoutLink'

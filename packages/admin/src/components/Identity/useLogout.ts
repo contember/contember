@@ -11,6 +11,14 @@ export const useLogout = () => {
 
 	return useCallback(
 		async () => {
+			if (navigator.credentials && navigator.credentials.preventSilentAccess) {
+				try {
+					await navigator.credentials.preventSilentAccess()
+				} catch {
+					// actually, not implemented in safari:
+					// https://github.com/WebKit/WebKit/blob/414f4e45b0e82bbfcee783d08a9642be1afa8f72/Source/WebCore/Modules/credentialmanagement/CredentialsContainer.cpp#L132
+				}
+			}
 			logout?.()
 
 			const response = await tenantLogout({})

@@ -3,10 +3,8 @@ import {
 	Component,
 	EntityAccessor,
 	EntityId,
-	EntityListSubTree,
 	EntityRealmKey,
 	Environment,
-	FieldAccessor,
 	FieldValue,
 	HasMany,
 	SugaredField,
@@ -16,17 +14,15 @@ import {
 	useDesugaredRelativeEntityList,
 	useDesugaredRelativeSingleField,
 	useEntity,
-	useEntityBeforePersist,
 	useEntityBeforeUpdate,
 	useEntityList,
 	useEntityPersistSuccess,
 	useEnvironment,
-	useField,
 	useSortedEntities,
 	VariableInputTransformer,
 } from '@contember/binding'
-import { emptyArray, noop, useConstantLengthInvariant } from '@contember/react-utils'
-import { EditorCanvas } from '@contember/ui'
+import { emptyArray, noop } from '@contember/react-utils'
+import { EditorCanvas, EditorCanvasSize } from '@contember/ui'
 import {
 	Fragment,
 	FunctionComponent,
@@ -66,6 +62,7 @@ export interface BlockEditorProps extends SugaredRelativeEntityList, CreateEdito
 	contentField: SugaredFieldProps['field']
 	sortableBy: SugaredFieldProps['field']
 	children?: ReactNode
+	size?: EditorCanvasSize
 
 	leadingFieldBackedElements?: FieldBackedElement[]
 	trailingFieldBackedElements?: FieldBackedElement[]
@@ -98,6 +95,7 @@ const BlockEditorComponent: FunctionComponent<BlockEditorProps> = Component(
 			contentField,
 			sortableBy,
 			children,
+			size,
 
 			leadingFieldBackedElements = emptyArray,
 			trailingFieldBackedElements = emptyArray,
@@ -303,7 +301,7 @@ const BlockEditorComponent: FunctionComponent<BlockEditorProps> = Component(
 						leading: leadingElements,
 						trailing: trailingElements,
 					}}
-					size="large"
+					size={size ?? 'large'}
 				>
 					{useMemo(
 						() => (

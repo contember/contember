@@ -45,6 +45,7 @@ const tenantConfigSchema = Typesafe.intersection(
 		}),
 		credentials: Typesafe.partial({
 			rootToken: Typesafe.string,
+			rootTokenHash: Typesafe.string,
 			rootPassword: Typesafe.string,
 			rootEmail: Typesafe.string,
 			loginToken: Typesafe.string,

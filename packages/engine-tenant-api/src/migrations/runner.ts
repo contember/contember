@@ -8,6 +8,7 @@ export interface TenantCredentials {
 	loginToken?: string
 	rootEmail?: string
 	rootToken?: string
+	rootTokenHash?: string
 	rootPassword?: string
 }
 
@@ -32,7 +33,8 @@ export class MigrationsRunnerFactory {
 			{
 				getCredentials: async () => ({
 					loginTokenHash: this.tenantCredentials.loginToken ? computeTokenHash(this.tenantCredentials.loginToken) : undefined,
-					rootTokenHash: this.tenantCredentials.rootToken ? computeTokenHash(this.tenantCredentials.rootToken) : undefined,
+					rootTokenHash: this.tenantCredentials.rootTokenHash
+						?? (this.tenantCredentials.rootToken ? computeTokenHash(this.tenantCredentials.rootToken) : undefined),
 					rootEmail: this.tenantCredentials.rootEmail,
 					rootPasswordBcrypted: this.tenantCredentials.rootPassword ? await this.providers.bcrypt(this.tenantCredentials.rootPassword) : undefined,
 				}),

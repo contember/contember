@@ -7,7 +7,7 @@ import { Response, ResponseError, ResponseOk } from '../utils/Response'
 import { DatabaseContext } from '../utils'
 
 export class SignUpManager {
-	async signUp(dbContext: DatabaseContext, email: string, password: string, roles: string[] = []): Promise<SignUpResponse> {
+	async signUp(dbContext: DatabaseContext, email: string, password: string, roles: readonly string[] = []): Promise<SignUpResponse> {
 		if (await this.isEmailAlreadyUsed(dbContext, email)) {
 			return new ResponseError(SignUpErrorCode.EmailAlreadyExists, `User with email ${email} already exists`)
 		}

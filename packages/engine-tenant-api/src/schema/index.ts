@@ -432,6 +432,7 @@ export type Mutation = {
 export type MutationSignUpArgs = {
 	email: Scalars['String']
 	password: Scalars['String']
+	roles?: Maybe<ReadonlyArray<Scalars['String']>>
 }
 
 

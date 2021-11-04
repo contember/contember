@@ -68,7 +68,7 @@ const createServerTerminator = (): Server[] => {
 	if (process.argv[2] === 'validate') {
 		process.exit(0)
 	}
-	initSentry(config.server.logging.sentry?.dsn)
+	'sentry' in config.server.logging && initSentry(config.server.logging.sentry?.dsn)
 	const workerConfig = config.server.workerCount || 1
 
 	const workerCount = workerConfig === 'auto' ? os.cpus().length : Number(workerConfig)

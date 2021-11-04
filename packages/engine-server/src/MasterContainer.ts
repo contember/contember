@@ -97,7 +97,7 @@ export class MasterContainerFactory {
 			.addService('systemContainerFactory', () =>
 				new SystemContainerFactory())
 			.addService('providers', ({ config }) => {
-				const encryptionKey = config.tenant.secrets
+				const encryptionKey = config.tenant.secrets.encryptionKey
 					? createSecretKey(Buffer.from(config.tenant.secrets.encryptionKey, 'hex'))
 					: undefined
 				return createProviders({ encryptionKey })

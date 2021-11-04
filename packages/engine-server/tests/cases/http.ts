@@ -48,6 +48,7 @@ const createContainer = (debug: boolean) => {
 					rootToken,
 					loginToken,
 				},
+				secrets: {},
 			},
 			server: {
 				logging: {},

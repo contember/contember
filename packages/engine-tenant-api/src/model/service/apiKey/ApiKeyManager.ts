@@ -66,6 +66,16 @@ export class ApiKeyManager {
 		await dbContext.commandBus.execute(new DisableIdentityApiKeysCommand(identityId))
 	}
 
+	async createGlobalPermanentApiKey(
+		dbContext: DatabaseContext,
+		description: string,
+		roles: readonly string[],
+	): Promise<CreateApiKeyResponse> {
+		return await dbContext.transaction(async db => {
+			return await this.apiKeyService.createPermanentApiKey(db, description, roles)
+		})
+	}
+
 	async createProjectPermanentApiKey(
 		dbContext: DatabaseContext,
 		projectId: string,

@@ -43,6 +43,7 @@ const schema: DocumentNode = gql`
 		updateProjectMember(projectSlug: String!, identityId: String!, memberships: [MembershipInput!]!): UpdateProjectMemberResponse
 
 		createApiKey(projectSlug: String!, memberships: [MembershipInput!]!, description: String!): CreateApiKeyResponse
+		createGlobalApiKey(description: String!, roles: [String!]): CreateApiKeyResponse
 		disableApiKey(id: String!): DisableApiKeyResponse
 
 		addProjectMailTemplate(template: MailTemplate!): AddMailTemplateResponse

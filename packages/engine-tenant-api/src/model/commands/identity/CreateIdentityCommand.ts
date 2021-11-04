@@ -2,7 +2,7 @@ import { Command } from '../Command'
 import { InsertBuilder } from '@contember/database'
 
 export class CreateIdentityCommand implements Command<string> {
-	constructor(private readonly roles: string[], private readonly description?: string) {}
+	constructor(private readonly roles: readonly string[], private readonly description?: string) {}
 
 	public async execute({ db, providers }: Command.Args): Promise<string> {
 		const identityId = providers.uuid()

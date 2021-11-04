@@ -1,7 +1,7 @@
 import {
 	CreateApiKeyErrorCode,
 	CreateApiKeyResponse,
-	MutationCreateApiKeyArgs,
+	MutationCreateApiKeyArgs, MutationCreateGlobalApiKeyArgs,
 	MutationResolvers,
 } from '../../../schema'
 import { GraphQLResolveInfo } from 'graphql'
@@ -45,6 +45,26 @@ export class CreateApiKeyMutationResolver implements MutationResolvers {
 
 		const result = await this.apiKeyManager.createProjectPermanentApiKey(context.db, project.id, memberships, description)
 
+		return {
+			ok: true,
+			errors: [],
+			result: {
+				apiKey: result.result.toApiKeyWithToken(),
+			},
+		}
+	}
+
+	async createGlobalApiKey(
+		parent: any,
+		{ roles, description }: MutationCreateGlobalApiKeyArgs,
+		context: ResolverContext,
+		info: GraphQLResolveInfo,
+	): Promise<CreateApiKeyResponse> {
+		await context.requireAccess({
+			action: PermissionActions.API_KEY_CREATE_GLOBAL,
+			message: 'You are not allowed to create a global API key',
+		})
+		const result = await this.apiKeyManager.createGlobalPermanentApiKey(context.db, description, roles ?? [])
 		return {
 			ok: true,
 			errors: [],

@@ -23,7 +23,7 @@ export const createEmptyTableRowElement = (columnCount = 2) => ({
 export const tableRowElementPlugin: CustomElementPlugin<TableRowElement> = {
 	type: tableRowElementType,
 	render: TableRowElementRenderer,
-	normalizeNode: ({ editor, path, element }) => {
+	normalizeNode: ({ editor, path, element, preventDefault }) => {
 		for (const [child, childPath] of SlateNode.children(editor, path)) {
 			if (SlateElement.isElement(child)) {
 				if (!isTableCellElement(child)) {
@@ -31,14 +31,17 @@ export const tableRowElementPlugin: CustomElementPlugin<TableRowElement> = {
 					Transforms.setNodes(editor, { type: tableCellElementType }, { at: childPath })
 				}
 			} else {
-				return Transforms.removeNodes(editor, { at: path })
+				Transforms.removeNodes(editor, { at: path })
+				return preventDefault()
 			}
 		}
 		if (!ContemberEditor.hasParentOfType(editor, [element, path], tableElementType)) {
-			return Transforms.unwrapNodes(editor, { at: path })
+			Transforms.unwrapNodes(editor, { at: path })
+			return preventDefault()
 		}
 		if (path[path.length - 1] > 0 && element.headerScope) {
-			return Transforms.setNodes(editor, { headerScope: null }, { at: path })
+			Transforms.setNodes(editor, { headerScope: null }, { at: path })
+			return preventDefault()
 		}
 	},
 	canContainAnyBlocks: false,

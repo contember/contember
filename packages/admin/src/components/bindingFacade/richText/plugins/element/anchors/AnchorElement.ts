@@ -43,7 +43,7 @@ export const anchorElementPlugin: CustomElementPlugin<AnchorElement> = {
 			AnchorModifications.wrapAnchor(editor, href)
 		}
 	},
-	normalizeNode: ({ element, path, editor }) => {
+	normalizeNode: ({ element, path, editor, preventDefault }) => {
 		if (SlateNode.string(element) === '') {
 			const selection = editor.selection
 			Transforms.removeNodes(editor, {
@@ -52,7 +52,7 @@ export const anchorElementPlugin: CustomElementPlugin<AnchorElement> = {
 			if (selection && SlateRange.isCollapsed(selection) && Path.isCommon(path, selection.focus.path)) {
 				Transforms.select(editor, Path.parent(path))
 			}
-			return
+			return preventDefault()
 		}
 	},
 }

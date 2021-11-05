@@ -43,9 +43,10 @@ export const getTableElementColumnCount = (element: TableElement): number => {
 export const tableElementPlugin: CustomElementPlugin<TableElement> = {
 	type: tableElementType,
 	render: TableElementRenderer,
-	normalizeNode: ({ editor, element, path }) => {
+	normalizeNode: ({ editor, element, path, preventDefault }) => {
 		if (element.children.length === 0) {
-			return Transforms.removeNodes(editor, { at: path })
+			Transforms.removeNodes(editor, { at: path })
+			return preventDefault()
 		}
 
 		let didTransform = false
@@ -57,11 +58,12 @@ export const tableElementPlugin: CustomElementPlugin<TableElement> = {
 					didTransform = true
 				}
 			} else {
-				return Transforms.removeNodes(editor, { at: path })
+				Transforms.removeNodes(editor, { at: path })
+				return preventDefault()
 			}
 		}
 		if (didTransform) {
-			return
+			return preventDefault()
 		}
 		const columnCount = gaugeTableColumnCount(element)
 		for (const [row, childPath] of SlateNode.children(editor, path) as Iterable<NodeEntry<TableRowElement>>) {

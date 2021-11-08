@@ -8,7 +8,6 @@ export interface WithBlockElements {
 
 	// Really, try to avoid passing just the referenceId at all costs
 	getReferencedEntity: (elementOrReferenceId: ElementWithReference | string) => EntityAccessor
-	prepareElementForInsertion: (element: Slate.Element) => Slate.Path
 	createElementReference: (
 		targetPath: Slate.Path,
 		referenceDiscriminant: FieldValue,

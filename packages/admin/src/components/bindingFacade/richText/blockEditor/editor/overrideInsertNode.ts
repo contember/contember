@@ -1,5 +1,6 @@
 import { Editor, Element as SlateElement, Transforms } from 'slate'
 import type { EditorWithBlocks } from './EditorWithBlocks'
+import { prepareElementForInsertion } from '../utils'
 
 export const overrideInsertNode = <E extends EditorWithBlocks>(editor: E) => {
 	const { insertNode } = editor
@@ -9,7 +10,7 @@ export const overrideInsertNode = <E extends EditorWithBlocks>(editor: E) => {
 			return insertNode(node)
 		}
 		Editor.withoutNormalizing(editor, () => {
-			const preppedPath = editor.prepareElementForInsertion(node)
+			const preppedPath = prepareElementForInsertion(editor, node)
 			Transforms.insertNodes(editor, node, {
 				at: preppedPath,
 			})

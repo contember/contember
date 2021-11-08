@@ -10,6 +10,7 @@ import type { MutableRefObject } from 'react'
 import { Editor, Element as SlateElement, PathRef, Transforms } from 'slate'
 import type { ElementWithReference } from '../elements'
 import type { EditorWithBlocks } from './EditorWithBlocks'
+import { prepareElementForInsertion } from '../utils'
 
 export interface OverrideInsertElementWithReferenceOptions {
 	bindingOperations: BindingOperations
@@ -49,7 +50,7 @@ export const overrideInsertElementWithReference = <E extends EditorWithBlocks>(
 		initialize?: EntityAccessor.BatchUpdatesHandler,
 	) => {
 		Editor.withoutNormalizing(editor, () => {
-			const preppedPath = editor.prepareElementForInsertion(element as Element)
+			const preppedPath = prepareElementForInsertion(editor, element as Element)
 			const [topLevelElementIndex] = preppedPath
 			const blockOrder = topLevelElementIndex
 			let newBlockId: string | undefined = undefined

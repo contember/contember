@@ -18,7 +18,6 @@ import {
 	OverrideInsertElementWithReferenceOptions,
 } from './overrideInsertElementWithReference'
 import { overrideInsertNode } from './overrideInsertNode'
-import { overridePrepareElementForInsertion } from './overridePrepareElementForInsertion'
 import { OverrideOnChangeOptions, overrideSlateOnChange } from './overrideSlateOnChange'
 
 export interface CreateEditorOptions
@@ -46,9 +45,6 @@ export const createBlockEditor = (options: CreateEditorOptions) => {
 			const e = editor as EditorWithBlocks
 			e.registerElement(createReferenceElementPlugin(options))
 
-			e.prepareElementForInsertion = () => {
-				throw new BindingError()
-			}
 			e.insertElementWithReference = () => {
 				throw new BindingError(
 					`BlockEditor: trying to insert a referenced element but referencing has not been correctly set up. ` +
@@ -86,7 +82,6 @@ export const createBlockEditor = (options: CreateEditorOptions) => {
 			overrideInsertData(e, options)
 			overrideInsertElementWithReference(e, options)
 			overrideInsertNode(e)
-			overridePrepareElementForInsertion(e, options)
 			overrideSlateOnChange(e, options)
 
 			return e

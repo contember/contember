@@ -6,7 +6,7 @@ import {
 	useDesugaredRelativeSingleField,
 } from '@contember/binding'
 import type { ReactNode } from 'react'
-import { Editor, Element as SlateElement, PathRef } from 'slate'
+import { Descendant, Editor, Element as SlateElement, PathRef } from 'slate'
 
 export interface UseBlockEditorSlateNodesOptions {
 	editor: Editor
@@ -22,7 +22,7 @@ export const useBlockEditorSlateNodes = ({
 	blockElementPathRefs,
 	blockContentField,
 	topLevelBlocks,
-}: UseBlockEditorSlateNodesOptions): SlateElement[] => {
+}: UseBlockEditorSlateNodesOptions): Descendant[] => {
 	const desugaredContentField = useDesugaredRelativeSingleField(blockContentField)
 	if (editor.operations.length) {
 		// This is *ABSOLUTELY CRUCIAL*!
@@ -33,7 +33,7 @@ export const useBlockEditorSlateNodes = ({
 		//	this hook generates and onChange in turn uses editor.children to update accessors.
 		//	Consequently, whenever there are pending changes, we just return whatever children the editor already has
 		//	because we know that an onChange is already scheduled.
-		return editor.children as SlateElement[]
+		return editor.children
 	}
 
 	const topLevelBlockElements = topLevelBlocks.length

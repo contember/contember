@@ -8,6 +8,7 @@ export type GetReferencedEntity = (path: Path, id: string) => EntityAccessor
 export const useGetReferencedEntity = (opts: ReferencesOptions): GetReferencedEntity => {
 	const getList = useGetReferenceEntityList(opts)
 	return useCallback((path, id) => {
-		return getList(path).getChildEntityById(id)
+		const list = getList(path)
+		return list.getChildEntityById(id)
 	}, [getList])
 }

@@ -39,12 +39,21 @@ export const createReferenceElementPlugin = (args: ReferenceElementOptions): Cus
 			}
 			return <ReferenceElementRenderer {...args} {...props} referenceDiscriminationField={args.referenceDiscriminationField} />
 		},
+		canContainAnyBlocks: true,
 		isVoid: ({ element, editor }) => {
 			if (args.referenceDiscriminationField === undefined) {
 				throw new BindingError()
 			}
-			const path = ReactEditor.findPath(editor, element)
-			const referencedEntity = args.getReferencedEntity(path, element.referenceId)
+			const index = editor.children.indexOf(element)
+			if (index < 0) {
+				throw new BindingError()
+			}
+			let referencedEntity: EntityAccessor | undefined
+			try {
+				referencedEntity = args.getReferencedEntity([index], element.referenceId)
+			} catch {
+				return false
+			}
 			const discriminationField = referencedEntity.getRelativeSingleField(args.referenceDiscriminationField)
 			const selectedReference = getDiscriminatedDatum(args.editorReferenceBlocks, discriminationField)?.datum
 
@@ -54,14 +63,14 @@ export const createReferenceElementPlugin = (args: ReferenceElementOptions): Cus
 
 			return selectedReference.template === undefined
 		},
-		normalizeNode: ({ editor, element, path }) => {
-			const referenceId = element.referenceId
-			try {
-				args.getReferencedEntity(path, referenceId)
-			} catch {
-				console.warn(`Removing a node linking a non-existent reference id '${referenceId}'.`)
-				Transforms.delete(editor, { at: path })
-			}
-		},
+		// normalizeNode: ({ editor, element, path }) => {
+		// 	const referenceId = element.referenceId
+		// 	try {
+		// 		args.getReferencedEntity(path, referenceId)
+		// 	} catch {
+		// 		console.warn(`Removing a node linking a non-existent reference id '${referenceId}'.`)
+		// 		Transforms.delete(editor, { at: path })
+		// 	}
+		// },
 	})
 }

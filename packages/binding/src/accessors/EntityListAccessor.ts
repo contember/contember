@@ -9,6 +9,7 @@ import type { ErrorAccessor } from './ErrorAccessor'
 import type { PersistErrorOptions } from './PersistErrorOptions'
 import type { PersistSuccessOptions } from './PersistSuccessOptions'
 import type { EntityListState } from '../core/state'
+import { RuntimeId } from '../accessorTree'
 
 class EntityListAccessor implements Errorable {
 	public constructor(
@@ -119,11 +120,11 @@ class EntityListAccessor implements Errorable {
 		this.operations.connectEntity(this.stateKey, entityToConnect)
 	}
 
-	public createNewEntity(initialize?: EntityAccessor.BatchUpdatesHandler): void {
-		this.operations.createNewEntity(this.stateKey, initialize)
+	public createNewEntity(initialize?: EntityAccessor.BatchUpdatesHandler): RuntimeId {
+		return this.operations.createNewEntity(this.stateKey, initialize)
 	}
-	public disconnectEntity(childEntity: EntityAccessor): void {
-		this.operations.disconnectEntity(this.stateKey, childEntity)
+	public disconnectEntity(childEntity: EntityAccessor, options: { noPersist?: boolean } = {}): void {
+		this.operations.disconnectEntity(this.stateKey, childEntity, options)
 	}
 	public getChildEntityById(id: EntityId): EntityAccessor {
 		return this.operations.getChildEntityById(this.stateKey, id)

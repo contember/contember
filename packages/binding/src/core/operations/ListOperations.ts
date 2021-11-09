@@ -1,6 +1,6 @@
 import { validate as uuidValidate } from 'uuid'
 import type { BatchUpdatesOptions, EntityAccessor, EntityListAccessor, ErrorAccessor } from '../../accessors'
-import { UnpersistedEntityDummyId } from '../../accessorTree'
+import { RuntimeId, UnpersistedEntityDummyId } from '../../accessorTree'
 import { BindingError } from '../../BindingError'
 import type { AccessorErrorManager } from '../AccessorErrorManager'
 import { EventManager } from '../EventManager'
@@ -118,7 +118,7 @@ export class ListOperations {
 		})
 	}
 
-	public disconnectEntity(listState: EntityListState, childEntity: EntityAccessor) {
+	public disconnectEntity(listState: EntityListState, childEntity: EntityAccessor, options: {noPersist?: boolean}) {
 		this.eventManager.syncOperation(() => {
 			// TODO disable this at the top-level.
 			const persistedEntityIds = this.treeStore.getEntityListPersistedIds(listState)
@@ -143,7 +143,9 @@ export class ListOperations {
 					if (state.plannedRemovals === undefined) {
 						state.plannedRemovals = new Map()
 					}
-					state.plannedRemovals.set(disconnectedChildIdValue, 'disconnect')
+					if (!options.noPersist) {
+						state.plannedRemovals.set(disconnectedChildIdValue, 'disconnect')
+					}
 				} else if (disconnectedChildRealm.entity.id.existsOnServer) {
 					// Disconnecting unpersisted entities doesn't constitute a change.
 
@@ -161,8 +163,8 @@ export class ListOperations {
 		})
 	}
 
-	public createNewEntity(outerState: EntityListState, initialize: EntityAccessor.BatchUpdatesHandler | undefined) {
-		this.eventManager.syncOperation(() => {
+	public createNewEntity(outerState: EntityListState, initialize: EntityAccessor.BatchUpdatesHandler | undefined): RuntimeId {
+		return this.eventManager.syncOperation((): RuntimeId => {
 			// All siblings need to have the same id.
 			const id = new UnpersistedEntityDummyId()
 
@@ -179,6 +181,7 @@ export class ListOperations {
 				// TODO defaultValue
 				this.eventManager.registerJustUpdated(state, EventManager.NO_CHANGES_DIFFERENCE)
 			}
+			return id
 		})
 	}
 

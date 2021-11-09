@@ -128,7 +128,14 @@ const BlockEditorComponent: FunctionComponent<BlockEditorProps> = Component(
 		)
 
 		const [baseEditor] = useState(() => createEditorWithEssentials(paragraphElementType))
-		const { nodes, onChange, sortedBlocksRef, blockElementPathRefs, blockElementCache, sortedBlocks } = useBlockEditorState({ editor: baseEditor, blockList: blockListProps, contentField, sortableBy })
+		const { nodes, onChange, sortedBlocksRef, blockElementPathRefs, blockElementCache, sortedBlocks } = useBlockEditorState({
+			editor: baseEditor,
+			blockList: blockListProps,
+			contentField,
+			sortableBy,
+			monolithicReferencesMode,
+			referencesField,
+		})
 		const getReferencedEntity = useGetReferencedEntity({
 			monolithicReferencesMode,
 			referencesField,

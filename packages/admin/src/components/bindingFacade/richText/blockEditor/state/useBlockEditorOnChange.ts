@@ -1,7 +1,8 @@
 import { MutableRefObject, useCallback } from 'react'
 import { assertNever } from '../../../../../utils'
-import { Editor, Element } from 'slate'
+import { Descendant, Editor, Element as SlateElement, Element, Node } from 'slate'
 import {
+	BindingError,
 	EntityAccessor,
 	EntityListAccessor,
 	SugaredFieldProps, SugaredRelativeEntityList, useDesugaredRelativeEntityList,
@@ -10,8 +11,9 @@ import {
 import { useGetParentEntityRef } from '../useGetParentEntityRef'
 import { BlockElementCache } from './useBlockElementCache'
 import { BlockElementPathRefs } from './useBlockElementPathRefs'
+import { isElementWithReference } from '../elements'
 
-export const useBlockEditorOnChange = ({ editor, sortedBlocksRef, sortableBy, contentField, blockList, blockElementCache, blockElementPathRefs }: {
+export const useBlockEditorOnChange = ({ editor, sortedBlocksRef, sortableBy, contentField, blockList, blockElementCache, blockElementPathRefs, referencesField, monolithicReferencesMode }: {
 	editor: Editor,
 	sortedBlocksRef: MutableRefObject<EntityAccessor[]>,
 	contentField: SugaredFieldProps['field'],
@@ -19,6 +21,8 @@ export const useBlockEditorOnChange = ({ editor, sortedBlocksRef, sortableBy, co
 	blockList: SugaredRelativeEntityList,
 	blockElementCache: BlockElementCache,
 	blockElementPathRefs: BlockElementPathRefs
+	referencesField?: SugaredRelativeEntityList | string
+	monolithicReferencesMode?: boolean
 }) => {
 
 	const getParentEntityRef = useGetParentEntityRef()
@@ -89,47 +93,57 @@ export const useBlockEditorOnChange = ({ editor, sortedBlocksRef, sortableBy, co
 			})
 		}
 
+
 		return getParentEntityRef.current().batchUpdates(getAccessor => {
-			const processedAccessors: Array<true | undefined> = Array.from({
+			const processedAccessors: Array<EntityAccessor | undefined> = Array.from({
 				length: editor.children.length,
 			})
 			const blockList = getAccessor().getRelativeEntityList(desugaredBlockList)
 			const getBlockList = blockList.getAccessor
 
+			let cleanupStack = () => {
+			}
+			const knownReferences = new Map<string, [reference: EntityAccessor, block: EntityAccessor]>()
+
 			for (const [blockId, pathRef] of blockElementPathRefs) {
 				const current = pathRef.current
-				const originalBlock = getBlockList().getChildEntityById(blockId)
+				const block = getBlockList().getChildEntityById(blockId)
+				if (!monolithicReferencesMode && referencesField) {
+					for (const reference of block.getEntityList(referencesField)) {
+						knownReferences.set(reference.id, [reference, block])
+					}
+				}
 				const cleanUp = () => {
-					originalBlock.deleteEntity()
-					pathRef.unref()
-					blockElementPathRefs.delete(blockId)
+					const prev = cleanupStack
+					cleanupStack = () => {
+						prev()
+						block.deleteEntity()
+						pathRef.unref()
+						blockElementPathRefs.delete(blockId)
+					}
 				}
 
 				if (current === null || current.length > 1) {
 					cleanUp()
 				} else {
-					const newBlockIndex = current[0]
-
-					const newBlockOrder = newBlockIndex
+					const newBlockOrder = current[0]
 
 					if (processedAccessors[newBlockOrder]) {
 						// This path has already been processed. This happens when nodes get merged.
 						cleanUp()
 					} else {
-						const originalElement = blockElementCache.get(originalBlock)
-						const currentElement = editor.children[newBlockIndex]
-
+						const originalElement = blockElementCache.get(block)
+						const currentElement = editor.children[newBlockOrder]
 						if (
 							originalElement !== currentElement ||
-							originalBlock.getRelativeSingleField(desugaredSortableByField).value !== newBlockOrder
+							block.getRelativeSingleField(desugaredSortableByField).value !== newBlockOrder
 						) {
-							getBlockList()
-								.getChildEntityById(blockId)
+							block
 								.getRelativeSingleField(desugaredSortableByField)
 								.updateValue(newBlockOrder)
 							saveBlockElement(getBlockList, blockId, currentElement as Element)
 						}
-						processedAccessors[newBlockOrder] = true
+						processedAccessors[newBlockOrder] = block
 					}
 				}
 			}
@@ -138,16 +152,53 @@ export const useBlockEditorOnChange = ({ editor, sortedBlocksRef, sortableBy, co
 				const blockOrder = topLevelIndex
 				const isProcessed = processedAccessors[blockOrder]
 				if (!isProcessed) {
-					blockList.createNewEntity(getAccessor => {
+					const id = blockList.createNewEntity(getAccessor => {
 						const newId = getAccessor().id
 						getAccessor().getRelativeSingleField(desugaredSortableByField).updateValue(blockOrder)
 						saveBlockElement(getBlockList, newId, child as Element)
 						blockElementPathRefs.set(newId, Editor.pathRef(editor, [topLevelIndex], { affinity: 'backward' }))
 					})
+					processedAccessors[blockOrder] = blockList.getChildEntityById(id.value)
 				}
 			}
+			if (!monolithicReferencesMode && referencesField) {
+				for (const index in children) {
+					const node = children[index]
+					const nodeReferences: string[] = []
+					const block = processedAccessors[index]!
+					const references = block.getEntityList(referencesField)
+					const collectReferences = (node: Descendant) => {
+						if (!SlateElement.isElement(node)) {
+							return
+						}
+						if (isElementWithReference(node)) {
+							nodeReferences.push(node.referenceId)
+						}
+						for (const child of node.children) {
+							collectReferences(child)
+						}
+					}
+					collectReferences(node)
+					for (const id of nodeReferences) {
+						const entry = knownReferences.get(id)
+						if (!entry) {
+							throw new BindingError(`Reference ${id} not found.`)
+						}
+						const [reference, prevBlock] = entry
+						if (prevBlock !== block) {
+							references.connectEntity(reference)
+							prevBlock.getEntityList(referencesField).disconnectEntity(reference, { noPersist: true })
+						}
+						knownReferences.delete(id)
+					}
+				}
+				for (const [, [reference]] of knownReferences) {
+					reference.deleteEntity()
+				}
+			}
+			cleanupStack()
 
 			return
 		})
-	}, [blockElementCache, blockElementPathRefs, desugaredBlockContentField, desugaredBlockList, desugaredSortableByField, editor, getParentEntityRef, sortedBlocksRef])
+	}, [blockElementCache, blockElementPathRefs, desugaredBlockContentField, desugaredBlockList, desugaredSortableByField, editor, getParentEntityRef, monolithicReferencesMode, referencesField, sortedBlocksRef])
 }

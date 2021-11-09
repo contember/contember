@@ -1,4 +1,10 @@
-import { BindingError, EntityAccessor, RelativeSingleField } from '@contember/binding'
+import {
+	BindingError,
+	EntityAccessor,
+	RelativeSingleField,
+	SugaredFieldProps,
+	useDesugaredRelativeSingleField,
+} from '@contember/binding'
 import type { ReactNode } from 'react'
 import { Editor, Element as SlateElement, PathRef } from 'slate'
 
@@ -6,7 +12,7 @@ export interface UseBlockEditorSlateNodesOptions {
 	editor: Editor
 	blockElementCache: WeakMap<EntityAccessor, SlateElement>
 	blockElementPathRefs: Map<string, PathRef>
-	blockContentField: RelativeSingleField
+	blockContentField: SugaredFieldProps['field']
 	topLevelBlocks: EntityAccessor[]
 }
 
@@ -17,6 +23,7 @@ export const useBlockEditorSlateNodes = ({
 	blockContentField,
 	topLevelBlocks,
 }: UseBlockEditorSlateNodesOptions): SlateElement[] => {
+	const desugaredContentField = useDesugaredRelativeSingleField(blockContentField)
 	if (editor.operations.length) {
 		// This is *ABSOLUTELY CRUCIAL*!
 		//	Slate invokes the onChange callback asynchronously, and so it could happen that this hook is invoked whilst
@@ -47,7 +54,7 @@ export const useBlockEditorSlateNodes = ({
 				if (existingBlockElement) {
 					return existingBlockElement
 				}
-				const contentField = entity.getRelativeSingleField(blockContentField)
+				const contentField = entity.getRelativeSingleField(desugaredContentField)
 
 				let blockElement: SlateElement
 

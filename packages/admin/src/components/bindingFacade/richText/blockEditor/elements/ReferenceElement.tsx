@@ -1,13 +1,13 @@
-import { Element, Node, Transforms } from 'slate'
+import { Element, Node, Path, Transforms } from 'slate'
 import type { ElementWithReference } from './ElementWithReference'
 import { CustomElementPlugin } from '../../baseEditor'
 import { ReferenceElementRenderer } from '../renderers'
-import { BindingError, FieldValue, RelativeSingleField } from '@contember/binding'
+import { BindingError, EntityAccessor, FieldValue, RelativeSingleField } from '@contember/binding'
 import { getDiscriminatedDatum } from '../../../discrimination'
-import { EditorWithBlocks } from '../editor'
 import { EditorReferenceBlocks } from '../templating'
 import { NormalizedEmbedHandlers } from '../embed'
 import { NormalizedBlocks } from '../../../blocks'
+import { ReactEditor } from 'slate-react'
 
 type ReferenceElementType = 'reference'
 export const referenceElementType: ReferenceElementType = 'reference'
@@ -27,6 +27,7 @@ export interface ReferenceElementOptions {
 	embedReferenceDiscriminateBy: FieldValue | undefined
 	embedContentDiscriminationField: RelativeSingleField | undefined
 	embedSubBlocks: NormalizedBlocks | undefined
+	getReferencedEntity: (path: Path, referenceId: string) => EntityAccessor
 }
 
 export const createReferenceElementPlugin = (args: ReferenceElementOptions): CustomElementPlugin<ReferenceElement> => {
@@ -38,12 +39,12 @@ export const createReferenceElementPlugin = (args: ReferenceElementOptions): Cus
 			}
 			return <ReferenceElementRenderer {...args} {...props} referenceDiscriminationField={args.referenceDiscriminationField} />
 		},
-		isVoid: ({ editor, element }) => {
+		isVoid: ({ element, editor }) => {
 			if (args.referenceDiscriminationField === undefined) {
 				throw new BindingError()
 			}
-			const blockEditor = editor as EditorWithBlocks
-			const referencedEntity = blockEditor.getReferencedEntity(element)
+			const path = ReactEditor.findPath(editor, element)
+			const referencedEntity = args.getReferencedEntity(path, element.referenceId)
 			const discriminationField = referencedEntity.getRelativeSingleField(args.referenceDiscriminationField)
 			const selectedReference = getDiscriminatedDatum(args.editorReferenceBlocks, discriminationField)?.datum
 
@@ -56,7 +57,7 @@ export const createReferenceElementPlugin = (args: ReferenceElementOptions): Cus
 		normalizeNode: ({ editor, element, path }) => {
 			const referenceId = element.referenceId
 			try {
-				(editor as EditorWithBlocks).getReferencedEntity(element)
+				args.getReferencedEntity(path, referenceId)
 			} catch {
 				console.warn(`Removing a node linking a non-existent reference id '${referenceId}'.`)
 				Transforms.delete(editor, { at: path })

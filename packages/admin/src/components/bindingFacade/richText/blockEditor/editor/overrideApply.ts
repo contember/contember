@@ -7,30 +7,25 @@ import type { EditorWithBlocks } from './EditorWithBlocks'
 
 export interface OverrideApplyOptions {
 	bindingOperations: BindingOperations
-	isMutatingRef: MutableRefObject<boolean>
-	createMonolithicReference: ((initialize: EntityAccessor.BatchUpdatesHandler) => void) | undefined
+	monolithicReferencesMode?: boolean
 	referencesField: string | SugaredRelativeEntityList | undefined
 	sortedBlocksRef: MutableRefObject<EntityAccessor[]>
 }
 
 export const overrideApply = <E extends EditorWithBlocks>(editor: E, options: OverrideApplyOptions) => {
 	const { apply } = editor
-	const { bindingOperations, isMutatingRef, createMonolithicReference, referencesField, sortedBlocksRef } = options
+	const { bindingOperations, monolithicReferencesMode, referencesField, sortedBlocksRef } = options
 
 	editor.apply = (operation: Operation) => {
 		if (operation.type === 'set_selection') {
 			return apply(operation) // Nothing to do here
 		}
-		if (isMutatingRef.current) {
-			return
-		}
-
 		const purgeElementReferences = (element: Node) => {
 			if (!SlateElement.isElement(element)) {
 				return
 			}
 			if (isElementWithReference(element)) {
-				const referencedEntity = editor.getReferencedEntity(element)
+				const referencedEntity = editor.getReferencedEntity(element.referenceId)
 				referencedEntity.deleteEntity()
 			}
 			for (const child of element.children) {
@@ -57,7 +52,7 @@ export const overrideApply = <E extends EditorWithBlocks>(editor: E, options: Ov
 				purgeElementReferences(operation.node)
 			})
 		} else if (operation.type === 'merge_node') {
-			if (operation.path.length === 1 && !createMonolithicReference && referencesField) {
+			if (operation.path.length === 1 && !monolithicReferencesMode && referencesField) {
 				bindingOperations.batchDeferredUpdates(() => {
 					const previousBlock = sortedBlocksRef.current[operation.path[0]]
 					const newBlock = sortedBlocksRef.current[operation.path[0] - 1]

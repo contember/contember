@@ -1,2 +1,2 @@
 export * from './EditorWithBlocks'
-export * from './createBlockEditor'
+export * from './initBlockEditor'

@@ -1,35 +1,40 @@
-import type { EntityAccessor, EntityListAccessor, RelativeEntityList, RelativeSingleField } from '@contember/binding'
-import type { MutableRefObject } from 'react'
-import { Editor, Element, Element as SlateElement, PathRef } from 'slate'
+import { MutableRefObject, useCallback } from 'react'
 import { assertNever } from '../../../../../utils'
-import type { EditorWithBlocks } from './EditorWithBlocks'
+import { Editor, Element } from 'slate'
+import {
+	EntityAccessor,
+	EntityListAccessor,
+	SugaredFieldProps, SugaredRelativeEntityList, useDesugaredRelativeEntityList,
+	useDesugaredRelativeSingleField,
+} from '@contember/binding'
+import { useGetParentEntityRef } from '../useGetParentEntityRef'
+import { BlockElementCache } from './useBlockElementCache'
+import { BlockElementPathRefs } from './useBlockElementPathRefs'
 
-export interface OverrideOnChangeOptions {
-	blockContentField: RelativeSingleField
-	blockElementCache: WeakMap<EntityAccessor, SlateElement>
-	blockElementPathRefs: Map<string, PathRef>
-	desugaredBlockList: RelativeEntityList
-	getParentEntityRef: MutableRefObject<EntityAccessor.GetEntityAccessor>
-	sortableByField: RelativeSingleField
-	sortedBlocksRef: MutableRefObject<EntityAccessor[]>
-}
+export const useBlockEditorOnChange = ({ editor, sortedBlocksRef, sortableBy, contentField, blockList, blockElementCache, blockElementPathRefs }: {
+	editor: Editor,
+	sortedBlocksRef: MutableRefObject<EntityAccessor[]>,
+	contentField: SugaredFieldProps['field'],
+	sortableBy: SugaredFieldProps['field'],
+	blockList: SugaredRelativeEntityList,
+	blockElementCache: BlockElementCache,
+	blockElementPathRefs: BlockElementPathRefs
+}) => {
 
-export const overrideSlateOnChange = <E extends EditorWithBlocks>(
-	editor: E,
-	{
-		blockContentField,
-		blockElementCache,
-		blockElementPathRefs,
-		desugaredBlockList,
-		getParentEntityRef,
-		sortableByField,
-		sortedBlocksRef,
-	}: OverrideOnChangeOptions,
-) => {
-	const { slateOnChange } = editor
+	const getParentEntityRef = useGetParentEntityRef()
+	const desugaredBlockList = useDesugaredRelativeEntityList(blockList)
+	const desugaredBlockContentField = useDesugaredRelativeSingleField(contentField)
+	const desugaredSortableByField = useDesugaredRelativeSingleField(sortableBy)
 
-	editor.slateOnChange = () => {
+	return useCallback(() => {
 		const { children, operations } = editor
+		const saveBlockElement = (getBlockList: () => EntityListAccessor, id: string, element: Element) => {
+			getBlockList()
+				.getChildEntityById(id)
+				.getRelativeSingleField(desugaredBlockContentField)
+				.updateValue(editor.serializeNodes([element]))
+			blockElementCache.set(getBlockList().getChildEntityById(id), element)
+		}
 
 		let hasSelectionOperation = false
 		let hasTextOperation = false
@@ -59,7 +64,7 @@ export const overrideSlateOnChange = <E extends EditorWithBlocks>(
 
 		if (hasSelectionOperation && !hasTextOperation && !hasNodeOperation) {
 			// Fast path: we're just moving the caret. Nothing to do from here.
-			return slateOnChange()
+			return
 		}
 
 		const topLevelBlocks = sortedBlocksRef.current
@@ -80,7 +85,7 @@ export const overrideSlateOnChange = <E extends EditorWithBlocks>(
 						}
 					}
 				}
-				return slateOnChange()
+				return
 			})
 		}
 
@@ -116,11 +121,11 @@ export const overrideSlateOnChange = <E extends EditorWithBlocks>(
 
 						if (
 							originalElement !== currentElement ||
-							originalBlock.getRelativeSingleField(sortableByField).value !== newBlockOrder
+							originalBlock.getRelativeSingleField(desugaredSortableByField).value !== newBlockOrder
 						) {
 							getBlockList()
 								.getChildEntityById(blockId)
-								.getRelativeSingleField(sortableByField)
+								.getRelativeSingleField(desugaredSortableByField)
 								.updateValue(newBlockOrder)
 							saveBlockElement(getBlockList, blockId, currentElement as Element)
 						}
@@ -135,22 +140,14 @@ export const overrideSlateOnChange = <E extends EditorWithBlocks>(
 				if (!isProcessed) {
 					blockList.createNewEntity(getAccessor => {
 						const newId = getAccessor().id
-						getAccessor().getRelativeSingleField(sortableByField).updateValue(blockOrder)
+						getAccessor().getRelativeSingleField(desugaredSortableByField).updateValue(blockOrder)
 						saveBlockElement(getBlockList, newId, child as Element)
 						blockElementPathRefs.set(newId, Editor.pathRef(editor, [topLevelIndex], { affinity: 'backward' }))
 					})
 				}
 			}
 
-			return slateOnChange()
+			return
 		})
-	}
-
-	const saveBlockElement = (getBlockList: () => EntityListAccessor, id: string, element: Element) => {
-		getBlockList()
-			.getChildEntityById(id)
-			.getRelativeSingleField(blockContentField)
-			.updateValue(editor.serializeNodes([element]))
-		blockElementCache.set(getBlockList().getChildEntityById(id), element)
-	}
+	}, [blockElementCache, blockElementPathRefs, desugaredBlockContentField, desugaredBlockList, desugaredSortableByField, editor, getParentEntityRef, sortedBlocksRef])
 }

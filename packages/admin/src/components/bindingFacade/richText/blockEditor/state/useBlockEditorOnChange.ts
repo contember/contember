@@ -1,4 +1,4 @@
-import { MutableRefObject, useCallback } from 'react'
+import { MutableRefObject, useCallback, useRef, useState } from 'react'
 import { assertNever } from '../../../../../utils'
 import { Descendant, Editor, Element as SlateElement, Element, Node } from 'slate'
 import {
@@ -6,7 +6,7 @@ import {
 	EntityAccessor,
 	EntityListAccessor,
 	SugaredFieldProps, SugaredRelativeEntityList, useDesugaredRelativeEntityList,
-	useDesugaredRelativeSingleField,
+	useDesugaredRelativeSingleField, useEntityBeforePersist,
 } from '@contember/binding'
 import { useGetParentEntityRef } from '../useGetParentEntityRef'
 import { BlockElementCache } from './useBlockElementCache'
@@ -29,9 +29,18 @@ export const useBlockEditorOnChange = ({ editor, sortedBlocksRef, sortableBy, co
 	const desugaredBlockList = useDesugaredRelativeEntityList(blockList)
 	const desugaredBlockContentField = useDesugaredRelativeSingleField(contentField)
 	const desugaredSortableByField = useDesugaredRelativeSingleField(sortableBy)
+	const trashFakeBlockId = useRef<string>()
+	useEntityBeforePersist(() => {
+		if (trashFakeBlockId.current) {
+			const block = getParentEntityRef.current().getRelativeEntityList(desugaredBlockList).getChildEntityById(trashFakeBlockId.current)
+			block.deleteEntity()
+			trashFakeBlockId.current = undefined
+		}
+	})
 
 	return useCallback(() => {
 		const { children, operations } = editor
+		console.log({ children, operations })
 		const saveBlockElement = (getBlockList: () => EntityListAccessor, id: string, element: Element) => {
 			getBlockList()
 				.getChildEntityById(id)
@@ -182,23 +191,38 @@ export const useBlockEditorOnChange = ({ editor, sortedBlocksRef, sortableBy, co
 					for (const id of nodeReferences) {
 						const entry = knownReferences.get(id)
 						if (!entry) {
-							throw new BindingError(`Reference ${id} not found.`)
+							if (trashFakeBlockId.current) {
+								const fakeBlock = blockList.getChildEntityById(trashFakeBlockId.current)
+								const fakeReferences = fakeBlock.getEntityList(referencesField)
+								const ref = fakeReferences.getChildEntityById(id)
+								references.connectEntity(ref)
+								fakeReferences.disconnectEntity(ref)
+              } else {
+								throw new BindingError(`Reference ${id} not found.`)
+							}
+						} else {
+							const [reference, prevBlock] = entry
+							if (prevBlock !== block) {
+								references.connectEntity(reference.getAccessor())
+								prevBlock.getEntityList(referencesField).disconnectEntity(reference.getAccessor(), { noPersist: true })
+							}
+							knownReferences.delete(id)
 						}
-						const [reference, prevBlock] = entry
-						if (prevBlock !== block) {
-							references.connectEntity(reference)
-							prevBlock.getEntityList(referencesField).disconnectEntity(reference, { noPersist: true })
-						}
-						knownReferences.delete(id)
 					}
 				}
-				for (const [, [reference]] of knownReferences) {
-					reference.deleteEntity()
+				for (const [, [reference, block]] of knownReferences) {
+					if (!trashFakeBlockId.current) {
+						blockList.createNewEntity(getAccessor => {
+							getAccessor().getRelativeSingleField(desugaredSortableByField).updateValue(Number.MAX_SAFE_INTEGER)
+							trashFakeBlockId.current = getAccessor().id
+						})
+					}
+					const trashBlock = blockList.getChildEntityById(trashFakeBlockId.current!)
+					trashBlock.getEntityList(referencesField).connectEntity(reference)
+					block.getEntityList(referencesField).disconnectEntity(reference, { noPersist: true })
 				}
 			}
 			cleanupStack()
-
-			return
 		})
 	}, [blockElementCache, blockElementPathRefs, desugaredBlockContentField, desugaredBlockList, desugaredSortableByField, editor, getParentEntityRef, monolithicReferencesMode, referencesField, sortedBlocksRef])
 }

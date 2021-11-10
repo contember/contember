@@ -2,8 +2,36 @@
 
 .#{$cui-conf-globalPrefix}editorBlockBoundary
 	height: .75em
-	cursor: text
 
+	display: flex
+	flex-direction: row
+	align-items: center
+	margin: 5px 0
+	cursor: pointer
+
+	&:hover
+		&::before
+			display: block
+			content: '+'
+			color: #777
+			border: 1px solid #777
+			border-radius: 50%
+			text-align: center
+			width: 14px
+			height: 14px
+			line-height: 10px
+
+		&::after
+			display: block
+			content: 'New paragraph'
+			font-size: 14px
+			line-height: 26px
+			color: #777
+			margin-left: 4px
+
+	.cui-editorCanvas-canvas > div[data-contember-type="reference"] + div[data-contember-type="reference"]
+		.cui-editorBlockBoundary.view-beforeBlock
+			display: none
 	//&.view-beforeBlock
 	//	top: (-$height / 2)
 	//&.view-afterBlock

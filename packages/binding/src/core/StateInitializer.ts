@@ -99,6 +99,7 @@ export class StateInitializer {
 		id: RuntimeId,
 		entityName: EntityName,
 		blueprint: EntityRealmBlueprint,
+		copyFrom?: EntityRealmState | EntityRealmStateStub,
 	): EntityRealmState | EntityRealmStateStub {
 		// This is counter-intuitive a bit. The method can also return an EntityRealmState, not just a stub.
 		// The reason is so that each call-site can just default to trying to initialize a stub without having to keep
@@ -112,30 +113,64 @@ export class StateInitializer {
 			return existing
 		}
 
-		const stub: EntityRealmStateStub = {
-			type: 'entityRealmStub',
+		if (!copyFrom || copyFrom.type !== 'entityRealm') {
+			const stub: EntityRealmStateStub = {
+				type: 'entityRealmStub',
 
-			blueprint,
-			entity,
-			realmKey,
-			getAccessor: () => this.materializeEntityRealm(stub).getAccessor(),
+				blueprint,
+				entity,
+				realmKey,
+				getAccessor: () => this.materializeEntityRealm(stub).getAccessor(),
+			}
+			this.registerEntityRealm(stub)
+
+			return stub
 		}
-		this.registerEntityRealm(stub)
+		const realm = this.createEntityRealm(blueprint, realmKey, entity)
 
-		return stub
+		this.registerEntityRealm(realm)
+
+		const marker = getEntityMarker(realm)
+		const pathBack = this.treeStore.getPathBackToParent(realm)
+
+		for (const [placeholderName, field] of marker.fields.markers) {
+			if (field instanceof FieldMarker) {
+				const value = copyFrom.children.get(placeholderName)
+				if (!value || value.type !== 'field') {
+					throw new BindingError()
+				}
+				this.initializeFromFieldMarker(realm, field, value.value)
+			} else if (field instanceof HasManyRelationMarker) {
+				// todo: get from copyFrom
+				this.initializeFromHasManyRelationMarker(realm, field, new Set())
+			} else if (field instanceof HasOneRelationMarker) {
+				let runtimeId: RuntimeId
+				let subCopyFrom: EntityRealmState | undefined = undefined
+				if (pathBack?.fieldBackToParent === field.parameters.field) {
+					runtimeId = pathBack.parent.entity.id
+				} else {
+					const value = copyFrom.children.get(placeholderName)
+					if (!value || (value.type !== 'entityRealm' && value.type !== 'entityRealmStub')) {
+						throw new BindingError()
+					}
+					if (value.type === 'entityRealm') {
+						subCopyFrom = value
+						runtimeId = value.entity.id
+					} else {
+						runtimeId = new UnpersistedEntityDummyId()
+					}
+				}
+				this.initializeFromHasOneRelationMarker(realm, field, runtimeId, subCopyFrom)
+			} else {
+				assertNever(field)
+			}
+		}
+
+		this.eventManager.registerNewlyInitialized(realm)
+		return realm
 	}
 
-	private materializeEntityRealm(state: EntityRealmState | EntityRealmStateStub): EntityRealmState {
-		if (state.type === 'entityRealm') {
-			return state
-		}
-		const { realmKey, entity, blueprint } = state
-
-		const existing = this.treeStore.entityRealmStore.get(realmKey)
-		if (existing !== undefined && existing.type === 'entityRealm') {
-			return existing
-		}
-
+	private createEntityRealm(blueprint: EntityRealmBlueprint, realmKey: string, entity: EntityState): EntityRealmState {
 		const entityRealm: EntityRealmState = {
 			type: 'entityRealm',
 
@@ -174,6 +209,21 @@ export class StateInitializer {
 				return entityRealm.accessor
 			},
 		}
+		return entityRealm
+	}
+
+	private materializeEntityRealm(state: EntityRealmState | EntityRealmStateStub): EntityRealmState {
+		if (state.type === 'entityRealm') {
+			return state
+		}
+		const { realmKey, entity, blueprint } = state
+
+		const existing = this.treeStore.entityRealmStore.get(realmKey)
+		if (existing !== undefined && existing.type === 'entityRealm') {
+			return existing
+		}
+
+		const entityRealm = this.createEntityRealm(blueprint, realmKey, entity)
 
 		this.registerEntityRealm(entityRealm)
 
@@ -376,6 +426,7 @@ export class StateInitializer {
 		parent: EntityRealmState,
 		field: HasOneRelationMarker,
 		entityId: RuntimeId,
+		copyFrom?: EntityRealmState | EntityRealmStateStub,
 	) {
 		parent.children.set(
 			field.placeholderName,
@@ -383,7 +434,7 @@ export class StateInitializer {
 				type: 'hasOne',
 				parent,
 				marker: field,
-			}),
+			}, copyFrom),
 		)
 		// if (fieldDatum instanceof ServerGeneratedUuid || fieldDatum === null || fieldDatum === undefined) {
 		// 	const entityId = fieldDatum instanceof ServerGeneratedUuid ? fieldDatum : new UnpersistedEntityDummyId()

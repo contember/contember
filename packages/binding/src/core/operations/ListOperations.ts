@@ -97,7 +97,7 @@ export class ListOperations {
 				this.stateInitializer.initializeEntityRealm(idToConnect, state.entityName, {
 					type: 'listEntity',
 					parent: state,
-				})
+				}, stateToConnect)
 
 				state.plannedRemovals?.delete(idToConnect.value)
 

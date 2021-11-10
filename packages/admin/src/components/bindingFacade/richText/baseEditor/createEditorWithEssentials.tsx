@@ -185,6 +185,9 @@ export const createEditorWithEssentials = (defaultElementType: string): Editor =
 		onFocus: () => {},
 		onBlur: () => {},
 		normalizeNode: ([node, path]) => {
+			if (Editor.isEditor(node) && node.children.length === 0) {
+				Transforms.insertNodes(editor, editor.createDefaultElement([{ text: '' }]))
+			}
 			if (!SlateElement.isElement(node)) {
 				normalizeNode([node, path])
 				return

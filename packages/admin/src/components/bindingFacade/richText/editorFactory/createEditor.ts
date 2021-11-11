@@ -58,13 +58,23 @@ export const createEditor = ({
 	addEditorBuiltins,
 	augmentEditor = identityFunction,
 }: CreateEditorOptions) => {
-	let baseEditor: SlateEditor = createEditorWithEssentials(defaultElementType)
+	const editor = createEditorWithEssentials(defaultElementType)
+	return initializeEditor({ editor, plugins, augmentEditor, addEditorBuiltins, augmentEditorBuiltins })
+}
 
+
+export const initializeEditor = ({
+	editor,
+	plugins = defaultEditorPluginPreset,
+	augmentEditorBuiltins = identityFunction,
+	addEditorBuiltins,
+	augmentEditor = identityFunction,
+}: Omit<CreateEditorOptions, 'defaultElementType'> & {editor: SlateEditor}) => {
 	for (const plugin of new Set(plugins)) {
-		baseEditor = pluginAugmenters[plugin](baseEditor)
+		editor = pluginAugmenters[plugin](editor)
 	}
 
-	const withAugmentedBase = augmentEditor(baseEditor)
+	const withAugmentedBase = augmentEditor(editor)
 	const withBuiltins = addEditorBuiltins(withAugmentedBase)
 
 	return augmentEditorBuiltins(withBuiltins)

@@ -53,7 +53,7 @@ export const HoveringToolbarContents = memo(({ buttons: rawButtons }: HoveringTo
 								}
 
 								Transforms.deselect(editor)
-								const referenceId = editor.createElementReference(
+								const reference = editor.createElementReference(
 									targetPath,
 									discriminateBy,
 									button.initializeReference,
@@ -64,9 +64,9 @@ export const HoveringToolbarContents = memo(({ buttons: rawButtons }: HoveringTo
 									await openDialog({
 										heading: button.label,
 										content: props => (
-											<Entity accessor={editor.getReferencedEntity(referenceId)}>
+											<Entity accessor={reference}>
 												<Content
-													referenceId={referenceId}
+													referenceId={reference.id}
 													editor={editor}
 													selection={selection}
 													onSuccess={() => props.resolve(undefined)}
@@ -76,7 +76,7 @@ export const HoveringToolbarContents = memo(({ buttons: rawButtons }: HoveringTo
 										),
 									})
 								} catch {
-									editor.getReferencedEntity(referenceId).deleteEntity()
+									reference.deleteEntity()
 								}
 							}
 						} else {

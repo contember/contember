@@ -14,5 +14,6 @@ export * from './treeParameters'
 
 export * from './bindingTypes'
 export * from './BindingError'
+export { v4 as generateUuid } from 'uuid'
 
 // Deliberately not exporting utils.

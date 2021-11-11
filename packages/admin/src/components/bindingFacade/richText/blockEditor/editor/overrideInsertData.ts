@@ -5,6 +5,8 @@ import { ReferenceElement, referenceElementType } from '../elements'
 import type { EmbedHandler, NormalizedEmbedHandlers } from '../embed'
 import type { EditorWithBlocks } from './EditorWithBlocks'
 import { parseUrl } from '../../utils'
+import { EditorTransforms } from '../../slate-reexport'
+import { isInReferenceElement } from '../utils'
 
 export interface OverrideInsertDataOptions {
 	embedHandlers: NormalizedEmbedHandlers | undefined
@@ -13,7 +15,7 @@ export interface OverrideInsertDataOptions {
 }
 
 export const overrideInsertData = <E extends EditorWithBlocks>(editor: E, options: OverrideInsertDataOptions) => {
-	const { insertData, insertFragment } = editor
+	let { insertData, insertFragment } = editor
 
 	const stripNodeReferences = (nodes: SlateNode[]): SlateNode[] =>
 		nodes.flatMap(node => {
@@ -32,6 +34,15 @@ export const overrideInsertData = <E extends EditorWithBlocks>(editor: E, option
 
 	editor.insertFragment = fragment => {
 		insertFragment(stripNodeReferences(fragment))
+	}
+
+	editor.insertData = data => {
+		if (editor.selection && isInReferenceElement(editor)) {
+			const text = data.getData('text/plain').trim()
+			EditorTransforms.insertText(editor, text)
+			return // No splitting of references. We'd have to clone the reference and we don't know how to do that yet.
+		}
+		return insertData(data)
 	}
 
 	const { embedReferenceDiscriminateBy, embedHandlers, embedContentDiscriminationField } = options
@@ -63,14 +74,15 @@ export const overrideInsertData = <E extends EditorWithBlocks>(editor: E, option
 		})
 	}
 
+	const insertDataEmbed = editor.insertData
 	editor.insertData = data => {
 		if (data.getData('application/x-slate-fragment')) {
-			return insertData(data)
+			return insertDataEmbed(data)
 		}
 
 		const text = data.getData('text/plain').trim()
 		if (!text) {
-			return insertData(data)
+			return insertDataEmbed(data)
 		}
 
 		const url = parseUrl(text)
@@ -82,7 +94,7 @@ export const overrideInsertData = <E extends EditorWithBlocks>(editor: E, option
 					return insertEmbed(handler, result, text)
 				}
 			}
-			insertData(data)
+			insertDataEmbed(data)
 		})()
 	}
 }

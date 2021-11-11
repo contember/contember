@@ -15,6 +15,7 @@ export class ContentBlock {
 export const ContentReferenceType = d.createEnum(
 	'image', // image
 	'quote', // primaryText, secondaryText
+	'link', // url
 )
 
 export class ContentReference {
@@ -23,4 +24,5 @@ export class ContentReference {
 	primaryText = d.stringColumn()
 	secondaryText = d.stringColumn()
 	image = d.manyHasOne(BasicImage)
+	url = d.stringColumn()
 }

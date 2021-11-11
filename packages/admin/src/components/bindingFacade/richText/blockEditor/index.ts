@@ -6,3 +6,4 @@ export * from './renderers'
 
 export * from './BlockEditor'
 export * from './useBlockEditorSlateNodes'
+export { prepareElementForInsertion } from './utils'

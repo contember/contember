@@ -24,7 +24,7 @@ export const createEmptyTableCellElement = () => ({
 export const tableCellElementPlugin: CustomElementPlugin<TableCellElement> = {
 	type: tableCellElementType,
 	render: TableCellElementRenderer,
-	normalizeNode: ({ element, editor, path }) => {
+	normalizeNode: ({ element, editor, path, preventDefault }) => {
 		if (element.children.length === 1) {
 			const onlyChild = element.children[0]
 			if (SlateElement.isElement(onlyChild) && editor.isDefaultElement(onlyChild)) {
@@ -34,10 +34,12 @@ export const tableCellElementPlugin: CustomElementPlugin<TableCellElement> = {
 			}
 		}
 		if (!ContemberEditor.hasParentOfType(editor, [element, path], tableRowElementType)) {
-			return Transforms.unwrapNodes(editor, { at: path })
+			Transforms.unwrapNodes(editor, { at: path })
+			return preventDefault()
 		}
 		if (path[path.length - 1] > 0 && element.headerScope) {
-			return Transforms.setNodes(editor, { headerScope: null }, { at: path })
+			Transforms.setNodes(editor, { headerScope: null }, { at: path })
+			return preventDefault()
 		}
 	},
 	canContainAnyBlocks: true,

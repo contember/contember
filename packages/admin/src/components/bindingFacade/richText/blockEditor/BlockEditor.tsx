@@ -1,9 +1,6 @@
 import {
 	BindingError,
 	Component,
-	EntityAccessor,
-	EntityId,
-	EntityRealmKey,
 	Environment,
 	FieldValue,
 	HasMany,
@@ -13,28 +10,14 @@ import {
 	useBindingOperations,
 	useDesugaredRelativeEntityList,
 	useDesugaredRelativeSingleField,
-	useEntity,
-	useEntityBeforeUpdate,
 	useEntityList,
-	useEntityPersistSuccess,
 	useEnvironment,
-	useSortedEntities,
 	VariableInputTransformer,
 } from '@contember/binding'
 import { emptyArray, noop } from '@contember/react-utils'
 import { EditorCanvas, EditorCanvasSize } from '@contember/ui'
-import {
-	Fragment,
-	FunctionComponent,
-	ReactElement,
-	ReactNode,
-	useCallback,
-	useLayoutEffect,
-	useMemo,
-	useRef,
-	useState,
-} from 'react'
-import { Editor, Element as SlateElement, PathRef, Range as SlateRange } from 'slate'
+import { Fragment, FunctionComponent, ReactElement, ReactNode, useCallback, useEffect, useMemo, useState } from 'react'
+import { Range as SlateRange } from 'slate'
 import { Slate } from 'slate-react'
 import { getDiscriminatedBlock, useNormalizedBlocks } from '../../blocks'
 import { Repeater } from '../../collections'
@@ -48,14 +31,21 @@ import {
 	ToolbarButtonSpec,
 } from '../toolbars'
 import { BlockHoveringToolbarContents, BlockHoveringToolbarContentsProps } from './BlockHoveringToolbarContents'
-import { createBlockEditor } from './editor'
+import { initBlockEditor } from './editor'
 import type { EmbedHandler } from './embed'
 import type { FieldBackedElement } from './FieldBackedElement'
 import { ContentOutlet, ContentOutletProps, useEditorReferenceBlocks } from './templating'
-import { useBlockEditorSlateNodes } from './useBlockEditorSlateNodes'
 import { EditableCanvas } from '../baseEditor/EditableCanvas'
 import { TextField } from '../../fields'
 import { RichTextField } from '../RichTextField'
+import { useCreateElementReference } from './references'
+import { useBlockEditorState } from './state/useBlockEditorState'
+import { useGetReferencedEntity } from './references/useGetReferencedEntity'
+import { createEditorWithEssentials } from '../baseEditor'
+import { paragraphElementType } from '../plugins'
+import { useInsertElementWithReference } from './references/useInsertElementWithReference'
+import { useReferentiallyStableCallback } from './useReferentiallyStableCallback'
+import { ReferencesProvider } from './references/ReferencesProvider'
 
 export interface BlockEditorProps extends SugaredRelativeEntityList, CreateEditorPublicOptions {
 	label: string
@@ -84,9 +74,6 @@ export interface BlockEditorProps extends SugaredRelativeEntityList, CreateEdito
 const BlockEditorComponent: FunctionComponent<BlockEditorProps> = Component(
 	props => {
 		const environment = useEnvironment()
-		//const isMutating = useMutationState()
-		const isMutating = false // TODO see the pathRef flushing below
-		const bindingOperations = useBindingOperations()
 
 		assertStaticBlockEditorInvariants(props, environment)
 
@@ -102,6 +89,7 @@ const BlockEditorComponent: FunctionComponent<BlockEditorProps> = Component(
 
 			referencesField,
 			referenceDiscriminationField,
+			monolithicReferencesMode = false,
 
 			embedReferenceDiscriminateBy,
 			embedContentDiscriminationField,
@@ -117,26 +105,12 @@ const BlockEditorComponent: FunctionComponent<BlockEditorProps> = Component(
 
 			...blockListProps
 		} = props
-
-		const parentEntity = useEntity() // TODO this is over-subscribing
-		const blockList = useEntityList(blockListProps)
-
-		// eslint-disable-next-line react-hooks/rules-of-hooks
-		const referenceList = props.monolithicReferencesMode ? useEntityList(referencesField) : undefined
-
-		const getParentEntity = parentEntity.getAccessor
-
-		const desugaredBlockList = useDesugaredRelativeEntityList(blockListProps)
-		const desugaredBlockContentField = useDesugaredRelativeSingleField(contentField)
-		const desugaredSortableByField = useDesugaredRelativeSingleField(sortableBy)
-
 		// const desugaredReferenceList = useDesugaredRelativeEntityList(referencesField)
 		const desugaredReferenceDiscriminationField = useDesugaredRelativeSingleField(referenceDiscriminationField)
 		const desugaredEmbedContentDiscriminationField = useDesugaredRelativeSingleField(embedContentDiscriminationField)
 
 
 		const editorReferenceBlocks = useEditorReferenceBlocks(children)
-		const { entities: topLevelBlocks } = useSortedEntities(blockList, sortableBy)
 
 		//
 
@@ -153,130 +127,63 @@ const BlockEditorComponent: FunctionComponent<BlockEditorProps> = Component(
 				: undefined, // TODO this may crash
 		)
 
-		//
-		const [blockElementCache] = useState(() => new WeakMap<EntityAccessor, SlateElement>())
-		const [blockElementPathRefs] = useState(() => new Map<string, PathRef>())
-		const [referencedEntityCache] = useState(() => new Map<EntityId, EntityRealmKey>())
+		const [baseEditor] = useState(() => createEditorWithEssentials(paragraphElementType))
+		const { nodes, onChange, sortedBlocksRef, blockElementPathRefs, blockElementCache, sortedBlocks } = useBlockEditorState({
+			editor: baseEditor,
+			blockList: blockListProps,
+			contentField,
+			sortableBy,
+			monolithicReferencesMode,
+			referencesField,
+		})
+		const getReferencedEntity = useGetReferencedEntity({
+			monolithicReferencesMode,
+			referencesField,
+			sortedBlocks,
+		})
+		const createElementReference = useCreateElementReference({
+			sortedBlocks,
+			monolithicReferencesMode,
+			referenceDiscriminationField,
+			referencesField,
+		})
+		const stableCreateElementReference = useReferentiallyStableCallback(createElementReference)
 
-		//
+		const insertElementWithReference = useInsertElementWithReference({
+			editor: baseEditor,
+			contentField,
+			sortableBy,
+			sortedBlocksRef,
+			blockList: blockListProps,
+			blockElementCache,
+			blockElementPathRefs,
+			createElementReference: stableCreateElementReference,
+			monolithicReferencesMode,
+		})
 
-		const getParentEntityRef = useRef(getParentEntity)
-		const isMutatingRef = useRef(isMutating)
-		const sortedBlocksRef = useRef(topLevelBlocks)
-
-		useLayoutEffect(() => {
-			getParentEntityRef.current = getParentEntity
-			isMutatingRef.current = isMutating
-			sortedBlocksRef.current = topLevelBlocks
-		}) // Deliberately no deps array
-
+		const stableGetReferencedEntity = useReferentiallyStableCallback(getReferencedEntity)
 		const [editor] = useState(() =>
-			createBlockEditor({
+			initBlockEditor({
+				editor: baseEditor,
 				augmentEditor,
 				augmentEditorBuiltins,
-				bindingOperations,
-				blockContentField: desugaredBlockContentField,
-				blockElementCache,
-				blockElementPathRefs,
-				createMonolithicReference: referenceList
-					? initialize => referenceList.getAccessor().createNewEntity(initialize)
-					: undefined,
-				desugaredBlockList,
 				editorReferenceBlocks,
 				embedContentDiscriminationField: desugaredEmbedContentDiscriminationField,
 				embedHandlers: discriminatedEmbedHandlers,
 				embedReferenceDiscriminateBy: embedReferenceDiscriminant,
 				embedSubBlocks,
-				getMonolithicReferenceById: referenceList
-					? id => referenceList.getAccessor().getChildEntityById(id)
-					: undefined,
-				getParentEntityRef,
-				isMutatingRef,
 				plugins,
-				referencedEntityCache,
 				referenceDiscriminationField: desugaredReferenceDiscriminationField,
-				referencesField,
-				sortableByField: desugaredSortableByField,
-				sortedBlocksRef,
-			}),
-		)
+				createElementReferences: stableCreateElementReference,
+				getReferencedEntity: stableGetReferencedEntity,
+				insertElementWithReference,
+			}))
 
-		// TODO this isn't particularly great. We should probably react to id changes more directly.
-		useEntityPersistSuccess(
-			useCallback(
-				getEntity => {
-					referencedEntityCache.clear()
-
-					for (const ref of blockElementPathRefs.values()) {
-						ref.unref()
-					}
-					blockElementPathRefs.clear()
-					const blocks = getEntity().getEntityList(blockListProps)
-					let blockIndex = 0
-					for (const topLevelBlock of blocks) {
-						blockElementPathRefs.set(topLevelBlock.id, Editor.pathRef(editor, [blockIndex++], { affinity: 'backward' }))
-					}
-				},
-				[referencedEntityCache, blockElementPathRefs, blockListProps, editor],
-			),
-		)
-
-		const nodes = useBlockEditorSlateNodes({
-			editor,
-			blockElementCache,
-			blockElementPathRefs,
-			blockContentField: desugaredBlockContentField,
-			topLevelBlocks,
-		})
-
-		useEntityBeforeUpdate(
-			useCallback(
-				getAccessor => {
-					const hasPendingOperations = !!editor.operations.length // See the explanation in overrideSlateOnChange
-
-					// This could feasibly be over-eager and cause incorrect early returns (due to both sides of the or)
-					// but I cannot force the editor into a situation where this would actually be the case.
-					if (props.monolithicReferencesMode || hasPendingOperations) {
-						return
-					}
-					for (const blockEntity of getAccessor().getEntityList(blockListProps)) {
-						const cachedElement = blockElementCache.get(blockEntity)
-
-						if (cachedElement !== undefined) {
-							continue
-						}
-						const blockIndex =
-							blockEntity.getRelativeSingleField<number>(desugaredSortableByField).value!
-						if (editor.children.length < blockIndex) {
-							continue
-						}
-
-						// Whenever something changes within the block, we get a new instance of the blockEntity accessor.
-						// Not all such changes are due to the editor though. Some could be just something within the reference.
-						// In those cases, we would get a cache miss and deserialize the block node again, thereby losing its
-						// referential equality. That, in turn, would cause Slate to re-mount the element during render which
-						// would completely ruin the UX. Thus we want to keep the old node if possible. We check whether it
-						// would be equivalent, and if so, just use the old one. That way Slate never gets a new node and no
-						// remounting ever takes place.
-						const previousNode = editor.children[blockIndex]
-						const contentField = blockEntity.getRelativeSingleField<string>(desugaredBlockContentField)
-						const currentNode = editor.deserializeNodes(
-							contentField.value!,
-							`BlockEditor: The 'contentField' of a block contains invalid data.`,
-						)[0]
-						if (SlateElement.isElement(previousNode) && JSON.stringify(previousNode) === JSON.stringify(currentNode)) {
-							blockElementCache.set(blockEntity, previousNode)
-						}
-					}
-				},
-				[blockElementCache, blockListProps, desugaredBlockContentField, desugaredSortableByField, editor, props.monolithicReferencesMode],
-			),
-		)
 
 		const shouldDisplayInlineToolbar = useCallback(() => {
-			const selection = editor.selection
+			const selection = baseEditor.selection
 			return !(!selection || SlateRange.isCollapsed(selection))
-		}, [editor])
+		}, [baseEditor])
 
 
 		const leadingElements = useFieldBackedElementFields(leadingFieldBackedElements)
@@ -284,43 +191,45 @@ const BlockEditorComponent: FunctionComponent<BlockEditorProps> = Component(
 
 		// TODO label?
 		return (
-			<Slate editor={editor} value={nodes} onChange={editor.slateOnChange}>
-				<EditorCanvas
-					underlyingComponent={EditableCanvas}
-					componentProps={{
-						renderElement: editor.renderElement,
-						renderLeaf: editor.renderLeaf,
-						onKeyDown: editor.onKeyDown,
-						onFocusCapture: editor.onFocus,
-						onBlurCapture: editor.onBlur,
-						onDOMBeforeInput: editor.onDOMBeforeInput,
-						onDrop: (e => {
-							e.preventDefault()
-						}),
-						placeholder: label,
-						leading: leadingElements,
-						trailing: trailingElements,
-					}}
-					size={size ?? 'large'}
-				>
-					{useMemo(
-						() => (
-							<HoveringToolbars
-								shouldDisplayInlineToolbar={shouldDisplayInlineToolbar}
-								inlineButtons={inlineButtons}
-								blockButtons={
-									<BlockHoveringToolbarContents
-										editorReferenceBlocks={editorReferenceBlocks}
-										blockButtons={blockButtons}
-										otherBlockButtons={otherBlockButtons}
-									/>
-								}
-							/>
-						),
-						[blockButtons, editorReferenceBlocks, inlineButtons, otherBlockButtons, shouldDisplayInlineToolbar],
-					)}
-				</EditorCanvas>
-			</Slate>
+			<ReferencesProvider getReferencedEntity={getReferencedEntity}>
+				<Slate editor={editor} value={nodes} onChange={onChange}>
+					<EditorCanvas
+						underlyingComponent={EditableCanvas}
+						componentProps={{
+							renderElement: baseEditor.renderElement,
+							renderLeaf: baseEditor.renderLeaf,
+							onKeyDown: baseEditor.onKeyDown,
+							onFocusCapture: baseEditor.onFocus,
+							onBlurCapture: baseEditor.onBlur,
+							onDOMBeforeInput: baseEditor.onDOMBeforeInput,
+							onDrop: (e => {
+								e.preventDefault()
+							}),
+							placeholder: label,
+							leading: leadingElements,
+							trailing: trailingElements,
+						}}
+						size={size ?? 'large'}
+					>
+						{useMemo(
+							() => (
+								<HoveringToolbars
+									shouldDisplayInlineToolbar={shouldDisplayInlineToolbar}
+									inlineButtons={inlineButtons}
+									blockButtons={
+										<BlockHoveringToolbarContents
+											editorReferenceBlocks={editorReferenceBlocks}
+											blockButtons={blockButtons}
+											otherBlockButtons={otherBlockButtons}
+										/>
+									}
+								/>
+							),
+							[blockButtons, editorReferenceBlocks, inlineButtons, otherBlockButtons, shouldDisplayInlineToolbar],
+						)}
+					</EditorCanvas>
+				</Slate>
+			</ReferencesProvider>
 		)
 	},
 	(props, environment) => {

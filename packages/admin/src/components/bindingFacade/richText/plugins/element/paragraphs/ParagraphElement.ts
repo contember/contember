@@ -44,10 +44,11 @@ export const paragraphElementPlugin: CustomElementPlugin<ParagraphElement> = {
 			}
 		})
 	},
-	normalizeNode: ({ editor, element, path }) => {
+	normalizeNode: ({ editor, element, path, preventDefault }) => {
 		for (const [i, child] of element.children.entries()) {
 			if (Editor.isBlock(editor, child)) {
-				return Transforms.unwrapNodes(editor, { at: [...path, i] })
+				Transforms.unwrapNodes(editor, { at: [...path, i] })
+				return preventDefault()
 			}
 		}
 	},

@@ -1,12 +1,18 @@
-import { BindingError, EntityAccessor, RelativeSingleField } from '@contember/binding'
+import {
+	BindingError,
+	EntityAccessor,
+	RelativeSingleField,
+	SugaredFieldProps,
+	useDesugaredRelativeSingleField,
+} from '@contember/binding'
 import type { ReactNode } from 'react'
-import { Editor, Element as SlateElement, PathRef } from 'slate'
+import { Descendant, Editor, Element as SlateElement, PathRef } from 'slate'
 
 export interface UseBlockEditorSlateNodesOptions {
 	editor: Editor
 	blockElementCache: WeakMap<EntityAccessor, SlateElement>
 	blockElementPathRefs: Map<string, PathRef>
-	blockContentField: RelativeSingleField
+	blockContentField: SugaredFieldProps['field']
 	topLevelBlocks: EntityAccessor[]
 }
 
@@ -16,7 +22,8 @@ export const useBlockEditorSlateNodes = ({
 	blockElementPathRefs,
 	blockContentField,
 	topLevelBlocks,
-}: UseBlockEditorSlateNodesOptions): SlateElement[] => {
+}: UseBlockEditorSlateNodesOptions): Descendant[] => {
+	const desugaredContentField = useDesugaredRelativeSingleField(blockContentField)
 	if (editor.operations.length) {
 		// This is *ABSOLUTELY CRUCIAL*!
 		//	Slate invokes the onChange callback asynchronously, and so it could happen that this hook is invoked whilst
@@ -26,7 +33,7 @@ export const useBlockEditorSlateNodes = ({
 		//	this hook generates and onChange in turn uses editor.children to update accessors.
 		//	Consequently, whenever there are pending changes, we just return whatever children the editor already has
 		//	because we know that an onChange is already scheduled.
-		return editor.children as SlateElement[]
+		return editor.children
 	}
 
 	const topLevelBlockElements = topLevelBlocks.length
@@ -47,7 +54,7 @@ export const useBlockEditorSlateNodes = ({
 				if (existingBlockElement) {
 					return existingBlockElement
 				}
-				const contentField = entity.getRelativeSingleField(blockContentField)
+				const contentField = entity.getRelativeSingleField(desugaredContentField)
 
 				let blockElement: SlateElement
 

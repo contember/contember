@@ -1,4 +1,4 @@
-import { BindingError, Entity, RelativeSingleField } from '@contember/binding'
+import { BindingError, Entity, RelativeSingleField, useEntity } from '@contember/binding'
 import { ActionableBox, Box, EditorBox } from '@contember/ui'
 import { memo, MouseEvent as ReactMouseEvent, ReactNode, useCallback } from 'react'
 import { Transforms } from 'slate'
@@ -20,7 +20,7 @@ export const ReferenceElementRenderer = memo((props: ReferenceElementRendererPro
 	const editor = useSlateStatic() as EditorWithBlocks
 	const selected = useSelected()
 
-	const referencedEntity = editor.getReferencedEntity(props.element)
+	const referencedEntity = useEntity()
 
 	const discriminationField = referencedEntity.getRelativeSingleField(props.referenceDiscriminationField)
 	const selectedReference = getDiscriminatedDatum(props.editorReferenceBlocks, discriminationField)?.datum

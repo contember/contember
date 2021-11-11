@@ -5,7 +5,7 @@ import { RenderElementProps } from 'slate-react'
 export interface CustomElementPlugin<T extends Element> {
 	type: T['type']
 	render: FunctionComponent<Omit<RenderElementProps, 'element'> & { element: T }>
-	normalizeNode?: (args: { element: T, path: Path, editor: Editor }) => void | true
+	normalizeNode?: (args: { element: T, path: Path, editor: Editor, preventDefault: () => void }) => void
 	isActive?: (args: { editor: Editor, suchThat?: Partial<T> }) => boolean
 	isInline?: boolean
 	isVoid?: boolean | ((args: { element: T, editor: Editor }) => boolean)

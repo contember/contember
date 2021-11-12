@@ -1,7 +1,7 @@
 import { BaseController } from './BaseController'
 import type { IncomingMessage, ServerResponse } from 'http'
-import type { TenantApi } from '../tenant'
-import type { S3Manager } from '../s3'
+import type { TenantClient } from '../services/TenantClient'
+import type { S3Manager } from '../services/S3Manager'
 
 interface MeResponsePayload {
 	email: string
@@ -14,12 +14,16 @@ interface MeResponsePayload {
 	}>
 }
 
-export class MeController extends BaseController {
-	constructor(private tenant: TenantApi, private s3: S3Manager) {
+interface MeParams {
+	projectGroup: string | undefined
+}
+
+export class MeController extends BaseController<MeParams> {
+	constructor(private tenant: TenantClient, private s3: S3Manager) {
 		super()
 	}
 
-	async handle(req: IncomingMessage, res: ServerResponse): Promise<void> {
+	async handle(req: IncomingMessage, res: ServerResponse, { projectGroup }: MeParams): Promise<void> {
 		const token = this.readAuthCookie(req)
 		if (token === null) {
 			res.writeHead(403)
@@ -27,14 +31,14 @@ export class MeController extends BaseController {
 			return
 		}
 
-		const me = await this.tenant.getMe(token)
+		const me = await this.tenant.getMe(token, projectGroup)
 		if (me === null) {
 			res.writeHead(403)
 			res.end('cookie contains invalid token')
 			return
 		}
 
-		const projectsWithAdmin = await this.s3.listProjectSlugs()
+		const projectsWithAdmin = await this.s3.listProjectSlugs({ projectGroup })
 		const projects = me.projects
 			.filter(it => projectsWithAdmin.includes(it.project.slug))
 			.map(it => ({ name: it.project.name, slug: it.project.slug, roles: it.memberships.map(it => it.role) }))

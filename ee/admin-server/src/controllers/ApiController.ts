@@ -1,19 +1,21 @@
 import { request as httpRequest, IncomingMessage, OutgoingHttpHeaders, ServerResponse } from 'http'
 import { request as httpsRequest, RequestOptions } from 'https'
-import { URL } from 'url'
 import { BaseController } from './BaseController'
-import type { ProjectListProvider } from '../project'
+import { ApiEndpointResolver } from '../services/ApiEndpointResolver'
+import { BadRequestError } from '../BadRequestError'
+import { ProjectListProvider } from '../services/ProjectListProvider'
 
 export const LOGIN_TOKEN_PLACEHOLDER = '__LOGIN_TOKEN__'
 export const SESSION_TOKEN_PLACEHOLDER = '__SESSION_TOKEN__'
 
 interface ApiParams {
 	path: string
+	projectGroup: string | undefined
 }
 
 export class ApiController extends BaseController<ApiParams> {
 	constructor(
-		private apiEndpoint: string,
+		private apiEndpointResolver: ApiEndpointResolver,
 		private loginToken: string,
 		private projectListProvider: ProjectListProvider,
 	) {
@@ -22,18 +24,26 @@ export class ApiController extends BaseController<ApiParams> {
 
 	async handle(req: IncomingMessage, res: ServerResponse, params: ApiParams): Promise<void> {
 		const tokenPath = req.headers['x-contember-token-path']
-		const apiEndpointUrl = new URL(this.apiEndpoint)
+		const resolvedEndpoint = this.apiEndpointResolver.resolve(params.projectGroup)
+		if (!resolvedEndpoint) {
+			throw new BadRequestError(404, 'Not Found')
+		}
+		const { endpoint, hostname } = resolvedEndpoint
 
 		const innerRequestOptions: RequestOptions = {
-			protocol: apiEndpointUrl.protocol,
-			hostname: apiEndpointUrl.hostname,
-			port: apiEndpointUrl.port,
-			path: apiEndpointUrl.pathname + params.path,
+			protocol: endpoint.protocol,
+			hostname: endpoint.hostname,
+			port: endpoint.port,
+			path: endpoint.pathname + params.path,
 			method: req.method,
-			headers: this.transformIncomingHeaders(req),
+			setHost: false,
+			headers: {
+				...this.transformIncomingHeaders(req),
+				host: hostname,
+			},
 		}
 
-		const driver = apiEndpointUrl.protocol === 'http:' ? httpRequest : httpsRequest
+		const driver = endpoint.protocol === 'http:' ? httpRequest : httpsRequest
 		req.pipe(
 			driver(innerRequestOptions, async innerRes => {
 				if (typeof tokenPath !== 'string') {
@@ -64,7 +74,7 @@ export class ApiController extends BaseController<ApiParams> {
 				}
 
 				jsonBody['extensions'] ??= {}
-				jsonBody['extensions']['contemberAdminServer'] = { projects: await this.projectListProvider.get(token) }
+				jsonBody['extensions']['contemberAdminServer'] = { projects: await this.projectListProvider.get(params.projectGroup, token) }
 
 				this.writeAuthCookie(res, token)
 				this.proxyOugoingHead(res, innerRes)

@@ -1,5 +1,5 @@
 import type { IncomingMessage, OutgoingMessage, ServerResponse } from 'http'
-import type { Json, Type } from '../schema'
+import type { Json, Type } from '../utils/schema'
 import { Buffer } from 'buffer'
 import * as cookie from 'cookie'
 

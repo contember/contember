@@ -1,8 +1,8 @@
 import type { IncomingMessage, ServerResponse } from 'http'
-import { array, object, ParseError, string } from '../schema'
+import { array, object, ParseError, string } from '../utils/schema'
 import { BaseController } from './BaseController'
-import type { TenantApi } from '../tenant'
-import type { S3Manager } from '../s3'
+import type { TenantClient } from '../services/TenantClient'
+import type { S3Manager } from '../services/S3Manager'
 
 type PayloadType = ReturnType<typeof PayloadType>
 const PayloadType = object({
@@ -17,12 +17,16 @@ const PayloadType = object({
 
 const SIMPLE_PATH = /^[\w-]+(?:\.[\w-]+)*(?:\/[\w-]+(?:\.[\w-]+)*)*$/
 
-export class DeployController extends BaseController {
-	constructor(private tenant: TenantApi, private s3: S3Manager) {
+interface DeployParams {
+	projectGroup: string | undefined
+}
+
+export class DeployController extends BaseController<DeployParams> {
+	constructor(private tenant: TenantClient, private s3: S3Manager) {
 		super()
 	}
 
-	async handle(req: IncomingMessage, res: ServerResponse): Promise<void> {
+	async handle(req: IncomingMessage, res: ServerResponse, { projectGroup }: DeployParams): Promise<void> {
 		let payload: PayloadType
 
 		try {
@@ -45,7 +49,7 @@ export class DeployController extends BaseController {
 			return
 		}
 
-		if (!(await this.tenant.hasProjectAccess(token, payload.project))) {
+		if (!(await this.tenant.hasProjectAccess(token, payload.project, projectGroup))) {
 			res.writeHead(403)
 			res.end(`provided token is not authorized to access project ${payload.project}`)
 			return
@@ -67,7 +71,12 @@ export class DeployController extends BaseController {
 			await Promise.all(
 				batch.map(async file => {
 					// TODO: handle error?
-					await this.s3.putObject(payload.project, file.path, new Buffer(file.data, 'base64'))
+					await this.s3.putObject({
+						project: payload.project,
+						projectGroup,
+						path: file.path,
+						body: new Buffer(file.data, 'base64'),
+					})
 				}),
 			)
 		}

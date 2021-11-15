@@ -1,19 +1,22 @@
 import {
 	Block,
 	BlockEditor,
-	BlockEditorProps, Button,
+	BlockEditorProps,
+	Button,
 	Component,
+	EditorRenderElementProps,
+	EditorTransforms,
+	EditorWithBlocks,
 	horizontalRuleToolbarButton,
-	ImageUploadField,
+	ImageUploadField, isElementWithReference,
 	paragraphNumberedToolbarButton,
 	paragraphToolbarButton,
 	RichEditor,
 	scrollTargetToolbarButton,
 	tableToolbarButton,
 	TextField,
-	EditorTransforms, useEntity, EditorRenderElementProps,
+	useEntity,
 } from '@contember/admin'
-import { useEffect } from 'react'
 
 const RB = RichEditor.buttons
 export const fullEditorInlineButtons: BlockEditorProps['inlineButtons'] = [
@@ -62,8 +65,11 @@ export interface ContentFieldProps {
 	field: string
 }
 
-const LinkElement = ({ attributes, children }: EditorRenderElementProps) => {
+const LinkElement = ({ attributes, children, element }: EditorRenderElementProps) => {
 	const ref = useEntity()
+	if (!isElementWithReference(element)) {
+		return <span {...attributes}>{children}</span> // stub
+	}
 	return (
 		<>
 			<span {...attributes} style={{ color: '#0094FF' }}>
@@ -81,6 +87,29 @@ export const ContentField = Component<ContentFieldProps>(
 					type: 'link',
 					render: LinkElement,
 					isInline: true,
+					normalizeNode: ({ element, path }) => {
+						if ('href' in element) {
+							const referenceId = (editor as EditorWithBlocks).createElementReference(path, 'link', getAccessor => (
+								getAccessor().getField('url').updateValue(element.href)
+							)).id
+							EditorTransforms.setNodes(editor, { referenceId, href: null }, { at: path })
+						}
+					},
+				})
+				editor.htmlDeserializer.registerPlugin({
+					processInlinePaste: ({ element, next, cumulativeTextAttrs }) => {
+						if (element.tagName === 'A' && element.getAttribute('href')) {
+							const href = element.getAttribute('href')
+
+							const node = {
+								type: 'link',
+								children: next(element.childNodes, cumulativeTextAttrs),
+								href,
+							}
+							return [node]
+						}
+						return null
+					},
 				})
 				return editor
 			}}

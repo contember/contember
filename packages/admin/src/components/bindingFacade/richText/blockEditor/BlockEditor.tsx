@@ -128,7 +128,7 @@ const BlockEditorComponent: FunctionComponent<BlockEditorProps> = Component(
 		)
 
 		const [baseEditor] = useState(() => createEditorWithEssentials(paragraphElementType))
-		const { nodes, onChange, sortedBlocksRef, blockElementPathRefs, blockElementCache, sortedBlocks } = useBlockEditorState({
+		const { nodes, onChange, sortedBlocksRef, refreshBlocks } = useBlockEditorState({
 			editor: baseEditor,
 			blockList: blockListProps,
 			contentField,
@@ -139,26 +139,20 @@ const BlockEditorComponent: FunctionComponent<BlockEditorProps> = Component(
 		const getReferencedEntity = useGetReferencedEntity({
 			monolithicReferencesMode,
 			referencesField,
-			sortedBlocks,
+			sortedBlocksRef,
 		})
 		const createElementReference = useCreateElementReference({
-			sortedBlocks,
+			sortedBlocksRef,
 			monolithicReferencesMode,
 			referenceDiscriminationField,
 			referencesField,
+			refreshBlocks,
 		})
 		const stableCreateElementReference = useReferentiallyStableCallback(createElementReference)
 
 		const insertElementWithReference = useInsertElementWithReference({
 			editor: baseEditor,
-			contentField,
-			sortableBy,
-			sortedBlocksRef,
-			blockList: blockListProps,
-			blockElementCache,
-			blockElementPathRefs,
 			createElementReference: stableCreateElementReference,
-			monolithicReferencesMode,
 		})
 
 		const stableGetReferencedEntity = useReferentiallyStableCallback(getReferencedEntity)

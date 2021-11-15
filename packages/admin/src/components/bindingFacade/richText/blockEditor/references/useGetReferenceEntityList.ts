@@ -12,14 +12,14 @@ import { useConstantValueInvariant } from '@contember/react-utils'
 export interface ReferencesOptions {
 	referencesField?: SugaredRelativeEntityList | string
 	monolithicReferencesMode?: boolean
-	sortedBlocks: EntityAccessor[]
+	sortedBlocksRef: MutableRefObject<EntityAccessor[]>
 }
 
 export type GetReferenceEntityList = (path: Slate.Path) => EntityListAccessor
 export const useGetReferenceEntityList = ({
-		referencesField,
-		sortedBlocks,
-		monolithicReferencesMode,
+	referencesField,
+	sortedBlocksRef,
+	monolithicReferencesMode,
 }: ReferencesOptions): GetReferenceEntityList => {
 	useConstantValueInvariant(referencesField)
 	useConstantValueInvariant(monolithicReferencesMode)
@@ -36,7 +36,7 @@ export const useGetReferenceEntityList = ({
 		// eslint-disable-next-line react-hooks/rules-of-hooks
 		? useGetMonolithicReferenceList({ referencesField })
 		// eslint-disable-next-line react-hooks/rules-of-hooks
-		: useGetPerBlockReferenceList({ referencesField, sortedBlocks: sortedBlocks })
+		: useGetPerBlockReferenceList({ referencesField, sortedBlocksRef: sortedBlocksRef })
 }
 
 const useGetMonolithicReferenceList = ({ referencesField }: {
@@ -46,13 +46,16 @@ const useGetMonolithicReferenceList = ({ referencesField }: {
 	return useCallback(() => referenceList, [referenceList])
 }
 
-const useGetPerBlockReferenceList = ({ referencesField, sortedBlocks }: {
+const useGetPerBlockReferenceList = ({ referencesField, sortedBlocksRef }: {
 	referencesField: SugaredRelativeEntityList | string
-	sortedBlocks: EntityAccessor[]
+	sortedBlocksRef: MutableRefObject<EntityAccessor[]>
 }): GetReferenceEntityList => {
 	return useCallback(targetPath => {
 		const blockIndex = targetPath[0]
-		const containingBlock = sortedBlocks[blockIndex]
+		const containingBlock = sortedBlocksRef.current[blockIndex]
+		if (!containingBlock) {
+			throw new BindingError()
+		}
 		return containingBlock.getEntityList(referencesField)
-	}, [referencesField, sortedBlocks])
+	}, [referencesField, sortedBlocksRef])
 }

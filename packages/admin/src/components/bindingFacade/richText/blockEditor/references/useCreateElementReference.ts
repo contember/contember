@@ -9,7 +9,7 @@ import {
 	SugaredRelativeEntityList,
 	useBindingOperations,
 } from '@contember/binding'
-import { useCallback } from 'react'
+import { MutableRefObject, useCallback } from 'react'
 import { useGetReferenceEntityList } from './useGetReferenceEntityList'
 
 export type CreateElementReferences = (
@@ -19,28 +19,32 @@ export type CreateElementReferences = (
 	initialize?: EntityAccessor.BatchUpdatesHandler
 ) => EntityAccessor
 
-export const useCreateElementReference = ({ monolithicReferencesMode, sortedBlocks, referenceDiscriminationField, referencesField }: {
+export const useCreateElementReference = ({ monolithicReferencesMode, sortedBlocksRef, referenceDiscriminationField, referencesField, refreshBlocks }: {
 	referencesField?: SugaredRelativeEntityList | string
 	monolithicReferencesMode?: boolean
-	sortedBlocks: EntityAccessor[]
+	sortedBlocksRef: MutableRefObject<EntityAccessor[]>
 	referenceDiscriminationField?: SugaredFieldProps['field']
+	refreshBlocks: () => void
 }): CreateElementReferences => {
-	const getReferenceList = useGetReferenceEntityList({ monolithicReferencesMode, sortedBlocks, referencesField })
+	const getReferenceList = useGetReferenceEntityList({ monolithicReferencesMode, sortedBlocksRef, referencesField })
 
 	// eslint-disable-next-line react-hooks/rules-of-hooks
 	return useCreateElementReferenceInternal({
 		referenceDiscriminationField: referenceDiscriminationField!,
 		getReferenceList,
+		refreshBlocks,
 	})
 }
 
-const useCreateElementReferenceInternal = ({ referenceDiscriminationField, getReferenceList }: {
-	referenceDiscriminationField: SugaredFieldProps['field'],
-	getReferenceList: (path: Slate.Path) => EntityListAccessor,
+const useCreateElementReferenceInternal = ({ referenceDiscriminationField, getReferenceList, refreshBlocks }: {
+	referenceDiscriminationField: SugaredFieldProps['field']
+	getReferenceList: (path: Slate.Path) => EntityListAccessor
+	refreshBlocks: () => void
 }): CreateElementReferences => {
 	const bindingOperations = useBindingOperations()
 	return useCallback((editor, path, referenceDiscriminant, initialize) => {
 		const referenceUuid = generateUuid()
+		refreshBlocks()
 
 		const references = getReferenceList(path)
 		Editor.withoutNormalizing(editor, () => {
@@ -55,5 +59,5 @@ const useCreateElementReferenceInternal = ({ referenceDiscriminationField, getRe
 			})
 		})
 		return references.getChildEntityById(referenceUuid)
-	}, [bindingOperations, getReferenceList, referenceDiscriminationField])
+	}, [bindingOperations, getReferenceList, referenceDiscriminationField, refreshBlocks])
 }

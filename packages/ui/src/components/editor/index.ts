@@ -1,5 +1,6 @@
 export * from './table'
 
+export * from './EditorBlock'
 export * from './EditorBlockBoundary'
 export * from './EditorBox'
 export * from './EditorCanvas'

@@ -96,10 +96,11 @@ export default new Builder({})
 			const startTime = process.hrtime()
 			const url = new URL(req.url ?? '/', `http://${req.headers.host}`)
 			const [prefix, ...rest] = url.pathname.substring(1).split('/')
-			const hostname = readHostFromHeader(req)
-			const projectGroup = projectGroupResolver.resolve(hostname)
 
 			try {
+				const hostname = readHostFromHeader(req)
+				const projectGroup = projectGroupResolver.resolve(hostname)
+
 				switch (prefix) {
 					case '_deploy':
 						await deployController.handle(req, res, { projectGroup })

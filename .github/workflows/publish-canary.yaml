@@ -1,0 +1,36 @@
+name: Publish Canary build
+on:
+  workflow_dispatch:
+
+jobs:
+  publish-canary:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup repo
+        uses: actions/checkout@v2
+
+      - name: Install pnpm
+        run: npm install -g pnpm
+
+      - name: Setup node
+        uses: actions/setup-node@main
+        with:
+          node-version: 16
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build
+        run: pnpm run build
+
+      - name: Build Docker
+        run: docker build -t "contember/admin:${GITHUB_SHA:10}" -f ./ee/admin-server/Dockerfile .
+
+      - name: Publish Docker
+        env:
+          DOCKER_USER: ${{ secrets.DOCKER_USER }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        run: |
+          docker login --username "$DOCKER_USER" --password "$DOCKER_PASSWORD"
+          docker push --all-tags "contember/admin"

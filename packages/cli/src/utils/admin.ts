@@ -10,8 +10,9 @@ export class AdminClient {
 
 	public async deploy(project: string, files: AdminFiles): Promise<void> {
 		const response = await this.execute('_deploy', 'POST', { project, files })
+
 		if (!response.ok) {
-			throw 'Failed to deploy admin'
+			throw `Failed to deploy admin, POST request to ${this.url}/_deploy returned status ${response.status} ${response.statusText}`
 		}
 	}
 

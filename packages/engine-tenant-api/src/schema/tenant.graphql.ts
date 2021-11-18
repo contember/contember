@@ -42,14 +42,14 @@ const schema: DocumentNode = gql`
 
 		updateProjectMember(projectSlug: String!, identityId: String!, memberships: [MembershipInput!]!): UpdateProjectMemberResponse
 
-		createApiKey(projectSlug: String!, memberships: [MembershipInput!]!, description: String!): CreateApiKeyResponse
-		createGlobalApiKey(description: String!, roles: [String!]): CreateApiKeyResponse
+		createApiKey(projectSlug: String!, memberships: [MembershipInput!]!, description: String!, tokenHash: String): CreateApiKeyResponse
+		createGlobalApiKey(description: String!, roles: [String!], tokenHash: String): CreateApiKeyResponse
 		disableApiKey(id: String!): DisableApiKeyResponse
 
 		addProjectMailTemplate(template: MailTemplate!): AddMailTemplateResponse
 		removeProjectMailTemplate(templateIdentifier: MailTemplateIdentifier!): RemoveMailTemplateResponse
 
-		createProject(projectSlug: String!, name: String, config: Json, secrets: [ProjectSecret!]): CreateProjectResponse
+		createProject(projectSlug: String!, name: String, config: Json, secrets: [ProjectSecret!], deployTokenHash: String): CreateProjectResponse
 		setProjectSecret(projectSlug: String!, key: String!, value: String!): SetProjectSecretResponse
 		updateProject(projectSlug: String!, name: String, config: Json, mergeConfig: Boolean): UpdateProjectResponse
 	}
@@ -418,7 +418,7 @@ const schema: DocumentNode = gql`
 
 	type ApiKeyWithToken {
 		id: String!
-		token: String!
+		token: String
 		identity: Identity!
 	}
 

@@ -11,6 +11,7 @@ import { ApiKeyByTokenQuery } from '../../queries'
 import { Response, ResponseError, ResponseOk } from '../../utils/Response'
 import { DatabaseContext } from '../../utils'
 import { ApiKeyService, CreateApiKeyResponse } from './ApiKeyService'
+import assert from 'assert'
 
 export class ApiKeyManager {
 	constructor(
@@ -48,9 +49,10 @@ export class ApiKeyManager {
 	}
 
 	async createSessionApiKey(dbContext: DatabaseContext, identityId: string, expiration?: number): Promise<string> {
-		return (
-			await dbContext.commandBus.execute(new CreateApiKeyCommand(ApiKey.Type.SESSION, identityId, expiration))
-		).token
+		const command = new CreateApiKeyCommand({ type: ApiKey.Type.SESSION, identityId, expiration })
+		const token = (await dbContext.commandBus.execute(command)).token
+		assert(token !== undefined)
+		return token
 	}
 
 
@@ -70,9 +72,10 @@ export class ApiKeyManager {
 		dbContext: DatabaseContext,
 		description: string,
 		roles: readonly string[],
+		tokenHash?: string,
 	): Promise<CreateApiKeyResponse> {
 		return await dbContext.transaction(async db => {
-			return await this.apiKeyService.createPermanentApiKey(db, description, roles)
+			return await this.apiKeyService.createPermanentApiKey(db, description, roles, tokenHash)
 		})
 	}
 
@@ -81,9 +84,10 @@ export class ApiKeyManager {
 		projectId: string,
 		memberships: readonly Membership[],
 		description: string,
+		tokenHash?: string,
 	): Promise<CreateApiKeyResponse> {
 		return await dbContext.transaction(async db => {
-			return await this.apiKeyService.createProjectPermanentApiKey(db, projectId, memberships, description)
+			return await this.apiKeyService.createProjectPermanentApiKey(db, projectId, memberships, description, tokenHash)
 		})
 	}
 

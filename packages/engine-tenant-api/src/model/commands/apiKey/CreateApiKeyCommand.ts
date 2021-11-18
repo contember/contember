@@ -4,34 +4,46 @@ import { ApiKeyHelper } from './ApiKeyHelper'
 import { InsertBuilder } from '@contember/database'
 import { computeTokenHash, generateToken } from '../../utils'
 
-export class CreateApiKeyCommand implements Command<CreateApiKeyCommandResult> {
-	private readonly type: ApiKey.Type
-	private readonly identityId: string
-	private readonly expiration: number | undefined
+interface CreateSessionApiKeyArgs {
+	type: ApiKey.Type.SESSION
+	identityId: string
+	expiration?: number
+	tokenHash?: string
+}
 
-	constructor(type: ApiKey.Type.SESSION, identityId: string, expiration?: number)
-	constructor(type: ApiKey.Type, identityId: string)
-	constructor(type: ApiKey.Type, identityId: string, expiration?: number) {
-		this.type = type
-		this.identityId = identityId
-		this.expiration = expiration
-	}
+interface CreatePermanentApiKeyArgs {
+	type: ApiKey.Type.PERMANENT
+	identityId: string
+	tokenHash?: string
+	expiration?: undefined
+}
+
+export type CreateApiKeyArgs =
+	| CreateSessionApiKeyArgs
+	| CreatePermanentApiKeyArgs
+
+export class CreateApiKeyCommand implements Command<CreateApiKeyCommandResult> {
+	constructor(private args: CreateApiKeyArgs) {}
 
 	async execute({ db, providers }: Command.Args): Promise<CreateApiKeyCommandResult> {
 		const apiKeyId = providers.uuid()
-		const token = await generateToken(providers)
-		const tokenHash = computeTokenHash(token)
+		let token = undefined
+		let tokenHash = this.args.tokenHash
+		if (!tokenHash) {
+			token = await generateToken(providers)
+			tokenHash = computeTokenHash(token)
+		}
 
 		await InsertBuilder.create()
 			.into('api_key')
 			.values({
 				id: apiKeyId,
 				token_hash: tokenHash,
-				type: this.type,
-				identity_id: this.identityId,
+				type: this.args.type,
+				identity_id: this.args.identityId,
 				disabled_at: null,
-				expires_at: ApiKeyHelper.getExpiration(providers, this.type, this.expiration),
-				expiration: this.expiration || null,
+				expires_at: ApiKeyHelper.getExpiration(providers, this.args.type, this.args.expiration),
+				expiration: this.args.expiration || null,
 				created_at: providers.now(),
 			})
 			.execute(db)
@@ -39,6 +51,8 @@ export class CreateApiKeyCommand implements Command<CreateApiKeyCommandResult> {
 		return new CreateApiKeyCommandResult(apiKeyId, token)
 	}
 }
+
 export class CreateApiKeyCommandResult {
-	constructor(public readonly id: string, public readonly token: string) {}
+	constructor(public readonly id: string, public readonly token?: string) {
+	}
 }

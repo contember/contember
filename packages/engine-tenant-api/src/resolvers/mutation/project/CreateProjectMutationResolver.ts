@@ -39,6 +39,7 @@ export class CreateProjectMutationResolver implements MutationResolvers {
 				secrets: Object.fromEntries((args.secrets || []).map(it => [it.key, it.value])),
 			},
 			context.identity.id,
+			args.deployTokenHash ?? undefined,
 		)
 		if (!response.ok) {
 			return createErrorResponse(response.error, response.errorMessage)

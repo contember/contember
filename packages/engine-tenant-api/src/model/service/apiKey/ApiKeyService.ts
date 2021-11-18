@@ -12,9 +12,10 @@ export class ApiKeyService {
 		db: DatabaseContext,
 		description: string,
 		roles: readonly string[] = [],
+		tokenHash?: string,
 	) {
 		const identityId = await db.commandBus.execute(new CreateIdentityCommand(roles, description))
-		const apiKeyResult = await db.commandBus.execute(new CreateApiKeyCommand(ApiKey.Type.PERMANENT, identityId))
+		const apiKeyResult = await db.commandBus.execute(new CreateApiKeyCommand({ type: ApiKey.Type.PERMANENT, identityId, tokenHash }))
 
 		return new ResponseOk(new CreateApiKeyResult({ id: identityId, description }, apiKeyResult))
 	}
@@ -24,8 +25,9 @@ export class ApiKeyService {
 		projectId: string,
 		memberships: readonly Membership[],
 		description: string,
+		tokenHash?: string,
 	) {
-		const response = await this.createPermanentApiKey(db, description)
+		const response = await this.createPermanentApiKey(db, description, [], tokenHash)
 
 		const addMemberResult = await db.commandBus.execute(
 			new AddProjectMemberCommand(projectId, response.result.identity.id, createSetMembershipVariables(memberships)),
@@ -41,7 +43,7 @@ export class ApiKeyService {
 export type CreateApiKeyResponse = Response<CreateApiKeyResult, never>
 
 export class CreateApiKeyResult {
-	constructor(public readonly identity: {id: string; description?: string}, public readonly apiKey: { id: string; token: string }) {
+	constructor(public readonly identity: {id: string; description?: string}, public readonly apiKey: { id: string; token?: string }) {
 	}
 
 	toApiKeyWithToken(): ApiKeyWithToken {

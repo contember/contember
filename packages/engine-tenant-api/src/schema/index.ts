@@ -70,7 +70,7 @@ export type ApiKey = {
 export type ApiKeyWithToken = {
 	readonly __typename?: 'ApiKeyWithToken'
 	readonly id: Scalars['String']
-	readonly token: Scalars['String']
+	readonly token?: Maybe<Scalars['String']>
 	readonly identity: Identity
 }
 
@@ -539,12 +539,14 @@ export type MutationCreateApiKeyArgs = {
 	projectSlug: Scalars['String']
 	memberships: ReadonlyArray<MembershipInput>
 	description: Scalars['String']
+	tokenHash?: Maybe<Scalars['String']>
 }
 
 
 export type MutationCreateGlobalApiKeyArgs = {
 	description: Scalars['String']
 	roles?: Maybe<ReadonlyArray<Scalars['String']>>
+	tokenHash?: Maybe<Scalars['String']>
 }
 
 
@@ -568,6 +570,7 @@ export type MutationCreateProjectArgs = {
 	name?: Maybe<Scalars['String']>
 	config?: Maybe<Scalars['Json']>
 	secrets?: Maybe<ReadonlyArray<ProjectSecret>>
+	deployTokenHash?: Maybe<Scalars['String']>
 }
 
 
@@ -1192,7 +1195,7 @@ export type ApiKeyResolvers<ContextType = any, ParentType extends ResolversParen
 
 export type ApiKeyWithTokenResolvers<ContextType = any, ParentType extends ResolversParentTypes['ApiKeyWithToken'] = ResolversParentTypes['ApiKeyWithToken']> = {
 	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	token?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	token?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
 	identity?: Resolver<ResolversTypes['Identity'], ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }

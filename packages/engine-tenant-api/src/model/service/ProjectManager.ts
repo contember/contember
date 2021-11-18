@@ -22,6 +22,7 @@ export class ProjectManager {
 		projectGroup: ProjectGroup,
 		project: Pick<ProjectWithSecrets, 'name' | 'slug' | 'config' | 'secrets'>,
 		ownerIdentityId: string | undefined,
+		deployTokenHash?: string,
 	): Promise<CreateProjectResponse> {
 		return await projectGroup.database.transaction(async db => {
 			const bus = db.commandBus
@@ -45,7 +46,8 @@ export class ProjectManager {
 			}
 
 			const deployMembership = [{ role: ProjectRole.DEPLOYER, variables: [] }]
-			const deployResult = await this.apiKeyService.createProjectPermanentApiKey(db, projectId, deployMembership, `Deploy key for ${project.slug}`)
+			const deployKeyDescription = `Deploy key for ${project.slug}`
+			const deployResult = await this.apiKeyService.createProjectPermanentApiKey(db, projectId, deployMembership, deployKeyDescription, deployTokenHash)
 
 			try {
 				await this.projectIntializer.initializeProject(projectGroup, {

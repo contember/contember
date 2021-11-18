@@ -5,6 +5,7 @@ export class EventManagerImpl {
 		[EventManager.Event.queryStart]: [] as EventManager.QueryStartCallback[],
 		[EventManager.Event.queryEnd]: [] as EventManager.QueryEndCallback[],
 		[EventManager.Event.queryError]: [] as EventManager.QueryStartCallback[],
+		[EventManager.Event.clientError]: [] as EventManager.ClientErrorCallback[],
 	}
 
 	constructor(private readonly parent: EventManager | null = null) {}
@@ -26,7 +27,7 @@ export class EventManagerImpl {
 		event: EventManager.Event,
 		cb: EventManager.ListenerTypes[Event],
 	): void {
-		this.listeners[event] = this.listeners[event].filter(it => it !== cb) as any[]
+		this.listeners[event] = (this.listeners[event] as EventManager.ListenerTypes[Event][]).filter(it => it !== cb) as any[]
 	}
 }
 
@@ -37,16 +38,19 @@ namespace EventManager {
 		queryStart = 'queryStart',
 		queryEnd = 'queryEnd',
 		queryError = 'queryError',
+		clientError = 'clientError',
 	}
 
 	export type QueryStartCallback = (query: Connection.Query) => void
 	export type QueryEndCallback = (query: Connection.Query, result: Connection.Result) => void
 	export type QueryErrorCallback = (query: Connection.Query, error: Error) => void
+	export type ClientErrorCallback = (error: Error) => void
 
 	export interface ListenerTypes {
 		[EventManager.Event.queryStart]: QueryStartCallback
 		[EventManager.Event.queryEnd]: QueryEndCallback
 		[EventManager.Event.queryError]: QueryErrorCallback
+		[EventManager.Event.clientError]: ClientErrorCallback
 	}
 
 	export type ListenersList = { [T in keyof ListenerTypes]: ListenerTypes[T][] }

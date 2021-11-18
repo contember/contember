@@ -13,6 +13,11 @@ class Connection implements Connection.ConnectionLike, Connection.ClientFactory,
 		public readonly eventManager: EventManager = new EventManagerImpl(),
 	) {
 		this.pool = new Pool(config)
+		this.pool.on('error', err => {
+			// eslint-disable-next-line no-console
+			console.error(err)
+			this.eventManager.fire(EventManager.Event.clientError, err)
+		})
 	}
 
 	public createClient(schema: string, queryMeta: Record<string, any>): Client {

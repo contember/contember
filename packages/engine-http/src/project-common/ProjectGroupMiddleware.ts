@@ -22,7 +22,15 @@ export class ProjectGroupMiddlewareFactory {
 	}
 
 	create(): KoaMiddleware<KoaState> {
-		const groupRegex = this.projectGroupDomainMapping ? new RegExp(this.projectGroupDomainMapping) : undefined
+		const groupRegex = (
+			this.projectGroupDomainMapping
+				? new RegExp(
+					this.projectGroupDomainMapping.includes('{group}')
+						? regexpQuote(this.projectGroupDomainMapping).replace(regexpQuote('{group}'), '([^.]+)')
+						: this.projectGroupDomainMapping,
+				)
+				: undefined
+		)
 		const tenantDatabase: KoaMiddleware<KoaState> = async (ctx, next) => {
 			let group: string | undefined = undefined
 			if (groupRegex) {
@@ -38,3 +46,5 @@ export class ProjectGroupMiddlewareFactory {
 		return tenantDatabase
 	}
 }
+
+const regexpQuote = (regexp: string) => regexp.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')

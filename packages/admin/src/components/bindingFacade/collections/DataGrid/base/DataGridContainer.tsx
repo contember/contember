@@ -110,14 +110,14 @@ export const DataGridContainer: FunctionComponent<DataGridContainerProps> = Comp
 								// We use desired state here to give immediate feedback about column changes.
 								.filter(([columnKey]) => !desiredState.hiddenColumns.has(columnKey))
 								.map(([columnKey, column]) => {
-									const filterArtifact = filterArtifacts.get(columnKey)
+									const filterArtifact = filterArtifacts[columnKey]
 									const orderDirection = orderDirections.get(columnKey)
 									return (
 										<DataGridHeaderCell
 											key={columnKey}
 											environment={accessor.environment}
 											filterArtifact={filterArtifact}
-											emptyFilterArtifact={column.enableFiltering !== false ? column.emptyFilter : undefined}
+											emptyFilterArtifact={column.enableFiltering !== false ? column.emptyFilter : null}
 											orderDirection={orderDirection}
 											setFilter={newFilter => setFilter(columnKey, newFilter)}
 											setOrderBy={newOrderBy => setOrderBy(columnKey, newOrderBy)}

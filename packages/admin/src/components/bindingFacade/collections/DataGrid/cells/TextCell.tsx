@@ -23,7 +23,8 @@ export type TextCellProps<Persisted extends FieldValue = FieldValue> = DataGridH
 		format?: (value: Persisted) => ReactNode
 	}
 
-interface TextFilterArtifacts {
+// eslint-disable-next-line @typescript-eslint/consistent-type-definitions
+type TextFilterArtifacts = {
 	mode: 'matches' | 'matchesExactly' | 'startsWith' | 'endsWith' | 'doesNotMatch'
 	query: string
 	nullCondition: boolean

@@ -14,9 +14,12 @@ export type BooleanCellProps = DataGridHeaderCellPublicProps &
 		initialOrder?: DataGridOrderDirection
 	}
 
-type SingleBooleanFilterArtifact = 'includeTrue' | 'includeFalse' | 'includeNull'
-
-type BooleanFilterArtifacts = Set<SingleBooleanFilterArtifact>
+// eslint-disable-next-line @typescript-eslint/consistent-type-definitions
+type BooleanFilterArtifacts = {
+	includeTrue: boolean
+	includeFalse: boolean
+	includeNull: boolean
+}
 
 export const BooleanCell: FunctionComponent<BooleanCellProps> = Component(props => {
 	return (
@@ -30,13 +33,13 @@ export const BooleanCell: FunctionComponent<BooleanCellProps> = Component(props 
 			getNewFilter={(filterArtifact, { environment }) => {
 				const conditions: Input.Condition<boolean>[] = []
 
-				if (filterArtifact.has('includeTrue')) {
+				if (filterArtifact.includeTrue) {
 					conditions.push({ eq: true })
 				}
-				if (filterArtifact.has('includeFalse')) {
+				if (filterArtifact.includeFalse) {
 					conditions.push({ eq: false })
 				}
-				if (filterArtifact.has('includeNull')) {
+				if (filterArtifact.includeNull) {
 					conditions.push({ isNull: true })
 				}
 				if (conditions.length === 0 || conditions.length === 3) {
@@ -48,7 +51,11 @@ export const BooleanCell: FunctionComponent<BooleanCellProps> = Component(props 
 					[desugared.field]: conditions.length > 1 ? { or: conditions } : conditions[0],
 				})
 			}}
-			emptyFilter={new Set()}
+			emptyFilter={{
+				includeFalse: false,
+				includeTrue: false,
+				includeNull: false,
+			}}
 			filterRenderer={({ filter, setFilter }) => {
 				const formatMessage = useMessageFormatter(dataGridCellsDictionary)
 				return (
@@ -62,17 +69,9 @@ export const BooleanCell: FunctionComponent<BooleanCellProps> = Component(props 
 						).map(([item, label]) => (
 							<Checkbox
 								key={item}
-								value={filter.has(item)}
+								value={filter[item]}
 								onChange={checked => {
-									const clone: BooleanFilterArtifacts = new Set(filter)
-
-									if (checked) {
-										clone.add(item)
-									} else {
-										clone.delete(item)
-									}
-
-									setFilter(clone)
+									setFilter({ ...filter, [item]: checked })
 								}}
 							>
 								{label}

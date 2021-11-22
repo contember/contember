@@ -16,9 +16,10 @@ export type DateCellProps = DataGridHeaderCellPublicProps &
 		initialOrder?: DataGridOrderDirection
 	}
 
-interface DateRange {
-	start: Date | undefined
-	end: Date | undefined
+// eslint-disable-next-line @typescript-eslint/consistent-type-definitions
+type DateRange = {
+	start: string | null
+	end: string | null
 }
 
 export const DateCell: FunctionComponent<DateCellProps> = Component(props => {
@@ -38,10 +39,10 @@ export const DateCell: FunctionComponent<DateCellProps> = Component(props => {
 				const conditions: Input.Condition<Input.ColumnValue>[] = []
 
 				if (filterArtifact.start) {
-					conditions.push({ gte: dateToStringWithoutTimezone(filterArtifact.start) })
+					conditions.push({ gte: filterArtifact.start })
 				}
 				if (filterArtifact.end) {
-					conditions.push({ lte: dateToStringWithoutTimezone(filterArtifact.end) })
+					conditions.push({ lte: filterArtifact.end })
 				}
 
 				return wrapFilterInHasOnes(desugared.hasOneRelationPath, {
@@ -49,18 +50,19 @@ export const DateCell: FunctionComponent<DateCellProps> = Component(props => {
 				})
 			}}
 			emptyFilter={{
-				start: undefined,
-				end: undefined,
+				start: null,
+				end: null,
 			}}
 			filterRenderer={({ filter, setFilter }) => {
 				const formatMessage = useMessageFormatter(dataGridCellsDictionary)
-				const { start, end } = filter
+				const start = filter.start ? new Date(filter.start) : null
+				const end = filter.end ? new Date(filter.end) : null
 				return (
 					<div style={{ display: 'flex', gap: '10px' }}>
 						<DatePicker
 							selected={start}
 							onChange={date => {
-								setFilter({ ...filter, start: (date as Date | null) ?? undefined })
+								setFilter({ ...filter, start: date ? dateToStringWithoutTimezone(date as Date) : null })
 							}}
 							selectsStart
 							startDate={start}
@@ -71,7 +73,7 @@ export const DateCell: FunctionComponent<DateCellProps> = Component(props => {
 						<DatePicker
 							selected={end}
 							onChange={date => {
-								setFilter({ ...filter, end: (date as Date | null) ?? undefined })
+								setFilter({ ...filter, end: date ? dateToStringWithoutTimezone(date as Date) : null })
 							}}
 							selectsEnd
 							startDate={start}

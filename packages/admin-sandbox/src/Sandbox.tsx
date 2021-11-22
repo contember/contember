@@ -6,7 +6,7 @@ const SandboxLayout: FC = props => {
 	return (
 		<Layout
 			children={props.children}
-			navBarHead={<Logotype>Contember</Logotype>}
+			sidebarHeader={<Logotype>Contember</Logotype>}
 			navigation={<Menu>
 				<Menu.Item title="Dashboard" to={'dashboard'}>
 					<Menu.Item title="Inputs" to="inputs" />

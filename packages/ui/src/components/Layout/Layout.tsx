@@ -10,8 +10,8 @@ interface LayoutProps extends LayoutChromeProps {
 export const Layout = memo(({
   className,
   children,
-  navBarHead,
-  navBarFoot,
+  sidebarHeader,
+  sidebarFooter,
   switchers,
   navigation,
 }: LayoutProps) => {
@@ -24,8 +24,8 @@ export const Layout = memo(({
   return (
     <div className={classList}>
       <LayoutChrome
-        navBarHead={navBarHead}
-        navBarFoot={navBarFoot}
+        sidebarHeader={sidebarHeader}
+        sidebarFooter={sidebarFooter}
         navigation={navigation}
         switchers={switchers}
       >

@@ -8,16 +8,16 @@ import { Stack } from '../Stack'
 
 export interface LayoutChromeProps {
 	children?: ReactNode
-	navBarFoot?: ReactNode
-	navBarHead?: ReactNode
+	sidebarFooter?: ReactNode
+	sidebarHeader?: ReactNode
 	navigation?: ReactNode
 	switchers?: ReactNode
 }
 
 export const LayoutChrome = memo(({
 	children,
-	navBarFoot,
-	navBarHead,
+	sidebarFooter,
+	sidebarHeader,
 	navigation,
 	switchers,
 }: LayoutChromeProps) => {
@@ -35,7 +35,7 @@ export const LayoutChrome = memo(({
 	)}>
 		<div className={`${prefix}layout-chrome-bar`}>
 			<div className={`${prefix}layout-chrome-bar-header`}>
-				{navBarHead}
+				{sidebarHeader}
 				<Button distinction="seamless" className={`${prefix}layout-chrome-navigation-button`} onClick={toggleCollapsed}>
 					<span className={`${prefix}chrome-menu-button-label`}>Menu</span>
 					<Icon blueprintIcon={collapsed ? 'menu' : 'cross'} />
@@ -48,7 +48,7 @@ export const LayoutChrome = memo(({
 				</Stack>
 			</div>
 			<div className={`${prefix}layout-chrome-bar-footer`}>
-				{navBarFoot}
+				{sidebarFooter}
 			</div>
 		</div>
 

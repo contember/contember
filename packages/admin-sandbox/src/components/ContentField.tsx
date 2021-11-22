@@ -161,7 +161,7 @@ export const ContentField = Component<ContentFieldProps>(
 				horizontalRuleToolbarButton,
 			]}
 		>
-			<Block discriminateBy="image" boxLabel="Image">
+			<Block discriminateBy="image" label="Image">
 				<BlockEditor.ContentOutlet placeholder="Text" />
 				<ImageUploadField
 					label="Image"
@@ -173,7 +173,7 @@ export const ContentField = Component<ContentFieldProps>(
 					fileTypeField="type"
 				/>
 			</Block>
-			<Block discriminateBy="quote" boxLabel="Quote">
+			<Block discriminateBy="quote" label="Quote">
 				<BlockEditor.ContentOutlet />
 				<TextField field="primaryText" label="Quote" />
 				<TextField field="secondaryText" label="Author" />

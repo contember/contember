@@ -111,16 +111,20 @@ export const DataGridContainer: FunctionComponent<DataGridContainerProps> = Comp
 								.filter(([columnKey]) => !desiredState.hiddenColumns[columnKey])
 								.map(([columnKey, column]) => {
 									const filterArtifact = filterArtifacts[columnKey]
-									const orderDirection = orderDirections.get(columnKey)
+									const orderDirection = orderDirections[columnKey]
+									const orderColumns = Object.keys(orderDirections)
 									return (
 										<DataGridHeaderCell
 											key={columnKey}
 											environment={accessor.environment}
 											filterArtifact={filterArtifact}
 											emptyFilterArtifact={column.enableFiltering !== false ? column.emptyFilter : null}
-											orderDirection={orderDirection}
+											orderState={orderDirection ? {
+												direction: orderDirection,
+												index: orderColumns.length > 1 ? orderColumns.indexOf(columnKey) : undefined,
+											} : undefined}
 											setFilter={newFilter => setFilter(columnKey, newFilter)}
-											setOrderBy={newOrderBy => setOrderBy(columnKey, newOrderBy)}
+											setOrderBy={(newOrderBy, append = false) => setOrderBy(columnKey, newOrderBy, append)}
 											headerJustification={column.headerJustification || column.justification}
 											shrunk={column.shrunk}
 											hasFilter={getColumnFilter(column, filterArtifact, accessor.environment) !== undefined}

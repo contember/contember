@@ -20,7 +20,7 @@ export interface DataGridHeaderCellInternalProps {
 	hasFilter: boolean
 	emptyFilterArtifact: DataGridFilterArtifact
 	filterArtifact: DataGridFilterArtifact
-	orderDirection: DataGridOrderDirection
+	orderState: { direction: Exclude<DataGridOrderDirection, null>, index: number | undefined } | undefined
 	setFilter: DataGridSetFilter
 	setOrderBy: DataGridSetOrderBy
 	filterRenderer: ComponentType<FilterRendererProps<DataGridFilterArtifact>> | undefined
@@ -38,7 +38,7 @@ export function DataGridHeaderCell({
 	hasFilter,
 	header,
 	headerJustification,
-	orderDirection,
+	orderState,
 	setFilter,
 	setOrderBy,
 	shrunk,
@@ -46,14 +46,17 @@ export function DataGridHeaderCell({
 	return (
 		<TableHeaderCell scope="col" justification={headerJustification} shrunk={shrunk}>
 			<span style={{ display: 'flex', justifyContent: 'flex-start', gap: '.25em' }}>
-				<span onClick={() => setOrderBy(cycleOrderDirection(orderDirection))} style={{ cursor: 'pointer' }}>
+				<span onClick={e => setOrderBy(cycleOrderDirection(orderState?.direction ?? null), e.ctrlKey || e.metaKey)} style={{ cursor: 'pointer' }}>
 					{header}
 					&nbsp;
-					{orderDirection &&
-						{
-							asc: ascOrderIcon ?? defaultAscIcon,
-							desc: descOrderIcon ?? defaultDescIcon,
-						}[orderDirection]}
+					{orderState &&
+						<>
+							{{
+								asc: ascOrderIcon ?? defaultAscIcon,
+								desc: descOrderIcon ?? defaultDescIcon,
+							}[orderState.direction]}
+							{orderState.index !== undefined ? `(${orderState.index + 1})` : null}
+						</>}
 				</span>
 				{filterRenderer && (
 					<Dropdown

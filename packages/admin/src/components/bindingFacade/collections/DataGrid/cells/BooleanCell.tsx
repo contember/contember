@@ -28,7 +28,7 @@ export const BooleanCell: FunctionComponent<BooleanCellProps> = Component(props 
 			{...props}
 			enableOrdering={!props.disableOrder as true}
 			getNewOrderBy={(newDirection, { environment }) =>
-				newDirection && QueryLanguage.desugarOrderBy(`${props.field as string} ${newDirection}`, environment)
+				newDirection ? QueryLanguage.desugarOrderBy(`${props.field as string} ${newDirection}`, environment) : undefined
 			}
 			getNewFilter={(filterArtifact, { environment }) => {
 				const conditions: Input.Condition<boolean>[] = []

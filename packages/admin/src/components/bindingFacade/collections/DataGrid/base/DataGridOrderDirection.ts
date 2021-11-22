@@ -1,16 +1,16 @@
 import { assertNever } from '../../../../../utils'
 
-export type DataGridOrderDirection = 'asc' | 'desc' | undefined
+export type DataGridOrderDirection = 'asc' | 'desc' | null
 
 export const cycleOrderDirection = (direction: DataGridOrderDirection): DataGridOrderDirection => {
-	if (direction === undefined) {
+	if (direction === null) {
 		return 'asc'
 	}
 	if (direction === 'asc') {
 		return 'desc'
 	}
 	if (direction === 'desc') {
-		return undefined
+		return null
 	}
 	return assertNever(direction)
 }

@@ -36,7 +36,7 @@ export const TextCell: FunctionComponent<TextCellProps> = Component(props => {
 			{...props}
 			enableOrdering={!props.disableOrder as true}
 			getNewOrderBy={(newDirection, { environment }) =>
-				newDirection && QueryLanguage.desugarOrderBy(`${props.field as string} ${newDirection}`, environment)
+				newDirection ? QueryLanguage.desugarOrderBy(`${props.field as string} ${newDirection}`, environment) : undefined
 			}
 			getNewFilter={(filter, { environment }) => {
 				if (filter.query === '' && filter.nullCondition === false) {

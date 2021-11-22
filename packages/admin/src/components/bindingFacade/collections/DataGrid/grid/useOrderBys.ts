@@ -1,18 +1,23 @@
-import { useCallback, useState } from 'react'
+import { useCallback } from 'react'
 import type { DataGridColumns, DataGridOrderDirectionStore, DataGridSetColumnOrderBy } from '../base'
 import type { GridPagingAction } from '../paging'
 import { normalizeInitialOrderBys } from './normalizeInitialOrderBys'
+import { useSessionStorageState } from './useStoredState'
 
 export const useOrderBys = (
 	columns: DataGridColumns,
 	updatePaging: (action: GridPagingAction) => void,
+	dataGridKey: string,
 ): [DataGridOrderDirectionStore, DataGridSetColumnOrderBy] => {
-	const [orderBys, setOrderBys] = useState<DataGridOrderDirectionStore>(() => normalizeInitialOrderBys(columns))
+	const [orderBys, setOrderBys] = useSessionStorageState<DataGridOrderDirectionStore>(
+		`${dataGridKey}-orderBy`,
+		val => normalizeInitialOrderBys(val, columns),
+	)
 
 	return [
 		orderBys,
 		useCallback(
-			(columnKey, columnOrderBy) => {
+			(columnKey, columnOrderBy, append) => {
 				const column = columns.get(columnKey)
 				if (column === undefined || column.enableOrdering === false) {
 					return
@@ -20,23 +25,17 @@ export const useOrderBys = (
 				let didBailOut = false
 
 				setOrderBys(orderBys => {
-					const existingValue = orderBys.get(columnKey)
+					const existingValue = orderBys[columnKey]
 
 					if (existingValue === columnOrderBy) {
-						// TODO perform better comparisons by value
 						didBailOut = true
 						return orderBys
 					}
-					//const clone = new Map(orderBys)
-					const clone: DataGridOrderDirectionStore = new Map()
-
-					if (columnOrderBy === undefined) {
-						clone.delete(columnKey)
-					} else {
-						clone.set(columnKey, columnOrderBy)
+					if (columnOrderBy === null) {
+						const { [columnKey]: _, ...rest } = orderBys
+						return rest
 					}
-
-					return clone
+					return append ? { ...orderBys, [columnKey]: columnOrderBy } : { [columnKey]: columnOrderBy }
 				})
 				if (!didBailOut) {
 					updatePaging({
@@ -44,7 +43,7 @@ export const useOrderBys = (
 					})
 				}
 			},
-			[columns, updatePaging],
+			[columns, setOrderBys, updatePaging],
 		),
 	]
 }

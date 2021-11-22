@@ -1,13 +1,13 @@
 import type { DataGridColumns, DataGridOrderDirectionStore } from '../base'
 
-export const normalizeInitialOrderBys = (columns: DataGridColumns): DataGridOrderDirectionStore => {
-	const orderBys: DataGridOrderDirectionStore = new Map()
-
-	for (const [i, value] of columns) {
-		if (value.enableOrdering !== false && value.initialOrder) {
-			orderBys.set(i, value.initialOrder)
-		}
+export const normalizeInitialOrderBys = (value: DataGridOrderDirectionStore | undefined, columns: DataGridColumns): DataGridOrderDirectionStore => {
+	if (value && Object.keys(value).length > 0) {
+		return value
 	}
-
-	return orderBys
+	return Object.fromEntries(Array.from(columns.entries()).flatMap(([i, value]) => {
+		if (value.enableOrdering !== false && value.initialOrder) {
+			return [[i, value.initialOrder]]
+		}
+		return []
+	}))
 }

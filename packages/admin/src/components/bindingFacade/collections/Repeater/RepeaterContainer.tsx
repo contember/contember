@@ -12,7 +12,7 @@ export interface RepeaterContainerPrivateProps {
 	formatMessage: MessageFormatter<RepeaterDictionary>
 	isEmpty: boolean
 	label?: ReactNode
-	itemLabel: ReactNode
+	itemLabel: string
 	createNewEntity: (initialize?: EntityAccessor.BatchUpdatesHandler) => void
 	children: ReactNode
 }

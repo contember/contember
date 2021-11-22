@@ -10,7 +10,7 @@ export interface VideoFileRepeaterProps<AcceptArtifacts = unknown>
 		Omit<FileInputPublicProps, 'label'> {
 	sortableBy?: SugaredFieldProps['field']
 	label?: ReactNode
-	itemLabel: ReactNode
+	itemLabel: string
 }
 
 export const VideoFileRepeater = Component<VideoFileRepeaterProps>(

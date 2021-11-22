@@ -44,7 +44,7 @@ import { useReferentiallyStableCallback } from './useReferentiallyStableCallback
 
 export interface BlockEditorProps extends SugaredRelativeEntityList, CreateEditorPublicOptions {
 	label?: ReactNode
-	itemLabel: ReactNode
+	itemLabel: string
 	contentField: SugaredFieldProps['field']
 	sortableBy: SugaredFieldProps['field']
 	children?: ReactNode
@@ -74,8 +74,8 @@ const BlockEditorComponent: FunctionComponent<BlockEditorProps> = Component(
 		assertStaticBlockEditorInvariants(props, environment)
 
 		const {
-			label,
 			contentField,
+			itemLabel,
 			sortableBy,
 			children,
 			size,
@@ -195,7 +195,7 @@ const BlockEditorComponent: FunctionComponent<BlockEditorProps> = Component(
 							onDrop: (e => {
 								e.preventDefault()
 							}),
-							placeholder: label,
+							placeholder: itemLabel,
 							leading: leadingElements,
 							trailing: trailingElements,
 						}}

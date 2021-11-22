@@ -1,14 +1,14 @@
 import {
-	Component,
-	Entity,
-	EntityListAccessor,
-	RemovalType,
-	StaticRenderProvider,
-	StaticRenderProviderProps,
-	SugaredField,
-	SugaredFieldProps,
-	useMutationState,
-	useSortedEntities,
+    Component,
+    Entity,
+    EntityListAccessor,
+    RemovalType,
+    StaticRenderProvider,
+    StaticRenderProviderProps,
+    SugaredField,
+    SugaredFieldProps,
+    useMutationState,
+    useSortedEntities,
 } from '@contember/binding'
 import { ComponentType, Fragment, ReactElement, ReactNode, useCallback } from 'react'
 import type { SortEndHandler } from 'react-sortable-hoc'
@@ -27,7 +27,7 @@ export interface RepeaterInnerProps<ContainerExtraProps, ItemExtraProps>
 		Omit<RepeaterItemProps, 'children' | 'canBeRemoved' | 'label'> {
 	accessor: EntityListAccessor
 	label?: ReactNode
-	itemLabel: ReactNode
+	itemLabel: string
 	children?: ReactNode
 
 	sortableBy?: SugaredFieldProps['field']

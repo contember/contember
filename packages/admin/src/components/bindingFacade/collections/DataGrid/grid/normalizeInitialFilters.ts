@@ -1,7 +1,7 @@
 import type { DataGridColumns, DataGridFilterArtifactStore } from '../base'
 
 export const normalizeInitialFilters = (storedValue: DataGridFilterArtifactStore | undefined, columns: DataGridColumns): DataGridFilterArtifactStore => {
-	return Object.fromEntries(Object.entries(columns).flatMap(([i, value]) => {
+	return Object.fromEntries(Array.from(columns.entries()).flatMap(([i, value]) => {
 		if (value.enableFiltering === false) {
 			return []
 		}

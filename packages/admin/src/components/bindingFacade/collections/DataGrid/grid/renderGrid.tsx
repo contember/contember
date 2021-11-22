@@ -74,7 +74,7 @@ export const renderGrid = (
 			}}
 		>
 			{Array.from(columns)
-				.filter(([key]) => !hiddenColumns.has(key))
+				.filter(([key]) => !hiddenColumns[key])
 				.map(([key, props]) => (
 					<Fragment key={key}>
 						{props.header}

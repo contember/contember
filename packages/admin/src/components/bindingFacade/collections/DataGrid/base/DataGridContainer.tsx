@@ -108,7 +108,7 @@ export const DataGridContainer: FunctionComponent<DataGridContainerProps> = Comp
 						<TableRow>
 							{Array.from(columns)
 								// We use desired state here to give immediate feedback about column changes.
-								.filter(([columnKey]) => !desiredState.hiddenColumns.has(columnKey))
+								.filter(([columnKey]) => !desiredState.hiddenColumns[columnKey])
 								.map(([columnKey, column]) => {
 									const filterArtifact = filterArtifacts[columnKey]
 									const orderDirection = orderDirections.get(columnKey)
@@ -144,14 +144,14 @@ export const DataGridContainer: FunctionComponent<DataGridContainerProps> = Comp
 							>
 								<TableRow>
 									{Array.from(columns)
-										.filter(([columnKey]) => !desiredState.hiddenColumns.has(columnKey))
+										.filter(([columnKey]) => !desiredState.hiddenColumns[columnKey])
 										.map(([columnKey, column]) => {
 											// This is tricky. We need to render a table cell from here no matter what so that the cell count
 											// matches that of the headers. However, there might be a header displayed for a column whose data
 											// has not yet been fetched. Displaying its cell contents from here would cause an error. Also, the
 											// column may have just been hidden but the information hasn't made it to displayed sate yet.
 											// For these, we just display an empty cell then.
-											if (displayedState.hiddenColumns.has(columnKey)) {
+											if (displayedState.hiddenColumns[columnKey]) {
 												return <TableCell key={columnKey} shrunk />
 											}
 											return (

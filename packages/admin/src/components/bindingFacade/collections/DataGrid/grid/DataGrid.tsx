@@ -35,7 +35,7 @@ export const DataGrid: FunctionComponent<DataGridProps> = Component(
 		})
 		const dataGridKey = typeof props.entities === 'string' ? props.entities : props.entities.entityName
 
-		const [hiddenColumns, setIsColumnHidden] = useHiddenColumnsState(columns)
+		const [hiddenColumns, setIsColumnHidden] = useHiddenColumnsState(columns, dataGridKey)
 		const [orderDirections, setOrderBy] = useOrderBys(columns, updatePaging)
 		const [filterArtifacts, setFilter] = useFilters(columns, updatePaging, dataGridKey)
 

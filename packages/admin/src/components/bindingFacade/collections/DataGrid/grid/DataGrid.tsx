@@ -17,6 +17,7 @@ import { renderGrid, RenderGridOptions } from './renderGrid'
 import { useFilters } from './useFilters'
 import { useHiddenColumnsState } from './useHiddenColumnsState'
 import { useOrderBys } from './useOrderBys'
+import { ContainerSpinner } from '@contember/ui'
 
 export interface DataGridProps extends DataGridContainerPublicProps {
 	entities: SugaredQualifiedEntityList['entities']
@@ -74,10 +75,10 @@ export const DataGrid: FunctionComponent<DataGridProps> = Component(
 		)
 
 		const [displayedState, setDisplayedState] = useState<{
-			gridState: DataGridState
+			gridState: DataGridState | undefined
 			treeRootId: TreeRootId | undefined
 		}>({
-			gridState: desiredState,
+			gridState: undefined,
 			treeRootId: undefined,
 		})
 
@@ -121,36 +122,14 @@ export const DataGrid: FunctionComponent<DataGridProps> = Component(
 			},
 			[],
 		)
+		if (!displayedState.gridState) {
+			return <ContainerSpinner />
+		}
 
 		return renderGrid(gridOptions, displayedState.treeRootId, displayedState.gridState, desiredState, environment)
 	},
 	(props, environment) => {
-		const columns = extractDataGridColumns(props.children)
-		const fakeState: DataGridState = {
-			columns,
-			paging: {
-				itemsPerPage: props.itemsPerPage ?? null,
-				pageIndex: 0,
-			},
-			hiddenColumns: normalizeInitialHiddenColumnsState(columns),
-			filterArtifacts: normalizeInitialFilters(columns),
-			orderDirections: normalizeInitialOrderBys(columns),
-		}
-
-		return renderGrid(
-			{
-				entities: props.entities,
-				updatePaging: noop,
-				setIsColumnHidden: noop,
-				setOrderBy: noop,
-				setFilter: noop,
-				containerProps: props,
-			},
-			undefined,
-			fakeState,
-			fakeState,
-			environment,
-		)
+		return null
 	},
 	'DataGrid',
 )

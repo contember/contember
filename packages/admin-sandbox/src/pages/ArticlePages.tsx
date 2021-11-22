@@ -1,27 +1,37 @@
 import {
 	AnchorButton,
 	CreatePage,
-	EditPage,
+	DataBindingProvider,
+	DataGrid,
+	DeleteEntityButton,
+	EditPage, EntityListSubTree,
+	FeedbackRenderer,
 	Field,
-	ListPage,
+	GenericCell,
+	GenericPage, ListRenderer,
 	MultiSelectField,
 	PageLinkButton,
-	PageLinkById,
-	TableCell,
+	PageLinkById, TableCell,
+	TextCell,
 	TextField,
+	TitleBar,
 } from '@contember/admin'
 
+
 export const ArticleListPage = (
-	<ListPage pageName="articleList" entities="Article" rendererProps={{
-		title: 'Articles',
-		boxLabel: 'Article',
-		actions: <>
-			<PageLinkButton to={'articleCreate'}>Add article</PageLinkButton>
-		</>,
-	}}>
-		<TableCell><Field field={'title'} /></TableCell>
-		<TableCell><PageLinkById to={'articleEdit'} Component={AnchorButton}>Edit</PageLinkById></TableCell>
-	</ListPage>
+	<GenericPage pageName="articleList">
+		<TitleBar actions={<PageLinkButton to="articleCreate">Add article</PageLinkButton>}>Articles</TitleBar>
+
+		<DataBindingProvider stateComponent={FeedbackRenderer}>
+			<DataGrid entities="Article" itemsPerPage={50}>
+				<TextCell field="title" header="Title" />
+				<GenericCell canBeHidden={false} justification="justifyEnd">
+					<PageLinkById to={'articleEdit'} Component={AnchorButton}>Edit</PageLinkById>
+					<DeleteEntityButton title="Delete" immediatePersist={true}></DeleteEntityButton>
+				</GenericCell>
+			</DataGrid>
+		</DataBindingProvider>
+	</GenericPage>
 )
 
 const form = <>

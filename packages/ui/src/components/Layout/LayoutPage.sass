@@ -11,7 +11,7 @@
 		flex-direction: column
 		padding: var(--section-padding-vertical) var(--section-padding-horizontal)
 
-		@media (min-width: $break768)
+		@media (min-width: $min-width-break-point-tablet)
 			--section-padding-horizontal: #{($cui-gap * 8)}
 			--section-padding-vertical: #{($cui-gap * 8)}
 			--section-gap: #{$cui-gap * 8}
@@ -45,11 +45,11 @@
 		&-title
 			margin: 0
 
-	@media (min-width: $break768)
+	@media (min-width: $min-width-break-point-tablet)
 		&-aside
 			padding: ($cui-gap * 8) ($cui-gap * 8)
 
-@media (min-width: $break1200)
+@media (min-width: $min-width-break-point-desktop)
 	html
 		height: 100vh
 		margin: 0

@@ -1,13 +1,10 @@
 import type { DataGridColumns, DataGridFilterArtifactStore } from '../base'
 
 export const normalizeInitialFilters = (columns: DataGridColumns): DataGridFilterArtifactStore => {
-	const filters: DataGridFilterArtifactStore = new Map()
-
-	for (const [i, value] of columns) {
+	return Object.fromEntries(Object.entries(columns).flatMap(([i, value]) => {
 		if (value.enableFiltering !== false && value.initialFilter !== undefined) {
-			filters.set(i, value.initialFilter)
+			return [[i, value.initialFilter]]
 		}
-	}
-
-	return filters
+		return []
+	}))
 }

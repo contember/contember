@@ -20,21 +20,17 @@ export const useFilters = (
 				let didBailOut = false
 
 				setFilters(filters => {
-					const existingValue = filters.get(columnKey)
+					const { [columnKey]: existingValue, ...otherFilters } = filters
 
 					if (existingValue === columnFilter) {
 						didBailOut = true
 						return filters
 					}
-					const clone = new Map(filters)
-
 					if (columnFilter === undefined) {
-						clone.delete(columnKey)
+						return otherFilters
 					} else {
-						clone.set(columnKey, columnFilter)
+						return { ...otherFilters, [columnKey]: columnFilter }
 					}
-
-					return clone
 				})
 				if (!didBailOut) {
 					updatePaging({
@@ -42,7 +38,7 @@ export const useFilters = (
 					})
 				}
 			},
-			[columns, updatePaging],
+			[columns, setFilters, updatePaging],
 		),
 	]
 }

@@ -8,7 +8,7 @@ export const collectFilters = (
 ): Filter | undefined => {
 	const mapped: Filter[] = []
 
-	for (const [key, artifact] of filters) {
+	for (const [key, artifact] of Object.entries(filters)) {
 		const column = columns.get(key)
 		if (column === undefined) {
 			continue

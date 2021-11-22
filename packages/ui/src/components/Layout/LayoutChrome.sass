@@ -46,7 +46,7 @@
 			flex-wrap: nowrap
 			gap: $cui-gap * 2
 
-	@media (min-width: 768px)
+	@media (min-width: $break768)
 		flex-direction: row
 
 		&-bar
@@ -56,7 +56,7 @@
 		&-navigation-button
 			display: none
 
-	@media (max-width: 767px)
+	@media (max-width: $break768M)
 		&-bar
 			height: 100vh
 		&.view-collapsed &-bar

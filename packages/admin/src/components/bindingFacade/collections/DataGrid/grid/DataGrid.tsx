@@ -5,14 +5,10 @@ import {
 	useBindingOperations,
 	useEnvironment,
 } from '@contember/binding'
-import { noop } from '@contember/react-utils'
 import { FunctionComponent, ReactNode, useEffect, useMemo, useRef, useState } from 'react'
 import type { DataGridContainerPublicProps, DataGridState } from '../base'
 import { useGridPagingState } from '../paging'
 import { extractDataGridColumns } from '../structure'
-import { normalizeInitialFilters } from './normalizeInitialFilters'
-import { normalizeInitialHiddenColumnsState } from './normalizeInitialHiddenColumnsState'
-import { normalizeInitialOrderBys } from './normalizeInitialOrderBys'
 import { renderGrid, RenderGridOptions } from './renderGrid'
 import { useFilters } from './useFilters'
 import { useHiddenColumnsState } from './useHiddenColumnsState'
@@ -37,9 +33,11 @@ export const DataGrid: FunctionComponent<DataGridProps> = Component(
 		const [pageState, updatePaging] = useGridPagingState({
 			itemsPerPage: props.itemsPerPage ?? null,
 		})
+		const dataGridKey = typeof props.entities === 'string' ? props.entities : props.entities.entityName
+
 		const [hiddenColumns, setIsColumnHidden] = useHiddenColumnsState(columns)
 		const [orderDirections, setOrderBy] = useOrderBys(columns, updatePaging)
-		const [filterArtifacts, setFilter] = useFilters(columns, updatePaging)
+		const [filterArtifacts, setFilter] = useFilters(columns, updatePaging, dataGridKey)
 
 		const containerProps: DataGridContainerPublicProps = useMemo(
 			() => ({

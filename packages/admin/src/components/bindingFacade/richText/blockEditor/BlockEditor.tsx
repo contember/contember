@@ -6,24 +6,24 @@ import {
 	HasMany,
 	SugaredField,
 	SugaredFieldProps,
-	SugaredRelativeEntityList,
-	useBindingOperations,
-	useDesugaredRelativeEntityList,
-	useDesugaredRelativeSingleField,
-	useEntityList,
-	useEnvironment,
+	SugaredRelativeEntityList, useDesugaredRelativeSingleField, useEnvironment,
 	VariableInputTransformer,
 } from '@contember/binding'
 import { emptyArray, noop } from '@contember/react-utils'
 import { EditorCanvas, EditorCanvasSize } from '@contember/ui'
-import { Fragment, FunctionComponent, ReactElement, ReactNode, useCallback, useEffect, useMemo, useState } from 'react'
+import { Fragment, FunctionComponent, ReactElement, ReactNode, useCallback, useMemo, useState } from 'react'
 import { Range as SlateRange } from 'slate'
 import { Slate } from 'slate-react'
 import { getDiscriminatedBlock, useNormalizedBlocks } from '../../blocks'
 import { Repeater } from '../../collections'
 import { SugaredDiscriminateBy, useDiscriminatedData } from '../../discrimination'
+import { TextField } from '../../fields'
+import { createEditorWithEssentials } from '../baseEditor'
+import { EditableCanvas } from '../baseEditor/EditableCanvas'
 import type { CreateEditorPublicOptions } from '../editorFactory'
+import { paragraphElementType } from '../plugins'
 import { RichEditor } from '../RichEditor'
+import { RichTextField } from '../RichTextField'
 import {
 	HoveringToolbars,
 	HoveringToolbarsProps,
@@ -34,18 +34,13 @@ import { BlockHoveringToolbarContents, BlockHoveringToolbarContentsProps } from 
 import { initBlockEditor } from './editor'
 import type { EmbedHandler } from './embed'
 import type { FieldBackedElement } from './FieldBackedElement'
-import { ContentOutlet, ContentOutletProps, useEditorReferenceBlocks } from './templating'
-import { EditableCanvas } from '../baseEditor/EditableCanvas'
-import { TextField } from '../../fields'
-import { RichTextField } from '../RichTextField'
 import { useCreateElementReference } from './references'
-import { useBlockEditorState } from './state/useBlockEditorState'
-import { useGetReferencedEntity } from './references/useGetReferencedEntity'
-import { createEditorWithEssentials } from '../baseEditor'
-import { paragraphElementType } from '../plugins'
-import { useInsertElementWithReference } from './references/useInsertElementWithReference'
-import { useReferentiallyStableCallback } from './useReferentiallyStableCallback'
 import { ReferencesProvider } from './references/ReferencesProvider'
+import { useGetReferencedEntity } from './references/useGetReferencedEntity'
+import { useInsertElementWithReference } from './references/useInsertElementWithReference'
+import { useBlockEditorState } from './state/useBlockEditorState'
+import { ContentOutlet, ContentOutletProps, useEditorReferenceBlocks } from './templating'
+import { useReferentiallyStableCallback } from './useReferentiallyStableCallback'
 
 export interface BlockEditorProps extends SugaredRelativeEntityList, CreateEditorPublicOptions {
 	label: string
@@ -78,8 +73,8 @@ const BlockEditorComponent: FunctionComponent<BlockEditorProps> = Component(
 		assertStaticBlockEditorInvariants(props, environment)
 
 		const {
-			label,
 			contentField,
+			label,
 			sortableBy,
 			children,
 			size,

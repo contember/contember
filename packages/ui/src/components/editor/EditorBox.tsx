@@ -5,6 +5,7 @@ import { BoxDepthContext, HeadingDepthContext } from '../../contexts'
 import type { NativeProps } from '../../types'
 import { toStateClass } from '../../utils'
 import { Heading } from '../Heading'
+import { Stack } from '../Stack'
 
 export interface EditorBoxOwnProps {
 	heading?: ReactNode
@@ -35,11 +36,11 @@ export const EditorBox = memo(function EditorBox({
 				</div>
 			)}
 			{children !== undefined && (
-				<div className={`${prefix}editorBox-content`}>
+				<Stack direction="vertical" depth={3} className={`${prefix}editorBox-content`}>
 					<IncreaseHeadingDepth currentDepth={headingDepth} onlyIf={heading !== undefined}>
 						<IncreaseBoxDepth currentDepth={boxDepth}>{children}</IncreaseBoxDepth>
 					</IncreaseHeadingDepth>
-				</div>
+				</Stack>
 			)}
 		</div>
 	)

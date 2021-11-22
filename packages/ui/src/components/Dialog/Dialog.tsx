@@ -2,7 +2,7 @@ import cn from 'classnames'
 import { useLayoutEffect, useState } from 'react'
 import { useClassNamePrefix, useRawCloseOnEscapeOrClickOutside } from '../../auxiliary'
 import { toEnumViewClass } from '../../utils'
-import { Box } from '../Box'
+import { Box } from '../Containers/Box'
 import type { DialogSettingsWithMetadata } from './dialogReducer'
 
 export interface DialogProps {

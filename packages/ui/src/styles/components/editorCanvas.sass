@@ -1,22 +1,26 @@
 @import '../common'
 
 .#{$cui-conf-globalPrefix}editorCanvas
-	// TODO don't use box
-	// TODO handle selection color systemically
-	// TODO proper spacing
-	// TODO less arbitrary styles of classic elements within the canvas (headings, lists, etc)
-	+box()
-	background: #FFFFFF
+	@extend %controlVariants
+
+	border: $cui-control-border-width solid $cui-control-view-default-border-color
+	border-radius: $cui-control-border-radius
 	width: 100%
-	padding: 0
+	padding: $cui-gap * 4
 
 	//&::after
 		+size(100% 2em)
 		content: ''
 		display: block
 
+	.#{$cui-conf-globalPrefix}box-content.view-depth-2,
+	.#{$cui-conf-globalPrefix}stack.view-depth-3 .#{$cui-conf-globalPrefix}editorBox
+		border: 0
+		border-radius: 0
+		border-bottom-width: 1px
+		padding: 0
+
 	&-canvas
-		padding: .75em
 		min-height: 2em
 		cursor: text
 
@@ -25,10 +29,6 @@
 			$counter-name: nth($cui-editor-heading-counters, $level)
 			$headingCounter: $headingCounter unquote($counter-name)
 		counter-reset: $headingCounter unquote($cui-editor-paragraph-counter)
-
-		// TODO this is crap
-		[data-contember-type="__contember_contentPlaceholder__"]:not(:first-child)
-			margin-top: var(--cui-formGroup-separation)
 
 		h1, h2, h3, h4, h5, h6
 			margin: 0
@@ -73,7 +73,6 @@
 
 	&.view-large > &-canvas
 		min-height: 32em
-		padding: 2em
 
 	& > &-canvas &-canvas
 		min-height: 1em

@@ -1,10 +1,11 @@
-import cn from 'classnames'
+import classnames from 'classnames'
 import { forwardRef, memo, ReactNode, useContext } from 'react'
-import { IncreaseBoxDepth, IncreaseHeadingDepth, useClassNamePrefix } from '../../auxiliary'
-import { BoxDepthContext, HeadingDepthContext } from '../../contexts'
-import type { BoxDistinction, NativeProps } from '../../types'
-import { toEnumViewClass, toStateClass, toViewClass } from '../../utils'
-import { Heading } from '../Heading'
+import { IncreaseHeadingDepth, useClassNamePrefix } from '../../../auxiliary'
+import { BoxDepthContext, HeadingDepthContext } from '../../../contexts'
+import type { BoxDistinction, NativeProps } from '../../../types'
+import { toStateClass, toViewClass } from '../../../utils'
+import { Heading } from '../../Heading'
+import { BoxContent } from './BoxContent'
 
 export interface BoxOwnProps {
 	heading?: ReactNode
@@ -26,10 +27,9 @@ export const Box = memo(
 			return (
 				<div
 					{...divProps}
-					className={cn(
+					className={classnames(
 						`${prefix}box`,
 						toViewClass(`depth-${boxDepth}`, true),
-						toEnumViewClass(distinction),
 						toStateClass('active', isActive),
 						className,
 					)}
@@ -48,13 +48,9 @@ export const Box = memo(
 						</div>
 					)}
 					{children && (
-						<div className={`${prefix}box-content`}>
-							<IncreaseHeadingDepth currentDepth={headingDepth} onlyIf={!!heading}>
-								<IncreaseBoxDepth currentDepth={boxDepth} onlyIf={distinction !== 'seamlessIfNested'}>
-									{children}
-								</IncreaseBoxDepth>
-							</IncreaseHeadingDepth>
-						</div>
+						<IncreaseHeadingDepth currentDepth={headingDepth} onlyIf={!!heading}>
+							<BoxContent distinction={distinction}>{children}</BoxContent>
+						</IncreaseHeadingDepth>
 					)}
 				</div>
 			)

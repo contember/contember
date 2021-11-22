@@ -2,8 +2,8 @@ import { Component, SugaredRelativeSingleField } from '@contember/binding'
 import type { FormGroupProps } from '@contember/ui'
 import { FunctionComponent, ReactNode, useMemo } from 'react'
 import { NativeSelectFieldInner, NormalizedStaticOption, StaticSingleChoiceField } from '../fields'
-import { useNormalizedBlocks } from './useNormalizedBlocks'
 import { useStaticSingleChoiceField } from '../fields/ChoiceField/useStaticSingleChoiceField'
+import { useNormalizedBlocks } from './useNormalizedBlocks'
 
 export interface DiscriminatedBlocksProps extends Omit<FormGroupProps, 'children'>, SugaredRelativeSingleField {
 	children: ReactNode

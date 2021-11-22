@@ -374,7 +374,6 @@ $cui-message-variants: map_merge((
 ), $cui-message-variants);
 
 // FormGroup
-$cui-formGroup-separation: 1em !default;
 $cui-formGroup-label-color: $cui-color-gray-8 !default;
 $cui-formGroup-labelDescription-color: $cui-color-gray-4 !default;
 $cui-formGroup-description-color: $cui-color-gray-4 !default;
@@ -432,114 +431,15 @@ $cui-heading-sizes: (
 	),
 );
 
-// Boxes
-$cui-box-active-color: $cui-control-view-default-distinction-color !default;
+// Spacing
+$cui-gap: 0.25em;
 
-$cui-box-depth-1-background: $cui-color-white !default;
-$cui-box-depth-1-separation: $cui-heading-1-fontSize-small !default;
-$cui-box-depth-1-separation-color: rgba($cui-color-gray-8, .15) !default;
-$cui-box-depth-1-border-radius: em(3px) !default;
-$cui-box-depth-1-padding-x: $cui-heading-1-fontSize-small * .85 !default;
-$cui-box-depth-1-padding-y: $cui-heading-1-fontSize-small * .85 !default;
-$cui-box-depth-1-boxShadow: 0 0 0 em(1px) rgba($cui-color-gray-8, .05), 0 em(1px) em(3px) 0 rgba($cui-color-gray-8, .15) !default;
-
-$cui-box-depth-2-background: darken($cui-box-depth-1-background, 1%) !default;
-$cui-box-depth-2-separation: $cui-heading-2-fontSize-small !default;
-$cui-box-depth-2-separation-color: rgba($cui-color-gray-8, .15) !default;
-$cui-box-depth-2-border-radius: em(2.5px) !default;
-$cui-box-depth-2-padding-x: $cui-heading-2-fontSize-small * .85 !default;
-$cui-box-depth-2-padding-y: $cui-heading-2-fontSize-small * .85 !default;
-$cui-box-depth-2-boxShadow: 0 0 0 em(1px) rgba($cui-color-gray-8, .05), 0 em(1px) em(2.75px) 0 rgba($cui-color-gray-8, .17) !default;
-
-$cui-box-depth-3-background: darken($cui-box-depth-2-background, 1%) !default;
-$cui-box-depth-3-separation: $cui-heading-3-fontSize-small !default;
-$cui-box-depth-3-separation-color: rgba($cui-color-gray-8, .15) !default;
-$cui-box-depth-3-border-radius: em(2px) !default;
-$cui-box-depth-3-padding-x: $cui-heading-3-fontSize-small * .85 !default;
-$cui-box-depth-3-padding-y: $cui-heading-3-fontSize-small * .85 !default;
-$cui-box-depth-3-boxShadow: 0 0 0 em(1px) rgba($cui-color-gray-8, .05), 0 em(1px) em(2.5px) 0 rgba($cui-color-gray-8, .19) !default;
-
-$cui-box-depth-4-background: darken($cui-box-depth-3-background, 1%) !default;
-$cui-box-depth-4-separation: $cui-heading-4-fontSize-small !default;
-$cui-box-depth-4-separation-color: rgba($cui-color-gray-8, .15) !default;
-$cui-box-depth-4-border-radius: em(1.75px) !default;
-$cui-box-depth-4-padding-x: $cui-heading-4-fontSize-small * .85 !default;
-$cui-box-depth-4-padding-y: $cui-heading-4-fontSize-small * .85 !default;
-$cui-box-depth-4-boxShadow: 0 0 0 em(1px) rgba($cui-color-gray-8, .05), 0 em(1px) em(2px) 0 rgba($cui-color-gray-8, .21) !default;
-
-$cui-box-depth-5-background: darken($cui-box-depth-4-background, 1%) !default;
-$cui-box-depth-5-separation: $cui-heading-5-fontSize-small !default;
-$cui-box-depth-5-separation-color: rgba($cui-color-gray-8, .15) !default;
-$cui-box-depth-5-border-radius: em(1.5px) !default;
-$cui-box-depth-5-padding-x: $cui-heading-5-fontSize-small * .85 !default;
-$cui-box-depth-5-padding-y: $cui-heading-5-fontSize-small * .85 !default;
-$cui-box-depth-5-boxShadow: 0 0 0 em(1px) rgba($cui-color-gray-8, .05), 0 em(1px) em(1.75px) 0 rgba($cui-color-gray-8, .23) !default;
-
-$cui-box-depth-6-background: darken($cui-box-depth-5-background, 1%) !default;
-$cui-box-depth-6-separation: $cui-heading-6-fontSize-small !default;
-$cui-box-depth-6-separation-color: rgba($cui-color-gray-8, .15) !default;
-$cui-box-depth-6-border-radius: em(1.25px) !default;
-$cui-box-depth-6-padding-x: $cui-heading-6-fontSize-small * .85 !default;
-$cui-box-depth-6-padding-y: $cui-heading-6-fontSize-small * .85 !default;
-$cui-box-depth-6-boxShadow: 0 0 0 em(1px) rgba($cui-color-gray-8, .05), 0 em(1px) em(1.5px) 0 rgba($cui-color-gray-8, .25) !default;
-
-$cui-box-depths: (
-	(
-		'background': $cui-box-depth-1-background,
-		'separation': $cui-box-depth-1-separation,
-		'borderRadius': $cui-box-depth-1-border-radius,
-		'paddingX': $cui-box-depth-1-padding-x,
-		'paddingY': $cui-box-depth-1-padding-y,
-		'separationColor': $cui-box-depth-1-separation-color,
-		'boxShadow': $cui-box-depth-1-boxShadow,
-	),
-	(
-		'background': $cui-box-depth-2-background,
-		'separation': $cui-box-depth-2-separation,
-		'borderRadius': $cui-box-depth-2-border-radius,
-		'paddingX': $cui-box-depth-2-padding-x,
-		'paddingY': $cui-box-depth-2-padding-y,
-		'separationColor': $cui-box-depth-2-separation-color,
-		'boxShadow': $cui-box-depth-2-boxShadow,
-	),
-	(
-		'background': $cui-box-depth-3-background,
-		'separation': $cui-box-depth-3-separation,
-		'borderRadius': $cui-box-depth-3-border-radius,
-		'paddingX': $cui-box-depth-3-padding-x,
-		'paddingY': $cui-box-depth-3-padding-y,
-		'separationColor': $cui-box-depth-3-separation-color,
-		'boxShadow': $cui-box-depth-3-boxShadow,
-	),
-	(
-		'background': $cui-box-depth-4-background,
-		'separation': $cui-box-depth-4-separation,
-		'borderRadius': $cui-box-depth-4-border-radius,
-		'paddingX': $cui-box-depth-4-padding-x,
-		'paddingY': $cui-box-depth-4-padding-y,
-		'separationColor': $cui-box-depth-4-separation-color,
-		'boxShadow': $cui-box-depth-4-boxShadow,
-	),
-	(
-		'background': $cui-box-depth-5-background,
-		'separation': $cui-box-depth-5-separation,
-		'borderRadius': $cui-box-depth-5-border-radius,
-		'paddingX': $cui-box-depth-5-padding-x,
-		'paddingY': $cui-box-depth-5-padding-y,
-		'separationColor': $cui-box-depth-5-separation-color,
-		'boxShadow': $cui-box-depth-5-boxShadow,
-	),
-	(
-		'background': $cui-box-depth-6-background,
-		'separation': $cui-box-depth-6-separation,
-		'borderRadius': $cui-box-depth-6-border-radius,
-		'paddingX': $cui-box-depth-6-padding-x,
-		'paddingY': $cui-box-depth-6-padding-y,
-		'separationColor': $cui-box-depth-6-separation-color,
-		'boxShadow': $cui-box-depth-6-boxShadow,
-	),
-) !default;
-
+// Panels
+$cui-panel-paddingY: $cui-gap;
+$cui-panel-paddingX: $cui-gap;
+$cui-light-panel-background: $cui-color-white;
+$cui-light-body-background: #f8f8f8;
+$cui-light-panel-border: $cui-control-border-width solid $cui-color-gray-2 !default;
 
 // Icon
 $cui-icon-default-size: 1em !default;
@@ -558,7 +458,7 @@ $cui-icon-sizes: map_merge((
 // Navigation
 $cui-navigation-text-color: $cui-color-gray-8 !default;
 $cui-navigation-title-font-size: rem(12px) !default;
-$cui-navigation-title-font-weight: $fw-medium;
+$cui-navigation-title-font-weight: $fw-bold;
 $cui-navigation-inactive-opacity: .8 !default;
 $cui-navigation-active-color: darken($cui-color-primary, 5) !default;
 $cui-navigation-hover-color: $cui-color-primary !default;
@@ -614,8 +514,8 @@ $cui-containerSpinner-sizes: map_merge((
 // Dropdown
 $cui-dropdown-zIndex: 100 !default;
 $cui-dropdown-content-color: $cui-color-black !default;
-$cui-dropdown-content-background: $cui-box-depth-1-background !default;
-$cui-dropdown-content-boxShadow: $cui-box-depth-1-boxShadow !default;
+$cui-dropdown-content-background: $cui-color-white !default;
+$cui-dropdown-content-boxShadow: 0 0 0 em(1px) rgba($cui-color-gray-8, .05), 0 em(1px) em(3px) 0 rgba($cui-color-gray-8, .15) !default;
 $cui-dropdown-content-border-radius: $cui-control-border-radius + $cui-control-border-width !default;
 $cui-dropdown-button-content-gap-size: .3em !default;
 $cui-dropdown-transition-duration: .1s !default;
@@ -661,7 +561,7 @@ $cui-dimensionSwitcher-spacing: 1em;
 // Layout
 $cui-layout-background: #FFFFFF;
 $cui-layout-border: solid 1px #E5E5EC;
-$cui-layout-sidebar-width: em(260px);
+$cui-layout-sidebar-width: em(300px);
 $cui-editable-width: 60em;
 $cui-topBar-right-safeSpace: 14em;
 
@@ -670,9 +570,10 @@ $cui-progressBar-background-color: #444444;
 $cui-progressBar-foreground-color: #85FF00;
 
 // FileDropZone
+$cui-fileDropZone-background-color: $cui-color-white;
 $cui-fileDropZone-border-color: #DFDFDF;
-$cui-fileDropZone-active-border-color: $cui-box-active-color;
-$cui-fileDropZone-accepting-border-color: $cui-box-active-color; // Deliberately active, and not success
+$cui-fileDropZone-active-border-color: $cui-control-view-default-distinction-color;
+$cui-fileDropZone-accepting-border-color: $cui-control-view-default-distinction-color; // Deliberately active, and not success
 $cui-fileDropZone-rejecting-border-color: $cui-control-validation-invalid-border-color;
 
 // Editor

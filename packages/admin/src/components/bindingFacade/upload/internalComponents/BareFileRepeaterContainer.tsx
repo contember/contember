@@ -14,7 +14,10 @@ export interface BareFileRepeaterContainerPrivateProps {
 	sortableBy?: SugaredFieldProps['field']
 }
 
-export interface BareFileRepeaterContainerPublicProps extends FileInputPublicProps {}
+export interface BareFileRepeaterContainerPublicProps extends Omit<FileInputPublicProps, 'label'> {
+	boxLabel?: ReactNode
+	label: ReactNode
+}
 
 export interface BareFileRepeaterContainerProps
 	extends BareFileRepeaterContainerPublicProps,
@@ -25,6 +28,7 @@ export const BareFileRepeaterContainer: FunctionComponent<BareFileRepeaterContai
 	accessor,
 	entities,
 	isEmpty,
+	label,
 	fileKinds: unstableFileKinds,
 	createNewEntity,
 	sortableBy,
@@ -86,6 +90,7 @@ export const BareFileRepeaterContainer: FunctionComponent<BareFileRepeaterContai
 	return (
 		<FileInput
 			{...fileInputProps}
+			label={label}
 			dropzoneState={dropzoneState}
 			formatMessage={formatMessage}
 			errors={accessor.errors}

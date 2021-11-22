@@ -7,11 +7,11 @@ import {
 	EditUser,
 	GenericPage,
 	InviteUser,
-	Layout,
-	LayoutInner,
+	LayoutChrome,
 	Menu,
 	NavigateBackButton,
 	Page,
+	PageLayoutContent,
 	PageLinkButton,
 	Pages,
 	ProjectsGrid,
@@ -19,14 +19,14 @@ import {
 	TitleBar,
 	UsersList,
 } from '@contember/admin'
-import './index.sass'
 import { FC } from 'react'
+import './index.sass'
 
 const PanelLayout: FC = props => {
 	return (
-		<Layout
+		<LayoutChrome
 			children={props.children}
-			sideBar={
+			navigation={
 				<Menu>
 					<Menu.Item>
 						<Menu.Item
@@ -79,7 +79,7 @@ runReactApp(
 
 			<Page name="projectOverview">
 				{({ project }: { project: string }) => (
-					<LayoutInner>
+					<PageLayoutContent>
 						<TitleBar navigation={<NavigateBackButton to={'projectList'}>Projects</NavigateBackButton>}>
 							Project {project}
 						</TitleBar>
@@ -109,13 +109,13 @@ runReactApp(
 								</Box>
 							</div>
 						</div>
-					</LayoutInner>
+					</PageLayoutContent>
 				)}
 			</Page>
 
 			<Page name="userInvite">
 				{({ project }: { project: string }) => (
-					<LayoutInner>
+					<PageLayoutContent>
 						<TitleBar
 							navigation={<NavigateBackButton
 								to={{ pageName: 'projectOverview', parameters: { project } }}>Project</NavigateBackButton>}
@@ -126,13 +126,13 @@ runReactApp(
 							project={project}
 							userListLink={{ pageName: 'projectOverview', parameters: { project } }}
 						/>
-					</LayoutInner>
+					</PageLayoutContent>
 				)}
 			</Page>
 
 			<Page name="identityEdit">
 				{({ project, identity }: { project: string, identity: string }) => (
-					<LayoutInner>
+					<PageLayoutContent>
 						<TitleBar
 							navigation={<NavigateBackButton
 								to={{ pageName: 'projectOverview', parameters: { project } }}>Users</NavigateBackButton>}
@@ -144,13 +144,13 @@ runReactApp(
 							identityId={identity}
 							userListLink={{ pageName: 'projectOverview', parameters: { project } }}
 						/>
-					</LayoutInner>
+					</PageLayoutContent>
 				)}
 			</Page>
 
 			<Page name="apiKeyCreate">
 				{({ project }: { project: string }) => (
-					<LayoutInner>
+					<PageLayoutContent>
 						<TitleBar
 							navigation={<NavigateBackButton
 								to={{ pageName: 'projectOverview', parameters: { project } }}>Project</NavigateBackButton>}
@@ -161,7 +161,7 @@ runReactApp(
 							project={project}
 							apiKeyListLink={{ pageName: 'projectOverview', parameters: { project } }}
 						/>
-					</LayoutInner>
+					</PageLayoutContent>
 				)}
 			</Page>
 		</Pages>

@@ -1,12 +1,12 @@
-import { RequestProvider, RouteMap, RoutingContext, RoutingContextValue, SelectedDimension } from '../routing'
 import { Environment, EnvironmentContext } from '@contember/binding'
-import { I18nProvider, MessageDictionaryByLocaleCode } from '../i18n'
-import { Toaster, ToasterProvider } from './Toaster'
-import { DialogProvider } from '@contember/ui'
 import { ContemberClient, ContemberClientProps } from '@contember/react-client'
-import { NavigationProvider } from './NavigationProvider'
-import { IdentityProvider } from './Identity'
+import { DialogProvider, SectionTabsProvider } from '@contember/ui'
 import { ReactNode } from 'react'
+import { I18nProvider, MessageDictionaryByLocaleCode } from '../i18n'
+import { RequestProvider, RouteMap, RoutingContext, RoutingContextValue, SelectedDimension } from '../routing'
+import { IdentityProvider } from './Identity'
+import { NavigationProvider } from './NavigationProvider'
+import { Toaster, ToasterProvider } from './Toaster'
 
 export interface ApplicationEntrypointProps extends ContemberClientProps {
 	basePath?: string
@@ -60,7 +60,9 @@ export const ApplicationEntrypoint = (props: ApplicationEntrypointProps) => {
 								>
 									<NavigationProvider>
 										<IdentityProvider onInvalidIdentity={props.onInvalidIdentity}>
-											{props.children}
+											<SectionTabsProvider>
+												{props.children}
+											</SectionTabsProvider>
 										</IdentityProvider>
 									</NavigationProvider>
 								</ContemberClient>

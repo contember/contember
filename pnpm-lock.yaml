@@ -262,7 +262,6 @@ importers:
       classnames: 2.3.1
       css-loader: 5.2.4
       csstype: 3.0.8
-      manrope: 2.0.0
       react-aria: 3.9.0
       react-popper: 2.2.5
       react-stately: 3.8.0
@@ -295,7 +294,6 @@ importers:
       babel-loader: 8.2.2_@babel+core@7.15.5
       css-loader: 5.2.4
       csstype: 3.0.8
-      manrope: 2.0.0
       resolve-url-loader: 4.0.0
       sass: 1.36.0
       sass-loader: 10.1.1_sass@1.36.0
@@ -12987,10 +12985,6 @@ packages:
     resolution: {integrity: sha1-4BpckQnyr3lmDk6LlYd5AYT1qWw=}
     dependencies:
       tmpl: 1.0.5
-    dev: true
-
-  /manrope/2.0.0:
-    resolution: {integrity: sha512-3IRhDEj8j6kjVcN/CtGc8ejBxTPBkYv+w6LHjy/IRwZ8upg7HzTg9wc/3/l11ip+6E3RG1+ivG3l6M4izq1x0A==}
     dev: true
 
   /map-cache/0.2.2:

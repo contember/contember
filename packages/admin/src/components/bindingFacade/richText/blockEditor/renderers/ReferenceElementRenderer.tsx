@@ -6,10 +6,10 @@ import { ReactEditor, RenderElementProps, useSelected, useSlateStatic } from 'sl
 import { BlockProps, getDiscriminatedBlock } from '../../../blocks'
 import { getDiscriminatedDatum } from '../../../discrimination'
 import { BlockElement } from '../../baseEditor'
+import { EditorWithBlocks } from '../editor'
 import type { ReferenceElement } from '../elements'
 import { ReferenceElementOptions } from '../elements'
 import type { EmbedHandler } from '../embed'
-import { EditorWithBlocks } from '../editor'
 
 export interface ReferenceElementRendererProps extends RenderElementProps, ReferenceElementOptions {
 	element: ReferenceElement

@@ -1,20 +1,26 @@
-@import '../common'
-
 .#{$cui-conf-globalPrefix}titleBar
-	margin-bottom: 1.5em
+	--padding-horizontal: #{$cui-gap * 4}
+	--padding-vertical: #{$cui-gap * 4}
+
+	align-items: stretch
+	background-color: $cui-light-body-background
+	border-bottom: $cui-light-panel-border
 	display: flex
+	flex-direction: column
 	flex-wrap: wrap
-	align-items: center
+	gap: $cui-gap * 2
+	padding: $cui-gap * 4
+	position: sticky
+	top: 0
+	z-index: 2
 
 	&-navigation
-		margin-bottom: .25em
 		flex: 1 0 100%
 	&-in
+		align-items: center
 		display: flex
 		flex-wrap: wrap
-		align-items: center
-		margin-top: 1em
-		width: 100%
+		gap: $cui-gap * 2
 	&-navigation + &-in
 		margin-top: 0
 
@@ -24,3 +30,9 @@
 	&-actions
 		flex: 0 0 auto
 		margin-left: auto
+
+	@media (min-width: $break768)
+		--padding-horizontal: #{$cui-gap * 8}
+
+		padding: ($cui-gap * 4) ($cui-gap * 8)
+		gap: $cui-gap * 4

@@ -1,5 +1,6 @@
 import cn from 'classnames'
 import { memo, ReactNode } from 'react'
+import { Description, Label } from '../'
 import { useClassNamePrefix } from '../../auxiliary'
 import type { FormGroupLabelPosition, Size } from '../../types'
 import { toEnumViewClass } from '../../utils'
@@ -31,13 +32,14 @@ export const FormGroup = memo(
 	}: FormGroupProps) => {
 		const LabelElement = useLabelElement ? 'label' : 'div'
 		const prefix = useClassNamePrefix()
+
 		return (
 			<div className={cn(`${prefix}formGroup`, toEnumViewClass(size), toEnumViewClass(labelPosition))}>
 				<LabelElement className={`${prefix}formGroup-label`}>
 					{(label || labelDescription) && (
 						<span className={`${prefix}formGroup-label-wrap`}>
-							{label && <span className={`${prefix}formGroup-label-text`}>{label}</span>}
-							{labelDescription && <span className={`${prefix}formGroup-labelDescription`}>{labelDescription}</span>}
+							{label && <Label>{label}</Label>}
+							{labelDescription && <Description>{labelDescription}</Description>}
 						</span>
 					)}
 					<span className={`${prefix}formGroup-field-wrap`}>{children}</span>

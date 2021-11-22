@@ -4,7 +4,7 @@ import { memo, ReactNode } from 'react'
 import { DeleteEntityButton } from '../helpers'
 
 export interface RepeaterItemProps {
-	label?: ReactNode
+	label: ReactNode
 	children: ReactNode
 	canBeRemoved: boolean
 	dragHandleComponent?: BoxSectionProps['dragHandleComponent']

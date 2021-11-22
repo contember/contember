@@ -1,17 +1,20 @@
 import cn from 'classnames'
 import { ReactNode, useCallback, useState } from 'react'
 import { useClassNamePrefix, useCloseOnEscapeOrClickOutside } from '../auxiliary'
-import { toViewClass } from '../utils'
+import { Default } from '../types'
+import { toEnumViewClass, toViewClass } from '../utils'
 
+type Direction = Default | 'down' | 'up'
 export interface SeamlessDropdownProps {
 	label: ReactNode
 	children?: ReactNode
 	hoverable?: boolean
 	inline?: boolean
 	caret?: boolean
+	direction?: Direction
 }
 
-export function SeamlessDropdown({ label, children, hoverable, caret, inline }: SeamlessDropdownProps) {
+export function SeamlessDropdown({ direction = 'down', label, children, hoverable, caret, inline }: SeamlessDropdownProps) {
 	const prefix = useClassNamePrefix()
 	const [open, setOpen] = useState(false)
 
@@ -34,6 +37,7 @@ export function SeamlessDropdown({ label, children, hoverable, caret, inline }: 
 		<div
 			className={cn(
 				`${prefix}seamlessDropdown`,
+				toEnumViewClass(direction),
 				toViewClass('open', open),
 				toViewClass('hoverable', hoverable),
 				toViewClass('caret', caret),

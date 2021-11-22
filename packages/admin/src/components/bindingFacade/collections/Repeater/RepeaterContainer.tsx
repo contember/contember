@@ -1,5 +1,5 @@
 import type { EntityAccessor, EntityListAccessor } from '@contember/binding'
-import { Box, BoxSection } from '@contember/ui'
+import { FormGroup, Stack } from '@contember/ui'
 import { ComponentType, memo, ReactNode } from 'react'
 import type { MessageFormatter } from '../../../../i18n'
 import { AccessorErrors } from '../../errors'
@@ -9,10 +9,11 @@ import type { RepeaterDictionary } from './repeaterDictionary'
 export interface RepeaterContainerPrivateProps {
 	accessor: EntityListAccessor
 	entities: EntityAccessor[]
+	formatMessage: MessageFormatter<RepeaterDictionary>
 	isEmpty: boolean
+	boxLabel?: ReactNode
 	label: ReactNode
 	createNewEntity: (initialize?: EntityAccessor.BatchUpdatesHandler) => void
-	formatMessage: MessageFormatter<RepeaterDictionary>
 	children: ReactNode
 }
 export interface RepeaterContainerPublicProps {
@@ -33,41 +34,45 @@ export interface RepeaterContainerProps extends RepeaterContainerPublicProps, Re
 export const RepeaterContainer = memo(
 	({
 		accessor,
+		addButtonText,
 		children,
 		createNewEntity,
 		addButtonComponent: AddButton = CreateNewEntityButton,
 		addButtonComponentExtraProps,
 		addButtonProps,
-		addButtonText,
-		emptyMessage,
 		emptyMessageComponent: EmptyMessageComponent = EmptyMessage,
-		emptyMessageComponentExtraProps,
 		enableAddingNew = true,
 		formatMessage,
 		isEmpty,
 		label,
 	}: RepeaterContainerProps) => {
-		return (
-			<Box heading={label}>
+		return <FormGroup label={label} useLabelElement={false}>
+			<Stack
+				direction="vertical"
+				depth={5}
+			>
 				<AccessorErrors accessor={accessor} />
 				{isEmpty && (
-					<EmptyMessageComponent {...emptyMessageComponentExtraProps}>
-						{formatMessage(emptyMessage, 'repeater.emptyMessage.text')}
-					</EmptyMessageComponent>
+					<AddButton
+						{...addButtonComponentExtraProps}
+						{...addButtonProps}
+						createNewEntity={createNewEntity}
+					>
+						{addButtonText ?? label ?? formatMessage(addButtonText, 'repeater.addButton.text')}
+					</AddButton>
 				)}
 				{isEmpty || children}
-				{enableAddingNew && (
-					<BoxSection heading={undefined}>
-						<AddButton
-							{...addButtonComponentExtraProps}
-							children={formatMessage(addButtonText, 'repeater.addButton.text')}
-							{...addButtonProps}
-							createNewEntity={createNewEntity}
-						/>
-					</BoxSection>
+				{!isEmpty && enableAddingNew && (
+					<AddButton
+						{...addButtonComponentExtraProps}
+						{...addButtonProps}
+						createNewEntity={createNewEntity}
+					>
+						{addButtonText ?? label ?? formatMessage(addButtonText, 'repeater.addButton.text')}
+					</AddButton>
 				)}
-			</Box>
-		)
+			</Stack>
+		</FormGroup>
 	},
 )
 RepeaterContainer.displayName = 'RepeaterContainer'

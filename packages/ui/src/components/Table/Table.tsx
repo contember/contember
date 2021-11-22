@@ -3,7 +3,7 @@ import { createContext, memo, ReactNode } from 'react'
 import { useClassNamePrefix } from '../../auxiliary'
 import type { Justification, Size } from '../../types'
 import { toEnumViewClass } from '../../utils'
-import { Box } from '../Box'
+import { Box } from '../Containers/Box'
 
 export const UseTableElementContext = createContext(true)
 

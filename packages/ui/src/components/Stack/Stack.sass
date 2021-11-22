@@ -1,0 +1,36 @@
+@import '../../styles/common'
+
+.#{$cui-conf-globalPrefix}stack
+  display:  flex
+
+  &.view-horizontal
+    flex-direction: row
+  &.view-vertical
+    flex-direction: column
+  &.view-horizontal-reverse
+    flex-direction: row-reverse
+  &.view-vertical-reverse
+    flex-direction: column-reverse
+
+  &.view-align
+    &-center
+      align-items: center
+    &-start
+      align-items: flex-start
+    &-end
+      align-items: flex-end
+    &-stretch
+      align-items: stretch
+
+  &.view-depth-1
+    gap: $cui-gap * 16
+  &.view-depth-2
+    gap: $cui-gap * 8
+  &.view-depth-3
+    gap: $cui-gap * 6
+  &.view-depth-4
+    gap: $cui-gap * 4
+  &.view-depth-5
+    gap: $cui-gap * 2
+  &.view-depth-6
+    gap: $cui-gap

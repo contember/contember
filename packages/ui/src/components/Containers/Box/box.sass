@@ -1,19 +1,20 @@
-@import '../common'
+@import 'boxContent'
 
 .#{$cui-conf-globalPrefix}box
-	+boxNesting
-	display: grid
-	grid-template-columns: 1fr auto
-	grid-template-rows: auto auto
+	+boxContent
+	display: flex
+	flex-direction: column
+	gap: $cui-gap * 6
 
-	& & + &-section:not(:first-child)
-		border-top: none
-		padding-top: 0
+	&-content,
+	&-section
+		+boxContent
 
-	&.view-seamless,
-	& &.view-seamlessIfNested
+	&-content.view-seamless,
+	&-content &.view-seamlessIfNested
 		box-shadow: none
 		background: inherit
+		border: 0
 		padding: 0
 		border-radius: unset
 
@@ -30,37 +31,36 @@
 		width: 100%
 
 	&-section
-		//&.view-hasHeading,
-		//&.view-hasHandle,
-		//&.view-hasActions,
-
 		display: grid
 		grid-template: auto 1fr / auto 1fr auto
 
 		&-handle
 			display: inline-flex
-			margin: -.5em 0 0 -1em
-			padding: .5em .5em 0 .5em
+			margin: -.125em 0 0 -1em
+			padding: 0 .5em
 			cursor: grab
-			grid-row: 1 / 2
+			grid-row: 1 / span 2
 			grid-column: 1
 		&-heading
 			grid-area: 1 / 2
+			margin-bottom: 1em
 		&-actions
 			grid-column: 3
 			grid-row: 1 / 2
 			margin-left: .5em
 			margin-right: -.5em
+			margin-top: -.5em
 		&-content
-			grid-row: 1 / 2
 			grid-column: 2 / 3
+			grid-row: 1 / 2
 
 		&.view-hasHeading > &
 			&-content
 				grid-row: 2
+				grid-column: span 2
 
 	&-section.is-active,
 	&.is-active
 		transition: box-shadow .15s
-		box-shadow: 0 0 0 .2em rgba($cui-box-active-color, .3)
+		box-shadow: 0 0 0 .2em rgba($cui-control-view-default-distinction-color, .3)
 		z-index: 1

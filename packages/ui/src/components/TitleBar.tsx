@@ -4,13 +4,14 @@ import { ButtonList } from './forms'
 import { Heading, HeadingProps } from './Heading'
 
 export interface TitleBarProps {
+	after?: ReactNode
 	navigation?: ReactNode // This can contain any number of buttons but only buttons
 	children: ReactNode
 	headingProps?: HeadingProps
 	actions?: ReactNode // This can contain any number of buttons but only buttons
 }
 
-export const TitleBar = memo(({ navigation, children, headingProps, actions }: TitleBarProps) => {
+export const TitleBar = memo(({ after, navigation, children, headingProps, actions }: TitleBarProps) => {
 	const prefix = useClassNamePrefix()
 	return (
 		<div className={`${prefix}titleBar`}>
@@ -29,6 +30,9 @@ export const TitleBar = memo(({ navigation, children, headingProps, actions }: T
 					</div>
 				)}
 			</div>
+			{after && <div className={`${prefix}titleBar-after`}>
+				{after}
+			</div>}
 		</div>
 	)
 })

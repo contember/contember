@@ -15,5 +15,5 @@ const gridTemplateAnalyzer = new ChildrenAnalyzer<BoxedGridColumnProps>([gridCol
 
 export const extractDataGridColumns = (nodes: ReactNode): DataGridColumns => {
 	const processed = gridTemplateAnalyzer.processChildren(nodes, undefined)
-	return new Map(processed.map((column, i) => [i, column.value]))
+	return new Map(processed.map((column, i) => [`col_${i}`, column.value])) // todo: support custom stable column key
 }

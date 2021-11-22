@@ -30,10 +30,8 @@ export const DataGrid: FunctionComponent<DataGridProps> = Component(
 
 		const columns = useMemo(() => extractDataGridColumns(props.children), [props.children])
 
-		const [pageState, updatePaging] = useGridPagingState({
-			itemsPerPage: props.itemsPerPage ?? null,
-		})
 		const dataGridKey = typeof props.entities === 'string' ? props.entities : props.entities.entityName
+		const [pageState, updatePaging] = useGridPagingState(props.itemsPerPage ?? null, dataGridKey)
 
 		const [hiddenColumns, setIsColumnHidden] = useHiddenColumnsState(columns, dataGridKey)
 		const [orderDirections, setOrderBy] = useOrderBys(columns, updatePaging, dataGridKey)

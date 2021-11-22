@@ -7,13 +7,9 @@ import { TitleBar, TitleBarProps } from '../TitleBar'
 export const PageLayoutContent = ({ children }: { children: ReactNode }) => {
 	const prefix = useClassNamePrefix()
 
-	return <Stack
-		depth={false}
-		direction="vertical"
-		className={`${prefix}layout-page-content`}
-	>
+	return <div className={`${prefix}layout-page-content`}>
 		{children}
-	</Stack>
+	</div>
 }
 
 export interface LayoutPageProps extends Omit<TitleBarProps, 'children'> {

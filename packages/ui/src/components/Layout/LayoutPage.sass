@@ -1,11 +1,25 @@
 @import '../../styles/common'
 
 .#{$cui-conf-globalPrefix}layout-page
+
 	&-content-wrap
+		--section-padding-horizontal: #{($cui-gap * 12)}
+		--section-padding-vertical: #{($cui-gap * 4)}
+		--section-gap: #{$cui-gap * 4}
+
 		display: flex
 		flex-direction: column
+		padding: var(--section-padding-vertical) var(--section-padding-horizontal)
+
+		@media (min-width: $break768)
+			--section-padding-horizontal: #{($cui-gap * 8)}
+			--section-padding-vertical: #{($cui-gap * 8)}
+			--section-gap: #{$cui-gap * 8}
 	&-content
+		display: flex
+		flex-direction: column
 		flex-grow: 1
+		gap: var(--section-gap)
 	&-content-wrap
 		background-color: inherit
 		position: relative

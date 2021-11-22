@@ -4,7 +4,7 @@ import type { SugaredDiscriminateBy } from '../discrimination'
 
 export interface BlockProps {
 	discriminateBy: SugaredDiscriminateBy
-	label?: ReactNode
+	boxLabel?: ReactNode
 	description?: ReactNode
 	alternate?: ReactNode
 	children?: ReactNode

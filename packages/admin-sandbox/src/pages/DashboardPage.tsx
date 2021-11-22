@@ -53,7 +53,7 @@ export const DashboardPage = (
 				test test
 			</VideoFiles>
 		</UploadField>
-		<FileRepeater field="fileList.items" label="Complex file list" itemLabel="Complex file list item" sortableBy="order" discriminationField="type">
+		<FileRepeater field="fileList.items" boxLabel="Complex file list" label="Complex file list item" sortableBy="order" discriminationField="type">
 			<ImageFiles
 				discriminateBy="image"
 				baseEntity="image"

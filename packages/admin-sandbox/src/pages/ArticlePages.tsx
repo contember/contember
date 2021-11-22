@@ -13,7 +13,7 @@ import {
 export const ArticleListPage = (
 	<ListPage pageName="articleList" entities="Article" rendererProps={{
 		title: 'Articles',
-		itemLabel: 'Article',
+		boxLabel: 'Article',
 		actions: <>
 			<PageLinkButton to={'articleCreate'}>Add article</PageLinkButton>
 		</>,

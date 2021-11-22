@@ -9,8 +9,8 @@ export interface ImageFileRepeaterProps<AcceptArtifacts = unknown>
 		StockImageFileKindProps<AcceptArtifacts>,
 		Omit<FileInputPublicProps, 'label'> {
 	sortableBy?: SugaredFieldProps['field']
-	label?: ReactNode
-	itemLabel: string
+	boxLabel?: ReactNode
+	label: ReactNode
 }
 
 export const ImageFileRepeater = Component<ImageFileRepeaterProps>(

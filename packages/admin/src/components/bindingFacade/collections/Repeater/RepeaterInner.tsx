@@ -26,8 +26,8 @@ export interface RepeaterInnerProps<ContainerExtraProps, ItemExtraProps>
 	extends RepeaterContainerPublicProps,
 		Omit<RepeaterItemProps, 'children' | 'canBeRemoved' | 'label'> {
 	accessor: EntityListAccessor
-	label?: ReactNode
-	itemLabel: string
+	boxLabel?: ReactNode
+	label: ReactNode
 	children?: ReactNode
 
 	sortableBy?: SugaredFieldProps['field']
@@ -76,7 +76,7 @@ export const RepeaterInner = Component<RepeaterInnerProps<any, any>, NonStaticPr
 		)
 
 		const removalType: RemovalType = props.removalType ?? 'delete'
-		const itemLabel = props.itemLabel
+		const label = props.label
 
 		if (props.sortableBy === undefined) {
 			return (
@@ -93,7 +93,7 @@ export const RepeaterInner = Component<RepeaterInnerProps<any, any>, NonStaticPr
 						<Entity accessor={entity} key={entity.key}>
 							<Item
 								{...props.itemComponentExtraProps!}
-								label={itemLabel ? `${itemLabel} #${i + 1}` : `#${i + 1}`}
+								label={label ? `${label} #${i + 1}` : `#${i + 1}`}
 								removalType={removalType}
 								canBeRemoved={itemRemovingEnabled}
 								dragHandleComponent={undefined}
@@ -134,7 +134,7 @@ export const RepeaterInner = Component<RepeaterInnerProps<any, any>, NonStaticPr
 							<Entity accessor={entity}>
 								<Item
 									{...props.itemComponentExtraProps!}
-									label={itemLabel ? `${itemLabel} #${i + 1}` : `#${i + 1}`}
+									label={label ? `${label} #${i + 1}` : `#${i + 1}`}
 									removalType={removalType}
 									canBeRemoved={itemRemovingEnabled}
 									dragHandleComponent={useDragHandle ? sortableHandle : undefined}

@@ -9,8 +9,8 @@ export interface AudioFileRepeaterProps<AcceptArtifacts = unknown>
 		StockAudioFileKindProps<AcceptArtifacts>,
 		Omit<FileInputPublicProps, 'label'> {
 	sortableBy?: SugaredFieldProps['field']
-	label?: ReactNode
-	itemLabel: string
+	boxLabel?: ReactNode
+	label: ReactNode
 }
 
 export const AudioFileRepeater = Component<AudioFileRepeaterProps>(

@@ -15,8 +15,8 @@ export interface BareFileRepeaterContainerPrivateProps {
 }
 
 export interface BareFileRepeaterContainerPublicProps extends Omit<FileInputPublicProps, 'label'> {
-	label?: ReactNode
-	itemLabel: string
+	boxLabel?: ReactNode
+	label: ReactNode
 }
 
 export interface BareFileRepeaterContainerProps
@@ -28,7 +28,7 @@ export const BareFileRepeaterContainer: FunctionComponent<BareFileRepeaterContai
 	accessor,
 	entities,
 	isEmpty,
-	itemLabel,
+	label,
 	fileKinds: unstableFileKinds,
 	createNewEntity,
 	sortableBy,
@@ -90,7 +90,7 @@ export const BareFileRepeaterContainer: FunctionComponent<BareFileRepeaterContai
 	return (
 		<FileInput
 			{...fileInputProps}
-			label={itemLabel}
+			label={label}
 			dropzoneState={dropzoneState}
 			formatMessage={formatMessage}
 			errors={accessor.errors}

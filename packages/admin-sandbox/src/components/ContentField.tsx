@@ -140,7 +140,6 @@ export const ContentField = Component<ContentFieldProps>(
 			referenceDiscriminationField="type"
 			field={`${field}.blocks`}
 			inlineButtons={fullEditorInlineButtons}
-			itemLabel="Content"
 			label="Content"
 			contentField="json"
 			sortableBy="order"
@@ -162,7 +161,7 @@ export const ContentField = Component<ContentFieldProps>(
 				horizontalRuleToolbarButton,
 			]}
 		>
-			<Block discriminateBy="image" label="Image">
+			<Block discriminateBy="image" boxLabel="Image">
 				<BlockEditor.ContentOutlet placeholder="Text" />
 				<ImageUploadField
 					label="Image"
@@ -174,7 +173,7 @@ export const ContentField = Component<ContentFieldProps>(
 					fileTypeField="type"
 				/>
 			</Block>
-			<Block discriminateBy="quote" label="Quote">
+			<Block discriminateBy="quote" boxLabel="Quote">
 				<BlockEditor.ContentOutlet />
 				<TextField field="primaryText" label="Quote" />
 				<TextField field="secondaryText" label="Author" />

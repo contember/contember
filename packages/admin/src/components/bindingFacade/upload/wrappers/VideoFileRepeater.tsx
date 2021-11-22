@@ -9,8 +9,8 @@ export interface VideoFileRepeaterProps<AcceptArtifacts = unknown>
 		StockVideoFileKindProps<AcceptArtifacts>,
 		Omit<FileInputPublicProps, 'label'> {
 	sortableBy?: SugaredFieldProps['field']
-	label?: ReactNode
-	itemLabel: string
+	boxLabel?: ReactNode
+	label: ReactNode
 }
 
 export const VideoFileRepeater = Component<VideoFileRepeaterProps>(

@@ -9,8 +9,8 @@ export interface AnyFileRepeaterProps<AcceptArtifacts = unknown>
 		StockAnyFileKindProps<AcceptArtifacts>,
 		Omit<FileInputPublicProps, 'label'> {
 	sortableBy?: SugaredFieldProps['field']
-	label?: ReactNode
-	itemLabel: string
+	boxLabel?: ReactNode
+	label: ReactNode
 }
 
 export const AnyFileRepeater = Component<AnyFileRepeaterProps>(

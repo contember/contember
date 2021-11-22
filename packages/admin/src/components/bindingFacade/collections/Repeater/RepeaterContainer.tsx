@@ -11,8 +11,8 @@ export interface RepeaterContainerPrivateProps {
 	entities: EntityAccessor[]
 	formatMessage: MessageFormatter<RepeaterDictionary>
 	isEmpty: boolean
-	label?: ReactNode
-	itemLabel: string
+	boxLabel?: ReactNode
+	label: ReactNode
 	createNewEntity: (initialize?: EntityAccessor.BatchUpdatesHandler) => void
 	children: ReactNode
 }
@@ -44,7 +44,6 @@ export const RepeaterContainer = memo(
 		enableAddingNew = true,
 		formatMessage,
 		isEmpty,
-		itemLabel,
 		label,
 	}: RepeaterContainerProps) => {
 		return <FormGroup label={label} useLabelElement={false}>
@@ -59,7 +58,7 @@ export const RepeaterContainer = memo(
 						{...addButtonProps}
 						createNewEntity={createNewEntity}
 					>
-						{addButtonText ?? itemLabel ?? formatMessage(addButtonText, 'repeater.addButton.text')}
+						{addButtonText ?? label ?? formatMessage(addButtonText, 'repeater.addButton.text')}
 					</AddButton>
 				)}
 				{isEmpty || children}
@@ -69,7 +68,7 @@ export const RepeaterContainer = memo(
 						{...addButtonProps}
 						createNewEntity={createNewEntity}
 					>
-						{addButtonText ?? itemLabel ?? formatMessage(addButtonText, 'repeater.addButton.text')}
+						{addButtonText ?? label ?? formatMessage(addButtonText, 'repeater.addButton.text')}
 					</AddButton>
 				)}
 			</Stack>

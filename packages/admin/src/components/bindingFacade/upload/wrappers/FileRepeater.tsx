@@ -6,8 +6,8 @@ import { BareFileRepeater, FileInputPublicProps } from '../internalComponents'
 import { getResolvedFileKinds, HybridFileKindProps } from '../templating'
 
 export interface FileRepeaterProps extends SugaredRelativeEntityList, HybridFileKindProps, Omit<FileInputPublicProps, 'label'> {
-	label?: ReactNode
-	itemLabel: string
+	boxLabel?: ReactNode
+	label: ReactNode
 	sortableBy?: SugaredFieldProps['field']
 	children?: ReactNode
 }

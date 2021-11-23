@@ -4,14 +4,13 @@ import {
 	DataBindingProvider,
 	DataGrid,
 	DeleteEntityButton,
-	EditPage, EntityListSubTree,
+	EditPage,
 	FeedbackRenderer,
-	Field,
 	GenericCell,
-	GenericPage, ListRenderer,
+	GenericPage,
 	MultiSelectField,
 	PageLinkButton,
-	PageLinkById, TableCell,
+	PageLinkById,
 	TextCell,
 	TextField,
 	TitleBar,
@@ -23,8 +22,9 @@ export const ArticleListPage = (
 		<TitleBar actions={<PageLinkButton to="articleCreate">Add article</PageLinkButton>}>Articles</TitleBar>
 
 		<DataBindingProvider stateComponent={FeedbackRenderer}>
-			<DataGrid entities="Article" itemsPerPage={50}>
+			<DataGrid entities="Article" itemsPerPage={2}>
 				<TextCell field="title" header="Title" />
+				<TextCell field="content" header="Content" />
 				<GenericCell canBeHidden={false} justification="justifyEnd">
 					<PageLinkById to={'articleEdit'} Component={AnchorButton}>Edit</PageLinkById>
 					<DeleteEntityButton title="Delete" immediatePersist={true}></DeleteEntityButton>

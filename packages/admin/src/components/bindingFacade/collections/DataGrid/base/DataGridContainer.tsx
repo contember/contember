@@ -177,7 +177,7 @@ export const DataGridContainer: FunctionComponent<DataGridContainerProps> = Comp
 						</TableRow>
 					)}
 				</Table>
-				{!!accessor.length && (
+				{!!normalizedItemCount && (
 					<div style={{ margin: '1em 0', display: 'flex', justifyContent: 'space-between' }}>
 						<div>{pagingSummary}</div>
 						<div style={{ display: 'flex', gap: '.5em' }}>
@@ -194,14 +194,14 @@ export const DataGridContainer: FunctionComponent<DataGridContainerProps> = Comp
 							{itemsPerPage !== null && (
 								<>
 									<Button
-										disabled={accessor.length !== itemsPerPage}
+										disabled={pagesCount === undefined || pagesCount <= pageIndex + 1}
 										onClick={() => updatePaging({ type: 'goToNextPage' })}
 									>
 										{formatMessage('dataGrid.paging.next')}
 									</Button>
 									<Button
 										distinction="seamless"
-										disabled={pagesCount === undefined || pageIndex === pagesCount - 1}
+										disabled={pagesCount === undefined || pagesCount <= pageIndex + 1}
 										onClick={() =>
 											pagesCount !== undefined && updatePaging({ type: 'goToPage', newPageIndex: pagesCount - 1 })
 										}

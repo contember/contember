@@ -6,12 +6,13 @@ import DatePicker from 'react-datepicker'
 import { useMessageFormatter } from '../../../../../i18n'
 import { dateToStringWithoutTimezone } from '../../../../../utils'
 import { DateFieldView, DateFieldViewProps } from '../../../fieldViews'
-import { DataGridCellPublicProps, DataGridColumn, DataGridHeaderCellPublicProps, DataGridOrderDirection } from '../base'
+import { DataGridColumn, DataGridColumnPublicProps, DataGridOrderDirection } from '../base'
 import { dataGridCellsDictionary } from './dataGridCellsDictionary'
 
-export type DateCellProps = DataGridHeaderCellPublicProps &
-	DataGridCellPublicProps &
-	DateFieldViewProps & {
+export type DateCellProps =
+	& DataGridColumnPublicProps
+	& DateFieldViewProps
+	& {
 		disableOrder?: boolean
 		initialOrder?: DataGridOrderDirection
 	}

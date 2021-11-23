@@ -11,13 +11,14 @@ import { Checkbox, Select, TextInput } from '@contember/ui'
 import type { FunctionComponent, ReactElement, ReactNode } from 'react'
 import { useMessageFormatter } from '../../../../../i18n'
 import { FieldFallbackView, FieldFallbackViewPublicProps } from '../../../fieldViews'
-import { DataGridCellPublicProps, DataGridColumn, DataGridHeaderCellPublicProps, DataGridOrderDirection } from '../base'
+import { DataGridColumn, DataGridColumnPublicProps, DataGridOrderDirection } from '../base'
 import { dataGridCellsDictionary } from './dataGridCellsDictionary'
 
-export type TextCellProps<Persisted extends FieldValue = FieldValue> = DataGridHeaderCellPublicProps &
-	DataGridCellPublicProps &
-	FieldFallbackViewPublicProps &
-	SugaredRelativeSingleField & {
+export type TextCellProps<Persisted extends FieldValue = FieldValue> =
+	& DataGridColumnPublicProps
+	& FieldFallbackViewPublicProps
+	& SugaredRelativeSingleField
+	& {
 		disableOrder?: boolean
 		initialOrder?: DataGridOrderDirection
 		format?: (value: Persisted) => ReactNode

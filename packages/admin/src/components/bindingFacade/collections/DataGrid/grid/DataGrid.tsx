@@ -14,8 +14,11 @@ import { useFilters } from './useFilters'
 import { useHiddenColumnsState } from './useHiddenColumnsState'
 import { useOrderBys } from './useOrderBys'
 import { ContainerSpinner } from '@contember/ui'
+import { useCurrentRequest } from '../../../../../routing'
 
 export interface DataGridProps extends DataGridContainerPublicProps {
+	dataGridKey?: string
+
 	entities: SugaredQualifiedEntityList['entities']
 	children: ReactNode
 
@@ -30,7 +33,10 @@ export const DataGrid: FunctionComponent<DataGridProps> = Component(
 
 		const columns = useMemo(() => extractDataGridColumns(props.children), [props.children])
 
-		const dataGridKey = typeof props.entities === 'string' ? props.entities : props.entities.entityName
+		const pageName = useCurrentRequest()?.pageName
+		const entityName = typeof props.entities === 'string' ? props.entities : props.entities.entityName
+		const dataGridKey = props.dataGridKey ?? `${pageName}__${entityName}`
+
 		const [pageState, updatePaging] = useGridPagingState(props.itemsPerPage ?? null, dataGridKey)
 
 		const [hiddenColumns, setIsColumnHidden] = useHiddenColumnsState(columns, dataGridKey)

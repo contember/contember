@@ -4,12 +4,13 @@ import { Checkbox } from '@contember/ui'
 import type { FunctionComponent } from 'react'
 import { useMessageFormatter } from '../../../../../i18n'
 import { BooleanFieldView, BooleanFieldViewProps } from '../../../fieldViews'
-import { DataGridCellPublicProps, DataGridColumn, DataGridHeaderCellPublicProps, DataGridOrderDirection } from '../base'
+import { DataGridColumn, DataGridColumnPublicProps, DataGridOrderDirection } from '../base'
 import { dataGridCellsDictionary } from './dataGridCellsDictionary'
 
-export type BooleanCellProps = DataGridHeaderCellPublicProps &
-	DataGridCellPublicProps &
-	BooleanFieldViewProps & {
+export type BooleanCellProps =
+	& DataGridColumnPublicProps
+	& BooleanFieldViewProps
+	& {
 		disableOrder?: boolean
 		initialOrder?: DataGridOrderDirection
 	}

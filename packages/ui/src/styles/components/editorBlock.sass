@@ -1,0 +1,25 @@
+.#{$cui-conf-globalPrefix}editorBlock
+	$root: &
+
+	&-inner
+		position: relative
+		display: flex
+		margin-left: -20px
+
+	&-content
+		flex: 1 1 auto
+
+	&-dragHandle
+		flex: 0 0 20px
+		opacity: 0.1
+		align-self: center
+		cursor: move
+
+	&.is-dragged #{$root}-dragHandle, &-dragHandle:hover
+			opacity: 1
+
+	&.is-dragged
+		z-index: 1
+
+		#{$root}-content
+			opacity: 0.5

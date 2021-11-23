@@ -17,6 +17,9 @@ export const shouldCancelStart: SortableContainerProps['shouldCancelStart'] = ev
 			if (interactiveElements.has(el.tagName)) {
 				return true
 			}
+			if ((el as any).sortableHandle === true) {
+				return false
+			}
 			if (el.getAttribute('data-slate-void') === 'true') {
 				return false
 			}

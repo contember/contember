@@ -6,16 +6,18 @@ import {
 	HasMany,
 	SugaredField,
 	SugaredFieldProps,
-	SugaredRelativeEntityList, useDesugaredRelativeSingleField, useEnvironment,
+	SugaredRelativeEntityList,
+	useDesugaredRelativeSingleField,
+	useEnvironment,
 	VariableInputTransformer,
 } from '@contember/binding'
 import { emptyArray, noop } from '@contember/react-utils'
 import { EditorCanvas, EditorCanvasSize } from '@contember/ui'
 import { Fragment, FunctionComponent, ReactElement, ReactNode, useCallback, useMemo, useState } from 'react'
-import { Range as SlateRange } from 'slate'
+import { Range as SlateRange, Transforms } from 'slate'
 import { Slate } from 'slate-react'
 import { getDiscriminatedBlock, useNormalizedBlocks } from '../../blocks'
-import { Repeater } from '../../collections'
+import { Repeater, SortableRepeaterContainer } from '../../collections'
 import { SugaredDiscriminateBy, useDiscriminatedData } from '../../discrimination'
 import { TextField } from '../../fields'
 import { createEditorWithEssentials } from '../baseEditor'
@@ -41,6 +43,8 @@ import { useInsertElementWithReference } from './references/useInsertElementWith
 import { useBlockEditorState } from './state/useBlockEditorState'
 import { ContentOutlet, ContentOutletProps, useEditorReferenceBlocks } from './templating'
 import { useReferentiallyStableCallback } from './useReferentiallyStableCallback'
+import { shouldCancelStart } from '../../collections/Repeater/shouldCancelStart'
+import { SortedBlocksContext } from './state/SortedBlocksContext'
 
 export interface BlockEditorProps extends SugaredRelativeEntityList, CreateEditorPublicOptions {
 	label: string
@@ -181,43 +185,61 @@ const BlockEditorComponent: FunctionComponent<BlockEditorProps> = Component(
 		// TODO label?
 		return (
 			<ReferencesProvider getReferencedEntity={getReferencedEntity}>
-				<Slate editor={editor} value={nodes} onChange={onChange}>
-					<EditorCanvas
-						underlyingComponent={EditableCanvas}
-						componentProps={{
-							renderElement: baseEditor.renderElement,
-							renderLeaf: baseEditor.renderLeaf,
-							onKeyDown: baseEditor.onKeyDown,
-							onFocusCapture: baseEditor.onFocus,
-							onBlurCapture: baseEditor.onBlur,
-							onDOMBeforeInput: baseEditor.onDOMBeforeInput,
-							onDrop: (e => {
-								e.preventDefault()
-							}),
-							placeholder: label,
-							leading: leadingElements,
-							trailing: trailingElements,
-						}}
-						size={size ?? 'large'}
+				<SortedBlocksContext.Provider value={sortedBlocksRef.current}>
+					<SortableRepeaterContainer
+						axis="y"
+						lockAxis="y"
+						helperClass="is-dragged"
+						lockToContainerEdges={true}
+						useWindowAsScrollContainer={true}
+						useDragHandle={true}
+						onSortEnd={useCallback(data => {
+							Transforms.moveNodes(editor, {
+								at: [data.oldIndex],
+								to: [data.newIndex],
+							})
+						}, [editor])}
+						shouldCancelStart={shouldCancelStart}
 					>
-						{useMemo(
-							() => (
-								<HoveringToolbars
-									shouldDisplayInlineToolbar={shouldDisplayInlineToolbar}
-									inlineButtons={inlineButtons}
-									blockButtons={
-										<BlockHoveringToolbarContents
-											editorReferenceBlocks={editorReferenceBlocks}
-											blockButtons={blockButtons}
-											otherBlockButtons={otherBlockButtons}
+						<Slate editor={editor} value={nodes} onChange={onChange}>
+							<EditorCanvas
+								underlyingComponent={EditableCanvas}
+								componentProps={{
+									renderElement: baseEditor.renderElement,
+									renderLeaf: baseEditor.renderLeaf,
+									onKeyDown: baseEditor.onKeyDown,
+									onFocusCapture: baseEditor.onFocus,
+									onBlurCapture: baseEditor.onBlur,
+									onDOMBeforeInput: baseEditor.onDOMBeforeInput,
+									onDrop: (e => {
+										e.preventDefault()
+									}),
+									placeholder: label,
+									leading: leadingElements,
+									trailing: trailingElements,
+								}}
+								size={size ?? 'large'}
+							>
+								{useMemo(
+									() => (
+										<HoveringToolbars
+											shouldDisplayInlineToolbar={shouldDisplayInlineToolbar}
+											inlineButtons={inlineButtons}
+											blockButtons={
+												<BlockHoveringToolbarContents
+													editorReferenceBlocks={editorReferenceBlocks}
+													blockButtons={blockButtons}
+													otherBlockButtons={otherBlockButtons}
+												/>
+											}
 										/>
-									}
-								/>
-							),
-							[blockButtons, editorReferenceBlocks, inlineButtons, otherBlockButtons, shouldDisplayInlineToolbar],
-						)}
-					</EditorCanvas>
-				</Slate>
+									),
+									[blockButtons, editorReferenceBlocks, inlineButtons, otherBlockButtons, shouldDisplayInlineToolbar],
+								)}
+							</EditorCanvas>
+						</Slate>
+					</SortableRepeaterContainer>
+				</SortedBlocksContext.Provider>
 			</ReferencesProvider>
 		)
 	},

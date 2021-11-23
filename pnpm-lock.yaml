@@ -129,7 +129,7 @@ importers:
       react-error-boundary: 3.1.3
       react-leaflet: 2.8.0
       react-select: 4.3.1
-      react-sortable-hoc: 1.11.0
+      react-sortable-hoc: 2.0.0
       react-window: 1.8.6
       slate: 0.66.5
       slate-history: 0.66.0
@@ -160,7 +160,7 @@ importers:
       react-error-boundary: 3.1.3
       react-leaflet: 2.8.0_leaflet@1.7.1
       react-select: 4.3.1_@types+react@17.0.30
-      react-sortable-hoc: 1.11.0
+      react-sortable-hoc: 2.0.0
       react-window: 1.8.6
       slate: 0.66.5
       slate-history: 0.66.0_slate@0.66.5
@@ -14879,11 +14879,11 @@ packages:
       throttle-debounce: 3.0.1
     dev: true
 
-  /react-sortable-hoc/1.11.0:
-    resolution: {integrity: sha512-v1CDCvdfoR3zLGNp6qsBa4J1BWMEVH25+UKxF/RvQRh+mrB+emqtVHMgZ+WreUiKJoEaiwYoScaueIKhMVBHUg==}
+  /react-sortable-hoc/2.0.0:
+    resolution: {integrity: sha512-JZUw7hBsAHXK7PTyErJyI7SopSBFRcFHDjWW5SWjcugY0i6iH7f+eJkY8cJmGMlZ1C9xz1J3Vjz0plFpavVeRg==}
     peerDependencies:
-      react: ^0.14.0 || ^15.0.0 || ^16.0.0
-      react-dom: ^0.14.0 || ^15.0.0 || ^16.0.0
+      react: ^16.3.0 || ^17.0.0
+      react-dom: ^16.3.0 || ^17.0.0
     dependencies:
       '@babel/runtime': 7.15.4
       invariant: 2.2.4

@@ -49,6 +49,9 @@ services:
       TEST_DB_USER: 'contember'
       TEST_DB_PASSWORD: 'contember'
       TENANT_DB_NAME: 'tenant'
+      TENANT_MAILER_HOST: 'mailhog'
+      TENANT_MAILER_PORT: '1025'
+      TENANT_MAILER_FROM: 'contember@localhost'
       CONTEMBER_TENANT_MIGRATIONS_DIR: /src/packages/engine-tenant-api/src/migrations
       CONTEMBER_SYSTEM_MIGRATIONS_DIR: /src/packages/engine-system-api/migrations
     command:
@@ -56,5 +59,7 @@ services:
       - --expose-gc
       - --inspect=0.0.0.0:4002
       - ./packages/engine-server/dist/src/start.js
+  mailhog:
+    image: mailhog/mailhog
 volumes:
   pgsql-data: ~

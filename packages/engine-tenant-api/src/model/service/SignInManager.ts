@@ -17,7 +17,9 @@ class SignInManager {
 		if (personRow === null) {
 			return new ResponseError(SignInErrorCode.UnknownEmail, `Person with email ${email} not found`)
 		}
-
+		if (!personRow.password_hash) {
+			return new ResponseError(SignInErrorCode.NoPasswordSet, `No password set`)
+		}
 		const passwordValid = await this.providers.bcryptCompare(password, personRow.password_hash)
 		if (!passwordValid) {
 			return new ResponseError(SignInErrorCode.InvalidPassword, `Password does not match`)

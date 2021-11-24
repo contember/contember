@@ -94,6 +94,7 @@ const schema: DocumentNode = gql`
 	enum SignInErrorCode {
 		UNKNOWN_EMAIL
 		INVALID_PASSWORD
+		NO_PASSWORD_SET
 		OTP_REQUIRED
 		INVALID_OTP_TOKEN
 	}
@@ -155,6 +156,7 @@ const schema: DocumentNode = gql`
 		TOO_WEAK
 		NOT_A_PERSON
 		INVALID_PASSWORD
+		NO_PASSWORD_SET
 	}
 
 	# === IDP ===
@@ -241,7 +243,13 @@ const schema: DocumentNode = gql`
 		isNew: Boolean!
 	}
 
+	enum InviteMethod {
+		CREATE_PASSWORD
+		RESET_PASSWORD
+	}
+
 	input InviteOptions {
+		method: InviteMethod
 		mailVariant: String
 	}
 

@@ -83,7 +83,8 @@ export type ChangeMyPasswordError = {
 export enum ChangeMyPasswordErrorCode {
 	TooWeak = 'TOO_WEAK',
 	NotAPerson = 'NOT_A_PERSON',
-	InvalidPassword = 'INVALID_PASSWORD'
+	InvalidPassword = 'INVALID_PASSWORD',
+	NoPasswordSet = 'NO_PASSWORD_SET'
 }
 
 export type ChangeMyPasswordResponse = {
@@ -329,7 +330,13 @@ export enum InviteErrorCode {
 	VariableEmpty = 'VARIABLE_EMPTY'
 }
 
+export enum InviteMethod {
+	CreatePassword = 'CREATE_PASSWORD',
+	ResetPassword = 'RESET_PASSWORD'
+}
+
 export type InviteOptions = {
+	readonly method?: Maybe<InviteMethod>
 	readonly mailVariant?: Maybe<Scalars['String']>
 }
 
@@ -755,6 +762,7 @@ export type SignInError = {
 export enum SignInErrorCode {
 	UnknownEmail = 'UNKNOWN_EMAIL',
 	InvalidPassword = 'INVALID_PASSWORD',
+	NoPasswordSet = 'NO_PASSWORD_SET',
 	OtpRequired = 'OTP_REQUIRED',
 	InvalidOtpToken = 'INVALID_OTP_TOKEN'
 }
@@ -1018,6 +1026,7 @@ export type ResolversTypes = {
 	InitSignInIDPResult: ResolverTypeWrapper<InitSignInIdpResult>
 	InviteError: ResolverTypeWrapper<InviteError>
 	InviteErrorCode: InviteErrorCode
+	InviteMethod: InviteMethod
 	InviteOptions: InviteOptions
 	InviteResponse: ResolverTypeWrapper<InviteResponse>
 	InviteResult: ResolverTypeWrapper<InviteResult>

@@ -1,13 +1,13 @@
 import {
-	CommandBus,
 	CreateIdentityCommand,
 	CreateOrUpdateProjectMembershipCommand,
+	CreatePasswordResetRequestCommand,
 	CreatePersonCommand,
 } from '../commands'
 import { Providers } from '../providers'
 import { PersonQuery, PersonRow } from '../queries'
 import { Membership } from '../type/Membership'
-import { InviteErrorCode } from '../../schema'
+import { InviteErrorCode, InviteMethod } from '../../schema'
 import { TenantRole } from '../authorization'
 import { UserMailer } from '../mailing'
 import { Project } from '../type'
@@ -19,6 +19,7 @@ export interface InviteOptions {
 	noEmail?: boolean
 	password?: string
 	emailVariant?: string
+	method?: InviteMethod
 }
 
 export class InviteManager {
@@ -37,16 +38,23 @@ export class InviteManager {
 		return await dbContext.transaction(async trx => {
 			let person: Omit<PersonRow, 'roles'> | null = await trx.queryHandler.fetch(PersonQuery.byEmail(email))
 			const isNew = !person
-			let generatedPassword: string = ''
+			let generatedPassword: string | null = null
+			let resetToken: string | null = null
 			if (!person) {
+				const shouldResetPassword = options.method === InviteMethod.ResetPassword
 				const identityId = await trx.commandBus.execute(new CreateIdentityCommand([TenantRole.PERSON]))
-				generatedPassword = options.password || (await this.providers.randomBytes(9)).toString('base64')
+
+				generatedPassword = options.password ??
+					(!shouldResetPassword ? (await this.providers.randomBytes(9)).toString('base64') : null)
+
 				person = await trx.commandBus.execute(new CreatePersonCommand(identityId, email, generatedPassword))
+				if (shouldResetPassword) {
+					const result = await trx.commandBus.execute(new CreatePasswordResetRequestCommand(person.id))
+					resetToken = result.token
+				}
 			}
 			for (const membershipUpdate of createAppendMembershipVariables(memberships)) {
-				await trx.commandBus.execute(
-					new CreateOrUpdateProjectMembershipCommand(project.id, person.identity_id, membershipUpdate),
-				)
+				await trx.commandBus.execute(new CreateOrUpdateProjectMembershipCommand(project.id, person.identity_id, membershipUpdate))
 			}
 			if (!options.noEmail) {
 				const customMailOptions = {
@@ -56,7 +64,7 @@ export class InviteManager {
 				if (isNew) {
 					await this.mailer.sendNewUserInvitedMail(
 						trx,
-						{ email, project: project.name, password: generatedPassword },
+						{ email, project: project.name, password: generatedPassword, token: resetToken },
 						customMailOptions,
 					)
 				} else {

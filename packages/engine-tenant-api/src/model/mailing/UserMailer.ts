@@ -17,7 +17,7 @@ export class UserMailer {
 
 	async sendNewUserInvitedMail(
 		dbContext: DatabaseContext,
-		mailArguments: { email: string; password: string; project: string },
+		mailArguments: { email: string; password: string | null; token: string | null; project: string },
 		customMailOptions: { projectId: string; variant: string },
 	): Promise<void> {
 		const template = (await this.getCustomTemplate(dbContext, { type: MailType.newUserInvited, ...customMailOptions })) || {

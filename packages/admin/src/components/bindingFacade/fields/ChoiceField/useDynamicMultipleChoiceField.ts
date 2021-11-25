@@ -14,6 +14,7 @@ import {
 	BaseDynamicChoiceField,
 	useCurrentValues,
 	useDesugaredOptionPath,
+	useMergeEntities,
 	useNormalizedOptions,
 	useOptionEntities,
 	useTopLevelOptionAccessors,
@@ -38,7 +39,7 @@ export const useDynamicMultipleChoiceField = (
 	const getCurrentValueEntity = useCallback((): EntityListAccessor => {
 		const parentEntity = getEntityByKey(entityKey)
 
-		return parentEntity.getRelativeEntityList(desugaredRelativePath as RelativeEntityList)
+		return parentEntity.getRelativeEntityList(desugaredRelativePath)
 	}, [entityKey, desugaredRelativePath, getEntityByKey])
 
 	const currentValueListAccessor = useAccessorUpdateSubscription(getCurrentValueEntity)
@@ -47,8 +48,9 @@ export const useDynamicMultipleChoiceField = (
 	//
 	const desugaredOptionPath = useDesugaredOptionPath(props)
 	const topLevelOptionAccessors = useTopLevelOptionAccessors(desugaredOptionPath)
-	const optionEntities = useOptionEntities(topLevelOptionAccessors, desugaredOptionPath)
-	const currentValues = useCurrentValues(currentlyChosenEntities, topLevelOptionAccessors)
+	const mergedEntities = useMergeEntities(currentlyChosenEntities, topLevelOptionAccessors)
+	const optionEntities = useOptionEntities(mergedEntities, desugaredOptionPath)
+	const currentValues = useCurrentValues(currentlyChosenEntities, mergedEntities)
 
 	const normalizedOptions = useNormalizedOptions(
 		optionEntities,

@@ -161,7 +161,11 @@ const defaultTemplate: any = {
 
 
 const projectNameToEnvName = (projectName: string): string => {
-	return projectName.toUpperCase().replace(/-/g, '_')
+	const envName = projectName.toUpperCase().replace(/-/g, '_')
+	if (envName === 'TENANT') {
+		throw new Error('Forbidden project name')
+	}
+	return envName
 }
 
 export type ConfigSource = { data: string; type: 'file' | 'json' | 'yaml' }

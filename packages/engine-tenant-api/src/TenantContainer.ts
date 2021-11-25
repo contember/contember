@@ -146,8 +146,7 @@ export class TenantContainerFactory {
 			.addService('projectManager', ({ secretManager, apiKeyService }) =>
 				new ProjectManager(secretManager, args.projectInitializer, apiKeyService))
 			.addService('passwordResetManager', ({ userMailer, projectManager }) =>
-				new PasswordResetManager(userMailer, projectManager),
-			)
+				new PasswordResetManager(userMailer, projectManager))
 			.addService('idpManager', () => {
 				const idpManager = new IDPManager()
 				idpManager.registerProvider('oidc', new OIDCProvider())

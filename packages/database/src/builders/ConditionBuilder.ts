@@ -117,6 +117,10 @@ export class ConditionBuilder {
 		return this.with(new Literal(`${toFqnWrap(columnName)} is null`))
 	}
 
+	isNotNull(columnName: QueryBuilder.ColumnIdentifier): ConditionBuilder {
+		return this.with(new Literal(`${toFqnWrap(columnName)} is not null`))
+	}
+
 	raw(sql: string, ...bindings: Value[]): ConditionBuilder {
 		return this.with(new Literal(sql, bindings))
 	}

@@ -55,7 +55,7 @@ export const useDesugaredOptionPath = (props: BaseDynamicChoiceField) => {
 export const useTopLevelOptionAccessors = (desugaredOptionPath: QualifiedFieldList | QualifiedEntityList) => {
 	const getSubTree = useGetEntityListSubTree()
 	const entityList = useMemo<SugaredQualifiedEntityList>(
-		() => ({ entities: desugaredOptionPath }),
+		() => ({ entities: desugaredOptionPath, ...desugaredOptionPath }),
 		[desugaredOptionPath],
 	)
 	const getSubTreeData = useCallback(() => getSubTree(entityList), [entityList, getSubTree])
@@ -64,28 +64,40 @@ export const useTopLevelOptionAccessors = (desugaredOptionPath: QualifiedFieldLi
 }
 
 export const useOptionEntities = (
-	topLevelOptionAccessors: EntityAccessor[],
+	optionAccessors: EntityAccessor[],
 	desugaredOptionPath: QualifiedFieldList | QualifiedEntityList,
 ) =>
 	useMemo(() => {
 		const relativeEntity: SugaredRelativeSingleEntity = { field: desugaredOptionPath.hasOneRelationPath }
 		const entities: EntityAccessor[] = []
-		for (const entity of topLevelOptionAccessors) {
+		for (const entity of optionAccessors) {
 			entities.push(entity.getEntity(relativeEntity))
 		}
 		return entities
-	}, [desugaredOptionPath.hasOneRelationPath, topLevelOptionAccessors])
+	}, [desugaredOptionPath.hasOneRelationPath, optionAccessors])
+
+export const useMergeEntities = (
+	currentlyChosenEntities: EntityAccessor[],
+	topLevelOptionAccessors: EntityAccessor[],
+) =>
+	useMemo(() => {
+		const ids = new Set(topLevelOptionAccessors.map(it => it.id))
+		return [
+			...topLevelOptionAccessors,
+			...currentlyChosenEntities.filter(it => !ids.has(it.id)),
+		]
+	}, [currentlyChosenEntities, topLevelOptionAccessors])
 
 export const useCurrentValues = (
 	currentlyChosenEntities: EntityAccessor[],
-	topLevelOptionAccessors: EntityAccessor[],
+	optionAccessors: EntityAccessor[],
 ) =>
 	useMemo(() => {
 		const values: ChoiceFieldData.ValueRepresentation[] = []
 
 		for (const entity of currentlyChosenEntities) {
 			const currentId = entity.id
-			const index = topLevelOptionAccessors.findIndex((entity: EntityAccessor) => {
+			const index = optionAccessors.findIndex((entity: EntityAccessor) => {
 				const id = entity.id
 				return !!id && id === currentId
 			})
@@ -95,7 +107,7 @@ export const useCurrentValues = (
 		}
 
 		return values
-	}, [currentlyChosenEntities, topLevelOptionAccessors])
+	}, [currentlyChosenEntities, optionAccessors])
 
 export const useNormalizedOptions = (
 	optionEntities: EntityAccessor[],

@@ -14,6 +14,7 @@ import {
 	BaseDynamicChoiceField,
 	useCurrentValues,
 	useDesugaredOptionPath,
+	useMergeEntities,
 	useNormalizedOptions,
 	useOptionEntities,
 	useTopLevelOptionAccessors,
@@ -54,8 +55,9 @@ export const useDynamicSingleChoiceField = (
 
 	const desugaredOptionPath = useDesugaredOptionPath(props)
 	const topLevelOptionAccessors = useTopLevelOptionAccessors(desugaredOptionPath)
-	const optionEntities = useOptionEntities(topLevelOptionAccessors, desugaredOptionPath)
-	const currentValues = useCurrentValues(currentlyChosenEntities, topLevelOptionAccessors)
+	const mergedEntities = useMergeEntities(currentlyChosenEntities, topLevelOptionAccessors)
+	const optionEntities = useOptionEntities(mergedEntities, desugaredOptionPath)
+	const currentValues = useCurrentValues(currentlyChosenEntities, mergedEntities)
 
 	const normalizedOptions = useNormalizedOptions(
 		optionEntities,

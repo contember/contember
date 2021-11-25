@@ -4,6 +4,7 @@ import {
 	EditPage,
 	Field,
 	ListPage,
+	MultiSelectField,
 	PageLinkButton,
 	PageLinkById,
 	TableCell,
@@ -23,14 +24,24 @@ export const ArticleListPage = (
 	</ListPage>
 )
 
+const form = <>
+	<MultiSelectField label={'tags'} field={'tags'} options={{
+		fields: "Tag[name != 'a'].name",
+		orderBy: 'name desc',
+	}} />
+	<TextField field={'title'} label={'Title'} />
+</>
+
 export const ArticleCreatePage = (
 	<CreatePage pageName={'articleCreate'} entity={'Article'}>
-		<TextField field={'title'} label={'Title'}/>
+		{form}
 	</CreatePage>
 )
 
 export const ArticleEditPage = (
-	<EditPage pageName={'articleEdit'} entity={'Article(id=$id)'}>
-		<TextField field={'title'} label={'Title'} />
+	<EditPage pageName={'articleEdit'} entity={'Article(id=$id)'} rendererProps={{
+		title: 'Article',
+	}}>
+		{form}
 	</EditPage>
 )

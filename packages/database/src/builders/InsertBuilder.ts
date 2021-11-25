@@ -42,7 +42,10 @@ class InsertBuilder<Result extends InsertBuilder.InsertResult> implements With.A
 		values: QueryBuilder.Values,
 		where?: Where.Expression,
 	): InsertBuilder<Result>
-	public onConflict(action: ConflictActionType.doNothing, target?: InsertBuilder.ConflictTarget): InsertBuilder<Result>
+	public onConflict(
+		action: ConflictActionType.doNothing,
+		target?: InsertBuilder.ConflictTarget,
+	): InsertBuilder<Result>
 	public onConflict(
 		action: ConflictActionType,
 		target?: InsertBuilder.ConflictTarget,
@@ -50,16 +53,36 @@ class InsertBuilder<Result extends InsertBuilder.InsertResult> implements With.A
 		where?: Where.Expression,
 	): InsertBuilder<Result> {
 		let conflictAction: InsertBuilder.ConflictAction
-		if (action === ConflictActionType.update && values && target) {
+		const conflictTarget: InsertBuilder.ConflictTargetOptions | undefined = (() => {
+			if (!target) {
+				return undefined
+			}
+			if (Array.isArray(target)) {
+				return {
+					columns: target,
+					where: new Where.Statement([]),
+				}
+			}
+			if ('constraint' in target) {
+				return target
+			}
+			const whereStm = new Where.Statement([])
+			return {
+				columns: target.columns,
+				where: target.where ? whereStm.withWhere(target.where) : whereStm,
+			}
+		})()
+
+		if (action === ConflictActionType.update && values && conflictTarget) {
 			const whereStm = new Where.Statement([])
 			conflictAction = {
 				type: action,
 				values: resolveValues(values),
-				target,
+				target: conflictTarget,
 				where: where ? whereStm.withWhere(where) : whereStm,
 			}
 		} else if (action === ConflictActionType.doNothing) {
-			conflictAction = { type: action, target }
+			conflictAction = { type: action, target: conflictTarget }
 		} else {
 			throw Error()
 		}
@@ -128,16 +151,32 @@ namespace InsertBuilder {
 		values: Exclude<Options['values'], undefined>
 	}
 
-	export type ConflictAction =
-		| { type: ConflictActionType.doNothing; target?: ConflictTarget }
-		| (Where.Options & {
+	export type ConflictTargetOptions =
+		| ({ columns: IndexColumns} & Where.Options)
+		| { constraint: string }
+
+	type DoNothingConflictAction = {
+		type: ConflictActionType.doNothing
+		target?: ConflictTargetOptions
+	}
+
+	type DoUpdateConflictAction =
+		& Where.Options
+		& {
 			type: ConflictActionType.update
 			values: QueryBuilder.ResolvedValues
-			target: ConflictTarget
-		  })
+			target: ConflictTargetOptions
+		}
+
+	export type ConflictAction =
+		| DoNothingConflictAction
+		| DoUpdateConflictAction
 
 	export type IndexColumns = string[]
-	export type ConflictTarget = IndexColumns | { constraint: string }
+	export type ConflictTarget =
+		| IndexColumns
+		| { columns: IndexColumns; where?: Where.Expression }
+		| { constraint: string }
 }
 
 export { InsertBuilder }

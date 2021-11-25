@@ -1,4 +1,4 @@
-import { assertNever, aliasLiteral, prependSchema, wrapIdentifier } from '../utils'
+import { aliasLiteral, assertNever, prependSchema, wrapIdentifier } from '../utils'
 import { SelectBuilder } from './SelectBuilder'
 import { Literal } from '../Literal'
 import { DeleteBuilder } from './DeleteBuilder'
@@ -227,16 +227,22 @@ class Compiler {
 		}
 	}
 
-	private compileOnConflictTarget(target?: InsertBuilder.ConflictTarget) {
+	private compileOnConflictTarget(target?: InsertBuilder.ConflictTargetOptions) {
 		if (!target) {
 			return Literal.empty
 		}
-		if (Array.isArray(target)) {
-			return Literal.empty.appendAll(
-				target.map(it => new Literal(wrapIdentifier(it))),
+		const createColumnList = (columns: string[]) =>
+			Literal.empty.appendAll(
+				columns.map(it => new Literal(wrapIdentifier(it))),
 				', ',
 				['(', ')'],
 			)
+
+		if (Array.isArray(target)) {
+			return createColumnList(target)
+		}
+		if ('columns' in target) {
+			return createColumnList(target.columns).append(target.where.compile())
 		}
 		return new Literal('on constraint ' + wrapIdentifier(target.constraint))
 	}

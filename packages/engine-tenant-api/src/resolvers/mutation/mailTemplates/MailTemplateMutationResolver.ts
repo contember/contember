@@ -18,7 +18,7 @@ export class MailTemplateMutationResolver implements MutationResolvers {
 		private readonly mailTemplateManager: MailTemplateManager,
 	) {}
 
-	async addProjectMailTemplate(
+	async addMailTemplate(
 		parent: any,
 		{ template: { content, projectSlug, subject, type, useLayout, variant } }: MutationAddProjectMailTemplateArgs,
 		context: ResolverContext,
@@ -48,7 +48,7 @@ export class MailTemplateMutationResolver implements MutationResolvers {
 		}
 	}
 
-	async removeProjectMailTemplate(
+	async removeMailTemplate(
 		parent: any,
 		{ templateIdentifier: { projectSlug, type, variant } }: MutationRemoveProjectMailTemplateArgs,
 		context: ResolverContext,

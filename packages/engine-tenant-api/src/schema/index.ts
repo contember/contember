@@ -429,11 +429,15 @@ export type Mutation = {
 	readonly createApiKey?: Maybe<CreateApiKeyResponse>
 	readonly createGlobalApiKey?: Maybe<CreateApiKeyResponse>
 	readonly disableApiKey?: Maybe<DisableApiKeyResponse>
-	readonly addProjectMailTemplate?: Maybe<AddMailTemplateResponse>
-	readonly removeProjectMailTemplate?: Maybe<RemoveMailTemplateResponse>
+	readonly addMailTemplate?: Maybe<AddMailTemplateResponse>
+	readonly removeMailTemplate?: Maybe<RemoveMailTemplateResponse>
 	readonly createProject?: Maybe<CreateProjectResponse>
 	readonly setProjectSecret?: Maybe<SetProjectSecretResponse>
 	readonly updateProject?: Maybe<UpdateProjectResponse>
+	/** @deprecated use addMailtemplate */
+	readonly addProjectMailTemplate?: Maybe<AddMailTemplateResponse>
+	/** @deprecated use removeMailtemplate */
+	readonly removeProjectMailTemplate?: Maybe<RemoveMailTemplateResponse>
 }
 
 
@@ -562,12 +566,12 @@ export type MutationDisableApiKeyArgs = {
 }
 
 
-export type MutationAddProjectMailTemplateArgs = {
+export type MutationAddMailTemplateArgs = {
 	template: MailTemplate
 }
 
 
-export type MutationRemoveProjectMailTemplateArgs = {
+export type MutationRemoveMailTemplateArgs = {
 	templateIdentifier: MailTemplateIdentifier
 }
 
@@ -593,6 +597,16 @@ export type MutationUpdateProjectArgs = {
 	name?: Maybe<Scalars['String']>
 	config?: Maybe<Scalars['Json']>
 	mergeConfig?: Maybe<Scalars['Boolean']>
+}
+
+
+export type MutationAddProjectMailTemplateArgs = {
+	template: MailTemplate
+}
+
+
+export type MutationRemoveProjectMailTemplateArgs = {
+	templateIdentifier: MailTemplateIdentifier
 }
 
 export type Person = {
@@ -1431,11 +1445,13 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
 	createApiKey?: Resolver<Maybe<ResolversTypes['CreateApiKeyResponse']>, ParentType, ContextType, RequireFields<MutationCreateApiKeyArgs, 'projectSlug' | 'memberships' | 'description'>>
 	createGlobalApiKey?: Resolver<Maybe<ResolversTypes['CreateApiKeyResponse']>, ParentType, ContextType, RequireFields<MutationCreateGlobalApiKeyArgs, 'description'>>
 	disableApiKey?: Resolver<Maybe<ResolversTypes['DisableApiKeyResponse']>, ParentType, ContextType, RequireFields<MutationDisableApiKeyArgs, 'id'>>
-	addProjectMailTemplate?: Resolver<Maybe<ResolversTypes['AddMailTemplateResponse']>, ParentType, ContextType, RequireFields<MutationAddProjectMailTemplateArgs, 'template'>>
-	removeProjectMailTemplate?: Resolver<Maybe<ResolversTypes['RemoveMailTemplateResponse']>, ParentType, ContextType, RequireFields<MutationRemoveProjectMailTemplateArgs, 'templateIdentifier'>>
+	addMailTemplate?: Resolver<Maybe<ResolversTypes['AddMailTemplateResponse']>, ParentType, ContextType, RequireFields<MutationAddMailTemplateArgs, 'template'>>
+	removeMailTemplate?: Resolver<Maybe<ResolversTypes['RemoveMailTemplateResponse']>, ParentType, ContextType, RequireFields<MutationRemoveMailTemplateArgs, 'templateIdentifier'>>
 	createProject?: Resolver<Maybe<ResolversTypes['CreateProjectResponse']>, ParentType, ContextType, RequireFields<MutationCreateProjectArgs, 'projectSlug'>>
 	setProjectSecret?: Resolver<Maybe<ResolversTypes['SetProjectSecretResponse']>, ParentType, ContextType, RequireFields<MutationSetProjectSecretArgs, 'projectSlug' | 'key' | 'value'>>
 	updateProject?: Resolver<Maybe<ResolversTypes['UpdateProjectResponse']>, ParentType, ContextType, RequireFields<MutationUpdateProjectArgs, 'projectSlug'>>
+	addProjectMailTemplate?: Resolver<Maybe<ResolversTypes['AddMailTemplateResponse']>, ParentType, ContextType, RequireFields<MutationAddProjectMailTemplateArgs, 'template'>>
+	removeProjectMailTemplate?: Resolver<Maybe<ResolversTypes['RemoveMailTemplateResponse']>, ParentType, ContextType, RequireFields<MutationRemoveProjectMailTemplateArgs, 'templateIdentifier'>>
 }
 
 export type PersonResolvers<ContextType = any, ParentType extends ResolversParentTypes['Person'] = ResolversParentTypes['Person']> = {

@@ -46,12 +46,19 @@ const schema: DocumentNode = gql`
 		createGlobalApiKey(description: String!, roles: [String!], tokenHash: String): CreateApiKeyResponse
 		disableApiKey(id: String!): DisableApiKeyResponse
 
-		addProjectMailTemplate(template: MailTemplate!): AddMailTemplateResponse
-		removeProjectMailTemplate(templateIdentifier: MailTemplateIdentifier!): RemoveMailTemplateResponse
+		addMailTemplate(template: MailTemplate!): AddMailTemplateResponse
+		removeMailTemplate(templateIdentifier: MailTemplateIdentifier!): RemoveMailTemplateResponse
 
 		createProject(projectSlug: String!, name: String, config: Json, secrets: [ProjectSecret!], deployTokenHash: String): CreateProjectResponse
 		setProjectSecret(projectSlug: String!, key: String!, value: String!): SetProjectSecretResponse
 		updateProject(projectSlug: String!, name: String, config: Json, mergeConfig: Boolean): UpdateProjectResponse
+
+		addProjectMailTemplate(template: MailTemplate!): AddMailTemplateResponse
+			@deprecated(reason: "use addMailtemplate")
+
+		removeProjectMailTemplate(templateIdentifier: MailTemplateIdentifier!): RemoveMailTemplateResponse
+			@deprecated(reason: "use removeMailtemplate")
+
 	}
 
 	# === signUp ===

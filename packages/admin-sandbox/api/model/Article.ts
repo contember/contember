@@ -1,4 +1,5 @@
 import { SchemaDefinition as d } from '@contember/schema-definition'
+import { Locale } from './Locale'
 
 export class Article {
 	title = d.stringColumn()
@@ -10,8 +11,27 @@ export class Article {
 
 export class Category {
 	name = d.stringColumn()
+	locales = d.oneHasMany(CategoryLocale, 'category')
 }
+
+
+@d.Unique('locale', 'category')
+export class CategoryLocale {
+	category = d.manyHasOne(Category, 'locales')
+	locale = d.manyHasOne(Locale)
+	name = d.stringColumn().notNull()
+}
+
 
 export class Tag {
 	name = d.stringColumn()
+	locales = d.oneHasMany(TagLocale, 'tag')
+}
+
+
+@d.Unique('locale', 'tag')
+export class TagLocale {
+	tag = d.manyHasOne(Tag, 'locales')
+	locale = d.manyHasOne(Locale)
+	name = d.stringColumn().notNull()
 }

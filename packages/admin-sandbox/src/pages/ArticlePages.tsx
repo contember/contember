@@ -10,7 +10,7 @@ import {
 	GenericPage,
 	MultiSelectField,
 	PageLinkButton,
-	PageLinkById,
+	PageLinkById, SelectField,
 	TextCell,
 	TextField,
 	TitleBar,
@@ -36,7 +36,11 @@ export const ArticleListPage = (
 
 const form = <>
 	<MultiSelectField label={'tags'} field={'tags'} options={{
-		fields: "Tag[name != 'a'].name",
+		fields: "Tag.locales(locale.code='cs').name",
+		orderBy: 'name desc',
+	}} />
+	<SelectField label={'category'} field={'category'} options={{
+		fields: "Category.locales(locale.code='cs').name",
 		orderBy: 'name desc',
 	}} />
 	<TextField field={'title'} label={'Title'} />

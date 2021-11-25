@@ -58,6 +58,15 @@ test('invite a new person', async () => {
 						rows: [],
 					},
 				},
+				{
+					sql: `select "id", "subject", "content", "use_layout" as "uselayout"
+							from "tenant"."mail_template"
+							where "project_id" is null and "mail_type" = ? and "variant" = ?`,
+					parameters: ['newUserInvited', ''],
+					response: {
+						rows: [],
+					},
+				},
 			),
 			disableOneOffKeySql({ id: authenticatedApiKeyId }),
 			{

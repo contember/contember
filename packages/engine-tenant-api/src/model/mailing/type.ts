@@ -5,7 +5,7 @@ export enum MailType {
 }
 
 export interface MailTemplateIdentifier {
-	projectId: string
+	projectId?: string
 	type: MailType
 	variant: string
 }

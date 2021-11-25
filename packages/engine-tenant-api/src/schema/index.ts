@@ -357,7 +357,7 @@ export type InviteResult = {
 
 
 export type MailTemplate = {
-	readonly projectSlug: Scalars['String']
+	readonly projectSlug?: Maybe<Scalars['String']>
 	readonly type: MailType
 	/** Custom mail variant identifier, e.g. a locale. */
 	readonly variant?: Maybe<Scalars['String']>
@@ -367,7 +367,7 @@ export type MailTemplate = {
 }
 
 export type MailTemplateIdentifier = {
-	readonly projectSlug: Scalars['String']
+	readonly projectSlug?: Maybe<Scalars['String']>
 	readonly type: MailType
 	readonly variant?: Maybe<Scalars['String']>
 }

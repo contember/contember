@@ -10,7 +10,7 @@ export class RemoveMailTemplateCommand implements Command<boolean> {
 			(await DeleteBuilder.create()
 				.from('mail_template')
 				.where({
-					project_id: this.mailTemplateIdentifier.projectId,
+					project_id: this.mailTemplateIdentifier.projectId ?? null,
 					mail_type: this.mailTemplateIdentifier.type,
 					variant: this.mailTemplateIdentifier.variant,
 				})

@@ -528,7 +528,7 @@ const schema: DocumentNode = gql`
 	# === mails ===
 
 	input MailTemplate {
-		projectSlug: String!
+		projectSlug: String
 		type: MailType!
 		"Custom mail variant identifier, e.g. a locale."
 		variant: String
@@ -544,7 +544,7 @@ const schema: DocumentNode = gql`
 	}
 
 	input MailTemplateIdentifier {
-		projectSlug: String!
+		projectSlug: String
 		type: MailType!
 		variant: String
 	}

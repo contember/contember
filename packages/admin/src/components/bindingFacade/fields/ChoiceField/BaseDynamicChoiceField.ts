@@ -55,7 +55,7 @@ export const useDesugaredOptionPath = (props: BaseDynamicChoiceField) => {
 export const useTopLevelOptionAccessors = (desugaredOptionPath: QualifiedFieldList | QualifiedEntityList) => {
 	const getSubTree = useGetEntityListSubTree()
 	const entityList = useMemo<SugaredQualifiedEntityList>(
-		() => ({ entities: desugaredOptionPath }),
+		() => ({ entities: desugaredOptionPath, ...desugaredOptionPath }),
 		[desugaredOptionPath],
 	)
 	const getSubTreeData = useCallback(() => getSubTree(entityList), [entityList, getSubTree])

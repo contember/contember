@@ -16,20 +16,14 @@ export class CreateProjectMutationResolver implements MutationResolvers {
 		args: MutationCreateProjectArgs,
 		context: ResolverContext,
 	): Promise<CreateProjectResponse> {
-		const project = await this.projectManager.getProjectBySlug(context.db, args.projectSlug)
-		if (
-			project &&
-			(await context.isAllowed({
-				scope: await context.permissionContext.createProjectScope(project),
-				action: PermissionActions.PROJECT_VIEW,
-			}))
-		) {
-			return createErrorResponse(CreateProjectResponseErrorCode.AlreadyExists, `Project ${args.projectSlug} already exists`)
-		}
 		await context.requireAccess({
 			action: PermissionActions.PROJECT_CREATE,
 			message: 'You are not allowed to create a project',
 		})
+		const project = await this.projectManager.getProjectBySlug(context.db, args.projectSlug)
+		if (project) {
+			return createErrorResponse(CreateProjectResponseErrorCode.AlreadyExists, `Project ${args.projectSlug} already exists`)
+		}
 		const response = await this.projectManager.createProject(
 			context.projectGroup,
 			{

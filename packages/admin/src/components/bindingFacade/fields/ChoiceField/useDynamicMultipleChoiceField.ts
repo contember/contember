@@ -72,12 +72,12 @@ export const useDynamicMultipleChoiceField = (
 	const onChange = useCallback(
 		(optionKey: ChoiceFieldData.ValueRepresentation, isChosen: boolean) => {
 			if (isChosen) {
-				getCurrentValues().connectEntity(optionEntities[optionKey])
+				getCurrentValues().connectEntity(mergedEntities[optionKey])
 			} else {
-				getCurrentValues().disconnectEntity(optionEntities[optionKey])
+				getCurrentValues().disconnectEntity(mergedEntities[optionKey])
 			}
 		},
-		[optionEntities, getCurrentValues],
+		[mergedEntities, getCurrentValues],
 	)
 
 	return {

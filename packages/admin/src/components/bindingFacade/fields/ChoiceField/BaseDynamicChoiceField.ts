@@ -114,7 +114,7 @@ export const useNormalizedOptions = (
 	desugaredOptionPath: QualifiedFieldList | QualifiedEntityList,
 	renderOption: ((entityAccessor: EntityAccessor) => ReactNode) | undefined,
 	searchByFields: BaseDynamicChoiceField['searchByFields'],
-) => {
+): ChoiceFieldData.Data => {
 	const sugaredFields = useMemo(
 		() => (searchByFields === undefined ? [] : Array.isArray(searchByFields) ? searchByFields : [searchByFields]),
 		[searchByFields],

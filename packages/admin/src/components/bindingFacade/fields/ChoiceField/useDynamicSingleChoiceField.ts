@@ -10,16 +10,9 @@ import {
 	useMutationState,
 } from '@contember/binding'
 import { useCallback, useMemo } from 'react'
-import {
-	BaseDynamicChoiceField,
-	useCurrentValues,
-	useDesugaredOptionPath,
-	useMergeEntities,
-	useNormalizedOptions,
-	useOptionEntities,
-	useTopLevelOptionAccessors,
-} from './BaseDynamicChoiceField'
+import { BaseDynamicChoiceField, useCurrentValues } from './BaseDynamicChoiceField'
 import type { ChoiceFieldData } from './ChoiceFieldData'
+import { useSelectOptions } from './useSelectOptions'
 
 export type DynamicSingleChoiceFieldProps = SugaredRelativeSingleEntity & BaseDynamicChoiceField
 
@@ -53,21 +46,12 @@ export const useDynamicSingleChoiceField = (
 	})
 	const currentlyChosenEntities = [currentValueEntity]
 
-	const desugaredOptionPath = useDesugaredOptionPath(props)
-	const topLevelOptionAccessors = useTopLevelOptionAccessors(desugaredOptionPath)
-	const mergedEntities = useMergeEntities(currentlyChosenEntities, topLevelOptionAccessors)
-	const optionEntities = useOptionEntities(mergedEntities, desugaredOptionPath)
-	const currentValues = useCurrentValues(currentlyChosenEntities, mergedEntities)
+	const [entities, options] = useSelectOptions(props, currentlyChosenEntities)
 
-	const normalizedOptions = useNormalizedOptions(
-		optionEntities,
-		desugaredOptionPath,
-		'renderOption' in props && props.renderOption ? props.renderOption : undefined,
-		props.searchByFields,
-	)
+	const currentValues = useCurrentValues(currentlyChosenEntities, entities)
 
 	return {
-		data: normalizedOptions,
+		data: options,
 		errors: currentValueEntity.errors,
 		isMutating,
 		environment,
@@ -81,7 +65,7 @@ export const useDynamicSingleChoiceField = (
 			if (newValue === -1) {
 				currentValueParent.disconnectEntityAtField(currentValueFieldName)
 			} else {
-				currentValueParent.connectEntityAtField(currentValueFieldName, topLevelOptionAccessors[newValue])
+				currentValueParent.connectEntityAtField(currentValueFieldName, entities[newValue])
 			}
 		},
 	}

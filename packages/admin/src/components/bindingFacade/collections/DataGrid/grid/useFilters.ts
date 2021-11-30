@@ -1,13 +1,15 @@
-import { useCallback, useState } from 'react'
+import { useCallback } from 'react'
 import type { DataGridColumns, DataGridFilterArtifactStore, DataGridSetColumnFilter } from '../base'
 import type { GridPagingAction } from '../paging'
 import { normalizeInitialFilters } from './normalizeInitialFilters'
+import { useSessionStorageState } from './useStoredState'
 
 export const useFilters = (
 	columns: DataGridColumns,
 	updatePaging: (action: GridPagingAction) => void,
+	dataGridKey: string,
 ): [DataGridFilterArtifactStore, DataGridSetColumnFilter] => {
-	const [filters, setFilters] = useState<DataGridFilterArtifactStore>(() => normalizeInitialFilters(columns))
+	const [filters, setFilters] = useSessionStorageState<DataGridFilterArtifactStore>(`${dataGridKey}-filters`, val => normalizeInitialFilters(val, columns))
 
 	return [
 		filters,
@@ -20,21 +22,17 @@ export const useFilters = (
 				let didBailOut = false
 
 				setFilters(filters => {
-					const existingValue = filters.get(columnKey)
+					const { [columnKey]: existingValue, ...otherFilters } = filters
 
 					if (existingValue === columnFilter) {
 						didBailOut = true
 						return filters
 					}
-					const clone = new Map(filters)
-
 					if (columnFilter === undefined) {
-						clone.delete(columnKey)
+						return otherFilters
 					} else {
-						clone.set(columnKey, columnFilter)
+						return { ...otherFilters, [columnKey]: columnFilter }
 					}
-
-					return clone
 				})
 				if (!didBailOut) {
 					updatePaging({
@@ -42,7 +40,7 @@ export const useFilters = (
 					})
 				}
 			},
-			[columns, updatePaging],
+			[columns, setFilters, updatePaging],
 		),
 	]
 }

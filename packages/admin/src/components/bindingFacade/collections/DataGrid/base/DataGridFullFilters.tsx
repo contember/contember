@@ -25,10 +25,10 @@ export function DataGridFullFilters({
 	setFilter,
 }: DataGridFullFiltersProps): ReactElement | null {
 	const remainingColumns = Array.from(desiredState.columns).filter(
-		([key, column]) => column.enableFiltering !== false && !desiredState.filterArtifacts.has(key),
+		([key, column]) => column.enableFiltering !== false && !(key in desiredState.filterArtifacts),
 	)
 
-	const hasAnyFilters = desiredState.filterArtifacts.size > 0
+	const hasAnyFilters = Object.keys(desiredState.filterArtifacts).length > 0
 
 	return (
 		<Dropdown
@@ -69,7 +69,7 @@ export function DataGridFullFilters({
 								</TableRow>
 							}
 						>
-							{Array.from(desiredState.filterArtifacts, ([key, filterArtifact]) => {
+							{Array.from(Object.entries(desiredState.filterArtifacts), ([key, filterArtifact]) => {
 								const column = desiredState.columns.get(key)!
 								const filterRenderer = column.enableFiltering !== false ? column.filterRenderer : undefined
 

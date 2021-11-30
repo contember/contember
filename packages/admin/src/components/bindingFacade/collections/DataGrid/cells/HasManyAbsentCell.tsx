@@ -9,12 +9,13 @@ import {
 import type { ComponentType, FunctionComponent, ReactElement, ReactNode } from 'react'
 import { Checkbox } from '@contember/ui'
 import type { FieldFallbackViewPublicProps } from '../../../fieldViews'
-import { DataGridCellPublicProps, DataGridColumn, DataGridHeaderCellPublicProps } from '../base'
+import { DataGridColumn, DataGridColumnPublicProps } from '../base'
 
-export type HasManyAbsentCellProps = DataGridHeaderCellPublicProps &
-	DataGridCellPublicProps &
-	FieldFallbackViewPublicProps &
-	SugaredRelativeEntityList & {
+export type HasManyAbsentCellProps =
+	& DataGridColumnPublicProps
+	& FieldFallbackViewPublicProps
+	& SugaredRelativeEntityList
+	& {
 		render: ComponentType<EntityListBaseProps>
 		children: ReactNode
 	}

@@ -1,0 +1,55 @@
+import { CoalesceFieldView, CoalesceFieldViewProps, FieldFallbackViewPublicProps } from '../../../fieldViews'
+import { Component, FieldValue, Filter, QueryLanguage, wrapFilterInHasOnes } from '@contember/binding'
+import { DataGridColumn, DataGridColumnPublicProps } from '../base'
+import { FC, ReactElement } from 'react'
+import { createGenericTextCellFilterCondition, GenericTextCellFilter } from './GenericTextCellFilter'
+
+export type CoalesceTextCellProps<Persisted extends FieldValue = FieldValue> =
+	& DataGridColumnPublicProps
+	& FieldFallbackViewPublicProps
+	& CoalesceFieldViewProps<Persisted>
+
+// eslint-disable-next-line @typescript-eslint/consistent-type-definitions
+type CoalesceTextFilterArtifacts = {
+	mode: 'matches' | 'matchesExactly' | 'startsWith' | 'endsWith' | 'doesNotMatch'
+	query: string
+}
+
+export const CoalesceTextCell: FC<CoalesceTextCellProps> = Component(props => {
+	return (
+		<DataGridColumn<CoalesceTextFilterArtifacts>
+			{...props}
+			enableOrdering={false}
+			getNewFilter={(filter, { environment }) => {
+				if (filter.query === '') {
+					return undefined
+				}
+				const condition = createGenericTextCellFilterCondition(filter)
+				const parts: Filter[] = []
+				for (const field of props.fields) {
+					const desugared = QueryLanguage.desugarRelativeSingleField({ field: field }, environment)
+					const fieldCondition = wrapFilterInHasOnes(desugared.hasOneRelationPath, {
+						[desugared.field]: condition,
+					})
+					parts.push(fieldCondition)
+				}
+				return filter.mode === 'doesNotMatch' ? { and: parts } : { or: parts }
+			}}
+			emptyFilter={{
+				mode: 'matches',
+				query: '',
+			}}
+			filterRenderer={props => {
+				return (
+					<div style={{ display: 'flex', gap: '0.5em', alignItems: 'center' }}>
+						<GenericTextCellFilter {...props} />
+					</div>
+				)
+			}}
+		>
+			<CoalesceFieldView {...props} />
+		</DataGridColumn>
+	)
+}, 'CoalesceTextCell') as <Persisted extends FieldValue = FieldValue>(
+	props: CoalesceTextCellProps<Persisted>,
+) => ReactElement

@@ -1,11 +1,8 @@
 import { Component } from '@contember/binding'
-import type { FunctionComponent, ReactNode } from 'react'
-import { DataGridCellPublicProps, DataGridColumn, DataGridHeaderCellPublicProps } from '../base'
+import type { FunctionComponent } from 'react'
+import { DataGridColumn, DataGridColumnPublicProps } from '../base'
 
-export type GenericCellProps = DataGridHeaderCellPublicProps &
-	DataGridCellPublicProps & {
-		children: ReactNode
-	}
+export type GenericCellProps = DataGridColumnPublicProps
 
 export const GenericCell: FunctionComponent<GenericCellProps> = Component(props => {
 	return (

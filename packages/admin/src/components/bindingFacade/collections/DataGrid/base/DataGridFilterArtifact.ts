@@ -1,1 +1,3 @@
-export type DataGridFilterArtifact = unknown
+import { Serializable } from './types'
+
+export type DataGridFilterArtifact = Serializable

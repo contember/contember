@@ -1,0 +1,313 @@
+{
+	"formatVersion": 3,
+	"modifications": [
+		{
+			"modification": "createEntity",
+			"entity": {
+				"name": "CategoryLocale",
+				"primary": "id",
+				"primaryColumn": "id",
+				"unique": {},
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"nullable": false,
+						"type": "Uuid",
+						"columnType": "uuid"
+					}
+				},
+				"tableName": "category_locale"
+			}
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"name": "TagLocale",
+				"primary": "id",
+				"primaryColumn": "id",
+				"unique": {},
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"nullable": false,
+						"type": "Uuid",
+						"columnType": "uuid"
+					}
+				},
+				"tableName": "tag_locale"
+			}
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"name": "Locale",
+				"primary": "id",
+				"primaryColumn": "id",
+				"unique": {},
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"nullable": false,
+						"type": "Uuid",
+						"columnType": "uuid"
+					}
+				},
+				"tableName": "locale"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "CategoryLocale",
+			"field": {
+				"name": "name",
+				"columnName": "name",
+				"nullable": false,
+				"type": "String",
+				"columnType": "text"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "TagLocale",
+			"field": {
+				"name": "name",
+				"columnName": "name",
+				"nullable": false,
+				"type": "String",
+				"columnType": "text"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "Locale",
+			"field": {
+				"name": "code",
+				"columnName": "code",
+				"nullable": false,
+				"type": "String",
+				"columnType": "text"
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "CategoryLocale",
+			"owningSide": {
+				"name": "category",
+				"inversedBy": "locales",
+				"nullable": true,
+				"type": "ManyHasOne",
+				"target": "Category",
+				"joiningColumn": {
+					"columnName": "category_id",
+					"onDelete": "restrict"
+				}
+			},
+			"inverseSide": {
+				"name": "locales",
+				"ownedBy": "category",
+				"type": "OneHasMany",
+				"target": "CategoryLocale"
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "CategoryLocale",
+			"owningSide": {
+				"name": "locale",
+				"nullable": true,
+				"type": "ManyHasOne",
+				"target": "Locale",
+				"joiningColumn": {
+					"columnName": "locale_id",
+					"onDelete": "restrict"
+				}
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "TagLocale",
+			"owningSide": {
+				"name": "tag",
+				"inversedBy": "locales",
+				"nullable": true,
+				"type": "ManyHasOne",
+				"target": "Tag",
+				"joiningColumn": {
+					"columnName": "tag_id",
+					"onDelete": "restrict"
+				}
+			},
+			"inverseSide": {
+				"name": "locales",
+				"ownedBy": "tag",
+				"type": "OneHasMany",
+				"target": "TagLocale"
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "TagLocale",
+			"owningSide": {
+				"name": "locale",
+				"nullable": true,
+				"type": "ManyHasOne",
+				"target": "Locale",
+				"joiningColumn": {
+					"columnName": "locale_id",
+					"onDelete": "restrict"
+				}
+			}
+		},
+		{
+			"modification": "createUniqueConstraint",
+			"entityName": "CategoryLocale",
+			"unique": {
+				"fields": [
+					"locale",
+					"category"
+				],
+				"name": "unique_CategoryLocale_locale_category_75cac4"
+			}
+		},
+		{
+			"modification": "createUniqueConstraint",
+			"entityName": "TagLocale",
+			"unique": {
+				"fields": [
+					"locale",
+					"tag"
+				],
+				"name": "unique_TagLocale_locale_tag_f74b63"
+			}
+		},
+		{
+			"modification": "createUniqueConstraint",
+			"entityName": "Locale",
+			"unique": {
+				"fields": [
+					"code"
+				],
+				"name": "unique_Locale_code_1d8243"
+			}
+		},
+		{
+			"modification": "patchAclSchema",
+			"patch": [
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/CategoryLocale",
+					"value": {
+						"predicates": {},
+						"operations": {
+							"create": {
+								"id": true,
+								"category": true,
+								"locale": true,
+								"name": true
+							},
+							"read": {
+								"id": true,
+								"category": true,
+								"locale": true,
+								"name": true
+							},
+							"update": {
+								"id": true,
+								"category": true,
+								"locale": true,
+								"name": true
+							},
+							"delete": true,
+							"customPrimary": true
+						}
+					}
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/TagLocale",
+					"value": {
+						"predicates": {},
+						"operations": {
+							"create": {
+								"id": true,
+								"tag": true,
+								"locale": true,
+								"name": true
+							},
+							"read": {
+								"id": true,
+								"tag": true,
+								"locale": true,
+								"name": true
+							},
+							"update": {
+								"id": true,
+								"tag": true,
+								"locale": true,
+								"name": true
+							},
+							"delete": true,
+							"customPrimary": true
+						}
+					}
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/Locale",
+					"value": {
+						"predicates": {},
+						"operations": {
+							"create": {
+								"id": true,
+								"code": true
+							},
+							"read": {
+								"id": true,
+								"code": true
+							},
+							"update": {
+								"id": true,
+								"code": true
+							},
+							"delete": true,
+							"customPrimary": true
+						}
+					}
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/Category/operations/create/locales",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/Category/operations/read/locales",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/Category/operations/update/locales",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/Tag/operations/create/locales",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/Tag/operations/read/locales",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/Tag/operations/update/locales",
+					"value": true
+				}
+			]
+		}
+	]
+}

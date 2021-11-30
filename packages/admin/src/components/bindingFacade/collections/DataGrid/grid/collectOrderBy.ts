@@ -9,7 +9,7 @@ export const collectOrderBy = (
 	// TODO This implementation uses column order. Shouldn't we use insertion order instead?
 	const mapped: OrderBy[] = []
 
-	for (const [key, direction] of directionStore) {
+	for (const [key, direction] of Object.entries(directionStore)) {
 		const orderBy = getColumnOrderBy(columns, key, direction, environment)
 
 		if (orderBy !== undefined) {

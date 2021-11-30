@@ -108,19 +108,23 @@ export const DataGridContainer: FunctionComponent<DataGridContainerProps> = Comp
 						<TableRow>
 							{Array.from(columns)
 								// We use desired state here to give immediate feedback about column changes.
-								.filter(([columnKey]) => !desiredState.hiddenColumns.has(columnKey))
+								.filter(([columnKey]) => !desiredState.hiddenColumns[columnKey])
 								.map(([columnKey, column]) => {
-									const filterArtifact = filterArtifacts.get(columnKey)
-									const orderDirection = orderDirections.get(columnKey)
+									const filterArtifact = filterArtifacts[columnKey]
+									const orderDirection = orderDirections[columnKey]
+									const orderColumns = Object.keys(orderDirections)
 									return (
 										<DataGridHeaderCell
 											key={columnKey}
 											environment={accessor.environment}
 											filterArtifact={filterArtifact}
-											emptyFilterArtifact={column.enableFiltering !== false ? column.emptyFilter : undefined}
-											orderDirection={orderDirection}
+											emptyFilterArtifact={column.enableFiltering !== false ? column.emptyFilter : null}
+											orderState={orderDirection ? {
+												direction: orderDirection,
+												index: orderColumns.length > 1 ? orderColumns.indexOf(columnKey) : undefined,
+											} : undefined}
 											setFilter={newFilter => setFilter(columnKey, newFilter)}
-											setOrderBy={newOrderBy => setOrderBy(columnKey, newOrderBy)}
+											setOrderBy={(newOrderBy, append = false) => setOrderBy(columnKey, newOrderBy, append)}
 											headerJustification={column.headerJustification || column.justification}
 											shrunk={column.shrunk}
 											hasFilter={getColumnFilter(column, filterArtifact, accessor.environment) !== undefined}
@@ -144,14 +148,14 @@ export const DataGridContainer: FunctionComponent<DataGridContainerProps> = Comp
 							>
 								<TableRow>
 									{Array.from(columns)
-										.filter(([columnKey]) => !desiredState.hiddenColumns.has(columnKey))
+										.filter(([columnKey]) => !desiredState.hiddenColumns[columnKey])
 										.map(([columnKey, column]) => {
 											// This is tricky. We need to render a table cell from here no matter what so that the cell count
 											// matches that of the headers. However, there might be a header displayed for a column whose data
 											// has not yet been fetched. Displaying its cell contents from here would cause an error. Also, the
 											// column may have just been hidden but the information hasn't made it to displayed sate yet.
 											// For these, we just display an empty cell then.
-											if (displayedState.hiddenColumns.has(columnKey)) {
+											if (displayedState.hiddenColumns[columnKey]) {
 												return <TableCell key={columnKey} shrunk />
 											}
 											return (
@@ -173,7 +177,7 @@ export const DataGridContainer: FunctionComponent<DataGridContainerProps> = Comp
 						</TableRow>
 					)}
 				</Table>
-				{!!accessor.length && (
+				{!!normalizedItemCount && (
 					<div style={{ margin: '1em 0', display: 'flex', justifyContent: 'space-between' }}>
 						<div>{pagingSummary}</div>
 						<div style={{ display: 'flex', gap: '.5em' }}>
@@ -190,14 +194,14 @@ export const DataGridContainer: FunctionComponent<DataGridContainerProps> = Comp
 							{itemsPerPage !== null && (
 								<>
 									<Button
-										disabled={accessor.length !== itemsPerPage}
+										disabled={pagesCount === undefined || pagesCount <= pageIndex + 1}
 										onClick={() => updatePaging({ type: 'goToNextPage' })}
 									>
 										{formatMessage('dataGrid.paging.next')}
 									</Button>
 									<Button
 										distinction="seamless"
-										disabled={pagesCount === undefined || pageIndex === pagesCount - 1}
+										disabled={pagesCount === undefined || pagesCount <= pageIndex + 1}
 										onClick={() =>
 											pagesCount !== undefined && updatePaging({ type: 'goToPage', newPageIndex: pagesCount - 1 })
 										}

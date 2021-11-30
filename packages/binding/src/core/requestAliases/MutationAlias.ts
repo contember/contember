@@ -18,7 +18,7 @@ const standaloneUuidPrefix = uuidToAliasReplacement
 
 export class MutationAlias {
 	public static encodeTopLevel(operation: TopLevelMutationOperation): string {
-		const treeRootId = operation.treeRootId === undefined ? 'u' : `t${operation.treeRootId}t`
+		const treeRootId = operation.treeRootId === undefined ? 'u' : `t${operation.treeRootId.replace('-', '_')}t`
 		const entityId = operation.entityId.replace(uuidToAliasRegex, uuidToAliasReplacement)
 
 		const alias = `${treeRootId}${operation.subTreePlaceholder}__${operation.type}${operation.subTreeType}${entityId}`

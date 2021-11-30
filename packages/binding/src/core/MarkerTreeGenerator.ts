@@ -28,7 +28,7 @@ export class MarkerTreeGenerator {
 		const processed = MarkerTreeGenerator.childrenAnalyzer.processChildren(this.sourceTree, this.environment)
 
 		if (processed.length === 0) {
-			throw new BindingError('Empty data binding tree discovered. Try adding some fields…')
+			return new MarkerTreeRoot(new Map(), new Map())
 		}
 
 		const collectedMarkers = MarkerTreeGenerator.mapNodeResultToEntityFields(processed)

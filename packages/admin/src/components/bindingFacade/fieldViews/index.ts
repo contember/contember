@@ -1,4 +1,5 @@
 export * from './BooleanFieldView'
+export * from './CoalesceFieldView'
 export * from './DateFieldView'
 export * from './FieldFallbackView'
 export * from './FileUrlFieldView'

@@ -1,12 +1,15 @@
-import { useCallback, useState } from 'react'
+import { useCallback } from 'react'
 import type { DataGridColumns, DataGridHiddenColumnsStateStore, DataGridSetIsColumnHidden } from '../base'
 import { normalizeInitialHiddenColumnsState } from './normalizeInitialHiddenColumnsState'
+import { useSessionStorageState } from './useStoredState'
 
 export const useHiddenColumnsState = (
 	columns: DataGridColumns,
+	dataGridKey: string,
 ): [DataGridHiddenColumnsStateStore, DataGridSetIsColumnHidden] => {
-	const [hiddenColumns, setHiddenColumns] = useState<DataGridHiddenColumnsStateStore>(() =>
-		normalizeInitialHiddenColumnsState(columns),
+	const [hiddenColumns, setHiddenColumns] = useSessionStorageState<DataGridHiddenColumnsStateStore>(
+		`${dataGridKey}-hidden`,
+		val => normalizeInitialHiddenColumnsState(val, columns),
 	)
 
 	return [
@@ -19,23 +22,10 @@ export const useHiddenColumnsState = (
 				}
 
 				setHiddenColumns(hiddenColumns => {
-					const isCurrentlyHidden = hiddenColumns.has(columnKey)
-
-					if (isCurrentlyHidden === isToBeHidden) {
-						return hiddenColumns
-					}
-					const clone: DataGridHiddenColumnsStateStore = new Set(hiddenColumns)
-
-					if (isToBeHidden) {
-						clone.add(columnKey)
-					} else {
-						clone.delete(columnKey)
-					}
-
-					return clone
+					return { ...hiddenColumns, [columnKey]: isToBeHidden }
 				})
 			},
-			[columns],
+			[columns, setHiddenColumns],
 		),
 	]
 }

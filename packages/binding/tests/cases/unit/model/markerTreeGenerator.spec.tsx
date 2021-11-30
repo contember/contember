@@ -21,10 +21,10 @@ import {
 } from '../../../../src'
 
 describe('Marker tree generator', () => {
-	it('should reject empty trees', () => {
+	it('should accept empty trees', () => {
 		const generator = new MarkerTreeGenerator(<></>)
 
-		expect(() => generator.generate()).toThrowError(/empty/i)
+		expect(generator.generate()).toEqual(new MarkerTreeRoot(new Map(), new Map()))
 	})
 
 	it('combine nested markers', () => {

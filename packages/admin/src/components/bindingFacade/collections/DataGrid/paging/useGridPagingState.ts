@@ -1,13 +1,18 @@
-import { useReducer } from 'react'
+import { useCallback } from 'react'
 import { gridPagingReducer } from './gridPagingReducer'
 import type { GridPagingState } from './GridPagingState'
+import { useSessionStorageState } from '../grid/useStoredState'
+import { GridPagingAction } from './GridPagingAction'
 
-const stateDefaults: GridPagingState = {
-	pageIndex: 0,
-	itemsPerPage: 25,
+export const useGridPagingState = (itemsPerPage: number | null, dataGridKey: string): [GridPagingState, (action: GridPagingAction) => void] => {
+	const [paginatorState, setPaginatorState] = useSessionStorageState<GridPagingState>(`${dataGridKey}-page`, val => val ?? {
+		pageIndex: 0,
+		itemsPerPage,
+	})
+	return [
+		paginatorState,
+		useCallback((action: GridPagingAction) => {
+			setPaginatorState(val => gridPagingReducer(val, action))
+		}, [setPaginatorState]),
+	]
 }
-
-export const useGridPagingState = ({
-	itemsPerPage = stateDefaults.itemsPerPage,
-	pageIndex = stateDefaults.pageIndex,
-}: Partial<GridPagingState> = stateDefaults) => useReducer(gridPagingReducer, { pageIndex, itemsPerPage })

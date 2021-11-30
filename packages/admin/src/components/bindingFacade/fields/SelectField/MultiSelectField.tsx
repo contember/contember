@@ -49,7 +49,7 @@ export interface MultiSelectFieldInnerProps
 	errors: ErrorAccessor | undefined
 }
 
-const MultiSelectFieldInner = memo(
+export const MultiSelectFieldInner = memo(
 	({
 		currentValues,
 		data,

@@ -1,6 +1,7 @@
 import { Builder } from '@contember/dic'
 import { env } from './env'
 import { S3Client } from '@aws-sdk/client-s3'
+import { createClient as createRedisClient } from 'redis'
 import { LoginController } from './controllers/LoginController'
 import { DeployController } from './controllers/DeployController'
 import { ProjectController } from './controllers/ProjectController'
@@ -19,6 +20,8 @@ import { BadRequestError } from './BadRequestError'
 import { S3LocationResolver } from './services/S3LocationResolver'
 import { readHostFromHeader } from './utils/readHostFromHeader'
 import { ProjectListProvider } from './services/ProjectListProvider'
+import { CollaborationController } from './controllers/CollaborationController'
+import { CollaborationRedisKeys, CollaborationRedisStorage } from './services/CollaborationStorage'
 
 export default new Builder({})
 	.addService('env', env)
@@ -49,6 +52,24 @@ export default new Builder({})
 				secretAccessKey: env.CONTEMBER_S3_SECRET,
 			},
 		})
+	})
+
+	.addService('redisClient', ({ env }) => {
+		if (env.REDIS_HOST) {
+			return createRedisClient({ url: env.REDIS_HOST }) as any // Cast because otherwise it would require explicit type on export
+		}
+	})
+
+	.addService('collaborationRedisKeys', ({ env }) => {
+		if (env.REDIS_PREFIX) {
+			return new CollaborationRedisKeys(env.REDIS_PREFIX)
+		}
+	})
+
+	.addService('collaborationStorage', ({ redisClient, collaborationRedisKeys }) => {
+		if (redisClient !== undefined && collaborationRedisKeys !== undefined) {
+			return new CollaborationRedisStorage(redisClient as ReturnType<typeof createRedisClient>, collaborationRedisKeys)
+		}
 	})
 
 	.addService('s3', ({ s3Client, s3LocationResolver }) => {
@@ -91,8 +112,16 @@ export default new Builder({})
 		return new PanelController(staticFileHandler)
 	})
 
-	.addService('httpServer', ({ loginController, deployController, projectController, apiController, meController, legacyController, panelController, projectGroupResolver }) => {
-		return http.createServer(async (req, res) => {
+	.addService('collaborationController', ({ collaborationStorage, projectGroupResolver, tenant }) => {
+		if (collaborationStorage) {
+			return new CollaborationController(collaborationStorage, projectGroupResolver, tenant)
+		}
+	})
+
+	.addService('httpServer', ({ loginController, deployController, projectController, apiController, meController, legacyController, panelController, collaborationController, projectGroupResolver }) => {
+		const server = http.createServer()
+
+		server.on('request', async (req, res) => {
 			const startTime = process.hrtime()
 			const url = new URL(req.url ?? '/', `http://${req.headers.host}`)
 			const [prefix, ...rest] = url.pathname.substring(1).split('/')
@@ -145,6 +174,14 @@ export default new Builder({})
 				console.error(`[http] [${res.statusCode}] ${req.method} ${req.url}`, e)
 			}
 		})
+
+		if (collaborationController) {
+			server.on('upgrade', (request, socket, head) => {
+				collaborationController.protocol.handleUpgrade(request, socket as any, head)
+			})
+		}
+
+		return server
 	})
 
 	.build()

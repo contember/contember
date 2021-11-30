@@ -1,10 +1,6 @@
-import type { IncomingMessage, OutgoingMessage, ServerResponse } from 'http'
+import type { IncomingMessage, ServerResponse } from 'http'
 import type { Json, Type } from '../utils/schema'
 import { Buffer } from 'buffer'
-import * as cookie from 'cookie'
-import { isRequestSecure } from '../utils/forwared'
-
-const CONTEMBER_TOKEN_COOKIE_NAME = 'CONTEMBER_TOKEN'
 
 export abstract class BaseController<T = {}> {
 	abstract handle(req: IncomingMessage, res: ServerResponse, params: T): Promise<void>
@@ -21,24 +17,6 @@ export abstract class BaseController<T = {}> {
 		}
 
 		return token
-	}
-
-	protected readAuthCookie(req: IncomingMessage): string | null {
-		const cookies = cookie.parse(req.headers.cookie || '')
-		return cookies[CONTEMBER_TOKEN_COOKIE_NAME] ?? null
-	}
-
-	protected writeAuthCookie(req: IncomingMessage, res: OutgoingMessage, token: string): void {
-		res.setHeader(
-			'Set-Cookie',
-			cookie.serialize(CONTEMBER_TOKEN_COOKIE_NAME, token, {
-				path: '/',
-				httpOnly: true,
-				secure: isRequestSecure(req),
-				sameSite: 'lax',
-				expires: new Date(Date.now() + 14 * 24 * 3600 * 1000),
-			}),
-		)
 	}
 
 	protected readRawBody(req: IncomingMessage): Promise<Buffer> {

@@ -4,6 +4,7 @@ import { BaseController } from './BaseController'
 import { ApiEndpointResolver } from '../services/ApiEndpointResolver'
 import { BadRequestError } from '../BadRequestError'
 import { ProjectListProvider } from '../services/ProjectListProvider'
+import { readAuthCookie, writeAuthCookie } from '../utils/cookies'
 
 export const LOGIN_TOKEN_PLACEHOLDER = '__LOGIN_TOKEN__'
 export const SESSION_TOKEN_PLACEHOLDER = '__SESSION_TOKEN__'
@@ -76,7 +77,7 @@ export class ApiController extends BaseController<ApiParams> {
 				jsonBody['extensions'] ??= {}
 				jsonBody['extensions']['contemberAdminServer'] = { projects: await this.projectListProvider.get(params.projectGroup, token) }
 
-				this.writeAuthCookie(req, res, token)
+				writeAuthCookie(req, res, token)
 				this.proxyOugoingHead(res, innerRes)
 				res.end(JSON.stringify(jsonBody))
 			}),
@@ -91,7 +92,7 @@ export class ApiController extends BaseController<ApiParams> {
 	private transformIncomingHeaders(req: IncomingMessage): OutgoingHttpHeaders {
 		const outHeaders: OutgoingHttpHeaders = {}
 		const bearerToken = this.readBearerToken(req)
-		const cookieToken = this.readAuthCookie(req)
+		const cookieToken = readAuthCookie(req)
 
 		if (bearerToken === LOGIN_TOKEN_PLACEHOLDER) {
 			outHeaders['Authorization'] = `Bearer ${this.loginToken}`

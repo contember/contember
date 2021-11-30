@@ -14,7 +14,7 @@ export default defineConfig({
 			treeshake: {
 				moduleSideEffects: (id, external) => {
 					return (
-						id.endsWith('ee/admin-server/public/main.tsx') ||
+						id.endsWith('ee/admin-server/public/index.tsx') ||
 						id.endsWith('ee/admin-server/public/_panel/main.tsx')
 					)
 				},

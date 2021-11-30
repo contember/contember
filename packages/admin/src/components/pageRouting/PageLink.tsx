@@ -10,7 +10,7 @@ export interface PageConfig {
 export type PageChange = () => PageConfig
 
 /** @deprecated */
-export const PageLink = memo(({  to,  ...props }: PageLinkProps) => {
+export const PageLink = memo(({ to, ...props }: PageLinkProps) => {
 	const passedTo: RoutingLinkTarget = useMemo(() => {
 		if (typeof to === 'function') {
 			return currentRequest => {

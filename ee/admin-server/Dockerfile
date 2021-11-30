@@ -1,15 +1,28 @@
-FROM node:14-alpine as builder
+FROM node:16-alpine as builder
 WORKDIR /src
 
 RUN npm install -g pnpm
 
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY ee/admin-server/package.json                    ./ee/admin-server/package.json
+COPY packages/admin/package.json                     ./packages/admin/package.json
+COPY packages/admin-i18n/package.json                ./packages/admin-i18n/package.json
+COPY packages/admin-sandbox/package.json             ./packages/admin-sandbox/package.json
+COPY packages/binding/package.json                   ./packages/binding/package.json
+COPY packages/client/package.json                    ./packages/client/package.json
+COPY packages/react-client/package.json              ./packages/react-client/package.json
+COPY packages/react-multipass-rendering/package.json ./packages/react-multipass-rendering/package.json
+COPY packages/react-utils/package.json               ./packages/react-utils/package.json
+COPY packages/ui/package.json                        ./packages/ui/package.json
+COPY packages/vimeo-file-uploader/package.json       ./packages/vimeo-file-uploader/package.json
+
+RUN cd ee/admin-server && pnpm install
+
 COPY ./ ./
 
-RUN cd ee/admin-server && \
-    pnpm install && \
-    pnpm run build
+RUN cd ee/admin-server && pnpm run build
 
-FROM node:14-alpine
+FROM node:16-alpine
 
 WORKDIR /src
 COPY --from=builder /src/ee/admin-server/dist/ ./

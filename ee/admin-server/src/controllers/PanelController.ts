@@ -1,6 +1,6 @@
 import type { IncomingMessage, ServerResponse } from 'http'
 import { BaseController } from './BaseController'
-import { StaticFileHandler } from '../http/StaticFileHandler'
+import { StaticFileHandler } from '../services/StaticFileHandler'
 
 export class PanelController extends BaseController {
 	constructor(private staticFileHandler: StaticFileHandler) {

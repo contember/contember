@@ -4,22 +4,39 @@ import { S3Client } from '@aws-sdk/client-s3'
 import { LoginController } from './controllers/LoginController'
 import { DeployController } from './controllers/DeployController'
 import { ProjectController } from './controllers/ProjectController'
-import { TenantApi } from './tenant'
+import { TenantClient } from './services/TenantClient'
 import { ApiController } from './controllers/ApiController'
 import * as http from 'http'
 import { URL } from 'url'
-import { S3Manager } from './s3'
-import { ProjectListProvider } from './project'
+import { S3Manager } from './services/S3Manager'
 import { MeController } from './controllers/MeController'
 import { LegacyController } from './controllers/LegacyController'
 import { PanelController } from './controllers/PanelController'
-import { StaticFileHandler } from './http/StaticFileHandler'
+import { StaticFileHandler } from './services/StaticFileHandler'
+import { ProjectGroupResolver } from './services/ProjectGroupResolver'
+import { ApiEndpointResolver } from './services/ApiEndpointResolver'
+import { BadRequestError } from './BadRequestError'
+import { S3LocationResolver } from './services/S3LocationResolver'
+import { readHostFromHeader } from './utils/readHostFromHeader'
+import { ProjectListProvider } from './services/ProjectListProvider'
 
 export default new Builder({})
 	.addService('env', env)
 
-	.addService('tenant', ({ env }) => {
-		return new TenantApi(env.CONTEMBER_API_ENDPOINT)
+	.addService('projectGroupResolver', ({ env }) => {
+		return new ProjectGroupResolver(env.CONTEMBER_PROJECT_GROUP_DOMAIN_MAPPING)
+	})
+
+	.addService('apiEndpointResolver', ({ env }) => {
+		return new ApiEndpointResolver(env.CONTEMBER_API_ENDPOINT, env.CONTEMBER_API_HOSTNAME)
+	})
+
+	.addService('tenant', ({ apiEndpointResolver }) => {
+		return new TenantClient(apiEndpointResolver)
+	})
+
+	.addService('s3LocationResolver', ({ env }) => {
+		return new S3LocationResolver(env.CONTEMBER_S3_BUCKET, env.CONTEMBER_S3_PREFIX)
 	})
 
 	.addService('s3Client', ({ env }) => {
@@ -34,8 +51,8 @@ export default new Builder({})
 		})
 	})
 
-	.addService('s3', ({ s3Client, env }) => {
-		return new S3Manager(s3Client, env.CONTEMBER_S3_BUCKET, env.CONTEMBER_S3_PREFIX)
+	.addService('s3', ({ s3Client, s3LocationResolver }) => {
+		return new S3Manager(s3Client, s3LocationResolver)
 	})
 
 	.addService('projectListProvider', ({ tenant, s3 }) => {
@@ -58,8 +75,8 @@ export default new Builder({})
 		return new ProjectController(tenant, s3)
 	})
 
-	.addService('apiController', ({ env, projectListProvider }) => {
-		return new ApiController(env.CONTEMBER_API_ENDPOINT, env.CONTEMBER_LOGIN_TOKEN, projectListProvider)
+	.addService('apiController', ({ env, projectListProvider, apiEndpointResolver }) => {
+		return new ApiController(apiEndpointResolver, env.CONTEMBER_LOGIN_TOKEN, projectListProvider)
 	})
 
 	.addService('meController', ({ tenant, s3 }) => {
@@ -74,29 +91,32 @@ export default new Builder({})
 		return new PanelController(staticFileHandler)
 	})
 
-	.addService('httpServer', ({ loginController, deployController, projectController, apiController, meController, legacyController, panelController }) => {
+	.addService('httpServer', ({ loginController, deployController, projectController, apiController, meController, legacyController, panelController, projectGroupResolver }) => {
 		return http.createServer(async (req, res) => {
 			const startTime = process.hrtime()
 			const url = new URL(req.url ?? '/', `http://${req.headers.host}`)
 			const [prefix, ...rest] = url.pathname.substring(1).split('/')
 
 			try {
+				const hostname = readHostFromHeader(req)
+				const projectGroup = projectGroupResolver.resolve(hostname)
+
 				switch (prefix) {
 					case '_deploy':
-						await deployController.handle(req, res)
+						await deployController.handle(req, res, { projectGroup })
 						break
 
 					case '_me':
-						await meController.handle(req, res)
+						await meController.handle(req, res, { projectGroup })
 						break
 
 					case '_api':
-						await apiController.handle(req, res, { path: rest.join('/') })
+						await apiController.handle(req, res, { path: rest.join('/'), projectGroup })
 						break
 
 					case '':
 					case '_static':
-						await loginController.handle(req, res)
+						await loginController.handle(req, res, { projectGroup })
 						break
 
 					case 'p':
@@ -109,7 +129,7 @@ export default new Builder({})
 						break
 
 					default:
-						await projectController.handle(req, res, { projectSlug: prefix, path: rest.join('/') })
+						await projectController.handle(req, res, { projectSlug: prefix, path: rest.join('/'), projectGroup })
 						break
 				}
 
@@ -117,7 +137,11 @@ export default new Builder({})
 				const elapsedTimeMs = ((elapsedTime[0] + elapsedTime[1] / 1e9) * 1e3).toFixed(0)
 				console.info(`[http] [${res.statusCode}] ${req.method} ${req.url} ${elapsedTimeMs}ms`)
 			} catch (e) {
-				res.headersSent || res.writeHead(500).end('Server error')
+				if (e instanceof BadRequestError) {
+					res.writeHead(e.code).end(e.message)
+				} else if (!res.headersSent) {
+					res.writeHead(500).end('Server error')
+				}
 				console.error(`[http] [${res.statusCode}] ${req.method} ${req.url}`, e)
 			}
 		})

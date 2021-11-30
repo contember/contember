@@ -1,12 +1,12 @@
 import type { CustomElementPlugin } from '../../../baseEditor'
 import {
-    Editor as SlateEditor,
-    Editor,
-    Element as SlateElement,
-    Node as SlateNode,
-    Path,
-    Range as SlateRange,
-    Transforms,
+	Editor as SlateEditor,
+	Editor,
+	Element as SlateElement,
+	Node as SlateNode,
+	Path,
+	Range as SlateRange,
+	Transforms,
 } from 'slate'
 import { AnchorModifications } from './AnchorModifications'
 import { AnchorRenderer } from './AnchorRenderer'

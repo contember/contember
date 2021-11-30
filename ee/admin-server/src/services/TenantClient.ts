@@ -1,5 +1,7 @@
 import fetch, { Response } from 'node-fetch'
-import { array, nullable, object, string } from './schema'
+import { array, nullable, object, string } from '../utils/schema'
+import { ApiEndpointResolver } from './ApiEndpointResolver'
+import { BadRequestError } from '../BadRequestError'
 
 const ProjectBySlugResponseType = object({
 	data: object({
@@ -56,14 +58,18 @@ interface TenantApiRequest {
 	token: string
 	query: string
 	variables?: any
+	projectGroup?: string
 }
 
-export class TenantApi {
-	constructor(private apiEndpoint: string) {}
+export class TenantClient {
+	constructor(
+		private apiEndpointResolver: ApiEndpointResolver,
+	) {}
 
-	async hasProjectAccess(token: string, projectSlug: string): Promise<boolean> {
+	async hasProjectAccess(token: string, projectSlug: string, projectGroup: string | undefined): Promise<boolean> {
 		const response = await this.request({
 			token,
+			projectGroup,
 			query: `
 				query($projectSlug: String!) {
 					projectBySlug(slug: $projectSlug) {
@@ -84,9 +90,10 @@ export class TenantApi {
 		return payload.data.projectBySlug !== null
 	}
 
-	async listAccessibleProjects(token: string) {
+	async listAccessibleProjects(token: string, projectGroup: string | undefined) {
 		const response = await this.request({
 			token,
+			projectGroup,
 			query: `
 				query {
 					projects {
@@ -105,9 +112,10 @@ export class TenantApi {
 		return payload.data.projects
 	}
 
-	async getMe(token: string) {
+	async getMe(token: string, projectGroup: string | undefined) {
 		const response = await this.request({
 			token,
+			projectGroup,
 			query: `
 				query {
 					me {
@@ -143,12 +151,18 @@ export class TenantApi {
 		return payload.data.me
 	}
 
-	private async request({ token, query, variables }: TenantApiRequest): Promise<Response> {
-		return await fetch(`${this.apiEndpoint}/tenant`, {
+	private async request({ token, query, variables, projectGroup }: TenantApiRequest): Promise<Response> {
+		const resolved = this.apiEndpointResolver.resolve(projectGroup)
+		if (!resolved) {
+			throw new BadRequestError(400, 'Cannot resolve API endpoint')
+		}
+		const { endpoint, hostname } = resolved
+		return await fetch(`${endpoint.toString()}tenant`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
 				'Authorization': `Bearer ${token}`,
+				'Host': hostname,
 			},
 			body: JSON.stringify({ query, variables }),
 		})

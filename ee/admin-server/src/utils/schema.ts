@@ -73,6 +73,18 @@ export const object = <T extends Record<string, Type<Json>>>(inner: T) => {
 	return type
 }
 
+export const partial = <T extends Record<string, Type<Json>>>(inner: T) => {
+	const type = (input: unknown, path: PropertyKey[] = []): { readonly [P in keyof T]?: ReturnType<T[P]> } => {
+		if (input === null || typeof input !== 'object') throw new ParseError(input, path, 'object')
+		return Object.fromEntries(Object.entries(inner).flatMap(([k, v]) => k in input! ? [[k, v((input as any)[k], [...path, k])]] : [])) as any
+	}
+
+	type.inner = inner
+
+	return type
+}
+
+
 export const union = <T extends Type<Json>[]>(...inner: T) => {
 	const type = (input: unknown, path: PropertyKey[] = []): ReturnType<Unpacked<T>> => {
 		const expected = []
@@ -88,6 +100,20 @@ export const union = <T extends Type<Json>[]>(...inner: T) => {
 	}
 
 	type.inner = inner
+
+	return type
+}
+
+
+export const intersection = <T1 extends Record<string, Json>, T2 extends Record<string, Json>>(inner1: Type<T1>, inner2: Type<T2>) => {
+	const type = (input: unknown, path: PropertyKey[] = []): T1 & T2 => {
+		return {
+			...inner1(input, path),
+			...inner2(input, path),
+		}
+	}
+
+	type.inner = [inner1, inner2]
 
 	return type
 }

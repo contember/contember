@@ -5,6 +5,7 @@ export * from './EnumCell'
 export * from './GenericCell'
 export * from './HasManyAbsentCell'
 export * from './HasOneSelectCell'
+export * from './HasManySelectCell'
 export * from './TextCell'
 
 export type { DataGridCellsDictionary } from './dataGridCellsDictionary'

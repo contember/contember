@@ -3,6 +3,7 @@ import { BaseController } from './BaseController'
 import { LOGIN_TOKEN_PLACEHOLDER, SESSION_TOKEN_PLACEHOLDER } from './ApiController'
 import { ProcessFile, StaticFileHandler } from '../services/StaticFileHandler'
 import { ProjectListProvider } from '../services/ProjectListProvider'
+import { readAuthCookie } from '../utils/cookies'
 
 const CONTEMBER_CONFIG_PLACEHOLDER = '{configuration}'
 
@@ -22,7 +23,7 @@ export class LoginController extends BaseController<LoginParams> {
 		await this.staticFileHandler.serve(req, res, {
 			fileProcessor: async (path, content, req) => {
 				if (path === 'index.html') {
-					const projects = await this.projectListProvider.get(projectGroup, this.readAuthCookie(req))
+					const projects = await this.projectListProvider.get(projectGroup, readAuthCookie(req))
 					const configJson = JSON.stringify({
 						apiBaseUrl: '/_api',
 						loginToken: LOGIN_TOKEN_PLACEHOLDER,
@@ -32,8 +33,7 @@ export class LoginController extends BaseController<LoginParams> {
 					return content.toString('utf8').replace(CONTEMBER_CONFIG_PLACEHOLDER, configJson)
 				}
 				return content
-			}
-			,
+			},
 		})
 	}
 }

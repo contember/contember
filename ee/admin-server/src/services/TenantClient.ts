@@ -27,6 +27,7 @@ const ProjectListResponseType = object({
 const MeResponseType = object({
 	data: object({
 		me: object({
+			id: string,
 			person: object({
 				id: string,
 				email: string,
@@ -119,6 +120,8 @@ export class TenantClient {
 			query: `
 				query {
 					me {
+						id
+
 						person {
 							id
 							email

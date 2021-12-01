@@ -1,12 +1,16 @@
 type Unpacked<T> = T extends readonly (infer U)[] ? U : never
 
+export interface JsonObject {
+	readonly [property: string]: Json | undefined
+}
+
 export type Json =
 	| string
 	| number
 	| boolean
 	| null
 	| readonly Json[]
-	| { readonly [property: string]: Json | undefined }
+	| JsonObject
 
 export interface Type<T extends Json> {
 	(input: unknown, path?: PropertyKey[]): T
@@ -37,6 +41,13 @@ export const boolean = (() => {
 	return (input: unknown, path: PropertyKey[] = []) => {
 		if (typeof input !== 'boolean') throw new ParseError(input, path, 'boolean')
 		return input
+	}
+})()
+
+export const anyObject = (() => {
+	return (input: unknown, path: PropertyKey[] = []): { readonly [property: string]: Json | undefined } => {
+		if (input === null || typeof input !== 'object') throw new ParseError(input, path, 'object')
+		return input as any
 	}
 })()
 
@@ -105,7 +116,7 @@ export const union = <T extends Type<Json>[]>(...inner: T) => {
 }
 
 
-export const intersection = <T1 extends Record<string, Json>, T2 extends Record<string, Json>>(inner1: Type<T1>, inner2: Type<T2>) => {
+export const intersection = <T1 extends JsonObject, T2 extends JsonObject>(inner1: Type<T1>, inner2: Type<T2>) => {
 	const type = (input: unknown, path: PropertyKey[] = []): T1 & T2 => {
 		return {
 			...inner1(input, path),

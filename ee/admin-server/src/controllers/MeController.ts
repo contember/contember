@@ -2,6 +2,7 @@ import { BaseController } from './BaseController'
 import type { IncomingMessage, ServerResponse } from 'http'
 import type { TenantClient } from '../services/TenantClient'
 import type { S3Manager } from '../services/S3Manager'
+import { readAuthCookie } from '../utils/cookies'
 
 interface MeResponsePayload {
 	email: string
@@ -24,7 +25,7 @@ export class MeController extends BaseController<MeParams> {
 	}
 
 	async handle(req: IncomingMessage, res: ServerResponse, { projectGroup }: MeParams): Promise<void> {
-		const token = this.readAuthCookie(req)
+		const token = readAuthCookie(req)
 		if (token === null) {
 			res.writeHead(403)
 			res.end('missing auth cookie')

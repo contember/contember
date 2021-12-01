@@ -4,6 +4,7 @@ import type { TenantClient } from '../services/TenantClient'
 import type { S3Manager } from '../services/S3Manager'
 import { Readable } from 'stream'
 import type { GetObjectCommandOutput } from '@aws-sdk/client-s3'
+import { readAuthCookie } from '../utils/cookies'
 
 interface ProjectParams {
 	projectSlug: string
@@ -20,7 +21,7 @@ export class ProjectController extends BaseController<ProjectParams> {
 	}
 
 	async handle(req: IncomingMessage, res: ServerResponse, params: ProjectParams): Promise<void> {
-		const token = this.readAuthCookie(req)
+		const token = readAuthCookie(req)
 
 		if (token === null || !(await this.tenant.hasProjectAccess(token, params.projectSlug, params.projectGroup))) {
 			res.setHeader('Location', '/')

@@ -2,7 +2,7 @@ version: '3'
 
 services:
   sandbox_vite:
-    image: node:14-alpine
+    image: node:16-alpine
     command: '/src/node_modules/.bin/vite src --config vite.config.js --debug --port 4002 --host 0.0.0.0'
 
     environment:
@@ -16,7 +16,7 @@ services:
 
 
   admin_server:
-    image: node:14-alpine
+    image: node:16-alpine
     command: 'node dist/server/run-admin.js'
 
     working_dir: /src/ee/admin-server
@@ -38,13 +38,16 @@ services:
       CONTEMBER_S3_KEY: 'contember'
       CONTEMBER_S3_SECRET: 'contember'
 
+      REDIS_HOST: 'redis://redis:6379'
+      REDIS_PREFIX: 'contember-admin-server'
+
     depends_on:
       - admin_server_esbuild
       - admin_server_vite
 
 
   admin_server_esbuild:
-    image: node:14-alpine
+    image: node:16-alpine
     command: 'npm run watch:server'
 
     working_dir: /src/ee/admin-server
@@ -53,7 +56,7 @@ services:
 
 
   admin_server_vite:
-    image: node:14-alpine
+    image: node:16-alpine
     command: 'npm run watch:public'
 
     working_dir: /src/ee/admin-server
@@ -62,7 +65,7 @@ services:
 
 
   api:
-    image: contember/contember:0.12.0-alpha.11
+    image: contember/engine:0.12.0-beta.2
 
     environment:
       NODE_ENV: 'development'
@@ -91,7 +94,7 @@ services:
       - postgres
 
   contember-cli:
-    image: contember/cli:0.12.0-alpha.11
+    image: contember/cli:0.12.0-beta.2
     volumes:
       - ./:/src:cached
     working_dir: /src/packages/admin-sandbox
@@ -102,7 +105,7 @@ services:
 
   s3:
     image: minio/minio
-    entrypoint: /minio-entrypoint.sh
+    entrypoint: /src/s3-entrypoint.sh
     command: 'server /data'
 
     environment:
@@ -112,8 +115,7 @@ services:
 
     volumes:
       - s3-data:/data:cached
-      - ./scripts/docker-compose/s3-policy.json:/bucket-policy.json
-      - ./scripts/docker-compose/s3-entrypoint.sh:/minio-entrypoint.sh
+      - ./scripts/docker-compose/:/src/:cached
 
   adminer:
     image: michalhosna/adminer:latest
@@ -141,6 +143,9 @@ services:
 
     volumes:
       - pgsql-data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:3.2-alpine
 
 
 volumes:

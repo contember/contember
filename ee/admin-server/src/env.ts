@@ -19,6 +19,9 @@ const Env = intersection(
 	partial({
 		CONTEMBER_API_HOSTNAME: string,
 		CONTEMBER_PROJECT_GROUP_DOMAIN_MAPPING: string,
+
+		REDIS_HOST: string,
+		REDIS_PREFIX: string,
 	}),
 )
 

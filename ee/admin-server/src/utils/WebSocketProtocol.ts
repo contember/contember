@@ -80,7 +80,8 @@ export class WebSocketProtocol<CD> {
 					id,
 					emit: async (data: JsonObject) => {
 						if (!(await context).subscriptionsClose.has(id)) {
-							throw new Error(`Subscription ${id} is closed`)
+							console.error(`WebSocket protocol: Subscription ${id} is closed`)
+							return
 						}
 						socket.send(JSON.stringify({
 							type: 'subscription',

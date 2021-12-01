@@ -26,7 +26,7 @@ export class S3Manager {
 		return this.s3.send(
 			new GetObjectCommand({
 				Bucket: bucket,
-				Key: `${prefix}/${path}`,
+				Key: `${prefix}${path}`,
 			}),
 		)
 	}
@@ -41,7 +41,7 @@ export class S3Manager {
 		return await this.s3.send(
 			new PutObjectCommand({
 				Bucket: bucket,
-				Key: `${prefix}/${path}`,
+				Key: `${prefix}${path}`,
 				Body: body,
 				ContentType: mime.getType(path) ?? 'application/octet-stream',
 				ACL: 'private',
@@ -56,11 +56,11 @@ export class S3Manager {
 		const response = await this.s3.send(
 			new ListObjectsV2Command({
 				Bucket: bucket,
-				Prefix: prefix + '/',
+				Prefix: prefix,
 				Delimiter: '/',
 			}),
 		)
 
-		return (response.CommonPrefixes ?? []).map(it => it.Prefix!.substring(prefix.length + 1, it.Prefix!.length - 1))
+		return (response.CommonPrefixes ?? []).map(it => it.Prefix!.substring(prefix.length, it.Prefix!.length - 1))
 	}
 }

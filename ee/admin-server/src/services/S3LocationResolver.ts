@@ -26,9 +26,10 @@ export class S3LocationResolver {
 		const replace = (value: string) => (
 			value.replace(ProjectGroupResolver.GROUP_PLACEHOLDER, projectGroup!).replace(S3LocationResolver.PROJECT_PLACEHOLDER, project ?? '')
 		)
+		const prefix = normalizePath(replace(this.prefix))
 		return {
 			bucket: replace(this.bucket),
-			prefix: normalizePath(replace(this.prefix)),
+			prefix: prefix ? prefix + '/' : '',
 		}
 	}
 }

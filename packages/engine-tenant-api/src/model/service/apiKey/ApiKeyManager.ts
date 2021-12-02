@@ -11,15 +11,18 @@ import { ApiKeyByTokenQuery } from '../../queries'
 import { Response, ResponseError, ResponseOk } from '../../utils/Response'
 import { DatabaseContext } from '../../utils'
 import { ApiKeyService, CreateApiKeyResponse } from './ApiKeyService'
+import assert from 'assert'
 
 export class ApiKeyManager {
 	constructor(
-		private readonly dbContext: DatabaseContext,
 		private readonly apiKeyService: ApiKeyService,
 	) {}
 
-	async verifyAndProlong(token: string): Promise<VerifyResponse> {
-		const apiKeyRow = await this.dbContext.queryHandler.fetch(new ApiKeyByTokenQuery(token))
+	async verifyAndProlong(
+		dbContext: DatabaseContext,
+		token: string,
+	): Promise<VerifyResponse> {
+		const apiKeyRow = await dbContext.queryHandler.fetch(new ApiKeyByTokenQuery(token))
 		if (apiKeyRow === null) {
 			return new ResponseError(VerifyErrorCode.NOT_FOUND, 'API key was not found')
 		}
@@ -37,7 +40,7 @@ export class ApiKeyManager {
 		}
 
 		setImmediate(async () => {
-			await this.dbContext.commandBus.execute(
+			await dbContext.commandBus.execute(
 				new ProlongApiKeyCommand(apiKeyRow.id, apiKeyRow.type, apiKeyRow.expiration || undefined),
 			)
 		})
@@ -45,32 +48,46 @@ export class ApiKeyManager {
 		return new ResponseOk(new VerifyResult(apiKeyRow.identity_id, apiKeyRow.id, apiKeyRow.roles))
 	}
 
-	async createSessionApiKey(identityId: string, expiration?: number): Promise<string> {
-		return (
-			await this.dbContext.commandBus.execute(new CreateApiKeyCommand(ApiKey.Type.SESSION, identityId, expiration))
-		).token
+	async createSessionApiKey(dbContext: DatabaseContext, identityId: string, expiration?: number): Promise<string> {
+		const command = new CreateApiKeyCommand({ type: ApiKey.Type.SESSION, identityId, expiration })
+		const token = (await dbContext.commandBus.execute(command)).token
+		assert(token !== undefined)
+		return token
 	}
 
 
-	async disableOneOffApiKey(apiKeyId: string): Promise<void> {
-		await this.dbContext.commandBus.execute(new DisableOneOffApiKeyCommand(apiKeyId))
+	async disableOneOffApiKey(dbContext: DatabaseContext, apiKeyId: string): Promise<void> {
+		await dbContext.commandBus.execute(new DisableOneOffApiKeyCommand(apiKeyId))
 	}
 
-	async disableApiKey(apiKeyId: string): Promise<boolean> {
-		return await this.dbContext.commandBus.execute(new DisableApiKeyCommand(apiKeyId))
+	async disableApiKey(dbContext: DatabaseContext, apiKeyId: string): Promise<boolean> {
+		return await dbContext.commandBus.execute(new DisableApiKeyCommand(apiKeyId))
 	}
 
-	async disableIdentityApiKeys(identityId: string): Promise<void> {
-		await this.dbContext.commandBus.execute(new DisableIdentityApiKeysCommand(identityId))
+	async disableIdentityApiKeys(dbContext: DatabaseContext, identityId: string): Promise<void> {
+		await dbContext.commandBus.execute(new DisableIdentityApiKeysCommand(identityId))
+	}
+
+	async createGlobalPermanentApiKey(
+		dbContext: DatabaseContext,
+		description: string,
+		roles: readonly string[],
+		tokenHash?: string,
+	): Promise<CreateApiKeyResponse> {
+		return await dbContext.transaction(async db => {
+			return await this.apiKeyService.createPermanentApiKey(db, description, roles, tokenHash)
+		})
 	}
 
 	async createProjectPermanentApiKey(
+		dbContext: DatabaseContext,
 		projectId: string,
 		memberships: readonly Membership[],
 		description: string,
+		tokenHash?: string,
 	): Promise<CreateApiKeyResponse> {
-		return await this.dbContext.transaction(async db => {
-			return await this.apiKeyService.createProjectPermanentApiKey(db, projectId, memberships, description)
+		return await dbContext.transaction(async db => {
+			return await this.apiKeyService.createProjectPermanentApiKey(db, projectId, memberships, description, tokenHash)
 		})
 	}
 

@@ -19,6 +19,7 @@ export class SignInMutationResolver implements MutationResolvers {
 		})
 
 		const response = await this.signInManager.signIn(
+			context.db,
 			args.email,
 			args.password,
 			args.expiration || undefined,
@@ -30,11 +31,14 @@ export class SignInMutationResolver implements MutationResolvers {
 		}
 		const result = response.result
 		const identityId = result.person.identity_id
-		const permissionContext = this.permissionContextFactory.create({ id: identityId, roles: result.person.roles })
+		const permissionContext = this.permissionContextFactory.create(context.projectGroup, { id: identityId, roles: result.person.roles })
 		const projects = await this.identityTypeResolver.projects(
 			{ id: identityId, projects: [] },
 			{},
-			createResolverContext(permissionContext, context.apiKeyId),
+			{
+				...context,
+				...createResolverContext(permissionContext, context.apiKeyId),
+			},
 		)
 		return {
 			ok: true,

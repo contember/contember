@@ -1,4 +1,5 @@
 import { Schema } from '@contember/schema'
+import { DatabaseContext } from '../utils'
 
 export interface Project {
 	readonly id: string
@@ -7,14 +8,21 @@ export interface Project {
 	readonly config: Record<string, unknown>
 }
 
+export interface ProjectGroup {
+	slug: string | undefined
+	database: DatabaseContext
+}
+
+
 export interface ProjectWithSecrets extends Project {
 	readonly secrets: Record<string, string>
 	readonly updatedAt: Date
 }
 
 export interface ProjectSchemaResolver {
-	getSchema(projectSlug: string): Promise<Schema | undefined>
+	getSchema(projectGroup: ProjectGroup, projectSlug: string): Promise<Schema | undefined>
 }
+
 export interface ProjectInitializer {
-	initializeProject(project: ProjectWithSecrets): Promise<{ log: string[] }>
+	initializeProject(projectGroup: ProjectGroup, project: ProjectWithSecrets): Promise<void>
 }

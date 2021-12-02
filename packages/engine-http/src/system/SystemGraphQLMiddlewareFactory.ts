@@ -10,13 +10,18 @@ import { KoaContext, KoaMiddleware } from '../koa'
 import { flattenVariables } from '@contember/engine-content-api'
 import { ProjectMemberMiddlewareState, ProjectResolveMiddlewareState } from '../project-common'
 import { AuthMiddlewareState } from '../common'
-import { createDbQueriesListener } from '../graphql/dbQueriesListener'
-import { createGraphQLQueryHandler, GraphQLListener } from '../graphql/execution'
+import {
+	createDbQueriesListener,
+	createErrorListener,
+	createGraphQLQueryHandler,
+	createGraphqlRequestInfoProviderListener,
+	ErrorLogger,
+	GraphQLKoaState,
+	GraphQLListener,
+} from '../graphql'
 import { mergeTypeDefs } from '@graphql-tools/merge'
 import { DocumentNode } from 'graphql'
 import { makeExecutableSchema } from '@graphql-tools/schema'
-import { createErrorListener, ErrorLogger } from '../graphql/errors'
-import { createGraphqlRequestInfoProviderListener, GraphQLKoaState } from '../graphql/state'
 
 type KoaState = AuthMiddlewareState & ProjectMemberMiddlewareState & ProjectResolveMiddlewareState & GraphQLKoaState
 

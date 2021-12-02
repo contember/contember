@@ -96,6 +96,7 @@ class ResolverFactory {
 				removeProjectMember: this.resolvers.removeProjectMemberMutationResolver.removeProjectMember.bind(this.resolvers.updateProjectMemberMutationResolver),
 
 				createApiKey: this.resolvers.createApiKeyMutationResolver.createApiKey.bind(this.resolvers.createApiKeyMutationResolver),
+				createGlobalApiKey: this.resolvers.createApiKeyMutationResolver.createGlobalApiKey.bind(this.resolvers.createApiKeyMutationResolver),
 				disableApiKey: this.resolvers.disableApiKeyMutationResolver.disableApiKey.bind(this.resolvers.disableApiKeyMutationResolver),
 
 				prepareOtp: this.resolvers.otpMutationResolver.prepareOtp.bind(this.resolvers.otpMutationResolver),

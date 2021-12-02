@@ -13,14 +13,14 @@ export class UserMailer {
 	constructor(
 		private readonly mailer: Mailer,
 		private readonly templateRenderer: TemplateRenderer,
-		private readonly dbContext: DatabaseContext,
 	) {}
 
 	async sendNewUserInvitedMail(
+		dbContext: DatabaseContext,
 		mailArguments: { email: string; password: string; project: string },
 		customMailOptions: { projectId: string; variant: string },
 	): Promise<void> {
-		const template = (await this.getCustomTemplate({ type: MailType.newUserInvited, ...customMailOptions })) || {
+		const template = (await this.getCustomTemplate(dbContext, { type: MailType.newUserInvited, ...customMailOptions })) || {
 			subject: 'You have been invited to {{project}}',
 			content: NewUserInvited,
 		}
@@ -28,10 +28,11 @@ export class UserMailer {
 	}
 
 	async sendExistingUserInvitedEmail(
+		dbContext: DatabaseContext,
 		mailArguments: { email: string; project: string },
 		customMailOptions: { projectId: string; variant: string },
 	): Promise<void> {
-		const template = (await this.getCustomTemplate({ type: MailType.existingUserInvited, ...customMailOptions })) || {
+		const template = (await this.getCustomTemplate(dbContext, { type: MailType.existingUserInvited, ...customMailOptions })) || {
 			subject: 'You have been invited to {{project}}',
 			content: ExistingUserInvited,
 		}
@@ -39,10 +40,11 @@ export class UserMailer {
 	}
 
 	async sendPasswordResetEmail(
+		dbContext: DatabaseContext,
 		mailArguments: { email: string; token: string; project?: string },
 		customMailOptions: { projectId?: string; variant: string },
 	): Promise<void> {
-		const template = (await this.getCustomTemplate({ type: MailType.passwordReset, ...customMailOptions })) || {
+		const template = (await this.getCustomTemplate(dbContext, { type: MailType.passwordReset, ...customMailOptions })) || {
 			subject: 'Password reset',
 			content: PasswordReset,
 		}
@@ -62,12 +64,13 @@ export class UserMailer {
 	}
 
 	private async getCustomTemplate(
+		dbContext: DatabaseContext,
 		identifier: SomeOptional<MailTemplateIdentifier, 'projectId'>,
 	): Promise<Pick<MailTemplateData, 'subject' | 'content'> | null> {
 		if (!identifier.projectId) {
 			return null
 		}
-		const customTemplate = await this.dbContext.queryHandler.fetch(
+		const customTemplate = await dbContext.queryHandler.fetch(
 			new MailTemplateQuery(identifier.projectId, identifier.type, identifier.variant),
 		)
 		if (!customTemplate) {

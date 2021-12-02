@@ -1,6 +1,5 @@
-import { InvalidIDPConfigurationError } from './InvalidIDPConfigurationError'
-import { hasStringProperty, isObject } from '@contember/engine-common'
-import { Client, errors, generators, Issuer, custom, ResponseType } from 'openid-client'
+import { Typesafe } from '@contember/engine-common'
+import { Client, custom, errors, generators, Issuer, ResponseType } from 'openid-client'
 import { IDPResponseError } from './IDPResponseError'
 import { IdentityProvider, IDPClaim, IDPResponse, InitIDPAuthResult } from './IdentityProvider'
 import { IDPValidationError } from './IDPValidationError'
@@ -9,17 +8,23 @@ custom.setHttpOptionsDefaults({
 	timeout: 5000,
 })
 
-export interface OIDCConfiguration {
-	url: string
-	clientId: string
-	clientSecret: string
-	responseType?: ResponseType
-}
+export type OIDCConfiguration = ReturnType<typeof OIDCConfigurationSchema>
 
 export interface SessionData {
 	nonce: string
 	state: string
 }
+
+const OIDCConfigurationSchema = Typesafe.intersection(
+	Typesafe.object({
+		url: Typesafe.string,
+		clientId: Typesafe.string,
+		clientSecret: Typesafe.string,
+	}),
+	Typesafe.partial({
+		responseType: Typesafe.enumeration<ResponseType>('code', 'code id_token', 'code id_token token', 'code token', 'id_token', 'id_token token', 'none'),
+	}),
+)
 
 export class OIDCProvider implements IdentityProvider<SessionData, OIDCConfiguration> {
 	private issuerCache: Record<string, Issuer<Client>> = {}
@@ -72,22 +77,7 @@ export class OIDCProvider implements IdentityProvider<SessionData, OIDCConfigura
 	}
 
 	public validateConfiguration(config: unknown): OIDCConfiguration {
-		if (!isObject(config)) {
-			throw new InvalidIDPConfigurationError('Configuration must be an object')
-		}
-		if (!hasStringProperty(config, 'url')) {
-			throw new InvalidIDPConfigurationError('url must be a string')
-		}
-		if (!hasStringProperty(config, 'clientId')) {
-			throw new InvalidIDPConfigurationError('clientId must be a string')
-		}
-		if (!hasStringProperty(config, 'clientSecret')) {
-			throw new InvalidIDPConfigurationError('clientSecret must be a string')
-		}
-		if (config.responseType && !hasStringProperty(config, 'clientId')) {
-			throw new InvalidIDPConfigurationError('responseType must be a string')
-		}
-		return config
+		return OIDCConfigurationSchema(config)
 	}
 
 	private async createOIDCClient(configuration: OIDCConfiguration): Promise<Client> {

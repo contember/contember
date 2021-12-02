@@ -13,7 +13,7 @@ export class ProjectMembersQueryResolver implements QueryResolvers {
 		args: QueryProjectMembershipsArgs,
 		context: ResolverContext,
 	): Promise<readonly Membership[]> {
-		const project = await this.projectManager.getProjectBySlug(args.projectSlug)
+		const project = await this.projectManager.getProjectBySlug(context.db, args.projectSlug)
 		const projectScope = await context.permissionContext.createProjectScope(project)
 		if (
 			!project ||
@@ -26,6 +26,6 @@ export class ProjectMembersQueryResolver implements QueryResolvers {
 		}
 		const verifier = context.permissionContext.createAccessVerifier(projectScope)
 
-		return await this.projectMemberManager.getProjectMemberships({ id: project.id }, { id: args.identityId }, verifier)
+		return await this.projectMemberManager.getProjectMemberships(context.db, { id: project.id }, { id: args.identityId }, verifier)
 	}
 }

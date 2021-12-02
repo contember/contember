@@ -1,6 +1,11 @@
 import { KoaMiddleware } from '../koa'
 
 type EventTime = { label: string; start: number; duration?: number }
+
+export interface TimerMiddlewareState {
+	timer: <T>(event: string, cb?: () => T) => Promise<T>
+}
+
 export const createTimerMiddleware = (): KoaMiddleware<TimerMiddlewareState> => {
 	const timer: KoaMiddleware<TimerMiddlewareState> = async (ctx, next) => {
 		const times: EventTime[] = []
@@ -31,8 +36,4 @@ export const createTimerMiddleware = (): KoaMiddleware<TimerMiddlewareState> => 
 		)
 	}
 	return timer
-}
-
-export interface TimerMiddlewareState {
-	timer: <T>(event: string, cb?: () => T) => Promise<T>
 }

@@ -1,5 +1,4 @@
 export * from './ContentQueryHandlerFactory'
-export * from './ContentMiddleware'
 export * from './ContentSchemaResolver'
 export * from './ContentServerMiddleware'
 export * from './ContentQueryHandlerProvider'

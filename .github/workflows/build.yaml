@@ -35,8 +35,8 @@ jobs:
         run: yarn run eslint:lint
       - name: "Build app"
         run: yarn run build
-      - name: Get the version
-        run: echo "CONTEMBER_TENANT_MIGRATIONS_DIR=`pwd`/packages/engine-tenant-api/migrations" >> $GITHUB_ENV
+      - name: Fill env
+        run: echo "CONTEMBER_TENANT_MIGRATIONS_DIR=`pwd`/packages/engine-tenant-api/src/migrations" >> $GITHUB_ENV
       - name: "Run tests"
         run: yarn run test
         env:

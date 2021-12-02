@@ -15,7 +15,6 @@ import { createErrorResponse } from '../../errorUtils'
 export class ChangePasswordMutationResolver implements MutationResolvers {
 	constructor(
 		private readonly passwordChangeManager: PasswordChangeManager,
-		private readonly dbContext: DatabaseContext,
 	) {}
 
 	async changePassword(
@@ -24,7 +23,7 @@ export class ChangePasswordMutationResolver implements MutationResolvers {
 		context: ResolverContext,
 		info: GraphQLResolveInfo,
 	): Promise<ChangePasswordResponse> {
-		const person = await this.dbContext.queryHandler.fetch(PersonQuery.byId(args.personId))
+		const person = await context.db.queryHandler.fetch(PersonQuery.byId(args.personId))
 		if (!person) {
 			return createErrorResponse(ChangePasswordErrorCode.PersonNotFound, 'Person not found')
 		}
@@ -34,7 +33,7 @@ export class ChangePasswordMutationResolver implements MutationResolvers {
 			action: PermissionActions.PERSON_CHANGE_PASSWORD,
 			message: 'You are not allowed to change password',
 		})
-		const result = await this.passwordChangeManager.changePassword(args.personId, args.password)
+		const result = await this.passwordChangeManager.changePassword(context.db, args.personId, args.password)
 
 		if (!result.ok) {
 			return createErrorResponse(result.error, result.errorMessage)
@@ -49,7 +48,7 @@ export class ChangePasswordMutationResolver implements MutationResolvers {
 		context: ResolverContext,
 		info: GraphQLResolveInfo,
 	): Promise<ChangeMyPasswordResponse> {
-		const person = await this.dbContext.queryHandler.fetch(PersonQuery.byIdentity(context.identity.id))
+		const person = await context.db.queryHandler.fetch(PersonQuery.byIdentity(context.identity.id))
 		if (!person) {
 			return createErrorResponse(ChangeMyPasswordErrorCode.NotAPerson, 'Only a person can change a password')
 		}
@@ -57,7 +56,7 @@ export class ChangePasswordMutationResolver implements MutationResolvers {
 			action: PermissionActions.PERSON_CHANGE_MY_PASSWORD,
 			message: 'You are not allowed to change password',
 		})
-		const result = await this.passwordChangeManager.changeMyPassword(person, args.currentPassword, args.newPassword)
+		const result = await this.passwordChangeManager.changeMyPassword(context.db, person, args.currentPassword, args.newPassword)
 
 		if (!result.ok) {
 			return createErrorResponse(result.error, result.errorMessage)

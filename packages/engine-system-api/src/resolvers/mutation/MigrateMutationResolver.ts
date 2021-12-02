@@ -3,7 +3,7 @@ import { ResolverContext } from '../ResolverContext'
 import { MutationResolver } from '../Resolver'
 import { MigrateResponse, MutationMigrateArgs } from '../../schema'
 import { Migration } from '@contember/schema-migrations'
-import { AuthorizationActions, createStageTree, MigrationError, ProjectMigrator } from '../../model'
+import { AuthorizationActions, MigrationError, ProjectMigrator } from '../../model'
 
 export class MigrateMutationResolver implements MutationResolver<'migrate'> {
 	constructor(private readonly projectMigrator: ProjectMigrator) {}
@@ -24,8 +24,9 @@ export class MigrateMutationResolver implements MutationResolver<'migrate'> {
 		info: GraphQLResolveInfo,
 		force = false,
 	): Promise<MigrateResponse> {
-		const rootStageSlug = createStageTree(context.project).getRoot().slug
-		await context.requireAccess(AuthorizationActions.PROJECT_MIGRATE, rootStageSlug)
+		for (const stage of context.project.stages) {
+			await context.requireAccess(AuthorizationActions.PROJECT_MIGRATE, stage.slug)
+		}
 		const migrations = args.migrations as readonly Migration[]
 
 		return context.db.transaction(async trx => {

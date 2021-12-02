@@ -35,6 +35,7 @@ namespace PermissionActions {
 	export const PROJECT_UPDATE_MEMBER = (memberships: readonly Membership[]) => Authorizator.createAction(Resources.project, 'updateMember', { memberships })
 
 	export const API_KEY_CREATE = Authorizator.createAction(Resources.apiKey, 'create')
+	export const API_KEY_CREATE_GLOBAL = Authorizator.createAction(Resources.apiKey, 'createGlobal')
 	export const API_KEY_DISABLE = Authorizator.createAction(Resources.apiKey, 'disable')
 
 	export const MAIL_TEMPLATE_ADD = Authorizator.createAction(Resources.mailTemplate, 'add')

@@ -1,7 +1,7 @@
 import {
 	CreateApiKeyErrorCode,
 	CreateApiKeyResponse,
-	MutationCreateApiKeyArgs,
+	MutationCreateApiKeyArgs, MutationCreateGlobalApiKeyArgs,
 	MutationResolvers,
 } from '../../../schema'
 import { GraphQLResolveInfo } from 'graphql'
@@ -19,11 +19,11 @@ export class CreateApiKeyMutationResolver implements MutationResolvers {
 
 	async createApiKey(
 		parent: any,
-		{ projectSlug, memberships, description }: MutationCreateApiKeyArgs,
+		{ projectSlug, memberships, description, tokenHash }: MutationCreateApiKeyArgs,
 		context: ResolverContext,
 		info: GraphQLResolveInfo,
 	): Promise<CreateApiKeyResponse> {
-		const project = await this.projectManager.getProjectBySlug(projectSlug)
+		const project = await this.projectManager.getProjectBySlug(context.db, projectSlug)
 		await context.requireAccess({
 			scope: await context.permissionContext.createProjectScope(project),
 			action: PermissionActions.API_KEY_CREATE,
@@ -33,7 +33,7 @@ export class CreateApiKeyMutationResolver implements MutationResolvers {
 			return createProjectNotFoundResponse(CreateApiKeyErrorCode.ProjectNotFound, projectSlug)
 		}
 
-		const validationResult = await this.membershipValidator.validate(project.slug, memberships)
+		const validationResult = await this.membershipValidator.validate(context.projectGroup, project.slug, memberships)
 		if (validationResult.length > 0) {
 			const errors = createMembershipValidationErrorResult<CreateApiKeyErrorCode>(validationResult)
 			return {
@@ -43,8 +43,28 @@ export class CreateApiKeyMutationResolver implements MutationResolvers {
 			}
 		}
 
-		const result = await this.apiKeyManager.createProjectPermanentApiKey(project.id, memberships, description)
+		const result = await this.apiKeyManager.createProjectPermanentApiKey(context.db, project.id, memberships, description, tokenHash ?? undefined)
 
+		return {
+			ok: true,
+			errors: [],
+			result: {
+				apiKey: result.result.toApiKeyWithToken(),
+			},
+		}
+	}
+
+	async createGlobalApiKey(
+		parent: any,
+		{ roles, description, tokenHash }: MutationCreateGlobalApiKeyArgs,
+		context: ResolverContext,
+		info: GraphQLResolveInfo,
+	): Promise<CreateApiKeyResponse> {
+		await context.requireAccess({
+			action: PermissionActions.API_KEY_CREATE_GLOBAL,
+			message: 'You are not allowed to create a global API key',
+		})
+		const result = await this.apiKeyManager.createGlobalPermanentApiKey(context.db, description, roles ?? [], tokenHash ?? undefined)
 		return {
 			ok: true,
 			errors: [],

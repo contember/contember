@@ -96,7 +96,7 @@ const resolveParametersInternal = (
 	if (typeof data === 'object') {
 		return Object.entries(data)
 			.map(([key, value]: [string, any]) => [key, resolveParametersInternal(value, [...path, key], parametersResolver)])
-			.reduce((result, [key, value]) => ({ ...result, [key]: value }), {})
+			.reduce((result, [key, value]) => value === undefined ? result : ({ ...result, [key]: value }), {})
 	}
 	return data
 }

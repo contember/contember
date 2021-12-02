@@ -4,10 +4,10 @@ import { ApiKeyManager, DatabaseContext, PermissionActions, PersonQuery } from '
 import { createErrorResponse } from '../../errorUtils'
 
 export class SignOutMutationResolver implements MutationResolvers {
-	constructor(private readonly apiKeyManager: ApiKeyManager, private readonly dbContext: DatabaseContext) {}
+	constructor(private readonly apiKeyManager: ApiKeyManager) {}
 
 	async signOut(parent: any, args: MutationSignOutArgs, context: ResolverContext): Promise<SignOutResponse> {
-		const person = await this.dbContext.queryHandler.fetch(PersonQuery.byIdentity(context.identity.id))
+		const person = await context.db.queryHandler.fetch(PersonQuery.byIdentity(context.identity.id))
 		if (!person) {
 			return createErrorResponse(SignOutErrorCode.NotAPerson, 'Only a person can sign out')
 		}
@@ -18,9 +18,9 @@ export class SignOutMutationResolver implements MutationResolvers {
 		})
 
 		if (args.all) {
-			await this.apiKeyManager.disableIdentityApiKeys(context.identity.id)
+			await this.apiKeyManager.disableIdentityApiKeys(context.db, context.identity.id)
 		} else {
-			await this.apiKeyManager.disableApiKey(context.apiKeyId)
+			await this.apiKeyManager.disableApiKey(context.db, context.apiKeyId)
 		}
 		return { ok: true, errors: [] }
 	}

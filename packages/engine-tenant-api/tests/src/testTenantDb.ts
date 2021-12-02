@@ -1,14 +1,14 @@
 import { GraphQLTestQuery } from '../cases/integration/mocked/gql/types'
 import { testUuid } from './testUuid'
 import {
+	computeTokenHash,
 	CreateProjectCommand,
-	createResolverContext,
-	PermissionContext,
+	createResolverContext, DatabaseContext, MigrationsRunnerFactory,
+	PermissionContext, ProjectGroup,
 	ProjectSchemaResolver,
 	ResolverContext,
 	StaticIdentity,
 	TenantContainerFactory,
-	TenantMigrationArgs,
 	typeDefs,
 } from '../../src'
 import { Buffer } from 'buffer'
@@ -22,6 +22,7 @@ import { Membership } from '../../src/model/type/Membership'
 import { Connection } from '@contember/database'
 import * as uvu from 'uvu'
 import * as assert from 'uvu/assert'
+import { TenantMigrationArgs } from '../../src/migrations'
 
 export interface TenantTest {
 	query: GraphQLTestQuery
@@ -98,10 +99,6 @@ export const createTenantTester = async (): Promise<TenantTester> => {
 	const credentials = dbCredentials(dbName)
 	const conn = await recreateDatabase(dbName)
 	await conn.end()
-	const getMigrations = (await import(process.env.CONTEMBER_TENANT_MIGRATIONS_DIR || '../../migrations')).default
-	const migrationsRunner = new MigrationsRunner(credentials, 'tenant', getMigrations)
-
-	let counter = 0
 	const providers = {
 		bcrypt: (value: string) => Promise.resolve('BCRYPTED-' + value),
 		bcryptCompare: (data: string, hash: string) => Promise.resolve('BCRYPTED-' + data === hash),
@@ -114,27 +111,31 @@ export const createTenantTester = async (): Promise<TenantTester> => {
 		encrypt: () => {
 			throw new Error('not supported')
 		},
+		hash: (value: any) => Buffer.from(value.toString()),
 	}
 
-	await migrationsRunner.migrate<TenantMigrationArgs>(() => {}, {
-		credentials: {
-			rootToken: process.env.CONTEMBER_ROOT_TOKEN,
-		},
-		providers,
-	})
+	const migrationsRunnerFactory = new MigrationsRunnerFactory(credentials, {
+		rootToken: process.env.CONTEMBER_ROOT_TOKEN,
+	}, providers)
+	let counter = 0
+	const migrationsRunner = migrationsRunnerFactory.create('tenant')
+
+	await migrationsRunner.run(() => null)
 	const mailer = createMockedMailer()
-	const tenantContainer = new TenantContainerFactory(credentials, {})
+	const tenantContainer = new TenantContainerFactory(credentials, {}, {})
 		.createBuilder({
 			providers,
 			projectSchemaResolver,
 			projectInitializer: {
-				initializeProject: () => Promise.resolve({ log: [] }),
+				initializeProject: () => Promise.resolve(),
 			},
 		})
 		.replaceService('mailer', () => mailer)
 		.build()
 
-	await tenantContainer.dbContext.commandBus.execute(new CreateProjectCommand({
+	const dbContext = new DatabaseContext(tenantContainer.db, tenantContainer.providers)
+
+	await dbContext.commandBus.execute(new CreateProjectCommand({
 		slug: 'blog',
 		name: 'blog',
 		config: {},
@@ -147,19 +148,28 @@ export const createTenantTester = async (): Promise<TenantTester> => {
 			requireResolversForResolveType: 'ignore',
 		},
 	})
+	const projectGroup: ProjectGroup = {
+		database: dbContext,
+		slug: undefined,
+	}
 
 	return {
 		async execute(query: GraphQLTestQuery, options: TenantTestOptions = {}): Promise<any> {
-			const context: ResolverContext = createResolverContext(
-				new PermissionContext(
-					new StaticIdentity(authenticatedIdentityId, options.roles || [], {
-						blog: [options.membership || { role: 'admin', variables: [] }],
-					}),
-					tenantContainer.authorizator,
-					tenantContainer.projectScopeFactory,
+			const context: ResolverContext = {
+				...createResolverContext(
+					new PermissionContext(
+						new StaticIdentity(authenticatedIdentityId, options.roles || [], {
+							blog: [options.membership || { role: 'admin', variables: [] }],
+						}),
+						tenantContainer.authorizator,
+						tenantContainer.projectScopeFactory,
+						projectGroup,
+					),
+					authenticatedApiKeyId,
 				),
-				authenticatedApiKeyId,
-			)
+				projectGroup,
+				db: dbContext,
+			}
 			const result = await graphql(
 				schema,
 				typeof query === 'string' ? query : query.query,

@@ -27,7 +27,7 @@ export class IDPMutationResolver implements MutationResolvers {
 			action: PermissionActions.PERSON_CREATE_IDP_URL,
 			message: 'You are not allowed to create a redirect URL for IDP',
 		})
-		const result = await this.idpSignInManager.initSignInIDP(args.identityProvider, args.redirectUrl)
+		const result = await this.idpSignInManager.initSignInIDP(context.db, args.identityProvider, args.redirectUrl)
 		if (!result.ok) {
 			return createErrorResponse(result.error, result.errorMessage)
 		}
@@ -40,6 +40,7 @@ export class IDPMutationResolver implements MutationResolvers {
 			message: 'You are not allowed to person IDP sign in',
 		})
 		const signIn = await this.idpSignInManager.signInIDP(
+			context.db,
 			args.identityProvider,
 			args.redirectUrl,
 			args.idpResponse,
@@ -51,11 +52,14 @@ export class IDPMutationResolver implements MutationResolvers {
 		}
 		const result = signIn.result
 		const identityId = result.person.identity_id
-		const permissionContext = this.permissionContextFactory.create({ id: identityId, roles: result.person.roles })
+		const permissionContext = this.permissionContextFactory.create(context.projectGroup, { id: identityId, roles: result.person.roles })
 		const projects = await this.identityTypeResolver.projects(
 			{ id: identityId, projects: [] },
 			{},
-			createResolverContext(permissionContext, context.apiKeyId),
+			{
+				...context,
+				...createResolverContext(permissionContext, context.apiKeyId),
+			},
 		)
 		return {
 			ok: true,

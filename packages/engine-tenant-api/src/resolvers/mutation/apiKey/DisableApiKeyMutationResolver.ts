@@ -23,7 +23,7 @@ export class DisableApiKeyMutationResolver implements MutationResolvers {
 			message: 'You are not allowed to disable api key',
 		})
 
-		const result = await this.apiKeyManager.disableApiKey(id)
+		const result = await this.apiKeyManager.disableApiKey(context.db, id)
 
 		if (!result) {
 			return createErrorResponse(DisableApiKeyErrorCode.KeyNotFound, 'API key not found')

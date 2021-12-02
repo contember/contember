@@ -8,23 +8,34 @@ import { Response, ResponseOk } from '../../utils/Response'
 import { ApiKeyWithToken } from '../../../schema'
 
 export class ApiKeyService {
+	async createPermanentApiKey(
+		db: DatabaseContext,
+		description: string,
+		roles: readonly string[] = [],
+		tokenHash?: string,
+	) {
+		const identityId = await db.commandBus.execute(new CreateIdentityCommand(roles, description))
+		const apiKeyResult = await db.commandBus.execute(new CreateApiKeyCommand({ type: ApiKey.Type.PERMANENT, identityId, tokenHash }))
+
+		return new ResponseOk(new CreateApiKeyResult({ id: identityId, description }, apiKeyResult))
+	}
+
 	async createProjectPermanentApiKey(
 		db: DatabaseContext,
 		projectId: string,
 		memberships: readonly Membership[],
 		description: string,
+		tokenHash?: string,
 	) {
-		const identityId = await db.commandBus.execute(new CreateIdentityCommand([], description))
-		const apiKeyResult = await db.commandBus.execute(new CreateApiKeyCommand(ApiKey.Type.PERMANENT, identityId))
+		const response = await this.createPermanentApiKey(db, description, [], tokenHash)
 
 		const addMemberResult = await db.commandBus.execute(
-			new AddProjectMemberCommand(projectId, identityId, createSetMembershipVariables(memberships)),
+			new AddProjectMemberCommand(projectId, response.result.identity.id, createSetMembershipVariables(memberships)),
 		)
 		if (!addMemberResult.ok) {
 			throw new ImplementationException()
 		}
-
-		return new ResponseOk(new CreateApiKeyResult({ id: identityId, description }, apiKeyResult))
+		return response
 	}
 }
 
@@ -32,7 +43,7 @@ export class ApiKeyService {
 export type CreateApiKeyResponse = Response<CreateApiKeyResult, never>
 
 export class CreateApiKeyResult {
-	constructor(public readonly identity: {id: string; description?: string}, public readonly apiKey: { id: string; token: string }) {
+	constructor(public readonly identity: {id: string; description?: string}, public readonly apiKey: { id: string; token?: string }) {
 	}
 
 	toApiKeyWithToken(): ApiKeyWithToken {

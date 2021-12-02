@@ -1,32 +1,43 @@
 import { KoaMiddleware, KoaRequestState } from '../koa'
-import { ProjectContainer } from '../ProjectContainer'
+import { ProjectContainer, ProjectContainerResolver } from '../ProjectContainer'
 import { ProjectConfig } from '../ProjectConfig'
-import { ErrorResponseMiddlewareState } from '../common'
-import { ProjectContainerResolverState, ProvidersState } from '../services'
+import { AuthMiddlewareState, ErrorFactory } from '../common'
+import { ProjectGroupState } from './ProjectGroupMiddleware'
+
+type InputKoaState =
+	& KoaRequestState
+	& AuthMiddlewareState
+	& ProjectGroupState
 
 type KoaState =
+	& InputKoaState
 	& ProjectResolveMiddlewareState
-	& KoaRequestState
-	& ErrorResponseMiddlewareState
-	& ProvidersState
-	& ProjectContainerResolverState
-
-export const createProjectResolveMiddleware = () => {
-	const projectResolve: KoaMiddleware<KoaState> = async (ctx, next) => {
-		const projectSlug = ctx.state.params.projectSlug
-		const projectContainer = await ctx.state.projectContainerResolver(projectSlug, true)
-
-		if (projectContainer === undefined) {
-			return ctx.state.fail.projectNotFound(projectSlug)
-		}
-		ctx.state.projectContainer = projectContainer
-		ctx.state.project = projectContainer.project
-		await next()
-	}
-	return projectResolve
-}
 
 export interface ProjectResolveMiddlewareState {
 	project: ProjectConfig
 	projectContainer: ProjectContainer
+}
+
+export class ProjectResolveMiddlewareFactory {
+	constructor(
+		private readonly projectContainerResolver: ProjectContainerResolver,
+		private readonly errorFactory: ErrorFactory,
+	) {
+	}
+
+	public create(): KoaMiddleware<KoaState> {
+		const projectResolve: KoaMiddleware<KoaState> = async (ctx, next) => {
+			const projectSlug = ctx.state.params.projectSlug
+			const projectContainer = await this.projectContainerResolver.getProjectContainer(ctx.state.projectGroup, projectSlug, true)
+
+			if (projectContainer === undefined) {
+				return this.errorFactory.createError(ctx, `Project ${projectSlug} NOT found`, 404)
+			}
+			ctx.state.projectContainer = projectContainer
+			ctx.state.project = projectContainer.project
+			await next()
+		}
+		return projectResolve
+
+	}
 }

@@ -1,15 +1,16 @@
 import { ConfigProcessor, ConfigTemplate, ConfigTemplateContext } from '@contember/engine-plugins'
-import { isObject, typeConfigError, hasStringProperty } from '@contember/engine-common'
-import { ProjectWithVimeoConfig, VimeoConfig } from './Config'
+import { Typesafe } from '@contember/engine-common'
+import { ProjectWithVimeoConfig, vimeoConfigSchema } from './Config'
 
 export class VimeoConfigProcessor implements ConfigProcessor<ProjectWithVimeoConfig> {
-	processProjectConfig<C>(slug: string, config: C & ProjectWithVimeoConfig): C & ProjectWithVimeoConfig {
-		return {
-			...config,
-			vimeo: checkVimeoConfig(config.vimeo, `projects.${slug}.vimeo`),
-		}
+	getProjectConfigSchema?(slug: string): Typesafe.Type<Record<string, any>> {
+		return Typesafe.union(
+			(input, path = []) => Typesafe.valueAt(input, ['vimeo', 'token']) === undefined ? {} : Typesafe.fail(path),
+			Typesafe.object({
+				vimeo: vimeoConfigSchema,
+			}),
+		)
 	}
-
 	prepareConfigTemplate(template: ConfigTemplate, { env }: ConfigTemplateContext) {
 		return {
 			...template,
@@ -18,20 +19,4 @@ export class VimeoConfigProcessor implements ConfigProcessor<ProjectWithVimeoCon
 			},
 		}
 	}
-}
-
-function checkVimeoConfig(json: unknown, path: string): VimeoConfig | undefined {
-	if (json === undefined) {
-		return undefined
-	}
-	if (!isObject(json)) {
-		return typeConfigError(path, json, 'object')
-	}
-	if (json.token === undefined) {
-		return undefined
-	}
-	if (!hasStringProperty(json, 'token')) {
-		return typeConfigError(path + '.token', json.token, 'string')
-	}
-	return json
 }

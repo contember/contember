@@ -9,22 +9,19 @@ import {
 } from '../../../schema'
 import { GraphQLResolveInfo } from 'graphql'
 import { ResolverContext } from '../../ResolverContext'
-import { QueryHandler } from '@contember/queryable'
-import { DatabaseQueryable } from '@contember/database'
 import {
 	PasswordResetManager,
-	PermissionActions,
+	PermissionActions, PermissionContextFactory,
 	PersonQuery,
-	ResetPasswordErrorCode,
 	ResetPasswordCommandErrorCode,
-	DatabaseContext,
+	ResetPasswordErrorCode,
 } from '../../../model'
 import { createErrorResponse } from '../../errorUtils'
 
 export class ResetPasswordMutationResolver implements MutationResolvers {
 	constructor(
 		private readonly passwordResetManager: PasswordResetManager,
-		private readonly dbContext: DatabaseContext,
+		private readonly permissionContextFactory: PermissionContextFactory,
 	) {}
 
 	async createResetPasswordRequest(
@@ -37,12 +34,17 @@ export class ResetPasswordMutationResolver implements MutationResolvers {
 			action: PermissionActions.PERSON_RESET_PASSWORD,
 			message: 'You are not allowed to initialize reset password request',
 		})
-		const person = await this.dbContext.queryHandler.fetch(PersonQuery.byEmail(args.email))
+		const person = await context.db.queryHandler.fetch(PersonQuery.byEmail(args.email))
 		if (!person) {
 			return createErrorResponse(CreatePasswordResetRequestErrorCode.PersonNotFound, 'Person was not found.')
 		}
 
-		await this.passwordResetManager.createPasswordResetRequest(person, {
+
+		const permissionContext = await this.permissionContextFactory.create(context.projectGroup, {
+			id: person.identity_id,
+			roles: person.roles,
+		})
+		await this.passwordResetManager.createPasswordResetRequest(context.db, permissionContext, person, {
 			mailVariant: args.options?.mailVariant || undefined,
 			project: args.options?.mailProject || undefined,
 		})
@@ -60,7 +62,7 @@ export class ResetPasswordMutationResolver implements MutationResolvers {
 			message: 'You are not allowed to perform reset password reset',
 		})
 
-		const result = await this.passwordResetManager.resetPassword(args.token, args.password)
+		const result = await this.passwordResetManager.resetPassword(context.db, args.token, args.password)
 		if (result.ok) {
 			return { ok: true, errors: [] }
 		}

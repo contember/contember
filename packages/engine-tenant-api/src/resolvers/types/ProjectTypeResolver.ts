@@ -1,9 +1,14 @@
 import { ProjectIdentityRelation, ProjectMembersArgs, ProjectResolvers } from '../../schema'
 import { ResolverContext } from '../ResolverContext'
-import { ProjectMemberManager } from '../../model/service'
-import { PermissionActions } from '../../model/authorization'
-import { Project, ProjectSchemaResolver, RoleVariablesDefinition, VariableDefinition } from '../../model/type'
-import { getRoleVariables } from '../../model/utils/schemaUtils'
+import {
+	getRoleVariables,
+	PermissionActions,
+	Project,
+	ProjectMemberManager,
+	ProjectSchemaResolver,
+	RoleVariablesDefinition,
+	VariableDefinition,
+} from '../../model'
 
 export class ProjectTypeResolver implements ProjectResolvers {
 	constructor(
@@ -22,15 +27,15 @@ export class ProjectTypeResolver implements ProjectResolvers {
 			return []
 		}
 
-		const members = await this.projectMemberManager.getProjectMembers(parent.id, verifier, args.memberType ?? undefined)
+		const members = await this.projectMemberManager.getProjectMembers(context.db, parent.id, verifier, args.memberType ?? undefined)
 		return members.map(it => ({
 			...it,
 			identity: { ...it.identity, projects: [] },
 		}))
 	}
 
-	async roles(parent: Project) {
-		const schema = await this.projectSchemaResolver.getSchema(parent.slug)
+	async roles(parent: Project, args: unknown, context: ResolverContext) {
+		const schema = await this.projectSchemaResolver.getSchema(context.projectGroup, parent.slug)
 		if (!schema) {
 			return []
 		}

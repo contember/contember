@@ -14,11 +14,11 @@ import { ImplementationException } from '../../../exceptions'
 import { createErrorResponse } from '../../errorUtils'
 
 export class OtpMutationResolver implements MutationResolvers {
-	constructor(private readonly otpManager: OtpManager, private readonly dbContext: DatabaseContext) {}
+	constructor(private readonly otpManager: OtpManager) {}
 
 	async prepareOtp(parent: any, args: MutationPrepareOtpArgs, context: ResolverContext): Promise<PrepareOtpResponse> {
 		const person = await this.getPersonFromContext(context)
-		const otp = await this.otpManager.prepareOtp(person, args.label || 'Contember')
+		const otp = await this.otpManager.prepareOtp(context.db, person, args.label || 'Contember')
 		return {
 			ok: true,
 			result: {
@@ -39,7 +39,7 @@ export class OtpMutationResolver implements MutationResolvers {
 		if (!this.otpManager.verifyOtp(person, args.otpToken)) {
 			return createErrorResponse(ConfirmOtpErrorCode.InvalidOtpToken, 'Provided token is not correct.')
 		}
-		await this.otpManager.confirmOtp(person)
+		await this.otpManager.confirmOtp(context.db, person)
 		return {
 			ok: true,
 			errors: [],
@@ -51,7 +51,7 @@ export class OtpMutationResolver implements MutationResolvers {
 		if (!person.otp_uri) {
 			return createErrorResponse(DisableOtpErrorCode.OtpNotActive, 'OTP is not active, you cannot disable it.')
 		}
-		await this.otpManager.disableOtp(person)
+		await this.otpManager.disableOtp(context.db, person)
 		return {
 			ok: true,
 			errors: [],
@@ -63,7 +63,7 @@ export class OtpMutationResolver implements MutationResolvers {
 			action: PermissionActions.PERSON_SETUP_OTP,
 			message: 'You are not allowed to setup a OTP',
 		})
-		const person = await this.dbContext.queryHandler.fetch(PersonQuery.byIdentity(context.identity.id))
+		const person = await context.db.queryHandler.fetch(PersonQuery.byIdentity(context.identity.id))
 		if (!person) {
 			throw new ImplementationException('Person should exists')
 		}

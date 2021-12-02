@@ -7,25 +7,23 @@ import { Response, ResponseError, ResponseOk } from '../utils/Response'
 import { DatabaseContext } from '../utils'
 
 export class SignUpManager {
-	constructor(private readonly dbContext: DatabaseContext) {}
-
-	async signUp(email: string, password: string, roles: string[] = []): Promise<SignUpResponse> {
-		if (await this.isEmailAlreadyUsed(email)) {
+	async signUp(dbContext: DatabaseContext, email: string, password: string, roles: readonly string[] = []): Promise<SignUpResponse> {
+		if (await this.isEmailAlreadyUsed(dbContext, email)) {
 			return new ResponseError(SignUpErrorCode.EmailAlreadyExists, `User with email ${email} already exists`)
 		}
 		const weakPassword = getPasswordWeaknessMessage(password)
 		if (weakPassword) {
 			return new ResponseError(SignUpErrorCode.TooWeak, weakPassword)
 		}
-		const person = await this.dbContext.transaction(async db => {
+		const person = await dbContext.transaction(async db => {
 			const identityId = await db.commandBus.execute(new CreateIdentityCommand([...roles, TenantRole.PERSON]))
 			return await db.commandBus.execute(new CreatePersonCommand(identityId, email, password))
 		})
 		return new ResponseOk(new SignUpResult(person))
 	}
 
-	private async isEmailAlreadyUsed(email: string): Promise<boolean> {
-		const personOrNull = await this.dbContext.queryHandler.fetch(PersonQuery.byEmail(email))
+	private async isEmailAlreadyUsed(dbContext: DatabaseContext, email: string): Promise<boolean> {
+		const personOrNull = await dbContext.queryHandler.fetch(PersonQuery.byEmail(email))
 		return personOrNull !== null
 	}
 }

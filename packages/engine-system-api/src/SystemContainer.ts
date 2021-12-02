@@ -9,24 +9,16 @@ import {
 import { MigrationsRunner } from '@contember/database-migrations'
 import { DatabaseCredentials } from '@contember/database'
 import {
-	ContentEventsApplier,
-	CreatedRowReferenceDependencyBuilder,
-	DeletedRowReferenceDependencyBuilder,
-	DependencyBuilderList,
-	DiffBuilder,
 	EntitiesSelector,
 	ExecutedMigrationsResolver,
-	HistoryEventResponseBuilder,
 	MigrationAlterer,
 	MigrationExecutor,
 	PermissionsFactory,
 	ProjectInitializer,
 	ProjectMigrator,
 	ProjectTruncateExecutor,
-	SameRowDependencyBuilder,
 	SchemaVersionBuilder,
 	StageCreator,
-	TransactionDependencyBuilder,
 } from './model'
 import { UuidProvider } from './utils'
 import {
@@ -38,8 +30,8 @@ import {
 	TruncateMutationResolver,
 } from './resolvers'
 import { ClientBase } from 'pg'
-import { IdentityFetcher } from './model/dependencies/tenant/IdentityFetcher'
 import { MigrationAlterMutationResolver } from './resolvers/mutation/MigrationAlterMutationResolver'
+import { MigrationArgs } from './migrations'
 
 export interface SystemContainer {
 	systemResolversFactory: ResolverFactory
@@ -50,15 +42,13 @@ export interface SystemContainer {
 	systemDbMigrationsRunnerFactory: SystemDbMigrationsRunnerFactory
 }
 
-export type SystemDbMigrationsRunnerFactory = (db: DatabaseCredentials, dbClient: ClientBase) => MigrationsRunner
+export type SystemDbMigrationsRunnerFactory = (db: DatabaseCredentials, dbClient: ClientBase) => MigrationsRunner<MigrationArgs>
 
 type Args = {
 	providers: UuidProvider
 	modificationHandlerFactory: ModificationHandlerFactory
 	entitiesSelector: EntitiesSelector
-	eventApplier: ContentEventsApplier
-	identityFetcher: IdentityFetcher
-	systemDbMigrationsRunnerFactory: (db: DatabaseCredentials, dbClient: ClientBase) => MigrationsRunner
+	systemDbMigrationsRunnerFactory: (db: DatabaseCredentials, dbClient: ClientBase) => MigrationsRunner<MigrationArgs>
 }
 
 export class SystemContainerFactory {
@@ -98,19 +88,10 @@ export class SystemContainerFactory {
 				new MigrationExecutor(modificationHandlerFactory))
 			.addService('migrationDescriber', ({ modificationHandlerFactory }) =>
 				new MigrationDescriber(modificationHandlerFactory))
-			.addService('dependencyBuilder', ({}) =>
-				new DependencyBuilderList([
-					new SameRowDependencyBuilder(),
-					new TransactionDependencyBuilder(),
-					new DeletedRowReferenceDependencyBuilder(),
-					new CreatedRowReferenceDependencyBuilder(),
-				]))
 			.addService('projectMigrator', ({ migrationDescriber, schemaVersionBuilder, executedMigrationsResolver }) =>
 				new ProjectMigrator(migrationDescriber, schemaVersionBuilder, executedMigrationsResolver))
 			.addService('stageCreator', () =>
 				new StageCreator())
-			.addService('diffBuilder', ({ dependencyBuilder, schemaVersionBuilder }) =>
-				new DiffBuilder(dependencyBuilder, schemaVersionBuilder, container.entitiesSelector))
 			.addService('projectTruncateExecutor', () =>
 				new ProjectTruncateExecutor())
 			.addService('migrationAlterer', () =>
@@ -119,8 +100,6 @@ export class SystemContainerFactory {
 				new StagesQueryResolver())
 			.addService('executedMigrationsQueryResolver', () =>
 				new ExecutedMigrationsQueryResolver())
-			.addService('historyEventResponseBuilder', () =>
-				new HistoryEventResponseBuilder(container.identityFetcher))
 			.addService('migrateMutationResolver', ({ projectMigrator }) =>
 				new MigrateMutationResolver(projectMigrator))
 			.addService('truncateMutationResolver', ({ projectTruncateExecutor }) =>

@@ -68,7 +68,7 @@ const createServerTerminator = (): Server[] => {
 	if (process.argv[2] === 'validate') {
 		process.exit(0)
 	}
-	initSentry(config.server.logging.sentry?.dsn)
+	'sentry' in config.server.logging && initSentry(config.server.logging.sentry?.dsn)
 	const workerConfig = config.server.workerCount || 1
 
 	const workerCount = workerConfig === 'auto' ? os.cpus().length : Number(workerConfig)
@@ -95,15 +95,22 @@ const createServerTerminator = (): Server[] => {
 				console.log(`Monitoring running on http://localhost:${monitoringPort}`)
 			}),
 		)
-		initializedProjects = await container.initializer.initialize()
+		if (!config.server.projectGroup) {
+			initializedProjects = await container.initializer.initialize()
+		}
 	}
 
 	const port = config.server.port
 	const printStarted = () => {
-		// eslint-disable-next-line no-console
-		console.log(`Contember API running on http://localhost:${port}`)
-		// eslint-disable-next-line no-console
-		console.log(`Initialized projects: ${initializedProjects.join(', ')}`)
+		if (config.server.projectGroup) {
+			// eslint-disable-next-line no-console
+			console.log('Contember Cloud running')
+		} else {
+			// eslint-disable-next-line no-console
+			console.log(`Contember API running on http://localhost:${port}`)
+			// eslint-disable-next-line no-console
+			console.log(initializedProjects.length ? `Initialized projects: ${initializedProjects.join(', ')}` : 'No project initialized')
+		}
 	}
 
 	if (isClusterMode && cluster.isMaster) {

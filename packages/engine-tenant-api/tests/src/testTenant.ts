@@ -1,6 +1,6 @@
 import { GraphQLTestQuery } from '../cases/integration/mocked/gql/types'
 import { testUuid } from './testUuid'
-import { ProjectSchemaResolver } from '../../src'
+import { DatabaseContext, ProjectGroup, ProjectSchemaResolver } from '../../src'
 import {
 	AclSchemaEvaluatorFactory,
 	createResolverContext,
@@ -8,7 +8,6 @@ import {
 	ProjectScopeFactory,
 	ResolverContext,
 	StaticIdentity,
-	TenantContainer,
 	TenantContainerFactory,
 	typeDefs,
 } from '../../src'
@@ -69,6 +68,7 @@ export const executeTenantTest = async (test: Test) => {
 			user: 'foo',
 		},
 		{},
+		{},
 	)
 		.createBuilder({
 			providers: {
@@ -83,6 +83,7 @@ export const executeTenantTest = async (test: Test) => {
 				encrypt: () => {
 					throw new Error('not supported')
 				},
+				hash: value => Buffer.from(value.toString()),
 			},
 			projectSchemaResolver,
 			projectInitializer: {
@@ -95,16 +96,26 @@ export const executeTenantTest = async (test: Test) => {
 		.replaceService('mailer', () => mailer)
 		.build()
 
-	const context: ResolverContext = createResolverContext(
-		new PermissionContext(
-			new StaticIdentity(authenticatedIdentityId, []),
-			{
-				isAllowed: () => Promise.resolve(true),
-			},
-			new ProjectScopeFactory(projectSchemaResolver, new AclSchemaEvaluatorFactory()),
+	const databaseContext = new DatabaseContext(tenantContainer.db, tenantContainer.providers)
+	const projectGroup: ProjectGroup = {
+		database: databaseContext,
+		slug: undefined,
+	}
+	const context: ResolverContext = {
+		...createResolverContext(
+			new PermissionContext(
+				new StaticIdentity(authenticatedIdentityId, []),
+				{
+					isAllowed: () => Promise.resolve(true),
+				},
+				new ProjectScopeFactory(projectSchemaResolver, new AclSchemaEvaluatorFactory()),
+				projectGroup,
+			),
+			authenticatedApiKeyId,
 		),
-		authenticatedApiKeyId,
-	)
+		projectGroup,
+		db: databaseContext,
+	}
 
 	const schema = makeExecutableSchema({
 		typeDefs: typeDefs,

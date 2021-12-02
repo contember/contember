@@ -17,7 +17,7 @@ export class UpdateProjectMutationResolver implements MutationResolvers {
 		args: MutationUpdateProjectArgs,
 		context: ResolverContext,
 	): Promise<UpdateProjectResponse> {
-		const project = await this.projectManager.getProjectBySlug(args.projectSlug)
+		const project = await this.projectManager.getProjectBySlug(context.db, args.projectSlug)
 		await context.requireAccess({
 			scope: await context.permissionContext.createProjectScope(project),
 			action: PermissionActions.PROJECT_UPDATE,
@@ -26,7 +26,7 @@ export class UpdateProjectMutationResolver implements MutationResolvers {
 		if (!project) {
 			return createProjectNotFoundResponse(AddProjectMemberErrorCode.ProjectNotFound, args.projectSlug)
 		}
-		await this.projectManager.updateProject(project.id, {
+		await this.projectManager.updateProject(context.db, project.id, {
 			name: args.name || undefined,
 			config: args.config !== undefined ? Merger.merge(args.mergeConfig ? project.config : {}, args.config) : undefined,
 		})

@@ -1,12 +1,12 @@
-import { ProjectSchemaResolver } from '../type'
+import { ProjectGroup, ProjectSchemaResolver } from '../type'
 import { Membership } from '../type/Membership'
-import { getRoleVariables } from '../utils/schemaUtils'
+import { DatabaseContext, getRoleVariables } from '../utils'
 
 export class MembershipValidator {
 	constructor(private readonly schemaResolver: ProjectSchemaResolver) {}
 
-	async validate(project: string, memberships: readonly Membership[]): Promise<MembershipValidationError[]> {
-		const schema = await this.schemaResolver.getSchema(project)
+	async validate(projectGroup: ProjectGroup, project: string, memberships: readonly Membership[]): Promise<MembershipValidationError[]> {
+		const schema = await this.schemaResolver.getSchema(projectGroup, project)
 		if (!schema) {
 			throw new Error()
 		}

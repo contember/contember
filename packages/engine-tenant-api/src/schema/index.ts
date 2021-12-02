@@ -522,7 +522,8 @@ export type MutationUnmanagedInviteArgs = {
 	email: Scalars['String']
 	projectSlug: Scalars['String']
 	memberships: ReadonlyArray<MembershipInput>
-	password: Scalars['String']
+	options?: Maybe<UnmanagedInviteOptions>
+	password?: Maybe<Scalars['String']>
 }
 
 
@@ -872,6 +873,11 @@ export type SignUpResult = {
 	readonly person: Person
 }
 
+export type UnmanagedInviteOptions = {
+	readonly password?: Maybe<Scalars['String']>
+	readonly resetTokenHash?: Maybe<Scalars['String']>
+}
+
 export type UpdateProjectMemberError = {
 	readonly __typename?: 'UpdateProjectMemberError'
 	readonly code: UpdateProjectMemberErrorCode
@@ -1090,6 +1096,7 @@ export type ResolversTypes = {
 	SignUpErrorCode: SignUpErrorCode
 	SignUpResponse: ResolverTypeWrapper<SignUpResponse>
 	SignUpResult: ResolverTypeWrapper<SignUpResult>
+	UnmanagedInviteOptions: UnmanagedInviteOptions
 	UpdateProjectMemberError: ResolverTypeWrapper<UpdateProjectMemberError>
 	UpdateProjectMemberErrorCode: UpdateProjectMemberErrorCode
 	UpdateProjectMemberResponse: ResolverTypeWrapper<UpdateProjectMemberResponse>
@@ -1174,6 +1181,7 @@ export type ResolversParentTypes = {
 	SignUpError: SignUpError
 	SignUpResponse: SignUpResponse
 	SignUpResult: SignUpResult
+	UnmanagedInviteOptions: UnmanagedInviteOptions
 	UpdateProjectMemberError: UpdateProjectMemberError
 	UpdateProjectMemberResponse: UpdateProjectMemberResponse
 	UpdateProjectResponse: UpdateProjectResponse
@@ -1438,7 +1446,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
 	createResetPasswordRequest?: Resolver<Maybe<ResolversTypes['CreatePasswordResetRequestResponse']>, ParentType, ContextType, RequireFields<MutationCreateResetPasswordRequestArgs, 'email'>>
 	resetPassword?: Resolver<Maybe<ResolversTypes['ResetPasswordResponse']>, ParentType, ContextType, RequireFields<MutationResetPasswordArgs, 'token' | 'password'>>
 	invite?: Resolver<Maybe<ResolversTypes['InviteResponse']>, ParentType, ContextType, RequireFields<MutationInviteArgs, 'email' | 'projectSlug' | 'memberships'>>
-	unmanagedInvite?: Resolver<Maybe<ResolversTypes['InviteResponse']>, ParentType, ContextType, RequireFields<MutationUnmanagedInviteArgs, 'email' | 'projectSlug' | 'memberships' | 'password'>>
+	unmanagedInvite?: Resolver<Maybe<ResolversTypes['InviteResponse']>, ParentType, ContextType, RequireFields<MutationUnmanagedInviteArgs, 'email' | 'projectSlug' | 'memberships'>>
 	addProjectMember?: Resolver<Maybe<ResolversTypes['AddProjectMemberResponse']>, ParentType, ContextType, RequireFields<MutationAddProjectMemberArgs, 'projectSlug' | 'identityId' | 'memberships'>>
 	removeProjectMember?: Resolver<Maybe<ResolversTypes['RemoveProjectMemberResponse']>, ParentType, ContextType, RequireFields<MutationRemoveProjectMemberArgs, 'projectSlug' | 'identityId'>>
 	updateProjectMember?: Resolver<Maybe<ResolversTypes['UpdateProjectMemberResponse']>, ParentType, ContextType, RequireFields<MutationUpdateProjectMemberArgs, 'projectSlug' | 'identityId' | 'memberships'>>

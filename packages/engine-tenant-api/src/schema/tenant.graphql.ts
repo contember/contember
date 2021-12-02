@@ -35,7 +35,13 @@ const schema: DocumentNode = gql`
 		resetPassword(token: String!, password: String!): ResetPasswordResponse
 
 		invite(email: String!, projectSlug: String!, memberships: [MembershipInput!]!, options: InviteOptions): InviteResponse
-		unmanagedInvite(email: String!, projectSlug: String!, memberships: [MembershipInput!]!, password: String!): InviteResponse
+		unmanagedInvite(
+			email: String!,
+			projectSlug: String!,
+			memberships: [MembershipInput!]!,
+			options: UnmanagedInviteOptions,
+			password: String @deprecated(reason: "Use options")
+		): InviteResponse
 
 		addProjectMember(projectSlug: String!, identityId: String!, memberships: [MembershipInput!]!): AddProjectMemberResponse
 		removeProjectMember(projectSlug: String!, identityId: String!): RemoveProjectMemberResponse
@@ -258,6 +264,11 @@ const schema: DocumentNode = gql`
 	input InviteOptions {
 		method: InviteMethod
 		mailVariant: String
+	}
+
+	input UnmanagedInviteOptions {
+		password: String
+		resetTokenHash: String
 	}
 
 	# === addProjectMember ===

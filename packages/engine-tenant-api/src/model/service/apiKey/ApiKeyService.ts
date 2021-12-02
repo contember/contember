@@ -1,5 +1,5 @@
 import { Membership } from '../../type/Membership'
-import { DatabaseContext } from '../../utils'
+import { DatabaseContext, TokenHash } from '../../utils'
 import { AddProjectMemberCommand, CreateApiKeyCommand, CreateIdentityCommand } from '../../commands'
 import { ApiKey } from '../../type'
 import { createSetMembershipVariables } from '../membershipUtils'
@@ -12,7 +12,7 @@ export class ApiKeyService {
 		db: DatabaseContext,
 		description: string,
 		roles: readonly string[] = [],
-		tokenHash?: string,
+		tokenHash?: TokenHash,
 	) {
 		const identityId = await db.commandBus.execute(new CreateIdentityCommand(roles, description))
 		const apiKeyResult = await db.commandBus.execute(new CreateApiKeyCommand({ type: ApiKey.Type.PERMANENT, identityId, tokenHash }))
@@ -25,7 +25,7 @@ export class ApiKeyService {
 		projectId: string,
 		memberships: readonly Membership[],
 		description: string,
-		tokenHash?: string,
+		tokenHash?: TokenHash,
 	) {
 		const response = await this.createPermanentApiKey(db, description, [], tokenHash)
 

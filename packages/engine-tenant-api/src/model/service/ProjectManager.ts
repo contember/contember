@@ -3,7 +3,7 @@ import { PermissionContext } from '../authorization'
 import { Project, ProjectGroup, ProjectInitializer, ProjectWithSecrets } from '../type'
 import { ProjectBySlugQuery, ProjectsByIdentityQuery, ProjectsQuery, ProjectUpdateTimestampQuery } from '../queries'
 import { SecretsManager } from './SecretsManager'
-import { DatabaseContext } from '../utils'
+import { DatabaseContext, TokenHash } from '../utils'
 import { createSetMembershipVariables } from './membershipUtils'
 import { ImplementationException } from '../../exceptions'
 import { ProjectRole } from '@contember/schema'
@@ -22,7 +22,7 @@ export class ProjectManager {
 		projectGroup: ProjectGroup,
 		project: Pick<ProjectWithSecrets, 'name' | 'slug' | 'config' | 'secrets'>,
 		ownerIdentityId: string | undefined,
-		deployTokenHash?: string,
+		deployTokenHash?: TokenHash,
 	): Promise<CreateProjectResponse> {
 		return await projectGroup.database.transaction(async db => {
 			const bus = db.commandBus

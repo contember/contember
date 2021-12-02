@@ -2,7 +2,7 @@ import { Command } from '../Command'
 import { ApiKey } from '../../type'
 import { ApiKeyHelper } from './ApiKeyHelper'
 import { InsertBuilder } from '@contember/database'
-import { computeTokenHash, generateToken } from '../../utils'
+import { computeTokenHash, generateToken, TokenHash } from '../../utils'
 
 interface CreateSessionApiKeyArgs {
 	type: ApiKey.Type.SESSION
@@ -14,7 +14,7 @@ interface CreateSessionApiKeyArgs {
 interface CreatePermanentApiKeyArgs {
 	type: ApiKey.Type.PERMANENT
 	identityId: string
-	tokenHash?: string
+	tokenHash?: TokenHash
 	expiration?: undefined
 }
 

@@ -44,13 +44,10 @@ export const createReferenceElementPlugin = (args: ReferenceElementOptions): Cus
 			if (args.referenceDiscriminationField === undefined) {
 				throw new BindingError()
 			}
-			const index = editor.children.indexOf(element)
-			if (index < 0) {
-				throw new BindingError()
-			}
+			const path = ReactEditor.findPath(editor, element)
 			let referencedEntity: EntityAccessor | undefined
 			try {
-				referencedEntity = args.getReferencedEntity([index], element.referenceId)
+				referencedEntity = args.getReferencedEntity(path, element.referenceId)
 			} catch {
 				return false
 			}

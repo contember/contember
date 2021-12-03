@@ -44,7 +44,7 @@ export const TextCell: FunctionComponent<TextCellProps> = Component(props => {
 					return undefined
 				}
 
-				let condition = createGenericTextCellFilterCondition(filter)
+				let condition = filter.query !== '' ? createGenericTextCellFilterCondition(filter) : {}
 
 				if (filter.mode === 'doesNotMatch') {
 					if (filter.nullCondition) {

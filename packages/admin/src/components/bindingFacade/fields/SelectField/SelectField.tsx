@@ -49,7 +49,7 @@ export interface SelectFieldInnerProps extends ChoiceFieldData.SingleChoiceField
 	errors: ErrorAccessor | undefined
 }
 
-const SelectFieldInner = memo(
+export const SelectFieldInner = memo(
 	({
 		placeholder,
 		allowNull,

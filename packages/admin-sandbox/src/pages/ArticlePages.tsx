@@ -8,9 +8,12 @@ import {
 	FeedbackRenderer,
 	GenericCell,
 	GenericPage,
+	HasManySelectCell,
+	HasOneSelectCell,
 	MultiSelectField,
 	PageLinkButton,
-	PageLinkById, SelectField,
+	PageLinkById,
+	SelectField,
 	TextCell,
 	TextField,
 	TitleBar,
@@ -22,9 +25,12 @@ export const ArticleListPage = (
 		<TitleBar actions={<PageLinkButton to="articleCreate">Add article</PageLinkButton>}>Articles</TitleBar>
 
 		<DataBindingProvider stateComponent={FeedbackRenderer}>
-			<DataGrid entities="Article" itemsPerPage={2}>
+			<DataGrid entities="Article" itemsPerPage={20}>
 				<TextCell field="title" header="Title" />
 				<TextCell field="content" header="Content" />
+				<HasOneSelectCell field="category" options={`Category.locales(locale.code = 'cs').name`} header="Category" />
+				<HasManySelectCell field="tags" options={`Tag.locales(locale.code = 'cs').name`} header="Tags" />
+
 				<GenericCell canBeHidden={false} justification="justifyEnd">
 					<PageLinkById to={'articleEdit'} Component={AnchorButton}>Edit</PageLinkById>
 					<DeleteEntityButton title="Delete" immediatePersist={true}></DeleteEntityButton>
@@ -47,7 +53,7 @@ const form = <>
 </>
 
 export const ArticleCreatePage = (
-	<CreatePage pageName={'articleCreate'} entity={'Article'}>
+	<CreatePage pageName={'articleCreate'} entity={'Article'} redirectOnSuccess={req => ({ ...req, pageName: 'articleList', parameters: {} })}>
 		{form}
 	</CreatePage>
 )

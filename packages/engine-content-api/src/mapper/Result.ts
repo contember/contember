@@ -178,9 +178,11 @@ export class MutationEntryNotFoundError implements MutationResultInterface {
 export class MutationNoResultError implements MutationResultInterface {
 	result = MutationResultType.noResultError as const
 	hints: MutationResultHint[] = []
-	message = undefined
 
-	constructor(public readonly paths: Path[]) {}
+	constructor(
+		public readonly paths: Path[],
+		public readonly message?: string,
+	) {}
 }
 
 export const prependPath = (path: Path, results: MutationResultList): MutationResultList =>

@@ -1,6 +1,6 @@
 import { JsonValue } from '../../../utils'
 import { useCallback } from 'react'
-import { useTenantGraphQlClient } from '@contember/react-client'
+import { GraphQlClientRequestOptions, useTenantGraphQlClient } from '@contember/react-client'
 
 export interface GQLVariableType<Value = any, Required extends boolean = boolean> {
 	graphQlType: string
@@ -10,6 +10,7 @@ export interface GQLVariableType<Value = any, Required extends boolean = boolean
 export namespace GQLVariable {
 	export const Json: GQLVariableType<JsonValue<undefined>, false> = { graphQlType: 'Json', required: false }
 	export const String: GQLVariableType<string, false> = { graphQlType: 'String', required: false }
+	export const Int: GQLVariableType<number, false> = { graphQlType: 'Int', required: false }
 	export const Required = <V extends any>(type: GQLVariableType<V, boolean>): GQLVariableType<V, true> => ({
 		graphQlType: type.graphQlType + '!',
 		required: true,
@@ -21,28 +22,34 @@ export namespace GQLVariable {
 }
 
 export type TenantMutationExecutor<VariableValues extends any, Res extends TenantMutationResponse<any, string>> =
-	(variables: VariableValues) => Promise<Res>
+	(variables: VariableValues, option?: { onResponse?: (response: any) => void }) => Promise<Res>
 
 export const useSingleTenantMutation = <
-	Result extends JsonValue,
+	Result extends any,
 	ErrorCode extends string,
 	Variables extends Record<string, GQLVariableType<any, any>>
-	>(mutation: string, variableDefinitions: Variables): TenantMutationExecutor<VariableValues<Variables>, TenantMutationResponse<Result, ErrorCode>> => {
+	>(
+		mutation: string,
+		variableDefinitions: Variables,
+		options?: Omit<GraphQlClientRequestOptions, 'variables'>,
+): TenantMutationExecutor<VariableValues<Variables>, TenantMutationResponse<Result, ErrorCode>> => {
 
 	const client = useTenantGraphQlClient()
 
-	return useCallback(async variables => {
+	return useCallback(async (variables, queryOptions) => {
 		const formattedVariables = Object.entries(variableDefinitions).map(([name, type]) => `$${name}: ${type.graphQlType}`).join(', ')
-		const response = await client.sendRequest< { data: { result: TenantMutationResponse<Result, ErrorCode>}, errors? : any }>(`
+		const gql = `
 			mutation${formattedVariables ? `(${formattedVariables})` : ''} {
 				result: ${mutation}
 			}
-		`, { variables })
+		`
+		const response = await client.sendRequest<{ data: { result: TenantMutationResponse<Result, ErrorCode> }, errors?: any }>(gql, { variables, ...options })
+		queryOptions?.onResponse?.(response)
 		if (response.errors) {
 			throw response.errors
 		}
 		return response.data.result
-	}, [client, mutation, variableDefinitions])
+	}, [client, mutation, options, variableDefinitions])
 }
 
 export interface TenantMutationErrorResponse<Code extends string> {
@@ -52,12 +59,12 @@ export interface TenantMutationErrorResponse<Code extends string> {
 		developerMessage: string
 	}
 }
-export interface TenantMutationOkResponse<Result extends JsonValue> {
+export interface TenantMutationOkResponse<Result> {
 	ok: true
 	result: Result
 }
 
-export type TenantMutationResponse<Result extends JsonValue, ErrorCode extends string> =
+export type TenantMutationResponse<Result, ErrorCode extends string> =
 	| TenantMutationErrorResponse<ErrorCode>
 	| TenantMutationOkResponse<Result>
 

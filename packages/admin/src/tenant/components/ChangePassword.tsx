@@ -1,93 +1,86 @@
-import { Box, Button, FormGroup, TextInput, TitleBar } from '@contember/ui'
-import { FC, useCallback, useState } from 'react'
+import { Box, Button, FormGroup, TextInput } from '@contember/ui'
+import { FC, useCallback } from 'react'
 import { useChangePassword } from '../hooks'
+import { useForm } from './useForm'
+import { useShowToast } from '../../components'
+
+const initialValues = {
+	currentPassword: '',
+	newPassword: '',
+	newPasswordAgain: '',
+}
 
 export const ChangePassword: FC<{}> = ({}) => {
-	const [newPassword, setNewPassword] = useState('')
-	const [newPasswordRepeated, setNewPasswordRepeated] = useState('')
-	const [changePassword, changePasswordState] = useChangePassword()
-	const [notEqualError, setNotEqualError] = useState(false)
-	const [errorsResolved, setErrorsResolved] = useState(false)
-	const onSubmit = useCallback(() => {
-		setErrorsResolved(false)
-		if (newPassword !== newPasswordRepeated) {
-			setNotEqualError(true)
-		} else {
-			changePassword(newPassword)
+	const changePassword = useChangePassword()
+	const addToast = useShowToast()
+	const { register, errors, isSubmitting, onSubmit } = useForm(initialValues, useCallback(async (val: typeof initialValues, setError) => {
+		if (val.newPassword !== val.newPasswordAgain) {
+			return setError('newPasswordAgain', 'Password confirmation doesn\'t match')
 		}
-	}, [changePassword, newPassword, newPasswordRepeated])
-	const resolveErrors = useCallback(() => {
-		setNotEqualError(false)
-		setErrorsResolved(true)
-	}, [setNotEqualError, setErrorsResolved])
-	const changeNewPasswordAndRemoveErrors = useCallback(
-		newValue => {
-			resolveErrors()
-			setNewPassword(newValue)
-		},
-		[resolveErrors, setNewPassword],
-	)
-	const changeNewPasswordRepeatedAndRemoveErrors = useCallback(
-		newValue => {
-			resolveErrors()
-			setNewPasswordRepeated(newValue)
-		},
-		[resolveErrors, setNewPasswordRepeated],
-	)
-
-	const success = changePasswordState.finished && changePasswordState.success
-	const errorFirstField = notEqualError
-		? undefined
-		: changePasswordState.finished && !changePasswordState.success && !errorsResolved
-		? changePasswordState.errors.join(', ')
-		: undefined
-	const errorSecondField = notEqualError ? 'Passwords are different' : undefined
-	const validation = errorFirstField ? 'invalid' : success ? 'valid' : 'default'
-	const disabled = changePasswordState.loading || success
+		const response = await changePassword({ currentPassword: val.currentPassword, newPassword: val.newPassword })
+		if (response.ok) {
+			addToast({
+				message: 'Password changed',
+				type: 'success',
+				dismiss: true,
+			})
+		} else {
+			switch (response.error.code) {
+				case 'INVALID_PASSWORD':
+					return setError('currentPassword', 'Current password is invalid')
+				case 'TOO_WEAK':
+					return setError('newPassword', 'Password is too weak')
+				default:
+					return addToast({
+						message: 'Unknown error',
+						type: 'error',
+						dismiss: true,
+					})
+			}
+		}
+	}, [addToast, changePassword]))
 
 	return (
-		<div>
-			<TitleBar>Change your password</TitleBar>
-			<Box>
-				<div style={{ marginBottom: '1em' }}>
+			<Box heading={'Change your password'}>
+				<form onSubmit={onSubmit}>
+					<FormGroup
+						label="Current password"
+						errors={errors.currentPassword === undefined ? undefined : [{ message: errors.currentPassword }]}
+					>
+						<TextInput
+							allowNewlines={false}
+							type="password"
+							autoComplete="password"
+							{...register('currentPassword')}
+						/>
+					</FormGroup>
 					<FormGroup
 						label="New password"
-						errors={errorFirstField === undefined ? undefined : [{ message: errorFirstField }]}
+						errors={errors.newPassword === undefined ? undefined : [{ message: errors.newPassword }]}
 					>
 						<TextInput
-							validationState={validation}
-							disabled={disabled}
-							value={newPassword}
-							onChange={e => changeNewPasswordAndRemoveErrors(e.target.value)}
 							allowNewlines={false}
 							type="password"
 							autoComplete="new-password"
+							{...register('newPassword')}
 						/>
 					</FormGroup>
 					<FormGroup
-						label="New password (once more)"
-						errors={errorSecondField === undefined ? undefined : [{ message: errorSecondField }]}
+						label="Confirm new password"
+						errors={errors.newPasswordAgain === undefined ? undefined : [{ message: errors.newPasswordAgain }]}
 					>
 						<TextInput
-							validationState={validation}
-							disabled={disabled}
-							value={newPasswordRepeated}
-							onChange={e => changeNewPasswordRepeatedAndRemoveErrors(e.target.value)}
 							allowNewlines={false}
 							type="password"
 							autoComplete="new-password"
+							{...register('newPasswordAgain')}
 						/>
 					</FormGroup>
-				</div>
-				<Button
-					intent={success ? 'success' : 'primary'}
-					onClick={onSubmit}
-					isLoading={changePasswordState.loading}
-					disabled={disabled}
-				>
-					{success ? 'Password changed' : 'Change password'}
-				</Button>
+					<br />
+					<Button intent={'primary'} type={'submit'} disabled={isSubmitting}>
+						Change password
+					</Button>
+				</form>
 			</Box>
-		</div>
 	)
 }

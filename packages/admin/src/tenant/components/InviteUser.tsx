@@ -42,16 +42,17 @@ export const InviteUser: FC<InviteUserProps> = ({ project, rolesConfig, userList
 				addToast({
 					type: 'success',
 					message: `User has been invited to this project and credentials have been sent to the given email.`,
+					dismiss: true,
 				})
 				redirect(userListLink)
 			} else {
 				switch (inviteResult.error.code) {
 					case 'ALREADY_MEMBER':
-						return addToast({ message: `User is already member `, type: 'error' })
+						return addToast({ message: `User is already member `, type: 'error', dismiss: true })
 					case 'INVALID_MEMBERSHIP':
-						return addToast({ message: `Invalid membership definition`, type: 'error' })
+						return addToast({ message: `Invalid membership definition`, type: 'error', dismiss: true })
 					case 'PROJECT_NOT_FOUND':
-						return addToast({ message: `Project not found`, type: 'error' })
+						return addToast({ message: `Project not found`, type: 'error', dismiss: true })
 				}
 			}
 		},

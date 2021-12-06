@@ -23,7 +23,7 @@ export const useRoleRenderer = (roleRendererFactory: RoleRendererFactory | undef
 			setRoleRenderer(() => DefaultRoleRenderer)
 			return
 		}
-		if (!query.finished || query.error) {
+		if (query.state !== 'success') {
 			return
 		}
 		(async () => {

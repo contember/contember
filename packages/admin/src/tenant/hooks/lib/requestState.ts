@@ -1,47 +1,31 @@
-interface RequestStateBase<T> {
-	data?: T
-	loading: boolean
-	finished: boolean
-	error: boolean
-}
-
-export interface RequestStateOk<T> extends RequestStateBase<T> {
+export interface RequestStateOk<T> {
 	data: T
 	extensions?: any
-	loading: false
-	finished: true
-	error: false
+	state: 'success'
 }
 
-export interface RequestStateError<T> extends RequestStateBase<T> {
-	data?: undefined
-	loading: false
-	finished: true
-	error: true
+export interface RequestStateError<T> {
+	state: 'error'
 }
 
-export interface RequestStateLoading<T> extends RequestStateBase<T> {
-	data?: undefined
-	loading: true
-	finished: false
-	error: false
+export interface RequestStateLoading<T>  {
+	state: 'loading'
 }
 
-export interface RequestStateUninitialized<T> extends RequestStateBase<T> {
-	data?: undefined
-	loading: false
-	finished: false
-	error: false
+export interface RequestStateUninitialized<T> {
+	state: 'initial'
 }
 
-export type QueryRequestState<T> = RequestStateOk<T> | RequestStateError<T> | RequestStateLoading<T>
+export type QueryRequestState<T> =
+	| RequestStateOk<T>
+	| RequestStateError<T>
+	| RequestStateLoading<T>
+
 export interface QueryRequestObject<T> {
 	state: QueryRequestState<T>
 	refetch: () => void
 }
 
 export type MutationRequestState<T> =
-	| RequestStateOk<T>
-	| RequestStateError<T>
-	| RequestStateLoading<T>
+	| QueryRequestState<T>
 	| RequestStateUninitialized<T>

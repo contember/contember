@@ -1,11 +1,11 @@
-import { useMutation, UseMutationReturn } from './lib'
-import { useLoginToken, useTenantGraphQlClient } from '@contember/react-client'
+import { useLoginToken } from '@contember/react-client'
+import { GQLVariable, useSingleTenantMutation } from './lib/facade'
+import { useMemo } from 'react'
 
 const LOGIN_MUTATION = `
-	mutation($email: String!, $password: String!, $expiration: Int) {
-		signIn(email: $email, password: $password, expiration: $expiration) {
+		signIn(email: $email, password: $password, expiration: $expiration, otpToken: $otpToken) {
 			ok
-			errors {
+			error {
 				code
 				endUserMessage
 			}
@@ -17,45 +17,33 @@ const LOGIN_MUTATION = `
 				}
 			}
 		}
-	}
 `
 
-type LoginResponse = LoginResponseOk | LoginResponseError
-
-interface LoginResponseOk {
-	signIn: {
-		ok: true
-		result: {
-			token: string
-			person: {
-				id: string
-				email: string
-			}
-		}
+const loginVariables = {
+	email: GQLVariable.Required(GQLVariable.String),
+	password: GQLVariable.Required(GQLVariable.String),
+	expiration: GQLVariable.Int,
+	otpToken: GQLVariable.String,
+}
+type LoginErrors =
+	| 'UNKNOWN_EMAIL'
+	| 'INVALID_PASSWORD'
+	| 'OTP_REQUIRED'
+	| 'INVALID_OTP_TOKEN'
+interface LoginResult {
+	token: string
+	person: {
+		id: string
+		email: string
 	}
 }
-
-interface LoginResponseError {
-	signIn: {
-		ok: false
-		errors: Array<{
-			code: string
-			endUserMessage?: string
-		}>
-	}
-}
-
-interface LoginVariables {
-	email: string
-	password: string
-	expiration: number
-}
-
-export const useLogin = (): UseMutationReturn<LoginResponse, LoginVariables> => {
+export const useLogin = () => {
 	const loginToken = useLoginToken()
-	const tenantClient = useTenantGraphQlClient()
 
-	return useMutation(tenantClient, LOGIN_MUTATION, loginToken, {
-		'X-Contember-Token-Path': 'data.signIn.result.token',
-	})
+	return useSingleTenantMutation<LoginResult, LoginErrors, typeof loginVariables>(LOGIN_MUTATION, loginVariables, useMemo(() => ({
+		apiTokenOverride: loginToken,
+		headers: {
+			'X-Contember-Token-Path': 'data.result.result.token',
+		},
+	}), [loginToken]))
 }

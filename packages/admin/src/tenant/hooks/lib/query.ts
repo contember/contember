@@ -20,46 +20,30 @@ export const useQuery = <R, V>(
 	apiToken?: string,
 ): QueryRequestObject<R> => {
 	const [state, setState] = useState<QueryRequestState<R>>({
-		loading: true,
-		finished: false,
-		error: false,
+		state: 'loading',
 	})
 	const vars = useJsonEqualMemo(() => variables, variables)
-	const fetch = useCallback((client: GraphQlClient, query: string, variables: V, apiToken?: string) => {
-		if (client) {
-			setState({ loading: true, finished: false, error: false })
-			client
-				.sendRequest<{ data: R }>(query, {
-					variables,
-					apiTokenOverride: apiToken,
-				})
-				.then(
-					data => {
-						setState({
-							data: data.data,
-							loading: false,
-							finished: true,
-							error: false,
-						})
-					},
-					() => {
-						setState({
-							loading: false,
-							finished: true,
-							error: true,
-						})
-					},
-				)
+	const refetch = useCallback(async () => {
+		setState({ state: 'loading' })
+		try {
+			const response = await client.sendRequest<{ data: R }>(query, {
+				variables: vars,
+				apiTokenOverride: apiToken,
+			})
+			setState({
+				...response,
+				state: 'success',
+			})
+		} catch (e) {
+			setState({ state: 'error' })
+			throw e
 		}
-	}, [])
+	}, [client, query, vars, apiToken])
 
 	useEffect(() => {
-		fetch(client, query, vars, apiToken)
-	}, [client, query, vars, apiToken, fetch])
+		refetch()
+	}, [refetch])
 
-	const refetch = useCallback(() => {
-		fetch(client, query, vars, apiToken)
-	}, [client, query, vars, apiToken, fetch])
 
 	return useMemo(() => ({ state, refetch }), [state, refetch])
 }

@@ -6,6 +6,7 @@ import { MiscPageLayout } from '../MiscPageLayout'
 
 export interface Identity {
 	email: string
+	otpEnabled: boolean
 	personId: string
 	projects: IdentityProject[]
 }
@@ -21,18 +22,25 @@ interface IdentityContext {
 }
 
 export const IdentityContext = createContext<IdentityContext | undefined>(undefined)
+export const IdentityRefreshContext = createContext<(() => void)>(() => {
+	throw new Error('IdentityRefreshContext is not initialized')
+})
 export const IdentityProvider: React.FC<{onInvalidIdentity?: () => void }> = ({ children, onInvalidIdentity }) => {
 	const [identity, setIdentity] = useState<Identity>()
 	const [identityCleared, setIdentityCleared] = useState(false)
 	const sessionToken = useSessionToken()
-	const { state: me } = useTenantMe()
+	const { state: me, refetch } = useTenantMe()
+
+	useEffect(() => {
+		if (me.state === 'error' && onInvalidIdentity) {
+			onInvalidIdentity()
+		}
+	}, [me.state, onInvalidIdentity])
+
 
 	useEffect(
 		() => {
-			if (me.error && onInvalidIdentity) {
-				onInvalidIdentity()
-			}
-			if (!me.finished || me.error || sessionToken === undefined || identity) {
+			if (me.state !== 'success' || sessionToken === undefined) {
 				return
 			}
 
@@ -41,6 +49,7 @@ export const IdentityProvider: React.FC<{onInvalidIdentity?: () => void }> = ({ 
 
 			setIdentity({
 				email: person.email,
+				otpEnabled: person.otpEnabled,
 				personId: person.id,
 				projects: projects.map(it => ({
 					name: it.project.name,
@@ -49,7 +58,7 @@ export const IdentityProvider: React.FC<{onInvalidIdentity?: () => void }> = ({ 
 				})),
 			})
 		},
-		[identity, sessionToken, me, onInvalidIdentity],
+		[sessionToken, me],
 	)
 
 	const clearIdentity = useCallback(
@@ -73,7 +82,7 @@ export const IdentityProvider: React.FC<{onInvalidIdentity?: () => void }> = ({ 
 		)
 	}
 
-	if (me.error) {
+	if (me.state === 'error') {
 		return (
 			<MiscPageLayout>
 				<Message type="danger" size="large" flow="generousBlock">Failed to fetch an identity</Message>
@@ -86,5 +95,11 @@ export const IdentityProvider: React.FC<{onInvalidIdentity?: () => void }> = ({ 
 		return <ContainerSpinner />
 	}
 
-	return <IdentityContext.Provider value={identityContextValue}>{children}</IdentityContext.Provider>
+	return (
+		<IdentityContext.Provider value={identityContextValue}>
+			<IdentityRefreshContext.Provider value={refetch}>
+				{children}
+			</IdentityRefreshContext.Provider>
+		</IdentityContext.Provider>
+	)
 }

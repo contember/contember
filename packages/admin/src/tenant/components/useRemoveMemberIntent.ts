@@ -17,6 +17,7 @@ export const useRemoveMemberIntent = (project: string, onRemove?: () => void | P
 				addToast({
 					message: `Member removed`,
 					type: 'success',
+					dismiss: true,
 				})
 			} else {
 				addToast({
@@ -24,6 +25,7 @@ export const useRemoveMemberIntent = (project: string, onRemove?: () => void | P
 						.map(it => getTenantErrorMessage(it.code))
 						.join(', ')}`,
 					type: 'error',
+					dismiss: true,
 				})
 			}
 			onRemove && await onRemove()

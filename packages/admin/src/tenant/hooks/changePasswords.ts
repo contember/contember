@@ -1,76 +1,31 @@
-import { getTenantErrorMessage } from '@contember/client'
-import { useCallback, useMemo } from 'react'
-import { useAuthedTenantMutation } from './lib'
-import { useIdentity } from '../../components'
+import { GQLVariable, useSingleTenantMutation } from './lib/facade'
 
 const CHANGE_PASSWORD_MUTATION = `
-	mutation(
-		$personId: String!,
-		$password: String!
+	changeMyPassword(
+		currentPassword: $currentPassword,
+		newPassword: $newPassword
 	) {
-		changePassword(
-			personId: $personId,
-			password: $password
-		) {
-			ok
-			errors {
-				code
-				endUserMessage
-			}
+		ok
+		error {
+			code
+			developerMessage
 		}
 	}
 `
 
-interface ChangePasswordResponse {
-	changePassword: {
-		ok: boolean
-		errors: {
-			code: string
-			endUserMessage?: string
-		}[]
-	}
+const changePasswordVariables = {
+	currentPassword: GQLVariable.Required(GQLVariable.String),
+	newPassword: GQLVariable.Required(GQLVariable.String),
 }
 
-interface ChangePasswordVariables {
-	personId: string
-	password: string
-}
+type ChangePasswordErrors =
+	| 'TOO_WEAK'
+	| 'NOT_A_PERSON'
+	| 'INVALID_PASSWORD'
 
-interface ReturnedState {
-	finished: boolean
-	success: boolean
-	loading: boolean
-	errors: string[]
-}
-
-export const useChangePassword = (): [(password: string) => void, ReturnedState] => {
-	const auth = useIdentity()
-	const personId = auth ? auth.personId : undefined
-	const [triggerChangePassword, state] = useAuthedTenantMutation<ChangePasswordResponse, ChangePasswordVariables>(
+export const useChangePassword = () => {
+	return useSingleTenantMutation<never, ChangePasswordErrors, typeof changePasswordVariables>(
 		CHANGE_PASSWORD_MUTATION,
+		changePasswordVariables,
 	)
-	const changePassword = useCallback(
-		(newPassword: string) => {
-			if (personId !== undefined) {
-				triggerChangePassword({
-					password: newPassword,
-					personId: personId,
-				})
-			}
-		},
-		[triggerChangePassword, personId],
-	)
-	const returnState = useMemo<ReturnedState>(() => {
-		return {
-			success: state.finished && !state.error && state.data.changePassword.ok,
-			finished: state.finished,
-			loading: state.loading,
-			errors:
-				(state.finished &&
-					!state.error &&
-					state.data.changePassword.errors.map(it => getTenantErrorMessage(it.code))) ||
-				[],
-		}
-	}, [state])
-	return [changePassword, returnState]
 }

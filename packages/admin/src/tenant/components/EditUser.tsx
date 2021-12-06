@@ -23,16 +23,12 @@ export const EditUser: FC<EditUserProps> = ({ project, rolesConfig, identityId, 
 
 	useEffect(() => {
 		setMemberships(currentMemberships => {
-			if (
-				currentMemberships.every(it => it === undefined) &&
-				previousMembershipsState.finished &&
-				!previousMembershipsState.error
-			) {
+			if (previousMembershipsState.state === 'success') {
 				return previousMembershipsState.data.memberships
 			}
 			return currentMemberships
 		})
-	}, [previousMembershipsState.data, previousMembershipsState.error, previousMembershipsState.finished])
+	}, [previousMembershipsState])
 
 	const redirect = useRedirect()
 	const addToast = useShowToast()
@@ -52,16 +48,17 @@ export const EditUser: FC<EditUserProps> = ({ project, rolesConfig, identityId, 
 				addToast({
 					type: 'success',
 					message: `Updated user's roles successfully.`,
+					dismiss: true,
 				})
 				redirect(userListLink)
 			} else {
 				switch (result.error.code) {
 					case 'NOT_MEMBER':
-						return addToast({ message: `Project member not found`, type: 'error' })
+						return addToast({ message: `Project member not found`, type: 'error', dismiss: true })
 					case 'INVALID_MEMBERSHIP':
-						return addToast({ message: `Invalid membership definition`, type: 'error' })
+						return addToast({ message: `Invalid membership definition`, type: 'error', dismiss: true })
 					case 'PROJECT_NOT_FOUND':
-						return addToast({ message: `Project not found`, type: 'error' })
+						return addToast({ message: `Project not found`, type: 'error', dismiss: true })
 				}
 			}
 		},

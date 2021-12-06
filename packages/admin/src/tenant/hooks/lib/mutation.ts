@@ -6,16 +6,12 @@ export type UseMutationReturn<R, V> = [(variables: V) => Promise<R>, MutationReq
 
 export const useMutation = <R, V>(client: GraphQlClient, query: string, apiToken?: string, headers?: Record<string, string>): UseMutationReturn<R, V> => {
 	const [state, setState] = useState<MutationRequestState<R>>({
-		error: false,
-		loading: false,
-		finished: false,
+		state: 'initial',
 	})
 	const cb = useCallback(
 		async (variables: V) => {
 			setState({
-				loading: true,
-				finished: false,
-				error: false,
+				state: 'loading',
 			})
 			try {
 				const response = await client.sendRequest<{ data: R, extensions?: any, errors?: any }>(query, {
@@ -25,17 +21,13 @@ export const useMutation = <R, V>(client: GraphQlClient, query: string, apiToken
 				})
 				setState({
 					...response,
-					loading: false,
-					finished: true,
-					error: false,
+					state: 'success',
 				})
 				return response.data
 
 			} catch (e) {
 				setState({
-					loading: false,
-					finished: true,
-					error: true,
+					state: 'error',
 				})
 				throw e
 			}

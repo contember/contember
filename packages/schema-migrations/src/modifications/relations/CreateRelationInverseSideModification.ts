@@ -1,6 +1,5 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Model, Schema } from '@contember/schema'
-import { ContentEvent } from '@contember/engine-common'
 import { addField, SchemaUpdater, updateEntity, updateField, updateModel } from '../utils/schemaUpdateUtils'
 import { ModificationHandlerStatic } from '../ModificationHandler'
 import { createFields } from '../utils/diffUtils'
@@ -23,10 +22,6 @@ export const CreateRelationInverseSideModification: ModificationHandlerStatic<Cr
 				})),
 			),
 		)
-	}
-
-	public transformEvents(events: ContentEvent[]): ContentEvent[] {
-		return events
 	}
 
 	describe() {

@@ -1,6 +1,5 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Schema } from '@contember/schema'
-import { ContentEvent } from '@contember/engine-common'
 import { SchemaUpdater, updateEntity, updateModel } from '../utils/schemaUpdateUtils'
 import { ModificationHandlerStatic } from '../ModificationHandler'
 
@@ -24,16 +23,6 @@ export const UpdateEntityTableNameModification: ModificationHandlerStatic<Update
 				tableName: this.data.tableName,
 			})),
 		)
-	}
-
-	public transformEvents(events: ContentEvent[]): ContentEvent[] {
-		const entity = this.schema.model.entities[this.data.entityName]
-		return events.map(it => {
-			if (it.tableName !== entity.tableName) {
-				return it
-			}
-			return { ...it, tableName: this.data.tableName }
-		})
 	}
 
 	describe() {

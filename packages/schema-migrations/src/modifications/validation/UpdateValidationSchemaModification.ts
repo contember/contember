@@ -1,6 +1,5 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Schema, Validation } from '@contember/schema'
-import { ContentEvent } from '@contember/engine-common'
 import { SchemaUpdater } from '../utils/schemaUpdateUtils'
 import { ModificationHandlerStatic } from '../ModificationHandler'
 import deepEqual from 'fast-deep-equal'
@@ -18,10 +17,6 @@ export const UpdateValidationSchemaModification: ModificationHandlerStatic<Updat
 			...schema,
 			validation: this.data.schema,
 		})
-	}
-
-	public transformEvents(events: ContentEvent[]): ContentEvent[] {
-		return events
 	}
 
 	describe() {

@@ -1,13 +1,6 @@
-import {
-	acceptFieldVisitor,
-	isInverseRelation,
-	isRelation,
-	NamingHelper,
-	tryGetColumnName,
-} from '@contember/schema-utils'
+import { acceptFieldVisitor, isInverseRelation, isRelation, NamingHelper } from '@contember/schema-utils'
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Schema } from '@contember/schema'
-import { ContentEvent, EventType } from '@contember/engine-common'
 import { removeField, SchemaUpdater } from '../utils/schemaUpdateUtils'
 import { ModificationHandlerStatic } from '../ModificationHandler'
 import { isDefined } from '../../utils/isDefined'
@@ -47,27 +40,6 @@ export const RemoveFieldModification: ModificationHandlerStatic<RemoveFieldModif
 
 	public getSchemaUpdater(): SchemaUpdater {
 		return removeField(this.data.entityName, this.data.fieldName, this.formatVersion)
-	}
-
-	public transformEvents(events: ContentEvent[]): ContentEvent[] {
-		const entity = this.schema.model.entities[this.data.entityName]
-		const tableName = entity.tableName
-		const columnName = tryGetColumnName(this.schema.model, entity, this.data.fieldName)
-		if (!columnName) {
-			return events
-		}
-		return events.map(it => {
-			if (
-				it.tableName !== tableName ||
-				(it.type !== EventType.create && it.type !== EventType.update) ||
-				!it.values.hasOwnProperty(columnName)
-			) {
-				return it
-			}
-
-			const { [columnName]: value, ...values } = it.values
-			return { ...it, values }
-		})
 	}
 
 	describe() {

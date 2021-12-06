@@ -1,6 +1,5 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Schema } from '@contember/schema'
-import { ContentEvent } from '@contember/engine-common'
 import {
 	removeField,
 	SchemaUpdater,
@@ -96,13 +95,6 @@ export const RemoveEntityModification: ModificationHandlerStatic<RemoveEntityMod
 				.filter(field => isRelation(field) && field.target === this.data.entityName)
 				.map((field): [string, string] => [entity.name, field.name]),
 		)
-	}
-
-	public transformEvents(events: ContentEvent[]): ContentEvent[] {
-		const entity = this.schema.model.entities[this.data.entityName]
-		return events.filter(it => {
-			return it.tableName !== entity.tableName
-		})
 	}
 
 	describe() {

@@ -1,6 +1,5 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Model, Schema } from '@contember/schema'
-import { ContentEvent, EventType } from '@contember/engine-common'
 import { SchemaUpdater, updateEntity, updateField, updateModel } from '../utils/schemaUpdateUtils'
 import { ModificationHandlerStatic } from '../ModificationHandler'
 import { updateColumns } from '../utils/diffUtils'
@@ -25,25 +24,6 @@ export const UpdateColumnNameModification: ModificationHandlerStatic<UpdateColum
 				updateField(this.data.fieldName, ({ field }) => ({ ...field, columnName: this.data.columnName })),
 			),
 		)
-	}
-
-	public transformEvents(events: ContentEvent[]): ContentEvent[] {
-		const entity = this.schema.model.entities[this.data.entityName]
-		const tableName = entity.tableName
-		const oldColumnName = (entity.fields[this.data.fieldName] as Model.AnyColumn).columnName
-		const newColumnName = this.data.columnName
-		return events.map(it => {
-			if (
-				it.tableName !== tableName ||
-				(it.type !== EventType.create && it.type !== EventType.update) ||
-				!it.values.hasOwnProperty(oldColumnName)
-			) {
-				return it
-			}
-
-			const { [oldColumnName]: value, ...values } = it.values
-			return { ...it, values: { ...values, [newColumnName]: value } }
-		})
 	}
 
 	describe() {

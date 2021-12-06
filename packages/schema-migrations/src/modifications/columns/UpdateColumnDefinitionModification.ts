@@ -1,6 +1,5 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Model, Schema } from '@contember/schema'
-import { ContentEvent } from '@contember/engine-common'
 import { SchemaUpdater, updateEntity, updateField, updateModel } from '../utils/schemaUpdateUtils'
 import { ModificationHandlerStatic } from '../ModificationHandler'
 import deepEqual from 'fast-deep-equal'
@@ -41,10 +40,6 @@ export const UpdateColumnDefinitionModification: ModificationHandlerStatic<Updat
 				}),
 			),
 		)
-	}
-
-	public transformEvents(events: ContentEvent[]): ContentEvent[] {
-		return events // todo transform type
 	}
 
 	describe() {

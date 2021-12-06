@@ -1,10 +1,9 @@
 import { escapeValue, MigrationBuilder } from '@contember/database-migrations'
 import { Model, Schema } from '@contember/schema'
-import { ContentEvent, EventType } from '@contember/engine-common'
 import { addField, SchemaUpdater, updateEntity, updateModel } from '../utils/schemaUpdateUtils'
 import { ModificationHandlerStatic } from '../ModificationHandler'
 import { wrapIdentifier } from '../../utils/dbHelpers'
-import { getColumnName, isColumn, resolveDefaultValue } from '@contember/schema-utils'
+import { getColumnName, isColumn } from '@contember/schema-utils'
 import { ImplementationException } from '../../exceptions'
 import { createFields } from '../utils/diffUtils'
 
@@ -52,40 +51,6 @@ export const CreateColumnModification: ModificationHandlerStatic<CreateColumnMod
 
 	public getSchemaUpdater(): SchemaUpdater {
 		return updateModel(updateEntity(this.data.entityName, addField(this.data.field)))
-	}
-
-	public transformEvents(events: ContentEvent[]): ContentEvent[] {
-		const entity = this.schema.model.entities[this.data.entityName]
-
-		return events.map(it => {
-			if (it.tableName !== entity.tableName || it.type !== EventType.create) {
-				return it
-			}
-
-			try {
-				let value: any = null
-				if (this.data.fillValue !== undefined) {
-					value = this.data.fillValue
-				} else if (this.data.copyValue !== undefined) {
-					const columnName = getColumnName(this.schema.model, entity, this.data.copyValue)
-					value = it.values[columnName] !== undefined ? it.values[columnName] : null
-				} else {
-					value = resolveDefaultValue(this.data.field, { now: () => it.createdAt })
-				}
-				return {
-					...it,
-					values: {
-						...it.values,
-						[this.data.field.columnName]: value,
-					},
-				}
-			} catch (e) {
-				// if (e instanceof NoDataError) {
-				// 	return {...it, errors: [...it.errors || []]}
-				// }
-				throw e
-			}
-		})
 	}
 
 	describe({ createdEntities }: { createdEntities: string[] }) {

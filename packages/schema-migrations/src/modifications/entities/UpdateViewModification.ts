@@ -1,6 +1,5 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Model, Schema } from '@contember/schema'
-import { ContentEvent } from '@contember/engine-common'
 import { ModificationHandlerStatic } from '../ModificationHandler'
 import { SchemaUpdater, updateEntity, updateModel } from '../utils/schemaUpdateUtils'
 
@@ -27,10 +26,6 @@ export const UpdateViewModification: ModificationHandlerStatic<UpdateViewModific
 				view: this.data.view,
 			})),
 		)
-	}
-
-	public async transformEvents(events: ContentEvent[]): Promise<ContentEvent[]> {
-		return events
 	}
 
 	describe() {

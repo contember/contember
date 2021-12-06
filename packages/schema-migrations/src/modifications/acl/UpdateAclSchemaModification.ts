@@ -1,6 +1,5 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Acl, Schema } from '@contember/schema'
-import { ContentEvent } from '@contember/engine-common'
 import { SchemaUpdater } from '../utils/schemaUpdateUtils'
 import { ModificationHandlerStatic } from '../ModificationHandler'
 import deepEqual from 'fast-deep-equal'
@@ -19,10 +18,6 @@ export const UpdateAclSchemaModification: ModificationHandlerStatic<UpdateAclSch
 			...schema,
 			acl: this.data.schema,
 		})
-	}
-
-	public transformEvents(events: ContentEvent[]): ContentEvent[] {
-		return events
 	}
 
 	describe() {

@@ -1,6 +1,5 @@
 import { MigrationFilesManager } from './MigrationFilesManager'
 import { Schema } from '@contember/schema'
-import { SchemaVersionBuilder } from './SchemaVersionBuilder'
 import { SchemaDiffer } from './SchemaDiffer'
 import { VERSION_LATEST } from './modifications/ModificationVersions'
 import { Migration } from './Migration'

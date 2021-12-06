@@ -23,6 +23,7 @@ import {
 	UpdateRelationOnDeleteModification,
 	UpdateRelationOrderByModification,
 } from './relations'
+
 class ModificationHandlerFactory {
 	constructor(private readonly map: Record<string, ModificationHandlerStatic<any>>) {}
 

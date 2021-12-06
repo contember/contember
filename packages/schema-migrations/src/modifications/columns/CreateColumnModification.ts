@@ -4,7 +4,7 @@ import { ContentEvent, EventType } from '@contember/engine-common'
 import { addField, SchemaUpdater, updateEntity, updateModel } from '../utils/schemaUpdateUtils'
 import { ModificationHandlerStatic } from '../ModificationHandler'
 import { wrapIdentifier } from '../../utils/dbHelpers'
-import { getColumnName, isColumn, isInverseRelation, isRelation, resolveDefaultValue } from '@contember/schema-utils'
+import { getColumnName, isColumn, resolveDefaultValue } from '@contember/schema-utils'
 import { ImplementationException } from '../../exceptions'
 import { createFields } from '../utils/diffUtils'
 

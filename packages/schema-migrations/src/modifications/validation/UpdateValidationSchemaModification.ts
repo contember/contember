@@ -5,7 +5,6 @@ import { SchemaUpdater } from '../utils/schemaUpdateUtils'
 import { ModificationHandlerStatic } from '../ModificationHandler'
 import deepEqual from 'fast-deep-equal'
 import { createPatch } from 'rfc6902'
-import { PatchAclSchemaModification } from '../acl'
 import { PatchValidationSchemaModification } from './PatchValidationSchemaModification'
 
 export const UpdateValidationSchemaModification: ModificationHandlerStatic<UpdateValidationSchemaModificationData> = class {

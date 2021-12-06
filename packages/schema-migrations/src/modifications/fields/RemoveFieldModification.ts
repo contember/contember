@@ -1,30 +1,15 @@
 import {
 	acceptFieldVisitor,
 	isInverseRelation,
-	isOwningRelation,
 	isRelation,
 	NamingHelper,
-	PredicateDefinitionProcessor,
 	tryGetColumnName,
 } from '@contember/schema-utils'
 import { MigrationBuilder } from '@contember/database-migrations'
-import { Model, Schema } from '@contember/schema'
+import { Schema } from '@contember/schema'
 import { ContentEvent, EventType } from '@contember/engine-common'
-import {
-	removeField,
-	SchemaUpdater,
-	updateAcl,
-	updateAclEveryEntity,
-	updateAclEveryPredicate,
-	updateAclEveryRole,
-	updateAclFieldPermissions,
-	updateEntity,
-	updateField,
-	updateModel,
-	updateSchema,
-} from '../utils/schemaUpdateUtils'
+import { removeField, SchemaUpdater } from '../utils/schemaUpdateUtils'
 import { ModificationHandlerStatic } from '../ModificationHandler'
-import { VERSION_ACL_PATCH, VERSION_REMOVE_RELATION_INVERSE_SIDE } from '../ModificationVersions'
 import { isDefined } from '../../utils/isDefined'
 
 export const RemoveFieldModification: ModificationHandlerStatic<RemoveFieldModificationData> = class {

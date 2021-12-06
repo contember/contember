@@ -1,6 +1,5 @@
 import { ModificationHandler } from './ModificationHandler'
 import { MigrationBuilder } from '@contember/database-migrations'
-import { Schema } from '@contember/schema'
 import { ContentEvent } from '@contember/engine-common'
 import { SchemaUpdater } from './utils/schemaUpdateUtils'
 

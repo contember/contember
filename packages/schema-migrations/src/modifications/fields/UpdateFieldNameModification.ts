@@ -1,6 +1,5 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Input, Model, Schema, Value } from '@contember/schema'
-import { ContentEvent } from '@contember/engine-common'
 import {
 	SchemaUpdater,
 	updateAcl,
@@ -156,10 +155,6 @@ export const UpdateFieldNameModification: ModificationHandlerStatic<UpdateFieldN
 			updateAclOp,
 			updateModel(updateConstraintName, updateConstraintFields, updateRelationReferences, updateEntityName),
 		)
-	}
-
-	public transformEvents(events: ContentEvent[]): ContentEvent[] {
-		return events
 	}
 
 	private getNewConstraintName(constraint: Model.UniqueConstraint): string | null {

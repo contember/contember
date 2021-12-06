@@ -1,6 +1,5 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Schema } from '@contember/schema'
-import { ContentEvent } from '@contember/engine-common'
 import { SchemaUpdater, updateModel } from '../utils/schemaUpdateUtils'
 import { ModificationHandlerStatic } from '../ModificationHandler'
 import deepEqual from 'fast-deep-equal'
@@ -27,10 +26,6 @@ export const UpdateEnumModification: ModificationHandlerStatic<UpdateEnumModific
 				[this.data.enumName]: this.data.values,
 			},
 		}))
-	}
-
-	public transformEvents(events: ContentEvent[]): ContentEvent[] {
-		return events
 	}
 
 	describe() {

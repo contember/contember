@@ -1,9 +1,7 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Schema } from '@contember/schema'
-import { ContentEvent } from '@contember/engine-common'
 import { SchemaUpdater, updateModel } from '../utils/schemaUpdateUtils'
 import { ModificationHandlerStatic } from '../ModificationHandler'
-import { escapeSqlString } from '../../utils/escapeSqlString'
 import { createCheck, getConstraintName } from './enumUtils'
 
 export const CreateEnumModification: ModificationHandlerStatic<CreateEnumModificationData> = class {
@@ -25,10 +23,6 @@ export const CreateEnumModification: ModificationHandlerStatic<CreateEnumModific
 				[this.data.enumName]: this.data.values,
 			},
 		}))
-	}
-
-	public transformEvents(events: ContentEvent[]): ContentEvent[] {
-		return events
 	}
 
 	describe() {

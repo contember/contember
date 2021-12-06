@@ -1,6 +1,5 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Model, Schema } from '@contember/schema'
-import { ContentEvent } from '@contember/engine-common'
 import { SchemaUpdater, updateEntity, updateModel } from '../utils/schemaUpdateUtils'
 import { ModificationHandlerStatic } from '../ModificationHandler'
 import { acceptFieldVisitor } from '@contember/schema-utils'
@@ -56,10 +55,6 @@ export const CreateUniqueConstraintModification: ModificationHandlerStatic<Creat
 				},
 			})),
 		)
-	}
-
-	public transformEvents(events: ContentEvent[]): ContentEvent[] {
-		return events
 	}
 
 	describe({ createdEntities }: { createdEntities: string[] }) {

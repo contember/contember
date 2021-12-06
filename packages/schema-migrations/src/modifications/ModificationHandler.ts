@@ -1,7 +1,6 @@
 import { MigrationBuilder } from '@contember/database-migrations'
-import { ContentEvent } from '@contember/engine-common'
 import { SchemaUpdater } from './utils/schemaUpdateUtils'
-import { Model, Schema } from '@contember/schema'
+import { Schema } from '@contember/schema'
 import { Migration } from '../Migration'
 
 export interface ModificationDescription {
@@ -17,8 +16,6 @@ export interface ModificationHandler<Data> {
 	createSql(builder: MigrationBuilder): void | Promise<void>
 
 	getSchemaUpdater(): SchemaUpdater
-
-	transformEvents(events: ContentEvent[]): ContentEvent[] | Promise<ContentEvent[]>
 
 	describe(context: ModificationDescriptionContext): ModificationDescription
 }

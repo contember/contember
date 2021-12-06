@@ -22,7 +22,7 @@ testMigrations('remove an entity', {
 			entityName: 'Author',
 		},
 	],
-	sql: SQL`DROP TABLE "author" CASCADE;`,
+	sql: SQL`ALTER TABLE "post" DROP "author_id"; DROP TABLE "author";`,
 })
 
 testMigrations('remove entity with acl', {
@@ -90,7 +90,7 @@ testMigrations('remove entity with acl', {
 			entityName: 'Site',
 		},
 	],
-	sql: SQL`DROP TABLE "site" CASCADE;`,
+	sql: SQL`ALTER TABLE "post" DROP "site_id"; DROP TABLE "site";`,
 })
 
 namespace ViewEntityOriginalSchema {

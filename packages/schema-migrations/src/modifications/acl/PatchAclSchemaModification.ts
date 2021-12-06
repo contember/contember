@@ -1,5 +1,4 @@
 import { MigrationBuilder } from '@contember/database-migrations'
-import { ContentEvent } from '@contember/engine-common'
 import { SchemaUpdater } from '../utils/schemaUpdateUtils'
 import { ModificationHandlerStatic } from '../ModificationHandler'
 import { applyPatch, Operation } from 'rfc6902'
@@ -25,10 +24,6 @@ export const PatchAclSchemaModification: ModificationHandlerStatic<PatchAclSchem
 				acl,
 			}
 		}
-	}
-
-	public transformEvents(events: ContentEvent[]): ContentEvent[] {
-		return events
 	}
 
 	describe() {

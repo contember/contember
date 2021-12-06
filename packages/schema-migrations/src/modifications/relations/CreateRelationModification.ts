@@ -7,7 +7,6 @@ import {
 	NamingHelper,
 } from '@contember/schema-utils'
 import { MigrationBuilder } from '@contember/database-migrations'
-import { ContentEvent } from '@contember/engine-common'
 import { addField, SchemaUpdater, updateEntity, updateModel } from '../utils/schemaUpdateUtils'
 import { ModificationHandlerStatic } from '../ModificationHandler'
 import { createEventTrigger, createEventTrxTrigger } from '../utils/sqlUpdateUtils'
@@ -125,10 +124,6 @@ export const CreateRelationModification: ModificationHandlerStatic<CreateRelatio
 				? updateEntity(this.data.owningSide.target, addField(this.data.inverseSide))
 				: undefined,
 		)
-	}
-
-	public transformEvents(events: ContentEvent[]): ContentEvent[] {
-		return events //todo fill
 	}
 
 	describe({ createdEntities }: { createdEntities: string[] }) {

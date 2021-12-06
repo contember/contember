@@ -1,6 +1,5 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Model, Schema } from '@contember/schema'
-import { ContentEvent } from '@contember/engine-common'
 import { SchemaUpdater, updateModel } from '../utils/schemaUpdateUtils'
 import { ModificationHandlerStatic } from '../ModificationHandler'
 import { createEventTrigger, createEventTrxTrigger } from '../utils/sqlUpdateUtils'
@@ -37,9 +36,6 @@ export const CreateEntityModification: ModificationHandlerStatic<CreateEntityMod
 		}))
 	}
 
-	public transformEvents(events: ContentEvent[]): ContentEvent[] {
-		return events
-	}
 
 	describe() {
 		return { message: `Add entity ${this.data.entity.name}` }

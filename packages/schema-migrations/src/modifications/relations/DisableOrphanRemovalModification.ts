@@ -1,6 +1,5 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Model, Schema } from '@contember/schema'
-import { ContentEvent } from '@contember/engine-common'
 import { SchemaUpdater, updateEntity, updateField, updateModel } from '../utils/schemaUpdateUtils'
 import { ModificationHandlerStatic } from '../ModificationHandler'
 import { isOwningRelation } from '@contember/schema-utils'
@@ -21,10 +20,6 @@ export const DisableOrphanRemovalModification: ModificationHandlerStatic<Disable
 				updateField<Model.OneHasOneOwningRelation>(fieldName, ({ field: { orphanRemoval, ...field } }) => field),
 			),
 		)
-	}
-
-	public transformEvents(events: ContentEvent[]): ContentEvent[] {
-		return events
 	}
 
 	describe() {

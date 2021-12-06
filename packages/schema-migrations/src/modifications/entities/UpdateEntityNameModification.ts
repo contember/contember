@@ -1,6 +1,5 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Model, Schema } from '@contember/schema'
-import { ContentEvent } from '@contember/engine-common'
 import {
 	SchemaUpdater,
 	updateAcl,
@@ -106,11 +105,6 @@ export const UpdateEntityNameModification: ModificationHandlerStatic<UpdateEntit
 				  )
 				: undefined,
 		)
-	}
-
-	public async transformEvents(events: ContentEvent[]): Promise<ContentEvent[]> {
-		events = await this.subModification.transformEvents(events)
-		return events
 	}
 
 	private getNewConstraintName(constraint: Model.UniqueConstraint): string | null {

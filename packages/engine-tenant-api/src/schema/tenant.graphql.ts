@@ -35,7 +35,13 @@ const schema: DocumentNode = gql`
 		resetPassword(token: String!, password: String!): ResetPasswordResponse
 
 		invite(email: String!, projectSlug: String!, memberships: [MembershipInput!]!, options: InviteOptions): InviteResponse
-		unmanagedInvite(email: String!, projectSlug: String!, memberships: [MembershipInput!]!, password: String!): InviteResponse
+		unmanagedInvite(
+			email: String!,
+			projectSlug: String!,
+			memberships: [MembershipInput!]!,
+			options: UnmanagedInviteOptions,
+			password: String @deprecated(reason: "Use options")
+		): InviteResponse
 
 		addProjectMember(projectSlug: String!, identityId: String!, memberships: [MembershipInput!]!): AddProjectMemberResponse
 		removeProjectMember(projectSlug: String!, identityId: String!): RemoveProjectMemberResponse
@@ -46,12 +52,19 @@ const schema: DocumentNode = gql`
 		createGlobalApiKey(description: String!, roles: [String!], tokenHash: String): CreateApiKeyResponse
 		disableApiKey(id: String!): DisableApiKeyResponse
 
-		addProjectMailTemplate(template: MailTemplate!): AddMailTemplateResponse
-		removeProjectMailTemplate(templateIdentifier: MailTemplateIdentifier!): RemoveMailTemplateResponse
+		addMailTemplate(template: MailTemplate!): AddMailTemplateResponse
+		removeMailTemplate(templateIdentifier: MailTemplateIdentifier!): RemoveMailTemplateResponse
 
 		createProject(projectSlug: String!, name: String, config: Json, secrets: [ProjectSecret!], deployTokenHash: String): CreateProjectResponse
 		setProjectSecret(projectSlug: String!, key: String!, value: String!): SetProjectSecretResponse
 		updateProject(projectSlug: String!, name: String, config: Json, mergeConfig: Boolean): UpdateProjectResponse
+
+		addProjectMailTemplate(template: MailTemplate!): AddMailTemplateResponse
+			@deprecated(reason: "use addMailtemplate")
+
+		removeProjectMailTemplate(templateIdentifier: MailTemplateIdentifier!): RemoveMailTemplateResponse
+			@deprecated(reason: "use removeMailtemplate")
+
 	}
 
 	# === signUp ===
@@ -94,6 +107,7 @@ const schema: DocumentNode = gql`
 	enum SignInErrorCode {
 		UNKNOWN_EMAIL
 		INVALID_PASSWORD
+		NO_PASSWORD_SET
 		OTP_REQUIRED
 		INVALID_OTP_TOKEN
 	}
@@ -155,6 +169,7 @@ const schema: DocumentNode = gql`
 		TOO_WEAK
 		NOT_A_PERSON
 		INVALID_PASSWORD
+		NO_PASSWORD_SET
 	}
 
 	# === IDP ===
@@ -241,8 +256,19 @@ const schema: DocumentNode = gql`
 		isNew: Boolean!
 	}
 
+	enum InviteMethod {
+		CREATE_PASSWORD
+		RESET_PASSWORD
+	}
+
 	input InviteOptions {
+		method: InviteMethod
 		mailVariant: String
+	}
+
+	input UnmanagedInviteOptions {
+		password: String
+		resetTokenHash: String
 	}
 
 	# === addProjectMember ===
@@ -520,7 +546,7 @@ const schema: DocumentNode = gql`
 	# === mails ===
 
 	input MailTemplate {
-		projectSlug: String!
+		projectSlug: String
 		type: MailType!
 		"Custom mail variant identifier, e.g. a locale."
 		variant: String
@@ -536,7 +562,7 @@ const schema: DocumentNode = gql`
 	}
 
 	input MailTemplateIdentifier {
-		projectSlug: String!
+		projectSlug: String
 		type: MailType!
 		variant: String
 	}

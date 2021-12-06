@@ -83,7 +83,8 @@ export type ChangeMyPasswordError = {
 export enum ChangeMyPasswordErrorCode {
 	TooWeak = 'TOO_WEAK',
 	NotAPerson = 'NOT_A_PERSON',
-	InvalidPassword = 'INVALID_PASSWORD'
+	InvalidPassword = 'INVALID_PASSWORD',
+	NoPasswordSet = 'NO_PASSWORD_SET'
 }
 
 export type ChangeMyPasswordResponse = {
@@ -329,7 +330,13 @@ export enum InviteErrorCode {
 	VariableEmpty = 'VARIABLE_EMPTY'
 }
 
+export enum InviteMethod {
+	CreatePassword = 'CREATE_PASSWORD',
+	ResetPassword = 'RESET_PASSWORD'
+}
+
 export type InviteOptions = {
+	readonly method?: Maybe<InviteMethod>
 	readonly mailVariant?: Maybe<Scalars['String']>
 }
 
@@ -350,7 +357,7 @@ export type InviteResult = {
 
 
 export type MailTemplate = {
-	readonly projectSlug: Scalars['String']
+	readonly projectSlug?: Maybe<Scalars['String']>
 	readonly type: MailType
 	/** Custom mail variant identifier, e.g. a locale. */
 	readonly variant?: Maybe<Scalars['String']>
@@ -360,7 +367,7 @@ export type MailTemplate = {
 }
 
 export type MailTemplateIdentifier = {
-	readonly projectSlug: Scalars['String']
+	readonly projectSlug?: Maybe<Scalars['String']>
 	readonly type: MailType
 	readonly variant?: Maybe<Scalars['String']>
 }
@@ -422,11 +429,15 @@ export type Mutation = {
 	readonly createApiKey?: Maybe<CreateApiKeyResponse>
 	readonly createGlobalApiKey?: Maybe<CreateApiKeyResponse>
 	readonly disableApiKey?: Maybe<DisableApiKeyResponse>
-	readonly addProjectMailTemplate?: Maybe<AddMailTemplateResponse>
-	readonly removeProjectMailTemplate?: Maybe<RemoveMailTemplateResponse>
+	readonly addMailTemplate?: Maybe<AddMailTemplateResponse>
+	readonly removeMailTemplate?: Maybe<RemoveMailTemplateResponse>
 	readonly createProject?: Maybe<CreateProjectResponse>
 	readonly setProjectSecret?: Maybe<SetProjectSecretResponse>
 	readonly updateProject?: Maybe<UpdateProjectResponse>
+	/** @deprecated use addMailtemplate */
+	readonly addProjectMailTemplate?: Maybe<AddMailTemplateResponse>
+	/** @deprecated use removeMailtemplate */
+	readonly removeProjectMailTemplate?: Maybe<RemoveMailTemplateResponse>
 }
 
 
@@ -511,7 +522,8 @@ export type MutationUnmanagedInviteArgs = {
 	email: Scalars['String']
 	projectSlug: Scalars['String']
 	memberships: ReadonlyArray<MembershipInput>
-	password: Scalars['String']
+	options?: Maybe<UnmanagedInviteOptions>
+	password?: Maybe<Scalars['String']>
 }
 
 
@@ -555,12 +567,12 @@ export type MutationDisableApiKeyArgs = {
 }
 
 
-export type MutationAddProjectMailTemplateArgs = {
+export type MutationAddMailTemplateArgs = {
 	template: MailTemplate
 }
 
 
-export type MutationRemoveProjectMailTemplateArgs = {
+export type MutationRemoveMailTemplateArgs = {
 	templateIdentifier: MailTemplateIdentifier
 }
 
@@ -586,6 +598,16 @@ export type MutationUpdateProjectArgs = {
 	name?: Maybe<Scalars['String']>
 	config?: Maybe<Scalars['Json']>
 	mergeConfig?: Maybe<Scalars['Boolean']>
+}
+
+
+export type MutationAddProjectMailTemplateArgs = {
+	template: MailTemplate
+}
+
+
+export type MutationRemoveProjectMailTemplateArgs = {
+	templateIdentifier: MailTemplateIdentifier
 }
 
 export type Person = {
@@ -755,6 +777,7 @@ export type SignInError = {
 export enum SignInErrorCode {
 	UnknownEmail = 'UNKNOWN_EMAIL',
 	InvalidPassword = 'INVALID_PASSWORD',
+	NoPasswordSet = 'NO_PASSWORD_SET',
 	OtpRequired = 'OTP_REQUIRED',
 	InvalidOtpToken = 'INVALID_OTP_TOKEN'
 }
@@ -848,6 +871,11 @@ export type SignUpResponse = {
 export type SignUpResult = {
 	readonly __typename?: 'SignUpResult'
 	readonly person: Person
+}
+
+export type UnmanagedInviteOptions = {
+	readonly password?: Maybe<Scalars['String']>
+	readonly resetTokenHash?: Maybe<Scalars['String']>
 }
 
 export type UpdateProjectMemberError = {
@@ -1018,6 +1046,7 @@ export type ResolversTypes = {
 	InitSignInIDPResult: ResolverTypeWrapper<InitSignInIdpResult>
 	InviteError: ResolverTypeWrapper<InviteError>
 	InviteErrorCode: InviteErrorCode
+	InviteMethod: InviteMethod
 	InviteOptions: InviteOptions
 	InviteResponse: ResolverTypeWrapper<InviteResponse>
 	InviteResult: ResolverTypeWrapper<InviteResult>
@@ -1067,6 +1096,7 @@ export type ResolversTypes = {
 	SignUpErrorCode: SignUpErrorCode
 	SignUpResponse: ResolverTypeWrapper<SignUpResponse>
 	SignUpResult: ResolverTypeWrapper<SignUpResult>
+	UnmanagedInviteOptions: UnmanagedInviteOptions
 	UpdateProjectMemberError: ResolverTypeWrapper<UpdateProjectMemberError>
 	UpdateProjectMemberErrorCode: UpdateProjectMemberErrorCode
 	UpdateProjectMemberResponse: ResolverTypeWrapper<UpdateProjectMemberResponse>
@@ -1151,6 +1181,7 @@ export type ResolversParentTypes = {
 	SignUpError: SignUpError
 	SignUpResponse: SignUpResponse
 	SignUpResult: SignUpResult
+	UnmanagedInviteOptions: UnmanagedInviteOptions
 	UpdateProjectMemberError: UpdateProjectMemberError
 	UpdateProjectMemberResponse: UpdateProjectMemberResponse
 	UpdateProjectResponse: UpdateProjectResponse
@@ -1415,18 +1446,20 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
 	createResetPasswordRequest?: Resolver<Maybe<ResolversTypes['CreatePasswordResetRequestResponse']>, ParentType, ContextType, RequireFields<MutationCreateResetPasswordRequestArgs, 'email'>>
 	resetPassword?: Resolver<Maybe<ResolversTypes['ResetPasswordResponse']>, ParentType, ContextType, RequireFields<MutationResetPasswordArgs, 'token' | 'password'>>
 	invite?: Resolver<Maybe<ResolversTypes['InviteResponse']>, ParentType, ContextType, RequireFields<MutationInviteArgs, 'email' | 'projectSlug' | 'memberships'>>
-	unmanagedInvite?: Resolver<Maybe<ResolversTypes['InviteResponse']>, ParentType, ContextType, RequireFields<MutationUnmanagedInviteArgs, 'email' | 'projectSlug' | 'memberships' | 'password'>>
+	unmanagedInvite?: Resolver<Maybe<ResolversTypes['InviteResponse']>, ParentType, ContextType, RequireFields<MutationUnmanagedInviteArgs, 'email' | 'projectSlug' | 'memberships'>>
 	addProjectMember?: Resolver<Maybe<ResolversTypes['AddProjectMemberResponse']>, ParentType, ContextType, RequireFields<MutationAddProjectMemberArgs, 'projectSlug' | 'identityId' | 'memberships'>>
 	removeProjectMember?: Resolver<Maybe<ResolversTypes['RemoveProjectMemberResponse']>, ParentType, ContextType, RequireFields<MutationRemoveProjectMemberArgs, 'projectSlug' | 'identityId'>>
 	updateProjectMember?: Resolver<Maybe<ResolversTypes['UpdateProjectMemberResponse']>, ParentType, ContextType, RequireFields<MutationUpdateProjectMemberArgs, 'projectSlug' | 'identityId' | 'memberships'>>
 	createApiKey?: Resolver<Maybe<ResolversTypes['CreateApiKeyResponse']>, ParentType, ContextType, RequireFields<MutationCreateApiKeyArgs, 'projectSlug' | 'memberships' | 'description'>>
 	createGlobalApiKey?: Resolver<Maybe<ResolversTypes['CreateApiKeyResponse']>, ParentType, ContextType, RequireFields<MutationCreateGlobalApiKeyArgs, 'description'>>
 	disableApiKey?: Resolver<Maybe<ResolversTypes['DisableApiKeyResponse']>, ParentType, ContextType, RequireFields<MutationDisableApiKeyArgs, 'id'>>
-	addProjectMailTemplate?: Resolver<Maybe<ResolversTypes['AddMailTemplateResponse']>, ParentType, ContextType, RequireFields<MutationAddProjectMailTemplateArgs, 'template'>>
-	removeProjectMailTemplate?: Resolver<Maybe<ResolversTypes['RemoveMailTemplateResponse']>, ParentType, ContextType, RequireFields<MutationRemoveProjectMailTemplateArgs, 'templateIdentifier'>>
+	addMailTemplate?: Resolver<Maybe<ResolversTypes['AddMailTemplateResponse']>, ParentType, ContextType, RequireFields<MutationAddMailTemplateArgs, 'template'>>
+	removeMailTemplate?: Resolver<Maybe<ResolversTypes['RemoveMailTemplateResponse']>, ParentType, ContextType, RequireFields<MutationRemoveMailTemplateArgs, 'templateIdentifier'>>
 	createProject?: Resolver<Maybe<ResolversTypes['CreateProjectResponse']>, ParentType, ContextType, RequireFields<MutationCreateProjectArgs, 'projectSlug'>>
 	setProjectSecret?: Resolver<Maybe<ResolversTypes['SetProjectSecretResponse']>, ParentType, ContextType, RequireFields<MutationSetProjectSecretArgs, 'projectSlug' | 'key' | 'value'>>
 	updateProject?: Resolver<Maybe<ResolversTypes['UpdateProjectResponse']>, ParentType, ContextType, RequireFields<MutationUpdateProjectArgs, 'projectSlug'>>
+	addProjectMailTemplate?: Resolver<Maybe<ResolversTypes['AddMailTemplateResponse']>, ParentType, ContextType, RequireFields<MutationAddProjectMailTemplateArgs, 'template'>>
+	removeProjectMailTemplate?: Resolver<Maybe<ResolversTypes['RemoveMailTemplateResponse']>, ParentType, ContextType, RequireFields<MutationRemoveProjectMailTemplateArgs, 'templateIdentifier'>>
 }
 
 export type PersonResolvers<ContextType = any, ParentType extends ResolversParentTypes['Person'] = ResolversParentTypes['Person']> = {

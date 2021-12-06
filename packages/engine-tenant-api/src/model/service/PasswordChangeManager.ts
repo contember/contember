@@ -25,6 +25,9 @@ class PasswordChangeManager {
 		if (weakPassword) {
 			return new ResponseError(ChangeMyPasswordErrorCode.TooWeak, weakPassword)
 		}
+		if (!person.password_hash) {
+			return new ResponseError(ChangeMyPasswordErrorCode.NoPasswordSet, 'No password set')
+		}
 		if (!(await this.providers.bcryptCompare(currentPassword, person.password_hash))) {
 			return new ResponseError(ChangeMyPasswordErrorCode.InvalidPassword, 'Password does not match')
 		}

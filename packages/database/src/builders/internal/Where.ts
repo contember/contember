@@ -26,7 +26,13 @@ namespace Where {
 
 			const valueWhereToLiteral = (where: Where.ValueWhere): Literal =>
 				new Literal('').appendAll(
-					Object.keys(where).map(it => new Literal(wrapIdentifier(it) + ' = ?', [where[it]])),
+					Object.keys(where).map(it => {
+						const identifier = wrapIdentifier(it)
+						if (where[it] === null) {
+							return new Literal(`${identifier} is null`)
+						}
+						return new Literal(`${identifier} = ?`, [where[it]])
+					}),
 					' and ',
 				)
 

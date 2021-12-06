@@ -6,9 +6,10 @@ import {
 } from '../../../schema'
 import { GraphQLResolveInfo } from 'graphql'
 import { ResolverContext } from '../../ResolverContext'
-import { ApiKeyManager, MembershipValidator, PermissionActions, ProjectManager } from '../../../model'
+import { ApiKeyManager, isTokenHash, MembershipValidator, PermissionActions, ProjectManager } from '../../../model'
 import { createMembershipValidationErrorResult } from '../../membershipUtils'
 import { createProjectNotFoundResponse } from '../../errorUtils'
+import { UserInputError } from 'apollo-server-errors'
 
 export class CreateApiKeyMutationResolver implements MutationResolvers {
 	constructor(
@@ -32,7 +33,9 @@ export class CreateApiKeyMutationResolver implements MutationResolvers {
 		if (!project) {
 			return createProjectNotFoundResponse(CreateApiKeyErrorCode.ProjectNotFound, projectSlug)
 		}
-
+		if (typeof tokenHash === 'string' && !isTokenHash(tokenHash)) {
+			throw new UserInputError('Invalid format of tokenHash. Must be hex-encoded sha256.')
+		}
 		const validationResult = await this.membershipValidator.validate(context.projectGroup, project.slug, memberships)
 		if (validationResult.length > 0) {
 			const errors = createMembershipValidationErrorResult<CreateApiKeyErrorCode>(validationResult)
@@ -64,6 +67,9 @@ export class CreateApiKeyMutationResolver implements MutationResolvers {
 			action: PermissionActions.API_KEY_CREATE_GLOBAL,
 			message: 'You are not allowed to create a global API key',
 		})
+		if (typeof tokenHash === 'string' && !isTokenHash(tokenHash)) {
+			throw new UserInputError('Invalid format of tokenHash. Must be hex-encoded sha256.')
+		}
 		const result = await this.apiKeyManager.createGlobalPermanentApiKey(context.db, description, roles ?? [], tokenHash ?? undefined)
 		return {
 			ok: true,

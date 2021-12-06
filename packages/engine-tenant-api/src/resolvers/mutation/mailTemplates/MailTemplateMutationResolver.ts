@@ -18,24 +18,24 @@ export class MailTemplateMutationResolver implements MutationResolvers {
 		private readonly mailTemplateManager: MailTemplateManager,
 	) {}
 
-	async addProjectMailTemplate(
+	async addMailTemplate(
 		parent: any,
 		{ template: { content, projectSlug, subject, type, useLayout, variant } }: MutationAddProjectMailTemplateArgs,
 		context: ResolverContext,
 	): Promise<AddMailTemplateResponse> {
-		const project = await this.projectManager.getProjectBySlug(context.db, projectSlug)
+		const project = projectSlug ? await this.projectManager.getProjectBySlug(context.db, projectSlug) : null
 		await context.requireAccess({
-			scope: await context.permissionContext.createProjectScope(project),
+			scope: project ? await context.permissionContext.createProjectScope(project) : undefined,
 			action: PermissionActions.MAIL_TEMPLATE_ADD,
 			message: 'You are not allowed to add a mail template',
 		})
-		if (!project) {
+		if (projectSlug && !project) {
 			return createProjectNotFoundResponse(AddMailTemplateErrorCode.ProjectNotFound, projectSlug)
 		}
 
 		await this.mailTemplateManager.addMailTemplate(context.db, {
 			content,
-			projectId: project.id,
+			projectId: project?.id,
 			subject,
 			useLayout: typeof useLayout === 'boolean' ? useLayout : true,
 			variant: variant || '',
@@ -48,23 +48,23 @@ export class MailTemplateMutationResolver implements MutationResolvers {
 		}
 	}
 
-	async removeProjectMailTemplate(
+	async removeMailTemplate(
 		parent: any,
 		{ templateIdentifier: { projectSlug, type, variant } }: MutationRemoveProjectMailTemplateArgs,
 		context: ResolverContext,
 	): Promise<RemoveMailTemplateResponse> {
-		const project = await this.projectManager.getProjectBySlug(context.db, projectSlug)
+		const project = projectSlug ? await this.projectManager.getProjectBySlug(context.db, projectSlug) : null
 		await context.requireAccess({
-			scope: await context.permissionContext.createProjectScope(project),
+			scope: project ? await context.permissionContext.createProjectScope(project) : undefined,
 			action: PermissionActions.MAIL_TEMPLATE_REMOVE,
 			message: 'You are not allowed to remove a mail template',
 		})
-		if (!project) {
+		if (projectSlug && !project) {
 			return createProjectNotFoundResponse(RemoveMailTemplateErrorCode.ProjectNotFound, projectSlug)
 		}
 
 		const removed = await this.mailTemplateManager.removeMailTemplate(context.db, {
-			projectId: project.id,
+			projectId: project?.id,
 			variant: variant || '',
 			type: this.mapMailType(type),
 		})

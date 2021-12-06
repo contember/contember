@@ -7,8 +7,6 @@ import { MailTemplateQuery } from '../queries'
 import Layout from './templates/Layout.mustache'
 import { DatabaseContext } from '../utils'
 
-type SomeOptional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>
-
 export class UserMailer {
 	constructor(
 		private readonly mailer: Mailer,
@@ -17,7 +15,7 @@ export class UserMailer {
 
 	async sendNewUserInvitedMail(
 		dbContext: DatabaseContext,
-		mailArguments: { email: string; password: string; project: string },
+		mailArguments: { email: string; password: string | null; token: string | null; project: string },
 		customMailOptions: { projectId: string; variant: string },
 	): Promise<void> {
 		const template = (await this.getCustomTemplate(dbContext, { type: MailType.newUserInvited, ...customMailOptions })) || {
@@ -65,14 +63,12 @@ export class UserMailer {
 
 	private async getCustomTemplate(
 		dbContext: DatabaseContext,
-		identifier: SomeOptional<MailTemplateIdentifier, 'projectId'>,
+		identifier: MailTemplateIdentifier,
 	): Promise<Pick<MailTemplateData, 'subject' | 'content'> | null> {
-		if (!identifier.projectId) {
-			return null
-		}
-		const customTemplate = await dbContext.queryHandler.fetch(
-			new MailTemplateQuery(identifier.projectId, identifier.type, identifier.variant),
-		)
+		const customTemplate =
+			(await dbContext.queryHandler.fetch(new MailTemplateQuery(identifier)))
+			?? (await dbContext.queryHandler.fetch(new MailTemplateQuery({ ...identifier, projectId: undefined })))
+
 		if (!customTemplate) {
 			return null
 		}

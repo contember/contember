@@ -9,7 +9,7 @@ import { ApiKey } from '../../type'
 import { Membership } from '../../type/Membership'
 import { ApiKeyByTokenQuery } from '../../queries'
 import { Response, ResponseError, ResponseOk } from '../../utils/Response'
-import { DatabaseContext } from '../../utils'
+import { DatabaseContext, TokenHash } from '../../utils'
 import { ApiKeyService, CreateApiKeyResponse } from './ApiKeyService'
 import assert from 'assert'
 
@@ -72,7 +72,7 @@ export class ApiKeyManager {
 		dbContext: DatabaseContext,
 		description: string,
 		roles: readonly string[],
-		tokenHash?: string,
+		tokenHash?: TokenHash,
 	): Promise<CreateApiKeyResponse> {
 		return await dbContext.transaction(async db => {
 			return await this.apiKeyService.createPermanentApiKey(db, description, roles, tokenHash)
@@ -84,7 +84,7 @@ export class ApiKeyManager {
 		projectId: string,
 		memberships: readonly Membership[],
 		description: string,
-		tokenHash?: string,
+		tokenHash?: TokenHash,
 	): Promise<CreateApiKeyResponse> {
 		return await dbContext.transaction(async db => {
 			return await this.apiKeyService.createProjectPermanentApiKey(db, projectId, memberships, description, tokenHash)

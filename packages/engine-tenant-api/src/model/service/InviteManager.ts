@@ -1,25 +1,30 @@
 import {
-	CommandBus,
 	CreateIdentityCommand,
 	CreateOrUpdateProjectMembershipCommand,
+	CreatePasswordResetRequestCommand,
 	CreatePersonCommand,
 } from '../commands'
 import { Providers } from '../providers'
 import { PersonQuery, PersonRow } from '../queries'
 import { Membership } from '../type/Membership'
-import { InviteErrorCode } from '../../schema'
+import { InviteErrorCode, InviteMethod } from '../../schema'
 import { TenantRole } from '../authorization'
 import { UserMailer } from '../mailing'
 import { Project } from '../type'
 import { createAppendMembershipVariables } from './membershipUtils'
 import { Response, ResponseOk } from '../utils/Response'
-import { DatabaseContext } from '../utils'
+import { DatabaseContext, TokenHash } from '../utils'
+import { SavePasswordResetRequestCommand } from '../commands/passwordReset/SavePasswordResetRequestCommand'
 
 export interface InviteOptions {
 	noEmail?: boolean
 	password?: string
 	emailVariant?: string
+	method?: InviteMethod
+	passwordResetTokenHash?: TokenHash
 }
+
+const INVITATION_RESET_TOKEN_EXPIRATION_MINUTES = 60 * 24
 
 export class InviteManager {
 	constructor(
@@ -32,31 +37,40 @@ export class InviteManager {
 		email: string,
 		project: Project,
 		memberships: readonly Membership[],
-		options: InviteOptions = {},
+		{ method, emailVariant, noEmail = false, password, passwordResetTokenHash }: InviteOptions = {},
 	): Promise<InviteResponse> {
 		return await dbContext.transaction(async trx => {
 			let person: Omit<PersonRow, 'roles'> | null = await trx.queryHandler.fetch(PersonQuery.byEmail(email))
 			const isNew = !person
-			let generatedPassword: string = ''
+			let generatedPassword: string | null = null
+			let resetToken: string | null = null
 			if (!person) {
 				const identityId = await trx.commandBus.execute(new CreateIdentityCommand([TenantRole.PERSON]))
-				generatedPassword = options.password || (await this.providers.randomBytes(9)).toString('base64')
+
+				generatedPassword = password ??
+					(method === InviteMethod.CreatePassword ? (await this.providers.randomBytes(9)).toString('base64') : null)
+
 				person = await trx.commandBus.execute(new CreatePersonCommand(identityId, email, generatedPassword))
+				if (method === InviteMethod.ResetPassword) {
+					const result = await trx.commandBus.execute(new CreatePasswordResetRequestCommand(person.id, INVITATION_RESET_TOKEN_EXPIRATION_MINUTES))
+					resetToken = result.token
+				}
+				if (passwordResetTokenHash) {
+					await trx.commandBus.execute(new SavePasswordResetRequestCommand(person.id, passwordResetTokenHash, INVITATION_RESET_TOKEN_EXPIRATION_MINUTES))
+				}
 			}
 			for (const membershipUpdate of createAppendMembershipVariables(memberships)) {
-				await trx.commandBus.execute(
-					new CreateOrUpdateProjectMembershipCommand(project.id, person.identity_id, membershipUpdate),
-				)
+				await trx.commandBus.execute(new CreateOrUpdateProjectMembershipCommand(project.id, person.identity_id, membershipUpdate))
 			}
-			if (!options.noEmail) {
+			if (!noEmail) {
 				const customMailOptions = {
 					projectId: project.id,
-					variant: options.emailVariant || '',
+					variant: emailVariant ?? '',
 				}
 				if (isNew) {
 					await this.mailer.sendNewUserInvitedMail(
 						trx,
-						{ email, project: project.name, password: generatedPassword },
+						{ email, project: project.name, password: generatedPassword, token: resetToken },
 						customMailOptions,
 					)
 				} else {

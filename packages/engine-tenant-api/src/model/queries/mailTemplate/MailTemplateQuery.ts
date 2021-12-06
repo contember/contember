@@ -1,11 +1,9 @@
 import { DatabaseQuery, DatabaseQueryable, SelectBuilder } from '@contember/database'
-import { MailTemplateData, MailType } from '../../mailing'
+import { MailTemplateData, MailTemplateIdentifier } from '../../mailing'
 
 class MailTemplateQuery extends DatabaseQuery<MailTemplateQuery.Result> {
 	constructor(
-		private readonly projectId: string,
-		private readonly mailType: MailType,
-		private readonly variant: string,
+		private mailTemplateIdentifier: MailTemplateIdentifier,
 	) {
 		super()
 	}
@@ -18,9 +16,9 @@ class MailTemplateQuery extends DatabaseQuery<MailTemplateQuery.Result> {
 			.select('use_layout', 'useLayout')
 			.from('mail_template')
 			.where({
-				project_id: this.projectId,
-				mail_type: this.mailType,
-				variant: this.variant,
+				project_id: this.mailTemplateIdentifier.projectId ?? null,
+				mail_type: this.mailTemplateIdentifier.type,
+				variant: this.mailTemplateIdentifier.variant,
 			})
 			.getResult(db)
 

@@ -1,5 +1,6 @@
 import {
 	InviteErrorCode,
+	InviteMethod,
 	InviteResponse,
 	MembershipInput,
 	MutationInviteArgs,
@@ -8,16 +9,18 @@ import {
 } from '../../../schema'
 import { ResolverContext } from '../../ResolverContext'
 import {
-	DatabaseContext,
 	InviteManager,
 	InviteOptions,
+	isTokenHash,
 	MembershipValidator,
 	PermissionActions,
-	Project, ProjectGroup,
+	Project,
+	ProjectGroup,
 	ProjectManager,
 } from '../../../model'
 import { createMembershipValidationErrorResult } from '../../membershipUtils'
 import { createErrorResponse, createProjectNotFoundResponse } from '../../errorUtils'
+import { UserInputError } from 'apollo-server-errors'
 
 export class InviteMutationResolver implements MutationResolvers {
 	constructor(
@@ -42,12 +45,13 @@ export class InviteMutationResolver implements MutationResolvers {
 		}
 		return this.doInvite(context.projectGroup, project, memberships, email, {
 			emailVariant: options?.mailVariant || '',
+			method: options?.method ?? InviteMethod.CreatePassword,
 		})
 	}
 
 	async unmanagedInvite(
 		parent: any,
-		{ projectSlug, email, memberships, password }: MutationUnmanagedInviteArgs,
+		{ projectSlug, email, memberships, password, options }: MutationUnmanagedInviteArgs,
 		context: ResolverContext,
 	): Promise<InviteResponse> {
 		const project = await this.projectManager.getProjectBySlug(context.db, projectSlug)
@@ -59,9 +63,13 @@ export class InviteMutationResolver implements MutationResolvers {
 		if (!project) {
 			return createProjectNotFoundResponse(InviteErrorCode.ProjectNotFound, projectSlug)
 		}
+		if (typeof options?.resetTokenHash === 'string' && !isTokenHash(options?.resetTokenHash)) {
+			throw new UserInputError('Invalid format of resetTokenHash. Must be hex-encoded sha256.')
+		}
 		return this.doInvite(context.projectGroup, project, memberships, email, {
 			noEmail: true,
-			password,
+			password: password ?? options?.password ?? undefined,
+			passwordResetTokenHash: options?.resetTokenHash ?? undefined,
 		})
 	}
 

@@ -15,6 +15,7 @@ import {
 import { ModificationHandlerStatic } from '../ModificationHandler'
 import { VERSION_ACL_PATCH, VERSION_REMOVE_REFERENCING_RELATIONS } from '../ModificationVersions'
 import { isRelation, PredicateDefinitionProcessor } from '@contember/schema-utils'
+import { RemoveFieldModification } from '../fields'
 
 export const RemoveEntityModification: ModificationHandlerStatic<RemoveEntityModificationData> = class {
 	static id = 'removeEntity'
@@ -30,7 +31,12 @@ export const RemoveEntityModification: ModificationHandlerStatic<RemoveEntityMod
 			builder.dropView(entity.tableName)
 			return
 		}
-		builder.dropTable(entity.tableName, { cascade: true })
+		if (this.formatVersion >= VERSION_REMOVE_REFERENCING_RELATIONS) {
+			this.getFieldsToRemove(this.schema).forEach(([entityName, fieldName]) => {
+				(new RemoveFieldModification({ entityName, fieldName }, this.schema, this.formatVersion)).createSql(builder)
+			})
+		}
+		builder.dropTable(entity.tableName)
 	}
 
 	public getSchemaUpdater(): SchemaUpdater {
@@ -67,11 +73,7 @@ export const RemoveEntityModification: ModificationHandlerStatic<RemoveEntityMod
 				: undefined,
 			this.formatVersion >= VERSION_REMOVE_REFERENCING_RELATIONS
 				? ({ schema }) => {
-					const fieldsToRemove = Object.values(schema.model.entities).flatMap(entity =>
-						Object.values(entity.fields)
-							.filter(field => isRelation(field) && field.target === this.data.entityName)
-							.map(field => [entity.name, field.name]),
-					)
+					const fieldsToRemove = this.getFieldsToRemove(schema)
 					return fieldsToRemove.reduce(
 						(schema, [entity, field]) => removeField(entity, field, this.formatVersion)({ schema }),
 						schema,
@@ -85,6 +87,14 @@ export const RemoveEntityModification: ModificationHandlerStatic<RemoveEntityMod
 					entities: { ...entities },
 				}
 			}),
+		)
+	}
+
+	private getFieldsToRemove(schema: Schema): [entity: string, field: string][] {
+		return Object.values(schema.model.entities).flatMap(entity =>
+			Object.values(entity.fields)
+				.filter(field => isRelation(field) && field.target === this.data.entityName)
+				.map((field): [string, string] => [entity.name, field.name]),
 		)
 	}
 

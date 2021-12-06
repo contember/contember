@@ -55,7 +55,8 @@ export class DeleteExecutor {
 				return [new MutationDeleteOk([], entity, primaryValue)]
 			} catch (e) {
 				if (e instanceof ForeignKeyViolationError) {
-					return [new MutationNoResultError([])]
+					const tableName = e.previous && 'table' in e.previous && typeof e.previous.table === 'string' ? e.previous.table : undefined
+					return [new MutationNoResultError([], tableName ? `table ${tableName}` : undefined)]
 				}
 				throw e
 			}

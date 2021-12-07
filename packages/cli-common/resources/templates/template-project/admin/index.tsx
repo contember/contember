@@ -1,7 +1,7 @@
-import * as React from 'react'
 import { ApplicationEntrypoint, Pages, runReactApp } from '@contember/admin'
-import { Layout } from './components/Layout'
 import '@contember/admin/style.css'
+import * as React from 'react'
+import { Layout } from './components/Layout'
 
 const pages = Object.values(import.meta.globEager('./pages/*.tsx')).flatMap(Object.values)
 

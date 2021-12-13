@@ -8,6 +8,7 @@
 		}
 	},
 	"references": [
-		{ "path": "../../../packages/admin/src"}
+		{ "path": "../../../packages/admin/src"},
+		{ "path":  "../src" }
 	]
 }

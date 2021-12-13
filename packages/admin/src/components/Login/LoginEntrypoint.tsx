@@ -14,7 +14,7 @@ export interface LoginEntrypointProps {
 	loginToken: string
 	sessionToken?: string
 	basePath?: string
-	projects: null | Project[]
+	projects: null | readonly Project[]
 	formatProjectUrl: (project: Project) => string
 }
 
@@ -81,7 +81,7 @@ export const LoginEntrypoint = (props: LoginEntrypointProps) => {
 }
 
 const LoginEntrypointInner: FC<Pick<LoginEntrypointProps, 'projects' | 'formatProjectUrl'>> = props => {
-	const [projects, setProjects] = useState<null | Project[]>(props.projects)
+	const [projects, setProjects] = useState<null | readonly Project[]>(props.projects)
 
 	if (projects === null) {
 		return <Login onLogin={setProjects} resetLink={'resetRequest'} />

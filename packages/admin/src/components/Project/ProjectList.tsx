@@ -8,7 +8,7 @@ export interface Project {
 }
 
 export interface ProjectListProps {
-	projects: Project[],
+	projects: readonly Project[],
 	formatProjectUrl: (project: Project) => string
 }
 

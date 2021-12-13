@@ -42,7 +42,7 @@ export const csCZ: AdminDictionary = {
 			},
 		},
 	},
-	dataGirdCells: {
+	dataGridCells: {
 		booleanCell: {
 			includeTrue: 'Ano',
 			includeFalse: 'Ne',

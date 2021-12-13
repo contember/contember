@@ -62,7 +62,7 @@ export const SelectCellFilter = ({ filter, setFilter, environment, optionProps }
 			}}
 		>
 			<span style={{ whiteSpace: 'nowrap' }}>
-				{formatMessage('dataGirdCells.textCell.includeNull', {
+				{formatMessage('dataGridCells.textCell.includeNull', {
 					strong: chunks => <strong>{chunks}</strong>,
 				})}
 			</span>

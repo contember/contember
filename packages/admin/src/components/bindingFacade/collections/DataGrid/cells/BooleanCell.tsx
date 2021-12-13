@@ -63,9 +63,9 @@ export const BooleanCell: FunctionComponent<BooleanCellProps> = Component(props 
 					<div style={{ display: 'flex', gap: '0.5em', alignItems: 'center' }}>
 						{(
 							[
-								['includeTrue', formatMessage('dataGirdCells.booleanCell.includeTrue')],
-								['includeFalse', formatMessage('dataGirdCells.booleanCell.includeFalse')],
-								['includeNull', formatMessage('dataGirdCells.booleanCell.includeNull')],
+								['includeTrue', formatMessage('dataGridCells.booleanCell.includeTrue')],
+								['includeFalse', formatMessage('dataGridCells.booleanCell.includeFalse')],
+								['includeNull', formatMessage('dataGridCells.booleanCell.includeNull')],
 							] as const
 						).map(([item, label]) => (
 							<Checkbox

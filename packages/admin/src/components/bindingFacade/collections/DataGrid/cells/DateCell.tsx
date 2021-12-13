@@ -69,7 +69,7 @@ export const DateCell: FunctionComponent<DateCellProps> = Component(props => {
 							startDate={start}
 							endDate={end}
 							isClearable
-							customInput={<DateBoundInput label={formatMessage('dataGirdCells.dateCell.fromLabel')} />}
+							customInput={<DateBoundInput label={formatMessage('dataGridCells.dateCell.fromLabel')} />}
 						/>
 						<DatePicker
 							selected={end}
@@ -81,7 +81,7 @@ export const DateCell: FunctionComponent<DateCellProps> = Component(props => {
 							endDate={end}
 							minDate={start}
 							isClearable
-							customInput={<DateBoundInput label={formatMessage('dataGirdCells.dateCell.toLabel')} />}
+							customInput={<DateBoundInput label={formatMessage('dataGridCells.dateCell.toLabel')} />}
 						/>
 					</div>
 				)

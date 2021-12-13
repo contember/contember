@@ -19,11 +19,11 @@ export const GenericTextCellFilter = <Filter extends GenericTextCellFilterArtifa
 		value: TextFilterArtifacts['mode']
 		label: string
 	}> = [
-		{ value: 'matches', label: formatMessage('dataGirdCells.textCell.matches') },
-		{ value: 'doesNotMatch', label: formatMessage('dataGirdCells.textCell.doesNotMatch') },
-		{ value: 'matchesExactly', label: formatMessage('dataGirdCells.textCell.matchesExactly') },
-		{ value: 'startsWith', label: formatMessage('dataGirdCells.textCell.startsWith') },
-		{ value: 'endsWith', label: formatMessage('dataGirdCells.textCell.endsWith') },
+		{ value: 'matches', label: formatMessage('dataGridCells.textCell.matches') },
+		{ value: 'doesNotMatch', label: formatMessage('dataGridCells.textCell.doesNotMatch') },
+		{ value: 'matchesExactly', label: formatMessage('dataGridCells.textCell.matchesExactly') },
+		{ value: 'startsWith', label: formatMessage('dataGridCells.textCell.startsWith') },
+		{ value: 'endsWith', label: formatMessage('dataGridCells.textCell.endsWith') },
 	]
 	return (
 		<>
@@ -41,7 +41,7 @@ export const GenericTextCellFilter = <Filter extends GenericTextCellFilterArtifa
 			/>
 			<TextInput
 				value={filter.query}
-				placeholder={formatMessage('dataGirdCells.textCell.queryPlaceholder')}
+				placeholder={formatMessage('dataGridCells.textCell.queryPlaceholder')}
 				onChange={e => {
 					const value = e.currentTarget.value
 					setFilter({

@@ -1,8 +1,9 @@
 FROM node:14-alpine as builder
 
 WORKDIR /src
+RUN apk --no-cache add bash
+RUN apk --no-cache add --virtual builds-deps build-base python2
 COPY ./ ./
-RUN apk add --no-cache bash
 RUN /src/packages/cli/build.sh
 
 FROM node:14-alpine

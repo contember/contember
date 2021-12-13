@@ -1,13 +1,14 @@
 import { ContemberClient } from '@contember/react-client'
 import { FC, useState } from 'react'
 import { Login } from './Login'
-import { Project } from '../Project'
-import { LoginProjects } from './LoginProjects'
+import { Project, ProjectListButtons } from '../Project'
 import { Toaster, ToasterProvider } from '../Toaster'
 import { RequestProvider, RoutingContext, RoutingContextValue } from '../../routing'
 import { Page, PageLink, Pages } from '../pageRouting'
 import { CreateResetPasswordRequestForm, FillResetPasswordTokenForm, ResetPasswordForm } from '../../tenant'
 import { MiscPageLayout } from '../MiscPageLayout'
+import { useLogout } from '../Identity'
+import { AnchorButton, Button, Icon } from '@contember/ui'
 
 export interface LoginEntrypointProps {
 	apiBaseUrl: string
@@ -82,15 +83,31 @@ export const LoginEntrypoint = (props: LoginEntrypointProps) => {
 
 const LoginEntrypointInner: FC<Pick<LoginEntrypointProps, 'projects' | 'formatProjectUrl'>> = props => {
 	const [projects, setProjects] = useState<null | readonly Project[]>(props.projects)
+	const logout = useLogout()
 
 	if (projects === null) {
-		return <Login onLogin={setProjects} resetLink={'resetRequest'} />
+		return (
+			<MiscPageLayout heading="Contember Admin">
+				<Login onLogin={setProjects} resetLink={'resetRequest'} />
+			</MiscPageLayout>
+		)
 
 	} else if (projects.length === 1) {
 		window.location.href = props.formatProjectUrl(projects[0])
 		return null
 
 	} else {
-		return <LoginProjects projects={projects} formatProjectUrl={props.formatProjectUrl} />
+		return (
+			<MiscPageLayout
+				heading="Projects"
+				actions={<>
+					<AnchorButton href={'/_panel/'} size={'small'} distinction={'seamless'}><Icon
+						blueprintIcon={'cog'} /></AnchorButton>
+					<Button onClick={logout} size={'small'} distinction={'seamless'}><Icon blueprintIcon={'log-out'} /></Button>
+				</>}
+			>
+				<ProjectListButtons projects={projects} formatProjectUrl={props.formatProjectUrl} />
+			</MiscPageLayout>
+		)
 	}
 }

@@ -53,41 +53,39 @@ export const Login = ({ onLogin, resetLink }: LoginProps) => {
 
 
 	return (
-		<MiscPageLayout heading="Contember Admin">
-			<form onSubmit={onSubmit}>
-				<ErrorList size="large" errors={errors} />
-				<FormGroup label="Email">
-					<TextInput
-						{...register('email')}
-						autoComplete="username"
-						type="email"
-						autoFocus={!otpRequired}
-						disabled={otpRequired}
-					/>
-				</FormGroup>
-				<FormGroup label="Password">
-					<TextInput
-						{...register('password')}
-						type="password"
-						autoComplete="current-password"
-						disabled={otpRequired}
-					/>
-				</FormGroup>
-				{otpRequired && <FormGroup label="Two-factor code">
-					<TextInput
-						autoFocus
-						autoComplete={'one-time-code'}
-						{...register('otpToken')}
-					/>
-				</FormGroup>}
+		<form onSubmit={onSubmit}>
+			<ErrorList size="large" errors={errors} />
+			<FormGroup label="Email">
+				<TextInput
+					{...register('email')}
+					autoComplete="username"
+					type="email"
+					autoFocus={!otpRequired}
+					disabled={otpRequired}
+				/>
+			</FormGroup>
+			<FormGroup label="Password">
+				<TextInput
+					{...register('password')}
+					type="password"
+					autoComplete="current-password"
+					disabled={otpRequired}
+				/>
+			</FormGroup>
+			{otpRequired && <FormGroup label="Two-factor code">
+				<TextInput
+					autoFocus
+					autoComplete={'one-time-code'}
+					{...register('otpToken')}
+				/>
+			</FormGroup>}
 
-				<FormGroup label={undefined}>
-					<Button type="submit" intent="primary" disabled={isSubmitting}>
-						Submit
-					</Button>
-					{resetLink && <PageLink to={resetLink} style={{ float: 'right' }}>Forgot your password?</PageLink>}
-				</FormGroup>
-			</form>
-		</MiscPageLayout>
+			<FormGroup label={undefined}>
+				<Button type="submit" intent="primary" disabled={isSubmitting}>
+					Submit
+				</Button>
+				{resetLink && <PageLink to={resetLink} style={{ float: 'right' }}>Forgot your password?</PageLink>}
+			</FormGroup>
+		</form>
 	)
 }

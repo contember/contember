@@ -1,7 +1,7 @@
 import { useSessionToken } from '@contember/react-client'
+import { useTenantMe } from '../../tenant'
 import { AnchorButton, ContainerSpinner, Message } from '@contember/ui'
 import { createContext, useCallback, useEffect, useMemo, useState } from 'react'
-import { useTenantMe } from '../../tenant/hooks/me'
 import { MiscPageLayout } from '../MiscPageLayout'
 
 export interface Identity {

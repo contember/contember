@@ -1,5 +1,5 @@
 import { Project } from '../../../components'
-import { useSignInIDP } from '../../hooks'
+import { useSignInIDP } from '../../mutations'
 import { useEffect, useState } from 'react'
 import { ContainerSpinner, ErrorList } from '@contember/ui'
 import { getBaseHref, IDP_CODE, IDP_SESSION_KEY } from './common'

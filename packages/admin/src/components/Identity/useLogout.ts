@@ -1,11 +1,11 @@
 import { useCallback, useContext } from 'react'
 import { IdentityContext } from './IdentityProvider'
-import { useSignOut as useTenantLogout } from '../../tenant/hooks/signOut'
+import { useSignOut } from '../../tenant'
 import { useShowToast } from '../Toaster'
 
 export const useLogout = () => {
 	const ctx = useContext(IdentityContext)
-	const [tenantLogout] = useTenantLogout()
+	const [tenantLogout] = useSignOut()
 	const logout = ctx?.clearIdentity
 	const toaster = useShowToast()
 

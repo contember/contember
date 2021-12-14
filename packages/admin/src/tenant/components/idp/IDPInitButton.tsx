@@ -1,4 +1,4 @@
-import { useInitSignInIDP } from '../../hooks'
+import { useInitSignInIDP } from '../../mutations'
 import { useCallback } from 'react'
 import { Button, FormGroup } from '@contember/ui'
 import { getBaseHref, IDP, IDP_CODE, IDP_SESSION_KEY } from './common'

@@ -1,5 +1,5 @@
-import { GQLVariable, useSingleTenantMutation } from '../../lib/facade'
-import { MembershipInput } from '../membership/updateMembership'
+import { GQLVariable, useSingleTenantMutation } from '../../lib'
+import { MembershipInput } from '../membership'
 
 const INVITE_MUTATION = `
 	invite(

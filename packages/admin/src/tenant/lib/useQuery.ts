@@ -1,19 +1,16 @@
 import type { GraphQlClient } from '@contember/client'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { GraphQlClientVariables } from '@contember/client'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { QueryRequestObject, QueryRequestState } from './requestState'
+import { JsonValue } from '../../utils'
 
-export const useJsonEqualMemo = <V>(memoFn: () => V, key: any): V => {
-	const ref = useRef<{ key: string; value: V }>()
-
-	const jsonKey = JSON.stringify(key)
-	if (!ref.current || ref.current.key !== jsonKey) {
-		ref.current = { key: jsonKey, value: memoFn() }
-	}
-
-	return ref.current.value
+const useJsonMemo = <V extends JsonValue>(value: V): V => {
+	const json = useMemo(() => JSON.stringify(value), [value])
+	// eslint-disable-next-line react-hooks/exhaustive-deps
+	return useMemo(() => value, [json])
 }
 
-export const useQuery = <R, V>(
+export const useQuery = <R, V extends GraphQlClientVariables>(
 	client: GraphQlClient,
 	query: string,
 	variables: V,
@@ -22,7 +19,7 @@ export const useQuery = <R, V>(
 	const [state, setState] = useState<QueryRequestState<R>>({
 		state: 'loading',
 	})
-	const vars = useJsonEqualMemo(() => variables, variables)
+	const vars = useJsonMemo(variables)
 	const refetch = useCallback(async () => {
 		setState({ state: 'loading' })
 		try {

@@ -1,4 +1,4 @@
-import { GQLVariable, useSingleTenantMutation } from '../../lib/facade'
+import { GQLVariable, useSingleTenantMutation } from '../../lib'
 
 const CHANGE_PASSWORD_MUTATION = `
 	changeMyPassword(

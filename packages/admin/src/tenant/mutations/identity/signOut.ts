@@ -30,8 +30,6 @@ interface SignOutResponseError {
 	}
 }
 
-interface SignOutVariables {}
-
-export const useSignOut = (): UseMutationReturn<SignOutResponse, SignOutVariables> => {
+export const useSignOut = (): UseMutationReturn<SignOutResponse, {}> => {
 	return useAuthedTenantMutation(SIGNOUT_MUTATION)
 }

@@ -1,10 +1,11 @@
 import type { GraphQlClient } from '@contember/client'
 import { useCallback, useState } from 'react'
 import type { MutationRequestState } from './requestState'
+import { JsonObject } from '../../utils'
 
 export type UseMutationReturn<R, V> = [(variables: V) => Promise<R>, MutationRequestState<R>]
 
-export const useMutation = <R, V>(client: GraphQlClient, query: string, apiToken?: string, headers?: Record<string, string>): UseMutationReturn<R, V> => {
+export const useMutation = <R, V extends JsonObject>(client: GraphQlClient, query: string, apiToken?: string, headers?: Record<string, string>): UseMutationReturn<R, V> => {
 	const [state, setState] = useState<MutationRequestState<R>>({
 		state: 'initial',
 	})

@@ -1,4 +1,4 @@
-import { GQLVariable, useSingleTenantMutation } from '../../lib/facade'
+import { GQLVariable, useSingleTenantMutation } from '../../lib'
 
 const CONFIRM_OTP_MUTATION = `
 confirmOtp(otpToken: $token) {

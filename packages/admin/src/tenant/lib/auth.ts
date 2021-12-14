@@ -1,40 +1,24 @@
-import { useCurrentContentGraphQlClient, useSessionToken, useTenantGraphQlClient } from '@contember/react-client'
-import { useMutation, UseMutationReturn } from './mutation'
-import { useQuery } from './query'
+import { GraphQlClientVariables, useCurrentContentGraphQlClient, useTenantGraphQlClient } from '@contember/react-client'
+import { useMutation, UseMutationReturn } from './useMutation'
+import { useQuery } from './useQuery'
 import type { QueryRequestObject } from './requestState'
 
-export const useAuthedTenantQuery = <R, V>(query: string, variables: V): QueryRequestObject<R> => {
-	const token = useSessionToken()
+export const useAuthedTenantQuery = <R, V extends GraphQlClientVariables>(query: string, variables: V): QueryRequestObject<R> => {
 	const client = useTenantGraphQlClient()
-	if (client === undefined) {
-		throw new Error('Cannot get a tenant client - maybe missing config context?')
-	}
-	return useQuery(client, query, variables, token)
+	return useQuery(client, query, variables)
 }
 
-export const useAuthedTenantMutation = <R, V>(query: string): UseMutationReturn<R, V> => {
-	const token = useSessionToken()
+export const useAuthedTenantMutation = <R, V extends GraphQlClientVariables>(query: string): UseMutationReturn<R, V> => {
 	const client = useTenantGraphQlClient()
-	if (client === undefined) {
-		throw new Error('Cannot get a tenant client - maybe missing config context?')
-	}
-	return useMutation(client, query, token)
+	return useMutation(client, query)
 }
 
-export const useAuthedContentQuery = <R, V>(query: string, variables: V): QueryRequestObject<R> => {
-	const token = useSessionToken()
+export const useAuthedContentQuery = <R, V extends GraphQlClientVariables>(query: string, variables: V): QueryRequestObject<R> => {
 	const client = useCurrentContentGraphQlClient()
-	if (client === undefined) {
-		throw new Error('Cannot get a content client - maybe missing config context?')
-	}
-	return useQuery(client, query, variables, token)
+	return useQuery(client, query, variables)
 }
 
-export const useAuthedContentMutation = <R, V>(query: string): UseMutationReturn<R, V> => {
-	const token = useSessionToken()
+export const useAuthedContentMutation = <R, V extends GraphQlClientVariables>(query: string): UseMutationReturn<R, V> => {
 	const client = useCurrentContentGraphQlClient()
-	if (client === undefined) {
-		throw new Error('Cannot get a content client - maybe missing config context?')
-	}
-	return useMutation(client, query, token)
+	return useMutation(client, query)
 }

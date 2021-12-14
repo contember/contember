@@ -1,4 +1,4 @@
-import { GQLVariable, GQLVariableType, useSingleTenantMutation } from '../../lib/facade'
+import { GQLVariable, GQLVariableType, useSingleTenantMutation } from '../../lib'
 import { Membership } from '../../types'
 
 const UPDATE_MEMBERSHIP_QUERY = `

@@ -1,5 +1,3 @@
 export * from './useCurrentSystemGraphQlClient'
-export * from './useDiffQuery'
-export * from './useReleaseTreeMutation'
 export * from './useSystemApiRequest'
 export * from './useSystemGraphQlClient'

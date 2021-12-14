@@ -6,6 +6,7 @@ export interface RequestStateOk<T> {
 
 export interface RequestStateError<T> {
 	state: 'error'
+	error: any
 }
 
 export interface RequestStateLoading<T>  {

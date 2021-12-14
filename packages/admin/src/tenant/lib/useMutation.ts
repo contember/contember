@@ -29,6 +29,7 @@ export const useMutation = <R, V extends JsonObject>(client: GraphQlClient, quer
 			} catch (e) {
 				setState({
 					state: 'error',
+					error: e,
 				})
 				throw e
 			}

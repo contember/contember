@@ -32,8 +32,7 @@ export const useQuery = <R, V extends GraphQlClientVariables>(
 				state: 'success',
 			})
 		} catch (e) {
-			setState({ state: 'error' })
-			throw e
+			setState({ state: 'error', error: e })
 		}
 	}, [client, query, vars, apiToken])
 

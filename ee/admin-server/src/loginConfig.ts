@@ -18,6 +18,16 @@ export const baseLoginConfigSchema = schema.object({
 export type BaseLoginConfig = ReturnType<typeof baseLoginConfigSchema>
 
 export const customLoginConfigSchema = schema.partial({
+	identityProviders: schema.array(
+		schema.intersection(
+			schema.object({
+				provider: schema.string,
+			}),
+			schema.partial({
+				name: schema.string,
+			}),
+		),
+	),
 })
 export type CustomLoginConfig = ReturnType<typeof customLoginConfigSchema>
 

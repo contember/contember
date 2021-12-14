@@ -1,14 +1,22 @@
 import { ContemberClient } from '@contember/react-client'
-import { FC, useState } from 'react'
+import { FC, useMemo, useState } from 'react'
 import { Login } from './Login'
 import { Project, ProjectListButtons } from '../Project'
 import { Toaster, ToasterProvider } from '../Toaster'
 import { RequestProvider, RoutingContext, RoutingContextValue } from '../../routing'
 import { Page, PageLink, Pages } from '../pageRouting'
-import { CreateResetPasswordRequestForm, FillResetPasswordTokenForm, ResetPasswordForm } from '../../tenant'
+import {
+	CreateResetPasswordRequestForm,
+	FillResetPasswordTokenForm,
+	IDP,
+	IDPInitButton,
+	IDPResponseHandler,
+	ResetPasswordForm,
+} from '../../tenant'
 import { MiscPageLayout } from '../MiscPageLayout'
 import { useLogout } from '../Identity'
-import { AnchorButton, Button, Icon } from '@contember/ui'
+import { AnchorButton, Button, ErrorList, Icon } from '@contember/ui'
+
 
 export interface LoginEntrypointProps {
 	apiBaseUrl: string
@@ -16,6 +24,7 @@ export interface LoginEntrypointProps {
 	sessionToken?: string
 	basePath?: string
 	projects: null | readonly Project[]
+	identityProviders?: readonly IDP[]
 	formatProjectUrl: (project: Project) => string
 }
 
@@ -39,7 +48,7 @@ export const LoginEntrypoint = (props: LoginEntrypointProps) => {
 					<RequestProvider>
 						<Pages>
 							<Page name={'index'}>
-								<LoginEntrypointInner projects={props.projects} formatProjectUrl={props.formatProjectUrl} />
+								<LoginEntrypointIndex projects={props.projects} formatProjectUrl={props.formatProjectUrl} identityProviders={props.identityProviders} />
 							</Page>
 							<Page name={'resetRequest'}>
 								<MiscPageLayout heading="Password reset" actions={<>
@@ -71,7 +80,6 @@ export const LoginEntrypoint = (props: LoginEntrypointProps) => {
 									</MiscPageLayout>
 								)}
 							</Page>
-
 						</Pages>
 					</RequestProvider>
 				</RoutingContext.Provider>
@@ -81,14 +89,14 @@ export const LoginEntrypoint = (props: LoginEntrypointProps) => {
 	)
 }
 
-const LoginEntrypointInner: FC<Pick<LoginEntrypointProps, 'projects' | 'formatProjectUrl'>> = props => {
+const LoginEntrypointIndex: FC<Pick<LoginEntrypointProps, 'projects' | 'formatProjectUrl' | 'identityProviders'>> = props => {
 	const [projects, setProjects] = useState<null | readonly Project[]>(props.projects)
 	const logout = useLogout()
 
 	if (projects === null) {
 		return (
 			<MiscPageLayout heading="Contember Admin">
-				<Login onLogin={setProjects} resetLink={'resetRequest'} />
+				<LoginContainer identityProviders={props.identityProviders} setProjects={setProjects} />
 			</MiscPageLayout>
 		)
 
@@ -110,4 +118,27 @@ const LoginEntrypointInner: FC<Pick<LoginEntrypointProps, 'projects' | 'formatPr
 			</MiscPageLayout>
 		)
 	}
+}
+
+const LoginContainer = ({ identityProviders, setProjects }: {
+	identityProviders?: readonly IDP[],
+	setProjects: (projects: Project[]) => void,
+}) => {
+	const [error, setError] = useState<string>()
+
+
+	const hasOauthResponse = useMemo(() => {
+		const params = new URLSearchParams(window.location.search)
+		return params.has('state') && params.has('code') && params.has('scope')
+	}, [])
+
+	if (hasOauthResponse) {
+		return <IDPResponseHandler onLogin={setProjects} />
+	}
+
+	return <>
+		<ErrorList errors={error ? [{ message: error }] : []} />
+		<Login onLogin={setProjects} resetLink={'resetRequest'} />
+		{identityProviders?.map(it => <IDPInitButton provider={it} onError={setError}/>)}
+	</>
 }

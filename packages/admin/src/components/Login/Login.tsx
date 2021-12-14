@@ -1,7 +1,6 @@
 import { getTenantErrorMessage } from '@contember/client'
 import { Button, ErrorList, FieldError, FormGroup, TextInput } from '@contember/ui'
-import { useCallback, useRef, useState } from 'react'
-import { MiscPageLayout } from '../MiscPageLayout'
+import { useCallback, useState } from 'react'
 import { useLogin } from '../../tenant'
 import { Project } from '../Project'
 import { RoutingLinkTarget } from '../../routing'

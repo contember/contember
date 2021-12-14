@@ -26,6 +26,7 @@ export interface LoginEntrypointProps {
 	projects: null | readonly Project[]
 	identityProviders?: readonly IDP[]
 	formatProjectUrl: (project: Project) => string
+	heading?: string
 }
 
 
@@ -48,7 +49,12 @@ export const LoginEntrypoint = (props: LoginEntrypointProps) => {
 					<RequestProvider>
 						<Pages>
 							<Page name={'index'}>
-								<LoginEntrypointIndex projects={props.projects} formatProjectUrl={props.formatProjectUrl} identityProviders={props.identityProviders} />
+								<LoginEntrypointIndex
+									projects={props.projects}
+									formatProjectUrl={props.formatProjectUrl}
+									identityProviders={props.identityProviders}
+									heading={props.heading}
+								/>
 							</Page>
 							<Page name={'resetRequest'}>
 								<MiscPageLayout heading="Password reset" actions={<>
@@ -89,13 +95,13 @@ export const LoginEntrypoint = (props: LoginEntrypointProps) => {
 	)
 }
 
-const LoginEntrypointIndex: FC<Pick<LoginEntrypointProps, 'projects' | 'formatProjectUrl' | 'identityProviders'>> = props => {
+const LoginEntrypointIndex: FC<Pick<LoginEntrypointProps, 'projects' | 'formatProjectUrl' | 'identityProviders' | 'heading'>> = props => {
 	const [projects, setProjects] = useState<null | readonly Project[]>(props.projects)
 	const logout = useLogout()
 
 	if (projects === null) {
 		return (
-			<MiscPageLayout heading="Contember Admin">
+			<MiscPageLayout heading={props.heading ?? 'Contember Admin'}>
 				<LoginContainer identityProviders={props.identityProviders} setProjects={setProjects} />
 			</MiscPageLayout>
 		)

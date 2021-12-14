@@ -29,6 +29,10 @@ export interface LoginEntrypointProps {
 	heading?: string
 }
 
+const indexPageName = 'index'
+const resetRequestPageName = 'resetRequest'
+const redirectOnSuccessPageName = 'resetRequestSuccess'
+const passwordResetPageName = 'passwordReset'
 
 export const LoginEntrypoint = (props: LoginEntrypointProps) => {
 	const routing: RoutingContextValue = {
@@ -48,7 +52,7 @@ export const LoginEntrypoint = (props: LoginEntrypointProps) => {
 				<RoutingContext.Provider value={routing}>
 					<RequestProvider>
 						<Pages>
-							<Page name={'index'}>
+							<Page name={indexPageName}>
 								<LoginEntrypointIndex
 									projects={props.projects}
 									formatProjectUrl={props.formatProjectUrl}
@@ -56,16 +60,16 @@ export const LoginEntrypoint = (props: LoginEntrypointProps) => {
 									heading={props.heading}
 								/>
 							</Page>
-							<Page name={'resetRequest'}>
+							<Page name={resetRequestPageName}>
 								<MiscPageLayout heading="Password reset" actions={<>
-									<PageLink to={'index'}>Back to login</PageLink>
+									<PageLink to={indexPageName}>Back to login</PageLink>
 								</>}>
-									<CreateResetPasswordRequestForm redirectOnSuccess={'resetRequestSuccess'} />
+									<CreateResetPasswordRequestForm redirectOnSuccess={redirectOnSuccessPageName} />
 								</MiscPageLayout>
 							</Page>
-							<Page name={'resetRequestSuccess'}>
+							<Page name={redirectOnSuccessPageName}>
 								<MiscPageLayout heading="Password reset" actions={<>
-									<PageLink to={'index'}>Back to login</PageLink>
+									<PageLink to={indexPageName}>Back to login</PageLink>
 								</>}>
 									<p>
 										Password reset request has been successfully created. Please check your inbox for the instructions.
@@ -73,16 +77,15 @@ export const LoginEntrypoint = (props: LoginEntrypointProps) => {
 									<p>
 										Please follow the link in e-mail or copy the reset token here:
 									</p>
-									<FillResetPasswordTokenForm
-										resetLink={token => ({ pageName: 'passwordReset', parameters: { token } })} />
+									<FillResetPasswordTokenForm resetLink={token => ({ pageName: passwordResetPageName, parameters: { token } })} />
 								</MiscPageLayout>
 							</Page>
-							<Page name={'passwordReset'}>
+							<Page name={passwordResetPageName}>
 								{({ token }: { token: string }) => (
 									<MiscPageLayout heading="Set a new password" actions={<>
-										<PageLink to={'index'}>Back to login</PageLink>
+										<PageLink to={indexPageName}>Back to login</PageLink>
 									</>}>
-										<ResetPasswordForm token={token} redirectOnSuccess={'index'} />
+										<ResetPasswordForm token={token} redirectOnSuccess={indexPageName} />
 									</MiscPageLayout>
 								)}
 							</Page>
@@ -144,7 +147,7 @@ const LoginContainer = ({ identityProviders, setProjects }: {
 
 	return <>
 		<ErrorList errors={error ? [{ message: error }] : []} />
-		<Login onLogin={setProjects} resetLink={'resetRequest'} />
+		<Login onLogin={setProjects} resetLink={resetRequestPageName} />
 		{identityProviders?.map(it => <IDPInitButton provider={it} onError={setError}/>)}
 	</>
 }

@@ -30,6 +30,7 @@ type LoginErrors =
 	| 'INVALID_PASSWORD'
 	| 'OTP_REQUIRED'
 	| 'INVALID_OTP_TOKEN'
+
 interface LoginResult {
 	token: string
 	person: {
@@ -37,6 +38,7 @@ interface LoginResult {
 		email: string
 	}
 }
+
 export const useLogin = () => {
 	const loginToken = useLoginToken()
 

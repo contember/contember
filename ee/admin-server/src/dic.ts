@@ -84,8 +84,8 @@ export default new Builder({})
 		return new StaticFileHandler(env.CONTEMBER_PUBLIC_DIR)
 	})
 
-	.addService('loginController', ({ staticFileHandler, projectListProvider }) => {
-		return new LoginController(staticFileHandler, projectListProvider)
+	.addService('loginController', ({ staticFileHandler, projectListProvider, s3 }) => {
+		return new LoginController(staticFileHandler, projectListProvider, s3)
 	})
 
 	.addService('deployController', ({ tenant, s3 }) => {

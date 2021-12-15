@@ -1,4 +1,5 @@
-import { QueryRequestObject, useAuthedTenantQuery } from '../lib'
+import { useTenantGraphQlClient } from '@contember/react-client'
+import { useCallback } from 'react'
 
 const ME_QUERY = `
 	query {
@@ -50,6 +51,9 @@ interface MeResponse {
 	},
 }
 
-export const useTenantMe = (): QueryRequestObject<MeResponse> => {
-	return useAuthedTenantQuery(ME_QUERY, {})
+export const useFetchMe = (): () => Promise<{ data: MeResponse }> => {
+	const client = useTenantGraphQlClient()
+	return useCallback(async () => {
+		return await client.sendRequest<{ data: MeResponse }>(ME_QUERY, {})
+	}, [client])
 }

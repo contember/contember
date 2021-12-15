@@ -1,4 +1,4 @@
-import { LoginEntrypoint, Project, runReactApp } from '@contember/admin'
+import { AnchorButton, Icon, LoginEntrypoint, Project, runReactApp } from '@contember/admin'
 import './index.sass'
 import { useMemo } from 'react'
 import { loginConfigSchema } from '../src/loginConfig'
@@ -10,7 +10,17 @@ const Entry = () => {
 	}, [])
 	const formatProjectUrl = (project: Project) => `/${project.slug}/`
 
-	return <LoginEntrypoint {...config} formatProjectUrl={formatProjectUrl} />
+	const panelButton = (
+		<AnchorButton href={'/_panel/'} size={'small'} distinction={'seamless'}>
+			<Icon blueprintIcon={'cog'} />
+		</AnchorButton>
+	)
+
+	return <LoginEntrypoint
+		{...config}
+		formatProjectUrl={formatProjectUrl}
+		projectsPageActions={panelButton}
+	/>
 }
 
 runReactApp(<Entry/>)

@@ -1,16 +1,16 @@
 import { useCallback, useContext } from 'react'
 import { IdentityContext } from './IdentityProvider'
 import { useSignOut } from '../../tenant'
-import { useShowToast } from '../Toaster'
+import { useSetSessionToken } from '@contember/react-client'
 
 export const useLogout = () => {
 	const ctx = useContext(IdentityContext)
 	const [tenantLogout] = useSignOut()
-	const logout = ctx?.clearIdentity
-	const toaster = useShowToast()
+	const clearIdentity = ctx?.clearIdentity
+	const setSessionToken = useSetSessionToken()
 
 	return useCallback(
-		async () => {
+		async ({ noRedirect = false }: { noRedirect?: boolean } = {}) => {
 			if (navigator.credentials && navigator.credentials.preventSilentAccess) {
 				try {
 					await navigator.credentials.preventSilentAccess()
@@ -19,20 +19,20 @@ export const useLogout = () => {
 					// https://github.com/WebKit/WebKit/blob/414f4e45b0e82bbfcee783d08a9642be1afa8f72/Source/WebCore/Modules/credentialmanagement/CredentialsContainer.cpp#L132
 				}
 			}
-			logout?.()
-
-			const response = await tenantLogout({})
-			if (!response.signOut.ok) {
-				console.warn(response.signOut.error)
-				toaster({
-					message: response.signOut.error?.endUserMessage ?? 'Failed to logout',
-					type: 'error',
-					dismiss: true,
-				})
+			clearIdentity?.()
+			setSessionToken(undefined)
+			try {
+				const response = await tenantLogout({})
+				if (!response.signOut.ok) {
+					console.warn(response.signOut.error)
+				}
+			} catch (e) {
+				console.warn(e)
 			}
-
-			window.location.href = '/' // todo better redirect?
+			if (!noRedirect) {
+				window.location.href = '/' // todo better redirect?
+			}
 		},
-		[logout, tenantLogout, toaster],
+		[clearIdentity, setSessionToken, tenantLogout],
 	)
 }

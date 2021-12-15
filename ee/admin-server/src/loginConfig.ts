@@ -3,15 +3,8 @@ import * as schema from './utils/schema'
 export const baseLoginConfigSchema = schema.object({
 	apiBaseUrl: schema.string,
 	loginToken: schema.string,
-	sessionToken: schema.string,
-	projects: schema.union(
-		schema.null_,
-		schema.array(
-			schema.object({
-				slug: schema.string,
-				name: schema.string,
-			}),
-		),
+	projects: schema.array(
+		schema.string,
 	),
 })
 

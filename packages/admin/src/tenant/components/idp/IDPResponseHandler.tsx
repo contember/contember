@@ -1,30 +1,26 @@
-import { Project } from '../../../components'
 import { useSignInIDP } from '../../mutations'
 import { useEffect, useState } from 'react'
 import { ContainerSpinner, ErrorList } from '@contember/ui'
 import { getBaseHref, IDP_CODE, IDP_SESSION_KEY } from './common'
+import { useSetSessionToken } from '@contember/react-client'
 
 export interface IDPResponseHandlerProps {
-	onLogin: (projects: Project[]) => void,
+	onLogin?: () => void,
 }
 
 export const IDPResponseHandler = ({ onLogin }: IDPResponseHandlerProps) => {
 	const idpSignIn = useSignInIDP()
 	const [error, setError] = useState<string>()
+	const setSessionToken = useSetSessionToken()
 
 	useEffect(() => {
 		(async () => {
-			let projects: Project[] = []
 			const response = await idpSignIn({
 				url: window.location.href,
 				redirectUrl: getBaseHref(),
 				session: JSON.parse(localStorage.getItem(IDP_SESSION_KEY) || '{}'),
 				identityProvider: localStorage.getItem(IDP_CODE) ?? '',
 				expiration: 3600 * 24 * 14,
-			}, {
-				onResponse: response => {
-					projects = response.extensions?.contemberAdminServer?.projects ?? []
-				},
 			})
 			setError(undefined)
 			if (!response.ok) {
@@ -37,10 +33,11 @@ export const IDPResponseHandler = ({ onLogin }: IDPResponseHandlerProps) => {
 						return setError('User not found')
 				}
 			} else {
-				onLogin(projects)
+				setSessionToken(response.result.token)
+				onLogin?.()
 			}
 		})()
-	}, [idpSignIn, setError, onLogin])
+	}, [idpSignIn, setError, onLogin, setSessionToken])
 
 	if (error) {
 		return <ErrorList errors={[{ message: error }]} />

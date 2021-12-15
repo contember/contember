@@ -1,5 +1,5 @@
 import { ContemberClient } from '@contember/react-client'
-import { FC, useMemo, useState } from 'react'
+import { FC, ReactNode, useMemo, useState } from 'react'
 import {
 	CreateResetPasswordRequestForm,
 	FillResetPasswordTokenForm,
@@ -14,8 +14,8 @@ import { Toaster, ToasterProvider } from '../Toaster'
 import { RequestProvider, RoutingContext, RoutingContextValue } from '../../routing'
 import { Page, PageLink, Pages } from '../pageRouting'
 import { MiscPageLayout } from '../MiscPageLayout'
-import { useLogout } from '../Identity'
-import { AnchorButton, Button, ErrorList, Icon } from '@contember/ui'
+import { IdentityProvider, useLogout, useOptionalIdentity } from '../Identity'
+import { Button, ErrorList, Icon } from '@contember/ui'
 
 
 export interface LoginEntrypointProps {
@@ -23,10 +23,11 @@ export interface LoginEntrypointProps {
 	loginToken: string
 	sessionToken?: string
 	basePath?: string
-	projects: null | readonly Project[]
+	projects: readonly string[]
 	identityProviders?: readonly IDP[]
 	formatProjectUrl: (project: Project) => string
 	heading?: string
+	projectsPageActions?: ReactNode
 }
 
 const indexPageName = 'index'
@@ -53,12 +54,15 @@ export const LoginEntrypoint = (props: LoginEntrypointProps) => {
 					<RequestProvider>
 						<Pages>
 							<Page name={indexPageName}>
-								<LoginEntrypointIndex
-									projects={props.projects}
-									formatProjectUrl={props.formatProjectUrl}
-									identityProviders={props.identityProviders}
-									heading={props.heading}
-								/>
+								<IdentityProvider allowUnauthenticated={true}>
+									<LoginEntrypointIndex
+										projects={props.projects}
+										formatProjectUrl={props.formatProjectUrl}
+										identityProviders={props.identityProviders}
+										heading={props.heading}
+										projectsPageActions={props.projectsPageActions}
+									/>
+								</IdentityProvider>
 							</Page>
 							<Page name={resetRequestPageName}>
 								<MiscPageLayout heading="Password reset" actions={<>
@@ -98,14 +102,17 @@ export const LoginEntrypoint = (props: LoginEntrypointProps) => {
 	)
 }
 
-const LoginEntrypointIndex: FC<Pick<LoginEntrypointProps, 'projects' | 'formatProjectUrl' | 'identityProviders' | 'heading'>> = props => {
-	const [projects, setProjects] = useState<null | readonly Project[]>(props.projects)
+const LoginEntrypointIndex: FC<Pick<LoginEntrypointProps, 'projects' | 'formatProjectUrl' | 'identityProviders' | 'heading' | 'projectsPageActions'>> = props => {
 	const logout = useLogout()
+	const identity = useOptionalIdentity()
+	const projects = useMemo(() => {
+		return identity?.projects.filter(it => props.projects.includes(it.slug))
+	}, [identity?.projects, props.projects])
 
-	if (projects === null) {
+	if (!projects) {
 		return (
 			<MiscPageLayout heading={props.heading ?? 'Contember Admin'}>
-				<LoginContainer identityProviders={props.identityProviders} setProjects={setProjects} />
+				<LoginContainer identityProviders={props.identityProviders} />
 			</MiscPageLayout>
 		)
 
@@ -118,9 +125,8 @@ const LoginEntrypointIndex: FC<Pick<LoginEntrypointProps, 'projects' | 'formatPr
 			<MiscPageLayout
 				heading="Projects"
 				actions={<>
-					<AnchorButton href={'/_panel/'} size={'small'} distinction={'seamless'}><Icon
-						blueprintIcon={'cog'} /></AnchorButton>
-					<Button onClick={logout} size={'small'} distinction={'seamless'}><Icon blueprintIcon={'log-out'} /></Button>
+					{props.projectsPageActions}
+					<Button onClick={() => logout()} size={'small'} distinction={'seamless'}><Icon blueprintIcon={'log-out'} /></Button>
 				</>}
 			>
 				<ProjectListButtons projects={projects} formatProjectUrl={props.formatProjectUrl} />
@@ -129,12 +135,10 @@ const LoginEntrypointIndex: FC<Pick<LoginEntrypointProps, 'projects' | 'formatPr
 	}
 }
 
-const LoginContainer = ({ identityProviders, setProjects }: {
+const LoginContainer = ({ identityProviders }: {
 	identityProviders?: readonly IDP[],
-	setProjects: (projects: Project[]) => void,
 }) => {
 	const [error, setError] = useState<string>()
-
 
 	const hasOauthResponse = useMemo(() => {
 		const params = new URLSearchParams(window.location.search)
@@ -142,12 +146,12 @@ const LoginContainer = ({ identityProviders, setProjects }: {
 	}, [])
 
 	if (hasOauthResponse) {
-		return <IDPResponseHandler onLogin={setProjects} />
+		return <IDPResponseHandler />
 	}
 
 	return <>
 		<ErrorList errors={error ? [{ message: error }] : []} />
-		<Login onLogin={setProjects} resetLink={resetRequestPageName} />
+		<Login resetLink={resetRequestPageName} />
 		{identityProviders?.map(it => <IDPInitButton provider={it} onError={setError}/>)}
 	</>
 }

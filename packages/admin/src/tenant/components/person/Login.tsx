@@ -2,11 +2,12 @@ import { getTenantErrorMessage } from '@contember/client'
 import { Button, ErrorList, FieldError, FormGroup, TextInput } from '@contember/ui'
 import { useCallback, useState } from 'react'
 import { useForm, useSignIn } from '../../index'
-import { PageLink, Project } from '../../../components'
+import { PageLink } from '../../../components'
 import { RoutingLinkTarget } from '../../../routing'
+import { useSetSessionToken } from '@contember/react-client'
 
 export interface LoginProps {
-	onLogin: (projects: Project[], person: { id: string, email: string }) => void
+	onLogin?: () => void
 	resetLink?: RoutingLinkTarget
 }
 
@@ -20,17 +21,14 @@ export const Login = ({ onLogin, resetLink }: LoginProps) => {
 	const [errors, setErrors] = useState<FieldError[]>([])
 	const [otpRequired, setOtpRequired] = useState(false)
 	const login = useSignIn()
+	const setSessionToken = useSetSessionToken()
+
 	const { onSubmit, isSubmitting, register } = useForm(initialValues, useCallback(async (values: typeof initialValues) => {
-		let projects: Project[] = []
 		const response = await login({
 			email: values.email,
 			password: values.password,
 			otpToken: values.otpToken || undefined,
 			expiration: 14 * 24 * 3600,
-		}, {
-			onResponse: response => {
-				projects = response.extensions?.contemberAdminServer?.projects ?? []
-			},
 		})
 		setErrors([])
 		if (!response.ok) {
@@ -41,12 +39,10 @@ export const Login = ({ onLogin, resetLink }: LoginProps) => {
 				setErrors([{ message: getTenantErrorMessage(error.code) }])
 			}
 		} else {
-			onLogin(
-				projects,
-				response.result.person,
-			)
+			setSessionToken(response.result.token)
+			onLogin?.()
 		}
-	}, [login, onLogin]))
+	}, [login, onLogin, setSessionToken]))
 
 
 	return (

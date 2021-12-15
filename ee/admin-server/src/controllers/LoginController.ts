@@ -1,9 +1,7 @@
 import type { IncomingMessage, ServerResponse } from 'http'
 import { BaseController } from './BaseController'
-import { LOGIN_TOKEN_PLACEHOLDER, SESSION_TOKEN_PLACEHOLDER } from './ApiController'
+import { LOGIN_TOKEN_PLACEHOLDER } from './ApiController'
 import { StaticFileHandler } from '../services/StaticFileHandler'
-import { ProjectListProvider } from '../services/ProjectListProvider'
-import { readAuthCookie } from '../utils/cookies'
 import { S3Manager } from '../services/S3Manager'
 import { BaseLoginConfig, customLoginConfigSchema } from '../loginConfig'
 
@@ -16,7 +14,6 @@ interface LoginParams {
 export class LoginController extends BaseController<LoginParams> {
 	constructor(
 		private staticFileHandler: StaticFileHandler,
-		private projectListProvider: ProjectListProvider,
 		private s3Manager: S3Manager,
 	) {
 		super()
@@ -26,7 +23,7 @@ export class LoginController extends BaseController<LoginParams> {
 		await this.staticFileHandler.serve(req, res, {
 			fileProcessor: async (path, content, req) => {
 				if (path === 'index.html') {
-					const projects = await this.projectListProvider.get(projectGroup, readAuthCookie(req))
+					const projects = await this.s3Manager.listProjectSlugs({ projectGroup })
 					let customConfig = {}
 					try {
 						const configContent = await this.s3Manager.getObjectContent({
@@ -41,7 +38,6 @@ export class LoginController extends BaseController<LoginParams> {
 					const baseConfig: BaseLoginConfig = {
 						apiBaseUrl: '/_api',
 						loginToken: LOGIN_TOKEN_PLACEHOLDER,
-						sessionToken: SESSION_TOKEN_PLACEHOLDER,
 						projects,
 					}
 					const configJson = JSON.stringify({ ...baseConfig, ...customConfig })

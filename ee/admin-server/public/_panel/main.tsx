@@ -50,7 +50,6 @@ const PanelLayout: FC = props => {
 
 runReactApp(
 	<ApplicationEntrypoint
-		sessionToken={'__SESSION_TOKEN__'}
 		apiBaseUrl={'/_api'}
 		basePath={'/_panel/'}
 		onInvalidIdentity={() => {

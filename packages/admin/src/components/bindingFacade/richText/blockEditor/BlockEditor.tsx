@@ -12,12 +12,13 @@ import {
 	VariableInputTransformer,
 } from '@contember/binding'
 import { emptyArray, noop } from '@contember/react-utils'
-import { EditorCanvas, EditorCanvasSize } from '@contember/ui'
+import { EditorCanvas, EditorCanvasSize, Scheme } from '@contember/ui'
 import { Fragment, FunctionComponent, ReactElement, ReactNode, useCallback, useMemo, useState } from 'react'
 import { Range as SlateRange, Transforms } from 'slate'
 import { Slate } from 'slate-react'
 import { getDiscriminatedBlock, useNormalizedBlocks } from '../../blocks'
 import { Repeater, SortableRepeaterContainer } from '../../collections'
+import { shouldCancelStart } from '../../collections/Repeater/shouldCancelStart'
 import { SugaredDiscriminateBy, useDiscriminatedData } from '../../discrimination'
 import { TextField } from '../../fields'
 import { createEditorWithEssentials } from '../baseEditor'
@@ -40,11 +41,10 @@ import { useCreateElementReference } from './references'
 import { ReferencesProvider } from './references/ReferencesProvider'
 import { useGetReferencedEntity } from './references/useGetReferencedEntity'
 import { useInsertElementWithReference } from './references/useInsertElementWithReference'
+import { SortedBlocksContext } from './state/SortedBlocksContext'
 import { useBlockEditorState } from './state/useBlockEditorState'
 import { ContentOutlet, ContentOutletProps, useEditorReferenceBlocks } from './templating'
 import { useReferentiallyStableCallback } from './useReferentiallyStableCallback'
-import { shouldCancelStart } from '../../collections/Repeater/shouldCancelStart'
-import { SortedBlocksContext } from './state/SortedBlocksContext'
 
 export interface BlockEditorProps extends SugaredRelativeEntityList, CreateEditorPublicOptions {
 	label: string
@@ -63,6 +63,8 @@ export interface BlockEditorProps extends SugaredRelativeEntityList, CreateEdito
 	embedReferenceDiscriminateBy?: SugaredDiscriminateBy
 	embedContentDiscriminationField?: SugaredFieldProps['field']
 	embedHandlers?: Iterable<EmbedHandler>
+
+	toolbarScheme?: Scheme
 
 	// TODO
 	inlineButtons?: HoveringToolbarsProps['inlineButtons']
@@ -93,6 +95,8 @@ const BlockEditorComponent: FunctionComponent<BlockEditorProps> = Component(
 			embedReferenceDiscriminateBy,
 			embedContentDiscriminationField,
 			embedHandlers = emptyArray,
+
+			toolbarScheme,
 
 			inlineButtons = defaultInlineButtons,
 			blockButtons,
@@ -203,6 +207,7 @@ const BlockEditorComponent: FunctionComponent<BlockEditorProps> = Component(
 					>
 						<Slate editor={editor} value={nodes} onChange={onChange}>
 							<EditorCanvas
+								inset="hovering-toolbar"
 								underlyingComponent={EditableCanvas}
 								componentProps={{
 									renderElement: baseEditor.renderElement,
@@ -219,10 +224,12 @@ const BlockEditorComponent: FunctionComponent<BlockEditorProps> = Component(
 									trailing: trailingElements,
 								}}
 								size={size ?? 'large'}
+
 							>
 								{useMemo(
 									() => (
 										<HoveringToolbars
+											toolbarScheme={toolbarScheme}
 											shouldDisplayInlineToolbar={shouldDisplayInlineToolbar}
 											inlineButtons={inlineButtons}
 											blockButtons={
@@ -234,7 +241,7 @@ const BlockEditorComponent: FunctionComponent<BlockEditorProps> = Component(
 											}
 										/>
 									),
-									[blockButtons, editorReferenceBlocks, inlineButtons, otherBlockButtons, shouldDisplayInlineToolbar],
+									[blockButtons, editorReferenceBlocks, inlineButtons, otherBlockButtons, shouldDisplayInlineToolbar, toolbarScheme],
 								)}
 							</EditorCanvas>
 						</Slate>

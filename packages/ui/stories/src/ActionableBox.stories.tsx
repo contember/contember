@@ -1,6 +1,7 @@
 import type { ComponentMeta, ComponentStory } from '@storybook/react'
 import * as React from 'react'
 import { ActionableBox, Aether } from '../../src'
+import { disabledControlsForAttributes } from './helpers'
 
 export default {
 	title: 'ActionableBox',
@@ -14,6 +15,7 @@ export default {
 			</Aether>
 		),
 	],
+	argTypes: disabledControlsForAttributes<typeof ActionableBox>('editContents'),
 } as ComponentMeta<typeof ActionableBox>
 
 const Template: ComponentStory<typeof ActionableBox> = args => <ActionableBox {...args} />

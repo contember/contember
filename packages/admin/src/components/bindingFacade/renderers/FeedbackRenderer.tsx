@@ -25,10 +25,10 @@ export function FeedbackRenderer({ accessorTreeState, children }: FeedbackRender
 			case 'unauthorized':
 				return null // This results in a redirect for now, and so the actual handling is in an effect
 			case 'networkError':
-				return <Message type="danger">Network error</Message> // TODO
+				return <Message intent="danger">Network error</Message> // TODO
 			case 'unknownError':
 			default:
-				return <Message type="danger">Unknown error</Message> // TODO
+				return <Message intent="danger">Unknown error</Message> // TODO
 		}
 	}
 

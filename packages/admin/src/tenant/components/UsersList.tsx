@@ -1,10 +1,10 @@
 import { useCurrentContentGraphQlClient, useProjectSlug } from '@contember/react-client'
-import { TitleBar } from '@contember/ui'
+import { LayoutPage } from '@contember/ui'
 import { FC, memo, useCallback } from 'react'
 import { PageLinkButton } from '../../components'
 import { RoutingLinkTarget } from '../../routing'
-import { RoleRendererFactory, RoleRenderers } from './RoleRenderer'
 import { MemberList } from './MemberList'
+import { RoleRendererFactory, RoleRenderers } from './RoleRenderer'
 
 export interface UsersListProps {
 	project: string
@@ -42,16 +42,16 @@ export const UsersManagement: FC<UsersManagementProps<any>> = <T extends {}>(pro
 	}, [contentClient, props.roleRenderers, props.rolesDataQuery])
 	if (project) {
 		return (
-			<>
-				<TitleBar actions={<PageLinkButton to={'tenantInviteUser'}>Add a user</PageLinkButton>}>
-					Users in project
-				</TitleBar>
+			<LayoutPage
+				actions={<PageLinkButton to={'tenantInviteUser'}>Add a user</PageLinkButton>}
+				title="Users in project"
+			>
 				<UsersList
 					project={project}
 					createRoleRenderer={roleRendererFactory}
 					createUserEditLink={id => ({ pageName: 'tenantEditUser', parameters: { id } })}
 				/>
-			</>
+			</LayoutPage>
 		)
 	}
 	return null

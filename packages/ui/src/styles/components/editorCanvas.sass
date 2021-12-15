@@ -1,28 +1,53 @@
 @import '../common'
+@import '../../components/Box/boxContentMixin'
 
 .#{$cui-conf-globalPrefix}editorCanvas
 	@extend %controlVariants
 
-	border: $cui-control-border-width solid $cui-control-view-default-border-color
-	border-radius: $cui-control-border-radius
+	--cui-editor-canvas-element-padding-bottom: calc(2 * var(--cui-gap-vertical))
+	--cui-editor-canvas-element-padding-left: calc(3 * var(--cui-gap-horizontal))
+	--cui-editor-canvas-element-padding-right: calc(3 * var(--cui-gap-horizontal))
+	--cui-editor-canvas-element-padding-top: calc(2 * var(--cui-gap-vertical))
+
+	border: var(--cui-control-border-width) solid var(--cui-color--lower)
+	border-radius: var(--cui-control-border-radius)
+	position: relative
 	width: 100%
-	padding: $cui-gap * 4
 
-	//&::after
-		+size(100% 2em)
-		content: ''
-		display: block
+	*[contenteditable="true"]
+		border-radius: var(--cui-control-border-radius)
+		flex-grow: 1
 
-	.#{$cui-conf-globalPrefix}box-content.view-depth-2,
-	.#{$cui-conf-globalPrefix}stack.view-depth-3 .#{$cui-conf-globalPrefix}editorBox
-		border: 0
-		border-radius: 0
-		border-bottom-width: 1px
+	&:hover
+		border-color: var(--cui-color--low)
+
+	&:focus-within
+		@extend %implementsCustomFocusEffects
+		border-color: var(--cui-control-border-color)
+
+	&.view-hovering-toolbar *[contenteditable="true"]
+		padding-bottom: calc(56px + 2 * var(--cui-gap-vertical)) // TODO: Measure the hovoering container
+
+	// TODO: Not ideal since `:focus-visible` would be good to use as well
+	*[contenteditable="true"]:focus // << Fails on large editors
+		@extend %implementsCustomFocusEffects
+		box-shadow: 0 0 0 .2em var(--cui-control-border-color)
+
+	&-canvas > [class^="cui-editor"]
+		padding-bottom: var(--cui-editor-canvas-element-padding-bottom)
+		padding-left: var(--cui-editor-canvas-element-padding-left)
+		padding-right: var(--cui-editor-canvas-element-padding-right)
+		padding-top: var(--cui-editor-canvas-element-padding-top)
+		position: relative
+
+	&-canvas > .#{$cui-conf-globalPrefix}editorBlock
 		padding: 0
 
 	&-canvas
-		min-height: 2em
 		cursor: text
+		display: flex
+		min-height: 2em
+		flex-direction: column
 
 		$headingCounter: null
 		@for $level from 1 through length($cui-editor-heading-counters)
@@ -71,7 +96,7 @@
 		::selection
 			background-color: #BFE4FF
 
-	&.view-large > &-canvas
+	&.view-large &-canvas
 		min-height: 32em
 
 	& > &-canvas &-canvas

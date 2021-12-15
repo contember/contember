@@ -1,21 +1,27 @@
+import classNames from 'classnames'
 import { memo, ReactNode, useLayoutEffect, useRef } from 'react'
-import { IncreaseHeadingDepth, useClassNamePrefix } from '../../auxiliary'
+import { useClassNamePrefix } from '../../auxiliary'
+import { toEnumClass, toThemeClass } from '../../utils'
 import { SectionTabs, useSectionTabsRegistration } from '../SectionTabs'
 import { Stack } from '../Stack'
 import { TitleBar, TitleBarProps } from '../TitleBar'
+import { useThemeScheme } from './ThemeSchemeContext'
+import { ThemeScheme } from './Types'
 
 export const PageLayoutContent = ({ children }: { children: ReactNode }) => {
 	const prefix = useClassNamePrefix()
 
 	return <div className={`${prefix}layout-page-content`}>
-		{children}
+		<div className={`${prefix}layout-page-content-container`}>
+			{children}
+		</div>
 	</div>
 }
 
-export interface LayoutPageProps extends Omit<TitleBarProps, 'children'> {
+export interface LayoutPageProps extends Omit<TitleBarProps, 'children'>, ThemeScheme {
+	children?: ReactNode
 	side?: ReactNode
 	title?: ReactNode
-	children?: ReactNode
 }
 
 const metaTab = {
@@ -63,34 +69,49 @@ const Aside = memo(({ children }: { children: ReactNode }) => {
 	})
 
 	return <div ref={element} id={metaTab.id} className={`${prefix}layout-page-aside`}>
-		<Stack depth={2} direction="vertical">
+		<Stack gap="large" direction="vertical">
 			{children}
 		</Stack>
 	</div>
 })
 
-
 export const LayoutPage = memo(({
-	side,
-	children,
-	title,
-	navigation,
 	actions,
+	children,
 	headingProps,
+	navigation,
+	scheme: schemeProp,
+	theme: themeProp,
+	themeContent: themeContentProp,
+	themeControls: themeControlsProp,
+	side,
+	title,
 }: LayoutPageProps) => {
 	const prefix = useClassNamePrefix()
+	const {
+		scheme: schemeContext,
+		theme: themeContext,
+		themeContent: themeContentContext,
+		themeControls: themeControlsContext,
+	} = useThemeScheme()
 
-	return <div className={`${prefix}layout-page-wrap`}>
-		{!!title && (
-			<TitleBar after={<SectionTabs />} navigation={navigation} actions={actions} headingProps={headingProps}>
-				{title}
-			</TitleBar>
-		)}
+	const scheme = schemeProp ?? schemeContext
+	const theme = themeProp ?? themeContext
+	const themeContent = themeContentProp ?? themeContentContext
+	const themeControls = themeControlsProp ?? themeControlsContext
+
+	return <div className={classNames(
+		`${prefix}layout-page`,
+		toThemeClass(themeContent ?? theme, 'content'),
+		toThemeClass(themeControls ?? theme, 'controls'),
+		toEnumClass('scheme-', scheme),
+	)}>
+		{(title || actions) && <TitleBar after={<SectionTabs />} navigation={navigation} actions={actions} headingProps={headingProps}>
+			{title}
+		</TitleBar>}
 		<div className={`${prefix}layout-page-content-wrap`}>
 			<PageLayoutContent>
-				<IncreaseHeadingDepth currentDepth={1}>
-					{children}
-				</IncreaseHeadingDepth>
+				{children}
 			</PageLayoutContent>
 			{side && <Aside>{side}</Aside>}
 		</div>

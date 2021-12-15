@@ -1,11 +1,11 @@
+import { Button, FormGroup, Stack, TextInput } from '@contember/ui'
 import { FC, SyntheticEvent, useCallback, useState } from 'react'
 import { useRedirect, useShowToast } from '../../components'
-import { Membership } from './VariableSelector'
-import { EditUserMembership, RolesConfig } from './EditUserMembership'
 import { RoutingLinkTarget } from '../../routing'
-import { Box, BoxSection, Button, FormGroup, TextInput } from '@contember/ui'
 import { useCreateApiKey } from '../hooks'
+import { EditUserMembership, RolesConfig } from './EditUserMembership'
 import { useForm } from './useForm'
+import { Membership } from './VariableSelector'
 
 interface CreateApiKeyFormProps {
 	project: string
@@ -58,22 +58,18 @@ export const CreateApiKeyForm: FC<CreateApiKeyFormProps> = ({ project, rolesConf
 	const editUserMembershipProps = { project, rolesConfig, memberships, setMemberships }
 
 	return (
-		<Box style={{ maxWidth: '800px' }}>
-			<form onSubmit={submit}>
-				<BoxSection heading={false}>
-					<FormGroup label="Description">
-						<TextInput {...register('description')} />
-					</FormGroup>
-				</BoxSection>
-				<BoxSection heading={false}>
-					<EditUserMembership {...editUserMembershipProps} />
-				</BoxSection>
-				<BoxSection heading={false}>
-					<Button intent="primary" size="large" type={'submit'} disabled={isSubmitting}>
-						Create API key
-					</Button>
-				</BoxSection>
-			</form>
-		</Box>
+		<form onSubmit={submit}>
+			<Stack direction="vertical">
+				<FormGroup label="Description">
+					<TextInput {...register('description')} />
+				</FormGroup>
+
+				<EditUserMembership {...editUserMembershipProps} />
+
+				<Button intent="primary" size="large" type={'submit'} disabled={isSubmitting}>
+					Create API key
+				</Button>
+			</Stack>
+		</form>
 	)
 }

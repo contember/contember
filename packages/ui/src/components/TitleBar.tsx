@@ -1,7 +1,7 @@
 import { memo, ReactNode } from 'react'
 import { useClassNamePrefix } from '../auxiliary'
-import { ButtonList } from './forms'
-import { Heading, HeadingProps } from './Heading'
+import { ButtonList } from './Forms'
+import { Heading, HeadingProps } from './Typography/Heading'
 
 export interface TitleBarProps {
 	after?: ReactNode
@@ -22,7 +22,7 @@ export const TitleBar = memo(({ after, navigation, children, headingProps, actio
 			)}
 			<div className={`${prefix}titleBar-in`}>
 				<div className={`${prefix}titleBar-heading`}>
-					<Heading {...headingProps}>{children}</Heading>
+					<Heading {...{ depth: 2, ...headingProps }}>{children}</Heading>
 				</div>
 				{actions && (
 					<div className={`${prefix}titleBar-actions`}>

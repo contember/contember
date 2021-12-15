@@ -1,4 +1,4 @@
-import { Button, Icon, Intent, Message, MessageProps } from '@contember/ui'
+import { Button, Icon, Intent, Message } from '@contember/ui'
 import { useContext } from 'react'
 import { ToasterContext } from './ToasterContext'
 
@@ -15,17 +15,11 @@ export interface Toast extends ToastDefinition {
 }
 
 
-const toastTypeToMessageType: { [K in ToastType]: MessageProps['type'] } = {
-	success: 'success',
-	warning: 'warn',
-	error: 'danger',
-	info: 'info',
-}
 const toastTypeToIntent: { [K in ToastType]: Intent } = {
 	success: 'success',
 	warning: 'warn',
 	error: 'danger',
-	info: 'primary',
+	info: 'positive',
 }
 
 export const Toaster: React.FC = () => {
@@ -38,7 +32,7 @@ export const Toaster: React.FC = () => {
 			{toasterContext.toasts.map(toast => (
 				<div key={toast.id} className="toaster-item">
 					<Message
-						type={toastTypeToMessageType[toast.type]}
+						intent={toastTypeToIntent[toast.type]}
 						flow="block"
 						lifted
 						distinction="striking"
@@ -51,7 +45,7 @@ export const Toaster: React.FC = () => {
 									toasterContext.dismissToast(toast.id)
 								}}
 							>
-								<Icon blueprintIcon="cross" style={{ color: 'white' }} />
+								<Icon blueprintIcon="cross" />
 							</Button>
 						}
 					>

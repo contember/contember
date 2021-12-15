@@ -1,12 +1,12 @@
-import { FC, memo, SyntheticEvent, useCallback, useEffect, useState } from 'react'
-import { useProjectMembershipsQuery } from '../hooks/projectMemberships'
-import { Membership } from './VariableSelector'
-import { useUpdateProjectMembership } from '../hooks'
-import { NavigateBackButton, useRedirect, useShowToast } from '../../components'
-import { EditUserMembership, RolesConfig } from './EditUserMembership'
 import { useProjectSlug } from '@contember/react-client'
+import { Button, LayoutPage, Stack } from '@contember/ui'
+import { FC, memo, SyntheticEvent, useCallback, useEffect, useState } from 'react'
+import { NavigateBackButton, useRedirect, useShowToast } from '../../components'
 import { RoutingLinkTarget } from '../../routing'
-import { Box, BoxSection, Button, TitleBar } from '@contember/ui'
+import { useUpdateProjectMembership } from '../hooks'
+import { useProjectMembershipsQuery } from '../hooks/projectMemberships'
+import { EditUserMembership, RolesConfig } from './EditUserMembership'
+import { Membership } from './VariableSelector'
 
 interface EditUserProps {
 	project: string
@@ -67,18 +67,15 @@ export const EditUser: FC<EditUserProps> = ({ project, rolesConfig, identityId, 
 
 	const editUserMembershipProps = { project, rolesConfig, memberships, setMemberships }
 	return (
-		<Box style={{ maxWidth: '800px' }}>
-			<form onSubmit={submit}>
-				<BoxSection heading={false}>
-						<EditUserMembership {...editUserMembershipProps} />
-				</BoxSection>
-				<BoxSection heading={false}>
-					<Button intent="primary" size="large" type={'submit'} disabled={isSubmitting}>
-						Save
-					</Button>
-				</BoxSection>
-			</form>
-		</Box>
+		<form onSubmit={submit}>
+			<Stack direction="vertical">
+				<EditUserMembership {...editUserMembershipProps} />
+
+				<Button intent="primary" size="large" type={'submit'} disabled={isSubmitting}>
+					Save
+				</Button>
+			</Stack>
+		</form>
 	)
 }
 
@@ -88,13 +85,11 @@ export const EditUserInProject: FC<{ rolesConfig: RolesConfig; identityId: strin
 		if (!project) {
 			return <>Not in project.</>
 		}
-		return (
-			<>
-				<TitleBar navigation={<NavigateBackButton to={'tenantUsers'}>Back to list of users</NavigateBackButton>}>
-					Edit user
-				</TitleBar>
-				<EditUser project={project} rolesConfig={rolesConfig} identityId={identityId} userListLink={'tenantUsers'} />
-			</>
-		)
+		return <LayoutPage
+			title="Edit user"
+			navigation={<NavigateBackButton to={'tenantUsers'}>Back to list of users</NavigateBackButton>}
+		>
+			<EditUser project={project} rolesConfig={rolesConfig} identityId={identityId} userListLink={'tenantUsers'} />
+		</LayoutPage>
 	},
 )

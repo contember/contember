@@ -1,28 +1,39 @@
 @import '../common'
 
 .#{$cui-conf-globalPrefix}hoveringToolbar
-	display: flex
-	justify-content: center
-	margin: 0 auto
-	z-index: 2
+	bottom: 0
 	opacity: 0
-	visibility: hidden
-	transition-duration: .15s
-	transition-property: opacity, visibility
-	position: sticky
-	bottom: 2em
-
+	overflow: visible
 	pointer-events: none
-	> *
-		pointer-events: all
+	position: sticky
+	top: 0
+	transition-duration: var(--cui-transition-duration--fast)
+	transition-property: opacity, visibility
+	visibility: hidden
+	z-index: 2
+
+	&:not(.view-contextual) &-content
+		bottom: 0
+		display: flex
+		justify-content: center
+		left: var(--cui-editor-canvas-element-padding-left)
+		margin: var(--cui-editor-canvas-element-padding-top) auto var(--cui-editor-canvas-element-padding-bottom) auto
+		overflow-x: auto
+		position: absolute
+		right: var(--cui-editor-canvas-element-padding-right)
+		top: auto
+
+	:not(.is-not-in-view) > &.is-active
+		opacity: 1
+		visibility: visible
+	:not(.is-not-in-view) > &.is-active &-content
+			pointer-events: all
 
 	&.view-contextual
-		position: absolute
-		top: -1000vh
+		bottom: unset
 		left: -1000vw
 		margin: -.5em 0 0 0
-		bottom: unset
-
-	&.is-active
-		visibility: visible
-		opacity: 1
+		position: absolute
+		right: unset
+		top: -1000vh
+		top: unset

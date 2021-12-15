@@ -1,11 +1,11 @@
 import { useProjectSlug } from '@contember/react-client'
+import { Button, FormGroup, LayoutPage, Stack, TextInput } from '@contember/ui'
 import { FC, memo, SyntheticEvent, useCallback, useState } from 'react'
 import { NavigateBackButton, useRedirect, useShowToast } from '../../components'
-import { useInvite } from '../hooks'
-import { Membership } from './VariableSelector'
-import { EditUserMembership, RolesConfig } from './EditUserMembership'
 import { RoutingLinkTarget } from '../../routing'
-import { Box, BoxSection, Button, FormGroup, TextInput, TitleBar } from '@contember/ui'
+import { useInvite } from '../hooks'
+import { EditUserMembership, RolesConfig } from './EditUserMembership'
+import { Membership } from './VariableSelector'
 
 interface InviteUserProps {
 	project: string
@@ -62,28 +62,22 @@ export const InviteUser: FC<InviteUserProps> = ({ project, rolesConfig, userList
 	const editUserMembershipProps = { project, rolesConfig, memberships, setMemberships }
 
 	return (
-		<Box style={{ maxWidth: '800px' }}>
-			<form onSubmit={submit}>
-				<BoxSection heading={false}>
-					<FormGroup label="E-mail" errors={emailNotValidError ? [{ message: 'Email is not valid.' }] : undefined}>
-						<TextInput
-							validationState={emailNotValidError ? 'invalid' : 'default'}
-							value={email}
-							onChange={e => setEmail && setEmail(e.target.value)}
-							allowNewlines={false}
-						/>
-					</FormGroup>
-				</BoxSection>
-				<BoxSection heading={false}>
-					<EditUserMembership {...editUserMembershipProps} />
-				</BoxSection>
-				<BoxSection heading={false}>
-					<Button intent="primary" size="large" type={'submit'} disabled={isSubmitting}>
-						Invite
-					</Button>
-				</BoxSection>
-			</form>
-		</Box>
+		<form onSubmit={submit}>
+			<Stack direction="vertical">
+				<FormGroup label="E-mail" errors={emailNotValidError ? [{ message: 'Email is not valid.' }] : undefined}>
+					<TextInput
+						validationState={emailNotValidError ? 'invalid' : 'default'}
+						value={email}
+						onChange={e => setEmail && setEmail(e.target.value)}
+						allowNewlines={false}
+					/>
+				</FormGroup>
+				<EditUserMembership {...editUserMembershipProps} />
+				<Button size="large" type={'submit'} disabled={isSubmitting}>
+					Invite
+				</Button>
+			</Stack>
+		</form>
 	)
 }
 
@@ -93,11 +87,11 @@ export const InviteUserToProject: FC<{ rolesConfig: RolesConfig }> = memo(({ rol
 		return <>Not in project.</>
 	}
 	return (
-		<>
-			<TitleBar navigation={<NavigateBackButton to={'tenantUsers'}>Back to list of users</NavigateBackButton>}>
-				Invite user
-			</TitleBar>
+		<LayoutPage
+			title="Invite user"
+			navigation={<NavigateBackButton to={'tenantUsers'}>Back to list of users</NavigateBackButton>}
+		>
 			<InviteUser project={project} rolesConfig={rolesConfig} userListLink={'tenantUsers'} />
-		</>
+		</LayoutPage>
 	)
 })

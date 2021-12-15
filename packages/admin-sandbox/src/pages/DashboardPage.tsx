@@ -10,8 +10,7 @@ import {
 } from '@contember/admin'
 
 // export const DashboardPage = (
-// 	<GenericPage pageName="dashboard">
-// 		<TitleBar>Sandbox admin</TitleBar>
+// 	<GenericPage pageName="dashboard" title="Sandbox admin">
 // 	</GenericPage>
 // )
 

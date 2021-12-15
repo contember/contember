@@ -1,6 +1,6 @@
 import { radios } from '@storybook/addon-knobs'
 import { storiesOf } from '@storybook/react'
-import { ButtonList } from '../../src/components/forms'
+import { ButtonList } from '../../src/components/Forms'
 import { simpleButtonStory } from './Button'
 
 storiesOf('ButtonList', module).add('simple', () => (

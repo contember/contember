@@ -7,16 +7,12 @@ import {
 	EditUser,
 	GenericPage,
 	InviteUser,
-	LayoutChrome,
-	Menu,
+	LayoutChrome, LayoutPage, Menu,
 	NavigateBackButton,
-	Page,
-	PageLayoutContent,
-	PageLinkButton,
+	Page, PageLinkButton,
 	Pages,
 	ProjectsGrid,
 	runReactApp,
-	TitleBar,
 	UsersList,
 	OtpManagement, ChangePassword,
 } from '@contember/admin'
@@ -66,26 +62,28 @@ runReactApp(
 		}}
 	>
 		<Pages layout={PanelLayout}>
-			<GenericPage pageName={'projectList'}>
-				<TitleBar actions={<PageLinkButton to={'projectCreate'}>New project</PageLinkButton>}>
-					Projects
-				</TitleBar>
+			<GenericPage
+				actions={<PageLinkButton to={'projectCreate'}>New project</PageLinkButton>}
+				pageName={'projectList'}
+				title="Projects"
+			>
 				<ProjectsGrid createProjectDetailLink={project => ({ pageName: 'projectOverview', parameters: { project } })} />
 			</GenericPage>
 
-			<GenericPage pageName={'projectCreate'}>
-				<TitleBar navigation={<NavigateBackButton to={'projectList'}>Projects</NavigateBackButton>}>
-					New project
-				</TitleBar>
+			<GenericPage
+				navigation={<NavigateBackButton to={'projectList'}>Projects</NavigateBackButton>}
+				pageName={'projectCreate'}
+				title="New project"
+			>
 				<CreateProjectForm projectListLink={'projectList'} />
 			</GenericPage>
 
 			<Page name="projectOverview">
 				{({ project }: { project: string }) => (
-					<PageLayoutContent>
-						<TitleBar navigation={<NavigateBackButton to={'projectList'}>Projects</NavigateBackButton>}>
-							Project {project}
-						</TitleBar>
+					<LayoutPage
+						navigation={<NavigateBackButton to={'projectList'}>Projects</NavigateBackButton>}
+						title={`Project ${project}`}
+					>
 						<div className={'projectMembers'}>
 							<div className={'projectMembers-section'}>
 								<Box
@@ -112,59 +110,56 @@ runReactApp(
 								</Box>
 							</div>
 						</div>
-					</PageLayoutContent>
+					</LayoutPage>
 				)}
 			</Page>
 
 			<Page name="userInvite">
 				{({ project }: { project: string }) => (
-					<PageLayoutContent>
-						<TitleBar
-							navigation={<NavigateBackButton
-								to={{ pageName: 'projectOverview', parameters: { project } }}>Project</NavigateBackButton>}
-						>
-							Invite user to project {project}
-						</TitleBar>
+					<LayoutPage
+						navigation={<NavigateBackButton
+							to={{ pageName: 'projectOverview', parameters: { project } }}
+						>Project</NavigateBackButton>}
+						title={`Invite user to project ${project}`}
+					>
 						<InviteUser
 							project={project}
 							userListLink={{ pageName: 'projectOverview', parameters: { project } }}
 						/>
-					</PageLayoutContent>
+					</LayoutPage>
 				)}
 			</Page>
 
 			<Page name="identityEdit">
 				{({ project, identity }: { project: string, identity: string }) => (
-					<PageLayoutContent>
-						<TitleBar
-							navigation={<NavigateBackButton
-								to={{ pageName: 'projectOverview', parameters: { project } }}>Users</NavigateBackButton>}
-						>
-							Edit membership in project {project}
-						</TitleBar>
+					<LayoutPage
+						navigation={<NavigateBackButton
+							to={{ pageName: 'projectOverview', parameters: { project } }}
+						>Users</NavigateBackButton>}
+						title={`Edit membership in project ${project}`}
+					>
 						<EditUser
 							project={project}
 							identityId={identity}
 							userListLink={{ pageName: 'projectOverview', parameters: { project } }}
 						/>
-					</PageLayoutContent>
+					</LayoutPage>
 				)}
 			</Page>
 
 			<Page name="apiKeyCreate">
 				{({ project }: { project: string }) => (
-					<PageLayoutContent>
-						<TitleBar
-							navigation={<NavigateBackButton
-								to={{ pageName: 'projectOverview', parameters: { project } }}>Project</NavigateBackButton>}
-						>
-							Create API key for project {project}
-						</TitleBar>
+					<LayoutPage
+						navigation={<NavigateBackButton
+							to={{ pageName: 'projectOverview', parameters: { project } }}
+						>Project</NavigateBackButton>}
+						title={`Create API key for project ${project}`}
+					>
 						<CreateApiKeyForm
 							project={project}
 							apiKeyListLink={{ pageName: 'projectOverview', parameters: { project } }}
 						/>
-					</PageLayoutContent>
+					</LayoutPage>
 				)}
 			</Page>
 

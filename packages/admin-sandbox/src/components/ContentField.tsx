@@ -11,8 +11,7 @@ import {
 	ImageUploadField, isElementWithReference,
 	paragraphNumberedToolbarButton,
 	paragraphToolbarButton,
-	RichEditor,
-	scrollTargetToolbarButton,
+	RichEditor, Scheme, scrollTargetToolbarButton,
 	tableToolbarButton,
 	TextField,
 	useEntity,
@@ -63,6 +62,7 @@ export const fullEditorInlineButtons: BlockEditorProps['inlineButtons'] = [
 
 export interface ContentFieldProps {
 	field: string
+	toolbarScheme?: Scheme
 }
 
 const LinkElement = ({ attributes, children, element }: EditorRenderElementProps) => {
@@ -80,7 +80,7 @@ const LinkElement = ({ attributes, children, element }: EditorRenderElementProps
 	)
 }
 export const ContentField = Component<ContentFieldProps>(
-	({ field }) => (
+	({ field, toolbarScheme }) => (
 		<BlockEditor
 			augmentEditor={editor => {
 				editor.registerElement({
@@ -160,6 +160,7 @@ export const ContentField = Component<ContentFieldProps>(
 				paragraphNumberedToolbarButton,
 				horizontalRuleToolbarButton,
 			]}
+			toolbarScheme={toolbarScheme}
 		>
 			<Block discriminateBy="image" label="Image">
 				<BlockEditor.ContentOutlet placeholder="Text" />

@@ -1,6 +1,6 @@
+import { Button, FormGroup, Message, TextInput } from '@contember/ui'
 import { FC, useCallback } from 'react'
 import { useShowToast } from '../../components'
-import { Button, FormGroup, Message, TextInput } from '@contember/ui'
 import { PrepareOtpResult, usePrepareOtp } from '../hooks'
 import { useForm } from './useForm'
 
@@ -42,7 +42,7 @@ export const PrepareOtpForm: FC<PrepareOtpFormProps> = ({ onPrepared, isReSetup,
 			</FormGroup>
 			<br />
 			{isReSetup && <>
-				<Message type={'warn'}>
+				<Message intent={'warn'}>
 					You already have two-factor authentication active. By clicking "Continue", the old one will no longer work.
 				</Message>
 				<br />

@@ -16,7 +16,7 @@ export const PageErrorBoundary = memo((props: PageErrorBoundaryProps) => (
 function ProdErrorFallback({}: FallbackProps) {
 	return (
 		<div>
-			<Message type="danger" size="large">
+			<Message intent="danger" size="large">
 				Fatal error!
 			</Message>
 		</div>

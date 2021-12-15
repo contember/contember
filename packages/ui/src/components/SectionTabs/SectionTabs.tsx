@@ -1,8 +1,6 @@
 import { memo, useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react'
 import { useClassNamePrefix } from '../../auxiliary'
-import { toStateClass } from '../../utils'
-import { AnchorButton } from '../forms/Button'
-import { ButtonList } from '../forms/ButtonList'
+import { TabButton } from '../Tabs'
 import { ActiveSectionsTabsContext, SectionTabsContext, SectionTabsRegistrationContext, useActiveSectionsTabs, useSectionTabs } from './Context'
 import { activeSectionTabsMapReducer, sectionTabsMapReducer } from './State'
 import { ActiveSectionsTabsContextType, SectionTabProps, SectionTabsProps, SectionTabsRegistrationContextType } from './Types'
@@ -109,26 +107,29 @@ export const SectionTabs = memo(() => {
 
 	return entries.length > 1
 		? <div className={`${prefix}section-tabs`}>
-				<ButtonList>{entries.map(([, { id, label, isMeta = false }]) => <AnchorButton
-				key={id}
-				size="small"
-				distinction="seamless"
-				isActive={selectedOrActiveTab === id}
-				className={toStateClass('meta', isMeta)}
-				onClick={() => {
-					const element = document.getElementById(id)
+			<div className={`${prefix}section-tabs-content`}>
+				{entries.map(([, { id, label, isMeta = false }]) => (
+					<TabButton
+						key={id}
+						isSelected={selectedOrActiveTab === id}
+						onClick={() => {
+							const element = document.getElementById(id)
 
-					if (element) {
-						element.tabIndex = 0
-						element.focus({ preventScroll: true })
-						element.blur()
-						element.tabIndex = -1
-						setSelectedTab(id)
-						element.scrollIntoView({ behavior: 'smooth' })
-						clickTimestamp.current = Date.now()
-					}
-				}}
-			>{label}</AnchorButton>)}</ButtonList>
+							if (element) {
+								element.tabIndex = 0
+								element.focus({ preventScroll: true })
+								element.blur()
+								element.tabIndex = -1
+								element.scrollIntoView({ behavior: 'smooth' })
+								setSelectedTab(id)
+								clickTimestamp.current = Date.now()
+							}
+						}}
+					>
+						{label}
+					</TabButton>
+				))}
+			</div>
 		</div>
 		: null
 })

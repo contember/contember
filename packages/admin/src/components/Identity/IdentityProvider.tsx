@@ -1,7 +1,7 @@
-import { createContext, useCallback, useEffect, useMemo, useState } from 'react'
 import { useSessionToken } from '@contember/react-client'
-import { useTenantMe } from '../../tenant/hooks/me'
 import { AnchorButton, ContainerSpinner, Message } from '@contember/ui'
+import { createContext, useCallback, useEffect, useMemo, useState } from 'react'
+import { useTenantMe } from '../../tenant/hooks/me'
 import { MiscPageLayout } from '../MiscPageLayout'
 
 export interface Identity {
@@ -77,7 +77,7 @@ export const IdentityProvider: React.FC<{onInvalidIdentity?: () => void }> = ({ 
 	if (identityCleared) {
 		return (
 			<MiscPageLayout>
-				<Message type="default" size="large" flow="generousBlock">Logging out&hellip;</Message>
+				<Message size="large" flow="generousBlock">Logging out&hellip;</Message>
 			</MiscPageLayout>
 		)
 	}
@@ -85,7 +85,7 @@ export const IdentityProvider: React.FC<{onInvalidIdentity?: () => void }> = ({ 
 	if (me.state === 'error') {
 		return (
 			<MiscPageLayout>
-				<Message type="danger" size="large" flow="generousBlock">Failed to fetch an identity</Message>
+				<Message intent="danger" size="large" flow="generousBlock">Failed to fetch an identity</Message>
 				<AnchorButton style={{ margin: '0 auto', display: 'block', textAlign: 'center', maxWidth: '100px' }} href={window.location.href}>Reload</AnchorButton>
 			</MiscPageLayout>
 		)

@@ -8,35 +8,49 @@
 	&-dimensions
 		display: flex
 		flex-direction: column
-		gap: $cui-gap * 8
+		gap: var(--cui-layout-section-gap)
 
 		&-in
 			display: flex
 			flex-direction: column
-			gap: $cui-gap * 4
+			gap: var(--cui-layout-section-gap)
 
 		&-dimension
 			display: flex
 			flex: 1
 			flex-direction: column
-			gap: $cui-gap * 6
+			gap: var(--cui-layout-section-gap)
 			position: relative
 
 		&-dimensionValue
-			background-color: rgba(0,0,0, 0.05)
+			background-color: var(--cui-background-color--below)
 			border-radius: 0.5em
 			font-size: 0.5em
 			padding: 0.1em 0.75em
 			position: absolute
-			right: 0
+			right: 1px
 			text-transform: uppercase
-			top: 0
+			top: 1px
+			z-index: 1
 
-	@media (min-width: $min-width-break-point-tablet)
+	@media (min-width: $breakpoint-min-medium)
 		&-dimensions
-			gap: $cui-gap * 6
+			gap: var(--cui-layout-section-gap)
+			&-dimension
+				min-width: 20em
 			&-in
 				flex-direction: row
-				gap: $cui-gap * 6
+				gap: var(--cui-layout-section-gap)
 			&-in:not(:first-child) &-dimensionValue
 				display: none
+	@media (min-width: $breakpoint-min-large)
+		&-dimensions
+			&-dimension
+				min-width: 25em
+	@media (min-width: $breakpoint-min-xlarge)
+		&-dimensions
+			&-dimension
+				min-width: 28.5em
+
+	[class*="-ValueContainer2"] &-dimensions-dimension
+		min-width: unset

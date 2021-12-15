@@ -2,12 +2,33 @@
 
 .#{$cui-conf-globalPrefix}layout-chrome
 	align-items: stretch
+	color: var(--cui-color--medium)
 	display: flex
 	flex-direction: column
 	min-height: 100vh
 
+	$tablet-width: 0.33333
+	&-bar,
+	&-body
+		--cui-layout-chrome-padding-bottom: calc(var(--cui-padding-bottom) + var(--cui-edge-offset-bottom) + env(safe-area-inset-bottom, 0em))
+		--cui-layout-chrome-padding-left: calc(var(--cui-padding-left) + var(--cui-edge-offset-left) + env(safe-area-inset-left, 0em))
+		--cui-layout-chrome-padding-right: calc(var(--cui-padding-right) + var(--cui-edge-offset-right) + env(safe-area-inset-right, 0em))
+		--cui-layout-chrome-padding-top: calc(var(--cui-padding-top) + var(--cui-edge-offset-top) + env(safe-area-inset-top, 0em))
+
+	&-body
+		--cui-layout-page-padding-bottom: calc(var(--cui-padding-bottom, 0em) + var(--cui-edge-offset-bottom, 0em) + env(safe-area-inset-bottom, 0em))
+		--cui-layout-page-padding-left: calc(var(--cui-padding-left, 0em) + var(--cui-edge-offset-left, 0em) + env(safe-area-inset-left, 0em))
+		--cui-layout-page-padding-right: calc(var(--cui-padding-right, 0em) + var(--cui-edge-offset-right, 0em) + env(safe-area-inset-right, 0em))
+		--cui-layout-page-padding-top: calc(var(--cui-padding-top, 0em) + var(--cui-edge-offset-top, 0em) + env(safe-area-inset-top, 0em))
+
+		--cui-layout-section-padding-bottom: var(--cui-layout-page-padding-bottom)
+		--cui-layout-section-padding-left: calc(var(--cui-layout-page-padding-left) - var(--cui-edge-offset-left, 0em))
+		--cui-layout-section-padding-right: calc(var(--cui-layout-page-padding-right) - var(--cui-edge-offset-right, 0em))
+		--cui-layout-section-padding-top: var(--cui-layout-page-padding-top)
+		--cui-layout-section-gap: #{$cui-gap * 4}
+
 	&-bar
-		background: $cui-light-panel-background
+		background: var(--cui-background-color)
 		display: flex
 		flex-direction: column
 		max-height: 100vh
@@ -18,47 +39,49 @@
 		display: flex
 		flex-direction: row
 		justify-content: space-between
-		padding: $cui-gap * 2  $cui-gap * 4
+		padding-bottom: var(--cui-layout-chrome-padding-bottom)
+		padding-left: var(--cui-layout-chrome-padding-left)
+		padding-right: var(--cui-layout-chrome-padding-right)
+		padding-top: var(--cui-layout-chrome-padding-top)
 		position: relative
 	&-bar-body
+		border-top: 1px solid transparent
 		flex-grow: 1
 		overflow-y: auto
 		position: relative
+		transition: border-color var(--cui-transition-duration)
 		z-index: 1
+		&.is-scrolled
+			border-top-color: var(--cui-color--lower)
 	&-bar-footer
 		align-items: stretch
-		border-top: $cui-light-panel-border
+		border-top: 1px solid var(--cui-color--lower)
 		display: flex
 		flex-direction: column
 	&-bar-switchers
-		border-bottom: $cui-light-panel-border
-		border-top: $cui-light-panel-border
-		padding: $cui-gap * 2  $cui-gap * 4
+		margin-top: calc(-1* var(--cui-padding-vertical) / 2)
+		padding-bottom: calc(var(--cui-padding-vertical) / 2)
+		padding-left: var(--cui-layout-chrome-padding-left)
+		padding-right: var(--cui-layout-chrome-padding-right)
 	&-body
-		background-color: $cui-light-body-background
+		background-color: var(--cui-background-color)
 		flex-grow: 1
+		position: relative
+		z-index: 2
 	&-navigation-button
-		height: 2em
+		height: var(--cui-control-height)
 		margin: 0.125em
 		& > .#{$cui-conf-globalPrefix}button-content
 			display: flex
 			flex-direction: row
 			flex-wrap: nowrap
-			gap: $cui-gap * 2
+			gap: calc(var(--cui-gap) * 2)
 
-	@media (min-width: $min-width-break-point-tablet)
-		flex-direction: row
-
-		&-bar
-			border-right: $cui-light-panel-border
-			width: $cui-layout-sidebar-width
-
-		&-navigation-button
-			display: none
-
-	@media (max-width: $max-width-break-point-tablet)
+	@media (max-width: $breakpoint-max-medium)
 		&-bar
 			height: 100vh
+		&-body
+			min-height: 100vh
 		&.view-collapsed &-bar
 			height: unset
 		&.view-collapsed &-bar-body,
@@ -66,3 +89,27 @@
 			display: none
 		&:not(.view-collapsed) &-body
 			display: none
+
+	@media (min-width: $breakpoint-min-medium)
+		flex-direction: row
+		&-bar
+			--cui-edge-offset-right: 0em
+			background: linear-gradient(to right, var(--cui-background-color) 25%, var(--cui-background-color--below))
+			width: 100% * $tablet-width
+		&-bar-body
+			padding-left: env(safe-area-inset-left, 0em)
+		&-body
+			--cui-layout-section-gap: #{$cui-gap * 8}
+			width: 100% - (100% * $tablet-width)
+			display: flex
+			flex-direction: column
+		&-navigation-button
+			display: none
+
+	@media (min-width: $breakpoint-min-large)
+		&-bar
+			flex-shrink: 0
+			width: unset
+			min-width: $breakpoint-min-large - $breakpoint-min-medium
+		&-body
+			width: calc(100% - #{$breakpoint-min-large * $tablet-width})

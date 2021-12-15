@@ -1,0 +1,2072 @@
+/*** All color swatches: ***/
+:root {
+	/** primary: #15009C **/
+	--cui-theme-primary-1000: 255, 255, 255;
+	--cui-theme-primary-975: 243, 244, 255;
+	--cui-theme-primary-950: 230, 233, 255;
+	--cui-theme-primary-925: 218, 223, 255;
+	--cui-theme-primary-900: 206, 214, 255;
+	--cui-theme-primary-875: 194, 204, 255;
+	--cui-theme-primary-850: 182, 195, 255;
+	--cui-theme-primary-825: 170, 186, 255;
+	--cui-theme-primary-800: 157, 178, 255;
+	--cui-theme-primary-775: 142, 171, 255;
+	--cui-theme-primary-750: 127, 163, 255;
+	--cui-theme-primary-725: 115, 156, 252;
+	--cui-theme-primary-700: 107, 148, 248;
+	--cui-theme-primary-675: 100, 140, 245;
+	--cui-theme-primary-650: 93, 133, 243;
+	--cui-theme-primary-625: 85, 125, 240;
+	--cui-theme-primary-600: 75, 118, 238;
+	--cui-theme-primary-575: 66, 112, 235;
+	--cui-theme-primary-550: 56, 105, 233;
+	--cui-theme-primary-525: 42, 98, 230;
+	--cui-theme-primary-500: 23, 92, 228;
+	--cui-theme-primary-475: 2, 86, 225;
+	--cui-theme-primary-450: 4, 80, 217;
+	--cui-theme-primary-425: 6, 74, 210;
+	--cui-theme-primary-400: 8, 68, 203;
+	--cui-theme-primary-375: 9, 62, 197;
+	--cui-theme-primary-350: 8, 57, 190;
+	--cui-theme-primary-325: 8, 51, 183;
+	--cui-theme-primary-300: 7, 45, 177;
+	--cui-theme-primary-275: 6, 40, 170;
+	--cui-theme-primary-250: 4, 33, 164;
+	--cui-theme-primary-225: 2, 27, 157;
+	--cui-theme-primary-200: 1, 21, 150;
+	--cui-theme-primary-175: 8, 18, 137;
+	--cui-theme-primary-150: 12, 15, 124;
+	--cui-theme-primary-125: 14, 12, 110;
+	--cui-theme-primary-100: 16, 9, 95;
+	--cui-theme-primary-75: 15, 6, 80;
+	--cui-theme-primary-50: 15, 7, 53;
+	--cui-theme-primary-25: 10, 5, 23;
+	--cui-theme-primary-0: 0, 0, 0;
+
+	/** secondary: #3DA9EB **/
+	--cui-theme-secondary-1000: 255, 255, 255;
+	--cui-theme-secondary-975: 206, 253, 255;
+	--cui-theme-secondary-950: 160, 249, 255;
+	--cui-theme-secondary-925: 111, 244, 254;
+	--cui-theme-secondary-900: 73, 236, 250;
+	--cui-theme-secondary-875: 39, 227, 245;
+	--cui-theme-secondary-850: 16, 218, 238;
+	--cui-theme-secondary-825: 2, 208, 232;
+	--cui-theme-secondary-800: 6, 199, 228;
+	--cui-theme-secondary-775: 8, 189, 223;
+	--cui-theme-secondary-750: 8, 180, 220;
+	--cui-theme-secondary-725: 7, 172, 216;
+	--cui-theme-secondary-700: 4, 164, 211;
+	--cui-theme-secondary-675: 1, 155, 208;
+	--cui-theme-secondary-650: 1, 148, 201;
+	--cui-theme-secondary-625: 1, 141, 194;
+	--cui-theme-secondary-600: 2, 134, 186;
+	--cui-theme-secondary-575: 2, 128, 180;
+	--cui-theme-secondary-550: 1, 121, 174;
+	--cui-theme-secondary-525: 1, 115, 167;
+	--cui-theme-secondary-500: 1, 109, 162;
+	--cui-theme-secondary-475: 0, 103, 155;
+	--cui-theme-secondary-450: 0, 98, 147;
+	--cui-theme-secondary-425: 0, 93, 139;
+	--cui-theme-secondary-400: 0, 87, 131;
+	--cui-theme-secondary-375: 0, 83, 123;
+	--cui-theme-secondary-350: 0, 78, 115;
+	--cui-theme-secondary-325: 0, 73, 107;
+	--cui-theme-secondary-300: 0, 69, 100;
+	--cui-theme-secondary-275: 0, 64, 92;
+	--cui-theme-secondary-250: 0, 59, 85;
+	--cui-theme-secondary-225: 0, 55, 77;
+	--cui-theme-secondary-200: 1, 50, 70;
+	--cui-theme-secondary-175: 1, 46, 63;
+	--cui-theme-secondary-150: 1, 41, 56;
+	--cui-theme-secondary-125: 1, 36, 48;
+	--cui-theme-secondary-100: 1, 31, 41;
+	--cui-theme-secondary-75: 1, 25, 32;
+	--cui-theme-secondary-50: 0, 18, 23;
+	--cui-theme-secondary-25: 0, 10, 12;
+	--cui-theme-secondary-0: 0, 0, 0;
+
+	/** tertiary: #AE65FF **/
+	--cui-theme-tertiary-1000: 255, 255, 255;
+	--cui-theme-tertiary-975: 252, 241, 255;
+	--cui-theme-tertiary-950: 249, 228, 255;
+	--cui-theme-tertiary-925: 247, 214, 255;
+	--cui-theme-tertiary-900: 244, 201, 255;
+	--cui-theme-tertiary-875: 241, 188, 255;
+	--cui-theme-tertiary-850: 238, 175, 255;
+	--cui-theme-tertiary-825: 235, 163, 255;
+	--cui-theme-tertiary-800: 234, 149, 255;
+	--cui-theme-tertiary-775: 236, 133, 255;
+	--cui-theme-tertiary-750: 229, 123, 255;
+	--cui-theme-tertiary-725: 222, 113, 255;
+	--cui-theme-tertiary-700: 212, 105, 252;
+	--cui-theme-tertiary-675: 203, 98, 249;
+	--cui-theme-tertiary-650: 194, 90, 246;
+	--cui-theme-tertiary-625: 185, 82, 244;
+	--cui-theme-tertiary-600: 176, 75, 242;
+	--cui-theme-tertiary-575: 168, 68, 239;
+	--cui-theme-tertiary-550: 159, 60, 237;
+	--cui-theme-tertiary-525: 150, 53, 235;
+	--cui-theme-tertiary-500: 142, 45, 233;
+	--cui-theme-tertiary-475: 135, 41, 223;
+	--cui-theme-tertiary-450: 129, 37, 213;
+	--cui-theme-tertiary-425: 123, 32, 204;
+	--cui-theme-tertiary-400: 117, 28, 194;
+	--cui-theme-tertiary-375: 112, 24, 185;
+	--cui-theme-tertiary-350: 106, 19, 176;
+	--cui-theme-tertiary-325: 100, 15, 167;
+	--cui-theme-tertiary-300: 95, 9, 159;
+	--cui-theme-tertiary-275: 90, 3, 150;
+	--cui-theme-tertiary-250: 84, 0, 142;
+	--cui-theme-tertiary-225: 79, 0, 130;
+	--cui-theme-tertiary-200: 74, 0, 118;
+	--cui-theme-tertiary-175: 68, 0, 107;
+	--cui-theme-tertiary-150: 62, 0, 96;
+	--cui-theme-tertiary-125: 55, 2, 83;
+	--cui-theme-tertiary-100: 47, 5, 68;
+	--cui-theme-tertiary-75: 37, 7, 54;
+	--cui-theme-tertiary-50: 27, 7, 38;
+	--cui-theme-tertiary-25: 14, 5, 19;
+	--cui-theme-tertiary-0: 0, 0, 0;
+
+	/** positive: #4390FF **/
+	--cui-theme-positive-1000: 255, 255, 255;
+	--cui-theme-positive-975: 211, 252, 255;
+	--cui-theme-positive-950: 175, 247, 255;
+	--cui-theme-positive-925: 150, 238, 255;
+	--cui-theme-positive-900: 134, 229, 255;
+	--cui-theme-positive-875: 125, 218, 255;
+	--cui-theme-positive-850: 108, 209, 255;
+	--cui-theme-positive-825: 91, 201, 255;
+	--cui-theme-positive-800: 73, 192, 255;
+	--cui-theme-positive-775: 65, 183, 252;
+	--cui-theme-positive-750: 61, 174, 249;
+	--cui-theme-positive-725: 57, 165, 245;
+	--cui-theme-positive-700: 52, 157, 242;
+	--cui-theme-positive-675: 46, 148, 240;
+	--cui-theme-positive-650: 39, 140, 237;
+	--cui-theme-positive-625: 31, 133, 235;
+	--cui-theme-positive-600: 19, 125, 232;
+	--cui-theme-positive-575: 0, 118, 230;
+	--cui-theme-positive-550: 2, 111, 225;
+	--cui-theme-positive-525: 3, 104, 218;
+	--cui-theme-positive-500: 3, 98, 214;
+	--cui-theme-positive-475: 2, 91, 208;
+	--cui-theme-positive-450: 0, 85, 202;
+	--cui-theme-positive-425: 0, 81, 192;
+	--cui-theme-positive-400: 0, 76, 182;
+	--cui-theme-positive-375: 0, 71, 172;
+	--cui-theme-positive-350: 0, 67, 163;
+	--cui-theme-positive-325: 0, 62, 155;
+	--cui-theme-positive-300: 0, 58, 145;
+	--cui-theme-positive-275: 0, 54, 137;
+	--cui-theme-positive-250: 0, 50, 127;
+	--cui-theme-positive-225: 0, 46, 117;
+	--cui-theme-positive-200: 1, 43, 106;
+	--cui-theme-positive-175: 1, 39, 95;
+	--cui-theme-positive-150: 1, 35, 85;
+	--cui-theme-positive-125: 1, 31, 75;
+	--cui-theme-positive-100: 1, 26, 64;
+	--cui-theme-positive-75: 1, 22, 51;
+	--cui-theme-positive-50: 0, 16, 37;
+	--cui-theme-positive-25: 0, 9, 20;
+	--cui-theme-positive-0: 0, 0, 0;
+
+	/** success: #6EBB00 **/
+	--cui-theme-success-1000: 255, 255, 255;
+	--cui-theme-success-975: 235, 251, 204;
+	--cui-theme-success-950: 214, 246, 160;
+	--cui-theme-success-925: 192, 240, 119;
+	--cui-theme-success-900: 169, 235, 76;
+	--cui-theme-success-875: 146, 229, 23;
+	--cui-theme-success-850: 125, 221, 21;
+	--cui-theme-success-825: 103, 214, 35;
+	--cui-theme-success-800: 78, 207, 45;
+	--cui-theme-success-775: 54, 199, 48;
+	--cui-theme-success-750: 50, 191, 44;
+	--cui-theme-success-725: 44, 183, 40;
+	--cui-theme-success-700: 40, 175, 36;
+	--cui-theme-success-675: 35, 167, 31;
+	--cui-theme-success-650: 31, 160, 27;
+	--cui-theme-success-625: 26, 153, 22;
+	--cui-theme-success-600: 21, 146, 18;
+	--cui-theme-success-575: 15, 139, 12;
+	--cui-theme-success-550: 9, 133, 6;
+	--cui-theme-success-525: 2, 127, 1;
+	--cui-theme-success-500: 6, 120, 0;
+	--cui-theme-success-475: 13, 114, 0;
+	--cui-theme-success-450: 17, 108, 0;
+	--cui-theme-success-425: 19, 102, 0;
+	--cui-theme-success-400: 22, 96, 0;
+	--cui-theme-success-375: 23, 90, 0;
+	--cui-theme-success-350: 25, 85, 0;
+	--cui-theme-success-325: 26, 79, 0;
+	--cui-theme-success-300: 26, 74, 0;
+	--cui-theme-success-275: 26, 69, 0;
+	--cui-theme-success-250: 26, 63, 0;
+	--cui-theme-success-225: 25, 58, 1;
+	--cui-theme-success-200: 24, 53, 1;
+	--cui-theme-success-175: 22, 48, 1;
+	--cui-theme-success-150: 21, 43, 1;
+	--cui-theme-success-125: 18, 37, 0;
+	--cui-theme-success-100: 17, 32, 0;
+	--cui-theme-success-75: 13, 25, 1;
+	--cui-theme-success-50: 10, 18, 1;
+	--cui-theme-success-25: 5, 10, 0;
+	--cui-theme-success-0: 0, 0, 0;
+
+	/** warn: #EC9117 **/
+	--cui-theme-warn-1000: 255, 255, 255;
+	--cui-theme-warn-975: 255, 243, 225;
+	--cui-theme-warn-950: 255, 231, 201;
+	--cui-theme-warn-925: 255, 219, 178;
+	--cui-theme-warn-900: 255, 207, 158;
+	--cui-theme-warn-875: 255, 194, 141;
+	--cui-theme-warn-850: 255, 182, 125;
+	--cui-theme-warn-825: 255, 170, 110;
+	--cui-theme-warn-800: 255, 157, 95;
+	--cui-theme-warn-775: 255, 145, 80;
+	--cui-theme-warn-750: 254, 132, 63;
+	--cui-theme-warn-725: 247, 124, 56;
+	--cui-theme-warn-700: 239, 116, 49;
+	--cui-theme-warn-675: 232, 108, 43;
+	--cui-theme-warn-650: 226, 100, 37;
+	--cui-theme-warn-625: 219, 93, 30;
+	--cui-theme-warn-600: 212, 86, 24;
+	--cui-theme-warn-575: 205, 79, 17;
+	--cui-theme-warn-550: 200, 71, 8;
+	--cui-theme-warn-525: 194, 64, 0;
+	--cui-theme-warn-500: 184, 61, 0;
+	--cui-theme-warn-475: 174, 58, 0;
+	--cui-theme-warn-450: 165, 56, 0;
+	--cui-theme-warn-425: 155, 54, 0;
+	--cui-theme-warn-400: 146, 52, 0;
+	--cui-theme-warn-375: 138, 49, 1;
+	--cui-theme-warn-350: 129, 47, 1;
+	--cui-theme-warn-325: 120, 45, 1;
+	--cui-theme-warn-300: 112, 42, 1;
+	--cui-theme-warn-275: 104, 40, 0;
+	--cui-theme-warn-250: 95, 38, 0;
+	--cui-theme-warn-225: 86, 37, 0;
+	--cui-theme-warn-200: 76, 35, 0;
+	--cui-theme-warn-175: 67, 33, 0;
+	--cui-theme-warn-150: 59, 30, 0;
+	--cui-theme-warn-125: 52, 26, 1;
+	--cui-theme-warn-100: 45, 22, 1;
+	--cui-theme-warn-75: 37, 17, 1;
+	--cui-theme-warn-50: 27, 13, 0;
+	--cui-theme-warn-25: 15, 6, 0;
+	--cui-theme-warn-0: 0, 0, 0;
+
+	/** danger: #FF4827 **/
+	--cui-theme-danger-1000: 255, 255, 255;
+	--cui-theme-danger-975: 255, 242, 238;
+	--cui-theme-danger-950: 255, 229, 223;
+	--cui-theme-danger-925: 255, 216, 210;
+	--cui-theme-danger-900: 255, 203, 197;
+	--cui-theme-danger-875: 255, 191, 185;
+	--cui-theme-danger-850: 255, 178, 175;
+	--cui-theme-danger-825: 255, 165, 165;
+	--cui-theme-danger-800: 255, 152, 156;
+	--cui-theme-danger-775: 255, 139, 147;
+	--cui-theme-danger-750: 255, 126, 138;
+	--cui-theme-danger-725: 255, 112, 131;
+	--cui-theme-danger-700: 255, 96, 123;
+	--cui-theme-danger-675: 255, 81, 107;
+	--cui-theme-danger-650: 255, 63, 84;
+	--cui-theme-danger-625: 255, 39, 56;
+	--cui-theme-danger-600: 252, 0, 27;
+	--cui-theme-danger-575: 240, 0, 26;
+	--cui-theme-danger-550: 229, 0, 26;
+	--cui-theme-danger-525: 219, 0, 26;
+	--cui-theme-danger-500: 208, 0, 25;
+	--cui-theme-danger-475: 198, 0, 25;
+	--cui-theme-danger-450: 188, 0, 25;
+	--cui-theme-danger-425: 179, 0, 24;
+	--cui-theme-danger-400: 169, 0, 24;
+	--cui-theme-danger-375: 160, 0, 24;
+	--cui-theme-danger-350: 151, 0, 21;
+	--cui-theme-danger-325: 143, 0, 18;
+	--cui-theme-danger-300: 134, 0, 15;
+	--cui-theme-danger-275: 126, 0, 12;
+	--cui-theme-danger-250: 117, 0, 9;
+	--cui-theme-danger-225: 109, 0, 6;
+	--cui-theme-danger-200: 101, 0, 2;
+	--cui-theme-danger-175: 92, 1, 1;
+	--cui-theme-danger-150: 81, 5, 2;
+	--cui-theme-danger-125: 70, 8, 4;
+	--cui-theme-danger-100: 58, 9, 5;
+	--cui-theme-danger-75: 46, 10, 6;
+	--cui-theme-danger-50: 33, 8, 6;
+	--cui-theme-danger-25: 18, 5, 4;
+	--cui-theme-danger-0: 0, 0, 0;
+
+	/** default: #999999 **/
+	--cui-theme-default-1000: 255, 255, 255;
+	--cui-theme-default-975: 245, 245, 245;
+	--cui-theme-default-950: 234, 234, 234;
+	--cui-theme-default-925: 225, 225, 225;
+	--cui-theme-default-900: 215, 215, 215;
+	--cui-theme-default-875: 206, 206, 206;
+	--cui-theme-default-850: 198, 198, 198;
+	--cui-theme-default-825: 189, 189, 189;
+	--cui-theme-default-800: 181, 181, 181;
+	--cui-theme-default-775: 173, 173, 173;
+	--cui-theme-default-750: 166, 166, 166;
+	--cui-theme-default-725: 158, 158, 158;
+	--cui-theme-default-700: 151, 151, 151;
+	--cui-theme-default-675: 145, 145, 145;
+	--cui-theme-default-650: 138, 138, 138;
+	--cui-theme-default-625: 132, 132, 132;
+	--cui-theme-default-600: 126, 126, 126;
+	--cui-theme-default-575: 120, 120, 120;
+	--cui-theme-default-550: 114, 114, 114;
+	--cui-theme-default-525: 108, 108, 108;
+	--cui-theme-default-500: 103, 103, 103;
+	--cui-theme-default-475: 98, 98, 98;
+	--cui-theme-default-450: 92, 92, 92;
+	--cui-theme-default-425: 87, 87, 87;
+	--cui-theme-default-400: 82, 82, 82;
+	--cui-theme-default-375: 78, 78, 78;
+	--cui-theme-default-350: 73, 73, 73;
+	--cui-theme-default-325: 68, 68, 68;
+	--cui-theme-default-300: 64, 64, 64;
+	--cui-theme-default-275: 59, 59, 59;
+	--cui-theme-default-250: 55, 55, 55;
+	--cui-theme-default-225: 51, 51, 51;
+	--cui-theme-default-200: 46, 46, 46;
+	--cui-theme-default-175: 42, 42, 42;
+	--cui-theme-default-150: 37, 37, 37;
+	--cui-theme-default-125: 32, 32, 32;
+	--cui-theme-default-100: 27, 27, 27;
+	--cui-theme-default-75: 22, 22, 22;
+	--cui-theme-default-50: 16, 16, 16;
+	--cui-theme-default-25: 8, 8, 8;
+	--cui-theme-default-0: 0, 0, 0;
+
+	/* Content */
+	--cui-content-1000: var(--cui-theme-default-1000);
+	--cui-content-975: var(--cui-theme-default-975);
+	--cui-content-950: var(--cui-theme-default-950);
+	--cui-content-925: var(--cui-theme-default-925);
+	--cui-content-900: var(--cui-theme-default-900);
+	--cui-content-875: var(--cui-theme-default-875);
+	--cui-content-850: var(--cui-theme-default-850);
+	--cui-content-825: var(--cui-theme-default-825);
+	--cui-content-800: var(--cui-theme-default-800);
+	--cui-content-775: var(--cui-theme-default-775);
+	--cui-content-750: var(--cui-theme-default-750);
+	--cui-content-725: var(--cui-theme-default-725);
+	--cui-content-700: var(--cui-theme-default-700);
+	--cui-content-675: var(--cui-theme-default-675);
+	--cui-content-650: var(--cui-theme-default-650);
+	--cui-content-625: var(--cui-theme-default-625);
+	--cui-content-600: var(--cui-theme-default-600);
+	--cui-content-575: var(--cui-theme-default-575);
+	--cui-content-550: var(--cui-theme-default-550);
+	--cui-content-525: var(--cui-theme-default-525);
+	--cui-content-500: var(--cui-theme-default-500);
+	--cui-content-475: var(--cui-theme-default-475);
+	--cui-content-450: var(--cui-theme-default-450);
+	--cui-content-425: var(--cui-theme-default-425);
+	--cui-content-400: var(--cui-theme-default-400);
+	--cui-content-375: var(--cui-theme-default-375);
+	--cui-content-350: var(--cui-theme-default-350);
+	--cui-content-325: var(--cui-theme-default-325);
+	--cui-content-300: var(--cui-theme-default-300);
+	--cui-content-275: var(--cui-theme-default-275);
+	--cui-content-250: var(--cui-theme-default-250);
+	--cui-content-225: var(--cui-theme-default-225);
+	--cui-content-200: var(--cui-theme-default-200);
+	--cui-content-175: var(--cui-theme-default-175);
+	--cui-content-150: var(--cui-theme-default-150);
+	--cui-content-125: var(--cui-theme-default-125);
+	--cui-content-100: var(--cui-theme-default-100);
+	--cui-content-75: var(--cui-theme-default-75);
+	--cui-content-50: var(--cui-theme-default-50);
+	--cui-content-25: var(--cui-theme-default-25);
+	--cui-content-0: var(--cui-theme-default-0);
+
+	/* Controls */
+	--cui-controls-1000: var(--cui-theme-primary-1000);
+	--cui-controls-975: var(--cui-theme-primary-975);
+	--cui-controls-950: var(--cui-theme-primary-950);
+	--cui-controls-925: var(--cui-theme-primary-925);
+	--cui-controls-900: var(--cui-theme-primary-900);
+	--cui-controls-875: var(--cui-theme-primary-875);
+	--cui-controls-850: var(--cui-theme-primary-850);
+	--cui-controls-825: var(--cui-theme-primary-825);
+	--cui-controls-800: var(--cui-theme-primary-800);
+	--cui-controls-775: var(--cui-theme-primary-775);
+	--cui-controls-750: var(--cui-theme-primary-750);
+	--cui-controls-725: var(--cui-theme-primary-725);
+	--cui-controls-700: var(--cui-theme-primary-700);
+	--cui-controls-675: var(--cui-theme-primary-675);
+	--cui-controls-650: var(--cui-theme-primary-650);
+	--cui-controls-625: var(--cui-theme-primary-625);
+	--cui-controls-600: var(--cui-theme-primary-600);
+	--cui-controls-575: var(--cui-theme-primary-575);
+	--cui-controls-550: var(--cui-theme-primary-550);
+	--cui-controls-525: var(--cui-theme-primary-525);
+	--cui-controls-500: var(--cui-theme-primary-500);
+	--cui-controls-475: var(--cui-theme-primary-475);
+	--cui-controls-450: var(--cui-theme-primary-450);
+	--cui-controls-425: var(--cui-theme-primary-425);
+	--cui-controls-400: var(--cui-theme-primary-400);
+	--cui-controls-375: var(--cui-theme-primary-375);
+	--cui-controls-350: var(--cui-theme-primary-350);
+	--cui-controls-325: var(--cui-theme-primary-325);
+	--cui-controls-300: var(--cui-theme-primary-300);
+	--cui-controls-275: var(--cui-theme-primary-275);
+	--cui-controls-250: var(--cui-theme-primary-250);
+	--cui-controls-225: var(--cui-theme-primary-225);
+	--cui-controls-200: var(--cui-theme-primary-200);
+	--cui-controls-175: var(--cui-theme-primary-175);
+	--cui-controls-150: var(--cui-theme-primary-150);
+	--cui-controls-125: var(--cui-theme-primary-125);
+	--cui-controls-100: var(--cui-theme-primary-100);
+	--cui-controls-75: var(--cui-theme-primary-75);
+	--cui-controls-50: var(--cui-theme-primary-50);
+	--cui-controls-25: var(--cui-theme-primary-25);
+	--cui-controls-0: var(--cui-theme-primary-0);
+}
+
+/*** Color themes ***/
+/** #15009C **/
+.theme-primary,
+.theme-primary\:hover:hover,
+.theme-primary\:active:active,
+.theme-primary\:focus:focus,
+.theme-primary-content,
+.theme-primary-content\:hover:hover,
+.theme-primary-content\:active:active,
+.theme-primary-content\:focus:focus {
+	--cui-content-1000: var(--cui-theme-primary-1000);
+	--cui-content-975: var(--cui-theme-primary-975);
+	--cui-content-950: var(--cui-theme-primary-950);
+	--cui-content-925: var(--cui-theme-primary-925);
+	--cui-content-900: var(--cui-theme-primary-900);
+	--cui-content-875: var(--cui-theme-primary-875);
+	--cui-content-850: var(--cui-theme-primary-850);
+	--cui-content-825: var(--cui-theme-primary-825);
+	--cui-content-800: var(--cui-theme-primary-800);
+	--cui-content-775: var(--cui-theme-primary-775);
+	--cui-content-750: var(--cui-theme-primary-750);
+	--cui-content-725: var(--cui-theme-primary-725);
+	--cui-content-700: var(--cui-theme-primary-700);
+	--cui-content-675: var(--cui-theme-primary-675);
+	--cui-content-650: var(--cui-theme-primary-650);
+	--cui-content-625: var(--cui-theme-primary-625);
+	--cui-content-600: var(--cui-theme-primary-600);
+	--cui-content-575: var(--cui-theme-primary-575);
+	--cui-content-550: var(--cui-theme-primary-550);
+	--cui-content-525: var(--cui-theme-primary-525);
+	--cui-content-500: var(--cui-theme-primary-500);
+	--cui-content-475: var(--cui-theme-primary-475);
+	--cui-content-450: var(--cui-theme-primary-450);
+	--cui-content-425: var(--cui-theme-primary-425);
+	--cui-content-400: var(--cui-theme-primary-400);
+	--cui-content-375: var(--cui-theme-primary-375);
+	--cui-content-350: var(--cui-theme-primary-350);
+	--cui-content-325: var(--cui-theme-primary-325);
+	--cui-content-300: var(--cui-theme-primary-300);
+	--cui-content-275: var(--cui-theme-primary-275);
+	--cui-content-250: var(--cui-theme-primary-250);
+	--cui-content-225: var(--cui-theme-primary-225);
+	--cui-content-200: var(--cui-theme-primary-200);
+	--cui-content-175: var(--cui-theme-primary-175);
+	--cui-content-150: var(--cui-theme-primary-150);
+	--cui-content-125: var(--cui-theme-primary-125);
+	--cui-content-100: var(--cui-theme-primary-100);
+	--cui-content-75: var(--cui-theme-primary-75);
+	--cui-content-50: var(--cui-theme-primary-50);
+	--cui-content-25: var(--cui-theme-primary-25);
+	--cui-content-0: var(--cui-theme-primary-0);
+}
+.theme-primary,
+.theme-primary\:hover:hover,
+.theme-primary\:active:active,
+.theme-primary\:focus:focus,
+.theme-primary-controls,
+.theme-primary-controls\:hover:hover,
+.theme-primary-controls\:active:active,
+.theme-primary-controls\:focus:focus {
+	--cui-controls-1000: var(--cui-theme-primary-1000);
+	--cui-controls-975: var(--cui-theme-primary-975);
+	--cui-controls-950: var(--cui-theme-primary-950);
+	--cui-controls-925: var(--cui-theme-primary-925);
+	--cui-controls-900: var(--cui-theme-primary-900);
+	--cui-controls-875: var(--cui-theme-primary-875);
+	--cui-controls-850: var(--cui-theme-primary-850);
+	--cui-controls-825: var(--cui-theme-primary-825);
+	--cui-controls-800: var(--cui-theme-primary-800);
+	--cui-controls-775: var(--cui-theme-primary-775);
+	--cui-controls-750: var(--cui-theme-primary-750);
+	--cui-controls-725: var(--cui-theme-primary-725);
+	--cui-controls-700: var(--cui-theme-primary-700);
+	--cui-controls-675: var(--cui-theme-primary-675);
+	--cui-controls-650: var(--cui-theme-primary-650);
+	--cui-controls-625: var(--cui-theme-primary-625);
+	--cui-controls-600: var(--cui-theme-primary-600);
+	--cui-controls-575: var(--cui-theme-primary-575);
+	--cui-controls-550: var(--cui-theme-primary-550);
+	--cui-controls-525: var(--cui-theme-primary-525);
+	--cui-controls-500: var(--cui-theme-primary-500);
+	--cui-controls-475: var(--cui-theme-primary-475);
+	--cui-controls-450: var(--cui-theme-primary-450);
+	--cui-controls-425: var(--cui-theme-primary-425);
+	--cui-controls-400: var(--cui-theme-primary-400);
+	--cui-controls-375: var(--cui-theme-primary-375);
+	--cui-controls-350: var(--cui-theme-primary-350);
+	--cui-controls-325: var(--cui-theme-primary-325);
+	--cui-controls-300: var(--cui-theme-primary-300);
+	--cui-controls-275: var(--cui-theme-primary-275);
+	--cui-controls-250: var(--cui-theme-primary-250);
+	--cui-controls-225: var(--cui-theme-primary-225);
+	--cui-controls-200: var(--cui-theme-primary-200);
+	--cui-controls-175: var(--cui-theme-primary-175);
+	--cui-controls-150: var(--cui-theme-primary-150);
+	--cui-controls-125: var(--cui-theme-primary-125);
+	--cui-controls-100: var(--cui-theme-primary-100);
+	--cui-controls-75: var(--cui-theme-primary-75);
+	--cui-controls-50: var(--cui-theme-primary-50);
+	--cui-controls-25: var(--cui-theme-primary-25);
+	--cui-controls-0: var(--cui-theme-primary-0);
+}
+
+/** #3DA9EB **/
+.theme-secondary,
+.theme-secondary\:hover:hover,
+.theme-secondary\:active:active,
+.theme-secondary\:focus:focus,
+.theme-secondary-content,
+.theme-secondary-content\:hover:hover,
+.theme-secondary-content\:active:active,
+.theme-secondary-content\:focus:focus {
+	--cui-content-1000: var(--cui-theme-secondary-1000);
+	--cui-content-975: var(--cui-theme-secondary-975);
+	--cui-content-950: var(--cui-theme-secondary-950);
+	--cui-content-925: var(--cui-theme-secondary-925);
+	--cui-content-900: var(--cui-theme-secondary-900);
+	--cui-content-875: var(--cui-theme-secondary-875);
+	--cui-content-850: var(--cui-theme-secondary-850);
+	--cui-content-825: var(--cui-theme-secondary-825);
+	--cui-content-800: var(--cui-theme-secondary-800);
+	--cui-content-775: var(--cui-theme-secondary-775);
+	--cui-content-750: var(--cui-theme-secondary-750);
+	--cui-content-725: var(--cui-theme-secondary-725);
+	--cui-content-700: var(--cui-theme-secondary-700);
+	--cui-content-675: var(--cui-theme-secondary-675);
+	--cui-content-650: var(--cui-theme-secondary-650);
+	--cui-content-625: var(--cui-theme-secondary-625);
+	--cui-content-600: var(--cui-theme-secondary-600);
+	--cui-content-575: var(--cui-theme-secondary-575);
+	--cui-content-550: var(--cui-theme-secondary-550);
+	--cui-content-525: var(--cui-theme-secondary-525);
+	--cui-content-500: var(--cui-theme-secondary-500);
+	--cui-content-475: var(--cui-theme-secondary-475);
+	--cui-content-450: var(--cui-theme-secondary-450);
+	--cui-content-425: var(--cui-theme-secondary-425);
+	--cui-content-400: var(--cui-theme-secondary-400);
+	--cui-content-375: var(--cui-theme-secondary-375);
+	--cui-content-350: var(--cui-theme-secondary-350);
+	--cui-content-325: var(--cui-theme-secondary-325);
+	--cui-content-300: var(--cui-theme-secondary-300);
+	--cui-content-275: var(--cui-theme-secondary-275);
+	--cui-content-250: var(--cui-theme-secondary-250);
+	--cui-content-225: var(--cui-theme-secondary-225);
+	--cui-content-200: var(--cui-theme-secondary-200);
+	--cui-content-175: var(--cui-theme-secondary-175);
+	--cui-content-150: var(--cui-theme-secondary-150);
+	--cui-content-125: var(--cui-theme-secondary-125);
+	--cui-content-100: var(--cui-theme-secondary-100);
+	--cui-content-75: var(--cui-theme-secondary-75);
+	--cui-content-50: var(--cui-theme-secondary-50);
+	--cui-content-25: var(--cui-theme-secondary-25);
+	--cui-content-0: var(--cui-theme-secondary-0);
+}
+.theme-secondary,
+.theme-secondary\:hover:hover,
+.theme-secondary\:active:active,
+.theme-secondary\:focus:focus,
+.theme-secondary-controls,
+.theme-secondary-controls\:hover:hover,
+.theme-secondary-controls\:active:active,
+.theme-secondary-controls\:focus:focus {
+	--cui-controls-1000: var(--cui-theme-secondary-1000);
+	--cui-controls-975: var(--cui-theme-secondary-975);
+	--cui-controls-950: var(--cui-theme-secondary-950);
+	--cui-controls-925: var(--cui-theme-secondary-925);
+	--cui-controls-900: var(--cui-theme-secondary-900);
+	--cui-controls-875: var(--cui-theme-secondary-875);
+	--cui-controls-850: var(--cui-theme-secondary-850);
+	--cui-controls-825: var(--cui-theme-secondary-825);
+	--cui-controls-800: var(--cui-theme-secondary-800);
+	--cui-controls-775: var(--cui-theme-secondary-775);
+	--cui-controls-750: var(--cui-theme-secondary-750);
+	--cui-controls-725: var(--cui-theme-secondary-725);
+	--cui-controls-700: var(--cui-theme-secondary-700);
+	--cui-controls-675: var(--cui-theme-secondary-675);
+	--cui-controls-650: var(--cui-theme-secondary-650);
+	--cui-controls-625: var(--cui-theme-secondary-625);
+	--cui-controls-600: var(--cui-theme-secondary-600);
+	--cui-controls-575: var(--cui-theme-secondary-575);
+	--cui-controls-550: var(--cui-theme-secondary-550);
+	--cui-controls-525: var(--cui-theme-secondary-525);
+	--cui-controls-500: var(--cui-theme-secondary-500);
+	--cui-controls-475: var(--cui-theme-secondary-475);
+	--cui-controls-450: var(--cui-theme-secondary-450);
+	--cui-controls-425: var(--cui-theme-secondary-425);
+	--cui-controls-400: var(--cui-theme-secondary-400);
+	--cui-controls-375: var(--cui-theme-secondary-375);
+	--cui-controls-350: var(--cui-theme-secondary-350);
+	--cui-controls-325: var(--cui-theme-secondary-325);
+	--cui-controls-300: var(--cui-theme-secondary-300);
+	--cui-controls-275: var(--cui-theme-secondary-275);
+	--cui-controls-250: var(--cui-theme-secondary-250);
+	--cui-controls-225: var(--cui-theme-secondary-225);
+	--cui-controls-200: var(--cui-theme-secondary-200);
+	--cui-controls-175: var(--cui-theme-secondary-175);
+	--cui-controls-150: var(--cui-theme-secondary-150);
+	--cui-controls-125: var(--cui-theme-secondary-125);
+	--cui-controls-100: var(--cui-theme-secondary-100);
+	--cui-controls-75: var(--cui-theme-secondary-75);
+	--cui-controls-50: var(--cui-theme-secondary-50);
+	--cui-controls-25: var(--cui-theme-secondary-25);
+	--cui-controls-0: var(--cui-theme-secondary-0);
+}
+
+/** #AE65FF **/
+.theme-tertiary,
+.theme-tertiary\:hover:hover,
+.theme-tertiary\:active:active,
+.theme-tertiary\:focus:focus,
+.theme-tertiary-content,
+.theme-tertiary-content\:hover:hover,
+.theme-tertiary-content\:active:active,
+.theme-tertiary-content\:focus:focus {
+	--cui-content-1000: var(--cui-theme-tertiary-1000);
+	--cui-content-975: var(--cui-theme-tertiary-975);
+	--cui-content-950: var(--cui-theme-tertiary-950);
+	--cui-content-925: var(--cui-theme-tertiary-925);
+	--cui-content-900: var(--cui-theme-tertiary-900);
+	--cui-content-875: var(--cui-theme-tertiary-875);
+	--cui-content-850: var(--cui-theme-tertiary-850);
+	--cui-content-825: var(--cui-theme-tertiary-825);
+	--cui-content-800: var(--cui-theme-tertiary-800);
+	--cui-content-775: var(--cui-theme-tertiary-775);
+	--cui-content-750: var(--cui-theme-tertiary-750);
+	--cui-content-725: var(--cui-theme-tertiary-725);
+	--cui-content-700: var(--cui-theme-tertiary-700);
+	--cui-content-675: var(--cui-theme-tertiary-675);
+	--cui-content-650: var(--cui-theme-tertiary-650);
+	--cui-content-625: var(--cui-theme-tertiary-625);
+	--cui-content-600: var(--cui-theme-tertiary-600);
+	--cui-content-575: var(--cui-theme-tertiary-575);
+	--cui-content-550: var(--cui-theme-tertiary-550);
+	--cui-content-525: var(--cui-theme-tertiary-525);
+	--cui-content-500: var(--cui-theme-tertiary-500);
+	--cui-content-475: var(--cui-theme-tertiary-475);
+	--cui-content-450: var(--cui-theme-tertiary-450);
+	--cui-content-425: var(--cui-theme-tertiary-425);
+	--cui-content-400: var(--cui-theme-tertiary-400);
+	--cui-content-375: var(--cui-theme-tertiary-375);
+	--cui-content-350: var(--cui-theme-tertiary-350);
+	--cui-content-325: var(--cui-theme-tertiary-325);
+	--cui-content-300: var(--cui-theme-tertiary-300);
+	--cui-content-275: var(--cui-theme-tertiary-275);
+	--cui-content-250: var(--cui-theme-tertiary-250);
+	--cui-content-225: var(--cui-theme-tertiary-225);
+	--cui-content-200: var(--cui-theme-tertiary-200);
+	--cui-content-175: var(--cui-theme-tertiary-175);
+	--cui-content-150: var(--cui-theme-tertiary-150);
+	--cui-content-125: var(--cui-theme-tertiary-125);
+	--cui-content-100: var(--cui-theme-tertiary-100);
+	--cui-content-75: var(--cui-theme-tertiary-75);
+	--cui-content-50: var(--cui-theme-tertiary-50);
+	--cui-content-25: var(--cui-theme-tertiary-25);
+	--cui-content-0: var(--cui-theme-tertiary-0);
+}
+.theme-tertiary,
+.theme-tertiary\:hover:hover,
+.theme-tertiary\:active:active,
+.theme-tertiary\:focus:focus,
+.theme-tertiary-controls,
+.theme-tertiary-controls\:hover:hover,
+.theme-tertiary-controls\:active:active,
+.theme-tertiary-controls\:focus:focus {
+	--cui-controls-1000: var(--cui-theme-tertiary-1000);
+	--cui-controls-975: var(--cui-theme-tertiary-975);
+	--cui-controls-950: var(--cui-theme-tertiary-950);
+	--cui-controls-925: var(--cui-theme-tertiary-925);
+	--cui-controls-900: var(--cui-theme-tertiary-900);
+	--cui-controls-875: var(--cui-theme-tertiary-875);
+	--cui-controls-850: var(--cui-theme-tertiary-850);
+	--cui-controls-825: var(--cui-theme-tertiary-825);
+	--cui-controls-800: var(--cui-theme-tertiary-800);
+	--cui-controls-775: var(--cui-theme-tertiary-775);
+	--cui-controls-750: var(--cui-theme-tertiary-750);
+	--cui-controls-725: var(--cui-theme-tertiary-725);
+	--cui-controls-700: var(--cui-theme-tertiary-700);
+	--cui-controls-675: var(--cui-theme-tertiary-675);
+	--cui-controls-650: var(--cui-theme-tertiary-650);
+	--cui-controls-625: var(--cui-theme-tertiary-625);
+	--cui-controls-600: var(--cui-theme-tertiary-600);
+	--cui-controls-575: var(--cui-theme-tertiary-575);
+	--cui-controls-550: var(--cui-theme-tertiary-550);
+	--cui-controls-525: var(--cui-theme-tertiary-525);
+	--cui-controls-500: var(--cui-theme-tertiary-500);
+	--cui-controls-475: var(--cui-theme-tertiary-475);
+	--cui-controls-450: var(--cui-theme-tertiary-450);
+	--cui-controls-425: var(--cui-theme-tertiary-425);
+	--cui-controls-400: var(--cui-theme-tertiary-400);
+	--cui-controls-375: var(--cui-theme-tertiary-375);
+	--cui-controls-350: var(--cui-theme-tertiary-350);
+	--cui-controls-325: var(--cui-theme-tertiary-325);
+	--cui-controls-300: var(--cui-theme-tertiary-300);
+	--cui-controls-275: var(--cui-theme-tertiary-275);
+	--cui-controls-250: var(--cui-theme-tertiary-250);
+	--cui-controls-225: var(--cui-theme-tertiary-225);
+	--cui-controls-200: var(--cui-theme-tertiary-200);
+	--cui-controls-175: var(--cui-theme-tertiary-175);
+	--cui-controls-150: var(--cui-theme-tertiary-150);
+	--cui-controls-125: var(--cui-theme-tertiary-125);
+	--cui-controls-100: var(--cui-theme-tertiary-100);
+	--cui-controls-75: var(--cui-theme-tertiary-75);
+	--cui-controls-50: var(--cui-theme-tertiary-50);
+	--cui-controls-25: var(--cui-theme-tertiary-25);
+	--cui-controls-0: var(--cui-theme-tertiary-0);
+}
+
+/** #4390FF **/
+.theme-positive,
+.theme-positive\:hover:hover,
+.theme-positive\:active:active,
+.theme-positive\:focus:focus,
+.theme-positive-content,
+.theme-positive-content\:hover:hover,
+.theme-positive-content\:active:active,
+.theme-positive-content\:focus:focus {
+	--cui-content-1000: var(--cui-theme-positive-1000);
+	--cui-content-975: var(--cui-theme-positive-975);
+	--cui-content-950: var(--cui-theme-positive-950);
+	--cui-content-925: var(--cui-theme-positive-925);
+	--cui-content-900: var(--cui-theme-positive-900);
+	--cui-content-875: var(--cui-theme-positive-875);
+	--cui-content-850: var(--cui-theme-positive-850);
+	--cui-content-825: var(--cui-theme-positive-825);
+	--cui-content-800: var(--cui-theme-positive-800);
+	--cui-content-775: var(--cui-theme-positive-775);
+	--cui-content-750: var(--cui-theme-positive-750);
+	--cui-content-725: var(--cui-theme-positive-725);
+	--cui-content-700: var(--cui-theme-positive-700);
+	--cui-content-675: var(--cui-theme-positive-675);
+	--cui-content-650: var(--cui-theme-positive-650);
+	--cui-content-625: var(--cui-theme-positive-625);
+	--cui-content-600: var(--cui-theme-positive-600);
+	--cui-content-575: var(--cui-theme-positive-575);
+	--cui-content-550: var(--cui-theme-positive-550);
+	--cui-content-525: var(--cui-theme-positive-525);
+	--cui-content-500: var(--cui-theme-positive-500);
+	--cui-content-475: var(--cui-theme-positive-475);
+	--cui-content-450: var(--cui-theme-positive-450);
+	--cui-content-425: var(--cui-theme-positive-425);
+	--cui-content-400: var(--cui-theme-positive-400);
+	--cui-content-375: var(--cui-theme-positive-375);
+	--cui-content-350: var(--cui-theme-positive-350);
+	--cui-content-325: var(--cui-theme-positive-325);
+	--cui-content-300: var(--cui-theme-positive-300);
+	--cui-content-275: var(--cui-theme-positive-275);
+	--cui-content-250: var(--cui-theme-positive-250);
+	--cui-content-225: var(--cui-theme-positive-225);
+	--cui-content-200: var(--cui-theme-positive-200);
+	--cui-content-175: var(--cui-theme-positive-175);
+	--cui-content-150: var(--cui-theme-positive-150);
+	--cui-content-125: var(--cui-theme-positive-125);
+	--cui-content-100: var(--cui-theme-positive-100);
+	--cui-content-75: var(--cui-theme-positive-75);
+	--cui-content-50: var(--cui-theme-positive-50);
+	--cui-content-25: var(--cui-theme-positive-25);
+	--cui-content-0: var(--cui-theme-positive-0);
+}
+.theme-positive,
+.theme-positive\:hover:hover,
+.theme-positive\:active:active,
+.theme-positive\:focus:focus,
+.theme-positive-controls,
+.theme-positive-controls\:hover:hover,
+.theme-positive-controls\:active:active,
+.theme-positive-controls\:focus:focus {
+	--cui-controls-1000: var(--cui-theme-positive-1000);
+	--cui-controls-975: var(--cui-theme-positive-975);
+	--cui-controls-950: var(--cui-theme-positive-950);
+	--cui-controls-925: var(--cui-theme-positive-925);
+	--cui-controls-900: var(--cui-theme-positive-900);
+	--cui-controls-875: var(--cui-theme-positive-875);
+	--cui-controls-850: var(--cui-theme-positive-850);
+	--cui-controls-825: var(--cui-theme-positive-825);
+	--cui-controls-800: var(--cui-theme-positive-800);
+	--cui-controls-775: var(--cui-theme-positive-775);
+	--cui-controls-750: var(--cui-theme-positive-750);
+	--cui-controls-725: var(--cui-theme-positive-725);
+	--cui-controls-700: var(--cui-theme-positive-700);
+	--cui-controls-675: var(--cui-theme-positive-675);
+	--cui-controls-650: var(--cui-theme-positive-650);
+	--cui-controls-625: var(--cui-theme-positive-625);
+	--cui-controls-600: var(--cui-theme-positive-600);
+	--cui-controls-575: var(--cui-theme-positive-575);
+	--cui-controls-550: var(--cui-theme-positive-550);
+	--cui-controls-525: var(--cui-theme-positive-525);
+	--cui-controls-500: var(--cui-theme-positive-500);
+	--cui-controls-475: var(--cui-theme-positive-475);
+	--cui-controls-450: var(--cui-theme-positive-450);
+	--cui-controls-425: var(--cui-theme-positive-425);
+	--cui-controls-400: var(--cui-theme-positive-400);
+	--cui-controls-375: var(--cui-theme-positive-375);
+	--cui-controls-350: var(--cui-theme-positive-350);
+	--cui-controls-325: var(--cui-theme-positive-325);
+	--cui-controls-300: var(--cui-theme-positive-300);
+	--cui-controls-275: var(--cui-theme-positive-275);
+	--cui-controls-250: var(--cui-theme-positive-250);
+	--cui-controls-225: var(--cui-theme-positive-225);
+	--cui-controls-200: var(--cui-theme-positive-200);
+	--cui-controls-175: var(--cui-theme-positive-175);
+	--cui-controls-150: var(--cui-theme-positive-150);
+	--cui-controls-125: var(--cui-theme-positive-125);
+	--cui-controls-100: var(--cui-theme-positive-100);
+	--cui-controls-75: var(--cui-theme-positive-75);
+	--cui-controls-50: var(--cui-theme-positive-50);
+	--cui-controls-25: var(--cui-theme-positive-25);
+	--cui-controls-0: var(--cui-theme-positive-0);
+}
+
+/** #6EBB00 **/
+.theme-success,
+.theme-success\:hover:hover,
+.theme-success\:active:active,
+.theme-success\:focus:focus,
+.theme-success-content,
+.theme-success-content\:hover:hover,
+.theme-success-content\:active:active,
+.theme-success-content\:focus:focus {
+	--cui-content-1000: var(--cui-theme-success-1000);
+	--cui-content-975: var(--cui-theme-success-975);
+	--cui-content-950: var(--cui-theme-success-950);
+	--cui-content-925: var(--cui-theme-success-925);
+	--cui-content-900: var(--cui-theme-success-900);
+	--cui-content-875: var(--cui-theme-success-875);
+	--cui-content-850: var(--cui-theme-success-850);
+	--cui-content-825: var(--cui-theme-success-825);
+	--cui-content-800: var(--cui-theme-success-800);
+	--cui-content-775: var(--cui-theme-success-775);
+	--cui-content-750: var(--cui-theme-success-750);
+	--cui-content-725: var(--cui-theme-success-725);
+	--cui-content-700: var(--cui-theme-success-700);
+	--cui-content-675: var(--cui-theme-success-675);
+	--cui-content-650: var(--cui-theme-success-650);
+	--cui-content-625: var(--cui-theme-success-625);
+	--cui-content-600: var(--cui-theme-success-600);
+	--cui-content-575: var(--cui-theme-success-575);
+	--cui-content-550: var(--cui-theme-success-550);
+	--cui-content-525: var(--cui-theme-success-525);
+	--cui-content-500: var(--cui-theme-success-500);
+	--cui-content-475: var(--cui-theme-success-475);
+	--cui-content-450: var(--cui-theme-success-450);
+	--cui-content-425: var(--cui-theme-success-425);
+	--cui-content-400: var(--cui-theme-success-400);
+	--cui-content-375: var(--cui-theme-success-375);
+	--cui-content-350: var(--cui-theme-success-350);
+	--cui-content-325: var(--cui-theme-success-325);
+	--cui-content-300: var(--cui-theme-success-300);
+	--cui-content-275: var(--cui-theme-success-275);
+	--cui-content-250: var(--cui-theme-success-250);
+	--cui-content-225: var(--cui-theme-success-225);
+	--cui-content-200: var(--cui-theme-success-200);
+	--cui-content-175: var(--cui-theme-success-175);
+	--cui-content-150: var(--cui-theme-success-150);
+	--cui-content-125: var(--cui-theme-success-125);
+	--cui-content-100: var(--cui-theme-success-100);
+	--cui-content-75: var(--cui-theme-success-75);
+	--cui-content-50: var(--cui-theme-success-50);
+	--cui-content-25: var(--cui-theme-success-25);
+	--cui-content-0: var(--cui-theme-success-0);
+}
+.theme-success,
+.theme-success\:hover:hover,
+.theme-success\:active:active,
+.theme-success\:focus:focus,
+.theme-success-controls,
+.theme-success-controls\:hover:hover,
+.theme-success-controls\:active:active,
+.theme-success-controls\:focus:focus {
+	--cui-controls-1000: var(--cui-theme-success-1000);
+	--cui-controls-975: var(--cui-theme-success-975);
+	--cui-controls-950: var(--cui-theme-success-950);
+	--cui-controls-925: var(--cui-theme-success-925);
+	--cui-controls-900: var(--cui-theme-success-900);
+	--cui-controls-875: var(--cui-theme-success-875);
+	--cui-controls-850: var(--cui-theme-success-850);
+	--cui-controls-825: var(--cui-theme-success-825);
+	--cui-controls-800: var(--cui-theme-success-800);
+	--cui-controls-775: var(--cui-theme-success-775);
+	--cui-controls-750: var(--cui-theme-success-750);
+	--cui-controls-725: var(--cui-theme-success-725);
+	--cui-controls-700: var(--cui-theme-success-700);
+	--cui-controls-675: var(--cui-theme-success-675);
+	--cui-controls-650: var(--cui-theme-success-650);
+	--cui-controls-625: var(--cui-theme-success-625);
+	--cui-controls-600: var(--cui-theme-success-600);
+	--cui-controls-575: var(--cui-theme-success-575);
+	--cui-controls-550: var(--cui-theme-success-550);
+	--cui-controls-525: var(--cui-theme-success-525);
+	--cui-controls-500: var(--cui-theme-success-500);
+	--cui-controls-475: var(--cui-theme-success-475);
+	--cui-controls-450: var(--cui-theme-success-450);
+	--cui-controls-425: var(--cui-theme-success-425);
+	--cui-controls-400: var(--cui-theme-success-400);
+	--cui-controls-375: var(--cui-theme-success-375);
+	--cui-controls-350: var(--cui-theme-success-350);
+	--cui-controls-325: var(--cui-theme-success-325);
+	--cui-controls-300: var(--cui-theme-success-300);
+	--cui-controls-275: var(--cui-theme-success-275);
+	--cui-controls-250: var(--cui-theme-success-250);
+	--cui-controls-225: var(--cui-theme-success-225);
+	--cui-controls-200: var(--cui-theme-success-200);
+	--cui-controls-175: var(--cui-theme-success-175);
+	--cui-controls-150: var(--cui-theme-success-150);
+	--cui-controls-125: var(--cui-theme-success-125);
+	--cui-controls-100: var(--cui-theme-success-100);
+	--cui-controls-75: var(--cui-theme-success-75);
+	--cui-controls-50: var(--cui-theme-success-50);
+	--cui-controls-25: var(--cui-theme-success-25);
+	--cui-controls-0: var(--cui-theme-success-0);
+}
+
+/** #EC9117 **/
+.theme-warn,
+.theme-warn\:hover:hover,
+.theme-warn\:active:active,
+.theme-warn\:focus:focus,
+.theme-warn-content,
+.theme-warn-content\:hover:hover,
+.theme-warn-content\:active:active,
+.theme-warn-content\:focus:focus {
+	--cui-content-1000: var(--cui-theme-warn-1000);
+	--cui-content-975: var(--cui-theme-warn-975);
+	--cui-content-950: var(--cui-theme-warn-950);
+	--cui-content-925: var(--cui-theme-warn-925);
+	--cui-content-900: var(--cui-theme-warn-900);
+	--cui-content-875: var(--cui-theme-warn-875);
+	--cui-content-850: var(--cui-theme-warn-850);
+	--cui-content-825: var(--cui-theme-warn-825);
+	--cui-content-800: var(--cui-theme-warn-800);
+	--cui-content-775: var(--cui-theme-warn-775);
+	--cui-content-750: var(--cui-theme-warn-750);
+	--cui-content-725: var(--cui-theme-warn-725);
+	--cui-content-700: var(--cui-theme-warn-700);
+	--cui-content-675: var(--cui-theme-warn-675);
+	--cui-content-650: var(--cui-theme-warn-650);
+	--cui-content-625: var(--cui-theme-warn-625);
+	--cui-content-600: var(--cui-theme-warn-600);
+	--cui-content-575: var(--cui-theme-warn-575);
+	--cui-content-550: var(--cui-theme-warn-550);
+	--cui-content-525: var(--cui-theme-warn-525);
+	--cui-content-500: var(--cui-theme-warn-500);
+	--cui-content-475: var(--cui-theme-warn-475);
+	--cui-content-450: var(--cui-theme-warn-450);
+	--cui-content-425: var(--cui-theme-warn-425);
+	--cui-content-400: var(--cui-theme-warn-400);
+	--cui-content-375: var(--cui-theme-warn-375);
+	--cui-content-350: var(--cui-theme-warn-350);
+	--cui-content-325: var(--cui-theme-warn-325);
+	--cui-content-300: var(--cui-theme-warn-300);
+	--cui-content-275: var(--cui-theme-warn-275);
+	--cui-content-250: var(--cui-theme-warn-250);
+	--cui-content-225: var(--cui-theme-warn-225);
+	--cui-content-200: var(--cui-theme-warn-200);
+	--cui-content-175: var(--cui-theme-warn-175);
+	--cui-content-150: var(--cui-theme-warn-150);
+	--cui-content-125: var(--cui-theme-warn-125);
+	--cui-content-100: var(--cui-theme-warn-100);
+	--cui-content-75: var(--cui-theme-warn-75);
+	--cui-content-50: var(--cui-theme-warn-50);
+	--cui-content-25: var(--cui-theme-warn-25);
+	--cui-content-0: var(--cui-theme-warn-0);
+}
+.theme-warn,
+.theme-warn\:hover:hover,
+.theme-warn\:active:active,
+.theme-warn\:focus:focus,
+.theme-warn-controls,
+.theme-warn-controls\:hover:hover,
+.theme-warn-controls\:active:active,
+.theme-warn-controls\:focus:focus {
+	--cui-controls-1000: var(--cui-theme-warn-1000);
+	--cui-controls-975: var(--cui-theme-warn-975);
+	--cui-controls-950: var(--cui-theme-warn-950);
+	--cui-controls-925: var(--cui-theme-warn-925);
+	--cui-controls-900: var(--cui-theme-warn-900);
+	--cui-controls-875: var(--cui-theme-warn-875);
+	--cui-controls-850: var(--cui-theme-warn-850);
+	--cui-controls-825: var(--cui-theme-warn-825);
+	--cui-controls-800: var(--cui-theme-warn-800);
+	--cui-controls-775: var(--cui-theme-warn-775);
+	--cui-controls-750: var(--cui-theme-warn-750);
+	--cui-controls-725: var(--cui-theme-warn-725);
+	--cui-controls-700: var(--cui-theme-warn-700);
+	--cui-controls-675: var(--cui-theme-warn-675);
+	--cui-controls-650: var(--cui-theme-warn-650);
+	--cui-controls-625: var(--cui-theme-warn-625);
+	--cui-controls-600: var(--cui-theme-warn-600);
+	--cui-controls-575: var(--cui-theme-warn-575);
+	--cui-controls-550: var(--cui-theme-warn-550);
+	--cui-controls-525: var(--cui-theme-warn-525);
+	--cui-controls-500: var(--cui-theme-warn-500);
+	--cui-controls-475: var(--cui-theme-warn-475);
+	--cui-controls-450: var(--cui-theme-warn-450);
+	--cui-controls-425: var(--cui-theme-warn-425);
+	--cui-controls-400: var(--cui-theme-warn-400);
+	--cui-controls-375: var(--cui-theme-warn-375);
+	--cui-controls-350: var(--cui-theme-warn-350);
+	--cui-controls-325: var(--cui-theme-warn-325);
+	--cui-controls-300: var(--cui-theme-warn-300);
+	--cui-controls-275: var(--cui-theme-warn-275);
+	--cui-controls-250: var(--cui-theme-warn-250);
+	--cui-controls-225: var(--cui-theme-warn-225);
+	--cui-controls-200: var(--cui-theme-warn-200);
+	--cui-controls-175: var(--cui-theme-warn-175);
+	--cui-controls-150: var(--cui-theme-warn-150);
+	--cui-controls-125: var(--cui-theme-warn-125);
+	--cui-controls-100: var(--cui-theme-warn-100);
+	--cui-controls-75: var(--cui-theme-warn-75);
+	--cui-controls-50: var(--cui-theme-warn-50);
+	--cui-controls-25: var(--cui-theme-warn-25);
+	--cui-controls-0: var(--cui-theme-warn-0);
+}
+
+/** #FF4827 **/
+.theme-danger,
+.theme-danger\:hover:hover,
+.theme-danger\:active:active,
+.theme-danger\:focus:focus,
+.theme-danger-content,
+.theme-danger-content\:hover:hover,
+.theme-danger-content\:active:active,
+.theme-danger-content\:focus:focus {
+	--cui-content-1000: var(--cui-theme-danger-1000);
+	--cui-content-975: var(--cui-theme-danger-975);
+	--cui-content-950: var(--cui-theme-danger-950);
+	--cui-content-925: var(--cui-theme-danger-925);
+	--cui-content-900: var(--cui-theme-danger-900);
+	--cui-content-875: var(--cui-theme-danger-875);
+	--cui-content-850: var(--cui-theme-danger-850);
+	--cui-content-825: var(--cui-theme-danger-825);
+	--cui-content-800: var(--cui-theme-danger-800);
+	--cui-content-775: var(--cui-theme-danger-775);
+	--cui-content-750: var(--cui-theme-danger-750);
+	--cui-content-725: var(--cui-theme-danger-725);
+	--cui-content-700: var(--cui-theme-danger-700);
+	--cui-content-675: var(--cui-theme-danger-675);
+	--cui-content-650: var(--cui-theme-danger-650);
+	--cui-content-625: var(--cui-theme-danger-625);
+	--cui-content-600: var(--cui-theme-danger-600);
+	--cui-content-575: var(--cui-theme-danger-575);
+	--cui-content-550: var(--cui-theme-danger-550);
+	--cui-content-525: var(--cui-theme-danger-525);
+	--cui-content-500: var(--cui-theme-danger-500);
+	--cui-content-475: var(--cui-theme-danger-475);
+	--cui-content-450: var(--cui-theme-danger-450);
+	--cui-content-425: var(--cui-theme-danger-425);
+	--cui-content-400: var(--cui-theme-danger-400);
+	--cui-content-375: var(--cui-theme-danger-375);
+	--cui-content-350: var(--cui-theme-danger-350);
+	--cui-content-325: var(--cui-theme-danger-325);
+	--cui-content-300: var(--cui-theme-danger-300);
+	--cui-content-275: var(--cui-theme-danger-275);
+	--cui-content-250: var(--cui-theme-danger-250);
+	--cui-content-225: var(--cui-theme-danger-225);
+	--cui-content-200: var(--cui-theme-danger-200);
+	--cui-content-175: var(--cui-theme-danger-175);
+	--cui-content-150: var(--cui-theme-danger-150);
+	--cui-content-125: var(--cui-theme-danger-125);
+	--cui-content-100: var(--cui-theme-danger-100);
+	--cui-content-75: var(--cui-theme-danger-75);
+	--cui-content-50: var(--cui-theme-danger-50);
+	--cui-content-25: var(--cui-theme-danger-25);
+	--cui-content-0: var(--cui-theme-danger-0);
+}
+.theme-danger,
+.theme-danger\:hover:hover,
+.theme-danger\:active:active,
+.theme-danger\:focus:focus,
+.theme-danger-controls,
+.theme-danger-controls\:hover:hover,
+.theme-danger-controls\:active:active,
+.theme-danger-controls\:focus:focus {
+	--cui-controls-1000: var(--cui-theme-danger-1000);
+	--cui-controls-975: var(--cui-theme-danger-975);
+	--cui-controls-950: var(--cui-theme-danger-950);
+	--cui-controls-925: var(--cui-theme-danger-925);
+	--cui-controls-900: var(--cui-theme-danger-900);
+	--cui-controls-875: var(--cui-theme-danger-875);
+	--cui-controls-850: var(--cui-theme-danger-850);
+	--cui-controls-825: var(--cui-theme-danger-825);
+	--cui-controls-800: var(--cui-theme-danger-800);
+	--cui-controls-775: var(--cui-theme-danger-775);
+	--cui-controls-750: var(--cui-theme-danger-750);
+	--cui-controls-725: var(--cui-theme-danger-725);
+	--cui-controls-700: var(--cui-theme-danger-700);
+	--cui-controls-675: var(--cui-theme-danger-675);
+	--cui-controls-650: var(--cui-theme-danger-650);
+	--cui-controls-625: var(--cui-theme-danger-625);
+	--cui-controls-600: var(--cui-theme-danger-600);
+	--cui-controls-575: var(--cui-theme-danger-575);
+	--cui-controls-550: var(--cui-theme-danger-550);
+	--cui-controls-525: var(--cui-theme-danger-525);
+	--cui-controls-500: var(--cui-theme-danger-500);
+	--cui-controls-475: var(--cui-theme-danger-475);
+	--cui-controls-450: var(--cui-theme-danger-450);
+	--cui-controls-425: var(--cui-theme-danger-425);
+	--cui-controls-400: var(--cui-theme-danger-400);
+	--cui-controls-375: var(--cui-theme-danger-375);
+	--cui-controls-350: var(--cui-theme-danger-350);
+	--cui-controls-325: var(--cui-theme-danger-325);
+	--cui-controls-300: var(--cui-theme-danger-300);
+	--cui-controls-275: var(--cui-theme-danger-275);
+	--cui-controls-250: var(--cui-theme-danger-250);
+	--cui-controls-225: var(--cui-theme-danger-225);
+	--cui-controls-200: var(--cui-theme-danger-200);
+	--cui-controls-175: var(--cui-theme-danger-175);
+	--cui-controls-150: var(--cui-theme-danger-150);
+	--cui-controls-125: var(--cui-theme-danger-125);
+	--cui-controls-100: var(--cui-theme-danger-100);
+	--cui-controls-75: var(--cui-theme-danger-75);
+	--cui-controls-50: var(--cui-theme-danger-50);
+	--cui-controls-25: var(--cui-theme-danger-25);
+	--cui-controls-0: var(--cui-theme-danger-0);
+}
+
+/** #999999 **/
+.theme-default,
+.theme-default\:hover:hover,
+.theme-default\:active:active,
+.theme-default\:focus:focus,
+.theme-default-content,
+.theme-default-content\:hover:hover,
+.theme-default-content\:active:active,
+.theme-default-content\:focus:focus {
+	--cui-content-1000: var(--cui-theme-default-1000);
+	--cui-content-975: var(--cui-theme-default-975);
+	--cui-content-950: var(--cui-theme-default-950);
+	--cui-content-925: var(--cui-theme-default-925);
+	--cui-content-900: var(--cui-theme-default-900);
+	--cui-content-875: var(--cui-theme-default-875);
+	--cui-content-850: var(--cui-theme-default-850);
+	--cui-content-825: var(--cui-theme-default-825);
+	--cui-content-800: var(--cui-theme-default-800);
+	--cui-content-775: var(--cui-theme-default-775);
+	--cui-content-750: var(--cui-theme-default-750);
+	--cui-content-725: var(--cui-theme-default-725);
+	--cui-content-700: var(--cui-theme-default-700);
+	--cui-content-675: var(--cui-theme-default-675);
+	--cui-content-650: var(--cui-theme-default-650);
+	--cui-content-625: var(--cui-theme-default-625);
+	--cui-content-600: var(--cui-theme-default-600);
+	--cui-content-575: var(--cui-theme-default-575);
+	--cui-content-550: var(--cui-theme-default-550);
+	--cui-content-525: var(--cui-theme-default-525);
+	--cui-content-500: var(--cui-theme-default-500);
+	--cui-content-475: var(--cui-theme-default-475);
+	--cui-content-450: var(--cui-theme-default-450);
+	--cui-content-425: var(--cui-theme-default-425);
+	--cui-content-400: var(--cui-theme-default-400);
+	--cui-content-375: var(--cui-theme-default-375);
+	--cui-content-350: var(--cui-theme-default-350);
+	--cui-content-325: var(--cui-theme-default-325);
+	--cui-content-300: var(--cui-theme-default-300);
+	--cui-content-275: var(--cui-theme-default-275);
+	--cui-content-250: var(--cui-theme-default-250);
+	--cui-content-225: var(--cui-theme-default-225);
+	--cui-content-200: var(--cui-theme-default-200);
+	--cui-content-175: var(--cui-theme-default-175);
+	--cui-content-150: var(--cui-theme-default-150);
+	--cui-content-125: var(--cui-theme-default-125);
+	--cui-content-100: var(--cui-theme-default-100);
+	--cui-content-75: var(--cui-theme-default-75);
+	--cui-content-50: var(--cui-theme-default-50);
+	--cui-content-25: var(--cui-theme-default-25);
+	--cui-content-0: var(--cui-theme-default-0);
+}
+.theme-default,
+.theme-default\:hover:hover,
+.theme-default\:active:active,
+.theme-default\:focus:focus,
+.theme-default-controls,
+.theme-default-controls\:hover:hover,
+.theme-default-controls\:active:active,
+.theme-default-controls\:focus:focus {
+	--cui-controls-1000: var(--cui-theme-default-1000);
+	--cui-controls-975: var(--cui-theme-default-975);
+	--cui-controls-950: var(--cui-theme-default-950);
+	--cui-controls-925: var(--cui-theme-default-925);
+	--cui-controls-900: var(--cui-theme-default-900);
+	--cui-controls-875: var(--cui-theme-default-875);
+	--cui-controls-850: var(--cui-theme-default-850);
+	--cui-controls-825: var(--cui-theme-default-825);
+	--cui-controls-800: var(--cui-theme-default-800);
+	--cui-controls-775: var(--cui-theme-default-775);
+	--cui-controls-750: var(--cui-theme-default-750);
+	--cui-controls-725: var(--cui-theme-default-725);
+	--cui-controls-700: var(--cui-theme-default-700);
+	--cui-controls-675: var(--cui-theme-default-675);
+	--cui-controls-650: var(--cui-theme-default-650);
+	--cui-controls-625: var(--cui-theme-default-625);
+	--cui-controls-600: var(--cui-theme-default-600);
+	--cui-controls-575: var(--cui-theme-default-575);
+	--cui-controls-550: var(--cui-theme-default-550);
+	--cui-controls-525: var(--cui-theme-default-525);
+	--cui-controls-500: var(--cui-theme-default-500);
+	--cui-controls-475: var(--cui-theme-default-475);
+	--cui-controls-450: var(--cui-theme-default-450);
+	--cui-controls-425: var(--cui-theme-default-425);
+	--cui-controls-400: var(--cui-theme-default-400);
+	--cui-controls-375: var(--cui-theme-default-375);
+	--cui-controls-350: var(--cui-theme-default-350);
+	--cui-controls-325: var(--cui-theme-default-325);
+	--cui-controls-300: var(--cui-theme-default-300);
+	--cui-controls-275: var(--cui-theme-default-275);
+	--cui-controls-250: var(--cui-theme-default-250);
+	--cui-controls-225: var(--cui-theme-default-225);
+	--cui-controls-200: var(--cui-theme-default-200);
+	--cui-controls-175: var(--cui-theme-default-175);
+	--cui-controls-150: var(--cui-theme-default-150);
+	--cui-controls-125: var(--cui-theme-default-125);
+	--cui-controls-100: var(--cui-theme-default-100);
+	--cui-controls-75: var(--cui-theme-default-75);
+	--cui-controls-50: var(--cui-theme-default-50);
+	--cui-controls-25: var(--cui-theme-default-25);
+	--cui-controls-0: var(--cui-theme-default-0);
+}
+
+
+[class*="theme-"] *:not([class*="scheme-"]):not([class*="theme-"]),
+[class*="scheme-"] *:not([class*="scheme-"]):not([class*="theme-"]) {
+	/* Properties that are interited donw the line */
+	--cui-background-color: inherit;
+	--cui-background-color--above: inherit;
+	--cui-background-color--below: inherit;
+	--cui-color: inherit;
+	--cui-color--strong: inherit;
+	--cui-color--high: inherit;
+	--cui-color--medium: inherit;
+	--cui-color--low: inherit;
+	--cui-color--lower: inherit;
+
+	/* Control */
+	--cui-control-color: inherit;
+	--cui-control-background-color: inherit;
+	--cui-control-border-color: inherit;
+
+	/* Control:highlighted */
+	--cui-control-color--highlighted: inherit;
+	--cui-control-background-color--highlighted: inherit;
+	--cui-control-border-color--highlighted: inherit;
+
+	/* Control:pressed */
+	--cui-control-color--pressed: inherit;
+	--cui-control-background-color--pressed: inherit;
+	--cui-control-border-color--pressed: inherit;
+
+	/* Filled */
+	--cui-filled-control-color: inherit;
+	--cui-filled-control-background-color: inherit;
+	--cui-filled-control-border-color: inherit;
+
+	/* Filled:highlighted */
+	--cui-filled-control-color--highlighted: inherit;
+	--cui-filled-control-background-color--highlighted: inherit;
+	--cui-filled-control-border-color--highlighted: inherit;
+
+	/* Filled:pressed */
+	--cui-filled-control-color--pressed: inherit;
+	--cui-filled-control-background-color--pressed: inherit;
+	--cui-filled-control-border-color--pressed: inherit;
+
+	/* Toned */
+	--cui-toned-control-color: inherit;
+	--cui-toned-control-background-color: inherit;
+	--cui-toned-control-border-color: inherit;
+
+	/* Toned:highlighted = Filled:highlighted */
+	--cui-toned-control-color--highlighted: inherit;
+	--cui-toned-control-background-color--highlighted: inherit;
+	--cui-toned-control-border-color--highlighted: inherit;
+
+	/* Toned:pressed = Filled:pressed */
+	--cui-toned-control-color--pressed: inherit;
+	--cui-toned-control-background-color--pressed: inherit;
+	--cui-toned-control-border-color--pressed: inherit;
+}
+
+:root,
+.scheme-light,
+.scheme-system,
+.scheme-light-above,
+.scheme-light-below,
+.scheme-system-above,
+.scheme-system-below {
+	/* Opacities */
+	--cui-opacity--strong: 1;
+	--cui-opacity--high: 0.750;
+	--cui-opacity--medium: 0.500;
+	--cui-opacity--low: 0.300;
+	--cui-opacity--lower: 0.125;
+	--cui-opacity--control-background-color: 0.000;
+	--cui-opacity--control-background-color--highlighted: 0.750;
+	--cui-opacity--filled-control-background-color--pressed: 0.175;
+	--cui-opacity--toned-control-background-color: 0.500;
+}
+.scheme-dark,
+.scheme-dark-below,
+.scheme-dark-above {
+	/* Opacities */
+	--cui-opacity--strong: 1;
+	--cui-opacity--high: 0.750;
+	--cui-opacity--medium: 0.500;
+	--cui-opacity--low: 0.300;
+	--cui-opacity--lower: 0.125;
+	--cui-opacity--control-background-color: 0.000;
+	--cui-opacity--control-background-color--highlighted: 0.750;
+	--cui-opacity--filled-control-background-color--pressed: 0.750;
+	--cui-opacity--toned-control-background-color: 0.750;
+}
+.scheme-light-below, .scheme-light-below *:not([class*="scheme-"]),
+.scheme-system-below, .scheme-system-below *:not([class*="scheme-"]) {
+	/* Content */
+	--cui-background-color: rgb(var(--cui-content-950));
+	--cui-background-color--above: rgb(var(--cui-content-975));
+	--cui-background-color--below: rgb(var(--cui-content-925));
+	--cui-color: rgba(var(--cui-content-150), 0.750);
+	--cui-color--strong: rgb(var(--cui-content-150));
+	--cui-color--high: rgba(var(--cui-content-150), 0.750);
+	--cui-color--medium: rgba(var(--cui-content-150), 0.500);
+	--cui-color--low: rgba(var(--cui-content-150), 0.300);
+	--cui-color--lower: rgba(var(--cui-content-150), 0.125);
+
+	/* Control – 950 : 550*/
+	--cui-control-color: rgb(var(--cui-controls-550));
+	--cui-control-background-color: rgba(var(--cui-controls-950), 0.00);
+	--cui-control-border-color: rgb(var(--cui-controls-550));
+
+	/* Control:highlighted – 950 : 650 */
+	--cui-control-color--highlighted: rgb(var(--cui-controls-650));
+	--cui-control-background-color--highlighted: rgba(var(--cui-controls-1000), 0.750);
+	--cui-control-border-color--highlighted: rgb(var(--cui-controls-650));
+
+	/* Control:pressed — 950 : 550 */
+	--cui-control-color--pressed: rgb(var(--cui-controls-550));
+	--cui-control-background-color--pressed: rgba(var(--cui-controls-1000), 0.175);
+	--cui-control-border-color--pressed: rgb(var(--cui-controls-750));
+
+	/* Filled — 1050 : rgb(var(--cui-controls-500)) */
+	--cui-filled-control-color: rgb(var(--cui-controls-500));
+	--cui-filled-control-background-color: rgb(var(--cui-controls-1000));
+	--cui-filled-control-border-color: rgb(var(--cui-controls-500));
+
+	/* Filled:highlighted – 1150 : 600 */
+	--cui-filled-control-color--highlighted: rgb(var(--cui-controls-600));
+	--cui-filled-control-background-color--highlighted: rgb(var(--cui-controls-1000));
+	--cui-filled-control-border-color--highlighted: rgb(var(--cui-controls-600));
+
+	/* Filled:pressed – 1050 alpha : 550 */
+	--cui-filled-control-color--pressed: rgb(var(--cui-controls-550));
+	--cui-filled-control-background-color--pressed: rgba(var(--cui-controls-1000), 0.175);
+	--cui-filled-control-border-color--pressed: rgb(var(--cui-controls-750));
+
+	/* Toned — 800 alpha : 450 */
+	--cui-toned-control-color: rgb(var(--cui-controls-450));
+	--cui-toned-control-background-color: rgba(var(--cui-controls-800), 0.500);
+	--cui-toned-control-border-color: rgb(var(--cui-controls-450));
+
+	/* Toned:highlighted = Filled:highlighted */
+	--cui-toned-control-color--highlighted: rgb(var(--cui-controls-600));
+	--cui-toned-control-background-color--highlighted: rgb(var(--cui-controls-1000));
+	--cui-toned-control-border-color--highlighted: rgb(var(--cui-controls-600));
+
+	/* Toned:pressed = Filled:pressed */
+	--cui-toned-control-color--pressed: rgb(var(--cui-controls-550));
+	--cui-toned-control-background-color--pressed: rgba(var(--cui-controls-1000), 0.175);
+	--cui-toned-control-border-color--pressed: rgb(var(--cui-controls-750));
+}
+:root, :root *:not([class*="scheme-"]),
+.scheme-light, .scheme-light *:not([class*="scheme-"]),
+.scheme-system, .scheme-system *:not([class*="scheme-"]) {
+	/* Content */
+	--cui-background-color: rgb(var(--cui-content-975));
+	--cui-background-color--above: rgb(var(--cui-content-1000));
+	--cui-background-color--below: rgb(var(--cui-content-950));
+	--cui-color: rgba(var(--cui-content-175), 0.750);
+	--cui-color--strong: rgb(var(--cui-content-175));
+	--cui-color--high: rgba(var(--cui-content-175), 0.750);
+	--cui-color--medium: rgba(var(--cui-content-175), 0.500);
+	--cui-color--low: rgba(var(--cui-content-175), 0.300);
+	--cui-color--lower: rgba(var(--cui-content-175), 0.125);
+
+	/* Control – 975 : 575*/
+	--cui-control-color: rgb(var(--cui-controls-575));
+	--cui-control-background-color: rgba(var(--cui-controls-975), 0.00);
+	--cui-control-border-color: rgb(var(--cui-controls-575));
+
+	/* Control:highlighted – 975 : 675 */
+	--cui-control-color--highlighted: rgb(var(--cui-controls-675));
+	--cui-control-background-color--highlighted: rgba(var(--cui-controls-1000), 0.750);
+	--cui-control-border-color--highlighted: rgb(var(--cui-controls-675));
+
+	/* Control:pressed — 975 : 575 */
+	--cui-control-color--pressed: rgb(var(--cui-controls-575));
+	--cui-control-background-color--pressed: rgba(var(--cui-controls-1000), 0.175);
+	--cui-control-border-color--pressed: rgb(var(--cui-controls-775));
+
+	/* Filled — 1075 : rgb(var(--cui-controls-525)) */
+	--cui-filled-control-color: rgb(var(--cui-controls-525));
+	--cui-filled-control-background-color: rgb(var(--cui-controls-1000));
+	--cui-filled-control-border-color: rgb(var(--cui-controls-525));
+
+	/* Filled:highlighted – 1175 : 625 */
+	--cui-filled-control-color--highlighted: rgb(var(--cui-controls-625));
+	--cui-filled-control-background-color--highlighted: rgb(var(--cui-controls-1000));
+	--cui-filled-control-border-color--highlighted: rgb(var(--cui-controls-625));
+
+	/* Filled:pressed – 1075 alpha : 575 */
+	--cui-filled-control-color--pressed: rgb(var(--cui-controls-575));
+	--cui-filled-control-background-color--pressed: rgba(var(--cui-controls-1000), 0.175);
+	--cui-filled-control-border-color--pressed: rgb(var(--cui-controls-775));
+
+	/* Toned — 825 alpha : 475 */
+	--cui-toned-control-color: rgb(var(--cui-controls-475));
+	--cui-toned-control-background-color: rgba(var(--cui-controls-825), 0.500);
+	--cui-toned-control-border-color: rgb(var(--cui-controls-475));
+
+	/* Toned:highlighted = Filled:highlighted */
+	--cui-toned-control-color--highlighted: rgb(var(--cui-controls-625));
+	--cui-toned-control-background-color--highlighted: rgb(var(--cui-controls-1000));
+	--cui-toned-control-border-color--highlighted: rgb(var(--cui-controls-625));
+
+	/* Toned:pressed = Filled:pressed */
+	--cui-toned-control-color--pressed: rgb(var(--cui-controls-575));
+	--cui-toned-control-background-color--pressed: rgba(var(--cui-controls-1000), 0.175);
+	--cui-toned-control-border-color--pressed: rgb(var(--cui-controls-775));
+}
+.scheme-light-above, .scheme-light-above *:not([class*="scheme-"]),
+.scheme-system-above, .scheme-system-above *:not([class*="scheme-"]) {
+	/* Content */
+	--cui-background-color: rgb(var(--cui-content-1000));
+	--cui-background-color--above: rgb(var(--cui-content-1000));
+	--cui-background-color--below: rgb(var(--cui-content-975));
+	--cui-color: rgba(var(--cui-content-200), 0.750);
+	--cui-color--strong: rgb(var(--cui-content-200));
+	--cui-color--high: rgba(var(--cui-content-200), 0.750);
+	--cui-color--medium: rgba(var(--cui-content-200), 0.500);
+	--cui-color--low: rgba(var(--cui-content-200), 0.300);
+	--cui-color--lower: rgba(var(--cui-content-200), 0.125);
+
+	/* Control – 1000 : 600*/
+	--cui-control-color: rgb(var(--cui-controls-600));
+	--cui-control-background-color: rgba(var(--cui-controls-1000), 0.00);
+	--cui-control-border-color: rgb(var(--cui-controls-600));
+
+	/* Control:highlighted – 1000 : 700 */
+	--cui-control-color--highlighted: rgb(var(--cui-controls-700));
+	--cui-control-background-color--highlighted: rgba(var(--cui-controls-1000), 0.750);
+	--cui-control-border-color--highlighted: rgb(var(--cui-controls-700));
+
+	/* Control:pressed — 1000 : 600 */
+	--cui-control-color--pressed: rgb(var(--cui-controls-600));
+	--cui-control-background-color--pressed: rgba(var(--cui-controls-1000), 0.175);
+	--cui-control-border-color--pressed: rgb(var(--cui-controls-800));
+
+	/* Filled — 1100 : rgb(var(--cui-controls-550)) */
+	--cui-filled-control-color: rgb(var(--cui-controls-550));
+	--cui-filled-control-background-color: rgb(var(--cui-controls-1000));
+	--cui-filled-control-border-color: rgb(var(--cui-controls-550));
+
+	/* Filled:highlighted – 1200 : 650 */
+	--cui-filled-control-color--highlighted: rgb(var(--cui-controls-650));
+	--cui-filled-control-background-color--highlighted: rgb(var(--cui-controls-1000));
+	--cui-filled-control-border-color--highlighted: rgb(var(--cui-controls-650));
+
+	/* Filled:pressed – 1100 alpha : 600 */
+	--cui-filled-control-color--pressed: rgb(var(--cui-controls-600));
+	--cui-filled-control-background-color--pressed: rgba(var(--cui-controls-1000), 0.175);
+	--cui-filled-control-border-color--pressed: rgb(var(--cui-controls-800));
+
+	/* Toned — 850 alpha : 500 */
+	--cui-toned-control-color: rgb(var(--cui-controls-500));
+	--cui-toned-control-background-color: rgba(var(--cui-controls-850), 0.500);
+	--cui-toned-control-border-color: rgb(var(--cui-controls-500));
+
+	/* Toned:highlighted = Filled:highlighted */
+	--cui-toned-control-color--highlighted: rgb(var(--cui-controls-650));
+	--cui-toned-control-background-color--highlighted: rgb(var(--cui-controls-1000));
+	--cui-toned-control-border-color--highlighted: rgb(var(--cui-controls-650));
+
+	/* Toned:pressed = Filled:pressed */
+	--cui-toned-control-color--pressed: rgb(var(--cui-controls-600));
+	--cui-toned-control-background-color--pressed: rgba(var(--cui-controls-1000), 0.175);
+	--cui-toned-control-border-color--pressed: rgb(var(--cui-controls-800));
+}
+.scheme-dark-below, .scheme-dark-below *:not([class*="scheme-"]) {
+	/* Content */
+	--cui-background-color: rgb(var(--cui-content-25));
+	--cui-background-color--above: rgb(var(--cui-content-75));
+	--cui-background-color--below: rgb(var(--cui-content-0));
+	--cui-color: rgba(var(--cui-content-825), 0.750);
+	--cui-color--strong: rgb(var(--cui-content-825));
+	--cui-color--high: rgba(var(--cui-content-825), 0.750);
+	--cui-color--medium: rgba(var(--cui-content-825), 0.500);
+	--cui-color--low: rgba(var(--cui-content-825), 0.300);
+	--cui-color--lower: rgba(var(--cui-content-825), 0.125);
+
+	/* Control – 25 : 525*/
+	--cui-control-color: rgb(var(--cui-controls-525));
+	--cui-control-background-color: rgba(var(--cui-controls-25), 0.00);
+	--cui-control-border-color: rgb(var(--cui-controls-525));
+
+	/* Control:highlighted – 25 : 925 */
+	--cui-control-color--highlighted: rgb(var(--cui-controls-925));
+	--cui-control-background-color--highlighted: rgba(var(--cui-controls-525), 0.750);
+	--cui-control-border-color--highlighted: rgb(var(--cui-controls-925));
+
+	/* Control:pressed — 25 : 525 */
+	--cui-control-color--pressed: rgb(var(--cui-controls-675));
+	--cui-control-background-color--pressed: rgba(var(--cui-controls-0), 0.750);
+	--cui-control-border-color--pressed: rgb(var(--cui-controls-275));
+
+	/* Filled — 375 : rgb(var(--cui-controls-925)) */
+	--cui-filled-control-color: rgb(var(--cui-controls-925));
+	--cui-filled-control-background-color: rgb(var(--cui-controls-375));
+	--cui-filled-control-border-color: rgb(var(--cui-controls-925));
+
+	/* Filled:highlighted – 475 : 1025 */
+	--cui-filled-control-color--highlighted: rgb(var(--cui-controls-1000));
+	--cui-filled-control-background-color--highlighted: rgb(var(--cui-controls-475));
+	--cui-filled-control-border-color--highlighted: rgb(var(--cui-controls-1000));
+
+	/* Filled:pressed – -25 alpha : 675 */
+	--cui-filled-control-color--pressed: rgb(var(--cui-controls-675));
+	--cui-filled-control-background-color--pressed: rgba(var(--cui-controls-0), 0.750);
+	--cui-filled-control-border-color--pressed: rgb(var(--cui-controls-275));
+
+	/* Toned — 225 alpha : 925 */
+	--cui-toned-control-color: rgb(var(--cui-controls-925));
+	--cui-toned-control-background-color: rgba(var(--cui-controls-225), 0.750);
+	--cui-toned-control-border-color: rgb(var(--cui-controls-925));
+
+	/* Toned:highlighted = Filled:highlighted */
+	--cui-toned-control-color--highlighted: rgb(var(--cui-controls-1000));
+	--cui-toned-control-background-color--highlighted: rgb(var(--cui-controls-475));
+	--cui-toned-control-border-color--highlighted: rgb(var(--cui-controls-1000));
+
+	/* Toned:pressed = Filled:pressed */
+	--cui-toned-control-color--pressed: rgb(var(--cui-controls-675));
+	--cui-toned-control-background-color--pressed: rgba(var(--cui-controls-0), 0.750);
+	--cui-toned-control-border-color--pressed: rgb(var(--cui-controls-275));
+}
+.scheme-dark, .scheme-dark *:not([class*="scheme-"]) {
+	/* Content */
+	--cui-background-color: rgb(var(--cui-content-75));
+	--cui-background-color--above: rgb(var(--cui-content-125));
+	--cui-background-color--below: rgb(var(--cui-content-25));
+	--cui-color: rgba(var(--cui-content-875), 0.750);
+	--cui-color--strong: rgb(var(--cui-content-875));
+	--cui-color--high: rgba(var(--cui-content-875), 0.750);
+	--cui-color--medium: rgba(var(--cui-content-875), 0.500);
+	--cui-color--low: rgba(var(--cui-content-875), 0.300);
+	--cui-color--lower: rgba(var(--cui-content-875), 0.125);
+
+	/* Control – 75 : 575*/
+	--cui-control-color: rgb(var(--cui-controls-575));
+	--cui-control-background-color: rgba(var(--cui-controls-75), 0.00);
+	--cui-control-border-color: rgb(var(--cui-controls-575));
+
+	/* Control:highlighted – 75 : 975 */
+	--cui-control-color--highlighted: rgb(var(--cui-controls-975));
+	--cui-control-background-color--highlighted: rgba(var(--cui-controls-575), 0.750);
+	--cui-control-border-color--highlighted: rgb(var(--cui-controls-975));
+
+	/* Control:pressed — 75 : 575 */
+	--cui-control-color--pressed: rgb(var(--cui-controls-725));
+	--cui-control-background-color--pressed: rgba(var(--cui-controls-25), 0.750);
+	--cui-control-border-color--pressed: rgb(var(--cui-controls-325));
+
+	/* Filled — 425 : rgb(var(--cui-controls-975)) */
+	--cui-filled-control-color: rgb(var(--cui-controls-975));
+	--cui-filled-control-background-color: rgb(var(--cui-controls-425));
+	--cui-filled-control-border-color: rgb(var(--cui-controls-975));
+
+	/* Filled:highlighted – 525 : 1075 */
+	--cui-filled-control-color--highlighted: rgb(var(--cui-controls-1000));
+	--cui-filled-control-background-color--highlighted: rgb(var(--cui-controls-525));
+	--cui-filled-control-border-color--highlighted: rgb(var(--cui-controls-1000));
+
+	/* Filled:pressed – 25 alpha : 725 */
+	--cui-filled-control-color--pressed: rgb(var(--cui-controls-725));
+	--cui-filled-control-background-color--pressed: rgba(var(--cui-controls-25), 0.750);
+	--cui-filled-control-border-color--pressed: rgb(var(--cui-controls-325));
+
+	/* Toned — 275 alpha : 975 */
+	--cui-toned-control-color: rgb(var(--cui-controls-975));
+	--cui-toned-control-background-color: rgba(var(--cui-controls-275), 0.750);
+	--cui-toned-control-border-color: rgb(var(--cui-controls-975));
+
+	/* Toned:highlighted = Filled:highlighted */
+	--cui-toned-control-color--highlighted: rgb(var(--cui-controls-1000));
+	--cui-toned-control-background-color--highlighted: rgb(var(--cui-controls-525));
+	--cui-toned-control-border-color--highlighted: rgb(var(--cui-controls-1000));
+
+	/* Toned:pressed = Filled:pressed */
+	--cui-toned-control-color--pressed: rgb(var(--cui-controls-725));
+	--cui-toned-control-background-color--pressed: rgba(var(--cui-controls-25), 0.750);
+	--cui-toned-control-border-color--pressed: rgb(var(--cui-controls-325));
+}
+.scheme-dark-above, .scheme-dark-above *:not([class*="scheme-"]) {
+	/* Content */
+	--cui-background-color: rgb(var(--cui-content-100));
+	--cui-background-color--above: rgb(var(--cui-content-150));
+	--cui-background-color--below: rgb(var(--cui-content-50));
+	--cui-color: rgba(var(--cui-content-900), 0.750);
+	--cui-color--strong: rgb(var(--cui-content-900));
+	--cui-color--high: rgba(var(--cui-content-900), 0.750);
+	--cui-color--medium: rgba(var(--cui-content-900), 0.500);
+	--cui-color--low: rgba(var(--cui-content-900), 0.300);
+	--cui-color--lower: rgba(var(--cui-content-900), 0.125);
+
+	/* Control – 100 : 600*/
+	--cui-control-color: rgb(var(--cui-controls-600));
+	--cui-control-background-color: rgba(var(--cui-controls-100), 0.00);
+	--cui-control-border-color: rgb(var(--cui-controls-600));
+
+	/* Control:highlighted – 100 : 1000 */
+	--cui-control-color--highlighted: rgb(var(--cui-controls-1000));
+	--cui-control-background-color--highlighted: rgba(var(--cui-controls-600), 0.750);
+	--cui-control-border-color--highlighted: rgb(var(--cui-controls-1000));
+
+	/* Control:pressed — 100 : 600 */
+	--cui-control-color--pressed: rgb(var(--cui-controls-750));
+	--cui-control-background-color--pressed: rgba(var(--cui-controls-50), 0.750);
+	--cui-control-border-color--pressed: rgb(var(--cui-controls-350));
+
+	/* Filled — 450 : rgb(var(--cui-controls-1000)) */
+	--cui-filled-control-color: rgb(var(--cui-controls-1000));
+	--cui-filled-control-background-color: rgb(var(--cui-controls-450));
+	--cui-filled-control-border-color: rgb(var(--cui-controls-1000));
+
+	/* Filled:highlighted – 550 : 1100 */
+	--cui-filled-control-color--highlighted: rgb(var(--cui-controls-1000));
+	--cui-filled-control-background-color--highlighted: rgb(var(--cui-controls-550));
+	--cui-filled-control-border-color--highlighted: rgb(var(--cui-controls-1000));
+
+	/* Filled:pressed – 50 alpha : 750 */
+	--cui-filled-control-color--pressed: rgb(var(--cui-controls-750));
+	--cui-filled-control-background-color--pressed: rgba(var(--cui-controls-50), 0.750);
+	--cui-filled-control-border-color--pressed: rgb(var(--cui-controls-350));
+
+	/* Toned — 300 alpha : 1000 */
+	--cui-toned-control-color: rgb(var(--cui-controls-1000));
+	--cui-toned-control-background-color: rgba(var(--cui-controls-300), 0.750);
+	--cui-toned-control-border-color: rgb(var(--cui-controls-1000));
+
+	/* Toned:highlighted = Filled:highlighted */
+	--cui-toned-control-color--highlighted: rgb(var(--cui-controls-1000));
+	--cui-toned-control-background-color--highlighted: rgb(var(--cui-controls-550));
+	--cui-toned-control-border-color--highlighted: rgb(var(--cui-controls-1000));
+
+	/* Toned:pressed = Filled:pressed */
+	--cui-toned-control-color--pressed: rgb(var(--cui-controls-750));
+	--cui-toned-control-background-color--pressed: rgba(var(--cui-controls-50), 0.750);
+	--cui-toned-control-border-color--pressed: rgb(var(--cui-controls-350));
+}
+
+/*** Prefers dark scheme defaults: ***/
+@media (prefers-color-scheme: dark) {
+	:root,
+	.scheme-dark,
+	.scheme-system,
+	.scheme-dark-above,
+	.scheme-dark-below,
+	.scheme-system-above,
+	.scheme-system-below {
+		/* Opacities */
+		--cui-opacity--strong: 1;
+		--cui-opacity--high: 0.750;
+		--cui-opacity--medium: 0.500;
+		--cui-opacity--low: 0.300;
+		--cui-opacity--lower: 0.125;
+		--cui-opacity--control-background-color: 0.000;
+		--cui-opacity--control-background-color--highlighted: 0.750;
+		--cui-opacity--filled-control-background-color--pressed: 0.750;
+		--cui-opacity--toned-control-background-color: 0.750;
+	}
+	.scheme-light,
+	.scheme-light-above,
+	.scheme-light-below {
+		/* Opacities */
+		--cui-opacity--strong: 1;
+		--cui-opacity--high: 0.750;
+		--cui-opacity--medium: 0.500;
+		--cui-opacity--low: 0.300;
+		--cui-opacity--lower: 0.125;
+		--cui-opacity--control-background-color: 0.000;
+		--cui-opacity--control-background-color--highlighted: 0.750;
+		--cui-opacity--filled-control-background-color--pressed: 0.175;
+		--cui-opacity--toned-control-background-color: 0.500;
+	}
+	.scheme-dark-below, .scheme-dark-below *:not([class*="scheme-"]),
+	.scheme-system-below, .scheme-system-below *:not([class*="scheme-"]) {
+		/* Content */
+		--cui-background-color: rgb(var(--cui-content-25));
+		--cui-background-color--above: rgb(var(--cui-content-75));
+		--cui-background-color--below: rgb(var(--cui-content-0));
+		--cui-color: rgba(var(--cui-content-825), 0.750);
+		--cui-color--strong: rgb(var(--cui-content-825));
+		--cui-color--high: rgba(var(--cui-content-825), 0.750);
+		--cui-color--medium: rgba(var(--cui-content-825), 0.500);
+		--cui-color--low: rgba(var(--cui-content-825), 0.300);
+		--cui-color--lower: rgba(var(--cui-content-825), 0.125);
+
+		/* Control – 25 : 525*/
+		--cui-control-color: rgb(var(--cui-controls-525));
+		--cui-control-background-color: rgba(var(--cui-controls-25), 0.00);
+		--cui-control-border-color: rgb(var(--cui-controls-525));
+
+		/* Control:highlighted – 25 : 925 */
+		--cui-control-color--highlighted: rgb(var(--cui-controls-925));
+		--cui-control-background-color--highlighted: rgba(var(--cui-controls-525), 0.750);
+		--cui-control-border-color--highlighted: rgb(var(--cui-controls-925));
+
+		/* Control:pressed — 25 : 525 */
+		--cui-control-color--pressed: rgb(var(--cui-controls-675));
+		--cui-control-background-color--pressed: rgba(var(--cui-controls-0), 0.750);
+		--cui-control-border-color--pressed: rgb(var(--cui-controls-275));
+
+		/* Filled — 375 : rgb(var(--cui-controls-925)) */
+		--cui-filled-control-color: rgb(var(--cui-controls-925));
+		--cui-filled-control-background-color: rgb(var(--cui-controls-375));
+		--cui-filled-control-border-color: rgb(var(--cui-controls-925));
+
+		/* Filled:highlighted – 475 : 1025 */
+		--cui-filled-control-color--highlighted: rgb(var(--cui-controls-1000));
+		--cui-filled-control-background-color--highlighted: rgb(var(--cui-controls-475));
+		--cui-filled-control-border-color--highlighted: rgb(var(--cui-controls-1000));
+
+		/* Filled:pressed – -25 alpha : 675 */
+		--cui-filled-control-color--pressed: rgb(var(--cui-controls-675));
+		--cui-filled-control-background-color--pressed: rgba(var(--cui-controls-0), 0.750);
+		--cui-filled-control-border-color--pressed: rgb(var(--cui-controls-275));
+
+		/* Toned — 225 alpha : 925 */
+		--cui-toned-control-color: rgb(var(--cui-controls-925));
+		--cui-toned-control-background-color: rgba(var(--cui-controls-225), 0.750);
+		--cui-toned-control-border-color: rgb(var(--cui-controls-925));
+
+		/* Toned:highlighted = Filled:highlighted */
+		--cui-toned-control-color--highlighted: rgb(var(--cui-controls-1000));
+		--cui-toned-control-background-color--highlighted: rgb(var(--cui-controls-475));
+		--cui-toned-control-border-color--highlighted: rgb(var(--cui-controls-1000));
+
+		/* Toned:pressed = Filled:pressed */
+		--cui-toned-control-color--pressed: rgb(var(--cui-controls-675));
+		--cui-toned-control-background-color--pressed: rgba(var(--cui-controls-0), 0.750);
+		--cui-toned-control-border-color--pressed: rgb(var(--cui-controls-275));
+	}
+	:root, :root *:not([class*="scheme-"]),
+	.scheme-dark, .scheme-dark *:not([class*="scheme-"]),
+	.scheme-system, .scheme-system *:not([class*="scheme-"]) {
+		/* Content */
+		--cui-background-color: rgb(var(--cui-content-75));
+		--cui-background-color--above: rgb(var(--cui-content-125));
+		--cui-background-color--below: rgb(var(--cui-content-25));
+		--cui-color: rgba(var(--cui-content-875), 0.750);
+		--cui-color--strong: rgb(var(--cui-content-875));
+		--cui-color--high: rgba(var(--cui-content-875), 0.750);
+		--cui-color--medium: rgba(var(--cui-content-875), 0.500);
+		--cui-color--low: rgba(var(--cui-content-875), 0.300);
+		--cui-color--lower: rgba(var(--cui-content-875), 0.125);
+
+		/* Control – 75 : 575*/
+		--cui-control-color: rgb(var(--cui-controls-575));
+		--cui-control-background-color: rgba(var(--cui-controls-75), 0.00);
+		--cui-control-border-color: rgb(var(--cui-controls-575));
+
+		/* Control:highlighted – 75 : 975 */
+		--cui-control-color--highlighted: rgb(var(--cui-controls-975));
+		--cui-control-background-color--highlighted: rgba(var(--cui-controls-575), 0.750);
+		--cui-control-border-color--highlighted: rgb(var(--cui-controls-975));
+
+		/* Control:pressed — 75 : 575 */
+		--cui-control-color--pressed: rgb(var(--cui-controls-725));
+		--cui-control-background-color--pressed: rgba(var(--cui-controls-25), 0.750);
+		--cui-control-border-color--pressed: rgb(var(--cui-controls-325));
+
+		/* Filled — 425 : rgb(var(--cui-controls-975)) */
+		--cui-filled-control-color: rgb(var(--cui-controls-975));
+		--cui-filled-control-background-color: rgb(var(--cui-controls-425));
+		--cui-filled-control-border-color: rgb(var(--cui-controls-975));
+
+		/* Filled:highlighted – 525 : 1075 */
+		--cui-filled-control-color--highlighted: rgb(var(--cui-controls-1000));
+		--cui-filled-control-background-color--highlighted: rgb(var(--cui-controls-525));
+		--cui-filled-control-border-color--highlighted: rgb(var(--cui-controls-1000));
+
+		/* Filled:pressed – 25 alpha : 725 */
+		--cui-filled-control-color--pressed: rgb(var(--cui-controls-725));
+		--cui-filled-control-background-color--pressed: rgba(var(--cui-controls-25), 0.750);
+		--cui-filled-control-border-color--pressed: rgb(var(--cui-controls-325));
+
+		/* Toned — 275 alpha : 975 */
+		--cui-toned-control-color: rgb(var(--cui-controls-975));
+		--cui-toned-control-background-color: rgba(var(--cui-controls-275), 0.750);
+		--cui-toned-control-border-color: rgb(var(--cui-controls-975));
+
+		/* Toned:highlighted = Filled:highlighted */
+		--cui-toned-control-color--highlighted: rgb(var(--cui-controls-1000));
+		--cui-toned-control-background-color--highlighted: rgb(var(--cui-controls-525));
+		--cui-toned-control-border-color--highlighted: rgb(var(--cui-controls-1000));
+
+		/* Toned:pressed = Filled:pressed */
+		--cui-toned-control-color--pressed: rgb(var(--cui-controls-725));
+		--cui-toned-control-background-color--pressed: rgba(var(--cui-controls-25), 0.750);
+		--cui-toned-control-border-color--pressed: rgb(var(--cui-controls-325));
+	}
+	.scheme-dark-above, .scheme-dark-above *:not([class*="scheme-"]),
+	.scheme-system-above, .scheme-system-above *:not([class*="scheme-"]) {
+		/* Content */
+		--cui-background-color: rgb(var(--cui-content-125));
+		--cui-background-color--above: rgb(var(--cui-content-175));
+		--cui-background-color--below: rgb(var(--cui-content-75));
+		--cui-color: rgba(var(--cui-content-925), 0.750);
+		--cui-color--strong: rgb(var(--cui-content-925));
+		--cui-color--high: rgba(var(--cui-content-925), 0.750);
+		--cui-color--medium: rgba(var(--cui-content-925), 0.500);
+		--cui-color--low: rgba(var(--cui-content-925), 0.300);
+		--cui-color--lower: rgba(var(--cui-content-925), 0.125);
+
+		/* Control – 125 : 625*/
+		--cui-control-color: rgb(var(--cui-controls-625));
+		--cui-control-background-color: rgba(var(--cui-controls-125), 0.00);
+		--cui-control-border-color: rgb(var(--cui-controls-625));
+
+		/* Control:highlighted – 125 : 1025 */
+		--cui-control-color--highlighted: rgb(var(--cui-controls-1000));
+		--cui-control-background-color--highlighted: rgba(var(--cui-controls-625), 0.750);
+		--cui-control-border-color--highlighted: rgb(var(--cui-controls-1000));
+
+		/* Control:pressed — 125 : 625 */
+		--cui-control-color--pressed: rgb(var(--cui-controls-775));
+		--cui-control-background-color--pressed: rgba(var(--cui-controls-75), 0.750);
+		--cui-control-border-color--pressed: rgb(var(--cui-controls-375));
+
+		/* Filled — 475 : rgb(var(--cui-controls-1000)) */
+		--cui-filled-control-color: rgb(var(--cui-controls-1000));
+		--cui-filled-control-background-color: rgb(var(--cui-controls-475));
+		--cui-filled-control-border-color: rgb(var(--cui-controls-1000));
+
+		/* Filled:highlighted – 575 : 1125 */
+		--cui-filled-control-color--highlighted: rgb(var(--cui-controls-1000));
+		--cui-filled-control-background-color--highlighted: rgb(var(--cui-controls-575));
+		--cui-filled-control-border-color--highlighted: rgb(var(--cui-controls-1000));
+
+		/* Filled:pressed – 75 alpha : 775 */
+		--cui-filled-control-color--pressed: rgb(var(--cui-controls-775));
+		--cui-filled-control-background-color--pressed: rgba(var(--cui-controls-75), 0.750);
+		--cui-filled-control-border-color--pressed: rgb(var(--cui-controls-375));
+
+		/* Toned — 325 alpha : 1025 */
+		--cui-toned-control-color: rgb(var(--cui-controls-1000));
+		--cui-toned-control-background-color: rgba(var(--cui-controls-325), 0.750);
+		--cui-toned-control-border-color: rgb(var(--cui-controls-1000));
+
+		/* Toned:highlighted = Filled:highlighted */
+		--cui-toned-control-color--highlighted: rgb(var(--cui-controls-1000));
+		--cui-toned-control-background-color--highlighted: rgb(var(--cui-controls-575));
+		--cui-toned-control-border-color--highlighted: rgb(var(--cui-controls-1000));
+
+		/* Toned:pressed = Filled:pressed */
+		--cui-toned-control-color--pressed: rgb(var(--cui-controls-775));
+		--cui-toned-control-background-color--pressed: rgba(var(--cui-controls-75), 0.750);
+		--cui-toned-control-border-color--pressed: rgb(var(--cui-controls-375));
+	}
+	.scheme-light-below, .scheme-light-below *:not([class*="scheme-"]) {
+		/* Content */
+		--cui-background-color: rgb(var(--cui-content-950));
+		--cui-background-color--above: rgb(var(--cui-content-975));
+		--cui-background-color--below: rgb(var(--cui-content-925));
+		--cui-color: rgba(var(--cui-content-150), 0.750);
+		--cui-color--strong: rgb(var(--cui-content-150));
+		--cui-color--high: rgba(var(--cui-content-150), 0.750);
+		--cui-color--medium: rgba(var(--cui-content-150), 0.500);
+		--cui-color--low: rgba(var(--cui-content-150), 0.300);
+		--cui-color--lower: rgba(var(--cui-content-150), 0.125);
+
+		/* Control – 950 : 550*/
+		--cui-control-color: rgb(var(--cui-controls-550));
+		--cui-control-background-color: rgba(var(--cui-controls-950), 0.00);
+		--cui-control-border-color: rgb(var(--cui-controls-550));
+
+		/* Control:highlighted – 950 : 650 */
+		--cui-control-color--highlighted: rgb(var(--cui-controls-650));
+		--cui-control-background-color--highlighted: rgba(var(--cui-controls-1000), 0.750);
+		--cui-control-border-color--highlighted: rgb(var(--cui-controls-650));
+
+		/* Control:pressed — 950 : 550 */
+		--cui-control-color--pressed: rgb(var(--cui-controls-550));
+		--cui-control-background-color--pressed: rgba(var(--cui-controls-1000), 0.175);
+		--cui-control-border-color--pressed: rgb(var(--cui-controls-750));
+
+		/* Filled — 1050 : rgb(var(--cui-controls-500)) */
+		--cui-filled-control-color: rgb(var(--cui-controls-500));
+		--cui-filled-control-background-color: rgb(var(--cui-controls-1000));
+		--cui-filled-control-border-color: rgb(var(--cui-controls-500));
+
+		/* Filled:highlighted – 1150 : 600 */
+		--cui-filled-control-color--highlighted: rgb(var(--cui-controls-600));
+		--cui-filled-control-background-color--highlighted: rgb(var(--cui-controls-1000));
+		--cui-filled-control-border-color--highlighted: rgb(var(--cui-controls-600));
+
+		/* Filled:pressed – 1050 alpha : 550 */
+		--cui-filled-control-color--pressed: rgb(var(--cui-controls-550));
+		--cui-filled-control-background-color--pressed: rgba(var(--cui-controls-1000), 0.175);
+		--cui-filled-control-border-color--pressed: rgb(var(--cui-controls-750));
+
+		/* Toned — 800 alpha : 450 */
+		--cui-toned-control-color: rgb(var(--cui-controls-450));
+		--cui-toned-control-background-color: rgba(var(--cui-controls-800), 0.500);
+		--cui-toned-control-border-color: rgb(var(--cui-controls-450));
+
+		/* Toned:highlighted = Filled:highlighted */
+		--cui-toned-control-color--highlighted: rgb(var(--cui-controls-600));
+		--cui-toned-control-background-color--highlighted: rgb(var(--cui-controls-1000));
+		--cui-toned-control-border-color--highlighted: rgb(var(--cui-controls-600));
+
+		/* Toned:pressed = Filled:pressed */
+		--cui-toned-control-color--pressed: rgb(var(--cui-controls-550));
+		--cui-toned-control-background-color--pressed: rgba(var(--cui-controls-1000), 0.175);
+		--cui-toned-control-border-color--pressed: rgb(var(--cui-controls-750));
+	}
+	.scheme-light,
+	.scheme-light *:not([class*="scheme-"]) {
+		/* Content */
+		--cui-background-color: rgb(var(--cui-content-975));
+		--cui-background-color--above: rgb(var(--cui-content-1000));
+		--cui-background-color--below: rgb(var(--cui-content-950));
+		--cui-color: rgba(var(--cui-content-175), 0.750);
+		--cui-color--strong: rgb(var(--cui-content-175));
+		--cui-color--high: rgba(var(--cui-content-175), 0.750);
+		--cui-color--medium: rgba(var(--cui-content-175), 0.500);
+		--cui-color--low: rgba(var(--cui-content-175), 0.300);
+		--cui-color--lower: rgba(var(--cui-content-175), 0.125);
+
+		/* Control – 975 : 575*/
+		--cui-control-color: rgb(var(--cui-controls-575));
+		--cui-control-background-color: rgba(var(--cui-controls-975), 0.00);
+		--cui-control-border-color: rgb(var(--cui-controls-575));
+
+		/* Control:highlighted – 975 : 675 */
+		--cui-control-color--highlighted: rgb(var(--cui-controls-675));
+		--cui-control-background-color--highlighted: rgba(var(--cui-controls-1000), 0.750);
+		--cui-control-border-color--highlighted: rgb(var(--cui-controls-675));
+
+		/* Control:pressed — 975 : 575 */
+		--cui-control-color--pressed: rgb(var(--cui-controls-575));
+		--cui-control-background-color--pressed: rgba(var(--cui-controls-1000), 0.175);
+		--cui-control-border-color--pressed: rgb(var(--cui-controls-775));
+
+		/* Filled — 1075 : rgb(var(--cui-controls-525)) */
+		--cui-filled-control-color: rgb(var(--cui-controls-525));
+		--cui-filled-control-background-color: rgb(var(--cui-controls-1000));
+		--cui-filled-control-border-color: rgb(var(--cui-controls-525));
+
+		/* Filled:highlighted – 1175 : 625 */
+		--cui-filled-control-color--highlighted: rgb(var(--cui-controls-625));
+		--cui-filled-control-background-color--highlighted: rgb(var(--cui-controls-1000));
+		--cui-filled-control-border-color--highlighted: rgb(var(--cui-controls-625));
+
+		/* Filled:pressed – 1075 alpha : 575 */
+		--cui-filled-control-color--pressed: rgb(var(--cui-controls-575));
+		--cui-filled-control-background-color--pressed: rgba(var(--cui-controls-1000), 0.175);
+		--cui-filled-control-border-color--pressed: rgb(var(--cui-controls-775));
+
+		/* Toned — 825 alpha : 475 */
+		--cui-toned-control-color: rgb(var(--cui-controls-475));
+		--cui-toned-control-background-color: rgba(var(--cui-controls-825), 0.500);
+		--cui-toned-control-border-color: rgb(var(--cui-controls-475));
+
+		/* Toned:highlighted = Filled:highlighted */
+		--cui-toned-control-color--highlighted: rgb(var(--cui-controls-625));
+		--cui-toned-control-background-color--highlighted: rgb(var(--cui-controls-1000));
+		--cui-toned-control-border-color--highlighted: rgb(var(--cui-controls-625));
+
+		/* Toned:pressed = Filled:pressed */
+		--cui-toned-control-color--pressed: rgb(var(--cui-controls-575));
+		--cui-toned-control-background-color--pressed: rgba(var(--cui-controls-1000), 0.175);
+		--cui-toned-control-border-color--pressed: rgb(var(--cui-controls-775));
+	}
+	.scheme-light-above,
+	.scheme-light-above *:not([class*="scheme-"]) {
+		/* Content */
+		--cui-background-color: rgb(var(--cui-content-1000));
+		--cui-background-color--above: rgb(var(--cui-content-1000));
+		--cui-background-color--below: rgb(var(--cui-content-975));
+		--cui-color: rgba(var(--cui-content-200), 0.750);
+		--cui-color--strong: rgb(var(--cui-content-200));
+		--cui-color--high: rgba(var(--cui-content-200), 0.750);
+		--cui-color--medium: rgba(var(--cui-content-200), 0.500);
+		--cui-color--low: rgba(var(--cui-content-200), 0.300);
+		--cui-color--lower: rgba(var(--cui-content-200), 0.125);
+
+		/* Control – 1000 : 600*/
+		--cui-control-color: rgb(var(--cui-controls-600));
+		--cui-control-background-color: rgba(var(--cui-controls-1000), 0.00);
+		--cui-control-border-color: rgb(var(--cui-controls-600));
+
+		/* Control:highlighted – 1000 : 700 */
+		--cui-control-color--highlighted: rgb(var(--cui-controls-700));
+		--cui-control-background-color--highlighted: rgba(var(--cui-controls-1000), 0.750);
+		--cui-control-border-color--highlighted: rgb(var(--cui-controls-700));
+
+		/* Control:pressed — 1000 : 600 */
+		--cui-control-color--pressed: rgb(var(--cui-controls-600));
+		--cui-control-background-color--pressed: rgba(var(--cui-controls-1000), 0.175);
+		--cui-control-border-color--pressed: rgb(var(--cui-controls-800));
+
+		/* Filled — 1100 : rgb(var(--cui-controls-550)) */
+		--cui-filled-control-color: rgb(var(--cui-controls-550));
+		--cui-filled-control-background-color: rgb(var(--cui-controls-1000));
+		--cui-filled-control-border-color: rgb(var(--cui-controls-550));
+
+		/* Filled:highlighted – 1200 : 650 */
+		--cui-filled-control-color--highlighted: rgb(var(--cui-controls-650));
+		--cui-filled-control-background-color--highlighted: rgb(var(--cui-controls-1000));
+		--cui-filled-control-border-color--highlighted: rgb(var(--cui-controls-650));
+
+		/* Filled:pressed – 1100 alpha : 600 */
+		--cui-filled-control-color--pressed: rgb(var(--cui-controls-600));
+		--cui-filled-control-background-color--pressed: rgba(var(--cui-controls-1000), 0.175);
+		--cui-filled-control-border-color--pressed: rgb(var(--cui-controls-800));
+
+		/* Toned — 850 alpha : 500 */
+		--cui-toned-control-color: rgb(var(--cui-controls-500));
+		--cui-toned-control-background-color: rgba(var(--cui-controls-850), 0.500);
+		--cui-toned-control-border-color: rgb(var(--cui-controls-500));
+
+		/* Toned:highlighted = Filled:highlighted */
+		--cui-toned-control-color--highlighted: rgb(var(--cui-controls-650));
+		--cui-toned-control-background-color--highlighted: rgb(var(--cui-controls-1000));
+		--cui-toned-control-border-color--highlighted: rgb(var(--cui-controls-650));
+
+		/* Toned:pressed = Filled:pressed */
+		--cui-toned-control-color--pressed: rgb(var(--cui-controls-600));
+		--cui-toned-control-background-color--pressed: rgba(var(--cui-controls-1000), 0.175);
+		--cui-toned-control-border-color--pressed: rgb(var(--cui-controls-800));
+	}
+}

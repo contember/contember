@@ -1,12 +1,12 @@
 import type { ComponentMeta, ComponentStory } from '@storybook/react'
 import * as React from 'react'
 import { Aether } from '../../src'
-import { disabledControlsFromAttributes } from './helpers'
+import { disabledControlsForAttributes } from './helpers'
 
 export default {
 	title: 'Aether',
 	component: Aether,
-  argTypes: disabledControlsFromAttributes(['children', 'ref', 'style']),
+  argTypes: disabledControlsForAttributes<typeof Aether>('children', 'ref', 'style'),
 } as ComponentMeta<typeof Aether>
 
 const Template: ComponentStory<typeof Aether> = args => <Aether {...args} />
@@ -15,7 +15,13 @@ export const Simple = Template.bind({})
 
 Simple.args = {
   style: { overflow: 'auto' },
-	children: <div style={{ background: '#FA0', margin: '2em', padding: '1em', textAlign: 'center' }}>
+	children: <div className="theme-warn scheme-light-above" style={{
+    background: 'var(--cui-background-color)',
+    color: 'var(--cui-color)',
+    margin: '2em',
+    padding: '1em',
+    textAlign: 'center',
+  }}>
     Aether is the container around this content.
   </div>,
 }

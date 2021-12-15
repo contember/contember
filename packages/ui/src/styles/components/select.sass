@@ -11,57 +11,45 @@
 	appearance: none
 	-moz-appearance: none
 	-webkit-appearance: none
+	padding-left: var(--cui-padding-horizontal)
+	padding-right: var(--cui-min-height)
 
 	&::-ms-expand
 		display: none
 
 	&-wrapper
+		--cui-min-height: var(--cui-control-height)
 		position: relative
 		width: 100%
-
-		&::before,
 		&::after
-			top: 50%
-			position: absolute
+			border: 3px solid var(--cui-color)
+			border-right-width: 0
+			border-top-width: 0
+			border-radius: 2px
+			bottom: 0
 			content: ''
 			display: block
-			background: $cui-select-chevron-background
+			height: calc(var(--cui-min-height) / 3)
+			margin: auto
+			opacity: var(--cui-opacity--medium)
+			position: absolute
+			right: calc(var(--cui-min-height) / 6)
+			top: 0
+			transform: rotate(-45deg)
+			width: calc(var(--cui-min-height) / 3)
 			pointer-events: none
-			z-index: 1
-		&::before
-			transform-origin: bottom right
-		&::after
 			transform-origin: bottom left
-
-		&:hover,
-		&:focus-within
-			&::before,
-			&::after
-				background: $cui-select-hover-chevron-background
-
-	@each $name, $settings in $cui-control-sizes
-		$height: map_get($settings, height)
-		$fontSize: map_get($settings, fontSize)
-
-		$view: toView($name)
-		$c: math.div($fontSize, 1em)
-		$normalizedHeight: math.div($height, $c)
-		$visualLineHeight: $normalizedHeight - 2 * math.div($cui-control-border-width, $c)
-		$actualLineHeight: $cui-base-lineHeight
-		$edgeOffset: ($visualLineHeight - $actualLineHeight) * 0.5
-
-		$paddingRight: $normalizedHeight
-		$chevronLineLength: $cui-select-chevron-height * $sqrt2
-		$chevronLineThickness: em(2px)
-		&#{$view}
-			padding-right: $paddingRight
-		&-wrapper#{$view}
-			&::before,
-			&::after
-				+size($chevronLineLength $chevronLineThickness)
-				right: (($paddingRight - $chevronLineLength) * 0.5)
-				border-radius: ($chevronLineThickness * 0.5)
-			&::before
-				transform: translate(-50%, -.5 * $chevronLineThickness + .5 * $cui-select-chevron-height) rotate(45deg)
-			&::after
-				transform: translate(50%, -.5 * $chevronLineThickness + .5 * $cui-select-chevron-height) rotate(-45deg)
+		&::before
+			background-color: var(--cui-color--lower)
+			content: ''
+			width: 1px
+			border-radius: 1px
+			position: absolute
+			top: 0.5em
+			bottom: 0.5em
+			right: var(--cui-min-height)
+			margin: auto
+			z-index: 1
+		&:hover::after,
+		&:focus-within::after
+			opacity: 1

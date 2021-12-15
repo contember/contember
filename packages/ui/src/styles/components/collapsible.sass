@@ -6,7 +6,7 @@
 	$root: &
 	$transition-timing-function: ease
 
-	--cui-collapsible-private-transition-duration: var(--cui-collapsible-transition-duration, #{$cui-collapsible-transition-duration})
+	--cui-collapsible-transition-duration: var(--cui-transition-duration--fast)
 	--cui-collapsible-transition-timing-function: #{$transition-timing-function}
 	--cui-collapsible-content-height: auto
 	visibility: hidden
@@ -14,11 +14,11 @@
 	display: flex
 	transition-property: height, width, opacity, visibility
 	transition-timing-function: var(--cui-collapsible-transition-timing-function)
-	transition-duration: var(--cui-collapsible-private-transition-duration)
+	transition-duration: var(--cui-collapsible-transition-duration)
 
 	@media (prefers-reduced-motion: reduce)
 		// 1 frame at 60 fps
-		--cui-collapsible-private-transition-duration: #{math.div(1s, 60)}
+		--cui-collapsible-transition-duration: #{math.div(1s, 60)}
 		--cui-collapsible-transition-timing-function: step-end
 
 	&.is-expanded
@@ -60,7 +60,7 @@
 		#{$root}-content
 			transition-property: transform
 			transition-timing-function: var(--cui-collapsible-transition-timing-function)
-			transition-duration: var(--cui-collapsible-private-transition-duration)
+			transition-duration: var(--cui-collapsible-transition-duration)
 			transform: translateX(-100%)
 
 	&.view-rightInsert

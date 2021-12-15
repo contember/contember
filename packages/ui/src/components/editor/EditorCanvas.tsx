@@ -1,8 +1,8 @@
-import cn from 'classnames'
-import type { ReactElement, ReactNode, TextareaHTMLAttributes } from 'react'
-import { IncreaseBoxDepth, useClassNamePrefix } from '../../auxiliary'
-import type { EditorCanvasSize, EditorCanvasDistinction } from '../../types'
-import { toEnumViewClass } from '../../utils'
+import classNames from 'classnames'
+import { memo, ReactElement, ReactNode, TextareaHTMLAttributes, useEffect, useRef, useState } from 'react'
+import { useClassNamePrefix } from '../../auxiliary'
+import type { EditorCanvasDistinction, EditorCanvasSize } from '../../types'
+import { toEnumStateClass, toEnumViewClass } from '../../utils'
 
 export interface EditorCanvasProps<P extends TextareaHTMLAttributes<HTMLDivElement>> {
 	underlyingComponent: (props: P) => ReactElement
@@ -10,11 +10,15 @@ export interface EditorCanvasProps<P extends TextareaHTMLAttributes<HTMLDivEleme
 	children?: ReactNode
 	size?: EditorCanvasSize
 	distinction?: EditorCanvasDistinction
+	inset?: 'hovering-toolbar'
 }
 
-// TODO add this to storybook
-export const EditorCanvas = (<P extends TextareaHTMLAttributes<HTMLDivElement>>({
+// Approximation: Toolbar height + vertical margin
+const toolbarVisibilityTreshold = 56 + 2 * 16
+
+export const EditorCanvas = memo(<P extends TextareaHTMLAttributes<HTMLDivElement>>({
 	children,
+	inset,
 	size,
 	distinction,
 	underlyingComponent: Component,
@@ -22,11 +26,39 @@ export const EditorCanvas = (<P extends TextareaHTMLAttributes<HTMLDivElement>>(
 }: EditorCanvasProps<P>) => {
 	const className = props.className
 	const prefix = useClassNamePrefix()
+
+	const [isInView, setIsInView] = useState(false)
+
+	const intersectionRef = useRef<HTMLDivElement>(null)
+	const observer = useRef(new IntersectionObserver(entries => {
+		entries.forEach(({ isIntersecting }) => {
+			setIsInView(isIntersecting)
+		})
+	}, {
+		rootMargin: `-${toolbarVisibilityTreshold}px 0px -${toolbarVisibilityTreshold}px 0px`,
+	}))
+
+	useEffect(() => {
+		const intersectionObserver = observer.current
+
+		if (intersectionRef.current) {
+			intersectionObserver.observe(intersectionRef.current)
+		}
+
+		return () => {
+			intersectionObserver.disconnect()
+		}
+	}, [])
+
 	return (
-		<div className={cn(`${prefix}editorCanvas`, toEnumViewClass(size), toEnumViewClass(distinction))}>
-			<IncreaseBoxDepth currentDepth={1}>
-				<Component {...props} className={cn(`${prefix}editorCanvas-canvas`, className)} />
-			</IncreaseBoxDepth>
+		<div ref={intersectionRef} className={classNames(
+			`${prefix}editorCanvas`,
+			toEnumViewClass(size),
+			toEnumViewClass(inset),
+			toEnumViewClass(distinction),
+			toEnumStateClass(isInView ? 'in-view' : 'not-in-view'),
+		)}>
+			<Component {...props} className={classNames(`${prefix}editorCanvas-canvas`, className)} />
 			{children}
 		</div>
 	)

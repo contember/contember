@@ -1,9 +1,9 @@
+import { Button, FormGroup, Section, Select, TextInput } from '@contember/ui'
 import { FC, SyntheticEvent, useState } from 'react'
-import { Box, BoxSection, Button, FormGroup, Select, TextInput } from '@contember/ui'
-import { useForm } from './useForm'
-import { useCreateProject } from '../hooks'
 import { useRedirect, useShowToast } from '../../components'
 import { RoutingLinkTarget } from '../../routing'
+import { useCreateProject } from '../hooks'
+import { useForm } from './useForm'
 
 const emptyForm = {
 	slug: '',
@@ -77,49 +77,47 @@ export const CreateProjectForm: FC<CreateProjectForm> = ({ projectListLink }) =>
 		}
 	}
 	return (
-		<Box heading={'Create a new project'}>
-			<form onSubmit={onSubmit}>
-				<BoxSection heading={false}>
-					<FormGroup label={'Project slug'}>
-						<TextInput {...register('slug')} pattern={'[a-z][-a-z0-9]*'} required />
-					</FormGroup>
-					<FormGroup label={'Project name'}>
-						<TextInput {...register('name')} placeholder={values.slug} />
-					</FormGroup>
-				</BoxSection>
-				<BoxSection heading={'Database credentials'}>
-					<p>You can leave some of this fields empty to use default values.</p>
-					<FormGroup label={'Host'}>
-						<TextInput {...register('dbHost')} />
-					</FormGroup>
-					<FormGroup label={'Port'}>
-						<TextInput {...register('dbPort')} />
-					</FormGroup>
-					<FormGroup label={'Database name'}>
-						<TextInput {...register('dbName')} />
-					</FormGroup>
-					<FormGroup label={'User'}>
-						<TextInput {...register('dbUser')} />
-					</FormGroup>
-					<FormGroup label={'Password'}>
-						<TextInput {...register('dbPassword')} />
-					</FormGroup>
-					<FormGroup label={'SSL'}>
-						<Select {...register('dbSsl')} options={[
-							{ value: '', label: 'default' },
-							{ value: 'yes', label: 'yes' },
-							{ value: 'no', label: 'no' },
-						]}/>
-					</FormGroup>
-				</BoxSection>
-				<BoxSection heading={false}>
-					<FormGroup label={undefined}>
-						<Button type={'submit'} intent={'primary'} disabled={isSubmitting}>
-							Create a project
-						</Button>
-					</FormGroup>
-				</BoxSection>
-			</form>
-		</Box>
+		<form onSubmit={onSubmit}>
+			<Section heading={'Create a new project'}>
+				<FormGroup label={'Project slug'}>
+					<TextInput {...register('slug')} pattern={'[a-z][-a-z0-9]*'} required />
+				</FormGroup>
+				<FormGroup label={'Project name'}>
+					<TextInput {...register('name')} placeholder={values.slug} />
+				</FormGroup>
+			</Section>
+
+			<Section heading={'Database credentials'}>
+				<p>You can leave some of this fields empty to use default values.</p>
+				<FormGroup label={'Host'}>
+					<TextInput {...register('dbHost')} />
+				</FormGroup>
+				<FormGroup label={'Port'}>
+					<TextInput {...register('dbPort')} />
+				</FormGroup>
+				<FormGroup label={'Database name'}>
+					<TextInput {...register('dbName')} />
+				</FormGroup>
+				<FormGroup label={'User'}>
+					<TextInput {...register('dbUser')} />
+				</FormGroup>
+				<FormGroup label={'Password'}>
+					<TextInput {...register('dbPassword')} />
+				</FormGroup>
+				<FormGroup label={'SSL'}>
+					<Select {...register('dbSsl')} options={[
+						{ value: '', label: 'default' },
+						{ value: 'yes', label: 'yes' },
+						{ value: 'no', label: 'no' },
+					]}/>
+				</FormGroup>
+			</Section>
+
+			<Section>
+				<Button type={'submit'} intent={'primary'} disabled={isSubmitting}>
+					Create a project
+				</Button>
+			</Section>
+		</form>
 	)
 }

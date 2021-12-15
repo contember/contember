@@ -1,5 +1,5 @@
 import { useClassNamePrefix } from '../../auxiliary'
-import { Button, ButtonGroup } from '../forms'
+import { Button, ButtonGroup } from '../Forms'
 import { Icon } from '../Icon'
 import { DevErrorInner, DevErrorInnerProps } from './DevErrorInner'
 

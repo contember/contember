@@ -1,9 +1,10 @@
 import { useDirtinessState, useMutationState } from '@contember/binding'
-import { Button, ButtonProps, FormGroup } from '@contember/ui'
-import { memo, useCallback, useMemo, useRef } from 'react'
+import { SaveButton, SaveButtonProps } from '@contember/ui'
+import { memo, useCallback, useRef } from 'react'
 import { usePersistWithFeedback } from '../../ui'
 
-export type PersistButtonProps = ButtonProps
+export type PersistButtonProps = Omit<SaveButtonProps, 'children' | 'isDirty'> & {
+}
 
 export const PersistButton = memo((props: PersistButtonProps) => {
 	const isMutating = useMutationState()
@@ -16,32 +17,22 @@ export const PersistButton = memo((props: PersistButtonProps) => {
 
 	const isDisabled = isMutating || !isDirty
 
-	const message = useMemo(
-		() => (
-			<div style={{ textAlign: 'center' }}>
-				{!isDirty ? 'There is nothing to submit.' : isMutating ? 'Submitting…' : 'There are unsaved changes.'}
-			</div>
-		),
-		[isDirty, isMutating],
-	)
-
 	if (!triggerPersist) {
 		return null
 	}
 	return (
-		<FormGroup label={undefined} size="large" description={message}>
-			<Button
-				intent={isDisabled ? 'default' : 'primary'}
-				onClick={onClick}
-				disabled={isDisabled}
-				isLoading={isMutating}
-				ref={buttonRef}
-				size="large"
-				flow="block"
-			>
-				{props.children || 'Save'}
-			</Button>
-		</FormGroup>
+		<SaveButton
+			ref={buttonRef}
+			disabled={isDisabled}
+			flow="block"
+			intent={isDisabled ? 'default' : 'primary'}
+			isDirty={isDirty}
+			isLoading={isMutating}
+			onClick={onClick}
+			scheme="dark"
+			size="large"
+			{...props}
+		/>
 	)
 })
 PersistButton.displayName = 'PersistButton'

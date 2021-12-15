@@ -1,30 +1,33 @@
 @import '../common'
 
 .#{$cui-conf-globalPrefix}dropdown
+	// Do not put any rules here:
 	// There is no .#{$cui-conf-globalPrefix}dropdown element in the markup!!
 
 	&-content
-		--cui-collapsible-transition-duration: #{$cui-dropdown-transition-duration}
-		color: $cui-dropdown-content-color
+		--cui-dropdown-content-boxShadow: 0 0 0 em(1px) rgba($cui-color-gray-8, .05), 0 em(1px) em(3px) 0 rgba($cui-color-gray-8, .15)
+		--cui-dropdown-button-content-gap-size: .3em
+
+		color: var(--cui-color)
 		z-index: $cui-dropdown-zIndex
 
 		&-in:not(.view-unstyled)
-			margin-top: $cui-dropdown-button-content-gap-size
-			border-radius: $cui-dropdown-content-border-radius
-			background: $cui-dropdown-content-background
-			box-shadow: $cui-dropdown-content-boxShadow
+			margin-top: var(--cui-dropdown-button-content-gap-size)
+			border-radius: var(--cui-control-border-radius)
+			background: var(--cui-background-color--above)
+			box-shadow: var(--cui-dropdown-content-boxShadow)
 
 		&[data-placement^="top"] &-in
-			margin-bottom: $cui-dropdown-button-content-gap-size
+			margin-bottom: var(--cui-dropdown-button-content-gap-size)
 
 		&[data-placement^="left"] &-in
-			margin-right: $cui-dropdown-button-content-gap-size
+			margin-right: var(--cui-dropdown-button-content-gap-size)
 
 		&[data-placement^="right"] &-in
-			margin-left: $cui-dropdown-button-content-gap-size
+			margin-left: var(--cui-dropdown-button-content-gap-size)
 
 		&.view-unstyled &-in
 			//
 
 	&-contentContainer
-		//
+		display: contents

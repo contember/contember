@@ -8,22 +8,26 @@
 	gap: .125em 0.5em
 	width: 100%
 
+	&:focus-within
+		color: var(--cui-control-color)
+
 	&-label
 		display: flex
 		flex-direction: column
-		gap: $cui-gap * 2
-		cursor: text
-
+		gap: calc(2 * var(--cui-gap))
 		&-wrap
 			display: flex
 			flex-direction: column
+
+	&:not(.is-active):not(:focus-within) &-label
+		color: var(--cui-color--high)
 
 	&-field
 		&-wrap
 			display: block
 		&-description
 			font-weight: $fw-light
-			color: $cui-formGroup-description-color
+			color: var(--cui-color--medium)
 			display: block
 			line-height: $cui-base-lineHeight
 

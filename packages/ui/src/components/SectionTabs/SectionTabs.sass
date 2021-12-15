@@ -1,15 +1,23 @@
 @import '../../styles/common'
 
 .#{$cui-conf-globalPrefix}section-tabs
-  margin-left: calc(-1 * var(--padding-horizontal, 0))
-  margin-right: calc(-1 * var(--padding-horizontal, 0))
-  margin-bottom: calc(-1 * var(--padding-vertical, 0))
+	--cui-tabs-padding-vertical: calc(3* var(--cui-gap, 0em))
+	--cui-tabs-padding-horizontal: calc(3* var(--cui-gap, 0em))
 
-  padding: 0 ($cui-gap * 2)
+	margin-bottom: calc(-1 * var(--cui-padding-vertical))
+	margin-left: calc(-1 * var(--cui-tabs-padding-horizontal))
+	margin-right: calc(-1 * var(--cui-tabs-padding-horizontal))
+	margin-top: calc(-1 * var(--cui-title-bar-gap, var(--cui-padding-vertical)))
+	padding-left: var(--cui-tabs-padding-horizontal)
+	padding-right: var(--cui-tabs-padding-horizontal)
 
-  @media (min-width: $min-width-break-point-tablet)
-    padding: 0 ($cui-gap * 6)
+	.is-meta
+		@media (min-width: $breakpoint-min-xlarge)
+			display: none
 
-  .is-meta
-    @media (min-width: $min-width-break-point-desktop)
-      display: none
+	&-content
+		display: inline-flex
+		flex-wrap: wrap
+		align-items: stretch
+		margin-left: calc(-3 * var(--cui-gap))
+		margin-right: calc(-3 * var(--cui-gap))

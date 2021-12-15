@@ -1,13 +1,17 @@
 import type { ComponentMeta, ComponentStory } from '@storybook/react'
 import * as React from 'react'
 import { RadioGroup } from '../../src'
+import { booleanControl, disabledControlsForAttributes, enumControl, stringControl } from './helpers'
 
 export default {
 	title: 'RadioGroup',
 	component: RadioGroup,
 	argTypes: {
-		isDisabled: { defaultValue: false },
-		isReadOnly: { defaultValue: false },
+		...disabledControlsForAttributes<typeof RadioGroup>('errors', 'options'),
+		name: stringControl('foo'),
+		isDisabled: booleanControl(false),
+		isReadOnly: booleanControl(false),
+		value: enumControl([undefined, null, 'alpha', 'beta'], 'radio', undefined),
 	},
 } as ComponentMeta<typeof RadioGroup>
 
@@ -34,7 +38,6 @@ Simple.args = {
 export const WithDescriptions = Template.bind({})
 
 WithDescriptions.args = {
-	name: 'foo',
 	options: [
 		{
 			value: 'alpha',

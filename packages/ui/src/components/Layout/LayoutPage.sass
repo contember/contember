@@ -1,79 +1,86 @@
 @import '../../styles/common'
 
 .#{$cui-conf-globalPrefix}layout-page
+	align-items: stretch
+	background-color: inherit
+	display: flex
+	flex-direction: column
+	flex-grow: 1
+	justify-content: flex-start
 
 	&-content-wrap
-		--section-padding-horizontal: #{($cui-gap * 12)}
-		--section-padding-vertical: #{($cui-gap * 4)}
-		--section-gap: #{$cui-gap * 4}
-
+		background-color: var(--cui-background-color)
 		display: flex
+		flex-basis: 100%
 		flex-direction: column
-		padding: var(--section-padding-vertical) var(--section-padding-horizontal)
-
-		@media (min-width: $min-width-break-point-tablet)
-			--section-padding-horizontal: #{($cui-gap * 8)}
-			--section-padding-vertical: #{($cui-gap * 8)}
-			--section-gap: #{$cui-gap * 8}
-	&-content
-		display: flex
-		flex-direction: column
-		flex-grow: 1
-		gap: var(--section-gap)
-	&-content-wrap
-		background-color: inherit
 		position: relative
 		z-index: 1
-	&-wrap
-		align-items: stretch
-		background-color: inherit
+	&-content
+		padding-top: var(--cui-layout-page-padding-top)
+		padding-left: var(--cui-layout-page-padding-left)
+		padding-right: var(--cui-layout-page-padding-right)
+		padding-bottom: var(--cui-layout-page-padding-bottom)
+		display: flex
+		flex-direction: row
+		flex-grow: 1
+		overflow: visible
+		&:not(:last-child)
+			padding-right: var(--cui-layout-section-padding-right)
+	&-content-container
 		display: flex
 		flex-direction: column
 		flex-grow: 1
-		justify-content: flex-start
-
+		gap: var(--cui-layout-section-gap)
 	&-aside
-		background-color: $cui-light-panel-background
+		background-color: var(--cui-background-color--above)
 		border-radius: unset
-		border-top: $cui-light-panel-border
-		margin-top: -1 * $cui-control-border-width
+		border-top: 1px solid var(--cui-color--lower)
+		margin-top: calc(-1 * var(--cui-control-border-width))
 		display: flex
 		flex-direction: column
-		padding: ($cui-gap * 12) ($cui-gap * 4)
-		padding-bottom: calc(#{$cui-gap * 12} + env(safe-area-inset-bottom))
+		padding-bottom: var(--cui-layout-section-padding-bottom)
+		padding-left: var(--cui-layout-page-padding-left)
+		padding-right: var(--cui-layout-page-padding-right)
+		padding-top: var(--cui-layout-section-padding-top)
 		width: auto
 		&-title
 			margin: 0
-
-	@media (min-width: $min-width-break-point-tablet)
+	@media (min-width: $breakpoint-min-medium)
+		[class$="container"] > [class$="control"]
+			min-width: 20em
+	@media (min-width: $breakpoint-min-large)
+		[class$="container"] > [class$="control"]
+			min-width: 25em
+		&-content-container
+			flex-grow: unset
+			margin-left: auto
+			margin-right: auto
+			flex-basis: $breakpoint-min-medium
+	@media (min-width: $breakpoint-min-xlarge)
+		height: 100vh
+		max-height: 100vh
+		&-content-wrap
+			flex-direction: row
+			overflow: hidden
+		&-content
+			overflow-y: auto
 		&-aside
-			padding: ($cui-gap * 8) ($cui-gap * 8)
+			background-color: unset
+			border-top: unset
+			flex-shrink: 0
+			margin-top: unset
+			max-width: 50%
+			overflow-y: auto
+			padding-left: var(--cui-layout-section-padding-left)
+			position: sticky
+			top: 0
 
-@media (min-width: $min-width-break-point-desktop)
+			// React-select override
+			[class$="container"] > [class$="control"]
+				min-width: 28.5em
+
+@media (min-width: $breakpoint-min-xlarge)
 	html
 		height: 100vh
 		margin: 0
 		padding: 0
-
-	.#{$cui-conf-globalPrefix}layout-page
-		&-wrap
-			height: 100vh
-			max-height: 100vh
-
-		&-content-wrap
-			flex-direction: row
-			overflow: hidden
-
-		&-content
-			overflow-y: auto
-
-		&-aside
-			background-color: unset
-			overflow-y: auto
-			border-top: unset
-			margin-top: unset
-			border-left: $cui-light-panel-border
-			flex-shrink: 0
-			position: sticky
-			top: 0
-			width: $cui-layout-sidebar-width

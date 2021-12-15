@@ -19,7 +19,6 @@ import { ApiEndpointResolver } from './services/ApiEndpointResolver'
 import { BadRequestError } from './BadRequestError'
 import { S3LocationResolver } from './services/S3LocationResolver'
 import { readHostFromHeader } from './utils/readHostFromHeader'
-import { ProjectListProvider } from './services/ProjectListProvider'
 import { CollaborationController } from './controllers/CollaborationController'
 import { CollaborationRedisKeys, CollaborationRedisStorage } from './services/CollaborationStorage'
 
@@ -76,16 +75,12 @@ export default new Builder({})
 		return new S3Manager(s3Client, s3LocationResolver)
 	})
 
-	.addService('projectListProvider', ({ tenant, s3 }) => {
-		return new ProjectListProvider(tenant, s3)
-	})
-
 	.addService('staticFileHandler', ({ env }) => {
 		return new StaticFileHandler(env.CONTEMBER_PUBLIC_DIR)
 	})
 
-	.addService('loginController', ({ staticFileHandler, projectListProvider }) => {
-		return new LoginController(staticFileHandler, projectListProvider)
+	.addService('loginController', ({ staticFileHandler, s3 }) => {
+		return new LoginController(staticFileHandler, s3)
 	})
 
 	.addService('deployController', ({ tenant, s3 }) => {
@@ -96,8 +91,8 @@ export default new Builder({})
 		return new ProjectController(tenant, s3)
 	})
 
-	.addService('apiController', ({ env, projectListProvider, apiEndpointResolver }) => {
-		return new ApiController(apiEndpointResolver, env.CONTEMBER_LOGIN_TOKEN, projectListProvider)
+	.addService('apiController', ({ env, apiEndpointResolver }) => {
+		return new ApiController(apiEndpointResolver, env.CONTEMBER_LOGIN_TOKEN)
 	})
 
 	.addService('meController', ({ tenant, s3 }) => {

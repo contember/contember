@@ -1,5 +1,5 @@
 export const dataGridCellsDictionary = {
-	dataGirdCells: {
+	dataGridCells: {
 		booleanCell: {
 			includeTrue: 'Yes',
 			includeFalse: 'No',

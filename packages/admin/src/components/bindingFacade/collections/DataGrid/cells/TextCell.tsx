@@ -84,10 +84,10 @@ export const TextCell: FunctionComponent<TextCellProps> = Component(props => {
 						>
 							<span style={{ whiteSpace: 'nowrap' }}>
 								{filter.mode === 'doesNotMatch'
-									? formatMessage('dataGirdCells.textCell.excludeNull', {
+									? formatMessage('dataGridCells.textCell.excludeNull', {
 											strong: chunks => <strong>{chunks}</strong>,
 									  })
-									: formatMessage('dataGirdCells.textCell.includeNull', {
+									: formatMessage('dataGridCells.textCell.includeNull', {
 											strong: chunks => <strong>{chunks}</strong>,
 									  })}
 							</span>

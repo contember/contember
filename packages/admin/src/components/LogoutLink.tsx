@@ -1,4 +1,4 @@
-import { ComponentType, FunctionComponent, memo, useCallback } from 'react'
+import { ComponentType, FunctionComponent, memo, ReactNode } from 'react'
 import { useLogout } from './Identity'
 
 interface InnerProps {
@@ -7,6 +7,7 @@ interface InnerProps {
 
 export interface LogoutLinkProps {
 	Component?: ComponentType<InnerProps>
+	children?: ReactNode
 }
 
 

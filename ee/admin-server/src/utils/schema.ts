@@ -19,7 +19,7 @@ export interface Type<T extends Json> {
 
 export class ParseError extends Error {
 	constructor(readonly input: unknown, readonly path: PropertyKey[], readonly expected: string) {
-		super(`${path.join('/')} must be ${expected}, ${typeof input} given`)
+		super(`${path.join('/')} must be ${expected}, ${input === null ? 'null' : typeof input} given`)
 	}
 }
 

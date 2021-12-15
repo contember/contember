@@ -10,7 +10,7 @@ import { Toaster, ToasterProvider } from './Toaster'
 
 export interface ApplicationEntrypointProps extends ContemberClientProps {
 	basePath?: string
-	sessionToken: string
+	sessionToken?: string
 	routes: RouteMap
 	defaultDimensions?: SelectedDimension
 	defaultLocale?: string
@@ -22,10 +22,6 @@ export interface ApplicationEntrypointProps extends ContemberClientProps {
 
 const validateProps = (props: Partial<ApplicationEntrypointProps>) => {
 	if (typeof props.apiBaseUrl !== 'string') {
-		throw new Error(`The ENV variables haven't been set. Check your \`.env.development.local\` file.`) // TODO: better message
-	}
-
-	if (typeof props.sessionToken !== 'string') {
 		throw new Error(`The ENV variables haven't been set. Check your \`.env.development.local\` file.`) // TODO: better message
 	}
 }

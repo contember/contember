@@ -13,17 +13,6 @@ const ProjectBySlugResponseType = object({
 	}),
 })
 
-const ProjectListResponseType = object({
-	data: object({
-		projects: array(
-			object({
-				slug: string,
-				name: string,
-			}),
-		),
-	}),
-})
-
 const MeResponseType = object({
 	data: object({
 		me: object({
@@ -91,27 +80,6 @@ export class TenantClient {
 		return payload.data.projectBySlug !== null
 	}
 
-	async listAccessibleProjects(token: string, projectGroup: string | undefined) {
-		const response = await this.request({
-			token,
-			projectGroup,
-			query: `
-				query {
-					projects {
-						slug
-						name
-					}
-				}
-			`,
-		})
-
-		if (!response.ok) {
-			return null
-		}
-
-		const payload = ProjectListResponseType(await response.json())
-		return payload.data.projects
-	}
 
 	async getMe(token: string, projectGroup: string | undefined) {
 		const response = await this.request({

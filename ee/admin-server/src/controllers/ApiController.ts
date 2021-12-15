@@ -1,9 +1,8 @@
-import { request as httpRequest, IncomingMessage, OutgoingHttpHeaders, ServerResponse } from 'http'
+import { IncomingMessage, OutgoingHttpHeaders, request as httpRequest, ServerResponse } from 'http'
 import { request as httpsRequest, RequestOptions } from 'https'
 import { BaseController } from './BaseController'
 import { ApiEndpointResolver } from '../services/ApiEndpointResolver'
 import { BadRequestError } from '../BadRequestError'
-import { ProjectListProvider } from '../services/ProjectListProvider'
 import { readAuthCookie, writeAuthCookie } from '../utils/cookies'
 
 export const LOGIN_TOKEN_PLACEHOLDER = '__LOGIN_TOKEN__'
@@ -18,7 +17,6 @@ export class ApiController extends BaseController<ApiParams> {
 	constructor(
 		private apiEndpointResolver: ApiEndpointResolver,
 		private loginToken: string,
-		private projectListProvider: ProjectListProvider,
 	) {
 		super()
 	}
@@ -45,45 +43,41 @@ export class ApiController extends BaseController<ApiParams> {
 		}
 
 		const driver = endpoint.protocol === 'http:' ? httpRequest : httpsRequest
-		req.pipe(
-			driver(innerRequestOptions, async innerRes => {
-				if (typeof tokenPath !== 'string') {
-					this.proxyOugoingHead(res, innerRes)
-					innerRes.pipe(res)
-					return
-				}
-
-				const rawBody = await this.readRawBody(innerRes)
-				const textBody = rawBody.toString('utf8')
-
-				let jsonBody: any
-				let token: string | undefined
-
-				try {
-					[jsonBody, token] = this.extractToken(JSON.parse(textBody), tokenPath.split('.'))
-
-				} catch (e) {
-					this.proxyOugoingHead(res, innerRes)
-					res.end(rawBody)
-					return
-				}
-
-				if (token === undefined || typeof jsonBody !== 'object' || jsonBody === null) {
-					this.proxyOugoingHead(res, innerRes)
-					res.end(rawBody)
-					return
-				}
-
-				jsonBody['extensions'] ??= {}
-				jsonBody['extensions']['contemberAdminServer'] = { projects: await this.projectListProvider.get(params.projectGroup, token) }
-
-				writeAuthCookie(req, res, token)
+		const innerReq = driver(innerRequestOptions, async innerRes => {
+			if (typeof tokenPath !== 'string') {
 				this.proxyOugoingHead(res, innerRes)
-				res.end(JSON.stringify(jsonBody))
-			}),
-		)
+				innerRes.pipe(res)
+				return
+			}
+
+			const rawBody = await this.readRawBody(innerRes)
+			const textBody = rawBody.toString('utf8')
+
+			let jsonBody: any
+			let token: string | undefined
+
+			try {
+				[jsonBody, token] = this.extractToken(JSON.parse(textBody), tokenPath.split('.'))
+
+			} catch (e) {
+				this.proxyOugoingHead(res, innerRes)
+				res.end(rawBody)
+				return
+			}
+
+			if (token === undefined || typeof jsonBody !== 'object' || jsonBody === null) {
+				this.proxyOugoingHead(res, innerRes)
+				res.end(rawBody)
+				return
+			}
+			writeAuthCookie(req, res, token)
+			this.proxyOugoingHead(res, innerRes)
+			res.end(JSON.stringify(jsonBody))
+		})
+		req.pipe(innerReq)
 
 		return new Promise((resolve, reject) => {
+			innerReq.on('error', reject)
 			res.on('error', error => reject(error))
 			res.on('finish', () => resolve())
 		})

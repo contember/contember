@@ -1,8 +1,10 @@
-import { useSessionToken } from '@contember/react-client'
-import { AnchorButton, ContainerSpinner, Message } from '@contember/ui'
 import { createContext, useCallback, useEffect, useMemo, useState } from 'react'
-import { useTenantMe } from '../../tenant/hooks/me'
+import { useSessionToken } from '@contember/react-client'
+import { useFetchMe } from '../../tenant'
+import { ContainerSpinner, Message } from '@contember/ui'
 import { MiscPageLayout } from '../MiscPageLayout'
+import { InvalidIdentityFallback } from './InvalidIdentityFallback'
+import { useLogout } from './useLogout'
 
 export interface Identity {
 	email: string
@@ -13,6 +15,7 @@ export interface Identity {
 
 export interface IdentityProject {
 	slug: string
+	name: string
 	roles: string[]
 }
 
@@ -25,27 +28,41 @@ export const IdentityContext = createContext<IdentityContext | undefined>(undefi
 export const IdentityRefreshContext = createContext<(() => void)>(() => {
 	throw new Error('IdentityRefreshContext is not initialized')
 })
-export const IdentityProvider: React.FC<{onInvalidIdentity?: () => void }> = ({ children, onInvalidIdentity }) => {
+
+interface IdentityProviderProps {
+	onInvalidIdentity?: () => void
+	allowUnauthenticated?: boolean
+}
+
+type IdentityState =
+	| 'none'
+	| 'loading'
+	| 'failed'
+	| 'success'
+	| 'cleared'
+
+export const IdentityProvider: React.FC<IdentityProviderProps> = ({ children, onInvalidIdentity, allowUnauthenticated }) => {
 	const [identity, setIdentity] = useState<Identity>()
-	const [identityCleared, setIdentityCleared] = useState(false)
 	const sessionToken = useSessionToken()
-	const { state: me, refetch } = useTenantMe()
+	const fetchMe = useFetchMe()
+	const [identityState, setIdentityState] = useState<IdentityState>(sessionToken ? 'loading' : 'none')
 
-	useEffect(() => {
-		if (me.state === 'error' && onInvalidIdentity) {
-			onInvalidIdentity()
-		}
-	}, [me.state, onInvalidIdentity])
+	const logout = useLogout()
 
-
-	useEffect(
+	const clearIdentity = useCallback(
 		() => {
-			if (me.state !== 'success' || sessionToken === undefined) {
-				return
-			}
+			setIdentity(undefined)
+			setIdentityState('cleared')
+		},
+		[],
+	)
 
-			const person = me.data.me.person
-			const projects = me.data.me.projects
+	const refetch = useCallback(async () => {
+		setIdentityState('loading')
+		try {
+			const response = await fetchMe()
+			const person = response.data.me.person
+			const projects = response.data.me.projects
 
 			setIdentity({
 				email: person.email,
@@ -57,24 +74,52 @@ export const IdentityProvider: React.FC<{onInvalidIdentity?: () => void }> = ({ 
 					roles: it.memberships.map(it => it.role),
 				})),
 			})
+			setIdentityState('success')
+		} catch (e) {
+			console.error(e)
+			if ('status' in e && e.status === 401) {
+				onInvalidIdentity?.()
+				logout({ noRedirect: true })
+				clearIdentity()
+				if (window.location.pathname !== '/') {
+					window.location.href = '/' // todo better redirect?
+				}
+			} else {
+				setIdentityState('failed')
+			}
+		}
+	}, [clearIdentity, fetchMe, logout, onInvalidIdentity])
+
+
+	useEffect(
+		() => {
+			if (sessionToken === undefined) {
+				setIdentityState('none')
+				if (!allowUnauthenticated) {
+					window.location.href = '/' // todo better redirect?
+				}
+				return
+			}
 		},
-		[sessionToken, me],
+		[sessionToken, allowUnauthenticated],
 	)
 
-	const clearIdentity = useCallback(
+	useEffect(
 		() => {
-			setIdentity(undefined)
-			setIdentityCleared(true)
+			if (sessionToken !== undefined) {
+				refetch()
+			}
 		},
-		[],
+		[sessionToken, refetch],
 	)
+
 
 	const identityContextValue = useMemo(
 		() => identity ? { clearIdentity, identity } : undefined,
 		[identity, clearIdentity],
 	)
 
-	if (identityCleared) {
+	if (identityState === 'cleared') {
 		return (
 			<MiscPageLayout>
 				<Message size="large" flow="generousBlock">Logging out&hellip;</Message>
@@ -82,16 +127,11 @@ export const IdentityProvider: React.FC<{onInvalidIdentity?: () => void }> = ({ 
 		)
 	}
 
-	if (me.state === 'error') {
-		return (
-			<MiscPageLayout>
-				<Message intent="danger" size="large" flow="generousBlock">Failed to fetch an identity</Message>
-				<AnchorButton style={{ margin: '0 auto', display: 'block', textAlign: 'center', maxWidth: '100px' }} href={window.location.href}>Reload</AnchorButton>
-			</MiscPageLayout>
-		)
+	if (identityState === 'failed') {
+		return <InvalidIdentityFallback />
 	}
 
-	if (!identity) {
+	if (identityState === 'loading' || (!allowUnauthenticated && identityState === 'none')) {
 		return <ContainerSpinner />
 	}
 

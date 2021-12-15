@@ -2,19 +2,24 @@ import {
 	ApiKeyList,
 	ApplicationEntrypoint,
 	Box,
+	ChangePassword,
 	CreateApiKeyForm,
 	CreateProjectForm,
-	EditUser,
+	EditIdentity,
 	GenericPage,
 	InviteUser,
-	LayoutChrome, LayoutPage, Menu,
+	LayoutChrome,
+	LayoutPage,
+	Menu,
 	NavigateBackButton,
-	Page, PageLinkButton,
+	OtpManagement,
+	Page,
+	PageLinkButton,
 	Pages,
 	ProjectsGrid,
 	runReactApp,
+	TitleBar,
 	UsersList,
-	OtpManagement, ChangePassword,
 } from '@contember/admin'
 import { FC } from 'react'
 import './index.sass'
@@ -45,7 +50,6 @@ const PanelLayout: FC = props => {
 
 runReactApp(
 	<ApplicationEntrypoint
-		sessionToken={'__SESSION_TOKEN__'}
 		apiBaseUrl={'/_api'}
 		basePath={'/_panel/'}
 		onInvalidIdentity={() => {
@@ -138,7 +142,7 @@ runReactApp(
 						>Users</NavigateBackButton>}
 						title={`Edit membership in project ${project}`}
 					>
-						<EditUser
+						<EditIdentity
 							project={project}
 							identityId={identity}
 							userListLink={{ pageName: 'projectOverview', parameters: { project } }}

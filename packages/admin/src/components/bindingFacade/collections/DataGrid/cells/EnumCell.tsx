@@ -1,9 +1,9 @@
 import { ChangeEvent, useCallback } from 'react'
-import { DataGridCellPublicProps, DataGridColumn } from '../base'
+import { DataGridColumn, DataGridColumnPublicProps } from '../base'
 import { Component, QueryLanguage, SugaredField, SugaredFieldProps, wrapFilterInHasOnes } from '@contember/binding'
 
 export type EnumCellProps =
-	& DataGridCellPublicProps
+	& DataGridColumnPublicProps
 	& {
 		field: SugaredFieldProps['field']
 		options: Record<string, string>

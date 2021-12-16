@@ -35,46 +35,42 @@ interface IdentityProviderProps {
 }
 
 type IdentityState =
-	| 'none'
-	| 'loading'
-	| 'failed'
-	| 'success'
-	| 'cleared'
+	| { state: 'none' }
+	| { state: 'loading'}
+	| { state: 'failed'}
+	| { state: 'success', identity: Identity }
+	| { state: 'cleared'}
 
 export const IdentityProvider: React.FC<IdentityProviderProps> = ({ children, onInvalidIdentity, allowUnauthenticated }) => {
-	const [identity, setIdentity] = useState<Identity>()
 	const sessionToken = useSessionToken()
 	const fetchMe = useFetchMe()
-	const [identityState, setIdentityState] = useState<IdentityState>(sessionToken ? 'loading' : 'none')
+
+	const [identityState, setIdentityState] = useState<IdentityState>(() => ({ state: sessionToken ? 'loading' : 'none' }))
 
 	const logout = useLogout()
 
-	const clearIdentity = useCallback(
-		() => {
-			setIdentity(undefined)
-			setIdentityState('cleared')
-		},
-		[],
-	)
+	const clearIdentity = useCallback(() => setIdentityState({ state: 'cleared' }), [])
 
 	const refetch = useCallback(async () => {
-		setIdentityState('loading')
+		setIdentityState({ state: 'loading' })
 		try {
 			const response = await fetchMe()
 			const person = response.data.me.person
 			const projects = response.data.me.projects
 
-			setIdentity({
-				email: person.email,
-				otpEnabled: person.otpEnabled,
-				personId: person.id,
-				projects: projects.map(it => ({
-					name: it.project.name,
-					slug: it.project.slug,
-					roles: it.memberships.map(it => it.role),
-				})),
+			setIdentityState({
+				state: 'success',
+				identity: {
+					email: person.email,
+					otpEnabled: person.otpEnabled,
+					personId: person.id,
+					projects: projects.map(it => ({
+						name: it.project.name,
+						slug: it.project.slug,
+						roles: it.memberships.map(it => it.role),
+					})),
+				},
 			})
-			setIdentityState('success')
 		} catch (e) {
 			console.error(e)
 			if ('status' in e && e.status === 401) {
@@ -85,7 +81,7 @@ export const IdentityProvider: React.FC<IdentityProviderProps> = ({ children, on
 					window.location.href = '/' // todo better redirect?
 				}
 			} else {
-				setIdentityState('failed')
+				setIdentityState({ state: 'failed' })
 			}
 		}
 	}, [clearIdentity, fetchMe, logout, onInvalidIdentity])
@@ -94,7 +90,7 @@ export const IdentityProvider: React.FC<IdentityProviderProps> = ({ children, on
 	useEffect(
 		() => {
 			if (sessionToken === undefined) {
-				setIdentityState('none')
+				setIdentityState({ state: 'none' })
 				if (!allowUnauthenticated) {
 					window.location.href = '/' // todo better redirect?
 				}
@@ -115,11 +111,11 @@ export const IdentityProvider: React.FC<IdentityProviderProps> = ({ children, on
 
 
 	const identityContextValue = useMemo(
-		() => identity ? { clearIdentity, identity } : undefined,
-		[identity, clearIdentity],
+		() => identityState.state === 'success' ? { clearIdentity, identity: identityState.identity } : undefined,
+		[identityState, clearIdentity],
 	)
 
-	if (identityState === 'cleared') {
+	if (identityState.state === 'cleared') {
 		return (
 			<MiscPageLayout>
 				<Message size="large" flow="generousBlock">Logging out&hellip;</Message>
@@ -127,11 +123,11 @@ export const IdentityProvider: React.FC<IdentityProviderProps> = ({ children, on
 		)
 	}
 
-	if (identityState === 'failed') {
+	if (identityState.state === 'failed') {
 		return <InvalidIdentityFallback />
 	}
 
-	if (identityState === 'loading' || (!allowUnauthenticated && identityState === 'none')) {
+	if (identityState.state === 'loading' || (!allowUnauthenticated && identityState.state === 'none')) {
 		return <ContainerSpinner />
 	}
 

@@ -81,6 +81,7 @@ export class QueryLanguage {
 	public static desugarUniqueWhere = QueryLanguage.preparePrimitiveEntryPointWithFallback('uniqueWhere')
 	public static desugarFilter = QueryLanguage.preparePrimitiveEntryPointWithFallback('filter')
 	public static desugarOrderBy = QueryLanguage.preparePrimitiveEntryPointWithFallback('orderBy')
+	public static desugarTaggedMap = QueryLanguage.preparePrimitiveEntryPointWithFallback('taggedMap')
 
 
 	private static desugarEntityListParameters(

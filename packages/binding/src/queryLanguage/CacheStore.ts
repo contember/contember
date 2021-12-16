@@ -50,6 +50,7 @@ export class CacheStore {
 			uniqueWhere: new LRUCache(100),
 			filter: new LRUCache(100),
 			orderBy: new LRUCache(50),
+			taggedMap: new LRUCache(50),
 		}
 	}
 }

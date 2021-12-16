@@ -1,14 +1,12 @@
 import { CrudQueryBuilder, GraphQlBuilder, GraphQlLiteral, Input } from '@contember/client'
 import { EmbeddedActionsParser, Lexer } from 'chevrotain'
 import { Environment } from '../dao'
+import type { EntityName, FieldName, Filter, OrderBy, UniqueWhere } from '../treeParameters'
 import type {
-	EntityName,
-	FieldName,
-	Filter,
-	OrderBy,
-	UniqueWhere,
-} from '../treeParameters'
-import type {
+	ParsedTaggedMap,
+	ParsedTaggedMapVariableValue,
+	ParsedTaggedMapLiteralValue,
+	ParsedTaggedMapEntry,
 	ParsedHasManyRelation,
 	ParsedHasOneRelation,
 	ParsedQualifiedEntityList,
@@ -533,6 +531,73 @@ class Parser extends EmbeddedActionsParser {
 		return order
 	})
 
+	private taggedMap: () => ParsedTaggedMap = this.RULE<ParsedTaggedMap>('taggedMap', () => {
+		const name = this.SUBRULE(this.identifier)
+		return {
+			name,
+			entries: this.OPTION(() => this.SUBRULE(this.taggedMapEntries)) ?? [],
+		}
+	})
+
+	private taggedMapEntries: () => ParsedTaggedMapEntry[] = this.RULE<ParsedTaggedMapEntry[]>('taggedMapEntries', () => {
+		this.CONSUME(tokens.LeftParenthesis)
+		const entries: ParsedTaggedMapEntry[] = []
+		this.AT_LEAST_ONE_SEP({
+			SEP: tokens.Comma,
+			DEF: () => entries.push(this.SUBRULE(this.taggedMapEntry)),
+		})
+		this.CONSUME(tokens.RightParenthesis)
+
+		return entries
+	})
+
+	private taggedMapEntry: () => ParsedTaggedMapEntry = this.RULE<ParsedTaggedMapEntry>('taggedMapEntry', () => {
+		const variableName = this.CONSUME(tokens.Identifier).image
+		this.CONSUME1(tokens.Colon)
+		const value = this.OR([
+			{
+				ALT: () => this.SUBRULE(this.taggedMapLiteralValue),
+			},
+			{
+				ALT: () => this.SUBRULE(this.taggedMapVariableValue),
+			},
+		])
+
+		return {
+			key: variableName,
+			value,
+		}
+	})
+
+	private taggedMapLiteralValue: () => ParsedTaggedMapLiteralValue = this.RULE<ParsedTaggedMapLiteralValue>('taggedMapLiteralValue', () => {
+		const value = this.OR([
+			{
+				ALT: () => this.SUBRULE(this.string),
+			},
+			{
+				ALT: () => this.SUBRULE(this.number),
+			},
+		])
+
+		return {
+			type: 'literal',
+			value,
+		}
+	})
+
+	private taggedMapVariableValue: () => ParsedTaggedMapVariableValue = this.RULE<ParsedTaggedMapVariableValue>('taggedMapVariableValue', () => {
+		const start = this.CONSUME(tokens.DollarSign)
+		this.SUBRULE(this.relativeSingleField)
+		const end = this.LA(0)
+		const field = this.input.slice(this.input.indexOf(start) + 1, this.input.indexOf(end) + 1).map(it => it.image).join('')
+
+		return {
+			type: 'variable',
+			value: field,
+		}
+	})
+
+
 	private fieldName: () => FieldName = this.RULE<FieldName>('fieldName', () => {
 		return this.OR([
 			{
@@ -732,6 +797,9 @@ class Parser extends EmbeddedActionsParser {
 			case 'orderBy':
 				expression = Parser.parser.orderBy()
 				break
+			case 'taggedMap':
+				expression = Parser.parser.taggedMap()
+				break
 			default:
 				throw new QueryLanguageError(`Not implemented entry point '${entry}'`)
 		}
@@ -771,6 +839,7 @@ namespace Parser {
 		uniqueWhere: UniqueWhere // E.g. (author.mother.id = 123)
 		filter: Filter // E.g. [author.son.age < 123]
 		orderBy: OrderBy // E.g. items.order asc, items.content.name asc
+		taggedMap: ParsedTaggedMap // E.g editUser(id: $entity.id, foo: 'bar')
 	}
 
 	export type EntryPoint = keyof ParserResult

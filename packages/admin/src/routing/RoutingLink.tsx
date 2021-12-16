@@ -8,7 +8,8 @@ import {
 	ReactNode,
 	useCallback,
 } from 'react'
-import { RoutingLinkTarget, useRoutingLink } from './useRoutingLink'
+import { useRoutingLink } from './useRoutingLink'
+import { RequestParameters, RoutingLinkTarget, RoutingParameterResolver } from './types'
 
 
 const defaultComponent: FunctionComponent<InnerRoutingLinkProps> = ({ isActive, ...props }) => (
@@ -16,8 +17,8 @@ const defaultComponent: FunctionComponent<InnerRoutingLinkProps> = ({ isActive, 
 	<a {...props} />
 )
 
-export const RoutingLink = memo<RoutingLinkProps & PublicAnchorProps>(({ onClick, to, Component, ...props }) => {
-	const { navigate, isActive, href } = useRoutingLink(to)
+export const RoutingLink = memo<RoutingLinkProps & PublicAnchorProps>(({ onClick, to, parametersResolver, parameters, Component, ...props }) => {
+	const { navigate, isActive, href } = useRoutingLink(to, parametersResolver, parameters)
 
 	const innerOnClick = useCallback((e?: ReactMouseEvent<HTMLAnchorElement, MouseEvent>) => {
 		if (e) {
@@ -50,4 +51,6 @@ export interface RoutingLinkProps {
 	Component?: ComponentType<InnerRoutingLinkProps>
 	children?: ReactNode
 	to: RoutingLinkTarget
+	parametersResolver?: RoutingParameterResolver
+	parameters?: RequestParameters
 }

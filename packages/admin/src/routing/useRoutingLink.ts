@@ -1,8 +1,16 @@
 import { BaseSyntheticEvent, useCallback, useMemo } from 'react'
-import { RequestChange, RequestState } from './types'
+import {
+	DynamicRequestParameters,
+	IncompleteRequestState,
+	RequestParameters,
+	RoutingParameterResolver,
+	RequestChange,
+	RequestState, RoutingLinkTarget,
+} from './types'
 import { requestChangeFactory, useCurrentRequest, usePushRequest } from './RequestContext'
 import { useRouting } from './RoutingContext'
-import { requestStateToPath } from './urlMapper'
+import { PageNotFound, requestStateToPath } from './urlMapper'
+import { RoutingParameter } from './RoutingParameter'
 
 export interface RoutingLinkParams {
 	href: string
@@ -10,7 +18,6 @@ export interface RoutingLinkParams {
 	isActive: boolean
 }
 
-export type RoutingLinkTarget = string | RequestChange | (Partial<RequestState> & { pageName: string })
 
 export const isRoutingLinkTarget = (value: unknown): value is RoutingLinkTarget => {
 	return typeof value === 'string'
@@ -18,7 +25,7 @@ export const isRoutingLinkTarget = (value: unknown): value is RoutingLinkTarget 
 		|| (typeof value === 'object' && value !== null && 'pageName' in value)
 }
 
-const targetToRequest = (target: RoutingLinkTarget, currentRequest: RequestState): RequestState => {
+export const targetToRequest = (target: RoutingLinkTarget, currentRequest: RequestState): IncompleteRequestState | null => {
 	if (typeof target === 'string') {
 		return requestChangeFactory(target, {})(currentRequest)
 	}
@@ -28,20 +35,43 @@ const targetToRequest = (target: RoutingLinkTarget, currentRequest: RequestState
 	if (target === null) {
 		return null
 	}
-	return {
-		pageName: target.pageName,
-		parameters: target.parameters ?? {},
-		dimensions: target.dimensions ?? currentRequest?.dimensions ?? {},
-	}
+	return target
 }
 
-export const useRoutingLinkFactory = () => {
+const resolveParameters = (parameters: DynamicRequestParameters, resolveParameter: RoutingParameterResolver): RequestParameters => {
+	return Object.fromEntries(Object.entries(parameters).map(([name, value]) => {
+		if (value instanceof RoutingParameter) {
+			return [name, resolveParameter(value.name)]
+		}
+		return [name, value]
+	}))
+}
+
+export const useRoutingLinkFactory = (parametersResolver?: RoutingParameterResolver) => {
 	const currentRequest = useCurrentRequest()
 	const routing = useRouting()
 	const pushRequest = usePushRequest()
 
-	return useCallback((target: RoutingLinkTarget): RoutingLinkParams => {
-		const request = targetToRequest(target, currentRequest)
+	return useCallback((target: RoutingLinkTarget, parameters?: RequestParameters): RoutingLinkParams => {
+		const tmpRequest = targetToRequest(target, currentRequest)
+		const request = tmpRequest === null ? null : {
+			pageName: tmpRequest.pageName,
+			dimensions: tmpRequest.dimensions ?? currentRequest?.dimensions ?? {},
+			parameters: resolveParameters(tmpRequest.parameters ?? {}, param => {
+				if (param.startsWith('request.')) {
+					return currentRequest?.parameters[param.slice('request.'.length)]
+				}
+				if (parameters && (param in parameters)) {
+					return parameters[param]
+				}
+
+				if (!parametersResolver) {
+					throw new PageNotFound(`Routing parameter ${param} not found`)
+				}
+
+				return parametersResolver?.(param)
+			}),
+		}
 		let href: string
 		try {
 			href = requestStateToPath(routing, request)
@@ -59,12 +89,12 @@ export const useRoutingLinkFactory = () => {
 				pushRequest(request)
 			},
 		}
-	}, [currentRequest, pushRequest, routing])
+	}, [currentRequest, parametersResolver, pushRequest, routing])
 }
 
-export const useRoutingLink = (target: RoutingLinkTarget) => {
-	const linkFactory = useRoutingLinkFactory()
+export const useRoutingLink = (target: RoutingLinkTarget, parametersResolver?: RoutingParameterResolver, parameters?: RequestParameters) => {
+	const linkFactory = useRoutingLinkFactory(parametersResolver)
 	return useMemo(() => {
-		return linkFactory(target)
-	}, [target, linkFactory])
+		return linkFactory(target, parameters)
+	}, [linkFactory, parameters, target])
 }

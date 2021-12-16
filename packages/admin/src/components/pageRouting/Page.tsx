@@ -16,7 +16,7 @@ export const Page = <P extends unknown = any>(props: PageProps<P>) => {
 		return null
 	}
 
-	return typeof props.children === 'function' ? <props.children {...request.parameters} /> : <>{props.children}</>
+	return typeof props.children === 'function' ? <props.children {...request.parameters as any} /> : <>{props.children}</>
 }
 
 Page.displayName = 'Page'

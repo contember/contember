@@ -1,11 +1,11 @@
 import { createContext, FC, useCallback, useContext, useEffect, useState } from 'react'
-import { PageParameters, PageRequest, RequestChange, RequestState } from './types'
+import { RequestParameters, PageRequest, RequestChange, RequestState } from './types'
 import { RoutingContextValue, useRouting } from './RoutingContext'
 import { pathToRequestState, requestStateToPath } from './urlMapper'
 
 
 export const requestChangeFactory =
-	<P extends PageParameters>(pageName: string, parameters?: P): RequestChange =>
+	<P extends RequestParameters>(pageName: string, parameters?: P): RequestChange =>
 	(currentState: RequestState): PageRequest<P> => ({
 		pageName,
 		parameters: parameters ?? {} as P,

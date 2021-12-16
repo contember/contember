@@ -59,3 +59,23 @@ export interface ParsedHasOneRelation {
 	field: FieldName
 	reducedBy: UniqueWhere | undefined
 }
+
+export interface ParsedTaggedMap {
+	name: string
+	entries: ParsedTaggedMapEntry[]
+}
+
+export interface ParsedTaggedMapEntry {
+	key: string
+	value: ParsedTaggedMapLiteralValue | ParsedTaggedMapVariableValue
+}
+
+export interface ParsedTaggedMapLiteralValue {
+	type: 'literal'
+	value:  string | number
+}
+
+export interface ParsedTaggedMapVariableValue {
+	type: 'variable'
+	value: string
+}

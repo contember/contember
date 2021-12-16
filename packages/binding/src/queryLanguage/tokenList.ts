@@ -39,6 +39,11 @@ export const tokens = {
 		pattern: /,/,
 	}),
 
+	Colon: createToken({
+		name: 'Colon',
+		pattern: /:/,
+	}),
+
 	NumberLiteral: createToken({
 		name: 'NumberLiteral',
 		pattern: /-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?/,
@@ -143,6 +148,7 @@ const tokenList = [
 	tokens.DollarSign,
 	tokens.Dot,
 	tokens.Comma,
+	tokens.Colon,
 	tokens.StringLiteral,
 	tokens.NumberLiteral,
 	tokens.LeftParenthesis,

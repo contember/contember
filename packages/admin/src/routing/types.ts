@@ -1,20 +1,29 @@
+import { RoutingParameter } from './RoutingParameter'
+
 export interface SelectedDimension {
 	[key: string]: string[]
 }
 
-export interface PageParameters {
-	[key: string]: string | PageParameters | undefined
+export type RequestParameterValue = string | undefined
+
+export interface RequestParameters<Extra extends RoutingParameter = never> {
+	[key: string]: RequestParameterValue | Extra
 }
 
-export interface PageRequest<P extends PageParameters> {
+export interface PageRequest<P extends RequestParameters<RoutingParameter> = RequestParameters> {
 	pageName: string
 	parameters: P
 	dimensions: SelectedDimension
 }
 
-export type RequestState = PageRequest<any> | null
+export type RequestState<Parameters extends RequestParameters<RoutingParameter> = RequestParameters> = PageRequest<Parameters> | null
 
-export type RequestChange = (currentState: RequestState) => RequestState
+export type RequestChange = (currentState: RequestState) => IncompleteRequestState
+export type DynamicRequestParameters = RequestParameters<RoutingParameter>;
+export type IncompleteRequestState = Partial<RequestState<DynamicRequestParameters>> & { pageName: string } | null
+
+export type RoutingParameterResolver = (name: string) => RequestParameterValue
+export type RoutingLinkTarget = string | RequestChange | IncompleteRequestState
 
 type Params = any
 type RouteName = string

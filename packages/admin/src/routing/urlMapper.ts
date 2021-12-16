@@ -47,7 +47,7 @@ export const pathToRequestState = (routing: RoutingContextValue, path: string, q
 		if (matchResult !== false) {
 			return {
 				pageName: pageName,
-				parameters: config.paramsToObject ? config.paramsToObject(matchResult.params) : matchResult.params,
+				parameters: config.paramsToObject ? config.paramsToObject(matchResult.params) : matchResult.params as Record<string, string>,
 				dimensions: dimensions ?? {},
 			}
 		}

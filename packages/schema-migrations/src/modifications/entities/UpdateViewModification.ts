@@ -10,11 +10,10 @@ export const UpdateViewModification: ModificationHandlerStatic<UpdateViewModific
 
 	public createSql(builder: MigrationBuilder): void {
 		const entity = this.schema.model.entities[this.data.entityName]
+		builder.dropView(entity.tableName, { ifExists: true })
 		builder.createView(
 			entity.tableName,
-			{
-				replace: true,
-			},
+			{},
 			this.data.view.sql,
 		)
 	}

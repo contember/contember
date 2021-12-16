@@ -82,14 +82,10 @@ export const executeMigrations = async ({
 		} while (true)
 	}
 
-	const result = await client.migrate(
+	await client.migrate(
 		migrations.map(it => it.localMigration),
 		force,
 	)
-	if (result.ok) {
-		console.log('Migration executed')
-		return 0
-	}
-	console.error(result.errors)
-	return 1
+	console.log('Migration executed')
+	return 0
 }

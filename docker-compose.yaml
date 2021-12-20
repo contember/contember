@@ -91,7 +91,8 @@ services:
       TENANT_DB_NAME: 'tenant'
 
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
 
   contember-cli:
     image: contember/cli:0.12.0-beta.2
@@ -143,6 +144,13 @@ services:
 
     volumes:
       - pgsql-data:/var/lib/postgresql/data
+
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready', '-U', 'contember']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
 
   redis:
     image: redis:3.2-alpine

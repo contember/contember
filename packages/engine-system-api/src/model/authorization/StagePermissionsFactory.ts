@@ -13,30 +13,9 @@ export class StagePermissionsFactory {
 
 		const rolePermissions = this.createRolePermissions(filteredSchema.acl)
 		Object.entries(rolePermissions).forEach(([role, value]) => {
-			// diff
-			if (value.diff === Acl.SystemPermissionsLevel.some) {
-				permissions.allow(role, AuthorizationActions.PROJECT_DIFF_SOME)
-			} else if (value.diff === Acl.SystemPermissionsLevel.any) {
-				permissions.allow(role, AuthorizationActions.PROJECT_DIFF_ANY)
-				permissions.allow(role, AuthorizationActions.PROJECT_DIFF_SOME)
-			}
-
 			// history
 			if (value.history === Acl.SystemPermissionsLevel.any) {
 				permissions.allow(role, AuthorizationActions.PROJECT_HISTORY_ANY)
-			}
-
-			// release
-			if (value.release === Acl.SystemPermissionsLevel.some) {
-				permissions.allow(role, AuthorizationActions.PROJECT_RELEASE_SOME)
-			} else if (value.release === Acl.SystemPermissionsLevel.any) {
-				permissions.allow(role, AuthorizationActions.PROJECT_RELEASE_ANY)
-				permissions.allow(role, AuthorizationActions.PROJECT_RELEASE_SOME)
-			}
-
-			// rebase
-			if (value.rebase === Acl.SystemPermissionsLevel.any) {
-				permissions.allow(role, AuthorizationActions.PROJECT_REBASE_ANY)
 			}
 
 			// migrate

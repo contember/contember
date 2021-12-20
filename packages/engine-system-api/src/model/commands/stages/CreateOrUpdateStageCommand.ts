@@ -17,11 +17,10 @@ export class CreateOrUpdateStageCommand implements Command<boolean> {
 			.onConflict(ConflictActionType.update, ['slug'], {
 				name: this.stage.name,
 			})
-			.returning('event_id')
 			.execute(db)
 
 		await db.query('CREATE SCHEMA IF NOT EXISTS ' + wrapIdentifier(formatSchemaName(this.stage)))
 
-		return result.length === 1
+		return result > 0
 	}
 }

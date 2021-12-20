@@ -17,7 +17,6 @@ export {
 	ProjectMigrator,
 	StageCreator,
 	getJunctionTables,
-	UpdateStageEventCommand,
 } from './model'
 export * from './SystemContainer'
 export * from './resolvers'

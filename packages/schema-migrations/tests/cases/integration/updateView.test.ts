@@ -40,5 +40,5 @@ testMigrations('update a view', {
 			},
 		},
 	],
-	sql: SQL`CREATE OR REPLACE VIEW "author" AS SELECT null as id, 'John' AS name, 'root@localhost' as email;`,
+	sql: SQL`DROP VIEW IF EXISTS "author"; CREATE VIEW "author" AS SELECT null as id, 'John' AS name, 'root@localhost' as email;`,
 })

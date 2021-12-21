@@ -1,10 +1,11 @@
 import { AnchorHTMLAttributes, useMemo } from 'react'
 import { ROUTING_BINDING_PARAMETER_PREFIX, useBindingLinkParametersResolver } from './useBindingLinkParametersResolver'
-import { Component, Environment, Field, QueryLanguage, useEnvironment } from '@contember/binding'
+import { Component, Field, useEnvironment } from '@contember/binding'
 import { RoutingLink, RoutingLinkProps } from '../RoutingLink'
-import { DynamicRequestParameters, RoutingLinkTarget } from '../types'
-import { RoutingParameter } from '../RoutingParameter'
+import { LinkTarget, parseLinkTarget } from './LinkLanguage'
 import { targetToRequest } from '../useRoutingLink'
+import { DynamicRequestParameters } from '../types'
+import { RoutingParameter } from '../RoutingParameter'
 
 export interface LinkProps extends Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'>, Omit<RoutingLinkProps, 'parametersResolver'> {
 }
@@ -13,15 +14,15 @@ export const Link = Component(({ to, ...props }: LinkProps) => {
 	const parametersResolver = useBindingLinkParametersResolver()
 	const env = useEnvironment()
 	const desugaredTo = useMemo(() => {
-		return desugarTarget(to, env)
+		return parseLinkTarget(to, env)
 	}, [to, env])
 
 	return <RoutingLink parametersResolver={parametersResolver} to={desugaredTo} {...props} />
 }, (props, env) => {
-	const to = desugarTarget(props.to, env)
+	const to = parseLinkTarget(props.to, env)
 
 	return <>
-		{fieldsFromTarget(to).map(it => <Field field={it} />)}
+		{createFieldsFromTarget(to).map(it => <Field field={it} />)}
 	</>
 })
 Link.displayName = 'Link'
@@ -29,25 +30,8 @@ Link.displayName = 'Link'
 /** @deprecated use Link */
 export const PageLink = Link
 
-const desugarTarget = (to: RoutingLinkTarget, env: Environment): Exclude<RoutingLinkTarget, string> => {
-	if (typeof to !== 'string') {
-		return to
-	}
-	const parsedTarget = QueryLanguage.desugarTaggedMap(to, env)
-	return {
-		pageName: parsedTarget.name,
-		parameters: Object.fromEntries(parsedTarget.entries.map(it => {
-			switch (it.value.type) {
-				case 'literal':
-					return [it.key, typeof it.value.value === 'number' ? String(it.value.value) : it.value.value ?? undefined]
-				case 'variable':
-					return [it.key, new RoutingParameter(it.value.value)]
-			}
-		})),
-	}
-}
 
-const fieldsFromTarget = (to: RoutingLinkTarget) => {
+const createFieldsFromTarget = (to: LinkTarget) => {
 	const dummyRequest = {
 		dimensions: {},
 		pageName: '',

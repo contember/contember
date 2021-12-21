@@ -1,6 +1,6 @@
 import type { EntityAccessor, PersistSuccessOptions } from '@contember/binding'
 import { useMemo } from 'react'
-import { useRedirect } from './useRedirect'
+import { useRedirect } from '../../routing/'
 import { RequestState, PageRequest } from '../../routing'
 
 export type RedirectOnSuccessHandler = (

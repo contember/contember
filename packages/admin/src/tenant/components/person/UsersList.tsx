@@ -1,10 +1,8 @@
 import { useCurrentContentGraphQlClient, useProjectSlug } from '@contember/react-client'
 import { LayoutPage } from '@contember/ui'
 import { FC, memo, useCallback } from 'react'
-import { LinkButton } from '../../../components'
-import { RoutingLinkTarget } from '../../../routing'
-import { RoleRendererFactory, RoleRenderers } from '../member'
-import { MemberList } from '../member'
+import { LinkButton, RoutingLinkTarget } from '../../../routing'
+import { MemberList, RoleRendererFactory, RoleRenderers } from '../member'
 
 export interface UsersListProps {
 	project: string

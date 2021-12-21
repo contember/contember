@@ -1,7 +1,6 @@
 import { EntityAccessor, useEntity } from '@contember/binding'
 import { ComponentType, memo, ReactNode, useMemo } from 'react'
-import { Link } from '../../pageRouting'
-import { InnerRoutingLinkProps, RequestState } from '../../../routing'
+import { InnerRoutingLinkProps, Link, RequestState } from '../../../routing'
 
 interface BasePageLinkByIdProps {
 	Component?: ComponentType<InnerRoutingLinkProps>

@@ -1,8 +1,7 @@
 import { Table, TableCell, TableHeaderCell, TableRow } from '@contember/ui'
 import { FC } from 'react'
 import { useAuthedTenantQuery } from '../../lib'
-import { RoutingLinkTarget } from '../../../routing'
-import { LinkButton } from '../../../components'
+import { LinkButton, RoutingLinkTarget } from '../../../routing'
 import { QueryLoader } from '../QueryLoader'
 
 interface ProjectGridProps {

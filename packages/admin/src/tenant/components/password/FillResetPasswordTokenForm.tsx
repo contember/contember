@@ -1,8 +1,7 @@
 import { FC, useCallback } from 'react'
-import { useRedirect } from '../../../components'
-import { RoutingLinkTarget } from '../../../routing'
+import { RoutingLinkTarget, useRedirect } from '../../../routing'
 import { Button, FormGroup, TextInput } from '@contember/ui'
-import { useForm } from '../../lib/useForm'
+import { useForm } from '../../lib'
 
 interface FillResetPasswordTokenFormProps {
 	resetLink: (token: string) => RoutingLinkTarget

@@ -1,6 +1,6 @@
 import { FC, useCallback, useContext } from 'react'
-import { IdentityRefreshContext, useRedirect, useShowToast } from '../../../components'
-import { RoutingLinkTarget } from '../../../routing'
+import { IdentityRefreshContext, useShowToast } from '../../../components'
+import { RoutingLinkTarget, useRedirect } from '../../../routing'
 import { Button, FormGroup, TextInput } from '@contember/ui'
 import { useConfirmOtp } from '../../mutations'
 import { useForm } from '../../lib'

@@ -2,8 +2,7 @@ import { getTenantErrorMessage } from '@contember/client'
 import { Button, ErrorList, FieldError, FormGroup, Section, TextInput } from '@contember/ui'
 import { useCallback, useState } from 'react'
 import { useForm, useSignIn } from '../../index'
-import { Link } from '../../../components'
-import { RoutingLinkTarget } from '../../../routing'
+import { Link, RoutingLinkTarget } from '../../../routing'
 import { useSetSessionToken } from '@contember/react-client'
 
 export interface LoginProps {

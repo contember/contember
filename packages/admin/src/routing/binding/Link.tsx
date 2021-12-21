@@ -1,14 +1,10 @@
 import { AnchorHTMLAttributes, useMemo } from 'react'
-import {
-	DynamicRequestParameters,
-	RoutingLink,
-	RoutingLinkProps,
-	RoutingLinkTarget,
-	RoutingParameter,
-	targetToRequest,
-} from '../../routing'
 import { ROUTING_BINDING_PARAMETER_PREFIX, useBindingLinkParametersResolver } from './useBindingLinkParametersResolver'
 import { Component, Environment, Field, QueryLanguage, useEnvironment } from '@contember/binding'
+import { RoutingLink, RoutingLinkProps } from '../RoutingLink'
+import { DynamicRequestParameters, RoutingLinkTarget } from '../types'
+import { RoutingParameter } from '../RoutingParameter'
+import { targetToRequest } from '../useRoutingLink'
 
 export interface LinkProps extends Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'>, Omit<RoutingLinkProps, 'parametersResolver'> {
 }

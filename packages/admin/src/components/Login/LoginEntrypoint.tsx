@@ -12,7 +12,7 @@ import {
 import { Project, ProjectListButtons } from '../Project'
 import { Toaster, ToasterProvider } from '../Toaster'
 import { RequestProvider, RoutingContext, RoutingContextValue } from '../../routing'
-import { Page, PageLink, Pages } from '../pageRouting'
+import { Page, Link, Pages } from '../pageRouting'
 import { MiscPageLayout } from '../MiscPageLayout'
 import { IdentityProvider, useLogout, useOptionalIdentity } from '../Identity'
 import { Button, ErrorList, Icon } from '@contember/ui'
@@ -66,14 +66,14 @@ export const LoginEntrypoint = (props: LoginEntrypointProps) => {
 							</Page>
 							<Page name={resetRequestPageName}>
 								<MiscPageLayout heading="Password reset" actions={<>
-									<PageLink to={indexPageName}>Back to login</PageLink>
+									<Link to={indexPageName}>Back to login</Link>
 								</>}>
 									<CreateResetPasswordRequestForm redirectOnSuccess={redirectOnSuccessPageName} />
 								</MiscPageLayout>
 							</Page>
 							<Page name={redirectOnSuccessPageName}>
 								<MiscPageLayout heading="Password reset" actions={<>
-									<PageLink to={indexPageName}>Back to login</PageLink>
+									<Link to={indexPageName}>Back to login</Link>
 								</>}>
 									<p>
 										Password reset request has been successfully created. Please check your inbox for the instructions.
@@ -87,7 +87,7 @@ export const LoginEntrypoint = (props: LoginEntrypointProps) => {
 							<Page name={passwordResetPageName}>
 								{({ token }: { token: string }) => (
 									<MiscPageLayout heading="Set a new password" actions={<>
-										<PageLink to={indexPageName}>Back to login</PageLink>
+										<Link to={indexPageName}>Back to login</Link>
 									</>}>
 										<ResetPasswordForm token={token} redirectOnSuccess={indexPageName} />
 									</MiscPageLayout>

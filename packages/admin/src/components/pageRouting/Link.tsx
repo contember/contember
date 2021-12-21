@@ -10,10 +10,10 @@ import {
 import { ROUTING_BINDING_PARAMETER_PREFIX, useBindingLinkParametersResolver } from './useBindingLinkParametersResolver'
 import { Component, Environment, Field, QueryLanguage, useEnvironment } from '@contember/binding'
 
-export interface PageLinkProps extends Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'>, Omit<RoutingLinkProps, 'parametersResolver'> {
+export interface LinkProps extends Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'>, Omit<RoutingLinkProps, 'parametersResolver'> {
 }
 
-export const PageLink = Component(({ to, ...props }: PageLinkProps) => {
+export const Link = Component(({ to, ...props }: LinkProps) => {
 	const parametersResolver = useBindingLinkParametersResolver()
 	const env = useEnvironment()
 	const desugaredTo = useMemo(() => {
@@ -28,7 +28,10 @@ export const PageLink = Component(({ to, ...props }: PageLinkProps) => {
 		{fieldsFromTarget(to).map(it => <Field field={it} />)}
 	</>
 })
-PageLink.displayName = 'PageLink'
+Link.displayName = 'Link'
+
+/** @deprecated use Link */
+export const PageLink = Link
 
 const desugarTarget = (to: RoutingLinkTarget, env: Environment): Exclude<RoutingLinkTarget, string> => {
 	if (typeof to !== 'string') {

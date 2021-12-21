@@ -1,6 +1,6 @@
 import { EntityAccessor, useEntity } from '@contember/binding'
 import { ComponentType, memo, ReactNode, useMemo } from 'react'
-import { PageLink } from '../../pageRouting'
+import { Link } from '../../pageRouting'
 import { InnerRoutingLinkProps, RequestState } from '../../../routing'
 
 interface BasePageLinkByIdProps {
@@ -45,9 +45,9 @@ export const PageLinkById = memo(function (props: PageLinkByIdProps) {
 
 	if (target !== null) {
 		return (
-			<PageLink to={target} Component={props.Component}>
+			<Link to={target} Component={props.Component}>
 				{props.children}
-			</PageLink>
+			</Link>
 		)
 	}
 	return null

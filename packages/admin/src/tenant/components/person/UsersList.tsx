@@ -1,7 +1,7 @@
 import { useCurrentContentGraphQlClient, useProjectSlug } from '@contember/react-client'
 import { LayoutPage } from '@contember/ui'
 import { FC, memo, useCallback } from 'react'
-import { PageLinkButton } from '../../../components'
+import { LinkButton } from '../../../components'
 import { RoutingLinkTarget } from '../../../routing'
 import { RoleRendererFactory, RoleRenderers } from '../member'
 import { MemberList } from '../member'
@@ -43,7 +43,7 @@ export const UsersManagement: FC<UsersManagementProps<any>> = <T extends {}>(pro
 	if (project) {
 		return (
 			<LayoutPage
-				actions={<PageLinkButton to={'tenantInviteUser'}>Add a user</PageLinkButton>}
+				actions={<LinkButton to={'tenantInviteUser'}>Add a user</LinkButton>}
 				title="Users in project"
 			>
 				<UsersList

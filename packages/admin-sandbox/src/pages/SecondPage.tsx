@@ -1,7 +1,7 @@
-import { EditPage, PageLink } from '@contember/admin'
+import { EditPage, Link } from '@contember/admin'
 
 export const SecondPage = (
 	<EditPage pageName="second" entity="UploadShowcase(unique = One)">
-		<PageLink to="dashboard">DASHBOARD</PageLink>
+		<Link to="dashboard">DASHBOARD</Link>
 	</EditPage>
 )

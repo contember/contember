@@ -1,10 +1,10 @@
 import { Icon } from '@contember/ui'
 import { memo } from 'react'
-import { PageLinkButton, PageLinkButtonProps } from './PageLinkButton'
+import { LinkButton, LinkButtonProps } from './LinkButton'
 
-export const NavigateBackButton = memo<PageLinkButtonProps>(props => (
-	<PageLinkButton distinction="seamless" size="small" style={{ marginLeft: '-.38em' }} {...props}>
+export const NavigateBackButton = memo<LinkButtonProps>(props => (
+	<LinkButton distinction="seamless" size="small" style={{ marginLeft: '-.38em' }} {...props}>
 		<Icon blueprintIcon="chevron-left" />
 		{props.children}
-	</PageLinkButton>
+	</LinkButton>
 ))

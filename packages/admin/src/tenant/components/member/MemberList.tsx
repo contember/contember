@@ -1,6 +1,6 @@
 import { Button, ContainerSpinner, Table, TableCell, TableRow } from '@contember/ui'
 import { ComponentType, memo } from 'react'
-import { EmptyMessage, PageLinkButton } from '../../../components'
+import { EmptyMessage, LinkButton } from '../../../components'
 import { ListMembersMemberType, MemberIdentity, useListMembersQuery } from '../../queries'
 import { RoutingLinkTarget } from '../../../routing'
 import { RoleRendererFactory, useRoleRenderer } from './RoleRenderer'
@@ -45,9 +45,9 @@ export const MemberList = memo<MemberListProps>(({ project, createRoleRenderer, 
 											<IdentityMembership RoleRenderer={RoleRenderer} memberships={member.memberships} />
 										</TableCell>
 										<TableCell shrunk>
-											<PageLinkButton size="small" to={createEditIdentityLink(member.identity.id)}>
+											<LinkButton size="small" to={createEditIdentityLink(member.identity.id)}>
 												Edit roles
-											</PageLinkButton>
+											</LinkButton>
 										</TableCell>
 										<TableCell shrunk>
 											<Button size="small" intent="danger" onClick={() => removeMember(member.identity.id)}>

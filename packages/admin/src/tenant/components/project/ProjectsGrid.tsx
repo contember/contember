@@ -2,7 +2,7 @@ import { Table, TableCell, TableHeaderCell, TableRow } from '@contember/ui'
 import { FC } from 'react'
 import { useAuthedTenantQuery } from '../../lib'
 import { RoutingLinkTarget } from '../../../routing'
-import { PageLinkButton } from '../../../components'
+import { LinkButton } from '../../../components'
 import { QueryLoader } from '../QueryLoader'
 
 interface ProjectGridProps {
@@ -37,7 +37,7 @@ export const ProjectsGrid: FC<ProjectGridProps> = ({ createProjectDetailLink }) 
 								<span style={{ fontFamily: 'monospace' }}>{project.slug}</span>
 							</TableCell>
 							<TableCell shrunk>
-								<PageLinkButton to={createProjectDetailLink(project.slug)}>Overview and users</PageLinkButton>
+								<LinkButton to={createProjectDetailLink(project.slug)}>Overview and users</LinkButton>
 							</TableCell>
 						</TableRow>
 					))}

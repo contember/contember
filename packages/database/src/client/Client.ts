@@ -43,7 +43,7 @@ class Client<ConnectionType extends Connection.ConnectionLike = Connection.Conne
 
 	async query<Row extends Record<string, any>>(
 		sql: string,
-		parameters: any[] = [],
+		parameters: readonly any[] = [],
 		meta: Record<string, any> = {},
 		config: Connection.QueryConfig = {},
 	): Promise<Connection.Result<Row>> {

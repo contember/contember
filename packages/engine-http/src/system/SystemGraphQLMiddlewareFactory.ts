@@ -8,7 +8,7 @@ import {
 } from '@contember/engine-system-api'
 import { KoaContext, KoaMiddleware } from '../koa'
 import { flattenVariables } from '@contember/engine-content-api'
-import { ProjectMemberMiddlewareState, ProjectResolveMiddlewareState } from '../project-common'
+import { ProjectGroupState, ProjectMemberMiddlewareState, ProjectResolveMiddlewareState } from '../project-common'
 import { AuthMiddlewareState } from '../common'
 import {
 	createDbQueriesListener,
@@ -23,7 +23,12 @@ import { mergeTypeDefs } from '@graphql-tools/merge'
 import { DocumentNode } from 'graphql'
 import { makeExecutableSchema } from '@graphql-tools/schema'
 
-type KoaState = AuthMiddlewareState & ProjectMemberMiddlewareState & ProjectResolveMiddlewareState & GraphQLKoaState
+type KoaState =
+	& AuthMiddlewareState
+	& ProjectGroupState
+	& ProjectMemberMiddlewareState
+	& ProjectResolveMiddlewareState
+	& GraphQLKoaState
 
 export type SystemGraphQLContext = ResolverContext & {
 	koaContext: KoaContext<KoaState>
@@ -85,6 +90,7 @@ export class SystemGraphQLMiddlewareFactory {
 		const variables = flattenVariables(ctx.state.projectMemberships)
 		const systemContext = await this.resolverContextFactory.create(
 			dbContextFactory.create(identity.id),
+			ctx.state.projectGroup.database.client,
 			ctx.state.project,
 			identity,
 			variables,

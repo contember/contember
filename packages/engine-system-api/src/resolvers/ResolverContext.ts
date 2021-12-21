@@ -7,6 +7,7 @@ import { Identity } from '../model/authorization'
 import { StagePermissionsFactory } from '../model/authorization/StagePermissionsFactory'
 import { StageScope } from '../model/authorization/StageScope'
 import { ItemLoader } from '../utils/batchQuery'
+import { Client } from '@contember/database'
 
 export class ResolverContextFactory {
 	constructor(
@@ -16,6 +17,7 @@ export class ResolverContextFactory {
 
 	public async create(
 		systemDbContext: DatabaseContext,
+		tenantDb: Client,
 		project: ProjectConfig,
 		identity: Identity,
 		variables: Acl.VariablesMap,
@@ -44,6 +46,7 @@ export class ResolverContextFactory {
 				loaders.set(loaderFactory, newLoader)
 				return newLoader
 			},
+			tenantDb,
 		}
 	}
 }
@@ -59,4 +62,5 @@ export interface ResolverContext {
 	readonly authorizator: Authorizator<Identity>
 	readonly requireAccess: (action: Authorizator.Action, stage: string, message?: string) => Promise<void>
 	readonly getLoader: <Args, Item>(loaderFactory: LoaderFactory<Args, Item>) => ItemLoader<Args, Item>
+	readonly tenantDb: Client
 }

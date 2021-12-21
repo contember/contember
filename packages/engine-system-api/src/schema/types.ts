@@ -15,6 +15,91 @@ export type Scalars = {
 	Json: unknown
 }
 
+export type CreateEvent = Event & {
+	readonly __typename?: 'CreateEvent'
+	readonly id: Scalars['String']
+	readonly transactionId: Scalars['String']
+	readonly identityId: Scalars['String']
+	readonly identityDescription: Scalars['String']
+	readonly description: Scalars['String']
+	readonly createdAt: Scalars['DateTime']
+	readonly appliedAt: Scalars['DateTime']
+	readonly type: EventType
+	readonly tableName: Scalars['String']
+	readonly primaryKey: ReadonlyArray<Scalars['String']>
+	readonly newValues: Scalars['Json']
+}
+
+
+export type DeleteEvent = Event & {
+	readonly __typename?: 'DeleteEvent'
+	readonly id: Scalars['String']
+	readonly transactionId: Scalars['String']
+	readonly identityId: Scalars['String']
+	readonly identityDescription: Scalars['String']
+	readonly description: Scalars['String']
+	readonly createdAt: Scalars['DateTime']
+	readonly appliedAt: Scalars['DateTime']
+	readonly type: EventType
+	readonly tableName: Scalars['String']
+	readonly primaryKey: ReadonlyArray<Scalars['String']>
+	readonly oldValues: Scalars['Json']
+}
+
+export type Event = {
+	readonly id: Scalars['String']
+	readonly transactionId: Scalars['String']
+	readonly identityDescription: Scalars['String']
+	readonly identityId: Scalars['String']
+	readonly description: Scalars['String']
+	readonly createdAt: Scalars['DateTime']
+	readonly appliedAt: Scalars['DateTime']
+	readonly type: EventType
+	readonly tableName: Scalars['String']
+	readonly primaryKey: ReadonlyArray<Scalars['String']>
+}
+
+export type EventFilterRow = {
+	readonly tableName: Scalars['String']
+	readonly primaryKey: ReadonlyArray<Scalars['String']>
+}
+
+export enum EventType {
+	Update = 'UPDATE',
+	Delete = 'DELETE',
+	Create = 'CREATE'
+}
+
+export type EventsArgs = {
+	readonly stage?: Maybe<Scalars['String']>
+	readonly filter?: Maybe<EventsFilter>
+	readonly order?: Maybe<EventsOrder>
+	readonly offset?: Maybe<Scalars['Int']>
+	/** Max 10000 */
+	readonly limit?: Maybe<Scalars['Int']>
+}
+
+export type EventsFilter = {
+	readonly types?: Maybe<ReadonlyArray<EventType>>
+	readonly rows?: Maybe<ReadonlyArray<EventFilterRow>>
+	readonly tables?: Maybe<ReadonlyArray<Scalars['String']>>
+	readonly transactions?: Maybe<ReadonlyArray<Scalars['String']>>
+	readonly identities?: Maybe<ReadonlyArray<Scalars['String']>>
+	readonly createdAt?: Maybe<EventsFilterDate>
+	readonly appliedAt?: Maybe<EventsFilterDate>
+}
+
+export type EventsFilterDate = {
+	readonly from?: Maybe<Scalars['DateTime']>
+	readonly to?: Maybe<Scalars['DateTime']>
+}
+
+export enum EventsOrder {
+	CreatedAtAsc = 'CREATED_AT_ASC',
+	CreatedAtDesc = 'CREATED_AT_DESC',
+	AppliedAtAsc = 'APPLIED_AT_ASC',
+	AppliedAtDesc = 'APPLIED_AT_DESC'
+}
 
 export type ExecutedMigration = {
 	readonly __typename?: 'ExecutedMigration'
@@ -24,106 +109,6 @@ export type ExecutedMigration = {
 	readonly checksum: Scalars['String']
 	readonly formatVersion: Scalars['Int']
 	readonly modifications: ReadonlyArray<Scalars['Json']>
-}
-
-export type HistoryCreateEvent = HistoryEvent & {
-	readonly __typename?: 'HistoryCreateEvent'
-	readonly id: Scalars['String']
-	readonly transactionId: Scalars['String']
-	readonly identityId: Scalars['String']
-	readonly identityDescription: Scalars['String']
-	readonly description: Scalars['String']
-	readonly createdAt: Scalars['DateTime']
-	readonly type: HistoryEventType
-	readonly tableName: Scalars['String']
-	readonly primaryKeys: ReadonlyArray<Scalars['String']>
-	readonly newValues: Scalars['Json']
-}
-
-export type HistoryDeleteEvent = HistoryEvent & {
-	readonly __typename?: 'HistoryDeleteEvent'
-	readonly id: Scalars['String']
-	readonly transactionId: Scalars['String']
-	readonly identityId: Scalars['String']
-	readonly identityDescription: Scalars['String']
-	readonly description: Scalars['String']
-	readonly createdAt: Scalars['DateTime']
-	readonly type: HistoryEventType
-	readonly tableName: Scalars['String']
-	readonly primaryKeys: ReadonlyArray<Scalars['String']>
-	readonly oldValues: Scalars['Json']
-}
-
-export type HistoryError = {
-	readonly __typename?: 'HistoryError'
-	readonly code: HistoryErrorCode
-	readonly developerMessage: Scalars['String']
-}
-
-export enum HistoryErrorCode {
-	StageNotFound = 'STAGE_NOT_FOUND'
-}
-
-export type HistoryEvent = {
-	readonly id: Scalars['String']
-	readonly transactionId: Scalars['String']
-	readonly identityDescription: Scalars['String']
-	readonly identityId: Scalars['String']
-	readonly description: Scalars['String']
-	readonly createdAt: Scalars['DateTime']
-	readonly type: HistoryEventType
-}
-
-export enum HistoryEventType {
-	Update = 'UPDATE',
-	Delete = 'DELETE',
-	Create = 'CREATE',
-	RunMigration = 'RUN_MIGRATION'
-}
-
-export type HistoryFilter = {
-	readonly entity: Scalars['String']
-	readonly id: Scalars['String']
-}
-
-export type HistoryResponse = {
-	readonly __typename?: 'HistoryResponse'
-	readonly ok?: Maybe<Scalars['Boolean']>
-	/** @deprecated Field no longer supported */
-	readonly errors: ReadonlyArray<HistoryErrorCode>
-	readonly error?: Maybe<HistoryError>
-	readonly result?: Maybe<HistoryResult>
-}
-
-export type HistoryResult = {
-	readonly __typename?: 'HistoryResult'
-	readonly events: ReadonlyArray<HistoryEvent>
-}
-
-export type HistoryRunMigrationEvent = HistoryEvent & {
-	readonly __typename?: 'HistoryRunMigrationEvent'
-	readonly id: Scalars['String']
-	readonly transactionId: Scalars['String']
-	readonly identityId: Scalars['String']
-	readonly identityDescription: Scalars['String']
-	readonly description: Scalars['String']
-	readonly createdAt: Scalars['DateTime']
-	readonly type: HistoryEventType
-}
-
-export type HistoryUpdateEvent = HistoryEvent & {
-	readonly __typename?: 'HistoryUpdateEvent'
-	readonly id: Scalars['String']
-	readonly transactionId: Scalars['String']
-	readonly identityId: Scalars['String']
-	readonly identityDescription: Scalars['String']
-	readonly description: Scalars['String']
-	readonly createdAt: Scalars['DateTime']
-	readonly type: HistoryEventType
-	readonly tableName: Scalars['String']
-	readonly primaryKeys: ReadonlyArray<Scalars['String']>
-	readonly oldValues: Scalars['Json']
-	readonly diffValues: Scalars['Json']
 }
 
 
@@ -237,7 +222,7 @@ export type Query = {
 	readonly __typename?: 'Query'
 	readonly stages: ReadonlyArray<Stage>
 	readonly executedMigrations: ReadonlyArray<ExecutedMigration>
-	readonly history: HistoryResponse
+	readonly events: ReadonlyArray<Event>
 }
 
 
@@ -246,11 +231,8 @@ export type QueryExecutedMigrationsArgs = {
 }
 
 
-export type QueryHistoryArgs = {
-	stage: Scalars['String']
-	filter?: Maybe<ReadonlyArray<HistoryFilter>>
-	sinceEvent?: Maybe<Scalars['String']>
-	sinceTime?: Maybe<Scalars['DateTime']>
+export type QueryEventsArgs = {
+	args?: Maybe<EventsArgs>
 }
 
 export type Stage = {
@@ -263,6 +245,22 @@ export type Stage = {
 export type TruncateResponse = {
 	readonly __typename?: 'TruncateResponse'
 	readonly ok: Scalars['Boolean']
+}
+
+export type UpdateEvent = Event & {
+	readonly __typename?: 'UpdateEvent'
+	readonly id: Scalars['String']
+	readonly transactionId: Scalars['String']
+	readonly identityId: Scalars['String']
+	readonly identityDescription: Scalars['String']
+	readonly description: Scalars['String']
+	readonly createdAt: Scalars['DateTime']
+	readonly appliedAt: Scalars['DateTime']
+	readonly type: EventType
+	readonly tableName: Scalars['String']
+	readonly primaryKey: ReadonlyArray<Scalars['String']>
+	readonly oldValues: Scalars['Json']
+	readonly diffValues: Scalars['Json']
 }
 
 
@@ -343,26 +341,24 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = {
-	DateTime: ResolverTypeWrapper<Scalars['DateTime']>
-	ExecutedMigration: ResolverTypeWrapper<ExecutedMigration>
+	CreateEvent: ResolverTypeWrapper<CreateEvent>
 	String: ResolverTypeWrapper<Scalars['String']>
+	DateTime: ResolverTypeWrapper<Scalars['DateTime']>
+	DeleteEvent: ResolverTypeWrapper<DeleteEvent>
+	Event: ResolversTypes['CreateEvent'] | ResolversTypes['DeleteEvent'] | ResolversTypes['UpdateEvent']
+	EventFilterRow: EventFilterRow
+	EventType: EventType
+	EventsArgs: EventsArgs
 	Int: ResolverTypeWrapper<Scalars['Int']>
-	HistoryCreateEvent: ResolverTypeWrapper<HistoryCreateEvent>
-	HistoryDeleteEvent: ResolverTypeWrapper<HistoryDeleteEvent>
-	HistoryError: ResolverTypeWrapper<HistoryError>
-	HistoryErrorCode: HistoryErrorCode
-	HistoryEvent: ResolversTypes['HistoryCreateEvent'] | ResolversTypes['HistoryDeleteEvent'] | ResolversTypes['HistoryRunMigrationEvent'] | ResolversTypes['HistoryUpdateEvent']
-	HistoryEventType: HistoryEventType
-	HistoryFilter: HistoryFilter
-	HistoryResponse: ResolverTypeWrapper<HistoryResponse>
-	Boolean: ResolverTypeWrapper<Scalars['Boolean']>
-	HistoryResult: ResolverTypeWrapper<HistoryResult>
-	HistoryRunMigrationEvent: ResolverTypeWrapper<HistoryRunMigrationEvent>
-	HistoryUpdateEvent: ResolverTypeWrapper<HistoryUpdateEvent>
+	EventsFilter: EventsFilter
+	EventsFilterDate: EventsFilterDate
+	EventsOrder: EventsOrder
+	ExecutedMigration: ResolverTypeWrapper<ExecutedMigration>
 	Json: ResolverTypeWrapper<Scalars['Json']>
 	MigrateError: ResolverTypeWrapper<MigrateError>
 	MigrateErrorCode: MigrateErrorCode
 	MigrateResponse: ResolverTypeWrapper<MigrateResponse>
+	Boolean: ResolverTypeWrapper<Scalars['Boolean']>
 	MigrateResult: ResolverTypeWrapper<MigrateResult>
 	Migration: Migration
 	MigrationDeleteError: ResolverTypeWrapper<MigrationDeleteError>
@@ -376,27 +372,26 @@ export type ResolversTypes = {
 	Query: ResolverTypeWrapper<{}>
 	Stage: ResolverTypeWrapper<Stage>
 	TruncateResponse: ResolverTypeWrapper<TruncateResponse>
+	UpdateEvent: ResolverTypeWrapper<UpdateEvent>
 }
 
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = {
-	DateTime: Scalars['DateTime']
-	ExecutedMigration: ExecutedMigration
+	CreateEvent: CreateEvent
 	String: Scalars['String']
+	DateTime: Scalars['DateTime']
+	DeleteEvent: DeleteEvent
+	Event: ResolversParentTypes['CreateEvent'] | ResolversParentTypes['DeleteEvent'] | ResolversParentTypes['UpdateEvent']
+	EventFilterRow: EventFilterRow
+	EventsArgs: EventsArgs
 	Int: Scalars['Int']
-	HistoryCreateEvent: HistoryCreateEvent
-	HistoryDeleteEvent: HistoryDeleteEvent
-	HistoryError: HistoryError
-	HistoryEvent: ResolversParentTypes['HistoryCreateEvent'] | ResolversParentTypes['HistoryDeleteEvent'] | ResolversParentTypes['HistoryRunMigrationEvent'] | ResolversParentTypes['HistoryUpdateEvent']
-	HistoryFilter: HistoryFilter
-	HistoryResponse: HistoryResponse
-	Boolean: Scalars['Boolean']
-	HistoryResult: HistoryResult
-	HistoryRunMigrationEvent: HistoryRunMigrationEvent
-	HistoryUpdateEvent: HistoryUpdateEvent
+	EventsFilter: EventsFilter
+	EventsFilterDate: EventsFilterDate
+	ExecutedMigration: ExecutedMigration
 	Json: Scalars['Json']
 	MigrateError: MigrateError
 	MigrateResponse: MigrateResponse
+	Boolean: Scalars['Boolean']
 	MigrateResult: MigrateResult
 	Migration: Migration
 	MigrationDeleteError: MigrationDeleteError
@@ -408,10 +403,55 @@ export type ResolversParentTypes = {
 	Query: {}
 	Stage: Stage
 	TruncateResponse: TruncateResponse
+	UpdateEvent: UpdateEvent
+}
+
+export type CreateEventResolvers<ContextType = any, ParentType extends ResolversParentTypes['CreateEvent'] = ResolversParentTypes['CreateEvent']> = {
+	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	transactionId?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	identityId?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	identityDescription?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	description?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	createdAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>
+	appliedAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>
+	type?: Resolver<ResolversTypes['EventType'], ParentType, ContextType>
+	tableName?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	primaryKey?: Resolver<ReadonlyArray<ResolversTypes['String']>, ParentType, ContextType>
+	newValues?: Resolver<ResolversTypes['Json'], ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export interface DateTimeScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['DateTime'], any> {
 	name: 'DateTime'
+}
+
+export type DeleteEventResolvers<ContextType = any, ParentType extends ResolversParentTypes['DeleteEvent'] = ResolversParentTypes['DeleteEvent']> = {
+	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	transactionId?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	identityId?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	identityDescription?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	description?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	createdAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>
+	appliedAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>
+	type?: Resolver<ResolversTypes['EventType'], ParentType, ContextType>
+	tableName?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	primaryKey?: Resolver<ReadonlyArray<ResolversTypes['String']>, ParentType, ContextType>
+	oldValues?: Resolver<ResolversTypes['Json'], ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
+export type EventResolvers<ContextType = any, ParentType extends ResolversParentTypes['Event'] = ResolversParentTypes['Event']> = {
+	__resolveType: TypeResolveFn<'CreateEvent' | 'DeleteEvent' | 'UpdateEvent', ParentType, ContextType>
+	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	transactionId?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	identityDescription?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	identityId?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	description?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	createdAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>
+	appliedAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>
+	type?: Resolver<ResolversTypes['EventType'], ParentType, ContextType>
+	tableName?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	primaryKey?: Resolver<ReadonlyArray<ResolversTypes['String']>, ParentType, ContextType>
 }
 
 export type ExecutedMigrationResolvers<ContextType = any, ParentType extends ResolversParentTypes['ExecutedMigration'] = ResolversParentTypes['ExecutedMigration']> = {
@@ -421,90 +461,6 @@ export type ExecutedMigrationResolvers<ContextType = any, ParentType extends Res
 	checksum?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	formatVersion?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
 	modifications?: Resolver<ReadonlyArray<ResolversTypes['Json']>, ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
-}
-
-export type HistoryCreateEventResolvers<ContextType = any, ParentType extends ResolversParentTypes['HistoryCreateEvent'] = ResolversParentTypes['HistoryCreateEvent']> = {
-	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	transactionId?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	identityId?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	identityDescription?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	description?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	createdAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>
-	type?: Resolver<ResolversTypes['HistoryEventType'], ParentType, ContextType>
-	tableName?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	primaryKeys?: Resolver<ReadonlyArray<ResolversTypes['String']>, ParentType, ContextType>
-	newValues?: Resolver<ResolversTypes['Json'], ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
-}
-
-export type HistoryDeleteEventResolvers<ContextType = any, ParentType extends ResolversParentTypes['HistoryDeleteEvent'] = ResolversParentTypes['HistoryDeleteEvent']> = {
-	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	transactionId?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	identityId?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	identityDescription?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	description?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	createdAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>
-	type?: Resolver<ResolversTypes['HistoryEventType'], ParentType, ContextType>
-	tableName?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	primaryKeys?: Resolver<ReadonlyArray<ResolversTypes['String']>, ParentType, ContextType>
-	oldValues?: Resolver<ResolversTypes['Json'], ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
-}
-
-export type HistoryErrorResolvers<ContextType = any, ParentType extends ResolversParentTypes['HistoryError'] = ResolversParentTypes['HistoryError']> = {
-	code?: Resolver<ResolversTypes['HistoryErrorCode'], ParentType, ContextType>
-	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
-}
-
-export type HistoryEventResolvers<ContextType = any, ParentType extends ResolversParentTypes['HistoryEvent'] = ResolversParentTypes['HistoryEvent']> = {
-	__resolveType: TypeResolveFn<'HistoryCreateEvent' | 'HistoryDeleteEvent' | 'HistoryRunMigrationEvent' | 'HistoryUpdateEvent', ParentType, ContextType>
-	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	transactionId?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	identityDescription?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	identityId?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	description?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	createdAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>
-	type?: Resolver<ResolversTypes['HistoryEventType'], ParentType, ContextType>
-}
-
-export type HistoryResponseResolvers<ContextType = any, ParentType extends ResolversParentTypes['HistoryResponse'] = ResolversParentTypes['HistoryResponse']> = {
-	ok?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>
-	errors?: Resolver<ReadonlyArray<ResolversTypes['HistoryErrorCode']>, ParentType, ContextType>
-	error?: Resolver<Maybe<ResolversTypes['HistoryError']>, ParentType, ContextType>
-	result?: Resolver<Maybe<ResolversTypes['HistoryResult']>, ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
-}
-
-export type HistoryResultResolvers<ContextType = any, ParentType extends ResolversParentTypes['HistoryResult'] = ResolversParentTypes['HistoryResult']> = {
-	events?: Resolver<ReadonlyArray<ResolversTypes['HistoryEvent']>, ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
-}
-
-export type HistoryRunMigrationEventResolvers<ContextType = any, ParentType extends ResolversParentTypes['HistoryRunMigrationEvent'] = ResolversParentTypes['HistoryRunMigrationEvent']> = {
-	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	transactionId?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	identityId?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	identityDescription?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	description?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	createdAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>
-	type?: Resolver<ResolversTypes['HistoryEventType'], ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
-}
-
-export type HistoryUpdateEventResolvers<ContextType = any, ParentType extends ResolversParentTypes['HistoryUpdateEvent'] = ResolversParentTypes['HistoryUpdateEvent']> = {
-	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	transactionId?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	identityId?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	identityDescription?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	description?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	createdAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>
-	type?: Resolver<ResolversTypes['HistoryEventType'], ParentType, ContextType>
-	tableName?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	primaryKeys?: Resolver<ReadonlyArray<ResolversTypes['String']>, ParentType, ContextType>
-	oldValues?: Resolver<ResolversTypes['Json'], ParentType, ContextType>
-	diffValues?: Resolver<ResolversTypes['Json'], ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
@@ -567,7 +523,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
 	stages?: Resolver<ReadonlyArray<ResolversTypes['Stage']>, ParentType, ContextType>
 	executedMigrations?: Resolver<ReadonlyArray<ResolversTypes['ExecutedMigration']>, ParentType, ContextType, RequireFields<QueryExecutedMigrationsArgs, never>>
-	history?: Resolver<ResolversTypes['HistoryResponse'], ParentType, ContextType, RequireFields<QueryHistoryArgs, 'stage'>>
+	events?: Resolver<ReadonlyArray<ResolversTypes['Event']>, ParentType, ContextType, RequireFields<QueryEventsArgs, never>>
 }
 
 export type StageResolvers<ContextType = any, ParentType extends ResolversParentTypes['Stage'] = ResolversParentTypes['Stage']> = {
@@ -582,17 +538,28 @@ export type TruncateResponseResolvers<ContextType = any, ParentType extends Reso
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
+export type UpdateEventResolvers<ContextType = any, ParentType extends ResolversParentTypes['UpdateEvent'] = ResolversParentTypes['UpdateEvent']> = {
+	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	transactionId?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	identityId?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	identityDescription?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	description?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	createdAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>
+	appliedAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>
+	type?: Resolver<ResolversTypes['EventType'], ParentType, ContextType>
+	tableName?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	primaryKey?: Resolver<ReadonlyArray<ResolversTypes['String']>, ParentType, ContextType>
+	oldValues?: Resolver<ResolversTypes['Json'], ParentType, ContextType>
+	diffValues?: Resolver<ResolversTypes['Json'], ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
 export type Resolvers<ContextType = any> = {
+	CreateEvent?: CreateEventResolvers<ContextType>
 	DateTime?: GraphQLScalarType
+	DeleteEvent?: DeleteEventResolvers<ContextType>
+	Event?: EventResolvers<ContextType>
 	ExecutedMigration?: ExecutedMigrationResolvers<ContextType>
-	HistoryCreateEvent?: HistoryCreateEventResolvers<ContextType>
-	HistoryDeleteEvent?: HistoryDeleteEventResolvers<ContextType>
-	HistoryError?: HistoryErrorResolvers<ContextType>
-	HistoryEvent?: HistoryEventResolvers<ContextType>
-	HistoryResponse?: HistoryResponseResolvers<ContextType>
-	HistoryResult?: HistoryResultResolvers<ContextType>
-	HistoryRunMigrationEvent?: HistoryRunMigrationEventResolvers<ContextType>
-	HistoryUpdateEvent?: HistoryUpdateEventResolvers<ContextType>
 	Json?: GraphQLScalarType
 	MigrateError?: MigrateErrorResolvers<ContextType>
 	MigrateResponse?: MigrateResponseResolvers<ContextType>
@@ -605,6 +572,7 @@ export type Resolvers<ContextType = any> = {
 	Query?: QueryResolvers<ContextType>
 	Stage?: StageResolvers<ContextType>
 	TruncateResponse?: TruncateResponseResolvers<ContextType>
+	UpdateEvent?: UpdateEventResolvers<ContextType>
 }
 
 

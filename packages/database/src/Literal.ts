@@ -3,7 +3,7 @@ export class Literal {
 
 	constructor(
 		public readonly sql: string,
-		public readonly parameters: any[] = [],
+		public readonly parameters: readonly any[] = [],
 		public readonly meta: Record<string, any> = {},
 	) {}
 

@@ -10,7 +10,9 @@ import { MigrationsRunner } from '@contember/database-migrations'
 import { DatabaseCredentials } from '@contember/database'
 import {
 	EntitiesSelector,
+	EventResponseBuilder,
 	ExecutedMigrationsResolver,
+	IdentityFetcher,
 	MigrationAlterer,
 	MigrationExecutor,
 	PermissionsFactory,
@@ -22,16 +24,18 @@ import {
 } from './model'
 import { UuidProvider } from './utils'
 import {
+	EventsQueryResolver,
 	ExecutedMigrationsQueryResolver,
 	MigrateMutationResolver,
+	MigrationAlterMutationResolver,
 	ResolverContextFactory,
 	ResolverFactory,
 	StagesQueryResolver,
 	TruncateMutationResolver,
 } from './resolvers'
 import { ClientBase } from 'pg'
-import { MigrationAlterMutationResolver } from './resolvers/mutation/MigrationAlterMutationResolver'
 import { MigrationArgs } from './migrations'
+import { EventOldValuesResolver } from './resolvers/types'
 
 export interface SystemContainer {
 	systemResolversFactory: ResolverFactory
@@ -49,6 +53,7 @@ type Args = {
 	modificationHandlerFactory: ModificationHandlerFactory
 	entitiesSelector: EntitiesSelector
 	systemDbMigrationsRunnerFactory: (db: DatabaseCredentials, dbClient: ClientBase) => MigrationsRunner<MigrationArgs>
+	identityFetcher: IdentityFetcher
 }
 
 export class SystemContainerFactory {
@@ -70,6 +75,8 @@ export class SystemContainerFactory {
 				container.systemDbMigrationsRunnerFactory)
 			.addService('modificationHandlerFactory', () =>
 				container.modificationHandlerFactory)
+			.addService('identityFetcher', () =>
+				container.identityFetcher)
 			.addService('schemaMigrator', ({ modificationHandlerFactory }) =>
 				new SchemaMigrator(modificationHandlerFactory))
 			.addService('executedMigrationsResolver', ({}) =>
@@ -96,6 +103,8 @@ export class SystemContainerFactory {
 				new ProjectTruncateExecutor())
 			.addService('migrationAlterer', () =>
 				new MigrationAlterer())
+			.addService('eventResponseBuilder', ({ identityFetcher }) =>
+				new EventResponseBuilder(identityFetcher))
 			.addService('stagesQueryResolver', () =>
 				new StagesQueryResolver())
 			.addService('executedMigrationsQueryResolver', () =>
@@ -106,8 +115,12 @@ export class SystemContainerFactory {
 				new TruncateMutationResolver(projectTruncateExecutor))
 			.addService('migrationAlterMutationResolver', ({ migrationAlterer }) =>
 				new MigrationAlterMutationResolver(migrationAlterer))
-			.addService('systemResolversFactory', ({ stagesQueryResolver, executedMigrationsQueryResolver, migrateMutationResolver, truncateMutationResolver, migrationAlterMutationResolver }) =>
-				new ResolverFactory(stagesQueryResolver, executedMigrationsQueryResolver, migrateMutationResolver, truncateMutationResolver, migrationAlterMutationResolver))
+			.addService('eventsQueryResolver', ({ eventResponseBuilder }) =>
+				new EventsQueryResolver(eventResponseBuilder))
+			.addService('eventOldValuesResolver', () =>
+				new EventOldValuesResolver())
+			.addService('systemResolversFactory', ({ stagesQueryResolver, executedMigrationsQueryResolver, migrateMutationResolver, truncateMutationResolver, migrationAlterMutationResolver, eventsQueryResolver, eventOldValuesResolver }) =>
+				new ResolverFactory(stagesQueryResolver, executedMigrationsQueryResolver, migrateMutationResolver, truncateMutationResolver, migrationAlterMutationResolver, eventsQueryResolver, eventOldValuesResolver))
 			.addService('resolverContextFactory', ({ authorizator, schemaVersionBuilder }) =>
 				new ResolverContextFactory(authorizator, schemaVersionBuilder))
 			.addService('projectInitializer', ({ projectMigrator, stageCreator, systemDbMigrationsRunnerFactory, schemaVersionBuilder }) =>

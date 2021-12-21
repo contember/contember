@@ -6,6 +6,5 @@ export const prepareStageQueryBuilder = () => {
 		.select('id')
 		.select('name')
 		.select('slug')
-		.select('event_id')
 		.from('stage')
 }

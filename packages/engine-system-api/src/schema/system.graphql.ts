@@ -13,107 +13,111 @@ const schema: DocumentNode = gql`
 	type Query {
 		stages: [Stage!]!
 		executedMigrations(version: String): [ExecutedMigration!]!
-		history(stage: String!, filter: [HistoryFilter!], sinceEvent: String, sinceTime: DateTime): HistoryResponse!
+		events(args: EventsArgs): [Event!]!
 	}
 
 	type Mutation {
 		migrate(migrations: [Migration!]!): MigrateResponse!
 	}
 
-	# === history filter ===
+	# === events ===
 
-	input HistoryFilter {
-		entity: String!
-		id: String!
+	input EventsArgs {
+		stage: String
+		filter: EventsFilter
+		order: EventsOrder
+		offset: Int
+		"Max 10000"
+		limit: Int
 	}
 
-	# === history ===
-
-	enum HistoryErrorCode {
-		STAGE_NOT_FOUND
+	enum EventsOrder {
+		CREATED_AT_ASC
+		CREATED_AT_DESC
+		APPLIED_AT_ASC
+		APPLIED_AT_DESC
 	}
 
-	type HistoryError {
-		code: HistoryErrorCode!
-		developerMessage: String!
+	input EventsFilter {
+		types: [EventType!]
+		rows: [EventFilterRow!]
+		tables: [String!]
+		transactions: [String!]
+		identities: [String!]
+		createdAt: EventsFilterDate
+		appliedAt: EventsFilterDate
 	}
 
-	type HistoryResponse {
-		ok: Boolean
-		errors: [HistoryErrorCode!]! @deprecated
-		error: HistoryError
-		result: HistoryResult
+	input EventsFilterDate {
+		from: DateTime
+		to: DateTime
 	}
 
-	type HistoryResult {
-		events: [HistoryEvent!]!
+	input EventFilterRow {
+		tableName: String!
+		primaryKey: [String!]!
 	}
 
-	interface HistoryEvent {
+	interface Event {
 		id: String!
 		transactionId: String!
 		identityDescription: String!
 		identityId: String!
 		description: String!
 		createdAt: DateTime!
-		type: HistoryEventType!
+		appliedAt: DateTime!
+		type: EventType!
+		tableName: String!
+		primaryKey: [String!]!
 	}
 
-	enum HistoryEventType {
+	enum EventType {
 		UPDATE
 		DELETE
 		CREATE
-		RUN_MIGRATION
 	}
 
-	type HistoryUpdateEvent implements HistoryEvent {
+	type UpdateEvent implements Event {
 		id: String!
 		transactionId: String!
 		identityId: String!
 		identityDescription: String!
 		description: String!
 		createdAt: DateTime!
-		type: HistoryEventType!
+		appliedAt: DateTime!
+		type: EventType!
 		tableName: String!
-		primaryKeys: [String!]!
+		primaryKey: [String!]!
 		oldValues: Json!
 		diffValues: Json!
 	}
 
-	type HistoryDeleteEvent implements HistoryEvent {
+	type DeleteEvent implements Event {
 		id: String!
 		transactionId: String!
 		identityId: String!
 		identityDescription: String!
 		description: String!
 		createdAt: DateTime!
-		type: HistoryEventType!
+		appliedAt: DateTime!
+		type: EventType!
 		tableName: String!
-		primaryKeys: [String!]!
+		primaryKey: [String!]!
 		oldValues: Json!
 	}
 
-	type HistoryCreateEvent implements HistoryEvent {
+	type CreateEvent implements Event {
 		id: String!
 		transactionId: String!
 		identityId: String!
 		identityDescription: String!
 		description: String!
 		createdAt: DateTime!
-		type: HistoryEventType!
+		appliedAt: DateTime!
+		type: EventType!
 		tableName: String!
-		primaryKeys: [String!]!
+		primaryKey: [String!]!
 		newValues: Json!
-	}
-
-	type HistoryRunMigrationEvent implements HistoryEvent {
-		id: String!
-		transactionId: String!
-		identityId: String!
-		identityDescription: String!
-		description: String!
-		createdAt: DateTime!
-		type: HistoryEventType!
 	}
 
 	# === executedMigrations ===

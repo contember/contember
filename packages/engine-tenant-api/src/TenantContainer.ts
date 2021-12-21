@@ -61,6 +61,7 @@ import {
 import * as Schema from './schema'
 import { createMailer, MailerOptions, TemplateRenderer } from './utils'
 import { MigrationsRunnerFactory, TenantCredentials } from './migrations'
+import { IdentityFetcher } from './bridges/system/IdentityFetcher'
 
 export type ConnectionType = Connection.ConnectionLike & Connection.ClientFactory & Connection.PoolStatusProvider
 
@@ -75,6 +76,7 @@ export interface TenantContainer {
 	resolverContextFactory: ResolverContextFactory
 	authorizator: Authorizator<Identity>
 	migrationsRunnerFactory: MigrationsRunnerFactory
+	identityFetcher: IdentityFetcher
 }
 
 export interface TenantContainerArgs {
@@ -104,6 +106,7 @@ export class TenantContainerFactory {
 				'connection',
 				'projectGroupProvider',
 				'migrationsRunnerFactory',
+				'identityFetcher',
 			)
 	}
 
@@ -166,6 +169,8 @@ export class TenantContainerFactory {
 				new OtpManager(otpAuthenticator))
 			.addService('mailTemplateManager', () =>
 				new MailTemplateManager())
+			.addService('identityFetcher', () =>
+				new IdentityFetcher())
 			.addService('identityTypeResolver', ({ projectMemberManager, projectManager }) =>
 				new IdentityTypeResolver(projectMemberManager, projectManager))
 			.addService('projectTypeResolver', ({ projectMemberManager, projectSchemaResolver }) =>

@@ -3,7 +3,7 @@ import {
 	FileRepeater,
 	ImageFiles,
 	ImageUploadField,
-	PageLink,
+	Link,
 	TextField,
 	UploadField,
 	VideoFiles,
@@ -16,7 +16,7 @@ import {
 
 export const DashboardPage = (
 	<EditPage pageName="dashboard" entity="UploadShowcase(unique = One)">
-		<PageLink to="second">SECOND</PageLink>
+		<Link to="second">SECOND</Link>
 		<ImageUploadField urlField="singleTrivialImage.url" label="Trivial imageddd" />
 		<ImageUploadField
 			label="Single basic image"

@@ -1,10 +1,10 @@
 import { useProjectSlug } from '@contember/react-client'
 import { Button, FormGroup, LayoutPage, Stack, TextInput } from '@contember/ui'
 import { FC, memo, SyntheticEvent, useCallback, useState } from 'react'
-import { NavigateBackButton, useRedirect, useShowToast } from '../../../components'
+import { useShowToast } from '../../../components'
 import { useInvite } from '../../mutations'
 import { EditMembership, RolesConfig } from '../member'
-import { RoutingLinkTarget } from '../../../routing'
+import { NavigateBackButton, RoutingLinkTarget, useRedirect } from '../../../routing'
 import { Membership } from '../../types'
 
 interface InviteUserProps {

@@ -11,7 +11,7 @@ import {
 	HasManySelectCell,
 	HasOneSelectCell,
 	MultiSelectField,
-	PageLinkButton,
+	LinkButton,
 	PageLinkById,
 	SelectField,
 	TextCell,
@@ -22,7 +22,7 @@ import {
 
 export const ArticleListPage = (
 	<GenericPage pageName="articleList">
-		<TitleBar actions={<PageLinkButton to="articleCreate">Add article</PageLinkButton>}>Articles</TitleBar>
+		<TitleBar actions={<LinkButton to="articleCreate">Add article</LinkButton>}>Articles</TitleBar>
 
 		<DataBindingProvider stateComponent={FeedbackRenderer}>
 			<DataGrid entities="Article" itemsPerPage={20}>
@@ -32,7 +32,7 @@ export const ArticleListPage = (
 				<HasManySelectCell field="tags" options={`Tag.locales(locale.code = 'cs').name`} header="Tags" />
 
 				<GenericCell canBeHidden={false} justification="justifyEnd">
-					<PageLinkButton to={`articleEdit(id: $entity.id)`} Component={AnchorButton}>Edit</PageLinkButton>
+					<LinkButton to={`articleEdit(id: $entity.id)`} Component={AnchorButton}>Edit</LinkButton>
 					<DeleteEntityButton title="Delete" immediatePersist={true}></DeleteEntityButton>
 				</GenericCell>
 			</DataGrid>

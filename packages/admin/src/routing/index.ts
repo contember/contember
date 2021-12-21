@@ -1,3 +1,5 @@
+export * from './binding'
+
 export { requestStateToPath, pathToRequestState, PageNotFound } from './urlMapper'
 export * from './RoutingContext'
 export * from './RequestContext'

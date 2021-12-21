@@ -14,7 +14,7 @@ import {
 	NavigateBackButton,
 	OtpManagement,
 	Page,
-	PageLinkButton,
+	LinkButton,
 	Pages,
 	ProjectsGrid,
 	runReactApp,
@@ -67,7 +67,7 @@ runReactApp(
 	>
 		<Pages layout={PanelLayout}>
 			<GenericPage
-				actions={<PageLinkButton to={'projectCreate'}>New project</PageLinkButton>}
+				actions={<LinkButton to={'projectCreate'}>New project</LinkButton>}
 				pageName={'projectList'}
 				title="Projects"
 			>
@@ -92,8 +92,7 @@ runReactApp(
 							<div className={'projectMembers-section'}>
 								<Box
 									heading={'Users'}
-									actions={<PageLinkButton to={{ pageName: 'userInvite', parameters: { project } }}>Invite
-										user</PageLinkButton>}
+									actions={<LinkButton to={{ pageName: 'userInvite', parameters: { project } }}>Invite user</LinkButton>}
 								>
 									<UsersList
 										project={project}
@@ -104,8 +103,7 @@ runReactApp(
 							<div className={'projectMembers-section'}>
 								<Box
 									heading={'API keys'}
-									actions={<PageLinkButton to={{ pageName: 'apiKeyCreate', parameters: { project } }}>Create API
-										key</PageLinkButton>}
+									actions={<LinkButton to={{ pageName: 'apiKeyCreate', parameters: { project } }}>Create API key</LinkButton>}
 								>
 									<ApiKeyList
 										project={project}
@@ -121,9 +119,7 @@ runReactApp(
 			<Page name="userInvite">
 				{({ project }: { project: string }) => (
 					<LayoutPage
-						navigation={<NavigateBackButton
-							to={{ pageName: 'projectOverview', parameters: { project } }}
-						>Project</NavigateBackButton>}
+						navigation={<NavigateBackButton to={{ pageName: 'projectOverview', parameters: { project } }}>Project</NavigateBackButton>}
 						title={`Invite user to project ${project}`}
 					>
 						<InviteUser
@@ -137,9 +133,7 @@ runReactApp(
 			<Page name="identityEdit">
 				{({ project, identity }: { project: string, identity: string }) => (
 					<LayoutPage
-						navigation={<NavigateBackButton
-							to={{ pageName: 'projectOverview', parameters: { project } }}
-						>Users</NavigateBackButton>}
+						navigation={<NavigateBackButton to={{ pageName: 'projectOverview', parameters: { project } }}>Users</NavigateBackButton>}
 						title={`Edit membership in project ${project}`}
 					>
 						<EditIdentity
@@ -154,9 +148,7 @@ runReactApp(
 			<Page name="apiKeyCreate">
 				{({ project }: { project: string }) => (
 					<LayoutPage
-						navigation={<NavigateBackButton
-							to={{ pageName: 'projectOverview', parameters: { project } }}
-						>Project</NavigateBackButton>}
+						navigation={<NavigateBackButton to={{ pageName: 'projectOverview', parameters: { project } }}>Project</NavigateBackButton>}
 						title={`Create API key for project ${project}`}
 					>
 						<CreateApiKeyForm

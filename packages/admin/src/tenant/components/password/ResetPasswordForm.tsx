@@ -1,9 +1,9 @@
 import { FC, useCallback } from 'react'
-import { useRedirect, useShowToast } from '../../../components'
-import { RoutingLinkTarget } from '../../../routing'
+import { useShowToast } from '../../../components'
+import { RoutingLinkTarget, useRedirect } from '../../../routing'
 import { Button, FormGroup, TextInput } from '@contember/ui'
 import { useResetPassword } from '../../mutations'
-import { useForm } from '../../lib/useForm'
+import { useForm } from '../../lib'
 
 interface ResetPasswordFormProps {
 	token: string

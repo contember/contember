@@ -1,6 +1,7 @@
-import { PageNotFound, RoutingParameterResolver } from '../../routing'
-import { useCallback } from 'react'
 import { BindingError, useEntity, useHasEntity } from '@contember/binding'
+import { useCallback } from 'react'
+import { RoutingParameterResolver } from '../types'
+import { PageNotFound } from '../urlMapper'
 
 export const ROUTING_BINDING_PARAMETER_PREFIX = 'entity.'
 export const useBindingLinkParametersResolver = (): RoutingParameterResolver => {

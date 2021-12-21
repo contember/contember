@@ -2,8 +2,8 @@ import { Button, FormGroup, Section, Select, TextInput } from '@contember/ui'
 import { FC, SyntheticEvent, useState } from 'react'
 import { useForm } from '../../lib'
 import { useCreateProject } from '../../mutations'
-import { useRedirect, useShowToast } from '../../../components'
-import { RoutingLinkTarget } from '../../../routing'
+import { useShowToast } from '../../../components'
+import { RoutingLinkTarget, useRedirect } from '../../../routing'
 
 const emptyForm = {
 	slug: '',

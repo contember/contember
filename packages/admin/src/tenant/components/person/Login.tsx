@@ -2,8 +2,7 @@ import { getTenantErrorMessage } from '@contember/client'
 import { Button, ErrorList, FieldError, FormGroup, Section, TextInput } from '@contember/ui'
 import { useCallback, useState } from 'react'
 import { useForm, useSignIn } from '../../index'
-import { PageLink } from '../../../components'
-import { RoutingLinkTarget } from '../../../routing'
+import { Link, RoutingLinkTarget } from '../../../routing'
 import { useSetSessionToken } from '@contember/react-client'
 
 export interface LoginProps {
@@ -78,7 +77,7 @@ export const Login = ({ onLogin, resetLink }: LoginProps) => {
 					<Button type="submit" intent="primary" disabled={isSubmitting}>
 						Submit
 					</Button>
-					{resetLink && <PageLink to={resetLink} style={{ float: 'right' }}>Forgot your password?</PageLink>}
+					{resetLink && <Link to={resetLink} style={{ float: 'right' }}>Forgot your password?</Link>}
 				</FormGroup>
 			</Section>
 		</form>

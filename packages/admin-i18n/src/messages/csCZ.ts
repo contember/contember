@@ -94,7 +94,7 @@ export const csCZ: AdminDictionary = {
 	upload: {
 		addButton: {
 			text: 'Vyberte soubory',
-			subText: 'or nebo je sem přetáhněte',
+			subText: 'nebo je sem přetáhněte',
 		},
 		fileState: {
 			inspectingFile: 'Zkoumám soubor…',

@@ -177,11 +177,11 @@ export class MutationEntryNotFoundError implements MutationResultInterface {
 // possibly denied by acl
 export class MutationNoResultError implements MutationResultInterface {
 	result = MutationResultType.noResultError as const
-	hints: MutationResultHint[] = []
 
 	constructor(
 		public readonly paths: Path[],
 		public readonly message?: string,
+		public readonly hints: MutationResultHint[] = [],
 	) {}
 }
 

@@ -10,6 +10,7 @@ import {
 	MutationEntryNotFoundError,
 	MutationNoResultError,
 	MutationNothingToDo,
+	MutationResultHint,
 	MutationResultList,
 	NothingToDoReason,
 } from '../Result'
@@ -56,7 +57,7 @@ export class DeleteExecutor {
 			} catch (e) {
 				if (e instanceof ForeignKeyViolationError) {
 					const tableName = e.previous && 'table' in e.previous && typeof e.previous.table === 'string' ? e.previous.table : undefined
-					return [new MutationNoResultError([], tableName ? `table ${tableName}` : undefined)]
+					return [new MutationNoResultError([], tableName ? `table ${tableName}` : undefined, [MutationResultHint.sqlError])]
 				}
 				throw e
 			}

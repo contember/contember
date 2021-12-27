@@ -2,9 +2,9 @@
 set -euo pipefail
 
 REPO="contember/engine"
-docker build -t "$REPO:canary-$VERSION" -f ./packages/engine-server/alpine.dockerfile .
+docker buildx build --platform linux/amd64,linux/arm64 --push -t "$REPO:canary-$VERSION" -f ./packages/engine-server/alpine.dockerfile .
 
-docker build -t "$REPO:canary-$VERSION-debian" -f ./packages/engine-server/debian.dockerfile .
+docker buildx build --platform linux/amd64,linux/arm64 --push -t "$REPO:canary-$VERSION-debian" -f ./packages/engine-server/debian.dockerfile .
 
 REPO="contember/cli"
-docker build -t "$REPO:canary-$VERSION" -f ./packages/cli/Dockerfile .
+docker buildx build --platform linux/amd64,linux/arm64 --push -t "$REPO:canary-$VERSION" -f ./packages/cli/Dockerfile .

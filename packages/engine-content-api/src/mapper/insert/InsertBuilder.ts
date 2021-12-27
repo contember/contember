@@ -5,7 +5,6 @@ import { getColumnName, getColumnType } from '@contember/schema-utils'
 import { ColumnValue, ResolvedColumnValue, resolveGenericValue, resolveRowData } from '../ColumnValue'
 import { ImplementationException } from '../../exception'
 import { AbortInsert } from './Inserter'
-import { EnrichedError } from '../ErrorUtils'
 
 export interface InsertResult {
 	values: ResolvedColumnValue[]
@@ -79,7 +78,7 @@ export class InsertBuilder {
 			return { values: resolvedData as ResolvedColumnValue[], executed: true, primaryValue: result, aborted: false }
 		} catch (e) {
 			this.resolver(null)
-			throw new EnrichedError(this.entity, resolvedDataFinal, e)
+			throw e
 		}
 	}
 }

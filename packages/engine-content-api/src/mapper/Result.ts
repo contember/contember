@@ -209,6 +209,7 @@ export const flattenResult = (result: (MutationResultList | MutationResultList[]
 export type ResultListNotFlatten = MutationResultList | MutationResultList[]
 
 export const collectResults = async (
+	schema: Model.Schema,
 	mainPromise: Promise<ResultListNotFlatten | undefined> | undefined,
 	otherPromises: (Promise<ResultListNotFlatten | undefined> | undefined)[],
 ): Promise<MutationResultList> => {
@@ -217,7 +218,7 @@ export const collectResults = async (
 		.filter((it): it is Promise<ResultListNotFlatten> => !!it)
 		.map(it =>
 			it //
-				.catch(e => [convertError(e)])
+				.catch(e => [convertError(schema, e)])
 				.then(value => ({ value, index: index++ })),
 		)
 	const results = await Promise.allSettled(allPromises)

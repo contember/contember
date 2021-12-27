@@ -36,7 +36,6 @@ export class DeleteExecutor {
 		filter?: Input.OptionalWhere,
 	): Promise<MutationResultList> {
 		return mapper.mutex.execute(async () => {
-			const db = mapper.db
 			await mapper.constraintHelper.setFkConstraintsDeferred()
 			const primaryValue = await mapper.getPrimaryValue(entity, by)
 			if (!primaryValue) {
@@ -51,16 +50,8 @@ export class DeleteExecutor {
 				return [new MutationNoResultError([])]
 			}
 
-			try {
-				await mapper.constraintHelper.setFkConstraintsImmediate()
-				return [new MutationDeleteOk([], entity, primaryValue)]
-			} catch (e) {
-				if (e instanceof ForeignKeyViolationError) {
-					const tableName = e.previous && 'table' in e.previous && typeof e.previous.table === 'string' ? e.previous.table : undefined
-					return [new MutationNoResultError([], tableName ? `table ${tableName}` : undefined, [MutationResultHint.sqlError])]
-				}
-				throw e
-			}
+			await mapper.constraintHelper.setFkConstraintsImmediate()
+			return [new MutationDeleteOk([], entity, primaryValue)]
 		})
 	}
 

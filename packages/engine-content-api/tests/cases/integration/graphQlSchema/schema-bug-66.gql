@@ -401,7 +401,7 @@ type Mutation {
   deleteFrontPage(by: FrontPageUniqueWhere!, filter: FrontPageWhere): FrontPageDeleteResult!
   updateFrontPage(by: FrontPageUniqueWhere!, filter: FrontPageWhere, data: FrontPageUpdateInput!): FrontPageUpdateResult!
   upsertFrontPage(by: FrontPageUniqueWhere!, filter: FrontPageWhere, update: FrontPageUpdateInput!, create: FrontPageCreateInput!): FrontPageUpsertResult!
-  transaction: MutationTransaction!
+  transaction(options: MutationTransactionOptions): MutationTransaction!
   query: Query!
 }
 
@@ -504,4 +504,8 @@ type MutationTransaction {
   updateFrontPage(by: FrontPageUniqueWhere!, filter: FrontPageWhere, data: FrontPageUpdateInput!): FrontPageUpdateResult!
   upsertFrontPage(by: FrontPageUniqueWhere!, filter: FrontPageWhere, update: FrontPageUpdateInput!, create: FrontPageCreateInput!): FrontPageUpsertResult!
   query: Query
+}
+
+input MutationTransactionOptions {
+  deferForeignKeyConstraints: Boolean
 }

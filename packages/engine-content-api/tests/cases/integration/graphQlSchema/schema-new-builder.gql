@@ -692,7 +692,7 @@ type Mutation {
   deleteCategory(by: CategoryUniqueWhere!, filter: CategoryWhere): CategoryDeleteResult!
   updateCategory(by: CategoryUniqueWhere!, filter: CategoryWhere, data: CategoryUpdateInput!): CategoryUpdateResult!
   upsertCategory(by: CategoryUniqueWhere!, filter: CategoryWhere, update: CategoryUpdateInput!, create: CategoryCreateInput!): CategoryUpsertResult!
-  transaction: MutationTransaction!
+  transaction(options: MutationTransactionOptions): MutationTransaction!
   query: Query!
 }
 
@@ -865,4 +865,8 @@ type MutationTransaction {
   updateCategory(by: CategoryUniqueWhere!, filter: CategoryWhere, data: CategoryUpdateInput!): CategoryUpdateResult!
   upsertCategory(by: CategoryUniqueWhere!, filter: CategoryWhere, update: CategoryUpdateInput!, create: CategoryCreateInput!): CategoryUpsertResult!
   query: Query
+}
+
+input MutationTransactionOptions {
+  deferForeignKeyConstraints: Boolean
 }

@@ -152,7 +152,7 @@ type Mutation {
   createTest(data: TestCreateInput!): TestCreateResult!
   updateTest(by: TestUniqueWhere!, filter: TestWhere, data: TestUpdateInput!): TestUpdateResult!
   upsertTest(by: TestUniqueWhere!, filter: TestWhere, update: TestUpdateInput!, create: TestCreateInput!): TestUpsertResult!
-  transaction: MutationTransaction!
+  transaction(options: MutationTransactionOptions): MutationTransaction!
   query: Query!
 }
 
@@ -212,4 +212,8 @@ type MutationTransaction {
   updateTest(by: TestUniqueWhere!, filter: TestWhere, data: TestUpdateInput!): TestUpdateResult!
   upsertTest(by: TestUniqueWhere!, filter: TestWhere, update: TestUpdateInput!, create: TestCreateInput!): TestUpsertResult!
   query: Query
+}
+
+input MutationTransactionOptions {
+  deferForeignKeyConstraints: Boolean
 }

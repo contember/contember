@@ -233,7 +233,7 @@ type Mutation {
   updateOneHasManyEntity(by: OneHasManyEntityUniqueWhere!, filter: OneHasManyEntityWhere, data: OneHasManyEntityUpdateInput!): OneHasManyEntityUpdateResult!
   deleteRoot(by: RootUniqueWhere!, filter: RootWhere): RootDeleteResult!
   updateRoot(by: RootUniqueWhere!, filter: RootWhere, data: RootUpdateInput!): RootUpdateResult!
-  transaction: MutationTransaction!
+  transaction(options: MutationTransactionOptions): MutationTransaction!
   query: Query!
 }
 
@@ -300,4 +300,8 @@ type MutationTransaction {
   deleteRoot(by: RootUniqueWhere!, filter: RootWhere): RootDeleteResult!
   updateRoot(by: RootUniqueWhere!, filter: RootWhere, data: RootUpdateInput!): RootUpdateResult!
   query: Query
+}
+
+input MutationTransactionOptions {
+  deferForeignKeyConstraints: Boolean
 }

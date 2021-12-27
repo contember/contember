@@ -4,7 +4,7 @@ import {
 	GraphQLNonNull,
 	GraphQLObjectType,
 	GraphQLSchema,
-	GraphQLString,
+	GraphQLString, GraphQLInputObjectType,
 } from 'graphql'
 import { Model } from '@contember/schema'
 import { MutationProvider } from './MutationProvider'
@@ -59,6 +59,16 @@ export class GraphQlSchemaBuilder {
 		})
 		if (mutations.size > 0) {
 			mutations.set('transaction', {
+				args: {
+					options: {
+						type: new GraphQLInputObjectType({
+							name: 'MutationTransactionOptions',
+							fields: {
+								deferForeignKeyConstraints: { type: GraphQLBoolean },
+							},
+						}),
+					},
+				},
 				type: new GraphQLNonNull(
 					new GraphQLObjectType({
 						name: 'MutationTransaction',
@@ -76,9 +86,11 @@ export class GraphQlSchemaBuilder {
 						},
 					}),
 				),
-				resolve: async (parent, args, context: Context, info) => {
+				resolve: async (parent, args: { options?: { deferForeignKeyConstraints?: boolean } }, context: Context, info) => {
 					return context.timer(`GraphQL.mutation.${info.fieldName}`, () =>
-						context.executionContainer.mutationResolver.resolveTransaction(info),
+						context.executionContainer.mutationResolver.resolveTransaction(info, {
+							deferForeignKeyConstraints: args.options?.deferForeignKeyConstraints ?? false,
+						}),
 					)
 				},
 			})

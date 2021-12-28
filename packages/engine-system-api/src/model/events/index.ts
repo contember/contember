@@ -1,1 +1,1 @@
-export * from './HistoryEventResponseBuilder'
+export * from './EventResponseBuilder'

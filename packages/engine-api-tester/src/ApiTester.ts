@@ -70,6 +70,11 @@ export class ApiTester {
 			entitiesSelector: new EntitiesSelector(mapperFactory, permissionsByIdentityFactory),
 			modificationHandlerFactory,
 			providers: providers,
+			identityFetcher: {
+				fetchIdentities: () => {
+					return Promise.resolve([])
+				},
+			},
 			systemDbMigrationsRunnerFactory: (db: DatabaseCredentials, dbClient: ClientBase) =>
 				new MigrationsRunner(db, 'system', getSystemMigrations, dbClient),
 		})

@@ -1,10 +1,8 @@
-import { EventType } from '@contember/engine-common'
 import { wrapIdentifier } from '@contember/database'
 import { Schema } from '@contember/schema'
 import { Migration, ModificationHandlerFactory } from '@contember/schema-migrations'
 import { createMigrationBuilder } from '@contember/database-migrations'
 import { Stage } from '../dtos'
-import { UpdateStageEventCommand } from '../commands'
 import { formatSchemaName } from '../helpers'
 import { DatabaseContext } from '../database'
 

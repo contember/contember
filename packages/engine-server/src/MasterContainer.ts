@@ -129,12 +129,13 @@ export class MasterContainerFactory {
 			.addService('systemDbMigrationsRunnerFactory', () =>
 				(db: DatabaseCredentials, dbClient: ClientBase) =>
 					new MigrationsRunner(db, 'system', getSystemMigrations, dbClient))
-			.addService('systemContainer', ({ systemContainerFactory, entitiesSelector, modificationHandlerFactory, providers, systemDbMigrationsRunnerFactory }) =>
+			.addService('systemContainer', ({ systemContainerFactory, entitiesSelector, modificationHandlerFactory, providers, systemDbMigrationsRunnerFactory, tenantContainer }) =>
 				systemContainerFactory.create({
 					entitiesSelector,
 					modificationHandlerFactory,
 					providers,
 					systemDbMigrationsRunnerFactory,
+					identityFetcher: tenantContainer.identityFetcher,
 				}))
 			.addService('schemaVersionBuilder', ({ systemContainer }) =>
 				systemContainer.schemaVersionBuilder)

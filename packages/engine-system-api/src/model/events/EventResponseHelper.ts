@@ -3,7 +3,7 @@ import { AnyEvent, ContentEvent, CreateEvent, DeleteEvent, UpdateEvent } from '@
 export const appendUpdateSpecificData = <T>(commonData: T, event: UpdateEvent) => ({
 	...commonData,
 	tableName: event.tableName,
-	primaryKeys: event.rowId,
+	primaryKey: event.rowId,
 	diffValues: event.values,
 	oldValues: {},
 })
@@ -11,13 +11,13 @@ export const appendUpdateSpecificData = <T>(commonData: T, event: UpdateEvent) =
 export const appendCreateSpecificData = <T>(commonData: T, event: CreateEvent) => ({
 	...commonData,
 	tableName: event.tableName,
-	primaryKeys: event.rowId,
+	primaryKey: event.rowId,
 	newValues: event.values,
 })
 
 export const appendDeleteSpecificData = <T>(commonData: T, event: DeleteEvent) => ({
 	...commonData,
 	tableName: event.tableName,
-	primaryKeys: event.rowId,
+	primaryKey: event.rowId,
 	oldValues: {},
 })

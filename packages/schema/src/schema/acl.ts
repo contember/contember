@@ -84,10 +84,7 @@ namespace Acl {
 	export type LimitedSystemPermissionsLevel = SystemPermissionsLevel.any | SystemPermissionsLevel.none
 
 	export interface SystemPermissions {
-		diff?: SystemPermissionsLevel
 		history?: LimitedSystemPermissionsLevel
-		release?: SystemPermissionsLevel
-		rebase?: LimitedSystemPermissionsLevel
 		migrate?: boolean
 		assumeIdentity?: boolean
 	}

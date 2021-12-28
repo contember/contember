@@ -9,7 +9,7 @@
   },
   "devDependencies": {
     "@types/js-yaml": "^4.0.1",
-    "@types/node": "^15.12.5"
+    "@types/node": "^17.0.5"
   },
   "dependencies": {
     "js-yaml": "^4.1.0"

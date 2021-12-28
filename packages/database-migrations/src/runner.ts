@@ -113,6 +113,9 @@ const ensureMigrationsTable = async (db: DBConnection, options: RunnerOption): P
 			`CREATE TABLE IF NOT EXISTS ${fullTableName} ( ${idColumn} SERIAL PRIMARY KEY, ${nameColumn} varchar(255) NOT NULL, ${runOnColumn} timestamp NOT NULL)`,
 		)
 	} catch (err) {
+		if (!(err instanceof Error)) {
+			throw err
+		}
 		throw new Error(`Unable to ensure migrations table: ${err.stack}`)
 	}
 }

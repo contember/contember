@@ -72,7 +72,7 @@ export const executeDbTest = async (test: Test) => {
 				}
 			}
 		} catch (e) {
-			if ('throws' in test) {
+			if ('throws' in test && e instanceof Error) {
 				assert.is(e.message, test.throws.message)
 			} else {
 				throw e

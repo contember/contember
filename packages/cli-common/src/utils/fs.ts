@@ -8,7 +8,7 @@ export const listDirectories = async (dir: string): Promise<string[]> => {
 		const stats = await Promise.all(entries.map(async it => tuple(it, await fs.lstat(it))))
 		return stats.filter(([, it]) => it.isDirectory()).map(([it]) => it)
 	} catch (e) {
-		if (e.code && e.code === 'ENOENT') {
+		if (e instanceof Error && 'code' in e && (e as any).code === 'ENOENT') {
 			return []
 		}
 		throw e
@@ -25,7 +25,7 @@ export const tryUnlink = async (path: string): Promise<void> => {
 	try {
 		await fs.unlink(path)
 	} catch (e) {
-		if (e.code && e.code === 'ENOENT') {
+		if (e instanceof Error && 'code' in e && (e as any).code === 'ENOENT') {
 			return
 		}
 		throw e

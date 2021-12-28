@@ -43,7 +43,7 @@ class Connection implements Connection.ConnectionLike, Connection.ClientFactory,
 			return result
 		} catch (e) {
 			await transaction.rollbackUnclosed()
-			client.release(e)
+			client.release(e as Error)
 			throw e
 		}
 	}
@@ -65,7 +65,7 @@ class Connection implements Connection.ConnectionLike, Connection.ClientFactory,
 			client.release()
 			return result
 		} catch (e) {
-			client.release(e)
+			client.release(e as Error)
 			throw e
 		}
 	}

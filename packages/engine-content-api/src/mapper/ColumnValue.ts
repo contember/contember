@@ -22,7 +22,7 @@ export const resolveGenericValue = <T>(value: Value.GenericValueLike<T>): Promis
 export const resolveRowData = async <E>(
 	values: ColumnValue<E>[],
 ): Promise<ResolvedColumnValue<Exclude<E, undefined>>[]> => {
-	const valuePromises = values.map(async it => ({ ...it, resolvedValue: await it.value }))
+	const valuePromises = values.map(async (it): Promise<ResolvedColumnValue<E | undefined>> => ({ ...it, resolvedValue: await it.value }))
 	const settledValues = await Promise.allSettled(valuePromises)
 	const failed = getRejections(settledValues)
 	if (failed.length > 0) {

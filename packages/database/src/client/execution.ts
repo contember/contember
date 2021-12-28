@@ -58,9 +58,12 @@ export async function executeQuery<Row extends Record<string, any>>(
 
 		return result
 	} catch (error) {
+		if (!(error instanceof Error)) {
+			throw error
+		}
 		eventManager.fire(EventManager.Event.queryError, { sql, parameters, meta }, error)
 
-		switch (error.code) {
+		switch ((error as any).code) {
 			case '23502':
 				throw new NotNullViolationError(sql, parameters, error)
 			case '23503':

@@ -39,7 +39,10 @@ export class UpdateProjectMemberCommand implements Command<UpdateProjectMemberRe
 
 			return new ResponseOk(null)
 		} catch (e) {
-			switch (e.constraint) {
+			if (!(e instanceof Error)) {
+				throw e
+			}
+			switch ((e as any).constraint) {
 				case 'project_membership_project':
 					return new ResponseError(UpdateProjectMemberErrorCode.ProjectNotFound, 'Project not found')
 				default:

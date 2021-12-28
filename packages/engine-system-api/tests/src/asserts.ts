@@ -47,7 +47,7 @@ export async function throwsAsync(
 
 		if (typeof exp === 'function') {
 			assert(exp(err), false, true, 'throws', false, 'Expected function to throw matching exception', msg)
-		} else if (exp instanceof RegExp) {
+		} else if (exp instanceof RegExp && err instanceof Error) {
 			let tmp = '`' + String(exp) + '`'
 			assert(
 				exp.test(err.message),

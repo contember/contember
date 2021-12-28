@@ -59,7 +59,10 @@ export class ProjectManager {
 				// eslint-disable-next-line no-console
 				console.error(e)
 				await db.client.connection.rollback()
-				return new ResponseError(CreateProjectResponseErrorCode.InitError, `Project initialization error: ${'message' in e ? e.message : 'unknown'}`)
+				return new ResponseError(
+					CreateProjectResponseErrorCode.InitError,
+					`Project initialization error: ${e instanceof Error && 'message' in e ? e.message : 'unknown'}`,
+				)
 			}
 
 			return new ResponseOk(new CreateProjectResult(deployResult.result))

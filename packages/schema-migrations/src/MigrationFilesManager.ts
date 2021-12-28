@@ -33,9 +33,9 @@ class MigrationFilesManager {
 	public async createDirIfNotExist(): Promise<void> {
 		try {
 			await mkdir(this.directory)
-		} catch (error) {
-			if (error.code !== 'EEXIST') {
-				throw error
+		} catch (e) {
+			if (!(e instanceof Error) || !('code' in e) || (e as any).code !== 'EEXIST') {
+				throw e
 			}
 		}
 	}
@@ -57,7 +57,7 @@ class MigrationFilesManager {
 		try {
 			return await readDir(this.directory)
 		} catch (e) {
-			if (e.code === 'ENOENT') {
+			if (e instanceof Error && 'code' in e && (e as any).code === 'ENOENT') {
 				return []
 			}
 			throw e

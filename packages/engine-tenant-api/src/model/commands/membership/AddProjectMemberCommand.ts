@@ -35,7 +35,10 @@ export class AddProjectMemberCommand implements Command<CommandResponse> {
 			}
 			return new ResponseOk(undefined)
 		} catch (e) {
-			switch (e.constraint) {
+			if (!(e instanceof Error)) {
+				throw e
+			}
+			switch ((e as any).constraint) {
 				case 'project_membership_project':
 					return new ResponseError(AddProjectMemberCommandError.projectNotFound, 'Project not found')
 				case 'project_membership_identity':

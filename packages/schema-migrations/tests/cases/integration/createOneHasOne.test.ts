@@ -132,7 +132,8 @@ testMigrations('create one has one relation (site with settings)', {
 	ALTER TABLE "site"
 		ADD "setting_id" uuid;
 	ALTER TABLE "site"
-		ADD CONSTRAINT "unique_Site_setting_8653a0" UNIQUE ("setting_id");
+		ADD CONSTRAINT "fk_site_setting_id_6a4aa6" FOREIGN KEY ("setting_id") REFERENCES "site_setting"("id") ON DELETE NO ACTION DEFERRABLE INITIALLY IMMEDIATE;
 	ALTER TABLE "site"
-		ADD CONSTRAINT "fk_site_setting_id_6a4aa6" FOREIGN KEY ("setting_id") REFERENCES "site_setting"("id") ON DELETE NO ACTION DEFERRABLE INITIALLY IMMEDIATE;`,
+		ADD CONSTRAINT "unique_Site_setting_8653a0" UNIQUE ("setting_id");
+		`,
 })

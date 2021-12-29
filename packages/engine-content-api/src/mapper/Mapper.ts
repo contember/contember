@@ -163,7 +163,7 @@ export class Mapper {
 		if (entity.view) {
 			throw new ImplementationException()
 		}
-		return tryMutation(() =>
+		return tryMutation(this.schema, () =>
 			this.inserter.insert(this, entity, data, id => {
 				const where = { [entity.primary]: id }
 				this.primaryKeyCache[this.hashWhere(entity.name, where)] = id
@@ -180,7 +180,7 @@ export class Mapper {
 		if (entity.view) {
 			throw new ImplementationException()
 		}
-		return tryMutation(async () => {
+		return tryMutation(this.schema, async () => {
 			const primaryValue = await this.getPrimaryValue(entity, by)
 			if (primaryValue === undefined) {
 				return [new MutationEntryNotFoundError([], by)]
@@ -195,7 +195,7 @@ export class Mapper {
 		predicateFields: string[],
 		builderCb: (builder: UpdateBuilder) => void,
 	): Promise<MutationResultList> {
-		return tryMutation(async () => {
+		return tryMutation(this.schema, async () => {
 			const primaryValue = await this.getPrimaryValue(entity, by)
 			if (primaryValue === undefined) {
 				return [new MutationEntryNotFoundError([], by)]
@@ -214,7 +214,7 @@ export class Mapper {
 		if (entity.view) {
 			throw new ImplementationException()
 		}
-		return tryMutation(async () => {
+		return tryMutation(this.schema, async () => {
 			const primaryValue = await this.getPrimaryValue(entity, by)
 			if (primaryValue === undefined) {
 				return await this.inserter.insert(this, entity, create, id => {
@@ -234,7 +234,7 @@ export class Mapper {
 		if (entity.view) {
 			throw new ImplementationException()
 		}
-		return tryMutation(() => this.deleteExecutor.execute(this, entity, by, filter))
+		return tryMutation(this.schema, () => this.deleteExecutor.execute(this, entity, by, filter))
 	}
 
 	public async connectJunction(

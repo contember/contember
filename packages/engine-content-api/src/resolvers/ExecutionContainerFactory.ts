@@ -64,7 +64,7 @@ export class ExecutionContainerFactory {
 			.addService('inputPreValidator', ({ entityRulesResolver, columnValueResolver, dataSelector }) =>
 				new InputPreValidator(this.schema.model, entityRulesResolver, columnValueResolver, dataSelector))
 			.addService('mutationResolver', ({ db, mapperFactory, inputPreValidator, queryAstFactory }) =>
-				new MutationResolver(db, mapperFactory, this.setupSystemVariables, inputPreValidator, queryAstFactory))
+				new MutationResolver(this.schema.model, db, mapperFactory, this.setupSystemVariables, inputPreValidator, queryAstFactory))
 			.addService('validationResolver', ({ inputPreValidator, db, mapperFactory }) =>
 				new ValidationResolver(db, mapperFactory, inputPreValidator))
 			.build()

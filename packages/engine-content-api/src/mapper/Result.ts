@@ -177,11 +177,11 @@ export class MutationEntryNotFoundError implements MutationResultInterface {
 // possibly denied by acl
 export class MutationNoResultError implements MutationResultInterface {
 	result = MutationResultType.noResultError as const
-	hints: MutationResultHint[] = []
 
 	constructor(
 		public readonly paths: Path[],
 		public readonly message?: string,
+		public readonly hints: MutationResultHint[] = [],
 	) {}
 }
 
@@ -209,6 +209,7 @@ export const flattenResult = (result: (MutationResultList | MutationResultList[]
 export type ResultListNotFlatten = MutationResultList | MutationResultList[]
 
 export const collectResults = async (
+	schema: Model.Schema,
 	mainPromise: Promise<ResultListNotFlatten | undefined> | undefined,
 	otherPromises: (Promise<ResultListNotFlatten | undefined> | undefined)[],
 ): Promise<MutationResultList> => {
@@ -217,7 +218,7 @@ export const collectResults = async (
 		.filter((it): it is Promise<ResultListNotFlatten> => !!it)
 		.map(it =>
 			it //
-				.catch(e => [convertError(e)])
+				.catch(e => [convertError(schema, e)])
 				.then(value => ({ value, index: index++ })),
 		)
 	const results = await Promise.allSettled(allPromises)

@@ -5,7 +5,6 @@ import { Client, Operator, QueryBuilder, UpdateBuilder as DbUpdateBuilder, Value
 import { PathFactory, WhereBuilder } from '../select'
 import { ColumnValue, ResolvedColumnValue, resolveGenericValue, resolveRowData } from '../ColumnValue'
 import { AbortUpdate } from './Updater'
-import { EnrichedError } from '../ErrorUtils'
 
 export interface UpdateResult {
 	values: ResolvedColumnValue[]
@@ -120,7 +119,7 @@ export class UpdateBuilder {
 			return { values: resolvedData as ResolvedColumnValue[], affectedRows: result, executed: true, aborted: false }
 		} catch (e) {
 			this.resolver(null)
-			throw new EnrichedError(this.entity, resolvedDataFinal, e)
+			throw e
 		}
 	}
 }

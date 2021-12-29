@@ -8,7 +8,7 @@ import {
 	MapperFactory,
 	MutationResultHint,
 	MutationResultList,
-	MutationResultType,
+	MutationResultType, tryMutation,
 } from '../mapper'
 import { ValidationResolver } from './ValidationResolver'
 import { GraphQLResolveInfo } from 'graphql'
@@ -23,8 +23,11 @@ import { executeReadOperations } from './ReadHelpers'
 
 type WithoutNode<T extends { node: any }> = Pick<T, Exclude<keyof T, 'node'>>
 
+type TransactionOptions = { deferForeignKeyConstraints?: boolean }
+
 export class MutationResolver {
 	constructor(
+		private readonly schema: Model.Schema,
 		private readonly db: Client,
 		private readonly mapperFactory: MapperFactory,
 		private readonly systemVariablesSetup: (db: Client) => Promise<void>,
@@ -32,7 +35,7 @@ export class MutationResolver {
 		private readonly graphqlQueryAstFactory: GraphQlQueryAstFactory,
 	) {}
 
-	public async resolveTransaction(info: GraphQLResolveInfo): Promise<Result.TransactionResult> {
+	public async resolveTransaction(info: GraphQLResolveInfo, options: TransactionOptions): Promise<Result.TransactionResult> {
 		const queryAst = this.graphqlQueryAstFactory.create(info, (node, path) => {
 			return (
 				(path.length === 1 && !['ok', 'validation', 'errorMessage', 'errors'].includes(node.name.value)) ||
@@ -57,6 +60,9 @@ export class MutationResolver {
 			}))
 
 		return this.transaction(async (mapper, trx) => {
+			if (options?.deferForeignKeyConstraints) {
+				await mapper.constraintHelper.setFkConstraintsDeferred()
+			}
 			const validationResult: Record<string, Result.MutationFieldResult> = {}
 			const validationErrors: Result.ValidationError[] = []
 			for (const field of queryAst.fields) {
@@ -180,6 +186,16 @@ export class MutationResolver {
 					}
 				}
 				trxResult[field.alias] = result
+			}
+			if (options?.deferForeignKeyConstraints) {
+				const constraintsResult = await tryMutation(this.schema, async () => {
+					await mapper.constraintHelper.setFkConstraintsImmediate()
+					return []
+				})
+				const errorResponse = this.createErrorResponse(constraintsResult)
+				if (errorResponse) {
+					return { ...errorResponse, ...validationResult }
+				}
 			}
 
 			return { ok: true, errors: [], validation: { valid: true, errors: [] }, ...trxResult }

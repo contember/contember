@@ -11,64 +11,87 @@ import {
 import * as Database from '@contember/database'
 import { UniqueWhereError } from '../inputProcessing'
 import { Model } from '@contember/schema'
-import { ResolvedColumnValue } from './ColumnValue'
-import { isOwningRelation, NamingHelper } from '@contember/schema-utils'
+import { isOwningRelation, isRelation, NamingHelper } from '@contember/schema-utils'
 import RelationType = Model.RelationType
 
-export class EnrichedError {
-	constructor(
-		public readonly entity: Model.Entity,
-		public readonly values: ResolvedColumnValue[] | null,
-		public readonly originalError: any,
-	) {}
-}
 
-const findConstraint = (entity: Model.Entity, constraintName: string): Model.UniqueConstraint | null => {
-	for (const constraint of Object.values(entity.unique)) {
-		if (constraint.name === constraintName) {
-			return constraint
+const findUniqueConstraint = (schema: Model.Schema, constraintName: string): [Model.Entity, Model.UniqueConstraint] | [null, null] => {
+	for (const entity of Object.values(schema.entities)) {
+		for (const constraint of Object.values(entity.unique)) {
+			if (constraint.name === constraintName) {
+				return [entity, constraint]
+			}
 		}
 	}
-	for (const field of Object.values(entity.fields)) {
-		if (
-			field.type === RelationType.OneHasOne &&
-			isOwningRelation(field) &&
-			NamingHelper.createUniqueConstraintName(entity.name, [field.name]) === constraintName
-		) {
-			return { name: constraintName, fields: [field.name] }
+	for (const entity of Object.values(schema.entities)) {
+		for (const field of Object.values(entity.fields)) {
+			if (
+				field.type === RelationType.OneHasOne &&
+				isOwningRelation(field) &&
+				NamingHelper.createUniqueConstraintName(entity.name, [field.name]) === constraintName
+			) {
+				return [entity, { name: constraintName, fields: [field.name] }]
+			}
+		}
+	}
+	return [null, null]
+}
+
+type RelationInfo = {
+	owningEntity: Model.Entity
+	owningRelation: Model.Relation
+	targetEntity: Model.Entity
+}
+
+const findForeignConstraint = (schema: Model.Schema, constraintName: string): RelationInfo | null => {
+	for (const owningEntity of Object.values(schema.entities)) {
+		for (const field of Object.values(owningEntity.fields)) {
+			if (!isRelation(field) || !isOwningRelation(field) || !('joiningColumn' in field)) {
+				continue
+			}
+			const targetEntity = schema.entities[field.target]
+			const fkName = NamingHelper.createForeignKeyName(
+				owningEntity.tableName,
+				field.joiningColumn.columnName,
+				targetEntity.tableName,
+				targetEntity.primaryColumn,
+			)
+			if (fkName === constraintName) {
+				return { owningEntity, targetEntity, owningRelation: field }
+			}
 		}
 	}
 	return null
 }
 
-export const convertError = (e: any): MutationResult => {
-	let entity: Model.Entity | null = null
-	let values: ResolvedColumnValue[] | null = null
-	if (e instanceof EnrichedError) {
-		entity = e.entity
-		values = e.values
-		e = e.originalError
-	}
+export const convertError = (schema: Model.Schema, e: any): MutationResult => {
+
 	if (e instanceof Database.NotNullViolationError) {
 		return new MutationConstraintViolationError([], ConstraintType.notNull, e.originalMessage, [
 			MutationResultHint.sqlError,
 		])
 	}
 	if (e instanceof Database.ForeignKeyViolationError) {
-		return new MutationConstraintViolationError([], ConstraintType.foreignKey, e.originalMessage, [
-			MutationResultHint.sqlError,
-		])
+		const relationInfo = e.constraint ? findForeignConstraint(schema, e.constraint) : null
+		const violationDetail: string = 'detail' in e.previous ? e.previous.detail : ''
+		const matchResult = violationDetail.match(/^Key \(.+\)=\((.+)\) is still referenced from table/)
+		const message = relationInfo
+			? `Cannot delete ${matchResult ? `row ${matchResult[1]}` : 'unknown row'}`
+				+ ` of entity ${relationInfo.targetEntity.name},`
+				+ ` because it is still referenced from ${relationInfo.owningEntity.name}::${relationInfo.owningRelation.name}.`
+				+ ' This is possibly caused by ACL denial or by missing "on delete cascade"'
+			: e.originalMessage
+		return new MutationConstraintViolationError([], ConstraintType.foreignKey, message, [MutationResultHint.sqlError])
 	}
 	if (e instanceof Database.UniqueViolationError) {
-		const constraint = entity && e.constraint ? findConstraint(entity, e.constraint) : null
-		const valuesInConstraint = constraint
-			? constraint.fields.map(it => values?.find(v => v.fieldName === it)?.resolvedValue)
-			: []
-		const message = constraint
-			? `Value (${valuesInConstraint.map(it => JSON.stringify(it)).join(', ')})` +
-			  ` of unique constraint (${constraint.fields.join(', ')}) already exists`
+		const [entity, constraint] = e.constraint ? findUniqueConstraint(schema, e.constraint) : [null, null]
+		const violationDetail: string = 'detail' in e.previous ? e.previous.detail : ''
+		const matchResult = violationDetail.match(/^Key \(.+\)=\((.+)\) already exists\.$/)
+		const values = matchResult?.[1]
+		const message = constraint && entity
+			? `${values ? `Value (${values})` : 'Unknown value'}` +
+			  ` already exists in unique columns (${constraint.fields.join(', ')}) on entity ${entity.name}`
 			: e.originalMessage
-
 		const paths = constraint ? constraint.fields.map(it => [{ field: it }]) : []
 		return new MutationConstraintViolationError(paths, ConstraintType.uniqueKey, message, [MutationResultHint.sqlError])
 	}
@@ -92,10 +115,10 @@ export const convertError = (e: any): MutationResult => {
 	throw e
 }
 
-export const tryMutation = async (cb: () => Promise<MutationResultList>): Promise<MutationResultList> => {
+export const tryMutation = async (schema: Model.Schema, cb: () => Promise<MutationResultList>): Promise<MutationResultList> => {
 	try {
 		return await cb()
 	} catch (e) {
-		return [convertError(e)]
+		return [convertError(schema, e)]
 	}
 }

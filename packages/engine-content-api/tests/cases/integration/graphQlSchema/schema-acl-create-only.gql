@@ -157,7 +157,7 @@ type Mutation {
   createPost(data: PostCreateInput!): PostCreateResult!
   createPostLocale(data: PostLocaleCreateInput!): PostLocaleCreateResult!
   createCategory(data: CategoryCreateInput!): CategoryCreateResult!
-  transaction: MutationTransaction!
+  transaction(options: MutationTransactionOptions): MutationTransaction!
   query: Query!
 }
 
@@ -222,4 +222,8 @@ type MutationTransaction {
   createPostLocale(data: PostLocaleCreateInput!): PostLocaleCreateResult!
   createCategory(data: CategoryCreateInput!): CategoryCreateResult!
   query: Query
+}
+
+input MutationTransactionOptions {
+  deferForeignKeyConstraints: Boolean
 }

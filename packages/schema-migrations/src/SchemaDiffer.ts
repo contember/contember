@@ -27,6 +27,7 @@ import {
 	UpdateColumnNameModification,
 } from './modifications/columns'
 import {
+	ConvertOneToManyRelationModification,
 	CreateRelationInverseSideModification,
 	CreateRelationModification,
 	DisableOrphanRemovalModification,
@@ -56,6 +57,8 @@ export class SchemaDiffer {
 		}
 
 		const differs: (CreateDiff | Differ)[] = [
+			ConvertOneToManyRelationModification.createDiff,
+
 			RemoveUniqueConstraintModification.createDiff,
 			RemoveEntityModification.createDiff,
 			RemoveFieldModification.createDiff,

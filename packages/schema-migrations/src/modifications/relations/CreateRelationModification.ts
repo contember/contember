@@ -29,58 +29,39 @@ export const CreateRelationModification: ModificationHandlerStatic<CreateRelatio
 			return
 		}
 		const targetEntity = this.schema.model.entities[this.data.owningSide.target]
+		const createOwningSide = (relation: Model.OneHasOneOwningRelation | Model.ManyHasOneRelation) => {
+			builder.addColumn(entity.tableName, {
+				[relation.joiningColumn.columnName]: {
+					type: getPrimaryType(targetEntity),
+					notNull: !relation.nullable,
+				},
+			})
+			const fkName = NamingHelper.createForeignKeyName(
+				entity.tableName,
+				relation.joiningColumn.columnName,
+				targetEntity.tableName,
+				targetEntity.primaryColumn,
+			)
+			builder.addConstraint(entity.tableName, fkName, {
+				foreignKeys: {
+					columns: relation.joiningColumn.columnName,
+					references: `"${targetEntity.tableName}"("${targetEntity.primaryColumn}")`,
+					onDelete: 'NO ACTION',
+				},
+				deferrable: true,
+				deferred: false,
+			})
+		}
 		acceptRelationTypeVisitor(this.schema.model, entity, this.data.owningSide, {
 			visitManyHasOne: ({}, relation, {}, _) => {
-				builder.addColumn(entity.tableName, {
-					[relation.joiningColumn.columnName]: {
-						type: getPrimaryType(targetEntity),
-						notNull: !relation.nullable,
-					},
-				})
-				const fkName = NamingHelper.createForeignKeyName(
-					entity.tableName,
-					relation.joiningColumn.columnName,
-					targetEntity.tableName,
-					targetEntity.primaryColumn,
-				)
-				builder.addConstraint(entity.tableName, fkName, {
-					foreignKeys: {
-						columns: relation.joiningColumn.columnName,
-						references: `"${targetEntity.tableName}"("${targetEntity.primaryColumn}")`,
-						onDelete: 'NO ACTION',
-					},
-					deferrable: true,
-					deferred: false,
-				})
+				createOwningSide(relation)
 				builder.addIndex(entity.tableName, relation.joiningColumn.columnName)
 			},
 			visitOneHasMany: () => {},
 			visitOneHasOneOwning: ({}, relation, {}, _) => {
-				builder.addColumn(entity.tableName, {
-					[relation.joiningColumn.columnName]: {
-						type: getPrimaryType(targetEntity),
-						notNull: !relation.nullable,
-					},
-				})
+				createOwningSide(relation)
 				const uniqueConstraintName = NamingHelper.createUniqueConstraintName(entity.name, [relation.name])
-
 				builder.addConstraint(entity.tableName, uniqueConstraintName, { unique: [relation.joiningColumn.columnName] })
-
-				const fkName = NamingHelper.createForeignKeyName(
-					entity.tableName,
-					relation.joiningColumn.columnName,
-					targetEntity.tableName,
-					targetEntity.primaryColumn,
-				)
-				builder.addConstraint(entity.tableName, fkName, {
-					foreignKeys: {
-						columns: relation.joiningColumn.columnName,
-						references: `"${targetEntity.tableName}"("${targetEntity.primaryColumn}")`,
-						onDelete: 'NO ACTION',
-					},
-					deferrable: true,
-					deferred: false,
-				})
 			},
 			visitOneHasOneInverse: () => {},
 			visitManyHasManyOwning: ({}, relation, {}, _) => {

@@ -7,12 +7,12 @@ import { VERSION_ACL_PATCH, VERSION_REMOVE_RELATION_INVERSE_SIDE } from '../Modi
 export type SchemaUpdater = (args: { schema: Schema }) => Schema
 export type ModelUpdater = (args: { schema: Schema; model: Model.Schema }) => Model.Schema
 export type EntityUpdater = (args: { schema: Schema; model: Model.Schema; entity: Model.Entity }) => Model.Entity
-export type FieldUpdater<T extends Model.AnyField> = (args: {
+export type FieldUpdater<In extends Model.AnyField, Out extends Model.AnyField> = (args: {
 	schema: Schema
 	model: Model.Schema
 	entity: Model.Entity
-	field: T
-}) => T | undefined
+	field: In
+}) => Out | undefined
 export type AclUpdater = (args: { schema: Schema; acl: Acl.Schema }) => Acl.Schema
 export type AclRoleUpdater = (args: {
 	schema: Schema
@@ -183,13 +183,13 @@ export const updateEveryEntity =
 		})
 
 export const updateField =
-	<T extends Model.AnyField = Model.AnyField>(name: string, fieldUpdater: FieldUpdater<T>): EntityUpdater =>
+	<In extends Model.AnyField = Model.AnyField, Out extends Model.AnyField = In>(name: string, fieldUpdater: FieldUpdater<In, Out>): EntityUpdater =>
 		args => {
 			const { [name]: field, ...otherFields } = args.entity.fields
 			if (!args.entity.fields[name]) {
 				throw new SchemaUpdateError(`Field ${args.entity.name}::${name} not found`)
 			}
-			const updatedField = fieldUpdater({ ...args, field: args.entity.fields[name] as T })
+			const updatedField = fieldUpdater({ ...args, field: args.entity.fields[name] as In })
 
 			return {
 				...args.entity,
@@ -201,7 +201,7 @@ export const updateField =
 		}
 
 export const updateEveryField =
-	(fieldUpdater: FieldUpdater<Model.AnyField>): EntityUpdater =>
+	(fieldUpdater: FieldUpdater<Model.AnyField, Model.AnyField>): EntityUpdater =>
 		args => ({
 			...args.entity,
 			fields: Object.fromEntries(

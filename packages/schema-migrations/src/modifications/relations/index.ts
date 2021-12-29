@@ -1,3 +1,4 @@
+export * from './ConvertOneToManyRelationModification'
 export * from './CreateRelationInverseSideModification'
 export * from './CreateRelationModification'
 export * from './DisableOrphanRemovalModification'

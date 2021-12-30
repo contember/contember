@@ -1,5 +1,5 @@
 import { BindingError, Entity, RelativeSingleField, useEntity } from '@contember/binding'
-import { ActionableBox, Box, EditorBox } from '@contember/ui'
+import { ActionableBox, Box, FieldSet } from '@contember/ui'
 import { memo, MouseEvent as ReactMouseEvent, ReactNode, useCallback } from 'react'
 import { Transforms } from 'slate'
 import { ReactEditor, RenderElementProps, useSelected, useSlateStatic } from 'slate-react'
@@ -115,13 +115,13 @@ export const ReferenceElementRenderer = memo((props: ReferenceElementRendererPro
 	const wrappedReference = (
 		<Entity accessor={referencedEntity}>
 			<ActionableBox editContents={alternate} onRemove={onRemove}>
-				<EditorBox
+				<FieldSet
 					heading={renderedBlock.label}
 					isActive={selected && !isEditable}
 					onClick={isEditable ? onContainerClick : undefined}
 				>
 					{blockBody}
-				</EditorBox>
+				</FieldSet>
 			</ActionableBox>
 		</Entity>
 	)

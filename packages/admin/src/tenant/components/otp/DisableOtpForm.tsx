@@ -1,9 +1,9 @@
+import { Button } from '@contember/ui'
 import { FC, useCallback, useContext } from 'react'
 import { IdentityRefreshContext, useShowToast } from '../../../components'
 import { RoutingLinkTarget, useRedirect } from '../../../routing'
-import { Button, FormGroup } from '@contember/ui'
-import { useDisableOtp } from '../../mutations'
 import { useForm } from '../../lib'
+import { useDisableOtp } from '../../mutations'
 
 interface DisableOtpFormProps {
 	onSuccess?: () => void

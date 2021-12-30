@@ -1,5 +1,5 @@
 import { Component, Field, FieldBasicProps, useEnvironment, useField, useMutationState } from '@contember/binding'
-import { Checkbox, FormGroup } from '@contember/ui'
+import { Checkbox, FieldContainer } from '@contember/ui'
 import type { FunctionComponent, ReactNode } from 'react'
 import { useAccessorErrors } from '../errors'
 
@@ -15,7 +15,7 @@ export const CheckboxField: FunctionComponent<CheckboxFieldProps> = Component(
 		const environment = useEnvironment()
 
 		return (
-			<FormGroup label={undefined} useLabelElement={false}>
+			<FieldContainer label={undefined} useLabelElement={false}>
 				<Checkbox
 					labelDescription={props.labelDescription}
 					value={field.value}
@@ -27,7 +27,7 @@ export const CheckboxField: FunctionComponent<CheckboxFieldProps> = Component(
 				>
 					{environment.applySystemMiddleware('labelMiddleware', props.label)}
 				</Checkbox>
-			</FormGroup>
+			</FieldContainer>
 		)
 	},
 	props => {

@@ -1,9 +1,9 @@
 import { Component, Environment, Field, FieldAccessor, FieldBasicProps, FieldValue } from '@contember/binding'
-import type { FormGroupProps } from '@contember/ui'
+import type { FieldContainerProps } from '@contember/ui'
 import type { NamedExoticComponent, ReactNode } from 'react'
 import { SimpleRelativeSingleFieldProxy } from './SimpleRelativeFieldProxy'
 
-export type SimpleRelativeSingleFieldProps = FieldBasicProps & Omit<FormGroupProps, 'children'>
+export type SimpleRelativeSingleFieldProps = FieldBasicProps & Omit<FieldContainerProps, 'children'>
 
 export interface SimpleRelativeSingleFieldMetadata<Value extends FieldValue = FieldValue> {
 	field: FieldAccessor<Value>
@@ -12,7 +12,7 @@ export interface SimpleRelativeSingleFieldMetadata<Value extends FieldValue = Fi
 }
 
 export const SimpleRelativeSingleField = function <
-	P extends FieldBasicProps & Omit<FormGroupProps, 'children'>,
+	P extends FieldBasicProps & Omit<FieldContainerProps, 'children'>,
 	Value extends FieldValue = FieldValue,
 >(
 	render: (fieldMetadata: SimpleRelativeSingleFieldMetadata<Value>, props: P) => ReactNode,

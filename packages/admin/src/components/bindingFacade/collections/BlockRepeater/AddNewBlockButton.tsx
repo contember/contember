@@ -1,4 +1,4 @@
-import { Dropdown, DropdownProps, FormGroup, Icon } from '@contember/ui'
+import { Dropdown, DropdownProps, FieldContainer, Icon } from '@contember/ui'
 import { memo, useMemo } from 'react'
 import { AddNewBlockButtonInner, AddNewBlockButtonInnerProps } from './AddNewBlockButtonInner'
 
@@ -29,7 +29,7 @@ export const AddNewBlockButton = memo<AddNewBlockButtonProps>(props => {
 	)
 
 	return (
-		<FormGroup label={undefined}>
+		<FieldContainer label={undefined}>
 			<Dropdown buttonProps={buttonProps} alignment="center">
 				{({ requestClose, forceUpdate, update }) => (
 					<AddNewBlockButtonInner
@@ -43,7 +43,7 @@ export const AddNewBlockButton = memo<AddNewBlockButtonProps>(props => {
 					/>
 				)}
 			</Dropdown>
-		</FormGroup>
+		</FieldContainer>
 	)
 })
 AddNewBlockButton.displayName = 'AddNewBlockButton'

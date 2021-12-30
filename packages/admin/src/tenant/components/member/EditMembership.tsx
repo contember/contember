@@ -1,9 +1,9 @@
-import { VariableSelector } from './VariableSelector'
+import { Box, BoxSection, Button, FieldContainer, Icon, Select, SelectOption } from '@contember/ui'
 import { ComponentType, Dispatch, FC, SetStateAction, useCallback } from 'react'
 import { useListRolesQuery } from '../../queries'
-import { Box, BoxSection, Button, FormGroup, Icon, Select, SelectOption } from '@contember/ui'
-import { QueryLoader } from '../QueryLoader'
 import { Membership } from '../../types'
+import { QueryLoader } from '../QueryLoader'
+import { VariableSelector } from './VariableSelector'
 
 interface VariableConfig {
 	render: ComponentType<{ value: string[]; onChange: (newValues: string[]) => void }>
@@ -67,7 +67,7 @@ export const EditMembership: FC<EditMembershipProps> = ({ project, memberships, 
 										key={membershipIndex}
 										actions={<Button distinction={'seamless'} size="small" onClick={removeMembership}><Icon blueprintIcon="trash" /></Button>}
 									>
-										<FormGroup label={undefined}>
+										<FieldContainer label={undefined}>
 											<Select
 												onChange={e => {
 													const newRole = e.target.value
@@ -89,7 +89,7 @@ export const EditMembership: FC<EditMembershipProps> = ({ project, memberships, 
 												]}
 												value={membership === undefined ? -1 : membership.role}
 											/>
-										</FormGroup>
+										</FieldContainer>
 										{roleDefinition &&
 											membership &&
 											roleDefinition.variables.map(variable => (

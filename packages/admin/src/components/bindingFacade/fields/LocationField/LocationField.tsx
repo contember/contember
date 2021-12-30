@@ -1,10 +1,10 @@
 import { Component, SugaredField, SugaredFieldProps, useField } from '@contember/binding'
-import { FormGroup, FormGroupProps } from '@contember/ui'
+import { FieldContainer, FieldContainerProps } from '@contember/ui'
 import * as Leaflet from 'leaflet'
 import { FunctionComponent, useState } from 'react'
 import { Map, MapProps, Marker, MarkerProps, TileLayer, TileLayerProps } from 'react-leaflet'
 
-export interface LocationFieldProps extends Omit<FormGroupProps, 'children'> {
+export interface LocationFieldProps extends Omit<FieldContainerProps, 'children'> {
 	latitudeField: SugaredFieldProps['field']
 	longitudeField: SugaredFieldProps['field']
 	mapCenter?: [number, number]
@@ -31,7 +31,7 @@ export const LocationField: FunctionComponent<LocationFieldProps> = Component(
 		tileLayerProps,
 		mapProps,
 		markerProps,
-		...formGroupProps
+		...fieldContainerProps
 	}) => {
 		const latitude = useField<number>(latitudeField)
 		const longitude = useField<number>(longitudeField)
@@ -56,7 +56,7 @@ export const LocationField: FunctionComponent<LocationFieldProps> = Component(
 		})
 
 		return (
-			<FormGroup {...formGroupProps}>
+			<FieldContainer {...fieldContainerProps}>
 				<div className="locationField-map-container">
 					<Map
 						center={resolvedCenter}
@@ -81,7 +81,7 @@ export const LocationField: FunctionComponent<LocationFieldProps> = Component(
 						)}
 					</Map>
 				</div>
-			</FormGroup>
+			</FieldContainer>
 		)
 	},
 	props => (

@@ -1,5 +1,5 @@
 import { Component, ErrorAccessor, FieldValue } from '@contember/binding'
-import { FormGroup, FormGroupProps } from '@contember/ui'
+import { FieldContainer, FieldContainerProps } from '@contember/ui'
 import { FunctionComponent, memo } from 'react'
 import type { Props as SelectProps } from 'react-select'
 import AsyncSelect from 'react-select/async'
@@ -40,7 +40,7 @@ export const SelectField: FunctionComponent<SelectFieldProps> = Component(
 	'SelectField',
 )
 
-export interface SelectFieldInnerPublicProps extends Omit<FormGroupProps, 'children'> {
+export interface SelectFieldInnerPublicProps extends Omit<FieldContainerProps, 'children'> {
 	placeholder?: string
 	allowNull?: boolean
 	reactSelectProps?: Partial<SelectProps<any>>
@@ -61,7 +61,7 @@ export const SelectFieldInner = memo(
 		isMutating,
 		onChange,
 		reactSelectProps,
-		...formGroupProps
+		...fieldContainerProps
 	}: SelectFieldInnerProps) => {
 		const asyncProps = useCommonReactSelectAsyncProps({
 			reactSelectProps,
@@ -71,10 +71,10 @@ export const SelectFieldInner = memo(
 		})
 
 		return (
-			<FormGroup
-				{...formGroupProps}
+			<FieldContainer
+				{...fieldContainerProps}
 				errors={errors}
-				label={environment.applySystemMiddleware('labelMiddleware', formGroupProps.label)}
+				label={environment.applySystemMiddleware('labelMiddleware', fieldContainerProps.label)}
 			>
 				<AsyncSelect
 					{...asyncProps}
@@ -105,7 +105,7 @@ export const SelectFieldInner = memo(
 						}
 					}}
 				/>
-			</FormGroup>
+			</FieldContainer>
 		)
 	},
 )

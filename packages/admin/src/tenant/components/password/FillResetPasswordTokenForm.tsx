@@ -1,6 +1,6 @@
+import { Button, FieldContainer, TextInput } from '@contember/ui'
 import { FC, useCallback } from 'react'
 import { RoutingLinkTarget, useRedirect } from '../../../routing'
-import { Button, FormGroup, TextInput } from '@contember/ui'
 import { useForm } from '../../lib'
 
 interface FillResetPasswordTokenFormProps {
@@ -24,14 +24,14 @@ export const FillResetPasswordTokenForm: FC<FillResetPasswordTokenFormProps> = (
 
 	return (
 		<form onSubmit={onSubmit}>
-			<FormGroup label="Token">
+			<FieldContainer label="Token">
 				<TextInput {...register('token')} required={true} />
-			</FormGroup>
-			<FormGroup label={undefined}>
+			</FieldContainer>
+			<FieldContainer label={undefined}>
 				<Button intent="primary" type={'submit'} disabled={isSubmitting}>
 					Continue
 				</Button>
-			</FormGroup>
+			</FieldContainer>
 		</form>
 	)
 }

@@ -1,9 +1,9 @@
 import { getTenantErrorMessage } from '@contember/client'
-import { Button, ErrorList, FieldError, FormGroup, Section, TextInput } from '@contember/ui'
-import { useCallback, useState } from 'react'
-import { useForm, useSignIn } from '../../index'
-import { Link, RoutingLinkTarget } from '../../../routing'
 import { useSetSessionToken } from '@contember/react-client'
+import { Button, ErrorList, FieldContainer, FieldError, Section, TextInput } from '@contember/ui'
+import { useCallback, useState } from 'react'
+import { Link, RoutingLinkTarget } from '../../../routing'
+import { useForm, useSignIn } from '../../index'
 
 export interface LoginProps {
 	onLogin?: () => void
@@ -48,7 +48,7 @@ export const Login = ({ onLogin, resetLink }: LoginProps) => {
 		<form onSubmit={onSubmit}>
 			<Section>
 				<ErrorList size="large" errors={errors} />
-				<FormGroup label="Email">
+				<FieldContainer label="Email">
 					<TextInput
 						{...register('email')}
 						autoComplete="username"
@@ -56,29 +56,29 @@ export const Login = ({ onLogin, resetLink }: LoginProps) => {
 						autoFocus={!otpRequired}
 						disabled={otpRequired}
 					/>
-				</FormGroup>
-				<FormGroup label="Password">
+				</FieldContainer>
+				<FieldContainer label="Password">
 					<TextInput
 						{...register('password')}
 						type="password"
 						autoComplete="current-password"
 						disabled={otpRequired}
 					/>
-				</FormGroup>
-				{otpRequired && <FormGroup label="Two-factor code">
+				</FieldContainer>
+				{otpRequired && <FieldContainer label="Two-factor code">
 					<TextInput
 						autoFocus
 						autoComplete={'one-time-code'}
 						{...register('otpToken')}
 					/>
-				</FormGroup>}
+				</FieldContainer>}
 
-				<FormGroup label={undefined}>
+				<FieldContainer label={undefined}>
 					<Button type="submit" intent="primary" disabled={isSubmitting}>
 						Submit
 					</Button>
 					{resetLink && <Link to={resetLink} style={{ float: 'right' }}>Forgot your password?</Link>}
-				</FormGroup>
+				</FieldContainer>
 			</Section>
 		</form>
 	)

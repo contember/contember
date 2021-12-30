@@ -1,11 +1,11 @@
-import { Button, FormGroup, Stack, TextInput } from '@contember/ui'
+import { Button, FieldContainer, Stack, TextInput } from '@contember/ui'
 import { FC, SyntheticEvent, useCallback, useState } from 'react'
 import { useShowToast } from '../../../components'
-import { EditMembership, RolesConfig } from '../member'
 import { RoutingLinkTarget, useRedirect } from '../../../routing'
-import { useCreateApiKey } from '../../mutations'
 import { useForm } from '../../lib'
+import { useCreateApiKey } from '../../mutations'
 import { Membership } from '../../types'
+import { EditMembership, RolesConfig } from '../member'
 
 interface CreateApiKeyFormProps {
 	project: string
@@ -60,9 +60,9 @@ export const CreateApiKeyForm: FC<CreateApiKeyFormProps> = ({ project, rolesConf
 	return (
 		<form onSubmit={submit}>
 			<Stack direction="vertical">
-				<FormGroup label="Description">
+				<FieldContainer label="Description">
 					<TextInput {...register('description')} />
-				</FormGroup>
+				</FieldContainer>
 
 				<EditMembership {...editUserMembershipProps} />
 

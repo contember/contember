@@ -1,11 +1,11 @@
 import { useProjectSlug } from '@contember/react-client'
-import { Button, FormGroup, LayoutPage, Stack, TextInput } from '@contember/ui'
+import { Button, FieldContainer, LayoutPage, Stack, TextInput } from '@contember/ui'
 import { FC, memo, SyntheticEvent, useCallback, useState } from 'react'
 import { useShowToast } from '../../../components'
-import { useInvite } from '../../mutations'
-import { EditMembership, RolesConfig } from '../member'
 import { NavigateBackButton, RoutingLinkTarget, useRedirect } from '../../../routing'
+import { useInvite } from '../../mutations'
 import { Membership } from '../../types'
+import { EditMembership, RolesConfig } from '../member'
 
 interface InviteUserProps {
 	project: string
@@ -64,14 +64,14 @@ export const InviteUser: FC<InviteUserProps> = ({ project, rolesConfig, userList
 	return (
 		<form onSubmit={submit}>
 			<Stack direction="vertical">
-				<FormGroup label="E-mail" errors={emailNotValidError ? [{ message: 'Email is not valid.' }] : undefined}>
+				<FieldContainer label="E-mail" errors={emailNotValidError ? [{ message: 'Email is not valid.' }] : undefined}>
 					<TextInput
 						validationState={emailNotValidError ? 'invalid' : 'default'}
 						value={email}
 						onChange={e => setEmail && setEmail(e.target.value)}
 						allowNewlines={false}
 					/>
-				</FormGroup>
+				</FieldContainer>
 				<EditMembership {...editUserMembershipProps} />
 				<Button size="large" type={'submit'} disabled={isSubmitting}>
 					Invite

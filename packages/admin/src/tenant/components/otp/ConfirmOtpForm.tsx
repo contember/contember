@@ -1,9 +1,9 @@
+import { Button, FieldContainer, TextInput } from '@contember/ui'
 import { FC, useCallback, useContext } from 'react'
 import { IdentityRefreshContext, useShowToast } from '../../../components'
 import { RoutingLinkTarget, useRedirect } from '../../../routing'
-import { Button, FormGroup, TextInput } from '@contember/ui'
-import { useConfirmOtp } from '../../mutations'
 import { useForm } from '../../lib'
+import { useConfirmOtp } from '../../mutations'
 
 interface ConfirmOtpFormProps {
 	redirectOnSuccess?: RoutingLinkTarget
@@ -48,9 +48,9 @@ export const ConfirmOtpForm: FC<ConfirmOtpFormProps> = ({ redirectOnSuccess, onS
 
 	return (
 		<form onSubmit={onSubmit}>
-			<FormGroup label="Two-factor code">
+			<FieldContainer label="Two-factor code">
 				<TextInput {...register('token')} required={true} />
-			</FormGroup>
+			</FieldContainer>
 			<br />
 			<Button intent="primary" type={'submit'} disabled={isSubmitting}>
 				Confirm two-factor authentication

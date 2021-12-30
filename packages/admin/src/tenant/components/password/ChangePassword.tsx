@@ -1,8 +1,8 @@
-import { Button, FormGroup, LayoutPage, TextInput } from '@contember/ui'
+import { Button, FieldContainer, LayoutPage, TextInput } from '@contember/ui'
 import { FC, useCallback } from 'react'
-import { useChangePassword } from '../../mutations'
-import { useForm } from '../../lib'
 import { useShowToast } from '../../../components'
+import { useForm } from '../../lib'
+import { useChangePassword } from '../../mutations'
 
 const initialValues = {
 	currentPassword: '',
@@ -43,7 +43,7 @@ export const ChangePassword: FC<{}> = ({}) => {
 	return (
 			<LayoutPage title="Change your password">
 				<form onSubmit={onSubmit}>
-					<FormGroup
+					<FieldContainer
 						label="Current password"
 						errors={errors.currentPassword === undefined ? undefined : [{ message: errors.currentPassword }]}
 					>
@@ -53,8 +53,8 @@ export const ChangePassword: FC<{}> = ({}) => {
 							autoComplete="password"
 							{...register('currentPassword')}
 						/>
-					</FormGroup>
-					<FormGroup
+					</FieldContainer>
+					<FieldContainer
 						label="New password"
 						errors={errors.newPassword === undefined ? undefined : [{ message: errors.newPassword }]}
 					>
@@ -64,8 +64,8 @@ export const ChangePassword: FC<{}> = ({}) => {
 							autoComplete="new-password"
 							{...register('newPassword')}
 						/>
-					</FormGroup>
-					<FormGroup
+					</FieldContainer>
+					<FieldContainer
 						label="Confirm new password"
 						errors={errors.newPasswordAgain === undefined ? undefined : [{ message: errors.newPasswordAgain }]}
 					>
@@ -75,7 +75,7 @@ export const ChangePassword: FC<{}> = ({}) => {
 							autoComplete="new-password"
 							{...register('newPasswordAgain')}
 						/>
-					</FormGroup>
+					</FieldContainer>
 					<br />
 					<Button intent={'primary'} type={'submit'} disabled={isSubmitting}>
 						Change password

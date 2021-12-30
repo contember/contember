@@ -1,5 +1,5 @@
 import { Component, ErrorAccessor } from '@contember/binding'
-import { FormGroup, FormGroupProps } from '@contember/ui'
+import { FieldContainer, FieldContainerProps } from '@contember/ui'
 import { FunctionComponent, memo } from 'react'
 import type { Props as SelectProps } from 'react-select'
 import AsyncSelect from 'react-select/async'
@@ -39,7 +39,7 @@ export const MultiSelectField: FunctionComponent<MultiSelectFieldProps> = Compon
 	'MultiSelectField',
 )
 
-export interface MultiSelectFieldInnerPublicProps extends Omit<FormGroupProps, 'children'> {
+export interface MultiSelectFieldInnerPublicProps extends Omit<FieldContainerProps, 'children'> {
 	placeholder?: string
 	reactSelectProps?: Partial<SelectProps<any>>
 }
@@ -61,7 +61,7 @@ export const MultiSelectFieldInner = memo(
 		clear,
 		reactSelectProps,
 		placeholder,
-		...formGroupProps
+		...fieldContainerProps
 	}: MultiSelectFieldInnerProps) => {
 		const asyncProps = useCommonReactSelectAsyncProps({
 			reactSelectProps,
@@ -70,10 +70,10 @@ export const MultiSelectFieldInner = memo(
 			isInvalid: (errors?.validation?.length ?? 0) > 0,
 		})
 		return (
-			<FormGroup
-				{...formGroupProps}
+			<FieldContainer
+				{...fieldContainerProps}
 				errors={errors}
-				label={environment.applySystemMiddleware('labelMiddleware', formGroupProps.label)}
+				label={environment.applySystemMiddleware('labelMiddleware', fieldContainerProps.label)}
 			>
 				<AsyncSelect
 					{...asyncProps}
@@ -113,7 +113,7 @@ export const MultiSelectFieldInner = memo(
 						}
 					}}
 				/>
-			</FormGroup>
+			</FieldContainer>
 		)
 	},
 )

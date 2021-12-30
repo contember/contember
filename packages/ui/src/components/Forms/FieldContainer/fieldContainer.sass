@@ -1,8 +1,6 @@
 @use 'sass:math'
 
-@import '../common'
-
-.#{$cui-conf-globalPrefix}formGroup
+.#{$cui-conf-globalPrefix}fieldContainer
 	display: flex
 	flex-direction: column
 	gap: .125em 0.5em
@@ -31,7 +29,7 @@
 			display: block
 			line-height: $cui-base-lineHeight
 
-	@each $name, $fontSize in $cui-formGroup-sizes
+	@each $name, $fontSize in $cui-fieldContainer-sizes
 		$view: toView($name)
 
 		&#{$view} &

@@ -1,9 +1,9 @@
+import { Button, FieldContainer, TextInput } from '@contember/ui'
 import { FC, useCallback } from 'react'
 import { useShowToast } from '../../../components'
 import { RoutingLinkTarget, useRedirect } from '../../../routing'
-import { Button, FormGroup, TextInput } from '@contember/ui'
-import { useCreateResetPasswordRequest } from '../../mutations'
 import { useForm } from '../../lib'
+import { useCreateResetPasswordRequest } from '../../mutations'
 
 interface CreateResetPasswordRequestFormProps {
 	redirectOnSuccess: RoutingLinkTarget
@@ -44,14 +44,14 @@ export const CreateResetPasswordRequestForm: FC<CreateResetPasswordRequestFormPr
 
 	return (
 		<form onSubmit={onSubmit}>
-			<FormGroup label="E-mail">
+			<FieldContainer label="E-mail">
 				<TextInput {...register('email')} required={true} type={'email'} />
-			</FormGroup>
-			<FormGroup label={undefined}>
+			</FieldContainer>
+			<FieldContainer label={undefined}>
 				<Button intent="primary" type={'submit'} disabled={isSubmitting}>
 					Reset password
 				</Button>
-			</FormGroup>
+			</FieldContainer>
 		</form>
 	)
 }

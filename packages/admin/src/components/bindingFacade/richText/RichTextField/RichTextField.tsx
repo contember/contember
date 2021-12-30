@@ -7,7 +7,7 @@ import {
 	useEntity,
 	useMutationState,
 } from '@contember/binding'
-import { EditorCanvas, EditorCanvasDistinction, FormGroup, FormGroupProps } from '@contember/ui'
+import { EditorCanvas, EditorCanvasDistinction, FieldContainer, FieldContainerProps } from '@contember/ui'
 import { FunctionComponent, useCallback, useMemo, useState } from 'react'
 import { Descendant, Editor, Element as SlateElement, Node as SlateNode, NodeEntry, Transforms } from 'slate'
 import { Editable, Slate } from 'slate-react'
@@ -20,7 +20,7 @@ import { useRichTextFieldNodes } from './useRichTextFieldNodes'
 
 export interface RichTextFieldProps
 	extends FieldBasicProps,
-		Omit<FormGroupProps, 'children' | 'errors'>,
+		Omit<FieldContainerProps, 'children' | 'errors'>,
 		CreateEditorPublicOptions,
 		HoveringToolbarsProps {
 	placeholder?: string
@@ -127,7 +127,7 @@ export const RichTextField: FunctionComponent<RichTextFieldProps> = Component(
 		)
 
 		return (
-			<FormGroup
+			<FieldContainer
 				label={props.label}
 				size={props.size}
 				labelDescription={props.labelDescription}
@@ -157,7 +157,7 @@ export const RichTextField: FunctionComponent<RichTextFieldProps> = Component(
 						/>
 					</EditorCanvas>
 				</Slate>
-			</FormGroup>
+			</FieldContainer>
 		)
 	},
 	props => (

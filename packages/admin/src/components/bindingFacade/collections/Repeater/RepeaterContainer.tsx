@@ -1,5 +1,5 @@
 import type { EntityAccessor, EntityListAccessor } from '@contember/binding'
-import { FormGroup, Stack } from '@contember/ui'
+import { FieldContainer, Stack } from '@contember/ui'
 import { ComponentType, memo, ReactNode } from 'react'
 import type { MessageFormatter } from '../../../../i18n'
 import { AccessorErrors } from '../../errors'
@@ -46,7 +46,7 @@ export const RepeaterContainer = memo(
 		isEmpty,
 		label,
 	}: RepeaterContainerProps) => {
-		return <FormGroup label={label} useLabelElement={false}>
+		return <FieldContainer label={label} useLabelElement={false}>
 			<Stack
 				direction="vertical"
 				gap="small"
@@ -72,7 +72,7 @@ export const RepeaterContainer = memo(
 					</AddButton>
 				)}
 			</Stack>
-		</FormGroup>
+		</FieldContainer>
 	},
 )
 RepeaterContainer.displayName = 'RepeaterContainer'

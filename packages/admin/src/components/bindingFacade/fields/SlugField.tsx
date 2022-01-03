@@ -14,15 +14,21 @@ import { FunctionComponent, useCallback, useMemo } from 'react'
 import type { SimpleRelativeSingleFieldProps } from '../auxiliary'
 import { ConcealableField, ConcealableFieldProps } from '../ui'
 
+type SlugPrefix = string | ((environment: Environment) => string);
 export type SlugFieldProps = Pick<ConcealableFieldProps, 'buttonProps' | 'concealTimeout'> &
 	SimpleRelativeSingleFieldProps & {
 		derivedFrom: SugaredRelativeSingleField['field']
-		unpersistedHardPrefix?: string | ((environment: Environment) => string)
-		persistedHardPrefix?: string | ((environment: Environment) => string)
-		persistedSoftPrefix?: string | ((environment: Environment) => string)
+		unpersistedHardPrefix?: SlugPrefix
+		persistedHardPrefix?: SlugPrefix
+		persistedSoftPrefix?: SlugPrefix
 		concealTimeout?: number
 		linkToExternalUrl?: boolean
 	}
+
+const useNormalizedPrefix = (value?: SlugPrefix) => {
+	const environment = useEnvironment()
+	return useMemo(() => typeof value === 'function' ? value(environment) : value ?? '', [value, environment])
+}
 
 export const SlugField: FunctionComponent<SlugFieldProps> = Component(
 	({
@@ -36,20 +42,10 @@ export const SlugField: FunctionComponent<SlugFieldProps> = Component(
 		linkToExternalUrl = false,
 		...props
 	}) => {
+		const normalizedUnpersistedHardPrefix = useNormalizedPrefix(unpersistedHardPrefix)
+		const normalizedPersistedHardPrefix = useNormalizedPrefix(persistedHardPrefix)
+		const normalizedPersistedSoftPrefix = useNormalizedPrefix(persistedSoftPrefix)
 		const environment = useEnvironment()
-		const { normalizedUnpersistedHardPrefix, normalizedPersistedHardPrefix, normalizedPersistedSoftPrefix } = useMemo(
-			() => ({
-				normalizedUnpersistedHardPrefix:
-					typeof unpersistedHardPrefix === 'function'
-						? unpersistedHardPrefix(environment)
-						: unpersistedHardPrefix || '',
-				normalizedPersistedHardPrefix:
-					typeof persistedHardPrefix === 'function' ? persistedHardPrefix(environment) : persistedHardPrefix || '',
-				normalizedPersistedSoftPrefix:
-					typeof persistedSoftPrefix === 'function' ? persistedSoftPrefix(environment) : persistedSoftPrefix || '',
-			}),
-			[environment, persistedHardPrefix, persistedSoftPrefix, unpersistedHardPrefix],
-		)
 		const transform = useCallback(
 			(driverFieldValue: string | null) => {
 				const slugValue = slugify(driverFieldValue || '')

@@ -1,4 +1,4 @@
-import cn from 'classnames'
+import classNames from 'classnames'
 import { memo, ReactNode } from 'react'
 import { ErrorList, ErrorListProps } from '..'
 import { useClassNamePrefix } from '../../../auxiliary'
@@ -32,22 +32,27 @@ export const FieldContainer = memo(
 		useLabelElement = true,
 	}: FieldContainerProps) => {
 		const LabelElement = useLabelElement ? 'label' : 'div'
-		const prefix = useClassNamePrefix()
+		const componentClassName = `${useClassNamePrefix()}field-container`
 
 		return (
-			<div className={cn(`${prefix}fieldContainer`, toEnumViewClass(size), toEnumViewClass(labelPosition))}>
-				<LabelElement className={`${prefix}fieldContainer-label`}>
-					{(label || labelDescription) && (
-						<span className={`${prefix}fieldContainer-label-wrap`}>
+			<div className={classNames(
+				`${componentClassName}`,
+				toEnumViewClass(size),
+				toEnumViewClass(labelPosition),
+			)}>
+				<LabelElement className={`${componentClassName}-label`}>
+					{(label || labelDescription) && <span className={`${componentClassName}-header`}>
 							{label && <FieldLabel>{label}</FieldLabel>}
 							{labelDescription && <Description>{labelDescription}</Description>}
 						</span>
-					)}
-					<span className={`${prefix}fieldContainer-field-wrap`}>{children}</span>
-					{description && <span className={`${prefix}fieldContainer-field-description`}>{description}</span>}
+					}
+					{(children || description) && <div className={`${componentClassName}-body`}>
+						{children && <span className={`${componentClassName}-body-content`}>{children}</span>}
+						{description && <span className={`${componentClassName}-body-content-description`}>{description}</span>}
+					</div>}
 				</LabelElement>
 				{!!errors && (
-					<div className={`${prefix}fieldContainer-errors`}>
+					<div className={`${componentClassName}-errors`}>
 						<ErrorList errors={errors} size={size} />
 					</div>
 				)}

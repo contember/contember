@@ -1,0 +1,54 @@
+@use 'sass:math'
+
+.#{$cui-conf-globalPrefix}field-container
+	display: flex
+	flex-direction: column
+	column-gap: calc(2 * var(--cui-gap-horizontal))
+	row-gap: calc(2 * var(--cui-gap-vertical))
+	width: 100%
+
+	--cui-font-size-label-small: #{rem(11.2px)}
+	--cui-font-size-label-large: #{rem(17.6px)}
+
+	&:focus-within
+		color: var(--cui-control-color)
+
+	&-label
+		display: flex
+		flex-direction: column
+		column-gap: calc(2 * var(--cui-gap-horizontal))
+		row-gap: calc(2 * var(--cui-gap-vertical))
+	&:not(.is-active):not(:focus-within) &-label
+		color: var(--cui-color--high)
+
+	&-header,
+	&-body
+		display: flex
+		flex-direction: column
+		gap: var(--cui-gap-vertical)
+
+	&-header
+		flex: 1 1 calc(100% / 7 * 2)
+	&-body
+		flex: 1 1 calc(100% / 7 * 5)
+
+	&-body-content
+		//
+	&-body-content-description
+		font-weight: $fw-light
+		color: var(--cui-color--medium)
+		display: block
+		font-size: calc(var(--cui-font-size-label) * 0.9)
+		line-height: $cui-base-lineHeight
+
+	&.view-labelLeft &-label,
+	&.view-labelInlineLeft &-label
+		flex-direction: row
+
+	&.view-labelInlineLeft &-header
+		flex-basis: 0%
+
+	&.view-small
+		--cui-font-size-label: var(--cui-font-size-label-small)
+	&.view-large
+		--cui-font-size-label: var(--cui-font-size-label-large)

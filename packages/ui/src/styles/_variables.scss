@@ -120,22 +120,6 @@ $cui-control-validation: map_merge((
 
 $cui-select-chevron-height: .5em !default;
 
-// FieldContainer
-$cui-fieldContainer-label-color: $cui-color-gray-8 !default;
-$cui-fieldContainer-labelDescription-color: $cui-color-gray-4 !default;
-$cui-fieldContainer-description-color: $cui-color-gray-4 !default;
-
-$cui-fieldContainer-size-small: .7em !default;
-$cui-fieldContainer-size-default: .8em !default;
-$cui-fieldContainer-size-large: 1.1em !default;
-
-$cui-fieldContainer-sizes: () !default;
-$cui-fieldContainer-sizes: map_merge((
-	$cui-conf-defaultView: $cui-fieldContainer-size-default,
-	'small': $cui-fieldContainer-size-small,
-	'large': $cui-fieldContainer-size-large,
-), $cui-fieldContainer-sizes);
-
 // Heading
 $cui-heading-color: $cui-color-gray-9 !default;
 $cui-heading-color-subtle: $cui-color-gray-8 !default;

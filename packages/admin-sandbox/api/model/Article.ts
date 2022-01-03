@@ -3,6 +3,7 @@ import { Locale } from './Locale'
 
 export class Article {
 	title = d.stringColumn()
+	slug = d.stringColumn().unique()
 	content = d.stringColumn()
 	publishedAt = d.dateTimeColumn()
 	category = d.manyHasOne(Category)

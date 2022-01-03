@@ -6,13 +6,13 @@ import {
 	useDerivedField,
 	useEnvironment,
 } from '@contember/binding'
-import { isSpecialLinkClick, SingleLineTextInputProps, TextInput } from '@contember/ui'
+import { isSpecialLinkClick, SingleLineTextInputProps } from '@contember/ui'
 import slugify from '@sindresorhus/slugify'
 import { useCallback, useMemo, useState } from 'react'
 import type { SimpleRelativeSingleFieldProps } from '../auxiliary'
 import { SimpleRelativeSingleField } from '../auxiliary'
 import { stringFieldParser, useTextInput } from './useTextInput'
-import { SlugControl } from '@contember/ui'
+import { SlugInput } from '@contember/ui'
 
 type SlugPrefix = string | ((environment: Environment) => string)
 
@@ -56,7 +56,7 @@ export const SlugFieldInner = SimpleRelativeSingleField<SlugFieldProps, string>(
 		const normalizedPersistedHardPrefix = useNormalizedPrefix(persistedHardPrefix)
 		const normalizedPersistedSoftPrefix = useNormalizedPrefix(persistedSoftPrefix)
 
-		const inputProps = useTextInput({
+		const { ref: inputRef, ...inputProps } = useTextInput({
 			fieldMetadata,
 			onBlur,
 			parse: (val, field) => {
@@ -85,33 +85,31 @@ export const SlugFieldInner = SimpleRelativeSingleField<SlugFieldProps, string>(
 						if (isSpecialLinkClick(event.nativeEvent)) {
 							event.stopPropagation()
 						} else {
-							inputProps.ref.current?.focus()
+							inputRef.current?.focus()
 							event.preventDefault()
 						}
 					}}
 				/>)}
 		</>
 		return (
-			<SlugControl
+			<SlugInput
+				{...props}
+				{...inputProps}
+				inputRef={inputRef}
 				prefix={hardPrefix}
 				link={props.linkToExternalUrl ? fullValue : undefined}
 				onOverlayClick={editing ? undefined : () => setEditing(true)}
 				overlay={editing ? undefined : overlay}
-			>
-				<TextInput
-						{...inputProps}
-						readOnly={!editing}
-						onBlur={e => {
-							inputProps.onBlur(e)
-							setTimeout(() => {
-								if (document.activeElement !== inputProps.ref.current) {
-									setEditing(false)
-								}
-							}, 2000)
-						}}
-						{...props}
-					/>
-			</SlugControl>
+				readOnly={!editing}
+				onBlur={e => {
+					inputProps.onBlur(e)
+					setTimeout(() => {
+						if (document.activeElement !== inputRef.current) {
+							setEditing(false)
+						}
+					}, 2000)
+				}}
+			/>
 		)
 	},
 	'SlugField',

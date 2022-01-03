@@ -1,1 +1,1 @@
-export * from './SlugControl'
+export * from './SlugInput'

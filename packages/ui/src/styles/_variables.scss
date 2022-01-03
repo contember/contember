@@ -182,7 +182,6 @@ $cui-icon-sizes: map_merge((
 
 // Navigation
 $cui-navigation-text-color: $cui-color-gray-8 !default;
-$cui-navigation-title-font-size: rem(14px) !default;
 $cui-navigation-title-font-weight: $fw-bold;
 $cui-navigation-inactive-opacity: .8 !default;
 $cui-navigation-active-color: darken($cui-color-primary, 5) !default;
@@ -192,7 +191,6 @@ $cui-navigation-focus-background-color: rgba($cui-navigation-active-color, .2) !
 
 // Breadcrumbs
 $cui-breadcrumbs-text-color: $cui-navigation-text-color;
-$cui-breadcrumbs-font-size: $cui-navigation-title-font-size;
 $cui-breadcrumbs-link-color: $cui-navigation-active-color;
 $cui-breadcrumbs-link-hover-color: $cui-navigation-hover-color;
 $cui-breadcrumbs-link-focus-background-color: $cui-navigation-focus-background-color;

@@ -1,19 +1,19 @@
 import classNames from 'classnames'
-import { memo, ReactNode } from 'react'
+import { memo } from 'react'
 import { useClassNamePrefix } from '../../auxiliary'
-import { Default } from '../../types'
+import { Default, NativeProps } from '../../types'
 import { toEnumViewClass, toStateClass } from '../../utils'
 
-export interface LabelProps {
+export interface LabelProps extends NativeProps<HTMLSpanElement> {
   isDisabled?: boolean
   isActive?: boolean
   isFocused?: boolean
   isHover?: boolean
-  children: ReactNode
   size?: Default | 'small'
 }
 
 export const Label = memo(({
+  className,
   isDisabled,
   isActive,
   isFocused,
@@ -29,6 +29,7 @@ export const Label = memo(({
     toStateClass('disabled', isDisabled),
     toStateClass('hover', !isDisabled && isHover),
     toEnumViewClass(size),
+    className,
   )
 
   return <span className={classList}>{children}</span>

@@ -88,7 +88,7 @@ export class MutationGenerator {
 					}
 				}
 			}
-			return builder.inTransaction().getGql()
+			return builder.inTransaction(undefined, { deferForeignKeyConstraints: true }).getGql()
 		} catch (e) {
 			return undefined
 		}

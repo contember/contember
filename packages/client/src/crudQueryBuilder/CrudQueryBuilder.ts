@@ -141,21 +141,9 @@ export class CrudQueryBuilder {
 		return new CrudQueryBuilder('mutation', this.rootObjectBuilder.object(objectName, objectBuilder))
 	}
 
-	public inTransaction(alias?: string): CrudQueryBuilder {
-		const name = 'transaction'
-		const [objectName, objectBuilder, fragments] =
-			typeof alias === 'string'
-				? [
-						alias,
-						new ObjectBuilder(undefined, { ...this.rootObjectBuilder.objects }, undefined, undefined, undefined, name),
-						this.rootObjectBuilder.fragmentDefinitions,
-				  ]
-				: [
-						name,
-						new ObjectBuilder(undefined, { ...this.rootObjectBuilder.objects }),
-						this.rootObjectBuilder.fragmentDefinitions,
-				  ]
-		return new CrudQueryBuilder(this.type, new RootObjectBuilder({ [objectName]: objectBuilder }, fragments))
+	public inTransaction(alias: string = 'transaction', options: { deferForeignKeyConstraints?: boolean } = {}): CrudQueryBuilder {
+		const objectBuilder = new ObjectBuilder(undefined, { ...this.rootObjectBuilder.objects }, options, undefined, undefined, 'transaction')
+		return new CrudQueryBuilder(this.type, new RootObjectBuilder({ [alias]: objectBuilder }, this.rootObjectBuilder.fragmentDefinitions))
 	}
 
 	getGql(): string {

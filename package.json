@@ -16,7 +16,8 @@
 		"test": "pnpm run -r --parallel test",
 		"ts:build": "tsc --build",
 		"ts:watch": "tsc --build --watch",
-		"vite": "cd packages/admin-sandbox && pnpm run vite"
+		"vite": "cd packages/admin-sandbox && pnpm run vite",
+		"dev-admin": "cd packages/admin-sandbox && pnpm run dev-admin"
 	},
 	"devDependencies": {
 		"@babel/core": "7.14.8",

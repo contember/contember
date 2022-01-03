@@ -4,7 +4,7 @@ import { defineConfig } from 'vite'
 import { getPackagePath, packageList } from './packageList.js'
 import { rootDirectory } from './rootDirectory.js'
 
-export function createViteConfig(packageName) {
+export function createViteConfig(packageName, useLocalAdminOverride = false) {
 	if (!packageList.includes(packageName)) {
 		throw new Error(`Invalid package name ${packageName}.`)
 	}
@@ -48,7 +48,9 @@ export function createViteConfig(packageName) {
 				alias: [
 					...packageList.map(packageName => ({
 						find: `@contember/${packageName}`,
-						replacement: resolve(rootDirectory, getPackagePath(packageName)),
+						replacement: useLocalAdminOverride
+							? resolve(rootDirectory, `packages/${packageName}/src/index.ts`)
+							: resolve(rootDirectory, getPackagePath(packageName)),
 					})),
 					{
 						find: 'attr-accept',

@@ -9,7 +9,7 @@ export default {
 	title: 'RepeaterContainer',
 	component: RepeaterContainer,
 	argTypes: {
-		...disabledControlsForAttributes<typeof RepeaterContainer>('children', 'actions'),
+		...disabledControlsForAttributes<typeof RepeaterContainer>('children', 'actions', 'dragHandleComponent'),
 		gap: enumControl(sizes, 'inline-radio', 'default'),
 		label: stringControl('Item label'),
 	},

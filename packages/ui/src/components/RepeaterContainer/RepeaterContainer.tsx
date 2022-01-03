@@ -1,8 +1,6 @@
-import classNames from 'classnames'
 import { ComponentType, memo, ReactNode } from 'react'
 import { Size } from 'types'
 import { useClassNamePrefix } from '../../auxiliary'
-import { toViewClass } from '../../utils'
 import { BoxContent } from '../Box'
 import { Icon } from '../Icon'
 import { Stack } from '../Stack'
@@ -17,40 +15,34 @@ export interface RepeaterContainerProps {
 }
 
 export const RepeaterContainer = memo(({ actions, children, gap, label, dragHandleComponent: Handle }: RepeaterContainerProps) => {
-	const prefix = useClassNamePrefix()
+	const componentClassName = `${useClassNamePrefix()}repeater-container`
 
 	return (
-		<BoxContent>
-			<div
-				className={classNames(
-					`${prefix}repeater-container`,
-					toViewClass('has-label', !!label),
-					toViewClass('has-actions', !!actions),
-				)}
-			>
-				{Handle && (
-					<div className={`${prefix}repeater-container-handle`}>
-						<Handle>
-							<Icon blueprintIcon="drag-handle-vertical" />
-						</Handle>
-					</div>
-				)}
+		<BoxContent gap={gap} className={componentClassName}>
+			{Handle && (
+				<div className={`${componentClassName}-handle`}>
+					<Handle>
+						<Icon blueprintIcon="drag-handle-vertical" />
+					</Handle>
+				</div>
+			)}
+			{(label || actions) && <div className={`${componentClassName}-header`}>
 				{label && (
-					<div className={`${prefix}repeater-container-label`}>
+					<div className={`${componentClassName}-label`}>
 						<Label>
 							{label}
 						</Label>
 					</div>
 				)}
-				{actions && <div className={`${prefix}repeater-container-actions`}>{actions}</div>}
-				<Stack
-					className={`${prefix}repeater-container-content`}
-					direction="vertical"
-					gap={gap}
-				>
-					{children}
-				</Stack>
-			</div>
+				{actions && <div className={`${componentClassName}-actions`}>{actions}</div>}
+			</div>}
+			<Stack
+				className={`${componentClassName}-content`}
+				direction="vertical"
+				gap={gap}
+			>
+				{children}
+			</Stack>
 		</BoxContent>
 	)
 })

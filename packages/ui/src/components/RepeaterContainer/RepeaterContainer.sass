@@ -2,44 +2,40 @@
 	$root: &
 
 	--cui-box-background-focused-overlay: linear-gradient(rgba(var(--cui-controls-1000), 0.01), rgba(var(--cui-controls-1000), 0.01))
+	--cui-box-content-padding-left: calc(2 * var(--cui-box-content-padding))
 
-	display: grid
-	grid-template: auto 1fr / auto 1fr auto
+	transition: background-image .15s
+
+	&-header
+		display: flex
+		justify-content: space-between
+	&-content
+		//
 
 	&-handle
-		display: inline-flex
-		margin: .25em 0 0 -1em
-		padding: 0 .5em
+		align-items: center
+		display: flex
+		flex-direction: column
 		cursor: grab
-		grid-row: 1 / span 2
-		grid-column: 1
+		position: absolute
+		left: 0
+		top: 0
+		bottom: 0
+		padding: var(--cui-box-content-padding) 0
+		width: calc(2 * var(--cui-box-content-padding))
+
 	&-label
 		font-weight: 800
 	&-actions
-		grid-column: 3
-		grid-row: 1 / 2
 		margin-left: .5em
 		margin-right: -.5em
 		margin-top: -.5em
-	&-content
-		background: inherit
-		grid-column: 2 / 3
-		grid-row: 1 / 2
 
-	&.view-has-actions
-		//
-	&.view-has-label > &
-		&-content
-			grid-row: 2
-			grid-column: span 2
 
 	&.is-active,
 	&:focus-within
 		color: var(--cui-control-color)
 		background-image: var(--cui-box-background-focused-overlay)
-		// border-color: var(--cui-control-border-color)
-		// box-shadow: 0 0 1em -.5em var(--cui-control-border-color)
-		transition: box-shadow .15s
 		z-index: 2
 
 	&.is-active &-content,

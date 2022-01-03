@@ -2,7 +2,7 @@ import { SugaredFieldProps, useGetEntityByKey, useMutationState } from '@contemb
 import type { FileId } from '@contember/react-client'
 import { FunctionComponent, ReactNode, useCallback, useState } from 'react'
 import { useMessageFormatter } from '../../../../i18n'
-import { RepeaterContainerPrivateProps, SortableRepeaterItem } from '../../collections'
+import { RepeaterFieldContainerPrivateProps, SortableRepeaterItem } from '../../collections'
 import type { ResolvedFileKinds } from '../ResolvedFileKinds'
 import { uploadDictionary } from '../uploadDictionary'
 import { FileInput, FileInputPublicProps } from './FileInput'
@@ -22,7 +22,7 @@ export interface BareFileRepeaterContainerPublicProps extends Omit<FileInputPubl
 export interface BareFileRepeaterContainerProps
 	extends BareFileRepeaterContainerPublicProps,
 		BareFileRepeaterContainerPrivateProps,
-		RepeaterContainerPrivateProps {}
+		RepeaterFieldContainerPrivateProps {}
 
 export const BareFileRepeaterContainer: FunctionComponent<BareFileRepeaterContainerProps> = ({
 	accessor,

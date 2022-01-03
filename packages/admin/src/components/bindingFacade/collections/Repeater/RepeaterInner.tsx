@@ -13,8 +13,8 @@ import {
 import { ComponentType, Fragment, ReactElement, ReactNode, useCallback } from 'react'
 import type { SortEndHandler } from 'react-sortable-hoc'
 import { useMessageFormatter } from '../../../../i18n'
-import { RepeaterContainer, RepeaterContainerProps, RepeaterContainerPublicProps } from './RepeaterContainer'
 import { repeaterDictionary } from './repeaterDictionary'
+import { RepeaterFieldContainer, RepeaterFieldContainerProps, RepeaterFieldContainerPublicProps } from './RepeaterFieldContainer'
 import { RepeaterItem, RepeaterItemProps } from './RepeaterItem'
 import { shouldCancelStart } from './shouldCancelStart'
 import { SortableRepeaterContainer } from './SortableRepeaterContainer'
@@ -23,7 +23,7 @@ import { SortableRepeaterItemHandle } from './SortableRepeaterItemHandle'
 
 // TODO alt content for collapsing
 export interface RepeaterInnerProps<ContainerExtraProps, ItemExtraProps>
-	extends RepeaterContainerPublicProps,
+	extends RepeaterFieldContainerPublicProps,
 		Omit<RepeaterItemProps, 'children' | 'canBeRemoved' | 'label'> {
 	accessor: EntityListAccessor
 	boxLabel?: ReactNode
@@ -34,7 +34,7 @@ export interface RepeaterInnerProps<ContainerExtraProps, ItemExtraProps>
 
 	enableRemoving?: boolean
 
-	containerComponent?: ComponentType<RepeaterContainerProps & ContainerExtraProps>
+	containerComponent?: ComponentType<RepeaterFieldContainerProps & ContainerExtraProps>
 	containerComponentExtraProps?: ContainerExtraProps
 
 	itemComponent?: ComponentType<RepeaterItemProps & ItemExtraProps>
@@ -60,8 +60,8 @@ export const RepeaterInner = Component<RepeaterInnerProps<any, any>, NonStaticPr
 
 		const Handle: ComponentType<{ children: ReactNode }> = props.dragHandleComponent || Fragment
 		const Item: ComponentType<RepeaterItemProps & ItemExtraProps> = props.itemComponent || RepeaterItem
-		const Container: ComponentType<RepeaterContainerProps & ContainerExtraProps> =
-			props.containerComponent || RepeaterContainer
+		const Container: ComponentType<RepeaterFieldContainerProps & ContainerExtraProps> =
+			props.containerComponent || RepeaterFieldContainer
 
 		const isEmpty = entities.length === 0
 		const itemRemovingEnabled = props.enableRemoving !== false

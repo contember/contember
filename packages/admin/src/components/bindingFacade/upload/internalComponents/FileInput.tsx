@@ -3,12 +3,12 @@ import { Button, FieldContainer, FieldContainerProps, FileDropZone } from '@cont
 import type { ReactNode } from 'react'
 import type { DropzoneState } from 'react-dropzone'
 import type { MessageFormatter } from '../../../../i18n'
-import type { RepeaterContainerPublicProps } from '../../collections'
+import type { RepeaterFieldContainerPublicProps } from '../../collections'
 import type { UploadDictionary } from '../uploadDictionary'
 
 export interface FileInputPublicProps
 	extends Omit<
-			RepeaterContainerPublicProps,
+			RepeaterFieldContainerPublicProps,
 			'emptyMessage' | 'emptyMessageComponent' | 'emptyMessageComponentExtraProps'
 		>,
 		Pick<FieldContainerProps, 'label' | 'description' | 'labelDescription'> {

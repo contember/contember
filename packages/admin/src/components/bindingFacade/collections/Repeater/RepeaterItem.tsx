@@ -1,5 +1,5 @@
 import { BindingError, RemovalType } from '@contember/binding'
-import { BoxSection, BoxSectionProps } from '@contember/ui'
+import { RepeaterContainer, RepeaterContainerProps } from '@contember/ui'
 import { memo, ReactNode } from 'react'
 import { DeleteEntityButton } from '../helpers'
 
@@ -7,7 +7,7 @@ export interface RepeaterItemProps {
 	label: ReactNode
 	children: ReactNode
 	canBeRemoved: boolean
-	dragHandleComponent?: BoxSectionProps['dragHandleComponent']
+	dragHandleComponent?: RepeaterContainerProps['dragHandleComponent']
 	removalType?: RemovalType
 }
 
@@ -20,13 +20,13 @@ export const RepeaterItem = memo(
 			)
 		}
 		return (
-			<BoxSection
+			<RepeaterContainer
 				dragHandleComponent={dragHandleComponent}
-				heading={label}
+				label={label}
 				actions={canBeRemoved ? <DeleteEntityButton /> : undefined}
 			>
 				{children}
-			</BoxSection>
+			</RepeaterContainer>
 		)
 	},
 )

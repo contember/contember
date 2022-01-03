@@ -6,7 +6,7 @@ import { AccessorErrors } from '../../errors'
 import { CreateNewEntityButton, CreateNewEntityButtonProps, EmptyMessage, EmptyMessageProps } from '../helpers'
 import type { RepeaterDictionary } from './repeaterDictionary'
 
-export interface RepeaterContainerPrivateProps {
+export interface RepeaterFieldContainerPrivateProps {
 	accessor: EntityListAccessor
 	entities: EntityAccessor[]
 	formatMessage: MessageFormatter<RepeaterDictionary>
@@ -16,7 +16,7 @@ export interface RepeaterContainerPrivateProps {
 	createNewEntity: (initialize?: EntityAccessor.BatchUpdatesHandler) => void
 	children: ReactNode
 }
-export interface RepeaterContainerPublicProps {
+export interface RepeaterFieldContainerPublicProps {
 	enableAddingNew?: boolean
 
 	emptyMessage?: ReactNode
@@ -29,9 +29,9 @@ export interface RepeaterContainerPublicProps {
 	addButtonComponentExtraProps?: {}
 }
 
-export interface RepeaterContainerProps extends RepeaterContainerPublicProps, RepeaterContainerPrivateProps {}
+export interface RepeaterFieldContainerProps extends RepeaterFieldContainerPublicProps, RepeaterFieldContainerPrivateProps {}
 
-export const RepeaterContainer = memo(
+export const RepeaterFieldContainer = memo(
 	({
 		accessor,
 		addButtonText,
@@ -45,7 +45,7 @@ export const RepeaterContainer = memo(
 		formatMessage,
 		isEmpty,
 		label,
-	}: RepeaterContainerProps) => {
+	}: RepeaterFieldContainerProps) => {
 		return <FieldContainer label={label} useLabelElement={false}>
 			<Stack
 				direction="vertical"
@@ -75,4 +75,4 @@ export const RepeaterContainer = memo(
 		</FieldContainer>
 	},
 )
-RepeaterContainer.displayName = 'RepeaterContainer'
+RepeaterFieldContainer.displayName = 'RepeaterFieldContainer'

@@ -27,10 +27,10 @@ export class EventsQuery extends DatabaseQuery<AnyEvent[]> {
 			}
 			const { from, to } = dateFilter
 			if (from) {
-				qb = qb.where(expr => expr.compare(column, Operator.lte, from))
+				qb = qb.where(expr => expr.compare(column, Operator.gte, from))
 			}
 			if (to) {
-				qb = qb.where(expr => expr.compare(column, Operator.gte, to))
+				qb = qb.where(expr => expr.compare(column, Operator.lte, to))
 			}
 			return qb
 		}

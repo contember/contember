@@ -3,7 +3,7 @@ import classNames from 'classnames'
 import * as React from 'react'
 import { Button, Stack } from '../../src'
 import { Intent, Scheme } from '../../src/types'
-import { enumControl } from './helpers'
+import { enumControl } from './Helpers'
 
 const colorThemes = [
   'default',

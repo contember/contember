@@ -1,7 +1,7 @@
 import type { ComponentMeta, ComponentStory } from '@storybook/react'
 import * as React from 'react'
 import { Box, Button } from '../../src'
-import { booleanControl, disabledControlsForAttributes } from './helpers'
+import { booleanControl, disabledControlsForAttributes } from './Helpers'
 
 export default {
 	title: 'Box',

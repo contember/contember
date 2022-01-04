@@ -1,7 +1,7 @@
 import type { ComponentMeta, ComponentStory } from '@storybook/react'
 import * as React from 'react'
 import { ContemberLogoImage, Logo } from '../../src'
-import { disabledControlsForAttributes, rangeControl } from './helpers'
+import { disabledControlsForAttributes, rangeControl } from './Helpers'
 
 export default {
 	title: 'Logo',

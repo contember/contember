@@ -1,7 +1,7 @@
 import type { ComponentMeta, ComponentStory } from '@storybook/react'
 import * as React from 'react'
 import { FieldContainer } from '../../src'
-import { disabledControlsForAttributes } from './helpers'
+import { disabledControlsForAttributes } from './Helpers'
 
 export default {
 	title: 'FieldContainer',

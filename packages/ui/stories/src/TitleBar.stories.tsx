@@ -1,7 +1,7 @@
 import type { ComponentMeta, ComponentStory } from '@storybook/react'
 import * as React from 'react'
 import { AnchorButton, Button, TitleBar } from '../../src'
-import { disabledControlsForAttributes, stringControl } from './helpers'
+import { disabledControlsForAttributes, stringControl } from './Helpers'
 
 export default {
 	title: 'TitleBar',

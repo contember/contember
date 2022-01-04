@@ -1,7 +1,7 @@
 import type { ComponentMeta, ComponentStory } from '@storybook/react'
 import * as React from 'react'
 import { RadioGroup } from '../../src'
-import { booleanControl, disabledControlsForAttributes, enumControl, stringControl } from './helpers'
+import { booleanControl, disabledControlsForAttributes, enumControl, stringControl } from './Helpers'
 
 export default {
 	title: 'RadioGroup',

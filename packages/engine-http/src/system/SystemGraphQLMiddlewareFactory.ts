@@ -7,7 +7,6 @@ import {
 	typeDefs,
 } from '@contember/engine-system-api'
 import { KoaContext, KoaMiddleware } from '../koa'
-import { flattenVariables } from '@contember/engine-content-api'
 import { ProjectGroupState, ProjectMemberMiddlewareState, ProjectResolveMiddlewareState } from '../project-common'
 import { AuthMiddlewareState } from '../common'
 import {
@@ -87,13 +86,11 @@ export class SystemGraphQLMiddlewareFactory {
 			ctx.state.projectMemberships.map(it => it.role),
 		)
 		const dbContextFactory = ctx.state.projectContainer.systemDatabaseContextFactory
-		const variables = flattenVariables(ctx.state.projectMemberships)
 		const systemContext = await this.resolverContextFactory.create(
 			dbContextFactory.create(identity.id),
 			ctx.state.projectGroup.database.client,
 			ctx.state.project,
 			identity,
-			variables,
 		)
 		return {
 			...systemContext,

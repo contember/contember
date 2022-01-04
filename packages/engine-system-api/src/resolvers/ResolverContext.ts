@@ -1,5 +1,5 @@
 import { Authorizator } from '@contember/authorization'
-import { Acl, Schema } from '@contember/schema'
+import { Schema } from '@contember/schema'
 import { ForbiddenError } from 'apollo-server-errors'
 import { DatabaseContext, SchemaVersionBuilder } from '../model'
 import { ProjectConfig } from '../types'
@@ -20,7 +20,6 @@ export class ResolverContextFactory {
 		tenantDb: Client,
 		project: ProjectConfig,
 		identity: Identity,
-		variables: Acl.VariablesMap,
 	): Promise<ResolverContext> {
 		const schema = await this.schemaVersionBuilder.buildSchema(systemDbContext)
 		const stagePermissionsFactory = new StagePermissionsFactory(schema)
@@ -28,7 +27,6 @@ export class ResolverContextFactory {
 		return {
 			project,
 			identity,
-			variables,
 			schema,
 			authorizator: this.authorizator,
 			db: systemDbContext,
@@ -58,7 +56,6 @@ export interface ResolverContext {
 	readonly schema: Schema
 	readonly identity: Identity
 	readonly db: DatabaseContext
-	readonly variables: Acl.VariablesMap
 	readonly authorizator: Authorizator<Identity>
 	readonly requireAccess: (action: Authorizator.Action, stage: string, message?: string) => Promise<void>
 	readonly getLoader: <Args, Item>(loaderFactory: LoaderFactory<Args, Item>) => ItemLoader<Args, Item>

@@ -1,20 +1,25 @@
 import { SugarableRelativeSingleField } from '@contember/binding'
-import type { ReactNode } from 'react'
 import { Size } from '@contember/ui'
+import { ReactNode } from 'react'
 
-export type FieldBackedElement = {
+interface RichTextFieldBackedElement {
 	field: string | SugarableRelativeSingleField
 	placeholder: string
+	format: 'richText'
+}
 
-	/** @deprecated */
-	render: (props: { isEmpty: boolean; children: ReactNode }) => ReactNode
-} & (
-	| {
-			format: 'richText'
-			// TODO specific settings
-	  }
-	| {
-			format: 'plainText'
-			size?: Size
-	  }
-)
+interface PlainTextFieldBackedElement {
+	field: string | SugarableRelativeSingleField
+	placeholder: string
+	format: 'plainText'
+	size?: Size
+}
+
+interface CustomFieldBackedElement {
+	element: ReactNode
+}
+
+export type FieldBackedElement =
+	| RichTextFieldBackedElement
+	| PlainTextFieldBackedElement
+	| CustomFieldBackedElement

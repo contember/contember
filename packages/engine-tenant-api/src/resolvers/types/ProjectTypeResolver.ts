@@ -1,7 +1,6 @@
 import { ProjectIdentityRelation, ProjectMembersArgs, ProjectResolvers } from '../../schema'
 import { ResolverContext } from '../ResolverContext'
 import {
-	getRoleVariables,
 	PermissionActions,
 	Project,
 	ProjectMemberManager,
@@ -9,6 +8,7 @@ import {
 	RoleVariablesDefinition,
 	VariableDefinition,
 } from '../../model'
+import { getRoleVariables } from '@contember/schema-utils'
 
 export class ProjectTypeResolver implements ProjectResolvers {
 	constructor(

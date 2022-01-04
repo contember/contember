@@ -44,6 +44,8 @@ export class ProjectTypeResolver implements ProjectResolvers {
 				switch (variableDef.type) {
 					case Acl.VariableType.entity:
 						return { __typename: 'RoleEntityVariableDefinition', name, entityName: variableDef.entityName }
+					case Acl.VariableType.predefined:
+						return { __typename: 'RolePredefinedVariableDefinition', name, value: variableDef.value }
 				}
 			}),
 		}))

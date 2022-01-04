@@ -45,7 +45,7 @@ export class ApiKeyManager {
 			)
 		})
 
-		return new ResponseOk(new VerifyResult(apiKeyRow.identity_id, apiKeyRow.id, apiKeyRow.roles))
+		return new ResponseOk(new VerifyResult(apiKeyRow.identity_id, apiKeyRow.id, apiKeyRow.roles, apiKeyRow.person_id))
 	}
 
 	async createSessionApiKey(dbContext: DatabaseContext, identityId: string, expiration?: number): Promise<string> {
@@ -98,7 +98,12 @@ export type VerifyResponse = Response<VerifyResult, VerifyErrorCode>
 export class VerifyResult {
 	readonly valid = true
 
-	constructor(public readonly identityId: string, public readonly apiKeyId: string, public readonly roles: string[]) {}
+	constructor(
+		public readonly identityId: string,
+		public readonly apiKeyId: string,
+		public readonly roles: string[],
+		public readonly personId: string | null,
+	) {}
 }
 
 export const enum VerifyErrorCode {

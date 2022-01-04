@@ -316,14 +316,13 @@ export const BlockEditor = Object.assign<
 	ContentOutlet,
 })
 
-
 const useFieldBackedElementFields = (elements: FieldBackedElement[]) => {
 	return <>
 		{elements.map(el => {
 			if (el.format === 'plainText') {
 				return (
 					<TextField field={el.field} label={undefined} placeholder={el.placeholder} distinction={'seamless'}
-										 size={el.size} />
+										 size={el.size} wrapLines />
 				)
 			}
 			return <RichTextField field={el.field} label={undefined} placeholder={el.placeholder} distinction={'seamless'} />

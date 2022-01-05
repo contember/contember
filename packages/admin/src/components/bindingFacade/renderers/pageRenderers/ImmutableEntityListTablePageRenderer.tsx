@@ -1,13 +1,13 @@
 import { Component, EntityAccessor } from '@contember/binding'
 import { Table, TableCell, TableProps, TableRow, TableRowProps } from '@contember/ui'
 import { memo, ReactElement, ReactNode } from 'react'
-import { DeleteEntityButton, EmptyMessage, RepeaterFieldContainerProps, RepeaterItemProps } from '../collections'
-import { ImmutableContentLayoutRenderer, ImmutableContentLayoutRendererProps } from './ImmutableContentLayoutRenderer'
-import { ImmutableEntityListRenderer, ImmutableEntityListRendererProps } from './ImmutableEntityListRenderer'
+import { DeleteEntityButton, EmptyMessage, RepeaterFieldContainerProps, RepeaterItemProps } from '../../collections'
+import { LayoutRenderer, LayoutRendererProps } from '../LayoutRenderer'
+import { ImmutableEntityListRenderer, ImmutableEntityListRendererProps } from '../listRenderers'
 
-export interface TableRendererProps<ContainerExtraProps, ItemExtraProps>
-	extends ImmutableContentLayoutRendererProps,
-		Omit<
+export type ImmutableEntityListTablePageRendererProps<ContainerExtraProps, ItemExtraProps> =
+	& LayoutRendererProps
+	& Omit<
 			ImmutableEntityListRendererProps<ContainerExtraProps, ItemExtraProps>,
 			| 'afterContent'
 			| 'beforeContent'
@@ -17,13 +17,14 @@ export interface TableRendererProps<ContainerExtraProps, ItemExtraProps>
 			| 'containerComponent'
 			| 'containerComponentExtraProps'
 			| 'removalType'
-		> {
-	tableProps?: Omit<TableProps, 'children'>
-	tableRowProps?: Omit<TableRowProps, 'children'>
-	enableRemoving?: boolean
-}
+		>
+	& {
+		tableProps?: Omit<TableProps, 'children'>
+		tableRowProps?: Omit<TableRowProps, 'children'>
+		enableRemoving?: boolean
+	}
 
-export const TableRenderer = Component(
+export const ImmutableEntityListTablePageRenderer = Component(
 	<ContainerExtraProps, ItemExtraProps>({
 		enableRemoving = true,
 		children,
@@ -35,9 +36,9 @@ export const TableRenderer = Component(
 		tableProps,
 		tableRowProps,
 		...entityListProps
-	}: TableRendererProps<ContainerExtraProps, ItemExtraProps>) => {
+	}: ImmutableEntityListTablePageRendererProps<ContainerExtraProps, ItemExtraProps>) => {
 		return (
-			<ImmutableContentLayoutRenderer
+			<LayoutRenderer
 				side={side}
 				title={title}
 				navigation={navigation}
@@ -56,12 +57,12 @@ export const TableRenderer = Component(
 				>
 					{children}
 				</ImmutableEntityListRenderer>
-			</ImmutableContentLayoutRenderer>
+			</LayoutRenderer>
 		)
 	},
-	'TableRenderer',
+	'ImmutableEntityListTablePageRenderer',
 ) as <ContainerExtraProps, ItemExtraProps>(
-	props: TableRendererProps<ContainerExtraProps, ItemExtraProps>,
+	props: ImmutableEntityListTablePageRendererProps<ContainerExtraProps, ItemExtraProps>,
 ) => ReactElement
 
 const EmptyTable = memo((props: { children: ReactNode }) => (

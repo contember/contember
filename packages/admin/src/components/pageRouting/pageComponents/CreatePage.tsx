@@ -6,18 +6,20 @@ import {
 	SugaredUnconstrainedQualifiedSingleEntity,
 } from '@contember/binding'
 import { ComponentType, memo, ReactNode } from 'react'
-import { FeedbackRenderer, MutableContentLayoutRendererProps, MutableSingleEntityRenderer } from '../bindingFacade'
-import type { PageProvider } from './Pages'
-import { RedirectOnSuccessHandler } from './useEntityRedirectOnPersistSuccess'
-import { useOnPersistSuccess } from './useOnPersistSuccess'
+import { FeedbackRenderer, MutableSingleEntityPageRenderer, MutableSingleEntityPageRendererProps } from '../../bindingFacade'
+import type { PageProvider } from '../Pages'
+import { RedirectOnSuccessHandler } from '../useEntityRedirectOnPersistSuccess'
+import { useOnPersistSuccess } from '../useOnPersistSuccess'
 
-export type CreatePageProps = Omit<SugaredUnconstrainedQualifiedSingleEntity, 'isCreating'> &
-	EntitySubTreeAdditionalProps &
-	EntitySubTreeAdditionalCreationProps & {
+export type CreatePageProps =
+	& Omit<SugaredUnconstrainedQualifiedSingleEntity, 'isCreating'>
+	& EntitySubTreeAdditionalProps
+	& EntitySubTreeAdditionalCreationProps
+	& {
 		pageName: string
 		children: ReactNode
 		redirectOnSuccess?: RedirectOnSuccessHandler
-		rendererProps?: Omit<MutableContentLayoutRendererProps, 'accessor'>
+		rendererProps?: Omit<MutableSingleEntityPageRendererProps, 'accessor'>
 	}
 
 const CreatePage: Partial<PageProvider<CreatePageProps>> & ComponentType<CreatePageProps> = memo(
@@ -26,7 +28,7 @@ const CreatePage: Partial<PageProvider<CreatePageProps>> & ComponentType<CreateP
 			<DataBindingProvider stateComponent={FeedbackRenderer}>
 				<EntitySubTree
 					{...entityProps}
-					entityComponent={MutableSingleEntityRenderer}
+					entityComponent={MutableSingleEntityPageRenderer}
 					entityProps={rendererProps}
 					onPersistSuccess={useOnPersistSuccess({ redirectOnSuccess, onPersistSuccess })}
 					isCreating

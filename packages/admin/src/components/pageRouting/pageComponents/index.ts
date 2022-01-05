@@ -1,0 +1,7 @@
+export * from './CreatePage'
+export * from './DetailPage'
+export * from './EditPage'
+export * from './GenericPage'
+export * from './ListPage'
+export * from './MultiEditPage'
+export * from './TablePage'

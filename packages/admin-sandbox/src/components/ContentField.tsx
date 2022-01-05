@@ -115,17 +115,12 @@ export const ContentField = Component<ContentFieldProps>(
 			}}
 			leadingFieldBackedElements={[
 				{
-					field: 'title',
-					placeholder: 'Title',
-					format: 'plainText',
-					size: 'large',
-					render: props => <h1 style={{ fontSize: '2.5em', fontWeight: 600 }}>{props.children}</h1>,
+					element: <TextField field={'title'} label={undefined} placeholder={'Title'} distinction={'seamless'} />,
 				},
 				{
 					field: 'lead',
 					placeholder: 'Lead',
 					format: 'richText',
-					render: props => <p>{props.children}</p>,
 				},
 			]}
 			trailingFieldBackedElements={[
@@ -133,7 +128,6 @@ export const ContentField = Component<ContentFieldProps>(
 					field: 'footer',
 					placeholder: 'Footer',
 					format: 'richText',
-					render: props => <p>{props.children}</p>,
 				},
 			]}
 			referencesField="references"

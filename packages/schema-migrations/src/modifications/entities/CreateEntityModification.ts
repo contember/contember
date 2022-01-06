@@ -11,6 +11,7 @@ export const CreateEntityModification: ModificationHandlerStatic<CreateEntityMod
 	public createSql(builder: MigrationBuilder): void {
 		const entity = this.data.entity
 		if (entity.view) {
+			// BC
 			builder.createView(entity.tableName, {}, entity.view.sql)
 			return
 		}
@@ -48,6 +49,7 @@ export const CreateEntityModification: ModificationHandlerStatic<CreateEntityMod
 	static createDiff(originalSchema: Schema, updatedSchema: Schema) {
 		return Object.values(updatedSchema.model.entities)
 			.filter(it => !originalSchema.model.entities[it.name])
+			.filter(it => !it.view)
 			.map(entity =>
 				CreateEntityModification.createModification({
 					entity: {

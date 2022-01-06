@@ -1,0 +1,46 @@
+{
+	"formatVersion": 3,
+	"modifications": [
+		{
+			"modification": "createColumn",
+			"entityName": "Article",
+			"field": {
+				"name": "slug",
+				"columnName": "slug",
+				"nullable": true,
+				"type": "String",
+				"columnType": "text"
+			}
+		},
+		{
+			"modification": "createUniqueConstraint",
+			"entityName": "Article",
+			"unique": {
+				"fields": [
+					"slug"
+				],
+				"name": "unique_Article_slug_39abc3"
+			}
+		},
+		{
+			"modification": "patchAclSchema",
+			"patch": [
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/Article/operations/create/slug",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/Article/operations/read/slug",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/Article/operations/update/slug",
+					"value": true
+				}
+			]
+		}
+	]
+}

@@ -16,7 +16,7 @@ import {
 	SelectField,
 	TextCell,
 	TextField,
-	TitleBar,
+	TitleBar, SlugField,
 } from '@contember/admin'
 
 
@@ -50,6 +50,7 @@ const form = <>
 		orderBy: 'name desc',
 	}} />
 	<TextField field={'title'} label={'Title'} />
+	<SlugField field={'slug'} label={'Slug'} derivedFrom={'title'} unpersistedHardPrefix={'http://localhost/'} persistedHardPrefix={'bar/'} persistedSoftPrefix={'lorem/'} linkToExternalUrl/>
 </>
 
 export const ArticleCreatePage = (

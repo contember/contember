@@ -53,7 +53,7 @@ export const useTextInput = <Value extends FieldValue>({
 			},
 			[field, parse],
 		),
-		onBlur: useCallback<FocusEventHandler<HTMLInputElement & HTMLTextAreaElement>>(
+		onBlur: useCallback<FocusEventHandler<HTMLInputElement | HTMLTextAreaElement>>(
 			e => {
 				onBlur?.(e)
 				if (e.isDefaultPrevented()) {

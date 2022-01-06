@@ -1,0 +1,34 @@
+.#{$cui-conf-globalPrefix}slugInput
+	display: flex
+	align-items: stretch
+
+	&-prefix
+		display: flex
+		align-items: center
+		padding: 0 calc(2 * var(--cui-gap-horizontal))
+		margin-right: calc(-2 * var(--cui-control-border-width))
+		border-style: solid
+		border-width: var(--cui-control-border-width)
+		border-top-left-radius: var(--cui-control-border-radius)
+		border-bottom-left-radius: var(--cui-control-border-radius)
+		border-color: $cui-control-view-default-border-color
+		border-right: none
+		background: $cui-color-gray-1
+		color: var(--cui-color--medium)
+
+	&-prefixLink
+		color: var(--cui-color--medium)
+		font-weight: normal
+
+	&-input
+		flex: 5 1 auto
+		position: relative
+
+	&-overlay
+		cursor: pointer
+		+absolute(0)
+
+		a
+			width: 100%
+			height: 100%
+			display: block

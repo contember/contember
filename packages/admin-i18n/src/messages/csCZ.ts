@@ -67,6 +67,8 @@ export const csCZ: AdminDictionary = {
 	},
 	errorCodes: {
 		fieldRequired: 'Vyplňte prosím toto pole.',
+		notUnique: 'Hodnota není unikátní.',
+		unknownExecutionError: 'Neznámá chyba.',
 	},
 	fieldView: {
 		boolean: {

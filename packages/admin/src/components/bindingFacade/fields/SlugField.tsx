@@ -5,125 +5,112 @@ import {
 	SugaredRelativeSingleField,
 	useDerivedField,
 	useEnvironment,
-	useField,
-	useMutationState,
 } from '@contember/binding'
-import { FormGroup, isSpecialLinkClick, TextInput } from '@contember/ui'
+import { isSpecialLinkClick, SingleLineTextInputProps } from '@contember/ui'
 import slugify from '@sindresorhus/slugify'
-import { FunctionComponent, useCallback, useMemo } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import type { SimpleRelativeSingleFieldProps } from '../auxiliary'
-import { ConcealableField, ConcealableFieldProps } from '../ui'
+import { SimpleRelativeSingleField } from '../auxiliary'
+import { stringFieldParser, useTextInput } from './useTextInput'
+import { SlugInput } from '@contember/ui'
 
-export type SlugFieldProps = Pick<ConcealableFieldProps, 'buttonProps' | 'concealTimeout'> &
-	SimpleRelativeSingleFieldProps & {
+type SlugPrefix = string | ((environment: Environment) => string)
+
+export type SlugFieldProps =
+	& SimpleRelativeSingleFieldProps
+	& Omit<SingleLineTextInputProps, 'value' | 'onChange' | 'validationState' | 'allowNewlines'>
+	& {
 		derivedFrom: SugaredRelativeSingleField['field']
-		unpersistedHardPrefix?: string | ((environment: Environment) => string)
-		persistedHardPrefix?: string | ((environment: Environment) => string)
-		persistedSoftPrefix?: string | ((environment: Environment) => string)
-		concealTimeout?: number
+		unpersistedHardPrefix?: SlugPrefix
+		persistedHardPrefix?: SlugPrefix
+		persistedSoftPrefix?: SlugPrefix
 		linkToExternalUrl?: boolean
 	}
 
-export const SlugField: FunctionComponent<SlugFieldProps> = Component(
-	({
-		buttonProps,
-		concealTimeout,
+const useNormalizedPrefix = (value?: SlugPrefix) => {
+	const environment = useEnvironment()
+	return useMemo(() => typeof value === 'function' ? value(environment) : value ?? '', [value, environment])
+}
+
+export const SlugField = Component<SlugFieldProps>(
+	props => <SlugFieldInner {...props}/>,
+	props => <>
+		<Field field={props.derivedFrom} />
+		<SlugFieldInner {...props} />
+	</>,
+)
+
+export const SlugFieldInner = SimpleRelativeSingleField<SlugFieldProps, string>(
+	(fieldMetadata, {
+		name,
+		label,
+		onBlur,
 		unpersistedHardPrefix,
 		persistedHardPrefix,
 		persistedSoftPrefix,
 		derivedFrom,
 		field,
-		linkToExternalUrl = false,
 		...props
 	}) => {
-		const environment = useEnvironment()
-		const { normalizedUnpersistedHardPrefix, normalizedPersistedHardPrefix, normalizedPersistedSoftPrefix } = useMemo(
-			() => ({
-				normalizedUnpersistedHardPrefix:
-					typeof unpersistedHardPrefix === 'function'
-						? unpersistedHardPrefix(environment)
-						: unpersistedHardPrefix || '',
-				normalizedPersistedHardPrefix:
-					typeof persistedHardPrefix === 'function' ? persistedHardPrefix(environment) : persistedHardPrefix || '',
-				normalizedPersistedSoftPrefix:
-					typeof persistedSoftPrefix === 'function' ? persistedSoftPrefix(environment) : persistedSoftPrefix || '',
-			}),
-			[environment, persistedHardPrefix, persistedSoftPrefix, unpersistedHardPrefix],
-		)
+		const normalizedUnpersistedHardPrefix = useNormalizedPrefix(unpersistedHardPrefix)
+		const normalizedPersistedHardPrefix = useNormalizedPrefix(persistedHardPrefix)
+		const normalizedPersistedSoftPrefix = useNormalizedPrefix(persistedSoftPrefix)
+
+		const { ref: inputRef, ...inputProps } = useTextInput({
+			fieldMetadata,
+			onBlur,
+			parse: (val, field) => {
+				const parsedValue = stringFieldParser(val, field)
+				return parsedValue !== null ? `${normalizedPersistedHardPrefix}${parsedValue}` : null
+			},
+			format: val => val !== null ? val.substring(normalizedPersistedHardPrefix.length) : '',
+		})
 		const transform = useCallback(
 			(driverFieldValue: string | null) => {
 				const slugValue = slugify(driverFieldValue || '')
-
 				return `${normalizedPersistedHardPrefix}${normalizedPersistedSoftPrefix}${slugValue}`
 			},
 			[normalizedPersistedHardPrefix, normalizedPersistedSoftPrefix],
 		)
 		useDerivedField<string>(derivedFrom, field, transform)
+		const [editing, setEditing] = useState(false)
 
-		const slugField = useField<string>(field)
-		const isMutating = useMutationState()
-
-		const completeHardPrefix = `${normalizedUnpersistedHardPrefix}${normalizedPersistedHardPrefix}`
-		const presentedValue = `${normalizedUnpersistedHardPrefix}${slugField.value || ''}`
-
+		const hardPrefix = normalizedUnpersistedHardPrefix + normalizedPersistedHardPrefix
+		const fullValue = hardPrefix + inputProps.value
+		const overlay = <>
+			{props.linkToExternalUrl && (
+				<a
+					href={fullValue}
+					onClick={event => {
+						if (isSpecialLinkClick(event.nativeEvent)) {
+							event.stopPropagation()
+						} else {
+							inputRef.current?.focus()
+							event.preventDefault()
+						}
+					}}
+				/>)}
+		</>
 		return (
-			<ConcealableField
-				renderConcealedValue={() =>
-					linkToExternalUrl ? (
-						<a
-							href={presentedValue}
-							onClick={event => {
-								if (isSpecialLinkClick(event.nativeEvent)) {
-									event.stopPropagation()
-								} else {
-									event.preventDefault()
-								}
-							}}
-						>
-							{presentedValue}
-						</a>
-					) : (
-						presentedValue
-					)
-				}
-				buttonProps={buttonProps}
-				concealTimeout={concealTimeout}
-			>
-				{({ inputRef, onFocus, onBlur }) => (
-					<FormGroup
-						label={props.label ? environment.applySystemMiddleware('labelMiddleware', props.label) : undefined}
-						errors={slugField.errors}
-						labelDescription={props.labelDescription}
-						labelPosition={props.labelPosition || 'labelInlineLeft'}
-						description={props.description}
-						size="small"
-					>
-						<TextInput
-							value={presentedValue}
-							onChange={e => {
-								const rawValue = e.target.value
-								const valueWithoutHardPrefix = rawValue.substring(completeHardPrefix.length)
-								slugField.updateValue(`${normalizedPersistedHardPrefix}${valueWithoutHardPrefix}`)
-							}}
-							readOnly={isMutating}
-							validationState={slugField.errors ? 'invalid' : undefined}
-							size="small"
-							ref={inputRef}
-							onFocus={onFocus}
-							onBlur={onBlur}
-							{...props}
-						/>
-					</FormGroup>
-				)}
-			</ConcealableField>
+			<SlugInput
+				{...props}
+				{...inputProps}
+				inputRef={inputRef}
+				prefix={hardPrefix}
+				link={props.linkToExternalUrl ? fullValue : undefined}
+				onOverlayClick={editing ? undefined : () => setEditing(true)}
+				overlay={editing ? undefined : overlay}
+				readOnly={!editing}
+				onBlur={e => {
+					inputProps.onBlur(e)
+					setTimeout(() => {
+						if (document.activeElement !== inputRef.current) {
+							setEditing(false)
+						}
+					}, 2000)
+				}}
+			/>
 		)
 	},
-	props => (
-		<>
-			<Field field={props.field} defaultValue={props.defaultValue} />
-			<Field field={props.derivedFrom} />
-			{props.label}
-		</>
-	),
 	'SlugField',
 )

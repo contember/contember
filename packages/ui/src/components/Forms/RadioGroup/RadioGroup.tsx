@@ -7,10 +7,11 @@ import type { Size, ValidationState } from '../../../types'
 import { toEnumStateClass, toEnumViewClass } from '../../../utils'
 import { ErrorList, ErrorListProps } from '../ErrorList'
 import { RadioContext } from './RadioContext'
-import { RadioControl } from './RadioControl'
+import { RadioControl as DefaultRadioControl } from './RadioControl'
 import type { RadioOption } from './types'
 
 export interface RadioGroupProps extends ErrorListProps {
+	RadioControlComponent?: typeof DefaultRadioControl
 	isDisabled?: boolean
 	isReadOnly?: boolean
 	name?: string
@@ -35,7 +36,7 @@ function deriveAriaValidationState(validationState?: ValidationState): 'valid' |
 }
 
 export const RadioGroup = memo((props: RadioGroupProps) => {
-	const { errors, name, options, orientation, size, validationState } = props
+	const { errors, name, options, orientation, size, validationState, RadioControlComponent } = props
 
 	const prefix = useClassNamePrefix()
 
@@ -54,6 +55,8 @@ export const RadioGroup = memo((props: RadioGroupProps) => {
 		toEnumViewClass(orientation ?? 'vertical'),
 	)
 
+	const RadioControl = RadioControlComponent || DefaultRadioControl
+
 	return (
 		<div className={classList} {...radioGroupProps}>
 			<RadioContext.Provider value={state}>
@@ -64,6 +67,7 @@ export const RadioGroup = memo((props: RadioGroupProps) => {
 						value={value}
 						validationState={validationState}
 						description={labelDescription}
+						size={size}
 					>
 						{label}
 					</RadioControl>

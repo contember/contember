@@ -19,10 +19,15 @@
 	text-transform: inherit
 	z-index: 0
 
+	&.view-bold
+		font-weight: bolder
+
 	&.view-small
-		color: var(--cui-color--medium)
-		font-weight: bold
-		font-size: calc(var(--cui-font-size-label) - 2px)
+		font-weight: bolder
+		font-size: var(--cui-font-size-note)
+	&.view-large
+		font-weight: lighter
+		font-size: var(--cui-font-size-heading)
 
 	&.is-active
 		color: var(--cui-control-color--highlighted)

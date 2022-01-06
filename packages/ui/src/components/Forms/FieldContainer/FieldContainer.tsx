@@ -5,7 +5,7 @@ import { useClassNamePrefix } from '../../../auxiliary'
 import type { FieldContainerLabelPosition, Size } from '../../../types'
 import { toEnumViewClass } from '../../../utils'
 import { Description } from '../../Typography/Description'
-import { FieldLabel } from '../../Typography/FieldLabel'
+import { Label } from '../../Typography/Label'
 
 export interface FieldContainerProps extends ErrorListProps {
 	label: ReactNode
@@ -42,7 +42,7 @@ export const FieldContainer = memo(
 			)}>
 				<LabelElement className={`${componentClassName}-label`}>
 					{(label || labelDescription) && <span className={`${componentClassName}-header`}>
-							{label && <FieldLabel>{label}</FieldLabel>}
+							{label && <Label>{label}</Label>}
 							{labelDescription && <Description>{labelDescription}</Description>}
 						</span>
 					}

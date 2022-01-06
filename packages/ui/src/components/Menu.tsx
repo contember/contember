@@ -13,7 +13,7 @@ import { GlobalClassNamePrefixContext } from '../contexts'
 import { useNavigationLink } from '../Navigation'
 import { isSpecialLinkClick, toViewClass } from '../utils'
 import { Collapsible } from './Collapsible'
-import { Label, LabelProps } from './Typography'
+import { Label, LabelOwnProps } from './Typography'
 
 const DepthContext = createContext(0)
 
@@ -53,7 +53,7 @@ namespace Menu {
 	type TitleProps = {
 		children?: ReactNode
 		className?: string
-	} & Omit<LabelProps, 'children'> & (
+	} & Omit<LabelOwnProps, 'children'> & (
 		  {
 				onClick?: never
 				href?: never
@@ -66,7 +66,6 @@ namespace Menu {
 				external?: boolean
 				suppressTo?: boolean
 		  }
-
 	)
 
 	function DepthSpecificItem(props: ItemProps) {

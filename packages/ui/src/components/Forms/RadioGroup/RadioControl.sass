@@ -1,0 +1,62 @@
+.#{$cui-conf-globalPrefix}radio-control
+	--button-knob-scale: 0.6
+	--button-color: var(--radio-color)
+
+	&.is-readonly
+		--button-color: var(--radio-color--readonly)
+		color: var(--radio-color--readonly)
+	&.is-invalid
+		--button-color: var(--radio-color--invalid)
+		color: var(--radio-color--invalid)
+	&.is-disabled
+		--button-color: var(--radio-color--disabled)
+		color: var(--radio-color--disabled)
+		cursor: not-allowed
+
+	align-items: flex-start
+	display: flex
+	flex-direction: row
+	position: relative
+	gap: var(--cui-gap-horizontal)
+
+	&-button
+		border-radius: 50%
+		border: var(--cui-control-border-width) solid var(--button-color)
+		display: flex
+		max-height: var(--radio-size)
+		max-width: var(--radio-size)
+		min-height: var(--radio-size)
+		min-width: var(--radio-size)
+		position: relative
+		transition-duration: var(--cui-transition-duration--fast),var(--cui-transition-duration--immediate), var(--cui-transition-duration--fast)
+		transition-property: box-shadow, border-color, box-shadow
+		.is-focused > &
+			box-shadow: 0 0 0 0.2em var(--cui-control-border-color)
+		&::after
+			background-color: var(--button-color)
+			border-radius: inherit
+			content: ''
+			display: inherit
+			position: absolute
+			left: 0
+			right: 0
+			bottom: 0
+			top: 0
+			transform: scale(0)
+			transition-duration: var(--cui-transition-duration--immediate), var(--cui-transition-duration--fast)
+			transition-property: background-color, transform
+			.is-checked > &
+				transform: scale(var(--button-knob-scale))
+
+	&-label
+		display: flex
+		flex-direction: column
+		font-weight: 600
+		.#{$cui-conf-globalPrefix}label
+			min-height: var(--radio-size)
+			margin-top: 0
+		&-description
+			font-weight: 500
+			font-size: var(--cui-font-size-note)
+			color: var(--cui-color--medium)
+			display: inline-block

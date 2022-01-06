@@ -2,9 +2,9 @@ import classnames from 'classnames'
 import { memo, ReactNode, useContext, useRef } from 'react'
 import { useFocusRing, useHover, useRadio, VisuallyHidden } from 'react-aria'
 import { useClassNamePrefix } from '../../../auxiliary'
-import { ValidationState } from '../../../types'
+import { Size, ValidationState } from '../../../types'
 import { toEnumStateClass, toStateClass } from '../../../utils'
-import { FieldLabel } from '../../Typography/FieldLabel'
+import { Label } from '../../Typography/Label'
 import { RadioContext } from './RadioContext'
 import type { RadioOption } from './types'
 
@@ -14,12 +14,13 @@ interface RadioProps {
 	name?: string
 	validationState?: ValidationState
 	value: RadioOption['value']
+	size?: Size
 }
 
 export const RadioControl = memo((props: RadioProps) => {
-	const { children, description, validationState, value } = props
+	const { children, description, size, validationState, value } = props
 
-	const prefix = useClassNamePrefix()
+	const componentClassName = `${useClassNamePrefix()}radio-control`
 	const ref = useRef<HTMLInputElement>(null)
 
 	const state = useContext(RadioContext)
@@ -31,7 +32,7 @@ export const RadioControl = memo((props: RadioProps) => {
 	const isSelected = state.selectedValue === value
 
 	const classList = classnames(
-		`${prefix}radio-option`,
+		componentClassName,
 		toEnumStateClass(validationState),
 		toStateClass('focused', isFocusVisible),
 		toStateClass('checked', isSelected),
@@ -46,10 +47,10 @@ export const RadioControl = memo((props: RadioProps) => {
 			<VisuallyHidden>
 				<input {...inputProps} {...focusProps} ref={ref} />
 			</VisuallyHidden>
-			<span className={`${prefix}radio-control`} />
-			<span className={`${prefix}radio-label`}>
-				<FieldLabel>{children}</FieldLabel>
-				{description && <span className={`${prefix}radio-label-description`}>{description}</span>}
+			<span className={`${componentClassName}-button`} />
+			<span className={`${componentClassName}-label`}>
+				<Label size={size}>{children}</Label>
+				{description && <span className={`${componentClassName}-label-description`}>{description}</span>}
 			</span>
 		</label>
 	)

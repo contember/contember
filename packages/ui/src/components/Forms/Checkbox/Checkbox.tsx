@@ -5,7 +5,7 @@ import { useToggleState } from 'react-stately'
 import { useClassNamePrefix } from '../../../auxiliary'
 import type { Size, ValidationState } from '../../../types'
 import { toEnumStateClass, toEnumViewClass, toStateClass } from '../../../utils'
-import { FieldLabel } from '../../Typography/FieldLabel'
+import { Label } from '../../Typography/Label'
 import { ErrorList, ErrorListProps } from '../ErrorList'
 
 export interface CheckboxProps extends ErrorListProps {
@@ -62,7 +62,7 @@ export const Checkbox = memo(
 				</VisuallyHidden>
 				<span className={`${prefix}checkbox-tick`} />
 				<span className={`${prefix}checkbox-label`}>
-					<FieldLabel>{children}</FieldLabel>
+					<Label size={size}>{children}</Label>
 					{labelDescription && <span className={`${prefix}checkbox-label-description`}>{labelDescription}</span>}
 				</span>
 				{!!errors && (

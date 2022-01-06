@@ -7,15 +7,13 @@
 	row-gap: calc(2 * var(--cui-gap-vertical))
 	width: 100%
 
-	--cui-font-size-label-small: #{rem(11.2px)}
-	--cui-font-size-label-large: #{rem(17.6px)}
-
 	&:focus-within
 		color: var(--cui-control-color)
 
 	&-label
 		display: flex
 		flex-direction: column
+		font-weight: 700
 		column-gap: calc(2 * var(--cui-gap-horizontal))
 		row-gap: calc(2 * var(--cui-gap-vertical))
 	&:not(.is-active):not(:focus-within) &-label
@@ -35,10 +33,10 @@
 	&-body-content
 		//
 	&-body-content-description
-		font-weight: $fw-light
+		font-weight: 500
 		color: var(--cui-color--medium)
 		display: block
-		font-size: calc(var(--cui-font-size-label) * 0.9)
+		font-size: 0.9em
 		line-height: $cui-base-lineHeight
 
 	&.view-labelLeft &-label,
@@ -49,6 +47,6 @@
 		flex-basis: 0%
 
 	&.view-small
-		--cui-font-size-label: var(--cui-font-size-label-small)
+		font-size: var(--cui-font-size-note)
 	&.view-large
-		--cui-font-size-label: var(--cui-font-size-label-large)
+		font-size: var(--cui-font-size-heading)

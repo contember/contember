@@ -2,7 +2,7 @@ import cn from 'classnames'
 import { forwardRef, HTMLAttributes, memo, ReactNode } from 'react'
 import { useClassNamePrefix } from '../../../auxiliary'
 import { toStateClass } from '../../../utils'
-import { BoxContent } from '../../Box'
+import { Box } from '../../Box'
 
 export interface FileDropZoneProps extends HTMLAttributes<HTMLDivElement> {
 	isActive?: boolean
@@ -15,7 +15,7 @@ export const FileDropZone = memo(
 	forwardRef<HTMLDivElement, FileDropZoneProps>(({ isActive, isAccepting, isRejecting, className, ...props }, ref) => {
 		const prefix = useClassNamePrefix()
 		return (
-			<BoxContent
+			<Box
 				{...props}
 				className={cn(
 					`${prefix}fileDropZone`,

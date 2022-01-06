@@ -3,7 +3,7 @@ import { createContext, memo, ReactNode } from 'react'
 import { useClassNamePrefix } from '../../auxiliary'
 import type { Justification, Size } from '../../types'
 import { toEnumViewClass } from '../../utils'
-import { BoxContent } from '../Box/BoxContent'
+import { Box } from '../Box'
 import { FieldContainer } from '../Forms/FieldContainer'
 
 export const UseTableElementContext = createContext(true)
@@ -42,9 +42,9 @@ export const Table = memo(({ /*useTableElement = true, */ bare, ...props }: Tabl
 	return (
 		<UseTableElementContext.Provider value={/*useTableElement*/ true}>
 			<FieldContainer label={!bare && props.heading}>
-				<BoxContent className="view-no-padding">
+				<Box className="view-no-padding">
 					{table}
-				</BoxContent>
+				</Box>
 			</FieldContainer>
 		</UseTableElementContext.Provider>
 	)

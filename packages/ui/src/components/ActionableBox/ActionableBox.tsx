@@ -1,5 +1,5 @@
 import { memo, MouseEvent as ReactMouseEvent, ReactNode } from 'react'
-import { BoxContent } from '..'
+import { Box } from '..'
 import { useClassNamePrefix } from '../../auxiliary'
 import { Dropdown } from '../Dropdown'
 import { Button, ButtonOwnProps } from '../Forms'
@@ -27,7 +27,7 @@ export const ActionableBox = memo(({ children, editContents, onRemove }: Actiona
 	}
 
 	return (
-		<BoxContent gap="large" className={`${prefix}actionableBox`}>
+		<Box gap="large" className={`${prefix}actionableBox`}>
 			<div className={`${prefix}actionableBox-contents`}>{children}</div>
 			<ul className={`${prefix}actionableBox-actions`} contentEditable={false}>
 				{editContents && (
@@ -50,7 +50,7 @@ export const ActionableBox = memo(({ children, editContents, onRemove }: Actiona
 					</li>
 				)}
 			</ul>
-		</BoxContent>
+		</Box>
 	)
 })
 ActionableBox.displayName = 'ActionableBox'

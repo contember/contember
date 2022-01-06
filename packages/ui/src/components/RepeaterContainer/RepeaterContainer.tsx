@@ -1,7 +1,7 @@
 import { ComponentType, memo, ReactNode } from 'react'
 import { Size } from 'types'
 import { useClassNamePrefix } from '../../auxiliary'
-import { BoxContent } from '../Box'
+import { Box } from '../Box'
 import { Icon } from '../Icon'
 import { Stack } from '../Stack'
 import { Label } from '../Typography/Label'
@@ -18,7 +18,7 @@ export const RepeaterContainer = memo(({ actions, children, gap, label, dragHand
 	const componentClassName = `${useClassNamePrefix()}repeater-container`
 
 	return (
-		<BoxContent gap={gap} className={componentClassName}>
+		<Box gap={gap} className={componentClassName}>
 			{Handle && (
 				<div className={`${componentClassName}-handle`}>
 					<Handle>
@@ -43,7 +43,7 @@ export const RepeaterContainer = memo(({ actions, children, gap, label, dragHand
 			>
 				{children}
 			</Stack>
-		</BoxContent>
+		</Box>
 	)
 })
 RepeaterContainer.displayName = 'RepeaterContainer'

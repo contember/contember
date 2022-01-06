@@ -6,7 +6,7 @@ export type UniqueOptions<T> = { name?: string; fields: (keyof T)[] }
 export function Unique<T>(options: UniqueOptions<T>): DecoratorFunction<T>
 export function Unique<T>(...fields: (keyof T)[]): DecoratorFunction<T>
 export function Unique<T>(options: UniqueOptions<T> | keyof T, ...args: (keyof T)[]): DecoratorFunction<T> {
-	return extendEntity(entity => {
+	return extendEntity(({ entity }) => {
 		const fields = (typeof options !== 'object' ? [options, ...args] : options.fields) as string[]
 		const name =
 			typeof options === 'object' && options.name

@@ -1,14 +1,16 @@
 import classnames from 'classnames'
 import { memo, ReactNode, useContext, useRef } from 'react'
 import { useFocusRing, useHover, useRadio, VisuallyHidden } from 'react-aria'
+import { FieldContainer } from '..'
 import { useClassNamePrefix } from '../../../auxiliary'
 import { Size, ValidationState } from '../../../types'
 import { toEnumStateClass, toStateClass } from '../../../utils'
-import { Label } from '../../Typography/Label'
+import { RadioButton as DefaultRadioButton } from './RadioButton'
 import { RadioContext } from './RadioContext'
 import type { RadioOption } from './types'
 
 interface RadioProps {
+	RadioButtonComponent?: typeof DefaultRadioButton
 	children: ReactNode
 	description: ReactNode
 	name?: string
@@ -17,8 +19,8 @@ interface RadioProps {
 	size?: Size
 }
 
-export const RadioControl = memo((props: RadioProps) => {
-	const { children, description, size, validationState, value } = props
+export const RadioControl = memo(({ RadioButtonComponent, description, size, validationState, ...props }: RadioProps) => {
+	const { children, value } = props
 
 	const componentClassName = `${useClassNamePrefix()}radio-control`
 	const ref = useRef<HTMLInputElement>(null)
@@ -42,16 +44,31 @@ export const RadioControl = memo((props: RadioProps) => {
 		toStateClass('hovered', isHovered),
 	)
 
+	const RadioButton = RadioButtonComponent ?? DefaultRadioButton
+
 	return (
 		<label className={classList}>
-			<VisuallyHidden>
-				<input {...inputProps} {...focusProps} ref={ref} />
-			</VisuallyHidden>
-			<span className={`${componentClassName}-button`} />
-			<span className={`${componentClassName}-label`}>
-				<Label size={size}>{children}</Label>
-				{description && <span className={`${componentClassName}-label-description`}>{description}</span>}
-			</span>
+			<FieldContainer
+				useLabelElement={false}
+				size={size}
+				label={children}
+				labelDescription={description}
+				labelPosition="labelInlineRight"
+			>
+				<VisuallyHidden>
+					<input {...inputProps} {...focusProps} ref={ref} />
+				</VisuallyHidden>
+
+				<RadioButton
+					isFocused={isFocusVisible}
+					isChecked={isSelected}
+					isIndeterminate={value === null}
+					isDisabled={isDisabled}
+					isReadonly={inputProps.readOnly}
+					isHovered={isHovered}
+					isInvalid={validationState === 'invalid'}
+				/>
+			</FieldContainer>
 		</label>
 	)
 })

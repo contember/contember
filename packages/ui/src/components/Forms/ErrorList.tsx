@@ -1,14 +1,13 @@
 import { memo } from 'react'
 import { useClassNamePrefix } from '../../auxiliary'
 import type { FieldErrors } from '../../types'
-import { Message, MessageProps } from '../Message'
+import { Message } from '../Message'
 
 export interface ErrorListProps {
 	errors?: FieldErrors
-	size?: MessageProps['size']
 }
 
-export const ErrorList = memo(({ errors, size }: ErrorListProps) => {
+export const ErrorList = memo(({ errors }: ErrorListProps) => {
 	const prefix = useClassNamePrefix()
 	if (!errors) {
 		return null
@@ -21,7 +20,7 @@ export const ErrorList = memo(({ errors, size }: ErrorListProps) => {
 		<ul className={`${prefix}errorList`}>
 			{fieldErrors.map(error => (
 				<li className={`${prefix}errorList-item`} key={error.message}>
-					<Message intent="danger" size={size}>
+					<Message intent="danger" size="small">
 						{error.message}
 					</Message>
 				</li>

@@ -5,13 +5,13 @@ import { useRadioGroupState } from 'react-stately'
 import { useClassNamePrefix } from '../../../auxiliary'
 import type { Size, ValidationState } from '../../../types'
 import { toEnumStateClass, toEnumViewClass } from '../../../utils'
-import { ErrorList, ErrorListProps } from '../ErrorList'
+import { RadioButton } from './RadioButton'
 import { RadioContext } from './RadioContext'
-import { RadioControl as DefaultRadioControl } from './RadioControl'
+import { RadioControl } from './RadioControl'
 import type { RadioOption } from './types'
 
-export interface RadioGroupProps extends ErrorListProps {
-	RadioControlComponent?: typeof DefaultRadioControl
+export interface RadioProps {
+	RadioButtonComponent?: typeof RadioButton
 	isDisabled?: boolean
 	isReadOnly?: boolean
 	name?: string
@@ -35,8 +35,8 @@ function deriveAriaValidationState(validationState?: ValidationState): 'valid' |
 	return undefined
 }
 
-export const RadioGroup = memo((props: RadioGroupProps) => {
-	const { errors, name, options, orientation, size, validationState, RadioControlComponent } = props
+export const Radio = memo((props: RadioProps) => {
+	const { name, options, orientation, size, validationState, RadioButtonComponent } = props
 
 	const prefix = useClassNamePrefix()
 
@@ -49,13 +49,10 @@ export const RadioGroup = memo((props: RadioGroupProps) => {
 	const { radioGroupProps } = useRadioGroup(ariaRadioGroupProps, state)
 
 	const classList = classNames(
-		`${prefix}radio-group`,
-		toEnumViewClass(size),
+		`${prefix}radio`,
 		toEnumStateClass(validationState),
 		toEnumViewClass(orientation ?? 'vertical'),
 	)
-
-	const RadioControl = RadioControlComponent || DefaultRadioControl
 
 	return (
 		<div className={classList} {...radioGroupProps}>
@@ -63,6 +60,7 @@ export const RadioGroup = memo((props: RadioGroupProps) => {
 				{options.map(({ value, label, labelDescription }: RadioOption) => (
 					<RadioControl
 						key={value}
+						RadioButtonComponent={RadioButtonComponent}
 						name={name}
 						value={value}
 						validationState={validationState}
@@ -73,13 +71,8 @@ export const RadioGroup = memo((props: RadioGroupProps) => {
 					</RadioControl>
 				))}
 			</RadioContext.Provider>
-			{!!errors && (
-				<div className={`${prefix}radio-errors`}>
-					<ErrorList errors={errors} size={size} />
-				</div>
-			)}
 		</div>
 	)
 })
 
-RadioGroup.displayName = 'RadioGroup'
+Radio.displayName = 'Radio'

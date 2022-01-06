@@ -2,13 +2,14 @@ import cn from 'classnames'
 import { memo, ReactNode, useRef } from 'react'
 import { mergeProps, useCheckbox, useFocusRing, useHover, VisuallyHidden } from 'react-aria'
 import { useToggleState } from 'react-stately'
+import { FieldContainer } from '..'
 import { useClassNamePrefix } from '../../../auxiliary'
 import type { Size, ValidationState } from '../../../types'
-import { toEnumStateClass, toEnumViewClass, toStateClass } from '../../../utils'
-import { Label } from '../../Typography/Label'
-import { ErrorList, ErrorListProps } from '../ErrorList'
+import { toEnumStateClass, toStateClass } from '../../../utils'
+import { CheckboxButton as DefaultCheckboxButton } from './CheckboxButton'
 
-export interface CheckboxProps extends ErrorListProps {
+export interface CheckboxProps {
+	CheckboxButtonComponent?: typeof DefaultCheckboxButton
 	children: ReactNode
 	isDisabled?: boolean
 	labelDescription?: ReactNode
@@ -19,7 +20,7 @@ export interface CheckboxProps extends ErrorListProps {
 }
 
 export const Checkbox = memo(
-	({ value, onChange, size, isDisabled, children, labelDescription, errors, validationState }: CheckboxProps) => {
+	({ CheckboxButtonComponent, value, onChange, size, isDisabled, children, labelDescription, validationState }: CheckboxProps) => {
 		const prefix = useClassNamePrefix()
 
 		const toggleProps: Parameters<typeof useToggleState>[0] = {
@@ -45,31 +46,40 @@ export const Checkbox = memo(
 
 		const finalClassName = cn(
 			`${prefix}checkbox`,
-			toEnumViewClass(size),
 			toEnumStateClass(validationState),
-			//toEnumStateClass(validationState),
 			toStateClass('focused', isFocusVisible),
 			toStateClass('checked', value === true),
 			toStateClass('indeterminate', value === null),
 			toStateClass('disabled', isDisabled),
+			toStateClass('readonly', inputProps.readOnly),
 			toStateClass('hovered', isHovered),
 		)
 
+		const CheckboxButton = CheckboxButtonComponent ?? DefaultCheckboxButton
+
 		return (
 			<label {...hoverProps} className={finalClassName}>
-				<VisuallyHidden>
-					<input {...mergeProps(inputProps, focusProps)} ref={checkboxRef} />
-				</VisuallyHidden>
-				<span className={`${prefix}checkbox-tick`} />
-				<span className={`${prefix}checkbox-label`}>
-					<Label size={size}>{children}</Label>
-					{labelDescription && <span className={`${prefix}checkbox-label-description`}>{labelDescription}</span>}
-				</span>
-				{!!errors && (
-					<div className={`${prefix}checkbox-errors`}>
-						<ErrorList errors={errors} size={size} />
-					</div>
-				)}
+				<FieldContainer
+					useLabelElement={false}
+					size={size}
+					label={children}
+					labelDescription={labelDescription}
+					labelPosition="labelInlineRight"
+				>
+					<VisuallyHidden>
+						<input {...mergeProps(inputProps, focusProps)} ref={checkboxRef} />
+					</VisuallyHidden>
+
+					<CheckboxButton
+						isFocused={isFocusVisible}
+						isChecked={value === true}
+						isIndeterminate={value === null}
+						isDisabled={isDisabled}
+						isReadonly={inputProps.readOnly}
+						isHovered={isHovered}
+						isInvalid={validationState === 'invalid'}
+					/>
+				</FieldContainer>
 			</label>
 		)
 	},

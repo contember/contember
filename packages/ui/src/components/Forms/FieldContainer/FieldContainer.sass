@@ -3,9 +3,15 @@
 .#{$cui-conf-globalPrefix}field-container
 	display: flex
 	flex-direction: column
+	font-size: var(--cui-control-font-size)
 	column-gap: calc(2 * var(--cui-gap-horizontal))
 	row-gap: calc(2 * var(--cui-gap-vertical))
 	width: 100%
+
+	&.view-small
+		font-size: var(--cui-control-font-size--small)
+	&.view-large
+		font-size: var(--cui-control-font-size--large)
 
 	&:focus-within
 		color: var(--cui-control-color)
@@ -13,7 +19,6 @@
 	&-label
 		display: flex
 		flex-direction: column
-		font-weight: 700
 		column-gap: calc(2 * var(--cui-gap-horizontal))
 		row-gap: calc(2 * var(--cui-gap-vertical))
 	&:not(.is-active):not(:focus-within) &-label
@@ -26,6 +31,7 @@
 		gap: var(--cui-gap-vertical)
 
 	&-header
+		font-weight: 700
 		flex: 1 1 calc(100% / 7 * 2)
 	&-body
 		flex: 1 1 calc(100% / 7 * 5)
@@ -43,10 +49,18 @@
 	&.view-labelInlineLeft &-label
 		flex-direction: row
 
-	&.view-labelInlineLeft &-header
-		flex-basis: 0%
+	&.view-labelRight &-label,
+	&.view-labelInlineRight &-label
+		flex-direction: row-reverse
 
-	&.view-small
-		font-size: var(--cui-font-size-note)
-	&.view-large
-		font-size: var(--cui-font-size-heading)
+	&.view-labelLeft &-header,
+	&.view-labelInlineLeft &-header,
+	&.view-labelRight &-header,
+	&.view-labelInlineRight &-header
+		justify-content: center
+		align-self: stretch
+
+	&.view-labelInlineLeft &-header
+		flex: unset
+	&.view-labelInlineRight &-body
+		flex: unset

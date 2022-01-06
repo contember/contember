@@ -47,7 +47,7 @@ export const Login = ({ onLogin, resetLink }: LoginProps) => {
 	return (
 		<form onSubmit={onSubmit}>
 			<Section>
-				<ErrorList size="large" errors={errors} />
+				<ErrorList errors={errors} />
 				<FieldContainer label="Email">
 					<TextInput
 						{...register('email')}

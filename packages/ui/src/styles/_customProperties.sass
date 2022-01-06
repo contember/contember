@@ -8,14 +8,14 @@
 	--cui-transition-duration--slow: 600ms
 	--cui-transition-duration--slowest: 800ms
 
-	--cui-font-size-heading: #{rem(16px)}
-	--cui-font-size-body: #{rem(14px)}
-	--cui-font-size-label: #{rem(13px)}
-	--cui-font-size-note: #{rem(12px)}
+	--cui-font-size-heading: #{em(16px)}
+	--cui-font-size-body: #{em(14px)}
+	--cui-font-size-label: #{em(13px)}
+	--cui-font-size-note: #{em(12px)}
 
-	--cui-logo-size: #{rem(18px)}
-	--cui-logo-size--small: #{rem(18px * 0.75)}
-	--cui-logo-size--large: #{rem(18px * 2)}
+	--cui-logo-size: #{em(18px)}
+	--cui-logo-size--small: #{em(18px * 0.75)}
+	--cui-logo-size--large: #{em(18px * 2)}
 
 	--cui-gap-horizontal: #{em(4px)}
 	--cui-gap-vertical: #{em(4px)}
@@ -85,10 +85,10 @@
 
 	// Touch devices like mobiles
 	@media (hover: none) and (pointer: coarse)
-		--cui-font-size-heading: #{rem(18px)}
-		--cui-font-size-body: #{rem(16px)}
-		--cui-font-size-label: #{rem(14px)}
-		--cui-font-size-note: #{rem(12.5px)}
+		--cui-font-size-heading: #{em(18px)}
+		--cui-font-size-body: #{em(16px)}
+		--cui-font-size-label: #{em(14px)}
+		--cui-font-size-note: #{em(12.5px)}
 
 		--cui-control-height--small: calc(var(--cui-tap-target-size) * 1.5 )
 		--cui-control-height: calc(var(--cui-tap-target-size) * 2)
@@ -102,6 +102,6 @@
 		--cui-transition-duration--slowest: 0s
 
 	@media (min-width: $breakpoint-min-large)
-		--cui-logo-size: #{rem(25px)}
-		--cui-logo-size--small: #{rem(25px * 0.75)}
-		--cui-logo-size--large: #{rem(25px * 2)}
+		--cui-logo-size: #{em(25px)}
+		--cui-logo-size--small: #{em(25px * 0.75)}
+		--cui-logo-size--large: #{em(25px * 2)}

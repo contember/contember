@@ -15,7 +15,11 @@ export const CheckboxField: FunctionComponent<CheckboxFieldProps> = Component(
 		const environment = useEnvironment()
 
 		return (
-			<FieldContainer label={undefined} useLabelElement={false}>
+			<FieldContainer
+				errors={useAccessorErrors(field)}
+				label={undefined}
+				useLabelElement={false}
+			>
 				<Checkbox
 					labelDescription={props.labelDescription}
 					value={field.value}
@@ -23,7 +27,6 @@ export const CheckboxField: FunctionComponent<CheckboxFieldProps> = Component(
 						field.updateValue(isChecked)
 					}}
 					isDisabled={isMutating}
-					errors={useAccessorErrors(field)}
 				>
 					{environment.applySystemMiddleware('labelMiddleware', props.label)}
 				</Checkbox>

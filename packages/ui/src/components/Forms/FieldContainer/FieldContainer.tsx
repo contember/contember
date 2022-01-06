@@ -2,10 +2,11 @@ import classNames from 'classnames'
 import { memo, ReactNode } from 'react'
 import { ErrorList, ErrorListProps } from '..'
 import { useClassNamePrefix } from '../../../auxiliary'
-import type { FieldContainerLabelPosition, Size } from '../../../types'
+import type { Size } from '../../../types'
 import { toEnumViewClass } from '../../../utils'
 import { Description } from '../../Typography/Description'
 import { Label } from '../../Typography/Label'
+import type { FieldContainerLabelPosition } from './Types'
 
 export interface FieldContainerProps extends ErrorListProps {
 	label: ReactNode
@@ -53,7 +54,7 @@ export const FieldContainer = memo(
 				</LabelElement>
 				{!!errors && (
 					<div className={`${componentClassName}-errors`}>
-						<ErrorList errors={errors} size={size} />
+						<ErrorList errors={errors} />
 					</div>
 				)}
 			</div>

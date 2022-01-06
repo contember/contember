@@ -4,7 +4,24 @@ import { orderedListElementType } from './OrderedListElement'
 import { listItemElementType } from './ListItemElement'
 import { Element as SlateElement } from 'slate'
 
-export const listHtmlDeserializer: HtmlDeserializerPlugin = ({
+export interface ListElementProperties {
+	ordered: boolean
+	properties: Record<string, unknown>
+}
+
+export interface ListHtmlDeserializerOptions {
+	getListElementProperties?: (text: string) => ListElementProperties
+}
+
+const defaultGetListElementProperties = (text: string): ListElementProperties => {
+	const firstChar = text[0]
+	return {
+		ordered: firstChar === 'o' ? false : firstChar.match(/^\w$/) !== null,
+		properties: {},
+	}
+}
+
+export const listHtmlDeserializerFactory = ({ getListElementProperties = defaultGetListElementProperties }: ListHtmlDeserializerOptions = {}): HtmlDeserializerPlugin => ({
 	processBlockPaste: ({ element, next, cumulativeTextAttrs }) => {
 		if (element.tagName === 'UL') {
 			return [{ type: unorderedListElementType, children: next(element.childNodes, cumulativeTextAttrs) }]
@@ -22,6 +39,7 @@ export const listHtmlDeserializer: HtmlDeserializerPlugin = ({
 		let group: Node[] = []
 		let groupWasList = false
 		let isOrdered: boolean = false
+		let currentListProperties: Record<string, unknown> = {}
 		let includesList = false
 		let lastListId: string | null = null
 
@@ -31,6 +49,7 @@ export const listHtmlDeserializer: HtmlDeserializerPlugin = ({
 					elements: [
 						{
 							type: isOrdered ? orderedListElementType : unorderedListElementType,
+							...currentListProperties,
 							children: group.map(item => {
 								return {
 									type: listItemElementType,
@@ -64,12 +83,9 @@ export const listHtmlDeserializer: HtmlDeserializerPlugin = ({
 
 					if (!groupWasList || lastListId === listId) {
 						const textContent = (curr as HTMLElement).textContent!
-						const firstChar = isList ? textContent[0] : ' '
-						isOrdered = isList
-							? firstChar === 'o'
-								? isOrdered
-								: firstChar.match(/^\w$/) !== null
-							: false
+						const specifics: ListElementProperties = getListElementProperties(textContent)
+						isOrdered = specifics.ordered
+						currentListProperties = specifics.properties
 					}
 				}
 			}

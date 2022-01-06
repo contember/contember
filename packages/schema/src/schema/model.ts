@@ -13,6 +13,7 @@ namespace Model {
 
 	export interface View {
 		sql: string
+		dependencies?: string[]
 	}
 
 	export type FieldType = RelationType | ColumnType

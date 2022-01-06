@@ -1,6 +1,6 @@
 import { ProjectGroup, ProjectSchemaResolver } from '../type'
 import { Membership } from '../type/Membership'
-import { DatabaseContext, getRoleVariables } from '../utils'
+import { getRoleVariables } from '@contember/schema-utils'
 
 export class MembershipValidator {
 	constructor(private readonly schemaResolver: ProjectSchemaResolver) {}

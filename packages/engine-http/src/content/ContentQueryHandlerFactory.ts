@@ -1,5 +1,5 @@
 import { GraphQLSchema } from 'graphql'
-import { Context, ExecutionContainerFactory, flattenVariables } from '@contember/engine-content-api'
+import { Context, createAclVariables, ExecutionContainerFactory } from '@contember/engine-content-api'
 import {
 	createDbQueriesListener,
 	createErrorListener,
@@ -67,7 +67,10 @@ export class ContentQueryHandlerFactory {
 	): ExtendedGraphqlContext {
 		const partialContext = {
 			db: ctx.state.db,
-			identityVariables: flattenVariables(ctx.state.projectMemberships),
+			identityVariables: createAclVariables(schema.acl, {
+				...ctx.state.authResult,
+				memberships: ctx.state.projectMemberships,
+			}),
 		}
 		const providers = {
 			uuid: () => uuidv4(),

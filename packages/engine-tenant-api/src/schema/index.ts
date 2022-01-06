@@ -757,6 +757,12 @@ export type RoleEntityVariableDefinition = RoleVariableDefinition & {
 	readonly entityName: Scalars['String']
 }
 
+export type RolePredefinedVariableDefinition = RoleVariableDefinition & {
+	readonly __typename?: 'RolePredefinedVariableDefinition'
+	readonly name: Scalars['String']
+	readonly value: Scalars['String']
+}
+
 export type RoleVariableDefinition = {
 	readonly name: Scalars['String']
 }
@@ -925,6 +931,10 @@ export type VariableEntryInput = {
 export type ResolverTypeWrapper<T> = Promise<T> | T
 
 
+export type ResolverWithResolve<TResult, TParent, TContext, TArgs> = {
+	resolve: ResolverFn<TResult, TParent, TContext, TArgs>
+}
+
 export type LegacyStitchingResolver<TResult, TParent, TContext, TArgs> = {
 	fragment: string
 	resolve: ResolverFn<TResult, TParent, TContext, TArgs>
@@ -937,6 +947,7 @@ export type NewStitchingResolver<TResult, TParent, TContext, TArgs> = {
 export type StitchingResolver<TResult, TParent, TContext, TArgs> = LegacyStitchingResolver<TResult, TParent, TContext, TArgs> | NewStitchingResolver<TResult, TParent, TContext, TArgs>
 export type Resolver<TResult, TParent = {}, TContext = {}, TArgs = {}> =
   | ResolverFn<TResult, TParent, TContext, TArgs>
+  | ResolverWithResolve<TResult, TParent, TContext, TArgs>
   | StitchingResolver<TResult, TParent, TContext, TArgs>
 
 export type ResolverFn<TResult, TParent, TContext, TArgs> = (
@@ -1079,7 +1090,8 @@ export type ResolversTypes = {
 	ResetPasswordResponse: ResolverTypeWrapper<ResetPasswordResponse>
 	RoleDefinition: ResolverTypeWrapper<RoleDefinition>
 	RoleEntityVariableDefinition: ResolverTypeWrapper<RoleEntityVariableDefinition>
-	RoleVariableDefinition: ResolversTypes['RoleEntityVariableDefinition']
+	RolePredefinedVariableDefinition: ResolverTypeWrapper<RolePredefinedVariableDefinition>
+	RoleVariableDefinition: ResolversTypes['RoleEntityVariableDefinition'] | ResolversTypes['RolePredefinedVariableDefinition']
 	SetProjectSecretResponse: ResolverTypeWrapper<SetProjectSecretResponse>
 	SignInError: ResolverTypeWrapper<SignInError>
 	SignInErrorCode: SignInErrorCode
@@ -1168,7 +1180,8 @@ export type ResolversParentTypes = {
 	ResetPasswordResponse: ResetPasswordResponse
 	RoleDefinition: RoleDefinition
 	RoleEntityVariableDefinition: RoleEntityVariableDefinition
-	RoleVariableDefinition: ResolversParentTypes['RoleEntityVariableDefinition']
+	RolePredefinedVariableDefinition: RolePredefinedVariableDefinition
+	RoleVariableDefinition: ResolversParentTypes['RoleEntityVariableDefinition'] | ResolversParentTypes['RolePredefinedVariableDefinition']
 	SetProjectSecretResponse: SetProjectSecretResponse
 	SignInError: SignInError
 	SignInIDPError: SignInIdpError
@@ -1560,8 +1573,14 @@ export type RoleEntityVariableDefinitionResolvers<ContextType = any, ParentType 
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
+export type RolePredefinedVariableDefinitionResolvers<ContextType = any, ParentType extends ResolversParentTypes['RolePredefinedVariableDefinition'] = ResolversParentTypes['RolePredefinedVariableDefinition']> = {
+	name?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	value?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
 export type RoleVariableDefinitionResolvers<ContextType = any, ParentType extends ResolversParentTypes['RoleVariableDefinition'] = ResolversParentTypes['RoleVariableDefinition']> = {
-	__resolveType: TypeResolveFn<'RoleEntityVariableDefinition', ParentType, ContextType>
+	__resolveType: TypeResolveFn<'RoleEntityVariableDefinition' | 'RolePredefinedVariableDefinition', ParentType, ContextType>
 	name?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 }
 
@@ -1724,6 +1743,7 @@ export type Resolvers<ContextType = any> = {
 	ResetPasswordResponse?: ResetPasswordResponseResolvers<ContextType>
 	RoleDefinition?: RoleDefinitionResolvers<ContextType>
 	RoleEntityVariableDefinition?: RoleEntityVariableDefinitionResolvers<ContextType>
+	RolePredefinedVariableDefinition?: RolePredefinedVariableDefinitionResolvers<ContextType>
 	RoleVariableDefinition?: RoleVariableDefinitionResolvers<ContextType>
 	SetProjectSecretResponse?: SetProjectSecretResponseResolvers<ContextType>
 	SignInError?: SignInErrorResolvers<ContextType>

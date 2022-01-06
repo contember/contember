@@ -2,12 +2,15 @@ import Input from './input'
 
 namespace Acl {
 	export enum VariableType {
-		enum = 'enum',
 		entity = 'entity',
-		column = 'column',
+		predefined = 'predefined',
+
+		// currently unsupported
+		// enum = 'enum',
+		// column = 'column',
 	}
 
-	export type Variable = EntityVariable // | EnumVariable | ColumnValueVariable
+	export type Variable = EntityVariable | PredefinedVariable  // | EnumVariable | ColumnValueVariable
 
 	// export interface EnumVariable {
 	// 	type: VariableType.enum
@@ -19,13 +22,19 @@ namespace Acl {
 		entityName: string
 	}
 
+	export interface PredefinedVariable {
+		type: VariableType.predefined
+		value: 'identityID' | 'personID'
+	}
+
+
 	// export interface ColumnValueVariable {
 	// 	type: VariableType.column
 	// 	entityName: string
 	// 	fieldName: string
 	// }
 
-	export type VariableValue = string | number | (string | number)[]
+	export type VariableValue = string | number | readonly (string | number)[]
 
 	export interface VariablesMap {
 		[name: string]: VariableValue

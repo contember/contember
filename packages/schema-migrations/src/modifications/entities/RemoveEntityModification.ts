@@ -1,5 +1,5 @@
 import { MigrationBuilder } from '@contember/database-migrations'
-import { Schema } from '@contember/schema'
+import { Acl, Schema } from '@contember/schema'
 import {
 	removeField,
 	SchemaUpdater,
@@ -46,7 +46,9 @@ export const RemoveEntityModification: ModificationHandlerStatic<RemoveEntityMod
 						({ role }) => ({
 							...role,
 							variables: Object.fromEntries(
-								Object.entries(role.variables).filter(([, variable]) => variable.entityName !== this.data.entityName),
+								Object.entries(role.variables).filter(([, variable]) =>
+									variable.type !== Acl.VariableType.entity || variable.entityName !== this.data.entityName,
+								),
 							),
 						}),
 						updateAclEntities(({ entities }) => {

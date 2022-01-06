@@ -1,14 +1,13 @@
 import { ProjectIdentityRelation, ProjectMembersArgs, ProjectResolvers } from '../../schema'
 import { ResolverContext } from '../ResolverContext'
 import {
-	getRoleVariables,
 	PermissionActions,
 	Project,
 	ProjectMemberManager,
 	ProjectSchemaResolver,
-	RoleVariablesDefinition,
-	VariableDefinition,
 } from '../../model'
+import { getRoleVariables } from '@contember/schema-utils'
+import { Acl } from '@contember/schema'
 
 export class ProjectTypeResolver implements ProjectResolvers {
 	constructor(
@@ -39,22 +38,16 @@ export class ProjectTypeResolver implements ProjectResolvers {
 		if (!schema) {
 			return []
 		}
-		const roles = Object.entries(schema.acl.roles).reduce<RoleVariablesDefinition[]>(
-			(acc, [role, def]) => [
-				...acc,
-				{
-					name: role,
-					variables: Object.entries(getRoleVariables(role, schema.acl)).reduce<VariableDefinition[]>(
-						(acc, [name, def]) => [...acc, { name, ...def } as VariableDefinition],
-						[],
-					),
-				},
-			],
-			[],
-		)
-		return roles.map(it => ({
-			...it,
-			variables: it.variables.map(it => ({ ...it, __typename: 'RoleEntityVariableDefinition' })),
+		return Object.entries(schema.acl.roles).map(([role, def]) => ({
+			name: role,
+			variables: Object.entries(getRoleVariables(role, schema.acl)).map(([name, variableDef]) => {
+				switch (variableDef.type) {
+					case Acl.VariableType.entity:
+						return { __typename: 'RoleEntityVariableDefinition', name, entityName: variableDef.entityName }
+					case Acl.VariableType.predefined:
+						return { __typename: 'RolePredefinedVariableDefinition', name, value: variableDef.value }
+				}
+			}),
 		}))
 	}
 }

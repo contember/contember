@@ -1,5 +1,5 @@
 import { MigrationBuilder } from '@contember/database-migrations'
-import { Model, Schema } from '@contember/schema'
+import { Acl, Model, Schema } from '@contember/schema'
 import {
 	SchemaUpdater,
 	updateAcl,
@@ -82,13 +82,18 @@ export const UpdateEntityNameModification: ModificationHandlerStatic<UpdateEntit
 						({ role }) => ({
 							...role,
 							variables: Object.fromEntries(
-								Object.entries(role.variables).map(([key, variable]) => [
-									key,
-									{
-										...variable,
-										entityName: changeValue(this.data.entityName, this.data.newEntityName)(variable.entityName),
-									},
-								]),
+								Object.entries(role.variables).map(([key, variable]) => {
+									if (variable.type === Acl.VariableType.entity) {
+										return [
+											key,
+											{
+												...variable,
+												entityName: changeValue(this.data.entityName, this.data.newEntityName)(variable.entityName),
+											},
+										]
+									}
+									return [key, variable]
+								}),
 							),
 						}),
 						updateAclEntities(({ entities }) => {

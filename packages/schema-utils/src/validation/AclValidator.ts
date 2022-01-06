@@ -143,6 +143,21 @@ export class AclValidator {
 					errorBuilder.add('Unsupported properties found: ' + extra.join(', '))
 				}
 				return { type: Acl.VariableType.entity, entityName: variable.entityName }
+
+			case Acl.VariableType.predefined:
+				if (!hasStringProperty(variable, 'value')) {
+					errorBuilder.add('Variable value type must be specified for this type of variable')
+					return
+				}
+				if (variable.value !== 'identityID' && variable.value !== 'personID') {
+					errorBuilder.add('Unknown predefined variable')
+					return
+				}
+				const extra2 = checkExtraProperties(variable, ['type', 'value'])
+				if (extra2.length) {
+					errorBuilder.add('Unsupported properties found: ' + extra2.join(', '))
+				}
+				return { type: variable.type, value: variable.value }
 			default:
 				errorBuilder.add(`Variable type "${variable.type}" is not supported.`)
 		}

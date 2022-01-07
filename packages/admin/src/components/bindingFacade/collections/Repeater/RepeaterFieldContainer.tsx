@@ -1,12 +1,12 @@
 import type { EntityAccessor, EntityListAccessor } from '@contember/binding'
-import { FormGroup, Stack } from '@contember/ui'
+import { FieldContainer, Stack } from '@contember/ui'
 import { ComponentType, memo, ReactNode } from 'react'
 import type { MessageFormatter } from '../../../../i18n'
 import { AccessorErrors } from '../../errors'
 import { CreateNewEntityButton, CreateNewEntityButtonProps, EmptyMessage, EmptyMessageProps } from '../helpers'
 import type { RepeaterDictionary } from './repeaterDictionary'
 
-export interface RepeaterContainerPrivateProps {
+export interface RepeaterFieldContainerPrivateProps {
 	accessor: EntityListAccessor
 	entities: EntityAccessor[]
 	formatMessage: MessageFormatter<RepeaterDictionary>
@@ -16,7 +16,7 @@ export interface RepeaterContainerPrivateProps {
 	createNewEntity: (initialize?: EntityAccessor.BatchUpdatesHandler) => void
 	children: ReactNode
 }
-export interface RepeaterContainerPublicProps {
+export interface RepeaterFieldContainerPublicProps {
 	enableAddingNew?: boolean
 
 	emptyMessage?: ReactNode
@@ -29,9 +29,9 @@ export interface RepeaterContainerPublicProps {
 	addButtonComponentExtraProps?: {}
 }
 
-export interface RepeaterContainerProps extends RepeaterContainerPublicProps, RepeaterContainerPrivateProps {}
+export interface RepeaterFieldContainerProps extends RepeaterFieldContainerPublicProps, RepeaterFieldContainerPrivateProps {}
 
-export const RepeaterContainer = memo(
+export const RepeaterFieldContainer = memo(
 	({
 		accessor,
 		addButtonText,
@@ -45,8 +45,8 @@ export const RepeaterContainer = memo(
 		formatMessage,
 		isEmpty,
 		label,
-	}: RepeaterContainerProps) => {
-		return <FormGroup label={label} useLabelElement={false}>
+	}: RepeaterFieldContainerProps) => {
+		return <FieldContainer label={label} useLabelElement={false}>
 			<Stack
 				direction="vertical"
 				gap="small"
@@ -72,7 +72,7 @@ export const RepeaterContainer = memo(
 					</AddButton>
 				)}
 			</Stack>
-		</FormGroup>
+		</FieldContainer>
 	},
 )
-RepeaterContainer.displayName = 'RepeaterContainer'
+RepeaterFieldContainer.displayName = 'RepeaterFieldContainer'

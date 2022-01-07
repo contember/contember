@@ -1,6 +1,6 @@
 import { Component, ErrorAccessor } from '@contember/binding'
-import type { RadioGroupProps } from '@contember/ui'
-import { FormGroup, FormGroupProps, RadioGroup, RadioOption } from '@contember/ui'
+import type { RadioProps } from '@contember/ui'
+import { FieldContainer, FieldContainerProps, Radio, RadioOption } from '@contember/ui'
 import type { FunctionComponent } from 'react'
 import { memo } from 'react'
 import {
@@ -40,7 +40,7 @@ export const RadioField: FunctionComponent<RadioFieldProps> = Component(props =>
 	</ChoiceField>
 }, 'RadioField')
 
-export interface RadioFieldInnerPublicProps extends Omit<FormGroupProps, 'children'>, Pick<RadioGroupProps, 'orientation'> {
+export interface RadioFieldInnerPublicProps extends Omit<FieldContainerProps, 'children'>, Pick<RadioProps, 'orientation'> {
 }
 
 export interface RadioFieldInnerProps extends ChoiceFieldData.SingleChoiceFieldMetadata, RadioFieldInnerPublicProps {
@@ -58,15 +58,19 @@ export const RadioFieldInner = memo((props: RadioFieldInnerProps) => {
 			}
 		})
 	return (
-		<FormGroup {...props} label={props.environment.applySystemMiddleware('labelMiddleware', props.label)}>
-			<RadioGroup
+		<FieldContainer
+			{...props}
+			errors={props.errors?.validation}
+			label={props.environment.applySystemMiddleware('labelMiddleware', props.label)}
+			useLabelElement={false}
+		>
+			<Radio
 				onChange={it => props.onChange(parseInt(it, 10))}
 				options={options}
 				size={props.size}
 				orientation={props.orientation}
-				errors={props.errors?.validation}
 				value={props.currentValue?.toString()}
 			/>
-		</FormGroup>
+		</FieldContainer>
 	)
 })

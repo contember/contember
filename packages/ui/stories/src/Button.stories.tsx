@@ -1,6 +1,6 @@
 import type { ComponentMeta, ComponentStory } from '@storybook/react'
 import { AnchorButton, Button, ButtonDistinction, ButtonFlow, Intent, Justification, Scheme, Size } from '../../src'
-import { booleanControl, enumControl } from './helpers'
+import { booleanControl, enumControl } from './Helpers'
 
 const intents: Intent[] = ['default', 'primary', 'secondary', 'tertiary', 'positive', 'success', 'warn', 'danger']
 const schemes: Scheme[] = ['system', 'light', 'light-above', 'light-below', 'dark', 'dark-above', 'dark-below']

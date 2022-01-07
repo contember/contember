@@ -1,17 +1,17 @@
 import type { ErrorAccessor } from '@contember/binding'
-import { Button, FileDropZone, FormGroup, FormGroupProps } from '@contember/ui'
+import { Button, FieldContainer, FieldContainerProps, FileDropZone } from '@contember/ui'
 import type { ReactNode } from 'react'
 import type { DropzoneState } from 'react-dropzone'
 import type { MessageFormatter } from '../../../../i18n'
-import type { RepeaterContainerPublicProps } from '../../collections'
+import type { RepeaterFieldContainerPublicProps } from '../../collections'
 import type { UploadDictionary } from '../uploadDictionary'
 
 export interface FileInputPublicProps
 	extends Omit<
-			RepeaterContainerPublicProps,
+			RepeaterFieldContainerPublicProps,
 			'emptyMessage' | 'emptyMessageComponent' | 'emptyMessageComponentExtraProps'
 		>,
-		Pick<FormGroupProps, 'label' | 'description' | 'labelDescription'> {
+		Pick<FieldContainerProps, 'label' | 'description' | 'labelDescription'> {
 	addButtonSubText?: ReactNode
 }
 
@@ -46,7 +46,7 @@ export function FileInput({
 	const { getRootProps, isDragActive, isDragAccept, isDragReject, getInputProps } = dropzoneState
 
 	return (
-		<FormGroup
+		<FieldContainer
 			label={label}
 			useLabelElement={false}
 			description={description}
@@ -81,6 +81,6 @@ export function FileInput({
 					</FileDropZone>
 				)}
 			</div>
-		</FormGroup>
+		</FieldContainer>
 	)
 }

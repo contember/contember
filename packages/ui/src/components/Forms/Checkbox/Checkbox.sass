@@ -1,162 +1,31 @@
-@use 'sass:math'
-
 .#{$cui-conf-globalPrefix}checkbox
-	$box-side: 1.2em
-	$box-offset: .35em
+	--checkbox-button-border-radius: .3em
+	--checkbox-button-background-color: transparent
+	--checkbox-button-size: 1.25em
 
-	$tick-thickness: .15em
-	$tick-short-length: .4em
-	$tick-long-length: .75em
+	--tick-color: transparent
+	--tick-border-color: var(--cui-color--high)
 
-	// SASS lacks trig support. 😞
-	$tick-angle-half: 40deg
-	$tick-angle-half-sine: 0.642787609687 // sin($tick-angle-half)
-
-	$t-background: .08s
-	$t-tick: .18s
-
-	$c-tick: #FFFFFF
-
-	--cui-tick-background-color: transparent
-	--cui-tick-color: transparent
-	--cui-tick-border-color: var(--cui-color--high)
-	--cui-tick-border-radius: .3em
-	--cui-label-color: var(--cui-color--high)
-	--cui-description-color: var(--cui-color--medium)
-	--cui-font-size: 1em
-
-	display: grid
-	font-size: var(--cui-font-size)
-	grid-template-rows: $box-side auto auto
-	grid-template-columns: $box-side 1fr
-	grid-template-areas: "box label" ". label" "errors errors"
-	column-gap: $box-offset
-	position: relative
+	--control-font-size: var(--cui-control-font-size)
 
 	&.view-small
-		--cui-font-size: var(--cui-control-font-size--small)
+		--control-font-size: var(--cui-control-font-size--small)
 	&.view-large
-		--cui-font-size: var(--cui-control-font-size--large)
+		--control-font-size: var(--cui-control-font-size--large)
 
-	&-tick
-		border-radius: var(--cui-tick-border-radius)
-		background: var(--cui-tick-background-color)
-		color: var(--cui-tick-color)
-		border: var(--cui-control-border-width) solid var(--cui-tick-border-color)
-		grid-area: box
-		position: relative
-		pointer-events: none
-		transition: background-color $t-background, border-color $t-background, box-shadow 0.2s
+	&.is-hovered, &:hover
+		--tick-border-color: var(--cui-control-border-color--highlighted)
+	&.is-readonly
+		--checkbox-button-background-color: var(--radio-color--readonly)
+		color: var(--radio-color--readonly)
+	&.is-invalid
+		--checkbox-button-background-color: rgb(var(--cui-theme-danger-500))
+		--tick-border-color: rgb(var(--cui-theme-danger-500))
+	&.is-checked:not(.is-invalid)
+		--checkbox-button-background-color: var(--cui-control-border-color)
+		--tick-border-color: var(--cui-control-border-color)
+	&.is-disabled.is-checked
+		--checkbox-button-background-color: var(--cui-color--medium)
+		--tick-border-color: var(--cui-color--medium)
 
-		&::before,
-		&::after
-			content: ''
-			position: absolute
-			top: 50%
-			left: 50%
-			background-color: currentColor
-			border-radius: ($tick-thickness * 0.5)
-			transform-origin: ($tick-thickness * 0.5) center // Essentially "left center"
-
-		$tick-x-offset: -($tick-thickness * 0.5) - ($tick-long-length - $tick-short-length) * $tick-angle-half-sine * 0.5
-		$tick-y-offset: -($tick-thickness * 0.25) + ($tick-long-length - $tick-thickness) * $tick-angle-half-sine * 0.5
-
-		&::before
-			+size($tick-short-length $tick-thickness)
-			transform: translate($tick-x-offset, $tick-y-offset) rotate((90deg - $tick-angle-half)) translate(-$tick-short-length + $tick-thickness)
-		&::after
-			+size($tick-long-length $tick-thickness)
-			transform: translate($tick-x-offset, $tick-y-offset) rotate(($tick-angle-half - 90deg))
-
-	&-label
-		grid-area: label
-		display: flex
-		flex-direction: column
-		line-height: $cui-base-lineHeight
-		padding-top: (($box-side - $cui-base-lineHeight * .8) * 0.5)
-
-		&-main
-			color: var(--cui-label-color)
-			font-weight: $fw-medium
-			font-size: .8em
-			line-height: $cui-base-lineHeight
-		&-description
-			font-weight: $fw-normal
-			font-size: .76em
-			color: var(--cui-description-color)
-			display: inline-block
-			line-height: $cui-base-lineHeight
-
-	&-errors
-		font-size: 1rem
-		margin-top: .1em
-		grid-area: errors
-
-	&.is-hovered,
-	&:hover
-		--cui-tick-border-color: var(--cui-control-border-color--highlighted)
-
-	&.is-checked &-tick
-		--cui-tick-border-color: var(--cui-control-border-color)
-		--cui-tick-background-color: var(--cui-control-border-color)
-
-	&.is-checked &-tick
-		// Repeating the color is easier than fiddling with another set of delays.
-		// Animating width (and not transforming scale) so that we always get a nice border-radius
-		@keyframes checkbox-tick-short
-			0%
-				color: white
-				width: $tick-thickness
-			100%
-				color: white
-				width: $tick-short-length
-		@keyframes checkbox-tick-long
-			0%
-				color: white
-				width: $tick-thickness
-			100%
-				color: white
-				width: $tick-long-length
-
-		$t-short-factor: math.div($tick-short-length, $tick-long-length + $tick-short-length)
-		$t-short: $t-tick * $t-short-factor
-		&::before
-			animation: $t-short checkbox-tick-short $t-background ease-in forwards
-		&::after
-			animation: ($t-tick * (1 - $t-short-factor)) checkbox-tick-long ($t-background + $t-short) ease-in forwards
-
-	&.is-indeterminate &-tick
-		border-width: var(--cui-control-border-width)
-		border-style: dashed
-	&.is-indeterminate:before
-		content: '?'
-		grid-area: box
-		text-align: center
-		vertical-align: middle
-
-	&.is-focused &-tick
-		box-shadow: 0 0 0 .2em var(--cui-control-border-color--highlighted)
-	&.is-focused:not(.is-checked) &-tick
-		--cui-tick-border-color: var(--cui-control-border-color--highlighted)
-
-	&.is-disabled &-tick
-		cursor: not-allowed
-		opacity: 0.5
-	&.is-disabled.is-checked &-tick
-		--cui-tick-border-color: var(--cui-color--medium)
-		--cui-tick-background-color: var(--cui-color--medium)
-
-	@each $name, $settings in $cui-control-validation
-		$color: map_get($settings, color)
-		$borderColor: map_get($settings, borderColor)
-
-		&.is-#{$name}
-			&::before
-				color: $color
-				border-color: $borderColor
-
-			&.is-focused.is-indeterminate::before,
-			&.is-focused::before
-				color: $color
-				border-color: $borderColor
-				box-shadow: 0 0 0 .2em rgba($borderColor, $cui-control-focus-opacity)
+	font-size: var(--control-font-size)

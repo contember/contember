@@ -120,22 +120,6 @@ $cui-control-validation: map_merge((
 
 $cui-select-chevron-height: .5em !default;
 
-// FormGroup
-$cui-formGroup-label-color: $cui-color-gray-8 !default;
-$cui-formGroup-labelDescription-color: $cui-color-gray-4 !default;
-$cui-formGroup-description-color: $cui-color-gray-4 !default;
-
-$cui-formGroup-size-small: .7em !default;
-$cui-formGroup-size-default: .8em !default;
-$cui-formGroup-size-large: 1.1em !default;
-
-$cui-formGroup-sizes: () !default;
-$cui-formGroup-sizes: map_merge((
-	$cui-conf-defaultView: $cui-formGroup-size-default,
-	'small': $cui-formGroup-size-small,
-	'large': $cui-formGroup-size-large,
-), $cui-formGroup-sizes);
-
 // Heading
 $cui-heading-color: $cui-color-gray-9 !default;
 $cui-heading-color-subtle: $cui-color-gray-8 !default;
@@ -198,7 +182,6 @@ $cui-icon-sizes: map_merge((
 
 // Navigation
 $cui-navigation-text-color: $cui-color-gray-8 !default;
-$cui-navigation-title-font-size: rem(14px) !default;
 $cui-navigation-title-font-weight: $fw-bold;
 $cui-navigation-inactive-opacity: .8 !default;
 $cui-navigation-active-color: darken($cui-color-primary, 5) !default;
@@ -208,7 +191,6 @@ $cui-navigation-focus-background-color: rgba($cui-navigation-active-color, .2) !
 
 // Breadcrumbs
 $cui-breadcrumbs-text-color: $cui-navigation-text-color;
-$cui-breadcrumbs-font-size: $cui-navigation-title-font-size;
 $cui-breadcrumbs-link-color: $cui-navigation-active-color;
 $cui-breadcrumbs-link-hover-color: $cui-navigation-hover-color;
 $cui-breadcrumbs-link-focus-background-color: $cui-navigation-focus-background-color;

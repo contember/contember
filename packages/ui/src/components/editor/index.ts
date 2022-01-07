@@ -1,8 +1,5 @@
-export * from './table'
-
 export * from './EditorBlock'
 export * from './EditorBlockBoundary'
-export * from './EditorBox'
 export * from './EditorCanvas'
 export * from './EditorHeading'
 export * from './EditorNonEditable'
@@ -11,3 +8,4 @@ export * from './EditorPlaceholder'
 export * from './EditorToolbar'
 export * from './EditorToolbarButton'
 export * from './HoveringToolbar'
+export * from './table'

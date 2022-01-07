@@ -8,7 +8,7 @@
 	border-radius: var(--cui-gap)
 	color: inherit
 	font-family: inherit
-	font-size: $cui-navigation-title-font-size
+	font-size: var(--cui-font-size-label)
 	font-weight: inherit
 	line-height: 1em
 	margin: calc(-1 * var(--cui-inset))
@@ -19,10 +19,13 @@
 	text-transform: inherit
 	z-index: 0
 
+	&.view-bold
+		font-weight: bolder
 	&.view-small
-		color: var(--cui-color--medium)
-		font-weight: bold
-		font-size: $cui-navigation-title-font-size - rem(2px)
+		font-size: var(--cui-font-size-note)
+	&.view-large
+		font-weight: lighter
+		font-size: var(--cui-font-size-heading)
 
 	&.is-active
 		color: var(--cui-control-color--highlighted)

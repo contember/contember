@@ -1,49 +1,54 @@
 import classnames from 'classnames'
 import { forwardRef, memo, ReactNode } from 'react'
 import { useClassNamePrefix } from '../../auxiliary'
-import type { BoxDistinction, NativeProps } from '../../types'
-import { toStateClass } from '../../utils'
+import type { BoxDistinction, Intent, NativeProps, Size } from '../../types'
+import { toEnumViewClass, toStateClass, toThemeClass } from '../../utils'
+import { Stack } from '../Stack'
 import { Label } from '../Typography/Label'
-import { BoxContent } from './BoxContent'
 
 export interface BoxOwnProps {
-	heading?: ReactNode
 	actions?: ReactNode
 	children?: ReactNode
 	distinction?: BoxDistinction
+	gap?: Size | 'none'
+	heading?: ReactNode
 	isActive?: boolean
+	intent?: Intent
 }
 
 export interface BoxProps extends BoxOwnProps, Omit<NativeProps<HTMLDivElement>, 'children'> {}
 
 export const Box = memo(
 	forwardRef<HTMLDivElement, BoxProps>(
-		({ actions, children, heading, distinction, isActive = false, className, ...divProps }: BoxProps, ref) => {
-			const prefix = useClassNamePrefix()
+		({ actions, className, distinction, children, gap, heading, intent, isActive, ...divProps }: BoxProps, ref) => {
+			const componentClassName = `${useClassNamePrefix()}box`
 
 			return (
 				<div
 					{...divProps}
 					className={classnames(
-						`${prefix}box`,
+						componentClassName,
 						toStateClass('active', isActive),
+						toEnumViewClass(distinction),
+						toThemeClass(intent),
 						className,
 					)}
 					ref={ref}
+					contentEditable={false}
 				>
-					{heading && (
-						<div className={`${prefix}box-heading`} contentEditable={false}>
-							<Label>{heading}</Label>
-						</div>
-					)}
-					{actions && (
-						<div className={`${prefix}box-actions`} contentEditable={false}>
-							{actions}
-						</div>
-					)}
-					{children && (
-						<BoxContent distinction={distinction}>{children}</BoxContent>
-					)}
+					<Stack gap={gap ?? 'small'} direction="vertical">
+						{(heading || actions) && (
+							<div className={`${componentClassName}-header`}>
+								<Label>{heading}</Label>
+								{actions && (
+									<div className={`${componentClassName}-actions`} contentEditable={false}>
+										{actions}
+									</div>
+								)}
+							</div>
+						)}
+						{children}
+					</Stack>
 				</div>
 			)
 		},

@@ -1,7 +1,7 @@
 import { boolean } from '@storybook/addon-knobs'
 import { storiesOf } from '@storybook/react'
 import { memo } from 'react'
-import { Aether, Box, BoxSection } from '../../src'
+import { Aether, Box, RepeaterContainer } from '../../src'
 
 const BoxStoryWrapper = memo(props => <Aether style={{ padding: '2em' }}>{props.children}</Aether>)
 
@@ -61,31 +61,31 @@ storiesOf('Box', module)
 	.add('with sections', () => (
 		<BoxStoryWrapper>
 			<Box>
-				<BoxSection heading="Boxes with">{loremIpsum}</BoxSection>
-				<BoxSection heading="Only sections">{loremIpsum}</BoxSection>
-				<BoxSection heading="Work just fine">{loremIpsum}</BoxSection>
+				<RepeaterContainer heading="Boxes with">{loremIpsum}</RepeaterContainer>
+				<RepeaterContainer heading="Only sections">{loremIpsum}</RepeaterContainer>
+				<RepeaterContainer heading="Work just fine">{loremIpsum}</RepeaterContainer>
 			</Box>
 			<Box heading="Lorem ipsum">
 				{loremIpsum}
-				<BoxSection heading="But there">{loremIpsum}</BoxSection>
-				<BoxSection heading="Can also be">{loremIpsum}</BoxSection>
-				<BoxSection heading="Top-level stuff">{loremIpsum}</BoxSection>
+				<RepeaterContainer heading="But there">{loremIpsum}</RepeaterContainer>
+				<RepeaterContainer heading="Can also be">{loremIpsum}</RepeaterContainer>
+				<RepeaterContainer heading="Top-level stuff">{loremIpsum}</RepeaterContainer>
 			</Box>
 			<Box heading="Let us">
-				<BoxSection heading="Put the nesting">{loremIpsum}</BoxSection>
+				<RepeaterContainer heading="Put the nesting">{loremIpsum}</RepeaterContainer>
 				<Box heading="To the test">
 					<Box heading="And see">
-						<BoxSection heading="If all">{loremIpsum}</BoxSection>
-						<BoxSection heading="Combinations">{loremIpsum}</BoxSection>
+						<RepeaterContainer heading="If all">{loremIpsum}</RepeaterContainer>
+						<RepeaterContainer heading="Combinations">{loremIpsum}</RepeaterContainer>
 					</Box>
-					<BoxSection heading="Actually">{loremIpsum}</BoxSection>
+					<RepeaterContainer heading="Actually">{loremIpsum}</RepeaterContainer>
 					<Box heading="Render">
-						<BoxSection heading="Without any">{loremIpsum}</BoxSection>
-						<BoxSection heading="Obvious flaws">{loremIpsum}</BoxSection>
+						<RepeaterContainer heading="Without any">{loremIpsum}</RepeaterContainer>
+						<RepeaterContainer heading="Obvious flaws">{loremIpsum}</RepeaterContainer>
 					</Box>
 				</Box>
-				<BoxSection heading="Because that would be">{loremIpsum}</BoxSection>
-				<BoxSection heading="Rather bad">{loremIpsum}</BoxSection>
+				<RepeaterContainer heading="Because that would be">{loremIpsum}</RepeaterContainer>
+				<RepeaterContainer heading="Rather bad">{loremIpsum}</RepeaterContainer>
 			</Box>
 		</BoxStoryWrapper>
 	))

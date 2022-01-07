@@ -1,13 +1,13 @@
 import { radios, text } from '@storybook/addon-knobs'
 import { storiesOf } from '@storybook/react'
 import type { ReactNode } from 'react'
-import { ButtonGroup, FormGroup } from '../../src'
+import { ButtonGroup, FieldContainer } from '../../src'
 import type { Size } from '../../src/types'
 import { sizeKnob } from '../utils/knobs'
 import { simpleButtonStory } from './Button'
 import { SimpleTextInputStory } from './TextInput'
 
-const FormGroupStory = (props: {
+const FieldContainerStory = (props: {
 	label: string
 	labelDescription: string
 	description: string
@@ -22,7 +22,7 @@ const FormGroupStory = (props: {
 	const error = text('Error', '')
 
 	return (
-		<FormGroup
+		<FieldContainer
 			label={label}
 			errors={[
 				{
@@ -44,27 +44,27 @@ const FormGroupStory = (props: {
 			useLabelElement={props.useLabelElement}
 		>
 			{props.children({ size, error })}
-		</FormGroup>
+		</FieldContainer>
 	)
 }
 
-storiesOf('FormGroup', module).add('text input', () => (
-	<FormGroupStory
+storiesOf('FieldContainer', module).add('text input', () => (
+	<FieldContainerStory
 		label="Phone number"
 		labelDescription="We may need to contact you."
 		description="You may leave out the area code."
 	>
 		{({ size, error }) => <SimpleTextInputStory size={size} validationState={error === '' ? undefined : 'invalid'} />}
-	</FormGroupStory>
+	</FieldContainerStory>
 ))
 
-storiesOf('FormGroup', module).add('button group', () => (
-	<FormGroupStory
+storiesOf('FieldContainer', module).add('button group', () => (
+	<FieldContainerStory
 		label="Favorite button"
 		labelDescription="Click on the prettiest."
 		description="You have to choose one."
 		useLabelElement={false}
 	>
 		{({ size }) => <ButtonGroup size={size}>{simpleButtonStory(size)}</ButtonGroup>}
-	</FormGroupStory>
+	</FieldContainerStory>
 ))

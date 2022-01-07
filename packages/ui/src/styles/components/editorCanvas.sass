@@ -1,5 +1,4 @@
 @import '../common'
-@import '../../components/Box/boxContentMixin'
 
 .#{$cui-conf-globalPrefix}editorCanvas
 	@extend %controlVariants
@@ -105,7 +104,3 @@
 
 	&.view-seamless
 		box-shadow: none
-
-	& &
-		&:not(:first-child)
-			margin-top: var(--cui-formGroup-separation)

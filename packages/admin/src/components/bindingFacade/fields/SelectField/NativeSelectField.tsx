@@ -1,5 +1,5 @@
 import { BindingError, Component, ErrorAccessor } from '@contember/binding'
-import { FormGroup, FormGroupProps, Select, SelectOption } from '@contember/ui'
+import { FieldContainer, FieldContainerProps, Select, SelectOption } from '@contember/ui'
 import { FunctionComponent, memo } from 'react'
 import { ChoiceField, ChoiceFieldData, DynamicSingleChoiceFieldProps, StaticSingleChoiceFieldProps } from '../ChoiceField'
 
@@ -39,7 +39,7 @@ export const NativeSelectField: FunctionComponent<NativeSelectFieldProps> = Comp
 	'SelectField',
 )
 
-export interface NativeSelectFieldInnerPublicProps extends Omit<FormGroupProps, 'children'> {
+export interface NativeSelectFieldInnerPublicProps extends Omit<FieldContainerProps, 'children'> {
 	placeholder?: string
 	allowNull?: boolean
 }
@@ -67,7 +67,7 @@ export const NativeSelectFieldInner = memo((props: NativeSelectFieldInnerProps) 
 	)
 
 	return (
-		<FormGroup {...props} label={props.environment.applySystemMiddleware('labelMiddleware', props.label)}>
+		<FieldContainer {...props} label={props.environment.applySystemMiddleware('labelMiddleware', props.label)}>
 			<Select
 				value={props.currentValue.toString()}
 				onChange={event => {
@@ -76,6 +76,6 @@ export const NativeSelectFieldInner = memo((props: NativeSelectFieldInnerProps) 
 				options={options}
 				disabled={props.isMutating}
 			/>
-		</FormGroup>
+		</FieldContainer>
 	)
 })

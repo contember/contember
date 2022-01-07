@@ -1,5 +1,5 @@
 import { Environment, SugaredRelativeSingleField, useEnvironment, useField, useMutationState } from '@contember/binding'
-import { FormGroup, FormGroupProps } from '@contember/ui'
+import { FieldContainer, FieldContainerProps } from '@contember/ui'
 import { memo, ReactNode, useMemo } from 'react'
 import { useAccessorErrors } from '../../errors'
 import type { SimpleRelativeSingleFieldMetadata } from './SimpleRelativeSingleField'
@@ -20,7 +20,7 @@ const contextualizeNode = (
 	return node
 }
 
-export type SimpleRelativeSingleFieldProxyProps = Omit<FormGroupProps, 'children'> &
+export type SimpleRelativeSingleFieldProxyProps = Omit<FieldContainerProps, 'children'> &
 	SugaredRelativeSingleField & {
 		render: (fieldMetadata: SimpleRelativeSingleFieldMetadata<any>, props: any) => ReactNode
 	}
@@ -56,7 +56,7 @@ export const SimpleRelativeSingleFieldProxy = memo(
 		return (
 			<>
 				{rendered && (
-					<FormGroup
+					<FieldContainer
 						label={normalizedLabel}
 						size={props.size}
 						labelDescription={normalizedLabelDescription}
@@ -65,7 +65,7 @@ export const SimpleRelativeSingleFieldProxy = memo(
 						errors={fieldErrors}
 					>
 						{rendered}
-					</FormGroup>
+					</FieldContainer>
 				)}
 			</>
 		)

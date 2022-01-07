@@ -1,8 +1,8 @@
-import { Button, FormGroup, Message, TextInput } from '@contember/ui'
+import { Button, FieldContainer, Message, TextInput } from '@contember/ui'
 import { FC, useCallback } from 'react'
 import { useShowToast } from '../../../components'
-import { PrepareOtpResult, usePrepareOtp } from '../../mutations'
 import { useForm } from '../../lib'
+import { PrepareOtpResult, usePrepareOtp } from '../../mutations'
 
 interface PrepareOtpFormProps {
 	onPrepared: (data: PrepareOtpResult) => void
@@ -37,9 +37,9 @@ export const PrepareOtpForm: FC<PrepareOtpFormProps> = ({ onPrepared, isReSetup,
 
 	return (
 		<form onSubmit={onSubmit}>
-			<FormGroup label="Label for an identification in two-factor app">
+			<FieldContainer label="Label for an identification in two-factor app">
 				<TextInput {...register('label')} />
-			</FormGroup>
+			</FieldContainer>
 			<br />
 			{isReSetup && <>
 				<Message intent={'warn'}>

@@ -1,6 +1,6 @@
-import { useInitSignInIDP } from '../../mutations'
+import { Button, FieldContainer } from '@contember/ui'
 import { useCallback } from 'react'
-import { Button, FormGroup } from '@contember/ui'
+import { useInitSignInIDP } from '../../mutations'
 import { getBaseHref, IDP, IDP_CODE, IDP_SESSION_KEY } from './common'
 
 export interface IDPInitButtonProps {
@@ -26,8 +26,8 @@ export const IDPInitButton = ({ provider, onError }: IDPInitButtonProps) => {
 	}, [initRequest, onError])
 
 	return (
-		<FormGroup label={undefined}>
+		<FieldContainer label={undefined}>
 			<Button onClick={() => onInitIDP(provider.provider)}>Login using {provider.name ?? provider.provider}</Button>
-		</FormGroup>
+		</FieldContainer>
 	)
 }

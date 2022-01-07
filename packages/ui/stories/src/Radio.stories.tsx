@@ -1,21 +1,21 @@
 import type { ComponentMeta, ComponentStory } from '@storybook/react'
 import * as React from 'react'
-import { RadioGroup } from '../../src'
-import { booleanControl, disabledControlsForAttributes, enumControl, stringControl } from './helpers'
+import { Radio } from '../../src'
+import { booleanControl, disabledControlsForAttributes, enumControl, stringControl } from './Helpers'
 
 export default {
-	title: 'RadioGroup',
-	component: RadioGroup,
+	title: 'Radio',
+	component: Radio,
 	argTypes: {
-		...disabledControlsForAttributes<typeof RadioGroup>('errors', 'options'),
+		...disabledControlsForAttributes<typeof Radio>('options', 'RadioButtonComponent'),
 		name: stringControl('foo'),
 		isDisabled: booleanControl(false),
 		isReadOnly: booleanControl(false),
 		value: enumControl([undefined, null, 'alpha', 'beta'], 'radio', undefined),
 	},
-} as ComponentMeta<typeof RadioGroup>
+} as ComponentMeta<typeof Radio>
 
-const Template: ComponentStory<typeof RadioGroup> = args => <RadioGroup {...args} />
+const Template: ComponentStory<typeof Radio> = args => <Radio {...args} />
 
 export const Simple = Template.bind({})
 
@@ -92,24 +92,4 @@ Preselected.args = {
 	value: 'beta',
 	onChange: value => console.log(value),
 	// errors: [{ message: 'Wrong' }],
-}
-
-export const WithErrors = Template.bind({})
-
-WithErrors.args = {
-	name: 'foo',
-	options: [
-		{
-			value: 'alpha',
-			label: 'Alpha',
-		},
-		{
-			value: 'beta',
-			label: 'Beta',
-		},
-	],
-	size: 'default',
-	onChange: value => console.log(value),
-	errors: [{ message: 'Select at least one' }],
-	validationState: 'invalid',
 }

@@ -1,7 +1,7 @@
 import classNames from 'classnames'
 import { HTMLAttributes, memo, MouseEvent as ReactMouseEvent, ReactNode } from 'react'
 import { useClassNamePrefix } from '../auxiliary'
-import { BoxContent } from './Box'
+import { Box } from './Box'
 import { Dropdown } from './Dropdown'
 import { Button, ButtonOwnProps } from './Forms'
 import { Icon, IconProps } from './Icon'
@@ -28,7 +28,7 @@ export const ActionableBox = memo(({ className, children, editContents, onRemove
 	}
 
 	return (
-		<BoxContent className={classNames(
+		<Box className={classNames(
 			`${prefix}actionableBox`,
 			className,
 		)}>
@@ -54,7 +54,7 @@ export const ActionableBox = memo(({ className, children, editContents, onRemove
 					</li>
 				)}
 			</ul>
-		</BoxContent>
+		</Box>
 	)
 })
 ActionableBox.displayName = 'ActionableBox'

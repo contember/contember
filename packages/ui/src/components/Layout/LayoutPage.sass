@@ -23,7 +23,8 @@
 		display: flex
 		flex-direction: row
 		flex-grow: 1
-		overflow: visible
+		overflow-x: auto
+		overflow-y: visible
 		&:not(:last-child)
 			padding-right: var(--cui-layout-section-padding-right)
 	&-content-container
@@ -38,6 +39,9 @@
 		margin-top: calc(-1 * var(--cui-control-border-width))
 		display: flex
 		flex-direction: column
+		// TODO: Any non 'visible' value causes floating menu not to stick
+		overflow-x: auto
+		overflow-y: visible
 		padding-bottom: var(--cui-layout-section-padding-bottom)
 		padding-left: var(--cui-layout-page-padding-left)
 		padding-right: var(--cui-layout-page-padding-right)
@@ -46,9 +50,11 @@
 		&-title
 			margin: 0
 	@media (min-width: $breakpoint-min-medium)
+		// TODO: Fix layout issue: https://github.com/contember/private-issues/issues/21
 		[class$="container"] > [class$="control"]
 			min-width: 20em
 	@media (min-width: $breakpoint-min-large)
+		// TODO: Fix layout issue: https://github.com/contember/private-issues/issues/21
 		[class$="container"] > [class$="control"]
 			min-width: 25em
 		&-content-container
@@ -76,6 +82,7 @@
 			top: 0
 
 			// React-select override
+			// TODO: Fix layout issue: https://github.com/contember/private-issues/issues/21
 			[class$="container"] > [class$="control"]
 				min-width: 28.5em
 

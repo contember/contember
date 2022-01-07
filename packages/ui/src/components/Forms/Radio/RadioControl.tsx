@@ -1,25 +1,28 @@
 import classnames from 'classnames'
 import { memo, ReactNode, useContext, useRef } from 'react'
 import { useFocusRing, useHover, useRadio, VisuallyHidden } from 'react-aria'
+import { FieldContainer } from '..'
 import { useClassNamePrefix } from '../../../auxiliary'
-import { ValidationState } from '../../../types'
+import { Size, ValidationState } from '../../../types'
 import { toEnumStateClass, toStateClass } from '../../../utils'
-import { FieldLabel } from '../../Typography/FieldLabel'
+import { RadioButton as DefaultRadioButton } from './RadioButton'
 import { RadioContext } from './RadioContext'
 import type { RadioOption } from './types'
 
 interface RadioProps {
+	RadioButtonComponent?: typeof DefaultRadioButton
 	children: ReactNode
 	description: ReactNode
 	name?: string
 	validationState?: ValidationState
 	value: RadioOption['value']
+	size?: Size
 }
 
-export const RadioControl = memo((props: RadioProps) => {
-	const { children, description, validationState, value } = props
+export const RadioControl = memo(({ RadioButtonComponent, description, size, validationState, ...props }: RadioProps) => {
+	const { children, value } = props
 
-	const prefix = useClassNamePrefix()
+	const componentClassName = `${useClassNamePrefix()}radio-control`
 	const ref = useRef<HTMLInputElement>(null)
 
 	const state = useContext(RadioContext)
@@ -31,7 +34,7 @@ export const RadioControl = memo((props: RadioProps) => {
 	const isSelected = state.selectedValue === value
 
 	const classList = classnames(
-		`${prefix}radio-option`,
+		componentClassName,
 		toEnumStateClass(validationState),
 		toStateClass('focused', isFocusVisible),
 		toStateClass('checked', isSelected),
@@ -41,16 +44,31 @@ export const RadioControl = memo((props: RadioProps) => {
 		toStateClass('hovered', isHovered),
 	)
 
+	const RadioButton = RadioButtonComponent ?? DefaultRadioButton
+
 	return (
 		<label className={classList}>
-			<VisuallyHidden>
-				<input {...inputProps} {...focusProps} ref={ref} />
-			</VisuallyHidden>
-			<span className={`${prefix}radio-control`} />
-			<span className={`${prefix}radio-label`}>
-				<FieldLabel>{children}</FieldLabel>
-				{description && <span className={`${prefix}radio-label-description`}>{description}</span>}
-			</span>
+			<FieldContainer
+				useLabelElement={false}
+				size={size}
+				label={children}
+				labelDescription={description}
+				labelPosition="labelInlineRight"
+			>
+				<VisuallyHidden>
+					<input {...inputProps} {...focusProps} ref={ref} />
+				</VisuallyHidden>
+
+				<RadioButton
+					isFocused={isFocusVisible}
+					isChecked={isSelected}
+					isIndeterminate={value === null}
+					isDisabled={isDisabled}
+					isReadonly={inputProps.readOnly}
+					isHovered={isHovered}
+					isInvalid={validationState === 'invalid'}
+				/>
+			</FieldContainer>
 		</label>
 	)
 })

@@ -1,9 +1,9 @@
-import { Button, FormGroup, Section, Select, TextInput } from '@contember/ui'
+import { Button, FieldContainer, Section, Select, TextInput } from '@contember/ui'
 import { FC, SyntheticEvent, useState } from 'react'
-import { useForm } from '../../lib'
-import { useCreateProject } from '../../mutations'
 import { useShowToast } from '../../../components'
 import { RoutingLinkTarget, useRedirect } from '../../../routing'
+import { useForm } from '../../lib'
+import { useCreateProject } from '../../mutations'
 
 const emptyForm = {
 	slug: '',
@@ -79,38 +79,38 @@ export const CreateProjectForm: FC<CreateProjectForm> = ({ projectListLink }) =>
 	return (
 		<form onSubmit={onSubmit}>
 			<Section heading={'Create a new project'}>
-				<FormGroup label={'Project slug'}>
+				<FieldContainer label={'Project slug'}>
 					<TextInput {...register('slug')} pattern={'[a-z][-a-z0-9]*'} required />
-				</FormGroup>
-				<FormGroup label={'Project name'}>
+				</FieldContainer>
+				<FieldContainer label={'Project name'}>
 					<TextInput {...register('name')} placeholder={values.slug} />
-				</FormGroup>
+				</FieldContainer>
 			</Section>
 
 			<Section heading={'Database credentials'}>
 				<p>You can leave some of this fields empty to use default values.</p>
-				<FormGroup label={'Host'}>
+				<FieldContainer label={'Host'}>
 					<TextInput {...register('dbHost')} />
-				</FormGroup>
-				<FormGroup label={'Port'}>
+				</FieldContainer>
+				<FieldContainer label={'Port'}>
 					<TextInput {...register('dbPort')} />
-				</FormGroup>
-				<FormGroup label={'Database name'}>
+				</FieldContainer>
+				<FieldContainer label={'Database name'}>
 					<TextInput {...register('dbName')} />
-				</FormGroup>
-				<FormGroup label={'User'}>
+				</FieldContainer>
+				<FieldContainer label={'User'}>
 					<TextInput {...register('dbUser')} />
-				</FormGroup>
-				<FormGroup label={'Password'}>
+				</FieldContainer>
+				<FieldContainer label={'Password'}>
 					<TextInput {...register('dbPassword')} />
-				</FormGroup>
-				<FormGroup label={'SSL'}>
+				</FieldContainer>
+				<FieldContainer label={'SSL'}>
 					<Select {...register('dbSsl')} options={[
 						{ value: '', label: 'default' },
 						{ value: 'yes', label: 'yes' },
 						{ value: 'no', label: 'no' },
 					]}/>
-				</FormGroup>
+				</FieldContainer>
 			</Section>
 
 			<Section>

@@ -1,7 +1,7 @@
 import type { ComponentMeta, ComponentStory } from '@storybook/react'
 import * as React from 'react'
 import { LayoutChrome, Menu, NavigationContext } from '../../src'
-import { booleanControl } from './helpers'
+import { booleanControl } from './Helpers'
 
 export default {
 	title: 'Menu',

@@ -6,13 +6,12 @@ import {
 	useDerivedField,
 	useEnvironment,
 } from '@contember/binding'
-import { isSpecialLinkClick, SingleLineTextInputProps } from '@contember/ui'
+import { isSpecialLinkClick, SingleLineTextInputProps, SlugInput } from '@contember/ui'
 import slugify from '@sindresorhus/slugify'
 import { useCallback, useMemo, useState } from 'react'
 import type { SimpleRelativeSingleFieldProps } from '../auxiliary'
 import { SimpleRelativeSingleField } from '../auxiliary'
 import { stringFieldParser, useTextInput } from './useTextInput'
-import { SlugInput } from '@contember/ui'
 
 type SlugPrefix = string | ((environment: Environment) => string)
 

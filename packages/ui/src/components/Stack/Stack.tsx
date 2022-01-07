@@ -2,12 +2,12 @@ import classnames from 'classnames'
 import { forwardRef, memo, ReactNode } from 'react'
 import { useClassNamePrefix } from '../../auxiliary'
 import type { NativeProps, Size } from '../../types'
-import { toEnumViewClass, toViewClass } from '../../utils'
+import { toEnumClass, toEnumViewClass, toViewClass } from '../../utils'
 
 export interface StackOwnProps {
   align?: 'center' | 'stretch' | 'start' | 'end'
   direction: 'vertical' | 'horizontal' | 'vertical-reverse' | 'horizontal-reverse'
-	gap?: Size
+	gap?: Size | 'none'
 	children?: ReactNode
   justify?:
    | 'center'
@@ -36,7 +36,7 @@ export const Stack = memo(
             className={classnames(
               `${prefix}stack`,
               toViewClass(`${direction}`, true),
-              toEnumViewClass(gap),
+              toEnumClass('gap-', gap),
               align && toEnumViewClass(`align-${align}`),
               justify && toEnumViewClass(`justify-${justify}`),
               className,

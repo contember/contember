@@ -1,6 +1,6 @@
 import { Component, QueryLanguage, wrapFilterInHasOnes } from '@contember/binding'
 import type { Input } from '@contember/client'
-import { FormGroup, TextInput } from '@contember/ui'
+import { FieldContainer, TextInput } from '@contember/ui'
 import { forwardRef, FunctionComponent, memo } from 'react'
 import DatePicker from 'react-datepicker'
 import { useMessageFormatter } from '../../../../../i18n'
@@ -94,8 +94,8 @@ export const DateCell: FunctionComponent<DateCellProps> = Component(props => {
 
 const DateBoundInput = memo(
 	forwardRef(({ className, label, style, ...props }: any, ref: any) => (
-		<FormGroup label={label} labelPosition="labelInlineLeft">
+		<FieldContainer label={label} labelPosition="labelInlineLeft">
 			<TextInput {...props} style={{ ...style, width: '130px' }} ref={ref} />
-		</FormGroup>
+		</FieldContainer>
 	)),
 )

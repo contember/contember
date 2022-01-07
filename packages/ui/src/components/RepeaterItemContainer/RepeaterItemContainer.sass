@@ -1,0 +1,43 @@
+.#{$cui-conf-globalPrefix}repeater-item-container
+	$root: &
+
+	--cui-box-background-focused-overlay: linear-gradient(rgba(var(--cui-controls-1000), 0.01), rgba(var(--cui-controls-1000), 0.01))
+	--cui-box-content-padding-left: calc(2 * var(--cui-box-content-padding))
+
+	transition: background-image .15s
+
+	&-header
+		display: flex
+		justify-content: space-between
+	&-content
+		//
+
+	&-handle
+		align-items: center
+		display: flex
+		flex-direction: column
+		cursor: grab
+		position: absolute
+		left: 0
+		top: 0
+		bottom: 0
+		padding: var(--cui-box-content-padding) 0
+		width: calc(2 * var(--cui-box-content-padding))
+
+	&-label
+		font-weight: 800
+	&-actions
+		margin-left: .5em
+		margin-right: -.5em
+		margin-top: -.5em
+
+
+	&.is-active,
+	&:focus-within
+		color: var(--cui-control-color)
+		background-image: var(--cui-box-background-focused-overlay)
+		z-index: 2
+
+	&.is-active &-content,
+	&:focus-within &-content
+		background-image: var(--cui-box-background-focused-overlay)

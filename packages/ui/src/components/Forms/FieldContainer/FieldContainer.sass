@@ -1,0 +1,66 @@
+@use 'sass:math'
+
+.#{$cui-conf-globalPrefix}field-container
+	display: flex
+	flex-direction: column
+	font-size: var(--cui-control-font-size)
+	column-gap: calc(2 * var(--cui-gap-horizontal))
+	row-gap: calc(2 * var(--cui-gap-vertical))
+	width: 100%
+
+	&.view-small
+		font-size: var(--cui-control-font-size--small)
+	&.view-large
+		font-size: var(--cui-control-font-size--large)
+
+	&:focus-within
+		color: var(--cui-control-color)
+
+	&-label
+		display: flex
+		flex-direction: column
+		column-gap: calc(2 * var(--cui-gap-horizontal))
+		row-gap: calc(2 * var(--cui-gap-vertical))
+	&:not(.is-active):not(:focus-within) &-label
+		color: var(--cui-color--high)
+
+	&-header,
+	&-body
+		display: flex
+		flex-direction: column
+		gap: var(--cui-gap-vertical)
+
+	&-header
+		font-weight: 700
+		flex: 1 1 calc(100% / 7 * 2)
+	&-body
+		flex: 1 1 calc(100% / 7 * 5)
+
+	&-body-content
+		//
+	&-body-content-description
+		font-weight: 500
+		color: var(--cui-color--medium)
+		display: block
+		font-size: 0.9em
+		line-height: $cui-base-lineHeight
+
+	&.view-labelLeft &-label,
+	&.view-labelInlineLeft &-label
+		flex-direction: row
+
+	&.view-labelRight &-label,
+	&.view-labelInlineRight &-label
+		flex-direction: row-reverse
+
+	&.view-labelLeft &-header,
+	&.view-labelInlineLeft &-header,
+	&.view-labelRight &-header,
+	&.view-labelInlineRight &-header
+		justify-content: center
+		align-self: stretch
+
+	&.view-labelInlineLeft &-header
+		flex: unset
+	&.view-labelInlineRight &-body
+		flex: unset

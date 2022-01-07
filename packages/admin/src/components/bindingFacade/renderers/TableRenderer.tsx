@@ -1,7 +1,7 @@
 import { Component, EntityAccessor } from '@contember/binding'
 import { Table, TableCell, TableProps, TableRow, TableRowProps } from '@contember/ui'
 import { memo, ReactElement, ReactNode } from 'react'
-import { DeleteEntityButton, EmptyMessage, RepeaterContainerProps, RepeaterItemProps } from '../collections'
+import { DeleteEntityButton, EmptyMessage, RepeaterFieldContainerProps, RepeaterItemProps } from '../collections'
 import { ImmutableContentLayoutRenderer, ImmutableContentLayoutRendererProps } from './ImmutableContentLayoutRenderer'
 import { ImmutableEntityListRenderer, ImmutableEntityListRendererProps } from './ImmutableEntityListRenderer'
 
@@ -69,7 +69,7 @@ const EmptyTable = memo((props: { children: ReactNode }) => (
 ))
 EmptyTable.displayName = 'EmptyTable'
 
-const Container = memo((props: RepeaterContainerProps & Omit<TableProps, 'children'>) => {
+const Container = memo((props: RepeaterFieldContainerProps & Omit<TableProps, 'children'>) => {
 	// TODO solve this via preferences
 	const isEmpty = !Array.from(props.accessor).some(entity => entity instanceof EntityAccessor && entity.existsOnServer)
 

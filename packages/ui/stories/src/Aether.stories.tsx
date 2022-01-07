@@ -1,7 +1,7 @@
 import type { ComponentMeta, ComponentStory } from '@storybook/react'
 import * as React from 'react'
 import { Aether } from '../../src'
-import { disabledControlsForAttributes } from './helpers'
+import { disabledControlsForAttributes } from './Helpers'
 
 export default {
 	title: 'Aether',

@@ -9,9 +9,8 @@ export interface ErrorListProps {
 
 export const ErrorList = memo(({ errors = [] }: ErrorListProps) => {
 	const prefix = useClassNamePrefix()
-	const fieldErrors = Array.isArray(errors) ? errors : errors.validation
-	const messages = useMemo(() => [...new Set(fieldErrors?.map(it => it.message))], [fieldErrors])
-	if (!fieldErrors || !fieldErrors.length) {
+	const messages = useMemo(() => [...new Set(errors.map(it => it.message))], [errors])
+	if (!messages.length) {
 		return null
 	}
 	return (

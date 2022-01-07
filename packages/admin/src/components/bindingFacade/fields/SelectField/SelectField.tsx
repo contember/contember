@@ -1,9 +1,14 @@
-import { Component, ErrorAccessor, FieldValue } from '@contember/binding'
-import { FieldContainer, FieldContainerProps } from '@contember/ui'
+import { Component, FieldValue } from '@contember/binding'
+import { FieldContainer, FieldContainerProps, FieldErrors } from '@contember/ui'
 import { FunctionComponent, memo } from 'react'
 import type { Props as SelectProps } from 'react-select'
 import AsyncSelect from 'react-select/async'
-import { ChoiceField, ChoiceFieldData, DynamicSingleChoiceFieldProps, StaticSingleChoiceFieldProps } from '../ChoiceField'
+import {
+	ChoiceField,
+	ChoiceFieldData,
+	DynamicSingleChoiceFieldProps,
+	StaticSingleChoiceFieldProps,
+} from '../ChoiceField'
 import { selectStyles } from './commonStyles'
 import { useCommonReactSelectAsyncProps } from './useCommonReactSelectAsyncProps'
 
@@ -47,7 +52,7 @@ export interface SelectFieldInnerPublicProps extends Omit<FieldContainerProps, '
 }
 
 export interface SelectFieldInnerProps extends ChoiceFieldData.SingleChoiceFieldMetadata, SelectFieldInnerPublicProps {
-	errors: ErrorAccessor | undefined
+	errors: FieldErrors | undefined
 }
 
 export const SelectFieldInner = memo(
@@ -67,7 +72,7 @@ export const SelectFieldInner = memo(
 			reactSelectProps,
 			placeholder,
 			data,
-			isInvalid: (errors?.validation?.length ?? 0) > 0,
+			isInvalid: (errors?.length ?? 0) > 0,
 		})
 
 		return (

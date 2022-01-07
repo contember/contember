@@ -13,6 +13,7 @@ import { useCallback, useMemo } from 'react'
 import { BaseDynamicChoiceField, useCurrentValues } from './BaseDynamicChoiceField'
 import type { ChoiceFieldData } from './ChoiceFieldData'
 import { useSelectOptions } from './useSelectOptions'
+import { useAccessorErrors } from '../../errors'
 
 export type DynamicMultipleChoiceFieldProps = SugaredRelativeEntityList & BaseDynamicChoiceField
 
@@ -63,12 +64,14 @@ export const useDynamicMultipleChoiceField = (
 		[entities, getCurrentValues],
 	)
 
+	const errors = useAccessorErrors(currentValueListAccessor)
+
 	return {
 		isMutating,
 		environment,
 		currentValues,
 		data: options,
-		errors: currentValueListAccessor.errors,
+		errors,
 		clear,
 		onChange,
 	}

@@ -1,5 +1,5 @@
-import { Component, ErrorAccessor } from '@contember/binding'
-import type { RadioProps } from '@contember/ui'
+import { Component } from '@contember/binding'
+import type { FieldErrors, RadioProps } from '@contember/ui'
 import { FieldContainer, FieldContainerProps, Radio, RadioOption } from '@contember/ui'
 import type { FunctionComponent } from 'react'
 import { memo } from 'react'
@@ -44,7 +44,7 @@ export interface RadioFieldInnerPublicProps extends Omit<FieldContainerProps, 'c
 }
 
 export interface RadioFieldInnerProps extends ChoiceFieldData.SingleChoiceFieldMetadata, RadioFieldInnerPublicProps {
-	errors: ErrorAccessor | undefined
+	errors: FieldErrors | undefined
 }
 
 
@@ -60,7 +60,7 @@ export const RadioFieldInner = memo((props: RadioFieldInnerProps) => {
 	return (
 		<FieldContainer
 			{...props}
-			errors={props.errors?.validation}
+			errors={props.errors}
 			label={props.environment.applySystemMiddleware('labelMiddleware', props.label)}
 			useLabelElement={false}
 		>

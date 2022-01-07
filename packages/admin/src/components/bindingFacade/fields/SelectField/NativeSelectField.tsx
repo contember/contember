@@ -1,7 +1,12 @@
-import { BindingError, Component, ErrorAccessor } from '@contember/binding'
-import { FieldContainer, FieldContainerProps, Select, SelectOption } from '@contember/ui'
+import { BindingError, Component } from '@contember/binding'
+import { FieldContainer, FieldContainerProps, FieldErrors, Select, SelectOption } from '@contember/ui'
 import { FunctionComponent, memo } from 'react'
-import { ChoiceField, ChoiceFieldData, DynamicSingleChoiceFieldProps, StaticSingleChoiceFieldProps } from '../ChoiceField'
+import {
+	ChoiceField,
+	ChoiceFieldData,
+	DynamicSingleChoiceFieldProps,
+	StaticSingleChoiceFieldProps,
+} from '../ChoiceField'
 
 export type NativeSelectFieldProps =
 	& NativeSelectFieldInnerPublicProps
@@ -45,7 +50,7 @@ export interface NativeSelectFieldInnerPublicProps extends Omit<FieldContainerPr
 }
 
 export interface NativeSelectFieldInnerProps extends ChoiceFieldData.SingleChoiceFieldMetadata, NativeSelectFieldInnerPublicProps {
-	errors: ErrorAccessor | undefined
+	errors: FieldErrors | undefined
 }
 
 export const NativeSelectFieldInner = memo((props: NativeSelectFieldInnerProps) => {

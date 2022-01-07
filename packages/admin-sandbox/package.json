@@ -5,8 +5,7 @@
 	"main": "src/index.html",
 	"private": true,
 	"scripts": {
-		"vite": "vite src --config vite.config.js --debug",
-		"dev-admin": "vite src --port ${VITE_PORT:-4010} --config vite.dev-admin-config.js --debug"
+		"vite": "vite src --port ${VITE_PORT:-4002} --config vite.config.js"
 	},
 	"devDependencies": {
 		"@contember/admin": "workspace:*"

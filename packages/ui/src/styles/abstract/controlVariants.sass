@@ -1,46 +1,44 @@
 %controlVariants
-	@each $name, $settings in $cui-control-variants
-		$view: toView($name)
+	--input-control-focus-ring: var(--cui-control-focus-ring-box-shadow)
 
-		&#{$view}
-			color: var(--cui-color--high)
-			background: var(--cui-background-color--above)
-			border-color: var(--cui-color--lower)
+	color: var(--cui-color--high)
+	background: var(--cui-background-color--above)
+	border-color: var(--cui-color--lower)
 
-			+disableWebkitAutoFill(var(--cui-control-background-color))
+	+disableWebkitAutoFill(var(--cui-control-background-color))
 
-			&:hover
-				border-color: var(--cui-color--low)
+	&:hover
+		border-color: var(--cui-color--low)
 
-			&:focus
-				@extend %implementsCustomFocusEffects
-				border-color: var(--cui-control-border-color)
-			&:focus:focus-visible
-				box-shadow: 0 0 0 .2em var(--cui-control-border-color)
+	&:focus
+		@extend %implementsCustomFocusEffects
+		border-color: var(--cui-control-border-color)
+	&:focus:focus-visible
+		box-shadow: var(--input-control-focus-ring)
 
-			&::placeholder
-				color: var(--cui-color--low)
+	&::placeholder
+		color: var(--cui-color--low)
 
-			&[readonly]
-				cursor: not-allowed
-				color: var(--cui-color--medium)
+	&[readonly]
+		cursor: not-allowed
+		color: var(--cui-color--medium)
 
-			&[disabled]
-				cursor: not-allowed
-				opacity: var(--cui-opacity--medium)
+	&[disabled]
+		cursor: not-allowed
+		opacity: var(--cui-opacity--medium)
 
-				&,
-				&::placeholder
-					color: var(--cui-color--low)
+		&,
+		&::placeholder
+			color: var(--cui-color--low)
 
-			&.view-seamless
-				background: transparent
-				border-color: transparent
-				padding-left: 0
-				padding-right: 0
+	&.view-seamless
+		background: transparent
+		border-color: transparent
+		padding-left: 0
+		padding-right: 0
 
-				&:focus
-					box-shadow: none
-				&:hover,
-				&:focus:focus-visible
-					background: var(--cui-filled-control-background-color--highlighted)
+		&:focus
+			box-shadow: none
+		&:hover,
+		&:focus:focus-visible
+			background: var(--cui-filled-control-background-color--highlighted)

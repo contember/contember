@@ -2,7 +2,7 @@ import classNames from 'classnames'
 import { memo, ReactNode } from 'react'
 import { useClassNamePrefix } from '../../../auxiliary'
 import type { Size } from '../../../types'
-import { toEnumViewClass } from '../../../utils'
+import { toEnumViewClass, toThemeClass } from '../../../utils'
 import { Description } from '../../Typography/Description'
 import { Label } from '../../Typography/Label'
 import type { FieldContainerLabelPosition } from './Types'
@@ -40,6 +40,7 @@ export const FieldContainer = memo(
 				`${componentClassName}`,
 				toEnumViewClass(size),
 				toEnumViewClass(labelPosition),
+				!!errors ? toThemeClass('danger', 'controls') : undefined,
 			)}>
 				<LabelElement className={`${componentClassName}-label`}>
 					{(label || labelDescription) && <span className={`${componentClassName}-header`}>

@@ -77,26 +77,6 @@ $cui-color-info: $cui-color-blue !default;
 $cui-base-lineHeight: 1.2 !default; // In order for computations to work, keep this a scalar
 
 // - Global controls
-$cui-effect-transition-duration: .3s !default;
-
-$cui-control-focus-opacity: 0.3 !default;
-$cui-control-view-default-color: $cui-color-gray-7 !default;
-$cui-control-view-default-background: $cui-color-white !default;
-$cui-control-view-default-border-color: $cui-color-gray-2 !default;
-$cui-control-view-default-distinction-color: $cui-color-primary !default;
-$cui-control-view-default: (
-	'color': $cui-control-view-default-color,
-	'background': $cui-control-view-default-background,
-	'borderColor': $cui-control-view-default-border-color,
-	'distinctionColor': $cui-control-view-default-distinction-color,
-) !default;
-
-$cui-control-variants: () !default;
-$cui-control-variants: map_merge((
-	$cui-conf-defaultView: $cui-control-view-default,
-), $cui-control-variants);
-
-
 $cui-control-validation-valid-color: $cui-color-success !default;
 $cui-control-validation-valid-border-color: darken($cui-color-success, 5) !default;
 $cui-control-validation-valid: (
@@ -115,10 +95,6 @@ $cui-control-validation: map_merge((
 	'valid': $cui-control-validation-valid,
 	'invalid': $cui-control-validation-invalid,
 ), $cui-control-validation);
-
-// Select
-
-$cui-select-chevron-height: .5em !default;
 
 // Heading
 $cui-heading-color: $cui-color-gray-9 !default;
@@ -260,13 +236,6 @@ $cui-dimensionSwitcher-spacing: 1em;
 // ProgressBar
 $cui-progressBar-background-color: #444444;
 $cui-progressBar-foreground-color: #85FF00;
-
-// FileDropZone
-$cui-fileDropZone-background-color: $cui-color-white;
-$cui-fileDropZone-border-color: #DFDFDF;
-$cui-fileDropZone-active-border-color: $cui-control-view-default-distinction-color;
-$cui-fileDropZone-accepting-border-color: $cui-control-view-default-distinction-color; // Deliberately active, and not success
-$cui-fileDropZone-rejecting-border-color: $cui-control-validation-invalid-border-color;
 
 // Editor
 $cui-editor-heading-counters: (

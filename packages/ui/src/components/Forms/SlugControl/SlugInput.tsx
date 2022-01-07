@@ -13,19 +13,20 @@ export type SlugInputProps =
 	}
 
 export const SlugInput = memo<SlugInputProps>(({ prefix, link, overlay, onOverlayClick, inputRef, ...textInputProps }) => {
-		const classPrefix = useClassNamePrefix()
+		const componentClassName = `${useClassNamePrefix()}slug-input`
+
 		return (
-			<div className={`${classPrefix}slugInput`}>
+			<div className={`${componentClassName}`}>
 				{prefix && (
-					<div className={`${classPrefix}slugInput-prefix`}>
+					<div className={`${componentClassName}-prefix`}>
 						{link ?
-							<a href={link} className={`${classPrefix}slugInput-prefixLink`} target={'_blank'}>{prefix}</a> : prefix}
+							<a href={link} className={`${componentClassName}-prefix-link`} target={'_blank'}>{prefix}</a> : prefix}
 					</div>
 				)}
-				<div className={`${classPrefix}slugInput-input`}>
+				<div className={`${componentClassName}-input`}>
 					<TextInput {...textInputProps} ref={inputRef} />
 					{(overlay || onOverlayClick) ? (
-						<div className={`${classPrefix}slugInput-overlay`} onClick={onOverlayClick}>
+						<div className={`${componentClassName}-overlay`} onClick={onOverlayClick}>
 							{overlay}
 						</div>
 					) : null}

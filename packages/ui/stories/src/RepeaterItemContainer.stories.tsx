@@ -1,21 +1,21 @@
 import type { ComponentMeta, ComponentStory } from '@storybook/react'
 import * as React from 'react'
-import { Button, Icon, RepeaterContainer, Size } from '../../src'
+import { Button, Icon, RepeaterItemContainer, Size } from '../../src'
 import { Block, disabledControlsForAttributes, enumControl, stringControl } from './Helpers'
 
 const sizes: Size[] = ['default', 'small', 'large']
 
 export default {
-	title: 'RepeaterContainer',
-	component: RepeaterContainer,
+	title: 'RepeaterItemContainer',
+	component: RepeaterItemContainer,
 	argTypes: {
-		...disabledControlsForAttributes<typeof RepeaterContainer>('children', 'actions', 'dragHandleComponent'),
+		...disabledControlsForAttributes<typeof RepeaterItemContainer>('children', 'actions', 'dragHandleComponent'),
 		gap: enumControl(sizes, 'inline-radio', 'default'),
 		label: stringControl('Item label'),
 	},
-} as ComponentMeta<typeof RepeaterContainer>
+} as ComponentMeta<typeof RepeaterItemContainer>
 
-const Template: ComponentStory<typeof RepeaterContainer> = args => <RepeaterContainer {...args} />
+const Template: ComponentStory<typeof RepeaterItemContainer> = args => <RepeaterItemContainer {...args} />
 
 export const Defaut = Template.bind({})
 

@@ -6,7 +6,7 @@ import { Icon } from '../Icon'
 import { Stack } from '../Stack'
 import { Label } from '../Typography/Label'
 
-export interface RepeaterContainerProps {
+export interface RepeaterItemContainerProps {
 	gap?: Size
 	label?: ReactNode
 	actions?: ReactNode
@@ -14,8 +14,8 @@ export interface RepeaterContainerProps {
 	dragHandleComponent?: ComponentType<{ children: ReactNode }>
 }
 
-export const RepeaterContainer = memo(({ actions, children, gap, label, dragHandleComponent: Handle }: RepeaterContainerProps) => {
-	const componentClassName = `${useClassNamePrefix()}repeater-container`
+export const RepeaterItemContainer = memo(({ actions, children, gap, label, dragHandleComponent: Handle }: RepeaterItemContainerProps) => {
+	const componentClassName = `${useClassNamePrefix()}repeater-item-container`
 
 	return (
 		<Box gap={gap} className={componentClassName}>
@@ -46,4 +46,4 @@ export const RepeaterContainer = memo(({ actions, children, gap, label, dragHand
 		</Box>
 	)
 })
-RepeaterContainer.displayName = 'RepeaterContainer'
+RepeaterItemContainer.displayName = 'RepeaterItemContainer'

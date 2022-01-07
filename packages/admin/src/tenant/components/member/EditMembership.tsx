@@ -1,4 +1,4 @@
-import { Box, Button, FieldContainer, Icon, RepeaterContainer, Select, SelectOption } from '@contember/ui'
+import { Box, Button, FieldContainer, Icon, RepeaterItemContainer, Select, SelectOption } from '@contember/ui'
 import { ComponentType, Dispatch, FC, SetStateAction, useCallback } from 'react'
 import { useListRolesQuery } from '../../queries'
 import { Membership } from '../../types'
@@ -62,7 +62,7 @@ export const EditMembership: FC<EditMembershipProps> = ({ project, memberships, 
 								}
 
 								return (
-									<RepeaterContainer
+									<RepeaterItemContainer
 										label={undefined}
 										key={membershipIndex}
 										actions={<Button distinction={'seamless'} size="small" onClick={removeMembership}><Icon blueprintIcon="trash" /></Button>}
@@ -104,10 +104,10 @@ export const EditMembership: FC<EditMembershipProps> = ({ project, memberships, 
 												/>
 											))}
 
-									</RepeaterContainer>
+									</RepeaterItemContainer>
 								)
 							})}
-							<RepeaterContainer label={undefined}>
+							<RepeaterItemContainer label={undefined}>
 								<Button
 									distinction="seamless"
 									flow="block"
@@ -117,7 +117,7 @@ export const EditMembership: FC<EditMembershipProps> = ({ project, memberships, 
 									<Icon blueprintIcon={'add'} style={{ marginRight: '0.2em' }} />
 									Add role
 								</Button>
-							</RepeaterContainer>
+							</RepeaterItemContainer>
 						</Box>
 					</>
 				)

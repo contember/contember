@@ -3,11 +3,11 @@ version: '3'
 services:
   sandbox_vite:
     user: '1000:1000'
-    ports: ['5000:5000']
+    ports: ['3000:3000']
 
   admin_server:
     user: '1000:1000'
-    ports: ['5006:4000']
+    ports: ['3006:4000']
 
   admin_server_esbuild:
     user: '1000:1000'
@@ -16,14 +16,14 @@ services:
     user: '1000:1000'
 
   api:
-    ports: ['5001:4000']
+    ports: ['3001:4000']
 
   adminer:
-    ports: ['5002:8080']
+    ports: ['3002:8080']
 
   s3:
-    command: 'server --address :5003 /data'
-    ports: ['5003:5003']
+    command: 'server --address :3003 /data'
+    ports: ['3003:3003']
 
   postgres:
-    ports: ['5005:5432']
+    ports: ['3005:5432']

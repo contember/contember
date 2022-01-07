@@ -3,11 +3,11 @@ version: '3'
 services:
   sandbox_vite:
     image: node:16-alpine
-    command: '/src/node_modules/.bin/vite src --config vite.config.js --debug --port 5000 --host 0.0.0.0'
+    command: '/src/node_modules/.bin/vite src --config vite.config.js --debug --port 3000 --host 0.0.0.0'
 
     environment:
       NODE_ENV: 'development'
-      VITE_CONTEMBER_ADMIN_API_BASE_URL: 'http://localhost:5001'
+      VITE_CONTEMBER_ADMIN_API_BASE_URL: 'http://localhost:3001'
       VITE_CONTEMBER_ADMIN_SESSION_TOKEN: '0000000000000000000000000000000000000000'
 
     working_dir: /src/packages/admin-sandbox
@@ -31,7 +31,7 @@ services:
       CONTEMBER_LOGIN_TOKEN: '1111111111111111111111111111111111111111'
       CONTEMBER_PUBLIC_DIR: '/src/ee/admin-server/dist/public'
 
-      CONTEMBER_S3_ENDPOINT: 'http://s3:5003'
+      CONTEMBER_S3_ENDPOINT: 'http://s3:3003'
       CONTEMBER_S3_REGION: '_'
       CONTEMBER_S3_BUCKET: 'contember'
       CONTEMBER_S3_PREFIX: 'admin/'
@@ -82,7 +82,7 @@ services:
       DEFAULT_DB_USER: 'contember'
       DEFAULT_DB_PASSWORD: 'contember'
 
-      DEFAULT_S3_ENDPOINT: 'http://host.docker.internal:5003'
+      DEFAULT_S3_ENDPOINT: 'http://host.docker.internal:3003'
       DEFAULT_S3_PROVIDER: 'minio'
       DEFAULT_S3_REGION: ''
       DEFAULT_S3_BUCKET: 'contember'

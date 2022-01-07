@@ -1,5 +1,5 @@
 import type { SugaredFieldProps } from '@contember/binding'
-import { SugaredField } from '@contember/binding'
+import { QueryLanguage, SugaredField } from '@contember/binding'
 import type { S3FileUploader } from '@contember/client'
 import type { FileDataExtractor } from '../interfaces'
 
@@ -19,5 +19,12 @@ export const getFileUrlDataExtractor: (
 			return
 		}
 		entity.getField(urlField).updateValue(uploadResult.fileUrl)
+	},
+	getErrorsHolders: ({ entity, environment }) => {
+		const desugaredUrlField = QueryLanguage.desugarRelativeSingleField(urlField, environment)
+		const owningEntity = entity.getRelativeSingleEntity({
+			hasOneRelationPath: desugaredUrlField.hasOneRelationPath,
+		})
+		return [entity.getField(urlField), owningEntity]
 	},
 })

@@ -44,7 +44,7 @@ export const useDynamicSingleChoiceField = (
 	const currentValueEntity = currentValueParent.getRelativeSingleEntity({
 		hasOneRelationPath: [lastHasOneRelation],
 	})
-	const currentlyChosenEntities = [currentValueEntity]
+	const currentlyChosenEntities = currentValueEntity.existsOnServer || currentValueEntity.hasUnpersistedChanges ? [currentValueEntity] : []
 
 	const [entities, options] = useSelectOptions(props, currentlyChosenEntities)
 

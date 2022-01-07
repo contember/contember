@@ -18,18 +18,14 @@ services:
     command: ['sleep', 'infinity']
 
   api:
-    environment:
-      CONTEMBER_PORT: '4000'
-      DEFAULT_S3_ENDPOINT: 'http://host.docker.internal:9000'
+    ports: ['5001:4000']
 
-    ports:
-      - '4001:4000'
+  adminer:
+    ports: ['5002:8080']
 
   s3:
-    command: 'server --address :9000 /data'
-    ports:
-      - '9000:9000'
+    command: 'server --address :5003 /data'
+    ports: ['5003:5003']
 
   postgres:
-    ports:
-      - '4003:5432'
+    ports: ['5005:5432']

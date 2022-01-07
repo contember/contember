@@ -3,7 +3,7 @@ import { TemporalFieldHelper, UuidFieldHelper } from '../fieldHelpers'
 import type { FieldName, FieldValue } from '../treeParameters'
 import type { BatchUpdatesOptions } from './BatchUpdatesOptions'
 import type { Errorable } from './Errorable'
-import type { ErrorAccessor } from './ErrorAccessor'
+import { ErrorAccessor } from './ErrorAccessor'
 import type { FieldState } from '../core/state'
 
 class FieldAccessor<Value extends FieldValue = FieldValue> implements Errorable {
@@ -20,8 +20,8 @@ class FieldAccessor<Value extends FieldValue = FieldValue> implements Errorable 
 		public readonly getAccessor: FieldAccessor.GetFieldAccessor<Value>,
 	) {}
 
-	public addError(error: ErrorAccessor.SugaredValidationError): () => void {
-		return this.operations.addError(this.stateKey, error)
+	public addError(error: ErrorAccessor.Error | string): () => void {
+		return this.operations.addError(this.stateKey, ErrorAccessor.normalizeError(error))
 	}
 
 	public clearErrors(): void {

@@ -21,7 +21,7 @@ import type { AsyncBatchUpdatesOptions } from './AsyncBatchUpdatesOptions'
 import type { BatchUpdatesOptions } from './BatchUpdatesOptions'
 import type { EntityListAccessor } from './EntityListAccessor'
 import type { Errorable } from './Errorable'
-import type { ErrorAccessor } from './ErrorAccessor'
+import { ErrorAccessor } from './ErrorAccessor'
 import type { FieldAccessor } from './FieldAccessor'
 import type { PersistErrorOptions } from './PersistErrorOptions'
 import type { PersistSuccessOptions } from './PersistSuccessOptions'
@@ -59,8 +59,8 @@ class EntityAccessor implements Errorable {
 
 	//
 
-	public addError(error: ErrorAccessor.SugaredValidationError): () => void {
-		return this.operations.addError(this.stateKey, error)
+	public addError(error: ErrorAccessor.Error | string): () => void {
+		return this.operations.addError(this.stateKey, ErrorAccessor.normalizeError(error))
 	}
 
 	public addEventListener<Type extends keyof EntityAccessor.RuntimeEntityEventListenerMap>(

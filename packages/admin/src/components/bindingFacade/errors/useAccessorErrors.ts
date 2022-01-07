@@ -1,7 +1,8 @@
 import type { ErrorAccessor } from '@contember/binding'
-import { MessageFormatter, useMessageFormatter } from '../../../i18n'
+import { useMessageFormatter } from '../../../i18n'
 import { errorCodeDictionary } from './errorCodeDictionary'
 import { useCallback, useMemo } from 'react'
+import { assertNever } from '../../../utils'
 
 export interface AccessorErrorsHolder {
 	readonly errors: ErrorAccessor | undefined
@@ -13,24 +14,24 @@ export type AccessorErrorMessages = [AccessorErrorMessage, ...AccessorErrorMessa
 export const useAccessorErrorFormatter = () => {
 	const formatMessage = useMessageFormatter(errorCodeDictionary)
 	return useCallback((accessor: AccessorErrorsHolder): AccessorErrorMessage[] => {
-		return [
-			...accessor.errors?.validation?.map((error): AccessorErrorMessage => {
+		return accessor.errors?.errors.map((error): AccessorErrorMessage => {
+			if (error.type === 'validation') {
 				switch (error.code) {
 					case 'fieldRequired':
 						return { message: formatMessage('errorCodes.fieldRequired') }
 					default:
 						return error
 				}
-			}) ?? [],
-			...accessor.errors?.execution?.map((error): AccessorErrorMessage => {
-				switch (error.type) {
+			} else if (error.type === 'execution') {
+				switch (error.code) {
 					case 'UniqueConstraintViolation':
 						return { message: formatMessage('errorCodes.notUnique') }
 					default:
 						return { message: formatMessage('errorCodes.unknownExecutionError') }
 				}
-			}) ?? [],
-		]
+			}
+			assertNever(error)
+		}) ?? []
 	}, [formatMessage])
 }
 

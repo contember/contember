@@ -54,7 +54,7 @@ export class AccessorErrorManager {
 		})
 	}
 
-	public addError(state: StateNode, error: ErrorAccessor.BoxedError): () => void {
+	public addError(state: StateNode, error: ErrorAccessor.Error): () => void {
 		return this.eventManager.syncOperation(() => {
 			const errorId = this.getNewErrorId()
 
@@ -63,7 +63,7 @@ export class AccessorErrorManager {
 				this.errorsByState.set(state, (errorsById = new Map()))
 			}
 			errorsById.set(errorId, error)
-			state.errors = new ErrorAccessor(errorsById)
+			state.errors = new ErrorAccessor(Array.from(errorsById.values()))
 			this.eventManager.registerJustUpdated(state, EventManager.NO_CHANGES_DIFFERENCE)
 
 			return () =>
@@ -74,7 +74,7 @@ export class AccessorErrorManager {
 					}
 					errorsById.delete(errorId)
 					if (errorsById.size) {
-						state.errors = new ErrorAccessor(errorsById)
+						state.errors = new ErrorAccessor(Array.from(errorsById.values()))
 					} else {
 						state.errors = undefined
 						this.errorsByState.delete(state)
@@ -87,12 +87,12 @@ export class AccessorErrorManager {
 	private addSeveralErrors(state: StateNode, errors: ErrorsPreprocessor.BaseErrorNode) {
 		if (errors.validation) {
 			for (const error of errors.validation) {
-				this.addError(state, { type: 'validation', error })
+				this.addError(state, error)
 			}
 		}
 		if (errors.execution) {
 			for (const error of errors.execution) {
-				this.addError(state, { type: 'execution', error })
+				this.addError(state, error)
 			}
 		}
 	}

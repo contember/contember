@@ -5,5 +5,5 @@ export interface FieldError {
 export type FieldErrors =
 	| FieldError[]
 	| {
-			validation: [FieldError, ...FieldError[]] | undefined
+			validation: FieldError[] | undefined
 	  }

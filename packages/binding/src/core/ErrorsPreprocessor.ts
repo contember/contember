@@ -42,8 +42,8 @@ class ErrorsPreprocessor {
 					treeRoot.set(subTreePlaceholder, {
 						nodeType: 'iNode',
 						children: new Map([[entityId, processedResponse]]),
-						validation: undefined,
-						execution: undefined,
+						validation: [],
+						execution: [],
 					})
 				} else if (child.nodeType === 'iNode') {
 					child.children.set(entityId, processedResponse)
@@ -142,14 +142,8 @@ class ErrorsPreprocessor {
 				}
 			}
 			if (this.isExecutionError(error)) {
-				if (currentNode.execution === undefined) {
-					currentNode.execution = []
-				}
-				currentNode.execution.push({ type: error.type, developerMessage: error.message })
+				currentNode.execution.push({ type: 'execution', code: error.type, developerMessage: error.message })
 			} else {
-				if (currentNode.validation === undefined) {
-					currentNode.validation = []
-				}
 				currentNode.validation.push(this.createValidationError(error.message.text))
 			}
 		}
@@ -159,8 +153,8 @@ class ErrorsPreprocessor {
 
 	private getRootNode(error: ValidationError | ExecutionError, startIndex: number = 0): ErrorsPreprocessor.ErrorNode {
 		let rootNode: ErrorsPreprocessor.ErrorNode = {
-			validation: this.isExecutionError(error) ? undefined : [this.createValidationError(error.message.text)],
-			execution: this.isExecutionError(error) ? [{ type: error.type, developerMessage: error.message }] : undefined,
+			validation: this.isExecutionError(error) ? [] : [this.createValidationError(error.message.text)],
+			execution: this.isExecutionError(error) ? [{ type: 'execution', code: error.type, developerMessage: error.message }] : [],
 			nodeType: 'leaf',
 		}
 
@@ -168,8 +162,8 @@ class ErrorsPreprocessor {
 			const pathNode = error.path[i]
 			if (pathNode.__typename === '_FieldPathFragment') {
 				rootNode = {
-					validation: undefined,
-					execution: undefined,
+					validation: [],
+					execution: [],
 					nodeType: 'iNode',
 					children: new Map([[pathNode.field, rootNode]]),
 				}
@@ -183,8 +177,8 @@ class ErrorsPreprocessor {
 				}
 
 				rootNode = {
-					validation: undefined,
-					execution: undefined,
+					validation: [],
+					execution: [],
 					nodeType: 'iNode',
 					children: new Map([[MutationAlias.decodeEntityId(alias), rootNode]]),
 				}
@@ -196,17 +190,18 @@ class ErrorsPreprocessor {
 		return rootNode
 	}
 
-	private createValidationError(message: string): ErrorAccessor.SugaredValidationError {
+	private createValidationError(message: string): ErrorAccessor.ValidationError {
 		if (message === 'Field is required') {
 			// TODO this is just awful. Validation errors currently don't have error codes which makes it more difficult
 			// 	to translate the error messages. This is the most common such error, and so we just make up a code
 			// 	in order to facilitate error handling further downstream.
 			return {
+				type: 'validation',
 				code: 'fieldRequired',
 				message,
 			}
 		}
-		return { message }
+		return { type: 'validation', message, code: undefined }
 	}
 
 	private isExecutionError(error: ValidationError | ExecutionError): error is ExecutionError {
@@ -222,8 +217,8 @@ class ErrorsPreprocessor {
 
 namespace ErrorsPreprocessor {
 	export interface BaseErrorNode {
-		validation: ErrorAccessor.SugaredValidationError[] | undefined
-		execution: ErrorAccessor.SugaredExecutionError[] | undefined
+		validation: ErrorAccessor.ValidationError[]
+		execution: ErrorAccessor.ExecutionError[]
 	}
 
 	export interface LeafErrorNode extends BaseErrorNode {

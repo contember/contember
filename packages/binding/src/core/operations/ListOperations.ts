@@ -22,8 +22,8 @@ export class ListOperations {
 		private readonly treeStore: TreeStore,
 	) {}
 
-	public addError(listState: EntityListState, error: ErrorAccessor.SugaredValidationError): () => void {
-		return this.accessorErrorManager.addError(listState, { type: 'validation', error })
+	public addError(listState: EntityListState, error: ErrorAccessor.Error): () => void {
+		return this.accessorErrorManager.addError(listState, error)
 	}
 
 	public addEventListener<Type extends keyof EntityListAccessor.RuntimeEntityListEventListenerMap>(

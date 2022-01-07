@@ -13,8 +13,8 @@ export type AccessorErrorMessages = [AccessorErrorMessage, ...AccessorErrorMessa
 
 export const useAccessorErrorFormatter = () => {
 	const formatMessage = useMessageFormatter(errorCodeDictionary)
-	return useCallback((accessor: AccessorErrorsHolder): AccessorErrorMessage[] => {
-		return accessor.errors?.errors.map((error): AccessorErrorMessage => {
+	return useCallback((errors: ErrorAccessor.Error[]): AccessorErrorMessage[] => {
+		return errors.map((error): AccessorErrorMessage => {
 			if (error.type === 'validation') {
 				switch (error.code) {
 					case 'fieldRequired':
@@ -31,13 +31,13 @@ export const useAccessorErrorFormatter = () => {
 				}
 			}
 			assertNever(error)
-		}) ?? []
+		})
 	}, [formatMessage])
 }
 
 export const useAccessorErrors = (accessor: AccessorErrorsHolder): AccessorErrorMessages | undefined => {
 	const errorFormatter = useAccessorErrorFormatter()
-	const errors = useMemo(() => errorFormatter(accessor), [accessor, errorFormatter])
+	const errors = useMemo(() => errorFormatter(accessor.errors?.errors ?? []), [accessor, errorFormatter])
 
 	return errors.length > 0 ? (errors as AccessorErrorMessages) : undefined
 }

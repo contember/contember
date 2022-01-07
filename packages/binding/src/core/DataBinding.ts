@@ -138,6 +138,7 @@ export class DataBinding {
 							}
 
 							throw {
+								errors: this.accessorErrorManager.getErrors(),
 								type: 'invalidInput',
 							}
 						}
@@ -221,6 +222,7 @@ export class DataBinding {
 								continue
 							}
 							throw {
+								errors: this.accessorErrorManager.getErrors(),
 								type: 'invalidInput',
 							}
 						}

@@ -46,7 +46,11 @@ export const BareUploadField = Component<BareUploadFieldProps>(
 			[environment, extractorEntity, fileKind?.extractors],
 		)
 		const errors = useMemo(
-			() => [parentWithBase, ...(parentWithBase === extractorEntity ? [] : [extractorEntity]), ...extractorsErrors].flatMap(it => errorFormatter(it)),
+			() => [
+				parentWithBase,
+				...(parentWithBase === extractorEntity ? [] : [extractorEntity]),
+				...extractorsErrors,
+			].flatMap(it => errorFormatter(it.errors?.errors ?? [])),
 			[errorFormatter, extractorEntity, extractorsErrors, parentWithBase],
 		)
 

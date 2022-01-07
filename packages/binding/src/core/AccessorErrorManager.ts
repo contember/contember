@@ -20,6 +20,10 @@ export class AccessorErrorManager {
 		return !!this.errorsByState.size
 	}
 
+	public getErrors(): ErrorAccessor.Error[] {
+		return Array.from(this.errorsByState.values(), it => Array.from(it.values())).flat()
+	}
+
 	public clearErrors() {
 		this.eventManager.syncOperation(() => {
 			for (const [stateNode] of this.errorsByState) {

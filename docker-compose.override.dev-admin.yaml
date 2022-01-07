@@ -2,18 +2,20 @@ version: '3'
 
 services:
   sandbox_vite:
-    user: '1000:1000'
-    ports: ['3000:3000']
+    image: 'alpine'
+    command: ['sleep', 'infinity']
 
   admin_server:
-    user: '1000:1000'
-    ports: ['3006:4000']
+    image: 'alpine'
+    command: ['sleep', 'infinity']
 
   admin_server_esbuild:
-    user: '1000:1000'
+    image: 'alpine'
+    command: ['sleep', 'infinity']
 
   admin_server_vite:
-    user: '1000:1000'
+    image: 'alpine'
+    command: ['sleep', 'infinity']
 
   api:
     ports: ['3001:4000']

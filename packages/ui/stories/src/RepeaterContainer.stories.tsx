@@ -1,7 +1,7 @@
 import type { ComponentMeta, ComponentStory } from '@storybook/react'
 import * as React from 'react'
 import { Button, Icon, RepeaterContainer, Size } from '../../src'
-import { disabledControlsForAttributes, enumControl, stringControl } from './Helpers'
+import { Block, disabledControlsForAttributes, enumControl, stringControl } from './Helpers'
 
 const sizes: Size[] = ['default', 'small', 'large']
 
@@ -21,8 +21,11 @@ export const Defaut = Template.bind({})
 
 Defaut.args = {
 	children: <>
-		<div>{'[input component]'}</div>
-		<div>{'[input component]'}</div>
+		<Block />
+		<Block />
+		<Block />
+		<Block />
+		<Block />
 	</>,
 	actions: <Button
 		distinction="seamless"

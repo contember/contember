@@ -1,9 +1,9 @@
 import { memo, MouseEvent as ReactMouseEvent, ReactNode } from 'react'
-import { Box } from '..'
 import { useClassNamePrefix } from '../../auxiliary'
 import { Dropdown } from '../Dropdown'
 import { Button, ButtonOwnProps } from '../Forms'
 import { Icon, IconProps } from '../Icon'
+import { Box } from '../Box'
 
 export interface ActionableBoxProps {
 	editContents?: ReactNode

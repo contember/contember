@@ -2,11 +2,11 @@ import cn from 'classnames'
 import { memo, ReactNode, useRef } from 'react'
 import { mergeProps, useCheckbox, useFocusRing, useHover, VisuallyHidden } from 'react-aria'
 import { useToggleState } from 'react-stately'
-import { FieldContainer } from '..'
 import { useClassNamePrefix } from '../../../auxiliary'
 import type { Size, ValidationState } from '../../../types'
 import { toEnumStateClass, toStateClass } from '../../../utils'
 import { CheckboxButton as DefaultCheckboxButton } from './CheckboxButton'
+import { FieldContainer } from '../FieldContainer'
 
 export interface CheckboxProps {
 	CheckboxButtonComponent?: typeof DefaultCheckboxButton

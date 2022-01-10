@@ -1,12 +1,12 @@
 import classNames from 'classnames'
 import { memo, ReactNode } from 'react'
-import { ErrorList, ErrorListProps } from '..'
 import { useClassNamePrefix } from '../../../auxiliary'
 import type { Size } from '../../../types'
 import { toEnumViewClass } from '../../../utils'
 import { Description } from '../../Typography/Description'
 import { Label } from '../../Typography/Label'
 import type { FieldContainerLabelPosition } from './Types'
+import { ErrorList, ErrorListProps } from '../ErrorList'
 
 export interface FieldContainerProps extends ErrorListProps {
 	label: ReactNode

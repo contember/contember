@@ -1,13 +1,13 @@
 import classnames from 'classnames'
 import { memo, ReactNode, useContext, useRef } from 'react'
 import { useFocusRing, useHover, useRadio, VisuallyHidden } from 'react-aria'
-import { FieldContainer } from '..'
 import { useClassNamePrefix } from '../../../auxiliary'
 import { Size, ValidationState } from '../../../types'
 import { toEnumStateClass, toStateClass } from '../../../utils'
 import { RadioButton as DefaultRadioButton } from './RadioButton'
 import { RadioContext } from './RadioContext'
 import type { RadioOption } from './types'
+import { FieldContainer } from '../FieldContainer'
 
 interface RadioProps {
 	RadioButtonComponent?: typeof DefaultRadioButton

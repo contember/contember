@@ -10,6 +10,7 @@ const entity: Model.Entity = {
 	tableName: 'foo',
 	fields: {},
 	unique: {},
+	eventLog: { enabled: true },
 }
 
 describe('order by helper', () => {

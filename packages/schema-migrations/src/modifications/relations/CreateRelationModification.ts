@@ -13,6 +13,7 @@ import { isIt } from '../../utils/isIt'
 import { createFields } from '../utils/diffUtils'
 import { getPrimaryColumnType } from '../utils/getPrimaryColumnType'
 import { createJunctionTableSql } from '../utils/createJunctionTable'
+import { normalizeManyHasManyRelation, PartialManyHasManyRelation } from './normalization'
 
 
 export const CreateRelationModification: ModificationHandlerStatic<CreateRelationModificationData> = class {
@@ -53,7 +54,7 @@ export const CreateRelationModification: ModificationHandlerStatic<CreateRelatio
 				deferred: false,
 			})
 		}
-		acceptRelationTypeVisitor(this.schema.model, entity, this.data.owningSide, {
+		acceptRelationTypeVisitor(this.schema.model, entity, this.getNormalizedOwningSide(), {
 			visitManyHasOne: ({}, relation, {}, _) => {
 				createOwningSide(relation)
 				builder.addIndex(entity.tableName, relation.joiningColumn.columnName)
@@ -74,7 +75,7 @@ export const CreateRelationModification: ModificationHandlerStatic<CreateRelatio
 
 	public getSchemaUpdater(): SchemaUpdater {
 		return updateModel(
-			updateEntity(this.data.entityName, addField(this.data.owningSide)),
+			updateEntity(this.data.entityName, addField(this.getNormalizedOwningSide())),
 			this.data.inverseSide !== undefined
 				? updateEntity(this.data.owningSide.target, addField(this.data.inverseSide))
 				: undefined,
@@ -112,10 +113,21 @@ export const CreateRelationModification: ModificationHandlerStatic<CreateRelatio
 			})
 		})
 	}
+
+	private getNormalizedOwningSide(): Model.AnyOwningRelation {
+		if (this.data.owningSide.type === Model.RelationType.ManyHasMany) {
+			return normalizeManyHasManyRelation(this.data.owningSide)
+		}
+		return this.data.owningSide
+	}
 }
 
-export interface CreateRelationModificationData {
+
+export type CreateRelationModificationData = {
 	entityName: string
-	owningSide: Model.AnyRelation & Model.OwningRelation
-	inverseSide?: Model.AnyRelation & Model.InverseRelation
+	owningSide:
+		| Model.ManyHasOneRelation
+		| Model.OneHasOneOwningRelation
+		| PartialManyHasManyRelation
+	inverseSide?: Model.AnyInverseRelation
 }

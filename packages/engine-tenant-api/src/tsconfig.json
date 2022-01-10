@@ -28,6 +28,9 @@
 		},
 		{
 			"path": "../../graphql-utils/src"
+		},
+		{
+			"path": "../../schema-utils/src"
 		}
 	]
 }

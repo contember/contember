@@ -40,6 +40,9 @@ export default class SchemaBuilderInternal {
 			unique: this.createUnique(name, options, fieldOptions),
 			fields: {},
 			tableName: options.tableName || this.conventions.getTableName(name),
+			eventLog: {
+				enabled: true,
+			},
 		}
 	}
 

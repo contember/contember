@@ -9,7 +9,7 @@ export class ManyHasManyDefinitionImpl extends FieldDefinition<ManyHasManyDefini
 		return this.withOption('inversedBy', inversedBy)
 	}
 
-	joiningTable(joiningTable: Model.JoiningTable): Interface<ManyHasManyDefinition> {
+	joiningTable(joiningTable: Partial<Model.JoiningTable>): Interface<ManyHasManyDefinition> {
 		return this.withOption('joiningTable', joiningTable)
 	}
 
@@ -23,19 +23,18 @@ export class ManyHasManyDefinitionImpl extends FieldDefinition<ManyHasManyDefini
 
 	createField({ name, conventions, entityName, entityRegistry }: CreateFieldContext): Model.AnyField {
 		const options = this.options
-		let joiningTable: Model.JoiningTable | undefined = options.joiningTable
-		if (!joiningTable) {
-			const columnNames = conventions.getJoiningTableColumnNames(
-				entityName,
-				name,
-				entityRegistry.getName(options.target),
-				options.inversedBy,
-			)
-			joiningTable = {
-				tableName: conventions.getJoiningTableName(entityName, name),
-				joiningColumn: { columnName: columnNames[0], onDelete: Model.OnDelete.cascade },
-				inverseJoiningColumn: { columnName: columnNames[1], onDelete: Model.OnDelete.cascade },
-			}
+		const columnNames = conventions.getJoiningTableColumnNames(
+			entityName,
+			name,
+			entityRegistry.getName(options.target),
+			options.inversedBy,
+		)
+		const joiningTable = {
+			tableName: conventions.getJoiningTableName(entityName, name),
+			joiningColumn: { columnName: columnNames[0], onDelete: Model.OnDelete.cascade },
+			inverseJoiningColumn: { columnName: columnNames[1], onDelete: Model.OnDelete.cascade },
+			eventLog: { enabled: true },
+			...options.joiningTable,
 		}
 
 		return {
@@ -58,6 +57,6 @@ export function manyHasMany(target: EntityConstructor, inversedBy?: string): Man
 export type ManyHasManyDefinitionOptions = {
 	target: RelationTarget
 	inversedBy?: string
-	joiningTable?: Model.JoiningTable
+	joiningTable?: Partial<Model.JoiningTable>
 	orderBy?: Model.OrderBy[]
 }

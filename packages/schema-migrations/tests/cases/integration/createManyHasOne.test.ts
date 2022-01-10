@@ -33,6 +33,9 @@ testMigrations('create many has one relation (post with author)', {
 				primaryColumn: 'id',
 				tableName: 'post',
 				unique: {},
+				eventLog: {
+					enabled: true,
+				},
 			},
 		},
 		{

@@ -34,6 +34,9 @@ testMigrations('create one has many relation (post with locales)', {
 				primaryColumn: 'id',
 				tableName: 'post_locale',
 				unique: {},
+				eventLog: {
+					enabled: true,
+				},
 			},
 		},
 		{

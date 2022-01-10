@@ -7,6 +7,7 @@ import { updateRelations } from '../utils/diffUtils'
 import { UpdateFieldNameModification } from '../fields'
 import { createJunctionTableSql } from '../utils/createJunctionTable'
 import { wrapIdentifier } from '@contember/database'
+import { normalizeManyHasManyRelation, PartialManyHasManyRelation } from './normalization'
 
 export const ConvertOneHasManyToManyHasManyRelationModification: ModificationHandlerStatic<ConvertOneHasManyToManyHasManyRelationModificationData> = class {
 	static id = 'convertOneHasManyToManyHasManyRelation'
@@ -33,7 +34,7 @@ export const ConvertOneHasManyToManyHasManyRelationModification: ModificationHan
 		const { relation: oldRelation } = this.getRelation()
 		const entity = this.schema.model.entities[this.data.entityName]
 
-		createJunctionTableSql(builder, this.options.systemSchema, entity, targetEntity, this.data.owningSide)
+		createJunctionTableSql(builder, this.options.systemSchema, entity, targetEntity, normalizeManyHasManyRelation(this.data.owningSide))
 		const joiningTable = this.data.owningSide.joiningTable
 		builder.sql(`
 			INSERT INTO ${wrapIdentifier(joiningTable.tableName)} (
@@ -51,7 +52,7 @@ export const ConvertOneHasManyToManyHasManyRelationModification: ModificationHan
 		const { entityName } = this.data
 		return updateSchema(
 			this.subModification.getSchemaUpdater(),
-			updateModel(updateEntity(entityName, addField(this.data.owningSide))),
+			updateModel(updateEntity(entityName, addField(normalizeManyHasManyRelation(this.data.owningSide)))),
 			this.data.inverseSide ? updateModel(updateEntity(this.data.owningSide.target, addField(this.data.inverseSide))) : undefined,
 		)
 	}
@@ -104,6 +105,6 @@ export const ConvertOneHasManyToManyHasManyRelationModification: ModificationHan
 export interface ConvertOneHasManyToManyHasManyRelationModificationData {
 	entityName: string
 	fieldName: string
-	owningSide: Model.ManyHasManyOwningRelation
+	owningSide: PartialManyHasManyRelation
 	inverseSide?: Model.ManyHasManyInverseRelation
 }

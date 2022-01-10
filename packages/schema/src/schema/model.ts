@@ -1,6 +1,7 @@
 import Input from './input'
 
 namespace Model {
+
 	export type Entity = {
 		readonly name: string
 		readonly primary: string
@@ -9,11 +10,16 @@ namespace Model {
 		readonly fields: { readonly [name: string]: AnyField }
 		readonly unique: UniqueConstraints
 		readonly view?: View
+		readonly eventLog: EventLogConfig
 	}
 
 	export type View = {
 		readonly sql: string
 		readonly dependencies?: readonly string[]
+	}
+
+	export type EventLogConfig = {
+		readonly enabled: boolean
 	}
 
 	export type FieldType = RelationType | ColumnType
@@ -196,6 +202,7 @@ namespace Model {
 		readonly tableName: string
 		readonly joiningColumn: JoiningColumn
 		readonly inverseJoiningColumn: JoiningColumn
+		readonly eventLog: EventLogConfig
 	}
 
 	export type JoiningTableRelation = {

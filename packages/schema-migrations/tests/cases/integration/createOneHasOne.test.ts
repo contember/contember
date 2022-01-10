@@ -31,6 +31,9 @@ testMigrations('create one has one relation (site with settings)', {
 				primaryColumn: 'id',
 				tableName: 'site',
 				unique: {},
+				eventLog: {
+					enabled: true,
+				},
 			},
 		},
 		{
@@ -50,6 +53,9 @@ testMigrations('create one has one relation (site with settings)', {
 				primaryColumn: 'id',
 				tableName: 'site_setting',
 				unique: {},
+				eventLog: {
+					enabled: true,
+				},
 			},
 		},
 		{

@@ -8,6 +8,7 @@ import {
 	CreateEntityModification,
 	CreateViewModification,
 	RemoveEntityModification,
+	ToggleEventLogModification,
 	UpdateEntityNameModification,
 	UpdateEntityTableNameModification,
 } from './entities'
@@ -22,6 +23,7 @@ import {
 	EnableOrphanRemovalModification,
 	MakeRelationNotNullModification,
 	MakeRelationNullableModification,
+	ToggleJunctionEventLogModification,
 	UpdateRelationOnDeleteModification,
 	UpdateRelationOrderByModification,
 } from './relations'
@@ -71,6 +73,8 @@ namespace ModificationHandlerFactory {
 		UpdateValidationSchemaModification,
 		PatchValidationSchemaModification,
 		ConvertOneToManyRelationModification,
+		ToggleEventLogModification,
+		ToggleJunctionEventLogModification,
 		ConvertOneHasManyToManyHasManyRelationModification,
 	]
 

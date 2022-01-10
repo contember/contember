@@ -17,6 +17,7 @@ import {
 	CreateEntityModification,
 	CreateViewModification,
 	RemoveEntityModification,
+	ToggleEventLogModification,
 	UpdateEntityTableNameModification,
 } from './modifications/entities'
 import { CreateEnumModification, RemoveEnumModification, UpdateEnumModification } from './modifications/enums'
@@ -34,6 +35,7 @@ import {
 	EnableOrphanRemovalModification,
 	MakeRelationNotNullModification,
 	MakeRelationNullableModification,
+	ToggleJunctionEventLogModification,
 	UpdateRelationOnDeleteModification,
 	UpdateRelationOrderByModification,
 } from './modifications/relations'
@@ -68,6 +70,8 @@ export class SchemaDiffer {
 			CreateEnumModification.createDiff,
 
 			UpdateEntityTableNameModification.createDiff,
+			ToggleEventLogModification.createDiff,
+			ToggleJunctionEventLogModification.createDiff,
 			UpdateColumnDefinitionModification.createDiff,
 			UpdateColumnNameModification.createDiff,
 			UpdateRelationOnDeleteModification.createDiff,

@@ -7,6 +7,7 @@ import 'reflect-metadata'
 import { FieldDefinition } from './fieldDefinitions'
 
 export * from './fieldDefinitions'
+export * from './EventLogDefinition'
 export * from './EnumDefinition'
 export * from './UniqueDefinition'
 export * from './ViewDefinition'

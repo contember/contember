@@ -6,6 +6,7 @@ import {
 	OptionallyVariableStaticOption,
 	StaticSingleChoiceFieldProps,
 } from './StaticSingleChoiceField'
+import { useAccessorErrors } from '../../errors'
 
 export const useStaticSingleChoiceField = (
 	props: StaticSingleChoiceFieldProps,
@@ -33,16 +34,17 @@ export const useStaticSingleChoiceField = (
 		},
 		[field, options],
 	)
+	const errors = useAccessorErrors(field)
 	return useMemo<ChoiceFieldData.SingleChoiceFieldMetadata>(
 		() => ({
 			currentValue,
 			data,
 			onChange,
-			errors: field.errors,
+			errors,
 			environment,
 			isMutating,
 		}),
-		[currentValue, data, environment, field.errors, isMutating, onChange],
+		[currentValue, data, environment, errors, isMutating, onChange],
 	)
 }
 const normalizeOptions = (options: OptionallyVariableStaticOption[], environment: Environment) =>

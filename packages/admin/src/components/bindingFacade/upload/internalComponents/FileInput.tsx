@@ -1,5 +1,4 @@
-import type { ErrorAccessor } from '@contember/binding'
-import { Button, FieldContainer, FieldContainerProps, FileDropZone } from '@contember/ui'
+import { Button, FieldContainer, FieldContainerProps, FieldErrors, FileDropZone } from '@contember/ui'
 import type { ReactNode } from 'react'
 import type { DropzoneState } from 'react-dropzone'
 import type { MessageFormatter } from '../../../../i18n'
@@ -18,7 +17,7 @@ export interface FileInputPublicProps
 export interface FileInputProps extends FileInputPublicProps {
 	dropzoneState: DropzoneState
 	formatMessage: MessageFormatter<UploadDictionary>
-	errors: ErrorAccessor | undefined
+	errors: FieldErrors | undefined
 	children: ReactNode
 }
 

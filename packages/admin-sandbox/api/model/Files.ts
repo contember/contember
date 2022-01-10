@@ -1,10 +1,12 @@
-import { SchemaDefinition as d } from '@contember/schema-definition'
+import { SchemaDefinition as d, InputValidation as val } from '@contember/schema-definition'
 
 export class TrivialImage {
+	@val.required('required TrivialImage - url')
 	url = d.stringColumn()
 }
 
 export class BasicImage {
+	@val.required('required BasicImage - url')
 	url = d.stringColumn()
 
 	width = d.intColumn()
@@ -14,6 +16,7 @@ export class BasicImage {
 }
 
 export class ComplexImage {
+	@val.required('required ComplexImage - url')
 	url = d.stringColumn()
 
 	width = d.intColumn()
@@ -27,6 +30,7 @@ export class ComplexImage {
 }
 
 export class BasicVideo {
+	@val.required('required BasicVideo - url')
 	url = d.stringColumn()
 
 	width = d.intColumn()

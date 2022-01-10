@@ -1,32 +1,43 @@
-import type { EntityAccessor, EntityListAccessor, ErrorAccessor, FieldAccessor, FieldValue } from '@contember/binding'
+import type { ErrorAccessor } from '@contember/binding'
 import { useMessageFormatter } from '../../../i18n'
 import { errorCodeDictionary } from './errorCodeDictionary'
-import { useMemo } from 'react'
+import { useCallback, useMemo } from 'react'
+import { assertNever } from '../../../utils'
 
-export const useAccessorErrors = <Value extends FieldValue>(
-	accessor: FieldAccessor<Value> | EntityAccessor | EntityListAccessor,
-): ErrorAccessor.ValidationErrors | undefined => {
+export interface AccessorErrorsHolder {
+	readonly errors: ErrorAccessor | undefined
+}
+
+export interface AccessorErrorMessage { message: string }
+export type AccessorErrorMessages = [AccessorErrorMessage, ...AccessorErrorMessage[]]
+
+export const useAccessorErrorFormatter = () => {
 	const formatMessage = useMessageFormatter(errorCodeDictionary)
-	const errors = useMemo(() => {
-		return [
-			...accessor.errors?.validation?.map((error): ErrorAccessor.ValidationError => {
+	return useCallback((errors: ErrorAccessor.Error[]): AccessorErrorMessage[] => {
+		return errors.map((error): AccessorErrorMessage => {
+			if (error.type === 'validation') {
 				switch (error.code) {
 					case 'fieldRequired':
-						return { ...error, message: formatMessage('errorCodes.fieldRequired') }
+						return { message: formatMessage('errorCodes.fieldRequired') }
 					default:
 						return error
 				}
-			}) ?? [],
-			...accessor.errors?.execution?.map((error): ErrorAccessor.ValidationError => {
-				switch (error.type) {
+			} else if (error.type === 'execution') {
+				switch (error.code) {
 					case 'UniqueConstraintViolation':
-						return { ...error, code: error.type, message: formatMessage('errorCodes.notUnique') }
+						return { message: formatMessage('errorCodes.notUnique') }
 					default:
-						return { ...error, code: error.type, message: formatMessage('errorCodes.unknownExecutionError') }
+						return { message: formatMessage('errorCodes.unknownExecutionError') }
 				}
-			}) ?? [],
-		]
-	}, [accessor.errors?.execution, accessor.errors?.validation, formatMessage])
+			}
+			assertNever(error)
+		})
+	}, [formatMessage])
+}
 
-	return errors.length > 0 ? (errors as ErrorAccessor.ValidationErrors) : undefined
+export const useAccessorErrors = (accessor: AccessorErrorsHolder): AccessorErrorMessages | undefined => {
+	const errorFormatter = useAccessorErrorFormatter()
+	const errors = useMemo(() => errorFormatter(accessor.errors?.errors ?? []), [accessor, errorFormatter])
+
+	return errors.length > 0 ? (errors as AccessorErrorMessages) : undefined
 }

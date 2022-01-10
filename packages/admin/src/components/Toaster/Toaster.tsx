@@ -1,5 +1,5 @@
 import { Button, Icon, Intent, Message } from '@contember/ui'
-import { useContext } from 'react'
+import { ReactNode, useContext } from 'react'
 import { ToasterContext } from './ToasterContext'
 
 export type ToastType = 'success' | 'error' | 'warning' | 'info'
@@ -7,7 +7,7 @@ export type ToastId = string
 
 export interface ToastDefinition {
 	type: ToastType
-	message: string
+	message: ReactNode
 }
 
 export interface Toast extends ToastDefinition {

@@ -1,5 +1,6 @@
 import type { EntityAccessor, Environment, ErrorAccessor, FieldValue } from '@contember/binding'
 import type { ReactElement, ReactNode } from 'react'
+import { FieldErrors } from '@contember/ui'
 
 export namespace ChoiceFieldData {
 
@@ -21,7 +22,7 @@ export namespace ChoiceFieldData {
 
 	export interface BaseChoiceMetadata {
 		data: Data<DynamicValue | StaticValue>
-		errors: ErrorAccessor | undefined
+		errors: FieldErrors | undefined
 		environment: Environment
 		isMutating: boolean
 	}

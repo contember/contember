@@ -1,0 +1,117 @@
+{
+	"formatVersion": 3,
+	"modifications": [
+		{
+			"modification": "patchValidationSchema",
+			"patch": [
+				{
+					"op": "add",
+					"path": "/TrivialImage",
+					"value": {
+						"url": [
+							{
+								"validator": {
+									"operation": "defined",
+									"args": []
+								},
+								"message": {
+									"text": "required TrivialImage - url"
+								}
+							}
+						]
+					}
+				},
+				{
+					"op": "add",
+					"path": "/BasicImage",
+					"value": {
+						"url": [
+							{
+								"validator": {
+									"operation": "defined",
+									"args": []
+								},
+								"message": {
+									"text": "required BasicImage - url"
+								}
+							}
+						]
+					}
+				},
+				{
+					"op": "add",
+					"path": "/ComplexImage",
+					"value": {
+						"url": [
+							{
+								"validator": {
+									"operation": "defined",
+									"args": []
+								},
+								"message": {
+									"text": "required ComplexImage - url"
+								}
+							}
+						]
+					}
+				},
+				{
+					"op": "add",
+					"path": "/BasicVideo",
+					"value": {
+						"url": [
+							{
+								"validator": {
+									"operation": "defined",
+									"args": []
+								},
+								"message": {
+									"text": "required BasicVideo - url"
+								}
+							}
+						]
+					}
+				},
+				{
+					"op": "add",
+					"path": "/UploadShowcase",
+					"value": {
+						"singleTrivialImage": [
+							{
+								"validator": {
+									"operation": "defined",
+									"args": []
+								},
+								"message": {
+									"text": "required UploadShowcase - singleTrivialImage"
+								}
+							}
+						],
+						"singleBasicImage": [
+							{
+								"validator": {
+									"operation": "defined",
+									"args": []
+								},
+								"message": {
+									"text": "required UploadShowcase - singleBasicImage"
+								}
+							}
+						],
+						"discriminatedAttachment": [
+							{
+								"validator": {
+									"operation": "defined",
+									"args": []
+								},
+								"message": {
+									"text": "required UploadShowcase - discriminatedAttachment"
+								}
+							}
+						]
+					}
+				}
+			]
+		}
+	]
+}

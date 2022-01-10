@@ -1,5 +1,6 @@
 import type { EntityAccessor, Environment } from '@contember/binding'
 import type { ReactNode } from 'react'
+import { AccessorErrorsHolder } from '../../errors'
 
 export interface FileDataExtractorPopulateFieldsOptions<
 	ExtractedData = unknown,
@@ -28,6 +29,11 @@ export interface FileDataExtractorDestroyOptions {
 	entity: EntityAccessor
 }
 
+export interface FileDataExtractorGetErrorsOptions {
+	entity: EntityAccessor
+	environment: Environment
+}
+
 export interface FileDataExtractor<ExtractedData = unknown, UploadResult = unknown, AcceptArtifacts = unknown> {
 	staticRender: (options: FileDataExtractorStaticRenderOptions) => ReactNode
 	extractFileData?: (options: FileDataExtractorExtractFileDataOptions<AcceptArtifacts>) => Promise<ExtractedData> | null
@@ -35,4 +41,5 @@ export interface FileDataExtractor<ExtractedData = unknown, UploadResult = unkno
 		options: FileDataExtractorPopulateFieldsOptions<ExtractedData, UploadResult, AcceptArtifacts>,
 	) => void
 	destroy?: (options: FileDataExtractorDestroyOptions) => void
+	getErrorsHolders?: (options: FileDataExtractorGetErrorsOptions) => AccessorErrorsHolder[]
 }

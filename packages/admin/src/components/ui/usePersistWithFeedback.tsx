@@ -3,6 +3,7 @@ import { useCallback } from 'react'
 import { useMessageFormatter } from '../../i18n'
 import { persistFeedbackDictionary } from './persistFeedbackDictionary'
 import { useShowToast } from '../Toaster'
+import { useAccessorErrorFormatter } from '../bindingFacade/errors'
 
 export interface PersistWithFeedbackOptions extends PersistOptions {
 	successMessage?: string
@@ -27,6 +28,7 @@ export const usePersistWithFeedback = ({
 	const persistAll = usePersist()
 	const showToast = useShowToast()
 	const formatMessage = useMessageFormatter(persistFeedbackDictionary)
+	const errorFormatter = useAccessorErrorFormatter()
 
 	return useCallback((): Promise<SuccessfulPersistResult> => {
 		return persistAll(persistOptions)
@@ -52,25 +54,29 @@ export const usePersistWithFeedback = ({
 			})
 			.catch((result: ErrorPersistResult) => {
 				console.debug('persist error', result)
-				showToast(
-					{
-						type: 'error',
-						message: formatMessage(errorMessage, 'persistFeedback.errorMessage'),
-						dismiss: errorDuration ?? true,
-					},
-				)
+				if (result.type === 'invalidInput' && result.errors.length) {
+					showToast(
+						{
+							type: 'error',
+							message: <>
+								{formatMessage(errorMessage, 'persistFeedback.errorMessage')}
+								<ul>
+									{errorFormatter(result.errors).map(it => <li>{it.message}</li>)}
+								</ul>
+							</>,
+							dismiss: errorDuration ?? true,
+						},
+					)
+				} else {
+					showToast(
+						{
+							type: 'error',
+							message: formatMessage(errorMessage, 'persistFeedback.errorMessage'),
+							dismiss: errorDuration ?? true,
+						},
+					)
+				}
 				return Promise.reject(result)
 			})
-	}, [
-		persistAll,
-		persistOptions,
-		showToast,
-		formatMessage,
-		successMessage,
-		successDuration,
-		errorMessage,
-		errorDuration,
-		afterPersistErrorDuration,
-		afterPersistErrorMessage,
-	])
+	}, [persistAll, persistOptions, showToast, formatMessage, successMessage, successDuration, afterPersistErrorMessage, afterPersistErrorDuration, errorFormatter, errorMessage, errorDuration])
 }

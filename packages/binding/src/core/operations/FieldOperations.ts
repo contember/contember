@@ -20,8 +20,8 @@ export class FieldOperations {
 		private readonly treeStore: TreeStore,
 	) {}
 
-	public addError(fieldState: FieldState<any>, error: ErrorAccessor.SugaredValidationError): () => void {
-		return this.accessorErrorManager.addError(fieldState, { type: 'validation', error })
+	public addError(fieldState: FieldState<any>, error: ErrorAccessor.Error): () => void {
+		return this.accessorErrorManager.addError(fieldState, error)
 	}
 
 	public clearErrors(fieldState: FieldState<any>): void {

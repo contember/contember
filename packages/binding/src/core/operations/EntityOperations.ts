@@ -23,8 +23,8 @@ export class EntityOperations {
 		private readonly treeStore: TreeStore,
 	) {}
 
-	public addError(entityRealm: EntityRealmState, error: ErrorAccessor.SugaredValidationError): () => void {
-		return this.accessorErrorManager.addError(entityRealm, { type: 'validation', error })
+	public addError(entityRealm: EntityRealmState, error: ErrorAccessor.Error): () => void {
+		return this.accessorErrorManager.addError(entityRealm, error)
 	}
 
 	public addEventListener<Type extends keyof EntityAccessor.RuntimeEntityEventListenerMap>(

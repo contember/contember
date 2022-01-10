@@ -2,8 +2,4 @@ export interface FieldError {
 	message: string
 }
 
-export type FieldErrors =
-	| FieldError[]
-	| {
-			validation: [FieldError, ...FieldError[]] | undefined
-	  }
+export type FieldErrors = FieldError[]

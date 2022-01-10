@@ -1,4 +1,5 @@
 import type { RequestError } from './RequestError'
+import { ErrorAccessor } from '../accessors'
 
 export interface NothingToPersistPersistResult {
 	type: 'nothingToPersist'
@@ -12,6 +13,7 @@ export interface JustSuccessPersistResult {
 
 export interface InvalidInputPersistResult {
 	type: 'invalidInput'
+	errors: ErrorAccessor.Error[]
 }
 
 export interface GivenUpPersistResult {

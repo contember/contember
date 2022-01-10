@@ -1,5 +1,5 @@
-import { Component, ErrorAccessor } from '@contember/binding'
-import { FieldContainer, FieldContainerProps } from '@contember/ui'
+import { Component } from '@contember/binding'
+import { FieldContainer, FieldContainerProps, FieldErrors } from '@contember/ui'
 import { FunctionComponent, memo } from 'react'
 import type { Props as SelectProps } from 'react-select'
 import AsyncSelect from 'react-select/async'
@@ -47,7 +47,7 @@ export interface MultiSelectFieldInnerPublicProps extends Omit<FieldContainerPro
 export interface MultiSelectFieldInnerProps
 	extends ChoiceFieldData.MultipleChoiceFieldMetadata,
 		MultiSelectFieldInnerPublicProps {
-	errors: ErrorAccessor | undefined
+	errors: FieldErrors | undefined
 }
 
 export const MultiSelectFieldInner = memo(
@@ -67,7 +67,7 @@ export const MultiSelectFieldInner = memo(
 			reactSelectProps,
 			placeholder,
 			data,
-			isInvalid: (errors?.validation?.length ?? 0) > 0,
+			isInvalid: (errors?.length ?? 0) > 0,
 		})
 		return (
 			<FieldContainer

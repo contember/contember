@@ -8,6 +8,7 @@ import { uploadDictionary } from '../uploadDictionary'
 import { FileInput, FileInputPublicProps } from './FileInput'
 import { SingleFilePreview } from './SingleFilePreview'
 import { useNormalizedUploadState } from './useNormalizedUploadState'
+import { useAccessorErrors } from '../../errors'
 
 export interface BareFileRepeaterContainerPrivateProps {
 	fileKinds: ResolvedFileKinds
@@ -57,6 +58,7 @@ export const BareFileRepeaterContainer: FunctionComponent<BareFileRepeaterContai
 		},
 		[getEntityByKey, removeFile],
 	)
+	const errors = useAccessorErrors(accessor)
 
 	const previews: ReactNode[] = []
 	for (const [i, entity] of entities.entries()) {
@@ -93,7 +95,7 @@ export const BareFileRepeaterContainer: FunctionComponent<BareFileRepeaterContai
 			label={label}
 			dropzoneState={dropzoneState}
 			formatMessage={formatMessage}
-			errors={accessor.errors}
+			errors={errors}
 			children={isEmpty && !previews.length ? undefined : previews}
 		/>
 	)

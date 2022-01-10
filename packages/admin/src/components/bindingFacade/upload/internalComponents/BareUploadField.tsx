@@ -1,13 +1,14 @@
-import { Component, EntityAccessor, HasOne, SugaredField, useEntity } from '@contember/binding'
-import { Fragment, useCallback, useState } from 'react'
+import { Component, EntityAccessor, HasOne, SugaredField, useEntity, useEnvironment } from '@contember/binding'
+import { Fragment, useCallback, useMemo, useState } from 'react'
 import { useMessageFormatter } from '../../../../i18n'
 import type { ResolvedFileKinds } from '../ResolvedFileKinds'
 import { uploadDictionary } from '../uploadDictionary'
-import { hasUploadedFile, staticRenderFileKind } from '../utils'
+import { getEntityFileKind, hasUploadedFile, staticRenderFileKind } from '../utils'
 import type { FileInputPublicProps } from './FileInput'
 import { FileInput } from './FileInput'
 import { SingleFilePreview } from './SingleFilePreview'
 import { useNormalizedUploadState } from './useNormalizedUploadState'
+import { useAccessorErrorFormatter } from '../../errors'
 
 export interface BareUploadFieldProps extends FileInputPublicProps {
 	fileKinds: ResolvedFileKinds
@@ -35,6 +36,24 @@ export const BareUploadField = Component<BareUploadFieldProps>(
 			fileKinds.isDiscriminated && fileKinds.baseEntity !== undefined
 				? parentEntity.getEntity(fileKinds.baseEntity)
 				: parentEntity
+
+		const environment = useEnvironment()
+		const errorFormatter = useAccessorErrorFormatter()
+		const fileKind = getEntityFileKind(fileKinds, parentWithBase.getAccessor)
+		const extractorEntity = fileKind?.baseEntity ? parentWithBase.getEntity(fileKind.baseEntity) : parentWithBase
+		const extractorsErrors = useMemo(
+			() => fileKind?.extractors.flatMap(it => it.getErrorsHolders?.({ entity: extractorEntity, environment }) ?? []) ?? [],
+			[environment, extractorEntity, fileKind?.extractors],
+		)
+		const errors = useMemo(
+			() => [
+				parentWithBase,
+				...(parentWithBase === extractorEntity ? [] : [extractorEntity]),
+				...extractorsErrors,
+			].flatMap(it => errorFormatter(it.errors?.errors ?? [])),
+			[errorFormatter, extractorEntity, extractorsErrors, parentWithBase],
+		)
+
 		const children =
 			hasUploadedFile(fileKinds, parentWithBase) || fileUploadState !== undefined ? (
 				<div className="fileInput-preview">
@@ -54,7 +73,7 @@ export const BareUploadField = Component<BareUploadFieldProps>(
 				{...fileInputProps}
 				dropzoneState={dropzoneState}
 				formatMessage={formatMessage}
-				errors={parentWithBase.errors}
+				errors={errors}
 				children={children}
 			/>
 		)

@@ -32,6 +32,8 @@
 	--cui-edge-offset-left: var(--cui-edge-offset-horizontal)
 	--cui-edge-offset-right: var(--cui-edge-offset-horizontal)
 
+	--cui-field-container-min-width: 100%
+
 	@media (min-width: $breakpoint-min-small)
 		--cui-gap-horizontal: #{em(5px)}
 		--cui-padding-horizontal: calc(var(--cui-gap-horizontal) * 4)
@@ -39,9 +41,11 @@
 	@media (min-width: $breakpoint-min-medium)
 		--cui-padding-horizontal: calc(var(--cui-gap-horizontal) * 5)
 		--cui-edge-offset-horizontal: calc(var(--cui-gap-horizontal) * 2)
+		--cui-field-container-min-width: 20em
 	@media (min-width: $breakpoint-min-large)
 		--cui-gap-horizontal: #{em(6px)}
 		--cui-edge-offset-horizontal: calc(var(--cui-gap-horizontal) * 3)
+		--cui-field-container-min-width: 25em
 	@media (min-width: $breakpoint-min-xlarge)
 		--cui-padding-horizontal: calc(var(--cui-gap-horizontal) * 6)
 		--cui-edge-offset-horizontal: calc(var(--cui-gap-horizontal) * 4)

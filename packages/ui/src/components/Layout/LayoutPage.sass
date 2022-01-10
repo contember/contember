@@ -22,7 +22,8 @@
 		padding-bottom: var(--cui-layout-page-padding-bottom)
 		display: flex
 		flex-direction: row
-		flex-grow: 1
+		flex: 1
+		// TODO: Any non 'visible' value causes floating menu not to stick
 		overflow-x: auto
 		overflow-y: visible
 		&:not(:last-child)
@@ -36,27 +37,20 @@
 		background-color: var(--cui-background-color--above)
 		border-radius: unset
 		border-top: 1px solid var(--cui-color--lower)
-		margin-top: calc(-1 * var(--cui-control-border-width))
 		display: flex
 		flex-direction: column
+		margin-top: calc(-1 * var(--cui-control-border-width))
 		// TODO: Any non 'visible' value causes floating menu not to stick
-		overflow-x: auto
-		overflow-y: visible
-		padding-bottom: var(--cui-layout-section-padding-bottom)
-		padding-left: var(--cui-layout-page-padding-left)
-		padding-right: var(--cui-layout-page-padding-right)
-		padding-top: var(--cui-layout-section-padding-top)
-		width: auto
+		overflow: visible
 		&-title
 			margin: 0
-	@media (min-width: $breakpoint-min-medium)
-		// TODO: Fix layout issue: https://github.com/contember/private-issues/issues/21
-		[class$="container"] > [class$="control"]
-			min-width: 20em
+		&-content
+			padding-bottom: var(--cui-layout-section-padding-bottom)
+			padding-left: var(--cui-layout-page-padding-left)
+			padding-right: var(--cui-layout-page-padding-right)
+			padding-top: var(--cui-layout-section-padding-top)
+
 	@media (min-width: $breakpoint-min-large)
-		// TODO: Fix layout issue: https://github.com/contember/private-issues/issues/21
-		[class$="container"] > [class$="control"]
-			min-width: 25em
 		&-content-container
 			flex-grow: unset
 			margin-left: auto
@@ -73,18 +67,14 @@
 		&-aside
 			background-color: unset
 			border-top: unset
-			flex-shrink: 0
 			margin-top: unset
 			max-width: 50%
 			overflow-y: auto
-			padding-left: var(--cui-layout-section-padding-left)
 			position: sticky
 			top: 0
+			&-content
+				padding-left: var(--cui-layout-section-padding-left)
 
-			// React-select override
-			// TODO: Fix layout issue: https://github.com/contember/private-issues/issues/21
-			[class$="container"] > [class$="control"]
-				min-width: 28.5em
 
 @media (min-width: $breakpoint-min-xlarge)
 	html

@@ -40,7 +40,7 @@ function isElementFixed (element: HTMLDivElement) {
 }
 
 const Aside = memo(({ children }: { children: ReactNode }) => {
-	const prefix = useClassNamePrefix()
+	const componentClassName = `${useClassNamePrefix()}layout-page-aside`
 	const [registerTab, unregisterTab] = useSectionTabsRegistration()
 	const element = useRef<HTMLDivElement>(null)
 
@@ -68,8 +68,8 @@ const Aside = memo(({ children }: { children: ReactNode }) => {
 		}
 	})
 
-	return <div ref={element} id={metaTab.id} className={`${prefix}layout-page-aside`}>
-		<Stack gap="large" direction="vertical">
+	return <div ref={element} id={metaTab.id} className={componentClassName}>
+		<Stack gap="large" direction="vertical" className={`${componentClassName}-content`}>
 			{children}
 		</Stack>
 	</div>

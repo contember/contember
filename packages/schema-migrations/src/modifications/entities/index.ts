@@ -1,5 +1,5 @@
 export * from './CreateEntityModification'
+export * from './CreateViewModification'
 export * from './RemoveEntityModification'
 export * from './UpdateEntityNameModification'
 export * from './UpdateEntityTableNameModification'
-export * from './UpdateViewModification'

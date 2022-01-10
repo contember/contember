@@ -10,10 +10,11 @@ export const UpdateViewModification: ModificationHandlerStatic<UpdateViewModific
 
 	public createSql(builder: MigrationBuilder): void {
 		const entity = this.schema.model.entities[this.data.entityName]
-		builder.dropView(entity.tableName, { ifExists: true })
 		builder.createView(
 			entity.tableName,
-			{},
+			{
+				replace: true,
+			},
 			this.data.view.sql,
 		)
 	}
@@ -33,20 +34,6 @@ export const UpdateViewModification: ModificationHandlerStatic<UpdateViewModific
 
 	static createModification(data: UpdateViewModificationData) {
 		return { modification: this.id, ...data }
-	}
-
-	static createDiff(originalSchema: Schema, updatedSchema: Schema) {
-		return Object.values(updatedSchema.model.entities)
-			.filter((it): it is Model.Entity & Required<Pick<Model.Entity, 'view'>> => {
-				const origView = originalSchema.model.entities[it.name]?.view
-				return !!it.view?.sql && !!origView && origView?.sql !== it.view.sql
-			})
-			.map(it =>
-				UpdateViewModification.createModification({
-					entityName: it.name,
-					view: it.view,
-				}),
-			)
 	}
 }
 

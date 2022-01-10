@@ -16,9 +16,9 @@ import { CreateUniqueConstraintModification, RemoveUniqueConstraintModification 
 import { RemoveFieldModification } from './modifications/fields'
 import {
 	CreateEntityModification,
+	CreateViewModification,
 	RemoveEntityModification,
 	UpdateEntityTableNameModification,
-	UpdateViewModification,
 } from './modifications/entities'
 import { CreateEnumModification, RemoveEnumModification, UpdateEnumModification } from './modifications/enums'
 import {
@@ -41,7 +41,7 @@ import { PatchAclSchemaModification, UpdateAclSchemaModification } from './modif
 import { PatchValidationSchemaModification, UpdateValidationSchemaModification } from './modifications/validation'
 import { CreateDiff, Differ } from './modifications/ModificationHandler'
 import { isDefined } from './utils/isDefined'
-import { ChangeViewNonViewDiffer, RemoveChangedFieldDiffer } from './modifications/differs'
+import { ChangeViewNonViewDiffer, RemoveChangedFieldDiffer, RemoveChangedViewDiffer } from './modifications/differs'
 
 export class SchemaDiffer {
 	constructor(private readonly schemaMigrator: SchemaMigrator) {}
@@ -60,11 +60,12 @@ export class SchemaDiffer {
 			ConvertOneToManyRelationModification.createDiff,
 
 			RemoveUniqueConstraintModification.createDiff,
+			new ChangeViewNonViewDiffer().createDiff,
+			new RemoveChangedViewDiffer().createDiff,
 			RemoveEntityModification.createDiff,
 			RemoveFieldModification.createDiff,
 			CreateEnumModification.createDiff,
 
-			UpdateViewModification.createDiff,
 			UpdateEntityTableNameModification.createDiff,
 			UpdateColumnDefinitionModification.createDiff,
 			UpdateColumnNameModification.createDiff,
@@ -78,11 +79,12 @@ export class SchemaDiffer {
 
 			new RemoveChangedFieldDiffer(it => !isRelation(it) || isOwningRelation(it)),
 			new RemoveChangedFieldDiffer(it => isRelation(it) && isInverseRelation(it)),
-			new ChangeViewNonViewDiffer().createDiff,
 			CreateEntityModification.createDiff,
 			CreateColumnModification.createDiff,
 			CreateRelationModification.createDiff,
 			CreateRelationInverseSideModification.createDiff,
+
+			CreateViewModification.createDiff,
 
 			CreateUniqueConstraintModification.createDiff,
 

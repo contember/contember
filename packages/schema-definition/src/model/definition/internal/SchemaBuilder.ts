@@ -55,7 +55,7 @@ export class SchemaBuilder {
 					}, {}),
 				tableName: this.conventions.getTableName(entityName),
 			}
-			return applyEntityExtensions(definition, entity, definitionInstance)
+			return applyEntityExtensions(definition, { entity,  definition: definitionInstance, registry: this.entityRegistry })
 		})
 
 		return {

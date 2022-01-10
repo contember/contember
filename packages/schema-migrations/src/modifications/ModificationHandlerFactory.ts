@@ -6,10 +6,10 @@ import { PatchAclSchemaModification, UpdateAclSchemaModification } from './acl'
 import { CreateUniqueConstraintModification, RemoveUniqueConstraintModification } from './constraints'
 import {
 	CreateEntityModification,
+	CreateViewModification,
 	RemoveEntityModification,
 	UpdateEntityNameModification,
 	UpdateEntityTableNameModification,
-	UpdateViewModification,
 } from './entities'
 import { CreateEnumModification, RemoveEnumModification, UpdateEnumModification } from './enums'
 import { RemoveFieldModification, UpdateFieldNameModification } from './fields'
@@ -24,6 +24,7 @@ import {
 	UpdateRelationOnDeleteModification,
 	UpdateRelationOrderByModification,
 } from './relations'
+import { UpdateViewModification } from './entities/UpdateViewModification'
 
 class ModificationHandlerFactory {
 	constructor(private readonly map: Record<string, ModificationHandlerStatic<any>>) {}
@@ -52,6 +53,7 @@ namespace ModificationHandlerFactory {
 		UpdateEntityNameModification,
 		UpdateEntityTableNameModification,
 		UpdateViewModification,
+		CreateViewModification,
 		CreateEnumModification,
 		RemoveEnumModification,
 		UpdateEnumModification,

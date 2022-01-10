@@ -111,7 +111,7 @@ testMigrations('create a view', {
 	updatedSchema: def.createModel(ViewEntityUpdatedSchema),
 	diff: [
 		{
-			modification: 'createEntity',
+			modification: 'createView',
 			entity: {
 				fields: {
 					id: {
@@ -121,6 +121,13 @@ testMigrations('create a view', {
 						type: Model.ColumnType.Uuid,
 						columnType: 'uuid',
 					},
+					name: {
+						columnName: 'name',
+						name: 'name',
+						nullable: true,
+						type: Model.ColumnType.String,
+						columnType: 'text',
+					},
 				},
 				name: 'Author',
 				primary: 'id',
@@ -128,17 +135,6 @@ testMigrations('create a view', {
 				tableName: 'author',
 				unique: {},
 				view: { sql: "SELECT null as id, 'John' AS name" },
-			},
-		},
-		{
-			modification: 'createColumn',
-			entityName: 'Author',
-			field: {
-				columnName: 'name',
-				name: 'name',
-				nullable: true,
-				type: Model.ColumnType.String,
-				columnType: 'text',
 			},
 		},
 	],

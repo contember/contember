@@ -16,16 +16,17 @@
 		position: relative
 		z-index: 1
 	&-content
-		padding-top: var(--cui-layout-page-padding-top)
-		padding-left: var(--cui-layout-page-padding-left)
-		padding-right: var(--cui-layout-page-padding-right)
-		padding-bottom: var(--cui-layout-page-padding-bottom)
 		display: flex
 		flex-direction: row
 		flex: 1
 		// TODO: Any non 'visible' value causes floating menu not to stick
 		overflow-x: auto
 		overflow-y: visible
+		padding-top: var(--cui-layout-page-padding-top)
+		padding-left: var(--cui-layout-page-padding-left)
+		padding-right: var(--cui-layout-page-padding-right)
+		padding-bottom: var(--cui-layout-page-padding-bottom)
+		transition: border-color var(--cui-transition-duration)
 		&:not(:last-child)
 			padding-right: var(--cui-layout-section-padding-right)
 	&-content-container
@@ -40,7 +41,6 @@
 		display: flex
 		flex-direction: column
 		margin-top: calc(-1 * var(--cui-control-border-width))
-		// TODO: Any non 'visible' value causes floating menu not to stick
 		overflow: visible
 		&-title
 			margin: 0
@@ -63,12 +63,16 @@
 			flex-direction: row
 			overflow: hidden
 		&-content
+			border-right: 1px solid transparent
 			overflow-y: auto
+			&.is-overflowing
+				border-right-color: var(--cui-color--lower)
 		&-aside
 			background-color: unset
 			border-top: unset
 			margin-top: unset
 			max-width: 50%
+			// TODO: Any non 'visible' value causes floating menu not to stick
 			overflow-y: auto
 			position: sticky
 			top: 0

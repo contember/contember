@@ -1,7 +1,7 @@
 import classNames from 'classnames'
-import { memo, ReactNode, useLayoutEffect, useRef } from 'react'
+import { memo, ReactNode, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { useClassNamePrefix } from '../../auxiliary'
-import { toEnumClass, toThemeClass } from '../../utils'
+import { toEnumClass, toStateClass, toThemeClass } from '../../utils'
 import { SectionTabs, useSectionTabsRegistration } from '../SectionTabs'
 import { Stack } from '../Stack'
 import { TitleBar, TitleBarProps } from '../TitleBar'
@@ -10,8 +10,38 @@ import { ThemeScheme } from './Types'
 
 export const PageLayoutContent = ({ children }: { children: ReactNode }) => {
 	const prefix = useClassNamePrefix()
+	const [isOverflowing, setIsOverflowing] = useState(false)
+	const contentRef = useRef<HTMLDivElement>(null)
 
-	return <div className={`${prefix}layout-page-content`}>
+	useEffect(() => {
+		const contentRefCopy = contentRef.current
+		const listener = () => {
+			const offsetWidth = Math.floor(contentRefCopy?.offsetWidth ?? 0)
+			const scrollWidth = Math.floor(contentRefCopy?.scrollWidth ?? 0)
+			const scrollLeft = Math.floor(contentRefCopy?.scrollLeft ?? 0)
+			const scrollRight = scrollWidth - offsetWidth - scrollLeft
+
+			const nextIsOverflowing = offsetWidth < scrollWidth && scrollRight > 1
+
+			if (isOverflowing !== nextIsOverflowing) {
+				setIsOverflowing(nextIsOverflowing)
+			}
+		}
+
+		listener()
+		contentRefCopy?.addEventListener('scroll', listener, { passive: true })
+
+		return () => {
+			contentRefCopy?.removeEventListener('scroll', listener)
+		}
+	}, [contentRef, isOverflowing])
+
+	return <div
+		ref={contentRef}
+		className={classNames(
+			`${prefix}layout-page-content`,
+			toStateClass('overflowing', isOverflowing),
+		)}>
 		<div className={`${prefix}layout-page-content-container`}>
 			{children}
 		</div>

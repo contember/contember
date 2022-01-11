@@ -1,48 +1,42 @@
 import {
 	AnchorButton,
 	CreatePage,
-	DataBindingProvider,
-	DataGrid,
+	DataGridPage,
 	DeleteEntityButton,
 	EditPage,
-	FeedbackRenderer,
+	EnumCell,
 	GenericCell,
-	GenericPage,
 	HasManySelectCell,
 	HasOneSelectCell,
-	MultiSelectField,
 	LinkButton,
-	PageLinkById,
+	MultiSelectField,
 	SelectField,
+	SlugField,
 	TextCell,
 	TextField,
-	TitleBar, SlugField, EnumCell,
 } from '@contember/admin'
 
 
 export const ArticleListPage = (
-	<GenericPage pageName="articleList">
-		<TitleBar actions={<LinkButton to="articleCreate">Add article</LinkButton>}>Articles</TitleBar>
-
-		<DataBindingProvider stateComponent={FeedbackRenderer}>
-			<DataGrid entities="Article" itemsPerPage={20}>
-				<TextCell field="title" header="Title" />
-				<TextCell field="content" header="Content" />
-				<HasOneSelectCell field="category" options={`Category.locales(locale.code = 'cs').name`} header="Category" />
-				<HasManySelectCell field="tags" options={`Tag.locales(locale.code = 'cs').name`} header="Tags" />
+	<DataGridPage pageName="articleList" entities="Article" itemsPerPage={20} rendererProps={{
+		actions: <LinkButton to="articleCreate">Add article</LinkButton>,
+		title: 'Articles',
+	}}>
+		<TextCell field="title" header="Title" />
+		<TextCell field="content" header="Content" />
+		<HasOneSelectCell field="category" options={`Category.locales(locale.code = 'cs').name`} header="Category" />
+		<HasManySelectCell field="tags" options={`Tag.locales(locale.code = 'cs').name`} header="Tags" />
 				<EnumCell field={'state'} options={{
 					draft: 'Draft',
 					published: 'Published',
 					removed: 'Removed',
 				}} header={'State'}/>
 
-				<GenericCell canBeHidden={false} justification="justifyEnd">
-					<LinkButton to={`articleEdit(id: $entity.id)`} Component={AnchorButton}>Edit</LinkButton>
-					<DeleteEntityButton title="Delete" immediatePersist={true}></DeleteEntityButton>
-				</GenericCell>
-			</DataGrid>
-		</DataBindingProvider>
-	</GenericPage>
+		<GenericCell canBeHidden={false} justification="justifyEnd">
+			<LinkButton to={`articleEdit(id: $entity.id)`} Component={AnchorButton}>Edit</LinkButton>
+			<DeleteEntityButton title="Delete" immediatePersist={true}></DeleteEntityButton>
+		</GenericCell>
+	</DataGridPage>
 )
 
 const form = <>

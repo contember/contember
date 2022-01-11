@@ -65,10 +65,9 @@ function ButtonOrDropdown(props: ToolbarButtonOrDropdown & WithPopupProps) {
 			</Dropdown>
 		)
 	}
-	const { onClick, ...rest } = props
 	return (
 		<div className={cn(className)}>
-			<EditorToolbarButton onMouseDown={onClick} {...rest} />
+			<EditorToolbarButton {...props} />
 		</div>
 	)
 }

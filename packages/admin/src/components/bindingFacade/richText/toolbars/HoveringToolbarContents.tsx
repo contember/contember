@@ -91,7 +91,7 @@ export const HoveringToolbarContents = memo(({ buttons: rawButtons }: HoveringTo
 							label: button.title,
 							//layout?: ToolbarButtonLayout
 							isActive,
-							onMouseDown: (e: ReactMouseEvent) => {
+							onClick: (e: ReactMouseEvent) => {
 								e.preventDefault() // This is crucial so that we don't unselect the selected text
 								e.nativeEvent.stopPropagation() // This is a bit of a hack ‒ so that we don't register this click as a start of a new selection
 								onMouseDown()

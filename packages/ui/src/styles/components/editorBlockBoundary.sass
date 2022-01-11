@@ -1,6 +1,7 @@
 @import '../common'
 
 .#{$cui-conf-globalPrefix}editorBlockBoundary
+	$root: &
 	height: .75em
 
 	display: flex
@@ -8,26 +9,21 @@
 	align-items: center
 	margin: 5px 0
 	cursor: pointer
-
+	&-inner
+		visibility: hidden
 	&:hover
-		&::before
-			display: block
-			content: '+'
-			color: #777
-			border: 1px solid #777
-			border-radius: 50%
-			text-align: center
-			width: 14px
-			height: 14px
-			line-height: 10px
-
-		&::after
-			display: block
-			content: 'New paragraph'
-			font-size: 14px
-			line-height: 26px
-			color: #777
-			margin-left: 4px
+		#{$root}-inner
+			visibility: visible
+			&::before
+				display: inline-block
+				content: '+'
+				color: #777
+				border: 1px solid #777
+				border-radius: 50%
+				text-align: center
+				width: 14px
+				height: 14px
+				line-height: 10px
 
 	.cui-editorCanvas-canvas > div[data-contember-type="reference"] + div[data-contember-type="reference"]
 		.cui-editorBlockBoundary.view-beforeBlock

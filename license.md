@@ -1,5 +1,5 @@
-Copyright 2020 manGoweb, s.r.o. and contributors.
-<https://www.mangoweb.eu>
+Copyright 2022 Contember Limited
+<https://www.contember.com>
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

@@ -11,14 +11,6 @@ export class MigrationCreator {
 		private readonly schemaDiffer: SchemaDiffer,
 	) {}
 
-	async createEmpty(migrationName: string): Promise<string> {
-		await this.migrationFilesManager.createDirIfNotExist()
-		const migration = this.createMigration([], migrationName)
-		const jsonDiff = MigrationCreator.createContent(migration)
-
-		return await this.migrationFilesManager.createFile(jsonDiff, migration.name)
-	}
-
 	async prepareMigration(
 		initialSchema: Schema,
 		newSchema: Schema,

@@ -1,5 +1,4 @@
 export * from './MigrationAmendCommand'
-export * from './MigrationCreateCommand'
 export * from './MigrationDescribeCommand'
 export * from './MigrationDiffCommand'
 export * from './MigrationExecuteCommand'

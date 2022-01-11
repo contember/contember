@@ -16,6 +16,8 @@ export const EditorBlockBoundary = memo(function EditorBlockBoundary({ blockEdge
 			contentEditable={false}
 			data-slate-editor={false}
 			onClick={onClick}
-		/>
+		>
+			<span className={`${prefix}editorBlockBoundary-inner`}>New paragraph</span>
+		</div>
 	)
 })

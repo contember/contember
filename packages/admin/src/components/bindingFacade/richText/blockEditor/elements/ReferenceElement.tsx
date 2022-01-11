@@ -1,4 +1,4 @@
-import { Element, Node, Path, Transforms } from 'slate'
+import { Ancestor, Element, Node, Path } from 'slate'
 import type { ElementWithReference } from './ElementWithReference'
 import { CustomElementPlugin } from '../../baseEditor'
 import { ReferenceElementRenderer } from '../renderers'
@@ -30,6 +30,22 @@ export interface ReferenceElementOptions {
 	getReferencedEntity: (path: Path, referenceId: string) => EntityAccessor
 }
 
+const findElementPathFallback = (parent: Ancestor, element: ReferenceElement): Path | undefined => {
+	for (const i in parent.children) {
+		const child = parent.children[i]
+		if (element === child) {
+			return [Number(i)]
+		}
+		if (Element.isAncestor(child)) {
+			const result = findElementPathFallback(child, element)
+			if (result !== undefined) {
+				return [Number(i), ...result]
+			}
+		}
+	}
+	return undefined
+}
+
 export const createReferenceElementPlugin = (args: ReferenceElementOptions): CustomElementPlugin<ReferenceElement> => {
 	return ({
 		type: referenceElementType,
@@ -44,11 +60,20 @@ export const createReferenceElementPlugin = (args: ReferenceElementOptions): Cus
 			if (args.referenceDiscriminationField === undefined) {
 				throw new BindingError()
 			}
-			const path = ReactEditor.findPath(editor, element)
+			const path = (() => {
+				try {
+					return ReactEditor.findPath(editor, element)
+				} catch (e) {
+					return findElementPathFallback(editor, element)
+				}
+			})()
+			if (!path) {
+				return false
+			}
 			let referencedEntity: EntityAccessor | undefined
 			try {
 				referencedEntity = args.getReferencedEntity(path, element.referenceId)
-			} catch {
+			} catch (e) {
 				return false
 			}
 			const discriminationField = referencedEntity.getRelativeSingleField(args.referenceDiscriminationField)

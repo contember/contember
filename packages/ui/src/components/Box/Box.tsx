@@ -34,7 +34,6 @@ export const Box = memo(
 						className,
 					)}
 					ref={ref}
-					contentEditable={false}
 				>
 					<Stack gap={gap ?? 'small'} direction="vertical">
 						{(heading || actions) && (

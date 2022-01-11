@@ -68,7 +68,7 @@ export const ReferenceElementRenderer = memo((props: ReferenceElementRendererPro
 		blockBody = (
 			<>
 				{!!contentTemplate.nodeBefore && <div contentEditable={false}>{contentTemplate.nodeBefore}</div>}
-				{props.children}
+				<div>{props.children}</div>
 				{!!contentTemplate.nodeAfter && <div contentEditable={false}>{contentTemplate.nodeAfter}</div>}
 			</>
 		)

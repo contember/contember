@@ -7,13 +7,13 @@ import {
 	Text,
 	Transforms,
 } from 'slate'
-import { EditorPasteUtils, NodesWithType } from '../../../baseEditor'
 import { ContemberEditor } from '../../../ContemberEditor'
-import { isListItemElement, ListItemElement, listItemElementPlugin, listItemElementType } from './ListItemElement'
-import { orderedListElementPlugin, orderedListElementType } from './OrderedListElement'
+import { isListItemElement, ListItemElement, listItemElementPlugin } from './ListItemElement'
+import { orderedListElementPlugin } from './OrderedListElement'
 import { dedentListItem, indentListItem } from './transforms'
-import { unorderedListElementPlugin, unorderedListElementType } from './UnorderedListElement'
+import { unorderedListElementPlugin } from './UnorderedListElement'
 import { isListElement } from './ListElement'
+import { listHtmlDeserializerFactory } from './ListHtmlDeserializer'
 
 export const withLists = <E extends Editor>(editor: E): Editor => {
 	const {
@@ -24,6 +24,8 @@ export const withLists = <E extends Editor>(editor: E): Editor => {
 	editor.registerElement(listItemElementPlugin)
 	editor.registerElement(orderedListElementPlugin)
 	editor.registerElement(unorderedListElementPlugin)
+
+	editor.htmlDeserializer.registerPlugin(listHtmlDeserializerFactory())
 
 	Object.assign<Editor, Partial<Editor>>(editor, {
 		insertBreak: () => {

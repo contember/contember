@@ -41,8 +41,8 @@ export const Table = memo(({ /*useTableElement = true, */ bare, ...props }: Tabl
 
 	return (
 		<UseTableElementContext.Provider value={/*useTableElement*/ true}>
-			<FieldContainer label={!bare && props.heading}>
-				<Box className="view-no-padding">
+			<FieldContainer label={!bare && props.heading} useLabelElement={false}>
+				<Box padding="no-padding">
 					{table}
 				</Box>
 			</FieldContainer>

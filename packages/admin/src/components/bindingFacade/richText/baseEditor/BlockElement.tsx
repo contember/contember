@@ -17,37 +17,29 @@ export const BlockElement = memo(function BlockElement({
 }: BlockElementProps) {
 	const editor = useSlateStatic()
 	const dataAttributes = ContemberEditor.getElementDataAttributes(element)
+	const El = domElement
+	return (
+		<El {...dataAttributes} {...attributes}>
+			{withBoundaries && (
+				<EditorBlockBoundary
+					blockEdge="before"
+					onClick={() => {
+						const elementPath = ReactEditor.findPath(editor, element)
+						editor.insertBetweenBlocks([element, elementPath], 'before')
+					}}
+				/>
+			)}
+			{children}
+			{withBoundaries && (
+				<EditorBlockBoundary
+					blockEdge="after"
+					onClick={() => {
+						const elementPath = ReactEditor.findPath(editor, element)
+						editor.insertBetweenBlocks([element, elementPath], 'after')
+					}}
+				/>
+			)}
 
-	return createElement(
-		domElement,
-		{
-			...dataAttributes,
-			...attributes,
-		},
-		[
-			<Fragment key="before">
-				{withBoundaries && (
-					<EditorBlockBoundary
-						blockEdge="before"
-						onClick={() => {
-							const elementPath = ReactEditor.findPath(editor, element)
-							editor.insertBetweenBlocks([element, elementPath], 'before')
-						}}
-					/>
-				)}
-			</Fragment>,
-			<Fragment key="block">{children}</Fragment>,
-			<Fragment key="after">
-				{withBoundaries && (
-					<EditorBlockBoundary
-						blockEdge="after"
-						onClick={() => {
-							const elementPath = ReactEditor.findPath(editor, element)
-							editor.insertBetweenBlocks([element, elementPath], 'after')
-						}}
-					/>
-				)}
-			</Fragment>,
-		],
+		</El>
 	)
 })

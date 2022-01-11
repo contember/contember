@@ -1,6 +1,7 @@
 import { ChangeEvent, useCallback } from 'react'
 import { DataGridColumn, DataGridColumnPublicProps } from '../base'
 import { Component, QueryLanguage, SugaredField, SugaredFieldProps, wrapFilterInHasOnes } from '@contember/binding'
+import { GraphQlLiteral } from '@contember/client'
 
 export type EnumCellProps =
 	& DataGridColumnPublicProps
@@ -25,7 +26,7 @@ export const EnumCell = Component<EnumCellProps>(props => {
 				const desugared = QueryLanguage.desugarRelativeSingleField(props.field, environment)
 				return wrapFilterInHasOnes(desugared.hasOneRelationPath, {
 					[desugared.field]: {
-						in: filterArtefact,
+						in: filterArtefact.map(it => new GraphQlLiteral(it)),
 					},
 				})
 			}}

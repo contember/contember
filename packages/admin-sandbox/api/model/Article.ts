@@ -1,6 +1,7 @@
 import { SchemaDefinition as d } from '@contember/schema-definition'
 import { Locale } from './Locale'
 
+export const ArticleState = d.createEnum('draft', 'published', 'removed')
 export class Article {
 	title = d.stringColumn()
 	slug = d.stringColumn().unique()
@@ -8,6 +9,7 @@ export class Article {
 	publishedAt = d.dateTimeColumn()
 	category = d.manyHasOne(Category)
 	tags = d.manyHasMany(Tag)
+	state = d.enumColumn(ArticleState)
 }
 
 export class Category {

@@ -1,0 +1,45 @@
+{
+	"formatVersion": 3,
+	"modifications": [
+		{
+			"modification": "createEnum",
+			"enumName": "ArticleState",
+			"values": [
+				"draft",
+				"published",
+				"removed"
+			]
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "Article",
+			"field": {
+				"name": "state",
+				"columnName": "state",
+				"nullable": true,
+				"type": "Enum",
+				"columnType": "ArticleState"
+			}
+		},
+		{
+			"modification": "patchAclSchema",
+			"patch": [
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/Article/operations/create/state",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/Article/operations/read/state",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/Article/operations/update/state",
+					"value": true
+				}
+			]
+		}
+	]
+}

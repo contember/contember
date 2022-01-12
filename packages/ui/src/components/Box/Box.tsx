@@ -21,7 +21,7 @@ export interface BoxProps extends BoxOwnProps, Omit<NativeProps<HTMLDivElement>,
 
 export const Box = memo(
 	forwardRef<HTMLDivElement, BoxProps>(
-		({ actions, className, distinction, children, gap, heading, intent, isActive, padding = 'default', ...divProps }: BoxProps, ref) => {
+		({ actions, className, distinction, children, gap, heading, intent, isActive, padding, ...divProps }: BoxProps, ref) => {
 			const componentClassName = `${useClassNamePrefix()}box`
 
 			return (

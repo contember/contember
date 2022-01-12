@@ -5,10 +5,11 @@ import {
 	SugaredQualifiedSingleEntity,
 } from '@contember/binding'
 import { ComponentType, memo, ReactNode } from 'react'
-import { FeedbackRenderer, MutableSingleEntityPageRenderer, MutableSingleEntityPageRendererProps } from '../../bindingFacade'
+import { FeedbackRenderer, LayoutRenderer, LayoutRendererProps, PersistButton } from '../../bindingFacade'
 import type { PageProvider } from '../Pages'
 import { RedirectOnSuccessHandler } from '../useEntityRedirectOnPersistSuccess'
 import { useOnPersistSuccess } from '../useOnPersistSuccess'
+import { NotFoundWrapper } from './NotFoundWrapper'
 
 export type EditPageProps =
 	& SugaredQualifiedSingleEntity
@@ -17,20 +18,19 @@ export type EditPageProps =
 		pageName: string
 		children: ReactNode
 		redirectOnSuccess?: RedirectOnSuccessHandler
-		rendererProps?: Omit<MutableSingleEntityPageRendererProps, 'accessor'>
+		rendererProps?: LayoutRendererProps
 		refreshDataBindingOnPersist?: boolean
 	}
 
 const EditPage: Partial<PageProvider<EditPageProps>> & ComponentType<EditPageProps> = memo(
 	({ pageName, children, rendererProps, redirectOnSuccess, onPersistSuccess, refreshDataBindingOnPersist, ...entityProps }: EditPageProps) => (
 		<DataBindingProvider stateComponent={FeedbackRenderer} refreshOnPersist={refreshDataBindingOnPersist ?? true}>
-			<EntitySubTree
-				{...entityProps}
-				entityComponent={MutableSingleEntityPageRenderer}
-				entityProps={rendererProps}
-				onPersistSuccess={useOnPersistSuccess({ redirectOnSuccess, onPersistSuccess })}
-			>
-				{children}
+			<EntitySubTree {...entityProps} onPersistSuccess={useOnPersistSuccess({ redirectOnSuccess, onPersistSuccess })}>
+				<NotFoundWrapper title={rendererProps?.title}>
+					<LayoutRenderer {...rendererProps} actions={rendererProps?.actions ?? <PersistButton />}>
+						{children}
+					</LayoutRenderer>
+				</NotFoundWrapper>
 			</EntitySubTree>
 		</DataBindingProvider>
 	),

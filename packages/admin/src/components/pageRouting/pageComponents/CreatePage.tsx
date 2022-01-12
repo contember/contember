@@ -6,7 +6,7 @@ import {
 	SugaredUnconstrainedQualifiedSingleEntity,
 } from '@contember/binding'
 import { ComponentType, memo, ReactNode } from 'react'
-import { FeedbackRenderer, MutableSingleEntityPageRenderer, MutableSingleEntityPageRendererProps } from '../../bindingFacade'
+import { FeedbackRenderer, LayoutRenderer, LayoutRendererProps, PersistButton } from '../../bindingFacade'
 import type { PageProvider } from '../Pages'
 import { RedirectOnSuccessHandler } from '../useEntityRedirectOnPersistSuccess'
 import { useOnPersistSuccess } from '../useOnPersistSuccess'
@@ -19,21 +19,17 @@ export type CreatePageProps =
 		pageName: string
 		children: ReactNode
 		redirectOnSuccess?: RedirectOnSuccessHandler
-		rendererProps?: Omit<MutableSingleEntityPageRendererProps, 'accessor'>
+		rendererProps?: LayoutRendererProps
 	}
 
 const CreatePage: Partial<PageProvider<CreatePageProps>> & ComponentType<CreatePageProps> = memo(
 	({ pageName, children, rendererProps, redirectOnSuccess, onPersistSuccess, ...entityProps }: CreatePageProps) => {
 		return (
 			<DataBindingProvider stateComponent={FeedbackRenderer}>
-				<EntitySubTree
-					{...entityProps}
-					entityComponent={MutableSingleEntityPageRenderer}
-					entityProps={rendererProps}
-					onPersistSuccess={useOnPersistSuccess({ redirectOnSuccess, onPersistSuccess })}
-					isCreating
-				>
-					{children}
+				<EntitySubTree {...entityProps} onPersistSuccess={useOnPersistSuccess({ redirectOnSuccess, onPersistSuccess })} isCreating>
+					<LayoutRenderer {...rendererProps} actions={rendererProps?.actions ?? <PersistButton />}>
+						{children}
+					</LayoutRenderer>
 				</EntitySubTree>
 			</DataBindingProvider>
 		)

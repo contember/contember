@@ -14,7 +14,12 @@ export const PageLayoutContent = ({ children }: { children: ReactNode }) => {
 	const contentRef = useRef<HTMLDivElement>(null)
 
 	useEffect(() => {
+		if (!contentRef.current) {
+			return
+		}
+
 		const contentRefCopy = contentRef.current
+
 		const listener = () => {
 			const offsetWidth = Math.floor(contentRefCopy?.offsetWidth ?? 0)
 			const scrollWidth = Math.floor(contentRefCopy?.scrollWidth ?? 0)
@@ -23,9 +28,7 @@ export const PageLayoutContent = ({ children }: { children: ReactNode }) => {
 
 			const nextIsOverflowing = offsetWidth < scrollWidth && scrollRight > 1
 
-			if (isOverflowing !== nextIsOverflowing) {
-				setIsOverflowing(nextIsOverflowing)
-			}
+			setIsOverflowing(nextIsOverflowing)
 		}
 
 		listener()
@@ -34,7 +37,7 @@ export const PageLayoutContent = ({ children }: { children: ReactNode }) => {
 		return () => {
 			contentRefCopy?.removeEventListener('scroll', listener)
 		}
-	}, [contentRef, isOverflowing])
+	}, [])
 
 	return <div
 		ref={contentRef}

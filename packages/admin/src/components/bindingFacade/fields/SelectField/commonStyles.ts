@@ -25,12 +25,83 @@ export const selectStyles: StylesConfig<OptionTypeBase, boolean, GroupTypeBase<O
 			'padding': '0 var(--cui-gap)',
 		}
 	},
+	singleValue: (provided, { isDisabled }) => {
+		const color = isDisabled
+			? 'var(--cui-control-color)'
+			: 'var(--cui-color-low)'
+
+		return {
+			...provided,
+			color,
+		}
+	},
+	multiValue: (provided, { isDisabled, isFocused }) => {
+		const color = isDisabled ? 'var(--cui-color--low)' : 'var(--cui-filled-control-color)'
+		const borderColor = isDisabled ? 'var(--cui-color--low)' : 'var(--cui-filled-control-border-color)'
+		const backgroundColor = isDisabled ? 'var(--cui-color--lower)' : 'var(--cui-toned-control-background-color)'
+
+		return {
+			...provided,
+			color,
+			borderColor,
+			backgroundColor,
+		}
+	},
+	multiValueLabel: (provided, { isDisabled, isFocused }) => {
+		const color = isDisabled ? 'var(--cui-color--high)' : 'var(--cui-filled-control-color)'
+
+		return {
+			...provided,
+			color,
+		}
+	},
+	multiValueRemove: provided => {
+		const color = 'var(--cui-toned-control-color)'
+		const backgroundColor = 'var(--cui-toned-control-background-color)'
+
+		// TODO: Indirect, but there seens to be no better way for now
+		const isFocusing = provided.backgroundColor
+
+		return {
+			...provided,
+			color,
+			'backgroundColor': isFocusing ? backgroundColor : undefined,
+			'opacity': isFocusing ? 1 : 0.5,
+			'&:hover': {
+				color,
+				backgroundColor,
+				opacity: 1,
+			},
+		}
+	},
+	dropdownIndicator: (provided, { isFocused, isDisabled }) => {
+		return {
+			...provided,
+			'color': isDisabled
+				? 'var(--cui-color--low)'
+				: isFocused
+					? 'var(--cui-color--strong)'
+					: 'var(--cui-color--high)',
+			'&:hover': {
+				color: 'var(--cui-color--strong)',
+			},
+		}
+	},
+	clearIndicator: (provided, { isFocused, isDisabled }) => {
+		return {
+			...provided,
+			'color': isDisabled
+				? 'var(--cui-color--low)'
+				: isFocused
+					? 'var(--cui-color--strong)'
+					: 'var(--cui-color--high)',
+			'&:hover': {
+				color: 'var(--cui-color--strong)',
+			},
+		}
+	},
 	control: (provided, { isFocused, isDisabled }) => {
-		const backgroundColor = isDisabled
-			? 'var(--cui-toned-control-background-color)'
-			: isFocused
-				? 'var(--cui-background-color--above)'
-				: 'var(--cui-background-color--above)'
+		const backgroundColor = 'var(--cui-background-color--above)'
 		const color = isDisabled
 			? 'var(--cui-color--low)'
 			: isFocused
@@ -56,6 +127,34 @@ export const selectStyles: StylesConfig<OptionTypeBase, boolean, GroupTypeBase<O
 				color: 'var(--cui-color--strong)',
 				borderColor: 'var(--cui-color--low)',
 			},
+		}
+	},
+	menu: (provided, props) => {
+		const backgroundColor = 'var(--cui-background-color--above)'
+		const border = 'var(--cui-control-border-width) solid var(--cui-color--lower)'
+
+		return {
+			...provided,
+			backgroundColor,
+			border,
+		}
+	},
+	option: (provided, { isFocused, isSelected }) => {
+		const color = isFocused
+			? 'var(--cui-filled-control-color)'
+			: isSelected
+				? 'var(--cui-toned-control-color)'
+				: 'var(--cui-control-color)'
+		const backgroundColor = isFocused
+			? 'var(--cui-filled-control-background-color)'
+			: isSelected
+				? 'var(--cui-toned-control-background-color)'
+				: 'var(--cui-control-background-color)'
+
+		return {
+			...provided,
+			backgroundColor,
+			color,
 		}
 	},
 }

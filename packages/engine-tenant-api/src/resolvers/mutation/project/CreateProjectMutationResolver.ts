@@ -17,14 +17,17 @@ export class CreateProjectMutationResolver implements MutationResolvers {
 		{ projectSlug, name, config, deployTokenHash, secrets }: MutationCreateProjectArgs,
 		context: ResolverContext,
 	): Promise<CreateProjectResponse> {
+		const project = await this.projectManager.getProjectBySlug(context.db, projectSlug)
+
+		if (project) {
+			return createErrorResponse(CreateProjectResponseErrorCode.AlreadyExists, `Project ${projectSlug} already exists`)
+		}
+
 		await context.requireAccess({
 			action: PermissionActions.PROJECT_CREATE,
 			message: 'You are not allowed to create a project',
 		})
-		const project = await this.projectManager.getProjectBySlug(context.db, projectSlug)
-		if (project) {
-			return createErrorResponse(CreateProjectResponseErrorCode.AlreadyExists, `Project ${projectSlug} already exists`)
-		}
+
 		if (typeof deployTokenHash === 'string' && !isTokenHash(deployTokenHash)) {
 			throw new UserInputError('Invalid format of deployTokenHash. Must be hex-encoded sha256.')
 		}

@@ -115,7 +115,6 @@ importers:
       '@types/is-hotkey': 0.1.5
       '@types/leaflet': 1.7.5
       '@types/react': 17.0.30
-      '@types/react-datepicker': 3.1.8
       '@types/react-dom': 17.0.9
       '@types/react-leaflet': 2.8.2
       '@types/react-select': 4.0.17
@@ -133,7 +132,6 @@ importers:
       leaflet: 1.7.1
       path-to-regexp: 6.2.0
       qrcode-generator: ^1.4.4
-      react-datepicker: 4.2.1
       react-dropzone: 10.2.2
       react-error-boundary: 3.1.3
       react-leaflet: 2.8.0
@@ -165,7 +163,6 @@ importers:
       leaflet: 1.7.1
       path-to-regexp: 6.2.0
       qrcode-generator: 1.4.4
-      react-datepicker: 4.2.1_react-dom@17.0.2+react@17.0.2
       react-dropzone: 10.2.2_react@17.0.2
       react-error-boundary: 3.1.3_react@17.0.2
       react-leaflet: 2.8.0_91fa1427a3331e02931dfea77720a290
@@ -182,7 +179,6 @@ importers:
       '@types/is-hotkey': 0.1.5
       '@types/leaflet': 1.7.5
       '@types/react': 17.0.30
-      '@types/react-datepicker': 3.1.8
       '@types/react-dom': 17.0.9
       '@types/react-leaflet': 2.8.2
       '@types/react-select': 4.0.17
@@ -7278,14 +7274,6 @@ packages:
     resolution: {integrity: sha512-FGa1F62FT09qcrueBA6qYTrJPVDzah9a+493+o2PCXsesWHIn27G98TsSMs3WPNbZIEj4+VJf6saSFpvD+3Zsw==}
     dev: true
 
-  /@types/react-datepicker/3.1.8:
-    resolution: {integrity: sha512-RFEg7++xhosMq02i2lsuaUPEbZGn66U3dxtvw9LU/ZRqLkBGr9Ft2LTz6vbeYYVtaBdOr0NcQatOLnlfUaS8kw==}
-    dependencies:
-      '@types/react': 17.0.30
-      date-fns: 2.25.0
-      popper.js: 1.16.1
-    dev: true
-
   /@types/react-dom/17.0.9:
     resolution: {integrity: sha512-wIvGxLfgpVDSAMH5utdL9Ngm5Owu0VsGmldro3ORLXV8CShrL8awVj06NuEXFQ5xyaYfdca7Sgbk/50Ri1GdPg==}
     dependencies:
@@ -9605,10 +9593,6 @@ packages:
       whatwg-mimetype: 3.0.0
       whatwg-url: 10.0.0
     dev: true
-
-  /date-fns/2.25.0:
-    resolution: {integrity: sha512-ovYRFnTrbGPD4nqaEqescPEv1mNwvt+UTqI3Ay9SzNtey9NZnYu6E2qCcBBgJ6/2VF1zGGygpyTDITqpQQ5e+w==}
-    engines: {node: '>=0.11'}
 
   /debounce/1.2.1:
     resolution: {integrity: sha512-XRRe6Glud4rd/ZGQfiV1ruXSfbvfJedlV9Y6zOlP+2K04vBYiJEte6stfFkCP03aMnY5tsipamumUjL14fofug==}
@@ -14540,11 +14524,6 @@ packages:
       '@babel/runtime': 7.15.4
     dev: true
 
-  /popper.js/1.16.1:
-    resolution: {integrity: sha512-Wb4p1J4zyFTbM+u6WuO4XstYx4Ky9Cewe4DWrel7B0w6VVICvPwdOpotjzcf6eD8TsckVnIMNONQyPIUFOUbCQ==}
-    deprecated: You can find the new Popper v2 at @popperjs/core, this package is dedicated to the legacy v1
-    dev: true
-
   /posix-character-classes/0.1.1:
     resolution: {integrity: sha1-AerA/jta9xoqbAL+q7jB/vfgDqs=}
     engines: {node: '>=0.10.0'}
@@ -15058,22 +15037,6 @@ packages:
       react-dom: 17.0.2_react@17.0.2
     dev: true
 
-  /react-datepicker/4.2.1_react-dom@17.0.2+react@17.0.2:
-    resolution: {integrity: sha512-0gcvHMnX8rS1fV90PjjsB7MQdsWNU77JeVHf6bbwK9HnFxgwjVflTx40ebKmHV+leqe+f+FgUP9Nvqbe5RGyfA==}
-    peerDependencies:
-      react: ^16.9.0 || ^17
-      react-dom: ^16.9.0 || ^17
-    dependencies:
-      '@popperjs/core': 2.10.2
-      classnames: 2.3.1
-      date-fns: 2.25.0
-      prop-types: 15.7.2
-      react: 17.0.2
-      react-dom: 17.0.2_react@17.0.2
-      react-onclickoutside: 6.12.0_react-dom@17.0.2+react@17.0.2
-      react-popper: 2.2.5_838acf1c84808345430cf17171f87518
-    dev: false
-
   /react-dev-utils/11.0.4:
     resolution: {integrity: sha512-dx0LvIGHcOPtKbeiSUM4jqpBl3TcY7CDjZdfOIcKeznE7BWr9dg0iPG90G5yfVQ+p/rGNMXdbfStvzQZEVEi4A==}
     engines: {node: '>=10'}
@@ -15252,16 +15215,6 @@ packages:
       react: 17.0.2
       react-dom: 17.0.2_react@17.0.2
       warning: 4.0.3
-    dev: false
-
-  /react-onclickoutside/6.12.0_react-dom@17.0.2+react@17.0.2:
-    resolution: {integrity: sha512-oPlOTYcISLHfpMog2lUZMFSbqOs4LFcA4+vo7fpfevB5v9Z0D5VBDBkfeO5lv+hpEcGoaGk67braLT+QT+eICA==}
-    peerDependencies:
-      react: ^15.5.x || ^16.x || ^17.x
-      react-dom: ^15.5.x || ^16.x || ^17.x
-    dependencies:
-      react: 17.0.2
-      react-dom: 17.0.2_react@17.0.2
     dev: false
 
   /react-popper-tooltip/3.1.1_react-dom@17.0.2+react@17.0.2:

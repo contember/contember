@@ -11,13 +11,7 @@ import { Field } from './Field'
 export type HasOneProps<EntityProps = never> = SugaredRelativeSingleEntity & {
 	children?: ReactNode
 	variables?: Environment.DeltaFactory
-} & (
-		| {}
-		| {
-				entityComponent: ComponentType<EntityProps & EntityBaseProps>
-				entityProps?: EntityProps
-		  }
-	)
+}
 
 export const HasOne = Component(
 	<EntityProps extends {}>(props: HasOneProps<EntityProps>) => {

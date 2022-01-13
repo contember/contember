@@ -11,7 +11,6 @@ import { Environment } from '../dao'
 import { MarkerFactory } from '../queryLanguage'
 import type { SugaredQualifiedEntityList, SugaredUnconstrainedQualifiedEntityList, TreeRootId } from '../treeParameters'
 import { Component } from './Component'
-import type { EntityBaseProps } from './Entity'
 import { EntityList, EntityListBaseProps } from './EntityList'
 import { Field } from './Field'
 
@@ -26,10 +25,6 @@ export type EntityListSubTreeProps<ListProps, EntityProps> = {
 	(SugaredQualifiedEntityList | SugaredUnconstrainedQualifiedEntityList) &
 	(
 		| {}
-		| {
-				entityComponent: ComponentType<EntityProps & EntityBaseProps>
-				entityProps?: EntityProps
-		  }
 		| {
 				listComponent: ComponentType<ListProps & EntityListBaseProps>
 				listProps?: ListProps

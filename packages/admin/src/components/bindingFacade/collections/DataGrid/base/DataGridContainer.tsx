@@ -53,8 +53,7 @@ export const DataGridContainer: FunctionComponent<DataGridContainerProps> = Comp
 		allowAggregateFilterControls,
 		allowColumnVisibilityControls,
 		emptyMessage,
-		emptyMessageComponent: EmptyMessageComponent = EmptyMessage,
-		emptyMessageComponentExtraProps,
+		emptyMessageComponent,
 	}) => {
 		const {
 			paging: { pageIndex, itemsPerPage },
@@ -143,8 +142,6 @@ export const DataGridContainer: FunctionComponent<DataGridContainerProps> = Comp
 							<Entity
 								key={entity.key}
 								accessor={entity}
-								//entityComponent={}
-								//entityProps={}
 							>
 								<TableRow>
 									{Array.from(columns)
@@ -170,9 +167,7 @@ export const DataGridContainer: FunctionComponent<DataGridContainerProps> = Comp
 					{!accessor.length && (
 						<TableRow>
 							<TableCell colSpan={columns.size}>
-								<EmptyMessageComponent {...emptyMessageComponentExtraProps}>
-									{formatMessage(emptyMessage, 'dataGrid.emptyMessage.text')}
-								</EmptyMessageComponent>
+								<EmptyMessage component={emptyMessageComponent}>{formatMessage(emptyMessage, 'dataGrid.emptyMessage.text')}</EmptyMessage>
 							</TableCell>
 						</TableRow>
 					)}

@@ -14,20 +14,35 @@ import { useCurrentRequest } from '../../routing'
 import { MiscPageLayout } from '../MiscPageLayout'
 import { PageErrorBoundary } from './PageErrorBoundary'
 
-export type PageProvider<P> = ComponentType & {
+export interface PageProvider<P> {
 	getPageName(props: P): string
 }
 
-export type PageProviderElement = ReactElement<any, PageProvider<any>>
+export type PageProviderElement = ReactElement<any, ComponentType & PageProvider<any>>
+
+export interface PageSetProvider<P> {
+	getPages(props: P): Record<string, ComponentType>
+}
+
+export type PageSetProviderElement = ReactElement<any, ComponentType & PageSetProvider<any>>
+
+type EmptyObject = Record<any, never>
+
+type PagesMapElement =
+	| ComponentType
+	| PageProviderElement
+	| PageSetProviderElement
+	| PageSetProvider<EmptyObject>;
+type PagesMap = Record<string, PagesMapElement>
 
 export interface PagesProps {
-	children: PageProviderElement[] | PageProviderElement
+	children:
+		| PagesMap
+		| PageProviderElement[]
+		| PageProviderElement
 	layout?: ComponentType<{ children?: ReactNode }>
 }
 
-function isPageProviderElement(el: ReactNode): el is PageProviderElement {
-	return isValidElement(el) && typeof el.type !== 'string' && typeof (el.type as any).getPageName === 'function'
-}
 
 function isPageList(children: ReactNodeArray): children is PageProviderElement[] {
 	return children.every(child => isPageProviderElement(child))
@@ -36,28 +51,43 @@ function isPageList(children: ReactNodeArray): children is PageProviderElement[]
 /**
  * Pages element specifies collection of pages (component Page or component with getPageName static method).
  */
-export const Pages = (props: PagesProps) => {
+export const Pages = ({ children, layout }: PagesProps) => {
 	const rootEnv = useEnvironment()
 	const request = useCurrentRequest()
 	const requestId = useRef<number>(0)
-	const Layout = props.layout ?? Fragment
+	const Layout = layout ?? Fragment
 
-	const pageMap = useMemo(
+	const pageMap = useMemo<Map<string, ComponentType>>(
 		() => {
-			const pageList = Array.isArray(props.children) ? props.children : [props.children]
+			if (Array.isArray(children)) {
+				if (isPageList(children)) {
+					return new Map(children.map(child => [child.type.getPageName(child.props), () => child]))
 
-			if (!isPageList(pageList)) {
-				throw new Error('Pages has a child which is not a Page')
+				} else {
+					throw new Error('Pages has a child which is not a Page')
+				}
+
+			} else if (isPageProviderElement(children)) {
+				return new Map([[children.type.getPageName(children.props), () => children]])
+
+			} else {
+				return new Map(Object.entries(children).flatMap(([k, v]): [string, ComponentType][] => {
+					if (isPageSetProvider<EmptyObject>(v)) {
+						return Object.entries(v.getPages({}))
+					} else if (isPageSetProviderElement(v)) {
+						return Object.entries(v.type.getPages(v.props))
+					} else if (isPageProviderElement(v)) {
+						return [[v.type.getPageName(v.props), () => v]]
+					} else {
+						return [[k, v]]
+					}
+				}))
 			}
-
-			return new Map(pageList.map(child => [child.type.getPageName(child.props), child]))
 		},
-		[props.children],
+		[children],
 	)
 
-	const page = request ? pageMap.get(request.pageName) : undefined
-
-	if (request === null || page === undefined) {
+	if (request === null) {
 		return (
 			<MiscPageLayout>
 				<Message intent="danger" size="large">Page not found</Message>
@@ -70,6 +100,11 @@ export const Pages = (props: PagesProps) => {
 			throw new Error(`Cannot use ${reservedVariableName} as parameter name.`)
 		}
 	}
+	const Page = pageMap.get(request.pageName)
+
+	if (Page === undefined) {
+		throw new Error(`No such page as ${request.pageName}.`)
+	}
 
 	const requestEnv = rootEnv
 		.updateDimensionsIfNecessary(request.dimensions, rootEnv.getAllDimensions())
@@ -78,8 +113,26 @@ export const Pages = (props: PagesProps) => {
 	return (
 		<EnvironmentContext.Provider value={requestEnv}>
 			<Layout>
-				<PageErrorBoundary key={requestId.current++}>{page}</PageErrorBoundary>
+				<PageErrorBoundary key={requestId.current++}><Page /></PageErrorBoundary>
 			</Layout>
 		</EnvironmentContext.Provider>
 	)
+}
+
+
+function isPageProvider(it: any): it is PageProvider<any> {
+	return typeof it === 'object' && it !== null && typeof it.getPageName === 'function'
+}
+
+function isPageProviderElement(el: ReactNode): el is PageProviderElement {
+	return isValidElement(el) && typeof el.type !== 'string' && isPageProvider(el.type)
+}
+
+
+function isPageSetProvider<T = any>(it: any): it is PageSetProvider<T> {
+	return typeof it === 'object' && it !== null && typeof it.getPages === 'function'
+}
+
+function isPageSetProviderElement(el: ReactNode): el is PageSetProviderElement {
+	return isValidElement(el) && typeof el.type !== 'string' && isPageSetProvider(el.type)
 }

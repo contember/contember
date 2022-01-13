@@ -5,20 +5,25 @@ import {
 	SugaredQualifiedSingleEntity,
 } from '@contember/binding'
 import { ComponentType, memo, ReactNode } from 'react'
-import { FeedbackRenderer, ImmutableContentLayoutRendererProps, ImmutableSingleEntityRenderer } from '../bindingFacade'
-import type { PageProvider } from './Pages'
+import { FeedbackRenderer, LayoutRenderer, LayoutRendererProps } from '../../bindingFacade'
+import type { PageProvider } from '../Pages'
 
-export interface DetailPageProps extends SugaredQualifiedSingleEntity, EntitySubTreeAdditionalProps {
-	pageName: string
-	children: ReactNode
-	rendererProps?: Omit<ImmutableContentLayoutRendererProps, 'accessor'>
-}
+export type DetailPageProps =
+	& SugaredQualifiedSingleEntity
+	& EntitySubTreeAdditionalProps
+	& {
+		pageName: string
+		children: ReactNode
+		rendererProps?: LayoutRendererProps
+	}
 
 const DetailPage: Partial<PageProvider<DetailPageProps>> & ComponentType<DetailPageProps> = memo(
 	({ pageName, children, rendererProps, ...entityProps }: DetailPageProps) => (
 		<DataBindingProvider stateComponent={FeedbackRenderer}>
-			<EntitySubTree {...entityProps} entityComponent={ImmutableSingleEntityRenderer} entityProps={rendererProps}>
-				{children}
+			<EntitySubTree {...entityProps}>
+				<LayoutRenderer {...rendererProps}>
+					{children}
+				</LayoutRenderer>
 			</EntitySubTree>
 		</DataBindingProvider>
 	),

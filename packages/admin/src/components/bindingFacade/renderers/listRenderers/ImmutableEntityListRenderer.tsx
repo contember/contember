@@ -1,27 +1,27 @@
-import { Component, EntityListAccessor } from '@contember/binding'
+import { Component } from '@contember/binding'
 import type { ReactElement, ReactNode } from 'react'
-import { RepeaterInner, RepeaterInnerProps } from '../collections'
+import { RepeaterInner, RepeaterInnerProps } from '../../collections'
 
-export interface ImmutableEntityListRendererProps<ContainerExtraProps, ItemExtraProps>
-	extends Omit<
-		RepeaterInnerProps<ContainerExtraProps, ItemExtraProps>,
-		| 'entityList'
-		| 'label'
-		| 'sortableBy'
-		| 'unstable__sortAxis'
-		| 'addButtonComponentExtraProps'
-		| 'addButtonText'
-		| 'addButtonProps'
-		| 'addButtonComponent'
-		| 'enableAddingNew'
-		| 'enableRemoving'
-		| 'dragHandleComponent'
-		| 'useDragHandle'
-	> {
-	beforeContent?: ReactNode
-	afterContent?: ReactNode
-	accessor: EntityListAccessor
-}
+export type ImmutableEntityListRendererProps<ContainerExtraProps, ItemExtraProps> =
+	& Omit<
+			RepeaterInnerProps<ContainerExtraProps, ItemExtraProps>,
+			| 'entityList'
+			| 'label'
+			| 'sortableBy'
+			| 'unstable__sortAxis'
+			| 'addButtonComponentExtraProps'
+			| 'addButtonText'
+			| 'addButtonProps'
+			| 'addButtonComponent'
+			| 'enableAddingNew'
+			| 'enableRemoving'
+			| 'dragHandleComponent'
+			| 'useDragHandle'
+		>
+	& {
+		beforeContent?: ReactNode
+		afterContent?: ReactNode
+	}
 
 export const ImmutableEntityListRenderer = Component(
 	<ContainerExtraProps, ItemExtraProps>(

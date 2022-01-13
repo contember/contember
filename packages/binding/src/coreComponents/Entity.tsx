@@ -1,4 +1,4 @@
-import type { ComponentType, ReactElement, ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import { AccessorProvider } from '../accessorPropagation'
 import type { EntityAccessor } from '../accessors'
 import { Component } from './Component'
@@ -8,32 +8,16 @@ export interface EntityBaseProps {
 	children?: ReactNode
 }
 
-export type EntityProps<EntityComponentProps> = EntityBaseProps &
-	(
-		| {}
-		| {
-				entityComponent: ComponentType<EntityComponentProps & EntityBaseProps>
-				entityProps?: EntityComponentProps
-		  }
-	)
+export type EntityProps = EntityBaseProps
 
-export const Entity = Component(<EntityComponentProps extends {}>(props: EntityProps<EntityComponentProps>) => {
-	let children = props.children
-
-	if ('entityComponent' in props && props.entityComponent) {
-		const EntityComponent = props.entityComponent
-
-		children = (
-			// HACK: the ?. is actually important, despite the typings.
-			<EntityComponent {...props.entityProps!} accessor={props.accessor} key={props.accessor?.key}>
-				{children}
-			</EntityComponent>
-		)
-	}
+export const Entity = Component(
+	({ children, accessor }: EntityProps) => {
 	return (
 		// HACK: the ?. is actually important, despite the typings.
-		<AccessorProvider accessor={props.accessor} key={props.accessor?.key}>
+		<AccessorProvider accessor={accessor} key={accessor?.key}>
 			{children}
 		</AccessorProvider>
 	)
-}, 'Entity') as <EntityComponentProps extends {}>(props: EntityProps<EntityComponentProps>) => ReactElement
+	},
+	'Entity',
+)

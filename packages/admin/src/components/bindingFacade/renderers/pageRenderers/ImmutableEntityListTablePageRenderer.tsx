@@ -1,24 +1,20 @@
-import { Component, EntityAccessor } from '@contember/binding'
+import { Component, Entity, EntityAccessor, EntityListAccessor } from '@contember/binding'
 import { Table, TableCell, TableProps, TableRow, TableRowProps } from '@contember/ui'
-import { memo, ReactElement, ReactNode } from 'react'
-import { DeleteEntityButton, EmptyMessage, RepeaterFieldContainerProps, RepeaterItemProps } from '../../collections'
+import { ComponentType, memo, ReactElement, ReactNode } from 'react'
+import { DeleteEntityButton, EmptyMessage, EmptyMessageProps } from '../../collections'
 import { LayoutRenderer, LayoutRendererProps } from '../LayoutRenderer'
-import { ImmutableEntityListRenderer, ImmutableEntityListRendererProps } from '../listRenderers'
+
+interface EmptyMessageOuterProps {
+	emptyMessage?: ReactNode
+	emptyMessageComponent?: ComponentType<EmptyMessageProps & any> // This can override 'emptyMessage'
+	emptyMessageComponentExtraProps?: {}
+}
 
 export type ImmutableEntityListTablePageRendererProps<ContainerExtraProps, ItemExtraProps> =
 	& LayoutRendererProps
-	& Omit<
-			ImmutableEntityListRendererProps<ContainerExtraProps, ItemExtraProps>,
-			| 'afterContent'
-			| 'beforeContent'
-			| 'wrapperComponent'
-			| 'itemComponent'
-			| 'itemComponentExtraProps'
-			| 'containerComponent'
-			| 'containerComponentExtraProps'
-			| 'removalType'
-		>
+	& EmptyMessageOuterProps
 	& {
+		accessor: EntityListAccessor
 		tableProps?: Omit<TableProps, 'children'>
 		tableRowProps?: Omit<TableRowProps, 'children'>
 		enableRemoving?: boolean
@@ -28,35 +24,22 @@ export const ImmutableEntityListTablePageRenderer = Component(
 	<ContainerExtraProps, ItemExtraProps>({
 		enableRemoving = true,
 		children,
-		side,
-		title,
-		navigation,
-		headingProps,
-		actions,
 		tableProps,
 		tableRowProps,
-		...entityListProps
+		accessor,
+		emptyMessage,
+		emptyMessageComponent,
+		emptyMessageComponentExtraProps,
+		after,
+		...layoutProps
 	}: ImmutableEntityListTablePageRendererProps<ContainerExtraProps, ItemExtraProps>) => {
 		return (
 			<LayoutRenderer
-				side={side}
-				title={title}
-				navigation={navigation}
-				actions={actions}
-				headingProps={headingProps}
+				{...layoutProps}
 			>
-				<ImmutableEntityListRenderer
-					{...entityListProps}
-					containerComponent={Container}
-					containerComponentExtraProps={tableProps}
-					itemComponent={Row}
-					itemComponentExtraProps={{
-						...tableRowProps,
-						enableRemoving,
-					}}
-				>
-					{children}
-				</ImmutableEntityListRenderer>
+				<TableRenderer accessor={accessor} {...{ emptyMessage, emptyMessageComponent, emptyMessageComponentExtraProps }} {...tableProps} >
+					<TableRowRenderer {...tableRowProps} enableRemoving={enableRemoving}>{children}</TableRowRenderer>
+				</TableRenderer>
 			</LayoutRenderer>
 		)
 	},
@@ -65,29 +48,50 @@ export const ImmutableEntityListTablePageRenderer = Component(
 	props: ImmutableEntityListTablePageRendererProps<ContainerExtraProps, ItemExtraProps>,
 ) => ReactElement
 
-const EmptyTable = memo((props: { children: ReactNode }) => (
-	<EmptyMessage>{props.children}</EmptyMessage>
-))
-EmptyTable.displayName = 'EmptyTable'
 
-const Container = memo((props: RepeaterFieldContainerProps & Omit<TableProps, 'children'>) => {
-	// TODO solve this via preferences
-	const isEmpty = !Array.from(props.accessor).some(entity => entity instanceof EntityAccessor && entity.existsOnServer)
+type TableContainerRendererProps =
+	& TableProps
+	& EmptyMessageOuterProps
+	& {
+		accessor: EntityListAccessor
+		children: ReactNode
+	}
+const TableRenderer = Component(
+	({ accessor, children, ...props }: TableContainerRendererProps) => {
+		// TODO solve this via preferences
+		const isEmpty = !Array.from(accessor).some(entity => entity instanceof EntityAccessor && entity.existsOnServer)
 
-	if (isEmpty) {
-		const EmptyMessageComponent = props.emptyMessageComponent || EmptyTable
+		if (isEmpty) {
+			const EmptyMessageComponent = props.emptyMessageComponent || EmptyTable
+			return (
+				<EmptyMessageComponent {...props.emptyMessageComponentExtraProps}>
+					{props.emptyMessage || 'There are no items to display.'}
+				</EmptyMessageComponent>
+			)
+		}
+
 		return (
-			<EmptyMessageComponent {...props.emptyMessageComponentExtraProps}>
-				{props.emptyMessage || 'There are no items to display.'}
-			</EmptyMessageComponent>
+			<Table {...props} >
+				{Array.from(accessor).map(it => (
+					<Entity accessor={it}>
+						{children}
+					</Entity>
+				))}
+			</Table>
 		)
+	},
+	({ children }) => <>{children}</>,
+	'TableContainerRenderer',
+)
+
+type TableRowRendererProps =
+	& TableRowProps
+	& {
+		enableRemoving: boolean
+		children: ReactNode
 	}
 
-	return <Table {...props} />
-})
-Container.displayName = 'Container'
-
-const Row = memo((props: RepeaterItemProps & Omit<TableRowProps, 'children'> & { enableRemoving: boolean }) => (
+const TableRowRenderer = memo((props: TableRowRendererProps) => (
 	<TableRow {...props}>
 		{props.children}
 		{props.enableRemoving && (
@@ -97,4 +101,10 @@ const Row = memo((props: RepeaterItemProps & Omit<TableRowProps, 'children'> & {
 		)}
 	</TableRow>
 ))
-Row.displayName = 'Row'
+TableRow.displayName = 'TableRowRenderer'
+
+
+const EmptyTable = memo((props: { children: ReactNode }) => (
+	<EmptyMessage>{props.children}</EmptyMessage>
+))
+EmptyTable.displayName = 'EmptyTable'

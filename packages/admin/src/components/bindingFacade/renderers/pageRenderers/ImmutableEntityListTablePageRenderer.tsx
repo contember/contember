@@ -1,14 +1,8 @@
 import { Component, Entity, EntityAccessor, EntityListAccessor } from '@contember/binding'
 import { Table, TableCell, TableProps, TableRow, TableRowProps } from '@contember/ui'
-import { ComponentType, memo, ReactElement, ReactNode } from 'react'
-import { DeleteEntityButton, EmptyMessage, EmptyMessageProps } from '../../collections'
+import { memo, ReactElement, ReactNode } from 'react'
+import { DeleteEntityButton, EmptyMessage, EmptyMessageOuterProps } from '../../collections'
 import { LayoutRenderer, LayoutRendererProps } from '../LayoutRenderer'
-
-interface EmptyMessageOuterProps {
-	emptyMessage?: ReactNode
-	emptyMessageComponent?: ComponentType<EmptyMessageProps & any> // This can override 'emptyMessage'
-	emptyMessageComponentExtraProps?: {}
-}
 
 export type ImmutableEntityListTablePageRendererProps<ContainerExtraProps, ItemExtraProps> =
 	& LayoutRendererProps
@@ -29,7 +23,6 @@ export const ImmutableEntityListTablePageRenderer = Component(
 		accessor,
 		emptyMessage,
 		emptyMessageComponent,
-		emptyMessageComponentExtraProps,
 		after,
 		...layoutProps
 	}: ImmutableEntityListTablePageRendererProps<ContainerExtraProps, ItemExtraProps>) => {
@@ -37,7 +30,7 @@ export const ImmutableEntityListTablePageRenderer = Component(
 			<LayoutRenderer
 				{...layoutProps}
 			>
-				<TableRenderer accessor={accessor} {...{ emptyMessage, emptyMessageComponent, emptyMessageComponentExtraProps }} {...tableProps} >
+				<TableRenderer accessor={accessor} {...{ emptyMessage, emptyMessageComponent }} {...tableProps} >
 					<TableRowRenderer {...tableRowProps} enableRemoving={enableRemoving}>{children}</TableRowRenderer>
 				</TableRenderer>
 			</LayoutRenderer>
@@ -62,11 +55,8 @@ const TableRenderer = Component(
 		const isEmpty = !Array.from(accessor).some(entity => entity instanceof EntityAccessor && entity.existsOnServer)
 
 		if (isEmpty) {
-			const EmptyMessageComponent = props.emptyMessageComponent || EmptyTable
 			return (
-				<EmptyMessageComponent {...props.emptyMessageComponentExtraProps}>
-					{props.emptyMessage || 'There are no items to display.'}
-				</EmptyMessageComponent>
+				<EmptyMessage component={props.emptyMessageComponent}>{props.emptyMessage ?? 'There are no items to display.'}</EmptyMessage>
 			)
 		}
 
@@ -102,9 +92,3 @@ const TableRowRenderer = memo((props: TableRowRendererProps) => (
 	</TableRow>
 ))
 TableRow.displayName = 'TableRowRenderer'
-
-
-const EmptyTable = memo((props: { children: ReactNode }) => (
-	<EmptyMessage>{props.children}</EmptyMessage>
-))
-EmptyTable.displayName = 'EmptyTable'

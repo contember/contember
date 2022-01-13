@@ -1,6 +1,6 @@
 import { whereToFilter } from '@contember/client'
 import { useConstantValueInvariant } from '@contember/react-utils'
-import { ComponentType, ReactElement, ReactNode, useCallback } from 'react'
+import { ReactElement, ReactNode, useCallback } from 'react'
 import { useAccessorUpdateSubscription, useEntitySubTreeParameters, useGetEntitySubTree } from '../accessorPropagation'
 import { SetOrderFieldOnCreate, SetOrderFieldOnCreateOwnProps } from '../accessorSorting'
 import { NIL_UUID, PRIMARY_KEY_NAME } from '../bindingTypes'
@@ -12,7 +12,7 @@ import type {
 	TreeRootId,
 } from '../treeParameters'
 import { Component } from './Component'
-import { Entity, EntityBaseProps } from './Entity'
+import { Entity } from './Entity'
 import { Field } from './Field'
 
 export interface EntitySubTreeAdditionalProps {
@@ -25,15 +25,7 @@ export type EntitySubTreeProps<EntityProps> = {
 	treeRootId?: TreeRootId
 	children?: ReactNode
 } & EntitySubTreeAdditionalProps &
-	(SugaredQualifiedSingleEntity | (SugaredUnconstrainedQualifiedSingleEntity & EntitySubTreeAdditionalCreationProps)) &
-	(
-		| {}
-		| {
-				entityComponent: ComponentType<EntityProps & EntityBaseProps>
-				entityProps?: EntityProps
-		  }
-	)
-
+	(SugaredQualifiedSingleEntity | (SugaredUnconstrainedQualifiedSingleEntity & EntitySubTreeAdditionalCreationProps))
 export const EntitySubTree = Component(
 	<EntityProps extends {}>(props: EntitySubTreeProps<EntityProps>) => {
 		useConstantValueInvariant(props.isCreating, 'EntitySubTree: cannot update isCreating')

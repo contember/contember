@@ -15,10 +15,6 @@ export type HasManyProps<ListProps = never, EntityProps = never> = SugaredRelati
 } & (
 		| {}
 		| {
-				entityComponent: ComponentType<EntityProps & EntityBaseProps>
-				entityProps?: EntityProps
-		  }
-		| {
 				listComponent: ComponentType<ListProps & EntityListBaseProps>
 				listProps?: ListProps
 		  }

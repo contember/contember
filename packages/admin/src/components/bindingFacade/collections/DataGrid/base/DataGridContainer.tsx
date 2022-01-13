@@ -142,8 +142,6 @@ export const DataGridContainer: FunctionComponent<DataGridContainerProps> = Comp
 							<Entity
 								key={entity.key}
 								accessor={entity}
-								//entityComponent={}
-								//entityProps={}
 							>
 								<TableRow>
 									{Array.from(columns)

@@ -1,20 +1,16 @@
 import { ComponentType, createElement, ReactElement, ReactNode } from 'react'
 import type { EntityListAccessor } from '../accessors'
 import { Component } from './Component'
-import { Entity, EntityBaseProps } from './Entity'
+import { Entity } from './Entity'
 
 export interface EntityListBaseProps {
 	accessor: EntityListAccessor
 	children?: ReactNode
 }
 
-export type EntityListProps<ListProps, EntityProps> = EntityListBaseProps &
+export type EntityListProps<ListProps> = EntityListBaseProps &
 	(
 		| {}
-		| {
-				entityComponent: ComponentType<EntityProps & EntityBaseProps>
-				entityProps?: EntityProps
-		  }
 		| {
 				listComponent: ComponentType<ListProps & EntityListBaseProps>
 				listProps?: ListProps
@@ -22,7 +18,7 @@ export type EntityListProps<ListProps, EntityProps> = EntityListBaseProps &
 	)
 
 export const EntityList = Component(
-	<ListProps, EntityProps>(props: EntityListProps<ListProps, EntityProps>) => {
+	<ListProps extends {}>(props: EntityListProps<ListProps>) => {
 		if ('listComponent' in props && props.listComponent) {
 			return createElement(props.listComponent, {
 				...props.listProps!,
@@ -33,18 +29,6 @@ export const EntityList = Component(
 		return (
 			<>
 				{Array.from(props.accessor, entity => {
-					if ('entityComponent' in props && props.entityComponent) {
-						return (
-							<Entity
-								key={entity.key}
-								accessor={entity}
-								entityComponent={props.entityComponent}
-								entityProps={props.entityProps}
-							>
-								{props.children}
-							</Entity>
-						)
-					}
 					return (
 						<Entity key={entity.key} accessor={entity}>
 							{props.children}
@@ -54,7 +38,7 @@ export const EntityList = Component(
 			</>
 		)
 	},
-	<ListProps, EntityProps>(props: EntityListProps<ListProps, EntityProps>) => {
+	<ListProps extends {}>(props: EntityListProps<ListProps>) => {
 		if ('listComponent' in props && props.listComponent) {
 			return createElement(props.listComponent, {
 				...props.listProps!,
@@ -62,14 +46,7 @@ export const EntityList = Component(
 				children: props.children,
 			})
 		}
-		if ('entityComponent' in props && props.entityComponent) {
-			return (
-				<Entity accessor={undefined as any} entityComponent={props.entityComponent} entityProps={props.entityProps}>
-					{props.children}
-				</Entity>
-			)
-		}
 		return <>{props.children}</>
 	},
 	'EntityList',
-) as <ListProps, EntityProps>(props: EntityListProps<ListProps, EntityProps>) => ReactElement
+) as <ListProps>(props: EntityListProps<ListProps>) => ReactElement

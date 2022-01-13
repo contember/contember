@@ -3,7 +3,6 @@ import { Message } from '@contember/ui'
 import {
 	ComponentType,
 	Fragment,
-	FunctionComponent,
 	isValidElement,
 	ReactElement,
 	ReactNode,
@@ -15,20 +14,35 @@ import { useCurrentRequest } from '../../routing'
 import { MiscPageLayout } from '../MiscPageLayout'
 import { PageErrorBoundary } from './PageErrorBoundary'
 
-export type PageProvider<P> = ComponentType & {
+export interface PageProvider<P> {
 	getPageName(props: P): string
 }
 
-export type PageProviderElement = ReactElement<any, PageProvider<any>>
+export type PageProviderElement = ReactElement<any, ComponentType & PageProvider<any>>
+
+export interface PageSetProvider<P> {
+	getPages(props: P): Record<string, ComponentType>
+}
+
+export type PageSetProviderElement = ReactElement<any, ComponentType & PageSetProvider<any>>
+
+type EmptyObject = Record<any, never>
+
+type PagesMapElement =
+	| ComponentType
+	| PageProviderElement
+	| PageSetProviderElement
+	| PageSetProvider<EmptyObject>;
+type PagesMap = Record<string, PagesMapElement>
 
 export interface PagesProps {
-	children: PageProviderElement[] | PageProviderElement | Record<string, FunctionComponent>
+	children:
+		| PagesMap
+		| PageProviderElement[]
+		| PageProviderElement
 	layout?: ComponentType<{ children?: ReactNode }>
 }
 
-function isPageProviderElement(el: ReactNode): el is PageProviderElement {
-	return isValidElement(el) && typeof el.type !== 'string' && typeof (el.type as any).getPageName === 'function'
-}
 
 function isPageList(children: ReactNodeArray): children is PageProviderElement[] {
 	return children.every(child => isPageProviderElement(child))
@@ -43,7 +57,7 @@ export const Pages = ({ children, layout }: PagesProps) => {
 	const requestId = useRef<number>(0)
 	const Layout = layout ?? Fragment
 
-	const pageMap = useMemo<Map<string, FunctionComponent>>(
+	const pageMap = useMemo<Map<string, ComponentType>>(
 		() => {
 			if (Array.isArray(children)) {
 				if (isPageList(children)) {
@@ -57,7 +71,17 @@ export const Pages = ({ children, layout }: PagesProps) => {
 				return new Map([[children.type.getPageName(children.props), () => children]])
 
 			} else {
-				return new Map(Object.entries(children))
+				return new Map(Object.entries(children).flatMap(([k, v]): [string, ComponentType][] => {
+					if (isPageSetProvider<EmptyObject>(v)) {
+						return Object.entries(v.getPages({}))
+					} else if (isPageSetProviderElement(v)) {
+						return Object.entries(v.type.getPages(v.props))
+					} else if (isPageProviderElement(v)) {
+						return [[v.type.getPageName(v.props), () => v]]
+					} else {
+						return [[k, v]]
+					}
+				}))
 			}
 		},
 		[children],
@@ -93,4 +117,22 @@ export const Pages = ({ children, layout }: PagesProps) => {
 			</Layout>
 		</EnvironmentContext.Provider>
 	)
+}
+
+
+function isPageProvider(it: any): it is PageProvider<any> {
+	return typeof it === 'object' && it !== null && typeof it.getPageName === 'function'
+}
+
+function isPageProviderElement(el: ReactNode): el is PageProviderElement {
+	return isValidElement(el) && typeof el.type !== 'string' && isPageProvider(el.type)
+}
+
+
+function isPageSetProvider<T = any>(it: any): it is PageSetProvider<T> {
+	return typeof it === 'object' && it !== null && typeof it.getPages === 'function'
+}
+
+function isPageSetProviderElement(el: ReactNode): el is PageSetProviderElement {
+	return isValidElement(el) && typeof el.type !== 'string' && isPageSetProvider(el.type)
 }

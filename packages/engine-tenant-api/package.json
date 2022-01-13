@@ -1,6 +1,6 @@
 {
   "name": "@contember/engine-tenant-api",
-  "version": "1.0.0-alpha.2",
+  "version": "1.0.0-alpha.3",
   "license": "Apache-2.0",
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
@@ -9,16 +9,16 @@
     "test": "uvu dist/tests/cases/ \\.js$"
   },
   "dependencies": {
-    "@contember/authorization": "^1.0.0-alpha.2",
-    "@contember/config-loader": "^1.0.0-alpha.2",
-    "@contember/database": "^1.0.0-alpha.2",
-    "@contember/database-migrations": "^1.0.0-alpha.2",
-    "@contember/dic": "^1.0.0-alpha.2",
-    "@contember/engine-common": "^1.0.0-alpha.2",
-    "@contember/graphql-utils": "^1.0.0-alpha.2",
-    "@contember/queryable": "^1.0.0-alpha.2",
-    "@contember/schema": "^1.0.0-alpha.2",
-    "@contember/schema-utils": "^1.0.0-alpha.2",
+    "@contember/authorization": "^1.0.0-alpha.3",
+    "@contember/config-loader": "^1.0.0-alpha.3",
+    "@contember/database": "^1.0.0-alpha.3",
+    "@contember/database-migrations": "^1.0.0-alpha.3",
+    "@contember/dic": "^1.0.0-alpha.3",
+    "@contember/engine-common": "^1.0.0-alpha.3",
+    "@contember/graphql-utils": "^1.0.0-alpha.3",
+    "@contember/queryable": "^1.0.0-alpha.3",
+    "@contember/schema": "^1.0.0-alpha.3",
+    "@contember/schema-utils": "^1.0.0-alpha.3",
     "@graphql-tools/utils": "^7.10.0",
     "apollo-server-errors": "^2.4.0",
     "graphql-tag": "^2.12.5",
@@ -28,7 +28,7 @@
     "otpauth": "^7.0.6"
   },
   "devDependencies": {
-    "@contember/database-tester": "^1.0.0-alpha.2",
+    "@contember/database-tester": "^1.0.0-alpha.3",
     "@graphql-codegen/cli": "^1.15.2",
     "@graphql-codegen/typescript": "^1.15.2",
     "@graphql-codegen/typescript-operations": "^1.15.2",

@@ -121,7 +121,7 @@ export const Pages = ({ children, layout }: PagesProps) => {
 
 
 function isPageProvider(it: any): it is PageProvider<any> {
-	return typeof it === 'object' && it !== null && typeof it.getPageName === 'function'
+	return typeof it.getPageName === 'function'
 }
 
 function isPageProviderElement(el: ReactNode): el is PageProviderElement {

@@ -2,10 +2,10 @@
 	$root: &
 
 	--cui-box-content-padding: calc(var(--cui-padding) / 2)
-	--cui-box-content-padding-left: calc(var(--cui-padding) / 2)
-	--cui-box-content-padding-right: calc(var(--cui-padding) / 2)
-	--cui-box-content-padding-top: calc(var(--cui-padding) / 2)
-	--cui-box-content-padding-bottom: calc(var(--cui-padding) / 2)
+	--cui-box-content-padding-left: var(--cui-box-content-padding)
+	--cui-box-content-padding-right: var(--cui-box-content-padding)
+	--cui-box-content-padding-top: var(--cui-box-content-padding)
+	--cui-box-content-padding-bottom: var(--cui-box-content-padding)
 
 	--cui-box-content-border: var(--cui-control-border-width) solid var(--cui-color--lower)
 	--cui-box-content-background-color: var(--cui-background-color--above)
@@ -36,10 +36,6 @@
 		border-radius: unset
 	&.view-no-padding
 		--cui-box-content-padding: 0
-		--cui-box-content-padding-left: 0
-		--cui-box-content-padding-right: 0
-		--cui-box-content-padding-top: 0
-		--cui-box-content-padding-bottom: 0
 
 	&-header,
 	&-body

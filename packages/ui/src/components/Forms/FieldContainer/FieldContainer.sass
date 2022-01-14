@@ -1,12 +1,15 @@
 @use 'sass:math'
 
 .#{$cui-conf-globalPrefix}field-container
+	align-self: stretch
+	column-gap: calc(2 * var(--cui-gap-horizontal))
 	display: flex
 	flex-direction: column
 	font-size: var(--cui-control-font-size)
-	column-gap: calc(2 * var(--cui-gap-horizontal))
 	row-gap: calc(2 * var(--cui-gap-vertical))
-	width: 100%
+
+	.#{$cui-conf-globalPrefix}layout-page-content-wrap &
+		min-width: var(--cui-field-container-min-width)
 
 	&.view-small
 		font-size: var(--cui-control-font-size--small)

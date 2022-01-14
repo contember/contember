@@ -1,7 +1,7 @@
 import classNames from 'classnames'
-import { memo, ReactNode, useLayoutEffect, useRef } from 'react'
+import { memo, ReactNode, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { useClassNamePrefix } from '../../auxiliary'
-import { toEnumClass, toThemeClass } from '../../utils'
+import { toEnumClass, toStateClass, toThemeClass } from '../../utils'
 import { SectionTabs, useSectionTabsRegistration } from '../SectionTabs'
 import { Stack } from '../Stack'
 import { TitleBar, TitleBarProps } from '../TitleBar'
@@ -10,8 +10,41 @@ import { ThemeScheme } from './Types'
 
 export const PageLayoutContent = ({ children }: { children: ReactNode }) => {
 	const prefix = useClassNamePrefix()
+	const [isOverflowing, setIsOverflowing] = useState(false)
+	const contentRef = useRef<HTMLDivElement>(null)
 
-	return <div className={`${prefix}layout-page-content`}>
+	useEffect(() => {
+		if (!contentRef.current) {
+			return
+		}
+
+		const contentRefCopy = contentRef.current
+
+		const listener = () => {
+			const offsetWidth = Math.floor(contentRefCopy.offsetWidth ?? 0)
+			const scrollWidth = Math.floor(contentRefCopy.scrollWidth ?? 0)
+			const scrollLeft = Math.floor(contentRefCopy.scrollLeft ?? 0)
+			const scrollRight = scrollWidth - offsetWidth - scrollLeft
+
+			const nextIsOverflowing = offsetWidth < scrollWidth && scrollRight > 1
+
+			setIsOverflowing(nextIsOverflowing)
+		}
+
+		listener()
+		contentRefCopy.addEventListener('scroll', listener, { passive: true })
+
+		return () => {
+			contentRefCopy.removeEventListener('scroll', listener)
+		}
+	}, [])
+
+	return <div
+		ref={contentRef}
+		className={classNames(
+			`${prefix}layout-page-content`,
+			toStateClass('overflowing', isOverflowing),
+		)}>
 		<div className={`${prefix}layout-page-content-container`}>
 			{children}
 		</div>
@@ -40,7 +73,7 @@ function isElementFixed (element: HTMLDivElement) {
 }
 
 const Aside = memo(({ children }: { children: ReactNode }) => {
-	const prefix = useClassNamePrefix()
+	const componentClassName = `${useClassNamePrefix()}layout-page-aside`
 	const [registerTab, unregisterTab] = useSectionTabsRegistration()
 	const element = useRef<HTMLDivElement>(null)
 
@@ -68,8 +101,8 @@ const Aside = memo(({ children }: { children: ReactNode }) => {
 		}
 	})
 
-	return <div ref={element} id={metaTab.id} className={`${prefix}layout-page-aside`}>
-		<Stack gap="large" direction="vertical">
+	return <div ref={element} id={metaTab.id} className={componentClassName}>
+		<Stack gap="large" direction="vertical" className={`${componentClassName}-content`}>
 			{children}
 		</Stack>
 	</div>

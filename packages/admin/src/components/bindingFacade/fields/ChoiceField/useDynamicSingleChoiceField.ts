@@ -59,11 +59,6 @@ export const useDynamicSingleChoiceField = (
 		environment,
 		currentValue: currentValues.length ? currentValues[0] : -1,
 		onChange: (newValue: ChoiceFieldData.ValueRepresentation) => {
-			const entity = currentlyChosenEntities[0]
-			if (entity === undefined || !(currentValueEntity instanceof EntityAccessor)) {
-				return
-			}
-
 			if (newValue === -1) {
 				currentValueParent.disconnectEntityAtField(currentValueFieldName)
 			} else {

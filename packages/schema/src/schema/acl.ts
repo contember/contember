@@ -103,7 +103,7 @@ namespace Acl {
 		tenant?: TenantPermissions
 		system?: SystemPermissions
 		variables: Acl.Variables
-		stages: StagesDefinition
+		stages?: StagesDefinition
 		entities: Permissions
 	} & Record<string, unknown>
 

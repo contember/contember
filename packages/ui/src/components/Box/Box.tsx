@@ -1,7 +1,7 @@
 import classnames from 'classnames'
 import { forwardRef, memo, ReactNode } from 'react'
 import { useClassNamePrefix } from '../../auxiliary'
-import type { BoxDistinction, Intent, NativeProps, Size } from '../../types'
+import type { BoxDistinction, Default, Intent, NativeProps, Size } from '../../types'
 import { toEnumViewClass, toStateClass, toThemeClass } from '../../utils'
 import { Stack } from '../Stack'
 import { Label } from '../Typography/Label'
@@ -14,13 +14,14 @@ export interface BoxOwnProps {
 	heading?: ReactNode
 	isActive?: boolean
 	intent?: Intent
+	padding?: Default | 'no-padding'
 }
 
 export interface BoxProps extends BoxOwnProps, Omit<NativeProps<HTMLDivElement>, 'children'> {}
 
 export const Box = memo(
 	forwardRef<HTMLDivElement, BoxProps>(
-		({ actions, className, distinction, children, gap, heading, intent, isActive, ...divProps }: BoxProps, ref) => {
+		({ actions, className, distinction, children, gap, heading, intent, isActive, padding, ...divProps }: BoxProps, ref) => {
 			const componentClassName = `${useClassNamePrefix()}box`
 
 			return (
@@ -31,6 +32,7 @@ export const Box = memo(
 						toStateClass('active', isActive),
 						toEnumViewClass(distinction),
 						toThemeClass(intent),
+						toEnumViewClass(padding),
 						className,
 					)}
 					ref={ref}

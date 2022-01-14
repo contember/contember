@@ -20,7 +20,7 @@ export interface InitializeReferenceContentProps {
 	referenceId: string
 	editor: EditorWithBlocks
 	selection: SlateRange | null
-	onSuccess: () => void
+	onSuccess: (options?: { createElement?: Partial<SlateElement> }) => void
 	onCancel: () => void
 }
 

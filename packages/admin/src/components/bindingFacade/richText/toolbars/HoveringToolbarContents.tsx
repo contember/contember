@@ -5,6 +5,8 @@ import { Transforms } from 'slate'
 import { useSlate } from 'slate-react'
 import type { EditorWithBlocks } from '../blockEditor'
 import type { ToolbarButtonSpec } from './ToolbarButtonSpec'
+import { EditorTransforms } from '../slate-reexport'
+import { referenceElementType } from '../blockEditor'
 
 export interface HoveringToolbarContentsProps {
 	buttons: ToolbarButtonSpec[] | ToolbarButtonSpec[][]
@@ -69,7 +71,26 @@ export const HoveringToolbarContents = memo(({ buttons: rawButtons }: HoveringTo
 													referenceId={reference.id}
 													editor={editor}
 													selection={selection}
-													onSuccess={() => props.resolve(undefined)}
+													onSuccess={({ createElement } = {}) => {
+														if (createElement !== undefined) {
+															if (!selection) {
+																return
+															}
+															EditorTransforms.select(editor, selection)
+															EditorTransforms.wrapNodes(
+																editor,
+																{
+																	type: referenceElementType,
+																	children: [{ text: '' }],
+																	referenceId: reference.id,
+																	...createElement,
+																},
+																{ split: true },
+															)
+															EditorTransforms.collapse(editor, { edge: 'end' })
+														}
+														props.resolve(undefined)
+													}}
 													onCancel={() => props.reject()}
 												/>
 											</Entity>

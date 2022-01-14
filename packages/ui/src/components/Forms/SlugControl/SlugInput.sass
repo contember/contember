@@ -1,0 +1,52 @@
+.#{$cui-conf-globalPrefix}slug-input
+	--slug-input-control-focus-ring: var(--cui-control-focus-ring-box-shadow)
+
+	align-items: stretch
+	border-radius: var(--cui-control-border-radius)
+	display: flex
+
+	&:focus-within
+		box-shadow: var(--slug-input-control-focus-ring)
+
+	&-prefix
+		display: flex
+		align-items: stretch
+		margin-right: calc(-2 * var(--cui-control-border-width))
+		border-top-left-radius: var(--cui-control-border-radius)
+		border-bottom-left-radius: var(--cui-control-border-radius)
+		border-right: none
+		background: var(--cui-color--lower)
+		color: var(--cui-color--medium)
+	&:hover &-prefix
+		background: var(--cui-color--low)
+	&:focus-within &-prefix
+		background: var(--cui-control-border-color)
+
+	&-prefix-link
+		align-items: center
+		display: flex
+		color: var(--cui-color--medium)
+		padding: 0 calc(2 * var(--cui-gap-horizontal))
+		font-weight: normal
+	&:hover &-prefix-link
+		color: var(--cui-color--strong)
+	&:focus-within &-prefix-link
+		color: white
+
+	&-input
+		flex: 5 1 auto
+		position: relative
+		.#{$cui-conf-globalPrefix}input
+			--input-control-focus-ring: none
+			border-left: 0
+			border-top-left-radius: 0
+			border-bottom-left-radius: 0
+
+	&-overlay
+		cursor: pointer
+		+absolute(0)
+
+		a
+			width: 100%
+			height: 100%
+			display: block

@@ -120,7 +120,7 @@ export const selectStyles: StylesConfig<OptionTypeBase, boolean, GroupTypeBase<O
 			borderColor,
 			color,
 			'borderRadius': 'var(--cui-control-border-radius)',
-			'boxShadow': isFocused ? '0 0 0 0.2em var(--cui-control-border-color)' : undefined,
+			'boxShadow': isFocused ? 'var(--cui-control-focus-ring-box-shadow)' : undefined,
 			'minHeight': 'var(--cui-control-height)',
 			'&:hover': {
 				backgroundColor: 'var(--cui-background-color--above)',

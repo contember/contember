@@ -30,7 +30,7 @@
 	// TODO: Not ideal since `:focus-visible` would be good to use as well
 	*[contenteditable="true"]:focus // << Fails on large editors
 		@extend %implementsCustomFocusEffects
-		box-shadow: 0 0 0 .2em var(--cui-control-border-color)
+		box-shadow: var(--cui-control-focus-ring-box-shadow)
 
 	&-canvas > [class^="cui-editor"]
 		padding-bottom: var(--cui-editor-canvas-element-padding-bottom)

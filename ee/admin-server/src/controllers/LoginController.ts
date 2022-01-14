@@ -27,6 +27,7 @@ export class LoginController extends BaseController<LoginParams> {
 					let customConfig = {}
 					try {
 						const configContent = await this.s3Manager.getObjectContent({
+							projectGroup,
 							path: 'login-config.json',
 						})
 						customConfig = customLoginConfigSchema(JSON.parse(configContent))

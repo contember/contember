@@ -20,7 +20,7 @@ export interface CreateEditorOptions
 		ReferenceElementOptions,
 		OverrideInsertDataOptions,
 		OverrideInsertElementWithReferenceOptions,
-		CreateEditorPublicOptions {}
+		CreateEditorPublicOptions<EditorWithBlocks> {}
 
 export const initBlockEditor = ({ editor, ...options }: CreateEditorOptions & { editor: Editor }) => {
 	if (options.plugins && options.plugins.indexOf(paragraphElementType) === -1) {

@@ -15,7 +15,7 @@ import { unorderedListElementPlugin } from './UnorderedListElement'
 import { isListElement } from './ListElement'
 import { listHtmlDeserializerFactory } from './ListHtmlDeserializer'
 
-export const withLists = <E extends Editor>(editor: E): Editor => {
+export const withLists = <E extends Editor>(editor: E): E => {
 	const {
 		insertBreak,
 		onKeyDown,

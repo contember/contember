@@ -34,7 +34,7 @@ import {
 	ToolbarButtonSpec,
 } from '../toolbars'
 import { BlockHoveringToolbarContents, BlockHoveringToolbarContentsProps } from './BlockHoveringToolbarContents'
-import { initBlockEditor } from './editor'
+import { EditorWithBlocks, initBlockEditor } from './editor'
 import type { EmbedHandler } from './embed'
 import type { FieldBackedElement } from './FieldBackedElement'
 import { useCreateElementReference } from './references'
@@ -46,7 +46,7 @@ import { useBlockEditorState } from './state/useBlockEditorState'
 import { ContentOutlet, ContentOutletProps, useEditorReferenceBlocks } from './templating'
 import { useReferentiallyStableCallback } from './useReferentiallyStableCallback'
 
-export interface BlockEditorProps extends SugaredRelativeEntityList, CreateEditorPublicOptions {
+export interface BlockEditorProps extends SugaredRelativeEntityList, CreateEditorPublicOptions<EditorWithBlocks> {
 	label: string
 	contentField: SugaredFieldProps['field']
 	sortableBy: SugaredFieldProps['field']

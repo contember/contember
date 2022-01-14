@@ -21,9 +21,9 @@ export const PageLayoutContent = ({ children }: { children: ReactNode }) => {
 		const contentRefCopy = contentRef.current
 
 		const listener = () => {
-			const offsetWidth = Math.floor(contentRefCopy?.offsetWidth ?? 0)
-			const scrollWidth = Math.floor(contentRefCopy?.scrollWidth ?? 0)
-			const scrollLeft = Math.floor(contentRefCopy?.scrollLeft ?? 0)
+			const offsetWidth = Math.floor(contentRefCopy.offsetWidth ?? 0)
+			const scrollWidth = Math.floor(contentRefCopy.scrollWidth ?? 0)
+			const scrollLeft = Math.floor(contentRefCopy.scrollLeft ?? 0)
 			const scrollRight = scrollWidth - offsetWidth - scrollLeft
 
 			const nextIsOverflowing = offsetWidth < scrollWidth && scrollRight > 1
@@ -32,10 +32,10 @@ export const PageLayoutContent = ({ children }: { children: ReactNode }) => {
 		}
 
 		listener()
-		contentRefCopy?.addEventListener('scroll', listener, { passive: true })
+		contentRefCopy.addEventListener('scroll', listener, { passive: true })
 
 		return () => {
-			contentRefCopy?.removeEventListener('scroll', listener)
+			contentRefCopy.removeEventListener('scroll', listener)
 		}
 	}, [])
 

@@ -43,7 +43,7 @@ class SingleConnection implements Connection.ConnectionLike, Connection.ClientFa
 	}
 
 	async end(): Promise<void> {
-		this.isConnected = true
+		this.isConnected = false
 		await this.pgClient.end()
 	}
 

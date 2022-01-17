@@ -1,12 +1,12 @@
 import * as React from 'react'
 import { ReactNode } from 'react'
 import { Layout as ContemberLayout } from '@contember/admin'
-import { SideMenu } from './SideMenu'
+import { Navigation } from './Navigation'
 
 export const Layout = (props: { children?: ReactNode }) => (
 	<ContemberLayout
-		topStart="{projectName}"
-		sideBar={<SideMenu />}
+		sidebarHeader="{projectName}"
+		navigation={<Navigation />}
 		children={props.children}
 	/>
 )

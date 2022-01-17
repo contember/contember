@@ -1,4 +1,4 @@
 type: project
 replaceVariables:
   - admin/index.tsx
-  - admin/index.html
+  - admin/components/Layout.tsx

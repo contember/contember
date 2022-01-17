@@ -83,30 +83,38 @@ namespace Menu {
 	}
 
 	function Title(props: TitleProps) {
-		const { children, external, suppressTo, onClick, ...otherProps } = props
-		const content = <Label size={otherProps.size} isActive={otherProps.isActive}>{children}</Label>
-		if (otherProps.href) {
-			return <a
-				href={otherProps.href}
-				{...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
-				onClick={event => {
-					if (onClick && !isSpecialLinkClick(event.nativeEvent)) {
-						onClick(event)
-						if (suppressTo) {
-							event.preventDefault()
-						}
+		const content = <Label size={props.size} isActive={props.isActive}>{props.children}</Label>
+
+		if (props.href) {
+			const onClick = (event: ReactMouseEvent<HTMLAnchorElement>) => {
+				if (props.onClick && !isSpecialLinkClick(event.nativeEvent)) {
+					props.onClick(event)
+					if (props.suppressTo) {
+						event.preventDefault()
 					}
-				}}
-				{...otherProps}
-			>{content}</a>
-		} else if (onClick) {
+				}
+			}
+
 			return (
-				<button type="button" onClick={onClick} {...otherProps}>
+				<a
+					className={props.className}
+					href={props.href}
+					onClick={onClick}
+					target={props.external ? '_blank' : undefined}
+					rel={props.external ? 'noopener noreferrer' : undefined}
+					children={content}
+				/>
+			)
+
+		} else if (props.onClick) {
+			return (
+				<button type="button" onClick={props.onClick} className={props.className}>
 					{content}
 				</button>
 			)
+
 		} else {
-			return <div {...otherProps}>{content}</div>
+			return <div className={props.className}>{content}</div>
 		}
 	}
 

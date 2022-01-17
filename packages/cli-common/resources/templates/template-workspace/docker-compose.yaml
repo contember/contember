@@ -3,7 +3,7 @@ version: '2.4'
 services:
   admin:
     image: node:16-alpine
-    command: 'npm run start-admin'
+    command: 'npm run start'
     user: '1000:1000'
 
     environment:
@@ -18,6 +18,10 @@ services:
     working_dir: /src
     volumes:
       - ./:/src:cached
+
+    depends_on:
+      engine:
+        condition: service_healthy
 
   engine:
     image: contember/engine:{version}
@@ -64,41 +68,6 @@ services:
 
     depends_on:
       postgres:
-        condition: service_healthy
-
-  contember-cli:
-    image: contember/cli:{version}
-    user: '1000:1000'
-
-    environment:
-      CONTEMBER_API_URL: 'http://engine:4000/'
-      CONTEMBER_API_TOKEN: '0000000000000000000000000000000000000000'
-      CONTEMBER_PROJECT_NAME: '{projectName}'
-
-    working_dir: /src
-    volumes:
-      - ./:/src:cached
-
-    depends_on:
-      engine:
-        condition: service_healthy
-
-  contember-migrations:
-    image: contember/cli:{version}
-    command: 'migrations:execute . --yes'
-    user: '1000:1000'
-
-    environment:
-      CONTEMBER_API_URL: 'http://engine:4000/'
-      CONTEMBER_API_TOKEN: '0000000000000000000000000000000000000000'
-      CONTEMBER_PROJECT_NAME: '{projectName}'
-
-    working_dir: /src
-    volumes:
-      - ./:/src:cached
-
-    depends_on:
-      engine:
         condition: service_healthy
 
   postgres:

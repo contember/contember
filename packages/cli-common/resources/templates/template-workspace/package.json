@@ -1,10 +1,11 @@
 {
   "scripts-template": {
-    "contember": "docker-compose run contember-cli",
-    "start-admin": "vite admin --port ${VITE_PORT:-4000} --host 0.0.0.0",
-    "build-admin": "tsc && vite build admin"
+    "contember": "contember",
+    "start": "contember migrations:execute . --yes && vite admin --port ${VITE_PORT:-4000} --host 0.0.0.0",
+    "build": "tsc && vite build admin"
   },
   "devDependencies": {
+    "@contember/cli": "{version}",
     "@contember/schema": "{version}",
     "@contember/schema-definition": "{version}",
     "@contember/admin": "^1.0.0-alpha.6",

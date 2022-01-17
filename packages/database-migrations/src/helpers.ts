@@ -1,6 +1,6 @@
 import { MigrationBuilder } from 'node-pg-migrate'
 import { Client, ClientConfig } from 'pg'
-import { DatabaseCredentials } from '@contember/database'
+import { ClientError, ClientErrorCodes, DatabaseCredentials } from '@contember/database'
 
 export function createMigrationBuilder(): MigrationBuilder & { getSql: () => string; getSqlSteps: () => string[] } {
 	// eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -30,13 +30,19 @@ export async function createPgClient(cfg: ClientConfig): Promise<Client> {
 
 export const createDatabaseIfNotExists = async (db: DatabaseCredentials, log: (message: string) => void) => {
 	const Connection = (await import('@contember/database')).Connection
-	const connection = new Connection({ ...db, database: 'postgres' }, {})
-	const result = await connection.query('SELECT 1 FROM "pg_database" WHERE "datname" = ?', [db.database])
-
-	if (result.rowCount === 0) {
-		log(`Database ${db.database} does not exist, attempting to create it...`)
-		await connection.query(`CREATE DATABASE ${wrapIdentifier(db.database)}`)
+	try {
+		const connection = new Connection(db, {})
+		await connection.query('SELECT 1')
+		await connection.end()
+		return
+	} catch (e) {
+		if (!(e instanceof ClientError && e.code === ClientErrorCodes.INVALID_CATALOG_NAME)) {
+			throw e
+		}
 	}
 
+	log(`Database ${db.database} does not exist, attempting to create it...`)
+	const connection = new Connection({ ...db, database: 'postgres' }, {})
+	await connection.query(`CREATE DATABASE ${wrapIdentifier(db.database)}`)
 	await connection.end()
 }

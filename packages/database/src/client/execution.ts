@@ -11,6 +11,7 @@ import {
 	UniqueViolationError,
 	ClientError,
 } from './errors'
+import { ClientErrorCodes } from './errorCodes'
 
 function prepareSql(sql: string) {
 	let parameterIndex = 0
@@ -64,18 +65,18 @@ export async function executeQuery<Row extends Record<string, any>>(
 		eventManager.fire(EventManager.Event.queryError, { sql, parameters, meta }, error)
 
 		switch ((error as any).code) {
-			case '23502':
+			case ClientErrorCodes.NOT_NULL_VIOLATION:
 				throw new NotNullViolationError(sql, parameters, error)
-			case '23503':
+			case ClientErrorCodes.FOREIGN_KEY_VIOLATION:
 				throw new ForeignKeyViolationError(sql, parameters, error)
-			case '23505':
+			case ClientErrorCodes.UNIQUE_VIOLATION:
 				throw new UniqueViolationError(sql, parameters, error)
-			case '40001':
+			case ClientErrorCodes.T_R_SERIALIZATION_FAILURE:
 				throw new SerializationFailureError(sql, parameters, error)
-			case '22P02':
-			case '22008':
+			case ClientErrorCodes.INVALID_TEXT_REPRESENTATION:
+			case ClientErrorCodes.DATETIME_FIELD_OVERFLOW:
 				throw new InvalidDataError(sql, parameters, error)
-			case '25P02':
+			case ClientErrorCodes.IN_FAILED_SQL_TRANSACTION:
 				throw new TransactionAbortedError(sql, parameters, error)
 			default:
 				throw new QueryError(sql, parameters, error)

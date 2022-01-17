@@ -1,4 +1,5 @@
 export * from './Client'
+export * from './errorCodes'
 export * from './errors'
 export * from './Connection'
 export * from './EventManager'

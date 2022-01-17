@@ -9,13 +9,8 @@ import {
 	VideoFiles,
 } from '@contember/admin'
 
-// export const DashboardPage = (
-// 	<GenericPage pageName="dashboard" title="Sandbox admin">
-// 	</GenericPage>
-// )
-
-export const DashboardPage = (
-	<EditPage pageName="dashboard" entity="UploadShowcase(unique = One)">
+export const IndexPage = (
+	<EditPage pageName="index" entity="UploadShowcase(unique = One)" setOnCreate="(unique = One)">
 		<Link to="second">SECOND</Link>
 		<ImageUploadField urlField="singleTrivialImage.url" label="Trivial imageddd" />
 		<ImageUploadField

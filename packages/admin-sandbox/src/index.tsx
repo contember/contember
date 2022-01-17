@@ -1,5 +1,5 @@
-import { ApplicationEntrypoint, runReactApp } from '@contember/admin'
-import Sandbox from './Sandbox'
+import { ApplicationEntrypoint, Pages, runReactApp } from '@contember/admin'
+import { Layout } from './components/Layout'
 import './index.sass'
 
 runReactApp(
@@ -8,14 +8,11 @@ runReactApp(
 		sessionToken={import.meta.env.VITE_CONTEMBER_ADMIN_SESSION_TOKEN as string}
 		project={'admin-sandbox'}
 		stage={'live'}
-		routes={{
-			dashboard: { path: '/' },
-			inputs: { path: '/inputs' },
-			second: { path: '/2nd' },
-			fooPage: { path: '/foo' },
-			barPage: { path: '/bar' },
-			loremPage: { path: '/lorem' },
-		}}
-		children={<Sandbox />}
+		children={
+			<Pages
+				layout={Layout}
+				children={Object.assign({}, ...Object.values(import.meta.globEager('./pages/*.tsx')))}
+			/>
+		}
 	/>,
 )

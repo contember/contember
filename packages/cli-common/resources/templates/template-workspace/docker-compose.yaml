@@ -128,8 +128,7 @@ services:
 
     volumes:
       - s3-data:/data
-      - ./scripts/minio/s3-policy.json:/bucket-policy.json
-      - ./scripts/minio/s3-entrypoint.sh:/minio-entrypoint.sh
+      - ./docker/minio/:/minio
 
   mailhog:
     image: mailhog/mailhog

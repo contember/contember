@@ -3,7 +3,7 @@
 		"allowSyntheticDefaultImports": true,
 		"experimentalDecorators": true,
 		"isolatedModules": true,
-		"jsx": "react-jsx",
+		"jsx": "react",
 		"lib": [
 			"esnext",
 			"dom"

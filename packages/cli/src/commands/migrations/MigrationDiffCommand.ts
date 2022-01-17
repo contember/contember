@@ -86,7 +86,7 @@ export class MigrationDiffCommand extends Command<Args, Options> {
 						await executeMigrations({
 							client,
 							migrations: status.migrationsToExecute,
-							requireConfirmation: !yes,
+							requireConfirmation: status.migrationsToExecute.length > 1 && !yes,
 							schemaVersionBuilder,
 							migrationDescriber,
 						})

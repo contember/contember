@@ -11,7 +11,7 @@ import { Toaster, ToasterProvider } from './Toaster'
 export interface ApplicationEntrypointProps extends ContemberClientProps {
 	basePath?: string
 	sessionToken?: string
-	routes: RouteMap
+	routes?: RouteMap
 	defaultDimensions?: SelectedDimension
 	defaultLocale?: string
 	dictionaries?: MessageDictionaryByLocaleCode
@@ -31,7 +31,7 @@ export const ApplicationEntrypoint = (props: ApplicationEntrypointProps) => {
 
 	const routing: RoutingContextValue = {
 		basePath: props.basePath ?? '/',
-		routes: props.routes,
+		routes: props.routes ?? { index: { path: '/' } },
 		defaultDimensions: props.defaultDimensions,
 	}
 

@@ -109,7 +109,7 @@ services:
       - pgsql-data:/var/lib/postgres/data
 
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready']
+      test: ['CMD-SHELL', 'pg_isready -U contember']
       interval: 5s
       timeout: 5s
       retries: 10

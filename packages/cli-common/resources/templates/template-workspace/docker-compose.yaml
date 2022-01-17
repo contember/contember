@@ -2,8 +2,8 @@ version: '2.4'
 
 services:
   admin:
-    image: node:14-alpine
-    command: npm run start-admin
+    image: node:16-alpine
+    command: 'npm run start-admin'
     user: '1000:1000'
 
     environment:
@@ -19,17 +19,18 @@ services:
     volumes:
       - ./:/src:cached
 
-  contember:
+  engine:
     image: contember/engine:{version}
-    restart: on-failure
 
     environment:
       NODE_ENV: 'development'
 
+      CONTEMBER_PORT: '4000'
       CONTEMBER_ROOT_EMAIL: 'contember@localhost'
       CONTEMBER_ROOT_PASSWORD: 'contember'
-      CONTEMBER_ROOT_TOKEN: '0000000000000000000000000000000000000000'
-      CONTEMBER_LOGIN_TOKEN: '1111111111111111111111111111111111111111'
+      CONTEMBER_ROOT_TOKEN: '0000000000000000000000000000000000000000' # openssl rand -hex 20
+      CONTEMBER_LOGIN_TOKEN: '1111111111111111111111111111111111111111' # openssl rand -hex 20
+
       CONTEMBER_CONFIG_YAML: |
         projectDefaults:
           s3:
@@ -55,6 +56,12 @@ services:
     ports:
       - '1481:4000'
 
+    healthcheck:
+      test: ['CMD-SHELL', 'curl --fail http://localhost:4000']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
     depends_on:
       postgres:
         condition: service_healthy
@@ -64,7 +71,7 @@ services:
     user: '1000:1000'
 
     environment:
-      CONTEMBER_API_URL: 'http://contember:4000/'
+      CONTEMBER_API_URL: 'http://engine:4000/'
       CONTEMBER_API_TOKEN: '0000000000000000000000000000000000000000'
       CONTEMBER_PROJECT_NAME: '{projectName}'
 
@@ -73,8 +80,8 @@ services:
       - ./:/src:cached
 
     depends_on:
-      contember:
-        condition: service_started
+      engine:
+        condition: service_healthy
 
   contember-migrations:
     image: contember/cli:{version}
@@ -82,7 +89,7 @@ services:
     user: '1000:1000'
 
     environment:
-      CONTEMBER_API_URL: 'http://contember:4000/'
+      CONTEMBER_API_URL: 'http://engine:4000/'
       CONTEMBER_API_TOKEN: '0000000000000000000000000000000000000000'
       CONTEMBER_PROJECT_NAME: '{projectName}'
 
@@ -91,16 +98,16 @@ services:
       - ./:/src:cached
 
     depends_on:
-      contember:
-        condition: service_started
+      engine:
+        condition: service_healthy
 
   postgres:
-    image: postgres:13-alpine
+    image: postgres:14-alpine
 
     environment:
-      POSTGRES_PASSWORD: contember
-      POSTGRES_USER: contember
-      POSTGRES_DB: contember
+      POSTGRES_PASSWORD: 'contember'
+      POSTGRES_USER: 'contember'
+      POSTGRES_DB: 'contember'
 
     ports:
       - '1482:5432'
@@ -116,12 +123,12 @@ services:
 
   s3:
     image: minio/minio
-    entrypoint: /minio-entrypoint.sh
+    entrypoint: /minio/s3-entrypoint.sh
     command: 'server --address :1483 /data'
 
     environment:
-      MINIO_ROOT_USER: contember
-      MINIO_ROOT_PASSWORD: contember
+      MINIO_ROOT_USER: 'contember'
+      MINIO_ROOT_PASSWORD: 'contember'
 
     ports:
       - '1483:1483' # ports must match
@@ -139,19 +146,20 @@ services:
     image: michalhosna/adminer:4.8.0-en_v1
 
     environment:
-      ADMINER_DRIVER: pgsql
-      ADMINER_SERVER: postgres
-      ADMINER_DB: contember
-      ADMINER_USERNAME: contember
-      ADMINER_PASSWORD: contember
-      ADMINER_AUTOLOGIN: 1
-      ADMINER_NAME: Contember
+      ADMINER_DRIVER: 'pgsql'
+      ADMINER_SERVER: 'postgres'
+      ADMINER_DB: 'contember'
+      ADMINER_USERNAME: 'contember'
+      ADMINER_PASSWORD: 'contember'
+      ADMINER_AUTOLOGIN: '1'
+      ADMINER_NAME: 'Contember'
 
     ports:
       - '1485:8080'
 
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
 
 volumes:
   pgsql-data: ~

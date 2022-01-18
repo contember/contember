@@ -1,79 +1,70 @@
-import cn from 'classnames'
-import { ChangeEvent, forwardRef, memo, Ref, useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { VisuallyHidden } from 'react-aria'
-import { useComponentClassName } from '../../../auxiliary'
-import { toEnumStateClass, toEnumViewClass, toViewClass } from '../../../utils'
+import { ChangeEvent, forwardRef, memo, Ref, useCallback, useEffect, useMemo, useRef } from 'react'
+import { assertDatetimeString, splitDateTime } from '.'
 import { Stack } from '../../Stack'
-import { TextInputOwnProps } from '../TextInput'
-import { dateToDateValue, dateToTimeValue } from './Serializer'
-
-function setNativeValue(element: HTMLInputElement, value: string) {
-	const valueSetter = Object.getOwnPropertyDescriptor(element, 'value')?.set
-	const prototype = Object.getPrototypeOf(element)
-	const prototypeValueSetter = Object.getOwnPropertyDescriptor(prototype, 'value')?.set
-
-	if (valueSetter && valueSetter !== prototypeValueSetter) {
-		prototypeValueSetter?.call(element, value)
-	} else {
-		valueSetter?.call(element, value)
-	}
-
-	element.dispatchEvent(new Event('input', { bubbles: true }))
-}
+import { DateTimeInputProps } from './Types'
 
 export const FallbackDateTimeInput = memo(
-	forwardRef(({ size, distinction, validationState, withTopToolbar, value, ...rest }: TextInputOwnProps, ref: Ref<HTMLInputElement>) => {
-		const finalClassName = cn(
-			useComponentClassName('input'),
-			toEnumViewClass(size),
-			toEnumViewClass(distinction),
-			toEnumStateClass(validationState),
-			toViewClass('withTopToolbar', withTopToolbar),
-		)
+	forwardRef(({ size, distinction, max, min, onChange, validationState, withTopToolbar, value, ...rest }: DateTimeInputProps, ref: Ref<HTMLInputElement>) => {
+		if (value) {
+			assertDatetimeString(value)
+		}
 
-		const datetime: Date | null = useMemo(() => {
-			if (value) {
-				return new Date(value)
-			}
+		if (max) {
+			assertDatetimeString(max)
+		}
 
-			return null
-		}, [value])
+		if (min) {
+			assertDatetimeString(min)
+		}
 
-		const hiddenRef = useRef<HTMLInputElement>(null)
-		const [date, setDate] = useState(datetime ? dateToDateValue(datetime) : '')
-		const [time, setTime] = useState(datetime ? dateToTimeValue(datetime) : '')
+		const [maxDate, maxTime] = useMemo(() => splitDateTime(max), [max])
+		const [minDate, minTime] = useMemo(() => splitDateTime(min), [min])
+		const [valueDate, valueTime] = useMemo(() => splitDateTime(value), [value])
 
-		const onDateChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
-			setDate(event.target.value)
-		}, [])
-
-		const onTimeChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
-			setTime(event.target.value)
-		}, [])
+		const date = useRef<string>(valueDate)
+		const time = useRef<string>(valueTime)
 
 		useEffect(() => {
-			if (hiddenRef.current && date && time) {
-				setNativeValue(hiddenRef.current, `${date}T${time}`)
+			date.current = valueDate
+			time.current = valueTime
+		}, [valueDate, valueTime])
+
+		const maybeCallOnChange = useCallback(() => {
+			const newValue = date.current && time.current ? `${date.current}T${time.current}` : ''
+
+			if (newValue !== value) {
+				onChange(newValue)
 			}
-		}, [hiddenRef, date, time])
+		}, [onChange, value])
+
+		const onDateChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
+			date.current = event.target.value
+			maybeCallOnChange()
+		}, [maybeCallOnChange])
+
+		const onTimeChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
+			time.current = event.target.value
+			maybeCallOnChange()
+		}, [maybeCallOnChange])
 
 		return <>
 			<Stack direction="horizontal">
-				<VisuallyHidden>
-					<input ref={hiddenRef} {...rest} type="text" tabIndex={-1} />
-				</VisuallyHidden>
 				<input
 					ref={ref}
-					className={finalClassName}
+					max={maxDate}
+					min={minDate}
 					onChange={onDateChange}
+					value={valueDate}
+					{...rest}
 					type="date"
-					value={date}
 				/>
 				<input
-					className={finalClassName}
+					max={date.current && date.current === maxDate ? maxTime : ''}
+					min={date.current && date.current === minDate ? minTime : ''}
 					onChange={onTimeChange}
+					value={valueTime}
+					{...rest}
 					type="time"
-					value={time}
 				/>
 			</Stack>
     </>

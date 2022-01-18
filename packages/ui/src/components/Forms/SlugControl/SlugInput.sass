@@ -35,10 +35,9 @@
 		font-weight: normal
 		color: inherit
 		@extend %implementsCustomFocusEffects
-		&:focus
+		&:focus, &:hover
 			text-decoration: underline
-	&:hover &-prefix-link
-		color: inherit
+			color: var(--cui-control-color)
 
 	&-input
 		flex: 1 1 auto

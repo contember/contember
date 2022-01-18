@@ -2,6 +2,7 @@
 	$root: &
 
 	@extend %buttonStates
+	@extend %implementsCustomFocusEffects
 
 	$border-width-em: em(1px)
 	$button-list-separation-x: .5em !default
@@ -56,10 +57,12 @@
 	transition-property: box-shadow, color, background, opacity, border-color
 	user-select: none
 
-	&:focus:focus-visible
+	&:focus
 		color: var(--cui-button-color--highlighted)
 		background: var(--cui-button-background-color--highlighted)
 		border-color: var(--cui-button-border-color--highlighted)
+		box-shadow: var(--cui-button-box-shadow--highlighted), var(--cui-control-focus-ring-box-shadow)
+	&:focus:not(:focus-visible)
 		box-shadow: var(--cui-button-box-shadow--highlighted)
 
 	// Duplicate of focus rules to overcome Safaru bug ignoring :hover when selectors are combined

@@ -13,6 +13,8 @@ a.#{$cui-conf-globalPrefix}menu
 				color: var(--cui-control-color--highlighted)
 
 .#{$cui-conf-globalPrefix}menu
+	--cui-menu-background-color-semitransparent: var(--cui-control-background-color--highlighted)
+
 	$caret-size: 0.4em
 	$padding-coeficient: 1.5
 
@@ -172,6 +174,8 @@ a.#{$cui-conf-globalPrefix}menu
 		&-action,
 		&-tooDeep
 			&-title
-				&:focus:focus-visible
-					@extend %implementsCustomFocusEffects
-					background-color: var(--cui-theme-primary-interactive-semitransparent)
+				@extend %implementsCustomFocusEffects
+				&:focus .#{$cui-conf-globalPrefix}label:not(.is-active)
+					background-color: var(--cui-menu-background-color-semitransparent)
+				&:focus:not(:focus-visible) .#{$cui-conf-globalPrefix}label
+					background-color: unset

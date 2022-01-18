@@ -4,16 +4,10 @@ on:
     tags:
       - '**'
 jobs:
-  publish:
+  publish-node:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
-
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v1
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
 
       - name: Setup node
         uses: actions/setup-node@v1
@@ -38,8 +32,33 @@ jobs:
           NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
           NPM_TAG: ${{ steps.versions.outputs.npmTag }}
 
+  publish-docker:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        image: [cli, engine-alpine, engine-debian]
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Setup node
+        uses: actions/setup-node@v1
+        with:
+          node-version: 14
+
+      - name: Extract version
+        id: versions
+        uses: ./.github/actions/extract-version
+        with:
+          version: ${{ github.ref }}
+
       - name: "Publish Docker"
-        run: bash ./scripts/docker/publish.sh
+        run: bash ./scripts/docker/publish.sh ${{ matrix.image }}
         env:
           DOCKER_USER: ${{ secrets.DOCKER_USER }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}

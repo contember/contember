@@ -3,6 +3,7 @@ set -e
 
 mkdir dist
 yarn install
+yarn build
 yarn esbuild ./packages/cli/src/run.ts \
 	--bundle --platform=node --sourcemap=external \
 	--external:pg-native --external:electron --external:typescript --external:ts-node \

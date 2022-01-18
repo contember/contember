@@ -16,6 +16,11 @@
 	&:focus:focus-visible
 		box-shadow: var(--input-control-focus-ring)
 
+	&:invalid
+		border-color: rgb(var(--cui-theme-danger-500))
+		&:focus:focus-visible
+			box-shadow: var(--cui-control-focus-ring-box-shadow-error)
+
 	&::placeholder
 		color: var(--cui-color--low)
 

@@ -25,6 +25,7 @@ export const InputsPage = (
 		<FloatField field={'floatValue'} label={'Float value'} />
 		<DateField field={'dateValue'} label={'Date'} />
 		<DateTimeField field={'dateTimeValue'} label={'Date time'} />
+		<DateTimeField field={'dateTimeValue'} label={'Date time'} min="2020-12-02T01:20" max="2022-01-20T23:13" />
 		<LocationField latitudeField={'gpsLatValue'} longitudeField={'gpsLonValue'} label={'Map'} />
 		<RadioField field={'enumValue'} label={'Value'} options={[
 			{ value: 'a', label: 'A option' },

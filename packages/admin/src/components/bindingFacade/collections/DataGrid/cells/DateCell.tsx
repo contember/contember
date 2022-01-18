@@ -1,8 +1,7 @@
 import { Component, QueryLanguage, wrapFilterInHasOnes } from '@contember/binding'
 import type { Input } from '@contember/client'
-import { FieldContainer, TextInput } from '@contember/ui'
-import { forwardRef, FunctionComponent, memo } from 'react'
-import DatePicker from 'react-datepicker'
+import { DateTimeInput, dateToDateValue, FieldContainer, Stack } from '@contember/ui'
+import { forwardRef, FunctionComponent, memo, ReactNode, useCallback } from 'react'
 import { useMessageFormatter } from '../../../../../i18n'
 import { dateToStringWithoutTimezone } from '../../../../../utils'
 import { DateFieldView, DateFieldViewProps } from '../../../fieldViews'
@@ -56,34 +55,42 @@ export const DateCell: FunctionComponent<DateCellProps> = Component(props => {
 			}}
 			filterRenderer={({ filter, setFilter }) => {
 				const formatMessage = useMessageFormatter(dataGridCellsDictionary)
-				const start = filter.start ? new Date(filter.start) : null
-				const end = filter.end ? new Date(filter.end) : null
+
+				const start = filter.start ? dateToDateValue(new Date(filter.start)) : ''
+				const end = filter.end ? dateToDateValue(new Date(filter.end)) : ''
+
+				const onDateStartChange = useCallback((value: string | null) => {
+					setFilter({
+						...filter,
+						start: value ? dateToStringWithoutTimezone(new Date(value)) : null,
+					})
+				}, [filter, setFilter])
+				const onDateEndChange = useCallback((value: string | null) => {
+					setFilter({
+						...filter,
+						end: value ? dateToStringWithoutTimezone(new Date(value)) : null,
+					})
+				}, [filter, setFilter])
+
 				return (
-					<div style={{ display: 'flex', gap: '10px' }}>
-						<DatePicker
-							selected={start}
-							onChange={date => {
-								setFilter({ ...filter, start: date ? dateToStringWithoutTimezone(date as Date) : null })
-							}}
-							selectsStart
-							startDate={start}
-							endDate={end}
-							isClearable
-							customInput={<DateBoundInput label={formatMessage('dataGridCells.dateCell.fromLabel')} />}
-						/>
-						<DatePicker
-							selected={end}
-							onChange={date => {
-								setFilter({ ...filter, end: date ? dateToStringWithoutTimezone(date as Date) : null })
-							}}
-							selectsEnd
-							startDate={start}
-							endDate={end}
-							minDate={start}
-							isClearable
-							customInput={<DateBoundInput label={formatMessage('dataGridCells.dateCell.toLabel')} />}
-						/>
-					</div>
+					<Stack direction="horizontal">
+						<DateBoundInput label={formatMessage('dataGridCells.dateCell.fromLabel')}>
+							<DateTimeInput
+								type="date"
+								value={start}
+								onChange={onDateStartChange}
+								max={end}
+							/>
+						</DateBoundInput>
+						<DateBoundInput label={formatMessage('dataGridCells.dateCell.toLabel')}>
+							<DateTimeInput
+								type="date"
+								value={end}
+								onChange={onDateEndChange}
+								min={start}
+							/>
+						</DateBoundInput>
+					</Stack>
 				)
 			}}
 		>
@@ -93,9 +100,9 @@ export const DateCell: FunctionComponent<DateCellProps> = Component(props => {
 }, 'DateCell')
 
 const DateBoundInput = memo(
-	forwardRef(({ className, label, style, ...props }: any, ref: any) => (
+	forwardRef(({ label, children }: { label: string, children: ReactNode }, ref: any) => (
 		<FieldContainer label={label} labelPosition="labelInlineLeft">
-			<TextInput {...props} style={{ ...style, width: '130px' }} ref={ref} />
+			{children}
 		</FieldContainer>
 	)),
 )

@@ -1,23 +1,23 @@
 @import '../../styles/common'
 
 .#{$cui-conf-globalPrefix}stack
-  --stack-gap: calc(var(--cui-padding-vertical) / 2)
-  &.view-horizontal, &.view-horizontal-reverse
-    --stack-gap: cacl(var(--cui-padding-horizontal) / 2)
+  --stack-row-gap: calc(var(--cui-padding-vertical) / 2)
+  --stack-column-gap: calc(var(--cui-padding-horizontal) / 2)
+
   &.gap-small
-    --stack-gap: var(--cui-gap-vertical)
-    &.view-horizontal, &.view-horizontal-reverse
-      --stack-gap: var(--cui-gap-horizontal)
+    --stack-row-gap: var(--cui-gap-vertical)
+    --stack-column-gap: var(--cui-gap-horizontal)
   &.gap-large
-    --stack-gap: var(--cui-padding-vertical)
-    &.view-horizontal, &.view-horizontal-reverse
-      --stack-gap: var(--cui-padding-horizontal)
+    --stack-row-gap: var(--cui-padding-vertical)
+    --stack-column-gap: var(--cui-padding-horizontal)
   &.gap-none
-    --stack-gap: unset
+    --stack-row-gap: 0
+    --stack-column-gap: 0
 
   display:  flex
   flex-direction: column
-  gap: var(--stack-gap)
+  row-gap: var(--stack-row-gap)
+  column-gap: var(--stack-column-gap)
 
   &.view-horizontal
     flex-direction: row

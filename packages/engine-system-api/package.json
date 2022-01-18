@@ -5,7 +5,7 @@
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
   "scripts": {
-    "prepare": "gql-gen --config graphql.codegen.yml",
+    "generate": "gql-gen --config graphql.codegen.yml",
     "test": "uvu dist/tests/cases/ \\.js$ && uvu migrations \\.test\\.js"
   },
   "dependencies": {

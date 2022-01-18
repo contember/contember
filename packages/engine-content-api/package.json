@@ -5,7 +5,8 @@
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
   "scripts": {
-    "prepare": "gql-gen --config graphql.codegen.yml && mkdir -p dist && find ./tests/ -name '*.gql' -type f -exec cp --parents {} ./dist \\;",
+    "build-copy": "mkdir -p dist && find ./tests/ -name '*.gql' -type f -exec cp --parents {} ./dist \\;",
+    "generate": "gql-gen --config graphql.codegen.yml",
     "test": "uvu dist/tests/cases/ \\.js$"
   },
   "dependencies": {

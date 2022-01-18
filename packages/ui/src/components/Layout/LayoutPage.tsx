@@ -1,7 +1,7 @@
 import classNames from 'classnames'
-import { memo, ReactNode, useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { CSSProperties, memo, ReactNode, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { useClassNamePrefix } from '../../auxiliary'
-import { toEnumClass, toStateClass, toThemeClass } from '../../utils'
+import { toEnumClass, toThemeClass } from '../../utils'
 import { SectionTabs, useSectionTabsRegistration } from '../SectionTabs'
 import { Stack } from '../Stack'
 import { TitleBar, TitleBarProps } from '../TitleBar'
@@ -10,41 +10,9 @@ import { ThemeScheme } from './Types'
 
 export const PageLayoutContent = ({ children }: { children: ReactNode }) => {
 	const prefix = useClassNamePrefix()
-	const [isOverflowing, setIsOverflowing] = useState(false)
-	const contentRef = useRef<HTMLDivElement>(null)
-
-	useEffect(() => {
-		if (!contentRef.current) {
-			return
-		}
-
-		const contentRefCopy = contentRef.current
-
-		const listener = () => {
-			const offsetWidth = Math.floor(contentRefCopy.offsetWidth ?? 0)
-			const scrollWidth = Math.floor(contentRefCopy.scrollWidth ?? 0)
-			const scrollLeft = Math.floor(contentRefCopy.scrollLeft ?? 0)
-			const scrollRight = scrollWidth - offsetWidth - scrollLeft
-
-			const nextIsOverflowing = offsetWidth < scrollWidth && scrollRight > 1
-
-			setIsOverflowing(nextIsOverflowing)
-		}
-
-		listener()
-		contentRefCopy.addEventListener('scroll', listener, { passive: true })
-
-		return () => {
-			contentRefCopy.removeEventListener('scroll', listener)
-		}
-	}, [])
 
 	return <div
-		ref={contentRef}
-		className={classNames(
-			`${prefix}layout-page-content`,
-			toStateClass('overflowing', isOverflowing),
-		)}>
+		className={`${prefix}layout-page-content`}>
 		<div className={`${prefix}layout-page-content-container`}>
 			{children}
 		</div>
@@ -133,6 +101,65 @@ export const LayoutPage = memo(({
 	const themeContent = themeContentProp ?? themeContentContext
 	const themeControls = themeControlsProp ?? themeControlsContext
 
+	const [contentOffsetTop, setContentOffsetTop] = useState<number | undefined>(undefined)
+	const contentRef = useRef<HTMLDivElement>(null)
+
+	useLayoutEffect(() => {
+		if (!contentRef.current) {
+			return
+		}
+
+		const ref = contentRef.current
+
+		const topOffsetHandler = () => {
+			const contentOffsetTop = ref.offsetTop
+
+			setContentOffsetTop(contentOffsetTop)
+		}
+
+		topOffsetHandler()
+
+		window.addEventListener('resize', topOffsetHandler, { passive: true })
+
+		return () => {
+			window.removeEventListener('resize', topOffsetHandler)
+		}
+	}, [])
+
+	const [showDivider, setShowDivider] = useState<boolean>(false)
+
+	useEffect(() => {
+		if (!document?.body?.parentElement) {
+			return
+		}
+
+		const container = document.body.parentElement
+
+		console.log(container)
+
+		const scrollHandler = () => {
+			const visibleWidth = container.offsetWidth
+			const contentWidth = container.scrollWidth
+			const scrollLeft = container.scrollLeft
+
+			console.log({
+				visibleWidth,
+				contentWidth,
+				scrollLeft,
+			})
+
+			setShowDivider(contentWidth > visibleWidth && scrollLeft + visibleWidth < contentWidth)
+		}
+
+		scrollHandler()
+
+		window.addEventListener('scroll', scrollHandler, { passive: true })
+
+		return () => {
+			window.removeEventListener('scroll', scrollHandler)
+		}
+	}, [])
+
 	return <div className={classNames(
 		`${prefix}layout-page`,
 		toThemeClass(themeContent ?? theme, 'content'),
@@ -142,7 +169,14 @@ export const LayoutPage = memo(({
 		{(title || actions) && <TitleBar after={<SectionTabs />} navigation={navigation} actions={actions} headingProps={headingProps}>
 			{title}
 		</TitleBar>}
-		<div className={`${prefix}layout-page-content-wrap`}>
+		<div
+			ref={contentRef}
+			className={classNames(
+				`${prefix}layout-page-content-wrap`,
+				showDivider ? 'view-aside-divider' : undefined,
+			)}
+			style={{ '--cui-content-offset-top': `${contentOffsetTop}px` } as CSSProperties}
+		>
 			<PageLayoutContent>
 				{children}
 			</PageLayoutContent>

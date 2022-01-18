@@ -43,6 +43,9 @@
 		flex: 1 1 auto
 		position: relative
 
+		.#{$cui-conf-globalPrefix}input:focus
+			@extend %implementsCustomFocusEffects
+
 	&-prefix + &-input
 		flex: 5 1 auto
 		position: relative

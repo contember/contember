@@ -1309,6 +1309,24 @@
 }
 
 :root,
+.scheme-system,
+.scheme-system-above,
+.scheme-system-below {
+  color-scheme: light dark;
+}
+.scheme-light,
+.scheme-light-above,
+.scheme-light-below {
+  color-scheme: light;
+}
+
+.scheme-dark,
+.scheme-dark-below,
+.scheme-dark-above {
+  color-scheme: dark;
+}
+
+:root,
 .scheme-light,
 .scheme-system,
 .scheme-light-above,

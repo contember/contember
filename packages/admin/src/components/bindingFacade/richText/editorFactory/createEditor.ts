@@ -18,10 +18,10 @@ import {
 } from '../plugins'
 import type { BuiltinEditorPlugins } from './BuiltinEditorPlugins'
 import { defaultEditorPluginPreset } from './presets'
-import { Editor as SlateEditor } from 'slate'
+import { Editor, Editor as SlateEditor } from 'slate'
 
 const pluginAugmenters: {
-	[pluginName in BuiltinEditorPlugins]: (editor: SlateEditor) => SlateEditor
+	[pluginName in BuiltinEditorPlugins]: <E extends Editor>(editor: E) => E
 } = {
 	anchor: withAnchors,
 	paragraph: withParagraphs,
@@ -40,15 +40,15 @@ const pluginAugmenters: {
 	underline: withUnderline,
 }
 
-export interface CreateEditorPublicOptions {
+export interface CreateEditorPublicOptions<E extends Editor = Editor> {
 	plugins?: BuiltinEditorPlugins[]
-	augmentEditor?: (baseEditor: SlateEditor) => SlateEditor
-	augmentEditorBuiltins?: (editor: SlateEditor) => SlateEditor
+	augmentEditor?: (baseEditor: Editor) => Editor | void
+	augmentEditorBuiltins?: (editor: E) => E | void
 }
 
-export interface CreateEditorOptions extends CreateEditorPublicOptions {
+export interface CreateEditorOptions<E extends Editor = Editor> extends CreateEditorPublicOptions<E> {
 	defaultElementType: string
-	addEditorBuiltins: (augmentedBaseEditor: SlateEditor) => SlateEditor
+	addEditorBuiltins: (augmentedBaseEditor: SlateEditor) => E | void
 }
 
 export const createEditor = ({
@@ -63,19 +63,19 @@ export const createEditor = ({
 }
 
 
-export const initializeEditor = ({
+export const initializeEditor = <E extends Editor>({
 	editor,
 	plugins = defaultEditorPluginPreset,
 	augmentEditorBuiltins = identityFunction,
 	addEditorBuiltins,
 	augmentEditor = identityFunction,
-}: Omit<CreateEditorOptions, 'defaultElementType'> & {editor: SlateEditor}) => {
+}: Omit<CreateEditorOptions<E>, 'defaultElementType'> & {editor: Editor}): E => {
 	for (const plugin of new Set(plugins)) {
 		editor = pluginAugmenters[plugin](editor)
 	}
 
-	const withAugmentedBase = augmentEditor(editor)
-	const withBuiltins = addEditorBuiltins(withAugmentedBase)
+	const withAugmentedBase = augmentEditor(editor) ?? editor
+	const withBuiltins = addEditorBuiltins(withAugmentedBase) ?? (withAugmentedBase as E)
 
-	return augmentEditorBuiltins(withBuiltins)
+	return augmentEditorBuiltins(withBuiltins) ?? withBuiltins
 }

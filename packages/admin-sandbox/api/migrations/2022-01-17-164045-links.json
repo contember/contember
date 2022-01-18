@@ -1,0 +1,273 @@
+{
+	"formatVersion": 3,
+	"modifications": [
+		{
+			"modification": "removeField",
+			"entityName": "ContentReference",
+			"fieldName": "url"
+		},
+		{
+			"modification": "createEnum",
+			"enumName": "LinkType",
+			"values": [
+				"internal",
+				"external"
+			]
+		},
+		{
+			"modification": "createEnum",
+			"enumName": "UrlType",
+			"values": [
+				"article",
+				"category",
+				"tag"
+			]
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"name": "Link",
+				"primary": "id",
+				"primaryColumn": "id",
+				"unique": {},
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"nullable": false,
+						"type": "Uuid",
+						"columnType": "uuid"
+					}
+				},
+				"tableName": "link"
+			}
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"name": "Url",
+				"primary": "id",
+				"primaryColumn": "id",
+				"unique": {},
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"nullable": false,
+						"type": "Uuid",
+						"columnType": "uuid"
+					}
+				},
+				"tableName": "url"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "Link",
+			"field": {
+				"name": "type",
+				"columnName": "type",
+				"nullable": false,
+				"type": "Enum",
+				"columnType": "LinkType"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "Link",
+			"field": {
+				"name": "externalLink",
+				"columnName": "external_link",
+				"nullable": true,
+				"type": "String",
+				"columnType": "text"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "Url",
+			"field": {
+				"name": "url",
+				"columnName": "url",
+				"nullable": false,
+				"type": "String",
+				"columnType": "text"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "Url",
+			"field": {
+				"name": "type",
+				"columnName": "type",
+				"nullable": false,
+				"type": "Enum",
+				"columnType": "UrlType"
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "ContentReference",
+			"owningSide": {
+				"name": "link",
+				"nullable": true,
+				"type": "ManyHasOne",
+				"target": "Link",
+				"joiningColumn": {
+					"columnName": "link_id",
+					"onDelete": "restrict"
+				}
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "Link",
+			"owningSide": {
+				"name": "internalLink",
+				"nullable": true,
+				"type": "ManyHasOne",
+				"target": "Url",
+				"joiningColumn": {
+					"columnName": "internal_link_id",
+					"onDelete": "set null"
+				}
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "Url",
+			"owningSide": {
+				"name": "article",
+				"nullable": true,
+				"type": "OneHasOne",
+				"target": "Article",
+				"joiningColumn": {
+					"columnName": "article_id",
+					"onDelete": "cascade"
+				}
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "Url",
+			"owningSide": {
+				"name": "category",
+				"nullable": true,
+				"type": "OneHasOne",
+				"target": "Category",
+				"joiningColumn": {
+					"columnName": "category_id",
+					"onDelete": "cascade"
+				}
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "Url",
+			"owningSide": {
+				"name": "tag",
+				"nullable": true,
+				"type": "OneHasOne",
+				"target": "Tag",
+				"joiningColumn": {
+					"columnName": "tag_id",
+					"onDelete": "cascade"
+				}
+			}
+		},
+		{
+			"modification": "createUniqueConstraint",
+			"entityName": "Url",
+			"unique": {
+				"fields": [
+					"url"
+				],
+				"name": "unique_Url_url_a758c1"
+			}
+		},
+		{
+			"modification": "patchAclSchema",
+			"patch": [
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/Link",
+					"value": {
+						"predicates": {},
+						"operations": {
+							"create": {
+								"id": true,
+								"type": true,
+								"internalLink": true,
+								"externalLink": true
+							},
+							"read": {
+								"id": true,
+								"type": true,
+								"internalLink": true,
+								"externalLink": true
+							},
+							"update": {
+								"id": true,
+								"type": true,
+								"internalLink": true,
+								"externalLink": true
+							},
+							"delete": true,
+							"customPrimary": true
+						}
+					}
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/Url",
+					"value": {
+						"predicates": {},
+						"operations": {
+							"create": {
+								"id": true,
+								"url": true,
+								"type": true,
+								"article": true,
+								"category": true,
+								"tag": true
+							},
+							"read": {
+								"id": true,
+								"url": true,
+								"type": true,
+								"article": true,
+								"category": true,
+								"tag": true
+							},
+							"update": {
+								"id": true,
+								"url": true,
+								"type": true,
+								"article": true,
+								"category": true,
+								"tag": true
+							},
+							"delete": true,
+							"customPrimary": true
+						}
+					}
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/ContentReference/operations/create/link",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/ContentReference/operations/update/link",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/ContentReference/operations/read/link",
+					"value": true
+				}
+			]
+		}
+	]
+}

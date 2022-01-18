@@ -1,5 +1,6 @@
 import { SchemaDefinition as d } from '@contember/schema-definition'
 import { BasicImage } from './Files'
+import { Link } from './Link'
 
 export class Content {
 	blocks: d.OneHasManyDefinition = d.oneHasMany(ContentBlock, 'content').orderBy('order')
@@ -15,7 +16,7 @@ export class ContentBlock {
 export const ContentReferenceType = d.createEnum(
 	'image', // image
 	'quote', // primaryText, secondaryText
-	'link', // url
+	'link', // link
 )
 
 export class ContentReference {
@@ -24,5 +25,5 @@ export class ContentReference {
 	primaryText = d.stringColumn()
 	secondaryText = d.stringColumn()
 	image = d.manyHasOne(BasicImage)
-	url = d.stringColumn()
+	link = d.manyHasOne(Link)
 }

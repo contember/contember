@@ -10,30 +10,40 @@
 
 	&-prefix
 		display: flex
-		align-items: stretch
-		margin-right: calc(-2 * var(--cui-control-border-width))
+		align-items: center
+		line-height: normal
+		padding-left: calc(3 * var(--cui-gap-horizontal))
+
 		border-top-left-radius: var(--cui-control-border-radius)
 		border-bottom-left-radius: var(--cui-control-border-radius)
 		border-right: none
-		background: var(--cui-color--lower)
+		border-style: solid
+		border-width: var(--cui-control-border-width)
+		border-radius: var(--cui-control-border-radius)
+		border-right: 0
+		border-top-right-radius: 0
+		border-bottom-right-radius: 0
+		background: var(--cui-background-color--above)
+		border-color: var(--cui-color--lower)
 		color: var(--cui-color--medium)
-	&:hover &-prefix
-		background: var(--cui-color--low)
-	&:focus-within &-prefix
-		background: var(--cui-control-border-color)
+	.cui-field-container:hover &-prefix
+		border-color: var(--cui-color--low)
+	&:focus-within &-prefix:not(:focus-within)
+		border-color: var(--cui-control-border-color)
 
 	&-prefix-link
 		align-items: center
 		display: flex
-		color: var(--cui-color--medium)
-		padding: 0 calc(2 * var(--cui-gap-horizontal))
 		font-weight: normal
+		color: inherit
 	&:hover &-prefix-link
-		color: var(--cui-color--strong)
-	&:focus-within &-prefix-link
-		color: white
+		color: inherit
 
 	&-input
+		flex: 1 1 auto
+		position: relative
+
+	&-prefix + &-input
 		flex: 5 1 auto
 		position: relative
 		.#{$cui-conf-globalPrefix}input
@@ -41,9 +51,10 @@
 			border-left: 0
 			border-top-left-radius: 0
 			border-bottom-left-radius: 0
+			padding-left: 0
 
 	&-overlay
-		cursor: pointer
+		cursor: text
 		+absolute(0)
 
 		a

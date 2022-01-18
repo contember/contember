@@ -17,7 +17,7 @@ import {
 export const InputsPage = (
 	<EditPage pageName="inputs" entity="InputShowcase(unique = One)" setOnCreate="(unique = One)">
 		<TextField field={'textValue'} label={'Text'} />
-		<SlugField derivedFrom={'textValue'} field={'slugValue'} label={'Slug with prefix'} unpersistedHardPrefix="https://www.contember.com" />
+		<SlugField derivedFrom={'textValue'} field={'slugValue'} label={'Slug with prefix'} unpersistedHardPrefix="https://www.contember.com/" linkToExternalUrl />
 		<SlugField derivedFrom={'textValue'} field={'slugValue'} label={'Slug without prefix'} />
 		<TextAreaField field={'multilineValue'} label={'Multiline text'} />
 		<CheckboxField field={'boolValue'} label={'Bool'} />

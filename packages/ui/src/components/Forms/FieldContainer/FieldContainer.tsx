@@ -5,8 +5,8 @@ import type { Size } from '../../../types'
 import { toEnumViewClass, toThemeClass } from '../../../utils'
 import { Description } from '../../Typography/Description'
 import { Label } from '../../Typography/Label'
-import type { FieldContainerLabelPosition } from './Types'
 import { ErrorList, ErrorListProps } from '../ErrorList'
+import type { FieldContainerLabelPosition } from './Types'
 
 export interface FieldContainerProps extends ErrorListProps {
 	label: ReactNode
@@ -40,7 +40,7 @@ export const FieldContainer = memo(
 				`${componentClassName}`,
 				toEnumViewClass(size),
 				toEnumViewClass(labelPosition),
-				!!errors ? toThemeClass('danger', 'controls') : undefined,
+				errors?.length ? toThemeClass('danger', 'controls') : undefined,
 			)}>
 				<LabelElement className={`${componentClassName}-label`}>
 					{(label || labelDescription) && <span className={`${componentClassName}-header`}>

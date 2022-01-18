@@ -72,13 +72,13 @@ export const SlugFieldInner = SimpleRelativeSingleField<SlugFieldProps, string>(
 			[normalizedPersistedHardPrefix, normalizedPersistedSoftPrefix],
 		)
 		useDerivedField<string>(derivedFrom, field, transform)
-		const [editing, setEditing] = useState(false)
 
 		const hardPrefix = normalizedUnpersistedHardPrefix + normalizedPersistedHardPrefix
 		const fullValue = hardPrefix + inputProps.value
 		const overlay = <>
 			{props.linkToExternalUrl && (
 				<a
+					tabIndex={-1}
 					href={fullValue}
 					onClick={event => {
 						if (isSpecialLinkClick(event.nativeEvent)) {
@@ -97,17 +97,6 @@ export const SlugFieldInner = SimpleRelativeSingleField<SlugFieldProps, string>(
 				inputRef={inputRef}
 				prefix={hardPrefix}
 				link={props.linkToExternalUrl ? fullValue : undefined}
-				onOverlayClick={editing ? undefined : () => setEditing(true)}
-				overlay={editing ? undefined : overlay}
-				readOnly={!editing}
-				onBlur={e => {
-					inputProps.onBlur(e)
-					setTimeout(() => {
-						if (document.activeElement !== inputRef.current) {
-							setEditing(false)
-						}
-					}, 2000)
-				}}
 			/>
 		)
 	},

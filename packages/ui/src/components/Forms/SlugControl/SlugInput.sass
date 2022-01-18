@@ -14,8 +14,6 @@
 		line-height: normal
 		padding-left: calc(3 * var(--cui-gap-horizontal))
 
-		border-top-left-radius: var(--cui-control-border-radius)
-		border-bottom-left-radius: var(--cui-control-border-radius)
 		border-right: none
 		border-style: solid
 		border-width: var(--cui-control-border-width)
@@ -36,6 +34,9 @@
 		display: flex
 		font-weight: normal
 		color: inherit
+		@extend %implementsCustomFocusEffects
+		&:focus
+			text-decoration: underline
 	&:hover &-prefix-link
 		color: inherit
 

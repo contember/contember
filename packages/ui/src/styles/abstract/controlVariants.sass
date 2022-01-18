@@ -1,6 +1,7 @@
 %controlVariants
 	--input-control-focus-ring: var(--cui-control-focus-ring-box-shadow)
 
+	@extend %implementsCustomFocusEffects
 	color: var(--cui-color--high)
 	background: var(--cui-background-color--above)
 	border-color: var(--cui-color--lower)
@@ -11,7 +12,6 @@
 		border-color: var(--cui-color--low)
 
 	&:focus
-		@extend %implementsCustomFocusEffects
 		border-color: var(--cui-control-border-color)
 	&:focus:focus-visible
 		box-shadow: var(--input-control-focus-ring)
@@ -38,7 +38,7 @@
 		padding-right: 0
 
 		&:focus
-			box-shadow: none
-		&:hover,
-		&:focus:focus-visible
+			background: var(--cui-filled-control-background-color--highlighted)
+			box-shadow: var(--input-control-focus-ring)
+		&:hover
 			background: var(--cui-filled-control-background-color--highlighted)

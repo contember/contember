@@ -30,11 +30,11 @@
 		border-color: var(--cui-control-border-color)
 
 	&-prefix-link
+		@extend %implementsCustomFocusEffects
 		align-items: center
 		display: flex
 		font-weight: normal
 		color: inherit
-		@extend %implementsCustomFocusEffects
 		&:focus, &:hover
 			text-decoration: underline
 			color: var(--cui-control-color)
@@ -43,7 +43,7 @@
 		flex: 1 1 auto
 		position: relative
 
-		.#{$cui-conf-globalPrefix}input:focus
+		.#{$cui-conf-globalPrefix}input
 			@extend %implementsCustomFocusEffects
 
 	&-prefix + &-input

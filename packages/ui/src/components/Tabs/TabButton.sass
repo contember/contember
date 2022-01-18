@@ -45,9 +45,11 @@
 		outline: none
 
 	&.is-focused &-label,
-	&:focus:focus-visible &-label
+	&:focus &-label
 		background-color: var(--cui-toned-control-background-color)
 		box-shadow: 0 0 0 .2em var(--cui-toned-control-border-color)
+	&:focus:not(:focus-visible) &-label
+		box-shadow: unset
 
 	&.is-disabled,
 	&:disabled

@@ -51,6 +51,9 @@ jobs:
         with:
           node-version: 14
 
+      - name: "Install yarn deps"
+        run: yarn install
+
       - name: Extract version
         id: versions
         uses: ./.github/actions/extract-version

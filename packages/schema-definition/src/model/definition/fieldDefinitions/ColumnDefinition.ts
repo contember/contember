@@ -115,6 +115,10 @@ export function enumColumn(enumDefinition: EnumDefinition) {
 	return column(Model.ColumnType.Enum, { enumDefinition })
 }
 
+export function uuidColumn() {
+	return column(Model.ColumnType.String)
+}
+
 export type ColumnTypeOptions = {
 	enumDefinition?: EnumDefinition
 }

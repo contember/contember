@@ -79,7 +79,7 @@ export const Pages = ({ children, layout }: PagesProps) => {
 					} else if (isPageProviderElement(v)) {
 						return [[v.type.getPageName(v.props), () => v]]
 					} else {
-						return [[k, v]]
+						return [[k.slice(0, 1).toLowerCase() + k.slice(1), v]]
 					}
 				}))
 			}

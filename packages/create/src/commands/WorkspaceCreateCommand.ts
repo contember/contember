@@ -33,19 +33,17 @@ $ ${chalk.greenBright(`cd ${workspaceName}`)}
 
 Install NPM dependencies:
 $ ${chalk.greenBright(`npm install`)}
-(of course, you can use any alternative package manager like pnpm or yarn)
 
-Now you are ready to start the Contember stack:
-$ ${chalk.greenBright('docker-compose up')}
+And start the Contember stack:
+$ ${chalk.greenBright('npm start')}
 
-The following services are now accessible:
+The following services will be accessible:
 
-- Admin at http://localhost:1480
-- API endpoints at http://localhost:1481 (you can authorize with token 0000000000000000000000000000000000000000)
-	- To connect to the GraphQL you can use pre-packed client (Apollo Playground) available at http://localhost:1481/playground
+- Contember Admin at http://localhost:1480
+- Contember Engine endpoints at http://localhost:1481 (you can authorize with token 0000000000000000000000000000000000000000)
 - Adminer database management tool at http://localhost:1485
 - Minio local S3 provider at http://localhost:1483 (you can sign in with contember / contember credentials)
-- Mailhog testing SMTP at http://localhost:1484
+- MailHog testing SMTP at http://localhost:1484
 - PostgreSQL database at localhost:1482 (you can sign in with contember / contember credentials)
 
 If you have any issues or questions, just ask here: https://github.com/contember/engine/discussions

@@ -1,7 +1,9 @@
 {
   "scripts-template": {
     "contember": "docker-compose run contember-cli",
-    "start-admin": "vite admin --port ${VITE_PORT:-4000} --host 0.0.0.0",
+    "start": "npm run start-engine && npm run start-admin",
+    "start-engine": "npm run contember migrations:execute . --yes && docker-compose up --detach",
+    "start-admin": "vite admin --port 1480 --host 0.0.0.0",
     "build-admin": "tsc && vite build admin"
   },
   "devDependencies": {

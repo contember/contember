@@ -3,7 +3,6 @@ remove:
   - package-lock.json
 patchPackageJson: true
 replaceVariables:
-  - contember.yaml
   - package.json
   - docker-compose.yaml
 

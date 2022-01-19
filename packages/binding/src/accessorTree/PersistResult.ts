@@ -16,10 +16,15 @@ export interface InvalidInputPersistResult {
 	errors: ErrorAccessor.Error[]
 }
 
+export interface InvalidResponseResult {
+	type: 'invalidResponse'
+	errors: any // todo
+}
+
 export interface GivenUpPersistResult {
 	type: 'givenUp'
 }
 
 export type SuccessfulPersistResult = NothingToPersistPersistResult | JustSuccessPersistResult
 
-export type ErrorPersistResult = InvalidInputPersistResult | GivenUpPersistResult | RequestError
+export type ErrorPersistResult = InvalidInputPersistResult | GivenUpPersistResult | RequestError | InvalidResponseResult

@@ -165,9 +165,12 @@ export class DataBinding {
 						})
 						const mutationData = mutationResponse.data?.transaction ?? {}
 						const aliases = Object.keys(mutationData)
-						const allSubMutationsOk = aliases.every(item => mutationData[item].ok)
-
-						if (allSubMutationsOk) {
+						if (!mutationResponse.data) {
+							throw {
+								errors: mutationData.errors,
+								type: 'invalidResponse',
+							}
+						} else if (mutationData.ok) {
 							const persistedEntityIds = aliases.map(alias => mutationData[alias].node?.id).filter(id => id !== undefined)
 							const result: SuccessfulPersistResult = {
 								type: 'justSuccess',

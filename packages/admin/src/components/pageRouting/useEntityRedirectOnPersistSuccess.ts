@@ -1,7 +1,7 @@
 import type { EntityAccessor, PersistSuccessOptions } from '@contember/binding'
 import { useMemo } from 'react'
 import { IncompleteRequestState, PageNotFound, PageRequest, RoutingParameterResolver, useRedirect } from '../../routing'
-import { ROUTING_BINDING_PARAMETER_PREFIX } from '../../routing/binding/useBindingLinkParametersResolver'
+import { createBindingLinkParametersResolver, ROUTING_BINDING_PARAMETER_PREFIX } from '../../routing/binding/useBindingLinkParametersResolver'
 
 export type RedirectOnSuccessHandler = (
 	currentState: PageRequest<any>,
@@ -25,17 +25,11 @@ export const useEntityRedirectOnPersistSuccess = (redirectOnSuccess: RedirectOnS
 				return
 			}
 
-			const parameterResolver: RoutingParameterResolver = name => {
-				if (name.startsWith(ROUTING_BINDING_PARAMETER_PREFIX)) {
-					return getAccessor().getField<string>(name.slice(ROUTING_BINDING_PARAMETER_PREFIX.length)).value ?? undefined
-
-				} else {
-					throw new PageNotFound(`Routing parameter ${name} not found`)
-				}
-			}
+			const entity = getAccessor()
+			const parameterResolver = createBindingLinkParametersResolver(entity)
 
 			if (typeof redirectOnSuccess === 'function') {
-				redirect(request => redirectOnSuccess(request!, getAccessor().id, getAccessor(), options), {}, parameterResolver)
+				redirect(request => redirectOnSuccess(request!, entity.id, entity, options), {}, parameterResolver)
 				return
 			}
 

@@ -170,7 +170,7 @@ export class DataBinding {
 								errors: mutationData.errors,
 								type: 'invalidResponse',
 							}
-						} else if (mutationData.ok) {
+						} else if (aliases.every(item => mutationData[item].ok)) {
 							const persistedEntityIds = aliases.map(alias => mutationData[alias].node?.id).filter(id => id !== undefined)
 							const result: SuccessfulPersistResult = {
 								type: 'justSuccess',

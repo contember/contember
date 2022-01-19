@@ -1,11 +1,12 @@
 import { LayoutPage, LayoutPageProps } from '@contember/ui'
 import { ComponentType, memo, ReactNode } from 'react'
 import type { PageProvider } from '../Pages'
+import { getPageName } from './getPageName'
 
 export type GenericPageProps =
 	& Omit<LayoutPageProps, 'children'>
 	& {
-		pageName: string
+		pageName?: string
 		children: ReactNode
 	}
 
@@ -14,6 +15,6 @@ const GenericPage: Partial<PageProvider<GenericPageProps>> & ComponentType<Gener
 )
 
 GenericPage.displayName = 'GenericPage'
-GenericPage.getPageName = (props: GenericPageProps) => props.pageName
+GenericPage.getPageName = getPageName
 
 export { GenericPage }

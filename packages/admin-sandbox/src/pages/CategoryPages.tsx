@@ -1,7 +1,7 @@
 import { MultiEditPage, Repeater, SelectField, TextField } from '@contember/admin'
 
-export const CategoryPages = (
-	<MultiEditPage pageName="categories" entities="Category" rendererProps={{
+export const Categories = (
+	<MultiEditPage entities="Category" rendererProps={{
 		title: 'Categories',
 	}}>
 		<TextField field={'name'} label={'Name'}/>

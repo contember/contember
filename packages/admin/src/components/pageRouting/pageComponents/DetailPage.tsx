@@ -7,12 +7,13 @@ import {
 import { ComponentType, memo, ReactNode } from 'react'
 import { FeedbackRenderer, LayoutRenderer, LayoutRendererProps } from '../../bindingFacade'
 import type { PageProvider } from '../Pages'
+import { getPageName } from './getPageName'
 
 export type DetailPageProps =
 	& SugaredQualifiedSingleEntity
 	& EntitySubTreeAdditionalProps
 	& {
-		pageName: string
+		pageName?: string
 		children: ReactNode
 		rendererProps?: LayoutRendererProps
 	}
@@ -30,6 +31,6 @@ const DetailPage: Partial<PageProvider<DetailPageProps>> & ComponentType<DetailP
 )
 
 DetailPage.displayName = 'DetailPage'
-DetailPage.getPageName = (props: DetailPageProps) => props.pageName
+DetailPage.getPageName = getPageName
 
 export { DetailPage }

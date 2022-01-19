@@ -1,7 +1,7 @@
 import { MultiEditPage, Repeater, SelectField, TextField } from '@contember/admin'
 
-export const TagPage = (
-	<MultiEditPage pageName="tags" entities="Tag" rendererProps={{
+export const Tags = (
+	<MultiEditPage entities="Tag" rendererProps={{
 		title: 'Abcd',
 	}}>
 		<TextField field={'name'} label={'Name'}/>

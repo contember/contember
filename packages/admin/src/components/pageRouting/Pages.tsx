@@ -15,7 +15,7 @@ import { MiscPageLayout } from '../MiscPageLayout'
 import { PageErrorBoundary } from './PageErrorBoundary'
 
 export interface PageProvider<P> {
-	getPageName(props: P): string
+	getPageName(props: P, fallback?: string): string
 }
 
 export type PageProviderElement = ReactElement<any, ComponentType & PageProvider<any>>
@@ -72,14 +72,15 @@ export const Pages = ({ children, layout }: PagesProps) => {
 
 			} else {
 				return new Map(Object.entries(children).flatMap(([k, v]): [string, ComponentType][] => {
+					const pageName = k.slice(0, 1).toLowerCase() + k.slice(1)
 					if (isPageSetProvider<EmptyObject>(v)) {
 						return Object.entries(v.getPages({}))
 					} else if (isPageSetProviderElement(v)) {
 						return Object.entries(v.type.getPages(v.props))
 					} else if (isPageProviderElement(v)) {
-						return [[v.type.getPageName(v.props), () => v]]
+						return [[v.type.getPageName(v.props, pageName), () => v]]
 					} else {
-						return [[k.slice(0, 1).toLowerCase() + k.slice(1), v]]
+						return [[pageName, v]]
 					}
 				}))
 			}

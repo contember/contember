@@ -10,12 +10,13 @@ import type { PageProvider } from '../Pages'
 import { RedirectOnSuccessHandler } from '../useEntityRedirectOnPersistSuccess'
 import { useOnPersistSuccess } from '../useOnPersistSuccess'
 import { NotFoundWrapper } from './NotFoundWrapper'
+import { getPageName } from './getPageName'
 
 export type EditPageProps =
 	& SugaredQualifiedSingleEntity
 	& EntitySubTreeAdditionalProps
 	& {
-		pageName: string
+		pageName?: string
 		children: ReactNode
 		redirectOnSuccess?: RedirectOnSuccessHandler
 		rendererProps?: LayoutRendererProps
@@ -37,6 +38,6 @@ const EditPage: Partial<PageProvider<EditPageProps>> & ComponentType<EditPagePro
 )
 
 EditPage.displayName = 'EditPage'
-EditPage.getPageName = (props: EditPageProps) => props.pageName
+EditPage.getPageName = getPageName
 
 export { EditPage }

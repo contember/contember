@@ -7,12 +7,13 @@ import {
 import { memo, ReactElement, ReactNode } from 'react'
 import { FeedbackRenderer, ImmutableEntityListPageRenderer, ImmutableEntityListPageRendererProps } from '../../bindingFacade'
 import type { PageProvider } from '../Pages'
+import { getPageName } from './getPageName'
 
 export type ListPageProps<ContainerExtraProps, ItemExtraProps> =
 	& SugaredQualifiedEntityList
 	& EntityListSubTreeAdditionalProps
 	& {
-		pageName: string
+		pageName?: string
 		children?: ReactNode
 		rendererProps?: Omit<ImmutableEntityListPageRendererProps<ContainerExtraProps, ItemExtraProps>, 'accessor' | 'children'>
 	}
@@ -35,6 +36,6 @@ const ListPage = memo(
 ) => ReactElement) &
 	Partial<PageProvider<ListPageProps<never, never>>>
 
-ListPage.getPageName = (props: ListPageProps<never, never>) => props.pageName
+ListPage.getPageName = getPageName
 
 export { ListPage }

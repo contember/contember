@@ -1,14 +1,13 @@
 import type { EntityAccessor, PersistSuccessOptions } from '@contember/binding'
 import { useMemo } from 'react'
-import { useRedirect } from '../../routing/'
-import { RequestState, PageRequest } from '../../routing'
+import { IncompleteRequestState, PageRequest, useRedirect } from '../../routing'
 
 export type RedirectOnSuccessHandler = (
 	currentState: PageRequest<any>,
 	persistedId: string,
 	entity: EntityAccessor,
 	options: PersistSuccessOptions,
-) => RequestState
+) => IncompleteRequestState
 
 export const useEntityRedirectOnPersistSuccess = (
 	redirectOnSuccess:

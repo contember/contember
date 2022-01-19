@@ -1,15 +1,12 @@
 {
   "scripts-template": {
-    "contember": "docker-compose exec node node_modules/.bin/contember",
-    "vite": "docker-compose exec node node_modules/.bin/vite",
-    "tsc": "docker-compose exec node node_modules/.bin/tsc",
+    "contember": "docker-compose run contember-cli",
     "start": "npm run start-engine && npm run start-admin",
-    "start-engine": "npm run contember migrations:execute . --yes",
-    "start-admin": "npm run vite admin --port ${VITE_PORT:-4000} --host 0.0.0.0",
-    "build-admin": "npm run tsc && npm run vite build admin"
+    "start-engine": "npm run contember migrations:execute . --yes && docker-compose up --detach",
+    "start-admin": "vite admin --port 1480 --host 0.0.0.0",
+    "build-admin": "tsc && vite build admin"
   },
   "devDependencies": {
-    "@contember/cli": "{version}",
     "@contember/schema": "{version}",
     "@contember/schema-definition": "{version}",
     "@contember/admin": "^1.0.0-alpha.6",

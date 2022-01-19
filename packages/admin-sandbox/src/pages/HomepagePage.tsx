@@ -1,8 +1,8 @@
 import { EditPage } from '@contember/admin'
 import { ContentField } from '../components/ContentField'
 
-export const HomepagePage = (
-	<EditPage pageName="homepage" entity="Homepage(unique = One)">
+export const Homepage = (
+	<EditPage entity="Homepage(unique = One)">
 		<ContentField field={'content'}/>
 	</EditPage>
 )

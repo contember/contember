@@ -17,8 +17,8 @@ import {
 } from '@contember/admin'
 
 
-export const ArticleListPage = (
-	<DataGridPage pageName="articleList" entities="Article" itemsPerPage={20} rendererProps={{
+export const ArticleList = (
+	<DataGridPage entities="Article" itemsPerPage={20} rendererProps={{
 		actions: <LinkButton to="articleCreate">Add article</LinkButton>,
 		title: 'Articles',
 	}}>
@@ -57,14 +57,14 @@ const form = <>
 	]} allowNull />
 </>
 
-export const ArticleCreatePage = (
-	<CreatePage pageName={'articleCreate'} entity={'Article'} redirectOnSuccess={req => ({ ...req, pageName: 'articleList', parameters: {} })}>
+export const ArticleCreate = (
+	<CreatePage entity={'Article'} redirectOnSuccess={req => ({ ...req, pageName: 'articleList', parameters: {} })}>
 		{form}
 	</CreatePage>
 )
 
-export const ArticleEditPage = (
-	<EditPage pageName={'articleEdit'} entity={'Article(id=$id)'} rendererProps={{
+export const ArticleEdit = (
+	<EditPage entity={'Article(id=$id)'} rendererProps={{
 		title: 'Article',
 	}}>
 		{form}

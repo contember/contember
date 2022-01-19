@@ -177,5 +177,5 @@ a.#{$cui-conf-globalPrefix}menu
 				@extend %implementsCustomFocusEffects
 				&:focus .#{$cui-conf-globalPrefix}label:not(.is-active)
 					background-color: var(--cui-menu-background-color-semitransparent)
-				&:focus:not(:focus-visible) .#{$cui-conf-globalPrefix}label
+				&:focus:not(:focus-visible) .#{$cui-conf-globalPrefix}label:not(.is-active)
 					background-color: unset

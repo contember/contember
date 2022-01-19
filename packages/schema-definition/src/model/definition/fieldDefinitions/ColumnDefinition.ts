@@ -4,44 +4,44 @@ import { CreateFieldContext, FieldDefinition } from './FieldDefinition'
 import { EnumDefinition } from '../EnumDefinition'
 import { getColumnType } from '../../utils'
 
-export class ColumnDefinition<Type extends Model.ColumnType> extends FieldDefinition<ColumnDefinitionOptions<Type>> {
+export class ColumnDefinition extends FieldDefinition<ColumnDefinitionOptions> {
 	type = 'ColumnDefinition' as const
 
-	public static create<Type extends Model.ColumnType>(
-		type: Type,
+	public static create(
+		type: Model.ColumnType,
 		typeOptions: ColumnTypeOptions = {},
-	): ColumnDefinition<Type> {
+	): ColumnDefinition {
 		return new ColumnDefinition({
 			type: type,
 			...typeOptions,
 		})
 	}
 
-	public columnName(columnName: string): Interface<ColumnDefinition<Type>> {
+	public columnName(columnName: string): Interface<ColumnDefinition> {
 		return this.withOption('columnName', columnName)
 	}
 
-	public columnType(columnType: string): Interface<ColumnDefinition<Type>> {
+	public columnType(columnType: string): Interface<ColumnDefinition> {
 		return this.withOption('columnType', columnType)
 	}
 
-	public nullable(): Interface<ColumnDefinition<Type>> {
+	public nullable(): Interface<ColumnDefinition> {
 		return this.withOption('nullable', true)
 	}
 
-	public notNull(): Interface<ColumnDefinition<Type>> {
+	public notNull(): Interface<ColumnDefinition> {
 		return this.withOption('nullable', false)
 	}
 
-	public unique(): Interface<ColumnDefinition<Type>> {
+	public unique(): Interface<ColumnDefinition> {
 		return this.withOption('unique', true)
 	}
 
-	public default(value: ColumnDefinition<Type>['options']['default']): Interface<ColumnDefinition<Type>> {
+	public default(value: ColumnDefinition['options']['default']): Interface<ColumnDefinition> {
 		return this.withOption('default', value)
 	}
 
-	public typeAlias(alias: string): Interface<ColumnDefinition<Type>> {
+	public typeAlias(alias: string): Interface<ColumnDefinition> {
 		return this.withOption('typeAlias', alias)
 	}
 
@@ -122,7 +122,7 @@ export function uuidColumn() {
 export type ColumnTypeOptions = {
 	enumDefinition?: EnumDefinition
 }
-export type ColumnDefinitionOptions<Type extends Model.ColumnType> = {
+export type ColumnDefinitionOptions = {
 	type: Model.ColumnType
 	columnType?: string
 	typeAlias?: string

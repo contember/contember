@@ -64,7 +64,7 @@ export class SchemaBuilder {
 		}
 	}
 
-	private createPrimaryColumn(): ColumnDefinition<Model.ColumnType.Uuid> {
+	private createPrimaryColumn(): ColumnDefinition {
 		return new ColumnDefinition({
 			nullable: false,
 			type: Model.ColumnType.Uuid,

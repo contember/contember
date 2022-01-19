@@ -25,10 +25,13 @@ export class ConstraintHelper {
 
 	private async setFkConstraintsPolicy(policy: 'DEFERRED' | 'IMMEDIATE') {
 		const constraints = await this.formatConstraints()
+		if (constraints === null) {
+			return
+		}
 		await this.client.query(`SET CONSTRAINTS ${constraints} ${policy}`)
 	}
 
-	private async formatConstraints(): Promise<string> {
+	private async formatConstraints(): Promise<string | null> {
 		if (this.fkConstraintNames === null) {
 			this.fkConstraintNames = (
 				await this.client.query<{ name: string }>(
@@ -39,6 +42,9 @@ export class ConstraintHelper {
 					[this.client.schema, 'f'],
 				)
 			).rows.map(it => it.name)
+		}
+		if (this.fkConstraintNames.length === 0) {
+			return null
 		}
 		return this.fkConstraintNames.map(it => `${wrapIdentifier(this.client.schema)}.${wrapIdentifier(it)}`).join(', ')
 	}

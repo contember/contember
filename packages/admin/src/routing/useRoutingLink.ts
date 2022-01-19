@@ -52,7 +52,7 @@ export const useRoutingLinkFactory = (parametersResolver?: RoutingParameterResol
 	const routing = useRouting()
 	const pushRequest = usePushRequest()
 
-	return useCallback((target: RoutingLinkTarget, parameters?: RequestParameters): RoutingLinkParams => {
+	return useCallback((target: RoutingLinkTarget, parameters?: RequestParameters, innerParametersResolver?: RoutingParameterResolver): RoutingLinkParams => {
 		const tmpRequest = targetToRequest(target, currentRequest)
 		const request = tmpRequest === null ? null : {
 			pageName: tmpRequest.pageName,
@@ -65,11 +65,11 @@ export const useRoutingLinkFactory = (parametersResolver?: RoutingParameterResol
 					return parameters[param]
 				}
 
-				if (!parametersResolver) {
+				if (!parametersResolver && !innerParametersResolver) {
 					throw new PageNotFound(`Routing parameter ${param} not found`)
 				}
 
-				return parametersResolver?.(param)
+				return (innerParametersResolver ?? parametersResolver)?.(param)
 			}),
 		}
 		let href: string

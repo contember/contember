@@ -47,12 +47,12 @@ const resolveParameters = (parameters: DynamicRequestParameters, resolveParamete
 	}))
 }
 
-export const useRoutingLinkFactory = (parametersResolver?: RoutingParameterResolver) => {
+export const useRoutingLinkFactory = () => {
 	const currentRequest = useCurrentRequest()
 	const routing = useRouting()
 	const pushRequest = usePushRequest()
 
-	return useCallback((target: RoutingLinkTarget, parameters?: RequestParameters, innerParametersResolver?: RoutingParameterResolver): RoutingLinkParams => {
+	return useCallback((target: RoutingLinkTarget, parameters?: RequestParameters, parametersResolver?: RoutingParameterResolver): RoutingLinkParams => {
 		const tmpRequest = targetToRequest(target, currentRequest)
 		const request = tmpRequest === null ? null : {
 			pageName: tmpRequest.pageName,
@@ -65,11 +65,11 @@ export const useRoutingLinkFactory = (parametersResolver?: RoutingParameterResol
 					return parameters[param]
 				}
 
-				if (!parametersResolver && !innerParametersResolver) {
+				if (!parametersResolver) {
 					throw new PageNotFound(`Routing parameter ${param} not found`)
 				}
 
-				return (innerParametersResolver ?? parametersResolver)?.(param)
+				return (parametersResolver)?.(param)
 			}),
 		}
 		let href: string
@@ -89,12 +89,12 @@ export const useRoutingLinkFactory = (parametersResolver?: RoutingParameterResol
 				pushRequest(request)
 			},
 		}
-	}, [currentRequest, parametersResolver, pushRequest, routing])
+	}, [currentRequest, pushRequest, routing])
 }
 
 export const useRoutingLink = (target: RoutingLinkTarget, parametersResolver?: RoutingParameterResolver, parameters?: RequestParameters) => {
-	const linkFactory = useRoutingLinkFactory(parametersResolver)
+	const linkFactory = useRoutingLinkFactory()
 	return useMemo(() => {
-		return linkFactory(target, parameters)
-	}, [linkFactory, parameters, target])
+		return linkFactory(target, parameters, parametersResolver)
+	}, [linkFactory, parameters, parametersResolver, target])
 }

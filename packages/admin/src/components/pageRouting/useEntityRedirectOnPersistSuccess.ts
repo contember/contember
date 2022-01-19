@@ -1,7 +1,14 @@
 import type { EntityAccessor, PersistSuccessOptions } from '@contember/binding'
+import { useEnvironment } from '@contember/binding'
 import { useMemo } from 'react'
-import { IncompleteRequestState, PageNotFound, PageRequest, RoutingParameterResolver, useRedirect } from '../../routing'
-import { createBindingLinkParametersResolver, ROUTING_BINDING_PARAMETER_PREFIX } from '../../routing/binding/useBindingLinkParametersResolver'
+import {
+	createBindingLinkParametersResolver,
+	IncompleteRequestState,
+	PageRequest,
+	parseLinkTarget,
+	RoutingLinkTarget,
+	useRoutingLinkFactory,
+} from '../../routing'
 
 export type RedirectOnSuccessHandler = (
 	currentState: PageRequest<any>,
@@ -12,11 +19,12 @@ export type RedirectOnSuccessHandler = (
 
 export type RedirectOnSuccessTarget = string | IncompleteRequestState | RedirectOnSuccessHandler
 
-export const useEntityRedirectOnPersistSuccess = (redirectOnSuccess: RedirectOnSuccessTarget | undefined) => {
-	const redirect = useRedirect()
+export const useEntityRedirectOnPersistSuccess = (target: RedirectOnSuccessTarget | undefined) => {
+	const linkFactory = useRoutingLinkFactory()
+	const env = useEnvironment()
 
 	return useMemo<EntityAccessor.PersistSuccessHandler | undefined>(() => {
-		if (!redirectOnSuccess) {
+		if (!target) {
 			return undefined
 		}
 
@@ -26,14 +34,16 @@ export const useEntityRedirectOnPersistSuccess = (redirectOnSuccess: RedirectOnS
 			}
 
 			const entity = getAccessor()
-			const parameterResolver = createBindingLinkParametersResolver(entity)
+			const linkTarget: RoutingLinkTarget = typeof target === 'function'
+				? request => target(request!, entity.id, entity, options)
+				: target
 
-			if (typeof redirectOnSuccess === 'function') {
-				redirect(request => redirectOnSuccess(request!, entity.id, entity, options), {}, parameterResolver)
-				return
-			}
+			const parsedTarget = parseLinkTarget(linkTarget, env)
+			const parameters = {}
+			const parametersResolver = createBindingLinkParametersResolver(entity)
+			const link = linkFactory(parsedTarget, parameters, parametersResolver)
 
-			redirect(redirectOnSuccess, {}, parameterResolver)
+			link.navigate()
 		}
-	}, [redirectOnSuccess, redirect])
+	}, [env, linkFactory, target])
 }

@@ -135,18 +135,10 @@ export const LayoutPage = memo(({
 
 		const container = document.body.parentElement
 
-		console.log(container)
-
 		const scrollHandler = () => {
 			const visibleWidth = container.offsetWidth
 			const contentWidth = container.scrollWidth
 			const scrollLeft = container.scrollLeft
-
-			console.log({
-				visibleWidth,
-				contentWidth,
-				scrollLeft,
-			})
 
 			setShowDivider(contentWidth > visibleWidth && scrollLeft + visibleWidth < contentWidth)
 		}

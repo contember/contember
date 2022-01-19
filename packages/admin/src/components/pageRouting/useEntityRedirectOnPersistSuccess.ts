@@ -9,22 +9,27 @@ export type RedirectOnSuccessHandler = (
 	options: PersistSuccessOptions,
 ) => IncompleteRequestState
 
-export const useEntityRedirectOnPersistSuccess = (
-	redirectOnSuccess:
-		| RedirectOnSuccessHandler
-		| undefined,
-) => {
+export type RedirectOnSuccessTarget = string | IncompleteRequestState | RedirectOnSuccessHandler
+
+export const useEntityRedirectOnPersistSuccess = (redirectOnSuccess: RedirectOnSuccessTarget | undefined) => {
 	const redirect = useRedirect()
 
 	return useMemo<EntityAccessor.PersistSuccessHandler | undefined>(() => {
 		if (!redirectOnSuccess) {
 			return undefined
 		}
+
 		return (getAccessor, options) => {
 			if (options.successType === 'nothingToPersist') {
 				return
 			}
-			redirect(request => redirectOnSuccess(request!, getAccessor().id, getAccessor(), options))
+
+			if (typeof redirectOnSuccess === 'function') {
+				redirect(request => redirectOnSuccess(request!, getAccessor().id, getAccessor(), options), { id: getAccessor().id })
+				return
+			}
+
+			redirect(redirectOnSuccess, { id: getAccessor().id })
 		}
 	}, [redirectOnSuccess, redirect])
 }

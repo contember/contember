@@ -65,7 +65,7 @@ services:
 
 
   api:
-    image: contember/engine:0.12.0-beta.2
+    image: contember/engine:1.0.0-rc.2
 
     environment:
       NODE_ENV: 'development'
@@ -97,7 +97,7 @@ services:
         condition: service_healthy
 
   contember-cli:
-    image: contember/cli:0.12.0-beta.2
+    image: contember/cli:1.0.0-rc.2
     volumes:
       - ./:/src:cached
     working_dir: /src/packages/admin-sandbox

@@ -195,11 +195,11 @@ importers:
   packages/admin-sandbox:
     specifiers:
       '@contember/admin': workspace:*
-      '@contember/schema': ^0.11.5
-      '@contember/schema-definition': ~0.11.5
+      '@contember/schema': ^1.0.0-rc.2
+      '@contember/schema-definition': ^1.0.0-rc.2
     dependencies:
-      '@contember/schema': 0.11.5
-      '@contember/schema-definition': 0.11.5
+      '@contember/schema': 1.0.0-rc.2
+      '@contember/schema-definition': 1.0.0-rc.2
     devDependencies:
       '@contember/admin': link:../admin
 
@@ -3700,22 +3700,26 @@ packages:
     resolution: {integrity: sha512-I6fJPHQsgfHWN753DgPue9L+X2Lopfy5gbtUymQrTi9bs2Qmju9kl6BGrNqCx0t3oURQLgDUdnNmq6sRiTEjbg==}
     dev: false
 
-  /@contember/schema-definition/0.11.5:
-    resolution: {integrity: sha512-T9FoOfzOWXcLgw6tTUSEWPfvHe5G0bRSri3ry8fEoxc0dlInOOTAuB6BuukOT8B16Ki0six+aub/857R9MhTmQ==}
+  /@contember/schema-definition/1.0.0-rc.2:
+    resolution: {integrity: sha512-oG2Vw+/vPIiLH5DBLUEaym4MadCnK77cKH52MpPTaTFYKvz3sPBXab7RG0OnsEiD1v6g7Dl1IAzaBWkBBBCbiw==}
     dependencies:
-      '@contember/schema': 0.11.5
-      '@contember/schema-utils': 0.11.5
+      '@contember/schema': 1.0.0-rc.2
+      '@contember/schema-utils': 1.0.0-rc.2
       reflect-metadata: 0.1.13
     dev: false
 
-  /@contember/schema-utils/0.11.5:
-    resolution: {integrity: sha512-uSTBZcF2AEJAYCabC557kZZdcTslBid7iroA2NLVtGx/2P4xOdjnrT/SnppCO4XiJbx+ceTsnhoXA24hNvKuvw==}
+  /@contember/schema-utils/1.0.0-rc.2:
+    resolution: {integrity: sha512-z90hBb1QoE0J113Ltl0vVIXs2ZXquTiNnGL5TTh8cA/dMmQ73fIn+dnAlvCrQC4bBfYCJ/JqMoVaOb/z9IhQiQ==}
     dependencies:
-      '@contember/schema': 0.11.5
+      '@contember/schema': 1.0.0-rc.2
     dev: false
 
   /@contember/schema/0.11.5:
     resolution: {integrity: sha512-5suwt1OSEKcRpGwuNyVRCPTnZFuM4GmxU7B2E+js5o+QkJWfVQHmcQJ3kCu7pspf7zx4/1hY13kVNbzHlFCGGw==}
+    dev: false
+
+  /@contember/schema/1.0.0-rc.2:
+    resolution: {integrity: sha512-1Bn285ik3cRjfVd7Q21SkINY1y8OcnVx98Ahjz0CgAE74yap1Pw8aKlc4YbFocP1O/vIPNYICfdP7sgPUhYSBw==}
     dev: false
 
   /@discoveryjs/json-ext/0.5.5:

@@ -7,13 +7,13 @@ import { useEnvironment } from '@contember/binding'
 
 export const useRedirect = () => {
 	const parametersResolver = useBindingLinkParametersResolver()
-	const linkFactory = useRoutingLinkFactory(parametersResolver)
+	const linkFactory = useRoutingLinkFactory()
 	const env = useEnvironment()
 	return useCallback(
 		(target: RoutingLinkTarget, parameters?: RequestParameters) => {
 			const parsedTarget = parseLinkTarget(target, env)
-			linkFactory(parsedTarget, parameters).navigate()
+			linkFactory(parsedTarget, parameters, parametersResolver).navigate()
 		},
-		[env, linkFactory],
+		[env, linkFactory, parametersResolver],
 	)
 }

@@ -1,9 +1,9 @@
 import { QueryLanguage, UnsugarableSingleEntityEventListeners } from '@contember/binding'
-import { RedirectOnSuccessHandler, useEntityRedirectOnPersistSuccess } from './useEntityRedirectOnPersistSuccess'
+import { RedirectOnSuccessTarget, useEntityRedirectOnPersistSuccess } from './useEntityRedirectOnPersistSuccess'
 import { useMemo } from 'react'
 
 export type UseOnPersistSuccessProps = Pick<UnsugarableSingleEntityEventListeners, 'onPersistSuccess'> & {
-	redirectOnSuccess?: RedirectOnSuccessHandler
+	redirectOnSuccess?: RedirectOnSuccessTarget
 }
 
 export const useOnPersistSuccess = ({ redirectOnSuccess, onPersistSuccess }: UseOnPersistSuccessProps): UnsugarableSingleEntityEventListeners['onPersistSuccess'] => {

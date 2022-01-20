@@ -58,7 +58,7 @@ const form = <>
 </>
 
 export const ArticleCreate = (
-	<CreatePage entity={'Article'} redirectOnSuccess={req => ({ ...req, pageName: 'articleList', parameters: {} })}>
+	<CreatePage entity={'Article'} redirectOnSuccess="articleEdit(id: $entity.id)">
 		{form}
 	</CreatePage>
 )

@@ -1,6 +1,14 @@
 import type { EntityAccessor, PersistSuccessOptions } from '@contember/binding'
+import { useEnvironment } from '@contember/binding'
 import { useMemo } from 'react'
-import { IncompleteRequestState, PageRequest, useRedirect } from '../../routing'
+import {
+	createBindingLinkParametersResolver,
+	IncompleteRequestState,
+	PageRequest,
+	parseLinkTarget,
+	RoutingLinkTarget,
+	useRoutingLinkFactory,
+} from '../../routing'
 
 export type RedirectOnSuccessHandler = (
 	currentState: PageRequest<any>,
@@ -9,22 +17,33 @@ export type RedirectOnSuccessHandler = (
 	options: PersistSuccessOptions,
 ) => IncompleteRequestState
 
-export const useEntityRedirectOnPersistSuccess = (
-	redirectOnSuccess:
-		| RedirectOnSuccessHandler
-		| undefined,
-) => {
-	const redirect = useRedirect()
+export type RedirectOnSuccessTarget = string | IncompleteRequestState | RedirectOnSuccessHandler
+
+export const useEntityRedirectOnPersistSuccess = (target: RedirectOnSuccessTarget | undefined) => {
+	const linkFactory = useRoutingLinkFactory()
+	const env = useEnvironment()
 
 	return useMemo<EntityAccessor.PersistSuccessHandler | undefined>(() => {
-		if (!redirectOnSuccess) {
+		if (!target) {
 			return undefined
 		}
+
 		return (getAccessor, options) => {
 			if (options.successType === 'nothingToPersist') {
 				return
 			}
-			redirect(request => redirectOnSuccess(request!, getAccessor().id, getAccessor(), options))
+
+			const entity = getAccessor()
+			const linkTarget: RoutingLinkTarget = typeof target === 'function'
+				? request => target(request!, entity.id, entity, options)
+				: target
+
+			const parsedTarget = parseLinkTarget(linkTarget, env)
+			const parameters = {}
+			const parametersResolver = createBindingLinkParametersResolver(entity)
+			const link = linkFactory(parsedTarget, parameters, parametersResolver)
+
+			link.navigate()
 		}
-	}, [redirectOnSuccess, redirect])
+	}, [env, linkFactory, target])
 }

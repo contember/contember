@@ -7,7 +7,7 @@ import {
 import { ComponentType, memo, ReactNode } from 'react'
 import { FeedbackRenderer, LayoutRenderer, LayoutRendererProps, PersistButton } from '../../bindingFacade'
 import type { PageProvider } from '../Pages'
-import { RedirectOnSuccessHandler } from '../useEntityRedirectOnPersistSuccess'
+import { RedirectOnSuccessTarget } from '../useEntityRedirectOnPersistSuccess'
 import { useOnPersistSuccess } from '../useOnPersistSuccess'
 import { NotFoundWrapper } from './NotFoundWrapper'
 import { getPageName } from './getPageName'
@@ -18,7 +18,7 @@ export type EditPageProps =
 	& {
 		pageName?: string
 		children: ReactNode
-		redirectOnSuccess?: RedirectOnSuccessHandler
+		redirectOnSuccess?: RedirectOnSuccessTarget
 		rendererProps?: LayoutRendererProps
 		refreshDataBindingOnPersist?: boolean
 	}

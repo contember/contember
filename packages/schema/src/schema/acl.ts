@@ -73,11 +73,18 @@ namespace Acl {
 	export type AnyStage = '*'
 	export type StagesDefinition = AnyStage | string[]
 
+	export type TenantManagedVariableSource = true | string
+
 	export type TenantManagePermissions = {
 		[role: string]: {
-			variables: Record<string, string> // target variable => source variable
+			variables?:
+			| true
+			| {
+				[targetVariable: string]: TenantManagedVariableSource
+			}
 		}
 	}
+
 	export interface TenantPermissions {
 		invite?: boolean
 		unmanagedInvite?: boolean

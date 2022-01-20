@@ -38,12 +38,18 @@ export class MembershipAwareAccessNode implements AccessNode {
 			if (!roleAcl) {
 				continue
 			}
+			if (roleAcl.variables === true) {
+				return true
+			}
 			for (const variable of membership.variables) {
-				const sourceVariableName = roleAcl.variables[variable.name]
-				if (!sourceVariableName) {
+				const sourceVariableRule = roleAcl.variables?.[variable.name]
+				if (!sourceVariableRule) {
 					continue nextMembership
 				}
-				const sourceVariable = invokerMembership.variables.find(it => it.name === sourceVariableName)
+				if (sourceVariableRule === true) {
+					continue // ok
+				}
+				const sourceVariable = invokerMembership.variables.find(it => typeof sourceVariableRule === 'string' && it.name === sourceVariableRule)
 				if (!sourceVariable) {
 					continue nextMembership
 				}

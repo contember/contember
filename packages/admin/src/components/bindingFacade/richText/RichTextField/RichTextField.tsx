@@ -69,7 +69,7 @@ export const RichTextField: FunctionComponent<RichTextFieldProps> = Component(
 				},
 				normalizeNode: (nodeEntry: NodeEntry) => {
 					const [node, path] = nodeEntry
-					if (path.length === 0 && SlateElement.isElement(node)) {
+					if (path.length === 0 && SlateElement.isAncestor(node)) {
 						// Enforce that there's exactly one child and that it's
 						if (node.children.length > 1) {
 							return Editor.withoutNormalizing(editor, () => {

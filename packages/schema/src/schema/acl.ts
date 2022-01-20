@@ -90,10 +90,13 @@ namespace Acl {
 		some = 'some',
 	}
 
+	/**
+	 * @deprecated
+	 */
 	export type LimitedSystemPermissionsLevel = SystemPermissionsLevel.any | SystemPermissionsLevel.none
 
 	export interface SystemPermissions {
-		history?: LimitedSystemPermissionsLevel
+		history?: boolean | LimitedSystemPermissionsLevel
 		migrate?: boolean
 		assumeIdentity?: boolean
 	}

@@ -14,7 +14,7 @@ export class StagePermissionsFactory {
 		const rolePermissions = this.createRolePermissions(filteredSchema.acl)
 		Object.entries(rolePermissions).forEach(([role, value]) => {
 			// history
-			if (value.history === Acl.SystemPermissionsLevel.any) {
+			if (value.history === Acl.SystemPermissionsLevel.any || value.history === true) {
 				permissions.allow(role, AuthorizationActions.PROJECT_HISTORY_ANY)
 			}
 

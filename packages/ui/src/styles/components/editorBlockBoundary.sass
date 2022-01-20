@@ -1,34 +1,66 @@
 @import '../common'
 
 .#{$cui-conf-globalPrefix}editorBlockBoundary
+	--cui-editor-block-boundary-height: var(--cui-editor-blocks-gap)
 	$root: &
-	height: .75em
 
+	align-items: center
+	color: var(--cui-color--low)
+	cursor: pointer
 	display: flex
 	flex-direction: row
-	align-items: center
-	margin: 5px 0
-	cursor: pointer
-	&-inner
-		visibility: hidden
-	&:hover
+	font-weight: 600
+	justify-content: center
+	height: var(--cui-editor-block-boundary-height)
+	margin: auto
+
+	.is-dragged &
+		display: none
+
+	.#{$cui-conf-globalPrefix}icon
+		color: inherit
+		align-items: center
+
+	&.view-afterBlock
+		margin-bottom: calc(-1 * var(--cui-editor-block-boundary-height))
+
+	&.view-beforeBlock
+		margin-top: calc(-1 * var(--cui-editor-block-boundary-height))
+
+	.#{$cui-conf-globalPrefix}editorBlock:first-child &.view-beforeBlock
 		#{$root}-inner
-			visibility: visible
-			&::before
-				display: inline-block
-				content: '+'
-				color: #777
-				border: 1px solid #777
-				border-radius: 50%
-				text-align: center
-				width: 14px
-				height: 14px
-				line-height: 10px
+			border: var(--cui-control-border-width) solid var(--cui-color--lower)
+			border-bottom: 0
+
+	&-inner
+		align-items: center
+		background-color: var(--cui-background-color--above)
+		border-radius: 1em
+		gap: var(--cui-gap-horizontal)
+		display: flex
+		flex-direction: row
+		line-height: 1em
+		padding: var(--cui-gap)
+		text-align: center
+
+	.#{$cui-conf-globalPrefix}label
+		display: none
 
 	.cui-editorCanvas-canvas > div[data-contember-type="reference"] + div[data-contember-type="reference"]
 		.cui-editorBlockBoundary.view-beforeBlock
 			display: none
-	//&.view-beforeBlock
-	//	top: (-$height / 2)
-	//&.view-afterBlock
-	//	bottom: (-$height / 2)
+
+	@media (hover: hover) and (pointer: fine)
+		&-inner
+			visibility: hidden
+
+		&:hover
+			color: var(--cui-control-color)
+			#{$root}-inner
+				visibility: visible
+			.#{$cui-conf-globalPrefix}label
+				display: block
+
+		.#{$cui-conf-globalPrefix}editorBlock:first-child &.view-beforeBlock
+			&:hover #{$root}-inner
+				border-color: var(--cui-color--low)

@@ -3,20 +3,15 @@
 
 	--cui-editor-canvas-element-handle-size: calc(6 * var(--cui-gap))
 
-	--cui-editor-canvas-element-padding-bottom: calc(2 * var(--cui-gap-vertical))
-	--cui-editor-canvas-element-padding-left: var(--cui-editor-canvas-element-handle-size)
-	--cui-editor-canvas-element-padding-right: calc(3 * var(--cui-gap-horizontal))
-	--cui-editor-canvas-element-padding-top: calc(2 * var(--cui-gap-vertical))
-
 	*[contenteditable="true"] &-inner
 		//
 
 	&-inner
 		display: flex
-		padding-bottom: var(--cui-editor-canvas-element-padding-bottom)
-		padding-left: var(--cui-editor-canvas-element-padding-left)
+		padding-bottom: 0
+		padding-left: var(--cui-editor-canvas-element-handle-size)
 		padding-right: var(--cui-editor-canvas-element-padding-right)
-		padding-top: var(--cui-editor-canvas-element-padding-top)
+		padding-top: 0
 		position: relative
 
 	&-content
@@ -29,10 +24,12 @@
 		align-self: center
 		cursor: move
 		flex: 0
-		left: 0 // calc(-1 * var(--cui-editor-canvas-element-handle-size))
+		left: 0
 		opacity: 0.1
 		position: absolute
 		text-align: center
+		top: 0
+		bottom: 0
 		width: var(--cui-editor-canvas-element-handle-size)
 
 	&.is-dragged #{$root}-dragHandle,

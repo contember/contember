@@ -7,6 +7,7 @@
 	--cui-editor-canvas-element-padding-left: calc(3 * var(--cui-gap-horizontal))
 	--cui-editor-canvas-element-padding-right: calc(3 * var(--cui-gap-horizontal))
 	--cui-editor-canvas-element-padding-top: calc(2 * var(--cui-gap-vertical))
+	--cui-editor-blocks-gap: var(--cui-padding)
 
 	border: var(--cui-control-border-width) solid var(--cui-color--lower)
 	border-radius: var(--cui-control-border-radius)
@@ -44,6 +45,13 @@
 
 	&-canvas > .#{$cui-conf-globalPrefix}editorBlock
 		padding: 0
+
+	&-canvas > *[contenteditable="true"]
+		display: flex
+		flex-direction: column
+		gap: var(--cui-editor-blocks-gap)
+		padding-bottom: var(--cui-editor-canvas-element-padding-bottom)
+		padding-top: var(--cui-editor-canvas-element-padding-top)
 
 	&-canvas
 		cursor: text

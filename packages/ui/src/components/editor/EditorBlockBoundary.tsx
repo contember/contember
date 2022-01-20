@@ -1,7 +1,9 @@
-import cn from 'classnames'
+import classNames from 'classnames'
 import { memo, MouseEvent as ReactMouseEvent } from 'react'
 import { useClassNamePrefix } from '../../auxiliary'
 import { toEnumViewClass } from '../../utils'
+import { Icon } from '../Icon'
+import { Label } from '../Typography/Label'
 
 export interface EditorBlockBoundaryProps {
 	blockEdge: 'before' | 'after'
@@ -12,12 +14,18 @@ export const EditorBlockBoundary = memo(function EditorBlockBoundary({ blockEdge
 	const prefix = useClassNamePrefix()
 	return (
 		<div
-			className={cn(`${prefix}editorBlockBoundary`, toEnumViewClass(`${blockEdge}Block`))}
+			className={classNames(
+				`${prefix}editorBlockBoundary`,
+				toEnumViewClass(`${blockEdge}Block`),
+			)}
 			contentEditable={false}
 			data-slate-editor={false}
 			onClick={onClick}
 		>
-			<span className={`${prefix}editorBlockBoundary-inner`}>New paragraph</span>
+			<span className={`${prefix}editorBlockBoundary-inner`}>
+				<Icon blueprintIcon="add" />
+				<Label>New paragraph</Label>
+			</span>
 		</div>
 	)
 })

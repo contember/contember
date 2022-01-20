@@ -17,7 +17,13 @@ import {
 } from '@contember/admin'
 
 
-export const ArticleList = (
+const stateOptions = {
+	draft: 'Draft',
+	published: 'Published',
+	removed: 'Removed',
+}
+
+export const articleList = (
 	<DataGridPage entities="Article" itemsPerPage={20} rendererProps={{
 		actions: <LinkButton to="articleCreate">Add article</LinkButton>,
 		title: 'Articles',
@@ -26,47 +32,42 @@ export const ArticleList = (
 		<TextCell field="content" header="Content" />
 		<HasOneSelectCell field="category" options={`Category.locales(locale.code = 'cs').name`} header="Category" />
 		<HasManySelectCell field="tags" options={`Tag.locales(locale.code = 'cs').name`} header="Tags" />
-				<EnumCell field={'state'} options={{
-					draft: 'Draft',
-					published: 'Published',
-					removed: 'Removed',
-				}} header={'State'}/>
+		<EnumCell field={'state'} options={stateOptions} header={'State'} />
 
 		<GenericCell canBeHidden={false} justification="justifyEnd">
 			<LinkButton to={`articleEdit(id: $entity.id)`} Component={AnchorButton}>Edit</LinkButton>
-			<DeleteEntityButton title="Delete" immediatePersist={true}></DeleteEntityButton>
+			<DeleteEntityButton title="Delete" immediatePersist={true} />
 		</GenericCell>
 	</DataGridPage>
 )
 
-const form = <>
-	<MultiSelectField label={'tags'} field={'tags'} options={{
-		fields: "Tag.locales(locale.code='cs').name",
-		orderBy: 'name desc',
-	}} />
-	<SelectField label={'category'} field={'category'} options={{
-		fields: "Category.locales(locale.code='cs').name",
-		orderBy: 'name desc',
-	}} />
-	<TextField field={'title'} label={'Title'} />
-	<SlugField field={'slug'} label={'Slug'} derivedFrom={'title'} unpersistedHardPrefix={'http://localhost/'} persistedHardPrefix={'bar/'} persistedSoftPrefix={'lorem/'} linkToExternalUrl/>
-	<SelectField field={'state'} label={'State'} options={[
-		{ value: 'draft', label: 'Draft' },
-		{ value: 'published', label: 'Published' },
-		{ value: 'removed', label: 'Removed' },
-	]} allowNull />
-</>
+const articleForm = (
+	<>
+		<MultiSelectField label={'tags'} field={'tags'} options={{
+			fields: 'Tag.locales(locale.code=\'cs\').name',
+			orderBy: 'name desc',
+		}} />
 
-export const ArticleCreate = (
-	<CreatePage entity={'Article'} redirectOnSuccess="articleEdit(id: $entity.id)">
-		{form}
+		<SelectField label={'category'} field={'category'} options={{
+			fields: 'Category.locales(locale.code=\'cs\').name',
+			orderBy: 'name desc',
+		}} />
+
+		<TextField field={'title'} label={'Title'} />
+		<SlugField field={'slug'} label={'Slug'} derivedFrom={'title'} unpersistedHardPrefix={'http://localhost/'} persistedHardPrefix={'bar/'}
+		           persistedSoftPrefix={'lorem/'} linkToExternalUrl />
+		<SelectField field={'state'} label={'State'} options={Object.entries(stateOptions).map(([value, label]) => ({ value, label }))} allowNull />
+	</>
+)
+
+export const articleCreate = (
+	<CreatePage entity="Article" redirectOnSuccess="articleEdit(id: $entity.id)">
+		{articleForm}
 	</CreatePage>
 )
 
-export const ArticleEdit = (
-	<EditPage entity={'Article(id=$id)'} rendererProps={{
-		title: 'Article',
-	}}>
-		{form}
+export const articleEdit = (
+	<EditPage entity="Article(id=$id)" rendererProps={{ title: 'Article' }}>
+		{articleForm}
 	</EditPage>
 )

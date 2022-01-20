@@ -10,6 +10,7 @@ import {
 	HasOneSelectCell,
 	LinkButton,
 	MultiSelectField,
+	RichTextField,
 	SelectField,
 	SlugField,
 	TextCell,
@@ -54,6 +55,7 @@ const articleForm = (
 		}} />
 
 		<TextField field={'title'} label={'Title'} />
+		<RichTextField field={'content'} label={'Content'} />
 		<SlugField field={'slug'} label={'Slug'} derivedFrom={'title'} unpersistedHardPrefix={'http://localhost/'} persistedHardPrefix={'bar/'}
 		           persistedSoftPrefix={'lorem/'} linkToExternalUrl />
 		<SelectField field={'state'} label={'State'} options={Object.entries(stateOptions).map(([value, label]) => ({ value, label }))} allowNull />

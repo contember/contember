@@ -15,6 +15,8 @@
 	width: 100%
 
 	*[contenteditable="true"]
+		padding-bottom: var(--cui-gap)
+		padding-top: var(--cui-gap)
 		border-radius: var(--cui-control-border-radius)
 		flex-grow: 1
 
@@ -37,10 +39,10 @@
 		box-shadow: var(--cui-control-focus-ring-box-shadow)
 
 	&-canvas > [class^="cui-editor"]
-		padding-bottom: var(--cui-editor-canvas-element-padding-bottom)
+		padding-bottom: 0
 		padding-left: var(--cui-editor-canvas-element-padding-left)
 		padding-right: var(--cui-editor-canvas-element-padding-right)
-		padding-top: var(--cui-editor-canvas-element-padding-top)
+		padding-top: 0
 		position: relative
 
 	&-canvas > .#{$cui-conf-globalPrefix}editorBlock
@@ -56,7 +58,7 @@
 	&-canvas
 		cursor: text
 		display: flex
-		min-height: 2em
+		min-height: var(--cui-control-height)
 		flex-direction: column
 
 		$headingCounter: null

@@ -190,13 +190,6 @@ $cui-containerSpinner-sizes: map_merge((
 ), $cui-containerSpinner-sizes);
 
 
-// Dropdown
-$cui-dropdown-zIndex: 100 !default;
-$cui-dropdown-content-color: $cui-color-black !default;
-$cui-dropdown-content-background: $cui-color-white !default;
-$cui-dropdown-transition-duration: .1s !default;
-
-
 // Table
 $cui-table-small: (
 	'spacingX': .4em,

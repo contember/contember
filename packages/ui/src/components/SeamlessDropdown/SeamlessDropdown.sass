@@ -1,5 +1,3 @@
-@import '../common'
-
 .#{$cui-conf-globalPrefix}seamlessDropdown
 	$spacing: .75em
 	position: relative
@@ -38,10 +36,13 @@
 		left: 0
 		min-height: 100%
 		min-width: 100%
-		background: #fff
+		background: var(--cui-background-color--above)
 		border-radius: 1em
 		display: none
 		box-shadow: 0 em(1px) em(3px) rgba(#000, .2), 0 em(2px) em(8px) rgba(#000, .2)
+		.#{$cui-conf-globalPrefix}layout-chrome-bar-footer &
+			border-bottom-left-radius: 0
+			border-bottom-right-radius: 0
 	&.view-down &-content
 		top: 0
 	&.view-up &-content

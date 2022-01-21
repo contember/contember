@@ -1,8 +1,9 @@
 import cn from 'classnames'
 import { ReactNode, useCallback, useState } from 'react'
-import { useClassNamePrefix, useCloseOnEscapeOrClickOutside } from '../auxiliary'
-import { Default } from '../types'
-import { toEnumViewClass, toViewClass } from '../utils'
+import { useClassNamePrefix, useCloseOnEscapeOrClickOutside } from '../../auxiliary'
+import { Default } from '../../types'
+import { toEnumViewClass, toViewClass } from '../../utils'
+import { Stack } from '../Stack'
 
 type Direction = Default | 'down' | 'up'
 export interface SeamlessDropdownProps {
@@ -50,7 +51,7 @@ export function SeamlessDropdown({ direction = 'down', label, children, hoverabl
 			<div className={cn(`${prefix}seamlessDropdown-content`)} ref={refs.contentRef}>
 				{buttonIn}
 				<div className={cn(`${prefix}seamlessDropdown-content-sep`)}></div>
-				<div className={cn(`${prefix}seamlessDropdown-content-in`)}>{children}</div>
+				<Stack direction="vertical" gap="small" className={cn(`${prefix}seamlessDropdown-content-in`)}>{children}</Stack>
 			</div>
 		</div>
 	)

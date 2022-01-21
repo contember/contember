@@ -42,14 +42,15 @@ export default new Builder({})
 	})
 
 	.addService('s3Client', ({ env }) => {
+		const credentialsOptions = env.CONTEMBER_S3_KEY === '' && env.CONTEMBER_S3_SECRET === ''
+			? {}
+			: { credentials: { accessKeyId: env.CONTEMBER_S3_KEY, secretAccessKey: env.CONTEMBER_S3_SECRET } }
+
 		return new S3Client({
 			endpoint: env.CONTEMBER_S3_ENDPOINT,
 			region: env.CONTEMBER_S3_REGION,
 			forcePathStyle: true,
-			credentials: {
-				accessKeyId: env.CONTEMBER_S3_KEY,
-				secretAccessKey: env.CONTEMBER_S3_SECRET,
-			},
+			...credentialsOptions,
 		})
 	})
 

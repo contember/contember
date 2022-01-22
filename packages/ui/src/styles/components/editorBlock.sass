@@ -1,7 +1,8 @@
 .#{$cui-conf-globalPrefix}editorBlock
 	$root: &
 
-	--cui-editor-canvas-element-handle-size: calc(6 * var(--cui-gap))
+	--cui-editor-canvas-element-handle-width: calc(6 * var(--cui-gap))
+	--cui-editor-canvas-element-handle-height: calc(1em * var(--cui-line-height, 1.5))
 
 	*[contenteditable="true"] &-inner
 		//
@@ -9,13 +10,15 @@
 	&-inner
 		display: flex
 		padding-bottom: 0
-		padding-left: var(--cui-editor-canvas-element-handle-size)
+		padding-left: var(--cui-editor-canvas-element-handle-width)
 		padding-right: var(--cui-editor-canvas-element-padding-right)
 		padding-top: 0
 		position: relative
 
 	&-content
 		flex: 1 1 auto
+		position: relative
+		z-index: 1
 		& > *
 			margin-bottom: 0
 			margin-top: 0
@@ -30,7 +33,11 @@
 		text-align: center
 		top: 0
 		bottom: 0
-		width: var(--cui-editor-canvas-element-handle-size)
+		width: var(--cui-editor-canvas-element-handle-width)
+		z-index: 0
+		.#{$cui-conf-globalPrefix}icon
+			align-items: center
+			height: var(--cui-editor-canvas-element-handle-height)
 
 	&.is-dragged #{$root}-dragHandle,
 	&-dragHandle:hover

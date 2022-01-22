@@ -7,7 +7,7 @@
 	--cui-editor-canvas-element-padding-left: calc(3 * var(--cui-gap-horizontal))
 	--cui-editor-canvas-element-padding-right: calc(3 * var(--cui-gap-horizontal))
 	--cui-editor-canvas-element-padding-top: calc(2 * var(--cui-gap-vertical))
-	--cui-editor-blocks-gap: var(--cui-padding)
+	--cui-editor-blocks-gap: calc(2 * var(--cui-editor-canvas-element-padding-top))
 
 	border: var(--cui-control-border-width) solid var(--cui-color--lower)
 	border-radius: var(--cui-control-border-radius)
@@ -34,10 +34,6 @@
 	*[contenteditable="true"]
 		@extend %implementsCustomFocusEffects
 
-	// TODO: Not ideal since `:focus-visible` would be good to use as well
-	*[contenteditable="true"]:focus // << Fails on large editors
-		box-shadow: var(--cui-control-focus-ring-box-shadow)
-
 	&-canvas > [class^="cui-editor"]
 		padding-bottom: 0
 		padding-left: var(--cui-editor-canvas-element-padding-left)
@@ -60,6 +56,7 @@
 		display: flex
 		min-height: var(--cui-control-height)
 		flex-direction: column
+		gap: var(--cui-editor-blocks-gap)
 
 		$headingCounter: null
 		@for $level from 1 through length($cui-editor-heading-counters)
@@ -116,4 +113,6 @@
 		padding: 0
 
 	&.view-seamless
+		background-color: transparent
+		border: 0
 		box-shadow: none

@@ -1,4 +1,4 @@
-import { Button, FieldContainer, TextInput } from '@contember/ui'
+import { Button, FieldContainer, Stack, TextInput } from '@contember/ui'
 import { FC, useCallback } from 'react'
 import { useShowToast } from '../../../components'
 import { RoutingLinkTarget, useRedirect } from '../../../routing'
@@ -44,14 +44,16 @@ export const CreateResetPasswordRequestForm: FC<CreateResetPasswordRequestFormPr
 
 	return (
 		<form onSubmit={onSubmit}>
-			<FieldContainer label="E-mail">
-				<TextInput {...register('email')} required={true} type={'email'} />
-			</FieldContainer>
-			<FieldContainer label={undefined}>
-				<Button intent="primary" type={'submit'} disabled={isSubmitting}>
-					Reset password
-				</Button>
-			</FieldContainer>
+			<Stack direction="vertical" gap="large">
+				<FieldContainer label="E-mail">
+					<TextInput {...register('email')} required={true} type={'email'} />
+				</FieldContainer>
+				<FieldContainer label={undefined}>
+					<Button intent="primary" type={'submit'} disabled={isSubmitting}>
+						Reset password
+					</Button>
+				</FieldContainer>
+			</Stack>
 		</form>
 	)
 }

@@ -66,14 +66,14 @@ export const LoginEntrypoint = (props: LoginEntrypointProps) => {
 							</Page>
 							<Page name={resetRequestPageName}>
 								<MiscPageLayout heading="Password reset" actions={<>
-									<Link to={indexPageName}>Back to login</Link>
+									<Link to={indexPageName}>&larr; Back to login</Link>
 								</>}>
 									<CreateResetPasswordRequestForm redirectOnSuccess={redirectOnSuccessPageName} />
 								</MiscPageLayout>
 							</Page>
 							<Page name={redirectOnSuccessPageName}>
 								<MiscPageLayout heading="Password reset" actions={<>
-									<Link to={indexPageName}>Back to login</Link>
+									<Link to={indexPageName}>&larr; Back to login</Link>
 								</>}>
 									<p>
 										Password reset request has been successfully created. Please check your inbox for the instructions.
@@ -87,7 +87,7 @@ export const LoginEntrypoint = (props: LoginEntrypointProps) => {
 							<Page name={passwordResetPageName}>
 								{({ token }: { token: string }) => (
 									<MiscPageLayout heading="Set a new password" actions={<>
-										<Link to={indexPageName}>Back to login</Link>
+										<Link to={indexPageName}>&larr; Back to login</Link>
 									</>}>
 										<ResetPasswordForm token={token} redirectOnSuccess={indexPageName} />
 									</MiscPageLayout>
@@ -111,7 +111,7 @@ const LoginEntrypointIndex: FC<Pick<LoginEntrypointProps, 'projects' | 'formatPr
 
 	if (!projects) {
 		return (
-			<MiscPageLayout heading={props.heading ?? <h1>Contember Admin</h1>}>
+			<MiscPageLayout heading={props.heading ?? 'Contember Admin'}>
 				<LoginContainer identityProviders={props.identityProviders} />
 			</MiscPageLayout>
 		)

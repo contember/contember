@@ -1,6 +1,6 @@
 import { getTenantErrorMessage } from '@contember/client'
 import { useSetSessionToken } from '@contember/react-client'
-import { Button, ErrorList, FieldContainer, FieldError, Section, Stack, TextInput } from '@contember/ui'
+import { Button, ErrorList, FieldContainer, FieldError, Stack, TextInput } from '@contember/ui'
 import { useCallback, useState } from 'react'
 import { Link, RoutingLinkTarget } from '../../../routing'
 import { useForm, useSignIn } from '../../index'
@@ -46,7 +46,7 @@ export const Login = ({ onLogin, resetLink }: LoginProps) => {
 
 	return (
 		<form onSubmit={onSubmit}>
-			<Section>
+			<Stack direction="vertical" gap="large">
 				<ErrorList errors={errors} />
 				<FieldContainer label="Email">
 					<TextInput
@@ -81,7 +81,7 @@ export const Login = ({ onLogin, resetLink }: LoginProps) => {
 						{resetLink && <Link to={resetLink}>Forgot your password?</Link>}
 					</Stack>
 				</FieldContainer>
-			</Section>
+			</Stack>
 		</form>
 	)
 }

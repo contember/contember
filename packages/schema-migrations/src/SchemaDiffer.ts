@@ -81,10 +81,10 @@ export class SchemaDiffer {
 			new RemoveChangedFieldDiffer(it => isRelation(it) && isInverseRelation(it)),
 			CreateEntityModification.createDiff,
 			CreateColumnModification.createDiff,
+			CreateViewModification.createDiff,
+
 			CreateRelationModification.createDiff,
 			CreateRelationInverseSideModification.createDiff,
-
-			CreateViewModification.createDiff,
 
 			CreateUniqueConstraintModification.createDiff,
 

@@ -109,8 +109,8 @@
 
 	&.view-squarish,
 	&.view-circular
-		height: var(--cui-control-height)
-		width: var(--cui-control-height)
+		height: var(--cui-button-height)
+		width: var(--cui-button-height)
 	&.view-generous,
 	&.view-generousBlock
 		--cui-button-padding-horizontal: calc(var(--cui-gap) * 8 - #{$border-width-em})
@@ -124,7 +124,7 @@
 		--cui-button-color: var(--cui-control-color)
 		--cui-button-color--highlighted: var(--cui-control-color--highlighted)
 		--cui-button-color--pressed: var(--cui-control-color--pressed)
-		&:not(.view-large):not(.view-generousBlock)
+		&:not(.view-large):not(.view-generousBlock):not(.view-squarish):not(.view-circular)
 			--cui-button-height: auto
 			--cui-button-padding-horizontal: calc(var(--cui-gap) - #{$border-width-em})
 		position: relative
@@ -170,8 +170,6 @@
 		text-align: end
 
 	&-content
-		align-items: center
-		display: inline-flex
 		font-size: var(--cui-button-font-size)
 		flex: 1
 		line-height: 1em
@@ -180,8 +178,9 @@
 		overflow: hidden
 		text-overflow: ellipsis
 		vertical-align: middle
+
+		// See: https://css-tricks.com/almanac/properties/l/line-clamp/
 		display: -webkit-box
-		/* number of lines to show */
 		-webkit-line-clamp: 2
 		-webkit-box-orient: vertical
 

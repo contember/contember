@@ -1,5 +1,7 @@
 import { ContemberClient } from '@contember/react-client'
+import { Button, ErrorList, Icon } from '@contember/ui'
 import { FC, ReactNode, useMemo, useState } from 'react'
+import { Link, RequestProvider, RoutingContext, RoutingContextValue } from '../../routing'
 import {
 	CreateResetPasswordRequestForm,
 	FillResetPasswordTokenForm,
@@ -9,13 +11,11 @@ import {
 	Login,
 	ResetPasswordForm,
 } from '../../tenant'
+import { IdentityProvider, useLogout, useOptionalIdentity } from '../Identity'
+import { MiscPageLayout } from '../MiscPageLayout'
+import { Page, Pages } from '../pageRouting'
 import { Project, ProjectListButtons } from '../Project'
 import { Toaster, ToasterProvider } from '../Toaster'
-import { Link, RequestProvider, RoutingContext, RoutingContextValue } from '../../routing'
-import { Page, Pages } from '../pageRouting'
-import { MiscPageLayout } from '../MiscPageLayout'
-import { IdentityProvider, useLogout, useOptionalIdentity } from '../Identity'
-import { Button, ErrorList, Icon } from '@contember/ui'
 
 
 export interface LoginEntrypointProps {
@@ -111,7 +111,7 @@ const LoginEntrypointIndex: FC<Pick<LoginEntrypointProps, 'projects' | 'formatPr
 
 	if (!projects) {
 		return (
-			<MiscPageLayout heading={props.heading ?? 'Contember Admin'}>
+			<MiscPageLayout heading={props.heading ?? <h1>Contember Admin</h1>}>
 				<LoginContainer identityProviders={props.identityProviders} />
 			</MiscPageLayout>
 		)

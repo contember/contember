@@ -1,6 +1,7 @@
 import type {
 	BlockRepeaterDictionary, DataGridCellsDictionary,
 	DataGridDictionary,
+	EditorDictionary,
 	ErrorCodeDictionary,
 	FieldViewDictionary,
 	PersistFeedbackDictionary,
@@ -17,6 +18,7 @@ export type AdminDictionary =
 	DataGridCellsDictionary &
 	DataGridDictionary &
 	ErrorCodeDictionary &
+	EditorDictionary &
 	FieldViewDictionary &
 	PersistFeedbackDictionary &
 	RepeaterDictionary &

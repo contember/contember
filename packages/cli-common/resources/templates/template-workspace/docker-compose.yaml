@@ -87,20 +87,18 @@ services:
       retries: 10
 
   s3:
-    image: minio/minio
-    entrypoint: /minio/s3-entrypoint.sh
-    command: 'server --address :1483 /data'
+    image: bitnami/minio
 
     environment:
       MINIO_ROOT_USER: 'contember'
       MINIO_ROOT_PASSWORD: 'contember'
+      MINIO_DEFAULT_BUCKETS: 'contember:download'
 
     ports:
-      - '1483:1483' # ports must match
+      - '1483:9000'
 
     volumes:
       - s3-data:/data
-      - ./docker/minio/:/minio
 
   mailhog:
     image: mailhog/mailhog

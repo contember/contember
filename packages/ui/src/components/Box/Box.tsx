@@ -40,7 +40,7 @@ export const Box = memo(
 					<Stack gap={gap ?? 'small'} direction="vertical">
 						{(heading || actions) && (
 							<div className={`${componentClassName}-header`}>
-								<Label>{heading}</Label>
+								{heading && <Label>{heading}</Label>}
 								{actions && (
 									<div className={`${componentClassName}-actions`} contentEditable={false}>
 										{actions}

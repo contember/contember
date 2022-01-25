@@ -1,5 +1,7 @@
 import { ContemberClient } from '@contember/react-client'
+import { Button, ErrorList, Icon } from '@contember/ui'
 import { FC, ReactNode, useMemo, useState } from 'react'
+import { Link, RequestProvider, RoutingContext, RoutingContextValue } from '../../routing'
 import {
 	CreateResetPasswordRequestForm,
 	FillResetPasswordTokenForm,
@@ -9,13 +11,11 @@ import {
 	Login,
 	ResetPasswordForm,
 } from '../../tenant'
+import { IdentityProvider, useLogout, useOptionalIdentity } from '../Identity'
+import { MiscPageLayout } from '../MiscPageLayout'
+import { Page, Pages } from '../pageRouting'
 import { Project, ProjectListButtons } from '../Project'
 import { Toaster, ToasterProvider } from '../Toaster'
-import { Link, RequestProvider, RoutingContext, RoutingContextValue } from '../../routing'
-import { Page, Pages } from '../pageRouting'
-import { MiscPageLayout } from '../MiscPageLayout'
-import { IdentityProvider, useLogout, useOptionalIdentity } from '../Identity'
-import { Button, ErrorList, Icon } from '@contember/ui'
 
 
 export interface LoginEntrypointProps {
@@ -66,14 +66,14 @@ export const LoginEntrypoint = (props: LoginEntrypointProps) => {
 							</Page>
 							<Page name={resetRequestPageName}>
 								<MiscPageLayout heading="Password reset" actions={<>
-									<Link to={indexPageName}>Back to login</Link>
+									<Link to={indexPageName}>&larr; Back to login</Link>
 								</>}>
 									<CreateResetPasswordRequestForm redirectOnSuccess={redirectOnSuccessPageName} />
 								</MiscPageLayout>
 							</Page>
 							<Page name={redirectOnSuccessPageName}>
 								<MiscPageLayout heading="Password reset" actions={<>
-									<Link to={indexPageName}>Back to login</Link>
+									<Link to={indexPageName}>&larr; Back to login</Link>
 								</>}>
 									<p>
 										Password reset request has been successfully created. Please check your inbox for the instructions.
@@ -87,7 +87,7 @@ export const LoginEntrypoint = (props: LoginEntrypointProps) => {
 							<Page name={passwordResetPageName}>
 								{({ token }: { token: string }) => (
 									<MiscPageLayout heading="Set a new password" actions={<>
-										<Link to={indexPageName}>Back to login</Link>
+										<Link to={indexPageName}>&larr; Back to login</Link>
 									</>}>
 										<ResetPasswordForm token={token} redirectOnSuccess={indexPageName} />
 									</MiscPageLayout>

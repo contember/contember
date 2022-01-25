@@ -23,6 +23,29 @@ $cui-buildState-alreadyOutputRoot: false !default
 		--cui-control-focus-ring-box-shadow: 0 0 0 .2em var(--cui-control-border-color)
 		--cui-control-focus-ring-box-shadow-error: 0 0 0 .2em rgb(var(--cui-theme-danger-500))
 
+	html, body
+		margin: 0
+		padding: 0
+
+	body
+		font-family: var(--cui-font-family)
+		line-height: var(--cui-line-height)
+		margin: 0
+		padding: 0
+		font-smoothing: antialiased
+		min-width: 100vw
+		@media (min-width: $breakpoint-min-medium)
+			width: fit-content
+		-webkit-font-smoothing: antialiased
+
+	h1, h2, h3, h4, h5, h6
+		font-weight: $fw-medium
+
+	textarea
+		resize: vertical
+
+	a
+		text-decoration: none
 	a, button
 		color: var(--cui-control-color)
 		font-weight: 600

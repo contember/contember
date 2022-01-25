@@ -13,11 +13,6 @@ services:
       CONTEMBER_ROOT_TOKEN: '0000000000000000000000000000000000000000' # openssl rand -hex 20
       CONTEMBER_LOGIN_TOKEN: '1111111111111111111111111111111111111111' # openssl rand -hex 20
 
-      CONTEMBER_CONFIG_YAML: |
-        projectDefaults:
-          s3:
-            prefix: '%project.slug%'
-
       DEFAULT_DB_HOST: 'postgres'
       DEFAULT_DB_PORT: '5432'
       DEFAULT_DB_USER: 'contember'

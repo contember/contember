@@ -5,7 +5,6 @@ import { Typesafe } from '@contember/engine-common'
 export class S3ConfigProcessor implements ConfigProcessor<ProjectWithS3Config> {
 	getDefaultEnv(): Record<string, string> {
 		return {
-			DEFAULT_S3_PREFIX: '',
 			DEFAULT_S3_ENDPOINT: '',
 			DEFAULT_S3_REGION: 'us-east-1',
 			DEFAULT_S3_PROVIDER: 'aws',
@@ -18,8 +17,8 @@ export class S3ConfigProcessor implements ConfigProcessor<ProjectWithS3Config> {
 			projectDefaults: {
 				...template.projectDefaults,
 				s3: {
-					bucket: `%?project.env.S3_BUCKET||project.slug%`,
-					prefix: `%project.env.S3_PREFIX%`,
+					bucket: `%project.env.S3_BUCKET%`,
+					prefix: `%?project.env.S3_PREFIX||project.slug%`,
 					region: `%project.env.S3_REGION%`,
 					endpoint: `%project.env.S3_ENDPOINT%`,
 					provider: '%project.env.S3_PROVIDER%',

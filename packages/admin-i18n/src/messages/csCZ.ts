@@ -1,6 +1,11 @@
 import type { AdminDictionary } from '@contember/admin'
 
 export const csCZ: AdminDictionary = {
+	blockRepeater: {
+		addNewBlockButton: {
+			addBlock: 'Přidat blok',
+		},
+	},
 	dataGrid: {
 		emptyMessage: {
 			text: 'Žádné položky.',

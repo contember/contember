@@ -110,4 +110,9 @@ export const csCZ: AdminDictionary = {
 			finalizing: 'Dokončuji…',
 		},
 	},
+	editorBlock: {
+		editorBlockBoundary: {
+			newParagraph: 'Nový odstavec',
+		},
+	},
 }

@@ -1,26 +1,24 @@
 .#{$cui-conf-globalPrefix}editorBlock
 	$root: &
 
-	--cui-editor-canvas-element-handle-size: calc(6 * var(--cui-gap))
-
-	--cui-editor-canvas-element-padding-bottom: calc(2 * var(--cui-gap-vertical))
-	--cui-editor-canvas-element-padding-left: var(--cui-editor-canvas-element-handle-size)
-	--cui-editor-canvas-element-padding-right: calc(3 * var(--cui-gap-horizontal))
-	--cui-editor-canvas-element-padding-top: calc(2 * var(--cui-gap-vertical))
+	--cui-editor-canvas-element-handle-width: calc(6 * var(--cui-gap))
+	--cui-editor-canvas-element-handle-height: calc(1em * var(--cui-line-height, 1.5))
 
 	*[contenteditable="true"] &-inner
 		//
 
 	&-inner
 		display: flex
-		padding-bottom: var(--cui-editor-canvas-element-padding-bottom)
-		padding-left: var(--cui-editor-canvas-element-padding-left)
+		padding-bottom: 0
+		padding-left: var(--cui-editor-canvas-element-handle-width)
 		padding-right: var(--cui-editor-canvas-element-padding-right)
-		padding-top: var(--cui-editor-canvas-element-padding-top)
+		padding-top: 0
 		position: relative
 
 	&-content
 		flex: 1 1 auto
+		position: relative
+		z-index: 1
 		& > *
 			margin-bottom: 0
 			margin-top: 0
@@ -29,11 +27,17 @@
 		align-self: center
 		cursor: move
 		flex: 0
-		left: 0 // calc(-1 * var(--cui-editor-canvas-element-handle-size))
+		left: 0
 		opacity: 0.1
 		position: absolute
 		text-align: center
-		width: var(--cui-editor-canvas-element-handle-size)
+		top: 0
+		bottom: 0
+		width: var(--cui-editor-canvas-element-handle-width)
+		z-index: 0
+		.#{$cui-conf-globalPrefix}icon
+			align-items: center
+			height: var(--cui-editor-canvas-element-handle-height)
 
 	&.is-dragged #{$root}-dragHandle,
 	&-dragHandle:hover

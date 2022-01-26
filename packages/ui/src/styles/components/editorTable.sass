@@ -9,7 +9,6 @@
 	$addDimensionThickness: 1em
 	$frontRemoveDimensionThickness: 1em
 	$topRemoveDimensionThickness: 1em
-	$verticalOffsetTop: 1.5em
 	$verticalOffsetBottom: 3.5em
 
 	$removeDimensionBorderRadius: .5em
@@ -24,7 +23,7 @@
 	display: grid
 	grid-template-rows: $topColumnControlsHeight repeat(calc(#{$rowCount}), $lineThickness auto) $lineThickness $addDimensionThickness
 	grid-template-columns: $frontRowControlsWidth repeat(calc(#{$columnCount}), $lineThickness 1fr) $lineThickness $addDimensionThickness
-	margin: ($verticalOffsetTop - $topColumnControlsHeight) (-$addDimensionThickness) ($verticalOffsetBottom - $frontRowControlsWidth) (-$frontRowControlsWidth)
+	margin: (-1 * $topColumnControlsHeight) (-$addDimensionThickness) (-1 * $addDimensionThickness) (-$frontRowControlsWidth)
 
 	&-rowControls,
 	&-columnControls,
@@ -219,6 +218,7 @@
 		visibility: hidden
 		opacity: 0
 
+	&.is-selected &,
 	&.is-focused &,
 	&:hover &
 		&-rowControls-add,

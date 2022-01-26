@@ -1,34 +1,83 @@
 @import '../common'
 
 .#{$cui-conf-globalPrefix}editorBlockBoundary
+	--cui-editor-block-boundary-height: var(--cui-editor-blocks-gap)
 	$root: &
-	height: .75em
 
+	align-items: center
+	color: var(--cui-color--low)
+	cursor: pointer
 	display: flex
 	flex-direction: row
-	align-items: center
-	margin: 5px 0
-	cursor: pointer
-	&-inner
+	font-weight: 600
+	height: var(--cui-editor-block-boundary-height)
+	justify-content: flex-start
+	margin: 0 auto 0 calc(-1 * var(--cui-editor-canvas-element-handle-width, 0))
+	padding-left: var(--cui-editor-canvas-element-handle-width, 0)
+	position: relative
+	z-index: 1
+
+	&::after, &::before
+		border-radius: 2px
+		border: 1px solid
+		content: ""
+		display: block
+		flex-grow: 1
+		height: 2px
 		visibility: hidden
-	&:hover
-		#{$root}-inner
-			visibility: visible
-			&::before
-				display: inline-block
-				content: '+'
-				color: #777
-				border: 1px solid #777
-				border-radius: 50%
-				text-align: center
-				width: 14px
-				height: 14px
-				line-height: 10px
+
+	.is-dragged &
+		display: none
+
+	&.view-afterBlock
+		margin-bottom: calc(-1 * var(--cui-editor-block-boundary-height))
+
+	&.view-beforeBlock
+		margin-top: calc(-1 * var(--cui-editor-block-boundary-height))
+		& + *
+			position: relative
+			z-index: 0
+			&.is-selected
+				z-index: 2
+		& + *:not(.#{$cui-conf-globalPrefix}editorTable)
+			display: flex
+			flex-direction: column
+			justify-content: center
+			min-height: var(--cui-editor-canvas-element-handle-height)
+
+	.#{$cui-conf-globalPrefix}icon
+		align-items: center
+		color: inherit
+		justify-content: center
+
+	&-inner
+		align-items: center
+		background-color: var(--cui-background-color--above)
+		border-radius: 1em
+		color: var(--cui-color--lower)
+		display: flex
+		flex-direction: row
+		line-height: 1em
+		padding: calc(var(--cui-gap) / 2)
+
+	.#{$cui-conf-globalPrefix}label
+		display: none
+		margin-left: 0
+		margin-right: 0
 
 	.cui-editorCanvas-canvas > div[data-contember-type="reference"] + div[data-contember-type="reference"]
 		.cui-editorBlockBoundary.view-beforeBlock
 			display: none
-	//&.view-beforeBlock
-	//	top: (-$height / 2)
-	//&.view-afterBlock
-	//	bottom: (-$height / 2)
+
+	@media (hover: hover) and (pointer: fine)
+		&-inner
+			background-color: var(--cui-control-border-color)
+			color: var(--cui-background-color--above)
+			visibility: hidden
+
+		&:hover
+			color: var(--cui-control-color)
+			#{$root}-inner, &::after, &::before
+				visibility: visible
+			.#{$cui-conf-globalPrefix}label
+				display: flex

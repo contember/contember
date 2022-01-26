@@ -1,5 +1,4 @@
 import { Command, CommandConfiguration, Input } from '@contember/cli-common'
-import { Schema } from '@contember/schema'
 import { printValidationErrors } from '../../utils/schema'
 import { InvalidSchemaException } from '@contember/schema-migrations'
 import { executeCreateMigrationCommand } from './MigrationCreateHelper'
@@ -14,6 +13,7 @@ import { resolveSystemApiClient } from './SystemApiClientResolver'
 import prompts from 'prompts'
 import { emptySchema } from '@contember/schema-utils'
 import { validateMigrations } from './MigrationValidationHelper'
+import { loadSchema } from '../../utils/project'
 
 type Args = {
 	project: string
@@ -68,8 +68,7 @@ export class MigrationAmendCommand extends Command<Args, Options> {
 				if (status.migrationsToExecute.length > 0) {
 					throw `Some migrations are not executed. Unable to amend.`
 				}
-				// eslint-disable-next-line @typescript-eslint/no-var-requires
-				const schema: Schema = require(project.apiDir).default
+				const schema = await loadSchema(project)
 				try {
 					const initialSchema = await schemaVersionBuilder.buildSchema()
 					const intermediateResult = await migrationCreator.prepareMigration(initialSchema, schema, '')

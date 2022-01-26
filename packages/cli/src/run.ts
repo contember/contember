@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-import { register } from 'ts-node'
 import { Application, CommandManager, getPackageVersion } from '@contember/cli-common'
 import {
 	CreateApiKeyCommand,
@@ -18,14 +17,9 @@ import {
 	SignInCommand,
 	VersionCommand,
 	WorkspaceUpdateApiCommand,
-} from './commands'
-;(async () => {
-	register({
-		compilerOptions: {
-			experimentalDecorators: true,
-			module: 'commonjs',
-		},
-	})
+} from './commands';
+
+(async () => {
 	const diffCommandFactory = () => new MigrationDiffCommand()
 	const migrationsDescribeFactory = () => new MigrationDescribeCommand()
 	const commandManager = new CommandManager({

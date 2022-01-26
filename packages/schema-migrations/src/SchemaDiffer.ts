@@ -9,7 +9,6 @@ import {
 } from '@contember/schema-utils'
 import { SchemaMigrator } from './SchemaMigrator'
 import { Migration } from './Migration'
-import deepEqual from 'fast-deep-equal'
 import { ImplementationException } from './exceptions'
 import { VERSION_LATEST } from './modifications/ModificationVersions'
 import { CreateUniqueConstraintModification, RemoveUniqueConstraintModification } from './modifications/constraints'
@@ -107,8 +106,12 @@ export class SchemaDiffer {
 			diffs.push(...differDiffs)
 		}
 
-		if (checkRecreate && !deepEqual(updatedSchema, appliedDiffsSchema)) {
+
+		if (checkRecreate) {
 			const errors = deepCompare(updatedSchema, appliedDiffsSchema, [])
+			if (errors.length === 0) {
+				return diffs
+			}
 			let message = 'Updated schema cannot be recreated by the generated diff:'
 			for (const err of errors) {
 				message += '\n\t' + err.path.join('.') + ': ' + err.message

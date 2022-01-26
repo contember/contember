@@ -1,5 +1,4 @@
 import { Command, CommandConfiguration, Input } from '@contember/cli-common'
-import { Schema } from '@contember/schema'
 import { validateSchemaAndPrintErrors } from '../../utils/schema'
 import { Workspace, validateProjectName } from '@contember/cli-common'
 import {
@@ -12,6 +11,7 @@ import {
 } from '@contember/engine-content-api'
 import { DocumentNode, printSchema } from 'graphql'
 import { mergeSchemas } from '@graphql-tools/merge'
+import { loadSchema } from '../../utils/project'
 
 type Args = {
 	project: string
@@ -37,8 +37,7 @@ export class ProjectPrintSchemaCommand extends Command<Args, Options> {
 
 		validateProjectName(projectName)
 		const project = await workspace.projects.getProject(projectName, { fuzzy: true })
-		// eslint-disable-next-line @typescript-eslint/no-var-requires
-		const schema: Schema = require(project.apiDir).default
+		const schema = await loadSchema(project)
 		if (!validateSchemaAndPrintErrors(schema, 'Defined schema is invalid:')) {
 			return 1
 		}

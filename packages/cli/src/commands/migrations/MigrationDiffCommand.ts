@@ -1,5 +1,4 @@
 import { Command, CommandConfiguration, Input } from '@contember/cli-common'
-import { Schema } from '@contember/schema'
 import { printValidationErrors } from '../../utils/schema'
 import { InvalidSchemaException } from '@contember/schema-migrations'
 import { configureCreateMigrationCommand, executeCreateMigrationCommand } from './MigrationCreateHelper'
@@ -9,6 +8,7 @@ import prompts from 'prompts'
 import { interactiveResolveApiToken, TenantClient } from '../../utils/tenant'
 import { interactiveResolveInstanceEnvironmentFromInput } from '../../utils/instance'
 import { SystemClient } from '../../utils/system'
+import { loadSchema } from '../../utils/project'
 
 type Args = {
 	project: string
@@ -42,8 +42,7 @@ export class MigrationDiffCommand extends Command<Args, Options> {
 				migrationCreator,
 				migrationDescriber,
 			}) => {
-				// eslint-disable-next-line @typescript-eslint/no-var-requires
-				const schema: Schema = require(project.apiDir).default
+				const schema = await loadSchema(project)
 				try {
 					const migrationName = input.getArgument('migrationName')
 					const initialSchema = await schemaVersionBuilder.buildSchema()

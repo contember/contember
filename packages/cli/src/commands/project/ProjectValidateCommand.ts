@@ -1,10 +1,9 @@
-import { Command, CommandConfiguration, Input } from '@contember/cli-common'
+import { Command, CommandConfiguration, Input, validateProjectName, Workspace } from '@contember/cli-common'
 import { MigrationsContainerFactory } from '../../MigrationsContainer'
-import { Schema } from '@contember/schema'
 import { validateSchemaAndPrintErrors } from '../../utils/schema'
 import { emptySchema } from '@contember/schema-utils'
-import { Workspace, validateProjectName } from '@contember/cli-common'
 import { validateMigrations } from '../migrations/MigrationValidationHelper'
+import { loadSchema } from '../../utils/project'
 
 type Args = {
 	project: string
@@ -42,9 +41,7 @@ export class ProjectValidateCommand extends Command<Args, Options> {
 				container.migrationDescriber,
 				container.schemaMigrator,
 			)
-
-			// eslint-disable-next-line @typescript-eslint/no-var-requires
-			const schema: Schema = require(project.apiDir).default
+			const schema = await loadSchema(project)
 			projectValid = validateSchemaAndPrintErrors(schema, 'Defined schema is invalid:') && projectValid
 
 			const builtSchema = await container.schemaVersionBuilder.buildSchema()

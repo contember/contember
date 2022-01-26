@@ -12,7 +12,7 @@
 		"watch:server": "esbuild src/run-admin.ts --bundle --sourcemap --platform=node --outdir=dist/server --watch ",
 		"build:api:dev": "exit 0",
 		"build:api:prod": "exit 0",
-		"test": "tsm node_modules/uvu/bin.js tests"
+		"test": "uvu -r tsm tests"
 	},
 	"bin": {
 		"run-admin": "dist/run-admin.js"

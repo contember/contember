@@ -12,7 +12,7 @@ import {
 	VariableInputTransformer,
 } from '@contember/binding'
 import { emptyArray, noop } from '@contember/react-utils'
-import { EditorCanvas, EditorCanvasSize, Scheme } from '@contember/ui'
+import { EditorCanvas, EditorCanvasSize, FieldContainer, Scheme } from '@contember/ui'
 import { Fragment, FunctionComponent, ReactElement, ReactNode, useCallback, useMemo, useState } from 'react'
 import { Range as SlateRange, Transforms } from 'slate'
 import { Slate } from 'slate-react'
@@ -47,7 +47,8 @@ import { ContentOutlet, ContentOutletProps, useEditorReferenceBlocks } from './t
 import { useReferentiallyStableCallback } from './useReferentiallyStableCallback'
 
 export interface BlockEditorProps extends SugaredRelativeEntityList, CreateEditorPublicOptions<EditorWithBlocks> {
-	label: string
+	label?: ReactNode
+	placeholder?: string
 	contentField: SugaredFieldProps['field']
 	sortableBy: SugaredFieldProps['field']
 	children?: ReactNode
@@ -81,6 +82,7 @@ const BlockEditorComponent: FunctionComponent<BlockEditorProps> = Component(
 		const {
 			contentField,
 			label,
+			placeholder,
 			sortableBy,
 			children,
 			size,
@@ -186,68 +188,69 @@ const BlockEditorComponent: FunctionComponent<BlockEditorProps> = Component(
 		const leadingElements = useFieldBackedElementFields(leadingFieldBackedElements)
 		const trailingElements = useFieldBackedElementFields(trailingFieldBackedElements)
 
-		// TODO label?
 		return (
-			<ReferencesProvider getReferencedEntity={getReferencedEntity}>
-				<SortedBlocksContext.Provider value={sortedBlocksRef.current}>
-					<SortableRepeaterContainer
-						axis="y"
-						lockAxis="y"
-						helperClass="is-dragged"
-						lockToContainerEdges={true}
-						useWindowAsScrollContainer={true}
-						useDragHandle={true}
-						onSortEnd={useCallback(data => {
-							Transforms.moveNodes(editor, {
-								at: [data.oldIndex],
-								to: [data.newIndex],
-							})
-						}, [editor])}
-						shouldCancelStart={shouldCancelStart}
-					>
-						<Slate editor={editor} value={nodes} onChange={onChange}>
-							<EditorCanvas
-								inset="hovering-toolbar"
-								underlyingComponent={EditableCanvas}
-								componentProps={{
-									renderElement: baseEditor.renderElement,
-									renderLeaf: baseEditor.renderLeaf,
-									onKeyDown: baseEditor.onKeyDown,
-									onFocusCapture: baseEditor.onFocus,
-									onBlurCapture: baseEditor.onBlur,
-									onDOMBeforeInput: baseEditor.onDOMBeforeInput,
-									onDrop: (e => {
-										e.preventDefault()
-									}),
-									placeholder: label,
-									leading: leadingElements,
-									trailing: trailingElements,
-								}}
-								size={size ?? 'large'}
+			<FieldContainer label={label}>
+				<ReferencesProvider getReferencedEntity={getReferencedEntity}>
+					<SortedBlocksContext.Provider value={sortedBlocksRef.current}>
+						<SortableRepeaterContainer
+							axis="y"
+							lockAxis="y"
+							helperClass="is-dragged"
+							lockToContainerEdges={true}
+							useWindowAsScrollContainer={true}
+							useDragHandle={true}
+							onSortEnd={useCallback(data => {
+								Transforms.moveNodes(editor, {
+									at: [data.oldIndex],
+									to: [data.newIndex],
+								})
+							}, [editor])}
+							shouldCancelStart={shouldCancelStart}
+						>
+							<Slate editor={editor} value={nodes} onChange={onChange}>
+								<EditorCanvas
+									inset="hovering-toolbar"
+									underlyingComponent={EditableCanvas}
+									componentProps={{
+										renderElement: baseEditor.renderElement,
+										renderLeaf: baseEditor.renderLeaf,
+										onKeyDown: baseEditor.onKeyDown,
+										onFocusCapture: baseEditor.onFocus,
+										onBlurCapture: baseEditor.onBlur,
+										onDOMBeforeInput: baseEditor.onDOMBeforeInput,
+										onDrop: (e => {
+											e.preventDefault()
+										}),
+										placeholder: placeholder,
+										leading: leadingElements,
+										trailing: trailingElements,
+									}}
+									size={size ?? 'large'}
 
-							>
-								{useMemo(
-									() => (
-										<HoveringToolbars
-											toolbarScheme={toolbarScheme}
-											shouldDisplayInlineToolbar={shouldDisplayInlineToolbar}
-											inlineButtons={inlineButtons}
-											blockButtons={
-												<BlockHoveringToolbarContents
-													editorReferenceBlocks={editorReferenceBlocks}
-													blockButtons={blockButtons}
-													otherBlockButtons={otherBlockButtons}
-												/>
-											}
-										/>
-									),
-									[blockButtons, editorReferenceBlocks, inlineButtons, otherBlockButtons, shouldDisplayInlineToolbar, toolbarScheme],
-								)}
-							</EditorCanvas>
-						</Slate>
-					</SortableRepeaterContainer>
-				</SortedBlocksContext.Provider>
-			</ReferencesProvider>
+								>
+									{useMemo(
+										() => (
+											<HoveringToolbars
+												toolbarScheme={toolbarScheme}
+												shouldDisplayInlineToolbar={shouldDisplayInlineToolbar}
+												inlineButtons={inlineButtons}
+												blockButtons={
+													<BlockHoveringToolbarContents
+														editorReferenceBlocks={editorReferenceBlocks}
+														blockButtons={blockButtons}
+														otherBlockButtons={otherBlockButtons}
+													/>
+												}
+											/>
+										),
+										[blockButtons, editorReferenceBlocks, inlineButtons, otherBlockButtons, shouldDisplayInlineToolbar, toolbarScheme],
+									)}
+								</EditorCanvas>
+							</Slate>
+						</SortableRepeaterContainer>
+					</SortedBlocksContext.Provider>
+				</ReferencesProvider>
+			</FieldContainer>
 		)
 	},
 	(props, environment) => {
@@ -294,7 +297,7 @@ const BlockEditorComponent: FunctionComponent<BlockEditorProps> = Component(
 				{props.trailingFieldBackedElements?.map((item, i) => (
 					'element' in item ? item.element : <SugaredField field={item.field} key={`trailing_${i}`} />
 				))}
-				<Repeater {...props} initialEntityCount={0}>
+				<Repeater {...props} label={props.label ?? ''} initialEntityCount={0}>
 					<SugaredField field={props.sortableBy} />
 					<SugaredField field={props.contentField} />
 					{!props.monolithicReferencesMode && references}

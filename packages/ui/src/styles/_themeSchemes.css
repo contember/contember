@@ -1364,24 +1364,24 @@
 	--cui-background-color: rgb(var(--cui-content-950));
 	--cui-background-color--above: rgb(var(--cui-content-975));
 	--cui-background-color--below: rgb(var(--cui-content-925));
-	--cui-color: rgba(var(--cui-content-150), 0.750);
-	--cui-color--strong: rgb(var(--cui-content-150));
-	--cui-color--high: rgba(var(--cui-content-150), 0.750);
-	--cui-color--medium: rgba(var(--cui-content-150), 0.500);
-	--cui-color--low: rgba(var(--cui-content-150), 0.300);
-	--cui-color--lower: rgba(var(--cui-content-150), 0.125);
+	--cui-color: rgba(var(--cui-content-75), 0.750);
+	--cui-color--strong: rgb(var(--cui-content-75));
+	--cui-color--high: rgba(var(--cui-content-75), 0.750);
+	--cui-color--medium: rgba(var(--cui-content-75), 0.500);
+	--cui-color--low: rgba(var(--cui-content-75), 0.300);
+	--cui-color--lower: rgba(var(--cui-content-75), 0.125);
 
-	/* Control – 950 : 550*/
-	--cui-control-color: rgb(var(--cui-controls-550));
+	/* Control – 950 : 475*/
+	--cui-control-color: rgb(var(--cui-controls-475));
 	--cui-control-background-color: rgba(var(--cui-controls-950), 0.00);
-	--cui-control-border-color: rgb(var(--cui-controls-550));
+	--cui-control-border-color: rgb(var(--cui-controls-475));
 
-	/* Control:highlighted – 950 : 650 */
-	--cui-control-color--highlighted: rgb(var(--cui-controls-650));
+	/* Control:highlighted – 950 : 575 */
+	--cui-control-color--highlighted: rgb(var(--cui-controls-575));
 	--cui-control-background-color--highlighted: rgba(var(--cui-controls-1000), 0.750);
-	--cui-control-border-color--highlighted: rgb(var(--cui-controls-650));
+	--cui-control-border-color--highlighted: rgb(var(--cui-controls-575));
 
-	/* Control:pressed — 950 : 550 */
+	/* Control:pressed — 950 : 475 */
 	--cui-control-color--pressed: rgb(var(--cui-controls-550));
 	--cui-control-background-color--pressed: rgba(var(--cui-controls-1000), 0.175);
 	--cui-control-border-color--pressed: rgb(var(--cui-controls-750));
@@ -1423,24 +1423,24 @@
 	--cui-background-color: rgb(var(--cui-content-975));
 	--cui-background-color--above: rgb(var(--cui-content-1000));
 	--cui-background-color--below: rgb(var(--cui-content-950));
-	--cui-color: rgba(var(--cui-content-175), 0.750);
-	--cui-color--strong: rgb(var(--cui-content-175));
-	--cui-color--high: rgba(var(--cui-content-175), 0.750);
-	--cui-color--medium: rgba(var(--cui-content-175), 0.500);
-	--cui-color--low: rgba(var(--cui-content-175), 0.300);
-	--cui-color--lower: rgba(var(--cui-content-175), 0.125);
+	--cui-color: rgba(var(--cui-content-100), 0.750);
+	--cui-color--strong: rgb(var(--cui-content-100));
+	--cui-color--high: rgba(var(--cui-content-100), 0.750);
+	--cui-color--medium: rgba(var(--cui-content-100), 0.500);
+	--cui-color--low: rgba(var(--cui-content-100), 0.300);
+	--cui-color--lower: rgba(var(--cui-content-100), 0.125);
 
-	/* Control – 975 : 575*/
-	--cui-control-color: rgb(var(--cui-controls-575));
+	/* Control – 975 : 500*/
+	--cui-control-color: rgb(var(--cui-controls-500));
 	--cui-control-background-color: rgba(var(--cui-controls-975), 0.00);
-	--cui-control-border-color: rgb(var(--cui-controls-575));
+	--cui-control-border-color: rgb(var(--cui-controls-500));
 
-	/* Control:highlighted – 975 : 675 */
-	--cui-control-color--highlighted: rgb(var(--cui-controls-675));
+	/* Control:highlighted – 975 : 600 */
+	--cui-control-color--highlighted: rgb(var(--cui-controls-600));
 	--cui-control-background-color--highlighted: rgba(var(--cui-controls-1000), 0.750);
-	--cui-control-border-color--highlighted: rgb(var(--cui-controls-675));
+	--cui-control-border-color--highlighted: rgb(var(--cui-controls-600));
 
-	/* Control:pressed — 975 : 575 */
+	/* Control:pressed — 975 : 500 */
 	--cui-control-color--pressed: rgb(var(--cui-controls-575));
 	--cui-control-background-color--pressed: rgba(var(--cui-controls-1000), 0.175);
 	--cui-control-border-color--pressed: rgb(var(--cui-controls-775));
@@ -1481,24 +1481,24 @@
 	--cui-background-color: rgb(var(--cui-content-1000));
 	--cui-background-color--above: rgb(var(--cui-content-1000));
 	--cui-background-color--below: rgb(var(--cui-content-975));
-	--cui-color: rgba(var(--cui-content-200), 0.750);
-	--cui-color--strong: rgb(var(--cui-content-200));
-	--cui-color--high: rgba(var(--cui-content-200), 0.750);
-	--cui-color--medium: rgba(var(--cui-content-200), 0.500);
-	--cui-color--low: rgba(var(--cui-content-200), 0.300);
-	--cui-color--lower: rgba(var(--cui-content-200), 0.125);
+	--cui-color: rgba(var(--cui-content-125), 0.750);
+	--cui-color--strong: rgb(var(--cui-content-125));
+	--cui-color--high: rgba(var(--cui-content-125), 0.750);
+	--cui-color--medium: rgba(var(--cui-content-125), 0.500);
+	--cui-color--low: rgba(var(--cui-content-125), 0.300);
+	--cui-color--lower: rgba(var(--cui-content-125), 0.125);
 
-	/* Control – 1000 : 600*/
-	--cui-control-color: rgb(var(--cui-controls-600));
+	/* Control – 1000 : 525*/
+	--cui-control-color: rgb(var(--cui-controls-525));
 	--cui-control-background-color: rgba(var(--cui-controls-1000), 0.00);
-	--cui-control-border-color: rgb(var(--cui-controls-600));
+	--cui-control-border-color: rgb(var(--cui-controls-525));
 
-	/* Control:highlighted – 1000 : 700 */
-	--cui-control-color--highlighted: rgb(var(--cui-controls-700));
+	/* Control:highlighted – 1000 : 625 */
+	--cui-control-color--highlighted: rgb(var(--cui-controls-625));
 	--cui-control-background-color--highlighted: rgba(var(--cui-controls-1000), 0.750);
-	--cui-control-border-color--highlighted: rgb(var(--cui-controls-700));
+	--cui-control-border-color--highlighted: rgb(var(--cui-controls-625));
 
-	/* Control:pressed — 1000 : 600 */
+	/* Control:pressed — 1000 : 525 */
 	--cui-control-color--pressed: rgb(var(--cui-controls-600));
 	--cui-control-background-color--pressed: rgba(var(--cui-controls-1000), 0.175);
 	--cui-control-border-color--pressed: rgb(var(--cui-controls-800));
@@ -1919,24 +1919,24 @@
 		--cui-background-color: rgb(var(--cui-content-950));
 		--cui-background-color--above: rgb(var(--cui-content-975));
 		--cui-background-color--below: rgb(var(--cui-content-925));
-		--cui-color: rgba(var(--cui-content-150), 0.750);
-		--cui-color--strong: rgb(var(--cui-content-150));
-		--cui-color--high: rgba(var(--cui-content-150), 0.750);
-		--cui-color--medium: rgba(var(--cui-content-150), 0.500);
-		--cui-color--low: rgba(var(--cui-content-150), 0.300);
-		--cui-color--lower: rgba(var(--cui-content-150), 0.125);
+		--cui-color: rgba(var(--cui-content-75), 0.750);
+		--cui-color--strong: rgb(var(--cui-content-75));
+		--cui-color--high: rgba(var(--cui-content-75), 0.750);
+		--cui-color--medium: rgba(var(--cui-content-75), 0.500);
+		--cui-color--low: rgba(var(--cui-content-75), 0.300);
+		--cui-color--lower: rgba(var(--cui-content-75), 0.125);
 
-		/* Control – 950 : 550*/
-		--cui-control-color: rgb(var(--cui-controls-550));
+		/* Control – 950 : 475*/
+		--cui-control-color: rgb(var(--cui-controls-475));
 		--cui-control-background-color: rgba(var(--cui-controls-950), 0.00);
-		--cui-control-border-color: rgb(var(--cui-controls-550));
+		--cui-control-border-color: rgb(var(--cui-controls-475));
 
-		/* Control:highlighted – 950 : 650 */
-		--cui-control-color--highlighted: rgb(var(--cui-controls-650));
+		/* Control:highlighted – 950 : 575 */
+		--cui-control-color--highlighted: rgb(var(--cui-controls-575));
 		--cui-control-background-color--highlighted: rgba(var(--cui-controls-1000), 0.750);
-		--cui-control-border-color--highlighted: rgb(var(--cui-controls-650));
+		--cui-control-border-color--highlighted: rgb(var(--cui-controls-575));
 
-		/* Control:pressed — 950 : 550 */
+		/* Control:pressed — 950 : 475 */
 		--cui-control-color--pressed: rgb(var(--cui-controls-550));
 		--cui-control-background-color--pressed: rgba(var(--cui-controls-1000), 0.175);
 		--cui-control-border-color--pressed: rgb(var(--cui-controls-750));
@@ -1977,24 +1977,24 @@
 		--cui-background-color: rgb(var(--cui-content-975));
 		--cui-background-color--above: rgb(var(--cui-content-1000));
 		--cui-background-color--below: rgb(var(--cui-content-950));
-		--cui-color: rgba(var(--cui-content-175), 0.750);
-		--cui-color--strong: rgb(var(--cui-content-175));
-		--cui-color--high: rgba(var(--cui-content-175), 0.750);
-		--cui-color--medium: rgba(var(--cui-content-175), 0.500);
-		--cui-color--low: rgba(var(--cui-content-175), 0.300);
-		--cui-color--lower: rgba(var(--cui-content-175), 0.125);
+		--cui-color: rgba(var(--cui-content-100), 0.750);
+		--cui-color--strong: rgb(var(--cui-content-100));
+		--cui-color--high: rgba(var(--cui-content-100), 0.750);
+		--cui-color--medium: rgba(var(--cui-content-100), 0.500);
+		--cui-color--low: rgba(var(--cui-content-100), 0.300);
+		--cui-color--lower: rgba(var(--cui-content-100), 0.125);
 
-		/* Control – 975 : 575*/
-		--cui-control-color: rgb(var(--cui-controls-575));
+		/* Control – 975 : 500*/
+		--cui-control-color: rgb(var(--cui-controls-500));
 		--cui-control-background-color: rgba(var(--cui-controls-975), 0.00);
-		--cui-control-border-color: rgb(var(--cui-controls-575));
+		--cui-control-border-color: rgb(var(--cui-controls-500));
 
-		/* Control:highlighted – 975 : 675 */
-		--cui-control-color--highlighted: rgb(var(--cui-controls-675));
+		/* Control:highlighted – 975 : 600 */
+		--cui-control-color--highlighted: rgb(var(--cui-controls-600));
 		--cui-control-background-color--highlighted: rgba(var(--cui-controls-1000), 0.750);
-		--cui-control-border-color--highlighted: rgb(var(--cui-controls-675));
+		--cui-control-border-color--highlighted: rgb(var(--cui-controls-600));
 
-		/* Control:pressed — 975 : 575 */
+		/* Control:pressed — 975 : 500 */
 		--cui-control-color--pressed: rgb(var(--cui-controls-575));
 		--cui-control-background-color--pressed: rgba(var(--cui-controls-1000), 0.175);
 		--cui-control-border-color--pressed: rgb(var(--cui-controls-775));
@@ -2035,24 +2035,24 @@
 		--cui-background-color: rgb(var(--cui-content-1000));
 		--cui-background-color--above: rgb(var(--cui-content-1000));
 		--cui-background-color--below: rgb(var(--cui-content-975));
-		--cui-color: rgba(var(--cui-content-200), 0.750);
-		--cui-color--strong: rgb(var(--cui-content-200));
-		--cui-color--high: rgba(var(--cui-content-200), 0.750);
-		--cui-color--medium: rgba(var(--cui-content-200), 0.500);
-		--cui-color--low: rgba(var(--cui-content-200), 0.300);
-		--cui-color--lower: rgba(var(--cui-content-200), 0.125);
+		--cui-color: rgba(var(--cui-content-125), 0.750);
+		--cui-color--strong: rgb(var(--cui-content-125));
+		--cui-color--high: rgba(var(--cui-content-125), 0.750);
+		--cui-color--medium: rgba(var(--cui-content-125), 0.500);
+		--cui-color--low: rgba(var(--cui-content-125), 0.300);
+		--cui-color--lower: rgba(var(--cui-content-125), 0.125);
 
-		/* Control – 1000 : 600*/
-		--cui-control-color: rgb(var(--cui-controls-600));
+		/* Control – 1000 : 525*/
+		--cui-control-color: rgb(var(--cui-controls-525));
 		--cui-control-background-color: rgba(var(--cui-controls-1000), 0.00);
-		--cui-control-border-color: rgb(var(--cui-controls-600));
+		--cui-control-border-color: rgb(var(--cui-controls-525));
 
-		/* Control:highlighted – 1000 : 700 */
-		--cui-control-color--highlighted: rgb(var(--cui-controls-700));
+		/* Control:highlighted – 1000 : 625 */
+		--cui-control-color--highlighted: rgb(var(--cui-controls-625));
 		--cui-control-background-color--highlighted: rgba(var(--cui-controls-1000), 0.750);
-		--cui-control-border-color--highlighted: rgb(var(--cui-controls-700));
+		--cui-control-border-color--highlighted: rgb(var(--cui-controls-625));
 
-		/* Control:pressed — 1000 : 600 */
+		/* Control:pressed — 1000 : 525 */
 		--cui-control-color--pressed: rgb(var(--cui-controls-600));
 		--cui-control-background-color--pressed: rgba(var(--cui-controls-1000), 0.175);
 		--cui-control-border-color--pressed: rgb(var(--cui-controls-800));

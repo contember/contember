@@ -1,4 +1,6 @@
 import {
+	Block,
+	BlockRepeater,
 	CheckboxField,
 	DateField,
 	DateTimeField,
@@ -37,5 +39,19 @@ export const Inputs = (
 			{ value: 'b', label: 'B option' },
 			{ value: 'c', label: 'C option' },
 		]} />
+		<BlockRepeater
+			field="blocks"
+			label={undefined}
+			discriminationField="type"
+			sortableBy="order"
+			addButtonText="Add content block"
+		>
+			<Block
+				discriminateBy="heroSection"
+				label="Hero section"
+			>
+				<TextField field="primaryText" label="Headline" />
+			</Block>
+		</BlockRepeater>
 	</EditPage>
 )

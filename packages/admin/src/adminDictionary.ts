@@ -1,5 +1,5 @@
 import type {
-	DataGridCellsDictionary,
+	BlockRepeaterDictionary, DataGridCellsDictionary,
 	DataGridDictionary,
 	ErrorCodeDictionary,
 	FieldViewDictionary,
@@ -12,7 +12,9 @@ import type {
 
 // This should ideally be a complete list of all individual dictionaries throughout the entire package.
 // That way, translation packages can implement this and have TS warn them about missing messages.
-export type AdminDictionary = DataGridCellsDictionary &
+export type AdminDictionary =
+	BlockRepeaterDictionary &
+	DataGridCellsDictionary &
 	DataGridDictionary &
 	ErrorCodeDictionary &
 	FieldViewDictionary &

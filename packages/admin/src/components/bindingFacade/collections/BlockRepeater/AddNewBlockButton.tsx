@@ -1,10 +1,14 @@
 import { Dropdown, DropdownProps, FieldContainer, Icon } from '@contember/ui'
 import { memo, useMemo } from 'react'
+import { blockRepeaterDictionary } from '.'
+import { useMessageFormatter } from '../../../../i18n'
 import { AddNewBlockButtonInner, AddNewBlockButtonInnerProps } from './AddNewBlockButtonInner'
 
 export interface AddNewBlockButtonProps extends Omit<AddNewBlockButtonInnerProps, 'requestClose'> {}
 
 export const AddNewBlockButton = memo<AddNewBlockButtonProps>(props => {
+	const formatter = useMessageFormatter(blockRepeaterDictionary)
+
 	const buttonProps: DropdownProps['buttonProps'] = useMemo(
 		() => ({
 			children: (
@@ -17,7 +21,7 @@ export const AddNewBlockButton = memo<AddNewBlockButtonProps>(props => {
 							top: '-0.071em',
 						}}
 					/>
-					{'Add'}
+					{props.children ?? formatter('blockRepeater.addNewBlockButton.addBlock')}
 				</>
 			),
 			disabled: props.isMutating,
@@ -25,7 +29,7 @@ export const AddNewBlockButton = memo<AddNewBlockButtonProps>(props => {
 			flow: 'block',
 			justification: 'justifyStart',
 		}),
-		[props.isMutating],
+		[formatter, props.isMutating, props.children],
 	)
 
 	return (

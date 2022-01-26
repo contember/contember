@@ -1,0 +1,137 @@
+{
+	"formatVersion": 3,
+	"modifications": [
+		{
+			"modification": "createEnum",
+			"enumName": "ContentBlockType",
+			"values": [
+				"heroSection"
+			]
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"name": "RepeaterBlock",
+				"primary": "id",
+				"primaryColumn": "id",
+				"unique": {},
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"nullable": false,
+						"type": "Uuid",
+						"columnType": "uuid"
+					}
+				},
+				"tableName": "repeater_block"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "RepeaterBlock",
+			"field": {
+				"name": "primaryText",
+				"columnName": "primary_text",
+				"nullable": true,
+				"type": "String",
+				"columnType": "text"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "RepeaterBlock",
+			"field": {
+				"name": "type",
+				"columnName": "type",
+				"nullable": false,
+				"type": "Enum",
+				"columnType": "ContentBlockType"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "RepeaterBlock",
+			"field": {
+				"name": "order",
+				"columnName": "order",
+				"nullable": false,
+				"type": "Integer",
+				"columnType": "integer"
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "RepeaterBlock",
+			"owningSide": {
+				"name": "page",
+				"inversedBy": "blocks",
+				"nullable": true,
+				"type": "ManyHasOne",
+				"target": "InputShowcase",
+				"joiningColumn": {
+					"columnName": "page_id",
+					"onDelete": "set null"
+				}
+			},
+			"inverseSide": {
+				"name": "blocks",
+				"ownedBy": "page",
+				"type": "OneHasMany",
+				"target": "RepeaterBlock"
+			}
+		},
+		{
+			"modification": "patchAclSchema",
+			"patch": [
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/RepeaterBlock",
+					"value": {
+						"predicates": {},
+						"operations": {
+							"create": {
+								"id": true,
+								"primaryText": true,
+								"type": true,
+								"order": true,
+								"page": true
+							},
+							"read": {
+								"id": true,
+								"primaryText": true,
+								"type": true,
+								"order": true,
+								"page": true
+							},
+							"update": {
+								"id": true,
+								"primaryText": true,
+								"type": true,
+								"order": true,
+								"page": true
+							},
+							"delete": true,
+							"customPrimary": true
+						}
+					}
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/InputShowcase/operations/create/blocks",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/InputShowcase/operations/update/blocks",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/InputShowcase/operations/read/blocks",
+					"value": true
+				}
+			]
+		}
+	]
+}

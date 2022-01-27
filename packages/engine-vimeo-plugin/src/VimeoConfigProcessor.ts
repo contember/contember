@@ -11,11 +11,15 @@ export class VimeoConfigProcessor implements ConfigProcessor<ProjectWithVimeoCon
 			}),
 		)
 	}
+
 	prepareConfigTemplate(template: ConfigTemplate, { env }: ConfigTemplateContext) {
 		return {
 			...template,
-			vimeo: {
-				token: `%?project.secret.vimeo.token||project.env.VIMEO_TOKEN%`,
+			projectDefaults: {
+				...template.projectDefaults,
+				vimeo: {
+					token: `%?project.secret.vimeo.token||project.env.VIMEO_TOKEN%`,
+				},
 			},
 		}
 	}

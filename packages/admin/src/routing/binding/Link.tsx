@@ -23,6 +23,7 @@ export const Link = Component(({ to, ...props }: LinkProps) => {
 
 	return <>
 		{createFieldsFromTarget(to).map(it => <Field field={it} />)}
+		{props.children}
 	</>
 })
 Link.displayName = 'Link'

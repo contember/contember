@@ -26,7 +26,7 @@ export class SchemaVersionBuilder {
 				...this.schemaMigrator.applyModifications(schema, migration.modifications, migration.formatVersion),
 				version: migration.version,
 			}),
-			after?.notNormalized ?? emptyVersionedSchema,
+			after?.notNormalized ?? emptyVersionedSchema.notNormalized,
 		)
 		const normalized = normalizeSchema(schema)
 		return {

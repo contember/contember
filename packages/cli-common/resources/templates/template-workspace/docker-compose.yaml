@@ -1,5 +1,3 @@
-version: '2.4'
-
 services:
   contember-engine:
     image: contember/engine:{version}
@@ -47,7 +45,9 @@ services:
   contember-cli:
     image: contember/cli:{version}
     user: '1000:1000'
-    scale: 0
+
+    deploy:
+      replicas: 0
 
     environment:
       CONTEMBER_API_URL: 'http://contember-engine:4000/'

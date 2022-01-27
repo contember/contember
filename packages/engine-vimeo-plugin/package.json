@@ -1,17 +1,17 @@
 {
   "name": "@contember/engine-vimeo-plugin",
   "license": "Apache-2.0",
-  "version": "1.0.0-rc.4",
+  "version": "1.0.0-rc.5",
   "main": "dist/src/index.js",
   "scripts": {
     "test": "echo 'No tests'"
   },
   "typings": "dist/src/index.d.ts",
   "dependencies": {
-    "@contember/engine-common": "^1.0.0-rc.4",
-    "@contember/engine-plugins": "^1.0.0-rc.4",
-    "@contember/graphql-utils": "^1.0.0-rc.4",
-    "@contember/schema": "^1.0.0-rc.4",
+    "@contember/engine-common": "^1.0.0-rc.5",
+    "@contember/engine-plugins": "^1.0.0-rc.5",
+    "@contember/graphql-utils": "^1.0.0-rc.5",
+    "@contember/schema": "^1.0.0-rc.5",
     "apollo-server-errors": "^2.3.4",
     "node-fetch": "^2.6.0"
   },

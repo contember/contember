@@ -54,7 +54,6 @@ services:
       CONTEMBER_API_TOKEN: '0000000000000000000000000000000000000000'
       CONTEMBER_PROJECT_NAME: '{projectName}'
 
-    working_dir: /src
     volumes:
       - ./:/src
 

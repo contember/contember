@@ -3,6 +3,7 @@
 	"include": [],
 	"references": [
 		{ "path": "./src"},
-		{ "path": "./public"}
+		{ "path": "./public"},
+		{ "path": "./tests"},
 	]
 }

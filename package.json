@@ -8,8 +8,8 @@
 		"changeset": "changeset",
 		"check": "./scripts/runChecks.sh",
 		"clean": "pnpm run clean:dependencies && pnpm run clean:generated",
-		"clean:dependencies": "rm -rf node_modules/ packages/*/node_modules",
-		"clean:generated": "rm -rf temp/ packages/*/dist packages/*/temp",
+		"clean:dependencies": "rm -rf node_modules ee/*/node_modules packages/*/node_modules",
+		"clean:generated": "rm -rf temp ee/*/dist ee/*/temp packages/*/dist packages/*/temp",
 		"eslint:fix": "eslint --fix \"**/*.{ts,tsx}\" ",
 		"eslint:lint": "eslint \"**/*.{ts,tsx}\" ",
 		"storybook": "cd packages/ui && pnpm run storybook",
@@ -47,6 +47,7 @@
 		"react": "17.0.2",
 		"react-dom": "17.0.2",
 		"sass": "1.35.2",
+		"tsm": "2.2.1",
 		"typescript": "4.3.5",
 		"vite": "2.6.14"
 	}

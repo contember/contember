@@ -56,7 +56,7 @@ services:
 
     working_dir: /src
     volumes:
-      - ./:/src:cached
+      - ./:/src
 
     depends_on:
       contember-engine:

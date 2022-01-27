@@ -82,7 +82,7 @@ services:
       timeout: 5s
       retries: 10
 
-  s3:
+  minio:
     image: bitnami/minio
 
     environment:
@@ -94,7 +94,7 @@ services:
       - '1483:9000'
 
     volumes:
-      - s3-data:/data
+      - minio-data:/data
 
   mailhog:
     image: mailhog/mailhog
@@ -122,4 +122,4 @@ services:
 
 volumes:
   pgsql-data: ~
-  s3-data: ~
+  minio-data: ~

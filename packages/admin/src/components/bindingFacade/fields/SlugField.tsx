@@ -6,9 +6,9 @@ import {
 	useDerivedField,
 	useEnvironment,
 } from '@contember/binding'
-import { isSpecialLinkClick, SingleLineTextInputProps, SlugInput } from '@contember/ui'
+import { SingleLineTextInputProps, SlugInput } from '@contember/ui'
 import slugify from '@sindresorhus/slugify'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useMemo } from 'react'
 import type { SimpleRelativeSingleFieldProps } from '../auxiliary'
 import { SimpleRelativeSingleField } from '../auxiliary'
 import { stringFieldParser, useTextInput } from './useTextInput'
@@ -75,21 +75,7 @@ export const SlugFieldInner = SimpleRelativeSingleField<SlugFieldProps, string>(
 
 		const hardPrefix = normalizedUnpersistedHardPrefix + normalizedPersistedHardPrefix
 		const fullValue = hardPrefix + inputProps.value
-		const overlay = <>
-			{props.linkToExternalUrl && (
-				<a
-					tabIndex={-1}
-					href={fullValue}
-					onClick={event => {
-						if (isSpecialLinkClick(event.nativeEvent)) {
-							event.stopPropagation()
-						} else {
-							inputRef.current?.focus()
-							event.preventDefault()
-						}
-					}}
-				/>)}
-		</>
+
 		return (
 			<SlugInput
 				{...props}

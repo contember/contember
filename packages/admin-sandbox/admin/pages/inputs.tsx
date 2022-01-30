@@ -17,7 +17,7 @@ import {
 } from '@contember/admin'
 
 
-export const Inputs = (
+export default () => (
 	<EditPage entity="InputShowcase(unique = One)" setOnCreate="(unique = One)">
 		<TextField field={'textValue'} label={'Text'} />
 		<SlugField derivedFrom={'textValue'} field={'slugValue'} label={'Slug with prefix'} unpersistedHardPrefix="https://www.contember.com/" linkToExternalUrl />

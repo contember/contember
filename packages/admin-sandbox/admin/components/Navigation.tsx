@@ -6,7 +6,7 @@ export const Navigation = () => (
 			<Menu.Item title="Inputs" to="inputs" />
 			<Menu.Item title="Tags" to="tags" />
 			<Menu.Item title="Categories" to="categories" />
-			<Menu.Item title="Articles" to="articleList" />
+			<Menu.Item title="Articles" to="article(action: 'list')" />
 			<Menu.Item title="Homepage" to="homepage" />
 			<Menu.Item title="Foo" to="foo" />
 			<Menu.Item title="Foo Bar">

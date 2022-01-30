@@ -1,12 +1,14 @@
 import { Environment, EnvironmentContext, useEnvironment } from '@contember/binding'
-import { Message } from '@contember/ui'
+import { ContainerSpinner, Message } from '@contember/ui'
 import {
 	ComponentType,
 	Fragment,
 	isValidElement,
+	lazy,
 	ReactElement,
 	ReactNode,
 	ReactNodeArray,
+	Suspense,
 	useMemo,
 	useRef,
 } from 'react'
@@ -32,14 +34,18 @@ type PagesMapElement =
 	| ComponentType
 	| PageProviderElement
 	| PageSetProviderElement
-	| PageSetProvider<EmptyObject>;
+	| PageSetProvider<EmptyObject>
+
 type PagesMap = Record<string, PagesMapElement>
+
+type LazyPageMap = Record<string, () => Promise<{default?: ComponentType}>>
 
 export interface PagesProps {
 	children:
 		| PagesMap
 		| PageProviderElement[]
 		| PageProviderElement
+		| LazyPageMap
 	layout?: ComponentType<{ children?: ReactNode }>
 }
 
@@ -79,6 +85,10 @@ export const Pages = ({ children, layout }: PagesProps) => {
 						return Object.entries(v.type.getPages(v.props))
 					} else if (isPageProviderElement(v)) {
 						return [[v.type.getPageName(v.props, pageName), () => v]]
+					} else if (k.endsWith('.tsx') || k.endsWith('.jsx')) {
+						const Lazy = lazy(v)
+						const WithFallback = () => <Suspense fallback={<ContainerSpinner />}><Lazy /></Suspense>
+						return [[k.slice(k.lastIndexOf('/') + 1, -4), WithFallback]]
 					} else {
 						return [[pageName, v]]
 					}

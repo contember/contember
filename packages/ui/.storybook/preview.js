@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import '../src/index.sass'
+import { Select } from '../stories/ui/Select'
 import './global.sass'
-import { Select } from './Select'
 
 export const parameters = {
   actions: { argTypesRegex: "^on[A-Z].*" },
@@ -66,7 +66,7 @@ export const decorators = [
         alignItems: 'stretch',
       }}>
         <Select
-          label="Position"
+          label="Scheme"
           name="scheme"
           value={scheme}
           options={[['system', 'System'], ['light', 'Light'], ['dark', 'Dark']]}
@@ -74,7 +74,7 @@ export const decorators = [
         />
 
         <Select
-          label="Scheme"
+          label="Position"
           name="position"
           value={position}
           options={[['default', 'Default'], ['above', 'Above'], ['below', 'Below']]}

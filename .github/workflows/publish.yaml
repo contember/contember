@@ -38,9 +38,6 @@ jobs:
       - name: Build
         run: pnpm run build
 
-      - name: Build API
-        run: pnpm run build:api:dev
-
       - name: Test
         run: pnpm run test
 

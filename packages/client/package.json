@@ -14,13 +14,11 @@
 	"files": [
 		"dist/"
 	],
-	"typings": "./dist/client.d.ts",
+	"typings": "./dist/types/index.d.ts",
 	"type": "module",
 	"sideEffects": false,
 	"scripts": {
 		"build": "vite build --mode development && vite build --mode production",
-		"build:api:dev": "api-extractor run --local",
-		"build:api:prod": "api-extractor run",
 		"test": "jest",
 		"test:with-coverage": "jest --coverage=true"
 	},

@@ -2,8 +2,8 @@
 	"extends": "../tsconfig.settings.json",
 	"compilerOptions": {
 		"baseUrl": ".",
-		"outDir": "../temp",
 		"typeRoots": ["./types/"],
+		"outDir": "../dist/types",
 		"paths": {
 			"@contember/binding": ["../../binding/src"],
 			"@contember/client": ["../../client/src"],

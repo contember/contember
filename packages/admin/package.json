@@ -17,12 +17,10 @@
 	"files": [
 		"dist/"
 	],
-	"typings": "./dist/admin.d.ts",
+	"typings": "./dist/types/index.d.ts",
 	"scripts": {
 		"build": "vite build --mode development && vite build --mode production",
-		"build:api:dev": "api-extractor run --local && cat src/components/bindingFacade/richText/slate-types.ts | tail -n 7 >> ./dist/admin.d.ts",
-		"build:api:prod": "api-extractor run",
-		"styles:build": "sass src/index.sass:dist/style.css",
+		"build:styles": "sass src/index.sass:dist/style.css",
 		"test": "jest"
 	},
 	"dependencies": {

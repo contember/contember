@@ -1,6 +1,6 @@
 {
 	"extends": "../tsconfig.settings.json",
 	"compilerOptions": {
-		"outDir": "./temp"
+		"outDir": "../dist/types"
 	}
 }

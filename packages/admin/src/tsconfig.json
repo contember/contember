@@ -2,7 +2,6 @@
 	"extends": "../tsconfig.settings.json",
 	"compilerOptions": {
 		"baseUrl": ".",
-		"typeRoots": ["./types/"],
 		"outDir": "../dist/types",
 		"paths": {
 			"@contember/binding": ["../../binding/src"],

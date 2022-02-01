@@ -50,13 +50,13 @@ export interface RadioFieldInnerProps extends ChoiceFieldData.SingleChoiceFieldM
 
 export const RadioFieldInner = memo((props: RadioFieldInnerProps) => {
 	const options: RadioOption[] = props.data.map(({ key, label, description }) => {
-			return {
-				disabled: false,
-				value: key.toString(),
-				label: label,
-				labelDescription: description,
-			}
-		})
+		return {
+			value: key.toString(),
+			label: label,
+			labelDescription: description,
+		}
+	})
+
 	return (
 		<FieldContainer
 			{...props}

@@ -1,10 +1,10 @@
 import { memo, ReactNode } from 'react'
-import ReactDOM from 'react-dom'
+import { createPortal } from 'react-dom'
 
 export interface PortalProps {
 	to?: HTMLElement
 	children: ReactNode
 }
 
-export const Portal = memo((props: PortalProps) => ReactDOM.createPortal(props.children, props.to ?? document.getElementById('portal-root') ?? document.body))
+export const Portal = memo((props: PortalProps) => createPortal(props.children, props.to ?? document.getElementById('portal-root') ?? document.body))
 Portal.displayName = 'Portal'

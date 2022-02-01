@@ -17,8 +17,8 @@
 	},
 	"typings": "./dist/types/index.d.ts",
 	"files": [
-		"dist",
-		"src"
+		"dist/",
+		"src/"
 	],
 	"scripts": {
 		"build": "vite build --mode development && vite build --mode production",

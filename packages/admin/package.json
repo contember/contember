@@ -15,7 +15,8 @@
 		"./style.css": "./dist/style.css"
 	},
 	"files": [
-		"dist/"
+		"dist/",
+		"src/"
 	],
 	"typings": "./dist/types/index.d.ts",
 	"scripts": {

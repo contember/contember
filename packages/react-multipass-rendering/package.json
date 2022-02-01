@@ -14,7 +14,8 @@
 		}
 	},
 	"files": [
-		"dist/"
+		"dist/",
+		"src/"
 	],
 	"typings": "./dist/types/index.d.ts",
 	"scripts": {

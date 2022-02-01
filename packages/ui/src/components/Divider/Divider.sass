@@ -2,6 +2,10 @@
   --divider-margin: calc(var(--cui-padding-vertical) / 2)
   .view-horizontal &
     --divider-margin: calc(var(--cui-padding-horizontal) / 2)
+  &.view-none
+    --divider-margin: 0
+    .view-horizontal &
+      --divider-margin: 0
   &.view-small
     --divider-margin: var(--cui-gap-vertical)
     .view-horizontal &

@@ -1,4 +1,4 @@
-import { Message } from '@contember/ui'
+import { Box, BoxProps, Stack } from '@contember/ui'
 import { ComponentType, memo, ReactNode } from 'react'
 
 export interface EmptyMessageOuterProps {
@@ -9,18 +9,25 @@ export interface EmptyMessageOuterProps {
 export interface EmptyMessageProps {
 	children: ReactNode
 	component?: ComponentType<EmptyMessageComponentProps>
+	distinction?: BoxProps['distinction']
 }
 
 export interface EmptyMessageComponentProps {
 	children: ReactNode
+	distinction?: BoxProps['distinction']
 }
 
-export const EmptyMessage = memo(({ children, component }: EmptyMessageProps) => {
+export const EmptyMessage = memo(({ children, component, distinction }: EmptyMessageProps) => {
 	const MessageComponent = component ?? EmptyMessageDefault
-	return <MessageComponent>{children}</MessageComponent>
+	return <MessageComponent distinction={distinction}>{children}</MessageComponent>
 })
 EmptyMessage.displayName = 'EmptyMessage'
 
-const EmptyMessageDefault = memo((props: EmptyMessageComponentProps) => (
-	<Message flow="generousBlock">{props.children}</Message>
+const EmptyMessageDefault = memo(({ children, distinction }: EmptyMessageComponentProps) => (
+	<Box distinction={distinction} intent="default">
+		<Stack
+			direction="horizontal"
+			justify="space-around"
+		>{children}</Stack>
+	</Box>
 ))

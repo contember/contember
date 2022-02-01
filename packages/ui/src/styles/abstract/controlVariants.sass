@@ -1,25 +1,24 @@
 %controlVariants
 	--input-control-focus-ring: var(--cui-control-focus-ring-box-shadow)
+	--input-control-color: var(--cui-color--high)
+	--input-control-background: var(--cui-background-color--above)
+	--input-control-border-color: var(--cui-color--lower)
 
 	@extend %implementsCustomFocusEffects
-	color: var(--cui-color--high)
-	background: var(--cui-background-color--above)
-	border-color: var(--cui-color--lower)
+
+	color: var(--input-control-color)
+	background: var(--input-control-background)
+	border-color: var(--input-control-border-color)
 
 	+disableWebkitAutoFill(var(--cui-control-background-color))
 
 	&:hover
-		border-color: var(--cui-color--low)
+		--input-control-border-color: var(--cui-color--low)
 
 	&:focus
-		border-color: var(--cui-control-border-color)
+		--input-control-border-color: var(--cui-control-border-color)
 	&:focus:focus-visible
 		box-shadow: var(--input-control-focus-ring)
-
-	&:invalid
-		border-color: rgb(var(--cui-theme-danger-500))
-		&:focus:focus-visible
-			box-shadow: var(--cui-control-focus-ring-box-shadow-error)
 
 	&::placeholder
 		color: var(--cui-color--low)
@@ -41,7 +40,7 @@
 		border-color: transparent
 
 		&:focus
-			background: var(--cui-background-color--above)
+			--input-control--background: var(--cui-background-color--above)
 			box-shadow: none
 		&:hover
-			background: var(--cui-background-color--above)
+			--input-control-background: var(--cui-background-color--above)

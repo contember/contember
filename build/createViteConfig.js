@@ -15,7 +15,6 @@ export function createViteConfig(packageName) {
 		const isDevMode = mode === 'development'
 		return {
 			build: {
-				emptyOutDir: false,
 				lib: {
 					name: packageName,
 					entry: resolve(rootDirectory, `${packageDir}/src/index.ts`),

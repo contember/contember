@@ -18,7 +18,7 @@ import { makeExecutableSchema } from '@graphql-tools/schema'
 import { ContentApiTester } from './ContentApiTester'
 import { SystemApiTester } from './SystemApiTester'
 import { TesterStageManager } from './TesterStageManager'
-import { Client, EventManagerImpl, SingleConnection } from '@contember/database'
+import { Client, EventManager, SingleConnection } from '@contember/database'
 import { createUuidGenerator } from './testUuid'
 import { project } from './project'
 import { createConnection, dbCredentials, recreateDatabase } from './dbUtils'
@@ -92,7 +92,7 @@ export class ApiTester {
 
 		const pgClient = await createPgClient(dbCredentials(dbName))
 		await pgClient.connect()
-		const singleConnection = new SingleConnection(pgClient, {}, new EventManagerImpl(), true)
+		const singleConnection = new SingleConnection(pgClient, {}, new EventManager(), true)
 		const dbContextMigrations = databaseContextFactory
 			.withClient(singleConnection.createClient('system', {}))
 			.create(unnamedIdentity)

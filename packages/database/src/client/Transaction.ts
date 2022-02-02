@@ -1,6 +1,6 @@
 import { Connection } from './Connection'
 import { EventManager } from './EventManager'
-import { ClientBase, PoolClient } from 'pg'
+import { ClientBase } from 'pg'
 import { wrapIdentifier } from '../utils'
 import { executeQuery } from './execution'
 
@@ -23,10 +23,16 @@ export class Transaction implements Connection.TransactionLike {
 
 	async transaction<Result>(
 		callback: (connection: Connection.TransactionLike) => Promise<Result> | Result,
+		options?: { eventManager?: EventManager },
 	): Promise<Result> {
 		const savepointName = `savepoint_${this.savepointCounter++}`
 		await this.query(`SAVEPOINT ${wrapIdentifier(savepointName)}`)
-		const savepoint = new SavePoint(savepointName, this, this.pgClient)
+		const savepoint = new SavePoint(
+			savepointName,
+			this,
+			this.pgClient,
+			new EventManager(options?.eventManager ?? this.eventManager),
+		)
 		try {
 			const result = await callback(savepoint)
 			if (!savepoint.isClosed) {
@@ -93,20 +99,20 @@ class SavePoint implements Connection.TransactionLike {
 		return this._isClosed
 	}
 
-	public get eventManager(): EventManager {
-		return this.transactionInst.eventManager
-	}
-
 	constructor(
 		public readonly savepointName: string,
 		private readonly transactionInst: Transaction,
 		private readonly pgClient: ClientBase,
+		public readonly eventManager: EventManager,
 	) {}
 
 	async transaction<Result>(
 		callback: (connection: Connection.TransactionLike) => Promise<Result> | Result,
+		options?: { eventManager?: EventManager },
 	): Promise<Result> {
-		return await this.transactionInst.transaction(callback)
+		return await this.transactionInst.transaction(callback, {
+			eventManager: options?.eventManager ?? this.eventManager,
+		})
 	}
 
 	async query<Row extends Record<string, any>>(

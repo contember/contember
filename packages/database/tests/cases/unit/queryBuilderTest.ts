@@ -1,4 +1,4 @@
-import { Client, ConflictActionType, LimitByGroupWrapper, LockType, Operator } from '../../../src'
+import { Client, ConflictActionType, EventManager, LimitByGroupWrapper, LockType, Operator } from '../../../src'
 import { createConnectionMock } from '@contember/database-tester'
 import { SQL } from '../../src/tags'
 import { test } from 'uvu'
@@ -17,7 +17,7 @@ const execute = async (test: Test) => {
 			response: { rows: [] },
 		},
 	])
-	const wrapper = new Client(connection, 'public', {})
+	const wrapper = new Client(connection, 'public', {}, new EventManager(null))
 
 	await test.query(wrapper)
 }

@@ -1,6 +1,6 @@
 import { Connection } from './Connection'
 
-export class EventManagerImpl {
+class EventManager {
 	private readonly listeners = {
 		[EventManager.Event.queryStart]: [] as EventManager.QueryStartCallback[],
 		[EventManager.Event.queryEnd]: [] as EventManager.QueryEndCallback[],
@@ -8,7 +8,9 @@ export class EventManagerImpl {
 		[EventManager.Event.clientError]: [] as EventManager.ClientErrorCallback[],
 	}
 
-	constructor(private readonly parent: EventManager | null = null) {}
+	constructor(
+		public readonly parent: EventManager | null = null,
+	) {}
 
 	on<Event extends keyof EventManager.ListenerTypes>(event: Event, cb: EventManager.ListenerTypes[Event]): void {
 		(this.listeners[event] as EventManager.ListenerTypes[Event][]).push(cb)
@@ -31,7 +33,6 @@ export class EventManagerImpl {
 	}
 }
 
-type EventManager = { [P in keyof EventManagerImpl]: EventManagerImpl[P] }
 
 namespace EventManager {
 	export enum Event {

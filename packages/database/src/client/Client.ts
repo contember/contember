@@ -9,19 +9,25 @@ class Client<ConnectionType extends Connection.ConnectionLike = Connection.Conne
 		public readonly connection: ConnectionType,
 		public readonly schema: string,
 		public readonly queryMeta: Record<string, any>,
+		public readonly eventManager: EventManager = new EventManager(connection.eventManager),
 	) {}
 
-	get eventManager(): EventManager {
-		return this.connection.eventManager
-	}
-
 	public forSchema(schema: string): Client<ConnectionType> {
-		return new Client<ConnectionType>(this.connection, schema, this.queryMeta)
+		const eventManager = new EventManager(this.eventManager.parent)
+		return new Client<ConnectionType>(this.connection, schema, this.queryMeta, eventManager)
 	}
 
 	async transaction<T>(transactionScope: (wrapper: Client<Connection.TransactionLike>) => Promise<T> | T): Promise<T> {
-		return await this.connection.transaction(connection =>
-			transactionScope(new Client<Connection.TransactionLike>(connection, this.schema, this.queryMeta)),
+		return await this.connection.transaction(
+			transaction =>
+				transactionScope(
+					new Client<Connection.TransactionLike>(
+						transaction,
+						this.schema,
+						this.queryMeta,
+						new EventManager(transaction.eventManager),
+					)),
+			{ eventManager: this.eventManager },
 		)
 	}
 
@@ -47,7 +53,15 @@ class Client<ConnectionType extends Connection.ConnectionLike = Connection.Conne
 		meta: Record<string, any> = {},
 		config: Connection.QueryConfig = {},
 	): Promise<Connection.Result<Row>> {
-		return this.connection.query<Row>(sql, parameters, { ...this.queryMeta, ...meta }, config)
+		return this.connection.query<Row>(
+			sql,
+			parameters,
+			{ ...this.queryMeta, ...meta },
+			{
+				eventManager: this.eventManager,
+				...config,
+			},
+		)
 	}
 
 	createQueryHandler(): QueryHandler<DatabaseQueryable> {

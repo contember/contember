@@ -1,5 +1,5 @@
 import { Pool, PoolConfig } from 'pg'
-import { EventManager, EventManagerImpl } from './EventManager'
+import { EventManager } from './EventManager'
 import { Client } from './Client'
 import { Transaction } from './Transaction'
 import { executeClientOperation, executeQuery } from './execution'
@@ -10,7 +10,7 @@ class Connection implements Connection.ConnectionLike, Connection.ClientFactory,
 	constructor(
 		public readonly config: PoolConfig,
 		private readonly queryConfig: Connection.QueryConfig,
-		public readonly eventManager: EventManager = new EventManagerImpl(),
+		public readonly eventManager: EventManager = new EventManager(null),
 	) {
 		this.pool = new Pool(config)
 		this.pool.on('error', err => {
@@ -21,14 +21,15 @@ class Connection implements Connection.ConnectionLike, Connection.ClientFactory,
 	}
 
 	public createClient(schema: string, queryMeta: Record<string, any>): Client {
-		return new Client(this, schema, queryMeta)
+		return new Client(this, schema, queryMeta, new EventManager(this.eventManager))
 	}
 
 	async transaction<Result>(
 		callback: (connection: Connection.TransactionLike) => Promise<Result> | Result,
+		options: { eventManager?: EventManager } = {},
 	): Promise<Result> {
 		const client = await executeClientOperation(() => this.pool.connect())
-		const eventManager = new EventManagerImpl(this.eventManager)
+		const eventManager = new EventManager(options.eventManager ?? this.eventManager)
 		await executeQuery(client, eventManager, {
 			sql: 'BEGIN',
 			...this.queryConfig,
@@ -56,12 +57,12 @@ class Connection implements Connection.ConnectionLike, Connection.ClientFactory,
 		sql: string,
 		parameters: any[] = [],
 		meta: Record<string, any> = {},
-		config: Connection.QueryConfig = {},
+		{ eventManager, ...config }: Connection.QueryConfig = {},
 	): Promise<Connection.Result<Row>> {
 		const client = await executeClientOperation(() => this.pool.connect())
 		const query: Connection.Query = { sql, parameters, meta, ...this.queryConfig, ...config }
 		try {
-			const result = await executeQuery<Row>(client, this.eventManager, query, {})
+			const result = await executeQuery<Row>(client, eventManager ?? this.eventManager, query, {})
 			client.release()
 			return result
 		} catch (e) {
@@ -83,6 +84,7 @@ class Connection implements Connection.ConnectionLike, Connection.ClientFactory,
 namespace Connection {
 	export interface QueryConfig {
 		timing?: boolean
+		eventManager?: EventManager
 	}
 
 	export interface Queryable {
@@ -97,7 +99,10 @@ namespace Connection {
 	}
 
 	export interface Transactional {
-		transaction<Result>(trx: (connection: TransactionLike) => Promise<Result> | Result): Promise<Result>
+		transaction<Result>(
+			trx: (connection: TransactionLike) => Promise<Result> | Result,
+			options?: { eventManager?: EventManager },
+		): Promise<Result>
 	}
 
 	export interface ConnectionLike extends Transactional, Queryable {}

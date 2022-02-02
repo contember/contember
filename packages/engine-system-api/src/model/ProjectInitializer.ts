@@ -7,7 +7,7 @@ import { SystemDbMigrationsRunnerFactory } from '../SystemContainer'
 import {
 	Connection,
 	DatabaseCredentials,
-	EventManagerImpl,
+	EventManager,
 	retryTransaction,
 	SingleConnection,
 } from '@contember/database'
@@ -36,7 +36,7 @@ export class ProjectInitializer {
 			await createDatabaseIfNotExists(project.db, logger.write.bind(logger))
 			const pgClient = await createPgClient(project.db)
 			await pgClient.connect()
-			const singleConnection = new SingleConnection(pgClient, {}, new EventManagerImpl(), true)
+			const singleConnection = new SingleConnection(pgClient, {}, new EventManager(), true)
 			const dbContextMigrations = databaseContextFactory
 				.withClient(singleConnection.createClient('system', { module: 'system' }))
 				.create(unnamedIdentity)

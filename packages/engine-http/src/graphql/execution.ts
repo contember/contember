@@ -35,7 +35,7 @@ export const createGraphQLQueryHandler = <Context, KoaState>({
 		max: 200,
 	})
 	return async ctx => {
-		const listenersQueue = listeners
+		const listenersQueue = [...listeners]
 
 		listenersQueue.forEach(it => {
 			it.onStart && listenersQueue.push(it.onStart({}) || {})

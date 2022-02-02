@@ -1,6 +1,6 @@
 import { IncomingMessage, ServerResponse } from 'http'
 import { URL } from 'url'
-import { getType } from 'mime'
+import mime from 'mime'
 import { readFile } from 'fs/promises'
 
 export type ProcessFile = (path: string, content: Buffer, req: IncomingMessage) => Promise<string | Buffer>
@@ -17,7 +17,7 @@ export class StaticFileHandler {
 		const url = new URL(req.url ?? '/', `http://${req.headers.host}`)
 		const basePath = options.basePath ?? '/'
 		const path = url.pathname.includes('.') ? url.pathname : basePath + 'index.html'
-		const contentType = getType(path) ?? 'application/octet-stream'
+		const contentType = mime.getType(path) ?? 'application/octet-stream'
 
 		let content: Buffer
 		try {

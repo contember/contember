@@ -1,7 +1,7 @@
 import { defineConfig } from 'vite'
 import { resolve } from 'path'
-import { getPackagePath, packageList } from '../../build/packageList'
-import { rootDirectory } from '../../build/rootDirectory'
+import { getPackagePath, packageList } from '../../build/packageList.js'
+import { rootDirectory } from '../../build/rootDirectory.js'
 import reactRefresh from '@vitejs/plugin-react-refresh'
 
 export default defineConfig({

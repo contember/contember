@@ -6,14 +6,14 @@
 		"check": "./scripts/runChecks.sh",
 		"clean": "pnpm run clean:dependencies && pnpm run clean:generated",
 		"clean:dependencies": "rm -rf node_modules ee/*/node_modules packages/*/node_modules",
-		"clean:generated": "rm -rf temp ee/*/dist ee/*/temp packages/*/dist packages/*/temp",
+		"clean:generated": "rm -rf dist ee/*/dist ee/*/temp packages/*/dist packages/*/temp",
 		"eslint:fix": "eslint --fix \"**/*.{ts,tsx}\" ",
 		"eslint:lint": "eslint \"**/*.{ts,tsx}\" ",
 		"storybook": "cd packages/ui && pnpm run storybook",
 		"test": "pnpm run -r --parallel test",
 		"ts:build": "tsc --build",
 		"ts:watch": "tsc --build --watch",
-		"vite": "cd packages/admin-sandbox && pnpm run vite"
+		"vite": "cd packages/admin-sandbox && pnpm run start"
 	},
 	"devDependencies": {
 		"@babel/core": "7.14.8",

@@ -1,9 +1,9 @@
 import { IncomingMessage } from 'http'
-import { parse } from 'ipaddr.js'
+import ipaddr from 'ipaddr.js'
 import { TLSSocket } from 'tls'
 
 export const isProxyRequest = (req: IncomingMessage): boolean => {
-	return parse(req.socket.remoteAddress ?? '0.0.0.0').range() === 'private'
+	return ipaddr.parse(req.socket.remoteAddress ?? '0.0.0.0').range() === 'private'
 }
 
 export const isRequestSecure = (req: IncomingMessage): boolean => {

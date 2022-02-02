@@ -1,9 +1,7 @@
-version: '3'
-
 services:
-  sandbox_vite:
+  sandbox-vite:
     image: node:16-alpine
-    command: '/src/node_modules/.bin/vite src --config vite.config.js --debug --port 3000 --host 0.0.0.0'
+    command: 'npm run start'
 
     environment:
       NODE_ENV: 'development'
@@ -15,9 +13,9 @@ services:
       - .:/src:cached
 
 
-  admin_server:
+  admin-server:
     image: node:16-alpine
-    command: 'node dist/server/run-admin.js'
+    command: 'npm run start'
 
     working_dir: /src/ee/admin-server
     volumes:
@@ -27,11 +25,11 @@ services:
       NODE_ENV: 'development'
       CONTEMBER_PORT: '4000'
 
-      CONTEMBER_API_ENDPOINT: 'http://api:4000'
+      CONTEMBER_API_ENDPOINT: 'http://contember-engine:4000'
       CONTEMBER_LOGIN_TOKEN: '1111111111111111111111111111111111111111'
       CONTEMBER_PUBLIC_DIR: '/src/ee/admin-server/dist/public'
 
-      CONTEMBER_S3_ENDPOINT: 'http://s3:3003'
+      CONTEMBER_S3_ENDPOINT: 'http://minio:9000'
       CONTEMBER_S3_REGION: '_'
       CONTEMBER_S3_BUCKET: 'contember'
       CONTEMBER_S3_PREFIX: 'admin/'
@@ -42,20 +40,10 @@ services:
       REDIS_PREFIX: 'contember-admin-server'
 
     depends_on:
-      - admin_server_esbuild
-      - admin_server_vite
+      - admin-server-vite
 
 
-  admin_server_esbuild:
-    image: node:16-alpine
-    command: 'npm run watch:server'
-
-    working_dir: /src/ee/admin-server
-    volumes:
-      - .:/src:cached
-
-
-  admin_server_vite:
+  admin-server-vite:
     image: node:16-alpine
     command: 'npm run watch:public'
 
@@ -64,7 +52,7 @@ services:
       - .:/src:cached
 
 
-  api:
+  contember-engine:
     image: contember/engine:1.0.0-rc.2
 
     environment:
@@ -82,7 +70,7 @@ services:
       DEFAULT_DB_USER: 'contember'
       DEFAULT_DB_PASSWORD: 'contember'
 
-      DEFAULT_S3_ENDPOINT: 'http://host.docker.internal:3003'
+      DEFAULT_S3_ENDPOINT: 'http://localhost:3003'
       DEFAULT_S3_PROVIDER: 'minio'
       DEFAULT_S3_REGION: ''
       DEFAULT_S3_BUCKET: 'contember'
@@ -92,33 +80,46 @@ services:
 
       TENANT_DB_NAME: 'tenant'
 
+    healthcheck:
+      test: 'curl --fail http://localhost:4000'
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
     depends_on:
       postgres:
         condition: service_healthy
 
+
   contember-cli:
     image: contember/cli:1.0.0-rc.2
-    volumes:
-      - ./:/src:cached
-    working_dir: /src/packages/admin-sandbox
-    command: 'version'
+
+    deploy:
+      replicas: 0
+
     environment:
-      CONTEMBER_API_URL: 'http://api:4000/'
+      CONTEMBER_API_URL: 'http://contember-engine:4000/'
       CONTEMBER_API_TOKEN: '0000000000000000000000000000000000000000'
 
-  s3:
-    image: minio/minio
-    entrypoint: /src/s3-entrypoint.sh
-    command: 'server /data'
+    volumes:
+      - ./:/src
+
+    depends_on:
+      contember-engine:
+        condition: service_healthy
+
+
+  minio:
+    image: bitnami/minio
 
     environment:
-      MINIO_ROOT_USER: contember
-      MINIO_ROOT_PASSWORD: contember
-
+      MINIO_ROOT_USER: 'contember'
+      MINIO_ROOT_PASSWORD: 'contember'
+      MINIO_DEFAULT_BUCKETS: 'contember:download'
 
     volumes:
-      - s3-data:/data:cached
-      - ./scripts/docker-compose/:/src/:cached
+      - minio-data:/data:cached
+
 
   adminer:
     image: michalhosna/adminer:latest
@@ -148,11 +149,12 @@ services:
       - pgsql-data:/var/lib/postgresql/data
 
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U contember']
+      test: 'pg_isready --username contember'
       interval: 5s
       timeout: 5s
       retries: 10
       start_period: 5s
+
 
   redis:
     image: redis:3.2-alpine
@@ -160,4 +162,4 @@ services:
 
 volumes:
   pgsql-data: ~
-  s3-data: ~
+  minio-data: ~

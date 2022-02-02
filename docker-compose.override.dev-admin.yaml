@@ -1,31 +1,24 @@
-version: '3'
-
 services:
-  sandbox_vite:
+  sandbox-vite:
     image: 'alpine'
     command: ['sleep', 'infinity']
 
-  admin_server:
+  admin-server:
     image: 'alpine'
     command: ['sleep', 'infinity']
 
-  admin_server_esbuild:
+  admin-server-vite:
     image: 'alpine'
     command: ['sleep', 'infinity']
 
-  admin_server_vite:
-    image: 'alpine'
-    command: ['sleep', 'infinity']
-
-  api:
+  contember-engine:
     ports: ['3001:4000']
 
   adminer:
     ports: ['3002:8080']
 
-  s3:
-    command: 'server --address :3003 /data'
-    ports: ['3003:3003']
+  minio:
+    ports: ['3003:9000']
 
   postgres:
     ports: ['3005:5432']

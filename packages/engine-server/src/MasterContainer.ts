@@ -71,15 +71,15 @@ export interface MasterContainerArgs {
 }
 
 export class MasterContainerFactory {
-	create({
+	createBuilder({
 		config,
 		debugMode,
 		plugins,
 		projectConfigResolver,
 		processType,
 		version,
-	}: MasterContainerArgs): MasterContainer {
-		const masterContainer = new Builder({})
+	}: MasterContainerArgs) {
+		return new Builder({})
 			.addService('config', () =>
 				config)
 			.addService('debugMode', () =>
@@ -260,7 +260,6 @@ export class MasterContainerFactory {
 				({ tenantContainer, systemContainer, projectContainerResolver }) =>
 					new Initializer(
 						tenantContainer.migrationsRunnerFactory,
-						tenantContainer.projectManager,
 						systemContainer.projectInitializer,
 						projectContainerResolver,
 						tenantContainer.projectGroupProvider,
@@ -272,8 +271,11 @@ export class MasterContainerFactory {
 			.setupService('projectInitializer', (it, { projectContainerResolver }) => {
 				it.setInitializer(new ProjectInitializer(projectContainerResolver))
 			})
-			.build()
 
-		return masterContainer.pick('initializer', 'koa', 'monitoringKoa', 'projectContainerResolver', 'projectInitializer', 'providers')
+	}
+
+	create(args: MasterContainerArgs): MasterContainer {
+		const container = this.createBuilder(args).build()
+		return container.pick('initializer', 'koa', 'monitoringKoa', 'projectContainerResolver', 'projectInitializer', 'providers')
 	}
 }

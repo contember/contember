@@ -7,9 +7,6 @@ import { test } from 'uvu'
 import prom from 'prom-client'
 import { MigrationFilesManager, MigrationsResolver } from '@contember/schema-migrations'
 import { Logger } from '@contember/engine-common'
-import { CreateProjectCommand, DatabaseContext } from '@contember/engine-tenant-api'
-import { ConflictActionType, InsertBuilder } from '@contember/database'
-import uuid from 'uuid'
 
 const dbCredentials = (dbName: string) => {
 	return {
@@ -38,7 +35,7 @@ const projectConfig = {
 }
 const createContainer = (debug: boolean) => {
 	prom.register.clear()
-	return new MasterContainerFactory().create({
+	return new MasterContainerFactory().createBuilder({
 		debugMode: debug,
 		config: {
 			tenant: {
@@ -60,7 +57,7 @@ const createContainer = (debug: boolean) => {
 		projectConfigResolver: () => projectConfig,
 		plugins: [],
 		processType: ProcessType.singleNode,
-	})
+	}).build()
 }
 
 const executeGraphql = (
@@ -109,7 +106,23 @@ test.before(async () => {
 		)
 		const container = createContainer(false)
 		await container.initializer.initialize()
-		await container.initializer.createProject(projectConfig, await migrationsResolver.getMigrations())
+
+		const { slug, name, ...config } = projectConfig
+		const group = await container.tenantContainer.projectGroupProvider.getGroup(undefined)
+		const result = await container.tenantContainer.projectManager.createProject(group, { slug, name, config: config as any, secrets: {} }, undefined)
+		if (!result) {
+			throw new Error('Project already exists')
+		}
+		const projectContainer = await container.projectContainerResolver.getProjectContainer(group, slug)
+		if (!projectContainer) {
+			throw new Error('Should not happen')
+		}
+		await container.systemContainer.projectInitializer.initialize(
+			projectContainer.systemDatabaseContextFactory,
+			projectConfig,
+			new Logger(() => null),
+			await migrationsResolver.getMigrations(),
+		)
 		await tenantConnection.end()
 	} catch (e) {
 		// eslint-disable-next-line no-console

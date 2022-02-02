@@ -33,7 +33,7 @@ export const interactiveResolveInstanceEnvironmentFromInput = async (
 		throw `Please provide an instance URL`
 	}
 	if (!instanceName.includes('://')) {
-		throw `Invalid instance URL`
+		throw `Invalid instance URL "${instanceName}"`
 	}
 	return createRemoteInstanceEnvironment(instanceName)
 }

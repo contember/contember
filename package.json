@@ -1,7 +1,7 @@
 {
 	"type": "module",
 	"scripts": {
-		"build": "pnpm run ts:build && pnpm run --recursive --parallel build && pnpm run --recursive --parallel build:styles",
+		"build": "pnpm run ts:build && pnpm run --recursive --parallel build",
 		"changeset": "changeset",
 		"check": "./scripts/runChecks.sh",
 		"clean": "pnpm run clean:dependencies && pnpm run clean:generated",

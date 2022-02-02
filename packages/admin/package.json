@@ -20,8 +20,9 @@
 	],
 	"typings": "./dist/types/index.d.ts",
 	"scripts": {
-		"build": "vite build --mode development && vite build --mode production",
-		"build:styles": "sass src/index.sass:dist/style.css",
+		"build": "pnpm run build:js && pnpm run build:css",
+		"build:js": "vite build --mode development && vite build --mode production",
+		"build:css": "sass src/index.sass:dist/style.css",
 		"test": "jest"
 	},
 	"dependencies": {

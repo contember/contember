@@ -1,29 +1,23 @@
-version: '3'
-
 services:
-  sandbox_vite:
+  sandbox-vite:
     user: '1000:1000'
     ports: ['3000:3000']
 
-  admin_server:
+  admin-server:
     user: '1000:1000'
     ports: ['3006:4000']
 
-  admin_server_esbuild:
+  admin-server-vite:
     user: '1000:1000'
 
-  admin_server_vite:
-    user: '1000:1000'
-
-  api:
+  contember-engine:
     ports: ['3001:4000']
 
   adminer:
     ports: ['3002:8080']
 
-  s3:
-    command: 'server --address :3003 /data'
-    ports: ['3003:3003']
+  minio:
+    ports: ['3003:9000']
 
   postgres:
     ports: ['3005:5432']

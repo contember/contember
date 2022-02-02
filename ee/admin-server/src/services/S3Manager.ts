@@ -7,7 +7,7 @@ import {
 	S3Client,
 } from '@aws-sdk/client-s3'
 import type * as Buffer from 'buffer'
-import * as mime from 'mime'
+import mime from 'mime'
 import { S3LocationResolver } from './S3LocationResolver'
 import { Readable } from 'stream'
 

@@ -18,7 +18,6 @@ export class ProjectTruncateExecutor {
 				await trx.client.query(`TRUNCATE ${wrappedNames}`)
 			}
 			await trx.client.query('SET CONSTRAINTS ALL IMMEDIATE')
-			await trx.commandBus.execute(new TruncateStagesCommand())
 			await trx.commandBus.execute(new TruncateEventsCommand())
 		})
 	}

@@ -60,6 +60,6 @@ export class ProjectManager {
 	}
 
 	private async getProjectPathMapping(): Promise<Record<string, string>> {
-		return resolvePathMappingConfig(this.workspace.directory, 'projects', this.workspace.config.projects)
+		return resolvePathMappingConfig(this.workspace.directory, this.workspace.config.projects)
 	}
 }

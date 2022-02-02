@@ -16,7 +16,6 @@ export function createViteConfig(packageName) {
 		return {
 			build: {
 				lib: {
-					name: packageName,
 					entry: resolve(rootDirectory, `${packageDir}/src/index.ts`),
 					formats: ['es'],
 				},

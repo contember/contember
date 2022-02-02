@@ -47,6 +47,7 @@ export const SlugFieldInner = SimpleRelativeSingleField<SlugFieldProps, string>(
 		unpersistedHardPrefix,
 		persistedHardPrefix,
 		persistedSoftPrefix,
+		linkToExternalUrl,
 		derivedFrom,
 		field,
 		...props
@@ -82,7 +83,7 @@ export const SlugFieldInner = SimpleRelativeSingleField<SlugFieldProps, string>(
 				{...inputProps}
 				inputRef={inputRef}
 				prefix={hardPrefix}
-				link={props.linkToExternalUrl ? fullValue : undefined}
+				link={linkToExternalUrl ? fullValue : undefined}
 			/>
 		)
 	},

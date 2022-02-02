@@ -1,5 +1,5 @@
 import { ComponentType, memo, ReactNode } from 'react'
-import { Size } from 'types'
+import { Size } from '../../types'
 import { useClassNamePrefix } from '../../auxiliary'
 import { Box } from '../Box'
 import { Icon } from '../Icon'

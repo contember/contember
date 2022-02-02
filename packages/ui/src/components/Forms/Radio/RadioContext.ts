@@ -1,7 +1,7 @@
-import React from 'react'
+import { createContext } from 'react'
 import type { RadioGroupState } from 'react-stately'
 
-export const RadioContext = React.createContext<RadioGroupState>({
+export const RadioContext = createContext<RadioGroupState>({
 	name: '',
 	isDisabled: false,
 	isReadOnly: false,

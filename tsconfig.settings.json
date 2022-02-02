@@ -1,7 +1,6 @@
 {
 	"compilerOptions": {
 		"allowSyntheticDefaultImports": true,
-		"baseUrl": ".",
 		"composite": true,
 		"declaration": true,
 		"emitDeclarationOnly": true,
@@ -10,9 +9,9 @@
 		"incremental": true,
 		"isolatedModules": true,
 		"jsx": "react-jsx",
-		"lib": ["ESNext", "DOM", "DOM.Iterable"],
-		"module": "ESNext",
-		"moduleResolution": "Node",
+		"lib": ["esnext", "dom", "dom.iterable"],
+		"module": "esnext",
+		"moduleResolution": "node",
 		"noEmitOnError": true,
 		"noImplicitOverride": true,
 		"outDir": "dist",

@@ -14,13 +14,12 @@
 		}
 	},
 	"files": [
-		"dist/"
+		"dist/",
+		"src/"
 	],
-	"typings": "./dist/admin-i18n.d.ts",
+	"typings": "./dist/types/index.d.ts",
 	"scripts": {
-		"build": "vite build --mode development && vite build --mode production",
-		"build:api:dev": "api-extractor run --local",
-		"build:api:prod": "api-extractor run"
+		"build": "vite build --mode development && vite build --mode production"
 	},
 	"devDependencies": {
 		"@contember/admin": "workspace:*"

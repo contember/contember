@@ -15,15 +15,13 @@
 			}
 		}
 	},
-	"typings": "./dist/ui.d.ts",
+	"typings": "./dist/types/index.d.ts",
 	"files": [
-		"dist",
-		"src"
+		"dist/",
+		"src/"
 	],
 	"scripts": {
 		"build": "vite build --mode development && vite build --mode production",
-		"build:api:dev": "api-extractor run --local",
-		"build:api:prod": "api-extractor run",
 		"storybook": "start-storybook -p 6006",
 		"build-storybook": "build-storybook"
 	},

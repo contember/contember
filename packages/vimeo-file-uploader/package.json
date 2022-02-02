@@ -12,15 +12,14 @@
 		}
 	},
 	"files": [
-		"dist/"
+		"dist/",
+		"src/"
 	],
-	"typings": "./dist/vimeo-file-uploader.d.ts",
+	"typings": "./dist/types/index.d.ts",
 	"type": "module",
 	"sideEffects": false,
 	"scripts": {
-		"build": "vite build --mode development && vite build --mode production",
-		"build:api:dev": "api-extractor run --local",
-		"build:api:prod": "api-extractor run"
+		"build": "vite build --mode development && vite build --mode production"
 	},
 	"dependencies": {
 		"@contember/client": "workspace:*",

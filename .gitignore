@@ -1,5 +1,6 @@
 /.pnpm-store
 /.npmrc
+/dist
 /ee/**/dist
 /ee/**/temp
 /ee/**/node_modules
@@ -8,5 +9,4 @@
 /packages/**/node_modules
 /packages/admin-sandbox/.env.development.local
 /node_modules
-/temp
 /docker-compose.override.yaml

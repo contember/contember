@@ -376,8 +376,16 @@ export class StateInitializer {
 			errors: undefined,
 			touchLog: undefined,
 			hasUnpersistedChanges: false,
+
 			getAccessor: () => {
 				if (fieldState.accessor === undefined) {
+					const fieldSchema = this.treeStore.schema.getEntityField(parent.entity.entityName, fieldMarker.fieldName)
+					if (!fieldSchema) {
+						throw new BindingError(`Unknown field ${parent.entity.entityName}.${fieldMarker.fieldName}.`)
+					}
+					if (fieldSchema.__typename !== '_Column') {
+						throw new BindingError(`Invalid type of field ${parent.entity.entityName}.${fieldMarker.fieldName}. Expected '_Column', '${fieldSchema.__typename}' found.`)
+					}
 					fieldState.accessor = new FieldAccessor(
 						fieldState,
 						this.fieldOperations,
@@ -389,6 +397,7 @@ export class StateInitializer {
 						fieldState.hasUnpersistedChanges,
 						fieldState.touchLog,
 						fieldState.getAccessor,
+						fieldSchema,
 					)
 				}
 				return fieldState.accessor

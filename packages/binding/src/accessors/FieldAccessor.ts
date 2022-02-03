@@ -1,10 +1,11 @@
 import type { FieldOperations } from '../core/operations'
+import type { FieldState } from '../core/state'
 import { TemporalFieldHelper, UuidFieldHelper } from '../fieldHelpers'
 import type { FieldName, FieldValue } from '../treeParameters'
 import type { BatchUpdatesOptions } from './BatchUpdatesOptions'
 import type { Errorable } from './Errorable'
 import { ErrorAccessor } from './ErrorAccessor'
-import type { FieldState } from '../core/state'
+import type { SchemaColumn } from '../core/schema/SchemaColumn'
 
 class FieldAccessor<Value extends FieldValue = FieldValue> implements Errorable {
 	constructor(
@@ -18,6 +19,7 @@ class FieldAccessor<Value extends FieldValue = FieldValue> implements Errorable 
 		public readonly hasUnpersistedChanges: boolean,
 		private readonly touchLog: ReadonlySet<string> | undefined,
 		public readonly getAccessor: FieldAccessor.GetFieldAccessor<Value>,
+		public readonly schema: SchemaColumn,
 	) {}
 
 	public addError(error: ErrorAccessor.Error | string): () => void {

@@ -532,7 +532,7 @@ class Parser extends EmbeddedActionsParser {
 	})
 
 	private taggedMap: () => ParsedTaggedMap = this.RULE<ParsedTaggedMap>('taggedMap', () => {
-		const name = this.SUBRULE(this.identifier)
+		const name = this.SUBRULE(this.pageName)
 		return {
 			name,
 			entries: this.OPTION(() => this.SUBRULE(this.taggedMapEntries)) ?? [],
@@ -667,6 +667,17 @@ class Parser extends EmbeddedActionsParser {
 				ALT: () => this.CONSUME(tokens.EntityIdentifier).image,
 			},
 		])
+	})
+
+	private pageName: () => string = this.RULE('pageName', () => {
+		const parts: string[] = []
+
+		this.AT_LEAST_ONE_SEP({
+			SEP: tokens.Slash,
+			DEF: () => parts.push(this.CONSUME(tokens.Identifier).image),
+		})
+
+		return parts.join('/')
 	})
 
 	private entityIdentifier: () => EntityName = this.RULE('entityIdentifier', () => {

@@ -1,17 +1,6 @@
 import { Environment, EnvironmentContext, useEnvironment } from '@contember/binding'
 import { ContainerSpinner, Message } from '@contember/ui'
-import {
-	ComponentType,
-	Fragment,
-	isValidElement,
-	lazy,
-	ReactElement,
-	ReactNode,
-	ReactNodeArray,
-	Suspense,
-	useMemo,
-	useRef,
-} from 'react'
+import { ComponentType, Fragment, isValidElement, lazy, ReactElement, ReactNode, ReactNodeArray, Suspense, useMemo, useRef } from 'react'
 import { useCurrentRequest } from '../../routing'
 import { MiscPageLayout } from '../MiscPageLayout'
 import { PageErrorBoundary } from './PageErrorBoundary'
@@ -38,7 +27,7 @@ type PagesMapElement =
 
 type PagesMap = Record<string, PagesMapElement>
 
-type LazyPageMap = Record<string, () => Promise<{default?: ComponentType}>>
+type LazyPageMap = Record<string, () => Promise<{ default?: ComponentType }>>
 
 export interface PagesProps {
 	children:
@@ -52,6 +41,19 @@ export interface PagesProps {
 
 function isPageList(children: ReactNodeArray): children is PageProviderElement[] {
 	return children.every(child => isPageProviderElement(child))
+}
+
+function findPrefix(strings: string[]): string {
+	const sorted = [...strings].sort()
+	const a = sorted[0]
+	const b = sorted[sorted.length - 1]
+
+	let i = 0
+	while (i < a.length && a.charAt(i) === b.charAt(i)) {
+		i++
+	}
+
+	return a.substring(0, i)
 }
 
 /**
@@ -77,6 +79,7 @@ export const Pages = ({ children, layout }: PagesProps) => {
 				return new Map([[children.type.getPageName(children.props), () => children]])
 
 			} else {
+				const lazyPrefix = findPrefix(Object.keys(children).filter(isLazyPage))
 				return new Map(Object.entries(children).flatMap(([k, v]): [string, ComponentType][] => {
 					const pageName = k.slice(0, 1).toLowerCase() + k.slice(1)
 					if (isPageSetProvider<EmptyObject>(v)) {
@@ -85,10 +88,10 @@ export const Pages = ({ children, layout }: PagesProps) => {
 						return Object.entries(v.type.getPages(v.props))
 					} else if (isPageProviderElement(v)) {
 						return [[v.type.getPageName(v.props, pageName), () => v]]
-					} else if (k.endsWith('.tsx') || k.endsWith('.jsx')) {
+					} else if (isLazyPage(k)) {
 						const Lazy = lazy(v)
 						const WithFallback = () => <Suspense fallback={<ContainerSpinner />}><Lazy /></Suspense>
-						return [[k.slice(k.lastIndexOf('/') + 1, -4), WithFallback]]
+						return [[k.slice(lazyPrefix.length, -4), WithFallback]]
 					} else {
 						return [[pageName, v]]
 					}
@@ -146,4 +149,8 @@ function isPageSetProvider<T = any>(it: any): it is PageSetProvider<T> {
 
 function isPageSetProviderElement(el: ReactNode): el is PageSetProviderElement {
 	return isValidElement(el) && typeof el.type !== 'string' && isPageSetProvider(el.type)
+}
+
+function isLazyPage(name: string) {
+	return name.endsWith('.tsx') || name.endsWith('.jsx')
 }

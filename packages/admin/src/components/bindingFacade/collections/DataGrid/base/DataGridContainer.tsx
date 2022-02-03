@@ -167,7 +167,12 @@ export const DataGridContainer: FunctionComponent<DataGridContainerProps> = Comp
 					{!accessor.length && (
 						<TableRow>
 							<TableCell colSpan={columns.size}>
-								<EmptyMessage component={emptyMessageComponent}>{formatMessage(emptyMessage, 'dataGrid.emptyMessage.text')}</EmptyMessage>
+								<EmptyMessage
+									distinction="seamless"
+									component={emptyMessageComponent}
+								>
+									{formatMessage(emptyMessage, 'dataGrid.emptyMessage.text')}
+								</EmptyMessage>
 							</TableCell>
 						</TableRow>
 					)}

@@ -55,7 +55,6 @@
 		overflow-y: auto
 		position: relative
 		transition: border-color var(--cui-transition-duration)
-		z-index: 1
 		&.is-scrolled
 			border-top-color: var(--cui-color--lower)
 	&-bar-footer
@@ -72,7 +71,6 @@
 		background-color: var(--cui-background-color)
 		flex-grow: 1
 		position: relative
-		z-index: 3
 	&-navigation-button
 		height: var(--cui-control-height)
 		margin: 0.125em
@@ -86,8 +84,11 @@
 		--layout-chrome-bar-width: 0
 		&-bar
 			max-width: 100vw
+		&-bar-body
+			z-index: 1
 		&-body
 			min-height: 100vh
+			z-index: 3
 		&.view-collapsed &-bar
 			height: unset
 		&.view-collapsed &-bar-body,

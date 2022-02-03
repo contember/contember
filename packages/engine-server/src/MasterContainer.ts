@@ -6,7 +6,7 @@ import {
 } from '@contember/engine-content-api'
 import { SystemContainerFactory } from '@contember/engine-system-api'
 import { ProjectInitializer as ProjectInitializerInterface, TenantContainerFactory } from '@contember/engine-tenant-api'
-import getSystemMigrations from '@contember/engine-system-api/migrations'
+import { getSystemMigrations } from '@contember/engine-system-api'
 import { Builder } from '@contember/dic'
 import { Config } from './config/config'
 import { createDbMetricsRegistrar, logSentryError, ProcessType } from './utils'

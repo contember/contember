@@ -26,7 +26,7 @@ import { join } from 'path'
 import { createPgClient, MigrationsRunner } from '@contember/database-migrations'
 import { ClientBase } from 'pg'
 import { DatabaseCredentials } from '@contember/database'
-import getSystemMigrations from '@contember/engine-system-api/migrations'
+import { getSystemMigrations } from '@contember/engine-system-api'
 
 export class ApiTester {
 	public static project = project

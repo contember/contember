@@ -34,7 +34,7 @@ import {
 	TruncateMutationResolver,
 } from './resolvers'
 import { ClientBase } from 'pg'
-import { MigrationArgs } from './migrations'
+import { SystemMigrationArgs } from './migrations'
 import { EventOldValuesResolver } from './resolvers/types'
 
 export interface SystemContainer {
@@ -46,13 +46,13 @@ export interface SystemContainer {
 	systemDbMigrationsRunnerFactory: SystemDbMigrationsRunnerFactory
 }
 
-export type SystemDbMigrationsRunnerFactory = (db: DatabaseCredentials, dbClient: ClientBase) => MigrationsRunner<MigrationArgs>
+export type SystemDbMigrationsRunnerFactory = (db: DatabaseCredentials, dbClient: ClientBase) => MigrationsRunner<SystemMigrationArgs>
 
 type Args = {
 	providers: UuidProvider
 	modificationHandlerFactory: ModificationHandlerFactory
 	entitiesSelector: EntitiesSelector
-	systemDbMigrationsRunnerFactory: (db: DatabaseCredentials, dbClient: ClientBase) => MigrationsRunner<MigrationArgs>
+	systemDbMigrationsRunnerFactory: (db: DatabaseCredentials, dbClient: ClientBase) => MigrationsRunner<SystemMigrationArgs>
 	identityFetcher: IdentityFetcher
 }
 

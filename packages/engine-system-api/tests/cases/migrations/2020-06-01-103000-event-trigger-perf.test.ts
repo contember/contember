@@ -1,23 +1,31 @@
-import { MigrationBuilder, Name } from '@contember/database-migrations'
-import { formatSchemaName, getJunctionTables, MigrationArgs } from '..'
+import migration from '../../../src/migrations/2020-06-01-103000-event-trigger-perf'
+import { createMigrationBuilder } from '@contember/database-migrations'
+import { sampleProject } from '@contember/engine-api-tester'
+import { test } from 'uvu'
+import * as assert from 'uvu/assert'
 
-const createEventStatementTrigger = (builder: MigrationBuilder, tableName: Name) => {
-	builder.createTrigger(tableName, 'log_event_statement', {
-		when: 'AFTER',
-		operation: ['INSERT', 'UPDATE', 'DELETE'],
-		level: 'STATEMENT',
-		function: {
-			schema: 'system',
-			name: 'statement_trigger_event',
+test('event-trigger-performance sql', async () => {
+	const builder = createMigrationBuilder()
+	await migration(builder, {
+		schemaResolver: () => Promise.resolve(sampleProject),
+		project: {
+			slug: 'test',
+			stages: [
+				{
+					slug: 'prod',
+					name: 'prod',
+				},
+				{
+					slug: 'preview',
+					name: 'preview',
+				},
+			],
 		},
+		queryHandler: null as any,
 	})
-}
-
-export default async function (builder: MigrationBuilder, args: MigrationArgs) {
-	const schema = await args.schemaResolver()
-	const junctionTables = getJunctionTables(schema.model)
-	const schemas = args.project.stages.map(formatSchemaName)
-	builder.sql(`CREATE OR REPLACE FUNCTION "system"."trigger_event"() RETURNS TRIGGER AS $$
+	assert.equal(
+		builder.getSql(),
+		`CREATE OR REPLACE FUNCTION "system"."trigger_event"() RETURNS TRIGGER AS $$
 DECLARE
     DECLARE new_event_type TEXT;
     DECLARE previous_id UUID;
@@ -92,8 +100,8 @@ BEGIN
     RETURN NULL;
 END;
 
-$$ LANGUAGE plpgsql`)
-	builder.sql(`CREATE OR REPLACE FUNCTION "system"."statement_trigger_event"() RETURNS TRIGGER AS
+$$ LANGUAGE plpgsql;
+CREATE OR REPLACE FUNCTION "system"."statement_trigger_event"() RETURNS TRIGGER AS
 $$
 BEGIN
     CASE
@@ -105,15 +113,57 @@ BEGIN
     RETURN NULL;
 END;
 $$
-    LANGUAGE plpgsql`)
-	for (const table of junctionTables) {
-		for (const schema of schemas) {
-			createEventStatementTrigger(builder, { name: table.tableName, schema })
-		}
-	}
-	for (const entity of Object.values(schema.model.entities)) {
-		for (const schema of schemas) {
-			createEventStatementTrigger(builder, { name: entity.tableName, schema })
-		}
-	}
-}
+    LANGUAGE plpgsql;
+CREATE TRIGGER "log_event_statement"
+  AFTER INSERT OR UPDATE OR DELETE ON "stage_prod"."post_tags"
+  FOR EACH STATEMENT
+  EXECUTE PROCEDURE "system"."statement_trigger_event"();
+CREATE TRIGGER "log_event_statement"
+  AFTER INSERT OR UPDATE OR DELETE ON "stage_preview"."post_tags"
+  FOR EACH STATEMENT
+  EXECUTE PROCEDURE "system"."statement_trigger_event"();
+CREATE TRIGGER "log_event_statement"
+  AFTER INSERT OR UPDATE OR DELETE ON "stage_prod"."author"
+  FOR EACH STATEMENT
+  EXECUTE PROCEDURE "system"."statement_trigger_event"();
+CREATE TRIGGER "log_event_statement"
+  AFTER INSERT OR UPDATE OR DELETE ON "stage_preview"."author"
+  FOR EACH STATEMENT
+  EXECUTE PROCEDURE "system"."statement_trigger_event"();
+CREATE TRIGGER "log_event_statement"
+  AFTER INSERT OR UPDATE OR DELETE ON "stage_prod"."author_contact"
+  FOR EACH STATEMENT
+  EXECUTE PROCEDURE "system"."statement_trigger_event"();
+CREATE TRIGGER "log_event_statement"
+  AFTER INSERT OR UPDATE OR DELETE ON "stage_preview"."author_contact"
+  FOR EACH STATEMENT
+  EXECUTE PROCEDURE "system"."statement_trigger_event"();
+CREATE TRIGGER "log_event_statement"
+  AFTER INSERT OR UPDATE OR DELETE ON "stage_prod"."post"
+  FOR EACH STATEMENT
+  EXECUTE PROCEDURE "system"."statement_trigger_event"();
+CREATE TRIGGER "log_event_statement"
+  AFTER INSERT OR UPDATE OR DELETE ON "stage_preview"."post"
+  FOR EACH STATEMENT
+  EXECUTE PROCEDURE "system"."statement_trigger_event"();
+CREATE TRIGGER "log_event_statement"
+  AFTER INSERT OR UPDATE OR DELETE ON "stage_prod"."tag"
+  FOR EACH STATEMENT
+  EXECUTE PROCEDURE "system"."statement_trigger_event"();
+CREATE TRIGGER "log_event_statement"
+  AFTER INSERT OR UPDATE OR DELETE ON "stage_preview"."tag"
+  FOR EACH STATEMENT
+  EXECUTE PROCEDURE "system"."statement_trigger_event"();
+CREATE TRIGGER "log_event_statement"
+  AFTER INSERT OR UPDATE OR DELETE ON "stage_prod"."entry"
+  FOR EACH STATEMENT
+  EXECUTE PROCEDURE "system"."statement_trigger_event"();
+CREATE TRIGGER "log_event_statement"
+  AFTER INSERT OR UPDATE OR DELETE ON "stage_preview"."entry"
+  FOR EACH STATEMENT
+  EXECUTE PROCEDURE "system"."statement_trigger_event"();
+`,
+	)
+})
+
+test.run()

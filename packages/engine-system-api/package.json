@@ -6,7 +6,7 @@
   "typings": "dist/src/index.d.ts",
   "scripts": {
     "generate": "gql-gen --config graphql.codegen.yml",
-    "test": "uvu dist/tests/cases/ \\.js$ && uvu migrations \\.test\\.js"
+    "test": "uvu dist/tests/cases/ \\\\.js$"
   },
   "dependencies": {
     "@contember/authorization": "^1.1.0-alpha.2",

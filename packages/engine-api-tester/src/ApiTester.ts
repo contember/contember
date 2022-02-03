@@ -7,13 +7,7 @@ import {
 	unnamedIdentity,
 } from '@contember/engine-system-api'
 import { MigrationFilesManager, MigrationsResolver, ModificationHandlerFactory } from '@contember/schema-migrations'
-import {
-	createMapperContainer,
-	EntitiesSelector,
-	EntitiesSelectorMapperFactory,
-	GraphQlSchemaBuilderFactory,
-	PermissionsByIdentityFactory,
-} from '@contember/engine-content-api'
+import { GraphQlSchemaBuilderFactory } from '@contember/engine-content-api'
 import { makeExecutableSchema } from '@graphql-tools/schema'
 import { ContentApiTester } from './ContentApiTester'
 import { SystemApiTester } from './SystemApiTester'
@@ -63,11 +57,7 @@ export class ApiTester {
 		const projectSlug = options.project?.slug || ApiTester.project.slug
 		const migrationFilesManager = MigrationFilesManager.createForProject(ApiTester.getMigrationsDir(), projectSlug)
 		const migrationsResolver = options.migrationsResolver || new MigrationsResolver(migrationFilesManager)
-		const permissionsByIdentityFactory = new PermissionsByIdentityFactory()
-		const mapperFactory: EntitiesSelectorMapperFactory = (db, schema, identityVariables, permissions) =>
-			createMapperContainer({ schema, identityVariables, permissions, providers }).mapperFactory(db)
 		let systemContainerBuilder = systemContainerFactory.createBuilder({
-			entitiesSelector: new EntitiesSelector(mapperFactory, permissionsByIdentityFactory),
 			modificationHandlerFactory,
 			providers: providers,
 			identityFetcher: {

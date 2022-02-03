@@ -1,5 +1,4 @@
 export * from './acl'
-export * from './bridges'
 export * from './resolvers'
 export * from './introspection'
 export * from './schema'

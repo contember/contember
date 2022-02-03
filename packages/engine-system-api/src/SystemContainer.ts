@@ -9,7 +9,6 @@ import {
 import { MigrationsRunner } from '@contember/database-migrations'
 import { DatabaseCredentials } from '@contember/database'
 import {
-	EntitiesSelector,
 	EventResponseBuilder,
 	ExecutedMigrationsResolver,
 	IdentityFetcher,
@@ -51,7 +50,6 @@ export type SystemDbMigrationsRunnerFactory = (db: DatabaseCredentials, dbClient
 type Args = {
 	providers: UuidProvider
 	modificationHandlerFactory: ModificationHandlerFactory
-	entitiesSelector: EntitiesSelector
 	systemDbMigrationsRunnerFactory: (db: DatabaseCredentials, dbClient: ClientBase) => MigrationsRunner<SystemMigrationArgs>
 	identityFetcher: IdentityFetcher
 }

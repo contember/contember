@@ -1,7 +1,4 @@
 import {
-	createMapperContainer,
-	EntitiesSelector,
-	EntitiesSelectorMapperFactory,
 	PermissionsByIdentityFactory,
 } from '@contember/engine-content-api'
 import { SystemContainerFactory } from '@contember/engine-system-api'
@@ -116,16 +113,6 @@ export class MasterContainerFactory {
 				new ModificationHandlerFactory(ModificationHandlerFactory.defaultFactoryMap))
 			.addService('permissionsByIdentityFactory', ({}) =>
 				new PermissionsByIdentityFactory())
-			.addService('entitiesSelector', ({ permissionsByIdentityFactory, providers }) => {
-				const mapperFactory: EntitiesSelectorMapperFactory = (db, schema, identityVariables, permissions) =>
-					createMapperContainer({
-						schema,
-						identityVariables,
-						permissions,
-						providers,
-					}).mapperFactory(db)
-				return new EntitiesSelector(mapperFactory, permissionsByIdentityFactory)
-			})
 			.addService('systemDbMigrationsRunnerFactory', () =>
 				(db: DatabaseCredentials, dbClient: ClientBase) =>
 					new MigrationsRunner(db, 'system', getSystemMigrations, dbClient))

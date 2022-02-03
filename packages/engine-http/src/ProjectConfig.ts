@@ -13,8 +13,9 @@ export interface StageConfig {
 	readonly name: string
 }
 
+export type ProjectSecrets = Record<string, string>
 export type ProjectConfigResolver = (
 	slug: string,
 	additionalConfig: any,
-	secrets: Record<string, string>,
+	secrets: ProjectSecrets,
 ) => ProjectConfig

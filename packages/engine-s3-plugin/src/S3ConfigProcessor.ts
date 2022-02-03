@@ -17,7 +17,7 @@ export class S3ConfigProcessor implements ConfigProcessor<ProjectWithS3Config> {
 			projectDefaults: {
 				...template.projectDefaults,
 				s3: {
-					bucket: `%project.env.S3_BUCKET%`,
+					bucket: `%?project.env.S3_BUCKET%`,
 					prefix: `%?project.env.S3_PREFIX||project.slug%`,
 					region: `%project.env.S3_REGION%`,
 					endpoint: `%project.env.S3_ENDPOINT%`,

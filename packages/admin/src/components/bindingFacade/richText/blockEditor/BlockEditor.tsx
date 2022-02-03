@@ -189,7 +189,7 @@ const BlockEditorComponent: FunctionComponent<BlockEditorProps> = Component(
 		const trailingElements = useFieldBackedElementFields(trailingFieldBackedElements)
 
 		return (
-			<FieldContainer label={label}>
+			<FieldContainer label={label} useLabelElement={false}>
 				<ReferencesProvider getReferencedEntity={getReferencedEntity}>
 					<SortedBlocksContext.Provider value={sortedBlocksRef.current}>
 						<SortableRepeaterContainer

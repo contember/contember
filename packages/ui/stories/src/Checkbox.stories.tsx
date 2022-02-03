@@ -1,3 +1,4 @@
+import { useState } from '@storybook/addons'
 import type { ComponentMeta, ComponentStory } from '@storybook/react'
 import * as React from 'react'
 import { Checkbox } from '../../src'
@@ -16,7 +17,7 @@ export default {
 } as ComponentMeta<typeof Checkbox>
 
 const Template: ComponentStory<typeof Checkbox> = args => {
-	const [value, setValue] = React.useState<boolean | null>(args.value)
+	const [value, setValue] = useState<boolean | null>(args.value)
 
 	React.useEffect(() => {
 		setValue(args.value)

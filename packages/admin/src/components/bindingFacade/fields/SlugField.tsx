@@ -67,7 +67,12 @@ export const SlugFieldInner = SimpleRelativeSingleField<SlugFieldProps, string>(
 		})
 		const transform = useCallback(
 			(driverFieldValue: string | null) => {
-				const slugValue = slugify(driverFieldValue || '')
+				if (driverFieldValue === null) {
+					return null
+				}
+
+				const slugValue = slugify(driverFieldValue)
+
 				return `${normalizedPersistedHardPrefix}${normalizedPersistedSoftPrefix}${slugValue}`
 			},
 			[normalizedPersistedHardPrefix, normalizedPersistedSoftPrefix],

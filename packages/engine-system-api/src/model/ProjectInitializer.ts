@@ -1,17 +1,16 @@
 import { unnamedIdentity } from './helpers'
-import { ProjectConfig, StageConfig } from '../types'
+import { ProjectConfig } from '../types'
 import { ProjectMigrator, SchemaVersionBuilder } from './migrations'
 import { StageCreator } from './stages'
 import { DatabaseContext, DatabaseContextFactory } from './database'
 import { SystemDbMigrationsRunnerFactory } from '../SystemContainer'
 import {
 	Connection,
+	createDatabaseIfNotExists,
 	DatabaseCredentials,
-	EventManager,
 	retryTransaction,
 	SingleConnection,
 } from '@contember/database'
-import { createDatabaseIfNotExists, createPgClient } from '@contember/database-migrations'
 import { Logger } from '@contember/engine-common'
 import { Migration } from '@contember/schema-migrations'
 
@@ -34,23 +33,20 @@ export class ProjectInitializer {
 			// todo: use dbContext
 			logger.group(`Executing system schema migration`)
 			await createDatabaseIfNotExists(project.db, logger.write.bind(logger))
-			const pgClient = await createPgClient(project.db)
-			await pgClient.connect()
-			const singleConnection = new SingleConnection(pgClient, {}, new EventManager(), true)
+			const singleConnection = new SingleConnection(project.db, {})
 			const dbContextMigrations = databaseContextFactory
 				.withClient(singleConnection.createClient('system', { module: 'system' }))
 				.create(unnamedIdentity)
 
 			const schemaResolver = () => this.schemaVersionBuilder.buildSchema(dbContextMigrations)
-			await this.systemDbMigrationsRunnerFactory(project.db, pgClient).migrate(
+			await this.systemDbMigrationsRunnerFactory(singleConnection).migrate(
 				logger.write.bind(logger),
 				{
 					schemaResolver,
 					project,
-					queryHandler: dbContextMigrations.queryHandler,
 				},
 			)
-			await pgClient.end()
+			await singleConnection.end()
 			logger.groupEnd()
 		}
 		return await retryTransaction(() =>

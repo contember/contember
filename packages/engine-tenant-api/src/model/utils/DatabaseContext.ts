@@ -27,7 +27,7 @@ export class DatabaseContext<Conn extends Connection.ConnectionLike = Connection
 
 export class DatabaseContextFactory {
 	constructor(
-		private readonly db: Client,
+		private readonly connection: Connection.ClientFactory,
 		private readonly providers: Providers,
 	) {
 	}
@@ -39,6 +39,6 @@ export class DatabaseContextFactory {
 			const hash = this.providers.hash(projectGroupSlug, 'md5').toString('hex')
 			schema = `tenant_${normalizedSlug}_${hash}`
 		}
-		return new DatabaseContext(this.db.forSchema(schema), this.providers)
+		return new DatabaseContext(this.connection.createClient(schema, { module: 'tenant' }), this.providers)
 	}
 }

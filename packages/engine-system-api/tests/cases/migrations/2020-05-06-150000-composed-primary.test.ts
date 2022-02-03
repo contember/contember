@@ -21,7 +21,6 @@ test('many-has-many-primary migration sql', async () => {
 				},
 			],
 		},
-		queryHandler: null as any,
 	})
 	assert.equal(
 		builder.getSql(),

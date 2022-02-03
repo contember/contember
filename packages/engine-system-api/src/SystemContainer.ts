@@ -7,7 +7,7 @@ import {
 	SchemaMigrator,
 } from '@contember/schema-migrations'
 import { MigrationsRunner } from '@contember/database-migrations'
-import { DatabaseCredentials } from '@contember/database'
+import { Connection, DatabaseCredentials } from '@contember/database'
 import {
 	EventResponseBuilder,
 	ExecutedMigrationsResolver,
@@ -33,7 +33,7 @@ import {
 	TruncateMutationResolver,
 } from './resolvers'
 import { ClientBase } from 'pg'
-import { SystemMigrationArgs } from './migrations'
+import { getSystemMigrations, SystemMigrationArgs } from './migrations'
 import { EventOldValuesResolver } from './resolvers/types'
 
 export interface SystemContainer {
@@ -45,12 +45,11 @@ export interface SystemContainer {
 	systemDbMigrationsRunnerFactory: SystemDbMigrationsRunnerFactory
 }
 
-export type SystemDbMigrationsRunnerFactory = (db: DatabaseCredentials, dbClient: ClientBase) => MigrationsRunner<SystemMigrationArgs>
+export type SystemDbMigrationsRunnerFactory = (db: Connection.ConnectionLike) => MigrationsRunner<SystemMigrationArgs>
 
 type Args = {
 	providers: UuidProvider
 	modificationHandlerFactory: ModificationHandlerFactory
-	systemDbMigrationsRunnerFactory: (db: DatabaseCredentials, dbClient: ClientBase) => MigrationsRunner<SystemMigrationArgs>
 	identityFetcher: IdentityFetcher
 }
 
@@ -69,8 +68,8 @@ export class SystemContainerFactory {
 	}
 	public createBuilder(container: Args) {
 		return new Builder({})
-			.addService('systemDbMigrationsRunnerFactory', () =>
-				container.systemDbMigrationsRunnerFactory)
+			.addService('systemDbMigrationsRunnerFactory', (): SystemDbMigrationsRunnerFactory =>
+				db => new MigrationsRunner(db, 'system', getSystemMigrations))
 			.addService('modificationHandlerFactory', () =>
 				container.modificationHandlerFactory)
 			.addService('identityFetcher', () =>

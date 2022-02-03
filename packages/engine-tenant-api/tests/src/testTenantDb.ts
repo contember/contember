@@ -133,7 +133,7 @@ export const createTenantTester = async (): Promise<TenantTester> => {
 		.replaceService('mailer', () => mailer)
 		.build()
 
-	const dbContext = new DatabaseContext(tenantContainer.db, tenantContainer.providers)
+	const dbContext = tenantContainer.databaseContextFactory.create(undefined)
 
 	await dbContext.commandBus.execute(new CreateProjectCommand({
 		slug: 'blog',

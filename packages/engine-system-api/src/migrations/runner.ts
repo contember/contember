@@ -1,4 +1,4 @@
-import { Migration, loadMigrations } from '@contember/database-migrations'
+import { loadMigrations, Migration } from '@contember/database-migrations'
 import projectMigrations from './2020-03-27-130000-project-migrations'
 import composedPrimary from './2020-05-06-150000-composed-primary'
 import eventTriggerPerf from './2020-06-01-103000-event-trigger-perf'

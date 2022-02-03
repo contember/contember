@@ -12,15 +12,11 @@ import { makeExecutableSchema } from '@graphql-tools/schema'
 import { ContentApiTester } from './ContentApiTester'
 import { SystemApiTester } from './SystemApiTester'
 import { TesterStageManager } from './TesterStageManager'
-import { Client, EventManager, SingleConnection } from '@contember/database'
+import { Client, SingleConnection } from '@contember/database'
 import { createUuidGenerator } from './testUuid'
 import { project } from './project'
 import { createConnection, dbCredentials, recreateDatabase } from './dbUtils'
 import { join } from 'path'
-import { createPgClient, MigrationsRunner } from '@contember/database-migrations'
-import { ClientBase } from 'pg'
-import { DatabaseCredentials } from '@contember/database'
-import { getSystemMigrations } from '@contember/engine-system-api'
 
 export class ApiTester {
 	public static project = project
@@ -65,8 +61,6 @@ export class ApiTester {
 					return Promise.resolve([])
 				},
 			},
-			systemDbMigrationsRunnerFactory: (db: DatabaseCredentials, dbClient: ClientBase) =>
-				new MigrationsRunner(db, 'system', getSystemMigrations, dbClient),
 		})
 		if (options.systemContainerHook) {
 			systemContainerBuilder = options.systemContainerHook(systemContainerBuilder)
@@ -80,22 +74,19 @@ export class ApiTester {
 
 		const db = databaseContextFactory.create(unnamedIdentity)
 
-		const pgClient = await createPgClient(dbCredentials(dbName))
-		await pgClient.connect()
-		const singleConnection = new SingleConnection(pgClient, {}, new EventManager(), true)
+		const singleConnection = new SingleConnection(dbCredentials(dbName), {})
 		const dbContextMigrations = databaseContextFactory
 			.withClient(singleConnection.createClient('system', {}))
 			.create(unnamedIdentity)
 
 		const schemaResolver = () => systemContainer.schemaVersionBuilder.buildSchema(dbContextMigrations)
 		await systemContainer
-			.systemDbMigrationsRunnerFactory(dbCredentials(dbName), pgClient)
+			.systemDbMigrationsRunnerFactory(singleConnection)
 			.migrate(() => null, {
 				schemaResolver,
 				project: projectConfig,
-				queryHandler: null as any,
 			})
-		await pgClient.end()
+		await singleConnection.end()
 
 		const systemSchema = makeExecutableSchema({
 			typeDefs: systemTypeDefs,

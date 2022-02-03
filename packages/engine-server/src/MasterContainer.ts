@@ -3,14 +3,12 @@ import {
 } from '@contember/engine-content-api'
 import { SystemContainerFactory } from '@contember/engine-system-api'
 import { ProjectInitializer as ProjectInitializerInterface, TenantContainerFactory } from '@contember/engine-tenant-api'
-import { getSystemMigrations } from '@contember/engine-system-api'
 import { Builder } from '@contember/dic'
 import { Config } from './config/config'
 import { createDbMetricsRegistrar, logSentryError, ProcessType } from './utils'
 import { ModificationHandlerFactory } from '@contember/schema-migrations'
 import { Initializer } from './bootstrap'
 import { Plugin } from '@contember/engine-plugins'
-import { DatabaseCredentials, MigrationsRunner } from '@contember/database-migrations'
 import { createColllectHttpMetricsMiddleware, createShowMetricsMiddleware } from './http'
 import {
 	ApiMiddlewareFactory,
@@ -44,7 +42,6 @@ import {
 	ProjectSchemaResolver,
 	ProjectSchemaResolverProxy,
 } from './project'
-import { ClientBase } from 'pg'
 import { createSecretKey } from 'crypto'
 import koaCompress from 'koa-compress'
 import bodyParser from 'koa-bodyparser'
@@ -113,15 +110,10 @@ export class MasterContainerFactory {
 				new ModificationHandlerFactory(ModificationHandlerFactory.defaultFactoryMap))
 			.addService('permissionsByIdentityFactory', ({}) =>
 				new PermissionsByIdentityFactory())
-			.addService('systemDbMigrationsRunnerFactory', () =>
-				(db: DatabaseCredentials, dbClient: ClientBase) =>
-					new MigrationsRunner(db, 'system', getSystemMigrations, dbClient))
-			.addService('systemContainer', ({ systemContainerFactory, entitiesSelector, modificationHandlerFactory, providers, systemDbMigrationsRunnerFactory, tenantContainer }) =>
+			.addService('systemContainer', ({ systemContainerFactory, modificationHandlerFactory, providers, tenantContainer }) =>
 				systemContainerFactory.create({
-					entitiesSelector,
 					modificationHandlerFactory,
 					providers,
-					systemDbMigrationsRunnerFactory,
 					identityFetcher: tenantContainer.identityFetcher,
 				}))
 			.addService('schemaVersionBuilder', ({ systemContainer }) =>

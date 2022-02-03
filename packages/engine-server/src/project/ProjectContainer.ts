@@ -2,7 +2,6 @@ import { Builder } from '@contember/dic'
 import { Connection } from '@contember/database'
 import { DatabaseContextFactory, SchemaVersionBuilder } from '@contember/engine-system-api'
 import { logSentryError } from '../utils'
-import { ModificationHandlerFactory } from '@contember/schema-migrations'
 import { GraphQlSchemaBuilderFactory, PermissionsByIdentityFactory } from '@contember/engine-content-api'
 import { GraphQLSchemaContributor, Plugin } from '@contember/engine-plugins'
 import {
@@ -45,8 +44,6 @@ export class ProjectContainerFactory {
 				project)
 			.addService('connection', ({ project }) =>
 				new Connection(project.db, { timing: true }))
-			.addService('modificationHandlerFactory', () =>
-				new ModificationHandlerFactory(ModificationHandlerFactory.defaultFactoryMap))
 			.addService('graphQlSchemaBuilderFactory', () =>
 				new GraphQlSchemaBuilderFactory())
 			.addService('permissionsByIdentityFactory', ({}) =>

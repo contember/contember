@@ -119,8 +119,6 @@ export class TenantContainerFactory {
 
 	createBuilder(args: TenantContainerArgs) {
 		return new Builder({})
-			.addService('connection', (): ConnectionType =>
-				new Connection(this.tenantDbCredentials, {}))
 			.addService('providers', () =>
 				args.providers)
 			.addService('mailer', () =>
@@ -236,17 +234,18 @@ export class TenantContainerFactory {
 				new UpdateProjectMutationResolver(projectManager))
 			.addService('setProjectSecretMutationResolver', ({ projectManager, secretManager }) =>
 				new SetProjectSecretMutationResolver(projectManager, secretManager))
-			.addService('db', ({ connection }) =>
-				connection.createClient('tenant', { module: 'tenant' }))
-			.addService('databaseContextFactory', ({ db, providers }) =>
-				new DatabaseContextFactory(db, providers))
-			.addService('migrationsRunnerFactory', ({ providers }) =>
-				new MigrationsRunnerFactory(this.tenantDbCredentials, this.tenantCredentials, providers))
-			.addService('projectGroupProvider', ({ databaseContextFactory, migrationsRunnerFactory }) =>
-				new ProjectGroupProvider(databaseContextFactory, migrationsRunnerFactory))
 			.addService('resolverContextFactory', ({ permissionContextFactory }) =>
 				new ResolverContextFactory(permissionContextFactory))
 			.addService('resolvers', container =>
 				new ResolverFactory(container).create())
+
+			.addService('connection', (): ConnectionType =>
+				new Connection(this.tenantDbCredentials, {}))
+			.addService('databaseContextFactory', ({ connection, providers }) =>
+				new DatabaseContextFactory(connection, providers))
+			.addService('migrationsRunnerFactory', ({ providers }) =>
+				new MigrationsRunnerFactory(this.tenantDbCredentials, this.tenantCredentials, providers))
+			.addService('projectGroupProvider', ({ databaseContextFactory, migrationsRunnerFactory }) =>
+				new ProjectGroupProvider(databaseContextFactory, migrationsRunnerFactory))
 	}
 }

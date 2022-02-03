@@ -96,7 +96,7 @@ export const executeTenantTest = async (test: Test) => {
 		.replaceService('mailer', () => mailer)
 		.build()
 
-	const databaseContext = new DatabaseContext(tenantContainer.db, tenantContainer.providers)
+	const databaseContext = tenantContainer.databaseContextFactory.create(undefined)
 	const projectGroup: ProjectGroup = {
 		database: databaseContext,
 		slug: undefined,

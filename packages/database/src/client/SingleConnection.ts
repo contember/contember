@@ -1,17 +1,27 @@
-import { Client as PgClient } from 'pg'
+import { Client as PgClient, ClientConfig } from 'pg'
 import { EventManager } from './EventManager'
 import { Client } from './Client'
 import { Transaction } from './Transaction'
 import { executeQuery } from './execution'
 import { Connection } from './Connection'
+import { DatabaseCredentials } from '../types'
 
-class SingleConnection implements Connection.ConnectionLike, Connection.ClientFactory {
+export class SingleConnection implements Connection.ConnectionLike, Connection.ClientFactory {
+	private readonly pgClient: PgClient
+	private isConnected = false
+
 	constructor(
-		private readonly pgClient: PgClient,
+		private readonly config: ClientConfig & DatabaseCredentials,
 		private readonly queryConfig: Connection.QueryConfig,
 		public readonly eventManager: EventManager = new EventManager(null),
-		private isConnected = false,
-	) {}
+	) {
+		this.pgClient = new PgClient(config)
+		this.pgClient.on('error', err => {
+			// eslint-disable-next-line no-console
+			console.error(err)
+			this.eventManager.fire(EventManager.Event.clientError, err)
+		})
+	}
 
 	public createClient(schema: string, queryMeta: Record<string, any>): Client {
 		return new Client(this, schema, queryMeta, new EventManager(this.eventManager))
@@ -70,4 +80,3 @@ class SingleConnection implements Connection.ConnectionLike, Connection.ClientFa
 		}
 	}
 }
-export { SingleConnection }

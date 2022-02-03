@@ -21,7 +21,6 @@ test('event-trigger-performance sql', async () => {
 				},
 			],
 		},
-		queryHandler: null as any,
 	})
 	assert.equal(
 		builder.getSql(),

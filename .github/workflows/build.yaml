@@ -11,35 +11,14 @@ on:
       - '**'
 
 jobs:
-  build:
-    name: Build
+  test:
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [14, 16]
+    container: node:16-alpine
 
     steps:
-      - name: Setup repo
-        uses: actions/checkout@v2
-
-      - name: Install pnpm
-        run: npm install -g pnpm
-
-      - name: Setup node
-        uses: actions/setup-node@main
-        with:
-          node-version: ${{ matrix.node-version }}
-          cache: pnpm
-
-      - name: Install dependencies
-        run: pnpm install
-
-      - name: Lint
-        run: pnpm run eslint:lint
-
-      - name: Build
-        run: pnpm run build
-
-      - name: Test
-        run: pnpm run test
+      - uses: actions/checkout@v2
+      - run: npm install -g pnpm
+      - run: pnpm install
+      - run: pnpm run eslint:lint
+      - run: pnpm run build
+      - run: pnpm run test

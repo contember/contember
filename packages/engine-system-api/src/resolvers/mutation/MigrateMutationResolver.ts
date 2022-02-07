@@ -1,5 +1,5 @@
 import { GraphQLResolveInfo } from 'graphql'
-import { ResolverContext } from '../ResolverContext'
+import { SystemResolverContext } from '../SystemResolverContext'
 import { MutationResolver } from '../Resolver'
 import { MigrateResponse, MutationMigrateArgs } from '../../schema'
 import { Migration } from '@contember/schema-migrations'
@@ -11,7 +11,7 @@ export class MigrateMutationResolver implements MutationResolver<'migrate'> {
 	async migrateForce(
 		parent: any,
 		args: MutationMigrateArgs,
-		context: ResolverContext,
+		context: SystemResolverContext,
 		info: GraphQLResolveInfo,
 	): Promise<MigrateResponse> {
 		return this.migrate(parent, args, context, info, true)
@@ -20,7 +20,7 @@ export class MigrateMutationResolver implements MutationResolver<'migrate'> {
 	async migrate(
 		parent: any,
 		args: MutationMigrateArgs,
-		context: ResolverContext,
+		context: SystemResolverContext,
 		info: GraphQLResolveInfo,
 		force = false,
 	): Promise<MigrateResponse> {

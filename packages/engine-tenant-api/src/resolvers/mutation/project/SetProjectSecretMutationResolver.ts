@@ -5,7 +5,7 @@ import {
 	MutationSetProjectSecretArgs,
 	SetProjectSecretResponse,
 } from '../../../schema'
-import { ResolverContext } from '../../ResolverContext'
+import { TenantResolverContext } from '../../TenantResolverContext'
 import { PermissionActions, ProjectManager, SecretsManager } from '../../../model'
 import { createProjectNotFoundResponse } from '../../errorUtils'
 
@@ -15,7 +15,7 @@ export class SetProjectSecretMutationResolver implements MutationResolvers {
 	async setProjectSecret(
 		parent: any,
 		args: MutationSetProjectSecretArgs,
-		context: ResolverContext,
+		context: TenantResolverContext,
 	): Promise<SetProjectSecretResponse> {
 		const project = await this.projectManager.getProjectBySlug(context.db, args.projectSlug)
 		await context.requireAccess({

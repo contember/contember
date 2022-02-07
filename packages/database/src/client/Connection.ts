@@ -106,6 +106,14 @@ namespace Connection {
 		): Promise<Result>
 	}
 
+	export type ConnectionType =
+		& Connection.ConnectionLike
+		& Connection.ClientFactory
+		& Connection.PoolStatusProvider
+		& {
+			config: DatabaseCredentials
+		}
+
 	export interface ConnectionLike extends Transactional, Queryable {}
 
 	export interface ClientFactory {

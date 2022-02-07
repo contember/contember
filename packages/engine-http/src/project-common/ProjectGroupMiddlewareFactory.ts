@@ -1,9 +1,9 @@
-import { ProjectGroup, ProjectGroupProvider } from '@contember/engine-tenant-api'
 import { KoaMiddleware } from '../koa'
 import { AuthMiddlewareState, ErrorFactory } from '../common'
+import { ProjectGroupContainer, ProjectGroupContainerResolver } from '../ProjectGroupContainer'
 
 export interface ProjectGroupState {
-	projectGroup: ProjectGroup
+	projectGroupContainer: ProjectGroupContainer
 }
 
 type InputKoaState =
@@ -16,7 +16,7 @@ type KoaState =
 export class ProjectGroupMiddlewareFactory {
 	constructor(
 		private projectGroupDomainMapping: string | undefined,
-		private projectGroupProvider: ProjectGroupProvider,
+		private projectGroupContainerResolver: ProjectGroupContainerResolver,
 		private readonly errorFactory: ErrorFactory,
 	) {
 	}
@@ -31,7 +31,7 @@ export class ProjectGroupMiddlewareFactory {
 				)
 				: undefined
 		)
-		const tenantDatabase: KoaMiddleware<KoaState> = async (ctx, next) => {
+		const projectGroup: KoaMiddleware<KoaState> = async (ctx, next) => {
 			let group: string | undefined = undefined
 			if (groupRegex) {
 				const match = ctx.request.host.match(groupRegex)
@@ -40,10 +40,10 @@ export class ProjectGroupMiddlewareFactory {
 				}
 				group = match[1]
 			}
-			ctx.state.projectGroup = await this.projectGroupProvider.getGroup(group)
+			ctx.state.projectGroupContainer = await this.projectGroupContainerResolver.getProjectGroupContainer(group, {})
 			return next()
 		}
-		return tenantDatabase
+		return projectGroup
 	}
 }
 

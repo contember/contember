@@ -1,14 +1,15 @@
 import { GraphQLTestQuery } from '../cases/integration/mocked/gql/types'
 import { testUuid } from './testUuid'
-import { DatabaseContext, ProjectGroup, ProjectSchemaResolver } from '../../src'
 import {
 	AclSchemaEvaluatorFactory,
 	createResolverContext,
 	PermissionContext,
+	ProjectSchemaResolver,
 	ProjectScopeFactory,
-	ResolverContext,
+	Providers,
 	StaticIdentity,
 	TenantContainerFactory,
+	TenantResolverContext,
 	typeDefs,
 } from '../../src'
 import { Buffer } from 'buffer'
@@ -59,61 +60,50 @@ export const authenticatedApiKeyId = testUuid(998)
 
 export const executeTenantTest = async (test: Test) => {
 	const mailer = createMockedMailer()
-	const tenantContainer = new TenantContainerFactory(
-		{
-			database: 'foo',
-			host: 'localhost',
-			port: 5432,
-			password: '123',
-			user: 'foo',
+	const providers: Providers = {
+		bcrypt: (value: string) => Promise.resolve('BCRYPTED-' + value),
+		bcryptCompare: (data: string, hash: string) => Promise.resolve('BCRYPTED-' + data === hash),
+		now: () => now,
+		randomBytes: (length: number) => Promise.resolve(Buffer.alloc(length)),
+		uuid: createUuidGenerator(),
+		decrypt: () => {
+			throw new Error('not supported')
 		},
-		{},
-		{},
-	)
+		encrypt: () => {
+			throw new Error('not supported')
+		},
+		hash: value => Buffer.from(value.toString()),
+	}
+	const projectInitializer = {
+		initializeProject: () => {
+			throw new Error()
+		},
+	}
+	const connection = createConnectionMock(test.executes)
+	const tenantContainer = new TenantContainerFactory(providers)
 		.createBuilder({
-			providers: {
-				bcrypt: (value: string) => Promise.resolve('BCRYPTED-' + value),
-				bcryptCompare: (data: string, hash: string) => Promise.resolve('BCRYPTED-' + data === hash),
-				now: () => now,
-				randomBytes: (length: number) => Promise.resolve(Buffer.alloc(length)),
-				uuid: createUuidGenerator(),
-				decrypt: () => {
-					throw new Error('not supported')
-				},
-				encrypt: () => {
-					throw new Error('not supported')
-				},
-				hash: value => Buffer.from(value.toString()),
-			},
+			mailOptions: {},
+			tenantCredentials: {},
+			projectInitializer,
 			projectSchemaResolver,
-			projectInitializer: {
-				initializeProject: () => {
-					throw new Error()
-				},
-			},
+			connection,
 		})
-		.replaceService('connection', () => createConnectionMock(test.executes))
 		.replaceService('mailer', () => mailer)
 		.build()
 
-	const databaseContext = tenantContainer.databaseContextFactory.create(undefined)
-	const projectGroup: ProjectGroup = {
-		database: databaseContext,
-		slug: undefined,
-	}
-	const context: ResolverContext = {
+	const databaseContext = tenantContainer.databaseContext
+	const context: TenantResolverContext = {
 		...createResolverContext(
 			new PermissionContext(
 				new StaticIdentity(authenticatedIdentityId, []),
 				{
 					isAllowed: () => Promise.resolve(true),
 				},
-				new ProjectScopeFactory(projectSchemaResolver, new AclSchemaEvaluatorFactory()),
-				projectGroup,
+				new ProjectScopeFactory(new AclSchemaEvaluatorFactory()),
+				projectSchemaResolver,
 			),
 			authenticatedApiKeyId,
 		),
-		projectGroup,
 		db: databaseContext,
 	}
 

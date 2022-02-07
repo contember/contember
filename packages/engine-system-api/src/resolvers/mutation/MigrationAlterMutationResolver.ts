@@ -1,5 +1,5 @@
 import { GraphQLResolveInfo } from 'graphql'
-import { ResolverContext } from '../ResolverContext'
+import { SystemResolverContext } from '../SystemResolverContext'
 import { MutationResolver } from '../Resolver'
 import {
 	MigrationDeleteErrorCode,
@@ -19,7 +19,7 @@ export class MigrationAlterMutationResolver implements MutationResolver<'migrati
 	async migrationModify(
 		parent: any,
 		args: MutationMigrationModifyArgs,
-		context: ResolverContext,
+		context: SystemResolverContext,
 		info: GraphQLResolveInfo,
 	): Promise<MigrationModifyResponse> {
 		const result = await this.migrationAlterer.modifyMigration(
@@ -41,7 +41,7 @@ export class MigrationAlterMutationResolver implements MutationResolver<'migrati
 	async migrationDelete(
 		parent: any,
 		args: MutationMigrationDeleteArgs,
-		context: ResolverContext,
+		context: SystemResolverContext,
 		info: GraphQLResolveInfo,
 	): Promise<MigrationDeleteResponse> {
 		const result = await this.migrationAlterer.deleteMigration(context.db, args.migration)

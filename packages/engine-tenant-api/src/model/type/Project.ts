@@ -1,16 +1,10 @@
 import { Schema } from '@contember/schema'
-import { DatabaseContext } from '../utils'
 
 export interface Project {
 	readonly id: string
 	readonly slug: string
 	readonly name: string
 	readonly config: Record<string, unknown>
-}
-
-export interface ProjectGroup {
-	slug: string | undefined
-	database: DatabaseContext
 }
 
 
@@ -20,9 +14,9 @@ export interface ProjectWithSecrets extends Project {
 }
 
 export interface ProjectSchemaResolver {
-	getSchema(projectGroup: ProjectGroup, projectSlug: string): Promise<Schema | undefined>
+	getSchema(projectSlug: string): Promise<Schema | undefined>
 }
 
 export interface ProjectInitializer {
-	initializeProject(projectGroup: ProjectGroup, project: ProjectWithSecrets): Promise<void>
+	initializeProject(project: ProjectWithSecrets): Promise<void>
 }

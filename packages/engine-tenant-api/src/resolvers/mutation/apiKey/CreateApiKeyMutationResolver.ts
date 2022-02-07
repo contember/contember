@@ -5,7 +5,7 @@ import {
 	MutationResolvers,
 } from '../../../schema'
 import { GraphQLResolveInfo } from 'graphql'
-import { ResolverContext } from '../../ResolverContext'
+import { TenantResolverContext } from '../../TenantResolverContext'
 import { ApiKeyManager, isTokenHash, MembershipValidator, PermissionActions, ProjectManager } from '../../../model'
 import { createMembershipValidationErrorResult } from '../../membershipUtils'
 import { createProjectNotFoundResponse } from '../../errorUtils'
@@ -21,7 +21,7 @@ export class CreateApiKeyMutationResolver implements MutationResolvers {
 	async createApiKey(
 		parent: any,
 		{ projectSlug, memberships, description, tokenHash }: MutationCreateApiKeyArgs,
-		context: ResolverContext,
+		context: TenantResolverContext,
 		info: GraphQLResolveInfo,
 	): Promise<CreateApiKeyResponse> {
 		const project = await this.projectManager.getProjectBySlug(context.db, projectSlug)
@@ -36,7 +36,7 @@ export class CreateApiKeyMutationResolver implements MutationResolvers {
 		if (typeof tokenHash === 'string' && !isTokenHash(tokenHash)) {
 			throw new UserInputError('Invalid format of tokenHash. Must be hex-encoded sha256.')
 		}
-		const validationResult = await this.membershipValidator.validate(context.projectGroup, project.slug, memberships)
+		const validationResult = await this.membershipValidator.validate(project.slug, memberships)
 		if (validationResult.length > 0) {
 			const errors = createMembershipValidationErrorResult<CreateApiKeyErrorCode>(validationResult)
 			return {
@@ -60,7 +60,7 @@ export class CreateApiKeyMutationResolver implements MutationResolvers {
 	async createGlobalApiKey(
 		parent: any,
 		{ roles, description, tokenHash }: MutationCreateGlobalApiKeyArgs,
-		context: ResolverContext,
+		context: TenantResolverContext,
 		info: GraphQLResolveInfo,
 	): Promise<CreateApiKeyResponse> {
 		await context.requireAccess({

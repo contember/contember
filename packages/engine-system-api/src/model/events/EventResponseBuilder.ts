@@ -4,19 +4,18 @@ import { assertNever } from '../../utils'
 import { IdentityFetcher } from '../dependencies'
 import { formatIdentity } from './identityUtils'
 import { appendCreateSpecificData, appendDeleteSpecificData, appendUpdateSpecificData } from './EventResponseHelper'
-import { Client } from '@contember/database'
 
 export class EventResponseBuilder {
 	constructor(private readonly identityFetcher: IdentityFetcher) {}
 
-	public async buildResponse(tenantDb: Client, events: AnyEvent[]): Promise<(CreateEvent | DeleteEvent | UpdateEvent)[]> {
+	public async buildResponse(events: AnyEvent[]): Promise<(CreateEvent | DeleteEvent | UpdateEvent)[]> {
 		const apiEventTypeMapping = {
 			[EventType.create]: ApiEventType.Create,
 			[EventType.update]: ApiEventType.Update,
 			[EventType.delete]: ApiEventType.Delete,
 		}
 		const identityIds = events.map(it => it.identityId).filter((it, index, ids) => ids.indexOf(it) === index)
-		const identities = await this.identityFetcher.fetchIdentities(tenantDb, identityIds)
+		const identities = await this.identityFetcher.fetchIdentities(identityIds)
 		const identitiesMap = Object.fromEntries(identities.map(it => [it.identityId, it]))
 
 		return events.map(it => {

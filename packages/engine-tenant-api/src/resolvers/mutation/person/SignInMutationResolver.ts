@@ -5,7 +5,7 @@ import {
 	MutationSignInArgs,
 	SignInResponse,
 } from '../../../schema'
-import { ResolverContext } from '../../ResolverContext'
+import { TenantResolverContext } from '../../TenantResolverContext'
 import { PermissionActions, SignInManager } from '../../../model'
 import { createErrorResponse } from '../../errorUtils'
 import { SignInResponseFactory } from '../../responseHelpers/SignInResponseFactory'
@@ -16,7 +16,7 @@ export class SignInMutationResolver implements MutationResolvers {
 		private readonly signInResponseFactory: SignInResponseFactory,
 	) {}
 
-	async signIn(parent: any, args: MutationSignInArgs, context: ResolverContext): Promise<SignInResponse> {
+	async signIn(parent: any, args: MutationSignInArgs, context: TenantResolverContext): Promise<SignInResponse> {
 		await context.requireAccess({
 			action: PermissionActions.PERSON_SIGN_IN,
 			message: 'You are not allowed to sign in',
@@ -40,7 +40,7 @@ export class SignInMutationResolver implements MutationResolvers {
 		}
 	}
 
-	async createSessionToken(parent: any, args: MutationCreateSessionTokenArgs, context: ResolverContext): Promise<CreateSessionTokenResponse> {
+	async createSessionToken(parent: any, args: MutationCreateSessionTokenArgs, context: TenantResolverContext): Promise<CreateSessionTokenResponse> {
 		await context.requireAccess({
 			action: PermissionActions.PERSON_CREATE_SESSION_KEY,
 			message: 'You are not allowed to create a session key',

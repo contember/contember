@@ -3,7 +3,7 @@ import { PromiseMap } from '@contember/engine-common'
 
 type ContainerWithMeta = { container: ProjectContainer; cleanups: (() => void)[]; timestamp: Date }
 
-export class ProjectGroupState {
+export class ProjectContainerStore {
 	private containers = new PromiseMap<string, ContainerWithMeta>()
 	private aliasMapping = new Map<string, string>()
 

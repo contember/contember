@@ -35,18 +35,19 @@ const projectConfig = {
 }
 const createContainer = (debug: boolean) => {
 	prom.register.clear()
+	const tenantConfig = {
+		db: dbCredentials(String(process.env.TEST_DB_NAME_TENANT)),
+		mailer: {},
+		credentials: {
+			rootToken,
+			loginToken,
+		},
+		secrets: {},
+	}
 	return new MasterContainerFactory().createBuilder({
 		debugMode: debug,
 		config: {
-			tenant: {
-				db: dbCredentials(String(process.env.TEST_DB_NAME_TENANT)),
-				mailer: {},
-				credentials: {
-					rootToken,
-					loginToken,
-				},
-				secrets: {},
-			},
+			tenant: tenantConfig,
 			server: {
 				logging: {},
 				port: 0,
@@ -55,6 +56,7 @@ const createContainer = (debug: boolean) => {
 			},
 		},
 		projectConfigResolver: () => projectConfig,
+		tenantConfigResolver: () => tenantConfig,
 		plugins: [],
 		processType: ProcessType.singleNode,
 	}).build()
@@ -108,16 +110,17 @@ test.before(async () => {
 		await container.initializer.initialize()
 
 		const { slug, name, ...config } = projectConfig
-		const group = await container.tenantContainer.projectGroupProvider.getGroup(undefined)
-		const result = await container.tenantContainer.projectManager.createProject(group, { slug, name, config: config as any, secrets: {} }, undefined)
+		const groupContainer = await container.projectGroupContainerResolver.getProjectGroupContainer(undefined)
+		const tenantContainer = groupContainer.tenantContainer
+		const result = await tenantContainer.projectManager.createProject(tenantContainer.databaseContext, { slug, name, config: config as any, secrets: {} }, undefined)
 		if (!result) {
 			throw new Error('Project already exists')
 		}
-		const projectContainer = await container.projectContainerResolver.getProjectContainer(group, slug)
+		const projectContainer = await groupContainer.projectContainerResolver.getProjectContainer(slug)
 		if (!projectContainer) {
 			throw new Error('Should not happen')
 		}
-		await container.systemContainer.projectInitializer.initialize(
+		await groupContainer.systemContainer.projectInitializer.initialize(
 			projectContainer.systemDatabaseContextFactory,
 			projectConfig,
 			new Logger(() => null),

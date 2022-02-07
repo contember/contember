@@ -7,8 +7,9 @@ export * from './tenant'
 export * from './koa'
 export * from './providers'
 export * from './ProjectContainer'
+export * from './ProjectGroupContainer'
 export * from './graphql'
-export * from './ProjectConfig'
+export * from './config'
 import Koa from 'koa'
 
 export { Koa }

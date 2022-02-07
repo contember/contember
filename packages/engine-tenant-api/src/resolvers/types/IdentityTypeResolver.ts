@@ -6,7 +6,7 @@ import {
 	ProjectManager,
 	ProjectMemberManager,
 } from '../../model'
-import { ResolverContext } from '../ResolverContext'
+import { TenantResolverContext } from '../TenantResolverContext'
 import { notEmpty } from '../../utils/array'
 import { createBatchLoader } from '../../utils/batchQuery'
 import { ImplementationException } from '../../exceptions'
@@ -30,7 +30,7 @@ export class IdentityTypeResolver implements IdentityResolvers {
 		private readonly projectManager: ProjectManager,
 	) {}
 
-	async person(parent: Identity, args: unknown, context: ResolverContext): Promise<Maybe<Person>> {
+	async person(parent: Identity, args: unknown, context: TenantResolverContext): Promise<Maybe<Person>> {
 		const person = await this.personLoader({ id: parent.id, db: context.db })
 		if (!person) {
 			return null
@@ -46,7 +46,7 @@ export class IdentityTypeResolver implements IdentityResolvers {
 	async projects(
 		parent: { id: string; projects: readonly IdentityProjectRelation[] },
 		{}: any,
-		context: ResolverContext,
+		context: TenantResolverContext,
 	): Promise<readonly IdentityProjectRelation[]> {
 		if (parent.projects.length > 0) {
 			return parent.projects

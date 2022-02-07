@@ -2,7 +2,7 @@ import { KoaMiddleware } from '../koa'
 import { ProjectResolveMiddlewareState } from './ProjectResolveMiddlewareFactory'
 import { AuthMiddlewareState, ErrorFactory, TimerMiddlewareState } from '../common'
 import { ProjectMemberManager } from '@contember/engine-tenant-api'
-import { ProjectGroupState } from './ProjectGroupMiddleware'
+import { ProjectGroupState } from './ProjectGroupMiddlewareFactory'
 
 type InputKoaState =
 	& AuthMiddlewareState
@@ -21,7 +21,6 @@ export interface ProjectMemberMiddlewareState {
 export class ProjectMemberMiddlewareFactory {
 	constructor(
 		private readonly debug: boolean,
-		private readonly projectMemberManager: ProjectMemberManager,
 		private readonly errorFactory: ErrorFactory,
 	) {
 	}
@@ -29,9 +28,10 @@ export class ProjectMemberMiddlewareFactory {
 	public create(): KoaMiddleware<KoaState> {
 		const projectMember: KoaMiddleware<KoaState> = async (ctx, next) => {
 			const project = ctx.state.project
+			const tenantContainer = ctx.state.projectGroupContainer.tenantContainer
 			const projectMemberships = await ctx.state.timer('MembershipFetch', () =>
-				this.projectMemberManager.getProjectMemberships(
-					ctx.state.projectGroup.database,
+				tenantContainer.projectMemberManager.getProjectMemberships(
+					tenantContainer.databaseContext,
 					{ slug: project.slug },
 					{
 						id: ctx.state.authResult.identityId,

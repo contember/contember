@@ -1,4 +1,4 @@
-import { ProjectGroup, ProjectSchemaResolver } from '../type'
+import { ProjectSchemaResolver } from '../type'
 import { Membership } from '../type/Membership'
 import { getRoleVariables } from '@contember/schema-utils'
 import { Acl } from '@contember/schema'
@@ -6,8 +6,8 @@ import { Acl } from '@contember/schema'
 export class MembershipValidator {
 	constructor(private readonly schemaResolver: ProjectSchemaResolver) {}
 
-	async validate(projectGroup: ProjectGroup, project: string, memberships: readonly Membership[]): Promise<MembershipValidationError[]> {
-		const schema = await this.schemaResolver.getSchema(projectGroup, project)
+	async validate(project: string, memberships: readonly Membership[]): Promise<MembershipValidationError[]> {
+		const schema = await this.schemaResolver.getSchema(project)
 		if (!schema) {
 			throw new Error()
 		}

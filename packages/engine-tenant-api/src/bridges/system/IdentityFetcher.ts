@@ -2,8 +2,13 @@ import { Client } from '@contember/database'
 import { IdentityQuery, PersonByIdentityBatchQuery } from '../../model'
 
 export class IdentityFetcher {
-	public async fetchIdentities(client: Client, ids: string[]): Promise<Identity[]> {
-		const queryHandler = client.createQueryHandler()
+	constructor(
+		private client: Client,
+	) {
+	}
+
+	public async fetchIdentities(ids: string[]): Promise<Identity[]> {
+		const queryHandler = this.client.createQueryHandler()
 		const persons = await queryHandler.fetch(new PersonByIdentityBatchQuery(ids))
 		const personIds = new Set(persons.map(it => it.identity_id))
 		const otherIdentityIds = ids.filter(it => !personIds.has(it))

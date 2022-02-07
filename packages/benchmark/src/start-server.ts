@@ -2,11 +2,12 @@
 
 import { createContainer, ProcessType, readConfig } from '@contember/engine-server'
 ;(async () => {
-	const { config, projectConfigResolver } = await readConfig([])
+	const { config, projectConfigResolver, tenantConfigResolver } = await readConfig([])
 	const container = await createContainer({
 		debugMode: false,
 		config,
 		projectConfigResolver,
+		tenantConfigResolver,
 		plugins: [],
 		processType: ProcessType.singleNode,
 	})

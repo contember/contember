@@ -18,36 +18,12 @@ const getMigrations = (): Promise<Migration[]> => {
 	])
 }
 
-export class MigrationsRunnerFactory {
+export class TenantMigrationsRunner {
 	constructor(
 		private readonly db: DatabaseCredentials,
+		private readonly schema: string,
 		private readonly tenantCredentials: TenantCredentials,
 		private readonly providers: Providers,
-	) {
-	}
-
-	public create(schema: string): MigrationsRunner {
-		return new MigrationsRunner(
-			schema,
-			this.db,
-			{
-				getCredentials: async () => ({
-					loginTokenHash: this.tenantCredentials.loginToken ? computeTokenHash(this.tenantCredentials.loginToken) : undefined,
-					rootTokenHash: this.tenantCredentials.rootTokenHash
-						?? (this.tenantCredentials.rootToken ? computeTokenHash(this.tenantCredentials.rootToken) : undefined),
-					rootEmail: this.tenantCredentials.rootEmail,
-					rootPasswordBcrypted: this.tenantCredentials.rootPassword ? await this.providers.bcrypt(this.tenantCredentials.rootPassword) : undefined,
-				}),
-			},
-		)
-	}
-}
-
-export class MigrationsRunner {
-	constructor(
-		private readonly schema: string,
-		private readonly db: DatabaseCredentials,
-		private readonly args: TenantMigrationArgs,
 	) {
 	}
 
@@ -55,7 +31,15 @@ export class MigrationsRunner {
 		await createDatabaseIfNotExists(this.db, log)
 		const connection = new SingleConnection(this.db, {})
 		const innerRunner = new DbMigrationsRunner<TenantMigrationArgs>(connection, this.schema, getMigrations)
-		const result = await innerRunner.migrate(log, this.args)
+		const result = await innerRunner.migrate(log, {
+			getCredentials: async () => ({
+				loginTokenHash: this.tenantCredentials.loginToken ? computeTokenHash(this.tenantCredentials.loginToken) : undefined,
+				rootTokenHash: this.tenantCredentials.rootTokenHash
+					?? (this.tenantCredentials.rootToken ? computeTokenHash(this.tenantCredentials.rootToken) : undefined),
+				rootEmail: this.tenantCredentials.rootEmail,
+				rootPasswordBcrypted: this.tenantCredentials.rootPassword ? await this.providers.bcrypt(this.tenantCredentials.rootPassword) : undefined,
+			}),
+		})
 		await connection.end()
 		return result
 	}

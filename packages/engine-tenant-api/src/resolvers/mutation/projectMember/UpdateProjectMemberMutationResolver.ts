@@ -4,10 +4,15 @@ import {
 	UpdateProjectMemberErrorCode,
 	UpdateProjectMemberResponse,
 } from '../../../schema'
-import { ResolverContext } from '../../ResolverContext'
-import { PermissionActions, ProjectManager, ProjectMemberManager } from '../../../model'
+import { TenantResolverContext } from '../../TenantResolverContext'
+import {
+	MembershipValidationErrorType,
+	MembershipValidator,
+	PermissionActions,
+	ProjectManager,
+	ProjectMemberManager,
+} from '../../../model'
 import { createMembershipValidationErrorResult } from '../../membershipUtils'
-import { MembershipValidationErrorType, MembershipValidator } from '../../../model/service/MembershipValidator'
 import { createMembershipModification } from '../../../model/service/membershipUtils'
 import { Membership } from '../../../model/type/Membership'
 import { createErrorResponse, createProjectNotFoundResponse } from '../../errorUtils'
@@ -22,7 +27,7 @@ export class UpdateProjectMemberMutationResolver implements MutationResolvers {
 	async updateProjectMember(
 		parent: any,
 		{ projectSlug, identityId, memberships }: MutationUpdateProjectMemberArgs,
-		context: ResolverContext,
+		context: TenantResolverContext,
 	): Promise<UpdateProjectMemberResponse> {
 		const project = await this.projectManager.getProjectBySlug(context.db, projectSlug)
 		const projectScope = await context.permissionContext.createProjectScope(project)
@@ -56,7 +61,7 @@ export class UpdateProjectMemberMutationResolver implements MutationResolvers {
 			message: 'You are not allowed to update project member variables',
 		})
 
-		const validationResult = (await this.membershipValidator.validate(context.projectGroup, project.slug, memberships)).filter(
+		const validationResult = (await this.membershipValidator.validate(project.slug, memberships)).filter(
 			it => it.error !== MembershipValidationErrorType.VARIABLE_EMPTY,
 		)
 		if (validationResult.length > 0) {

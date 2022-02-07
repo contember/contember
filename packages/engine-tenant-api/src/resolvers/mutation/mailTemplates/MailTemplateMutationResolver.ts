@@ -8,7 +8,7 @@ import {
 	RemoveMailTemplateErrorCode,
 	RemoveMailTemplateResponse,
 } from '../../../schema'
-import { ResolverContext } from '../../ResolverContext'
+import { TenantResolverContext } from '../../TenantResolverContext'
 import { MailTemplateManager, MailType, PermissionActions, ProjectManager } from '../../../model'
 import { createErrorResponse, createProjectNotFoundResponse } from '../../errorUtils'
 
@@ -21,7 +21,7 @@ export class MailTemplateMutationResolver implements MutationResolvers {
 	async addMailTemplate(
 		parent: any,
 		{ template: { content, projectSlug, subject, type, useLayout, variant } }: MutationAddProjectMailTemplateArgs,
-		context: ResolverContext,
+		context: TenantResolverContext,
 	): Promise<AddMailTemplateResponse> {
 		const project = projectSlug ? await this.projectManager.getProjectBySlug(context.db, projectSlug) : null
 		await context.requireAccess({
@@ -51,7 +51,7 @@ export class MailTemplateMutationResolver implements MutationResolvers {
 	async removeMailTemplate(
 		parent: any,
 		{ templateIdentifier: { projectSlug, type, variant } }: MutationRemoveProjectMailTemplateArgs,
-		context: ResolverContext,
+		context: TenantResolverContext,
 	): Promise<RemoveMailTemplateResponse> {
 		const project = projectSlug ? await this.projectManager.getProjectBySlug(context.db, projectSlug) : null
 		await context.requireAccess({

@@ -4,7 +4,7 @@ import { ContentQueryHandlerFactory, KoaState } from './ContentQueryHandlerFacto
 import { GraphQLSchema } from 'graphql'
 import { DatabaseContext } from '@contember/engine-system-api'
 import { KoaMiddleware } from '../koa'
-import { StageConfig } from '../ProjectConfig'
+import { StageConfig } from '../config'
 
 export class ContentQueryHandlerProvider {
 	private cache = new WeakMap<GraphQLSchema, KoaMiddleware<KoaState>>()

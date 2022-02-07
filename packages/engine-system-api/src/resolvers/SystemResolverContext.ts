@@ -1,15 +1,13 @@
 import { Authorizator } from '@contember/authorization'
 import { Schema } from '@contember/schema'
 import { ForbiddenError } from 'apollo-server-errors'
-import { DatabaseContext, SchemaVersionBuilder } from '../model'
+import { DatabaseContext, Identity, SchemaVersionBuilder } from '../model'
 import { ProjectConfig } from '../types'
-import { Identity } from '../model/authorization'
 import { StagePermissionsFactory } from '../model/authorization/StagePermissionsFactory'
 import { StageScope } from '../model/authorization/StageScope'
 import { ItemLoader } from '../utils/batchQuery'
-import { Client } from '@contember/database'
 
-export class ResolverContextFactory {
+export class SystemResolverContextFactory {
 	constructor(
 		private readonly authorizator: Authorizator<Identity>,
 		private readonly schemaVersionBuilder: SchemaVersionBuilder,
@@ -17,10 +15,9 @@ export class ResolverContextFactory {
 
 	public async create(
 		systemDbContext: DatabaseContext,
-		tenantDb: Client,
 		project: ProjectConfig,
 		identity: Identity,
-	): Promise<ResolverContext> {
+	): Promise<SystemResolverContext> {
 		const schema = await this.schemaVersionBuilder.buildSchema(systemDbContext)
 		const stagePermissionsFactory = new StagePermissionsFactory(schema)
 		const loaders = new Map<LoaderFactory<any, any>, ItemLoader<any, any>>()
@@ -44,14 +41,13 @@ export class ResolverContextFactory {
 				loaders.set(loaderFactory, newLoader)
 				return newLoader
 			},
-			tenantDb,
 		}
 	}
 }
 
 export type LoaderFactory<Args, Item> = (db: DatabaseContext) => ItemLoader<Args, Item>
 
-export interface ResolverContext {
+export interface SystemResolverContext {
 	readonly project: ProjectConfig
 	readonly schema: Schema
 	readonly identity: Identity
@@ -59,5 +55,4 @@ export interface ResolverContext {
 	readonly authorizator: Authorizator<Identity>
 	readonly requireAccess: (action: Authorizator.Action, stage: string, message?: string) => Promise<void>
 	readonly getLoader: <Args, Item>(loaderFactory: LoaderFactory<Args, Item>) => ItemLoader<Args, Item>
-	readonly tenantDb: Client
 }

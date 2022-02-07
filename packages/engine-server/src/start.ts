@@ -68,7 +68,7 @@ const createServerTerminator = (): Server[] => {
 		}
 	}
 
-	const { config, projectConfigResolver } = await readConfig(configSources, configProcessors)
+	const { config, projectConfigResolver, tenantConfigResolver } = await readConfig(configSources, configProcessors)
 
 	if (process.argv[2] === 'validate') {
 		process.exit(0)
@@ -85,6 +85,7 @@ const createServerTerminator = (): Server[] => {
 		debugMode: isDebug,
 		config,
 		projectConfigResolver,
+		tenantConfigResolver,
 		plugins,
 		processType,
 		version,

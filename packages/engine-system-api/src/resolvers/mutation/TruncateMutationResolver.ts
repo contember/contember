@@ -1,5 +1,5 @@
 import { GraphQLResolveInfo } from 'graphql'
-import { ResolverContext } from '../ResolverContext'
+import { SystemResolverContext } from '../SystemResolverContext'
 import { MutationResolver } from '../Resolver'
 import { TruncateResponse } from '../../schema'
 import { ProjectTruncateExecutor } from '../../model'
@@ -9,7 +9,7 @@ export class TruncateMutationResolver implements MutationResolver<'truncate'> {
 	async truncate(
 		parent: any,
 		args: any,
-		context: ResolverContext,
+		context: SystemResolverContext,
 		info: GraphQLResolveInfo,
 	): Promise<TruncateResponse> {
 		await this.projectTruncateExecutor.truncateProject(context.db, context.project, context.schema)

@@ -1,4 +1,4 @@
-import { createResolverContext, IdentityTypeResolver, ResolverContext } from '../index'
+import { createResolverContext, IdentityTypeResolver, TenantResolverContext } from '../index'
 import { PermissionContextFactory, SignInResult } from '../../model'
 import { CommonSignInResult } from '../../schema'
 
@@ -9,12 +9,9 @@ export class SignInResponseFactory {
 	) {
 	}
 
-	public async createResponse(
-		signInResult: SignInResult,
-		context: ResolverContext,
-	): Promise<CommonSignInResult> {
+	public async createResponse(signInResult: SignInResult, context: TenantResolverContext): Promise<CommonSignInResult> {
 		const identityId = signInResult.person.identity_id
-		const permissionContext = this.permissionContextFactory.create(context.projectGroup, {
+		const permissionContext = this.permissionContextFactory.create(context.db, {
 			id: identityId,
 			roles: signInResult.person.roles,
 		})

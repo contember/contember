@@ -1,6 +1,6 @@
 import { Typesafe } from '@contember/engine-common'
 import { MailerOptions } from '@contember/engine-tenant-api'
-import { upperCaseFirst } from '../utils/strings'
+import { upperCaseFirst } from '../utils'
 
 
 export const dbCredentialsSchema = Typesafe.intersection(
@@ -66,6 +66,7 @@ export const serverConfigSchema = Typesafe.intersection(
 		workerCount: Typesafe.union(Typesafe.number, Typesafe.string),
 		projectGroup: (val, path) => Typesafe.valueAt(val, ['domainMapping']) === undefined ? undefined : Typesafe.object({
 			domainMapping: Typesafe.string,
+
 		})(val, path),
 	}),
 )

@@ -4,7 +4,7 @@ import {
 	MutationUpdateProjectArgs,
 	UpdateProjectResponse,
 } from '../../../schema'
-import { ResolverContext } from '../../ResolverContext'
+import { TenantResolverContext } from '../../TenantResolverContext'
 import { PermissionActions, ProjectManager } from '../../../model'
 import { createProjectNotFoundResponse } from '../../errorUtils'
 import { Merger } from '@contember/config-loader'
@@ -15,7 +15,7 @@ export class UpdateProjectMutationResolver implements MutationResolvers {
 	async updateProject(
 		parent: any,
 		args: MutationUpdateProjectArgs,
-		context: ResolverContext,
+		context: TenantResolverContext,
 	): Promise<UpdateProjectResponse> {
 		const project = await this.projectManager.getProjectBySlug(context.db, args.projectSlug)
 		await context.requireAccess({

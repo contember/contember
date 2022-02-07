@@ -4,7 +4,7 @@ import {
 	MutationAddProjectMemberArgs,
 	MutationResolvers,
 } from '../../../schema'
-import { ResolverContext } from '../../ResolverContext'
+import { TenantResolverContext } from '../../TenantResolverContext'
 import { MembershipValidator, PermissionActions, ProjectManager, ProjectMemberManager } from '../../../model'
 import { createMembershipValidationErrorResult } from '../../membershipUtils'
 import { createErrorResponse, createProjectNotFoundResponse } from '../../errorUtils'
@@ -19,7 +19,7 @@ export class AddProjectMemberMutationResolver implements MutationResolvers {
 	async addProjectMember(
 		parent: any,
 		{ projectSlug, identityId, memberships }: MutationAddProjectMemberArgs,
-		context: ResolverContext,
+		context: TenantResolverContext,
 	): Promise<AddProjectMemberResponse> {
 		const project = await this.projectManager.getProjectBySlug(context.db, projectSlug)
 		await context.requireAccess({
@@ -30,7 +30,7 @@ export class AddProjectMemberMutationResolver implements MutationResolvers {
 		if (!project) {
 			return createProjectNotFoundResponse(AddProjectMemberErrorCode.ProjectNotFound, projectSlug)
 		}
-		const validationResult = await this.membershipValidator.validate(context.projectGroup, project.slug, memberships)
+		const validationResult = await this.membershipValidator.validate(project.slug, memberships)
 		if (validationResult.length > 0) {
 			const errors = createMembershipValidationErrorResult<AddProjectMemberErrorCode>(validationResult)
 			return {

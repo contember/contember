@@ -14,8 +14,4 @@ export interface StageConfig {
 }
 
 export type ProjectSecrets = Record<string, string>
-export type ProjectConfigResolver = (
-	slug: string,
-	additionalConfig: any,
-	secrets: ProjectSecrets,
-) => ProjectConfig
+

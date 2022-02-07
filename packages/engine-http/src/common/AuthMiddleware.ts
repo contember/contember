@@ -1,4 +1,4 @@
-import { ApiKeyManager, VerifyResult } from '@contember/engine-tenant-api'
+import { VerifyResult } from '@contember/engine-tenant-api'
 import { KoaContext, KoaMiddleware } from '../koa'
 import { TimerMiddlewareState } from './TimerMiddleware'
 import { ErrorFactory } from './ErrorFactory'
@@ -20,7 +20,6 @@ const assumeIdentityHeader = 'x-contember-assume-identity'
 
 export class AuthMiddlewareFactory {
 	constructor(
-		private readonly apiKeyManager: ApiKeyManager,
 		private readonly errorFactory: ErrorFactory,
 	) {
 	}
@@ -40,8 +39,10 @@ export class AuthMiddlewareFactory {
 				return authError(ctx, `invalid Authorization header format`)
 			}
 			const [, token] = match
-			const tenantDatabase = ctx.state.projectGroup.database
-			const authResult = await ctx.state.timer('Auth', () => this.apiKeyManager.verifyAndProlong(tenantDatabase, token))
+			const projectGroupContainer = ctx.state.projectGroupContainer
+			const tenantDatabase = projectGroupContainer.tenantDatabase
+			const tenantContainer = projectGroupContainer.tenantContainer
+			const authResult = await ctx.state.timer('Auth', () => tenantContainer.apiKeyManager.verifyAndProlong(tenantDatabase, token))
 			if (!authResult.ok) {
 				return authError(ctx, authResult.errorMessage)
 			}

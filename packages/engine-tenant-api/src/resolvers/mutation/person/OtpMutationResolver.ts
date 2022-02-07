@@ -8,7 +8,7 @@ import {
 	MutationResolvers,
 	PrepareOtpResponse,
 } from '../../../schema'
-import { ResolverContext } from '../../ResolverContext'
+import { TenantResolverContext } from '../../TenantResolverContext'
 import { DatabaseContext, OtpManager, PermissionActions, PersonQuery, PersonRow } from '../../../model'
 import { ImplementationException } from '../../../exceptions'
 import { createErrorResponse } from '../../errorUtils'
@@ -16,7 +16,7 @@ import { createErrorResponse } from '../../errorUtils'
 export class OtpMutationResolver implements MutationResolvers {
 	constructor(private readonly otpManager: OtpManager) {}
 
-	async prepareOtp(parent: any, args: MutationPrepareOtpArgs, context: ResolverContext): Promise<PrepareOtpResponse> {
+	async prepareOtp(parent: any, args: MutationPrepareOtpArgs, context: TenantResolverContext): Promise<PrepareOtpResponse> {
 		const person = await this.getPersonFromContext(context)
 		const otp = await this.otpManager.prepareOtp(context.db, person, args.label || 'Contember')
 		return {
@@ -28,7 +28,7 @@ export class OtpMutationResolver implements MutationResolvers {
 		}
 	}
 
-	async confirmOtp(parent: any, args: MutationConfirmOtpArgs, context: ResolverContext): Promise<ConfirmOtpResponse> {
+	async confirmOtp(parent: any, args: MutationConfirmOtpArgs, context: TenantResolverContext): Promise<ConfirmOtpResponse> {
 		const person = await this.getPersonFromContext(context)
 		if (!person.otp_uri) {
 			return createErrorResponse(
@@ -46,7 +46,7 @@ export class OtpMutationResolver implements MutationResolvers {
 		}
 	}
 
-	async disableOtp(parent: any, args: {}, context: ResolverContext): Promise<DisableOtpResponse> {
+	async disableOtp(parent: any, args: {}, context: TenantResolverContext): Promise<DisableOtpResponse> {
 		const person = await this.getPersonFromContext(context)
 		if (!person.otp_uri) {
 			return createErrorResponse(DisableOtpErrorCode.OtpNotActive, 'OTP is not active, you cannot disable it.')
@@ -58,7 +58,7 @@ export class OtpMutationResolver implements MutationResolvers {
 		}
 	}
 
-	private async getPersonFromContext(context: ResolverContext): Promise<PersonRow> {
+	private async getPersonFromContext(context: TenantResolverContext): Promise<PersonRow> {
 		await context.requireAccess({
 			action: PermissionActions.PERSON_SETUP_OTP,
 			message: 'You are not allowed to setup a OTP',

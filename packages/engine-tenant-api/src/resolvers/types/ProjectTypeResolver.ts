@@ -1,11 +1,6 @@
 import { ProjectIdentityRelation, ProjectMembersArgs, ProjectResolvers } from '../../schema'
-import { ResolverContext } from '../ResolverContext'
-import {
-	PermissionActions,
-	Project,
-	ProjectMemberManager,
-	ProjectSchemaResolver,
-} from '../../model'
+import { TenantResolverContext } from '../TenantResolverContext'
+import { PermissionActions, Project, ProjectMemberManager, ProjectSchemaResolver } from '../../model'
 import { getRoleVariables } from '@contember/schema-utils'
 import { Acl } from '@contember/schema'
 
@@ -18,7 +13,7 @@ export class ProjectTypeResolver implements ProjectResolvers {
 	async members(
 		parent: Project,
 		args: ProjectMembersArgs,
-		context: ResolverContext,
+		context: TenantResolverContext,
 	): Promise<readonly ProjectIdentityRelation[]> {
 		const projectScope = await context.permissionContext.createProjectScope(parent)
 		const verifier = context.permissionContext.createAccessVerifier(projectScope)
@@ -33,8 +28,8 @@ export class ProjectTypeResolver implements ProjectResolvers {
 		}))
 	}
 
-	async roles(parent: Project, args: unknown, context: ResolverContext) {
-		const schema = await this.projectSchemaResolver.getSchema(context.projectGroup, parent.slug)
+	async roles(parent: Project, args: unknown, context: TenantResolverContext) {
+		const schema = await this.projectSchemaResolver.getSchema(parent.slug)
 		if (!schema) {
 			return []
 		}

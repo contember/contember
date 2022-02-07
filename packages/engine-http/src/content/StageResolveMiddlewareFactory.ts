@@ -1,6 +1,6 @@
 import { KoaMiddleware, KoaRequestState } from '../koa'
 import { ProjectResolveMiddlewareState } from '../project-common'
-import { StageConfig } from '../ProjectConfig'
+import { StageConfig } from '../config'
 import { AuthMiddlewareState, ErrorFactory } from '../common'
 
 type InputKoaState =

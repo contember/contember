@@ -1,5 +1,5 @@
-import { ResolverContext } from './ResolverContext'
-import { PermissionContext, PermissionContextFactory, ProjectGroup } from '../model'
+import { TenantResolverContext } from './TenantResolverContext'
+import { DatabaseContext, PermissionContext, PermissionContextFactory } from '../model'
 
 export const createResolverContext = (permissionContext: PermissionContext, apiKeyId: string) => {
 	return {
@@ -11,20 +11,22 @@ export const createResolverContext = (permissionContext: PermissionContext, apiK
 	}
 }
 
-export class ResolverContextFactory {
+export class TenantResolverContextFactory {
 	constructor(
 		private readonly permissionContextFactory: PermissionContextFactory,
 	) {}
 
-	public create(authContext: { apiKeyId: string; identityId: string; roles: string[] }, projectGroup: ProjectGroup): ResolverContext {
-		const permissionContext = this.permissionContextFactory.create(projectGroup, {
+	public create(
+		authContext: { apiKeyId: string; identityId: string; roles: string[] },
+		db: DatabaseContext,
+	): TenantResolverContext {
+		const permissionContext = this.permissionContextFactory.create(db, {
 			id: authContext.identityId,
 			roles: authContext.roles,
 		})
 		return {
 			...createResolverContext(permissionContext, authContext.apiKeyId),
-			projectGroup,
-			db: projectGroup.database,
+			db,
 		}
 	}
 }

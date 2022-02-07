@@ -1,4 +1,4 @@
-import { Client, Connection, EventManager } from '@contember/database'
+import { Client, Connection, DatabaseCredentials, EventManager } from '@contember/database'
 import 'uvu'
 import * as assert from 'uvu/assert'
 
@@ -8,7 +8,10 @@ export interface ExpectedQuery {
 	response: Partial<Connection.Result>
 }
 
-export class ConnectionMock implements Connection.TransactionLike, Connection.ClientFactory, Connection.PoolStatusProvider  {
+export class ConnectionMock implements Connection.ConnectionType  {
+
+	public config: DatabaseCredentials = { database: '', host: '', password: '', user: '', port: 5432 }
+
 	constructor(
 		private readonly queries: ExpectedQuery[],
 		public readonly eventManager = new EventManager(),
@@ -100,6 +103,6 @@ ${expected.sql}`
 
 export const createConnectionMock = (
 	queries: ExpectedQuery[],
-): Connection.TransactionLike & Connection.ClientFactory & Connection.PoolStatusProvider => {
+): Connection.ConnectionType => {
 	return new ConnectionMock(queries)
 }

@@ -1,5 +1,5 @@
 export * from './mutation'
 export * from './query'
 export * from './Resolver'
-export * from './ResolverContext'
+export * from './SystemResolverContext'
 export * from './ResolverFactory'

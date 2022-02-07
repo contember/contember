@@ -9,10 +9,22 @@ import {
 	ContentQueryHandlerProvider,
 	ContentSchemaResolver,
 	GraphQlSchemaFactory,
-	Providers,
-	ProjectContainer,
+	ProjectContainer, Providers,
 } from '@contember/engine-http'
 import { ContentQueryHandlerFactory } from '@contember/engine-http'
+
+export class ProjectContainerFactoryFactory {
+	constructor(
+		private readonly debug: boolean,
+		private readonly plugins: Plugin[],
+		private readonly providers: Providers,
+	) {
+	}
+
+	create(schemaVersionBuilder: SchemaVersionBuilder): ProjectContainerFactory {
+		return new ProjectContainerFactory(this.debug, this.plugins, schemaVersionBuilder, this.providers)
+	}
+}
 
 export class ProjectContainerFactory {
 	constructor(

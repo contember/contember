@@ -1,10 +1,11 @@
 import { AccessEvaluator, Authorizator } from '@contember/authorization'
-import { Connection, DatabaseCredentials } from '@contember/database'
+import { Connection } from '@contember/database'
 import { Builder } from '@contember/dic'
 import {
 	AclSchemaEvaluatorFactory,
 	ApiKeyManager,
 	ApiKeyService,
+	DatabaseContext,
 	DatabaseContextFactory,
 	Identity,
 	IdentityFactory,
@@ -20,7 +21,6 @@ import {
 	PasswordResetManager,
 	PermissionContextFactory,
 	PermissionsFactory,
-	ProjectGroupProvider,
 	ProjectInitializer,
 	ProjectManager,
 	ProjectMemberManager,
@@ -52,51 +52,49 @@ import {
 	ProjectTypeResolver,
 	RemoveProjectMemberMutationResolver,
 	ResetPasswordMutationResolver,
-	ResolverContextFactory,
 	ResolverFactory,
 	SetProjectSecretMutationResolver,
 	SignInMutationResolver,
 	SignOutMutationResolver,
 	SignUpMutationResolver,
+	TenantResolverContextFactory,
 	UpdateProjectMemberMutationResolver,
 	UpdateProjectMutationResolver,
 } from './resolvers'
 import * as Schema from './schema'
 import { createMailer, MailerOptions, TemplateRenderer } from './utils'
-import { MigrationsRunnerFactory, TenantCredentials } from './migrations'
 import { IdentityFetcher } from './bridges/system/IdentityFetcher'
 import { SignInResponseFactory } from './resolvers/responseHelpers/SignInResponseFactory'
 import { IDPManager } from './model/service/idp/IDPManager'
 import { IDPQueryResolver } from './resolvers/query/IDPQueryResolver'
 import { UpdateIDPMutationResolver } from './resolvers/mutation/idp/UpdateIDPMutationResolver'
-
-export type ConnectionType = Connection.ConnectionLike & Connection.ClientFactory & Connection.PoolStatusProvider
+import { TenantCredentials, TenantMigrationsRunner } from './migrations'
 
 export interface TenantContainer {
-	connection: ConnectionType
-	projectGroupProvider: ProjectGroupProvider
 	projectMemberManager: ProjectMemberManager
 	apiKeyManager: ApiKeyManager
 	signUpManager: SignUpManager
 	projectManager: ProjectManager
 	resolvers: Schema.Resolvers
-	resolverContextFactory: ResolverContextFactory
+	resolverContextFactory: TenantResolverContextFactory
 	authorizator: Authorizator<Identity>
-	migrationsRunnerFactory: MigrationsRunnerFactory
 	identityFetcher: IdentityFetcher
+	databaseContext: DatabaseContext
+	migrationsRunner: TenantMigrationsRunner
+	connection: Connection.ConnectionType
 }
 
 export interface TenantContainerArgs {
-	providers: Providers
+	connection: Connection.ConnectionType
+	mailOptions: MailerOptions
 	projectSchemaResolver: ProjectSchemaResolver
 	projectInitializer: ProjectInitializer
+	tenantCredentials: TenantCredentials
 }
 
 export class TenantContainerFactory {
 	constructor(
-		private readonly tenantDbCredentials: DatabaseCredentials,
-		private readonly mailOptions: MailerOptions,
-		private readonly tenantCredentials: TenantCredentials,
+		private readonly providers: Providers,
 	) {}
 
 	create(args: TenantContainerArgs): TenantContainer {
@@ -110,19 +108,19 @@ export class TenantContainerFactory {
 				'resolvers',
 				'authorizator',
 				'resolverContextFactory',
-				'connection',
-				'projectGroupProvider',
-				'migrationsRunnerFactory',
 				'identityFetcher',
+				'databaseContext',
+				'migrationsRunner',
+				'connection',
 			)
 	}
 
 	createBuilder(args: TenantContainerArgs) {
 		return new Builder({})
 			.addService('providers', () =>
-				args.providers)
+				this.providers)
 			.addService('mailer', () =>
-				createMailer(this.mailOptions))
+				createMailer(args.mailOptions))
 			.addService('projectSchemaResolver', () =>
 				args.projectSchemaResolver)
 			.addService('templateRenderer', () =>
@@ -145,10 +143,10 @@ export class TenantContainerFactory {
 				new ProjectMemberManager())
 			.addService('identityFactory', ({ projectMemberManager }) =>
 				new IdentityFactory(projectMemberManager))
-			.addService('projectScopeFactory', ({ projectSchemaResolver }) =>
-				new ProjectScopeFactory(projectSchemaResolver, new AclSchemaEvaluatorFactory()))
-			.addService('permissionContextFactory', ({ authorizator, identityFactory, projectScopeFactory }) =>
-				new PermissionContextFactory(authorizator, identityFactory, projectScopeFactory))
+			.addService('projectScopeFactory', () =>
+				new ProjectScopeFactory(new AclSchemaEvaluatorFactory()))
+			.addService('permissionContextFactory', ({ authorizator, identityFactory, projectScopeFactory, projectSchemaResolver }) =>
+				new PermissionContextFactory(authorizator, identityFactory, projectScopeFactory, projectSchemaResolver))
 			.addService('secretManager', ({ providers }) =>
 				new SecretsManager(providers))
 			.addService('projectManager', ({ secretManager, apiKeyService }) =>
@@ -176,8 +174,7 @@ export class TenantContainerFactory {
 				new OtpManager(otpAuthenticator))
 			.addService('mailTemplateManager', () =>
 				new MailTemplateManager())
-			.addService('identityFetcher', () =>
-				new IdentityFetcher())
+
 			.addService('identityTypeResolver', ({ projectMemberManager, projectManager }) =>
 				new IdentityTypeResolver(projectMemberManager, projectManager))
 			.addService('projectTypeResolver', ({ projectMemberManager, projectSchemaResolver }) =>
@@ -235,17 +232,16 @@ export class TenantContainerFactory {
 			.addService('setProjectSecretMutationResolver', ({ projectManager, secretManager }) =>
 				new SetProjectSecretMutationResolver(projectManager, secretManager))
 			.addService('resolverContextFactory', ({ permissionContextFactory }) =>
-				new ResolverContextFactory(permissionContextFactory))
+				new TenantResolverContextFactory(permissionContextFactory))
 			.addService('resolvers', container =>
 				new ResolverFactory(container).create())
-
-			.addService('connection', (): ConnectionType =>
-				new Connection(this.tenantDbCredentials, {}))
-			.addService('databaseContextFactory', ({ connection, providers }) =>
-				new DatabaseContextFactory(connection, providers))
-			.addService('migrationsRunnerFactory', ({ providers }) =>
-				new MigrationsRunnerFactory(this.tenantDbCredentials, this.tenantCredentials, providers))
-			.addService('projectGroupProvider', ({ databaseContextFactory, migrationsRunnerFactory }) =>
-				new ProjectGroupProvider(databaseContextFactory, migrationsRunnerFactory))
+			.addService('connection', () =>
+				args.connection)
+			.addService('databaseContext', ({ connection, providers }) =>
+				new DatabaseContextFactory(connection, providers).create())
+			.addService('identityFetcher', ({ databaseContext }) =>
+				new IdentityFetcher(databaseContext.client))
+			.addService('migrationsRunner', ({ providers }) =>
+				new TenantMigrationsRunner(args.connection.config, 'tenant', args.tenantCredentials, providers))
 	}
 }

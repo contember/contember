@@ -8,10 +8,11 @@ import {
 	ResetPasswordResponse,
 } from '../../../schema'
 import { GraphQLResolveInfo } from 'graphql'
-import { ResolverContext } from '../../ResolverContext'
+import { TenantResolverContext } from '../../TenantResolverContext'
 import {
 	PasswordResetManager,
-	PermissionActions, PermissionContextFactory,
+	PermissionActions,
+	PermissionContextFactory,
 	PersonQuery,
 	ResetPasswordCommandErrorCode,
 	ResetPasswordErrorCode,
@@ -27,7 +28,7 @@ export class ResetPasswordMutationResolver implements MutationResolvers {
 	async createResetPasswordRequest(
 		parent: any,
 		args: MutationCreateResetPasswordRequestArgs,
-		context: ResolverContext,
+		context: TenantResolverContext,
 		info: GraphQLResolveInfo,
 	): Promise<CreatePasswordResetRequestResponse> {
 		await context.requireAccess({
@@ -40,7 +41,7 @@ export class ResetPasswordMutationResolver implements MutationResolvers {
 		}
 
 
-		const permissionContext = await this.permissionContextFactory.create(context.projectGroup, {
+		const permissionContext = await this.permissionContextFactory.create(context.db, {
 			id: person.identity_id,
 			roles: person.roles,
 		})
@@ -54,7 +55,7 @@ export class ResetPasswordMutationResolver implements MutationResolvers {
 	async resetPassword(
 		parent: any,
 		args: MutationResetPasswordArgs,
-		context: ResolverContext,
+		context: TenantResolverContext,
 		info: GraphQLResolveInfo,
 	): Promise<ResetPasswordResponse> {
 		await context.requireAccess({

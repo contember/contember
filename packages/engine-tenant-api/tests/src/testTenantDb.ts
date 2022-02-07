@@ -1,14 +1,13 @@
 import { GraphQLTestQuery } from '../cases/integration/mocked/gql/types'
 import { testUuid } from './testUuid'
 import {
-	computeTokenHash,
 	CreateProjectCommand,
-	createResolverContext, DatabaseContext, MigrationsRunnerFactory,
-	PermissionContext, ProjectGroup,
+	createResolverContext,
+	PermissionContext,
 	ProjectSchemaResolver,
-	ResolverContext,
 	StaticIdentity,
-	TenantContainerFactory,
+	TenantContainerFactory, TenantMigrationsRunner,
+	TenantResolverContext,
 	typeDefs,
 } from '../../src'
 import { Buffer } from 'buffer'
@@ -16,13 +15,11 @@ import { makeExecutableSchema } from '@graphql-tools/schema'
 import { Acl, Schema } from '@contember/schema'
 import { createMockedMailer, MockedMailer } from './mailer'
 import { dbCredentials, recreateDatabase } from './dbUtils'
-import { MigrationsRunner } from '@contember/database-migrations'
 import { graphql } from 'graphql'
 import { Membership } from '../../src/model/type/Membership'
 import { Connection } from '@contember/database'
 import * as uvu from 'uvu'
 import * as assert from 'uvu/assert'
-import { TenantMigrationArgs } from '../../src/migrations'
 
 export interface TenantTest {
 	query: GraphQLTestQuery
@@ -114,26 +111,28 @@ export const createTenantTester = async (): Promise<TenantTester> => {
 		hash: (value: any) => Buffer.from(value.toString()),
 	}
 
-	const migrationsRunnerFactory = new MigrationsRunnerFactory(credentials, {
+	const migrationsRunner = new TenantMigrationsRunner(credentials, 'tenant', {
 		rootToken: process.env.CONTEMBER_ROOT_TOKEN,
 	}, providers)
 	let counter = 0
-	const migrationsRunner = migrationsRunnerFactory.create('tenant')
-
 	await migrationsRunner.run(() => null)
 	const mailer = createMockedMailer()
-	const tenantContainer = new TenantContainerFactory(credentials, {}, {})
+	const projectInitializer = {
+		initializeProject: () => Promise.resolve(),
+	}
+	const connection = new Connection(credentials, {})
+	const tenantContainer = new TenantContainerFactory(providers)
 		.createBuilder({
-			providers,
+			mailOptions: {},
+			tenantCredentials: {},
 			projectSchemaResolver,
-			projectInitializer: {
-				initializeProject: () => Promise.resolve(),
-			},
+			projectInitializer,
+			connection,
 		})
 		.replaceService('mailer', () => mailer)
 		.build()
 
-	const dbContext = tenantContainer.databaseContextFactory.create(undefined)
+	const dbContext = tenantContainer.databaseContext
 
 	await dbContext.commandBus.execute(new CreateProjectCommand({
 		slug: 'blog',
@@ -148,14 +147,10 @@ export const createTenantTester = async (): Promise<TenantTester> => {
 			requireResolversForResolveType: 'ignore',
 		},
 	})
-	const projectGroup: ProjectGroup = {
-		database: dbContext,
-		slug: undefined,
-	}
 
 	return {
 		async execute(query: GraphQLTestQuery, options: TenantTestOptions = {}): Promise<any> {
-			const context: ResolverContext = {
+			const context: TenantResolverContext = {
 				...createResolverContext(
 					new PermissionContext(
 						new StaticIdentity(authenticatedIdentityId, options.roles || [], {
@@ -163,11 +158,10 @@ export const createTenantTester = async (): Promise<TenantTester> => {
 						}),
 						tenantContainer.authorizator,
 						tenantContainer.projectScopeFactory,
-						projectGroup,
+						projectSchemaResolver,
 					),
 					authenticatedApiKeyId,
 				),
-				projectGroup,
 				db: dbContext,
 			}
 			const result = await graphql(
@@ -185,7 +179,7 @@ export const createTenantTester = async (): Promise<TenantTester> => {
 		},
 		mailer,
 		end: async () => {
-			await (tenantContainer.connection as Connection).end()
+			await connection.end()
 		},
 	}
 }

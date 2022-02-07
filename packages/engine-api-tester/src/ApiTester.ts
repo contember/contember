@@ -49,13 +49,11 @@ export class ApiTester {
 		const modificationHandlerFactory = new ModificationHandlerFactory(ModificationHandlerFactory.defaultFactoryMap)
 		const gqlSchemaBuilderFactory = new GraphQlSchemaBuilderFactory()
 
-		const systemContainerFactory = new SystemContainerFactory()
+		const systemContainerFactory = new SystemContainerFactory(providers, modificationHandlerFactory)
 		const projectSlug = options.project?.slug || ApiTester.project.slug
 		const migrationFilesManager = MigrationFilesManager.createForProject(ApiTester.getMigrationsDir(), projectSlug)
 		const migrationsResolver = options.migrationsResolver || new MigrationsResolver(migrationFilesManager)
 		let systemContainerBuilder = systemContainerFactory.createBuilder({
-			modificationHandlerFactory,
-			providers: providers,
 			identityFetcher: {
 				fetchIdentities: () => {
 					return Promise.resolve([])

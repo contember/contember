@@ -5,8 +5,10 @@ import {
 	MutationSignInIdpArgs,
 	SignInIdpResponse,
 } from '../../../schema'
-import { ResolverContext } from '../../ResolverContext'
-import { IDPSignInManager, PermissionActions } from '../../../model'
+import { TenantResolverContext } from '../../TenantResolverContext'
+import { IDPSignInManager, PermissionActions, PermissionContextFactory } from '../../../model'
+import { createResolverContext } from '../../TenantResolverContextFactory'
+import { IdentityTypeResolver } from '../../types'
 import { createErrorResponse } from '../../errorUtils'
 import { SignInResponseFactory } from '../../responseHelpers/SignInResponseFactory'
 
@@ -19,7 +21,7 @@ export class IDPMutationResolver implements MutationResolvers {
 	async initSignInIDP(
 		parent: any,
 		args: MutationInitSignInIdpArgs,
-		context: ResolverContext,
+		context: TenantResolverContext,
 	): Promise<InitSignInIdpResponse> {
 		await context.requireAccess({
 			action: PermissionActions.PERSON_CREATE_IDP_URL,
@@ -32,7 +34,7 @@ export class IDPMutationResolver implements MutationResolvers {
 		return { ok: true, errors: [], result: result.result }
 	}
 
-	async signInIDP(parent: any, args: MutationSignInIdpArgs, context: ResolverContext): Promise<SignInIdpResponse> {
+	async signInIDP(parent: any, args: MutationSignInIdpArgs, context: TenantResolverContext): Promise<SignInIdpResponse> {
 		await context.requireAccess({
 			action: PermissionActions.PERSON_SIGN_IN_IDP,
 			message: 'You are not allowed to person IDP sign in',

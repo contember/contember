@@ -8,8 +8,8 @@ import {
 	MutationResolvers,
 } from '../../../schema'
 import { GraphQLResolveInfo } from 'graphql'
-import { ResolverContext } from '../../ResolverContext'
-import { DatabaseContext, IdentityScope, PasswordChangeManager, PermissionActions, PersonQuery } from '../../../model'
+import { TenantResolverContext } from '../../TenantResolverContext'
+import { IdentityScope, PasswordChangeManager, PermissionActions, PersonQuery } from '../../../model'
 import { createErrorResponse } from '../../errorUtils'
 
 export class ChangePasswordMutationResolver implements MutationResolvers {
@@ -20,7 +20,7 @@ export class ChangePasswordMutationResolver implements MutationResolvers {
 	async changePassword(
 		parent: unknown,
 		args: MutationChangePasswordArgs,
-		context: ResolverContext,
+		context: TenantResolverContext,
 		info: GraphQLResolveInfo,
 	): Promise<ChangePasswordResponse> {
 		const person = await context.db.queryHandler.fetch(PersonQuery.byId(args.personId))
@@ -45,7 +45,7 @@ export class ChangePasswordMutationResolver implements MutationResolvers {
 	async changeMyPassword(
 		parent: unknown,
 		args: MutationChangeMyPasswordArgs,
-		context: ResolverContext,
+		context: TenantResolverContext,
 		info: GraphQLResolveInfo,
 	): Promise<ChangeMyPasswordResponse> {
 		const person = await context.db.queryHandler.fetch(PersonQuery.byIdentity(context.identity.id))

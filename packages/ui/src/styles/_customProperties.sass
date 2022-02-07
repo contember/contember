@@ -11,10 +11,11 @@
 	--cui-font-family: Poppins, Roboto, #{$font-family-sans-serif-fallback}
 
 	--cui-line-height: 1.5
-	--cui-font-size-heading: #{em(16px)}
-	--cui-font-size-body: #{em(14px)}
-	--cui-font-size-label: #{em(13px)}
-	--cui-font-size-note: #{em(12px)}
+	--cui-font-size-body: 14px
+	--cui-font-size-heading: 1.125em
+	--cui-font-size-text: 1em
+	--cui-font-size-label: 0.875em
+	--cui-font-size-note: 0.8125em
 
 	--cui-logo-size: #{em(18px)}
 	--cui-logo-size--small: #{em(18px * 0.75)}
@@ -92,10 +93,7 @@
 
 	// Touch devices like mobiles
 	@media (hover: none) and (pointer: coarse)
-		--cui-font-size-heading: #{em(18px)}
-		--cui-font-size-body: #{em(16px)}
-		--cui-font-size-label: #{em(14px)}
-		--cui-font-size-note: #{em(12.5px)}
+		--cui-font-size-body: 16px
 
 		--cui-control-height--small: calc(var(--cui-tap-target-size) * 1.5 )
 		--cui-control-height: calc(var(--cui-tap-target-size) * 2)

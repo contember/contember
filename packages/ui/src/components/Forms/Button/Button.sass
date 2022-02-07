@@ -31,7 +31,7 @@
 	--cui-button-border-color--highlighted: rgba(0, 0, 0, 0)
 	--cui-button-border-color--pressed: rgba(0, 0, 0, 0)
 	--cui-button-border-width: 0px
-	--cui-button-font-size: var(--cui-font-size-label)
+	--cui-button-label-font-size: var(--cui-font-size-label)
 	--cui-button-height: var(--cui-control-height)
 	--cui-button-padding-horizontal: calc(3 * var(--cui-gap-horizontal))
 
@@ -44,7 +44,7 @@
 	box-shadow: var(--cui-button-box-shadow)
 	color: var(--cui-button-color)
 	display: inline-flex
-	font-size: 1em
+	font-size: unset
 	font-weight: 600
 	height: var(--cui-button-height)
 	overflow: hidden
@@ -85,7 +85,7 @@
 	&.view-large,
 	&-list.view-large &,
 	&-group.view-large &
-		--cui-button-font-size: var(--cui-font-size-body)
+		--cui-button-label-font-size: var(--cui-font-size-body)
 		--cui-button-height: var(--cui-control-height--large)
 		--cui-button-padding-horizontal: calc(var(--cui-gap) * 5 - #{$border-width-em})
 
@@ -170,7 +170,7 @@
 		text-align: end
 
 	&-content
-		font-size: var(--cui-button-font-size)
+		font-size: var(--cui-button-label-font-size)
 		flex: 1
 		line-height: 1em
 		padding-bottom: $cui-gap - $border-width-em

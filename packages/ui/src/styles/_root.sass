@@ -27,15 +27,16 @@ $cui-buildState-alreadyOutputRoot: false !default
 		margin: 0
 		padding: 0
 
+	html
+		display: flex
+
 	body
+		flex: 1 1 100%
 		font-family: var(--cui-font-family)
 		line-height: var(--cui-line-height)
 		margin: 0
 		padding: 0
 		font-smoothing: antialiased
-		min-width: 100vw
-		@media (min-width: $breakpoint-min-medium)
-			width: fit-content
 		-webkit-font-smoothing: antialiased
 
 	h1, h2, h3, h4, h5, h6

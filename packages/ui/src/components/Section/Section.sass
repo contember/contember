@@ -17,13 +17,13 @@
   padding-top: var(--cui-section-padding-top)
   scroll-margin-top: 6em // TODO: This is approximate, e.g. use some --cui-custom-property
   &:first-child
-    margin-top: calc(-1 * var(--cui-section-padding-top, 0em))
+    margin-top: calc(-1 * var(--cui-layout-page-padding-top, 0em))
     border-color: transparent
   & + &
     margin-bottom: 0
     margin-top: calc(-1 * var(--cui-layout-section-gap, 0em))
-  &:last-child:not(:first-child)
-    margin-bottom: calc(-1 * var(--cui-layout-section-gap, 0em))
+  &:last-child
+    margin-bottom: calc(-1 * var(--cui-layout-page-padding-bottom, 0em))
 
   .message--nesting-warning
     display: none

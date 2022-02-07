@@ -8,12 +8,12 @@ import {
 	useContext,
 	useState,
 } from 'react'
-import { useClassNamePrefix } from '../auxiliary'
-import { GlobalClassNamePrefixContext } from '../contexts'
-import { useNavigationLink } from '../Navigation'
-import { isSpecialLinkClick, toViewClass } from '../utils'
-import { Collapsible } from './Collapsible'
-import { Label, LabelOwnProps } from './Typography'
+import { useClassNamePrefix } from '../../auxiliary'
+import { GlobalClassNamePrefixContext } from '../../contexts'
+import { useNavigationLink } from '../../Navigation'
+import { isSpecialLinkClick, toViewClass } from '../../utils'
+import { Collapsible } from '../Collapsible'
+import { Label, LabelOwnProps } from '../Typography'
 
 const DepthContext = createContext(0)
 

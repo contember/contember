@@ -42,12 +42,16 @@
 	&-bar-header
 		display: flex
 		flex-direction: row
+		gap: calc(var(--cui-gap) * 2)
 		justify-content: space-between
 		padding-bottom: var(--cui-layout-chrome-padding-bottom)
 		padding-left: var(--cui-layout-chrome-padding-left)
 		padding-right: var(--cui-layout-chrome-padding-right)
 		padding-top: var(--cui-layout-chrome-padding-top)
 		position: relative
+		&-inner
+			flex: 1
+			overflow: hidden
 	&-bar-body
 		border-top: 1px solid transparent
 		flex-grow: 1
@@ -72,12 +76,14 @@
 		position: relative
 	&-navigation-button
 		height: var(--cui-control-height)
-		margin: 0.125em
-		& > .#{$cui-conf-globalPrefix}button-content
+		margin-top: -0.5em
+		margin-bottom: -0.5em
+		.#{$cui-conf-globalPrefix}button-content
+			align-items: center
 			display: flex
-			flex-direction: row
-			flex-wrap: nowrap
 			gap: calc(var(--cui-gap) * 2)
+			padding-left: calc(var(--cui-gap) * 3)
+			padding-right: calc(var(--cui-gap) * 3)
 
 	@media (max-width: $breakpoint-max-medium)
 		--layout-chrome-bar-width: 0

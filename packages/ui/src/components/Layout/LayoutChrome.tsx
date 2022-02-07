@@ -91,7 +91,7 @@ export const LayoutChrome = memo(({
 		<DropdownContentContainerProvider>
 			<div className={`${prefix}layout-chrome-bar`}>
 				<div className={`${prefix}layout-chrome-bar-header`}>
-					{sidebarHeader}
+					{sidebarHeader && <div className={`${prefix}layout-chrome-bar-header-inner`}>{sidebarHeader}</div>}
 					<Button distinction="seamless" className={`${prefix}layout-chrome-navigation-button`} onClick={toggleCollapsed}>
 						<span className={`${prefix}chrome-menu-button-label`}>Menu</span>
 						<Icon blueprintIcon={collapsed ? 'menu' : 'cross'} />

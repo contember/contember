@@ -1,6 +1,5 @@
 import {
 	DatabaseContext,
-	formatSchemaName,
 	SchemaVersionBuilder,
 	setupSystemVariables,
 } from '@contember/engine-system-api'
@@ -37,7 +36,7 @@ export class ContentApiTester {
 		const authorizator = new Authorizator(permissions)
 		const gqlSchemaBuilder = this.graphqlSchemaBuilderFactory.create(model, authorizator)
 		const gqlSchema = gqlSchemaBuilder.build()
-		const db = this.db.client.forSchema(formatSchemaName(stage))
+		const db = this.db.client.forSchema(`stage_${stage.slug}`)
 
 		const executionContainer = new ExecutionContainerFactory(
 			schema,

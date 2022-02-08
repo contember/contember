@@ -7,4 +7,5 @@ export interface ProjectConfig {
 export interface StageConfig {
 	slug: string
 	name: string
+	schema?: string
 }

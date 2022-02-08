@@ -1,9 +1,7 @@
 export interface Stage {
+	readonly id: string
 	readonly name: string
 	readonly slug: string
-}
-
-export interface StageWithId extends Stage {
-	readonly id: string
+	readonly schema: string
 }
 

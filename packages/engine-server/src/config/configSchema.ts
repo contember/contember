@@ -75,13 +75,20 @@ export const configSchema = Typesafe.object({
 	server: serverConfigSchema,
 })
 
-export const stageConfig = Typesafe.map(Typesafe.object({
-	name: Typesafe.union(
-		Typesafe.string,
-		(_, path = []) => upperCaseFirst(String(path[path.length - 2])),
+export const stageConfig = Typesafe.map(
+	Typesafe.intersection(
+		Typesafe.object({
+			name: Typesafe.union(
+				Typesafe.string,
+				(_, path = []) => upperCaseFirst(String(path[path.length - 2])),
+			),
+			slug: (_, path = []) => String(path[path.length - 2]),
+		}),
+		Typesafe.partial({
+			schema: Typesafe.string,
+		}),
 	),
-	slug: (_, path = []) => String(path[path.length - 2]),
-}))
+)
 
 export const projectConfigSchema = Typesafe.object({
 	name: Typesafe.union(

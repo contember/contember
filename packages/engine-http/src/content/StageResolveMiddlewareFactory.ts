@@ -2,6 +2,7 @@ import { KoaMiddleware, KoaRequestState } from '../koa'
 import { ProjectResolveMiddlewareState } from '../project-common'
 import { StageConfig } from '../config'
 import { AuthMiddlewareState, ErrorFactory } from '../common'
+import { Stage, StageBySlugQuery, unnamedIdentity } from '@contember/engine-system-api'
 
 type InputKoaState =
 	& ProjectResolveMiddlewareState
@@ -13,7 +14,7 @@ type KoaState =
 	& StageResolveMiddlewareState
 
 export interface StageResolveMiddlewareState {
-	stage: StageConfig
+	stage: Stage
 }
 
 export class StageResolveMiddlewareFactory {
@@ -23,12 +24,10 @@ export class StageResolveMiddlewareFactory {
 	}
 
 	public create(): KoaMiddleware<KoaState> {
-		const stageResolve: KoaMiddleware<KoaState> = (ctx, next) => {
-			const project = ctx.state.projectContainer.project
-
-			const stage = project.stages.find(stage => stage.slug === ctx.state.params.stageSlug)
-
-			if (stage === undefined) {
+		const stageResolve: KoaMiddleware<KoaState> = async (ctx, next) => {
+			const systemDb = ctx.state.projectContainer.systemDatabaseContextFactory.create(unnamedIdentity)
+			const stage = await systemDb.queryHandler.fetch(new StageBySlugQuery(ctx.state.params.stageSlug))
+			if (!stage) {
 				return this.errorFactory.createError(ctx, `Stage ${ctx.state.params.stageSlug} NOT found`, 404)
 			}
 			ctx.state.stage = stage

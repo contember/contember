@@ -13,6 +13,7 @@ import {
 } from '@contember/database'
 import { Logger } from '@contember/engine-common'
 import { Migration } from '@contember/schema-migrations'
+import { StagesQuery } from './queries'
 
 export class ProjectInitializer {
 	constructor(
@@ -65,6 +66,7 @@ export class ProjectInitializer {
 	) {
 
 		logger.group(`Creating stages`)
+
 		for (const stage of project.stages) {
 			const created = await this.stageCreator.createStage(db, stage)
 			if (created) {
@@ -77,7 +79,8 @@ export class ProjectInitializer {
 		logger.groupEnd()
 		if (migrations) {
 			logger.group(`Executing project migrations`)
-			await this.projectMigrator.migrate(db, project, migrations, logger.write.bind(logger))
+			const stages = await db.queryHandler.fetch(new StagesQuery())
+			await this.projectMigrator.migrate(db, stages, migrations, logger.write.bind(logger))
 			logger.groupEnd()
 		}
 	}

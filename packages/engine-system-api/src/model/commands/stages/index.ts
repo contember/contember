@@ -1,2 +1,2 @@
-export * from './CreateOrUpdateStageCommand'
+export * from './CreateStageCommand'
 export * from './TruncateStagesCommand'

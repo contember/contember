@@ -3,7 +3,7 @@ import { SystemResolverContext } from '../SystemResolverContext'
 import { MutationResolver } from '../Resolver'
 import { MigrateResponse, MutationMigrateArgs } from '../../schema'
 import { Migration } from '@contember/schema-migrations'
-import { AuthorizationActions, MigrationError, ProjectMigrator } from '../../model'
+import { AuthorizationActions, MigrationError, ProjectMigrator, StagesQuery } from '../../model'
 
 export class MigrateMutationResolver implements MutationResolver<'migrate'> {
 	constructor(private readonly projectMigrator: ProjectMigrator) {}
@@ -24,14 +24,15 @@ export class MigrateMutationResolver implements MutationResolver<'migrate'> {
 		info: GraphQLResolveInfo,
 		force = false,
 	): Promise<MigrateResponse> {
-		for (const stage of context.project.stages) {
-			await context.requireAccess(AuthorizationActions.PROJECT_MIGRATE, stage.slug)
-		}
 		const migrations = args.migrations as readonly Migration[]
 
 		return context.db.transaction(async trx => {
+			const stages = await trx.queryHandler.fetch(new StagesQuery())
+			for (const stage of stages) {
+				await context.requireAccess(AuthorizationActions.PROJECT_MIGRATE, stage.slug)
+			}
 			try {
-				await this.projectMigrator.migrate(trx, context.project, migrations, () => null, force)
+				await this.projectMigrator.migrate(trx, stages, migrations, () => null, force)
 			} catch (e) {
 				if (e instanceof MigrationError) {
 					await trx.client.connection.rollback()

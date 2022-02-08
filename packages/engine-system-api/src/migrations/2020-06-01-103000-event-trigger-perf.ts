@@ -1,6 +1,6 @@
 import { MigrationBuilder, Name } from '@contember/database-migrations'
 import { SystemMigrationArgs } from './types'
-import { formatSchemaName, getJunctionTables } from '../model'
+import { getJunctionTables } from '../model'
 
 const createEventStatementTrigger = (builder: MigrationBuilder, tableName: Name) => {
 	builder.createTrigger(tableName, 'log_event_statement', {
@@ -17,7 +17,7 @@ const createEventStatementTrigger = (builder: MigrationBuilder, tableName: Name)
 export default async function (builder: MigrationBuilder, args: SystemMigrationArgs) {
 	const schema = await args.schemaResolver()
 	const junctionTables = getJunctionTables(schema.model)
-	const schemas = args.project.stages.map(formatSchemaName)
+	const schemas = args.project.stages.map(it => `stage_${it.slug}`)
 	builder.sql(`CREATE OR REPLACE FUNCTION "trigger_event"() RETURNS TRIGGER AS $$
 DECLARE
     DECLARE new_event_type TEXT;
@@ -99,7 +99,7 @@ $$
 BEGIN
     CASE
         WHEN NULLIF(current_setting('system.current_stage_id' || TG_TABLE_SCHEMA, TRUE), '') IS NOT NULL THEN
-            UPDATE system.stage SET event_id = current_setting('system.current_stage_event' || TG_TABLE_SCHEMA)::UUID WHERE id = current_setting('system.current_stage_id' || TG_TABLE_SCHEMA)::UUID;
+            UPDATE stage SET event_id = current_setting('system.current_stage_event' || TG_TABLE_SCHEMA)::UUID WHERE id = current_setting('system.current_stage_id' || TG_TABLE_SCHEMA)::UUID;
         ELSE
         -- do nothing
         END CASE;

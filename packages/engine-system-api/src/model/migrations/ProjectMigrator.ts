@@ -7,7 +7,6 @@ import { Stage } from '../dtos'
 import { DatabaseContext } from '../database'
 import { ExecutedMigrationsResolver } from './ExecutedMigrationsResolver'
 import { MigrateErrorCode } from '../../schema'
-import { ProjectConfig } from '../../types'
 import { SchemaVersionBuilder } from './SchemaVersionBuilder'
 
 export class ProjectMigrator {
@@ -19,7 +18,7 @@ export class ProjectMigrator {
 
 	public async migrate(
 		db: DatabaseContext,
-		project: ProjectConfig,
+		stages: Stage[],
 		migrationsToExecute: readonly Migration[],
 		logger: (message: string) => void,
 		ignoreOrder: boolean = false,
@@ -39,7 +38,7 @@ export class ProjectMigrator {
 			for (const modification of migration.modifications) {
 				[schema] = await this.applyModification(
 					db.client,
-					project.stages,
+					stages,
 					schema,
 					modification,
 					formatVersion,
@@ -106,7 +105,7 @@ export class ProjectMigrator {
 	}
 
 	private async executeOnStage(db: Client, stage: Stage, sql: string, migrationVersion: string) {
-		await db.query('SET search_path TO ' + wrapIdentifier(formatSchemaName(stage)))
+		await db.query('SET search_path TO ' + wrapIdentifier(stage.schema))
 		try {
 			await db.query(sql)
 		} catch (e) {

@@ -27,7 +27,7 @@ export class ContentServerMiddlewareFactory {
 			const stage = ctx.state.stage
 			const projectContainer = ctx.state.projectContainer
 			const dbContextFactory = ctx.state.projectContainer.systemDatabaseContextFactory
-			const dbClient = projectContainer.connection.createClient(formatSchemaName(stage), { module: 'content' })
+			const dbClient = projectContainer.connection.createClient(stage.schema, { module: 'content' })
 			ctx.state.db = dbClient
 			const handler = await ctx.state.timer('GraphQLServerCreate', () =>
 				projectContainer.contentQueryHandlerProvider.get(dbContextFactory.create(unnamedIdentity), stage, projectRoles),

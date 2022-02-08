@@ -22,7 +22,7 @@
 	"scripts": {
 		"build": "pnpm run build:js && pnpm run build:css",
 		"build:js": "vite build --mode development && vite build --mode production",
-		"build:css": "sass src/index.sass:dist/style.css",
+		"build:css": "sass --no-charset src/index.sass:dist/style.css",
 		"test": "jest"
 	},
 	"dependencies": {

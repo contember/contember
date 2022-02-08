@@ -5,7 +5,7 @@ export type ProjectConfig = {
 	readonly alias?: string[]
 	readonly name: string
 	readonly stages: StageConfig[]
-	readonly db: DatabaseCredentials
+	readonly db: DatabaseCredentials & { systemSchema?: string }
 } & Record<string, unknown>
 
 export interface StageConfig {

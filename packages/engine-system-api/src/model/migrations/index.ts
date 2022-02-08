@@ -1,5 +1,4 @@
 export * from './ExecutedMigrationsResolver'
 export * from './MigrationAlterer'
-export * from './MigrationExecutor'
 export * from './ProjectMigrator'
 export * from './SchemaVersionBuilder'

@@ -26,6 +26,10 @@ export class ProjectContainerFactoryFactory {
 	}
 }
 
+interface ProjectContainerFactoryArgs {
+	project: ProjectConfig
+}
+
 export class ProjectContainerFactory {
 	constructor(
 		private readonly debug: boolean,
@@ -34,8 +38,8 @@ export class ProjectContainerFactory {
 		private readonly providers: Providers,
 	) {}
 
-	public createContainer(project: ProjectConfig): ProjectContainer {
-		return this.createBuilder(project)
+	public createContainer(args: ProjectContainerFactoryArgs): ProjectContainer {
+		return this.createBuilder(args)
 			.build()
 			.pick(
 				'project',
@@ -46,7 +50,7 @@ export class ProjectContainerFactory {
 			)
 	}
 
-	protected createBuilder(project: ProjectConfig) {
+	protected createBuilder({ project }: ProjectContainerFactoryArgs) {
 		return new Builder({})
 			.addService('providers', () =>
 				this.providers)
@@ -72,7 +76,7 @@ export class ProjectContainerFactory {
 				new ContentSchemaResolver(schemaVersionBuilder))
 			.addService('contentQueryHandlerProvider', ({ contentSchemaResolver, graphQlSchemaFactory, contentQueryHandlerFactory }) =>
 				new ContentQueryHandlerProvider(contentSchemaResolver, graphQlSchemaFactory, contentQueryHandlerFactory))
-			.addService('systemDatabaseContextFactory', ({ connection, providers }) =>
-				new DatabaseContextFactory(connection.createClient('system', { module: 'system' }), providers))
+			.addService('systemDatabaseContextFactory', ({ connection, providers, project }) =>
+				new DatabaseContextFactory(connection.createClient(project.db.systemSchema ?? 'system', { module: 'system' }), providers))
 	}
 }

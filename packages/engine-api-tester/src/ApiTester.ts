@@ -79,7 +79,7 @@ export class ApiTester {
 
 		const schemaResolver = () => systemContainer.schemaVersionBuilder.buildSchema(dbContextMigrations)
 		await systemContainer
-			.systemDbMigrationsRunnerFactory(singleConnection)
+			.systemDbMigrationsRunnerFactory(singleConnection, 'system')
 			.migrate(() => null, {
 				schemaResolver,
 				project: projectConfig,

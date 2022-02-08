@@ -63,7 +63,9 @@ export class ProjectContainerResolver {
 	public async createProjectContainer(project: ProjectWithSecrets): Promise<ProjectContainer> {
 		const projectConfig = this.projectConfigResolver(project.slug, project.config, project.secrets)
 		return (await this.projectContainers.fetchContainer(project.slug, async slug => {
-			const projectContainer = this.projectContainerFactory.createContainer(projectConfig)
+			const projectContainer = this.projectContainerFactory.createContainer({
+				project: projectConfig,
+			})
 			await this.systemProjectInitializer.initialize(
 				projectContainer.systemDatabaseContextFactory,
 				projectContainer.project,

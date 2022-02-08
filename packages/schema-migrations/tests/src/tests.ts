@@ -69,7 +69,7 @@ export function testGenerateSql(originalSchema: Model.Schema, diff: Migration.Mo
 	let schema = { model: originalSchema, acl: emptyAcl, validation: {} }
 	const builder = createMigrationBuilder()
 	for (let { modification, ...data } of diff) {
-		const modificationHandler = modificationFactory.create(modification, data, schema, VERSION_LATEST)
+		const modificationHandler = modificationFactory.create(modification, data, schema, { formatVersion: VERSION_LATEST, systemSchema: 'system' })
 		modificationHandler.createSql(builder)
 		schema = modificationHandler.getSchemaUpdater()({ schema })
 	}

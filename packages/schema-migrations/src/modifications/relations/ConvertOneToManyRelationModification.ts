@@ -1,7 +1,7 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Model, Schema } from '@contember/schema'
 import { SchemaUpdater, updateEntity, updateField, updateModel, updateSchema } from '../utils/schemaUpdateUtils'
-import { ModificationHandler, ModificationHandlerStatic } from '../ModificationHandler'
+import { ModificationHandler, ModificationHandlerOptions, ModificationHandlerStatic } from '../ModificationHandler'
 import { isOwningRelation, NamingHelper } from '@contember/schema-utils'
 import { updateRelations } from '../utils/diffUtils'
 import { UpdateFieldNameModification } from '../fields'
@@ -11,7 +11,11 @@ export const ConvertOneToManyRelationModification: ModificationHandlerStatic<Con
 	static id = 'convertOneToManyRelation'
 	private subModification: ModificationHandler<any>
 
-	constructor(private readonly data: ConvertOneToManyRelationModificationData, private readonly schema: Schema, private readonly formatVersion: number) {
+	constructor(
+		private readonly data: ConvertOneToManyRelationModificationData,
+		private readonly schema: Schema,
+		private readonly options: ModificationHandlerOptions,
+	) {
 		const { relation } = this.getRelation()
 		this.subModification = data.newInverseSideFieldName && relation.inversedBy ?
 			new UpdateFieldNameModification(
@@ -21,7 +25,7 @@ export const ConvertOneToManyRelationModification: ModificationHandlerStatic<Con
 					newFieldName: data.newInverseSideFieldName,
 				},
 				schema,
-				formatVersion,
+				this.options,
 			)
 			: new NoopModification()
 	}

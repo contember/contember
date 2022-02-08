@@ -34,12 +34,13 @@ export class ProjectInitializer {
 			logger.group(`Executing system schema migration`)
 			await createDatabaseIfNotExists(project.db, logger.write.bind(logger))
 			const singleConnection = new SingleConnection(project.db, {})
+			const systemSchema = dbContext.client.schema
 			const dbContextMigrations = databaseContextFactory
-				.withClient(singleConnection.createClient('system', { module: 'system' }))
+				.withClient(singleConnection.createClient(systemSchema, { module: 'system' }))
 				.create(unnamedIdentity)
 
 			const schemaResolver = () => this.schemaVersionBuilder.buildSchema(dbContextMigrations)
-			await this.systemDbMigrationsRunnerFactory(singleConnection).migrate(
+			await this.systemDbMigrationsRunnerFactory(singleConnection, systemSchema).migrate(
 				logger.write.bind(logger),
 				{
 					schemaResolver,

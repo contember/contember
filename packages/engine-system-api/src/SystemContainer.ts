@@ -13,7 +13,6 @@ import {
 	ExecutedMigrationsResolver,
 	IdentityFetcher,
 	MigrationAlterer,
-	MigrationExecutor,
 	PermissionsFactory,
 	ProjectInitializer,
 	ProjectMigrator,
@@ -41,10 +40,9 @@ export interface SystemContainer {
 	resolverContextFactory: SystemResolverContextFactory
 	schemaVersionBuilder: SchemaVersionBuilder
 	projectInitializer: ProjectInitializer
-	systemDbMigrationsRunnerFactory: SystemDbMigrationsRunnerFactory
 }
 
-export type SystemDbMigrationsRunnerFactory = (db: Connection.ConnectionLike) => MigrationsRunner<SystemMigrationArgs>
+export type SystemDbMigrationsRunnerFactory = (db: Connection.ConnectionLike, schema: string) => MigrationsRunner<SystemMigrationArgs>
 
 type Args = {
 	identityFetcher: IdentityFetcher
@@ -66,7 +64,6 @@ export class SystemContainerFactory {
 				'resolverContextFactory',
 				'schemaVersionBuilder',
 				'projectInitializer',
-				'systemDbMigrationsRunnerFactory',
 			)
 	}
 	public createBuilder({ identityFetcher }: Args) {
@@ -78,7 +75,7 @@ export class SystemContainerFactory {
 			.addService('identityFetcher', () =>
 				identityFetcher)
 			.addService('systemDbMigrationsRunnerFactory', (): SystemDbMigrationsRunnerFactory =>
-				db => new MigrationsRunner(db, 'system', getSystemMigrations))
+				(db, schema) => new MigrationsRunner(db, schema, getSystemMigrations))
 			.addService('schemaMigrator', ({ modificationHandlerFactory }) =>
 				new SchemaMigrator(modificationHandlerFactory))
 			.addService('executedMigrationsResolver', ({}) =>
@@ -91,8 +88,6 @@ export class SystemContainerFactory {
 				new Authorizator.Default(accessEvaluator))
 			.addService('schemaDiffer', ({ schemaMigrator }) =>
 				new SchemaDiffer(schemaMigrator))
-			.addService('migrationExecutor', ({ modificationHandlerFactory }) =>
-				new MigrationExecutor(modificationHandlerFactory))
 			.addService('migrationDescriber', ({ modificationHandlerFactory }) =>
 				new MigrationDescriber(modificationHandlerFactory))
 			.addService('projectMigrator', ({ migrationDescriber, schemaVersionBuilder, executedMigrationsResolver }) =>

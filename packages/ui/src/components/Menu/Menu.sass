@@ -1,85 +1,82 @@
-a.#{$cui-conf-globalPrefix}menu
-	&-group,
-	&-subgroup,
-	&-action,
-	&-tooDeep
-		&-title
-			color: var(--cui-control-color)
-			&:hover,
-			&:active,
-			.is-active &
-				color: var(--cui-control-color--highlighted)
-
 .#{$cui-conf-globalPrefix}menu
-	--cui-menu-background-color-semitransparent: var(--cui-control-background-color--highlighted)
+	--cui-menu-background-color-focused: var(--cui-toned-control-background-color)
 
-	$caret-size: 0.4em
-	$padding-coeficient: 1.5
+	user-select: none
 
-	line-height: 1.5
-	text-align: left
+	&-list
+		list-style: none
+		padding: 0
+		margin: 0
+
+	li
+		@extend %implementsCustomFocusEffects
+
+
+	li:focus > &-section-title .#{$cui-conf-globalPrefix}label,
+	li:focus > &-group-title  .#{$cui-conf-globalPrefix}label
+		color: var(--cui-control-color--highlighted)
+		background-color: var(--cui-menu-background-color-focused)
 
 	.#{$cui-conf-globalPrefix}label
-		background-color: inherit
-		border-radius: var(--cui-control-border-radius)
+		--cui-inset-vertical: calc(1.5 * var(--cui-gap))
+		--cui-inset-horizontal: calc(1.5 * var(--cui-gap-horizontal))
+	.is-active > .#{$cui-conf-globalPrefix}label
+		background-color: var(--cui-toned-control-background-color--highlighted)
+		color: var(--cui-toned-control-color--highlighted)
+
+	&-expand-toggle
+		--cui-expand-toggle-size: calc(5 * var(--cui-gap))
+		border: 0
 		color: inherit
-		flex-grow: 1
-		&.is-active
-			background-color: var(--cui-toned-control-background-color--highlighted)
-			color: var(--cui-toned-control-color--highlighted)
-
-	button
-		font-size: 1em
-
-	&-subgroup
-		transition: margin var(--cui-transition-duration)
-
-	&-group,
-	&-subgroup,
-	&-action,
-	&-tooDeep
+		height: var(--cui-expand-toggle-size)
 		padding: 0
+		position: absolute
+		right: calc(100% + 1.5 * var(--cui-gap))
+		width: var(--cui-expand-toggle-size)
+		&::before
+			$caret-size: 0.4em
+			border-bottom: rem(1.75px) solid var(--cui-color--high)
+			border-right: rem(1.75px) solid var(--cui-color--high)
+			bottom: 0
+			content: ''
+			display: inline-block
+			height: $caret-size
+			left: calc(var(--cui-expand-toggle-size) / 2 - #{($caret-size * 0.5)})
+			margin: auto
+			position: absolute
+			top: -0.15em
+			transform-origin: 70% 70%
+			transform: rotate(45deg)
+			transition: transform var(--cui-transition-duration--fast)
+			width: $caret-size
+			z-index: 1
+		&.is-collapsed::before
+			transform: rotate(-45deg)
+		&[disabled]
+			display: none
+		&-label
+			visibility: hidden
 
-	&,
-	&-group,
-	&-subgroup,
-	&-action,
-	&-tooDeep
-		&,
-		&-list
-			margin: 0
-			padding: 0
-			list-style-type: none
-
-	&-subgroup,
-	&-tooDeep,
-	&-action
-		&-list
-			padding: 0 0 0 calc(var(--cui-gap) * 3)
-
-	&-subgroup.is-expanded:not(:first-child)
-		margin-top: var(--cui-gap-vertical)
-	&-subgroup.is-expanded:not(:last-child)
-		margin-bottom: var(--cui-gap-vertical)
-
-	&-group,
-	&-subgroup,
-	&-action,
-	&-tooDeep
-		&-title
-			display: flex
-			align-items: center
-			line-height: inherit // TODO: Requied for button to inherit line-height
-			transition: background-color ease-in-out .5s
-			width: 100%
-
+	&-section,
 	&-group
-		padding-bottom: calc(var(--cui-padding-vertical) / 2)
+		&-title
+			align-items: center
+			display: flex
+			font-weight: 600
+			position: relative
+			&-content
+				display: flex
+				flex-direction: column
+				flex: 1
+				margin: 0 calc(-2 * var(--cui-gap))
+				padding: calc(2 * var(--cui-gap))
+
+	&-section
 		margin-left: var(--cui-edge-offset-left)
+		padding-bottom: calc(var(--cui-padding-vertical) / 2)
 		padding-right: 0
 		padding-top: calc(var(--cui-padding-vertical) / 2)
 		position: relative
-
 		&::after
 			border-bottom: 1px solid var(--cui-color--lower)
 			content: ""
@@ -88,92 +85,31 @@ a.#{$cui-conf-globalPrefix}menu
 			position: absolute
 			right: 0
 			top: 0
-
 		&-title
-			font-weight: 600
+			&-content
+				font-size: var(--cui-font-size-note)
 			letter-spacing: 0.125em
-			margin: var(--cui-gap) 0
+			margin-bottom: var(--cui-gap)
+			margin-left: var(--cui-padding-left)
+			margin-right: var(--cui-padding-right)
+			margin-top: var(--cui-gap)
 			padding-bottom: var(--cui-gap-vertical)
-			padding-left: var(--cui-padding-left)
-			padding-right: var(--cui-padding-right)
 			padding-top: var(--cui-gap-vertical)
-			font-weight: $fw-extraBold
 			text-transform: uppercase
-
+			&.is-active:after
+				visibility: unset
 		&-list
-			//
+			list-style: none
+			margin-bottom: 0
+			margin-left: var(--cui-padding-left)
+			margin-right: var(--cui-padding-right)
+			margin-top: 0
+			padding: 0
 
-	&-subgroup
-		&-title
-			margin: 0
-			padding-bottom: calc(#{$padding-coeficient} * var(--cui-gap-vertical))
-			padding-left: var(--cui-padding-left)
-			padding-right: var(--cui-padding-right)
-			padding-top: calc(#{$padding-coeficient} * var(--cui-gap-vertical))
-			text-align: inherit
-			text-decoration: none
-			border: none
-			background: transparent
-			text-transform: inherit
-			font-family: inherit
-
+	&-group
+		&.is-interactive > &-title
+			color: var(--cui-control-color)
 		&-list
-			padding-bottom: calc(var(--cui-gap-vertical) / 2)
-
-	&.view-showCaret .has-children
-		position: relative
-		&::before
-			content: ''
-			display: inline-block
-			margin-top: -0.2em
-			width: $caret-size
-			height: $caret-size
-			top: 0
-			bottom: 0
-			margin-top: auto
-			margin-bottom: auto
-			left: calc(var(--cui-padding-left) / 2 - #{($caret-size * 0.5)})
-			border-bottom: rem(1.75px) solid var(--cui-color--high)
-			border-right: rem(1.75px) solid var(--cui-color--high)
-			position: absolute
-			transition: transform var(--cui-transition-duration--fast)
-			transform-origin: 70% 70%
-			transform: rotate(45deg)
-		&.is-collapsed::before
-			transform: rotate(-45deg)
-
-	&-action
-		&-title
-			margin: 0
-			padding-bottom: calc(#{$padding-coeficient} * var(--cui-gap-vertical))
-			padding-left: var(--cui-padding-left)
-			padding-right: var(--cui-padding-right)
-			padding-top: calc(#{$padding-coeficient} * var(--cui-gap-vertical))
-			text-decoration: none
-
-	&-tooDeep
-		font-size: .9em
-		list-style-type: none
-
-		&-title
-			margin: 0
-			text-decoration: none
-			padding-bottom: var(--cui-gap-vertical)
-			padding-left: var(--cui-padding-left)
-			padding-right: var(--cui-padding-right)
-			padding-top: var(--cui-gap-vertical)
-
-	a#{&},
-	button#{&}
-		&-subgroup-title
-			cursor: pointer
-
-		&-subgroup,
-		&-action,
-		&-tooDeep
-			&-title
-				@extend %implementsCustomFocusEffects
-				&:focus .#{$cui-conf-globalPrefix}label:not(.is-active)
-					background-color: var(--cui-menu-background-color-semitransparent)
-				&:focus:not(:focus-visible) .#{$cui-conf-globalPrefix}label:not(.is-active)
-					background-color: unset
+			list-style: none
+			padding-left: calc(4 * var(--cui-gap-horizontal))
+			position: relative

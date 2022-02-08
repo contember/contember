@@ -1,5 +1,7 @@
 type: project
 replaceVariables:
-  - admin/.env
-  - admin/index.html
   - admin/components/Layout.tsx
+  - admin/.env.development
+  - admin/.env.production
+  - admin/index.html
+  - admin/vite.config.ts

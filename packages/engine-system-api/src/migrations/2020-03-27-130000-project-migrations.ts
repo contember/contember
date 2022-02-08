@@ -5,7 +5,6 @@ export default async function (builder: MigrationBuilder, args: SystemMigrationA
 	builder.createTable(
 		{
 			name: 'schema_migration',
-			schema: 'system',
 		},
 		{
 			id: { notNull: true, type: 'SERIAL4' },
@@ -16,7 +15,7 @@ export default async function (builder: MigrationBuilder, args: SystemMigrationA
 			executed_at: { notNull: true, type: 'timestamp', default: 'now()' },
 		},
 	)
-	builder.createIndex({ name: 'schema_migration', schema: 'system' }, ['version'], {
+	builder.createIndex({ name: 'schema_migration' }, ['version'], {
 		name: 'system_schema_migration_version',
 	})
 }

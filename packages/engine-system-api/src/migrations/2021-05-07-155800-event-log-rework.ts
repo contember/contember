@@ -20,9 +20,9 @@ export default async function (builder: MigrationBuilder, args: SystemMigrationA
 	const schema = await args.schemaResolver()
 	const junctionTables = getJunctionTables(schema.model)
 	const schemas = args.project.stages.map(formatSchemaName)
-	builder.sql(`LOCK TABLE system.event`)
+	builder.sql(`LOCK TABLE event`)
 	builder.sql(`
-		ALTER TABLE system.schema_migration
+		ALTER TABLE schema_migration
 		ADD PRIMARY KEY (id)
 	`)
 	builder.sql(`
@@ -30,40 +30,40 @@ export default async function (builder: MigrationBuilder, args: SystemMigrationA
 		CONSTRAINT event_data_type_check CHECK (VALUE = ANY (ARRAY ['create', 'update', 'delete']));
 	`)
 	builder.sql(`
-		CREATE TABLE system.event_data (
+		CREATE TABLE event_data (
 			id UUID NOT NULL CONSTRAINT event_data_pkey PRIMARY KEY,
-		type system.event_data_type NOT NULL,
+		type event_data_type NOT NULL,
 		table_name TEXT NOT NULL,
 		row_ids JSONB NOT NULL,
 		values JSONB DEFAULT NULL,
 		created_at TIMESTAMP WITH TIME ZONE DEFAULT CLOCK_TIMESTAMP() NOT NULL,
-		schema_id INTEGER NOT NULL REFERENCES system.schema_migration(id),
+		schema_id INTEGER NOT NULL REFERENCES schema_migration(id),
 		identity_id UUID NOT NULL,
 		transaction_id UUID DEFAULT COALESCE(
 			(NULLIF(CURRENT_SETTING('system.transaction_id'::TEXT, TRUE), ''::TEXT))::UUID,
-			(SET_CONFIG('system.transaction_id'::TEXT, (system.uuid_generate_v4())::TEXT, TRUE))::UUID) NOT NULL
+			(SET_CONFIG('system.transaction_id'::TEXT, (uuid_generate_v4())::TEXT, TRUE))::UUID) NOT NULL
 		)
 	`)
 	builder.sql(`
 		CREATE INDEX system_event_row_id
-		ON system.event_data(row_ids)
+		ON event_data(row_ids)
 	`)
 	builder.sql(`
 		CREATE INDEX system_event2_table_name
-		ON system.event_data(table_name)
+		ON event_data(table_name)
 	`)
 	builder.sql(`
 		CREATE INDEX system_event2_type
-		ON system.event_data(type)
+		ON event_data(type)
 	`)
 	builder.sql(`
 		CREATE INDEX system_event2_transaction
-		ON system.event_data(transaction_id)
+		ON event_data(transaction_id)
 	`)
 	builder.sql(`
-		CREATE TABLE system.stage_transaction (
+		CREATE TABLE stage_transaction (
 			transaction_id UUID NOT NULL,
-			stage_id UUID NOT NULL REFERENCES system.stage(id) ON DELETE CASCADE,
+			stage_id UUID NOT NULL REFERENCES stage(id) ON DELETE CASCADE,
 			applied_at TIMESTAMPTZ NOT NULL,
 			PRIMARY KEY (transaction_id, stage_id)
 		)
@@ -73,23 +73,23 @@ export default async function (builder: MigrationBuilder, args: SystemMigrationA
 		events AS (
 			SELECT
 				e.*,
-				(SELECT MAX(id) FROM system.schema_migration) AS schema_id,
+				(SELECT MAX(id) FROM schema_migration) AS schema_id,
 				1 AS index,
 				stage.id AS stage_id
-			FROM system.stage
-			JOIN system.event e ON stage.event_id = e.id
+			FROM stage
+			JOIN event e ON stage.event_id = e.id
  			UNION ALL
  			SELECT
  				event.*,
  				COALESCE(
  					CASE WHEN event.type = 'run_migration' THEN
-						(SELECT id FROM system.schema_migration WHERE version = event.data ->> 'version')
+						(SELECT id FROM schema_migration WHERE version = event.data ->> 'version')
 					END,
 					events.schema_id
 				),
  				index + 1,
  				stage_id
- 			FROM system.event
+ 			FROM event
  				JOIN events
  			ON events.previous_id = event.id
  		),
@@ -103,7 +103,7 @@ export default async function (builder: MigrationBuilder, args: SystemMigrationA
  			FROM events
  		)
  		INSERT
- 		INTO system.event_data (id, type, table_name, row_ids, values, created_at, schema_id, identity_id, transaction_id)
+ 		INTO event_data (id, type, table_name, row_ids, values, created_at, schema_id, identity_id, transaction_id)
  		SELECT
  			id,
  			type,
@@ -125,14 +125,14 @@ export default async function (builder: MigrationBuilder, args: SystemMigrationA
  				e.*,
  				1 AS index,
  				stage.id AS stage_id
- 			FROM system.stage
- 			JOIN system.event e ON stage.event_id = e.id
+ 			FROM stage
+ 			JOIN event e ON stage.event_id = e.id
  			UNION ALL
  			SELECT
  				event.*,
  				index + 1,
  				stage_id
- 			FROM system.event
+ 			FROM event
  			JOIN events ON events.previous_id = event.id
  		),
  		transaction_times AS (
@@ -146,12 +146,12 @@ export default async function (builder: MigrationBuilder, args: SystemMigrationA
  			ORDER BY transaction_id
  		)
  		INSERT
- 		INTO system.stage_transaction (transaction_id, stage_id, applied_at)
+ 		INTO stage_transaction (transaction_id, stage_id, applied_at)
  		SELECT transaction_id, stage_id, created_at
  		FROM transaction_times
 	`)
 	builder.sql(`
-		CREATE OR REPLACE FUNCTION "system"."trigger_event"() RETURNS TRIGGER AS
+		CREATE OR REPLACE FUNCTION "trigger_event"() RETURNS TRIGGER AS
 		$$
 		DECLARE new_event_type TEXT;
 		DECLARE table_name TEXT;
@@ -202,14 +202,14 @@ export default async function (builder: MigrationBuilder, args: SystemMigrationA
 			END CASE;
 
 			CASE WHEN NULLIF(CURRENT_SETTING('system.schema_id', true), '') IS NULL THEN
-				PERFORM SET_CONFIG('system.schema_id', (select MAX("id")::TEXT from system.schema_migration), TRUE);
+				PERFORM SET_CONFIG('system.schema_id', (select MAX("id")::TEXT from schema_migration), TRUE);
 			ELSE
 				-- do nothing
 			END CASE;
 
-			INSERT INTO "system"."event_data" ("id", "type", "table_name", "row_ids", "values", "created_at", schema_id, identity_id)
+			INSERT INTO "event_data" ("id", "type", "table_name", "row_ids", "values", "created_at", schema_id, identity_id)
 			VALUES (
-				system.uuid_generate_v4(),
+				uuid_generate_v4(),
 				new_event_type,
 				table_name,
 				primary_values,
@@ -234,12 +234,12 @@ export default async function (builder: MigrationBuilder, args: SystemMigrationA
 				NULLIF(CURRENT_SETTING('system.transaction_id', true), '') IS NOT NULL
 				AND NULLIF(CURRENT_SETTING('system.transaction_inserted', true), '') IS NULL
 				THEN
-				INSERT INTO system.stage_transaction(transaction_id, stage_id, applied_at)
+				INSERT INTO stage_transaction(transaction_id, stage_id, applied_at)
 				VALUES (
 					CURRENT_SETTING('system.transaction_id')::UUID,
 					(
 						SELECT id
- 						FROM "system"."stage"
+ 						FROM "stage"
  						WHERE "slug" = RIGHT(TG_TABLE_SCHEMA, - LENGTH('stage_'))
  				    ),
 					CLOCK_TIMESTAMP()
@@ -269,11 +269,11 @@ export default async function (builder: MigrationBuilder, args: SystemMigrationA
 		}
 	}
 	builder.sql(`
-		ALTER TABLE system.stage
+		ALTER TABLE stage
 		ALTER event_id DROP NOT NULL
 	`)
 	builder.sql(`
-		ALTER TABLE system.event
+		ALTER TABLE event
 		RENAME TO event_bak
 	`)
 }

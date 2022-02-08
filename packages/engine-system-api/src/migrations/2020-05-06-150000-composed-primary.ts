@@ -20,13 +20,13 @@ const migrateEvents = (builder: MigrationBuilder, tableName: string, primaryKeys
 		WITH RECURSIVE
 			recent_events(id, type, previous_id, data, created_at, stage) AS (
 				SELECT event.id, type, previous_id, data, created_at, stage.slug
-				FROM system.event
-				JOIN system.stage ON stage.event_id = event.id
+				FROM event
+				JOIN stage ON stage.event_id = event.id
 
 				UNION ALL
 
 				SELECT event.id, event.type, event.previous_id, event.data, event.created_at, recent_events.stage
-				FROM system.event, recent_events
+				FROM event, recent_events
 				WHERE event.id = recent_events.previous_id
 			),
 			affected_events AS (
@@ -83,15 +83,15 @@ export default async function (builder: MigrationBuilder, args: SystemMigrationA
 		}
 	}
 	builder.sql(`
-		UPDATE system.event
+		UPDATE event
 		SET data = data || jsonb_build_object('rowId', json_build_array(data ->> 'rowId'))
 		WHERE jsonb_typeof(data -> 'rowId') = 'string'
 	`)
-	builder.sql(`CREATE OR REPLACE FUNCTION "system"."trigger_event"() RETURNS TRIGGER AS
+	builder.sql(`CREATE OR REPLACE FUNCTION "trigger_event"() RETURNS TRIGGER AS
 $$
 
 DECLARE
-	new_event_id UUID := system.uuid_generate_v4();
+	new_event_id UUID := uuid_generate_v4();
 	DECLARE new_event_type TEXT;
 	DECLARE new_event_data JSONB;
 	DECLARE current_stage RECORD;
@@ -151,15 +151,15 @@ BEGIN
 		END CASE;
 
 	SELECT "id", "event_id"
-	FROM "system"."stage"
+	FROM "stage"
 	WHERE "slug" = right(TG_TABLE_SCHEMA, -length('stage_'))
 		FOR NO KEY UPDATE
 	INTO current_stage;
 
-	INSERT INTO "system"."event" ("id", "type", "data", "previous_id")
+	INSERT INTO "event" ("id", "type", "data", "previous_id")
 	VALUES (new_event_id, new_event_type, new_event_data, current_stage.event_id);
 
-	UPDATE "system"."stage"
+	UPDATE "stage"
 	SET "event_id" = new_event_id
 	WHERE "id" = current_stage.id;
 
@@ -170,7 +170,6 @@ $$ LANGUAGE plpgsql;
 `)
 	builder.dropFunction(
 		{
-			schema: 'system',
 			name: 'make_diff',
 		},
 		[

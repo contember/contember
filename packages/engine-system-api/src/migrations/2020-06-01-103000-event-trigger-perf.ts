@@ -18,7 +18,7 @@ export default async function (builder: MigrationBuilder, args: SystemMigrationA
 	const schema = await args.schemaResolver()
 	const junctionTables = getJunctionTables(schema.model)
 	const schemas = args.project.stages.map(formatSchemaName)
-	builder.sql(`CREATE OR REPLACE FUNCTION "system"."trigger_event"() RETURNS TRIGGER AS $$
+	builder.sql(`CREATE OR REPLACE FUNCTION "trigger_event"() RETURNS TRIGGER AS $$
 DECLARE
     DECLARE new_event_type TEXT;
     DECLARE previous_id UUID;
@@ -80,21 +80,21 @@ BEGIN
         END CASE;
     CASE WHEN NULLIF(current_setting('system.current_stage_id' || TG_TABLE_SCHEMA, TRUE), '') IS NULL THEN
         PERFORM set_config('system.current_stage_id' || TG_TABLE_SCHEMA, "id"::TEXT, TRUE), set_config('system.current_stage_event' || TG_TABLE_SCHEMA, "event_id"::TEXT, TRUE)
-        FROM "system"."stage"
+        FROM "stage"
         WHERE "slug" = right(TG_TABLE_SCHEMA, -length('stage_'))
             FOR NO KEY UPDATE;
         ELSE
         -- do nothing
         END CASE;
     previous_id := current_setting('system.current_stage_event' || TG_TABLE_SCHEMA)::UUID;
-    INSERT INTO "system"."event" ("id", "type", "data", "previous_id")
+    INSERT INTO "event" ("id", "type", "data", "previous_id")
     VALUES (set_config('system.current_stage_event' || TG_TABLE_SCHEMA, system.uuid_generate_v4()::TEXT, TRUE)::UUID, new_event_type, new_event_data, previous_id);
 
     RETURN NULL;
 END;
 
 $$ LANGUAGE plpgsql`)
-	builder.sql(`CREATE OR REPLACE FUNCTION "system"."statement_trigger_event"() RETURNS TRIGGER AS
+	builder.sql(`CREATE OR REPLACE FUNCTION "statement_trigger_event"() RETURNS TRIGGER AS
 $$
 BEGIN
     CASE

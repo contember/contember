@@ -5,9 +5,9 @@ $BLOCK$
           SELECT
           FROM pg_proc
                    JOIN pg_namespace ON pg_proc.pronamespace = pg_namespace.oid
-          WHERE pg_namespace.nspname = 'system' AND pg_proc.proname = 'uuid_generate_v4'
+          WHERE pg_namespace.nspname in(current_schema(), 'pg_catalog') AND pg_proc.proname = 'uuid_generate_v4'
             ) THEN
-            CREATE FUNCTION "system"."uuid_generate_v4"() RETURNS UUID
+            CREATE FUNCTION "uuid_generate_v4"() RETURNS UUID
             AS
             $$
             SELECT OVERLAY(OVERLAY(md5(random()::TEXT || ':' || clock_timestamp()::TEXT) PLACING '4' FROM 13) PLACING
@@ -18,7 +18,7 @@ $BLOCK$
 $BLOCK$;
 
 
-CREATE FUNCTION "system"."make_diff"(old jsonb, new jsonb) RETURNS jsonb AS $$
+CREATE FUNCTION "make_diff"(old jsonb, new jsonb) RETURNS jsonb AS $$
 
   DECLARE col record;
   DECLARE diff jsonb := '{}'::jsonb;
@@ -36,9 +36,9 @@ CREATE FUNCTION "system"."make_diff"(old jsonb, new jsonb) RETURNS jsonb AS $$
 $$ LANGUAGE  plpgsql;
 
 
-CREATE FUNCTION "system"."trigger_event"() RETURNS TRIGGER AS $$
+CREATE FUNCTION "trigger_event"() RETURNS TRIGGER AS $$
 
-  DECLARE new_event_id uuid := system.uuid_generate_v4();
+  DECLARE new_event_id uuid := uuid_generate_v4();
   DECLARE new_event_type text;
   DECLARE new_event_data jsonb;
   DECLARE current_stage record;
@@ -58,7 +58,7 @@ CREATE FUNCTION "system"."trigger_event"() RETURNS TRIGGER AS $$
         new_event_data := jsonb_build_object(
           'tableName', TG_TABLE_NAME,
           'rowId', OLD.id::text,
-          'values', "system"."make_diff"(to_jsonb(OLD), to_jsonb(NEW))
+          'values', "make_diff"(to_jsonb(OLD), to_jsonb(NEW))
         );
 
       WHEN 'DELETE' THEN
@@ -72,15 +72,15 @@ CREATE FUNCTION "system"."trigger_event"() RETURNS TRIGGER AS $$
         RAISE EXCEPTION 'Unknown TG_OP value %', TG_OP;
     END CASE;
 
-    SELECT "id", "event_id" FROM "system"."stage"
+    SELECT "id", "event_id" FROM "stage"
     WHERE "slug" = right(TG_TABLE_SCHEMA, -length('stage_'))
     FOR NO KEY UPDATE
     INTO current_stage;
 
-    INSERT INTO "system"."event" ("id", "type", "data", "previous_id")
+    INSERT INTO "event" ("id", "type", "data", "previous_id")
     VALUES (new_event_id, new_event_type, new_event_data, current_stage.event_id);
 
-    UPDATE "system"."stage"
+    UPDATE "stage"
     SET "event_id" = new_event_id
     WHERE "id" = current_stage.id;
 

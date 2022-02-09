@@ -19,6 +19,14 @@ export const createProviders = (args: { encryptionKey?: KeyObject }) => ({
 				}
 			})
 		}),
+	hash: (value: BinaryLike, algo: string): Buffer => (
+		crypto.createHash(algo).update(value).digest()
+	),
+})
+
+export type Providers = ReturnType<typeof createProviders>
+
+export const createCryptoProviders = (args: { encryptionKey?: KeyObject }) => ({
 	encrypt: async (value: Buffer): Promise<{ encrypted: Buffer; iv: Buffer }> => {
 		if (!args.encryptionKey) {
 			throw new Error('encryption key not provided')
@@ -35,9 +43,6 @@ export const createProviders = (args: { encryptionKey?: KeyObject }) => ({
 		const decipher = crypto.createDecipheriv(cryptoAlgo, args.encryptionKey, iv)
 		return decipher.update(valueEncrypted)
 	},
-	hash: (value: BinaryLike, algo: string): Buffer => (
-		crypto.createHash(algo).update(value).digest()
-	),
 })
 
-export type Providers = ReturnType<typeof createProviders>
+export type CryptoProviders = ReturnType<typeof createCryptoProviders>

@@ -87,6 +87,7 @@ export const executeTenantTest = async (test: Test) => {
 			projectInitializer,
 			projectSchemaResolver,
 			connection,
+			cryptoProviders: providers,
 		})
 		.replaceService('mailer', () => mailer)
 		.build()

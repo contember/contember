@@ -2,7 +2,12 @@ import { Builder } from '@contember/dic'
 import { Connection } from '@contember/database'
 import { TenantContainerFactory } from '@contember/engine-tenant-api'
 import { TenantConfig } from '../config/config'
-import { ProjectGroupContainer, Providers, TenantGraphQLHandlerFactory } from '@contember/engine-http'
+import {
+	createCryptoProviders,
+	ProjectGroupContainer,
+	Providers,
+	TenantGraphQLHandlerFactory,
+} from '@contember/engine-http'
 import {
 	ProjectContainerFactoryFactory,
 	ProjectContainerResolver,
@@ -14,6 +19,7 @@ import {
 import { SystemContainerFactory } from '@contember/engine-system-api'
 import { ProjectConfigResolver } from '../config/projectConfigResolver'
 import { SystemGraphQLHandlerFactory } from '@contember/engine-http'
+import { createSecretKey } from 'crypto'
 
 interface ProjectGroupContainerFactoryArgs
 {
@@ -41,14 +47,20 @@ export class ProjectGroupContainerFactory {
 				new ProjectSchemaResolverProxy())
 			.addService('projectInitializer', () =>
 				new ProjectInitializerProxy())
-			.addService('tenantContainer', ({ tenantConnection, projectSchemaResolver, projectInitializer }) =>
-				this.tenantContainerFactory.create({
+			.addService('tenantContainer', ({ tenantConnection, projectSchemaResolver, projectInitializer }) => {
+				const encryptionKey = config.secrets.encryptionKey
+					? createSecretKey(Buffer.from(config.secrets.encryptionKey, 'hex'))
+					: undefined
+
+				return this.tenantContainerFactory.create({
 					connection: tenantConnection,
 					mailOptions: config.mailer,
 					tenantCredentials: config.credentials,
 					projectInitializer,
 					projectSchemaResolver,
-				}))
+					cryptoProviders: createCryptoProviders({ encryptionKey }),
+				})
+			})
 			.addService('tenantDatabase', ({ tenantContainer }) =>
 				tenantContainer.databaseContext)
 			.addService('identityFetcher', ({ tenantContainer: { identityFetcher } }) =>

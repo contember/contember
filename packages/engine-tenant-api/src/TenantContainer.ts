@@ -90,11 +90,12 @@ export interface TenantContainerArgs {
 	projectSchemaResolver: ProjectSchemaResolver
 	projectInitializer: ProjectInitializer
 	tenantCredentials: TenantCredentials
+	cryptoProviders: Pick<Providers, 'encrypt' | 'decrypt'>
 }
 
 export class TenantContainerFactory {
 	constructor(
-		private readonly providers: Providers,
+		private readonly providers: Omit<Providers, 'encrypt' | 'decrypt'>,
 	) {}
 
 	create(args: TenantContainerArgs): TenantContainer {
@@ -118,7 +119,7 @@ export class TenantContainerFactory {
 	createBuilder(args: TenantContainerArgs) {
 		return new Builder({})
 			.addService('providers', () =>
-				this.providers)
+				({ ...this.providers, ...args.cryptoProviders }))
 			.addService('mailer', () =>
 				createMailer(args.mailOptions))
 			.addService('projectSchemaResolver', () =>

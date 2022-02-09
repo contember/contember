@@ -46,6 +46,8 @@ export const configTemplate: any = {
 		},
 		projectGroup: {
 			domainMapping: '%?env.CONTEMBER_PROJECT_GROUP_DOMAIN_MAPPING%',
+			configHeader: '%?env.CONTEMBER_PROJECT_GROUP_CONFIG_HEADER%',
+			configEncryptionKey: '%?env.CONTEMBER_PROJECT_GROUP_CONFIG_ENCRYPTION_KEY%',
 		},
 		logging: {
 			sentry: {

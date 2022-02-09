@@ -64,10 +64,17 @@ export const serverConfigSchema = Typesafe.intersection(
 	}),
 	Typesafe.partial({
 		workerCount: Typesafe.union(Typesafe.number, Typesafe.string),
-		projectGroup: (val, path) => Typesafe.valueAt(val, ['domainMapping']) === undefined ? undefined : Typesafe.object({
-			domainMapping: Typesafe.string,
-
-		})(val, path),
+		projectGroup: (val, path) => Typesafe.valueAt(val, ['domainMapping']) === undefined
+			? undefined
+			: Typesafe.intersection(
+				Typesafe.object({
+					domainMapping: Typesafe.string,
+				}),
+				Typesafe.partial({
+					configHeader: Typesafe.string,
+					configEncryptionKey: Typesafe.string,
+				}),
+			)(val, path),
 	}),
 )
 export const configSchema = Typesafe.object({

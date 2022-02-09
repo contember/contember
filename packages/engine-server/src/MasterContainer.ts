@@ -17,6 +17,7 @@ import {
 	createPoweredByHeaderMiddleware,
 	createProviders,
 	createTimerMiddleware,
+	CryptoWrapper,
 	ErrorFactory,
 	Koa,
 	NotModifiedMiddlewareFactory,
@@ -138,8 +139,18 @@ export class MasterContainerFactory {
 				new ErrorFactory(debugMode))
 			.addService('authMiddlewareFactory', ({ httpErrorFactory }) =>
 				new AuthMiddlewareFactory(httpErrorFactory))
-			.addService('projectGroupMiddlewareFactory', ({ projectGroupContainerResolver, httpErrorFactory }) =>
-				new ProjectGroupMiddlewareFactory(config.server.projectGroup?.domainMapping, projectGroupContainerResolver, httpErrorFactory))
+			.addService('projectGroupMiddlewareFactory', ({ projectGroupContainerResolver, httpErrorFactory }) => {
+				const encryptionKey = config.server.projectGroup?.configEncryptionKey
+					? createSecretKey(Buffer.from(config.server.projectGroup?.configEncryptionKey, 'hex'))
+					: undefined
+				return new ProjectGroupMiddlewareFactory(
+					config.server.projectGroup?.domainMapping,
+					config.server.projectGroup?.configHeader,
+					config.server.projectGroup?.configEncryptionKey ? new CryptoWrapper(encryptionKey) : undefined,
+					projectGroupContainerResolver,
+					httpErrorFactory,
+				)
+			})
 			.addService('projectResolverMiddlewareFactory', ({ httpErrorFactory }) =>
 				new ProjectResolveMiddlewareFactory(httpErrorFactory))
 			.addService('apiMiddlewareFactory', ({ projectGroupMiddlewareFactory, authMiddlewareFactory }) =>

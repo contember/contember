@@ -18,4 +18,11 @@ export default defineConfig({
 			replacement: resolve(rootDirectory, getPackagePath(packageName)),
 		})),
 	},
+	css: {
+		preprocessorOptions: {
+			sass: {
+				charset: false,
+			},
+		},
+	},
 })

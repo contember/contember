@@ -21,6 +21,13 @@ export default defineConfig({
 			},
 		},
 	},
+	css: {
+		preprocessorOptions: {
+			sass: {
+				charset: false,
+			},
+		},
+	},
 	esbuild: {
 		jsxInject: `import * as React from 'react'`,
 		target: 'esnext',

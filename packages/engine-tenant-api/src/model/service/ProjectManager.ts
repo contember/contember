@@ -38,7 +38,7 @@ export class ProjectManager {
 				return new ResponseError(CreateProjectResponseErrorCode.AlreadyExists, `Project ${project.slug} already exists`)
 			}
 			for (const [key, value] of Object.entries(project.secrets)) {
-				await bus.execute(new SetProjectSecretCommand(projectId, key, value))
+				await bus.execute(new SetProjectSecretCommand(projectId, key, Buffer.from(value)))
 			}
 			if (ownerIdentityId) {
 				const addMemberResult = await db.commandBus.execute(

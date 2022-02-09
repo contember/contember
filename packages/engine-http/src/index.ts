@@ -10,6 +10,8 @@ export * from './ProjectContainer'
 export * from './ProjectGroupContainer'
 export * from './graphql'
 export * from './config'
+export * from './utils/CryptoWrapper'
+
 import Koa from 'koa'
 
 export { Koa }

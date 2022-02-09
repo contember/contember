@@ -81,12 +81,8 @@ export class MasterContainerFactory {
 				tenantConfigResolver)
 			.addService('plugins', () =>
 				plugins)
-			.addService('providers', ({ config }) => {
-				const encryptionKey = config.tenant.secrets.encryptionKey
-					? createSecretKey(Buffer.from(config.tenant.secrets.encryptionKey, 'hex'))
-					: undefined
-				return createProviders({ encryptionKey })
-			})
+			.addService('providers', () =>
+				createProviders())
 			.addService('tenantContainerFactory', ({ providers }) =>
 				new TenantContainerFactory(providers))
 			.addService('modificationHandlerFactory', () =>

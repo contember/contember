@@ -33,7 +33,7 @@
     "@types/node": "^17.0.5",
     "graphql": "^15.4.0",
     "pg": "^8.5.0",
-    "uvu": "^0.5.1"
+    "uvu": "^0.5.3"
   },
   "peerDependencies": {
     "graphql": ">= 14.6.0",

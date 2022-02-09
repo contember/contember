@@ -5,7 +5,7 @@
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
   "scripts": {
-    "test": "echo 'No tests'"
+    "test": "uvu dist/tests/cases/ \\\\.js$"
   },
   "dependencies": {
     "@apollographql/graphql-playground-html": "^1.6.24",
@@ -36,7 +36,8 @@
     "@types/lru-cache": "^5.1.0",
     "@types/node": "^17.0.5",
     "@types/uuid": "^8.3.0",
-    "graphql": "^15.4.0"
+    "graphql": "^15.4.0",
+    "uvu": "^0.5.3"
   },
   "peerDependencies": {
     "graphql": "^14.6.0",

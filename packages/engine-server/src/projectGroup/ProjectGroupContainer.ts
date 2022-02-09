@@ -3,9 +3,10 @@ import { Connection } from '@contember/database'
 import { TenantContainerFactory } from '@contember/engine-tenant-api'
 import { TenantConfig } from '../config/config'
 import {
-	createCryptoProviders,
+	CryptoWrapper,
 	ProjectGroupContainer,
 	Providers,
+	SystemGraphQLHandlerFactory,
 	TenantGraphQLHandlerFactory,
 } from '@contember/engine-http'
 import {
@@ -18,7 +19,6 @@ import {
 } from '../project'
 import { SystemContainerFactory } from '@contember/engine-system-api'
 import { ProjectConfigResolver } from '../config/projectConfigResolver'
-import { SystemGraphQLHandlerFactory } from '@contember/engine-http'
 import { createSecretKey } from 'crypto'
 
 interface ProjectGroupContainerFactoryArgs
@@ -52,13 +52,17 @@ export class ProjectGroupContainerFactory {
 					? createSecretKey(Buffer.from(config.secrets.encryptionKey, 'hex'))
 					: undefined
 
+				const cryptoWrapper = new CryptoWrapper(encryptionKey)
 				return this.tenantContainerFactory.create({
 					connection: tenantConnection,
 					mailOptions: config.mailer,
 					tenantCredentials: config.credentials,
 					projectInitializer,
 					projectSchemaResolver,
-					cryptoProviders: createCryptoProviders({ encryptionKey }),
+					cryptoProviders: {
+						decrypt: cryptoWrapper.decrypt.bind(cryptoWrapper),
+						encrypt: cryptoWrapper.encrypt.bind(cryptoWrapper),
+					},
 				})
 			})
 			.addService('tenantDatabase', ({ tenantContainer }) =>

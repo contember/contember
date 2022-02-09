@@ -2,6 +2,7 @@ import { SyntheticEvent, useCallback, useState } from 'react'
 
 interface FormMethods<V> {
 	values: V
+	setValues: (values: V) => void
 	isSubmitting: boolean
 	onSubmit: (e: SyntheticEvent) => void
 	errors: FormErrors<V>
@@ -17,7 +18,7 @@ interface FormMethods<V> {
 type FormErrors<V> = {
 	[K in keyof V]?: string
 }
-type FormHandler<V> = (values: V, setError: (field: keyof V, error: string) => void) => void | Promise<any>
+type FormHandler<V> = (values: V, setError: (field: keyof V, error: string) => void, setValues: (values: V) => void) => void | Promise<any>
 
 export const useForm = <V>(initialValues: V, handler?: FormHandler<V>): FormMethods<V> => {
 	const [values, setValues] = useState<V>(initialValues)
@@ -28,16 +29,16 @@ export const useForm = <V>(initialValues: V, handler?: FormHandler<V>): FormMeth
 	const [isSubmitting, setSubmitting] = useState(false)
 	return {
 		values,
+		setValues,
 		errors,
 		isSubmitting,
 		onSubmit: useCallback(async e => {
 			e.preventDefault()
 			setSubmitting(true)
 			setErrors({})
-			await handler?.(values, setError)
+			await handler?.(values, setError, setValues)
 			setSubmitting(false)
-			setValues(initialValues)
-		}, [handler, initialValues, setError, values]),
+		}, [handler, setError, values]),
 		register: useCallback(
 			(field, options: { type?: 'number' } = {}) => {
 				return {

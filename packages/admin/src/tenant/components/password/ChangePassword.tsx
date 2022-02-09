@@ -13,7 +13,7 @@ const initialValues = {
 export const ChangePassword: FC<{}> = ({}) => {
 	const changePassword = useChangePassword()
 	const addToast = useShowToast()
-	const { register, errors, isSubmitting, onSubmit } = useForm(initialValues, useCallback(async (val: typeof initialValues, setError) => {
+	const { register, errors, isSubmitting, onSubmit } = useForm(initialValues, useCallback(async (val: typeof initialValues, setError, setValues) => {
 		if (val.newPassword !== val.newPasswordAgain) {
 			return setError('newPasswordAgain', 'Password confirmation doesn\'t match')
 		}
@@ -24,6 +24,7 @@ export const ChangePassword: FC<{}> = ({}) => {
 				type: 'success',
 				dismiss: true,
 			})
+			setValues(initialValues)
 		} else {
 			switch (response.error.code) {
 				case 'INVALID_PASSWORD':

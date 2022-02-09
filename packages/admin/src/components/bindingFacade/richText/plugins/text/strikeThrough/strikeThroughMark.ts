@@ -1,6 +1,6 @@
 import { CustomMarkPlugin } from '../../../baseEditor'
 import { createElement } from 'react'
-import isHotkey from 'is-hotkey'
+import { isHotkey } from 'is-hotkey'
 
 export const strikeThroughMark = 'isStruckThrough'
 export const strikeThroughPlugin: CustomMarkPlugin = {

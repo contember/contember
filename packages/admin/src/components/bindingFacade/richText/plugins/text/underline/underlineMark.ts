@@ -1,5 +1,5 @@
 import { CustomMarkPlugin } from '../../../baseEditor'
-import isHotkey from 'is-hotkey'
+import { isHotkey } from 'is-hotkey'
 import { createElement } from 'react'
 
 export const underlineMark = 'isUnderlined'

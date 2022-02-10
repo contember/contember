@@ -1,6 +1,6 @@
 import { createElement } from 'react'
 import { CustomMarkPlugin } from '../../../baseEditor'
-import isHotkey from 'is-hotkey'
+import { isHotkey } from 'is-hotkey'
 
 export const boldMark = 'isBold'
 

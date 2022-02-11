@@ -11,7 +11,7 @@ export interface IDPClaim {
 	email: string
 }
 
-export interface IdentityProvider<SessionData extends {}, Configuration extends {}> {
+export interface IdentityProviderHandler<SessionData extends {}, Configuration extends {}> {
 	initAuth(configuration: Configuration, redirectUrl: string): Promise<InitIDPAuthResult<SessionData>>
 
 	processResponse(

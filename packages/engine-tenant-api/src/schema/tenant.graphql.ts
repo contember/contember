@@ -3,6 +3,7 @@ import { DocumentNode } from 'graphql'
 
 const schema: DocumentNode = gql`
 	scalar Json
+	scalar DateTime
 
 	schema {
 		query: Query
@@ -15,6 +16,8 @@ const schema: DocumentNode = gql`
 		projectBySlug(slug: String!): Project
 		projectMemberships(projectSlug: String!, identityId: String!): [Membership!]!
 		checkResetPasswordToken(requestId: String!, token: String!): CheckResetPasswordTokenCode!
+
+		identityProviders: [IdentityProvider!]!
 	}
 
 	type Mutation {
@@ -27,6 +30,11 @@ const schema: DocumentNode = gql`
 
 		initSignInIDP(identityProvider: String!, redirectUrl: String!): InitSignInIDPResponse
 		signInIDP(identityProvider: String!, idpResponse: IDPResponseInput!, redirectUrl: String!, sessionData: Json!, expiration: Int): SignInIDPResponse
+
+		# IDP management
+		addIDP(identityProvider: String!, type: String!, configuration: Json!): AddIDPResponse
+		disableIDP(identityProvider: String!): DisableIDPResponse
+		enableIDP(identityProvider: String!): EnableIDPResponse
 
 		prepareOtp(label: String): PrepareOtpResponse
 		confirmOtp(otpToken: String!): ConfirmOtpResponse
@@ -254,6 +262,59 @@ const schema: DocumentNode = gql`
 		token: String!
 		person: Person!
 	}
+
+	type AddIDPResponse {
+		error: AddIDPError
+		ok: Boolean!
+	}
+
+	type AddIDPError {
+		code: AddIDPErrorCode!
+		developerMessage: String!
+	}
+
+	enum AddIDPErrorCode {
+		ALREADY_EXISTS
+		UNKNOWN_TYPE
+		INVALID_CONFIGURATION
+	}
+
+
+	type DisableIDPResponse {
+		error: DisableIDPError
+		ok: Boolean!
+	}
+
+	type DisableIDPError {
+		code: DisableIDPErrorCode!
+		developerMessage: String!
+	}
+
+	enum DisableIDPErrorCode {
+        NOT_FOUND
+    }
+
+	type EnableIDPResponse {
+		error: EnableIDPError
+		ok: Boolean!
+	}
+
+	type EnableIDPError {
+		code: EnableIDPErrorCode!
+		developerMessage: String!
+	}
+
+	enum EnableIDPErrorCode {
+        NOT_FOUND
+	}
+
+	type IdentityProvider {
+		slug: String!
+		type: String!
+		configuration: Json!
+		disabledAt: DateTime!
+	}
+
 
 	# === invite ===
 

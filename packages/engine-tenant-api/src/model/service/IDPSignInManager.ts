@@ -1,6 +1,6 @@
-import { ApiKeyManager } from '../service'
-import { IdentityProviderQuery, PersonQuery, PersonRow } from '../queries'
-import { IDPManager, IDPResponse, IDPResponseError, IDPValidationError } from './idp'
+import { ApiKeyManager } from './apiKey'
+import { IdentityProviderBySlugQuery, PersonQuery, PersonRow } from '../queries'
+import { IDPHandlerRegistry, IDPResponse, IDPResponseError, IDPValidationError } from './idp'
 import { Response, ResponseError, ResponseOk } from '../utils/Response'
 import { InitSignInIdpErrorCode, SignInIdpErrorCode } from '../../schema'
 import { DatabaseContext } from '../utils'
@@ -8,7 +8,7 @@ import { DatabaseContext } from '../utils'
 class IDPSignInManager {
 	constructor(
 		private readonly apiKeyManager: ApiKeyManager,
-		private readonly idpManager: IDPManager,
+		private readonly idpRegistry: IDPHandlerRegistry,
 	) {}
 
 	async signInIDP(
@@ -19,14 +19,15 @@ class IDPSignInManager {
 		sessionData: any,
 		expiration?: number,
 	): Promise<IDPSignInManager.SignInIDPResponse> {
-		const provider = await dbContext.queryHandler.fetch(new IdentityProviderQuery(idpSlug))
-		if (!provider) {
+		const provider = await dbContext.queryHandler.fetch(new IdentityProviderBySlugQuery(idpSlug))
+		if (!provider || provider.disabledAt) {
 			throw new Error('provider not found')
 		}
 		try {
-			const claim = await this.idpManager.processResponse(
-				provider.type,
-				provider.configuration,
+			const providerService = this.idpRegistry.getHandler(provider.type)
+			const validatedConfig = providerService.validateConfiguration(provider.configuration)
+			const claim = await providerService.processResponse(
+				validatedConfig,
 				redirectUrl,
 				idpResponse,
 				sessionData,
@@ -50,11 +51,13 @@ class IDPSignInManager {
 	}
 
 	async initSignInIDP(dbContext: DatabaseContext, idpSlug: string, redirectUrl: string): Promise<IDPSignInManager.InitSignInIDPResponse> {
-		const provider = await dbContext.queryHandler.fetch(new IdentityProviderQuery(idpSlug))
-		if (!provider) {
-			return new ResponseError(InitSignInIdpErrorCode.ProviderNotFound, `IDP provider ${idpSlug} was not found`)
+		const provider = await dbContext.queryHandler.fetch(new IdentityProviderBySlugQuery(idpSlug))
+		if (!provider || provider.disabledAt) {
+			return new ResponseError(InitSignInIdpErrorCode.ProviderNotFound, `Identity provider ${idpSlug} not found`)
 		}
-		const initResponse = await this.idpManager.initAuth(provider.type, provider.configuration, redirectUrl)
+		const providerService = this.idpRegistry.getHandler(provider.type)
+		const validatedConfig = providerService.validateConfiguration(provider.configuration)
+		const initResponse = await providerService.initAuth(validatedConfig, redirectUrl)
 		return new ResponseOk(initResponse)
 	}
 }

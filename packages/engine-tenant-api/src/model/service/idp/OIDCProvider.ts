@@ -1,8 +1,10 @@
 import { Typesafe } from '@contember/engine-common'
 import { Client, custom, errors, generators, Issuer, ResponseType } from 'openid-client'
 import { IDPResponseError } from './IDPResponseError'
-import { IdentityProvider, IDPClaim, IDPResponse, InitIDPAuthResult } from './IdentityProvider'
+import { IdentityProviderHandler, IDPClaim, IDPResponse, InitIDPAuthResult } from './IdentityProviderHandler'
 import { IDPValidationError } from './IDPValidationError'
+import { ParseError } from '@contember/engine-common/dist/src/config/Typesafe'
+import { InvalidIDPConfigurationError } from './InvalidIDPConfigurationError'
 
 custom.setHttpOptionsDefaults({
 	timeout: 5000,
@@ -26,7 +28,7 @@ const OIDCConfigurationSchema = Typesafe.intersection(
 	}),
 )
 
-export class OIDCProvider implements IdentityProvider<SessionData, OIDCConfiguration> {
+export class OIDCProvider implements IdentityProviderHandler<SessionData, OIDCConfiguration> {
 	private issuerCache: Record<string, Issuer<Client>> = {}
 
 	public async initAuth(
@@ -77,7 +79,14 @@ export class OIDCProvider implements IdentityProvider<SessionData, OIDCConfigura
 	}
 
 	public validateConfiguration(config: unknown): OIDCConfiguration {
-		return OIDCConfigurationSchema(config)
+		try {
+			return OIDCConfigurationSchema(config)
+		} catch (e) {
+			if (e instanceof ParseError) {
+				throw new InvalidIDPConfigurationError(e.message)
+			}
+			throw e
+		}
 	}
 
 	private async createOIDCClient(configuration: OIDCConfiguration): Promise<Client> {

@@ -5,8 +5,10 @@ import { InvalidSchemaException } from '@contember/schema-migrations'
 import { configureCreateMigrationCommand, executeCreateMigrationCommand } from './MigrationCreateHelper'
 import { createMigrationStatusTable, printMigrationDescription } from '../../utils/migrations'
 import { executeMigrations, resolveMigrationStatus } from './MigrationExecuteHelper'
-import { resolveSystemApiClient } from './SystemApiClientResolver'
 import prompts from 'prompts'
+import { interactiveResolveApiToken, TenantClient } from '../../utils/tenant'
+import { interactiveResolveInstanceEnvironmentFromInput } from '../../utils/instance'
+import { SystemClient } from '../../utils/system'
 
 type Args = {
 	project: string
@@ -77,14 +79,19 @@ export class MigrationDiffCommand extends Command<Args, Options> {
 					console.log(`${filename} created`)
 
 					if (shouldExecute) {
-						const client = await resolveSystemApiClient(workspace, project)
-						const status = await resolveMigrationStatus(client, migrationsResolver)
+						const instance = await interactiveResolveInstanceEnvironmentFromInput(workspace)
+						const apiToken = await interactiveResolveApiToken({ instance })
+						const tenantClient = TenantClient.create(instance.baseUrl, apiToken)
+						await tenantClient.createProject(project.name, true)
+						const systemClient = SystemClient.create(instance.baseUrl, project.name, apiToken)
+
+						const status = await resolveMigrationStatus(systemClient, migrationsResolver)
 						if (status.errorMigrations.length > 0) {
 							console.error(createMigrationStatusTable(status.errorMigrations))
 							throw `Cannot execute migrations`
 						}
 						await executeMigrations({
-							client,
+							client: systemClient,
 							migrations: status.migrationsToExecute,
 							requireConfirmation: status.migrationsToExecute.length > 1 && !yes,
 							schemaVersionBuilder,

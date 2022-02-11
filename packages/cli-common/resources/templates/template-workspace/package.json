@@ -4,7 +4,9 @@
     "start": "npm run start-engine && npm run start-admin",
     "start-engine": "docker-compose up --detach && npm run contember migrations:execute . --yes",
     "start-admin": "vite admin --port 1480 --host 0.0.0.0",
-    "build-admin": "tsc && vite build admin"
+    "build": "npm run build-admin && npm run build-api",
+    "build-admin": "tsc --project admin && vite build admin",
+    "build-api": "tsc --project api"
   },
   "devDependencies": {
     "@contember/schema": "{version}",

@@ -1,16 +1,8 @@
 {
-	"compilerOptions": {
-		"allowSyntheticDefaultImports": true,
-		"experimentalDecorators": true,
-		"isolatedModules": true,
-		"jsx": "react",
-		"lib": ["esnext", "dom"],
-		"module": "esnext",
-		"moduleResolution": "node",
-		"noEmit": true,
-		"noImplicitOverride": true,
-		"skipLibCheck": true,
-		"strict": true,
-		"target": "esnext"
-	}
+	"files": [],
+	"include": [],
+	"references": [
+		{ "path": "./admin"},
+		{ "path": "./api"}
+	]
 }

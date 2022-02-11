@@ -15,33 +15,37 @@ export class ProjectManager {
 
 	public async getProject(name: string, options: { fuzzy?: boolean } = {}): Promise<Project> {
 		validateProjectName(name)
-		let projectDir = await this.getDirectory(name)
-		if (!(await pathExists(projectDir))) {
-			if (!options.fuzzy) {
-				throw `Project ${name} not found.`
-			}
-			const projects = await this.listProjectPaths()
-			const matcher = new RegExp(
-				'^' +
-					name
-						.split('')
-						.map(it => it.replace(/[-\\/\\\\^$*+?.()|[\\]{}]/g, '\\\\$&') + '.*')
-						.join(''),
-			)
-			const matched = projects.filter(it => it.match(matcher))
-			if (matched.length === 0) {
-				throw `Project ${name} not found.`
-			} else if (matched.length > 1) {
-				throw `Project name ${name} is ambiguous. Did you mean one of these?\n - ` + matched.join('\n - ') + '\n'
-			}
-			return this.getProject(matched[0])
+		const projectDir = await this.getDirectory(name)
+		if (projectDir && (await pathExists(projectDir))) {
+			return new Project(name, projectDir, this.workspace)
 		}
-		return new Project(name, projectDir, this.workspace)
+		const projects = await this.listProjectPaths()
+
+		if (!options.fuzzy) {
+			throw `Project ${name} not found. Known projects: ${projects.join(', ')}`
+		}
+		const matcher = new RegExp(
+			'^' +
+				name
+					.split('')
+					.map(it => it.replace(/[-\\/\\\\^$*+?.()|[\\]{}]/g, '\\\\$&') + '.*')
+					.join(''),
+		)
+		const matched = projects.filter(it => it.match(matcher))
+		if (matched.length === 0) {
+			throw `Project ${name} not found. Known projects: ${projects.join(', ')}`
+		} else if (matched.length > 1) {
+			throw `Project name ${name} is ambiguous. Did you mean one of these?\n - ` + matched.join('\n - ') + '\n'
+		}
+		return this.getProject(matched[0])
 	}
 
 	public async createProject(name: string, args: { template?: string }): Promise<Project> {
 		validateProjectName(name)
 		const projectDir = await this.getDirectory(name)
+		if (!projectDir) {
+			throw `Cannot resolve directory for project ${name}`
+		}
 		const withAdmin = this.workspace.adminEnabled
 		const template =
 			args.template ||

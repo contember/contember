@@ -16,14 +16,13 @@ export const resolvePathMappingConfig = async (
 	return { [baseName]: baseDir }
 }
 
-export const getPathFromMapping = (config: PathMapping, name: string): string => {
+export const getPathFromMapping = (config: PathMapping, name: string): string | undefined => {
 	if (config[name]) {
 		return config[name]
 	} else if (config['*']) {
 		return join(config['*'], name)
-	} else {
-		throw `${name} not found in path mapping`
 	}
+	return undefined
 }
 
 export const listEntriesInMapping = async (config: PathMapping): Promise<string[]> => {

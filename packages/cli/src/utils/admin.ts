@@ -1,5 +1,6 @@
 import fetch, { Response } from 'node-fetch'
 import { readdir, readFile } from 'fs/promises'
+import { maskToken } from './token'
 
 export class AdminClient {
 	constructor(private readonly url: string, private readonly apiToken: string) {}
@@ -12,7 +13,8 @@ export class AdminClient {
 		const response = await this.execute('_deploy', 'POST', { project, files })
 
 		if (!response.ok) {
-			throw `Failed to deploy admin, POST request to ${this.url}/_deploy returned status ${response.status} ${response.statusText}`
+			const maskedToken = maskToken(this.apiToken)
+			throw `Failed to deploy admin, POST request to ${this.url}/_deploy with token ${maskedToken} returned status ${response.status} ${response.statusText}\n${await response.text()}`
 		}
 	}
 

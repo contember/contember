@@ -43,16 +43,10 @@ export function createViteConfig(packageName) {
 			},
 			plugins: [reactRefresh()],
 			resolve: {
-				alias: [
-					...packageList.map(packageName => ({
-						find: `@contember/${packageName}`,
-						replacement: resolve(rootDirectory, getPackagePath(packageName)),
-					})),
-					{
-						find: 'attr-accept',
-						replacement: resolve(rootDirectory, `packages/admin/node_modules/attr-accept/src/index.js`),
-					},
-				],
+				alias: packageList.map(packageName => ({
+					find: `@contember/${packageName}`,
+					replacement: resolve(rootDirectory, getPackagePath(packageName)),
+				})),
 				dedupe: packageList.map(packageName => `@contember/${packageName}`),
 			},
 		}

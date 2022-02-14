@@ -1,8 +1,8 @@
 import { BindingError } from '@contember/binding'
-import attrAccept from 'attr-accept'
 import { AcceptFileKindError } from '../interfaces'
 import type { AcceptFileOptions, FullFileKind } from '../interfaces'
 import type { ResolvedFileKinds } from '../ResolvedFileKinds'
+import { attrAccept } from './attrAccept'
 import { eachFileKind } from './eachFileKind'
 
 export interface ResolvedAcceptingFileKind<AcceptArtifacts = any> {

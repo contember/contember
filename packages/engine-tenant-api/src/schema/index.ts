@@ -346,6 +346,10 @@ export type EnableIdpResponse = {
 	readonly ok: Scalars['Boolean']
 }
 
+export type IdpOptions = {
+	readonly autoSignUp?: Maybe<Scalars['Boolean']>
+}
+
 export type IdpResponseInput = {
 	readonly url: Scalars['String']
 }
@@ -506,6 +510,7 @@ export type Mutation = {
 	readonly initSignInIDP?: Maybe<InitSignInIdpResponse>
 	readonly signInIDP?: Maybe<SignInIdpResponse>
 	readonly addIDP?: Maybe<AddIdpResponse>
+	readonly updateIDP?: Maybe<UpdateIdpResponse>
 	readonly disableIDP?: Maybe<DisableIdpResponse>
 	readonly enableIDP?: Maybe<EnableIdpResponse>
 	readonly prepareOtp?: Maybe<PrepareOtpResponse>
@@ -590,6 +595,14 @@ export type MutationAddIdpArgs = {
 	identityProvider: Scalars['String']
 	type: Scalars['String']
 	configuration: Scalars['Json']
+	options?: Maybe<IdpOptions>
+}
+
+
+export type MutationUpdateIdpArgs = {
+	identityProvider: Scalars['String']
+	configuration?: Maybe<Scalars['Json']>
+	options?: Maybe<IdpOptions>
 }
 
 
@@ -1000,6 +1013,23 @@ export type UnmanagedInviteOptions = {
 	readonly resetTokenHash?: Maybe<Scalars['String']>
 }
 
+export type UpdateIdpError = {
+	readonly __typename?: 'UpdateIDPError'
+	readonly code: UpdateIdpErrorCode
+	readonly developerMessage: Scalars['String']
+}
+
+export enum UpdateIdpErrorCode {
+	NotFound = 'NOT_FOUND',
+	InvalidConfiguration = 'INVALID_CONFIGURATION'
+}
+
+export type UpdateIdpResponse = {
+	readonly __typename?: 'UpdateIDPResponse'
+	readonly error?: Maybe<UpdateIdpError>
+	readonly ok: Scalars['Boolean']
+}
+
 export type UpdateProjectMemberError = {
 	readonly __typename?: 'UpdateProjectMemberError'
 	readonly code: UpdateProjectMemberErrorCode
@@ -1179,6 +1209,7 @@ export type ResolversTypes = {
 	EnableIDPError: ResolverTypeWrapper<EnableIdpError>
 	EnableIDPErrorCode: EnableIdpErrorCode
 	EnableIDPResponse: ResolverTypeWrapper<EnableIdpResponse>
+	IDPOptions: IdpOptions
 	IDPResponseInput: IdpResponseInput
 	Identity: ResolverTypeWrapper<Identity>
 	IdentityProjectRelation: ResolverTypeWrapper<IdentityProjectRelation>
@@ -1241,6 +1272,9 @@ export type ResolversTypes = {
 	SignUpResponse: ResolverTypeWrapper<SignUpResponse>
 	SignUpResult: ResolverTypeWrapper<SignUpResult>
 	UnmanagedInviteOptions: UnmanagedInviteOptions
+	UpdateIDPError: ResolverTypeWrapper<UpdateIdpError>
+	UpdateIDPErrorCode: UpdateIdpErrorCode
+	UpdateIDPResponse: ResolverTypeWrapper<UpdateIdpResponse>
 	UpdateProjectMemberError: ResolverTypeWrapper<UpdateProjectMemberError>
 	UpdateProjectMemberErrorCode: UpdateProjectMemberErrorCode
 	UpdateProjectMemberResponse: ResolverTypeWrapper<UpdateProjectMemberResponse>
@@ -1290,6 +1324,7 @@ export type ResolversParentTypes = {
 	DisableOtpResponse: DisableOtpResponse
 	EnableIDPError: EnableIdpError
 	EnableIDPResponse: EnableIdpResponse
+	IDPOptions: IdpOptions
 	IDPResponseInput: IdpResponseInput
 	Identity: Identity
 	IdentityProjectRelation: IdentityProjectRelation
@@ -1339,6 +1374,8 @@ export type ResolversParentTypes = {
 	SignUpResponse: SignUpResponse
 	SignUpResult: SignUpResult
 	UnmanagedInviteOptions: UnmanagedInviteOptions
+	UpdateIDPError: UpdateIdpError
+	UpdateIDPResponse: UpdateIdpResponse
 	UpdateProjectMemberError: UpdateProjectMemberError
 	UpdateProjectMemberResponse: UpdateProjectMemberResponse
 	UpdateProjectResponse: UpdateProjectResponse
@@ -1672,6 +1709,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
 	initSignInIDP?: Resolver<Maybe<ResolversTypes['InitSignInIDPResponse']>, ParentType, ContextType, RequireFields<MutationInitSignInIdpArgs, 'identityProvider' | 'redirectUrl'>>
 	signInIDP?: Resolver<Maybe<ResolversTypes['SignInIDPResponse']>, ParentType, ContextType, RequireFields<MutationSignInIdpArgs, 'identityProvider' | 'idpResponse' | 'redirectUrl' | 'sessionData'>>
 	addIDP?: Resolver<Maybe<ResolversTypes['AddIDPResponse']>, ParentType, ContextType, RequireFields<MutationAddIdpArgs, 'identityProvider' | 'type' | 'configuration'>>
+	updateIDP?: Resolver<Maybe<ResolversTypes['UpdateIDPResponse']>, ParentType, ContextType, RequireFields<MutationUpdateIdpArgs, 'identityProvider'>>
 	disableIDP?: Resolver<Maybe<ResolversTypes['DisableIDPResponse']>, ParentType, ContextType, RequireFields<MutationDisableIdpArgs, 'identityProvider'>>
 	enableIDP?: Resolver<Maybe<ResolversTypes['EnableIDPResponse']>, ParentType, ContextType, RequireFields<MutationEnableIdpArgs, 'identityProvider'>>
 	prepareOtp?: Resolver<Maybe<ResolversTypes['PrepareOtpResponse']>, ParentType, ContextType, RequireFields<MutationPrepareOtpArgs, never>>
@@ -1887,6 +1925,18 @@ export type SignUpResultResolvers<ContextType = any, ParentType extends Resolver
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
+export type UpdateIdpErrorResolvers<ContextType = any, ParentType extends ResolversParentTypes['UpdateIDPError'] = ResolversParentTypes['UpdateIDPError']> = {
+	code?: Resolver<ResolversTypes['UpdateIDPErrorCode'], ParentType, ContextType>
+	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
+export type UpdateIdpResponseResolvers<ContextType = any, ParentType extends ResolversParentTypes['UpdateIDPResponse'] = ResolversParentTypes['UpdateIDPResponse']> = {
+	error?: Resolver<Maybe<ResolversTypes['UpdateIDPError']>, ParentType, ContextType>
+	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
 export type UpdateProjectMemberErrorResolvers<ContextType = any, ParentType extends ResolversParentTypes['UpdateProjectMemberError'] = ResolversParentTypes['UpdateProjectMemberError']> = {
 	code?: Resolver<ResolversTypes['UpdateProjectMemberErrorCode'], ParentType, ContextType>
 	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
@@ -1991,6 +2041,8 @@ export type Resolvers<ContextType = any> = {
 	SignUpError?: SignUpErrorResolvers<ContextType>
 	SignUpResponse?: SignUpResponseResolvers<ContextType>
 	SignUpResult?: SignUpResultResolvers<ContextType>
+	UpdateIDPError?: UpdateIdpErrorResolvers<ContextType>
+	UpdateIDPResponse?: UpdateIdpResponseResolvers<ContextType>
 	UpdateProjectMemberError?: UpdateProjectMemberErrorResolvers<ContextType>
 	UpdateProjectMemberResponse?: UpdateProjectMemberResponseResolvers<ContextType>
 	UpdateProjectResponse?: UpdateProjectResponseResolvers<ContextType>

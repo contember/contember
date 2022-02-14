@@ -64,6 +64,7 @@ import { IdentityFetcher } from './bridges/system/IdentityFetcher'
 import { SignInResponseFactory } from './resolvers/responseHelpers/SignInResponseFactory'
 import { IDPManager } from './model/service/idp/IDPManager'
 import { IDPQueryResolver } from './resolvers/query/IDPQueryResolver'
+import { UpdateIDPMutationResolver } from './resolvers/mutation/idp/UpdateIDPMutationResolver'
 
 export type ConnectionType = Connection.ConnectionLike & Connection.ClientFactory & Connection.PoolStatusProvider
 
@@ -219,6 +220,8 @@ export class TenantContainerFactory {
 				new IDPMutationResolver(idpSignInManager, signInResponseFactory))
 			.addService('registerIdpMutationResolver', ({ idpManager }) =>
 				new AddIDPMutationResolver(idpManager))
+			.addService('updateIdpMutationResolver', ({ idpManager }) =>
+				new UpdateIDPMutationResolver(idpManager))
 			.addService('disableIdpMutationResolver', ({ idpManager }) =>
 				new DisableIDPMutationResolver(idpManager))
 			.addService('enableIdpMutationResolver', ({ idpManager }) =>

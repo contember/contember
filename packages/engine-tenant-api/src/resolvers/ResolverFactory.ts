@@ -23,6 +23,7 @@ import { MeQueryResolver, ProjectMembersQueryResolver, ProjectQueryResolver } fr
 import { IdentityTypeResolver, ProjectTypeResolver } from './types'
 import { DateTimeType, JSONType } from '@contember/graphql-utils'
 import { IDPQueryResolver } from './query/IDPQueryResolver'
+import { UpdateIDPMutationResolver } from './mutation/idp/UpdateIDPMutationResolver'
 
 class ResolverFactory {
 	public constructor(
@@ -41,6 +42,7 @@ class ResolverFactory {
 			registerIdpMutationResolver: AddIDPMutationResolver
 			disableIdpMutationResolver: DisableIDPMutationResolver
 			enableIdpMutationResolver: EnableIDPMutationResolver
+			updateIdpMutationResolver: UpdateIDPMutationResolver
 
 			inviteMutationResolver: InviteMutationResolver
 			addProjectMemberMutationResolver: AddProjectMemberMutationResolver
@@ -102,6 +104,7 @@ class ResolverFactory {
 				addIDP: this.resolvers.registerIdpMutationResolver.addIDP.bind(this.resolvers.registerIdpMutationResolver),
 				disableIDP: this.resolvers.disableIdpMutationResolver.disableIDP.bind(this.resolvers.disableIdpMutationResolver),
 				enableIDP: this.resolvers.enableIdpMutationResolver.enableIDP.bind(this.resolvers.enableIdpMutationResolver),
+				updateIDP: this.resolvers.updateIdpMutationResolver.updateIDP.bind(this.resolvers.updateIdpMutationResolver),
 
 				invite: this.resolvers.inviteMutationResolver.invite.bind(this.resolvers.inviteMutationResolver),
 				unmanagedInvite: this.resolvers.inviteMutationResolver.unmanagedInvite.bind(this.resolvers.inviteMutationResolver),

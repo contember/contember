@@ -32,7 +32,8 @@ const schema: DocumentNode = gql`
 		signInIDP(identityProvider: String!, idpResponse: IDPResponseInput!, redirectUrl: String!, sessionData: Json!, expiration: Int): SignInIDPResponse
 
 		# IDP management
-		addIDP(identityProvider: String!, type: String!, configuration: Json!): AddIDPResponse
+		addIDP(identityProvider: String!, type: String!, configuration: Json!, options: IDPOptions): AddIDPResponse
+		updateIDP(identityProvider: String!, configuration: Json, options: IDPOptions): UpdateIDPResponse
 		disableIDP(identityProvider: String!): DisableIDPResponse
 		enableIDP(identityProvider: String!): EnableIDPResponse
 
@@ -279,6 +280,21 @@ const schema: DocumentNode = gql`
 		INVALID_CONFIGURATION
 	}
 
+	type UpdateIDPResponse {
+		error: UpdateIDPError
+		ok: Boolean!
+	}
+
+	type UpdateIDPError {
+		code: UpdateIDPErrorCode!
+		developerMessage: String!
+	}
+
+	enum UpdateIDPErrorCode {
+		NOT_FOUND
+		INVALID_CONFIGURATION
+	}
+
 
 	type DisableIDPResponse {
 		error: DisableIDPError
@@ -313,6 +329,10 @@ const schema: DocumentNode = gql`
 		type: String!
 		configuration: Json!
 		disabledAt: DateTime!
+	}
+
+	input IDPOptions {
+		autoSignUp: Boolean
 	}
 
 

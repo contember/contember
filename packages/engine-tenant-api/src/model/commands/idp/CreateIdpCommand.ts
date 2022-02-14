@@ -9,11 +9,15 @@ export class CreateIdpCommand implements Command<void> {
 	}
 
 	async execute({ db, providers }: Command.Args): Promise<void> {
+		const { configuration, options: { autoSignUp }, slug, type } = this.data
 		await InsertBuilder.create()
 			.into('identity_provider')
 			.values({
 				id: providers.uuid(),
-				...this.data,
+				configuration,
+				slug,
+				type,
+				auto_sign_up: autoSignUp,
 			})
 			.execute(db)
 	}

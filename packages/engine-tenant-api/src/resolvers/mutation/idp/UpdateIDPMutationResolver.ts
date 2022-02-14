@@ -1,30 +1,34 @@
-import { MutationAddIdpArgs, MutationResolvers, AddIdpResponse } from '../../../schema'
+import {
+	MutationAddIdpArgs,
+	MutationResolvers,
+	AddIdpResponse,
+	MutationUpdateIdpArgs,
+	UpdateIdpResponse,
+} from '../../../schema'
 import { GraphQLResolveInfo } from 'graphql'
 import { ResolverContext } from '../../ResolverContext'
 import { PermissionActions } from '../../../model'
 import { IDPManager } from '../../../model/service/idp/IDPManager'
 import { createErrorResponse } from '../../errorUtils'
 
-export class AddIDPMutationResolver implements MutationResolvers {
+export class UpdateIDPMutationResolver implements MutationResolvers {
 	constructor(private readonly idpManager: IDPManager) {
 	}
 
-	async addIDP(
+	async updateIDP(
 		parent: any,
-		args: MutationAddIdpArgs,
+		args: MutationUpdateIdpArgs,
 		context: ResolverContext,
 		info: GraphQLResolveInfo,
-	): Promise<AddIdpResponse> {
+	): Promise<UpdateIdpResponse> {
 		await context.requireAccess({
 			action: PermissionActions.IDP_ADD,
 			message: 'You are not allowed to add IDP',
 		})
-		const result = await this.idpManager.addIDP(context.db, {
+		const result = await this.idpManager.updateIDP(context.db, args.identityProvider, {
 			configuration: args.configuration,
-			slug: args.identityProvider,
-			type: args.type,
 			options: {
-				autoSignUp: args.options?.autoSignUp ?? false,
+				autoSignUp: args.options?.autoSignUp ?? undefined,
 			},
 		})
 		if (!result.ok) {

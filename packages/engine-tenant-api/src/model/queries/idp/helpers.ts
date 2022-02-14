@@ -8,4 +8,5 @@ export const createBaseIdpQuery = () =>
 		.select('type')
 		.select('configuration')
 		.select('disabled_at', 'disabledAt')
+		.select('auto_sign_up', 'autoSignUp')
 		.from('identity_provider')

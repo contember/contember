@@ -4,4 +4,5 @@ export type IdentityProviderRow = {
 	type: string
 	disabledAt: Date | unknown
 	configuration: Record<string, unknown>
+	autoSignUp: boolean
 }

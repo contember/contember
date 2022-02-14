@@ -1,9 +1,12 @@
 import { ApiKeyManager } from './apiKey'
 import { IdentityProviderBySlugQuery, PersonQuery, PersonRow } from '../queries'
-import { IDPHandlerRegistry, IDPResponse, IDPResponseError, IDPValidationError } from './idp'
+import { IDPClaim, IDPHandlerRegistry, IDPResponse, IDPResponseError, IDPValidationError } from './idp'
 import { Response, ResponseError, ResponseOk } from '../utils/Response'
 import { InitSignInIdpErrorCode, SignInIdpErrorCode } from '../../schema'
 import { DatabaseContext } from '../utils'
+import { CreateIdentityCommand, CreatePersonCommand } from '../commands'
+import { TenantRole } from '../authorization'
+import { ImplementationException } from '../../exceptions'
 
 class IDPSignInManager {
 	constructor(
@@ -19,35 +22,50 @@ class IDPSignInManager {
 		sessionData: any,
 		expiration?: number,
 	): Promise<IDPSignInManager.SignInIDPResponse> {
-		const provider = await dbContext.queryHandler.fetch(new IdentityProviderBySlugQuery(idpSlug))
-		if (!provider || provider.disabledAt) {
-			throw new Error('provider not found')
-		}
-		try {
+		return dbContext.transaction(async db => {
+			const provider = await db.queryHandler.fetch(new IdentityProviderBySlugQuery(idpSlug))
+			if (!provider || provider.disabledAt) {
+				throw new Error('provider not found')
+			}
 			const providerService = this.idpRegistry.getHandler(provider.type)
 			const validatedConfig = providerService.validateConfiguration(provider.configuration)
-			const claim = await providerService.processResponse(
-				validatedConfig,
-				redirectUrl,
-				idpResponse,
-				sessionData,
-			)
-			const personRow = await dbContext.queryHandler.fetch(PersonQuery.byEmail(claim.email))
+			let claim: IDPClaim
+			try {
+				claim = await providerService.processResponse(
+					validatedConfig,
+					redirectUrl,
+					idpResponse,
+					sessionData,
+				)
+			} catch (e) {
+				if (e instanceof IDPResponseError) {
+					return new ResponseError(SignInIdpErrorCode.InvalidIdpResponse, e.message)
+				}
+				if (e instanceof IDPValidationError) {
+					return new ResponseError(SignInIdpErrorCode.IdpValidationFailed, e.message)
+				}
+				throw e
+			}
+			let personRow = await db.queryHandler.fetch(PersonQuery.byEmail(claim.email))
 			if (!personRow) {
-				return new ResponseError(SignInIdpErrorCode.PersonNotFound, `Person ${claim.email} not found`)
+				if (!provider.autoSignUp) {
+					return new ResponseError(SignInIdpErrorCode.PersonNotFound, `Person ${claim.email} not found`)
+				}
+				const roles = [TenantRole.PERSON]
+				const identityId = await db.commandBus.execute(new CreateIdentityCommand(roles))
+				const newPerson = await db.commandBus.execute(new CreatePersonCommand(identityId, claim.email, null))
+				personRow = {
+					...newPerson,
+					roles,
+				}
+			}
+			if (!personRow) {
+				throw new ImplementationException()
 			}
 
-			const sessionToken = await this.apiKeyManager.createSessionApiKey(dbContext, personRow.identity_id, expiration)
+			const sessionToken = await this.apiKeyManager.createSessionApiKey(db, personRow.identity_id, expiration)
 			return new ResponseOk({ person: personRow, token: sessionToken })
-		} catch (e) {
-			if (e instanceof IDPResponseError) {
-				return new ResponseError(SignInIdpErrorCode.InvalidIdpResponse, e.message)
-			}
-			if (e instanceof IDPValidationError) {
-				return new ResponseError(SignInIdpErrorCode.IdpValidationFailed, e.message)
-			}
-			throw e
-		}
+		})
 	}
 
 	async initSignInIDP(dbContext: DatabaseContext, idpSlug: string, redirectUrl: string): Promise<IDPSignInManager.InitSignInIDPResponse> {

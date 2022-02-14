@@ -35,7 +35,6 @@
 		"@formatjs/icu-messageformat-parser": "2.0.11",
 		"@mangoweb/sass-base": "0.0.8",
 		"@sindresorhus/slugify": "0.11.0",
-		"attr-accept": "2.2.2",
 		"blueimp-md5": "2.18.0",
 		"buffer": "6.0.3",
 		"classnames": "2.3.1",

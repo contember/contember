@@ -13,7 +13,7 @@ import {
 } from '@contember/binding'
 import { emptyArray, noop } from '@contember/react-utils'
 import { EditorCanvas, EditorCanvasSize, FieldContainer, Scheme } from '@contember/ui'
-import { Fragment, FunctionComponent, ReactElement, ReactNode, useCallback, useMemo, useState } from 'react'
+import { Fragment, FunctionComponent, ReactElement, ReactNode, useCallback, useMemo, useState, useEffect } from 'react'
 import { Range as SlateRange, Transforms } from 'slate'
 import { Slate } from 'slate-react'
 import { getDiscriminatedBlock, useNormalizedBlocks } from '../../blocks'
@@ -187,6 +187,13 @@ const BlockEditorComponent: FunctionComponent<BlockEditorProps> = Component(
 
 		const leadingElements = useFieldBackedElementFields(leadingFieldBackedElements)
 		const trailingElements = useFieldBackedElementFields(trailingFieldBackedElements)
+
+		useEffect(() => {
+			if (editor.children !== nodes) {
+				editor.children = nodes
+			}
+		}, [nodes, editor])
+
 
 		return (
 			<FieldContainer label={label} useLabelElement={false}>

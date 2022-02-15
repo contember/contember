@@ -1,3 +1,4 @@
+export * from './BrowserTabs'
 export * from './LocalStorage'
 export * from './useClassNamePrefix'
 export * from './useCloseOnEscapeOrClickOutside'

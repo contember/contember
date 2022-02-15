@@ -2,6 +2,7 @@ import { KoaMiddleware } from '../koa'
 import { AuthMiddlewareState, ErrorFactory } from '../common'
 import { ProjectGroupContainer, ProjectGroupContainerResolver } from '../ProjectGroupContainer'
 import { CryptoWrapper } from '../utils/CryptoWrapper'
+import { HttpError } from '../common/HttpError'
 
 export interface ProjectGroupState {
 	projectGroupContainer: ProjectGroupContainer
@@ -20,7 +21,6 @@ export class ProjectGroupMiddlewareFactory {
 		private projectGroupConfigHeader: string | undefined,
 		private projectGroupConfigCrypto: CryptoWrapper | undefined,
 		private projectGroupContainerResolver: ProjectGroupContainerResolver,
-		private readonly errorFactory: ErrorFactory,
 	) {
 	}
 
@@ -40,13 +40,13 @@ export class ProjectGroupMiddlewareFactory {
 			if (groupRegex) {
 				const match = ctx.request.host.match(groupRegex)
 				if (!match) {
-					return this.errorFactory.createError(ctx, 'Project group not found', 404)
+					throw new HttpError('Project group not found', 404)
 				}
 				group = match[1]
 				if (this.projectGroupConfigHeader) {
 					const configHeader = ctx.request.get(this.projectGroupConfigHeader.toLowerCase())
 					if (configHeader === '') {
-						return this.errorFactory.createError(ctx, `${this.projectGroupConfigHeader} header is missing`, 400)
+						throw new HttpError(`${this.projectGroupConfigHeader} header is missing`, 400)
 					}
 					const configValue = Buffer.from(configHeader, 'base64')
 					const decryptedValue = this.projectGroupConfigCrypto ?
@@ -55,7 +55,7 @@ export class ProjectGroupMiddlewareFactory {
 					try {
 						config = JSON.parse(decryptedValue.toString())
 					} catch (e: any) {
-						return this.errorFactory.createError(ctx, `Cannot parse config: ${e.message}`, 400)
+						throw new HttpError(`Cannot parse config: ${e.message}`, 400)
 					}
 				}
 			}

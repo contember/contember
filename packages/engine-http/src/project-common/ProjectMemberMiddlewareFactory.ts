@@ -1,8 +1,8 @@
 import { KoaMiddleware } from '../koa'
 import { ProjectResolveMiddlewareState } from './ProjectResolveMiddlewareFactory'
-import { AuthMiddlewareState, ErrorFactory, TimerMiddlewareState } from '../common'
-import { ProjectMemberManager } from '@contember/engine-tenant-api'
+import { AuthMiddlewareState, TimerMiddlewareState } from '../common'
 import { ProjectGroupState } from './ProjectGroupMiddlewareFactory'
+import { HttpError } from '../common/HttpError'
 
 type InputKoaState =
 	& AuthMiddlewareState
@@ -21,7 +21,6 @@ export interface ProjectMemberMiddlewareState {
 export class ProjectMemberMiddlewareFactory {
 	constructor(
 		private readonly debug: boolean,
-		private readonly errorFactory: ErrorFactory,
 	) {
 	}
 
@@ -41,9 +40,9 @@ export class ProjectMemberMiddlewareFactory {
 				),
 			)
 			if (projectMemberships.length === 0) {
-				return this.debug
-					? this.errorFactory.createError(ctx, `You are not allowed to access project ${project.slug}`, 403)
-					: this.errorFactory.createError(ctx, `Project ${project.slug} NOT found`, 404)
+				throw this.debug
+					? new HttpError(`You are not allowed to access project ${project.slug}`, 403)
+					: new HttpError(`Project ${project.slug} NOT found`, 404)
 			}
 			ctx.state.projectMemberships = projectMemberships
 			await next()

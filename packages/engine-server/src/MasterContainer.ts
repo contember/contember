@@ -18,7 +18,7 @@ import {
 	createProviders,
 	createTimerMiddleware,
 	CryptoWrapper,
-	ErrorFactory,
+	ErrorFactory, ErrorMiddlewareFactory,
 	Koa,
 	NotModifiedMiddlewareFactory,
 	ProjectGroupMiddlewareFactory,
@@ -135,11 +135,11 @@ export class MasterContainerFactory {
 				})
 				return register
 			})
-			.addService('httpErrorFactory', ({ debugMode }) =>
-				new ErrorFactory(debugMode))
-			.addService('authMiddlewareFactory', ({ httpErrorFactory }) =>
-				new AuthMiddlewareFactory(httpErrorFactory))
-			.addService('projectGroupMiddlewareFactory', ({ projectGroupContainerResolver, httpErrorFactory }) => {
+			.addService('httpErrorMiddlewareFactory', ({ debugMode }) =>
+				new ErrorMiddlewareFactory(debugMode))
+			.addService('authMiddlewareFactory', () =>
+				new AuthMiddlewareFactory())
+			.addService('projectGroupMiddlewareFactory', ({ projectGroupContainerResolver }) => {
 				const encryptionKey = config.server.projectGroup?.configEncryptionKey
 					? createSecretKey(Buffer.from(config.server.projectGroup?.configEncryptionKey, 'hex'))
 					: undefined
@@ -148,24 +148,24 @@ export class MasterContainerFactory {
 					config.server.projectGroup?.configHeader,
 					config.server.projectGroup?.configEncryptionKey ? new CryptoWrapper(encryptionKey) : undefined,
 					projectGroupContainerResolver,
-					httpErrorFactory,
 				)
 			})
-			.addService('projectResolverMiddlewareFactory', ({ httpErrorFactory }) =>
-				new ProjectResolveMiddlewareFactory(httpErrorFactory))
+			.addService('projectResolverMiddlewareFactory', () =>
+				new ProjectResolveMiddlewareFactory())
 			.addService('apiMiddlewareFactory', ({ projectGroupMiddlewareFactory, authMiddlewareFactory }) =>
 				new ApiMiddlewareFactory(projectGroupMiddlewareFactory, authMiddlewareFactory))
-			.addService('stageResolveMiddlewareFactory', ({ httpErrorFactory }) =>
-				new StageResolveMiddlewareFactory(httpErrorFactory))
+			.addService('stageResolveMiddlewareFactory', () =>
+				new StageResolveMiddlewareFactory())
 			.addService('notModifiedMiddlewareFactory', () =>
 				new NotModifiedMiddlewareFactory())
-			.addService('projectMemberMiddlewareFactory', ({ debugMode, httpErrorFactory }) =>
-				new ProjectMemberMiddlewareFactory(debugMode, httpErrorFactory))
+			.addService('projectMemberMiddlewareFactory', ({ debugMode }) =>
+				new ProjectMemberMiddlewareFactory(debugMode))
 			.addService('contentServerMiddlewareFactory', () =>
 				new ContentServerMiddlewareFactory())
 			.addService(
 				'koa',
 				({
+					httpErrorMiddlewareFactory,
 					 tenantGraphQlMiddlewareFactory,
 					 systemGraphQLMiddlewareFactory,
 					 apiMiddlewareFactory,
@@ -189,6 +189,7 @@ export class MasterContainerFactory {
 								jsonLimit: config.server.http.requestBodySize || '1mb',
 							}),
 							createPoweredByHeaderMiddleware(debugMode, version ?? 'unknown'),
+							httpErrorMiddlewareFactory.create(),
 							createColllectHttpMetricsMiddleware(promRegistry),
 							createTimerMiddleware(),
 							route('/playground$', createPlaygroundMiddleware()),

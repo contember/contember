@@ -3,6 +3,7 @@ import { ProjectContainer } from '../ProjectContainer'
 import { ProjectConfig } from '../config'
 import { AuthMiddlewareState, ErrorFactory } from '../common'
 import { ProjectGroupState } from './ProjectGroupMiddlewareFactory'
+import { HttpError } from '../common/HttpError'
 
 type InputKoaState =
 	& KoaRequestState
@@ -19,18 +20,13 @@ export interface ProjectResolveMiddlewareState {
 }
 
 export class ProjectResolveMiddlewareFactory {
-	constructor(
-		private readonly errorFactory: ErrorFactory,
-	) {
-	}
-
 	public create(): KoaMiddleware<KoaState> {
 		const projectResolve: KoaMiddleware<KoaState> = async (ctx, next) => {
 			const projectSlug = ctx.state.params.projectSlug
 			const projectContainer = await ctx.state.projectGroupContainer.projectContainerResolver.getProjectContainer(projectSlug, true)
 
 			if (projectContainer === undefined) {
-				return this.errorFactory.createError(ctx, `Project ${projectSlug} NOT found`, 404)
+				throw new HttpError(`Project ${projectSlug} NOT found`, 404)
 			}
 			ctx.state.projectContainer = projectContainer
 			ctx.state.project = projectContainer.project

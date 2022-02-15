@@ -20,6 +20,7 @@ const schema: DocumentNode = gql`
 	type Mutation {
 		signUp(email: String!, password: String!, roles: [String!]): SignUpResponse
 		signIn(email: String!, password: String!, expiration: Int, otpToken: String): SignInResponse
+		createSessionToken(email: String!, expiration: Int): CreateSessionTokenResponse
 		signOut(all: Boolean): SignOutResponse
 		changePassword(personId: String!, password: String!): ChangePasswordResponse
 		changeMyPassword(currentPassword: String!, newPassword: String!): ChangeMyPasswordResponse
@@ -90,6 +91,13 @@ const schema: DocumentNode = gql`
 		person: Person!
 	}
 
+	# === signInCommon ==
+
+	interface CommonSignInResult {
+		token: String!
+		person: Person!
+	}
+
 	# === signIn ===
 	type SignInResponse {
 		ok: Boolean!
@@ -112,7 +120,29 @@ const schema: DocumentNode = gql`
 		INVALID_OTP_TOKEN
 	}
 
-	type SignInResult {
+	type SignInResult implements CommonSignInResult {
+		token: String!
+		person: Person!
+	}
+
+	# == createSessionToken ==
+
+	type CreateSessionTokenResponse {
+		ok: Boolean!
+		error: CreateSessionTokenError
+		result: CreateSessionTokenResult
+	}
+
+	type CreateSessionTokenError {
+		code: CreateSessionTokenErrorCode!
+		developerMessage: String!
+	}
+
+	enum CreateSessionTokenErrorCode {
+		UNKNOWN_EMAIL
+	}
+
+	type CreateSessionTokenResult implements CommonSignInResult{
 		token: String!
 		person: Person!
 	}
@@ -220,7 +250,7 @@ const schema: DocumentNode = gql`
 		PERSON_NOT_FOUND
 	}
 
-	type SignInIDPResult {
+	type SignInIDPResult implements CommonSignInResult {
 		token: String!
 		person: Person!
 	}

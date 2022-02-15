@@ -1,15 +1,19 @@
-import { MutationResolvers, MutationSignInArgs, SignInResponse } from '../../../schema'
+import {
+	CreateSessionTokenResponse,
+	MutationCreateSessionTokenArgs,
+	MutationResolvers,
+	MutationSignInArgs,
+	SignInResponse,
+} from '../../../schema'
 import { ResolverContext } from '../../ResolverContext'
-import { PermissionActions, PermissionContextFactory, SignInManager } from '../../../model'
-import { IdentityTypeResolver } from '../../types'
-import { createResolverContext } from '../../ResolverContextFactory'
+import { PermissionActions, SignInManager } from '../../../model'
 import { createErrorResponse } from '../../errorUtils'
+import { SignInResponseFactory } from '../../responseHelpers/SignInResponseFactory'
 
 export class SignInMutationResolver implements MutationResolvers {
 	constructor(
 		private readonly signInManager: SignInManager,
-		private readonly identityTypeResolver: IdentityTypeResolver,
-		private readonly permissionContextFactory: PermissionContextFactory,
+		private readonly signInResponseFactory: SignInResponseFactory,
 	) {}
 
 	async signIn(parent: any, args: MutationSignInArgs, context: ResolverContext): Promise<SignInResponse> {
@@ -29,32 +33,31 @@ export class SignInMutationResolver implements MutationResolvers {
 		if (!response.ok) {
 			return createErrorResponse(response.error, response.errorMessage)
 		}
-		const result = response.result
-		const identityId = result.person.identity_id
-		const permissionContext = this.permissionContextFactory.create(context.projectGroup, { id: identityId, roles: result.person.roles })
-		const projects = await this.identityTypeResolver.projects(
-			{ id: identityId, projects: [] },
-			{},
-			{
-				...context,
-				...createResolverContext(permissionContext, context.apiKeyId),
-			},
-		)
 		return {
 			ok: true,
 			errors: [],
-			result: {
-				token: result.token,
-				person: {
-					id: result.person.id,
-					otpEnabled: !!result.person.otp_activated_at,
-					email: result.person.email,
-					identity: {
-						id: identityId,
-						projects,
-					},
-				},
-			},
+			result: await this.signInResponseFactory.createResponse(response.result, context),
+		}
+	}
+
+	async createSessionToken(parent: any, args: MutationCreateSessionTokenArgs, context: ResolverContext): Promise<CreateSessionTokenResponse> {
+		await context.requireAccess({
+			action: PermissionActions.PERSON_CREATE_SESSION_KEY,
+			message: 'You are not allowed to create a session key',
+		})
+
+		const response = await this.signInManager.createSessionToken(
+			context.db,
+			args.email,
+			args.expiration || undefined,
+		)
+
+		if (!response.ok) {
+			return createErrorResponse(response.error, response.errorMessage)
+		}
+		return {
+			ok: true,
+			result: await this.signInResponseFactory.createResponse(response.result, context),
 		}
 	}
 }

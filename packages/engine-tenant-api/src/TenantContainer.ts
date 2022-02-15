@@ -62,6 +62,7 @@ import * as Schema from './schema'
 import { createMailer, MailerOptions, TemplateRenderer } from './utils'
 import { MigrationsRunnerFactory, TenantCredentials } from './migrations'
 import { IdentityFetcher } from './bridges/system/IdentityFetcher'
+import { SignInResponseFactory } from './resolvers/responseHelpers/SignInResponseFactory'
 
 export type ConnectionType = Connection.ConnectionLike & Connection.ClientFactory & Connection.PoolStatusProvider
 
@@ -175,6 +176,8 @@ export class TenantContainerFactory {
 				new IdentityTypeResolver(projectMemberManager, projectManager))
 			.addService('projectTypeResolver', ({ projectMemberManager, projectSchemaResolver }) =>
 				new ProjectTypeResolver(projectMemberManager, projectSchemaResolver))
+			.addService('signInResponseFactory', ({ permissionContextFactory, identityTypeResolver }) =>
+				new SignInResponseFactory(permissionContextFactory, identityTypeResolver))
 			.addService('meQueryResolver', () =>
 				new MeQueryResolver())
 			.addService('projectQueryResolver', ({ projectManager }) =>
@@ -183,8 +186,8 @@ export class TenantContainerFactory {
 				new ProjectMembersQueryResolver(projectManager, projectMemberManager))
 			.addService('signUpMutationResolver', ({ signUpManager, apiKeyManager }) =>
 				new SignUpMutationResolver(signUpManager, apiKeyManager))
-			.addService('signInMutationResolver', ({ signInManager, permissionContextFactory, identityTypeResolver }) =>
-				new SignInMutationResolver(signInManager, identityTypeResolver, permissionContextFactory))
+			.addService('signInMutationResolver', ({ signInManager, signInResponseFactory  }) =>
+				new SignInMutationResolver(signInManager, signInResponseFactory))
 			.addService('signOutMutationResolver', ({ apiKeyManager }) =>
 				new SignOutMutationResolver(apiKeyManager))
 			.addService('changePasswordMutationResolver', ({ passwordChangeManager }) =>
@@ -207,8 +210,8 @@ export class TenantContainerFactory {
 				new OtpMutationResolver(otpManager))
 			.addService('mailTemplateMutationResolver', ({ projectManager, mailTemplateManager }) =>
 				new MailTemplateMutationResolver(projectManager, mailTemplateManager))
-			.addService('idpMutationResolver', ({ idpSignInManager, identityTypeResolver, permissionContextFactory }) =>
-				new IDPMutationResolver(idpSignInManager, identityTypeResolver, permissionContextFactory))
+			.addService('idpMutationResolver', ({ idpSignInManager, signInResponseFactory }) =>
+				new IDPMutationResolver(idpSignInManager, signInResponseFactory))
 			.addService('createProjectMutationResolver', ({ projectManager }) =>
 				new CreateProjectMutationResolver(projectManager))
 			.addService('updateProjectMutationResolver', ({ projectManager }) =>

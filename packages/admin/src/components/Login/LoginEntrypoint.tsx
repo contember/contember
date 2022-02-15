@@ -142,7 +142,7 @@ const LoginContainer = ({ identityProviders }: {
 
 	const hasOauthResponse = useMemo(() => {
 		const params = new URLSearchParams(window.location.search)
-		return params.has('state') && params.has('code') && params.has('scope')
+		return params.has('state') && (params.has('code') || params.has('id_token'))
 	}, [])
 
 	if (hasOauthResponse) {

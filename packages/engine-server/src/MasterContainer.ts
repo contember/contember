@@ -39,6 +39,7 @@ import { ProjectConfigResolver } from './config/projectConfigResolver'
 import { TenantConfigResolver } from './config/tenantConfigResolver'
 import { ProjectGroupContainerResolver } from './projectGroup/ProjectGroupContainerResolver'
 import { ProjectGroupContainerFactory } from './projectGroup/ProjectGroupContainer'
+import corsMiddleware from '@koa/cors'
 
 export interface MasterContainer {
 	initializer: Initializer
@@ -194,6 +195,7 @@ export class MasterContainerFactory {
 							createTimerMiddleware(),
 							route('/playground$', createPlaygroundMiddleware()),
 							createHomepageMiddleware(),
+							corsMiddleware(),
 							route(
 								'/content/:projectSlug/:stageSlug$',
 								compose([

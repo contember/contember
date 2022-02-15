@@ -1,6 +1,5 @@
 import { compose, KoaMiddleware } from '../koa'
 import { createModuleInfoMiddleware } from './ModuleInfoMiddleware'
-import corsMiddleware from '@koa/cors'
 import { AuthMiddlewareFactory } from './AuthMiddleware'
 import { ProjectGroupMiddlewareFactory } from '../project-common'
 
@@ -17,7 +16,6 @@ export class ApiMiddlewareFactory {
 		return compose([
 			this.projectGroupMiddlewareFactory.create(),
 			createModuleInfoMiddleware(module),
-			corsMiddleware(),
 			this.authMiddlewareFactory.create(),
 		])
 	}

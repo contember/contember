@@ -188,9 +188,12 @@ const BlockEditorComponent: FunctionComponent<BlockEditorProps> = Component(
 		const leadingElements = useFieldBackedElementFields(leadingFieldBackedElements)
 		const trailingElements = useFieldBackedElementFields(trailingFieldBackedElements)
 
+		const [_, setMeaninglessState] = useState(0)
 		useEffect(() => {
-			if (editor.children !== nodes) {
+			if (editor.children !== nodes && JSON.stringify(editor.children) !== JSON.stringify(nodes)) {
 				editor.children = nodes
+				// Force a re-render
+				setMeaninglessState(meaninglessState => meaninglessState + 1)
 			}
 		}, [nodes, editor])
 

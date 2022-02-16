@@ -33,8 +33,8 @@ export const configTemplate: any = {
 			port: `%project.env.DB_PORT::number%`,
 			user: `%project.env.DB_USER%`,
 			password: `%project.secret.db.password||project.env.DB_PASSWORD%`,
-			ssl: `%?project.env.DB_SSL::bool%`,
 			database: `%project.env.DB_NAME||project.slug%`,
+			ssl: `%?project.env.DB_SSL::bool%`,
 		},
 	},
 	server: {

@@ -88,6 +88,7 @@ export class ProjectGroupContainerFactory {
 					tenantProjectManager,
 					systemContainer.projectInitializer,
 					tenantContainer.databaseContext,
+					config,
 				))
 
 			.setupService('projectSchemaResolver', (it, { projectContainerResolver, schemaVersionBuilder }) => {

@@ -101,7 +101,12 @@ export const projectConfigSchema = Typesafe.object({
 	slug: (_, path = []) => String(path[path.length - 2]),
 	stages: (input, path = []) => Object.values(stageConfig(input, path)),
 	db: Typesafe.intersection(
-		dbCredentialsSchema,
+		Typesafe.union(
+			Typesafe.object({
+				useTenantDb: Typesafe.literal(true),
+			}),
+			dbCredentialsSchema,
+		),
 		Typesafe.partial({
 			systemSchema: Typesafe.string,
 		}),

@@ -5,6 +5,7 @@ import { ProjectInitializer as SystemProjectInitializer } from '@contember/engin
 import { ProjectContainerStore } from './ProjectContainerStore'
 import { Logger } from '@contember/engine-common'
 import { ProjectConfigResolver } from '../config/projectConfigResolver'
+import { TenantConfig } from '../config/config'
 
 export class ProjectContainerResolver {
 	private projectContainers = new ProjectContainerStore()
@@ -17,6 +18,7 @@ export class ProjectContainerResolver {
 		private readonly projectManager: ProjectManager,
 		private readonly systemProjectInitializer: SystemProjectInitializer,
 		private readonly tenantDatabase: DatabaseContext,
+		private readonly tenantConfig: TenantConfig,
 	) {}
 
 	public async getAllProjectContainers(): Promise<ProjectContainer[]> {
@@ -61,7 +63,7 @@ export class ProjectContainerResolver {
 	}
 
 	public async createProjectContainer(project: ProjectWithSecrets): Promise<ProjectContainer> {
-		const projectConfig = this.projectConfigResolver(project.slug, project.config, project.secrets)
+		const projectConfig = this.projectConfigResolver(project.slug, project.config, project.secrets, this.tenantConfig)
 		return (await this.projectContainers.fetchContainer(project.slug, async slug => {
 			const projectContainer = this.projectContainerFactory.createContainer({
 				project: projectConfig,

@@ -3,17 +3,19 @@ import { ConfigProcessor } from '@contember/engine-plugins'
 import { Merger, ParametersResolver, resolveParameters, UndefinedParameterError } from '@contember/config-loader'
 import { Typesafe } from '@contember/engine-common'
 import { projectConfigSchema } from './configSchema'
+import { TenantConfig } from './config'
 
 export type ProjectConfigResolver = (
 	slug: string,
 	additionalConfig: any,
 	secrets: ProjectSecrets,
+	tenantConfig: TenantConfig,
 ) => ProjectConfig
 
 type Env = Record<string, string>
 
 export const createProjectConfigResolver = (env: Env, config: any, configProcessors: ConfigProcessor[]): ProjectConfigResolver =>
-	(slug, additionalConfig, secrets) => {
+	(slug, additionalConfig, secrets, tenantConfig): ProjectConfig => {
 		const mergedConfig = Merger.merge(
 			config.projectDefaults as any,
 			(config?.projects as any)?.[slug] as any,
@@ -30,7 +32,20 @@ export const createProjectConfigResolver = (env: Env, config: any, configProcess
 			),
 			projectConfigSchema,
 		)
-		return projectConfigSchemaWithPlugins(resolvedConfig, ['project', slug])
+		const projectConfig = projectConfigSchemaWithPlugins(resolvedConfig, ['project', slug])
+		if (!('host' in projectConfig.db)) {
+			return {
+				...projectConfig,
+				db: {
+					...tenantConfig.db,
+					...projectConfig.db,
+				},
+			}
+		}
+		return {
+			...projectConfig,
+			db: projectConfig.db,
+		}
 	}
 
 

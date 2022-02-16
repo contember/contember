@@ -1,4 +1,3 @@
-import { unnamedIdentity } from './helpers'
 import { ProjectConfig } from '../types'
 import { ProjectMigrator, SchemaVersionBuilder } from './migrations'
 import { StageCreator } from './stages'
@@ -29,7 +28,7 @@ export class ProjectInitializer {
 		logger: Logger,
 		migrations?: Migration[],
 	) {
-		const dbContext = databaseContextFactory.create(unnamedIdentity)
+		const dbContext = databaseContextFactory.create()
 		if (project.db) {
 			// todo: use dbContext
 			logger.group(`Executing system schema migration`)
@@ -38,7 +37,7 @@ export class ProjectInitializer {
 			const systemSchema = dbContext.client.schema
 			const dbContextMigrations = databaseContextFactory
 				.withClient(singleConnection.createClient(systemSchema, { module: 'system' }))
-				.create(unnamedIdentity)
+				.create()
 
 			const schemaResolver = () => this.schemaVersionBuilder.buildSchema(dbContextMigrations)
 			await this.systemDbMigrationsRunnerFactory(singleConnection, systemSchema).migrate(

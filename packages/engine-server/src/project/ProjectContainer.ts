@@ -1,17 +1,15 @@
 import { Builder } from '@contember/dic'
 import { Connection } from '@contember/database'
 import { DatabaseContextFactory, SchemaVersionBuilder } from '@contember/engine-system-api'
-import { logSentryError } from '../utils'
 import { GraphQlSchemaBuilderFactory, PermissionsByIdentityFactory } from '@contember/engine-content-api'
 import { GraphQLSchemaContributor, Plugin } from '@contember/engine-plugins'
 import {
-	ProjectConfig,
-	ContentQueryHandlerProvider,
 	ContentSchemaResolver,
 	GraphQlSchemaFactory,
-	ProjectContainer, Providers,
+	ProjectConfig,
+	ProjectContainer,
+	Providers,
 } from '@contember/engine-http'
-import { ContentQueryHandlerFactory } from '@contember/engine-http'
 
 export class ProjectContainerFactoryFactory {
 	constructor(
@@ -44,9 +42,9 @@ export class ProjectContainerFactory {
 			.pick(
 				'project',
 				'connection',
-				'contentQueryHandlerProvider',
 				'systemDatabaseContextFactory',
 				'contentSchemaResolver',
+				'graphQlSchemaFactory',
 			)
 	}
 
@@ -70,12 +68,8 @@ export class ProjectContainerFactory {
 					.filter((it): it is GraphQLSchemaContributor => !!it)
 				return new GraphQlSchemaFactory(graphQlSchemaBuilderFactory, permissionsByIdentityFactory, contributors)
 			})
-			.addService('contentQueryHandlerFactory', () =>
-				new ContentQueryHandlerFactory(project.slug, this.debug, logSentryError))
 			.addService('contentSchemaResolver', ({ schemaVersionBuilder }) =>
 				new ContentSchemaResolver(schemaVersionBuilder))
-			.addService('contentQueryHandlerProvider', ({ contentSchemaResolver, graphQlSchemaFactory, contentQueryHandlerFactory }) =>
-				new ContentQueryHandlerProvider(contentSchemaResolver, graphQlSchemaFactory, contentQueryHandlerFactory))
 			.addService('systemDatabaseContextFactory', ({ connection, providers, project }) =>
 				new DatabaseContextFactory(connection.createClient(project.db.systemSchema ?? 'system', { module: 'system' }), providers))
 	}

@@ -36,6 +36,7 @@ export class ProjectGroupContainerResolver implements ProjectGroupContainerResol
 		return (await this.containers.fetch(slug, async slug => {
 			const container = this.containerFactory.create({
 				config: this.configResolver(slug, config),
+				slug,
 			})
 			const cleanups = this.onCreate.map(it => it(container, slug) || (() => null))
 			// eslint-disable-next-line no-console

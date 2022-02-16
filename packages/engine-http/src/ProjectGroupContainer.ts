@@ -6,19 +6,25 @@ import {
 	TenantContainer,
 } from '@contember/engine-tenant-api'
 import { SystemContainer } from '@contember/engine-system-api'
-import { KoaMiddleware } from './koa'
+import { Authenticator } from './common'
+import { TenantGraphQLHandler } from './tenant'
+import { SystemGraphQLHandler } from './system'
 
 export interface ProjectGroupContainer {
+	slug: string | undefined
+
+	authenticator: Authenticator
+
 	projectContainerResolver: ProjectContainerResolver
 	projectSchemaResolver: ProjectSchemaResolver
 	projectInitializer: ProjectInitializer
 
 	tenantContainer: TenantContainer
 	tenantDatabase: DatabaseContext
-	tenantGraphQLMiddleware: KoaMiddleware<any>
+	tenantGraphQLHandler: TenantGraphQLHandler
 
 	systemContainer: SystemContainer
-	systemGraphQLMiddleware: KoaMiddleware<any>
+	systemGraphQLHandler: SystemGraphQLHandler
 }
 
 export interface ProjectGroupContainerResolver {

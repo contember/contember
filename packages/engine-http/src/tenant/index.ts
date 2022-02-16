@@ -1,2 +1,3 @@
+export * from './TenantApiMiddlewareFactory'
 export * from './TenantGraphQLHandlerFactory'
-export * from './TenantGraphQLMiddlewareFactory'
+export * from './TenantGraphQLContextFactory'

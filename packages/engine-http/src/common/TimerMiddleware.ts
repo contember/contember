@@ -2,8 +2,10 @@ import { KoaMiddleware } from '../koa'
 
 type EventTime = { label: string; start: number; duration?: number }
 
+export type Timer = <T>(event: string, cb?: () => T) => Promise<T>
+
 export interface TimerMiddlewareState {
-	timer: <T>(event: string, cb?: () => T) => Promise<T>
+	timer: Timer
 }
 
 export const createTimerMiddleware = (): KoaMiddleware<TimerMiddlewareState> => {

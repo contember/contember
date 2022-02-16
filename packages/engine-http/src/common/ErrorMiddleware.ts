@@ -1,6 +1,6 @@
 import { KoaMiddleware } from '../koa'
 import { HttpError } from './HttpError'
-import { AuthMiddlewareState } from './AuthMiddleware'
+import { AuthResult } from './Authorizator'
 
 export class ErrorMiddlewareFactory {
 	constructor(
@@ -8,7 +8,7 @@ export class ErrorMiddlewareFactory {
 	) {
 	}
 
-	public create(): KoaMiddleware<AuthMiddlewareState> {
+	public create(): KoaMiddleware<{ authResult?: AuthResult }> {
 		return async (ctx, next) => {
 			try {
 				await next()

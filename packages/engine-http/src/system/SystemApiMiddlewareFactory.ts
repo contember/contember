@@ -1,0 +1,73 @@
+import { KoaMiddleware, KoaRequestState } from '../koa'
+import { ProjectGroupResolver, ProjectInfoMiddlewareState } from '../project-common'
+import { AuthResult, HttpError, TimerMiddlewareState } from '../common'
+import { GraphQLKoaState } from '../graphql'
+import { SystemGraphQLContextFactory } from './SystemGraphQLContextFactory'
+
+type SystemApiMiddlewareKoaState =
+	& TimerMiddlewareState
+	& KoaRequestState
+	& GraphQLKoaState
+	& ProjectInfoMiddlewareState
+	& { authResult: AuthResult }
+
+export class SystemApiMiddlewareFactory {
+	constructor(
+		private readonly debug: boolean,
+		private readonly projectGroupResolver: ProjectGroupResolver,
+		private readonly systemGraphqlContextFactory: SystemGraphQLContextFactory,
+	) {
+	}
+
+	create(): KoaMiddleware<SystemApiMiddlewareKoaState> {
+		return async koaContext => {
+			const { request, response, state: { timer, params } } = koaContext
+			const groupContainer = await this.projectGroupResolver.resolveContainer({ request })
+			koaContext.state.projectGroup = groupContainer.slug
+			const authResult = await groupContainer.authenticator.authenticate({ request, timer })
+			koaContext.state.authResult = authResult
+
+			const projectSlug = params.projectSlug
+			const projectContainer = await groupContainer.projectContainerResolver.getProjectContainer(projectSlug, true)
+			if (projectContainer === undefined) {
+				throw new HttpError(`Project ${projectSlug} NOT found`, 404)
+			}
+			const project = projectContainer.project
+			koaContext.state.project = project.slug
+
+			const tenantContainer = groupContainer.tenantContainer
+			const memberships = await timer('MembershipFetch', () =>
+				tenantContainer.projectMemberManager.getProjectMemberships(
+					tenantContainer.databaseContext,
+					{ slug: project.slug },
+					{
+						id: authResult.identityId,
+						roles: authResult.roles,
+					},
+					undefined,
+				),
+			)
+			if (memberships.length === 0) {
+				throw this.debug
+					? new HttpError(`You are not allowed to access project ${project.slug}`, 403)
+					: new HttpError(`Project ${project.slug} NOT found`, 404)
+			}
+
+
+			const graphqlContext = await this.systemGraphqlContextFactory.create({
+				authResult,
+				memberships,
+				koaContext,
+				projectContainer,
+				systemContainer: groupContainer.systemContainer,
+			})
+			const handler = groupContainer.systemGraphQLHandler
+
+			await timer('GraphQL', () => handler({
+				request,
+				response,
+				context: graphqlContext,
+			}))
+		}
+	}
+}

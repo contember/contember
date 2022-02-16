@@ -1,4 +1,4 @@
-import { devTypeDefs, Identity, ResolverFactory, SystemResolverContext, typeDefs } from '@contember/engine-system-api'
+import { devTypeDefs, ResolverFactory, SystemResolverContext, typeDefs } from '@contember/engine-system-api'
 import {
 	createDbQueriesListener,
 	createErrorListener,
@@ -7,24 +7,23 @@ import {
 	ErrorLogger,
 	GraphQLKoaState,
 	GraphQLListener,
+	GraphQLQueryHandler,
 } from '../graphql'
-import { KoaContext, KoaMiddleware } from '../koa'
+import { KoaContext } from '../koa'
 import { DocumentNode } from 'graphql'
 import { mergeTypeDefs } from '@graphql-tools/merge'
 import { makeExecutableSchema } from '@graphql-tools/schema'
-import { ProjectGroupState, ProjectMemberMiddlewareState, ProjectResolveMiddlewareState } from '../project-common'
-import { AuthMiddlewareState } from '../common'
+import { ContentSchemaResolver } from '../content'
 
 type KoaState =
-	& AuthMiddlewareState
-	& ProjectGroupState
-	& ProjectMemberMiddlewareState
-	& ProjectResolveMiddlewareState
 	& GraphQLKoaState
 
 export type SystemGraphQLContext = SystemResolverContext & {
 	koaContext: KoaContext<KoaState>
+	contentSchemaResolver: ContentSchemaResolver
 }
+
+export type SystemGraphQLHandler = GraphQLQueryHandler<SystemGraphQLContext>
 
 export class SystemGraphQLHandlerFactory {
 	constructor(
@@ -33,7 +32,7 @@ export class SystemGraphQLHandlerFactory {
 	) {
 	}
 
-	create(resolversFactory: ResolverFactory): KoaMiddleware<KoaState> {
+	create(resolversFactory: ResolverFactory): SystemGraphQLHandler {
 		const defs: DocumentNode[] = [typeDefs]
 		if (this.debugMode) {
 			defs.push(devTypeDefs)
@@ -50,9 +49,9 @@ export class SystemGraphQLHandlerFactory {
 				this.errorLogger(err, {
 					body: ctx.koaContext.request.body as string,
 					url: ctx.koaContext.request.originalUrl,
-					user: ctx.koaContext.state.authResult.identityId,
+					user: ctx.identity.id,
 					module: 'system',
-					project: ctx.koaContext.state.project.slug,
+					project: ctx.project.slug,
 				})
 			}),
 			createGraphqlRequestInfoProviderListener(),
@@ -60,34 +59,14 @@ export class SystemGraphQLHandlerFactory {
 		if (this.debugMode) {
 			listeners.push({
 				onResponse: ({ context }) => {
-					context.koaContext.state.projectContainer.contentSchemaResolver.clearCache()
+					context.contentSchemaResolver.clearCache()
 				},
 			})
 			listeners.push(createDbQueriesListener(context => context.db.client))
 		}
-		return createGraphQLQueryHandler<SystemGraphQLContext, KoaState>({
+		return createGraphQLQueryHandler<SystemGraphQLContext>({
 			schema,
-			contextFactory: ctx => this.createContext(ctx),
 			listeners,
 		})
-	}
-
-	private async createContext(ctx: KoaContext<KoaState>): Promise<SystemGraphQLContext> {
-		const identity = new Identity(
-			ctx.state.authResult.identityId,
-			ctx.state.projectMemberships.map(it => it.role),
-		)
-		const projectContainer = ctx.state.projectContainer
-		const dbContextFactory = projectContainer.systemDatabaseContextFactory
-
-		const systemContext = await ctx.state.projectGroupContainer.systemContainer.resolverContextFactory.create(
-			dbContextFactory.create(identity.id),
-			ctx.state.project,
-			identity,
-		)
-		return {
-			...systemContext,
-			koaContext: ctx,
-		}
 	}
 }

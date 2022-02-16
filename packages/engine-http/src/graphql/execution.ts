@@ -1,7 +1,7 @@
 import { DocumentNode, execute, GraphQLError, GraphQLSchema, parse, validate, validateSchema } from 'graphql'
-import { KoaContext } from '../koa'
 import LRUCache from 'lru-cache'
 import { createHash } from 'crypto'
+import { Request, Response } from 'koa'
 
 export interface GraphQLListener<Context> {
 	onStart?: (ctx: {}) => Omit<GraphQLListener<Context>, 'onStart'> | void
@@ -18,13 +18,12 @@ export interface GraphQLListener<Context> {
 	}) => Omit<GraphQLListener<Context>, 'onStart' | 'onExecute' | 'onResponse' | 'onShutdown'> | void
 }
 
-interface FactoryArgs<Context, KoaState> {
+interface FactoryArgs<Context> {
 	schema: GraphQLSchema
-	contextFactory: (ctx: KoaContext<KoaState>) => Context | Promise<Context>
 	listeners: GraphQLListener<Context>[]
 }
 
-export type GraphQLQueryHandler<KoaState> = (context: KoaContext<KoaState>) => any
+export type GraphQLQueryHandler<Context> = (args: {request: Request; response: Response; context: Context }) => any
 
 const hitCacheMaxAgeSeconds = 10 * 60
 const documentCacheMaxAgeSeconds = hitCacheMaxAgeSeconds * 10
@@ -32,11 +31,10 @@ const pruneIntervalSeconds = documentCacheMaxAgeSeconds / 2
 const documentCacheMax = 100
 const hitCacheMax = documentCacheMax * 2
 
-export const createGraphQLQueryHandler = <Context, KoaState>({
+export const createGraphQLQueryHandler = <Context>({
 	schema,
-	contextFactory,
 	listeners,
-}: FactoryArgs<Context, KoaState>): GraphQLQueryHandler<KoaState> => {
+}: FactoryArgs<Context>): GraphQLQueryHandler<Context> => {
 	let schemaValidated = false
 	const hitCache = new LRUCache<string, true>({
 		max: hitCacheMax,
@@ -48,14 +46,13 @@ export const createGraphQLQueryHandler = <Context, KoaState>({
 	})
 	let lastPrune = Date.now()
 
-	return async ctx => {
+	return async ({ request, response, context }) => {
 
 		const now = Date.now()
 		if ((now - lastPrune) > pruneIntervalSeconds * 1000) {
 			documentCache.prune()
 			lastPrune = now
 		}
-
 		const listenersQueue = [...listeners]
 
 		listenersQueue.forEach(it => {
@@ -63,9 +60,9 @@ export const createGraphQLQueryHandler = <Context, KoaState>({
 		})
 
 		const respond = (code: number, data: any) => {
-			ctx.status = code
-			ctx.body = JSON.stringify(data)
-			ctx.set('Content-type', 'application/json')
+			response.status = code
+			response.body = JSON.stringify(data)
+			response.set('Content-type', 'application/json')
 
 			listenersQueue.forEach(it => {
 				it.onShutdown && listenersQueue.push(it.onShutdown({ response: data }) || {})
@@ -81,17 +78,17 @@ export const createGraphQLQueryHandler = <Context, KoaState>({
 				}
 				schemaValidated = true
 			}
-			const request = ctx.method === 'POST' ? (ctx.request.body as any) : ctx.query
-			if (!request.query) {
+			const resolvedRequest = request.method === 'POST' ? (request.body as any) : request.query
+			if (!resolvedRequest.query) {
 				return respond(400, {
 					errors: { message: 'Missing request query' },
 				})
 			}
-			const queryHash = createHash('md5').update(request.query).digest('hex')
+			const queryHash = createHash('md5').update(resolvedRequest.query).digest('hex')
 			let doc = documentCache.get(queryHash)
 			if (!doc) {
 				try {
-					doc = parse(request.query)
+					doc = parse(resolvedRequest.query)
 					const validationResult = validate(schema, doc)
 					if (validationResult.length) {
 						return respond(400, { errors: validationResult })
@@ -109,14 +106,13 @@ export const createGraphQLQueryHandler = <Context, KoaState>({
 			}
 			const document = doc
 
-			const context = await contextFactory(ctx)
 			listenersQueue.forEach(it => {
 				it.onExecute && listenersQueue.push(it.onExecute({ context, document }) || {})
 			})
 			const response = await execute({
 				schema,
 				document,
-				variableValues: request.variables,
+				variableValues: resolvedRequest.variables,
 				contextValue: context,
 			})
 			listenersQueue.forEach(it => {

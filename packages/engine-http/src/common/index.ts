@@ -1,6 +1,4 @@
-export * from './ApiMiddleware'
-export * from './AuthMiddleware'
-export * from './ErrorFactory'
+export * from './Authorizator'
 export * from './HttpError'
 export * from './ErrorMiddleware'
 export * from './ModuleInfoMiddleware'

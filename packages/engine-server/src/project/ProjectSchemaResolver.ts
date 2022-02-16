@@ -14,7 +14,7 @@ export class ProjectSchemaResolver implements ProjectSchemaResolverInterface {
 		if (!container) {
 			return undefined
 		}
-		const db = container.systemDatabaseContextFactory.create(undefined)
+		const db = container.systemDatabaseContextFactory.create()
 		return await this.schemaVersionBuilder.buildSchema(db)
 	}
 }

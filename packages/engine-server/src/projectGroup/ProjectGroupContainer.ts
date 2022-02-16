@@ -3,6 +3,7 @@ import { Connection } from '@contember/database'
 import { TenantContainerFactory } from '@contember/engine-tenant-api'
 import { TenantConfig } from '../config/config'
 import {
+	Authenticator,
 	CryptoWrapper,
 	ProjectGroupContainer,
 	Providers,
@@ -24,6 +25,7 @@ import { createSecretKey } from 'crypto'
 interface ProjectGroupContainerFactoryArgs
 {
 	config: TenantConfig
+	slug: string | undefined
 }
 
 export class ProjectGroupContainerFactory {
@@ -37,8 +39,10 @@ export class ProjectGroupContainerFactory {
 		private readonly systemGraphQLHandlerFactory: SystemGraphQLHandlerFactory,
 	) {}
 
-	public create({ config }: ProjectGroupContainerFactoryArgs): ProjectGroupContainer {
+	public create({ config, slug }: ProjectGroupContainerFactoryArgs): ProjectGroupContainer {
 		return new Builder({})
+			.addService('slug', () =>
+				slug)
 			.addService('providers', () =>
 				this.providers)
 			.addService('tenantConnection', (): Connection.ConnectionType =>
@@ -92,20 +96,24 @@ export class ProjectGroupContainerFactory {
 			.setupService('projectInitializer', (it, { projectContainerResolver }) => {
 				it.setInitializer(new ProjectInitializer(projectContainerResolver))
 			})
-			.addService('tenantGraphQLMiddleware', ({ tenantContainer }) =>
+			.addService('tenantGraphQLHandler', ({ tenantContainer }) =>
 				this.tenantGraphQLHandlerFactory.create(tenantContainer.resolvers))
-			.addService('systemGraphQLMiddleware', ({ systemContainer }) =>
+			.addService('systemGraphQLHandler', ({ systemContainer }) =>
 				this.systemGraphQLHandlerFactory.create(systemContainer.systemResolversFactory))
+			.addService('authenticator', ({ tenantDatabase, tenantContainer }) =>
+				new Authenticator(tenantDatabase, tenantContainer.apiKeyManager))
 			.build()
 			.pick(
 				'projectContainerResolver',
 				'projectSchemaResolver',
 				'projectInitializer',
 				'systemContainer',
-				'systemGraphQLMiddleware',
+				'systemGraphQLHandler',
 				'tenantContainer',
 				'tenantDatabase',
-				'tenantGraphQLMiddleware',
+				'authenticator',
+				'tenantGraphQLHandler',
+				'slug',
 			)
 	}
 }

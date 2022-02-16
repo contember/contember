@@ -4,7 +4,6 @@ import {
 	SystemContainer,
 	SystemContainerFactory,
 	typeDefs as systemTypeDefs,
-	unnamedIdentity,
 } from '@contember/engine-system-api'
 import { MigrationFilesManager, MigrationsResolver, ModificationHandlerFactory } from '@contember/schema-migrations'
 import { GraphQlSchemaBuilderFactory } from '@contember/engine-content-api'
@@ -29,7 +28,8 @@ export class ApiTester {
 		public readonly system: SystemApiTester,
 		public readonly stages: TesterStageManager,
 		public readonly cleanup: () => Promise<void>,
-	) {}
+	) {
+	}
 
 	public static async create(options: {
 		project?: Partial<ProjectConfig>
@@ -70,12 +70,12 @@ export class ApiTester {
 
 		const projectConfig = { ...ApiTester.project, ...options.project }
 
-		const db = databaseContextFactory.create(unnamedIdentity)
+		const db = databaseContextFactory.create()
 
 		const singleConnection = new SingleConnection(dbCredentials(dbName), {})
 		const dbContextMigrations = databaseContextFactory
 			.withClient(singleConnection.createClient('system', {}))
-			.create(unnamedIdentity)
+			.create()
 
 		const schemaResolver = () => systemContainer.schemaVersionBuilder.buildSchema(dbContextMigrations)
 		await systemContainer

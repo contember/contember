@@ -321,17 +321,17 @@ export const BlockEditor = Object.assign<
 
 const useFieldBackedElementFields = (elements: FieldBackedElement[]) => {
 	return <>
-		{elements.map(el => {
+		{elements.map((el, i) => {
 			if ('element' in el) {
-				return el.element
+				return <Fragment key={i}>{el.element}</Fragment>
 			}
 			if (el.format === 'plainText') {
 				return (
-					<TextField field={el.field} label={undefined} placeholder={el.placeholder} distinction={'seamless'}
+					<TextField key={i} field={el.field} label={undefined} placeholder={el.placeholder} distinction={'seamless'}
 										 size={el.size} wrapLines />
 				)
 			}
-			return <RichTextField field={el.field} label={undefined} placeholder={el.placeholder} distinction={'seamless'} />
+			return <RichTextField key={i} field={el.field} label={undefined} placeholder={el.placeholder} distinction={'seamless'} />
 		})}
 	</>
 }

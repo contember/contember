@@ -59,6 +59,7 @@ export class AclValidator {
 			variables: variablesIn,
 			stages: stagesIn,
 			entities: entitiesIn,
+			implicit: implicitIn,
 			...plugins
 		} = permissions
 
@@ -75,6 +76,13 @@ export class AclValidator {
 		const result: Acl.RolePermissions = { variables, stages, entities }
 		if (inherits !== undefined) {
 			result.inherits = inherits
+		}
+		if (implicitIn !== undefined) {
+			if (typeof implicitIn !== 'boolean') {
+				errorBuilder.for('implicit').add('Must be boolean')
+				return
+			}
+			result.implicit = implicitIn
 		}
 
 		return { ...plugins, ...result }

@@ -1,4 +1,4 @@
-import { Button, FieldContainer } from '@contember/ui'
+import { Button } from '@contember/ui'
 import { useCallback } from 'react'
 import { useInitSignInIDP } from '../../mutations'
 import { getBaseHref, IDP, IDP_CODE, IDP_SESSION_KEY } from './common'
@@ -26,8 +26,6 @@ export const IDPInitButton = ({ provider, onError }: IDPInitButtonProps) => {
 	}, [initRequest, onError])
 
 	return (
-		<FieldContainer label={undefined}>
-			<Button onClick={() => onInitIDP(provider.provider)}>Login using {provider.name ?? provider.provider}</Button>
-		</FieldContainer>
+		<Button onClick={() => onInitIDP(provider.provider)}>Login using {provider.name ?? provider.provider}</Button>
 	)
 }

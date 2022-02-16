@@ -72,15 +72,12 @@ export const Login = ({ onLogin, resetLink }: LoginProps) => {
 						{...register('otpToken')}
 					/>
 				</FieldContainer>}
-
-				<FieldContainer label={undefined}>
-					<Stack direction="horizontal" align="center" justify="space-between">
-						<Button type="submit" scheme="dark" intent="primary" disabled={isSubmitting}>
-							Submit
-						</Button>
-						{resetLink && <Link to={resetLink}>Forgot your password?</Link>}
-					</Stack>
-				</FieldContainer>
+				<Stack direction="horizontal" align="center" justify="space-between">
+					<Button type="submit" scheme="dark" intent="primary" disabled={isSubmitting}>
+						Submit
+					</Button>
+					{resetLink && <Link to={resetLink}>Forgot your password?</Link>}
+				</Stack>
 			</Stack>
 		</form>
 	)

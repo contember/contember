@@ -1,5 +1,5 @@
 import { ContemberClient } from '@contember/react-client'
-import { Button, ErrorList, Icon } from '@contember/ui'
+import { Button, ErrorList, Icon, Stack } from '@contember/ui'
 import { FC, ReactNode, useMemo, useState } from 'react'
 import { Link, RequestProvider, RoutingContext, RoutingContextValue } from '../../routing'
 import {
@@ -28,6 +28,7 @@ export interface LoginEntrypointProps {
 	formatProjectUrl: (project: Project) => string
 	heading?: string
 	projectsPageActions?: ReactNode
+	collapsedEmailLogin?: boolean
 }
 
 const indexPageName = 'index'
@@ -61,6 +62,7 @@ export const LoginEntrypoint = (props: LoginEntrypointProps) => {
 										identityProviders={props.identityProviders}
 										heading={props.heading}
 										projectsPageActions={props.projectsPageActions}
+										collapsedEmailLogin={props.collapsedEmailLogin}
 									/>
 								</IdentityProvider>
 							</Page>
@@ -102,7 +104,7 @@ export const LoginEntrypoint = (props: LoginEntrypointProps) => {
 	)
 }
 
-const LoginEntrypointIndex: FC<Pick<LoginEntrypointProps, 'projects' | 'formatProjectUrl' | 'identityProviders' | 'heading' | 'projectsPageActions'>> = props => {
+const LoginEntrypointIndex: FC<Pick<LoginEntrypointProps, 'projects' | 'formatProjectUrl' | 'identityProviders' | 'heading' | 'projectsPageActions' | 'collapsedEmailLogin'>> = props => {
 	const logout = useLogout()
 	const identity = useOptionalIdentity()
 	const projects = useMemo(() => {
@@ -112,7 +114,7 @@ const LoginEntrypointIndex: FC<Pick<LoginEntrypointProps, 'projects' | 'formatPr
 	if (!projects) {
 		return (
 			<MiscPageLayout heading={props.heading ?? 'Contember Admin'}>
-				<LoginContainer identityProviders={props.identityProviders} />
+				<LoginContainer identityProviders={props.identityProviders} collapsedEmailLogin={props.collapsedEmailLogin} />
 			</MiscPageLayout>
 		)
 
@@ -135,9 +137,13 @@ const LoginEntrypointIndex: FC<Pick<LoginEntrypointProps, 'projects' | 'formatPr
 	}
 }
 
-const LoginContainer = ({ identityProviders }: {
-	identityProviders?: readonly IDP[],
-}) => {
+interface LoginContainerProps {
+	identityProviders?: readonly IDP[]
+	collapsedEmailLogin?: boolean
+}
+
+const LoginContainer = ({ identityProviders, collapsedEmailLogin: initialCollapsedEmailLogin }: LoginContainerProps) => {
+	const [collapsedEmailLogin, setCollapsedEmailLogin] = useState(initialCollapsedEmailLogin ?? false)
 	const [error, setError] = useState<string>()
 
 	const hasOauthResponse = useMemo(() => {
@@ -151,7 +157,12 @@ const LoginContainer = ({ identityProviders }: {
 
 	return <>
 		<ErrorList errors={error ? [{ message: error }] : []} />
-		<Login resetLink={resetRequestPageName} />
-		{identityProviders?.map(it => <IDPInitButton provider={it} onError={setError}/>)}
+		{!collapsedEmailLogin && <Login resetLink={resetRequestPageName} />}
+		{((identityProviders?.length ?? 0) > 0 || collapsedEmailLogin) && (
+			<Stack direction="vertical">
+				{identityProviders?.map(it => <IDPInitButton provider={it} onError={setError}/>)}
+				{collapsedEmailLogin && <Button onClick={() => setCollapsedEmailLogin(false)}>Login with email</Button>}
+			</Stack>
+		)}
 	</>
 }

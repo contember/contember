@@ -1,16 +1,12 @@
 import { ConfigLoader, createObjectParametersResolver, Merger, resolveParameters } from '@contember/config-loader'
 import { ConfigProcessor } from '@contember/engine-plugins'
-import { configSchema } from './configSchema'
+import { serverConfigSchema, tenantConfigSchema } from './configSchema'
 import { configTemplate } from './configTemplate'
 import { createProjectConfigResolver, ProjectConfigResolver } from './projectConfigResolver'
-import {
-	createTenantConfigResolver,
-	createTenantParametersResolver,
-	TenantConfigResolver,
-} from './tenantConfigResolver'
+import { createTenantConfigResolver, TenantConfigResolver } from './tenantConfigResolver'
 
-export type Config = ReturnType<typeof configSchema>
-export type TenantConfig = Config['tenant']
+export type ServerConfig = ReturnType<typeof serverConfigSchema>
+export type TenantConfig = ReturnType<typeof tenantConfigSchema>
 
 export type ConfigSource = { data: string; type: 'file' | 'json' | 'yaml' }
 
@@ -20,7 +16,7 @@ export async function readConfig(
 	configSources: ConfigSource[],
 	configProcessors: ConfigProcessor[] = [],
 ): Promise<{
-	config: Config
+	serverConfig: ServerConfig
 	projectConfigResolver: ProjectConfigResolver
 	tenantConfigResolver: TenantConfigResolver
 }> {
@@ -41,22 +37,15 @@ export async function readConfig(
 	)
 
 	const rawConfig = Merger.merge(template, ...configs)
-	let { projectDefaults, ...config } = rawConfig
 
 	const parametersResolver = createObjectParametersResolver({ env })
-	const tenantParametersResolver = createTenantParametersResolver(env)
-	config = resolveParameters(config, (parts, path, dataResolver) => {
-		if (parts[0] === 'tenant' && path[0] === 'tenant') {
-			return tenantParametersResolver(parts, path, dataResolver)
-		}
-		return parametersResolver(parts, path, dataResolver)
-	})
+	const config = resolveParameters(rawConfig.server, parametersResolver)
 
-	const baseConfig = configSchema(config)
+	const serverConfig = serverConfigSchema(config)
 	return {
-		config: baseConfig,
+		serverConfig,
 		projectConfigResolver: createProjectConfigResolver(env, rawConfig, configProcessors),
-		tenantConfigResolver: createTenantConfigResolver(env, rawConfig),
+		tenantConfigResolver: createTenantConfigResolver(env, rawConfig.tenant),
 	}
 }
 

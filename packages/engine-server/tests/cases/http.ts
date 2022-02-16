@@ -46,14 +46,11 @@ const createContainer = (debug: boolean) => {
 	}
 	return new MasterContainerFactory().createBuilder({
 		debugMode: debug,
-		config: {
-			tenant: tenantConfig,
-			server: {
-				logging: {},
-				port: 0,
-				monitoringPort: 0,
-				http: {},
-			},
+		serverConfig: {
+			logging: {},
+			port: 0,
+			monitoringPort: 0,
+			http: {},
 		},
 		projectConfigResolver: () => projectConfig,
 		tenantConfigResolver: () => tenantConfig,

@@ -12,12 +12,9 @@ export type TenantConfigResolver =  (slug: string | undefined, additionalConfig:
 
 type Env = Record<string, string>
 
-export const createTenantConfigResolver = (env: Env, config: any): TenantConfigResolver =>
+export const createTenantConfigResolver = (env: Env, tenantConfig: any): TenantConfigResolver =>
 	(slug, additionalConfig) => {
-		const mergedConfig = Merger.merge(
-			config.tenant as any,
-			additionalConfig,
-		)
+		const mergedConfig = Merger.merge(tenantConfig, additionalConfig)
 		const parametersResolver = createObjectParametersResolver({ env })
 		const tenantParametersResolver = createTenantParametersResolver(env)
 		const resolvedConfig = resolveParameters(mergedConfig, (parts, path, dataResolver) => {

@@ -1,7 +1,7 @@
 import { SystemContainerFactory } from '@contember/engine-system-api'
 import { TenantContainerFactory } from '@contember/engine-tenant-api'
 import { Builder } from '@contember/dic'
-import { Config } from './config/config'
+import { ServerConfig } from './config/config'
 import { createDbMetricsRegistrar, logSentryError, ProcessType } from './utils'
 import { ModificationHandlerFactory } from '@contember/schema-migrations'
 import { Initializer } from './bootstrap'
@@ -48,7 +48,7 @@ export interface MasterContainer {
 
 export interface MasterContainerArgs {
 	debugMode: boolean
-	config: Config
+	serverConfig: ServerConfig
 	projectConfigResolver: ProjectConfigResolver
 	tenantConfigResolver: TenantConfigResolver
 	plugins: Plugin[]
@@ -58,7 +58,7 @@ export interface MasterContainerArgs {
 
 export class MasterContainerFactory {
 	createBuilder({
-		config,
+		serverConfig,
 		debugMode,
 		plugins,
 		projectConfigResolver,
@@ -67,8 +67,8 @@ export class MasterContainerFactory {
 		version,
 	}: MasterContainerArgs) {
 		return new Builder({})
-			.addService('config', () =>
-				config)
+			.addService('serverConfig', () =>
+				serverConfig)
 			.addService('debugMode', () =>
 				debugMode)
 			.addService('processType', () =>
@@ -132,14 +132,14 @@ export class MasterContainerFactory {
 			})
 			.addService('httpErrorMiddlewareFactory', ({ debugMode }) =>
 				new ErrorMiddlewareFactory(debugMode))
-			.addService('projectGroupResolver', ({ projectGroupContainerResolver }) => {
-				const encryptionKey = config.server.projectGroup?.configEncryptionKey
-					? createSecretKey(Buffer.from(config.server.projectGroup?.configEncryptionKey, 'hex'))
+			.addService('projectGroupResolver', ({ projectGroupContainerResolver, serverConfig }) => {
+				const encryptionKey = serverConfig.projectGroup?.configEncryptionKey
+					? createSecretKey(Buffer.from(serverConfig.projectGroup?.configEncryptionKey, 'hex'))
 					: undefined
 				return new ProjectGroupResolver(
-					config.server.projectGroup?.domainMapping,
-					config.server.projectGroup?.configHeader,
-					config.server.projectGroup?.configEncryptionKey ? new CryptoWrapper(encryptionKey) : undefined,
+					serverConfig.projectGroup?.domainMapping,
+					serverConfig.projectGroup?.configHeader,
+					serverConfig.projectGroup?.configEncryptionKey ? new CryptoWrapper(encryptionKey) : undefined,
 					projectGroupContainerResolver,
 				)
 			})
@@ -159,7 +159,7 @@ export class MasterContainerFactory {
 				new SystemGraphQLContextFactory())
 			.addService('systemApiMiddlewareFactory', ({ debugMode, projectGroupResolver, systemGraphQLContextFactory }) =>
 				new SystemApiMiddlewareFactory(debugMode, projectGroupResolver, systemGraphQLContextFactory))
-			.addService('koa', ({ contentApiMiddlewareFactory, tenantApiMiddlewareFactory, systemApiMiddlewareFactory, httpErrorMiddlewareFactory, promRegistry, debugMode, version, config }) => {
+			.addService('koa', ({ contentApiMiddlewareFactory, tenantApiMiddlewareFactory, systemApiMiddlewareFactory, httpErrorMiddlewareFactory, promRegistry, debugMode, version, serverConfig }) => {
 				const app = new Koa()
 				app.use(
 					compose([
@@ -167,7 +167,7 @@ export class MasterContainerFactory {
 							br: false,
 						}),
 						bodyParser({
-							jsonLimit: config.server.http.requestBodySize || '1mb',
+							jsonLimit: serverConfig.http.requestBodySize || '1mb',
 						}),
 						createPoweredByHeaderMiddleware(debugMode, version ?? 'unknown'),
 						httpErrorMiddlewareFactory.create(),

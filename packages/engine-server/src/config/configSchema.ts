@@ -77,10 +77,6 @@ export const serverConfigSchema = Typesafe.intersection(
 			)(val, path),
 	}),
 )
-export const configSchema = Typesafe.object({
-	tenant: tenantConfigSchema,
-	server: serverConfigSchema,
-})
 
 export const stageConfig = Typesafe.map(
 	Typesafe.intersection(

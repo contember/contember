@@ -50,10 +50,10 @@ test('Filter by has many with additional join', async () => {
 				sql: SQL`
 select "root_"."id" as "root_id", "root_"."short_name" as "root_shortName", "root_"."id" as "root_id"
 from "public"."person" as "root_"
-where "root_"."id" in (select distinct "root_"."person_id"
-  from "public"."person_locale" as "root_"
-    left join "public"."language" as "root_locale" on "root_"."locale_id" = "root_locale"."id"
-  where "root_locale"."slug" = ? and not("root_"."url_slug" is null))`,
+where exists (select 1
+  from "public"."person_locale" as "sub_"
+    left join "public"."language" as "sub_locale" on "sub_"."locale_id" = "sub_locale"."id"
+  where "root_"."id" = "sub_"."person_id" and "sub_locale"."slug" = ? and not("sub_"."url_slug" is null))`,
 				response: { rows: [{ root_id: testUuid(1), root_shortName: 'John' }] },
 				parameters: ['cs'],
 			},

@@ -25,9 +25,9 @@ test('Author by post title (where one has many)', async () => {
 			{
 				sql: SQL`select "root_"."id" as "root_id"
                      from "public"."author" as "root_"
-                     where "root_"."id" in (select distinct "root_"."author_id"
-                                            from "public"."post" as "root_"
-                                            where "root_"."title" = ?)`,
+                     where exists (select 1
+                                            from "public"."post" as "sub_"
+                                            where "root_"."id" = "sub_"."author_id" and "sub_"."title" = ?)`,
 				parameters: ['Hello'],
 				response: {
 					rows: [

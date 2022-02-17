@@ -7,7 +7,7 @@ esbuild.build({
 	sourcemap: 'external',
 	outfile: './server/server.js',
 	plugins: [resolvePlugin],
-	external: ['pg-native', 'mock-aws-s3', 'aws-sdk', 'nock', 'bcrypt'],
+	external: ['pg-native', 'mock-aws-s3', 'aws-sdk', 'nock', 'bcrypt', 'heapdump'],
 }).catch(e => {
 	console.error(e)
 	process.exit(1)

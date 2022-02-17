@@ -32,6 +32,11 @@ const createServerTerminator = (): Server[] => {
 }
 
 ;(async () => {
+	if (process.env.NODE_HEAPDUMP === 'true') {
+		// eslint-disable-next-line no-console
+		console.log('Initializing heapdump')
+		await import('heapdump')
+	}
 	const isDebug = process.env.NODE_ENV === 'development'
 	const packageJsonFile = process.env.CONTEMBER_PACKAGE_JSON || join(__dirname, '../../package.json')
 	// eslint-disable-next-line @typescript-eslint/no-var-requires

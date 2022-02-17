@@ -3,18 +3,18 @@ import {
 	CreateOrUpdateProjectMembershipCommand,
 	CreatePasswordResetRequestCommand,
 	CreatePersonCommand,
+	SavePasswordResetRequestCommand,
 } from '../commands'
 import { Providers } from '../providers'
 import { PersonQuery, PersonRow } from '../queries'
-import { Membership } from '../type/Membership'
+import { Membership, Project } from '../type'
 import { InviteErrorCode, InviteMethod } from '../../schema'
 import { TenantRole } from '../authorization'
 import { UserMailer } from '../mailing'
-import { Project } from '../type'
 import { createAppendMembershipVariables } from './membershipUtils'
 import { Response, ResponseOk } from '../utils/Response'
 import { DatabaseContext, TokenHash } from '../utils'
-import { SavePasswordResetRequestCommand } from '../commands/passwordReset/SavePasswordResetRequestCommand'
+import { NoPassword, PasswordPlain } from '../dtos'
 
 export interface InviteOptions {
 	noEmail?: boolean
@@ -49,8 +49,9 @@ export class InviteManager {
 
 				generatedPassword = password ??
 					(method === InviteMethod.CreatePassword ? (await this.providers.randomBytes(9)).toString('base64') : null)
+				const passwordWrapper = generatedPassword !== null ? new PasswordPlain(generatedPassword) : NoPassword
 
-				person = await trx.commandBus.execute(new CreatePersonCommand(identityId, email, generatedPassword))
+				person = await trx.commandBus.execute(new CreatePersonCommand(identityId, email, passwordWrapper))
 				if (method === InviteMethod.ResetPassword) {
 					const result = await trx.commandBus.execute(new CreatePasswordResetRequestCommand(person.id, INVITATION_RESET_TOKEN_EXPIRATION_MINUTES))
 					resetToken = result.token

@@ -1,7 +1,15 @@
 import { MutationResolvers, MutationSignUpArgs, SignUpResponse } from '../../../schema'
 import { TenantResolverContext } from '../../TenantResolverContext'
-import { PermissionActions, ApiKeyManager, SignUpManager } from '../../../model'
+import {
+	ApiKeyManager,
+	NoPassword,
+	PasswordHash,
+	PasswordPlain,
+	PermissionActions,
+	SignUpManager,
+} from '../../../model'
 import { createErrorResponse } from '../../errorUtils'
+import { UserInputError } from 'apollo-server-errors'
 
 export class SignUpMutationResolver implements MutationResolvers {
 	constructor(private readonly signUpManager: SignUpManager, private readonly apiKeyManager: ApiKeyManager) {}
@@ -11,8 +19,20 @@ export class SignUpMutationResolver implements MutationResolvers {
 			action: PermissionActions.PERSON_SIGN_UP,
 			message: 'You are not allowed to sign up',
 		})
+		const password = (() => {
+			if (args.password) {
+				return new PasswordPlain(args.password)
+			}
+			if (args.passwordHash) {
+				if (!args.passwordHash.startsWith('$2b$')) {
+					throw new UserInputError('Invalid password hash. Only $2b$ bcrypt hashes are accepted.')
+				}
+				return new PasswordHash(args.passwordHash)
+			}
+			return NoPassword
+		})()
 
-		const response = await this.signUpManager.signUp(context.db, args.email, args.password, args.roles ?? [])
+		const response = await this.signUpManager.signUp(context.db, args.email, password, args.roles ?? [])
 
 		if (!response.ok) {
 			return createErrorResponse(response.error, response.errorMessage)

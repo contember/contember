@@ -7,6 +7,7 @@ import { DatabaseContext } from '../utils'
 import { CreateIdentityCommand, CreatePersonCommand } from '../commands'
 import { TenantRole } from '../authorization'
 import { ImplementationException } from '../../exceptions'
+import { NoPassword } from '../dtos'
 
 class IDPSignInManager {
 	constructor(
@@ -53,7 +54,7 @@ class IDPSignInManager {
 				}
 				const roles = [TenantRole.PERSON]
 				const identityId = await db.commandBus.execute(new CreateIdentityCommand(roles))
-				const newPerson = await db.commandBus.execute(new CreatePersonCommand(identityId, claim.email, null))
+				const newPerson = await db.commandBus.execute(new CreatePersonCommand(identityId, claim.email, NoPassword))
 				personRow = {
 					...newPerson,
 					roles,

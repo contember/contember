@@ -13,8 +13,8 @@ import {
 } from '@contember/binding'
 import { emptyArray, noop } from '@contember/react-utils'
 import { EditorCanvas, EditorCanvasSize, FieldContainer, Scheme } from '@contember/ui'
-import { Fragment, FunctionComponent, ReactElement, ReactNode, useCallback, useMemo, useState, useEffect } from 'react'
-import { Range as SlateRange, Transforms } from 'slate'
+import { Fragment, FunctionComponent, ReactElement, ReactNode, useCallback, useMemo, useState, useLayoutEffect } from 'react'
+import { Range as SlateRange, Transforms, Editor } from 'slate'
 import { Slate } from 'slate-react'
 import { getDiscriminatedBlock, useNormalizedBlocks } from '../../blocks'
 import { Repeater, SortableRepeaterContainer } from '../../collections'
@@ -189,7 +189,7 @@ const BlockEditorComponent: FunctionComponent<BlockEditorProps> = Component(
 		const trailingElements = useFieldBackedElementFields(trailingFieldBackedElements)
 
 		const [_, setMeaninglessState] = useState(0)
-		useEffect(() => {
+		useLayoutEffect(() => {
 			if (editor.children !== nodes && JSON.stringify(editor.children) !== JSON.stringify(nodes)) {
 				editor.children = nodes
 				// Force a re-render

@@ -29,11 +29,11 @@ export const configTemplate: any = {
 	},
 	projectDefaults: {
 		db: {
-			host: `%project.env.DB_HOST%`,
-			port: `%project.env.DB_PORT::number%`,
-			user: `%project.env.DB_USER%`,
-			password: `%project.secret.db.password||project.env.DB_PASSWORD%`,
-			database: `%project.env.DB_NAME||project.slug%`,
+			host: `%?project.env.DB_HOST%`,
+			port: `%?project.env.DB_PORT::number%`,
+			user: `%?project.env.DB_USER%`,
+			password: `%?project.secret.db.password||project.env.DB_PASSWORD%`,
+			database: `%?project.env.DB_NAME||project.slug%`,
 			ssl: `%?project.env.DB_SSL::bool%`,
 		},
 	},

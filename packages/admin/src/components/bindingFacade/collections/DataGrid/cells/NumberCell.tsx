@@ -18,12 +18,13 @@ export type NumberCellProps<Persisted extends FieldValue = FieldValue> =
 		format?: (value: Persisted) => ReactNode
 	}
 
+// eslint-disable-next-line @typescript-eslint/consistent-type-definitions
 export type NumberFilterArtifacts = {
 	mode: 'eq' | 'gte' | 'lte'
 	query: string
 }
 
-export const NumberCell: FunctionComponent<NumberCellProps> = Component((props) => {
+export const NumberCell: FunctionComponent<NumberCellProps> = Component(props => {
 	return (
 		<DataGridColumn<NumberFilterArtifacts>
 			{...props}
@@ -70,7 +71,7 @@ export const NumberCell: FunctionComponent<NumberCellProps> = Component((props) 
 						<Select
 							value={filter.mode}
 							options={options}
-							onChange={(e) => {
+							onChange={e => {
 								const value = e.currentTarget.value as NumberFilterArtifacts['mode']
 								setFilter({
 									...filter,
@@ -81,7 +82,7 @@ export const NumberCell: FunctionComponent<NumberCellProps> = Component((props) 
 						<TextInput
 							value={filter.query}
 							placeholder="Value"
-							onChange={(e) => {
+							onChange={e => {
 								const value = e.currentTarget.value
 								setFilter({
 									...filter,
@@ -95,7 +96,7 @@ export const NumberCell: FunctionComponent<NumberCellProps> = Component((props) 
 		>
 			<Field
 				{...props}
-				format={(value) => {
+				format={value => {
 					if (value === null) {
 						return <FieldFallbackView fallback={props.fallback} fallbackStyle={props.fallbackStyle} />
 					}

@@ -69,6 +69,11 @@ export const csCZ: AdminDictionary = {
 			includeNull: '<strong>Zahrnout</strong> prázdné',
 			excludeNull: '<strong>Vynechat</strong> prázdné',
 		},
+		numberCell: {
+			equals: 'Rovná se',
+			greaterThan: 'Větší než',
+			lessThan: 'Menší než',
+		},
 	},
 	errorCodes: {
 		fieldRequired: 'Vyplňte prosím toto pole.',

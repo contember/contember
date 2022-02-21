@@ -13,7 +13,8 @@
 				"development": "./dist/development/index.js",
 				"production": "./dist/production/index.js"
 			}
-		}
+		},
+		"./style.css": "./dist/style.css"
 	},
 	"typings": "./dist/types/index.d.ts",
 	"files": [
@@ -21,7 +22,8 @@
 		"src/"
 	],
 	"scripts": {
-		"build": "vite build --mode development && vite build --mode production",
+		"build": "vite build --mode development && vite build --mode production && pnpm run build:css",
+		"build:css": "sass --no-charset src/index.sass:dist/style.css",
 		"storybook": "start-storybook -p 6006",
 		"build-storybook": "build-storybook"
 	},

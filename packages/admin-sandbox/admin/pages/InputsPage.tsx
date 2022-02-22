@@ -13,6 +13,7 @@ import {
 	SlugField,
 	TextAreaField,
 	TextField,
+	TimeField,
 } from '@contember/admin'
 
 
@@ -25,6 +26,7 @@ export const Inputs = (
 		<CheckboxField field={'boolValue'} label={'Bool'} />
 		<NumberField field={'intValue'} label={'Int'} />
 		<FloatField field={'floatValue'} label={'Float value'} />
+		<TimeField field={'timeValue'} label={'Time'} />
 		<DateField field={'dateValue'} label={'Date'} />
 		<DateTimeField field={'dateTimeValue'} label={'Date time'} />
 		<DateTimeField field={'dateTimeValue'} label={'Date time'} min="2020-12-02T01:20" max="2022-01-20T23:13" />

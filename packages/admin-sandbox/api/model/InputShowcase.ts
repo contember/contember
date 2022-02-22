@@ -12,6 +12,7 @@ export class InputShowcase {
 	boolValue = d.boolColumn()
 	intValue = d.intColumn()
 	floatValue = d.doubleColumn()
+	timeValue = d.stringColumn()
 	dateValue = d.dateColumn()
 	dateTimeValue = d.dateTimeColumn()
 	gpsLatValue = d.doubleColumn()

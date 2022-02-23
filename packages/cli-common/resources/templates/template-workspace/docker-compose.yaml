@@ -14,6 +14,7 @@ services:
 
       DEFAULT_DB_HOST: 'postgres'
       DEFAULT_DB_PORT: '5432'
+      DEFAULT_DB_NAME: 'contember'
       DEFAULT_DB_USER: 'contember'
       DEFAULT_DB_PASSWORD: 'contember'
 
@@ -24,7 +25,6 @@ services:
       DEFAULT_S3_SECRET: 'contember'
       DEFAULT_S3_PROVIDER: 'minio'
 
-      TENANT_DB_NAME: 'tenant'
       TENANT_MAILER_HOST: 'mailhog'
       TENANT_MAILER_PORT: '1025'
       TENANT_MAILER_FROM: 'contember@localhost'

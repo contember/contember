@@ -19,7 +19,14 @@ export type PageSetProviderElement = ReactElement<any, ComponentType & PageSetPr
 
 type EmptyObject = Record<any, never>
 
+interface LazyPage {
+	[action: string]: ComponentType | undefined
+}
+
+type LazyPageProvider = () => Promise<LazyPage>
+
 type PagesMapElement =
+	| LazyPageProvider
 	| ComponentType
 	| PageProviderElement
 	| PageSetProviderElement
@@ -27,17 +34,13 @@ type PagesMapElement =
 
 type PagesMap = Record<string, PagesMapElement>
 
-type LazyPageMap = Record<string, () => Promise<{ default?: ComponentType }>>
-
 export interface PagesProps {
 	children:
 		| PagesMap
 		| PageProviderElement[]
 		| PageProviderElement
-		| LazyPageMap
 	layout?: ComponentType<{ children?: ReactNode }>
 }
-
 
 function isPageList(children: ReactNodeArray): children is PageProviderElement[] {
 	return children.every(child => isPageProviderElement(child))
@@ -56,6 +59,18 @@ function findPrefix(strings: string[]): string {
 	return a.substring(0, i)
 }
 
+function disallowAction(Component: ComponentType) {
+	return (props: { action?: string }) => {
+		const pageName = useCurrentRequest()?.pageName
+
+		if (props.action !== undefined) {
+			throw new Error(`No such page as ${pageName}.`)
+		}
+
+		return <Component />
+	}
+}
+
 /**
  * Pages element specifies collection of pages (component Page or component with getPageName static method).
  */
@@ -65,35 +80,58 @@ export const Pages = ({ children, layout }: PagesProps) => {
 	const requestId = useRef<number>(0)
 	const Layout = layout ?? Fragment
 
-	const pageMap = useMemo<Map<string, ComponentType>>(
+	const pageMap = useMemo<Map<string, ComponentType<{ action?: string }>>>(
 		() => {
 			if (Array.isArray(children)) {
 				if (isPageList(children)) {
-					return new Map(children.map(child => [child.type.getPageName(child.props), () => child]))
+					return new Map(children.map(child => [child.type.getPageName(child.props), disallowAction(() => child)]))
 
 				} else {
 					throw new Error('Pages has a child which is not a Page')
 				}
 
 			} else if (isPageProviderElement(children)) {
-				return new Map([[children.type.getPageName(children.props), () => children]])
+				return new Map([[children.type.getPageName(children.props), disallowAction(() => children)]])
 
 			} else {
-				const lazyPrefix = findPrefix(Object.keys(children).filter(isLazyPage))
-				return new Map(Object.entries(children).flatMap(([k, v]): [string, ComponentType][] => {
-					const pageName = k.slice(0, 1).toLowerCase() + k.slice(1)
-					if (isPageSetProvider<EmptyObject>(v)) {
-						return Object.entries(v.getPages({}))
-					} else if (isPageSetProviderElement(v)) {
-						return Object.entries(v.type.getPages(v.props))
-					} else if (isPageProviderElement(v)) {
-						return [[v.type.getPageName(v.props, pageName), () => v]]
-					} else if (isLazyPage(k)) {
-						const Lazy = lazy(v)
-						const WithFallback = () => <Suspense fallback={<ContainerSpinner />}><Lazy /></Suspense>
-						return [[k.slice(lazyPrefix.length, -4), WithFallback]]
+				const lazyPrefix = findPrefix(Object.entries(children).flatMap(([k, v]) => isLazyPageProvider(k, v) ? [k] : []))
+
+				return new Map(Object.entries(children).flatMap(([k, v]): [string, ComponentType<{ action?: string }>][] => {
+					if (isLazyPageProvider(k, v)) {
+						const pageName = k.slice(lazyPrefix.length, -4)
+
+						const WithFallback = (props: { action?: string }) => {
+							const Lazy = lazy(async () => {
+								const module = await v()
+								const page = module[props.action ?? 'default']
+
+								if (page === undefined) {
+									throw new Error(`No such page as ${pageName}${props.action ? '/' + props.action : ''}.`)
+								}
+
+								return { default: isValidElement(page) ? () => page : page }
+							})
+
+							return <Suspense fallback={<ContainerSpinner />}><Lazy /></Suspense>
+						}
+
+						return [[pageName, WithFallback]]
+
 					} else {
-						return [[pageName, v]]
+						const pageName = k.slice(0, 1).toLowerCase() + k.slice(1)
+
+						if (isPageSetProvider(v)) {
+							return Object.entries(v.getPages({})).map(([k, v]) => [k, disallowAction(v)])
+
+						} else if (isPageSetProviderElement(v)) {
+							return Object.entries(v.type.getPages(v.props)).map(([k, v]) => [k, disallowAction(v)])
+
+						} else if (isPageProviderElement(v)) {
+							return [[v.type.getPageName(v.props, pageName), disallowAction(() => v)]]
+
+						} else {
+							return [[pageName, disallowAction(v)]]
+						}
 					}
 				}))
 			}
@@ -114,7 +152,19 @@ export const Pages = ({ children, layout }: PagesProps) => {
 			throw new Error(`Cannot use ${reservedVariableName} as parameter name.`)
 		}
 	}
-	const Page = pageMap.get(request.pageName)
+
+	let pageKey = request.pageName
+	let pageAction = undefined
+	let Page = pageMap.get(pageKey)
+
+	if (Page === undefined) {
+		const pos = request.pageName.lastIndexOf('/')
+		if (pos > 0) {
+			pageKey = request.pageName.slice(0, pos)
+			pageAction = request.pageName.slice(pos + 1)
+			Page = pageMap.get(pageKey)
+		}
+	}
 
 	if (Page === undefined) {
 		throw new Error(`No such page as ${request.pageName}.`)
@@ -127,7 +177,7 @@ export const Pages = ({ children, layout }: PagesProps) => {
 	return (
 		<EnvironmentContext.Provider value={requestEnv}>
 			<Layout>
-				<PageErrorBoundary key={requestId.current++}><Page /></PageErrorBoundary>
+				<PageErrorBoundary key={requestId.current++}><Page action={pageAction} /></PageErrorBoundary>
 			</Layout>
 		</EnvironmentContext.Provider>
 	)
@@ -142,7 +192,6 @@ function isPageProviderElement(el: ReactNode): el is PageProviderElement {
 	return isValidElement(el) && typeof el.type !== 'string' && isPageProvider(el.type)
 }
 
-
 function isPageSetProvider<T = any>(it: any): it is PageSetProvider<T> {
 	return typeof it === 'object' && it !== null && typeof it.getPages === 'function'
 }
@@ -151,6 +200,6 @@ function isPageSetProviderElement(el: ReactNode): el is PageSetProviderElement {
 	return isValidElement(el) && typeof el.type !== 'string' && isPageSetProvider(el.type)
 }
 
-function isLazyPage(name: string) {
-	return name.endsWith('.tsx') || name.endsWith('.jsx')
+function isLazyPageProvider(name: string, it: any): it is LazyPageProvider {
+	return (name.endsWith('.tsx') || name.endsWith('.jsx')) && typeof it === 'function'
 }

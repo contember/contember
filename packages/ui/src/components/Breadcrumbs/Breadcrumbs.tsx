@@ -1,5 +1,5 @@
 import { memo, ReactNode } from 'react'
-import { useClassNamePrefix } from '../auxiliary'
+import { useClassNamePrefix } from '../../auxiliary'
 
 export interface BreadcrumbsProps {
 	items: ReactNode[]

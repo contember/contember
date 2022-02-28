@@ -1,6 +1,7 @@
 import { ProjectGroup, ProjectSchemaResolver } from '../type'
 import { Membership } from '../type/Membership'
 import { getRoleVariables } from '@contember/schema-utils'
+import { Acl } from '@contember/schema'
 
 export class MembershipValidator {
 	constructor(private readonly schemaResolver: ProjectSchemaResolver) {}
@@ -19,7 +20,7 @@ export class MembershipValidator {
 			}
 			const roleVariables = getRoleVariables(membership.role, schema.acl)
 			for (const variable of membership.variables) {
-				if (!roleVariables[variable.name]) {
+				if (!roleVariables[variable.name] || roleVariables[variable.name].type === Acl.VariableType.predefined) {
 					errors.push(
 						new MembershipValidationError(
 							membership.role,
@@ -30,6 +31,9 @@ export class MembershipValidator {
 				}
 			}
 			for (const variable of Object.keys(roleVariables)) {
+				if (roleVariables[variable].type === Acl.VariableType.predefined) {
+					continue
+				}
 				const inputVariable = membership.variables.find(it => it.name === variable)
 				if (!inputVariable || inputVariable.values.length === 0) {
 					errors.push(

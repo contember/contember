@@ -1,6 +1,6 @@
 {
   "name": "@contember/engine-s3-plugin",
-  "version": "1.0.0-rc.8",
+  "version": "1.0.0-rc.9",
   "license": "Apache-2.0",
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
@@ -8,10 +8,10 @@
     "test": "uvu dist/tests/cases/ \\.js$"
   },
   "dependencies": {
-    "@contember/engine-common": "^1.0.0-rc.8",
-    "@contember/engine-plugins": "^1.0.0-rc.8",
-    "@contember/graphql-utils": "^1.0.0-rc.8",
-    "@contember/schema": "^1.0.0-rc.8",
+    "@contember/engine-common": "^1.0.0-rc.9",
+    "@contember/engine-plugins": "^1.0.0-rc.9",
+    "@contember/graphql-utils": "^1.0.0-rc.9",
+    "@contember/schema": "^1.0.0-rc.9",
     "apollo-server-errors": "^2.3.4",
     "mime-types": "^2.1.24",
     "picomatch": "^2.2.1",

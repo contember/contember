@@ -1,6 +1,6 @@
 {
   "name": "@contember/schema-migrations",
-  "version": "1.0.0-rc.8",
+  "version": "1.0.0-rc.9",
   "license": "Apache-2.0",
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
@@ -8,15 +8,15 @@
     "test": "uvu dist/tests/cases/ \\.js$"
   },
   "dependencies": {
-    "@contember/database-migrations": "^1.0.0-rc.8",
-    "@contember/engine-common": "^1.0.0-rc.8",
-    "@contember/schema": "^1.0.0-rc.8",
-    "@contember/schema-utils": "^1.0.0-rc.8",
+    "@contember/database-migrations": "^1.0.0-rc.9",
+    "@contember/engine-common": "^1.0.0-rc.9",
+    "@contember/schema": "^1.0.0-rc.9",
+    "@contember/schema-utils": "^1.0.0-rc.9",
     "fast-deep-equal": "^3.1.3",
     "rfc6902": "^4.0.1"
   },
   "devDependencies": {
-    "@contember/schema-definition": "^1.0.0-rc.8",
+    "@contember/schema-definition": "^1.0.0-rc.9",
     "uvu": "^0.5.1"
   },
   "peerDependencies": {

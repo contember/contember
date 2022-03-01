@@ -6,7 +6,7 @@ import {
 	Identity,
 	IntrospectionSchemaDefinitionFactory,
 	PermissionsByIdentityFactory,
-	StaticAuthorizator,
+	Authorizator,
 	IntrospectionSchemaFactory,
 } from '@contember/engine-content-api'
 import { mergeSchemas } from '@graphql-tools/merge'
@@ -50,7 +50,7 @@ export class GraphQlSchemaFactory {
 		}
 		const { permissions, verifier } = this.permissionFactory.createPermissions(schema, identity)
 
-		const authorizator = new StaticAuthorizator(permissions)
+		const authorizator = new Authorizator(permissions)
 		const dataSchemaBuilder = this.graphqlSchemaBuilderFactory.create(schema.model, authorizator)
 		const contentSchemaFactory = new IntrospectionSchemaDefinitionFactory(
 			new IntrospectionSchemaFactory(

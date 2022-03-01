@@ -53,14 +53,14 @@ export class EntityTypeProvider {
 	}
 
 	public getEntity(entityName: string): GraphQLObjectType {
-		if (!this.authorizator.isAllowed(Acl.Operation.read, entityName)) {
+		if (this.authorizator.getEntityPermission(Acl.Operation.read, entityName) === 'no') {
 			throw new ImplementationException()
 		}
 		return this.entities(entityName)
 	}
 
 	public getConnection(entityName: string): GraphQLObjectType {
-		if (!this.authorizator.isAllowed(Acl.Operation.read, entityName)) {
+		if (this.authorizator.getEntityPermission(Acl.Operation.read, entityName) === 'no') {
 			throw new ImplementationException()
 		}
 		return this.connections(entityName)

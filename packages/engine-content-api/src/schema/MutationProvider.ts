@@ -69,7 +69,7 @@ export class MutationProvider {
 		if (entity.view) {
 			return undefined
 		}
-		if (!this.authorizator.isAllowed(Acl.Operation.delete, entityName)) {
+		if (this.authorizator.getEntityPermission(Acl.Operation.delete, entityName) === 'no') {
 			return undefined
 		}
 		const uniqueWhere = this.whereTypeProvider.getEntityUniqueWhereType(entityName)
@@ -180,7 +180,7 @@ export class MutationProvider {
 			errorMessage: { type: GraphQLString },
 			errors: { type: this.resultSchemaTypeProvider.errorListResultType },
 		}
-		if (this.authorizator.isAllowed(Acl.Operation.read, entityName)) {
+		if (this.authorizator.getEntityPermission(Acl.Operation.read, entityName) !== 'no') {
 			const nodeType = this.entityTypeProvider.getEntity(entityName)
 			fields.node = { type: nodeType, resolve: aliasAwareResolver }
 		}

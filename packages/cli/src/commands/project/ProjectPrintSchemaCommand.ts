@@ -8,7 +8,7 @@ import {
 	IntrospectionSchemaDefinitionFactory,
 	IntrospectionSchemaFactory,
 	PermissionFactory,
-	StaticAuthorizator,
+	Authorizator,
 } from '@contember/engine-content-api'
 import { DocumentNode, printSchema } from 'graphql'
 import { mergeSchemas } from '@graphql-tools/merge'
@@ -45,7 +45,7 @@ export class ProjectPrintSchemaCommand extends Command<Args, Options> {
 		const permissionFactory = new PermissionFactory(schema.model)
 		const permissions = permissionFactory.create(schema.acl, input.getOption('role') || ['admin'])
 		const schemaBuilderFactory = new GraphQlSchemaBuilderFactory()
-		const authorizator = new StaticAuthorizator(permissions)
+		const authorizator = new Authorizator(permissions)
 		const introspection = new IntrospectionSchemaFactory(
 			schema.model,
 			new EntityRulesResolver(schema.validation, schema.model),

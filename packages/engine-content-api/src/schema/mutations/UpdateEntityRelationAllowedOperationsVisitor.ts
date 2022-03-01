@@ -76,15 +76,11 @@ export class UpdateEntityRelationAllowedOperationsVisitor implements
 	): Input.UpdateRelationOperation[] {
 		const result: Input.UpdateRelationOperation[] = []
 
-		const canReadTargetEntity = this.authorizator.isAllowed(Acl.Operation.read, targetEntity.name)
-		const canCreateTargetEntity = this.authorizator.isAllowed(Acl.Operation.create, targetEntity.name)
-		const canUpdateTargetEntity = this.authorizator.isAllowed(Acl.Operation.update, targetEntity.name)
-		const canDeleteTargetEntity = this.authorizator.isAllowed(Acl.Operation.delete, targetEntity.name)
-		const canUpdateOwningRelation = this.authorizator.isAllowed(
-			Acl.Operation.update,
-			owningEntity.name,
-			owningRelation.name,
-		)
+		const canReadTargetEntity = this.authorizator.getEntityPermission(Acl.Operation.read, targetEntity.name) !== 'no'
+		const canCreateTargetEntity = this.authorizator.getEntityPermission(Acl.Operation.create, targetEntity.name) !== 'no'
+		const canUpdateTargetEntity = this.authorizator.getEntityPermission(Acl.Operation.update, targetEntity.name) !== 'no'
+		const canDeleteTargetEntity = this.authorizator.getEntityPermission(Acl.Operation.delete, targetEntity.name) !== 'no'
+		const canUpdateOwningRelation = this.authorizator.getFieldPermissions(Acl.Operation.update, owningEntity.name, owningRelation.name) !== 'no'
 
 		if (canReadTargetEntity && canUpdateOwningRelation) {
 			result.push(Input.UpdateRelationOperation.connect)

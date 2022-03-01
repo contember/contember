@@ -107,7 +107,7 @@ export class IntrospectionSchemaFactory {
 			},
 		})
 		return Object.values(getEntity(this.model, entityName).fields)
-			.filter(it => this.authorizator.isAllowed(Acl.Operation.read, entityName, it.name))
+			.filter(it => this.authorizator.getFieldPermissions(Acl.Operation.read, entityName, it.name) !== 'no')
 			.map((it): ContentSchema._Column | ContentSchema._Relation => ({
 				...additionalInfo[it.name],
 				name: it.name,
@@ -154,7 +154,7 @@ export class IntrospectionSchemaFactory {
 
 	public create(): ContentSchema._Schema {
 		const entities = Object.values(this.model.entities)
-			.filter(it => this.authorizator.isAllowed(Acl.Operation.read, it.name))
+			.filter(it => this.authorizator.getEntityPermission(Acl.Operation.read, it.name) !== 'no')
 			.map(entity => ({
 				name: entity.name,
 				customPrimaryAllowed: this.authorizator.isCustomPrimaryAllowed(entity.name),

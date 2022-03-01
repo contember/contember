@@ -19,7 +19,7 @@ export class CreateEntityInputFieldVisitor implements
 		if (entity.primary === column.name && !this.authorizator.isCustomPrimaryAllowed(entity.name)) {
 			return undefined
 		}
-		if (!this.authorizator.isAllowed(Acl.Operation.create, entity.name, column.name)) {
+		if (this.authorizator.getFieldPermissions(Acl.Operation.create, entity.name, column.name) === 'no') {
 			return undefined
 		}
 		const type = this.columnTypeResolver.getType(column)

@@ -19,7 +19,7 @@ export class QueryProvider {
 	) {}
 
 	public getQueries(entity: Model.Entity): { [fieldName: string]: GraphQLFieldConfig<any, Context, any> } {
-		if (!this.authorizator.isAllowed(Acl.Operation.read, entity.name)) {
+		if (this.authorizator.getEntityPermission(Acl.Operation.read, entity.name) === 'no') {
 			return {}
 		}
 		return {

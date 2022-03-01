@@ -51,7 +51,7 @@ export class EntityInputProvider<Operation extends EntityInputType> {
 					throw new ImplementationException(`EntityInputProvider: Invalid operation ${this.operation}`)
 			}
 		})()
-		if (!this.authorizator.isAllowed(operation, entity.name)) {
+		if (this.authorizator.getEntityPermission(operation, entity.name) === 'no') {
 			return undefined
 		}
 

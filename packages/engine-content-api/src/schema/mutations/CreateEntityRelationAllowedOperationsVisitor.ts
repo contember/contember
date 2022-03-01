@@ -65,9 +65,9 @@ export class CreateEntityRelationAllowedOperationsVisitor implements
 	): Input.CreateRelationOperation[] {
 		const result: Input.CreateRelationOperation[] = []
 
-		const canReadTargetEntity = this.authorizator.isAllowed(Acl.Operation.read, targetEntity.name)
-		const canCreateTargetEntity = this.authorizator.isAllowed(Acl.Operation.create, targetEntity.name)
-		const canCreateOwning = this.authorizator.isAllowed(Acl.Operation.create, owningEntity.name, owningRelation.name)
+		const canReadTargetEntity = this.authorizator.getEntityPermission(Acl.Operation.read, targetEntity.name) !== 'no'
+		const canCreateTargetEntity = this.authorizator.getEntityPermission(Acl.Operation.create, targetEntity.name) !== 'no'
+		const canCreateOwning = this.authorizator.getFieldPermissions(Acl.Operation.create, owningEntity.name, owningRelation.name) !== 'no'
 
 		if (canReadTargetEntity && canCreateOwning) {
 			result.push(Input.CreateRelationOperation.connect)

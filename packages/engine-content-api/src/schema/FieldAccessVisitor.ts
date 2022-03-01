@@ -8,10 +8,10 @@ export class FieldAccessVisitor implements Model.ColumnVisitor<boolean>, Model.R
 	) {}
 
 	visitColumn(entity: Model.Entity, column: Model.AnyColumn) {
-		return this.authorizator.isAllowed(this.operation, entity.name, column.name)
+		return this.authorizator.getFieldPermissions(this.operation, entity.name, column.name) !== 'no'
 	}
 
 	visitRelation({}, {}, targetEntity: Model.Entity) {
-		return this.authorizator.isAllowed(this.operation, targetEntity.name)
+		return this.authorizator.getEntityPermission(this.operation, targetEntity.name) !== 'no'
 	}
 }

@@ -3,7 +3,7 @@ import { Acl, Model } from '@contember/schema'
 import * as path from 'path'
 
 import { AllowAllPermissionFactory, SchemaBuilder, SchemaDefinition } from '@contember/schema-definition'
-import { GraphQlSchemaBuilderFactory, StaticAuthorizator } from '../../../../src'
+import { GraphQlSchemaBuilderFactory, Authorizator } from '../../../../src'
 import * as model from './model'
 import { promises as fs } from 'fs'
 import * as assert from 'uvu/assert'
@@ -23,7 +23,7 @@ const testSchema = async (test: Test) => {
 	const schema = schemaResult instanceof SchemaBuilder ? schemaResult.buildSchema() : schemaResult
 	const schemaWithAcl = { ...schema, acl: { roles: {}, variables: {} } }
 	const permissions = test.permissions(schemaWithAcl)
-	const authorizator = new StaticAuthorizator(permissions)
+	const authorizator = new Authorizator(permissions)
 	const graphQlSchemaBuilder = schemaFactory.create(schemaWithAcl, authorizator)
 	const graphQlSchema = graphQlSchemaBuilder.build()
 

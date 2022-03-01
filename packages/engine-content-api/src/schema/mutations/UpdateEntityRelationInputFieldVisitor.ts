@@ -174,7 +174,7 @@ export class UpdateEntityRelationInputFieldVisitor implements
 	}
 
 	private createWhereInput(targetEntity: Model.Entity): GraphQLInputFieldConfig | undefined {
-		if (!this.authorizator.isAllowed(Acl.Operation.read, targetEntity.name)) {
+		if (this.authorizator.getEntityPermission(Acl.Operation.read, targetEntity.name) === 'no') {
 			return undefined
 		}
 		const uniqueWhere = this.whereTypeBuilder.getEntityUniqueWhereType(targetEntity.name)

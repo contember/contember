@@ -22,14 +22,14 @@ export class WhereTypeProvider {
 	) {}
 
 	public getEntityWhereType(entityName: string): GraphQLInputObjectType {
-		if (!this.authorizator.isAllowed(Acl.Operation.read, entityName)) {
+		if (this.authorizator.getEntityPermission(Acl.Operation.read, entityName) === 'no') {
 			throw new ImplementationException()
 		}
 		return this.whereSingleton(entityName)
 	}
 
 	public getEntityUniqueWhereType(entityName: string): undefined | GraphQLInputObjectType {
-		if (!this.authorizator.isAllowed(Acl.Operation.read, entityName)) {
+		if (this.authorizator.getEntityPermission(Acl.Operation.read, entityName) === 'no') {
 			return undefined
 		}
 		return this.uniqueWhereSingleton(entityName)

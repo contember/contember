@@ -100,7 +100,7 @@ export class EntityTypeProvider {
 
 		const fields: { [field: string]: GraphQLFieldConfig<any, any> } = accessibleFields.reduce(
 			(result, fieldName) => {
-				const fieldTypeVisitor = new FieldTypeVisitor(this.columnTypeResolver, this)
+				const fieldTypeVisitor = new FieldTypeVisitor(this.columnTypeResolver, this, this.authorizator)
 				const type: GraphQLOutputType = acceptFieldVisitor(this.schema, entity, fieldName, fieldTypeVisitor)
 
 				const fieldArgsVisitor = new FieldArgsVisitor(this.whereTypeProvider, this.orderByTypeProvider)

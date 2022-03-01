@@ -1,20 +1,21 @@
 import { GraphQLList, GraphQLNonNull, GraphQLOutputType } from 'graphql'
-import { Model } from '@contember/schema'
+import { Acl, Model } from '@contember/schema'
 import { ColumnTypeResolver } from '../ColumnTypeResolver'
 import { EntityTypeProvider } from '../EntityTypeProvider'
+import { Authorizator } from '../../acl'
 
 export class FieldTypeVisitor implements Model.ColumnVisitor<GraphQLOutputType>, Model.RelationByGenericTypeVisitor<GraphQLOutputType> {
-	private columnTypeResolver: ColumnTypeResolver
-	private entityTypeProvider: EntityTypeProvider
-
-	constructor(columnTypeResolver: ColumnTypeResolver, entityTypeProvider: EntityTypeProvider) {
-		this.columnTypeResolver = columnTypeResolver
-		this.entityTypeProvider = entityTypeProvider
+	constructor(
+		private readonly columnTypeResolver: ColumnTypeResolver,
+		private readonly entityTypeProvider: EntityTypeProvider,
+		private readonly authorizator: Authorizator,
+	) {
 	}
 
 	public visitColumn(entity: Model.Entity, column: Model.AnyColumn): GraphQLOutputType {
 		const basicType = this.columnTypeResolver.getType(column)
-		return column.nullable ? basicType : new GraphQLNonNull(basicType)
+		const permissions = this.authorizator.getFieldPermissions(Acl.Operation.read, entity.name, column.name)
+		return column.nullable || permissions === 'maybe' ? basicType : new GraphQLNonNull(basicType)
 	}
 
 	public visitHasMany(entity: Model.Entity, relation: Model.Relation): GraphQLOutputType {

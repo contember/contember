@@ -1,16 +1,9 @@
 import { BaseSyntheticEvent, useCallback, useMemo } from 'react'
-import {
-	DynamicRequestParameters,
-	IncompleteRequestState,
-	RequestParameters,
-	RoutingParameterResolver,
-	RequestChange,
-	RequestState, RoutingLinkTarget,
-} from './types'
 import { requestChangeFactory, useCurrentRequest, usePushRequest } from './RequestContext'
 import { useRouting } from './RoutingContext'
-import { PageNotFound, requestStateToPath } from './urlMapper'
 import { RoutingParameter } from './RoutingParameter'
+import { DynamicRequestParameters, IncompleteRequestState, RequestParameters, RequestState, RoutingLinkTarget, RoutingParameterResolver } from './types'
+import { PageNotFound, requestStateToPath } from './urlMapper'
 
 export interface RoutingLinkParams {
 	href: string

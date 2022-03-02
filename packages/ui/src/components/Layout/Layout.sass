@@ -2,3 +2,32 @@
 
 .#{$cui-conf-globalPrefix}layout
   display: contents
+
+  background-color: var(--cui-background-color)
+  color: var(--cui-color)
+  font-family: var(--cui-font-family)
+  font-size: var(--cui-font-size-body)
+  font-smoothing: antialiased
+  -webkit-font-smoothing: antialiased
+  line-height: var(--cui-line-height)
+
+  h1, h2, h3, h4, h5, h6
+    font-weight: $fw-medium
+
+  textarea
+    resize: vertical
+
+  a, button
+    font-weight: 600
+  a
+    text-decoration: none
+    &:hover
+      color: var(--cui-control-color--highlighted)
+    &:focus:focus-visible
+      color: var(--cui-control-color--highlighted)
+    &:active
+      color: var(--cui-control-color--pressed)
+  button
+    cursor: pointer
+  button[disabled]
+    cursor: not-allowed

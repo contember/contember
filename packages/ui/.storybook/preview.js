@@ -28,7 +28,7 @@ export const decorators = [
     const [themeControls, setThemeControls] = useState('primary');
 
     return <div
-      className={`scheme-${scheme}${position !== 'default' ? `-${position}` : ''} theme-${themeContent}-content theme-${themeControls}-controls`}
+      className={`cui-layout scheme-${scheme}${position !== 'default' ? `-${position}` : ''} theme-${themeContent}-content theme-${themeControls}-controls`}
       style={{
         display: 'flex',
         flexDirection: 'column',

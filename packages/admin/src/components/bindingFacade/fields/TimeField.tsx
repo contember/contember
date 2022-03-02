@@ -1,7 +1,7 @@
 import type { FieldAccessor } from '@contember/binding'
-import { DateTimeInput, SingleLineTextInputProps } from '@contember/ui'
+import { DateTimeInput, SingleLineTextInputProps, dateToTimeValue } from '@contember/ui'
 import { forwardRef, memo, Ref } from 'react'
-import { dateToTimeValue } from '../../../../../ui/src/components/Forms/DateTimeInput/Serializer'
+
 import {
 	SimpleRelativeSingleField,
 	SimpleRelativeSingleFieldMetadata,

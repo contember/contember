@@ -81,6 +81,7 @@ export const NumberCell: FunctionComponent<NumberCellProps> = Component(props =>
 						/>
 						<TextInput
 							value={filter.query}
+							type="number"
 							placeholder="Value"
 							onChange={e => {
 								const value = e.currentTarget.value

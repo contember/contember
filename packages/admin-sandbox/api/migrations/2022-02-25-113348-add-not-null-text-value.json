@@ -1,0 +1,36 @@
+{
+	"formatVersion": 3,
+	"modifications": [
+		{
+			"modification": "createColumn",
+			"entityName": "InputShowcase",
+			"field": {
+				"name": "notNullTextValue",
+				"columnName": "not_null_text_value",
+				"nullable": false,
+				"type": "String",
+				"columnType": "text"
+			}
+		},
+		{
+			"modification": "patchAclSchema",
+			"patch": [
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/InputShowcase/operations/create/notNullTextValue",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/InputShowcase/operations/update/notNullTextValue",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/InputShowcase/operations/read/notNullTextValue",
+					"value": true
+				}
+			]
+		}
+	]
+}

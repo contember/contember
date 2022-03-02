@@ -109,7 +109,3 @@ export const NumberCell: FunctionComponent<NumberCellProps> = Component(props =>
 		</DataGridColumn>
 	)
 }, 'NumberCell') as <Persisted extends FieldValue = FieldValue>(props: NumberCellProps<Persisted>) => ReactElement
-function formatMessage(arg0: string): string {
-	throw new Error('Function not implemented.')
-}
-

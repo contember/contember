@@ -6,6 +6,7 @@ import './global.sass'
 export const parameters = {
   actions: { argTypesRegex: "^on[A-Z].*" },
   controls: {
+    sort: 'requiredFirst',
     hideNoControlsWarning: true,
     matchers: {
       color: /(background|color)$/i,

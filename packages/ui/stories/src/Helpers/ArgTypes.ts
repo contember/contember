@@ -19,6 +19,14 @@ export function rangeControl(min: number = 0, max: number = 100, step: number = 
   }
 }
 
+export function numberControl(min?: number, max?: number, step?: number, defaultValue?: number, description?: string) {
+  return {
+    control: { type: 'number', min, max, step },
+    defaultValue: defaultValue ?? min,
+    description,
+  }
+}
+
 export function booleanControl(defaultValue?: boolean, description?: string) {
   return {
     control: { type: 'boolean' },

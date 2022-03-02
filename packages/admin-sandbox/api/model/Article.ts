@@ -10,6 +10,7 @@ export class Article {
 	category = d.manyHasOne(Category)
 	tags = d.manyHasMany(Tag)
 	state = d.enumColumn(ArticleState)
+	number = d.intColumn().default(1) // for testing NumberCell
 }
 
 export class Category {

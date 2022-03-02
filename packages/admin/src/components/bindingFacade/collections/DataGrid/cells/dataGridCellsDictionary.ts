@@ -21,6 +21,11 @@ export const dataGridCellsDictionary = {
 			includeNull: '<strong>Include</strong> N/A',
 			excludeNull: '<strong>Exclude</strong> N/A',
 		},
+		numberCell: {
+			equals: 'Equals',
+			greaterThan: 'Greater than',
+			lessThan: 'Less than',
+		},
 	},
 }
 export type DataGridCellsDictionary = typeof dataGridCellsDictionary

@@ -6,7 +6,7 @@ import {
 	SugaredRelativeSingleField,
 	wrapFilterInHasOnes,
 } from '@contember/binding'
-import { Checkbox } from '@contember/ui'
+import { Checkbox, Stack } from '@contember/ui'
 import type { FunctionComponent, ReactElement, ReactNode } from 'react'
 import { useMessageFormatter } from '../../../../../i18n'
 import { FieldFallbackView, FieldFallbackViewPublicProps } from '../../../fieldViews'
@@ -71,7 +71,7 @@ export const TextCell: FunctionComponent<TextCellProps> = Component(props => {
 			filterRenderer={({ filter, setFilter, ...props }) => {
 				const formatMessage = useMessageFormatter(dataGridCellsDictionary)
 				return (
-					<div style={{ display: 'flex', gap: '0.5em', alignItems: 'center' }}>
+					<Stack direction="horizontal">
 						<GenericTextCellFilter {...props} filter={filter} setFilter={setFilter} />
 						<Checkbox
 							value={filter.nullCondition}
@@ -92,7 +92,7 @@ export const TextCell: FunctionComponent<TextCellProps> = Component(props => {
 									  })}
 							</span>
 						</Checkbox>
-					</div>
+					</Stack>
 				)
 			}}
 		>

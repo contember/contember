@@ -1,0 +1,38 @@
+{
+	"formatVersion": 3,
+	"modifications": [
+		{
+			"modification": "createColumn",
+			"entityName": "Article",
+			"field": {
+				"name": "number",
+				"columnName": "number",
+				"nullable": true,
+				"default": 1,
+				"type": "Integer",
+				"columnType": "integer"
+			},
+			"fillValue": 1
+		},
+		{
+			"modification": "patchAclSchema",
+			"patch": [
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/Article/operations/create/number",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/Article/operations/update/number",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/Article/operations/read/number",
+					"value": true
+				}
+			]
+		}
+	]
+}

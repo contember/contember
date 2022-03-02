@@ -3,6 +3,7 @@ import { Component, FieldValue, Filter, QueryLanguage, wrapFilterInHasOnes } fro
 import { DataGridColumn, DataGridColumnPublicProps } from '../base'
 import { FC, ReactElement } from 'react'
 import { createGenericTextCellFilterCondition, GenericTextCellFilter } from './GenericTextCellFilter'
+import { Stack } from '@contember/ui'
 
 export type CoalesceTextCellProps<Persisted extends FieldValue = FieldValue> =
 	& DataGridColumnPublicProps
@@ -41,9 +42,9 @@ export const CoalesceTextCell: FC<CoalesceTextCellProps> = Component(props => {
 			}}
 			filterRenderer={props => {
 				return (
-					<div style={{ display: 'flex', gap: '0.5em', alignItems: 'center' }}>
+					<Stack direction="horizontal">
 						<GenericTextCellFilter {...props} />
-					</div>
+					</Stack>
 				)
 			}}
 		>

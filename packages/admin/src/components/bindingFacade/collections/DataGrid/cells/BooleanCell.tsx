@@ -1,6 +1,6 @@
 import { Component, QueryLanguage, wrapFilterInHasOnes } from '@contember/binding'
 import type { Input } from '@contember/client'
-import { Checkbox } from '@contember/ui'
+import { Checkbox, Stack } from '@contember/ui'
 import type { FunctionComponent } from 'react'
 import { useMessageFormatter } from '../../../../../i18n'
 import { BooleanFieldView, BooleanFieldViewProps } from '../../../fieldViews'
@@ -60,7 +60,7 @@ export const BooleanCell: FunctionComponent<BooleanCellProps> = Component(props 
 			filterRenderer={({ filter, setFilter }) => {
 				const formatMessage = useMessageFormatter(dataGridCellsDictionary)
 				return (
-					<div style={{ display: 'flex', gap: '0.5em', alignItems: 'center' }}>
+					<Stack direction="horizontal">
 						{(
 							[
 								['includeTrue', formatMessage('dataGridCells.booleanCell.includeTrue')],
@@ -78,7 +78,7 @@ export const BooleanCell: FunctionComponent<BooleanCellProps> = Component(props 
 								{label}
 							</Checkbox>
 						))}
-					</div>
+					</Stack>
 				)
 			}}
 		>

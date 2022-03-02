@@ -10,6 +10,7 @@ import {
 	HasOneSelectCell,
 	LinkButton,
 	MultiSelectField,
+	NumberCell,
 	RichTextField,
 	SelectField,
 	SlugField,
@@ -30,11 +31,12 @@ export const articleList = (
 		title: 'Articles',
 	}}>
 		<TextCell field="title" header="Title" />
+		<TextCell field="title" header="Title" />
 		<TextCell field="content" header="Content" />
 		<HasOneSelectCell field="category" options={`Category.locales(locale.code = 'cs').name`} header="Category" />
 		<HasManySelectCell field="tags" options={`Tag.locales(locale.code = 'cs').name`} header="Tags" />
 		<EnumCell field={'state'} options={stateOptions} header={'State'} />
-
+		<NumberCell field="number" header="Number" />
 		<GenericCell canBeHidden={false} justification="justifyEnd">
 			<LinkButton to={`articleEdit(id: $entity.id)`} Component={AnchorButton}>Edit</LinkButton>
 			<DeleteEntityButton title="Delete" immediatePersist={true} />

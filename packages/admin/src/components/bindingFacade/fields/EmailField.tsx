@@ -1,4 +1,4 @@
-import { TextInput, TextInputProps } from '@contember/ui'
+import { EmailInput, EmailInputProps } from '@contember/ui'
 import { SimpleRelativeSingleField, SimpleRelativeSingleFieldProps } from '../auxiliary'
 import {
 	ControlValueParser,
@@ -6,13 +6,13 @@ import {
 	useFieldControl,
 } from './useFieldControl'
 
-export type ColorFieldProps = SimpleRelativeSingleFieldProps &
-	Omit<TextInputProps, 'value' | 'validationState' | 'allowNewlines' | 'wrapLines'>
+export type EmailFieldProps = SimpleRelativeSingleFieldProps &
+	Omit<EmailInputProps, 'value' | 'validationState' | 'allowNewlines' | 'wrapLines'>
 
 const parse: ControlValueParser<string, string> = value => value ??  null
 const format: FieldValueFormatter<string, string> = value => value ?? null
 
-export const ColorField = SimpleRelativeSingleField<ColorFieldProps, string>(
+export const EmailField = SimpleRelativeSingleField<EmailFieldProps, string>(
 	(fieldMetadata, {
 		defaultValue,
 		name,
@@ -26,7 +26,7 @@ export const ColorField = SimpleRelativeSingleField<ColorFieldProps, string>(
 			format,
 		})
 
-		return <TextInput {...inputProps} />
+		return <EmailInput {...inputProps} />
 	},
-	'ColorField',
+	'EmailField',
 )

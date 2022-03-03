@@ -1,11 +1,27 @@
-import { SimpleRelativeSingleField } from '../auxiliary'
-import { DateFieldInner, DateFieldProps } from './DateField'
+import {
+	DateTimeInput,
+	DateTimeInputProps,
+	toDatetimeString,
+	toISOString,
+} from '@contember/ui'
+import {
+	SimpleRelativeSingleField,
+	SimpleRelativeSingleFieldProps,
+} from '../auxiliary'
+import { useFieldControl } from './useFieldControl'
 
-export type DateTimeFieldProps = Omit<DateFieldProps, 'showTimeSelect'>
+export type DateTimeFieldProps = SimpleRelativeSingleFieldProps & DateTimeInputProps
 
 export const DateTimeField = SimpleRelativeSingleField<DateTimeFieldProps, string>(
-	(fieldMetadata, { ...props }) => {
-		return <DateFieldInner fieldMetadata={fieldMetadata} {...props} showTimeSelect />
+	(fieldMetadata, props) => {
+		const inputProps = useFieldControl<string, string>({
+			...props,
+			fieldMetadata,
+			parse: toISOString,
+			format: toDatetimeString,
+		})
+
+		return <DateTimeInput {...inputProps} />
 	},
 	'DateTimeField',
 )

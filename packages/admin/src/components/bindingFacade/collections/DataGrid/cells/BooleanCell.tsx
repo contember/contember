@@ -1,6 +1,6 @@
 import { Component, QueryLanguage, wrapFilterInHasOnes } from '@contember/binding'
 import type { Input } from '@contember/client'
-import { Checkbox, Stack } from '@contember/ui'
+import { Checkbox, FieldContainer, Stack } from '@contember/ui'
 import type { FunctionComponent } from 'react'
 import { useMessageFormatter } from '../../../../../i18n'
 import { BooleanFieldView, BooleanFieldViewProps } from '../../../fieldViews'
@@ -67,16 +67,20 @@ export const BooleanCell: FunctionComponent<BooleanCellProps> = Component(props 
 								['includeFalse', formatMessage('dataGridCells.booleanCell.includeFalse')],
 								['includeNull', formatMessage('dataGridCells.booleanCell.includeNull')],
 							] as const
-						).map(([item, label]) => (
-							<Checkbox
-								key={item}
-								value={filter[item]}
-								onChange={checked => {
-									setFilter({ ...filter, [item]: checked })
-								}}
+						).map(([item, label], index) => (
+							<FieldContainer
+								key={`${index}-${label}`}
+								label={label}
+								labelPosition="labelInlineRight"
 							>
-								{label}
-							</Checkbox>
+								<Checkbox
+									key={item}
+									value={filter[item]}
+									onChange={checked => {
+										setFilter({ ...filter, [item]: checked })
+									}}
+								/>
+							</FieldContainer>
 						))}
 					</Stack>
 				)

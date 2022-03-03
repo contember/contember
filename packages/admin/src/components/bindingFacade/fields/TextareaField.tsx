@@ -1,11 +1,59 @@
-import { Component } from '@contember/binding'
-import type { FunctionComponent } from 'react'
-import { TextField, TextFieldProps } from './TextField'
+import { ControlProps, TextareaInput, TextareaInputOwnProps } from '@contember/ui'
+import { SimpleRelativeSingleField, SimpleRelativeSingleFieldProps } from '../auxiliary'
+import {
+	ControlValueParser,
+	FieldValueFormatter,
+	useFieldControl,
+} from './useFieldControl'
 
-export type TextareaFieldProps = TextFieldProps
+export type TextareaFieldProps =
+	& SimpleRelativeSingleFieldProps
+	& ControlProps<string>
+	& TextareaInputOwnProps
 
-const TF: any = TextField // TODO this is a shitty hotfix
+const parse: ControlValueParser<string, string> = value => value ??  null
+const format: FieldValueFormatter<string, string> = value => value ?? null
 
-export const TextAreaField: FunctionComponent<TextFieldProps> = Component(props => (
-	<TF {...props} allowNewlines={true} minRows={(props as any).minRows || 3} />
-))
+export const TextareaField = SimpleRelativeSingleField<TextareaFieldProps, string>(
+	(fieldMetadata, {
+		label,
+		minRows,
+		...props
+	}) => {
+		const inputProps = useFieldControl<string, string>({
+			...props,
+			fieldMetadata,
+			parse,
+			format,
+		})
+
+		return <TextareaInput {...inputProps} minRows={minRows || 3} />
+	},
+	'TextareaField',
+)
+
+// TODO: Remove after depreciation period
+/**
+ * @deprecated Use `TextareaField` instead
+ */
+export const TextAreaField = SimpleRelativeSingleField<TextareaFieldProps, string>(
+	(fieldMetadata, {
+		label,
+		minRows,
+		...props
+	}) => {
+		if (import.meta.env.DEV) {
+			console.warn('TextAreaField is deprecated. Plese use TextareaField to align with HTML/UI naming of components')
+		}
+
+		const inputProps = useFieldControl<string, string>({
+			...props,
+			fieldMetadata,
+			parse,
+			format,
+		})
+
+		return <TextareaInput {...inputProps} minRows={minRows || 3} />
+	},
+	'TextAreaField',
+)

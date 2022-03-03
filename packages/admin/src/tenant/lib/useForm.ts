@@ -11,7 +11,7 @@ interface FormMethods<V> {
 		options?: { type?: 'number' },
 	) => {
 		value: V[K]
-		onChange: (args: (SyntheticEvent & { currentTarget: { value: V[K] } }) | V[K]) => void
+		onChange: (value: V[K] | null | undefined) => void
 	}
 }
 
@@ -44,13 +44,14 @@ export const useForm = <V>(initialValues: V, handler?: FormHandler<V>): FormMeth
 				return {
 					name: field,
 					value: values[field],
-					onChange: arg => {
-						let value: any =
-							typeof arg === 'object' && arg !== null && 'currentTarget' in arg ? arg.currentTarget.value : arg
+					onChange: value => {
+						let nextValue: any = value
+
 						if (options.type === 'number') {
-							value = Number(value).toString(10) === value ? Number(value) : undefined
+							nextValue = Number(nextValue).toString(10) === nextValue ? Number(nextValue) : undefined
 						}
-						setValues(values => ({ ...values, [field]: value }))
+
+						setValues(values => ({ ...values, [field]: nextValue }))
 					},
 				}
 			},

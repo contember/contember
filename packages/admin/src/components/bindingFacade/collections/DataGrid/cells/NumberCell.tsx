@@ -1,10 +1,10 @@
 import { Component, Field, FieldValue, QueryLanguage, SugaredRelativeSingleField, wrapFilterInHasOnes } from '@contember/binding'
 import { Input } from '@contember/client'
-import { TextInput, Select, Stack } from '@contember/ui'
+import { NumberInput, Select, Stack } from '@contember/ui'
 import type { FunctionComponent, ReactElement, ReactNode } from 'react'
 import { useMessageFormatter } from '../../../../../i18n'
-import { FieldFallbackViewPublicProps, FieldFallbackView } from '../../../fieldViews'
-import { DataGridOrderDirection, DataGridHeaderCellPublicProps, DataGridCellPublicProps, DataGridColumn } from '../base'
+import { FieldFallbackView, FieldFallbackViewPublicProps } from '../../../fieldViews'
+import { DataGridCellPublicProps, DataGridColumn, DataGridHeaderCellPublicProps, DataGridOrderDirection } from '../base'
 import { dataGridCellsDictionary } from './dataGridCellsDictionary'
 
 export type NumberCellProps<Persisted extends FieldValue = FieldValue> =
@@ -69,26 +69,31 @@ export const NumberCell: FunctionComponent<NumberCellProps> = Component(props =>
 				return (
 					<Stack direction="horizontal">
 						<Select
+							notNull
 							value={filter.mode}
 							options={options}
-							onChange={e => {
-								const value = e.currentTarget.value as NumberFilterArtifacts['mode']
+							onChange={value => {
+								if (!value) {
+									return
+								}
+
 								setFilter({
 									...filter,
 									mode: value,
 								})
 							}}
 						/>
-						<TextInput
-							value={filter.query}
-							type="number"
+						{/* TODO: Maybe support float */}
+						<NumberInput
+							value={parseInt(filter.query)}
 							placeholder="Value"
-							onChange={e => {
-								const value = e.currentTarget.value
-								setFilter({
-									...filter,
-									query: value,
-								})
+							onChange={value => {
+								if (value || value === 0) {
+									setFilter({
+										...filter,
+										query: value?.toString(),
+									})
+								}
 							}}
 						/>
 					</Stack>

@@ -1,11 +1,11 @@
-import { FilterRendererProps } from '../base'
-import { BaseDynamicChoiceField } from '../../../fields/ChoiceField/BaseDynamicChoiceField'
-import { useSelectOptions } from '../../../fields/ChoiceField/useSelectOptions'
+import { Checkbox, FieldContainer } from '@contember/ui'
 import { useMemo } from 'react'
 import { useMessageFormatter } from '../../../../../i18n'
-import { dataGridCellsDictionary } from './dataGridCellsDictionary'
 import { MultiSelectFieldInner } from '../../../fields'
-import { Checkbox } from '@contember/ui'
+import { BaseDynamicChoiceField } from '../../../fields/ChoiceField/BaseDynamicChoiceField'
+import { useSelectOptions } from '../../../fields/ChoiceField/useSelectOptions'
+import { FilterRendererProps } from '../base'
+import { dataGridCellsDictionary } from './dataGridCellsDictionary'
 
 
 // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
@@ -47,25 +47,30 @@ export const SelectCellFilter = ({ filter, setFilter, environment, optionProps }
 			}}
 			data={options}
 			errors={undefined}
-			currentValues={currentValues} clear={() => {
-			setFilter({ ...filter, id: [] })
-		}}
-			isMutating={false} />
-
-		<Checkbox
-			value={filter.nullCondition}
-			onChange={checked => {
-				setFilter({
-					...filter,
-					nullCondition: checked,
-				})
+			currentValues={currentValues}
+			clear={() => {
+				setFilter({ ...filter, id: [] })
 			}}
-		>
-			<span style={{ whiteSpace: 'nowrap' }}>
+			isMutating={false}
+		/>
+
+		<FieldContainer
+			label={<span style={{ whiteSpace: 'nowrap' }}>
 				{formatMessage('dataGridCells.textCell.includeNull', {
 					strong: chunks => <strong>{chunks}</strong>,
 				})}
-			</span>
-		</Checkbox>
+			</span>}
+			labelPosition="labelInlineRight"
+		>
+			<Checkbox
+				value={filter.nullCondition}
+				onChange={checked => {
+					setFilter({
+						...filter,
+						nullCondition: !!checked,
+					})
+				}}
+			/>
+		</FieldContainer>
 	</>
 }

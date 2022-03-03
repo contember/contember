@@ -1,6 +1,6 @@
 import { useProjectSlug } from '@contember/react-client'
-import { Button, FieldContainer, LayoutPage, Stack, TextInput } from '@contember/ui'
-import { FC, memo, SyntheticEvent, useCallback, useState } from 'react'
+import { Button, FieldContainer, LayoutPage, Spacer, Stack, TextInput } from '@contember/ui'
+import { FC, memo, SyntheticEvent, useCallback, useRef, useState } from 'react'
 import { useShowToast } from '../../../components'
 import { NavigateBackButton, RoutingLinkTarget, useRedirect } from '../../../routing'
 import { useInvite } from '../../mutations'
@@ -61,15 +61,17 @@ export const InviteUser: FC<InviteUserProps> = ({ project, rolesConfig, userList
 
 	const editUserMembershipProps = { project, rolesConfig, memberships, setMemberships }
 
+	const emailInput = useRef<HTMLInputElement>(null)
+
 	return (
 		<form onSubmit={submit}>
 			<Stack direction="vertical" gap="large">
 				<FieldContainer label="E-mail" errors={emailNotValidError ? [{ message: 'Email is not valid.' }] : undefined}>
 					<TextInput
+						ref={emailInput}
 						validationState={emailNotValidError ? 'invalid' : 'default'}
 						value={email}
-						onChange={e => setEmail && setEmail(e.target.value)}
-						allowNewlines={false}
+						onChange={useCallback(value => setEmail?.(value), [setEmail])}
 					/>
 				</FieldContainer>
 

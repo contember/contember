@@ -6,8 +6,8 @@ import {
 	SugaredRelativeEntityList,
 	wrapFilterInHasOnes,
 } from '@contember/binding'
+import { Checkbox, FieldContainer } from '@contember/ui'
 import type { ComponentType, FunctionComponent, ReactElement, ReactNode } from 'react'
-import { Checkbox } from '@contember/ui'
 import type { FieldFallbackViewPublicProps } from '../../../fieldViews'
 import { DataGridColumn, DataGridColumnPublicProps } from '../base'
 
@@ -41,11 +41,12 @@ export const HasManyAbsentCell: FunctionComponent<HasManyAbsentCellProps> = Comp
 			}}
 			emptyFilter={false}
 			filterRenderer={({ filter, setFilter }) => {
-				return (
-					<Checkbox value={filter} onChange={checked => setFilter(checked)}>
-						Has any
-					</Checkbox>
-				)
+				return <FieldContainer
+					label="Has any"
+					labelPosition="labelInlineRight"
+				>
+					<Checkbox value={filter} onChange={checked => setFilter(!!checked)} />
+				</FieldContainer>
 			}}
 		>
 			<HasMany {...props} listComponent={props.render} />

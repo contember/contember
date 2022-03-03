@@ -1,54 +1,32 @@
-import { Component, Field, FieldBasicProps, useEnvironment, useField, useMutationState } from '@contember/binding'
-import { Checkbox, FieldContainer } from '@contember/ui'
-import type { FunctionComponent, ReactNode } from 'react'
-import { useAccessorErrors } from '../errors'
+import { Checkbox, ControlProps } from '@contember/ui'
+import { SimpleRelativeSingleField, SimpleRelativeSingleFieldProps } from '../auxiliary'
+import {
+	ControlValueParser,
+	FieldValueFormatter,
+	useFieldControl,
+} from './useFieldControl'
 
-export type CheckboxFieldProps = FieldBasicProps & {
-	label: ReactNode
-	labelDescription?: ReactNode
-}
+const parse: ControlValueParser<boolean, boolean> = value => value ??  null
+const format: FieldValueFormatter<boolean, boolean> = value => value ?? null
 
-export const CheckboxField: FunctionComponent<CheckboxFieldProps> = Component(
-	props => {
-		const field = useField<boolean>(props)
-		const isMutating = useMutationState()
-		const environment = useEnvironment()
+export type CheckboxFieldProps =
+	& SimpleRelativeSingleFieldProps
+	& ControlProps<boolean>
 
-		return (
-			<FieldContainer
-				errors={useAccessorErrors(field)}
-				label={undefined}
-				useLabelElement={false}
-			>
-				<Checkbox
-					labelDescription={props.labelDescription}
-					value={field.value}
-					onChange={(isChecked: boolean) => {
-						field.updateValue(isChecked)
-					}}
-					isDisabled={isMutating}
-				>
-					{environment.applySystemMiddleware('labelMiddleware', props.label)}
-				</Checkbox>
-			</FieldContainer>
-		)
-	},
-	props => {
-		// let isNonbearing = props.isNonbearing
-		// let defaultValue = props.defaultValue
-		//
-		// if (props.defaultValue === undefined && props.isNonbearing !== false) {
-		// 	defaultValue = false
-		// 	isNonbearing = true
-		// }
+	export const CheckboxField = SimpleRelativeSingleField<CheckboxFieldProps, boolean>(
+		(fieldMetadata, {
+			label,
+			...props
+		}) => {
+			const inputProps = useFieldControl<boolean, boolean>({
+				...props,
+				fieldMetadata,
+				parse,
+				format,
+			})
 
-		return (
-			<>
-				<Field {...props} />
-				{props.label}
-				{props.labelDescription}
-			</>
-		)
-	},
-	'CheckboxField',
-)
+			return <Checkbox {...inputProps} />
+		},
+		'CheckboxField',
+		{ labelPosition: 'labelInlineRight' },
+	)

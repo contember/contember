@@ -50,29 +50,26 @@ export const ChangePassword: FC<{}> = ({}) => {
 					errors={errors.currentPassword === undefined ? undefined : [{ message: errors.currentPassword }]}
 				>
 					<TextInput
-						allowNewlines={false}
 						type="password"
 						autoComplete="password"
 						{...register('currentPassword')}
 					/>
-				</FieldContainer>
-				<FieldContainer
-					label="New password"
-					errors={errors.newPassword === undefined ? undefined : [{ message: errors.newPassword }]}
-				>
-					<TextInput
-						allowNewlines={false}
-						type="password"
-						autoComplete="new-password"
-						{...register('newPassword')}
-					/>
-				</FieldContainer>
-				<FieldContainer
-					label="Confirm new password"
-					errors={errors.newPasswordAgain === undefined ? undefined : [{ message: errors.newPasswordAgain }]}
-				>
-					<TextInput
-						allowNewlines={false}
+			</FieldContainer>
+			<FieldContainer
+				label="New password"
+				errors={errors.newPassword === undefined ? undefined : [{ message: errors.newPassword }]}
+			>
+				<TextInput
+					type="password"
+					autoComplete="new-password"
+					{...register('newPassword')}
+				/>
+			</FieldContainer>
+			<FieldContainer
+				label="Confirm new password"
+				errors={errors.newPasswordAgain === undefined ? undefined : [{ message: errors.newPasswordAgain }]}
+			>
+				<TextInput
 						type="password"
 						autoComplete="new-password"
 						{...register('newPasswordAgain')}

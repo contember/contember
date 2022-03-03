@@ -1,1 +1,2 @@
-export * from './IdentityProviderQuery'
+export * from './IdentityProviderBySlugQuery'
+export * from './IdentityProvidersQuery'

@@ -1,14 +1,14 @@
+export type JSONPrimitive = string | number | boolean | null | undefined
+export type JSONValue = JSONPrimitive | JSONObject | JSONArray
+export type JSONObject = { [member: string]: JSONValue }
+export type JSONArray = JSONValue[]
+
 export type Value =
-	| null
-	| string
-	| number
-	| boolean
+	| JSONValue
 	| Date
-	| readonly string[]
-	| readonly number[]
 	| readonly Date[]
-	| readonly boolean[]
 	| Buffer
+
 
 export interface Raw {
 	sql: string

@@ -8,7 +8,7 @@ import {
 	DatabaseContextFactory,
 	Identity,
 	IdentityFactory,
-	IDPManager,
+	IDPHandlerRegistry,
 	IDPSignInManager,
 	InviteManager,
 	MailTemplateManager,
@@ -33,11 +33,14 @@ import {
 	UserMailer,
 } from './model'
 import {
+	AddIDPMutationResolver,
 	AddProjectMemberMutationResolver,
 	ChangePasswordMutationResolver,
 	CreateApiKeyMutationResolver,
 	CreateProjectMutationResolver,
 	DisableApiKeyMutationResolver,
+	DisableIDPMutationResolver,
+	EnableIDPMutationResolver,
 	IdentityTypeResolver,
 	IDPMutationResolver,
 	InviteMutationResolver,
@@ -63,6 +66,9 @@ import { createMailer, MailerOptions, TemplateRenderer } from './utils'
 import { MigrationsRunnerFactory, TenantCredentials } from './migrations'
 import { IdentityFetcher } from './bridges/system/IdentityFetcher'
 import { SignInResponseFactory } from './resolvers/responseHelpers/SignInResponseFactory'
+import { IDPManager } from './model/service/idp/IDPManager'
+import { IDPQueryResolver } from './resolvers/query/IDPQueryResolver'
+import { UpdateIDPMutationResolver } from './resolvers/mutation/idp/UpdateIDPMutationResolver'
 
 export type ConnectionType = Connection.ConnectionLike & Connection.ClientFactory & Connection.PoolStatusProvider
 
@@ -151,13 +157,15 @@ export class TenantContainerFactory {
 				new ProjectManager(secretManager, args.projectInitializer, apiKeyService))
 			.addService('passwordResetManager', ({ userMailer, projectManager }) =>
 				new PasswordResetManager(userMailer, projectManager))
-			.addService('idpManager', () => {
-				const idpManager = new IDPManager()
-				idpManager.registerProvider('oidc', new OIDCProvider())
-				return idpManager
+			.addService('idpRegistry', () => {
+				const idpRegistry = new IDPHandlerRegistry()
+				idpRegistry.registerHandler('oidc', new OIDCProvider())
+				return idpRegistry
 			})
-			.addService('idpSignInManager', ({ apiKeyManager, idpManager }) =>
-				new IDPSignInManager(apiKeyManager, idpManager))
+			.addService('idpSignInManager', ({ apiKeyManager, idpRegistry }) =>
+				new IDPSignInManager(apiKeyManager, idpRegistry))
+			.addService('idpManager', ({ idpRegistry }) =>
+				new IDPManager(idpRegistry))
 			.addService('otpAuthenticator', ({ providers }) =>
 				new OtpAuthenticator(providers))
 			.addService('signInManager', ({ apiKeyManager, providers, otpAuthenticator }) =>
@@ -180,6 +188,8 @@ export class TenantContainerFactory {
 				new SignInResponseFactory(permissionContextFactory, identityTypeResolver))
 			.addService('meQueryResolver', () =>
 				new MeQueryResolver())
+			.addService('idpQueryResolver', () =>
+				new IDPQueryResolver())
 			.addService('projectQueryResolver', ({ projectManager }) =>
 				new ProjectQueryResolver(projectManager))
 			.addService('projectMembersQueryResolver', ({ projectManager, projectMemberManager }) =>
@@ -212,6 +222,14 @@ export class TenantContainerFactory {
 				new MailTemplateMutationResolver(projectManager, mailTemplateManager))
 			.addService('idpMutationResolver', ({ idpSignInManager, signInResponseFactory }) =>
 				new IDPMutationResolver(idpSignInManager, signInResponseFactory))
+			.addService('registerIdpMutationResolver', ({ idpManager }) =>
+				new AddIDPMutationResolver(idpManager))
+			.addService('updateIdpMutationResolver', ({ idpManager }) =>
+				new UpdateIDPMutationResolver(idpManager))
+			.addService('disableIdpMutationResolver', ({ idpManager }) =>
+				new DisableIDPMutationResolver(idpManager))
+			.addService('enableIdpMutationResolver', ({ idpManager }) =>
+				new EnableIDPMutationResolver(idpManager))
 			.addService('createProjectMutationResolver', ({ projectManager }) =>
 				new CreateProjectMutationResolver(projectManager))
 			.addService('updateProjectMutationResolver', ({ projectManager }) =>

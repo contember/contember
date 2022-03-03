@@ -3,11 +3,11 @@ import {
 	ChangePasswordMutationResolver,
 	CreateApiKeyMutationResolver,
 	CreateProjectMutationResolver,
-	DisableApiKeyMutationResolver,
+	DisableApiKeyMutationResolver, DisableIDPMutationResolver, EnableIDPMutationResolver,
 	IDPMutationResolver,
 	InviteMutationResolver,
 	MailTemplateMutationResolver,
-	OtpMutationResolver,
+	OtpMutationResolver, AddIDPMutationResolver,
 	RemoveProjectMemberMutationResolver,
 	ResetPasswordMutationResolver,
 	SetProjectSecretMutationResolver,
@@ -21,7 +21,9 @@ import {
 import { Resolvers } from '../schema'
 import { MeQueryResolver, ProjectMembersQueryResolver, ProjectQueryResolver } from './query'
 import { IdentityTypeResolver, ProjectTypeResolver } from './types'
-import { JSONType } from '@contember/graphql-utils'
+import { DateTimeType, JSONType } from '@contember/graphql-utils'
+import { IDPQueryResolver } from './query/IDPQueryResolver'
+import { UpdateIDPMutationResolver } from './mutation/idp/UpdateIDPMutationResolver'
 
 class ResolverFactory {
 	public constructor(
@@ -29,6 +31,7 @@ class ResolverFactory {
 			meQueryResolver: MeQueryResolver
 			projectQueryResolver: ProjectQueryResolver
 			projectMembersQueryResolver: ProjectMembersQueryResolver
+			idpQueryResolver: IDPQueryResolver
 
 			signUpMutationResolver: SignUpMutationResolver
 			signInMutationResolver: SignInMutationResolver
@@ -36,6 +39,10 @@ class ResolverFactory {
 			changePasswordMutationResolver: ChangePasswordMutationResolver
 			resetPasswordMutationResolver: ResetPasswordMutationResolver
 			idpMutationResolver: IDPMutationResolver
+			registerIdpMutationResolver: AddIDPMutationResolver
+			disableIdpMutationResolver: DisableIDPMutationResolver
+			enableIdpMutationResolver: EnableIDPMutationResolver
+			updateIdpMutationResolver: UpdateIDPMutationResolver
 
 			inviteMutationResolver: InviteMutationResolver
 			addProjectMemberMutationResolver: AddProjectMemberMutationResolver
@@ -55,12 +62,14 @@ class ResolverFactory {
 
 			identityTypeResolver: IdentityTypeResolver
 			projectTypeResolver: ProjectTypeResolver
+
 		},
 	) {}
 
-	create(): Resolvers & { Mutation: Required<Resolvers['Mutation']> } {
+	create(): Resolvers & { Mutation: Required<Resolvers['Mutation']> } & { Query: Required<Resolvers['Query']> } {
 		return {
 			Json: JSONType,
+			DateTime: DateTimeType,
 			Identity: {
 				projects: this.resolvers.identityTypeResolver.projects.bind(this.resolvers.identityTypeResolver),
 				person: this.resolvers.identityTypeResolver.person.bind(this.resolvers.identityTypeResolver),
@@ -74,6 +83,10 @@ class ResolverFactory {
 				projectBySlug: this.resolvers.projectQueryResolver.projectBySlug.bind(this.resolvers.projectQueryResolver),
 				projects: this.resolvers.projectQueryResolver.projects.bind(this.resolvers.projectQueryResolver),
 				projectMemberships: this.resolvers.projectMembersQueryResolver.projectMemberships.bind(this.resolvers.projectMembersQueryResolver),
+				identityProviders: this.resolvers.idpQueryResolver.identityProviders.bind(this.resolvers.idpQueryResolver),
+				checkResetPasswordToken: () => {
+					throw new Error('not implemented')
+				},
 			},
 			Mutation: {
 				signUp: this.resolvers.signUpMutationResolver.signUp.bind(this.resolvers.signUpMutationResolver),
@@ -88,6 +101,10 @@ class ResolverFactory {
 
 				initSignInIDP: this.resolvers.idpMutationResolver.initSignInIDP.bind(this.resolvers.idpMutationResolver),
 				signInIDP: this.resolvers.idpMutationResolver.signInIDP.bind(this.resolvers.idpMutationResolver),
+				addIDP: this.resolvers.registerIdpMutationResolver.addIDP.bind(this.resolvers.registerIdpMutationResolver),
+				disableIDP: this.resolvers.disableIdpMutationResolver.disableIDP.bind(this.resolvers.disableIdpMutationResolver),
+				enableIDP: this.resolvers.enableIdpMutationResolver.enableIDP.bind(this.resolvers.enableIdpMutationResolver),
+				updateIDP: this.resolvers.updateIdpMutationResolver.updateIDP.bind(this.resolvers.updateIdpMutationResolver),
 
 				invite: this.resolvers.inviteMutationResolver.invite.bind(this.resolvers.inviteMutationResolver),
 				unmanagedInvite: this.resolvers.inviteMutationResolver.unmanagedInvite.bind(this.resolvers.inviteMutationResolver),

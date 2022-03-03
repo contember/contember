@@ -8,6 +8,7 @@ namespace PermissionActions {
 		project = 'project',
 		apiKey = 'apiKey',
 		mailTemplate = 'mailTemplate',
+		idp = 'idp',
 	}
 
 	export const PERSON_SIGN_IN = Authorizator.createAction(Resources.person, 'signIn')
@@ -41,6 +42,10 @@ namespace PermissionActions {
 
 	export const MAIL_TEMPLATE_ADD = Authorizator.createAction(Resources.mailTemplate, 'add')
 	export const MAIL_TEMPLATE_REMOVE = Authorizator.createAction(Resources.mailTemplate, 'remove')
+
+	export const IDP_ADD = Authorizator.createAction(Resources.idp, 'add')
+	export const IDP_DISABLE = Authorizator.createAction(Resources.idp, 'disable')
+	export const IDP_ENABLE = Authorizator.createAction(Resources.idp, 'enable')
 }
 
 export { PermissionActions }

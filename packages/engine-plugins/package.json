@@ -1,17 +1,17 @@
 {
   "name": "@contember/engine-plugins",
   "license": "Apache-2.0",
-  "version": "1.0.0-rc.10",
+  "version": "1.0.0-rc.11",
   "main": "dist/src/index.js",
   "scripts": {
     "test": "echo 'No tests'"
   },
   "typings": "dist/src/index.d.ts",
   "dependencies": {
-    "@contember/dic": "^1.0.0-rc.10",
-    "@contember/engine-common": "^1.0.0-rc.10",
-    "@contember/graphql-utils": "^1.0.0-rc.10",
-    "@contember/schema": "^1.0.0-rc.10"
+    "@contember/dic": "^1.0.0-rc.11",
+    "@contember/engine-common": "^1.0.0-rc.11",
+    "@contember/graphql-utils": "^1.0.0-rc.11",
+    "@contember/schema": "^1.0.0-rc.11"
   },
   "peerDependencies": {
     "graphql": ">= 14.6.0"

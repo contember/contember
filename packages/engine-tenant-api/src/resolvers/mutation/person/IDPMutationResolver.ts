@@ -6,16 +6,14 @@ import {
 	SignInIdpResponse,
 } from '../../../schema'
 import { ResolverContext } from '../../ResolverContext'
-import { IDPSignInManager, PermissionActions, PermissionContextFactory } from '../../../model'
-import { createResolverContext } from '../../ResolverContextFactory'
-import { IdentityTypeResolver } from '../../types'
+import { IDPSignInManager, PermissionActions } from '../../../model'
 import { createErrorResponse } from '../../errorUtils'
+import { SignInResponseFactory } from '../../responseHelpers/SignInResponseFactory'
 
 export class IDPMutationResolver implements MutationResolvers {
 	constructor(
 		private readonly idpSignInManager: IDPSignInManager,
-		private readonly identityTypeResolver: IdentityTypeResolver,
-		private readonly permissionContextFactory: PermissionContextFactory,
+		private readonly signInResponseFactory: SignInResponseFactory,
 	) {}
 
 	async initSignInIDP(
@@ -50,32 +48,10 @@ export class IDPMutationResolver implements MutationResolvers {
 		if (!signIn.ok) {
 			return createErrorResponse(signIn.error, signIn.errorMessage)
 		}
-		const result = signIn.result
-		const identityId = result.person.identity_id
-		const permissionContext = this.permissionContextFactory.create(context.projectGroup, { id: identityId, roles: result.person.roles })
-		const projects = await this.identityTypeResolver.projects(
-			{ id: identityId, projects: [] },
-			{},
-			{
-				...context,
-				...createResolverContext(permissionContext, context.apiKeyId),
-			},
-		)
 		return {
 			ok: true,
 			errors: [],
-			result: {
-				token: result.token,
-				person: {
-					id: result.person.id,
-					otpEnabled: !!result.person.otp_activated_at,
-					email: result.person.email,
-					identity: {
-						id: identityId,
-						projects,
-					},
-				},
-			},
+			result: await this.signInResponseFactory.createResponse(signIn.result, context),
 		}
 	}
 }

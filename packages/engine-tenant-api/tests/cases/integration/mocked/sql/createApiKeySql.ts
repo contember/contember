@@ -1,7 +1,5 @@
-import { Membership } from '../../../../../src/model/type/Membership'
 import { SQL } from '../../../../src/tags'
 import { ExpectedQuery } from '@contember/database-tester'
-import { now } from '../../../../src/testTenant'
 
 export const createApiKeySql = (args: { apiKeyId: string; identityId: string }): ExpectedQuery => ({
 	sql: SQL`INSERT INTO "tenant"."api_key" ("id", "token_hash", "type", "identity_id", "disabled_at", "expires_at", "expiration", "created_at")

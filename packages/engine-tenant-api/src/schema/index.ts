@@ -126,6 +126,11 @@ export type CheckResetPasswordTokenResult = {
 	readonly code: CheckResetPasswordTokenCode
 }
 
+export type CommonSignInResult = {
+	readonly token: Scalars['String']
+	readonly person: Person
+}
+
 export type ConfirmOtpError = {
 	readonly __typename?: 'ConfirmOtpError'
 	readonly code: ConfirmOtpErrorCode
@@ -224,6 +229,29 @@ export type CreateProjectResult = {
 export type CreateResetPasswordRequestOptions = {
 	readonly mailProject?: Maybe<Scalars['String']>
 	readonly mailVariant?: Maybe<Scalars['String']>
+}
+
+export type CreateSessionTokenError = {
+	readonly __typename?: 'CreateSessionTokenError'
+	readonly code: CreateSessionTokenErrorCode
+	readonly developerMessage: Scalars['String']
+}
+
+export enum CreateSessionTokenErrorCode {
+	UnknownEmail = 'UNKNOWN_EMAIL'
+}
+
+export type CreateSessionTokenResponse = {
+	readonly __typename?: 'CreateSessionTokenResponse'
+	readonly ok: Scalars['Boolean']
+	readonly error?: Maybe<CreateSessionTokenError>
+	readonly result?: Maybe<CreateSessionTokenResult>
+}
+
+export type CreateSessionTokenResult = CommonSignInResult & {
+	readonly __typename?: 'CreateSessionTokenResult'
+	readonly token: Scalars['String']
+	readonly person: Person
 }
 
 export type DisableApiKeyError = {
@@ -411,6 +439,7 @@ export type Mutation = {
 	readonly __typename?: 'Mutation'
 	readonly signUp?: Maybe<SignUpResponse>
 	readonly signIn?: Maybe<SignInResponse>
+	readonly createSessionToken?: Maybe<CreateSessionTokenResponse>
 	readonly signOut?: Maybe<SignOutResponse>
 	readonly changePassword?: Maybe<ChangePasswordResponse>
 	readonly changeMyPassword?: Maybe<ChangeMyPasswordResponse>
@@ -453,6 +482,12 @@ export type MutationSignInArgs = {
 	password: Scalars['String']
 	expiration?: Maybe<Scalars['Int']>
 	otpToken?: Maybe<Scalars['String']>
+}
+
+
+export type MutationCreateSessionTokenArgs = {
+	email: Scalars['String']
+	expiration?: Maybe<Scalars['Int']>
 }
 
 
@@ -811,7 +846,7 @@ export type SignInIdpResponse = {
 	readonly result?: Maybe<SignInIdpResult>
 }
 
-export type SignInIdpResult = {
+export type SignInIdpResult = CommonSignInResult & {
 	readonly __typename?: 'SignInIDPResult'
 	readonly token: Scalars['String']
 	readonly person: Person
@@ -826,7 +861,7 @@ export type SignInResponse = {
 	readonly result?: Maybe<SignInResult>
 }
 
-export type SignInResult = {
+export type SignInResult = CommonSignInResult & {
 	readonly __typename?: 'SignInResult'
 	readonly token: Scalars['String']
 	readonly person: Person
@@ -1027,6 +1062,7 @@ export type ResolversTypes = {
 	ChangePasswordResponse: ResolverTypeWrapper<ChangePasswordResponse>
 	CheckResetPasswordTokenCode: CheckResetPasswordTokenCode
 	CheckResetPasswordTokenResult: ResolverTypeWrapper<CheckResetPasswordTokenResult>
+	CommonSignInResult: ResolversTypes['CreateSessionTokenResult'] | ResolversTypes['SignInIDPResult'] | ResolversTypes['SignInResult']
 	ConfirmOtpError: ResolverTypeWrapper<ConfirmOtpError>
 	ConfirmOtpErrorCode: ConfirmOtpErrorCode
 	ConfirmOtpResponse: ResolverTypeWrapper<ConfirmOtpResponse>
@@ -1042,6 +1078,10 @@ export type ResolversTypes = {
 	CreateProjectResponseErrorCode: CreateProjectResponseErrorCode
 	CreateProjectResult: ResolverTypeWrapper<CreateProjectResult>
 	CreateResetPasswordRequestOptions: CreateResetPasswordRequestOptions
+	CreateSessionTokenError: ResolverTypeWrapper<CreateSessionTokenError>
+	CreateSessionTokenErrorCode: CreateSessionTokenErrorCode
+	CreateSessionTokenResponse: ResolverTypeWrapper<CreateSessionTokenResponse>
+	CreateSessionTokenResult: ResolverTypeWrapper<CreateSessionTokenResult>
 	DisableApiKeyError: ResolverTypeWrapper<DisableApiKeyError>
 	DisableApiKeyErrorCode: DisableApiKeyErrorCode
 	DisableApiKeyResponse: ResolverTypeWrapper<DisableApiKeyResponse>
@@ -1132,6 +1172,7 @@ export type ResolversParentTypes = {
 	ChangePasswordError: ChangePasswordError
 	ChangePasswordResponse: ChangePasswordResponse
 	CheckResetPasswordTokenResult: CheckResetPasswordTokenResult
+	CommonSignInResult: ResolversParentTypes['CreateSessionTokenResult'] | ResolversParentTypes['SignInIDPResult'] | ResolversParentTypes['SignInResult']
 	ConfirmOtpError: ConfirmOtpError
 	ConfirmOtpResponse: ConfirmOtpResponse
 	CreateApiKeyError: CreateApiKeyError
@@ -1143,6 +1184,9 @@ export type ResolversParentTypes = {
 	CreateProjectResponseError: CreateProjectResponseError
 	CreateProjectResult: CreateProjectResult
 	CreateResetPasswordRequestOptions: CreateResetPasswordRequestOptions
+	CreateSessionTokenError: CreateSessionTokenError
+	CreateSessionTokenResponse: CreateSessionTokenResponse
+	CreateSessionTokenResult: CreateSessionTokenResult
 	DisableApiKeyError: DisableApiKeyError
 	DisableApiKeyResponse: DisableApiKeyResponse
 	DisableOtpError: DisableOtpError
@@ -1275,6 +1319,12 @@ export type CheckResetPasswordTokenResultResolvers<ContextType = any, ParentType
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
+export type CommonSignInResultResolvers<ContextType = any, ParentType extends ResolversParentTypes['CommonSignInResult'] = ResolversParentTypes['CommonSignInResult']> = {
+	__resolveType: TypeResolveFn<'CreateSessionTokenResult' | 'SignInIDPResult' | 'SignInResult', ParentType, ContextType>
+	token?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	person?: Resolver<ResolversTypes['Person'], ParentType, ContextType>
+}
+
 export type ConfirmOtpErrorResolvers<ContextType = any, ParentType extends ResolversParentTypes['ConfirmOtpError'] = ResolversParentTypes['ConfirmOtpError']> = {
 	code?: Resolver<ResolversTypes['ConfirmOtpErrorCode'], ParentType, ContextType>
 	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
@@ -1339,6 +1389,25 @@ export type CreateProjectResponseErrorResolvers<ContextType = any, ParentType ex
 
 export type CreateProjectResultResolvers<ContextType = any, ParentType extends ResolversParentTypes['CreateProjectResult'] = ResolversParentTypes['CreateProjectResult']> = {
 	deployerApiKey?: Resolver<ResolversTypes['ApiKeyWithToken'], ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
+export type CreateSessionTokenErrorResolvers<ContextType = any, ParentType extends ResolversParentTypes['CreateSessionTokenError'] = ResolversParentTypes['CreateSessionTokenError']> = {
+	code?: Resolver<ResolversTypes['CreateSessionTokenErrorCode'], ParentType, ContextType>
+	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
+export type CreateSessionTokenResponseResolvers<ContextType = any, ParentType extends ResolversParentTypes['CreateSessionTokenResponse'] = ResolversParentTypes['CreateSessionTokenResponse']> = {
+	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	error?: Resolver<Maybe<ResolversTypes['CreateSessionTokenError']>, ParentType, ContextType>
+	result?: Resolver<Maybe<ResolversTypes['CreateSessionTokenResult']>, ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
+export type CreateSessionTokenResultResolvers<ContextType = any, ParentType extends ResolversParentTypes['CreateSessionTokenResult'] = ResolversParentTypes['CreateSessionTokenResult']> = {
+	token?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	person?: Resolver<ResolversTypes['Person'], ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
@@ -1448,6 +1517,7 @@ export type MembershipValidationErrorResolvers<ContextType = any, ParentType ext
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
 	signUp?: Resolver<Maybe<ResolversTypes['SignUpResponse']>, ParentType, ContextType, RequireFields<MutationSignUpArgs, 'email' | 'password'>>
 	signIn?: Resolver<Maybe<ResolversTypes['SignInResponse']>, ParentType, ContextType, RequireFields<MutationSignInArgs, 'email' | 'password'>>
+	createSessionToken?: Resolver<Maybe<ResolversTypes['CreateSessionTokenResponse']>, ParentType, ContextType, RequireFields<MutationCreateSessionTokenArgs, 'email'>>
 	signOut?: Resolver<Maybe<ResolversTypes['SignOutResponse']>, ParentType, ContextType, RequireFields<MutationSignOutArgs, never>>
 	changePassword?: Resolver<Maybe<ResolversTypes['ChangePasswordResponse']>, ParentType, ContextType, RequireFields<MutationChangePasswordArgs, 'personId' | 'password'>>
 	changeMyPassword?: Resolver<Maybe<ResolversTypes['ChangeMyPasswordResponse']>, ParentType, ContextType, RequireFields<MutationChangeMyPasswordArgs, 'currentPassword' | 'newPassword'>>
@@ -1703,6 +1773,7 @@ export type Resolvers<ContextType = any> = {
 	ChangePasswordError?: ChangePasswordErrorResolvers<ContextType>
 	ChangePasswordResponse?: ChangePasswordResponseResolvers<ContextType>
 	CheckResetPasswordTokenResult?: CheckResetPasswordTokenResultResolvers<ContextType>
+	CommonSignInResult?: CommonSignInResultResolvers<ContextType>
 	ConfirmOtpError?: ConfirmOtpErrorResolvers<ContextType>
 	ConfirmOtpResponse?: ConfirmOtpResponseResolvers<ContextType>
 	CreateApiKeyError?: CreateApiKeyErrorResolvers<ContextType>
@@ -1713,6 +1784,9 @@ export type Resolvers<ContextType = any> = {
 	CreateProjectResponse?: CreateProjectResponseResolvers<ContextType>
 	CreateProjectResponseError?: CreateProjectResponseErrorResolvers<ContextType>
 	CreateProjectResult?: CreateProjectResultResolvers<ContextType>
+	CreateSessionTokenError?: CreateSessionTokenErrorResolvers<ContextType>
+	CreateSessionTokenResponse?: CreateSessionTokenResponseResolvers<ContextType>
+	CreateSessionTokenResult?: CreateSessionTokenResultResolvers<ContextType>
 	DisableApiKeyError?: DisableApiKeyErrorResolvers<ContextType>
 	DisableApiKeyResponse?: DisableApiKeyResponseResolvers<ContextType>
 	DisableOtpError?: DisableOtpErrorResolvers<ContextType>

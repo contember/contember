@@ -78,6 +78,7 @@ class ResolverFactory {
 			Mutation: {
 				signUp: this.resolvers.signUpMutationResolver.signUp.bind(this.resolvers.signUpMutationResolver),
 				signIn: this.resolvers.signInMutationResolver.signIn.bind(this.resolvers.signInMutationResolver),
+				createSessionToken: this.resolvers.signInMutationResolver.createSessionToken.bind(this.resolvers.signInMutationResolver),
 				signOut: this.resolvers.signOutMutationResolver.signOut.bind(this.resolvers.signOutMutationResolver),
 
 				changePassword: this.resolvers.changePasswordMutationResolver.changePassword.bind(this.resolvers.changePasswordMutationResolver),

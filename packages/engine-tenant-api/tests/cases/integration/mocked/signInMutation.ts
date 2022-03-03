@@ -8,34 +8,9 @@ import { SignInErrorCode } from '../../../../src/schema'
 import { test } from 'uvu'
 import { OtpAuthenticator } from '../../../../src'
 import { Buffer } from 'buffer'
+import { createSessionKeySql } from './sql/createSessionKeySql'
+import { getIdentityProjectsSql } from './sql/getIdentityProjectsSql'
 
-const createApiKeySql = function ({ apiKeyId, identityId }: { apiKeyId: string; identityId: string }) {
-	return {
-		sql: SQL`INSERT INTO "tenant"."api_key" ("id", "token_hash", "type", "identity_id", "disabled_at", "expires_at", "expiration", "created_at")
-			         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-		parameters: [
-			apiKeyId,
-			'9692e67b8378a6f6753f97782d458aa757e947eab2fbdf6b5c187b74561eb78f',
-			'session',
-			identityId,
-			null,
-			new Date('2019-09-04 12:30'),
-			null,
-			new Date('2019-09-04 12:00'),
-		],
-		response: { rowCount: 1 },
-	}
-}
-const getIdentityProjectsSql = function ({ identityId, projectId }: { identityId: string; projectId: string }) {
-	return {
-		sql: SQL`SELECT "project"."id", "project"."name", "project"."slug", "project"."config"
-			         FROM "tenant"."project"
-			         WHERE "project"."id" IN (SELECT "project_id" FROM "tenant"."project_membership" WHERE "identity_id" = ?) AND
-					         "project"."id" IN (SELECT "project_id" FROM "tenant"."project_membership" WHERE "identity_id" = ?)`,
-		parameters: [identityId, identityId],
-		response: { rows: [{ id: projectId, name: 'Foo', slug: 'foo' }] },
-	}
-}
 test('signs in', async () => {
 	const email = 'john@doe.com'
 	const password = '123'
@@ -47,7 +22,7 @@ test('signs in', async () => {
 		query: signInMutation({ email, password }, { withData: true }),
 		executes: [
 			getPersonByEmailSql({ email, response: { personId, identityId, password, roles: [] } }),
-			createApiKeySql({ apiKeyId: apiKeyId, identityId: identityId }),
+			createSessionKeySql({ apiKeyId: apiKeyId, identityId: identityId }),
 			getIdentityProjectsSql({ identityId: identityId, projectId: projectId }),
 			selectMembershipsSql({
 				identityId: identityId,
@@ -193,7 +168,7 @@ test('sign in - valid otp token', async () => {
 		query: signInMutation({ email, password, otpToken: otpAuth.generate(otp) }),
 		executes: [
 			getPersonByEmailSql({ email, response: { personId, identityId, password, roles: [], otpUri: otp.uri } }),
-			createApiKeySql({ apiKeyId, identityId }),
+			createSessionKeySql({ apiKeyId, identityId }),
 			getIdentityProjectsSql({ identityId, projectId }),
 			selectMembershipsSql({
 				identityId,

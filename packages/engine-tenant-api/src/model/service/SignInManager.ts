@@ -1,4 +1,4 @@
-import { SignInErrorCode } from '../../schema'
+import { CreateSessionTokenErrorCode, SignInErrorCode } from '../../schema'
 import { ApiKeyManager, OtpAuthenticator } from '../service'
 import { PersonQuery, PersonRow } from '../queries'
 import { Providers } from '../providers'
@@ -36,14 +36,25 @@ class SignInManager {
 		const sessionToken = await this.apiKeyManager.createSessionApiKey(dbContext, personRow.identity_id, expiration)
 		return new ResponseOk(new SignInResult(personRow, sessionToken))
 	}
+
+	async createSessionToken(dbContext: DatabaseContext, email: string, expiration?: number): Promise<CreateSessionTokenResponse> {
+		const personRow = await dbContext.queryHandler.fetch(PersonQuery.byEmail(email))
+		if (personRow === null) {
+			return new ResponseError(CreateSessionTokenErrorCode.UnknownEmail, `Person with email ${email} not found`)
+		}
+		const sessionToken = await this.apiKeyManager.createSessionApiKey(dbContext, personRow.identity_id, expiration)
+		return new ResponseOk(new SignInResult(personRow, sessionToken))
+	}
 }
 
 export class SignInResult {
-	readonly ok = true
-
-	constructor(public readonly person: PersonRow, public readonly token: string) {}
+	constructor(
+		public readonly person: PersonRow,
+		public readonly token: string,
+	) {}
 }
 
 export type SignInResponse = Response<SignInResult, SignInErrorCode>
+export type CreateSessionTokenResponse = Response<SignInResult, CreateSessionTokenErrorCode>
 
 export { SignInManager }

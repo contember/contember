@@ -1,6 +1,7 @@
 import { DocumentNode, execute, GraphQLError, GraphQLSchema, parse, validate, validateSchema } from 'graphql'
 import { KoaContext } from '../koa'
 import LRUCache from 'lru-cache'
+import { createHash } from 'crypto'
 
 export interface GraphQLListener<Context> {
 	onStart?: (ctx: {}) => Omit<GraphQLListener<Context>, 'onStart'> | void
@@ -25,16 +26,36 @@ interface FactoryArgs<Context, KoaState> {
 
 export type GraphQLQueryHandler<KoaState> = (context: KoaContext<KoaState>) => any
 
+const hitCacheMaxAgeSeconds = 10 * 60
+const documentCacheMaxAgeSeconds = hitCacheMaxAgeSeconds * 10
+const pruneIntervalSeconds = documentCacheMaxAgeSeconds / 2
+const documentCacheMax = 100
+const hitCacheMax = documentCacheMax * 2
+
 export const createGraphQLQueryHandler = <Context, KoaState>({
 	schema,
 	contextFactory,
 	listeners,
 }: FactoryArgs<Context, KoaState>): GraphQLQueryHandler<KoaState> => {
 	let schemaValidated = false
-	const documentCache = new LRUCache<string, DocumentNode>({
-		max: 200,
+	const hitCache = new LRUCache<string, true>({
+		max: hitCacheMax,
+		maxAge: hitCacheMaxAgeSeconds * 1000,
 	})
+	const documentCache = new LRUCache<string, DocumentNode>({
+		max: documentCacheMax,
+		maxAge: documentCacheMaxAgeSeconds * 1000,
+	})
+	let lastPrune = Date.now()
+
 	return async ctx => {
+
+		const now = Date.now()
+		if ((now - lastPrune) > pruneIntervalSeconds * 1000) {
+			documentCache.prune()
+			lastPrune = now
+		}
+
 		const listenersQueue = [...listeners]
 
 		listenersQueue.forEach(it => {
@@ -66,7 +87,8 @@ export const createGraphQLQueryHandler = <Context, KoaState>({
 					errors: { message: 'Missing request query' },
 				})
 			}
-			let doc = documentCache.get(request.query)
+			const queryHash = createHash('md5').update(request.query).digest('hex')
+			let doc = documentCache.get(queryHash)
 			if (!doc) {
 				try {
 					doc = parse(request.query)
@@ -74,7 +96,10 @@ export const createGraphQLQueryHandler = <Context, KoaState>({
 					if (validationResult.length) {
 						return respond(400, { errors: validationResult })
 					}
-					documentCache.set(request.query, doc)
+					if (hitCache.get(queryHash)) {
+						documentCache.set(queryHash, doc)
+					}
+					hitCache.set(queryHash, true)
 				} catch (e) {
 					if (e instanceof GraphQLError) {
 						return respond(400, { errors: [e] })

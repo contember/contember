@@ -12,12 +12,12 @@ import type { RadioOption } from './types'
 
 export interface RadioProps {
 	RadioButtonComponent?: typeof RadioButton
-	isDisabled?: boolean
-	isReadOnly?: boolean
+	disabled?: boolean
 	name?: string
 	onChange: (newValue: string) => void
 	options: RadioOption[]
 	orientation?: 'horizontal' | 'vertical'
+	readOnly?: boolean
 	size?: Size
 	validationState?: ValidationState
 	value?: string

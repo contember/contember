@@ -32,16 +32,16 @@ export default {
 	 * - https://github.com/strothj/react-docgen-typescript-loader/issues/10
 	 */
 	argTypes: {
+		active: booleanControl(false),
 		bland: booleanControl(false),
 		disabled: booleanControl(false),
-		isActive: booleanControl(false),
-		isLoading: booleanControl(false),
-		intent: enumControl(intents, 'select', 'default'),
-		scheme: enumControl(schemes, 'select', undefined),
-		flow: enumControl(flows, 'select', 'default'),
-		size: enumControl(sizes, 'inline-radio', 'default'),
 		distinction: enumControl(distinctions, 'inline-radio', 'default'),
+		flow: enumControl(flows, 'select', 'default'),
+		intent: enumControl(intents, 'select', 'default'),
 		justification: enumControl(justifications, 'inline-radio', 'default'),
+		loading: booleanControl(false),
+		scheme: enumControl(schemes, 'select', undefined),
+		size: enumControl(sizes, 'inline-radio', 'default'),
 	},
 } as ComponentMeta<typeof Button>
 
@@ -55,8 +55,8 @@ const Template: ComponentStory<typeof Button> = args => <>
     distinction={args.distinction}
     disabled={args.disabled}
     bland={args.bland}
-    isActive={args.isActive}
-    isLoading={args.isLoading}
+    active={args.active}
+    loading={args.loading}
     scheme={args.scheme}
     justification={args.justification}
   >Anchor</AnchorButton>

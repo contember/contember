@@ -1,18 +1,18 @@
-import { memo, ReactNode, Ref } from 'react'
+import { ForwardedRef, forwardRef, memo, ReactNode } from 'react'
 import { useClassNamePrefix } from '../../../auxiliary'
-import { SingleLineTextInputProps, TextInput } from '../TextInput'
+import { TextInput, TextInputProps } from '../Inputs'
 
 export type SlugInputProps =
-	& SingleLineTextInputProps
+	& TextInputProps
 	& {
 		link?: string
 		prefix?: string
 		overlay?: ReactNode
 		onOverlayClick?: () => void
-		inputRef?: Ref<HTMLInputElement | undefined>
 	}
 
-export const SlugInput = memo<SlugInputProps>(({ prefix, link, overlay, onOverlayClick, inputRef, ...textInputProps }) => {
+export const SlugInput = memo(
+	forwardRef(({ prefix, link, overlay, onOverlayClick, ...textInputProps }: SlugInputProps, ref: ForwardedRef<HTMLInputElement>) => {
 		const componentClassName = `${useClassNamePrefix()}slug-input`
 
 		return (
@@ -24,7 +24,7 @@ export const SlugInput = memo<SlugInputProps>(({ prefix, link, overlay, onOverla
 					</div>
 				)}
 				<div className={`${componentClassName}-input`}>
-					<TextInput {...textInputProps} ref={inputRef} />
+					<TextInput {...textInputProps} distinction={prefix ? 'seamless' : textInputProps.distinction} ref={ref} />
 					{(overlay || onOverlayClick) ? (
 						<div className={`${componentClassName}-overlay`} onClick={onOverlayClick}>
 							{overlay}
@@ -33,5 +33,5 @@ export const SlugInput = memo<SlugInputProps>(({ prefix, link, overlay, onOverla
 				</div>
 			</div>
 		)
-	},
+	}),
 )

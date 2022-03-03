@@ -1,40 +1,29 @@
 import classNames from 'classnames'
-import { useClassNamePrefix } from '../../../auxiliary'
+import { useComponentClassName } from '../../../auxiliary'
 import { toStateClass } from '../../../utils'
+import { AllVisuallyDependententControlProps } from '../Types'
+import { useInputClassName } from '../useInputClassName'
 
-export interface CheckboxButtonProps {
-  isFocused?: boolean
-  isChecked?: boolean
-  isIndeterminate?: boolean
-  isDisabled?: boolean
-  isReadonly?: boolean
-  isHovered?: boolean
-	isInvalid?: boolean
+export interface CheckboxButtonProps extends AllVisuallyDependententControlProps {
+  checked?: boolean | null
+  indeterminate?: boolean
 }
 
 export const CheckboxButton = ({
-  isChecked,
-  isDisabled,
-  isFocused,
-  isHovered,
-  isIndeterminate,
-  isReadonly,
-  isInvalid,
+  checked,
+  indeterminate,
+  ...props
 }: CheckboxButtonProps) => {
-  const componentClassName = `${useClassNamePrefix()}checkbox-button`
+  const componentClassName = useComponentClassName('checkbox-button')
 
   return <span
     className={classNames(
-      `${componentClassName}`,
-      toStateClass('checked', isChecked),
-      toStateClass('disabled', isDisabled),
-      toStateClass('focused', isFocused),
-      toStateClass('hovered', isHovered),
-      toStateClass('invalid', isInvalid),
-      toStateClass('indeterminate', isIndeterminate),
-      toStateClass('readonly', isReadonly),
+      componentClassName,
+      toStateClass('checked', checked === true),
+      toStateClass('indeterminate', indeterminate),
+      useInputClassName(props),
     )}
-    children={isIndeterminate
+    children={indeterminate
       ? <span aria-hidden="true" className={`${componentClassName}-questionmark`}>?</span>
       : undefined}
   />

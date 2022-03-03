@@ -3,7 +3,6 @@ import { Client, custom, errors, generators, Issuer, ResponseType } from 'openid
 import { IDPResponseError } from './IDPResponseError'
 import { IdentityProviderHandler, IDPClaim, IDPResponse, InitIDPAuthResult } from './IdentityProviderHandler'
 import { IDPValidationError } from './IDPValidationError'
-import { ParseError } from '@contember/engine-common/dist/src/config/Typesafe'
 import { InvalidIDPConfigurationError } from './InvalidIDPConfigurationError'
 
 custom.setHttpOptionsDefaults({
@@ -82,7 +81,7 @@ export class OIDCProvider implements IdentityProviderHandler<SessionData, OIDCCo
 		try {
 			return OIDCConfigurationSchema(config)
 		} catch (e) {
-			if (e instanceof ParseError) {
+			if (e instanceof Typesafe.ParseError) {
 				throw new InvalidIDPConfigurationError(e.message)
 			}
 			throw e

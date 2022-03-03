@@ -13,6 +13,7 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: 14
+          cache: 'yarn'
 
       - name: "Install yarn deps"
         run: yarn install
@@ -50,6 +51,7 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: 14
+          cache: 'yarn'
 
       - name: "Install yarn deps"
         run: yarn install

@@ -13,8 +13,8 @@ import {
 	tableToolbarButton,
 	TextField,
 } from '@contember/admin'
-import { withAnchorsAsReference } from './AnchorInsertHandler'
 import * as React from 'react'
+import { withAnchorsAsReference } from './AnchorInsertHandler'
 import { InsertLink, LinkElement } from './customLinks'
 
 
@@ -63,12 +63,13 @@ export const ContentField = Component<ContentFieldProps>(
 			}}
 			leadingFieldBackedElements={[
 				{
-					element: <TextField field={'title'} label={undefined} placeholder={'Title'} distinction={'seamless'} />,
+					element: <TextField field={'title'} label={undefined} placeholder={'Title'} distinction="seamless-with-padding" />,
 				},
 				{
 					field: 'lead',
 					placeholder: 'Lead',
 					format: 'richText',
+					distinction: 'seamless-with-padding',
 				},
 			]}
 			trailingFieldBackedElements={[
@@ -76,6 +77,7 @@ export const ContentField = Component<ContentFieldProps>(
 					field: 'footer',
 					placeholder: 'Footer',
 					format: 'richText',
+					distinction: 'seamless-with-padding',
 				},
 			]}
 			referencesField="references"

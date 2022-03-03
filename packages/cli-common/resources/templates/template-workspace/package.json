@@ -6,7 +6,8 @@
     "start-admin": "vite admin --port 1480 --host 0.0.0.0",
     "build": "npm run build-admin && npm run build-api",
     "build-admin": "tsc --project admin && vite build admin",
-    "build-api": "tsc --project api"
+    "build-api": "tsc --project api",
+    "deploy": "docker-compose run -e CONTEMBER_TOKEN= contember-cli deploy"
   },
   "devDependencies": {
     "@contember/schema": "{version}",

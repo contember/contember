@@ -18,6 +18,11 @@
 		"src/"
 	],
 	"typings": "./dist/types/index.d.ts",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/contember/admin.git",
+		"directory": "packages/admin-i18n"
+	},
 	"scripts": {
 		"build": "vite build --mode development && vite build --mode production"
 	},

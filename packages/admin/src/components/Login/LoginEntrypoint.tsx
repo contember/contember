@@ -152,10 +152,8 @@ const LoginEntrypointIndex: FC<Pick<LoginEntrypointProps, 'projects' | 'formatPr
 		return (
 			<MiscPageLayout
 				heading="Projects"
-				actions={<>
-					{props.projectsPageActions}
-					<Button onClick={() => logout()} size={'small'} distinction={'seamless'}><Icon blueprintIcon={'log-out'} /></Button>
-				</>}
+				actions={props.projectsPageActions}
+				footerActions={<Button onClick={() => logout()} distinction="seamless" flow="block">Sign out <Icon blueprintIcon="log-out" /></Button>}
 			>
 				<ProjectListButtons projects={projects} formatProjectUrl={props.formatProjectUrl} />
 			</MiscPageLayout>

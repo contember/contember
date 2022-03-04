@@ -1,25 +1,27 @@
 import {
+	AnchorButton,
 	ApiKeyList,
 	ApplicationEntrypoint,
 	Box,
 	ChangePassword,
+	ContemberLogoImage,
 	CreateApiKeyForm,
 	CreateProjectForm,
+	Divider,
 	EditIdentity,
 	GenericPage,
+	Heading,
 	InviteUser,
 	Layout,
-	LayoutPage,
-	LinkButton,
+	LayoutPage, LinkButton,
+	Logo,
 	Menu,
 	NavigateBackButton,
 	OtpManagement,
-	Page,
-	Pages,
+	Page, Pages,
 	ProjectsGrid,
-	runReactApp,
-	TitleBar,
-	UsersList,
+	RoutingLink,
+	runReactApp, Section, Stack, UsersList,
 } from '@contember/admin'
 import { FC } from 'react'
 import './index.sass'
@@ -28,16 +30,20 @@ const PanelLayout: FC = props => {
 	return (
 		<Layout
 			children={props.children}
+			sidebarHeader={
+				<RoutingLink to="projectList">
+					<Logo image={<ContemberLogoImage withLabel />} />
+				</RoutingLink>
+			}
+			sidebarFooter={
+				<AnchorButton
+					distinction="seamless"
+					href="/"
+					justification="justifyStart"
+				>&larr; Close Admin Panel</AnchorButton>
+			}
 			navigation={
 				<Menu>
-					<Menu.Item>
-						<Menu.Item
-							title={<>
-								<span>close Admin Panel</span>
-							</>}
-							href={'/'}
-						/>
-					</Menu.Item>
 					<Menu.Item title={'Contember Admin Panel'}>
 						<Menu.Item title="Projects" to={'projectList'} />
 						<Menu.Item title="Profile security" to={'security'} />
@@ -67,7 +73,7 @@ runReactApp(
 	>
 		<Pages layout={PanelLayout}>
 			<GenericPage
-				actions={<LinkButton to={'projectCreate'}>New project</LinkButton>}
+				actions={<LinkButton to={'projectCreate'} distinction="primary">New project</LinkButton>}
 				pageName={'projectList'}
 				title="Projects"
 			>
@@ -77,7 +83,7 @@ runReactApp(
 			<GenericPage
 				navigation={<NavigateBackButton to={'projectList'}>Projects</NavigateBackButton>}
 				pageName={'projectCreate'}
-				title="New project"
+				title="Create new project"
 			>
 				<CreateProjectForm projectListLink={'projectList'} />
 			</GenericPage>
@@ -88,30 +94,24 @@ runReactApp(
 						navigation={<NavigateBackButton to={'projectList'}>Projects</NavigateBackButton>}
 						title={`Project ${project}`}
 					>
-						<div className={'projectMembers'}>
-							<div className={'projectMembers-section'}>
-								<Box
-									heading={'Users'}
-									actions={<LinkButton to={{ pageName: 'userInvite', parameters: { project } }}>Invite user</LinkButton>}
-								>
-									<UsersList
-										project={project}
-										createUserEditLink={identity => ({ pageName: 'identityEdit', parameters: { project, identity } })}
-									/>
-								</Box>
-							</div>
-							<div className={'projectMembers-section'}>
-								<Box
-									heading={'API keys'}
-									actions={<LinkButton to={{ pageName: 'apiKeyCreate', parameters: { project } }}>Create API key</LinkButton>}
-								>
-									<ApiKeyList
-										project={project}
-										createApiKeyEditLink={identity => ({ pageName: 'identityEdit', parameters: { project, identity } })}
-									/>
-								</Box>
-							</div>
-						</div>
+						<Section
+							heading={'Users'}
+							actions={<LinkButton distinction="seamless" to={{ pageName: 'userInvite', parameters: { project } }}>Invite user</LinkButton>}
+						>
+							<UsersList
+								project={project}
+								createUserEditLink={identity => ({ pageName: 'identityEdit', parameters: { project, identity } })}
+							/>
+						</Section>
+						<Section
+							heading={'API keys'}
+							actions={<LinkButton distinction="seamless" to={{ pageName: 'apiKeyCreate', parameters: { project } }}>Create API key</LinkButton>}
+						>
+							<ApiKeyList
+								project={project}
+								createApiKeyEditLink={identity => ({ pageName: 'identityEdit', parameters: { project, identity } })}
+							/>
+						</Section>
 					</LayoutPage>
 				)}
 			</Page>
@@ -159,15 +159,17 @@ runReactApp(
 				)}
 			</Page>
 
-			<GenericPage pageName={'security'}>
-				<TitleBar>
-					Profile security
-				</TitleBar>
-				<ChangePassword />
+			<GenericPage pageName={'security'} title="Profile security">
+				<Stack direction="vertical" gap="xlarge">
+					<ChangePassword />
 
-				<Box heading={'Two-factor authentication'}>
-					<OtpManagement />
-				</Box>
+					<Divider />
+
+					<Heading depth={3}>Two-factor authentication</Heading>
+					<Box >
+						<OtpManagement />
+					</Box>
+				</Stack>
 			</GenericPage>
 		</Pages>
 	</ApplicationEntrypoint>,

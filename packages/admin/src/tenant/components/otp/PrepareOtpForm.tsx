@@ -1,4 +1,4 @@
-import { Button, FieldContainer, Message, TextInput } from '@contember/ui'
+import { Button, FieldContainer, Message, Stack, TextInput } from '@contember/ui'
 import { FC, useCallback } from 'react'
 import { useShowToast } from '../../../components'
 import { useForm } from '../../lib'
@@ -34,26 +34,30 @@ export const PrepareOtpForm: FC<PrepareOtpFormProps> = ({ onPrepared, isReSetup,
 		),
 	)
 
-
 	return (
 		<form onSubmit={onSubmit}>
-			<FieldContainer label="Label for an identification in two-factor app">
-				<TextInput {...register('label')} />
-			</FieldContainer>
-			<br />
-			{isReSetup && <>
-				<Message intent={'warn'}>
-					You already have two-factor authentication active. By clicking "Continue", the old one will no longer work.
-				</Message>
-				<br />
-			</>}
+			<Stack direction="vertical" gap="large">
+				<FieldContainer label="Label for an identification in two-factor app">
+					<TextInput {...register('label')} />
+				</FieldContainer>
 
-			<Button intent="primary" type={'submit'} disabled={isSubmitting}>
-				Continue
-			</Button>
-			{isReSetup && <Button type={'submit'} onClick={onCancel}>
-				Cancel
-			</Button>}
+				{isReSetup && <>
+					<Message distinction="striking" intent="warn">
+						You already have two-factor authentication active. By clicking "Continue", the old one will no longer work.
+					</Message>
+				</>}
+
+				<Stack direction="horizontal" style={{ alignSelf: 'flex-end' }}>
+					<Button type="submit" distinction="seamless" onClick={onCancel}>
+						Cancel
+					</Button>
+
+					<Button intent={isReSetup ? 'danger' : 'primary'} distinction="primary" type="submit" disabled={isSubmitting}>
+						Continue
+					</Button>
+
+				</Stack>
+			</Stack>
 		</form>
 	)
 }

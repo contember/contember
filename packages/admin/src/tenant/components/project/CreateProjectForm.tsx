@@ -1,4 +1,4 @@
-import { Button, FieldContainer, Section, Select, TextInput } from '@contember/ui'
+import { Button, Divider, FieldContainer, Heading, Select, Stack, TextInput } from '@contember/ui'
 import { FC, SyntheticEvent, useState } from 'react'
 import { useShowToast } from '../../../components'
 import { RoutingLinkTarget, useRedirect } from '../../../routing'
@@ -78,17 +78,21 @@ export const CreateProjectForm: FC<CreateProjectForm> = ({ projectListLink }) =>
 	}
 	return (
 		<form onSubmit={onSubmit}>
-			<Section heading={'Create a new project'}>
+			<Stack direction="vertical" gap="xlarge">
+				<Heading depth={3}>New project</Heading>
+
 				<FieldContainer label={'Project slug'}>
 					<TextInput {...register('slug')} pattern={'[a-z][-a-z0-9]*'} required />
 				</FieldContainer>
 				<FieldContainer label={'Project name'}>
 					<TextInput {...register('name')} placeholder={values.slug} />
 				</FieldContainer>
-			</Section>
 
-			<Section heading={'Database credentials'}>
+				<Divider />
+
+				<Heading depth={3}>Database credentials</Heading>
 				<p>You can leave some of this fields empty to use default values.</p>
+
 				<FieldContainer label={'Host'}>
 					<TextInput {...register('dbHost')} />
 				</FieldContainer>
@@ -111,13 +115,13 @@ export const CreateProjectForm: FC<CreateProjectForm> = ({ projectListLink }) =>
 						{ value: 'no', label: 'no' },
 					]}/>
 				</FieldContainer>
-			</Section>
 
-			<Section>
-				<Button type={'submit'} intent={'primary'} disabled={isSubmitting}>
-					Create a project
+				<Divider />
+
+				<Button type="submit" distinction="primary" intent="primary" disabled={isSubmitting}>
+					Create new project
 				</Button>
-			</Section>
+			</Stack>
 		</form>
 	)
 }

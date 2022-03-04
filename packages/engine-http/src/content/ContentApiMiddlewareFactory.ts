@@ -61,7 +61,7 @@ export class ContentApiMiddlewareFactory {
 			}
 
 			const tenantContainer = groupContainer.tenantContainer
-			const memberships = await timer('MembershipFetch', () =>
+			const explicitMemberships = await timer('MembershipFetch', () =>
 				tenantContainer.projectMemberManager.getProjectMemberships(
 					tenantContainer.databaseContext,
 					{ slug: project.slug },
@@ -72,16 +72,24 @@ export class ContentApiMiddlewareFactory {
 					undefined,
 				),
 			)
-			if (memberships.length === 0) {
+			const schema = await projectContainer.contentSchemaResolver.getSchema(systemDatabase, stage.slug)
+			const implicitRoles = Object.entries(schema.acl.roles).filter(([, role]) => role.implicit).map(([name]) => name)
+
+			if (explicitMemberships.length === 0 && implicitRoles.length === 0) {
 				throw this.debug
 					? new HttpError(`You are not allowed to access project ${project.slug}`, 403)
 					: new HttpError(`Project ${project.slug} NOT found`, 404)
 			}
 
-			const projectRoles = memberships.map(it => it.role)
+			const explicitProjectRoles = explicitMemberships.map(it => it.role)
+			const implicitRolesToAssign = implicitRoles.filter(it => !explicitProjectRoles.includes(it))
+			const memberships = [
+				...explicitMemberships,
+				...implicitRolesToAssign.map(it => ({ role: it, variables: [] })),
+			]
+			const projectRoles = [...explicitProjectRoles, ...implicitRolesToAssign]
 			const contentDatabase = projectContainer.connection.createClient(stage.schema, { module: 'content' })
 
-			const schema = await projectContainer.contentSchemaResolver.getSchema(systemDatabase, stage.slug)
 			const [graphQlSchema, permissions] = await timer('GraphQLSchemaCreate', () => projectContainer.graphQlSchemaFactory.create(schema, {
 				projectRoles: projectRoles,
 			}))

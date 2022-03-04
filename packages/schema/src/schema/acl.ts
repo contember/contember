@@ -110,6 +110,7 @@ namespace Acl {
 
 	export type RolePermissions = {
 		inherits?: string[]
+		implicit?: boolean
 		tenant?: TenantPermissions
 		system?: SystemPermissions
 		variables: Acl.Variables

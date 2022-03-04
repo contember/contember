@@ -8,13 +8,13 @@ import {
 	EditIdentity,
 	GenericPage,
 	InviteUser,
-	LayoutChrome,
+	Layout,
 	LayoutPage,
+	LinkButton,
 	Menu,
 	NavigateBackButton,
 	OtpManagement,
 	Page,
-	LinkButton,
 	Pages,
 	ProjectsGrid,
 	runReactApp,
@@ -26,7 +26,7 @@ import './index.sass'
 
 const PanelLayout: FC = props => {
 	return (
-		<LayoutChrome
+		<Layout
 			children={props.children}
 			navigation={
 				<Menu>

@@ -152,37 +152,41 @@ export const LayoutChrome = memo(({
 		}
 	})
 
+	const barClassName = `${prefix}layout-chrome-bar`
+	const hasBar: boolean = !!(sidebarHeader || switchers || navigation || sidebarFooter)
+
 	return <div ref={layoutRef} className={classnames(
 		`${prefix}layout-chrome`,
+		toViewClass('no-bar', !hasBar),
 		toThemeClass(themeContent ?? theme, themeControls ?? theme),
 		toSchemeClass(scheme),
 		toViewClass('collapsed', collapsed),
 	)}>
-		<DropdownContentContainerProvider>
-			<PreventCloseContext.Provider value={preventMenuClose}>
-				<div className={`${prefix}layout-chrome-bar`}>
-					<div className={`${prefix}layout-chrome-bar-header`}>
-						{sidebarHeader && <div className={`${prefix}layout-chrome-bar-header-inner`}>{sidebarHeader}</div>}
-						<Button id="cui-menu-button" distinction="seamless" className={`${prefix}layout-chrome-navigation-button`} onClick={toggleCollapsed}>
-							<span className={`${prefix}chrome-menu-button-label`}>Menu</span>
-							<Icon blueprintIcon={collapsed ? 'menu' : 'cross'} />
-						</Button>
+		{hasBar && <DropdownContentContainerProvider>
+				<PreventCloseContext.Provider value={preventMenuClose}>
+					<div className={barClassName}>
+						<div className={`${barClassName}-header`}>
+							{sidebarHeader && <div className={`${barClassName}-header-inner`}>{sidebarHeader}</div>}
+							<Button id="cui-menu-button" distinction="seamless" className={`${prefix}layout-chrome-navigation-button`} onClick={toggleCollapsed}>
+								<span className={`${prefix}chrome-menu-button-label`}>Menu</span>
+								<Icon blueprintIcon={collapsed ? 'menu' : 'cross'} />
+							</Button>
+						</div>
+						{switchers && <div className={`${barClassName}-switchers`}>{switchers}</div>}
+						{navigation && <div ref={contentRef} className={classNames(
+							`${barClassName}-body`,
+							toStateClass('scrolled', isScrolled),
+						)}>
+							<Stack direction="vertical">
+								{navigation}
+							</Stack>
+						</div>}
+						{sidebarFooter && <div className={`${barClassName}-footer`}>
+							{sidebarFooter}
+						</div>}
 					</div>
-					{switchers && <div className={`${prefix}layout-chrome-bar-switchers`}>{switchers}</div>}
-					<div ref={contentRef} className={classNames(
-						`${prefix}layout-chrome-bar-body`,
-						toStateClass('scrolled', isScrolled),
-					)}>
-						<Stack direction="vertical">
-							{navigation}
-						</Stack>
-					</div>
-					<div className={`${prefix}layout-chrome-bar-footer`}>
-						{sidebarFooter}
-					</div>
-				</div>
-			</PreventCloseContext.Provider>
-		</DropdownContentContainerProvider>
+				</PreventCloseContext.Provider>
+			</DropdownContentContainerProvider>}
 
 		<DropdownContentContainerProvider>
 			<div className={classNames(

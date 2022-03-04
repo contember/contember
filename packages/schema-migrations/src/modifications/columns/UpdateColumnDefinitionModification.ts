@@ -4,6 +4,7 @@ import { SchemaUpdater, updateEntity, updateField, updateModel } from '../utils/
 import { ModificationHandlerStatic } from '../ModificationHandler'
 import deepEqual from 'fast-deep-equal'
 import { updateColumns } from '../utils/diffUtils'
+import { wrapIdentifier } from '@contember/database'
 
 export const UpdateColumnDefinitionModification: ModificationHandlerStatic<UpdateColumnDefinitionModificationData> = class {
 	static id = 'updateColumnDefinition'
@@ -16,14 +17,15 @@ export const UpdateColumnDefinitionModification: ModificationHandlerStatic<Updat
 		}
 		const field = entity.fields[this.data.fieldName] as Model.AnyColumn
 		const definition = this.data.definition
+		const newType = definition.columnType !== field.columnType
+			? definition.type === Model.ColumnType.Enum
+				? `"${definition.columnType}"`
+				: definition.columnType
+			: undefined
 		builder.alterColumn(entity.tableName, field.columnName, {
-			type:
-				definition.columnType !== field.columnType
-					? definition.type === Model.ColumnType.Enum
-						? `"${definition.columnType}"`
-						: definition.columnType
-					: undefined,
+			type: newType,
 			notNull: field.nullable !== definition.nullable ? !definition.nullable : undefined,
+			using: newType !== undefined ? `${wrapIdentifier(field.columnName)}::${newType}` : undefined,
 		})
 	}
 

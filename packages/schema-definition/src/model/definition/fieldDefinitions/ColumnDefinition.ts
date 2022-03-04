@@ -116,7 +116,7 @@ export function enumColumn(enumDefinition: EnumDefinition) {
 }
 
 export function uuidColumn() {
-	return column(Model.ColumnType.String)
+	return column(Model.ColumnType.Uuid)
 }
 
 export type ColumnTypeOptions = {

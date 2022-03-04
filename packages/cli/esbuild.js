@@ -8,7 +8,7 @@ esbuild.build({
 	sourcemap: 'external',
 	outfile: './dist/run.js',
 	plugins: [resolvePlugin],
-	external: ['pg-native', 'electron', 'typescript', 'ts-node'],
+	external: ['pg-native', 'electron', 'esbuild', 'vm2'],
 }).catch(e => {
 	console.error(e)
 	process.exit(1)

@@ -1,0 +1,27 @@
+services:
+  sandbox-vite:
+    image: 'alpine'
+    command: ['sleep', 'infinity']
+
+  admin-server:
+    image: 'alpine'
+    command: ['sleep', 'infinity']
+
+  admin-server-vite:
+    image: 'alpine'
+    command: ['sleep', 'infinity']
+
+  contember-engine:
+    ports: ['3001:4000']
+
+  adminer:
+    ports: ['3002:8080']
+
+  minio:
+    ports: ['3003:9000']
+
+  postgres:
+    ports: ['3005:5432']
+
+  redis:
+    ports: ['3006:6379']

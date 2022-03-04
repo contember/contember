@@ -2,15 +2,16 @@ import { acceptFieldVisitor, isInverseRelation, isRelation, NamingHelper } from 
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Schema } from '@contember/schema'
 import { removeField, SchemaUpdater } from '../utils/schemaUpdateUtils'
-import { ModificationHandlerStatic } from '../ModificationHandler'
+import { ModificationHandlerOptions, ModificationHandlerStatic } from '../ModificationHandler'
 import { isDefined } from '../../utils/isDefined'
 
 export const RemoveFieldModification: ModificationHandlerStatic<RemoveFieldModificationData> = class {
 	static id = 'removeField'
+
 	constructor(
 		private readonly data: RemoveFieldModificationData,
 		private readonly schema: Schema,
-		private readonly formatVersion: number,
+		private readonly options: ModificationHandlerOptions,
 	) {}
 
 	public createSql(builder: MigrationBuilder): void {
@@ -39,7 +40,7 @@ export const RemoveFieldModification: ModificationHandlerStatic<RemoveFieldModif
 	}
 
 	public getSchemaUpdater(): SchemaUpdater {
-		return removeField(this.data.entityName, this.data.fieldName, this.formatVersion)
+		return removeField(this.data.entityName, this.data.fieldName, this.options.formatVersion)
 	}
 
 	describe() {

@@ -7,14 +7,12 @@ import {
 	SchemaMigrator,
 } from '@contember/schema-migrations'
 import { MigrationsRunner } from '@contember/database-migrations'
-import { DatabaseCredentials } from '@contember/database'
+import { Connection } from '@contember/database'
 import {
-	EntitiesSelector,
 	EventResponseBuilder,
 	ExecutedMigrationsResolver,
 	IdentityFetcher,
 	MigrationAlterer,
-	MigrationExecutor,
 	PermissionsFactory,
 	ProjectInitializer,
 	ProjectMigrator,
@@ -28,35 +26,35 @@ import {
 	ExecutedMigrationsQueryResolver,
 	MigrateMutationResolver,
 	MigrationAlterMutationResolver,
-	ResolverContextFactory,
 	ResolverFactory,
 	StagesQueryResolver,
+	SystemResolverContextFactory,
 	TruncateMutationResolver,
 } from './resolvers'
-import { ClientBase } from 'pg'
-import { MigrationArgs } from './migrations'
+import { getSystemMigrations, SystemMigrationArgs } from './migrations'
 import { EventOldValuesResolver } from './resolvers/types'
 
 export interface SystemContainer {
 	systemResolversFactory: ResolverFactory
 	authorizator: Authorizator
-	resolverContextFactory: ResolverContextFactory
+	resolverContextFactory: SystemResolverContextFactory
 	schemaVersionBuilder: SchemaVersionBuilder
 	projectInitializer: ProjectInitializer
-	systemDbMigrationsRunnerFactory: SystemDbMigrationsRunnerFactory
 }
 
-export type SystemDbMigrationsRunnerFactory = (db: DatabaseCredentials, dbClient: ClientBase) => MigrationsRunner<MigrationArgs>
+export type SystemDbMigrationsRunnerFactory = (db: Connection.ConnectionLike, schema: string) => MigrationsRunner<SystemMigrationArgs>
 
 type Args = {
-	providers: UuidProvider
-	modificationHandlerFactory: ModificationHandlerFactory
-	entitiesSelector: EntitiesSelector
-	systemDbMigrationsRunnerFactory: (db: DatabaseCredentials, dbClient: ClientBase) => MigrationsRunner<MigrationArgs>
 	identityFetcher: IdentityFetcher
 }
 
 export class SystemContainerFactory {
+	constructor(
+		private readonly providers: UuidProvider,
+		private readonly modificationHandlerFactory: ModificationHandlerFactory,
+	) {
+	}
+
 	public create(container: Args): Container<SystemContainer> {
 		return this.createBuilder(container)
 			.build()
@@ -66,33 +64,30 @@ export class SystemContainerFactory {
 				'resolverContextFactory',
 				'schemaVersionBuilder',
 				'projectInitializer',
-				'systemDbMigrationsRunnerFactory',
 			)
 	}
-	public createBuilder(container: Args) {
+	public createBuilder({ identityFetcher }: Args) {
 		return new Builder({})
-			.addService('systemDbMigrationsRunnerFactory', () =>
-				container.systemDbMigrationsRunnerFactory)
+			.addService('providers', () =>
+				this.providers)
 			.addService('modificationHandlerFactory', () =>
-				container.modificationHandlerFactory)
+				this.modificationHandlerFactory)
 			.addService('identityFetcher', () =>
-				container.identityFetcher)
+				identityFetcher)
+			.addService('systemDbMigrationsRunnerFactory', (): SystemDbMigrationsRunnerFactory =>
+				(db, schema) => new MigrationsRunner(db, schema, getSystemMigrations))
 			.addService('schemaMigrator', ({ modificationHandlerFactory }) =>
 				new SchemaMigrator(modificationHandlerFactory))
 			.addService('executedMigrationsResolver', ({}) =>
 				new ExecutedMigrationsResolver())
 			.addService('schemaVersionBuilder', ({ executedMigrationsResolver, schemaMigrator }) =>
 				new SchemaVersionBuilder(executedMigrationsResolver, schemaMigrator))
-			.addService('providers', () =>
-				container.providers)
 			.addService('accessEvaluator', ({}) =>
 				new AccessEvaluator.PermissionEvaluator(new PermissionsFactory().create()))
 			.addService('authorizator', ({ accessEvaluator }): Authorizator =>
 				new Authorizator.Default(accessEvaluator))
 			.addService('schemaDiffer', ({ schemaMigrator }) =>
 				new SchemaDiffer(schemaMigrator))
-			.addService('migrationExecutor', ({ modificationHandlerFactory }) =>
-				new MigrationExecutor(modificationHandlerFactory))
 			.addService('migrationDescriber', ({ modificationHandlerFactory }) =>
 				new MigrationDescriber(modificationHandlerFactory))
 			.addService('projectMigrator', ({ migrationDescriber, schemaVersionBuilder, executedMigrationsResolver }) =>
@@ -115,6 +110,8 @@ export class SystemContainerFactory {
 				new TruncateMutationResolver(projectTruncateExecutor))
 			.addService('migrationAlterMutationResolver', ({ migrationAlterer }) =>
 				new MigrationAlterMutationResolver(migrationAlterer))
+			.addService('projectInitializer', ({ projectMigrator, stageCreator, systemDbMigrationsRunnerFactory, schemaVersionBuilder }) =>
+				new ProjectInitializer(projectMigrator, stageCreator, systemDbMigrationsRunnerFactory, schemaVersionBuilder))
 			.addService('eventsQueryResolver', ({ eventResponseBuilder }) =>
 				new EventsQueryResolver(eventResponseBuilder))
 			.addService('eventOldValuesResolver', () =>
@@ -122,9 +119,6 @@ export class SystemContainerFactory {
 			.addService('systemResolversFactory', ({ stagesQueryResolver, executedMigrationsQueryResolver, migrateMutationResolver, truncateMutationResolver, migrationAlterMutationResolver, eventsQueryResolver, eventOldValuesResolver }) =>
 				new ResolverFactory(stagesQueryResolver, executedMigrationsQueryResolver, migrateMutationResolver, truncateMutationResolver, migrationAlterMutationResolver, eventsQueryResolver, eventOldValuesResolver))
 			.addService('resolverContextFactory', ({ authorizator, schemaVersionBuilder }) =>
-				new ResolverContextFactory(authorizator, schemaVersionBuilder))
-			.addService('projectInitializer', ({ projectMigrator, stageCreator, systemDbMigrationsRunnerFactory, schemaVersionBuilder }) =>
-				new ProjectInitializer(projectMigrator, stageCreator, systemDbMigrationsRunnerFactory, schemaVersionBuilder),
-			)
+				new SystemResolverContextFactory(authorizator, schemaVersionBuilder))
 	}
 }

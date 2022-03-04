@@ -1,9 +1,10 @@
 import { DatabaseContext } from './database'
 import { ProjectConfig } from '../types'
 import { TruncateEventsCommand } from './commands'
-import { formatSchemaName, getJunctionTables } from './helpers'
+import { getJunctionTables } from './helpers'
 import { Schema } from '@contember/schema'
 import { wrapIdentifier } from '@contember/database'
+import { StagesQuery } from './queries'
 
 export class ProjectTruncateExecutor {
 	public async truncateProject(db: DatabaseContext, project: ProjectConfig, schema: Schema) {
@@ -12,9 +13,9 @@ export class ProjectTruncateExecutor {
 			const tableNames = Object.values(schema.model.entities).filter(it => !it.view).map(it => it.tableName)
 			const junctionTableNames = getJunctionTables(schema.model).map(it => it.tableName)
 			const allTableNames = [...tableNames, ...junctionTableNames]
-			for (const stage of project.stages) {
-				const schemaName = formatSchemaName(stage)
-				const wrappedNames = allTableNames.map(it => `${wrapIdentifier(schemaName)}.${wrapIdentifier(it)}`)
+			const stages = await db.queryHandler.fetch(new StagesQuery())
+			for (const stage of stages) {
+				const wrappedNames = allTableNames.map(it => `${wrapIdentifier(stage.schema)}.${wrapIdentifier(it)}`)
 				await trx.client.query(`TRUNCATE ${wrappedNames}`)
 			}
 			await trx.client.query('SET CONSTRAINTS ALL IMMEDIATE')

@@ -6,7 +6,7 @@ import {
 	emptyModificationDescriptionContext,
 	ModificationDescription,
 	ModificationDescriptionContext,
-	ModificationHandler,
+	ModificationHandler, ModificationHandlerOptions,
 } from './modifications/ModificationHandler'
 import { CreateEntityModification } from './modifications/entities'
 import { SchemaValidator, ValidationError } from '@contember/schema-utils'
@@ -22,12 +22,13 @@ export interface ModificationDescriptionResult {
 }
 
 export class MigrationDescriber {
-	constructor(private readonly modificationHandlerFactory: ModificationHandlerFactory) {}
+	constructor(private readonly modificationHandlerFactory: ModificationHandlerFactory) {
+	}
 
 	public async describeModification(
 		schema: Schema,
 		modification: Migration.Modification,
-		formatVersion: number,
+		options: ModificationHandlerOptions,
 		modificationDescriptionContext: ModificationDescriptionContext = emptyModificationDescriptionContext,
 	): Promise<ModificationDescriptionResult> {
 		const builder = createMigrationBuilder()
@@ -35,7 +36,7 @@ export class MigrationDescriber {
 			modification.modification,
 			modification,
 			schema,
-			formatVersion,
+			options,
 		)
 		try {
 			schema = modificationHandler.getSchemaUpdater()({ schema })
@@ -57,16 +58,23 @@ export class MigrationDescriber {
 		}
 	}
 
-	public async describeModifications(schema: Schema, migration: Migration): Promise<ModificationDescriptionResult[]> {
+	public async describeModifications(schema: Schema, migration: Migration, systemSchema: string): Promise<ModificationDescriptionResult[]> {
 		const result = []
 		const createdEntities = []
 		for (const modification of migration.modifications) {
 			if (modification.modification === CreateEntityModification.id) {
 				createdEntities.push(modification.entity.name)
 			}
-			const description = await this.describeModification(schema, modification, migration.formatVersion, {
-				createdEntities,
-			})
+			const description = await this.describeModification(
+				schema,
+				modification,
+				{
+					formatVersion: migration.formatVersion,
+					systemSchema,
+				},
+				{
+					createdEntities,
+				})
 			schema = description.schema
 			result.push(description)
 		}

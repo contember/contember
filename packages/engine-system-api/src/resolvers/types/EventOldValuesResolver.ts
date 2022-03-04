@@ -1,12 +1,12 @@
 import { DeleteEvent, DeleteEventResolvers, UpdateEvent, UpdateEventResolvers } from '../../schema'
-import { ResolverContext } from '../ResolverContext'
+import { SystemResolverContext } from '../SystemResolverContext'
 import { oldValuesLoaderFactory } from './OldValuesHelpers'
 
-export class EventOldValuesResolver implements UpdateEventResolvers<ResolverContext>, DeleteEventResolvers<ResolverContext> {
+export class EventOldValuesResolver implements UpdateEventResolvers<SystemResolverContext>, DeleteEventResolvers<SystemResolverContext> {
 	async oldValues(
 		parent: UpdateEvent | DeleteEvent,
 		args: unknown,
-		context: ResolverContext,
+		context: SystemResolverContext,
 	): Promise<object> {
 		return await context.getLoader(oldValuesLoaderFactory)(parent.id)
 	}

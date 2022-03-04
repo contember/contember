@@ -1,5 +1,5 @@
 import { Membership, QueryProjectMembershipsArgs, QueryResolvers } from '../../schema'
-import { ResolverContext } from '../ResolverContext'
+import { TenantResolverContext } from '../TenantResolverContext'
 import { PermissionActions, ProjectManager, ProjectMemberManager } from '../../model'
 
 export class ProjectMembersQueryResolver implements QueryResolvers {
@@ -11,7 +11,7 @@ export class ProjectMembersQueryResolver implements QueryResolvers {
 	async projectMemberships(
 		parent: unknown,
 		args: QueryProjectMembershipsArgs,
-		context: ResolverContext,
+		context: TenantResolverContext,
 	): Promise<readonly Membership[]> {
 		const project = await this.projectManager.getProjectBySlug(context.db, args.projectSlug)
 		const projectScope = await context.permissionContext.createProjectScope(project)

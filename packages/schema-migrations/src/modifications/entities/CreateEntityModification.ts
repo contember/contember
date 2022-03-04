@@ -1,12 +1,16 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Model, Schema } from '@contember/schema'
 import { SchemaUpdater, updateModel } from '../utils/schemaUpdateUtils'
-import { ModificationHandlerStatic } from '../ModificationHandler'
+import { ModificationHandlerOptions, ModificationHandlerStatic } from '../ModificationHandler'
 import { createEventTrigger, createEventTrxTrigger } from '../utils/sqlUpdateUtils'
 
 export const CreateEntityModification: ModificationHandlerStatic<CreateEntityModificationData> = class {
 	static id = 'createEntity'
-	constructor(private readonly data: CreateEntityModificationData, private readonly schema: Schema) {}
+	constructor(
+		private readonly data: CreateEntityModificationData,
+		private readonly schema: Schema,
+		private readonly options: ModificationHandlerOptions,
+	) {}
 
 	public createSql(builder: MigrationBuilder): void {
 		const entity = this.data.entity
@@ -23,8 +27,8 @@ export const CreateEntityModification: ModificationHandlerStatic<CreateEntityMod
 				notNull: true,
 			},
 		})
-		createEventTrigger(builder, entity.tableName, [entity.primaryColumn])
-		createEventTrxTrigger(builder, entity.tableName)
+		createEventTrigger(builder, this.options.systemSchema, entity.tableName, [entity.primaryColumn])
+		createEventTrxTrigger(builder, this.options.systemSchema, entity.tableName)
 	}
 
 	public getSchemaUpdater(): SchemaUpdater {

@@ -11,4 +11,10 @@ export * from './builders'
 export * from './queryable'
 export * from './Literal'
 export * from './types'
-export { wrapIdentifier, retryTransaction, ConstraintHelper } from './utils'
+export {
+	wrapIdentifier,
+	retryTransaction,
+	ConstraintHelper,
+	withDatabaseAdvisoryLock,
+	createDatabaseIfNotExists,
+} from './utils'

@@ -3,11 +3,10 @@ import { Client, QueryError, wrapIdentifier } from '@contember/database'
 import { formatSchemaName } from '../helpers'
 import { Schema } from '@contember/schema'
 import { SaveMigrationCommand } from '../commands'
-import { StageWithoutEvent } from '../dtos'
+import { Stage } from '../dtos'
 import { DatabaseContext } from '../database'
 import { ExecutedMigrationsResolver } from './ExecutedMigrationsResolver'
 import { MigrateErrorCode } from '../../schema'
-import { ProjectConfig } from '../../types'
 import { SchemaVersionBuilder } from './SchemaVersionBuilder'
 
 export class ProjectMigrator {
@@ -19,7 +18,7 @@ export class ProjectMigrator {
 
 	public async migrate(
 		db: DatabaseContext,
-		project: ProjectConfig,
+		stages: Stage[],
 		migrationsToExecute: readonly Migration[],
 		logger: (message: string) => void,
 		ignoreOrder: boolean = false,
@@ -39,11 +38,12 @@ export class ProjectMigrator {
 			for (const modification of migration.modifications) {
 				[schema] = await this.applyModification(
 					db.client,
-					project.stages,
+					stages,
 					schema,
 					modification,
 					formatVersion,
 					migration.version,
+					db.client.schema,
 				)
 			}
 			await db.commandBus.execute(new SaveMigrationCommand(migration))
@@ -68,7 +68,7 @@ export class ProjectMigrator {
 			if (migration.version < version && !ignoreOrder) {
 				throw new MustFollowLatestMigrationError(migration.version, `Must follow latest executed migration ${version}`)
 			}
-			const described = await this.migrationDescriber.describeModifications(schema, migration)
+			const described = await this.migrationDescriber.describeModifications(schema, migration, 'system') // system schema name not important here
 			if (described.length === 0) {
 				continue
 			}
@@ -86,25 +86,26 @@ export class ProjectMigrator {
 
 	private async applyModification(
 		db: Client,
-		stages: StageWithoutEvent[],
+		stages: Stage[],
 		schema: Schema,
 		modification: Migration.Modification,
 		formatVersion: number,
 		migrationVersion: string,
+		systemSchema: string,
 	): Promise<[Schema]> {
 		const {
 			sql,
 			schema: newSchema,
 			handler,
-		} = await this.migrationDescriber.describeModification(schema, modification, formatVersion)
+		} = await this.migrationDescriber.describeModification(schema, modification, { systemSchema, formatVersion })
 		for (const stage of stages) {
 			await this.executeOnStage(db, stage, sql, migrationVersion)
 		}
 		return [newSchema]
 	}
 
-	private async executeOnStage(db: Client, stage: StageWithoutEvent, sql: string, migrationVersion: string) {
-		await db.query('SET search_path TO ' + wrapIdentifier(formatSchemaName(stage)))
+	private async executeOnStage(db: Client, stage: Stage, sql: string, migrationVersion: string) {
+		await db.query('SET search_path TO ' + wrapIdentifier(stage.schema))
 		try {
 			await db.query(sql)
 		} catch (e) {

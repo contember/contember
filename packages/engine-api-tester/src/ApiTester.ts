@@ -4,29 +4,18 @@ import {
 	SystemContainer,
 	SystemContainerFactory,
 	typeDefs as systemTypeDefs,
-	unnamedIdentity,
 } from '@contember/engine-system-api'
 import { MigrationFilesManager, MigrationsResolver, ModificationHandlerFactory } from '@contember/schema-migrations'
-import {
-	createMapperContainer,
-	EntitiesSelector,
-	EntitiesSelectorMapperFactory,
-	GraphQlSchemaBuilderFactory,
-	PermissionsByIdentityFactory,
-} from '@contember/engine-content-api'
+import { GraphQlSchemaBuilderFactory } from '@contember/engine-content-api'
 import { makeExecutableSchema } from '@graphql-tools/schema'
 import { ContentApiTester } from './ContentApiTester'
 import { SystemApiTester } from './SystemApiTester'
 import { TesterStageManager } from './TesterStageManager'
-import { Client, EventManager, SingleConnection } from '@contember/database'
+import { Client, SingleConnection } from '@contember/database'
 import { createUuidGenerator } from './testUuid'
 import { project } from './project'
 import { createConnection, dbCredentials, recreateDatabase } from './dbUtils'
 import { join } from 'path'
-import { createPgClient, MigrationsRunner } from '@contember/database-migrations'
-import { ClientBase } from 'pg'
-import { DatabaseCredentials } from '@contember/database'
-import getSystemMigrations from '@contember/engine-system-api/migrations'
 
 export class ApiTester {
 	public static project = project
@@ -39,7 +28,8 @@ export class ApiTester {
 		public readonly system: SystemApiTester,
 		public readonly stages: TesterStageManager,
 		public readonly cleanup: () => Promise<void>,
-	) {}
+	) {
+	}
 
 	public static async create(options: {
 		project?: Partial<ProjectConfig>
@@ -59,24 +49,16 @@ export class ApiTester {
 		const modificationHandlerFactory = new ModificationHandlerFactory(ModificationHandlerFactory.defaultFactoryMap)
 		const gqlSchemaBuilderFactory = new GraphQlSchemaBuilderFactory()
 
-		const systemContainerFactory = new SystemContainerFactory()
+		const systemContainerFactory = new SystemContainerFactory(providers, modificationHandlerFactory)
 		const projectSlug = options.project?.slug || ApiTester.project.slug
 		const migrationFilesManager = MigrationFilesManager.createForProject(ApiTester.getMigrationsDir(), projectSlug)
 		const migrationsResolver = options.migrationsResolver || new MigrationsResolver(migrationFilesManager)
-		const permissionsByIdentityFactory = new PermissionsByIdentityFactory()
-		const mapperFactory: EntitiesSelectorMapperFactory = (db, schema, identityVariables, permissions) =>
-			createMapperContainer({ schema, identityVariables, permissions, providers }).mapperFactory(db)
 		let systemContainerBuilder = systemContainerFactory.createBuilder({
-			entitiesSelector: new EntitiesSelector(mapperFactory, permissionsByIdentityFactory),
-			modificationHandlerFactory,
-			providers: providers,
 			identityFetcher: {
 				fetchIdentities: () => {
 					return Promise.resolve([])
 				},
 			},
-			systemDbMigrationsRunnerFactory: (db: DatabaseCredentials, dbClient: ClientBase) =>
-				new MigrationsRunner(db, 'system', getSystemMigrations, dbClient),
 		})
 		if (options.systemContainerHook) {
 			systemContainerBuilder = options.systemContainerHook(systemContainerBuilder)
@@ -88,24 +70,21 @@ export class ApiTester {
 
 		const projectConfig = { ...ApiTester.project, ...options.project }
 
-		const db = databaseContextFactory.create(unnamedIdentity)
+		const db = databaseContextFactory.create()
 
-		const pgClient = await createPgClient(dbCredentials(dbName))
-		await pgClient.connect()
-		const singleConnection = new SingleConnection(pgClient, {}, new EventManager(), true)
+		const singleConnection = new SingleConnection(dbCredentials(dbName), {})
 		const dbContextMigrations = databaseContextFactory
 			.withClient(singleConnection.createClient('system', {}))
-			.create(unnamedIdentity)
+			.create()
 
 		const schemaResolver = () => systemContainer.schemaVersionBuilder.buildSchema(dbContextMigrations)
 		await systemContainer
-			.systemDbMigrationsRunnerFactory(dbCredentials(dbName), pgClient)
+			.systemDbMigrationsRunnerFactory(singleConnection, 'system')
 			.migrate(() => null, {
 				schemaResolver,
 				project: projectConfig,
-				queryHandler: null as any,
 			})
-		await pgClient.end()
+		await singleConnection.end()
 
 		const systemSchema = makeExecutableSchema({
 			typeDefs: systemTypeDefs,

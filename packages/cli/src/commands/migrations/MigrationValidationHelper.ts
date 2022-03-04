@@ -13,7 +13,7 @@ export const validateMigrations = async (
 	for (const migration of await migrations) {
 		try {
 			// just a check that it does not fail
-			await describer.describeModifications(migratedSchema, migration)
+			await describer.describeModifications(migratedSchema, migration, 'system') // schema name not important here
 
 			migratedSchema = migrator.applyModifications(migratedSchema, migration.modifications, migration.formatVersion)
 		} catch (e) {

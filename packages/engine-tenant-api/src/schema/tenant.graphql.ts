@@ -21,7 +21,7 @@ const schema: DocumentNode = gql`
 	}
 
 	type Mutation {
-		signUp(email: String!, password: String!, roles: [String!]): SignUpResponse
+		signUp(email: String!, password: String, passwordHash: String, roles: [String!]): SignUpResponse
 		signIn(email: String!, password: String!, expiration: Int, otpToken: String): SignInResponse
 		createSessionToken(email: String!, expiration: Int): CreateSessionTokenResponse
 		signOut(all: Boolean): SignOutResponse

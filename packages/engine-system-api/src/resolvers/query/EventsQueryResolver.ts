@@ -1,5 +1,5 @@
 import { GraphQLResolveInfo } from 'graphql'
-import { ResolverContext } from '../ResolverContext'
+import { SystemResolverContext } from '../SystemResolverContext'
 import { QueryResolver } from '../Resolver'
 import { EventsOrder, QueryEventsArgs, ResolversTypes } from '../../schema'
 import { AuthorizationActions, EventResponseBuilder, EventsQuery, StageBySlugQuery } from '../../model'
@@ -14,7 +14,7 @@ export class EventsQueryResolver implements QueryResolver<'events'> {
 	async events(
 		parent: any,
 		{ args }: QueryEventsArgs,
-		context: ResolverContext,
+		context: SystemResolverContext,
 		info: GraphQLResolveInfo,
 	): Promise<ResolversTypes['Event'][]> {
 		return context.db.transaction(async db => {
@@ -36,7 +36,7 @@ export class EventsQueryResolver implements QueryResolver<'events'> {
 				Math.min(args?.limit ?? 1000, 10000),
 			))
 
-			return await this.eventResponseBuilder.buildResponse(context.tenantDb, history)
+			return await this.eventResponseBuilder.buildResponse(history)
 		})
 	}
 }

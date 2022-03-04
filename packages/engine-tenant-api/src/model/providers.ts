@@ -8,6 +8,6 @@ export interface Providers {
 	bcryptCompare: (data: any, encrypted: string) => Promise<boolean>
 	hash: (value: BinaryLike, algo: string) => Buffer
 
-	encrypt: (data: Buffer) => Promise<{ encrypted: Buffer; iv: Buffer }>
-	decrypt: (encrypted: Buffer, iv: Buffer) => Promise<Buffer>
+	encrypt: (value: Buffer) => Promise<{ value: Buffer; version: number }>
+	decrypt: (value: Buffer, version: number) => Promise<{ value: Buffer; needsReEncrypt: boolean }>
 }

@@ -4,7 +4,7 @@ import {
 	RemoveProjectMemberErrorCode,
 	RemoveProjectMemberResponse,
 } from '../../../schema'
-import { ResolverContext } from '../../ResolverContext'
+import { TenantResolverContext } from '../../TenantResolverContext'
 import { PermissionActions, ProjectManager, ProjectMemberManager } from '../../../model'
 import { createErrorResponse, createProjectNotFoundResponse } from '../../errorUtils'
 
@@ -17,7 +17,7 @@ export class RemoveProjectMemberMutationResolver implements MutationResolvers {
 	async removeProjectMember(
 		parent: any,
 		{ projectSlug, identityId }: MutationRemoveProjectMemberArgs,
-		context: ResolverContext,
+		context: TenantResolverContext,
 	): Promise<RemoveProjectMemberResponse> {
 		const project = await this.projectManager.getProjectBySlug(context.db, projectSlug)
 		await context.requireAccess({

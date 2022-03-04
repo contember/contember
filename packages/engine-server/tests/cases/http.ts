@@ -7,9 +7,6 @@ import { test } from 'uvu'
 import prom from 'prom-client'
 import { MigrationFilesManager, MigrationsResolver } from '@contember/schema-migrations'
 import { Logger } from '@contember/engine-common'
-import { CreateProjectCommand, DatabaseContext } from '@contember/engine-tenant-api'
-import { ConflictActionType, InsertBuilder } from '@contember/database'
-import uuid from 'uuid'
 
 const dbCredentials = (dbName: string) => {
 	return {
@@ -38,29 +35,28 @@ const projectConfig = {
 }
 const createContainer = (debug: boolean) => {
 	prom.register.clear()
-	return new MasterContainerFactory().create({
+	const tenantConfig = {
+		db: dbCredentials(String(process.env.TEST_DB_NAME_TENANT)),
+		mailer: {},
+		credentials: {
+			rootToken,
+			loginToken,
+		},
+		secrets: {},
+	}
+	return new MasterContainerFactory().createBuilder({
 		debugMode: debug,
-		config: {
-			tenant: {
-				db: dbCredentials(String(process.env.TEST_DB_NAME_TENANT)),
-				mailer: {},
-				credentials: {
-					rootToken,
-					loginToken,
-				},
-				secrets: {},
-			},
-			server: {
-				logging: {},
-				port: 0,
-				monitoringPort: 0,
-				http: {},
-			},
+		serverConfig: {
+			logging: {},
+			port: 0,
+			monitoringPort: 0,
+			http: {},
 		},
 		projectConfigResolver: () => projectConfig,
+		tenantConfigResolver: () => tenantConfig,
 		plugins: [],
 		processType: ProcessType.singleNode,
-	})
+	}).build()
 }
 
 const executeGraphql = (
@@ -109,7 +105,24 @@ test.before(async () => {
 		)
 		const container = createContainer(false)
 		await container.initializer.initialize()
-		await container.initializer.createProject(projectConfig, await migrationsResolver.getMigrations())
+
+		const { slug, name, ...config } = projectConfig
+		const groupContainer = await container.projectGroupContainerResolver.getProjectGroupContainer(undefined)
+		const tenantContainer = groupContainer.tenantContainer
+		const result = await tenantContainer.projectManager.createProject(tenantContainer.databaseContext, { slug, name, config: config as any, secrets: {} }, undefined)
+		if (!result) {
+			throw new Error('Project already exists')
+		}
+		const projectContainer = await groupContainer.projectContainerResolver.getProjectContainer(slug)
+		if (!projectContainer) {
+			throw new Error('Should not happen')
+		}
+		await groupContainer.systemContainer.projectInitializer.initialize(
+			projectContainer.systemDatabaseContextFactory,
+			projectConfig,
+			new Logger(() => null),
+			await migrationsResolver.getMigrations(),
+		)
 		await tenantConnection.end()
 	} catch (e) {
 		// eslint-disable-next-line no-console

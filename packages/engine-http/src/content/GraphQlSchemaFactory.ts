@@ -1,14 +1,14 @@
-import { Acl, Schema } from '@contember/schema'
-import { GraphQLSchema } from 'graphql'
 import {
 	EntityRulesResolver,
 	GraphQlSchemaBuilderFactory,
 	Identity,
 	IntrospectionSchemaDefinitionFactory,
+	IntrospectionSchemaFactory,
 	PermissionsByIdentityFactory,
 	Authorizator,
-	IntrospectionSchemaFactory,
 } from '@contember/engine-content-api'
+import { Acl, Schema } from '@contember/schema'
+import { GraphQLSchema } from 'graphql'
 import { mergeSchemas } from '@graphql-tools/merge'
 import { makeExecutableSchema } from '@graphql-tools/schema'
 import { GraphQLSchemaContributor } from '@contember/engine-plugins'
@@ -31,10 +31,6 @@ export class GraphQlSchemaFactory {
 		private readonly permissionFactory: PermissionsByIdentityFactory,
 		private readonly schemaContributors: GraphQLSchemaContributor[],
 	) {}
-
-	private getContributorsCacheKey(ctx: Context): string {
-		return JSON.stringify(this.schemaContributors.map(it => it.getCacheKey(ctx)))
-	}
 
 	public create(schema: Schema, identity: Identity): [GraphQLSchema, Acl.Permissions] {
 		let cacheEntries = this.cache.get(schema)
@@ -79,5 +75,9 @@ export class GraphQlSchemaFactory {
 		cacheEntries.push({ graphQlSchema, verifier, permissions, contributorsCacheKey })
 
 		return [graphQlSchema, permissions]
+	}
+
+	private getContributorsCacheKey(ctx: Context): string {
+		return JSON.stringify(this.schemaContributors.map(it => it.getCacheKey(ctx)))
 	}
 }

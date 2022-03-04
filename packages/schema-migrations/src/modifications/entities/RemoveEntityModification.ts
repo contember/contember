@@ -11,17 +11,18 @@ import {
 	updateModel,
 	updateSchema,
 } from '../utils/schemaUpdateUtils'
-import { ModificationHandlerStatic } from '../ModificationHandler'
+import { ModificationHandlerOptions, ModificationHandlerStatic } from '../ModificationHandler'
 import { VERSION_ACL_PATCH, VERSION_REMOVE_REFERENCING_RELATIONS } from '../ModificationVersions'
 import { isRelation, PredicateDefinitionProcessor } from '@contember/schema-utils'
 import { RemoveFieldModification } from '../fields'
 
 export const RemoveEntityModification: ModificationHandlerStatic<RemoveEntityModificationData> = class {
 	static id = 'removeEntity'
+
 	constructor(
 		private readonly data: RemoveEntityModificationData,
 		private readonly schema: Schema,
-		private readonly formatVersion: number,
+		private readonly options: ModificationHandlerOptions,
 	) {}
 
 	public createSql(builder: MigrationBuilder): void {
@@ -30,9 +31,9 @@ export const RemoveEntityModification: ModificationHandlerStatic<RemoveEntityMod
 			builder.dropView(entity.tableName)
 			return
 		}
-		if (this.formatVersion >= VERSION_REMOVE_REFERENCING_RELATIONS) {
+		if (this.options.formatVersion >= VERSION_REMOVE_REFERENCING_RELATIONS) {
 			this.getFieldsToRemove(this.schema).forEach(([entityName, fieldName]) => {
-				(new RemoveFieldModification({ entityName, fieldName }, this.schema, this.formatVersion)).createSql(builder)
+				(new RemoveFieldModification({ entityName, fieldName }, this.schema, this.options)).createSql(builder)
 			})
 		}
 		builder.dropTable(entity.tableName)
@@ -40,7 +41,7 @@ export const RemoveEntityModification: ModificationHandlerStatic<RemoveEntityMod
 
 	public getSchemaUpdater(): SchemaUpdater {
 		return updateSchema(
-			this.formatVersion >= VERSION_ACL_PATCH
+			this.options.formatVersion >= VERSION_ACL_PATCH
 				? updateAcl(
 					updateAclEveryRole(
 						({ role }) => ({
@@ -72,11 +73,11 @@ export const RemoveEntityModification: ModificationHandlerStatic<RemoveEntityMod
 					),
 				  )
 				: undefined,
-			this.formatVersion >= VERSION_REMOVE_REFERENCING_RELATIONS
+			this.options.formatVersion >= VERSION_REMOVE_REFERENCING_RELATIONS
 				? ({ schema }) => {
 					const fieldsToRemove = this.getFieldsToRemove(schema)
 					return fieldsToRemove.reduce(
-						(schema, [entity, field]) => removeField(entity, field, this.formatVersion)({ schema }),
+						(schema, [entity, field]) => removeField(entity, field, this.options.formatVersion)({ schema }),
 						schema,
 					)
 				  }

@@ -4,7 +4,7 @@ import {
 	MutationCreateProjectArgs,
 	MutationResolvers,
 } from '../../../schema'
-import { ResolverContext } from '../../ResolverContext'
+import { TenantResolverContext } from '../../TenantResolverContext'
 import { isTokenHash, PermissionActions, ProjectManager } from '../../../model'
 import { createErrorResponse } from '../../errorUtils'
 import { UserInputError } from 'apollo-server-errors'
@@ -15,7 +15,7 @@ export class CreateProjectMutationResolver implements MutationResolvers {
 	async createProject(
 		parent: any,
 		{ projectSlug, name, config, deployTokenHash, secrets }: MutationCreateProjectArgs,
-		context: ResolverContext,
+		context: TenantResolverContext,
 	): Promise<CreateProjectResponse> {
 		const project = await this.projectManager.getProjectBySlug(context.db, projectSlug)
 
@@ -32,7 +32,7 @@ export class CreateProjectMutationResolver implements MutationResolvers {
 			throw new UserInputError('Invalid format of deployTokenHash. Must be hex-encoded sha256.')
 		}
 		const response = await this.projectManager.createProject(
-			context.projectGroup,
+			context.db,
 			{
 				slug: projectSlug,
 				name: name || projectSlug,

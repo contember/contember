@@ -1,87 +1,74 @@
-import {
-	createMapperContainer,
-	EntitiesSelector,
-	EntitiesSelectorMapperFactory,
-	PermissionsByIdentityFactory,
-} from '@contember/engine-content-api'
 import { SystemContainerFactory } from '@contember/engine-system-api'
-import { ProjectInitializer as ProjectInitializerInterface, TenantContainerFactory } from '@contember/engine-tenant-api'
-import getSystemMigrations from '@contember/engine-system-api/migrations'
+import { TenantContainerFactory } from '@contember/engine-tenant-api'
 import { Builder } from '@contember/dic'
-import { Config } from './config/config'
+import { ServerConfig } from './config/config'
 import { createDbMetricsRegistrar, logSentryError, ProcessType } from './utils'
 import { ModificationHandlerFactory } from '@contember/schema-migrations'
 import { Initializer } from './bootstrap'
 import { Plugin } from '@contember/engine-plugins'
-import { DatabaseCredentials, MigrationsRunner } from '@contember/database-migrations'
 import { createColllectHttpMetricsMiddleware, createShowMetricsMiddleware } from './http'
 import {
-	ApiMiddlewareFactory,
-	AuthMiddlewareFactory,
 	compose,
-	ContentServerMiddlewareFactory,
+	ContentApiMiddlewareFactory,
+	ContentGraphQLContextFactory,
+	ContentQueryHandlerFactory,
 	createHomepageMiddleware,
+	createModuleInfoMiddleware,
 	createPlaygroundMiddleware,
 	createPoweredByHeaderMiddleware,
 	createProviders,
 	createTimerMiddleware,
-	ErrorFactory,
+	CryptoWrapper,
+	ErrorMiddlewareFactory,
 	Koa,
-	NotModifiedMiddlewareFactory,
-	ProjectConfigResolver,
-	ProjectGroupMiddlewareFactory,
-	ProjectMemberMiddlewareFactory,
-	ProjectResolveMiddlewareFactory,
+	NotModifiedChecker,
+	ProjectGroupResolver,
 	Providers,
-	route,
-	StageResolveMiddlewareFactory,
-	SystemGraphQLMiddlewareFactory,
-	TenantGraphQLMiddlewareFactory,
+	route, SystemApiMiddlewareFactory, SystemGraphQLContextFactory,
+	SystemGraphQLHandlerFactory, TenantApiMiddlewareFactory, TenantGraphQLContextFactory,
+	TenantGraphQLHandlerFactory,
 } from '@contember/engine-http'
 import prom from 'prom-client'
-import {
-	ProjectContainerFactory,
-	ProjectContainerResolver,
-	ProjectInitializer,
-	ProjectInitializerProxy,
-	ProjectSchemaResolver,
-	ProjectSchemaResolverProxy,
-} from './project'
-import { ClientBase } from 'pg'
+import { ProjectContainerFactoryFactory } from './project'
 import { createSecretKey } from 'crypto'
 import koaCompress from 'koa-compress'
 import bodyParser from 'koa-bodyparser'
+import { ProjectConfigResolver } from './config/projectConfigResolver'
+import { TenantConfigResolver } from './config/tenantConfigResolver'
+import { ProjectGroupContainerResolver } from './projectGroup/ProjectGroupContainerResolver'
+import { ProjectGroupContainerFactory } from './projectGroup/ProjectGroupContainer'
+import corsMiddleware from '@koa/cors'
 
 export interface MasterContainer {
 	initializer: Initializer
 	koa: Koa
 	monitoringKoa: Koa
-	projectContainerResolver: ProjectContainerResolver
-	projectInitializer: ProjectInitializerInterface
 	providers: Providers
 }
 
 export interface MasterContainerArgs {
 	debugMode: boolean
-	config: Config
+	serverConfig: ServerConfig
 	projectConfigResolver: ProjectConfigResolver
+	tenantConfigResolver: TenantConfigResolver
 	plugins: Plugin[]
 	processType: ProcessType
 	version?: string
 }
 
 export class MasterContainerFactory {
-	create({
-		config,
+	createBuilder({
+		serverConfig,
 		debugMode,
 		plugins,
 		projectConfigResolver,
+		tenantConfigResolver,
 		processType,
 		version,
-	}: MasterContainerArgs): MasterContainer {
-		const masterContainer = new Builder({})
-			.addService('config', () =>
-				config)
+	}: MasterContainerArgs) {
+		return new Builder({})
+			.addService('serverConfig', () =>
+				serverConfig)
 			.addService('debugMode', () =>
 				debugMode)
 			.addService('processType', () =>
@@ -90,66 +77,29 @@ export class MasterContainerFactory {
 				version)
 			.addService('projectConfigResolver', () =>
 				projectConfigResolver)
+			.addService('tenantConfigResolver', () =>
+				tenantConfigResolver)
 			.addService('plugins', () =>
 				plugins)
-			.addService('tenantContainerFactory', ({ config }) =>
-				new TenantContainerFactory(config.tenant.db, config.tenant.mailer, config.tenant.credentials))
-			.addService('systemContainerFactory', () =>
-				new SystemContainerFactory())
-			.addService('providers', ({ config }) => {
-				const encryptionKey = config.tenant.secrets.encryptionKey
-					? createSecretKey(Buffer.from(config.tenant.secrets.encryptionKey, 'hex'))
-					: undefined
-				return createProviders({ encryptionKey })
-			})
-			.addService('projectSchemaResolver', () =>
-				new ProjectSchemaResolverProxy())
-			.addService('projectInitializer', () =>
-				new ProjectInitializerProxy())
-			.addService('tenantContainer', ({ tenantContainerFactory, providers, projectSchemaResolver, projectInitializer }) =>
-				tenantContainerFactory.create({
-					providers,
-					projectSchemaResolver,
-					projectInitializer,
-				}))
+			.addService('providers', () =>
+				createProviders())
+			.addService('tenantContainerFactory', ({ providers }) =>
+				new TenantContainerFactory(providers))
 			.addService('modificationHandlerFactory', () =>
 				new ModificationHandlerFactory(ModificationHandlerFactory.defaultFactoryMap))
-			.addService('permissionsByIdentityFactory', ({}) =>
-				new PermissionsByIdentityFactory())
-			.addService('entitiesSelector', ({ permissionsByIdentityFactory, providers }) => {
-				const mapperFactory: EntitiesSelectorMapperFactory = (db, schema, identityVariables, permissions) =>
-					createMapperContainer({
-						schema,
-						identityVariables,
-						permissions,
-						providers,
-					}).mapperFactory(db)
-				return new EntitiesSelector(mapperFactory, permissionsByIdentityFactory)
-			})
-			.addService('systemDbMigrationsRunnerFactory', () =>
-				(db: DatabaseCredentials, dbClient: ClientBase) =>
-					new MigrationsRunner(db, 'system', getSystemMigrations, dbClient))
-			.addService('systemContainer', ({ systemContainerFactory, entitiesSelector, modificationHandlerFactory, providers, systemDbMigrationsRunnerFactory, tenantContainer }) =>
-				systemContainerFactory.create({
-					entitiesSelector,
-					modificationHandlerFactory,
-					providers,
-					systemDbMigrationsRunnerFactory,
-					identityFetcher: tenantContainer.identityFetcher,
-				}))
-			.addService('schemaVersionBuilder', ({ systemContainer }) =>
-				systemContainer.schemaVersionBuilder)
-			.addService('projectContainerFactory', ({ debugMode, plugins, schemaVersionBuilder, providers }) =>
-				new ProjectContainerFactory(debugMode, plugins, schemaVersionBuilder, providers))
-			.addService('tenantProjectManager', ({ tenantContainer }) =>
-				tenantContainer.projectManager)
-			.addService('projectContainerResolver', ({ tenantProjectManager, projectContainerFactory, projectConfigResolver, systemContainer }) =>
-				new ProjectContainerResolver(projectContainerFactory, projectConfigResolver, tenantProjectManager, systemContainer.projectInitializer))
-			.addService('tenantGraphQlMiddlewareFactory', ({ tenantContainer }) =>
-				new TenantGraphQLMiddlewareFactory(tenantContainer.resolvers, tenantContainer.resolverContextFactory, logSentryError))
-			.addService('systemGraphQLMiddlewareFactory', ({ systemContainer, debugMode }) =>
-				new SystemGraphQLMiddlewareFactory(systemContainer.systemResolversFactory, systemContainer.resolverContextFactory, logSentryError, debugMode))
-			.addService('promRegistry', ({ projectContainerResolver, processType, tenantContainer }) => {
+			.addService('systemContainerFactory', ({ providers, modificationHandlerFactory }) =>
+				new SystemContainerFactory(providers, modificationHandlerFactory))
+			.addService('projectContainerFactoryFactory', ({ debugMode, plugins, providers }) =>
+				new ProjectContainerFactoryFactory(debugMode, plugins, providers))
+			.addService('tenantGraphQLHandlerFactory', () =>
+				new TenantGraphQLHandlerFactory(logSentryError))
+			.addService('systemGraphQLHandlerFactory', ({ debugMode }) =>
+				new SystemGraphQLHandlerFactory(logSentryError, debugMode))
+			.addService('projectGroupContainerFactory', ({ providers, systemContainerFactory, tenantContainerFactory, projectContainerFactoryFactory, projectConfigResolver, tenantGraphQLHandlerFactory, systemGraphQLHandlerFactory }) =>
+				new ProjectGroupContainerFactory(providers, systemContainerFactory, tenantContainerFactory, projectContainerFactoryFactory, projectConfigResolver, tenantGraphQLHandlerFactory, systemGraphQLHandlerFactory))
+			.addService('projectGroupContainerResolver', ({ tenantConfigResolver, projectGroupContainerFactory }) =>
+				new ProjectGroupContainerResolver(tenantConfigResolver, projectGroupContainerFactory))
+			.addService('promRegistry', ({ processType, projectGroupContainerResolver }) => {
 				if (processType === ProcessType.clusterMaster) {
 					const register = new prom.AggregatorRegistry()
 					prom.collectDefaultMetrics({ register })
@@ -158,122 +108,113 @@ export class MasterContainerFactory {
 				const register = prom.register
 				prom.collectDefaultMetrics({ register })
 				const registrar = createDbMetricsRegistrar(register)
-				registrar({ connection: tenantContainer.connection, module: 'tenant', project: 'unknown' })
-				projectContainerResolver.onCreate.push(container =>
-					registrar({
-						connection: container.connection,
-						module: 'content',
-						project: container.project.slug,
-					}),
-				)
+				projectGroupContainerResolver.onCreate.push((groupContainer, slug) => {
+					groupContainer.projectContainerResolver.onCreate.push(projectContainer =>
+						registrar({
+							connection: projectContainer.connection,
+							labels: {
+								contember_module: 'content',
+								contember_project: projectContainer.project.slug,
+								contember_project_group: slug ?? 'unknown',
+							},
+						}),
+					)
+					return registrar({
+						connection: groupContainer.tenantContainer.connection,
+						labels: {
+							contember_module: 'tenant',
+							contember_project_group: slug ?? 'unknown',
+							contember_project: 'unknown',
+						},
+					})
+				})
 				return register
 			})
-			.addService('httpErrorFactory', ({ debugMode }) =>
-				new ErrorFactory(debugMode))
-			.addService('authMiddlewareFactory', ({ tenantContainer, httpErrorFactory }) =>
-				new AuthMiddlewareFactory(tenantContainer.apiKeyManager, httpErrorFactory))
-			.addService('projectGroupMiddlewareFactory', ({ tenantContainer, httpErrorFactory }) =>
-				new ProjectGroupMiddlewareFactory(config.server.projectGroup?.domainMapping, tenantContainer.projectGroupProvider, httpErrorFactory))
-			.addService('projectResolverMiddlewareFactory', ({ projectContainerResolver, httpErrorFactory }) =>
-				new ProjectResolveMiddlewareFactory(projectContainerResolver, httpErrorFactory))
-			.addService('apiMiddlewareFactory', ({ projectGroupMiddlewareFactory, authMiddlewareFactory }) =>
-				new ApiMiddlewareFactory(projectGroupMiddlewareFactory, authMiddlewareFactory))
-			.addService('stageResolveMiddlewareFactory', ({ httpErrorFactory }) =>
-				new StageResolveMiddlewareFactory(httpErrorFactory))
-			.addService('notModifiedMiddlewareFactory', () =>
-				new NotModifiedMiddlewareFactory())
-			.addService('projectMemberMiddlewareFactory', ({ debugMode, tenantContainer, httpErrorFactory }) =>
-				new ProjectMemberMiddlewareFactory(debugMode, tenantContainer.projectMemberManager, httpErrorFactory))
-			.addService('contentServerMiddlewareFactory', () =>
-				new ContentServerMiddlewareFactory())
-			.addService(
-				'koa',
-				({
-					 tenantGraphQlMiddlewareFactory,
-					 systemGraphQLMiddlewareFactory,
-					 apiMiddlewareFactory,
-					 projectResolverMiddlewareFactory,
-					 stageResolveMiddlewareFactory,
-					 notModifiedMiddlewareFactory,
-					 projectMemberMiddlewareFactory,
-					 contentServerMiddlewareFactory,
-					 promRegistry,
-					 debugMode,
-					 version,
-					 config,
-				 }) => {
-					const app = new Koa()
-					app.use(
-						compose([
-							koaCompress({
-								br: false,
-							}),
-							bodyParser({
-								jsonLimit: config.server.http.requestBodySize || '1mb',
-							}),
-							createPoweredByHeaderMiddleware(debugMode, version ?? 'unknown'),
-							createColllectHttpMetricsMiddleware(promRegistry),
-							createTimerMiddleware(),
-							route('/playground$', createPlaygroundMiddleware()),
-							createHomepageMiddleware(),
-							route(
-								'/content/:projectSlug/:stageSlug$',
-								compose([
-									apiMiddlewareFactory.create('content'),
-									projectResolverMiddlewareFactory.create(),
-									stageResolveMiddlewareFactory.create(),
-									notModifiedMiddlewareFactory.create(),
-									projectMemberMiddlewareFactory.create(),
-									contentServerMiddlewareFactory.create(),
-								]),
-							),
-							route(
-								'/tenant$',
-								compose([
-									apiMiddlewareFactory.create('tenant'),
-									tenantGraphQlMiddlewareFactory.create(),
-								]),
-							),
-							route(
-								'/system/:projectSlug$',
-								compose([
-									apiMiddlewareFactory.create('system'),
-									projectResolverMiddlewareFactory.create(),
-									projectMemberMiddlewareFactory.create(),
-									systemGraphQLMiddlewareFactory.create(),
-								]),
-							),
-						]),
-					)
+			.addService('httpErrorMiddlewareFactory', ({ debugMode }) =>
+				new ErrorMiddlewareFactory(debugMode))
+			.addService('projectGroupResolver', ({ projectGroupContainerResolver, serverConfig }) => {
+				const encryptionKey = serverConfig.projectGroup?.configEncryptionKey
+					? createSecretKey(Buffer.from(serverConfig.projectGroup?.configEncryptionKey, 'hex'))
+					: undefined
+				return new ProjectGroupResolver(
+					serverConfig.projectGroup?.domainMapping,
+					serverConfig.projectGroup?.configHeader,
+					serverConfig.projectGroup?.configEncryptionKey ? new CryptoWrapper(encryptionKey) : undefined,
+					projectGroupContainerResolver,
+				)
+			})
+			.addService('notModifiedChecker', () =>
+				new NotModifiedChecker())
+			.addService('contentGraphqlContextFactory', ({ providers }) =>
+				new ContentGraphQLContextFactory(providers))
+			.addService('contentQueryHandlerFactory', ({ debugMode }) =>
+				new ContentQueryHandlerFactory(debugMode, logSentryError))
+			.addService('contentApiMiddlewareFactory', ({ debugMode, projectGroupResolver, notModifiedChecker, contentGraphqlContextFactory, contentQueryHandlerFactory }) =>
+				new ContentApiMiddlewareFactory(debugMode, projectGroupResolver, notModifiedChecker, contentGraphqlContextFactory, contentQueryHandlerFactory))
+			.addService('tenantGraphQLContextFactory', () =>
+				new TenantGraphQLContextFactory())
+			.addService('tenantApiMiddlewareFactory', ({ debugMode, projectGroupResolver, tenantGraphQLContextFactory }) =>
+				new TenantApiMiddlewareFactory(debugMode, projectGroupResolver, tenantGraphQLContextFactory))
+			.addService('systemGraphQLContextFactory', () =>
+				new SystemGraphQLContextFactory())
+			.addService('systemApiMiddlewareFactory', ({ debugMode, projectGroupResolver, systemGraphQLContextFactory }) =>
+				new SystemApiMiddlewareFactory(debugMode, projectGroupResolver, systemGraphQLContextFactory))
+			.addService('koa', ({ contentApiMiddlewareFactory, tenantApiMiddlewareFactory, systemApiMiddlewareFactory, httpErrorMiddlewareFactory, promRegistry, debugMode, version, serverConfig }) => {
+				const app = new Koa()
+				app.use(
+					compose([
+						koaCompress({
+							br: false,
+						}),
+						bodyParser({
+							jsonLimit: serverConfig.http.requestBodySize || '1mb',
+						}),
+						createPoweredByHeaderMiddleware(debugMode, version ?? 'unknown'),
+						httpErrorMiddlewareFactory.create(),
+						createColllectHttpMetricsMiddleware(promRegistry),
+						createTimerMiddleware(),
+						route('/playground$', createPlaygroundMiddleware()),
+						createHomepageMiddleware(),
+						corsMiddleware(),
+						route(
+							'/content/:projectSlug/:stageSlug$',
+							compose([
+								createModuleInfoMiddleware('content'),
+								contentApiMiddlewareFactory.create(),
+							]),
+						),
+						route(
+							'/tenant$',
+							compose([
+								createModuleInfoMiddleware('tenant'),
+								tenantApiMiddlewareFactory.create(),
+							]),
+						),
+						route(
+							'/system/:projectSlug$',
+							compose([
+								createModuleInfoMiddleware('system'),
+								systemApiMiddlewareFactory.create(),
+							]),
+						),
+					]),
+				)
 
-					return app
-				},
-			)
+				return app
+			})
 			.addService('monitoringKoa', ({ promRegistry }) => {
 				const app = new Koa()
 				app.use(createShowMetricsMiddleware(promRegistry))
 
 				return app
 			})
-			.addService(
-				'initializer',
-				({ tenantContainer, systemContainer, projectContainerResolver }) =>
-					new Initializer(
-						tenantContainer.migrationsRunnerFactory,
-						tenantContainer.projectManager,
-						systemContainer.projectInitializer,
-						projectContainerResolver,
-						tenantContainer.projectGroupProvider,
-					),
-			)
-			.setupService('projectSchemaResolver', (it, { projectContainerResolver, schemaVersionBuilder }) => {
-				it.setResolver(new ProjectSchemaResolver(projectContainerResolver, schemaVersionBuilder))
-			})
-			.setupService('projectInitializer', (it, { projectContainerResolver }) => {
-				it.setInitializer(new ProjectInitializer(projectContainerResolver))
-			})
-			.build()
+			.addService('initializer', ({ projectGroupContainerResolver }) =>
+				new Initializer(projectGroupContainerResolver))
 
-		return masterContainer.pick('initializer', 'koa', 'monitoringKoa', 'projectContainerResolver', 'projectInitializer', 'providers')
+	}
+
+	create(args: MasterContainerArgs): MasterContainer {
+		const container = this.createBuilder(args).build()
+		return container.pick('initializer', 'koa', 'monitoringKoa', 'providers')
 	}
 }

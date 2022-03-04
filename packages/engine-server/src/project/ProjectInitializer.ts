@@ -1,8 +1,4 @@
-import {
-	ProjectGroup,
-	ProjectInitializer as ProjectInitializerInterface,
-	ProjectWithSecrets,
-} from '@contember/engine-tenant-api'
+import { ProjectInitializer as ProjectInitializerInterface, ProjectWithSecrets } from '@contember/engine-tenant-api'
 import { ProjectContainerResolver } from './ProjectContainerResolver'
 
 export class ProjectInitializer implements ProjectInitializerInterface {
@@ -10,8 +6,8 @@ export class ProjectInitializer implements ProjectInitializerInterface {
 		private readonly projectContainerResolver: ProjectContainerResolver,
 	) {}
 
-	async initializeProject(projectGroup: ProjectGroup, project: ProjectWithSecrets) {
-		await this.projectContainerResolver.createProjectContainer(projectGroup, project)
+	async initializeProject(project: ProjectWithSecrets) {
+		await this.projectContainerResolver.createProjectContainer(project)
 	}
 }
 
@@ -22,10 +18,10 @@ export class ProjectInitializerProxy implements ProjectInitializerInterface {
 		this.initializer = initializer
 	}
 
-	initializeProject(projectGroup: ProjectGroup, project: ProjectWithSecrets) {
+	initializeProject(project: ProjectWithSecrets) {
 		if (!this.initializer) {
 			throw new Error('Initializer is not set')
 		}
-		return this.initializer.initializeProject(projectGroup, project)
+		return this.initializer.initializeProject(project)
 	}
 }

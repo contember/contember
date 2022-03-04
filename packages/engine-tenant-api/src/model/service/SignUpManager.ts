@@ -5,13 +5,15 @@ import { TenantRole } from '../authorization'
 import { getPasswordWeaknessMessage } from '../utils/password'
 import { Response, ResponseError, ResponseOk } from '../utils/Response'
 import { DatabaseContext } from '../utils'
+import { MaybePassword } from '../dtos'
 
 export class SignUpManager {
-	async signUp(dbContext: DatabaseContext, email: string, password: string, roles: readonly string[] = []): Promise<SignUpResponse> {
+	async signUp(dbContext: DatabaseContext, email: string, password: MaybePassword, roles: readonly string[] = []): Promise<SignUpResponse> {
 		if (await this.isEmailAlreadyUsed(dbContext, email)) {
 			return new ResponseError(SignUpErrorCode.EmailAlreadyExists, `User with email ${email} already exists`)
 		}
-		const weakPassword = getPasswordWeaknessMessage(password)
+		const plainPassword = password.getPlain()
+		const weakPassword = plainPassword ? getPasswordWeaknessMessage(plainPassword) : null
 		if (weakPassword) {
 			return new ResponseError(SignUpErrorCode.TooWeak, weakPassword)
 		}

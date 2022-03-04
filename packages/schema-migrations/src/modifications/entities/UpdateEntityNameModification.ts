@@ -11,7 +11,7 @@ import {
 	updateModel,
 	updateSchema,
 } from '../utils/schemaUpdateUtils'
-import { ModificationHandler, ModificationHandlerStatic } from '../ModificationHandler'
+import { ModificationHandler, ModificationHandlerOptions, ModificationHandlerStatic } from '../ModificationHandler'
 import { isIt } from '../../utils/isIt'
 import { VERSION_ACL_PATCH, VERSION_UPDATE_CONSTRAINT_NAME } from '../ModificationVersions'
 import { NamingHelper } from '@contember/schema-utils'
@@ -27,20 +27,20 @@ export const UpdateEntityNameModification: ModificationHandlerStatic<UpdateEntit
 	constructor(
 		private readonly data: UpdateEntityNameModificationData,
 		private readonly schema: Schema,
-		private readonly formatVersion: number,
+		private readonly options: ModificationHandlerOptions,
 	) {
 		this.subModification = data.tableName
 			? new UpdateEntityTableNameModification(
 				{ entityName: data.entityName, tableName: data.tableName },
 				schema,
-				this.formatVersion,
+				this.options,
 			  )
 			: new NoopModification()
 	}
 
 	public createSql(builder: MigrationBuilder): void {
 		const entity = this.schema.model.entities[this.data.entityName]
-		if (!entity.view && this.formatVersion >= VERSION_UPDATE_CONSTRAINT_NAME) {
+		if (!entity.view && this.options.formatVersion >= VERSION_UPDATE_CONSTRAINT_NAME) {
 			renameConstraintsSqlBuilder(builder, entity, this.getNewConstraintName.bind(this))
 		}
 		this.subModification.createSql(builder)
@@ -58,7 +58,7 @@ export const UpdateEntityNameModification: ModificationHandlerStatic<UpdateEntit
 						return field
 					}),
 				),
-				this.formatVersion >= VERSION_UPDATE_CONSTRAINT_NAME
+				this.options.formatVersion >= VERSION_UPDATE_CONSTRAINT_NAME
 					? updateEntity(this.data.entityName, renameConstraintSchemaUpdater(this.getNewConstraintName.bind(this)))
 					: undefined,
 				({ model }) => {
@@ -76,7 +76,7 @@ export const UpdateEntityNameModification: ModificationHandlerStatic<UpdateEntit
 					}
 				},
 			),
-			this.formatVersion >= VERSION_ACL_PATCH
+			this.options.formatVersion >= VERSION_ACL_PATCH
 				? updateAcl(
 					updateAclEveryRole(
 						({ role }) => ({

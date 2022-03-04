@@ -1,5 +1,6 @@
 export * from './authorization'
 export * from './commands'
+export * from './dtos'
 export * from './queries'
 export * from './mailing'
 export * from './service'

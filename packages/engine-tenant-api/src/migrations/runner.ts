@@ -1,4 +1,4 @@
-import { DatabaseCredentials } from '@contember/database'
+import { createDatabaseIfNotExists, DatabaseCredentials, SingleConnection } from '@contember/database'
 import { TenantMigrationArgs } from './types'
 import { loadMigrations, Migration, MigrationsRunner as DbMigrationsRunner } from '@contember/database-migrations'
 import tenantCredentials from './2020-06-08-134000-tenant-credentials'
@@ -18,39 +18,29 @@ const getMigrations = (): Promise<Migration[]> => {
 	])
 }
 
-export class MigrationsRunnerFactory {
+export class TenantMigrationsRunner {
 	constructor(
 		private readonly db: DatabaseCredentials,
+		private readonly schema: string,
 		private readonly tenantCredentials: TenantCredentials,
 		private readonly providers: Providers,
 	) {
 	}
 
-	public create(schema: string): MigrationsRunner {
-		const innerRunner = new DbMigrationsRunner<TenantMigrationArgs>(this.db, schema, getMigrations)
-		return new MigrationsRunner(
-			innerRunner,
-			{
-				getCredentials: async () => ({
-					loginTokenHash: this.tenantCredentials.loginToken ? computeTokenHash(this.tenantCredentials.loginToken) : undefined,
-					rootTokenHash: this.tenantCredentials.rootTokenHash
-						?? (this.tenantCredentials.rootToken ? computeTokenHash(this.tenantCredentials.rootToken) : undefined),
-					rootEmail: this.tenantCredentials.rootEmail,
-					rootPasswordBcrypted: this.tenantCredentials.rootPassword ? await this.providers.bcrypt(this.tenantCredentials.rootPassword) : undefined,
-				}),
-			},
-		)
-	}
-}
-
-export class MigrationsRunner {
-	constructor(
-		private readonly innerMigrationsRunner: DbMigrationsRunner<TenantMigrationArgs>,
-		private readonly args: TenantMigrationArgs,
-	) {
-	}
-
 	public async run(log: (msg: string) => void): Promise<{ name: string }[]> {
-		return await this.innerMigrationsRunner.migrate(log, this.args)
+		await createDatabaseIfNotExists(this.db, log)
+		const connection = new SingleConnection(this.db, {})
+		const innerRunner = new DbMigrationsRunner<TenantMigrationArgs>(connection, this.schema, getMigrations)
+		const result = await innerRunner.migrate(log, {
+			getCredentials: async () => ({
+				loginTokenHash: this.tenantCredentials.loginToken ? computeTokenHash(this.tenantCredentials.loginToken) : undefined,
+				rootTokenHash: this.tenantCredentials.rootTokenHash
+					?? (this.tenantCredentials.rootToken ? computeTokenHash(this.tenantCredentials.rootToken) : undefined),
+				rootEmail: this.tenantCredentials.rootEmail,
+				rootPasswordBcrypted: this.tenantCredentials.rootPassword ? await this.providers.bcrypt(this.tenantCredentials.rootPassword) : undefined,
+			}),
+		})
+		await connection.end()
+		return result
 	}
 }

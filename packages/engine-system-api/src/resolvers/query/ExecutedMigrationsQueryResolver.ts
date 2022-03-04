@@ -1,5 +1,5 @@
 import { GraphQLResolveInfo } from 'graphql'
-import { ResolverContext } from '../ResolverContext'
+import { SystemResolverContext } from '../SystemResolverContext'
 import { QueryResolver } from '../Resolver'
 import { ExecutedMigration, QueryExecutedMigrationsArgs } from '../../schema'
 import { ExecutedMigrationByVersionQuery, ExecutedMigrationsQuery } from '../../model'
@@ -8,7 +8,7 @@ export class ExecutedMigrationsQueryResolver implements QueryResolver<'executedM
 	async executedMigrations(
 		parent: any,
 		args: QueryExecutedMigrationsArgs,
-		context: ResolverContext,
+		context: SystemResolverContext,
 		info: GraphQLResolveInfo,
 	): Promise<ExecutedMigration[]> {
 		if (args.version) {

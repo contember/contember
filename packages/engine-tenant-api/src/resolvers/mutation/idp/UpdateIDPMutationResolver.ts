@@ -1,26 +1,14 @@
-import {
-	MutationAddIdpArgs,
-	MutationResolvers,
-	AddIdpResponse,
-	MutationUpdateIdpArgs,
-	UpdateIdpResponse,
-} from '../../../schema'
-import { GraphQLResolveInfo } from 'graphql'
-import { ResolverContext } from '../../ResolverContext'
+import { MutationResolvers, MutationUpdateIdpArgs, UpdateIdpResponse } from '../../../schema'
 import { PermissionActions } from '../../../model'
 import { IDPManager } from '../../../model/service/idp/IDPManager'
 import { createErrorResponse } from '../../errorUtils'
+import { TenantResolverContext } from '../../TenantResolverContext'
 
 export class UpdateIDPMutationResolver implements MutationResolvers {
 	constructor(private readonly idpManager: IDPManager) {
 	}
 
-	async updateIDP(
-		parent: any,
-		args: MutationUpdateIdpArgs,
-		context: ResolverContext,
-		info: GraphQLResolveInfo,
-	): Promise<UpdateIdpResponse> {
+	async updateIDP(parent: any, args: MutationUpdateIdpArgs, context: TenantResolverContext): Promise<UpdateIdpResponse> {
 		await context.requireAccess({
 			action: PermissionActions.IDP_ADD,
 			message: 'You are not allowed to add IDP',

@@ -27,18 +27,12 @@ export class DatabaseContext<Conn extends Connection.ConnectionLike = Connection
 
 export class DatabaseContextFactory {
 	constructor(
-		private readonly db: Client,
+		private readonly connection: Connection.ClientFactory,
 		private readonly providers: Providers,
 	) {
 	}
 
-	public create(projectGroupSlug: string | undefined): DatabaseContext {
-		let schema = 'tenant'
-		if (projectGroupSlug !== undefined) {
-			const normalizedSlug = projectGroupSlug.replace(/\W/g, '').slice(0, 15)
-			const hash = this.providers.hash(projectGroupSlug, 'md5').toString('hex')
-			schema = `tenant_${normalizedSlug}_${hash}`
-		}
-		return new DatabaseContext(this.db.forSchema(schema), this.providers)
+	public create(): DatabaseContext {
+		return new DatabaseContext(this.connection.createClient('tenant', { module: 'tenant' }), this.providers)
 	}
 }

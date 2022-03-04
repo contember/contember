@@ -22,11 +22,17 @@ export interface ModificationHandler<Data> {
 
 export type CreateDiff = (originalSchema: Schema, updatedSchema: Schema) => Migration.Modification[]
 
+export interface ModificationHandlerOptions {
+	formatVersion: number
+	systemSchema: string
+}
+
 export interface ModificationHandlerStatic<Data> {
 	id: string
 	createModification: (data: Data) => Migration.Modification<Data>
 	createDiff?: CreateDiff
-	new (data: Data, schema: Schema, formatVersion: number): ModificationHandler<Data>
+
+	new(data: Data, schema: Schema, options: ModificationHandlerOptions): ModificationHandler<Data>
 }
 
 export interface Differ {

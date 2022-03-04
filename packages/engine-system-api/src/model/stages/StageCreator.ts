@@ -1,4 +1,4 @@
-import { CreateOrUpdateStageCommand } from '../commands'
+import { CreateStageCommand } from '../commands'
 import { StageBySlugQuery } from '../queries'
 import { StageConfig } from '../../types'
 import { DatabaseContext } from '../database'
@@ -11,10 +11,11 @@ class StageCreator {
 		stage: StageConfig,
 	): Promise<boolean> {
 		const stageRow = await db.queryHandler.fetch(new StageBySlugQuery(stage.slug))
-		if (stageRow && stageRow.name === stage.name) {
+		if (stageRow) {
 			return false
 		}
-		return await db.commandBus.execute(new CreateOrUpdateStageCommand(stage))
+		await db.commandBus.execute(new CreateStageCommand(stage))
+		return true
 	}
 }
 

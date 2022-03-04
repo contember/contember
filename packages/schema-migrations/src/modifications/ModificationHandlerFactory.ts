@@ -1,5 +1,5 @@
 import { Schema } from '@contember/schema'
-import { ModificationHandler, ModificationHandlerStatic } from './ModificationHandler'
+import { ModificationHandler, ModificationHandlerOptions, ModificationHandlerStatic } from './ModificationHandler'
 import { CreateColumnModification, UpdateColumnDefinitionModification, UpdateColumnNameModification } from './columns'
 import { PatchValidationSchemaModification, UpdateValidationSchemaModification } from './validation'
 import { PatchAclSchemaModification, UpdateAclSchemaModification } from './acl'
@@ -29,11 +29,11 @@ import { UpdateViewModification } from './entities/UpdateViewModification'
 class ModificationHandlerFactory {
 	constructor(private readonly map: Record<string, ModificationHandlerStatic<any>>) {}
 
-	public create<D>(name: string, data: D, schema: Schema, version: number): ModificationHandler<D> {
+	public create<D>(name: string, data: D, schema: Schema, options: ModificationHandlerOptions): ModificationHandler<D> {
 		if (!this.map[name]) {
 			throw new Error(`Undefined modification handler for ${name}`)
 		}
-		return new this.map[name](data, schema, version)
+		return new this.map[name](data, schema, options)
 	}
 }
 

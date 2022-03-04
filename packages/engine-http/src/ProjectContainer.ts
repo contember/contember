@@ -1,18 +1,20 @@
 import { DatabaseContextFactory } from '@contember/engine-system-api'
 import { Connection } from '@contember/database'
-import { ContentQueryHandlerProvider, ContentSchemaResolver } from './content'
-import { ProjectConfig } from './ProjectConfig'
-import { ProjectGroup } from '@contember/engine-tenant-api'
+import { ProjectConfig } from './config'
+import { ContentSchemaResolver, GraphQlSchemaFactory } from './content'
 
 export interface ProjectContainer {
 	systemDatabaseContextFactory: DatabaseContextFactory
 	project: ProjectConfig
 	connection: Connection
-	contentQueryHandlerProvider: ContentQueryHandlerProvider
+	graphQlSchemaFactory: GraphQlSchemaFactory
 	contentSchemaResolver: ContentSchemaResolver
 }
 
 export interface ProjectContainerResolver {
-	getProjectContainer(projectGroup: ProjectGroup, slug: string, aliasFallback?: boolean): Promise<ProjectContainer | undefined>
+	onCreate: ((container: ProjectContainer) => void | (() => void))[]
+
+	getAllProjectContainers(): Promise<ProjectContainer[]>
+	getProjectContainer(slug: string, aliasFallback?: boolean): Promise<ProjectContainer | undefined>
 }
 

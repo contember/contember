@@ -5,7 +5,7 @@ import {
 	MutationResolvers,
 } from '../../../schema'
 import { GraphQLResolveInfo } from 'graphql'
-import { ResolverContext } from '../../ResolverContext'
+import { TenantResolverContext } from '../../TenantResolverContext'
 import { PermissionActions, ApiKeyManager } from '../../../model'
 import { createErrorResponse } from '../../errorUtils'
 
@@ -15,7 +15,7 @@ export class DisableApiKeyMutationResolver implements MutationResolvers {
 	async disableApiKey(
 		parent: any,
 		{ id }: MutationDisableApiKeyArgs,
-		context: ResolverContext,
+		context: TenantResolverContext,
 		info: GraphQLResolveInfo,
 	): Promise<DisableApiKeyResponse> {
 		await context.requireAccess({

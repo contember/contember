@@ -8,7 +8,7 @@ import {
 } from '@contember/schema-utils'
 import { MigrationBuilder } from '@contember/database-migrations'
 import { addField, SchemaUpdater, updateEntity, updateModel } from '../utils/schemaUpdateUtils'
-import { ModificationHandlerStatic } from '../ModificationHandler'
+import { ModificationHandlerOptions, ModificationHandlerStatic } from '../ModificationHandler'
 import { createEventTrigger, createEventTrxTrigger } from '../utils/sqlUpdateUtils'
 import { isIt } from '../../utils/isIt'
 import { createFields } from '../utils/diffUtils'
@@ -21,7 +21,11 @@ const getPrimaryType = (entity: Model.Entity): string => {
 export const CreateRelationModification: ModificationHandlerStatic<CreateRelationModificationData> = class {
 	static id = 'createRelation'
 
-	constructor(private readonly data: CreateRelationModificationData, private readonly schema: Schema) {}
+	constructor(
+		private readonly data: CreateRelationModificationData,
+		private readonly schema: Schema,
+		private readonly options: ModificationHandlerOptions,
+	) {}
 
 	public createSql(builder: MigrationBuilder): void {
 		const entity = this.schema.model.entities[this.data.entityName]
@@ -91,8 +95,8 @@ export const CreateRelationModification: ModificationHandlerStatic<CreateRelatio
 						},
 					},
 				)
-				createEventTrigger(builder, relation.joiningTable.tableName, primaryColumns)
-				createEventTrxTrigger(builder, relation.joiningTable.tableName)
+				createEventTrigger(builder, this.options.systemSchema, relation.joiningTable.tableName, primaryColumns)
+				createEventTrxTrigger(builder, this.options.systemSchema, relation.joiningTable.tableName)
 			},
 			visitManyHasManyInverse: () => {},
 		})

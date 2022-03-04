@@ -1,13 +1,14 @@
 import { ProjectContainerFactory } from './ProjectContainer'
-import { ProjectConfigResolver, ProjectContainer } from '@contember/engine-http'
-import { ProjectManager, ProjectWithSecrets } from '@contember/engine-tenant-api'
-import { ProjectGroup } from '@contember/engine-tenant-api'
+import { ProjectContainer } from '@contember/engine-http'
+import { DatabaseContext, ProjectManager, ProjectWithSecrets } from '@contember/engine-tenant-api'
 import { ProjectInitializer as SystemProjectInitializer } from '@contember/engine-system-api'
-import { ProjectGroupState } from './ProjectGroupState'
+import { ProjectContainerStore } from './ProjectContainerStore'
 import { Logger } from '@contember/engine-common'
+import { ProjectConfigResolver } from '../config/projectConfigResolver'
+import { TenantConfig } from '../config/config'
 
 export class ProjectContainerResolver {
-	private projectGroupStates = new WeakMap<ProjectGroup, ProjectGroupState>()
+	private projectContainers = new ProjectContainerStore()
 
 	public readonly onCreate: ((container: ProjectContainer) => void | (() => void))[] = []
 
@@ -16,13 +17,15 @@ export class ProjectContainerResolver {
 		private readonly projectConfigResolver: ProjectConfigResolver,
 		private readonly projectManager: ProjectManager,
 		private readonly systemProjectInitializer: SystemProjectInitializer,
+		private readonly tenantDatabase: DatabaseContext,
+		private readonly tenantConfig: TenantConfig,
 	) {}
 
-	public async getAllProjectContainers(projectGroup: ProjectGroup): Promise<ProjectContainer[]> {
-		const projects = await this.projectManager.getProjects(projectGroup.database)
+	public async getAllProjectContainers(): Promise<ProjectContainer[]> {
+		const projects = await this.projectManager.getProjects(this.tenantDatabase)
 		return await Promise.all(
 			projects.map(async it => {
-				const container = await this.getProjectContainer(projectGroup, it.slug)
+				const container = await this.getProjectContainer(it.slug)
 				if (!container) {
 					throw new Error('should not happen')
 				}
@@ -31,41 +34,40 @@ export class ProjectContainerResolver {
 		)
 	}
 
-	public async getProjectContainer(projectGroup: ProjectGroup, slug: string, alias: boolean = false): Promise<ProjectContainer | undefined> {
-		let groupState = this.getProjectGroupState(projectGroup)
-
-		const realSlug = groupState.resolveAlias(slug)
+	public async getProjectContainer(slug: string, alias: boolean = false): Promise<ProjectContainer | undefined> {
+		const realSlug = this.projectContainers.resolveAlias(slug)
 		if (realSlug) {
 			slug = realSlug
 		}
-		const existing = groupState.getContainer(slug)
+		const existing = this.projectContainers.getContainer(slug)
 		if (existing) {
 			const existingAwaited = await existing
-			const state = await this.projectManager.getProjectState(projectGroup.database, slug, existingAwaited.timestamp)
+			const state = await this.projectManager.getProjectState(this.tenantDatabase, slug, existingAwaited.timestamp)
 			if (state === 'valid') {
 				return (await existingAwaited).container
 			}
-			await this.destroyContainer(projectGroup, slug)
+			await this.destroyContainer(slug)
 			if (state === 'not_found') {
 				return undefined
 			}
 		}
-		const project = await this.projectManager.getProjectWithSecretsBySlug(projectGroup.database, slug, alias)
+		const project = await this.projectManager.getProjectWithSecretsBySlug(this.tenantDatabase, slug, alias)
 		if (!project) {
 			return undefined
 		}
-		const container = await this.createProjectContainer(projectGroup, project)
+		const container = await this.createProjectContainer(project)
 		if (slug !== project.slug) {
-			groupState.setAlias(project.slug, slug)
+			this.projectContainers.setAlias(project.slug, slug)
 		}
 		return container
 	}
 
-	public async createProjectContainer(projectGroup: ProjectGroup, project: ProjectWithSecrets): Promise<ProjectContainer> {
-		const projectConfig = this.projectConfigResolver(project.slug, project.config, project.secrets)
-		const groupState = this.getProjectGroupState(projectGroup)
-		return (await groupState.fetchContainer(project.slug, async slug => {
-			const projectContainer = this.projectContainerFactory.createContainer(projectConfig)
+	public async createProjectContainer(project: ProjectWithSecrets): Promise<ProjectContainer> {
+		const projectConfig = this.projectConfigResolver(project.slug, project.config, project.secrets, this.tenantConfig)
+		return (await this.projectContainers.fetchContainer(project.slug, async slug => {
+			const projectContainer = this.projectContainerFactory.createContainer({
+				project: projectConfig,
+			})
 			await this.systemProjectInitializer.initialize(
 				projectContainer.systemDatabaseContextFactory,
 				projectContainer.project,
@@ -81,28 +83,18 @@ export class ProjectContainerResolver {
 		})).container
 	}
 
-	public async destroyContainer(projectGroup: ProjectGroup, slug: string): Promise<void> {
-		const groupState = this.getProjectGroupState(projectGroup)
-		const existing = groupState.getContainer(slug)
+	public async destroyContainer(slug: string): Promise<void> {
+		const existing = this.projectContainers.getContainer(slug)
 		if (existing) {
 			const existingAwaited = await existing
 			existingAwaited.cleanups.forEach(it => it())
-			existingAwaited.container.project.alias?.forEach(it => groupState.removeAlias(it))
-			groupState.removeContainer(slug)
+			existingAwaited.container.project.alias?.forEach(it => this.projectContainers.removeAlias(it))
+			this.projectContainers.removeContainer(slug)
 		}
 		process.nextTick(() => {
 			if (global.gc) {
 				global.gc()
 			}
 		})
-	}
-
-	private getProjectGroupState(projectGroup: ProjectGroup): ProjectGroupState {
-		let groupState = this.projectGroupStates.get(projectGroup)
-		if (!groupState) {
-			groupState = new ProjectGroupState()
-			this.projectGroupStates.set(projectGroup, new ProjectGroupState())
-		}
-		return groupState
 	}
 }

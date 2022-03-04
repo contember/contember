@@ -1,7 +1,7 @@
 import { Client } from '@contember/database'
 
 export interface IdentityFetcher {
-	fetchIdentities(client: Client, ids: string[]): Promise<TenantIdentity[]>
+	fetchIdentities(ids: string[]): Promise<TenantIdentity[]>
 }
 
 export type TenantIdentity = PersonIdentity | ApiKeyIdentity

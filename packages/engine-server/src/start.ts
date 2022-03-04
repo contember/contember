@@ -68,13 +68,13 @@ const createServerTerminator = (): Server[] => {
 		}
 	}
 
-	const { config, projectConfigResolver } = await readConfig(configSources, configProcessors)
+	const { serverConfig, projectConfigResolver, tenantConfigResolver } = await readConfig(configSources, configProcessors)
 
 	if (process.argv[2] === 'validate') {
 		process.exit(0)
 	}
-	'sentry' in config.server.logging && initSentry(config.server.logging.sentry?.dsn)
-	const workerConfig = config.server.workerCount || 1
+	'sentry' in serverConfig.logging && initSentry(serverConfig.logging.sentry?.dsn)
+	const workerConfig = serverConfig.workerCount || 1
 
 	const workerCount = workerConfig === 'auto' ? os.cpus().length : Number(workerConfig)
 	const isClusterMode = workerCount > 1
@@ -83,8 +83,9 @@ const createServerTerminator = (): Server[] => {
 
 	const container = createContainer({
 		debugMode: isDebug,
-		config,
+		serverConfig,
 		projectConfigResolver,
+		tenantConfigResolver,
 		plugins,
 		processType,
 		version,
@@ -92,7 +93,7 @@ const createServerTerminator = (): Server[] => {
 
 	let initializedProjects: string[] = []
 	if (cluster.isMaster) {
-		const monitoringPort = config.server.monitoringPort
+		const monitoringPort = serverConfig.monitoringPort
 		const terminator = createServerTerminator()
 		terminator.push(
 			container.monitoringKoa.listen(monitoringPort, () => {
@@ -100,14 +101,14 @@ const createServerTerminator = (): Server[] => {
 				console.log(`Monitoring running on http://localhost:${monitoringPort}`)
 			}),
 		)
-		if (!config.server.projectGroup) {
+		if (!serverConfig.projectGroup) {
 			initializedProjects = await container.initializer.initialize()
 		}
 	}
 
-	const port = config.server.port
+	const port = serverConfig.port
 	const printStarted = () => {
-		if (config.server.projectGroup) {
+		if (serverConfig.projectGroup) {
 			// eslint-disable-next-line no-console
 			console.log('Contember Cloud running')
 		} else {

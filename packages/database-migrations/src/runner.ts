@@ -26,91 +26,33 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
 
-import path, { join } from 'path'
-import Db, { DBConnection } from 'node-pg-migrate/dist/db'
-import { LogFn, Logger, RunnerOptionClient, RunnerOptionUrl } from 'node-pg-migrate/dist/types'
-import { createSchemalize, getSchemas } from 'node-pg-migrate/dist/utils'
-import migrateSqlFile from 'node-pg-migrate/dist/sqlMigration'
-import { MigrationBuilder } from 'node-pg-migrate'
 import { createMigrationBuilder } from './helpers'
-import { readdir } from 'fs/promises'
+import { Connection, withDatabaseAdvisoryLock, wrapIdentifier } from '@contember/database'
+import { Migration } from './Migration'
 
-export interface RunnerOptionConfig {
+export type RunnerOption = {
 	migrationsTable: string
-	migrationsSchema?: string
-	schema?: string
-	createSchema?: boolean
-	createMigrationsSchema?: boolean
-	log?: LogFn
-	logger?: Logger
-	verbose?: boolean
+	schema: string
+	log: (msg: string) => void
 	migrationArgs?: any
 }
 
-export declare type RunnerOption = RunnerOptionConfig & (RunnerOptionClient | RunnerOptionUrl)
 
 // Random but well-known identifier shared by all instances of node-pg-migrate
 const PG_MIGRATE_LOCK_ID = 7241865325823964
 
-const idColumn = 'id'
-const nameColumn = 'name'
-const runOnColumn = 'run_on'
-
-export class Migration {
-	constructor(
-		public readonly name: string,
-		public readonly migration: (builder: MigrationBuilder, args: any) => Promise<void> | void,
-	) {}
-}
-
-export const loadMigrations = async (sqlDir: string, additional: Migration[]): Promise<Migration[]> => {
-	return (
-		await Promise.all(
-			(
-				await readdir(sqlDir)
-			)
-				.filter(it => path.extname(it) === '.sql')
-				.map(async it => {
-					const migration = (await migrateSqlFile(join(sqlDir, it))).up
-					if (!migration) {
-						throw new Error()
-					}
-					return new Migration(path.basename(it, path.extname(it)), migration)
-				}),
-		)
-	)
-		.concat(additional)
-		.sort((a, b) => a.name.localeCompare(b.name))
-}
-
-const lock = async (db: DBConnection): Promise<void> => {
-	await db.select(`select pg_advisory_lock(${PG_MIGRATE_LOCK_ID})`)
-}
-
-const unlock = async (db: DBConnection): Promise<void> => {
-	const [result] = await db.select(`select pg_advisory_unlock(${PG_MIGRATE_LOCK_ID}) as "lockReleased"`)
-
-	if (!result.lockReleased) {
-		throw new Error('Failed to release migration lock')
-	}
-}
-
 const getMigrationsTableName = (options: RunnerOption): string => {
-	const schema = options.migrationsSchema || options.schema || 'public'
-	const { migrationsTable } = options
-	return createSchemalize(
-		false,
-		true,
-	)({
-		schema,
-		name: migrationsTable,
-	})
+	return `${wrapIdentifier(options.schema)}.${wrapIdentifier(options.migrationsTable)}`
 }
-const ensureMigrationsTable = async (db: DBConnection, options: RunnerOption): Promise<void> => {
+const ensureMigrationsTable = async (db: Connection.ConnectionLike, options: RunnerOption): Promise<void> => {
 	try {
 		const fullTableName = getMigrationsTableName(options)
-		await db.query(
-			`CREATE TABLE IF NOT EXISTS ${fullTableName} ( ${idColumn} SERIAL PRIMARY KEY, ${nameColumn} varchar(255) NOT NULL, ${runOnColumn} timestamp NOT NULL)`,
+		await db.query(`
+			CREATE TABLE IF NOT EXISTS ${fullTableName} (
+				id SERIAL PRIMARY KEY,
+				name varchar(255) NOT NULL,
+				run_on timestamp NOT NULL
+			)`,
 		)
 	} catch (err) {
 		if (!(err instanceof Error)) {
@@ -120,9 +62,9 @@ const ensureMigrationsTable = async (db: DBConnection, options: RunnerOption): P
 	}
 }
 
-const getRunMigrations = async (db: DBConnection, options: RunnerOption) => {
+const getRunMigrations = async (db: Connection.ConnectionLike, options: RunnerOption) => {
 	const fullTableName = getMigrationsTableName(options)
-	return db.column(nameColumn, `SELECT ${nameColumn} FROM ${fullTableName} ORDER BY ${runOnColumn}, ${idColumn}`)
+	return (await db.query<{name: string}>(`SELECT name FROM ${fullTableName} ORDER BY run_on, id`)).rows.map(it => it.name)
 }
 
 const getMigrationsToRun = (options: RunnerOption, runNames: string[], migrations: Migration[]): Migration[] => {
@@ -143,38 +85,17 @@ const checkOrder = (runNames: string[], migrations: Migration[]) => {
 	}
 }
 
-const getLogger = ({ log, logger, verbose }: RunnerOption): Logger => {
-	let loggerObject: Logger = console
-	if (typeof logger === 'object') {
-		loggerObject = logger
-	} else if (typeof log === 'function') {
-		loggerObject = { debug: log, info: log, warn: log, error: log }
-	}
-	return verbose ? loggerObject : { ...loggerObject, debug: undefined }
-}
-
 export default async (
 	getMigrations: () => Promise<Migration[]>,
+	connection: Connection.ConnectionLike,
 	options: RunnerOption,
 ): Promise<{ name: string }[]> => {
-	const logger = getLogger(options)
-	const db = Db((options as RunnerOptionClient).dbClient || (options as RunnerOptionUrl).databaseUrl, logger)
-	try {
-		await db.createConnection()
-		await lock(db)
-
-		if (options.schema) {
-			const schemas = getSchemas(options.schema)
-			if (options.createSchema) {
-				await Promise.all(schemas.map(schema => db.query(`CREATE SCHEMA IF NOT EXISTS "${schema}"`)))
-			}
-			await db.query(`SET search_path TO ${schemas.map(s => `"${s}"`).join(', ')}`)
-		}
-		if (options.migrationsSchema && options.createMigrationsSchema) {
-			await db.query(`CREATE SCHEMA IF NOT EXISTS "${options.migrationsSchema}"`)
-		}
-
+	const logger = options.log
+	return await withDatabaseAdvisoryLock(connection, PG_MIGRATE_LOCK_ID, async db => {
+		await db.query(`CREATE SCHEMA IF NOT EXISTS ${wrapIdentifier(options.schema)}`)
+		await db.query(`SET search_path TO ${wrapIdentifier(options.schema)}`)
 		await ensureMigrationsTable(db, options)
+
 
 		const runNames = await getRunMigrations(db, options)
 		const migrations = await getMigrations()
@@ -185,45 +106,40 @@ export default async (
 		if (!toRun.length) {
 			return []
 		}
+		logger(`Migrating ${toRun.length} file(s):`)
+		return await db.transaction(async trx => {
+			try {
+				for (const migration of toRun) {
+					try {
+						logger(`  Executing migration ${migration.name}...`)
+						const migrationsBuilder = createMigrationBuilder()
+						await migration.migration(migrationsBuilder, options.migrationArgs)
+						const steps = migrationsBuilder.getSqlSteps()
 
-		logger.info(`Migrating ${toRun.length} file(s):`)
+						for (const sql of steps) {
+							await trx.query(sql)
+						}
 
-		await db.query('BEGIN')
-		try {
-			for (const migration of toRun) {
-				try {
-					logger.info(`  Executing migration ${migration.name}...`)
-					const migrationsBuilder = createMigrationBuilder()
-					await migration.migration(migrationsBuilder, options.migrationArgs)
-					const steps = migrationsBuilder.getSqlSteps()
-
-					for (const sql of steps) {
-						await db.query(sql)
+						await trx.query(
+							`INSERT INTO ${getMigrationsTableName(options)} (name, run_on) VALUES (?, NOW());`,
+							[migration.name],
+						)
+						logger(`  Done`)
+					} catch (e) {
+						logger(`  FAILED`)
+						throw e
 					}
-
-					await db.query(
-						`INSERT INTO ${getMigrationsTableName(options)} (${nameColumn}, ${runOnColumn}) VALUES ('${
-							migration.name
-						}', NOW());`,
-					)
-					logger.info(`  Done`)
-				} catch (e) {
-					logger.warn(`  FAILED`)
-					throw e
 				}
+			} catch (err) {
+				logger('Rolling back attempted migration ...')
+				await trx.rollback()
+				throw err
 			}
-			await db.query('COMMIT')
-		} catch (err) {
-			logger.warn('Rolling back attempted migration ...')
-			await db.query('ROLLBACK')
-			throw err
-		}
+			return toRun.map(m => ({
+				name: m.name,
+			}))
 
-		return toRun.map(m => ({
-			name: m.name,
-		}))
-	} finally {
-		await unlock(db).catch(error => logger.warn(error.message))
-		await db.close()
-	}
+		})
+	})
+
 }

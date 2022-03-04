@@ -1,19 +1,32 @@
 import { Builder } from '@contember/dic'
 import { Connection } from '@contember/database'
 import { DatabaseContextFactory, SchemaVersionBuilder } from '@contember/engine-system-api'
-import { logSentryError } from '../utils'
-import { ModificationHandlerFactory } from '@contember/schema-migrations'
 import { GraphQlSchemaBuilderFactory, PermissionsByIdentityFactory } from '@contember/engine-content-api'
 import { GraphQLSchemaContributor, Plugin } from '@contember/engine-plugins'
 import {
-	ProjectConfig,
-	ContentQueryHandlerProvider,
 	ContentSchemaResolver,
 	GraphQlSchemaFactory,
-	Providers,
+	ProjectConfig,
 	ProjectContainer,
+	Providers,
 } from '@contember/engine-http'
-import { ContentQueryHandlerFactory } from '@contember/engine-http'
+
+export class ProjectContainerFactoryFactory {
+	constructor(
+		private readonly debug: boolean,
+		private readonly plugins: Plugin[],
+		private readonly providers: Providers,
+	) {
+	}
+
+	create(schemaVersionBuilder: SchemaVersionBuilder): ProjectContainerFactory {
+		return new ProjectContainerFactory(this.debug, this.plugins, schemaVersionBuilder, this.providers)
+	}
+}
+
+interface ProjectContainerFactoryArgs {
+	project: ProjectConfig
+}
 
 export class ProjectContainerFactory {
 	constructor(
@@ -23,19 +36,19 @@ export class ProjectContainerFactory {
 		private readonly providers: Providers,
 	) {}
 
-	public createContainer(project: ProjectConfig): ProjectContainer {
-		return this.createBuilder(project)
+	public createContainer(args: ProjectContainerFactoryArgs): ProjectContainer {
+		return this.createBuilder(args)
 			.build()
 			.pick(
 				'project',
 				'connection',
-				'contentQueryHandlerProvider',
 				'systemDatabaseContextFactory',
 				'contentSchemaResolver',
+				'graphQlSchemaFactory',
 			)
 	}
 
-	protected createBuilder(project: ProjectConfig) {
+	protected createBuilder({ project }: ProjectContainerFactoryArgs) {
 		return new Builder({})
 			.addService('providers', () =>
 				this.providers)
@@ -45,8 +58,6 @@ export class ProjectContainerFactory {
 				project)
 			.addService('connection', ({ project }) =>
 				new Connection(project.db, { timing: true }))
-			.addService('modificationHandlerFactory', () =>
-				new ModificationHandlerFactory(ModificationHandlerFactory.defaultFactoryMap))
 			.addService('graphQlSchemaBuilderFactory', () =>
 				new GraphQlSchemaBuilderFactory())
 			.addService('permissionsByIdentityFactory', ({}) =>
@@ -57,13 +68,9 @@ export class ProjectContainerFactory {
 					.filter((it): it is GraphQLSchemaContributor => !!it)
 				return new GraphQlSchemaFactory(graphQlSchemaBuilderFactory, permissionsByIdentityFactory, contributors)
 			})
-			.addService('contentQueryHandlerFactory', () =>
-				new ContentQueryHandlerFactory(project.slug, this.debug, logSentryError))
 			.addService('contentSchemaResolver', ({ schemaVersionBuilder }) =>
 				new ContentSchemaResolver(schemaVersionBuilder))
-			.addService('contentQueryHandlerProvider', ({ contentSchemaResolver, graphQlSchemaFactory, contentQueryHandlerFactory }) =>
-				new ContentQueryHandlerProvider(contentSchemaResolver, graphQlSchemaFactory, contentQueryHandlerFactory))
-			.addService('systemDatabaseContextFactory', ({ connection, providers }) =>
-				new DatabaseContextFactory(connection.createClient('system', { module: 'system' }), providers))
+			.addService('systemDatabaseContextFactory', ({ connection, providers, project }) =>
+				new DatabaseContextFactory(connection.createClient(project.db.systemSchema ?? 'system', { module: 'system' }), providers))
 	}
 }

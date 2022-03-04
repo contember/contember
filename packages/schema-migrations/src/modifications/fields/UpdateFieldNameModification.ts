@@ -13,7 +13,7 @@ import {
 	updateModel,
 	updateSchema,
 } from '../utils/schemaUpdateUtils'
-import { ModificationHandlerStatic } from '../ModificationHandler'
+import { ModificationHandlerOptions, ModificationHandlerStatic } from '../ModificationHandler'
 import { acceptFieldVisitor, NamingHelper, PredicateDefinitionProcessor } from '@contember/schema-utils'
 import { VERSION_ACL_PATCH, VERSION_UPDATE_CONSTRAINT_NAME } from '../ModificationVersions'
 import { renameConstraintSchemaUpdater, renameConstraintsSqlBuilder } from '../utils/renameConstraintsHelper'
@@ -24,7 +24,7 @@ export const UpdateFieldNameModification: ModificationHandlerStatic<UpdateFieldN
 	constructor(
 		private readonly data: UpdateFieldNameModificationData,
 		private readonly schema: Schema,
-		private readonly formatVersion: number,
+		private readonly options: ModificationHandlerOptions,
 	) {}
 
 	public createSql(builder: MigrationBuilder): void {
@@ -32,18 +32,18 @@ export const UpdateFieldNameModification: ModificationHandlerStatic<UpdateFieldN
 		if (entity.view) {
 			return
 		}
-		if (this.formatVersion >= VERSION_UPDATE_CONSTRAINT_NAME) {
+		if (this.options.formatVersion >= VERSION_UPDATE_CONSTRAINT_NAME) {
 			renameConstraintsSqlBuilder(builder, entity, this.getNewConstraintName.bind(this))
 		}
 	}
 
 	public getSchemaUpdater(): SchemaUpdater {
 		const updateConstraintName =
-			this.formatVersion >= VERSION_UPDATE_CONSTRAINT_NAME
+			this.options.formatVersion >= VERSION_UPDATE_CONSTRAINT_NAME
 				? updateEntity(this.data.entityName, renameConstraintSchemaUpdater(this.getNewConstraintName.bind(this)))
 				: undefined
 		const updateConstraintFields =
-			this.formatVersion >= VERSION_UPDATE_CONSTRAINT_NAME
+			this.options.formatVersion >= VERSION_UPDATE_CONSTRAINT_NAME
 				? updateEntity(this.data.entityName, ({ entity }) => {
 					return {
 						...entity,
@@ -112,7 +112,7 @@ export const UpdateFieldNameModification: ModificationHandlerStatic<UpdateFieldN
 			}
 		})
 		const updateAclOp =
-			this.formatVersion >= VERSION_ACL_PATCH
+			this.options.formatVersion >= VERSION_ACL_PATCH
 				? updateAcl(
 					updateAclEveryRole(
 						updateAclEveryEntity(

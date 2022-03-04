@@ -1,6 +1,11 @@
-import { AddProjectMemberCommand, CreateProjectCommand, SetProjectSecretCommand, UpdateProjectCommand } from '../commands'
+import {
+	AddProjectMemberCommand,
+	CreateProjectCommand,
+	SetProjectSecretCommand,
+	UpdateProjectCommand,
+} from '../commands'
 import { PermissionContext } from '../authorization'
-import { Project, ProjectGroup, ProjectInitializer, ProjectWithSecrets } from '../type'
+import { Project, ProjectInitializer, ProjectWithSecrets } from '../type'
 import { ProjectBySlugQuery, ProjectsByIdentityQuery, ProjectsQuery, ProjectUpdateTimestampQuery } from '../queries'
 import { SecretsManager } from './SecretsManager'
 import { DatabaseContext, TokenHash } from '../utils'
@@ -19,12 +24,12 @@ export class ProjectManager {
 	) {}
 
 	public async createProject(
-		projectGroup: ProjectGroup,
+		dbContext: DatabaseContext,
 		project: Pick<ProjectWithSecrets, 'name' | 'slug' | 'config' | 'secrets'>,
 		ownerIdentityId: string | undefined,
 		deployTokenHash?: TokenHash,
 	): Promise<CreateProjectResponse> {
-		return await projectGroup.database.transaction(async db => {
+		return await dbContext.transaction(async db => {
 			const bus = db.commandBus
 
 			const now = db.providers.now()
@@ -33,7 +38,7 @@ export class ProjectManager {
 				return new ResponseError(CreateProjectResponseErrorCode.AlreadyExists, `Project ${project.slug} already exists`)
 			}
 			for (const [key, value] of Object.entries(project.secrets)) {
-				await bus.execute(new SetProjectSecretCommand(projectId, key, value))
+				await bus.execute(new SetProjectSecretCommand(projectId, key, Buffer.from(value)))
 			}
 			if (ownerIdentityId) {
 				const addMemberResult = await db.commandBus.execute(
@@ -50,7 +55,7 @@ export class ProjectManager {
 			const deployResult = await this.apiKeyService.createProjectPermanentApiKey(db, projectId, deployMembership, deployKeyDescription, deployTokenHash)
 
 			try {
-				await this.projectIntializer.initializeProject(projectGroup, {
+				await this.projectIntializer.initializeProject({
 					id: projectId,
 					...project,
 					updatedAt: now,

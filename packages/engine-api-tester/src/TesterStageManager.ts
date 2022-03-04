@@ -1,7 +1,7 @@
 import { SelectBuilder } from '@contember/database'
 import { Logger } from '@contember/engine-common'
 import {
-	DatabaseContext,
+	DatabaseContext, formatSchemaName,
 	MigrationsResolver,
 	ProjectConfig,
 	ProjectMigrator,
@@ -9,6 +9,7 @@ import {
 	StageCreator,
 } from '@contember/engine-system-api'
 import { Migration, MigrationVersionHelper } from '@contember/schema-migrations'
+import { testUuid } from './testUuid'
 
 export class TesterStageManager {
 	private createdStages = new Set<string>()
@@ -62,7 +63,11 @@ export class TesterStageManager {
 			}
 			migration = resolvedMigration
 		}
-		await this.projectMigrator.migrate(this.db, this.project, [migration], () => null)
+		await this.projectMigrator.migrate(this.db, this.project.stages.map(it => ({
+			...it,
+			id: testUuid(0),
+			schema: formatSchemaName(it),
+		})), [migration], () => null)
 	}
 
 	private getStageInternal(slug: string): StageConfig {

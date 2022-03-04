@@ -1,11 +1,11 @@
 import { Maybe, Project, QueryProjectBySlugArgs, QueryResolvers } from '../../schema'
-import { ResolverContext } from '../ResolverContext'
+import { TenantResolverContext } from '../TenantResolverContext'
 import { PermissionActions, ProjectManager } from '../../model'
 
 export class ProjectQueryResolver implements QueryResolvers {
 	constructor(private readonly projectManager: ProjectManager) {}
 
-	async projects(parent: unknown, args: unknown, context: ResolverContext): Promise<readonly Project[]> {
+	async projects(parent: unknown, args: unknown, context: TenantResolverContext): Promise<readonly Project[]> {
 		return (await this.projectManager.getProjectsByIdentity(context.db, context.identity.id, context.permissionContext)).map(
 			it => ({ ...it, members: [], roles: [] }),
 		)
@@ -14,7 +14,7 @@ export class ProjectQueryResolver implements QueryResolvers {
 	async projectBySlug(
 		parent: unknown,
 		args: QueryProjectBySlugArgs,
-		context: ResolverContext,
+		context: TenantResolverContext,
 	): Promise<Maybe<Project>> {
 		const project = await this.projectManager.getProjectBySlug(context.db, args.slug)
 		if (

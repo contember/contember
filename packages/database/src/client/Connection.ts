@@ -3,12 +3,13 @@ import { EventManager } from './EventManager'
 import { Client } from './Client'
 import { Transaction } from './Transaction'
 import { executeClientOperation, executeQuery } from './execution'
+import { DatabaseCredentials } from '../types'
 
 class Connection implements Connection.ConnectionLike, Connection.ClientFactory, Connection.PoolStatusProvider {
 	private readonly pool: Pool
 
 	constructor(
-		public readonly config: PoolConfig,
+		public readonly config: PoolConfig & DatabaseCredentials,
 		private readonly queryConfig: Connection.QueryConfig,
 		public readonly eventManager: EventManager = new EventManager(null),
 	) {
@@ -104,6 +105,14 @@ namespace Connection {
 			options?: { eventManager?: EventManager },
 		): Promise<Result>
 	}
+
+	export type ConnectionType =
+		& Connection.ConnectionLike
+		& Connection.ClientFactory
+		& Connection.PoolStatusProvider
+		& {
+			config: DatabaseCredentials
+		}
 
 	export interface ConnectionLike extends Transactional, Queryable {}
 

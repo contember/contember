@@ -22,7 +22,7 @@ let printMigrationDescription = async function (
 	migration: Migration,
 	options: { sqlOnly: boolean; noSql: boolean },
 ) {
-	const description = await migrationsDescriber.describeModifications(schema, migration)
+	const description = await migrationsDescriber.describeModifications(schema, migration, 'system') // schema name cannot be determined here
 	description.forEach(({ modification, sql, description }) => {
 		if (options.sqlOnly) {
 			if (sql.trim()) {

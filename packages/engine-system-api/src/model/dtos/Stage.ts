@@ -1,10 +1,7 @@
 export interface Stage {
+	readonly id: string
 	readonly name: string
 	readonly slug: string
+	readonly schema: string
 }
 
-export interface StageWithId extends Stage {
-	readonly id: string
-}
-
-export type StageWithoutEvent = Pick<Stage, Exclude<keyof Stage, 'event_id'>>

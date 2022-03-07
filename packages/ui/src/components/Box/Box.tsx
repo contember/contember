@@ -3,25 +3,38 @@ import { forwardRef, memo, ReactNode } from 'react'
 import { useClassNamePrefix } from '../../auxiliary'
 import type { BoxDistinction, Default, Intent, NativeProps, Size } from '../../types'
 import { toEnumViewClass, toStateClass, toThemeClass } from '../../utils'
-import { Stack } from '../Stack'
+import { Stack, StackProps } from '../Stack'
 import { Label } from '../Typography/Label'
 
 export interface BoxOwnProps {
 	actions?: ReactNode
 	children?: ReactNode
 	distinction?: BoxDistinction
+	direction?: StackProps['direction']
 	gap?: Size | 'none'
 	heading?: ReactNode
 	isActive?: boolean
 	intent?: Intent
-	padding?: Default | 'no-padding'
+	padding?: Default | 'no-padding' | 'with-padding'
 }
 
 export interface BoxProps extends BoxOwnProps, Omit<NativeProps<HTMLDivElement>, 'children'> {}
 
 export const Box = memo(
 	forwardRef<HTMLDivElement, BoxProps>(
-		({ actions, className, distinction, children, gap, heading, intent, isActive, padding, ...divProps }: BoxProps, ref) => {
+		({
+			actions,
+			children,
+			className,
+			direction = 'vertical',
+			distinction,
+			gap = 'small',
+			heading,
+			intent,
+			isActive,
+			padding,
+			...divProps
+		}: BoxProps, ref) => {
 			const componentClassName = `${useClassNamePrefix()}box`
 
 			return (
@@ -37,7 +50,7 @@ export const Box = memo(
 					)}
 					ref={ref}
 				>
-					<Stack gap={gap ?? 'small'} direction="vertical">
+					<Stack gap={gap} direction={direction}>
 						{(heading || actions) && (
 							<div className={`${componentClassName}-header`}>
 								{heading && <Label>{heading}</Label>}

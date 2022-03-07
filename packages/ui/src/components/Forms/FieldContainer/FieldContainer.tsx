@@ -3,6 +3,7 @@ import { memo, ReactNode } from 'react'
 import { useClassNamePrefix } from '../../../auxiliary'
 import type { Size } from '../../../types'
 import { toEnumViewClass, toThemeClass } from '../../../utils'
+import { Stack, StackProps } from '../../Stack'
 import { Description } from '../../Typography/Description'
 import { Label } from '../../Typography/Label'
 import { ErrorList, ErrorListProps } from '../ErrorList'
@@ -11,6 +12,8 @@ import type { FieldContainerLabelPosition } from './Types'
 export interface FieldContainerProps extends ErrorListProps {
 	label: ReactNode
 	children: ReactNode // The actual field
+	direction?: StackProps['direction']
+	gap?: Size | 'none'
 
 	size?: Size
 	labelPosition?: FieldContainerLabelPosition
@@ -24,14 +27,16 @@ export interface FieldContainerProps extends ErrorListProps {
 
 export const FieldContainer = memo(
 	({
-		label,
 		children,
-		labelPosition,
-		labelDescription,
 		description,
+		direction = 'vertical',
+		errors,
+		gap = 'small',
+		label,
+		labelDescription,
+		labelPosition,
 		required,
 		size,
-		errors,
 		useLabelElement = true,
 	}: FieldContainerProps) => {
 		const LabelElement = useLabelElement ? 'label' : 'div'
@@ -54,7 +59,13 @@ export const FieldContainer = memo(
 						</span>
 					}
 					{(children || description) && <div className={`${componentClassName}-body`}>
-						{children && <span className={`${componentClassName}-body-content`}>{children}</span>}
+						{children && <Stack
+							className={`${componentClassName}-body-content`}
+							direction={direction}
+							gap={gap}
+						>
+							{children}
+						</Stack>}
 						{description && <span className={`${componentClassName}-body-content-description`}>{description}</span>}
 					</div>}
 				</LabelElement>

@@ -24,7 +24,7 @@ export const EmptyMessage = memo(({ children, component, distinction }: EmptyMes
 EmptyMessage.displayName = 'EmptyMessage'
 
 const EmptyMessageDefault = memo(({ children, distinction }: EmptyMessageComponentProps) => (
-	<Box distinction={distinction} intent="default">
+	<Box distinction={distinction} intent="default" padding="with-padding">
 		<Stack
 			direction="horizontal"
 			justify="space-around"

@@ -1,6 +1,6 @@
 import { Environment, EnvironmentContext } from '@contember/binding'
 import { ContemberClient, ContemberClientProps } from '@contember/react-client'
-import { DialogProvider, SectionTabsProvider } from '@contember/ui'
+import { DialogProvider, SectionTabsProvider, StyleProvider } from '@contember/ui'
 import { ReactNode } from 'react'
 import { I18nProvider, MessageDictionaryByLocaleCode } from '../i18n'
 import { RequestProvider, RouteMap, RoutingContext, RoutingContextValue, SelectedDimension } from '../routing'
@@ -41,33 +41,35 @@ export const ApplicationEntrypoint = (props: ApplicationEntrypointProps) => {
 	})
 
 	return (
-		<EnvironmentContext.Provider value={rootEnv}>
-			<I18nProvider localeCode={props.defaultLocale} dictionaries={props.dictionaries}>
-				<RoutingContext.Provider value={routing}>
-					<RequestProvider>
-						<ToasterProvider>
-							<DialogProvider>
-								<ContemberClient
-									apiBaseUrl={props.apiBaseUrl}
-									sessionToken={props.sessionToken}
-									loginToken={props.loginToken}
-									project={props.project}
-									stage={props.stage}
-								>
-									<NavigationProvider>
-										<IdentityProvider onInvalidIdentity={props.onInvalidIdentity}>
-											<SectionTabsProvider>
-												{props.children}
-											</SectionTabsProvider>
-										</IdentityProvider>
-									</NavigationProvider>
-								</ContemberClient>
-								<Toaster />
-							</DialogProvider>
-						</ToasterProvider>
-					</RequestProvider>
-				</RoutingContext.Provider>
-			</I18nProvider>
-		</EnvironmentContext.Provider>
+		<StyleProvider>
+			<EnvironmentContext.Provider value={rootEnv}>
+				<I18nProvider localeCode={props.defaultLocale} dictionaries={props.dictionaries}>
+					<RoutingContext.Provider value={routing}>
+						<RequestProvider>
+							<ToasterProvider>
+								<DialogProvider>
+									<ContemberClient
+										apiBaseUrl={props.apiBaseUrl}
+										sessionToken={props.sessionToken}
+										loginToken={props.loginToken}
+										project={props.project}
+										stage={props.stage}
+									>
+										<NavigationProvider>
+											<IdentityProvider onInvalidIdentity={props.onInvalidIdentity}>
+												<SectionTabsProvider>
+													{props.children}
+												</SectionTabsProvider>
+											</IdentityProvider>
+										</NavigationProvider>
+									</ContemberClient>
+									<Toaster />
+								</DialogProvider>
+							</ToasterProvider>
+						</RequestProvider>
+					</RoutingContext.Provider>
+				</I18nProvider>
+			</EnvironmentContext.Provider>
+		</StyleProvider>
 	)
 }

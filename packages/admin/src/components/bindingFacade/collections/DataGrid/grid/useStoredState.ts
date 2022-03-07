@@ -4,8 +4,9 @@ import { Serializable } from '../base'
 type SetState<V extends Serializable> = (value: V | ((current: V) => V)) => void;
 type ValueInitializer<V extends Serializable> = (storedValue: V | undefined) => V;
 
-const createStoredStateHook = (storage: Storage) => {
+const createStoredStateHook = (getStorage: () => Storage) => {
 	return <V extends Serializable>(key: string, initializeValue: ValueInitializer<V>): [V, SetState<V>] => {
+		const storage = getStorage()
 		const [value, setValue] = useState<V>(() => {
 			const value = storage.getItem(key)
 			const parsedValue: V | undefined = value !== null ? JSON.parse(value) : undefined
@@ -17,9 +18,9 @@ const createStoredStateHook = (storage: Storage) => {
 				storage.setItem(key, JSON.stringify(newValue))
 				return newValue
 			})
-		}, [key])]
+		}, [key, storage])]
 	}
 
 }
 
-export const useSessionStorageState = createStoredStateHook(sessionStorage)
+export const useSessionStorageState = createStoredStateHook(() => sessionStorage)

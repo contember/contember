@@ -1,6 +1,6 @@
 {
   "name": "@contember/cli",
-  "version": "1.0.0-rc.11",
+  "version": "1.0.0-rc.12",
   "license": "Apache-2.0",
   "bin": {
     "contember": "./dist/src/run.js"
@@ -14,15 +14,15 @@
     "@types/fs-extra": "^9.0.3"
   },
   "dependencies": {
-    "@contember/cli-common": "^1.0.0-rc.11",
-    "@contember/config-loader": "^1.0.0-rc.11",
-    "@contember/database-migrations": "^1.0.0-rc.11",
-    "@contember/dic": "^1.0.0-rc.11",
-    "@contember/engine-content-api": "^1.0.0-rc.11",
-    "@contember/schema": "^1.0.0-rc.11",
-    "@contember/schema-definition": "^1.0.0-rc.11",
-    "@contember/schema-migrations": "^1.0.0-rc.11",
-    "@contember/schema-utils": "^1.0.0-rc.11",
+    "@contember/cli-common": "^1.0.0-rc.12",
+    "@contember/config-loader": "^1.0.0-rc.12",
+    "@contember/database-migrations": "^1.0.0-rc.12",
+    "@contember/dic": "^1.0.0-rc.12",
+    "@contember/engine-content-api": "^1.0.0-rc.12",
+    "@contember/schema": "^1.0.0-rc.12",
+    "@contember/schema-definition": "^1.0.0-rc.12",
+    "@contember/schema-migrations": "^1.0.0-rc.12",
+    "@contember/schema-utils": "^1.0.0-rc.12",
     "@graphql-tools/merge": "^6.2.14",
     "chalk": "^4.1.0",
     "chalk-table": "^1.0.2",

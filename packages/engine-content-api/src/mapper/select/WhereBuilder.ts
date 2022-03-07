@@ -4,7 +4,7 @@ import { Input, Model } from '@contember/schema'
 import { Path, PathFactory } from './Path'
 import { JoinBuilder } from './JoinBuilder'
 import { ConditionBuilder } from './ConditionBuilder'
-import { ConditionBuilder as SqlConditionBuilder, Operator, SelectBuilder } from '@contember/database'
+import { ConditionBuilder as SqlConditionBuilder, Operator, QueryBuilder, SelectBuilder } from '@contember/database'
 
 export class WhereBuilder {
 	constructor(
@@ -125,10 +125,9 @@ export class WhereBuilder {
 					}
 					const relationWhere = where[fieldName] as Input.Where
 
-					return conditionBuilder.in(
-						[tableName, entity.primaryColumn],
+					return conditionBuilder.exists(
 						this.createManyHasManySubquery(
-							SelectBuilder.create(),
+							[tableName, entity.primaryColumn],
 							relationWhere,
 							targetEntity,
 							targetRelation.joiningTable,
@@ -143,10 +142,9 @@ export class WhereBuilder {
 
 					const relationWhere = where[fieldName] as Input.Where
 
-					return conditionBuilder.in(
-						[tableName, entity.primaryColumn],
+					return conditionBuilder.exists(
 						this.createManyHasManySubquery(
-							SelectBuilder.create(),
+							[tableName, entity.primaryColumn],
 							relationWhere,
 							targetEntity,
 							relation.joiningTable,
@@ -161,15 +159,14 @@ export class WhereBuilder {
 
 					const relationWhere = where[fieldName] as Input.Where
 
-					return conditionBuilder.in(
-						[tableName, entity.primaryColumn],
+					return conditionBuilder.exists(
 						this.build(
 							SelectBuilder.create()
-								.distinct()
-								.select(['root_', targetRelation.joiningColumn.columnName])
-								.from(targetEntity.tableName, 'root_'),
+								.select(it => it.raw('1'))
+								.from(targetEntity.tableName, 'sub_')
+								.where(it => it.columnsEq([tableName, entity.primaryColumn], ['sub_', targetRelation.joiningColumn.columnName])),
 							targetEntity,
-							this.pathFactory.create([]),
+							this.pathFactory.create([], 'sub_'),
 							relationWhere,
 							true,
 						),
@@ -181,36 +178,35 @@ export class WhereBuilder {
 	}
 
 	private createManyHasManySubquery(
-		qb: SelectBuilder<SelectBuilder.Result>,
+		outerColumn: QueryBuilder.ColumnIdentifier,
 		relationWhere: Input.Where,
 		targetEntity: Model.Entity,
 		joiningTable: Model.JoiningTable,
 		fromSide: 'owning' | 'inverse',
 	) {
-		let augmentedBuilder: SelectBuilder<SelectBuilder.Result> = qb
-		const fromColumn =
-			fromSide === 'owning' ? joiningTable.joiningColumn.columnName : joiningTable.inverseJoiningColumn.columnName
-		const toColumn =
-			fromSide === 'owning' ? joiningTable.inverseJoiningColumn.columnName : joiningTable.joiningColumn.columnName
-		augmentedBuilder = augmentedBuilder
+		const fromColumn = fromSide === 'owning' ? joiningTable.joiningColumn.columnName : joiningTable.inverseJoiningColumn.columnName
+		const toColumn = fromSide === 'owning' ? joiningTable.inverseJoiningColumn.columnName : joiningTable.joiningColumn.columnName
+		const qb = SelectBuilder.create<SelectBuilder.Result>()
 			.from(joiningTable.tableName, 'junction_')
-			.distinct()
-			.select(['junction_', fromColumn])
+			.select(it => it.raw('1'))
+			.where(it => it.columnsEq(outerColumn, ['junction_', fromColumn]))
+
 		const primaryCondition = this.transformWhereToPrimaryCondition(relationWhere, targetEntity.primary)
 		if (primaryCondition !== null) {
-			return augmentedBuilder.where(condition =>
+
+			return qb.where(condition =>
 				this.conditionBuilder.build(condition, 'junction_', toColumn, primaryCondition),
 			)
 		}
 
-		augmentedBuilder = augmentedBuilder.join(targetEntity.tableName, 'root_', clause =>
-			clause.compareColumns(['junction_', toColumn], Operator.eq, ['root_', targetEntity.primary]),
+		const qbJoined = qb.join(targetEntity.tableName, 'sub_', clause =>
+			clause.compareColumns(['junction_', toColumn], Operator.eq, ['sub_', targetEntity.primary]),
 		)
 		return this.buildAdvanced(
 			targetEntity,
-			this.pathFactory.create([]),
+			this.pathFactory.create([], 'sub_'),
 			relationWhere,
-			cb => augmentedBuilder.where(clause => cb(clause)),
+			cb => qbJoined.where(clause => cb(clause)),
 			true,
 		)
 	}

@@ -24,9 +24,9 @@ test('Post by category name (where many has many owning)', async () => {
 			{
 				sql: SQL`select "root_"."id" as "root_id"
                      from "public"."post" as "root_"
-                     where "root_"."id" in (select distinct "junction_"."post_id"
-                                            from "public"."post_categories" as "junction_" inner join "public"."category" as "root_" on "junction_"."category_id" = "root_"."id"
-                                            where "root_"."name" = ?)`,
+                     where exists (select 1
+                                            from "public"."post_categories" as "junction_" inner join "public"."category" as "sub_" on "junction_"."category_id" = "sub_"."id"
+                                            where "root_"."id" = "junction_"."post_id"  and "sub_"."name" = ?)`,
 				parameters: ['Stuff'],
 				response: {
 					rows: [
@@ -74,9 +74,9 @@ test('Post by category ids (where many has many owning)', async () => {
 			{
 				sql: SQL`select "root_"."id" as "root_id"
                      from "public"."post" as "root_"
-                     where "root_"."id" in (select distinct "junction_"."post_id"
+                     where exists (select 1
                                             from "public"."post_categories" as "junction_"
-                                            where "junction_"."category_id" in (?, ?))`,
+                                            where "root_"."id" = "junction_"."post_id" and "junction_"."category_id" in (?, ?))`,
 				parameters: [testUuid(10), testUuid(11)],
 				response: {
 					rows: [

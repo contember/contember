@@ -30,7 +30,7 @@ test('Post by post locale (one-has-many unique)', async () => {
 			{
 				sql: SQL`SELECT "root_"."id" AS "root_id"
 						         FROM "public"."post" AS "root_"
-						         WHERE "root_"."id" IN (SELECT distinct "root_"."post_id" FROM "public"."post_locale" AS "root_" WHERE "root_"."id" = ?)`,
+						         WHERE EXISTS (SELECT 1 FROM "public"."post_locale" AS "sub_" WHERE "root_"."id" = "sub_"."post_id" AND "sub_"."id" = ?)`,
 				parameters: [testUuid(1)],
 				response: { rows: [{ root_id: testUuid(2) }] },
 			},

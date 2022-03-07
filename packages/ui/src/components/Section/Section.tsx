@@ -4,6 +4,7 @@ import { useClassNamePrefix } from '../../auxiliary'
 import type { NativeProps } from '../../types'
 import { Message } from '../Message'
 import { useSectionTabsRegistration } from '../SectionTabs'
+import { Stack } from '../Stack'
 import { Heading } from '../Typography/Heading'
 
 export interface SectionOwnProps {
@@ -50,16 +51,14 @@ export const Section = memo(
 					ref={ref}
 				>
 					{import.meta.env.DEV && <Message distinction="striking" intent="warn" className="message--nesting-warning">Please use <code><strong>Section</strong></code> as parent element of the <code><strong>LocaleSideDimension</strong></code>.</Message>}
-					{heading && (
+					{(heading || actions) && (
 						<div className={`${prefix}section-heading`} contentEditable={false}>
 							<Heading depth={3}>
 								{heading}
 							</Heading>
-						</div>
-					)}
-					{actions && (
-						<div className={`${prefix}section-actions`} contentEditable={false}>
-							{actions}
+							<Stack direction="horizontal" className={`${prefix}section-actions`} contentEditable={false}>
+								{actions}
+							</Stack>
 						</div>
 					)}
 					{children}

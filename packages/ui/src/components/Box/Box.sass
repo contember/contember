@@ -20,19 +20,24 @@
 	align-items: stretch
 	flex-direction: column
 
-	padding-left: var(--cui-box-content-padding-left)
-	padding-right: var(--cui-box-content-padding-right)
-	padding-top: var(--cui-box-content-padding-top)
-	padding-bottom: var(--cui-box-content-padding-bottom)
+	&,
+	&.view-with-padding
+		padding-left: var(--cui-box-content-padding-left)
+		padding-right: var(--cui-box-content-padding-right)
+		padding-top: var(--cui-box-content-padding-top)
+		padding-bottom: var(--cui-box-content-padding-bottom)
 
 	position: relative
 	width: 100%
 
+	&.view-seamless:not(.view-with-padding)
+		--cui-box-content-padding: 0
 	&.view-seamless
 		box-shadow: none
 		background: inherit
 		border: 0
 		border-radius: unset
+
 	&.view-no-padding
 		--cui-box-content-padding: 0
 
@@ -47,10 +52,12 @@
 		font-weight: 600
 		justify-content: space-between
 
-	&:not(.is-active):not(:focus-within) &-heading
+	&:not(.is-active):not(:focus-within) &-header
 		color: var(--cui-color--high)
 
 	&-actions
+		display: flex
+		gap: var(--cui-gap-horizontal)
 		grid-column: 2
 
 	&.is-active,

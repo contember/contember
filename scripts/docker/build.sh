@@ -1,6 +1,8 @@
 #!/bin/bash
 set -euo pipefail
 
+tar czf yarn.tar.gz -C "$(yarn cache dir)" .
+
 ALL_VERSIONS=($DOCKER_TAGS)
 
 if [[ -z "$1" || "$1" == "engine-alpine" ]]; then

@@ -4,6 +4,8 @@ WORKDIR /src
 RUN apk --no-cache add bash
 RUN apk --no-cache add --virtual builds-deps build-base python2
 COPY ./ ./
+
+RUN tar xf yarn.tar.gz -C "$(yarn cache dir)" .
 RUN /src/packages/engine-server/build.sh
 
 FROM node:14-alpine

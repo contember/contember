@@ -1,6 +1,6 @@
 {
   "name": "@contember/database",
-  "version": "v1.0.0-rc.13",
+  "version": "1.0.0-rc.14",
   "license": "Apache-2.0",
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
@@ -8,10 +8,10 @@
     "test": "uvu dist/tests/cases/ \\.js$"
   },
   "dependencies": {
-    "@contember/queryable": "^v1.0.0-rc.13"
+    "@contember/queryable": "^1.0.0-rc.14"
   },
   "devDependencies": {
-    "@contember/database-tester": "^v1.0.0-rc.13",
+    "@contember/database-tester": "^1.0.0-rc.14",
     "@types/node": "^17.0.5",
     "pg": "^8.5.0",
     "uvu": "^0.5.1"

@@ -1,6 +1,6 @@
 {
   "name": "@contember/engine-content-api",
-  "version": "v1.0.0-rc.13",
+  "version": "1.0.0-rc.14",
   "license": "Apache-2.0",
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
@@ -10,19 +10,19 @@
     "test": "uvu dist/tests/cases/ \\.js$"
   },
   "dependencies": {
-    "@contember/database": "^v1.0.0-rc.13",
-    "@contember/dic": "^v1.0.0-rc.13",
-    "@contember/engine-common": "^v1.0.0-rc.13",
-    "@contember/graphql-utils": "^v1.0.0-rc.13",
-    "@contember/schema": "^v1.0.0-rc.13",
-    "@contember/schema-utils": "^v1.0.0-rc.13",
+    "@contember/database": "^1.0.0-rc.14",
+    "@contember/dic": "^1.0.0-rc.14",
+    "@contember/engine-common": "^1.0.0-rc.14",
+    "@contember/graphql-utils": "^1.0.0-rc.14",
+    "@contember/schema": "^1.0.0-rc.14",
+    "@contember/schema-utils": "^1.0.0-rc.14",
     "@graphql-tools/schema": "^7.1.5",
     "graphql-tag": "^2.12.5"
   },
   "devDependencies": {
-    "@contember/database-tester": "^v1.0.0-rc.13",
-    "@contember/engine-api-tester": "^v1.0.0-rc.13",
-    "@contember/schema-definition": "^v1.0.0-rc.13",
+    "@contember/database-tester": "^1.0.0-rc.14",
+    "@contember/engine-api-tester": "^1.0.0-rc.14",
+    "@contember/schema-definition": "^1.0.0-rc.14",
     "@graphql-codegen/cli": "^1.15.2",
     "@graphql-codegen/typescript": "^1.15.2",
     "@graphql-codegen/typescript-operations": "^1.15.2",

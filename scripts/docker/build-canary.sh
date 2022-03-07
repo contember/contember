@@ -1,6 +1,8 @@
 #!/bin/bash
 set -euo pipefail
 
+tar czf yarn.tar.gz -C "$(yarn cache dir)" .
+
 REPO="contember/engine"
 docker buildx build --platform linux/amd64,linux/arm64 --push -t "$REPO:canary-$VERSION" -f ./packages/engine-server/alpine.dockerfile .
 

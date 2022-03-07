@@ -2,6 +2,8 @@ FROM node:14 as builder
 
 WORKDIR /src
 COPY ./ ./
+
+RUN tar xf yarn.tar.gz -C "$(yarn cache dir)" .
 RUN /src/packages/engine-server/build.sh
 
 FROM node:14

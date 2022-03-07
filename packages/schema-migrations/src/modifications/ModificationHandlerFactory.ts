@@ -14,6 +14,7 @@ import {
 import { CreateEnumModification, RemoveEnumModification, UpdateEnumModification } from './enums'
 import { RemoveFieldModification, UpdateFieldNameModification } from './fields'
 import {
+	ConvertOneHasManyToManyHasManyRelationModification,
 	ConvertOneToManyRelationModification,
 	CreateRelationInverseSideModification,
 	CreateRelationModification,
@@ -70,6 +71,7 @@ namespace ModificationHandlerFactory {
 		UpdateValidationSchemaModification,
 		PatchValidationSchemaModification,
 		ConvertOneToManyRelationModification,
+		ConvertOneHasManyToManyHasManyRelationModification,
 	]
 
 	export const defaultFactoryMap: HandlerMap<any> = Object.fromEntries(handlers.map(it => [it.id, it]))

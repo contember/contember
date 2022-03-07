@@ -9,14 +9,11 @@ import {
 import { MigrationBuilder } from '@contember/database-migrations'
 import { addField, SchemaUpdater, updateEntity, updateModel } from '../utils/schemaUpdateUtils'
 import { ModificationHandlerStatic } from '../ModificationHandler'
-import { createEventTrigger, createEventTrxTrigger } from '../utils/sqlUpdateUtils'
 import { isIt } from '../../utils/isIt'
 import { createFields } from '../utils/diffUtils'
+import { getPrimaryColumnType } from '../utils/getPrimaryColumnType'
+import { createJunctionTableSql } from '../utils/createJunctionTable'
 
-const getPrimaryType = (entity: Model.Entity): string => {
-	const column = entity.fields[entity.primary] as Model.AnyColumn
-	return column.columnType
-}
 
 export const CreateRelationModification: ModificationHandlerStatic<CreateRelationModificationData> = class {
 	static id = 'createRelation'
@@ -32,7 +29,7 @@ export const CreateRelationModification: ModificationHandlerStatic<CreateRelatio
 		const createOwningSide = (relation: Model.OneHasOneOwningRelation | Model.ManyHasOneRelation) => {
 			builder.addColumn(entity.tableName, {
 				[relation.joiningColumn.columnName]: {
-					type: getPrimaryType(targetEntity),
+					type: getPrimaryColumnType(targetEntity),
 					notNull: !relation.nullable,
 				},
 			})
@@ -65,34 +62,7 @@ export const CreateRelationModification: ModificationHandlerStatic<CreateRelatio
 			},
 			visitOneHasOneInverse: () => {},
 			visitManyHasManyOwning: ({}, relation, {}, _) => {
-				const primaryColumns = [
-					relation.joiningTable.joiningColumn.columnName,
-					relation.joiningTable.inverseJoiningColumn.columnName,
-				]
-				builder.createTable(
-					relation.joiningTable.tableName,
-					{
-						[relation.joiningTable.joiningColumn.columnName]: {
-							type: getPrimaryType(entity),
-							notNull: true,
-							references: `"${entity.tableName}"("${entity.primaryColumn}")`,
-							onDelete: 'CASCADE',
-						},
-						[relation.joiningTable.inverseJoiningColumn.columnName]: {
-							type: getPrimaryType(targetEntity),
-							notNull: true,
-							references: `"${targetEntity.tableName}"("${targetEntity.primaryColumn}")`,
-							onDelete: 'CASCADE',
-						},
-					},
-					{
-						constraints: {
-							primaryKey: primaryColumns,
-						},
-					},
-				)
-				createEventTrigger(builder, relation.joiningTable.tableName, primaryColumns)
-				createEventTrxTrigger(builder, relation.joiningTable.tableName)
+				createJunctionTableSql(builder, entity, targetEntity, relation)
 			},
 			visitManyHasManyInverse: () => {},
 		})

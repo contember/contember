@@ -7,7 +7,7 @@ import { toEnumClass, toEnumViewClass, toViewClass } from '../../utils'
 export interface StackOwnProps {
   align?: 'center' | 'stretch' | 'start' | 'end'
   direction: 'vertical' | 'horizontal' | 'vertical-reverse' | 'horizontal-reverse'
-	gap?: Size | 'none'
+	gap?: Size | 'xlarge' | 'none'
 	children?: ReactNode
   justify?:
    | 'center'

@@ -1,6 +1,6 @@
 {
   "name": "@contember/engine-common",
-  "version": "1.0.0-rc.12",
+  "version": "v1.0.0-rc.13",
   "license": "Apache-2.0",
   "main": "dist/src/index.js",
   "scripts": {

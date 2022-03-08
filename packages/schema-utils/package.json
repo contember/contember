@@ -1,6 +1,6 @@
 {
   "name": "@contember/schema-utils",
-  "version": "1.0.0-rc.14",
+  "version": "1.0.0-rc.15",
   "license": "Apache-2.0",
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
@@ -8,7 +8,7 @@
     "test": "echo 'No tests'"
   },
   "dependencies": {
-    "@contember/schema": "^1.0.0-rc.14"
+    "@contember/schema": "^1.0.0-rc.15"
   },
   "devDependencies": {
     "@types/node": "^17.0.5"

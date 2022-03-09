@@ -28,7 +28,7 @@ export interface DataGridContainerOwnProps extends DataGridContainerPublicProps 
 	desiredState: DataGridState
 	displayedState: DataGridState
 	entityName: EntityName
-	filter: Filter | undefined
+	filter: Filter
 	setIsColumnHidden: DataGridSetIsColumnHidden
 	setFilter: DataGridSetColumnFilter
 	setOrderBy: DataGridSetColumnOrderBy

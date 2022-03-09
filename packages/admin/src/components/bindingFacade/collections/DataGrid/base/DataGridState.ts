@@ -6,7 +6,6 @@ import type { DataGridOrderDirectionStore } from './DataGridOrderDirectionStore'
 
 export interface DataGridState {
 	paging: GridPagingState
-
 	columns: DataGridColumns
 	hiddenColumns: DataGridHiddenColumnsStateStore
 	filterArtifacts: DataGridFilterArtifactStore

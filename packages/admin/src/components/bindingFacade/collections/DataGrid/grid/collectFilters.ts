@@ -5,26 +5,13 @@ export const collectFilters = (
 	columns: DataGridColumns,
 	filters: DataGridFilterArtifactStore,
 	environment: Environment,
-): Filter | undefined => {
-	const mapped: Filter[] = []
-
-	for (const [key, artifact] of Object.entries(filters)) {
+): Filter[] => {
+	return Object.entries(filters).flatMap(([key, artifact]) => {
 		const column = columns.get(key)
 		if (column === undefined) {
-			continue
+			return []
 		}
-
 		const filter = getColumnFilter(column, artifact, environment)
-		if (filter !== undefined) {
-			mapped.push(filter)
-		}
-	}
-
-	if (mapped.length === 0) {
-		return undefined
-	}
-	if (mapped.length === 1) {
-		return mapped[0]
-	}
-	return { and: mapped }
+		return filter !== undefined ? [filter] : []
+	})
 }

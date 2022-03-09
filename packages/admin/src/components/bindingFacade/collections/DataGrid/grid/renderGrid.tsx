@@ -45,8 +45,7 @@ export const renderGrid = (
 	const desugared = QueryLanguage.desugarQualifiedEntityList({ entities }, environment)
 	const columnFilters = collectFilters(columns, filterArtifacts, environment)
 
-	const filter: Filter | undefined =
-		desugared.filter && columnFilters ? { and: [desugared.filter, columnFilters] } : desugared.filter ?? columnFilters
+	const filter: Filter = { and: [...columnFilters, desugared.filter ?? {}] }
 
 	return (
 		<EntityListSubTree

@@ -1,5 +1,3 @@
-export * from './BrowserTabs'
-export * from './LocalStorage'
 export * from './randomId'
 export * from './useClassNamePrefix'
 export * from './useCloseOnEscapeOrClickOutside'

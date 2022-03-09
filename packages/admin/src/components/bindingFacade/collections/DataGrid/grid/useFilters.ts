@@ -2,7 +2,7 @@ import { useCallback } from 'react'
 import type { DataGridColumns, DataGridFilterArtifactStore, DataGridSetColumnFilter } from '../base'
 import type { GridPagingAction } from '../paging'
 import { normalizeInitialFilters } from './normalizeInitialFilters'
-import { useSessionStorageState } from './useStoredState'
+import { useSessionStorageState } from '@contember/react-utils'
 
 export const useFilters = (
 	columns: DataGridColumns,

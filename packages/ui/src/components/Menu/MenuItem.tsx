@@ -12,7 +12,8 @@ import { MenuLink } from './MenuLink'
 import { MenuItemProps, TAB_INDEX_FOCUSABLE, TAB_INDEX_NEVER_FOCUSABLE, TAB_INDEX_TEMPORARY_UNFOCUSABLE } from './Types'
 import { useActiveMenuItemContext } from './useActiveMenuItem'
 import { useMouseToFocus } from './useMouseToFocus'
-import { usePersistedMenuContext } from './usePersistedMenu'
+import { useMenuId } from './useMenuId'
+import { useSessionStorageState } from '@contember/react-utils'
 
 
 export function MenuItem<T extends any = any>({ children, ...props }: MenuItemProps<T>) {
@@ -54,18 +55,11 @@ export function MenuItem<T extends any = any>({ children, ...props }: MenuItemPr
 			: TAB_INDEX_NEVER_FOCUSABLE
 		: TAB_INDEX_NEVER_FOCUSABLE
 
-	const { initial, onExpandedChange } = usePersistedMenuContext(menuItemId)
-	const initialWasInitialized = typeof initial === 'boolean'
-	const [expanded, setExpanded] = useState(initial || !!props.expandedByDefault || depth === 0 || !props.title)
-
-	useEffect(() => {
-		if (initialWasInitialized) {
-			if (initial === true) {
-				// Forces initial expanded
-				setExpanded(true)
-			}
-		}
-	}, [initialWasInitialized, initial])
+	const menuId = useMenuId()
+	const [expanded, setExpanded] = useSessionStorageState<boolean>(
+		`menu-${menuId}-${menuItemId}`,
+			val => val ?? (props.expandedByDefault || depth === 0 || !props.title),
+	)
 
 	const preventMenuClose = usePreventCloseContext()
 
@@ -79,8 +73,7 @@ export function MenuItem<T extends any = any>({ children, ...props }: MenuItemPr
 		}
 
 		setExpanded(nextExpanded)
-		onExpandedChange(nextExpanded)
-	}, [isInteractive, onExpandedChange])
+	}, [isInteractive, setExpanded])
 
 	const onLabelClick = useCallback((event: SyntheticEvent) => {
 		if (event.defaultPrevented) {

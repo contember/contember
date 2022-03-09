@@ -1,3 +1,3 @@
-import { Serializable } from './types'
+import { Serializable } from '@contember/react-utils'
 
 export type DataGridFilterArtifact = Serializable

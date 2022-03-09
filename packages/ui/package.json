@@ -28,6 +28,7 @@
 	"dependencies": {
 		"@blueprintjs/icons": "3.29.0",
 		"@contember/react-multipass-rendering": "workspace:*",
+		"@contember/react-utils": "workspace:*",
 		"@mangoweb/sass-base": "0.0.8",
 		"@popperjs/core": "2.10.2",
 		"chroma-js": "2.1.2",

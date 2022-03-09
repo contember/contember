@@ -5,6 +5,7 @@
 		"emitDeclarationOnly": false
 	},
 	"references": [
-		{ "path": "../../admin/src" }
+		{ "path": "../../admin/src" },
+		{ "path": "../../ui/src" }
 	]
 }

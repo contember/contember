@@ -1,18 +1,12 @@
 import classNames from 'classnames'
-import {
-	FunctionComponent,
-	useCallback,
-	useMemo,
-	useRef,
-} from 'react'
+import { FunctionComponent, PropsWithChildren, useCallback, useMemo, useRef } from 'react'
 import { MouseMoveProvider, useComponentClassName } from '../../auxiliary'
 import { toViewClass } from '../../utils'
 import { DepthContext, FocusableContext } from './Contexts'
 import { MenuItem } from './MenuItem'
 import type { MenuItemProps, MenuProps } from './Types'
 import { ActiveMenuItemProvider } from './useActiveMenuItem'
-import { useMenuIdentity } from './useMenuIdentity'
-import { PersistedMenuProvider } from './usePersistedMenu'
+import { MenuIdProvider } from './useMenuId'
 
 
 function getFocusableItems<E extends HTMLElement = HTMLElement>(parent: E): HTMLLIElement[] {
@@ -34,9 +28,9 @@ function getClosestFocusable<E extends HTMLElement = HTMLElement>(parent: E, off
 	return list[currentlyFocusedIndex + offset] ?? null
 }
 
-export const Menu: FunctionComponent<MenuProps> & {
+export const Menu: FunctionComponent<any> & {
 	Item: <T>(props: MenuItemProps<T>) => JSX.Element
-} = (props: MenuProps) => {
+} = (props: PropsWithChildren<MenuProps>) => {
 	const menuRef = useRef<HTMLUListElement>(null)
 	const componentClassName = useComponentClassName('menu')
 
@@ -56,10 +50,10 @@ export const Menu: FunctionComponent<MenuProps> & {
 		return getClosestFocusable(menuRef.current, -1)
 	}, [])
 
-	const menuId = useMenuIdentity(props)
+	const menuId = props.id ?? 'unknown'
 
 	return <DepthContext.Provider value={0}>
-		<PersistedMenuProvider menuId={menuId}>
+		<MenuIdProvider menuId={menuId}>
 			<MouseMoveProvider elementRef={menuRef}>
 				<ActiveMenuItemProvider menuRef={menuRef}>
 					<section className={classNames(
@@ -80,7 +74,7 @@ export const Menu: FunctionComponent<MenuProps> & {
 					</section>
 				</ActiveMenuItemProvider>
 			</MouseMoveProvider>
-		</PersistedMenuProvider>
+		</MenuIdProvider>
 	</DepthContext.Provider>
 }
 

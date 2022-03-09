@@ -6,8 +6,8 @@ import {
 	useBindingOperations,
 	useEnvironment,
 } from '@contember/binding'
-import { FunctionComponent, ReactNode, useEffect, useMemo, useRef, useState } from 'react'
-import type { DataGridContainerPublicProps, DataGridState } from '../base'
+import { ComponentType, ReactElement, ReactNode, useEffect, useMemo, useRef, useState } from 'react'
+import type { DataGridContainerProps, DataGridContainerPublicProps, DataGridState } from '../base'
 import { useGridPagingState } from '../paging'
 import { extractDataGridColumns } from '../structure'
 import { renderGrid, RenderGridOptions } from './renderGrid'
@@ -17,17 +17,26 @@ import { useOrderBys } from './useOrderBys'
 import { ContainerSpinner } from '@contember/ui'
 import { useCurrentRequest } from '../../../../../routing'
 
-export interface DataGridProps extends DataGridContainerPublicProps {
-	dataGridKey?: string
+export type DataGridProps<ComponentExtraProps extends {}> =
+	& DataGridContainerPublicProps
+	& {
+		dataGridKey?: string
 
-	entities: SugaredQualifiedEntityList['entities']
-	children: ReactNode
+		entities: SugaredQualifiedEntityList['entities']
+		children: ReactNode
+		itemsPerPage?: number | null
+	}
+	& (
+		| {}
+		| {
+			component: ComponentType<DataGridContainerProps & ComponentExtraProps>
+			componentProps: ComponentExtraProps
+		}
+	)
 
-	itemsPerPage?: number | null
-}
 
-export const DataGrid: FunctionComponent<DataGridProps> = Component(
-	props => {
+export const DataGrid = Component(
+	<ComponentProps extends {}>(props: DataGridProps<ComponentProps>) => {
 		const { extendTree } = useBindingOperations()
 		const isMountedRef = useRef(true)
 		const environment = useEnvironment()
@@ -61,7 +70,7 @@ export const DataGrid: FunctionComponent<DataGridProps> = Component(
 				setOrderBy,
 				containerProps,
 			}),
-			[props.entities, setIsColumnHidden, updatePaging, setFilter, setOrderBy, containerProps],
+			[props, setIsColumnHidden, updatePaging, setFilter, setOrderBy, containerProps],
 		)
 
 		const loadAbortControllerRef = useRef<AbortController | undefined>(undefined)
@@ -131,10 +140,18 @@ export const DataGrid: FunctionComponent<DataGridProps> = Component(
 			return <ContainerSpinner />
 		}
 
-		return renderGrid(gridOptions, displayedState.treeRootId, displayedState.gridState, desiredState, environment)
+		return renderGrid(
+			gridOptions,
+			displayedState.treeRootId,
+			displayedState.gridState,
+			desiredState,
+			environment,
+			'component' in props ? props.component : undefined,
+			'componentProps' in props ? props.componentProps : undefined,
+		)
 	},
 	() => {
 		return null
 	},
 	'DataGrid',
-)
+) as <ComponentProps>(props: DataGridProps<ComponentProps>) => ReactElement

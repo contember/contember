@@ -6,9 +6,9 @@ import {
 	SugaredQualifiedEntityList,
 	TreeRootId,
 } from '@contember/binding'
-import { Fragment, ReactElement } from 'react'
+import { ComponentType, Fragment, ReactElement } from 'react'
 import {
-	DataGridContainer,
+	DataGridContainer, DataGridContainerProps,
 	DataGridContainerPublicProps,
 	DataGridSetColumnFilter,
 	DataGridSetColumnOrderBy,
@@ -28,12 +28,14 @@ export interface RenderGridOptions {
 	containerProps: DataGridContainerPublicProps
 }
 
-export const renderGrid = (
-	{ entities, setIsColumnHidden, setFilter, setOrderBy, updatePaging, containerProps }: RenderGridOptions,
+export const renderGrid = <ComponentExtraProps extends {}>(
+	{ entities, setIsColumnHidden, setFilter, setOrderBy, updatePaging, containerProps, ...props }: RenderGridOptions,
 	treeRootId: TreeRootId | undefined,
 	displayedState: DataGridState,
 	desiredState: DataGridState,
 	environment: Environment,
+	component?: ComponentType<DataGridContainerProps & ComponentExtraProps>,
+	componentProps ? : ComponentExtraProps,
 ): ReactElement => {
 	const {
 		paging: { pageIndex, itemsPerPage },
@@ -57,7 +59,7 @@ export const renderGrid = (
 			offset={itemsPerPage === null ? undefined : itemsPerPage * pageIndex}
 			limit={itemsPerPage === null ? undefined : itemsPerPage}
 			orderBy={collectOrderBy(columns, orderDirections, environment)}
-			listComponent={DataGridContainer}
+			listComponent={(component as typeof DataGridContainer) ?? DataGridContainer}
 			listProps={{
 				desiredState,
 				displayedState,
@@ -70,6 +72,7 @@ export const renderGrid = (
 				emptyMessageComponentExtraProps: containerProps.emptyMessageComponentExtraProps,
 				emptyMessageComponent: containerProps.emptyMessageComponent,
 				emptyMessage: containerProps.emptyMessage,
+				...componentProps,
 			}}
 		>
 			{Array.from(columns)

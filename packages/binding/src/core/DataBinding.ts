@@ -259,7 +259,7 @@ export class DataBinding {
 
 	public async extendTree(newFragment: ReactNode, options: ExtendTreeOptions = {}): Promise<TreeRootId | undefined> {
 		if (options.signal?.aborted) {
-			return Promise.reject()
+			return Promise.reject(DataBindingExtendAborted)
 		}
 		const markerTreeRoot = new MarkerTreeGenerator(newFragment, options.environment ?? this.environment).generate()
 
@@ -290,7 +290,7 @@ export class DataBinding {
 				newFragment,
 				newTreeRootId: this.getNewTreeRootId(),
 				options,
-				reject,
+				reject: () => reject(DataBindingExtendAborted),
 				resolve,
 			})
 			const pendingExtensionsCount = this.pendingExtensions.size
@@ -452,3 +452,5 @@ export class DataBinding {
 			: `${generateEnumerabilityPreventingEntropy()}-${DataBinding.getNextTreeRootIdSeed()}`
 	}
 }
+
+export const DataBindingExtendAborted = Symbol('aborted')

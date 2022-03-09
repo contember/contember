@@ -1,5 +1,6 @@
 import {
 	Component,
+	DataBindingExtendAborted,
 	SugaredQualifiedEntityList,
 	TreeRootId,
 	useBindingOperations,
@@ -15,7 +16,6 @@ import { useHiddenColumnsState } from './useHiddenColumnsState'
 import { useOrderBys } from './useOrderBys'
 import { ContainerSpinner } from '@contember/ui'
 import { useCurrentRequest } from '../../../../../routing'
-import { noop } from '@contember/react-utils'
 
 export interface DataGridProps extends DataGridContainerPublicProps {
 	dataGridKey?: string
@@ -104,9 +104,11 @@ export const DataGrid: FunctionComponent<DataGridProps> = Component(
 							signal: newController.signal,
 						},
 					)
-				} catch {
-					// TODO Distinguish abort vs actual error
-					return
+				} catch (e) {
+					if (e === DataBindingExtendAborted) {
+						return
+					}
+					throw e
 				}
 				if (!isMountedRef.current) {
 					return

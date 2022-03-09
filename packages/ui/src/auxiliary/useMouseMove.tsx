@@ -1,15 +1,14 @@
-import { createContext, ReactNode, RefObject, useContext, useEffect, useRef, useState } from 'react'
+import { createContext, ReactNode, RefObject, useContext, useEffect, useRef } from 'react'
 
-const MouseMoveContext = createContext<boolean>(false)
+const MouseMoveContext = createContext<RefObject<boolean>>({ current: false })
 
 export function useMouseMoveContext() {
 	return useContext(MouseMoveContext)
 }
 
-export function useMouseMove<E extends HTMLElement = HTMLElement>(observedElementRef: RefObject<E>) {
-  const coordinates = useRef<[number | undefined, number | undefined]>([undefined, undefined])
+export function useMouseMove<E extends HTMLElement = HTMLElement>(observedElementRef: RefObject<E>): RefObject<boolean> {
 	const movingTimeout = useRef<number>(0)
-	const [mouseIsActive, setMouseIsActive] = useState(false)
+	const mouseActive = useRef(false)
 
   useEffect(() => {
 		if (!observedElementRef.current) {
@@ -18,19 +17,12 @@ export function useMouseMove<E extends HTMLElement = HTMLElement>(observedElemen
 
 		const element = observedElementRef.current
 
-		const mouseMoveListener = (event: MouseEvent) => {
-			const [x, y] = coordinates.current
-
-			if (x && y && (event.x !== x || event.y !== y)) {
-				setMouseIsActive(true)
-
-				window.clearTimeout(movingTimeout.current)
-				movingTimeout.current = window.setTimeout(() => {
-					setMouseIsActive(false)
-				}, 300)
-			}
-
-			coordinates.current = [event.x, event.y]
+		const mouseMoveListener = () => {
+			mouseActive.current = true
+			window.clearTimeout(movingTimeout.current)
+			movingTimeout.current = window.setTimeout(() => {
+				mouseActive.current = false
+			}, 300)
 		}
 
 		element.addEventListener('mousemove', mouseMoveListener)
@@ -40,7 +32,7 @@ export function useMouseMove<E extends HTMLElement = HTMLElement>(observedElemen
 		}
 	}, [observedElementRef])
 
-  return mouseIsActive
+  return mouseActive
 }
 
 export function MouseMoveProvider<E extends HTMLElement = HTMLElement>({
@@ -52,7 +44,9 @@ export function MouseMoveProvider<E extends HTMLElement = HTMLElement>({
 }) {
 	const mouseIsMoving = useMouseMove(elementRef)
 
-	return <MouseMoveContext.Provider value={mouseIsMoving}>
-		{children}
-	</MouseMoveContext.Provider>
+	return (
+		<MouseMoveContext.Provider value={mouseIsMoving}>
+			{children}
+		</MouseMoveContext.Provider>
+	)
 }

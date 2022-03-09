@@ -21,7 +21,7 @@ export function useMouseToFocus({
 		const titleRef = listItemTitleRef.current
 
 		const mouseOverListener = (event: MouseEvent) => {
-			if (event.defaultPrevented || !mouseIsMoving || liRef === document.activeElement) {
+			if (event.defaultPrevented || !mouseIsMoving.current || liRef === document.activeElement) {
 				return
 			}
 

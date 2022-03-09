@@ -131,33 +131,8 @@ export const DataGrid: FunctionComponent<DataGridProps> = Component(
 
 		return renderGrid(gridOptions, displayedState.treeRootId, displayedState.gridState, desiredState, environment)
 	},
-	(props, environment) => {
-		const columns = extractDataGridColumns(props.children)
-		const fakeState: DataGridState = {
-			columns,
-			paging: {
-				itemsPerPage: props.itemsPerPage ?? null,
-				pageIndex: 0,
-			},
-			hiddenColumns: {},
-			filterArtifacts: {},
-			orderDirections: {},
-		}
-
-		return renderGrid(
-			{
-				entities: props.entities,
-				updatePaging: noop,
-				setIsColumnHidden: noop,
-				setOrderBy: noop,
-				setFilter: noop,
-				containerProps: props,
-			},
-			undefined,
-			fakeState,
-			fakeState,
-			environment,
-		)
+	() => {
+		return null
 	},
 	'DataGrid',
 )

@@ -1,5 +1,7 @@
-import { defineConfig } from 'vite'
+import { defineConfig, loadEnv } from 'vite'
 
-export default defineConfig(env => ({
-	base: env.mode === 'production' ? '/{projectName}/' : '/',
+export default defineConfig(({ command, mode }) => ({
+	base: command === 'build'
+		? `/${loadEnv(mode, __dirname).VITE_CONTEMBER_ADMIN_PROJECT_NAME}/`
+		: '/',
 }))

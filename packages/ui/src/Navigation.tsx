@@ -1,8 +1,8 @@
-import { createContext, MouseEvent as ReactMouseEvent, useContext, useMemo } from 'react'
+import { createContext, SyntheticEvent, useContext, useMemo } from 'react'
 
 export interface NavigationLinkProps {
 	href: string
-	navigate: (e: ReactMouseEvent) => void
+	navigate: (e?: SyntheticEvent) => void
 	isActive: boolean
 }
 export type NavigationContext = <T extends any>(to: T) => NavigationLinkProps
@@ -13,7 +13,7 @@ export const NavigationContext = createContext<NavigationContext>(to => {
 	}
 	return {
 		href: to,
-		navigate: (e: ReactMouseEvent) => {
+		navigate: (e?: SyntheticEvent) => {
 			location.href = to
 			e?.preventDefault()
 		},

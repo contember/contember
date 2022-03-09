@@ -1,7 +1,8 @@
 @import '../../styles/common'
 
 .#{$cui-conf-globalPrefix}label
-	--cui-inset: var(--cui-gap)
+	--cui-inset-vertical: var(--cui-gap)
+	--cui-inset-horizontal: var(--cui-gap)
 
 	background-color: transparent
 	border: none
@@ -11,8 +12,8 @@
 	font-size: var(--cui-font-size-label)
 	font-weight: inherit
 	line-height: 1em
-	margin: calc(-1 * var(--cui-inset))
-	padding: var(--cui-inset)
+	margin: calc(-1 * var(--cui-inset-vertical)) calc(-1 * var(--cui-inset-horizontal))
+	padding: var(--cui-inset-vertical) var(--cui-inset-horizontal)
 	position: relative
 	text-align: inherit
 	text-decoration: none

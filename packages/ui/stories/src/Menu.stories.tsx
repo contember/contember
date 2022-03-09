@@ -56,6 +56,7 @@ const Template: ComponentStory<typeof Menu> = args => (
 													<Menu.Item title="So dark in here">
 														<Menu.Item title="I don't feel safe anymore" />
 														<Menu.Item title="Let me out!" />
+														<Menu.Item />
 													</Menu.Item>
 												</Menu.Item>
 											</Menu.Item>

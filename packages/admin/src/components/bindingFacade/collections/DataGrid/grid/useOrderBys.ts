@@ -2,7 +2,7 @@ import { useCallback } from 'react'
 import type { DataGridColumns, DataGridOrderDirectionStore, DataGridSetColumnOrderBy } from '../base'
 import type { GridPagingAction } from '../paging'
 import { normalizeInitialOrderBys } from './normalizeInitialOrderBys'
-import { useSessionStorageState } from './useStoredState'
+import { useSessionStorageState } from '@contember/react-utils'
 
 export const useOrderBys = (
 	columns: DataGridColumns,

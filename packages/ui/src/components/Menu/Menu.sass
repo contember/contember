@@ -1,0 +1,115 @@
+.#{$cui-conf-globalPrefix}menu
+	--cui-menu-background-color-focused: var(--cui-toned-control-background-color)
+
+	user-select: none
+
+	&-list
+		list-style: none
+		padding: 0
+		margin: 0
+
+	li
+		@extend %implementsCustomFocusEffects
+
+
+	li:focus > &-section-title .#{$cui-conf-globalPrefix}label,
+	li:focus > &-group-title  .#{$cui-conf-globalPrefix}label
+		color: var(--cui-control-color--highlighted)
+		background-color: var(--cui-menu-background-color-focused)
+
+	.#{$cui-conf-globalPrefix}label
+		--cui-inset-vertical: calc(1.5 * var(--cui-gap))
+		--cui-inset-horizontal: calc(1.5 * var(--cui-gap-horizontal))
+	.is-active > .#{$cui-conf-globalPrefix}label
+		background-color: var(--cui-toned-control-background-color--highlighted)
+		color: var(--cui-toned-control-color--highlighted)
+
+	&-expand-toggle
+		--cui-expand-toggle-size: calc(5 * var(--cui-gap))
+		border: 0
+		color: inherit
+		height: var(--cui-expand-toggle-size)
+		padding: 0
+		position: absolute
+		right: calc(100% + 1.5 * var(--cui-gap))
+		width: var(--cui-expand-toggle-size)
+		&::before
+			$caret-size: 0.4em
+			border-bottom: rem(1.75px) solid var(--cui-color--high)
+			border-right: rem(1.75px) solid var(--cui-color--high)
+			bottom: 0
+			content: ''
+			display: inline-block
+			height: $caret-size
+			left: calc(var(--cui-expand-toggle-size) / 2 - #{($caret-size * 0.5)})
+			margin: auto
+			position: absolute
+			top: -0.15em
+			transform-origin: 70% 70%
+			transform: rotate(45deg)
+			transition: transform var(--cui-transition-duration--fast)
+			width: $caret-size
+			z-index: 1
+		&.is-collapsed::before
+			transform: rotate(-45deg)
+		&[disabled]
+			display: none
+		&-label
+			visibility: hidden
+
+	&-section,
+	&-group
+		&-title
+			align-items: center
+			display: flex
+			font-weight: 600
+			position: relative
+			&-content
+				display: flex
+				flex-direction: column
+				flex: 1
+				margin: 0 calc(-2 * var(--cui-gap))
+				padding: calc(2 * var(--cui-gap))
+
+	&-section
+		margin-left: var(--cui-edge-offset-left)
+		padding-bottom: calc(var(--cui-padding-vertical) / 2)
+		padding-right: 0
+		padding-top: calc(var(--cui-padding-vertical) / 2)
+		position: relative
+		&::after
+			border-bottom: 1px solid var(--cui-color--lower)
+			content: ""
+			display: block
+			left: var(--cui-padding-left)
+			position: absolute
+			right: 0
+			top: 0
+		&-title
+			&-content
+				font-size: var(--cui-font-size-note)
+			letter-spacing: 0.125em
+			margin-bottom: var(--cui-gap)
+			margin-left: var(--cui-padding-left)
+			margin-right: var(--cui-padding-right)
+			margin-top: var(--cui-gap)
+			padding-bottom: var(--cui-gap-vertical)
+			padding-top: var(--cui-gap-vertical)
+			text-transform: uppercase
+			&.is-active:after
+				visibility: unset
+		&-list
+			list-style: none
+			margin-bottom: 0
+			margin-left: var(--cui-padding-left)
+			margin-right: var(--cui-padding-right)
+			margin-top: 0
+			padding: 0
+
+	&-group
+		&.is-interactive > &-title
+			color: var(--cui-control-color)
+		&-list
+			list-style: none
+			padding-left: calc(4 * var(--cui-gap-horizontal))
+			position: relative

@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react'
-import { Serializable } from '../base'
+import { Serializable } from '../types'
 
 type SetState<V extends Serializable> = (value: V | ((current: V) => V)) => void;
 type ValueInitializer<V extends Serializable> = (storedValue: V | undefined) => V;

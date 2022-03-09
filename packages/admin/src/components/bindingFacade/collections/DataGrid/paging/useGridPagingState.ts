@@ -1,7 +1,7 @@
 import { useCallback } from 'react'
 import { gridPagingReducer } from './gridPagingReducer'
 import type { GridPagingState } from './GridPagingState'
-import { useSessionStorageState } from '../grid/useStoredState'
+import { useSessionStorageState } from '@contember/react-utils'
 import { GridPagingAction } from './GridPagingAction'
 
 export const useGridPagingState = (itemsPerPage: number | null, dataGridKey: string): [GridPagingState, (action: GridPagingAction) => void] => {

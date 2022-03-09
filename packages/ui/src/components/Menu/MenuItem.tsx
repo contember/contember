@@ -1,12 +1,12 @@
 import classNames from 'classnames'
-import { KeyboardEvent as ReactKeyboardEvent, KeyboardEventHandler, SyntheticEvent, useCallback, useContext, useEffect, useRef, useState } from 'react'
+import { SyntheticEvent, useCallback, useContext, useEffect, useRef } from 'react'
 import { randomId, useComponentClassName } from '../../auxiliary'
 import { useNavigationLink } from '../../Navigation'
 import { toStateClass, useChildrenAsLabel } from '../../utils'
 import { Collapsible } from '../Collapsible'
 import { usePreventCloseContext } from '../PreventCloseContext'
-import { Label } from '../Typography/Label'
-import { DepthContext, ExpandParentContext, useExpandParentContext, useFocusableContext } from './Contexts'
+import { Label } from '../Typography'
+import { DepthContext, ExpandParentContext, useExpandParentContext } from './Contexts'
 import { MenuExpandToggle } from './ExpandToggle'
 import { MenuLink } from './MenuLink'
 import { MenuItemProps, TAB_INDEX_FOCUSABLE, TAB_INDEX_NEVER_FOCUSABLE, TAB_INDEX_TEMPORARY_UNFOCUSABLE } from './Types'
@@ -14,6 +14,7 @@ import { useActiveMenuItemContext } from './useActiveMenuItem'
 import { useMouseToFocus } from './useMouseToFocus'
 import { useMenuId } from './useMenuId'
 import { useSessionStorageState } from '@contember/react-utils'
+import { useKeyNavigation } from './useKeyNavigation'
 
 
 export function MenuItem<T extends any = any>({ children, ...props }: MenuItemProps<T>) {
@@ -96,70 +97,22 @@ export function MenuItem<T extends any = any>({ children, ...props }: MenuItemPr
 		event.preventDefault()
 	}, [expanded, changeExpand, isInteractive, navigate, preventMenuClose])
 
-	const { nextFocusable, previousFocusable } = useFocusableContext()
 
 	useMouseToFocus({ listItemRef, listItemTitleRef, tabIndex })
 
-	const onKeyPress = useCallback<KeyboardEventHandler<HTMLLIElement>>((event: ReactKeyboardEvent<HTMLLIElement>) => {
-		if (!listItemRef.current || event.defaultPrevented) {
-			return
-		}
+	const onKeyPress = useKeyNavigation({ changeExpand, expanded, depth, isInteractive, listItemRef, onClick: onLabelClick })
 
-		if (document.activeElement !== listItemRef.current) {
-			if (depth > 0 && event.code === 'ArrowLeft' && expanded) {
-				changeExpand(false)
-				listItemRef.current.focus()
-				event.preventDefault()
-			}
-
-			return
-		}
-
-		switch (event.code) {
-			case 'ArrowLeft':
-				if (expanded) {
-					changeExpand(false)
-				} else {
-					previousFocusable()?.focus()
-				}
-				event.preventDefault()
-				break
-			case 'ArrowRight':
-				if (!expanded && isInteractive) {
-					changeExpand(true)
-				} else {
-					nextFocusable()?.focus()
-				}
-				event.preventDefault()
-				break
-			case 'Space':
-				changeExpand(!expanded)
-				event.preventDefault()
-				break
-			case 'Enter':
-				onLabelClick(event)
-				event.preventDefault()
-				break
-			case 'ArrowUp':
-				previousFocusable()?.focus()
-				event.preventDefault()
-				break
-			case 'ArrowDown':
-				nextFocusable()?.focus()
-				event.preventDefault()
-				break
-		}
-	}, [changeExpand, depth, expanded, isInteractive, nextFocusable, onLabelClick, previousFocusable])
-
-	const submenu = <ul
-		aria-labelledby={isInteractive ? id.current : undefined}
-		className={classNames(
-			`${componentClassName}-list`,
-			hasSubItems && (expanded ? 'is-expanded' : 'is-collapsed'),
-		)}
-	>
-		{children}
-	</ul>
+	const submenu = (
+		<ul
+			aria-labelledby={isInteractive ? id.current : undefined}
+			className={classNames(
+				`${componentClassName}-list`,
+				hasSubItems && (expanded ? 'is-expanded' : 'is-collapsed'),
+			)}
+		>
+			{children}
+		</ul>
+	)
 
 	const label = useChildrenAsLabel(props.title)
 

@@ -5,17 +5,9 @@ export const collectOrderBy = (
 	columns: DataGridColumns,
 	directionStore: DataGridOrderDirectionStore,
 	environment: Environment,
-): OrderBy | undefined => {
-	// TODO This implementation uses column order. Shouldn't we use insertion order instead?
-	const mapped: OrderBy[] = []
-
-	for (const [key, direction] of Object.entries(directionStore)) {
+): OrderBy => {
+	return Object.entries(directionStore).flatMap(([key, direction]) => {
 		const orderBy = getColumnOrderBy(columns, key, direction, environment)
-
-		if (orderBy !== undefined) {
-			mapped.push(orderBy)
-		}
-	}
-
-	return mapped.length ? mapped.flat(1) : undefined
+		return orderBy ?? []
+	})
 }

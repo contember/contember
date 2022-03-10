@@ -3,6 +3,7 @@ import { array, object, ParseError, string } from '../utils/schema'
 import { BaseController } from './BaseController'
 import type { TenantClient } from '../services/TenantClient'
 import type { S3Manager } from '../services/S3Manager'
+import { ForbiddenError, SystemClient } from '../services/SystemClient'
 
 type PayloadType = ReturnType<typeof PayloadType>
 const PayloadType = object({
@@ -22,7 +23,11 @@ interface DeployParams {
 }
 
 export class DeployController extends BaseController<DeployParams> {
-	constructor(private tenant: TenantClient, private s3: S3Manager) {
+	constructor(
+		private readonly tenant: TenantClient,
+		private readonly systemClient: SystemClient,
+		private readonly s3: S3Manager,
+	) {
 		super()
 	}
 
@@ -53,6 +58,16 @@ export class DeployController extends BaseController<DeployParams> {
 			res.writeHead(403)
 			res.end(`provided token is not authorized to access project ${payload.project}`)
 			return
+		}
+		try {
+			await this.systemClient.migrate({ token, project: payload.project, projectGroup, migrations: [] })
+		} catch (e) {
+			if (e instanceof ForbiddenError) {
+				res.writeHead(403)
+				res.end(`provided token is not authorized to deploy project ${payload.project}`)
+				return
+			}
+			throw e
 		}
 
 		const filesWithWrongPath = payload.files.filter(file => !SIMPLE_PATH.test(file.path))

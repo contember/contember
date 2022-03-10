@@ -1,7 +1,6 @@
-import fetch, { Response } from 'node-fetch'
+import { Response } from 'node-fetch'
 import { array, nullable, object, string } from '../utils/schema'
-import { ApiEndpointResolver } from './ApiEndpointResolver'
-import { BadRequestError } from '../BadRequestError'
+import { ApiRequest, ApiRequestSender } from './ApiRequestSender'
 
 const ProjectBySlugResponseType = object({
 	data: object({
@@ -44,16 +43,11 @@ const MeResponseType = object({
 	}),
 })
 
-interface TenantApiRequest {
-	token: string
-	query: string
-	variables?: any
-	projectGroup?: string
-}
+type TenantApiRequest = Omit<ApiRequest, 'path'>
 
 export class TenantClient {
 	constructor(
-		private apiEndpointResolver: ApiEndpointResolver,
+		private apiRequestSender: ApiRequestSender,
 	) {}
 
 	async hasProjectAccess(token: string, projectSlug: string, projectGroup: string | undefined): Promise<boolean> {
@@ -122,20 +116,7 @@ export class TenantClient {
 		return payload.data.me
 	}
 
-	private async request({ token, query, variables, projectGroup }: TenantApiRequest): Promise<Response> {
-		const resolved = this.apiEndpointResolver.resolve(projectGroup)
-		if (!resolved) {
-			throw new BadRequestError(400, 'Cannot resolve API endpoint')
-		}
-		const { endpoint, hostname } = resolved
-		return await fetch(`${endpoint.toString()}tenant`, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				'Authorization': `Bearer ${token}`,
-				'Host': hostname,
-			},
-			body: JSON.stringify({ query, variables }),
-		})
+	private async request(request: TenantApiRequest): Promise<Response> {
+		return this.apiRequestSender.send({ ...request, path: 'tenant' })
 	}
 }

@@ -21,6 +21,7 @@ import { S3LocationResolver } from './services/S3LocationResolver'
 import { readHostFromHeader } from './utils/readHostFromHeader'
 import { CollaborationController } from './controllers/CollaborationController'
 import { CollaborationRedisKeys, CollaborationRedisStorage } from './services/CollaborationStorage'
+import { ApiRequestSender } from './services/ApiRequestSender'
 
 export default new Builder({})
 	.addService('env', env)
@@ -33,8 +34,12 @@ export default new Builder({})
 		return new ApiEndpointResolver(env.CONTEMBER_API_ENDPOINT, env.CONTEMBER_API_HOSTNAME)
 	})
 
-	.addService('tenant', ({ apiEndpointResolver }) => {
-		return new TenantClient(apiEndpointResolver)
+	.addService('apiRequestSender', ({ apiEndpointResolver }) => {
+		return new ApiRequestSender(apiEndpointResolver)
+	})
+
+	.addService('tenant', ({ apiRequestSender }) => {
+		return new TenantClient(apiRequestSender)
 	})
 
 	.addService('s3LocationResolver', ({ env }) => {

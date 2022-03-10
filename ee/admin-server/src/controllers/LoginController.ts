@@ -3,7 +3,8 @@ import { BaseController } from './BaseController'
 import { LOGIN_TOKEN_PLACEHOLDER } from './ApiController'
 import { StaticFileHandler } from '../services/StaticFileHandler'
 import { S3Manager } from '../services/S3Manager'
-import { BaseLoginConfig, customLoginConfigSchema } from '../loginConfig'
+import { BaseLoginConfig, customLoginConfigSchema } from '../config'
+import { ConfigResolver } from '../services/ConfigResolver'
 
 const CONTEMBER_CONFIG_PLACEHOLDER = '{configuration}'
 
@@ -15,6 +16,7 @@ export class LoginController extends BaseController<LoginParams> {
 	constructor(
 		private staticFileHandler: StaticFileHandler,
 		private s3Manager: S3Manager,
+		private configResolver: ConfigResolver,
 	) {
 		super()
 	}
@@ -24,24 +26,13 @@ export class LoginController extends BaseController<LoginParams> {
 			fileProcessor: async (path, content, req) => {
 				if (path === 'index.html') {
 					const projects = await this.s3Manager.listProjectSlugs({ projectGroup })
-					let customConfig = {}
-					try {
-						const configContent = await this.s3Manager.getObjectContent({
-							projectGroup,
-							path: 'login-config.json',
-						})
-						customConfig = customLoginConfigSchema(JSON.parse(configContent))
-					} catch (e) {
-						if (!(typeof e === 'object' && 'name' in e && e.name === 'NoSuchKey')) {
-							throw e
-						}
-					}
+					const customConfig = await this.configResolver.getConfig(projectGroup)
 					const baseConfig: BaseLoginConfig = {
 						apiBaseUrl: '/_api',
 						loginToken: LOGIN_TOKEN_PLACEHOLDER,
 						projects,
 					}
-					const configJson = JSON.stringify({ ...baseConfig, ...customConfig })
+					const configJson = JSON.stringify({ ...baseConfig, ...customConfig.login })
 					return content.toString('utf8').replace(CONTEMBER_CONFIG_PLACEHOLDER, configJson)
 				}
 				return content

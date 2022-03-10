@@ -1,6 +1,6 @@
 import { ContemberClient } from '@contember/react-client'
-import { Button, ErrorList, Icon, Stack } from '@contember/ui'
-import { FC, ReactNode, useMemo, useState } from 'react'
+import { Button, ErrorList, Icon, Stack, StyleProvider } from '@contember/ui'
+import { FC, ReactNode, useEffect, useMemo, useState } from 'react'
 import { Link, RequestProvider, RoutingContext, RoutingContextValue } from '../../routing'
 import {
 	CreateResetPasswordRequestForm,
@@ -23,7 +23,7 @@ export interface LoginEntrypointProps {
 	loginToken: string
 	sessionToken?: string
 	basePath?: string
-	projects: readonly string[]
+	projects: readonly string[] | (() => Promise<readonly string[]>)
 	identityProviders?: readonly IDP[]
 	formatProjectUrl: (project: Project) => string
 	heading?: string
@@ -50,56 +50,58 @@ export const LoginEntrypoint = (props: LoginEntrypointProps) => {
 			sessionToken={props.sessionToken}
 			loginToken={props.loginToken}
 		>
-			<ToasterProvider>
-				<RoutingContext.Provider value={routing}>
-					<RequestProvider>
-						<Pages>
-							<Page name={indexPageName}>
-								<IdentityProvider allowUnauthenticated={true}>
-									<LoginEntrypointIndex
-										projects={props.projects}
-										formatProjectUrl={props.formatProjectUrl}
-										identityProviders={props.identityProviders}
-										heading={props.heading}
-										projectsPageActions={props.projectsPageActions}
-										collapsedEmailLogin={props.collapsedEmailLogin}
-									/>
-								</IdentityProvider>
-							</Page>
-							<Page name={resetRequestPageName}>
-								<MiscPageLayout heading="Password reset" actions={<>
-									<Link to={indexPageName}>&larr; Back to login</Link>
-								</>}>
-									<CreateResetPasswordRequestForm redirectOnSuccess={redirectOnSuccessPageName} />
-								</MiscPageLayout>
-							</Page>
-							<Page name={redirectOnSuccessPageName}>
-								<MiscPageLayout heading="Password reset" actions={<>
-									<Link to={indexPageName}>&larr; Back to login</Link>
-								</>}>
-									<p>
-										Password reset request has been successfully created. Please check your inbox for the instructions.
-									</p>
-									<p>
-										Please follow the link in e-mail or copy the reset token here:
-									</p>
-									<FillResetPasswordTokenForm resetLink={token => ({ pageName: passwordResetPageName, parameters: { token } })} />
-								</MiscPageLayout>
-							</Page>
-							<Page name={passwordResetPageName}>
-								{({ token }: { token: string }) => (
-									<MiscPageLayout heading="Set a new password" actions={<>
+			<StyleProvider>
+				<ToasterProvider>
+					<RoutingContext.Provider value={routing}>
+						<RequestProvider>
+							<Pages>
+								<Page name={indexPageName}>
+									<IdentityProvider allowUnauthenticated={true}>
+										<LoginEntrypointIndex
+											projects={props.projects}
+											formatProjectUrl={props.formatProjectUrl}
+											identityProviders={props.identityProviders}
+											heading={props.heading}
+											projectsPageActions={props.projectsPageActions}
+											collapsedEmailLogin={props.collapsedEmailLogin}
+										/>
+									</IdentityProvider>
+								</Page>
+								<Page name={resetRequestPageName}>
+									<MiscPageLayout heading="Password reset" actions={<>
 										<Link to={indexPageName}>&larr; Back to login</Link>
 									</>}>
-										<ResetPasswordForm token={token} redirectOnSuccess={indexPageName} />
+										<CreateResetPasswordRequestForm redirectOnSuccess={redirectOnSuccessPageName} />
 									</MiscPageLayout>
-								)}
-							</Page>
-						</Pages>
-					</RequestProvider>
-				</RoutingContext.Provider>
-				<Toaster />
-			</ToasterProvider>
+								</Page>
+								<Page name={redirectOnSuccessPageName}>
+									<MiscPageLayout heading="Password reset" actions={<>
+										<Link to={indexPageName}>&larr; Back to login</Link>
+									</>}>
+										<p>
+											Password reset request has been successfully created. Please check your inbox for the instructions.
+										</p>
+										<p>
+											Please follow the link in e-mail or copy the reset token here:
+										</p>
+										<FillResetPasswordTokenForm resetLink={token => ({ pageName: passwordResetPageName, parameters: { token } })} />
+									</MiscPageLayout>
+								</Page>
+								<Page name={passwordResetPageName}>
+									{({ token }: { token: string }) => (
+										<MiscPageLayout heading="Set a new password" actions={<>
+											<Link to={indexPageName}>&larr; Back to login</Link>
+										</>}>
+											<ResetPasswordForm token={token} redirectOnSuccess={indexPageName} />
+										</MiscPageLayout>
+									)}
+								</Page>
+							</Pages>
+						</RequestProvider>
+					</RoutingContext.Provider>
+					<Toaster />
+				</ToasterProvider>
+			</StyleProvider>
 		</ContemberClient>
 	)
 }
@@ -107,14 +109,38 @@ export const LoginEntrypoint = (props: LoginEntrypointProps) => {
 const LoginEntrypointIndex: FC<Pick<LoginEntrypointProps, 'projects' | 'formatProjectUrl' | 'identityProviders' | 'heading' | 'projectsPageActions' | 'collapsedEmailLogin'>> = props => {
 	const logout = useLogout()
 	const identity = useOptionalIdentity()
-	const projects = useMemo(() => {
-		return identity?.projects.filter(it => props.projects.includes(it.slug))
-	}, [identity?.projects, props.projects])
+	const [projectSlugs, setProjectSlugs] = useState<readonly string[]>()
+	const projectsProvider = props.projects
+	useEffect(() => {
+		(async () => {
+			if (identity === undefined) {
+				return
+			}
+			setProjectSlugs(projectsProvider instanceof Function ? await projectsProvider() : projectsProvider)
+		})()
+	}, [identity, projectsProvider])
 
-	if (!projects) {
+	const projects = useMemo(() => {
+		return identity?.projects.filter(it => projectSlugs?.includes(it.slug))
+	}, [identity?.projects, projectSlugs])
+
+	if (identity === undefined) {
 		return (
 			<MiscPageLayout heading={props.heading ?? 'Contember Admin'}>
 				<LoginContainer identityProviders={props.identityProviders} collapsedEmailLogin={props.collapsedEmailLogin} />
+			</MiscPageLayout>
+		)
+
+	} else if (projects === undefined) {
+		return (
+			<MiscPageLayout
+				heading="Projects"
+				actions={<>
+					{props.projectsPageActions}
+					<Button onClick={() => logout()} size={'small'} distinction={'seamless'}><Icon blueprintIcon={'log-out'} /></Button>
+				</>}
+			>
+				Loading projects...
 			</MiscPageLayout>
 		)
 

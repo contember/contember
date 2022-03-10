@@ -3,6 +3,7 @@ import type { IncomingMessage, ServerResponse } from 'http'
 import type { TenantClient } from '../services/TenantClient'
 import type { S3Manager } from '../services/S3Manager'
 import { readAuthCookie } from '../utils/cookies'
+import { ConfigResolver } from '../services/ConfigResolver'
 
 interface MeResponsePayload {
 	email: string
@@ -20,7 +21,11 @@ interface MeParams {
 }
 
 export class MeController extends BaseController<MeParams> {
-	constructor(private tenant: TenantClient, private s3: S3Manager) {
+	constructor(
+		private tenant: TenantClient,
+		private s3: S3Manager,
+		private configResolver: ConfigResolver,
+	) {
 		super()
 	}
 
@@ -39,10 +44,15 @@ export class MeController extends BaseController<MeParams> {
 			return
 		}
 
+		const config = await this.configResolver.getConfig(projectGroup)
 		const projectsWithAdmin = await this.s3.listProjectSlugs({ projectGroup })
 		const projects = me.projects
 			.filter(it => projectsWithAdmin.includes(it.project.slug))
 			.map(it => ({ name: it.project.name, slug: it.project.slug, roles: it.memberships.map(it => it.role) }))
+			.filter(it => {
+				const allowedRoles = config?.projects?.[it.slug]?.allowedRoles
+				return allowedRoles === undefined || it.roles.some(role => allowedRoles.includes(role))
+			})
 
 		const payload: MeResponsePayload = { email: me.person.email, personId: me.person.id, projects	}
 		res.setHeader('Content-Type', 'application/json')

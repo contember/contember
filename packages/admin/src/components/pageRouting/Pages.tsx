@@ -19,14 +19,15 @@ export type PageSetProviderElement = ReactElement<any, ComponentType & PageSetPr
 
 type EmptyObject = Record<any, never>
 
-interface LazyPage {
+interface PageModule {
 	[action: string]: ComponentType | undefined
 }
 
-type LazyPageProvider = () => Promise<LazyPage>
+type LazyPageModule = () => Promise<PageModule>
 
 type PagesMapElement =
-	| LazyPageProvider
+	| LazyPageModule
+	| PageModule
 	| ComponentType
 	| PageProviderElement
 	| PageSetProviderElement
@@ -100,13 +101,13 @@ export const Pages = ({ children, layout }: PagesProps) => {
 				return new Map([[children.type.getPageName(children.props), disallowAction(() => children)]])
 
 			} else {
-				const lazyPrefix = findPrefix(Object.entries(children).flatMap(([k, v]) => isLazyPageProvider(k, v) ? [k] : []))
+				const lazyPrefix = findPrefix(Object.entries(children).flatMap(([k, v]) => isLazyPageModule(k, v) || isEagerPageModule(k, v) ? [k] : []))
 
 				return new Map(Object.entries(children).flatMap(([k, v]): [string, ComponentType<{ action?: string }>][] => {
-					if (isLazyPageProvider(k, v)) {
+					if (isLazyPageModule(k, v)) { // children={import.meta.glob('./pages/**/*.tsx')}
 						const pageName = k.slice(lazyPrefix.length, -4)
 
-						const WithFallback = (props: { action?: string }) => {
+						const PageActionHandler = (props: { action?: string }) => {
 							const Lazy = lazy(async () => {
 								const module = await v()
 								const page = module[props.action ?? 'default']
@@ -121,7 +122,22 @@ export const Pages = ({ children, layout }: PagesProps) => {
 							return <Suspense fallback={<ContainerSpinner />}><Lazy /></Suspense>
 						}
 
-						return [[pageName, WithFallback]]
+						return [[pageName, PageActionHandler]]
+
+					} else if (isEagerPageModule(k, v)) { // children={import.meta.globEager('./pages/**/*.tsx')}
+						const pageName = k.slice(lazyPrefix.length, -4)
+
+						const PageActionHandler = (props: { action?: string }) => {
+							const Page = v[props.action ?? 'default']
+
+							if (Page === undefined) {
+								throw new Error(`No such page as ${pageName}${props.action ? '/' + props.action : ''}.`)
+							}
+
+							return isValidElement(Page) ? Page : <Page />
+						}
+
+						return [[pageName, PageActionHandler]]
 
 					} else {
 						const pageName = k.slice(0, 1).toLowerCase() + k.slice(1)
@@ -206,6 +222,10 @@ function isPageSetProviderElement(el: ReactNode): el is PageSetProviderElement {
 	return isValidElement(el) && typeof el.type !== 'string' && isPageSetProvider(el.type)
 }
 
-function isLazyPageProvider(name: string, it: any): it is LazyPageProvider {
+function isLazyPageModule(name: string, it: any): it is LazyPageModule {
 	return (name.endsWith('.tsx') || name.endsWith('.jsx')) && typeof it === 'function'
+}
+
+function isEagerPageModule(name: string, it: any): it is PageModule {
+	return (name.endsWith('.tsx') || name.endsWith('.jsx')) && typeof it === 'object'
 }

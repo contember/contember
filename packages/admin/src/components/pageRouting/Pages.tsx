@@ -35,10 +35,6 @@ export interface PagesProps {
 
 type PageActionHandler = ComponentType<{ action?: string }>
 
-function isPageList(children: ReactNodeArray): children is PageProviderElement[] {
-	return children.every(child => isPageProviderElement(child))
-}
-
 function findPrefix(strings: string[]): string {
 	const sorted = [...strings].sort()
 	const a = sorted[0]
@@ -82,7 +78,7 @@ export const Pages = ({ children, layout }: PagesProps) => {
 	const pageMap = useMemo<Map<string, PageActionHandler>>(
 		() => {
 			if (Array.isArray(children)) {
-				if (isPageList(children)) {
+				if (children.every(child => isPageProviderElement(child))) {
 					return new Map(children.map(child => [child.type.getPageName(child.props), disallowAction(() => child)]))
 
 				} else {
@@ -93,11 +89,12 @@ export const Pages = ({ children, layout }: PagesProps) => {
 				return new Map([[children.type.getPageName(children.props), disallowAction(() => children)]])
 
 			} else {
-				const lazyPrefix = findPrefix(Object.entries(children).flatMap(([k, v]) => isLazyPageModule(k, v) || isEagerPageModule(k, v) ? [k] : []))
+				const modules = Object.entries(children).filter(([k, v]) => isLazyPageModule(k, v) || isEagerPageModule(k, v))
+				const modulesPrefix = findPrefix(modules.map(it => it[0]))
 
 				return new Map(Object.entries(children).flatMap(([k, v]): [string, PageActionHandler][] => {
 					if (isLazyPageModule(k, v)) { // children={import.meta.glob('./pages/**/*.tsx')}
-						const pageName = k.slice(lazyPrefix.length, -4)
+						const pageName = k.slice(modulesPrefix.length, -4)
 
 						const PageActionHandler = (props: { action?: string }) => {
 							const Lazy = lazy(async () => {
@@ -117,7 +114,7 @@ export const Pages = ({ children, layout }: PagesProps) => {
 						return [[pageName, PageActionHandler]]
 
 					} else if (isEagerPageModule(k, v)) { // children={import.meta.globEager('./pages/**/*.tsx')}
-						const pageName = k.slice(lazyPrefix.length, -4)
+						const pageName = k.slice(modulesPrefix.length, -4)
 
 						const PageActionHandler = (props: { action?: string }) => {
 							const Page = v[props.action ?? 'default']

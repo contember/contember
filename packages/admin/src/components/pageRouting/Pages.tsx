@@ -1,15 +1,6 @@
 import { Environment, EnvironmentContext, useEnvironment } from '@contember/binding'
-import { Message } from '@contember/ui'
-import {
-	ComponentType,
-	Fragment,
-	isValidElement,
-	ReactElement,
-	ReactNode,
-	ReactNodeArray,
-	useMemo,
-	useRef,
-} from 'react'
+import { ContainerSpinner, Message } from '@contember/ui'
+import { ComponentType, Fragment, isValidElement, lazy, ReactElement, ReactNode, ReactNodeArray, Suspense, useMemo, useRef } from 'react'
 import { useCurrentRequest } from '../../routing'
 import { MiscPageLayout } from '../MiscPageLayout'
 import { PageErrorBoundary } from './PageErrorBoundary'
@@ -20,20 +11,19 @@ export interface PageProvider<P> {
 
 export type PageProviderElement = ReactElement<any, ComponentType & PageProvider<any>>
 
-export interface PageSetProvider<P> {
-	getPages(props: P): Record<string, ComponentType>
+export interface PageModule {
+	[action: string]: ComponentType | ReactElement | undefined
 }
 
-export type PageSetProviderElement = ReactElement<any, ComponentType & PageSetProvider<any>>
+export type LazyPageModule = () => Promise<PageModule>
 
-type EmptyObject = Record<any, never>
-
-type PagesMapElement =
+export type PagesMapElement =
+	| LazyPageModule
+	| PageModule
 	| ComponentType
 	| PageProviderElement
-	| PageSetProviderElement
-	| PageSetProvider<EmptyObject>;
-type PagesMap = Record<string, PagesMapElement>
+
+export type PagesMap = Record<string, PagesMapElement>
 
 export interface PagesProps {
 	children:
@@ -43,9 +33,37 @@ export interface PagesProps {
 	layout?: ComponentType<{ children?: ReactNode }>
 }
 
+type PageActionHandler = ComponentType<{ action?: string }>
 
-function isPageList(children: ReactNodeArray): children is PageProviderElement[] {
-	return children.every(child => isPageProviderElement(child))
+function findPrefix(strings: string[]): string {
+	const sorted = [...strings].sort()
+	const a = sorted[0]
+	const b = sorted[sorted.length - 1]
+
+	let i = 0
+	let j = 0
+
+	while (j < a.length && a.charAt(j) === b.charAt(j)) {
+		j++
+
+		if (a.charAt(j) === '/') {
+			i = j + 1
+		}
+	}
+
+	return a.substring(0, i)
+}
+
+function disallowAction(Component: ComponentType): PageActionHandler {
+	return (props: { action?: string }) => {
+		const pageName = useCurrentRequest()?.pageName
+
+		if (props.action !== undefined) {
+			throw new Error(`No such page as ${pageName}.`)
+		}
+
+		return <Component />
+	}
 }
 
 /**
@@ -57,30 +75,68 @@ export const Pages = ({ children, layout }: PagesProps) => {
 	const requestId = useRef<number>(0)
 	const Layout = layout ?? Fragment
 
-	const pageMap = useMemo<Map<string, ComponentType>>(
+	const pageMap = useMemo<Map<string, PageActionHandler>>(
 		() => {
 			if (Array.isArray(children)) {
-				if (isPageList(children)) {
-					return new Map(children.map(child => [child.type.getPageName(child.props), () => child]))
+				if (children.every(child => isPageProviderElement(child))) {
+					return new Map(children.map(child => [child.type.getPageName(child.props), disallowAction(() => child)]))
 
 				} else {
 					throw new Error('Pages has a child which is not a Page')
 				}
 
 			} else if (isPageProviderElement(children)) {
-				return new Map([[children.type.getPageName(children.props), () => children]])
+				return new Map([[children.type.getPageName(children.props), disallowAction(() => children)]])
 
 			} else {
-				return new Map(Object.entries(children).flatMap(([k, v]): [string, ComponentType][] => {
-					const pageName = k.slice(0, 1).toLowerCase() + k.slice(1)
-					if (isPageSetProvider<EmptyObject>(v)) {
-						return Object.entries(v.getPages({}))
-					} else if (isPageSetProviderElement(v)) {
-						return Object.entries(v.type.getPages(v.props))
-					} else if (isPageProviderElement(v)) {
-						return [[v.type.getPageName(v.props, pageName), () => v]]
+				const modules = Object.entries(children).filter(([k, v]) => isLazyPageModule(k, v) || isEagerPageModule(k, v))
+				const modulesPrefix = findPrefix(modules.map(it => it[0]))
+
+				return new Map(Object.entries(children).flatMap(([k, v]): [string, PageActionHandler][] => {
+					if (isLazyPageModule(k, v)) { // children={import.meta.glob('./pages/**/*.tsx')}
+						const pageName = k.slice(modulesPrefix.length, -4)
+
+						const PageActionHandler = (props: { action?: string }) => {
+							const Lazy = lazy(async () => {
+								const module = await v()
+								const page = module[props.action ?? 'default']
+
+								if (page === undefined) {
+									throw new Error(`No such page as ${pageName}${props.action ? '/' + props.action : ''}.`)
+								}
+
+								return { default: isValidElement(page) ? () => page : page }
+							})
+
+							return <Suspense fallback={<ContainerSpinner />}><Lazy /></Suspense>
+						}
+
+						return [[pageName, PageActionHandler]]
+
+					} else if (isEagerPageModule(k, v)) { // children={import.meta.globEager('./pages/**/*.tsx')}
+						const pageName = k.slice(modulesPrefix.length, -4)
+
+						const PageActionHandler = (props: { action?: string }) => {
+							const Page = v[props.action ?? 'default']
+
+							if (Page === undefined) {
+								throw new Error(`No such page as ${pageName}${props.action ? '/' + props.action : ''}.`)
+							}
+
+							return isValidElement(Page) ? Page : <Page />
+						}
+
+						return [[pageName, PageActionHandler]]
+
 					} else {
-						return [[pageName, v]]
+						const pageName = k.slice(0, 1).toLowerCase() + k.slice(1)
+
+						if (isPageProviderElement(v)) {
+							return [[v.type.getPageName(v.props, pageName), disallowAction(() => v)]]
+
+						} else {
+							return [[pageName, disallowAction(v)]]
+						}
 					}
 				}))
 			}
@@ -101,7 +157,19 @@ export const Pages = ({ children, layout }: PagesProps) => {
 			throw new Error(`Cannot use ${reservedVariableName} as parameter name.`)
 		}
 	}
-	const Page = pageMap.get(request.pageName)
+
+	let pageKey = request.pageName
+	let pageAction = undefined
+	let Page = pageMap.get(pageKey)
+
+	if (Page === undefined) {
+		const pos = request.pageName.lastIndexOf('/')
+		if (pos > 0) {
+			pageKey = request.pageName.slice(0, pos)
+			pageAction = request.pageName.slice(pos + 1)
+			Page = pageMap.get(pageKey)
+		}
+	}
 
 	if (Page === undefined) {
 		throw new Error(`No such page as ${request.pageName}.`)
@@ -114,7 +182,7 @@ export const Pages = ({ children, layout }: PagesProps) => {
 	return (
 		<EnvironmentContext.Provider value={requestEnv}>
 			<Layout>
-				<PageErrorBoundary key={requestId.current++}><Page /></PageErrorBoundary>
+				<PageErrorBoundary key={requestId.current++}><Page action={pageAction} /></PageErrorBoundary>
 			</Layout>
 		</EnvironmentContext.Provider>
 	)
@@ -129,11 +197,10 @@ function isPageProviderElement(el: ReactNode): el is PageProviderElement {
 	return isValidElement(el) && typeof el.type !== 'string' && isPageProvider(el.type)
 }
 
-
-function isPageSetProvider<T = any>(it: any): it is PageSetProvider<T> {
-	return typeof it === 'object' && it !== null && typeof it.getPages === 'function'
+function isLazyPageModule(name: string, it: any): it is LazyPageModule {
+	return (name.endsWith('.tsx') || name.endsWith('.jsx')) && typeof it === 'function'
 }
 
-function isPageSetProviderElement(el: ReactNode): el is PageSetProviderElement {
-	return isValidElement(el) && typeof el.type !== 'string' && isPageSetProvider(el.type)
+function isEagerPageModule(name: string, it: any): it is PageModule {
+	return (name.endsWith('.tsx') || name.endsWith('.jsx')) && typeof it === 'object'
 }

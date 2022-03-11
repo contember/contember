@@ -9,7 +9,7 @@ import {
 	VideoFiles,
 } from '@contember/admin'
 
-export const Index = (
+export default () => (
 	<EditPage entity="UploadShowcase(unique = One)" setOnCreate="(unique = One)">
 		<Link to="second">SECOND</Link>
 		<ImageUploadField urlField="singleTrivialImage.url" label="Trivial imageddd" />

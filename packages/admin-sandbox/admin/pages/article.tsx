@@ -25,9 +25,9 @@ const stateOptions = {
 	removed: 'Removed',
 }
 
-export const articleList = (
+export const list = (
 	<DataGridPage entities="Article" itemsPerPage={20} rendererProps={{
-		actions: <LinkButton to="articleCreate">Add article</LinkButton>,
+		actions: <LinkButton to="article/create">Add article</LinkButton>,
 		title: 'Articles',
 	}}>
 		<TextCell field="title" header="Title" />
@@ -38,7 +38,7 @@ export const articleList = (
 		<EnumCell field={'state'} options={stateOptions} header={'State'} />
 		<NumberCell field="number" header="Number" />
 		<GenericCell canBeHidden={false} justification="justifyEnd">
-			<LinkButton to={`articleEdit(id: $entity.id)`} Component={AnchorButton}>Edit</LinkButton>
+			<LinkButton to={`article/edit(id: $entity.id)`} Component={AnchorButton}>Edit</LinkButton>
 			<DeleteEntityButton title="Delete" immediatePersist={true} />
 		</GenericCell>
 	</DataGridPage>
@@ -64,14 +64,14 @@ const articleForm = (
 	</>
 )
 
-export const articleCreate = (
-	<CreatePage entity="Article" redirectOnSuccess="articleEdit(id: $entity.id)">
+export const create = (
+	<CreatePage entity="Article" redirectOnSuccess="article/edit(id: $entity.id)">
 		{articleForm}
 	</CreatePage>
 )
 
-export const articleEdit = (
-	<EditPage entity="Article(id=$id)" rendererProps={{ title: 'Article' }}>
+export const edit = (
+	<EditPage entity="Article(id = $id)" rendererProps={{ title: 'Article' }}>
 		{articleForm}
 	</EditPage>
 )

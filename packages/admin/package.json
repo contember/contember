@@ -62,9 +62,9 @@
 		"react-select": "4.3.1",
 		"react-sortable-hoc": "2.0.0",
 		"react-window": "1.8.6",
-		"slate": "0.66.5",
+		"slate": "0.73.1",
 		"slate-history": "0.66.0",
-		"slate-react": "0.67.0",
+		"slate-react": "0.74.0",
 		"stacktracey": "2.1.7"
 	},
 	"peerDependencies": {

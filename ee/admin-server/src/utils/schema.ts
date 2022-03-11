@@ -84,6 +84,18 @@ export const object = <T extends Record<string, Type<Json>>>(inner: T) => {
 	return type
 }
 
+export const record = <K extends Type<string>, T extends Type<Json>>(key: K, value: T) => {
+	const type = (input: unknown, path: PropertyKey[] = []): { readonly [P in ReturnType<K>]: ReturnType<T> } => {
+		if (input === null || typeof input !== 'object') throw new ParseError(input, path, 'object')
+		return Object.fromEntries(Object.entries(input as any).map(([k, v]) => [key(k, [...path, k]), value(v, [...path, k])])) as any
+	}
+
+	type.inner = { key, value }
+
+	return type
+}
+
+
 export const partial = <T extends Record<string, Type<Json>>>(inner: T) => {
 	const type = (input: unknown, path: PropertyKey[] = []): { readonly [P in keyof T]?: ReturnType<T[P]> } => {
 		if (input === null || typeof input !== 'object') throw new ParseError(input, path, 'object')

@@ -24,7 +24,17 @@ export const customLoginConfigSchema = schema.partial({
 		),
 	),
 })
+
 export type CustomLoginConfig = ReturnType<typeof customLoginConfigSchema>
 
 export const loginConfigSchema = schema.intersection(baseLoginConfigSchema, customLoginConfigSchema)
 export type LoginConfig = ReturnType<typeof loginConfigSchema>
+
+
+export const customConfig = schema.partial({
+	login: customLoginConfigSchema,
+	projects: schema.record(schema.string, schema.partial({
+		allowedRoles: schema.array(schema.string),
+	})),
+})
+export type CustomConfig = ReturnType<typeof customConfig>

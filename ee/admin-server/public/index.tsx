@@ -1,7 +1,7 @@
 import { AnchorButton, Icon, LoginEntrypoint, Project, runReactApp } from '@contember/admin'
 import './index.sass'
-import { useMemo } from 'react'
-import { loginConfigSchema } from '../src/loginConfig'
+import { useCallback, useMemo } from 'react'
+import { loginConfigSchema } from '../src/config'
 
 const Entry = () => {
 	const config = useMemo(() => {
@@ -16,8 +16,15 @@ const Entry = () => {
 		</AnchorButton>
 	)
 
+	const listProjects = useCallback(async () => {
+		const me = await fetch('/_me')
+		const data = await me.json()
+		return data.projects.map((it: any) => it.slug)
+	}, [])
+
 	return <LoginEntrypoint
 		{...config}
+		projects={listProjects}
 		formatProjectUrl={formatProjectUrl}
 		projectsPageActions={panelButton}
 	/>

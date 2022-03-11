@@ -23,6 +23,7 @@ import { CollaborationController } from './controllers/CollaborationController'
 import { CollaborationRedisKeys, CollaborationRedisStorage } from './services/CollaborationStorage'
 import { ApiRequestSender } from './services/ApiRequestSender'
 import { SystemClient } from './services/SystemClient'
+import { ConfigResolver } from './services/ConfigResolver'
 
 export default new Builder({})
 	.addService('env', env)
@@ -87,12 +88,16 @@ export default new Builder({})
 		return new S3Manager(s3Client, s3LocationResolver)
 	})
 
+	.addService('configResolver', ({ s3 }) => {
+		return new ConfigResolver(s3)
+	})
+
 	.addService('staticFileHandler', ({ env }) => {
 		return new StaticFileHandler(env.CONTEMBER_PUBLIC_DIR)
 	})
 
-	.addService('loginController', ({ staticFileHandler, s3 }) => {
-		return new LoginController(staticFileHandler, s3)
+	.addService('loginController', ({ staticFileHandler, s3, configResolver }) => {
+		return new LoginController(staticFileHandler, s3, configResolver)
 	})
 
 	.addService('deployController', ({ tenant, systemClient, s3 }) => {
@@ -107,8 +112,8 @@ export default new Builder({})
 		return new ApiController(apiEndpointResolver, env.CONTEMBER_LOGIN_TOKEN)
 	})
 
-	.addService('meController', ({ tenant, s3 }) => {
-		return new MeController(tenant, s3)
+	.addService('meController', ({ tenant, s3, configResolver }) => {
+		return new MeController(tenant, s3, configResolver)
 	})
 
 	.addService('legacyController', () => {

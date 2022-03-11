@@ -13,5 +13,10 @@
 		{ "path": "./packages/react-utils"},
 		{ "path": "./packages/ui" },
 		{ "path": "./packages/vimeo-file-uploader" }
-	]
+	],
+	"ts-node": {
+		"moduleTypes": {
+			"packages/admin-sandbox/api/**/*": "cjs"
+		}
+	}
 }

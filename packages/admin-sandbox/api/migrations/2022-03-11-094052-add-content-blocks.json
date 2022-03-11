@@ -1,0 +1,315 @@
+{
+	"formatVersion": 3,
+	"modifications": [
+		{
+			"modification": "createEnum",
+			"enumName": "ContentBlockPageUnique",
+			"values": [
+				"One"
+			]
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"name": "ContentBlockPage",
+				"primary": "id",
+				"primaryColumn": "id",
+				"unique": {},
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"nullable": false,
+						"type": "Uuid",
+						"columnType": "uuid"
+					}
+				},
+				"tableName": "content_block_page"
+			}
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"name": "BlockRepeaterBlock",
+				"primary": "id",
+				"primaryColumn": "id",
+				"unique": {},
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"nullable": false,
+						"type": "Uuid",
+						"columnType": "uuid"
+					}
+				},
+				"tableName": "block_repeater_block"
+			}
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"name": "RepeaterGallery",
+				"primary": "id",
+				"primaryColumn": "id",
+				"unique": {},
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"nullable": false,
+						"type": "Uuid",
+						"columnType": "uuid"
+					}
+				},
+				"tableName": "repeater_gallery"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "ContentBlockPage",
+			"field": {
+				"name": "unique",
+				"columnName": "unique",
+				"nullable": true,
+				"type": "Enum",
+				"columnType": "ContentBlockPageUnique"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "BlockRepeaterBlock",
+			"field": {
+				"name": "order",
+				"columnName": "order",
+				"nullable": false,
+				"type": "Integer",
+				"columnType": "integer"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "BlockRepeaterBlock",
+			"field": {
+				"name": "type",
+				"columnName": "type",
+				"nullable": false,
+				"type": "Enum",
+				"columnType": "ContentBlockType"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "BlockRepeaterBlock",
+			"field": {
+				"name": "content",
+				"columnName": "content",
+				"nullable": true,
+				"type": "String",
+				"columnType": "text"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "BlockRepeaterBlock",
+			"field": {
+				"name": "author",
+				"columnName": "author",
+				"nullable": true,
+				"type": "String",
+				"columnType": "text"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "RepeaterGallery",
+			"field": {
+				"name": "order",
+				"columnName": "order",
+				"nullable": false,
+				"type": "Integer",
+				"columnType": "integer"
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "BlockRepeaterBlock",
+			"owningSide": {
+				"name": "blockRepeater",
+				"inversedBy": "blocks",
+				"nullable": true,
+				"type": "ManyHasOne",
+				"target": "ContentBlockPage",
+				"joiningColumn": {
+					"columnName": "block_repeater_id",
+					"onDelete": "restrict"
+				}
+			},
+			"inverseSide": {
+				"name": "blocks",
+				"ownedBy": "blockRepeater",
+				"type": "OneHasMany",
+				"target": "BlockRepeaterBlock",
+				"orderBy": [
+					{
+						"path": [
+							"order"
+						],
+						"direction": "asc"
+					}
+				]
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "RepeaterGallery",
+			"owningSide": {
+				"name": "image",
+				"nullable": false,
+				"type": "ManyHasOne",
+				"target": "BasicImage",
+				"joiningColumn": {
+					"columnName": "image_id",
+					"onDelete": "restrict"
+				}
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "RepeaterGallery",
+			"owningSide": {
+				"name": "repeaterReference",
+				"inversedBy": "images",
+				"nullable": true,
+				"type": "ManyHasOne",
+				"target": "BlockRepeaterBlock",
+				"joiningColumn": {
+					"columnName": "repeater_reference_id",
+					"onDelete": "cascade"
+				}
+			},
+			"inverseSide": {
+				"name": "images",
+				"ownedBy": "repeaterReference",
+				"type": "OneHasMany",
+				"target": "RepeaterGallery",
+				"orderBy": [
+					{
+						"path": [
+							"order"
+						],
+						"direction": "asc"
+					}
+				]
+			}
+		},
+		{
+			"modification": "createUniqueConstraint",
+			"entityName": "ContentBlockPage",
+			"unique": {
+				"fields": [
+					"unique"
+				],
+				"name": "unique_ContentBlockPage_unique_3a5c8c"
+			}
+		},
+		{
+			"modification": "patchAclSchema",
+			"patch": [
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/ContentBlockPage",
+					"value": {
+						"predicates": {},
+						"operations": {
+							"create": {
+								"id": true,
+								"unique": true,
+								"blocks": true
+							},
+							"update": {
+								"id": true,
+								"unique": true,
+								"blocks": true
+							},
+							"read": {
+								"id": true,
+								"unique": true,
+								"blocks": true
+							},
+							"delete": true,
+							"customPrimary": true
+						}
+					}
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/BlockRepeaterBlock",
+					"value": {
+						"predicates": {},
+						"operations": {
+							"create": {
+								"id": true,
+								"order": true,
+								"type": true,
+								"content": true,
+								"author": true,
+								"images": true,
+								"blockRepeater": true
+							},
+							"update": {
+								"id": true,
+								"order": true,
+								"type": true,
+								"content": true,
+								"author": true,
+								"images": true,
+								"blockRepeater": true
+							},
+							"read": {
+								"id": true,
+								"order": true,
+								"type": true,
+								"content": true,
+								"author": true,
+								"images": true,
+								"blockRepeater": true
+							},
+							"delete": true,
+							"customPrimary": true
+						}
+					}
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/RepeaterGallery",
+					"value": {
+						"predicates": {},
+						"operations": {
+							"create": {
+								"id": true,
+								"order": true,
+								"image": true,
+								"repeaterReference": true
+							},
+							"update": {
+								"id": true,
+								"order": true,
+								"image": true,
+								"repeaterReference": true
+							},
+							"read": {
+								"id": true,
+								"order": true,
+								"image": true,
+								"repeaterReference": true
+							},
+							"delete": true,
+							"customPrimary": true
+						}
+					}
+				}
+			]
+		}
+	]
+}

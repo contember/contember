@@ -11,12 +11,6 @@ export interface PageProvider<P> {
 
 export type PageProviderElement = ReactElement<any, ComponentType & PageProvider<any>>
 
-export interface PageSetProvider<P> {
-	getPages(props: P): Record<string, ComponentType>
-}
-
-export type PageSetProviderElement = ReactElement<any, ComponentType & PageSetProvider<any>>
-
 export interface PageModule {
 	[action: string]: ComponentType | ReactElement | undefined
 }
@@ -28,8 +22,6 @@ export type PagesMapElement =
 	| PageModule
 	| ComponentType
 	| PageProviderElement
-	| PageSetProviderElement
-	| PageSetProvider<Record<any, never>>
 
 export type PagesMap = Record<string, PagesMapElement>
 
@@ -142,13 +134,7 @@ export const Pages = ({ children, layout }: PagesProps) => {
 					} else {
 						const pageName = k.slice(0, 1).toLowerCase() + k.slice(1)
 
-						if (isPageSetProvider(v)) {
-							return Object.entries(v.getPages({})).map(([k, v]) => [k, disallowAction(v)])
-
-						} else if (isPageSetProviderElement(v)) {
-							return Object.entries(v.type.getPages(v.props)).map(([k, v]) => [k, disallowAction(v)])
-
-						} else if (isPageProviderElement(v)) {
+						if (isPageProviderElement(v)) {
 							return [[v.type.getPageName(v.props, pageName), disallowAction(() => v)]]
 
 						} else {
@@ -212,14 +198,6 @@ function isPageProvider(it: any): it is PageProvider<any> {
 
 function isPageProviderElement(el: ReactNode): el is PageProviderElement {
 	return isValidElement(el) && typeof el.type !== 'string' && isPageProvider(el.type)
-}
-
-function isPageSetProvider<T = any>(it: any): it is PageSetProvider<T> {
-	return typeof it === 'object' && it !== null && typeof it.getPages === 'function'
-}
-
-function isPageSetProviderElement(el: ReactNode): el is PageSetProviderElement {
-	return isValidElement(el) && typeof el.type !== 'string' && isPageSetProvider(el.type)
 }
 
 function isLazyPageModule(name: string, it: any): it is LazyPageModule {

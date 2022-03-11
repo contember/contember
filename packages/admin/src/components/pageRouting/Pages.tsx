@@ -17,23 +17,21 @@ export interface PageSetProvider<P> {
 
 export type PageSetProviderElement = ReactElement<any, ComponentType & PageSetProvider<any>>
 
-type EmptyObject = Record<any, never>
-
-interface PageModule {
-	[action: string]: ComponentType | undefined
+export interface PageModule {
+	[action: string]: ComponentType | ReactElement | undefined
 }
 
-type LazyPageModule = () => Promise<PageModule>
+export type LazyPageModule = () => Promise<PageModule>
 
-type PagesMapElement =
+export type PagesMapElement =
 	| LazyPageModule
 	| PageModule
 	| ComponentType
 	| PageProviderElement
 	| PageSetProviderElement
-	| PageSetProvider<EmptyObject>
+	| PageSetProvider<Record<any, never>>
 
-type PagesMap = Record<string, PagesMapElement>
+export type PagesMap = Record<string, PagesMapElement>
 
 export interface PagesProps {
 	children:
@@ -42,6 +40,8 @@ export interface PagesProps {
 		| PageProviderElement
 	layout?: ComponentType<{ children?: ReactNode }>
 }
+
+type PageActionHandler = ComponentType<{ action?: string }>
 
 function isPageList(children: ReactNodeArray): children is PageProviderElement[] {
 	return children.every(child => isPageProviderElement(child))
@@ -66,7 +66,7 @@ function findPrefix(strings: string[]): string {
 	return a.substring(0, i)
 }
 
-function disallowAction(Component: ComponentType) {
+function disallowAction(Component: ComponentType): PageActionHandler {
 	return (props: { action?: string }) => {
 		const pageName = useCurrentRequest()?.pageName
 
@@ -87,7 +87,7 @@ export const Pages = ({ children, layout }: PagesProps) => {
 	const requestId = useRef<number>(0)
 	const Layout = layout ?? Fragment
 
-	const pageMap = useMemo<Map<string, ComponentType<{ action?: string }>>>(
+	const pageMap = useMemo<Map<string, PageActionHandler>>(
 		() => {
 			if (Array.isArray(children)) {
 				if (isPageList(children)) {
@@ -103,7 +103,7 @@ export const Pages = ({ children, layout }: PagesProps) => {
 			} else {
 				const lazyPrefix = findPrefix(Object.entries(children).flatMap(([k, v]) => isLazyPageModule(k, v) || isEagerPageModule(k, v) ? [k] : []))
 
-				return new Map(Object.entries(children).flatMap(([k, v]): [string, ComponentType<{ action?: string }>][] => {
+				return new Map(Object.entries(children).flatMap(([k, v]): [string, PageActionHandler][] => {
 					if (isLazyPageModule(k, v)) { // children={import.meta.glob('./pages/**/*.tsx')}
 						const pageName = k.slice(lazyPrefix.length, -4)
 

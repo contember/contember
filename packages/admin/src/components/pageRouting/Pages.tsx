@@ -52,8 +52,14 @@ function findPrefix(strings: string[]): string {
 	const b = sorted[sorted.length - 1]
 
 	let i = 0
-	while (i < a.length && a.charAt(i) === b.charAt(i)) {
-		i++
+	let j = 0
+
+	while (j < a.length && a.charAt(j) === b.charAt(j)) {
+		j++
+
+		if (a.charAt(j) === '/') {
+			i = j + 1
+		}
 	}
 
 	return a.substring(0, i)

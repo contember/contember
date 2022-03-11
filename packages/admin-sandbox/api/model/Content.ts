@@ -3,14 +3,14 @@ import { BasicImage } from './Files'
 import { Link } from './Link'
 
 export class Content {
-	blocks: d.OneHasManyDefinition = d.oneHasMany(ContentBlock, 'content').orderBy('order')
+	blocks = d.oneHasMany(ContentBlock, 'content').orderBy('order')
 }
 
 export class ContentBlock {
 	content = d.manyHasOne(Content, 'blocks').cascadeOnDelete().notNull()
 	order = d.intColumn().notNull()
 	json = d.stringColumn().notNull()
-	references: d.OneHasManyDefinition = d.oneHasMany(ContentReference, 'block')
+	references = d.oneHasMany(ContentReference, 'block')
 }
 
 export const ContentReferenceType = d.createEnum(

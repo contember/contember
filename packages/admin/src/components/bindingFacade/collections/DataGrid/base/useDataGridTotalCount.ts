@@ -1,14 +1,16 @@
 import type { EntityName, Filter } from '@contember/binding'
 import { GraphQlBuilder } from '@contember/client'
 import { useContentApiRequest } from '@contember/react-client'
-import { useEffect, useRef } from 'react'
+import { useEffect } from 'react'
+import { useAbortController } from '@contember/react-utils'
+import { DataBindingExtendAborted } from '@contember/binding'
 
-export const useHackyTotalCount = (entityName: EntityName, filter: Filter | undefined): number | undefined => {
+export const useDataGridTotalCount = (entityName: EntityName, filter: Filter | undefined): number | undefined => {
 	const [queryState, sendQuery] = useContentApiRequest<{
 		data: { paginate: { pageInfo: { totalCount: number } } }
 	}>()
 
-	const loadAbortControllerRef = useRef<AbortController | undefined>(undefined)
+	const abortController = useAbortController()
 
 	const query = new GraphQlBuilder.QueryBuilder().query(builder =>
 		builder.object('paginate', builder => {
@@ -21,23 +23,19 @@ export const useHackyTotalCount = (entityName: EntityName, filter: Filter | unde
 	)
 
 	useEffect(() => {
-		async function performEffect() {
-			loadAbortControllerRef.current?.abort()
-
-			const newController = new AbortController()
-			loadAbortControllerRef.current = newController
-
+		(async () => {
 			try {
 				await sendQuery(query, undefined, {
-					signal: newController.signal,
+					signal: abortController(),
 				})
-			} catch {
-				// TODO Distinguish abort vs actual error
-				return
+			} catch (e) {
+				if (e === DataBindingExtendAborted) {
+					return
+				}
+				throw e
 			}
-		}
-		performEffect()
-	}, [query, sendQuery])
+		})()
+	}, [abortController, query, sendQuery])
 
 	if (queryState.readyState !== 'networkSuccess') {
 		return undefined

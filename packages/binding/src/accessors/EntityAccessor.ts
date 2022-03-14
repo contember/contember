@@ -1,4 +1,4 @@
-import { RuntimeId, ServerGeneratedUuid, SingleEntityPersistedData } from '../accessorTree'
+import { RuntimeId, SingleEntityPersistedData } from '../accessorTree'
 import { BindingError } from '../BindingError'
 import type { EntityOperations } from '../core/operations'
 import type { Environment } from '../dao'
@@ -116,21 +116,6 @@ class EntityAccessor implements Errorable {
 		return this.getRelativeEntityList(QueryLanguage.desugarRelativeEntityList(entityList, this.environment))
 	}
 
-	public getKeyConnectedOnServer(entity: SugaredRelativeSingleEntity | string): string | null {
-		const desugared = QueryLanguage.desugarRelativeSingleEntity(entity, this.environment)
-		const lastHasOne = desugared.hasOneRelationPath[desugared.hasOneRelationPath.length - 1]
-		const lastHasOnePlaceholder = PlaceholderGenerator.getHasOneRelationPlaceholder(lastHasOne)
-
-		let containingAccessor: EntityAccessor = this
-
-		if (desugared.hasOneRelationPath.length > 1) {
-			containingAccessor = this.getRelativeSingleEntity({
-				hasOneRelationPath: desugared.hasOneRelationPath.slice(0, -1),
-			})
-		}
-		return containingAccessor.getPersistedKeyByPlaceholder(lastHasOnePlaceholder)
-	}
-
 	//
 
 	/**
@@ -172,40 +157,6 @@ class EntityAccessor implements Errorable {
 			)
 		}
 		return record.getAccessor()
-	}
-
-	private getPersistedKeyByPlaceholder(placeholderName: string): string | null {
-		if (this.dataFromServer === undefined) {
-			return null
-		}
-		const key = this.dataFromServer.get(placeholderName)
-
-		if (key instanceof ServerGeneratedUuid) {
-			return key.value
-		}
-		if (key === null) {
-			// TODO this also returns null and fails to throw when placeholderName points to a regular scalar field that
-			// 	happens to be also null.
-			return null
-		}
-
-		// From now on, we're past the happy path, way into error land.
-		if (key === undefined) {
-			throw new BindingError(
-				`EntityAccessor.getKeyConnectedOnServer: unknown placeholder '${placeholderName}'. Unless this is just ` +
-					`a typo, this typically happens when a has-one relation hasn't been registered during static render.`,
-			)
-		}
-		if (key instanceof Set) {
-			throw new BindingError(
-				`EntityAccessor.getKeyConnectedOnServer: the placeholder '${placeholderName}' refers to a has-many relation, ` +
-					`not a has-one. This method is meant exclusively for has-one relations.`,
-			)
-		}
-		throw new BindingError(
-			`EntityAccessor.getKeyConnectedOnServer: the placeholder '${placeholderName}' refers to a scalar field, not a` +
-				`has-one relation. This method is meant exclusively for has-one relations.`,
-		)
 	}
 }
 

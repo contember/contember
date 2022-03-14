@@ -1,68 +1,48 @@
-import {
-	EntityListSubTree,
-	Environment,
-	Filter,
-	QueryLanguage,
-	SugaredQualifiedEntityList,
-	TreeRootId,
-} from '@contember/binding'
-import { Fragment, ReactElement } from 'react'
+import { EntityListSubTree, Environment, TreeRootId } from '@contember/binding'
+import { ComponentType, Fragment, ReactElement } from 'react'
 import {
 	DataGridContainer,
+	DataGridContainerProps,
 	DataGridContainerPublicProps,
-	DataGridSetColumnFilter,
-	DataGridSetColumnOrderBy,
-	DataGridSetIsColumnHidden,
 	DataGridState,
+	DataGridStateMethods,
 } from '../base'
-import type { GridPagingAction } from '../paging'
-import { collectFilters } from './collectFilters'
-import { collectOrderBy } from './collectOrderBy'
 
-export interface RenderGridOptions {
-	entities: SugaredQualifiedEntityList['entities']
-	setIsColumnHidden: DataGridSetIsColumnHidden
-	setFilter: DataGridSetColumnFilter
-	setOrderBy: DataGridSetColumnOrderBy
-	updatePaging: (action: GridPagingAction) => void
-	containerProps: DataGridContainerPublicProps
-}
 
-export const renderGrid = (
-	{ entities, setIsColumnHidden, setFilter, setOrderBy, updatePaging, containerProps }: RenderGridOptions,
+export const renderGrid = <ComponentExtraProps extends {}>(
+	{ setIsColumnHidden, setFilter, setOrderBy, updatePaging }: DataGridStateMethods,
 	treeRootId: TreeRootId | undefined,
 	displayedState: DataGridState,
 	desiredState: DataGridState,
 	environment: Environment,
+	containerProps: DataGridContainerPublicProps = {},
+	component?: ComponentType<DataGridContainerProps & ComponentExtraProps>,
+	componentProps ? : ComponentExtraProps,
 ): ReactElement => {
 	const {
+		entities,
 		paging: { pageIndex, itemsPerPage },
 		hiddenColumns,
-		filterArtifacts,
-		orderDirections,
+		filter,
 		columns,
+		orderBy,
 	} = displayedState
-	const desugared = QueryLanguage.desugarQualifiedEntityList({ entities }, environment)
-	const columnFilters = collectFilters(columns, filterArtifacts, environment)
-
-	const filter: Filter | undefined =
-		desugared.filter && columnFilters ? { and: [desugared.filter, columnFilters] } : desugared.filter ?? columnFilters
 
 	return (
 		<EntityListSubTree
 			entities={{
-				...desugared,
+				...entities,
 				filter,
 			}}
 			treeRootId={treeRootId}
 			offset={itemsPerPage === null ? undefined : itemsPerPage * pageIndex}
 			limit={itemsPerPage === null ? undefined : itemsPerPage}
-			orderBy={collectOrderBy(columns, orderDirections, environment)}
-			listComponent={DataGridContainer}
+			orderBy={orderBy}
+			listComponent={(component as typeof DataGridContainer) ?? DataGridContainer}
 			listProps={{
 				desiredState,
 				displayedState,
-				entityName: desugared.entityName,
+				entityName: entities.entityName,
 				filter,
 				setIsColumnHidden,
 				setFilter,
@@ -71,6 +51,7 @@ export const renderGrid = (
 				emptyMessageComponentExtraProps: containerProps.emptyMessageComponentExtraProps,
 				emptyMessageComponent: containerProps.emptyMessageComponent,
 				emptyMessage: containerProps.emptyMessage,
+				...componentProps,
 			}}
 		>
 			{Array.from(columns)

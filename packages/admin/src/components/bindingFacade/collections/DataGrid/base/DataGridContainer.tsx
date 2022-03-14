@@ -13,7 +13,7 @@ import type { DataGridSetIsColumnHidden } from './DataGridSetIsColumnHidden'
 import type { DataGridSetColumnOrderBy } from './DataGridSetOrderBy'
 import type { DataGridState } from './DataGridState'
 import { getColumnFilter } from './getColumnFilter'
-import { useHackyTotalCount } from './useHackyTotalCount'
+import { useDataGridTotalCount } from './useDataGridTotalCount'
 
 export interface DataGridContainerPublicProps {
 	allowColumnVisibilityControls?: boolean
@@ -28,7 +28,7 @@ export interface DataGridContainerOwnProps extends DataGridContainerPublicProps 
 	desiredState: DataGridState
 	displayedState: DataGridState
 	entityName: EntityName
-	filter: Filter | undefined
+	filter: Filter
 	setIsColumnHidden: DataGridSetIsColumnHidden
 	setFilter: DataGridSetColumnFilter
 	setOrderBy: DataGridSetColumnOrderBy
@@ -62,7 +62,7 @@ export const DataGridContainer: FunctionComponent<DataGridContainerProps> = Comp
 			columns,
 		} = desiredState
 		const formatMessage = useMessageFormatter(dataGridDictionary)
-		const totalCount = useHackyTotalCount(entityName, filter)
+		const totalCount = useDataGridTotalCount(entityName, filter)
 		const normalizedItemCount = itemsPerPage === null ? accessor.length : totalCount
 		const pagesCount =
 			totalCount !== undefined && itemsPerPage !== null ? Math.ceil(totalCount / itemsPerPage) : undefined

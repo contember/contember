@@ -15,6 +15,8 @@ export * from './getColumnFilter'
 export * from './getColumnOrderBy'
 export * from './GetNewFilter'
 export * from './GetNewOrderBy'
+export * from './useDataGridState'
+export * from './useDataGrid'
 
 export type { DataGridCellPublicProps } from './DataGridCellPublicProps'
 export type { DataGridDictionary } from './dataGridDictionary'

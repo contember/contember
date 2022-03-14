@@ -1,5 +1,5 @@
 import { BindingError, Entity, RelativeSingleField, useEntity } from '@contember/binding'
-import { ActionableBox, Box, FieldSet } from '@contember/ui'
+import { ActionableBox, Box, EditorPlaceholder, FieldSet } from '@contember/ui'
 import { memo, MouseEvent as ReactMouseEvent, ReactNode, useCallback } from 'react'
 import { Transforms } from 'slate'
 import { ReactEditor, RenderElementProps, useSelected, useSlateStatic } from 'slate-react'
@@ -65,10 +65,23 @@ export const ReferenceElementRenderer = memo((props: ReferenceElementRendererPro
 					`missing or isn't at the very top level.`,
 			)
 		}
+		const placeholder = contentTemplate.value.placeholder
+		const showPlaceholder = placeholder !== undefined && props.element.children.length === 1 && props.element.children[0]?.text === ''
 		blockBody = (
 			<>
 				{!!contentTemplate.nodeBefore && <div contentEditable={false}>{contentTemplate.nodeBefore}</div>}
-				<div>{props.children}</div>
+				{showPlaceholder
+					? (
+						<div style={{ position: 'relative' }}>
+							<div style={{ position: 'absolute', pointerEvents: 'none' }}>
+								<EditorPlaceholder>{placeholder}</EditorPlaceholder>
+							</div>
+							<div>{props.children}</div>
+						</div>
+					) : (
+						<div>{props.children}</div>
+					)
+				}
 				{!!contentTemplate.nodeAfter && <div contentEditable={false}>{contentTemplate.nodeAfter}</div>}
 			</>
 		)

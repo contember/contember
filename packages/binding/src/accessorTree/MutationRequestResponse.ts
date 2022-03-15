@@ -1,6 +1,8 @@
 import type { Result } from '@contember/client'
 import type { ReceivedEntityData } from './QueryRequestResponse'
 
+type WithType<V, Type extends string> = V & { __typename: Type }
+
 export interface FieldPathErrorFragment {
 	__typename: '_FieldPathFragment'
 	field: string
@@ -47,7 +49,7 @@ export interface MutationDataResponse {
 }
 
 export interface MutationTransactionResponse {
-	transaction: MutationDataResponse | null
+	transaction: WithType<MutationDataResponse, 'MutationTransaction'> | null
 }
 
 export interface MutationRequestResponse {

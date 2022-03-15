@@ -1,20 +1,23 @@
 import type { Scalar } from '../treeParameters'
 
-export type ReceivedFieldData<A = never> = Scalar | ReceivedEntityData<A> | Array<ReceivedEntityData<A> | A>
-export type ReceivedEntityData<A = never> =
-	| A
-	| {
-			id: string
-			__typename: string
-			[fieldName: string]: ReceivedFieldData<A>
-	  }
-export type ReceivedData<A = never> = A | ReceivedEntityData<A> | ReceivedEntityData<A>[]
+export type ReceivedFieldData = Scalar | ReceivedEntityData | Array<ReceivedEntityData>
 
-export interface ReceivedDataTree<A = never> {
-	[treeId: string]: ReceivedData<A> | null
+export type ReceivedEntityData =
+	& {
+		__typename: string
+		id: string
+	}
+	& {
+		[fieldName: string]: ReceivedFieldData
+	}
+
+export type ReceivedData = ReceivedEntityData | ReceivedEntityData[]
+
+export interface ReceivedDataTree {
+	[treeId: string]: ReceivedData | null
 }
 
-export interface QueryRequestResponse<A = never> {
-	data: ReceivedDataTree<A>
+export interface QueryRequestResponse {
+	data: ReceivedDataTree
 	errors?: { message: string, path?: string[] }[]
 }

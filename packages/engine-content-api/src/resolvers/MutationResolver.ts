@@ -66,11 +66,11 @@ export class MutationResolver {
 			const validationResult: Record<string, Result.MutationFieldResult> = {}
 			const validationErrors: Result.ValidationError[] = []
 			for (const field of queryAst.fields) {
+				if (field.name === 'query' || field.name === '__typename') {
+					continue
+				}
 				if (!(field instanceof ObjectNode)) {
 					throw new ImplementationException()
-				}
-				if (field.name === 'query') {
-					continue
 				}
 				const fieldConfig = fields[field.name]
 				if (!fieldConfig) {
@@ -110,6 +110,7 @@ export class MutationResolver {
 			}
 			if (validationErrors.length) {
 				return {
+					__typename: 'MutationTransaction',
 					ok: false,
 					errorMessage: this.stringifyValidationErrors(validationErrors),
 					errors: [],
@@ -123,6 +124,9 @@ export class MutationResolver {
 
 			const trxResult: Record<string, any> = {}
 			for (const field of queryAst.fields) {
+				if (field.name === '__typename') {
+					continue
+				}
 				if (!(field instanceof ObjectNode)) {
 					throw new ImplementationException()
 				}
@@ -198,7 +202,13 @@ export class MutationResolver {
 				}
 			}
 
-			return { ok: true, errors: [], validation: { valid: true, errors: [] }, ...trxResult }
+			return {
+				__typename: 'MutationTransaction',
+				ok: true,
+				errors: [],
+				validation: { valid: true, errors: [] },
+				...trxResult,
+			}
 		})
 	}
 

@@ -50,11 +50,11 @@ export interface ControlValueProps<V> {
 }
 
 export type ControlProps<V> =
-	ControlDisplayProps &
-	ValidationSteteProps &
-	ControlStateProps &
-	ControlFocusProps &
-	ControlValueProps<V>
+	& ControlDisplayProps
+	& ValidationSteteProps
+	& ControlStateProps
+	& ControlFocusProps
+	& ControlValueProps<V>
 
 export type AllControlProps<V> = Omit<All<ControlProps<V>>, 'type'>
 export type ControlPropsKeys<V> = keyof ControlProps<V>

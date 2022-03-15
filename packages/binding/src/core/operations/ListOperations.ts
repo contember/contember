@@ -11,7 +11,7 @@ import { EntityListState, getEntityMarker, StateIterator } from '../state'
 import type { StateInitializer } from '../StateInitializer'
 import type { TreeStore } from '../TreeStore'
 import { OperationsHelpers } from './OperationsHelpers'
-import { EventListenersStore } from '../../treeParameters'
+import { EntityId, EventListenersStore } from '../../treeParameters'
 
 export class ListOperations {
 	public constructor(
@@ -185,7 +185,7 @@ export class ListOperations {
 		})
 	}
 
-	public getChildEntityById(state: EntityListState, id: string) {
+	public getChildEntityById(state: EntityListState, id: EntityId) {
 		const realm = state.children.get(id)
 		if (realm === undefined) {
 			const isRuntimeId = uuidValidate(id) || UnpersistedEntityDummyId.matchesDummyId(id)

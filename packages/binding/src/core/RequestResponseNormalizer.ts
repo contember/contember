@@ -5,7 +5,7 @@ import {
 	ReceivedDataTree,
 	ReceivedEntityData,
 	ReceivedFieldData,
-	ServerGeneratedUuid,
+	ServerId,
 	SingleEntityPersistedData,
 } from '../accessorTree'
 import { BindingError } from '../BindingError'
@@ -52,36 +52,32 @@ export class RequestResponseNormalizer {
 			}
 			const { type, entityId, subTreeType, subTreePlaceholder } = operation
 
+			const treeDatum = newPersistedData[operationAlias]
+			const fieldData = this.createFieldData(persistedEntityDataStore, treeDatum)
+			if (!(fieldData instanceof ServerId)) {
+				return this.rejectData()
+			}
+
 			switch (type) {
 				case mutationOperationType.update:
 				case mutationOperationType.create: {
-					const treeDatum = newPersistedData[operationAlias]
-					const fieldData = this.createFieldData(persistedEntityDataStore, treeDatum)
 
 					if (subTreeType === mutationOperationSubTreeType.singleEntity) {
-						if (fieldData instanceof ServerGeneratedUuid) {
-							subTreeDataStore.set(subTreePlaceholder, fieldData)
-						} else {
-							return this.rejectData()
-						}
+						subTreeDataStore.set(subTreePlaceholder, fieldData)
 					} else if (subTreeType === mutationOperationSubTreeType.entityList) {
-						if (fieldData instanceof ServerGeneratedUuid) {
-							if (type === mutationOperationType.create) {
-								const list = subTreeDataStore.get(subTreePlaceholder)
+						if (type === mutationOperationType.create) {
+							const list = subTreeDataStore.get(subTreePlaceholder)
 
-								if (list instanceof Set) {
-									// TODO this is somewhat dubious because we're essentially just guessing the order of the entities
-									//		and just carelessly put the new one at the end.
-									list.add(fieldData.value)
-								} else if (list === undefined) {
-									// That's fine. This is probably just an isCreating sub-tree.
-									subTreeDataStore.set(subTreePlaceholder, new Set([fieldData.value]))
-								} else {
-									return this.rejectData()
-								}
+							if (list instanceof Set) {
+								// TODO this is somewhat dubious because we're essentially just guessing the order of the entities
+								//		and just carelessly put the new one at the end.
+								list.add(fieldData.value)
+							} else if (list === undefined) {
+								// That's fine. This is probably just an isCreating sub-tree.
+								subTreeDataStore.set(subTreePlaceholder, new Set([fieldData.value]))
+							} else {
+								return this.rejectData()
 							}
-						} else {
-							return this.rejectData()
 						}
 					} else {
 						return assertNever(subTreeType)
@@ -92,7 +88,7 @@ export class RequestResponseNormalizer {
 				case mutationOperationType.delete: {
 					// TODO there are potentially some references to entityId that this whole process won't quite remove.
 					//		That's a memory leak. Probably not particularly severe in most cases but still.
-					persistedEntityDataStore.delete(entityId)
+					persistedEntityDataStore.delete(fieldData.uniqueValue)
 					if (subTreeType === mutationOperationSubTreeType.singleEntity) {
 						subTreeDataStore.delete(subTreePlaceholder)
 					} else if (subTreeType === mutationOperationSubTreeType.entityList) {
@@ -121,28 +117,30 @@ export class RequestResponseNormalizer {
 		if (Array.isArray(fieldData)) {
 			const subTreeListIds = new Set<string>()
 			for (const entityDatum of fieldData) {
-				subTreeListIds.add(this.createEntityData(entityMap, entityDatum))
+				subTreeListIds.add(this.createEntityData(entityMap, entityDatum).value)
 			}
 			return subTreeListIds
 		} else if (fieldData !== null && typeof fieldData === 'object') {
-			return new ServerGeneratedUuid(this.createEntityData(entityMap, fieldData))
+			return this.createEntityData(entityMap, fieldData)
 		} else {
 			return fieldData
 		}
 	}
 
-	private static createEntityData(entityMap: PersistedEntityDataStore, entityData: ReceivedEntityData): string {
+	private static createEntityData(entityMap: PersistedEntityDataStore, entityData: ReceivedEntityData): ServerId {
 		const primaryKey: string | undefined = entityData[PRIMARY_KEY_NAME]
 
 		if (primaryKey === undefined) {
 			throw new BindingError(`The server has responded with an entity that lacks a primary key.`)
 		}
 
-		const presentEntityData = entityMap.get(primaryKey)
+		const id = new ServerId(primaryKey, entityData.__typename)
+
+		const presentEntityData = entityMap.get(id.uniqueValue)
 
 		if (presentEntityData === undefined) {
 			const fieldsMap: SingleEntityPersistedData = new Map()
-			entityMap.set(primaryKey, fieldsMap)
+			entityMap.set(id.uniqueValue, fieldsMap)
 			for (const field in entityData) {
 				const fieldDatum = entityData[field]
 
@@ -151,7 +149,7 @@ export class RequestResponseNormalizer {
 		} else {
 			this.mergeInEntityData(entityMap, presentEntityData, entityData)
 		}
-		return primaryKey
+		return id
 	}
 
 	private static mergeInFieldData(
@@ -162,28 +160,28 @@ export class RequestResponseNormalizer {
 		if (fromTarget === undefined) {
 			return this.createFieldData(entityMap, newDatum)
 		}
-		if (fromTarget instanceof ServerGeneratedUuid || (fromTarget === null && typeof newDatum === 'object')) {
+		if (fromTarget instanceof ServerId || (fromTarget === null && typeof newDatum === 'object')) {
 			if (newDatum === null) {
 				return null
 			} else if (typeof newDatum === 'object' && !Array.isArray(newDatum)) {
 				const newId = newDatum[PRIMARY_KEY_NAME]
-				const target = entityMap.get(newId)
+				const target = entityMap.get(ServerId.formatUniqueValue(newId, newDatum.__typename))
 				if (target === undefined) {
-					return new ServerGeneratedUuid(this.createEntityData(entityMap, newDatum))
+					return this.createEntityData(entityMap, newDatum)
 				}
 
 				if (fromTarget?.value === newId) {
 					this.mergeInEntityData(entityMap, target, newDatum)
 					return fromTarget
 				} else {
-					return new ServerGeneratedUuid(this.createEntityData(entityMap, newDatum))
+					return this.createEntityData(entityMap, newDatum)
 				}
 			}
 		} else if (fromTarget instanceof Set) {
 			if (Array.isArray(newDatum)) {
 				fromTarget.clear()
 				for (const entityData of newDatum) {
-					fromTarget.add(this.createEntityData(entityMap, entityData))
+					fromTarget.add(this.createEntityData(entityMap, entityData).value)
 				}
 				return fromTarget
 			}

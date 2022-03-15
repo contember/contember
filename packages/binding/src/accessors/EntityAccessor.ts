@@ -42,7 +42,7 @@ class EntityAccessor implements Errorable {
 		public readonly getAccessor: EntityAccessor.GetEntityAccessor,
 	) {}
 
-	public get idOnServer(): string | undefined {
+	public get idOnServer(): EntityId | undefined {
 		return this.runtimeId.existsOnServer ? this.runtimeId.value : undefined
 	}
 

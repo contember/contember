@@ -1,7 +1,7 @@
 // noinspection JSVoidFunctionReturnValueUsed // IntelliJ seems to be super confused througouht this file.
 
 import { CrudQueryBuilder, GraphQlBuilder } from '@contember/client'
-import { ClientGeneratedUuid, ServerGeneratedUuid } from '../accessorTree'
+import { ClientGeneratedUuid, ServerId } from '../accessorTree'
 import { BindingError } from '../BindingError'
 import { PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
 import { FieldMarker, HasManyRelationMarker, HasOneRelationMarker } from '../markers'
@@ -503,7 +503,7 @@ export class MutationGenerator {
 		}
 
 		const pathBack = this.treeStore.getPathBackToParent(currentState)
-		const entityData = this.treeStore.persistedEntityData.get(currentState.entity.id.value)
+		const entityData = this.treeStore.persistedEntityData.get(currentState.entity.id.uniqueValue)
 
 		for (const [placeholderName, fieldState] of currentState.children) {
 			if (placeholderName === PRIMARY_KEY_NAME || placeholderName === TYPENAME_KEY_NAME) {
@@ -542,7 +542,7 @@ export class MutationGenerator {
 						) => {
 							const persistedValue = entityData?.get?.(placeholderName)
 
-							if (persistedValue instanceof ServerGeneratedUuid) {
+							if (persistedValue instanceof ServerId) {
 								if (persistedValue.value === runtimeId.value) {
 									// The persisted and currently referenced ids match, and so this is an update.
 									if (fieldState.type === 'entityRealmStub') {
@@ -598,7 +598,7 @@ export class MutationGenerator {
 							const persistedValue = entityData?.get?.(placeholderName)
 							const alias = MutationAlias.encodeEntityId(runtimeId)
 
-							if (persistedValue instanceof ServerGeneratedUuid) {
+							if (persistedValue instanceof ServerId) {
 								if (persistedValue.value === runtimeId.value) {
 									if (fieldState.type === 'entityRealmStub') {
 										return builder
@@ -677,7 +677,7 @@ export class MutationGenerator {
 						}
 						if (fieldState.plannedRemovals) {
 							for (const [removedId, removalType] of fieldState.plannedRemovals) {
-								const alias = MutationAlias.encodeEntityId(new ServerGeneratedUuid(removedId))
+								const alias = MutationAlias.encodeEntityId(new ServerId(removedId, fieldState.entityName))
 								if (removalType === 'delete') {
 									builder = builder.delete({ [PRIMARY_KEY_NAME]: removedId }, alias)
 								} else if (removalType === 'disconnect') {

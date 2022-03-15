@@ -1,5 +1,5 @@
 import type { RelationFilter, TreeFilter } from '@contember/client'
-import { EntityListPersistedData, ServerGeneratedUuid } from '../accessorTree'
+import { EntityListPersistedData, ServerId } from '../accessorTree'
 import {
 	EntityFieldMarkersContainer,
 	EntityListSubTreeMarker,
@@ -7,7 +7,7 @@ import {
 	HasManyRelationMarker,
 	HasOneRelationMarker,
 } from '../markers'
-import type { EntityName } from '../treeParameters'
+import type { EntityId, EntityName } from '../treeParameters'
 import { assertNever } from '../utils'
 import { StateIterator } from './state'
 import type { TreeStore } from './TreeStore'
@@ -34,7 +34,7 @@ export class TreeFilterGenerator {
 
 	private generateSubTreeFilter(
 		subTree: EntitySubTreeMarker | EntityListSubTreeMarker,
-		persistedData: ServerGeneratedUuid | EntityListPersistedData | undefined,
+		persistedData: ServerId | EntityListPersistedData | undefined,
 	): TreeFilter[] {
 		const filters: TreeFilter[] = []
 
@@ -42,7 +42,7 @@ export class TreeFilterGenerator {
 			return filters // Do nothing
 		}
 
-		if (persistedData instanceof ServerGeneratedUuid) {
+		if (persistedData instanceof ServerId) {
 			const filter = this.generateTopLevelEntityFilter(
 				persistedData.value,
 				subTree.parameters.entityName,
@@ -60,7 +60,7 @@ export class TreeFilterGenerator {
 	}
 
 	private generateTopLevelEntityFilter(
-		id: string,
+		id: EntityId,
 		entityName: EntityName,
 		fields: EntityFieldMarkersContainer,
 	): TreeFilter | undefined {

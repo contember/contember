@@ -3,7 +3,7 @@ import {
 	EntityListPersistedData,
 	ReceivedDataTree,
 	RuntimeId,
-	ServerGeneratedUuid,
+	ServerId,
 	UnpersistedEntityDummyId,
 } from '../accessorTree'
 import { BindingError } from '../BindingError'
@@ -63,7 +63,7 @@ export class TreeAugmenter {
 						}
 						this.updateEntityListPersistedData(rootState, rootData)
 					} else if (rootState.type === 'entityRealm') {
-						if (rootData !== undefined && !(rootData instanceof ServerGeneratedUuid)) {
+						if (rootData !== undefined && !(rootData instanceof ServerId)) {
 							continue // This should never happen.
 						}
 						this.updateRealmIdIfNecessary(rootState, rootData)
@@ -130,12 +130,12 @@ export class TreeAugmenter {
 
 	private updateRealmIdIfNecessary(
 		realm: EntityRealmState | EntityRealmStateStub,
-		newId: ServerGeneratedUuid | undefined | null,
+		newId: ServerId | undefined | null,
 	) {
 		const currentId = realm.entity.id
 		let idToChangeTo: RuntimeId | undefined = undefined
 
-		if (currentId instanceof ServerGeneratedUuid) {
+		if (currentId instanceof ServerId) {
 			if (newId === undefined || newId === null) {
 				idToChangeTo = new UnpersistedEntityDummyId()
 			} else if (currentId.value !== newId.value) {
@@ -157,14 +157,14 @@ export class TreeAugmenter {
 
 	private updateEntityRealmPersistedData(realm: EntityRealmState) {
 		const realmId = realm.entity.id
-		const persistedData = realmId.existsOnServer ? this.treeStore.persistedEntityData.get(realmId.value) : undefined
+		const persistedData = realmId.existsOnServer ? this.treeStore.persistedEntityData.get(realmId.uniqueValue) : undefined
 
 		for (const [placeholderName, child] of realm.children) {
 			const childData = persistedData?.get(placeholderName)
 
 			switch (child.type) {
 				case 'field': {
-					if (childData instanceof ServerGeneratedUuid || childData instanceof Set) {
+					if (childData instanceof ServerId || childData instanceof Set) {
 						throw new BindingError()
 					}
 
@@ -181,7 +181,7 @@ export class TreeAugmenter {
 				}
 				case 'entityRealm':
 				case 'entityRealmStub': {
-					if (!(childData instanceof ServerGeneratedUuid) && childData !== undefined && childData !== null) {
+					if (!(childData instanceof ServerId) && childData !== undefined && childData !== null) {
 						throw new BindingError()
 					}
 					this.updateRealmIdIfNecessary(child, childData)
@@ -220,7 +220,7 @@ export class TreeAugmenter {
 				if (
 					// It's a uuid but it's not among the persisted so either it got deleted/disconnected or the client-side
 					// id generation didn't quite pan out.
-					childRuntimeId instanceof ServerGeneratedUuid ||
+					childRuntimeId instanceof ServerId ||
 					childRuntimeId instanceof ClientGeneratedUuid ||
 					// No persisted entity id to allocate to this so that's a goodbye.
 					persistedWithoutState.length === 0
@@ -234,7 +234,7 @@ export class TreeAugmenter {
 						this.eventManager,
 						this.stateInitializer,
 						child,
-						new ServerGeneratedUuid(drawnId),
+						new ServerId(drawnId, child.entity.entityName),
 					)
 				}
 			} else if (childRuntimeId instanceof ClientGeneratedUuid) {
@@ -243,7 +243,7 @@ export class TreeAugmenter {
 					this.eventManager,
 					this.stateInitializer,
 					child,
-					new ServerGeneratedUuid(childRuntimeId.value),
+					new ServerId(childRuntimeId.value, child.entity.entityName),
 				)
 			}
 			if (child.type === 'entityRealm') {
@@ -251,7 +251,7 @@ export class TreeAugmenter {
 			}
 		}
 		for (const unclaimedPersistedId of persistedWithoutState) {
-			this.stateInitializer.initializeEntityRealm(new ServerGeneratedUuid(unclaimedPersistedId), state.entityName, {
+			this.stateInitializer.initializeEntityRealm(new ServerId(unclaimedPersistedId, state.entityName), state.entityName, {
 				type: 'listEntity',
 				parent: state,
 			})

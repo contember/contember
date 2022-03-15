@@ -1,4 +1,10 @@
-import { NormalizedPersistedData, PersistedEntityDataStore, ReceivedDataTree, SubTreeDataStore } from '../accessorTree'
+import {
+	NormalizedPersistedData,
+	PersistedEntityDataStore,
+	ReceivedDataTree,
+	SubTreeDataStore,
+	UniqueEntityId,
+} from '../accessorTree'
 import { BindingError } from '../BindingError'
 import type { Environment } from '../dao'
 import { MarkerTreeRoot, PlaceholderGenerator } from '../markers'
@@ -25,7 +31,7 @@ import type { EntityListState, EntityRealmState, EntityRealmStateStub, EntitySta
 const emptyEntityIdSet: ReadonlySet<EntityId> = new Set()
 
 export class TreeStore {
-	public readonly entityStore: Map<EntityId, EntityState> = new Map()
+	public readonly entityStore: Map<UniqueEntityId, EntityState> = new Map()
 	public readonly entityRealmStore: Map<EntityRealmKey, EntityRealmState | EntityRealmStateStub> = new Map()
 
 	// This is tricky. We allow placeholder name duplicates, only the (TreeRootId, PlaceholderName) tuple is unique.
@@ -193,7 +199,7 @@ export class TreeStore {
 		const blueprint = state.blueprint
 
 		if (blueprint.parent) {
-			const entityData = this.persistedEntityData.get(blueprint.parent.entity.id.value)
+			const entityData = this.persistedEntityData.get(blueprint.parent.entity.id.uniqueValue)
 			return (entityData?.get(blueprint.marker.placeholderName) as Set<string> | undefined) ?? emptyEntityIdSet
 		} else {
 			return (this.subTreePersistedData.get(blueprint.marker.placeholderName) as Set<string>) ?? emptyEntityIdSet
@@ -235,8 +241,8 @@ export class TreeStore {
 		for (const realm of entity.realms.values()) {
 			this.disposeOfRealm(realm)
 		}
-		this.entityStore.delete(entity.id.value)
-		this.persistedEntityData.delete(entity.id.value)
+		this.entityStore.delete(entity.id.uniqueValue)
+		this.persistedEntityData.delete(entity.id.uniqueValue)
 	}
 
 	public effectivelyHasTreeRoot(candidateRoot: MarkerTreeRoot): boolean {

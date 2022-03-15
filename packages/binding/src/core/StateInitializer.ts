@@ -1,5 +1,5 @@
 import { BatchUpdatesOptions, EntityAccessor, EntityListAccessor, FieldAccessor } from '../accessors'
-import { EntityFieldPersistedData, RuntimeId, ServerGeneratedUuid, UnpersistedEntityDummyId } from '../accessorTree'
+import { EntityFieldPersistedData, RuntimeId, ServerId, UnpersistedEntityDummyId } from '../accessorTree'
 import { BindingError } from '../BindingError'
 import {
 	EntityListSubTreeMarker,
@@ -10,7 +10,7 @@ import {
 } from '../markers'
 import { BijectiveIndexedMap } from '../structures'
 import type {
-	EntityEventListenerStore,
+	EntityEventListenerStore, EntityId,
 	EntityListEventListenerStore,
 	EntityName,
 	FieldEventListenerStore,
@@ -72,7 +72,7 @@ export class StateInitializer {
 		const persistedRootData = this.treeStore.subTreePersistedData.get(tree.placeholderName)
 
 		if (tree instanceof EntityListSubTreeMarker) {
-			const persistedEntityIds: Set<string> = persistedRootData instanceof Set ? persistedRootData : new Set()
+			const persistedEntityIds: Set<EntityId> = persistedRootData instanceof Set ? persistedRootData : new Set()
 			subTreeState = this.initializeEntityListState(
 				{ marker: tree, parent: undefined },
 				tree.entityName,
@@ -81,7 +81,7 @@ export class StateInitializer {
 		} else {
 			subTreeState = this.materializeEntityRealm(
 				this.initializeEntityRealm(
-					persistedRootData instanceof ServerGeneratedUuid ? persistedRootData : new UnpersistedEntityDummyId(),
+					persistedRootData instanceof ServerId ? persistedRootData : new UnpersistedEntityDummyId(),
 					tree.entityName,
 					{
 						type: 'subTree',
@@ -197,7 +197,7 @@ export class StateInitializer {
 						// We're technically exposing more info in runtime than we'd like but that way we don't have to allocate and
 						// keep in sync two copies of the same data. TS hides the extra info anyway.
 						entityRealm.children,
-						this.treeStore.persistedEntityData.get(entity.id.value),
+						this.treeStore.persistedEntityData.get(entity.id.uniqueValue),
 						entityRealm.unpersistedChangesCount !== 0,
 						entityRealm.errors,
 						getEntityMarker(entityRealm).environment,
@@ -229,7 +229,7 @@ export class StateInitializer {
 		// 	entityRealm.unpersistedChangesCount += 1
 		// }
 
-		const persistedData = this.treeStore.persistedEntityData.get(entity.id.value)
+		const persistedData = this.treeStore.persistedEntityData.get(entity.id.uniqueValue)
 
 		const marker = getEntityMarker(state)
 		const pathBack = this.treeStore.getPathBackToParent(entityRealm)
@@ -252,7 +252,7 @@ export class StateInitializer {
 				if (pathBack?.fieldBackToParent === field.parameters.field) {
 					runtimeId = pathBack.parent.entity.id
 				} else {
-					runtimeId = fieldDatum instanceof ServerGeneratedUuid ? fieldDatum : new UnpersistedEntityDummyId()
+					runtimeId = fieldDatum instanceof ServerId ? fieldDatum : new UnpersistedEntityDummyId()
 				}
 				this.initializeFromHasOneRelationMarker(entityRealm, field, runtimeId)
 			} else {
@@ -279,7 +279,7 @@ export class StateInitializer {
 	}
 
 	public initializeEntityState(id: RuntimeId, entityName: EntityName): EntityState {
-		const entityId = id.value
+		const entityId = id.uniqueValue
 
 		const existing = this.treeStore.entityStore.get(entityId)
 		if (existing !== undefined) {
@@ -288,7 +288,7 @@ export class StateInitializer {
 
 		const entityState: EntityState = {
 			entityName,
-			hasIdSetInStone: id instanceof ServerGeneratedUuid,
+			hasIdSetInStone: id instanceof ServerId,
 			id,
 			isScheduledForDeletion: false,
 			maidenId: id instanceof UnpersistedEntityDummyId ? id : undefined,
@@ -302,7 +302,7 @@ export class StateInitializer {
 	private initializeEntityListState(
 		blueprint: EntityListBlueprint,
 		entityName: EntityName,
-		initialEntityIds: Set<string>,
+		initialEntityIds: Set<EntityId>,
 	): EntityListState {
 		const entityListState: EntityListState = {
 			type: 'entityList',
@@ -334,13 +334,13 @@ export class StateInitializer {
 			},
 		}
 
-		const initialData: Iterable<string | undefined> =
+		const initialData: Iterable<EntityId | undefined> =
 			initialEntityIds.size === 0
 				? Array.from({ length: blueprint.marker.parameters.initialEntityCount })
 				: initialEntityIds
 		for (const entityId of initialData) {
 			this.initializeEntityRealm(
-				entityId ? new ServerGeneratedUuid(entityId) : new UnpersistedEntityDummyId(),
+				entityId ? new ServerId(entityId, entityName) : new UnpersistedEntityDummyId(),
 				entityListState.entityName,
 				{
 					type: 'listEntity',
@@ -417,7 +417,7 @@ export class StateInitializer {
 					`Perhaps you wanted to use a <Repeater />?`,
 			)
 		}
-		if (fieldDatum instanceof ServerGeneratedUuid) {
+		if (fieldDatum instanceof ServerId) {
 			throw new BindingError(
 				`Received a referenced entity where a single '${field.fieldName}' field was expected. ` +
 					`Perhaps you wanted to use <HasOne />?`,

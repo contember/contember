@@ -16,7 +16,7 @@ class EntityListAccessor implements Errorable {
 		private readonly stateKey: EntityListState,
 		private readonly operations: ListOperations,
 		private readonly _children: ReadonlyMap<EntityId, { getAccessor: EntityAccessor.GetEntityAccessor }>,
-		private readonly _idsPersistedOnServer: ReadonlySet<string>,
+		private readonly _idsPersistedOnServer: ReadonlySet<EntityId>,
 		public readonly hasUnpersistedChanges: boolean,
 		public readonly errors: ErrorAccessor | undefined,
 		public readonly environment: Environment,
@@ -42,7 +42,7 @@ class EntityListAccessor implements Errorable {
 	 * This will only contain the ids that the server knows about. Not necessarily the ids that have been added on
 	 * the list since the last server query.
 	 */
-	public get idsPersistedOnServer(): Set<string> {
+	public get idsPersistedOnServer(): Set<EntityId> {
 		return new Set(this._idsPersistedOnServer)
 	}
 

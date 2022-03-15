@@ -36,6 +36,10 @@ export interface PagesProps {
 type PageActionHandler = ComponentType<{ action?: string }>
 
 function findPrefix(strings: string[]): string {
+	if (strings.length === 0) {
+		return ''
+	}
+
 	const sorted = [...strings].sort()
 	const a = sorted[0]
 	const b = sorted[sorted.length - 1]

@@ -1,3 +1,4 @@
+import { expect, it, describe } from 'vitest'
 import { Environment } from '../../../../src/dao'
 import { Parser } from '../../../../src/queryLanguage'
 import type { ParsedTaggedMap } from '../../../../src/queryLanguage/ParserResults'

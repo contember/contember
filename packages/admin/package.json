@@ -28,7 +28,7 @@
 		"build": "pnpm run build:js && pnpm run build:css",
 		"build:js": "vite build --mode development && vite build --mode production",
 		"build:css": "sass --no-charset src/index.sass:dist/style.css",
-		"test": "jest"
+		"test": "vitest --environment jsdom"
 	},
 	"dependencies": {
 		"@contember/binding": "workspace:*",

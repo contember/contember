@@ -21,6 +21,7 @@ export type PagesMapElement =
 	| LazyPageModule
 	| PageModule
 	| ComponentType
+	| ReactElement
 	| PageProviderElement
 
 export type PagesMap = Record<string, PagesMapElement>
@@ -137,6 +138,9 @@ export const Pages = ({ children, layout }: PagesProps) => {
 
 						if (isPageProviderElement(v)) {
 							return [[v.type.getPageName(v.props, pageName), disallowAction(() => v)]]
+
+						} else if (isValidElement(v)) {
+							return [[pageName, disallowAction(() => v)]]
 
 						} else {
 							return [[pageName, disallowAction(v)]]

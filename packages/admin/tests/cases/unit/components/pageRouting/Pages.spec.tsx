@@ -99,7 +99,7 @@ describe('Pages', () => {
 
 				'./pages/lorem/ipsum.tsx': {
 					edit: () => <>Lorem Ipsum Edit</>,
-					list: () => <>Lorem Ipsum List</>,
+					List: () => <>Lorem Ipsum List</>,
 				},
 			}} />
 		)

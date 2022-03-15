@@ -1,6 +1,6 @@
 import { Environment, EnvironmentContext, useEnvironment } from '@contember/binding'
 import { ContainerSpinner, Message } from '@contember/ui'
-import { ComponentType, Fragment, isValidElement, lazy, ReactElement, ReactNode, ReactNodeArray, Suspense, useMemo, useRef } from 'react'
+import { ComponentType, Fragment, isValidElement, lazy, ReactElement, ReactNode, Suspense, useMemo, useRef } from 'react'
 import { useCurrentRequest } from '../../routing'
 import { MiscPageLayout } from '../MiscPageLayout'
 import { PageErrorBoundary } from './PageErrorBoundary'
@@ -96,14 +96,15 @@ export const Pages = ({ children, layout }: PagesProps) => {
 			} else {
 				const modules = Object.entries(children).filter(([k, v]) => isLazyPageModule(k, v) || isEagerPageModule(k, v))
 				const modulesPrefix = findPrefix(modules.map(it => it[0]))
+				const getPageNameFromFile = (name: string) => name.slice(modulesPrefix.length, -4)
 
 				return new Map(Object.entries(children).flatMap(([k, v]): [string, PageActionHandler][] => {
 					if (isLazyPageModule(k, v)) { // children={import.meta.glob('./pages/**/*.tsx')}
-						const pageName = k.slice(modulesPrefix.length, -4)
+						const pageName = getPageNameFromFile(k)
 
 						const PageActionHandler = (props: { action?: string }) => {
 							const Lazy = lazy(async () => {
-								const module = await v()
+								const module = normalizeModule(await v())
 								const page = module[props.action ?? 'default']
 
 								if (page === undefined) {
@@ -119,10 +120,11 @@ export const Pages = ({ children, layout }: PagesProps) => {
 						return [[pageName, PageActionHandler]]
 
 					} else if (isEagerPageModule(k, v)) { // children={import.meta.globEager('./pages/**/*.tsx')}
-						const pageName = k.slice(modulesPrefix.length, -4)
+						const pageName = getPageNameFromFile(k)
+						const module = normalizeModule(v)
 
 						const PageActionHandler = (props: { action?: string }) => {
-							const Page = v[props.action ?? 'default']
+							const Page = module[props.action ?? 'default']
 
 							if (Page === undefined) {
 								throw new Error(`No such page as ${pageName}${props.action ? '/' + props.action : ''}.`)
@@ -134,7 +136,7 @@ export const Pages = ({ children, layout }: PagesProps) => {
 						return [[pageName, PageActionHandler]]
 
 					} else {
-						const pageName = k.slice(0, 1).toLowerCase() + k.slice(1)
+						const pageName = lowerFirst(k)
 
 						if (isPageProviderElement(v)) {
 							return [[v.type.getPageName(v.props, pageName), disallowAction(() => v)]]
@@ -211,4 +213,12 @@ function isLazyPageModule(name: string, it: any): it is LazyPageModule {
 
 function isEagerPageModule(name: string, it: any): it is PageModule {
 	return (name.endsWith('.tsx') || name.endsWith('.jsx')) && typeof it === 'object'
+}
+
+function lowerFirst(val: string) {
+	return val.slice(0, 1).toLowerCase() + val.slice(1)
+}
+
+function normalizeModule<V extends any>(map: Record<string, V>): Record<string, V> {
+	return Object.fromEntries(Object.entries(map).map(([k, v]) => [lowerFirst(k), v]))
 }

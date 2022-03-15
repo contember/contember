@@ -21,7 +21,7 @@ export type NumberCellProps<Persisted extends FieldValue = FieldValue> =
 // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
 export type NumberFilterArtifacts = {
 	mode: 'eq' | 'gte' | 'lte'
-	query: string
+	query: number | null
 }
 
 export const NumberCell: FunctionComponent<NumberCellProps> = Component(props => {
@@ -33,7 +33,7 @@ export const NumberCell: FunctionComponent<NumberCellProps> = Component(props =>
 				newDirection ? QueryLanguage.desugarOrderBy(`${props.field as string} ${newDirection}`, environment) : undefined
 			}
 			getNewFilter={(filter, { environment }) => {
-				if (filter.query === '') {
+				if (filter.query === null) {
 					return undefined
 				}
 
@@ -43,8 +43,8 @@ export const NumberCell: FunctionComponent<NumberCellProps> = Component(props =>
 					lte: 'lte',
 				}
 
-				const condition: Input.Condition<string> = {
-					[baseOperators[filter.mode]]: Number(filter.query),
+				const condition: Input.Condition = {
+					[baseOperators[filter.mode]]: filter.query,
 				}
 
 				const desugared = QueryLanguage.desugarRelativeSingleField(props, environment)
@@ -54,7 +54,7 @@ export const NumberCell: FunctionComponent<NumberCellProps> = Component(props =>
 			}}
 			emptyFilter={{
 				mode: 'eq',
-				query: '',
+				query: null,
 			}}
 			filterRenderer={({ filter, setFilter }) => {
 				const formatMessage = useMessageFormatter(dataGridCellsDictionary)
@@ -83,17 +83,14 @@ export const NumberCell: FunctionComponent<NumberCellProps> = Component(props =>
 								})
 							}}
 						/>
-						{/* TODO: Maybe support float */}
 						<NumberInput
-							value={parseInt(filter.query)}
+							value={filter.query}
 							placeholder="Value"
 							onChange={value => {
-								if (value || value === 0) {
-									setFilter({
-										...filter,
-										query: value?.toString(),
-									})
-								}
+								setFilter({
+									...filter,
+									query: value ?? null,
+								})
 							}}
 						/>
 					</Stack>

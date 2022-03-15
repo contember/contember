@@ -21,6 +21,7 @@ export type PagesMapElement =
 	| LazyPageModule
 	| PageModule
 	| ComponentType
+	| ReactElement
 	| PageProviderElement
 
 export type PagesMap = Record<string, PagesMapElement>
@@ -36,6 +37,10 @@ export interface PagesProps {
 type PageActionHandler = ComponentType<{ action?: string }>
 
 function findPrefix(strings: string[]): string {
+	if (strings.length === 0) {
+		return ''
+	}
+
 	const sorted = [...strings].sort()
 	const a = sorted[0]
 	const b = sorted[sorted.length - 1]
@@ -133,6 +138,9 @@ export const Pages = ({ children, layout }: PagesProps) => {
 
 						if (isPageProviderElement(v)) {
 							return [[v.type.getPageName(v.props, pageName), disallowAction(() => v)]]
+
+						} else if (isValidElement(v)) {
+							return [[pageName, disallowAction(() => v)]]
 
 						} else {
 							return [[pageName, disallowAction(v)]]

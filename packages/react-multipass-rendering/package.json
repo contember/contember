@@ -20,8 +20,7 @@
 	"typings": "./dist/types/index.d.ts",
 	"scripts": {
 		"build": "vite build --mode development && vite build --mode production",
-		"test": "jest",
-		"test:with-coverage": "jest --coverage=true"
+		"test": "vitest"
 	},
 	"peerDependencies": {
 		"react": "^17"

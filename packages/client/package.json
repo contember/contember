@@ -20,8 +20,7 @@
 	"sideEffects": false,
 	"scripts": {
 		"build": "vite build --mode development && vite build --mode production",
-		"test": "jest",
-		"test:with-coverage": "jest --coverage=true"
+		"test": "vitest"
 	},
 	"dependencies": {
 		"@contember/schema": "^0.11.5"

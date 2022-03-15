@@ -1,3 +1,4 @@
+import { expect, it, describe } from 'vitest'
 import { GraphQlBuilder } from '@contember/client'
 import { Environment } from '../../../../src/dao'
 import { Parser } from '../../../../src/queryLanguage'

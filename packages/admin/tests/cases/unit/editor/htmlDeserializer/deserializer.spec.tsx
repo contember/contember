@@ -1,3 +1,4 @@
+import { expect, it, describe } from 'vitest'
 import { deserializeHtml } from './utils'
 import {
 	anchorHtmlDeserializer,

@@ -1,3 +1,4 @@
+import { expect, it, describe } from 'vitest'
 import { whereToFilter, GraphQlBuilder } from '../../../src'
 
 describe('whereToFilter', () => {

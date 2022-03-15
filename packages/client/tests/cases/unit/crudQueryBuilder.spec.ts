@@ -1,3 +1,4 @@
+import { expect, it, describe } from 'vitest'
 import { CrudQueryBuilder } from '../../../src'
 import type { DeleteMutationArguments } from '../../../src/crudQueryBuilder'
 

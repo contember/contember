@@ -30,14 +30,16 @@ export class SchemaBuilder {
 			const definitionInstance: FieldsDefinition = new definition()
 
 			const primaryName = this.conventions.getPrimaryField()
-			const primaryField = this.createPrimaryColumn()
 
 			const entity: Model.Entity = {
 				name: entityName,
 				primary: primaryName,
 				primaryColumn: this.conventions.getColumnName(primaryName),
 				unique: this.createUnique(entityName, definitionInstance),
-				fields: [tuple(primaryName, primaryField), ...Object.entries(definitionInstance)]
+				fields: [
+					...definitionInstance[primaryName] ? [] : [tuple(primaryName, this.createPrimaryColumn())],
+					...Object.entries(definitionInstance),
+				]
 					.map(([name, definition]) => {
 						return definition.createField({
 							name,

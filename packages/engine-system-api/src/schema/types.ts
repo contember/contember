@@ -13,6 +13,7 @@ export type Scalars = {
 	Float: number
 	DateTime: Date
 	Json: unknown
+	PrimaryKey: any
 }
 
 export type CreateEvent = Event & {
@@ -26,7 +27,7 @@ export type CreateEvent = Event & {
 	readonly appliedAt: Scalars['DateTime']
 	readonly type: EventType
 	readonly tableName: Scalars['String']
-	readonly primaryKey: ReadonlyArray<Scalars['String']>
+	readonly primaryKey: ReadonlyArray<Scalars['PrimaryKey']>
 	readonly newValues: Scalars['Json']
 }
 
@@ -42,7 +43,7 @@ export type DeleteEvent = Event & {
 	readonly appliedAt: Scalars['DateTime']
 	readonly type: EventType
 	readonly tableName: Scalars['String']
-	readonly primaryKey: ReadonlyArray<Scalars['String']>
+	readonly primaryKey: ReadonlyArray<Scalars['PrimaryKey']>
 	readonly oldValues: Scalars['Json']
 }
 
@@ -56,12 +57,12 @@ export type Event = {
 	readonly appliedAt: Scalars['DateTime']
 	readonly type: EventType
 	readonly tableName: Scalars['String']
-	readonly primaryKey: ReadonlyArray<Scalars['String']>
+	readonly primaryKey: ReadonlyArray<Scalars['PrimaryKey']>
 }
 
 export type EventFilterRow = {
 	readonly tableName: Scalars['String']
-	readonly primaryKey: ReadonlyArray<Scalars['String']>
+	readonly primaryKey: ReadonlyArray<Scalars['PrimaryKey']>
 }
 
 export enum EventType {
@@ -218,6 +219,7 @@ export type MutationMigrationModifyArgs = {
 	modification: MigrationModification
 }
 
+
 export type Query = {
 	readonly __typename?: 'Query'
 	readonly stages: ReadonlyArray<Stage>
@@ -258,7 +260,7 @@ export type UpdateEvent = Event & {
 	readonly appliedAt: Scalars['DateTime']
 	readonly type: EventType
 	readonly tableName: Scalars['String']
-	readonly primaryKey: ReadonlyArray<Scalars['String']>
+	readonly primaryKey: ReadonlyArray<Scalars['PrimaryKey']>
 	readonly oldValues: Scalars['Json']
 	readonly diffValues: Scalars['Json']
 }
@@ -267,6 +269,10 @@ export type UpdateEvent = Event & {
 
 export type ResolverTypeWrapper<T> = Promise<T> | T
 
+
+export type ResolverWithResolve<TResult, TParent, TContext, TArgs> = {
+	resolve: ResolverFn<TResult, TParent, TContext, TArgs>
+}
 
 export type LegacyStitchingResolver<TResult, TParent, TContext, TArgs> = {
 	fragment: string
@@ -280,6 +286,7 @@ export type NewStitchingResolver<TResult, TParent, TContext, TArgs> = {
 export type StitchingResolver<TResult, TParent, TContext, TArgs> = LegacyStitchingResolver<TResult, TParent, TContext, TArgs> | NewStitchingResolver<TResult, TParent, TContext, TArgs>
 export type Resolver<TResult, TParent = {}, TContext = {}, TArgs = {}> =
   | ResolverFn<TResult, TParent, TContext, TArgs>
+  | ResolverWithResolve<TResult, TParent, TContext, TArgs>
   | StitchingResolver<TResult, TParent, TContext, TArgs>
 
 export type ResolverFn<TResult, TParent, TContext, TArgs> = (
@@ -369,6 +376,7 @@ export type ResolversTypes = {
 	MigrationModifyErrorCode: MigrationModifyErrorCode
 	MigrationModifyResponse: ResolverTypeWrapper<MigrationModifyResponse>
 	Mutation: ResolverTypeWrapper<{}>
+	PrimaryKey: ResolverTypeWrapper<Scalars['PrimaryKey']>
 	Query: ResolverTypeWrapper<{}>
 	Stage: ResolverTypeWrapper<Stage>
 	TruncateResponse: ResolverTypeWrapper<TruncateResponse>
@@ -400,6 +408,7 @@ export type ResolversParentTypes = {
 	MigrationModifyError: MigrationModifyError
 	MigrationModifyResponse: MigrationModifyResponse
 	Mutation: {}
+	PrimaryKey: Scalars['PrimaryKey']
 	Query: {}
 	Stage: Stage
 	TruncateResponse: TruncateResponse
@@ -416,7 +425,7 @@ export type CreateEventResolvers<ContextType = any, ParentType extends Resolvers
 	appliedAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>
 	type?: Resolver<ResolversTypes['EventType'], ParentType, ContextType>
 	tableName?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	primaryKey?: Resolver<ReadonlyArray<ResolversTypes['String']>, ParentType, ContextType>
+	primaryKey?: Resolver<ReadonlyArray<ResolversTypes['PrimaryKey']>, ParentType, ContextType>
 	newValues?: Resolver<ResolversTypes['Json'], ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
@@ -435,7 +444,7 @@ export type DeleteEventResolvers<ContextType = any, ParentType extends Resolvers
 	appliedAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>
 	type?: Resolver<ResolversTypes['EventType'], ParentType, ContextType>
 	tableName?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	primaryKey?: Resolver<ReadonlyArray<ResolversTypes['String']>, ParentType, ContextType>
+	primaryKey?: Resolver<ReadonlyArray<ResolversTypes['PrimaryKey']>, ParentType, ContextType>
 	oldValues?: Resolver<ResolversTypes['Json'], ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
@@ -451,7 +460,7 @@ export type EventResolvers<ContextType = any, ParentType extends ResolversParent
 	appliedAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>
 	type?: Resolver<ResolversTypes['EventType'], ParentType, ContextType>
 	tableName?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	primaryKey?: Resolver<ReadonlyArray<ResolversTypes['String']>, ParentType, ContextType>
+	primaryKey?: Resolver<ReadonlyArray<ResolversTypes['PrimaryKey']>, ParentType, ContextType>
 }
 
 export type ExecutedMigrationResolvers<ContextType = any, ParentType extends ResolversParentTypes['ExecutedMigration'] = ResolversParentTypes['ExecutedMigration']> = {
@@ -520,6 +529,10 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
 	truncate?: Resolver<ResolversTypes['TruncateResponse'], ParentType, ContextType>
 }
 
+export interface PrimaryKeyScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['PrimaryKey'], any> {
+	name: 'PrimaryKey'
+}
+
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
 	stages?: Resolver<ReadonlyArray<ResolversTypes['Stage']>, ParentType, ContextType>
 	executedMigrations?: Resolver<ReadonlyArray<ResolversTypes['ExecutedMigration']>, ParentType, ContextType, RequireFields<QueryExecutedMigrationsArgs, never>>
@@ -548,7 +561,7 @@ export type UpdateEventResolvers<ContextType = any, ParentType extends Resolvers
 	appliedAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>
 	type?: Resolver<ResolversTypes['EventType'], ParentType, ContextType>
 	tableName?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	primaryKey?: Resolver<ReadonlyArray<ResolversTypes['String']>, ParentType, ContextType>
+	primaryKey?: Resolver<ReadonlyArray<ResolversTypes['PrimaryKey']>, ParentType, ContextType>
 	oldValues?: Resolver<ResolversTypes['Json'], ParentType, ContextType>
 	diffValues?: Resolver<ResolversTypes['Json'], ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
@@ -569,6 +582,7 @@ export type Resolvers<ContextType = any> = {
 	MigrationModifyError?: MigrationModifyErrorResolvers<ContextType>
 	MigrationModifyResponse?: MigrationModifyResponseResolvers<ContextType>
 	Mutation?: MutationResolvers<ContextType>
+	PrimaryKey?: GraphQLScalarType
 	Query?: QueryResolvers<ContextType>
 	Stage?: StageResolvers<ContextType>
 	TruncateResponse?: TruncateResponseResolvers<ContextType>

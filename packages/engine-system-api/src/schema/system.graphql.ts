@@ -4,6 +4,7 @@ import { DocumentNode } from 'graphql'
 const schema: DocumentNode = gql`
 	scalar DateTime
 	scalar Json
+	scalar PrimaryKey
 
 	schema {
 		query: Query
@@ -55,7 +56,7 @@ const schema: DocumentNode = gql`
 
 	input EventFilterRow {
 		tableName: String!
-		primaryKey: [String!]!
+		primaryKey: [PrimaryKey!]!
 	}
 
 	interface Event {
@@ -68,7 +69,7 @@ const schema: DocumentNode = gql`
 		appliedAt: DateTime!
 		type: EventType!
 		tableName: String!
-		primaryKey: [String!]!
+		primaryKey: [PrimaryKey!]!
 	}
 
 	enum EventType {
@@ -87,7 +88,7 @@ const schema: DocumentNode = gql`
 		appliedAt: DateTime!
 		type: EventType!
 		tableName: String!
-		primaryKey: [String!]!
+		primaryKey: [PrimaryKey!]!
 		oldValues: Json!
 		diffValues: Json!
 	}
@@ -102,7 +103,7 @@ const schema: DocumentNode = gql`
 		appliedAt: DateTime!
 		type: EventType!
 		tableName: String!
-		primaryKey: [String!]!
+		primaryKey: [PrimaryKey!]!
 		oldValues: Json!
 	}
 
@@ -116,7 +117,7 @@ const schema: DocumentNode = gql`
 		appliedAt: DateTime!
 		type: EventType!
 		tableName: String!
-		primaryKey: [String!]!
+		primaryKey: [PrimaryKey!]!
 		newValues: Json!
 	}
 

@@ -102,8 +102,7 @@ export function useNativeInput<E extends HTMLInputElement | HTMLTextAreaElement 
 
 	// Sync when outer value changes
 	useEffect(() => {
-		// Uncontrolled
-		if (value == undefined) {
+		if (value === undefined || value === null) {
 			return
 		}
 

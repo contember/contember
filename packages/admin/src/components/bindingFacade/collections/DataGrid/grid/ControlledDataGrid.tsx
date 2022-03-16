@@ -56,8 +56,17 @@ export const ControlledDataGrid = Component(
 			'componentProps' in props ? props.componentProps : undefined,
 		)
 	},
-	() => {
-		return null
+	({ state, stateMethods, ...props }, environment) => {
+		return renderGrid(
+			stateMethods,
+			undefined,
+			state,
+			state,
+			environment,
+			{},
+			'component' in props ? props.component : undefined,
+			'componentProps' in props ? props.componentProps : undefined,
+		)
 	},
 	'ControlledDataGrid',
 ) as <ComponentProps>(props: ControlledDataGridProps<ComponentProps>) => ReactElement

@@ -25,26 +25,34 @@ describe('GraphQlQueryBuilder', () => {
 				)
 				.object('Authors', o => o.field('id')),
 		)
-		expect(query).toEqual(`query {
-	Post(where: {id: "123"}) {
-		id
-		publishedAt
-		... on Article {
-			leadParagraph
-		}
-		... on BlogPost {
-			comments {
-				id
-			}
-		}
-		locales(where: {locale: {eq: cs}}) {
-			id
-			title
-		}
-	}
-	Authors {
-		id
-	}
-}`)
+		expect(query).toMatchInlineSnapshot(`
+			"query {
+				Post(where: {id: \\"123\\"}) {
+					__typename
+					id
+					publishedAt
+					... on Article {
+						__typename
+						leadParagraph
+					}
+					... on BlogPost {
+						__typename
+						comments {
+							__typename
+							id
+						}
+					}
+					locales(where: {locale: {eq: cs}}) {
+						__typename
+						id
+						title
+					}
+				}
+				Authors {
+					__typename
+					id
+				}
+			}"
+		`)
 	})
 })

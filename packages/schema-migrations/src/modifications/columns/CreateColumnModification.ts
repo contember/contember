@@ -23,6 +23,7 @@ export const CreateColumnModification: ModificationHandlerStatic<CreateColumnMod
 			[column.columnName]: {
 				type: column.type === Model.ColumnType.Enum ? `"${column.columnType}"` : column.columnType,
 				notNull: !column.nullable && !hasSeed,
+				sequenceGenerated: column.sequence,
 			},
 		})
 		if (hasSeed) {

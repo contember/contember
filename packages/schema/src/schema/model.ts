@@ -46,6 +46,10 @@ namespace Model {
 		typeAlias?: string
 		nullable: boolean
 		default?: string | number | boolean | null
+		sequence?: {
+			precedence: 'ALWAYS' | 'BY DEFAULT'
+			start?: number
+		}
 	}
 
 	export interface ColumnVisitor<T> {

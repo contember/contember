@@ -17,6 +17,7 @@ export class ColumnDefinition extends FieldDefinition<ColumnDefinitionOptions> {
 		})
 	}
 
+
 	public columnName(columnName: string): Interface<ColumnDefinition> {
 		return this.withOption('columnName', columnName)
 	}
@@ -33,6 +34,10 @@ export class ColumnDefinition extends FieldDefinition<ColumnDefinitionOptions> {
 		return this.withOption('nullable', false)
 	}
 
+	public sequence(options?: Model.ColumnTypeDefinition['sequence']): Interface<ColumnDefinition> {
+		return this.withOption('sequence', options ?? { precedence: 'BY DEFAULT' })
+	}
+
 	public unique(): Interface<ColumnDefinition> {
 		return this.withOption('unique', true)
 	}
@@ -46,12 +51,13 @@ export class ColumnDefinition extends FieldDefinition<ColumnDefinitionOptions> {
 	}
 
 	createField({ name, conventions, enumRegistry, entityName }: CreateFieldContext): Model.AnyField {
-		const { type, nullable, columnName, enumDefinition, default: defaultValue, columnType, typeAlias } = this.options
+		const { type, nullable, columnName, enumDefinition, default: defaultValue, columnType, typeAlias, sequence } = this.options
 		const common = {
 			name: name,
 			columnName: columnName || conventions.getColumnName(name),
 			nullable: nullable === undefined ? true : nullable,
 			...(defaultValue !== undefined ? { default: defaultValue } : {}),
+			...(sequence !== undefined ? { sequence } : {}),
 		}
 		if (type === Model.ColumnType.Enum) {
 			if (typeAlias) {
@@ -130,4 +136,5 @@ export type ColumnDefinitionOptions = {
 	unique?: boolean
 	nullable?: boolean
 	default?: Model.ColumnTypeDefinition['default']
+	sequence?: Model.ColumnTypeDefinition['sequence']
 } & ColumnTypeOptions

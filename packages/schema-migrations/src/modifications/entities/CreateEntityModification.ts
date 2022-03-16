@@ -3,6 +3,7 @@ import { Model, Schema } from '@contember/schema'
 import { SchemaUpdater, updateModel } from '../utils/schemaUpdateUtils'
 import { ModificationHandlerOptions, ModificationHandlerStatic } from '../ModificationHandler'
 import { createEventTrigger, createEventTrxTrigger } from '../utils/sqlUpdateUtils'
+import { EnumDefinition } from '@contember/schema-definition/dist/src/model/definition'
 
 export const CreateEntityModification: ModificationHandlerStatic<CreateEntityModificationData> = class {
 	static id = 'createEntity'
@@ -20,11 +21,13 @@ export const CreateEntityModification: ModificationHandlerStatic<CreateEntityMod
 			return
 		}
 		const primaryColumn = entity.fields[entity.primary] as Model.AnyColumn
+
 		builder.createTable(entity.tableName, {
 			[primaryColumn.name]: {
 				primaryKey: true,
 				type: primaryColumn.type === Model.ColumnType.Enum ? `"${primaryColumn.columnType}"` : primaryColumn.columnType,
 				notNull: true,
+				sequenceGenerated: primaryColumn.sequence,
 			},
 		})
 		createEventTrigger(builder, this.options.systemSchema, entity.tableName, [entity.primaryColumn])

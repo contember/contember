@@ -20,14 +20,16 @@ export class SchemaValidator {
 		const validSchema = { ...schema, acl, model, validation }
 
 		const errors = [...aclErrors, ...modelErrors, ...validationErrors]
-		if (errors.length === 0 && !isDeepStrictEqual(validSchema, schema)) {
+		if (errors.length === 0) {
 			const errors = deepCompare(validSchema, schema, [])
-			let message = 'There is something wrong with a schema validator:'
-			for (const err of errors) {
-				message += '\n\t' + err.path.join('.') + ': ' + err.message
+			if (errors.length) {
+				let message = 'There is something wrong with a schema validator:'
+				for (const err of errors) {
+					message += '\n\t' + err.path.join('.') + ': ' + err.message
+				}
+				message += '\n\nPlease fill a bug report'
+				throw new Error(message)
 			}
-			message += '\n\nPlease fill a bug report'
-			throw new Error(message)
 		}
 		return errors
 	}

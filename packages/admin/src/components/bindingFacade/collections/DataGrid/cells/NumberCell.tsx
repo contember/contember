@@ -64,7 +64,7 @@ export const NumberCell: FunctionComponent<NumberCellProps> = Component(props =>
 				}> = [
 						{ value: 'eq', label: formatMessage('dataGridCells.numberCell.equals') },
 						{ value: 'gte', label: formatMessage('dataGridCells.numberCell.greaterThan') },
-						{ value: 'gte', label: formatMessage('dataGridCells.numberCell.lessThan') },
+						{ value: 'lte', label: formatMessage('dataGridCells.numberCell.lessThan') },
 					]
 				return (
 					<Stack direction="horizontal">

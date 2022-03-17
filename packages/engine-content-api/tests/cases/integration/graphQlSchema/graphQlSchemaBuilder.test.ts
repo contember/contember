@@ -112,7 +112,7 @@ graphqlSchemaBuilderTest('restricted access to fields by permissions', async () 
 })
 
 
-graphqlSchemaBuilderTest('conditionally restricted read', async () => {
+graphqlSchemaBuilderTest('conditionally restricted read of some fields', async () => {
 	await testSchema({
 		schema: builder =>
 			builder.entity('Test', e =>
@@ -135,6 +135,33 @@ graphqlSchemaBuilderTest('conditionally restricted read', async () => {
 			},
 		}),
 		graphQlSchemaFile: 'schema-acl-predicate.gql',
+	})
+})
+
+
+graphqlSchemaBuilderTest('conditionally restricted read of whole row', async () => {
+	await testSchema({
+		schema: builder =>
+			builder.entity('Test', e =>
+				e
+					.column('a', c => c.type(Model.ColumnType.String).notNull()),
+			),
+		permissions: () => ({
+			Test: {
+				predicates: {
+					testPredicate: {
+						a: { eq: 'Foo' },
+					},
+				},
+				operations: {
+					read: {
+						id: 'testPredicate',
+						a: 'testPredicate',
+					},
+				},
+			},
+		}),
+		graphQlSchemaFile: 'schema-acl-predicate2.gql',
 	})
 })
 

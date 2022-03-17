@@ -3,6 +3,7 @@ import { Acl, Model } from '@contember/schema'
 import { ColumnTypeResolver } from '../ColumnTypeResolver'
 import { EntityTypeProvider } from '../EntityTypeProvider'
 import { Authorizator } from '../../acl'
+import { ImplementationException } from '../../exception'
 
 export class FieldTypeVisitor implements Model.ColumnVisitor<GraphQLOutputType>, Model.RelationByGenericTypeVisitor<GraphQLOutputType> {
 	constructor(
@@ -14,8 +15,15 @@ export class FieldTypeVisitor implements Model.ColumnVisitor<GraphQLOutputType>,
 
 	public visitColumn(entity: Model.Entity, column: Model.AnyColumn): GraphQLOutputType {
 		const basicType = this.columnTypeResolver.getType(column)
-		const permissions = this.authorizator.getFieldPermissions(Acl.Operation.read, entity.name, column.name)
-		return column.nullable || permissions === 'maybe' ? basicType : new GraphQLNonNull(basicType)
+		const fieldPredicate = this.authorizator.getFieldPredicate(Acl.Operation.read, entity.name, column.name)
+		const idPredicate = this.authorizator.getFieldPredicate(Acl.Operation.read, entity.name, entity.primary)
+		if (!fieldPredicate || !idPredicate) {
+			throw new ImplementationException()
+		}
+		if (!column.nullable && (fieldPredicate === true || fieldPredicate === idPredicate)) {
+			return new GraphQLNonNull(basicType)
+		}
+		return basicType
 	}
 
 	public visitHasMany(entity: Model.Entity, relation: Model.Relation): GraphQLOutputType {

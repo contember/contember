@@ -19,5 +19,8 @@ export const loadSchema = async (project: Project): Promise<Schema> => {
 			builtin: ['*'],
 		},
 	})
-	return (await vm.run(bundledJs)).default
+	const schema = await vm.run(bundledJs).default
+	// https://github.com/patriksimek/vm2/issues/198
+	const fixedSchema = JSON.parse(JSON.stringify(schema))
+	return fixedSchema
 }

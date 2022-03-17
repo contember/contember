@@ -1,0 +1,156 @@
+{
+	"formatVersion": 3,
+	"modifications": [
+		{
+			"modification": "createEntity",
+			"entity": {
+				"name": "SeqEntity",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "seq_entity",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"columnType": "integer",
+						"nullable": false,
+						"type": "Integer",
+						"sequence": {
+							"precedence": "BY DEFAULT"
+						}
+					}
+				},
+				"unique": {},
+				"eventLog": {
+					"enabled": true
+				}
+			}
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"name": "SeqEntity2",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "seq_entity2",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"columnType": "integer",
+						"nullable": false,
+						"type": "Integer",
+						"sequence": {
+							"precedence": "ALWAYS",
+							"start": 100
+						}
+					}
+				},
+				"unique": {},
+				"eventLog": {
+					"enabled": true
+				}
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "SeqEntity",
+			"field": {
+				"name": "value",
+				"columnName": "value",
+				"columnType": "text",
+				"nullable": true,
+				"type": "String"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "SeqEntity2",
+			"field": {
+				"name": "value",
+				"columnName": "value",
+				"columnType": "text",
+				"nullable": true,
+				"type": "String"
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "SeqEntity2",
+			"owningSide": {
+				"type": "ManyHasOne",
+				"name": "parent",
+				"target": "SeqEntity",
+				"joiningColumn": {
+					"columnName": "parent_id",
+					"onDelete": "restrict"
+				},
+				"nullable": true,
+				"inversedBy": "sub"
+			},
+			"inverseSide": {
+				"type": "OneHasMany",
+				"name": "sub",
+				"target": "SeqEntity2",
+				"ownedBy": "parent"
+			}
+		},
+		{
+			"modification": "patchAclSchema",
+			"patch": [
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/SeqEntity",
+					"value": {
+						"predicates": {},
+						"operations": {
+							"read": {
+								"id": true,
+								"value": true,
+								"sub": true
+							},
+							"create": {
+								"id": true,
+								"value": true,
+								"sub": true
+							},
+							"update": {
+								"id": true,
+								"value": true,
+								"sub": true
+							},
+							"delete": true,
+							"customPrimary": true
+						}
+					}
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/SeqEntity2",
+					"value": {
+						"predicates": {},
+						"operations": {
+							"read": {
+								"id": true,
+								"value": true,
+								"parent": true
+							},
+							"create": {
+								"id": true,
+								"value": true,
+								"parent": true
+							},
+							"update": {
+								"id": true,
+								"value": true,
+								"parent": true
+							},
+							"delete": true,
+							"customPrimary": true
+						}
+					}
+				}
+			]
+		}
+	]
+}

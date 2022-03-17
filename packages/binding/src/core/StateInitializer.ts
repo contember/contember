@@ -463,7 +463,7 @@ export class StateInitializer {
 	private initializeFromHasManyRelationMarker(
 		parent: EntityRealmState,
 		field: HasManyRelationMarker,
-		persistedEntityIds: Set<string>,
+		persistedEntityIds: Set<EntityId>,
 	) {
 		parent.children.set(
 			field.placeholderName,

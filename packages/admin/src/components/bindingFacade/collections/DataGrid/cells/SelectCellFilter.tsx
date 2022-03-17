@@ -6,11 +6,12 @@ import { BaseDynamicChoiceField } from '../../../fields/ChoiceField/BaseDynamicC
 import { useSelectOptions } from '../../../fields/ChoiceField/useSelectOptions'
 import { FilterRendererProps } from '../base'
 import { dataGridCellsDictionary } from './dataGridCellsDictionary'
+import { EntityId } from '@contember/binding'
 
 
 // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
 export type SelectCellArtifacts = {
-	id: string[]
+	id: EntityId[]
 	nullCondition: boolean
 }
 type SelectCellFilterProps =

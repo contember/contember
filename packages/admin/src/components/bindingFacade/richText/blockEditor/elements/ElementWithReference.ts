@@ -1,8 +1,9 @@
 import { Element, Node, Text } from 'slate'
+import { EntityId } from '@contember/binding'
 
 // This isn't necessarily meant to represent an actual element that will appear in the editor.
 export interface ElementWithReference extends Element {
-	referenceId: string
+	referenceId: EntityId
 }
 
 export const isElementWithReference = (candidate: Node): candidate is ElementWithReference => {

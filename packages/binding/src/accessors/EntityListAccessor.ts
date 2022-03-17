@@ -65,7 +65,7 @@ class EntityListAccessor implements Errorable {
 	}
 
 	public hasEntityOnServer(entityOrItsId: EntityAccessor | EntityId): boolean {
-		if (typeof entityOrItsId === 'string') {
+		if (typeof entityOrItsId === 'string' || typeof entityOrItsId === 'number') {
 			return this.idsPersistedOnServer.has(entityOrItsId)
 		}
 		const idOnServer = entityOrItsId.idOnServer

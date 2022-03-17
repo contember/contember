@@ -12,6 +12,7 @@ import { BindingError } from '../BindingError'
 import { PRIMARY_KEY_NAME } from '../bindingTypes'
 import { assertNever } from '../utils'
 import { MutationAlias, mutationOperationSubTreeType, mutationOperationType } from './requestAliases'
+import { EntityId } from '../treeParameters'
 
 export class RequestResponseNormalizer {
 	public static mergeInQueryResponse(
@@ -115,7 +116,7 @@ export class RequestResponseNormalizer {
 		fieldData: ReceivedFieldData,
 	): EntityFieldPersistedData {
 		if (Array.isArray(fieldData)) {
-			const subTreeListIds = new Set<string>()
+			const subTreeListIds = new Set<EntityId>()
 			for (const entityDatum of fieldData) {
 				subTreeListIds.add(this.createEntityData(entityMap, entityDatum).value)
 			}
@@ -128,7 +129,7 @@ export class RequestResponseNormalizer {
 	}
 
 	private static createEntityData(entityMap: PersistedEntityDataStore, entityData: ReceivedEntityData): ServerId {
-		const primaryKey: string | undefined = entityData[PRIMARY_KEY_NAME]
+		const primaryKey: EntityId | undefined = entityData[PRIMARY_KEY_NAME]
 
 		if (primaryKey === undefined) {
 			throw new BindingError(`The server has responded with an entity that lacks a primary key.`)

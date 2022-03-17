@@ -1,11 +1,11 @@
-import type { Scalar } from '../treeParameters'
+import type { EntityId, Scalar } from '../treeParameters'
 
 export type ReceivedFieldData = Scalar | ReceivedEntityData | Array<ReceivedEntityData>
 
 export type ReceivedEntityData =
 	& {
 		__typename: string
-		id: string
+		id: EntityId
 	}
 	& {
 		[fieldName: string]: ReceivedFieldData

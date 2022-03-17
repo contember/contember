@@ -195,7 +195,7 @@ export class TreeStore {
 		return subTreeState
 	}
 
-	public getEntityListPersistedIds(state: EntityListState): ReadonlySet<string> {
+	public getEntityListPersistedIds(state: EntityListState): ReadonlySet<EntityId> {
 		const blueprint = state.blueprint
 
 		if (blueprint.parent) {

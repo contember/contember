@@ -1,5 +1,6 @@
 import type { RequestError } from './RequestError'
 import { ErrorAccessor } from '../accessors'
+import { EntityId } from '../treeParameters'
 
 export interface NothingToPersistPersistResult {
 	type: 'nothingToPersist'
@@ -7,7 +8,7 @@ export interface NothingToPersistPersistResult {
 
 export interface JustSuccessPersistResult {
 	type: 'justSuccess'
-	persistedEntityIds: string[]
+	persistedEntityIds: EntityId[]
 	afterPersistError?: any
 }
 

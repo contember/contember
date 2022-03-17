@@ -1,13 +1,18 @@
 import { Editor, PathRef } from 'slate'
 import { useCallback, useState } from 'react'
-import { SugaredRelativeEntityList, useDesugaredRelativeEntityList, useEntityPersistSuccess } from '@contember/binding'
+import {
+	EntityId,
+	SugaredRelativeEntityList,
+	useDesugaredRelativeEntityList,
+	useEntityPersistSuccess,
+} from '@contember/binding'
 
-export type BlockElementPathRefs = Map<string, PathRef>
+export type BlockElementPathRefs = Map<EntityId, PathRef>
 export const useBlockElementPathRefs = ({ editor, blockList }: {
 	editor: Editor,
 	blockList: SugaredRelativeEntityList,
 }): BlockElementPathRefs => {
-	const [blockElementPathRefs] = useState(() => new Map<string, PathRef>())
+	const [blockElementPathRefs] = useState(() => new Map<EntityId, PathRef>())
 	const desugaredBlockList = useDesugaredRelativeEntityList(blockList)
 	// TODO this isn't particularly great. We should probably react to id changes more directly.
 	useEntityPersistSuccess(

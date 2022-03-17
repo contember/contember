@@ -2,7 +2,7 @@ import { Ancestor, Element, Node, Path } from 'slate'
 import type { ElementWithReference } from './ElementWithReference'
 import { CustomElementPlugin } from '../../baseEditor'
 import { ReferenceElementRenderer } from '../renderers'
-import { BindingError, EntityAccessor, FieldValue, RelativeSingleField } from '@contember/binding'
+import { BindingError, EntityAccessor, EntityId, FieldValue, RelativeSingleField } from '@contember/binding'
 import { getDiscriminatedDatum } from '../../../discrimination'
 import { EditorReferenceBlocks } from '../templating'
 import { NormalizedEmbedHandlers } from '../embed'
@@ -27,7 +27,7 @@ export interface ReferenceElementOptions {
 	embedReferenceDiscriminateBy: FieldValue | undefined
 	embedContentDiscriminationField: RelativeSingleField | undefined
 	embedSubBlocks: NormalizedBlocks | undefined
-	getReferencedEntity: (path: Path, referenceId: string) => EntityAccessor
+	getReferencedEntity: (path: Path, referenceId: EntityId) => EntityAccessor
 }
 
 const findElementPathFallback = (parent: Ancestor, element: ReferenceElement): Path | undefined => {

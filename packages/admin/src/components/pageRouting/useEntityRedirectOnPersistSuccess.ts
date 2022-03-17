@@ -1,4 +1,4 @@
-import type { EntityAccessor, PersistSuccessOptions } from '@contember/binding'
+import type { EntityAccessor, EntityId, PersistSuccessOptions } from '@contember/binding'
 import { useEnvironment } from '@contember/binding'
 import { useMemo } from 'react'
 import {
@@ -12,7 +12,7 @@ import {
 
 export type RedirectOnSuccessHandler = (
 	currentState: PageRequest<any>,
-	persistedId: string,
+	persistedId: EntityId,
 	entity: EntityAccessor,
 	options: PersistSuccessOptions,
 ) => IncompleteRequestState

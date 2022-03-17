@@ -188,11 +188,11 @@ export class ListOperations {
 	public getChildEntityById(state: EntityListState, id: EntityId) {
 		const realm = state.children.get(id)
 		if (realm === undefined) {
-			const isRuntimeId = uuidValidate(id) || UnpersistedEntityDummyId.matchesDummyId(id)
+			const isRuntimeId = typeof id === 'number' || uuidValidate(id) || UnpersistedEntityDummyId.matchesDummyId(id)
 			if (isRuntimeId) {
 				throw new BindingError(`EntityList: cannot retrieve an entity with id '${id}' as it is not on the list.`)
 			}
-			const looksLikeKey = this.treeStore.entityRealmStore.has(id) || RealmKeyGenerator.vaguelyAppearsToBeAKey(id)
+			const looksLikeKey = typeof id === 'string' && (this.treeStore.entityRealmStore.has(id) || RealmKeyGenerator.vaguelyAppearsToBeAKey(id))
 			throw new BindingError(
 				`EntityList: cannot retrieve an entity with id '${id}' because it's not a valid id.` +
 					(looksLikeKey

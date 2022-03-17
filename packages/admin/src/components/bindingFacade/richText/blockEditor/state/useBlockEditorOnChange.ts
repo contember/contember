@@ -3,6 +3,7 @@ import { assertNever } from '../../../../../utils'
 import { Editor, Element, Operation } from 'slate'
 import {
 	EntityAccessor,
+	EntityId,
 	EntityListAccessor,
 	SugaredFieldProps,
 	SugaredRelativeEntityList,
@@ -28,7 +29,7 @@ export const useBlockEditorOnChange = ({ refreshBlocks, editor, sortedBlocksRef,
 
 	return useCallback(() => {
 		const { children, operations } = editor
-		const saveBlockElement = (getBlockList: () => EntityListAccessor, id: string, element: Element) => {
+		const saveBlockElement = (getBlockList: () => EntityListAccessor, id: EntityId, element: Element) => {
 			getBlockList()
 				.getChildEntityById(id)
 				.getRelativeSingleField(desugaredBlockContentField)

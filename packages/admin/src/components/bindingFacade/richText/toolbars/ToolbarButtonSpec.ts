@@ -1,4 +1,4 @@
-import type { EntityAccessor } from '@contember/binding'
+import type { EntityAccessor, EntityId } from '@contember/binding'
 import type { IconSourceSpecification } from '@contember/ui'
 import type { FunctionComponent, ReactNode } from 'react'
 import type { Range as SlateRange } from 'slate'
@@ -17,7 +17,7 @@ export interface ElementSpecificToolbarButton<E extends SlateElement> {
 }
 
 export interface InitializeReferenceContentProps {
-	referenceId: string
+	referenceId: EntityId
 	editor: EditorWithBlocks
 	selection: SlateRange | null
 	onSuccess: (options?: { createElement?: Partial<SlateElement> }) => void

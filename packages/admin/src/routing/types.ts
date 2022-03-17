@@ -4,7 +4,7 @@ export interface SelectedDimension {
 	[key: string]: string[]
 }
 
-export type RequestParameterValue = string | undefined
+export type RequestParameterValue = number | string | undefined
 
 export interface RequestParameters<Extra extends RoutingParameter = never> {
 	[key: string]: RequestParameterValue | Extra

@@ -1,0 +1,110 @@
+type Query {
+  getTest(by: TestUniqueWhere!, filter: TestWhere): Test
+  listTest(filter: TestWhere, orderBy: [TestOrderBy!], offset: Int, limit: Int): [Test!]!
+  paginateTest(filter: TestWhere, orderBy: [TestOrderBy!], skip: Int, first: Int): TestConnection!
+  transaction: QueryTransaction
+  _info: Info
+}
+
+type Test {
+  _meta: TestMeta
+  id: UUID!
+  a: String!
+}
+
+type TestMeta {
+  id: FieldMeta
+  a: FieldMeta
+}
+
+type FieldMeta {
+  readable: Boolean
+  updatable: Boolean
+}
+
+scalar UUID
+
+input TestUniqueWhere {
+  id: UUID
+}
+
+input TestWhere {
+  id: UUIDCondition
+  a: StringCondition
+  and: [TestWhere]
+  or: [TestWhere]
+  not: TestWhere
+}
+
+input UUIDCondition {
+  and: [UUIDCondition!]
+  or: [UUIDCondition!]
+  not: UUIDCondition
+  null: Boolean
+  isNull: Boolean
+  eq: UUID
+  notEq: UUID
+  in: [UUID!]
+  notIn: [UUID!]
+  lt: UUID
+  lte: UUID
+  gt: UUID
+  gte: UUID
+}
+
+input StringCondition {
+  and: [StringCondition!]
+  or: [StringCondition!]
+  not: StringCondition
+  null: Boolean
+  isNull: Boolean
+  eq: String
+  notEq: String
+  in: [String!]
+  notIn: [String!]
+  lt: String
+  lte: String
+  gt: String
+  gte: String
+  contains: String
+  startsWith: String
+  endsWith: String
+  containsCI: String
+  startsWithCI: String
+  endsWithCI: String
+}
+
+input TestOrderBy {
+  _random: Boolean
+  _randomSeeded: Int
+  id: OrderDirection
+  a: OrderDirection
+}
+
+enum OrderDirection {
+  asc
+  desc
+}
+
+type TestConnection {
+  pageInfo: PageInfo!
+  edges: [TestEdge!]!
+}
+
+type PageInfo {
+  totalCount: Int!
+}
+
+type TestEdge {
+  node: Test!
+}
+
+type QueryTransaction {
+  getTest(by: TestUniqueWhere!, filter: TestWhere): Test
+  listTest(filter: TestWhere, orderBy: [TestOrderBy!], offset: Int, limit: Int): [Test!]!
+  paginateTest(filter: TestWhere, orderBy: [TestOrderBy!], skip: Int, first: Int): TestConnection!
+}
+
+type Info {
+  description: String
+}

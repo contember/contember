@@ -8,7 +8,7 @@
   },
   "typings": "dist/src/index.d.ts",
   "dependencies": {
-    "@contember/engine-common": "^1.1.0-alpha.5",
+    "@contember/typesafe": "^1.1.0-alpha.5",
     "@contember/engine-plugins": "^1.1.0-alpha.5",
     "@contember/graphql-utils": "^1.1.0-alpha.5",
     "@contember/schema": "^1.1.0-alpha.5",

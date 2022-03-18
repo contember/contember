@@ -1,6 +1,6 @@
 import { ConfigProcessor, ConfigTemplate, ConfigTemplateContext } from '@contember/engine-plugins'
 import { ProjectWithS3Config, s3ConfigSchema } from './Config'
-import { Typesafe } from '@contember/engine-common'
+import * as Typesafe from '@contember/typesafe'
 
 export class S3ConfigProcessor implements ConfigProcessor<ProjectWithS3Config> {
 	getDefaultEnv(): Record<string, string> {
@@ -34,7 +34,7 @@ export class S3ConfigProcessor implements ConfigProcessor<ProjectWithS3Config> {
 
 	getProjectConfigSchema?(slug: string): Typesafe.Type<Record<string, any>> {
 		return Typesafe.union(
-			(input, path = []) => Typesafe.valueAt(input, ['s3', 'credentials', 'key']) === undefined ? {} : Typesafe.fail(path),
+			(input: unknown, path: PropertyKey[] = []) => Typesafe.valueAt(input, ['s3', 'credentials', 'key']) === undefined ? {} : Typesafe.fail(path),
 			Typesafe.object({
 				s3: s3ConfigSchema,
 			}),

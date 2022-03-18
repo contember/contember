@@ -1,5 +1,5 @@
 import { ProjectConfig } from './ProjectContainer'
-import { Typesafe } from '@contember/engine-common'
+import * as Typesafe from '@contember/typesafe'
 
 export type Env = Record<string, string>
 export type ConfigTemplate = any // fixme
@@ -13,5 +13,5 @@ export interface ConfigProcessor<ProjectConf extends ProjectConfig = ProjectConf
 
 	prepareConfigTemplate?(template: ConfigTemplate, context: ConfigTemplateContext): ConfigTemplate
 
-	getProjectConfigSchema?(slug: string): Typesafe.Type<Record<string, any>>
+	getProjectConfigSchema?(slug: string): Typesafe.Type<Typesafe.JsonObject>
 }

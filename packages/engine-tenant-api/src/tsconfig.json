@@ -9,7 +9,7 @@
 			"path": "../../config-loader/src"
 		},
 		{
-			"path": "../../engine-common/src"
+			"path": "../../typesafe/src"
 		},
 		{
 			"path": "../../queryable/src"

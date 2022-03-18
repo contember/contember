@@ -13,7 +13,7 @@
     "@contember/database": "^1.1.0-alpha.5",
     "@contember/database-migrations": "^1.1.0-alpha.5",
     "@contember/dic": "^1.1.0-alpha.5",
-    "@contember/engine-common": "^1.1.0-alpha.5",
+    "@contember/typesafe": "^1.1.0-alpha.5",
     "@contember/engine-content-api": "^1.1.0-alpha.5",
     "@contember/engine-http": "^1.1.0-alpha.5",
     "@contember/engine-plugins": "^1.1.0-alpha.5",

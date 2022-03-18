@@ -54,6 +54,9 @@
 		},
 		{
 			"path": "../../engine-vimeo-plugin/src"
+		},
+		{
+			"path": "../../typesafe/src"
 		}
 	]
 }

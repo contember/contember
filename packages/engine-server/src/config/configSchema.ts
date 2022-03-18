@@ -1,4 +1,4 @@
-import { Typesafe } from '@contember/engine-common'
+import * as Typesafe from '@contember/typesafe'
 import { MailerOptions } from '@contember/engine-tenant-api'
 import { upperCaseFirst } from '../utils'
 
@@ -25,9 +25,9 @@ export const tenantConfigSchema = Typesafe.intersection(
 			port: Typesafe.number,
 			user: Typesafe.string,
 			password: Typesafe.string,
-		}), (value, input): MailerOptions => {
+		}), (value, input): MailerOptions & Typesafe.JsonObject => {
 			return {
-				...(input as MailerOptions),
+				...(input as any),
 				...value,
 				...(value.user ? { auth: { user: value.user, pass: value.password } } : {}),
 			}
@@ -64,7 +64,7 @@ export const serverConfigSchema = Typesafe.intersection(
 	}),
 	Typesafe.partial({
 		workerCount: Typesafe.union(Typesafe.number, Typesafe.string),
-		projectGroup: (val, path) => Typesafe.valueAt(val, ['domainMapping']) === undefined
+		projectGroup: (val: unknown, path: PropertyKey[] = []) => Typesafe.valueAt(val, ['domainMapping']) === undefined
 			? undefined
 			: Typesafe.intersection(
 				Typesafe.object({
@@ -78,14 +78,15 @@ export const serverConfigSchema = Typesafe.intersection(
 	}),
 )
 
-export const stageConfig = Typesafe.map(
+export const stageConfig = Typesafe.record(
+	Typesafe.string,
 	Typesafe.intersection(
 		Typesafe.object({
 			name: Typesafe.union(
 				Typesafe.string,
-				(_, path = []) => upperCaseFirst(String(path[path.length - 2])),
+				(_: unknown, path: PropertyKey[] = []) => upperCaseFirst(String(path[path.length - 2])),
 			),
-			slug: (_, path = []) => String(path[path.length - 2]),
+			slug: (_: unknown, path: PropertyKey[] = []) => String(path[path.length - 2]),
 		}),
 		Typesafe.partial({
 			schema: Typesafe.string,
@@ -96,7 +97,7 @@ export const stageConfig = Typesafe.map(
 export const projectConfigSchema = Typesafe.object({
 	name: Typesafe.union(
 		Typesafe.string,
-		(_, path = []) => upperCaseFirst(String(path[path.length - 2])).replace(/-/g, ' '),
+		(_: unknown, path: PropertyKey[] = []) => upperCaseFirst(String(path[path.length - 2])).replace(/-/g, ' '),
 	),
 	slug: (_, path = []) => String(path[path.length - 2]),
 	stages: (input, path = []) => Object.values(stageConfig(input, path)),

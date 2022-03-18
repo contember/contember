@@ -14,6 +14,7 @@ import { VERSION_LATEST } from './modifications/ModificationVersions'
 import { CreateUniqueConstraintModification, RemoveUniqueConstraintModification } from './modifications/constraints'
 import { RemoveFieldModification } from './modifications/fields'
 import {
+	ConfigureEntityDatabaseMigrationsModification,
 	CreateEntityModification,
 	CreateViewModification,
 	RemoveEntityModification,
@@ -60,6 +61,7 @@ export class SchemaDiffer {
 		}
 
 		const differs: (CreateDiff | Differ)[] = [
+			ConfigureEntityDatabaseMigrationsModification.createDiff,
 			ConvertOneToManyRelationModification.createDiff,
 			ConvertOneHasManyToManyHasManyRelationModification.createDiff,
 

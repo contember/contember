@@ -32,6 +32,9 @@ export const ConvertOneToManyRelationModification: ModificationHandlerStatic<Con
 
 	public createSql(builder: MigrationBuilder): void {
 		const { entity, relation } = this.getRelation()
+		if (!entity.migrations.enabled) {
+			return
+		}
 		builder.addIndex(entity.tableName, relation.joiningColumn.columnName)
 		const uniqueConstraintName = NamingHelper.createUniqueConstraintName(entity.name, [relation.name])
 		builder.dropConstraint(entity.tableName, uniqueConstraintName)

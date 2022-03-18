@@ -13,6 +13,8 @@ export * from './IndexDefinition'
 export * from './EnumDefinition'
 export * from './UniqueDefinition'
 export * from './ViewDefinition'
+export * from './DisableMigrationsAnnotation'
+
 export { extendEntity, EntityExtension } from './extensions'
 
 export abstract class Entity {

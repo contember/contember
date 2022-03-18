@@ -15,6 +15,9 @@ export const CreateEntityModification: ModificationHandlerStatic<CreateEntityMod
 
 	public createSql(builder: MigrationBuilder): void {
 		const entity = this.data.entity
+		if (entity.migrations?.enabled === false) {
+			return
+		}
 		if (entity.view) {
 			// BC
 			builder.createView(entity.tableName, {}, entity.view.sql)
@@ -45,6 +48,7 @@ export const CreateEntityModification: ModificationHandlerStatic<CreateEntityMod
 				[this.data.entity.name]: {
 					eventLog: { enabled: true },
 					indexes: {},
+					migrations: { enabled: true },
 					...this.data.entity,
 				},
 			},

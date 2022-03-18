@@ -57,9 +57,8 @@ export class SchemaBuilder {
 						return { ...acc, [field.name]: field }
 					}, {}),
 				tableName: this.conventions.getTableName(entityName),
-				eventLog: {
-					enabled: true,
-				},
+				eventLog: { enabled: true },
+				migrations: { enabled: true },
 			}
 			return applyEntityExtensions(definition, { entity,  definition: definitionInstance, registry: this.entityRegistry })
 		})

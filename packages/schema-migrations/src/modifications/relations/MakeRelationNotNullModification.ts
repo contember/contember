@@ -12,6 +12,9 @@ export const MakeRelationNotNullModification: ModificationHandlerStatic<MakeRela
 
 	public createSql(builder: MigrationBuilder): void {
 		const entity = getEntity(this.schema.model, this.data.entityName)
+		if (!entity.migrations.enabled) {
+			return
+		}
 		if (entity.view) {
 			return
 		}

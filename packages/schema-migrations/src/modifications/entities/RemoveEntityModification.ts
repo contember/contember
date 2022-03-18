@@ -27,6 +27,9 @@ export const RemoveEntityModification: ModificationHandlerStatic<RemoveEntityMod
 
 	public createSql(builder: MigrationBuilder): void {
 		const entity = this.schema.model.entities[this.data.entityName]
+		if (!entity.migrations.enabled) {
+			return
+		}
 		if (entity.view) {
 			builder.dropView(entity.tableName)
 			return

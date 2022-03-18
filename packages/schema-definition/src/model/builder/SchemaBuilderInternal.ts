@@ -41,9 +41,8 @@ export default class SchemaBuilderInternal {
 			fields: {},
 			indexes: {},
 			tableName: options.tableName || this.conventions.getTableName(name),
-			eventLog: {
-				enabled: true,
-			},
+			eventLog: { enabled: true },
+			migrations: { enabled: true },
 		}
 	}
 

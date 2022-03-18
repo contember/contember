@@ -10,6 +10,9 @@ export const UpdateViewModification: ModificationHandlerStatic<UpdateViewModific
 
 	public createSql(builder: MigrationBuilder): void {
 		const entity = this.schema.model.entities[this.data.entityName]
+		if (!entity.migrations.enabled) {
+			return
+		}
 		builder.createView(
 			entity.tableName,
 			{

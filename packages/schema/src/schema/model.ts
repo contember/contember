@@ -12,6 +12,11 @@ export namespace Model {
 		readonly indexes: Indexes
 		readonly view?: View
 		readonly eventLog: EventLogConfig
+		readonly migrations: EntityMigrations
+	}
+
+	export type EntityMigrations = {
+		readonly enabled: boolean
 	}
 
 	export type View = {

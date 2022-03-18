@@ -166,6 +166,9 @@ const entitySchema = Typesafe.intersection(
 		})),
 		indexes: indexesSchema,
 		eventLog: eventLogSchema,
+		migrations: Typesafe.coalesce<Model.EntityMigrations, Model.EntityMigrations>(Typesafe.object({
+			enabled: Typesafe.boolean,
+		}), { enabled: true }),
 	}),
 	Typesafe.partial({
 		view: viewSchema,

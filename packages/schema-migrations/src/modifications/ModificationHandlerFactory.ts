@@ -5,6 +5,7 @@ import { PatchValidationSchemaModification, UpdateValidationSchemaModification }
 import { PatchAclSchemaModification, UpdateAclSchemaModification } from './acl'
 import { CreateUniqueConstraintModification, RemoveUniqueConstraintModification } from './constraints'
 import {
+	ConfigureEntityDatabaseMigrationsModification,
 	CreateEntityModification,
 	CreateViewModification,
 	RemoveEntityModification,
@@ -79,6 +80,7 @@ namespace ModificationHandlerFactory {
 		ToggleEventLogModification,
 		ToggleJunctionEventLogModification,
 		ConvertOneHasManyToManyHasManyRelationModification,
+		ConfigureEntityDatabaseMigrationsModification,
 	]
 
 	export const defaultFactoryMap: HandlerMap<any> = Object.fromEntries(handlers.map(it => [it.id, it]))

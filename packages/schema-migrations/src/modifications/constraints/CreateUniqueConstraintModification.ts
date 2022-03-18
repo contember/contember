@@ -11,7 +11,7 @@ export const CreateUniqueConstraintModification: ModificationHandlerStatic<Creat
 
 	public createSql(builder: MigrationBuilder): void {
 		const entity = this.schema.model.entities[this.data.entityName]
-		if (entity.view) {
+		if (entity.view || !entity.migrations.enabled) {
 			return
 		}
 		const fields = this.data.unique.fields

@@ -1,3 +1,4 @@
+export * from './ConfigureEntityDatabaseMigrationsModification'
 export * from './CreateEntityModification'
 export * from './CreateViewModification'
 export * from './RemoveEntityModification'

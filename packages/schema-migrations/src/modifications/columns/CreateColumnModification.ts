@@ -14,7 +14,7 @@ export const CreateColumnModification: ModificationHandlerStatic<CreateColumnMod
 
 	public createSql(builder: MigrationBuilder): void {
 		const entity = this.schema.model.entities[this.data.entityName]
-		if (entity.view) {
+		if (entity.view || !entity.migrations.enabled) {
 			return
 		}
 		const column = this.data.field

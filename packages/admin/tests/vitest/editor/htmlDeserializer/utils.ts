@@ -1,4 +1,4 @@
-import { HtmlDeserializer, HtmlDeserializerPlugin, paragraphElementType } from '../../../../../src/'
+import { HtmlDeserializer, HtmlDeserializerPlugin, paragraphElementType } from '../../../../src/'
 
 export const deserializeHtml = (html: string, plugins: HtmlDeserializerPlugin[] = []) => {
 	const document = new DOMParser().parseFromString(html, 'text/html')

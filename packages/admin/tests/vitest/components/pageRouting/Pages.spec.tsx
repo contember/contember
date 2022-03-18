@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import * as renderer from 'react-test-renderer'
-import { CurrentRequestContext, Page, Pages, RequestState } from '../../../../../src'
+import { CurrentRequestContext, Page, Pages, RequestState } from '../../../../src'
 import { ReactNode } from 'react'
 
 function expectRequest(pages: ReactNode, request: RequestState) {

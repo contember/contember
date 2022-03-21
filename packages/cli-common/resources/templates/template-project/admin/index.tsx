@@ -10,11 +10,6 @@ runReactApp(
 		sessionToken={import.meta.env.VITE_CONTEMBER_ADMIN_SESSION_TOKEN}
 		project={import.meta.env.VITE_CONTEMBER_ADMIN_PROJECT_NAME}
 		stage="live"
-		children={
-			<Pages
-				layout={Layout}
-				children={Object.assign({}, ...Object.values(import.meta.globEager('./pages/*.tsx')))}
-			/>
-		}
+		children={<Pages layout={Layout} children={import.meta.glob('./pages/**/*.tsx')} />}
 	/>,
 )

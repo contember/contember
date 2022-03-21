@@ -1,7 +1,8 @@
 import { acceptEveryFieldVisitor } from '@contember/schema-utils'
 import { Model } from '@contember/schema'
 
-export const getFieldsForUniqueWhere = (schema: Model.Schema, entity: Model.Entity): string[][] => {
+type SingleUnique = readonly string[]
+export const getFieldsForUniqueWhere = (schema: Model.Schema, entity: Model.Entity): readonly (SingleUnique)[] => {
 	const relations = Object.values(
 		acceptEveryFieldVisitor<undefined | [string]>(schema, entity, {
 			visitColumn: () => undefined,

@@ -150,43 +150,42 @@ namespace Input {
 
 	export type OrderBy<T = OrderDirection> = OrderByFields<T> & { _random?: boolean; _randomSeeded?: number }
 
-	export interface Condition<T = Value.FieldValue> {
-		and?: Array<Condition<T>>
-		or?: Array<Condition<T>>
-		not?: Condition<T>
-
-		eq?: T
-		null?: boolean // deprecated
-		isNull?: boolean
-		notEq?: T
-		in?: T[]
-		notIn?: T[]
-		lt?: T
-		lte?: T
-		gt?: T
-		gte?: T
-		never?: true
-		always?: true
-		contains?: string
-		startsWith?: string
-		endsWith?: string
-		containsCI?: string
-		startsWithCI?: string
-		endsWithCI?: string
+	export type Condition<T = Value.FieldValue> = {
+		readonly and?: readonly Condition<T>[]
+		readonly or?: readonly Condition<T>[]
+		readonly not?: Condition<T>
+		readonly eq?: T
+		readonly null?: boolean // deprecated
+		readonly isNull?: boolean
+		readonly notEq?: T
+		readonly in?: readonly T[]
+		readonly notIn?: readonly T[]
+		readonly lt?: T
+		readonly lte?: T
+		readonly gt?: T
+		readonly gte?: T
+		readonly never?: true
+		readonly always?: true
+		readonly contains?: string
+		readonly startsWith?: string
+		readonly endsWith?: string
+		readonly containsCI?: string
+		readonly startsWithCI?: string
+		readonly endsWithCI?: string
 	}
 
-	export interface UniqueWhere<E = never> {
-		[field: string]: Value.PrimaryValue<E> | UniqueWhere<E>
+	export type UniqueWhere<E = never> = {
+		readonly [field: string]: Value.PrimaryValue<E> | UniqueWhere<E>
 	}
 
 	export type ComposedWhere<C, Opt = never> = {
-		and?: (Where<C, Opt> | Opt)[]
-		or?: (Where<C, Opt> | Opt)[]
-		not?: Where<C, Opt>
+		readonly and?: readonly (Where<C, Opt> | Opt)[]
+		readonly or?: readonly (Where<C, Opt> | Opt)[]
+		readonly not?: Where<C, Opt>
 	}
 
 	export interface FieldWhere<C = Condition, Opt = never> {
-		[name: string]: C | Where<C, Opt> | undefined | (Where<C, Opt> | Opt)[] //last one if for ComposedWhere
+		readonly [name: string]: C | Where<C, Opt> |  readonly (Where<C, Opt> | Opt)[] //last one if for ComposedWhere
 	}
 
 	export type Where<C = Condition, Opt = never> = ComposedWhere<C, Opt> & FieldWhere<C, Opt>

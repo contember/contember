@@ -1,4 +1,4 @@
-import { Model } from '@contember/schema'
+import { Model, Writable } from '@contember/schema'
 import { NamingHelper } from '@contember/schema-utils'
 import EntityBuilder from './EntityBuilder'
 import { SchemaBuilderError } from './SchemaBuilderError'
@@ -12,7 +12,7 @@ import { NamingConventions } from './../definition/NamingConventions'
 import FieldBuilder from './FieldBuilder'
 
 export default class SchemaBuilderInternal {
-	private entities: { [name: string]: Model.Entity } = {}
+	private entities: { [name: string]: Model.Entity & { fields: Record<string, Model.AnyField> } } = {}
 
 	private fieldOptions: { [entity: string]: FieldBuilder.Map } = {}
 
@@ -155,7 +155,7 @@ export default class SchemaBuilderInternal {
 		options: EntityBuilder.EntityOptions,
 		fieldOptions: FieldBuilder.Map,
 	): Model.UniqueConstraints {
-		const unique: Model.UniqueConstraints = {}
+		const unique: Writable<Model.UniqueConstraints> = {}
 		for (const singleUnique of options.unique || []) {
 			const name = singleUnique.name || NamingHelper.createUniqueConstraintName(entityName, singleUnique.fields)
 			unique[name] = { fields: singleUnique.fields, name: name }

@@ -1,4 +1,4 @@
-import { Acl, Model } from '@contember/schema'
+import { Acl, Model, Writable } from '@contember/schema'
 
 export class AllowAllPermissionFactory {
 	constructor(
@@ -11,7 +11,7 @@ export class AllowAllPermissionFactory {
 	) {}
 
 	create(schema: Pick<Model.Schema, 'entities'>, allowCustomPrimary = false): Acl.Permissions {
-		const permissions: Acl.Permissions = {}
+		const permissions: Writable<Acl.Permissions> = {}
 		for (let entityName in schema.entities) {
 			if (!schema.entities.hasOwnProperty(entityName)) {
 				continue

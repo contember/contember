@@ -1,4 +1,5 @@
 import Input from './input'
+import { JSONValue } from './json'
 
 namespace Acl {
 	export enum VariableType {
@@ -17,14 +18,14 @@ namespace Acl {
 	// 	enumName: string
 	// }
 
-	export interface EntityVariable {
-		type: VariableType.entity
-		entityName: string
+	export type EntityVariable = {
+		readonly type: VariableType.entity
+		readonly entityName: string
 	}
 
-	export interface PredefinedVariable {
-		type: VariableType.predefined
-		value: 'identityID' | 'personID'
+	export type PredefinedVariable = {
+		readonly type: VariableType.predefined
+		readonly value: 'identityID' | 'personID'
 	}
 
 
@@ -36,18 +37,18 @@ namespace Acl {
 
 	export type VariableValue = string | number | readonly (string | number)[]
 
-	export interface VariablesMap {
-		[name: string]: VariableValue
+	export type VariablesMap = {
+		readonly [name: string]: VariableValue
 	}
 
 	export type PredicateVariable = string //{ name: string }
 	export type PredicateDefinition<E = never> = Input.Where<PredicateVariable | Input.Condition | E>
 
-	export type PredicateMap = { [name: string]: PredicateDefinition }
+	export type PredicateMap = { readonly [name: string]: PredicateDefinition }
 
-	export interface EntityPermissions {
-		predicates: PredicateMap
-		operations: EntityOperations
+	export type EntityPermissions = {
+		readonly predicates: PredicateMap
+		readonly operations: EntityOperations
 	}
 
 	export enum Operation {
@@ -57,38 +58,38 @@ namespace Acl {
 		delete = 'delete',
 	}
 
-	export interface EntityOperations {
-		read?: FieldPermissions
-		create?: FieldPermissions
-		customPrimary?: boolean
-		update?: FieldPermissions
-		delete?: Predicate
+	export type EntityOperations = {
+		readonly read?: FieldPermissions
+		readonly create?: FieldPermissions
+		readonly customPrimary?: boolean
+		readonly update?: FieldPermissions
+		readonly delete?: Predicate
 	}
 
-	export type FieldPermissions = { [field: string]: Predicate | undefined }
+	export type FieldPermissions = { readonly [field: string]: Predicate }
 
 	export type PredicateReference = string
 	export type Predicate = PredicateReference | boolean
 
 	export type AnyStage = '*'
-	export type StagesDefinition = AnyStage | string[]
+	export type StagesDefinition = AnyStage | readonly string[]
 
 	export type TenantManagedVariableSource = true | string
 
 	export type TenantManagePermissions = {
-		[role: string]: {
-			variables?:
+		readonly [role: string]: {
+			readonly variables?:
 			| true
 			| {
-				[targetVariable: string]: TenantManagedVariableSource
+				readonly [targetVariable: string]: TenantManagedVariableSource
 			}
 		}
 	}
 
-	export interface TenantPermissions {
-		invite?: boolean
-		unmanagedInvite?: boolean
-		manage?: TenantManagePermissions
+	export type TenantPermissions = {
+		readonly invite?: boolean
+		readonly unmanagedInvite?: boolean
+		readonly manage?: TenantManagePermissions
 	}
 
 	export enum SystemPermissionsLevel {
@@ -100,33 +101,37 @@ namespace Acl {
 	/**
 	 * @deprecated
 	 */
-	export type LimitedSystemPermissionsLevel = SystemPermissionsLevel.any | SystemPermissionsLevel.none
+	export type LimitedSystemPermissionsLevel = 'any' | 'none'
 
-	export interface SystemPermissions {
-		history?: boolean | LimitedSystemPermissionsLevel
-		migrate?: boolean
-		assumeIdentity?: boolean
+	export type SystemPermissions = {
+		readonly history?: boolean | LimitedSystemPermissionsLevel
+		readonly migrate?: boolean
+		readonly assumeIdentity?: boolean
 	}
 
-	export type RolePermissions = {
-		inherits?: string[]
-		implicit?: boolean
-		tenant?: TenantPermissions
-		system?: SystemPermissions
-		variables: Acl.Variables
-		stages?: StagesDefinition
-		entities: Permissions
-	} & Record<string, unknown>
-
-	export interface Permissions {
-		[entity: string]: EntityPermissions
+	export interface BaseRolePermissions {
+		readonly inherits?: readonly string[]
+		readonly implicit?: boolean
+		readonly tenant?: TenantPermissions
+		readonly system?: SystemPermissions
+		readonly variables: Acl.Variables
+		readonly stages?: StagesDefinition
+		readonly entities: Permissions
+	}
+	export type RolePermissions =
+		& BaseRolePermissions
+		& {
+			readonly [key: string] : JSONValue
+		}
+	export type Permissions = {
+		readonly [entity: string]: EntityPermissions
 	}
 
-	export type Roles = { [role: string]: RolePermissions }
-	export type Variables = { [name: string]: Variable }
+	export type Roles = { readonly [role: string]: RolePermissions }
+	export type Variables = { readonly [name: string]: Variable }
 
-	export interface Schema {
-		roles: Acl.Roles
+	export type Schema = {
+		readonly roles: Acl.Roles
 	}
 }
 

@@ -6,11 +6,14 @@ import Value from './schema/value'
 import Result from './schema/result'
 
 export * from './ProjectRole'
+export * from './schema/json'
 
 type Schema = {
-	model: Model.Schema
-	acl: Acl.Schema
-	validation: Validation.Schema
+	readonly model: Model.Schema
+	readonly acl: Acl.Schema
+	readonly validation: Validation.Schema
 }
+
+export type Writable<V> = {-readonly [K in keyof V]: V[K]}
 
 export { Input, Model, Acl, Schema, Validation, Value, Result }

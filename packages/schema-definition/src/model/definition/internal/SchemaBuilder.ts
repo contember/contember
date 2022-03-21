@@ -1,4 +1,4 @@
-import { Model } from '@contember/schema'
+import { Model, Writable } from '@contember/schema'
 import { NamingHelper } from '@contember/schema-utils'
 import 'reflect-metadata'
 import { tuple } from '../../../utils'
@@ -74,7 +74,7 @@ export class SchemaBuilder {
 	}
 
 	private createUnique(entityName: string, fieldDefinitions: FieldsDefinition): Model.UniqueConstraints {
-		const unique: Model.UniqueConstraints = {}
+		const unique: Writable<Model.UniqueConstraints> = {}
 		for (const [fieldName, definition] of Object.entries(fieldDefinitions)) {
 			if (definition.options.unique) {
 				const uniqueName = NamingHelper.createUniqueConstraintName(entityName, [fieldName])

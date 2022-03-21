@@ -1,5 +1,7 @@
+import { JSONValue } from './json'
+
 namespace Validation {
-	export type ContextPath = string[]
+	export type ContextPath = readonly string[]
 
 	export enum ArgumentType {
 		validator = 'validator',
@@ -7,47 +9,61 @@ namespace Validation {
 		literal = 'literal',
 	}
 
-	export type ValidatorArgument = { type: ArgumentType.validator; validator: Validator }
-	export type PathArgument = { type: ArgumentType.path; path: ContextPath }
-	export type LiteralArgument<V = any> = { type: ArgumentType.literal; value: V }
+	export type ValidatorArgument = {
+		readonly type: ArgumentType.validator
+		readonly validator: Validator
+	}
+	export type PathArgument = {
+		readonly type: ArgumentType.path
+		readonly path: ContextPath
+	}
+	export type LiteralArgument<V = JSONValue> = {
+		readonly type: ArgumentType.literal
+		readonly value: V
+	}
 
 	export type ValidatorArguments = {
-		and: ValidatorArgument[]
-		or: ValidatorArgument[]
-		conditional: [ValidatorArgument, ValidatorArgument]
-		pattern: [LiteralArgument<[string, string]>]
-		lengthRange: [LiteralArgument<number | null>, LiteralArgument<number | null>]
-		range: [LiteralArgument<number | null>, LiteralArgument<number | null>]
-		equals: [LiteralArgument<any>]
-		not: [ValidatorArgument]
-		empty: []
-		defined: []
-		inContext: [PathArgument, ValidatorArgument]
-		every: [ValidatorArgument]
-		any: [ValidatorArgument]
-		filter: [ValidatorArgument, ValidatorArgument]
+		readonly and: readonly ValidatorArgument[]
+		readonly or: readonly ValidatorArgument[]
+		readonly conditional: readonly [ValidatorArgument, ValidatorArgument]
+		readonly pattern: readonly [LiteralArgument<readonly [string, string]>]
+		readonly lengthRange: readonly [LiteralArgument<number | null>, LiteralArgument<number | null>]
+		readonly range: readonly [LiteralArgument<number | null>, LiteralArgument<number | null>]
+		readonly equals: readonly [LiteralArgument<JSONValue>]
+		readonly not: readonly [ValidatorArgument]
+		readonly empty: readonly[]
+		readonly defined: readonly[]
+		readonly inContext: readonly [PathArgument, ValidatorArgument]
+		readonly every: readonly [ValidatorArgument]
+		readonly any: readonly [ValidatorArgument]
+		readonly filter: readonly [ValidatorArgument, ValidatorArgument]
 	}
 
 	export type SpecificValidator<N extends keyof ValidatorArguments> = {
-		operation: N
-		args: ValidatorArguments[N]
+		readonly operation: N
+		readonly args: ValidatorArguments[N]
 	}
 
-	export type Validator = { [N in keyof ValidatorArguments]: SpecificValidator<N> }[keyof ValidatorArguments]
+	export type Validator = {
+		readonly [N in keyof ValidatorArguments]: SpecificValidator<N>
+	}[keyof ValidatorArguments]
 
-	export type Message = { text: string; parameters?: (string | number)[] }
-
-	export interface ValidationRule {
-		validator: Validator
-		message: Message
+	export type Message = {
+		readonly text: string
+		readonly parameters?: readonly (string | number)[]
 	}
 
-	export interface EntityRules {
-		[field: string]: ValidationRule[]
+	export type ValidationRule = {
+		readonly validator: Validator
+		readonly message: Message
 	}
 
-	export interface Schema {
-		[entity: string]: EntityRules
+	export type EntityRules = {
+		readonly [field: string]: readonly ValidationRule[]
+	}
+
+	export type Schema = {
+		readonly [entity: string]: EntityRules
 	}
 }
 

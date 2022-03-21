@@ -1,9 +1,9 @@
 namespace Value {
-	export interface Object<E = never> {
-		[key: string]: FieldValue<E>
+	export type Object<E = never> = {
+		readonly [key: string]: FieldValue<E>
 	}
 
-	export interface List<E = never> extends Array<FieldValue<E>> {}
+	export type List<E = never> = readonly FieldValue<E>[]
 
 	export type PrimaryValue<E = never> = string | number | E
 

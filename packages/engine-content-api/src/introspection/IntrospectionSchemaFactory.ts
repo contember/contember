@@ -116,7 +116,7 @@ export class IntrospectionSchemaFactory {
 			}))
 	}
 
-	createValidationSchema(rules: Validation.ValidationRule[]): Pick<ContentSchema._Field, 'rules' | 'validators'> {
+	createValidationSchema(rules: readonly Validation.ValidationRule[]): Pick<ContentSchema._Field, 'rules' | 'validators'> {
 		const validators: ContentSchema._Validator[] = []
 
 		const processValidator = (validator: Validation.Validator) => {

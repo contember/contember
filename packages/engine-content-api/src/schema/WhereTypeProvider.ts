@@ -50,7 +50,7 @@ export class WhereTypeProvider {
 		const combinations: string[] = []
 
 		const possibleUniqueWhereFields = getFieldsForUniqueWhere(this.schema, entity)
-		const uniqueKeys: string[][] = possibleUniqueWhereFields.filter(uniqueKey =>
+		const uniqueKeys: (readonly string[])[] = possibleUniqueWhereFields.filter(uniqueKey =>
 			uniqueKey.every(it =>
 				acceptFieldVisitor(this.schema, entityName, it, new FieldAccessVisitor(Acl.Operation.read, this.authorizator)),
 			),
@@ -66,7 +66,7 @@ export class WhereTypeProvider {
 		})
 	}
 
-	public getUniqueWhereFields(entity: Model.Entity, uniqueKeys: string[][]) {
+	public getUniqueWhereFields(entity: Model.Entity, uniqueKeys: (readonly string[])[]) {
 		const fields: GraphQLInputFieldConfigMap = {}
 		for (const uniqueKey of uniqueKeys) {
 			for (const field of uniqueKey) {

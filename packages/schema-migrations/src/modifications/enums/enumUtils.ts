@@ -1,6 +1,6 @@
 import { escapeSqlString } from '../../utils/escapeSqlString'
 
-export const createCheck = (values: string[]) => {
+export const createCheck = (values: readonly string[]) => {
 	const joinedValues = values.map(it => `'${escapeSqlString(it)}'`).join(',')
 	return `VALUE IN(${joinedValues})`
 }

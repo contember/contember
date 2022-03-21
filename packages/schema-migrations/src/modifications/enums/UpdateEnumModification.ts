@@ -55,5 +55,5 @@ export const UpdateEnumModification: ModificationHandlerStatic<UpdateEnumModific
 
 export interface UpdateEnumModificationData {
 	enumName: string
-	values: string[]
+	values: readonly string[]
 }

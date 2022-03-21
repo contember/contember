@@ -1,3 +1,5 @@
 export * from './AclValidator'
+export * from './ModelValidator'
+export * from './ValidationValidator'
 export * from './errors'
 export * from './SchemaValidator'

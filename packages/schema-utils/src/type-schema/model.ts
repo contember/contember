@@ -180,10 +180,23 @@ const entitySchemaCheck: Typesafe.Equals<Model.Entity, ReturnType<typeof entityS
 
 const enumSchema = Typesafe.object({
 	values: Typesafe.array(Typesafe.string),
+	migrations: Typesafe.object({
+		enabled: Typesafe.boolean,
+	}),
 })
+const enumSchemaCheck: Typesafe.Equals<Model.Enum, ReturnType<typeof enumSchema>> = true
 
 export const modelSchema = Typesafe.object({
 	entities: Typesafe.record(Typesafe.string, entitySchema),
-	enums: Typesafe.record(Typesafe.string, enumSchema),
+	enums: Typesafe.record(
+		Typesafe.string,
+		Typesafe.union(
+			enumSchema,
+			Typesafe.transform<readonly string[], Model.Enum>(
+				Typesafe.array(Typesafe.string),
+				values => ({ values, migrations: { enabled: true } }),
+			),
+		),
+	),
 })
 

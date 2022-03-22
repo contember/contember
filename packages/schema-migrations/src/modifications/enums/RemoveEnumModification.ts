@@ -8,6 +8,10 @@ export const RemoveEnumModification: ModificationHandlerStatic<RemoveEnumModific
 	constructor(private readonly data: RemoveEnumModificationData, private readonly schema: Schema) {}
 
 	public createSql(builder: MigrationBuilder): void {
+		const enum_ = this.schema.model.enums[this.data.enumName]
+		if (!enum_.migrations.enabled) {
+			return
+		}
 		builder.dropDomain(this.data.enumName)
 	}
 

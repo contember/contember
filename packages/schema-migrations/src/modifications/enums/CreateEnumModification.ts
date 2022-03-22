@@ -1,5 +1,5 @@
 import { MigrationBuilder } from '@contember/database-migrations'
-import { Schema } from '@contember/schema'
+import { Model, Schema } from '@contember/schema'
 import { SchemaUpdater, updateModel } from '../utils/schemaUpdateUtils'
 import { ModificationHandlerStatic } from '../ModificationHandler'
 import { createCheck, getConstraintName } from './enumUtils'
@@ -9,6 +9,9 @@ export const CreateEnumModification: ModificationHandlerStatic<CreateEnumModific
 	constructor(private readonly data: CreateEnumModificationData, private readonly schema: Schema) {}
 
 	public createSql(builder: MigrationBuilder): void {
+		if (this.data.migrations?.enabled == false) {
+			return
+		}
 		builder.createDomain(this.data.enumName, 'text', {
 			check: createCheck(this.data.values),
 			constraintName: getConstraintName(this.data.enumName),
@@ -20,7 +23,10 @@ export const CreateEnumModification: ModificationHandlerStatic<CreateEnumModific
 			...model,
 			enums: {
 				...model.enums,
-				[this.data.enumName]: { values: this.data.values },
+				[this.data.enumName]: {
+					values: this.data.values,
+					migrations: this.data.migrations ?? { enabled: true },
+				},
 			},
 		}))
 	}
@@ -36,11 +42,12 @@ export const CreateEnumModification: ModificationHandlerStatic<CreateEnumModific
 	static createDiff(originalSchema: Schema, updatedSchema: Schema) {
 		return Object.entries(updatedSchema.model.enums)
 			.filter(([name]) => !originalSchema.model.enums[name])
-			.map(([enumName, enum_]) => CreateEnumModification.createModification({ enumName, values: enum_.values }))
+			.map(([enumName, enum_]) => CreateEnumModification.createModification({ enumName, values: enum_.values, migrations: enum_.migrations }))
 	}
 }
 
 export interface CreateEnumModificationData {
 	enumName: string
 	values: readonly string[]
+	migrations?: Model.EnumMigrations
 }

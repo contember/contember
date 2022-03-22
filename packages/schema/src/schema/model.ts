@@ -271,7 +271,13 @@ export namespace Model {
 
 	export type Enum = {
 		readonly values: readonly string[]
+		readonly migrations: EnumMigrations
 	}
+
+	export type EnumMigrations = {
+		readonly enabled: boolean
+	}
+
 
 	export type Schema = {
 		readonly enums: { readonly [name: string]: Enum }

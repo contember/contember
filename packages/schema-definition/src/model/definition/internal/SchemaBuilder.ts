@@ -64,8 +64,17 @@ export class SchemaBuilder {
 		})
 
 		return {
-			enums: Object.fromEntries(Object.entries(this.enumRegistry.enums).map(([name, def]) => [name, { values: def.values }])),
-			entities: entities.reduce((acc, entity) => ({ ...acc, [entity.name]: entity }), {}),
+			enums: Object.fromEntries(
+				Object.entries(this.enumRegistry.enums).map(([name, def]) => [
+					name,
+					{
+						values: def.values,
+						migrations: def.migrations,
+					},
+				],
+				),
+			),
+			entities: Object.fromEntries(entities.map(entity => [entity.name, entity])),
 		}
 	}
 

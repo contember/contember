@@ -47,7 +47,7 @@ export default class SchemaBuilderInternal {
 	}
 
 	public addEnum(name: string, values: string[]): void {
-		this.enums[name] = { values }
+		this.enums[name] = { values, migrations: { enabled: true } }
 	}
 
 	public createSchema(): Model.Schema {

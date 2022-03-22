@@ -13,7 +13,12 @@ import {
 	UpdateEntityNameModification,
 	UpdateEntityTableNameModification,
 } from './entities'
-import { CreateEnumModification, RemoveEnumModification, UpdateEnumModification } from './enums'
+import {
+	ConfigureEnumDatabaseMigrationsModification,
+	CreateEnumModification,
+	RemoveEnumModification,
+	UpdateEnumModification,
+} from './enums'
 import { RemoveFieldModification, UpdateFieldNameModification } from './fields'
 import {
 	ConvertOneHasManyToManyHasManyRelationModification,
@@ -81,6 +86,7 @@ namespace ModificationHandlerFactory {
 		ToggleJunctionEventLogModification,
 		ConvertOneHasManyToManyHasManyRelationModification,
 		ConfigureEntityDatabaseMigrationsModification,
+		ConfigureEnumDatabaseMigrationsModification,
 	]
 
 	export const defaultFactoryMap: HandlerMap<any> = Object.fromEntries(handlers.map(it => [it.id, it]))

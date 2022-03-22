@@ -21,7 +21,12 @@ import {
 	ToggleEventLogModification,
 	UpdateEntityTableNameModification,
 } from './modifications/entities'
-import { CreateEnumModification, RemoveEnumModification, UpdateEnumModification } from './modifications/enums'
+import {
+	ConfigureEnumDatabaseMigrationsModification,
+	CreateEnumModification,
+	RemoveEnumModification,
+	UpdateEnumModification,
+} from './modifications/enums'
 import {
 	CreateColumnModification,
 	UpdateColumnDefinitionModification,
@@ -62,6 +67,7 @@ export class SchemaDiffer {
 
 		const differs: (CreateDiff | Differ)[] = [
 			ConfigureEntityDatabaseMigrationsModification.createDiff,
+			ConfigureEnumDatabaseMigrationsModification.createDiff,
 			ConvertOneToManyRelationModification.createDiff,
 			ConvertOneHasManyToManyHasManyRelationModification.createDiff,
 

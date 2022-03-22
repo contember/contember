@@ -169,7 +169,7 @@ export class IntrospectionSchemaFactory {
 		)
 		const enums = Object.entries(this.model.enums)
 			.filter(([name]) => usedEnums.has(name))
-			.map(([name, values]) => ({ name, values }))
+			.map(([name, enum_]) => ({ name, values: enum_.values }))
 		return {
 			enums,
 			entities,

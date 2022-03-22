@@ -18,8 +18,8 @@ export class ModelValidator {
 	}
 
 	private validateEnums(enums: Model.Schema['enums'], errors: ErrorBuilder): void {
-		for (const [enumName, enumValues] of Object.entries(enums)) {
-			for (const value of enumValues) {
+		for (const [enumName, enum_] of Object.entries(enums)) {
+			for (const value of enum_.values) {
 				const valueErrors = errors.for(enumName, value)
 				this.validateIdentifier(value, valueErrors)
 			}

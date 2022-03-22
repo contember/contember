@@ -177,8 +177,13 @@ const entitySchema = Typesafe.intersection(
 
 const entitySchemaCheck: Typesafe.Equals<Model.Entity, ReturnType<typeof entitySchema>> = true
 
+
+const enumSchema = Typesafe.object({
+	values: Typesafe.array(Typesafe.string),
+})
+
 export const modelSchema = Typesafe.object({
 	entities: Typesafe.record(Typesafe.string, entitySchema),
-	enums: Typesafe.record(Typesafe.string, Typesafe.array(Typesafe.string)),
+	enums: Typesafe.record(Typesafe.string, enumSchema),
 })
 

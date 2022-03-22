@@ -26,11 +26,11 @@ export const ProjectInfo = (props: { schema: Schema; projectName: string }) => {
 					<div>
 						<h2 class={'font-semibold text-gray-500 mb-1'}>Enums</h2>
 						<ul class={'text-sm'}>
-							{Object.entries(props.schema.model.enums).map(([name, values]) => (
+							{Object.entries(props.schema.model.enums).map(([name, _enum]) => (
 								<li class={'mb-2'}>
 									{name} <br />
 									<span class={'text-gray-700 ml-4'}>
-										{values.join(', ')}
+										{_enum.values.join(', ')}
 									</span>
 								</li>
 							))}

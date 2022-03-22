@@ -23,7 +23,7 @@ export class EnumsProvider {
 
 	private createEnum(name: string): GraphQLEnumType {
 		const valuesConfig: GraphQLEnumValueConfigMap = {}
-		for (const val of this.schema.enums[name]) {
+		for (const val of this.schema.enums[name].values) {
 			valuesConfig[val] = { value: val }
 		}
 

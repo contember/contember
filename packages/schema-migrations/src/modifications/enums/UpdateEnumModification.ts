@@ -23,14 +23,14 @@ export const UpdateEnumModification: ModificationHandlerStatic<UpdateEnumModific
 			...model,
 			enums: {
 				...model.enums,
-				[this.data.enumName]: this.data.values,
+				[this.data.enumName]: { values: this.data.values },
 			},
 		}))
 	}
 
 	describe() {
-		const currentValues = this.schema.model.enums[this.data.enumName]
-		const missingValues = currentValues.filter(it => !this.data.values.includes(it))
+		const currentEnum = this.schema.model.enums[this.data.enumName]
+		const missingValues = currentEnum.values.filter(it => !this.data.values.includes(it))
 		const failureWarning =
 			missingValues.length > 0
 				? `Removing values (${missingValues.join(', ')}) from enum, this may fail in runtime`
@@ -47,9 +47,9 @@ export const UpdateEnumModification: ModificationHandlerStatic<UpdateEnumModific
 			.filter(
 				([name]) =>
 					originalSchema.model.enums[name] &&
-					!deepEqual(updatedSchema.model.enums[name], originalSchema.model.enums[name]),
+					!deepEqual(updatedSchema.model.enums[name].values, originalSchema.model.enums[name].values),
 			)
-			.map(([enumName, values]) => UpdateEnumModification.createModification({ enumName, values }))
+			.map(([enumName, enum_]) => UpdateEnumModification.createModification({ enumName, values: enum_.values }))
 	}
 }
 

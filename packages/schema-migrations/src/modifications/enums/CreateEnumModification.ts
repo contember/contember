@@ -20,7 +20,7 @@ export const CreateEnumModification: ModificationHandlerStatic<CreateEnumModific
 			...model,
 			enums: {
 				...model.enums,
-				[this.data.enumName]: this.data.values,
+				[this.data.enumName]: { values: this.data.values },
 			},
 		}))
 	}
@@ -36,7 +36,7 @@ export const CreateEnumModification: ModificationHandlerStatic<CreateEnumModific
 	static createDiff(originalSchema: Schema, updatedSchema: Schema) {
 		return Object.entries(updatedSchema.model.enums)
 			.filter(([name]) => !originalSchema.model.enums[name])
-			.map(([enumName, values]) => CreateEnumModification.createModification({ enumName, values }))
+			.map(([enumName, enum_]) => CreateEnumModification.createModification({ enumName, values: enum_.values }))
 	}
 }
 

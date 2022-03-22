@@ -269,8 +269,12 @@ export namespace Model {
 	/** @deprecated */
 	export type ManyHasManyOwnerRelation = ManyHasManyOwningRelation
 
+	export type Enum = {
+		readonly values: readonly string[]
+	}
+
 	export type Schema = {
-		readonly enums: { readonly [name: string]: readonly string[] }
+		readonly enums: { readonly [name: string]: Enum }
 		readonly entities: { readonly [name: string]: Entity }
 	}
 

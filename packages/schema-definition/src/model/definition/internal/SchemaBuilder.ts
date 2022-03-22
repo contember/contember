@@ -64,7 +64,7 @@ export class SchemaBuilder {
 		})
 
 		return {
-			enums: Object.entries(this.enumRegistry.enums).reduce((acc, [name, def]) => ({ ...acc, [name]: def.values }), {}),
+			enums: Object.fromEntries(Object.entries(this.enumRegistry.enums).map(([name, def]) => [name, { values: def.values }])),
 			entities: entities.reduce((acc, entity) => ({ ...acc, [entity.name]: entity }), {}),
 		}
 	}

@@ -22,6 +22,7 @@ export const s3ConfigSchema = Typesafe.intersection(
 	}),
 	Typesafe.partial({
 		endpoint: Typesafe.string,
+		cdnEndpoint: Typesafe.string,
 		provider: Typesafe.enumeration(S3Providers.aws, S3Providers.minio, S3Providers.ceph, S3Providers.localstack, S3Providers.cloudserver),
 		noAcl: Typesafe.boolean,
 	}),
@@ -48,12 +49,18 @@ export const resolveS3Endpoint = (
 ): {
 	endpoint: string
 	basePath: string
-	baseUrl: string
 } => {
 	const hasLegacyPath = !!config.endpoint || config.bucket.includes('.')
 	const endpoint = config.endpoint || `https://${hasLegacyPath ? '' : `${config.bucket}.`}s3.${config.region || defaultRegion}.amazonaws.com`
 	const basePath = hasLegacyPath ? `/${config.bucket}` : ''
 
-	const baseUrl = endpoint + basePath
-	return { endpoint, basePath, baseUrl }
+	return { endpoint, basePath }
+}
+
+export const resolveS3PublicBaseUrl = (config: S3Config): string => {
+	if (config.cdnEndpoint) {
+		return config.cdnEndpoint
+	}
+	const { endpoint, basePath } = resolveS3Endpoint(config)
+	return endpoint + basePath
 }

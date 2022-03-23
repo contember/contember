@@ -1,0 +1,19 @@
+{
+  "name": "@contember/schema-generator",
+  "version": "1.1.0-alpha.5",
+  "license": "Apache-2.0",
+  "main": "dist/src/index.js",
+  "typings": "dist/src/index.d.ts",
+  "scripts": {
+    "test": "echo 'No tests'"
+  },
+  "dependencies": {
+    "pg": "^8.5.0",
+    "pg-connection-string": "^2.5.0",
+    "@contember/database": "^1.1.0-alpha.5",
+    "@contember/schema": "^1.1.0-alpha.5"
+  },
+  "devDependencies": {
+    "@types/node": "^17.0.5"
+  }
+}

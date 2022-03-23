@@ -31,6 +31,7 @@
 		{ "path": "./packages/queryable" },
 		{ "path": "./packages/schema" },
 		{ "path": "./packages/schema-definition" },
+		{ "path": "./packages/schema-generator" },
 		{ "path": "./packages/schema-migrations" },
 		{ "path": "./packages/schema-utils" },
 		{ "path": "./packages/typesafe" },

@@ -21,6 +21,7 @@ export class S3ConfigProcessor implements ConfigProcessor<ProjectWithS3Config> {
 					prefix: `%?project.env.S3_PREFIX||project.slug%`,
 					region: `%project.env.S3_REGION%`,
 					endpoint: `%project.env.S3_ENDPOINT%`,
+					cdnEndpoint: `%?project.env.S3_CDN%`,
 					provider: '%project.env.S3_PROVIDER%',
 					credentials: {
 						key: `%?project.secret.s3.key||project.env.S3_KEY%`,

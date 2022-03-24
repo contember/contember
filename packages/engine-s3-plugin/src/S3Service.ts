@@ -1,5 +1,5 @@
 import { extension } from 'mime-types'
-import { resolveS3Endpoint, S3Config } from './Config'
+import { resolveS3Endpoint, resolveS3PublicBaseUrl, S3Config } from './Config'
 import { ObjectKeyVerifier } from './ObjectKeyVerifier'
 import { ForbiddenError } from 'apollo-server-errors'
 import { Providers } from '@contember/engine-plugins'
@@ -28,13 +28,14 @@ type SignedUploadUrl = {
 	method: string
 }
 
+
 export class S3Service {
-	private readonly baseUrl: string
+	private readonly publicBaseUrl: string
 
 	private readonly signer: S3Signer
 
 	constructor(public readonly config: S3Config, private readonly providers: Providers) {
-		this.baseUrl = resolveS3Endpoint(config).baseUrl
+		this.publicBaseUrl = resolveS3PublicBaseUrl(config)
 		this.signer = new S3Signer(config, providers)
 	}
 
@@ -119,7 +120,7 @@ export class S3Service {
 	}
 
 	public formatPublicUrl(key: string): string {
-		return `${this.baseUrl}/${key}`
+		return `${this.publicBaseUrl}/${key}`
 	}
 }
 

@@ -4,6 +4,7 @@ import { assertNever } from '../utils'
 import { MigrateMutationResolver, MigrationAlterMutationResolver, TruncateMutationResolver } from './mutation'
 import { DateTimeType, JSONType } from '@contember/graphql-utils'
 import { EventOldValuesResolver } from './types'
+import { GraphQLError, GraphQLScalarType, Kind } from 'graphql'
 
 export class ResolverFactory {
 	public constructor(
@@ -20,6 +21,7 @@ export class ResolverFactory {
 		const resolvers: Resolvers & Required<Pick<Resolvers, 'Mutation'>> = {
 			DateTime: DateTimeType,
 			Json: JSONType,
+			PrimaryKey: PrimaryKeyType,
 			Event: {
 				__resolveType: (obj: Event) => {
 					switch (obj.type) {
@@ -61,3 +63,25 @@ export class ResolverFactory {
 		return resolvers
 	}
 }
+
+const parseValue = (value: any)  => {
+	if ((typeof value === 'string' && value !== '') || typeof value === 'number' && isFinite(value) && Math.floor(value) === value) {
+		return value
+	}
+	throw new GraphQLError('PrimaryKey cannot represent value: ' + JSON.stringify(value))
+}
+export const PrimaryKeyType = new GraphQLScalarType({
+	name: 'PrimaryKey',
+	description: 'PrimaryKey custom scalar type. Can be Int or String',
+	serialize: parseValue,
+	parseValue: parseValue,
+	parseLiteral(ast) {
+		if (ast.kind === Kind.STRING) {
+			return ast.value
+		}
+		if (ast.kind === Kind.INT) {
+			return Number.parseInt(ast.value, 10)
+		}
+		return null
+	},
+})

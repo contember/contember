@@ -37,11 +37,11 @@ export const resolveDefaultValue = (column: Model.AnyColumn, providers: Pick<Pro
 	throw new NoDataError(`No data for column ${column.name}`)
 }
 
-export const resolvePrimaryGenerator = (column: Model.AnyColumn, providers: Providers): (() => Input.PrimaryValue) => {
+export const resolvePrimaryGenerator = (column: Model.AnyColumn, providers: Providers): (() => Input.PrimaryValue | undefined) => {
 	if (column.type === Model.ColumnType.Uuid) {
 		return providers.uuid
 	}
-	throw new Error('not implemented')
+	return () => undefined
 }
 
 export const resolveColumnValue = (
@@ -55,7 +55,7 @@ export const resolveColumnValue = (
 		input: Input.ColumnValue | undefined
 	},
 	providers: Providers,
-): Value.AtomicValue => {
+): Value.AtomicValue | undefined => {
 	if (input !== undefined) {
 		return input as Value.AtomicValue
 	}

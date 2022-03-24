@@ -18,7 +18,7 @@ export class SqlCreateInputProcessor implements CreateInputProcessor<MutationRes
 	public async column(context: Context.ColumnContext): Promise<MutationResultList> {
 		this.insertBuilder.addFieldValue(
 			context.column.name,
-			((): Value.GenericValueLike<Value.AtomicValue> => {
+			((): Value.GenericValueLike<Value.AtomicValue | undefined> => {
 				return resolveColumnValue(context, this.providers)
 			})(),
 		)

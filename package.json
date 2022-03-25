@@ -37,7 +37,7 @@
     "lint-staged": "^11.0.0",
     "oao": "^2.0.2",
     "ts-node": "^10.2.0",
-    "typescript": "^4.3.5"
+    "typescript": "^4.6.3"
   },
   "workspaces": [
     "packages/*"

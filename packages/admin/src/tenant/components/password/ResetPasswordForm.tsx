@@ -1,4 +1,4 @@
-import { Button, FieldContainer, TextInput } from '@contember/ui'
+import { Button, FieldContainer, Stack, TextInput } from '@contember/ui'
 import { FC, useCallback } from 'react'
 import { useShowToast } from '../../../components'
 import { RoutingLinkTarget, useRedirect } from '../../../routing'
@@ -23,7 +23,7 @@ export const ResetPasswordForm: FC<ResetPasswordFormProps> = ({ redirectOnSucces
 	const { register, isSubmitting, onSubmit } = useForm<typeof initialValues>(initialValues, useCallback(
 			async values => {
 				if (values.password !== values.passwordAgain) {
-						return addToast({ message: `Passwords does not match`, type: 'error', dismiss: true })
+					return addToast({ message: `Passwords does not match`, type: 'error', dismiss: true })
 				}
 				const response = await resetPassword({
 					password: values.password,
@@ -54,17 +54,19 @@ export const ResetPasswordForm: FC<ResetPasswordFormProps> = ({ redirectOnSucces
 
 	return (
 		<form onSubmit={onSubmit}>
-			<FieldContainer label="Password">
-				<TextInput {...register('password')} required={true} type={'password'} />
-			</FieldContainer>
-			<FieldContainer label="Password again">
-				<TextInput {...register('passwordAgain')} required={true} type={'password'} />
-			</FieldContainer>
-			<FieldContainer label={undefined}>
-				<Button intent="primary" type={'submit'} disabled={isSubmitting}>
-					Set new password
-				</Button>
-			</FieldContainer>
+			<Stack direction="vertical" gap="large">
+				<FieldContainer label="Password">
+					<TextInput {...register('password')} required={true} type={'password'} />
+				</FieldContainer>
+				<FieldContainer label="Password again">
+					<TextInput {...register('passwordAgain')} required={true} type={'password'} />
+				</FieldContainer>
+				<FieldContainer label={undefined}>
+					<Button intent="primary" type={'submit'} disabled={isSubmitting}>
+						Set new password
+					</Button>
+				</FieldContainer>
+			</Stack>
 		</form>
 	)
 }

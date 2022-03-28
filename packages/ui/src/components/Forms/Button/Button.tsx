@@ -70,7 +70,7 @@ export const BaseButton = memo(
 				toThemeClass(!props.disabled ? intent : 'default'),
 				toEnumClass('scheme-', !props.disabled ? scheme : undefined),
 				toEnumViewClass(size),
-				toEnumViewClass(distinction),
+				toEnumViewClass(props.disabled ? 'default' : distinction),
 				toEnumViewClass(flow),
 				toEnumViewClass(justification, 'justifyCenter'),
 				toStateClass('loading', isLoading),

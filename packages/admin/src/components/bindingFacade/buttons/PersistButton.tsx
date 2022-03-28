@@ -29,7 +29,6 @@ export const PersistButton = memo((props: PersistButtonProps) => {
 			isDirty={isDirty}
 			isLoading={isMutating}
 			onClick={onClick}
-			scheme="dark"
 			size="large"
 			{...props}
 		/>

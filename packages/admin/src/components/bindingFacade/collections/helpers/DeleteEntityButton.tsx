@@ -37,7 +37,7 @@ export const DeleteEntityButton = memo((props: DeleteEntityButtonProps) => {
 	}
 
 	return (
-		<Button scheme="dark" {...defaultProps} {...rest} className={classNames(
+		<Button distinction="primary" {...defaultProps} {...rest} className={classNames(
 			className,
 			'theme-grey-controls',
 			'theme-danger-controls:hover',

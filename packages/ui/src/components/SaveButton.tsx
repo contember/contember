@@ -25,8 +25,8 @@ export const SaveButton = memo(
 			ref={ref}
 			size={size ?? 'large'}
 			flow={flow ?? 'block'}
-			scheme={isPrimary ? 'dark' : scheme }
-			distinction={rest.disabled ? 'seamless' : distinction}
+			scheme={scheme}
+			distinction={rest.disabled ? 'seamless' : isPrimary ? 'primary' : distinction}
 			{...rest}
 			>
 				{isDirty

@@ -6,7 +6,7 @@ const intents: Intent[] = ['default', 'primary', 'secondary', 'tertiary', 'posit
 const schemes: Scheme[] = ['system', 'light', 'light-above', 'light-below', 'dark', 'dark-above', 'dark-below']
 const sizes: Size[] = ['default', 'small', 'large']
 const flows: ButtonFlow[] = ['default', 'circular', 'squarish', 'generous', 'block', 'generousBlock']
-const distinctions: ButtonDistinction[] = ['default', 'toned', 'outlined', 'seamless']
+const distinctions: ButtonDistinction[] = ['default', 'primary', 'toned', 'outlined', 'seamless']
 const justifications: Justification[] = ['default', 'justifyStart', 'justifyCenter', 'justifyEnd']
 
 export default {

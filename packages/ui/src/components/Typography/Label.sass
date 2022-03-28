@@ -11,7 +11,7 @@
 	font-family: inherit
 	font-size: var(--cui-font-size-label)
 	font-weight: inherit
-	line-height: 1em
+	line-height: 1.125em
 	margin: calc(-1 * var(--cui-inset-vertical)) calc(-1 * var(--cui-inset-horizontal))
 	padding: var(--cui-inset-vertical) var(--cui-inset-horizontal)
 	position: relative
@@ -27,6 +27,9 @@
 	&.view-large
 		font-weight: lighter
 		font-size: var(--cui-font-size-heading)
+
+	a &, button &
+		color: var(--cui-control-color)
 
 	&.is-active
 		color: var(--cui-control-color--highlighted)

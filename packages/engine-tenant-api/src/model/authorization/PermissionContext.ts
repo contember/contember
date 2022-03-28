@@ -1,5 +1,5 @@
 import { AccessNode, AuthorizationScope, Authorizator } from '@contember/authorization'
-import { ForbiddenError } from 'apollo-server-errors'
+import { ForbiddenError } from '@contember/graphql-utils'
 import { ProjectScopeFactory } from './ProjectScopeFactory'
 import { Project, ProjectSchemaResolver } from '../type'
 import { Identity } from './Identity'

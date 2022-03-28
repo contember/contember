@@ -1,5 +1,5 @@
 import pm, { Matcher } from 'picomatch'
-import { ForbiddenError } from 'apollo-server-errors'
+import { ForbiddenError } from '@contember/graphql-utils'
 
 export type ObjectKeyVerifier = (key: string) => void
 

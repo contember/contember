@@ -20,7 +20,6 @@
     "@contember/schema-migrations": "^1.1.0-alpha.5",
     "@contember/schema-utils": "^1.1.0-alpha.5",
     "@graphql-tools/utils": "^7.10.0",
-    "apollo-server-errors": "^2.4.0",
     "graphql-tag": "^2.12.5"
   },
   "devDependencies": {

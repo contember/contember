@@ -1,7 +1,7 @@
 import { GraphQLError } from 'graphql'
 import { UserError } from '@contember/engine-content-api'
 import { GraphQLListener } from './execution'
-import { ForbiddenError } from 'apollo-server-errors'
+import { ForbiddenError } from '@contember/graphql-utils'
 
 interface ErrorContext {
 	user: string

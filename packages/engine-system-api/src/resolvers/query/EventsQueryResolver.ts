@@ -3,7 +3,7 @@ import { SystemResolverContext } from '../SystemResolverContext'
 import { QueryResolver } from '../Resolver'
 import { EventsOrder, QueryEventsArgs, ResolversTypes } from '../../schema'
 import { AuthorizationActions, EventResponseBuilder, EventsQuery, StageBySlugQuery } from '../../model'
-import { UserInputError } from 'apollo-server-errors'
+import { UserInputError } from '@contember/graphql-utils'
 
 export class EventsQueryResolver implements QueryResolver<'events'> {
 	constructor(

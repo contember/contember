@@ -9,7 +9,7 @@ import {
 	SignUpManager,
 } from '../../../model'
 import { createErrorResponse } from '../../errorUtils'
-import { UserInputError } from 'apollo-server-errors'
+import { UserInputError } from '@contember/graphql-utils'
 
 export class SignUpMutationResolver implements MutationResolvers {
 	constructor(private readonly signUpManager: SignUpManager, private readonly apiKeyManager: ApiKeyManager) {}

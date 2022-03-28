@@ -12,7 +12,6 @@
     "@contember/engine-plugins": "^1.1.0-alpha.5",
     "@contember/graphql-utils": "^1.1.0-alpha.5",
     "@contember/schema": "^1.1.0-alpha.5",
-    "apollo-server-errors": "^2.3.4",
     "mime-types": "^2.1.24",
     "picomatch": "^2.2.1",
     "qs": "^6.10.1",

@@ -23,8 +23,8 @@
 	--cui-button-color--highlighted: var(--cui-filled-control-color--highlighted)
 	--cui-button-color--disabled: var(--cui-color--low)
 	--cui-button-color--pressed: var(--cui-filled-control-color--pressed)
-	--cui-button-background-color: var(--cui-filled-control-background-color)
-	--cui-button-background-color--highlighted: var(--cui-filled-control-background-color--highlighted)
+	--cui-button-background-color: var(--cui-filled-background-color)
+	--cui-button-background-color--highlighted: var(--cui-filled-background-color--highlighted)
 	--cui-button-background-color--pressed: linear-gradient(180deg, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.05)), var(--cui-filled-control-background-color--pressed)
 	--cui-button-background-color--disabled: var(--cui-toned-control-background-color)
 	--cui-button-border-color: rgba(0, 0, 0, 0)
@@ -128,6 +128,13 @@
 			--cui-button-height: auto
 			--cui-button-padding-horizontal: calc(var(--cui-gap) - #{$border-width-em})
 		position: relative
+	&.view-primary
+		--cui-button-color: var(--cui-filled-primary-control-color)
+		--cui-button-color--highlighted: var(--cui-filled-primary-control-color--highlighted)
+		--cui-button-color--pressed: var(--cui-filled-primary-control-color--pressed)
+		--cui-button-background-color: var(--cui-filled-primary-control-background-color)
+		--cui-button-background-color--highlighted: var(--cui-filled-primary-control-background-color--highlighted)
+		--cui-button-background-color--pressed: linear-gradient(180deg, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.05)), var(--cui-filled-primary-control-background-color--pressed)
 	&.view-toned
 		--cui-button-background-color: var(--cui-toned-control-background-color)
 		--cui-button-background-color--highlighted: var(--cui-toned-control-background-color--highlighted)

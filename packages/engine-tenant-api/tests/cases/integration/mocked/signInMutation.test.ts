@@ -5,7 +5,7 @@ import { selectMembershipsSql } from './sql/selectMembershipsSql'
 import { signInMutation } from './gql/signIn'
 import { getPersonByEmailSql } from './sql/getPersonByEmailSql'
 import { SignInErrorCode } from '../../../../src/schema'
-import { test } from 'uvu'
+import { test } from 'vitest'
 import { OtpAuthenticator } from '../../../../src'
 import { Buffer } from 'buffer'
 import { createSessionKeySql } from './sql/createSessionKeySql'
@@ -190,4 +190,3 @@ test('sign in - valid otp token', async () => {
 	})
 })
 
-test.run()

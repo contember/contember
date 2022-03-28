@@ -1,4 +1,4 @@
-import { test } from 'uvu'
+import { test } from 'vitest'
 import { execute } from '../../../../../src/test'
 import { SchemaBuilder } from '@contember/schema-definition'
 import { Model } from '@contember/schema'
@@ -50,4 +50,4 @@ test('Post by author name (where many has one)', async () => {
 		},
 	})
 })
-test.run()
+

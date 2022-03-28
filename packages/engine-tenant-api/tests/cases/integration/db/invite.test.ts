@@ -1,12 +1,11 @@
-import { dbSuite } from '../../../src/testTenantDb'
+import { testTenantDb } from '../../../src/testTenantDb'
 import { inviteMutation } from '../mocked/gql/invite'
 import { testUuid } from '../../../src/testUuid'
 import { GQL } from '../../../src/tags'
-import * as assert from 'uvu/assert'
+import { test, assert } from 'vitest'
 
-const inviteSuite = dbSuite('invite permissions')
 
-inviteSuite('admin can invite a user with a membership', async ({ tester }) => {
+test('admin can invite a user with a membership', testTenantDb(async ({ tester }) => {
 	const languageId = testUuid(555)
 	const result = await tester.execute(
 		inviteMutation({
@@ -20,7 +19,7 @@ inviteSuite('admin can invite a user with a membership', async ({ tester }) => {
 			],
 		}),
 	)
-	assert.is(result.data.invite.ok, true)
+	assert.isOk(result.data.invite.ok)
 	tester.mailer.expectMessage({ subject: 'You have been invited to blog' })
 	const identity = result.data.invite.result.person.identity.id
 	const resultListMembers = await tester.execute(GQL`
@@ -41,8 +40,8 @@ inviteSuite('admin can invite a user with a membership', async ({ tester }) => {
 				}
 			}
 		`)
-	assert.is(identity, testUuid(2))
-	assert.equal(resultListMembers.data, {
+	assert.equal(identity, testUuid(2))
+	assert.deepStrictEqual(resultListMembers.data, {
 		projectBySlug: {
 			members: [
 				{
@@ -65,9 +64,9 @@ inviteSuite('admin can invite a user with a membership', async ({ tester }) => {
 		},
 	})
 	tester.mailer.expectEmpty()
-})
+}))
 
-inviteSuite('superEditor can invite a user with a membership', async ({ tester }) => {
+test('superEditor can invite a user with a membership', testTenantDb(async ({ tester }) => {
 	const languageId = testUuid(555)
 	const result = await tester.execute(
 		inviteMutation({
@@ -87,10 +86,10 @@ inviteSuite('superEditor can invite a user with a membership', async ({ tester }
 			},
 		},
 	)
-	assert.is(result.data.invite.ok, true)
-})
+	assert.equal(result.data.invite.ok, true)
+}))
 
-inviteSuite('superEditor cannot invite a user with different variables', async ({ tester }) => {
+test('superEditor cannot invite a user with different variables', testTenantDb(async ({ tester }) => {
 	const languageId = testUuid(555)
 	const languageId2 = testUuid(556)
 	const result = await tester.execute(
@@ -112,10 +111,10 @@ inviteSuite('superEditor cannot invite a user with different variables', async (
 			noErrorsCheck: true,
 		},
 	)
-	assert.is(result.errors[0].message, 'You are not allowed to invite a person')
-})
+	assert.equal(result.errors[0].message, 'You are not allowed to invite a person')
+}))
 
-inviteSuite('editor cannot invite a user with a membership', async ({ tester }) => {
+test('editor cannot invite a user with a membership', testTenantDb(async ({ tester }) => {
 	const languageId = testUuid(555)
 	const result = await tester.execute(
 		inviteMutation({
@@ -136,7 +135,5 @@ inviteSuite('editor cannot invite a user with a membership', async ({ tester }) 
 			noErrorsCheck: true,
 		},
 	)
-	assert.is(result.errors[0].message, 'You are not allowed to invite a person')
-})
-
-inviteSuite.run()
+	assert.equal(result.errors[0].message, 'You are not allowed to invite a person')
+}))

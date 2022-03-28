@@ -5,7 +5,7 @@
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
   "scripts": {
-    "test": "uvu dist/tests/cases/ \\.js$"
+    "test": "vitest"
   },
   "dependencies": {
     "@contember/database-migrations": "^1.1.0-alpha.5",
@@ -16,8 +16,7 @@
     "rfc6902": "^4.0.1"
   },
   "devDependencies": {
-    "@contember/schema-definition": "^1.1.0-alpha.5",
-    "uvu": "^0.5.3"
+    "@contember/schema-definition": "^1.1.0-alpha.5"
   },
   "peerDependencies": {
     "pg": "^8.5.0"

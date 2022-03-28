@@ -1,4 +1,4 @@
-import { test } from 'uvu'
+import { test } from 'vitest'
 import { execute, sqlTransaction } from '../../../../../src/test'
 import { SchemaBuilder } from '@contember/schema-definition'
 import { Model } from '@contember/schema'
@@ -67,4 +67,4 @@ test('insert site with settings (one has one owning relation', async () => {
 		},
 	})
 })
-test.run()
+

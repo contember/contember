@@ -1,7 +1,6 @@
 import { EventManager } from '../../../src'
 import { createConnectionMock } from '@contember/database-tester'
-import { test } from 'uvu'
-import assert from 'uvu/assert'
+import { test, assert } from 'vitest'
 
 const simpleQuery = (sql: string) => ({
 	sql,
@@ -21,7 +20,7 @@ test('event manager: connection and client', async () => {
 	client.eventManager.on(EventManager.Event.queryStart, ({ sql }) => events.push({ sql, source: 'client' }))
 	await client.query('SELECT 1')
 	await connection.query('SELECT 2')
-	assert.equal(events, [
+	assert.deepStrictEqual(events, [
 		{ sql: 'SELECT 1', source: 'client' },
 		{ sql: 'SELECT 1', source: 'connection' },
 		{ sql: 'SELECT 2', source: 'connection' },
@@ -49,7 +48,7 @@ test('event manager: connection and client with transaction', async () => {
 	})
 	await client.query('SELECT 2')
 	await connection.query('SELECT 3')
-	assert.equal(events, [
+	assert.deepStrictEqual(events, [
 		{ sql: 'BEGIN;', source: 'connection' },
 		{ sql: 'SELECT 1', source: 'transaction' },
 		{ sql: 'SELECT 1', source: 'client' },
@@ -60,4 +59,3 @@ test('event manager: connection and client with transaction', async () => {
 		{ sql: 'SELECT 3', source: 'connection' },
 	])
 })
-test.run()

@@ -1,4 +1,4 @@
-import { test } from 'uvu'
+import { test } from 'vitest'
 import { execute } from '../../../../../src/test'
 import { SchemaBuilder } from '@contember/schema-definition'
 import { Model } from '@contember/schema'
@@ -222,4 +222,4 @@ test('one has many with where, limit and orderBy', async () => {
 		},
 	})
 })
-test.run()
+

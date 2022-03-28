@@ -1,4 +1,4 @@
-import { test } from 'uvu'
+import { test } from 'vitest'
 import { execute, sqlTransaction } from '../../../../../src/test'
 import { SchemaBuilder } from '@contember/schema-definition'
 import { Model } from '@contember/schema'
@@ -71,4 +71,4 @@ from "public"."post" as "root_"`,
 	})
 })
 
-test.run()
+

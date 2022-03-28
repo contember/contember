@@ -6,7 +6,8 @@ import {
 	PermissionContext,
 	ProjectSchemaResolver,
 	StaticIdentity,
-	TenantContainerFactory, TenantMigrationsRunner,
+	TenantContainerFactory,
+	TenantMigrationsRunner,
 	TenantResolverContext,
 	typeDefs,
 } from '../../src'
@@ -18,8 +19,7 @@ import { dbCredentials, recreateDatabase } from './dbUtils'
 import { graphql } from 'graphql'
 import { Membership } from '../../src/model/type/Membership'
 import { Connection } from '@contember/database'
-import * as uvu from 'uvu'
-import * as assert from 'uvu/assert'
+import { assert } from 'vitest'
 
 export interface TenantTest {
 	query: GraphQLTestQuery
@@ -174,7 +174,7 @@ export const createTenantTester = async (): Promise<TenantTester> => {
 			)
 			const result2 = JSON.parse(JSON.stringify(result))
 			if (options.noErrorsCheck !== true) {
-				assert.equal(result2.errors ?? [], [])
+				assert.deepStrictEqual(result2.errors ?? [], [])
 			}
 			return result2
 		},
@@ -189,18 +189,11 @@ interface TenantContext {
 	tester: TenantTester
 }
 
-export const dbSuite = (title: string) => {
-	const dbSuite = uvu.suite<TenantContext>(title)
-	dbSuite.before.each(async ctx => {
-		try {
-			ctx.tester = await createTenantTester()
-		} catch (e) {
-			console.error(e)
-			process.exit(1)
-		}
-	})
-	dbSuite.after.each(async ctx => {
-		await ctx.tester.end()
-	})
-	return dbSuite
+
+export const testTenantDb = (cb: (ctx: TenantContext) =>  Promise<void>) => {
+	return async () => {
+		const tester = await createTenantTester()
+		await cb({ tester })
+		await tester.end()
+	}
 }

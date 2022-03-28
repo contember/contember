@@ -1,5 +1,4 @@
-import { test } from 'uvu'
-import * as assert from 'uvu/assert'
+import { test, assert } from 'vitest'
 import { S3Acl, S3Service } from '../../src'
 
 const mocked = new Date('2021-07-02 17:22')
@@ -45,4 +44,3 @@ test('bucket with dot', () => {
 	)
 })
 
-test.run()

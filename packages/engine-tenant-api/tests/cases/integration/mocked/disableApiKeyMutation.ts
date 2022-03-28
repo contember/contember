@@ -2,7 +2,7 @@ import { executeTenantTest } from '../../../src/testTenant'
 import { GQL } from '../../../src/tags'
 import { testUuid } from '../../../src/testUuid'
 import { disableApiKey } from './sql/disableApiKeySql'
-import { test } from 'uvu'
+import { test } from 'vitest'
 
 test('disable api key', async () => {
 	const apiKeyId = testUuid(1)
@@ -25,4 +25,3 @@ test('disable api key', async () => {
 		},
 	})
 })
-test.run()

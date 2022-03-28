@@ -5,7 +5,7 @@
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
   "scripts": {
-    "test": "uvu dist/tests/cases/ \\.js$"
+    "test-e2e": "vitest --no-threads tests/e2e"
   },
   "dependencies": {
     "@contember/authorization": "^1.1.0-alpha.5",
@@ -41,7 +41,6 @@
     "@types/koa-compress": "^4.0.1",
     "@types/node": "^17.0.5",
     "@types/supertest": "^2.0.8",
-    "supertest": "^6.0.1",
-    "uvu": "^0.5.3"
+    "supertest": "^6.0.1"
   }
 }

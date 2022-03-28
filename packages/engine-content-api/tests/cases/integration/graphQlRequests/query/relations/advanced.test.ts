@@ -1,4 +1,4 @@
-import { test } from 'uvu'
+import { test } from 'vitest'
 import { execute } from '../../../../../src/test'
 import { SchemaBuilder } from '@contember/schema-definition'
 import { Model } from '@contember/schema'
@@ -353,4 +353,4 @@ test('Categories with posts and author (many has many inverse + many has one)', 
 		},
 	})
 })
-test.run()
+

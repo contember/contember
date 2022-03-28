@@ -1,6 +1,5 @@
 import { Client, Connection, DatabaseCredentials, EventManager } from '@contember/database'
-import 'uvu'
-import * as assert from 'uvu/assert'
+import { assert } from 'vitest'
 
 export interface ExpectedQuery {
 	sql: string
@@ -36,18 +35,18 @@ ${JSON.stringify(parameters, undefined, '  ')}
 
 Expected:
 ${expected.sql}`
-		assert.is(actualSql, expectedSql, expectedMsg)
+		assert.equal(actualSql, expectedSql, expectedMsg)
 		const evm = config?.eventManager ?? this.eventManager
 		if (expected.parameters) {
-			assert.is((parameters || []).length, expected.parameters.length, expectedMsg)
+			assert.lengthOf((parameters || []), expected.parameters.length, expectedMsg)
 
 			for (let index in expected.parameters) {
 				const expectedParameter = expected.parameters[index]
 				const actualParameter = (parameters || [])[index]
 				if (typeof expectedParameter === 'function') {
-					assert.is(expectedParameter(actualParameter), true, expectedMsg)
+					assert.deepStrictEqual(expectedParameter(actualParameter), true, expectedMsg)
 				} else {
-					assert.equal(actualParameter, expectedParameter, expectedMsg)
+					assert.deepStrictEqual(actualParameter, expectedParameter, expectedMsg)
 				}
 			}
 		}

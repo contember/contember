@@ -1,4 +1,4 @@
-import { test } from 'uvu'
+import { test } from 'vitest'
 import { execute } from '../../../../../src/test'
 import { SchemaBuilder } from '@contember/schema-definition'
 import { GQL, SQL } from '../../../../../src/tags'
@@ -116,4 +116,4 @@ test('Posts with paginated tags (many has many owning)', async () => {
 	})
 })
 
-test.run()
+

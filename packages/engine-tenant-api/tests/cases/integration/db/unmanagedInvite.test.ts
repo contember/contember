@@ -1,13 +1,11 @@
-import { dbSuite } from '../../../src/testTenantDb'
 import { testUuid } from '../../../src/testUuid'
 import { unmanagedInviteMutation } from '../mocked/gql/unmanagedInvite'
 import { signInMutation } from '../mocked/gql/signIn'
 import { TenantRole } from '../../../../src/model/authorization'
-import * as assert from 'uvu/assert'
+import { test, assert } from 'vitest'
+import { testTenantDb } from '../../../src/testTenantDb'
 
-const inviteSuite = dbSuite('unmanaged invite')
-
-inviteSuite('does not send an email and sets given password', async ({ tester }) => {
+test('does not send an email and sets given password', testTenantDb(async ({ tester }) => {
 	const languageId = testUuid(555)
 	const email = 'john@doe.com'
 	const password = 'abcdefg'
@@ -24,7 +22,7 @@ inviteSuite('does not send an email and sets given password', async ({ tester })
 			],
 		}),
 	)
-	assert.equal(result.data.unmanagedInvite, {
+	assert.deepStrictEqual(result.data.unmanagedInvite, {
 		ok: true,
 		errors: [],
 		result: {
@@ -40,7 +38,7 @@ inviteSuite('does not send an email and sets given password', async ({ tester })
 	const signInResult = await tester.execute(signInMutation({ email, password }, { withData: true }), {
 		roles: [TenantRole.LOGIN],
 	})
-	assert.equal(signInResult.data.signIn, {
+	assert.deepStrictEqual(signInResult.data.signIn, {
 		ok: true,
 		errors: [],
 		result: {
@@ -64,6 +62,4 @@ inviteSuite('does not send an email and sets given password', async ({ tester })
 			},
 		},
 	})
-})
-
-inviteSuite.run()
+}))

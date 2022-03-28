@@ -1,6 +1,6 @@
 import { InputValidation as v, SchemaDefinition as d } from '@contember/schema-definition'
 import { createSchema, testCreate } from '../utils'
-import { suite } from 'uvu'
+import { describe, it } from 'vitest'
 
 class Item {
 	@v.assert(v.rules.and(v.rules.pattern(/.+@.+/), v.rules.minLength(5)), 'failure')
@@ -10,22 +10,23 @@ class Item {
 const schema = createSchema({
 	Item,
 })
-const test = suite('Logical AND rule')
-test('fails when value not valid', async () => {
-	await testCreate({
-		schema,
-		entity: 'Item',
-		data: { value: 'a@b' },
-		errors: ['failure'],
-	})
-})
+describe('Logical AND rule', () => {
 
-test('succeeds when value valid', async () => {
-	await testCreate({
-		schema,
-		entity: 'Item',
-		data: { value: 'abcde@bb.com' },
-		errors: [],
+	it('fails when value not valid', async () => {
+		await testCreate({
+			schema,
+			entity: 'Item',
+			data: { value: 'a@b' },
+			errors: ['failure'],
+		})
+	})
+
+	it('succeeds when value valid', async () => {
+		await testCreate({
+			schema,
+			entity: 'Item',
+			data: { value: 'abcde@bb.com' },
+			errors: [],
+		})
 	})
 })
-test.run()

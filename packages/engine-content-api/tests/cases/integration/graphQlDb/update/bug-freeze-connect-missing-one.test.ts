@@ -1,4 +1,4 @@
-import { test } from 'uvu'
+import { test } from 'vitest'
 import { SchemaDefinition as def } from '@contember/schema-definition'
 import { GQL } from '../../../../src/tags'
 import { executeDbTest } from '@contember/engine-api-tester'
@@ -43,4 +43,4 @@ test('create redirect to non-existing target', async () => {
 	})
 })
 
-test.run()
+

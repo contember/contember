@@ -1,4 +1,4 @@
-import { test } from 'uvu'
+import { test } from 'vitest'
 import { execute } from '../../../../../src/test'
 import { SchemaBuilder } from '@contember/schema-definition'
 import { GQL, SQL } from '../../../../../src/tags'
@@ -170,4 +170,4 @@ test('empty many-has-many inverse relation', async () => {
 	})
 })
 
-test.run()
+

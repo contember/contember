@@ -1,4 +1,4 @@
-import { test } from 'uvu'
+import { test } from 'vitest'
 import { execute, sqlDeferred, sqlTransaction } from '../../../../src/test'
 import { SchemaBuilder } from '@contember/schema-definition'
 import { GQL, SQL } from '../../../../src/tags'
@@ -72,4 +72,4 @@ test('delete post and orphaned content', async () => {
 	})
 })
 
-test.run()
+

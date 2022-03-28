@@ -11,6 +11,7 @@
     "ts:clean": "tsc --build --clean",
     "build": "oao run-script build-copy && tsc --build && oao run-script build",
     "test": "oao run-script --relative-time test",
+    "test-e2e": "oao run-script --relative-time test-e2e",
     "eslint:lint": "eslint \"**/*.{ts,tsx}\" ",
     "eslint:fix": "eslint --fix \"**/*.{ts,tsx}\" ",
     "tag-version": "oao publish --no-npm-publish --no-changelog --no-check-uncommitted --no-master"
@@ -37,7 +38,9 @@
     "lint-staged": "^11.0.0",
     "oao": "^2.0.2",
     "ts-node": "^10.2.0",
-    "typescript": "^4.6.3"
+    "typescript": "^4.6.3",
+    "vite": "^2.8.6",
+    "vitest": "^0.7.11"
   },
   "workspaces": [
     "packages/*"

@@ -1,7 +1,7 @@
 import { Client, ConflictActionType, EventManager, LimitByGroupWrapper, LockType, Operator } from '../../../src'
 import { createConnectionMock } from '@contember/database-tester'
 import { SQL } from '../../src/tags'
-import { test } from 'uvu'
+import { test } from 'vitest'
 
 interface Test {
 	query: (wrapper: Client) => void
@@ -425,4 +425,3 @@ test('query builder: select with recursive', async () => {
 	})
 })
 
-test.run()

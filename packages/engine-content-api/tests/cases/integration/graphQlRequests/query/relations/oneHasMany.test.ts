@@ -1,4 +1,4 @@
-import { test } from 'uvu'
+import { test } from 'vitest'
 import { execute } from '../../../../../src/test'
 import { SchemaBuilder } from '@contember/schema-definition'
 import { Model } from '@contember/schema'
@@ -416,4 +416,4 @@ test('Posts with paginated comments without count (one has many)', async () => {
 	})
 })
 
-test.run()
+

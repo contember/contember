@@ -23,6 +23,7 @@ jobs:
           POSTGRES_DB: postgres
         ports:
           - 5432:5432
+
     steps:
       - uses: actions/checkout@v1
       - name: Setup node
@@ -40,14 +41,31 @@ jobs:
         run: |
           echo "CONTEMBER_TENANT_MIGRATIONS_DIR=`pwd`/packages/engine-tenant-api/src/migrations" >> $GITHUB_ENV
           echo "CONTEMBER_SYSTEM_MIGRATIONS_DIR=`pwd`/packages/engine-system-api/src/migrations" >> $GITHUB_ENV
+          echo "CONTEMBER_EXAMPLE_PROJECTS_DIRECTORY=`pwd`/packages/engine-api-tester/src/projects" >> $GITHUB_ENV
       - name: "Run tests"
         run: yarn run test
         env:
           TEST_DB_HOST: 127.0.0.1
           TEST_DB_PASSWORD: postgres
           TEST_DB_USER: postgres
-          TEST_DB_NAME: cms_test
-          TEST_DB_NAME_TENANT: cms_test_tenant
-          TEST_DB_PORT: 5432
+          TEST_DB_NAME: test
+          CONTEMBER_ROOT_TOKEN: '0000000000000000000000000000000000000000'
+          CONTEMBER_LOGIN_TOKEN: '1111111111111111111111111111111111111111'
+      - name: Start server
+        run: ./packages/engine-server/tests/start-server.sh
+        env:
+          DEFAULT_DB_HOST: 127.0.0.1
+          DEFAULT_DB_PASSWORD: postgres
+          DEFAULT_DB_USER: postgres
+          DEFAULT_DB_PORT: 5432
+          TENANT_DB_NAME: test_tenant
+          CONTEMBER_PORT: 4000
+          CONTEMBER_MONITORING_PORT: 4001
+          CONTEMBER_ROOT_TOKEN: '0000000000000000000000000000000000000000'
+          CONTEMBER_LOGIN_TOKEN: '1111111111111111111111111111111111111111'
+      - name: "Run E2E tests"
+        run: yarn run test-e2e
+        env:
+          CONTEMBER_API_URL: "http://localhost:4000"
           CONTEMBER_ROOT_TOKEN: '0000000000000000000000000000000000000000'
           CONTEMBER_LOGIN_TOKEN: '1111111111111111111111111111111111111111'

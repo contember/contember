@@ -5,8 +5,7 @@
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
   "dependencies": {
-    "@contember/database": "^1.1.0-alpha.5",
-    "uvu": "^0.5.3"
+    "@contember/database": "^1.1.0-alpha.5"
   },
   "scripts": {
     "test": "echo 'No tests'"

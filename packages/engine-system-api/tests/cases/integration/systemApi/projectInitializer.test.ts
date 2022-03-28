@@ -1,13 +1,12 @@
 import { ApiTester } from '@contember/engine-api-tester'
 import { ProjectConfig, StageConfig } from '../../../../src'
-import { suite } from 'uvu'
-import * as assert from '../../../src/asserts'
+import { assert, test } from 'vitest'
+
 import { Logger } from '@contember/engine-common'
 
-const projectInitializerTest = suite('Project initializer')
 const nullLogger = new Logger(() => {})
 
-projectInitializerTest('create stage', async () => {
+test('create stage', async () => {
 	const prodStage: StageConfig = {
 		name: 'Prod',
 		slug: 'prod',
@@ -25,9 +24,8 @@ projectInitializerTest('create stage', async () => {
 
 	await tester.systemContainer.projectInitializer.initialize(tester.databaseContextFactory, project, nullLogger)
 	const createdStagesA = await tester.stages.refreshCreatedStages()
-	assert.contains(createdStagesA, 'prod')
+	assert.ok(createdStagesA.has('prod'))
 
 	await tester.cleanup()
 })
 
-projectInitializerTest.run()

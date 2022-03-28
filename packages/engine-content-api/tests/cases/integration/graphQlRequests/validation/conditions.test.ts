@@ -1,6 +1,6 @@
 import { InputValidation as v, SchemaDefinition as d } from '@contember/schema-definition'
 import { createSchema, testCreate } from './utils'
-import { suite } from 'uvu'
+import { describe, it, assert } from 'vitest'
 
 export class Author {
 	name = d.stringColumn()
@@ -12,32 +12,33 @@ export class Author {
 }
 
 const schema = createSchema({ Author })
-const validationConditionTest = suite('Validation conditions')
-validationConditionTest('succeeds when rule condition is not true', async () => {
-	await testCreate({
-		schema,
-		entity: 'Author',
-		data: { emailValidated: false, email: 'abcd' },
-		executes: [],
-		errors: [],
+describe('Validation conditions', () => {
+
+	it('succeeds when rule condition is not true', async () => {
+		await testCreate({
+			schema,
+			entity: 'Author',
+			data: { emailValidated: false, email: 'abcd' },
+			executes: [],
+			errors: [],
+		})
+	})
+	it('fails when rule condition is true and value is not valid', async () => {
+		await testCreate({
+			schema,
+			entity: 'Author',
+			data: { emailValidated: true, email: 'abcd' },
+			executes: [],
+			errors: ['E-mail is not valid'],
+		})
+	})
+	it('succeeds when rule condition is true and value is set', async () => {
+		await testCreate({
+			schema,
+			entity: 'Author',
+			data: { emailValidated: true, email: 'xx@foo' },
+			executes: [],
+			errors: [],
+		})
 	})
 })
-validationConditionTest('fails when rule condition is true and value is not valid', async () => {
-	await testCreate({
-		schema,
-		entity: 'Author',
-		data: { emailValidated: true, email: 'abcd' },
-		executes: [],
-		errors: ['E-mail is not valid'],
-	})
-})
-validationConditionTest('succeeds when rule condition is true and value is set', async () => {
-	await testCreate({
-		schema,
-		entity: 'Author',
-		data: { emailValidated: true, email: 'xx@foo' },
-		executes: [],
-		errors: [],
-	})
-})
-validationConditionTest.run()

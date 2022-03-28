@@ -1,4 +1,4 @@
-import { test } from 'uvu'
+import { test } from 'vitest'
 import { SchemaBuilder } from '@contember/schema-definition'
 import { GQL } from '../../../../src/tags'
 import { testUuid } from '../../../../src/testUuid'
@@ -44,4 +44,4 @@ test('fails when deleting entity without proper cascade', async () => {
 	})
 })
 
-test.run()
+

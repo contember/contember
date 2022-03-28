@@ -3,7 +3,7 @@ import { testUuid } from '../../../src/testUuid'
 import { GQL, SQL } from '../../../src/tags'
 import { disableApiKey } from './sql/disableApiKeySql'
 import { getPersonByIdentity } from './sql/getPersonByIdentity'
-import { test } from 'uvu'
+import { test } from 'vitest'
 
 test('sign out', async () => {
 	const personId = testUuid(1)
@@ -101,4 +101,3 @@ test('sign out - not a person', async () => {
 	})
 })
 
-test.run()

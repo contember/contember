@@ -1,4 +1,4 @@
-import { test } from 'uvu'
+import { test } from 'vitest'
 import { execute } from '../../../../../src/test'
 import { SchemaDefinition as def } from '@contember/schema-definition'
 import { GQL, SQL } from '../../../../../src/tags'
@@ -83,4 +83,4 @@ test('query a view through a relation', async () => {
 		},
 	})
 })
-test.run()
+

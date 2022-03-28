@@ -7,7 +7,7 @@ import { sqlTransaction } from './sql/sqlTransaction'
 import { getProjectMembershipSql } from './sql/getProjectMembershipSql'
 import { createMembershipSql } from './sql/createMembershipSql'
 import { updateProjectMemberMutation } from './gql/updateProjectMember'
-import { test } from 'uvu'
+import { test } from 'vitest'
 
 test('update project member', async () => {
 	const identityId = testUuid(6)
@@ -58,4 +58,3 @@ test('update project member', async () => {
 	})
 })
 
-test.run()

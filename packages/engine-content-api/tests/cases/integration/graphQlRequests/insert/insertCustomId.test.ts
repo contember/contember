@@ -3,7 +3,7 @@ import { Model } from '@contember/schema'
 import { execute, sqlTransaction } from '../../../../src/test'
 import { GQL, SQL } from '../../../../src/tags'
 import { testUuid } from '../../../../src/testUuid'
-import { test } from 'uvu'
+import { test } from 'vitest'
 
 test('insert author with id', async () => {
 	const schema = new SchemaBuilder()
@@ -54,4 +54,4 @@ test('insert author with id', async () => {
 		permissions: new AllowAllPermissionFactory().create(schema, true),
 	})
 })
-test.run()
+

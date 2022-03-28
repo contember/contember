@@ -1,8 +1,8 @@
 import migration from '../../../src/migrations/2020-06-01-103000-event-trigger-perf'
 import { createMigrationBuilder } from '@contember/database-migrations'
 import { sampleProject } from '@contember/engine-api-tester'
-import { test } from 'uvu'
-import * as assert from 'uvu/assert'
+import { test, assert } from 'vitest'
+
 
 test('event-trigger-performance sql', async () => {
 	const builder = createMigrationBuilder()
@@ -165,4 +165,3 @@ CREATE TRIGGER "log_event_statement"
 	)
 })
 
-test.run()

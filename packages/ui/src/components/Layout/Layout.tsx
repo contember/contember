@@ -22,6 +22,10 @@ export const Layout = memo(({
   pageTheme,
   pageThemeContent,
   pageThemeControls,
+  titleScheme,
+  titleTheme,
+  titleThemeContent,
+  titleThemeControls,
 }: LayoutProps) => {
 	const prefix = useClassNamePrefix()
   const classList = classNames(
@@ -44,6 +48,10 @@ export const Layout = memo(({
         pageTheme={pageTheme}
         pageThemeContent={pageThemeContent}
         pageThemeControls={pageThemeControls}
+        titleScheme={titleScheme}
+        titleTheme={titleTheme}
+        titleThemeContent={titleThemeContent}
+        titleThemeControls={titleThemeControls}
       >
         {children}
       </LayoutChrome>

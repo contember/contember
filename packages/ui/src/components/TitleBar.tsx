@@ -1,9 +1,13 @@
+import classNames from 'classnames'
 import { memo, ReactNode } from 'react'
 import { useClassNamePrefix } from '../auxiliary'
+import { toEnumClass, toThemeClass } from '../utils'
 import { ButtonList } from './Forms'
+import { useThemeScheme, useTitleThemeScheme } from './Layout/ThemeSchemeContext'
+import type { ThemeScheme } from './Layout/Types'
 import { Heading, HeadingProps } from './Typography/Heading'
 
-export interface TitleBarProps {
+export interface TitleBarProps extends ThemeScheme {
 	after?: ReactNode
 	navigation?: ReactNode // This can contain any number of buttons but only buttons
 	children: ReactNode
@@ -11,10 +15,25 @@ export interface TitleBarProps {
 	actions?: ReactNode // This can contain any number of buttons but only buttons
 }
 
-export const TitleBar = memo(({ after, navigation, children, headingProps, actions }: TitleBarProps) => {
+export const TitleBar = memo(({ after, navigation, children, headingProps, actions, ...props }: TitleBarProps) => {
 	const prefix = useClassNamePrefix()
+	const {
+		scheme,
+		theme,
+		themeContent,
+		themeControls,
+	} = useTitleThemeScheme(props)
+
+	const { scheme: layoutScheme } = useThemeScheme({})
+
 	return (
-		<div className={`${prefix}titleBar`}>
+		<div className={classNames(
+			`${prefix}titleBar`,
+			toThemeClass(themeContent ?? theme, 'content'),
+			toThemeClass(themeControls ?? theme, 'controls'),
+			toEnumClass('scheme-', scheme),
+			scheme !== layoutScheme ? 'is-global-theme' : undefined,
+		)}>
 			{navigation && (
 				<nav className={`${prefix}titleBar-navigation`}>
 					<ButtonList>{navigation}</ButtonList>

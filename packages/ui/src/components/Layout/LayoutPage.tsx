@@ -77,29 +77,22 @@ const Aside = memo(({ children }: { children: ReactNode }) => {
 })
 
 export const LayoutPage = memo(({
+	after,
 	actions,
 	children,
 	headingProps,
 	navigation,
-	scheme: schemeProp,
-	theme: themeProp,
-	themeContent: themeContentProp,
-	themeControls: themeControlsProp,
 	side,
 	title,
+	...props
 }: LayoutPageProps) => {
 	const prefix = useClassNamePrefix()
 	const {
-		scheme: schemeContext,
-		theme: themeContext,
-		themeContent: themeContentContext,
-		themeControls: themeControlsContext,
-	} = useThemeScheme()
-
-	const scheme = schemeProp ?? schemeContext
-	const theme = themeProp ?? themeContext
-	const themeContent = themeContentProp ?? themeContentContext
-	const themeControls = themeControlsProp ?? themeControlsContext
+		scheme,
+		theme,
+		themeContent,
+		themeControls,
+	} = useThemeScheme(props)
 
 	const [contentOffsetTop, setContentOffsetTop] = useState<number | undefined>(undefined)
 	const contentRef = useRef<HTMLDivElement>(null)

@@ -25,7 +25,7 @@ export const PersistButton = memo((props: PersistButtonProps) => {
 			ref={buttonRef}
 			disabled={isDisabled}
 			flow="block"
-			intent={isDisabled ? 'default' : 'primary'}
+			intent={isDisabled ? 'default' : props.intent}
 			isDirty={isDirty}
 			isLoading={isMutating}
 			onClick={onClick}

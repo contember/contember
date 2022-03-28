@@ -9,36 +9,44 @@ import { Button } from '../Forms'
 import { Icon } from '../Icon'
 import { PreventCloseContext } from '../PreventCloseContext'
 import { Stack } from '../Stack'
-import { ThemeSchemeContext } from './ThemeSchemeContext'
+import { ThemeSchemeContext, TitleThemeSchemeContext } from './ThemeSchemeContext'
 import { ThemeScheme } from './Types'
 export interface LayoutChromeProps extends ThemeScheme {
 	children?: ReactNode
-	sidebarFooter?: ReactNode
-	sidebarHeader?: ReactNode
 	navigation?: ReactNode
-	switchers?: ReactNode
 	pageScheme?: Scheme
 	pageTheme?: Intent
 	pageThemeContent?: Intent
 	pageThemeControls?: Intent
+	sidebarFooter?: ReactNode
+	sidebarHeader?: ReactNode
+	switchers?: ReactNode
+	titleScheme?: Scheme
+	titleTheme?: Intent
+	titleThemeContent?: Intent
+	titleThemeControls?: Intent
 }
 
 const PREVENT_HAPPENED_RECENTLY = 100
 
 export const LayoutChrome = memo(({
 	children,
-	sidebarFooter,
-	sidebarHeader,
 	navigation,
-	switchers,
-	scheme,
-	theme,
-	themeContent,
-	themeControls,
 	pageScheme,
 	pageTheme,
 	pageThemeContent,
 	pageThemeControls,
+	scheme,
+	sidebarFooter,
+	sidebarHeader,
+	switchers,
+	theme,
+	themeContent,
+	themeControls,
+	titleScheme,
+	titleTheme,
+	titleThemeContent,
+	titleThemeControls,
 }: LayoutChromeProps) => {
 	const prefix = useClassNamePrefix()
 
@@ -91,14 +99,34 @@ export const LayoutChrome = memo(({
 		themeContent: pageThemeContent ?? themeContent,
 		themeControls: pageThemeControls ?? themeControls,
 	}), [
-		scheme,
-		theme,
-		themeContent,
-		themeControls,
 		pageScheme,
 		pageTheme,
 		pageThemeContent,
 		pageThemeControls,
+		scheme,
+		theme,
+		themeContent,
+		themeControls,
+	])
+
+	const titleThemeScheme = useMemo<ThemeScheme>(() => ({
+		scheme: titleScheme ?? pageScheme ?? scheme,
+		theme: titleTheme ?? pageTheme ?? theme,
+		themeContent: titleThemeContent ?? pageThemeContent ?? themeContent,
+		themeControls: titleThemeControls ?? pageThemeControls ?? themeControls,
+	}), [
+		pageScheme,
+		pageTheme,
+		pageThemeContent,
+		pageThemeControls,
+		scheme,
+		theme,
+		themeContent,
+		themeControls,
+		titleScheme,
+		titleTheme,
+		titleThemeContent,
+		titleThemeControls,
 	])
 
 	const layoutRef = useRef<HTMLDivElement>(null)
@@ -164,7 +192,9 @@ export const LayoutChrome = memo(({
 				toThemeClass(pageThemeContent ?? pageTheme, 'content'),
 			)}>
 				<ThemeSchemeContext.Provider value={themeScheme}>
-					{children}
+					<TitleThemeSchemeContext.Provider value={titleThemeScheme}>
+						{children}
+					</TitleThemeSchemeContext.Provider>
 				</ThemeSchemeContext.Provider>
 			</div>
 		</DropdownContentContainerProvider>

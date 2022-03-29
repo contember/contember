@@ -6,8 +6,10 @@ import {
 	SchemaDiffer,
 	SchemaMigrator,
 } from '../../src'
-import { emptySchema } from '@contember/schema-utils'
+import { emptySchema, schemaType } from '@contember/schema-utils'
 ;(async () => {
+	// eslint-disable-next-line no-console
+	console.log(relative(process.cwd(), process.argv[2]))
 	const migrationsResolver = new MigrationsResolver(new MigrationFilesManager(relative(process.cwd(), process.argv[2])))
 	const modificationHandlerFactory = new ModificationHandlerFactory(ModificationHandlerFactory.defaultFactoryMap)
 	const differ = new SchemaDiffer(new SchemaMigrator(modificationHandlerFactory))
@@ -15,10 +17,13 @@ import { emptySchema } from '@contember/schema-utils'
 	let schema = emptySchema
 	for (const migration of await migrationsResolver.getMigrations()) {
 		const nextSchema = migrator.applyModifications(schema, migration.modifications, migration.formatVersion)
+		schemaType(nextSchema)
 		differ.diffSchemas(schema, nextSchema)
 
 		schema = nextSchema
 	}
+	// eslint-disable-next-line no-console
+	console.log('OK')
 })().catch(e => {
 	// eslint-disable-next-line no-console
 	console.error(e)

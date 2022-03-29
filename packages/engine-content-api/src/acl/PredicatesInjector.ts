@@ -1,4 +1,4 @@
-import { Acl, Input, Model } from '@contember/schema'
+import { Acl, Input, Model, Writable } from '@contember/schema'
 import { acceptFieldVisitor } from '@contember/schema-utils'
 import { PredicateFactory } from './PredicateFactory'
 
@@ -28,7 +28,7 @@ export class PredicatesInjector {
 	}
 
 	private injectToWhere(where: Input.OptionalWhere, entity: Model.Entity): Input.OptionalWhere {
-		const resultWhere: Input.OptionalWhere = {}
+		const resultWhere: Writable<Input.OptionalWhere> = {}
 		if (where.and) {
 			resultWhere.and = where.and.filter((it): it is Input.Where => !!it).map(it => this.injectToWhere(it, entity))
 		}

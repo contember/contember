@@ -216,7 +216,11 @@ export class WhereBuilder {
 		if (keys.filter(it => !['and', 'or', 'not', primaryField].includes(it)).length > 0) {
 			return null
 		}
-		let condition: Input.Condition<never> = {}
+		let condition: {
+			and?: Array<Input.Condition<never>>
+			or?: Array<Input.Condition<never>>
+			not?: Input.Condition<never>
+		} = {}
 		if (where.and) {
 			const conditions = where.and
 				.filter((it): it is Input.Where => !!it)
@@ -236,11 +240,11 @@ export class WhereBuilder {
 			condition.or = conditions as Input.Condition<never>[]
 		}
 		if (where.not) {
-			const condition = this.transformWhereToPrimaryCondition(where.not, primaryField)
-			if (condition === null) {
+			const conditions = this.transformWhereToPrimaryCondition(where.not, primaryField)
+			if (conditions === null) {
 				return null
 			}
-			condition.not = condition as Input.Condition<never>
+			condition.not = conditions as Input.Condition<never>
 		}
 		if (where[primaryField]) {
 			if (Object.keys(condition).length > 0) {

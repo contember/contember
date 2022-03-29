@@ -1,4 +1,4 @@
-import { Acl, Model } from '@contember/schema'
+import { Acl, Model, Writable } from '@contember/schema'
 import { getEntity, PredicateDefinitionProcessor } from '@contember/schema-utils'
 import { mapObject } from '../utils'
 import { prefixVariable } from './VariableUtils'
@@ -6,7 +6,7 @@ import { prefixVariable } from './VariableUtils'
 export class PermissionFactory {
 	constructor(private readonly schema: Model.Schema) {}
 
-	public create(acl: Acl.Schema, roles: string[], prefix?: string): Acl.Permissions {
+	public create(acl: Acl.Schema, roles: readonly string[], prefix?: string): Acl.Permissions {
 		let result: Acl.Permissions = {}
 		for (let role of roles) {
 			const roleDefinition = acl.roles[role] || { entities: {} }
@@ -49,10 +49,11 @@ export class PermissionFactory {
 		for (let entityName in permissions) {
 			const entity = getEntity(this.schema, entityName)
 			const entityPermissions: Acl.EntityPermissions = permissions[entityName]
+			const entityPredicates: Writable<Acl.PredicateMap> = entityPermissions.predicates
 
 			const operationNames = ['read', 'create', 'update'] as const
 			for (let operation of operationNames) {
-				const fieldPermissions: Acl.FieldPermissions | undefined = entityPermissions.operations[operation]
+				const fieldPermissions: Writable<Acl.FieldPermissions> | undefined = entityPermissions.operations[operation]
 				if (fieldPermissions === undefined) {
 					continue
 				}
@@ -85,8 +86,7 @@ export class PermissionFactory {
 					predicates[predicate] = predicateDefinition
 				}
 				fieldPermissions[entity.primary] = idPermissions
-				entityPermissions.predicates[idPermissions as Acl.PredicateReference] =
-					predicates[idPermissions as Acl.PredicateReference]
+				entityPredicates[idPermissions as Acl.PredicateReference] = predicates[idPermissions as Acl.PredicateReference]
 			}
 		}
 	}
@@ -104,8 +104,8 @@ export class PermissionFactory {
 	}
 
 	private mergeEntityPermissions(left: Acl.EntityPermissions, right: Acl.EntityPermissions): Acl.EntityPermissions {
-		let predicates: Acl.PredicateMap = {}
-		const operations: Acl.EntityOperations = {}
+		let predicates: Writable<Acl.PredicateMap> = {}
+		const operations: Writable<Acl.EntityOperations> = {}
 		if (left.operations.customPrimary || right.operations.customPrimary) {
 			operations.customPrimary = true
 		}
@@ -156,8 +156,8 @@ export class PermissionFactory {
 		rightPredicates: Acl.PredicateMap,
 		rightFieldPermissions: Acl.FieldPermissions,
 	): [Acl.PredicateMap, Acl.FieldPermissions] {
-		const fields: Acl.FieldPermissions = {}
-		const predicates: Acl.PredicateMap = {}
+		const fields: Writable<Acl.FieldPermissions> = {}
+		const predicates: Writable<Acl.PredicateMap> = {}
 
 		for (let field in { ...leftFieldPermissions, ...rightFieldPermissions }) {
 			const [predicateDefinition, predicate] = this.mergePredicates(

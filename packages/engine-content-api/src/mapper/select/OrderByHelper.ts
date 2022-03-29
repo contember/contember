@@ -5,7 +5,7 @@ export class OrderByHelper {
 	public static appendDefaultOrderBy(
 		entity: Model.Entity,
 		objectNode: ObjectNode<Input.ListQueryInput>,
-		defaultOrderBy: Model.OrderBy[],
+		defaultOrderBy: readonly Model.OrderBy[],
 	): ObjectNode<Input.ListQueryInput> {
 		const inputOrder = objectNode.args.orderBy || []
 		const hasOrderBy = inputOrder.length > 0
@@ -26,16 +26,16 @@ export class OrderByHelper {
 		return objectNode.withArg('orderBy', [...(inputOrder || []), ...orderBy])
 	}
 
-	private static buildOrderBy(defaultOrderBy: Model.OrderBy[]): Input.OrderByFields[] {
+	private static buildOrderBy(defaultOrderBy: readonly Model.OrderBy[]): Input.OrderByFields[] {
 		return defaultOrderBy
 			.map(({ path, direction }): Input.OrderByFields | null => {
-				path = [...path]
-				const lastItem = path.pop()
+				const mutablePath = [...path]
+				const lastItem = mutablePath.pop()
 				if (!lastItem) {
 					return null
 				}
 				const columnOrderBy = { [lastItem]: direction }
-				return path.reverse().reduce<Input.OrderByFields>((value, field) => ({ [field]: value }), columnOrderBy)
+				return mutablePath.reverse().reduce<Input.OrderByFields>((value, field) => ({ [field]: value }), columnOrderBy)
 			})
 			.filter((it): it is Input.OrderByFields => !!it)
 	}

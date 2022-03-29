@@ -1,7 +1,7 @@
 import { ProjectConfig, ProjectSecrets } from '@contember/engine-http'
 import { ConfigProcessor } from '@contember/engine-plugins'
 import { Merger, ParametersResolver, resolveParameters, UndefinedParameterError } from '@contember/config-loader'
-import { Typesafe } from '@contember/engine-common'
+import * as Typesafe from '@contember/typesafe'
 import { projectConfigSchema } from './configSchema'
 import { TenantConfig } from './config'
 
@@ -27,9 +27,12 @@ export const createProjectConfigResolver = (env: Env, config: any, configProcess
 		const resolvedConfig = resolveParameters(mergedConfig, createProjectParametersResolver(slug, env, secrets))
 
 		const projectConfigSchemaWithPlugins = configProcessors.reduce(
-			(schema, current) => (
-				current.getProjectConfigSchema ? Typesafe.intersection(schema, current.getProjectConfigSchema(slug)) : schema
-			),
+			(schema, current) => {
+				if (!current.getProjectConfigSchema) {
+					return schema
+				}
+				return Typesafe.intersection(schema, current.getProjectConfigSchema(slug))
+			},
 			projectConfigSchema,
 		)
 		const projectConfig = projectConfigSchemaWithPlugins(resolvedConfig, ['project', slug])

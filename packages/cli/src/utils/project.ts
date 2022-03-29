@@ -3,6 +3,7 @@ import { Schema } from '@contember/schema'
 import * as esbuild from 'esbuild'
 import { join } from 'path'
 import { NodeVM } from 'vm2'
+import { schemaType } from '@contember/schema-utils'
 
 export const loadSchema = async (project: Project): Promise<Schema> => {
 	const response = await esbuild.build({
@@ -22,5 +23,5 @@ export const loadSchema = async (project: Project): Promise<Schema> => {
 	const schema = await vm.run(bundledJs).default
 	// https://github.com/patriksimek/vm2/issues/198
 	const fixedSchema = JSON.parse(JSON.stringify(schema))
-	return fixedSchema
+	return schemaType(fixedSchema)
 }

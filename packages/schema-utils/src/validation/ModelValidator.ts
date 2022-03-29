@@ -1,245 +1,88 @@
 import { Model } from '@contember/schema'
 import { ErrorBuilder, ValidationError } from './errors'
-import { everyIs, isObject, UnknownObject } from './utils'
 import { acceptEveryFieldVisitor, getTargetEntity, isInverseRelation, isOwningRelation } from '../model'
 
 const IDENTIFIER_PATTERN = /^[_a-zA-Z][_a-zA-Z0-9]*$/
 const RESERVED_WORDS = ['and', 'or', 'not']
 
+
 export class ModelValidator {
 	constructor(private readonly model: Model.Schema) {}
 
-	public validate(): [Model.Schema, ValidationError[]] {
-		const model = this.model as unknown
+	public validate(): ValidationError[] {
 		const errorBuilder = new ErrorBuilder([], [])
-		let validModel: Model.Schema
-		if (!isObject(model)) {
-			errorBuilder.add('Must be an object')
-			validModel = { entities: {}, enums: {} }
-		} else {
-			const enums = this.validateEnums(model.enums, errorBuilder.for('enums'))
-			const entities = this.validateEntities(model.entities, errorBuilder.for('entities'))
-			validModel = { enums, entities }
-		}
-		this.validateCollisions(Object.values(validModel.entities), errorBuilder.for('entities'))
-		return [validModel, errorBuilder.errors]
+		this.validateEnums(this.model.enums, errorBuilder.for('enums'))
+		this.validateEntities(this.model.entities, errorBuilder.for('entities'))
+		this.validateCollisions(Object.values(this.model.entities), errorBuilder.for('entities'))
+		return errorBuilder.errors
 	}
 
-	private validateEnums(enums: unknown, errors: ErrorBuilder): Model.Schema['enums'] {
-		if (!enums) {
-			errors.add('Enums definitions are missing')
-			return {}
-		}
-		if (!isObject(enums)) {
-			errors.add('Enums must be an object')
-			return {}
-		}
-		const validEnums: Model.Schema['enums'] = {}
-		enums: for (const [enumName, enumValues] of Object.entries(enums)) {
-			if (!Array.isArray(enumValues) || !everyIs(enumValues, (it): it is string => typeof it === 'string')) {
-				errors.for(enumName).add('Enum values must be an array of strings')
-				continue
-			}
-			if (enumValues.length === 0) {
-				errors.for(enumName).add('Enum must have at least one value')
-			}
+	private validateEnums(enums: Model.Schema['enums'], errors: ErrorBuilder): void {
+		for (const [enumName, enumValues] of Object.entries(enums)) {
 			for (const value of enumValues) {
-				const valueErrors = errors.for(value)
-				if (!this.validateIdentifier(value, valueErrors)) {
-					continue enums
-				}
+				const valueErrors = errors.for(enumName, value)
+				this.validateIdentifier(value, valueErrors)
 			}
-			validEnums[enumName] = enumValues
 		}
-		return validEnums
 	}
 
-	private validateEntities(entities: unknown, errors: ErrorBuilder): Model.Schema['entities'] {
-		if (!entities) {
-			errors.add('Entities definitions are missing')
-			return {}
-		}
-		if (!isObject(entities)) {
-			errors.add('Entities must be an object')
-			return {}
-		}
-		const validEntities: Model.Schema['entities'] = {}
+	private validateEntities(entities: Model.Schema['entities'], errors: ErrorBuilder): void {
 		for (const [entityName, entity] of Object.entries(entities)) {
 			const entityErrors = errors.for(entityName)
-			const validEntity = this.validateEntity(entity, entityErrors)
-			if (!validEntity) {
-				continue
+			if (entity.name !== entityName) {
+				entityErrors.add(`Entity name "${entity.name}" does not match the name in a map "${entityName}"`)
 			}
-			if (validEntity.name !== entityName) {
-				entityErrors.add(`Entity name "${validEntity.name}" does not match the name in a map "${entityName}"`)
-				continue
-			}
-
-			validEntities[entityName] = validEntity
+			this.validateEntity(entity, entityErrors)
 		}
-		return validEntities
 	}
 
-	private validateEntity(entity: unknown, errors: ErrorBuilder): Model.Entity | undefined {
-		if (!isObject(entity)) {
-			errors.add('Entity must be an object')
-			return undefined
-		}
-		if (typeof entity.name !== 'string') {
-			errors.for('name').add('Entity name must be a string')
-			return undefined
-		}
-		if (!this.validateIdentifier(entity.name, errors)) {
-			return undefined
-		}
-		if (typeof entity.primary !== 'string') {
-			errors.for('primary').add('Primary must be a string')
-			return undefined
-		}
-		if (typeof entity.primaryColumn !== 'string') {
-			errors.for('primaryColumn').add('Primary column must be a string')
-			return undefined
-		}
-		if (typeof entity.tableName !== 'string') {
-			errors.for('tableName').add('Table name must be a string')
-			return undefined
-		}
-		const fields = entity.fields
-		if (!isObject(fields)) {
-			errors.add('Fields must be an object')
-			return undefined
-		}
-		const partialEntity: Model.Entity = {
-			name: entity.name,
-			primary: entity.primary,
-			primaryColumn: entity.primaryColumn,
-			tableName: entity.tableName,
-			fields: {},
-			unique: {},
-		}
+	private validateEntity(entity: Model.Entity, errors: ErrorBuilder): void {
+		this.validateIdentifier(entity.name, errors)
 
-		if (entity.view) {
-			const viewTmp = entity.view
-			if (!isObject(viewTmp)) {
-				errors.for('view').add('View must be an object')
-				return undefined
-			}
-			if (typeof viewTmp.sql !== 'string') {
-				errors.for('view', 'sql').add('View SQL must be a string')
-				return undefined
-			}
-			partialEntity.view = entity.view as Model.View
-		}
-
-		const validFields: Model.Entity['fields'] = {}
-		for (const [fieldName, field] of Object.entries(fields)) {
+		for (const [fieldName, field] of Object.entries(entity.fields)) {
 			const fieldErrors = errors.for(fieldName)
-			const validField = this.validateField(partialEntity, field, fieldErrors)
-			if (!validField) {
-				continue
+			this.validateField(entity, field, fieldErrors)
+			if (field.name !== fieldName) {
+				fieldErrors.add(`Field name "${field.name}" does not match the name in a map "${fieldName}"`)
 			}
-			if (validField.name !== fieldName) {
-				fieldErrors.add(`Field name "${validField.name}" does not match the name in a map "${fieldName}"`)
-				continue
-			}
-			validFields[fieldName] = validField
 		}
-
-		const uniqueConstraints = entity.unique
-		if (!isObject(uniqueConstraints)) {
-			errors.add('Unique constraints must be an object')
-			return undefined
-		}
-		const validUniqueConstraints = this.validateUniqueConstraints(
-			uniqueConstraints,
-			new Set(Object.keys(validFields)),
+		this.validateUniqueConstraints(
+			entity.unique,
+			new Set(Object.keys(entity.fields)),
 			errors.for('unique'),
 		)
-
-		return {
-			...partialEntity,
-			fields: validFields,
-			unique: validUniqueConstraints,
-		}
 	}
 
-	private validateUniqueConstraints(
-		uniqueConstraints: unknown,
-		fields: Set<string>,
-		errors: ErrorBuilder,
-	): Model.Entity['unique'] {
-		if (!isObject(uniqueConstraints)) {
-			errors.add('Unique constraints must be an object')
-			return {}
-		}
-		const validUniqueConstraints: Model.Entity['unique'] = {}
-		constraint: for (const [constraintName, constraint] of Object.entries(uniqueConstraints)) {
+	private validateUniqueConstraints(uniqueConstraints: Model.Entity['unique'], fields: Set<string>, errors: ErrorBuilder): void {
+		for (const [constraintName, constraint] of Object.entries(uniqueConstraints)) {
 			const uniqueErrors = errors.for(constraintName)
-			if (!isObject(constraint)) {
-				uniqueErrors.add('Unique constraint must be an object')
-				continue
-			}
-			if (typeof constraint.name !== 'string') {
-				uniqueErrors.add('Constraint name is not defined')
-				continue
-			}
 			if (constraint.name !== constraintName) {
 				uniqueErrors.add(`Constraint name ${constraint.name} does not match the name in a map "${constraintName}"`)
-				continue
-			}
-			if (
-				!Array.isArray(constraint.fields) ||
-				!everyIs(constraint.fields, (it): it is string => typeof it === 'string')
-			) {
-				uniqueErrors.add('Every field must be a string')
 				continue
 			}
 			for (const field of constraint.fields) {
 				if (!fields.has(field)) {
 					uniqueErrors.add(`Referenced field ${field} in a constraint does not exists`)
-					continue constraint
 				}
 			}
-			validUniqueConstraints[constraintName] = { name: constraint.name, fields: constraint.fields }
 		}
-		return validUniqueConstraints
 	}
 
-	private validateField(partialEntity: Model.Entity, field: unknown, errors: ErrorBuilder): Model.AnyField | undefined {
-		if (!isObject(field)) {
-			errors.add('Field must be an object')
-			return undefined
+	private validateField(partialEntity: Model.Entity, field: Model.AnyField, errors: ErrorBuilder): void {
+		this.validateIdentifier(field.name, errors)
+		if (isRelation(field)) {
+			this.validateRelation(partialEntity, field, errors)
 		}
-		if (typeof field.type !== 'string') {
-			errors.add('Field type must be a string')
-			return undefined
-		}
-		if (typeof field.name !== 'string') {
-			errors.for('name').add('Field name must be a string')
-			return undefined
-		}
-		if (!this.validateIdentifier(field.name, errors)) {
-			return undefined
-		}
-		if (isRelation(field as any)) {
-			return this.validateRelation(partialEntity, field, errors)
-		}
-		return field as unknown as Model.AnyColumn
 	}
 
-	private validateRelation(
-		partialEntity: Model.Entity,
-		field: UnknownObject,
-		errors: ErrorBuilder,
-	): Model.AnyRelation | undefined {
+	private validateRelation(partialEntity: Model.Entity, field: Model.AnyRelation, errors: ErrorBuilder):  void {
 		const entityName = partialEntity.name
-		const targetEntityName = field.target as string // todo
+		const targetEntityName = field.target
 		const targetEntity = this.model.entities[targetEntityName] || undefined
 		if (!targetEntity) {
-			errors.add(`Target entity ${targetEntityName} not found`)
-			return undefined
+			return errors.add(`Target entity ${targetEntityName} not found`)
 		}
-		if (((it: Model.AnyRelation): it is Model.AnyRelation & Model.OrderableRelation => 'orderBy' in it)(field as any)) {
+		if (((it: Model.AnyRelation): it is Model.AnyRelation & Model.OrderableRelation => 'orderBy' in it)(field)) {
 			(field as Model.OrderableRelation).orderBy?.forEach(it => {
 				let entity = targetEntity
 
@@ -262,133 +105,95 @@ export class ModelValidator {
 			})
 		}
 		if (partialEntity.view) {
-			const type = (field as any as Model.Relation).type
 			if (
-				type === Model.RelationType.ManyHasMany ||
-				type === Model.RelationType.OneHasMany ||
-				(type === Model.RelationType.OneHasOne && !('joiningColumn' in field))
+				field.type === Model.RelationType.ManyHasMany ||
+				field.type === Model.RelationType.OneHasMany ||
+				(field.type === Model.RelationType.OneHasOne && !('joiningColumn' in field))
 			) {
-				errors.add(
-					'This relation type is not allowed on a view entity. Only one-has-one owning and many-has one are allowed.',
-				)
+				return errors.add('This relation type is not allowed on a view entity. Only one-has-one owning and many-has one are allowed.')
 			}
 		}
-		if (isInverseRelation(field as any as Model.Relation)) {
-			// todo
+		if (isInverseRelation(field)) {
 			const ownedBy = field.ownedBy
-			if (typeof ownedBy !== 'string') {
-				errors.add('Owned by is not defined')
-				return undefined
-			}
 			const targetField = targetEntity.fields[ownedBy]
 			const relationDescription = `Target relation ${targetEntityName}::${ownedBy}:`
 			if (!targetField) {
-				errors.add(`${relationDescription} not exists`)
-				return undefined
+				return errors.add(`${relationDescription} not exists`)
 			}
+
 			if (!isRelation(targetField)) {
-				errors.add(`${relationDescription} not a relation`)
-				return undefined
+				return errors.add(`${relationDescription} not a relation`)
 			}
 			if (targetField.target !== entityName) {
-				errors.add(
-					`${relationDescription} back reference to entity ${entityName} expected, but ${targetField.target} given`,
-				)
-				return undefined
+				return errors.add(`${relationDescription} back reference to entity ${entityName} expected, but ${targetField.target} given`)
 			}
 			if (!isOwningRelation(targetField)) {
 				errors.add(`${relationDescription} not an owning relation`)
-				return undefined
+				return
 			}
 			if (!targetField.inversedBy) {
-				errors.add(`${relationDescription} inverse relation is not set`)
-				return undefined
+				return errors.add(`${relationDescription} inverse relation is not set`)
 			}
 			if (targetField.inversedBy !== field.name) {
-				errors.add(
-					`${relationDescription} back reference ${entityName}::${field.name} exepcted, ${targetField.target}::${targetField.inversedBy} given`,
-				)
-				return undefined
+				return errors.add(`${relationDescription} back reference ${entityName}::${field.name} exepcted, ${targetField.target}::${targetField.inversedBy} given`)
 			}
 			if (field.type === Model.RelationType.OneHasOne && targetField.type !== Model.RelationType.OneHasOne) {
-				errors.add(`${relationDescription} "OneHasOne" type expected, "${targetField.type}" given`)
-				return undefined
+				return errors.add(`${relationDescription} "OneHasOne" type expected, "${targetField.type}" given`)
 			}
 			if (field.type === Model.RelationType.OneHasMany && targetField.type !== Model.RelationType.ManyHasOne) {
-				errors.add(`${relationDescription} "ManyHasOne" type expected, "${targetField.type}" given`)
-				return undefined
+				return errors.add(`${relationDescription} "ManyHasOne" type expected, "${targetField.type}" given`)
 			}
 			if (field.type === Model.RelationType.ManyHasMany && targetField.type !== Model.RelationType.ManyHasMany) {
-				errors.add(`${relationDescription} "ManyHasMany" type expected, "${targetField.type}" given`)
-				return undefined
+				return errors.add(`${relationDescription} "ManyHasMany" type expected, "${targetField.type}" given`)
 			}
 		} else {
-			const inversedBy = field.inversedBy as string // todo
+			const inversedBy = field.inversedBy
 			if (targetEntity.view) {
 				if ('joiningColumn' in field) {
-					errors.add(
-						`View entity ${targetEntity.name} cannot be referenced from an owning relation. Try switching the owning side.`,
-					)
+					return errors.add(`View entity ${targetEntity.name} cannot be referenced from an owning relation. Try switching the owning side.`)
 				}
 			}
 			if (inversedBy) {
 				const targetField = targetEntity.fields[inversedBy]
 				const relationDescription = `Target relation ${targetEntityName}::${inversedBy}:`
 				if (!targetField) {
-					errors.add(`${relationDescription} not exists`)
-					return undefined
+					return errors.add(`${relationDescription} not exists`)
 				}
 				if (!isRelation(targetField)) {
-					errors.add(`${relationDescription} not a relation`)
-					return undefined
+					return errors.add(`${relationDescription} not a relation`)
 				}
 				if (targetField.target !== entityName) {
-					errors.add(
-						`${relationDescription} back reference to entity ${entityName} expected, but ${targetField.target} given`,
-					)
-					return undefined
+					return errors.add(`${relationDescription} back reference to entity ${entityName} expected, but ${targetField.target} given`)
 				}
 				if (!isInverseRelation(targetField)) {
-					errors.add(`${relationDescription} not an inverse relation`)
-					return undefined
+					return errors.add(`${relationDescription} not an inverse relation`)
 				}
 				if (!targetField.ownedBy) {
-					errors.add(`${relationDescription} owning relation is not set`)
-					return undefined
+					return errors.add(`${relationDescription} owning relation is not set`)
 				}
 				if (targetField.ownedBy !== field.name) {
-					errors.add(
-						`${relationDescription} back reference ${entityName}::${field.name} exepcted, ${targetField.target}::${targetField.ownedBy} given`,
-					)
-					return undefined
+					return errors.add(`${relationDescription} back reference ${entityName}::${field.name} exepcted, ${targetField.target}::${targetField.ownedBy} given`)
 				}
 				if (field.type === Model.RelationType.OneHasOne && targetField.type !== Model.RelationType.OneHasOne) {
-					errors.add(`${relationDescription} "OneHasOne" type expected, "${targetField.type}" given`)
-					return undefined
+					return errors.add(`${relationDescription} "OneHasOne" type expected, "${targetField.type}" given`)
 				}
 				if (field.type === Model.RelationType.ManyHasOne && targetField.type !== Model.RelationType.OneHasMany) {
-					errors.add(`${relationDescription} "ManyHasOne" type expected, "${targetField.type}" given`)
-					return undefined
+					return errors.add(`${relationDescription} "ManyHasOne" type expected, "${targetField.type}" given`)
 				}
 				if (field.type === Model.RelationType.ManyHasMany && targetField.type !== Model.RelationType.ManyHasMany) {
-					errors.add(`${relationDescription} "ManyHasMany" type expected, "${targetField.type}" given`)
-					return undefined
+					return errors.add(`${relationDescription} "ManyHasMany" type expected, "${targetField.type}" given`)
 				}
 			}
 		}
-		return field as any as Model.AnyRelation // todo
 	}
 
 	private validateIdentifier(value: string, errorBuilder: ErrorBuilder) {
 		if (!value.match(IDENTIFIER_PATTERN)) {
-			errorBuilder.add(`${value} must match pattern ${IDENTIFIER_PATTERN.source}`)
-			return false
+			return errorBuilder.add(`${value} must match pattern ${IDENTIFIER_PATTERN.source}`)
 		}
 		if (RESERVED_WORDS.includes(value)) {
 			errorBuilder.add(`${value} is reserved word`)
-			return false
 		}
-		return true
 	}
 
 	private validateCollisions(entities: Model.Entity[], errorBuilder: ErrorBuilder) {
@@ -399,11 +204,7 @@ export class ModelValidator {
 			if (tableNames[entity.tableName]) {
 				errorBuilder
 					.for(entity.name)
-					.add(
-						`Table name ${entity.tableName} of ${description} collides with a table name of ${
-							tableNames[entity.tableName]
-						}`,
-					)
+					.add(`Table name ${entity.tableName} of ${description} collides with a table name of ${tableNames[entity.tableName]}`)
 			} else {
 				tableNames[entity.tableName] = description
 			}
@@ -418,9 +219,8 @@ export class ModelValidator {
 						entityErrorBuilder
 							.for(relation.name)
 							.add(
-								`Joining table name ${joiningTable.tableName} of ${description} collides with a table name of ${
-									tableNames[joiningTable.tableName]
-								}. Consider using plural for a relation name or change the joining table name using .joiningTable(...) in schema definition.`,
+								`Joining table name ${joiningTable.tableName} of ${description} collides with a table name of ${tableNames[joiningTable.tableName]}.` +
+								'Consider using plural for a relation name or change the joining table name using .joiningTable(...) in schema definition.',
 							)
 					} else {
 						tableNames[joiningTable.tableName] = description

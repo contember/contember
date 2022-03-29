@@ -14,7 +14,7 @@
     "@contember/database": "^1.1.0-alpha.5",
     "@contember/database-migrations": "^1.1.0-alpha.5",
     "@contember/dic": "^1.1.0-alpha.5",
-    "@contember/engine-common": "^1.1.0-alpha.5",
+    "@contember/typesafe": "^1.1.0-alpha.5",
     "@contember/graphql-utils": "^1.1.0-alpha.5",
     "@contember/queryable": "^1.1.0-alpha.5",
     "@contember/schema": "^1.1.0-alpha.5",

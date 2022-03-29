@@ -6,7 +6,7 @@ import { Validation } from '@contember/schema'
 type MessageOrString = Validation.Message | string
 
 export type ContextPath = Validation.ContextPath | string | undefined
-export const parsePath = (path: ContextPath): string[] => {
+export const parsePath = (path: ContextPath): readonly string[] => {
 	if (!path) {
 		return []
 	}

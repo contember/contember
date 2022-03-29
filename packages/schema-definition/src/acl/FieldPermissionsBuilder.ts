@@ -1,6 +1,6 @@
 import FieldSelector from './FieldSelector'
 import EntityPermissionsBuilder from './EntityPermissionsBuilder'
-import { Acl, Model } from '@contember/schema'
+import { Acl, Model, Writable } from '@contember/schema'
 import EntitySelector from './EntitySelector'
 import PermissionsBuilder from './PermissionsBuilder'
 
@@ -42,13 +42,14 @@ export default class FieldPermissionsBuilder {
 		operations: (Acl.Operation.create | Acl.Operation.read | Acl.Operation.update)[],
 		predicate: Acl.Predicate = true,
 	): FieldPermissionsBuilder {
-		const permissions: Acl.Permissions = {}
+		const permissions: Writable<Acl.Permissions> = {}
 		for (const [entity, field] of this.fields) {
 			if (!permissions[entity.name]) {
 				permissions[entity.name] = { operations: {}, predicates: {} }
 			}
+			const entityOperations: Writable<Acl.EntityOperations> = permissions[entity.name].operations
 			for (const op of operations) {
-				permissions[entity.name].operations[op] = {
+				entityOperations[op] = {
 					...(permissions[entity.name].operations[op] || {}),
 					[field.name]: predicate,
 				}

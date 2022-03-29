@@ -42,5 +42,5 @@ export const CreateEnumModification: ModificationHandlerStatic<CreateEnumModific
 
 export interface CreateEnumModificationData {
 	enumName: string
-	values: string[]
+	values: readonly string[]
 }

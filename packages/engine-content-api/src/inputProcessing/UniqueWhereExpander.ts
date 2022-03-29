@@ -1,4 +1,4 @@
-import { Input, Model } from '@contember/schema'
+import { Input, Model, Writable } from '@contember/schema'
 import { getTargetEntity } from '@contember/schema-utils'
 import { UserError } from '../exception'
 import { getFieldsForUniqueWhere } from '../utils'
@@ -30,7 +30,7 @@ export class UniqueWhereExpander {
 			throw new UniqueWhereError(this.formatErrorMessage(entity, where, path))
 		}
 
-		const whereExpanded: Input.Where = {}
+		const whereExpanded: Writable<Input.Where> = {}
 		for (const field in where) {
 			if (!isFilled(field)) {
 				continue

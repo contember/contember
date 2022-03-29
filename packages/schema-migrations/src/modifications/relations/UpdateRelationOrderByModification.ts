@@ -56,5 +56,5 @@ export const UpdateRelationOrderByModification: ModificationHandlerStatic<Update
 export interface UpdateRelationOrderByModificationData {
 	entityName: string
 	fieldName: string
-	orderBy: Model.OrderBy[]
+	orderBy: readonly Model.OrderBy[]
 }

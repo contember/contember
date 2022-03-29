@@ -12,6 +12,9 @@
 		},
 		{
 			"path": "../../dic/src"
+		},
+		{
+			"path": "../../typesafe/src"
 		}
 	]
 }

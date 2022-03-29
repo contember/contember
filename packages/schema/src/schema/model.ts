@@ -1,24 +1,24 @@
 import Input from './input'
 
 namespace Model {
-	export interface Entity {
-		name: string
-		primary: string
-		primaryColumn: string
-		tableName: string
-		fields: { [name: string]: AnyField }
-		unique: UniqueConstraints
-		view?: View
+	export type Entity = {
+		readonly name: string
+		readonly primary: string
+		readonly primaryColumn: string
+		readonly tableName: string
+		readonly fields: { readonly [name: string]: AnyField }
+		readonly unique: UniqueConstraints
+		readonly view?: View
 	}
 
-	export interface View {
-		sql: string
-		dependencies?: string[]
+	export type View = {
+		readonly sql: string
+		readonly dependencies?: readonly string[]
 	}
 
 	export type FieldType = RelationType | ColumnType
-	export interface Field<T extends FieldType> {
-		type: T
+	export type Field<T extends FieldType> = {
+		readonly type: T
 	}
 
 	export type AnyField = AnyColumn | AnyRelation
@@ -37,20 +37,22 @@ namespace Model {
 	}
 
 	export type Column<T extends ColumnType> = ColumnTypeDefinition<T> & {
-		name: string
-		columnName: string
+		readonly name: string
+		readonly columnName: string
 	}
 
-	export interface ColumnTypeDefinition<T extends ColumnType = ColumnType> extends Field<T> {
-		columnType: string
-		typeAlias?: string
-		nullable: boolean
-		default?: string | number | boolean | null
-		sequence?: {
-			precedence: 'ALWAYS' | 'BY DEFAULT'
-			start?: number
+	export type ColumnTypeDefinition<T extends ColumnType = ColumnType>  =
+		& Field<T>
+		& {
+			readonly columnType: string
+			readonly typeAlias?: string
+			readonly nullable: boolean
+			readonly default?: string | number | boolean | null
+			readonly sequence?: {
+				readonly precedence: 'ALWAYS' | 'BY DEFAULT'
+				readonly start?: number
+			}
 		}
-	}
 
 	export interface ColumnVisitor<T> {
 		visitColumn(entity: Entity, column: AnyColumn): T
@@ -145,25 +147,31 @@ namespace Model {
 
 	export type AnyRelation = AnyInverseRelation | AnyOwningRelation
 
-	export interface Relation<T extends RelationType = RelationType> extends Field<T> {
-		name: string
-		type: T
-		target: string
-	}
+	export type Relation<T extends RelationType = RelationType>=
+		& Field<T>
+		& {
+			readonly name: string
+			readonly type: T
+			readonly target: string
+		}
 
-	export interface InverseRelation extends Relation {
-		ownedBy: string
-	}
-
-	/** @deprecated */
-	export interface InversedRelation extends InverseRelation {}
-
-	export interface OwningRelation extends Relation {
-		inversedBy?: string
-	}
+	export type InverseRelation =
+		& Relation
+		& {
+			readonly ownedBy: string
+		}
 
 	/** @deprecated */
-	export interface OwnerRelation extends OwningRelation {}
+	export type InversedRelation = InverseRelation
+
+	export type OwningRelation =
+		& Relation
+		& {
+			readonly inversedBy?: string
+		}
+
+	/** @deprecated */
+	export type OwnerRelation = OwningRelation
 
 	export enum OnDelete {
 		cascade = 'cascade',
@@ -172,33 +180,36 @@ namespace Model {
 	}
 
 	export type JoiningColumn = {
-		columnName: string
-		onDelete: OnDelete
+		readonly columnName: string
+		readonly onDelete: OnDelete
 	}
 
-	export interface JoiningColumnRelation {
-		joiningColumn: JoiningColumn
+	export type JoiningColumnRelation = {
+		readonly joiningColumn: JoiningColumn
 	}
 
-	export interface NullableRelation {
-		nullable: boolean
+	export type NullableRelation = {
+		readonly nullable: boolean
 	}
 
-	export interface JoiningTable {
-		tableName: string
-		joiningColumn: JoiningColumn
-		inverseJoiningColumn: JoiningColumn
+	export type JoiningTable = {
+		readonly tableName: string
+		readonly joiningColumn: JoiningColumn
+		readonly inverseJoiningColumn: JoiningColumn
 	}
 
-	export interface JoiningTableRelation {
-		joiningTable: JoiningTable
+	export type JoiningTableRelation = {
+		readonly joiningTable: JoiningTable
 	}
 
 	export import OrderDirection = Input.OrderDirection
-	export type OrderBy = { path: string[]; direction: OrderDirection }
+	export type OrderBy = {
+		readonly path: readonly string[]
+		readonly direction: OrderDirection
+	}
 
-	export interface OrderableRelation {
-		orderBy?: OrderBy[]
+	export type OrderableRelation = {
+		readonly orderBy?: readonly OrderBy[]
 	}
 
 	export type OneHasManyRelation =
@@ -225,7 +236,7 @@ namespace Model {
 		& JoiningColumnRelation
 		& NullableRelation
 		& {
-			orphanRemoval?: true
+			readonly orphanRemoval?: true
 		}
 	/** @deprecated */
 	export type OneHasOneOwnerRelation = OneHasOneOwningRelation
@@ -245,18 +256,18 @@ namespace Model {
 	/** @deprecated */
 	export type ManyHasManyOwnerRelation = ManyHasManyOwningRelation
 
-	export interface Schema {
-		enums: { [name: string]: string[] }
-		entities: { [name: string]: Entity }
+	export type Schema = {
+		readonly enums: { readonly [name: string]: readonly string[] }
+		readonly entities: { readonly [name: string]: Entity }
 	}
 
-	export interface UniqueConstraints {
-		[name: string]: UniqueConstraint
+	export type UniqueConstraints = {
+		readonly [name: string]: UniqueConstraint
 	}
 
-	export interface UniqueConstraint {
-		fields: string[]
-		name: string
+	export type UniqueConstraint = {
+		readonly fields: readonly string[]
+		readonly name: string
 	}
 }
 

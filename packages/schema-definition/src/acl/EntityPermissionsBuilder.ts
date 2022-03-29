@@ -1,6 +1,6 @@
 import { tuple } from '../utils'
 import EntitySelector from './EntitySelector'
-import { Acl, Model } from '@contember/schema'
+import { Acl, Model, Writable } from '@contember/schema'
 import FieldSelector from './FieldSelector'
 import FieldPermissionsBuilder from './FieldPermissionsBuilder'
 import PermissionsBuilder from './PermissionsBuilder'
@@ -67,7 +67,7 @@ export default class EntityPermissionsBuilder {
 				},
 				{},
 			)
-			const entityOperations: Acl.EntityOperations = {}
+			const entityOperations: Writable<Acl.EntityOperations> = {}
 			if (operations.includes(Acl.Operation.read)) {
 				entityOperations.read = fieldPermissions
 			}

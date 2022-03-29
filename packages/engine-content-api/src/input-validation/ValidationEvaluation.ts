@@ -97,7 +97,7 @@ const validatorEvaluators: {
 			visitUndefinedContext: fixedResult(false),
 		})
 	},
-	pattern: (context: ValidationContext.AnyContext, patternArgument: Validation.LiteralArgument<[string, string]>) => {
+	pattern: (context: ValidationContext.AnyContext, patternArgument: Validation.LiteralArgument<readonly [string, string]>) => {
 		return acceptContextVisitor(context, {
 			visitNodeContext: cannotApplyOnNode('pattern', 'node'),
 			visitNodeListContext: cannotApplyOnNode('pattern', 'node list'),

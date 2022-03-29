@@ -1,4 +1,4 @@
-import { Typesafe } from '@contember/engine-common'
+import * as Typesafe from '@contember/typesafe'
 import { Client, custom, errors, generators, Issuer, ResponseType } from 'openid-client'
 import { IDPResponseError } from './IDPResponseError'
 import { IdentityProviderHandler, IDPClaim, IDPResponse, InitIDPAuthResult } from './IdentityProviderHandler'

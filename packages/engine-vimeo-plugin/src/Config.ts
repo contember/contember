@@ -1,5 +1,5 @@
 import { ProjectConfig } from '@contember/engine-plugins'
-import { Typesafe } from '@contember/engine-common'
+import * as Typesafe from '@contember/typesafe'
 
 export const vimeoConfigSchema = Typesafe.object({
 	token: Typesafe.string,

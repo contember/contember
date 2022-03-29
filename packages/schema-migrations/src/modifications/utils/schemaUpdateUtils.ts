@@ -1,4 +1,4 @@
-import { Acl, Model, Schema } from '@contember/schema'
+import { Acl, Model, Schema, Writable } from '@contember/schema'
 import { SchemaUpdateError } from '../exceptions'
 import { isDefined } from '../../utils/isDefined'
 import { isInverseRelation, isOwningRelation, isRelation, PredicateDefinitionProcessor } from '@contember/schema-utils'
@@ -111,7 +111,7 @@ type EntityOperationHandler = {
 export const updateAclFieldPermissions =
 	(updater: EntityAclFieldPermissionsUpdater): AclEntityPermissionsUpdater =>
 		({ entityPermissions, entityName }) => {
-			const operations: Acl.EntityOperations = {}
+			const operations: Writable<Acl.EntityOperations> = {}
 			const handlers: EntityOperationHandler = {
 				create: value => updater(value, entityName, Acl.Operation.create),
 				update: value => updater(value, entityName, Acl.Operation.update),

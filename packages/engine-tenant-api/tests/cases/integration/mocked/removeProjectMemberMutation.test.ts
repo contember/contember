@@ -4,7 +4,7 @@ import { executeTenantTest } from '../../../src/testTenant'
 import { selectMembershipsSql } from './sql/selectMembershipsSql'
 import { getProjectBySlugSql } from './sql/getProjectBySlugSql'
 import { sqlTransaction } from './sql/sqlTransaction'
-import { test } from 'uvu'
+import { test } from 'vitest'
 
 test('removes a project member', async () => {
 	const identityId = testUuid(6)
@@ -46,4 +46,3 @@ test('removes a project member', async () => {
 	})
 })
 
-test.run()

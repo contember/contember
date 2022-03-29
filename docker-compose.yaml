@@ -30,7 +30,7 @@ services:
     volumes:
       - .:/src
     environment:
-      NODE_ENV: production
+      NODE_ENV: development
       CONTEMBER_PORT: 4000
       CONTEMBER_MONITORING_PORT: 4001
       CONTEMBER_ROOT_EMAIL: 'admin@localhost'
@@ -54,6 +54,7 @@ services:
       TENANT_MAILER_FROM: 'contember@localhost'
       CONTEMBER_TENANT_MIGRATIONS_DIR: /src/packages/engine-tenant-api/src/migrations
       CONTEMBER_SYSTEM_MIGRATIONS_DIR: /src/packages/engine-system-api/src/migrations
+      CONTEMBER_EXAMPLE_PROJECTS_DIRECTORY: /src/packages/engine-api-tester/src/projects
     command:
       - node
       - --expose-gc

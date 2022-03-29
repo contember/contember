@@ -1,4 +1,4 @@
-import { test } from 'uvu'
+import { test } from 'vitest'
 import { execute, sqlTransaction } from '../../../../../src/test'
 import { GQL } from '../../../../../src/tags'
 import { testUuid } from '../../../../../src/testUuid'
@@ -158,4 +158,4 @@ test.skip('insert book with validation - ok', async () => {
 	})
 })
 
-test.run()
+

@@ -1,7 +1,6 @@
 import { InputValidation as v, SchemaDefinition as d } from '@contember/schema-definition'
 import { createSchema, testCreate } from '../utils'
-import { suite } from 'uvu'
-
+import { describe, it, assert } from 'vitest'
 class Item {
 	@v.assert(v.rules.or(v.rules.pattern(/.+@.+/), v.rules.minLength(5)), 'failure')
 	value = d.stringColumn()
@@ -10,32 +9,34 @@ class Item {
 const schema = createSchema({
 	Item,
 })
-const test = suite('Logical OR rule')
+describe('Logical OR rule', () => {
 
-test('fails when value not valid', async () => {
-	await testCreate({
-		schema,
-		entity: 'Item',
-		data: { value: 'abc' },
-		errors: ['failure'],
+	it('fails when value not valid', async () => {
+		await testCreate({
+			schema,
+			entity: 'Item',
+			data: { value: 'abc' },
+			errors: ['failure'],
+		})
+	})
+
+	it('succeeds when value valid #1', async () => {
+		await testCreate({
+			schema,
+			entity: 'Item',
+			data: { value: 'a@b' },
+			errors: [],
+		})
+	})
+
+	it('succeeds when value valid #2', async () => {
+		await testCreate({
+			schema,
+			entity: 'Item',
+			data: { value: 'abcdeagffg' },
+			errors: [],
+		})
 	})
 })
 
-test('succeeds when value valid #1', async () => {
-	await testCreate({
-		schema,
-		entity: 'Item',
-		data: { value: 'a@b' },
-		errors: [],
-	})
-})
 
-test('succeeds when value valid #2', async () => {
-	await testCreate({
-		schema,
-		entity: 'Item',
-		data: { value: 'abcdeagffg' },
-		errors: [],
-	})
-})
-test.run()

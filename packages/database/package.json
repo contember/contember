@@ -5,7 +5,7 @@
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
   "scripts": {
-    "test": "uvu dist/tests/cases/ \\.js$"
+    "test": "vitest"
   },
   "dependencies": {
     "@contember/queryable": "^1.1.0-alpha.5"
@@ -13,8 +13,7 @@
   "devDependencies": {
     "@contember/database-tester": "^1.1.0-alpha.5",
     "@types/node": "^17.0.5",
-    "pg": "^8.5.0",
-    "uvu": "^0.5.3"
+    "pg": "^8.5.0"
   },
   "peerDependencies": {
     "pg": "^8.5.0"

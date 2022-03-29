@@ -3,7 +3,7 @@ import { testUuid } from '../../../src/testUuid'
 import { changePasswordMutation } from './gql/changePassword'
 import { getPersonByIdSql } from './sql/getPersonByIdSql'
 import { updatePersonPasswordSql } from './sql/updatePesonPasswordSql'
-import { test } from 'uvu'
+import { test } from 'vitest'
 
 test('changes a password', async () => {
 	const personId = testUuid(1)
@@ -28,4 +28,3 @@ test('changes a password', async () => {
 	})
 })
 
-test.run()

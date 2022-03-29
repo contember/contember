@@ -10,7 +10,7 @@ import { createIdentitySql } from './sql/createIdentitySql'
 import { createMembershipSql } from './sql/createMembershipSql'
 import { createPersonSql } from './sql/createPersonSql'
 import { disableOneOffKeySql } from './sql/disableOneOffKeySql'
-import { test } from 'uvu'
+import { test } from 'vitest'
 import { createPasswordResetSql } from './sql/createPasswordResetSql'
 import { getMailTemplateSql } from './sql/getMailTemplateSql'
 
@@ -173,4 +173,3 @@ test('invite a new person with password reset', async () => {
 	})
 })
 
-test.run()

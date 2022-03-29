@@ -5,14 +5,13 @@
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
   "scripts": {
-    "test": "uvu dist/tests/cases/ \\.js$"
+    "test": "vitest"
   },
   "dependencies": {
     "@contember/engine-common": "^1.1.0-alpha.5",
     "@contember/engine-plugins": "^1.1.0-alpha.5",
     "@contember/graphql-utils": "^1.1.0-alpha.5",
     "@contember/schema": "^1.1.0-alpha.5",
-    "apollo-server-errors": "^2.3.4",
     "mime-types": "^2.1.24",
     "picomatch": "^2.2.1",
     "qs": "^6.10.1",
@@ -22,8 +21,7 @@
     "@types/mime-types": "^2.1.0",
     "@types/qs": "^6.9.6",
     "@types/uuid": "^8.3.0",
-    "graphql": "^15.4.0",
-    "uvu": "^0.5.3"
+    "graphql": "^15.4.0"
   },
   "peerDependencies": {
     "graphql": ">= 14.6.0"

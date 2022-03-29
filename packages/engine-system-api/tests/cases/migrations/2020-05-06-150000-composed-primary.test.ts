@@ -1,8 +1,7 @@
 import migration from '../../../src/migrations/2020-05-06-150000-composed-primary'
 import { createMigrationBuilder } from '@contember/database-migrations'
 import { sampleProject } from '@contember/engine-api-tester'
-import { test } from 'uvu'
-import * as assert from 'uvu/assert'
+import { test, assert } from 'vitest'
 
 test('many-has-many-primary migration sql', async () => {
 	const builder = createMigrationBuilder()
@@ -222,5 +221,3 @@ DROP FUNCTION "make_diff"("old" jsonb, "new" jsonb);
 `,
 	)
 })
-
-test.run()

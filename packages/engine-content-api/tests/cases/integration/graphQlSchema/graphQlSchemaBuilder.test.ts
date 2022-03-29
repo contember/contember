@@ -2,13 +2,16 @@ import { graphql, printSchema } from 'graphql'
 import { Acl, Model } from '@contember/schema'
 import * as path from 'path'
 
-import { AllowAllPermissionFactory, SchemaBuilder, SchemaDefinition } from '@contember/schema-definition'
-import { GraphQlSchemaBuilderFactory, Authorizator } from '../../../../src'
+import {
+	AllowAllPermissionFactory,
+	SchemaBuilder,
+	SchemaDefinition,
+	SchemaDefinition as def,
+} from '@contember/schema-definition'
+import { Authorizator, GraphQlSchemaBuilderFactory } from '../../../../src'
 import * as model from './model'
 import { promises as fs } from 'fs'
-import * as assert from 'uvu/assert'
-import { suite } from 'uvu'
-import { SchemaDefinition as def } from '@contember/schema-definition'
+import { assert, describe, it } from 'vitest'
 
 interface Test {
 	schema: (builder: SchemaBuilder) => SchemaBuilder | Model.Schema
@@ -38,7 +41,7 @@ const testSchema = async (test: Test) => {
 		`,
 	)
 	const errors = (result.errors || []).map(it => it.message)
-	assert.equal(errors, [])
+	assert.deepEqual(errors, [])
 
 	const textSchema = printSchema(graphQlSchema)
 
@@ -51,302 +54,313 @@ const testSchema = async (test: Test) => {
 		throw new Error(`Schema file ${filename} not found, creating with current schema`)
 	}
 	if (expectedSchema) {
-		assert.equal(textSchema, expectedSchema)
+		assert.deepEqual(textSchema, expectedSchema)
 	}
 }
-const graphqlSchemaBuilderTest = suite('GraphQL schema builder')
-
-graphqlSchemaBuilderTest('basic schema', async () => {
-	await testSchema({
-		schema: builder =>
-			builder
-				.entity('Author', e =>
-					e
-						.column('name', c => c.type(Model.ColumnType.String))
-						.oneHasMany('posts', r => r.target('Post').ownedBy('author')),
-				)
-				.entity('Category', e => e.column('name', c => c.type(Model.ColumnType.String)))
-				.entity('Post', e =>
-					e
-						.column('publishedAt', c => c.type(Model.ColumnType.DateTime))
-						.oneHasMany('locales', r =>
-							r.target('PostLocale', e => e.column('title', c => c.type(Model.ColumnType.String))),
-						)
-						.manyHasMany('categories', r => r.target('Category').inversedBy('posts')),
-				),
-		permissions: schema => new AllowAllPermissionFactory().create(schema),
-		graphQlSchemaFile: 'schema-basic.gql',
-	})
-})
-
-graphqlSchemaBuilderTest('restricted access to fields by permissions', async () => {
-	await testSchema({
-		schema: builder =>
-			builder.entity('Test', e =>
-				e
-					.column('a', c => c.type(Model.ColumnType.String))
-					.column('b', c => c.type(Model.ColumnType.String))
-					.column('c', c => c.type(Model.ColumnType.String)),
-			),
-		permissions: () => ({
-			Test: {
-				predicates: {},
-				operations: {
-					create: {
-						id: true,
-						a: true,
-					},
-					update: {
-						id: true,
-						b: true,
-					},
-					read: {
-						id: true,
-						c: true,
-					},
-				},
-			},
-		}),
-		graphQlSchemaFile: 'schema-acl.gql',
-	})
-})
+describe('GraphQL schema builder', () => {
 
 
-graphqlSchemaBuilderTest('conditionally restricted read of some fields', async () => {
-	await testSchema({
-		schema: builder =>
-			builder.entity('Test', e =>
-				e
-					.column('a', c => c.type(Model.ColumnType.String).notNull()),
-			),
-		permissions: () => ({
-			Test: {
-				predicates: {
-					testPredicate: {
-						a: { eq: 'Foo' },
-					},
-				},
-				operations: {
-					read: {
-						id: true,
-						a: 'testPredicate',
-					},
-				},
-			},
-		}),
-		graphQlSchemaFile: 'schema-acl-predicate.gql',
-	})
-})
-
-
-graphqlSchemaBuilderTest('conditionally restricted read of whole row', async () => {
-	await testSchema({
-		schema: builder =>
-			builder.entity('Test', e =>
-				e
-					.column('a', c => c.type(Model.ColumnType.String).notNull()),
-			),
-		permissions: () => ({
-			Test: {
-				predicates: {
-					testPredicate: {
-						a: { eq: 'Foo' },
-					},
-				},
-				operations: {
-					read: {
-						id: 'testPredicate',
-						a: 'testPredicate',
-					},
-				},
-			},
-		}),
-		graphQlSchemaFile: 'schema-acl-predicate2.gql',
-	})
-})
-
-const oneHasManySchema = (builder: SchemaBuilder) =>
-	builder.entity('Root', e =>
-		e
-			.column('foo', c => c.type(Model.ColumnType.String))
-			.oneHasMany('r', r =>
-				r.target('OneHasManyEntity', e => e.column('a', c => c.type(Model.ColumnType.String))).ownedBy('r2'),
-			),
-	)
-
-graphqlSchemaBuilderTest('ACL with relations - everything allowed', async () => {
-	await testSchema({
-		schema: oneHasManySchema,
-		permissions: schema => new AllowAllPermissionFactory().create(schema),
-		graphQlSchemaFile: 'schema-acl-allowed.gql',
-	})
-})
-
-graphqlSchemaBuilderTest('ACL with relations - restricted delete', async () => {
-	await testSchema({
-		schema: oneHasManySchema,
-		permissions: () => ({
-			Root: {
-				predicates: {},
-				operations: {
-					create: { id: true },
-					update: { id: true },
-					read: { id: true },
-					delete: true,
-				},
-			},
-			OneHasManyEntity: {
-				predicates: {},
-				operations: {
-					create: { id: true, a: true, r2: true },
-					update: { id: true, a: true, r2: true },
-					read: { id: true, a: true },
-				},
-			},
-		}),
-		graphQlSchemaFile: 'schema-acl-restricted-delete.gql',
-	})
-})
-
-graphqlSchemaBuilderTest('ACL with relations - restricted update', async () => {
-	await testSchema({
-		schema: oneHasManySchema,
-		permissions: () => ({
-			Root: {
-				predicates: {},
-				operations: {
-					create: { id: true, r: true },
-					update: { id: true, r: true },
-					read: { id: true, r: true },
-					delete: true,
-				},
-			},
-			OneHasManyEntity: {
-				predicates: {},
-				operations: {
-					create: { id: true, a: true, r2: true },
-					read: { id: true, a: true },
-					delete: true,
-				},
-			},
-		}),
-		graphQlSchemaFile: 'schema-acl-restricted-update.gql',
-	})
-})
-
-graphqlSchemaBuilderTest('ACL with relations - restricted create', async () => {
-	await testSchema({
-		schema: oneHasManySchema,
-		permissions: () => ({
-			Root: {
-				predicates: {},
-				operations: {
-					update: { id: true, r: true },
-					read: { id: true, r: true },
-					delete: true,
-				},
-			},
-			OneHasManyEntity: {
-				predicates: {},
-				operations: {
-					update: { id: true, a: true, r2: true },
-					read: { id: true, a: true },
-					delete: true,
-				},
-			},
-		}),
-		graphQlSchemaFile: 'schema-acl-restricted-create.gql',
-	})
-})
-
-graphqlSchemaBuilderTest('has many relation reduction', async () => {
-	await testSchema({
-		schema: builder =>
-			builder.entity('Post', e =>
-				e
-					.column('publishedAt', c => c.type(Model.ColumnType.DateTime))
-					.oneHasMany('locales', r =>
-						r.ownedBy('post').target('PostLocale', e =>
-							e
-								.unique(['locale', 'post'])
-								.column('locale', c => c.type(Model.ColumnType.String))
-								.column('title', c => c.type(Model.ColumnType.String)),
-						),
+	it('basic schema', async () => {
+		await testSchema({
+			schema: builder =>
+				builder
+					.entity('Author', e =>
+						e
+							.column('name', c => c.type(Model.ColumnType.String))
+							.oneHasMany('posts', r => r.target('Post').ownedBy('author')),
+					)
+					.entity('Category', e => e.column('name', c => c.type(Model.ColumnType.String)))
+					.entity('Post', e =>
+						e
+							.column('publishedAt', c => c.type(Model.ColumnType.DateTime))
+							.oneHasMany('locales', r =>
+								r.target('PostLocale', e => e.column('title', c => c.type(Model.ColumnType.String))),
+							)
+							.manyHasMany('categories', r => r.target('Category').inversedBy('posts')),
 					),
-			),
-		permissions: schema => new AllowAllPermissionFactory().create(schema),
-		graphQlSchemaFile: 'schema-has-many-reduction.gql',
+			permissions: schema => new AllowAllPermissionFactory().create(schema),
+			graphQlSchemaFile: 'schema-basic.gql',
+		})
 	})
-})
 
-graphqlSchemaBuilderTest('bug with multiple relations 66', async () => {
-	await testSchema({
-		schema: builder =>
-			builder
-				.enum('one', ['one'])
-				.entity('Video', entity => entity.column('vimeoId'))
-				.entity('FrontPage', entity =>
-					entity
-						.column('unique', column => column.type(Model.ColumnType.Enum, { enumName: 'one' }).unique().notNull())
-						.oneHasOne('introVideo', relation => relation.target('Video').notNull().inversedBy('frontPageForIntro'))
-						.oneHasMany('inHouseVideos', relation => relation.target('Video').ownedBy('frontPage')),
-				),
-		permissions: schema => new AllowAllPermissionFactory().create(schema),
-		graphQlSchemaFile: 'schema-bug-66.gql',
-	})
-})
-
-graphqlSchemaBuilderTest('basic schema with new builder', async () => {
-	const schema1 = SchemaDefinition.createModel(model)
-	const relation = schema1.entities['Author'].fields['posts']
-	assert.equal((relation as Model.OneHasManyRelation).orderBy, [
-		{ path: ['publishedAt'], direction: Model.OrderDirection.desc },
-	])
-	await testSchema({
-		schema: () => schema1,
-		permissions: schema => new AllowAllPermissionFactory().create(schema),
-		graphQlSchemaFile: 'schema-new-builder.gql',
-	})
-})
-
-graphqlSchemaBuilderTest('allow only create', async () => {
-	const schema = SchemaDefinition.createModel(model)
-	await testSchema({
-		schema: () => schema,
-		permissions: schema => new AllowAllPermissionFactory([Acl.Operation.create]).create(schema),
-		graphQlSchemaFile: 'schema-acl-create-only.gql',
-	})
-})
-
-graphqlSchemaBuilderTest('custom primary allowed', async () => {
-	await testSchema({
-		schema: builder =>
-			builder
-				.entity('Author', e =>
+	it('restricted access to fields by permissions', async () => {
+		await testSchema({
+			schema: builder =>
+				builder.entity('Test', e =>
 					e
-						.column('name', c => c.type(Model.ColumnType.String))
-						.oneHasMany('posts', r => r.target('Post').ownedBy('author')),
-				)
-				.entity('Category', e => e.column('name', c => c.type(Model.ColumnType.String)))
-				.entity('Post', e =>
+						.column('a', c => c.type(Model.ColumnType.String))
+						.column('b', c => c.type(Model.ColumnType.String))
+						.column('c', c => c.type(Model.ColumnType.String)),
+				),
+			permissions: () => ({
+				Test: {
+					predicates: {},
+					operations: {
+						create: {
+							id: true,
+							a: true,
+						},
+						update: {
+							id: true,
+							b: true,
+						},
+						read: {
+							id: true,
+							c: true,
+						},
+					},
+				},
+			}),
+			graphQlSchemaFile: 'schema-acl.gql',
+		})
+	})
+
+
+	it('conditionally restricted read of some fields', async () => {
+		await testSchema({
+			schema: builder =>
+				builder.entity('Test', e =>
+					e
+						.column('a', c => c.type(Model.ColumnType.String).notNull()),
+				),
+			permissions: () => ({
+				Test: {
+					predicates: {
+						testPredicate: {
+							a: { eq: 'Foo' },
+						},
+					},
+					operations: {
+						read: {
+							id: true,
+							a: 'testPredicate',
+						},
+					},
+				},
+			}),
+			graphQlSchemaFile: 'schema-acl-predicate.gql',
+		})
+	})
+
+
+	it('conditionally restricted read of whole row', async () => {
+		await testSchema({
+			schema: builder =>
+				builder.entity('Test', e =>
+					e
+						.column('a', c => c.type(Model.ColumnType.String).notNull()),
+				),
+			permissions: () => ({
+				Test: {
+					predicates: {
+						testPredicate: {
+							a: { eq: 'Foo' },
+						},
+					},
+					operations: {
+						read: {
+							id: 'testPredicate',
+							a: 'testPredicate',
+						},
+					},
+				},
+			}),
+			graphQlSchemaFile: 'schema-acl-predicate2.gql',
+		})
+	})
+
+	const oneHasManySchema = (builder: SchemaBuilder) =>
+		builder.entity('Root', e =>
+			e
+				.column('foo', c => c.type(Model.ColumnType.String))
+				.oneHasMany('r', r =>
+					r.target('OneHasManyEntity', e => e.column('a', c => c.type(Model.ColumnType.String))).ownedBy('r2'),
+				),
+		)
+
+	it('ACL with relations - everything allowed', async () => {
+		await testSchema({
+			schema: oneHasManySchema,
+			permissions: schema => new AllowAllPermissionFactory().create(schema),
+			graphQlSchemaFile: 'schema-acl-allowed.gql',
+		})
+	})
+
+	it('ACL with relations - restricted delete', async () => {
+		await testSchema({
+			schema: oneHasManySchema,
+			permissions: () => ({
+				Root: {
+					predicates: {},
+					operations: {
+						create: { id: true },
+						update: { id: true },
+						read: { id: true },
+						delete: true,
+					},
+				},
+				OneHasManyEntity: {
+					predicates: {},
+					operations: {
+						create: { id: true, a: true, r2: true },
+						update: { id: true, a: true, r2: true },
+						read: { id: true, a: true },
+					},
+				},
+			}),
+			graphQlSchemaFile: 'schema-acl-restricted-delete.gql',
+		})
+	})
+
+	it('ACL with relations - restricted update', async () => {
+		await testSchema({
+			schema: oneHasManySchema,
+			permissions: () => ({
+				Root: {
+					predicates: {},
+					operations: {
+						create: { id: true, r: true },
+						update: { id: true, r: true },
+						read: { id: true, r: true },
+						delete: true,
+					},
+				},
+				OneHasManyEntity: {
+					predicates: {},
+					operations: {
+						create: { id: true, a: true, r2: true },
+						read: { id: true, a: true },
+						delete: true,
+					},
+				},
+			}),
+			graphQlSchemaFile: 'schema-acl-restricted-update.gql',
+		})
+	})
+
+	it('ACL with relations - restricted create', async () => {
+		await testSchema({
+			schema: oneHasManySchema,
+			permissions: () => ({
+				Root: {
+					predicates: {},
+					operations: {
+						update: { id: true, r: true },
+						read: { id: true, r: true },
+						delete: true,
+					},
+				},
+				OneHasManyEntity: {
+					predicates: {},
+					operations: {
+						update: { id: true, a: true, r2: true },
+						read: { id: true, a: true },
+						delete: true,
+					},
+				},
+			}),
+			graphQlSchemaFile: 'schema-acl-restricted-create.gql',
+		})
+	})
+
+	it('has many relation reduction', async () => {
+		await testSchema({
+			schema: builder =>
+				builder.entity('Post', e =>
 					e
 						.column('publishedAt', c => c.type(Model.ColumnType.DateTime))
 						.oneHasMany('locales', r =>
-							r.target('PostLocale', e => e.column('title', c => c.type(Model.ColumnType.String))),
-						)
-						.manyHasMany('categories', r => r.target('Category').inversedBy('posts')),
+							r.ownedBy('post').target('PostLocale', e =>
+								e
+									.unique(['locale', 'post'])
+									.column('locale', c => c.type(Model.ColumnType.String))
+									.column('title', c => c.type(Model.ColumnType.String)),
+							),
+						),
 				),
-		permissions: schema => new AllowAllPermissionFactory().create(schema, true),
-		graphQlSchemaFile: 'schema-custom-primary.gql',
+			permissions: schema => new AllowAllPermissionFactory().create(schema),
+			graphQlSchemaFile: 'schema-has-many-reduction.gql',
+		})
 	})
-})
 
-graphqlSchemaBuilderTest('aliased type', async () => {
-	await testSchema({
-		schema: builder =>
-			builder.entity('Author', e => e.column('name', c => c.type(Model.ColumnType.String).typeAlias('AuthorName'))),
-		permissions: schema => new AllowAllPermissionFactory().create(schema),
-		graphQlSchemaFile: 'schema-aliased-type.gql',
+	it('bug with multiple relations 66', async () => {
+		await testSchema({
+			schema: builder =>
+				builder
+					.enum('one', ['one'])
+					.entity('Video', entity => entity.column('vimeoId'))
+					.entity('FrontPage', entity =>
+						entity
+							.column('unique', column => column.type(Model.ColumnType.Enum, { enumName: 'one' }).unique().notNull())
+							.oneHasOne('introVideo', relation => relation.target('Video').notNull().inversedBy('frontPageForIntro'))
+							.oneHasMany('inHouseVideos', relation => relation.target('Video').ownedBy('frontPage')),
+					),
+			permissions: schema => new AllowAllPermissionFactory().create(schema),
+			graphQlSchemaFile: 'schema-bug-66.gql',
+		})
+	})
+
+	it('basic schema with new builder', async () => {
+		const schema1 = SchemaDefinition.createModel(model)
+		const relation = schema1.entities['Author'].fields['posts']
+		assert.deepEqual((relation as Model.OneHasManyRelation).orderBy, [
+			{ path: ['publishedAt'], direction: Model.OrderDirection.desc },
+		])
+		await testSchema({
+			schema: () => schema1,
+			permissions: schema => new AllowAllPermissionFactory().create(schema),
+			graphQlSchemaFile: 'schema-new-builder.gql',
+		})
+	})
+
+	it('allow only create', async () => {
+		const schema = SchemaDefinition.createModel(model)
+		await testSchema({
+			schema: () => schema,
+			permissions: schema => new AllowAllPermissionFactory([Acl.Operation.create]).create(schema),
+			graphQlSchemaFile: 'schema-acl-create-only.gql',
+		})
+	})
+
+	it('custom primary allowed', async () => {
+		await testSchema({
+			schema: builder =>
+				builder
+					.entity('Author', e =>
+						e
+							.column('name', c => c.type(Model.ColumnType.String))
+							.oneHasMany('posts', r => r.target('Post').ownedBy('author')),
+					)
+					.entity('Category', e => e.column('name', c => c.type(Model.ColumnType.String)))
+					.entity('Post', e =>
+						e
+							.column('publishedAt', c => c.type(Model.ColumnType.DateTime))
+							.oneHasMany('locales', r =>
+								r.target('PostLocale', e => e.column('title', c => c.type(Model.ColumnType.String))),
+							)
+							.manyHasMany('categories', r => r.target('Category').inversedBy('posts')),
+					),
+			permissions: schema => new AllowAllPermissionFactory().create(schema, true),
+			graphQlSchemaFile: 'schema-custom-primary.gql',
+		})
+	})
+
+	it('aliased type', async () => {
+		await testSchema({
+			schema: builder =>
+				builder.entity('Author', e => e.column('name', c => c.type(Model.ColumnType.String).typeAlias('AuthorName'))),
+			permissions: schema => new AllowAllPermissionFactory().create(schema),
+			graphQlSchemaFile: 'schema-aliased-type.gql',
+		})
+	})
+
+
+	it('view entity', async () => {
+		await testSchema({
+			schema: () => SchemaDefinition.createModel(ViewEntity),
+			permissions: schema => new AllowAllPermissionFactory().create(schema),
+			graphQlSchemaFile: 'schema-view-entity.gql',
+		})
 	})
 })
 
@@ -356,11 +370,3 @@ namespace ViewEntity {
 		name = def.stringColumn()
 	}
 }
-graphqlSchemaBuilderTest('view entity', async () => {
-	await testSchema({
-		schema: () => SchemaDefinition.createModel(ViewEntity),
-		permissions: schema => new AllowAllPermissionFactory().create(schema),
-		graphQlSchemaFile: 'schema-view-entity.gql',
-	})
-})
-graphqlSchemaBuilderTest.run()

@@ -20,7 +20,7 @@ import {
 } from '../../../model'
 import { createMembershipValidationErrorResult } from '../../membershipUtils'
 import { createErrorResponse, createProjectNotFoundResponse } from '../../errorUtils'
-import { UserInputError } from 'apollo-server-errors'
+import { UserInputError } from '@contember/graphql-utils'
 
 export class InviteMutationResolver implements MutationResolvers {
 	constructor(

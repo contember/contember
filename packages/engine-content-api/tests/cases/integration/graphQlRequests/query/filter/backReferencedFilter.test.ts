@@ -1,4 +1,4 @@
-import { test } from 'uvu'
+import { test } from 'vitest'
 import { execute } from '../../../../../src/test'
 import { SchemaBuilder } from '@contember/schema-definition'
 import { GQL, SQL } from '../../../../../src/tags'
@@ -79,4 +79,4 @@ test('Categories with children filtered by back-referenced parent', async () => 
 		},
 	})
 })
-test.run()
+

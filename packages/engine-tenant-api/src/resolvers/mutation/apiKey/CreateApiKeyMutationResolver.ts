@@ -9,7 +9,7 @@ import { TenantResolverContext } from '../../TenantResolverContext'
 import { ApiKeyManager, isTokenHash, MembershipValidator, PermissionActions, ProjectManager } from '../../../model'
 import { createMembershipValidationErrorResult } from '../../membershipUtils'
 import { createProjectNotFoundResponse } from '../../errorUtils'
-import { UserInputError } from 'apollo-server-errors'
+import { UserInputError } from '@contember/graphql-utils'
 
 export class CreateApiKeyMutationResolver implements MutationResolvers {
 	constructor(

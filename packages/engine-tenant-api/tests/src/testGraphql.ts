@@ -1,5 +1,5 @@
 import { graphql, GraphQLSchema } from 'graphql'
-import * as assert from 'uvu/assert'
+import { assert } from 'vitest'
 
 export interface Test {
 	schema: GraphQLSchema
@@ -19,6 +19,6 @@ export const executeGraphQlTest = async (test: Test) => {
 	if (typeof test.return === 'function') {
 		test.return(responseNormalized)
 	} else {
-		assert.equal(responseNormalized, test.return)
+		assert.deepStrictEqual(responseNormalized, test.return)
 	}
 }

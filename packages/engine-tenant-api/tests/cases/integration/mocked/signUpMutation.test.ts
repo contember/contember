@@ -7,7 +7,7 @@ import { createIdentitySql } from './sql/createIdentitySql'
 import { getPersonByEmailSql } from './sql/getPersonByEmailSql'
 import { sqlTransaction } from './sql/sqlTransaction'
 import { disableOneOffKeySql } from './sql/disableOneOffKeySql'
-import { test } from 'uvu'
+import { test } from 'vitest'
 
 test('signs up a new user', async () => {
 	const email = 'john@doe.com'
@@ -77,4 +77,3 @@ test('not sign up user with existing email', async () => {
 	})
 })
 
-test.run()

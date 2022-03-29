@@ -1,9 +1,8 @@
-import { suite } from 'uvu'
+import { describe, it, assert } from 'vitest'
 import { InputValidation as v } from '@contember/schema-definition'
 import { SchemaDefinition as d } from '@contember/schema-definition'
 import { createSchema, testCreate } from '../utils'
 
-const test = suite('Max length rule')
 
 class Item {
 	@v.assert(v.rules.maxLength(5), 'failure')
@@ -13,22 +12,22 @@ class Item {
 const schema = createSchema({
 	Item,
 })
-test('fails when value not valid', async () => {
-	await testCreate({
-		schema,
-		entity: 'Item',
-		data: { value: 'abcdef' },
-		errors: ['failure'],
+describe('Max length rule', () => {
+	it('fails when value not valid', async () => {
+		await testCreate({
+			schema,
+			entity: 'Item',
+			data: { value: 'abcdef' },
+			errors: ['failure'],
+		})
+	})
+
+	it('succeeds when value valid', async () => {
+		await testCreate({
+			schema,
+			entity: 'Item',
+			data: { value: 'abc' },
+			errors: [],
+		})
 	})
 })
-
-test('succeeds when value valid', async () => {
-	await testCreate({
-		schema,
-		entity: 'Item',
-		data: { value: 'abc' },
-		errors: [],
-	})
-})
-
-test.run()

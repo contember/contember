@@ -3,7 +3,7 @@ import { execute } from '../../src/test'
 import { GQL, SQL } from '../../src/tags'
 import { testUuid } from '../../src/testUuid'
 import { SchemaBuilder } from '@contember/schema-definition'
-import { test } from 'uvu'
+import { test } from 'vitest'
 
 const schema = new SchemaBuilder()
 	.entity('Location', entity =>
@@ -88,4 +88,4 @@ test('Filter by "has one" multiple times with OR and with empty parameter', asyn
 	})
 })
 
-test.run()
+

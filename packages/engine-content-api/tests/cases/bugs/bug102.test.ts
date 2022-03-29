@@ -3,7 +3,7 @@ import { execute } from '../../src/test'
 import { GQL, SQL } from '../../src/tags'
 import { testUuid } from '../../src/testUuid'
 import { SchemaBuilder } from '@contember/schema-definition'
-import { test } from 'uvu'
+import { test } from 'vitest'
 
 test('Filter by has many with additional join', async () => {
 	await execute({
@@ -84,4 +84,4 @@ where "root_locale"."slug" = ? and "root_"."person_id" in (?)`,
 	})
 })
 
-test.run()
+

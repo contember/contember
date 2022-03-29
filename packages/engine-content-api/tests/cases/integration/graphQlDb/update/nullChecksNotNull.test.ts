@@ -1,6 +1,6 @@
 import { SchemaBuilder } from '@contember/schema-definition'
 import { Model } from '@contember/schema'
-import { test } from 'uvu'
+import { test } from 'vitest'
 import { executeDbTest } from '@contember/engine-api-tester'
 import { GQL } from '../../../../src/tags'
 import { testUuid } from '../../../../src/testUuid'
@@ -80,4 +80,4 @@ test('update site & try to create contact page which however exists', async () =
 		},
 	})
 })
-test.run()
+

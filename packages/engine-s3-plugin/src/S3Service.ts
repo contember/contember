@@ -1,7 +1,7 @@
 import { extension } from 'mime-types'
-import { resolveS3Endpoint, resolveS3PublicBaseUrl, S3Config } from './Config'
+import { resolveS3PublicBaseUrl, S3Config } from './Config'
 import { ObjectKeyVerifier } from './ObjectKeyVerifier'
-import { ForbiddenError } from 'apollo-server-errors'
+import { ForbiddenError } from '@contember/graphql-utils'
 import { Providers } from '@contember/engine-plugins'
 import { S3Signer } from './S3Signer'
 

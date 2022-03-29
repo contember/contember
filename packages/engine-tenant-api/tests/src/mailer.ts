@@ -1,5 +1,5 @@
 import { Mailer, MailMessage, SentInfo } from '../../src/utils'
-import * as assert from 'uvu/assert'
+import { assert } from 'vitest'
 
 export type ExpectedMessage = { subject: string }
 

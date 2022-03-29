@@ -3,7 +3,7 @@ import { SQL } from '../../../src/tags'
 import { testUuid } from '../../../src/testUuid'
 import { selectMembershipsSql } from './sql/selectMembershipsSql'
 import { getPersonByEmailSql } from './sql/getPersonByEmailSql'
-import { test } from 'uvu'
+import { test } from 'vitest'
 import { getIdentityProjectsSql } from './sql/getIdentityProjectsSql'
 import { createSessionTokenMutation } from './gql/createSessionToken'
 import { createSessionKeySql } from './sql/createSessionKeySql'
@@ -77,4 +77,3 @@ test('create session key', async () => {
 	})
 })
 
-test.run()

@@ -11,7 +11,7 @@ import {
 import { emptySchema } from '@contember/schema-utils'
 import { ApiTester } from './ApiTester'
 import { SelectBuilder } from '@contember/database'
-import * as assert from 'uvu/assert'
+import { assert } from 'vitest'
 
 type Test = {
 	schema: Model.Schema
@@ -68,12 +68,12 @@ export const executeDbTest = async (test: Test) => {
 				if (typeof test.return === 'function') {
 					test.return(response)
 				} else {
-					assert.equal(response, test.return)
+					assert.deepStrictEqual(response, test.return)
 				}
 			}
 		} catch (e) {
 			if ('throws' in test && e instanceof Error) {
-				assert.is(e.message, test.throws.message)
+				assert.equal(e.message, test.throws.message)
 			} else {
 				throw e
 			}
@@ -87,7 +87,7 @@ export const executeDbTest = async (test: Test) => {
 			const qbWithSelect = columns.reduce<SelectBuilder<Record<string, any>>>((qb, column) => qb.select(column), qb)
 			dbData[table] = await qbWithSelect.getResult(tester.client.forSchema('stage_prod'))
 		}
-		assert.equal(dbData, test.expectDatabase ?? {})
+		assert.deepStrictEqual(dbData, test.expectDatabase ?? {})
 	} finally {
 		await tester.cleanup()
 	}

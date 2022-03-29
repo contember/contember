@@ -1,7 +1,7 @@
 import { executeTenantTest } from '../../../src/testTenant'
 import { testUuid } from '../../../src/testUuid'
 import { updatePersonPasswordSql } from './sql/updatePesonPasswordSql'
-import { test } from 'uvu'
+import { test } from 'vitest'
 import { changeMyPasswordMutation } from './gql/changeMyPassword'
 import { getPersonByIdentity } from './sql/getPersonByIdentity'
 import { authenticatedIdentityId } from '../../../src/testTenantDb'
@@ -58,4 +58,3 @@ test('changes my password - invalid current password', async () => {
 	})
 })
 
-test.run()

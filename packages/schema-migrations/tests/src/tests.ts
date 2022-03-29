@@ -1,8 +1,7 @@
 import { Migration, ModificationHandlerFactory, SchemaDiffer, SchemaMigrator, VERSION_LATEST } from '../../src'
 import { Acl, Model } from '@contember/schema'
 import { createMigrationBuilder } from '@contember/database-migrations'
-import * as assert from 'uvu/assert'
-import { suite } from 'uvu'
+import { assert, describe, it } from 'vitest'
 
 const modificationFactory = new ModificationHandlerFactory(ModificationHandlerFactory.defaultFactoryMap)
 const schemaMigrator = new SchemaMigrator(modificationFactory)
@@ -32,13 +31,13 @@ export function testDiffSchemas(
 		{ model: updatedModel, acl: updatedAcl, validation: {} },
 		false,
 	)
-	assert.equal(actualDiff, expectedDiff)
+	assert.deepStrictEqual(actualDiff, expectedDiff)
 	const schema = schemaMigrator.applyModifications(
 		{ model: originalModel, acl: originalAcl, validation: {} },
 		actualDiff,
 		VERSION_LATEST,
 	)
-	assert.equal(schema, {
+	assert.deepStrictEqual(schema, {
 		model: updatedModel,
 		acl: updatedAcl,
 		validation: {},
@@ -58,7 +57,7 @@ export function testApplyDiff(
 		VERSION_LATEST,
 	)
 
-	assert.equal(actualSchema, {
+	assert.deepStrictEqual(actualSchema, {
 		model: expectedModel,
 		acl: expectedAcl,
 		validation: {},
@@ -77,19 +76,19 @@ export function testGenerateSql(originalSchema: Model.Schema, diff: Migration.Mo
 	assert.equal(actual, expectedSql)
 }
 
-export function testMigrations(title: string, ctx: TestContext) {
-	const migrationsSuite = suite<TestContext>(title, ctx)
-	migrationsSuite('diff schemas', ({ originalSchema, updatedSchema, diff, noDiff }) => {
-		if (noDiff) {
-			return
-		}
-		testDiffSchemas(originalSchema, updatedSchema, diff, ctx.originalAcl, ctx.updatedAcl)
+export function testMigrations(title: string, { originalSchema, updatedSchema, diff, noDiff, originalAcl, updatedAcl, sql }: TestContext) {
+	describe(title, () => {
+		it('diff schemas', () => {
+			if (noDiff) {
+				return
+			}
+			testDiffSchemas(originalSchema, updatedSchema, diff, originalAcl, updatedAcl)
+		})
+		it('apply diff', () => {
+			testApplyDiff(originalSchema, diff, updatedSchema, originalAcl, updatedAcl)
+		})
+		it('generate sql', () => {
+			testGenerateSql(originalSchema, diff, sql)
+		})
 	})
-	migrationsSuite('apply diff', ({ originalSchema, diff, updatedSchema }) => {
-		testApplyDiff(originalSchema, diff, updatedSchema, ctx.originalAcl, ctx.updatedAcl)
-	})
-	migrationsSuite('generate sql', ({ originalSchema, diff, sql }) => {
-		testGenerateSql(originalSchema, diff, sql)
-	})
-	migrationsSuite.run()
 }

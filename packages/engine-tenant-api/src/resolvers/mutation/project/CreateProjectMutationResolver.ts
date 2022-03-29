@@ -7,7 +7,7 @@ import {
 import { TenantResolverContext } from '../../TenantResolverContext'
 import { isTokenHash, PermissionActions, ProjectManager } from '../../../model'
 import { createErrorResponse } from '../../errorUtils'
-import { UserInputError } from 'apollo-server-errors'
+import { UserInputError } from '@contember/graphql-utils'
 
 export class CreateProjectMutationResolver implements MutationResolvers {
 	constructor(private readonly projectManager: ProjectManager) {}

@@ -1,6 +1,6 @@
 import { SchemaBuilder } from '@contember/schema-definition'
 import { Model } from '@contember/schema'
-import { test } from 'uvu'
+import { test } from 'vitest'
 import { executeDbTest } from '@contember/engine-api-tester'
 import { GQL } from '../../../../src/tags'
 
@@ -37,4 +37,4 @@ test('fail when creating a non-unique site', async () => {
 	})
 })
 
-test.run()
+

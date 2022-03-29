@@ -1,6 +1,6 @@
 import { InputValidation as v, SchemaBuilder } from '@contember/schema-definition'
 import { Model, Validation } from '@contember/schema'
-import { test } from 'uvu'
+import { test } from 'vitest'
 import { execute, sqlTransaction } from '../../../../../src/test'
 import { GQL, SQL } from '../../../../../src/tags'
 import { testUuid } from '../../../../../src/testUuid'
@@ -110,4 +110,4 @@ test.skip('update book with validation - failed', async () => {
 		},
 	})
 })
-test.run()
+

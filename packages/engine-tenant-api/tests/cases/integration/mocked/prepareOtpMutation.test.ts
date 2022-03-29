@@ -2,8 +2,7 @@ import { authenticatedIdentityId, executeTenantTest } from '../../../src/testTen
 import { testUuid } from '../../../src/testUuid'
 import { prepareOtpMutation } from './gql/prepareOtp'
 import { getPersonByIdentity } from './sql/getPersonByIdentity'
-import { test } from 'uvu'
-import * as assert from 'uvu/assert'
+import { test, assert } from 'vitest'
 
 test('prepare otp', async () => {
 	const personId = testUuid(1)
@@ -34,4 +33,3 @@ test('prepare otp', async () => {
 	})
 })
 
-test.run()

@@ -1,11 +1,8 @@
 import migration from './2020-06-08-134000-tenant-credentials'
 import { createMigrationBuilder } from '@contember/database-migrations'
-import { suite } from 'uvu'
-import * as assert from 'uvu/assert'
+import { test, assert } from 'vitest'
 
-const credentialsMigrationTest = suite('credentials migration ')
-
-credentialsMigrationTest('generate sql with root token and login token', async () => {
+test('generate sql with root token and login token', async () => {
 	const builder = createMigrationBuilder()
 	await migration(builder, {
 		getCredentials: async () => ({
@@ -51,15 +48,11 @@ credentialsMigrationTest('generate sql with root token and login token', async (
 			)
 			SELECT * FROM person, api_key
 		;
-UPDATE "api_key"
-	         SET "disabled_at" = now()
-	         WHERE "token_hash" = '081115df5d291465362f17c4b7b182da6aaa6d8147a0fec1aca8435eec404612'
-	               AND "disabled_at" IS NULL;
 `,
 	)
 })
 
-credentialsMigrationTest('generate sql with both root user and token', async () => {
+test('generate sql with both root user and token', async () => {
 	const builder = createMigrationBuilder()
 	await migration(builder, {
 		getCredentials: async () => ({
@@ -97,11 +90,6 @@ credentialsMigrationTest('generate sql with both root user and token', async () 
 			)
 			SELECT * FROM person, api_key
 		;
-UPDATE "api_key"
-	         SET "disabled_at" = now()
-	         WHERE "token_hash" = '081115df5d291465362f17c4b7b182da6aaa6d8147a0fec1aca8435eec404612'
-	               AND "disabled_at" IS NULL;
 `,
 	)
 })
-credentialsMigrationTest.run()

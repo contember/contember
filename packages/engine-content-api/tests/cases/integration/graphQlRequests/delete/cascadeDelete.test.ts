@@ -1,4 +1,4 @@
-import { test } from 'uvu'
+import { test } from 'vitest'
 import { execute, sqlDeferred, sqlTransaction } from '../../../../src/test'
 import { SchemaBuilder } from '@contember/schema-definition'
 import { Model } from '@contember/schema'
@@ -87,4 +87,4 @@ test('delete author with posts and locales cascade delete', async () => {
 	})
 })
 
-test.run()
+

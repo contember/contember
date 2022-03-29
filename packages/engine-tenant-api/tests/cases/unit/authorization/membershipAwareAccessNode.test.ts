@@ -1,5 +1,4 @@
-import { test } from 'uvu'
-import assert from 'uvu/assert'
+import { test, assert } from 'vitest'
 import { MembershipAwareAccessNode } from '../../../../src/model/authorization/MembershipAwareAccessNode'
 import { testUuid } from '@contember/engine-api-tester'
 import { PermissionActions } from '../../../../src'
@@ -85,18 +84,18 @@ test('admin can assign editor role with matching variable', async () => {
 
 test('admin cannot assign editor role with different variable', async () => {
 	const node = new MembershipAwareAccessNode([...adminOfSiteA, ...editorOfSiteB], aclSchemaAdminCanManageEditorWithMatchingVariables)
-	assert.not(await node.isAllowed(aclEvaluator, PermissionActions.PROJECT_ADD_MEMBER(editorOfSiteB)))
+	assert.notOk(await node.isAllowed(aclEvaluator, PermissionActions.PROJECT_ADD_MEMBER(editorOfSiteB)))
 })
 
 test('admin cannot assign editor role with matching variable, but in a different role', async () => {
 	const node = new MembershipAwareAccessNode(adminOfSiteA, aclSchemaAdminCanManageEditorWithMatchingVariables)
-	assert.not(await node.isAllowed(aclEvaluator, PermissionActions.PROJECT_ADD_MEMBER(editorOfSiteB)))
+	assert.notOk(await node.isAllowed(aclEvaluator, PermissionActions.PROJECT_ADD_MEMBER(editorOfSiteB)))
 })
 
 test('editor cannot assign editor role', async () => {
 	const node = new MembershipAwareAccessNode(editorOfSiteA, aclSchemaAdminCanManageEditorWithMatchingVariables)
 
-	assert.not(await node.isAllowed(aclEvaluator, PermissionActions.PROJECT_ADD_MEMBER(editorOfSiteA)))
+	assert.notOk(await node.isAllowed(aclEvaluator, PermissionActions.PROJECT_ADD_MEMBER(editorOfSiteA)))
 })
 
 test('admin can assign editor role with any variable', async () => {
@@ -107,7 +106,7 @@ test('admin can assign editor role with any variable', async () => {
 
 test('admin cannot assign editor role with any variable', async () => {
 	const node = new MembershipAwareAccessNode(adminOfSiteA, aclSchemaAdminCanManageEditorWithoutVariables)
-	assert.not(await node.isAllowed(aclEvaluator, PermissionActions.PROJECT_ADD_MEMBER(editorOfSiteB)))
+	assert.notOk(await node.isAllowed(aclEvaluator, PermissionActions.PROJECT_ADD_MEMBER(editorOfSiteB)))
 })
 
 test('admin can assign editor role without variable', async () => {
@@ -121,5 +120,3 @@ test('admin can assign editor role with any variable', async () => {
 	assert.ok(await node.isAllowed(aclEvaluator, PermissionActions.PROJECT_ADD_MEMBER(editorOfSiteB)))
 })
 
-
-test.run()

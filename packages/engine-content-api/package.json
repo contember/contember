@@ -7,7 +7,7 @@
   "scripts": {
     "build-copy": "mkdir -p dist && find ./tests/ -name '*.gql' -type f -exec cp --parents {} ./dist \\;",
     "generate": "gql-gen --config graphql.codegen.yml",
-    "test": "uvu dist/tests/cases/ \\.js$"
+    "test": "vitest --no-threads"
   },
   "dependencies": {
     "@contember/database": "^1.1.0-alpha.5",
@@ -16,7 +16,7 @@
     "@contember/graphql-utils": "^1.1.0-alpha.5",
     "@contember/schema": "^1.1.0-alpha.5",
     "@contember/schema-utils": "^1.1.0-alpha.5",
-    "@graphql-tools/schema": "^7.1.5",
+    "@graphql-tools/schema": "^8.3.5",
     "graphql-tag": "^2.12.5"
   },
   "devDependencies": {
@@ -29,8 +29,7 @@
     "@graphql-codegen/typescript-resolvers": "^1.15.2",
     "@types/node": "^17.0.5",
     "graphql": "^15.4.0",
-    "pg": "^8.5.0",
-    "uvu": "^0.5.3"
+    "pg": "^8.5.0"
   },
   "peerDependencies": {
     "graphql": ">= 14.6.0",

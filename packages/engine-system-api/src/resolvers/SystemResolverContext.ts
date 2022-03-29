@@ -1,6 +1,6 @@
 import { Authorizator } from '@contember/authorization'
 import { Schema } from '@contember/schema'
-import { ForbiddenError } from 'apollo-server-errors'
+import { ForbiddenError } from '@contember/graphql-utils'
 import { DatabaseContext, Identity, SchemaVersionBuilder } from '../model'
 import { ProjectConfig } from '../types'
 import { StagePermissionsFactory } from '../model/authorization/StagePermissionsFactory'

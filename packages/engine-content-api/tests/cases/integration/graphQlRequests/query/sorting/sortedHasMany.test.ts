@@ -1,4 +1,4 @@
-import { test } from 'uvu'
+import { test } from 'vitest'
 import { execute } from '../../../../../src/test'
 import { SchemaBuilder } from '@contember/schema-definition'
 import { GQL, SQL } from '../../../../../src/tags'
@@ -76,4 +76,4 @@ test('Post with ordered locales', async () => {
 		},
 	})
 })
-test.run()
+

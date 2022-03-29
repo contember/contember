@@ -1,4 +1,4 @@
-import { test } from 'uvu'
+import { test } from 'vitest'
 import { SchemaBuilder } from '@contember/schema-definition'
 import { GQL } from '../../../../src/tags'
 import { testUuid } from '../../../../src/testUuid'
@@ -205,4 +205,4 @@ test('delete with unsuccessfully deferring constraints', async () => {
 })
 
 
-test.run()
+

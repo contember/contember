@@ -1,6 +1,6 @@
 import { SchemaBuilder } from '@contember/schema-definition'
 import { Acl } from '@contember/schema'
-import { test } from 'uvu'
+import { test } from 'vitest'
 import { execute } from '../../../../../src/test'
 import { GQL, SQL } from '../../../../../src/tags'
 import { testUuid } from '../../../../../src/testUuid'
@@ -66,4 +66,4 @@ test('same predicate on row and field level', async () => {
 	})
 })
 
-test.run()
+

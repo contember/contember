@@ -1,4 +1,4 @@
-import { test } from 'uvu'
+import { test } from 'vitest'
 import { execute, sqlDeferred, sqlTransaction } from '../../../../src/test'
 import { SchemaBuilder } from '@contember/schema-definition'
 import { Model } from '@contember/schema'
@@ -76,4 +76,4 @@ test('delete author and set null on posts', async () => {
 		},
 	})
 })
-test.run()
+

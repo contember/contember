@@ -24,7 +24,7 @@
 		"ipaddr.js": "^2.0.1",
 		"mime": "^2.5.2",
 		"node-fetch": "^2.6.5",
-		"redis": "^4.0.0",
+		"redis": "^4.0.2",
 		"ws": "^8.2.3"
 	},
 	"devDependencies": {

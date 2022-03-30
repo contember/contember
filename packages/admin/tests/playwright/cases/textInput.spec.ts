@@ -17,14 +17,13 @@ test('basic test', async ({ page }) => {
 	})
 
 	await page.goto(`/${projectSlug}/text-input`)
-	await page.waitForLoadState('networkidle')
-	await page.waitForTimeout(100)
+	await page.waitForLoadState('networkidle') // wait for fonts
+	await page.waitForSelector('input#pw-title')
 	expect(await page.screenshot()).toMatchSnapshot('initial.png')
 
 	await page.locator('input#pw-title').click()
 	await page.locator('input#pw-title').fill('My First Article')
 	await page.locator('button:has-text("Save")').click()
-	await page.waitForLoadState('networkidle')
-	await page.waitForTimeout(100)
+	await page.waitForSelector('.toaster-item')
 	expect(await page.screenshot()).toMatchSnapshot('after-save.png')
 })

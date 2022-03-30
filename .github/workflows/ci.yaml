@@ -20,6 +20,61 @@ jobs:
       - run: pnpm run build
       - run: pnpm run test
 
+  playwright:
+    runs-on: ubuntu-latest
+    container: mcr.microsoft.com/playwright:v1.20.0-focal
+
+    services:
+      postgres:
+        image: postgres:13-alpine
+        env:
+          POSTGRES_PASSWORD: 'contember'
+          POSTGRES_USER: 'contember'
+          POSTGRES_DB: 'contember'
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      contember-engine:
+        image: contember/engine:1.0.0-rc.15
+        env:
+          NODE_ENV: 'development'
+          CONTEMBER_PORT: '4000'
+          CONTEMBER_ROOT_EMAIL: 'superadmin@localhost'
+          CONTEMBER_ROOT_PASSWORD: 'superadmin@localhost'
+          CONTEMBER_ROOT_TOKEN: '0000000000000000000000000000000000000000'
+          CONTEMBER_LOGIN_TOKEN: '1111111111111111111111111111111111111111'
+          CONTEMBER_ENCRYPTION_KEY: '0000000000000000000000000000000000000000000000000000000000000000'
+          DEFAULT_DB_HOST: 'postgres'
+          DEFAULT_DB_PORT: '5432'
+          DEFAULT_DB_USER: 'contember'
+          DEFAULT_DB_PASSWORD: 'contember'
+          TENANT_DB_NAME: 'contember'
+
+    env:
+      CONTEMBER_API_URL: 'http://contember-engine:4000'
+      CONTEMBER_API_TOKEN: '0000000000000000000000000000000000000000'
+
+    steps:
+      - uses: actions/checkout@v2
+      - run: npm install -g pnpm
+      - run: pnpm install
+      - run: pnpm run build
+      - run: cd packages/admin && pnpm run build:playwright
+      - run: cd packages/admin && pnpm run test:playwright
+      - uses: actions/upload-artifact@v2
+        if: ${{ failure() }}
+        with:
+          name: playwright-results
+          path: packages/admin/test-results
+      - uses: actions/upload-artifact@v2
+        if: ${{ always() }}
+        with:
+          name: playwright-report
+          path: packages/admin/playwright-report
+
 
   publish-npm:
     if: github.event_name == 'push' && github.ref_type == 'tag'

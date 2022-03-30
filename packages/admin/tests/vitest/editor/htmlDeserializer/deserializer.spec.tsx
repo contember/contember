@@ -5,7 +5,7 @@ import {
 	headingHtmlDeserializer,
 	listHtmlDeserializerFactory,
 	paragraphHtmlDeserializer,
-} from '../../../../../src'
+} from '../../../../src'
 
 describe('editor html deserializer', () => {
 	it('deserializes text', () => {

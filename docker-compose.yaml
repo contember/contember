@@ -51,9 +51,24 @@ services:
     volumes:
       - .:/src:cached
 
+  playwright:
+    image: mcr.microsoft.com/playwright:v1.20.0-focal
+    command: ['npm', 'run', 'test:playwright']
+    user: '1000:1000'
+
+    deploy:
+      replicas: 0
+
+    environment:
+      CONTEMBER_API_URL: 'http://contember-engine:4000'
+      CONTEMBER_API_TOKEN: '0000000000000000000000000000000000000000'
+
+    working_dir: /src/packages/admin
+    volumes:
+      - .:/src:cached
 
   contember-engine:
-    image: contember/engine:1.0.0-rc.2
+    image: contember/engine:1.0.0-rc.15
 
     environment:
       NODE_ENV: 'development'
@@ -92,7 +107,7 @@ services:
 
 
   contember-cli:
-    image: contember/cli:1.0.0-rc.2
+    image: contember/cli:1.0.0-rc.15
 
     deploy:
       replicas: 0

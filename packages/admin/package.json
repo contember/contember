@@ -28,7 +28,10 @@
 		"build": "pnpm run build:js && pnpm run build:css",
 		"build:js": "vite build --mode development && vite build --mode production",
 		"build:css": "sass --no-charset src/index.sass:dist/style.css",
-		"test": "vitest --environment jsdom"
+		"build:playwright": "vite build tests/playwright/admin",
+		"preview:playwright": "vite preview tests/playwright/admin",
+		"test": "vitest --environment jsdom tests/vitest",
+		"test:playwright": "playwright test tests/playwright"
 	},
 	"dependencies": {
 		"@contember/binding": "workspace:*",
@@ -66,10 +69,16 @@
 		"react-dom": "^17"
 	},
 	"devDependencies": {
+		"@contember/schema": "^1.0.0-rc.15",
+		"@contember/schema-definition": "^1.0.0-rc.15",
+		"@contember/schema-migrations": "^1.0.0-rc.15",
+		"@contember/schema-utils": "^1.0.0-rc.15",
+		"@playwright/test": "^1.20.0",
 		"@types/blueimp-md5": "2.18.0",
 		"@types/debounce": "1.2.0",
 		"@types/is-hotkey": "0.1.5",
 		"@types/leaflet": "1.7.5",
+		"@types/node": "^16",
 		"@types/react": "17.0.30",
 		"@types/react-dom": "17.0.9",
 		"@types/react-leaflet": "2.8.2",
@@ -78,6 +87,9 @@
 		"@types/react-window": "1.8.5",
 		"csstype": "3.0.8",
 		"jsdom": "^18.0.0",
+		"node-fetch": "^2.6.5",
+		"pg": "^8.7.3",
+		"playwright": "^1.20.0",
 		"react-test-renderer": "^17"
 	}
 }

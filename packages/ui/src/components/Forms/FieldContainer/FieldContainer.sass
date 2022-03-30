@@ -23,8 +23,9 @@
 		flex-direction: column
 		column-gap: calc(2 * var(--cui-gap-horizontal))
 		row-gap: calc(2 * var(--cui-gap-vertical))
-	&:not(.is-active):not(:focus-within) &-label
-		color: var(--cui-color--high)
+	// TODO: Find a fix for Safari performance issue
+	// &:not(.is-active):not(:focus-within) &-label
+	// 	color: var(--cui-color--high)
 
 	&-required-asterix
 		color: var(--cui-control-color)

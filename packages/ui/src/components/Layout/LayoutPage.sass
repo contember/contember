@@ -22,8 +22,6 @@
 		padding-right: var(--cui-layout-page-padding-right)
 		padding-bottom: var(--cui-layout-page-padding-bottom)
 		transition: border-color var(--cui-transition-duration)
-		&:not(:last-child)
-			padding-right: var(--cui-layout-section-padding-right)
 	&-content-container
 		display: flex
 		flex-direction: column
@@ -51,6 +49,9 @@
 			margin-right: auto
 			flex-basis: $breakpoint-min-medium
 	@media (min-width: $breakpoint-min-xlarge)
+		&-content
+			&:not(:last-child)
+				padding-right: var(--cui-layout-section-padding-right)
 		&-content-wrap
 			flex-direction: row
 		&-aside

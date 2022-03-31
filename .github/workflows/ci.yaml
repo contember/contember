@@ -64,16 +64,24 @@ jobs:
       - run: pnpm run build
       - run: cd packages/admin && pnpm run build:playwright
       - run: cd packages/admin && pnpm run test:playwright
-      - uses: actions/upload-artifact@v2
-        if: ${{ failure() }}
-        with:
-          name: playwright-results
-          path: packages/admin/test-results
-      - uses: actions/upload-artifact@v2
+
+      - uses: jakejarvis/s3-sync-action@master
         if: ${{ always() }}
         with:
-          name: playwright-report
-          path: packages/admin/playwright-report
+          args: --acl public-read
+        env:
+          AWS_S3_BUCKET: 'contember-admin'
+          AWS_ACCESS_KEY_ID: ${{ secrets.PLAYWRIGHT_S3_KEY }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.PLAYWRIGHT_S3_SECRET }}
+          AWS_S3_ENDPOINT: 'https://fra1.digitaloceanspaces.com'
+          SOURCE_DIR: 'packages/admin/playwright-report'
+          DEST_DIR: ${{ github.sha }}
+
+      - uses: phulsechinmay/rewritable-pr-comment@v0.2.1
+        if: ${{ always() }}
+        with:
+          message: '[Playwright Test Report](https://contember-admin.fra1.digitaloceanspaces.com/${{ github.sha }}/index.html)'
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 
   publish-npm:

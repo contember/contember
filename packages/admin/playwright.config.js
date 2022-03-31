@@ -6,8 +6,9 @@ const config = {
 	reporter: process.env.CI ? [['github'], ['html', { open: 'never' }]] : [['list'], ['html', { open: 'never' }]],
 
 	use: {
-		screenshot: 'only-on-failure',
-		trace: 'retain-on-failure',
+		screenshot: 'on',
+		trace: 'on',
+		video: 'on',
 	},
 
 	projects: [

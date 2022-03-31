@@ -1,5 +1,5 @@
 import { ApplicationEntrypoint, Pages, runReactApp } from '../../../src'
-import '../../../dist/style.css'
+import '../../../src/index.sass'
 
 const projectSlug = window.location.pathname.split('/')[1]
 

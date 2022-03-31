@@ -62,8 +62,8 @@ jobs:
       - run: npm install -g pnpm
       - run: pnpm install
       - run: pnpm run build
-      - run: cd packages/admin && pnpm run build:playwright
-      - run: cd packages/admin && pnpm run test:playwright
+      - run: cd packages/admin && pnpm run pw:build
+      - run: cd packages/admin && pnpm run pw:test
 
       - uses: jakejarvis/s3-sync-action@master
         if: ${{ always() }}

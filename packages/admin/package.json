@@ -28,10 +28,11 @@
 		"build": "pnpm run build:js && pnpm run build:css",
 		"build:js": "vite build --mode development && vite build --mode production",
 		"build:css": "sass --no-charset src/index.sass:dist/style.css",
-		"build:playwright": "vite build tests/playwright/admin",
-		"preview:playwright": "vite preview tests/playwright/admin",
-		"test": "vitest --environment jsdom tests/vitest",
-		"test:playwright": "playwright test tests/playwright"
+		"pw:build": "vite build tests/playwright/admin",
+		"pw:preview": "vite preview tests/playwright/admin",
+		"pw:update": "playwright test --update-snapshots tests/playwright",
+		"pw:test": "playwright test tests/playwright",
+		"test": "vitest --environment jsdom tests/vitest"
 	},
 	"dependencies": {
 		"@contember/binding": "workspace:*",

@@ -43,7 +43,7 @@ const config = {
 	],
 
 	webServer: {
-		command: 'npm run preview:playwright',
+		command: 'npm run pw:preview',
 		port: 3333,
 		reuseExistingServer: true,
 	},

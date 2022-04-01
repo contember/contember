@@ -6,7 +6,7 @@ If you wish to communicate with any Contember API, wrap your code with the `Cont
 
 ```tsx
 import { ContemberClient } from '@contember/react-client'
-;<ContemberClient
+<ContemberClient
 	apiBaseUrl="https://api.example.com"
 	project="PROJECT-SLUG"
 	sessionToken="SESSION-TOKEN"

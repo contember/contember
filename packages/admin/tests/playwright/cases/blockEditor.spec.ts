@@ -24,7 +24,7 @@ test('basic test', async ({ page }) => {
 	await page.locator('p.cui-editorParagraph').fill('Hello world')
 	expect(await page.screenshot({ animations: 'disabled' })).toMatchSnapshot('filled.png')
 	await page.locator('p.cui-editorParagraph').selectText()
-	await page.waitForSelector('.cui-hoveringToolbar', { state: 'attached' })
+	await page.waitForSelector('.cui-hoveringToolbar.is-active')
 	expect(await page.screenshot({ animations: 'disabled' })).toMatchSnapshot('selected.png')
 })
 
@@ -46,7 +46,7 @@ test('inline buttons: ordered list', async ({ page }) => {
 		await page.keyboard.press('Shift+ArrowLeft')
 		await page.waitForTimeout(200)
 	}
-	await page.waitForSelector('.cui-hoveringToolbar', { state: 'attached' })
+	await page.waitForSelector('.cui-hoveringToolbar.is-active')
 	await page.waitForTimeout(200)
 	expect(await page.screenshot({ animations: 'disabled' })).toMatchSnapshot('inline-buttons-ordered-list-initial.png')
 	await page.locator(':nth-match(button.cui-editorToolbarButton, 1)').click()
@@ -58,7 +58,7 @@ test('inline buttons: ordered list', async ({ page }) => {
 		await page.keyboard.press('Shift+ArrowLeft')
 		await page.waitForTimeout(200)
 	}
-	await page.waitForSelector('.cui-hoveringToolbar', { state: 'attached' })
+	await page.waitForSelector('.cui-hoveringToolbar.is-active')
 	await page.waitForTimeout(200)
 	expect(await page.screenshot({ animations: 'disabled' })).toMatchSnapshot('inline-buttons-ordered-list-first.png')
 	await page.locator(':nth-match(button.cui-editorToolbarButton, 2)').click()
@@ -68,7 +68,7 @@ test('inline buttons: ordered list', async ({ page }) => {
 		await page.keyboard.press('Shift+ArrowLeft')
 		await page.waitForTimeout(200)
 	}
-	await page.waitForSelector('.cui-hoveringToolbar', { state: 'attached' })
+	await page.waitForSelector('.cui-hoveringToolbar.is-active')
 	await page.waitForTimeout(200)
 	expect(await page.screenshot({ animations: 'disabled' })).toMatchSnapshot('inline-buttons-ordered-list-second.png')
 	await page.locator(':nth-match(button.cui-editorToolbarButton, 3)').click()
@@ -78,7 +78,7 @@ test('inline buttons: ordered list', async ({ page }) => {
 		await page.keyboard.press('Shift+ArrowLeft')
 		await page.waitForTimeout(200)
 	}
-	await page.waitForSelector('.cui-hoveringToolbar', { state: 'attached' })
+	await page.waitForSelector('.cui-hoveringToolbar.is-active')
 	await page.waitForTimeout(200)
 	expect(await page.screenshot({ animations: 'disabled' })).toMatchSnapshot('inline-buttons-ordered-list-third.png')
 })
@@ -101,7 +101,7 @@ test('inline buttons: unordered list', async ({ page }) => {
 		await page.keyboard.press('Shift+ArrowLeft')
 		await page.waitForTimeout(200)
 	}
-	await page.waitForSelector('.cui-hoveringToolbar', { state: 'attached' })
+	await page.waitForSelector('.cui-hoveringToolbar.is-active')
 	await page.waitForTimeout(200)
 	expect(await page.screenshot({ animations: 'disabled' })).toMatchSnapshot('inline-buttons-unordered-list-initial.png')
 	await page.locator(':nth-match(button.cui-editorToolbarButton, 1)').click()
@@ -113,7 +113,7 @@ test('inline buttons: unordered list', async ({ page }) => {
 		await page.keyboard.press('Shift+ArrowLeft')
 		await page.waitForTimeout(200)
 	}
-	await page.waitForSelector('.cui-hoveringToolbar', { state: 'attached' })
+	await page.waitForSelector('.cui-hoveringToolbar.is-active')
 	await page.waitForTimeout(200)
 	expect(await page.screenshot({ animations: 'disabled' })).toMatchSnapshot('inline-buttons-unordered-list-first.png')
 	await page.locator(':nth-match(button.cui-editorToolbarButton, 2)').click()
@@ -123,7 +123,7 @@ test('inline buttons: unordered list', async ({ page }) => {
 		await page.keyboard.press('Shift+ArrowLeft')
 		await page.waitForTimeout(200)
 	}
-	await page.waitForSelector('.cui-hoveringToolbar', { state: 'attached' })
+	await page.waitForSelector('.cui-hoveringToolbar.is-active')
 	await page.waitForTimeout(200)
 	expect(await page.screenshot({ animations: 'disabled' })).toMatchSnapshot('inline-buttons-unordered-list-second.png')
 	await page.locator(':nth-match(button.cui-editorToolbarButton, 3)').click()
@@ -133,7 +133,7 @@ test('inline buttons: unordered list', async ({ page }) => {
 		await page.keyboard.press('Shift+ArrowLeft')
 		await page.waitForTimeout(200)
 	}
-	await page.waitForSelector('.cui-hoveringToolbar', { state: 'attached' })
+	await page.waitForSelector('.cui-hoveringToolbar.is-active')
 	await page.waitForTimeout(200)
 	expect(await page.screenshot({ animations: 'disabled' })).toMatchSnapshot('inline-buttons-unordered-list-third.png')
 })

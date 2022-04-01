@@ -47,13 +47,13 @@ export const FieldContainer = memo(
 				`${componentClassName}`,
 				toEnumViewClass(size),
 				toEnumViewClass(labelPosition),
-				errors?.length ? toThemeClass('danger', 'controls') : undefined,
+				errors?.length ? toThemeClass(null, 'danger') : null,
 			)}>
 				<LabelElement className={`${componentClassName}-label`}>
 					{(label || labelDescription) && <span className={`${componentClassName}-header`}>
 							{label && <Label>
 								{label}
-								<span className={`${componentClassName}-required-asterix ${toThemeClass('danger')}`}>{required && '*'}</span>
+								<span className={`${componentClassName}-required-asterix ${toThemeClass('danger', 'danger')}`}>{required && '*'}</span>
 							</Label>}
 							{labelDescription && <Description>{labelDescription}</Description>}
 						</span>

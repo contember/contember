@@ -2,7 +2,7 @@ import cn from 'classnames'
 import { ButtonHTMLAttributes, createElement, forwardRef, memo, ReactNode } from 'react'
 import { useClassNamePrefix } from '../../../auxiliary'
 import type { ButtonDistinction, ButtonFlow, Intent, Justification, Scheme, Size } from '../../../types'
-import { toEnumClass, toEnumViewClass, toStateClass, toThemeClass, toViewClass } from '../../../utils'
+import { toEnumViewClass, toSchemeClass, toStateClass, toThemeClass, toViewClass } from '../../../utils'
 import { Spinner } from '../../Spinner'
 
 type PropBlackList = 'ref' | 'size'
@@ -62,13 +62,14 @@ export const BaseButton = memo(
 			(rest as ButtonHTMLAttributes<HTMLButtonElement>).type = props.type !== undefined ? props.type : 'button'
 		}
 		const prefix = useClassNamePrefix()
+		const themeIntent = !props.disabled ? intent : 'default'
 
 		const attrs = {
 			className: cn(
 				rest.className,
 				`${prefix}button`,
-				toThemeClass(!props.disabled ? intent : 'default'),
-				toEnumClass('scheme-', !props.disabled ? scheme : undefined),
+				toThemeClass(themeIntent, themeIntent),
+				toSchemeClass(!props.disabled ? scheme : undefined),
 				toEnumViewClass(size),
 				toEnumViewClass(props.disabled ? 'default' : distinction),
 				toEnumViewClass(flow),

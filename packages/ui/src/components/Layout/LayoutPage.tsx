@@ -1,7 +1,7 @@
 import classNames from 'classnames'
 import { CSSProperties, memo, ReactNode, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { useClassNamePrefix } from '../../auxiliary'
-import { toEnumClass, toThemeClass } from '../../utils'
+import { toSchemeClass, toThemeClass } from '../../utils'
 import { SectionTabs, useSectionTabsRegistration } from '../SectionTabs'
 import { Stack } from '../Stack'
 import { TitleBar, TitleBarProps } from '../TitleBar'
@@ -147,9 +147,8 @@ export const LayoutPage = memo(({
 
 	return <div className={classNames(
 		`${prefix}layout-page`,
-		toThemeClass(themeContent ?? theme, 'content'),
-		toThemeClass(themeControls ?? theme, 'controls'),
-		toEnumClass('scheme-', scheme),
+		toThemeClass(themeContent ?? theme, themeControls ?? theme),
+		toSchemeClass(scheme),
 	)}>
 		{(title || actions) && <TitleBar after={<SectionTabs />} navigation={navigation} actions={actions} headingProps={headingProps}>
 			{title}

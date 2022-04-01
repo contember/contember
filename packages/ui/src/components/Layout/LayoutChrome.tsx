@@ -3,7 +3,7 @@ import { memo, ReactNode, useCallback, useContext, useEffect, useMemo, useRef, u
 import { NavigationContext } from '../..'
 import { useClassNamePrefix } from '../../auxiliary'
 import { Intent, Scheme } from '../../types'
-import { toEnumClass, toStateClass, toThemeClass, toViewClass } from '../../utils'
+import { toSchemeClass, toStateClass, toThemeClass, toViewClass } from '../../utils'
 import { DropdownContentContainerProvider } from '../Dropdown'
 import { Button } from '../Forms'
 import { Icon } from '../Icon'
@@ -154,9 +154,8 @@ export const LayoutChrome = memo(({
 
 	return <div ref={layoutRef} className={classnames(
 		`${prefix}layout-chrome`,
-		toThemeClass(themeContent ?? theme, 'content'),
-		toThemeClass(themeControls ?? theme, 'controls'),
-    toEnumClass('scheme-', scheme),
+		toThemeClass(themeContent ?? theme, themeControls ?? theme),
+		toSchemeClass(scheme),
 		toViewClass('collapsed', collapsed),
 	)}>
 		<DropdownContentContainerProvider>
@@ -188,8 +187,8 @@ export const LayoutChrome = memo(({
 		<DropdownContentContainerProvider>
 			<div className={classNames(
 				`${prefix}layout-chrome-body`,
-				toEnumClass('scheme-', pageScheme ?? scheme),
-				toThemeClass(pageThemeContent ?? pageTheme, 'content'),
+				toSchemeClass(pageScheme ?? scheme),
+				toThemeClass(pageThemeContent ?? pageTheme, pageThemeControls ?? pageTheme),
 			)}>
 				<ThemeSchemeContext.Provider value={themeScheme}>
 					<TitleThemeSchemeContext.Provider value={titleThemeScheme}>

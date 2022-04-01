@@ -21,9 +21,9 @@ export const isUnorderedListElement = (
 export const unorderedListElementPlugin: CustomElementPlugin<UnorderedListElement> = {
 	type: unorderedListElementType,
 	render: UnorderedListRenderer,
-	isActive: ({ editor }) => {
+	isActive: ({ editor, suchThat }) => {
 		const list = getParentListElement(editor)
-		return list ? isUnorderedListElement(list) : false
+		return list ? isUnorderedListElement(list, suchThat) : false
 	},
 	toggleElement: ({ editor, suchThat }) => {
 		toggleListElement(editor, unorderedListElementType, suchThat, orderedListElementType)

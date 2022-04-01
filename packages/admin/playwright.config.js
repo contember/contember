@@ -2,7 +2,8 @@ import { devices } from '@playwright/test'
 
 /** @type  { import("@playwright/test").PlaywrightTestConfig } **/
 const config = {
-	workers: process.env.CI ? 4 : undefined,
+	timeout: 60000,
+	workers: process.env.CI ? 1 : undefined,
 	reporter: process.env.CI ? [['github'], ['html', { open: 'never' }]] : [['list'], ['html', { open: 'never' }]],
 
 	use: {

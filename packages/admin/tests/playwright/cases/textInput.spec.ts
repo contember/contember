@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { initContemberProject } from '../utils'
+import { expectNoConsoleErrors, initContemberProject } from '../utils'
 import * as modelDefinition from './textInput.model'
 
 let projectSlug: string
@@ -9,12 +9,7 @@ test.beforeAll(async ({}, testInfo) => {
 })
 
 test('basic test', async ({ page }) => {
-	page.on('console', msg => {
-		if (msg.type() === 'error') {
-			console.error(msg.text())
-			test.fail()
-		}
-	})
+	expectNoConsoleErrors(page)
 
 	await page.goto(`/${projectSlug}/text-input`)
 	await page.waitForLoadState('networkidle') // wait for fonts

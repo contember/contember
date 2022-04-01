@@ -63,7 +63,7 @@ jobs:
       - run: pnpm install
       - run: pnpm run build
       - run: cd packages/admin && pnpm run pw:build
-      - run: cd packages/admin && pnpm run pw:test
+      - run: cd packages/admin && pnpm run pw:test -- --workers 1
 
       - uses: jakejarvis/s3-sync-action@master
         if: ${{ always() }}

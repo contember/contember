@@ -33,7 +33,6 @@
 		top: 0
 		bottom: 0
 		width: var(--cui-editor-canvas-element-handle-width)
-		z-index: 0
 		.#{$cui-conf-globalPrefix}icon
 			align-items: center
 			height: var(--cui-editor-canvas-element-handle-height)
@@ -55,7 +54,7 @@
 			opacity: 1
 
 	&.is-dragged
-		z-index: 2
+		z-index: 1
 
 		#{$root}-content
 			opacity: 0.5

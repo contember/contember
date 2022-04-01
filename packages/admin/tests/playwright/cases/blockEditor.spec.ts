@@ -41,25 +41,43 @@ test('inline buttons: ordered list', async ({ page }) => {
 	await page.waitForLoadState('networkidle') // wait for fonts
 	await page.waitForSelector('p.cui-editorParagraph')
 	await page.locator('p.cui-editorParagraph').click()
-	await page.locator('p.cui-editorParagraph').fill('Hello world')
-	await page.locator('p.cui-editorParagraph').selectText()
+	await page.keyboard.type('Hello world')
+	for (let i = 0; i < 'world'.length; i++) {
+		await page.keyboard.press('Shift+ArrowLeft')
+		await page.waitForTimeout(200)
+	}
 	await page.waitForSelector('.cui-hoveringToolbar', { state: 'attached' })
 	await page.waitForTimeout(200)
 	expect(await page.screenshot({ animations: 'disabled' })).toMatchSnapshot('inline-buttons-ordered-list-initial.png')
 	await page.locator(':nth-match(button.cui-editorToolbarButton, 1)').click()
 	await page.waitForTimeout(200)
 	expect(await page.screenshot({ animations: 'disabled' })).toMatchSnapshot('inline-buttons-ordered-list-clicked.png')
-	await page.locator('text=Hello world').selectText()
+	await page.locator('text=Hello world').click()
+	await page.keyboard.press('End')
+	for (let i = 0; i < 'world'.length; i++) {
+		await page.keyboard.press('Shift+ArrowLeft')
+		await page.waitForTimeout(200)
+	}
 	await page.waitForSelector('.cui-hoveringToolbar', { state: 'attached' })
 	await page.waitForTimeout(200)
 	expect(await page.screenshot({ animations: 'disabled' })).toMatchSnapshot('inline-buttons-ordered-list-first.png')
 	await page.locator(':nth-match(button.cui-editorToolbarButton, 2)').click()
-	await page.locator('text=Hello world').selectText()
+	await page.locator('text=Hello world').click()
+	await page.keyboard.press('End')
+	for (let i = 0; i < 'world'.length; i++) {
+		await page.keyboard.press('Shift+ArrowLeft')
+		await page.waitForTimeout(200)
+	}
 	await page.waitForSelector('.cui-hoveringToolbar', { state: 'attached' })
 	await page.waitForTimeout(200)
 	expect(await page.screenshot({ animations: 'disabled' })).toMatchSnapshot('inline-buttons-ordered-list-second.png')
 	await page.locator(':nth-match(button.cui-editorToolbarButton, 3)').click()
-	await page.locator('text=Hello world').selectText()
+	await page.locator('text=Hello world').click()
+	await page.keyboard.press('End')
+	for (let i = 0; i < 'world'.length; i++) {
+		await page.keyboard.press('Shift+ArrowLeft')
+		await page.waitForTimeout(200)
+	}
 	await page.waitForSelector('.cui-hoveringToolbar', { state: 'attached' })
 	await page.waitForTimeout(200)
 	expect(await page.screenshot({ animations: 'disabled' })).toMatchSnapshot('inline-buttons-ordered-list-third.png')
@@ -78,25 +96,43 @@ test('inline buttons: unordered list', async ({ page }) => {
 	await page.waitForLoadState('networkidle') // wait for fonts
 	await page.waitForSelector('p.cui-editorParagraph')
 	await page.locator('p.cui-editorParagraph').click()
-	await page.locator('p.cui-editorParagraph').fill('Hello world')
-	await page.locator('p.cui-editorParagraph').selectText()
+	await page.keyboard.type('Hello world')
+	for (let i = 0; i < 'world'.length; i++) {
+		await page.keyboard.press('Shift+ArrowLeft')
+		await page.waitForTimeout(200)
+	}
 	await page.waitForSelector('.cui-hoveringToolbar', { state: 'attached' })
 	await page.waitForTimeout(200)
 	expect(await page.screenshot({ animations: 'disabled' })).toMatchSnapshot('inline-buttons-unordered-list-initial.png')
 	await page.locator(':nth-match(button.cui-editorToolbarButton, 1)').click()
 	await page.waitForTimeout(200)
 	expect(await page.screenshot({ animations: 'disabled' })).toMatchSnapshot('inline-buttons-unordered-list-clicked.png')
-	await page.locator('text=Hello world').selectText()
+	await page.locator('text=Hello world').click()
+	await page.keyboard.press('End')
+	for (let i = 0; i < 'world'.length; i++) {
+		await page.keyboard.press('Shift+ArrowLeft')
+		await page.waitForTimeout(200)
+	}
 	await page.waitForSelector('.cui-hoveringToolbar', { state: 'attached' })
 	await page.waitForTimeout(200)
 	expect(await page.screenshot({ animations: 'disabled' })).toMatchSnapshot('inline-buttons-unordered-list-first.png')
 	await page.locator(':nth-match(button.cui-editorToolbarButton, 2)').click()
-	await page.locator('text=Hello world').selectText()
+	await page.locator('text=Hello world').click()
+	await page.keyboard.press('End')
+	for (let i = 0; i < 'world'.length; i++) {
+		await page.keyboard.press('Shift+ArrowLeft')
+		await page.waitForTimeout(200)
+	}
 	await page.waitForSelector('.cui-hoveringToolbar', { state: 'attached' })
 	await page.waitForTimeout(200)
 	expect(await page.screenshot({ animations: 'disabled' })).toMatchSnapshot('inline-buttons-unordered-list-second.png')
 	await page.locator(':nth-match(button.cui-editorToolbarButton, 3)').click()
-	await page.locator('text=Hello world').selectText()
+	await page.locator('text=Hello world').click()
+	await page.keyboard.press('End')
+	for (let i = 0; i < 'world'.length; i++) {
+		await page.keyboard.press('Shift+ArrowLeft')
+		await page.waitForTimeout(200)
+	}
 	await page.waitForSelector('.cui-hoveringToolbar', { state: 'attached' })
 	await page.waitForTimeout(200)
 	expect(await page.screenshot({ animations: 'disabled' })).toMatchSnapshot('inline-buttons-unordered-list-third.png')

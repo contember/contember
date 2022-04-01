@@ -78,7 +78,7 @@ jobs:
           DEST_DIR: ${{ github.sha }}
 
       - uses: phulsechinmay/rewritable-pr-comment@v0.2.1
-        if: ${{ always() }}
+        if: ${{ always() }} && github.event_name == 'pull_request'
         with:
           message: '[Playwright Test Report](https://contember-admin.fra1.digitaloceanspaces.com/${{ github.sha }}/index.html)'
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -2,7 +2,7 @@ import classNames from 'classnames'
 import { forwardRef, memo, ReactNode } from 'react'
 import { useComponentClassName } from '../../auxiliary'
 import type { HoveringToolbarScope, Scheme } from '../../types'
-import { toEnumClass, toEnumViewClass, toStateClass } from '../../utils'
+import { toEnumViewClass, toSchemeClass, toStateClass } from '../../utils'
 
 export interface HoveringToolbarProps {
 	isActive?: boolean
@@ -20,7 +20,7 @@ export const HoveringToolbar = memo(
 				componentClassName,
 				toStateClass('active', isActive),
 				toEnumViewClass(scope),
-				toEnumClass('scheme-', scheme ?? 'dark'),
+				toSchemeClass(scheme ?? 'dark'),
 			)}
 			ref={ref}
 		>

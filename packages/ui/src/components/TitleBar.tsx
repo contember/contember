@@ -1,7 +1,7 @@
 import classNames from 'classnames'
 import { memo, ReactNode } from 'react'
 import { useClassNamePrefix } from '../auxiliary'
-import { toEnumClass, toThemeClass } from '../utils'
+import { toSchemeClass, toThemeClass } from '../utils'
 import { ButtonList } from './Forms'
 import { useThemeScheme, useTitleThemeScheme } from './Layout/ThemeSchemeContext'
 import type { ThemeScheme } from './Layout/Types'
@@ -29,9 +29,8 @@ export const TitleBar = memo(({ after, navigation, children, headingProps, actio
 	return (
 		<div className={classNames(
 			`${prefix}titleBar`,
-			toThemeClass(themeContent ?? theme, 'content'),
-			toThemeClass(themeControls ?? theme, 'controls'),
-			toEnumClass('scheme-', scheme),
+			toThemeClass(themeContent ?? theme, themeControls ?? theme),
+			toSchemeClass(scheme),
 			scheme !== layoutScheme ? 'is-global-theme' : undefined,
 		)}>
 			{navigation && (

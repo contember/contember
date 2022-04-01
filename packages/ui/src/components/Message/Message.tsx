@@ -2,7 +2,7 @@ import cn from 'classnames'
 import { HTMLAttributes, memo, ReactNode } from 'react'
 import { useClassNamePrefix } from '../../auxiliary'
 import type { Intent, MessageDistinction, MessageFlow, Size } from '../../types'
-import { toEnumClass, toEnumViewClass, toViewClass } from '../../utils'
+import { toEnumViewClass, toThemeClass, toViewClass } from '../../utils'
 
 export interface MessageProps extends HTMLAttributes<HTMLDivElement> {
 	intent?: Intent
@@ -21,7 +21,7 @@ export const Message = memo(({ className, children, intent, size, flow, distinct
 		<div
 			className={cn(
 				`${prefix}message`,
-				toEnumClass('theme-', intent),
+				toThemeClass(intent, intent),
 				toEnumViewClass(size),
 				toEnumViewClass(distinction),
 				toViewClass('lifted', lifted),

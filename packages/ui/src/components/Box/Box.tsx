@@ -44,7 +44,7 @@ export const Box = memo(
 						componentClassName,
 						toStateClass('active', isActive),
 						toEnumViewClass(distinction),
-						toThemeClass(intent),
+						toThemeClass(intent, intent),
 						toEnumViewClass(padding),
 						className,
 					)}

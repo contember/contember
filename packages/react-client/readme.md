@@ -27,7 +27,7 @@ You'll have to look at the code for now, sorry.
 
 ## RichTextRenderer
 
-Here is simple exmaple of how to use the `RichTextRenderer` component with custome references and elements.
+Here is simple exmaple of how to use the `RichTextRenderer` component with custom references and elements.
 
 ```tsx
 import { RichTextRenderer } from '@contember/react-client'

@@ -1,11 +1,11 @@
 import { randomInt } from 'crypto'
-import { anyObject, JsonObject, object, string } from '../utils/schema'
-import { CollaborationStorage, ClientIdentity, Scope } from '../services/CollaborationStorage'
-import { MethodDefinition, WebSocketProtocol } from '../utils/WebSocketProtocol'
+import { ClientIdentity, CollaborationStorage, Scope } from '../services/CollaborationStorage'
 import { ProjectGroupResolver } from '../services/ProjectGroupResolver'
-import { readHostFromHeader } from '../utils/readHostFromHeader'
 import { TenantClient } from '../services/TenantClient'
 import { readAuthCookie } from '../utils/cookies'
+import { readHostFromHeader } from '../utils/readHostFromHeader'
+import { anyObject, JsonObject, object, string } from '../utils/schema'
+import { MethodDefinition, WebSocketProtocol } from '../utils/WebSocketProtocol'
 
 interface Context {
 	clientIdentity: ClientIdentity
@@ -124,6 +124,6 @@ export class CollaborationController {
 		},
 		async context => {
 			await this.storage.clientDisconnected(context.connectionData.scope, context.connectionData.clientIdentity)
-		}
+		},
 	)
 }

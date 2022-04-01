@@ -66,7 +66,7 @@ jobs:
       - run: cd packages/admin && pnpm run pw:test
 
       - uses: jakejarvis/s3-sync-action@master
-        if: ${{ always() }}
+        if: always()
         with:
           args: --acl public-read
         env:
@@ -78,7 +78,7 @@ jobs:
           DEST_DIR: ${{ github.sha }}
 
       - uses: phulsechinmay/rewritable-pr-comment@v0.2.1
-        if: ${{ always() }} && github.event_name == 'pull_request'
+        if: always() && github.event_name == 'pull_request'
         with:
           message: '[Playwright Test Report](https://contember-admin.fra1.digitaloceanspaces.com/${{ github.sha }}/index.html)'
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -122,11 +122,11 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Release Tag
-        if: ${{ github.event_name == 'push' && github.ref_type == 'tag' }}
+        if: github.event_name == 'push' && github.ref_type == 'tag'
         run: 'echo "TAG=${GITHUB_REF:11}" >> $GITHUB_ENV'
 
       - name: Canary Tag
-        if: ${{ github.event_name == 'workflow_dispatch' }}
+        if: github.event_name == 'workflow_dispatch'
         run: 'echo "TAG=canary-${GITHUB_SHA:0:10}" >> $GITHUB_ENV'
 
       - name: Build & Publish Docker Image

@@ -48,6 +48,9 @@ testMigrations('convert one has many to many has many', {
 						columnName: 'category_id',
 						onDelete: 'cascade',
 					},
+					eventLog: {
+						enabled: true,
+					},
 				},
 			},
 			inverseSide: {

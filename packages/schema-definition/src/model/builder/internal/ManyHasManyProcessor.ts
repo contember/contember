@@ -52,6 +52,9 @@ export default class ManyHasManyProcessor implements FieldProcessor<ManyHasManyB
 				tableName: this.conventions.getJoiningTableName(entityName, fieldName),
 				joiningColumn: { columnName: columnNames[0], onDelete: Model.OnDelete.cascade },
 				inverseJoiningColumn: { columnName: columnNames[1], onDelete: Model.OnDelete.cascade },
+				eventLog: {
+					enabled: true,
+				},
 			}
 		}
 

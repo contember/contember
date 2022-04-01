@@ -21,7 +21,10 @@ export const CreateViewModification: ModificationHandlerStatic<CreateViewModific
 			...model,
 			entities: {
 				...model.entities,
-				[this.data.entity.name]: this.data.entity,
+				[this.data.entity.name]: {
+					eventLog: { enabled: true }, // not relevant here...
+					...this.data.entity,
+				},
 			},
 		}))
 	}
@@ -60,6 +63,8 @@ export const CreateViewModification: ModificationHandlerStatic<CreateViewModific
 	}
 }
 
+type SomePartial<E, K extends keyof E> = Omit<E, K> & Partial<Pick<E, K>>
+
 export interface CreateViewModificationData {
-	entity: Model.Entity
+	entity: SomePartial<Model.Entity, 'eventLog'>
 }

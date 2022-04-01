@@ -31,6 +31,9 @@ testMigrations('create many has many relation (post with categories)', {
 				primaryColumn: 'id',
 				tableName: 'category',
 				unique: {},
+				eventLog: {
+					enabled: true,
+				},
 			},
 		},
 		{
@@ -60,6 +63,9 @@ testMigrations('create many has many relation (post with categories)', {
 					inverseJoiningColumn: {
 						columnName: 'category_id',
 						onDelete: Model.OnDelete.cascade,
+					},
+					eventLog: {
+						enabled: true,
 					},
 				},
 			},

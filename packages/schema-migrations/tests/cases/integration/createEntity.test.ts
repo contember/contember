@@ -32,6 +32,9 @@ testMigrations('create a table (no relations, unique on column)', {
 				primaryColumn: 'id',
 				tableName: 'author',
 				unique: {},
+				eventLog: {
+					enabled: true,
+				},
 			},
 		},
 		{
@@ -135,6 +138,9 @@ testMigrations('create a view', {
 				tableName: 'author',
 				unique: {},
 				view: { sql: "SELECT null as id, 'John' AS name" },
+				eventLog: {
+					enabled: true,
+				},
 			},
 		},
 	],

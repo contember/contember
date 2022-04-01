@@ -29,7 +29,10 @@ module.exports = {
 		'no-extra-semi': 'off',
 		'@typescript-eslint/indent': ['error', 'tab', {
 			SwitchCase: 1,
-			ignoredNodes: ['TSTypeParameterInstantiation'],
+			ignoredNodes: [
+				'TSTypeAnnotation',
+				'TSTypeParameterInstantiation',
+			],
 		}],
 		'@typescript-eslint/semi': ['error', 'never'],
 		'@typescript-eslint/no-extra-semi': ['error'],

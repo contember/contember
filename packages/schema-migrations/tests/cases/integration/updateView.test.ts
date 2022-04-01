@@ -80,6 +80,9 @@ testMigrations('update a view 1', {
 				view: {
 					sql: "SELECT null as id, 'Jack' AS name",
 				},
+				eventLog: {
+					enabled: true,
+				},
 			},
 		},
 		{
@@ -112,6 +115,9 @@ testMigrations('update a view 1', {
 						'Author',
 					],
 				},
+				eventLog: {
+					enabled: true,
+				},
 			},
 		},
 		{
@@ -143,6 +149,9 @@ testMigrations('update a view 1', {
 					dependencies: [
 						'Author2',
 					],
+				},
+				eventLog: {
+					enabled: true,
 				},
 			},
 		},
@@ -215,6 +224,9 @@ testMigrations('update a view 2', {
 						'Author',
 					],
 				},
+				eventLog: {
+					enabled: true,
+				},
 			},
 		},
 		{
@@ -246,6 +258,9 @@ testMigrations('update a view 2', {
 					dependencies: [
 						'Author2',
 					],
+				},
+				eventLog: {
+					enabled: true,
 				},
 			},
 		},
@@ -312,6 +327,9 @@ testMigrations('update a view 3', {
 					dependencies: [
 						'Author2',
 					],
+				},
+				eventLog: {
+					enabled: true,
 				},
 			},
 		},
@@ -381,6 +399,9 @@ testMigrations('update a view 4', {
 				view: {
 					sql: "SELECT null as id, 'Jack' AS name",
 				},
+				eventLog: {
+					enabled: true,
+				},
 			},
 		},
 		{
@@ -413,6 +434,9 @@ testMigrations('update a view 4', {
 						'Author',
 					],
 				},
+				eventLog: {
+					enabled: true,
+				},
 			},
 		},
 		{
@@ -444,6 +468,9 @@ testMigrations('update a view 4', {
 					dependencies: [
 						'Author2',
 					],
+				},
+				eventLog: {
+					enabled: true,
 				},
 			},
 		},

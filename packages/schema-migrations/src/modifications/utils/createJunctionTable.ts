@@ -36,6 +36,8 @@ export const createJunctionTableSql = (
 			},
 		},
 	)
-	createEventTrigger(builder, systemSchema, relation.joiningTable.tableName, primaryColumns)
-	createEventTrxTrigger(builder, systemSchema, relation.joiningTable.tableName)
+	if (relation.joiningTable.eventLog.enabled) {
+		createEventTrigger(builder, systemSchema, relation.joiningTable.tableName, primaryColumns)
+		createEventTrxTrigger(builder, systemSchema, relation.joiningTable.tableName)
+	}
 }

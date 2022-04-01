@@ -13,6 +13,10 @@ export const createEventTrigger = (builder: MigrationBuilder, systemSchema: stri
 	})
 }
 
+export const dropEventTrigger = (builder: MigrationBuilder, tableName: Name) => {
+	builder.dropTrigger(tableName, 'log_event')
+}
+
 export const createEventTrxTrigger = (builder: MigrationBuilder, systemSchema: string, tableName: Name) => {
 	builder.createTrigger(tableName, 'log_event_trx', {
 		when: 'AFTER',
@@ -26,4 +30,8 @@ export const createEventTrxTrigger = (builder: MigrationBuilder, systemSchema: s
 			name: 'trigger_event_commit',
 		},
 	})
+}
+
+export const dropEventTrxTrigger = (builder: MigrationBuilder, tableName: Name) => {
+	builder.dropTrigger(tableName, 'log_event_trx')
 }

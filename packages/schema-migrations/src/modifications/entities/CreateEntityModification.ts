@@ -3,7 +3,6 @@ import { Model, Schema } from '@contember/schema'
 import { SchemaUpdater, updateModel } from '../utils/schemaUpdateUtils'
 import { ModificationHandlerOptions, ModificationHandlerStatic } from '../ModificationHandler'
 import { createEventTrigger, createEventTrxTrigger } from '../utils/sqlUpdateUtils'
-import { EnumDefinition } from '@contember/schema-definition/dist/src/model/definition'
 
 export const CreateEntityModification: ModificationHandlerStatic<CreateEntityModificationData> = class {
 	static id = 'createEntity'
@@ -30,8 +29,11 @@ export const CreateEntityModification: ModificationHandlerStatic<CreateEntityMod
 				sequenceGenerated: primaryColumn.sequence,
 			},
 		})
-		createEventTrigger(builder, this.options.systemSchema, entity.tableName, [entity.primaryColumn])
-		createEventTrxTrigger(builder, this.options.systemSchema, entity.tableName)
+
+		if  (entity.eventLog?.enabled !== false) {
+			createEventTrigger(builder, this.options.systemSchema, entity.tableName, [entity.primaryColumn])
+			createEventTrxTrigger(builder, this.options.systemSchema, entity.tableName)
+		}
 	}
 
 	public getSchemaUpdater(): SchemaUpdater {
@@ -39,7 +41,10 @@ export const CreateEntityModification: ModificationHandlerStatic<CreateEntityMod
 			...model,
 			entities: {
 				...model.entities,
-				[this.data.entity.name]: this.data.entity,
+				[this.data.entity.name]: {
+					eventLog: { enabled: true },
+					...this.data.entity,
+				},
 			},
 		}))
 	}
@@ -71,6 +76,8 @@ export const CreateEntityModification: ModificationHandlerStatic<CreateEntityMod
 	}
 }
 
+type SomePartial<E, K extends keyof E> = Omit<E, K> & Partial<Pick<E, K>>
+
 export interface CreateEntityModificationData {
-	entity: Model.Entity
+	entity: SomePartial<Model.Entity, 'eventLog'>
 }

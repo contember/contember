@@ -1,5 +1,6 @@
 export * from './CreateEntityModification'
 export * from './CreateViewModification'
 export * from './RemoveEntityModification'
+export * from './ToggleEventLogModification'
 export * from './UpdateEntityNameModification'
 export * from './UpdateEntityTableNameModification'

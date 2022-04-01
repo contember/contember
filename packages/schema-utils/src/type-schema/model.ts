@@ -72,6 +72,9 @@ const manyHasManyOwningRelationSchema = Typesafe.intersection(
 			tableName: Typesafe.string,
 			joiningColumn: joiningColumnSchema,
 			inverseJoiningColumn: joiningColumnSchema,
+			eventLog: Typesafe.object({
+				enabled: Typesafe.boolean,
+			}),
 		}),
 	}),
 	Typesafe.partial({
@@ -152,6 +155,9 @@ const entitySchema = Typesafe.intersection(
 			fields: Typesafe.array(Typesafe.string),
 			name: Typesafe.string,
 		})),
+		eventLog: Typesafe.object({
+			enabled: Typesafe.boolean,
+		}),
 	}),
 	Typesafe.partial({
 		view: viewSchema,

@@ -65,6 +65,9 @@ testMigrations('create view', {
 				view: {
 					sql: 'SELECT 1',
 				},
+				eventLog: {
+					enabled: true,
+				},
 			},
 		},
 		{

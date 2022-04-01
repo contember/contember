@@ -6,6 +6,7 @@ If you wish to communicate with any Contember API, wrap your code with the `Cont
 
 ```tsx
 import { ContemberClient } from '@contember/react-client'
+
 <ContemberClient
 	apiBaseUrl="https://api.example.com"
 	project="PROJECT-SLUG"
@@ -29,6 +30,12 @@ You'll have to look at the code for now, sorry.
 Here is simple exmaple of how to use the `RichTextRenderer` component with custome references and elements.
 
 ```tsx
+import { RichTextRenderer } from '@contember/react-client'
+import Image from './myComponents/Image'
+import Gallery from './myComponents/Gallery'
+import Quote from './myComponents/Quote'
+import Link from './myComponents/Link'
+
 <RichTextRenderer
 	sourceField="json"
 	renderElement={(props) => {

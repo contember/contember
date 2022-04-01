@@ -31,6 +31,7 @@
 		"pw:build": "vite build tests/playwright/admin",
 		"pw:preview": "vite preview tests/playwright/admin",
 		"pw:update": "playwright test --update-snapshots tests/playwright",
+		"pw:report": "playwright show-report",
 		"pw:test": "playwright test tests/playwright",
 		"test": "vitest --environment jsdom tests/vitest"
 	},

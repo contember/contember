@@ -13,6 +13,7 @@
 		"eslint:lint": "eslint \"**/*.{ts,tsx}\" ",
 		"pw:build": "cd packages/admin && docker-compose run --rm playwright npm run -- pw:build",
 		"pw:preview": "cd packages/admin && docker-compose run --rm playwright npm run -- pw:preview",
+		"pw:report": "cd packages/admin && pnpm run -- pw:report",
 		"pw:update": "pnpm run -- pw:build && pnpm run -- pw:update-only",
 		"pw:update-only": "cd packages/admin && docker-compose run --rm playwright npm run -- pw:update",
 		"pw:test": "pnpm run -- pw:build && pnpm run -- pw:test-only",

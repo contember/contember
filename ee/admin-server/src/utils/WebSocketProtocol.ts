@@ -33,6 +33,7 @@ export class WebSocketProtocol<CD> {
 		extractConnectionData: (request: IncomingMessage) => Promise<CD>,
 		protocolDefinition: ProtocolDefinition<Context<CD>>,
 		onPong: (context: Context<CD>) => Promise<void>,
+		onClose?: (context: Context<CD>) => Promise<void>,
 	) {
 		const requestValidator = intersection(
 			object({
@@ -156,6 +157,7 @@ export class WebSocketProtocol<CD> {
 					listener()
 				}
 				ctx.subscriptionsClose.clear()
+				onClose?.(ctx)
 			})
 
 			context.then(ctx => {

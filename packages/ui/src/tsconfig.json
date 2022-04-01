@@ -1,9 +1,10 @@
 {
-	"extends": "../tsconfig.settings.json",
+	"extends": "../../../tsconfig.settings.json",
 	"compilerOptions": {
 		"outDir": "../dist/types"
 	},
 	"references": [
-		{ "path": "../../react-multipass-rendering/src" }
+		{ "path": "../../react-multipass-rendering/src" },
+		{ "path": "../../react-utils/src" }
 	]
 }

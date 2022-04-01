@@ -1249,80 +1249,6 @@
 }
 
 
-[class*="theme-"] *:not([class*="scheme-"]):not([class*="theme-"]),
-[class*="scheme-"] *:not([class*="scheme-"]):not([class*="theme-"]) {
-	/* Properties that are interited donw the line */
-	--cui-background-color: inherit;
-	--cui-background-color--above: inherit;
-	--cui-background-color--below: inherit;
-	--cui-color: inherit;
-	--cui-color--strong: inherit;
-	--cui-color--high: inherit;
-	--cui-color--medium: inherit;
-	--cui-color--low: inherit;
-	--cui-color--lower: inherit;
-
-	/* Control */
-	--cui-control-color: inherit;
-	--cui-control-background-color: inherit;
-	--cui-control-border-color: inherit;
-
-	/* Control:highlighted */
-	--cui-control-color--highlighted: inherit;
-	--cui-control-background-color--highlighted: inherit;
-	--cui-control-border-color--highlighted: inherit;
-
-	/* Control:pressed */
-	--cui-control-color--pressed: inherit;
-	--cui-control-background-color--pressed: inherit;
-	--cui-control-border-color--pressed: inherit;
-
-	/* Filled */
-	--cui-filled-control-color: inherit;
-	--cui-filled-control-background-color: inherit;
-	--cui-filled-control-border-color: inherit;
-
-	/* Filled:highlighted */
-	--cui-filled-control-color--highlighted: inherit;
-	--cui-filled-control-background-color--highlighted: inherit;
-	--cui-filled-control-border-color--highlighted: inherit;
-
-	/* Filled:pressed */
-	--cui-filled-control-color--pressed: inherit;
-	--cui-filled-control-background-color--pressed: inherit;
-	--cui-filled-control-border-color--pressed: inherit;
-
-	/* FilledPrimary */
-	--cui-filled-primary-control-color: inherit;
-	--cui-filled-primary-control-background-color: inherit;
-	--cui-filled-primary-control-border-color: inherit;
-
-	/* FilledPrimary:highlighted */
-	--cui-filled-primary-control-color--highlighted: inherit;
-	--cui-filled-primary-control-background-color--highlighted: inherit;
-	--cui-filled-primary-control-border-color--highlighted: inherit;
-
-	/* FilledPrimary:pressed */
-	--cui-filled-primary-control-color--pressed: inherit;
-	--cui-filled-primary-control-background-color--pressed: inherit;
-	--cui-filled-primary-control-border-color--pressed: inherit;
-
-	/* Toned */
-	--cui-toned-control-color: inherit;
-	--cui-toned-control-background-color: inherit;
-	--cui-toned-control-border-color: inherit;
-
-	/* Toned:highlighted = Filled:highlighted */
-	--cui-toned-control-color--highlighted: inherit;
-	--cui-toned-control-background-color--highlighted: inherit;
-	--cui-toned-control-border-color--highlighted: inherit;
-
-	/* Toned:pressed = Filled:pressed */
-	--cui-toned-control-color--pressed: inherit;
-	--cui-toned-control-background-color--pressed: inherit;
-	--cui-toned-control-border-color--pressed: inherit;
-}
-
 :root,
 .scheme-system,
 .scheme-system-above,
@@ -1373,8 +1299,8 @@
 	--cui-opacity--filled-control-background-color--pressed: 0.750;
 	--cui-opacity--toned-control-background-color: 0.250;
 }
-.scheme-light-below, .scheme-light-below *:not([class*="scheme-"]),
-.scheme-system-below, .scheme-system-below *:not([class*="scheme-"]) {
+.scheme-light-below, .scheme-light-below .cui-theme:not([class*="scheme-"]),
+.scheme-system-below, .scheme-system-below .cui-theme:not([class*="scheme-"]) {
 	/* Content */
 	--cui-background-color: rgb(var(--cui-content-925));
 	--cui-background-color--above: rgb(var(--cui-content-950));
@@ -1490,9 +1416,9 @@
 	--cui-toned-control-background-color--pressed: rgba(var(--cui-controls-125), 0.175);
 	--cui-toned-control-border-color--pressed: rgb(var(--cui-controls-475));
 }
-:root, :root *:not([class*="scheme-"]),
-.scheme-light, .scheme-light *:not([class*="scheme-"]),
-.scheme-system, .scheme-system *:not([class*="scheme-"]) {
+:root, :root .cui-theme:not([class*="scheme-"]),
+.scheme-light, .scheme-light .cui-theme:not([class*="scheme-"]),
+.scheme-system, .scheme-system .cui-theme:not([class*="scheme-"]) {
 	/* Content */
 	--cui-background-color: rgb(var(--cui-content-950));
 	--cui-background-color--above: rgb(var(--cui-content-975));
@@ -1608,8 +1534,8 @@
 	--cui-toned-control-background-color--pressed: rgba(var(--cui-controls-150), 0.175);
 	--cui-toned-control-border-color--pressed: rgb(var(--cui-controls-500));
 }
-.scheme-light-above, .scheme-light-above *:not([class*="scheme-"]),
-.scheme-system-above, .scheme-system-above *:not([class*="scheme-"]) {
+.scheme-light-above, .scheme-light-above .cui-theme:not([class*="scheme-"]),
+.scheme-system-above, .scheme-system-above .cui-theme:not([class*="scheme-"]) {
 	/* Content */
 	--cui-background-color: rgb(var(--cui-content-975));
 	--cui-background-color--above: rgb(var(--cui-content-1000));
@@ -1725,7 +1651,7 @@
 	--cui-toned-control-background-color--pressed: rgba(var(--cui-controls-175), 0.175);
 	--cui-toned-control-border-color--pressed: rgb(var(--cui-controls-525));
 }
-.scheme-dark-below, .scheme-dark-below *:not([class*="scheme-"]) {
+.scheme-dark-below, .scheme-dark-below .cui-theme:not([class*="scheme-"]) {
 	/* Content */
 	--cui-background-color: rgb(var(--cui-content-25));
 	--cui-background-color--above: rgb(var(--cui-content-50));
@@ -1841,7 +1767,7 @@
 	--cui-toned-control-background-color--pressed: rgba(var(--cui-controls-100), 0.750);
 	--cui-toned-control-border-color--pressed: rgb(var(--cui-controls-675));
 }
-.scheme-dark, .scheme-dark *:not([class*="scheme-"]) {
+.scheme-dark, .scheme-dark .cui-theme:not([class*="scheme-"]) {
 	/* Content */
 	--cui-background-color: rgb(var(--cui-content-50));
 	--cui-background-color--above: rgb(var(--cui-content-75));
@@ -1957,7 +1883,7 @@
 	--cui-toned-control-background-color--pressed: rgba(var(--cui-controls-125), 0.750);
 	--cui-toned-control-border-color--pressed: rgb(var(--cui-controls-700));
 }
-.scheme-dark-above, .scheme-dark-above *:not([class*="scheme-"]) {
+.scheme-dark-above, .scheme-dark-above .cui-theme:not([class*="scheme-"]) {
 	/* Content */
 	--cui-background-color: rgb(var(--cui-content-75));
 	--cui-background-color--above: rgb(var(--cui-content-100));
@@ -2108,8 +2034,8 @@
 		--cui-opacity--filled-control-background-color--pressed: 0.175;
 		--cui-opacity--toned-control-background-color: 0.500;
 	}
-	.scheme-dark-below, .scheme-dark-below *:not([class*="scheme-"]),
-	.scheme-system-below, .scheme-system-below *:not([class*="scheme-"]) {
+	.scheme-dark-below, .scheme-dark-below .cui-theme:not([class*="scheme-"]),
+	.scheme-system-below, .scheme-system-below .cui-theme:not([class*="scheme-"]) {
 		/* Content */
 		--cui-background-color: rgb(var(--cui-content-25));
 		--cui-background-color--above: rgb(var(--cui-content-50));
@@ -2225,9 +2151,9 @@
 		--cui-toned-control-background-color--pressed: rgba(var(--cui-controls-100), 0.750);
 		--cui-toned-control-border-color--pressed: rgb(var(--cui-controls-675));
 	}
-	:root, :root *:not([class*="scheme-"]),
-	.scheme-dark, .scheme-dark *:not([class*="scheme-"]),
-	.scheme-system, .scheme-system *:not([class*="scheme-"]) {
+	:root, :root .cui-theme:not([class*="scheme-"]),
+	.scheme-dark, .scheme-dark .cui-theme:not([class*="scheme-"]),
+	.scheme-system, .scheme-system .cui-theme:not([class*="scheme-"]) {
 		/* Content */
 		--cui-background-color: rgb(var(--cui-content-50));
 		--cui-background-color--above: rgb(var(--cui-content-75));
@@ -2343,8 +2269,8 @@
 		--cui-toned-control-background-color--pressed: rgba(var(--cui-controls-125), 0.750);
 		--cui-toned-control-border-color--pressed: rgb(var(--cui-controls-700));
 	}
-	.scheme-dark-above, .scheme-dark-above *:not([class*="scheme-"]),
-	.scheme-system-above, .scheme-system-above *:not([class*="scheme-"]) {
+	.scheme-dark-above, .scheme-dark-above .cui-theme:not([class*="scheme-"]),
+	.scheme-system-above, .scheme-system-above .cui-theme:not([class*="scheme-"]) {
 		/* Content */
 		--cui-background-color: rgb(var(--cui-content-75));
 		--cui-background-color--above: rgb(var(--cui-content-100));
@@ -2460,7 +2386,7 @@
 		--cui-toned-control-background-color--pressed: rgba(var(--cui-controls-150), 0.750);
 		--cui-toned-control-border-color--pressed: rgb(var(--cui-controls-725));
 	}
-	.scheme-light-below, .scheme-light-below *:not([class*="scheme-"]) {
+	.scheme-light-below, .scheme-light-below .cui-theme:not([class*="scheme-"]) {
 		/* Content */
 		--cui-background-color: rgb(var(--cui-content-925));
 		--cui-background-color--above: rgb(var(--cui-content-950));
@@ -2577,7 +2503,7 @@
 		--cui-toned-control-border-color--pressed: rgb(var(--cui-controls-475));
 	}
 	.scheme-light,
-	.scheme-light *:not([class*="scheme-"]) {
+	.scheme-light .cui-theme:not([class*="scheme-"]) {
 		/* Content */
 		--cui-background-color: rgb(var(--cui-content-950));
 		--cui-background-color--above: rgb(var(--cui-content-975));
@@ -2694,7 +2620,7 @@
 		--cui-toned-control-border-color--pressed: rgb(var(--cui-controls-500));
 	}
 	.scheme-light-above,
-	.scheme-light-above *:not([class*="scheme-"]) {
+	.scheme-light-above .cui-theme:not([class*="scheme-"]) {
 		/* Content */
 		--cui-background-color: rgb(var(--cui-content-975));
 		--cui-background-color--above: rgb(var(--cui-content-1000));

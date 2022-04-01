@@ -122,5 +122,8 @@ export class CollaborationController {
 		async context => {
 			await this.storage.clientHeartbeat(context.connectionData.scope, context.connectionData.clientIdentity)
 		},
+		async context => {
+			await this.storage.clientDisconnected(context.connectionData.scope, context.connectionData.clientIdentity)
+		}
 	)
 }

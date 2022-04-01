@@ -22,6 +22,7 @@ export interface CollaborationStorage {
 	updateValue(scope: Scope, clientIdentity: ClientIdentity, key: string, value: string): Promise<Result<undefined, undefined>>
 	release(scope: Scope, clientIdentity: ClientIdentity, key: string): Promise<Result<undefined, undefined>>
 	clientHeartbeat(scope: Scope, clientIdentity: ClientIdentity): Promise<void>
+	clientDisconnected(scope: Scope, clientIdentity: ClientIdentity): Promise<void>
 }
 
 type RedisClient = ReturnType<typeof createRedisClient>
@@ -242,6 +243,12 @@ export class CollaborationRedisStorage implements CollaborationStorage {
 	async clientHeartbeat(scope: Scope, clientIdentity: ClientIdentity): Promise<void> {
 		return await this.repeatableWithIsolation(async isolatedClient => {
 			await isolatedClient.set(this.keys.buildHeartbeatKey(scope, clientIdentity), Date.now().toString())
+		})
+	}
+
+	async clientDisconnected(scope: Scope, clientIdentity: ClientIdentity): Promise<void> {
+		return await this.repeatableWithIsolation(async isolatedClient => {
+			await isolatedClient.del(this.keys.buildHeartbeatKey(scope, clientIdentity))
 		})
 	}
 }

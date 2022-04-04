@@ -1,5 +1,5 @@
 import classNames from 'classnames'
-import { FunctionComponent, PropsWithChildren, useCallback, useMemo, useRef } from 'react'
+import { memo, MemoExoticComponent, PropsWithChildren, useCallback, useMemo, useRef } from 'react'
 import { MouseMoveProvider, useComponentClassName } from '../../auxiliary'
 import { toViewClass } from '../../utils'
 import { DepthContext, FocusableContext } from './Contexts'
@@ -28,9 +28,7 @@ function getClosestFocusable<E extends HTMLElement = HTMLElement>(parent: E, off
 	return list[currentlyFocusedIndex + offset] ?? null
 }
 
-export const Menu: FunctionComponent<any> & {
-	Item: <T>(props: MenuItemProps<T>) => JSX.Element
-} = (props: PropsWithChildren<MenuProps>) => {
+const MenuInternal = memo((props: PropsWithChildren<MenuProps>) => {
 	const menuRef = useRef<HTMLUListElement>(null)
 	const componentClassName = useComponentClassName('menu')
 
@@ -76,6 +74,10 @@ export const Menu: FunctionComponent<any> & {
 			</MouseMoveProvider>
 		</MenuIdProvider>
 	</DepthContext.Provider>
-}
+})
+
+export const Menu: MemoExoticComponent<(props: PropsWithChildren<MenuProps>) => JSX.Element> & {
+	Item: <T>(props: MenuItemProps<T>) => JSX.Element
+} = MenuInternal as any
 
 Menu.Item = MenuItem

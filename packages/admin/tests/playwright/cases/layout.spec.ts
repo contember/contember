@@ -1,0 +1,29 @@
+import { expect, test } from '@playwright/test'
+import { initContemberProject } from '../utils'
+import { SchemaDefinition as def } from '@contember/schema-definition/dist/src/model'
+
+namespace Model {
+	export class Dummy {
+		dummy = def.stringColumn()
+	}
+}
+
+let projectSlug: string
+
+test.beforeAll(async ({}, testInfo) => {
+	projectSlug = await initContemberProject(testInfo, Model)
+})
+
+test('basic test', async ({ page }) => {
+	page.on('console', msg => {
+		if (msg.type() === 'error') {
+			console.error(msg.text())
+			test.fail()
+		}
+	})
+
+	await page.goto(`/${projectSlug}/layout`)
+	await page.waitForLoadState('networkidle') // wait for fonts
+	await page.waitForTimeout(200)
+	expect(await page.screenshot()).toMatchSnapshot('initial.png')
+})

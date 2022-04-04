@@ -17,10 +17,10 @@ const config = {
 			name: 'Desktop Chrome',
 			use: { ...devices['Desktop Chrome'], viewport: { width: 1903, height: 1009 } },
 		},
-		// {
-		// 	name: 'Desktop Firefox',
-		// 	use: { ...devices['Desktop Firefox'], viewport: { width: 1903, height: 1009 } },
-		// },
+		{
+			name: 'Desktop Firefox',
+			use: { ...devices['Desktop Firefox'], viewport: { width: 1903, height: 1009 } },
+		},
 		{
 			name: 'Desktop Safari',
 			use: { ...devices['Desktop Safari'], viewport: { width: 1903, height: 1009 } },
@@ -29,10 +29,6 @@ const config = {
 			name: 'Desktop Chrome Dark',
 			use: { ...devices['Desktop Chrome'], viewport: { width: 1903, height: 1009 }, colorScheme: 'dark' },
 		},
-		// {
-		// 	name: 'Desktop Firefox Dark',
-		// 	use: { ...devices['Desktop Firefox'], viewport: { width: 1903, height: 1009 }, colorScheme: 'dark' },
-		// },
 		{
 			name: 'iPhone 11',
 			use: { ...devices['iPhone 11'] },

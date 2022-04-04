@@ -1,5 +1,6 @@
+import { useSessionStorageState } from '@contember/react-utils'
 import classNames from 'classnames'
-import { SyntheticEvent, useCallback, useContext, useEffect, useRef } from 'react'
+import { SyntheticEvent, useCallback, useContext, useEffect, useMemo, useRef } from 'react'
 import { randomId, useComponentClassName } from '../../auxiliary'
 import { useNavigationLink } from '../../Navigation'
 import { toStateClass, useChildrenAsLabel } from '../../utils'
@@ -11,10 +12,9 @@ import { MenuExpandToggle } from './ExpandToggle'
 import { MenuLink } from './MenuLink'
 import { MenuItemProps, TAB_INDEX_FOCUSABLE, TAB_INDEX_NEVER_FOCUSABLE, TAB_INDEX_TEMPORARY_UNFOCUSABLE } from './Types'
 import { useActiveMenuItemContext } from './useActiveMenuItem'
-import { useMouseToFocus } from './useMouseToFocus'
-import { useMenuId } from './useMenuId'
-import { useSessionStorageState } from '@contember/react-utils'
 import { useKeyNavigation } from './useKeyNavigation'
+import { useMenuId } from './useMenuId'
+import { useMouseToFocus } from './useMouseToFocus'
 
 
 export function MenuItem<T extends any = any>({ children, ...props }: MenuItemProps<T>) {
@@ -102,16 +102,22 @@ export function MenuItem<T extends any = any>({ children, ...props }: MenuItemPr
 
 	const onKeyPress = useKeyNavigation({ changeExpand, expanded, depth, isInteractive, listItemRef, onClick: onLabelClick })
 
-	const submenu = (
-		<ul
-			aria-labelledby={isInteractive ? id.current : undefined}
-			className={classNames(
-				`${componentClassName}-list`,
-				hasSubItems && (expanded ? 'is-expanded' : 'is-collapsed'),
-			)}
-		>
-			{children}
-		</ul>
+	const submenu = useMemo(
+		() => {
+			const ul = (
+				<ul
+					aria-labelledby={isInteractive ? id.current : undefined}
+					className={classNames(
+						`${componentClassName}-list`,
+						hasSubItems && (expanded ? 'is-expanded' : 'is-collapsed'),
+					)}
+				>
+					{children}
+				</ul>
+			)
+			return isInteractive ? <Collapsible expanded={expanded}>{ul}</Collapsible> : ul
+		},
+		[children, componentClassName, expanded, hasSubItems, isInteractive],
 	)
 
 	const label = useChildrenAsLabel(props.title)
@@ -179,10 +185,7 @@ export function MenuItem<T extends any = any>({ children, ...props }: MenuItemPr
 							: (import.meta.env.DEV ? '⚠️' : undefined)
 						}
 					</div>
-					{isInteractive
-						? <Collapsible expanded={expanded}>{submenu}</Collapsible>
-						: submenu
-					}
+					{submenu}
 				</li>
 			</ExpandParentContext.Provider>
 		</DepthContext.Provider>

@@ -9,6 +9,16 @@ export default defineConfig({
 		jsxFragment: '_jsxFragment',
 		jsxInject: `import { createElement as _jsx, Fragment as _jsxFragment } from 'react'`,
 	},
+	build: {
+		chunkSizeWarningLimit: undefined,
+	},
+	css: {
+		preprocessorOptions: {
+			sass: {
+				charset: false,
+			},
+		},
+	},
 	resolve: {
 		alias: [
 			{ find: '@contember/admin', replacement: `${packagesDir}/admin${suffix}` },

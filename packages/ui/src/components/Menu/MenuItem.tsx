@@ -23,7 +23,9 @@ export function MenuItem<T extends any = any>({ children, ...props }: MenuItemPr
 	const { isActive, href, navigate } = useNavigationLink(props.to, props.href)
 
 	const id = useRef(`cui-menu-id-${randomId()}`)
-	const menuItemId = `cui-menu-item-${depth}-${href ?? props.title}`
+	const label = useChildrenAsLabel(props.title)
+
+	const menuItemId = `cui-menu-item-${depth}-${href ?? label}`
 	const componentClassName = useComponentClassName(depth === 0 ? 'menu-section' : 'menu-group')
 
 	const listItemRef = useRef<HTMLLIElement>(null)
@@ -59,7 +61,7 @@ export function MenuItem<T extends any = any>({ children, ...props }: MenuItemPr
 	const menuId = useMenuId()
 	const [expanded, setExpanded] = useSessionStorageState<boolean>(
 		`menu-${menuId}-${menuItemId}`,
-			val => val ?? (props.expandedByDefault || depth === 0 || !props.title),
+			val => val ?? (props.expandedByDefault || depth === 0 || !label),
 	)
 
 	const preventMenuClose = usePreventCloseContext()
@@ -119,8 +121,6 @@ export function MenuItem<T extends any = any>({ children, ...props }: MenuItemPr
 		},
 		[children, componentClassName, expanded, hasSubItems, isInteractive],
 	)
-
-	const label = useChildrenAsLabel(props.title)
 
 	if (import.meta.env.DEV && depth !== 0 && !label) {
 		console.warn('Accesibility issue: All submenu items should provide a title.')
@@ -182,7 +182,7 @@ export function MenuItem<T extends any = any>({ children, ...props }: MenuItemPr
 								>
 									<Label className={`${componentClassName}-label`}>{props.title}</Label>
 								</span>
-							: (import.meta.env.DEV ? '⚠️' : undefined)
+							: (import.meta.env.DEV && depth !== 0 ? '⚠️' : undefined)
 						}
 					</div>
 					{submenu}

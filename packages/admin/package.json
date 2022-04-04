@@ -30,9 +30,9 @@
 		"build:css": "sass --no-charset src/index.sass:dist/style.css",
 		"pw:build": "vite build tests/playwright/admin",
 		"pw:preview": "vite preview tests/playwright/admin",
-		"pw:update": "playwright test --update-snapshots tests/playwright",
+		"pw:update": "playwright test --update-snapshots",
 		"pw:report": "playwright show-report",
-		"pw:test": "playwright test tests/playwright",
+		"pw:test": "playwright test",
 		"test": "vitest --environment jsdom tests/vitest"
 	},
 	"dependencies": {

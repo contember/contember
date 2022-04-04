@@ -75,7 +75,7 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.PLAYWRIGHT_S3_KEY }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.PLAYWRIGHT_S3_SECRET }}
           AWS_S3_ENDPOINT: 'https://fra1.digitaloceanspaces.com'
-          SOURCE_DIR: 'packages/admin/playwright-report'
+          SOURCE_DIR: 'packages/admin/tests/playwright/report'
           DEST_DIR: ${{ github.sha }}
 
       - uses: phulsechinmay/rewritable-pr-comment@v0.2.1

@@ -4,7 +4,14 @@ import { devices } from '@playwright/test'
 const config = {
 	timeout: 60000,
 	workers: process.env.CI ? 1 : undefined,
-	reporter: process.env.CI ? [['github'], ['html', { open: 'never' }]] : [['list'], ['html', { open: 'never' }]],
+
+	reporter: process.env.CI
+		? [['github'], ['html', { open: 'never', outputFolder: 'tests/playwright/report' }]]
+		: [['list'], ['html', { open: 'never', outputFolder: 'tests/playwright/report' }]],
+
+	testDir: 'tests/playwright/cases',
+	outputDir: 'tests/playwright/output',
+	snapshotDir: 'tests/playwright/snapshots',
 
 	use: {
 		screenshot: 'on',

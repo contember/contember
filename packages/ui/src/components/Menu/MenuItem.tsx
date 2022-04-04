@@ -102,15 +102,23 @@ export function MenuItem<T extends any = any>({ children, ...props }: MenuItemPr
 
 	const onKeyPress = useKeyNavigation({ changeExpand, expanded, depth, isInteractive, listItemRef, onClick: onLabelClick })
 
-	const submenu = useMemo(() => <ul
-		aria-labelledby={isInteractive ? id.current : undefined}
-		className={classNames(
-			`${componentClassName}-list`,
-			hasSubItems && (expanded ? 'is-expanded' : 'is-collapsed'),
-		)}
-	>
-		{children}
-	</ul>, [children, componentClassName, expanded, hasSubItems, isInteractive])
+	const submenu = useMemo(
+		() => {
+			const ul = (
+				<ul
+					aria-labelledby={isInteractive ? id.current : undefined}
+					className={classNames(
+						`${componentClassName}-list`,
+						hasSubItems && (expanded ? 'is-expanded' : 'is-collapsed'),
+					)}
+				>
+					{children}
+				</ul>
+			)
+			return isInteractive ? <Collapsible expanded={expanded}>{ul}</Collapsible> : ul
+		},
+		[children, componentClassName, expanded, hasSubItems, isInteractive],
+	)
 
 	const label = useChildrenAsLabel(props.title)
 
@@ -177,10 +185,7 @@ export function MenuItem<T extends any = any>({ children, ...props }: MenuItemPr
 							: (import.meta.env.DEV ? '⚠️' : undefined)
 						}
 					</div>
-					{isInteractive
-						? <Collapsible expanded={expanded}>{submenu}</Collapsible>
-						: submenu
-					}
+					{submenu}
 				</li>
 			</ExpandParentContext.Provider>
 		</DepthContext.Provider>

@@ -245,10 +245,7 @@ importers:
       '@contember/client': link:../client
 
   packages/react-multipass-rendering:
-    specifiers:
-      tslib: 1.10.0
-    devDependencies:
-      tslib: 1.10.0
+    specifiers: {}
 
   packages/react-utils:
     specifiers: {}
@@ -15655,10 +15652,6 @@ packages:
         optional: true
     dependencies:
       typescript: 4.3.5
-    dev: true
-
-  /tslib/1.10.0:
-    resolution: {integrity: sha512-qOebF53frne81cf0S9B41ByenJ3/IuH8yJKngAX35CmiZySA0khhkovshKK+jGCaMnVomla7gVlIcc3EvKPbTQ==}
     dev: true
 
   /tslib/1.13.0:

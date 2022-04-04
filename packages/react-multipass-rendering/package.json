@@ -24,8 +24,5 @@
 	},
 	"peerDependencies": {
 		"react": "^17"
-	},
-	"devDependencies": {
-		"tslib": "1.10.0"
 	}
 }

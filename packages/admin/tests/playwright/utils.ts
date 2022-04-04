@@ -2,7 +2,7 @@ import { Schema } from '@contember/schema'
 import { InputValidation, PermissionsBuilder, SchemaDefinition } from '@contember/schema-definition'
 import { Migration, ModificationHandlerFactory, SchemaDiffer, SchemaMigrator, VERSION_LATEST } from '@contember/schema-migrations'
 import { emptySchema } from '@contember/schema-utils'
-import { expect, TestInfo } from '@playwright/test'
+import { expect, Page, test, TestInfo } from '@playwright/test'
 import fetch from 'node-fetch'
 import { createHash } from 'crypto'
 
@@ -113,4 +113,13 @@ export async function initContemberProject(testInfo: TestInfo, definitions: Sche
 	}
 
 	return projectSlug
+}
+
+export function expectNoConsoleErrors(page: Page) {
+	page.on('console', msg => {
+		if (msg.type() === 'error') {
+			console.error(msg.text())
+			test.fail()
+		}
+	})
 }

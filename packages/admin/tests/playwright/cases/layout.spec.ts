@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { initContemberProject } from '../utils'
+import { expectNoConsoleErrors, initContemberProject } from '../utils'
 import { SchemaDefinition as def } from '@contember/schema-definition/dist/src/model'
 
 namespace Model {
@@ -15,12 +15,7 @@ test.beforeAll(async ({}, testInfo) => {
 })
 
 test('basic test', async ({ page }) => {
-	page.on('console', msg => {
-		if (msg.type() === 'error') {
-			console.error(msg.text())
-			test.fail()
-		}
-	})
+	expectNoConsoleErrors(page)
 
 	await page.goto(`/${projectSlug}/layout`)
 	await page.waitForLoadState('networkidle') // wait for fonts

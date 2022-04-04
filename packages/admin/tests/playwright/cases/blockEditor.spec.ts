@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { initContemberProject } from '../utils'
+import { expectNoConsoleErrors, initContemberProject } from '../utils'
 import * as modelDefinition from './blockEditor.model'
 
 let projectSlug: string
@@ -9,12 +9,7 @@ test.beforeAll(async ({}, testInfo) => {
 })
 
 test('basic test', async ({ page }) => {
-	page.on('console', msg => {
-		if (msg.type() === 'error') {
-			console.error(msg.text())
-			test.fail()
-		}
-	})
+	expectNoConsoleErrors(page)
 
 	await page.goto(`/${projectSlug}/block-editor`)
 	await page.waitForLoadState('networkidle') // wait for fonts
@@ -30,12 +25,7 @@ test('basic test', async ({ page }) => {
 
 
 test('inline buttons: ordered list', async ({ page }) => {
-	page.on('console', msg => {
-		if (msg.type() === 'error') {
-			console.error(msg.text())
-			test.fail()
-		}
-	})
+	expectNoConsoleErrors(page)
 
 	await page.goto(`/${projectSlug}/block-editor/inline-buttons-ordered-list`)
 	await page.waitForLoadState('networkidle') // wait for fonts
@@ -85,12 +75,7 @@ test('inline buttons: ordered list', async ({ page }) => {
 
 
 test('inline buttons: unordered list', async ({ page }) => {
-	page.on('console', msg => {
-		if (msg.type() === 'error') {
-			console.error(msg.text())
-			test.fail()
-		}
-	})
+	expectNoConsoleErrors(page)
 
 	await page.goto(`/${projectSlug}/block-editor/inline-buttons-unordered-list`)
 	await page.waitForLoadState('networkidle') // wait for fonts

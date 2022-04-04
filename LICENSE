@@ -1,19 +1,12 @@
-Copyright 2022 Contember Limited
-<https://www.contember.com>
+Copyright (c) 2022 Contember Limited
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
+Portions of this software are licensed as follows:
 
-<http://www.apache.org/licenses/LICENSE-2.0>
+* All content that resides under the "EE/" directory of this repository, if that directory exists, is licensed under the license defined in "EE/LICENSE".
+* All third party components incorporated into the Contember/Engine are licensed under the original license provided by the owner of the applicable component.
+* Content outside of the above mentioned directories or restrictions above is available under the Apache License, Version 2.0 (the "License") as defined below.
 
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
 
-```
 -------------------------------------------------------------------------
                               Apache License
                         Version 2.0, January 2004
@@ -192,4 +185,3 @@ TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
    of your accepting any such warranty or additional liability.
 
 END OF TERMS AND CONDITIONS
-```

@@ -25,16 +25,16 @@ export const UpdateColumnNameModification: ModificationHandlerStatic<UpdateColum
 				builder.renameColumn(entity.tableName, relation.joiningColumn.columnName, this.data.columnName)
 			},
 			visitManyHasManyInverse: () => {
-				throw new Error('Cannot rename column of many-to-many inverse')
+				throw new Error('Cannot rename column of many-to-many relation')
 			},
 			visitManyHasManyOwning: () => {
-				throw new Error('Cannot rename column of many-to-many owning')
+				throw new Error('Cannot rename column of many-to-many relation')
 			},
 			visitOneHasMany: () => {
-				throw new Error('Cannot rename column of one-to-many inverse')
+				throw new Error('Cannot rename column of one-to-many relation')
 			},
 			visitOneHasOneInverse: () => {
-				throw new Error('Cannot rename column of one-to-one inverse')
+				throw new Error('Cannot rename column of one-to-one inverse relation')
 			},
 		})
 	}
@@ -69,16 +69,16 @@ export const UpdateColumnNameModification: ModificationHandlerStatic<UpdateColum
 						}
 					},
 					visitManyHasManyInverse: () => {
-						throw new Error('Cannot rename column of many-to-many inverse')
+						throw new Error('Cannot rename column of many-to-many relation')
 					},
 					visitManyHasManyOwning: () => {
-						throw new Error('Cannot rename column of many-to-many owning')
+						throw new Error('Cannot rename column of many-to-many relation')
 					},
 					visitOneHasMany: () => {
-						throw new Error('Cannot rename column of one-to-many inverse')
+						throw new Error('Cannot rename column of one-to-many relation')
 					},
 					visitOneHasOneInverse: () => {
-						throw new Error('Cannot rename column of one-to-one inverse')
+						throw new Error('Cannot rename column of one-to-one inverse relation')
 					},
 				})),
 			),

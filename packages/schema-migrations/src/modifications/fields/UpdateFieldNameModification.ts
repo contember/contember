@@ -13,19 +13,32 @@ import {
 	updateModel,
 	updateSchema,
 } from '../utils/schemaUpdateUtils'
-import { ModificationHandlerOptions, ModificationHandlerStatic } from '../ModificationHandler'
+import { ModificationHandler, ModificationHandlerOptions, ModificationHandlerStatic } from '../ModificationHandler'
 import { acceptFieldVisitor, NamingHelper, PredicateDefinitionProcessor } from '@contember/schema-utils'
 import { VERSION_ACL_PATCH, VERSION_UPDATE_CONSTRAINT_NAME } from '../ModificationVersions'
 import { renameConstraintSchemaUpdater, renameConstraintsSqlBuilder } from '../utils/renameConstraintsHelper'
 import { changeValue } from '../utils/valueUtils'
+import { UpdateColumnNameModification } from '../columns'
+import { NoopModification } from '../NoopModification'
 
 export const UpdateFieldNameModification: ModificationHandlerStatic<UpdateFieldNameModificationData> = class {
 	static id = 'updateFieldName'
+
+	private renameColumnSubModification: ModificationHandler<any> = new NoopModification()
+
 	constructor(
 		private readonly data: UpdateFieldNameModificationData,
 		private readonly schema: Schema,
 		private readonly options: ModificationHandlerOptions,
-	) {}
+	) {
+		if (this.data.columnName) {
+			this.renameColumnSubModification = new UpdateColumnNameModification({
+				entityName: this.data.entityName,
+				columnName: this.data.columnName,
+				fieldName: this.data.fieldName,
+			}, this.schema, this.options)
+		}
+	}
 
 	public createSql(builder: MigrationBuilder): void {
 		const entity = this.schema.model.entities[this.data.entityName]
@@ -35,6 +48,7 @@ export const UpdateFieldNameModification: ModificationHandlerStatic<UpdateFieldN
 		if (this.options.formatVersion >= VERSION_UPDATE_CONSTRAINT_NAME) {
 			renameConstraintsSqlBuilder(builder, entity, this.getNewConstraintName.bind(this))
 		}
+		this.renameColumnSubModification.createSql(builder)
 	}
 
 	public getSchemaUpdater(): SchemaUpdater {
@@ -101,7 +115,7 @@ export const UpdateFieldNameModification: ModificationHandlerStatic<UpdateFieldN
 				})
 			}),
 		)
-		const updateEntityName = updateEntity(this.data.entityName, ({ entity }) => {
+		const updateFieldName = updateEntity(this.data.entityName, ({ entity }) => {
 			const { [this.data.fieldName]: updated, ...fields } = entity.fields
 			return {
 				...entity,
@@ -153,9 +167,16 @@ export const UpdateFieldNameModification: ModificationHandlerStatic<UpdateFieldN
 				: undefined
 		return updateSchema(
 			updateAclOp,
-			updateModel(updateConstraintName, updateConstraintFields, updateRelationReferences, updateEntityName),
+			this.renameColumnSubModification.getSchemaUpdater(),
+			updateModel(
+				updateConstraintName,
+				updateConstraintFields,
+				updateRelationReferences,
+				updateFieldName,
+			),
 		)
 	}
+
 
 	private getNewConstraintName(constraint: Model.UniqueConstraint): string | null {
 		const generatedName = NamingHelper.createUniqueConstraintName(this.data.entityName, constraint.fields)
@@ -181,4 +202,5 @@ export interface UpdateFieldNameModificationData {
 	entityName: string
 	fieldName: string
 	newFieldName: string
+	columnName?: string
 }

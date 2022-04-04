@@ -59,14 +59,14 @@ export const CreateApiKeyForm: FC<CreateApiKeyFormProps> = ({ project, rolesConf
 
 	return (
 		<form onSubmit={submit}>
-			<Stack direction="vertical">
+			<Stack direction="vertical" gap="large">
 				<FieldContainer label="Description">
 					<TextInput {...register('description')} />
 				</FieldContainer>
 
 				<EditMembership {...editUserMembershipProps} />
 
-				<Button intent="primary" size="large" type={'submit'} disabled={isSubmitting}>
+				<Button intent="primary" distinction="primary" size="large" type="submit" disabled={isSubmitting}>
 					Create API key
 				</Button>
 			</Stack>

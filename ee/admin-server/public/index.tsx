@@ -1,7 +1,7 @@
 import { AnchorButton, Icon, LoginEntrypoint, Project, runReactApp } from '@contember/admin'
-import './index.sass'
 import { useCallback, useMemo } from 'react'
 import { loginConfigSchema } from '../src/config'
+import './index.sass'
 
 const Entry = () => {
 	const config = useMemo(() => {
@@ -12,7 +12,7 @@ const Entry = () => {
 
 	const panelButton = (
 		<AnchorButton href={'/_panel/'} size={'small'} distinction={'seamless'}>
-			<Icon blueprintIcon={'cog'} />
+			<Icon blueprintIcon="cog" /> Settings
 		</AnchorButton>
 	)
 

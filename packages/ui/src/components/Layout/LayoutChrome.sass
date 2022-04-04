@@ -10,6 +10,9 @@
 	flex-direction: column
 	min-height: 100vh
 
+	&.view-no-bar
+		--layout-chrome-bar-width: 0
+
 	&-bar,
 	&-body
 		--cui-layout-chrome-padding-bottom: calc(var(--cui-padding-bottom) + var(--cui-edge-offset-bottom) + env(safe-area-inset-bottom, 0em))
@@ -63,6 +66,10 @@
 		border-top: 1px solid var(--cui-color--lower)
 		display: flex
 		flex-direction: column
+		padding-bottom: var(--cui-layout-chrome-padding-bottom)
+		padding-left: var(--cui-layout-chrome-padding-left)
+		padding-right: var(--cui-layout-chrome-padding-right)
+		padding-top: var(--cui-layout-chrome-padding-top)
 	&-bar-switchers
 		margin-top: calc(-1* var(--cui-padding-vertical) / 2)
 		padding-bottom: calc(var(--cui-padding-vertical) / 2)

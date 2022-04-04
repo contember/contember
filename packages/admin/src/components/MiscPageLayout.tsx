@@ -1,23 +1,34 @@
-import { Aether, Box, BoxOwnProps, Heading, Stack } from '@contember/ui'
-import { memo } from 'react'
+import { Box, BoxOwnProps, Heading, Layout, Spacer, Stack } from '@contember/ui'
+import { memo, ReactNode } from 'react'
 
-export interface MiscPageLayoutProps extends BoxOwnProps {}
+export interface MiscPageLayoutProps extends BoxOwnProps {
+	footerActions?: ReactNode
+}
 
-export const MiscPageLayout = memo<MiscPageLayoutProps>(({ heading, children, ...props }) => (
-	<Aether>
+export const MiscPageLayout = memo<MiscPageLayoutProps>(({ footerActions, heading, children, ...props }) => (
+	<Layout>
 		<div className="centerCard">
 			<div className="centerCard-in">
-				<Box {...props}>
+				<Box
+					gap="large"
+					heading={heading && (typeof heading === 'string'
+						? <Heading depth={1} size="small">{heading}</Heading>
+						: heading
+					)}
+					{...props}
+				>
 					<Stack direction="vertical" gap="large">
-						{heading && (typeof heading === 'string'
-							? <Heading size="small" depth={1}>{heading}</Heading>
-							: heading
-						)}
 						{children}
 					</Stack>
 				</Box>
+				{footerActions && <div style={{ position: 'sticky', bottom: 0 }}>
+					<Spacer gap="large" />
+					<Stack direction="horizontal">
+						{footerActions}
+					</Stack>
+				</div>}
 			</div>
 		</div>
-	</Aether>
+	</Layout>
 ))
 MiscPageLayout.displayName = 'MiscPageLayout'

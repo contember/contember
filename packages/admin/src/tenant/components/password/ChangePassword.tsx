@@ -1,4 +1,4 @@
-import { Button, FieldContainer, LayoutPage, Stack, TextInput } from '@contember/ui'
+import { Button, FieldContainer, Heading, Spacer, Stack, TextInput } from '@contember/ui'
 import { FC, useCallback } from 'react'
 import { useShowToast } from '../../../components'
 import { useForm } from '../../lib'
@@ -41,49 +41,48 @@ export const ChangePassword: FC<{}> = ({}) => {
 		}
 	}, [addToast, changePassword]))
 
-	return (
-			<LayoutPage title="Change your password">
-				<form onSubmit={onSubmit}>
-					<Stack direction="vertical" gap="large">
-						<FieldContainer
-							label="Current password"
-							errors={errors.currentPassword === undefined ? undefined : [{ message: errors.currentPassword }]}
-						>
-							<TextInput
-								allowNewlines={false}
-								type="password"
-								autoComplete="password"
-								{...register('currentPassword')}
-							/>
-						</FieldContainer>
-						<FieldContainer
-							label="New password"
-							errors={errors.newPassword === undefined ? undefined : [{ message: errors.newPassword }]}
-						>
-							<TextInput
-								allowNewlines={false}
-								type="password"
-								autoComplete="new-password"
-								{...register('newPassword')}
-							/>
-						</FieldContainer>
-						<FieldContainer
-							label="Confirm new password"
-							errors={errors.newPasswordAgain === undefined ? undefined : [{ message: errors.newPasswordAgain }]}
-						>
-							<TextInput
-								allowNewlines={false}
-								type="password"
-								autoComplete="new-password"
-								{...register('newPasswordAgain')}
-							/>
-						</FieldContainer>
-						<br />
-						<Button intent={'primary'} type={'submit'} disabled={isSubmitting}>
-							Change password
-						</Button>
-					</Stack>
-				</form>
-			</LayoutPage>
-	)
+	return <>
+		<Heading depth={3}>Change password</Heading>
+		<form onSubmit={onSubmit}>
+			<Stack direction="vertical" gap="large">
+				<FieldContainer
+					label="Current password"
+					errors={errors.currentPassword === undefined ? undefined : [{ message: errors.currentPassword }]}
+				>
+					<TextInput
+						allowNewlines={false}
+						type="password"
+						autoComplete="password"
+						{...register('currentPassword')}
+					/>
+				</FieldContainer>
+				<FieldContainer
+					label="New password"
+					errors={errors.newPassword === undefined ? undefined : [{ message: errors.newPassword }]}
+				>
+					<TextInput
+						allowNewlines={false}
+						type="password"
+						autoComplete="new-password"
+						{...register('newPassword')}
+					/>
+				</FieldContainer>
+				<FieldContainer
+					label="Confirm new password"
+					errors={errors.newPasswordAgain === undefined ? undefined : [{ message: errors.newPasswordAgain }]}
+				>
+					<TextInput
+						allowNewlines={false}
+						type="password"
+						autoComplete="new-password"
+						{...register('newPasswordAgain')}
+					/>
+				</FieldContainer>
+				<Spacer />
+				<Button intent={'primary'} type={'submit'} disabled={isSubmitting}>
+					Change password
+				</Button>
+			</Stack>
+		</form>
+	</>
 }

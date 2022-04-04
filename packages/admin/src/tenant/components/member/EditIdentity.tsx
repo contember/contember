@@ -1,12 +1,12 @@
 import { useProjectSlug } from '@contember/react-client'
 import { Button, LayoutPage, Stack } from '@contember/ui'
 import { FC, memo, SyntheticEvent, useCallback, useEffect, useState } from 'react'
-import { useProjectMembershipsQuery } from '../../queries'
-import { useUpdateProjectMembership } from '../../mutations'
 import { useShowToast } from '../../../components'
-import { NavigateBackButton, useRedirect, RoutingLinkTarget } from '../../../routing'
-import { EditMembership, RolesConfig } from './EditMembership'
+import { NavigateBackButton, RoutingLinkTarget, useRedirect } from '../../../routing'
+import { useUpdateProjectMembership } from '../../mutations'
+import { useProjectMembershipsQuery } from '../../queries'
 import { Membership } from '../../types'
+import { EditMembership, RolesConfig } from './EditMembership'
 
 interface EditUserProps {
 	project: string
@@ -68,10 +68,10 @@ export const EditIdentity: FC<EditUserProps> = ({ project, rolesConfig, identity
 	const editUserMembershipProps = { project, rolesConfig, memberships, setMemberships }
 	return (
 		<form onSubmit={submit}>
-			<Stack direction="vertical">
+			<Stack direction="vertical" gap="large">
 				<EditMembership {...editUserMembershipProps} />
 
-				<Button intent="primary" size="large" type={'submit'} disabled={isSubmitting}>
+				<Button intent="primary" distinction="primary" size="large" type="submit" disabled={isSubmitting}>
 					Save
 				</Button>
 			</Stack>

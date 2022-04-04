@@ -63,7 +63,7 @@ export const InviteUser: FC<InviteUserProps> = ({ project, rolesConfig, userList
 
 	return (
 		<form onSubmit={submit}>
-			<Stack direction="vertical">
+			<Stack direction="vertical" gap="large">
 				<FieldContainer label="E-mail" errors={emailNotValidError ? [{ message: 'Email is not valid.' }] : undefined}>
 					<TextInput
 						validationState={emailNotValidError ? 'invalid' : 'default'}
@@ -72,8 +72,10 @@ export const InviteUser: FC<InviteUserProps> = ({ project, rolesConfig, userList
 						allowNewlines={false}
 					/>
 				</FieldContainer>
+
 				<EditMembership {...editUserMembershipProps} />
-				<Button size="large" type={'submit'} disabled={isSubmitting}>
+
+				<Button intent="primary" distinction="primary" type="submit" disabled={isSubmitting}>
 					Invite
 				</Button>
 			</Stack>

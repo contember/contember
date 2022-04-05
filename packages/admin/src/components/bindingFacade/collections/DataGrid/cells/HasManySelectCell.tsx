@@ -7,12 +7,11 @@ import {
 	useEntityList,
 	wrapFilterInHasOnes,
 } from '@contember/binding'
-import type { FunctionComponent, ReactElement, ReactNode } from 'react'
-import { useMemo } from 'react'
-import { DataGridColumn, DataGridColumnPublicProps } from '../base'
-import { renderDynamicChoiceFieldStatic } from '../../../fields/ChoiceField/renderDynamicChoiceFieldStatic'
+import { Fragment, FunctionComponent, ReactElement, ReactNode, useMemo } from 'react'
 import { BaseDynamicChoiceField, useDesugaredOptionPath } from '../../../fields/ChoiceField/BaseDynamicChoiceField'
+import { renderDynamicChoiceFieldStatic } from '../../../fields/ChoiceField/renderDynamicChoiceFieldStatic'
 import { FieldFallbackView, FieldFallbackViewPublicProps } from '../../../fieldViews'
+import { DataGridColumn, DataGridColumnPublicProps } from '../base'
 import { SelectCellArtifacts, SelectCellFilter } from './SelectCellFilter'
 
 export type HasManySelectProps =
@@ -89,9 +88,9 @@ const HasManySelectCellContent = Component<HasManySelectProps>(
 			return elementsRenderer(entitiesArray.map(it => {
 				const val = it.getField(desugaredOptionPath.field).value
 				if (val !== null) {
-					return <>{val}</>
+					return <Fragment key={it.key}>{val}</Fragment>
 				}
-				return <FieldFallbackView fallback={props.fallback} fallbackStyle={props.fallbackStyle} />
+				return <FieldFallbackView key={it.key} fallback={props.fallback} fallbackStyle={props.fallbackStyle} />
 			}))
 		}
 
@@ -114,6 +113,6 @@ const HasManySelectCellContent = Component<HasManySelectProps>(
 
 const defaultElementsRenderer = (elements: ReactNode[]): ReactElement => (
 	<>
-		{elements.map((it, index, arr) => <>{it}{index < (arr.length - 1) ? ', ' : ''}</>)}
+		{elements.map((it, index, arr) => <Fragment key={typeof it === 'object' && it !== null && 'key' in it ? it.key : index}>{it}{index < (arr.length - 1) ? ', ' : ''}</Fragment>)}
 	</>
 )

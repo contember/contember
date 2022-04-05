@@ -12,7 +12,6 @@ export function createViteConfig(packageName) {
 	const packageDir = `packages/${packageName}`
 
 	return defineConfig(({ command, mode }) => {
-		const isDevMode = mode === 'development'
 		return {
 			build: {
 				lib: {
@@ -34,7 +33,7 @@ export function createViteConfig(packageName) {
 					},
 				},
 				sourcemap: true,
-				target: isDevMode ? 'esnext' : 'es2020',
+				target: 'es2020',
 			},
 			esbuild: {
 				jsxFactory: '_jsx',

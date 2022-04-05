@@ -3,6 +3,7 @@ import { Model, Schema } from '@contember/schema'
 import { SchemaUpdater, updateEntity, updateField, updateModel } from '../utils/schemaUpdateUtils'
 import { ModificationHandlerStatic } from '../ModificationHandler'
 import { updateColumns } from '../utils/diffUtils'
+import { acceptFieldVisitor } from '@contember/schema-utils'
 
 export const UpdateColumnNameModification: ModificationHandlerStatic<UpdateColumnNameModificationData> = class {
 	static id = 'updateColumnName'
@@ -13,15 +14,73 @@ export const UpdateColumnNameModification: ModificationHandlerStatic<UpdateColum
 		if (entity.view) {
 			return
 		}
-		const field = entity.fields[this.data.fieldName] as Model.AnyColumn
-		builder.renameColumn(entity.tableName, field.columnName, this.data.columnName)
+		acceptFieldVisitor(this.schema.model, entity, this.data.fieldName, {
+			visitColumn: (entity, column) => {
+				builder.renameColumn(entity.tableName, column.columnName, this.data.columnName)
+			},
+			visitManyHasOne: (entity, relation) => {
+				builder.renameColumn(entity.tableName, relation.joiningColumn.columnName, this.data.columnName)
+			},
+			visitOneHasOneOwning: (entity, relation) =>  {
+				builder.renameColumn(entity.tableName, relation.joiningColumn.columnName, this.data.columnName)
+			},
+			visitManyHasManyInverse: () => {
+				throw new Error('Cannot rename column of many-to-many relation')
+			},
+			visitManyHasManyOwning: () => {
+				throw new Error('Cannot rename column of many-to-many relation')
+			},
+			visitOneHasMany: () => {
+				throw new Error('Cannot rename column of one-to-many relation')
+			},
+			visitOneHasOneInverse: () => {
+				throw new Error('Cannot rename column of one-to-one inverse relation')
+			},
+		})
 	}
 
 	public getSchemaUpdater(): SchemaUpdater {
 		return updateModel(
 			updateEntity(
 				this.data.entityName,
-				updateField(this.data.fieldName, ({ field }) => ({ ...field, columnName: this.data.columnName })),
+				updateField(this.data.fieldName, ({ field, entity }) => acceptFieldVisitor<Model.AnyField>(this.schema.model, entity, field, {
+					visitColumn: (entity, column) => {
+						return {
+							...column,
+							columnName: this.data.columnName,
+						}
+					},
+					visitManyHasOne: (entity, relation) => {
+						return {
+							...relation,
+							joiningColumn: {
+								...relation.joiningColumn,
+								columnName: this.data.columnName,
+							},
+						}
+					},
+					visitOneHasOneOwning: (entity, relation) => {
+						return {
+							...relation,
+							joiningColumn: {
+								...relation.joiningColumn,
+								columnName: this.data.columnName,
+							},
+						}
+					},
+					visitManyHasManyInverse: () => {
+						throw new Error('Cannot rename column of many-to-many relation')
+					},
+					visitManyHasManyOwning: () => {
+						throw new Error('Cannot rename column of many-to-many relation')
+					},
+					visitOneHasMany: () => {
+						throw new Error('Cannot rename column of one-to-many relation')
+					},
+					visitOneHasOneInverse: () => {
+						throw new Error('Cannot rename column of one-to-one inverse relation')
+					},
+				})),
 			),
 		)
 	}

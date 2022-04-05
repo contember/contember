@@ -22,6 +22,27 @@ testMigrations('rename a field', {
 	noDiff: true,
 })
 
+testMigrations('rename a field with column', {
+	originalSchema: new SchemaBuilder()
+		.entity('Author', e => e.column('firstName', c => c.type(Model.ColumnType.String)))
+		.buildSchema(),
+	updatedSchema: new SchemaBuilder()
+		.entity('Author', e => e.column('name', c => c.type(Model.ColumnType.String)))
+		.buildSchema(),
+	diff: [
+		{
+			modification: 'updateFieldName',
+			entityName: 'Author',
+			fieldName: 'firstName',
+			newFieldName: 'name',
+			columnName: 'name',
+		},
+	],
+	sql: SQL`ALTER TABLE "author" RENAME "first_name" TO "name";`,
+	noDiff: true,
+})
+
+
 testMigrations('rename a field with a constraint', {
 	originalSchema: new SchemaBuilder()
 		.entity('Author', e => e.column('slug', c => c.type(Model.ColumnType.String).unique()))
@@ -64,6 +85,32 @@ testMigrations('rename a relation', {
 	sql: SQL``,
 	noDiff: true,
 })
+
+
+testMigrations('rename a relation with joining column', {
+	originalSchema: new SchemaBuilder()
+		.entity('Post', e => e.column('title').manyHasOne('user', r => r.target('Author').inversedBy('posts')))
+		.entity('Author', e => e.column('name'))
+		.buildSchema(),
+	updatedSchema: new SchemaBuilder()
+		.entity('Post', e =>
+			e.column('title').manyHasOne('author', r => r.target('Author').inversedBy('posts')),
+		)
+		.entity('Author', e => e.column('name'))
+		.buildSchema(),
+	diff: [
+		{
+			modification: 'updateFieldName',
+			entityName: 'Post',
+			fieldName: 'user',
+			newFieldName: 'author',
+			columnName: 'author_id',
+		},
+	],
+	sql: SQL`ALTER TABLE "post" RENAME "user_id" TO "author_id";`,
+	noDiff: true,
+})
+
 
 testMigrations('rename relation with acl', {
 	originalSchema: new SchemaBuilder()

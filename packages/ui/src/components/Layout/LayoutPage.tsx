@@ -8,7 +8,7 @@ import { TitleBar, TitleBarProps } from '../TitleBar'
 import { useThemeScheme } from './ThemeSchemeContext'
 import { ThemeScheme } from './Types'
 
-export const PageLayoutContent = ({ children }: { children: ReactNode }) => {
+export const PageLayoutContent = memo(({ children }: { children: ReactNode }) => {
 	const prefix = useClassNamePrefix()
 
 	return <div
@@ -17,7 +17,7 @@ export const PageLayoutContent = ({ children }: { children: ReactNode }) => {
 			{children}
 		</div>
 	</div>
-}
+})
 
 export interface LayoutPageProps extends Omit<TitleBarProps, 'children'>, ThemeScheme {
 	children?: ReactNode

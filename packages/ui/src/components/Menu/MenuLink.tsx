@@ -23,6 +23,7 @@ export function MenuLink({ className, children, external, href, isActive, onClic
 		}
 	}, [onNavigate, suppressTo])
 
+	// eslint-disable-next-line react/jsx-no-target-blank
 	return <a
 		tabIndex={-1}
 		className={classNames(className, toStateClass('active', isActive))}

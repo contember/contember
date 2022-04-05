@@ -49,8 +49,8 @@ export const simpleButtonStory = (size?: Size): ReactElement => {
 
 	return (
 		<>
-			{allIntents.map(intent => (
-				<Button intent={intent} {...props} />
+			{allIntents.map((intent, i) => (
+				<Button key={i} intent={intent} {...props} />
 			))}
 		</>
 	)

@@ -42,8 +42,8 @@ export const CoalesceFieldView = Component(
 	(props: CoalesceFieldViewProps<any>) => {
 		return (
 			<>
-				{props.fields.map(it => (
-					<Field field={it} />
+				{props.fields.map((it, i) => (
+					<Field key={i} field={it} />
 				))}
 			</>
 		)

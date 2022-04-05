@@ -43,7 +43,7 @@ export const PrepareOtpForm: FC<PrepareOtpFormProps> = ({ onPrepared, isReSetup,
 
 				{isReSetup && <>
 					<Message distinction="striking" intent="warn">
-						You already have two-factor authentication active. By clicking "Continue", the old one will no longer work.
+						You already have two-factor authentication active. By clicking &quot;Continue&quot;, the old one will no longer work.
 					</Message>
 				</>}
 

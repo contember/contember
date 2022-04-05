@@ -27,10 +27,11 @@ storiesOf('Table', module).add('simple', () => {
 
 	return (
 		<Table /*useTableElement={useTableElement}*/ heading={heading} size={size} justification={justification}>
-			{[1, 2, 3, 4, 5, 6].map(row => (
-				<TableRow justification={row === 6 ? justificationLastRow : undefined}>
-					{['A', 'B', 'C', 'D'].map(column => (
+			{[1, 2, 3, 4, 5, 6].map((row, i) => (
+				<TableRow key={i} justification={row === 6 ? justificationLastRow : undefined}>
+					{['A', 'B', 'C', 'D'].map((column, i) => (
 						<TableCell
+							key={i}
 							shrunk={column === 'D' && shrinkLastColumn}
 							justification={column === 'A' ? justificationFirstColumn : undefined}
 						>

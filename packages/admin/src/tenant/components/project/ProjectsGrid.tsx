@@ -30,7 +30,7 @@ export const ProjectsGrid: FC<ProjectGridProps> = ({ createProjectDetailLink }) 
 					</TableRow>}
 				>
 					{query.data?.projects.map(project => (
-						<TableRow>
+						<TableRow key={project.slug}>
 							<TableCell>{project.name}</TableCell>
 							<TableCell>
 								<span style={{ fontFamily: 'monospace' }}>{project.slug}</span>

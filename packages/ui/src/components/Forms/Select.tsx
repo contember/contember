@@ -45,13 +45,7 @@ export const Select: ComponentType<SelectProps & RefAttributes<HTMLSelectElement
 				<div className={wrapperClassName}>
 					<select className={selectClassName} {...otherProps} ref={ref}>
 						{options.map(option => {
-							const optionProps: DetailedHTMLProps<OptionHTMLAttributes<HTMLOptionElement>, HTMLOptionElement> = {
-								value: option.value,
-								children: option.label,
-								disabled: option.disabled,
-								key: option.value,
-							}
-							return <option {...optionProps} />
+							return <option key={option.value} value={option.value} disabled={option.disabled}>{option.label}</option>
 						})}
 					</select>
 				</div>

@@ -20,7 +20,7 @@ export const SlugInput = memo<SlugInputProps>(({ prefix, link, overlay, onOverla
 				{prefix && (
 					<div className={`${componentClassName}-prefix`}>
 						{link ?
-							<a href={link} className={`${componentClassName}-prefix-link`} target={'_blank'}>{prefix}</a> : prefix}
+							<a href={link} className={`${componentClassName}-prefix-link`} target="_blank" rel="noopener noreferrer">{prefix}</a> : prefix}
 					</div>
 				)}
 				<div className={`${componentClassName}-input`}>

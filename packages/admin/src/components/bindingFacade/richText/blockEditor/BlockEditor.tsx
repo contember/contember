@@ -13,8 +13,8 @@ import {
 } from '@contember/binding'
 import { emptyArray, noop } from '@contember/react-utils'
 import { EditorCanvas, EditorCanvasSize, FieldContainer, Scheme } from '@contember/ui'
-import { Fragment, FunctionComponent, ReactElement, ReactNode, useCallback, useMemo, useState, useLayoutEffect } from 'react'
-import { Range as SlateRange, Transforms, Editor } from 'slate'
+import { Fragment, FunctionComponent, ReactElement, ReactNode, useCallback, useLayoutEffect, useMemo, useState } from 'react'
+import { Range as SlateRange, Transforms } from 'slate'
 import { Slate } from 'slate-react'
 import { getDiscriminatedBlock, useNormalizedBlocks } from '../../blocks'
 import { Repeater, SortableRepeaterContainer } from '../../collections'
@@ -302,10 +302,10 @@ const BlockEditorComponent: FunctionComponent<BlockEditorProps> = Component(
 		return (
 			<>
 				{props.leadingFieldBackedElements?.map((item, i) => (
-					'element' in item ? item.element : <SugaredField field={item.field} key={`leading_${i}`} />
+					'element' in item ? <Fragment key={`leading_${i}`}>{item.element}</Fragment> : <SugaredField field={item.field} key={`leading_${i}`} />
 				))}
 				{props.trailingFieldBackedElements?.map((item, i) => (
-					'element' in item ? item.element : <SugaredField field={item.field} key={`trailing_${i}`} />
+					'element' in item ? <Fragment key={`trailing_${i}`}>{item.element}</Fragment> : <SugaredField field={item.field} key={`trailing_${i}`} />
 				))}
 				<Repeater {...props} label={props.label ?? ''} initialEntityCount={0}>
 					<SugaredField field={props.sortableBy} />

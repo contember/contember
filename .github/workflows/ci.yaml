@@ -62,7 +62,7 @@ jobs:
       - uses: actions/checkout@v2
       - run: npm install -g pnpm
       - run: pnpm install
-      - run: pnpm run build
+      - run: pnpm run --recursive --parallel -- build:js:prod
       - run: cd packages/admin && pnpm run pw:build
       - run: cd packages/admin && pnpm run pw:test
 

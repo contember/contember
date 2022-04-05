@@ -122,7 +122,9 @@ export function MenuItem<T extends any = any>({ children, ...props }: MenuItemPr
 		[children, componentClassName, expanded, hasSubItems, isInteractive],
 	)
 
-	if (import.meta.env.DEV && depth !== 0 && !label) {
+	const warnAboutA11YIssues = import.meta.env.DEV && depth !== 0
+
+	if (warnAboutA11YIssues && !label) {
 		console.warn('Accesibility issue: All submenu items should provide a title.')
 	}
 
@@ -182,7 +184,7 @@ export function MenuItem<T extends any = any>({ children, ...props }: MenuItemPr
 								>
 									<Label className={`${componentClassName}-label`}>{props.title}</Label>
 								</span>
-							: (import.meta.env.DEV && depth !== 0 ? '⚠️' : undefined)
+							: (warnAboutA11YIssues ? '⚠️' : undefined)
 						}
 					</div>
 					{submenu}

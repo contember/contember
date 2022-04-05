@@ -96,7 +96,6 @@ export async function contemberTruncate(projectSlug: string) {
 		}
 	`)
 
-	expect(payload.data.truncate.error?.code).toBeUndefined()
 	expect(payload.data.truncate.ok).toBe(true)
 }
 

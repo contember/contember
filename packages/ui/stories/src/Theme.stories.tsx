@@ -79,7 +79,7 @@ const PropertyBackgroundColor = ({ children }: { children: string }) => <>
     children,
     `${children}--highlighted`,
     `${children}--pressed`,
-  ].map(children => <Stack direction="horizontal" gap="small" align="center">
+  ].map((children, i) => <Stack key={i} direction="horizontal" gap="small" align="center">
     <div style={{
       height: swatchSize,
       minHeight: swatchSize,
@@ -109,7 +109,7 @@ const ThemePreview = ({ background, belowAbove, children }: ThemaPreviewProps) =
     }}
   >
     {colorThemes.map(theme => (
-      <div className={classNames([
+      <div key={theme} className={classNames([
         `theme-${theme}`,
         background !== 'inherit' ? `scheme-${background + (belowAbove ? `-${belowAbove}` : '')}` : undefined,
       ])

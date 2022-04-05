@@ -134,7 +134,7 @@ storiesOf('Layout', module)
 				sideBarEnd="sideBarEnd"
 				mainStart={
 					<div style={{ fontSize: 12, margin: '10px 0' }}>
-						<Trio start={<Breadcrumbs items={[<a href="#">Posts</a>, 'Edit post']} />} end={<ContentStatus />} />
+						<Trio start={<Breadcrumbs items={[<a key={0} href="#">Posts</a>, 'Edit post']} />} end={<ContentStatus />} />
 
 						<p>
 							Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut ut diam sed augue commodo imperdiet. Nunc

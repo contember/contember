@@ -21,6 +21,7 @@ export const AnchorRenderer: FunctionComponent<AnchorRendererProps> = (props: An
 		href={props.element.href}
 		title={props.element.href}
 		target="_blank"
+		rel="noopener noreferrer"
 		onClickCapture={onClick}
 		style={style}
 	>

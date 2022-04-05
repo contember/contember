@@ -14,7 +14,7 @@ export const FileUrlFieldView: FunctionComponent<FileUrlFieldViewProps> = Compon
 				style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', direction: 'rtl' }}
 				href={url}
 				target="_blank"
-				rel="noopener"
+				rel="noopener noreferrer"
 				{...props}
 			>
 				{url.substring(Math.max(0, url.lastIndexOf('/') + 1))}

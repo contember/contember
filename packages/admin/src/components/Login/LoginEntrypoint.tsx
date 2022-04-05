@@ -184,7 +184,7 @@ const LoginContainer = ({ identityProviders, collapsedEmailLogin: initialCollaps
 		{!collapsedEmailLogin && <Login resetLink={resetRequestPageName} />}
 		{((identityProviders?.length ?? 0) > 0 || collapsedEmailLogin) && (
 			<Stack direction="vertical">
-				{identityProviders?.map(it => <IDPInitButton provider={it} onError={setError}/>)}
+				{identityProviders?.map((it, i) => <IDPInitButton key={i} provider={it} onError={setError}/>)}
 				{collapsedEmailLogin && <Button onClick={() => setCollapsedEmailLogin(false)}>Login with email</Button>}
 			</Stack>
 		)}

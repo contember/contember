@@ -14,5 +14,5 @@ const Template: ComponentStory<typeof Breadcrumbs> = args => <Breadcrumbs {...ar
 export const Defaut = Template.bind({})
 
 Defaut.args = {
-  items: [<a href="#">Content</a>, <a href="#">Posts</a>, 'Edit post'],
+  items: [<a key={0} href="#">Content</a>, <a key={1} href="#">Posts</a>, 'Edit post'],
 }

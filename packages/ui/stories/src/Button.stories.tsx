@@ -14,7 +14,7 @@ export default {
 	component: Button,
 	decorators: [
 		Story => <>
-      <p style={{ flex: '1 1 100%' }}>This is a text with normal weight that is not clickable. And here's some <a href="#">link</a> that is clickable. Buttons should have enough clickable visual affordance event when seamless.</p>
+      <p style={{ flex: '1 1 100%' }}>This is a text with normal weight that is not clickable. And here&apos;s some <a href="#">link</a> that is clickable. Buttons should have enough clickable visual affordance event when seamless.</p>
       <Story />
 		</>,
 	],

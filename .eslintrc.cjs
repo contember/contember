@@ -34,9 +34,10 @@ module.exports = {
 		'@typescript-eslint/prefer-interface': 'off',
 
 		'prefer-const': 'off',
+		'react/display-name': 'off',
+		'react/jsx-key': ['error', {'checkFragmentShorthand': true }],
 		'react/no-children-prop': 'off',
 		'react/no-render-return-value': 'off',
-		'react/display-name': 'off',
 		'react/prop-types': 'off',
 		'react-hooks/rules-of-hooks': 'error',
 		'react-hooks/exhaustive-deps': 'error',

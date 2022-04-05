@@ -61,7 +61,7 @@ export const usePersistWithFeedback = ({
 							message: <>
 								{formatMessage(errorMessage, 'persistFeedback.errorMessage')}
 								<ul>
-									{errorFormatter(result.errors).map(it => <li>{it.message}</li>)}
+									{errorFormatter(result.errors).map((it, i) => <li key={i}>{it.message}</li>)}
 								</ul>
 							</>,
 							dismiss: errorDuration ?? true,

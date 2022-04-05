@@ -62,8 +62,8 @@ const TableRenderer = Component(
 
 		return (
 			<Table {...props} >
-				{Array.from(accessor).map(it => (
-					<Entity accessor={it}>
+				{Array.from(accessor).map((it, i) => (
+					<Entity key={i} accessor={it}>
 						{children}
 					</Entity>
 				))}

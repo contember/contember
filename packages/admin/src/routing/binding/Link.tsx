@@ -1,11 +1,11 @@
-import { AnchorHTMLAttributes, useMemo } from 'react'
-import { ROUTING_BINDING_PARAMETER_PREFIX, useBindingLinkParametersResolver } from './useBindingLinkParametersResolver'
 import { Component, Field, useEnvironment } from '@contember/binding'
+import { AnchorHTMLAttributes, useMemo } from 'react'
 import { RoutingLink, RoutingLinkProps } from '../RoutingLink'
-import { LinkTarget, parseLinkTarget } from './LinkLanguage'
-import { targetToRequest } from '../useRoutingLink'
-import { DynamicRequestParameters } from '../types'
 import { RoutingParameter } from '../RoutingParameter'
+import { DynamicRequestParameters } from '../types'
+import { targetToRequest } from '../useRoutingLink'
+import { LinkTarget, parseLinkTarget } from './LinkLanguage'
+import { ROUTING_BINDING_PARAMETER_PREFIX, useBindingLinkParametersResolver } from './useBindingLinkParametersResolver'
 
 export interface LinkProps extends Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'>, Omit<RoutingLinkProps, 'parametersResolver'> {
 }
@@ -22,7 +22,7 @@ export const Link = Component(({ to, ...props }: LinkProps) => {
 	const to = parseLinkTarget(props.to, env)
 
 	return <>
-		{createFieldsFromTarget(to).map(it => <Field field={it} />)}
+		{createFieldsFromTarget(to).map((it, index) => <Field key={`${index}-${it}`} field={it} />)}
 		{props.children}
 	</>
 })

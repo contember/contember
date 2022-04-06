@@ -10,6 +10,7 @@ export interface CheckboxButtonProps extends AllVisuallyDependententControlProps
 }
 
 export const CheckboxButton = ({
+  id,
   checked,
   indeterminate,
   ...props
@@ -17,6 +18,7 @@ export const CheckboxButton = ({
   const componentClassName = useComponentClassName('checkbox-button')
 
   return <span
+    id={id}
     className={classNames(
       componentClassName,
       toStateClass('checked', checked === true),

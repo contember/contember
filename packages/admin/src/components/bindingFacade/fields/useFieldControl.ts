@@ -109,6 +109,7 @@ export const useFieldControl = <FieldValue extends Scalar, ControlValue extends 
 		onFocusChange: useCallback(() => {}, []),
 
 		// ControlDisplayProps
+		id: props.id,
 		className: props.className,
 		distinction: props.distinction,
 		intent: props.intent,

@@ -97,6 +97,7 @@ export const Checkbox = memo(
 				/>
 
 				<CheckboxButton
+					id={outerProps.id}
 					active={outerProps.active}
 					checked={booleanValue}
 					className={className}

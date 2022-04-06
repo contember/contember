@@ -32,6 +32,7 @@ export interface ControlFocusProps {
 export interface ControlDisplayProps {
 	className?: HTMLAttributes<HTMLElement>['className']
 	distinction?: ControlDistinction
+	id?: string
 	intent?: Intent
 	scheme?: Scheme
 	size?: Size

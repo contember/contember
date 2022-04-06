@@ -43,6 +43,7 @@
     "vitest": "^0.7.11"
   },
   "workspaces": [
+    "ee/*",
     "packages/*"
   ],
   "dependencies": {}

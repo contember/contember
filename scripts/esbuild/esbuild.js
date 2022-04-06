@@ -1,4 +1,5 @@
 const path = require('path')
+const esbuild = require('esbuild')
 
 const root = path.dirname(path.dirname(__dirname))
 const resolvePlugin = {
@@ -17,4 +18,15 @@ const resolvePlugin = {
 
 	},
 }
-module.exports = { resolvePlugin }
+
+const buildServer = entrypoint => esbuild.build({
+	entryPoints: [entrypoint],
+	bundle: true,
+	platform: 'node',
+	sourcemap: 'external',
+	outfile: './server/server.js',
+	plugins: [resolvePlugin],
+	external: ['pg-native', 'mock-aws-s3', 'aws-sdk', 'nock', 'bcrypt', 'heapdump'],
+})
+
+module.exports = { resolvePlugin, buildServer }

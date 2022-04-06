@@ -1,22 +1,24 @@
 import { ConfigLoader, createObjectParametersResolver, Merger, resolveParameters } from '@contember/config-loader'
 import { ConfigProcessor } from '@contember/engine-plugins'
-import { serverConfigSchema, tenantConfigSchema } from './configSchema'
+import { serverConfigSchema as defaultServerConfigSchema, tenantConfigSchema } from './configSchema'
 import { configTemplate } from './configTemplate'
 import { createProjectConfigResolver, ProjectConfigResolver } from './projectConfigResolver'
 import { createTenantConfigResolver, TenantConfigResolver } from './tenantConfigResolver'
+import { Type } from '@contember/typesafe'
 
-export type ServerConfig = ReturnType<typeof serverConfigSchema>
+export type ServerConfig = ReturnType<typeof defaultServerConfigSchema>
 export type TenantConfig = ReturnType<typeof tenantConfigSchema>
 
 export type ConfigSource = { data: string; type: 'file' | 'json' | 'yaml' }
 
 type Env = Record<string, string>
 
-export async function readConfig(
-	configSources: ConfigSource[],
+export async function readConfig<T extends ServerConfig>(
+	configSources: ConfigSource[] = [],
 	configProcessors: ConfigProcessor[] = [],
+	serverConfigSchema: Type<T> = defaultServerConfigSchema as Type<T>,
 ): Promise<{
-	serverConfig: ServerConfig
+	serverConfig: T
 	projectConfigResolver: ProjectConfigResolver
 	tenantConfigResolver: TenantConfigResolver
 }> {

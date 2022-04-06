@@ -1,9 +1,7 @@
-import { TenantConfigResolver } from '../config/tenantConfigResolver'
+import { ProjectGroupContainerFactory, TenantConfigResolver } from '@contember/engine-server'
 import {
 	ProjectGroupContainer,
-	ProjectGroupContainerResolver as ProjectGroupContainerResolverInterface,
 } from '@contember/engine-http'
-import { ProjectGroupContainerFactory } from './ProjectGroupContainer'
 import { PromiseMap } from '@contember/engine-common'
 import { isDeepStrictEqual } from 'util'
 
@@ -13,7 +11,7 @@ interface ContainerWithMeta {
 	inputConfig: any
 }
 
-export class ProjectGroupContainerResolver implements ProjectGroupContainerResolverInterface {
+export class ProjectGroupContainerResolver {
 	private containers = new PromiseMap<string | undefined, ContainerWithMeta>()
 
 	public readonly onCreate: ((container: ProjectGroupContainer, slug: string | undefined) => void | (() => void))[] = []

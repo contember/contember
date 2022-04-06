@@ -27,6 +27,7 @@
 		{ "path": "./packages/schema-definition" },
 		{ "path": "./packages/schema-migrations" },
 		{ "path": "./packages/schema-utils" },
-		{ "path": "./packages/typesafe" }
+		{ "path": "./packages/typesafe" },
+		{ "path": "./ee/engine-server-ee" }
 	]
 }

@@ -59,37 +59,21 @@ export const tenantConfigSchema = Typesafe.intersection(
 		}),
 	}),
 )
-export const serverConfigSchema = Typesafe.intersection(
-	Typesafe.object({
-		port: Typesafe.number,
-		monitoringPort: Typesafe.number,
-		http: Typesafe.partial({
-			requestBodySize: Typesafe.string,
-		}),
-		logging: Typesafe.union(
-			val => Typesafe.valueAt(val, ['sentry', 'dsn']) === undefined ? {} : Typesafe.fail([]),
-			Typesafe.partial({
-				sentry: Typesafe.object({
-					dsn: Typesafe.string,
-				}),
+
+export const serverConfigSchema = Typesafe.object({
+	port: Typesafe.number,
+	http: Typesafe.partial({
+		requestBodySize: Typesafe.string,
+	}),
+	logging: Typesafe.union(
+		(val): { sentry?: { dsn: string } } => Typesafe.valueAt(val, ['sentry', 'dsn']) === undefined ? {} : Typesafe.fail([]),
+		Typesafe.partial({
+			sentry: Typesafe.object({
+				dsn: Typesafe.string,
 			}),
-		),
-	}),
-	Typesafe.partial({
-		workerCount: Typesafe.union(Typesafe.number, Typesafe.string),
-		projectGroup: (val: unknown, path: PropertyKey[] = []) => Typesafe.valueAt(val, ['domainMapping']) === undefined
-			? undefined
-			: Typesafe.intersection(
-				Typesafe.object({
-					domainMapping: Typesafe.string,
-				}),
-				Typesafe.partial({
-					configHeader: Typesafe.string,
-					configEncryptionKey: Typesafe.string,
-				}),
-			)(val, path),
-	}),
-)
+		}),
+	),
+})
 
 export const stageConfig = Typesafe.record(
 	Typesafe.string,

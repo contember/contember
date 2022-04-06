@@ -1,15 +1,14 @@
 #!/usr/bin/env node
 
-import { createContainer, ProcessType, readConfig } from '@contember/engine-server'
+import { createContainer, readConfig } from '@contember/engine-server'
 ;(async () => {
-	const { serverConfig, projectConfigResolver, tenantConfigResolver } = await readConfig([])
+	const { serverConfig, projectConfigResolver, tenantConfigResolver } = await readConfig()
 	const container = await createContainer({
 		debugMode: false,
 		serverConfig,
 		projectConfigResolver,
 		tenantConfigResolver,
 		plugins: [],
-		processType: ProcessType.singleNode,
 	})
 	await container.initializer.initialize()
 	const server = await container.koa.listen(serverConfig.port)

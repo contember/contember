@@ -1,5 +1,5 @@
 import { EntityAccessor, useEntity, useMutationState } from '@contember/binding'
-import { Button, ButtonOwnProps, ButtonProps, Icon } from '@contember/ui'
+import { Button, ButtonOwnProps, ButtonProps, Icon, toThemeClass } from '@contember/ui'
 import classNames from 'classnames'
 import { memo, ReactNode, useCallback } from 'react'
 import { usePersistWithFeedback } from '../../../ui'
@@ -37,11 +37,17 @@ export const DeleteEntityButton = memo((props: DeleteEntityButtonProps) => {
 	}
 
 	return (
-		<Button distinction="primary" {...defaultProps} {...rest} className={classNames(
-			className,
-			'theme-grey-controls',
-			'theme-danger-controls:hover',
-		)} disabled={isMutating || rest.disabled} onClick={onClick}>
+		<Button
+			distinction="primary"
+			{...defaultProps}
+			{...rest}
+			className={classNames(
+				className,
+				toThemeClass(null, 'danger', ':hover'),
+			)}
+			disabled={isMutating || rest.disabled}
+			onClick={onClick}
+		>
 			{children || <Icon blueprintIcon="trash" />}
 		</Button>
 	)

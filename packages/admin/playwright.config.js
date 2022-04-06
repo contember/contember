@@ -4,7 +4,15 @@ import { devices } from '@playwright/test'
 const config = {
 	timeout: 60000,
 	workers: process.env.CI ? 1 : undefined,
-	reporter: process.env.CI ? [['github'], ['html', { open: 'never' }]] : [['list'], ['html', { open: 'never' }]],
+
+	reporter: [
+		[process.env.CI ? 'github' : 'list'],
+		['html', { open: 'never', outputFolder: 'tests/playwright/report' }],
+	],
+
+	testDir: 'tests/playwright/cases',
+	outputDir: 'tests/playwright/output',
+	snapshotDir: 'tests/playwright/snapshots',
 
 	use: {
 		screenshot: 'on',
@@ -17,10 +25,10 @@ const config = {
 			name: 'Desktop Chrome',
 			use: { ...devices['Desktop Chrome'], viewport: { width: 1903, height: 1009 } },
 		},
-		// {
-		// 	name: 'Desktop Firefox',
-		// 	use: { ...devices['Desktop Firefox'], viewport: { width: 1903, height: 1009 } },
-		// },
+		{
+			name: 'Desktop Firefox',
+			use: { ...devices['Desktop Firefox'], viewport: { width: 1903, height: 1009 } },
+		},
 		{
 			name: 'Desktop Safari',
 			use: { ...devices['Desktop Safari'], viewport: { width: 1903, height: 1009 } },
@@ -29,10 +37,6 @@ const config = {
 			name: 'Desktop Chrome Dark',
 			use: { ...devices['Desktop Chrome'], viewport: { width: 1903, height: 1009 }, colorScheme: 'dark' },
 		},
-		// {
-		// 	name: 'Desktop Firefox Dark',
-		// 	use: { ...devices['Desktop Firefox'], viewport: { width: 1903, height: 1009 }, colorScheme: 'dark' },
-		// },
 		{
 			name: 'iPhone 11',
 			use: { ...devices['iPhone 11'] },

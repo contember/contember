@@ -22,7 +22,9 @@
 		"src/"
 	],
 	"scripts": {
-		"build": "vite build --mode development && vite build --mode production && pnpm run build:css",
+		"build": "pnpm run build:js:dev && pnpm run build:js:prod && pnpm run build:css",
+		"build:js:dev": "vite build --mode development",
+		"build:js:prod": "vite build --mode production",
 		"build:css": "sass --no-charset src/index.sass:dist/style.css",
 		"storybook": "start-storybook -p 6006",
 		"build-storybook": "build-storybook"

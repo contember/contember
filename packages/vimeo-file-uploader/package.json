@@ -19,7 +19,9 @@
 	"type": "module",
 	"sideEffects": false,
 	"scripts": {
-		"build": "vite build --mode development && vite build --mode production"
+		"build": "pnpm run build:js:dev && pnpm run build:js:prod",
+		"build:js:dev": "vite build --mode development",
+		"build:js:prod": "vite build --mode production"
 	},
 	"dependencies": {
 		"@contember/client": "workspace:*",

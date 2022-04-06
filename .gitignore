@@ -7,8 +7,8 @@
 /packages/**/dist
 /packages/**/temp
 /packages/**/node_modules
-/packages/admin/playwright-report
-/packages/admin/test-results
+/packages/admin/tests/playwright/output
+/packages/admin/tests/playwright/report
 /packages/admin-sandbox/.env.development.local
 /node_modules
 /docker-compose.override.yaml

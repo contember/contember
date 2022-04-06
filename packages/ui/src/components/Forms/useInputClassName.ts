@@ -57,7 +57,7 @@ export function useInputClassName<P extends AllVisuallyDependententControlProps 
 		toStateClass('required', required),
 
 		toEnumClass('scheme-', !disabled ? scheme : undefined),
-		toThemeClass(finalIntent),
+		toThemeClass(finalIntent, finalIntent),
 		toEnumViewClass(size),
 		toEnumViewClass(distinction),
 		toEnumStateClass(validationState),

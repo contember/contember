@@ -1,4 +1,5 @@
 export type ServiceName = string
+export type ReservedServiceName = 'inner'
 export type ServiceType = any
 
 export type ServiceTypeMap = { [N in ServiceName]: ServiceType | undefined }
@@ -9,6 +10,7 @@ export type ServiceSetup<M extends ServiceTypeMap, T> = (service: T, accessors: 
 export interface ServiceDefinition<M extends ServiceTypeMap, T> {
 	factory: ServiceFactory<M, T>
 	setup: ServiceSetup<any, T>[]
+	innerDefinition?: ServiceDefinition<M, T>
 }
 
 export type ServiceDefinitionMap<M extends ServiceTypeMap> = { [N in keyof M]: ServiceDefinition<M, M[N]> }
@@ -17,7 +19,7 @@ export class Builder<M extends ServiceTypeMap = {}> {
 	constructor(private factories: ServiceDefinitionMap<M>) {}
 
 	addService<N extends ServiceName, T extends ServiceType>(
-		name: N extends keyof M ? 'Service with this name already exists' : N,
+		name: N extends ReservedServiceName ? 'Reserved service name' : N extends keyof M ? 'Service with this name already exists' : N,
 		factory: ServiceFactory<M, T> | ServiceDefinition<M, T>,
 	): Builder<M & { [K in N]: T }> {
 		return new Builder({
@@ -28,18 +30,21 @@ export class Builder<M extends ServiceTypeMap = {}> {
 
 	replaceService<N extends ServiceName, T extends { [P in keyof M[N]]: M[N][P] }>(
 		name: N extends keyof M ? N : 'Service with this name does not exist',
-		factory: ServiceFactory<M, T> | ServiceDefinition<M, T>,
+		factory: ServiceFactory<M & {inner: T}, T> | ServiceDefinition<M, T>,
 	): Builder<M> {
 		const currentFactory = this.factories[name]
 		return new Builder({
 			...this.factories,
-			[name]:
-				'factory' in factory
-					? factory
-					: {
-						...currentFactory,
-						factory,
-					  },
+			[name]: 'factory' in factory
+				? {
+					...factory,
+					innerDefinition: currentFactory,
+				}
+				: {
+					...currentFactory,
+					factory,
+					innerDefinition: currentFactory,
+				},
 		} as ServiceDefinitionMap<M>)
 	}
 
@@ -68,11 +73,14 @@ type ServiceRegistry<M extends ServiceTypeMap> = Map<keyof M, ServiceType>
 export class ContainerImpl<M extends ServiceTypeMap> {
 	private readonly services: ServiceRegistry<M> = new Map()
 	private readonly accessors: Readonly<M> = {} as any
+	private level = 0
+	private setups: (() => void)[] = []
 
 	constructor(private definitions: ServiceDefinitionMap<M>) {
 		Object.keys(this.definitions).forEach(name => {
 			Object.defineProperty(this.accessors, name, {
 				get: this.get.bind(this, name),
+				enumerable: true,
 			})
 
 			Object.defineProperty(this, name, {
@@ -81,21 +89,44 @@ export class ContainerImpl<M extends ServiceTypeMap> {
 		})
 	}
 
-	getDefinitions(): ServiceDefinitionMap<M> {
-		return this.definitions
-	}
-
 	get<N extends keyof M>(name: N): M[N] {
 		const existingService: M[N] | undefined = this.services.get(name)
 		if (existingService !== undefined) {
 			return existingService
 		}
 		const definition = this.definitions[name]
-		const service = definition.factory(this.accessors)
+		this.definitions[name] = { setup: [], factory: () => {
+			throw new Error(`Circular dependency when creating a service "${name}"`)
+		} }
+		this.level++
+		const service = this.createService(definition)
 		this.services.set(name, service)
-		for (const setup of definition.setup) {
-			setup(service, this.accessors)
+		this.level--
+		if (this.level === 0) {
+			this.setups.forEach(it => it())
 		}
+		return service
+	}
+
+	private createService<T>(definition: ServiceDefinition<M, T>): T {
+		let accessors = this.accessors
+		const innerDefinition = definition.innerDefinition
+		if (innerDefinition !== undefined) {
+			// spreading would invoke getters
+			accessors = Object.create(
+				Object.getPrototypeOf(this.accessors),
+				Object.getOwnPropertyDescriptors(this.accessors),
+			)
+			Object.defineProperty(accessors, 'inner', {
+				get: () => this.createService(innerDefinition),
+			})
+		}
+		this.setups.push(() => {
+			for (const setup of definition.setup) {
+				setup(service, accessors)
+			}
+		})
+		const service = definition.factory(accessors)
 		return service
 	}
 
@@ -106,14 +137,4 @@ export class ContainerImpl<M extends ServiceTypeMap> {
 		}
 		return new ContainerImpl(factories as ServiceDefinitionMap<{ [K in N]: M[K] }>) as Container<{ [K in N]: M[K] }>
 	}
-}
-
-export function mergeContainers<M1 extends ServiceTypeMap, M2 extends ServiceTypeMap>(
-	containerA: Container<M1>,
-	containerB: Container<M2>,
-): Container<M1 & M2> {
-	return new ContainerImpl({
-		...containerA.getDefinitions(),
-		...containerB.getDefinitions(),
-	} as ServiceDefinitionMap<M1 & M2>) as Container<M1 & M2>
 }

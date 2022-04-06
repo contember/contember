@@ -28,7 +28,3 @@ export interface ProjectGroupContainer {
 	systemContainer: SystemContainer
 	systemGraphQLHandler: SystemGraphQLHandler
 }
-
-export interface ProjectGroupContainerResolver {
-	getProjectGroupContainer(slug: string | undefined, config: any): Promise<ProjectGroupContainer>
-}

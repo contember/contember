@@ -37,10 +37,17 @@ export const DeleteEntityButton = memo((props: DeleteEntityButtonProps) => {
 	}
 
 	return (
-		<Button distinction="primary" {...defaultProps} {...rest} className={classNames(
-			className,
-			toThemeClass(null, 'danger', ':hover'),
-		)} disabled={isMutating || rest.disabled} onClick={onClick}>
+		<Button
+			distinction="primary"
+			{...defaultProps}
+			{...rest}
+			className={classNames(
+				className,
+				toThemeClass(null, 'danger', ':hover'),
+			)}
+			disabled={isMutating || rest.disabled}
+			onClick={onClick}
+		>
 			{children || <Icon blueprintIcon="trash" />}
 		</Button>
 	)

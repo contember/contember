@@ -6,7 +6,7 @@ import {
 	SugaredRelativeSingleField,
 	wrapFilterInHasOnes,
 } from '@contember/binding'
-import { Checkbox, Stack } from '@contember/ui'
+import { Checkbox, FieldContainer, Stack } from '@contember/ui'
 import type { FunctionComponent, ReactElement, ReactNode } from 'react'
 import { useMessageFormatter } from '../../../../../i18n'
 import { FieldFallbackView, FieldFallbackViewPublicProps } from '../../../fieldViews'
@@ -73,25 +73,28 @@ export const TextCell: FunctionComponent<TextCellProps> = Component(props => {
 				return (
 					<Stack direction="horizontal">
 						<GenericTextCellFilter {...props} filter={filter} setFilter={setFilter} />
-						<Checkbox
-							value={filter.nullCondition}
-							onChange={checked => {
-								setFilter({
-									...filter,
-									nullCondition: checked,
-								})
-							}}
-						>
-							<span style={{ whiteSpace: 'nowrap' }}>
-								{filter.mode === 'doesNotMatch'
-									? formatMessage('dataGridCells.textCell.excludeNull', {
-											strong: chunks => <strong>{chunks}</strong>,
-									  })
-									: formatMessage('dataGridCells.textCell.includeNull', {
-											strong: chunks => <strong>{chunks}</strong>,
-									  })}
-							</span>
-						</Checkbox>
+							<FieldContainer
+								label={<span style={{ whiteSpace: 'nowrap' }}>
+									{filter.mode === 'doesNotMatch'
+										? formatMessage('dataGridCells.textCell.excludeNull', {
+												strong: chunks => <strong>{chunks}</strong>,
+											})
+										: formatMessage('dataGridCells.textCell.includeNull', {
+												strong: chunks => <strong>{chunks}</strong>,
+											})}
+									</span>}
+								labelPosition="labelInlineRight"
+							>
+								<Checkbox
+									value={filter.nullCondition}
+									onChange={checked => {
+										setFilter({
+											...filter,
+											nullCondition: !!checked,
+										})
+									}}
+								/>
+							</FieldContainer>
 					</Stack>
 				)
 			}}

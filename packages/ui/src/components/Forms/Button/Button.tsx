@@ -21,8 +21,8 @@ export interface ButtonOwnProps {
 	flow?: ButtonFlow
 	distinction?: ButtonDistinction
 	justification?: Justification
-	isLoading?: boolean
-	isActive?: boolean
+	loading?: boolean
+	active?: boolean
 	disabled?: boolean
 	bland?: boolean
 	children?: ReactNode
@@ -50,7 +50,7 @@ Button.displayName = 'Button'
 
 export const BaseButton = memo(
 	forwardRef<any, BaseButtonProps>((props, ref) => {
-		const { Component, intent, size, flow, distinction, justification, isLoading, isActive, bland, children, scheme, ...rest } =
+		const { Component, intent, size, flow, distinction, justification, loading, active, bland, children, scheme, ...rest } =
 			props
 
 		if (props.disabled === true) {
@@ -74,8 +74,8 @@ export const BaseButton = memo(
 				toEnumViewClass(props.disabled ? 'default' : distinction),
 				toEnumViewClass(flow),
 				toEnumViewClass(justification, 'justifyCenter'),
-				toStateClass('loading', isLoading),
-				toStateClass('active', isActive),
+				toStateClass('loading', loading),
+				toStateClass('active', active),
 				toViewClass('bland', bland),
 			),
 			ref: ref,
@@ -83,7 +83,7 @@ export const BaseButton = memo(
 		const content = (
 			<>
 				<div className={`${prefix}button-content`}>{children}</div>
-				{isLoading && (
+				{loading && (
 					<span className={`${prefix}button-spinner`}>
 						<Spinner />
 					</span>

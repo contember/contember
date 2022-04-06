@@ -1,30 +1,49 @@
-import { TextInput, TextInputProps } from '@contember/ui'
+import { ControlProps, TextareaInput, TextInput } from '@contember/ui'
 import { SimpleRelativeSingleField, SimpleRelativeSingleFieldProps } from '../auxiliary'
-import { stringFieldParser, useTextInput } from './useTextInput'
+import {
+	ControlValueParser,
+	FieldValueFormatter,
+	useFieldControl,
+} from './useFieldControl'
 
 export type TextFieldProps =
 	& SimpleRelativeSingleFieldProps
-	& Omit<TextInputProps, 'value' | 'onChange' | 'validationState'>
+	& ControlProps<string>
 	& {
+		/**
+		 * @deprecated Use TextareaField
+		 */
+		allowNewlines?: boolean
+		/**
+		 * @deprecated Use TextareaField
+		 */
 		wrapLines?: boolean
 	}
 
-const removeNewLines = (text: string) => text.replace(/[\r\n]/g, '')
+const parse: ControlValueParser<string, string> = value => value ??  null
+const format: FieldValueFormatter<string, string> = value => value ?? null
 
 export const TextField = SimpleRelativeSingleField<TextFieldProps, string>(
-	(fieldMetadata, { defaultValue, name, label, onBlur, wrapLines = false, allowNewlines = false, ...props }) => {
-		const inputProps = useTextInput({
+	(fieldMetadata, {
+		allowNewlines,
+		label,
+		wrapLines,
+		...props
+	}) => {
+		const inputProps = useFieldControl<string, string>({
+			...props,
 			fieldMetadata,
-			onBlur,
-			parse: wrapLines && !allowNewlines ? removeNewLines : stringFieldParser,
+			parse,
+			format,
 		})
-		return (
-			<TextInput
-				allowNewlines={allowNewlines || wrapLines}
-				{...inputProps}
-				{...(props as any)} // This is VERY wrong.
-			/>
-		)
+
+		if (import.meta.env.DEV && (allowNewlines || wrapLines)) {
+			console.warn('Props `allowNewlines` and `wrapLines` are deprecated. Use TextareaField instead.')
+		}
+
+		return allowNewlines || wrapLines
+			? <TextareaInput {...inputProps} />
+			: <TextInput {...inputProps} />
 	},
 	'TextField',
 )

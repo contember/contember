@@ -1,6 +1,6 @@
 import { Entity, EntityAccessor, EntityListAccessor, useEnvironment } from '@contember/binding'
 import { emptyArray } from '@contember/react-utils'
-import { AnchorButton, ButtonGroup, ButtonProps, Checkbox, Dropdown } from '@contember/ui'
+import { AnchorButton, ButtonGroup, ButtonProps, Checkbox, Dropdown, FieldContainer } from '@contember/ui'
 import { ReactNode, useEffect } from 'react'
 import type { RequestChange } from '../../../../routing'
 import { RoutingLink, useRedirect } from '../../../../routing'
@@ -80,7 +80,7 @@ export function DimensionsRenderer(props: DimensionsRendererProps) {
 								href={href}
 								flow="block"
 								distinction="seamless"
-								isActive={dimension.isSelected}
+								active={dimension.isSelected}
 								onClick={onClick}
 							>
 								{dimension.label}
@@ -90,14 +90,17 @@ export function DimensionsRenderer(props: DimensionsRendererProps) {
 				)
 			} else {
 				return (
-					<Checkbox
-						key={dimension.slug}
-						value={dimension.isSelected}
-						isDisabled={dimension.isSelected && !canSelectLess}
-						onChange={() => redirect(getRequestChangeCallback(dimension))}
+					<FieldContainer
+						label={dimension.label}
+						labelPosition="labelInlineRight"
 					>
-						{dimension.label}
-					</Checkbox>
+						<Checkbox
+							key={dimension.slug}
+							value={dimension.isSelected}
+							disabled={dimension.isSelected && !canSelectLess}
+							onChange={() => redirect(getRequestChangeCallback(dimension))}
+						/>
+					</FieldContainer>
 				)
 			}
 		})
@@ -105,6 +108,7 @@ export function DimensionsRenderer(props: DimensionsRendererProps) {
 		if (canSelectJustOne) {
 			return <ButtonGroup orientation="vertical">{renderedDimensions}</ButtonGroup>
 		}
+
 		return (
 			<div
 				style={{ display: 'flex', flexDirection: 'column', gap: '0.25em', padding: '0.75em' }}

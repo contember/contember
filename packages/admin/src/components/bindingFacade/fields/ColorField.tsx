@@ -1,18 +1,32 @@
-import { SingleLineTextInputProps, TextInput } from '@contember/ui'
+import { TextInput, TextInputProps } from '@contember/ui'
 import { SimpleRelativeSingleField, SimpleRelativeSingleFieldProps } from '../auxiliary'
-import { stringFieldParser, useTextInput } from './useTextInput'
+import {
+	ControlValueParser,
+	FieldValueFormatter,
+	useFieldControl,
+} from './useFieldControl'
 
 export type ColorFieldProps = SimpleRelativeSingleFieldProps &
-	Omit<SingleLineTextInputProps, 'value' | 'onChange' | 'validationState' | 'allowNewlines'>
+	Omit<TextInputProps, 'value' | 'validationState' | 'allowNewlines' | 'wrapLines'>
+
+const parse: ControlValueParser<string, string> = value => value ??  null
+const format: FieldValueFormatter<string, string> = value => value ?? null
 
 export const ColorField = SimpleRelativeSingleField<ColorFieldProps, string>(
-	(fieldMetadata, { defaultValue, name, label, onBlur, ...props }) => {
-		const inputProps = useTextInput({
+	(fieldMetadata, {
+		defaultValue,
+		name,
+		label,
+		...props
+	}) => {
+		const inputProps = useFieldControl<string, string>({
+			...props,
 			fieldMetadata,
-			onBlur,
-			parse: stringFieldParser,
+			parse,
+			format,
 		})
-		return <TextInput type="color" {...inputProps} {...props} />
+
+		return <TextInput {...inputProps} />
 	},
 	'ColorField',
 )

@@ -1,50 +1,21 @@
-import type { FieldAccessor } from '@contember/binding'
-import { DateTimeInput, SingleLineTextInputProps, dateToTimeValue } from '@contember/ui'
-import { forwardRef, memo, Ref } from 'react'
+import { TimeInput, TimeInputProps, toTimeString } from '@contember/ui'
+import { SimpleRelativeSingleField, SimpleRelativeSingleFieldProps } from '../auxiliary'
+import { ControlValueParser, useFieldControl } from './useFieldControl'
 
-import {
-	SimpleRelativeSingleField,
-	SimpleRelativeSingleFieldMetadata,
-	SimpleRelativeSingleFieldProps,
-} from '../auxiliary'
+export type TimeFieldProps = SimpleRelativeSingleFieldProps & TimeInputProps
 
-export type TimeFieldProps = SimpleRelativeSingleFieldProps &
-	Omit<SingleLineTextInputProps, 'value' | 'onChange' | 'validationState' | 'max' | 'min'> & {
-		max?: string
-		min?: string
-	}
+const parse: ControlValueParser<string, string> = value => value ??  null
 
 export const TimeField = SimpleRelativeSingleField<TimeFieldProps, string>(
-	(fieldMetadata, props) => <TimeFieldInner fieldMetadata={fieldMetadata} {...props} />,
+	(fieldMetadata, props) => {
+		const inputProps = useFieldControl<string, string>({
+			...props,
+			fieldMetadata,
+			parse,
+			format: toTimeString,
+		})
+
+		return <TimeInput {...inputProps} />
+	},
 	'TimeField',
-)
-
-export interface TimeFieldInnerProps
-	extends Omit<TimeFieldProps, 'field' | 'label' | 'isNonbearing' | 'defaultValue' | 'max' | 'min'> {
-	fieldMetadata: SimpleRelativeSingleFieldMetadata<string>
-	max?: string
-	min?: string
-}
-
-// Dummy date 1-1-1970 is used to benefit from Date class time validation
-const deserializeTime = (time: string | null): string => (time ? dateToTimeValue(new Date(`1-1-1970 ${time}`)) : '')
-
-const serialize = (time: string | null) => time
-
-const generateOnChange = (data: FieldAccessor<string>) => (value: string | null) => {
-	data.updateValue(serialize(value ? value : null))
-}
-
-export const TimeFieldInner = memo(
-	forwardRef(({ fieldMetadata, ...props }: TimeFieldInnerProps, suppliedRef: Ref<any>) => {
-		return (
-			<DateTimeInput
-				{...props}
-				onChange={generateOnChange(fieldMetadata.field)}
-				ref={suppliedRef}
-				value={deserializeTime(fieldMetadata.field.value)}
-				type="time"
-			/>
-		)
-	}),
 )

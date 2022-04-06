@@ -1,10 +1,10 @@
 import { Component, Field, FieldValue, QueryLanguage, SugaredRelativeSingleField, wrapFilterInHasOnes } from '@contember/binding'
 import { Input } from '@contember/client'
-import { TextInput, Select, Stack } from '@contember/ui'
+import { NumberInput, Select, Stack } from '@contember/ui'
 import type { FunctionComponent, ReactElement, ReactNode } from 'react'
 import { useMessageFormatter } from '../../../../../i18n'
-import { FieldFallbackViewPublicProps, FieldFallbackView } from '../../../fieldViews'
-import { DataGridOrderDirection, DataGridHeaderCellPublicProps, DataGridCellPublicProps, DataGridColumn } from '../base'
+import { FieldFallbackView, FieldFallbackViewPublicProps } from '../../../fieldViews'
+import { DataGridCellPublicProps, DataGridColumn, DataGridHeaderCellPublicProps, DataGridOrderDirection } from '../base'
 import { dataGridCellsDictionary } from './dataGridCellsDictionary'
 
 export type NumberCellProps<Persisted extends FieldValue = FieldValue> =
@@ -21,7 +21,7 @@ export type NumberCellProps<Persisted extends FieldValue = FieldValue> =
 // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
 export type NumberFilterArtifacts = {
 	mode: 'eq' | 'gte' | 'lte'
-	query: string
+	query: number | null
 }
 
 export const NumberCell: FunctionComponent<NumberCellProps> = Component(props => {
@@ -33,7 +33,7 @@ export const NumberCell: FunctionComponent<NumberCellProps> = Component(props =>
 				newDirection ? QueryLanguage.desugarOrderBy(`${props.field as string} ${newDirection}`, environment) : undefined
 			}
 			getNewFilter={(filter, { environment }) => {
-				if (filter.query === '') {
+				if (filter.query === null) {
 					return undefined
 				}
 
@@ -43,8 +43,8 @@ export const NumberCell: FunctionComponent<NumberCellProps> = Component(props =>
 					lte: 'lte',
 				}
 
-				const condition: Input.Condition<string> = {
-					[baseOperators[filter.mode]]: Number(filter.query),
+				const condition: Input.Condition = {
+					[baseOperators[filter.mode]]: filter.query,
 				}
 
 				const desugared = QueryLanguage.desugarRelativeSingleField(props, environment)
@@ -54,7 +54,7 @@ export const NumberCell: FunctionComponent<NumberCellProps> = Component(props =>
 			}}
 			emptyFilter={{
 				mode: 'eq',
-				query: '',
+				query: null,
 			}}
 			filterRenderer={({ filter, setFilter }) => {
 				const formatMessage = useMessageFormatter(dataGridCellsDictionary)
@@ -69,25 +69,27 @@ export const NumberCell: FunctionComponent<NumberCellProps> = Component(props =>
 				return (
 					<Stack direction="horizontal">
 						<Select
+							notNull
 							value={filter.mode}
 							options={options}
-							onChange={e => {
-								const value = e.currentTarget.value as NumberFilterArtifacts['mode']
+							onChange={value => {
+								if (!value) {
+									return
+								}
+
 								setFilter({
 									...filter,
 									mode: value,
 								})
 							}}
 						/>
-						<TextInput
+						<NumberInput
 							value={filter.query}
-							type="number"
 							placeholder="Value"
-							onChange={e => {
-								const value = e.currentTarget.value
+							onChange={value => {
 								setFilter({
 									...filter,
-									query: value,
+									query: value ?? null,
 								})
 							}}
 						/>

@@ -2,7 +2,11 @@
 	--slug-input-control-focus-ring: var(--cui-control-focus-ring-box-shadow)
 
 	align-items: stretch
+	background: var(--cui-background-color--above)
+	border-color: var(--cui-color--lower)
 	border-radius: var(--cui-control-border-radius)
+	border-style: solid
+	border-width: var(--cui-control-border-width)
 	display: flex
 
 	&:focus-within
@@ -13,16 +17,6 @@
 		align-items: center
 		line-height: normal
 		padding-left: calc(3 * var(--cui-gap-horizontal))
-
-		border-right: none
-		border-style: solid
-		border-width: var(--cui-control-border-width)
-		border-radius: var(--cui-control-border-radius)
-		border-right: 0
-		border-top-right-radius: 0
-		border-bottom-right-radius: 0
-		background: var(--cui-background-color--above)
-		border-color: var(--cui-color--lower)
 		color: var(--cui-color--medium)
 	.cui-field-container:hover &-prefix
 		border-color: var(--cui-color--low)

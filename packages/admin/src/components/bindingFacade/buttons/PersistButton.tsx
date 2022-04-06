@@ -1,16 +1,16 @@
 import { useDirtinessState, useMutationState } from '@contember/binding'
 import { SaveButton, SaveButtonProps } from '@contember/ui'
-import { memo, useCallback, useRef } from 'react'
+import { forwardRef, memo, useCallback } from 'react'
 import { usePersistWithFeedback } from '../../ui'
 
 export type PersistButtonProps = Omit<SaveButtonProps, 'children' | 'isDirty'> & {
 }
 
-export const PersistButton = memo((props: PersistButtonProps) => {
+export const PersistButton = memo(
+	forwardRef<HTMLButtonElement, PersistButtonProps>((props, ref) => {
 	const isMutating = useMutationState()
 	const isDirty = useDirtinessState()
 	const triggerPersist = usePersistWithFeedback()
-	const buttonRef = useRef<HTMLButtonElement | null>(null)
 	const onClick = useCallback(() => {
 		triggerPersist().catch(() => {})
 	}, [triggerPersist])
@@ -22,16 +22,16 @@ export const PersistButton = memo((props: PersistButtonProps) => {
 	}
 	return (
 		<SaveButton
-			ref={buttonRef}
+			ref={ref}
 			disabled={isDisabled}
 			flow="block"
 			intent={isDisabled ? 'default' : props.intent}
 			isDirty={isDirty}
-			isLoading={isMutating}
+			loading={isMutating}
 			onClick={onClick}
 			size="large"
 			{...props}
 		/>
 	)
-})
+}))
 PersistButton.displayName = 'PersistButton'

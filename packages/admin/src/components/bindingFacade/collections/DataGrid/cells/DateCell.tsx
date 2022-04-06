@@ -1,6 +1,6 @@
 import { Component, QueryLanguage, wrapFilterInHasOnes } from '@contember/binding'
 import type { Input } from '@contember/client'
-import { DateTimeInput, dateToDateValue, FieldContainer, Stack } from '@contember/ui'
+import { DateInput, FieldContainer, Stack, toDateString } from '@contember/ui'
 import { forwardRef, FunctionComponent, memo, ReactNode, useCallback } from 'react'
 import { useMessageFormatter } from '../../../../../i18n'
 import { dateToStringWithoutTimezone } from '../../../../../utils'
@@ -56,16 +56,16 @@ export const DateCell: FunctionComponent<DateCellProps> = Component(props => {
 			filterRenderer={({ filter, setFilter }) => {
 				const formatMessage = useMessageFormatter(dataGridCellsDictionary)
 
-				const start = filter.start ? dateToDateValue(new Date(filter.start)) : ''
-				const end = filter.end ? dateToDateValue(new Date(filter.end)) : ''
+				const start = toDateString(filter.start) ?? ''
+				const end = toDateString(filter.end) ?? ''
 
-				const onDateStartChange = useCallback((value: string | null) => {
+				const onDateStartChange = useCallback((value?: string | null) => {
 					setFilter({
 						...filter,
 						start: value ? dateToStringWithoutTimezone(new Date(value)) : null,
 					})
 				}, [filter, setFilter])
-				const onDateEndChange = useCallback((value: string | null) => {
+				const onDateEndChange = useCallback((value?: string | null) => {
 					setFilter({
 						...filter,
 						end: value ? dateToStringWithoutTimezone(new Date(value)) : null,
@@ -75,16 +75,14 @@ export const DateCell: FunctionComponent<DateCellProps> = Component(props => {
 				return (
 					<Stack direction="horizontal">
 						<DateBoundInput label={formatMessage('dataGridCells.dateCell.fromLabel')}>
-							<DateTimeInput
-								type="date"
+							<DateInput
 								value={start}
 								onChange={onDateStartChange}
 								max={end}
 							/>
 						</DateBoundInput>
 						<DateBoundInput label={formatMessage('dataGridCells.dateCell.toLabel')}>
-							<DateTimeInput
-								type="date"
+							<DateInput
 								value={end}
 								onChange={onDateEndChange}
 								min={start}

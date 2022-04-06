@@ -1,8 +1,9 @@
+import { Input } from '@contember/client'
+import { Select, TextInput } from '@contember/ui'
+import { useCallback } from 'react'
 import { useMessageFormatter } from '../../../../../i18n'
 import { dataGridCellsDictionary } from './dataGridCellsDictionary'
-import { Select, TextInput } from '@contember/ui'
 import { TextFilterArtifacts } from './TextCell'
-import { Input } from '@contember/client'
 
 // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
 export type GenericTextCellFilterArtifacts = {
@@ -25,30 +26,30 @@ export const GenericTextCellFilter = <Filter extends GenericTextCellFilterArtifa
 		{ value: 'startsWith', label: formatMessage('dataGridCells.textCell.startsWith') },
 		{ value: 'endsWith', label: formatMessage('dataGridCells.textCell.endsWith') },
 	]
+
 	return (
 		<>
 			<Select
-				value={filter.mode}
+				required
 				options={options}
-				onChange={e => {
-					const value = e.currentTarget.value as TextFilterArtifacts['mode']
-
+				onChange={value => {
 					setFilter({
 						...filter,
-						mode: value,
+						mode: value as TextFilterArtifacts['mode'],
 					})
 				}}
+				placeholder={null}
+				value={filter.mode}
 			/>
 			<TextInput
 				value={filter.query}
 				placeholder={formatMessage('dataGridCells.textCell.queryPlaceholder')}
-				onChange={e => {
-					const value = e.currentTarget.value
+				onChange={useCallback((value?: string | null) => {
 					setFilter({
 						...filter,
 						query: value,
 					})
-				}}
+				}, [filter, setFilter])}
 			/>
 		</>
 	)

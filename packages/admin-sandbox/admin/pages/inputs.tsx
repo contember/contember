@@ -5,28 +5,36 @@ import {
 	DateField,
 	DateTimeField,
 	EditPage,
+	EmailField,
 	FloatField,
 	LocationField,
 	NumberField,
 	RadioField,
+	SearchField,
 	SelectField,
 	SlugField,
-	TextAreaField,
+	TextareaField,
 	TextField,
 	TimeField,
+	UrlField,
 } from '@contember/admin'
 
 
 export default () => (
 	<EditPage entity="InputShowcase(unique = One)" setOnCreate="(unique = One)">
 		<TextField field={'textValue'} label={'Text'} />
+		<TextField field={'notNullTextValue'} label={'Not null text'} />
+		<EmailField field={'emailValue'} label={'Your email'} />
+		<SearchField field={'searchValue'} label={'Search page'} />
+		<UrlField field={'urlValue'} label={'URL'} />
 		<SlugField derivedFrom={'textValue'} field={'slugValue'} label={'Slug with prefix'} unpersistedHardPrefix="https://www.contember.com/" linkToExternalUrl />
 		<SlugField derivedFrom={'textValue'} field={'slugValue'} label={'Slug without prefix'} />
-		<TextAreaField field={'multilineValue'} label={'Multiline text'} />
+		<TextareaField field={'multilineValue'} label={'Multiline text'} />
 		<CheckboxField field={'boolValue'} label={'Bool'} />
 		<NumberField field={'intValue'} label={'Int'} />
 		<FloatField field={'floatValue'} label={'Float value'} />
 		<TimeField field={'timeValue'} label={'Time'} />
+		<TimeField field={'timeValue'} label={'Time'} seconds />
 		<DateField field={'dateValue'} label={'Date'} />
 		<DateTimeField field={'dateTimeValue'} label={'Date time'} />
 		<DateTimeField field={'dateTimeValue'} label={'Date time'} min="2020-12-02T01:20" max="2022-01-20T23:13" />

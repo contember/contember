@@ -1,33 +1,34 @@
-import { SingleLineTextInputProps, TextInput } from '@contember/ui'
+import { ControlProps, FloatInput } from '@contember/ui'
 import { SimpleRelativeSingleField, SimpleRelativeSingleFieldProps } from '../auxiliary'
-import { useTextInput } from './useTextInput'
-import { useState } from 'react'
+import {
+	ControlValueParser,
+	FieldValueFormatter,
+	useFieldControl,
+} from './useFieldControl'
 
-export type FloatFieldProps = SimpleRelativeSingleFieldProps &
-	Omit<SingleLineTextInputProps, 'value' | 'onChange' | 'validationState' | 'allowNewlines'>
+export type FloatFieldProps =
+	& SimpleRelativeSingleFieldProps
+	& ControlProps<number>
+
+
+const parse: ControlValueParser<number, number> = value => value ??  null
+const format: FieldValueFormatter<number, number> = value => value ?? null
 
 export const FloatField = SimpleRelativeSingleField<FloatFieldProps, number>(
-	(fieldMetadata, { defaultValue, onBlur, ...props }) => {
-		const [innerValue, setInnerValue] = useState('')
-		const inputProps = useTextInput<number>({
+	(fieldMetadata, {
+		defaultValue,
+		name,
+		label,
+		...props
+	}) => {
+		const inputProps = useFieldControl<number, number>({
+			...props,
 			fieldMetadata,
-			onBlur,
-			parse: val => {
-				const normalizedValue = (val || '0')
-					.replaceAll(',', '.')
-					.replace(/([^0-9.]|\.(?=\d*\.))/g, '')
-					.replace(/^0*(?=\d)/, '')
-				setInnerValue(normalizedValue)
-				return parseFloat(normalizedValue)
-			},
-			format: value =>
-				innerValue && parseFloat(innerValue) === value
-					? innerValue
-					: typeof value === 'number'
-					? value.toString(10)
-					: '0',
+			parse,
+			format,
 		})
-		return <TextInput {...inputProps} {...props} />
+
+		return <FloatInput {...inputProps} />
 	},
 	'FloatField',
 )

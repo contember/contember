@@ -26,7 +26,7 @@ export const CreateNewEntityButton = memo(
 				// This looks silly but the event handler gets a different parameter than createNewEntity expects.
 				onClick={() => createNewEntity()}
 				disabled={isMutating}
-				isLoading={isMutating}
+				loading={isMutating}
 				className={`${prefix}new-entity-button`}
 				distinction="seamless"
 				justification="justifyStart"

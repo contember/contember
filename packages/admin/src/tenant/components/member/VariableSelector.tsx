@@ -1,8 +1,8 @@
+import { TextareaInput } from '@contember/ui'
 import { FC, useCallback } from 'react'
 import { RoleVariableDefinition } from '../../queries'
-import { RolesConfig } from './EditMembership'
-import { TextInput } from '@contember/ui'
 import { Membership } from '../../types'
+import { RolesConfig } from './EditMembership'
 
 interface VariableSelectorProps {
 	rolesConfig?: RolesConfig
@@ -13,15 +13,13 @@ interface VariableSelectorProps {
 
 const GenericVariableEdit = ({ value, onChange }: { value: string[]; onChange: (newValues: string[]) => void }) => {
 	return (
-		<TextInput
-			allowNewlines={true}
+		<TextareaInput
 			value={value.join('\n')}
-			onChange={e => {
-				onChange(
-					e.currentTarget.value
-						.split('\n')
-						.map(it => it.trim())
-						.filter(it => !!it),
+			onChange={value => {
+				onChange((value ?? '')
+					.split('\n')
+					.map(it => it.trim())
+					.filter(it => !!it),
 				)
 			}}
 		/>

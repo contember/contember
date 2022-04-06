@@ -1,6 +1,6 @@
 import { BindingError, Component } from '@contember/binding'
-import { FieldContainer, FieldContainerProps, FieldErrors, Select, SelectOption } from '@contember/ui'
-import { FunctionComponent, memo } from 'react'
+import { FieldContainer, FieldContainerProps, FieldErrors, flipValue, Select, SelectOption } from '@contember/ui'
+import { forwardRef, FunctionComponent, memo, RefAttributes } from 'react'
 import {
 	ChoiceField,
 	ChoiceFieldData,
@@ -46,41 +46,43 @@ export const NativeSelectField: FunctionComponent<NativeSelectFieldProps> = Comp
 
 export interface NativeSelectFieldInnerPublicProps extends Omit<FieldContainerProps, 'children'> {
 	placeholder?: string
+	/**
+	 * @deprecated Use `notNull` prop instead
+	 */
 	allowNull?: boolean
+	notNull?: boolean
 }
 
-export interface NativeSelectFieldInnerProps extends ChoiceFieldData.SingleChoiceFieldMetadata, NativeSelectFieldInnerPublicProps {
+export interface NativeSelectFieldInnerProps extends ChoiceFieldData.SingleChoiceFieldMetadata, NativeSelectFieldInnerPublicProps, RefAttributes<HTMLSelectElement> {
 	errors: FieldErrors | undefined
 }
 
-export const NativeSelectFieldInner = memo((props: NativeSelectFieldInnerProps) => {
-	const options = Array<SelectOption>({
-		disabled: props.allowNull !== true,
-		value: -1,
-		label: props.placeholder || (typeof props.label === 'string' ? props.label : ''),
-	}).concat(
-		props.data.map(({ key, label }) => {
-			if (typeof label !== 'string') {
-				throw new BindingError(`The labels of <SelectField /> items must be strings!`)
-			}
-			return {
-				disabled: false,
-				value: key,
-				label: label,
-			}
-		}),
-	)
+export const NativeSelectFieldInner = memo(forwardRef<HTMLSelectElement, NativeSelectFieldInnerProps>((props, ref) => {
+	const options: SelectOption<number>[] = props.data.map(({ key, label }) => {
+		if (typeof label !== 'string') {
+			throw new BindingError(`The labels of <SelectField /> items must be strings!`)
+		}
+		return {
+			disabled: false,
+			value: key,
+			label: label,
+		}
+	})
 
 	return (
 		<FieldContainer {...props} label={props.environment.applySystemMiddleware('labelMiddleware', props.label)}>
 			<Select
-				value={props.currentValue.toString()}
-				onChange={event => {
-					props.onChange(parseInt(event.currentTarget.value, 10))
+				ref={ref}
+				required={props.required}
+				notNull={props.notNull ?? flipValue(props.allowNull)}
+				value={props.currentValue}
+				placeholder={props.placeholder}
+				onChange={(value?: number | null) => {
+					props.onChange(value ?? -1)
 				}}
 				options={options}
-				disabled={props.isMutating}
+				loading={props.isMutating}
 			/>
 		</FieldContainer>
 	)
-})
+}))

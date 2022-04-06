@@ -1,0 +1,36 @@
+{
+	"formatVersion": 3,
+	"modifications": [
+		{
+			"modification": "createColumn",
+			"entityName": "InputShowcase",
+			"field": {
+				"name": "urlValue",
+				"columnName": "url_value",
+				"nullable": true,
+				"type": "String",
+				"columnType": "text"
+			}
+		},
+		{
+			"modification": "patchAclSchema",
+			"patch": [
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/InputShowcase/operations/create/urlValue",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/InputShowcase/operations/update/urlValue",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/InputShowcase/operations/read/urlValue",
+					"value": true
+				}
+			]
+		}
+	]
+}

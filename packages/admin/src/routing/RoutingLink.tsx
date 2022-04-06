@@ -8,17 +8,17 @@ import {
 	ReactNode,
 	useCallback,
 } from 'react'
-import { useRoutingLink } from './useRoutingLink'
 import { RequestParameters, RoutingLinkTarget, RoutingParameterResolver } from './types'
+import { useRoutingLink } from './useRoutingLink'
 
 
-const defaultComponent: FunctionComponent<InnerRoutingLinkProps> = ({ isActive, ...props }) => (
+const defaultComponent: FunctionComponent<InnerRoutingLinkProps> = ({ active, ...props }) => (
 	// TODO do something with isActive?
 	<a {...props} />
 )
 
 export const RoutingLink = memo<RoutingLinkProps & PublicAnchorProps>(({ onClick, to, parametersResolver, parameters, Component, ...props }) => {
-	const { navigate, isActive, href } = useRoutingLink(to, parametersResolver, parameters)
+	const { navigate, isActive: active, href } = useRoutingLink(to, parametersResolver, parameters)
 
 	const innerOnClick = useCallback((e?: ReactMouseEvent<HTMLAnchorElement, MouseEvent>) => {
 		if (e) {
@@ -33,7 +33,7 @@ export const RoutingLink = memo<RoutingLinkProps & PublicAnchorProps>(({ onClick
 	}, [navigate, onClick])
 
 	const InnerComponent = Component ?? defaultComponent
-	return <InnerComponent isActive={isActive} href={href} {...props} onClick={innerOnClick} />
+	return <InnerComponent active={active} href={href} {...props} onClick={innerOnClick} />
 })
 RoutingLink.displayName = 'RoutingLink'
 
@@ -42,7 +42,7 @@ export type PublicAnchorProps = Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'h
 
 export interface InnerRoutingLinkProps extends Omit<PublicAnchorProps, 'onClick'> {
 	href: string
-	isActive: boolean
+	active: boolean
 	onClick: (e?: ReactMouseEvent<HTMLAnchorElement>) => void
 }
 

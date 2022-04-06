@@ -1,4 +1,4 @@
-import { Box, Checkbox, Dropdown, Icon } from '@contember/ui'
+import { Box, Checkbox, Dropdown, FieldContainer, Icon } from '@contember/ui'
 import { Fragment, ReactElement } from 'react'
 import type { MessageFormatter } from '../../../../../i18n'
 import type { DataGridDictionary } from './dataGridDictionary'
@@ -37,13 +37,16 @@ export function DataGridColumnHiding({
 							return <Fragment key={key} />
 						}
 						return (
-							<Checkbox
-								key={key}
-								value={!desiredState.hiddenColumns[key]}
-								onChange={isChecked => setIsColumnHidden(key, !isChecked)}
+							<FieldContainer
+								label={column.header}
+								labelPosition="labelInlineRight"
 							>
-								{column.header}
-							</Checkbox>
+								<Checkbox
+									key={key}
+									value={!desiredState.hiddenColumns[key]}
+									onChange={isChecked => setIsColumnHidden(key, !isChecked)}
+								/>
+							</FieldContainer>
 						)
 					})}
 				</div>

@@ -1,3 +1,7 @@
+// Uncomment to see what caused re-renders
+// Note: Does not work with pages containing content editor
+// import './wdyr' // THIS MUST BE THE FIRST IMPORT!
+
 import { ApplicationEntrypoint, Pages, runReactApp } from '@contember/admin'
 import { Layout } from './components/Layout'
 import './index.sass'

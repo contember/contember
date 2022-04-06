@@ -10,7 +10,8 @@
 		"start": "vite --config vite.config.ts --port ${VITE_PORT:-3000} --host 0.0.0.0"
 	},
 	"devDependencies": {
-		"@contember/admin": "workspace:*"
+		"@contember/admin": "workspace:*",
+		"@welldone-software/why-did-you-render": "^6.2.3"
 	},
 	"dependencies": {
 		"@contember/schema": "^1.0.0-rc.2",

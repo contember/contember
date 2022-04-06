@@ -1,7 +1,7 @@
 import classNames from 'classnames'
-import { VisuallyDependententControlProps } from '.'
 import { toEnumClass, toEnumStateClass, toEnumViewClass, toStateClass, toThemeClass } from '../../utils'
 import { AllVisuallyDependententControlProps } from './Types'
+import { VisuallyDependententControlProps } from './Types/ControlProps'
 
 /**
  * Generates className prop from the set of props

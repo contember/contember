@@ -1,12 +1,13 @@
 import classNames from 'classnames'
 import { ChangeEvent, forwardRef, memo, Ref, useCallback, useEffect, useRef, useState } from 'react'
-import { useNativeInput, VisuallyDependententControlProps } from '..'
 import { useComponentClassName } from '../../../auxiliary'
 import { toViewClass } from '../../../utils'
 import { Divider } from '../../Divider'
 import { Stack } from '../../Stack'
 import { assertDatetimeString, splitDatetime } from '../Types'
+import { VisuallyDependententControlProps } from '../Types/ControlProps'
 import { useInputClassName } from '../useInputClassName'
+import { useNativeInput } from '../useNativeInput'
 import { DateTimeInputProps } from './Types'
 
 function joinDatetime(date?: string | null, time?: string | null) {

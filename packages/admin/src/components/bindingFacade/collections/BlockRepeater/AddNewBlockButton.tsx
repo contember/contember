@@ -1,8 +1,8 @@
 import { Dropdown, DropdownProps, FieldContainer, Icon } from '@contember/ui'
 import { memo, useMemo } from 'react'
-import { blockRepeaterDictionary } from '.'
 import { useMessageFormatter } from '../../../../i18n'
 import { AddNewBlockButtonInner, AddNewBlockButtonInnerProps } from './AddNewBlockButtonInner'
+import { blockRepeaterDictionary } from './Dictionary'
 
 export interface AddNewBlockButtonProps extends Omit<AddNewBlockButtonInnerProps, 'requestClose'> {}
 

@@ -1,11 +1,10 @@
 import classNames from 'classnames'
 import { AllHTMLAttributes, DetailedHTMLProps, forwardRef, InputHTMLAttributes, memo, useCallback } from 'react'
 import { mergeProps, useFocusRing, useHover } from 'react-aria'
-import { fromBooleanValue, toBooleanValue } from '..'
 import { useComponentClassName } from '../../../auxiliary'
 import { toStateClass } from '../../../utils'
 import { ControlProps, ControlPropsKeys } from '../Types'
-import { useNativeInput } from '../useNativeInput'
+import { fromBooleanValue, toBooleanValue, useNativeInput } from '../useNativeInput'
 import { CheckboxButton as DefaultCheckboxButton } from './CheckboxButton'
 
 export interface RestHTMLCheckboxProps extends Omit<AllHTMLAttributes<HTMLInputElement>, ControlPropsKeys<boolean> | 'checked' | 'children'> {}

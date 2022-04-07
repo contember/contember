@@ -1,16 +1,7 @@
 import * as schema from './utils/schema'
 
-export const baseLoginConfigSchema = schema.object({
-	apiBaseUrl: schema.string,
-	loginToken: schema.string,
-	projects: schema.array(
-		schema.string,
-	),
-})
-
-export type BaseLoginConfig = ReturnType<typeof baseLoginConfigSchema>
-
-export const customLoginConfigSchema = schema.partial({
+export type CustomLoginConfig = ReturnType<typeof customLoginConfig>
+export const customLoginConfig = schema.partial({
 	heading: schema.string,
 	collapsedEmailLogin: schema.boolean,
 	identityProviders: schema.array(
@@ -25,16 +16,11 @@ export const customLoginConfigSchema = schema.partial({
 	),
 })
 
-export type CustomLoginConfig = ReturnType<typeof customLoginConfigSchema>
 
-export const loginConfigSchema = schema.intersection(baseLoginConfigSchema, customLoginConfigSchema)
-export type LoginConfig = ReturnType<typeof loginConfigSchema>
-
-
+export type CustomConfig = ReturnType<typeof customConfig>
 export const customConfig = schema.partial({
-	login: customLoginConfigSchema,
+	login: customLoginConfig,
 	projects: schema.record(schema.string, schema.partial({
 		allowedRoles: schema.array(schema.string),
 	})),
 })
-export type CustomConfig = ReturnType<typeof customConfig>

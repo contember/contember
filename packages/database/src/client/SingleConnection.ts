@@ -5,6 +5,7 @@ import { Transaction } from './Transaction'
 import { executeQuery } from './execution'
 import { Connection } from './Connection'
 import { DatabaseCredentials } from '../types'
+import { ClientError } from './errors'
 
 export class SingleConnection implements Connection.ConnectionLike, Connection.ClientFactory {
 	private readonly pgClient: PgClient
@@ -31,10 +32,7 @@ export class SingleConnection implements Connection.ConnectionLike, Connection.C
 		callback: (connection: Connection.TransactionLike) => Promise<Result> | Result,
 		options: { eventManager?: EventManager } = {},
 	): Promise<Result> {
-		if (!this.isConnected) {
-			await this.pgClient.connect()
-			this.isConnected = true
-		}
+		await this.maybeConnect()
 		const eventManager = new EventManager(options.eventManager ?? this.eventManager)
 		await executeQuery(
 			this.pgClient,
@@ -68,15 +66,23 @@ export class SingleConnection implements Connection.ConnectionLike, Connection.C
 		meta: Record<string, any> = {},
 		config: Connection.QueryConfig = {},
 	): Promise<Connection.Result<Row>> {
-		if (!this.isConnected) {
-			await this.pgClient.connect()
-			this.isConnected = true
-		}
+		await this.maybeConnect()
 		const query: Connection.Query = { sql, parameters, meta, ...this.queryConfig, ...config }
 		try {
 			return await executeQuery<Row>(this.pgClient, config.eventManager ?? this.eventManager, query, {})
 		} catch (e) {
 			throw e
+		}
+	}
+
+	private async maybeConnect() {
+		if (!this.isConnected) {
+			try {
+				await this.pgClient.connect()
+			} catch (e) {
+				throw new ClientError(e)
+			}
+			this.isConnected = true
 		}
 	}
 }

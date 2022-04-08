@@ -45,13 +45,15 @@ export class ProjectGroupContainerFactory {
 				slug)
 			.addService('providers', () =>
 				this.providers)
-			.addService('tenantConnection', (): Connection.ConnectionType =>
-				new Connection(config.db, {}))
+			.addService('tenantDbCredentials', () =>
+				config.db)
+			.addService('tenantConnection', ({ tenantDbCredentials }): Connection.ConnectionType =>
+				Connection.create(tenantDbCredentials, {}))
 			.addService('projectSchemaResolver', () =>
 				new ProjectSchemaResolverProxy())
 			.addService('projectInitializer', () =>
 				new ProjectInitializerProxy())
-			.addService('tenantContainer', ({ tenantConnection, projectSchemaResolver, projectInitializer }) => {
+			.addService('tenantContainer', ({ tenantConnection, tenantDbCredentials, projectSchemaResolver, projectInitializer }) => {
 				const encryptionKey = config.secrets.encryptionKey
 					? createSecretKey(Buffer.from(config.secrets.encryptionKey, 'hex'))
 					: undefined
@@ -59,6 +61,7 @@ export class ProjectGroupContainerFactory {
 				const cryptoWrapper = new CryptoWrapper(encryptionKey)
 				return this.tenantContainerFactory.create({
 					connection: tenantConnection,
+					dbCredentials: tenantDbCredentials,
 					mailOptions: config.mailer,
 					tenantCredentials: config.credentials,
 					projectInitializer,

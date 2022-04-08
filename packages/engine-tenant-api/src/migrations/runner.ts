@@ -1,4 +1,4 @@
-import { createDatabaseIfNotExists, DatabaseCredentials, SingleConnection } from '@contember/database'
+import { Connection, createDatabaseIfNotExists, DatabaseCredentials, SingleConnection } from '@contember/database'
 import { TenantMigrationArgs } from './types'
 import { loadMigrations, Migration, MigrationsRunner as DbMigrationsRunner } from '@contember/database-migrations'
 import tenantCredentials from './2020-06-08-134000-tenant-credentials'

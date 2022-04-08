@@ -18,6 +18,7 @@ import { executeGraphQlTest } from './testGraphql'
 import { createConnectionMock, ExpectedQuery } from '@contember/database-tester'
 import { Acl, Schema } from '@contember/schema'
 import { createMockedMailer, ExpectedMessage } from './mailer'
+import { dbCredentials } from './dbUtils'
 
 export interface Test {
 	query: GraphQLTestQuery
@@ -83,6 +84,7 @@ export const executeTenantTest = async (test: Test) => {
 	const tenantContainer = new TenantContainerFactory(providers)
 		.createBuilder({
 			mailOptions: {},
+			dbCredentials: dbCredentials('xx'),
 			tenantCredentials: {},
 			projectInitializer,
 			projectSchemaResolver,

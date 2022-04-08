@@ -17,4 +17,5 @@ export {
 	ConstraintHelper,
 	withDatabaseAdvisoryLock,
 	createDatabaseIfNotExists,
+	createPgClientFactory,
 } from './utils'

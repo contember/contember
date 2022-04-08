@@ -1,5 +1,5 @@
 import { AccessEvaluator, Authorizator } from '@contember/authorization'
-import { Connection } from '@contember/database'
+import { Connection, DatabaseCredentials } from '@contember/database'
 import { Builder } from '@contember/dic'
 import {
 	AclSchemaEvaluatorFactory,
@@ -86,6 +86,7 @@ export interface TenantContainer {
 
 export interface TenantContainerArgs {
 	connection: Connection.ConnectionType
+	dbCredentials: DatabaseCredentials
 	mailOptions: MailerOptions
 	projectSchemaResolver: ProjectSchemaResolver
 	projectInitializer: ProjectInitializer
@@ -243,6 +244,6 @@ export class TenantContainerFactory {
 			.addService('identityFetcher', ({ databaseContext }) =>
 				new IdentityFetcher(databaseContext.client))
 			.addService('migrationsRunner', ({ providers }) =>
-				new TenantMigrationsRunner(args.connection.config, 'tenant', args.tenantCredentials, providers))
+				new TenantMigrationsRunner(args.dbCredentials, 'tenant', args.tenantCredentials, providers))
 	}
 }

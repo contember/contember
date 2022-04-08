@@ -3,13 +3,15 @@ export class DatabaseError extends Error {
 	public readonly originalMessage?: string
 	public readonly previous: any
 
-	constructor(errMessage: string, previous: Error | any) {
+	constructor(errMessage: string, previous?: Error | any) {
 		super(errMessage)
-		const { message, stack, ...other } = previous
-		const otherDefined = Object.fromEntries(Object.entries(other).filter(it => it[1] !== undefined))
-		this.previous = { message, ...otherDefined }
-		this.code = previous.code
-		this.originalMessage = previous.message
+		if (previous) {
+			const { message, stack, ...other } = previous
+			const otherDefined = Object.fromEntries(Object.entries(other).filter(it => it[1] !== undefined))
+			this.previous = { message, ...otherDefined }
+			this.code = previous.code
+			this.originalMessage = previous.message
+		}
 	}
 }
 
@@ -46,3 +48,5 @@ export class SerializationFailureError extends QueryError {}
 export class InvalidDataError extends QueryError {}
 
 export class TransactionAbortedError extends QueryError {}
+
+

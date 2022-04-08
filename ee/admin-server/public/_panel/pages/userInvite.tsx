@@ -1,8 +1,11 @@
-import { InviteUser, LayoutPage, NavigateBackButton, useCurrentRequest } from '@contember/admin'
+import { InviteMethod, InviteUser, LayoutPage, NavigateBackButton, useCurrentRequest, useEnvironment } from '@contember/admin'
 
 export default () => {
 	const request = useCurrentRequest()!
 	const project = request.parameters.project!
+
+	const env = useEnvironment()
+	const inviteMethod = env.getValueOrElse('inviteMethod', undefined) as InviteMethod | undefined
 
 	return (
 		<LayoutPage
@@ -12,6 +15,7 @@ export default () => {
 			<InviteUser
 				project={project}
 				userListLink={{ pageName: 'projectOverview', parameters: { project } }}
+				method={inviteMethod}
 			/>
 		</LayoutPage>
 	)

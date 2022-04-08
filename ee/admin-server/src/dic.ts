@@ -120,8 +120,8 @@ export default new Builder({})
 		return new LegacyController()
 	})
 
-	.addService('panelController', ({ staticFileHandler }) => {
-		return new PanelController(staticFileHandler)
+	.addService('panelController', ({ env, staticFileHandler }) => {
+		return new PanelController(staticFileHandler, env.CONTEMBER_INVITE_METHOD)
 	})
 
 	.addService('collaborationController', ({ collaborationStorage, projectGroupResolver, tenant }) => {

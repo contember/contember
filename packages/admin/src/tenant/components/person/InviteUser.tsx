@@ -3,7 +3,7 @@ import { Button, FieldContainer, LayoutPage, Spacer, Stack, TextInput } from '@c
 import { FC, memo, SyntheticEvent, useCallback, useRef, useState } from 'react'
 import { useShowToast } from '../../../components'
 import { NavigateBackButton, RoutingLinkTarget, useRedirect } from '../../../routing'
-import { useInvite } from '../../mutations'
+import { InviteMethod, useInvite } from '../../mutations'
 import { Membership } from '../../types'
 import { EditMembership, RolesConfig } from '../member'
 
@@ -11,9 +11,10 @@ interface InviteUserProps {
 	project: string
 	rolesConfig?: RolesConfig
 	userListLink: RoutingLinkTarget
+	method?: InviteMethod
 }
 
-export const InviteUser: FC<InviteUserProps> = ({ project, rolesConfig, userListLink }) => {
+export const InviteUser: FC<InviteUserProps> = ({ project, rolesConfig, userListLink, method }) => {
 	const [email, setEmailInner] = useState('')
 	const redirect = useRedirect()
 	const addToast = useShowToast()
@@ -36,7 +37,7 @@ export const InviteUser: FC<InviteUserProps> = ({ project, rolesConfig, userList
 			if (!email.match(/^.+@.+$/)) {
 				return setEmailNotValidError(true)
 			}
-			const inviteResult = await invite({ email, memberships: membershipsToSave, projectSlug: project })
+			const inviteResult = await invite({ email, memberships: membershipsToSave, projectSlug: project, method })
 			setSubmitting(false)
 			if (inviteResult.ok) {
 				addToast({
@@ -56,7 +57,7 @@ export const InviteUser: FC<InviteUserProps> = ({ project, rolesConfig, userList
 				}
 			}
 		},
-		[memberships, email, invite, project, redirect, userListLink, addToast],
+		[memberships, email, invite, project, method, redirect, userListLink, addToast],
 	)
 
 	const editUserMembershipProps = { project, rolesConfig, memberships, setMemberships }

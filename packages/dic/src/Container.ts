@@ -90,9 +90,8 @@ export class ContainerImpl<M extends ServiceTypeMap> {
 	}
 
 	get<N extends keyof M>(name: N): M[N] {
-		const existingService: M[N] | undefined = this.services.get(name)
-		if (existingService !== undefined) {
-			return existingService
+		if (this.services.has(name)) {
+			return this.services.get(name) as M[N]
 		}
 		const definition = this.definitions[name]
 		this.definitions[name] = { setup: [], factory: () => {

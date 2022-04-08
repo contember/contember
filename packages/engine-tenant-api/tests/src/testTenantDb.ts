@@ -122,10 +122,11 @@ export const createTenantTester = async (): Promise<TenantTester> => {
 	const projectInitializer = {
 		initializeProject: () => Promise.resolve(),
 	}
-	const connection = new Connection(credentials, {})
+	const connection = Connection.create(credentials, {})
 	const tenantContainer = new TenantContainerFactory(providers)
 		.createBuilder({
 			mailOptions: {},
+			dbCredentials: credentials,
 			tenantCredentials: {},
 			projectSchemaResolver,
 			projectInitializer,

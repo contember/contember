@@ -11,14 +11,7 @@ export const dbCredentials = (dbName: string) => {
 }
 
 export const createConnection = (dbName: string): Connection => {
-	return new Connection(
-		{
-			...dbCredentials(dbName),
-			max: 1,
-			min: 1,
-		},
-		{},
-	)
+	return Connection.create(dbCredentials(dbName), { max: 1 })
 }
 
 export const recreateDatabase = async (dbName: string): Promise<Connection> => {

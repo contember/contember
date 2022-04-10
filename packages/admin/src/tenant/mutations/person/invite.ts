@@ -5,7 +5,8 @@ const INVITE_MUTATION = `
 	invite(
 		email: $email,
 		projectSlug: $projectSlug,
-		memberships: $memberships
+		memberships: $memberships,
+		options: { method: $method },
 	) {
 		ok
 		errors {
@@ -14,10 +15,13 @@ const INVITE_MUTATION = `
 	}
 `
 
+export type InviteMethod = 'CREATE_PASSWORD' | 'RESET_PASSWORD'
+
 const inviteVariables = {
 	projectSlug: GQLVariable.Required(GQLVariable.String),
 	email: GQLVariable.Required(GQLVariable.String),
 	memberships: GQLVariable.Required(GQLVariable.List(MembershipInput)),
+	method: GQLVariable.Enum<InviteMethod>('InviteMethod'),
 }
 
 type InviteErrorCodes =
@@ -25,4 +29,9 @@ type InviteErrorCodes =
 	| 'ALREADY_MEMBER'
 	| 'INVALID_MEMBERSHIP'
 
-export const useInvite = () => useSingleTenantMutation<never, InviteErrorCodes, typeof inviteVariables>(INVITE_MUTATION, inviteVariables)
+export const useInvite = () => {
+	return useSingleTenantMutation<never, InviteErrorCodes, typeof inviteVariables>(
+		INVITE_MUTATION,
+		inviteVariables,
+	)
+}

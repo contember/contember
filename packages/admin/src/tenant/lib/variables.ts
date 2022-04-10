@@ -9,12 +9,19 @@ export namespace GQLVariable {
 	export const Json: GQLVariableType<JsonValue<undefined>, false> = { graphQlType: 'Json', required: false }
 	export const String: GQLVariableType<string, false> = { graphQlType: 'String', required: false }
 	export const Int: GQLVariableType<number, false> = { graphQlType: 'Int', required: false }
+
 	export const Required = <V extends any>(type: GQLVariableType<V, boolean>): GQLVariableType<V, true> => ({
 		graphQlType: type.graphQlType + '!',
 		required: true,
 	})
+
 	export const List = <V extends any>(type: GQLVariableType<V, false>): GQLVariableType<V[], false> => ({
 		graphQlType: `[${type.graphQlType}!]`,
+		required: false,
+	})
+
+	export const Enum = <V extends string>(name: string): GQLVariableType<V, false> => ({
+		graphQlType: name,
 		required: false,
 	})
 }

@@ -1,8 +1,11 @@
 import { Client, Connection } from '@contember/database'
 import { Providers } from '../providers'
 import { CommandBus } from '../commands'
+import { BatchLoaderArgs, initBatchLoader, ItemLoader } from '../../utils/batchQuery'
 
 export class DatabaseContext<Conn extends Connection.ConnectionLike = Connection.ConnectionLike> {
+	private loaders = new Map<BatchLoaderArgs<any, any, any>, ItemLoader<any, any>>()
+
 	constructor(
 		public readonly client: Client<Conn>,
 		public readonly providers: Providers,
@@ -22,6 +25,16 @@ export class DatabaseContext<Conn extends Connection.ConnectionLike = Connection
 			await db.query(Connection.REPEATABLE_READ)
 			return await cb(new DatabaseContext(db, this.providers))
 		})
+	}
+
+	public batchLoad<Arg, Result, Item>(loaderArgs: BatchLoaderArgs<Arg, Result, Item>, arg: Arg): Promise<Item> {
+		const existing = this.loaders.get(loaderArgs)
+		if (existing) {
+			return existing(arg)
+		}
+		const newLoader = initBatchLoader(loaderArgs, this)
+		this.loaders.set(loaderArgs, newLoader)
+		return newLoader(arg)
 	}
 }
 

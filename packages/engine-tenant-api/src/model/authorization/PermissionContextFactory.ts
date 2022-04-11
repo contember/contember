@@ -13,7 +13,7 @@ export class PermissionContextFactory {
 		private readonly schemaResolver: ProjectSchemaResolver,
 	) {}
 
-	public create(db: DatabaseContext, args: { id: string; roles: string[] }): PermissionContext {
+	public create(db: DatabaseContext, args: { id: string; roles: readonly string[] }): PermissionContext {
 		const identity = this.identityFactory.create(db, args)
 		return new PermissionContext(identity, this.authorizator, this.projectScopeFactory, this.schemaResolver)
 	}

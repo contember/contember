@@ -1,6 +1,15 @@
-import { Identity, IdentityProjectRelation, IdentityResolvers, Maybe, Person } from '../../schema'
 import {
+	Identity,
+	IdentityGlobalPermissions,
+	IdentityProjectRelation,
+	IdentityResolvers,
+	Maybe,
+	Person,
+} from '../../schema'
+import {
+	IdentityQuery,
 	PermissionActions,
+	PermissionContextFactory,
 	PersonByIdentityBatchQuery,
 	PersonRow,
 	ProjectManager,
@@ -18,11 +27,20 @@ export class IdentityTypeResolver implements IdentityResolvers {
 		},
 		(id, result) => result[id],
 	)
+	private rolesLoader = batchLoader<string, Record<string, string[]>, string[]>(
+		async (ids, db) => {
+			const identities = await db.queryHandler.fetch(new IdentityQuery(ids))
+			return Object.fromEntries(identities.map(it => [it.id, it.roles]))
+		},
+		(id, result) => result[id] ?? [],
+	)
 
 	constructor(
 		private readonly projectMemberManager: ProjectMemberManager,
 		private readonly projectManager: ProjectManager,
-	) {}
+		private readonly permissionContextFactory: PermissionContextFactory,
+	) {
+	}
 
 	async person(parent: Identity, args: unknown, context: TenantResolverContext): Promise<Maybe<Person>> {
 		const person = await context.db.batchLoad(this.personLoader, parent.id)
@@ -71,4 +89,53 @@ export class IdentityTypeResolver implements IdentityResolvers {
 			)
 		).filter(notEmpty)
 	}
+
+	async roles(
+		parent: { id: string; roles?: readonly string[] | undefined | null },
+		{}: any,
+		context: TenantResolverContext,
+	): Promise<readonly string[] | null> {
+		if (parent.roles) {
+			return parent.roles
+		}
+		const isSelf = parent.id === context.identity.id
+		if (isSelf) {
+			return context.identity.roles
+		}
+		const canViewRoles = await context.permissionContext.isAllowed({ action: PermissionActions.IDENTITY_VIEW_PERMISSIONS })
+		if (canViewRoles) {
+			return await context.db.batchLoad(this.rolesLoader, parent.id)
+		} else {
+			return null
+		}
+	}
+
+	async permissions(
+		parent: { id: string; permissions?: IdentityGlobalPermissions | undefined | null; roles?: readonly string[] | undefined | null },
+		{}: any,
+		context: TenantResolverContext,
+	): Promise<IdentityGlobalPermissions | null> {
+		if (parent.permissions) {
+			return parent.permissions
+		}
+		const permissionsContext = await (async () => {
+			const isSelf = parent.id === context.identity.id
+			if (isSelf) {
+				return context.permissionContext
+			}
+			const roles = await this.roles(parent, {}, context)
+			if (roles === null) {
+				return null
+			}
+			return this.permissionContextFactory.create(context.db, { id: parent.id, roles })
+		})()
+		if (!permissionsContext) {
+			return null
+		}
+		return {
+			canCreateProject: await permissionsContext.isAllowed({ action: PermissionActions.PROJECT_CREATE }),
+		}
+	}
+
+
 }

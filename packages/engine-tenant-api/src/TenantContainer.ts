@@ -176,8 +176,8 @@ export class TenantContainerFactory {
 			.addService('mailTemplateManager', () =>
 				new MailTemplateManager())
 
-			.addService('identityTypeResolver', ({ projectMemberManager, projectManager }) =>
-				new IdentityTypeResolver(projectMemberManager, projectManager))
+			.addService('identityTypeResolver', ({ projectMemberManager, projectManager, permissionContextFactory }) =>
+				new IdentityTypeResolver(projectMemberManager, projectManager, permissionContextFactory))
 			.addService('projectTypeResolver', ({ projectMemberManager, projectSchemaResolver }) =>
 				new ProjectTypeResolver(projectMemberManager, projectSchemaResolver))
 			.addService('signInResponseFactory', ({ permissionContextFactory, identityTypeResolver }) =>

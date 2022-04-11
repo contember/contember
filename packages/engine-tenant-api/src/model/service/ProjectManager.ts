@@ -26,8 +26,8 @@ export class ProjectManager {
 	public async createProject(
 		dbContext: DatabaseContext,
 		project: Pick<ProjectWithSecrets, 'name' | 'slug' | 'config' | 'secrets'>,
-		ownerIdentityId: string | undefined,
 		options: {
+			ownerIdentityId?: string
 			deployTokenHash?: TokenHash
 			noDeployToken?: boolean
 		},
@@ -43,14 +43,13 @@ export class ProjectManager {
 			for (const [key, value] of Object.entries(project.secrets)) {
 				await bus.execute(new SetProjectSecretCommand(projectId, key, Buffer.from(value)))
 			}
-			if (ownerIdentityId) {
-				const addMemberResult = await db.commandBus.execute(
-					new AddProjectMemberCommand(projectId, ownerIdentityId, createSetMembershipVariables([{ role: ProjectRole.ADMIN, variables: [] }])),
-				)
+			if (options.ownerIdentityId) {
+				const memberships = createSetMembershipVariables([{ role: ProjectRole.ADMIN, variables: [] }])
+				const addProjectMemberCommand = new AddProjectMemberCommand(projectId, options.ownerIdentityId, memberships)
+				const addMemberResult = await db.commandBus.execute(addProjectMemberCommand)
 				if (!addMemberResult.ok) {
 					throw new ImplementationException()
 				}
-
 			}
 
 			const deployMembership = [{ role: ProjectRole.DEPLOYER, variables: [] }]

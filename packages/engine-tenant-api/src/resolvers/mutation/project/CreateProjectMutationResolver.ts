@@ -5,7 +5,7 @@ import {
 	MutationResolvers,
 } from '../../../schema'
 import { TenantResolverContext } from '../../TenantResolverContext'
-import { isTokenHash, PermissionActions, ProjectManager } from '../../../model'
+import { isTokenHash, PermissionActions, ProjectManager, TenantRole } from '../../../model'
 import { createErrorResponse } from '../../errorUtils'
 import { UserInputError } from '@contember/graphql-utils'
 
@@ -32,6 +32,9 @@ export class CreateProjectMutationResolver implements MutationResolvers {
 		if (typeof deployTokenHash === 'string' && !isTokenHash(deployTokenHash)) {
 			throw new UserInputError('Invalid format of deployTokenHash. Must be hex-encoded sha256.')
 		}
+
+		const isSuperAdmin = await context.identity.roles.includes(TenantRole.SUPER_ADMIN)
+
 		const response = await this.projectManager.createProject(
 			context.db,
 			{
@@ -40,8 +43,11 @@ export class CreateProjectMutationResolver implements MutationResolvers {
 				config: config || {},
 				secrets: Object.fromEntries((secrets || []).map(it => [it.key, it.value])),
 			},
-			context.identity.id,
-			{ deployTokenHash, noDeployToken: options?.noDeployToken ?? false },
+			{
+				ownerIdentityId: isSuperAdmin ? undefined : context.identity.id,
+				deployTokenHash,
+				noDeployToken: options?.noDeployToken ?? false,
+			},
 		)
 		if (!response.ok) {
 			return createErrorResponse(response.error, response.errorMessage)

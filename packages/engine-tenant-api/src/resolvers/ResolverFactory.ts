@@ -64,6 +64,8 @@ class ResolverFactory {
 			Identity: {
 				projects: this.resolvers.identityTypeResolver.projects.bind(this.resolvers.identityTypeResolver),
 				person: this.resolvers.identityTypeResolver.person.bind(this.resolvers.identityTypeResolver),
+				roles: this.resolvers.identityTypeResolver.roles.bind(this.resolvers.identityTypeResolver),
+				permissions: this.resolvers.identityTypeResolver.permissions.bind(this.resolvers.identityTypeResolver),
 			},
 			Project: {
 				members: this.resolvers.projectTypeResolver.members.bind(this.resolvers.projectTypeResolver),

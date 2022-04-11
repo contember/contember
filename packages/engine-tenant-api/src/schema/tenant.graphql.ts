@@ -456,6 +456,12 @@ const schema: DocumentNode = gql`
 		person: Person
 		apiKey: ApiKey
 		projects: [IdentityProjectRelation!]!
+		permissions: IdentityGlobalPermissions
+		roles: [String!]
+	}
+
+	type IdentityGlobalPermissions {
+		canCreateProject: Boolean!
 	}
 
 	type IdentityProjectRelation {

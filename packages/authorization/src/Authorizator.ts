@@ -43,7 +43,7 @@ namespace Authorizator {
 	}
 
 	export interface Identity {
-		roles: string[]
+		roles: readonly string[]
 	}
 }
 

@@ -72,7 +72,7 @@ namespace AccessNode {
 	}
 
 	export class Roles implements AccessNode {
-		constructor(public readonly roles: string[]) {}
+		constructor(public readonly roles: readonly string[]) {}
 
 		isAllowed(accessEvaluator: AccessEvaluator, action: Authorizator.Action): Promise<boolean> {
 			return accessEvaluator.evaluate(this, action)

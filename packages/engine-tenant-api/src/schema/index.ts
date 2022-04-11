@@ -277,6 +277,13 @@ export type Identity = {
 	readonly person?: Maybe<Person>
 	readonly apiKey?: Maybe<ApiKey>
 	readonly projects: ReadonlyArray<IdentityProjectRelation>
+	readonly permissions?: Maybe<IdentityGlobalPermissions>
+	readonly roles?: Maybe<ReadonlyArray<Scalars['String']>>
+}
+
+export type IdentityGlobalPermissions = {
+	readonly __typename?: 'IdentityGlobalPermissions'
+	readonly canCreateProject: Scalars['Boolean']
 }
 
 export type IdentityProjectRelation = {
@@ -1050,6 +1057,7 @@ export type ResolversTypes = {
 	DisableOtpResponse: ResolverTypeWrapper<DisableOtpResponse>
 	IDPResponseInput: IdpResponseInput
 	Identity: ResolverTypeWrapper<Identity>
+	IdentityGlobalPermissions: ResolverTypeWrapper<IdentityGlobalPermissions>
 	IdentityProjectRelation: ResolverTypeWrapper<IdentityProjectRelation>
 	InitSignInIDPError: ResolverTypeWrapper<InitSignInIdpError>
 	InitSignInIDPErrorCode: InitSignInIdpErrorCode
@@ -1149,6 +1157,7 @@ export type ResolversParentTypes = {
 	DisableOtpResponse: DisableOtpResponse
 	IDPResponseInput: IdpResponseInput
 	Identity: Identity
+	IdentityGlobalPermissions: IdentityGlobalPermissions
 	IdentityProjectRelation: IdentityProjectRelation
 	InitSignInIDPError: InitSignInIdpError
 	InitSignInIDPResponse: InitSignInIdpResponse
@@ -1376,6 +1385,13 @@ export type IdentityResolvers<ContextType = any, ParentType extends ResolversPar
 	person?: Resolver<Maybe<ResolversTypes['Person']>, ParentType, ContextType>
 	apiKey?: Resolver<Maybe<ResolversTypes['ApiKey']>, ParentType, ContextType>
 	projects?: Resolver<ReadonlyArray<ResolversTypes['IdentityProjectRelation']>, ParentType, ContextType>
+	permissions?: Resolver<Maybe<ResolversTypes['IdentityGlobalPermissions']>, ParentType, ContextType>
+	roles?: Resolver<Maybe<ReadonlyArray<ResolversTypes['String']>>, ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
+export type IdentityGlobalPermissionsResolvers<ContextType = any, ParentType extends ResolversParentTypes['IdentityGlobalPermissions'] = ResolversParentTypes['IdentityGlobalPermissions']> = {
+	canCreateProject?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
@@ -1718,6 +1734,7 @@ export type Resolvers<ContextType = any> = {
 	DisableOtpError?: DisableOtpErrorResolvers<ContextType>
 	DisableOtpResponse?: DisableOtpResponseResolvers<ContextType>
 	Identity?: IdentityResolvers<ContextType>
+	IdentityGlobalPermissions?: IdentityGlobalPermissionsResolvers<ContextType>
 	IdentityProjectRelation?: IdentityProjectRelationResolvers<ContextType>
 	InitSignInIDPError?: InitSignInIdpErrorResolvers<ContextType>
 	InitSignInIDPResponse?: InitSignInIdpResponseResolvers<ContextType>

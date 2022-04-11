@@ -5,7 +5,7 @@ import { DatabaseContext } from '../utils'
 export class IdentityFactory {
 	constructor(private readonly projectMemberManager: ProjectMemberManager) {}
 
-	public create(dbContext: DatabaseContext, args: { id: string; roles: string[] }): Identity {
+	public create(dbContext: DatabaseContext, args: { id: string; roles: readonly string[] }): Identity {
 		return new ProjectAwareIdentity(args.id, args.roles, dbContext, this.projectMemberManager)
 	}
 }

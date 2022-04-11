@@ -171,8 +171,8 @@ export class TenantContainerFactory {
 				new MailTemplateManager())
 			.addService('identityFetcher', () =>
 				new IdentityFetcher())
-			.addService('identityTypeResolver', ({ projectMemberManager, projectManager }) =>
-				new IdentityTypeResolver(projectMemberManager, projectManager))
+			.addService('identityTypeResolver', ({ projectMemberManager, projectManager, permissionContextFactory }) =>
+				new IdentityTypeResolver(projectMemberManager, projectManager, permissionContextFactory))
 			.addService('projectTypeResolver', ({ projectMemberManager, projectSchemaResolver }) =>
 				new ProjectTypeResolver(projectMemberManager, projectSchemaResolver))
 			.addService('meQueryResolver', () =>

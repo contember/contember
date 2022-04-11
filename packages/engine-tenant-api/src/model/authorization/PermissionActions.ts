@@ -5,10 +5,13 @@ namespace PermissionActions {
 	export enum Resources {
 		system = 'system',
 		person = 'person',
+		identity = 'identity',
 		project = 'project',
 		apiKey = 'apiKey',
 		mailTemplate = 'mailTemplate',
 	}
+
+	export const IDENTITY_VIEW_PERMISSIONS = Authorizator.createAction(Resources.identity, 'viewPermissions')
 
 	export const PERSON_SIGN_IN = Authorizator.createAction(Resources.person, 'signIn')
 	export const PERSON_SIGN_UP = Authorizator.createAction(Resources.person, 'signUp')

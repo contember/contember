@@ -75,7 +75,7 @@ export class ProjectMemberManager {
 	async getProjectMemberships(
 		dbContext: DatabaseContext,
 		project: { id: string } | { slug: string },
-		identity: { id: string; roles?: string[] },
+		identity: { id: string; roles?: readonly string[] },
 		verifier: AccessVerifier | undefined,
 	): Promise<readonly Membership[]> {
 		if (identity.roles?.includes(TenantRole.SUPER_ADMIN) || identity.roles?.includes(TenantRole.PROJECT_ADMIN)) {

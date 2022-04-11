@@ -11,7 +11,7 @@ export class PermissionContextFactory {
 		private readonly projectScopeFactory: ProjectScopeFactory,
 	) {}
 
-	public create(projectGroup: ProjectGroup, args: { id: string; roles: string[] }): PermissionContext {
+	public create(projectGroup: ProjectGroup, args: { id: string; roles: readonly string[] }): PermissionContext {
 		const identity = this.identityFactory.create(projectGroup.database, args)
 		return new PermissionContext(identity, this.authorizator, this.projectScopeFactory, projectGroup)
 	}

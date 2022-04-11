@@ -4,7 +4,7 @@ WORKDIR /src
 ENV NODE_ENV "production"
 COPY ./packages/engine-server ./
 COPY ./yarn.lock ./
-RUN apk --no-cache add --virtual builds-deps build-base python
+RUN apk --no-cache add --virtual builds-deps build-base python2
 RUN yarn install
 
 FROM node:14-alpine

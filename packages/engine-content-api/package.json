@@ -1,6 +1,6 @@
 {
   "name": "@contember/engine-content-api",
-  "version": "0.9.8",
+  "version": "0.9.9",
   "license": "Apache-2.0",
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
@@ -9,21 +9,21 @@
     "test": "jasmine --config=jasmine.json"
   },
   "dependencies": {
-    "@contember/database": "^0.9.8",
-    "@contember/dic": "^0.9.8",
-    "@contember/engine-common": "^0.9.8",
-    "@contember/schema": "^0.9.8",
-    "@contember/schema-utils": "^0.9.8",
-    "@contember/graphql-utils": "^0.9.8",
+    "@contember/database": "^0.9.9",
+    "@contember/dic": "^0.9.9",
+    "@contember/engine-common": "^0.9.9",
+    "@contember/schema": "^0.9.9",
+    "@contember/schema-utils": "^0.9.9",
+    "@contember/graphql-utils": "^0.9.9",
     "apollo-server-core": "^2.9.1",
     "farmhash": "^3.1.0",
     "graphql": "^14.6.0",
     "graphql-tools": "^4.0.7"
   },
   "devDependencies": {
-    "@contember/database-tester": "^0.9.8",
-    "@contember/engine-api-tester": "^0.9.8",
-    "@contember/schema-definition": "^0.9.8",
+    "@contember/database-tester": "^0.9.9",
+    "@contember/engine-api-tester": "^0.9.9",
+    "@contember/schema-definition": "^0.9.9",
     "@graphql-codegen/cli": "^1.15.2",
     "@graphql-codegen/typescript": "^1.15.2",
     "@graphql-codegen/typescript-operations": "^1.15.2",

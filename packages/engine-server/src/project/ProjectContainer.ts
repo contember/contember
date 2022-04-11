@@ -57,7 +57,7 @@ export class ProjectContainerFactory {
 			.addService('project', () =>
 				project)
 			.addService('connection', ({ project }) =>
-				Connection.create(project.db, {}, { timing: true }))
+				Connection.create(project.db, { timing: true }))
 			.addService('graphQlSchemaBuilderFactory', () =>
 				new GraphQlSchemaBuilderFactory())
 			.addService('permissionsByIdentityFactory', ({}) =>

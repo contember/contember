@@ -1,5 +1,5 @@
 import { AccessEvaluator, Authorizator } from '@contember/authorization'
-import { Connection, DatabaseCredentials } from '@contember/database'
+import { Connection, DatabaseConfig } from '@contember/database'
 import { Builder } from '@contember/dic'
 import {
 	AclSchemaEvaluatorFactory,
@@ -86,7 +86,7 @@ export interface TenantContainer {
 
 export interface TenantContainerArgs {
 	connection: Connection.ConnectionType
-	dbCredentials: DatabaseCredentials
+	dbCredentials: DatabaseConfig
 	mailOptions: MailerOptions
 	projectSchemaResolver: ProjectSchemaResolver
 	projectInitializer: ProjectInitializer

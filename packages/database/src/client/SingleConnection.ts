@@ -4,7 +4,7 @@ import { Client } from './Client'
 import { Transaction } from './Transaction'
 import { executeQuery } from './execution'
 import { Connection } from './Connection'
-import { DatabaseCredentials } from '../types'
+import { DatabaseConfig } from '../types'
 import { ClientError } from './errors'
 
 export class SingleConnection implements Connection.ConnectionLike, Connection.ClientFactory {
@@ -12,7 +12,7 @@ export class SingleConnection implements Connection.ConnectionLike, Connection.C
 	private isConnected = false
 
 	constructor(
-		private readonly config: ClientConfig & DatabaseCredentials,
+		private readonly config: ClientConfig & DatabaseConfig,
 		private readonly queryConfig: Connection.QueryConfig,
 		public readonly eventManager: EventManager = new EventManager(null),
 	) {

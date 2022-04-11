@@ -14,8 +14,6 @@ export const createConnection = (dbName: string): Connection => {
 	return Connection.create(
 		{
 			...dbCredentials(dbName),
-		},
-		{
 			max: 1,
 		},
 	)

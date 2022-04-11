@@ -1,8 +1,8 @@
-import { DatabaseCredentials } from '../types'
+import { DatabaseConfig } from '../types'
 import { ClientError, ClientErrorCodes, SingleConnection } from '../client'
 import { wrapIdentifier } from './sql'
 
-export const createDatabaseIfNotExists = async (db: DatabaseCredentials, log: (message: string) => void) => {
+export const createDatabaseIfNotExists = async (db: DatabaseConfig, log: (message: string) => void) => {
 	try {
 		const connection = new SingleConnection(db, {})
 		await connection.query('SELECT 1')

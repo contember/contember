@@ -7,7 +7,9 @@ import { PgClientFactory } from '../utils'
 
 export type PoolLogger = (message: string, status: PoolStatus) => void
 
-export interface PoolOptions {
+export type PoolConfig = Partial<PoolConfigInternal>
+
+interface PoolConfigInternal {
 	/** maximum number of connections in a pool */
 	max: number
 	/** maximum number of connections concurrently establishing*/
@@ -98,7 +100,7 @@ class Pool extends EventEmitter {
 	 */
 	private queue: PendingItem[] = []
 
-	private poolConfig: PoolOptions
+	private poolConfig: PoolConfigInternal
 
 	private lastRecoverableError: {
 		error: any
@@ -107,7 +109,7 @@ class Pool extends EventEmitter {
 
 	constructor(
 		private clientFactory: PgClientFactory,
-		poolConfig: Partial<PoolOptions>,
+		poolConfig: PoolConfig,
 	) {
 		super()
 		this.poolConfig = {

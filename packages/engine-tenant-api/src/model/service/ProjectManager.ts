@@ -27,7 +27,10 @@ export class ProjectManager {
 		dbContext: DatabaseContext,
 		project: Pick<ProjectWithSecrets, 'name' | 'slug' | 'config' | 'secrets'>,
 		ownerIdentityId: string | undefined,
-		deployTokenHash?: TokenHash,
+		options: {
+			deployTokenHash?: TokenHash
+			noDeployToken?: boolean
+		},
 	): Promise<CreateProjectResponse> {
 		return await dbContext.transaction(async db => {
 			const bus = db.commandBus
@@ -52,7 +55,9 @@ export class ProjectManager {
 
 			const deployMembership = [{ role: ProjectRole.DEPLOYER, variables: [] }]
 			const deployKeyDescription = `Deploy key for ${project.slug}`
-			const deployResult = await this.apiKeyService.createProjectPermanentApiKey(db, projectId, deployMembership, deployKeyDescription, deployTokenHash)
+			const deployResult = options.noDeployToken === true
+				? undefined
+				: await this.apiKeyService.createProjectPermanentApiKey(db, projectId, deployMembership, deployKeyDescription, options.deployTokenHash)
 
 			try {
 				await this.projectIntializer.initializeProject({
@@ -70,7 +75,7 @@ export class ProjectManager {
 				)
 			}
 
-			return new ResponseOk(new CreateProjectResult(deployResult.result))
+			return new ResponseOk(new CreateProjectResult(deployResult?.result))
 		})
 	}
 
@@ -114,6 +119,6 @@ export class ProjectInitError extends Error {}
 export type CreateProjectResponse = Response<CreateProjectResult, CreateProjectResponseErrorCode>
 
 export class CreateProjectResult {
-	constructor(public readonly deployerApiKey: CreateApiKeyResult) {
+	constructor(public readonly deployerApiKey?: CreateApiKeyResult) {
 	}
 }

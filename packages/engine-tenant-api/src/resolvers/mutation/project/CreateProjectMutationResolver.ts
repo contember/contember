@@ -14,7 +14,7 @@ export class CreateProjectMutationResolver implements MutationResolvers {
 
 	async createProject(
 		parent: any,
-		{ projectSlug, name, config, deployTokenHash, secrets }: MutationCreateProjectArgs,
+		{ projectSlug, name, config, deployTokenHash: deployTokenHashDeprecated, secrets, options }: MutationCreateProjectArgs,
 		context: TenantResolverContext,
 	): Promise<CreateProjectResponse> {
 		const project = await this.projectManager.getProjectBySlug(context.db, projectSlug)
@@ -27,6 +27,7 @@ export class CreateProjectMutationResolver implements MutationResolvers {
 			action: PermissionActions.PROJECT_CREATE,
 			message: 'You are not allowed to create a project',
 		})
+		const deployTokenHash = options?.deployTokenHash ?? deployTokenHashDeprecated ?? undefined
 
 		if (typeof deployTokenHash === 'string' && !isTokenHash(deployTokenHash)) {
 			throw new UserInputError('Invalid format of deployTokenHash. Must be hex-encoded sha256.')
@@ -40,7 +41,7 @@ export class CreateProjectMutationResolver implements MutationResolvers {
 				secrets: Object.fromEntries((secrets || []).map(it => [it.key, it.value])),
 			},
 			context.identity.id,
-			deployTokenHash ?? undefined,
+			{ deployTokenHash, noDeployToken: options?.noDeployToken ?? false },
 		)
 		if (!response.ok) {
 			return createErrorResponse(response.error, response.errorMessage)
@@ -49,7 +50,7 @@ export class CreateProjectMutationResolver implements MutationResolvers {
 			ok: true,
 			error: null,
 			result: {
-				deployerApiKey: response.result.deployerApiKey.toApiKeyWithToken(),
+				deployerApiKey: response.result.deployerApiKey?.toApiKeyWithToken(),
 			},
 		}
 	}

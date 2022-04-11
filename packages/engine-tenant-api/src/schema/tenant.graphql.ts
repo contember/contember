@@ -65,7 +65,14 @@ const schema: DocumentNode = gql`
 		addMailTemplate(template: MailTemplate!): AddMailTemplateResponse
 		removeMailTemplate(templateIdentifier: MailTemplateIdentifier!): RemoveMailTemplateResponse
 
-		createProject(projectSlug: String!, name: String, config: Json, secrets: [ProjectSecret!], deployTokenHash: String): CreateProjectResponse
+		createProject(
+			projectSlug: String!,
+			name: String,
+			config: Json,
+			secrets: [ProjectSecret!],
+			options: CreateProjectOptions,
+			deployTokenHash: String @deprecated(reason: "Use options")
+		): CreateProjectResponse
 		setProjectSecret(projectSlug: String!, key: String!, value: String!): SetProjectSecretResponse
 		updateProject(projectSlug: String!, name: String, config: Json, mergeConfig: Boolean): UpdateProjectResponse
 
@@ -783,6 +790,11 @@ const schema: DocumentNode = gql`
 		value: String!
 	}
 
+	input CreateProjectOptions {
+		deployTokenHash: String
+		noDeployToken: Boolean
+	}
+
 	type CreateProjectResponse {
 		ok: Boolean!
 		error: CreateProjectResponseError
@@ -795,7 +807,7 @@ const schema: DocumentNode = gql`
 	}
 
 	type CreateProjectResult {
-		deployerApiKey: ApiKeyWithToken!
+		deployerApiKey: ApiKeyWithToken
 	}
 
 	enum CreateProjectResponseErrorCode {

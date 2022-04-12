@@ -50,6 +50,9 @@ export const executeMigrations = async ({
 	migrationDescriber: MigrationDescriber
 	force?: boolean
 }): Promise<number> => {
+	if (migrations.length === 0) {
+		return 0
+	}
 	console.log('Will execute following migrations:')
 	migrations.forEach(it => console.log(it.name))
 	if (requireConfirmation) {

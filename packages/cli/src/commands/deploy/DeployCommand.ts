@@ -12,6 +12,9 @@ import { SystemClient } from '../../utils/system'
 import { MigrationsContainerFactory } from '../../MigrationsContainer'
 import { AdminClient, readAdminFiles } from '../../utils/admin'
 import { URL } from 'url'
+import prompts from 'prompts'
+import { printMigrationDescription } from '../../utils/migrations'
+import { maskToken } from '../../utils/token'
 
 type Args = {
 	dsn: string
@@ -59,13 +62,20 @@ export class DeployCommand extends Command<Args, Options> {
 			apiTokenFromDsn = uri.password
 			adminEndpoint = (uri.protocol === 'contember-unsecure:' ? 'http://' : 'https://') + uri.host
 		}
-
 		const instance = await interactiveResolveInstanceEnvironmentFromInput(workspace, apiUrl ?? (adminEndpoint ? adminEndpoint + '/_api' : undefined))
+		const apiToken = await interactiveResolveApiToken({ workspace, instance, apiToken: apiTokenFromDsn })
+		console.log('')
+		console.log('Contember project deployment configuration:')
+		console.log(`Local project name: ${project.name}`)
+		console.log(`Target project name: ${remoteProject}`)
+		console.log(`API URL: ${instance.baseUrl}`)
+		console.log(`Admin URL: ${adminEndpoint ?? 'none'}`)
+		console.log(`Deploy token: ${maskToken(apiToken)}`)
+		console.log('')
 
 		const migrationsDir = project.migrationsDir
 		const container = new MigrationsContainerFactory(migrationsDir).create()
 
-		const apiToken = await interactiveResolveApiToken({ workspace, instance, apiToken: apiTokenFromDsn })
 		const tenantClient = TenantClient.create(instance.baseUrl, apiToken)
 		await tenantClient.createProject(remoteProject, true)
 		const systemClient = SystemClient.create(instance.baseUrl, remoteProject, apiToken)
@@ -76,13 +86,34 @@ export class DeployCommand extends Command<Args, Options> {
 		}
 
 		const status = await resolveMigrationStatus(systemClient, container.migrationsResolver, false)
-
+		if (status.migrationsToExecute.length === 0 && !adminEndpoint) {
+			console.log('Nothing to do.')
+			return 0
+		}
+		if (!input.getOption('yes')) {
+			if (!process.stdin.isTTY) {
+				throw 'TTY not available. Pass --yes option to confirm execution.'
+			}
+			console.log('Following migrations will be executed:')
+			console.log(status.migrationsToExecute.length ? status.migrationsToExecute.map(it => it.name).join(' ') : 'none')
+			console.log(adminEndpoint ? 'Admin will be deployed.' : 'Admin will NOT be deployed.')
+			console.log('(to skip this dialog, you can pass --yes option)')
+			console.log('')
+			const { ok } = await prompts({
+				type: 'confirm',
+				name: 'ok',
+				message: `Do you want to continue?`,
+			})
+			 if (!ok) {
+				return 1
+			}
+		}
 		const migrationExitCode = await executeMigrations({
 			migrationDescriber: container.migrationDescriber,
 			schemaVersionBuilder: container.schemaVersionBuilder,
 			client: systemClient,
 			migrations: status.migrationsToExecute,
-			requireConfirmation: !input.getOption('yes'),
+			requireConfirmation: false,
 			force: false,
 		})
 
@@ -91,9 +122,15 @@ export class DeployCommand extends Command<Args, Options> {
 		}
 
 		if (adminEndpoint) {
+			console.log('Deploying admin:')
 			const client = AdminClient.create(adminEndpoint, apiToken)
-			await client.deploy(remoteProject, await readAdminFiles(projectAdminDistDir))
+			const files = await readAdminFiles(projectAdminDistDir)
+			files.forEach(it => console.log('  ' + it.path))
+			await client.deploy(remoteProject, files)
+			console.log('Admin deployed')
 		}
+		console.log('')
+		console.log('Deployment successful')
 
 		return 0
 	}

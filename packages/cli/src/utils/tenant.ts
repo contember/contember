@@ -1,6 +1,7 @@
 import prompts from 'prompts'
 import { GraphQLClient } from 'graphql-request'
 import { InstanceApiEnvironment } from './instance'
+import { Workspace } from '@contember/cli-common'
 
 const validatePassword = (password: string) =>
 	password.length < 6 ? 'Password must contain at least 6 characters' : true
@@ -15,9 +16,9 @@ export const createTenantApiUrl = (url: string) => {
 	return url + '/tenant'
 }
 
-export const interactiveResolveLoginToken = async (instance: InstanceApiEnvironment) => {
-	if (process.env.CONTEMBER_LOGIN_TOKEN) {
-		return process.env.CONTEMBER_LOGIN_TOKEN
+export const interactiveResolveLoginToken = async (workspace: Workspace) => {
+	if (workspace.env.loginToken) {
+		return workspace.env.loginToken
 	}
 	const { loginToken } = await prompts({
 		type: 'text',
@@ -83,12 +84,19 @@ export const interactiveAskForCredentials = async (): Promise<{ email: string; p
 }
 
 export const interactiveResolveApiToken = async ({
+	workspace,
 	instance,
+	apiToken,
 }: {
+	workspace: Workspace
 	instance: InstanceApiEnvironment
+	apiToken?: string
 }): Promise<string> => {
-	if (process.env.CONTEMBER_API_TOKEN) {
-		return process.env.CONTEMBER_API_TOKEN
+	if (apiToken) {
+		return apiToken
+	}
+	if (workspace.env.apiToken) {
+		return workspace.env.apiToken
 	}
 	const { strategy } = await prompts({
 		type: 'select',
@@ -100,7 +108,7 @@ export const interactiveResolveApiToken = async ({
 		],
 	})
 	if (strategy === 'signin') {
-		const loginToken = await interactiveResolveLoginToken(instance)
+		const loginToken = await interactiveResolveLoginToken(workspace)
 		return (await interactiveSignIn({ apiUrl: createTenantApiUrl(instance.baseUrl), loginToken, expiration: 60 * 5 }))
 			.sessionToken
 	}

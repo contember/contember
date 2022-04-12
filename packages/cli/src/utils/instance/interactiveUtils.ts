@@ -1,4 +1,4 @@
-import { getInstanceFromEnv, InstanceApiEnvironment } from './environment'
+import { InstanceApiEnvironment } from './environment'
 import { Workspace } from '@contember/cli-common'
 import prompts from 'prompts'
 
@@ -21,7 +21,7 @@ export const interactiveResolveInstanceEnvironmentFromInput = async (
 ): Promise<InstanceApiEnvironment> => {
 	let instanceName =
 		instance ||
-		getInstanceFromEnv() ||
+		workspace.env.apiUrl ||
 		(
 			await prompts({
 				type: 'text',

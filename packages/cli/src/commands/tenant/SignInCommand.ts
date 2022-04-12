@@ -24,7 +24,7 @@ export class SignInCommand extends Command<Args, Options> {
 		}
 		const workspace = await Workspace.get(process.cwd())
 		const instance = await interactiveResolveInstanceEnvironmentFromInput(workspace, input.getArgument('instance'))
-		const loginToken = await interactiveResolveLoginToken(instance)
+		const loginToken = await interactiveResolveLoginToken(workspace)
 		const { sessionToken } = await interactiveSignIn({ apiUrl: instance.baseUrl, loginToken })
 		console.log('Session token:')
 		console.log(sessionToken)

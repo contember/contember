@@ -1,4 +1,4 @@
-import { Command, CommandConfiguration, Input, Workspace } from '@contember/cli-common'
+import { Command, CommandConfiguration, Input, Project, Workspace } from '@contember/cli-common'
 import {
 	configureExecuteMigrationCommand,
 	ExecuteMigrationOptions,
@@ -11,9 +11,11 @@ import { interactiveResolveInstanceEnvironmentFromInput } from '../../utils/inst
 import { SystemClient } from '../../utils/system'
 import { MigrationsContainerFactory } from '../../MigrationsContainer'
 import { AdminClient, readAdminFiles } from '../../utils/admin'
+import { URL } from 'url'
 
 type Args = {
-	project: string
+	dsn: string
+	project?: string
 }
 
 type Options = ExecuteMigrationOptions & {
@@ -23,28 +25,52 @@ type Options = ExecuteMigrationOptions & {
 export class DeployCommand extends Command<Args, Options> {
 	protected configure(configuration: CommandConfiguration<Args, Options>): void {
 		configuration.description('Deploy Contember project')
-		configuration.argument('project')
+		configuration.argument('dsn')
+		configuration.argument('project').optional()
 		configuration.option('admin').valueRequired()
 		configureExecuteMigrationCommand(configuration)
 	}
 
 	protected async execute(input: Input<Args, Options>): Promise<void | number> {
-		const projectName = input.getArgument('project')
-		const adminEndpoint = input.getOption('admin')
-
+		const [dsn, projectName] = this.getNormalizedInput(input)
 		const workspace = await Workspace.get(process.cwd())
-		const project = await workspace.projects.getProject(projectName, { fuzzy: true })
-		const projectAdminDistDir = `${project.adminDir}/dist`
+		let project: Project
+
+		let apiUrl = input.getOption('instance')
+		let adminEndpoint = input.getOption('admin')
+
+		let apiTokenFromDsn: string | undefined = undefined
+		if (projectName) {
+			project = await workspace.projects.getProject(projectName, { fuzzy: true })
+		} else {
+			const projects = await workspace.projects.listProjects()
+			if (projects.length !== 1) {
+				throw 'Please specify a local name project'
+			}
+			project = projects[0]
+		}
+		let remoteProject = input.getOption('remote-project') || project.name
+		if (dsn) {
+			const uri = new URL(dsn)
+			if (uri.protocol !== 'contember:' && uri.protocol !== 'contember-unsecure:') {
+				throw 'Invalid deploy DSN'
+			}
+			remoteProject = uri.username
+			apiTokenFromDsn = uri.password
+			adminEndpoint = (uri.protocol === 'contember-unsecure:' ? 'http://' : 'https://') + uri.host
+		}
+
+		const instance = await interactiveResolveInstanceEnvironmentFromInput(workspace, apiUrl ?? (adminEndpoint ? adminEndpoint + '/_api' : undefined))
+
 		const migrationsDir = project.migrationsDir
 		const container = new MigrationsContainerFactory(migrationsDir).create()
 
-		const instance = await interactiveResolveInstanceEnvironmentFromInput(workspace, input?.getOption('instance'))
-		const apiToken = await interactiveResolveApiToken({ instance })
-		const remoteProject = input.getOption('remote-project') || project.name
+		const apiToken = await interactiveResolveApiToken({ workspace, instance, apiToken: apiTokenFromDsn })
 		const tenantClient = TenantClient.create(instance.baseUrl, apiToken)
 		await tenantClient.createProject(remoteProject, true)
 		const systemClient = SystemClient.create(instance.baseUrl, remoteProject, apiToken)
 
+		const projectAdminDistDir = `${project.adminDir}/dist`
 		if (adminEndpoint && !(await pathExists(`${projectAdminDistDir}/index.html`))) {
 			throw `Missing ${projectAdminDistDir}/index.html. Please build admin before deploying.`
 		}
@@ -70,5 +96,15 @@ export class DeployCommand extends Command<Args, Options> {
 		}
 
 		return 0
+	}
+
+	private getNormalizedInput(input: Input<Args, Options>): [string | undefined, string | undefined] {
+		const projectOrDsnInput = input.getArgument('dsn')
+		const secondInput = input.getArgument('project')
+
+		const isUriLike = projectOrDsnInput.includes('://')
+		const dsn = isUriLike ? projectOrDsnInput : undefined
+		const projectName = !isUriLike ? projectOrDsnInput : secondInput
+		return [dsn, projectName]
 	}
 }

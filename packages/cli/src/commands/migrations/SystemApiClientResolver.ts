@@ -16,7 +16,7 @@ export const resolveSystemApiClient = async (
 	>,
 ): Promise<SystemClient> => {
 	const instance = await interactiveResolveInstanceEnvironmentFromInput(workspace, input?.getOption('instance'))
-	const apiToken = await interactiveResolveApiToken({ instance })
+	const apiToken = await interactiveResolveApiToken({ workspace, instance })
 	const remoteProject = input?.getOption('remote-project') || project.name
 	return SystemClient.create(instance.baseUrl, remoteProject, apiToken)
 }

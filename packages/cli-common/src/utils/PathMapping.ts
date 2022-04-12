@@ -4,16 +4,14 @@ import { listDirectories } from './fs'
 export type PathMapping = Record<string, string>
 export const resolvePathMappingConfig = async (
 	baseDir: string,
+	defaultProjectName: string,
 	config?: PathMapping,
 ): Promise<PathMapping> => {
 	if (config) {
 		return Object.fromEntries(Object.entries(config).map(([name, path]) => [name, resolve(baseDir, path)]))
 	}
 	// single instance/project
-	const baseName = process.env.CONTEMBER_PROJECT_NAME ?? basename(baseDir)
-		.toLocaleLowerCase()
-		.replace(/[^-_a-z0-9]/, '')
-	return { [baseName]: baseDir }
+	return { [defaultProjectName]: baseDir }
 }
 
 export const getPathFromMapping = (config: PathMapping, name: string): string | undefined => {

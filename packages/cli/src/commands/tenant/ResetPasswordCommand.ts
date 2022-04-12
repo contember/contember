@@ -24,7 +24,7 @@ export class ResetPasswordCommand extends Command<Args, Options> {
 		}
 		const workspace = await Workspace.get(process.cwd())
 		const instance = await interactiveResolveInstanceEnvironmentFromInput(workspace, input.getArgument('instance'))
-		const loginToken = await interactiveResolveLoginToken(instance)
+		const loginToken = await interactiveResolveLoginToken(workspace)
 		await interactiveResetPassword({ apiUrl: instance.baseUrl, loginToken })
 	}
 }

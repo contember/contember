@@ -5,6 +5,7 @@ import { installTemplate } from './template'
 import { getPackageVersion } from './version'
 import { pathExists } from 'fs-extra'
 import { readYaml } from './yaml'
+import { CliEnv, readCliEnv } from '../application'
 
 export interface WorkspaceDirectoryArgument {
 	workspaceDirectory: string
@@ -40,11 +41,15 @@ export interface WorkspaceConfig {
 export class Workspace {
 	public readonly projects = new ProjectManager(this)
 
-	constructor(public readonly directory: string, public readonly config: WorkspaceConfig) {}
+	constructor(
+		public readonly directory: string,
+		public readonly env: CliEnv,
+		public readonly config: WorkspaceConfig,
+	) {}
 
 	public static async get(workspaceDirectory: string) {
 		const config = await readWorkspaceConfig({ workspaceDirectory })
-		return new Workspace(workspaceDirectory, config)
+		return new Workspace(workspaceDirectory, readCliEnv(), config)
 	}
 
 	get name() {

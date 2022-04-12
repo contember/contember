@@ -54,7 +54,7 @@ export class MigrationStatusCommand extends Command<Args, Options> {
 		const container = new MigrationsContainerFactory(migrationsDir).create()
 
 		const instance = await interactiveResolveInstanceEnvironmentFromInput(workspace, input.getOption('instance'))
-		const apiToken = await interactiveResolveApiToken({ instance })
+		const apiToken = await interactiveResolveApiToken({ workspace, instance })
 		const remoteProject = input.getOption('remote-project') || project.name
 		const client = SystemClient.create(instance.baseUrl, remoteProject, apiToken)
 

@@ -26,8 +26,11 @@ export class ProjectManager {
 	public async createProject(
 		dbContext: DatabaseContext,
 		project: Pick<ProjectWithSecrets, 'name' | 'slug' | 'config' | 'secrets'>,
-		ownerIdentityId: string | undefined,
-		deployTokenHash?: TokenHash,
+		options: {
+			ownerIdentityId?: string
+			deployTokenHash?: TokenHash
+			noDeployToken?: boolean
+		},
 	): Promise<CreateProjectResponse> {
 		return await dbContext.transaction(async db => {
 			const bus = db.commandBus
@@ -40,19 +43,20 @@ export class ProjectManager {
 			for (const [key, value] of Object.entries(project.secrets)) {
 				await bus.execute(new SetProjectSecretCommand(projectId, key, Buffer.from(value)))
 			}
-			if (ownerIdentityId) {
-				const addMemberResult = await db.commandBus.execute(
-					new AddProjectMemberCommand(projectId, ownerIdentityId, createSetMembershipVariables([{ role: ProjectRole.ADMIN, variables: [] }])),
-				)
+			if (options.ownerIdentityId) {
+				const memberships = createSetMembershipVariables([{ role: ProjectRole.ADMIN, variables: [] }])
+				const addProjectMemberCommand = new AddProjectMemberCommand(projectId, options.ownerIdentityId, memberships)
+				const addMemberResult = await db.commandBus.execute(addProjectMemberCommand)
 				if (!addMemberResult.ok) {
 					throw new ImplementationException()
 				}
-
 			}
 
 			const deployMembership = [{ role: ProjectRole.DEPLOYER, variables: [] }]
 			const deployKeyDescription = `Deploy key for ${project.slug}`
-			const deployResult = await this.apiKeyService.createProjectPermanentApiKey(db, projectId, deployMembership, deployKeyDescription, deployTokenHash)
+			const deployResult = options.noDeployToken === true
+				? undefined
+				: await this.apiKeyService.createProjectPermanentApiKey(db, projectId, deployMembership, deployKeyDescription, options.deployTokenHash)
 
 			try {
 				await this.projectIntializer.initializeProject({
@@ -70,7 +74,7 @@ export class ProjectManager {
 				)
 			}
 
-			return new ResponseOk(new CreateProjectResult(deployResult.result))
+			return new ResponseOk(new CreateProjectResult(deployResult?.result))
 		})
 	}
 
@@ -114,6 +118,6 @@ export class ProjectInitError extends Error {}
 export type CreateProjectResponse = Response<CreateProjectResult, CreateProjectResponseErrorCode>
 
 export class CreateProjectResult {
-	constructor(public readonly deployerApiKey: CreateApiKeyResult) {
+	constructor(public readonly deployerApiKey?: CreateApiKeyResult) {
 	}
 }

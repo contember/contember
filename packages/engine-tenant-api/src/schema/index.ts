@@ -222,6 +222,11 @@ export type CreatePasswordResetRequestResponse = {
 	readonly error?: Maybe<CreatePasswordResetRequestError>
 }
 
+export type CreateProjectOptions = {
+	readonly deployTokenHash?: Maybe<Scalars['String']>
+	readonly noDeployToken?: Maybe<Scalars['Boolean']>
+}
+
 export type CreateProjectResponse = {
 	readonly __typename?: 'CreateProjectResponse'
 	readonly ok: Scalars['Boolean']
@@ -242,7 +247,7 @@ export enum CreateProjectResponseErrorCode {
 
 export type CreateProjectResult = {
 	readonly __typename?: 'CreateProjectResult'
-	readonly deployerApiKey: ApiKeyWithToken
+	readonly deployerApiKey?: Maybe<ApiKeyWithToken>
 }
 
 export type CreateResetPasswordRequestOptions = {
@@ -718,6 +723,7 @@ export type MutationCreateProjectArgs = {
 	name?: Maybe<Scalars['String']>
 	config?: Maybe<Scalars['Json']>
 	secrets?: Maybe<ReadonlyArray<ProjectSecret>>
+	options?: Maybe<CreateProjectOptions>
 	deployTokenHash?: Maybe<Scalars['String']>
 }
 
@@ -1195,6 +1201,7 @@ export type ResolversTypes = {
 	CreatePasswordResetRequestError: ResolverTypeWrapper<CreatePasswordResetRequestError>
 	CreatePasswordResetRequestErrorCode: CreatePasswordResetRequestErrorCode
 	CreatePasswordResetRequestResponse: ResolverTypeWrapper<CreatePasswordResetRequestResponse>
+	CreateProjectOptions: CreateProjectOptions
 	CreateProjectResponse: ResolverTypeWrapper<CreateProjectResponse>
 	CreateProjectResponseError: ResolverTypeWrapper<CreateProjectResponseError>
 	CreateProjectResponseErrorCode: CreateProjectResponseErrorCode
@@ -1317,6 +1324,7 @@ export type ResolversParentTypes = {
 	CreateApiKeyResult: CreateApiKeyResult
 	CreatePasswordResetRequestError: CreatePasswordResetRequestError
 	CreatePasswordResetRequestResponse: CreatePasswordResetRequestResponse
+	CreateProjectOptions: CreateProjectOptions
 	CreateProjectResponse: CreateProjectResponse
 	CreateProjectResponseError: CreateProjectResponseError
 	CreateProjectResult: CreateProjectResult
@@ -1547,7 +1555,7 @@ export type CreateProjectResponseErrorResolvers<ContextType = any, ParentType ex
 }
 
 export type CreateProjectResultResolvers<ContextType = any, ParentType extends ResolversParentTypes['CreateProjectResult'] = ResolversParentTypes['CreateProjectResult']> = {
-	deployerApiKey?: Resolver<ResolversTypes['ApiKeyWithToken'], ParentType, ContextType>
+	deployerApiKey?: Resolver<Maybe<ResolversTypes['ApiKeyWithToken']>, ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 

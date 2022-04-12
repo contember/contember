@@ -5,7 +5,7 @@ import {
 	MutationResolvers,
 } from '../../../schema'
 import { TenantResolverContext } from '../../TenantResolverContext'
-import { isTokenHash, PermissionActions, ProjectManager } from '../../../model'
+import { isTokenHash, PermissionActions, ProjectManager, TenantRole } from '../../../model'
 import { createErrorResponse } from '../../errorUtils'
 import { UserInputError } from '@contember/graphql-utils'
 
@@ -14,7 +14,7 @@ export class CreateProjectMutationResolver implements MutationResolvers {
 
 	async createProject(
 		parent: any,
-		{ projectSlug, name, config, deployTokenHash, secrets }: MutationCreateProjectArgs,
+		{ projectSlug, name, config, deployTokenHash: deployTokenHashDeprecated, secrets, options }: MutationCreateProjectArgs,
 		context: TenantResolverContext,
 	): Promise<CreateProjectResponse> {
 		const project = await this.projectManager.getProjectBySlug(context.db, projectSlug)
@@ -27,10 +27,14 @@ export class CreateProjectMutationResolver implements MutationResolvers {
 			action: PermissionActions.PROJECT_CREATE,
 			message: 'You are not allowed to create a project',
 		})
+		const deployTokenHash = options?.deployTokenHash ?? deployTokenHashDeprecated ?? undefined
 
 		if (typeof deployTokenHash === 'string' && !isTokenHash(deployTokenHash)) {
 			throw new UserInputError('Invalid format of deployTokenHash. Must be hex-encoded sha256.')
 		}
+
+		const isSuperAdmin = await context.identity.roles.includes(TenantRole.SUPER_ADMIN)
+
 		const response = await this.projectManager.createProject(
 			context.db,
 			{
@@ -39,8 +43,11 @@ export class CreateProjectMutationResolver implements MutationResolvers {
 				config: config || {},
 				secrets: Object.fromEntries((secrets || []).map(it => [it.key, it.value])),
 			},
-			context.identity.id,
-			deployTokenHash ?? undefined,
+			{
+				ownerIdentityId: isSuperAdmin ? undefined : context.identity.id,
+				deployTokenHash,
+				noDeployToken: options?.noDeployToken ?? false,
+			},
 		)
 		if (!response.ok) {
 			return createErrorResponse(response.error, response.errorMessage)
@@ -49,7 +56,7 @@ export class CreateProjectMutationResolver implements MutationResolvers {
 			ok: true,
 			error: null,
 			result: {
-				deployerApiKey: response.result.deployerApiKey.toApiKeyWithToken(),
+				deployerApiKey: response.result.deployerApiKey?.toApiKeyWithToken(),
 			},
 		}
 	}

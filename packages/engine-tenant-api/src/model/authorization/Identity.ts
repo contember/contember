@@ -4,7 +4,7 @@ import { DatabaseContext } from '../utils'
 
 export interface Identity {
 	readonly id: string
-	readonly roles: string[]
+	readonly roles: readonly string[]
 
 	getProjectMemberships(projectSlug: string): Promise<readonly Membership[]>
 }
@@ -24,7 +24,7 @@ export class StaticIdentity implements Identity {
 export class ProjectAwareIdentity implements Identity {
 	constructor(
 		public readonly id: string,
-		public readonly roles: string[],
+		public readonly roles: readonly string[],
 		private readonly dbContext: DatabaseContext,
 		private readonly memberManager: ProjectMemberManager,
 	) {}

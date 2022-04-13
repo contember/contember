@@ -1,5 +1,5 @@
 import { Component, Entity, EntityListBaseProps, EntityName, Filter } from '@contember/binding'
-import { Button, ButtonList, Stack, Table, TableCell, TableRow } from '@contember/ui'
+import { Button, ButtonList, LayoutPageStickyContainer, Stack, Table, TableCell, TableRow } from '@contember/ui'
 import type { ComponentType, FunctionComponent, ReactNode } from 'react'
 import { useMessageFormatter } from '../../../../../i18n'
 import { EmptyMessage, EmptyMessageProps } from '../../helpers'
@@ -82,26 +82,31 @@ export const DataGridContainer: FunctionComponent<DataGridContainerProps> = Comp
 
 		return (
 			<Stack direction="vertical">
-				<Stack direction="horizontal" justify="space-between" style={{ flexWrap: 'wrap' }}>
-					<div>{pagingSummary}</div>
-					<ButtonList>
-						{allowColumnVisibilityControls !== false && (
-							<DataGridColumnHiding
-								desiredState={desiredState}
-								formatMessage={formatMessage}
-								setIsColumnHidden={setIsColumnHidden}
-							/>
-						)}
-						{allowAggregateFilterControls !== false && (
-							<DataGridFullFilters
-								desiredState={desiredState}
-								environment={accessor.environment}
-								formatMessage={formatMessage}
-								setFilter={setFilter}
-							/>
-						)}
-					</ButtonList>
-				</Stack>
+				<LayoutPageStickyContainer
+					left="var(--cui-layout-page-padding-left)"
+					right="var(--cui-layout-page-padding-right)"
+				>
+					<Stack wrap align="center" direction="horizontal" justify="space-between">
+						<ButtonList>
+							{allowColumnVisibilityControls !== false && (
+								<DataGridColumnHiding
+									desiredState={desiredState}
+									formatMessage={formatMessage}
+									setIsColumnHidden={setIsColumnHidden}
+								/>
+							)}
+							{allowAggregateFilterControls !== false && (
+								<DataGridFullFilters
+									desiredState={desiredState}
+									environment={accessor.environment}
+									formatMessage={formatMessage}
+									setFilter={setFilter}
+								/>
+							)}
+						</ButtonList>
+						<div>{pagingSummary}</div>
+					</Stack>
+				</LayoutPageStickyContainer>
 				<Table
 					tableHead={
 						<TableRow>
@@ -177,9 +182,11 @@ export const DataGridContainer: FunctionComponent<DataGridContainerProps> = Comp
 						</TableRow>
 					)}
 				</Table>
-				{!!normalizedItemCount && (
-					<Stack direction="horizontal" justify="space-between" style={{ flexWrap: 'wrap' }}>
-						<div>{pagingSummary}</div>
+				{!!normalizedItemCount && <LayoutPageStickyContainer
+					left="var(--cui-layout-page-padding-left)"
+					right="var(--cui-layout-page-padding-right)"
+				>
+					<Stack wrap align="center" direction="horizontal" justify="space-between">
 						<Stack direction="horizontal" justify="space-between" gap="small">
 							<Button
 								distinction="seamless"
@@ -211,8 +218,9 @@ export const DataGridContainer: FunctionComponent<DataGridContainerProps> = Comp
 								</>
 							)}
 						</Stack>
+						<div>{pagingSummary}</div>
 					</Stack>
-				)}
+				</LayoutPageStickyContainer>}
 			</Stack>
 		)
 	},

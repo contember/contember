@@ -1,11 +1,11 @@
 import classNames from 'classnames'
 import { memo, ReactNode } from 'react'
-import { useClassNamePrefix } from '../auxiliary'
-import { toSchemeClass, toThemeClass } from '../utils'
-import { ButtonList } from './Forms'
-import { useThemeScheme, useTitleThemeScheme } from './Layout/ThemeSchemeContext'
-import type { ThemeScheme } from './Layout/Types'
-import { Heading, HeadingProps } from './Typography/Heading'
+import { useClassNamePrefix } from '../../auxiliary'
+import { toSchemeClass, toThemeClass } from '../../utils'
+import { ButtonList } from '../Forms'
+import { useThemeScheme, useTitleThemeScheme } from '../Layout/ThemeSchemeContext'
+import type { ThemeScheme } from '../Layout/Types'
+import { Heading, HeadingProps } from '../Typography/Heading'
 
 export interface TitleBarProps extends ThemeScheme {
 	after?: ReactNode

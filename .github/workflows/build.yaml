@@ -25,7 +25,7 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v1
         with:
-          node-version: 14
+          node-version: 12
       - name: "Install base deps"
         run: yarn install
       - name: "Run linter"

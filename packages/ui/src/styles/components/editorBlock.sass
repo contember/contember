@@ -4,6 +4,8 @@
 	--cui-editor-canvas-element-handle-width: calc(6 * var(--cui-gap))
 	--cui-editor-canvas-element-handle-height: calc(1em * var(--cui-line-height, 1.5))
 
+	display: block
+
 	*[contenteditable="true"] &-inner
 		//
 
@@ -54,6 +56,7 @@
 			opacity: 1
 
 	&.is-dragged
+		display: block
 		z-index: 3
 
 		#{$root}-content

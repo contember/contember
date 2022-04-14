@@ -68,7 +68,7 @@ export const BaseButton = memo(
 			className: cn(
 				rest.className,
 				`${prefix}button`,
-				toThemeClass(themeIntent, themeIntent),
+				toThemeClass(props.distinction === 'default' ? null : themeIntent, themeIntent),
 				toSchemeClass(!props.disabled ? scheme : undefined),
 				toEnumViewClass(size),
 				toEnumViewClass(props.disabled ? 'default' : distinction),

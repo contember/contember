@@ -1,12 +1,14 @@
 .#{$cui-conf-globalPrefix}root
-  -webkit-font-smoothing: antialiased
-  background-color: var(--cui-background-color)
-  color: var(--cui-color)
-  display: contents
-  font-family: var(--cui-font-family)
-  font-size: var(--cui-font-size-body)
-  font-smoothing: antialiased
-  line-height: var(--cui-line-height)
+  &
+    display: contents
+  &, &-no-display
+    -webkit-font-smoothing: antialiased
+    background-color: var(--cui-background-color)
+    color: var(--cui-color)
+    font-family: var(--cui-font-family)
+    font-size: var(--cui-font-size-body)
+    font-smoothing: antialiased
+    line-height: var(--cui-line-height)
 
   h1, h2, h3, h4, h5, h6
     font-weight: $fw-medium

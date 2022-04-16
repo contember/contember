@@ -17,7 +17,7 @@ export const SortableRepeaterContainer = ({ helperClass, ...props }: SortableRep
 	{...props}
 	helperClass={classNames(
 		helperClass,
-		useComponentClassName('root'),
+		useComponentClassName('root-no-display'),
 	)}
 />
 

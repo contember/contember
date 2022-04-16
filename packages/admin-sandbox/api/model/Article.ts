@@ -16,6 +16,7 @@ export class Article {
 export class Category {
 	name = d.stringColumn()
 	locales = d.oneHasMany(CategoryLocale, 'category')
+	order = d.intColumn()
 }
 
 

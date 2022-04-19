@@ -46,7 +46,7 @@ export class GraphQlSchemaFactory {
 		}
 		const { permissions, verifier } = this.permissionFactory.createPermissions(schema, identity)
 
-		const authorizator = new Authorizator(permissions)
+		const authorizator = new Authorizator(permissions, schema.acl.customPrimary ?? false)
 		const dataSchemaBuilder = this.graphqlSchemaBuilderFactory.create(schema.model, authorizator)
 		const contentSchemaFactory = new IntrospectionSchemaDefinitionFactory(
 			new IntrospectionSchemaFactory(

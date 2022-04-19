@@ -131,6 +131,7 @@ namespace Acl {
 	export type Variables = { readonly [name: string]: Variable }
 
 	export type Schema = {
+		readonly customPrimary?: boolean
 		readonly roles: Acl.Roles
 	}
 }

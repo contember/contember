@@ -4,7 +4,10 @@ import { Acl } from '@contember/schema'
 export type AuthorizationResult = 'yes' | 'no' | 'maybe'
 
 export class Authorizator {
-	constructor(private readonly permissions: Acl.Permissions) {
+	constructor(
+		private readonly permissions: Acl.Permissions,
+		private readonly defaultCustomPrimary: boolean,
+	) {
 	}
 
 	getEntityPermission(operation: Acl.Operation, entity: string): AuthorizationResult {
@@ -47,6 +50,6 @@ export class Authorizator {
 
 
 	isCustomPrimaryAllowed(entity: string): boolean {
-		return this.permissions?.[entity]?.operations?.customPrimary || false
+		return this.permissions?.[entity]?.operations?.customPrimary ?? this.defaultCustomPrimary
 	}
 }

@@ -62,7 +62,7 @@ export const ResetPasswordForm: FC<ResetPasswordFormProps> = ({ redirectOnSucces
 					<TextInput {...register('passwordAgain')} required={true} type={'password'} />
 				</FieldContainer>
 				<FieldContainer label={undefined}>
-					<Button intent="primary" type={'submit'} disabled={isSubmitting}>
+					<Button distinction="primary" type={'submit'} disabled={isSubmitting}>
 						Set new password
 					</Button>
 				</FieldContainer>

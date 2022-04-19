@@ -58,4 +58,4 @@ namespace PermissionsBuilder {
 	}
 	export const predicateReference = (name: Acl.PredicateReference) => new Reference(name)
 }
-export default PermissionsBuilder
+export { PermissionsBuilder }

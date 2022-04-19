@@ -3,7 +3,7 @@ import EntitySelector from './EntitySelector'
 import { Acl, Model, Writable } from '@contember/schema'
 import FieldSelector from './FieldSelector'
 import FieldPermissionsBuilder from './FieldPermissionsBuilder'
-import PermissionsBuilder from './PermissionsBuilder'
+import { PermissionsBuilder } from './PermissionsBuilder'
 import PredicateReference, { resolvePredicateReference } from './PredicateReference'
 
 export default class EntityPermissionsBuilder {

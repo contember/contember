@@ -85,16 +85,21 @@ const baseRolePermissionsSchema = Typesafe.intersection(
 )
 const baseRolePermissionsCheck: Typesafe.Equals<Acl.BaseRolePermissions, ReturnType<typeof baseRolePermissionsSchema>> = true
 
-export const aclSchema = Typesafe.object({
-	roles: Typesafe.record(
-		Typesafe.string,
-		(v, p): Acl.RolePermissions => {
-			const main: Acl.BaseRolePermissions = baseRolePermissionsSchema(v, p)
-			return {
-				...(v as any),
-				...main,
-			}
-		},
-	),
-})
+export const aclSchema = Typesafe.intersection(
+	Typesafe.object({
+		roles: Typesafe.record(
+			Typesafe.string,
+			(v, p): Acl.RolePermissions => {
+				const main: Acl.BaseRolePermissions = baseRolePermissionsSchema(v, p)
+				return {
+					...(v as any),
+					...main,
+				}
+			},
+		),
+	}),
+	Typesafe.partial({
+		customPrimary: Typesafe.boolean,
+	}),
+)
 const aclSchemaCheck: Typesafe.Equals<Acl.Schema, ReturnType<typeof aclSchema>> = true

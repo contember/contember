@@ -44,7 +44,7 @@ export class ProjectPrintSchemaCommand extends Command<Args, Options> {
 		const permissionFactory = new PermissionFactory(schema.model)
 		const permissions = permissionFactory.create(schema.acl, input.getOption('role') || ['admin'])
 		const schemaBuilderFactory = new GraphQlSchemaBuilderFactory()
-		const authorizator = new Authorizator(permissions)
+		const authorizator = new Authorizator(permissions, schema.acl.customPrimary ?? false)
 		const introspection = new IntrospectionSchemaFactory(
 			schema.model,
 			new EntityRulesResolver(schema.validation, schema.model),

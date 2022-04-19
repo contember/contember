@@ -33,7 +33,7 @@ export class ContentApiTester {
 		const schema = await this.getSchema()
 		const model = schema.model
 		const permissions = new AllowAllPermissionFactory().create(model)
-		const authorizator = new Authorizator(permissions)
+		const authorizator = new Authorizator(permissions, false)
 		const gqlSchemaBuilder = this.graphqlSchemaBuilderFactory.create(model, authorizator)
 		const gqlSchema = gqlSchemaBuilder.build()
 		const db = this.db.client.forSchema(`stage_${stage.slug}`)

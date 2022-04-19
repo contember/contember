@@ -3,7 +3,7 @@ import { MailerOptions } from '@contember/engine-tenant-api'
 import { upperCaseFirst } from '../utils'
 
 
-export const dbCredentialsSchema = Typesafe.intersection(
+export const dbConfigSchema = Typesafe.intersection(
 	Typesafe.object({
 		host: Typesafe.string,
 		port: Typesafe.number,
@@ -13,12 +13,25 @@ export const dbCredentialsSchema = Typesafe.intersection(
 	}),
 	Typesafe.partial({
 		ssl: Typesafe.boolean,
+		queryTimeoutMs: Typesafe.number,
+		statementTimeoutMs: Typesafe.number,
+		connectionTimeoutMs: Typesafe.number,
+		pool: Typesafe.partial({
+			maxConnections: Typesafe.number,
+			maxConnecting: Typesafe.number,
+			maxIdle: Typesafe.number,
+			reconnectIntervalMs: Typesafe.number,
+			idleTimeoutMs: Typesafe.number,
+			acquireTimeoutMs: Typesafe.number,
+			maxUses: Typesafe.number,
+			maxAgeMs: Typesafe.number,
+		}),
 	}),
 )
 
 export const tenantConfigSchema = Typesafe.intersection(
 	Typesafe.object({
-		db: dbCredentialsSchema,
+		db: dbConfigSchema,
 		mailer: Typesafe.transform(Typesafe.partial({
 			from: Typesafe.string,
 			host: Typesafe.string,
@@ -106,7 +119,7 @@ export const projectConfigSchema = Typesafe.object({
 			Typesafe.object({
 				useTenantDb: Typesafe.literal(true),
 			}),
-			dbCredentialsSchema,
+			dbConfigSchema,
 		),
 		Typesafe.partial({
 			systemSchema: Typesafe.string,

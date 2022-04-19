@@ -6,7 +6,7 @@ import { SystemDbMigrationsRunnerFactory } from '../SystemContainer'
 import {
 	Connection,
 	createDatabaseIfNotExists,
-	DatabaseCredentials,
+	DatabaseConfig,
 	retryTransaction,
 	SingleConnection,
 } from '@contember/database'
@@ -24,7 +24,7 @@ export class ProjectInitializer {
 
 	public async initialize(
 		databaseContextFactory: DatabaseContextFactory,
-		project: ProjectConfig & { db?: DatabaseCredentials },
+		project: ProjectConfig & { db?: DatabaseConfig },
 		logger: Logger,
 		migrations?: Migration[],
 	) {

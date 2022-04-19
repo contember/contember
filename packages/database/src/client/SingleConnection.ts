@@ -4,19 +4,20 @@ import { Client } from './Client'
 import { Transaction } from './Transaction'
 import { executeQuery } from './execution'
 import { Connection } from './Connection'
-import { DatabaseCredentials } from '../types'
+import { DatabaseConfig } from '../types'
 import { ClientError } from './errors'
+import { createPgClientFactory } from '../utils'
 
 export class SingleConnection implements Connection.ConnectionLike, Connection.ClientFactory {
 	private readonly pgClient: PgClient
 	private isConnected = false
 
 	constructor(
-		private readonly config: ClientConfig & DatabaseCredentials,
+		private readonly config: ClientConfig & DatabaseConfig,
 		private readonly queryConfig: Connection.QueryConfig,
 		public readonly eventManager: EventManager = new EventManager(null),
 	) {
-		this.pgClient = new PgClient(config)
+		this.pgClient = createPgClientFactory(config)()
 		this.pgClient.on('error', err => {
 			// eslint-disable-next-line no-console
 			console.error(err)

@@ -1,11 +1,10 @@
-import { ClientConfig, PoolConfig } from 'pg'
 import { EventManager } from './EventManager'
 import { Client } from './Client'
 import { Transaction } from './Transaction'
 import { executeQuery } from './execution'
-import { DatabaseCredentials } from '../types'
-import { Pool, PoolOptions, PoolStatus } from './Pool'
+import { Pool, PoolConfig, PoolStatus } from './Pool'
 import { createPgClientFactory } from '../utils'
+import { DatabaseConfig } from '../types'
 
 class Connection implements Connection.ConnectionLike, Connection.ClientFactory, Connection.PoolStatusProvider {
 	constructor(
@@ -21,11 +20,10 @@ class Connection implements Connection.ConnectionLike, Connection.ClientFactory,
 	}
 
 	public static create(
-		clientConfig: ClientConfig & DatabaseCredentials,
-		poolConfig: Partial<PoolOptions>,
+		{ pool = {}, ...config }: DatabaseConfig & { pool?: PoolConfig },
 		queryConfig: Connection.QueryConfig = {},
 	): Connection {
-		return new Connection(new Pool(createPgClientFactory(clientConfig), poolConfig), queryConfig)
+		return new Connection(new Pool(createPgClientFactory(config), pool), queryConfig)
 	}
 
 	public createClient(schema: string, queryMeta: Record<string, any>): Client {
@@ -140,8 +138,6 @@ namespace Connection {
 		readonly parameters: any[]
 		readonly meta: Record<string, any>
 	}
-
-	export type Credentials = Pick<PoolConfig, 'host' | 'port' | 'user' | 'password' | 'database'>
 
 	export interface Result<Row extends Record<string, any> = Record<string, any>> {
 		readonly rowCount: number

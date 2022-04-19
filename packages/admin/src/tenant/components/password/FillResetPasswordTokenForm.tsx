@@ -29,7 +29,7 @@ export const FillResetPasswordTokenForm: FC<FillResetPasswordTokenFormProps> = (
 					<TextInput {...register('token')} required={true} />
 				</FieldContainer>
 				<FieldContainer label={undefined}>
-					<Button intent="primary" type={'submit'} disabled={isSubmitting}>
+					<Button distinction="primary" type={'submit'} disabled={isSubmitting}>
 						Continue
 					</Button>
 				</FieldContainer>

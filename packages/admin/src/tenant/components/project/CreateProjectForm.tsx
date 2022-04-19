@@ -118,7 +118,7 @@ export const CreateProjectForm: FC<CreateProjectForm> = ({ projectListLink }) =>
 
 				<Divider />
 
-				<Button type="submit" distinction="primary" intent="primary" disabled={isSubmitting}>
+				<Button type="submit" distinction="primary" disabled={isSubmitting}>
 					Create new project
 				</Button>
 			</Stack>

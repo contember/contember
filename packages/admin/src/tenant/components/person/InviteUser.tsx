@@ -78,7 +78,7 @@ export const InviteUser: FC<InviteUserProps> = ({ project, rolesConfig, userList
 
 				<EditMembership {...editUserMembershipProps} />
 
-				<Button intent="primary" distinction="primary" type="submit" disabled={isSubmitting}>
+				<Button distinction="primary" type="submit" disabled={isSubmitting}>
 					Invite
 				</Button>
 			</Stack>

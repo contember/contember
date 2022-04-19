@@ -41,7 +41,7 @@ export const InsertLink = Component<InitializeReferenceContentProps>(
 			<LinkTarget />
 			<div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '1em', minWidth: '350px' }}>
 				<Button onClick={onCancel}>Cancel</Button>
-				<Button intent="primary" onClick={() => onSuccess({ createElement: { type: 'link' } })}>Insert</Button>
+				<Button distinction="primary" onClick={() => onSuccess({ createElement: { type: 'link' } })}>Insert</Button>
 			</div>
 		</>
 	),

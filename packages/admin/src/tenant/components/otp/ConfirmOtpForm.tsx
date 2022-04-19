@@ -52,7 +52,7 @@ export const ConfirmOtpForm: FC<ConfirmOtpFormProps> = ({ redirectOnSuccess, onS
 				<TextInput {...register('token')} required={true} />
 			</FieldContainer>
 			<br />
-			<Button intent="primary" type={'submit'} disabled={isSubmitting}>
+			<Button distinction="primary" type={'submit'} disabled={isSubmitting}>
 				Confirm two-factor authentication
 			</Button>
 		</form>

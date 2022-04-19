@@ -49,7 +49,7 @@ export const CreateResetPasswordRequestForm: FC<CreateResetPasswordRequestFormPr
 					<TextInput {...register('email')} required={true} type={'email'} />
 				</FieldContainer>
 				<FieldContainer label={undefined}>
-					<Button intent="primary" type={'submit'} disabled={isSubmitting}>
+					<Button distinction="primary" type={'submit'} disabled={isSubmitting}>
 						Reset password
 					</Button>
 				</FieldContainer>

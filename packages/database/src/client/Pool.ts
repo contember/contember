@@ -7,9 +7,11 @@ import { PgClientFactory } from '../utils'
 
 export type PoolLogger = (message: string, status: PoolStatus) => void
 
-export interface PoolOptions {
+export type PoolConfig = Partial<PoolConfigInternal>
+
+interface PoolConfigInternal {
 	/** maximum number of connections in a pool */
-	max: number
+	maxConnections: number
 	/** maximum number of connections concurrently establishing*/
 	maxConnecting: number
 	/** maximum number of idle connections. when reached, will be disposed immediately */
@@ -98,7 +100,7 @@ class Pool extends EventEmitter {
 	 */
 	private queue: PendingItem[] = []
 
-	private poolConfig: PoolOptions
+	private poolConfig: PoolConfigInternal
 
 	private lastRecoverableError: {
 		error: any
@@ -107,13 +109,13 @@ class Pool extends EventEmitter {
 
 	constructor(
 		private clientFactory: PgClientFactory,
-		poolConfig: Partial<PoolOptions>,
+		poolConfig: PoolConfig,
 	) {
 		super()
 		this.poolConfig = {
-			max: 10,
-			maxConnecting: Math.ceil((poolConfig.max ?? 10) / 2),
-			maxIdle: Math.ceil((poolConfig.max ?? 10) / 2),
+			maxConnections: 10,
+			maxConnecting: Math.ceil((poolConfig.maxConnections ?? 10) / 2),
+			maxIdle: Math.ceil((poolConfig.maxConnections ?? 10) / 2),
 			idleTimeoutMs: 10_000,
 			acquireTimeoutMs: 10_000,
 			reconnectIntervalMs: 100,
@@ -194,7 +196,7 @@ class Pool extends EventEmitter {
 
 	public getPoolStatus(): PoolStatus {
 		return {
-			max: this.poolConfig.max,
+			max: this.poolConfig.maxConnections,
 			active: this.active.size,
 			idle: this.idle.length,
 			pending: this.queue.length,
@@ -217,7 +219,7 @@ class Pool extends EventEmitter {
 			return
 		}
 		const idleCount = this.idle.length
-		if ((this.active.size + idleCount + connectingCount) >= this.poolConfig.max) {
+		if ((this.active.size + idleCount + connectingCount) >= this.poolConfig.maxConnections) {
 			this.log('Not connecting, max connections reached.')
 			return
 		}

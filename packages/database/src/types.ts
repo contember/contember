@@ -15,11 +15,14 @@ export interface Raw {
 	bindings: Value[]
 }
 
-export interface DatabaseCredentials {
+export interface DatabaseConfig {
 	readonly host: string
 	readonly port: number
 	readonly user: string
 	readonly password: string
 	readonly database: string
 	readonly ssl?: boolean
+	readonly queryTimeoutMs?: number
+	readonly statementTimeoutMs?: number
+	readonly connectionTimeoutMs?: number
 }

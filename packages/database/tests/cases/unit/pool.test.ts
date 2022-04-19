@@ -206,7 +206,7 @@ it('releases idle connection', async () => {
 it('waits for idle connection when pool is full', async () => {
 	const logger = createPoolLogger()
 	const pool = new Pool(() => new PgClientMock() as unknown as PgClient, {
-		max: 1,
+		maxConnections: 1,
 		log: logger,
 	})
 	const conn1 = await pool.acquire()

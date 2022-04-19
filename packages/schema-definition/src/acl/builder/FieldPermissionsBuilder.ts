@@ -2,7 +2,7 @@ import FieldSelector from './FieldSelector'
 import EntityPermissionsBuilder from './EntityPermissionsBuilder'
 import { Acl, Model, Writable } from '@contember/schema'
 import EntitySelector from './EntitySelector'
-import PermissionsBuilder from './PermissionsBuilder'
+import { PermissionsBuilder } from './PermissionsBuilder'
 
 export default class FieldPermissionsBuilder {
 	public constructor(

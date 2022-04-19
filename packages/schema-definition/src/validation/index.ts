@@ -2,6 +2,7 @@ import { tuple } from '../utils'
 import { SchemaDefinition } from '../model'
 import 'reflect-metadata'
 import { Validation } from '@contember/schema'
+import { filterEntityDefinition } from '../utils'
 
 type MessageOrString = Validation.Message | string
 
@@ -196,10 +197,9 @@ export const combine =
 			decorators.forEach(it => it(target, propertyKey))
 
 export function parseDefinition(
-	definitions: Record<string, SchemaDefinition.EnumDefinition | { new (): any }>,
+	definitions: Record<string, any>,
 ): Validation.Schema {
-	return Object.entries(definitions)
-		.filter((it): it is [string, { new (): any }] => !(it[1] instanceof SchemaDefinition.EnumDefinition))
+	return filterEntityDefinition(definitions)
 		.map(([name, definition]) => {
 			const target = definition.prototype
 			const defInstance = new definition()

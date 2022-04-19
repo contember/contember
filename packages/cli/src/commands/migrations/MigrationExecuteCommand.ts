@@ -54,7 +54,7 @@ export class MigrationExecuteCommand extends Command<Args, Options> {
 			const migrationArg = input.getArgument('migration')
 
 			const instance = await interactiveResolveInstanceEnvironmentFromInput(workspace, input?.getOption('instance'))
-			const apiToken = await interactiveResolveApiToken({ instance })
+			const apiToken = await interactiveResolveApiToken({ workspace, instance })
 			const remoteProject = remoteProjectOption || project.name
 			const tenantClient = TenantClient.create(instance.baseUrl, apiToken)
 			await tenantClient.createProject(remoteProject, true)

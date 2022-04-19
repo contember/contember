@@ -24,7 +24,7 @@ export class CreateApiKeyCommand extends Command<Args, Options> {
 		}
 		const workspace = await Workspace.get(process.cwd())
 		const instance = await interactiveResolveInstanceEnvironmentFromInput(workspace, input.getArgument('instance'))
-		const apiToken = await interactiveResolveApiToken({ instance })
+		const apiToken = await interactiveResolveApiToken({ workspace, instance })
 		const tenantClient = TenantClient.create(instance.baseUrl, apiToken)
 		const { id, token } = await interactiveCreateApiKey({ client: tenantClient })
 		console.log('API key created:')

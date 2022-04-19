@@ -79,7 +79,7 @@ export class MigrationDiffCommand extends Command<Args, Options> {
 
 					if (shouldExecute) {
 						const instance = await interactiveResolveInstanceEnvironmentFromInput(workspace)
-						const apiToken = await interactiveResolveApiToken({ instance })
+						const apiToken = await interactiveResolveApiToken({ workspace, instance })
 						const tenantClient = TenantClient.create(instance.baseUrl, apiToken)
 						await tenantClient.createProject(project.name, true)
 						const systemClient = SystemClient.create(instance.baseUrl, project.name, apiToken)

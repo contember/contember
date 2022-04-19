@@ -1,5 +1,5 @@
 import { Project, validateProjectName } from './Project'
-import { join } from 'path'
+import { basename, join } from 'path'
 import { Workspace } from './Workspace'
 import { resourcesDir } from '../pathUtils'
 import { installTemplate } from './template'
@@ -64,6 +64,14 @@ export class ProjectManager {
 	}
 
 	private async getProjectPathMapping(): Promise<Record<string, string>> {
-		return resolvePathMappingConfig(this.workspace.directory, this.workspace.config.projects)
+		return resolvePathMappingConfig(this.workspace.directory, this.getDefaultProjectName(), this.workspace.config.projects)
+	}
+
+
+	private getDefaultProjectName(): string {
+		return this.workspace.env.projectName
+			?? basename(this.workspace.directory)
+				.toLocaleLowerCase()
+				.replace(/[^-_a-z0-9]/, '')
 	}
 }

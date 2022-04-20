@@ -24,6 +24,10 @@ const ME_QUERY = `
 					}
 				}
 			}
+
+			permissions {
+				canCreateProject
+			}
 		}
 	}
 `
@@ -48,6 +52,9 @@ interface MeResponse {
 				}>,
 			}>,
 		}>,
+		permissions: {
+			canCreateProject: boolean,
+		},
 	},
 }
 

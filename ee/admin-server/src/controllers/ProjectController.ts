@@ -5,6 +5,7 @@ import type { S3Manager } from '../services/S3Manager'
 import { Readable } from 'stream'
 import type { GetObjectCommandOutput } from '@aws-sdk/client-s3'
 import { readAuthCookie } from '../utils/cookies'
+import { readReadable } from '../utils/readReadable'
 
 interface ProjectParams {
 	projectSlug: string
@@ -31,12 +32,17 @@ export class ProjectController extends BaseController<ProjectParams> {
 		}
 
 		try {
-			const innerRes = await this.tryFiles(params.projectSlug, params.projectGroup, params.path)
-
+			const path = params.path.includes('.') ? params.path : 'index.html'
+			const innerRes = await this.tryFiles(params.projectSlug, params.projectGroup, path)
 			if (innerRes.Body instanceof Readable) {
 				res.setHeader('Content-Type', innerRes.ContentType ?? 'application/octet-stream')
-				innerRes.Body.pipe(res)
-
+				if (path === 'index.html') {
+					const html = await readReadable(innerRes.Body)
+					const processedHtml = this.preprocessIndexHtml(html, params)
+					res.end(processedHtml)
+				} else {
+					innerRes.Body.pipe(res)
+				}
 			} else {
 				res.writeHead(500)
 				res.end()
@@ -49,6 +55,12 @@ export class ProjectController extends BaseController<ProjectParams> {
 	}
 
 	private async tryFiles(project: string, projectGroup: string | undefined, path: string): Promise<GetObjectCommandOutput> {
-		return await this.s3.getObject({ project, projectGroup, path: path.includes('.') ? path : 'index.html' })
+		return await this.s3.getObject({ project, projectGroup, path })
+	}
+
+	private preprocessIndexHtml(html: string, params: ProjectParams): string {
+		return html.replaceAll(/(src|href)="\.\//g, ((substring, attrName) => {
+			return `${attrName}="/${params.projectSlug}/`
+		}))
 	}
 }

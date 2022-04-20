@@ -98,8 +98,54 @@ test('upsert author (exists)', async () => {
 					response: { rowCount: 1 },
 				},
 				{
-					sql: SQL`select "root_"."id" as "root_id"  from "public"."author" as "root_"  where "root_"."id" = ?`,
-					parameters: [testUuid(2)],
+					sql: SQL`select "root_"."id" as "root_id"  from "public"."author" as "root_"  where "root_"."slug" = ?`,
+					parameters: ['john-doe'],
+					response: { rows: [{ root_id: testUuid(2) }] },
+				},
+			]),
+		],
+		return: {
+			data: {
+				upsertAuthor: {
+					ok: true,
+					node: {
+						id: testUuid(2),
+					},
+				},
+			},
+		},
+	})
+})
+
+test('upsert author (exists) with noop update)', async () => {
+	await execute({
+		schema: new SchemaBuilder()
+			.entity('Author', entity =>
+				entity
+					.column('name', c => c.type(Model.ColumnType.String))
+					.column('slug', c => c.type(Model.ColumnType.String).unique()),
+			)
+			.buildSchema(),
+		query: GQL`
+          mutation {
+              upsertAuthor(by: {slug: "john-doe"}, update: {}, create: {slug: "john-doe", name: "John Doe"}) {
+                  ok
+                  node {
+                      id
+                  }
+              }
+          }`,
+		executes: [
+			...sqlTransaction([
+				{
+					sql: SQL`select "root_"."id"
+					from "public"."author" as "root_"  where "root_"."slug" = ?`,
+					parameters: ['john-doe'],
+					response: { rows: [{ id: testUuid(2) }] },
+				},
+				{
+					sql: SQL`select "root_"."id" as "root_id"  from "public"."author" as "root_"  where "root_"."slug" = ?`,
+					parameters: ['john-doe'],
 					response: { rows: [{ root_id: testUuid(2) }] },
 				},
 			]),
@@ -117,3 +163,4 @@ test('upsert author (exists)', async () => {
 	})
 })
 test.run()
+

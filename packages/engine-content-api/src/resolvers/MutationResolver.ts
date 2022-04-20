@@ -378,12 +378,13 @@ export class MutationResolver {
 		if (errorResponse) {
 			return errorResponse
 		}
-		const primary = getInsertPrimary(result) || getUpdatePrimary(result)
-		if (!primary) {
+		const primary = getInsertPrimary(result)
+		const byResolved = primary ? { [entity.primary]: primary } : input.by
+		if (!byResolved) {
 			throw new ImplementationException('MutationResolver::resolveUpsertInternal does not handle result properly')
 		}
 
-		const nodes = await this.resolveResultNodes(mapper, entity, { [entity.primary]: primary }, queryAst)
+		const nodes = await this.resolveResultNodes(mapper, entity, byResolved, queryAst)
 		return {
 			ok: true,
 			validation: {

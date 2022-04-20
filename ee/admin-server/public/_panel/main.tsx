@@ -12,7 +12,8 @@ const Entry = () => {
 			apiBaseUrl={'/_api'}
 			basePath={'/_panel/'}
 			onInvalidIdentity={() => {
-				window.location.href = '/'
+				const params = new URLSearchParams({ backlink: window.location.pathname + window.location.search })
+				window.location.href = '/?' + params.toString()
 			}}
 			routes={{
 				projectList: { path: '/' },

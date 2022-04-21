@@ -24,8 +24,8 @@ export const LayoutPageStickyContainer = memo(({
 	const style: CSSProperties = useMemo(() => ({
 		'--cui-sticky-container-offset-left': left,
 		'--cui-sticky-container-offset-right': right,
-		'bottom': bottom === 0 ? 0 : bottom,
-		'top': top === 0 ? 0 : top,
+		'bottom': bottom,
+		'top': top,
 		...styleProp,
 	}), [bottom, left, right, styleProp, top])
 

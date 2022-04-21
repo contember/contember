@@ -17,7 +17,7 @@ export const Dialog = (props: DialogProps) => {
 	useRawCloseOnEscapeOrClickOutside<HTMLElement, HTMLElement>({
 		isOpen: true,
 		close: () => {
-			reject()
+			resolve()
 		},
 		content: contentElement,
 		reference: null,
@@ -31,12 +31,11 @@ export const Dialog = (props: DialogProps) => {
 	}, [contentElement])
 
 	const {
-		reject,
 		resolve,
 		settings: { content: RenderContent, bare, gap = 'default', heading, type },
 	} = props.settings
 
-	const renderedContent = <RenderContent resolve={resolve} reject={reject} />
+	const renderedContent = <RenderContent resolve={resolve} />
 
 	return (
 		<div className={cn(`${prefix}dialog`, toEnumViewClass(type))}>

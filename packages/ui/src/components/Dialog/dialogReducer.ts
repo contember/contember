@@ -4,8 +4,7 @@ import type { DialogSettings } from './DialogSettings'
 export type DialogId = number
 
 export interface DialogSettingsWithMetadata<Success> {
-	resolve: (value: Success) => void
-	reject: () => void
+	resolve: (value?: Success) => void
 	settings: DialogSettings<Success>
 }
 

@@ -14,13 +14,10 @@ export const DialogProvider = memo((props: DialogProviderProps) => {
 	const [dialogState, dispatch] = useReducer(dialogReducer, initialDialogState)
 	const idSeed = useRef<number>(1)
 
-	const options = useMemo<DialogOptions>(() => {
+	const options = useMemo<DialogOptions<any>>(() => {
 		return {
 			openDialog: <Success extends unknown>(settings: DialogSettings<Success>) =>
-				new Promise<Success>((promiseResolve, promiseReject) => {
-					if (settings.signal?.aborted) {
-						return promiseReject()
-					}
+				new Promise<Success>(promiseResolve => {
 					const dialogId = idSeed.current++
 					const resolve = (value: Success) => {
 						dispatch({
@@ -29,22 +26,11 @@ export const DialogProvider = memo((props: DialogProviderProps) => {
 						})
 						promiseResolve(value)
 					}
-					const reject = () => {
-						dispatch({
-							type: 'closeDialog',
-							dialogId,
-						})
-						promiseReject()
-					}
-
-					settings.signal?.addEventListener('abort', reject)
-
 					dispatch({
 						type: 'openDialog',
 						dialogId,
 						dialog: {
 							resolve,
-							reject,
 							settings,
 						},
 					})

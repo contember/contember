@@ -1,4 +1,5 @@
-import { RefObject, useLayoutEffect, useRef } from 'react'
+import { RefObject, useEffect, useLayoutEffect, useRef } from 'react'
+import { EditorSelectionState } from './EditorSelectionState'
 import { useEditorSelection } from './useEditorSelection'
 
 export interface ToolbarsState {
@@ -7,7 +8,46 @@ export interface ToolbarsState {
 	blockToolbarActive: boolean
 }
 
-// TODO use a container so that it doesn't break during resize.
+function updateToolbarStyle(container: HTMLDivElement, selectionState: EditorSelectionState) {
+	let top, left, maxWidth
+	let domRangeRect: DOMRect | undefined
+
+	if (selectionState.name === 'expandedNonPointerSelection') {
+		domRangeRect = selectionState.selection.getRangeAt(0).getBoundingClientRect()
+	} else if (selectionState.name === 'expandedPointerSelection') {
+		if (document.caretRangeFromPoint) {
+			domRangeRect =
+				document
+					.caretRangeFromPoint(selectionState.finishEvent.clientX, selectionState.finishEvent.clientY)
+					?.getBoundingClientRect() || undefined
+		} else {
+			domRangeRect =
+				document
+					.caretPositionFromPoint(selectionState.finishEvent.clientX, selectionState.finishEvent.clientY)
+					?.getClientRect() || undefined
+		}
+	}
+
+	if (domRangeRect) {
+		top = `${domRangeRect.top + window.pageYOffset - container.offsetHeight}px`
+		left = `${
+			Math.min(
+				Math.max(0, document.documentElement.clientWidth - container.offsetWidth),
+				Math.max(0, domRangeRect.left + window.pageXOffset - container.offsetWidth / 2 + domRangeRect.width / 2),
+			)
+		}px`
+		maxWidth = `${document.documentElement.clientWidth}px`
+	} else {
+		top = '-1000vh'
+		left = '-1000vw'
+		maxWidth = 'unset'
+	}
+
+	container.style.top = top
+	container.style.left = left
+	container.style.maxWidth = maxWidth
+}
+
 export const useToolbarState = (): ToolbarsState => {
 	const inlineToolbarRef = useRef<HTMLDivElement>(null)
 	const selectionState = useEditorSelection()
@@ -24,34 +64,30 @@ export const useToolbarState = (): ToolbarsState => {
 			return
 		}
 
-		let top, left
-		let domRangeRect: DOMRect | undefined
+		updateToolbarStyle(container, selectionState)
+	}, [selectionState])
 
-		if (selectionState.name === 'expandedNonPointerSelection') {
-			domRangeRect = selectionState.selection.getRangeAt(0).getBoundingClientRect()
-		} else if (selectionState.name === 'expandedPointerSelection') {
-			if (document.caretRangeFromPoint) {
-				domRangeRect =
-					document
-						.caretRangeFromPoint(selectionState.finishEvent.clientX, selectionState.finishEvent.clientY)
-						?.getBoundingClientRect() || undefined
-			} else {
-				domRangeRect =
-					document
-						.caretPositionFromPoint(selectionState.finishEvent.clientX, selectionState.finishEvent.clientY)
-						?.getClientRect() || undefined
+	useEffect(() => {
+		const container = inlineToolbarRef.current
+		let timeoutId: NodeJS.Timeout
+
+		function resize() {
+			if (!container) {
+				return
 			}
-		}
-		if (domRangeRect) {
-			top = `${domRangeRect.top + window.pageYOffset - container.offsetHeight}px`
-			left = `${domRangeRect.left + window.pageXOffset - container.offsetWidth / 2 + domRangeRect.width / 2}px`
-		} else {
-			top = '-1000vh'
-			left = '-1000vw'
+
+			clearTimeout(timeoutId)
+
+			timeoutId = setTimeout(() => {
+				updateToolbarStyle(container, selectionState)
+			}, 100)
 		}
 
-		container.style.top = top
-		container.style.left = left
+		window.addEventListener('resize', resize)
+
+		return () => {
+			window.removeEventListener('resize', resize)
+		}
 	}, [selectionState])
 
 	return {

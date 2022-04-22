@@ -1,0 +1,45 @@
+{
+	"formatVersion": 3,
+	"modifications": [
+		{
+			"modification": "createEnum",
+			"enumName": "ContentReferenceAlign",
+			"values": [
+				"left",
+				"right",
+				"center"
+			]
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "ContentReference",
+			"field": {
+				"name": "align",
+				"columnName": "align",
+				"nullable": true,
+				"type": "Enum",
+				"columnType": "ContentReferenceAlign"
+			}
+		},
+		{
+			"modification": "patchAclSchema",
+			"patch": [
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/ContentReference/operations/create/align",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/ContentReference/operations/update/align",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/ContentReference/operations/read/align",
+					"value": true
+				}
+			]
+		}
+	]
+}

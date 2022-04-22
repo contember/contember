@@ -15,7 +15,7 @@ import {
 	EntityRealmStateStub,
 	EntityState,
 	FieldState,
-	getEntityMarker,
+	getEntityMarker, RootStateNode, StateIterator,
 } from './state'
 import type { TreeStore } from './TreeStore'
 
@@ -25,15 +25,20 @@ type ProcessedPlaceholdersByEntity = Map<EntityState, Set<PlaceholderName>>
 
 // TODO enforce correct expected mutations in dev mode.
 export class MutationGenerator {
-	public constructor(private readonly treeStore: TreeStore) {}
+	public constructor(private readonly treeStore: TreeStore) {
+	}
 
 	public getPersistMutation(): string | undefined {
 		try {
 			let builder: QueryBuilder = new CrudQueryBuilder.CrudQueryBuilder()
 			const processedPlaceholdersByEntity: ProcessedPlaceholdersByEntity = new Map()
 
-			for (const [treeRootId, rootStates] of this.treeStore.subTreeStatesByRoot) {
-				for (const [placeholderName, subTreeState] of rootStates) {
+
+			for (const [treeRootId, rootStates] of this.treeStore.subTreeStatesByRoot.entries()) {
+				for (const [placeholderName, subTreeState] of Array.from(rootStates.entries()).reverse()) {
+					if (subTreeState.unpersistedChangesCount <= 0) {
+						continue
+					}
 					if (subTreeState.type === 'entityRealm') {
 						builder = this.addSubMutation(
 							processedPlaceholdersByEntity,
@@ -88,6 +93,7 @@ export class MutationGenerator {
 					}
 				}
 			}
+
 			return builder.inTransaction(undefined, { deferForeignKeyConstraints: true }).getGql()
 		} catch (e) {
 			return undefined
@@ -291,11 +297,9 @@ export class MutationGenerator {
 
 			const pathBack = this.treeStore.getPathBackToParent(siblingState)
 
-			const nonbearingFields: Array<
-				| { type: 'field'; marker: FieldMarker; fieldState: FieldState }
+			const nonbearingFields: Array<| { type: 'field'; marker: FieldMarker; fieldState: FieldState }
 				| { type: 'hasOne'; marker: HasOneRelationMarker; fieldState: EntityRealmState | EntityRealmStateStub }
-				| { type: 'hasMany'; marker: HasManyRelationMarker; fieldState: EntityListState }
-			> = []
+				| { type: 'hasMany'; marker: HasManyRelationMarker; fieldState: EntityListState }> = []
 
 			for (const [placeholderName, fieldState] of siblingState.children) {
 				if (processedPlaceholders.has(placeholderName)) {

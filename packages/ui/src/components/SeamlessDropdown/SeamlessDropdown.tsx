@@ -1,6 +1,10 @@
 import cn from 'classnames'
-import { ReactNode, useCallback, useState } from 'react'
-import { useClassNamePrefix, useCloseOnEscapeOrClickOutside } from '../../auxiliary'
+import { ReactNode, useCallback, useMemo, useRef, useState } from 'react'
+import {
+	useClassNamePrefix,
+	useCloseOnClickOutside,
+	useCloseOnEscape,
+} from '../../auxiliary'
 import { Default } from '../../types'
 import { toEnumViewClass, toViewClass } from '../../utils'
 import { Stack } from '../Stack'
@@ -27,7 +31,12 @@ export function SeamlessDropdown({ direction = 'down', label, children, hoverabl
 		setOpen(false)
 	}, [])
 
-	const refs = useCloseOnEscapeOrClickOutside<HTMLDivElement, HTMLDivElement>(open, close)
+	useCloseOnEscape(({ isOpen: open, close }))
+
+	const [buttonRef, setButtonRef] = useState<HTMLDivElement | null>(null)
+	const [contentRef, setContentRef] = useState<HTMLDivElement | null>(null)
+	const contents = useMemo(() => [buttonRef, contentRef], [buttonRef, contentRef])
+	useCloseOnClickOutside({ isOpen: open, close, contents: contents })
 
 	const buttonIn = (
 		<div className={cn(`${prefix}seamlessDropdown-button-in`)} onClick={hoverable ? undefined : toggleOpen}>
@@ -45,10 +54,10 @@ export function SeamlessDropdown({ direction = 'down', label, children, hoverabl
 				toViewClass('inline', inline),
 			)}
 		>
-			<div className={cn(`${prefix}seamlessDropdown-button`)} ref={refs.buttonRef}>
+			<div className={cn(`${prefix}seamlessDropdown-button`)} ref={setButtonRef}>
 				{buttonIn}
 			</div>
-			<div className={cn(`${prefix}seamlessDropdown-content`)} ref={refs.contentRef}>
+			<div className={cn(`${prefix}seamlessDropdown-content`)} ref={setContentRef}>
 				{buttonIn}
 				<div className={cn(`${prefix}seamlessDropdown-content-sep`)}></div>
 				<Stack direction="vertical" gap="small" className={cn(`${prefix}seamlessDropdown-content-in`)}>{children}</Stack>

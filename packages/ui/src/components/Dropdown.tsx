@@ -10,11 +10,12 @@ import {
 	useCallback,
 	useContext,
 	useEffect,
+	useMemo,
 	useRef,
 	useState,
 } from 'react'
 import { usePopper } from 'react-popper'
-import { useClassNamePrefix, useRawCloseOnEscapeOrClickOutside } from '../auxiliary'
+import { useClassNamePrefix, useCloseOnClickOutside, useCloseOnEscape } from '../auxiliary'
 import type { DropdownAlignment } from '../types'
 import { assertNever, toViewClass } from '../utils'
 import { Collapsible } from './Collapsible'
@@ -100,12 +101,8 @@ export const Dropdown = memo((props: DropdownProps) => {
 		onDismiss?.()
 	}, [close, onDismiss])
 
-	useRawCloseOnEscapeOrClickOutside<HTMLElement, HTMLElement>({
-		isOpen,
-		close: dismiss,
-		reference: referenceElement,
-		content: popperElement,
-	})
+	useCloseOnEscape({ isOpen, close: dismiss })
+	useCloseOnClickOutside({ isOpen, close: dismiss, contents: useMemo(() => [referenceElement, popperElement], [referenceElement, popperElement]) })
 
 	const contentContainerFromContent = useContext(DropdownContentContainerContext)
 	const contentContainer = props.contentContainer || contentContainerFromContent || document.body

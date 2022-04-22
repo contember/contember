@@ -1,33 +1,6 @@
-import { useEffect, useRef } from 'react'
+import { useEffect } from 'react'
 
-export const useCloseOnEscapeOrClickOutside = <Reference extends Node, Content extends Node>(
-	isOpen: boolean,
-	close: () => void,
-) => {
-	const buttonRef = useRef<Reference>(null)
-	const contentRef = useRef<Content>(null)
-
-	useRawCloseOnEscapeOrClickOutside<Reference, Content>({
-		reference: buttonRef.current,
-		content: contentRef.current,
-		isOpen,
-		close,
-	})
-
-	return { buttonRef, contentRef }
-}
-
-export const useRawCloseOnEscapeOrClickOutside = <Reference extends Node, Content extends Node>({
-	isOpen,
-	close,
-	reference,
-	content,
-}: {
-	isOpen: boolean
-	close: () => void
-	reference: Reference | null
-	content: Content | null
-}) => {
+export const useCloseOnEscape = ({ isOpen, close }: { isOpen: boolean, close: () => void }) => {
 	useEffect(() => {
 		if (isOpen) {
 			const closeOnEscapeKey = (event: KeyboardEvent) => {
@@ -35,27 +8,37 @@ export const useRawCloseOnEscapeOrClickOutside = <Reference extends Node, Conten
 					close()
 				}
 			}
-			const closeOnClickOutside = (event: MouseEvent) => {
+			window.addEventListener('keydown', closeOnEscapeKey)
+
+			return () => {
+				window.removeEventListener('keydown', closeOnEscapeKey)
+			}
+		}
+	}, [close, isOpen])
+}
+
+export const useCloseOnClickOutside = ({ isOpen, close, contents, outside }: { isOpen: boolean, close: () => void, contents: (Node | null)[], outside?: HTMLElement | null }) => {
+	useEffect(() => {
+		if (isOpen) {
+			const closeOnClickOutside = (event: Event) => {
+				const target = event.target
 				if (
-					event.target instanceof Node &&
-					(!document.body.contains(event.target) ||
-						event.target === document.body ||
-						(reference && reference.contains(event.target)) ||
-						(content && content.contains(event.target)))
+					target instanceof Node &&
+					(!document.body.contains(target) ||
+						target === document.body ||
+						contents.some(it => it && it.contains(target)))
 				) {
 					return
 				}
-				if (!content && !reference) {
+				if (contents.every(it => it === null)) {
 					return
 				}
 				close()
 			}
-			window.addEventListener('keydown', closeOnEscapeKey)
-			window.addEventListener('click', closeOnClickOutside)
+			(outside ?? window).addEventListener('click', closeOnClickOutside)
 			return () => {
-				window.removeEventListener('keydown', closeOnEscapeKey)
-				window.removeEventListener('click', closeOnClickOutside)
+				(outside ?? window).removeEventListener('click', closeOnClickOutside)
 			}
 		}
-	}, [close, content, isOpen, reference])
+	}, [close, isOpen, contents, outside])
 }

@@ -10,6 +10,7 @@ import type * as Buffer from 'buffer'
 import mime from 'mime'
 import { S3LocationResolver } from './S3LocationResolver'
 import { Readable } from 'stream'
+import { readReadable } from '../utils/readReadable'
 
 export class S3Manager {
 	constructor(
@@ -38,12 +39,7 @@ export class S3Manager {
 		if (!(body instanceof Readable)) {
 			throw new Error('Invalid S3 response')
 		}
-		return new Promise((resolve, reject) => {
-			body.once('error', reject)
-			const chunks: string[] = []
-			body.on('data', it => chunks.push(it))
-			body.on('end', () => resolve(chunks.join('')))
-		})
+		return readReadable(body)
 	}
 
 	async putObject({ project, projectGroup, path, body }: {

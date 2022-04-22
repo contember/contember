@@ -28,9 +28,15 @@ const validateProps = (props: Partial<ApplicationEntrypointProps>) => {
 
 export const ApplicationEntrypoint = (props: ApplicationEntrypointProps) => {
 	validateProps(props)
+	const projectSlug = props.project === '__PROJECT_SLUG__'
+		? window.location.pathname.split('/')[1]
+		: props.project
+	const basePath = props.basePath === './'
+		? `/${projectSlug}/`
+		: (props.basePath ?? '/')
 
 	const routing: RoutingContextValue = {
-		basePath: props.basePath ?? '/',
+		basePath,
 		routes: props.routes ?? { index: { path: '/' } },
 		defaultDimensions: props.defaultDimensions,
 	}
@@ -52,7 +58,7 @@ export const ApplicationEntrypoint = (props: ApplicationEntrypointProps) => {
 										apiBaseUrl={props.apiBaseUrl}
 										sessionToken={props.sessionToken}
 										loginToken={props.loginToken}
-										project={props.project}
+										project={projectSlug}
 										stage={props.stage}
 									>
 										<NavigationProvider>

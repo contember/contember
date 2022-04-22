@@ -287,142 +287,145 @@ export class MutationGenerator {
 			return builder
 		}
 
-		const pathBack = this.treeStore.getPathBackToParent(currentState)
+		for (const siblingState of StateIterator.eachSiblingRealm(currentState)) {
 
-		const nonbearingFields: Array<
-			| { type: 'field'; marker: FieldMarker; fieldState: FieldState }
-			| { type: 'hasOne'; marker: HasOneRelationMarker; fieldState: EntityRealmState | EntityRealmStateStub }
-			| { type: 'hasMany'; marker: HasManyRelationMarker; fieldState: EntityListState }
-		> = []
+			const pathBack = this.treeStore.getPathBackToParent(siblingState)
 
-		for (const [placeholderName, fieldState] of currentState.children) {
-			if (processedPlaceholders.has(placeholderName)) {
-				continue
+			const nonbearingFields: Array<
+				| { type: 'field'; marker: FieldMarker; fieldState: FieldState }
+				| { type: 'hasOne'; marker: HasOneRelationMarker; fieldState: EntityRealmState | EntityRealmStateStub }
+				| { type: 'hasMany'; marker: HasManyRelationMarker; fieldState: EntityListState }
+			> = []
+
+			for (const [placeholderName, fieldState] of siblingState.children) {
+				if (processedPlaceholders.has(placeholderName)) {
+					continue
+				}
+				processedPlaceholders.add(placeholderName)
+
+				switch (fieldState.type) {
+					case 'field': {
+						const marker = fieldState.fieldMarker
+						const placeholderName = marker.placeholderName
+
+						if (
+							placeholderName === TYPENAME_KEY_NAME ||
+							(placeholderName === PRIMARY_KEY_NAME && !(siblingState.entity.id instanceof ClientGeneratedUuid))
+						) {
+							continue
+						}
+						if (marker.isNonbearing) {
+							nonbearingFields.push({
+								type: 'field',
+								marker,
+								fieldState,
+							})
+							continue
+						}
+						builder = this.registerCreateFieldPart(fieldState, marker, builder)
+						break
+					}
+					case 'entityRealmStub':
+					case 'entityRealm': {
+						const marker = getEntityMarker(fieldState)
+						if (!(marker instanceof HasOneRelationMarker)) {
+							throw new BindingError()
+						}
+						if (pathBack?.fieldBackToParent === marker.parameters.field) {
+							continue
+						}
+						if (marker.parameters.isNonbearing) {
+							nonbearingFields.push({
+								type: 'hasOne',
+								marker,
+								fieldState,
+							})
+							continue
+						}
+						builder = this.registerCreateEntityPart(processedPlaceholdersByEntity, fieldState, marker, builder)
+						break
+					}
+					case 'entityList': {
+						const marker = fieldState.blueprint.marker
+						if (!(marker instanceof HasManyRelationMarker)) {
+							throw new BindingError()
+						}
+						if (pathBack?.fieldBackToParent === marker.parameters.field) {
+							continue
+						}
+						if (marker.parameters.isNonbearing) {
+							nonbearingFields.push({
+								type: 'hasMany',
+								marker,
+								fieldState,
+							})
+							continue
+						}
+						builder = this.registerCreateEntityListPart(processedPlaceholdersByEntity, fieldState, marker, builder)
+						break
+					}
+					default: {
+						return assertNever(fieldState)
+					}
+				}
 			}
-			processedPlaceholders.add(placeholderName)
 
-			switch (fieldState.type) {
-				case 'field': {
-					const marker = fieldState.fieldMarker
-					const placeholderName = marker.placeholderName
+			// if (
+			// 	currentState.blueprint.creationParameters.forceCreation &&
+			// 	(builder.data === undefined || isEmptyObject(builder.data))
+			// ) {
+			// 	builder = builder.set('_dummy_field_', true)
+			// }
+
+			if (
+				(builder.data !== undefined && !isEmptyObject(builder.data)) ||
+				!getEntityMarker(siblingState).fields.hasAtLeastOneBearingField
+			) {
+				for (const field of nonbearingFields) {
+					switch (field.type) {
+						case 'field': {
+							builder = this.registerCreateFieldPart(field.fieldState, field.marker, builder)
+							break
+						}
+						case 'hasOne': {
+							builder = this.registerCreateEntityPart(
+								processedPlaceholdersByEntity,
+								field.fieldState,
+								field.marker,
+								builder,
+							)
+							break
+						}
+						case 'hasMany': {
+							builder = this.registerCreateEntityListPart(
+								processedPlaceholdersByEntity,
+								field.fieldState,
+								field.marker,
+								builder,
+							)
+							break
+						}
+						default:
+							assertNever(field)
+					}
+				}
+			}
+
+			const setOnCreate = getEntityMarker(siblingState).parameters.setOnCreate
+			if (setOnCreate && builder.data !== undefined && !isEmptyObject(builder.data)) {
+				for (const key in setOnCreate) {
+					const field = setOnCreate[key]
 
 					if (
-						placeholderName === TYPENAME_KEY_NAME ||
-						(placeholderName === PRIMARY_KEY_NAME && !(currentState.entity.id instanceof ClientGeneratedUuid))
+						typeof field === 'string' ||
+						typeof field === 'number' ||
+						field === null ||
+						field instanceof GraphQlBuilder.GraphQlLiteral
 					) {
-						continue
+						builder = builder.set(key, field)
+					} else {
+						builder = builder.one(key, builder => builder.connect(field))
 					}
-					if (marker.isNonbearing) {
-						nonbearingFields.push({
-							type: 'field',
-							marker,
-							fieldState,
-						})
-						continue
-					}
-					builder = this.registerCreateFieldPart(fieldState, marker, builder)
-					break
-				}
-				case 'entityRealmStub':
-				case 'entityRealm': {
-					const marker = getEntityMarker(fieldState)
-					if (!(marker instanceof HasOneRelationMarker)) {
-						throw new BindingError()
-					}
-					if (pathBack?.fieldBackToParent === marker.parameters.field) {
-						continue
-					}
-					if (marker.parameters.isNonbearing) {
-						nonbearingFields.push({
-							type: 'hasOne',
-							marker,
-							fieldState,
-						})
-						continue
-					}
-					builder = this.registerCreateEntityPart(processedPlaceholdersByEntity, fieldState, marker, builder)
-					break
-				}
-				case 'entityList': {
-					const marker = fieldState.blueprint.marker
-					if (!(marker instanceof HasManyRelationMarker)) {
-						throw new BindingError()
-					}
-					if (pathBack?.fieldBackToParent === marker.parameters.field) {
-						continue
-					}
-					if (marker.parameters.isNonbearing) {
-						nonbearingFields.push({
-							type: 'hasMany',
-							marker,
-							fieldState,
-						})
-						continue
-					}
-					builder = this.registerCreateEntityListPart(processedPlaceholdersByEntity, fieldState, marker, builder)
-					break
-				}
-				default: {
-					return assertNever(fieldState)
-				}
-			}
-		}
-
-		// if (
-		// 	currentState.blueprint.creationParameters.forceCreation &&
-		// 	(builder.data === undefined || isEmptyObject(builder.data))
-		// ) {
-		// 	builder = builder.set('_dummy_field_', true)
-		// }
-
-		if (
-			(builder.data !== undefined && !isEmptyObject(builder.data)) ||
-			!getEntityMarker(currentState).fields.hasAtLeastOneBearingField
-		) {
-			for (const field of nonbearingFields) {
-				switch (field.type) {
-					case 'field': {
-						builder = this.registerCreateFieldPart(field.fieldState, field.marker, builder)
-						break
-					}
-					case 'hasOne': {
-						builder = this.registerCreateEntityPart(
-							processedPlaceholdersByEntity,
-							field.fieldState,
-							field.marker,
-							builder,
-						)
-						break
-					}
-					case 'hasMany': {
-						builder = this.registerCreateEntityListPart(
-							processedPlaceholdersByEntity,
-							field.fieldState,
-							field.marker,
-							builder,
-						)
-						break
-					}
-					default:
-						assertNever(field)
-				}
-			}
-		}
-
-		const setOnCreate = getEntityMarker(currentState).parameters.setOnCreate
-		if (setOnCreate && builder.data !== undefined && !isEmptyObject(builder.data)) {
-			for (const key in setOnCreate) {
-				const field = setOnCreate[key]
-
-				if (
-					typeof field === 'string' ||
-					typeof field === 'number' ||
-					field === null ||
-					field instanceof GraphQlBuilder.GraphQlLiteral
-				) {
-					builder = builder.set(key, field)
-				} else {
-					builder = builder.one(key, builder => builder.connect(field))
 				}
 			}
 		}

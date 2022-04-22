@@ -2,13 +2,14 @@ import classnames from 'classnames'
 import { CSSProperties, forwardRef, memo, ReactNode, useMemo } from 'react'
 import { useClassNamePrefix } from '../../auxiliary'
 import type { NativeProps, Size } from '../../types'
-import { toEnumClass, toEnumViewClass, toViewClass } from '../../utils'
+import { toEnumClass, toEnumViewClass, toStateClass, toViewClass } from '../../utils'
 
 export interface StackOwnProps {
 	align?: 'center' | 'stretch' | 'start' | 'end',
 	basis?: CSSProperties['flexBasis'],
 	children?: ReactNode,
 	direction: 'vertical' | 'horizontal' | 'vertical-reverse' | 'horizontal-reverse',
+	evenly?: boolean,
 	gap?: Size | 'xlarge' | 'none',
 	grow?: boolean | CSSProperties['flexGrow'],
 	justify?:
@@ -34,6 +35,7 @@ export const Stack = memo(
 		({
 			align,
 			basis,
+			evenly,
 			children,
 			className,
 			direction,
@@ -48,7 +50,7 @@ export const Stack = memo(
 			const prefix = useClassNamePrefix()
 
 			const style: CSSProperties = useMemo(() => ({
-				...(typeof basis !== 'boolean' ? { flexBasis: basis } : {}),
+				...{ flexBasis: basis },
 				...(typeof grow !== 'boolean' ? { flexGrow: grow } : {}),
 				...(typeof shrink !== 'boolean' ? { flexShrink: shrink } : {}),
 				...styleProp,
@@ -61,6 +63,7 @@ export const Stack = memo(
 						className={classnames(
 							`${prefix}stack`,
 							toViewClass(`${direction}`, true),
+							toStateClass('evenly-distributed', evenly),
 							toEnumClass('gap-', gap),
 							align && toEnumViewClass(`align-${align}`),
 							grow === true && toEnumViewClass('grow'),

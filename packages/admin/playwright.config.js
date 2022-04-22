@@ -5,6 +5,12 @@ const config = {
 	timeout: 60000,
 	workers: process.env.CI ? 1 : undefined,
 
+	expect: {
+		toMatchSnapshot: {
+			threshold: 0.05,
+		},
+	},
+
 	reporter: [
 		[process.env.CI ? 'github' : 'list'],
 		['html', { open: 'never', outputFolder: 'tests/playwright/report' }],

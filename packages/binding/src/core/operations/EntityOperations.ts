@@ -152,6 +152,7 @@ export class EntityOperations {
 						stateToConnect.entity.id,
 						stateToConnect.entity.entityName,
 						previouslyConnectedState.blueprint,
+						stateToConnect,
 					)
 
 					this.eventManager.registerUpdatedConnection(state, targetHasOneMarker.placeholderName)

@@ -126,7 +126,7 @@ export class StateInitializer {
 
 			return stub
 		}
-		const realm = this.createEntityRealm(blueprint, realmKey, entity)
+		const realm = this.createEntityRealm(blueprint, realmKey, entity, copyFrom)
 
 		this.registerEntityRealm(realm)
 
@@ -139,7 +139,7 @@ export class StateInitializer {
 				if (!value || value.type !== 'field') {
 					throw new BindingError()
 				}
-				this.initializeFromFieldMarker(realm, field, value.value)
+				this.initializeFromFieldMarker(realm, field, undefined, value)
 			} else if (field instanceof HasManyRelationMarker) {
 				// todo: get from copyFrom
 				this.initializeFromHasManyRelationMarker(realm, field, new Set())
@@ -168,7 +168,12 @@ export class StateInitializer {
 		return realm
 	}
 
-	private createEntityRealm(blueprint: EntityRealmBlueprint, realmKey: string, entity: EntityState): EntityRealmState {
+	private createEntityRealm(
+		blueprint: EntityRealmBlueprint,
+		realmKey: string,
+		entity: EntityState,
+		copyFrom?: EntityRealmState,
+	): EntityRealmState {
 		const entityRealm: EntityRealmState = {
 			type: 'entityRealm',
 
@@ -183,7 +188,7 @@ export class StateInitializer {
 			eventListeners: this.initializeEntityEventListenerStore(blueprint),
 			fieldsWithPendingConnectionUpdates: undefined,
 			plannedHasOneDeletions: undefined,
-			unpersistedChangesCount: 0,
+			unpersistedChangesCount: copyFrom?.unpersistedChangesCount ?? 0,
 			getAccessor: () => {
 				if (entityRealm.accessor === undefined) {
 					const entity = entityRealm.entity
@@ -359,8 +364,9 @@ export class StateInitializer {
 		placeholderName: FieldName,
 		fieldMarker: FieldMarker,
 		persistedValue: Scalar | undefined,
+		copyFromState: FieldState | undefined,
 	): FieldState {
-		const resolvedFieldValue = persistedValue ?? fieldMarker.defaultValue ?? null
+		const resolvedFieldValue = copyFromState ? copyFromState.value : (persistedValue ?? fieldMarker.defaultValue ?? null)
 
 		const fieldState: FieldState = {
 			type: 'field',
@@ -373,7 +379,7 @@ export class StateInitializer {
 			eventListeners: this.initializeFieldEventListenerStore(fieldMarker),
 			errors: undefined,
 			touchLog: undefined,
-			hasUnpersistedChanges: false,
+			hasUnpersistedChanges: copyFromState?.hasUnpersistedChanges ?? false,
 
 			getAccessor: () => {
 				if (fieldState.accessor === undefined) {
@@ -409,15 +415,16 @@ export class StateInitializer {
 	private initializeFromFieldMarker(
 		parent: EntityRealmState,
 		field: FieldMarker,
-		fieldDatum: EntityFieldPersistedData | undefined,
+		persistedValue: EntityFieldPersistedData | undefined,
+		copyFromState?: FieldState,
 	) {
-		if (fieldDatum instanceof Set) {
+		if (persistedValue instanceof Set) {
 			throw new BindingError(
 				`Received a collection of referenced entities where a single '${field.fieldName}' field was expected. ` +
 					`Perhaps you wanted to use a <Repeater />?`,
 			)
 		}
-		if (fieldDatum instanceof ServerId) {
+		if (persistedValue instanceof ServerId) {
 			throw new BindingError(
 				`Received a referenced entity where a single '${field.fieldName}' field was expected. ` +
 					`Perhaps you wanted to use <HasOne />?`,
@@ -425,7 +432,7 @@ export class StateInitializer {
 		}
 		parent.children.set(
 			field.placeholderName,
-			this.initializeFieldState(parent, field.placeholderName, field, fieldDatum),
+			this.initializeFieldState(parent, field.placeholderName, field, persistedValue, copyFromState),
 		)
 	}
 

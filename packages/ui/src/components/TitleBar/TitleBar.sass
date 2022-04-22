@@ -15,10 +15,6 @@
 	padding-left: var(--cui-padding-left)
 	padding-right: var(--cui-padding-right)
 	padding-top: var(--cui-padding-top)
-	position: sticky
-	top: 0
-	left: var(--layout-chrome-bar-width, 0)
-	max-width: calc(100vw - var(--layout-chrome-bar-width, 0))
 	z-index: 2
 
 	&::after
@@ -35,14 +31,13 @@
 		display: flex
 		flex-wrap: wrap
 		gap: calc(var(--cui-gap) * 2)
+		justify-content: space-between
 	&-navigation + &-in
 		margin-top: 0
 
 	&-heading
 		flex: 1
 		padding-right: .5em
-	&-actions
-		margin-left: auto
 
 	@media (max-width: $breakpoint-max-medium)
 		background: linear-gradient(to bottom, var(--cui-background-color), var(--cui-background-color--below))

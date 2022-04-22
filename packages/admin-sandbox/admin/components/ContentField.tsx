@@ -7,6 +7,7 @@ import {
 	ImageUploadField,
 	paragraphNumberedToolbarButton,
 	paragraphToolbarButton,
+	RadioField,
 	RichEditor,
 	Scheme,
 	scrollTargetToolbarButton,
@@ -117,6 +118,11 @@ export const ContentField = Component<ContentFieldProps>(
 					fileSizeField="size"
 					fileTypeField="type"
 				/>
+				<RadioField field={'align'} label={'Align'} options={[
+					{ value: 'left', label: 'Left' },
+					{ value: 'right', label: 'Right' },
+					{ value: 'center', label: 'Center' },
+				]} orientation={'horizontal'} />
 			</Block>
 			<Block discriminateBy="quote" label="Quote">
 				<BlockEditor.ContentOutlet />

@@ -26,4 +26,5 @@ export class ContentReference {
 	secondaryText = d.stringColumn()
 	image = d.manyHasOne(BasicImage)
 	link = d.manyHasOne(Link)
+	align = d.enumColumn(d.createEnum('left', 'right', 'center'))
 }

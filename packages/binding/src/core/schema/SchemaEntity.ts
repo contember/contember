@@ -6,5 +6,5 @@ export interface SchemaEntity {
 	name: EntityName
 	customPrimaryAllowed: boolean
 	fields: SchemaFields
-	unique: SchemaUniqueConstraint
+	unique: SchemaUniqueConstraint[]
 }

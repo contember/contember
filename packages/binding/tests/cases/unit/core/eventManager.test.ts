@@ -37,7 +37,7 @@ const prepareBeforePersistTest = ({ event }: { event: (getAccessor: () => Entity
 							}],
 						]),
 						name: 'Foo',
-						unique: { fields: new Set() },
+						unique: [],
 					}],
 				],
 			),

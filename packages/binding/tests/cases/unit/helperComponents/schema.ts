@@ -36,7 +36,7 @@ export const schema = new Schema(SchemaPreprocessor.processRawSchema({
 					},
 				],
 				customPrimaryAllowed: false,
-				unique: { fields: new Set() },
+				unique: [],
 			},
 			{
 				name: 'Article',
@@ -79,7 +79,7 @@ export const schema = new Schema(SchemaPreprocessor.processRawSchema({
 					},
 				],
 				customPrimaryAllowed: false,
-				unique: { fields: new Set() },
+				unique: [],
 			},
 		],
 		enums: [],

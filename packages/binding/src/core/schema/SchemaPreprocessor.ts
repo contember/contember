@@ -32,7 +32,7 @@ export class SchemaPreprocessor {
 				customPrimaryAllowed: entity.customPrimaryAllowed,
 				fields: this.processRawFields(entity.fields),
 				name: entity.name,
-				unique: entity.unique,
+				unique: entity.unique.map(it => ({ fields: new Set(it.fields) })),
 			})
 		}
 

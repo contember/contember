@@ -106,7 +106,8 @@ export class ListOperations {
 				if (persistedEntityIds.has(idToConnect.value)) {
 					// It was removed from the list but now we're adding it back.
 					changesDelta--
-				} else {
+				} else if (idToConnect.existsOnServer) {
+					// ignoring unpersisted entities
 					changesDelta++
 				}
 				if (stateToConnect.type === 'entityRealm') {

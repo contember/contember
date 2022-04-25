@@ -127,16 +127,11 @@ export class EntityOperations {
 					}
 
 					const persistedId = persistedData?.get(targetHasOneMarker.placeholderName)
-					if (persistedId instanceof ServerId) {
-						if (persistedId.value === stateToConnect.entity.id.value) {
-							changesDelta-- // It was removed from the list but now we're adding it back.
-						} else if (persistedId.value === previouslyConnectedState.entity.id.value) {
-							changesDelta++ // We're changing it from the persisted id.
-						}
+					if (persistedId instanceof ServerId && persistedId.value === stateToConnect.entity.id.value) {
+						changesDelta-- // It was removed from the list but now we're adding it back.
+					} else if (persistedId instanceof ServerId && persistedId.value === previouslyConnectedState.entity.id.value) {
+						changesDelta++ // We're changing it from the persisted id.
 					} else if (!previouslyConnectedState.entity.id.existsOnServer) {
-						// This assumes the invariant enforced above that we cannot connect unpersisted entities.
-						// Hence the previouslyConnectedState still refers to the entity created initially.
-
 						if (
 							persistedId === null || // We're updating.
 							(persistedId === undefined && // We're creating.
@@ -144,6 +139,9 @@ export class EntityOperations {
 						) {
 							changesDelta++
 						}
+					}
+					if (stateToConnect.type === 'entityRealm') {
+							changesDelta += stateToConnect.unpersistedChangesCount
 					}
 
 					// TODO do something about the existing state…

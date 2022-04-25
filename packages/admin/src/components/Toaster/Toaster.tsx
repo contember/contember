@@ -38,7 +38,6 @@ export const Toaster: React.FC = () => {
 						distinction="striking"
 						action={
 							<Button
-								intent={toastTypeToIntent[toast.type]}
 								distinction="seamless"
 								flow="squarish"
 								onClick={() => {

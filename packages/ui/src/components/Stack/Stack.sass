@@ -22,6 +22,9 @@
   row-gap: var(--stack-row-gap)
   column-gap: var(--stack-column-gap)
 
+  &.is-evenly-distributed > *
+    flex-basis: 0%
+
   &.view-horizontal
     flex-direction: row
   &.view-vertical
@@ -56,6 +59,9 @@
       justify-content: space-evenly
     &-stretch
       justify-content: stretch
+      & > *
+        flex-grow: 1
+        flex-shrink: 1
     &-inherit
       justify-content: inherit
     &-initial

@@ -1,30 +1,50 @@
 import type { ComponentMeta, ComponentStory } from '@storybook/react'
 import * as React from 'react'
 import { Stack } from '../../src'
-import { Block, booleanControl, numberControl } from './Helpers'
+import { Block, booleanControl, disabledControlsForAttributes } from './Helpers'
 
 export default {
 	title: 'Stack',
 	component: Stack,
 	argTypes: {
-		grow: numberControl(0, undefined, 1, undefined),
-		shrink: numberControl(0, undefined, 1, undefined),
+		...disabledControlsForAttributes<typeof Stack>('children'),
+		evenly: booleanControl(false),
 		wrap: booleanControl(false),
 	},
 } as ComponentMeta<typeof Stack>
 
 const Template: ComponentStory<typeof Stack> = args => <Stack {...args}>
-	<Block />
-	<Block />
-	<Block />
-	<Block />
-	<Block />
-	<Block />
-	<Block style={{ flexBasis: '100%' }} />
+	{args.children ?? <>
+		<Block />
+		<Block />
+		<Block>Lorem ipsum</Block>
+		<Block />
+		<Block />
+	</>}
 </Stack>
 
 export const Defaut = Template.bind({})
 
 Defaut.args = {
 	direction: 'vertical',
+}
+
+export const Many_children = Template.bind({})
+
+Many_children.args = {
+	direction: 'vertical',
+	children: <>
+		<Block />
+		<Block />
+		<Block />
+		<Block>Lorem ipsum</Block>
+		<Block />
+		<Block />
+		<Block />
+		<Block />
+		<Block />
+		<Block />
+		<Block />
+		<Block />
+	</>,
 }

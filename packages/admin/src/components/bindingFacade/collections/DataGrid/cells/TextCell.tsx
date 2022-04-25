@@ -86,6 +86,7 @@ export const TextCell: FunctionComponent<TextCellProps> = Component(props => {
 								labelPosition="labelInlineRight"
 							>
 								<Checkbox
+									notNull
 									value={filter.nullCondition}
 									onChange={checked => {
 										setFilter({

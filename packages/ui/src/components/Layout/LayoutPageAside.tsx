@@ -4,15 +4,6 @@ import { NativeProps } from '../../types'
 import { useSectionTabsRegistration } from '../SectionTabs'
 import { Stack } from '../Stack'
 
-function isElementFixed (element: HTMLDivElement) {
-  const offsetTop = element.offsetTop
-  const offsetHeight = element.offsetHeight
-  const scrollTop = element.scrollTop
-  const scrollHeight = element.scrollHeight
-
-  return offsetTop === scrollTop && offsetHeight === scrollHeight
-}
-
 const metaTab = {
 	id: 'meta-section-aside',
 	label: 'Meta',
@@ -25,11 +16,11 @@ export const LayoutPageAside = memo(({ children }: NativeProps<HTMLDivElement>) 
 	const element = useRef<HTMLDivElement>(null)
 
 	useLayoutEffect(() => {
+		const mediaQueryList = matchMedia('(min-width: 1280px)')
+
 		const tabRegistration = () => {
 			if (element.current) {
-				const isFixed = isElementFixed(element.current)
-
-				if (!isFixed) {
+				if (!mediaQueryList.matches) {
 					registerTab(metaTab)
 				} else {
 					unregisterTab(metaTab)
@@ -39,12 +30,13 @@ export const LayoutPageAside = memo(({ children }: NativeProps<HTMLDivElement>) 
 			}
 		}
 
-		window.addEventListener('resize', tabRegistration)
 		tabRegistration()
+
+		mediaQueryList.addEventListener('change', tabRegistration)
 
 		return () => {
 			unregisterTab(metaTab)
-			window.removeEventListener('resize', tabRegistration)
+			mediaQueryList.removeEventListener('change', tabRegistration)
 		}
 	})
 

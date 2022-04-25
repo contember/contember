@@ -14,6 +14,7 @@ import { BaseDynamicChoiceField, useCurrentValues } from './BaseDynamicChoiceFie
 import type { ChoiceFieldData } from './ChoiceFieldData'
 import { useSelectOptions } from './useSelectOptions'
 import { useAccessorErrors } from '../../errors'
+import { useOnAddNew } from './useOnAddNew'
 
 export type DynamicSingleChoiceFieldProps = SugaredRelativeSingleEntity & BaseDynamicChoiceField
 
@@ -37,8 +38,8 @@ export const useDynamicSingleChoiceField = (
 		const parentEntity = getEntityByKey(entityKey)
 		return desugaredRelativePath.hasOneRelationPath.length > 1
 			? parentEntity.getRelativeSingleEntity({
-					hasOneRelationPath: desugaredRelativePath.hasOneRelationPath.slice(0, -1),
-			  })
+				hasOneRelationPath: desugaredRelativePath.hasOneRelationPath.slice(0, -1),
+			})
 			: parentEntity
 	}, [entityKey, desugaredRelativePath, getEntityByKey])
 	const currentValueParent = useAccessorUpdateSubscription(getCurrentValueParent)
@@ -65,5 +66,11 @@ export const useDynamicSingleChoiceField = (
 				currentValueParent.connectEntityAtField(currentValueFieldName, entities[newValue])
 			}
 		},
+		onAddNew: useOnAddNew({
+			...props,
+			connect: useCallback(entity => {
+				currentValueParent.connectEntityAtField(currentValueFieldName, entity)
+			}, [currentValueFieldName, currentValueParent]),
+		}),
 	}
 }

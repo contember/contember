@@ -120,4 +120,11 @@ export const csCZ: AdminDictionary = {
 			newParagraph: 'Nový odstavec',
 		},
 	},
+	choiceField: {
+		createNew: {
+			confirmButtonText: 'Ok',
+			cancelButtonText: 'Zrušit',
+			dialogTitle: 'Nová položka',
+		},
+	},
 }

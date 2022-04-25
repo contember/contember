@@ -19,7 +19,6 @@ import type {
 } from '../treeParameters'
 import { assertNever } from '../utils'
 import type { AccessorErrorManager } from './AccessorErrorManager'
-import type { Config } from './Config'
 import type { EventManager } from './EventManager'
 import { EntityOperations, FieldOperations, ListOperations } from './operations'
 import { RealmKeyGenerator } from './RealmKeyGenerator'
@@ -44,27 +43,14 @@ export class StateInitializer {
 	private readonly listOperations: ListOperations
 
 	public constructor(
-		private readonly accessorErrorManager: AccessorErrorManager,
-		private readonly batchUpdatesOptions: BatchUpdatesOptions,
-		private readonly config: Config,
+		accessorErrorManager: AccessorErrorManager,
+		batchUpdatesOptions: BatchUpdatesOptions,
 		private readonly eventManager: EventManager,
 		private readonly treeStore: TreeStore,
 	) {
-		this.fieldOperations = new FieldOperations(this.accessorErrorManager, this.eventManager, this, this.treeStore)
-		this.entityOperations = new EntityOperations(
-			this.accessorErrorManager,
-			this.batchUpdatesOptions,
-			this.eventManager,
-			this,
-			this.treeStore,
-		)
-		this.listOperations = new ListOperations(
-			this.accessorErrorManager,
-			this.batchUpdatesOptions,
-			this.eventManager,
-			this,
-			this.treeStore,
-		)
+		this.fieldOperations = new FieldOperations(accessorErrorManager, this.eventManager, this, this.treeStore)
+		this.entityOperations = new EntityOperations(accessorErrorManager, batchUpdatesOptions, this.eventManager, this, this.treeStore)
+		this.listOperations = new ListOperations(accessorErrorManager, batchUpdatesOptions, this.eventManager, this, this.treeStore)
 	}
 
 	public initializeSubTree(tree: EntitySubTreeMarker | EntityListSubTreeMarker): RootStateNode {

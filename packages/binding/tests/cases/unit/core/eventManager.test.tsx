@@ -1,98 +1,31 @@
-import { expect, it, describe } from 'vitest'
-import assert from 'assert'
-import { StateInitializer } from '../../../../src/core/StateInitializer'
-import {
-	EntityAccessor,
-	EntityEventListenerStore,
-	EntityFieldMarker,
-	EntityFieldMarkersContainer,
-	EntitySubTreeMarker, Environment,
-	EventListenersStore, FieldMarker,
-	MarkerTreeRoot,
-	PlaceholderName, PRIMARY_KEY_NAME,
-} from '../../../../src'
-import { TreeStore } from '../../../../src/core/TreeStore'
-import { Schema } from '../../../../src/core/schema'
-import { EventManager } from '../../../../src/core/EventManager'
-import { DirtinessTracker } from '../../../../src/core/DirtinessTracker'
-import { Config } from '../../../../src/core/Config'
-import { TreeAugmenter } from '../../../../src/core/TreeAugmenter'
+import { describe, expect, it } from 'vitest'
+import { EntityAccessor, EntitySubTree, Field } from '../../../../src'
+import { createBindingWithEntitySubtree } from './bindingFactory'
 
 const prepareBeforePersistTest = ({ event }: { event: (getAccessor: () => EntityAccessor) => any }) => {
-	const treeStore = new TreeStore()
-	treeStore.setSchema(
-		new Schema({
-			enums: new Map(),
-			entities: new Map([
-					['Foo', {
-						customPrimaryAllowed: false,
-						fields: new Map([
-							['fooField', {
-								__typename: '_Column',
-								name: 'fooField',
-								defaultValue: null,
-								nullable: false,
-								enumName: null,
-								type: 'String',
-							}],
-						]),
-						name: 'Foo',
-						unique: [],
-					}],
-				],
-			),
-		}),
-	)
-	const config = new Config()
-	const eventManager = new EventManager({} as any, {} as any, config, new DirtinessTracker(), () => null, treeStore)
-	const stateInitializer = new StateInitializer(
-		{} as any,
-		{} as any,
-		eventManager,
-		treeStore,
-	)
-	const environment = new Environment()
-	const idMarker = [PRIMARY_KEY_NAME, new FieldMarker(PRIMARY_KEY_NAME)] as const
-	const eventListenersStore: EntityEventListenerStore = new EventListenersStore()
-	eventListenersStore.set({ type: 'beforePersist' }, new Set([event]))
-
-	const treeAugmenter = new TreeAugmenter(eventManager, stateInitializer, treeStore)
-	const entitySubTreeMarker = new EntitySubTreeMarker(
-		{
-			entityName: 'Foo',
-			where: { bar: 123 },
-			filter: undefined,
-			hasOneRelationPath: [],
-			isCreating: false,
-			isNonbearing: false,
-			setOnCreate: undefined,
-			// forceCreation: false,
-			eventListeners: eventListenersStore,
-			expectedMutation: 'anyMutation',
-			alias: undefined,
-		},
-		new EntityFieldMarkersContainer(
-			true,
-			new Map<PlaceholderName, EntityFieldMarker>([
-				idMarker,
-				['fooField', new FieldMarker('fooField')],
-			]),
-			new Map([
-				[PRIMARY_KEY_NAME, idMarker[1].placeholderName],
-				['fooField', 'fooField'],
-			]),
+	return createBindingWithEntitySubtree({
+		node: (
+			<EntitySubTree entity="Foo(bar = 123)" onBeforePersist={event}>
+				<Field field={'fooField'} />
+			</EntitySubTree>
 		),
-		environment,
-	)
-	treeAugmenter.extendTreeStates(undefined, new MarkerTreeRoot(new Map([
-		[entitySubTreeMarker.placeholderName, entitySubTreeMarker],
-	]), new Map([[entitySubTreeMarker.placeholderName, entitySubTreeMarker.placeholderName]])))
-
-	const subtree = treeStore.getSubTreeState('entity', undefined, entitySubTreeMarker.placeholderName, environment)
-
-	expect(subtree.type).eq('entityRealm')
-	assert(subtree.type === 'entityRealm')
-	return { entity: subtree, eventManager }
+		schema: {
+			enums: [],
+			entities: [{
+				name: 'Foo',
+				customPrimaryAllowed: false,
+				unique: [],
+				fields: [{
+					__typename: '_Column',
+					type: 'String',
+					enumName: null,
+					nullable: true,
+					defaultValue: null,
+					name: 'fooField',
+				}],
+			}],
+		},
+	})
 }
 
 describe('event manager', () => {

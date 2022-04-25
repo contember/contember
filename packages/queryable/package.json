@@ -1,6 +1,6 @@
 {
   "name": "@contember/queryable",
-  "version": "1.0.0-rc.15",
+  "version": "1.0.0-rc.16",
   "license": "Apache-2.0",
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",

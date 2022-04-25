@@ -75,6 +75,7 @@ export const BooleanCell: FunctionComponent<BooleanCellProps> = Component(props 
 							>
 								<Checkbox
 									key={item}
+									notNull
 									value={filter[item]}
 									onChange={checked => {
 										setFilter({ ...filter, [item]: checked })

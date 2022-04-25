@@ -43,6 +43,7 @@ export function DataGridColumnHiding({
 							>
 								<Checkbox
 									key={key}
+									notNull
 									value={!desiredState.hiddenColumns[key]}
 									onChange={isChecked => setIsColumnHidden(key, !isChecked)}
 								/>

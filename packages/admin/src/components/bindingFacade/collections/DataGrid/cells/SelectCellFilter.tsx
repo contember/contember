@@ -63,6 +63,7 @@ export const SelectCellFilter = ({ filter, setFilter, environment, optionProps }
 			labelPosition="labelInlineRight"
 		>
 			<Checkbox
+				notNull
 				value={filter.nullCondition}
 				onChange={checked => {
 					setFilter({

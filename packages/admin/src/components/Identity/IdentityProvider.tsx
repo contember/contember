@@ -11,6 +11,9 @@ export interface Identity {
 	otpEnabled: boolean
 	personId: string
 	projects: IdentityProject[]
+	permissions: {
+		canCreateProject: boolean
+	}
 }
 
 export interface IdentityProject {
@@ -57,6 +60,7 @@ export const IdentityProvider: React.FC<IdentityProviderProps> = ({ children, on
 			const response = await fetchMe()
 			const person = response.data.me.person
 			const projects = response.data.me.projects
+			const permissions = response.data.me.permissions
 
 			setIdentityState({
 				state: 'success',
@@ -69,6 +73,7 @@ export const IdentityProvider: React.FC<IdentityProviderProps> = ({ children, on
 						slug: it.project.slug,
 						roles: it.memberships.map(it => it.role),
 					})),
+					permissions,
 				},
 			})
 		} catch (e) {

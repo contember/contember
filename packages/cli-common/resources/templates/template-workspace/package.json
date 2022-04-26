@@ -12,7 +12,7 @@
   "devDependencies": {
     "@contember/schema": "{version}",
     "@contember/schema-definition": "{version}",
-    "@contember/admin": "^1.0.0-alpha.6",
+    "@contember/admin": "^1.0.0",
     "@types/react": "^17",
     "react": "^17",
     "react-dom": "^17",

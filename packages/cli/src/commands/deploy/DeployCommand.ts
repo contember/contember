@@ -122,15 +122,16 @@ export class DeployCommand extends Command<Args, Options> {
 		}
 
 		if (adminEndpoint) {
-			console.log('Deploying admin:')
+			console.log('Deploying admin...')
 			const client = AdminClient.create(adminEndpoint, apiToken)
 			const files = await readAdminFiles(projectAdminDistDir)
-			files.forEach(it => console.log('  ' + it.path))
 			await client.deploy(remoteProject, files)
-			console.log('Admin deployed')
+			console.log(`Admin deployed (${files.length} files)`)
 		}
 		console.log('')
 		console.log('Deployment successful')
+		console.log(`API URL: ${instance.baseUrl}`)
+		console.log(`Admin URL: ${adminEndpoint ?? 'none'}`)
 
 		return 0
 	}

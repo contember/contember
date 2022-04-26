@@ -7,6 +7,11 @@
 
 # Contember Admin
 
+Contember is an open-source, headless CMS without limits. It gives you full control over the administration interface and data structure. Enjoy GraphQL API, role-based access control, authentication and a well-structured PostgreSQL database. Built by developers for developers.
+
+- [Start building with Contember](https://www.contember.com/start)
+- [Documentation](https://docs.contember.com/)
+
 ## Contributing
 If you wish to send a pull request, be sure to first consult the maintainers by creating an issue. We typically react
 very quickly and are happy to provide any guidance.

@@ -88,22 +88,30 @@
 			padding: em(2px) em(1px)
 
 		code
+			background-color: var(--cui-color--lower)
+			border-radius: 0.25em
 			font-family: monospace
-			background-color: $cui-color-gray-2
+			padding-left: 0.25em
+			padding-right: 0.25em
 
 		em
-			// TODO use a css var with a fallback
-			background-color: lighten($cui-color-blue, 35)
+			--cui-highlight-color: 255, 249, 51
+			color: var(--cui-color--strong)
+			background-color: rgb(var(--cui-highlight-color), var(--cui-opacity--medium, 0.5))
+			@media (prefers-color-scheme: dark)
+				background-color: rgb(var(--cui-highlight-color), var(--cui-opacity--low, 0.3))
 			font-style: normal
 
 		hr
-			background-color: $cui-color-gray-2
+			background-color: var(--cui-color--lower)
 			height: em(1px)
 			margin: 0
 			border: none
 
 		::selection
-			background-color: #BFE4FF
+			color: var(--cui-color--strong)
+			background-color: rgb(75, 150, 255, 0.500)
+			background-color: rgb(var(--cui-theme-positive-500), var(--cui-opacity--medium, 0.5))
 
 	&.view-large &-canvas
 		min-height: 32em

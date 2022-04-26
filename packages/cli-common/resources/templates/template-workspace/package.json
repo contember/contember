@@ -7,7 +7,7 @@
     "build": "npm run build-admin && npm run build-api",
     "build-admin": "tsc --project admin && vite build admin",
     "build-api": "tsc --project api",
-    "deploy": "docker-compose run -e CONTEMBER_TOKEN= contember-cli deploy"
+    "deploy": "npm run build && docker-compose run contember-cli deploy"
   },
   "devDependencies": {
     "@contember/schema": "{version}",

@@ -92,10 +92,10 @@ importers:
       '@contember/react-client': workspace:*
       '@contember/react-multipass-rendering': workspace:*
       '@contember/react-utils': workspace:*
-      '@contember/schema': ^1.0.0-rc.15
-      '@contember/schema-definition': ^1.0.0-rc.15
-      '@contember/schema-migrations': ^1.0.0-rc.15
-      '@contember/schema-utils': ^1.0.0-rc.15
+      '@contember/schema': ^1.0.0-rc.16
+      '@contember/schema-definition': ^1.0.0-rc.16
+      '@contember/schema-migrations': ^1.0.0-rc.16
+      '@contember/schema-utils': ^1.0.0-rc.16
       '@contember/ui': workspace:*
       '@formatjs/icu-messageformat-parser': 2.0.11
       '@mangoweb/sass-base': 0.0.8
@@ -169,10 +169,10 @@ importers:
       slate-react: 0.74.0_7f0474d2f1224a2fc7a4a9e23b38a268
       stacktracey: 2.1.7
     devDependencies:
-      '@contember/schema': 1.0.0-rc.15
-      '@contember/schema-definition': 1.0.0-rc.15
-      '@contember/schema-migrations': 1.0.0-rc.15_pg@8.7.3
-      '@contember/schema-utils': 1.0.0-rc.15
+      '@contember/schema': 1.0.0-rc.16
+      '@contember/schema-definition': 1.0.0-rc.16
+      '@contember/schema-migrations': 1.0.0-rc.16_pg@8.7.3
+      '@contember/schema-utils': 1.0.0-rc.16
       '@playwright/test': 1.20.0
       '@types/blueimp-md5': 2.18.0
       '@types/debounce': 1.2.0
@@ -3143,22 +3143,22 @@ packages:
       minimist: 1.2.5
     dev: true
 
-  /@contember/database-migrations/1.0.0-rc.15_pg@8.7.3:
-    resolution: {integrity: sha512-UYzuQ2VnOZO4EF4lIRDNA/mBsMeRPKLZeq6vL/MT2dT7j5gp4mrbDaRQlXPBjuhruOxDksHyjzmEIWsBzB30Yg==}
+  /@contember/database-migrations/1.0.0-rc.16_pg@8.7.3:
+    resolution: {integrity: sha512-w+LoHlSWaaR+riEBQ2PHJjdSeDllB9an4QvJGeBNnm1OEbVpohrbq45pepq64qggnQK5Y2gBixAJiZo2cyavcg==}
     peerDependencies:
       pg: ^8.5.0
     dependencies:
-      '@contember/database': 1.0.0-rc.15_pg@8.7.3
+      '@contember/database': 1.0.0-rc.16_pg@8.7.3
       node-pg-migrate: 5.10.0_pg@8.7.3
       pg: 8.7.3
     dev: true
 
-  /@contember/database/1.0.0-rc.15_pg@8.7.3:
-    resolution: {integrity: sha512-vp41zB7sCAaLODP6AEbXUnw1ViyT0xpnRhFEbijBwVZBpb6Bv30HDJu8jaVAPq5qajMPFBFrLyDqIcpJt8NfOg==}
+  /@contember/database/1.0.0-rc.16_pg@8.7.3:
+    resolution: {integrity: sha512-YnCFZOzKra37aQ3hBmKh5wgFmxJGFzTfU58OikDLKirs8YuQSup/MiyegGBrOHAhW4duXhgJwipdmXzCHiRU7g==}
     peerDependencies:
       pg: ^8.5.0
     dependencies:
-      '@contember/queryable': 1.0.0-rc.15
+      '@contember/queryable': 1.0.0-rc.16
       pg: 8.7.3
     dev: true
 
@@ -3166,19 +3166,19 @@ packages:
     resolution: {integrity: sha512-I6fJPHQsgfHWN753DgPue9L+X2Lopfy5gbtUymQrTi9bs2Qmju9kl6BGrNqCx0t3oURQLgDUdnNmq6sRiTEjbg==}
     dev: false
 
-  /@contember/engine-common/1.0.0-rc.15:
-    resolution: {integrity: sha512-WeMU2F2yMkYJ+zd3Zu/fp+QP0zB37varaMSqmUyT+z56Qu38ogSXYMKUjLA+3g4OBajb/BVviRG9HSKR0AafOw==}
+  /@contember/engine-common/1.0.0-rc.16:
+    resolution: {integrity: sha512-2J2tNrgkAjzMrE6JgTjBSEj7qXD3Q4HOTn/jZwJRWwsRxS+8zbz7sZlUbW9bqUGgFDnabJbdxhB0rUmQmHtnLg==}
     dev: true
 
-  /@contember/queryable/1.0.0-rc.15:
-    resolution: {integrity: sha512-up5CzH82PF5AiMBWEFJo/CZn4gBfeaO2wUyX6wbm1yXJJQcbC/PcnYED2+mh2F68kaqiCyZtVGW3ItdNj06/rg==}
+  /@contember/queryable/1.0.0-rc.16:
+    resolution: {integrity: sha512-k76TtlSDdZno0nw4eFsxR+SbwPOCvSaiIK0ooMY8GFVfw+mPFOHtmvtn+KdbeasgOZZ587HdKQbKU7uhlrYltw==}
     dev: true
 
-  /@contember/schema-definition/1.0.0-rc.15:
-    resolution: {integrity: sha512-/FJMYgrzTKKKSnKUk5w5tWJQ4olIFXxib6l7On3mBe1kjDiFfagJt5iuCSKc/rTxSVMntpNOOeISASC2utE4kw==}
+  /@contember/schema-definition/1.0.0-rc.16:
+    resolution: {integrity: sha512-wyU/FTXqv7/xFUsG8T17Dn1U+vqjLudrrYxhJ0ubUubkCfzS+b2DuxyOLv1OdWHqKVnaKqaS5PPc+VTSPN5Whg==}
     dependencies:
-      '@contember/schema': 1.0.0-rc.15
-      '@contember/schema-utils': 1.0.0-rc.15
+      '@contember/schema': 1.0.0-rc.16
+      '@contember/schema-utils': 1.0.0-rc.16
       reflect-metadata: 0.1.13
     dev: true
 
@@ -3190,24 +3190,24 @@ packages:
       reflect-metadata: 0.1.13
     dev: false
 
-  /@contember/schema-migrations/1.0.0-rc.15_pg@8.7.3:
-    resolution: {integrity: sha512-v3d2Vl5jzJ4ZheopXrZCIRt65rALe255NSB8TDxZ+JAnFZBNj7/KJEeLcb+TFHw9JDuNp960mSVxHF5xVoOrHw==}
+  /@contember/schema-migrations/1.0.0-rc.16_pg@8.7.3:
+    resolution: {integrity: sha512-vyRm2N4fGOcmRAPiE3nI9K4cWnV9himaU9vzjIHk9LsukwZkJZxV5jMZbErACP7h0wNrijAzZQFRuekD+GywgQ==}
     peerDependencies:
       pg: ^8.5.0
     dependencies:
-      '@contember/database-migrations': 1.0.0-rc.15_pg@8.7.3
-      '@contember/engine-common': 1.0.0-rc.15
-      '@contember/schema': 1.0.0-rc.15
-      '@contember/schema-utils': 1.0.0-rc.15
+      '@contember/database-migrations': 1.0.0-rc.16_pg@8.7.3
+      '@contember/engine-common': 1.0.0-rc.16
+      '@contember/schema': 1.0.0-rc.16
+      '@contember/schema-utils': 1.0.0-rc.16
       fast-deep-equal: 3.1.3
       pg: 8.7.3
       rfc6902: 4.0.2
     dev: true
 
-  /@contember/schema-utils/1.0.0-rc.15:
-    resolution: {integrity: sha512-5+kEUSrKp6YebdHXcPkCe7wjki4O9UjDavM1wkLEUxEu6D4SGXOxygbUK5ZSymn4Apn3RXE+pQ0nmlBppbFO0w==}
+  /@contember/schema-utils/1.0.0-rc.16:
+    resolution: {integrity: sha512-9GauZj31NbZjLYJlDcJRG4+9d3IvIICKLGRbng1/t12GMleXVjGg3NBYaVvxWNoYd4BYMuq9HIYs3PtzQYCesQ==}
     dependencies:
-      '@contember/schema': 1.0.0-rc.15
+      '@contember/schema': 1.0.0-rc.16
     dev: true
 
   /@contember/schema-utils/1.0.0-rc.2:
@@ -3220,8 +3220,8 @@ packages:
     resolution: {integrity: sha512-5suwt1OSEKcRpGwuNyVRCPTnZFuM4GmxU7B2E+js5o+QkJWfVQHmcQJ3kCu7pspf7zx4/1hY13kVNbzHlFCGGw==}
     dev: false
 
-  /@contember/schema/1.0.0-rc.15:
-    resolution: {integrity: sha512-dqbf2WPXx5B32v7YACo+wBtwNoRKJm0SGhBQXpIroMp7bwRZ7hpUWqriYf5JWr94GLphiV1g86At6WxeL13xzQ==}
+  /@contember/schema/1.0.0-rc.16:
+    resolution: {integrity: sha512-xXL9ukZtds1rIjuPvKfnHVo8ZQFpggtHW6dUHu3uhUXsKeTpv4dSg5yXF6/iDscwPRsu6FCuI9QptRFE93JlEQ==}
     dev: true
 
   /@contember/schema/1.0.0-rc.2:
@@ -7866,7 +7866,7 @@ packages:
       chownr: 1.1.4
       figgy-pudding: 3.5.2
       glob: 7.2.0
-      graceful-fs: 4.2.8
+      graceful-fs: 4.2.10
       infer-owner: 1.0.4
       lru-cache: 5.1.1
       mississippi: 3.0.0
@@ -8462,7 +8462,7 @@ packages:
     resolution: {integrity: sha512-0Cbj7gyvFVApzpK/uhCtQ/9kE9UnYpxMzaq5nQQC/Dh4iaj5fxp7iEFIullrYwzj8nf0qnsI1Qsx34hAeAebvw==}
     engines: {node: '>=8'}
     dependencies:
-      graceful-fs: 4.2.8
+      graceful-fs: 4.2.10
       make-dir: 3.1.0
       nested-error-stacks: 2.1.0
       p-event: 4.2.0
@@ -10183,7 +10183,7 @@ packages:
   /fs-write-stream-atomic/1.0.10:
     resolution: {integrity: sha1-tH31NJPvkR33VzHnCp3tAYnbQMk=}
     dependencies:
-      graceful-fs: 4.2.8
+      graceful-fs: 4.2.10
       iferr: 0.1.5
       imurmurhash: 0.1.4
       readable-stream: 2.3.7
@@ -11529,7 +11529,7 @@ packages:
     engines: {node: '>= 10.14.2'}
     dependencies:
       '@types/node': 16.11.1
-      graceful-fs: 4.2.8
+      graceful-fs: 4.2.10
     dev: true
 
   /jest-util/26.6.2:
@@ -11725,7 +11725,7 @@ packages:
   /jsonfile/2.4.0:
     resolution: {integrity: sha1-NzaitCi4e72gzIO1P6PWM6NcKug=}
     optionalDependencies:
-      graceful-fs: 4.2.8
+      graceful-fs: 4.2.10
     dev: true
 
   /jsonfile/6.1.0:
@@ -11733,7 +11733,7 @@ packages:
     dependencies:
       universalify: 2.0.0
     optionalDependencies:
-      graceful-fs: 4.2.8
+      graceful-fs: 4.2.10
     dev: true
 
   /jsx-ast-utils/3.2.2:
@@ -11782,7 +11782,7 @@ packages:
   /klaw/1.3.1:
     resolution: {integrity: sha1-QIhDO0azsbolnXh4XY6W9zugJDk=}
     optionalDependencies:
-      graceful-fs: 4.2.8
+      graceful-fs: 4.2.10
     dev: true
 
   /kleur/3.0.3:
@@ -14155,7 +14155,7 @@ packages:
     resolution: {integrity: sha512-1JU/8q+VgFZyxwrJ+SVIOsh+KywWGpds3NTqikiKpDMZWScmAYyKIgqkO+ARvNWJfXeXR1zxz7aHF4u4CyH6vQ==}
     engines: {node: '>=0.10'}
     dependencies:
-      graceful-fs: 4.2.8
+      graceful-fs: 4.2.10
       micromatch: 3.1.10
       readable-stream: 2.3.7
     dev: true
@@ -16256,7 +16256,7 @@ packages:
       graceful-fs: 4.2.8
       neo-async: 2.6.2
     optionalDependencies:
-      chokidar: 3.5.2
+      chokidar: 3.5.3
       watchpack-chokidar2: 2.0.1
     dev: true
 

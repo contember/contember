@@ -72,10 +72,10 @@
 		"react-dom": "^17"
 	},
 	"devDependencies": {
-		"@contember/schema": "^1.0.0-rc.15",
-		"@contember/schema-definition": "^1.0.0-rc.15",
-		"@contember/schema-migrations": "^1.0.0-rc.15",
-		"@contember/schema-utils": "^1.0.0-rc.15",
+		"@contember/schema": "^1.0.0-rc.16",
+		"@contember/schema-definition": "^1.0.0-rc.16",
+		"@contember/schema-migrations": "^1.0.0-rc.16",
+		"@contember/schema-utils": "^1.0.0-rc.16",
 		"@playwright/test": "^1.20.0",
 		"@types/blueimp-md5": "2.18.0",
 		"@types/debounce": "1.2.0",

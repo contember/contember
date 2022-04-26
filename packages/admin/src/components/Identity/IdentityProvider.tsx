@@ -74,10 +74,11 @@ export const IdentityProvider: React.FC<IdentityProviderProps> = ({ children, on
 		} catch (e) {
 			console.error(e)
 			if ('status' in e && e.status === 401) {
-				onInvalidIdentity?.()
 				logout({ noRedirect: true })
 				clearIdentity()
-				if (window.location.pathname !== '/') {
+				if (onInvalidIdentity) {
+					onInvalidIdentity()
+				} else if (window.location.pathname !== '/') {
 					window.location.href = '/' // todo better redirect?
 				}
 			} else {
@@ -92,12 +93,16 @@ export const IdentityProvider: React.FC<IdentityProviderProps> = ({ children, on
 			if (sessionToken === undefined) {
 				setIdentityState({ state: 'none' })
 				if (!allowUnauthenticated) {
-					window.location.href = '/' // todo better redirect?
+					if (onInvalidIdentity) {
+						onInvalidIdentity()
+					} else if (window.location.pathname !== '/') {
+						window.location.href = '/' // todo better redirect?
+					}
 				}
 				return
 			}
 		},
-		[sessionToken, allowUnauthenticated],
+		[sessionToken, allowUnauthenticated, onInvalidIdentity],
 	)
 
 	useEffect(

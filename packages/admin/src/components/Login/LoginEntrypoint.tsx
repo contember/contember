@@ -1,6 +1,6 @@
 import { ContemberClient } from '@contember/react-client'
 import { Button, ErrorList, Icon, Stack, StyleProvider } from '@contember/ui'
-import { FC, ReactNode, useEffect, useMemo, useState } from 'react'
+import { FC, ReactNode, useCallback, useEffect, useMemo, useState } from 'react'
 import { Link, RequestProvider, RoutingContext, RoutingContextValue } from '../../routing'
 import {
 	CreateResetPasswordRequestForm,
@@ -169,6 +169,16 @@ interface LoginContainerProps {
 const LoginContainer = ({ identityProviders, collapsedEmailLogin: initialCollapsedEmailLogin }: LoginContainerProps) => {
 	const [collapsedEmailLogin, setCollapsedEmailLogin] = useState(initialCollapsedEmailLogin ?? false)
 	const [error, setError] = useState<string>()
+	const onLoginHandler = useCallback(() => {
+		const params = new URLSearchParams(window.location.search)
+		const backlink = params.get('backlink')
+		if (backlink) {
+			const resolvedBacklink = new URL(backlink, window.location.href)
+			if (resolvedBacklink.origin === window.location.origin) {
+				window.location.href = resolvedBacklink.toString()
+			}
+		}
+	}, [])
 
 	const hasOauthResponse = useMemo(() => {
 		const params = new URLSearchParams(window.location.search)
@@ -176,12 +186,12 @@ const LoginContainer = ({ identityProviders, collapsedEmailLogin: initialCollaps
 	}, [])
 
 	if (hasOauthResponse) {
-		return <IDPResponseHandler />
+		return <IDPResponseHandler onLogin={onLoginHandler}/>
 	}
 
 	return <>
 		<ErrorList errors={error ? [{ message: error }] : []} />
-		{!collapsedEmailLogin && <Login resetLink={resetRequestPageName} />}
+		{!collapsedEmailLogin && <Login resetLink={resetRequestPageName} onLogin={onLoginHandler} />}
 		{((identityProviders?.length ?? 0) > 0 || collapsedEmailLogin) && (
 			<Stack direction="vertical">
 				{identityProviders?.map((it, i) => <IDPInitButton key={i} provider={it} onError={setError}/>)}

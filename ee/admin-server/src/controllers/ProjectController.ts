@@ -25,7 +25,8 @@ export class ProjectController extends BaseController<ProjectParams> {
 		const token = readAuthCookie(req)
 
 		if (token === null || !(await this.tenant.hasProjectAccess(token, params.projectSlug, params.projectGroup))) {
-			res.setHeader('Location', '/')
+			const params = new URLSearchParams({ backlink: req.url! })
+			res.setHeader('Location', '/?' + params.toString())
 			res.writeHead(302)
 			res.end()
 			return

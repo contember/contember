@@ -56,7 +56,7 @@ export class OrderByBuilder {
 		if (typeof value === 'string') {
 			const columnName = getColumnName(this.schema, entity, fieldName)
 			const applyOrder = <Orderable extends QueryBuilder.Orderable<any>>(orderable: Orderable) =>
-				orderable.orderBy([path.getAlias(), columnName], value as Input.OrderDirection)
+				orderable.orderBy([path.alias, columnName], value as Input.OrderDirection)
 
 			qb = applyOrder(qb)
 			if (orderable !== null) {

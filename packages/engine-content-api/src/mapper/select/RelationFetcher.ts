@@ -209,9 +209,9 @@ export class RelationFetcher {
 
 		if (hasWhere || hasFieldOrderBy) {
 			const path = this.pathFactory.create([])
-			qb = qb.join(targetEntity.tableName, path.getAlias(), condition =>
+			qb = qb.join(targetEntity.tableName, path.alias, condition =>
 				condition.compareColumns(['junction_', column.targetColumn.columnName], Operator.eq, [
-					path.getAlias(),
+					path.alias,
 					targetEntity.primaryColumn,
 				]),
 			)

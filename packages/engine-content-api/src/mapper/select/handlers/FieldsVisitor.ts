@@ -19,8 +19,8 @@ export class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.C
 	visitColumn(entity: Model.Entity, column: Model.AnyColumn): void {
 		const columnPath = this.executionContext.path
 		this.executionContext.addColumn(qb => {
-			const tableAlias = columnPath.back().getAlias()
-			const columnAlias = columnPath.getAlias()
+			const tableAlias = columnPath.back().alias
+			const columnAlias = columnPath.alias
 
 			const fieldPredicate = this.predicateFactory.shouldApplyCellLevelPredicate(
 				entity,

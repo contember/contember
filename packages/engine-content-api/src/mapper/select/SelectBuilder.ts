@@ -60,7 +60,7 @@ export class SelectBuilder {
 		if (groupBy) {
 			const groupByColumn = getColumnName(this.schema, entity, groupBy)
 			this.queryWrapper = new LimitByGroupWrapper(
-				[path.getAlias(), groupByColumn],
+				[path.alias, groupByColumn],
 				(orderable, qb) => {
 					if (orderBy.length > 0) {
 						[qb, orderable] = this.orderByBuilder.build(qb, orderable, entity, this.pathFactory.create([]), orderBy)
@@ -139,9 +139,9 @@ export class SelectBuilder {
 	}
 
 	private async getColumnValues(columnPath: Path, columnName: string): Promise<Input.PrimaryValue[]> {
-		this.qb = this.qb.select([columnPath.back().getAlias(), columnName], columnPath.getAlias())
+		this.qb = this.qb.select([columnPath.back().alias, columnName], columnPath.alias)
 		const rows = await this.rows
-		const columnAlias = columnPath.getAlias()
+		const columnAlias = columnPath.alias
 		return Array.from(new Set(rows.map((it): Input.PrimaryValue => it[columnAlias] as Input.PrimaryValue)))
 	}
 }

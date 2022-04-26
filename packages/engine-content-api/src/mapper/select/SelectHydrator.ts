@@ -75,7 +75,7 @@ export class SelectHydrator {
 			const last: string = path.pop() as string
 			const currentObject = path.reduce<any>((obj, part) => (obj[part] = obj[part] || {}), result)
 
-			const field = row[columnPath.getAlias()]
+			const field = row[columnPath.alias]
 			currentObject[last] = this.formatValue(field)
 		}
 
@@ -83,7 +83,7 @@ export class SelectHydrator {
 			const pathTmp = [...path.path]
 			const last = pathTmp.pop() as string
 			const currentObject = pathTmp.reduce<any>((obj, part) => (obj && obj[part]) || undefined, result)
-			const parentValue = row[parentKeyPath.getAlias()] as Value.PrimaryValue
+			const parentValue = row[parentKeyPath.alias] as Value.PrimaryValue
 			if (currentObject) {
 				currentObject[last] = (parentValue ? data[parentValue] : undefined) || defaultValue
 			}

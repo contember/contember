@@ -48,7 +48,7 @@ export class MetaHandler implements SelectExecutionHandler<{}> {
 							}
 							return condition
 						}),
-					metaPath.getAlias(),
+					metaPath.alias,
 				),
 			)
 		}, metaPath)

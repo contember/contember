@@ -142,8 +142,6 @@ export class SelectBuilder {
 		this.qb = this.qb.select([columnPath.back().getAlias(), columnName], columnPath.getAlias())
 		const rows = await this.rows
 		const columnAlias = columnPath.getAlias()
-		return rows
-			.map((it): Input.PrimaryValue => it[columnAlias] as Input.PrimaryValue)
-			.filter((val, index, all) => all.indexOf(val) === index)
+		return Array.from(new Set(rows.map((it): Input.PrimaryValue => it[columnAlias] as Input.PrimaryValue)))
 	}
 }

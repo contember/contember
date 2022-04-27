@@ -23,8 +23,12 @@ export class Authorizator {
 		return Object.values(fieldPermissions).filter(it => !!it).length > 0 ? 'yes' : 'no'
 	}
 
+	getFieldPredicate(operation: Acl.Operation.create | Acl.Operation.read | Acl.Operation.update, entity: string, field: string): Acl.Predicate {
+		return this.permissions[entity]?.operations[operation]?.[field] ?? false
+	}
+
 	getFieldPermissions(operation: Acl.Operation.create | Acl.Operation.read | Acl.Operation.update, entity: string, field: string): AuthorizationResult {
-		const fieldPermissions = this.permissions[entity]?.operations[operation]?.[field]
+		const fieldPermissions = this.getFieldPredicate(operation, entity, field)
 		if (!fieldPermissions) {
 			return 'no'
 		}

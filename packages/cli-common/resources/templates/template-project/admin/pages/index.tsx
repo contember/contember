@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { GenericPage } from '@contember/admin'
 
-export const index = (
+export default () => (
 	<GenericPage>
 		Welcome to Contember Admin!
 	</GenericPage>

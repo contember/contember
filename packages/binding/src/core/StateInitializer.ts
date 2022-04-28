@@ -153,11 +153,9 @@ export class StateInitializer {
 					if (!value || (value.type !== 'entityRealm' && value.type !== 'entityRealmStub')) {
 						throw new BindingError()
 					}
+					runtimeId = !(value.entity.id instanceof UnpersistedEntityDummyId) ? value.entity.id : new UnpersistedEntityDummyId()
 					if (value.type === 'entityRealm') {
 						subCopyFrom = value
-						runtimeId = value.entity.id
-					} else {
-						runtimeId = new UnpersistedEntityDummyId()
 					}
 				}
 				this.initializeFromHasOneRelationMarker(realm, field, runtimeId, subCopyFrom)

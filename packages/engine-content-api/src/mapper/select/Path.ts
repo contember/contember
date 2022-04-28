@@ -25,6 +25,8 @@ export class PathFactory {
 }
 
 export class Path {
+	public readonly alias = this.createAlias()
+
 	constructor(
 		public readonly path: string[],
 		private readonly aliasContext: AliasContext,
@@ -41,7 +43,7 @@ export class Path {
 		return new Path([...this.path, path], this.aliasContext, this.rootAlias)
 	}
 
-	public getAlias(): string {
+	private createAlias(): string {
 		const alias = this.rootAlias + this.path.join('_')
 
 		// intentionally not allowing == MAX_IDENTIFIER_LENGTH
@@ -49,6 +51,6 @@ export class Path {
 			return alias
 		}
 		const index = this.aliasContext.getAliasIndex(alias).toString()
-		return alias.substr(0, MAX_IDENTIFIER_LENGTH - index.length - 1) + '_' + index
+		return alias.substring(0, MAX_IDENTIFIER_LENGTH - index.length - 1) + '_' + index
 	}
 }

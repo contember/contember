@@ -72,8 +72,8 @@ export class Mapper {
 		let indexByAlias: string | null = null
 		if (indexBy) {
 			const path = this.pathFactory.create([])
-			indexByAlias = path.for(indexBy).getAlias()
-			qb = qb.select([path.getAlias(), getColumnName(this.schema, entity, indexBy)], indexByAlias)
+			indexByAlias = path.for(indexBy).alias
+			qb = qb.select([path.alias, getColumnName(this.schema, entity, indexBy)], indexByAlias)
 		}
 		const rows = await this.selectRows(hydrator, qb, entity, input)
 
@@ -100,7 +100,7 @@ export class Mapper {
 		let qb: SelectBuilder<SelectBuilder.Result> = SelectBuilder.create()
 		const path = this.pathFactory.create([])
 		const groupingKey = '__grouping_key'
-		qb = qb.select([path.getAlias(), relation.joiningColumn.columnName], groupingKey)
+		qb = qb.select([path.alias, relation.joiningColumn.columnName], groupingKey)
 
 		const rows = await this.selectRows(hydrator, qb, entity, input, relation.name)
 		return await hydrator.hydrateGroups(rows, groupingKey)
@@ -115,22 +115,19 @@ export class Mapper {
 	) {
 		const inputWithOrder = OrderByHelper.appendDefaultOrderBy(entity, input, [])
 		const path = this.pathFactory.create([])
-		const augmentedBuilder = qb.from(entity.tableName, path.getAlias()).meta('path', [...input.path, input.alias])
+		const augmentedBuilder = qb.from(entity.tableName, path.alias).meta('path', [...input.path, input.alias])
 
 		const selector = this.selectBuilderFactory.create(augmentedBuilder, hydrator)
 		const filterWithPredicates = this.predicatesInjector.inject(entity, inputWithOrder.args.filter || {})
 		const inputWithPredicates = inputWithOrder.withArg('filter', filterWithPredicates)
-		const selectPromise = selector.select(this, entity, inputWithPredicates, path, groupBy)
-		const rows = await selector.execute(this.db)
-		await selectPromise
-
-		return rows
+		selector.select(this, entity, inputWithPredicates, path, groupBy)
+		return await selector.execute(this.db)
 	}
 
 	public async count(entity: Model.Entity, filter: Input.OptionalWhere) {
 		const path = this.pathFactory.create([])
 		const qb = SelectBuilder.create()
-			.from(entity.tableName, path.getAlias())
+			.from(entity.tableName, path.alias)
 			.select(expr => expr.raw('count(*)'), 'row_count')
 		const withPredicates = this.predicatesInjector.inject(entity, filter)
 		const qbWithWhere = this.whereBuilder.build(qb, entity, path, withPredicates)
@@ -145,10 +142,10 @@ export class Mapper {
 	): Promise<Record<string, number>> {
 		const path = this.pathFactory.create([])
 		const qb = SelectBuilder.create()
-			.from(entity.tableName, path.getAlias())
+			.from(entity.tableName, path.alias)
 			.select(expr => expr.raw('count(*)'), 'row_count')
-			.select([path.getAlias(), relation.joiningColumn.columnName])
-			.groupBy([path.getAlias(), relation.joiningColumn.columnName])
+			.select([path.alias, relation.joiningColumn.columnName])
+			.groupBy([path.alias, relation.joiningColumn.columnName])
 		const withPredicates = this.predicatesInjector.inject(entity, filter)
 		const qbWithWhere = this.whereBuilder.build(qb, entity, path, withPredicates)
 		const rows = await qbWithWhere.getResult(this.db)

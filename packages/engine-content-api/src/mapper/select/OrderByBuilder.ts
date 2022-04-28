@@ -30,7 +30,7 @@ export class OrderByBuilder {
 	): [SelectBuilder<SelectBuilder.Result>, Orderable] {
 		const entries = Object.entries(orderBy)
 		if (entries.length !== 1) {
-			const fields = entries.join(', ')
+			const fields = entries.map(it => it[0]).join(', ')
 			throw new UserError('Order by: only one field is expected in each item of order by clause, got: ' + fields)
 		}
 		if (orderBy._random || orderBy._randomSeeded) {
@@ -56,7 +56,7 @@ export class OrderByBuilder {
 		if (typeof value === 'string') {
 			const columnName = getColumnName(this.schema, entity, fieldName)
 			const applyOrder = <Orderable extends QueryBuilder.Orderable<any>>(orderable: Orderable) =>
-				orderable.orderBy([path.getAlias(), columnName], value as Input.OrderDirection)
+				orderable.orderBy([path.alias, columnName], value as Input.OrderDirection)
 
 			qb = applyOrder(qb)
 			if (orderable !== null) {

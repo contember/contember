@@ -68,8 +68,8 @@ export class JoinVisitor implements Model.RelationByTypeVisitor<JoinDefinition[]
 		relation: Model.ManyHasManyOwningRelation,
 		targetEntity: Model.Entity,
 	): JoinDefinition[] {
-		const sourceAlias = this.path.back().getAlias()
-		const targetAlias = this.path.getAlias()
+		const sourceAlias = this.path.back().alias
+		const targetAlias = this.path.alias
 		const joiningAlias = `${sourceAlias}_x_${targetAlias}`
 		return [
 			{
@@ -96,8 +96,8 @@ export class JoinVisitor implements Model.RelationByTypeVisitor<JoinDefinition[]
 		targetEntity: Model.Entity,
 		targetRelation: Model.ManyHasManyOwningRelation,
 	): JoinDefinition[] {
-		const sourceAlias = this.path.back().getAlias()
-		const targetAlias = this.path.getAlias()
+		const sourceAlias = this.path.back().alias
+		const targetAlias = this.path.alias
 		const joiningAlias = `${sourceAlias}_x_${targetAlias}`
 		return [
 			{

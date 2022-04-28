@@ -43,14 +43,14 @@ export class SelectBuilder {
 		return result
 	}
 
-	public async select(
+	public select(
 		mapper: Mapper,
 		entity: Model.Entity,
 		input: ObjectNode<Input.ListQueryInput>,
 		path: Path,
 		groupBy?: string,
 	) {
-		const promise = this.selectInternal(mapper, entity, path, input)
+		this.selectInternal(mapper, entity, path, input)
 		const where = input.args.filter
 		if (where) {
 			this.qb = this.whereBuilder.build(this.qb, entity, path, where)
@@ -60,7 +60,7 @@ export class SelectBuilder {
 		if (groupBy) {
 			const groupByColumn = getColumnName(this.schema, entity, groupBy)
 			this.queryWrapper = new LimitByGroupWrapper(
-				[path.getAlias(), groupByColumn],
+				[path.alias, groupByColumn],
 				(orderable, qb) => {
 					if (orderBy.length > 0) {
 						[qb, orderable] = this.orderByBuilder.build(qb, orderable, entity, this.pathFactory.create([]), orderBy)
@@ -76,11 +76,9 @@ export class SelectBuilder {
 			}
 			this.qb = this.qb.limit(input.args.limit, input.args.offset)
 		}
-
-		await promise
 	}
 
-	private async selectInternal(mapper: Mapper, entity: Model.Entity, path: Path, input: ObjectNode) {
+	private selectInternal(mapper: Mapper, entity: Model.Entity, path: Path, input: ObjectNode) {
 		if (!input.fields.find(it => it.name === entity.primary && it.alias === entity.primary)) {
 			input = input.withField(new FieldNode(entity.primary, entity.primary, {}))
 		}
@@ -139,11 +137,9 @@ export class SelectBuilder {
 	}
 
 	private async getColumnValues(columnPath: Path, columnName: string): Promise<Input.PrimaryValue[]> {
-		this.qb = this.qb.select([columnPath.back().getAlias(), columnName], columnPath.getAlias())
+		this.qb = this.qb.select([columnPath.back().alias, columnName], columnPath.alias)
 		const rows = await this.rows
-		const columnAlias = columnPath.getAlias()
-		return rows
-			.map((it): Input.PrimaryValue => it[columnAlias] as Input.PrimaryValue)
-			.filter((val, index, all) => all.indexOf(val) === index)
+		const columnAlias = columnPath.alias
+		return Array.from(new Set(rows.map((it): Input.PrimaryValue => it[columnAlias] as Input.PrimaryValue)))
 	}
 }

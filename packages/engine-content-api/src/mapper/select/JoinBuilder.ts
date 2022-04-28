@@ -22,11 +22,11 @@ export class JoinBuilder {
 		const joins = acceptRelationTypeVisitor(this.schema, entity, relationName, new JoinVisitor(path))
 
 		return joins.reduce<SelectBuilder<SelectBuilder.Result>>((qb, join) => {
-			const targetAlias = join.targetAlias || path.getAlias()
+			const targetAlias = join.targetAlias || path.alias
 			if (qb.options.join.find(it => it.alias === targetAlias)) {
 				return qb
 			}
-			const sourceAlias = join.sourceAlias || path.back().getAlias()
+			const sourceAlias = join.sourceAlias || path.back().alias
 
 			return qb.leftJoin(join.tableName, targetAlias, clause =>
 				clause.compareColumns([sourceAlias, join.sourceColumn], Operator.eq, [targetAlias, join.targetColumn]),

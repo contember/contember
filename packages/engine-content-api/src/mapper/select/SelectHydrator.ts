@@ -1,14 +1,24 @@
 import { Path } from './Path'
 import { Value } from '@contember/schema'
+import { getFulfilledValues, getRejections } from '../../utils'
+
+type DataPromises = {
+	path: Path
+	parentKeyPath: Path
+	data: Promise<SelectNestedData>
+	defaultValue: SelectNestedDefaultValue
+}
+
+type ResolvedData = {
+	path: Path
+	parentKeyPath: Path
+	data: SelectNestedData
+	defaultValue: SelectNestedDefaultValue
+}
 
 export class SelectHydrator {
 	private columns: Path[] = []
-	private promises: {
-		path: Path
-		parentKeyPath: Path
-		data: PromiseLike<SelectNestedData>
-		defaultValue: SelectNestedDefaultValue
-	}[] = []
+	private promises: DataPromises[] = []
 
 	public addColumn(path: Path) {
 		this.columns.push(path)
@@ -17,21 +27,21 @@ export class SelectHydrator {
 	public addPromise(
 		path: Path,
 		parentKeyPath: Path,
-		data: PromiseLike<SelectNestedData>,
+		data: Promise<SelectNestedData>,
 		defaultValue: SelectNestedDefaultValue,
 	) {
 		this.promises.push({ path, parentKeyPath, data, defaultValue })
 	}
 
 	public async hydrateGroups(rows: SelectRow[], groupBy: string): Promise<SelectGroupedObjects> {
-		await Promise.all(this.promises.map(it => it.data))
+		const resolved = await this.resolveDataPromises()
 		const result: SelectGroupedObjects = {}
 		for (let row of rows) {
 			const key = row[groupBy] as Value.PrimaryValue
 			if (!result[key]) {
 				result[key] = []
 			}
-			result[key].push(await this.hydrateRow(row))
+			result[key].push(this.hydrateRow(row, resolved))
 		}
 		return result
 	}
@@ -43,19 +53,22 @@ export class SelectHydrator {
 		rows: SelectRow[],
 		indexBy?: string,
 	): Promise<SelectResultObject[] | SelectIndexedResultObjects> {
-		await Promise.all(this.promises.map(it => it.data))
+		const resolved = await this.resolveDataPromises()
 		if (indexBy) {
 			const result: SelectIndexedResultObjects = {}
 			for (let row of rows) {
-				result[row[indexBy] as Value.PrimaryValue] = await this.hydrateRow(row)
+				result[row[indexBy] as Value.PrimaryValue] = this.hydrateRow(row, resolved)
 			}
 			return result
 		}
-
-		return Promise.all(rows.map(row => this.hydrateRow(row)))
+		const result: SelectResultObject[] = []
+		for (const row of rows) {
+			result.push(this.hydrateRow(row, resolved))
+		}
+		return result
 	}
 
-	private async hydrateRow(row: SelectRow): Promise<SelectResultObject> {
+	private hydrateRow(row: SelectRow, resolvedData: ResolvedData[]): SelectResultObject {
 		const result: SelectResultObject = {}
 
 		for (let columnPath of this.columns) {
@@ -63,22 +76,42 @@ export class SelectHydrator {
 			const last: string = path.pop() as string
 			const currentObject = path.reduce<any>((obj, part) => (obj[part] = obj[part] || {}), result)
 
-			const field = row[columnPath.getAlias()]
+			const field = row[columnPath.alias]
 			currentObject[last] = this.formatValue(field)
 		}
 
-		for (let { path, parentKeyPath, data, defaultValue } of this.promises) {
-			const awaitedData = await data
+		for (let { path, parentKeyPath, data, defaultValue } of resolvedData) {
 			const pathTmp = [...path.path]
 			const last = pathTmp.pop() as string
 			const currentObject = pathTmp.reduce<any>((obj, part) => (obj && obj[part]) || undefined, result)
-			const parentValue = row[parentKeyPath.getAlias()] as Value.PrimaryValue
+			const parentValue = row[parentKeyPath.alias] as Value.PrimaryValue
 			if (currentObject) {
-				currentObject[last] = (parentValue ? awaitedData[parentValue] : undefined) || defaultValue
+				currentObject[last] = (parentValue ? data[parentValue] : undefined) || defaultValue
 			}
 		}
 
 		return result
+	}
+
+	private async resolveDataPromises(): Promise<ResolvedData[]> {
+		const results = await Promise.allSettled(this.promises.map(async (it): Promise<ResolvedData> => ({
+			defaultValue: it.defaultValue,
+			parentKeyPath: it.parentKeyPath,
+			path: it.path,
+			data: await it.data,
+		})))
+		const failures = getRejections(results)
+		if (failures.length > 0) {
+			if (failures.length > 1) {
+				// eslint-disable-next-line no-console
+				console.error('Multiple error has occurred, printing them & rethrowing the first one')
+				// eslint-disable-next-line no-console
+				failures.slice(1).map(e => console.error(e))
+			}
+			throw failures[0]
+		}
+
+		return getFulfilledValues(results)
 	}
 
 	private formatValue(value: any) {

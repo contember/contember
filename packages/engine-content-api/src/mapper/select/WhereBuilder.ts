@@ -48,7 +48,7 @@ export class WhereBuilder {
 		allowManyJoin: boolean,
 		joinList: WhereJoinDefinition[],
 	): SqlConditionBuilder {
-		const tableName = path.getAlias()
+		const tableName = path.alias
 
 		if (where.and !== undefined && where.and.length > 0) {
 			const expr = where.and

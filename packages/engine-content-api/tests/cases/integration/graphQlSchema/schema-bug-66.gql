@@ -142,6 +142,8 @@ input VideoOrderBy {
 enum OrderDirection {
   asc
   desc
+  ascNullsFirst
+  descNullsLast
 }
 
 input FrontPageOrderBy {

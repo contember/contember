@@ -114,6 +114,8 @@ input OneHasManyEntityOrderBy {
 enum OrderDirection {
   asc
   desc
+  ascNullsFirst
+  descNullsLast
 }
 
 input RootOrderBy {

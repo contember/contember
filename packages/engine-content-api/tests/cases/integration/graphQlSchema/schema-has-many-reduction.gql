@@ -137,6 +137,8 @@ input PostLocaleOrderBy {
 enum OrderDirection {
   asc
   desc
+  ascNullsFirst
+  descNullsLast
 }
 
 input PostOrderBy {

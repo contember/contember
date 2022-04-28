@@ -111,7 +111,12 @@ class Compiler {
 			return Literal.empty
 		}
 		return new Literal(' order by ').appendAll(
-			orderBy.map(([column, direction]) => column.appendString(' ' + direction)),
+			orderBy.map(([column, direction]) => {
+				if (!SelectBuilder.orderByDirection.has(direction)) {
+					throw new Error()
+				}
+				return column.appendString(' ' + direction)
+			}),
 			', ',
 		)
 	}

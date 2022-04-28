@@ -85,7 +85,7 @@ class SelectBuilder<Result = SelectBuilder.Result> implements With.Aware, Where.
 
 	public orderBy(
 		expression: QueryBuilder.ColumnIdentifier | Literal,
-		direction: 'asc' | 'desc' = 'asc',
+		direction: SelectBuilder.OrderByDirection = 'asc',
 	): SelectBuilder<Result> {
 		const literal = expression instanceof Literal ? expression : new Literal(toFqnWrap(expression))
 		return this.withOption('orderBy', [...this.options.orderBy, [literal, direction]])
@@ -176,6 +176,8 @@ namespace SelectBuilder {
 
 	export type Result = Record<string, any>
 
+	export type OrderByDirection = 'asc' | 'desc' | 'asc nulls last' | 'asc nulls first' | 'desc nulls first' | 'desc nulls last'
+	export const orderByDirection = new Set<OrderByDirection>(['asc', 'desc', 'asc nulls last', 'asc nulls first', 'desc nulls first', 'desc nulls last'])
 	export type Options = Readonly<
 		With.Options &
 		Where.Options & {
@@ -183,7 +185,7 @@ namespace SelectBuilder {
 			select: Literal[]
 			limit: [number | undefined, number | undefined]
 			from: undefined | [Literal | string, string | undefined][]
-			orderBy: [Literal, 'asc' | 'desc'][]
+			orderBy: [Literal, OrderByDirection][]
 			join: {
 				type: 'inner' | 'left'
 				table: string | Literal

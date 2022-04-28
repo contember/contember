@@ -84,6 +84,8 @@ input AuthorOrderBy {
 enum OrderDirection {
   asc
   desc
+  ascNullsFirst
+  descNullsLast
 }
 
 type AuthorConnection {

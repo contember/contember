@@ -84,6 +84,8 @@ input TestOrderBy {
 enum OrderDirection {
   asc
   desc
+  ascNullsFirst
+  descNullsLast
 }
 
 type TestConnection {

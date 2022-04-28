@@ -41,29 +41,3 @@ test('returns error for invalid date input', async () => {
 		expectDatabase: {},
 	})
 })
-
-test('returns error for invalid uuid', async () => {
-	await executeDbTest({
-		schema,
-		seed: [],
-		query: GQL`mutation {
-        updatePost(by: { id: "abc" }, data: { createdAt: "2020-13-01 20:00" }) {
-          ok
-          errors {
-            type
-            message
-          }
-        }
-      }`,
-		return: response => {
-			assert.ok(response.updatePost)
-			assert.notOk(response.updatePost.ok)
-			assert.lengthOf(response.updatePost.errors, 1)
-			assert.equal(response.updatePost.errors[0].type, 'InvalidDataInput')
-			assert.match(response.updatePost.errors[0].message, /invalid input syntax for (type )?uuid: "abc"/)
-		},
-		expectDatabase: {},
-	})
-})
-
-

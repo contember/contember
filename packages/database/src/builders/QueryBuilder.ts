@@ -2,6 +2,7 @@ import { Literal } from '../Literal'
 import { Value } from '../types'
 import { ColumnExpressionFactory } from './ColumnExpressionFactory'
 import { Compiler } from './Compiler'
+import { SelectBuilder } from './SelectBuilder'
 
 interface QueryBuilder {
 	createQuery(context: Compiler.Context): Literal
@@ -19,7 +20,7 @@ namespace QueryBuilder {
 	export type ColumnExpressionMap = { [columnName: string]: QueryBuilder.ColumnExpression }
 
 	export interface Orderable<R> {
-		orderBy(columnName: QueryBuilder.ColumnIdentifier | Literal, direction?: 'asc' | 'desc'): R
+		orderBy(columnName: QueryBuilder.ColumnIdentifier | Literal, direction?: SelectBuilder.OrderByDirection): R
 	}
 }
 

@@ -232,6 +232,8 @@ input PostOrderBy {
 enum OrderDirection {
   asc
   desc
+  ascNullsFirst
+  descNullsLast
 }
 
 input AuthorOrderBy {

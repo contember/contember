@@ -15,6 +15,8 @@ export class OrderByTypeProvider {
 		values: {
 			asc: { value: 'asc' },
 			desc: { value: 'desc' },
+			ascNullsFirst: { value: 'asc nulls first' },
+			descNullsLast: { value: 'desc nulls last' },
 		},
 	})
 

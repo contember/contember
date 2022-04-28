@@ -1,5 +1,6 @@
 import { Path } from './Path'
 import { Value } from '@contember/schema'
+import { getFulfilledValues, getRejections } from '../../utils'
 
 type DataPromises = {
 	path: Path
@@ -93,12 +94,24 @@ export class SelectHydrator {
 	}
 
 	private async resolveDataPromises(): Promise<ResolvedData[]> {
-		return await Promise.all(this.promises.map(async (it): Promise<ResolvedData> => ({
+		const results = await Promise.allSettled(this.promises.map(async (it): Promise<ResolvedData> => ({
 			defaultValue: it.defaultValue,
 			parentKeyPath: it.parentKeyPath,
 			path: it.path,
 			data: await it.data,
 		})))
+		const failures = getRejections(results)
+		if (failures.length > 0) {
+			if (failures.length > 1) {
+				// eslint-disable-next-line no-console
+				console.error('Multiple error has occurred, printing them & rethrowing the first one')
+				// eslint-disable-next-line no-console
+				failures.slice(1).map(e => console.error(e))
+			}
+			throw failures[0]
+		}
+
+		return getFulfilledValues(results)
 	}
 
 	private formatValue(value: any) {

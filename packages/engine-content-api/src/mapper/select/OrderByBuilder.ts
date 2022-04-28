@@ -30,7 +30,7 @@ export class OrderByBuilder {
 	): [SelectBuilder<SelectBuilder.Result>, Orderable] {
 		const entries = Object.entries(orderBy)
 		if (entries.length !== 1) {
-			const fields = entries.join(', ')
+			const fields = entries.map(it => it[0]).join(', ')
 			throw new UserError('Order by: only one field is expected in each item of order by clause, got: ' + fields)
 		}
 		if (orderBy._random || orderBy._randomSeeded) {

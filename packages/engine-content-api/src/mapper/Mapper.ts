@@ -120,11 +120,8 @@ export class Mapper {
 		const selector = this.selectBuilderFactory.create(augmentedBuilder, hydrator)
 		const filterWithPredicates = this.predicatesInjector.inject(entity, inputWithOrder.args.filter || {})
 		const inputWithPredicates = inputWithOrder.withArg('filter', filterWithPredicates)
-		const selectPromise = selector.select(this, entity, inputWithPredicates, path, groupBy)
-		const rows = await selector.execute(this.db)
-		await selectPromise
-
-		return rows
+		selector.select(this, entity, inputWithPredicates, path, groupBy)
+		return await selector.execute(this.db)
 	}
 
 	public async count(entity: Model.Entity, filter: Input.OptionalWhere) {

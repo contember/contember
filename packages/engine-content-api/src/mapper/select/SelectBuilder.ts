@@ -43,14 +43,14 @@ export class SelectBuilder {
 		return result
 	}
 
-	public async select(
+	public select(
 		mapper: Mapper,
 		entity: Model.Entity,
 		input: ObjectNode<Input.ListQueryInput>,
 		path: Path,
 		groupBy?: string,
 	) {
-		const promise = this.selectInternal(mapper, entity, path, input)
+		this.selectInternal(mapper, entity, path, input)
 		const where = input.args.filter
 		if (where) {
 			this.qb = this.whereBuilder.build(this.qb, entity, path, where)
@@ -76,11 +76,9 @@ export class SelectBuilder {
 			}
 			this.qb = this.qb.limit(input.args.limit, input.args.offset)
 		}
-
-		await promise
 	}
 
-	private async selectInternal(mapper: Mapper, entity: Model.Entity, path: Path, input: ObjectNode) {
+	private selectInternal(mapper: Mapper, entity: Model.Entity, path: Path, input: ObjectNode) {
 		if (!input.fields.find(it => it.name === entity.primary && it.alias === entity.primary)) {
 			input = input.withField(new FieldNode(entity.primary, entity.primary, {}))
 		}

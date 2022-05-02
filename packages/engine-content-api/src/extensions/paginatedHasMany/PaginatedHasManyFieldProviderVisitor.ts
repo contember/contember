@@ -3,6 +3,7 @@ import { FieldMap } from '../EntityFieldsProvider'
 import { PaginatedHasManyFieldProviderExtension } from './PaginatedHasManyFieldProvider'
 import { capitalizeFirstLetter } from '../../utils'
 import { PaginatedFieldConfigFactory } from '../../schema/PaginatedFieldConfigFactory'
+import { aliasAwareResolver } from '../../schema'
 
 export class PaginatedHasManyFieldProviderVisitor implements
 	Model.ColumnVisitor<FieldMap<PaginatedHasManyFieldProviderExtension>>,
@@ -47,6 +48,7 @@ export class PaginatedHasManyFieldProviderVisitor implements
 				extensions: {
 					relationName: relation.name,
 				},
+				resolve: aliasAwareResolver,
 			},
 		}
 	}

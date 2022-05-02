@@ -27,7 +27,7 @@ export class PatchProjectMembershipVariableValuesCommand implements Command<stri
 					.from('filtered')
 					.unionDistinct(qb => qb.select(expr => expr.raw('*')).from(new Literal('unnest(?::text[])', [this.append]))),
 			)
-			.with('new', qb => qb.from('new_list').select(expr => expr.raw(`jsonb_agg(value)`), 'value'))
+			.with('new', qb => qb.from('new_list').select(expr => expr.raw(`coalesce(jsonb_agg(value), ?::jsonb)`, '[]'), 'value'))
 			.into('project_membership_variable')
 			.from(qb => qb.from('new'))
 			.values({

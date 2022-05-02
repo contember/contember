@@ -20,7 +20,7 @@ export const patchVariablesSql = (args: {
 		    (SELECT "filtered"."value"
 		    FROM "filtered"
 		        UNION DISTINCT ( SELECT * FROM unnest(?::TEXT[]))),
-		"new" AS (SELECT jsonb_agg(value) AS "value" FROM "new_list")
+		"new" AS (SELECT coalesce(jsonb_agg(value), ?::jsonb) AS "value" FROM "new_list")
 		INSERT INTO "tenant"."project_membership_variable"
 		    ("id", "membership_id", "variable", "value")
 		    SELECT ?, ?, ?, "new"."value"
@@ -33,6 +33,7 @@ export const patchVariablesSql = (args: {
 		args.variableName,
 		...(args.removeValues ? args.removeValues : []),
 		args.values,
+		'[]',
 		args.id,
 		args.membershipId,
 		args.variableName,

@@ -1,6 +1,6 @@
-import { AllowAllPermissionFactory } from '@contember/schema-utils'
+export { AllowAllPermissionFactory } from '@contember/schema-utils'
+export { PermissionsBuilder } from './acl/builder/PermissionsBuilder'
+export * as InputValidation from './validation'
+export * as AclDefinition from './acl/definition'
+export * from './createSchema'
 export * from './model'
-import PermissionsBuilder from './acl/PermissionsBuilder'
-import * as InputValidation from './validation'
-
-export { AllowAllPermissionFactory, PermissionsBuilder, InputValidation }

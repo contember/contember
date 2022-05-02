@@ -89,7 +89,7 @@ export const failedTransaction = (executes: SqlQuery[]): SqlQuery[] => {
 
 export const execute = async (test: Test) => {
 	const permissions: Acl.Permissions = test.permissions || new AllowAllPermissionFactory().create(test.schema)
-	const authorizator = new Authorizator(permissions)
+	const authorizator = new Authorizator(permissions, false)
 	const builder = new GraphQlSchemaBuilderFactory().create(test.schema, authorizator)
 	const graphQLSchema = builder.build()
 

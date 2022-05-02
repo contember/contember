@@ -5,6 +5,7 @@ import { SchemaBuilder } from './internal'
 import { DefaultNamingConventions } from './NamingConventions'
 import 'reflect-metadata'
 import { FieldDefinition } from './fieldDefinitions'
+import { isEntityConstructor } from '../../utils'
 
 export * from './fieldDefinitions'
 export * from './EventLogDefinition'
@@ -18,7 +19,7 @@ export abstract class Entity {
 }
 
 export type ModelDefinition<M> = {
-	[K in keyof M]: EnumDefinition | EntityConstructor
+	[K in keyof M]: unknown
 }
 
 export function createModel<M extends ModelDefinition<M>>(definitions: M): Model.Schema {
@@ -26,8 +27,8 @@ export function createModel<M extends ModelDefinition<M>>(definitions: M): Model
 	for (const [name, definition] of Object.entries(definitions)) {
 		if (definition instanceof EnumDefinition) {
 			schemaBuilder.addEnum(name, definition)
-		} else {
-			schemaBuilder.addEntity(name, definition as any)
+		} else if (isEntityConstructor(definition)) {
+			schemaBuilder.addEntity(name, definition)
 		}
 	}
 	const schema = schemaBuilder.createSchema()

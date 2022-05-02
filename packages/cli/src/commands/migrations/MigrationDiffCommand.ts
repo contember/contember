@@ -8,7 +8,7 @@ import prompts from 'prompts'
 import { interactiveResolveApiToken, TenantClient } from '../../utils/tenant'
 import { interactiveResolveInstanceEnvironmentFromInput } from '../../utils/instance'
 import { SystemClient } from '../../utils/system'
-import { loadSchema } from '../../utils/project'
+import { loadSchema } from '../../utils/project/loadSchema'
 
 type Args = {
 	project: string

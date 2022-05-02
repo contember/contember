@@ -11,7 +11,7 @@ import {
 } from '@contember/engine-content-api'
 import { DocumentNode, printSchema } from 'graphql'
 import { mergeSchemas } from '@graphql-tools/merge'
-import { loadSchema } from '../../utils/project'
+import { loadSchema } from '../../utils/project/loadSchema'
 
 type Args = {
 	project: string

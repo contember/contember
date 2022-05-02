@@ -3,7 +3,7 @@ import { MigrationsContainerFactory } from '../../MigrationsContainer'
 import { validateSchemaAndPrintErrors } from '../../utils/schema'
 import { emptySchema } from '@contember/schema-utils'
 import { validateMigrations } from '../migrations/MigrationValidationHelper'
-import { loadSchema } from '../../utils/project'
+import { loadSchema } from '../../utils/project/loadSchema'
 
 type Args = {
 	project: string

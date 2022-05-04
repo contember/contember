@@ -1,7 +1,7 @@
 FROM node:16-alpine as builder
 WORKDIR /src
 
-RUN npm install -g pnpm@6
+RUN npm install -g pnpm
 
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY ee/admin-server/package.json                    ./ee/admin-server/package.json

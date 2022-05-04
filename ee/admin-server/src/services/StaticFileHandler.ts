@@ -24,7 +24,8 @@ export class StaticFileHandler {
 			content = await readFile(this.publicDir + path)
 		} catch (e) {
 			res.writeHead(404)
-			return res.end()
+			res.end()
+			return
 		}
 
 		res.setHeader('Content-Type', contentType)

@@ -8,14 +8,15 @@ import { LayoutPageAside } from './LayoutPageAside'
 import { LayoutPageContent } from './LayoutPageContent'
 import { useThemeScheme } from './ThemeSchemeContext'
 import { ThemeScheme } from './Types'
-export interface LayoutPageProps extends Omit<TitleBarProps, 'children'>, ThemeScheme {
+export interface LayoutPageProps extends Omit<TitleBarProps, 'after' | 'children'>, ThemeScheme {
+	afterTitle?: TitleBarProps['after']
 	children?: ReactNode
 	side?: ReactNode
 	title?: ReactNode
 }
 
 export const LayoutPage = memo(({
-	after,
+	afterTitle,
 	actions,
 	children,
 	headingProps,
@@ -90,7 +91,7 @@ export const LayoutPage = memo(({
 		toThemeClass(themeContent ?? theme, themeControls ?? theme),
 		toSchemeClass(scheme),
 	)}>
-		{(title || actions) && <TitleBar after={<SectionTabs />} navigation={navigation} actions={actions} headingProps={headingProps}>
+		{(title || actions) && <TitleBar after={afterTitle === undefined ? <SectionTabs /> : afterTitle} navigation={navigation} actions={actions} headingProps={headingProps}>
 			{title}
 		</TitleBar>}
 		<div

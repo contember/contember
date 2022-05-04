@@ -4,7 +4,7 @@
 		"build": "pnpm run -- ts:build && pnpm run --recursive --parallel -- build",
 		"changeset": "changeset",
 		"check": "./scripts/runChecks.sh",
-		"reinstall": "docker run --rm --interactive --tty --network=host -v \"$PWD:$PWD\" -w \"$PWD\" -u \"1000\" node:16-alpine npx pnpm install",
+		"reinstall": "docker run --rm --interactive --tty --network=host -v \"$PWD:$PWD\" -w \"$PWD\" -u \"1000\" node:16-alpine npx pnpm@6 install",
 		"clean": "pnpm run -- clean:dependencies && pnpm run -- clean:generated",
 		"clean:dependencies": "rm -rf node_modules ee/*/node_modules packages/*/node_modules",
 		"clean:generated": "rm -rf dist ee/*/dist ee/*/temp packages/*/dist packages/*/temp",

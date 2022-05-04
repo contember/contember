@@ -31,6 +31,11 @@ const systemPermissionsSchema = Typesafe.partial({
 })
 const systemSchemaCheck: Typesafe.Equals<Acl.SystemPermissions, ReturnType<typeof systemPermissionsSchema>> = true
 
+const contentPermissionsSchema = Typesafe.partial({
+	assumeMembership: membershipMatchRuleSchema,
+})
+const contentSchemaCheck: Typesafe.Equals<Acl.ContentPermissions, ReturnType<typeof contentPermissionsSchema>> = true
+
 const variablesSchema = Typesafe.record(
 	Typesafe.string,
 	Typesafe.union(
@@ -89,6 +94,7 @@ const baseRolePermissionsSchema = Typesafe.intersection(
 		),
 		tenant: tenantPermissionsSchema,
 		system: systemPermissionsSchema,
+		content: contentPermissionsSchema,
 	}),
 )
 const baseRolePermissionsCheck: Typesafe.Equals<Acl.BaseRolePermissions, ReturnType<typeof baseRolePermissionsSchema>> = true

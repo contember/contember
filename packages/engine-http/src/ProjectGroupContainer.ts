@@ -9,11 +9,13 @@ import { SystemContainer } from '@contember/engine-system-api'
 import { Authenticator } from './common'
 import { TenantGraphQLHandler } from './tenant'
 import { SystemGraphQLHandler } from './system'
+import { ProjectMembershipResolver } from './content'
 
 export interface ProjectGroupContainer {
 	slug: string | undefined
 
 	authenticator: Authenticator
+	projectMembershipResolver: ProjectMembershipResolver
 
 	projectContainerResolver: ProjectContainerResolver
 	projectSchemaResolver: ProjectSchemaResolver

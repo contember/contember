@@ -180,3 +180,58 @@ test('Tenant API: sign up, add to a project and check project access', async () 
 		})
 		.expect(200)
 })
+
+
+test('Content API: assume membership', async () => {
+	const tester = await createTester(createSchema(TagModel, schema => {
+		return {
+			...schema,
+			acl: {
+				roles: {
+					test: {
+						entities: {},
+						variables: {},
+						content: {
+							assumeMembership: {
+								admin: {},
+							},
+						},
+					},
+				},
+			},
+		}
+	}))
+
+	const email = `john+${Date.now()}@doe.com`
+	const identityId = await signUp(email)
+	const authKey = await signIn(email)
+	await addProjectMember(identityId, tester.projectSlug, 'test')
+
+	await tester(
+		gql`
+			query {
+				listTag {
+					id
+				}
+			}
+		`,
+		{ authorizationToken: authKey },
+	)
+		.expect(400)
+
+
+
+	await tester(
+		gql`
+			query {
+				listTag {
+					id
+				}
+			}
+		`,
+		{ authorizationToken: authKey },
+	)
+		.set('X-Contember-assume-membership', JSON.stringify({ memberships: [{ role: 'admin', variables: [] }] }))
+		.expect({ data: { listTag: [] } })
+		.expect(200)
+})

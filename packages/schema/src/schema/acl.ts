@@ -115,11 +115,16 @@ namespace Acl {
 		readonly assumeIdentity?: boolean
 	}
 
+	export type ContentPermissions = {
+		readonly assumeMembership?: MembershipMatchRule
+	}
+
 	export interface BaseRolePermissions {
 		readonly inherits?: readonly string[]
 		readonly implicit?: boolean
 		readonly tenant?: TenantPermissions
 		readonly system?: SystemPermissions
+		readonly content?: ContentPermissions
 		readonly variables: Acl.Variables
 		readonly stages?: StagesDefinition
 		readonly entities: Permissions

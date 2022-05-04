@@ -269,6 +269,21 @@ export const transform = <Input extends Json, Result extends Json>(inner: Type<I
 	return transform(inner(input, path), input)
 }
 
+export const coalesce = <T extends Json, F extends Json>(inner: Type<T>, fallback: F): Type<T | F> => {
+	const type = (input: unknown, path: PropertyKey[] = []): T | F => {
+		try {
+			return inner(input, path)
+		} catch (e) {
+			if (e instanceof ParseError) return fallback
+			else throw e
+		}
+	}
+
+	type.inner = inner
+
+	return type
+}
+
 export const valueAt = (input: any, path: PropertyKey[]): unknown | undefined => {
 	let value = input
 	for (const key of path) {

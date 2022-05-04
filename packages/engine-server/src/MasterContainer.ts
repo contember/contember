@@ -95,8 +95,8 @@ export class MasterContainerFactory {
 				new TenantGraphQLHandlerFactory(logSentryError))
 			.addService('systemGraphQLHandlerFactory', ({ debugMode }) =>
 				new SystemGraphQLHandlerFactory(logSentryError, debugMode))
-			.addService('projectGroupContainerFactory', ({ providers, systemContainerFactory, tenantContainerFactory, projectContainerFactoryFactory, projectConfigResolver, tenantGraphQLHandlerFactory, systemGraphQLHandlerFactory }) =>
-				new ProjectGroupContainerFactory(providers, systemContainerFactory, tenantContainerFactory, projectContainerFactoryFactory, projectConfigResolver, tenantGraphQLHandlerFactory, systemGraphQLHandlerFactory))
+			.addService('projectGroupContainerFactory', ({ debugMode, providers, systemContainerFactory, tenantContainerFactory, projectContainerFactoryFactory, projectConfigResolver, tenantGraphQLHandlerFactory, systemGraphQLHandlerFactory }) =>
+				new ProjectGroupContainerFactory(debugMode, providers, systemContainerFactory, tenantContainerFactory, projectContainerFactoryFactory, projectConfigResolver, tenantGraphQLHandlerFactory, systemGraphQLHandlerFactory))
 			.addService('projectGroupContainerResolver', ({ tenantConfigResolver, projectGroupContainerFactory }) =>
 				new ProjectGroupContainerResolver(tenantConfigResolver, projectGroupContainerFactory))
 			.addService('promRegistry', ({ processType, projectGroupContainerResolver }) => {
@@ -149,8 +149,8 @@ export class MasterContainerFactory {
 				new ContentGraphQLContextFactory(providers))
 			.addService('contentQueryHandlerFactory', ({ debugMode }) =>
 				new ContentQueryHandlerFactory(debugMode, logSentryError))
-			.addService('contentApiMiddlewareFactory', ({ debugMode, projectGroupResolver, notModifiedChecker, contentGraphqlContextFactory, contentQueryHandlerFactory }) =>
-				new ContentApiMiddlewareFactory(debugMode, projectGroupResolver, notModifiedChecker, contentGraphqlContextFactory, contentQueryHandlerFactory))
+			.addService('contentApiMiddlewareFactory', ({ projectGroupResolver, notModifiedChecker, contentGraphqlContextFactory, contentQueryHandlerFactory }) =>
+				new ContentApiMiddlewareFactory(projectGroupResolver, notModifiedChecker, contentGraphqlContextFactory, contentQueryHandlerFactory))
 			.addService('tenantGraphQLContextFactory', () =>
 				new TenantGraphQLContextFactory())
 			.addService('tenantApiMiddlewareFactory', ({ debugMode, projectGroupResolver, tenantGraphQLContextFactory }) =>

@@ -1,18 +1,26 @@
 import { Acl, Model } from '@contember/schema'
 import * as Typesafe from '@contember/typesafe'
 
+const membershipMatchRuleSchema = Typesafe.record(
+	Typesafe.string,
+	Typesafe.union(
+		Typesafe.literal(true),
+		Typesafe.partial({
+			variables: Typesafe.union(
+				Typesafe.literal(true),
+				Typesafe.record(
+					Typesafe.string,
+					Typesafe.union(Typesafe.literal(true), Typesafe.string),
+				),
+			),
+		}),
+	),
+)
+
 const tenantPermissionsSchema = Typesafe.partial({
 	invite: Typesafe.boolean,
 	unmanagedInvite: Typesafe.boolean,
-	manage: Typesafe.record(Typesafe.string, Typesafe.partial({
-		variables: Typesafe.union(
-			Typesafe.literal(true),
-			Typesafe.record(
-				Typesafe.string,
-				Typesafe.union(Typesafe.literal(true), Typesafe.string),
-			),
-		),
-	})),
+	manage: membershipMatchRuleSchema,
 })
 const tenantSchemaCheck: Typesafe.Equals<Acl.TenantPermissions, ReturnType<typeof tenantPermissionsSchema>> = true
 

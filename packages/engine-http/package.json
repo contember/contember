@@ -17,6 +17,7 @@
     "@contember/graphql-utils": "^1.1.0-alpha.8",
     "@contember/schema": "^1.1.0-alpha.8",
     "@contember/schema-utils": "^1.1.0-alpha.8",
+    "@contember/typesafe": "^1.1.0-alpha.8",
     "@graphql-tools/merge": "^6.2.14",
     "@graphql-tools/schema": "^8.3.5",
     "@types/lru-cache": "^5.1.0",

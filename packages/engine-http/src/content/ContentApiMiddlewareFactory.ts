@@ -15,9 +15,9 @@ type ContentApiMiddlewareKoaState =
 	& ProjectInfoMiddlewareState
 	& { authResult: AuthResult }
 
+
 export class ContentApiMiddlewareFactory {
 	constructor(
-		private readonly debug: boolean,
 		private readonly projectGroupResolver: ProjectGroupResolver,
 		private readonly notModifiedChecker: NotModifiedChecker,
 		private readonly contentGraphqlContextFactory: ContentGraphQLContextFactory,
@@ -36,10 +36,9 @@ export class ContentApiMiddlewareFactory {
 			const authResult = await groupContainer.authenticator.authenticate({ request, timer })
 			koaContext.state.authResult = authResult
 
-			const projectSlug = params.projectSlug
-			const projectContainer = await groupContainer.projectContainerResolver.getProjectContainer(projectSlug, true)
+			const projectContainer = await groupContainer.projectContainerResolver.getProjectContainer(params.projectSlug, true)
 			if (projectContainer === undefined) {
-				throw new HttpError(`Project ${projectSlug} NOT found`, 404)
+				throw new HttpError(`Project ${(params.projectSlug)} NOT found`, 404)
 			}
 			const project = projectContainer.project
 			koaContext.state.project = project.slug
@@ -59,35 +58,19 @@ export class ContentApiMiddlewareFactory {
 				response.status = 304
 				return
 			}
-
-			const tenantContainer = groupContainer.tenantContainer
-			const explicitMemberships = await timer('MembershipFetch', () =>
-				tenantContainer.projectMemberManager.getProjectMemberships(
-					tenantContainer.databaseContext,
-					{ slug: project.slug },
-					{
-						id: authResult.identityId,
-						roles: authResult.roles,
-					},
-					undefined,
-				),
-			)
 			const schema = await projectContainer.contentSchemaResolver.getSchema(systemDatabase, stage.slug)
-			const implicitRoles = Object.entries(schema.acl.roles).filter(([, role]) => role.implicit).map(([name]) => name)
 
-			if (explicitMemberships.length === 0 && implicitRoles.length === 0) {
-				throw this.debug
-					? new HttpError(`You are not allowed to access project ${project.slug}`, 403)
-					: new HttpError(`Project ${project.slug} NOT found`, 404)
-			}
+			const memberships = await await timer('MembershipFetch', () => groupContainer.projectMembershipResolver.resolveMemberships({
+				request,
+				acl: schema.acl,
+				projectSlug: project.slug,
+				identity: {
+					id: authResult.identityId,
+					roles: authResult.roles,
+				},
+			}))
+			const projectRoles = memberships.map(it => it.role)
 
-			const explicitProjectRoles = explicitMemberships.map(it => it.role)
-			const implicitRolesToAssign = implicitRoles.filter(it => !explicitProjectRoles.includes(it))
-			const memberships = [
-				...explicitMemberships,
-				...implicitRolesToAssign.map(it => ({ role: it, variables: [] })),
-			]
-			const projectRoles = [...explicitProjectRoles, ...implicitRolesToAssign]
 			const contentDatabase = projectContainer.connection.createClient(stage.schema, { module: 'content' })
 
 			const [graphQlSchema, permissions] = await timer('GraphQLSchemaCreate', () => projectContainer.graphQlSchemaFactory.create(schema, {

@@ -1,18 +1,20 @@
 import { Acl, Model } from '@contember/schema'
 import * as Typesafe from '@contember/typesafe'
 
+const membershipMatchRuleSchema = Typesafe.record(Typesafe.string, Typesafe.partial({
+	variables: Typesafe.union(
+		Typesafe.literal(true),
+		Typesafe.record(
+			Typesafe.string,
+			Typesafe.union(Typesafe.literal(true), Typesafe.string),
+		),
+	),
+}))
+
 const tenantPermissionsSchema = Typesafe.partial({
 	invite: Typesafe.boolean,
 	unmanagedInvite: Typesafe.boolean,
-	manage: Typesafe.record(Typesafe.string, Typesafe.partial({
-		variables: Typesafe.union(
-			Typesafe.literal(true),
-			Typesafe.record(
-				Typesafe.string,
-				Typesafe.union(Typesafe.literal(true), Typesafe.string),
-			),
-		),
-	})),
+	manage: membershipMatchRuleSchema,
 })
 const tenantSchemaCheck: Typesafe.Equals<Acl.TenantPermissions, ReturnType<typeof tenantPermissionsSchema>> = true
 
@@ -22,6 +24,11 @@ const systemPermissionsSchema = Typesafe.partial({
 	assumeIdentity: Typesafe.boolean,
 })
 const systemSchemaCheck: Typesafe.Equals<Acl.SystemPermissions, ReturnType<typeof systemPermissionsSchema>> = true
+
+const contentPermissionsSchema = Typesafe.partial({
+	assumeMembership: membershipMatchRuleSchema,
+})
+const contentSchemaCheck: Typesafe.Equals<Acl.ContentPermissions, ReturnType<typeof contentPermissionsSchema>> = true
 
 const variablesSchema = Typesafe.record(
 	Typesafe.string,
@@ -81,6 +88,7 @@ const baseRolePermissionsSchema = Typesafe.intersection(
 		),
 		tenant: tenantPermissionsSchema,
 		system: systemPermissionsSchema,
+		content: contentPermissionsSchema,
 	}),
 )
 const baseRolePermissionsCheck: Typesafe.Equals<Acl.BaseRolePermissions, ReturnType<typeof baseRolePermissionsSchema>> = true

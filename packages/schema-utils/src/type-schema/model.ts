@@ -63,6 +63,10 @@ const oneHasOneOwningRelationSchema = Typesafe.intersection(
 
 const oneHasOneOwningRelationSchemaCheck: Typesafe.Equals<Model.OneHasOneOwningRelation, ReturnType<typeof oneHasOneOwningRelationSchema>> = true
 
+const eventLogSchema = Typesafe.coalesce(Typesafe.object({
+	enabled: Typesafe.boolean,
+}), { enabled: true }) as Typesafe.Type<{ readonly enabled: boolean }>
+
 const manyHasManyOwningRelationSchema = Typesafe.intersection(
 	Typesafe.object({
 		type: Typesafe.literal(Model.RelationType.ManyHasMany),
@@ -72,9 +76,7 @@ const manyHasManyOwningRelationSchema = Typesafe.intersection(
 			tableName: Typesafe.string,
 			joiningColumn: joiningColumnSchema,
 			inverseJoiningColumn: joiningColumnSchema,
-			eventLog: Typesafe.object({
-				enabled: Typesafe.boolean,
-			}),
+			eventLog: eventLogSchema,
 		}),
 	}),
 	Typesafe.partial({
@@ -156,9 +158,7 @@ const entitySchema = Typesafe.intersection(
 			fields: Typesafe.array(Typesafe.string),
 			name: Typesafe.string,
 		})),
-		eventLog: Typesafe.object({
-			enabled: Typesafe.boolean,
-		}),
+		eventLog: eventLogSchema,
 	}),
 	Typesafe.partial({
 		view: viewSchema,

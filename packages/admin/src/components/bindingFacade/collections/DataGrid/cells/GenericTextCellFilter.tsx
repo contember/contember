@@ -42,6 +42,7 @@ export const GenericTextCellFilter = <Filter extends GenericTextCellFilterArtifa
 				value={filter.mode}
 			/>
 			<TextInput
+				notNull
 				value={filter.query}
 				placeholder={formatMessage('dataGridCells.textCell.queryPlaceholder')}
 				onChange={useCallback((value?: string | null) => {

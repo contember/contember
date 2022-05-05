@@ -43,6 +43,8 @@ export const FieldContainer = memo(
 		const LabelElement = useLabelElement ? 'label' : 'div'
 		const componentClassName = `${useClassNamePrefix()}field-container`
 
+		const isLabelInline = labelPosition === 'labelInlineLeft' || labelPosition === 'labelInlineRight'
+
 		return (
 			<div
 				{...rest}
@@ -64,7 +66,7 @@ export const FieldContainer = memo(
 							{labelDescription && <Description>{labelDescription}</Description>}
 						</span>
 					}
-					{(children || description) && <div className={`${componentClassName}-body`}>
+					{(children || (!isLabelInline && description)) && <div className={`${componentClassName}-body`}>
 						{children && <Stack
 							className={`${componentClassName}-body-content`}
 							direction={direction}
@@ -72,9 +74,11 @@ export const FieldContainer = memo(
 						>
 							{children}
 						</Stack>}
-						{description && <span className={`${componentClassName}-body-content-description`}>{description}</span>}
+						{!isLabelInline && description && <span className={`${componentClassName}-body-content-description`}>{description}</span>}
 					</div>}
 				</LabelElement>
+				{isLabelInline && description && <span className={`${componentClassName}-body-content-description`}>{description}</span>}
+
 				{!!errors && errors.length > 0 && (
 					<div className={`${componentClassName}-errors`}>
 						<ErrorList errors={errors} />

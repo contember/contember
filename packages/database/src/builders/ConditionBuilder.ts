@@ -85,13 +85,16 @@ export class ConditionBuilder {
 		return this.with(new Literal(ConditionBuilder.createOperatorSql(toFqnWrap(columnName1), toFqnWrap(columnName2), operator)))
 	}
 
-	in(columnName: QueryBuilder.ColumnIdentifier, values: ReadonlyArray<Value> | SelectBuilder<SelectBuilder.Result>): ConditionBuilder {
+	in(columnName: QueryBuilder.ColumnIdentifier, values: ReadonlyArray<Value> | SelectBuilder<SelectBuilder.Result>, columnType?: string): ConditionBuilder {
 		if (!isReadonlyArray(values)) {
 			// todo: replace placeholder with some kind of callback
 			const query = values.createQuery(new Compiler.Context(Compiler.SCHEMA_PLACEHOLDER, new Set()))
 			return this.with(new Literal(`${toFqnWrap(columnName)} in (${query.sql})`, query.parameters))
 		}
 		values = values.filter(it => it !== undefined)
+		if (columnType && values.length > 100) {
+			return this.with(new Literal(`${toFqnWrap(columnName)} = any(?::${columnType}[])`, [values]))
+		}
 		if (values.length > 0) {
 			const parameters = values.map(() => '?').join(', ')
 			return this.with(new Literal(`${toFqnWrap(columnName)} in (${parameters})`, values))

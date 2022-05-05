@@ -19,14 +19,14 @@ type Args = {
 
 type Options = {
 	role?: string[]
-	format?: 'graphql' | 'introspection'
+	format?: 'graphql' | 'introspection' | 'schema'
 }
 
 export class ProjectPrintSchemaCommand extends Command<Args, Options> {
 	protected configure(configuration: CommandConfiguration<Args, Options>): void {
 		configuration.description('Prints project schema')
 		configuration.argument('project')
-		configuration.option('format').valueRequired().description('graphql|introspection')
+		configuration.option('format').valueRequired().description('graphql|introspection|schema')
 		configuration.option('role').valueArray()
 	}
 
@@ -42,7 +42,8 @@ export class ProjectPrintSchemaCommand extends Command<Args, Options> {
 			return 1
 		}
 		const permissionFactory = new PermissionFactory(schema.model)
-		const permissions = permissionFactory.create(schema.acl, input.getOption('role') || ['admin'])
+		const inputRoles = input.getOption('role')
+		const permissions = permissionFactory.create(schema.acl, inputRoles || ['admin'])
 		const schemaBuilderFactory = new GraphQlSchemaBuilderFactory()
 		const authorizator = new Authorizator(permissions, schema.acl.customPrimary ?? false)
 		const introspection = new IntrospectionSchemaFactory(
@@ -50,7 +51,12 @@ export class ProjectPrintSchemaCommand extends Command<Args, Options> {
 			new EntityRulesResolver(schema.validation, schema.model),
 			authorizator,
 		)
-		if (format === 'introspection') {
+		if (format === 'schema') {
+			if (inputRoles) {
+				throw `--roles option is not supported for "schema" format`
+			}
+			console.log(JSON.stringify(schema, null, '\t'))
+		} else if (format === 'introspection') {
 			console.log(JSON.stringify(introspection.create(), null, '\t'))
 		} else if (format === 'graphql') {
 			const contentSchema = schemaBuilderFactory.create(schema.model, authorizator).build()
@@ -64,7 +70,7 @@ export class ProjectPrintSchemaCommand extends Command<Args, Options> {
 			const printedSchema = printSchema(gqlSchema).replace('""""""\n', '') // remove empty comment
 			console.log(printedSchema)
 		} else {
-			throw new Error(`Unknown format ${format}`)
+			throw `Unknown format ${format}`
 		}
 
 		return 0

@@ -69,6 +69,9 @@ export const anyJson = ((): Type<Json> => {
 				if (input === null) {
 					return null
 				}
+				if (Array.isArray(input)) {
+					return input.map((it, index) => anyJson(it, [...path, index]))
+				}
 				return anyJsonObject(input, path)
 			default:
 				throw ParseError.format(input, path, 'string|boolean|number|object')

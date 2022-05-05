@@ -9,11 +9,6 @@ import { createSubQueryLiteralFactory, SubQueryExpression } from './internal/Sub
 export type ConditionCallback = (builder: ConditionBuilder) => ConditionBuilder
 export type ConditionExpression = ConditionBuilder | ConditionCallback
 
-interface Raw {
-	sql: string
-	bindings: Value[]
-}
-
 export enum Operator {
 	'notEq' = '!=',
 	'eq' = '=',
@@ -90,13 +85,16 @@ export class ConditionBuilder {
 		return this.with(new Literal(ConditionBuilder.createOperatorSql(toFqnWrap(columnName1), toFqnWrap(columnName2), operator)))
 	}
 
-	in(columnName: QueryBuilder.ColumnIdentifier, values: ReadonlyArray<Value> | SelectBuilder<SelectBuilder.Result>): ConditionBuilder {
+	in(columnName: QueryBuilder.ColumnIdentifier, values: ReadonlyArray<Value> | SelectBuilder<SelectBuilder.Result>, columnType?: string): ConditionBuilder {
 		if (!isReadonlyArray(values)) {
 			// todo: replace placeholder with some kind of callback
 			const query = values.createQuery(new Compiler.Context(Compiler.SCHEMA_PLACEHOLDER, new Set()))
 			return this.with(new Literal(`${toFqnWrap(columnName)} in (${query.sql})`, query.parameters))
 		}
 		values = values.filter(it => it !== undefined)
+		if (columnType && values.length > 100) {
+			return this.with(new Literal(`${toFqnWrap(columnName)} = any(?::${columnType}[])`, [values]))
+		}
 		if (values.length > 0) {
 			const parameters = values.map(() => '?').join(', ')
 			return this.with(new Literal(`${toFqnWrap(columnName)} in (${parameters})`, values))
@@ -175,10 +173,9 @@ export class ConditionBuilder {
 		if (expressions.length === 0) {
 			return null
 		}
-		const sql = expressions.map(it => (it as any as Raw).sql).join(` ${operator} `)
+		const sql = expressions.map(it => it.sql).join(` ${operator} `)
 
-		const bindings: Value[] = []
-		expressions.map(it => (it as any as Literal).parameters).forEach(it => bindings.push(...it))
+		const bindings: Value[] = ([] as Value[]).concat(...expressions.map(it => it.parameters))
 
 		return new Literal(not ? `not(${sql})` : operator === 'or' ? `(${sql})` : sql, bindings)
 	}

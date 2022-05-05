@@ -13,4 +13,10 @@ export interface UnknownErrorRequestError {
 	type: 'unknownError'
 }
 
-export type RequestError = UnauthorizedRequestError | NetworkErrorRequestError | UnknownErrorRequestError
+export interface GqlError {
+	type: 'gqlError'
+	query: string,
+	errors: { message: string, path?: string[] }[]
+}
+
+export type RequestError = UnauthorizedRequestError | NetworkErrorRequestError | GqlError | UnknownErrorRequestError

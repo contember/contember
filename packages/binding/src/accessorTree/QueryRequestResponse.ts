@@ -16,4 +16,5 @@ export interface ReceivedDataTree<A = never> {
 
 export interface QueryRequestResponse<A = never> {
 	data: ReceivedDataTree<A>
+	errors?: { message: string, path?: string[] }[]
 }

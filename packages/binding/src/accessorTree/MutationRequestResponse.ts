@@ -52,4 +52,5 @@ export interface MutationTransactionResponse {
 
 export interface MutationRequestResponse {
 	data: MutationTransactionResponse | null
+	errors?: { message: string, path?: string[] }[]
 }

@@ -163,6 +163,15 @@ export class DataBinding {
 						const mutationResponse: MutationRequestResponse = await this.contentApiClient.sendRequest(mutation, {
 							signal,
 						})
+
+						if (mutationResponse.errors !== undefined && mutationResponse.errors.length > 0) {
+							this.onError({
+								type: 'gqlError',
+								query: mutation,
+								errors: mutationResponse.errors,
+							})
+						}
+
 						const mutationData = mutationResponse.data?.transaction ?? {}
 						const aliases = Object.keys(mutationData)
 						if (!mutationResponse.data) {
@@ -383,6 +392,15 @@ export class DataBinding {
 			}
 			this.onError(metadataToRequestError(metadata as GraphQlClientFailedRequestMetadata))
 		}
+
+		if (queryResponse && queryResponse.errors !== undefined && queryResponse.errors.length > 0) {
+			this.onError({
+				type: 'gqlError',
+				query: query ?? 'unknown query',
+				errors: queryResponse.errors,
+			})
+		}
+
 		return queryResponse
 	}
 

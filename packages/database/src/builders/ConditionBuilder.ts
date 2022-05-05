@@ -9,11 +9,6 @@ import { createSubQueryLiteralFactory, SubQueryExpression } from './internal/Sub
 export type ConditionCallback = (builder: ConditionBuilder) => ConditionBuilder
 export type ConditionExpression = ConditionBuilder | ConditionCallback
 
-interface Raw {
-	sql: string
-	bindings: Value[]
-}
-
 export enum Operator {
 	'notEq' = '!=',
 	'eq' = '=',
@@ -175,10 +170,9 @@ export class ConditionBuilder {
 		if (expressions.length === 0) {
 			return null
 		}
-		const sql = expressions.map(it => (it as any as Raw).sql).join(` ${operator} `)
+		const sql = expressions.map(it => it.sql).join(` ${operator} `)
 
-		const bindings: Value[] = []
-		expressions.map(it => (it as any as Literal).parameters).forEach(it => bindings.push(...it))
+		const bindings: Value[] = ([] as Value[]).concat(...expressions.map(it => it.parameters))
 
 		return new Literal(not ? `not(${sql})` : operator === 'or' ? `(${sql})` : sql, bindings)
 	}

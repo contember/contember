@@ -2,9 +2,11 @@
 	$root: &
 
 	--cui-box-background-focused-overlay: linear-gradient(rgba(var(--cui-controls-1000), 0.01), rgba(var(--cui-controls-1000), 0.01))
-	--cui-box-content-padding-left: calc(2 * var(--cui-box-content-padding))
 
 	transition: background-image .15s
+
+	&.view-sortable
+		--cui-box-content-padding-left: calc(2 * var(--cui-box-content-padding))
 
 	&-header
 		display: flex

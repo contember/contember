@@ -177,8 +177,7 @@ export class ConditionBuilder {
 		}
 		const sql = expressions.map(it => (it as any as Raw).sql).join(` ${operator} `)
 
-		const bindings: Value[] = []
-		expressions.map(it => (it as any as Literal).parameters).forEach(it => bindings.push(...it))
+		const bindings: Value[] = ([] as Value[]).concat(...expressions.map(it => (it as any as Literal).parameters))
 
 		return new Literal(not ? `not(${sql})` : operator === 'or' ? `(${sql})` : sql, bindings)
 	}

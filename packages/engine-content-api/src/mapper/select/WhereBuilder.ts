@@ -101,6 +101,7 @@ export class WhereBuilder {
 							conditionBuilder,
 							tableName,
 							relation.joiningColumn.columnName,
+							(targetEntity.fields[targetEntity.primary] as Model.AnyColumn).columnType,
 							primaryCondition,
 						)
 					}
@@ -114,7 +115,7 @@ export class WhereBuilder {
 			conditionBuilder = acceptFieldVisitor<SqlConditionBuilder>(this.schema, entity, fieldName, {
 				visitColumn: (entity, column) => {
 					const subWhere: Input.Condition<Input.ColumnValue> = where[column.name] as Input.Condition<Input.ColumnValue>
-					return this.conditionBuilder.build(conditionBuilder, tableName, column.columnName, subWhere)
+					return this.conditionBuilder.build(conditionBuilder, tableName, column.columnName, column.columnType, subWhere)
 				},
 				visitOneHasOneInverse: joinedWhere,
 				visitOneHasOneOwning: joinedWhere,
@@ -194,8 +195,10 @@ export class WhereBuilder {
 		const primaryCondition = this.transformWhereToPrimaryCondition(relationWhere, targetEntity.primary)
 		if (primaryCondition !== null) {
 
+			const columnType = (targetEntity.fields[targetEntity.primary] as Model.AnyColumn).columnType
+
 			return qb.where(condition =>
-				this.conditionBuilder.build(condition, 'junction_', toColumn, primaryCondition),
+				this.conditionBuilder.build(condition, 'junction_', toColumn, columnType, primaryCondition),
 			)
 		}
 

@@ -7,6 +7,7 @@ export class ConditionBuilder {
 		builder: SqlConditionBuilder,
 		tableName: string,
 		columnName: string,
+		columnType: string,
 		condition: Input.Condition<any>,
 	): SqlConditionBuilder {
 		const keys = Object.keys(condition) as (keyof Required<Input.Condition<any>>)[]
@@ -27,13 +28,13 @@ export class ConditionBuilder {
 				param: Exclude<Input.Condition<any>[K], undefined>,
 			) => SqlConditionBuilder
 		} = {
-			and: (builder, expressions) => builder.and(builder2 => expressions.reduce((builder3, expr) => this.build(builder3, tableName, columnName, expr), builder2)),
-			or: (builder, expressions) => builder.or(builder2 => expressions.reduce((builder3, expr) => this.build(builder3, tableName, columnName, expr), builder2)),
-			not: (builder, expression) => builder.not(builder2 => this.build(builder2, tableName, columnName, expression)),
+			and: (builder, expressions) => builder.and(builder2 => expressions.reduce((builder3, expr) => this.build(builder3, tableName, columnName, columnType, expr), builder2)),
+			or: (builder, expressions) => builder.or(builder2 => expressions.reduce((builder3, expr) => this.build(builder3, tableName, columnName, columnType, expr), builder2)),
+			not: (builder, expression) => builder.not(builder2 => this.build(builder2, tableName, columnName, columnType, expression)),
 			eq: (builder, value) => builder.compare(columnIdentifier, Operator.eq, value),
 			notEq: (builder, value) => builder.compare(columnIdentifier, Operator.notEq, value),
 			isNull: (builder, value) => value ? builder.isNull(columnIdentifier) : builder.not(clause => clause.isNull(columnIdentifier)),
-			in: (builder, values) => builder.in(columnIdentifier, values),
+			in: (builder, values) => builder.in(columnIdentifier, values, columnType),
 			notIn: (builder, values) => builder.not(builder2 => builder2.in(columnIdentifier, values)),
 			lt: (builder, value) => builder.compare(columnIdentifier, Operator.lt, value),
 			lte: (builder, value) => builder.compare(columnIdentifier, Operator.lte, value),

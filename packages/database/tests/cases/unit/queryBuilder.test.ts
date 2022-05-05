@@ -23,6 +23,7 @@ const execute = async (test: Test) => {
 }
 
 test('query builder: constructs condition', async () => {
+	const values = Array.from({ length: 101 }).map((it, index) => index)
 	await execute({
 		query: async wrapper => {
 			const qb = wrapper
@@ -44,6 +45,7 @@ test('query builder: constructs condition', async () => {
 						.compare('l', Operator.endsWithCI, 'Z')
 						.compareColumns('z', Operator.eq, ['foo', 'x'])
 						.in('o', [1, 2, 3])
+						.in('x', values, 'int')
 						.in('m', wrapper.selectBuilder().select(expr => expr.selectValue(1)))
 						.exists(it => it)
 						.isNull('n')
@@ -57,8 +59,8 @@ test('query builder: constructs condition', async () => {
                where "a" = ? and "b" != ? and "c" < ? and "d" <= ? and "e" > ? and "f" >= ?
                      and "g" like '%' || ? || '%' and "h" like ? || '%' and "i" like '%' || ?
                      and "j" ilike '%' || ? || '%' and "k" ilike ? || '%' and "l" ilike '%' || ?
-                     and "z" = "foo"."x" and "o" in (?, ?, ?) and "m" in (select ?) and exists (select ?::int) and "n" is null and false`,
-		parameters: [1, 2, 3, 4, 5, 6, 'foo\\\\\\%bar', 'lorem\\_ipsum', 'dolor\\%sit', 'X', 'Y', 'Z', 1, 2, 3, 1, 1],
+                     and "z" = "foo"."x" and "o" in (?, ?, ?) and "x" = any(?::int[]) and "m" in (select ?) and exists (select ?::int) and "n" is null and false`,
+		parameters: [1, 2, 3, 4, 5, 6, 'foo\\\\\\%bar', 'lorem\\_ipsum', 'dolor\\%sit', 'X', 'Y', 'Z', 1, 2, 3, values, 1, 1],
 	})
 })
 

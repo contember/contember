@@ -1,7 +1,11 @@
 {
 	"extends": "../tsconfig.settings.json",
 	"compilerOptions": {
-		"outDir": "../dist/src"
+		"outDir": "../dist/src",
+		"jsx": "react",
+		"jsxFactory": "h",
+		"lib": ["dom"],
+		"jsxFragmentFactory": "Fragment"
 	},
 	"references": [
 		{

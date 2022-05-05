@@ -1,3 +1,5 @@
+import { isDeepStrictEqual } from 'util'
+
 type Unpacked<T> = T extends readonly (infer U)[] ? U : never
 
 export type JsonObject = {
@@ -23,7 +25,7 @@ export class ParseError extends Error {
 	}
 
 	static format(input: unknown, path: PropertyKey[], expected: string) {
-		return new ParseError(path, `must be ${expected}, ${typeof input} given`, expected)
+		return new ParseError(path, `must be ${expected}, ${input === 'undefined' ? 'undefined' : JSON.stringify(input)} given`, expected)
 	}
 }
 
@@ -168,21 +170,44 @@ export const record = <K extends Type<string>, T extends Type<Json>>(key: K, val
 
 export const union = <T extends Type<Json>[]>(...inner: T): Type<ReturnType<Unpacked<T>>> => {
 	const type = (input: unknown, path: PropertyKey[] = []): ReturnType<Unpacked<T>> => {
-		const expected = []
+		const errors = []
 		for (const innerInner of inner) {
 			try {
 				return innerInner(input, path) as any
 			} catch (e) {
 				if (e instanceof ParseError) {
-					if (e.expected) {
-						expected.push(e.expected)
-					}
+					errors.push(' '.repeat('ParseError: '.length) + e.message)
 				} else {
 					throw e
 				}
 			}
 		}
-		throw ParseError.format(input, path, expected.join('|'))
+		throw new ParseError(path, 'all variants of union has failed:\n' + errors.join('\n'))
+	}
+
+	type.inner = inner
+
+	return type
+}
+
+export const discriminatedUnion = <T extends Type<JsonObject>[]>(field: string, ...inner: T): Type<ReturnType<Unpacked<T>>> => {
+	const type = (input: unknown, path: PropertyKey[] = []): ReturnType<Unpacked<T>> => {
+		const errors = []
+		for (const innerInner of inner) {
+			try {
+				return innerInner(input, path) as any
+			} catch (e) {
+				if (e instanceof ParseError) {
+					if (isDeepStrictEqual(e.path, [...path, field])) {
+						continue
+					}
+					errors.push(' '.repeat('ParseError: '.length) + e.message)
+				} else {
+					throw e
+				}
+			}
+		}
+		throw new ParseError(path, 'all variants of union has failed:\n' + errors.join('\n'))
 	}
 
 	type.inner = inner
@@ -242,6 +267,21 @@ export const nullable = <T extends Json>(inner: Type<T>): Type<T | null> => {
 
 export const transform = <Input extends Json, Result extends Json>(inner: Type<Input>, transform: (value: Input, input: unknown) => Result) => (input: unknown, path: PropertyKey[] = []): Result => {
 	return transform(inner(input, path), input)
+}
+
+export const coalesce = <T extends Json, F extends Json>(inner: Type<T>, fallback: F): Type<T | F> => {
+	const type = (input: unknown, path: PropertyKey[] = []): T | F => {
+		try {
+			return inner(input, path)
+		} catch (e) {
+			if (e instanceof ParseError) return fallback
+			else throw e
+		}
+	}
+
+	type.inner = inner
+
+	return type
 }
 
 export const valueAt = (input: any, path: PropertyKey[]): unknown | undefined => {

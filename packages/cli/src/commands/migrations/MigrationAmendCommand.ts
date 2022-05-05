@@ -13,7 +13,7 @@ import { resolveSystemApiClient } from './SystemApiClientResolver'
 import prompts from 'prompts'
 import { emptySchema } from '@contember/schema-utils'
 import { validateMigrations } from './MigrationValidationHelper'
-import { loadSchema } from '../../utils/project'
+import { loadSchema } from '../../utils/project/loadSchema'
 
 type Args = {
 	project: string

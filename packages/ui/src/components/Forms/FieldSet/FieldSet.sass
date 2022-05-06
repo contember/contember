@@ -1,6 +1,7 @@
 .#{$cui-conf-globalPrefix}fieldSet
 	display: flex
 	flex-direction: column
+	row-gap: calc(2 * var(--cui-gap-vertical))
 
-	&-heading + &-content
-		margin-top: .75em
+	&-content > [contenteditable="false"]
+		display: contents

@@ -3,9 +3,9 @@ import { MultiEditPage, Repeater, SelectField, TextField } from '@contember/admi
 export default () => (
 	<MultiEditPage entities="Tag" rendererProps={{ title: 'Abcd' }}>
 		<TextField field={'name'} label={'Name'} />
-		<Repeater field={'locales'} label={'Locales'} orderBy={'id'}>
-			<SelectField label={'Locale'} options={'Locale.code'} field={'locale'} />
+		<Repeater field={'locales'} label={'Locales'} sortableBy={'order'}>
 			<TextField field={'name'} label={'Name'} />
+			<SelectField label={'Locale'} options={'Locale.code'} field={'locale'} />
 		</Repeater>
 	</MultiEditPage>
 )

@@ -1,0 +1,36 @@
+{
+	"formatVersion": 3,
+	"modifications": [
+		{
+			"modification": "createColumn",
+			"entityName": "Locale",
+			"field": {
+				"name": "label",
+				"columnName": "label",
+				"nullable": true,
+				"type": "String",
+				"columnType": "text"
+			}
+		},
+		{
+			"modification": "patchAclSchema",
+			"patch": [
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/Locale/operations/create/label",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/Locale/operations/update/label",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/Locale/operations/read/label",
+					"value": true
+				}
+			]
+		}
+	]
+}

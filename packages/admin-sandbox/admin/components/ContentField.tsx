@@ -11,6 +11,7 @@ import {
 	RichEditor,
 	Scheme,
 	scrollTargetToolbarButton,
+	SelectField,
 	tableToolbarButton,
 	TextField,
 } from '@contember/admin'
@@ -123,6 +124,11 @@ export const ContentField = Component<ContentFieldProps>(
 					{ value: 'right', label: 'Right' },
 					{ value: 'center', label: 'Center' },
 				]} orientation={'horizontal'} />
+				<SelectField field={'align	'} label={'Align'} options={[
+					{ value: 'left', label: 'Left' },
+					{ value: 'right', label: 'Right' },
+					{ value: 'center', label: 'Center' },
+				]} />
 			</Block>
 			<Block discriminateBy="quote" label="Quote">
 				<BlockEditor.ContentOutlet />

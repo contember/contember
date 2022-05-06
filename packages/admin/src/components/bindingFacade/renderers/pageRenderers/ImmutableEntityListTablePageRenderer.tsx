@@ -23,7 +23,7 @@ export const ImmutableEntityListTablePageRenderer = Component(
 		accessor,
 		emptyMessage,
 		emptyMessageComponent,
-		after,
+		afterTitle,
 		...layoutProps
 	}: ImmutableEntityListTablePageRendererProps<ContainerExtraProps, ItemExtraProps>) => {
 		return (

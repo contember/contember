@@ -33,9 +33,6 @@
 
 	&.view-beforeBlock
 		margin-top: calc(-1 * var(--cui-editor-block-boundary-height))
-		& + *
-			position: relative
-			z-index: 1
 		& + *:not(.#{$cui-conf-globalPrefix}editorTable)
 			display: flex
 			flex-direction: column

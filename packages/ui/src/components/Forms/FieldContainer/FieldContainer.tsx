@@ -69,7 +69,7 @@ export const FieldContainer = memo(
 						{description && <span className={`${componentClassName}-body-content-description`}>{description}</span>}
 					</div>}
 				</LabelElement>
-				{!!errors && (
+				{!!errors && errors.length > 0 && (
 					<div className={`${componentClassName}-errors`}>
 						<ErrorList errors={errors} />
 					</div>

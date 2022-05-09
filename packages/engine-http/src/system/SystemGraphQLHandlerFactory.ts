@@ -13,14 +13,13 @@ import { KoaContext } from '../koa'
 import { DocumentNode } from 'graphql'
 import { mergeTypeDefs } from '@graphql-tools/merge'
 import { makeExecutableSchema } from '@graphql-tools/schema'
-import { ContentSchemaResolver } from '../content'
 
 type KoaState =
 	& GraphQLKoaState
 
 export type SystemGraphQLContext = SystemResolverContext & {
 	koaContext: KoaContext<KoaState>
-	contentSchemaResolver: ContentSchemaResolver
+	onClearCache: () => void
 }
 
 export type SystemGraphQLHandler = GraphQLQueryHandler<SystemGraphQLContext>
@@ -59,7 +58,7 @@ export class SystemGraphQLHandlerFactory {
 		if (this.debugMode) {
 			listeners.push({
 				onResponse: ({ context }) => {
-					context.contentSchemaResolver.clearCache()
+					context.onClearCache()
 				},
 			})
 			listeners.push(createDbQueriesListener(context => context.db.client))

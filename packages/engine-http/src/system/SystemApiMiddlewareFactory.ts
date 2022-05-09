@@ -60,6 +60,10 @@ export class SystemApiMiddlewareFactory {
 				koaContext,
 				projectContainer,
 				systemContainer: groupContainer.systemContainer,
+				onClearCache: () => {
+					projectContainer.contentSchemaResolver.clearCache()
+					groupContainer.projectSchemaResolver.clearCache()
+				},
 			})
 			const handler = groupContainer.systemGraphQLHandler
 

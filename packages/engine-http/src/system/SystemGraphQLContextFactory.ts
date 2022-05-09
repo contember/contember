@@ -7,12 +7,13 @@ import { GraphQLKoaState } from '../graphql'
 import { ProjectContainer } from '../ProjectContainer'
 
 export class SystemGraphQLContextFactory {
-	public async create({ authResult, memberships, koaContext, projectContainer, systemContainer }: {
+	public async create({ authResult, memberships, koaContext, projectContainer, systemContainer, onClearCache }: {
 		authResult: AuthResult
 		memberships: readonly Membership[]
 		koaContext: KoaContext<GraphQLKoaState & AuthMiddlewareState>
 		projectContainer: ProjectContainer
 		systemContainer: SystemContainer
+		onClearCache: () => void
 	}): Promise<SystemGraphQLContext> {
 		const identity = new Identity(
 			authResult.identityId,
@@ -27,7 +28,7 @@ export class SystemGraphQLContextFactory {
 		)
 		return {
 			...systemContext,
-			contentSchemaResolver: projectContainer.contentSchemaResolver,
+			onClearCache,
 			koaContext,
 		}
 	}

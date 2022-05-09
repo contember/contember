@@ -1,6 +1,6 @@
 {
   "name": "@contember/cli-common",
-  "version": "1.1.0-beta.1",
+  "version": "1.1.0-beta.2",
   "license": "Apache-2.0",
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
@@ -13,7 +13,7 @@
     "@types/npm-package-arg": "^6.1.0"
   },
   "dependencies": {
-    "@contember/config-loader": "^1.1.0-beta.1",
+    "@contember/config-loader": "^1.1.0-beta.2",
     "chalk": "^4.1.0",
     "download-tarball": "^2.0.0",
     "fs-extra": "^10.0.0",

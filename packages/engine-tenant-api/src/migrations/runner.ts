@@ -1,4 +1,4 @@
-import { createDatabaseIfNotExists, DatabaseCredentials, SingleConnection } from '@contember/database'
+import { Connection, createDatabaseIfNotExists, DatabaseConfig, SingleConnection } from '@contember/database'
 import { TenantMigrationArgs } from './types'
 import { loadMigrations, Migration, MigrationsRunner as DbMigrationsRunner } from '@contember/database-migrations'
 import tenantCredentials from './2020-06-08-134000-tenant-credentials'
@@ -20,7 +20,7 @@ const getMigrations = (): Promise<Migration[]> => {
 
 export class TenantMigrationsRunner {
 	constructor(
-		private readonly db: DatabaseCredentials,
+		private readonly db: DatabaseConfig,
 		private readonly schema: string,
 		private readonly tenantCredentials: TenantCredentials,
 		private readonly providers: Providers,

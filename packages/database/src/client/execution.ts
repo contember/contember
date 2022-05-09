@@ -9,7 +9,6 @@ import {
 	SerializationFailureError,
 	TransactionAbortedError,
 	UniqueViolationError,
-	ClientError,
 } from './errors'
 import { ClientErrorCodes } from './errorCodes'
 
@@ -81,13 +80,5 @@ export async function executeQuery<Row extends Record<string, any>>(
 			default:
 				throw new QueryError(sql, parameters, error)
 		}
-	}
-}
-
-export const executeClientOperation = async <T>(cb: () => Promise<T>): Promise<T> => {
-	try {
-		return await cb()
-	} catch (e) {
-		throw new ClientError(e)
 	}
 }

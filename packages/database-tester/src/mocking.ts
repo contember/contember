@@ -1,4 +1,4 @@
-import { Client, Connection, DatabaseCredentials, EventManager } from '@contember/database'
+import { Client, Connection, DatabaseConfig, EventManager, PoolStatus } from '@contember/database'
 import { assert } from 'vitest'
 
 export interface ExpectedQuery {
@@ -9,7 +9,7 @@ export interface ExpectedQuery {
 
 export class ConnectionMock implements Connection.ConnectionType  {
 
-	public config: DatabaseCredentials = { database: '', host: '', password: '', user: '', port: 5432 }
+	public config: DatabaseConfig = { database: '', host: '', password: '', user: '', port: 5432 }
 
 	constructor(
 		private readonly queries: ExpectedQuery[],
@@ -90,12 +90,13 @@ ${expected.sql}`
 		return new Client(this, schema, meta, new EventManager(this.eventManager))
 	}
 
-	getPoolStatus(): Connection.PoolStatus {
+	getPoolStatus(): PoolStatus {
 		return {
-			idleCount: 0,
-			totalCount: 1,
-			waitingCount: 0,
-			maxCount: 1,
+			max: 1,
+			idle: 0,
+			pending: 0,
+			active: 0,
+			connecting: 0,
 		}
 	}
 }

@@ -32,7 +32,7 @@ export class S3ConfigProcessor implements ConfigProcessor<ProjectWithS3Config> {
 		}
 	}
 
-	getProjectConfigSchema?(slug: string): Typesafe.Type<Record<string, any>> {
+	getProjectConfigSchema(slug: string): Typesafe.Type<Record<string, any>> {
 		return Typesafe.union(
 			(input: unknown, path: PropertyKey[] = []) => Typesafe.valueAt(input, ['s3', 'credentials', 'key']) === undefined ? {} : Typesafe.fail(path),
 			Typesafe.object({

@@ -1,24 +1,29 @@
-import { Pool, PoolConfig } from 'pg'
 import { EventManager } from './EventManager'
 import { Client } from './Client'
 import { Transaction } from './Transaction'
-import { executeClientOperation, executeQuery } from './execution'
-import { DatabaseCredentials } from '../types'
+import { executeQuery } from './execution'
+import { Pool, PoolConfig, PoolStatus } from './Pool'
+import { createPgClientFactory } from '../utils'
+import { DatabaseConfig } from '../types'
 
 class Connection implements Connection.ConnectionLike, Connection.ClientFactory, Connection.PoolStatusProvider {
-	private readonly pool: Pool
-
 	constructor(
-		public readonly config: PoolConfig & DatabaseCredentials,
+		private readonly pool: Pool,
 		private readonly queryConfig: Connection.QueryConfig,
 		public readonly eventManager: EventManager = new EventManager(null),
 	) {
-		this.pool = new Pool(config)
 		this.pool.on('error', err => {
 			// eslint-disable-next-line no-console
 			console.error(err)
 			this.eventManager.fire(EventManager.Event.clientError, err)
 		})
+	}
+
+	public static create(
+		{ pool = {}, ...config }: DatabaseConfig & { pool?: PoolConfig },
+		queryConfig: Connection.QueryConfig = {},
+	): Connection {
+		return new Connection(new Pool(createPgClientFactory(config), pool), queryConfig)
 	}
 
 	public createClient(schema: string, queryMeta: Record<string, any>): Client {
@@ -29,29 +34,29 @@ class Connection implements Connection.ConnectionLike, Connection.ClientFactory,
 		callback: (connection: Connection.TransactionLike) => Promise<Result> | Result,
 		options: { eventManager?: EventManager } = {},
 	): Promise<Result> {
-		const client = await executeClientOperation(() => this.pool.connect())
+		const acquired = await this.pool.acquire()
 		const eventManager = new EventManager(options.eventManager ?? this.eventManager)
-		await executeQuery(client, eventManager, {
+		await executeQuery(acquired.client, eventManager, {
 			sql: 'BEGIN',
 			...this.queryConfig,
 		})
-		const transaction = new Transaction(client, eventManager, this.queryConfig)
+		const transaction = new Transaction(acquired.client, eventManager, this.queryConfig)
 		try {
 			const result = await callback(transaction)
 
 			await transaction.commitUnclosed()
-			client.release()
+			this.pool.release(acquired)
 
 			return result
 		} catch (e) {
 			await transaction.rollbackUnclosed()
-			client.release(e as Error)
+			this.pool.dispose(acquired)
 			throw e
 		}
 	}
 
 	async end(): Promise<void> {
-		await executeClientOperation(() => this.pool.end())
+		await this.pool.end()
 	}
 
 	async query<Row extends Record<string, any>>(
@@ -60,25 +65,20 @@ class Connection implements Connection.ConnectionLike, Connection.ClientFactory,
 		meta: Record<string, any> = {},
 		{ eventManager, ...config }: Connection.QueryConfig = {},
 	): Promise<Connection.Result<Row>> {
-		const client = await executeClientOperation(() => this.pool.connect())
+		const client = await this.pool.acquire()
 		const query: Connection.Query = { sql, parameters, meta, ...this.queryConfig, ...config }
 		try {
-			const result = await executeQuery<Row>(client, eventManager ?? this.eventManager, query, {})
-			client.release()
+			const result = await executeQuery<Row>(client.client, eventManager ?? this.eventManager, query, {})
+			this.pool.release(client)
 			return result
 		} catch (e) {
-			client.release(e as Error)
+			this.pool.dispose(client)
 			throw e
 		}
 	}
 
-	getPoolStatus(): Connection.PoolStatus {
-		return {
-			idleCount: this.pool.idleCount,
-			totalCount: this.pool.totalCount,
-			waitingCount: this.pool.waitingCount,
-			maxCount: this.config.max || 10,
-		}
+	getPoolStatus(): PoolStatus {
+		return this.pool.getPoolStatus()
 	}
 }
 
@@ -110,9 +110,6 @@ namespace Connection {
 		& Connection.ConnectionLike
 		& Connection.ClientFactory
 		& Connection.PoolStatusProvider
-		& {
-			config: DatabaseCredentials
-		}
 
 	export interface ConnectionLike extends Transactional, Queryable {}
 
@@ -142,8 +139,6 @@ namespace Connection {
 		readonly meta: Record<string, any>
 	}
 
-	export type Credentials = Pick<PoolConfig, 'host' | 'port' | 'user' | 'password' | 'database'>
-
 	export interface Result<Row extends Record<string, any> = Record<string, any>> {
 		readonly rowCount: number
 		readonly rows: Row[]
@@ -155,7 +150,6 @@ namespace Connection {
 
 	export const REPEATABLE_READ = 'SET TRANSACTION ISOLATION LEVEL REPEATABLE READ'
 
-	export type PoolStatus = { totalCount: number; idleCount: number; waitingCount: number; maxCount: number }
 }
 
 export { Connection }

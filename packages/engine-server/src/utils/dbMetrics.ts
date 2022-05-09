@@ -60,10 +60,10 @@ const createSingleDbPoolMetricsCollector = (registry: prom.Registry) => {
 
 	return (db: Connection.PoolStatusProvider, labels: Labels) => {
 		const poolInfo = db.getPoolStatus()
-		totalCount.set(labels, poolInfo.totalCount)
-		idleCount.set(labels, poolInfo.idleCount)
-		waitingCount.set(labels, poolInfo.waitingCount)
-		maxCount.set(labels, poolInfo.maxCount)
+		totalCount.set(labels, poolInfo.pending + poolInfo.idle + poolInfo.connecting)
+		idleCount.set(labels, poolInfo.idle)
+		waitingCount.set(labels, poolInfo.pending)
+		maxCount.set(labels, poolInfo.max)
 	}
 }
 type SqlMetricsRegistrar = (

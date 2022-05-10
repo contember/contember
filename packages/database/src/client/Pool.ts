@@ -194,6 +194,13 @@ class Pool extends EventEmitter {
 	}
 
 
+	public async closeIdle(): Promise<void> {
+		this.log('Disposing all idle connection on request.')
+		await Promise.allSettled(this.idle.map(it => this.disposeConnection(it)))
+		this.idle = []
+	}
+
+
 	public getPoolStatus(): PoolStatus {
 		return {
 			max: this.poolConfig.maxConnections,

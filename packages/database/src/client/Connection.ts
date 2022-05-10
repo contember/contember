@@ -30,6 +30,10 @@ class Connection implements Connection.ConnectionLike, Connection.ClientFactory,
 		return new Client(this, schema, queryMeta, new EventManager(this.eventManager))
 	}
 
+	public async clearPool(): Promise<void> {
+		await this.pool.closeIdle()
+	}
+
 	async transaction<Result>(
 		callback: (connection: Connection.TransactionLike) => Promise<Result> | Result,
 		options: { eventManager?: EventManager } = {},

@@ -7,6 +7,7 @@ import { ContentGraphQLContextFactory } from './ContentGraphQLContextFactory'
 import { ContentQueryHandler, ContentQueryHandlerFactory } from './ContentQueryHandlerFactory'
 import { GraphQLSchema } from 'graphql'
 import { GraphQLKoaState } from '../graphql'
+import { Logger } from '@contember/engine-common'
 
 type ContentApiMiddlewareKoaState =
 	& TimerMiddlewareState
@@ -36,10 +37,17 @@ export class ContentApiMiddlewareFactory {
 			const authResult = await groupContainer.authenticator.authenticate({ request, timer })
 			koaContext.state.authResult = authResult
 
-			const projectSlug = params.projectSlug
-			const projectContainer = await groupContainer.projectContainerResolver.getProjectContainer(projectSlug, true)
+			// eslint-disable-next-line no-console
+			const logger = new Logger(console.log)
+			logger.group(`Initializing ${groupContainer.slug}/${params.projectSlug}`)
+
+			const projectContainer = await groupContainer.projectContainerResolver.getProjectContainer(params.projectSlug, {
+				alias: true,
+				logger,
+			})
+			logger.groupEnd()
 			if (projectContainer === undefined) {
-				throw new HttpError(`Project ${projectSlug} NOT found`, 404)
+				throw new HttpError(`Project ${params.projectSlug} NOT found`, 404)
 			}
 			const project = projectContainer.project
 			koaContext.state.project = project.slug

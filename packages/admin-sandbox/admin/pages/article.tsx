@@ -1,14 +1,11 @@
 import {
 	AnchorButton,
-	ControlledDataGrid,
 	CreatePage,
-	DataBindingProvider,
+	DataGridPage,
 	DeleteEntityButton,
 	EditPage,
 	EnumCell,
-	FeedbackRenderer,
 	GenericCell,
-	GenericPage,
 	HasManySelectCell,
 	HasOneSelectCell,
 	LinkButton,
@@ -19,9 +16,7 @@ import {
 	SlugField,
 	TextCell,
 	TextField,
-	useDataGrid,
 } from '@contember/admin'
-import { useEffect, useMemo } from 'react'
 
 
 const stateOptions = {
@@ -30,33 +25,25 @@ const stateOptions = {
 	removed: 'Removed',
 }
 
-
-export const List = () => {
-	const dataGridProps = useDataGrid({
-		entities: 'Article',
-		itemsPerPage: 20,
-		children: useMemo(() => <>
-			<TextCell field="title" header="Title" />
-			<TextCell field="content" header="Content" />
-			<HasOneSelectCell field="category" options={`Category.locales(locale.code = 'cs').name`} header="Category" />
-			<HasManySelectCell field="tags" options={`Tag.locales(locale.code = 'cs').name`} header="Tags" />
-			<EnumCell field={'state'} options={stateOptions} header={'State'} />
-			<NumberCell field="number" header="Number" />
-			<GenericCell canBeHidden={false} justification="justifyEnd">
-				<LinkButton to={`article/edit(id: $entity.id)`} Component={AnchorButton}>Edit</LinkButton>
-				<DeleteEntityButton title="Delete" immediatePersist={true} />
-			</GenericCell>
-		</>, []),
-	})
-
-	return (
-		<GenericPage title={'Articles'} actions={<LinkButton to="article/create">Add article</LinkButton>}>
-			<DataBindingProvider stateComponent={FeedbackRenderer}>
-				<ControlledDataGrid {...dataGridProps} />
-			</DataBindingProvider>
-		</GenericPage>
-	)
-}
+export const List = () => <DataGridPage
+	entities="Article"
+	itemsPerPage={20}
+	rendererProps={{
+		actions: <LinkButton to="article/create">Add article</LinkButton>,
+		title: 'Articles',
+	}}
+>
+	<TextCell field="title" header="Title" />
+	<TextCell field="content" header="Content" />
+	<HasOneSelectCell field="category" options={`Category.locales(locale.code = 'cs').name`} header="Category" />
+	<HasManySelectCell field="tags" options={`Tag.locales(locale.code = 'cs').name`} header="Tags" />
+	<EnumCell field={'state'} options={stateOptions} header={'State'} />
+	<NumberCell field="number" header="Number" />
+	<GenericCell canBeHidden={false} justification="justifyEnd">
+		<LinkButton to={`article/edit(id: $entity.id)`} Component={AnchorButton}>Edit</LinkButton>
+		<DeleteEntityButton title="Delete" immediatePersist={true} />
+	</GenericCell>
+</DataGridPage>
 
 const articleForm = (
 	<>

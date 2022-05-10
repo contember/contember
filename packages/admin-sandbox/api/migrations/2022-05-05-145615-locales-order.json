@@ -1,0 +1,36 @@
+{
+	"formatVersion": 3,
+	"modifications": [
+		{
+			"modification": "createColumn",
+			"entityName": "TagLocale",
+			"field": {
+				"name": "order",
+				"columnName": "order",
+				"nullable": true,
+				"type": "Integer",
+				"columnType": "integer"
+			}
+		},
+		{
+			"modification": "patchAclSchema",
+			"patch": [
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/TagLocale/operations/create/order",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/TagLocale/operations/update/order",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/TagLocale/operations/read/order",
+					"value": true
+				}
+			]
+		}
+	]
+}

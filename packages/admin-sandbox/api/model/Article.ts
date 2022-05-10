@@ -39,4 +39,5 @@ export class TagLocale {
 	tag = d.manyHasOne(Tag, 'locales')
 	locale = d.manyHasOne(Locale)
 	name = d.stringColumn().notNull()
+	order = d.intColumn()
 }

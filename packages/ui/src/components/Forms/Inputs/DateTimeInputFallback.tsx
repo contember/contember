@@ -5,7 +5,7 @@ import { toViewClass } from '../../../utils'
 import { Divider } from '../../Divider'
 import { Stack } from '../../Stack'
 import { assertDatetimeString, splitDatetime } from '../Types'
-import { VisuallyDependententControlProps } from '../Types/ControlProps'
+import { VisuallyDependentControlProps } from '../Types/ControlProps'
 import { useInputClassName } from '../useInputClassName'
 import { useNativeInput } from '../useNativeInput'
 import { DateTimeInputProps } from './Types'
@@ -98,7 +98,7 @@ export const DateTimeInputFallback = memo(
 		const [maxDate, maxTime] = splitDatetime(max)
 		const [minDate, minTime] = splitDatetime(min)
 
-		return <Stack gap="large" direction="horizontal" className={useInputClassName<VisuallyDependententControlProps>({
+		return <Stack gap="large" direction="horizontal" className={useInputClassName<VisuallyDependentControlProps>({
 			...outerProps,
 			className: classNames(
 				useComponentClassName('text-input'),

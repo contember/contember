@@ -1,19 +1,19 @@
 import classNames from 'classnames'
 import { toEnumClass, toEnumStateClass, toEnumViewClass, toStateClass, toThemeClass } from '../../utils'
-import { AllVisuallyDependententControlProps } from './Types'
-import { VisuallyDependententControlProps } from './Types/ControlProps'
+import { AllVisuallyDependentControlProps } from './Types'
+import { VisuallyDependentControlProps } from './Types/ControlProps'
 
 /**
  * Generates className prop from the set of props
  *
- * `AllVisuallyDependententControlProps` and `VisuallyDependententControlProps` are basically the same.
+ * `AllVisuallyDependentControlProps` and `VisuallyDependentControlProps` are basically the same.
  *  Hover `All*` has all props required and is the default which ensures none of the props are unintentionaly left out.
  *
- * Use `useInputClassName<VisuallyDependententControlProps>(...)` to ease usage of the hook.
+ * Use `useInputClassName<VisuallyDependentControlProps>(...)` to ease usage of the hook.
  *
  */
 
-export function useInputClassName<P extends AllVisuallyDependententControlProps | VisuallyDependententControlProps = AllVisuallyDependententControlProps>({
+export function useInputClassName<P extends AllVisuallyDependentControlProps | VisuallyDependentControlProps = AllVisuallyDependentControlProps>({
   // ControlStateProps
 	active,
 	disabled,

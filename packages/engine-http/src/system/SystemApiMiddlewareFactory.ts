@@ -3,6 +3,7 @@ import { ProjectGroupResolver, ProjectInfoMiddlewareState } from '../project-com
 import { AuthResult, HttpError, TimerMiddlewareState } from '../common'
 import { GraphQLKoaState } from '../graphql'
 import { SystemGraphQLContextFactory } from './SystemGraphQLContextFactory'
+import { Logger } from '@contember/engine-common'
 
 type SystemApiMiddlewareKoaState =
 	& TimerMiddlewareState
@@ -28,7 +29,14 @@ export class SystemApiMiddlewareFactory {
 			koaContext.state.authResult = authResult
 
 			const projectSlug = params.projectSlug
-			const projectContainer = await groupContainer.projectContainerResolver.getProjectContainer(projectSlug, true)
+			// eslint-disable-next-line no-console
+			const logger = new Logger(console.log)
+			logger.group(`Initializing ${groupContainer.slug}/${params.projectSlug}`)
+			const projectContainer = await groupContainer.projectContainerResolver.getProjectContainer(projectSlug, {
+				alias: true,
+				logger,
+			})
+			logger.groupEnd()
 			if (projectContainer === undefined) {
 				throw new HttpError(`Project ${projectSlug} NOT found`, 404)
 			}

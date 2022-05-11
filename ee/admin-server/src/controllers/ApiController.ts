@@ -7,6 +7,8 @@ import { readAuthCookie, writeAuthCookie } from '../utils/cookies'
 export const LOGIN_TOKEN_PLACEHOLDER = '__LOGIN_TOKEN__'
 export const SESSION_TOKEN_PLACEHOLDER = '__SESSION_TOKEN__'
 
+const REQUEST_METHOD_WHITELIST = ['head', 'get', 'post'] // 'options' is intentionally excluded
+
 interface ApiParams {
 	path: string
 	projectGroup: string | undefined
@@ -21,6 +23,12 @@ export class ApiController extends BaseController<ApiParams> {
 	}
 
 	async handle(req: IncomingMessage, res: ServerResponse, params: ApiParams): Promise<void> {
+		if (!REQUEST_METHOD_WHITELIST.includes(req.method?.toLowerCase() ?? '')) {
+			res.writeHead(400)
+			res.end()
+			return
+		}
+
 		const tokenPath = req.headers['x-contember-token-path']
 		const resolvedEndpoint = this.apiEndpointResolver.resolve(params.projectGroup)
 		const { endpoint, hostname } = resolvedEndpoint
@@ -83,12 +91,15 @@ export class ApiController extends BaseController<ApiParams> {
 		const outHeaders: OutgoingHttpHeaders = {}
 		const bearerToken = this.readBearerToken(req)
 		const cookieToken = readAuthCookie(req)
+		const post = req.method?.toUpperCase() === 'POST'
 
 		if (bearerToken === LOGIN_TOKEN_PLACEHOLDER) {
-			outHeaders['Authorization'] = `Bearer ${this.loginToken}`
+			if (post) {
+				outHeaders['Authorization'] = `Bearer ${this.loginToken}`
+			}
 
 		} else if (bearerToken === SESSION_TOKEN_PLACEHOLDER || req.headers['authorization'] === undefined) {
-			if (cookieToken !== null) {
+			if (post && cookieToken !== null) {
 				outHeaders['Authorization'] = `Bearer ${cookieToken}`
 			}
 
@@ -96,7 +107,7 @@ export class ApiController extends BaseController<ApiParams> {
 			outHeaders['Authorization'] = req.headers['authorization']
 		}
 
-		if (req.headers['content-type'] !== undefined) {
+		if (post && req.headers['content-type'] !== undefined) {
 			outHeaders['Content-Type'] = req.headers['content-type']
 		}
 

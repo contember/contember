@@ -7,14 +7,17 @@ export const permissivelyDeserializeNodes = <E extends SlateEditor>(
 	serializedElement: string,
 	errorMessage?: string,
 ): Array<SlateElement | SlateText> => {
-	let deserialized: SerializableEditorNode | SlateElement
+	let deserialized: SerializableEditorNode | SlateElement | null = null
 	try {
 		// It is important that only the JSON.parse call is inside the try block.
 		// We don't want to catch other exceptions from here.
 		deserialized = JSON.parse(serializedElement)
-	} catch (e) {
+	} catch (e) {}
+
+	if (typeof deserialized !== "object" || deserialized === null) {
 		return [editor.createDefaultElement([{ text: serializedElement }])]
 	}
+
 	if ('formatVersion' in deserialized) {
 		return toLatestFormat(editor, deserialized as SerializableEditorNode).children
 	}

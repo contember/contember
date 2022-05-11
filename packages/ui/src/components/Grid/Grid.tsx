@@ -2,7 +2,7 @@ import classNames from 'classnames'
 import { CSSProperties, forwardRef, memo, useMemo } from 'react'
 import { useComponentClassName } from '../../auxiliary'
 import { NativeProps } from '../../types'
-import { useFallbackRef } from '../../utils/useFallbackRef'
+import { useFallbackRef } from '../../utils'
 
 export interface GridOwnProps {
   columnWidth: number

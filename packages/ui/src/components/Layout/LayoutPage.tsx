@@ -5,12 +5,13 @@ import { toSchemeClass, toThemeClass } from '../../utils'
 import { SectionTabs } from '../SectionTabs'
 import { TitleBar, TitleBarProps } from '../TitleBar'
 import { LayoutPageAside } from './LayoutPageAside'
-import { LayoutPageContent } from './LayoutPageContent'
+import { LayoutPageContent, LayoutPageContentProps } from './LayoutPageContent'
 import { useThemeScheme } from './ThemeSchemeContext'
 import { ThemeScheme } from './Types'
 export interface LayoutPageProps extends Omit<TitleBarProps, 'after' | 'children'>, ThemeScheme {
 	afterTitle?: TitleBarProps['after']
 	children?: ReactNode
+	layout?: LayoutPageContentProps['layout']
 	side?: ReactNode
 	title?: ReactNode
 }
@@ -20,6 +21,7 @@ export const LayoutPage = memo(({
 	actions,
 	children,
 	headingProps,
+	layout,
 	navigation,
 	side,
 	title,
@@ -102,7 +104,7 @@ export const LayoutPage = memo(({
 			)}
 			style={{ '--cui-content-offset-top': `${contentOffsetTop}px` } as CSSProperties}
 		>
-			<LayoutPageContent>
+			<LayoutPageContent layout={layout}>
 				{children}
 			</LayoutPageContent>
 			{side && <LayoutPageAside>{side}</LayoutPageAside>}

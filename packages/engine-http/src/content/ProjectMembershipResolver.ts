@@ -29,9 +29,10 @@ export class ProjectMembershipResolver {
 		const implicitRoles = Object.entries(acl.roles).filter(([, role]) => role.implicit).map(([name]) => name)
 
 		if (explicitMemberships.length === 0 && implicitRoles.length === 0) {
-			throw this.debug
-				? new HttpError(`You are not allowed to access project ${projectSlug}`, 403)
-				: new HttpError(`Project ${projectSlug} NOT found`, 404)
+			const errorMessage = this.debug
+				? `You are not allowed to access project ${projectSlug}`
+				: `Project ${projectSlug} NOT found`
+			throw new HttpError(errorMessage, 404)
 		}
 
 		const assumedMemberships = this.readAssumedMemberships(request)

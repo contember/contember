@@ -2,7 +2,6 @@ import { IncomingMessage, OutgoingHttpHeaders, request as httpRequest, ServerRes
 import { request as httpsRequest, RequestOptions } from 'https'
 import { BaseController } from './BaseController'
 import { ApiEndpointResolver } from '../services/ApiEndpointResolver'
-import { BadRequestError } from '../BadRequestError'
 import { readAuthCookie, writeAuthCookie } from '../utils/cookies'
 
 export const LOGIN_TOKEN_PLACEHOLDER = '__LOGIN_TOKEN__'
@@ -24,9 +23,6 @@ export class ApiController extends BaseController<ApiParams> {
 	async handle(req: IncomingMessage, res: ServerResponse, params: ApiParams): Promise<void> {
 		const tokenPath = req.headers['x-contember-token-path']
 		const resolvedEndpoint = this.apiEndpointResolver.resolve(params.projectGroup)
-		if (!resolvedEndpoint) {
-			throw new BadRequestError(404, 'Not Found')
-		}
 		const { endpoint, hostname } = resolvedEndpoint
 
 		const innerRequestOptions: RequestOptions = {

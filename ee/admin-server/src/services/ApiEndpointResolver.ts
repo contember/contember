@@ -7,11 +7,12 @@ export class ApiEndpointResolver {
 	) {
 	}
 
-	public resolve(projectGroup: string | undefined): undefined | { endpoint: URL, hostname: string } {
-		if (!projectGroup) {
+	public resolve(projectGroup: string | undefined): { endpoint: URL, hostname: string } {
+		if (projectGroup === undefined) {
 			const endpoint = new URL(this.apiEndpoint)
-			return { endpoint: endpoint, hostname: endpoint.hostname }
+			return { endpoint, hostname: endpoint.hostname }
 		}
+
 		const endpoint = new URL(this.apiEndpoint.replace(ProjectGroupResolver.GROUP_PLACEHOLDER, projectGroup))
 		const hostname = this.apiHostname ? this.apiHostname.replace(ProjectGroupResolver.GROUP_PLACEHOLDER, projectGroup) : endpoint.hostname
 		return { endpoint, hostname }

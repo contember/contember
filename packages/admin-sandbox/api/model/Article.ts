@@ -1,10 +1,12 @@
 import { SchemaDefinition as d } from '@contember/schema-definition'
+import { BasicImage } from './Files'
 import { Locale } from './Locale'
 
 export const ArticleState = d.createEnum('draft', 'published', 'removed')
 export class Article {
 	title = d.stringColumn()
 	slug = d.stringColumn().unique()
+	image = d.manyHasOne(BasicImage)
 	content = d.stringColumn()
 	publishedAt = d.dateTimeColumn()
 	category = d.manyHasOne(Category)

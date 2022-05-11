@@ -16,6 +16,7 @@ export const ImmutableEntityListPageRenderer = Component(
 		navigation,
 		headingProps,
 		actions,
+		layout,
 
 		...entityListProps
 	}: ImmutableEntityListPageRendererProps<ContainerExtraProps, ItemExtraProps>) => (
@@ -25,6 +26,7 @@ export const ImmutableEntityListPageRenderer = Component(
 			navigation={navigation}
 			actions={actions}
 			headingProps={headingProps}
+			layout={layout}
 		>
 			<ImmutableEntityListRenderer {...entityListProps}>{children}</ImmutableEntityListRenderer>
 		</LayoutRenderer>

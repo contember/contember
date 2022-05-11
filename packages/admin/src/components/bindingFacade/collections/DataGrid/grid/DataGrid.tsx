@@ -1,9 +1,9 @@
 import { Component, QueryLanguage, SugaredQualifiedEntityList } from '@contember/binding'
 import { ComponentType, ReactElement, ReactNode } from 'react'
-import { ControlledDataGrid } from './ControlledDataGrid'
 import { DataGridContainerProps, DataGridContainerPublicProps, DataGridState, useDataGrid } from '../base'
-import { renderGrid } from './renderGrid'
 import { extractDataGridColumns } from '../structure'
+import { ControlledDataGrid } from './ControlledDataGrid'
+import { renderGrid } from './renderGrid'
 
 export type DataGridProps<ComponentExtraProps extends {}> =
 	& DataGridContainerPublicProps
@@ -40,15 +40,18 @@ export const DataGrid = Component(
 			orderBy: [],
 			entities: QueryLanguage.desugarQualifiedEntityList({ entities: props.entities }, environment),
 			filter: {},
+			layout: 'default',
 		}
 
 		return renderGrid(
-			{ setFilter: () => null, setIsColumnHidden: () => null, setOrderBy: () => null, updatePaging: () => null },
+			{ setFilter: () => null, setIsColumnHidden: () => null, setOrderBy: () => null, updatePaging: () => null, setLayout: () => null },
 			undefined,
 			fakeState,
 			fakeState,
 			environment,
-			{},
+			{
+				tile: props.tile,
+			},
 			'component' in props ? props.component : undefined,
 			'componentProps' in props ? props.componentProps : undefined,
 		)

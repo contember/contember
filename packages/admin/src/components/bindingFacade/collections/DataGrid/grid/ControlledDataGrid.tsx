@@ -1,10 +1,10 @@
 import { Component, SugaredQualifiedEntityList, useEnvironment } from '@contember/binding'
+import { ContainerSpinner } from '@contember/ui'
 import { ComponentType, ReactElement, ReactNode, useMemo } from 'react'
 import type { DataGridContainerProps, DataGridContainerPublicProps } from '../base'
 import { DataGridState, DataGridStateMethods } from '../base'
-import { renderGrid } from './renderGrid'
-import { ContainerSpinner } from '@contember/ui'
 import { useDataGridDisplayedState } from '../base/useDataGridDisplayedState'
+import { renderGrid } from './renderGrid'
 
 export type ControlledDataGridProps<ComponentExtraProps extends {}> =
 	& DataGridContainerPublicProps
@@ -33,12 +33,13 @@ export const ControlledDataGrid = Component(
 				emptyMessageComponentExtraProps: props.emptyMessageComponentExtraProps,
 				emptyMessage: props.emptyMessage,
 				emptyMessageComponent: props.emptyMessageComponent,
+				tile: props.tile,
 			}),
-			[props.emptyMessage, props.emptyMessageComponent, props.emptyMessageComponentExtraProps],
+			[props.emptyMessage, props.emptyMessageComponent, props.emptyMessageComponentExtraProps, props.tile],
 		)
 
 
-		const displayedState = useDataGridDisplayedState(stateMethods, state)
+		const displayedState = useDataGridDisplayedState(stateMethods, state, props.tile)
 		const environment = useEnvironment()
 
 		if (!displayedState.gridState) {
@@ -63,7 +64,9 @@ export const ControlledDataGrid = Component(
 			state,
 			state,
 			environment,
-			{},
+			{
+				tile: props.tile,
+			},
 			'component' in props ? props.component : undefined,
 			'componentProps' in props ? props.componentProps : undefined,
 		)

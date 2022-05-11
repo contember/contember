@@ -1,6 +1,6 @@
 import { Component, Entity, EntityListBaseProps, EntityName, Filter } from '@contember/binding'
-import { Button, ButtonList, LayoutPageStickyContainer, Stack, Table, TableCell, TableRow } from '@contember/ui'
-import type { ComponentType, FunctionComponent, ReactNode } from 'react'
+import { Button, ButtonList, Divider, Grid, Icon, LayoutPageStickyContainer, Stack, Table, TableCell, TableRow } from '@contember/ui'
+import { ComponentType, FunctionComponent, ReactNode, useCallback } from 'react'
 import { useMessageFormatter } from '../../../../../i18n'
 import { EmptyMessage, EmptyMessageProps } from '../../helpers'
 import type { GridPagingAction } from '../paging'
@@ -8,6 +8,7 @@ import { DataGridColumnHiding } from './DataGridColumnHiding'
 import { dataGridDictionary } from './dataGridDictionary'
 import { DataGridFullFilters } from './DataGridFullFilters'
 import { DataGridHeaderCell } from './DataGridHeaderCell'
+import { SetDataGridView } from './DataGridLayout'
 import type { DataGridSetColumnFilter } from './DataGridSetFilter'
 import type { DataGridSetIsColumnHidden } from './DataGridSetIsColumnHidden'
 import type { DataGridSetColumnOrderBy } from './DataGridSetOrderBy'
@@ -22,6 +23,9 @@ export interface DataGridContainerPublicProps {
 	emptyMessage?: ReactNode
 	emptyMessageComponent?: ComponentType<EmptyMessageProps & any> // This can override 'emptyMessage'
 	emptyMessageComponentExtraProps?: {}
+
+	tile?: ReactNode
+	tileSize?: number
 }
 
 export interface DataGridContainerOwnProps extends DataGridContainerPublicProps {
@@ -33,6 +37,7 @@ export interface DataGridContainerOwnProps extends DataGridContainerPublicProps 
 	setFilter: DataGridSetColumnFilter
 	setOrderBy: DataGridSetColumnOrderBy
 	updatePaging: (action: GridPagingAction) => void
+	setLayout: SetDataGridView
 }
 
 export interface DataGridContainerProps extends DataGridContainerOwnProps, EntityListBaseProps {}
@@ -44,6 +49,7 @@ export const DataGridContainer: FunctionComponent<DataGridContainerProps> = Comp
 		setFilter,
 		setIsColumnHidden,
 		setOrderBy,
+		setLayout,
 		updatePaging,
 		desiredState,
 		displayedState,
@@ -54,12 +60,15 @@ export const DataGridContainer: FunctionComponent<DataGridContainerProps> = Comp
 		allowColumnVisibilityControls,
 		emptyMessage,
 		emptyMessageComponent,
+		tile,
+		tileSize = 160,
 	}) => {
 		const {
 			paging: { pageIndex, itemsPerPage },
 			filterArtifacts,
 			orderDirections,
 			columns,
+			layout,
 		} = desiredState
 		const formatMessage = useMessageFormatter(dataGridDictionary)
 		const totalCount = useDataGridTotalCount(entityName, filter)
@@ -80,6 +89,9 @@ export const DataGridContainer: FunctionComponent<DataGridContainerProps> = Comp
 			</>
 		)
 
+		const setDefaultView = useCallback(() => setLayout('default'), [setLayout])
+		const setTileView = useCallback(() => setLayout('tiles'), [setLayout])
+
 		return (
 			<Stack direction="vertical">
 				<LayoutPageStickyContainer
@@ -87,14 +99,27 @@ export const DataGridContainer: FunctionComponent<DataGridContainerProps> = Comp
 					right="var(--cui-layout-page-padding-right)"
 				>
 					<Stack wrap align="center" direction="horizontal" justify="space-between">
-						<ButtonList>
-							{allowColumnVisibilityControls !== false && (
-								<DataGridColumnHiding
-									desiredState={desiredState}
-									formatMessage={formatMessage}
-									setIsColumnHidden={setIsColumnHidden}
-								/>
-							)}
+						<Stack gap="small" direction="horizontal">
+							{tile && <>
+								<ButtonList>
+									<Button onClick={setTileView} size="small" distinction="seamless" intent={layout === 'tiles' ? 'primary' : 'default'}>
+										<Icon blueprintIcon="grid-view" />
+									</Button>
+									<Button onClick={setDefaultView} size="small" distinction="seamless" intent={layout === 'default' ? 'primary' : 'default'}>
+										<Icon blueprintIcon="list" />
+									</Button>
+								</ButtonList>
+
+								<Divider />
+							</>}
+							{layout !== 'tiles' && allowColumnVisibilityControls !== false && (
+									<DataGridColumnHiding
+										desiredState={desiredState}
+										formatMessage={formatMessage}
+										setIsColumnHidden={setIsColumnHidden}
+									/>
+								)
+							}
 							{allowAggregateFilterControls !== false && (
 								<DataGridFullFilters
 									desiredState={desiredState}
@@ -103,85 +128,96 @@ export const DataGridContainer: FunctionComponent<DataGridContainerProps> = Comp
 									setFilter={setFilter}
 								/>
 							)}
-						</ButtonList>
+						</Stack>
 						<div>{pagingSummary}</div>
 					</Stack>
 				</LayoutPageStickyContainer>
-				<Table
-					tableHead={
-						<TableRow>
-							{Array.from(columns)
-								// We use desired state here to give immediate feedback about column changes.
-								.filter(([columnKey]) => !desiredState.hiddenColumns[columnKey])
-								.map(([columnKey, column]) => {
-									const filterArtifact = filterArtifacts[columnKey]
-									const orderDirection = orderDirections[columnKey]
-									const orderColumns = Object.keys(orderDirections)
-									return (
-										<DataGridHeaderCell
-											key={columnKey}
-											environment={accessor.environment}
-											filterArtifact={filterArtifact}
-											emptyFilterArtifact={column.enableFiltering !== false ? column.emptyFilter : null}
-											orderState={orderDirection ? {
-												direction: orderDirection,
-												index: orderColumns.length > 1 ? orderColumns.indexOf(columnKey) : undefined,
-											} : undefined}
-											setFilter={newFilter => setFilter(columnKey, newFilter)}
-											setOrderBy={(newOrderBy, append = false) => setOrderBy(columnKey, newOrderBy, append)}
-											headerJustification={column.headerJustification || column.justification}
-											shrunk={column.shrunk}
-											hasFilter={getColumnFilter(column, filterArtifact, accessor.environment) !== undefined}
-											header={column.header}
-											ascOrderIcon={column.ascOrderIcon}
-											descOrderIcon={column.descOrderIcon}
-											filterRenderer={column.enableFiltering !== false ? column.filterRenderer : undefined}
-										/>
-									)
-								})}
-						</TableRow>
-					}
-				>
-					{!!accessor.length &&
-						Array.from(accessor, entity => (
+				{tile && layout === 'tiles'
+					? <Grid columnWidth={tileSize}>
+						{!!accessor.length && Array.from(accessor, entity => (
 							<Entity
 								key={entity.key}
 								accessor={entity}
 							>
-								<TableRow>
-									{Array.from(columns)
-										.filter(([columnKey]) => !desiredState.hiddenColumns[columnKey])
-										.map(([columnKey, column]) => {
-											// This is tricky. We need to render a table cell from here no matter what so that the cell count
-											// matches that of the headers. However, there might be a header displayed for a column whose data
-											// has not yet been fetched. Displaying its cell contents from here would cause an error. Also, the
-											// column may have just been hidden but the information hasn't made it to displayed sate yet.
-											// For these, we just display an empty cell then.
-											if (displayedState.hiddenColumns[columnKey]) {
-												return <TableCell key={columnKey} shrunk />
-											}
-											return (
-												<TableCell key={columnKey} shrunk={column.shrunk} justification={column.justification}>
-													{column.children}
-												</TableCell>
-											)
-										})}
-								</TableRow>
+								{tile}
 							</Entity>
 						))}
-					{!accessor.length && (
-						<TableRow>
-							<TableCell colSpan={columns.size}>
-								<EmptyMessage
-									distinction="seamless"
-									component={emptyMessageComponent}
+					</Grid>
+					: <Table
+						tableHead={
+							<TableRow>
+								{Array.from(columns)
+									// We use desired state here to give immediate feedback about column changes.
+									.filter(([columnKey]) => !desiredState.hiddenColumns[columnKey])
+									.map(([columnKey, column]) => {
+										const filterArtifact = filterArtifacts[columnKey]
+										const orderDirection = orderDirections[columnKey]
+										const orderColumns = Object.keys(orderDirections)
+										return (
+											<DataGridHeaderCell
+												key={columnKey}
+												environment={accessor.environment}
+												filterArtifact={filterArtifact}
+												emptyFilterArtifact={column.enableFiltering !== false ? column.emptyFilter : null}
+												orderState={orderDirection ? {
+													direction: orderDirection,
+													index: orderColumns.length > 1 ? orderColumns.indexOf(columnKey) : undefined,
+												} : undefined}
+												setFilter={newFilter => setFilter(columnKey, newFilter)}
+												setOrderBy={(newOrderBy, append = false) => setOrderBy(columnKey, newOrderBy, append)}
+												headerJustification={column.headerJustification || column.justification}
+												shrunk={column.shrunk}
+												hasFilter={getColumnFilter(column, filterArtifact, accessor.environment) !== undefined}
+												header={column.header}
+												ascOrderIcon={column.ascOrderIcon}
+												descOrderIcon={column.descOrderIcon}
+												filterRenderer={column.enableFiltering !== false ? column.filterRenderer : undefined}
+											/>
+										)
+									})}
+							</TableRow>
+						}
+					>
+						{!!accessor.length &&
+							Array.from(accessor, entity => (
+								<Entity
+									key={entity.key}
+									accessor={entity}
 								>
-									{formatMessage(emptyMessage, 'dataGrid.emptyMessage.text')}
-								</EmptyMessage>
-							</TableCell>
-						</TableRow>
-					)}
-				</Table>
+									<TableRow>
+										{Array.from(columns)
+											.filter(([columnKey]) => !desiredState.hiddenColumns[columnKey])
+											.map(([columnKey, column]) => {
+												// This is tricky. We need to render a table cell from here no matter what so that the cell count
+												// matches that of the headers. However, there might be a header displayed for a column whose data
+												// has not yet been fetched. Displaying its cell contents from here would cause an error. Also, the
+												// column may have just been hidden but the information hasn't made it to displayed sate yet.
+												// For these, we just display an empty cell then.
+												if (displayedState.hiddenColumns[columnKey]) {
+													return <TableCell key={columnKey} shrunk />
+												}
+												return (
+													<TableCell key={columnKey} shrunk={column.shrunk} justification={column.justification}>
+														{column.children}
+													</TableCell>
+												)
+											})}
+									</TableRow>
+								</Entity>
+							))}
+						{!accessor.length && (
+							<TableRow>
+								<TableCell colSpan={columns.size}>
+									<EmptyMessage
+										distinction="seamless"
+										component={emptyMessageComponent}
+									>
+										{formatMessage(emptyMessage, 'dataGrid.emptyMessage.text')}
+									</EmptyMessage>
+								</TableCell>
+							</TableRow>
+						)}
+					</Table>}
 				{!!normalizedItemCount && <LayoutPageStickyContainer
 					left="var(--cui-layout-page-padding-left)"
 					right="var(--cui-layout-page-padding-right)"

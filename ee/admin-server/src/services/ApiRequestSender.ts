@@ -1,4 +1,3 @@
-import { BadRequestError } from '../BadRequestError'
 import fetch, { Response } from 'node-fetch'
 import { ApiEndpointResolver } from './ApiEndpointResolver'
 
@@ -17,11 +16,7 @@ export class ApiRequestSender {
 	) {}
 
 	public async send({ projectGroup, query, token, variables, path }: ApiRequest): Promise<Response> {
-		const resolved = this.apiEndpointResolver.resolve(projectGroup)
-		if (!resolved) {
-			throw new BadRequestError(400, 'Cannot resolve API endpoint')
-		}
-		const { endpoint, hostname } = resolved
+		const { endpoint, hostname } = this.apiEndpointResolver.resolve(projectGroup)
 		return await fetch(`${endpoint.toString()}${path}`, {
 			method: 'POST',
 			headers: {

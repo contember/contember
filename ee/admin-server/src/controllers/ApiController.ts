@@ -2,11 +2,13 @@ import { IncomingMessage, OutgoingHttpHeaders, request as httpRequest, ServerRes
 import { request as httpsRequest, RequestOptions } from 'https'
 import { BaseController } from './BaseController'
 import { ApiEndpointResolver } from '../services/ApiEndpointResolver'
-import { BadRequestError } from '../BadRequestError'
 import { readAuthCookie, writeAuthCookie } from '../utils/cookies'
 
 export const LOGIN_TOKEN_PLACEHOLDER = '__LOGIN_TOKEN__'
 export const SESSION_TOKEN_PLACEHOLDER = '__SESSION_TOKEN__'
+
+const REQUEST_METHOD_WHITELIST = ['head', 'get', 'post'] // 'options' is intentionally excluded
+const RESPONSE_HEADER_WHITELIST = ['content-type', 'x-contember-ref']
 
 interface ApiParams {
 	path: string
@@ -22,12 +24,14 @@ export class ApiController extends BaseController<ApiParams> {
 	}
 
 	async handle(req: IncomingMessage, res: ServerResponse, params: ApiParams): Promise<void> {
-		const tokenPath = req.headers['x-contember-token-path']
-		const resolvedEndpoint = this.apiEndpointResolver.resolve(params.projectGroup)
-		if (!resolvedEndpoint) {
-			throw new BadRequestError(404, 'Not Found')
+		if (!REQUEST_METHOD_WHITELIST.includes(req.method?.toLowerCase() ?? '')) {
+			res.writeHead(400)
+			res.end()
+			return
 		}
-		const { endpoint, hostname } = resolvedEndpoint
+
+		const tokenPath = req.headers['x-contember-token-path']
+		const { endpoint, hostname } = this.apiEndpointResolver.resolve(params.projectGroup)
 
 		const innerRequestOptions: RequestOptions = {
 			protocol: endpoint.protocol,
@@ -37,7 +41,7 @@ export class ApiController extends BaseController<ApiParams> {
 			method: req.method,
 			setHost: false,
 			headers: {
-				...this.transformIncomingHeaders(req),
+				...this.transformRequestHeaders(req),
 				host: hostname,
 			},
 		}
@@ -45,7 +49,7 @@ export class ApiController extends BaseController<ApiParams> {
 		const driver = endpoint.protocol === 'http:' ? httpRequest : httpsRequest
 		const innerReq = driver(innerRequestOptions, async innerRes => {
 			if (typeof tokenPath !== 'string') {
-				this.proxyOugoingHead(res, innerRes)
+				this.proxyResponseHead(res, innerRes)
 				innerRes.pipe(res)
 				return
 			}
@@ -60,20 +64,22 @@ export class ApiController extends BaseController<ApiParams> {
 				[jsonBody, token] = this.extractToken(JSON.parse(textBody), tokenPath.split('.'))
 
 			} catch (e) {
-				this.proxyOugoingHead(res, innerRes)
+				this.proxyResponseHead(res, innerRes)
 				res.end(rawBody)
 				return
 			}
 
 			if (token === undefined || typeof jsonBody !== 'object' || jsonBody === null) {
-				this.proxyOugoingHead(res, innerRes)
+				this.proxyResponseHead(res, innerRes)
 				res.end(rawBody)
 				return
 			}
+
 			writeAuthCookie(req, res, token)
-			this.proxyOugoingHead(res, innerRes)
+			this.proxyResponseHead(res, innerRes)
 			res.end(JSON.stringify(jsonBody))
 		})
+
 		req.pipe(innerReq)
 
 		return new Promise((resolve, reject) => {
@@ -83,16 +89,19 @@ export class ApiController extends BaseController<ApiParams> {
 		})
 	}
 
-	private transformIncomingHeaders(req: IncomingMessage): OutgoingHttpHeaders {
+	private transformRequestHeaders(req: IncomingMessage): OutgoingHttpHeaders {
 		const outHeaders: OutgoingHttpHeaders = {}
 		const bearerToken = this.readBearerToken(req)
 		const cookieToken = readAuthCookie(req)
+		const post = req.method?.toUpperCase() === 'POST'
 
 		if (bearerToken === LOGIN_TOKEN_PLACEHOLDER) {
-			outHeaders['Authorization'] = `Bearer ${this.loginToken}`
+			if (post) {
+				outHeaders['Authorization'] = `Bearer ${this.loginToken}`
+			}
 
 		} else if (bearerToken === SESSION_TOKEN_PLACEHOLDER || req.headers['authorization'] === undefined) {
-			if (cookieToken !== null) {
+			if (post && cookieToken !== null) {
 				outHeaders['Authorization'] = `Bearer ${cookieToken}`
 			}
 
@@ -100,7 +109,7 @@ export class ApiController extends BaseController<ApiParams> {
 			outHeaders['Authorization'] = req.headers['authorization']
 		}
 
-		if (req.headers['content-type'] !== undefined) {
+		if (post && req.headers['content-type'] !== undefined) {
 			outHeaders['Content-Type'] = req.headers['content-type']
 		}
 
@@ -126,12 +135,11 @@ export class ApiController extends BaseController<ApiParams> {
 		return [json, undefined]
 	}
 
-	private proxyOugoingHead(outerRes: ServerResponse, innerRes: IncomingMessage) {
-		const headerWhitelist = new Set(['content-type', 'x-contember-ref'])
+	private proxyResponseHead(outerRes: ServerResponse, innerRes: IncomingMessage) {
 		const outHeaders: OutgoingHttpHeaders = {}
 
-		for (const headerName in innerRes.headers) {
-			if (headerWhitelist.has(headerName)) {
+		for (const headerName of RESPONSE_HEADER_WHITELIST) {
+			if (innerRes.headers[headerName]) {
 				outHeaders[headerName] = innerRes.headers[headerName]
 			}
 		}

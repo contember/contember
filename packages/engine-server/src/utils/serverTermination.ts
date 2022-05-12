@@ -1,18 +1,19 @@
-import { Server } from 'net'
+import cluster from 'cluster'
 
-export const createServerTerminator = (mutableServerList: Server[]): void => {
-	const signals = {
-		SIGHUP: 1,
-		SIGINT: 2,
-		SIGTERM: 15,
-	}
+const signals = {
+	SIGHUP: 1,
+	SIGINT: 2,
+	SIGTERM: 15,
+}
+export type TerminationJob = (args: { signal: keyof typeof signals; code: number }) => Promise<void>
+export const listenOnProcessTermination = (jobs: TerminationJob[]) => {
 	for (const [signal, code] of Object.entries(signals)) {
 		process.on(signal, async () => {
 			// eslint-disable-next-line no-console
-			console.log(`process received a ${signal} signal`)
-			for (const server of mutableServerList) {
-				await new Promise(resolve => server.close(() => resolve(null)))
-			}
+			console.log(`Process ${process.pid} received a ${signal} signal, executing ${jobs.length} termination jobs`)
+			await Promise.allSettled(jobs.map(it => it({ signal: signal as keyof typeof signals, code })))
+			// eslint-disable-next-line no-console
+			console.log(cluster.isMaster ? `All terminated, exiting` : 'All terminated, exiting a worker')
 			process.exit(128 + code)
 		})
 	}

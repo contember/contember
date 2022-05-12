@@ -4,12 +4,17 @@ import { createContainer } from './index'
 import loadPlugins from './loadPlugins'
 import os from 'os'
 import cluster from 'cluster'
-import { getClusterProcessType, notifyWorkerStarted, timeout, waitForWorker } from './utils'
-import { getServerVersion, isDebugMode, printStartInfo, resolveServerConfig } from '@contember/engine-server'
-import { initSentry } from '@contember/engine-server'
+import { getClusterProcessType, notifyWorkerStarted, timeout, WorkerManager } from './utils'
+import {
+	getServerVersion,
+	initSentry,
+	isDebugMode,
+	listenOnProcessTermination,
+	printStartInfo,
+	resolveServerConfig,
+	TerminationJob,
+} from '@contember/engine-server'
 import { serverConfigSchema } from './config/configSchema'
-import { createServerTerminator } from '@contember/engine-server'
-import { Server } from 'http';
 
 (async () => {
 	if (process.env.NODE_HEAPDUMP === 'true') {
@@ -45,17 +50,20 @@ import { Server } from 'http';
 	})
 
 	let initializedProjects: string[] = []
-	const servers: Server[] = []
-	createServerTerminator(servers)
+	const terminationJobs: TerminationJob[] = []
+	listenOnProcessTermination(terminationJobs)
 
 	if (cluster.isMaster) {
 		const monitoringPort = serverConfig.monitoringPort
-		servers.push(
-			container.monitoringKoa.listen(monitoringPort, () => {
-				// eslint-disable-next-line no-console
-				console.log(`Monitoring running on http://localhost:${monitoringPort}`)
-			}),
-		)
+		const monitoringServer = container.monitoringKoa.listen(monitoringPort, () => {
+			// eslint-disable-next-line no-console
+			console.log(`Monitoring running on http://localhost:${monitoringPort}`)
+		})
+		terminationJobs.push(async () => {
+			await new Promise<any>(resolve => monitoringServer.close(resolve))
+			// eslint-disable-next-line no-console
+			console.log('Monitoring server terminated')
+		})
 		if (!serverConfig.projectGroup) {
 			initializedProjects = await container.initializer.initialize()
 		}
@@ -78,24 +86,35 @@ import { Server } from 'http';
 		if (cluster.isMaster) {
 			// eslint-disable-next-line no-console
 			console.log(`Master ${process.pid} is running`)
-			cluster.on('exit', async (worker, code, signal) => {
+			const workerManager = new WorkerManager(workerCount)
+			terminationJobs.push(async ({ signal }) => {
+				await workerManager.terminate(signal)
 				// eslint-disable-next-line no-console
-				console.log(`Worker ${worker.process.pid} died with signal ${signal}, restarting`)
-				await timeout(2000)
-				cluster.fork()
+				console.log('Workers terminated')
 			})
-			for (let i = 0; i < workerCount; i++) {
-				cluster.fork()
-				await waitForWorker(15000)
-			}
+			await workerManager.start()
 			printStarted()
 		} else {
 			// eslint-disable-next-line no-console
 			console.log(`Starting worker ${process.pid}`)
-			servers.push(container.koa.listen(port, () => notifyWorkerStarted()))
+
+			// this line somehow ensures, that worker waits for termination of all jobs
+			process.on('disconnect', () => timeout(0))
+
+			const httpServer = container.koa.listen(port, () => notifyWorkerStarted())
+			terminationJobs.push(async () => {
+				await new Promise<any>(resolve => httpServer.close(resolve))
+				// eslint-disable-next-line no-console
+				console.log('API server terminated')
+			})
 		}
 	} else {
-		servers.push(container.koa.listen(port, () => printStarted()))
+		const httpServer = container.koa.listen(port, () => printStarted())
+		terminationJobs.push(async () => {
+			await new Promise<any>(resolve => httpServer.close(resolve))
+			// eslint-disable-next-line no-console
+			console.log('API server terminated')
+		})
 	}
 
 })().catch(e => {

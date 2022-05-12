@@ -6,6 +6,8 @@ import {
 	Authenticator,
 	CryptoWrapper,
 	ProjectGroupContainer,
+	ProjectMembershipFetcher,
+	ProjectMembershipResolver,
 	Providers,
 	SystemGraphQLHandlerFactory,
 	TenantGraphQLHandlerFactory,
@@ -30,6 +32,7 @@ interface ProjectGroupContainerFactoryArgs
 
 export class ProjectGroupContainerFactory {
 	constructor(
+		private readonly debug: boolean,
 		private readonly providers: Providers,
 		private readonly systemContainerFactory: SystemContainerFactory,
 		private readonly tenantContainerFactory: TenantContainerFactory,
@@ -106,6 +109,8 @@ export class ProjectGroupContainerFactory {
 				this.systemGraphQLHandlerFactory.create(systemContainer.systemResolversFactory))
 			.addService('authenticator', ({ tenantDatabase, tenantContainer }) =>
 				new Authenticator(tenantDatabase, tenantContainer.apiKeyManager))
+			.addService('projectMembershipResolver', ({ tenantContainer }) =>
+				new ProjectMembershipResolver(this.debug, new ProjectMembershipFetcher(tenantContainer.projectMemberManager, tenantContainer.databaseContext)))
 			.build()
 			.pick(
 				'projectContainerResolver',
@@ -116,6 +121,7 @@ export class ProjectGroupContainerFactory {
 				'tenantContainer',
 				'tenantDatabase',
 				'authenticator',
+				'projectMembershipResolver',
 				'tenantGraphQLHandler',
 				'slug',
 			)

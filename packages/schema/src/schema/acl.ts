@@ -74,22 +74,28 @@ namespace Acl {
 	export type AnyStage = '*'
 	export type StagesDefinition = AnyStage | readonly string[]
 
-	export type TenantManagedVariableSource = true | string
+	export type MembershipVariableMatchRule = true | string
 
-	export type TenantManagePermissions = {
-		readonly [role: string]: {
-			readonly variables?:
-			| true
-			| {
-				readonly [targetVariable: string]: TenantManagedVariableSource
-			}
+	export type MembershipVariablesMatchRule =
+		| true
+		| {
+			readonly [targetVariable: string]: MembershipVariableMatchRule
 		}
+
+	export type MembershipRoleMatchRule =
+		| true
+		| {
+			readonly variables?: MembershipVariablesMatchRule
+		}
+
+	export type MembershipMatchRule = {
+		readonly [role: string]: MembershipRoleMatchRule
 	}
 
 	export type TenantPermissions = {
 		readonly invite?: boolean
 		readonly unmanagedInvite?: boolean
-		readonly manage?: TenantManagePermissions
+		readonly manage?: MembershipMatchRule
 	}
 
 	export enum SystemPermissionsLevel {
@@ -109,11 +115,16 @@ namespace Acl {
 		readonly assumeIdentity?: boolean
 	}
 
+	export type ContentPermissions = {
+		readonly assumeMembership?: MembershipMatchRule
+	}
+
 	export interface BaseRolePermissions {
 		readonly inherits?: readonly string[]
 		readonly implicit?: boolean
 		readonly tenant?: TenantPermissions
 		readonly system?: SystemPermissions
+		readonly content?: ContentPermissions
 		readonly variables: Acl.Variables
 		readonly stages?: StagesDefinition
 		readonly entities: Permissions

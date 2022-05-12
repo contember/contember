@@ -1,13 +1,11 @@
 #!/usr/bin/env node
 
-import { createContainer, serverConfigSchema } from './index'
+import { createContainer, listenOnProcessTermination, serverConfigSchema, TerminationJob } from './index'
 import loadPlugins from './loadPlugins'
 import { initSentry } from './utils'
 
 
-import { createServerTerminator } from './utils/serverTermination'
 import { getServerVersion, isDebugMode, printStartInfo, resolveServerConfig } from './utils/serverStartup'
-import { Server } from 'http';
 
 (async () => {
 	if (process.env.NODE_HEAPDUMP === 'true') {
@@ -15,6 +13,9 @@ import { Server } from 'http';
 		console.log('Initializing heapdump')
 		await import('heapdump')
 	}
+	const terminationJobs: TerminationJob[] = []
+	listenOnProcessTermination(terminationJobs)
+
 	const isDebug = isDebugMode()
 	const version = getServerVersion()
 	printStartInfo({ version, isDebug })
@@ -33,17 +34,14 @@ import { Server } from 'http';
 	})
 
 	const initializedProjects: string[] = await container.initializer.initialize()
-	const servers: Server[] = []
-	createServerTerminator(servers)
 
-	servers.push(
-		container.koa.listen(serverConfig.port, () => {
-			// eslint-disable-next-line no-console
-			console.log(`Contember API running on http://localhost:${(serverConfig.port)}`)
-			// eslint-disable-next-line no-console
-			console.log(initializedProjects.length ? `Initialized projects: ${initializedProjects.join(', ')}` : 'No project initialized')
-		}),
-	)
+	const httpServer = container.koa.listen(serverConfig.port, () => {
+		// eslint-disable-next-line no-console
+		console.log(`Contember API running on http://localhost:${(serverConfig.port)}`)
+		// eslint-disable-next-line no-console
+		console.log(initializedProjects.length ? `Initialized projects: ${initializedProjects.join(', ')}` : 'No project initialized')
+	})
+	terminationJobs.push(() => new Promise<any>(resolve => httpServer.close(resolve)))
 })().catch(e => {
 	// eslint-disable-next-line no-console
 	console.log(e)

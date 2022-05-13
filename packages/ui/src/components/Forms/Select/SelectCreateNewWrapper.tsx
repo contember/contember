@@ -19,7 +19,7 @@ export const SelectCreateNewWrapper = ({ onClick, children }: SelectCreateNewWra
 				{children}
 			</div>
 			<div className={`${prefix}selectCreateNewWrapper-button`}>
-				<Button onClick={onClick}><Icon blueprintIcon={'plus'}/></Button>
+				<Button onClick={onClick} elevation="none" intent="default"><Icon blueprintIcon={'plus'}/></Button>
 			</div>
 		</div>
 	)

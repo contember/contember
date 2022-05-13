@@ -86,7 +86,8 @@ namespace SideDimensions {
 	export interface CommonDimensionProps {
 		hasOneField?: string | SugaredRelativeSingleEntity
 		variableName?: Environment.Name
-		variables?: Environment.DeltaFactory | ((dimensionValue: Environment.Value) => Environment.DeltaFactory)
+		variables?: Environment.ValuesMapWithFactory | ((dimensionValue: Environment.Value) => Environment.ValuesMapWithFactory)
+		labelMiddleware?: Environment.LabelMiddleware
 	}
 
 	export interface SingleDimensionProps extends CommonDimensionProps {
@@ -125,22 +126,18 @@ namespace SideDimensions {
 		}
 
 		public static generateEnvironment(props: SingleDimensionProps, oldEnvironment: Environment): Environment {
-			let deltaFactory: Environment.DeltaFactory
-
-			if (typeof props.variables === 'function') {
-				deltaFactory = props.variables(props.dimensionValue)
-			} else if (props.variables) {
-				deltaFactory = props.variables
-			} else {
-				deltaFactory = {}
-			}
+			const deltaFactory: Environment.ValuesMapWithFactory = typeof props.variables === 'function'
+				? props.variables(props.dimensionValue)
+				: props.variables ?? {}
 
 			if (props.variableName) {
-				oldEnvironment = oldEnvironment.putName(props.variableName, props.dimensionValue)
 				deltaFactory[props.variableName] = props.dimensionValue
 			}
 
-			return oldEnvironment.putDelta(Environment.generateDelta(oldEnvironment, deltaFactory))
+			const { labelMiddleware = props.labelMiddleware, ...variables } = deltaFactory
+			const newEnvironment = oldEnvironment.withVariables(variables)
+
+			return labelMiddleware ? newEnvironment.withLabelMiddleware(labelMiddleware as Environment.Options['labelMiddleware']) : newEnvironment
 		}
 	}
 

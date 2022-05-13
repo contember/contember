@@ -285,10 +285,7 @@ export class MarkerMerger {
 	}
 
 	public static mergeEnvironments(original: Environment, fresh: Environment): Environment {
-		if (original === fresh) {
-			return original
-		}
-		return original.putDelta(fresh.getAllNames())
+		return original.merge(fresh)
 	}
 
 	private static rejectRelationScalarCombo(fieldName: FieldName): never {

@@ -41,10 +41,9 @@ export const ApplicationEntrypoint = (props: ApplicationEntrypointProps) => {
 		defaultDimensions: props.defaultDimensions,
 	}
 
-	const rootEnv = Environment.create({
-		...props.envVariables,
-		dimensions: props.defaultDimensions ?? {},
-	})
+	const rootEnv = Environment.create()
+		.withVariables(props.envVariables)
+		.withDimensions(props.defaultDimensions ?? {})
 
 	return (
 		<StyleProvider>

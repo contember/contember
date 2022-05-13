@@ -73,7 +73,7 @@ export const MultiSelectFieldInner = memo(
 			<FieldContainer
 				{...fieldContainerProps}
 				errors={errors}
-				label={environment.applySystemMiddleware('labelMiddleware', fieldContainerProps.label)}
+				label={environment.applyLabelMiddleware(fieldContainerProps.label)}
 			>
 				<AsyncSelect
 					{...asyncProps}

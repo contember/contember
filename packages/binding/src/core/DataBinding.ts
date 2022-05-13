@@ -29,7 +29,7 @@ import { MarkerMerger } from './MarkerMerger'
 import { MarkerTreeGenerator } from './MarkerTreeGenerator'
 import { MutationGenerator } from './MutationGenerator'
 import { QueryGenerator } from './QueryGenerator'
-import { Schema, SchemaLoader, SchemaValidator } from './schema'
+import { Schema, SchemaLoader } from './schema'
 import { StateIterator } from './state'
 import { StateInitializer } from './StateInitializer'
 import { TreeAugmenter } from './TreeAugmenter'
@@ -270,21 +270,13 @@ export class DataBinding {
 		if (options.signal?.aborted) {
 			return Promise.reject(DataBindingExtendAborted)
 		}
-		const markerTreeRoot = new MarkerTreeGenerator(newFragment, options.environment ?? this.environment).generate()
+		const schema = await this.getOrLoadSchema()
+		this.treeStore.setSchema(schema)
+		const markerTreeRoot = new MarkerTreeGenerator(newFragment, (options.environment ?? this.environment).withSchema(schema)).generate()
 
 		if (this.treeStore.effectivelyHasTreeRoot(markerTreeRoot)) {
 			// This isn't perfectly accurate as theoretically, we could already have all the data necessary but this
 			// could still be false.
-
-			const schema = await this.getOrLoadSchema()
-			this.treeStore.setSchema(schema)
-			if (import.meta.env.DEV) {
-				// For most trees, checking this against the schema should be unnecessary since if we already effectively
-				// have this tree root, then assuming everything we already have is valid, this should match the schema as well.
-				// However, we might be dealing with an isCreating tree root which is completely new. Also, we can just lean
-				// towards the safe side since developer machines can generally handle the potentially unnecessary check anyway.
-				SchemaValidator.assertTreeValid(schema, markerTreeRoot)
-			}
 
 			return this.eventManager.syncOperation(() => {
 				const newTreeRootId = this.getNewTreeRootId()
@@ -341,20 +333,7 @@ export class DataBinding {
 
 		const aggregateSignal = getCombinedSignal(pendingExtensions.map(extension => extension.options.signal))
 
-		// Even if we don't have a schema yet, we'll still optimistically fire the request so as to prevent a waterfall
-		// in the most likely case that things will go fine and the query does match the schema. If it doesn't, then we
-		// just get a "400 Bad Request" but that's not enough to make us delay the happy path.
-		const [aggregatePersistedData, schema] = await Promise.all([
-			this.fetchPersistedData(aggregateMarkerTreeRoot, aggregateSignal),
-			this.getOrLoadSchema(),
-		])
-		this.treeStore.setSchema(schema)
-
-		if (import.meta.env.DEV) {
-			for (const extension of pendingExtensions) {
-				SchemaValidator.assertTreeValid(schema, extension.markerTreeRoot)
-			}
-		}
+		const aggregatePersistedData = await this.fetchPersistedData(aggregateMarkerTreeRoot, aggregateSignal)
 
 		if (aggregateSignal?.aborted) {
 			return

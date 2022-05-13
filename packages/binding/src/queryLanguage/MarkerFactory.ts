@@ -28,6 +28,7 @@ import type {
 import { assertNever } from '../utils'
 import { QueryLanguage } from './QueryLanguage'
 import { GraphQlLiteral } from '@contember/client'
+import { BindingError } from '../BindingError'
 
 export class MarkerFactory {
 	private static createSubTreeMarker<
@@ -191,7 +192,7 @@ export class MarkerFactory {
 			)
 			return this.wrapRelativeEntityFieldMarkers(
 				relativeEntityList.hasOneRelationPath,
-				environment,
+				environment.getParent(),
 				this.createEntityFieldMarkersContainer(hasManyRelationMarker),
 			)
 		}
@@ -210,7 +211,7 @@ export class MarkerFactory {
 		return new EntityFieldsWithHoistablesMarker(
 			this.wrapRelativeEntityFieldMarkers(
 				relativeEntityList.hasOneRelationPath,
-				environment,
+				environment.getParent(),
 				this.createEntityFieldMarkersContainer(hasManyRelationMarker),
 			),
 			fields.subTrees,
@@ -236,7 +237,7 @@ export class MarkerFactory {
 
 		return this.wrapRelativeEntityFieldMarkers(
 			relativeSingleField.hasOneRelationPath,
-			environment,
+			environment.getParent(),
 			this.createEntityFieldMarkersContainer(getMarker(relativeSingleField)),
 		)
 	}
@@ -248,6 +249,7 @@ export class MarkerFactory {
 	): EntityFieldMarkersContainer {
 		for (let i = hasOneRelationPath.length - 1; i >= 0; i--) {
 			const marker = this.createHasOneRelationMarker(hasOneRelationPath[i], environment, fields)
+			environment = environment.getParent()
 			fields = this.createEntityFieldMarkersContainer(marker)
 		}
 		return fields

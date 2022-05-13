@@ -70,7 +70,7 @@ export const NativeSelectFieldInner = memo(forwardRef<HTMLSelectElement, NativeS
 	})
 
 	return (
-		<FieldContainer {...props} label={props.environment.applySystemMiddleware('labelMiddleware', props.label)}>
+		<FieldContainer {...props} label={props.environment.applyLabelMiddleware(props.label)}>
 			<Select
 				ref={ref}
 				required={props.required}

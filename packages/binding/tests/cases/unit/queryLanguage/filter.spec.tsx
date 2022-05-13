@@ -2,7 +2,7 @@ import { expect, it, describe } from 'vitest'
 import { Environment } from '../../../../src/dao'
 import { Parser } from '../../../../src/queryLanguage'
 
-const parse = (input: string, environment: Environment = new Environment()) => {
+const parse = (input: string, environment: Environment = Environment.create()) => {
 	return Parser.parseQueryLanguageExpression(input, 'filter', environment)
 }
 
@@ -15,7 +15,7 @@ describe('filter QueryLanguage parser', () => {
 	})
 
 	it('should parse variable filters', () => {
-		const myEnv = Environment.create({
+		const myEnv = Environment.create().withVariables({
 			myFilter: { foo: { eq: 123 } },
 		})
 		expect(parse('[$myFilter]', myEnv)).toEqual({ foo: { eq: 123 } })
@@ -23,7 +23,7 @@ describe('filter QueryLanguage parser', () => {
 	})
 
 	it('should parse filter sub expressions', () => {
-		const myEnv = Environment.create({
+		const myEnv = Environment.create().withVariables({
 			myFilter: { foo: { eq: 123 } },
 		})
 		expect(parse('[!($myFilter || x < 456)]', myEnv)).toEqual({

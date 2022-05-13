@@ -4,7 +4,7 @@ import { Parser } from '../../../../src/queryLanguage'
 import type { ParsedRelativeEntityList } from '../../../../src/queryLanguage/ParserResults'
 
 const parse = (input: string): ParsedRelativeEntityList => {
-	return Parser.parseQueryLanguageExpression(input, 'relativeEntityList', new Environment())
+	return Parser.parseQueryLanguageExpression(input, 'relativeEntityList', Environment.create())
 }
 
 describe('relative entity list QueryLanguage parser', () => {

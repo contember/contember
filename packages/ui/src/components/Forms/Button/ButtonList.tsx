@@ -1,8 +1,9 @@
 import cn from 'classnames'
 import { memo, ReactNode } from 'react'
 import { useComponentClassName } from '../../../auxiliary'
-import type { ButtonGroupOrientation, ButtonListFlow, Size } from '../../../types'
+import { Size } from '../../../types'
 import { toEnumViewClass } from '../../../utils'
+import type { ButtonGroupOrientation, ButtonListFlow } from './Types'
 
 export interface ButtonListProps {
 	children?: ReactNode

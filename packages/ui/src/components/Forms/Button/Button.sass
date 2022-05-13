@@ -178,6 +178,16 @@
 		justify-content: end
 		text-align: end
 
+	&.elevation-none
+		--cui-button-box-shadow-shadow-below: 0 0 transparent
+		--cui-button-box-shadow-dark-edge-top: 0 0 transparent
+		--cui-button-box-shadow-dark-edge-bottom: 0 0 transparent
+		&:not(.view-outlined):not(.view-seamless):not(.view-primary):not(.view-toned)
+			--cui-button-border-color: var(--cui-color--lower)
+			--cui-button-border-width: var(--cui-control-border-width, 1px)
+			&:hover
+				--cui-button-border-color--highlighted: var(--cui-color--low)
+
 	&-content
 		font-size: var(--cui-button-label-font-size)
 		flex: 1

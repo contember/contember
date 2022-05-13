@@ -122,7 +122,7 @@ export const csCZ: AdminDictionary = {
 	},
 	choiceField: {
 		createNew: {
-			confirmButtonText: 'Ok',
+			confirmButtonText: 'OK',
 			cancelButtonText: 'Zrušit',
 			dialogTitle: 'Nová položka',
 		},

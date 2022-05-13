@@ -1,7 +1,7 @@
 export const choiceFieldDictionary = {
 	choiceField: {
 		createNew: {
-			confirmButtonText: 'Ok',
+			confirmButtonText: 'OK',
 			cancelButtonText: 'Cancel',
 			dialogTitle: 'New item',
 		},

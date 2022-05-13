@@ -77,11 +77,14 @@ export const selectStyles: StylesConfig<OptionTypeBase, boolean, GroupTypeBase<O
 	dropdownIndicator: (provided, { isFocused, isDisabled }) => {
 		return {
 			...provided,
+			'align-self': 'stretch',
+			'align-items': 'center',
 			'color': isDisabled
 				? 'var(--cui-color--low)'
 				: isFocused
 					? 'var(--cui-color--strong)'
 					: 'var(--cui-color--high)',
+			'padding': '0 var(--cui-gap)',
 			'&:hover': {
 				color: 'var(--cui-color--strong)',
 			},
@@ -118,6 +121,7 @@ export const selectStyles: StylesConfig<OptionTypeBase, boolean, GroupTypeBase<O
 			...provided,
 			backgroundColor,
 			borderColor,
+			'borderWidth': '0.0625em',
 			color,
 			'borderRadius': 'var(--cui-control-border-radius)',
 			'boxShadow': isFocused ? 'var(--cui-control-focus-ring-box-shadow)' : undefined,

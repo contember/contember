@@ -70,7 +70,7 @@ export class JoinVisitor implements Model.RelationByTypeVisitor<JoinDefinition[]
 	): JoinDefinition[] {
 		const sourceAlias = this.path.back().getAlias()
 		const targetAlias = this.path.getAlias()
-		const joiningAlias = `${sourceAlias}_x_${targetAlias}`
+		const joiningAlias = this.path.back().for('x_' + this.path.getAlias()).getAlias()
 		return [
 			{
 				tableName: relation.joiningTable.tableName,
@@ -98,7 +98,7 @@ export class JoinVisitor implements Model.RelationByTypeVisitor<JoinDefinition[]
 	): JoinDefinition[] {
 		const sourceAlias = this.path.back().getAlias()
 		const targetAlias = this.path.getAlias()
-		const joiningAlias = `${sourceAlias}_x_${targetAlias}`
+		const joiningAlias = this.path.back().for('x_' + this.path.getAlias()).getAlias()
 		return [
 			{
 				tableName: targetRelation.joiningTable.tableName,

@@ -1,7 +1,4 @@
 import {
-	Card,
-	CardProps,
-	CheckboxButtonProps,
 	Component,
 	Field,
 	Link,
@@ -10,34 +7,14 @@ import {
 	LinkProps,
 	useEntity,
 } from '@contember/admin'
-import { ComponentType } from 'react'
 
-type CommonDataGridTileProps =
-	& {
-		checked?: boolean
-		thumbnailField?: string
-		titleField?: string
-	}
-	& Partial<Omit<CheckboxButtonProps, 'active' | 'type'>>
-
-type LinkableDataGridTileProps = & CommonDataGridTileProps
+type DataGridTileProps =
 	& Omit<LinkCardProps, 'src' | 'title' | 'href' | 'active' | 'onClick'>
 	& Pick<LinkProps, 'to'>
 	& {
-		CardComponent?: ComponentType<LinkCardProps>
+		thumbnailField?: string
+		titleField?: string
 	}
-
-type NotLinkableDataGridTileProps =
-	& CommonDataGridTileProps
-	& Omit<CardProps, 'src' | 'title' | 'href' | 'active' | 'onClick'>
-	& {
-		to?: never
-		CardComponent?: ComponentType<CardProps>
-	}
-
-export type DataGridTileProps =
-	| LinkableDataGridTileProps
-	| NotLinkableDataGridTileProps
 
 export const DataGridTile = Component((props: DataGridTileProps) => {
 	const entityAccessor = useEntity()
@@ -45,38 +22,20 @@ export const DataGridTile = Component((props: DataGridTileProps) => {
 	const src = props.thumbnailField ? entityAccessor.getField<string>(props.thumbnailField).value : null
 	const title = props.titleField ? entityAccessor.getField<string>(props.titleField).value : null
 
-	if (props.to) {
-		const {
-			thumbnailField,
-			titleField,
-			to,
-			CardComponent = LinkCard as ComponentType<LinkCardProps>,
-			...rest
-		} = props
+	const {
+		thumbnailField,
+		titleField,
+		to,
+		...rest
+	} = props
 
-		return <Link
-			{...rest}
-			Component={CardComponent}
-			componentProps={{ src }}
-			to={to}
-			children={title}
-		/>
-	} else {
-		const {
-			thumbnailField,
-			titleField,
-			to,
-			CardComponent: _CardComponent,
-			...rest
-		} = props as NotLinkableDataGridTileProps
-
-		const CardComponent = _CardComponent as ComponentType<CardProps> ?? Card
-
-		return <CardComponent
-			{...rest}
-			src={src}
-		>{title}</CardComponent>
-	}
+	return <Link
+		{...rest}
+		Component={LinkCard}
+		componentProps={{ src }}
+		to={to}
+		children={title}
+	/>
 }, ({
 	thumbnailField,
 	titleField,

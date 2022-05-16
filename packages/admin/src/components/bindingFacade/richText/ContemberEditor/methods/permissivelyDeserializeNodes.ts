@@ -14,7 +14,7 @@ export const permissivelyDeserializeNodes = <E extends SlateEditor>(
 		deserialized = JSON.parse(serializedElement)
 	} catch (e) {}
 
-	if (typeof deserialized !== "object" || deserialized === null) {
+	if (typeof deserialized !== 'object' || deserialized === null) {
 		return [editor.createDefaultElement([{ text: serializedElement }])]
 	}
 

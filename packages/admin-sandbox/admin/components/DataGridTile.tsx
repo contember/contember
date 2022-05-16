@@ -1,7 +1,16 @@
-import { Component, Field, useEntity } from '@contember/binding'
-import { Card, CardProps, CheckboxButtonProps, LinkCard, LinkCardProps } from '@contember/ui'
+import {
+	Card,
+	CardProps,
+	CheckboxButtonProps,
+	Component,
+	Field,
+	Link,
+	LinkCard,
+	LinkCardProps,
+	LinkProps,
+	useEntity,
+} from '@contember/admin'
 import { ComponentType } from 'react'
-import { Link, LinkProps } from '../../../../../routing'
 
 type CommonDataGridTileProps =
 	& {

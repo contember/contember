@@ -8,7 +8,6 @@ import { ProjectController } from './controllers/ProjectController'
 import { TenantClient } from './services/TenantClient'
 import { ApiController } from './controllers/ApiController'
 import * as http from 'http'
-import { URL } from 'url'
 import { S3Manager } from './services/S3Manager'
 import { MeController } from './controllers/MeController'
 import { LegacyController } from './controllers/LegacyController'
@@ -16,14 +15,13 @@ import { PanelController } from './controllers/PanelController'
 import { StaticFileHandler } from './services/StaticFileHandler'
 import { ProjectGroupResolver } from './services/ProjectGroupResolver'
 import { ApiEndpointResolver } from './services/ApiEndpointResolver'
-import { BadRequestError } from './BadRequestError'
 import { S3LocationResolver } from './services/S3LocationResolver'
-import { readHostFromHeader } from './utils/readHostFromHeader'
 import { CollaborationController } from './controllers/CollaborationController'
 import { CollaborationRedisKeys, CollaborationRedisStorage } from './services/CollaborationStorage'
 import { ApiRequestSender } from './services/ApiRequestSender'
 import { SystemClient } from './services/SystemClient'
 import { ConfigResolver } from './services/ConfigResolver'
+import { Router } from './services/Router'
 
 export default new Builder({})
 	.addService('env', env)
@@ -130,61 +128,31 @@ export default new Builder({})
 		}
 	})
 
-	.addService('httpServer', ({ loginController, deployController, projectController, apiController, meController, legacyController, panelController, collaborationController, projectGroupResolver }) => {
+	.addService('router', ({ loginController, deployController, projectController, apiController, meController, legacyController, panelController, projectGroupResolver }) => {
+		return new Router(
+			projectGroupResolver,
+			deployController,
+			meController,
+			apiController,
+			loginController,
+			legacyController,
+			panelController,
+			projectController,
+		)
+	})
+
+	.addService('httpServer', ({ router, collaborationController }) => {
 		const server = http.createServer()
 
 		server.on('request', async (req, res) => {
 			const startTime = process.hrtime()
-			const url = new URL(req.url ?? '/', `http://${req.headers.host}`)
-			const [prefix, ...rest] = url.pathname.substring(1).split('/')
 
-			try {
-				const hostname = readHostFromHeader(req)
-				const projectGroup = projectGroupResolver.resolve(hostname)
+			const handler = router.getHandler(req)
+			await handler(req, res)
 
-				switch (prefix) {
-					case '_deploy':
-						await deployController.handle(req, res, { projectGroup })
-						break
-
-					case '_me':
-						await meController.handle(req, res, { projectGroup })
-						break
-
-					case '_api':
-						await apiController.handle(req, res, { path: rest.join('/'), projectGroup })
-						break
-
-					case '':
-					case '_static':
-						await loginController.handle(req, res, { projectGroup })
-						break
-
-					case 'p':
-					case 'projects':
-						await legacyController.handle(req, res)
-						break
-
-					case '_panel':
-						await panelController.handle(req, res)
-						break
-
-					default:
-						await projectController.handle(req, res, { projectSlug: prefix, path: rest.join('/'), projectGroup })
-						break
-				}
-
-				const elapsedTime = process.hrtime(startTime)
-				const elapsedTimeMs = ((elapsedTime[0] + elapsedTime[1] / 1e9) * 1e3).toFixed(0)
-				console.info(`[http] [${res.statusCode}] ${req.method} ${req.url} ${elapsedTimeMs}ms`)
-			} catch (e) {
-				if (e instanceof BadRequestError) {
-					res.writeHead(e.code).end(e.message)
-				} else if (!res.headersSent) {
-					res.writeHead(500).end('Server error')
-				}
-				console.error(`[http] [${res.statusCode}] ${req.method} ${req.url}`, e)
-			}
+			const elapsedTime = process.hrtime(startTime)
+			const elapsedTimeMs = ((elapsedTime[0] + elapsedTime[1] / 1e9) * 1e3).toFixed(0)
+			console.info(`[http] [${res.statusCode}] ${req.method} ${req.url} ${elapsedTimeMs}ms`)
 		})
 
 		if (collaborationController) {

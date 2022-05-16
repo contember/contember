@@ -2,7 +2,6 @@ import {
 	AnchorButton,
 	CreatePage,
 	DataGridPage,
-	DataGridTile,
 	DeleteEntityButton,
 	EditPage,
 	EnumCell,
@@ -19,6 +18,7 @@ import {
 	TextCell,
 	TextField,
 } from '@contember/admin'
+import { DataGridTile } from '../components/DataGridTile'
 
 
 const stateOptions = {

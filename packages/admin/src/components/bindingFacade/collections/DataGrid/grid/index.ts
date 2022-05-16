@@ -1,2 +1,2 @@
-export * from './DataGrid'
 export * from './ControlledDataGrid'
+export * from './DataGrid'

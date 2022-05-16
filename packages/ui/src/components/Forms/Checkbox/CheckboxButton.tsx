@@ -1,10 +1,10 @@
 import classNames from 'classnames'
 import { useComponentClassName } from '../../../auxiliary'
 import { toStateClass } from '../../../utils'
-import { AllVisuallyDependententControlProps } from '../Types'
+import { AllVisuallyDependentControlProps } from '../Types'
 import { useInputClassName } from '../useInputClassName'
 
-export interface CheckboxButtonProps extends AllVisuallyDependententControlProps {
+export interface CheckboxButtonProps extends AllVisuallyDependentControlProps {
   checked?: boolean | null
   indeterminate?: boolean
 }

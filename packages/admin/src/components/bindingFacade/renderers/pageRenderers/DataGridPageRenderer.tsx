@@ -1,6 +1,6 @@
 import { Component } from '@contember/binding'
-import { LayoutRenderer, LayoutRendererProps } from '../LayoutRenderer'
 import { DataGridContainer, DataGridContainerProps } from '../../collections'
+import { LayoutRenderer, LayoutRendererProps } from '../LayoutRenderer'
 
 export type DataGridPageRendererProps =
 	& LayoutRendererProps
@@ -14,6 +14,7 @@ export const DataGridPageRenderer = Component(({
 		navigation,
 		headingProps,
 		actions,
+		layout,
 
 		...entityListProps
 	}: DataGridPageRendererProps) => (
@@ -23,6 +24,7 @@ export const DataGridPageRenderer = Component(({
 			navigation={navigation}
 			actions={actions}
 			headingProps={headingProps}
+			layout={layout}
 		>
 			<DataGridContainer {...entityListProps}>{children}</DataGridContainer>
 		</LayoutRenderer>

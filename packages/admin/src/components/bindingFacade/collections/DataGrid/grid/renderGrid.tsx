@@ -10,7 +10,7 @@ import {
 
 
 export const renderGrid = <ComponentExtraProps extends {}>(
-	{ setIsColumnHidden, setFilter, setOrderBy, updatePaging }: DataGridStateMethods,
+	{ setIsColumnHidden, setFilter, setOrderBy, updatePaging, setLayout }: DataGridStateMethods,
 	treeRootId: TreeRootId | undefined,
 	displayedState: DataGridState,
 	desiredState: DataGridState,
@@ -44,9 +44,12 @@ export const renderGrid = <ComponentExtraProps extends {}>(
 				displayedState,
 				entityName: entities.entityName,
 				filter,
+				tile: containerProps.tile,
+				tileSize: containerProps.tileSize,
 				setIsColumnHidden,
 				setFilter,
 				setOrderBy,
+				setLayout,
 				updatePaging,
 				emptyMessageComponentExtraProps: containerProps.emptyMessageComponentExtraProps,
 				emptyMessageComponent: containerProps.emptyMessageComponent,
@@ -54,6 +57,7 @@ export const renderGrid = <ComponentExtraProps extends {}>(
 				...componentProps,
 			}}
 		>
+			{containerProps.tile}
 			{Array.from(columns)
 				.filter(([key]) => !hiddenColumns[key])
 				.map(([key, props]) => (

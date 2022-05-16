@@ -1,12 +1,13 @@
+import { Filter, OrderBy, QualifiedEntityList } from '@contember/binding'
 import type { DispatchChangePage, GridPagingState } from '../paging'
 import type { DataGridColumns } from './DataGridColumn'
 import type { DataGridFilterArtifactStore } from './DataGridFilterArtifactStore'
 import type { DataGridHiddenColumnsStateStore } from './DataGridHiddenColumnsStateStore'
+import { DataGridLayout, SetDataGridView } from './DataGridLayout'
 import type { DataGridOrderDirectionStore } from './DataGridOrderDirectionStore'
-import { Filter, OrderBy, QualifiedEntityList } from '@contember/binding'
+import { DataGridSetColumnFilter } from './DataGridSetFilter'
 import { DataGridSetIsColumnHidden } from './DataGridSetIsColumnHidden'
 import { DataGridSetColumnOrderBy } from './DataGridSetOrderBy'
-import { DataGridSetColumnFilter, DataGridSetFilter } from './DataGridSetFilter'
 
 export interface DataGridState {
 	/**
@@ -26,6 +27,7 @@ export interface DataGridState {
 	hiddenColumns: DataGridHiddenColumnsStateStore
 	filterArtifacts: DataGridFilterArtifactStore
 	orderDirections: DataGridOrderDirectionStore
+	layout: DataGridLayout
 
 	/**
 	 * constructed structs
@@ -39,4 +41,5 @@ export interface DataGridStateMethods {
 	setOrderBy: DataGridSetColumnOrderBy
 	setFilter: DataGridSetColumnFilter
 	updatePaging: DispatchChangePage
+	setLayout: SetDataGridView
 }

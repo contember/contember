@@ -1,8 +1,8 @@
 import { Component } from '@contember/binding'
 import type { ReactElement } from 'react'
-import { MutableEntityListRenderer, MutableEntityListRendererProps } from '../listRenderers'
 import { PersistButton } from '../../buttons'
 import { LayoutRenderer, LayoutRendererProps } from '../LayoutRenderer'
+import { MutableEntityListRenderer, MutableEntityListRendererProps } from '../listRenderers'
 
 export type MutableEntityListPageRendererProps<ContainerExtraProps, ItemExtraProps> =
 	& LayoutRendererProps
@@ -16,6 +16,7 @@ export const MutableEntityListPageRenderer = Component(
 		navigation,
 		headingProps,
 		actions,
+		layout,
 
 		...entityListProps
 	}: MutableEntityListPageRendererProps<ContainerExtraProps, ItemExtraProps>) => (
@@ -25,6 +26,7 @@ export const MutableEntityListPageRenderer = Component(
 			navigation={navigation}
 			actions={actions ?? <PersistButton/>}
 			headingProps={headingProps}
+			layout={layout}
 		>
 			<MutableEntityListRenderer {...entityListProps}>{children}</MutableEntityListRenderer>
 		</LayoutRenderer>

@@ -1,17 +1,19 @@
+import { Filter, QueryLanguage, useEnvironment } from '@contember/binding'
+import { useSessionStorageState } from '@contember/react-utils'
 import { useMemo } from 'react'
-import { DataGridState, DataGridStateMethods } from './DataGridState'
+import { DataGridProps } from '../grid'
 import { collectFilters } from '../grid/collectFilters'
 import { collectOrderBy } from '../grid/collectOrderBy'
-import { useGridPagingState } from '../paging'
+import { useFilters } from '../grid/useFilters'
 import { useHiddenColumnsState } from '../grid/useHiddenColumnsState'
 import { useOrderBys } from '../grid/useOrderBys'
-import { useFilters } from '../grid/useFilters'
-import { useDataGridKey } from './useDataGridKey'
+import { useGridPagingState } from '../paging'
 import { extractDataGridColumns } from '../structure'
-import { Filter, QueryLanguage, useEnvironment } from '@contember/binding'
-import { DataGridProps } from '../grid'
+import { DataGridLayout } from './DataGridLayout'
+import { DataGridState, DataGridStateMethods } from './DataGridState'
+import { useDataGridKey } from './useDataGridKey'
 
-export const useDataGridState = (props: Pick<DataGridProps<any>, 'children' | 'itemsPerPage' | 'entities' | 'dataGridKey'>): [DataGridState, DataGridStateMethods] => {
+export const useDataGridState = (props: Pick<DataGridProps<any>, 'children' | 'itemsPerPage' | 'entities' | 'dataGridKey' | 'tile'>): [DataGridState, DataGridStateMethods] => {
 	const dataGridKey = useDataGridKey(props)
 	const environment = useEnvironment()
 	const columns = useMemo(() => extractDataGridColumns(props.children), [props.children])
@@ -20,6 +22,7 @@ export const useDataGridState = (props: Pick<DataGridProps<any>, 'children' | 'i
 	const [orderDirections, setOrderBy] = useOrderBys(columns, updatePaging, dataGridKey)
 	const [filterArtifacts, setFilter] = useFilters(columns, updatePaging, dataGridKey)
 	const entities = useMemo(() => QueryLanguage.desugarQualifiedEntityList({ entities: props.entities }, environment), [environment, props.entities])
+	const [layout, setLayout] = useSessionStorageState<DataGridLayout>(`${dataGridKey}-layout`, layout => layout ?? (props.tile ? 'tiles' : 'default'))
 	const desiredState = useMemo(
 		(): DataGridState => {
 			const columnFilters = collectFilters(columns, filterArtifacts, environment)
@@ -34,13 +37,14 @@ export const useDataGridState = (props: Pick<DataGridProps<any>, 'children' | 'i
 				orderDirections,
 				entities,
 				filter,
+				layout,
 				orderBy,
 			}
 		},
-		[columns, filterArtifacts, environment, entities, pageState, hiddenColumns, orderDirections],
+		[columns, filterArtifacts, environment, entities, pageState, hiddenColumns, orderDirections, layout],
 	)
 	return [
 		desiredState,
-		useMemo(() => ({ updatePaging, setFilter, setIsColumnHidden, setOrderBy }), [updatePaging, setFilter, setIsColumnHidden, setOrderBy]),
+		useMemo(() => ({ updatePaging, setFilter, setIsColumnHidden, setOrderBy, setLayout }), [updatePaging, setFilter, setIsColumnHidden, setOrderBy, setLayout]),
 	]
 }

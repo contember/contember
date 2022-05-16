@@ -60,8 +60,8 @@ export type ControlProps<V> =
 export type AllControlProps<V> = Omit<All<ControlProps<V>>, 'type'>
 export type ControlPropsKeys<V> = keyof ControlProps<V>
 
-export type VisuallyDependententControlProps =
+export type VisuallyDependentControlProps =
 	ControlStateProps
 	& ControlDisplayProps
 	& Pick<ValidationSteteProps, 'validationState'>
-export type AllVisuallyDependententControlProps = Omit<All<VisuallyDependententControlProps>, 'type'>
+export type AllVisuallyDependentControlProps = Omit<All<VisuallyDependentControlProps>, 'type'>

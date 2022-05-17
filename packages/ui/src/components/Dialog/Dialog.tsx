@@ -33,7 +33,7 @@ export const Dialog = (props: DialogProps) => {
 	const {
 		reject,
 		resolve,
-		settings: { content: RenderContent, bare, heading, type },
+		settings: { content: RenderContent, bare, gap = 'default', heading, type },
 	} = props.settings
 
 	const renderedContent = <RenderContent resolve={resolve} reject={reject} />
@@ -41,7 +41,7 @@ export const Dialog = (props: DialogProps) => {
 	return (
 		<div className={cn(`${prefix}dialog`, toEnumViewClass(type))}>
 			<div className={`${prefix}dialog-in`} ref={setContentElement}>
-				{bare ? renderedContent : <Box heading={heading}>{renderedContent}</Box>}
+				{bare ? renderedContent : <Box gap={gap} heading={heading}>{renderedContent}</Box>}
 			</div>
 		</div>
 	)

@@ -24,7 +24,7 @@ export const SaveButton = memo(
 		return <Button
 			ref={ref}
 			size={size ?? 'large'}
-			flow={flow ?? 'block'}
+			flow={flow}
 			scheme={scheme}
 			distinction={rest.disabled ? 'seamless' : isPrimary ? 'primary' : distinction}
 			{...rest}

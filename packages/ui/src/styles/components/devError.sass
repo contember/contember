@@ -2,13 +2,14 @@
 
 .#{$cui-conf-globalPrefix}devError
 	$root: &
-	+fixed(0)
+	+absolute(0)
 	+size(100vw 100vh)
 	z-index: 99
 	display: flex
 	justify-content: center
 	align-items: flex-start
 	background: rgba(212, 212, 212, 0.66)
+	font-family: Poppins, Roboto, sans-serif
 
 	&-in
 		z-index: 100
@@ -19,7 +20,7 @@
 		box-shadow: 3px 3px 10px rgba(50, 50, 50, 0.5)
 		display: flex
 		flex-direction: column
-		overflow: hidden auto
+		overflow: auto
 
 	&-header
 		background: #CD1818
@@ -40,9 +41,13 @@
 		margin-top: 0.5em
 		font-size: 1.7em
 
+
+	&-causeLink
+		color: #FFCC00
+		text-decoration: underline
+
 	&-stack
 		flex: 1 1 auto
-		overflow: auto
 		&-dump
 			color: #fff
 			margin-top: 1em
@@ -53,6 +58,12 @@
 		padding: 0.2em 0.2em 0.2em 1em
 		background: #ac1616
 		color: #eee
+		display: flex
+
+	&-causedBy
+		padding: 0.2em 0.2em 0.2em 1em
+		background: #FFCC00
+		color: #000
 		display: flex
 
 	&-actions

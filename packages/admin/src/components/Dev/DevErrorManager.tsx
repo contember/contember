@@ -1,6 +1,6 @@
 import { DevErrorBadge, DevErrorList, ErrorType } from '@contember/ui'
 import { useEffect, useState } from 'react'
-import { useParsedStacktrace } from './useParsedStacktrace'
+import { useProcessedError } from './useParsedStacktrace'
 
 export class ErrorBus {
 	private queue: { error: ErrorType, source: string }[] = []
@@ -52,7 +52,7 @@ export function DevErrorManager(props: DevErrorManagerProps) {
 	)
 
 	const currentError = errors[errIndex]
-	const stackTrace = useParsedStacktrace(currentError?.error)
+	const processedError = useProcessedError(currentError?.error)
 	if (!currentError) {
 		return null
 	}
@@ -64,10 +64,8 @@ export function DevErrorManager(props: DevErrorManagerProps) {
 	}
 	return (
 		<DevErrorList
-			currentError={{
-				...currentError,
-				parsedStacktrace: stackTrace,
-			}}
+			currentError={processedError}
+			currentErrorSource={currentError.source}
 			currentErrorIndex={errIndex}
 			errorCount={errors.length}
 			onPrevious={onPrevious}

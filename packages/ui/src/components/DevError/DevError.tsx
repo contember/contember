@@ -3,6 +3,7 @@ import { DevErrorInner, DevErrorInnerProps } from './DevErrorInner'
 
 export interface DevErrorProps extends DevErrorInnerProps
 {
+	source: string
 }
 
 export function DevError(props: DevErrorProps) {
@@ -13,7 +14,7 @@ export function DevError(props: DevErrorProps) {
 				<div className={`${prefix}devError-bar`}>
 					<div className={`${prefix}devError-errorSource`}>{props.source}</div>
 				</div>
-				<DevErrorInner {...props} />
+				<DevErrorInner error={props.error} />
 			</div>
 		</div>
 	)

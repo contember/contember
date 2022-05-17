@@ -1,4 +1,4 @@
-import { ErrorType, ParsedStackTrace } from '@contember/ui'
+import { ErrorType, ProcessedError } from '@contember/ui'
 import { useEffect, useState } from 'react'
 
 export const parseStacktrace = async (e: Error) => {
@@ -11,16 +11,30 @@ export const parseStacktrace = async (e: Error) => {
 		sourceCodeLines: it.sourceFile?.lines,
 	}))
 }
-export const useParsedStacktrace = (e: ErrorType): undefined | ParsedStackTrace => {
-	const [stackTrace, setStackTrace] = useState<ParsedStackTrace>()
+
+const createInitialError = (e: ErrorType): ProcessedError => ({
+	error: e,
+	cause: e instanceof Error && 'cause' in e && (e as any).cause !== undefined ? createInitialError((e as any).cause) : undefined,
+})
+
+export const useProcessedError = (e: ErrorType): ProcessedError => {
+	const [error, setError] = useState<ProcessedError>(() => createInitialError(e))
 	useEffect(() => {
-		setStackTrace(undefined)
+		setError(createInitialError(e))
 		if (!(e instanceof Error)) {
 			return
 		}
+		const createErrorWithStackTrace = async (e: ErrorType): Promise<ProcessedError> => {
+			return {
+				error: e,
+				parsedStackStrace: e instanceof Error ? await parseStacktrace(e) : undefined,
+				cause: e instanceof Error && 'cause' in e && (e as any).cause !== undefined ? await createErrorWithStackTrace((e as any).cause) : undefined,
+			}
+		}
 		(async () => {
-			setStackTrace(await parseStacktrace(e))
+			setError(await createErrorWithStackTrace(e))
 		})()
 	}, [e])
-	return stackTrace
+
+	return error
 }

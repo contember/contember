@@ -1,37 +1,45 @@
 import { useClassNamePrefix } from '../../auxiliary'
-import type { ErrorType, ParsedStackFrame } from './types'
+import type { ProcessedError } from './types'
 import { StackTrace } from './StackTrace'
 
 export interface DevErrorInnerProps
 {
-	error: ErrorType
-	parsedStacktrace?: ParsedStackFrame[]
-	source: string
+	error: ProcessedError
+	level?: number
 }
 
-export function DevErrorInner(props: DevErrorInnerProps) {
+export function DevErrorInner({ error, level = 1 }: DevErrorInnerProps) {
 	const prefix = useClassNamePrefix()
 
-	let error: Error | undefined = props.error instanceof Error ? props.error : undefined
+	let errorObject: Error | undefined = error.error instanceof Error ? error.error : undefined
 
 	return (
 		<>
-			<div className={`${prefix}devError-header`}>
-				{error ? (
+			<div className={`${prefix}devError-header`} >
+				{errorObject ? (
 					<>
-						<h1 className={`${prefix}devError-errorName`}>{error.name}</h1>
-						{error.message && <h2 className={`${prefix}devError-errorMessage`}>{error.message}</h2>}
+						<h1 className={`${prefix}devError-errorName`}>{errorObject.name}</h1>
+						{error.cause && <a href={`#error-${level}`} className={`${prefix}devError-causeLink`}>caused by &gt;</a>}
+						{errorObject.message && <h2 className={`${prefix}devError-errorMessage`}>{errorObject.message}</h2>}
 					</>
 				) : (
 					<h1 className={`${prefix}devError-errorName`}>Unknown error</h1>
 				)}
 			</div>
-			{props.parsedStacktrace ? (
-				<StackTrace stackTrace={props.parsedStacktrace} />
-			) : error?.stack ? (
+			{error.parsedStackStrace ? (
+				<StackTrace stackTrace={error.parsedStackStrace} />
+			) : errorObject?.stack ? (
 				<div className={`${prefix}devError-stack`}>
-					<div className={`${prefix}devError-stack-dump`}>{error.stack}</div>
+					<div className={`${prefix}devError-stack-dump`}>{errorObject.stack}</div>
 				</div>
+			) : null}
+			{error.cause ? (
+				<>
+					<div className={`${prefix}devError-causedBy`} id={`error-${level}`}>
+						Caused by
+					</div>
+					<DevErrorInner error={error.cause} level={level + 1} />
+				</>
 			) : null}
 		</>
 	)

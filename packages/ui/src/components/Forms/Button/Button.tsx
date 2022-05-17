@@ -79,6 +79,9 @@ export const BaseButton = memo(
 				toViewClass('bland', bland),
 			),
 			ref: ref,
+			...(props.disabled ? {
+				href: null,
+			} : undefined),
 		}
 		const content = (
 			<>

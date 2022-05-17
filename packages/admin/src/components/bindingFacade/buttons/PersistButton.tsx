@@ -24,7 +24,6 @@ export const PersistButton = memo(
 		<SaveButton
 			ref={ref}
 			disabled={isDisabled}
-			flow="block"
 			intent={isDisabled ? 'default' : props.intent}
 			isDirty={isDirty}
 			loading={isMutating}

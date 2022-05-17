@@ -27,7 +27,7 @@
 		color: #FFF
 		padding: 0.5em 1em
 
-	&-errorMessage, &-errorName
+	&-errorMessage, &-errorName, &-errorDetails
 		margin: 0
 		flex: 0 0 auto
 		font-weight: 300
@@ -41,6 +41,12 @@
 		margin-top: 0.5em
 		font-size: 1.7em
 
+	&-errorDetails
+		font-family: monospace
+		margin-top: 0.5em
+		font-size: 1em
+		white-space: pre
+		overflow-x: scroll
 
 	&-causeLink
 		color: #FFCC00

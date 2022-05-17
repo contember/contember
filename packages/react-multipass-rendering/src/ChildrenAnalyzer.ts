@@ -1,4 +1,4 @@
-import type { ElementType, ReactNode } from 'react'
+import type { ElementType, ReactElement, ReactNode } from 'react'
 import { assertNever } from './assertNever'
 import type { BranchNodeList } from './BranchNodeList'
 import { ChildrenAnalyzerError } from './ChildrenAnalyzerError'
@@ -8,12 +8,12 @@ import type { LeafList } from './LeafList'
 import type {
 	DeclarationSiteNodeRepresentationFactory,
 	RawNodeRepresentation,
-	RepresentationFactorySite,
 	StaticContextFactory,
 	SyntheticChildrenFactory,
 	UnconstrainedLeafRepresentationFactory,
 	ValidFactoryName,
 } from './nodeSpecs'
+import { wrapError } from './helpers/wrapError'
 
 export class ChildrenAnalyzer<
 	AllLeavesRepresentation = any,
@@ -66,7 +66,7 @@ export class ChildrenAnalyzer<
 		children: ReactNode,
 		initialStaticContext: StaticContext,
 	): Array<AllLeavesRepresentation | AllBranchNodesRepresentation> {
-		const processed = this.processNode(children, initialStaticContext)
+		const processed = this.processNode(children, initialStaticContext, [])
 
 		const rawResult: Array<AllLeavesRepresentation | AllBranchNodesRepresentation | undefined> = Array.isArray(
 			processed,
@@ -82,6 +82,7 @@ export class ChildrenAnalyzer<
 	private processNode(
 		node: ReactNode | Function,
 		staticContext: StaticContext,
+		componentPath: ReactElement[],
 	): RawNodeRepresentation<AllLeavesRepresentation, AllBranchNodesRepresentation> {
 		if (!node || typeof node === 'string' || typeof node === 'number' || typeof node === 'boolean') {
 			for (const leaf of this.leaves) {
@@ -114,7 +115,7 @@ export class ChildrenAnalyzer<
 			let mapped: Array<AllLeavesRepresentation | AllBranchNodesRepresentation> = []
 
 			for (const subNode of node) {
-				const processed = this.processNode(subNode, staticContext)
+				const processed = this.processNode(subNode, staticContext, componentPath)
 
 				if (processed !== undefined) {
 					if (Array.isArray(processed)) {
@@ -131,13 +132,13 @@ export class ChildrenAnalyzer<
 		let children: ReactNode = undefined
 
 		if (!('type' in node)) {
-			return this.processNode(children, staticContext)
+			return this.processNode(children, staticContext, componentPath)
 		}
 		children = node.props.children
 
 		if (typeof node.type === 'symbol') {
 			// Fragment, Portal or other non-component
-			return this.processNode(children, staticContext)
+			return this.processNode(children, staticContext, componentPath)
 		}
 		// if (typeof node.type === 'string') {
 		// 	// Typically a host component
@@ -158,18 +159,27 @@ export class ChildrenAnalyzer<
 					| DeclarationSiteNodeRepresentationFactory<any, unknown, AllBranchNodesRepresentation, StaticContext>
 			}
 
+		componentPath = [...componentPath, node]
 		if (typeof treeNode !== 'string') {
 			if (this.options.staticContextFactoryName in treeNode) {
 				const staticContextFactory = treeNode[this.options.staticContextFactoryName] as StaticContextFactory<
 					any,
 					StaticContext
 				>
-				staticContext = staticContextFactory(node.props, staticContext)
+				try {
+					staticContext = staticContextFactory(node.props, staticContext)
+				} catch (e) {
+					wrapError(e, treeNode.displayName ?? '???', this.options.staticContextFactoryName, componentPath)
+				}
 			}
 
 			if (this.options.staticRenderFactoryName in treeNode) {
 				const factory = treeNode[this.options.staticRenderFactoryName] as SyntheticChildrenFactory<any, StaticContext>
-				children = factory(node.props, staticContext)
+				try {
+					children = factory(node.props, staticContext)
+				} catch (e) {
+					wrapError(e, treeNode.displayName ?? '???', this.options.staticRenderFactoryName, componentPath)
+				}
 			}
 		}
 
@@ -201,7 +211,7 @@ export class ChildrenAnalyzer<
 			}
 		}
 
-		const processedChildren = this.processNode(children, staticContext)
+		const processedChildren = this.processNode(children, staticContext, componentPath)
 
 		for (const branchNode of this.branchNodes) {
 			const specification = branchNode.specification

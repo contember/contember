@@ -5,7 +5,7 @@
 	"license": "proprietary",
 	"type": "module",
 	"scripts": {
-		"start": "nodemon --exec tsm --ext ts src/run-admin.ts",
+		"start": "tsx watch src/run-admin.ts",
 		"build": "pnpm run build:public && pnpm run build:server",
 		"watch": "pnpm run watch:public && pnpm run watch:server",
 		"build:public": "vite build public --config vite.config.js",

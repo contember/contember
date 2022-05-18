@@ -1,8 +1,8 @@
-import { forwardRef, memo, ReactNode } from 'react'
+import { forwardRef, memo } from 'react'
 import { Button, ButtonProps } from './Forms/Button'
 
 export interface SaveButtonProps extends ButtonProps {
-	isPrimary?: ReactNode
+	isPrimary?: boolean
 	labelSave?: string
 	labelSaved?: string
 	isDirty: boolean

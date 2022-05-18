@@ -66,7 +66,7 @@ export const EditMembership: FC<EditMembershipProps> = ({ project, memberships, 
 										<Stack align="center" direction="horizontal" gap="none">
 											<Select
 												required
-												distinction="seamless"
+												distinction="seamless-with-padding"
 												onChange={role => {
 													if (typeof role === 'string' && (!membership || role !== membership.role)) {
 														updateMembership({ role, variables: [] })

@@ -1,18 +1,21 @@
 import type { ComponentMeta, ComponentStory } from '@storybook/react'
-import { Stack } from '../../src'
-import { Block, booleanControl, disabledControlsForAttributes } from './Helpers'
+import { CSSProperties } from 'react'
+import { Grid } from '../../src'
+import { Block, disabledControlsForAttributes } from './Helpers'
 
 export default {
-	title: 'Layout/Stack',
-	component: Stack,
+	title: 'Layout/Grid',
+	component: Grid,
 	argTypes: {
-		...disabledControlsForAttributes<typeof Stack>('children'),
-		evenly: booleanControl(false),
-		wrap: booleanControl(false),
+		...disabledControlsForAttributes<typeof Grid>('children'),
 	},
-} as ComponentMeta<typeof Stack>
+} as ComponentMeta<typeof Grid>
 
-const Template: ComponentStory<typeof Stack> = args => <Stack {...args}>
+const style: CSSProperties = {
+	flex: 1,
+}
+
+const Template: ComponentStory<typeof Grid> = args => <Grid {...args} style={style}>
 	{args.children ?? <>
 		<Block />
 		<Block />
@@ -20,18 +23,18 @@ const Template: ComponentStory<typeof Stack> = args => <Stack {...args}>
 		<Block />
 		<Block />
 	</>}
-</Stack>
+</Grid>
 
 export const Defaut = Template.bind({})
 
 Defaut.args = {
-	direction: 'vertical',
+	columnWidth: 120,
 }
 
 export const Many_children = Template.bind({})
 
 Many_children.args = {
-	direction: 'vertical',
+	columnWidth: 120,
 	children: <>
 		<Block />
 		<Block />

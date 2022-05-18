@@ -1,10 +1,9 @@
 import type { ComponentMeta, ComponentStory } from '@storybook/react'
-import * as React from 'react'
 import { Radio } from '../../src'
 import { booleanControl, disabledControlsForAttributes, enumControl, stringControl } from './Helpers'
 
 export default {
-	title: 'Radio',
+	title: 'Forms/Radio',
 	component: Radio,
 	argTypes: {
 		...disabledControlsForAttributes<typeof Radio>('options', 'RadioButtonComponent'),

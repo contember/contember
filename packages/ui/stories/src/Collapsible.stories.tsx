@@ -1,11 +1,10 @@
 import type { ComponentMeta, ComponentStory } from '@storybook/react'
-import * as React from 'react'
 import { Collapsible } from '../../src'
 import { booleanControl } from './Helpers'
 
 
 export default {
-	title: 'Collapsible',
+	title: 'Containers/Collapsible',
 	component: Collapsible,
 	decorators: [
 		Story => <>

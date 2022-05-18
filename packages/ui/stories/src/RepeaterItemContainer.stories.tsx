@@ -6,7 +6,7 @@ import { Block, disabledControlsForAttributes, enumControl, stringControl } from
 const sizes: Size[] = ['default', 'small', 'large']
 
 export default {
-	title: 'RepeaterItemContainer',
+	title: 'Containers/RepeaterItemContainer',
 	component: RepeaterItemContainer,
 	argTypes: {
 		...disabledControlsForAttributes<typeof RepeaterItemContainer>('children', 'actions', 'dragHandleComponent'),

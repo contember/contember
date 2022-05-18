@@ -1,10 +1,13 @@
 import type { ComponentMeta, ComponentStory } from '@storybook/react'
-import * as React from 'react'
 import { SaveButton } from '../../src'
+import { booleanControl } from './Helpers'
 
 export default {
-	title: 'SaveButton',
+	title: 'Forms/SaveButton',
 	component: SaveButton,
+	argTypes: {
+		isPrimary: booleanControl(true),
+	},
 	decorators: [
 		Story => <div style={{ display: 'flex', flex: 1, flexDirection: 'column' }}>
 			<p>Container set to align children flex-start:</p>
@@ -39,5 +42,6 @@ Defaut.args = {}
 export const Translated = Template.bind({})
 
 Translated.args = {
-	children: 'Uložit',
+	labelSave: 'Uložit',
+	labelSaved: 'Uložit',
 }

@@ -1,10 +1,9 @@
 import type { ComponentMeta, ComponentStory } from '@storybook/react'
-import * as React from 'react'
 import { Divider } from '../../src'
 import { Block, DirectionStack } from './Helpers'
 
 export default {
-	title: 'Divider',
+	title: 'Layout/Divider',
 	component: Divider,
 } as ComponentMeta<typeof Divider>
 

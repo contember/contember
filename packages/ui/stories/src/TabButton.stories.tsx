@@ -1,10 +1,9 @@
 import type { ComponentMeta, ComponentStory } from '@storybook/react'
-import * as React from 'react'
 import { TabButton } from '../../src'
 import { booleanControl } from './Helpers'
 
 export default {
-	title: 'TabButton',
+	title: 'Navigation/TabButton',
 	component: TabButton,
 	argTypes: {
 		isDisabled: booleanControl(false),

@@ -4,7 +4,7 @@ import { AnchorButton, Button, TitleBar } from '../../src'
 import { disabledControlsForAttributes, stringControl } from './Helpers'
 
 export default {
-	title: 'TitleBar',
+	title: 'Layout/TitleBar',
 	component: TitleBar,
 	argTypes: {
 		...disabledControlsForAttributes<typeof TitleBar>('actions', 'headingProps', 'navigation'),

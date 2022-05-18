@@ -1,10 +1,9 @@
 import type { ComponentMeta, ComponentStory } from '@storybook/react'
-import * as React from 'react'
 import { Aether } from '../../src'
 import { disabledControlsForAttributes } from './Helpers'
 
 export default {
-	title: 'Aether',
+	title: 'Containers/Aether',
 	component: Aether,
   argTypes: disabledControlsForAttributes<typeof Aether>('children', 'ref', 'style'),
 } as ComponentMeta<typeof Aether>

@@ -6,7 +6,7 @@ import { Button } from '../ui/Button'
 import { booleanControl, disabledControlsForAttributes } from './Helpers'
 
 export default {
-	title: 'Select',
+	title: 'Forms/Select',
 	component: Select,
 	argTypes: {
 		...disabledControlsForAttributes<typeof Select>('options'),

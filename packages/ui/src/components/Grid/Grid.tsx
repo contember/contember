@@ -16,6 +16,7 @@ export const Grid = memo(
       className,
       columnWidth,
       children,
+      style: styleProp,
       ...rest
     }: GridProps, forwardedRef) => {
       if (columnWidth < 0) {
@@ -26,7 +27,8 @@ export const Grid = memo(
       const componentClassName = useComponentClassName('grid')
       const style: CSSProperties | undefined = useMemo(() => columnWidth ? ({
         ['--cui-grid-column-width' as any]: `${columnWidth}px`,
-      }) : undefined, [columnWidth])
+        ...styleProp,
+      }) : styleProp, [columnWidth, styleProp])
 
       return (
         <div

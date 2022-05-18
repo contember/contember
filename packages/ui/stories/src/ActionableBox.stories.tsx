@@ -1,10 +1,9 @@
 import type { ComponentMeta, ComponentStory } from '@storybook/react'
-import * as React from 'react'
 import { ActionableBox, Aether } from '../../src'
 import { disabledControlsForAttributes } from './Helpers'
 
 export default {
-	title: 'ActionableBox',
+	title: 'Containers/ActionableBox',
 	component: ActionableBox,
 	decorators: [
 		Story => (

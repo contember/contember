@@ -6,7 +6,7 @@ import { Button } from '../ui/Button'
 import { booleanControl, enumControl, numberControl, stringControl } from './Helpers'
 
 export default {
-	title: 'TextareaInput',
+	title: 'Forms/TextareaInput',
 	component: TextareaInput,
 	argTypes: {
 		active: booleanControl(false),

@@ -1,9 +1,8 @@
 import type { ComponentMeta, ComponentStory } from '@storybook/react'
-import * as React from 'react'
 import { Button, ButtonGroup } from '../../src'
 
 export default {
-	title: 'ButtonGroup',
+	title: 'Forms/ButtonGroup',
 	component: ButtonGroup,
   argTypes: {
     isTopToolbar: { defaultValue: false },

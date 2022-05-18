@@ -10,7 +10,7 @@ const distinctions: ButtonDistinction[] = ['default', 'primary', 'toned', 'outli
 const justifications: Justification[] = ['default', 'justifyStart', 'justifyCenter', 'justifyEnd']
 
 export default {
-	title: 'Button',
+	title: 'Forms/Button',
 	component: Button,
 	decorators: [
 		Story => <>

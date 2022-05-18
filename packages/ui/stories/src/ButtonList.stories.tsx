@@ -1,9 +1,8 @@
 import type { ComponentMeta, ComponentStory } from '@storybook/react'
-import * as React from 'react'
 import { Button, ButtonList } from '../../src'
 
 export default {
-	title: 'ButtonList',
+	title: 'Forms/ButtonList',
 	component: ButtonList,
 } as ComponentMeta<typeof ButtonList>
 

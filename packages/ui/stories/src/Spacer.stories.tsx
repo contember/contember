@@ -1,10 +1,9 @@
 import type { ComponentMeta, ComponentStory } from '@storybook/react'
-import * as React from 'react'
 import { Spacer } from '../../src'
 import { Block, DirectionStack } from './Helpers'
 
 export default {
-	title: 'Spacer',
+	title: 'Layout/Spacer',
 	component: Spacer,
 } as ComponentMeta<typeof Spacer>
 

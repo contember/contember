@@ -126,7 +126,7 @@ const ThemePreview = ({ background, belowAbove, children }: ThemaPreviewProps) =
 </>
 
 export default {
-	title: 'ThemePreview',
+	title: 'Misc/Theming & Schemes',
 	component: ThemePreview,
   argTypes: {
     background: enumControl(backgrounds, 'inline-radio'),

@@ -5,7 +5,7 @@ import { Checkbox } from '../../src'
 import { booleanControl, disabledControlsForAttributes, enumControl } from './Helpers'
 
 export default {
-	title: 'Checkbox',
+	title: 'Forms/Checkbox',
 	component: Checkbox,
 	argTypes: {
 		...disabledControlsForAttributes<typeof Checkbox>('CheckboxButtonComponent'),

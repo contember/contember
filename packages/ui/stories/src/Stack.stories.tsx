@@ -1,10 +1,9 @@
 import type { ComponentMeta, ComponentStory } from '@storybook/react'
-import * as React from 'react'
 import { Stack } from '../../src'
 import { Block, booleanControl, disabledControlsForAttributes } from './Helpers'
 
 export default {
-	title: 'Stack',
+	title: 'Layout/Stack',
 	component: Stack,
 	argTypes: {
 		...disabledControlsForAttributes<typeof Stack>('children'),

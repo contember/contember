@@ -1,10 +1,9 @@
 import type { ComponentMeta, ComponentStory } from '@storybook/react'
-import * as React from 'react'
 import { Breadcrumbs } from '../../src'
 import { disabledControlsForAttributes } from './Helpers'
 
 export default {
-	title: 'Breadcrumbs',
+	title: 'Navigation/Breadcrumbs',
 	component: Breadcrumbs,
 	argTypes: disabledControlsForAttributes<typeof Breadcrumbs>('items'),
 } as ComponentMeta<typeof Breadcrumbs>

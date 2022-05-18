@@ -1,11 +1,11 @@
 import { IncomingMessage } from 'http'
-import ipaddr, { IPv4 } from 'ipaddr.js'
+import ipaddr from 'ipaddr.js'
 import { TLSSocket } from 'tls'
 
 export const isProxyRequest = (req: IncomingMessage): boolean => {
 	const ip = ipaddr.parse(req.socket.remoteAddress ?? '0.0.0.0')
 
-	if (ip instanceof IPv4) {
+	if (ip instanceof ipaddr.IPv4) {
 		return ip.range() === 'private'
 
 	} else if (ip.range() === 'ipv4Mapped') {

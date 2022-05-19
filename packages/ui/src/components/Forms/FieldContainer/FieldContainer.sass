@@ -7,7 +7,10 @@
 	flex-direction: column
 	row-gap: calc(2 * var(--cui-gap-vertical))
 
-	.#{$cui-conf-globalPrefix}layout-page-content-wrap &
+	&.width-fluid
+		max-width: 100%
+
+	.#{$cui-conf-globalPrefix}layout-page-content-wrap &.width-column
 		min-width: var(--cui-field-container-min-width)
 	.#{$cui-conf-globalPrefix}layout-page-content-wrap & &
 		min-width: unset

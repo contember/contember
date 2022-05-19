@@ -1,33 +1,32 @@
 import classNames from 'classnames'
 import { memo, ReactNode } from 'react'
 import { useClassNamePrefix } from '../../../auxiliary'
-import type { Size } from '../../../types'
-import { toEnumViewClass, toThemeClass } from '../../../utils'
+import type { NativeProps, Size } from '../../../types'
+import { toEnumClass, toEnumViewClass, toThemeClass } from '../../../utils'
 import { Stack, StackProps } from '../../Stack'
 import { Description } from '../../Typography/Description'
 import { Label } from '../../Typography/Label'
 import { ErrorList, ErrorListProps } from '../ErrorList'
 import type { FieldContainerLabelPosition } from './Types'
 
-export interface FieldContainerProps extends ErrorListProps {
-	label: ReactNode
+export interface FieldContainerProps extends ErrorListProps, Pick<NativeProps<HTMLDivElement>, 'className' | 'style'> {
 	children: ReactNode // The actual field
+	description?: ReactNode // Can explain e.g. the kinds of values to be filled
 	direction?: StackProps['direction']
 	gap?: Size | 'none'
-
-	size?: Size
-	labelPosition?: FieldContainerLabelPosition
-
+	label: ReactNode
 	labelDescription?: ReactNode // Expands on the label e.g. to provide the additional explanation
-	description?: ReactNode // Can explain e.g. the kinds of values to be filled
-
+	labelPosition?: FieldContainerLabelPosition
+	width?: 'column' | 'fluid' | 'none'
 	required?: boolean
+	size?: Size
 	useLabelElement?: boolean
 }
 
 export const FieldContainer = memo(
 	({
 		children,
+		className,
 		description,
 		direction = 'vertical',
 		errors,
@@ -35,20 +34,27 @@ export const FieldContainer = memo(
 		label,
 		labelDescription,
 		labelPosition,
+		width = 'column',
 		required,
 		size,
 		useLabelElement = true,
+		...rest
 	}: FieldContainerProps) => {
 		const LabelElement = useLabelElement ? 'label' : 'div'
 		const componentClassName = `${useClassNamePrefix()}field-container`
 
 		return (
-			<div className={classNames(
-				`${componentClassName}`,
-				toEnumViewClass(size),
-				toEnumViewClass(labelPosition),
-				errors?.length ? toThemeClass(null, 'danger') : null,
-			)}>
+			<div
+				{...rest}
+				className={classNames(
+					`${componentClassName}`,
+					toEnumViewClass(size),
+					toEnumViewClass(labelPosition),
+					toEnumClass('width-', width === 'none' ? undefined : width),
+					errors?.length ? toThemeClass(null, 'danger') : null,
+					className,
+				)}
+			>
 				<LabelElement className={`${componentClassName}-label`}>
 					{(label || labelDescription) && <span className={`${componentClassName}-header`}>
 							{label && <Label>

@@ -125,10 +125,6 @@ namespace SideDimensions {
 		}
 
 		public static generateEnvironment(props: SingleDimensionProps, oldEnvironment: Environment): Environment {
-			if (!props.variables) {
-				return oldEnvironment
-			}
-
 			let deltaFactory: Environment.DeltaFactory
 
 			if (typeof props.variables === 'function') {

@@ -4,6 +4,8 @@
 	@extend %controlStates
 	@extend %controlVariants
 
+	--select-min-height: calc(var(--cui-min-height) - 2 * var(--cui-control-border-width))
+
 	appearance: none
 	-moz-appearance: none
 	-webkit-appearance: none
@@ -11,8 +13,8 @@
 	padding-right: var(--cui-padding-horizontal)
 	&:not(.view-rows)
 		padding-right: var(--cui-min-height)
-	padding-bottom: calc((var(--cui-min-height) - var(--cui-control-line-height) * 1em) / 2)
-	padding-top: calc((var(--cui-min-height) - var(--cui-control-line-height) * 1em) / 2)
+	padding-bottom: calc((var(--select-min-height) - var(--cui-control-line-height) * 1em) / 2)
+	padding-top: calc((var(--select-min-height) - var(--cui-control-line-height) * 1em) / 2)
 
 	&::-ms-expand
 		display: none

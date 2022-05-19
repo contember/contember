@@ -1,5 +1,5 @@
 import type { ComponentMeta, ComponentStory } from '@storybook/react'
-import { AnchorButton, Button, ButtonDistinction, ButtonFlow, Intent, Justification, Scheme, Size } from '../../src'
+import { AnchorButton, Button, ButtonDistinction, ButtonElevation, ButtonFlow, Intent, Justification, Scheme, Size } from '../../src'
 import { booleanControl, enumControl } from './Helpers'
 
 const intents: Intent[] = ['default', 'primary', 'secondary', 'tertiary', 'positive', 'success', 'warn', 'danger']
@@ -8,6 +8,7 @@ const sizes: Size[] = ['default', 'small', 'large']
 const flows: ButtonFlow[] = ['default', 'circular', 'squarish', 'generous', 'block', 'generousBlock']
 const distinctions: ButtonDistinction[] = ['default', 'primary', 'toned', 'outlined', 'seamless']
 const justifications: Justification[] = ['default', 'justifyStart', 'justifyCenter', 'justifyEnd']
+const buttonElevations: ButtonElevation[] = ['default', 'none']
 
 export default {
 	title: 'Forms/Button',
@@ -42,6 +43,7 @@ export default {
 		loading: booleanControl(false),
 		scheme: enumControl(schemes, 'select', undefined),
 		size: enumControl(sizes, 'inline-radio', 'default'),
+		elevation: enumControl(buttonElevations, 'inline-radio', 'default'),
 	},
 } as ComponentMeta<typeof Button>
 

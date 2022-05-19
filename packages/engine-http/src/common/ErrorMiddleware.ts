@@ -13,8 +13,8 @@ export class ErrorMiddlewareFactory {
 			try {
 				await next()
 			} catch (e) {
+				ctx.set('Content-type', 'application/json')
 				if (e instanceof HttpError) {
-					ctx.set('Content-type', 'application/json')
 					ctx.status = e.code
 					const body: any = { errors: [{ message: e.message, code: e.code }] }
 					if (this.debug && ctx.state.authResult) {
@@ -24,7 +24,10 @@ export class ErrorMiddlewareFactory {
 					}
 					ctx.body = JSON.stringify(body)
 				} else {
-					throw e
+					ctx.status = 500
+					ctx.body = JSON.stringify({ errors: [{ message: 'Internal server error' }] })
+					// eslint-disable-next-line no-console
+					console.error(e)
 				}
 			}
 		}

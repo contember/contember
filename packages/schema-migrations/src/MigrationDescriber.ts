@@ -6,10 +6,10 @@ import {
 	emptyModificationDescriptionContext,
 	ModificationDescription,
 	ModificationDescriptionContext,
-	ModificationHandler, ModificationHandlerOptions,
+	ModificationHandler,
+	ModificationHandlerOptions,
 } from './modifications/ModificationHandler'
 import { CreateEntityModification } from './modifications/entities'
-import { SchemaValidator, ValidationError } from '@contember/schema-utils'
 import { SchemaUpdateError } from './modifications/exceptions'
 
 export interface ModificationDescriptionResult {
@@ -18,7 +18,6 @@ export interface ModificationDescriptionResult {
 	schema: Schema
 	description: ModificationDescription
 	handler: ModificationHandler<any>
-	errors: ValidationError[]
 }
 
 export class MigrationDescriber {
@@ -47,13 +46,11 @@ export class MigrationDescriber {
 			throw new SchemaUpdateError(e.message + '\n for modification: \n' + JSON.stringify(modification))
 		}
 		await modificationHandler.createSql(builder)
-		const errors = SchemaValidator.validate(schema)
 		return {
 			modification,
 			schema,
 			sql: builder.getSql(),
 			description: modificationHandler.describe(modificationDescriptionContext),
-			errors,
 			handler: modificationHandler,
 		}
 	}

@@ -8,6 +8,7 @@ import { DatabaseContext } from '../database'
 import { ExecutedMigrationsResolver } from './ExecutedMigrationsResolver'
 import { MigrateErrorCode } from '../../schema'
 import { SchemaVersionBuilder } from './SchemaVersionBuilder'
+import { SchemaValidator } from '@contember/schema-utils'
 
 export class ProjectMigrator {
 	constructor(
@@ -74,11 +75,12 @@ export class ProjectMigrator {
 			}
 			const latestModification = described[described.length - 1]
 			schema = latestModification.schema
-			if (latestModification.errors.length > 0) {
+			const errors = SchemaValidator.validate(schema)
+			if (errors.length > 0) {
 				throw new InvalidSchemaError(
 					migration.version,
 					'Migration generates invalid schema: \n' +
-						latestModification.errors.map(it => it.path.join('.') + ': ' + it.message).join('\n'),
+					errors.map(it => it.path.join('.') + ': ' + it.message).join('\n'),
 				)
 			}
 		}

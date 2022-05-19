@@ -1,9 +1,10 @@
 import cn from 'classnames'
 import { ButtonHTMLAttributes, createElement, forwardRef, memo, ReactNode } from 'react'
 import { useClassNamePrefix } from '../../../auxiliary'
-import type { ButtonDistinction, ButtonFlow, Intent, Justification, Scheme, Size } from '../../../types'
-import { toEnumViewClass, toSchemeClass, toStateClass, toThemeClass, toViewClass } from '../../../utils'
+import type { Intent, Justification, Scheme, Size } from '../../../types'
+import { toEnumClass, toEnumViewClass, toSchemeClass, toStateClass, toThemeClass, toViewClass } from '../../../utils'
 import { Spinner } from '../../Spinner'
+import type { ButtonDistinction, ButtonElevation, ButtonFlow } from './Types'
 
 type PropBlackList = 'ref' | 'size'
 
@@ -27,6 +28,7 @@ export interface ButtonOwnProps {
 	bland?: boolean
 	children?: ReactNode
 	scheme?: Scheme
+	elevation?: ButtonElevation
 }
 
 export type ButtonProps = ButtonOwnProps & Omit<ButtonBasedProps, 'Component'>
@@ -50,7 +52,7 @@ Button.displayName = 'Button'
 
 export const BaseButton = memo(
 	forwardRef<any, BaseButtonProps>((props, ref) => {
-		const { Component, intent, size, flow, distinction, justification, loading, active, bland, children, scheme, ...rest } =
+		const { Component, intent, size, flow, distinction, elevation, justification, loading, active, bland, children, scheme, ...rest } =
 			props
 
 		if (props.disabled === true) {
@@ -77,6 +79,7 @@ export const BaseButton = memo(
 				toStateClass('loading', loading),
 				toStateClass('active', active),
 				toViewClass('bland', bland),
+				toEnumClass('elevation-', elevation),
 			),
 			ref: ref,
 			...(props.disabled ? {

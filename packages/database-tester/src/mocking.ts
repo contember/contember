@@ -90,14 +90,8 @@ ${expected.sql}`
 		return new Client(this, schema, meta, new EventManager(this.eventManager))
 	}
 
-	getPoolStatus(): PoolStatus {
-		return {
-			max: 1,
-			idle: 0,
-			pending: 0,
-			active: 0,
-			connecting: 0,
-		}
+	getPoolStatus() {
+		return undefined
 	}
 }
 

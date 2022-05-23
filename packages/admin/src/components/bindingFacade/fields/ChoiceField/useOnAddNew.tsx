@@ -2,13 +2,9 @@ import {
 	AccessorTree,
 	Entity,
 	EntityAccessor,
-	InitializedAccessorTreeState,
 	NIL_UUID,
-	TreeRootAccessor,
-	useBindingOperations,
-	useDirtinessState,
+	useAccessorTreeState,
 	useGetEntityListSubTree,
-	useMutationState,
 } from '@contember/binding'
 import { BaseDynamicChoiceField, useDesugaredOptionPath } from './BaseDynamicChoiceField'
 import { useMemo } from 'react'
@@ -20,18 +16,9 @@ export const useOnAddNew = ({ createNewForm, connect, ...props }: BaseDynamicCho
 	const desugaredOptionPath = useDesugaredOptionPath(props)
 	const getSubTree = useGetEntityListSubTree()
 	const dialog = useDialog<true>()
-	const hasUnpersistedChanges = useDirtinessState()
-	const bindingOperations = useBindingOperations()
-	const isMutating = useMutationState()
 	const localization = useMessageFormatter(choiceFieldDictionary)
 
-	const currentAccessorTreeState = useMemo(
-		(): InitializedAccessorTreeState => ({
-			name: 'initialized',
-			data: new TreeRootAccessor(hasUnpersistedChanges, isMutating, bindingOperations),
-		}),
-		[hasUnpersistedChanges, isMutating, bindingOperations],
-	)
+	const accessorTreeState = useAccessorTreeState()
 	return useMemo(() => {
 			if (!createNewForm) {
 				return undefined
@@ -50,7 +37,7 @@ export const useOnAddNew = ({ createNewForm, connect, ...props }: BaseDynamicCho
 					heading: localization('choiceField.createNew.dialogTitle'),
 					content: contentProps => (
 						<Stack direction="vertical">
-							<AccessorTree state={currentAccessorTreeState}>
+							<AccessorTree state={accessorTreeState}>
 								<Entity accessor={entity}>{createNewForm}</Entity>
 							</AccessorTree>
 							<ButtonList>
@@ -68,6 +55,6 @@ export const useOnAddNew = ({ createNewForm, connect, ...props }: BaseDynamicCho
 					entity.deleteEntity()
 				}
 			}
-		}, [createNewForm, getSubTree, desugaredOptionPath.entityName, dialog, currentAccessorTreeState, localization, connect],
+		}, [createNewForm, getSubTree, desugaredOptionPath.entityName, dialog, accessorTreeState, localization, connect],
 	)
 }

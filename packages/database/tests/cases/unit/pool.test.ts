@@ -295,20 +295,26 @@ it('fails to reconnect on recoverable error', async () => {
 it('fails to reconnect on unrecoverable error', async () => {
 	const logger = createPoolLogger()
 	const pgClientMock = new PgClientMock()
-	pgClientMock.on('error', () => {
-	})
 	const pool = new Pool(() => pgClientMock as unknown as PgClient, {
 		log: logger,
+		acquireTimeoutMs: 3,
 	})
 	pgClientMock.connections.push(createErrorPromise())
-	await expect(async () => await pool.acquire()).rejects.toThrowError('Database client error: my err')
-	await timeout()
+	const poolError = new Promise((resolve, reject) => pool.once('error', e => {
+		reject(e)
+	}))
+
+	await expect(pool.acquire.bind(pool)).rejects.toThrowError('Failed to acquire a connection')
+	await expect(poolError).rejects.toThrowError('my err')
+
+	await timeout(4)
 	expect(logger.messages).toMatchInlineSnapshot(`
 		CAI P
 		000 1: Item added to a queue.
 		000 1: Creating a new connection
 		100 1: Connection error occurred: my err
-		000 0: Connecting failed, rejecting pending item
+		000 1: Connecting failed, emitting error
+		000 0: Queued item timed out
 	`)
 })
 

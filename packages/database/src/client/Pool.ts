@@ -327,14 +327,8 @@ class Pool extends EventEmitter {
 			} else {
 				this.poolStats.connection_error_count++
 				this.connectingCount--
-				const pendingItem = this.queue.shift()
-				if (pendingItem) {
-					this.log('Connecting failed, rejecting pending item')
-					pendingItem.reject(new ClientError(e))
-				} else {
-					this.log('Connecting failed, emitting error')
-					this.emit('error', e)
-				}
+				this.log('Connecting failed, emitting error')
+				this.emit('error', e)
 			}
 			return
 		}

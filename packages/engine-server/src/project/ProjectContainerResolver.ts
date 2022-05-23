@@ -21,20 +21,8 @@ export class ProjectContainerResolver {
 		private readonly tenantConfig: TenantConfig,
 	) {}
 
-	public async getAllProjectContainers(): Promise<ProjectContainer[]> {
-		const projects = await this.projectManager.getProjects(this.tenantDatabase)
-		return await Promise.all(
-			projects.map(async it => {
-				const container = await this.getProjectContainer(it.slug)
-				if (!container) {
-					throw new Error('should not happen')
-				}
-				return container
-			}),
-		)
-	}
 
-	public async getProjectContainer(slug: string, alias: boolean = false): Promise<ProjectContainer | undefined> {
+	public async getProjectContainer(slug: string, { alias = false, logger }: {alias?: boolean; logger?: Logger} = {}): Promise<ProjectContainer | undefined> {
 		const realSlug = this.projectContainers.resolveAlias(slug)
 		if (realSlug) {
 			slug = realSlug
@@ -55,14 +43,14 @@ export class ProjectContainerResolver {
 		if (!project) {
 			return undefined
 		}
-		const container = await this.createProjectContainer(project)
+		const container = await this.createProjectContainer(project, logger)
 		if (slug !== project.slug) {
 			this.projectContainers.setAlias(project.slug, slug)
 		}
 		return container
 	}
 
-	public async createProjectContainer(project: ProjectWithSecrets): Promise<ProjectContainer> {
+	public async createProjectContainer(project: ProjectWithSecrets, logger?: Logger): Promise<ProjectContainer> {
 		const projectConfig = this.projectConfigResolver(project.slug, project.config, project.secrets, this.tenantConfig)
 		return (await this.projectContainers.fetchContainer(project.slug, async slug => {
 			const projectContainer = this.projectContainerFactory.createContainer({
@@ -71,8 +59,7 @@ export class ProjectContainerResolver {
 			await this.systemProjectInitializer.initialize(
 				projectContainer.systemDatabaseContextFactory,
 				projectContainer.project,
-				// eslint-disable-next-line no-console
-				new Logger(console.log),
+				logger ?? new Logger(() => null),
 			)
 			const cleanups = this.onCreate.map(it => it(projectContainer) || (() => null))
 			return {

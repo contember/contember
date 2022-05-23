@@ -194,6 +194,14 @@ class Pool extends EventEmitter {
 	}
 
 
+	public async closeIdle(): Promise<void> {
+		this.log('Disposing all idle connection on request.')
+		const idle = this.idle
+		this.idle = []
+		await Promise.allSettled(idle.map(it => this.disposeConnection(it)))
+	}
+
+
 	public getPoolStatus(): PoolStatus {
 		return {
 			max: this.poolConfig.maxConnections,
@@ -329,9 +337,9 @@ class Pool extends EventEmitter {
 				const index = this.idle.indexOf(poolConnection)
 				if (index > -1) {
 					this.idle.splice(index, 1)
+					await this.disposeConnection(poolConnection)
+					this.log('Idle connection disposed after timeout.')
 				}
-				await this.disposeConnection(poolConnection)
-				this.log('Idle connection disposed after timeout.')
 			}, this.poolConfig.idleTimeoutMs)
 			this.idle.push(poolConnection)
 			this.log('Connection is idle and available.')
@@ -340,6 +348,9 @@ class Pool extends EventEmitter {
 
 	private async disposeConnection(connection: PoolConnection) {
 		try {
+			if (connection.disposed) {
+				throw new PoolError('Connection is already disposed')
+			}
 			connection.disposed = true
 			await connection.client.end()
 		} catch (e: any) {

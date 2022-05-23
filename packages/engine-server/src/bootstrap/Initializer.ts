@@ -13,15 +13,25 @@ export class Initializer {
 		// todo
 		const groupContainer = await this.projectGroupContainer
 
-		await groupContainer.tenantContainer.migrationsRunner.run(logger.write.bind(logger))
+		const tenantContainer = groupContainer.tenantContainer
+		await tenantContainer.migrationsRunner.run(logger.write.bind(logger))
 		logger.groupEnd()
 
 		const systemContainer = groupContainer.systemContainer
 		const projects: string[] = []
-		for (const projectContainer of await groupContainer.projectContainerResolver.getAllProjectContainers()) {
+
+		const tenantProjects = await tenantContainer.projectManager.getProjects(tenantContainer.databaseContext)
+		for (const { slug: projectSlug } of tenantProjects) {
+			logger.group(`\nUpdating project ${projectSlug}`)
+			const projectContainer = await groupContainer.projectContainerResolver.getProjectContainer(projectSlug, {
+				alias: false,
+				logger,
+			})
+			if (!projectContainer) {
+				throw new Error()
+			}
 			const project = projectContainer.project
 			projects.push(project.slug)
-			logger.group(`\nUpdating project ${project.slug}`)
 			await systemContainer.projectInitializer.initialize(projectContainer.systemDatabaseContextFactory, project, logger)
 			logger.groupEnd()
 		}

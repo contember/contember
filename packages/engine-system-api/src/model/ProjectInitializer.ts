@@ -50,11 +50,15 @@ export class ProjectInitializer {
 			await singleConnection.end()
 			logger.groupEnd()
 		}
-		return await retryTransaction(() =>
+		const result = await retryTransaction(() =>
 			dbContext.transaction(async trx => {
 				await this.initStages(trx, project, logger, migrations)
 			}),
 		)
+		if (dbContext.client.connection instanceof Connection) {
+			await dbContext.client.connection.clearPool()
+		}
+		return result
 	}
 
 	private async initStages(

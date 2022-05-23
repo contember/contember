@@ -9,7 +9,7 @@ import {
 	useEnvironment,
 } from '@contember/binding'
 import { Spinner } from '@contember/ui'
-import { memo } from 'react'
+import { memo, useMemo } from 'react'
 import { DimensionsRenderer, DimensionsRendererProps } from './DimensionsRenderer'
 
 export interface DimensionsSwitcherBaseProps
@@ -51,10 +51,11 @@ export const DimensionsSwitcher = memo((props: DimensionsSwitcherProps) => {
 		},
 		environment,
 	)
+	const key = useMemo(() => JSON.stringify(qualifiedEntityList), [qualifiedEntityList])
 	const labelFactory = <Field field={props.labelField} />
 
 	return (
-		<DataBindingProvider stateComponent={DimensionsStateRenderer} refreshOnEnvironmentChange={false}>
+		<DataBindingProvider stateComponent={DimensionsStateRenderer} refreshOnEnvironmentChange={false} key={key}>
 			<EntityListSubTree
 				entities={qualifiedEntityList}
 				orderBy={qualifiedEntityList.orderBy}

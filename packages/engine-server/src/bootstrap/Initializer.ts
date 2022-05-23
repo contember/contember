@@ -1,9 +1,9 @@
 import { Logger } from '@contember/engine-common'
-import { ProjectGroupContainerResolver } from '../projectGroup/ProjectGroupContainerResolver'
+import { ProjectGroupContainer } from '@contember/engine-http'
 
 export class Initializer {
 	constructor(
-		private readonly projectGroupContainerResolver: ProjectGroupContainerResolver,
+		private readonly projectGroupContainer: ProjectGroupContainer,
 	) {}
 
 	public async initialize(): Promise<string[]> {
@@ -11,7 +11,7 @@ export class Initializer {
 		const logger = new Logger(console.log)
 		logger.group('\nInitializing tenant database')
 		// todo
-		const groupContainer = await this.projectGroupContainerResolver.getProjectGroupContainer(undefined)
+		const groupContainer = await this.projectGroupContainer
 
 		await groupContainer.tenantContainer.migrationsRunner.run(logger.write.bind(logger))
 		logger.groupEnd()

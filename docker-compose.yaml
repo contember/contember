@@ -59,7 +59,7 @@ services:
       - node
       - --expose-gc
       - --inspect=0.0.0.0:4002
-      - ./packages/engine-server/dist/src/start.js
+      - ./ee/engine-server-ee/dist/src/start.js
   mailhog:
     image: mailhog/mailhog
 volumes:

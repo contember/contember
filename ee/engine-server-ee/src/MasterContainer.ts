@@ -1,7 +1,6 @@
-import { createDbMetricsRegistrar, ProcessType } from './utils'
+import { ProcessType } from './utils'
 import { createColllectHttpMetricsMiddleware, createShowMetricsMiddleware } from './http'
 import { compose, CryptoWrapper, Koa, KoaMiddleware } from '@contember/engine-http'
-import prom, { Gauge } from 'prom-client'
 import { createSecretKey } from 'crypto'
 import { ProjectGroupContainerResolver } from './projectGroup/ProjectGroupContainerResolver'
 import { ProjectGroupResolver } from './projectGroup/ProjectGroupResolver'
@@ -11,6 +10,8 @@ import {
 	MasterContainerFactory as BaseMasterContainerFactory,
 } from '@contember/engine-server'
 import { ServerConfig } from './config/configSchema'
+import { PrometheusRegistryFactory } from './prometheus/PrometheusRegistryFactory'
+import { ProjectGroupContainerMetricsHook } from './prometheus/ProjectGroupContainerMetricsHook'
 
 export interface MasterContainer extends BaseMasterContainer {
 	monitoringKoa: Koa
@@ -33,45 +34,14 @@ export class MasterContainerFactory {
 				processType)
 			.addService('projectGroupContainerResolver', ({ tenantConfigResolver, projectGroupContainerFactory }) =>
 				new ProjectGroupContainerResolver(tenantConfigResolver, projectGroupContainerFactory))
-			.addService('promRegistry', ({ processType, projectGroupContainerResolver }) => {
-				if (processType === ProcessType.clusterMaster) {
-					const register = new prom.AggregatorRegistry()
-					prom.collectDefaultMetrics({ register })
-					return register
-				}
-				const register = prom.register
-				const contemberVersion = new Gauge({
-					help: 'Current contember version',
-					name: 'contember_info',
-					labelNames: ['version'],
-				})
-				contemberVersion.set({
-					version: args.version,
-				}, 1)
-				register.registerMetric(contemberVersion)
-				prom.collectDefaultMetrics({ register })
-				const registrar = createDbMetricsRegistrar(register)
-				projectGroupContainerResolver.onCreate.push((groupContainer, slug) => {
-					groupContainer.projectContainerResolver.onCreate.push(projectContainer =>
-						registrar({
-							connection: projectContainer.connection,
-							labels: {
-								contember_module: 'content',
-								contember_project: projectContainer.project.slug,
-								contember_project_group: slug ?? 'unknown',
-							},
-						}),
-					)
-					return registrar({
-						connection: groupContainer.tenantContainer.connection,
-						labels: {
-							contember_module: 'tenant',
-							contember_project_group: slug ?? 'unknown',
-							contember_project: 'unknown',
-						},
-					})
-				})
-				return register
+			.addService('promRegistryFactory', ({ processType }) =>
+				new PrometheusRegistryFactory(processType, { version: args.version }))
+			.addService('projectGroupContainerMetricsHook', ({ projectGroupContainerResolver }) =>
+				new ProjectGroupContainerMetricsHook(projectGroupContainerResolver))
+			.addService('promRegistry', ({ promRegistryFactory, projectGroupContainerMetricsHook }) => {
+				const registry = promRegistryFactory.create()
+				projectGroupContainerMetricsHook.register(registry)
+				return registry
 			})
 			.replaceService<'koaMiddlewares', KoaMiddleware<any>>('koaMiddlewares', ({ inner, promRegistry }) => {
 				return compose([

@@ -1,7 +1,7 @@
 import { createDbMetricsRegistrar, ProcessType } from './utils'
 import { createColllectHttpMetricsMiddleware, createShowMetricsMiddleware } from './http'
 import { compose, CryptoWrapper, Koa, KoaMiddleware } from '@contember/engine-http'
-import prom from 'prom-client'
+import prom, { Gauge } from 'prom-client'
 import { createSecretKey } from 'crypto'
 import { ProjectGroupContainerResolver } from './projectGroup/ProjectGroupContainerResolver'
 import { ProjectGroupResolver } from './projectGroup/ProjectGroupResolver'
@@ -40,6 +40,15 @@ export class MasterContainerFactory {
 					return register
 				}
 				const register = prom.register
+				const contemberVersion = new Gauge({
+					help: 'Current contember version',
+					name: 'contember_info',
+					labelNames: ['version'],
+				})
+				contemberVersion.set({
+					version: args.version,
+				}, 1)
+				register.registerMetric(contemberVersion)
 				prom.collectDefaultMetrics({ register })
 				const registrar = createDbMetricsRegistrar(register)
 				projectGroupContainerResolver.onCreate.push((groupContainer, slug) => {

@@ -1,12 +1,11 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Model, Schema } from '@contember/schema'
 import { SchemaUpdater, updateEntity, updateField, updateModel } from '../utils/schemaUpdateUtils'
-import { ModificationHandlerStatic } from '../ModificationHandler'
+import { createModificationType, Differ, ModificationHandler } from '../ModificationHandler'
 import { isOwningRelation } from '@contember/schema-utils'
 import { updateRelations } from '../utils/diffUtils'
 
-export const DisableOrphanRemovalModification: ModificationHandlerStatic<DisableOrphanRemovalModificationData> = class {
-	static id = 'disableOrphanRemoval'
+export class DisableOrphanRemovalModificationHandler implements ModificationHandler<DisableOrphanRemovalModificationData> {
 
 	constructor(private readonly data: DisableOrphanRemovalModificationData, private readonly schema: Schema) {}
 
@@ -27,12 +26,20 @@ export const DisableOrphanRemovalModification: ModificationHandlerStatic<Disable
 			message: `Disable orphan removal on ${this.data.entityName}.${this.data.fieldName}`,
 		}
 	}
+}
 
-	static createModification(data: DisableOrphanRemovalModificationData) {
-		return { modification: this.id, ...data }
-	}
+export interface DisableOrphanRemovalModificationData {
+	entityName: string
+	fieldName: string
+}
 
-	static createDiff(originalSchema: Schema, updatedSchema: Schema) {
+export const disableOrphanRemovalModification = createModificationType({
+	id: 'disableOrphanRemoval',
+	handler: DisableOrphanRemovalModificationHandler,
+})
+
+export class DisableOrphanRemovalDiffer implements Differ {
+	createDiff(originalSchema: Schema, updatedSchema: Schema) {
 		return updateRelations(originalSchema, updatedSchema, ({ originalRelation, updatedRelation, updatedEntity }) => {
 			if (
 				isOwningRelation(originalRelation) &&
@@ -42,7 +49,7 @@ export const DisableOrphanRemovalModification: ModificationHandlerStatic<Disable
 				originalRelation.orphanRemoval &&
 				!updatedRelation.orphanRemoval
 			) {
-				return DisableOrphanRemovalModification.createModification({
+				return disableOrphanRemovalModification.createModification({
 					entityName: updatedEntity.name,
 					fieldName: updatedRelation.name,
 				})
@@ -50,8 +57,4 @@ export const DisableOrphanRemovalModification: ModificationHandlerStatic<Disable
 			return undefined
 		})
 	}
-}
-export interface DisableOrphanRemovalModificationData {
-	entityName: string
-	fieldName: string
 }

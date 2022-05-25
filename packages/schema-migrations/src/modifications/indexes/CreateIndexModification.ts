@@ -1,12 +1,10 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Model, Schema } from '@contember/schema'
 import { SchemaUpdater, updateEntity, updateModel } from '../utils/schemaUpdateUtils'
-import { ModificationHandlerStatic } from '../ModificationHandler'
+import { createModificationType, Differ, ModificationHandler } from '../ModificationHandler'
 import { acceptFieldVisitor } from '@contember/schema-utils'
 
-export const CreateIndexModification: ModificationHandlerStatic<CreateIndexModificationData> = class {
-	static id = 'createIndex'
-
+export class CreateIndexModificationHandler implements ModificationHandler<CreateIndexModificationData> {
 	constructor(private readonly data: CreateIndexModificationData, private readonly schema: Schema) {}
 
 	public createSql(builder: MigrationBuilder): void {
@@ -62,16 +60,19 @@ export const CreateIndexModification: ModificationHandlerStatic<CreateIndexModif
 			message: `Create index(${this.data.index.fields.join(', ')}) on entity ${this.data.entityName}`,
 		}
 	}
+}
 
-	static createModification(data: CreateIndexModificationData) {
-		return { modification: this.id, ...data }
-	}
+export const createIndexModification = createModificationType({
+	id: 'createIndex',
+	handler: CreateIndexModificationHandler,
+})
 
-	static createDiff(originalSchema: Schema, updatedSchema: Schema) {
+export class CreateIndexDiffer implements Differ {
+	createDiff(originalSchema: Schema, updatedSchema: Schema) {
 		return Object.values(updatedSchema.model.entities).flatMap(entity =>
 			Object.values(entity.indexes)
 				.filter(it => !originalSchema.model.entities[entity.name].indexes[it.name])
-				.map(index => CreateIndexModification.createModification({ entityName: entity.name, index })),
+				.map(index => createIndexModification.createModification({ entityName: entity.name, index })),
 		)
 	}
 }

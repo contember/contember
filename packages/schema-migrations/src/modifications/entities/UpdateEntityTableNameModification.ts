@@ -1,10 +1,9 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Schema } from '@contember/schema'
 import { SchemaUpdater, updateEntity, updateModel } from '../utils/schemaUpdateUtils'
-import { ModificationHandlerStatic } from '../ModificationHandler'
+import { createModificationType, Differ, ModificationHandler } from '../ModificationHandler'
 
-export const UpdateEntityTableNameModification: ModificationHandlerStatic<UpdateEntityTableNameModificationData> = class {
-	static id = 'updateEntityTableName'
+export class UpdateEntityTableNameModificationHandler implements ModificationHandler<UpdateEntityTableNameModificationData> {
 	constructor(private readonly data: UpdateEntityTableNameModificationData, private readonly schema: Schema) {}
 
 	public createSql(builder: MigrationBuilder): void {
@@ -28,22 +27,28 @@ export const UpdateEntityTableNameModification: ModificationHandlerStatic<Update
 	describe() {
 		return { message: `Change table name of entity ${this.data.entityName}` }
 	}
-
-	static createModification(data: UpdateEntityTableNameModificationData) {
-		return { modification: this.id, ...data }
-	}
-
-	static createDiff(originalSchema: Schema, updatedSchema: Schema) {
-		return Object.values(updatedSchema.model.entities)
-			.filter(
-				it =>
-					originalSchema.model.entities[it.name] && originalSchema.model.entities[it.name].tableName !== it.tableName,
-			)
-			.map(it => UpdateEntityTableNameModification.createModification({ entityName: it.name, tableName: it.tableName }))
-	}
 }
 
 export interface UpdateEntityTableNameModificationData {
 	entityName: string
 	tableName: string
+}
+
+export const updateEntityTableNameModification = createModificationType({
+	id: 'updateEntityTableName',
+	handler: UpdateEntityTableNameModificationHandler,
+})
+
+export class UpdateEntityTableNameDiffer implements Differ {
+	createDiff(originalSchema: Schema, updatedSchema: Schema) {
+		return Object.values(updatedSchema.model.entities)
+			.filter(
+				it =>
+					originalSchema.model.entities[it.name] && originalSchema.model.entities[it.name].tableName !== it.tableName,
+			)
+			.map(it => updateEntityTableNameModification.createModification({
+				entityName: it.name,
+				tableName: it.tableName,
+			}))
+	}
 }

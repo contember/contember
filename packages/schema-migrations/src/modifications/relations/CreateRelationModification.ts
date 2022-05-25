@@ -8,7 +8,12 @@ import {
 } from '@contember/schema-utils'
 import { MigrationBuilder } from '@contember/database-migrations'
 import { addField, SchemaUpdater, updateEntity, updateModel } from '../utils/schemaUpdateUtils'
-import { ModificationHandlerOptions, ModificationHandlerStatic } from '../ModificationHandler'
+import {
+	createModificationType,
+	Differ,
+	ModificationHandler,
+	ModificationHandlerOptions,
+} from '../ModificationHandler'
 import { isIt } from '../../utils/isIt'
 import { createFields } from '../utils/diffUtils'
 import { getPrimaryColumnType } from '../utils/getPrimaryColumnType'
@@ -16,8 +21,7 @@ import { createJunctionTableSql } from '../utils/createJunctionTable'
 import { normalizeManyHasManyRelation, PartialManyHasManyRelation } from './normalization'
 
 
-export const CreateRelationModification: ModificationHandlerStatic<CreateRelationModificationData> = class {
-	static id = 'createRelation'
+export class CreateRelationModificationHandler implements ModificationHandler<CreateRelationModificationData> {
 
 	constructor(
 		private readonly data: CreateRelationModificationData,
@@ -91,28 +95,6 @@ export const CreateRelationModification: ModificationHandlerStatic<CreateRelatio
 		return { message: `Add relation ${this.data.entityName}.${this.data.owningSide.name}`, failureWarning }
 	}
 
-	static createModification(data: CreateRelationModificationData) {
-		return { modification: this.id, ...data }
-	}
-
-	static createDiff(originalSchema: Schema, updatedSchema: Schema) {
-		return createFields(originalSchema, updatedSchema, ({ newField, updatedEntity }) => {
-			if (!isRelation(newField) || !isOwningRelation(newField)) {
-				return undefined
-			}
-			const inverseSide = newField.inversedBy
-				? updatedSchema.model.entities[newField.target].fields[newField.inversedBy]
-				: undefined
-			if (inverseSide && !(isRelation(inverseSide) && isInverseRelation(inverseSide))) {
-				throw new Error()
-			}
-			return CreateRelationModification.createModification({
-				entityName: updatedEntity.name,
-				owningSide: newField,
-				...(inverseSide ? { inverseSide } : {}),
-			})
-		})
-	}
 
 	private getNormalizedOwningSide(): Model.AnyOwningRelation {
 		if (this.data.owningSide.type === Model.RelationType.ManyHasMany) {
@@ -130,4 +112,30 @@ export type CreateRelationModificationData = {
 		| Model.OneHasOneOwningRelation
 		| PartialManyHasManyRelation
 	inverseSide?: Model.AnyInverseRelation
+}
+
+export const createRelationModification = createModificationType({
+	id: 'createRelation',
+	handler: CreateRelationModificationHandler,
+})
+
+export class CreateRelationDiffer implements Differ {
+	createDiff(originalSchema: Schema, updatedSchema: Schema) {
+		return createFields(originalSchema, updatedSchema, ({ newField, updatedEntity }) => {
+			if (!isRelation(newField) || !isOwningRelation(newField)) {
+				return undefined
+			}
+			const inverseSide = newField.inversedBy
+				? updatedSchema.model.entities[newField.target].fields[newField.inversedBy]
+				: undefined
+			if (inverseSide && !(isRelation(inverseSide) && isInverseRelation(inverseSide))) {
+				throw new Error()
+			}
+			return createRelationModification.createModification({
+				entityName: updatedEntity.name,
+				owningSide: newField,
+				...(inverseSide ? { inverseSide } : {}),
+			})
+		})
+	}
 }

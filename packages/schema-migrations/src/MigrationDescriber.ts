@@ -1,16 +1,16 @@
-import ModificationHandlerFactory from './modifications/ModificationHandlerFactory'
-import { createMigrationBuilder } from '@contember/database-migrations'
-import { Migration } from './Migration'
-import { Schema } from '@contember/schema'
 import {
+	createEntityModification,
 	emptyModificationDescriptionContext,
 	ModificationDescription,
 	ModificationDescriptionContext,
 	ModificationHandler,
+	ModificationHandlerFactory,
 	ModificationHandlerOptions,
-} from './modifications/ModificationHandler'
-import { CreateEntityModification } from './modifications/entities'
-import { SchemaUpdateError } from './modifications/exceptions'
+	SchemaUpdateError,
+} from './modifications'
+import { createMigrationBuilder } from '@contember/database-migrations'
+import { Migration } from './Migration'
+import { Schema } from '@contember/schema'
 
 export interface ModificationDescriptionResult {
 	modification: Migration.Modification
@@ -59,7 +59,7 @@ export class MigrationDescriber {
 		const result = []
 		const createdEntities = []
 		for (const modification of migration.modifications) {
-			if (modification.modification === CreateEntityModification.id) {
+			if (modification.modification === createEntityModification.id) {
 				createdEntities.push(modification.entity.name)
 			}
 			const description = await this.describeModification(

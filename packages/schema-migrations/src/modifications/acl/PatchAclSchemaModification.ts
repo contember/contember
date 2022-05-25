@@ -1,12 +1,10 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { SchemaUpdater } from '../utils/schemaUpdateUtils'
-import { ModificationHandlerStatic } from '../ModificationHandler'
+import { createModificationType, ModificationHandler } from '../ModificationHandler'
 import { applyPatch, Operation } from 'rfc6902'
 import deepCopy from '../../utils/deepCopy'
 
-export const PatchAclSchemaModification: ModificationHandlerStatic<PatchAclSchemaModificationData> = class {
-	static id = 'patchAclSchema'
-
+export class PatchAclSchemaModificationHandler implements ModificationHandler<PatchAclSchemaModificationData>{
 	constructor(private readonly data: PatchAclSchemaModificationData) {}
 
 	public createSql(builder: MigrationBuilder): void {}
@@ -29,11 +27,12 @@ export const PatchAclSchemaModification: ModificationHandlerStatic<PatchAclSchem
 	describe() {
 		return { message: 'Update ACL schema' }
 	}
-
-	static createModification(data: PatchAclSchemaModificationData) {
-		return { modification: this.id, ...data }
-	}
 }
+
+export const patchAclSchemaModification = createModificationType({
+	id: 'patchAclSchema',
+	handler: PatchAclSchemaModificationHandler,
+})
 
 export interface PatchAclSchemaModificationData {
 	patch: Operation[]

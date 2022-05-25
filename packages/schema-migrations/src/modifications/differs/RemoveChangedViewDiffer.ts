@@ -1,7 +1,7 @@
 import { Differ } from '../ModificationHandler'
 import { Model, Schema } from '@contember/schema'
 import deepEqual from 'fast-deep-equal'
-import { RemoveEntityModification } from '../entities'
+import { removeEntityModification } from '../entities'
 import { getViewDirectDependants } from '../utils/viewDependencies'
 import { Migration } from '../../Migration'
 
@@ -32,7 +32,7 @@ export class RemoveChangedViewDiffer implements Differ {
 			for (const dependant of dependants.get(entity.name) ?? []) {
 				removeCascade(dependant)
 			}
-			modifications.push(RemoveEntityModification.createModification({ entityName: entity.name }))
+			modifications.push(removeEntityModification.createModification({ entityName: entity.name }))
 		}
 		for (const changed of changedViews) {
 			removeCascade(changed)

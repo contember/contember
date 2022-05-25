@@ -11,17 +11,16 @@ import {
 	updateModel,
 	updateSchema,
 } from '../utils/schemaUpdateUtils'
-import { ModificationHandler, ModificationHandlerOptions, ModificationHandlerStatic } from '../ModificationHandler'
+import { createModificationType, ModificationHandler, ModificationHandlerOptions } from '../ModificationHandler'
 import { isIt } from '../../utils/isIt'
 import { VERSION_ACL_PATCH, VERSION_UPDATE_CONSTRAINT_NAME } from '../ModificationVersions'
 import { NamingHelper } from '@contember/schema-utils'
-import { UpdateEntityTableNameModification } from './UpdateEntityTableNameModification'
 import { NoopModification } from '../NoopModification'
 import { renameConstraintSchemaUpdater, renameConstraintsSqlBuilder } from '../utils/renameConstraintsHelper'
 import { changeValue } from '../utils/valueUtils'
+import { updateEntityTableNameModification } from './UpdateEntityTableNameModification'
 
-export const UpdateEntityNameModification: ModificationHandlerStatic<UpdateEntityNameModificationData> = class {
-	static id = 'updateEntityName'
+export class UpdateEntityNameModificationHandler implements ModificationHandler<UpdateEntityNameModificationData> {
 	private subModification: ModificationHandler<any>
 
 	constructor(
@@ -30,7 +29,7 @@ export const UpdateEntityNameModification: ModificationHandlerStatic<UpdateEntit
 		private readonly options: ModificationHandlerOptions,
 	) {
 		this.subModification = data.tableName
-			? new UpdateEntityTableNameModification(
+			? updateEntityTableNameModification.createHandler(
 				{ entityName: data.entityName, tableName: data.tableName },
 				schema,
 				this.options,
@@ -124,10 +123,6 @@ export const UpdateEntityNameModification: ModificationHandlerStatic<UpdateEntit
 	describe() {
 		return { message: `Change entity name from ${this.data.entityName} to ${this.data.newEntityName}` }
 	}
-
-	static createModification(data: UpdateEntityNameModificationData) {
-		return { modification: this.id, ...data }
-	}
 }
 
 export interface UpdateEntityNameModificationData {
@@ -135,3 +130,8 @@ export interface UpdateEntityNameModificationData {
 	newEntityName: string
 	tableName?: string
 }
+
+export const updateEntityNameModification = createModificationType({
+	id: 'updateEntityName',
+	handler: UpdateEntityNameModificationHandler,
+})

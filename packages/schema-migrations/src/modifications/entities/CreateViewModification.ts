@@ -1,12 +1,11 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Model, Schema } from '@contember/schema'
 import { SchemaUpdater, updateModel } from '../utils/schemaUpdateUtils'
-import { ModificationHandlerStatic } from '../ModificationHandler'
+import { createModificationType, Differ, ModificationHandler } from '../ModificationHandler'
 import { Migration } from '../../Migration'
 import { PartialEntity } from '../../utils/PartialEntity.js'
 
-export const CreateViewModification: ModificationHandlerStatic<CreateViewModificationData> = class {
-	static id = 'createView'
+export class CreateViewModificationHandler implements ModificationHandler<CreateViewModificationData> {
 	constructor(private readonly data: CreateViewModificationData, private readonly schema: Schema) {}
 
 	public createSql(builder: MigrationBuilder): void {
@@ -35,12 +34,15 @@ export const CreateViewModification: ModificationHandlerStatic<CreateViewModific
 	describe() {
 		return { message: `Add view ${this.data.entity.name}` }
 	}
+}
 
-	static createModification(data: CreateViewModificationData) {
-		return { modification: this.id, ...data }
-	}
+export const createViewModification = createModificationType({
+	id: 'createView',
+	handler: CreateViewModificationHandler,
+})
 
-	static createDiff(originalSchema: Schema, updatedSchema: Schema) {
+export class CreateViewDiffer implements Differ {
+	createDiff(originalSchema: Schema, updatedSchema: Schema) {
 		const newViews = Object.values(updatedSchema.model.entities)
 			.filter(it => !originalSchema.model.entities[it.name])
 			.filter(it => !!it.view)
@@ -54,7 +56,7 @@ export const CreateViewModification: ModificationHandlerStatic<CreateViewModific
 			for (const dependency of entity.view?.dependencies ?? []) {
 				cascadeCreate(updatedSchema.model.entities[dependency])
 			}
-			modifications.push(CreateViewModification.createModification({
+			modifications.push(createViewModification.createModification({
 				entity: entity,
 			}))
 		}

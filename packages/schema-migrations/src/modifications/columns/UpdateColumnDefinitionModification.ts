@@ -1,13 +1,12 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Model, Schema } from '@contember/schema'
 import { SchemaUpdater, updateEntity, updateField, updateModel } from '../utils/schemaUpdateUtils'
-import { ModificationHandlerStatic } from '../ModificationHandler'
+import { createModificationType, Differ, ModificationHandler } from '../ModificationHandler'
 import deepEqual from 'fast-deep-equal'
 import { updateColumns } from '../utils/diffUtils'
 import { wrapIdentifier } from '@contember/database'
 
-export const UpdateColumnDefinitionModification: ModificationHandlerStatic<UpdateColumnDefinitionModificationData> = class {
-	static id = 'updateColumnDefinition'
+export class UpdateColumnDefinitionModificationHandler implements ModificationHandler<UpdateColumnDefinitionModificationData>  {
 	constructor(private readonly data: UpdateColumnDefinitionModificationData, private readonly schema: Schema) {}
 
 	public createSql(builder: MigrationBuilder): void {
@@ -71,33 +70,6 @@ export const UpdateColumnDefinitionModification: ModificationHandlerStatic<Updat
 			failureWarning,
 		}
 	}
-
-	static createModification(data: UpdateColumnDefinitionModificationData) {
-		return { modification: this.id, ...data }
-	}
-
-	static createDiff(originalSchema: Schema, updatedSchema: Schema) {
-		return updateColumns(originalSchema, updatedSchema, ({ originalColumn, updatedColumn, updatedEntity }) => {
-			const {
-				name: {},
-				columnName: {},
-				...updatedDefinition
-			} = updatedColumn as any
-			const {
-				name: {},
-				columnName: {},
-				...originalDefinition
-			} = originalColumn as any
-			if (deepEqual(updatedDefinition, originalDefinition)) {
-				return undefined
-			}
-			return UpdateColumnDefinitionModification.createModification({
-				entityName: updatedEntity.name,
-				fieldName: updatedColumn.name,
-				definition: updatedDefinition,
-			})
-		})
-	}
 }
 
 type SequenceDefinitionAlter =
@@ -116,4 +88,34 @@ export interface UpdateColumnDefinitionModificationData {
 	entityName: string
 	fieldName: string
 	definition: ColumnDefinitionAlter
+}
+
+export const updateColumnDefinitionModification = createModificationType({
+	id: 'updateColumnDefinition',
+	handler: UpdateColumnDefinitionModificationHandler,
+})
+
+export class UpdateColumnDefinitionDiffer implements Differ {
+	createDiff(originalSchema: Schema, updatedSchema: Schema) {
+		return updateColumns(originalSchema, updatedSchema, ({ originalColumn, updatedColumn, updatedEntity }) => {
+			const {
+				name: {},
+				columnName: {},
+				...updatedDefinition
+			} = updatedColumn as any
+			const {
+				name: {},
+				columnName: {},
+				...originalDefinition
+			} = originalColumn as any
+			if (deepEqual(updatedDefinition, originalDefinition)) {
+				return undefined
+			}
+			return updateColumnDefinitionModification.createModification({
+				entityName: updatedEntity.name,
+				fieldName: updatedColumn.name,
+				definition: updatedDefinition,
+			})
+		})
+	}
 }

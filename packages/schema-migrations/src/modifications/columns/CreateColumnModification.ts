@@ -1,15 +1,13 @@
 import { escapeValue, MigrationBuilder } from '@contember/database-migrations'
 import { Model, Schema } from '@contember/schema'
 import { addField, SchemaUpdater, updateEntity, updateModel } from '../utils/schemaUpdateUtils'
-import { ModificationHandlerStatic } from '../ModificationHandler'
+import { createModificationType, Differ, ModificationHandler } from '../ModificationHandler'
 import { wrapIdentifier } from '../../utils/dbHelpers'
 import { getColumnName, isColumn } from '@contember/schema-utils'
 import { ImplementationException } from '../../exceptions'
 import { createFields } from '../utils/diffUtils'
 
-export const CreateColumnModification: ModificationHandlerStatic<CreateColumnModificationData> = class {
-	static id = 'createColumn'
-
+export class CreateColumnModificationHandler implements ModificationHandler<CreateColumnModificationData> {
 	constructor(private readonly data: CreateColumnModificationData, private readonly schema: Schema) {}
 
 	public createSql(builder: MigrationBuilder): void {
@@ -63,23 +61,6 @@ export const CreateColumnModification: ModificationHandlerStatic<CreateColumnMod
 				: undefined
 		return { message: `Add field ${this.data.entityName}.${this.data.field.name}`, failureWarning }
 	}
-
-	static createModification(data: CreateColumnModificationData) {
-		return { modification: this.id, ...data }
-	}
-
-	static createDiff(originalSchema: Schema, updatedSchema: Schema) {
-		return createFields(originalSchema, updatedSchema, ({ newField, updatedEntity }) => {
-			if (!isColumn(newField)) {
-				return undefined
-			}
-			return CreateColumnModification.createModification({
-				entityName: updatedEntity.name,
-				field: newField,
-				...(newField.default !== undefined ? { fillValue: newField.default } : {}),
-			})
-		})
-	}
 }
 
 export interface CreateColumnModificationData {
@@ -87,4 +68,25 @@ export interface CreateColumnModificationData {
 	field: Model.AnyColumn
 	fillValue?: any
 	copyValue?: string
+}
+
+
+export const createColumnModification = createModificationType({
+	id: 'createColumn',
+	handler: CreateColumnModificationHandler,
+})
+
+export class CreateColumnDiffer implements Differ {
+	createDiff(originalSchema: Schema, updatedSchema: Schema) {
+		return createFields(originalSchema, updatedSchema, ({ newField, updatedEntity }) => {
+			if (!isColumn(newField)) {
+				return undefined
+			}
+			return createColumnModification.createModification({
+				entityName: updatedEntity.name,
+				field: newField,
+				...(newField.default !== undefined ? { fillValue: newField.default } : {}),
+			})
+		})
+	}
 }

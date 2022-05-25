@@ -10,47 +10,41 @@ import {
 import { SchemaMigrator } from './SchemaMigrator'
 import { Migration } from './Migration'
 import { ImplementationException } from './exceptions'
-import { VERSION_LATEST } from './modifications/ModificationVersions'
-import { CreateUniqueConstraintModification, RemoveUniqueConstraintModification } from './modifications/constraints'
-import { RemoveFieldModification } from './modifications/fields'
 import {
-	ConfigureEntityDatabaseMigrationsModification,
-	CreateEntityModification,
-	CreateViewModification,
-	RemoveEntityModification,
-	ToggleEventLogModification,
-	UpdateEntityTableNameModification,
-} from './modifications/entities'
-import {
-	ConfigureEnumDatabaseMigrationsModification,
-	CreateEnumModification,
-	RemoveEnumModification,
-	UpdateEnumModification,
-} from './modifications/enums'
-import {
-	CreateColumnModification,
-	UpdateColumnDefinitionModification,
-	UpdateColumnNameModification,
-} from './modifications/columns'
-import {
-	ConvertOneHasManyToManyHasManyRelationModification,
-	ConvertOneToManyRelationModification,
-	CreateRelationInverseSideModification,
-	CreateRelationModification,
-	DisableOrphanRemovalModification,
-	EnableOrphanRemovalModification,
-	MakeRelationNotNullModification,
-	MakeRelationNullableModification,
-	ToggleJunctionEventLogModification,
-	UpdateRelationOnDeleteModification,
-	UpdateRelationOrderByModification,
-} from './modifications/relations'
-import { PatchAclSchemaModification, UpdateAclSchemaModification } from './modifications/acl'
-import { PatchValidationSchemaModification, UpdateValidationSchemaModification } from './modifications/validation'
-import { CreateDiff, Differ } from './modifications/ModificationHandler'
-import { isDefined } from './utils/isDefined'
+	ConfigureEntityDatabaseMigrationsDiffer,
+	ConfigureEnumDatabaseMigrationsDiffer,
+	ConvertOneHasManyToManyHasManyRelationDiffer,
+	ConvertOneToManyRelationDiffer,
+	CreateColumnDiffer,
+	CreateEntityDiffer,
+	CreateEnumDiffer,
+	CreateRelationDiffer,
+	CreateRelationInverseSideDiffer,
+	CreateUniqueConstraintDiffer,
+	CreateViewDiffer,
+	Differ,
+	DisableOrphanRemovalDiffer,
+	EnableOrphanRemovalDiffer,
+	MakeRelationNotNullDiffer,
+	MakeRelationNullableDiffer,
+	RemoveEntityDiffer,
+	RemoveEnumDiffer,
+	RemoveFieldDiffer,
+	RemoveUniqueConstraintDiffer,
+	ToggleEventLogDiffer,
+	ToggleJunctionEventLogDiffer,
+	UpdateAclSchemaDiffer,
+	UpdateColumnDefinitionDiffer,
+	UpdateColumnNameDiffer,
+	UpdateEntityTableNameDiffer,
+	UpdateEnumDiffer,
+	UpdateRelationOnDeleteDiffer,
+	UpdateRelationOrderByDiffer,
+	UpdateValidationSchemaDiffer,
+	VERSION_LATEST,
+} from './modifications'
 import { ChangeViewNonViewDiffer, RemoveChangedFieldDiffer, RemoveChangedViewDiffer } from './modifications/differs'
-import { CreateIndexModification, RemoveIndexModification } from './modifications/indexes'
+import { CreateIndexDiffer, RemoveIndexDiffer } from './modifications/indexes'
 
 export class SchemaDiffer {
 	constructor(private readonly schemaMigrator: SchemaMigrator) {}
@@ -65,60 +59,48 @@ export class SchemaDiffer {
 			throw new InvalidSchemaException('updated schema is not valid', updatedErrors)
 		}
 
-		const differs: (CreateDiff | Differ)[] = [
-			ConfigureEntityDatabaseMigrationsModification.createDiff,
-			ConfigureEnumDatabaseMigrationsModification.createDiff,
-			ConvertOneToManyRelationModification.createDiff,
-			ConvertOneHasManyToManyHasManyRelationModification.createDiff,
-
-			RemoveUniqueConstraintModification.createDiff,
-			RemoveIndexModification.createDiff,
-			new ChangeViewNonViewDiffer().createDiff,
-			new RemoveChangedViewDiffer().createDiff,
-			RemoveEntityModification.createDiff,
-			RemoveFieldModification.createDiff,
-			CreateEnumModification.createDiff,
-
-			UpdateEntityTableNameModification.createDiff,
-			ToggleEventLogModification.createDiff,
-			ToggleJunctionEventLogModification.createDiff,
-			UpdateColumnDefinitionModification.createDiff,
-			UpdateColumnNameModification.createDiff,
-			UpdateRelationOnDeleteModification.createDiff,
-			MakeRelationNotNullModification.createDiff,
-			MakeRelationNullableModification.createDiff,
-			EnableOrphanRemovalModification.createDiff,
-			DisableOrphanRemovalModification.createDiff,
-			UpdateRelationOrderByModification.createDiff,
-			UpdateEnumModification.createDiff,
-
+		const differs: Differ[] = [
+			new ConfigureEntityDatabaseMigrationsDiffer(),
+			new ConfigureEnumDatabaseMigrationsDiffer(),
+			new ConvertOneToManyRelationDiffer(),
+			new ConvertOneHasManyToManyHasManyRelationDiffer(),
+			new RemoveUniqueConstraintDiffer(),
+			new RemoveIndexDiffer(),
+			new ChangeViewNonViewDiffer(),
+			new RemoveChangedViewDiffer(),
+			new RemoveEntityDiffer(),
+			new RemoveFieldDiffer(),
+			new CreateEnumDiffer(),
+			new UpdateEntityTableNameDiffer(),
+			new ToggleEventLogDiffer(),
+			new ToggleJunctionEventLogDiffer(),
+			new UpdateColumnDefinitionDiffer(),
+			new UpdateColumnNameDiffer(),
+			new UpdateRelationOnDeleteDiffer(),
+			new MakeRelationNotNullDiffer(),
+			new MakeRelationNullableDiffer(),
+			new EnableOrphanRemovalDiffer(),
+			new DisableOrphanRemovalDiffer(),
+			new UpdateRelationOrderByDiffer(),
+			new UpdateEnumDiffer(),
 			new RemoveChangedFieldDiffer(it => !isRelation(it) || isOwningRelation(it)),
 			new RemoveChangedFieldDiffer(it => isRelation(it) && isInverseRelation(it)),
-			CreateEntityModification.createDiff,
-			CreateColumnModification.createDiff,
-			CreateViewModification.createDiff,
-
-			CreateRelationModification.createDiff,
-			CreateRelationInverseSideModification.createDiff,
-
-			CreateUniqueConstraintModification.createDiff,
-			CreateIndexModification.createDiff,
-
-			RemoveEnumModification.createDiff,
-
-			UpdateAclSchemaModification.createDiff,
-			PatchAclSchemaModification.createDiff,
-
-			UpdateValidationSchemaModification.createDiff,
-			PatchValidationSchemaModification.createDiff,
-		].filter(isDefined)
+			new CreateEntityDiffer(),
+			new CreateColumnDiffer(),
+			new CreateViewDiffer(),
+			new CreateRelationDiffer(),
+			new CreateRelationInverseSideDiffer(),
+			new CreateUniqueConstraintDiffer(),
+			new CreateIndexDiffer(),
+			new RemoveEnumDiffer(),
+			new UpdateAclSchemaDiffer(),
+			new UpdateValidationSchemaDiffer(),
+		]
 
 		const diffs: Migration.Modification[] = []
 		let appliedDiffsSchema = originalSchema
 		for (const differ of differs) {
-			const differDiffs = 'createDiff' in differ
-				? differ.createDiff(appliedDiffsSchema, updatedSchema)
-				: differ(appliedDiffsSchema, updatedSchema)
+			const differDiffs = differ.createDiff(appliedDiffsSchema, updatedSchema)
 			appliedDiffsSchema = this.schemaMigrator.applyModifications(appliedDiffsSchema, differDiffs, VERSION_LATEST)
 			diffs.push(...differDiffs)
 		}

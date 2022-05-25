@@ -1,10 +1,9 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Schema } from '@contember/schema'
 import { SchemaUpdater, updateModel } from '../utils/schemaUpdateUtils'
-import { ModificationHandlerStatic } from '../ModificationHandler'
+import { createModificationType, Differ, ModificationHandler } from '../ModificationHandler'
 
-export const RemoveEnumModification: ModificationHandlerStatic<RemoveEnumModificationData> = class {
-	static id = 'removeEnum'
+export class RemoveEnumModificationHandler implements ModificationHandler<RemoveEnumModificationData> {
 	constructor(private readonly data: RemoveEnumModificationData, private readonly schema: Schema) {}
 
 	public createSql(builder: MigrationBuilder): void {
@@ -28,18 +27,21 @@ export const RemoveEnumModification: ModificationHandlerStatic<RemoveEnumModific
 	describe() {
 		return { message: `Remove ${this.data.enumName}` }
 	}
-
-	static createModification(data: RemoveEnumModificationData) {
-		return { modification: this.id, ...data }
-	}
-
-	static createDiff(originalSchema: Schema, updatedSchema: Schema) {
-		return Object.entries(originalSchema.model.enums)
-			.filter(([name]) => !updatedSchema.model.enums[name])
-			.map(([enumName, values]) => RemoveEnumModification.createModification({ enumName }))
-	}
 }
 
 export interface RemoveEnumModificationData {
 	enumName: string
+}
+
+export const removeEnumModification = createModificationType({
+	id: 'removeEnum',
+	handler: RemoveEnumModificationHandler,
+})
+
+export class RemoveEnumDiffer implements Differ {
+	createDiff(originalSchema: Schema, updatedSchema: Schema) {
+		return Object.entries(originalSchema.model.enums)
+			.filter(([name]) => !updatedSchema.model.enums[name])
+			.map(([enumName, values]) => removeEnumModification.createModification({ enumName }))
+	}
 }

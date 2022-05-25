@@ -1,13 +1,12 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Model, Schema } from '@contember/schema'
 import { SchemaUpdater, updateEntity, updateModel } from '../utils/schemaUpdateUtils'
-import { ModificationHandlerStatic } from '../ModificationHandler'
+import { createModificationType, Differ, ModificationHandler } from '../ModificationHandler'
 import { acceptFieldVisitor } from '@contember/schema-utils'
 
-export const CreateUniqueConstraintModification: ModificationHandlerStatic<CreateUniqueConstraintModificationData> = class {
-	static id = 'createUniqueConstraint'
-
-	constructor(private readonly data: CreateUniqueConstraintModificationData, private readonly schema: Schema) {}
+export class CreateUniqueConstraintModificationHandler implements ModificationHandler<CreateUniqueConstraintModificationData> {
+	constructor(private readonly data: CreateUniqueConstraintModificationData, private readonly schema: Schema) {
+	}
 
 	public createSql(builder: MigrationBuilder): void {
 		const entity = this.schema.model.entities[this.data.entityName]
@@ -66,20 +65,27 @@ export const CreateUniqueConstraintModification: ModificationHandlerStatic<Creat
 		}
 	}
 
-	static createModification(data: CreateUniqueConstraintModificationData) {
-		return { modification: this.id, ...data }
-	}
-
-	static createDiff(originalSchema: Schema, updatedSchema: Schema) {
-		return Object.values(updatedSchema.model.entities).flatMap(entity =>
-			Object.values(entity.unique)
-				.filter(it => !originalSchema.model.entities[entity.name].unique[it.name])
-				.map(unique => CreateUniqueConstraintModification.createModification({ entityName: entity.name, unique })),
-		)
-	}
 }
 
 export interface CreateUniqueConstraintModificationData {
 	entityName: string
 	unique: Model.UniqueConstraint
+}
+
+export const createUniqueConstraintModification = createModificationType({
+	id: 'createUniqueConstraint',
+	handler: CreateUniqueConstraintModificationHandler,
+})
+
+export class CreateUniqueConstraintDiffer implements Differ {
+	createDiff(originalSchema: Schema, updatedSchema: Schema) {
+		return Object.values(updatedSchema.model.entities).flatMap(entity =>
+			Object.values(entity.unique)
+				.filter(it => !originalSchema.model.entities[entity.name].unique[it.name])
+				.map(unique => createUniqueConstraintModification.createModification({
+					entityName: entity.name,
+					unique,
+				})),
+		)
+	}
 }

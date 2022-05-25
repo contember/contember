@@ -2,11 +2,10 @@ import { acceptFieldVisitor, isInverseRelation, isRelation, NamingHelper } from 
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Schema } from '@contember/schema'
 import { removeField, SchemaUpdater } from '../utils/schemaUpdateUtils'
-import { ModificationHandlerOptions, ModificationHandlerStatic } from '../ModificationHandler'
+import { createModificationType, Differ, ModificationHandler, ModificationHandlerOptions } from '../ModificationHandler'
 import { isDefined } from '../../utils/isDefined'
 
-export const RemoveFieldModification: ModificationHandlerStatic<RemoveFieldModificationData> = class {
-	static id = 'removeField'
+export class RemoveFieldModificationHandler implements ModificationHandler<RemoveFieldModificationData> {
 
 	constructor(
 		private readonly data: RemoveFieldModificationData,
@@ -50,11 +49,20 @@ export const RemoveFieldModification: ModificationHandlerStatic<RemoveFieldModif
 		return { message: `Remove field ${this.data.entityName}.${this.data.fieldName}`, isDestructive: true }
 	}
 
-	static createModification(data: RemoveFieldModificationData) {
-		return { modification: this.id, ...data }
-	}
+}
 
-	static createDiff(originalSchema: Schema, updatedSchema: Schema) {
+export interface RemoveFieldModificationData {
+	entityName: string
+	fieldName: string
+}
+
+export const removeFieldModification = createModificationType({
+	id: 'removeField',
+	handler: RemoveFieldModificationHandler,
+})
+
+export class RemoveFieldDiffer implements Differ {
+	createDiff(originalSchema: Schema, updatedSchema: Schema) {
 		return Object.values(updatedSchema.model.entities)
 			.filter(({ name }) => originalSchema.model.entities[name])
 			.flatMap(entity => {
@@ -69,7 +77,7 @@ export const RemoveFieldModification: ModificationHandlerStatic<RemoveFieldModif
 								return undefined
 							}
 						}
-						return RemoveFieldModification.createModification({
+						return removeFieldModification.createModification({
 							entityName: entity.name,
 							fieldName: field.name,
 						})
@@ -77,9 +85,4 @@ export const RemoveFieldModification: ModificationHandlerStatic<RemoveFieldModif
 					.filter(isDefined)
 			})
 	}
-}
-
-export interface RemoveFieldModificationData {
-	entityName: string
-	fieldName: string
 }

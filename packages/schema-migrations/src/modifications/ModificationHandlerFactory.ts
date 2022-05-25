@@ -1,95 +1,92 @@
 import { Schema } from '@contember/schema'
-import { ModificationHandler, ModificationHandlerOptions, ModificationHandlerStatic } from './ModificationHandler'
-import { CreateColumnModification, UpdateColumnDefinitionModification, UpdateColumnNameModification } from './columns'
-import { PatchValidationSchemaModification, UpdateValidationSchemaModification } from './validation'
-import { PatchAclSchemaModification, UpdateAclSchemaModification } from './acl'
-import { CreateUniqueConstraintModification, RemoveUniqueConstraintModification } from './constraints'
+import { ModificationHandler, ModificationHandlerOptions, ModificationType } from './ModificationHandler'
+import { patchAclSchemaModification, updateAclSchemaModification } from './acl'
+import { createColumnModification, updateColumnDefinitionModification, updateColumnNameModification } from './columns'
+import { createUniqueConstraintModification, removeUniqueConstraintModification } from './constraints'
 import {
-	ConfigureEntityDatabaseMigrationsModification,
-	CreateEntityModification,
-	CreateViewModification,
-	RemoveEntityModification,
-	ToggleEventLogModification,
-	UpdateEntityNameModification,
-	UpdateEntityTableNameModification,
+	configureEntityDatabaseMigrationsModification,
+	createEntityModification, createViewModification,
+	removeEntityModification, toggleEventLogModification,
+	updateEntityNameModification,
+	updateEntityTableNameModification,
 } from './entities'
+import { updateViewModification } from './entities/UpdateViewModification'
 import {
-	ConfigureEnumDatabaseMigrationsModification,
-	CreateEnumModification,
-	RemoveEnumModification,
-	UpdateEnumModification,
+	configureEnumDatabaseMigrationsModification,
+	createEnumModification,
+	removeEnumModification,
+	updateEnumModification,
 } from './enums'
-import { RemoveFieldModification, UpdateFieldNameModification } from './fields'
+import { removeFieldModification, updateFieldNameModification } from './fields'
 import {
-	ConvertOneHasManyToManyHasManyRelationModification,
-	ConvertOneToManyRelationModification,
-	CreateRelationInverseSideModification,
-	CreateRelationModification,
-	DisableOrphanRemovalModification,
-	EnableOrphanRemovalModification,
-	MakeRelationNotNullModification,
-	MakeRelationNullableModification,
-	ToggleJunctionEventLogModification,
-	UpdateRelationOnDeleteModification,
-	UpdateRelationOrderByModification,
+	convertOneHasManyToManyHasManyRelationModification,
+	convertOneToManyRelationModification,
+	createRelationInverseSideModification,
+	createRelationModification, disableOrphanRemovalModification,
+	enableOrphanRemovalModification,
+	makeRelationNotNullModification,
+	makeRelationNullableModification, toggleJunctionEventLogModification,
+	updateRelationOnDeleteModification,
+	updateRelationOrderByModification,
 } from './relations'
-import { UpdateViewModification } from './entities/UpdateViewModification'
-import { CreateIndexModification, RemoveIndexModification } from './indexes'
+import { patchValidationSchemaModification, updateValidationSchemaModification } from './validation'
+import { createIndexModification, removeIndexModification } from './indexes'
+
 
 class ModificationHandlerFactory {
-	constructor(private readonly map: Record<string, ModificationHandlerStatic<any>>) {}
+	constructor(private readonly map: Record<string, ModificationType<string, any>>) {}
 
 	public create<D>(name: string, data: D, schema: Schema, options: ModificationHandlerOptions): ModificationHandler<D> {
 		if (!this.map[name]) {
 			throw new Error(`Undefined modification handler for ${name}`)
 		}
-		return new this.map[name](data, schema, options)
+		return this.map[name].createHandler(data, schema, options)
 	}
 }
 
 namespace ModificationHandlerFactory {
-	export type HandlerMap<D> = { [modificationName: string]: ModificationHandlerStatic<D> }
+	type HandlerMap<D> = { [modificationName: string]: ModificationType<string, D> }
 
 	const handlers = [
-		UpdateAclSchemaModification,
-		PatchAclSchemaModification,
-		CreateColumnModification,
-		UpdateColumnDefinitionModification,
-		UpdateColumnNameModification,
-		CreateUniqueConstraintModification,
-		RemoveUniqueConstraintModification,
-		CreateIndexModification,
-		RemoveIndexModification,
-		CreateEntityModification,
-		RemoveEntityModification,
-		UpdateEntityNameModification,
-		UpdateEntityTableNameModification,
-		UpdateViewModification,
-		CreateViewModification,
-		CreateEnumModification,
-		RemoveEnumModification,
-		UpdateEnumModification,
-		RemoveFieldModification,
-		UpdateFieldNameModification,
-		CreateRelationInverseSideModification,
-		CreateRelationModification,
-		UpdateRelationOnDeleteModification,
-		UpdateRelationOrderByModification,
-		MakeRelationNotNullModification,
-		MakeRelationNullableModification,
-		EnableOrphanRemovalModification,
-		DisableOrphanRemovalModification,
-		UpdateValidationSchemaModification,
-		PatchValidationSchemaModification,
-		ConvertOneToManyRelationModification,
-		ToggleEventLogModification,
-		ToggleJunctionEventLogModification,
-		ConvertOneHasManyToManyHasManyRelationModification,
-		ConfigureEntityDatabaseMigrationsModification,
-		ConfigureEnumDatabaseMigrationsModification,
+		updateAclSchemaModification,
+		patchAclSchemaModification,
+		createColumnModification,
+		updateColumnDefinitionModification,
+		updateColumnNameModification,
+		createUniqueConstraintModification,
+		removeUniqueConstraintModification,
+		createIndexModification,
+		removeIndexModification,
+		createEntityModification,
+		removeEntityModification,
+		updateEntityNameModification,
+		updateEntityTableNameModification,
+		updateViewModification,
+		createViewModification,
+		createEnumModification,
+		removeEnumModification,
+		updateEnumModification,
+		removeFieldModification,
+		updateFieldNameModification,
+		createRelationInverseSideModification,
+		createRelationModification,
+		updateRelationOnDeleteModification,
+		updateRelationOrderByModification,
+		makeRelationNotNullModification,
+		makeRelationNullableModification,
+		enableOrphanRemovalModification,
+		disableOrphanRemovalModification,
+		updateValidationSchemaModification,
+		patchValidationSchemaModification,
+		convertOneToManyRelationModification,
+		toggleEventLogModification,
+		toggleJunctionEventLogModification,
+		convertOneHasManyToManyHasManyRelationModification,
+		configureEntityDatabaseMigrationsModification,
+		configureEnumDatabaseMigrationsModification,
 	]
 
 	export const defaultFactoryMap: HandlerMap<any> = Object.fromEntries(handlers.map(it => [it.id, it]))
 }
 
-export default ModificationHandlerFactory
+export { ModificationHandlerFactory }

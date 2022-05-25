@@ -11,14 +11,17 @@ import {
 	updateModel,
 	updateSchema,
 } from '../utils/schemaUpdateUtils'
-import { ModificationHandlerOptions, ModificationHandlerStatic } from '../ModificationHandler'
+import {
+	createModificationType,
+	Differ,
+	ModificationHandler,
+	ModificationHandlerOptions,
+} from '../ModificationHandler'
 import { VERSION_ACL_PATCH, VERSION_REMOVE_REFERENCING_RELATIONS } from '../ModificationVersions'
 import { isRelation, PredicateDefinitionProcessor } from '@contember/schema-utils'
-import { RemoveFieldModification } from '../fields'
+import { removeFieldModification } from '../fields'
 
-export const RemoveEntityModification: ModificationHandlerStatic<RemoveEntityModificationData> = class {
-	static id = 'removeEntity'
-
+export class RemoveEntityModificationHandler implements ModificationHandler<RemoveEntityModificationData> {
 	constructor(
 		private readonly data: RemoveEntityModificationData,
 		private readonly schema: Schema,
@@ -36,7 +39,7 @@ export const RemoveEntityModification: ModificationHandlerStatic<RemoveEntityMod
 		}
 		if (this.options.formatVersion >= VERSION_REMOVE_REFERENCING_RELATIONS) {
 			this.getFieldsToRemove(this.schema).forEach(([entityName, fieldName]) => {
-				(new RemoveFieldModification({ entityName, fieldName }, this.schema, this.options)).createSql(builder)
+				removeFieldModification.createHandler({ entityName, fieldName }, this.schema, this.options).createSql(builder)
 			})
 		}
 		builder.dropTable(entity.tableName)
@@ -107,17 +110,21 @@ export const RemoveEntityModification: ModificationHandlerStatic<RemoveEntityMod
 		return { message: `Remove entity ${this.data.entityName}`, isDestructive: true }
 	}
 
-	static createModification(data: RemoveEntityModificationData) {
-		return { modification: this.id, ...data }
-	}
-
-	static createDiff(originalSchema: Schema, updatedSchema: Schema) {
-		return Object.keys(originalSchema.model.entities)
-			.filter(name => !updatedSchema.model.entities[name])
-			.map(entityName => RemoveEntityModification.createModification({ entityName }))
-	}
 }
 
 export interface RemoveEntityModificationData {
 	entityName: string
+}
+
+export const removeEntityModification = createModificationType({
+	id: 'removeEntity',
+	handler: RemoveEntityModificationHandler,
+})
+
+export class RemoveEntityDiffer implements Differ {
+	createDiff(originalSchema: Schema, updatedSchema: Schema) {
+		return Object.keys(originalSchema.model.entities)
+			.filter(name => !updatedSchema.model.entities[name])
+			.map(entityName => removeEntityModification.createModification({ entityName }))
+	}
 }

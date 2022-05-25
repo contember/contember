@@ -1,6 +1,6 @@
 import { Differ } from '../ModificationHandler'
 import { Schema } from '@contember/schema'
-import { RemoveEntityModification } from '../entities'
+import { removeEntityModification } from '../entities'
 
 export class ChangeViewNonViewDiffer implements Differ {
 	createDiff(originalSchema: Schema, updatedSchema: Schema) {
@@ -12,6 +12,6 @@ export class ChangeViewNonViewDiffer implements Differ {
 				}
 				return !!origEntity.view !== !!it.view
 			})
-			.map(it => RemoveEntityModification.createModification({ entityName: it.name }))
+			.map(it => removeEntityModification.createModification({ entityName: it.name }))
 	}
 }

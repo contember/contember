@@ -1,12 +1,16 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Model, Schema } from '@contember/schema'
 import { SchemaUpdater, updateModel } from '../utils/schemaUpdateUtils'
-import { ModificationHandlerOptions, ModificationHandlerStatic } from '../ModificationHandler'
+import {
+	createModificationType,
+	Differ,
+	ModificationHandler,
+	ModificationHandlerOptions,
+} from '../ModificationHandler'
 import { createEventTrigger, createEventTrxTrigger } from '../utils/sqlUpdateUtils'
 import { PartialEntity } from '../../utils/PartialEntity.js'
 
-export const CreateEntityModification: ModificationHandlerStatic<CreateEntityModificationData> = class {
-	static id = 'createEntity'
+export class CreateEntityModificationHandler implements ModificationHandler<CreateEntityModificationData> {
 	constructor(
 		private readonly data: CreateEntityModificationData,
 		private readonly schema: Schema,
@@ -60,16 +64,20 @@ export const CreateEntityModification: ModificationHandlerStatic<CreateEntityMod
 		return { message: `Add entity ${this.data.entity.name}` }
 	}
 
-	static createModification(data: CreateEntityModificationData) {
-		return { modification: this.id, ...data }
-	}
+}
 
-	static createDiff(originalSchema: Schema, updatedSchema: Schema) {
+export const createEntityModification = createModificationType({
+	id: 'createEntity',
+	handler: CreateEntityModificationHandler,
+})
+
+export class CreateEntityDiffer implements Differ {
+	createDiff(originalSchema: Schema, updatedSchema: Schema) {
 		return Object.values(updatedSchema.model.entities)
 			.filter(it => !originalSchema.model.entities[it.name])
 			.filter(it => !it.view)
 			.map(entity =>
-				CreateEntityModification.createModification({
+				createEntityModification.createModification({
 					entity: {
 						...entity,
 						fields: {

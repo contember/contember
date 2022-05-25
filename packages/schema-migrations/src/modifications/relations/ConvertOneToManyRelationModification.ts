@@ -1,14 +1,18 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Model, Schema } from '@contember/schema'
 import { SchemaUpdater, updateEntity, updateField, updateModel, updateSchema } from '../utils/schemaUpdateUtils'
-import { ModificationHandler, ModificationHandlerOptions, ModificationHandlerStatic } from '../ModificationHandler'
+import {
+	createModificationType,
+	Differ,
+	ModificationHandler,
+	ModificationHandlerOptions,
+} from '../ModificationHandler'
 import { isOwningRelation, NamingHelper } from '@contember/schema-utils'
 import { updateRelations } from '../utils/diffUtils'
-import { UpdateFieldNameModification } from '../fields'
 import { NoopModification } from '../NoopModification'
+import { updateFieldNameModification } from '../fields'
 
-export const ConvertOneToManyRelationModification: ModificationHandlerStatic<ConvertOneToManyRelationModificationData> = class {
-	static id = 'convertOneToManyRelation'
+export class ConvertOneToManyRelationModificationHandler implements ModificationHandler<ConvertOneToManyRelationModificationData> {
 	private subModification: ModificationHandler<any>
 
 	constructor(
@@ -18,7 +22,7 @@ export const ConvertOneToManyRelationModification: ModificationHandlerStatic<Con
 	) {
 		const { relation } = this.getRelation()
 		this.subModification = data.newInverseSideFieldName && relation.inversedBy ?
-			new UpdateFieldNameModification(
+			updateFieldNameModification.createHandler(
 				{
 					entityName: relation.target,
 					fieldName: relation.inversedBy,
@@ -80,31 +84,6 @@ export const ConvertOneToManyRelationModification: ModificationHandlerStatic<Con
 		}
 	}
 
-	static createModification(data: ConvertOneToManyRelationModificationData) {
-		return { modification: this.id, ...data }
-	}
-
-	static createDiff(originalSchema: Schema, updatedSchema: Schema) {
-		return updateRelations(originalSchema, updatedSchema, ({ originalRelation, updatedRelation, updatedEntity }) => {
-			if (
-				isOwningRelation(originalRelation) &&
-				isOwningRelation(updatedRelation) &&
-				originalRelation.type === Model.RelationType.OneHasOne &&
-				updatedRelation.type === Model.RelationType.ManyHasOne
-			) {
-				const isInverseSideRenamed = originalRelation.inversedBy && updatedRelation.inversedBy && originalRelation.inversedBy !== updatedRelation.inversedBy
-				return ConvertOneToManyRelationModification.createModification({
-					entityName: updatedEntity.name,
-					fieldName: updatedRelation.name,
-					...(isInverseSideRenamed ? {
-						newInverseSideFieldName: updatedRelation.inversedBy,
-					} : {}),
-				})
-			}
-			return undefined
-		})
-	}
-
 	private getRelation() {
 		const entity = this.schema.model.entities[this.data.entityName]
 		const relation = entity.fields[this.data.fieldName]
@@ -119,4 +98,32 @@ export interface ConvertOneToManyRelationModificationData {
 	entityName: string
 	fieldName: string
 	newInverseSideFieldName?: string
+}
+
+export const convertOneToManyRelationModification = createModificationType({
+	id: 'convertOneToManyRelation',
+	handler: ConvertOneToManyRelationModificationHandler,
+})
+
+export class ConvertOneToManyRelationDiffer implements Differ {
+	createDiff(originalSchema: Schema, updatedSchema: Schema) {
+		return updateRelations(originalSchema, updatedSchema, ({ originalRelation, updatedRelation, updatedEntity }) => {
+			if (
+				isOwningRelation(originalRelation) &&
+				isOwningRelation(updatedRelation) &&
+				originalRelation.type === Model.RelationType.OneHasOne &&
+				updatedRelation.type === Model.RelationType.ManyHasOne
+			) {
+				const isInverseSideRenamed = originalRelation.inversedBy && updatedRelation.inversedBy && originalRelation.inversedBy !== updatedRelation.inversedBy
+				return convertOneToManyRelationModification.createModification({
+					entityName: updatedEntity.name,
+					fieldName: updatedRelation.name,
+					...(isInverseSideRenamed ? {
+						newInverseSideFieldName: updatedRelation.inversedBy,
+					} : {}),
+				})
+			}
+			return undefined
+		})
+	}
 }

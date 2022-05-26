@@ -162,12 +162,6 @@ export const Pages = ({ children, layout }: PagesProps) => {
 		)
 	}
 
-	for (const reservedVariableName of Environment.reservedVariableNames) {
-		if (reservedVariableName in request.parameters) {
-			throw new Error(`Cannot use ${reservedVariableName} as parameter name.`)
-		}
-	}
-
 	let pageKey = request.pageName
 	let pageAction = undefined
 	let Page = pageMap.get(pageKey)
@@ -186,8 +180,8 @@ export const Pages = ({ children, layout }: PagesProps) => {
 	}
 
 	const requestEnv = rootEnv
-		.updateDimensionsIfNecessary(request.dimensions, rootEnv.getAllDimensions())
-		.putDelta(request.parameters)
+		.withDimensions(request.dimensions)
+		.withParameters(request.parameters)
 
 	return (
 		<EnvironmentContext.Provider value={requestEnv}>

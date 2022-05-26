@@ -4,7 +4,7 @@ import { Parser } from '../../../../src/queryLanguage'
 import type { ParsedTaggedMap } from '../../../../src/queryLanguage/ParserResults'
 
 const parse = (input: string): ParsedTaggedMap => {
-	return Parser.parseQueryLanguageExpression(input, 'taggedMap', new Environment())
+	return Parser.parseQueryLanguageExpression(input, 'taggedMap', Environment.create())
 }
 
 describe('tagged map QueryLanguage parser', () => {

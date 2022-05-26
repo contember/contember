@@ -8,14 +8,15 @@ import {
 } from '../accessorPropagation'
 import { NIL_UUID, PRIMARY_KEY_NAME } from '../bindingTypes'
 import { Environment } from '../dao'
-import { MarkerFactory } from '../queryLanguage'
+import { MarkerFactory, QueryLanguage } from '../queryLanguage'
 import type { SugaredQualifiedEntityList, SugaredUnconstrainedQualifiedEntityList, TreeRootId } from '../treeParameters'
 import { Component } from './Component'
 import { EntityList, EntityListBaseProps } from './EntityList'
 import { Field } from './Field'
+import { TreeNodeEnvironmentFactory } from '../dao/TreeNodeEnvironmentFactory'
 
 export interface EntityListSubTreeAdditionalProps {
-	variables?: Environment.DeltaFactory
+	variables?: Environment.ValuesMapWithFactory
 }
 
 export type EntityListSubTreeProps<ListProps, EntityProps> = {
@@ -65,20 +66,8 @@ export const EntityListSubTree = Component(
 			</EntityList>
 		),
 		generateEnvironment: (props, oldEnvironment) => {
-			const newEnvironment =
-				props.variables === undefined
-					? oldEnvironment
-					: oldEnvironment.putDelta(Environment.generateDelta(oldEnvironment, props.variables))
-
-			if (newEnvironment.hasName('rootWhere') || newEnvironment.hasName('rootWhereAsFilter')) {
-				return newEnvironment
-			}
-
-			const rootWhere = { id: NIL_UUID } as const
-			return newEnvironment.putDelta({
-				rootWhere,
-				rootWhereAsFilter: whereToFilter(rootWhere),
-			})
+			const environment = oldEnvironment.withVariables(props.variables)
+			return TreeNodeEnvironmentFactory.createEnvironmentForEntityListSubtree(environment, props)
 		},
 	},
 	'EntityListSubTree',

@@ -1,10 +1,12 @@
 import { useClassNamePrefix } from '../../auxiliary'
 import { Button, ButtonGroup } from '../Forms'
 import { Icon } from '../Icon'
-import { DevErrorInner, DevErrorInnerProps } from './DevErrorInner'
+import { DevErrorInner } from './DevErrorInner'
+import { ProcessedError } from './types'
 
 export interface DevErrorListProps {
-	currentError: DevErrorInnerProps
+	currentError: ProcessedError
+	currentErrorSource: string
 	currentErrorIndex: number
 	errorCount: number
 	onPrevious: () => void
@@ -16,6 +18,7 @@ export interface DevErrorListProps {
 export function DevErrorList({
 	currentError,
 	currentErrorIndex,
+	currentErrorSource,
 	errorCount,
 	onClose,
 	onNext,
@@ -26,7 +29,7 @@ export function DevErrorList({
 		<div className={`${prefix}devError`}>
 			<div className={`${prefix}devError-in`}>
 				<div className={`${prefix}devError-bar`}>
-					<div className={`${prefix}devError-errorSource`}>{currentError.source}</div>
+					<div className={`${prefix}devError-errorSource`}>{currentErrorSource}</div>
 					<div className={`${prefix}devError-actions`}>
 						{errorCount > 1 ? (
 							<div className={`${prefix}devError-switcher`}>
@@ -51,7 +54,7 @@ export function DevErrorList({
 					</div>
 				</div>
 
-				<DevErrorInner {...currentError} />
+				<DevErrorInner error={currentError} />
 			</div>
 		</div>
 	)

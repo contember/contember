@@ -5,7 +5,7 @@ import { Parser } from '../../../../src/queryLanguage'
 
 describe('query language parser', () => {
 	it('should resolve variables adhering to the principle maximal munch', () => {
-		const environment = Environment.create({
+		const environment = Environment.create().withVariables({
 			ab: 456,
 			a: 123,
 			x: 'x',

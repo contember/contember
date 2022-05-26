@@ -9,3 +9,9 @@ export interface ParsedStackFrame {
 }
 
 export type ErrorType = Error | unknown
+
+export interface ProcessedError {
+	error: ErrorType
+	parsedStackStrace?: ParsedStackTrace
+	cause?: ProcessedError
+}

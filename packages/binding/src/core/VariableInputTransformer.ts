@@ -11,12 +11,15 @@ export class VariableInputTransformer {
 	}
 
 	public static transformVariableFieldValue(variableFieldValue: VariableFieldValue, environment: Environment): Scalar {
-		const value = environment.getValueOrElse(variableFieldValue.variableName, undefined)
+		const value = environment.getVariableOrElse(variableFieldValue.variableName, undefined)
+			?? environment.getParameterOrElse(variableFieldValue.variableName, undefined)
+
+		if (value === undefined) {
+			throw new BindingError(`Variable '${variableFieldValue.variableName}' not found.`)
+		}
 
 		if (typeof value !== 'string' && typeof value !== 'boolean' && typeof value !== 'number' && value !== null) {
-			throw new BindingError(
-				`The value of the '${variableFieldValue.variableName}' must be a scalar or null, not '${typeof value}'.`,
-			)
+			throw new BindingError(`The value of the '${variableFieldValue.variableName}' must be a scalar or null, not '${typeof value}'.`)
 		}
 		return value
 	}

@@ -1,11 +1,10 @@
-import { whereToFilter } from '@contember/client'
 import { useConstantValueInvariant } from '@contember/react-utils'
 import { ReactElement, ReactNode, useCallback } from 'react'
 import { useAccessorUpdateSubscription, useEntitySubTreeParameters, useGetEntitySubTree } from '../accessorPropagation'
 import { SetOrderFieldOnCreate, SetOrderFieldOnCreateOwnProps } from '../accessorSorting'
-import { NIL_UUID, PRIMARY_KEY_NAME } from '../bindingTypes'
+import { PRIMARY_KEY_NAME } from '../bindingTypes'
 import { Environment } from '../dao'
-import { MarkerFactory, QueryLanguage } from '../queryLanguage'
+import { MarkerFactory } from '../queryLanguage'
 import type {
 	SugaredQualifiedSingleEntity,
 	SugaredUnconstrainedQualifiedSingleEntity,
@@ -14,18 +13,25 @@ import type {
 import { Component } from './Component'
 import { Entity } from './Entity'
 import { Field } from './Field'
+import { TreeNodeEnvironmentFactory } from '../dao/TreeNodeEnvironmentFactory'
 
 export interface EntitySubTreeAdditionalProps {
-	variables?: Environment.DeltaFactory
+	variables?: Environment.ValuesMapWithFactory
 }
 
 export type EntitySubTreeAdditionalCreationProps = {} | SetOrderFieldOnCreateOwnProps
 
-export type EntitySubTreeProps<EntityProps> = {
-	treeRootId?: TreeRootId
-	children?: ReactNode
-} & EntitySubTreeAdditionalProps &
-	(SugaredQualifiedSingleEntity | (SugaredUnconstrainedQualifiedSingleEntity & EntitySubTreeAdditionalCreationProps))
+export type EntitySubTreeProps<EntityProps> =
+	& {
+		treeRootId?: TreeRootId
+		children?: ReactNode
+	}
+	& EntitySubTreeAdditionalProps
+	& (
+		| SugaredQualifiedSingleEntity
+		| (SugaredUnconstrainedQualifiedSingleEntity & EntitySubTreeAdditionalCreationProps)
+	)
+
 export const EntitySubTree = Component(
 	<EntityProps extends {}>(props: EntitySubTreeProps<EntityProps>) => {
 		useConstantValueInvariant(props.isCreating, 'EntitySubTree: cannot update isCreating')
@@ -69,29 +75,8 @@ export const EntitySubTree = Component(
 			</>
 		),
 		generateEnvironment: (props, oldEnvironment) => {
-			const newEnvironment =
-				props.variables === undefined
-					? oldEnvironment
-					: oldEnvironment.putDelta(Environment.generateDelta(oldEnvironment, props.variables))
-
-			if (newEnvironment.hasName('rootWhere') || newEnvironment.hasName('rootWhereAsFilter')) {
-				return newEnvironment
-			}
-
-			if (props.isCreating) {
-				const rootWhere = { id: NIL_UUID } as const
-				return newEnvironment.putDelta({
-					rootWhere,
-					rootWhereAsFilter: whereToFilter(rootWhere),
-					rootShouldExists: 'no',
-				})
-			}
-			const qualifiedSingleEntity = QueryLanguage.desugarQualifiedSingleEntity(props, newEnvironment, { missingSetOnCreate: 'fill' })
-			return newEnvironment.putDelta({
-				rootWhere: qualifiedSingleEntity.where,
-				rootWhereAsFilter: whereToFilter(qualifiedSingleEntity.where),
-				rootShouldExists: qualifiedSingleEntity.setOnCreate ? 'maybe' : 'yes',
-			})
+			const environment = oldEnvironment.withVariables(props.variables)
+			return TreeNodeEnvironmentFactory.createEnvironmentForEntitySubtree(environment, props)
 		},
 	},
 	'EntitySubTree',

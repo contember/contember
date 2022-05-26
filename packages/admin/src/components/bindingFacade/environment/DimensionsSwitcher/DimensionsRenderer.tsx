@@ -145,7 +145,7 @@ export function DimensionsRenderer(props: DimensionsRendererProps) {
 		return selectedDimensions.filter((item, i, array) => array.indexOf(item) === i)
 	}
 
-	const uniqueDimensions = getUniqueDimensions(environment.getDimension(props.dimension) || [])
+	const uniqueDimensions = getUniqueDimensions(environment.getDimensionOrElse(props.dimension, []))
 	const normalizedData = getNormalizedData(uniqueDimensions, props.accessor)
 
 	const selectedDimensions = normalizedData

@@ -12,7 +12,6 @@ class Environment {
 
 	public static create() {
 		return new Environment({
-			labelMiddleware: label => label,
 			dimensions: {},
 			variables: {},
 			parameters: {},
@@ -161,14 +160,6 @@ class Environment {
 		return new Environment({ ...this.options, dimensions: newDimensions })
 	}
 
-	public applyLabelMiddleware(label: React.ReactNode): React.ReactNode {
-		return this.options['labelMiddleware'](label, this)
-	}
-
-	public withLabelMiddleware(labelMiddleware: Environment.Options['labelMiddleware']) {
-		return new Environment({ ...this.options, labelMiddleware })
-	}
-
 	public getSchema(): Schema {
 		if (!this.options.schema) {
 			throw new BindingError('Schema is not set')
@@ -226,15 +217,12 @@ namespace Environment {
 
 	export type ResolvedValue = Value | Filter
 
-	export type LabelMiddleware = (label: ReactNode, environment: Environment) => ReactNode
-
 	export interface Options {
 		node?: AnyNode
 		schema?: Schema
 		dimensions: SelectedDimensions
 		parameters: Parameters
 		variables: CustomVariables
-		labelMiddleware: LabelMiddleware
 		parent?: Environment
 	}
 

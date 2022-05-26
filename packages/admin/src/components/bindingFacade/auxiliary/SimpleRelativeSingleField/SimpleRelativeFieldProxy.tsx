@@ -3,6 +3,7 @@ import { FieldContainer, FieldContainerProps } from '@contember/ui'
 import { memo, ReactNode, useMemo } from 'react'
 import { useAccessorErrors } from '../../errors'
 import type { SimpleRelativeSingleFieldMetadata } from './SimpleRelativeSingleField'
+import { useLabelMiddleware } from '../../environment/LabelMiddleware'
 
 export type SimpleRelativeSingleFieldProxyProps = Omit<FieldContainerProps, 'children'> &
 	SugaredRelativeSingleField & {
@@ -13,11 +14,9 @@ export const SimpleRelativeSingleFieldProxy = memo(
 	({ render, label, labelDescription, labelPosition, description, ...props }: SimpleRelativeSingleFieldProxyProps) => {
 		const environment = useEnvironment()
 		const field = useField(props)
+		const labelMiddleware = useLabelMiddleware()
 
-		const normalizedLabel = useMemo(
-			() => environment.applyLabelMiddleware(label),
-			[environment, label],
-		)
+		const normalizedLabel = useMemo(() => labelMiddleware(label), [labelMiddleware, label])
 
 		const isMutating = useMutationState()
 

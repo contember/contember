@@ -11,6 +11,7 @@ import {
 } from '../ChoiceField'
 import { selectStyles } from './commonStyles'
 import { useCommonReactSelectAsyncProps } from './useCommonReactSelectAsyncProps'
+import { useLabelMiddleware } from '../../environment/LabelMiddleware'
 
 export type SelectFieldProps =
 	& SelectFieldInnerPublicProps
@@ -75,11 +76,13 @@ export const SelectFieldInner = memo(
 			isInvalid: (errors?.length ?? 0) > 0,
 		})
 
+		const labelMiddleware = useLabelMiddleware()
+
 		return (
 			<FieldContainer
 				{...fieldContainerProps}
 				errors={errors}
-				label={environment.applyLabelMiddleware(fieldContainerProps.label)}
+				label={labelMiddleware(fieldContainerProps.label)}
 			>
 				<AsyncSelect
 					{...asyncProps}

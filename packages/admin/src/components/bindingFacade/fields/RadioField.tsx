@@ -9,6 +9,7 @@ import {
 	DynamicSingleChoiceFieldProps,
 	StaticSingleChoiceFieldProps,
 } from './ChoiceField'
+import { useLabelMiddleware } from '../environment/LabelMiddleware'
 
 export type RadioFieldProps =
 	& RadioFieldInnerPublicProps
@@ -49,6 +50,7 @@ export interface RadioFieldInnerProps extends ChoiceFieldData.SingleChoiceFieldM
 
 
 export const RadioFieldInner = memo((props: RadioFieldInnerProps) => {
+	const labelMiddleware = useLabelMiddleware()
 	const options: RadioOption[] = props.data.map(({ key, label, description }) => {
 		return {
 			value: key.toString(),
@@ -61,7 +63,7 @@ export const RadioFieldInner = memo((props: RadioFieldInnerProps) => {
 		<FieldContainer
 			{...props}
 			errors={props.errors}
-			label={props.environment.applyLabelMiddleware(props.label)}
+			label={labelMiddleware(props.label)}
 			useLabelElement={false}
 		>
 			<Radio

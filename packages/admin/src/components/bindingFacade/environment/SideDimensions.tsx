@@ -8,6 +8,7 @@ import {
 	SugaredRelativeSingleEntity,
 } from '@contember/binding'
 import { PureComponent, ReactElement, ReactNode, ReactNodeArray } from 'react'
+import { LabelMiddleware, LabelMiddlewareProvider } from './LabelMiddleware'
 
 type EnforceSubtypeRelation<Sub extends Super, Super> = never
 
@@ -70,6 +71,7 @@ class SideDimensions extends PureComponent<SideDimensionsProps> {
 									hasOneField={props.hasOneField}
 									key={j}
 									renderDimensionValue={dimensions.length > 1}
+									labelMiddleware={props.labelMiddleware}
 								>
 									{child}
 								</SideDimensions.SingleDimension>
@@ -87,7 +89,7 @@ namespace SideDimensions {
 		hasOneField?: string | SugaredRelativeSingleEntity
 		variableName?: Environment.Name
 		variables?: Environment.ValuesMapWithFactory | ((dimensionValue: Environment.Value) => Environment.ValuesMapWithFactory)
-		labelMiddleware?: Environment.LabelMiddleware
+		labelMiddleware?: LabelMiddleware
 	}
 
 	export interface SingleDimensionProps extends CommonDimensionProps {
@@ -102,7 +104,8 @@ namespace SideDimensions {
 
 		public override render() {
 			const children = SingleDimension.staticRender(this.props, this.props.environment)
-			return (
+			const newLabelMiddleware = this.getLabelMiddleware()
+			const inner = (
 				<EnvironmentContext.Provider value={SingleDimension.generateEnvironment(this.props, this.props.environment)}>
 					<div className="sideDimensions-dimensions-dimension">
 						{this.props.renderDimensionValue && <span className="sideDimensions-dimensions-dimensionValue">{this.props.dimensionValue}</span>}
@@ -110,6 +113,28 @@ namespace SideDimensions {
 					</div>
 				</EnvironmentContext.Provider>
 			)
+			if (newLabelMiddleware) {
+				return (
+					<LabelMiddlewareProvider value={newLabelMiddleware}>
+						{inner}
+					</LabelMiddlewareProvider>
+				)
+			}
+			return inner
+		}
+
+		public getLabelMiddleware(): LabelMiddleware | undefined {
+			if (this.props.labelMiddleware) {
+				return this.props.labelMiddleware
+			}
+			if (!this.props.variables) {
+				return undefined
+			}
+			const variables = typeof this.props.variables === 'function' ? this.props.variables(this.props.dimensionValue) : this.props.variables
+			if ('labelMiddleware' in variables) {
+				return variables.labelMiddleware as LabelMiddleware
+			}
+			return undefined
 		}
 
 		public static staticRender(props: SingleDimensionProps, environment: Environment): ReactNode {
@@ -134,10 +159,8 @@ namespace SideDimensions {
 				deltaFactory[props.variableName] = props.dimensionValue
 			}
 
-			const { labelMiddleware = props.labelMiddleware, ...variables } = deltaFactory
-			const newEnvironment = oldEnvironment.withVariables(variables)
-
-			return labelMiddleware ? newEnvironment.withLabelMiddleware(labelMiddleware as Environment.Options['labelMiddleware']) : newEnvironment
+			const { labelMiddleware, ...variables } = deltaFactory
+			return oldEnvironment.withVariables(variables)
 		}
 	}
 

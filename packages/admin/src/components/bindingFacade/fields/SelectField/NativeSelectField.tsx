@@ -7,6 +7,7 @@ import {
 	DynamicSingleChoiceFieldProps,
 	StaticSingleChoiceFieldProps,
 } from '../ChoiceField'
+import { useLabelMiddleware } from '../../environment/LabelMiddleware'
 
 export type NativeSelectFieldProps =
 	& NativeSelectFieldInnerPublicProps
@@ -58,6 +59,7 @@ export interface NativeSelectFieldInnerProps extends ChoiceFieldData.SingleChoic
 }
 
 export const NativeSelectFieldInner = memo(forwardRef<HTMLSelectElement, NativeSelectFieldInnerProps>((props, ref) => {
+	const labelMiddleware = useLabelMiddleware()
 	const options: SelectOption<number>[] = props.data.map(({ key, label }) => {
 		if (typeof label !== 'string') {
 			throw new BindingError(`The labels of <SelectField /> items must be strings!`)
@@ -70,7 +72,7 @@ export const NativeSelectFieldInner = memo(forwardRef<HTMLSelectElement, NativeS
 	})
 
 	return (
-		<FieldContainer {...props} label={props.environment.applyLabelMiddleware(props.label)}>
+		<FieldContainer {...props} label={labelMiddleware(props.label)}>
 			<Select
 				ref={ref}
 				required={props.required}

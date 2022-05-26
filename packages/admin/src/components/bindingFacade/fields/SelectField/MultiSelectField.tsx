@@ -6,6 +6,7 @@ import AsyncSelect from 'react-select/async'
 import { ChoiceFieldData, DynamicMultiChoiceField, DynamicMultipleChoiceFieldProps } from '../ChoiceField'
 import { selectStyles } from './commonStyles'
 import { useCommonReactSelectAsyncProps } from './useCommonReactSelectAsyncProps'
+import { useLabelMiddleware } from '../../environment/LabelMiddleware'
 
 export type MultiSelectFieldProps =
 	& MultiSelectFieldInnerPublicProps
@@ -63,6 +64,7 @@ export const MultiSelectFieldInner = memo(
 		placeholder,
 		...fieldContainerProps
 	}: MultiSelectFieldInnerProps) => {
+		const labelMiddleware = useLabelMiddleware()
 		const asyncProps = useCommonReactSelectAsyncProps({
 			reactSelectProps,
 			placeholder,
@@ -73,7 +75,7 @@ export const MultiSelectFieldInner = memo(
 			<FieldContainer
 				{...fieldContainerProps}
 				errors={errors}
-				label={environment.applyLabelMiddleware(fieldContainerProps.label)}
+				label={labelMiddleware(fieldContainerProps.label)}
 			>
 				<AsyncSelect
 					{...asyncProps}

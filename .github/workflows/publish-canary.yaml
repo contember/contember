@@ -26,9 +26,12 @@ jobs:
       - name: "Install yarn deps"
         run: yarn install
 
+      - name: Get the version
+        run: echo "VERSION=${GITHUB_SHA:0:10}" >> $GITHUB_ENV
+
       - name: "Publish Docker"
         run: bash ./scripts/docker/publish.sh ${{ matrix.image }}
         env:
           DOCKER_USER: ${{ secrets.DOCKER_USER }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-          DOCKER_TAGS: "canary-${GITHUB_SHA:0:10}"
+          DOCKER_TAGS: "canary-${{ env.VERSION }}"

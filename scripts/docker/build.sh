@@ -10,8 +10,8 @@ if [[ -z "$1" || "$1" == "engine-alpine" ]]; then
 	TAGS=""
 	for VERSION in "${ALL_VERSIONS[@]}"; do TAGS="$TAGS -t $REPO:$VERSION"; done
 	docker buildx build \
-		--build-args LICENSE_FILE=LICENSE \
-		--build-args SERVER_DIR=packages/engine-server \
+		--build-arg LICENSE_FILE=LICENSE \
+		--build-arg SERVER_DIR=packages/engine-server \
 		--platform linux/amd64,linux/arm64 \
 		--push $TAGS \
 		-f ./scripts/docker/server-alpine.dockerfile \
@@ -23,8 +23,8 @@ if [[ -z "$1" || "$1" == "engine-debian" ]]; then
 	TAGS=""
 	for VERSION in "${ALL_VERSIONS[@]}"; do TAGS="$TAGS -t $REPO:$VERSION-debian"; done
 	docker buildx build \
-		--build-args LICENSE_FILE=LICENSE \
-		--build-args SERVER_DIR=packages/engine-server \
+		--build-arg LICENSE_FILE=LICENSE \
+		--build-arg SERVER_DIR=packages/engine-server \
 		--platform linux/amd64,linux/arm64 \
 		--push $TAGS \
 		-f ./scripts/docker/server-debian.dockerfile \
@@ -36,8 +36,8 @@ if [[ -z "$1" || "$1" == "engine-ee-alpine" ]]; then
 	TAGS=""
 	for VERSION in "${ALL_VERSIONS[@]}"; do TAGS="$TAGS -t $REPO:$VERSION"; done
 	docker buildx build \
-		--build-args LICENSE_FILE=ee/LICENSE \
-		--build-args SERVER_DIR=ee/engine-server-ee \
+		--build-arg LICENSE_FILE=ee/LICENSE \
+		--build-arg SERVER_DIR=ee/engine-server-ee \
 		--platform linux/amd64,linux/arm64 \
 		--push $TAGS \
 		-f ./scripts/docker/server-debian.dockerfile \
@@ -49,8 +49,8 @@ if [[ -z "$1" || "$1" == "engine-ee-debian" ]]; then
 	TAGS=""
 	for VERSION in "${ALL_VERSIONS[@]}"; do TAGS="$TAGS -t $REPO:$VERSION-debian"; done
 	docker buildx build \
-		--build-args LICENSE_FILE=ee/LICENSE \
-		--build-args SERVER_DIR=ee/engine-server-ee \
+		--build-arg LICENSE_FILE=ee/LICENSE \
+		--build-arg SERVER_DIR=ee/engine-server-ee \
 		--platform linux/amd64,linux/arm64 \
 		--push $TAGS \
 		-f ./scripts/docker/server-alpine.dockerfile \

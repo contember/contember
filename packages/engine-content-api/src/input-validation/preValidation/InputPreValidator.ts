@@ -105,8 +105,8 @@ export class InputPreValidator {
 				return data[column.name] as Input.ColumnValue | undefined
 			},
 			visitHasOne: (entity, relation) => {
-				const value = data[relation.name] as Input.CreateOneRelationInput | Input.UpdateOneRelationInput | undefined
-				if (value === undefined) {
+				const value = data[relation.name] as Input.CreateOneRelationInput | Input.UpdateOneRelationInput | undefined | null
+				if (value === undefined || value === null) {
 					return undefined
 				}
 				if ('disconnect' in value) {

@@ -10,11 +10,14 @@ export class ConditionBuilder {
 		columnType: string,
 		condition: Input.Condition<any>,
 	): SqlConditionBuilder {
-		const keys = Object.keys(condition) as (keyof Required<Input.Condition<any>>)[]
-		if (keys.length === 0) {
+		const entries = Object.entries(condition)
+			.filter(<T extends keyof Input.Condition>(it: [string, any]): it is [T, Input.Condition[T]] =>
+				it[1] !== null,
+			)
+		if (entries.length === 0) {
 			return builder
 		}
-		if (keys.length > 1) {
+		if (entries.length > 1) {
 			throw new UserError(
 				'Only single field is allowed. If you want to combine multiple conditions, use "and" or "or". Got: ' +
 					JSON.stringify(condition),
@@ -53,6 +56,6 @@ export class ConditionBuilder {
 			null: (builder, value) => value ? builder.isNull(columnIdentifier) : builder.not(clause => clause.isNull(columnIdentifier)),
 		}
 
-		return handler[keys[0]](builder, condition[keys[0]])
+		return handler[entries[0][0]](builder, entries[0][1])
 	}
 }

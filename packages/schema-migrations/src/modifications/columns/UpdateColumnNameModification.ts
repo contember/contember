@@ -6,12 +6,12 @@ import { updateColumns } from '../utils/diffUtils'
 import { acceptFieldVisitor } from '@contember/schema-utils'
 
 export class UpdateColumnNameModificationHandler implements ModificationHandler<UpdateColumnNameModificationData> {
-	constructor(private readonly data: UpdateColumnNameModificationData, private readonly schema: Schema) {
+	constructor(protected readonly data: UpdateColumnNameModificationData, protected readonly schema: Schema) {
 	}
 
 	public createSql(builder: MigrationBuilder): void {
 		const entity = this.schema.model.entities[this.data.entityName]
-		if (entity.view || !entity.migrations.enabled) {
+		if (entity.view) {
 			return
 		}
 		acceptFieldVisitor(this.schema.model, entity, this.data.fieldName, {

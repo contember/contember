@@ -7,13 +7,10 @@ import { isIt } from '../../utils/isIt'
 import { updateRelations } from '../utils/diffUtils'
 
 export class MakeRelationNullableModificationHandler implements ModificationHandler<MakeRelationNullableModificationData> {
-	constructor(private readonly data: MakeRelationNullableModificationData, private readonly schema: Schema) {}
+	constructor(protected readonly data: MakeRelationNullableModificationData, protected readonly schema: Schema) {}
 
 	public createSql(builder: MigrationBuilder): void {
 		const entity = getEntity(this.schema.model, this.data.entityName)
-		if (!entity.migrations.enabled) {
-			return
-		}
 		if (entity.view) {
 			return
 		}

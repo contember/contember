@@ -4,13 +4,9 @@ import { SchemaUpdater, updateModel } from '../utils/schemaUpdateUtils'
 import { createModificationType, Differ, ModificationHandler } from '../ModificationHandler'
 
 export class RemoveEnumModificationHandler implements ModificationHandler<RemoveEnumModificationData> {
-	constructor(private readonly data: RemoveEnumModificationData, private readonly schema: Schema) {}
+	constructor(protected readonly data: RemoveEnumModificationData, protected readonly schema: Schema) {}
 
 	public createSql(builder: MigrationBuilder): void {
-		const enum_ = this.schema.model.enums[this.data.enumName]
-		if (!enum_.migrations.enabled) {
-			return
-		}
 		builder.dropDomain(this.data.enumName)
 	}
 

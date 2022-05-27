@@ -24,16 +24,13 @@ import { normalizeManyHasManyRelation, PartialManyHasManyRelation } from './norm
 export class CreateRelationModificationHandler implements ModificationHandler<CreateRelationModificationData> {
 
 	constructor(
-		private readonly data: CreateRelationModificationData,
-		private readonly schema: Schema,
+		protected readonly data: CreateRelationModificationData,
+		protected readonly schema: Schema,
 		private readonly options: ModificationHandlerOptions,
 	) {}
 
 	public createSql(builder: MigrationBuilder): void {
 		const entity = this.schema.model.entities[this.data.entityName]
-		if (!entity.migrations.enabled) {
-			return
-		}
 		if (entity.view) {
 			return
 		}

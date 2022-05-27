@@ -25,8 +25,8 @@ export class UpdateFieldNameModificationHandler implements ModificationHandler<U
 	private renameColumnSubModification: ModificationHandler<any> = new NoopModification()
 
 	constructor(
-		private readonly data: UpdateFieldNameModificationData,
-		private readonly schema: Schema,
+		protected readonly data: UpdateFieldNameModificationData,
+		protected readonly schema: Schema,
 		private readonly options: ModificationHandlerOptions,
 	) {
 		if (this.data.columnName) {
@@ -40,9 +40,6 @@ export class UpdateFieldNameModificationHandler implements ModificationHandler<U
 
 	public createSql(builder: MigrationBuilder): void {
 		const entity = this.schema.model.entities[this.data.entityName]
-		if (!entity.migrations.enabled) {
-			return
-		}
 		if (entity.view) {
 			return
 		}

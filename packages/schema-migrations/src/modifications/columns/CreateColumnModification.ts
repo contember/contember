@@ -8,11 +8,11 @@ import { ImplementationException } from '../../exceptions'
 import { createFields } from '../utils/diffUtils'
 
 export class CreateColumnModificationHandler implements ModificationHandler<CreateColumnModificationData> {
-	constructor(private readonly data: CreateColumnModificationData, private readonly schema: Schema) {}
+	constructor(protected readonly data: CreateColumnModificationData, protected readonly schema: Schema) {}
 
 	public createSql(builder: MigrationBuilder): void {
 		const entity = this.schema.model.entities[this.data.entityName]
-		if (entity.view || !entity.migrations.enabled) {
+		if (entity.view) {
 			return
 		}
 		const column = this.data.field

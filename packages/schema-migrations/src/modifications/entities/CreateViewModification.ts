@@ -6,13 +6,10 @@ import { Migration } from '../../Migration'
 import { PartialEntity } from '../../utils/PartialEntity.js'
 
 export class CreateViewModificationHandler implements ModificationHandler<CreateViewModificationData> {
-	constructor(private readonly data: CreateViewModificationData, private readonly schema: Schema) {}
+	constructor(protected readonly data: CreateViewModificationData, protected readonly schema: Schema) {}
 
 	public createSql(builder: MigrationBuilder): void {
 		const entity = this.data.entity
-		if (!entity.migrations.enabled) {
-			return
-		}
 		if (!entity.view) {
 			throw new Error()
 		}

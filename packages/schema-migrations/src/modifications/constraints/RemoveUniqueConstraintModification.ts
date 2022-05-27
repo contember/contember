@@ -5,12 +5,12 @@ import { createModificationType, Differ, ModificationHandler } from '../Modifica
 import deepEqual from 'fast-deep-equal'
 
 export class RemoveUniqueConstraintModificationHandler implements ModificationHandler<RemoveUniqueConstraintModificationData> {
-	constructor(private readonly data: RemoveUniqueConstraintModificationData, private readonly schema: Schema) {
+	constructor(protected readonly data: RemoveUniqueConstraintModificationData, protected readonly schema: Schema) {
 	}
 
 	public createSql(builder: MigrationBuilder): void {
 		const entity = this.schema.model.entities[this.data.entityName]
-		if (entity.view || !entity.migrations.enabled) {
+		if (entity.view) {
 			return
 		}
 		builder.dropConstraint(entity.tableName, this.data.constraintName)

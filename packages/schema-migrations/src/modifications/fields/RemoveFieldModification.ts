@@ -8,16 +8,13 @@ import { isDefined } from '../../utils/isDefined'
 export class RemoveFieldModificationHandler implements ModificationHandler<RemoveFieldModificationData> {
 
 	constructor(
-		private readonly data: RemoveFieldModificationData,
-		private readonly schema: Schema,
+		protected readonly data: RemoveFieldModificationData,
+		protected readonly schema: Schema,
 		private readonly options: ModificationHandlerOptions,
 	) {}
 
 	public createSql(builder: MigrationBuilder): void {
 		const entity = this.schema.model.entities[this.data.entityName]
-		if (!entity.migrations.enabled) {
-			return
-		}
 		if (entity.view) {
 			return
 		}

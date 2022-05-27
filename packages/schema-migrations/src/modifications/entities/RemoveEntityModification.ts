@@ -23,16 +23,13 @@ import { removeFieldModification } from '../fields'
 
 export class RemoveEntityModificationHandler implements ModificationHandler<RemoveEntityModificationData> {
 	constructor(
-		private readonly data: RemoveEntityModificationData,
-		private readonly schema: Schema,
+		protected readonly data: RemoveEntityModificationData,
+		protected readonly schema: Schema,
 		private readonly options: ModificationHandlerOptions,
 	) {}
 
 	public createSql(builder: MigrationBuilder): void {
 		const entity = this.schema.model.entities[this.data.entityName]
-		if (!entity.migrations.enabled) {
-			return
-		}
 		if (entity.view) {
 			builder.dropView(entity.tableName)
 			return

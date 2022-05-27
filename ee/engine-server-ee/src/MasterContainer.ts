@@ -12,6 +12,8 @@ import {
 import { ServerConfig } from './config/configSchema'
 import { PrometheusRegistryFactory } from './prometheus/PrometheusRegistryFactory'
 import { ProjectGroupContainerMetricsHook } from './prometheus/ProjectGroupContainerMetricsHook'
+import { ModificationHandlerFactory } from '@contember/schema-migrations'
+import { getModificationTypes } from './migrations/modificationsFactory'
 
 export interface MasterContainer extends BaseMasterContainer {
 	monitoringKoa: Koa
@@ -60,6 +62,8 @@ export class MasterContainerFactory {
 					projectGroupContainerResolver,
 				)
 			})
+			.replaceService('modificationHandlerFactory', () =>
+				new ModificationHandlerFactory(getModificationTypes()))
 			.addService('monitoringKoa', ({ promRegistry }) => {
 				const app = new Koa()
 				app.use(createShowMetricsMiddleware(promRegistry))

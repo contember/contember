@@ -16,8 +16,8 @@ export class ConvertOneToManyRelationModificationHandler implements Modification
 	private subModification: ModificationHandler<any>
 
 	constructor(
-		private readonly data: ConvertOneToManyRelationModificationData,
-		private readonly schema: Schema,
+		protected readonly data: ConvertOneToManyRelationModificationData,
+		protected readonly schema: Schema,
 		private readonly options: ModificationHandlerOptions,
 	) {
 		const { relation } = this.getRelation()
@@ -36,9 +36,6 @@ export class ConvertOneToManyRelationModificationHandler implements Modification
 
 	public createSql(builder: MigrationBuilder): void {
 		const { entity, relation } = this.getRelation()
-		if (!entity.migrations.enabled) {
-			return
-		}
 		builder.addIndex(entity.tableName, relation.joiningColumn.columnName)
 		const uniqueConstraintName = NamingHelper.createUniqueConstraintName(entity.name, [relation.name])
 		builder.dropConstraint(entity.tableName, uniqueConstraintName)

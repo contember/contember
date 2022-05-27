@@ -6,13 +6,10 @@ import deepEqual from 'fast-deep-equal'
 import { createCheck, getConstraintName } from './enumUtils'
 
 export class UpdateEnumModificationHandler implements ModificationHandler<UpdateEnumModificationData> {
-	constructor(private readonly data: UpdateEnumModificationData, private readonly schema: Schema) {}
+	constructor(protected readonly data: UpdateEnumModificationData, protected readonly schema: Schema) {}
 
 	public createSql(builder: MigrationBuilder): void {
 		const enum_ = this.schema.model.enums[this.data.enumName]
-		if (!enum_.migrations.enabled) {
-			return
-		}
 		builder.sql(`
 			ALTER DOMAIN "${this.data.enumName}"
 			DROP CONSTRAINT ${getConstraintName(this.data.enumName)}`)

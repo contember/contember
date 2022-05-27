@@ -5,7 +5,7 @@ import { createModificationType, Differ, ModificationHandler } from '../Modifica
 import { createCheck, getConstraintName } from './enumUtils'
 
 export class CreateEnumModificationHandler implements ModificationHandler<CreateEnumModificationData> {
-	constructor(private readonly data: CreateEnumModificationData, private readonly schema: Schema) {}
+	constructor(protected readonly data: CreateEnumModificationData, protected readonly schema: Schema) {}
 
 	public createSql(builder: MigrationBuilder): void {
 		if (this.data.migrations?.enabled == false) {

@@ -12,16 +12,13 @@ import { PartialEntity } from '../../utils/PartialEntity.js'
 
 export class CreateEntityModificationHandler implements ModificationHandler<CreateEntityModificationData> {
 	constructor(
-		private readonly data: CreateEntityModificationData,
-		private readonly schema: Schema,
+		protected readonly data: CreateEntityModificationData,
+		protected readonly schema: Schema,
 		private readonly options: ModificationHandlerOptions,
 	) {}
 
 	public createSql(builder: MigrationBuilder): void {
 		const entity = this.data.entity
-		if (entity.migrations?.enabled === false) {
-			return
-		}
 		if (entity.view) {
 			// BC
 			builder.createView(entity.tableName, {}, entity.view.sql)

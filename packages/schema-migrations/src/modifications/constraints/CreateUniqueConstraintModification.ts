@@ -5,12 +5,12 @@ import { createModificationType, Differ, ModificationHandler } from '../Modifica
 import { acceptFieldVisitor } from '@contember/schema-utils'
 
 export class CreateUniqueConstraintModificationHandler implements ModificationHandler<CreateUniqueConstraintModificationData> {
-	constructor(private readonly data: CreateUniqueConstraintModificationData, private readonly schema: Schema) {
+	constructor(protected readonly data: CreateUniqueConstraintModificationData, protected readonly schema: Schema) {
 	}
 
 	public createSql(builder: MigrationBuilder): void {
 		const entity = this.schema.model.entities[this.data.entityName]
-		if (entity.view || !entity.migrations.enabled) {
+		if (entity.view) {
 			return
 		}
 		const fields = this.data.unique.fields

@@ -18,9 +18,9 @@ export class ConvertOneHasManyToManyHasManyRelationModificationHandler implement
 	private subModification: ModificationHandler<any>
 
 	constructor(
-		private readonly data: ConvertOneHasManyToManyHasManyRelationModificationData,
-		private readonly schema: Schema,
-		private readonly options: ModificationHandlerOptions,
+		protected readonly data: ConvertOneHasManyToManyHasManyRelationModificationData,
+		protected readonly schema: Schema,
+		protected readonly options: ModificationHandlerOptions,
 	) {
 		this.subModification = updateFieldNameModification.createHandler(
 			{
@@ -35,9 +35,6 @@ export class ConvertOneHasManyToManyHasManyRelationModificationHandler implement
 
 	public createSql(builder: MigrationBuilder): void {
 		const entity = this.schema.model.entities[this.data.entityName]
-		if (!entity.migrations.enabled) {
-			return
-		}
 		const targetEntity = this.schema.model.entities[this.data.owningSide.target]
 		const { relation: oldRelation } = this.getRelation()
 

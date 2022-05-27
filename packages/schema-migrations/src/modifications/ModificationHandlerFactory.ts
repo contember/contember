@@ -5,12 +5,14 @@ import { createColumnModification, updateColumnDefinitionModification, updateCol
 import { createUniqueConstraintModification, removeUniqueConstraintModification } from './constraints'
 import {
 	configureEntityDatabaseMigrationsModification,
-	createEntityModification, createViewModification,
-	removeEntityModification, toggleEventLogModification,
+	createEntityModification,
+	createViewModification,
+	removeEntityModification,
+	toggleEventLogModification,
 	updateEntityNameModification,
 	updateEntityTableNameModification,
+	updateViewModification,
 } from './entities'
-import { updateViewModification } from './entities/UpdateViewModification'
 import {
 	configureEnumDatabaseMigrationsModification,
 	createEnumModification,
@@ -22,10 +24,12 @@ import {
 	convertOneHasManyToManyHasManyRelationModification,
 	convertOneToManyRelationModification,
 	createRelationInverseSideModification,
-	createRelationModification, disableOrphanRemovalModification,
+	createRelationModification,
+	disableOrphanRemovalModification,
 	enableOrphanRemovalModification,
 	makeRelationNotNullModification,
-	makeRelationNullableModification, toggleJunctionEventLogModification,
+	makeRelationNullableModification,
+	toggleJunctionEventLogModification,
 	updateRelationOnDeleteModification,
 	updateRelationOrderByModification,
 } from './relations'
@@ -45,9 +49,9 @@ class ModificationHandlerFactory {
 }
 
 namespace ModificationHandlerFactory {
-	type HandlerMap<D> = { [modificationName: string]: ModificationType<string, D> }
+	export type ModificationTypes<D> = { [modificationName: string]: ModificationType<string, D> }
 
-	const handlers = [
+	const modificationTypes = [
 		updateAclSchemaModification,
 		patchAclSchemaModification,
 		createColumnModification,
@@ -86,7 +90,7 @@ namespace ModificationHandlerFactory {
 		configureEnumDatabaseMigrationsModification,
 	]
 
-	export const defaultFactoryMap: HandlerMap<any> = Object.fromEntries(handlers.map(it => [it.id, it]))
+	export const defaultFactoryMap: ModificationTypes<any> = Object.fromEntries(modificationTypes.map(it => [it.id, it]))
 }
 
 export { ModificationHandlerFactory }

@@ -2,7 +2,7 @@ import { ApiKeyList, LayoutPage, LinkButton, NavigateBackButton, Section, useCur
 
 export default () => {
 	const request = useCurrentRequest()!
-	const project = request.parameters.project!
+	const project = String(request.parameters.project)
 
 	return (
 		<LayoutPage

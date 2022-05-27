@@ -2,7 +2,7 @@ import { InviteMethod, InviteUser, LayoutPage, NavigateBackButton, useCurrentReq
 
 export default () => {
 	const request = useCurrentRequest()!
-	const project = request.parameters.project!
+	const project = String(request.parameters.project)
 
 	const env = useEnvironment()
 	const inviteMethod = env.getVariableOrElse<undefined, InviteMethod>('inviteMethod', undefined)

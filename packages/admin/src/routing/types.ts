@@ -4,10 +4,10 @@ export interface SelectedDimension {
 	[key: string]: string[]
 }
 
-export type RequestParameterValue = number | string | undefined
+export type RequestParameterValue = number | string
 
-export interface RequestParameters<Extra extends RoutingParameter = never> {
-	[key: string]: RequestParameterValue | Extra
+export type RequestParameters<Extra extends RoutingParameter = never> = {
+	[K in string]?: RequestParameterValue | Extra
 }
 
 export interface PageRequest<P extends RequestParameters<RoutingParameter> = RequestParameters> {
@@ -22,7 +22,7 @@ export type RequestChange = (currentState: RequestState) => IncompleteRequestSta
 export type DynamicRequestParameters = RequestParameters<RoutingParameter>;
 export type IncompleteRequestState = Partial<RequestState<DynamicRequestParameters>> & { pageName: string } | null
 
-export type RoutingParameterResolver = (name: string) => RequestParameterValue
+export type RoutingParameterResolver = (name: string) => RequestParameterValue | undefined
 export type RoutingLinkTarget = string | RequestChange | IncompleteRequestState
 
 type Params = any

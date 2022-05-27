@@ -114,14 +114,14 @@ class Environment {
 		return key in this.options.parameters
 	}
 
-	public getParameter<F>(key: string): string {
-		if (!(key in this.options.parameters) || this.options.parameters[key] === undefined) {
+	public getParameter<F>(key: string): string | number {
+		if (!(key in this.options.parameters)) {
 			throw new BindingError(`Parameter ${key} not found`)
 		}
-		return this.options.parameters[key] as string
+		return this.options.parameters[key] as string | number
 	}
 
-	public getParameterOrElse<F>(key: string, fallback: F): string | F {
+	public getParameterOrElse<F>(key: string, fallback: F): string | number | F {
 		return this.options.parameters[key] ?? fallback
 	}
 
@@ -275,8 +275,8 @@ namespace Environment {
 		[key: string]: string[]
 	}
 
-	export interface Parameters {
-		[key: string]: string | undefined
+	export type Parameters = {
+		[K in string]?: string | number
 	}
 
 	export interface CustomVariables {

@@ -34,7 +34,7 @@ class SpotifyEmbedHandler implements EmbedHandler<SpotifyEmbedHandler.Artifacts>
 			}
 		}
 
-		if (url.host.endsWith('open.spotify.com')) {
+		if (!url.host.endsWith('open.spotify.com')) {
 			return undefined
 		}
 

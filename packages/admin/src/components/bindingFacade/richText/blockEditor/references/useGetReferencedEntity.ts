@@ -1,9 +1,9 @@
 import { Path } from 'slate'
-import { EntityAccessor } from '@contember/binding'
+import { EntityAccessor, EntityId } from '@contember/binding'
 import { ReferencesOptions, useGetReferenceEntityList } from './useGetReferenceEntityList'
 import { useCallback } from 'react'
 
-export type GetReferencedEntity = (path: Path, id: string) => EntityAccessor
+export type GetReferencedEntity = (path: Path, id: EntityId) => EntityAccessor
 
 export const useGetReferencedEntity = (opts: ReferencesOptions): GetReferencedEntity => {
 	const getList = useGetReferenceEntityList(opts)

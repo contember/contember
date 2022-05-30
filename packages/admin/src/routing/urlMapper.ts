@@ -61,7 +61,11 @@ export const pathToRequestState = (routing: RoutingContextValue, path: string, q
 	}
 	return {
 		pageName,
-		parameters: Object.fromEntries(searchParams),
+		parameters: Object.fromEntries(
+			Array.from(
+				searchParams,
+				([key, val]) => [key, parseInt(val, 10).toString() === val ? parseInt(val, 10) : val]),
+		),
 		dimensions: dimensions ?? {},
 	}
 }

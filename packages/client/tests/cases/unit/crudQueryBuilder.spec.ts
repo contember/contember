@@ -42,34 +42,45 @@ describe('crud query builder', () => {
 					),
 			)
 
-		expect(builder.getGql()).toEqual(`mutation {
-	updatePost(data: {name: "John", locales: [{connect: {id: "1"}}, {update: {by: {locale: "cs"}, data: {title: "foo"}}}, {update: {by: {id: "123"}, data: {foo: "bar"}}}], tags: [{connect: {id: "1"}, alias: "connectId1"}, {create: {name: "foo"}, alias: "createNameFoo"}, {disconnect: {id: 2}}], author: {create: {name: "John"}}}, by: {id: "123"}) {
-		node {
-			id
-			... on Foo {
-				bar
+		expect(builder.getGql()).toMatchInlineSnapshot(`
+			"mutation {
+				updatePost(data: {name: \\"John\\", locales: [{connect: {id: \\"1\\"}}, {update: {by: {locale: \\"cs\\"}, data: {title: \\"foo\\"}}}, {update: {by: {id: \\"123\\"}, data: {foo: \\"bar\\"}}}], tags: [{connect: {id: \\"1\\"}, alias: \\"connectId1\\"}, {create: {name: \\"foo\\"}, alias: \\"createNameFoo\\"}, {disconnect: {id: 2}}], author: {create: {name: \\"John\\"}}}, by: {id: \\"123\\"}) {
+					__typename
+					node {
+						__typename
+						id
+						... on Foo {
+							__typename
+							bar
+						}
+						author {
+							__typename
+							name
+						}
+					}
+				}
+				deleteCategory(by: {id: \\"123\\"}) {
+					__typename
+					id
+				}
+				createAuthor(data: {name: \\"John\\", posts: [{connect: {id: \\"456\\"}}, {create: {title: \\"Abcd\\"}}]}) {
+					__typename
+					node {
+						__typename
+						name
+						... authorSnippet
+					}
+				}
 			}
-			author {
-				name
-			}
-		}
-	}
-	deleteCategory(by: {id: "123"}) {
-		id
-	}
-	createAuthor(data: {name: "John", posts: [{connect: {id: "456"}}, {create: {title: "Abcd"}}]}) {
-		node {
-			name
-			... authorSnippet
-		}
-	}
-}
-fragment authorSnippet on Author {
-	nickName
-	favoritePet {
-		name
-	}
-}`)
+			fragment authorSnippet on Author {
+				__typename
+				nickName
+				favoritePet {
+					__typename
+					name
+				}
+			}"
+		`)
 	})
 
 	it('mutation part merging', () => {
@@ -91,13 +102,17 @@ fragment authorSnippet on Author {
 				.node(builder => builder.column('id')),
 		)
 
-		expect(builder.getGql()).toEqual(`mutation {
-	updatePost(data: {name: "John", locales: [{connect: {id: "1"}}, {update: {by: {locale: "cs"}, data: {title: "foo"}}}, {update: {by: {id: "123"}, data: {foo: "bar"}}}, {update: {by: {id: "456"}, data: {foo: "baz"}}}], tags: [{connect: {id: "1"}, alias: "connectId1"}, {create: {name: "foo"}, alias: "createNameFoo"}, {disconnect: {id: 2}}], author: {create: {surname: "Smith", name: "John"}}}, by: {id: "123"}) {
-		node {
-			id
-		}
-	}
-}`)
+		expect(builder.getGql()).toMatchInlineSnapshot(`
+			"mutation {
+				updatePost(data: {name: \\"John\\", locales: [{connect: {id: \\"1\\"}}, {update: {by: {locale: \\"cs\\"}, data: {title: \\"foo\\"}}}, {update: {by: {id: \\"123\\"}, data: {foo: \\"bar\\"}}}, {update: {by: {id: \\"456\\"}, data: {foo: \\"baz\\"}}}], tags: [{connect: {id: \\"1\\"}, alias: \\"connectId1\\"}, {create: {name: \\"foo\\"}, alias: \\"createNameFoo\\"}, {disconnect: {id: 2}}], author: {create: {surname: \\"Smith\\", name: \\"John\\"}}}, by: {id: \\"123\\"}) {
+					__typename
+					node {
+						__typename
+						id
+					}
+				}
+			}"
+		`)
 	})
 
 	it('query', () => {
@@ -110,56 +125,71 @@ fragment authorSnippet on Author {
 					.hasOneRelation('author', o => o.column('name')),
 			'myPostsAlias',
 		)
-		expect(builder.getGql()).toEqual(`query {
-	myPostsAlias: listPosts(filter: {foo: {eq: "bar"}}) {
-		title
-		author {
-			name
-		}
-	}
-}`)
+		expect(builder.getGql()).toMatchInlineSnapshot(`
+			"query {
+				myPostsAlias: listPosts(filter: {foo: {eq: \\"bar\\"}}) {
+					__typename
+					title
+					author {
+						__typename
+						name
+					}
+				}
+			}"
+		`)
 	})
 
 	it('validation & errors relation builders', () => {
 		const builder = new CrudQueryBuilder.CrudQueryBuilder().create('Foo', builder =>
 			builder.data({ bar: '123' }).ok().errors().validation(),
 		)
-		expect(builder.getGql()).toEqual(`mutation {
-	createFoo(data: {bar: "123"}) {
-		ok
-		errors {
-			type
-			message
-			path {
-				__typename
-				... on _FieldPathFragment {
-					field
-				}
-				... on _IndexPathFragment {
-					index
-					alias
-				}
-			}
-		}
-		validation {
-			valid
-			errors {
-				path {
+		expect(builder.getGql()).toMatchInlineSnapshot(`
+			"mutation {
+				createFoo(data: {bar: \\"123\\"}) {
 					__typename
-					... on _FieldPathFragment {
-						field
+					ok
+					errors {
+						__typename
+						type
+						message
+						path {
+							__typename
+							... on _FieldPathFragment {
+								__typename
+								field
+							}
+							... on _IndexPathFragment {
+								__typename
+								index
+								alias
+							}
+						}
 					}
-					... on _IndexPathFragment {
-						index
-						alias
+					validation {
+						__typename
+						valid
+						errors {
+							__typename
+							path {
+								__typename
+								... on _FieldPathFragment {
+									__typename
+									field
+								}
+								... on _IndexPathFragment {
+									__typename
+									index
+									alias
+								}
+							}
+							message {
+								__typename
+								text
+							}
+						}
 					}
 				}
-				message {
-					text
-				}
-			}
-		}
-	}
-}`)
+			}"
+		`)
 	})
 })

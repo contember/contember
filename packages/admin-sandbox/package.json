@@ -14,8 +14,8 @@
 		"@welldone-software/why-did-you-render": "^6.2.3"
 	},
 	"dependencies": {
-		"@contember/schema": "^1.0.0-rc.2",
-		"@contember/schema-definition": "^1.0.0-rc.2",
+		"@contember/schema": "^1.1.0-beta",
+		"@contember/schema-definition": "^1.1.0-beta",
 		"react": "^17",
 		"react-dom": "^17"
 	}

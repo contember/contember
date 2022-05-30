@@ -134,6 +134,9 @@ export class AccessorErrorManager {
 		}
 
 		for (const [childKey, child] of errors.children) {
+			if (typeof childKey !== 'string') {
+				continue
+			}
 			if (child.nodeType === 'leaf') {
 				const fieldState = state.children.get(childKey)
 

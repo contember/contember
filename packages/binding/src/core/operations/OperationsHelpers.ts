@@ -54,8 +54,8 @@ export class OperationsHelpers {
 	) {
 		const previousId = entity.id
 
-		treeStore.entityStore.delete(previousId.value)
-		treeStore.entityStore.set(newId.value, entity)
+		treeStore.entityStore.delete(previousId.uniqueValue)
+		treeStore.entityStore.set(newId.uniqueValue, entity)
 
 		let counter = 0
 		for (const realm of entity.realms.values()) {

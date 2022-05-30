@@ -1,6 +1,6 @@
 import {
 	BindingError,
-	EntityAccessor, EntityListAccessor, SugaredFieldProps, SugaredRelativeEntityList,
+	EntityAccessor, EntityId, EntityListAccessor, SugaredFieldProps, SugaredRelativeEntityList,
 	useDesugaredRelativeEntityList, useDesugaredRelativeSingleField,
 	useEntityBeforePersist,
 } from '@contember/binding'
@@ -26,7 +26,7 @@ export const useRefreshBlocks = ({ editor, sortedBlocksRef, sortableBy, contentF
 	const desugaredBlockContentField = useDesugaredRelativeSingleField(contentField)
 	const desugaredSortableByField = useDesugaredRelativeSingleField(sortableBy)
 	const getParentEntityRef = useGetParentEntityRef()
-	const trashFakeBlockId = useRef<string>()
+	const trashFakeBlockId = useRef<EntityId>()
 	useEntityBeforePersist(() => {
 		if (trashFakeBlockId.current) {
 			const block = getParentEntityRef.current().getRelativeEntityList(desugaredBlockList).getChildEntityById(trashFakeBlockId.current)
@@ -37,7 +37,7 @@ export const useRefreshBlocks = ({ editor, sortedBlocksRef, sortableBy, contentF
 
 	return useCallback(() => {
 		const { children } = editor
-		const saveBlockElement = (getBlockList: () => EntityListAccessor, id: string, element: Element) => {
+		const saveBlockElement = (getBlockList: () => EntityListAccessor, id: EntityId, element: Element) => {
 			getBlockList()
 				.getChildEntityById(id)
 				.getRelativeSingleField(desugaredBlockContentField)
@@ -53,7 +53,7 @@ export const useRefreshBlocks = ({ editor, sortedBlocksRef, sortableBy, contentF
 
 			let cleanupStack = () => {
 			}
-			const knownReferences = new Map<string, [reference: EntityAccessor, block: EntityAccessor]>()
+			const knownReferences = new Map<EntityId, [reference: EntityAccessor, block: EntityAccessor]>()
 
 			for (const [blockId, pathRef] of blockElementPathRefs) {
 				const current = pathRef.current
@@ -116,7 +116,7 @@ export const useRefreshBlocks = ({ editor, sortedBlocksRef, sortableBy, contentF
 			if (!monolithicReferencesMode && referencesField) {
 				for (const index in children) {
 					const node = children[index]
-					const nodeReferences: string[] = []
+					const nodeReferences: EntityId[] = []
 					const block = processedAccessors[index]!
 					const references = block.getEntityList(referencesField)
 					const collectReferences = (node: Descendant) => {

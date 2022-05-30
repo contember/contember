@@ -1,5 +1,5 @@
 import type { BatchUpdatesOptions, EntityAccessor, ErrorAccessor } from '../../accessors'
-import { ServerGeneratedUuid, UnpersistedEntityDummyId } from '../../accessorTree'
+import { ServerId, UnpersistedEntityDummyId } from '../../accessorTree'
 import { BindingError } from '../../BindingError'
 import { EntityFieldMarkersContainer, HasOneRelationMarker } from '../../markers'
 import type { FieldName } from '../../treeParameters'
@@ -48,7 +48,7 @@ export class EntityOperations {
 		this.eventManager.syncOperation(() => {
 			const stateToConnect = OperationsHelpers.resolveAndPrepareEntityToConnect(this.treeStore, entityToConnect)
 			const fieldsToConnect = getEntityMarker(stateToConnect).fields
-			const persistedData = this.treeStore.persistedEntityData.get(outerState.entity.id.value)
+			const persistedData = this.treeStore.persistedEntityData.get(outerState.entity.id.uniqueValue)
 
 			const entityName = outerState.entity.entityName
 			const fieldSchema = this.treeStore.schema.getEntityField(entityName, fieldName)
@@ -127,7 +127,7 @@ export class EntityOperations {
 					}
 
 					const persistedId = persistedData?.get(targetHasOneMarker.placeholderName)
-					if (persistedId instanceof ServerGeneratedUuid) {
+					if (persistedId instanceof ServerId) {
 						if (persistedId.value === stateToConnect.entity.id.value) {
 							changesDelta-- // It was removed from the list but now we're adding it back.
 						} else if (persistedId.value === previouslyConnectedState.entity.id.value) {
@@ -167,7 +167,7 @@ export class EntityOperations {
 		initializeReplacement: EntityAccessor.BatchUpdatesHandler | undefined,
 	) {
 		this.eventManager.syncOperation(() => {
-			const persistedData = this.treeStore.persistedEntityData.get(outerState.entity.id.value)
+			const persistedData = this.treeStore.persistedEntityData.get(outerState.entity.id.uniqueValue)
 
 			for (const state of StateIterator.eachSiblingRealm(outerState)) {
 				const targetHasOneMarkers = this.resolveHasOneRelationMarkers(
@@ -194,7 +194,7 @@ export class EntityOperations {
 					}
 					const persistedId = persistedData?.get(targetHasOneMarker.placeholderName)
 
-					if (persistedId instanceof ServerGeneratedUuid) {
+					if (persistedId instanceof ServerId) {
 						if (persistedId.value === stateToDisconnect.entity.id.value) {
 							changesDelta++ // Disconnecting the persisted entity.
 						} else {

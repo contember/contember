@@ -1,15 +1,28 @@
 import { generateEnumerabilityPreventingEntropy } from '../utils'
+import { EntityId } from '../treeParameters'
+
+export type UniqueEntityId = string & { __type: 'UniqueEntityId' }
 
 export interface RuntimeIdSpec {
 	existsOnServer: boolean
-	value: string
+	value: EntityId
+	uniqueValue: UniqueEntityId
 }
 
-export class ServerGeneratedUuid implements RuntimeIdSpec {
+export class ServerId implements RuntimeIdSpec {
 	public get existsOnServer(): true {
 		return true
 	}
-	public constructor(public readonly value: string) {}
+	public constructor(public readonly value: EntityId, public readonly entityName: string) {
+	}
+
+	get uniqueValue() {
+		return ServerId.formatUniqueValue(this.value, this.entityName)
+	}
+
+	static formatUniqueValue(id: EntityId, entityName: string): UniqueEntityId {
+		return `${entityName}_${id}` as UniqueEntityId
+	}
 }
 
 export class ClientGeneratedUuid implements RuntimeIdSpec {
@@ -17,6 +30,10 @@ export class ClientGeneratedUuid implements RuntimeIdSpec {
 		return false
 	}
 	public constructor(public readonly value: string) {}
+
+	get uniqueValue() {
+		return this.value as UniqueEntityId
+	}
 }
 
 export class UnpersistedEntityDummyId implements RuntimeIdSpec {
@@ -41,9 +58,13 @@ export class UnpersistedEntityDummyId implements RuntimeIdSpec {
 
 	private static entropyLength = 5
 	private static dummyIdRegex = new RegExp(`^adminOnlyDummyId-\\d{${UnpersistedEntityDummyId.entropyLength}}-\\d+$`)
-	public static matchesDummyId(candidate: string): boolean {
-		return UnpersistedEntityDummyId.dummyIdRegex.test(candidate)
+	public static matchesDummyId(candidate: EntityId): boolean {
+		return typeof candidate === 'string' && UnpersistedEntityDummyId.dummyIdRegex.test(candidate)
+	}
+
+	get uniqueValue() {
+		return this.value as UniqueEntityId
 	}
 }
 
-export type RuntimeId = ServerGeneratedUuid | ClientGeneratedUuid | UnpersistedEntityDummyId
+export type RuntimeId = ServerId | ClientGeneratedUuid | UnpersistedEntityDummyId

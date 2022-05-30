@@ -1,6 +1,6 @@
 import type { ErrorAccessor } from '../accessors'
 import type { ExecutionError, MutationDataResponse, MutationResponse, ValidationError } from '../accessorTree'
-import type { PlaceholderName } from '../treeParameters'
+import type { EntityId, FieldName, PlaceholderName } from '../treeParameters'
 import { assertNever } from '../utils'
 import { MutationAlias, mutationOperationSubTreeType } from './requestAliases'
 
@@ -227,7 +227,7 @@ namespace ErrorsPreprocessor {
 
 	export interface ErrorINode extends BaseErrorNode {
 		nodeType: 'iNode'
-		children: Map<string, ErrorNode>
+		children: Map<FieldName | EntityId, ErrorNode>
 	}
 
 	export type ErrorNode = ErrorINode | LeafErrorNode

@@ -19,7 +19,7 @@ const standaloneUuidPrefix = uuidToAliasReplacement
 export class MutationAlias {
 	public static encodeTopLevel(operation: TopLevelMutationOperation): string {
 		const treeRootId = operation.treeRootId === undefined ? 'u' : `t${operation.treeRootId.replace('-', '_')}t`
-		const entityId = operation.entityId.replace(uuidToAliasRegex, uuidToAliasReplacement)
+		const entityId = String(operation.entityId).replace(uuidToAliasRegex, uuidToAliasReplacement)
 
 		const alias = `${treeRootId}${operation.subTreePlaceholder}__${operation.type}${operation.subTreeType}${entityId}`
 
@@ -57,10 +57,12 @@ export class MutationAlias {
 	}
 
 	public static encodeEntityId(entityId: RuntimeId): string {
-		return `${standaloneUuidPrefix}${entityId.value.replace(uuidToAliasRegex, uuidToAliasReplacement)}`
+		return `${standaloneUuidPrefix}${String(entityId.value).replace(uuidToAliasRegex, uuidToAliasReplacement)}`
 	}
 
 	public static decodeEntityId(alias: string): RuntimeId['value'] {
-		return `${alias.substring(standaloneUuidPrefix.length).replace(aliasToUuidRegex, aliasToUuidReplacement)}`
+		const stringId = `${alias.substring(standaloneUuidPrefix.length).replace(aliasToUuidRegex, aliasToUuidReplacement)}`
+		const intId = parseInt(stringId)
+		return intId.toString() === stringId ? intId : stringId
 	}
 }

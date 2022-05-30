@@ -69,7 +69,7 @@ services:
       - .:/src:cached
 
   contember-engine:
-    image: contember/engine:1.0.0-rc.16
+    image: contember/engine:1.1.0-beta.2
 
     environment:
       NODE_ENV: 'development'
@@ -108,7 +108,7 @@ services:
 
 
   contember-cli:
-    image: contember/cli:1.0.0-rc.16
+    image: contember/cli:1.1.0-beta.2
 
     deploy:
       replicas: 0

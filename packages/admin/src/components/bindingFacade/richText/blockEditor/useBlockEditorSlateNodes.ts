@@ -1,17 +1,16 @@
 import {
 	BindingError,
 	EntityAccessor,
-	RelativeSingleField,
+	EntityId,
 	SugaredFieldProps,
 	useDesugaredRelativeSingleField,
 } from '@contember/binding'
-import type { ReactNode } from 'react'
 import { Descendant, Editor, Element as SlateElement, PathRef } from 'slate'
 
 export interface UseBlockEditorSlateNodesOptions {
 	editor: Editor
 	blockElementCache: WeakMap<EntityAccessor, SlateElement>
-	blockElementPathRefs: Map<string, PathRef>
+	blockElementPathRefs: Map<EntityId, PathRef>
 	blockContentField: SugaredFieldProps['field']
 	topLevelBlocks: EntityAccessor[]
 }

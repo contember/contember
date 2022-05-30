@@ -1,4 +1,4 @@
-import type { EntityAccessor, Environment, ErrorAccessor, FieldValue } from '@contember/binding'
+import type { EntityAccessor, EntityId, Environment, ErrorAccessor, FieldValue } from '@contember/binding'
 import type { ReactElement, ReactNode } from 'react'
 import { FieldErrors } from '@contember/ui'
 
@@ -10,7 +10,7 @@ export namespace ChoiceFieldData {
 	// This is just the JS array index as specified in options or as returned from the server.
 	export type ValueRepresentation = number
 
-	export interface SingleDatum<ActualValue extends Environment.Value = string> {
+	export interface SingleDatum<ActualValue extends Environment.Value | EntityId = EntityId> {
 		key: ValueRepresentation
 		label: ReactNode
 		searchKeywords: string
@@ -18,7 +18,7 @@ export namespace ChoiceFieldData {
 		actualValue: ActualValue
 	}
 
-	export type Data<ActualValue extends Environment.Value = string> = SingleDatum<ActualValue>[]
+	export type Data<ActualValue extends Environment.Value | EntityId = EntityId> = SingleDatum<ActualValue>[]
 
 	export interface BaseChoiceMetadata {
 		data: Data<DynamicValue | StaticValue>

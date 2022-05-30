@@ -49,7 +49,7 @@ export class QueryCompiler {
 	}
 
 	private formatObjectBody(builder: ObjectBuilder): string[] {
-		const result = []
+		const result = ['__typename']
 		for (const fieldName of builder.fields) {
 			result.push(fieldName)
 		}

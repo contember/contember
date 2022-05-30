@@ -8,7 +8,6 @@ export class ErrorsRelationBuilder {
 				.field('message')
 				.object('path', builder =>
 					builder
-						.field('__typename')
 						.inlineFragment('_FieldPathFragment', builder => builder.field('field'))
 						.inlineFragment('_IndexPathFragment', builder => builder.field('index').field('alias')),
 				),

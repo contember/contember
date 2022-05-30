@@ -1,6 +1,6 @@
 import { validate as uuidValidate } from 'uuid'
 import { ErrorAccessor, FieldAccessor } from '../../accessors'
-import { ClientGeneratedUuid } from '../../accessorTree'
+import { ClientGeneratedUuid, ServerId } from '../../accessorTree'
 import { BindingError } from '../../BindingError'
 import { PRIMARY_KEY_NAME } from '../../bindingTypes'
 import type { FieldValue } from '../../treeParameters'
@@ -66,7 +66,7 @@ export class FieldOperations {
 								`Hint: you may use 'FieldAccessor.asUuid.setToUuid()'.`,
 						)
 					}
-					if (this.treeStore.entityStore.has(newValue)) {
+					if (this.treeStore.entityStore.has(ServerId.formatUniqueValue(newValue, entity.entityName))) {
 						throw new BindingError(
 							`Trying to set the '${PRIMARY_KEY_NAME}' field to '${newValue}' which is a valid uuid but is not unique. ` +
 								`It is already in use by an existing entity.`,

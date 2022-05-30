@@ -1,3 +1,3 @@
 export * from './cluster'
-export * from './dbMetrics'
+export * from '../prometheus/dbMetrics'
 export * from './timeout'

@@ -31,6 +31,7 @@ export default () => (
 		<SlugField derivedFrom={'textValue'} field={'slugValue'} label={'Slug without prefix'} />
 		<TextareaField field={'multilineValue'} label={'Multiline text'} />
 		<CheckboxField field={'boolValue'} label={'Bool'} />
+		<CheckboxField field={'boolValue'} label={'Bool'} description="Same checkbox with description" labelDescription="This could be true or false or null" />
 		<NumberField field={'intValue'} label={'Int'} />
 		<FloatField field={'floatValue'} label={'Float value'} />
 		<TimeField field={'timeValue'} label={'Time'} />

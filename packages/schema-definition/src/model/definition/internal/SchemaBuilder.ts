@@ -31,31 +31,33 @@ export class SchemaBuilder {
 
 			const primaryName = this.conventions.getPrimaryField()
 
+			const fields: Record<string, Model.AnyField> = [
+				...definitionInstance[primaryName] ? [] : [tuple(primaryName, this.createPrimaryColumn())],
+				...Object.entries(definitionInstance),
+			]
+				.map(([name, definition]) => {
+					return definition.createField({
+						name,
+						entityName,
+						conventions: this.conventions,
+						enumRegistry: this.enumRegistry,
+						entityRegistry: this.entityRegistry,
+					})
+				})
+				.reduce<Model.Entity['fields']>((acc, field) => {
+					if (acc[field.name]) {
+						throw new Error(`Entity ${entityName}: field ${field.name} is already registered`)
+					}
+					return { ...acc, [field.name]: field }
+				}, {})
+
 			const entity: Model.Entity = {
 				name: entityName,
 				primary: primaryName,
-				primaryColumn: this.conventions.getColumnName(primaryName),
+				primaryColumn: (fields[primaryName] as Model.AnyColumn).columnName,
 				unique: this.createUnique(entityName, definitionInstance),
+				fields: fields,
 				indexes: {},
-				fields: [
-					...definitionInstance[primaryName] ? [] : [tuple(primaryName, this.createPrimaryColumn())],
-					...Object.entries(definitionInstance),
-				]
-					.map(([name, definition]) => {
-						return definition.createField({
-							name,
-							entityName,
-							conventions: this.conventions,
-							enumRegistry: this.enumRegistry,
-							entityRegistry: this.entityRegistry,
-						})
-					})
-					.reduce<Model.Entity['fields']>((acc, field) => {
-						if (acc[field.name]) {
-							throw new Error(`Entity ${entityName}: field ${field.name} is already registered`)
-						}
-						return { ...acc, [field.name]: field }
-					}, {}),
 				tableName: this.conventions.getTableName(entityName),
 				eventLog: { enabled: true },
 				migrations: { enabled: true },

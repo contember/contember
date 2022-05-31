@@ -1,7 +1,7 @@
-import type { GroupTypeBase, OptionTypeBase, StylesConfig } from 'react-select'
+import type { StylesConfig } from 'react-select'
 
 // TODO: Not yet finished with all styles
-export const selectStyles: StylesConfig<OptionTypeBase, boolean, GroupTypeBase<OptionTypeBase>> = {
+export const selectStyles: StylesConfig<unknown, boolean, never> = {
 	indicatorSeparator: (provided, { isFocused, isDisabled }) => {
 		const backgroundColor = isDisabled
 			? 'var(--cui-color--lower)'
@@ -90,12 +90,10 @@ export const selectStyles: StylesConfig<OptionTypeBase, boolean, GroupTypeBase<O
 			},
 		}
 	},
-	clearIndicator: (provided, { isFocused, isDisabled }) => {
+	clearIndicator: (provided, { isFocused }) => {
 		return {
 			...provided,
-			'color': isDisabled
-				? 'var(--cui-color--low)'
-				: isFocused
+			'color': isFocused
 					? 'var(--cui-color--strong)'
 					: 'var(--cui-color--high)',
 			'&:hover': {
@@ -159,6 +157,12 @@ export const selectStyles: StylesConfig<OptionTypeBase, boolean, GroupTypeBase<O
 			...provided,
 			backgroundColor,
 			color,
+		}
+	},
+	placeholder: provided => {
+		return {
+			...provided,
+			position: 'absolute',
 		}
 	},
 }

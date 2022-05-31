@@ -2,7 +2,7 @@ import type { FieldValue } from '@contember/binding'
 import Fuse from 'fuse.js'
 import { useMemo } from 'react'
 import type { Props as SelectProps } from 'react-select'
-import type { Props as AsyncProps } from 'react-select/async'
+import type { AsyncProps } from 'react-select/async'
 import type { ChoiceFieldData } from '../ChoiceField'
 import { SearchInput } from './SearchInput'
 import { VirtualizedMenuList } from './VirtualizedMenuList'
@@ -19,7 +19,7 @@ export const useCommonReactSelectAsyncProps = ({
 	placeholder,
 	data,
 	isInvalid,
-}: UseCommonReactSelectAsyncPropsProps): AsyncProps<ChoiceFieldData.SingleDatum<FieldValue | undefined>, boolean> => {
+}: UseCommonReactSelectAsyncPropsProps): AsyncProps<ChoiceFieldData.SingleDatum<FieldValue | undefined>, boolean, never> => {
 	const fuse = useMemo(
 		() =>
 			new Fuse(data, {

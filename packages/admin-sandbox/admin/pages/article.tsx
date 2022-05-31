@@ -87,7 +87,7 @@ const ArticleSidebarForm = Component(() => <>
 				orderBy: 'name desc',
 			}}
 			createNewForm={<TextField field={'name'} label={'Name'} />}
-		/>g
+		/>
 
 		<SelectField
 			label={'category'}

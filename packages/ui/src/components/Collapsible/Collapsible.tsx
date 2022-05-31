@@ -1,8 +1,8 @@
 import cn from 'classnames'
 import { CSSProperties, memo, ReactNode, useEffect, useRef, useState } from 'react'
-import { useClassNamePrefix } from '../auxiliary'
-import type { CollapsibleTransition } from '../types'
-import { forceReflow, toEnumViewClass, toStateClass } from '../utils'
+import { useClassNamePrefix } from '../../auxiliary'
+import type { CollapsibleTransition } from '../../types'
+import { forceReflow, toEnumStateClass, toEnumViewClass, toStateClass } from '../../utils'
 
 export interface CollapsibleProps {
 	expanded: boolean
@@ -60,7 +60,7 @@ export const Collapsible = memo((props: CollapsibleProps) => {
 			className={cn(
 				`${prefix}collapsible`,
 				toEnumViewClass(props.transition, 'topInsert'),
-				toStateClass('expanded', delayedExpanded),
+				toEnumStateClass(delayedExpanded ? 'expanded' : 'collapsed'),
 				toStateClass('transitioning', isTransitioning),
 			)}
 			style={

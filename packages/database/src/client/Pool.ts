@@ -30,6 +30,8 @@ interface PoolConfigInternal {
 	log?: PoolLogger
 }
 
+export type PoolStats = { [K in keyof typeof poolStatsDescription]: number }
+
 export interface PoolStatus {
 	/** maximum number of connections in a pool */
 	max: number
@@ -41,6 +43,30 @@ export interface PoolStatus {
 	idle: number
 	/** number of currently establishing connections */
 	connecting: number
+	stats: PoolStats
+}
+
+export const poolStatsDescription =  {
+	connection_established_count: 'Total number of established connections.',
+	connection_recoverable_error_count: 'Number of connections that failed on recoverable error (e.g. 53300) and retry was tried.',
+	connection_error_count: 'Number of non-recoverable errors or recoverable errors reaching max attempts.',
+	connection_disposed_idle_timeout_count: 'Number of idle connection, that was disposed after configured timeout.',
+	connection_disposed_idle_max_count: 'Number of idle connections, that was immediately disposed, because maximum number of idle connection was reached.',
+	connection_disposed_old_count: 'Number of connections, that was too old after it was released.',
+	connection_disposed_manual_count: 'Number of manually disposed connection (e.g. due to exception on given connection).',
+	connection_released_count: 'Number of connection returned to the pool.',
+	connection_reused_immediately_count: 'Number of connections, that was reused by pending item immediately after it was returned to the pool.',
+	connection_reused_later_count: 'Number of idle connections, that was reused later.',
+
+	connection_established_idle_count: 'Number of newly established connections, which was not used (e.g. some connection was returned earlier).',
+
+	item_queued_count: 'Number of queued items requesting a connection.',
+	item_timeout_count: 'Number of items waiting for connection, which timed out.',
+
+	item_resolved_new_ms_count: 'Number of queued items resolved with newly established connection.',
+	item_resolved_new_ms_sum: 'Waiting time of queued items, which was resolved with a new connection.',
+	item_resolved_released_ms_count: 'Number of queued items resolved with released connection.',
+	item_resolved_released_ms_sum: 'Waiting time of queued items, which was resolved with a released connection.',
 }
 
 class PoolConnection {
@@ -102,6 +128,26 @@ class Pool extends EventEmitter {
 
 	private poolConfig: PoolConfigInternal
 
+	private poolStats: PoolStats = {
+		connection_established_count: 0,
+		connection_recoverable_error_count: 0,
+		connection_error_count: 0,
+		connection_disposed_idle_timeout_count: 0,
+		connection_disposed_idle_max_count: 0,
+		connection_disposed_old_count: 0,
+		connection_disposed_manual_count: 0,
+		connection_released_count: 0,
+		connection_reused_immediately_count: 0,
+		connection_reused_later_count: 0,
+		connection_established_idle_count: 0,
+		item_queued_count: 0,
+		item_timeout_count: 0,
+		item_resolved_new_ms_count: 0,
+		item_resolved_new_ms_sum: 0,
+		item_resolved_released_ms_count: 0,
+		item_resolved_released_ms_sum: 0,
+	}
+
 	private lastRecoverableError: {
 		error: any
 		time: number
@@ -134,12 +180,12 @@ class Pool extends EventEmitter {
 			}
 			poolConnection.uses++
 			this.active.add(poolConnection)
+			this.poolStats.connection_reused_later_count++
 			this.log('Item fulfilled with an idle connection.')
 
 			return Promise.resolve(poolConnection)
 		}
 		const pendingItem = this.createPendingItem()
-		this.log('Item added to a queue.')
 		this.maybeCreateNew()
 		return pendingItem
 	}
@@ -158,6 +204,7 @@ class Pool extends EventEmitter {
 			|| (this.poolConfig.maxAgeMs && poolConnection.createdAt + this.poolConfig.maxAgeMs < Date.now())) {
 			setImmediate(async () => {
 				await this.disposeConnection(poolConnection)
+				this.poolStats.connection_disposed_old_count++
 				this.log('Connection has reached max age or usage and was disposed.')
 			})
 			this.maybeCreateNew()
@@ -171,6 +218,7 @@ class Pool extends EventEmitter {
 		if (this.ended) {
 			return
 		}
+		this.poolStats.connection_disposed_manual_count++
 		this.log('Releasing and disposing a connection.')
 		if (!this.active.delete(poolConnection)) {
 			throw new ImplementationException('Connection does not belong to this pool.')
@@ -209,6 +257,7 @@ class Pool extends EventEmitter {
 			idle: this.idle.length,
 			pending: this.queue.length,
 			connecting: this.connectingCount,
+			stats: this.poolStats,
 		}
 	}
 
@@ -245,6 +294,7 @@ class Pool extends EventEmitter {
 		})
 		try {
 			await client.connect()
+			this.poolStats.connection_established_count++
 			this.log('Connection established')
 			this.connectingCount--
 			if (this.ended) {
@@ -260,10 +310,12 @@ class Pool extends EventEmitter {
 			if (e.code === ClientErrorCodes.TOO_MANY_CONNECTIONS || e.code === ClientErrorCodes.CANNOT_CONNECT_NOW) {
 				this.lastRecoverableError = { error: e, time: Date.now() }
 				if (this.poolConfig.reconnectIntervalMs * attempt >= this.poolConfig.acquireTimeoutMs) {
+					this.poolStats.connection_error_count++
 					this.log('Recoverable error, max retries reached.')
 					this.emit('e', e)
 					this.connectingCount--
 				} else {
+					this.poolStats.connection_recoverable_error_count++
 					this.log('Recoverable error, retrying in a moment.')
 					this.emit('recoverableError', e)
 					setTimeout(() => {
@@ -273,15 +325,10 @@ class Pool extends EventEmitter {
 					}, this.poolConfig.reconnectIntervalMs)
 				}
 			} else {
+				this.poolStats.connection_error_count++
 				this.connectingCount--
-				const pendingItem = this.queue.shift()
-				if (pendingItem) {
-					this.log('Connecting failed, rejecting pending item')
-					pendingItem.reject(new ClientError(e))
-				} else {
-					this.log('Connecting failed, emitting error')
-					this.emit('error', e)
-				}
+				this.log('Connecting failed, emitting error')
+				this.emit('error', e)
 			}
 			return
 		}
@@ -302,10 +349,22 @@ class Pool extends EventEmitter {
 				if (index > -1) {
 					this.queue.splice(index, 1)
 				}
+				this.poolStats.item_timeout_count++
 				this.log('Queued item timed out')
 			}, this.poolConfig.acquireTimeoutMs)
 
 			const item = new PendingItem(it => {
+				const duration = Date.now() - item.createdAt
+				const isNew = it.uses === 0
+				this.log(`Queued item fulfilled with ${!isNew ? 'released' : 'new'} connection.`)
+
+				if (isNew) {
+					this.poolStats.item_resolved_new_ms_count++
+					this.poolStats.item_resolved_new_ms_sum += duration
+				} else {
+					this.poolStats.item_resolved_released_ms_count++
+					this.poolStats.item_resolved_released_ms_sum += duration
+				}
 				clearTimeout(timeout)
 				resolve(it)
 			}, it => {
@@ -313,23 +372,35 @@ class Pool extends EventEmitter {
 				reject(it)
 			})
 
+			this.poolStats.item_queued_count++
 			this.queue.push(item)
+			this.log(`Item added to a queue.`)
 		})
 	}
 
 
 	private handleAvailableConnection(poolConnection: PoolConnection) {
 		const item = this.queue.shift()
+		const isNew = poolConnection.uses === 0
+		if (!isNew) {
+			this.poolStats.connection_released_count++
+		}
 		if (item) {
 			this.active.add(poolConnection)
 			item.resolve(poolConnection)
-			this.log(`Queued item fulfilled with ${poolConnection.uses > 0 ? 'released' : 'new'} connection.`)
+			if (!isNew) {
+				this.poolStats.connection_reused_immediately_count++
+			}
 			poolConnection.uses++
 			return
+		}
+		if (isNew) {
+			this.poolStats.connection_established_idle_count++
 		}
 		if (this.idle.length >= this.poolConfig.maxIdle) {
 			setImmediate(async () => {
 				await this.disposeConnection(poolConnection)
+				this.poolStats.connection_disposed_idle_max_count++
 				this.log('Too many idle connections, connection disposed.')
 			})
 		} else {
@@ -338,6 +409,7 @@ class Pool extends EventEmitter {
 				if (index > -1) {
 					this.idle.splice(index, 1)
 					await this.disposeConnection(poolConnection)
+					this.poolStats.connection_disposed_idle_timeout_count++
 					this.log('Idle connection disposed after timeout.')
 				}
 			}, this.poolConfig.idleTimeoutMs)

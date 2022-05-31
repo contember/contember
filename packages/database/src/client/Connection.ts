@@ -122,7 +122,7 @@ namespace Connection {
 	}
 
 	export interface PoolStatusProvider {
-		getPoolStatus(): PoolStatus
+		getPoolStatus(): PoolStatus | undefined
 	}
 
 	export interface TransactionLike extends ConnectionLike {

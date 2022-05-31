@@ -1,7 +1,4 @@
-@import '../common'
-
 .#{$cui-conf-globalPrefix}table
-
 	@each $name, $data in $cui-table-sizes
 		$view: toView($name)
 		&#{$view}
@@ -24,6 +21,21 @@
 
 		&:nth-child(even)
 			background-color: rgba(#000000, .02)
+
+		&.with-hover:hover,
+		&.with-hover:hover > .cui-table-cell
+			color: var(--cui-control-color)
+			background-color: var(--cui-toned-control-background-color--highlighted)
+			cursor: pointer
+		&.with-press:active
+		&.with-press:active > .cui-table-cell
+			color: var(--cui-control-color--pressed)
+			background-color: var(--cui-toned-control-background-color--pressed)
+
+		&.is-active
+			background-color: var(--cui-toned-control-background-color)
+			color: var(--cui-control-color--highlighted)
+
 
 	& thead &-row
 		background-color: rgba(#000000, .05)

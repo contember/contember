@@ -67,6 +67,11 @@
   &-thumbnail
     border-radius: var(--card-thumbnail-border-radius)
 
+  &.is-active &-inner
+    border: var(--card-thumbnail-border-radius) solid var(--cui-control-color)
+  &.is-active &-thumbnail
+    border-radius: 0
+
   &-thumbnail
     background-position: center center
     background-repeat: no-repeat

@@ -5,7 +5,6 @@ import type { Props as SelectProps } from 'react-select'
 import AsyncSelect from 'react-select/async'
 import { useLabelMiddleware } from '../../environment/LabelMiddleware'
 import { ChoiceFieldData, DynamicMultiChoiceField, DynamicMultipleChoiceFieldProps } from '../ChoiceField'
-import { selectStyles } from './commonStyles'
 import { useCommonReactSelectAsyncProps } from './useCommonReactSelectAsyncProps'
 
 export type MultiSelectFieldProps =
@@ -68,7 +67,6 @@ export const MultiSelectFieldInner = memo(
 						isMulti
 						isClearable
 						closeMenuOnSelect={false}
-						styles={selectStyles as Object} // TODO: Too complex to fix styling related typesafety
 						value={Array.from(currentValues, key => data[key])}
 						onChange={(newValues, actionMeta) => {
 							switch (actionMeta.action) {

@@ -1,7 +1,8 @@
 import type { StylesConfig } from 'react-select'
+import { useMemo } from 'react'
 
 // TODO: Not yet finished with all styles
-export const selectStyles: StylesConfig<unknown, boolean, never> = {
+export const useCommonStyles = (isInvalid: boolean): StylesConfig<any, boolean, never> => useMemo(() => ({
 	indicatorSeparator: (provided, { isFocused, isDisabled }) => {
 		const backgroundColor = isDisabled
 			? 'var(--cui-color--lower)'
@@ -109,11 +110,13 @@ export const selectStyles: StylesConfig<unknown, boolean, never> = {
 				? 'var(--cui-color--strong)'
 				: 'var(--cui-color)'
 
-		const borderColor = isDisabled
-			? 'var(--cui-color--lower)'
-			: isFocused
-				? 'var(--cui-color--low)'
-				: 'var(--cui-color--lower)'
+		const borderColor = isInvalid
+			? 'rgb(var(--cui-theme-danger-500))'
+			: isDisabled
+				? 'var(--cui-color--lower)'
+				: isFocused
+					? 'var(--cui-color--low)'
+					: 'var(--cui-color--lower)'
 
 		return {
 			...provided,
@@ -165,4 +168,4 @@ export const selectStyles: StylesConfig<unknown, boolean, never> = {
 			position: 'absolute',
 		}
 	},
-}
+}), [isInvalid])

@@ -6,6 +6,7 @@ import type { AsyncProps } from 'react-select/async'
 import type { ChoiceFieldData } from '../ChoiceField'
 import { SearchInput } from './SearchInput'
 import { VirtualizedMenuList } from './VirtualizedMenuList'
+import { useCommonStyles } from './useCommonStyles'
 
 export interface UseCommonReactSelectAsyncPropsProps {
 	reactSelectProps: Partial<SelectProps<any, any, any>> | undefined
@@ -27,25 +28,11 @@ export const useCommonReactSelectAsyncProps = ({
 			}),
 		[data],
 	)
+	const styles = useCommonStyles(isInvalid)
 	return {
 		...reactSelectProps,
 		placeholder,
-		styles: {
-			menu: base => ({
-				...base,
-				zIndex: 99,
-			}),
-			control: base =>
-				isInvalid
-					? {
-							...base,
-							'borderColor': '#FF312E',
-							'&:hover': {
-								borderColor: '#FF312E',
-							},
-					  }
-					: base,
-		},
+		styles,
 		loadOptions: (inputValue, callback) => {
 			const result = fuse.search(inputValue)
 			callback(result.map(item => item.item))

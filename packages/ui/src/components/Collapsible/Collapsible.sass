@@ -1,7 +1,5 @@
 @use 'sass:math'
 
-@import '../common'
-
 .#{$cui-conf-globalPrefix}collapsible
 	$root: &
 	$transition-timing-function: ease
@@ -9,9 +7,6 @@
 	--cui-collapsible-transition-duration: var(--cui-transition-duration--fast)
 	--cui-collapsible-transition-timing-function: #{$transition-timing-function}
 	--cui-collapsible-content-height: auto
-	visibility: hidden
-	overflow: hidden
-	opacity: 0
 	display: flex
 	transition-property: height, width, opacity, visibility
 	transition-timing-function: var(--cui-collapsible-transition-timing-function)
@@ -23,8 +18,13 @@
 		--cui-collapsible-transition-timing-function: step-end
 
 	&.is-expanded
-		visibility: visible
 		opacity: 1
+		visibility: visible
+	&.is-collapsed
+		height: 0
+		opacity: 0
+		overflow: hidden
+		visibility: hidden
 
 	&.is-transitioning
 		overflow: hidden
@@ -34,8 +34,6 @@
 
 	&.view-topInsert,
 	&.view-bottomInsert
-		height: 0
-
 		&.is-expanded
 			height: var(--cui-collapsible-content-height)
 
@@ -49,7 +47,6 @@
 	&.view-leftInsert,
 	&.view-rightInsert
 		align-items: flex-start
-		height: 0
 		transition-timing-function: step-end, var(--cui-collapsible-transition-timing-function), var(--cui-collapsible-transition-timing-function), var(--cui-collapsible-transition-timing-function)
 
 		&.is-expanded

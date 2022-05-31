@@ -1,5 +1,6 @@
 export * from './DeferredSubTrees'
 export * from './EntityView'
+export * from './If'
 export * from './FieldView'
 export * from './StaticRender'
 export * from './SugaredField'

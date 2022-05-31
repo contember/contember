@@ -1,5 +1,5 @@
 import { Component } from '@contember/binding'
-import { FieldContainer, FieldContainerProps, FieldErrors } from '@contember/ui'
+import { FieldContainer, FieldContainerProps, FieldErrors, SelectCreateNewWrapper } from '@contember/ui'
 import { FunctionComponent, memo } from 'react'
 import type { Props as SelectProps } from 'react-select'
 import AsyncSelect from 'react-select/async'
@@ -15,25 +15,8 @@ export type MultiSelectFieldProps =
 export const MultiSelectField: FunctionComponent<MultiSelectFieldProps> = Component(
 	props => (
 		<DynamicMultiChoiceField {...props} >
-			{({
-				data,
-				currentValues,
-				onChange,
-				errors,
-				environment,
-				isMutating,
-				clear,
-			}: ChoiceFieldData.MultipleChoiceFieldMetadata) => (
-				<MultiSelectFieldInner
-					{...props}
-					data={data}
-					currentValues={currentValues}
-					onChange={onChange}
-					environment={environment}
-					errors={errors}
-					isMutating={isMutating}
-					clear={clear}
-				/>
+			{(choiceProps: ChoiceFieldData.MultipleChoiceFieldMetadata) => (
+				<MultiSelectFieldInner {...props} {...choiceProps} />
 			)}
 		</DynamicMultiChoiceField>
 	),
@@ -62,6 +45,7 @@ export const MultiSelectFieldInner = memo(
 		clear,
 		reactSelectProps,
 		placeholder,
+		onAddNew,
 		...fieldContainerProps
 	}: MultiSelectFieldInnerProps) => {
 		const labelMiddleware = useLabelMiddleware()
@@ -77,45 +61,47 @@ export const MultiSelectFieldInner = memo(
 				errors={errors}
 				label={labelMiddleware(fieldContainerProps.label)}
 			>
-				<AsyncSelect
-					menuPlacement="auto"
-					{...asyncProps}
-					isMulti
-					isClearable
-					closeMenuOnSelect={false}
-					styles={selectStyles as Object} // TODO: Too complex to fix styling related typesafety
-					value={Array.from(currentValues, key => data[key])}
-					onChange={(newValues, actionMeta) => {
-						switch (actionMeta.action) {
-							case 'select-option': {
-								onChange(actionMeta.option!.key, true)
-								break
-							}
-							case 'remove-value': {
-								onChange(actionMeta.removedValue!.key, false)
-								break
-							}
-							case 'pop-value': {
-								if (currentValues.length > 0) {
-									onChange(currentValues[currentValues.length - 1], false)
+				<SelectCreateNewWrapper onClick={onAddNew}>
+					<AsyncSelect
+						{...asyncProps}
+						menuPlacement="auto"
+						isMulti
+						isClearable
+						closeMenuOnSelect={false}
+						styles={selectStyles as Object} // TODO: Too complex to fix styling related typesafety
+						value={Array.from(currentValues, key => data[key])}
+						onChange={(newValues, actionMeta) => {
+							switch (actionMeta.action) {
+								case 'select-option': {
+									onChange(actionMeta.option!.key, true)
+									break
 								}
-								break
+								case 'remove-value': {
+									onChange(actionMeta.removedValue!.key, false)
+									break
+								}
+								case 'pop-value': {
+									if (currentValues.length > 0) {
+										onChange(currentValues[currentValues.length - 1], false)
+									}
+									break
+								}
+								case 'clear': {
+									clear()
+									break
+								}
+								case 'create-option': {
+									// TODO not yet supported
+									break
+								}
+								case 'deselect-option': {
+									// When is this even called? 🤔
+									break
+								}
 							}
-							case 'clear': {
-								clear()
-								break
-							}
-							case 'create-option': {
-								// TODO not yet supported
-								break
-							}
-							case 'deselect-option': {
-								// When is this even called? 🤔
-								break
-							}
-						}
-					}}
-				/>
+						}}
+					/>
+				</SelectCreateNewWrapper>
 			</FieldContainer>
 		)
 	},

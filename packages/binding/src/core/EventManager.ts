@@ -346,9 +346,12 @@ export class EventManager {
 
 				for (const [state, callback] of callbackQueue) {
 					correspondingStates.push(state)
+					const changesCountBefore = this.dirtinessTracker.getTotalTouchCount()
+					let validateChanges = false
 					try {
 						const result = callback(state.getAccessor as any, options as any) // TS can't quite handle this but this is sound.
 						if (result instanceof Promise) {
+							validateChanges = true
 							promiseReturns.push(result)
 						} else {
 							promiseReturns.push(Promise.resolve(result))
@@ -356,10 +359,15 @@ export class EventManager {
 					} catch (e) {
 						promiseReturns.push(Promise.reject(e))
 					}
+					if (validateChanges) {
+						this.validateWithoutChanges(changesCountBefore, eventType)
+					}
 				}
 				// TODO timeout
 
-				const newCallbacks = await this.executeWithoutChanges(eventType, () => Promise.allSettled(promiseReturns))
+				const changesCountBefore = this.dirtinessTracker.getTotalTouchCount()
+				const newCallbacks = await Promise.allSettled(promiseReturns)
+				this.validateWithoutChanges(changesCountBefore, eventType)
 
 				callbackQueue.length = 0 // Empties the queue
 
@@ -561,20 +569,18 @@ export class EventManager {
 		}
 	}
 
-	private async executeWithoutChanges<T>(eventType: string, cb: () => Promise<T>): Promise<T> {
-		const changesCountBefore = this.dirtinessTracker.getTotalChangesCount()
-		const result = await cb()
-		const changesCountAfter = this.dirtinessTracker.getTotalChangesCount()
+
+	private validateWithoutChanges(initialCount: number, eventType: string): void {
+		const changesCountAfter = this.dirtinessTracker.getTotalTouchCount()
 		if (import.meta.env.DEV) {
-			if (changesCountBefore !== changesCountAfter) {
+			if (initialCount !== changesCountAfter) {
 				// This isn't bulletproof. They could e.g. undo a change and make another one which would
 				// slip through this detection. But for most cases, it should be good enough and not too expensive.
 				throw new BindingError(
 					`A ${eventType} event handler cannot be asynchronous and alter the accessor tree at the same time. ` +
-						`To achieve this, prepare your data asynchronously but only touch the tree from a returned callback.`,
+					`To achieve this, prepare your data asynchronously but only touch the tree from a returned callback.`,
 				)
 			}
 		}
-		return result
 	}
 }

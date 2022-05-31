@@ -25,6 +25,7 @@ export namespace ChoiceFieldData {
 		errors: FieldErrors | undefined
 		environment: Environment
 		isMutating: boolean
+		onAddNew?: () => void
 	}
 
 	export interface SingleChoiceFieldMetadata extends BaseChoiceMetadata {

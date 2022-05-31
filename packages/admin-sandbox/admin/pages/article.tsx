@@ -18,6 +18,7 @@ import {
 	TextCell,
 	TextField,
 } from '@contember/admin'
+import { CategoryForm } from './categories'
 import { DataGridTile } from '../components/DataGridTile'
 
 
@@ -78,15 +79,25 @@ const ArticleForm = Component(() => <>
 
 const ArticleSidebarForm = Component(() => <>
 		<SelectField field={'state'} label={'State'} options={Object.entries(stateOptions).map(([value, label]) => ({ value, label }))} allowNull />
-		<MultiSelectField label={'tags'} field={'tags'} options={{
-			fields: 'Tag.locales(locale.code=\'cs\').name',
-			orderBy: 'name desc',
-		}} />
+		<MultiSelectField
+			label={'tags'}
+			field={'tags'}
+			options={{
+				fields: 'Tag.name',
+				orderBy: 'name desc',
+			}}
+			createNewForm={<TextField field={'name'} label={'Name'} />}
+		/>g
 
-		<SelectField label={'category'} field={'category'} options={{
-			fields: 'Category.locales(locale.code=\'cs\').name',
-			orderBy: 'name desc',
-		}} />
+		<SelectField
+			label={'category'}
+			field={'category'}
+			createNewForm={<CategoryForm />}
+			options={{
+				fields: 'Category.name',
+				orderBy: 'name desc',
+			}}
+		/>
 	</>,
 	'ArticleSidebarForm',
 )

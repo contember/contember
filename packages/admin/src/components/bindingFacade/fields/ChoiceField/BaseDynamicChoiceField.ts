@@ -26,6 +26,7 @@ export type BaseDynamicChoiceField = (
 	  }
 ) & {
 	searchByFields?: SugaredRelativeSingleField['field'] | SugaredRelativeSingleField['field'][]
+	createNewForm?: ReactElement
 }
 
 export const useDesugaredOptionPath = (props: BaseDynamicChoiceField) => {

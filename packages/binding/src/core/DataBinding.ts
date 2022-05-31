@@ -89,7 +89,6 @@ export class DataBinding {
 		this.stateInitializer = new StateInitializer(
 			this.accessorErrorManager,
 			this.batchUpdatesOptions,
-			this.config,
 			this.eventManager,
 			this.treeStore,
 		)

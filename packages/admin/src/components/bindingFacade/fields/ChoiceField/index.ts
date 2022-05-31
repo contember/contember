@@ -1,4 +1,5 @@
 export * from './ChoiceField'
+export * from './choiceFieldDictionary'
 export * from './ChoiceFieldData'
 export * from './DynamicMultiChoiceField'
 export * from './StaticSingleChoiceField'

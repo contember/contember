@@ -14,7 +14,7 @@ export interface HoveringToolbarContentsProps {
 
 export const HoveringToolbarContents = memo(({ buttons: rawButtons }: HoveringToolbarContentsProps) => {
 	const editor = useSlate() as EditorWithBlocks
-	const { openDialog } = useDialog()
+	const { openDialog } = useDialog<true>()
 	const environment = useEnvironment()
 
 	if (!rawButtons.length) {
@@ -61,42 +61,41 @@ export const HoveringToolbarContents = memo(({ buttons: rawButtons }: HoveringTo
 									button.initializeReference,
 								)
 
-								try {
-									const Content = button.referenceContent
-									await openDialog({
-										heading: button.label,
-										content: props => (
-											<Entity accessor={reference}>
-												<Content
-													referenceId={reference.id}
-													editor={editor}
-													selection={selection}
-													onSuccess={({ createElement } = {}) => {
-														if (createElement !== undefined) {
-															if (!selection) {
-																return
-															}
-															EditorTransforms.select(editor, selection)
-															EditorTransforms.wrapNodes(
-																editor,
-																{
-																	type: referenceElementType,
-																	children: [{ text: '' }],
-																	referenceId: reference.id,
-																	...createElement,
-																},
-																{ split: true },
-															)
-															EditorTransforms.collapse(editor, { edge: 'end' })
+								const Content = button.referenceContent
+								const result = await openDialog({
+									heading: button.label,
+									content: props => (
+										<Entity accessor={reference}>
+											<Content
+												referenceId={reference.id}
+												editor={editor}
+												selection={selection}
+												onSuccess={({ createElement } = {}) => {
+													if (createElement !== undefined) {
+														if (!selection) {
+															return
 														}
-														props.resolve(undefined)
-													}}
-													onCancel={() => props.reject()}
-												/>
-											</Entity>
-										),
-									})
-								} catch {
+														EditorTransforms.select(editor, selection)
+														EditorTransforms.wrapNodes(
+															editor,
+															{
+																type: referenceElementType,
+																children: [{ text: '' }],
+																referenceId: reference.id,
+																...createElement,
+															},
+															{ split: true },
+														)
+														EditorTransforms.collapse(editor, { edge: 'end' })
+													}
+													props.resolve(true)
+												}}
+												onCancel={() => props.resolve()}
+											/>
+										</Entity>
+									),
+								})
+								if (result !== true) {
 									reference.deleteEntity()
 								}
 							}

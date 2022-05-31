@@ -14,6 +14,7 @@ import { BaseDynamicChoiceField, useCurrentValues } from './BaseDynamicChoiceFie
 import type { ChoiceFieldData } from './ChoiceFieldData'
 import { useSelectOptions } from './useSelectOptions'
 import { useAccessorErrors } from '../../errors'
+import { useOnAddNew } from './useOnAddNew'
 
 export type DynamicMultipleChoiceFieldProps = SugaredRelativeEntityList & BaseDynamicChoiceField
 
@@ -74,5 +75,11 @@ export const useDynamicMultipleChoiceField = (
 		errors,
 		clear,
 		onChange,
+		onAddNew: useOnAddNew({
+			...props,
+			connect: useCallback(entity => {
+				getCurrentValues().connectEntity(entity)
+			}, [getCurrentValues]),
+		}),
 	}
 }

@@ -61,7 +61,7 @@ describe('Marker tree generator', () => {
 				{
 					name: 'Foo',
 					customPrimaryAllowed: false,
-					unique: { fields: new Set() },
+					unique: [],
 					fields: [
 						{
 							__typename: '_Column',
@@ -117,7 +117,7 @@ describe('Marker tree generator', () => {
 				{
 					name: 'Bar',
 					customPrimaryAllowed: false,
-					unique: { fields: new Set() },
+					unique: [],
 					fields: [
 						{
 							__typename: '_Column',

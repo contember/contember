@@ -15,14 +15,24 @@ const prepareBeforePersistTest = ({ event }: { event: (getAccessor: () => Entity
 				name: 'Foo',
 				customPrimaryAllowed: false,
 				unique: [],
-				fields: [{
-					__typename: '_Column',
-					type: 'String',
-					enumName: null,
-					nullable: true,
-					defaultValue: null,
-					name: 'fooField',
-				}],
+				fields: [
+					{
+						__typename: '_Column',
+						name: 'id',
+						nullable: false,
+						defaultValue: null,
+						type: 'Uuid',
+						enumName: null,
+					},
+					{
+						__typename: '_Column',
+						type: 'String',
+						enumName: null,
+						nullable: true,
+						defaultValue: null,
+						name: 'fooField',
+					},
+				],
 			}],
 		},
 	})

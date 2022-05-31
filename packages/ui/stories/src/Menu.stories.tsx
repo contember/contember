@@ -23,8 +23,11 @@ const Template: ComponentStory<typeof Menu> = args => (
 				})}>
 					<Menu {...args}>
 						<Menu.Item title="Front page" to="#active-page" />
+						<Menu.Item title="Active page" to="#active-page" />
 						<Menu.Item title="Content">
+							<Menu.Item title="Active page" to="#active-page" />
 							<Menu.Item title="Posts">
+								<Menu.Item title="Active page" to="#active-page" />
 								<Menu.Item title="List all" to="#other-page" />
 								<Menu.Item title="Categories" to="#other-page" />
 								<Menu.Item title="Tags" to="#active-page" />

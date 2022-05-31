@@ -166,25 +166,23 @@ export function MenuItem<T extends any = any>({ children, ...props }: MenuItemPr
 							disabled={!isInteractive}
 							onChange={changeExpand}
 						/>}
-						{props.title
-							? href
-								? <MenuLink
-									className={`${componentClassName}-title-content`}
-									external={props.external}
-									href={href}
-									isActive={isActive}
-									onClick={onLabelClick}
-									suppressTo={expanded}
-								>
-									<Label className={`${componentClassName}-title-label`}>{props.title}</Label>
-								</MenuLink>
-								: <span
-									className={`${componentClassName}-title-content`}
-									onClick={onLabelClick}
-								>
-									<Label className={`${componentClassName}-label`}>{props.title}</Label>
-								</span>
-							: (warnAboutA11YIssues ? '⚠️' : undefined)
+						{href
+							? <MenuLink
+								className={`${componentClassName}-title-content`}
+								external={props.external}
+								href={href}
+								isActive={isActive}
+								onClick={onLabelClick}
+								suppressTo={expanded}
+							>
+								<Label className={`${componentClassName}-title-label`}>{props.title}</Label>
+							</MenuLink>
+							: <span
+								className={`${componentClassName}-title-content`}
+								onClick={onLabelClick}
+							>
+								<Label className={`${componentClassName}-label`}>{props.title}</Label>
+							</span>
 						}
 					</div>
 					{submenu}

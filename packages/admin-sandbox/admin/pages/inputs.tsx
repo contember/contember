@@ -45,11 +45,6 @@ export default () => (
 			{ value: 'b', label: 'B option' },
 			{ value: 'c', label: 'C option' },
 		]} orientation={'horizontal'} />
-		<SelectField field={'selectValue	'} label={'Value'} options={[
-			{ value: 'a', label: 'A option' },
-			{ value: 'b', label: 'B option' },
-			{ value: 'c', label: 'C option' },
-		]} />
 		<BlockRepeater
 			field="blocks"
 			label={undefined}
@@ -64,5 +59,10 @@ export default () => (
 				<TextField field="primaryText" label="Headline" />
 			</Block>
 		</BlockRepeater>
+		<SelectField field={'selectValue	'} label={'Value'} options={[
+			{ value: 'a', label: 'A option' },
+			{ value: 'b', label: 'B option' },
+			{ value: 'c', label: 'C option' },
+		]} />
 	</EditPage>
 )

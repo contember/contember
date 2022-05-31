@@ -8,8 +8,7 @@ import {
 	EnumCell,
 	GenericCell,
 	HasManySelectCell,
-	HasOneSelectCell,
-	ImageUploadField,
+	HasOneSelectCell, If, ImageUploadField,
 	LinkButton,
 	MultiSelectField,
 	NumberCell,
@@ -20,7 +19,6 @@ import {
 	TextField,
 } from '@contember/admin'
 import { DataGridTile } from '../components/DataGridTile'
-import { If } from '@contember/admin'
 
 
 const stateOptions = {
@@ -57,6 +55,10 @@ export const List = () => <DataGridPage
 </DataGridPage>
 
 const ArticleForm = Component(() => <>
+		<TextField field={'title'} label={'Title'} />
+		<SlugField field={'slug'} label={'Slug'} derivedFrom={'title'} unpersistedHardPrefix={'http://localhost/'} persistedHardPrefix={'bar/'}
+		           persistedSoftPrefix={'lorem/'} linkToExternalUrl />
+		<RichTextField field={'content'} label={'Content'} />
 		<ImageUploadField
 			label="Image"
 			baseEntity="image"
@@ -66,6 +68,16 @@ const ArticleForm = Component(() => <>
 			fileSizeField="size"
 			fileTypeField="type"
 		/>
+
+		<If condition={'[state = removed]'}>
+				<TextField field={'title'} label={'Title'} />
+		</If>
+	</>,
+	'ArticleForm',
+)
+
+const ArticleSidebarForm = Component(() => <>
+		<SelectField field={'state'} label={'State'} options={Object.entries(stateOptions).map(([value, label]) => ({ value, label }))} allowNull />
 		<MultiSelectField label={'tags'} field={'tags'} options={{
 			fields: 'Tag.locales(locale.code=\'cs\').name',
 			orderBy: 'name desc',
@@ -75,27 +87,21 @@ const ArticleForm = Component(() => <>
 			fields: 'Category.locales(locale.code=\'cs\').name',
 			orderBy: 'name desc',
 		}} />
-
-		<TextField field={'title'} label={'Title'} />
-		<RichTextField field={'content'} label={'Content'} />
-		<SlugField field={'slug'} label={'Slug'} derivedFrom={'title'} unpersistedHardPrefix={'http://localhost/'} persistedHardPrefix={'bar/'}
-		           persistedSoftPrefix={'lorem/'} linkToExternalUrl />
-		<SelectField field={'state'} label={'State'} options={Object.entries(stateOptions).map(([value, label]) => ({ value, label }))} allowNull />
-		<If condition={'[state = removed]'}>
-				<TextField field={'title'} label={'Title'} />
-		</If>
 	</>,
-	'ArticleForm',
+	'ArticleSidebarForm',
 )
 
 export const create = (
-	<CreatePage entity="Article" redirectOnSuccess="article/edit(id: $entity.id)">
+	<CreatePage entity="Article" redirectOnSuccess="article/edit(id: $entity.id)" rendererProps={{ side: <ArticleSidebarForm /> }}>
 		<ArticleForm/>
 	</CreatePage>
 )
 
 export const edit = (
-	<EditPage entity="Article(id = $id)" rendererProps={{ title: 'Article' }}>
+	<EditPage entity="Article(id = $id)" rendererProps={{
+		title: 'Article',
+		side: <ArticleSidebarForm />,
+	}}>
 		<ArticleForm/>
 	</EditPage>
 )

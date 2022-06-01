@@ -1,7 +1,7 @@
 import { Entity, EntityAccessor, EntityListAccessor, useEnvironment } from '@contember/binding'
 import { emptyArray } from '@contember/react-utils'
-import { AnchorButton, ButtonGroup, ButtonProps, Checkbox, Dropdown, FieldContainer } from '@contember/ui'
-import { ReactNode, useEffect } from 'react'
+import { AnchorButton, ButtonGroup, ButtonProps, Checkbox, Dropdown, DropdownProps, FieldContainer } from '@contember/ui'
+import { ReactNode, useCallback, useEffect, useMemo } from 'react'
 import type { RequestChange } from '../../../../routing'
 import { RoutingLink, useRedirect } from '../../../../routing'
 import { renderByJoining } from './renderByJoining'
@@ -22,11 +22,11 @@ export function DimensionsRenderer(props: DimensionsRendererProps) {
 	const environment = useEnvironment()
 	const redirect = useRedirect()
 
-	const renderSelected = (selectedDimensions: StatefulDimensionDatum<true>[]): ReactNode => {
+	const renderSelected = useCallback((selectedDimensions: StatefulDimensionDatum<true>[]): ReactNode => {
 		const renderer = props.renderSelected || renderByJoining
 
 		return renderer(selectedDimensions)
-	}
+	}, [props.renderSelected])
 
 	const renderContent = (
 		dimensionData: StatefulDimensionDatum[],
@@ -171,6 +171,12 @@ export function DimensionsRenderer(props: DimensionsRendererProps) {
 		}
 	}, [normalizedData, props.dimension, props.maxItems, redirect, selectedDimensions])
 
+	const buttonProps: DropdownProps['buttonProps'] = useMemo(() => ({
+		size: 'small',
+		...props.buttonProps,
+		children: renderSelected(selectedDimensions),
+	}), [props.buttonProps, renderSelected, selectedDimensions])
+
 	if (normalizedData.length === 0) {
 		return null // What do we even do here…?
 	}
@@ -185,13 +191,7 @@ export function DimensionsRenderer(props: DimensionsRendererProps) {
 	}
 
 	return (
-		<Dropdown
-			buttonProps={{
-				size: 'small',
-				...props.buttonProps,
-				children: renderSelected(selectedDimensions),
-			}}
-		>
+		<Dropdown buttonProps={buttonProps}>
 			{renderContent(normalizedData, selectedDimensions)}
 		</Dropdown>
 	)

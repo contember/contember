@@ -1,5 +1,5 @@
-import { Box, Checkbox, Dropdown, FieldContainer, Icon } from '@contember/ui'
-import { Fragment, ReactElement } from 'react'
+import { Box, Checkbox, Dropdown, DropdownProps, FieldContainer, Icon } from '@contember/ui'
+import { Fragment, ReactElement, useMemo } from 'react'
 import type { MessageFormatter } from '../../../../../i18n'
 import type { DataGridDictionary } from './dataGridDictionary'
 import type { DataGridSetIsColumnHidden } from './DataGridSetIsColumnHidden'
@@ -16,19 +16,21 @@ export function DataGridColumnHiding({
 	formatMessage,
 	setIsColumnHidden,
 }: DataGridColumnHidingProps): ReactElement | null {
+	const buttonProps: DropdownProps['buttonProps'] = useMemo(() => ({
+		intent: 'default',
+		distinction: 'seamless',
+		children: (
+			<>
+				<Icon blueprintIcon="list-columns" alignWithLowercase style={{ marginRight: '0.4em' }} />
+				{formatMessage('dataGrid.columnHiding.showMenuButton.text')}
+			</>
+		),
+	}), [formatMessage])
+
 	return (
 		<Dropdown
 			alignment="end"
-			buttonProps={{
-				intent: 'default',
-				distinction: 'seamless',
-				children: (
-					<>
-						<Icon blueprintIcon="list-columns" alignWithLowercase style={{ marginRight: '0.4em' }} />
-						{formatMessage('dataGrid.columnHiding.showMenuButton.text')}
-					</>
-				),
-			}}
+			buttonProps={buttonProps}
 		>
 			<Box heading={formatMessage('dataGrid.columnHiding.heading')}>
 				<div style={{ display: 'flex', flexDirection: 'column', gap: '0.25em' }}>

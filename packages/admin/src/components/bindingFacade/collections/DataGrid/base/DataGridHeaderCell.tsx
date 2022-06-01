@@ -1,6 +1,6 @@
 import type { Environment } from '@contember/binding'
-import { ActionableBox, Box, Dropdown, Icon, Justification, TableHeaderCell } from '@contember/ui'
-import { ComponentType, createElement, ReactElement, ReactNode } from 'react'
+import { ActionableBox, Box, Dropdown, DropdownProps, Icon, Justification, TableHeaderCell } from '@contember/ui'
+import { ComponentType, createElement, ReactElement, ReactNode, useMemo } from 'react'
 import type { FilterRendererProps } from './DataGridColumn'
 import type { DataGridFilterArtifact } from './DataGridFilterArtifact'
 import { cycleOrderDirection, DataGridOrderDirection } from './DataGridOrderDirection'
@@ -43,6 +43,21 @@ export function DataGridHeaderCell({
 	setOrderBy,
 	shrunk,
 }: DataGridHeaderCellProps): ReactElement {
+	const buttonProps: DropdownProps['buttonProps'] = useMemo(() => ({
+		intent: hasFilter ? 'primary' : 'default',
+		distinction: 'seamless',
+		size: 'small',
+		children: (
+			<Icon
+				blueprintIcon="filter"
+				alignWithLowercase
+				style={{
+					opacity: hasFilter ? '1' : '0.5',
+				}}
+			/>
+		),
+	}), [hasFilter])
+
 	return (
 		<TableHeaderCell scope="col" justification={headerJustification} shrunk={shrunk}>
 			<span style={{ display: 'flex', justifyContent: 'flex-start', gap: '.25em' }}>
@@ -60,20 +75,7 @@ export function DataGridHeaderCell({
 				</span>
 				{filterRenderer && (
 					<Dropdown
-						buttonProps={{
-							intent: hasFilter ? 'primary' : 'default',
-							distinction: 'seamless',
-							size: 'small',
-							children: (
-								<Icon
-									blueprintIcon="filter"
-									alignWithLowercase
-									style={{
-										opacity: hasFilter ? '1' : '0.5',
-									}}
-								/>
-							),
-						}}
+						buttonProps={buttonProps}
 						renderContent={({ requestClose }) => (
 							<ActionableBox
 								onRemove={() => {

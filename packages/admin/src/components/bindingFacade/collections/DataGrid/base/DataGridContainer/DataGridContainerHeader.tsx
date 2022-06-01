@@ -79,3 +79,4 @@ export const DataGridContainerHeader = memo<DataGridContainerHeaderProps>(({
 		</LayoutPageStickyContainer>
 	)
 })
+DataGridContainerHeader.displayName = 'DataGridContainerHeader'

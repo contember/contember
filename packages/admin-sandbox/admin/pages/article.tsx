@@ -6,7 +6,9 @@ import {
 	DeleteEntityButton,
 	EditPage,
 	EnumCell,
+	Field,
 	GenericCell,
+	HasMany,
 	HasManySelectCell,
 	HasOneSelectCell, If, ImageUploadField,
 	LinkButton,
@@ -79,7 +81,14 @@ const ArticleForm = Component(() => <>
 	</>,
 	'ArticleForm',
 )
-
+const CategoryOptionItem = Component(() => {
+	return <>
+		<Field field={'name'}/>, locales:
+		<HasMany field={'locales'}>
+			<Field field={'name'} />
+		</HasMany>
+	</>
+})
 const ArticleSidebarForm = Component(() => <>
 		<SelectField field={'state'} label={'State'} options={Object.entries(stateOptions).map(([value, label]) => ({ value, label }))} allowNull />
 		<MultiSelectField
@@ -109,9 +118,10 @@ const ArticleSidebarForm = Component(() => <>
 			field={'category'}
 			createNewForm={<CategoryForm />}
 			options={{
-				fields: 'Category.name',
+				entities: 'Category',
 				orderBy: 'name desc',
 			}}
+			optionLabel={<CategoryOptionItem />}
 		/>
 
 	</>,

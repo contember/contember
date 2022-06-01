@@ -8,7 +8,6 @@ import {
 	QueryLanguage,
 	SugaredQualifiedEntityList,
 	SugaredQualifiedFieldList,
-	SugaredRelativeSingleEntity,
 	SugaredRelativeSingleField,
 	useAccessorUpdateSubscription,
 	useEnvironment,
@@ -116,9 +115,7 @@ export const useCurrentValues = (
 export const useNormalizedOptions = (
 	optionEntities: EntityAccessor[],
 	desugaredOptionPath: QualifiedFieldList | QualifiedEntityList,
-	renderOption: ((entityAccessor: EntityAccessor) => ReactNode) | undefined,
-	optionLabel: ReactElement | undefined,
-	searchByFields: BaseDynamicChoiceField['searchByFields'],
+	{ searchByFields, ...props }: BaseDynamicChoiceField,
 ): ChoiceFieldData.Data<EntityId> => {
 	const sugaredFields = useMemo(
 		() => (searchByFields === undefined ? [] : Array.isArray(searchByFields) ? searchByFields : [searchByFields]),
@@ -129,6 +126,8 @@ export const useNormalizedOptions = (
 		() => sugaredFields.map(field => QueryLanguage.desugarRelativeSingleField(field, environment)),
 		[sugaredFields, environment],
 	)
+	const renderOption = 'renderOption' in props && props.renderOption ? props.renderOption : undefined
+	const optionLabel = 'optionLabel' in props && props.optionLabel ? props.optionLabel : undefined
 	return useMemo(
 		() =>
 			optionEntities.map((item, i): ChoiceFieldData.SingleDatum<EntityId> => {

@@ -168,4 +168,10 @@ export const useCommonStyles = (isInvalid: boolean): StylesConfig<any, boolean, 
 			position: 'absolute',
 		}
 	},
+	valueContainer: provided => {
+		return {
+			...provided,
+			display: 'flex',
+		}
+	},
 }), [isInvalid])

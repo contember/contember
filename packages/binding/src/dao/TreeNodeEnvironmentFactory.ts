@@ -201,11 +201,11 @@ export class TreeNodeEnvironmentFactory {
 
 	private static describeLocation(environment: Environment): string {
 		const path = []
+		const loc = environment.getSubTreeNode()
 		for (let env = environment;; env = env.getParent()) {
 			const node = env.getSubTreeNode()
 			if (node.type === 'subtree-entity' || node.type === 'subtree-entity-list') {
-				const pathText = path.length ? ` in path ${path.join('.')}` : ''
-				return `entity '${node.entity.name}'${pathText}`
+				return `entity '${loc.entity.name}' in path '${[node.entity.name, ...path].join('.')}'`
 			}
 			path.push(node.field.name)
 		}

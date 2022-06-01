@@ -1,5 +1,5 @@
 import { Button, LayoutPageStickyContainer, Stack } from '@contember/ui'
-import { memo, ReactNode } from 'react'
+import { memo, ReactNode, useCallback } from 'react'
 import { useMessageFormatter } from '../../../../../../i18n'
 import { dataGridDictionary } from '../dataGridDictionary'
 import type { DataGridContainerProps } from './Types'
@@ -24,6 +24,19 @@ export const DataGridContainerFooter = memo<DataGridContainerFooterProps>(({
 
   const formatMessage = useMessageFormatter(dataGridDictionary)
 
+  const goToFirstPageClick = useCallback(() => {
+    updatePaging({ type: 'goToFirstPage' })
+  }, [updatePaging])
+  const goToPreviousPageClick = useCallback(() => {
+    updatePaging({ type: 'goToPreviousPage' })
+  }, [updatePaging])
+  const goToNextPageClick = useCallback(() => {
+    updatePaging({ type: 'goToNextPage' })
+  }, [updatePaging])
+  const goToLastPageClick = useCallback(() => {
+    pagesCount !== undefined && updatePaging({ type: 'goToPage', newPageIndex: pagesCount - 1 })
+  }, [pagesCount, updatePaging])
+
   return (
     <LayoutPageStickyContainer
       left="var(--cui-layout-page-padding-left)"
@@ -34,27 +47,28 @@ export const DataGridContainerFooter = memo<DataGridContainerFooterProps>(({
           <Button
             distinction="seamless"
             disabled={pageIndex === 0}
-            onClick={() => updatePaging({ type: 'goToFirstPage' })}
+            onClick={goToFirstPageClick}
           >
             {formatMessage('dataGrid.paging.first')}
           </Button>
-          <Button disabled={pageIndex === 0} onClick={() => updatePaging({ type: 'goToPreviousPage' })}>
+          <Button
+            disabled={pageIndex === 0}
+            onClick={goToPreviousPageClick}
+          >
             {formatMessage('dataGrid.paging.previous')}
           </Button>
           {itemsPerPage !== null && (
             <>
               <Button
                 disabled={pagesCount === undefined || pagesCount <= pageIndex + 1}
-                onClick={() => updatePaging({ type: 'goToNextPage' })}
+                onClick={goToNextPageClick}
               >
                 {formatMessage('dataGrid.paging.next')}
               </Button>
               <Button
                 distinction="seamless"
                 disabled={pagesCount === undefined || pagesCount <= pageIndex + 1}
-                onClick={() =>
-                  pagesCount !== undefined && updatePaging({ type: 'goToPage', newPageIndex: pagesCount - 1 })
-                }
+                onClick={goToLastPageClick}
               >
                 {formatMessage('dataGrid.paging.last')}
               </Button>
@@ -66,3 +80,4 @@ export const DataGridContainerFooter = memo<DataGridContainerFooterProps>(({
     </LayoutPageStickyContainer>
   )
 })
+DataGridContainerFooter.displayName = 'DataGridContainerFooter'

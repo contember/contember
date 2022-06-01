@@ -23,8 +23,6 @@ export namespace ChoiceFieldData {
 	export interface BaseChoiceMetadata {
 		data: Data<DynamicValue | StaticValue>
 		errors: FieldErrors | undefined
-		environment: Environment
-		isMutating: boolean
 		onAddNew?: () => void
 	}
 

@@ -20,7 +20,7 @@ type SelectCellFilterProps =
 		optionProps: BaseDynamicChoiceField
 	}
 
-export const SelectCellFilter = ({ filter, setFilter, environment, optionProps }: SelectCellFilterProps) => {
+export const SelectCellFilter = ({ filter, setFilter, optionProps }: SelectCellFilterProps) => {
 	const [entities, options] = useSelectOptions(optionProps)
 	const currentValues = useMemo(() => {
 		const values: number[] = []
@@ -37,7 +37,6 @@ export const SelectCellFilter = ({ filter, setFilter, environment, optionProps }
 	return <>
 		<MultiSelectFieldInner
 			label={undefined}
-			environment={environment}
 			onChange={(val, isChosen) => {
 				const id = entities[val].id
 				if (isChosen) {
@@ -52,7 +51,6 @@ export const SelectCellFilter = ({ filter, setFilter, environment, optionProps }
 			clear={() => {
 				setFilter({ ...filter, id: [] })
 			}}
-			isMutating={false}
 		/>
 
 		<FieldContainer

@@ -37,9 +37,7 @@ export const MultiSelectFieldInner = memo(
 	({
 		currentValues,
 		data,
-		environment,
 		errors,
-		isMutating,
 		onChange,
 		clear,
 		reactSelectProps,

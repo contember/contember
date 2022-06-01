@@ -25,17 +25,13 @@ export const RadioField: FunctionComponent<RadioFieldProps> = Component(props =>
 				currentValue,
 				onChange,
 				errors,
-				environment,
-				isMutating,
 			}: ChoiceFieldData.SingleChoiceFieldMetadata) => (
 			<RadioFieldInner
 				{...props}
 				data={data}
 				currentValue={currentValue}
 				onChange={onChange}
-				environment={environment}
 				errors={errors}
-				isMutating={isMutating}
 			/>
 		)}
 	</ChoiceField>

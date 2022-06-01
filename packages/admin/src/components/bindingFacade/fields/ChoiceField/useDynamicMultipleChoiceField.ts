@@ -5,9 +5,7 @@ import {
 	SugaredRelativeEntityList,
 	useAccessorUpdateSubscription,
 	useEntityKey,
-	useEnvironment,
 	useGetEntityByKey,
-	useMutationState,
 } from '@contember/binding'
 import { useCallback, useMemo } from 'react'
 import { BaseDynamicChoiceField, useCurrentValues } from './BaseDynamicChoiceField'
@@ -23,8 +21,6 @@ export const useDynamicMultipleChoiceField = (
 ): ChoiceFieldData.MultipleChoiceFieldMetadata => {
 	const entityKey = useEntityKey()
 	const getEntityByKey = useGetEntityByKey()
-	const environment = useEnvironment()
-	const isMutating = useMutationState()
 
 	const desugaredRelativePath = useMemo<RelativeEntityList>(
 		() => QueryLanguage.desugarRelativeEntityList(props, environment),
@@ -68,8 +64,6 @@ export const useDynamicMultipleChoiceField = (
 	const errors = useAccessorErrors(currentValueListAccessor)
 
 	return {
-		isMutating,
-		environment,
 		currentValues,
 		data: options,
 		errors,

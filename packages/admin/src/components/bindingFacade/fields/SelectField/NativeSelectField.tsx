@@ -1,4 +1,4 @@
-import { BindingError, Component } from '@contember/binding'
+import { BindingError, Component, useMutationState } from '@contember/binding'
 import {
 	FieldContainer,
 	FieldContainerProps,
@@ -52,6 +52,7 @@ export interface NativeSelectFieldInnerProps extends ChoiceFieldData.SingleChoic
 }
 
 export const NativeSelectFieldInner = memo(forwardRef<HTMLSelectElement, NativeSelectFieldInnerProps>((props, ref) => {
+	const isMutating = useMutationState()
 	const labelMiddleware = useLabelMiddleware()
 	const options: SelectOption<number>[] = props.data.map(({ key, label }) => {
 		if (typeof label !== 'string') {
@@ -77,7 +78,7 @@ export const NativeSelectFieldInner = memo(forwardRef<HTMLSelectElement, NativeS
 						props.onChange(value ?? -1)
 					}}
 					options={options}
-					loading={props.isMutating}
+					loading={isMutating}
 				/>
 			</SelectCreateNewWrapper>
 		</FieldContainer>

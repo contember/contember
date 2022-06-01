@@ -24,7 +24,6 @@ export const useDynamicSingleChoiceField = (
 	const entityKey = useEntityKey()
 	const getEntityByKey = useGetEntityByKey()
 	const environment = useEnvironment()
-	const isMutating = useMutationState()
 
 	const desugaredRelativePath = useMemo<RelativeSingleEntity>(() => {
 		return QueryLanguage.desugarRelativeSingleEntity(props, environment)
@@ -56,8 +55,6 @@ export const useDynamicSingleChoiceField = (
 	return {
 		data: options,
 		errors,
-		isMutating,
-		environment,
 		currentValue: currentValues.length ? currentValues[0] : -1,
 		onChange: (newValue: ChoiceFieldData.ValueRepresentation) => {
 			if (newValue === -1) {

@@ -1,19 +1,16 @@
 import type { EntityAccessor, EntityListAccessor } from '@contember/binding'
 import { FieldContainer, Stack } from '@contember/ui'
-import { ComponentType, memo, ReactNode } from 'react'
+import { memo, ReactNode } from 'react'
 import type { MessageFormatter } from '../../../../i18n'
 import { AccessorErrors } from '../../errors'
-import { CreateNewEntityButton, CreateNewEntityButtonProps, EmptyMessage, EmptyMessageOuterProps } from '../helpers'
+import { AddEntityButtonProps, CreateNewEntityButton, EmptyMessage, EmptyMessageOuterProps } from '../helpers'
 import type { RepeaterDictionary } from './repeaterDictionary'
 
 export type RepeaterFieldContainerPublicProps =
 	& EmptyMessageOuterProps
+	& AddEntityButtonProps
 	& {
 		enableAddingNew?: boolean
-		addButtonText?: ReactNode
-		addButtonProps?: CreateNewEntityButtonProps // Children here override 'addButtonText'
-		addButtonComponent?: ComponentType<CreateNewEntityButtonProps & any> // This can override 'addButtonText' and 'addButtonProps'
-		addButtonComponentExtraProps?: {}
 	}
 
 export interface RepeaterFieldContainerPrivateProps {

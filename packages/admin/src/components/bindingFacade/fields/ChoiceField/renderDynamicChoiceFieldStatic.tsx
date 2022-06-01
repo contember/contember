@@ -23,11 +23,17 @@ export const renderDynamicChoiceFieldStatic = (props: BaseDynamicChoiceField, en
 		))
 
 
-	if ('renderOption' in props) {
-		const renderedOptionBase =
-			typeof props.optionsStaticRender === 'function'
-				? props.optionsStaticRender(environment)
-				: props.optionsStaticRender
+	if ('renderOption' in props || 'optionLabel' in props) {
+		let renderedOptionBase
+		if ('renderOption' in props) {
+			renderedOptionBase =
+				typeof props.optionsStaticRender === 'function'
+					? props.optionsStaticRender(environment)
+					: props.optionsStaticRender
+
+		} else {
+			renderedOptionBase = props.optionLabel
+		}
 		const renderedOption = (
 			<>
 				{searchByFields}

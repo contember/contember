@@ -22,6 +22,7 @@ export const useSelectOptions = (
 		optionEntities,
 		desugaredOptionPath,
 		'renderOption' in optionProps && optionProps.renderOption ? optionProps.renderOption : undefined,
+		'optionLabel' in optionProps && optionProps.optionLabel ? optionProps.optionLabel : undefined,
 		optionProps.searchByFields,
 	)
 	return [mergedEntities, normalizedOptions]

@@ -1,4 +1,5 @@
 import {
+	Entity,
 	EntityAccessor,
 	EntityId,
 	Environment,
@@ -16,15 +17,23 @@ import {
 import { ReactElement, ReactNode, useCallback, useMemo } from 'react'
 import type { ChoiceFieldData } from './ChoiceFieldData'
 
+/** @deprecated */
+interface LegacyChoiceFieldWithOptionRenderer {
+	renderOption: (entityAccessor: EntityAccessor) => ReactNode
+	options: string | SugaredQualifiedEntityList['entities'] | SugaredQualifiedEntityList
+	optionsStaticRender: ReactElement | ((environment: Environment) => ReactElement)
+}
+
 export type BaseDynamicChoiceField = (
 	| {
-			renderOption: (entityAccessor: EntityAccessor) => ReactNode
 			options: string | SugaredQualifiedEntityList['entities'] | SugaredQualifiedEntityList
-			optionsStaticRender: ReactElement | ((environment: Environment) => ReactElement)
-	  }
+			optionLabel: ReactNode
+		}
 	| {
 			options: string | SugaredQualifiedFieldList['fields'] | SugaredQualifiedFieldList
-	  }
+		}
+	| LegacyChoiceFieldWithOptionRenderer
+
 ) & {
 	searchByFields?: SugaredRelativeSingleField['field'] | SugaredRelativeSingleField['field'][]
 	createNewForm?: ReactElement
@@ -33,7 +42,7 @@ export type BaseDynamicChoiceField = (
 export const useDesugaredOptionPath = (props: BaseDynamicChoiceField) => {
 	const environment = useEnvironment()
 	return useMemo<QualifiedFieldList | QualifiedEntityList>(() => {
-		if ('optionsStaticRender' in props) {
+		if ('optionsStaticRender' in props || 'optionLabel' in props) {
 			return QueryLanguage.desugarQualifiedEntityList(
 				typeof props.options === 'string' || !('entities' in props.options)
 					? {
@@ -120,6 +129,7 @@ export const useNormalizedOptions = (
 	optionEntities: EntityAccessor[],
 	desugaredOptionPath: QualifiedFieldList | QualifiedEntityList,
 	renderOption: ((entityAccessor: EntityAccessor) => ReactNode) | undefined,
+	optionLabel: ReactElement | undefined,
 	searchByFields: BaseDynamicChoiceField['searchByFields'],
 ): ChoiceFieldData.Data => {
 	const sugaredFields = useMemo(
@@ -134,11 +144,16 @@ export const useNormalizedOptions = (
 	return useMemo(
 		() =>
 			optionEntities.map((item, i): ChoiceFieldData.SingleDatum => {
-				const label = renderOption
-					? renderOption(item)
-					: 'field' in desugaredOptionPath
-					? `${item.getField(desugaredOptionPath.field).value ?? ''}`
-					: ''
+				let label
+				if (renderOption) {
+					label = renderOption(item)
+				} else if (optionLabel) {
+					label = <Entity accessor={item}>{optionLabel}</Entity>
+				} else if ('field' in desugaredOptionPath) {
+					label = `${item.getField(desugaredOptionPath.field).value ?? ''}`
+				} else {
+					label = ''
+				}
 
 				let searchKeywords: string
 
@@ -160,6 +175,6 @@ export const useNormalizedOptions = (
 					actualValue: item.id,
 				}
 			}),
-		[desugaredOptionPath, optionEntities, renderOption, desugaredFields],
+		[optionEntities, renderOption, optionLabel, desugaredOptionPath, desugaredFields],
 	)
 }

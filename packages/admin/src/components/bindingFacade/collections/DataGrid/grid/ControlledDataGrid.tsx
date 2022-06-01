@@ -30,12 +30,21 @@ export const ControlledDataGrid = Component(
 	<ComponentProps extends {}>({ state, stateMethods, ...props }: ControlledDataGridProps<ComponentProps>) => {
 		const containerProps: DataGridContainerPublicProps = useMemo(
 			() => ({
-				emptyMessageComponentExtraProps: props.emptyMessageComponentExtraProps,
 				emptyMessage: props.emptyMessage,
 				emptyMessageComponent: props.emptyMessageComponent,
+				emptyMessageComponentExtraProps: props.emptyMessageComponentExtraProps,
+				onEntityClick: props.onEntityClick,
+				selectedEntityKeys: props.selectedEntityKeys,
 				tile: props.tile,
 			}),
-			[props.emptyMessage, props.emptyMessageComponent, props.emptyMessageComponentExtraProps, props.tile],
+			[
+				props.emptyMessage,
+				props.emptyMessageComponent,
+				props.emptyMessageComponentExtraProps,
+				props.onEntityClick,
+				props.selectedEntityKeys,
+				props.tile,
+			],
 		)
 
 

@@ -1,6 +1,6 @@
 import { Entity } from '@contember/binding'
-import { Table, TableCell, TableRow } from '@contember/ui'
-import { memo } from 'react'
+import { Table, TableCell, TableRow, useComponentClassName } from '@contember/ui'
+import { memo, useMemo } from 'react'
 import { useMessageFormatter } from '../../../../../../i18n'
 import { EmptyMessage } from '../../../helpers'
 import { dataGridDictionary } from '../dataGridDictionary'
@@ -16,6 +16,8 @@ interface DataGridContainerTableProps
 		| 'emptyMessage'
 		| 'emptyMessageComponent'
 		| 'displayedState'
+		| 'onEntityClick'
+		| 'selectedEntityKeys'
 		| 'setFilter'
 		| 'setOrderBy'
 	> {}
@@ -26,6 +28,8 @@ export const DataGridContainerTable = memo<DataGridContainerTableProps>(({
 	displayedState,
 	emptyMessage,
 	emptyMessageComponent,
+	onEntityClick,
+	selectedEntityKeys,
 	setFilter,
 	setOrderBy,
 }) => {
@@ -37,8 +41,20 @@ export const DataGridContainerTable = memo<DataGridContainerTableProps>(({
 
 	const formatMessage = useMessageFormatter(dataGridDictionary)
 
+	const onRowClick = useMemo(() => (onEntityClick
+		? (id: string) => {
+			const entity = accessor.getChildEntityById(id)
+
+			if (entity) {
+				onEntityClick(entity)
+			}
+		}
+		: undefined
+	), [accessor, onEntityClick])
+
 	return (
 		<Table
+			className={useComponentClassName('data-grid-body-content--table')}
 			tableHead={
 				<TableRow>
 					{Array.from(columns)
@@ -79,7 +95,7 @@ export const DataGridContainerTable = memo<DataGridContainerTableProps>(({
 						key={entity.id ?? entity.key}
 						accessor={entity}
 					>
-						<TableRow>
+						<TableRow id={entity.id} onClick={onRowClick} active={selectedEntityKeys?.includes(entity.id)}>
 							{Array.from(columns)
 								.filter(([columnKey]) => !desiredState.hiddenColumns[columnKey])
 								.map(([columnKey, column]) => {
@@ -115,3 +131,4 @@ export const DataGridContainerTable = memo<DataGridContainerTableProps>(({
 		</Table>
 	)
 })
+DataGridContainerTable.displayName = 'DataGridContainerTable'

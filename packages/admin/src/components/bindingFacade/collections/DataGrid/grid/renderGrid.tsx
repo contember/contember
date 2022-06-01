@@ -44,6 +44,8 @@ export const renderGrid = <ComponentExtraProps extends {}>(
 				displayedState,
 				entityName: entities.entityName,
 				filter,
+				onEntityClick: containerProps.onEntityClick,
+				selectedEntityKeys: containerProps.selectedEntityKeys,
 				tile: containerProps.tile,
 				tileSize: containerProps.tileSize,
 				setIsColumnHidden,

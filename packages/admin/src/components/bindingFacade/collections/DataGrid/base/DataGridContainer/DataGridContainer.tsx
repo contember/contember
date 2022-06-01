@@ -67,16 +67,11 @@ export const DataGridContainer: FunctionComponent<DataGridContainerProps> = Comp
 					setLayout={setLayout}
 				/>
 				{tile && layout === 'tiles'
-					? <Grid columnWidth={tileSize}>
-						{!!accessor.length && Array.from(accessor, entity => (
-							<Entity
-								key={entity.key}
-								accessor={entity}
-							>
-								{tile}
-							</Entity>
-						))}
-					</Grid>
+					? <DataGridContainerGrid
+						accessor={accessor}
+						tile={tile}
+						tileSize={tileSize}
+					/>
 					: <DataGridContainerTable
 						accessor={accessor}
 						desiredState={desiredState}

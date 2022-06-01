@@ -35,6 +35,7 @@ export namespace ChoiceFieldData {
 		currentValues: ValueRepresentation[]
 		clear: () => void
 		onChange: (optionKey: ValueRepresentation, isChosen: boolean) => void
+		onMove?: (oldIndex: number, newIndex: number) => void
 	}
 
 	export interface SingleChoiceFieldProps {

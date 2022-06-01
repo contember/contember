@@ -1,39 +1,25 @@
-import {
-	EntityListAccessor,
-	QueryLanguage,
-	RelativeEntityList,
-	SugaredRelativeEntityList,
-	useAccessorUpdateSubscription,
-	useEntityKey,
-	useGetEntityByKey,
-} from '@contember/binding'
-import { useCallback, useMemo } from 'react'
+import { SugaredRelativeEntityList, useEntityList } from '@contember/binding'
+import { useCallback } from 'react'
 import { BaseDynamicChoiceField, useCurrentValues } from './BaseDynamicChoiceField'
 import type { ChoiceFieldData } from './ChoiceFieldData'
 import { useSelectOptions } from './useSelectOptions'
 import { useAccessorErrors } from '../../errors'
 import { useOnAddNew } from './useOnAddNew'
+import { DynamicMultipleChoiceWithConnectingEntityFieldProps } from './useDynamicMultipleChoiceWithConnectingEntityField'
 
-export type DynamicMultipleChoiceFieldProps = SugaredRelativeEntityList & BaseDynamicChoiceField
+export type DynamicMultipleChoiceFieldProps =
+	& SugaredRelativeEntityList
+	& BaseDynamicChoiceField
+	& (
+		| { }
+		| DynamicMultipleChoiceWithConnectingEntityFieldProps
+	)
 
 export const useDynamicMultipleChoiceField = (
 	props: DynamicMultipleChoiceFieldProps,
 ): ChoiceFieldData.MultipleChoiceFieldMetadata => {
-	const entityKey = useEntityKey()
-	const getEntityByKey = useGetEntityByKey()
+	const currentValueListAccessor = useEntityList(props)
 
-	const desugaredRelativePath = useMemo<RelativeEntityList>(
-		() => QueryLanguage.desugarRelativeEntityList(props, environment),
-		[environment, props],
-	)
-
-	const getCurrentValueEntity = useCallback((): EntityListAccessor => {
-		const parentEntity = getEntityByKey(entityKey)
-
-		return parentEntity.getRelativeEntityList(desugaredRelativePath)
-	}, [entityKey, desugaredRelativePath, getEntityByKey])
-
-	const currentValueListAccessor = useAccessorUpdateSubscription(getCurrentValueEntity)
 	const currentlyChosenEntities = Array.from(currentValueListAccessor)
 
 	const [entities, options] = useSelectOptions(props, currentlyChosenEntities)

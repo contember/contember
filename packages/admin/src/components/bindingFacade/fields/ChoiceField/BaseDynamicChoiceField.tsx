@@ -75,19 +75,6 @@ export const useTopLevelOptionAccessors = (desugaredOptionPath: QualifiedFieldLi
 	return useMemo(() => Array.from(subTreeData), [subTreeData]) // Preserve ref equality if possible.
 }
 
-export const useOptionEntities = (
-	optionAccessors: EntityAccessor[],
-	desugaredOptionPath: QualifiedFieldList | QualifiedEntityList,
-) =>
-	useMemo(() => {
-		const relativeEntity: SugaredRelativeSingleEntity = { field: desugaredOptionPath.hasOneRelationPath }
-		const entities: EntityAccessor[] = []
-		for (const entity of optionAccessors) {
-			entities.push(entity.getEntity(relativeEntity))
-		}
-		return entities
-	}, [desugaredOptionPath.hasOneRelationPath, optionAccessors])
-
 export const useMergeEntities = (
 	currentlyChosenEntities: EntityAccessor[],
 	topLevelOptionAccessors: EntityAccessor[],
@@ -151,7 +138,7 @@ export const useNormalizedOptions = (
 				} else if (optionLabel) {
 					label = <Entity accessor={item}>{optionLabel}</Entity>
 				} else if ('field' in desugaredOptionPath) {
-					label = `${item.getField(desugaredOptionPath.field).value ?? ''}`
+					label = `${item.getRelativeSingleField(desugaredOptionPath).value ?? ''}`
 				} else {
 					label = ''
 				}

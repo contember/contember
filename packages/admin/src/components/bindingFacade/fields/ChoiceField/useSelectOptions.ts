@@ -3,7 +3,6 @@ import {
 	useDesugaredOptionPath,
 	useMergeEntities,
 	useNormalizedOptions,
-	useOptionEntities,
 	useTopLevelOptionAccessors,
 } from './BaseDynamicChoiceField'
 import { EntityAccessor } from '@contember/binding'
@@ -16,10 +15,9 @@ export const useSelectOptions = (
 	const desugaredOptionPath = useDesugaredOptionPath(optionProps)
 	const topLevelOptionAccessors = useTopLevelOptionAccessors(desugaredOptionPath)
 	const mergedEntities = useMergeEntities(additionalAccessors ?? [], topLevelOptionAccessors)
-	const optionEntities = useOptionEntities(mergedEntities, desugaredOptionPath)
 
 	const normalizedOptions = useNormalizedOptions(
-		optionEntities,
+		mergedEntities,
 		desugaredOptionPath,
 		'renderOption' in optionProps && optionProps.renderOption ? optionProps.renderOption : undefined,
 		'optionLabel' in optionProps && optionProps.optionLabel ? optionProps.optionLabel : undefined,

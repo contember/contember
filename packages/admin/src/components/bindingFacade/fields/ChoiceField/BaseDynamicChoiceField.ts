@@ -1,5 +1,6 @@
 import {
 	EntityAccessor,
+	EntityId,
 	Environment,
 	QualifiedEntityList,
 	QualifiedFieldList,
@@ -92,23 +93,28 @@ export const useMergeEntities = (
 export const useCurrentValues = (
 	currentlyChosenEntities: EntityAccessor[],
 	optionAccessors: EntityAccessor[],
-) =>
-	useMemo(() => {
+) => {
+	const idKeyMap = useMemo(() => {
+		const idKeyMap = new Map<EntityId, ChoiceFieldData.ValueRepresentation>()
+		optionAccessors.forEach((entity, index) =>
+			idKeyMap.set(entity.id, index),
+		)
+		return idKeyMap
+	}, [optionAccessors])
+
+	return useMemo(() => {
 		const values: ChoiceFieldData.ValueRepresentation[] = []
 
 		for (const entity of currentlyChosenEntities) {
-			const currentId = entity.id
-			const index = optionAccessors.findIndex((entity: EntityAccessor) => {
-				const id = entity.id
-				return !!id && id === currentId
-			})
-			if (index > -1) {
+			const index = idKeyMap.get(entity.id)
+			if (index !== undefined) {
 				values.push(index)
 			}
 		}
 
 		return values
-	}, [currentlyChosenEntities, optionAccessors])
+	}, [currentlyChosenEntities, idKeyMap])
+}
 
 export const useNormalizedOptions = (
 	optionEntities: EntityAccessor[],

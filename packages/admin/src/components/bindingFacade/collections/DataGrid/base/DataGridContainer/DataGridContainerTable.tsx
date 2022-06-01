@@ -76,7 +76,7 @@ export const DataGridContainerTable = memo<DataGridContainerTableProps>(({
 			{!!accessor.length &&
 				Array.from(accessor, entity => (
 					<Entity
-						key={entity.key}
+						key={entity.id ?? entity.key}
 						accessor={entity}
 					>
 						<TableRow>

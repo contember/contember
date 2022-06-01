@@ -2,11 +2,10 @@ import { Component } from '@contember/binding'
 import { FieldContainer, FieldContainerProps, FieldErrors, SelectCreateNewWrapper } from '@contember/ui'
 import { FunctionComponent, memo, MouseEventHandler, useCallback } from 'react'
 import type { MultiValueGenericProps, MultiValueProps, Props as SelectProps } from 'react-select'
-import { ActionMeta, components } from 'react-select'
-import AsyncSelect, { AsyncProps } from 'react-select/async'
+import Select, { ActionMeta, components } from 'react-select'
 import { useLabelMiddleware } from '../../environment/LabelMiddleware'
 import { ChoiceFieldData, DynamicMultiChoiceField, DynamicMultipleChoiceFieldProps } from '../ChoiceField'
-import { useCommonReactSelectAsyncProps } from './useCommonReactSelectAsyncProps'
+import { useCommonReactSelectProps } from './useCommonReactSelectProps'
 import {
 	HelperContainerGetter,
 	SortableContainer,
@@ -56,7 +55,7 @@ export const MultiSelectFieldInner = memo(
 		...fieldContainerProps
 	}: MultiSelectFieldInnerProps) => {
 		const labelMiddleware = useLabelMiddleware()
-		const asyncProps = useCommonReactSelectAsyncProps({
+		const selectProps = useCommonReactSelectProps({
 			reactSelectProps,
 			placeholder,
 			data,
@@ -94,8 +93,8 @@ export const MultiSelectFieldInner = memo(
 			}
 		}, [clear, currentValues, onChange])
 
-		const allAsyncSelectProps: AsyncProps<ChoiceFieldData.SingleDatum, boolean, never> = {
-			...asyncProps,
+		const allSelectProps: SelectProps<ChoiceFieldData.SingleDatum, boolean, never> = {
+			...selectProps,
 			isMulti: true,
 			isClearable: true,
 			closeMenuOnSelect: false,
@@ -115,7 +114,7 @@ export const MultiSelectFieldInner = memo(
 				<SelectCreateNewWrapper onClick={onAddNew}>
 					{onMove
 						? <SortableSelect
-							{...allAsyncSelectProps}
+							{...allSelectProps}
 							useDragHandle
 							axis="xy"
 							onSortEnd={onSortEnd}
@@ -123,12 +122,12 @@ export const MultiSelectFieldInner = memo(
 							helperContainer={getHelperContainer}
 							helperClass={'sortable-dragged'}
 							components={{
-								...asyncProps.components,
+								...selectProps.components,
 								MultiValue: SortableMultiValue,
 								MultiValueLabel: SortableMultiValueLabel,
 							}}
 						/>
-						: <AsyncSelect {...allAsyncSelectProps}/>
+						: <Select {...allSelectProps}/>
 					}
 				</SelectCreateNewWrapper>
 			</FieldContainer>
@@ -141,7 +140,7 @@ const getHelperContainer: HelperContainerGetter = () => {
 }
 
 
-const SortableSelect = SortableContainer(AsyncSelect) as React.ComponentClass<SelectProps<ChoiceFieldData.SingleDatum, boolean, never> & SortableContainerProps>
+const SortableSelect = SortableContainer(Select) as React.ComponentClass<SelectProps<ChoiceFieldData.SingleDatum, boolean, never> & SortableContainerProps>
 const SortableMultiValue = SortableElement(
 	(props: MultiValueProps<any, boolean, never>) => {
 		// this prevents the menu from being opened/closed when the user clicks

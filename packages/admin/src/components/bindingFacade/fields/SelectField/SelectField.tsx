@@ -2,7 +2,7 @@ import { Component } from '@contember/binding'
 import { FieldContainer, FieldContainerProps, FieldErrors, SelectCreateNewWrapper } from '@contember/ui'
 import { FunctionComponent, memo } from 'react'
 import type { Props as SelectProps } from 'react-select'
-import AsyncSelect from 'react-select/async'
+import Select from 'react-select'
 import { useLabelMiddleware } from '../../environment/LabelMiddleware'
 import {
 	ChoiceField,
@@ -10,7 +10,7 @@ import {
 	DynamicSingleChoiceFieldProps,
 	StaticSingleChoiceFieldProps,
 } from '../ChoiceField'
-import { useCommonReactSelectAsyncProps } from './useCommonReactSelectAsyncProps'
+import { useCommonReactSelectProps } from './useCommonReactSelectProps'
 
 export type SelectFieldProps =
 	& SelectFieldInnerPublicProps
@@ -53,7 +53,7 @@ export const SelectFieldInner = memo(
 		onAddNew,
 		...fieldContainerProps
 	}: SelectFieldInnerProps) => {
-		const asyncProps = useCommonReactSelectAsyncProps({
+		const selectProps = useCommonReactSelectProps({
 			reactSelectProps,
 			placeholder,
 			data,
@@ -69,8 +69,8 @@ export const SelectFieldInner = memo(
 				label={labelMiddleware(fieldContainerProps.label)}
 			>
 				<SelectCreateNewWrapper onClick={onAddNew}>
-					<AsyncSelect
-						{...asyncProps}
+					<Select
+						{...selectProps}
 						menuPlacement="auto"
 						isClearable={allowNull === true}
 						value={data[currentValue]}

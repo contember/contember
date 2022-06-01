@@ -1,11 +1,17 @@
 export const uploadDictionary = {
 	upload: {
-		// emptyMessage: {
-		// 	text: 'No files uploaded',
-		// },
 		addButton: {
 			text: 'Select files to upload',
 			subText: 'or drag & drop',
+		},
+		selectButton: {
+			text: 'Select uploaded files',
+		},
+		selectModal: {
+			maxLimitReached: 'Maximum amount of items reached',
+		},
+		insertSelected: {
+			text: 'Insert selected',
 		},
 		fileState: {
 			inspectingFile: 'Inspecting file…',

@@ -105,8 +105,17 @@ export const csCZ: AdminDictionary = {
 	},
 	upload: {
 		addButton: {
-			text: 'Vyberte soubory',
+			text: 'Vyberte soubory z disku',
 			subText: 'nebo je sem přetáhněte',
+		},
+		selectButton: {
+			text: 'Vyberte nahrané soubory',
+		},
+		selectModal: {
+			maxLimitReached: 'Bylo dosaženo maximálního počtu položek',
+		},
+		insertSelected: {
+			text: 'Vložiť vybraté',
 		},
 		fileState: {
 			inspectingFile: 'Zkoumám soubor…',

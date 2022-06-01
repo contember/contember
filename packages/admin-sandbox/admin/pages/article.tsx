@@ -73,6 +73,9 @@ const ArticleForm = Component(() => <>
 		<If condition={'[state = removed]'}>
 				<TextField field={'title'} label={'Title'} />
 		</If>
+
+
+
 	</>,
 	'ArticleForm',
 )
@@ -88,6 +91,18 @@ const ArticleSidebarForm = Component(() => <>
 			}}
 			createNewForm={<TextField field={'name'} label={'Name'} />}
 		/>
+		<MultiSelectField
+			label={'Sortable tags'}
+			field={'sortedTags'}
+			options={{
+				fields: 'Tag.name',
+				orderBy: 'name desc',
+			}}
+			createNewForm={<TextField field={'name'} label={'Name'} />}
+
+			connectingEntityField={'tag'}
+			sortableBy={'order'}
+		/>
 
 		<SelectField
 			label={'category'}
@@ -98,6 +113,7 @@ const ArticleSidebarForm = Component(() => <>
 				orderBy: 'name desc',
 			}}
 		/>
+
 	</>,
 	'ArticleSidebarForm',
 )

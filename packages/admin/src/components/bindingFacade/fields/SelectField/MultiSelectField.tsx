@@ -1,4 +1,4 @@
-import { Component, FieldValue } from '@contember/binding'
+import { Component } from '@contember/binding'
 import { FieldContainer, FieldContainerProps, FieldErrors, SelectCreateNewWrapper } from '@contember/ui'
 import { FunctionComponent, memo, MouseEventHandler, useCallback } from 'react'
 import type { MultiValueGenericProps, MultiValueProps, Props as SelectProps } from 'react-select'
@@ -12,7 +12,8 @@ import {
 	SortableContainer,
 	SortableContainerProps,
 	SortableElement,
-	SortableHandle, SortEndHandler,
+	SortableHandle,
+	SortEndHandler,
 } from 'react-sortable-hoc'
 
 export type MultiSelectFieldProps =
@@ -62,7 +63,7 @@ export const MultiSelectFieldInner = memo(
 			isInvalid: (errors?.length ?? 0) > 0,
 		})
 
-		const selectOnChange = useCallback((newValue: unknown, actionMeta: ActionMeta<ChoiceFieldData.SingleDatum<FieldValue | undefined>>) => {
+		const selectOnChange = useCallback((newValue: unknown, actionMeta: ActionMeta<ChoiceFieldData.SingleDatum>) => {
 			switch (actionMeta.action) {
 				case 'select-option': {
 					onChange(actionMeta.option!.key, true)
@@ -93,7 +94,7 @@ export const MultiSelectFieldInner = memo(
 			}
 		}, [clear, currentValues, onChange])
 
-		const allAsyncSelectProps: AsyncProps<ChoiceFieldData.SingleDatum<FieldValue | undefined>, boolean, never> = {
+		const allAsyncSelectProps: AsyncProps<ChoiceFieldData.SingleDatum, boolean, never> = {
 			...asyncProps,
 			isMulti: true,
 			isClearable: true,
@@ -140,7 +141,7 @@ const getHelperContainer: HelperContainerGetter = () => {
 }
 
 
-const SortableSelect = SortableContainer(AsyncSelect) as React.ComponentClass<SelectProps<ChoiceFieldData.SingleDatum<FieldValue | undefined>, boolean, never> & SortableContainerProps>
+const SortableSelect = SortableContainer(AsyncSelect) as React.ComponentClass<SelectProps<ChoiceFieldData.SingleDatum, boolean, never> & SortableContainerProps>
 const SortableMultiValue = SortableElement(
 	(props: MultiValueProps<any, boolean, never>) => {
 		// this prevents the menu from being opened/closed when the user clicks

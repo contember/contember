@@ -132,7 +132,7 @@ export const useNormalizedOptions = (
 	renderOption: ((entityAccessor: EntityAccessor) => ReactNode) | undefined,
 	optionLabel: ReactElement | undefined,
 	searchByFields: BaseDynamicChoiceField['searchByFields'],
-): ChoiceFieldData.Data => {
+): ChoiceFieldData.Data<EntityId> => {
 	const sugaredFields = useMemo(
 		() => (searchByFields === undefined ? [] : Array.isArray(searchByFields) ? searchByFields : [searchByFields]),
 		[searchByFields],
@@ -144,7 +144,7 @@ export const useNormalizedOptions = (
 	)
 	return useMemo(
 		() =>
-			optionEntities.map((item, i): ChoiceFieldData.SingleDatum => {
+			optionEntities.map((item, i): ChoiceFieldData.SingleDatum<EntityId> => {
 				let label
 				if (renderOption) {
 					label = renderOption(item)

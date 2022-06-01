@@ -1,11 +1,10 @@
-import type { FieldValue } from '@contember/binding'
 import { ReactElement, useCallback, useLayoutEffect, useMemo, useRef } from 'react'
 import type { MenuListProps } from 'react-select'
 import { ListChildComponentProps, VariableSizeList } from 'react-window'
 import type { ChoiceFieldData } from '../ChoiceField'
 
 export function VirtualizedMenuList(
-	props: MenuListProps<ChoiceFieldData.SingleDatum<FieldValue | undefined>, boolean, never>,
+	props: MenuListProps<ChoiceFieldData.SingleDatum, boolean, never>,
 ) {
 	const { children, maxHeight, innerRef } = props
 	const height = 40

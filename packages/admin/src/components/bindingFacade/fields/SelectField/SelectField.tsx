@@ -1,4 +1,4 @@
-import { Component, FieldValue } from '@contember/binding'
+import { Component } from '@contember/binding'
 import { FieldContainer, FieldContainerProps, FieldErrors, SelectCreateNewWrapper } from '@contember/ui'
 import { FunctionComponent, memo } from 'react'
 import type { Props as SelectProps } from 'react-select'
@@ -75,7 +75,7 @@ export const SelectFieldInner = memo(
 						isClearable={allowNull === true}
 						value={data[currentValue]}
 						onChange={(newValue, actionMeta) => {
-							const value = newValue as ChoiceFieldData.SingleDatum<FieldValue | undefined>
+							const value = newValue as ChoiceFieldData.SingleDatum
 							switch (actionMeta.action) {
 								case 'select-option': {
 									onChange(value.key)

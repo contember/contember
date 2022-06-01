@@ -1,4 +1,3 @@
-import type { FieldValue } from '@contember/binding'
 import Fuse from 'fuse.js'
 import { useMemo } from 'react'
 import type { Props as SelectProps } from 'react-select'
@@ -11,7 +10,7 @@ import { useCommonStyles } from './useCommonStyles'
 export interface UseCommonReactSelectAsyncPropsProps {
 	reactSelectProps: Partial<SelectProps<any, any, any>> | undefined
 	placeholder: string | undefined
-	data: ChoiceFieldData.Data<FieldValue | undefined>
+	data: ChoiceFieldData.Data
 	isInvalid: boolean
 }
 
@@ -20,7 +19,7 @@ export const useCommonReactSelectAsyncProps = ({
 	placeholder,
 	data,
 	isInvalid,
-}: UseCommonReactSelectAsyncPropsProps): AsyncProps<ChoiceFieldData.SingleDatum<FieldValue | undefined>, boolean, never> => {
+}: UseCommonReactSelectAsyncPropsProps): AsyncProps<ChoiceFieldData.SingleDatum, boolean, never> => {
 	const fuse = useMemo(
 		() =>
 			new Fuse(data, {

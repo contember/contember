@@ -50,7 +50,6 @@ export const useOnAddNew = ({ createNewForm, connect, ...props }: BaseDynamicCho
 				if (result === true) {
 					const entityToConnect = entity.getAccessor()
 					connect(entityToConnect)
-					subTree.disconnectAll()
 				} else {
 					entity.deleteEntity()
 				}

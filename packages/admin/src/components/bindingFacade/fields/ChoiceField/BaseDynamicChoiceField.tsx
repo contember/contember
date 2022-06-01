@@ -24,20 +24,21 @@ interface LegacyChoiceFieldWithOptionRenderer {
 	optionsStaticRender: ReactElement | ((environment: Environment) => ReactElement)
 }
 
-export type BaseDynamicChoiceField = (
-	| {
-			options: string | SugaredQualifiedEntityList['entities'] | SugaredQualifiedEntityList
-			optionLabel: ReactNode
-		}
-	| {
-			options: string | SugaredQualifiedFieldList['fields'] | SugaredQualifiedFieldList
-		}
-	| LegacyChoiceFieldWithOptionRenderer
-
-) & {
-	searchByFields?: SugaredRelativeSingleField['field'] | SugaredRelativeSingleField['field'][]
-	createNewForm?: ReactElement
-}
+export type BaseDynamicChoiceField =
+	& (
+		| {
+				options: string | SugaredQualifiedEntityList['entities'] | SugaredQualifiedEntityList
+				optionLabel: ReactNode
+			}
+		| {
+				options: string | SugaredQualifiedFieldList['fields'] | SugaredQualifiedFieldList
+			}
+		| LegacyChoiceFieldWithOptionRenderer
+	)
+	& {
+		searchByFields?: SugaredRelativeSingleField['field'] | SugaredRelativeSingleField['field'][]
+		createNewForm?: ReactElement
+	}
 
 export const useDesugaredOptionPath = (props: BaseDynamicChoiceField) => {
 	const environment = useEnvironment()

@@ -14,7 +14,7 @@
 				"production": "./dist/production/index.js"
 			}
 		},
-		"./style.css": "./dist/style.css"
+		"./style.css": "./dist/assets/style.css"
 	},
 	"typings": "./dist/types/index.d.ts",
 	"files": [
@@ -25,7 +25,8 @@
 		"build": "pnpm run build:js:dev && pnpm run build:js:prod && pnpm run build:css",
 		"build:js:dev": "vite build --mode development",
 		"build:js:prod": "vite build --mode production",
-		"build:css": "sass --no-charset src/index.sass:dist/style.css",
+		"build:css": "sass --no-charset src/index.sass:dist/assets/style.css && pnpm run build:css:copy-fonts",
+		"build:css:copy-fonts": "rm -rf \"dist/assets/Inter\" && cp -R \"src/assets/Inter\" \"dist/assets/Inter\"",
 		"storybook": "start-storybook -p 6006",
 		"build-storybook": "build-storybook"
 	},

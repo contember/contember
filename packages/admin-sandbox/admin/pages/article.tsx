@@ -91,14 +91,19 @@ const CategoryOptionItem = Component(() => {
 })
 const ArticleSidebarForm = Component(() => <>
 		<SelectField field={'state'} label={'State'} options={Object.entries(stateOptions).map(([value, label]) => ({ value, label }))} allowNull />
+		{/*<MultiSelectField*/}
+		{/*	label={'tags'}*/}
+		{/*	field={'tags'}*/}
+		{/*	options={{*/}
+		{/*		fields: 'Tag.name',*/}
+		{/*		orderBy: 'name desc',*/}
+		{/*	}}*/}
+		{/*	createNewForm={<TextField field={'name'} label={'Name'} />}*/}
+		{/*/>*/}
 		<MultiSelectField
 			label={'tags'}
 			field={'tags'}
-			options={{
-				fields: 'Tag.name',
-				orderBy: 'name desc',
-			}}
-			createNewForm={<TextField field={'name'} label={'Name'} />}
+			options={`Tag.locales(locale.code = 'cs').name`}
 		/>
 		<MultiSelectField
 			label={'Sortable tags'}

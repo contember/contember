@@ -21,7 +21,7 @@ type SelectCellFilterProps =
 	}
 
 export const SelectCellFilter = ({ filter, setFilter, optionProps }: SelectCellFilterProps) => {
-	const options = useSelectOptions(optionProps)
+	const [options, onSearch] = useSelectOptions(optionProps)
 	const currentValues = useMemo<ChoiceFieldData.Data<EntityAccessor>>(() => {
 		return options.filter(it => filter.id.includes(it.actualValue.id))
 	}, [filter.id, options])
@@ -38,6 +38,7 @@ export const SelectCellFilter = ({ filter, setFilter, optionProps }: SelectCellF
 			onClear={() => {
 				setFilter({ ...filter, id: [] })
 			}}
+			onSearch={onSearch}
 		/>
 
 		<FieldContainer

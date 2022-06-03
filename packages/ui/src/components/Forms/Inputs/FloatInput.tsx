@@ -33,7 +33,7 @@ export const FloatInput = memo(
 				value = typeof value === 'string' && value.trim() !== ''
 				? (value)
 					.replaceAll(',', '.')
-					.replace(/[^\d.]/g, '')
+					.replace(/[^\d.-]/g, '')
 					.replace(/^(\d+\.\d+|\d+).*/, '$1')
 					.replace(/^0*(?=\d)/, '')
 				: ''

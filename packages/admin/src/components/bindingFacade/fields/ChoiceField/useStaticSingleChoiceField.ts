@@ -1,5 +1,12 @@
 import { ChoiceFieldData } from './ChoiceFieldData'
-import { Environment, useEnvironment, useField, useMutationState, VariableInputTransformer } from '@contember/binding'
+import {
+	Environment,
+	Scalar,
+	useEnvironment,
+	useField,
+	useMutationState,
+	VariableInputTransformer,
+} from '@contember/binding'
 import { useCallback, useMemo } from 'react'
 import {
 	NormalizedStaticOption,
@@ -10,17 +17,16 @@ import { useAccessorErrors } from '../../errors'
 
 export const useStaticSingleChoiceField = (
 	props: StaticSingleChoiceFieldProps,
-): ChoiceFieldData.SingleChoiceFieldMetadata => {
+): ChoiceFieldData.SingleChoiceFieldMetadata<Scalar> => {
 
 	const environment = useEnvironment()
 	const isMutating = useMutationState()
 	const field = useField(props)
 	const options = useMemo(() => normalizeOptions(props.options, environment), [environment, props.options])
-	const currentValue: ChoiceFieldData.ValueRepresentation = options.findIndex(({ value }) => field.hasValue(value))
 	const data = useMemo(
 		() =>
 			options.map(({ label, description, value: actualValue, searchKeywords }, i) => ({
-				key: i,
+				key: i.toString(),
 				description,
 				label,
 				actualValue,
@@ -28,23 +34,26 @@ export const useStaticSingleChoiceField = (
 			})),
 		[options],
 	)
-	const onChange = useCallback(
-		(newValue: ChoiceFieldData.ValueRepresentation) => {
-			field.updateValue(newValue === -1 ? null : options[newValue].value)
-		},
-		[field, options],
-	)
+	const currentValue: ChoiceFieldData.SingleDatum<Scalar> | null = data.find(it => field.hasValue(it.actualValue)) ?? null
+
 	const errors = useAccessorErrors(field)
-	return useMemo<ChoiceFieldData.SingleChoiceFieldMetadata>(
+	const onSelect = useCallback((value: ChoiceFieldData.SingleDatum<Scalar>) => {
+		field.updateValue(value.actualValue)
+	}, [field])
+	const onClear = useCallback(() => {
+		field.updateValue(null)
+	}, [field])
+	return useMemo<ChoiceFieldData.SingleChoiceFieldMetadata<Scalar>>(
 		() => ({
 			currentValue,
 			data,
-			onChange,
+			onSelect: onSelect,
+			onClear: onClear,
 			errors,
 			environment,
 			isMutating,
 		}),
-		[currentValue, data, environment, errors, isMutating, onChange],
+		[currentValue, data, environment, errors, isMutating, onClear, onSelect],
 	)
 }
 const normalizeOptions = (options: OptionallyVariableStaticOption[], environment: Environment) =>

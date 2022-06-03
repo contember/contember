@@ -1,4 +1,4 @@
-import { Component, SugaredRelativeSingleField, useEnvironment, useMutationState } from '@contember/binding'
+import { Component, SugaredRelativeSingleField } from '@contember/binding'
 import type { FieldContainerProps } from '@contember/ui'
 import { FunctionComponent, ReactNode, useMemo } from 'react'
 import { NativeSelectFieldInner, NormalizedStaticOption, StaticSingleChoiceField } from '../fields'
@@ -32,15 +32,12 @@ export const DiscriminatedBlocks: FunctionComponent<DiscriminatedBlocksProps> = 
 			<>
 				{props.allowBlockTypeChange !== false && (
 					<NativeSelectFieldInner
+						{...metadata}
 						label={props.label}
-						data={metadata.data}
-						currentValue={metadata.currentValue}
-						onChange={metadata.onChange}
-						errors={metadata.errors}
 						placeholder="Choose…"
 					/>
 				)}
-				{metadata.currentValue in blocksArray && blocksArray[metadata.currentValue].datum.children}
+				{metadata.currentValue && normalizedBlocks.get(metadata.currentValue.actualValue)?.datum.children}
 			</>
 		)
 	},

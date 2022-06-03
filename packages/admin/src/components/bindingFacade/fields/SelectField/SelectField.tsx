@@ -22,8 +22,8 @@ export type SelectFieldProps =
 export const SelectField: FunctionComponent<SelectFieldProps> = Component(
 	props => (
 		<ChoiceField {...props} >
-			{(choiceProps: ChoiceFieldData.SingleChoiceFieldMetadata) => (
-				<SelectFieldInner {...props}{...choiceProps} />
+			{(choiceProps: ChoiceFieldData.SingleChoiceFieldMetadata<any>) => (
+				<SelectFieldInner {...props} {...choiceProps} />
 			)}
 		</ChoiceField>
 	),
@@ -48,7 +48,8 @@ export const SelectFieldInner = memo(
 		currentValue,
 		data,
 		errors,
-		onChange,
+		onSelect,
+		onClear,
 		reactSelectProps,
 		onAddNew,
 		...fieldContainerProps
@@ -73,28 +74,13 @@ export const SelectFieldInner = memo(
 						{...selectProps}
 						menuPlacement="auto"
 						isClearable={allowNull === true}
-						value={data[currentValue]}
+						value={currentValue}
 						onChange={(newValue, actionMeta) => {
 							const value = newValue as ChoiceFieldData.SingleDatum
-							switch (actionMeta.action) {
-								case 'select-option': {
-									onChange(value.key)
-									break
-								}
-								case 'clear': {
-									onChange(-1)
-									break
-								}
-								case 'create-option': {
-									// TODO not yet supported
-									break
-								}
-								case 'remove-value':
-								case 'pop-value':
-								case 'deselect-option': {
-									// When is this even called? 🤔
-									break
-								}
+							if (actionMeta.action === 'select-option') {
+								onSelect(value)
+							} else if (actionMeta.action === 'clear') {
+								onClear()
 							}
 						}}
 					/>

@@ -11,15 +11,14 @@ import { ChoiceFieldData } from './ChoiceFieldData'
 export const useSelectOptions = (
 	optionProps: BaseDynamicChoiceField,
 	additionalAccessors?: EntityAccessor[],
-): [EntityAccessor[], ChoiceFieldData.Data] => {
+): ChoiceFieldData.Data<EntityAccessor> => {
 	const desugaredOptionPath = useDesugaredOptionPath(optionProps)
 	const topLevelOptionAccessors = useTopLevelOptionAccessors(desugaredOptionPath)
 	const mergedEntities = useMergeEntities(additionalAccessors ?? [], topLevelOptionAccessors)
 
-	const normalizedOptions = useNormalizedOptions(
+	return useNormalizedOptions(
 		mergedEntities,
 		desugaredOptionPath,
 		optionProps,
 	)
-	return [mergedEntities, normalizedOptions]
 }

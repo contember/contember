@@ -1,6 +1,5 @@
 import {
-	EntityAccessor,
-	EntityId,
+	EntityAccessor, EntityId,
 	SugaredFieldProps,
 	SugaredRelativeSingleEntity,
 	useDesugaredRelativeSingleEntity,
@@ -20,11 +19,9 @@ export interface DynamicMultipleChoiceWithConnectingEntityFieldProps {
 	sortableBy?: SugaredFieldProps['field']
 }
 
-
-
 export const useDynamicMultipleChoiceWithConnectingEntityField = (
 	props: DynamicMultipleChoiceFieldProps & DynamicMultipleChoiceWithConnectingEntityFieldProps,
-): ChoiceFieldData.MultipleChoiceFieldMetadata => {
+): ChoiceFieldData.MultipleChoiceFieldMetadata<EntityAccessor> => {
 	const connectingEntitiesListAccessor = useEntityList(props)
 	const sortedConnectingEntities = useSortedEntities(connectingEntitiesListAccessor, props.sortableBy)
 	const optionTargetField = useDesugaredRelativeSingleEntity(props.connectingEntityField)
@@ -40,9 +37,10 @@ export const useDynamicMultipleChoiceWithConnectingEntityField = (
 		return [currentlyChosenOptions, optionIdToConnectingEntityMap]
 	}, [optionTargetField, sortedConnectingEntities.entities])
 
-	const [entities, options] = useSelectOptions(props, currentlyChosenEntities)
 
-	const currentValues = useCurrentValues(currentlyChosenOptions, entities)
+	const options = useSelectOptions(props, currentlyChosenEntities)
+
+	const currentValues = useCurrentValues(currentlyChosenOptions, props)
 
 	const getConnectingEntityValues = connectingEntitiesListAccessor.getAccessor
 
@@ -63,29 +61,19 @@ export const useDynamicMultipleChoiceWithConnectingEntityField = (
 		})
 	}, [optionTargetField.hasOneRelationPath, sortedConnectingEntities])
 
-	const onChange = useCallback(
-		(optionKey: ChoiceFieldData.ValueRepresentation, isChosen: boolean) => {
-			const optionEntity = entities[optionKey]
-			if (isChosen) {
-				onAdd(optionEntity)
-			} else {
-				const connectingEntity = optionIdToConnectingEntityMap.get(optionEntity.id)
-				if (connectingEntity !== undefined) {
-					connectingEntity.deleteEntity()
-				}
-			}
-		},
-		[entities, onAdd, optionIdToConnectingEntityMap],
-	)
-
 	const errors = useAccessorErrors(connectingEntitiesListAccessor)
 
 	return {
 		currentValues,
 		data: options,
 		errors,
-		clear,
-		onChange,
+		onClear: clear,
+		onAdd: useCallback(value => {
+			onAdd(value.actualValue)
+		}, [onAdd]),
+		onRemove: useCallback(value => {
+			optionIdToConnectingEntityMap.get(value.actualValue.id)?.deleteEntity()
+		}, [optionIdToConnectingEntityMap]),
 		onAddNew: useOnAddNew({
 			...props,
 			connect: onAdd,

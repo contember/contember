@@ -1,12 +1,12 @@
 import { Checkbox, FieldContainer } from '@contember/ui'
 import { useMemo } from 'react'
 import { useMessageFormatter } from '../../../../../i18n'
-import { MultiSelectFieldInner } from '../../../fields'
+import { ChoiceFieldData, MultiSelectFieldInner } from '../../../fields'
 import { BaseDynamicChoiceField } from '../../../fields/ChoiceField/BaseDynamicChoiceField'
 import { useSelectOptions } from '../../../fields/ChoiceField/useSelectOptions'
 import { FilterRendererProps } from '../base'
 import { dataGridCellsDictionary } from './dataGridCellsDictionary'
-import { EntityId } from '@contember/binding'
+import { EntityAccessor, EntityId } from '@contember/binding'
 
 
 // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
@@ -21,34 +21,21 @@ type SelectCellFilterProps =
 	}
 
 export const SelectCellFilter = ({ filter, setFilter, optionProps }: SelectCellFilterProps) => {
-	const [entities, options] = useSelectOptions(optionProps)
-	const currentValues = useMemo(() => {
-		const values: number[] = []
-		for (const id of filter.id) {
-			const val = entities.findIndex(it => it.id === id)
-			if (val >= 0) {
-				values.push(val)
-			}
-		}
-		return values
-	}, [entities, filter])
+	const options = useSelectOptions(optionProps)
+	const currentValues = useMemo<ChoiceFieldData.Data<EntityAccessor>>(() => {
+		return options.filter(it => filter.id.includes(it.actualValue.id))
+	}, [filter.id, options])
 	const formatMessage = useMessageFormatter(dataGridCellsDictionary)
 
 	return <>
 		<MultiSelectFieldInner
 			label={undefined}
-			onChange={(val, isChosen) => {
-				const id = entities[val].id
-				if (isChosen) {
-					setFilter({ ...filter, id: [...filter.id, id] })
-				} else {
-					setFilter({ ...filter, id: filter.id.filter(it => it !== id) })
-				}
-			}}
 			data={options}
+			onAdd={(val: ChoiceFieldData.SingleDatum<EntityAccessor>) => setFilter({ ...filter, id: [...filter.id, val.actualValue.id] })}
+			onRemove={val => setFilter({ ...filter, id: filter.id.filter(it => it !== val.actualValue.id) })}
 			errors={undefined}
 			currentValues={currentValues}
-			clear={() => {
+			onClear={() => {
 				setFilter({ ...filter, id: [] })
 			}}
 		/>

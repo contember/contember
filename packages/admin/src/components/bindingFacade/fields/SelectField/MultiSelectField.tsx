@@ -1,6 +1,6 @@
-import { Component } from '@contember/binding'
+import { Component, EntityAccessor } from '@contember/binding'
 import { FieldContainer, FieldContainerProps, FieldErrors, SelectCreateNewWrapper } from '@contember/ui'
-import { FunctionComponent, memo, MouseEventHandler, useCallback } from 'react'
+import { ComponentType, FunctionComponent, memo, MouseEventHandler, useCallback } from 'react'
 import type { MultiValueGenericProps, MultiValueProps, Props as SelectProps } from 'react-select'
 import Select, { ActionMeta, components } from 'react-select'
 import { useLabelMiddleware } from '../../environment/LabelMiddleware'
@@ -22,7 +22,7 @@ export type MultiSelectFieldProps =
 export const MultiSelectField: FunctionComponent<MultiSelectFieldProps> = Component(
 	props => (
 		<DynamicMultiChoiceField {...props} >
-			{(choiceProps: ChoiceFieldData.MultipleChoiceFieldMetadata) => (
+			{(choiceProps: ChoiceFieldData.MultipleChoiceFieldMetadata<EntityAccessor>) => (
 				<MultiSelectFieldInner {...props} {...choiceProps} />
 			)}
 		</DynamicMultiChoiceField>
@@ -35,70 +35,53 @@ export interface MultiSelectFieldInnerPublicProps extends Omit<FieldContainerPro
 	reactSelectProps?: Partial<SelectProps<any>>
 }
 
-export interface MultiSelectFieldInnerProps
-	extends ChoiceFieldData.MultipleChoiceFieldMetadata,
+export interface MultiSelectFieldInnerProps<ActualValue>
+	extends ChoiceFieldData.MultipleChoiceFieldMetadata<ActualValue>,
 		MultiSelectFieldInnerPublicProps {
 	errors: FieldErrors | undefined
 }
 
-export const MultiSelectFieldInner = memo(
-	({
+const typedMemo: <T>(c: T) => T = memo
+export const MultiSelectFieldInner = typedMemo(
+	<T extends any>({
 		currentValues,
 		data,
 		errors,
-		onChange,
-		clear,
+		onAdd,
+		onClear,
+		onRemove,
 		reactSelectProps,
 		placeholder,
 		onAddNew,
 		onMove,
 		...fieldContainerProps
-	}: MultiSelectFieldInnerProps) => {
+	}: MultiSelectFieldInnerProps<T>) => {
 		const labelMiddleware = useLabelMiddleware()
-		const selectProps = useCommonReactSelectProps({
+		const selectProps = useCommonReactSelectProps<T>({
 			reactSelectProps,
 			placeholder,
 			data,
 			isInvalid: (errors?.length ?? 0) > 0,
 		})
 
-		const selectOnChange = useCallback((newValue: unknown, actionMeta: ActionMeta<ChoiceFieldData.SingleDatum>) => {
-			switch (actionMeta.action) {
-				case 'select-option': {
-					onChange(actionMeta.option!.key, true)
-					break
-				}
-				case 'remove-value': {
-					onChange(actionMeta.removedValue!.key, false)
-					break
-				}
-				case 'pop-value': {
-					if (currentValues.length > 0) {
-						onChange(currentValues[currentValues.length - 1], false)
-					}
-					break
-				}
-				case 'clear': {
-					clear()
-					break
-				}
-				case 'create-option': {
-					// TODO not yet supported
-					break
-				}
-				case 'deselect-option': {
-					// When is this even called? 🤔
-					break
-				}
+		const selectOnChange = useCallback((newValue: unknown, actionMeta: ActionMeta<ChoiceFieldData.SingleDatum<T>>) => {
+			if (actionMeta.action === 'select-option') {
+					onAdd(actionMeta.option!)
+			} else if (actionMeta.action === 'remove-value') {
+				onRemove(actionMeta.removedValue!)
+			} else if (actionMeta.action === 'pop-value') {
+				onRemove(currentValues[currentValues.length - 1])
+			} else if (actionMeta.action === 'clear') {
+				onClear()
 			}
-		}, [clear, currentValues, onChange])
+		}, [currentValues, onAdd, onClear, onRemove])
 
-		const allSelectProps: SelectProps<ChoiceFieldData.SingleDatum, boolean, never> = {
+		const allSelectProps: SelectProps<ChoiceFieldData.SingleDatum<T>, boolean, never> = {
 			...selectProps,
 			isMulti: true,
 			isClearable: true,
 			closeMenuOnSelect: false,
-			value: Array.from(currentValues, key => data[key]),
+			value: currentValues,
 			onChange: selectOnChange,
 		}
 		const onSortEnd = useCallback<SortEndHandler>(({ oldIndex, newIndex }) => {
@@ -140,7 +123,7 @@ const getHelperContainer: HelperContainerGetter = () => {
 }
 
 
-const SortableSelect = SortableContainer(Select) as React.ComponentClass<SelectProps<ChoiceFieldData.SingleDatum, boolean, never> & SortableContainerProps>
+const SortableSelect = SortableContainer(Select) as React.ComponentClass<SelectProps<ChoiceFieldData.SingleDatum<any>, boolean, never> & SortableContainerProps>
 const SortableMultiValue = SortableElement(
 	(props: MultiValueProps<any, boolean, never>) => {
 		// this prevents the menu from being opened/closed when the user clicks

@@ -3,15 +3,12 @@ import { FieldErrors } from '@contember/ui'
 
 export namespace ChoiceFieldData {
 
-	// This is just the JS array index as specified in options or as returned from the server.
-	export type ValueRepresentation = number
-
 	export interface SingleDatum<ActualValue = unknown > {
-		key: ValueRepresentation
 		label: ReactNode
 		searchKeywords: string
 		description?: ReactNode
 		actualValue: ActualValue
+		key: string
 	}
 
 	export type Data<ActualValue = unknown> = SingleDatum<ActualValue>[]
@@ -23,14 +20,16 @@ export namespace ChoiceFieldData {
 	}
 
 	export interface SingleChoiceFieldMetadata<ActualValue = unknown> extends BaseChoiceMetadata<ActualValue> {
-		currentValue: ValueRepresentation
-		onChange: (newValue: ValueRepresentation) => void
+		currentValue: SingleDatum<ActualValue> | null
+		onSelect: (newValue: SingleDatum<ActualValue>) => void
+		onClear: () => void
 	}
 
-	export interface MultipleChoiceFieldMetadata<ActualValue = unknown> extends BaseChoiceMetadata<ActualValue> {
-		currentValues: ValueRepresentation[]
-		clear: () => void
-		onChange: (optionKey: ValueRepresentation, isChosen: boolean) => void
+	export interface MultipleChoiceFieldMetadata<ActualValue> extends BaseChoiceMetadata<ActualValue> {
+		currentValues: SingleDatum<ActualValue>[]
+		onClear: () => void
+		onAdd: (option: SingleDatum<ActualValue>) => void
+		onRemove: (option: SingleDatum<ActualValue>) => void
 		onMove?: (oldIndex: number, newIndex: number) => void
 	}
 

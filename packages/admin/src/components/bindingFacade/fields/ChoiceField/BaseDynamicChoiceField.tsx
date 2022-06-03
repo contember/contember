@@ -88,35 +88,17 @@ export const useMergeEntities = (
 
 export const useCurrentValues = (
 	currentlyChosenEntities: EntityAccessor[],
-	optionAccessors: EntityAccessor[],
+	optionProps: BaseDynamicChoiceField,
 ) => {
-	const idKeyMap = useMemo(() => {
-		const idKeyMap = new Map<EntityId, ChoiceFieldData.ValueRepresentation>()
-		optionAccessors.forEach((entity, index) =>
-			idKeyMap.set(entity.id, index),
-		)
-		return idKeyMap
-	}, [optionAccessors])
-
-	return useMemo(() => {
-		const values: ChoiceFieldData.ValueRepresentation[] = []
-
-		for (const entity of currentlyChosenEntities) {
-			const index = idKeyMap.get(entity.id)
-			if (index !== undefined) {
-				values.push(index)
-			}
-		}
-
-		return values
-	}, [currentlyChosenEntities, idKeyMap])
+	const desugaredOptionPath = useDesugaredOptionPath(optionProps)
+	return useNormalizedOptions(currentlyChosenEntities, desugaredOptionPath, optionProps)
 }
 
 export const useNormalizedOptions = (
 	optionEntities: EntityAccessor[],
 	desugaredOptionPath: QualifiedFieldList | QualifiedEntityList,
 	{ searchByFields, ...props }: BaseDynamicChoiceField,
-): ChoiceFieldData.Data<EntityId> => {
+): ChoiceFieldData.Data<EntityAccessor> => {
 	const sugaredFields = useMemo(
 		() => (searchByFields === undefined ? [] : Array.isArray(searchByFields) ? searchByFields : [searchByFields]),
 		[searchByFields],
@@ -130,7 +112,7 @@ export const useNormalizedOptions = (
 	const optionLabel = 'optionLabel' in props && props.optionLabel ? props.optionLabel : undefined
 	return useMemo(
 		() =>
-			optionEntities.map((item, i): ChoiceFieldData.SingleDatum<EntityId> => {
+			optionEntities.map((item, i): ChoiceFieldData.SingleDatum<EntityAccessor> => {
 				let label
 				if (renderOption) {
 					label = renderOption(item)
@@ -156,10 +138,10 @@ export const useNormalizedOptions = (
 				}
 
 				return {
-					key: i,
+					key: item.id.toString(),
 					label,
 					searchKeywords,
-					actualValue: item.id,
+					actualValue: item,
 				}
 			}),
 		[optionEntities, renderOption, optionLabel, desugaredOptionPath, desugaredFields],

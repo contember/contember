@@ -1,4 +1,4 @@
-import { SugaredRelativeEntityList, useEntityList } from '@contember/binding'
+import { EntityAccessor, SugaredRelativeEntityList, useEntityList } from '@contember/binding'
 import { useCallback } from 'react'
 import { BaseDynamicChoiceField, useCurrentValues } from './BaseDynamicChoiceField'
 import type { ChoiceFieldData } from './ChoiceFieldData'
@@ -17,14 +17,14 @@ export type DynamicMultipleChoiceFieldProps =
 
 export const useDynamicMultipleChoiceField = (
 	props: DynamicMultipleChoiceFieldProps,
-): ChoiceFieldData.MultipleChoiceFieldMetadata => {
+): ChoiceFieldData.MultipleChoiceFieldMetadata<EntityAccessor> => {
 	const currentValueListAccessor = useEntityList(props)
 
 	const currentlyChosenEntities = Array.from(currentValueListAccessor)
 
-	const [entities, options] = useSelectOptions(props, currentlyChosenEntities)
+	const options = useSelectOptions(props, currentlyChosenEntities)
 
-	const currentValues = useCurrentValues(currentlyChosenEntities, entities)
+	const currentValues = useCurrentValues(currentlyChosenEntities, props)
 
 	const getCurrentValues = currentValueListAccessor.getAccessor
 
@@ -36,25 +36,19 @@ export const useDynamicMultipleChoiceField = (
 		})
 	}, [getCurrentValues])
 
-	const onChange = useCallback(
-		(optionKey: ChoiceFieldData.ValueRepresentation, isChosen: boolean) => {
-			if (isChosen) {
-				getCurrentValues().connectEntity(entities[optionKey])
-			} else {
-				getCurrentValues().disconnectEntity(entities[optionKey])
-			}
-		},
-		[entities, getCurrentValues],
-	)
-
 	const errors = useAccessorErrors(currentValueListAccessor)
 
 	return {
 		currentValues,
 		data: options,
 		errors,
-		clear,
-		onChange,
+		onClear: clear,
+		onAdd: useCallback(value => {
+			getCurrentValues().connectEntity(value.actualValue)
+		}, [getCurrentValues]),
+		onRemove: useCallback(value => {
+			getCurrentValues().disconnectEntity(value.actualValue)
+		}, [getCurrentValues]),
 		onAddNew: useOnAddNew({
 			...props,
 			connect: useCallback(entity => {

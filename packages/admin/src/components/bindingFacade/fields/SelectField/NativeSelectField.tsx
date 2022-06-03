@@ -30,7 +30,7 @@ export type NativeSelectFieldProps =
 export const NativeSelectField: FunctionComponent<NativeSelectFieldProps> = Component(
 	props => (
 		<ChoiceField {...props}>
-			{(choiceProps: ChoiceFieldData.SingleChoiceFieldMetadata) => (
+			{(choiceProps: ChoiceFieldData.SingleChoiceFieldMetadata<any>) => (
 				<NativeSelectFieldInner {...props} {...choiceProps} />
 			)}
 		</ChoiceField>
@@ -47,21 +47,21 @@ export interface NativeSelectFieldInnerPublicProps extends Omit<FieldContainerPr
 	notNull?: boolean
 }
 
-export interface NativeSelectFieldInnerProps extends ChoiceFieldData.SingleChoiceFieldMetadata, NativeSelectFieldInnerPublicProps, RefAttributes<HTMLSelectElement> {
+export interface NativeSelectFieldInnerProps<ActualValue> extends ChoiceFieldData.SingleChoiceFieldMetadata<ActualValue>, NativeSelectFieldInnerPublicProps, RefAttributes<HTMLSelectElement> {
 	errors: FieldErrors | undefined
 }
 
-export const NativeSelectFieldInner = memo(forwardRef<HTMLSelectElement, NativeSelectFieldInnerProps>((props, ref) => {
+export const NativeSelectFieldInner = memo(forwardRef<HTMLSelectElement, NativeSelectFieldInnerProps<any>>((props, ref) => {
 	const isMutating = useMutationState()
 	const labelMiddleware = useLabelMiddleware()
-	const options: SelectOption<number>[] = props.data.map(({ key, label }) => {
-		if (typeof label !== 'string') {
+	const options: SelectOption<ChoiceFieldData.SingleDatum>[] = props.data.map(it => {
+		if (typeof it.label !== 'string') {
 			throw new BindingError(`The labels of <SelectField /> items must be strings!`)
 		}
 		return {
 			disabled: false,
-			value: key,
-			label: label,
+			value: it,
+			label: it.label,
 		}
 	})
 
@@ -74,8 +74,12 @@ export const NativeSelectFieldInner = memo(forwardRef<HTMLSelectElement, NativeS
 					notNull={props.notNull ?? flipValue(props.allowNull)}
 					value={props.currentValue}
 					placeholder={props.placeholder}
-					onChange={(value?: number | null) => {
-						props.onChange(value ?? -1)
+					onChange={(value?: ChoiceFieldData.SingleDatum | null) => {
+						if (value) {
+							props.onSelect(value)
+						} else {
+							props.onClear()
+						}
 					}}
 					options={options}
 					loading={isMutating}

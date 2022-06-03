@@ -20,19 +20,8 @@ export type RadioFieldProps =
 
 export const RadioField: FunctionComponent<RadioFieldProps> = Component(props => {
 	return <ChoiceField {...props} >
-		{({
-				data,
-				currentValue,
-				onChange,
-				errors,
-			}: ChoiceFieldData.SingleChoiceFieldMetadata) => (
-			<RadioFieldInner
-				{...props}
-				data={data}
-				currentValue={currentValue}
-				onChange={onChange}
-				errors={errors}
-			/>
+		{(choiceProps: ChoiceFieldData.SingleChoiceFieldMetadata<any>) => (
+			<RadioFieldInner{...props} {...choiceProps} />
 		)}
 	</ChoiceField>
 }, 'RadioField')
@@ -63,11 +52,11 @@ export const RadioFieldInner = memo((props: RadioFieldInnerProps) => {
 			useLabelElement={false}
 		>
 			<Radio
-				onChange={it => props.onChange(parseInt(it, 10))}
+				onChange={it => props.onSelect(props.data[parseInt(it, 10)])}
 				options={options}
 				size={props.size}
 				orientation={props.orientation}
-				value={props.currentValue?.toString()}
+				value={props.currentValue?.key}
 			/>
 		</FieldContainer>
 	)

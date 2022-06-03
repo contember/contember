@@ -20,7 +20,7 @@ export type DynamicSingleChoiceFieldProps = SugaredRelativeSingleEntity & BaseDy
 
 export const useDynamicSingleChoiceField = (
 	props: DynamicSingleChoiceFieldProps,
-): ChoiceFieldData.SingleChoiceFieldMetadata => {
+): ChoiceFieldData.SingleChoiceFieldMetadata<EntityAccessor> => {
 	const entityKey = useEntityKey()
 	const getEntityByKey = useGetEntityByKey()
 	const environment = useEnvironment()
@@ -41,27 +41,30 @@ export const useDynamicSingleChoiceField = (
 			})
 			: parentEntity
 	}, [entityKey, desugaredRelativePath, getEntityByKey])
+
 	const currentValueParent = useAccessorUpdateSubscription(getCurrentValueParent)
 	const currentValueEntity = currentValueParent.getRelativeSingleEntity({
 		hasOneRelationPath: [lastHasOneRelation],
 	})
-	const currentlyChosenEntities = currentValueEntity.existsOnServer || currentValueEntity.hasUnpersistedChanges ? [currentValueEntity] : []
+	const currentlyChosenEntities = useMemo(
+		() => currentValueEntity.existsOnServer || currentValueEntity.hasUnpersistedChanges ? [currentValueEntity] : [],
+		[currentValueEntity],
+	)
 
-	const [entities, options] = useSelectOptions(props, currentlyChosenEntities)
+	const options = useSelectOptions(props, currentlyChosenEntities)
 
-	const currentValues = useCurrentValues(currentlyChosenEntities, entities)
+	const currentValues = useCurrentValues(currentlyChosenEntities, props)
 	const errors = useAccessorErrors(currentValueEntity)
 
 	return {
 		data: options,
 		errors,
-		currentValue: currentValues.length ? currentValues[0] : -1,
-		onChange: (newValue: ChoiceFieldData.ValueRepresentation) => {
-			if (newValue === -1) {
-				currentValueParent.disconnectEntityAtField(currentValueFieldName)
-			} else {
-				currentValueParent.connectEntityAtField(currentValueFieldName, entities[newValue])
-			}
+		currentValue: currentValues.length ? currentValues[0] : null,
+		onSelect: value => {
+				currentValueParent.connectEntityAtField(currentValueFieldName, value.actualValue)
+		},
+		onClear: () => {
+			currentValueParent.disconnectEntityAtField(currentValueFieldName)
 		},
 		onAddNew: useOnAddNew({
 			...props,

@@ -7,7 +7,7 @@ import {
 } from '@contember/binding'
 import { FunctionComponent, ReactNode } from 'react'
 import type { ChoiceFieldData } from './ChoiceFieldData'
-import { useStaticSingleChoiceField } from './useStaticSingleChoiceField'
+import { useStaticSingleChoiceField } from './hooks/useStaticSingleChoiceField'
 
 export interface StaticOption {
 	label: ReactNode

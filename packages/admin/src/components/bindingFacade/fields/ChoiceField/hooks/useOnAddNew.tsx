@@ -8,9 +8,10 @@ import {
 } from '@contember/binding'
 import { Button, Stack, useDialog } from '@contember/ui'
 import { useMemo } from 'react'
-import { useMessageFormatter } from '../../../../i18n'
-import { BaseDynamicChoiceField, useDesugaredOptionPath } from './BaseDynamicChoiceField'
-import { choiceFieldDictionary } from './choiceFieldDictionary'
+import { useMessageFormatter } from '../../../../../i18n'
+import { BaseDynamicChoiceField } from '../BaseDynamicChoiceField'
+import { choiceFieldDictionary } from '../choiceFieldDictionary'
+import { useDesugaredOptionPath } from './useDesugaredOptionPath'
 
 export const useOnAddNew = ({ createNewForm, connect, ...props }: BaseDynamicChoiceField & { connect: (entity: EntityAccessor) => void }) => {
 	const desugaredOptionPath = useDesugaredOptionPath(props)

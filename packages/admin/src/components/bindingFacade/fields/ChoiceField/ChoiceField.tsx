@@ -3,7 +3,7 @@ import type { FunctionComponent } from 'react'
 import type { ChoiceFieldData } from './ChoiceFieldData'
 import { StaticSingleChoiceField, StaticSingleChoiceFieldProps } from './StaticSingleChoiceField'
 import { DynamicSingleChoiceField } from './DynamicSingleChoiceField'
-import { DynamicSingleChoiceFieldProps } from './useDynamicSingleChoiceField'
+import { DynamicSingleChoiceFieldProps } from './hooks/useDynamicSingleChoiceField'
 
 export type ChoiceFieldProps =
 	| (

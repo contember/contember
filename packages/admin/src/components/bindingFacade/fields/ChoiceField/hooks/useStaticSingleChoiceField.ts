@@ -1,4 +1,4 @@
-import { ChoiceFieldData } from './ChoiceFieldData'
+import { ChoiceFieldData } from '../ChoiceFieldData'
 import {
 	Environment,
 	Scalar,
@@ -12,8 +12,8 @@ import {
 	NormalizedStaticOption,
 	OptionallyVariableStaticOption,
 	StaticSingleChoiceFieldProps,
-} from './StaticSingleChoiceField'
-import { useAccessorErrors } from '../../errors'
+} from '../StaticSingleChoiceField'
+import { useAccessorErrors } from '../../../errors'
 
 export const useStaticSingleChoiceField = (
 	props: StaticSingleChoiceFieldProps,

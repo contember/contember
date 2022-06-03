@@ -9,9 +9,10 @@ import {
 import type { FunctionComponent } from 'react'
 import { DataGridColumn, DataGridColumnPublicProps } from '../base'
 import { renderDynamicChoiceFieldStatic } from '../../../fields/ChoiceField/renderDynamicChoiceFieldStatic'
-import { BaseDynamicChoiceField, useDesugaredOptionPath } from '../../../fields/ChoiceField/BaseDynamicChoiceField'
+import { BaseDynamicChoiceField } from '../../../fields/ChoiceField/BaseDynamicChoiceField'
 import { FieldFallbackView, FieldFallbackViewPublicProps } from '../../../fieldViews'
 import { SelectCellArtifacts, SelectCellFilter } from './SelectCellFilter'
+import { useDesugaredOptionPath } from '../../../fields/ChoiceField/hooks/useDesugaredOptionPath'
 
 export type HasOneSelectProps =
 	& DataGridColumnPublicProps

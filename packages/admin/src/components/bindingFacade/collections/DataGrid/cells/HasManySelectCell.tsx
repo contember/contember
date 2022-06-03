@@ -8,11 +8,12 @@ import {
 	wrapFilterInHasOnes,
 } from '@contember/binding'
 import { Fragment, FunctionComponent, ReactElement, ReactNode, useMemo } from 'react'
-import { BaseDynamicChoiceField, useDesugaredOptionPath } from '../../../fields/ChoiceField/BaseDynamicChoiceField'
+import { BaseDynamicChoiceField } from '../../../fields/ChoiceField/BaseDynamicChoiceField'
 import { renderDynamicChoiceFieldStatic } from '../../../fields/ChoiceField/renderDynamicChoiceFieldStatic'
 import { FieldFallbackView, FieldFallbackViewPublicProps } from '../../../fieldViews'
 import { DataGridColumn, DataGridColumnPublicProps } from '../base'
 import { SelectCellArtifacts, SelectCellFilter } from './SelectCellFilter'
+import { useDesugaredOptionPath } from '../../../fields/ChoiceField/hooks/useDesugaredOptionPath'
 
 export type HasManySelectProps =
 	& DataGridColumnPublicProps

@@ -1,9 +1,9 @@
 import { Component, EntityAccessor, HasMany, HasOne, SugaredField } from '@contember/binding'
 import type { FunctionComponent } from 'react'
 import type { ChoiceFieldData } from './ChoiceFieldData'
-import { DynamicMultipleChoiceFieldProps, useDynamicMultipleChoiceField } from './useDynamicMultipleChoiceField'
+import { DynamicMultipleChoiceFieldProps, useDynamicMultipleChoiceField } from './hooks/useDynamicMultipleChoiceField'
 import { renderDynamicChoiceFieldStatic } from './renderDynamicChoiceFieldStatic'
-import { useDynamicMultipleChoiceWithConnectingEntityField } from './useDynamicMultipleChoiceWithConnectingEntityField'
+import { useDynamicMultipleChoiceWithConnectingEntityField } from './hooks/useDynamicMultipleChoiceWithConnectingEntityField'
 
 export const DynamicMultiChoiceField: FunctionComponent<DynamicMultipleChoiceFieldProps & ChoiceFieldData.MultiChoiceFieldProps<EntityAccessor>> =
 	Component(

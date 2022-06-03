@@ -1,7 +1,7 @@
 import { Component, EntityAccessor, HasOne } from '@contember/binding'
 import type { FunctionComponent } from 'react'
 import type { ChoiceFieldData } from './ChoiceFieldData'
-import { DynamicSingleChoiceFieldProps, useDynamicSingleChoiceField } from './useDynamicSingleChoiceField'
+import { DynamicSingleChoiceFieldProps, useDynamicSingleChoiceField } from './hooks/useDynamicSingleChoiceField'
 import { renderDynamicChoiceFieldStatic } from './renderDynamicChoiceFieldStatic'
 
 export const DynamicSingleChoiceField: FunctionComponent<DynamicSingleChoiceFieldProps & ChoiceFieldData.SingleChoiceFieldProps<EntityAccessor>> =

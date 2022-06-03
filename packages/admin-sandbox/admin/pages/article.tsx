@@ -104,6 +104,7 @@ const ArticleSidebarForm = Component(() => <>
 			label={'tags'}
 			field={'tags'}
 			options={`Tag.locales(locale.code = 'cs').name`}
+			lazy
 		/>
 		<MultiSelectField
 			label={'Sortable tags'}
@@ -116,17 +117,20 @@ const ArticleSidebarForm = Component(() => <>
 
 			connectingEntityField={'tag'}
 			sortableBy={'order'}
+			lazy
 		/>
 
 		<SelectField
 			label={'category'}
 			field={'category'}
 			createNewForm={<CategoryForm />}
+			searchByFields={'name'}
 			options={{
 				entities: 'Category',
 				orderBy: 'name desc',
 			}}
 			optionLabel={<CategoryOptionItem />}
+			lazy
 		/>
 
 	</>,

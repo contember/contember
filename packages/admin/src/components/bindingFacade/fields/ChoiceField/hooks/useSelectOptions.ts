@@ -12,6 +12,8 @@ import Fuse from 'fuse.js'
 
 type OnSearch = (input: string) => void
 
+const RENDERED_OPTIONS_LIMIT = 100
+
 export const useSelectOptions = (
 	optionProps: BaseDynamicChoiceField,
 	additionalAccessors: EntityAccessor[] = [],
@@ -86,13 +88,14 @@ export const useSelectOptions = (
 	)
 	const fuse = useMemo(
 		() =>
-			new Fuse(options, {
+			options.some(it => it.searchKeywords !== '') ? new Fuse(options, {
 				keys: ['searchKeywords'],
-			}),
+			}) : undefined,
 		[options],
 	)
 	const filteredOptions = useMemo(() => {
-		return (input ? fuse.search(input).map(it => it.item) : options).slice(0, 100)
+
+		return (input && fuse ? fuse.search(input).map(it => it.item) : options).slice(0, RENDERED_OPTIONS_LIMIT)
 	}, [fuse, input, options])
 
 	return {

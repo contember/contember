@@ -1,0 +1,23 @@
+// $include-inter-font: false
+$inter-font-path: "../src/assets/Inter"
+
+@import "../src/index.sass"
+
+html,
+body
+	font-family: Inter, "system-ui"
+	min-height: 100vh
+
+	@supports (font-variation-settings: normal)
+		font-family: "Inter var", "system-ui"
+
+body.sb-show-main,
+body.sb-show-main.sb-main-padded
+	display: flex
+	flex-direction: column
+	padding: 0
+
+#root
+	display: flex
+	flex-direction: column
+	flex-grow: 1

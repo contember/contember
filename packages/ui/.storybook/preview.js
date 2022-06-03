@@ -1,7 +1,6 @@
 import { useState } from 'react'
-import '../src/index.sass'
 import { Select } from '../stories/ui/Select'
-import './global.sass'
+import './index.sass'
 
 export const parameters = {
   actions: { argTypesRegex: "^on[A-Z].*" },

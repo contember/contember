@@ -41,11 +41,13 @@ export const EditMembership: FC<EditMembershipProps> = ({ project, memberships, 
 			{({ query }) => {
 				const roleDefinitions = query.data.project.roles
 				const rolesToShow = rolesConfig ? roleDefinitions.filter(({ name }) => name in rolesConfig) : roleDefinitions
+
 				return (
 					<FieldContainer label={'Roles'} useLabelElement={false}>
 						<Stack direction="vertical" gap="small">
 							{memberships.map((membership, membershipIndex) => {
 								const roleDefinition = membership && roleDefinitions.find(def => def.name === membership.role)
+								const variablesToShow = (roleDefinition && roleDefinition.variables.filter(it => 'entityName' in it)) ?? []
 
 								const updateMembership = (newMembership: Membership) => {
 									setMemberships(memberships => {
@@ -97,11 +99,11 @@ export const EditMembership: FC<EditMembershipProps> = ({ project, memberships, 
 											</Button>
 										</Stack>
 
-										{roleDefinition && roleDefinition.variables.length > 0 && membership && <>
+										{variablesToShow.length > 0 && membership && <>
 											<Divider gap="none" />
 											<Box distinction="seamless">
 												<Stack direction="vertical">
-													{roleDefinition.variables.map(variable => (
+													{variablesToShow.map(variable => (
 															<VariableSelector
 																key={variable.name}
 																rolesConfig={rolesConfig}

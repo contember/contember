@@ -27,11 +27,11 @@ interface RoleVariableDefinitionBase {
 	name: string
 }
 
-interface RoleEntityVariableDefinition extends RoleVariableDefinitionBase {
+interface RoleEntityVariableDefinition {
 	entityName: string
 }
 
-export type RoleVariableDefinition = RoleEntityVariableDefinition
+export type RoleVariableDefinition = RoleVariableDefinitionBase & (RoleEntityVariableDefinition | {})
 
 export interface RoleDefinition {
 	name: string

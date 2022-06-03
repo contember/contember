@@ -94,14 +94,22 @@ export const useSelectOptions = (
 			}) : undefined,
 		[options],
 	)
+	const fuseFilteredOptions = useMemo(() => {
+		return (input && fuse ? fuse.search(input).map(it => it.item) : options)
+	}, [fuse, input, options])
+
+	const transformFn = optionProps.transformOptions
+	const transformedOptions = useMemo(() => {
+		return transformFn?.(fuseFilteredOptions, input) ?? fuseFilteredOptions
+	}, [transformFn, fuseFilteredOptions, input])
 
 	const renderedLimit = optionProps.renderedOptionsLimit ?? RENDERED_OPTIONS_LIMIT
-	const filteredOptions = useMemo(() => {
-		return (input && fuse ? fuse.search(input).map(it => it.item) : options).slice(0, renderedLimit)
-	}, [fuse, input, options, renderedLimit])
+	const slicedOptions = useMemo(() => {
+		return transformedOptions.slice(0, renderedLimit)
+	}, [transformedOptions, renderedLimit])
 
 	return {
-		options: filteredOptions,
+		options: slicedOptions,
 		onSearch: setSearchInput,
 		isLoading: renderedStateInputValueRef.current !== input,
 	}

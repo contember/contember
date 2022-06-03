@@ -87,12 +87,21 @@ export const useSelectOptions = (
 		desugaredOptionPath,
 		optionProps,
 	)
+	const fuseOpts = optionProps.fuseOptions ?? true
 	const fuse = useMemo(
-		() =>
-			options.some(it => it.searchKeywords !== '') ? new Fuse(options, {
+		() => {
+			if (!options.some(it => it.searchKeywords !== '')) {
+				return undefined
+			}
+			if (!fuseOpts) {
+				return undefined
+			}
+			return new Fuse(options, {
+				...(fuseOpts === true ? {} : fuseOpts),
 				keys: ['searchKeywords'],
-			}) : undefined,
-		[options],
+			})
+		},
+		[fuseOpts, options],
 	)
 	const fuseFilteredOptions = useMemo(() => {
 		return (input && fuse ? fuse.search(input).map(it => it.item) : options)

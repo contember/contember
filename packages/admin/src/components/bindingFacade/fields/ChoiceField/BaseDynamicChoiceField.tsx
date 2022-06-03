@@ -1,12 +1,14 @@
 import {
 	EntityAccessor,
-	Environment, Filter,
+	Environment,
+	Filter,
 	SugaredQualifiedEntityList,
 	SugaredQualifiedFieldList,
 	SugaredRelativeSingleField,
 } from '@contember/binding'
 import { ReactElement, ReactNode } from 'react'
 import { ChoiceFieldData } from './ChoiceFieldData'
+import Fuse from 'fuse.js'
 
 /** @deprecated */
 interface LegacyChoiceFieldWithOptionRenderer {
@@ -37,6 +39,9 @@ export type BaseDynamicChoiceField =
 		searchByFields?: SearchByFields
 		createNewForm?: ReactElement
 		lazy?: LazyChoiceFieldSettings
+		fuseOptions?:
+			| Fuse.IFuseOptions<ChoiceFieldData.SingleDatum<EntityAccessor>>
+			| boolean
 		renderedOptionsLimit?: number
 		transformOptions?: (data: ChoiceFieldData.Data<EntityAccessor>, input: string) => ChoiceFieldData.Data<EntityAccessor>
 	}

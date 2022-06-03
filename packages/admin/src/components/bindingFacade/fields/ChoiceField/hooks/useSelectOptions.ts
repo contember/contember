@@ -9,6 +9,7 @@ import { useDebounce } from '@contember/react-utils'
 import { renderDynamicChoiceFieldStatic } from '../renderDynamicChoiceFieldStatic'
 import { useCreateOptionsFilter } from './useCreateOptionsFilter'
 import Fuse from 'fuse.js'
+import { Props } from 'react-select'
 
 type OnSearch = (input: string) => void
 
@@ -93,10 +94,11 @@ export const useSelectOptions = (
 			}) : undefined,
 		[options],
 	)
-	const filteredOptions = useMemo(() => {
 
-		return (input && fuse ? fuse.search(input).map(it => it.item) : options).slice(0, RENDERED_OPTIONS_LIMIT)
-	}, [fuse, input, options])
+	const renderedLimit = optionProps.renderedOptionsLimit ?? RENDERED_OPTIONS_LIMIT
+	const filteredOptions = useMemo(() => {
+		return (input && fuse ? fuse.search(input).map(it => it.item) : options).slice(0, renderedLimit)
+	}, [fuse, input, options, renderedLimit])
 
 	return {
 		options: filteredOptions,

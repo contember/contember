@@ -36,6 +36,7 @@ export type BaseDynamicChoiceField =
 		searchByFields?: SearchByFields
 		createNewForm?: ReactElement
 		lazy?: LazyChoiceFieldSettings
+		renderedOptionsLimit?: number
 	}
 
 export type LazyChoiceFieldSettings =

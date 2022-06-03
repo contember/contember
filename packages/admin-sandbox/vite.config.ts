@@ -1,8 +1,8 @@
-import { defineConfig } from 'vite'
+import reactRefresh from '@vitejs/plugin-react-refresh'
 import { resolve } from 'path'
+import { defineConfig } from 'vite'
 import { getPackagePath, packageList } from '../../build/packageList.js'
 import { rootDirectory } from '../../build/rootDirectory.js'
-import reactRefresh from '@vitejs/plugin-react-refresh'
 
 export default defineConfig({
 	root: 'admin',
@@ -22,6 +22,7 @@ export default defineConfig({
 		preprocessorOptions: {
 			sass: {
 				charset: false,
+				additionalData: `$inter-font-path: '/@fs/src/packages/ui/src/assets/Inter'\n`,
 			},
 		},
 	},

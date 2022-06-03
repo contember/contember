@@ -2,12 +2,14 @@ import type { Props as SelectProps } from 'react-select'
 import type { ChoiceFieldData } from '../ChoiceField'
 import { SearchInput } from './SearchInput'
 import { useCommonStyles } from './useCommonStyles'
+import { useStateManager } from 'react-select'
 
 export interface UseCommonReactSelectPropsProps<T> {
 	reactSelectProps: Partial<SelectProps<any, any, any>> | undefined
 	placeholder: string | undefined
 	data: ChoiceFieldData.Data<T>
 	isInvalid: boolean
+	onSearch?: (input: string) => void
 }
 
 export const useCommonReactSelectProps = <T>({
@@ -15,10 +17,15 @@ export const useCommonReactSelectProps = <T>({
 	placeholder,
 	data,
 	isInvalid,
+	onSearch,
 }: UseCommonReactSelectPropsProps<T>): SelectProps<ChoiceFieldData.SingleDatum<T>, boolean, never> => {
 	const styles = useCommonStyles(isInvalid)
+	const reactSelectState = useStateManager<ChoiceFieldData.SingleDatum<T>, boolean, never, {}>({
+		onInputChange: onSearch,
+	})
 	return {
 		...reactSelectProps,
+		...reactSelectState,
 		placeholder,
 		styles,
 		options: data,
@@ -26,5 +33,6 @@ export const useCommonReactSelectProps = <T>({
 		components: {
 			Input: SearchInput,
 		},
+		filterOption: () => true,
 	}
 }

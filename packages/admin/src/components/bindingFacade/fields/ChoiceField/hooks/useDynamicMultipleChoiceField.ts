@@ -24,7 +24,7 @@ export const useDynamicMultipleChoiceField = (
 	const currentValueListAccessor = useEntityList(props)
 	const currentlyChosenEntities = Array.from(currentValueListAccessor)
 
-	const options = useSelectOptions(props, currentlyChosenEntities)
+	const { options, onSearch, isLoading } = useSelectOptions(props, currentlyChosenEntities)
 
 	const currentValues = useCurrentValues(props, currentlyChosenEntities)
 
@@ -57,5 +57,7 @@ export const useDynamicMultipleChoiceField = (
 				getCurrentValues().connectEntity(entity)
 			}, [getCurrentValues]),
 		}),
+		onSearch,
+		isLoading,
 	}
 }

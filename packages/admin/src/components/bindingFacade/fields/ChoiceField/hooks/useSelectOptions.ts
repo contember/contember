@@ -1,18 +1,76 @@
 import { BaseDynamicChoiceField } from '../BaseDynamicChoiceField'
-import { EntityAccessor } from '@contember/binding'
+import { EntityAccessor, Filter, TreeRootId, useEnvironment, useExtendTree, useTreeRootId } from '@contember/binding'
 import { ChoiceFieldData } from '../ChoiceFieldData'
-import { useMemo } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useDesugaredOptionPath } from './useDesugaredOptionPath'
 import { useTopLevelOptionAccessors } from './useTopLevelOptionAccessor'
 import { useNormalizedOptions } from './useNormalizedOptions'
+import { useDebounce } from '@contember/react-utils'
+import { renderDynamicChoiceFieldStatic } from '../renderDynamicChoiceFieldStatic'
+import { useCreateOptionsFilter } from './useCreateOptionsFilter'
+import Fuse from 'fuse.js'
 
+type OnSearch = (input: string) => void
 
 export const useSelectOptions = (
 	optionProps: BaseDynamicChoiceField,
 	additionalAccessors: EntityAccessor[] = [],
-): ChoiceFieldData.Data<EntityAccessor> => {
-	const desugaredOptionPath = useDesugaredOptionPath(optionProps)
-	const topLevelOptionAccessors = useTopLevelOptionAccessors(desugaredOptionPath)
+): { options: ChoiceFieldData.Data<EntityAccessor>, onSearch: OnSearch, isLoading: boolean } => {
+	const [input, setSearchInput] = useState('')
+	const renderedStateInputValueRef = useRef('')
+	const debouncedInput = useDebounce(input, 250)
+	const inputRef = useRef(debouncedInput)
+	useEffect(() => {
+		inputRef.current = input
+	}, [input])
+
+	const environment = useEnvironment()
+	const [renderedState, setRenderedState] = useState<{ treeRootId: TreeRootId | undefined, filter: Filter | undefined }>({
+		treeRootId: useTreeRootId(),
+		filter: undefined,
+	})
+
+	const desugaredOptionPath = useDesugaredOptionPath(optionProps, renderedState.filter)
+
+	const topLevelOptionAccessors = useTopLevelOptionAccessors(desugaredOptionPath, renderedState.treeRootId)
+
+	const extendTree = useExtendTree()
+	const createFilter = useCreateOptionsFilter(desugaredOptionPath, optionProps.searchByFields, optionProps.lazy)
+
+	useEffect(() => {
+		if (input === '') {
+			renderedStateInputValueRef.current = ''
+			setRenderedState({
+				treeRootId: undefined,
+				filter: undefined,
+			})
+		}
+	}, [input])
+
+	useEffect(() => {
+		if (!optionProps.lazy) {
+			return
+		}
+		if (debouncedInput === renderedStateInputValueRef.current || debouncedInput === '' || debouncedInput !== inputRef.current) {
+			return
+		}
+		(async () => {
+			const filter = createFilter(debouncedInput)
+			const { subTree } = renderDynamicChoiceFieldStatic({
+				...optionProps,
+				createNewForm: undefined,
+			}, environment, filter)
+			const treeRootId = await extendTree(subTree)
+
+			if (treeRootId && debouncedInput === inputRef.current) {
+				renderedStateInputValueRef.current = debouncedInput
+				setRenderedState({
+					treeRootId,
+					filter,
+				})
+			}
+		})()
+	}, [createFilter, debouncedInput, environment, extendTree, optionProps])
 	const mergedEntities = useMemo(() => {
 		const ids = new Set(topLevelOptionAccessors.map(it => it.id))
 		return [
@@ -21,9 +79,26 @@ export const useSelectOptions = (
 		]
 	}, [additionalAccessors, topLevelOptionAccessors])
 
-	return useNormalizedOptions(
+	const options = useNormalizedOptions(
 		mergedEntities,
 		desugaredOptionPath,
 		optionProps,
 	)
+	const fuse = useMemo(
+		() =>
+			new Fuse(options, {
+				keys: ['searchKeywords'],
+			}),
+		[options],
+	)
+	const filteredOptions = useMemo(() => {
+		return (input ? fuse.search(input).map(it => it.item) : options).slice(0, 100)
+	}, [fuse, input, options])
+
+	return {
+		options: filteredOptions,
+		onSearch: setSearchInput,
+		isLoading: renderedStateInputValueRef.current !== input,
+	}
 }
+

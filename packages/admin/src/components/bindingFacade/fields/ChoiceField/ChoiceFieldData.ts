@@ -16,6 +16,8 @@ export namespace ChoiceFieldData {
 	export interface BaseChoiceMetadata<ActualValue = unknown> {
 		data: Data<ActualValue>
 		errors: FieldErrors | undefined
+		onSearch?: (input: string) => void
+		isLoading?: boolean
 		onAddNew?: () => void
 	}
 

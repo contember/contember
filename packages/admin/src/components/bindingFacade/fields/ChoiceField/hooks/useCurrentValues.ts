@@ -7,6 +7,10 @@ export const useCurrentValues = (
 	optionProps: BaseDynamicChoiceField,
 	currentlyChosenEntities: EntityAccessor[],
 ) => {
-	const desugaredOptionPath = useDesugaredOptionPath(optionProps)
-	return useNormalizedOptions(currentlyChosenEntities, desugaredOptionPath, optionProps)
+	const desugaredOptionPath = useDesugaredOptionPath(optionProps, undefined)
+	return useNormalizedOptions(
+		currentlyChosenEntities,
+		desugaredOptionPath,
+		optionProps,
+	)
 }

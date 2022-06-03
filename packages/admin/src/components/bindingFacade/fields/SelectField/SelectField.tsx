@@ -52,6 +52,8 @@ export const SelectFieldInner = memo(
 		onClear,
 		reactSelectProps,
 		onAddNew,
+		onSearch,
+		isLoading,
 		...fieldContainerProps
 	}: SelectFieldInnerProps) => {
 		const selectProps = useCommonReactSelectProps({
@@ -59,6 +61,7 @@ export const SelectFieldInner = memo(
 			placeholder,
 			data,
 			isInvalid: (errors?.length ?? 0) > 0,
+			onSearch,
 		})
 
 		const labelMiddleware = useLabelMiddleware()
@@ -75,6 +78,7 @@ export const SelectFieldInner = memo(
 						menuPlacement="auto"
 						isClearable={allowNull === true}
 						value={currentValue}
+						isLoading={isLoading}
 						onChange={(newValue, actionMeta) => {
 							const value = newValue as ChoiceFieldData.SingleDatum
 							if (actionMeta.action === 'select-option') {

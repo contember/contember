@@ -14,7 +14,7 @@ import { choiceFieldDictionary } from '../choiceFieldDictionary'
 import { useDesugaredOptionPath } from './useDesugaredOptionPath'
 
 export const useOnAddNew = ({ createNewForm, connect, ...props }: BaseDynamicChoiceField & { connect: (entity: EntityAccessor) => void }) => {
-	const desugaredOptionPath = useDesugaredOptionPath(props)
+	const desugaredOptionPath = useDesugaredOptionPath(props, undefined)
 	const getSubTree = useGetEntityListSubTree()
 	const dialog = useDialog<true>()
 	const localization = useMessageFormatter(choiceFieldDictionary)

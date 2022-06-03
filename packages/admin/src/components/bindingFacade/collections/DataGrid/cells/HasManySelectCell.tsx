@@ -70,7 +70,7 @@ export const HasManySelectCell: FunctionComponent<HasManySelectProps> = Componen
 
 const HasManySelectCellContent = Component<HasManySelectProps>(
 	props => {
-		const desugaredOptionPath = useDesugaredOptionPath(props)
+		const desugaredOptionPath = useDesugaredOptionPath(props, undefined)
 		const entities = useEntityList(props)
 		const entitiesArray = useMemo(
 			() => Array.from(entities, it => it.getEntity({ field: desugaredOptionPath.hasOneRelationPath })),

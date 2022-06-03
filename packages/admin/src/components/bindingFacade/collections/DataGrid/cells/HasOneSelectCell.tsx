@@ -56,7 +56,7 @@ export const HasOneSelectCell: FunctionComponent<HasOneSelectProps> = Component(
 
 const HasOneSelectCellContent = Component<BaseDynamicChoiceField & SugaredRelativeSingleEntity & FieldFallbackViewPublicProps>(
 	props => {
-		const desugaredOptionPath = useDesugaredOptionPath(props)
+		const desugaredOptionPath = useDesugaredOptionPath(props, undefined)
 		const entity = useEntity(props).getEntity({ field: desugaredOptionPath.hasOneRelationPath })
 
 		if ('renderOption' in props) {

@@ -52,6 +52,7 @@ export const useStaticSingleChoiceField = (
 			errors,
 			environment,
 			isMutating,
+			// todo onSearch
 		}),
 		[currentValue, data, environment, errors, isMutating, onClear, onSelect],
 	)

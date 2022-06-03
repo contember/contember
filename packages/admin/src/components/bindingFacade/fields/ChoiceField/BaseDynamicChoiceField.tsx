@@ -1,6 +1,6 @@
 import {
 	EntityAccessor,
-	Environment,
+	Environment, Filter,
 	SugaredQualifiedEntityList,
 	SugaredQualifiedFieldList,
 	SugaredRelativeSingleField,
@@ -14,20 +14,34 @@ interface LegacyChoiceFieldWithOptionRenderer {
 	optionsStaticRender: ReactElement | ((environment: Environment) => ReactElement)
 }
 
+export type OptionsAsEntityList = string | SugaredQualifiedEntityList['entities'] | SugaredQualifiedEntityList
+export type OptionsAsFieldList = string | SugaredQualifiedFieldList['fields'] | SugaredQualifiedFieldList
+
+export type SearchByFields =
+	| SugaredRelativeSingleField['field']
+	| SugaredRelativeSingleField['field'][]
+
 export type BaseDynamicChoiceField =
 	& (
 		| {
-				options: string | SugaredQualifiedEntityList['entities'] | SugaredQualifiedEntityList
+				options: OptionsAsEntityList
 				optionLabel: ReactNode
 			}
 		| {
-				options: string | SugaredQualifiedFieldList['fields'] | SugaredQualifiedFieldList
+				options: OptionsAsFieldList
 			}
 		| LegacyChoiceFieldWithOptionRenderer
 	)
 	& {
-		searchByFields?: SugaredRelativeSingleField['field'] | SugaredRelativeSingleField['field'][]
+		searchByFields?: SearchByFields
 		createNewForm?: ReactElement
+		lazy?: LazyChoiceFieldSettings
 	}
 
-
+export type LazyChoiceFieldSettings =
+	| undefined
+	| boolean
+	| {
+		limit?: number
+		createFilter?: (input: string) => Filter
+	}

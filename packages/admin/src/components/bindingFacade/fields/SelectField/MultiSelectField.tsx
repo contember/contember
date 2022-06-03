@@ -54,6 +54,8 @@ export const MultiSelectFieldInner = typedMemo(
 		placeholder,
 		onAddNew,
 		onMove,
+		onSearch,
+		isLoading,
 		...fieldContainerProps
 	}: MultiSelectFieldInnerProps<T>) => {
 		const labelMiddleware = useLabelMiddleware()
@@ -62,6 +64,7 @@ export const MultiSelectFieldInner = typedMemo(
 			placeholder,
 			data,
 			isInvalid: (errors?.length ?? 0) > 0,
+			onSearch,
 		})
 
 		const selectOnChange = useCallback((newValue: unknown, actionMeta: ActionMeta<ChoiceFieldData.SingleDatum<T>>) => {
@@ -69,7 +72,7 @@ export const MultiSelectFieldInner = typedMemo(
 					onAdd(actionMeta.option!)
 			} else if (actionMeta.action === 'remove-value') {
 				onRemove(actionMeta.removedValue!)
-			} else if (actionMeta.action === 'pop-value') {
+			} else if (actionMeta.action === 'pop-value' && currentValues.length > 0) {
 				onRemove(currentValues[currentValues.length - 1])
 			} else if (actionMeta.action === 'clear') {
 				onClear()
@@ -83,6 +86,7 @@ export const MultiSelectFieldInner = typedMemo(
 			closeMenuOnSelect: false,
 			value: currentValues,
 			onChange: selectOnChange,
+			isLoading,
 		}
 		const onSortEnd = useCallback<SortEndHandler>(({ oldIndex, newIndex }) => {
 			onMove?.(oldIndex, newIndex)

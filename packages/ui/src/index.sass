@@ -1,2 +1,11 @@
+$include-inter-font: true !default
+$inter-font-path: null !default
+
+@import 'styles/inter'
+
+@if $include-inter-font
+  @include inter-font-faces($inter-font-path)
+  @include inter-variable-font-faces($inter-font-path)
+
 @import 'styles/index'
 @import 'components/index'

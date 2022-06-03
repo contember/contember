@@ -1,7 +1,6 @@
 import type { Props as SelectProps } from 'react-select'
 import type { ChoiceFieldData } from '../ChoiceField'
 import { SearchInput } from './SearchInput'
-import { VirtualizedMenuList } from './VirtualizedMenuList'
 import { useCommonStyles } from './useCommonStyles'
 
 export interface UseCommonReactSelectPropsProps {
@@ -25,11 +24,6 @@ export const useCommonReactSelectProps = ({
 		options: data,
 		getOptionValue: datum => datum.key.toFixed(),
 		components: {
-			...(data.length > 100
-				? {
-						MenuList: VirtualizedMenuList,
-				  }
-				: {}),
 			Input: SearchInput,
 		},
 	}

@@ -224,6 +224,7 @@ type TupleFromTupledType<T extends Type<Json>[]> = T extends [Type<infer X>, ...
 export const tuple = <T extends Type<Json>[]>(...inner: T): Type<TupleFromTupledType<T>> => {
 	const type = (input: unknown, path: PropertyKey[] = []): TupleFromTupledType<T> => {
 		if (!Array.isArray(input)) throw ParseError.format(input, path, 'array')
+		if (input.length !== inner.length) throw ParseError.format(input, path, `array with length ${inner.length}`)
 		return Object.entries(inner).map(([k, v]) => {
 			const newPath = [...path, k]
 			if (!(k in input)) {

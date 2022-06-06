@@ -1,12 +1,12 @@
-@use "../src/index.sass" with ($inter-font-path: "../src/assets/Inter")
+@use '../src/index' with ($inter-font-path: '../src/assets/Inter')
 
 html,
 body
-	font-family: Inter, "system-ui"
+	font-family: Inter, 'system-ui'
 	min-height: 100vh
 
 	@supports (font-variation-settings: normal)
-		font-family: "Inter var", "system-ui"
+		font-family: 'Inter var', 'system-ui'
 
 body.sb-show-main,
 body.sb-show-main.sb-main-padded

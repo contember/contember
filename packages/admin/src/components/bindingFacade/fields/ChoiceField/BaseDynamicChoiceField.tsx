@@ -8,7 +8,7 @@ import {
 } from '@contember/binding'
 import { ReactElement, ReactNode } from 'react'
 import { ChoiceFieldData } from './ChoiceFieldData'
-import Fuse from 'fuse.js'
+import { SelectFuseOptionsProps } from './hooks/useFuseFilteredOptions'
 
 /** @deprecated */
 interface LegacyChoiceFieldWithOptionRenderer {
@@ -35,13 +35,11 @@ export type BaseDynamicChoiceField =
 			}
 		| LegacyChoiceFieldWithOptionRenderer
 	)
+	& SelectFuseOptionsProps<EntityAccessor>
 	& {
 		searchByFields?: SearchByFields
 		createNewForm?: ReactElement
 		lazy?: LazyChoiceFieldSettings
-		fuseOptions?:
-			| Fuse.IFuseOptions<ChoiceFieldData.SingleDatum<EntityAccessor>>
-			| boolean
 		renderedOptionsLimit?: number
 		transformOptions?: (data: ChoiceFieldData.Data<EntityAccessor>, input: string) => ChoiceFieldData.Data<EntityAccessor>
 	}

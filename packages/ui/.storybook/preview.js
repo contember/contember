@@ -3,7 +3,7 @@ import { Select } from '../stories/ui/Select'
 import './index.sass'
 
 export const parameters = {
-  actions: { argTypesRegex: "^on[A-Z].*" },
+  actions: { argTypesRegex: '^on[A-Z].*' },
   controls: {
     sort: 'requiredFirst',
     hideNoControlsWarning: true,
@@ -21,11 +21,11 @@ export const parameters = {
 }
 
 export const decorators = [
-  (Story) => {
-    const [scheme, setScheme] = useState('system');
-    const [position, setPosition] = useState('default');
-    const [themeContent, setThemeContent] = useState('default');
-    const [themeControls, setThemeControls] = useState('primary');
+  Story => {
+    const [scheme, setScheme] = useState('system')
+    const [position, setPosition] = useState('default')
+    const [themeContent, setThemeContent] = useState('default')
+    const [themeControls, setThemeControls] = useState('primary')
 
     return <div
       className={`cui-layout scheme-${scheme}${position !== 'default' ? `-${position}` : ''} theme-${themeContent}-content theme-${themeControls}-controls`}
@@ -52,7 +52,7 @@ export const decorators = [
         paddingTop: '2em',
         paddingBottom: '2em',
       }}>
-        <div style={{ display: 'flex', flexWrap: 'wrap', flexDirection: 'row', gap: '1em', }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', flexDirection: 'row', gap: '1em' }}>
           <Story />
         </div>
       </div>
@@ -86,7 +86,7 @@ export const decorators = [
           name="themeContent"
           value={themeContent}
           options={[
-            ["default"], ["primary"], ["secondary"], ["tertiary"], ["positive"], ["success"], ["warn"], ["danger"]
+            ['default'], ['primary'], ['secondary'], ['tertiary'], ['positive'], ['success'], ['warn'], ['danger'],
           ]}
           onChange={setThemeContent}
         />
@@ -95,7 +95,7 @@ export const decorators = [
           name="themeControls"
           value={themeControls}
           options={[
-            ["default"], ["primary"], ["secondary"], ["tertiary"], ["positive"], ["success"], ["warn"], ["danger"]
+            ['default'], ['primary'], ['secondary'], ['tertiary'], ['positive'], ['success'], ['warn'], ['danger'],
           ]}
           onChange={setThemeControls}
         />

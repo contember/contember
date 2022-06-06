@@ -48,14 +48,6 @@ export function createViteConfig(packageName) {
 				})),
 				dedupe: packageList.map(packageName => `@contember/${packageName}`),
 			},
-			css: {
-				preprocessorOptions: {
-					sass: {
-						charset: false,
-						additionalData: `$inter-font-path: '/@fs/src/packages/ui/src/assets/Inter'\n`,
-					},
-				},
-			},
 		}
 	})
 }

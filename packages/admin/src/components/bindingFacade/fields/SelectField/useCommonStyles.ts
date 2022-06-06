@@ -78,8 +78,8 @@ export const useCommonStyles = (isInvalid: boolean): StylesConfig<any, boolean, 
 	dropdownIndicator: (provided, { isFocused, isDisabled }) => {
 		return {
 			...provided,
-			'align-self': 'stretch',
-			'align-items': 'center',
+			'alignSelf': 'stretch',
+			'alignItems': 'center',
 			'color': isDisabled
 				? 'var(--cui-color--low)'
 				: isFocused

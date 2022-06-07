@@ -7,7 +7,7 @@ import { PermissionsByEntity } from './AclFactory'
 import { createPredicateName } from './createPredicateName'
 import { AllowDefinition, PredicateExtra, WhenDefinition } from '../permissions'
 import { PredicateEvaluationReference } from '../references'
-import { EntityVariableDefinition } from '../variables'
+import { VariableDefinition } from '../variables'
 
 export class EntityPredicatesResolver {
 	private usedPredicates: string[] = []
@@ -92,7 +92,7 @@ export class EntityPredicatesResolver {
 		const processor = new PredicateDefinitionProcessor(model)
 		return processor.process<Acl.PredicateReference | Input.Condition, PredicateExtra>(entity, when, {
 			handleColumn(ctx) {
-				if (ctx.value instanceof EntityVariableDefinition) {
+				if (ctx.value instanceof VariableDefinition) {
 					return ctx.value.name
 				}
 				if (ctx.value instanceof PredicateEvaluationReference) {
@@ -101,7 +101,7 @@ export class EntityPredicatesResolver {
 				return ctx.value
 			},
 			handleRelation(ctx) {
-				if (ctx.value instanceof EntityVariableDefinition) {
+				if (ctx.value instanceof VariableDefinition) {
 					return { [ctx.targetEntity.primary]: ctx.value.name }
 				}
 				if (ctx.value instanceof PredicateEvaluationReference) {

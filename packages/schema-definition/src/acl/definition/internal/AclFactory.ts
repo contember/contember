@@ -10,7 +10,7 @@ import {
 	EntityPermissionsDefinition,
 } from './stores'
 import { Role } from '../roles'
-import { EntityVariableDefinition, VariableDefinition } from '../variables'
+import {  VariableDefinition } from '../variables'
 import { filterEntityDefinition } from '../../../utils'
 
 export class AclFactory {
@@ -24,7 +24,7 @@ export class AclFactory {
 	): Acl.Schema {
 		const entityLikeDefinition = filterEntityDefinition(exportedDefinitions)
 		const roles: Role[] = Object.values(exportedDefinitions).filter(it => it instanceof Role)
-		const variables: VariableDefinition[] = Object.values(exportedDefinitions).filter(it => it instanceof EntityVariableDefinition)
+		const variables: VariableDefinition[] = Object.values(exportedDefinitions).filter(it => it instanceof VariableDefinition)
 
 		const groupedPermissions = AclFactory.groupPermissions(entityLikeDefinition, roles)
 
@@ -85,10 +85,7 @@ export class AclFactory {
 	private createVariables(role: Role, variables: VariableDefinition[]): Acl.Variables {
 		const roleVariables = variables.filter(it => it.roles.includes(role))
 		return Object.fromEntries(roleVariables.map((variable): [string, Acl.Variable] => {
-			switch (variable.type) {
-				case 'entity':
-					return [variable.name, { type: Acl.VariableType.entity, entityName: variable.entityName }]
-			}
+			return [variable.name, variable.variable]
 		}))
 	}
 

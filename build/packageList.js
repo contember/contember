@@ -15,8 +15,8 @@ export const packageList = [
 export const getPackagePath = name => {
 	switch (name) {
 		case 'admin-server':
-			return `ee/${name}/src/index.ts`
+			return `ee/${name}/src`
 		default:
-			return `packages/${name}/src/index.ts`
+			return `packages/${name}/src`
 	}
 }

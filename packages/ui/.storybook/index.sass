@@ -1,9 +1,12 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap')
+@use '../src/index' with ($inter-font-path: '../src/assets/Inter')
 
 html,
 body
-	font-family: Inter, sans-serif
+	font-family: Inter, 'system-ui'
 	min-height: 100vh
+
+	@supports (font-variation-settings: normal)
+		font-family: 'Inter var', 'system-ui'
 
 body.sb-show-main,
 body.sb-show-main.sb-main-padded

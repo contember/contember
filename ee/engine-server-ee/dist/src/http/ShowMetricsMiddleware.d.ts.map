@@ -1,1 +1,0 @@
-{"version":3,"file":"ShowMetricsMiddleware.d.ts","sourceRoot":"","sources":["../../../src/http/ShowMetricsMiddleware.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,aAAa,EAAS,MAAM,wBAAwB,CAAA;AAC7D,OAAO,IAAI,MAAM,aAAa,CAAA;AAE9B,eAAO,MAAM,2BAA2B,aAAc,KAAK,QAAQ,KAAG,cAAc,GAAG,CAQtF,CAAA"}

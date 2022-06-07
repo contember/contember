@@ -23,9 +23,10 @@ namespace Acl {
 		readonly entityName: string
 	}
 
+	export type PredefinedVariableValue = 'identityID' | 'personID'
 	export type PredefinedVariable = {
 		readonly type: VariableType.predefined
-		readonly value: 'identityID' | 'personID'
+		readonly value: PredefinedVariableValue
 	}
 
 

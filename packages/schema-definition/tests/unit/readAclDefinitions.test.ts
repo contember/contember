@@ -404,3 +404,47 @@ test('definition with invalid predicate references', () => {
 	)
 })
 
+
+namespace ModelWithPredefinedVariables {
+	export const customerRole = acl.createRole('customer')
+	export const personId = acl.createPredefinedVariable('person', 'personID', customerRole)
+
+	@acl.allow(customerRole, {
+		when: { personId: personId },
+		read: true,
+	})
+	export class Order {
+		personId = def.uuidColumn().notNull()
+		valueCents = def.intColumn().notNull()
+	}
+}
+
+test('definition with predefined variables', () => {
+	const schema = createSchema(ModelWithPredefinedVariables)
+	expect(schema.acl.roles.customer).toMatchInlineSnapshot(`
+		{
+		  "entities": {
+		    "Order": {
+		      "operations": {
+		        "read": {
+		          "personId": "personId_person",
+		          "valueCents": "personId_person",
+		        },
+		      },
+		      "predicates": {
+		        "personId_person": {
+		          "personId": "person",
+		        },
+		      },
+		    },
+		  },
+		  "stages": "*",
+		  "variables": {
+		    "person": {
+		      "type": "predefined",
+		      "value": "personID",
+		    },
+		  },
+		}
+	`)
+})

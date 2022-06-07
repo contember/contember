@@ -8,9 +8,8 @@ import { DataGridHeaderCell } from '../DataGridHeaderCell'
 import { getColumnFilter } from '../getColumnFilter'
 import type { DataGridContainerProps } from './Types'
 
-interface DataGridContainerTableProps
-	extends Pick<
-		DataGridContainerProps,
+type DataGridContainerTableProps=
+	Pick<DataGridContainerProps,
 		| 'accessor'
 		| 'desiredState'
 		| 'emptyMessage'
@@ -20,7 +19,7 @@ interface DataGridContainerTableProps
 		| 'selectedEntityKeys'
 		| 'setFilter'
 		| 'setOrderBy'
-	> {}
+	>
 
 export const DataGridContainerTable = memo<DataGridContainerTableProps>(({
 	accessor,
@@ -41,16 +40,18 @@ export const DataGridContainerTable = memo<DataGridContainerTableProps>(({
 
 	const formatMessage = useMessageFormatter(dataGridDictionary)
 
-	const onRowClick = useMemo(() => (onEntityClick
-		? (id: string) => {
+	const onRowClick = useMemo(() => {
+		if (!onEntityClick) {
+			return undefined
+		}
+		return (id: string) => {
 			const entity = accessor.getChildEntityById(id)
 
 			if (entity) {
 				onEntityClick(entity)
 			}
 		}
-		: undefined
-	), [accessor, onEntityClick])
+	}, [accessor, onEntityClick])
 
 	return (
 		<Table

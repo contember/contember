@@ -28,7 +28,7 @@ export const DataGridContainer: FunctionComponent<DataGridContainerProps> = Comp
 		setLayout,
 		setOrderBy,
 		tile,
-		tileSize = 160,
+		tileSize,
 		updatePaging,
 	}) => {
 		const componentClassName = useComponentClassName('data-grid')
@@ -70,21 +70,22 @@ export const DataGridContainer: FunctionComponent<DataGridContainerProps> = Comp
 				/>
 				{tile && layout === 'tiles'
 					? <DataGridContainerGrid
-						accessor={accessor}
-						tile={tile}
-						tileSize={tileSize}
-					/>
+							accessor={accessor}
+							tile={tile}
+							tileSize={tileSize}
+						/>
 					: <DataGridContainerTable
-						accessor={accessor}
-						desiredState={desiredState}
-						displayedState={displayedState}
-						emptyMessage={emptyMessage}
-						emptyMessageComponent={emptyMessageComponent}
-						onEntityClick={onEntityClick}
-						selectedEntityKeys={selectedEntityKeys}
-						setFilter={setFilter}
-						setOrderBy={setOrderBy}
-					/>}
+							accessor={accessor}
+							desiredState={desiredState}
+							displayedState={displayedState}
+							emptyMessage={emptyMessage}
+							emptyMessageComponent={emptyMessageComponent}
+							onEntityClick={onEntityClick}
+							selectedEntityKeys={selectedEntityKeys}
+							setFilter={setFilter}
+							setOrderBy={setOrderBy}
+						/>
+				}
 				{!!normalizedItemCount && (
 					<DataGridContainerFooter
 						desiredState={desiredState}

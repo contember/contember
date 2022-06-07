@@ -10,10 +10,10 @@ export interface TableRowProps {
 	active?: boolean
 	children?: ReactNode
 	justification?: Justification
-	onClick?: (id: string) => void
+	onClick?: (id: number | string) => void
 }
 
-export const TableRow = memo(({ active, children, id, justification, onClick: onClickProp, ...emtyRest }: TableRowProps) => {
+export const TableRow = memo(({ active, children, id, justification, onClick: onClickProp }: TableRowProps) => {
 	const useTableElement = useContext(UseTableElementContext)
 	const className = classNames(
 		useComponentClassName('table-row'),
@@ -24,9 +24,9 @@ export const TableRow = memo(({ active, children, id, justification, onClick: on
 	)
 
 	const onClick = useCallback(() => {
-		if (typeof id === 'string') {
-			onClickProp?.(id)
-		}
+			if (id !== undefined) {
+				onClickProp?.(id)
+			}
 	}, [id, onClickProp])
 
 	if (useTableElement) {

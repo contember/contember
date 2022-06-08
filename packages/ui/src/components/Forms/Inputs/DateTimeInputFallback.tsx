@@ -6,9 +6,9 @@ import { Divider } from '../../Divider'
 import { Stack } from '../../Stack'
 import { assertDatetimeString, splitDatetime } from '../Types'
 import { VisuallyDependentControlProps } from '../Types/ControlProps'
-import { useInputClassName } from '../useInputClassName'
-import { useNativeInput } from '../useNativeInput'
+import { useInputClassName } from '../hooks/useInputClassName'
 import { DateTimeInputProps } from './Types'
+import { useTextBasedInput } from '../hooks/useTextBasedInput'
 
 function joinDatetime(date?: string | null, time?: string | null) {
 	return `${date}T${time}`
@@ -65,7 +65,7 @@ export const DateTimeInputFallback = memo(
 			onValidationStateChange?.([dateError.current, timeError.current].filter(Boolean).join(' '))
 		}, [onValidationStateChange])
 
-		const { props: dateInputProps } = useNativeInput<HTMLInputElement>({
+		const dateInputProps = useTextBasedInput<HTMLInputElement>({
 			...outerProps,
 			distinction: 'seamless',
 			className: classNames(
@@ -80,7 +80,7 @@ export const DateTimeInputFallback = memo(
 		}, forwardedRef)
 
 		const timeInputRef = useRef<HTMLInputElement>(null)
-		const { props: timeInputProps } = useNativeInput<HTMLInputElement>({
+		const timeInputProps = useTextBasedInput<HTMLInputElement>({
 			...outerProps,
 			distinction: 'seamless',
 			className: classNames(

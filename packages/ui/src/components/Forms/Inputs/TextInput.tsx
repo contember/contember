@@ -2,7 +2,6 @@ import classNames from 'classnames'
 import { forwardRef, memo } from 'react'
 import { useComponentClassName } from '../../../auxiliary'
 import { toViewClass } from '../../../utils'
-import { useNativeInput } from '../useNativeInput'
 import { ColorInput } from './ColorInput'
 import { DateInput } from './DateInput'
 import { DateTimeInput } from './DateTimeInput'
@@ -16,6 +15,7 @@ import { TimeInput } from './TimeInput'
 import type { TextInputProps } from './Types'
 import { UrlInput } from './UrlInput'
 import { WeekInput } from './WeekInput'
+import { useTextBasedInput } from '../hooks/useTextBasedInput'
 
 export const InternalTextInput = memo(
 	forwardRef<HTMLInputElement, TextInputProps>(({
@@ -24,7 +24,7 @@ export const InternalTextInput = memo(
 		withTopToolbar,
 		...outerProps
 	}, forwardedRed) => {
-		const { props } = useNativeInput<HTMLInputElement>({
+		const props = useTextBasedInput<HTMLInputElement>({
 			...outerProps,
 			className: classNames(
 				useComponentClassName('text-input'),

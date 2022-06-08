@@ -2,8 +2,8 @@ import classNames from 'classnames'
 import { forwardRef, memo } from 'react'
 import { useComponentClassName } from '../../../auxiliary'
 import { toViewClass } from '../../../utils'
-import { useNativeInput } from '../useNativeInput'
 import type { RangeInputProps } from './Types'
+import { useTextBasedInput } from '../hooks/useTextBasedInput'
 
 export const RangeInput = memo(
 	forwardRef<HTMLInputElement, RangeInputProps>(({
@@ -11,7 +11,7 @@ export const RangeInput = memo(
 		withTopToolbar,
 		...outerProps
 	}, forwardedRed) => {
-		const { props } = useNativeInput<HTMLInputElement>({
+		const props = useTextBasedInput<HTMLInputElement>({
 			...outerProps,
 			className: classNames(
 				useComponentClassName('text-input'),

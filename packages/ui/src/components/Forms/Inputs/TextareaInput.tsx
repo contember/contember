@@ -4,7 +4,7 @@ import TextareaAutosize, { TextareaAutosizeProps } from 'react-textarea-autosize
 import { useComponentClassName } from '../../../auxiliary'
 import { toViewClass } from '../../../utils'
 import type { ControlProps, ControlPropsKeys } from '../Types'
-import { useNativeInput } from '../useNativeInput'
+import { useTextBasedInput } from '../hooks/useTextBasedInput'
 
 export interface UnderlyingElementProps extends Omit<AllHTMLAttributes<HTMLTextAreaElement>, ControlPropsKeys<string>> {}
 
@@ -25,7 +25,7 @@ export const TextareaInput = memo(
 		withTopToolbar,
 		...outerProps
 	}: TextareaInputProps, forwardedRed: ForwardedRef<HTMLTextAreaElement>) => {
-		const { props } = useNativeInput<HTMLTextAreaElement>({
+		const props = useTextBasedInput<HTMLTextAreaElement>({
 			...outerProps,
 			className: classNames(
 				useComponentClassName('textarea-input'),

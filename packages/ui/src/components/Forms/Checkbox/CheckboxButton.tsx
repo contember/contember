@@ -2,7 +2,7 @@ import classNames from 'classnames'
 import { useComponentClassName } from '../../../auxiliary'
 import { toStateClass } from '../../../utils'
 import { AllVisuallyDependentControlProps } from '../Types'
-import { useInputClassName } from '../useInputClassName'
+import { useInputClassName } from '../hooks/useInputClassName'
 
 export interface CheckboxButtonProps extends AllVisuallyDependentControlProps {
   checked?: boolean | null

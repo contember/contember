@@ -40,7 +40,6 @@ import { ReactNode } from 'react';
 import { ReactPortal } from 'react';
 import { Ref } from 'react';
 import { RefAttributes } from 'react';
-import { RefCallback } from 'react';
 import { RefObject } from 'react';
 import { SyntheticEvent } from 'react';
 import { TextareaAutosizeProps } from 'react-textarea-autosize';
@@ -267,7 +266,7 @@ export type CardProps = Omit<CommonCardProps, 'type'> & Omit<NativeProps<HTMLDiv
 };
 
 // @public (undocumented)
-export const Checkbox: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationSteteProps & ControlStateProps & ControlFocusProps & ControlValueProps<boolean> & {
+export const Checkbox: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<boolean> & ControlValueProps<boolean> & {
 CheckboxButtonComponent?: (({ id, checked, indeterminate, ...props }: CheckboxButtonProps) => JSX.Element) | undefined;
 children?: undefined;
 } & RestHTMLCheckboxProps & RefAttributes<HTMLInputElement>>>;
@@ -318,7 +317,7 @@ export interface CollapsibleProps {
 export type CollapsibleTransition = Default | 'topInsert' | 'leftInsert' | 'rightInsert' | 'bottomInsert' | 'fade';
 
 // @public (undocumented)
-export const ColorInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationSteteProps & ControlStateProps & ControlFocusProps & ControlValueProps<string> & {
+export const ColorInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<string> & ControlValueProps<string> & {
 withTopToolbar?: boolean | undefined;
 } & RestHTMLTextInputProps & RefAttributes<HTMLInputElement>>>;
 
@@ -380,6 +379,14 @@ export interface ContentStatusProps {
 }
 
 // @public (undocumented)
+export interface ControlConstraintProps<V> {
+    // (undocumented)
+    max?: V | null;
+    // (undocumented)
+    min?: V | null;
+}
+
+// @public (undocumented)
 export interface ControlDisplayProps {
     // (undocumented)
     className?: HTMLAttributes<HTMLElement>['className'];
@@ -389,6 +396,10 @@ export interface ControlDisplayProps {
     id?: string;
     // (undocumented)
     intent?: Intent;
+    // (undocumented)
+    name?: string;
+    // (undocumented)
+    placeholder?: string | null;
     // (undocumented)
     scheme?: Scheme;
     // (undocumented)
@@ -411,7 +422,7 @@ export interface ControlFocusProps {
 }
 
 // @public (undocumented)
-export type ControlProps<V> = ControlDisplayProps & ValidationSteteProps & ControlStateProps & ControlFocusProps & ControlValueProps<V>;
+export type ControlProps<V> = ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<V> & ControlValueProps<V>;
 
 // @public (undocumented)
 export type ControlPropsKeys<V> = keyof ControlProps<V>;
@@ -439,23 +450,15 @@ export interface ControlValueProps<V> {
     // (undocumented)
     defaultValue?: V | null | undefined;
     // (undocumented)
-    max?: V | null;
-    // (undocumented)
-    min?: V | null;
-    // (undocumented)
-    name?: string;
-    // (undocumented)
     notNull?: boolean;
     // (undocumented)
     onChange?: (value?: V | null) => void;
-    // (undocumented)
-    placeholder?: string | null;
     // (undocumented)
     value?: V | null;
 }
 
 // @public (undocumented)
-export const DateInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationSteteProps & ControlStateProps & ControlFocusProps & ControlValueProps<string> & {
+export const DateInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<string> & ControlValueProps<string> & {
 withTopToolbar?: boolean | undefined;
 } & RestHTMLTextInputProps & RefAttributes<HTMLInputElement>>>;
 
@@ -469,12 +472,12 @@ export type DateInputString = string;
 export const DateInputStringRegExp: RegExp;
 
 // @public (undocumented)
-export const DateTimeInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationSteteProps & ControlStateProps & ControlFocusProps & ControlValueProps<string> & {
+export const DateTimeInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<string> & ControlValueProps<string> & {
 withTopToolbar?: boolean | undefined;
 } & RestHTMLTextInputProps & RefAttributes<HTMLInputElement>>>;
 
 // @public (undocumented)
-export const DateTimeInputFallback: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationSteteProps & ControlStateProps & ControlFocusProps & ControlValueProps<string> & {
+export const DateTimeInputFallback: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<string> & ControlValueProps<string> & {
 withTopToolbar?: boolean | undefined;
 } & RestHTMLTextInputProps & RefAttributes<HTMLInputElement>>>;
 
@@ -1411,7 +1414,7 @@ export interface EditorToolbarProps {
 const ellipsis: string[];
 
 // @public (undocumented)
-export const EmailInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationSteteProps & ControlStateProps & ControlFocusProps & ControlValueProps<string> & {
+export const EmailInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<string> & ControlValueProps<string> & {
 withTopToolbar?: boolean | undefined;
 } & RestHTMLTextInputProps & RefAttributes<HTMLInputElement>>>;
 
@@ -1522,7 +1525,7 @@ export interface FilePreviewProps {
 export function flipValue<V extends any = any, T extends any = boolean, F extends any = boolean>(value: V, truthy?: T, falsy?: F): boolean | NonNullable<T> | NonNullable<F> | undefined;
 
 // @public (undocumented)
-export const FloatInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationSteteProps & ControlStateProps & ControlFocusProps & ControlValueProps<number> & {
+export const FloatInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<number> & ControlValueProps<number> & {
 withTopToolbar?: boolean | undefined;
 } & RestHTMLTextInputProps & RefAttributes<HTMLInputElement>>>;
 
@@ -1531,9 +1534,6 @@ export type FloatInputProps = TextInputProps<number>;
 
 // @public (undocumented)
 export const forceReflow: (element: HTMLElement | null) => void;
-
-// @public (undocumented)
-export function fromBooleanValue(value?: boolean | null): string;
 
 // @public (undocumented)
 const gallery: string[];
@@ -1609,7 +1609,7 @@ export interface HeadingProps extends Omit<DetailedHTMLProps<HTMLAttributes<HTML
 }
 
 // @public (undocumented)
-export const HiddenInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationSteteProps & ControlStateProps & ControlFocusProps & ControlValueProps<string> & {
+export const HiddenInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<string> & ControlValueProps<string> & {
 withTopToolbar?: boolean | undefined;
 } & RestHTMLTextInputProps & RefAttributes<HTMLInputElement>>>;
 
@@ -1674,7 +1674,7 @@ const image: string[];
 export type Intent = Default | 'primary' | 'secondary' | 'tertiary' | 'positive' | 'success' | 'warn' | 'danger';
 
 // @public (undocumented)
-export const InternalTextInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationSteteProps & ControlStateProps & ControlFocusProps & ControlValueProps<string> & {
+export const InternalTextInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<string> & ControlValueProps<string> & {
 withTopToolbar?: boolean | undefined;
 } & RestHTMLTextInputProps & RefAttributes<HTMLInputElement>>>;
 
@@ -1904,7 +1904,7 @@ export interface MessageProps extends HTMLAttributes<HTMLDivElement> {
 }
 
 // @public (undocumented)
-export const MonthInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationSteteProps & ControlStateProps & ControlFocusProps & ControlValueProps<string> & {
+export const MonthInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<string> & ControlValueProps<string> & {
 withTopToolbar?: boolean | undefined;
 } & RestHTMLTextInputProps & RefAttributes<HTMLInputElement>>>;
 
@@ -1941,7 +1941,7 @@ const newNote: string[];
 export function noop(): void;
 
 // @public (undocumented)
-export const NumberInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationSteteProps & ControlStateProps & ControlFocusProps & ControlValueProps<number> & {
+export const NumberInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<number> & ControlValueProps<number> & {
 withTopToolbar?: boolean | undefined;
 } & RestHTMLTextInputProps & RefAttributes<HTMLInputElement>>>;
 
@@ -1975,7 +1975,7 @@ export interface ParsedStackFrame {
 export type ParsedStackTrace = ParsedStackFrame[];
 
 // @public (undocumented)
-export const PasswordInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationSteteProps & ControlStateProps & ControlFocusProps & ControlValueProps<string> & {
+export const PasswordInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<string> & ControlValueProps<string> & {
 withTopToolbar?: boolean | undefined;
 } & RestHTMLTextInputProps & RefAttributes<HTMLInputElement>>>;
 
@@ -2067,7 +2067,7 @@ export interface RadioProps {
 export const randomId: () => string;
 
 // @public (undocumented)
-export const RangeInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationSteteProps & ControlStateProps & ControlFocusProps & ControlValueProps<string> & {
+export const RangeInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<string> & ControlValueProps<string> & {
 withTopToolbar?: boolean | undefined;
 } & RestHTMLTextInputProps & RefAttributes<HTMLInputElement>>>;
 
@@ -2157,7 +2157,7 @@ export interface SeamlessDropdownProps {
 }
 
 // @public (undocumented)
-export const SearchInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationSteteProps & ControlStateProps & ControlFocusProps & ControlValueProps<string> & {
+export const SearchInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<string> & ControlValueProps<string> & {
 withTopToolbar?: boolean | undefined;
 } & RestHTMLTextInputProps & RefAttributes<HTMLInputElement>>>;
 
@@ -2222,7 +2222,7 @@ export type SelectProps<V> = Omit<ControlProps<V>, 'min' | 'max'> & RestHTMLSele
 export type Size = Default | 'small' | 'large';
 
 // @public (undocumented)
-export const SlugInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationSteteProps & ControlStateProps & ControlFocusProps & ControlValueProps<string> & {
+export const SlugInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<string> & ControlValueProps<string> & {
 withTopToolbar?: boolean | undefined;
 } & RestHTMLTextInputProps & {
 link?: string | undefined;
@@ -2413,7 +2413,7 @@ export interface TagProps {
 }
 
 // @public (undocumented)
-export const TelInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationSteteProps & ControlStateProps & ControlFocusProps & ControlValueProps<string> & {
+export const TelInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<string> & ControlValueProps<string> & {
 withTopToolbar?: boolean | undefined;
 } & RestHTMLTextInputProps & RefAttributes<HTMLInputElement>>>;
 
@@ -2421,7 +2421,7 @@ withTopToolbar?: boolean | undefined;
 export type TelInputProps = TextInputProps;
 
 // @public (undocumented)
-export const TextareaInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationSteteProps & ControlStateProps & ControlFocusProps & ControlValueProps<string> & TextareaInputOwnProps & UnderlyingElementProps & {
+export const TextareaInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<string> & ControlValueProps<string> & TextareaInputOwnProps & UnderlyingElementProps & {
 style?: TextareaAutosizeProps['style'];
 } & RefAttributes<HTMLTextAreaElement>>>;
 
@@ -2452,7 +2452,7 @@ export type TextInputOwnProps<V extends string | number = string> = ControlProps
 export type TextInputProps<V extends string | number = string> = TextInputOwnProps<V> & RestHTMLTextInputProps;
 
 // @public (undocumented)
-export const TimeInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationSteteProps & ControlStateProps & ControlFocusProps & ControlValueProps<string> & {
+export const TimeInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<string> & ControlValueProps<string> & {
 withTopToolbar?: boolean | undefined;
 } & RestHTMLTextInputProps & {
 seconds?: boolean | undefined;
@@ -2491,9 +2491,6 @@ export interface TitleBarProps extends ThemeScheme {
     // (undocumented)
     navigation?: ReactNode;
 }
-
-// @public (undocumented)
-export function toBooleanValue(value: string): boolean | null;
 
 // @public (undocumented)
 export function toDate(value?: any): Date | null;
@@ -2595,7 +2592,7 @@ export interface UploadProgressProps {
 }
 
 // @public (undocumented)
-export const UrlInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationSteteProps & ControlStateProps & ControlFocusProps & ControlValueProps<string> & {
+export const UrlInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<string> & ControlValueProps<string> & {
 withTopToolbar?: boolean | undefined;
 } & RestHTMLTextInputProps & RefAttributes<HTMLInputElement>>>;
 
@@ -2643,11 +2640,8 @@ export function useMouseMove<E extends HTMLElement = HTMLElement>(observedElemen
 export function useMouseMoveContext(): RefObject<boolean>;
 
 // @public (undocumented)
-export function useNativeInput<E extends HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>({ active, disabled, loading, readOnly, required, focused, hovered, onBlur, onFocus, onFocusChange, defaultValue, name, max, min, onChange, notNull: _notNull, placeholder, type, value, onValidationStateChange, validationState, className: outerClassName, distinction, intent, scheme, size, ...rest }: ControlProps<string>, forwardedRef: ForwardedRef<E>): {
-    props: AllHTMLAttributes<E> & {
-        ref: RefCallback<E> | RefObject<E>;
-    };
-    state: string;
+export function useNativeInput<E extends HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement, T>({ active, disabled, loading, readOnly, required, focused, hovered, onBlur, onFocus, onFocusChange, defaultValue, name, max, min, onChange, notNull: _notNull, placeholder, type, value, onValidationStateChange, validationState, className: outerClassName, distinction, intent, scheme, size, ...rest }: ControlProps<T>, forwardedRef: ForwardedRef<E>): AllHTMLAttributes<E> & {
+    ref: RefObject<E>;
 };
 
 // @public (undocumented)
@@ -2686,7 +2680,7 @@ export const UseTableElementContext: Context<boolean>;
 export type ValidationState = Default | 'valid' | 'invalid';
 
 // @public (undocumented)
-export interface ValidationSteteProps {
+export interface ValidationStateProps {
     // (undocumented)
     onValidationStateChange?: (error?: string) => void;
     // (undocumented)
@@ -2694,10 +2688,10 @@ export interface ValidationSteteProps {
 }
 
 // @public (undocumented)
-export type VisuallyDependentControlProps = ControlStateProps & ControlDisplayProps & Pick<ValidationSteteProps, 'validationState'>;
+export type VisuallyDependentControlProps = ControlStateProps & ControlDisplayProps & Pick<ValidationStateProps, 'validationState'>;
 
 // @public (undocumented)
-export const WeekInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationSteteProps & ControlStateProps & ControlFocusProps & ControlValueProps<string> & {
+export const WeekInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<string> & ControlValueProps<string> & {
 withTopToolbar?: boolean | undefined;
 } & RestHTMLTextInputProps & RefAttributes<HTMLInputElement>>>;
 

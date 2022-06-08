@@ -3,9 +3,9 @@ import { DetailedHTMLProps, forwardRef, InputHTMLAttributes, memo, Ref } from 'r
 import { useComponentClassName } from '../../../auxiliary'
 import { toViewClass } from '../../../utils'
 import { assertDatetimeString } from '../Types'
-import { useNativeInput } from '../useNativeInput'
 import { DateTimeInputFallback } from './DateTimeInputFallback'
 import { DateTimeInputProps } from './Types'
+import { useTextBasedInput } from '../hooks/useTextBasedInput'
 
 let _isInputDateTimeLocalSupported: boolean | null = null
 
@@ -49,7 +49,7 @@ export const DateTimeInput = memo(
 		withTopToolbar,
 		...outerProps
 	}: DateTimeInputProps, forwardedRef: Ref<HTMLInputElement>) => {
-		const { props } = useNativeInput<HTMLInputElement>({
+		const props = useTextBasedInput<HTMLInputElement>({
 			...outerProps,
 			className: classNames(
 				useComponentClassName('text-input'),

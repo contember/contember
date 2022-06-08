@@ -3,8 +3,8 @@ import { forwardRef, memo, useCallback } from 'react'
 import { mergeProps } from 'react-aria'
 import { useComponentClassName } from '../../../auxiliary'
 import { toViewClass } from '../../../utils'
-import { useNativeInput } from '../useNativeInput'
 import type { NumberInputProps } from './Types'
+import { useTextBasedInput } from '../hooks/useTextBasedInput'
 
 export const NumberInput = memo(
 	forwardRef<HTMLInputElement, NumberInputProps>(({
@@ -17,7 +17,7 @@ export const NumberInput = memo(
 		withTopToolbar,
 		...outerProps
 	}, forwardedRed) => {
-		const { props } = useNativeInput<HTMLInputElement>({
+		const props = useTextBasedInput<HTMLInputElement>({
 			...outerProps,
 			className: classNames(
 				useComponentClassName('text-input'),

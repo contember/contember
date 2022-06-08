@@ -3,7 +3,7 @@ import { AuthResult, HttpError, TimerMiddlewareState } from '../common'
 import { ProjectGroupResolver, ProjectInfoMiddlewareState } from '../project-common'
 import { StageBySlugQuery } from '@contember/engine-system-api'
 import { ContentExporter } from './ContentExporter'
-import { ContentImporter } from './ContentImporter'
+import { ContentImporter, ImportError } from './ContentImporter'
 import { Logger } from '@contember/engine-common'
 import { Readable } from 'stream'
 
@@ -63,10 +63,22 @@ export class TransferApiMiddlewareFactory {
 				response.body = Readable.from(this.contentExporter.export(contentClient, schema))
 
 			} else {
-				await this.contentImporter.import(contentClient, response.req, schema)
-				response.status = 200
-				response.headers['Content-Type'] = 'application/json'
-				response.body = { ok: true }
+				try {
+					await this.contentImporter.import(contentClient, response.req, schema)
+					response.status = 200
+					response.headers['Content-Type'] = 'application/json'
+					response.body = { ok: true }
+
+				} catch (e) {
+					if (e instanceof ImportError) {
+						response.status = 400
+						response.headers['Content-Type'] = 'application/json'
+						response.body = { ok: false, error: e.message }
+
+					} else {
+						throw e
+					}
+				}
 			}
 		}
 	}

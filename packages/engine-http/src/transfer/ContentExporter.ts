@@ -1,6 +1,6 @@
 import { Client, Compiler, Connection } from '@contember/database'
 import { Command } from './Command'
-import { PgSchema, PgSchemaBuilder, PgTableSchema } from './PgSchemaBuilder'
+import { DbSchema, DbSchemaBuilder, DbTableSchema } from './DbSchemaBuilder'
 import TransactionLike = Connection.TransactionLike
 import { VersionedSchema } from '@contember/engine-system-api'
 import { asyncIterableTransaction } from '@contember/database'
@@ -11,7 +11,7 @@ export class ContentExporter {
 		const that = this
 		yield* asyncIterableTransaction(db, async function* (db) {
 			await db.query('SET TRANSACTION ISOLATION LEVEL SERIALIZABLE READ ONLY DEFERRABLE')
-			const commands = that.exportSchema(db, PgSchemaBuilder.build(projectSchema), projectSchema.version)
+			const commands = that.exportSchema(db, DbSchemaBuilder.build(projectSchema), projectSchema.version)
 			yield* that.toBuffer(commands)
 		})
 	}
@@ -24,7 +24,7 @@ export class ContentExporter {
 		}
 	}
 
-	private async* exportSchema(db: Client<TransactionLike>, schema: PgSchema, schemaVersion: string): AsyncIterable<Command> {
+	private async* exportSchema(db: Client<TransactionLike>, schema: DbSchema, schemaVersion: string): AsyncIterable<Command> {
 		yield ['checkSchemaVersion', schemaVersion]
 		yield ['deferForeignKeyConstraints']
 		yield ['truncate', Object.keys(schema.tables)]
@@ -34,7 +34,7 @@ export class ContentExporter {
 		}
 	}
 
-	private async* exportTable(db: Client<TransactionLike>, table: PgTableSchema): AsyncIterable<Command> {
+	private async* exportTable(db: Client<TransactionLike>, table: DbTableSchema): AsyncIterable<Command> {
 		const query = this.buildQuery(db, table)
 		let empty = true
 
@@ -52,7 +52,7 @@ export class ContentExporter {
 		}
 	}
 
-	private buildQuery(db: Client<TransactionLike>, table: PgTableSchema) {
+	private buildQuery(db: Client<TransactionLike>, table: DbTableSchema) {
 		let builder = db.selectBuilder().from(table.name)
 
 		for (const column of Object.keys(table.columns)) {

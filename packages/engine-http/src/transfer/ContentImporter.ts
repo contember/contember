@@ -2,7 +2,7 @@ import { Client, ConstraintHelper, wrapIdentifier } from '@contember/database'
 import { Model } from '@contember/schema'
 import * as Typesafe from '@contember/typesafe'
 import { Command } from './Command'
-import { PgColumnSchema, PgSchema, PgSchemaBuilder } from './PgSchemaBuilder'
+import { DbColumnSchema, DbSchema, DbSchemaBuilder } from './DbSchemaBuilder'
 import { Readable } from 'stream'
 import { assertNever, VersionedSchema } from '@contember/engine-system-api'
 
@@ -23,14 +23,14 @@ export class ImportError extends Error {
 export class ContentImporter {
 	async import(db: Client, stream: Readable, schema: VersionedSchema) {
 		await db.transaction(async db => {
-			const pgSchema = PgSchemaBuilder.build(schema)
+			const pgSchema = DbSchemaBuilder.build(schema)
 			const lines = this.readLines(stream)
 			const commands = this.readCommands(lines)
 			await this.executeCommands(commands, db, pgSchema, schema.version)
 		})
 	}
 
-	private async executeCommands(commands: AsyncIterable<Command>, db: Client, schema: PgSchema, schemaVersion: string) {
+	private async executeCommands(commands: AsyncIterable<Command>, db: Client, schema: DbSchema, schemaVersion: string) {
 		let insertContext: InsertContext | null = null
 
 		for await (const command of commands) {
@@ -112,7 +112,7 @@ export class ContentImporter {
 		await db.query(sql, parameters)
 	}
 
-	private buildInsertContext(schema: PgSchema, tableName: string, columnNames: readonly string[]): InsertContext {
+	private buildInsertContext(schema: DbSchema, tableName: string, columnNames: readonly string[]): InsertContext {
 		const table = schema.tables[tableName]
 		const columns = []
 
@@ -134,7 +134,7 @@ export class ContentImporter {
 		return { table: tableName, columns: columnNames, rowType: rowRuntimeType, rows: [] }
 	}
 
-	private buildRowRuntimeType(columns: PgColumnSchema[]): Typesafe.Type<readonly Cell[]> {
+	private buildRowRuntimeType(columns: DbColumnSchema[]): Typesafe.Type<readonly Cell[]> {
 		return Typesafe.tuple(...columns.map(it => {
 			const base = this.buildColumnRuntimeType(it.type)
 			return it.nullable ? Typesafe.nullable(base) : base

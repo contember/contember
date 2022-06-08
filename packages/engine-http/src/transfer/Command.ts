@@ -1,5 +1,10 @@
 import * as Typesafe from '@contember/typesafe'
 
+export const CheckSchemaVersion = Typesafe.tuple(
+	Typesafe.literal('checkSchemaVersion'),
+	Typesafe.string, // schemaVersion
+)
+
 export const DeferForeignKeyConstraintCommand = Typesafe.tuple(
 	Typesafe.literal('deferForeignKeyConstraints'),
 )
@@ -25,6 +30,7 @@ export const InsertEndCommand = Typesafe.tuple(
 )
 
 export const Command = Typesafe.union(
+	CheckSchemaVersion,
 	DeferForeignKeyConstraintCommand,
 	TruncateCommand,
 	InsertBeginCommand,

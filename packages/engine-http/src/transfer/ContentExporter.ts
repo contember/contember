@@ -1,17 +1,15 @@
 import { Client, Compiler, Connection } from '@contember/database'
-import { Schema } from '@contember/schema'
 import { Command } from './Command'
 import { PgSchema, PgSchemaBuilder, PgTableSchema } from './PgSchemaBuilder'
 import TransactionLike = Connection.TransactionLike
-
-// TODO: checkMigrationHash
+import { VersionedSchema } from '@contember/engine-system-api'
 
 export class ContentExporter {
-	async* export(db: Client, projectSchema: Schema): AsyncIterable<Buffer> {
+	async* export(db: Client, projectSchema: VersionedSchema): AsyncIterable<Buffer> {
 		const that = this
 		yield* this.asyncIterableTransaction(db, async function* (db) {
 			await db.query('SET TRANSACTION ISOLATION LEVEL SERIALIZABLE READ ONLY DEFERRABLE')
-			const commands = that.exportSchema(db, PgSchemaBuilder.build(projectSchema))
+			const commands = that.exportSchema(db, PgSchemaBuilder.build(projectSchema), projectSchema.version)
 			yield* that.toBuffer(commands)
 		})
 	}
@@ -41,7 +39,8 @@ export class ContentExporter {
 		}
 	}
 
-	private async* exportSchema(db: Client<TransactionLike>, schema: PgSchema): AsyncIterable<Command> {
+	private async* exportSchema(db: Client<TransactionLike>, schema: PgSchema, schemaVersion: string): AsyncIterable<Command> {
+		yield ['checkSchemaVersion', schemaVersion]
 		yield ['deferForeignKeyConstraints']
 		yield ['truncate', Object.keys(schema.tables)]
 

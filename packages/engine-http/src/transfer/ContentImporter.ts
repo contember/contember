@@ -1,10 +1,10 @@
 import { Client, ConstraintHelper, wrapIdentifier } from '@contember/database'
-import { Model, Schema } from '@contember/schema'
+import { Model } from '@contember/schema'
 import * as Typesafe from '@contember/typesafe'
 import { Command } from './Command'
 import { PgColumnSchema, PgSchema, PgSchemaBuilder } from './PgSchemaBuilder'
 import { Readable } from 'stream'
-import { assertNever } from '@contember/engine-system-api'
+import { assertNever, VersionedSchema } from '@contember/engine-system-api'
 
 
 type Cell = boolean | number | string | null
@@ -18,22 +18,28 @@ type InsertContext = {
 }
 
 export class ContentImporter {
-	async import(db: Client, stream: Readable, schema: Schema) {
+	async import(db: Client, stream: Readable, schema: VersionedSchema) {
 		await db.transaction(async db => {
 			const pgSchema = PgSchemaBuilder.build(schema)
 			const lines = this.readLines(stream)
 			const commands = this.readCommands(lines)
-			await this.executeCommands(commands, db, pgSchema)
+			await this.executeCommands(commands, db, pgSchema, schema.version)
 		})
 	}
 
-	private async executeCommands(commands: AsyncIterable<Command>, db: Client, schema: PgSchema) {
+	private async executeCommands(commands: AsyncIterable<Command>, db: Client, schema: PgSchema, schemaVersion: string) {
 		let insertContext: InsertContext | null = null
 
 		for await (const command of commands) {
 			const [commandName] = command
 
-			if (commandName === 'deferForeignKeyConstraints') {
+			if (commandName === 'checkSchemaVersion') {
+				const [, expectedVersion] = command
+				if (schemaVersion !== expectedVersion) {
+					throw new Error(`Incompatible schema version`)
+				}
+
+			} else if (commandName === 'deferForeignKeyConstraints') {
 				const constraintHelper = new ConstraintHelper(db)
 				await constraintHelper.setFkConstraintsDeferred()
 

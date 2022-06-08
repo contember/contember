@@ -1,7 +1,6 @@
 {
   "name": "@contember/engine-server-ee",
   "version": "1.2.0-alpha.0",
-  "private": true,
   "license": "proprietary",
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",

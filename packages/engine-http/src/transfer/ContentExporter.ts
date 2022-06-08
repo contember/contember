@@ -1,9 +1,7 @@
-import { Client, Compiler, Connection } from '@contember/database'
+import { asyncIterableTransaction, Client, Compiler, Connection } from '@contember/database'
 import { Command } from './Command'
 import { DbSchema, DbSchemaBuilder, DbTableSchema } from './DbSchemaBuilder'
-import TransactionLike = Connection.TransactionLike
 import { VersionedSchema } from '@contember/engine-system-api'
-import { asyncIterableTransaction } from '@contember/database'
 import { Buffer } from 'buffer'
 
 const DB_FETCH_BATCH_SIZE = 100
@@ -40,7 +38,7 @@ export class ContentExporter {
 		}
 	}
 
-	private async* exportSchema(db: Client<TransactionLike>, schema: DbSchema, schemaVersion: string): AsyncIterable<Command> {
+	private async* exportSchema(db: Client<Connection.TransactionLike>, schema: DbSchema, schemaVersion: string): AsyncIterable<Command> {
 		yield ['checkSchemaVersion', schemaVersion]
 		yield ['deferForeignKeyConstraints']
 		yield ['truncate', Object.keys(schema.tables)]
@@ -50,7 +48,7 @@ export class ContentExporter {
 		}
 	}
 
-	private async* exportTable(db: Client<TransactionLike>, table: DbTableSchema): AsyncIterable<Command> {
+	private async* exportTable(db: Client<Connection.TransactionLike>, table: DbTableSchema): AsyncIterable<Command> {
 		const query = this.buildQuery(db, table)
 		let empty = true
 
@@ -68,7 +66,7 @@ export class ContentExporter {
 		}
 	}
 
-	private buildQuery(db: Client<TransactionLike>, table: DbTableSchema) {
+	private buildQuery(db: Client<Connection.TransactionLike>, table: DbTableSchema) {
 		let builder = db.selectBuilder().from(table.name)
 
 		for (const column of Object.keys(table.columns)) {
@@ -79,7 +77,7 @@ export class ContentExporter {
 		return builder.createQuery(namespaceContext)
 	}
 
-	private async* cursorQuery(db: Client<TransactionLike>, batchSize: number, sql: string, parameters: readonly any[] = []) {
+	private async* cursorQuery(db: Client<Connection.TransactionLike>, batchSize: number, sql: string, parameters: readonly any[] = []) {
 		await db.query(`DECLARE contember_cursor NO SCROLL CURSOR FOR ${sql}`, parameters)
 
 		const fetchSql = `FETCH ${Number(batchSize)} FROM contember_cursor`

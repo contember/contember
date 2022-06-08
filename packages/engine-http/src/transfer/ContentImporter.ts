@@ -68,6 +68,7 @@ export class ContentImporter {
 
 				if (insertContext.rows.length === 100) {
 					await this.insertRows(db, insertContext)
+					insertContext.rows = []
 				}
 
 			} else if (commandName === 'insertEnd') {
@@ -109,7 +110,6 @@ export class ContentImporter {
 		}
 
 		await db.query(sql, parameters)
-		context.rows = []
 	}
 
 	private buildInsertContext(schema: PgSchema, tableName: string, columnNames: readonly string[]): InsertContext {

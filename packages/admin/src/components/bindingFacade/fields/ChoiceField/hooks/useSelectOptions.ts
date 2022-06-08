@@ -14,6 +14,7 @@ type OnSearch = (input: string) => void
 
 interface SelectOptions {
 	options: ChoiceFieldData.Data<EntityAccessor>,
+	allOptions: ChoiceFieldData.Data<EntityAccessor>,
 	onSearch: OnSearch,
 	isLoading: boolean
 }
@@ -36,6 +37,7 @@ export const useSelectOptions = (
 
 	return {
 		options: slicedOptions,
+		allOptions: options,
 		onSearch: setSearchInput,
 		isLoading,
 	}
@@ -183,6 +185,6 @@ const useOptionsLoader = (
 
 	return {
 		renderedState,
-		isLoading: renderedState.query !== input,
+		isLoading: !!optionProps.lazy && renderedState.query !== input,
 	}
 }

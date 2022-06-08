@@ -21,10 +21,10 @@ type SelectCellFilterProps =
 	}
 
 export const SelectCellFilter = ({ filter, setFilter, optionProps }: SelectCellFilterProps) => {
-	const { options, onSearch, isLoading } = useSelectOptions(optionProps)
+	const { options, allOptions, onSearch, isLoading } = useSelectOptions(optionProps)
 	const currentValues = useMemo<ChoiceFieldData.Data<EntityAccessor>>(() => {
-		return options.filter(it => filter.id.includes(it.actualValue.id))
-	}, [filter.id, options])
+		return allOptions.filter(it => filter.id.includes(it.actualValue.id))
+	}, [filter.id, allOptions])
 	const formatMessage = useMessageFormatter(dataGridCellsDictionary)
 
 	return <>

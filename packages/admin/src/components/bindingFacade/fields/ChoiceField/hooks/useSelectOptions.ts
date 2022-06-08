@@ -99,6 +99,9 @@ const useSlicedOptions = (
 ) => {
 	const renderedLimit = optionProps.renderedOptionsLimit ?? RENDERED_OPTIONS_LIMIT
 	return useMemo(() => {
+		if (renderedLimit === 0) {
+			return options
+		}
 		return options.slice(0, renderedLimit)
 	}, [options, renderedLimit])
 }

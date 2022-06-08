@@ -3,7 +3,7 @@ ARG SERVER_DIR
 
 WORKDIR /src
 RUN apk --no-cache add bash
-RUN apk --no-cache add --virtual builds-deps build-base python2
+RUN apk --no-cache add build-base python3
 COPY ./ ./
 
 RUN test ! -f yarn.tar.gz || tar xf yarn.tar.gz -C "$(yarn cache dir)" .

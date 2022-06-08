@@ -47,9 +47,12 @@ export const HasOneSelectCell: FunctionComponent<HasOneSelectProps> = Component(
 				id: [],
 				nullCondition: false,
 			}}
-			filterRenderer={filterProps => <SelectCellFilter optionProps={props} {...filterProps} />}
+			filterRenderer={filterProps => <SelectCellFilter optionProps={{
+				lazy: { initialLimit: 0 },
+				...props,
+			}} {...filterProps} />}
 		>
-			<HasOneSelectCellContent {...props} />
+			<HasOneSelectCellContent lazy={{ initialLimit: 0 }} {...props} />
 		</DataGridColumn>
 	)
 }, 'HasOneSelectField')

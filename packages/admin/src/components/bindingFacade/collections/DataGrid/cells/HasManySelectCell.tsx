@@ -60,9 +60,12 @@ export const HasManySelectCell: FunctionComponent<HasManySelectProps> = Componen
 				id: [],
 				nullCondition: false,
 			}}
-			filterRenderer={filterProps => <SelectCellFilter optionProps={props} {...filterProps} />}
+			filterRenderer={filterProps => <SelectCellFilter optionProps={{
+				lazy: { initialLimit: 0 },
+				...props,
+			}} {...filterProps} />}
 		>
-			<HasManySelectCellContent {...props} />
+			<HasManySelectCellContent lazy={{ initialLimit: 0 }} {...props} />
 		</DataGridColumn>
 	)
 }, 'HasManySelectField')

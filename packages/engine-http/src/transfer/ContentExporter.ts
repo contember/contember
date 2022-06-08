@@ -6,6 +6,8 @@ import { VersionedSchema } from '@contember/engine-system-api'
 import { asyncIterableTransaction } from '@contember/database'
 import { Buffer } from 'buffer'
 
+const DB_FETCH_BATCH_SIZE = 100
+
 export class ContentExporter {
 	async* export(db: Client, projectSchema: VersionedSchema): AsyncIterable<Buffer> {
 		const that = this
@@ -38,7 +40,7 @@ export class ContentExporter {
 		const query = this.buildQuery(db, table)
 		let empty = true
 
-		for await (const row of this.cursorQuery(db, 100, query.sql, query.parameters)) {
+		for await (const row of this.cursorQuery(db, DB_FETCH_BATCH_SIZE, query.sql, query.parameters)) {
 			if (empty) {
 				yield ['insertBegin', table.name, Object.keys(table.columns)]
 				empty = false
@@ -66,13 +68,12 @@ export class ContentExporter {
 	private async* cursorQuery(db: Client<TransactionLike>, batchSize: number, sql: string, parameters: readonly any[] = []) {
 		await db.query(`DECLARE contember_cursor NO SCROLL CURSOR FOR ${sql}`, parameters)
 
-		while (true) {
-			const result = await db.query(`FETCH ${Number(batchSize)} FROM contember_cursor`)
+		const fetchSql = `FETCH ${Number(batchSize)} FROM contember_cursor`
+		let resultPromise: Promise<Connection.Result> | null = db.query(fetchSql)
 
-			if (result.rowCount === 0) {
-				break
-			}
-
+		while (resultPromise !== null) {
+			const result: Connection.Result = await resultPromise
+			resultPromise = result.rowCount < batchSize ? null : db.query(fetchSql) // pipeline
 			yield* result.rows
 		}
 

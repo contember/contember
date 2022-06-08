@@ -100,10 +100,12 @@ const HasManySelectCellContent = Component<HasManySelectProps>(
 	},
 	(props, environment) => {
 		const { subTree, renderedOption } = renderDynamicChoiceFieldStatic(props, environment)
+		const { subTree: currentValuesSubtree } = renderDynamicChoiceFieldStatic(props, environment, { id: { in: [] } })
 
 		return (
 			<>
 				{subTree}
+				{currentValuesSubtree}
 				<HasMany field={props.field} expectedMutation="none">
 					{renderedOption}
 				</HasMany>

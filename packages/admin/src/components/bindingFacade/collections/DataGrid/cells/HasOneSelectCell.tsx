@@ -76,10 +76,12 @@ const HasOneSelectCellContent = Component<BaseDynamicChoiceField & SugaredRelati
 	},
 	(props, environment) => {
 		const { subTree, renderedOption } = renderDynamicChoiceFieldStatic(props, environment)
+		const { subTree: currentValuesSubtree } = renderDynamicChoiceFieldStatic(props, environment, { id: { in: [] } })
 
 		return (
 			<>
 				{subTree}
+				{currentValuesSubtree}
 				<HasOne field={props.field} expectedMutation="none">
 					{renderedOption}
 				</HasOne>

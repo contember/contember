@@ -7,6 +7,7 @@ import { useSelectOptions } from '../../../fields/ChoiceField/hooks/useSelectOpt
 import { FilterRendererProps } from '../base'
 import { dataGridCellsDictionary } from './dataGridCellsDictionary'
 import { EntityAccessor, EntityId } from '@contember/binding'
+import { useCurrentlyChosenEntities } from '../../../fields/ChoiceField/hooks/useCurrentlyChosenEntities'
 
 
 // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
@@ -21,7 +22,8 @@ type SelectCellFilterProps =
 	}
 
 export const SelectCellFilter = ({ filter, setFilter, optionProps }: SelectCellFilterProps) => {
-	const { options, allOptions, onSearch, isLoading } = useSelectOptions(optionProps)
+	const currentlyChosenEntities = useCurrentlyChosenEntities(optionProps, filter.id)
+	const { options, allOptions, onSearch, isLoading } = useSelectOptions(optionProps, currentlyChosenEntities)
 	const currentValues = useMemo<ChoiceFieldData.Data<EntityAccessor>>(() => {
 		return allOptions.filter(it => filter.id.includes(it.actualValue.id))
 	}, [filter.id, allOptions])

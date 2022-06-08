@@ -1,20 +1,20 @@
 import { Model, Schema } from '@contember/schema'
 import { acceptFieldVisitor } from '@contember/schema-utils'
 
-export type PgSchema = { tables: PgTableSchemaMap }
-export type PgTableSchemaMap = Record<string, PgTableSchema>
-export type PgTableSchema = { name: string, columns: PgColumnSchemaMap }
-export type PgColumnSchemaMap = Record<string, PgColumnSchema>
-export type PgColumnSchema = { name: string, type: Model.ColumnType, nullable: boolean }
+export type DbSchema = { tables: DbTableSchemaMap }
+export type DbTableSchemaMap = Record<string, DbTableSchema>
+export type DbTableSchema = { name: string, columns: DbColumnSchemaMap }
+export type DbColumnSchemaMap = Record<string, DbColumnSchema>
+export type DbColumnSchema = { name: string, type: Model.ColumnType, nullable: boolean }
 
-export class PgSchemaBuilder {
-	static build(schema: Schema): PgSchema {
-		const tables: Record<string, PgTableSchema> = {}
+export class DbSchemaBuilder {
+	static build(schema: Schema): DbSchema {
+		const tables: Record<string, DbTableSchema> = {}
 
 		for (const entity of Object.values(schema.model.entities)) {
 			tables[entity.tableName] = {
 				name: entity.tableName,
-				columns: this.buildPgColumnSchemaMap(schema, entity),
+				columns: this.buildDbColumnSchemaMap(schema, entity),
 			}
 
 			for (const joiningTable of this.collectManyHasManyOwned(schema, entity)) {
@@ -25,8 +25,8 @@ export class PgSchemaBuilder {
 		return { tables }
 	}
 
-	private static buildPgColumnSchemaMap(schema: Schema, entity: Model.Entity): PgColumnSchemaMap {
-		const columns: PgColumnSchemaMap = {}
+	private static buildDbColumnSchemaMap(schema: Schema, entity: Model.Entity): DbColumnSchemaMap {
+		const columns: DbColumnSchemaMap = {}
 
 		for (const field of Object.values(entity.fields)) {
 			const column = acceptFieldVisitor(schema.model, entity, field, {
@@ -59,11 +59,11 @@ export class PgSchemaBuilder {
 		return columns
 	}
 
-	private static collectManyHasManyOwned(schema: Schema, entity: Model.Entity): PgTableSchema[] {
+	private static collectManyHasManyOwned(schema: Schema, entity: Model.Entity): DbTableSchema[] {
 		const joiningTables = []
 
 		for (const field of Object.values(entity.fields)) {
-			const joiningTable = acceptFieldVisitor<PgTableSchema | null>(schema.model, entity, field, {
+			const joiningTable = acceptFieldVisitor<DbTableSchema | null>(schema.model, entity, field, {
 				visitColumn: () => null,
 				visitOneHasOneOwning: () => null,
 				visitManyHasOne: () => null,

@@ -3,32 +3,15 @@ import { Command } from './Command'
 import { PgSchema, PgSchemaBuilder, PgTableSchema } from './PgSchemaBuilder'
 import TransactionLike = Connection.TransactionLike
 import { VersionedSchema } from '@contember/engine-system-api'
+import { asyncIterableTransaction } from '@contember/database'
 
 export class ContentExporter {
 	async* export(db: Client, projectSchema: VersionedSchema): AsyncIterable<Buffer> {
 		const that = this
-		yield* this.asyncIterableTransaction(db, async function* (db) {
+		yield* asyncIterableTransaction(db, async function* (db) {
 			await db.query('SET TRANSACTION ISOLATION LEVEL SERIALIZABLE READ ONLY DEFERRABLE')
 			const commands = that.exportSchema(db, PgSchemaBuilder.build(projectSchema), projectSchema.version)
 			yield* that.toBuffer(commands)
-		})
-	}
-
-	private async* asyncIterableTransaction<T>(db: Client, cb: (db2: Client<TransactionLike>) => AsyncIterable<T>): AsyncIterable<T> {
-		yield* await new Promise<AsyncIterable<T>>(async (resolveOuter) => {
-			await db.transaction((db2: Client<TransactionLike>) => {
-				return new Promise<void>((resolveInner, rejectInner) => {
-					resolveOuter((async function* () {
-						try {
-							yield* cb(db2)
-							resolveInner()
-
-						} catch (e) {
-							rejectInner(e)
-						}
-					})())
-				})
-			})
 		})
 	}
 

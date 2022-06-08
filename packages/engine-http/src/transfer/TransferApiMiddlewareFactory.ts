@@ -59,7 +59,7 @@ export class TransferApiMiddlewareFactory {
 			if (kind === 'export') {
 				koaContext.compress = true
 				response.status = 200
-				response.headers['Content-Type'] = 'application/x-ndjson'
+				response.headers['Content-Type'] = 'application/x-ndjson' // https://github.com/ndjson/ndjson-spec
 				response.body = Readable.from(this.contentExporter.export(contentClient, schema))
 
 			} else {

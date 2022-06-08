@@ -17,6 +17,9 @@ type InsertContext = {
 	rows: Array<Row>
 }
 
+export class ImportError extends Error {
+}
+
 export class ContentImporter {
 	async import(db: Client, stream: Readable, schema: VersionedSchema) {
 		await db.transaction(async db => {
@@ -36,7 +39,7 @@ export class ContentImporter {
 			if (commandName === 'checkSchemaVersion') {
 				const [, expectedVersion] = command
 				if (schemaVersion !== expectedVersion) {
-					throw new Error(`Incompatible schema version`)
+					throw new ImportError(`Incompatible schema version`)
 				}
 
 			} else if (commandName === 'deferForeignKeyConstraints') {
@@ -49,7 +52,7 @@ export class ContentImporter {
 
 			} else if (commandName === 'insertBegin') {
 				if (insertContext !== null) {
-					throw new Error(`You need to call insertEnd before calling ${commandName}`)
+					throw new ImportError(`InsertEnd command must be called before calling ${commandName}`)
 				}
 
 				const [, tableName, columnNames] = command
@@ -57,7 +60,7 @@ export class ContentImporter {
 
 			} else if (commandName === 'insertRow') {
 				if (insertContext === null) {
-					throw new Error(`You need to call insertBegin before calling ${commandName}`)
+					throw new ImportError(`InsertBegin command must be called before calling ${commandName}`)
 				}
 
 				const [, values] = command
@@ -69,7 +72,7 @@ export class ContentImporter {
 
 			} else if (commandName === 'insertEnd') {
 				if (insertContext === null) {
-					throw new Error(`You need to call insertBegin before calling ${commandName}`)
+					throw new ImportError(`InsertBegin command must be called before calling ${commandName}`)
 				}
 
 				if (insertContext.rows.length > 0) {
@@ -114,14 +117,14 @@ export class ContentImporter {
 		const columns = []
 
 		if (table === undefined) {
-			throw new Error(`Unknown table ${tableName}`)
+			throw new ImportError(`Unknown table ${tableName}`)
 		}
 
 		for (const columnName of columnNames) {
 			const column = table.columns[columnName]
 
 			if (column === undefined) {
-				throw new Error(`Unknown column ${tableName}.${columnName}`)
+				throw new ImportError(`Unknown column ${tableName}.${columnName}`)
 			}
 
 			columns.push(column)
@@ -154,7 +157,20 @@ export class ContentImporter {
 
 	private async* readCommands(lines: AsyncIterable<string>) {
 		for await (let line of lines) {
-			yield Command(JSON.parse(line))
+			try {
+				yield Command(JSON.parse(line))
+
+			} catch (e) {
+				if (e instanceof SyntaxError) {
+					throw new ImportError(`Line ${line} is not valid JSON`)
+
+				} else if (e instanceof Typesafe.ParseError) {
+					throw new ImportError(`Line ${line} is not valid command`)
+
+				} else {
+					throw e
+				}
+			}
 		}
 	}
 
@@ -175,6 +191,10 @@ export class ContentImporter {
 				yield Buffer.concat(chunks).toString('utf8')
 				chunks = []
 			}
+		}
+
+		if (chunks.length > 0) {
+			throw new ImportError(`Unexpected stream end`)
 		}
 	}
 }

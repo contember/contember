@@ -7,6 +7,7 @@ import { asyncIterableTransaction } from '@contember/database'
 import { Buffer } from 'buffer'
 
 const DB_FETCH_BATCH_SIZE = 100
+const OUTPUT_BUFFER_SIZE = 16 * 1024
 
 export class ContentExporter {
 	async* export(db: Client, projectSchema: VersionedSchema): AsyncIterable<Buffer> {
@@ -19,10 +20,23 @@ export class ContentExporter {
 	}
 
 	private async* toBuffer(commands: AsyncIterable<Command>): AsyncIterable<Buffer> {
-		const newLine = Buffer.from('\n')
+		let chunks = []
+		let chunksLength = 0
+
 		for await (const command of commands) {
-			yield Buffer.from(JSON.stringify(command))
-			yield newLine
+			const chunk = Buffer.from(JSON.stringify(command) + '\n')
+			chunks.push(chunk)
+			chunksLength += chunk.length
+
+			if (chunksLength >= OUTPUT_BUFFER_SIZE) {
+				yield Buffer.concat(chunks)
+				chunks = []
+				chunksLength = 0
+			}
+		}
+
+		if (chunksLength > 0) {
+			yield Buffer.concat(chunks)
 		}
 	}
 

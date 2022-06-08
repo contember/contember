@@ -50,6 +50,7 @@ export type LazyChoiceFieldSettings =
 	| boolean
 	| {
 		limit?: number
+		initialLimit?: number
 		createFilter?: (input: string) => Filter
 		inputDebounceDelay?: number
 	}

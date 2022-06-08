@@ -38,7 +38,7 @@ export const getDesugaredEntityList = (options: OptionsAsEntityList, environment
 	return {
 		...qualifiedEntityList,
 		filter: filter && qualifiedEntityList.filter ? { and: [filter, qualifiedEntityList.filter] } : (qualifiedEntityList.filter ?? filter),
-		limit: getLazyLimit(lazyOptions) ?? qualifiedEntityList.limit,
+		limit: getLazyLimit(lazyOptions, filter === undefined) ?? qualifiedEntityList.limit,
 	}
 }
 
@@ -51,14 +51,19 @@ export const getDesugaredFieldList = (options: OptionsAsFieldList, environment: 
 	return {
 		...desugarQualifiedFieldList,
 		filter: filter && desugarQualifiedFieldList.filter ? { and: [filter, desugarQualifiedFieldList.filter] } : (desugarQualifiedFieldList.filter ?? filter),
-		limit: getLazyLimit(lazyOptions) ?? desugarQualifiedFieldList.limit,
+		limit: getLazyLimit(lazyOptions, filter === undefined) ?? desugarQualifiedFieldList.limit,
 	}
 }
 
 const DEFAULT_LAZY_LIMIT = 100
-export const getLazyLimit = (lazyOptions: LazyChoiceFieldSettings): number | undefined => {
+const DEFAULT_LAZY_INIT_LIMIT = 20
+export const getLazyLimit = (lazyOptions: LazyChoiceFieldSettings, isInitial: boolean): number | undefined => {
 	if (!lazyOptions) {
 		return undefined
 	}
-	return typeof lazyOptions === 'object' && lazyOptions.limit ? lazyOptions.limit : DEFAULT_LAZY_LIMIT
+	const normalized = typeof lazyOptions === 'object' ? lazyOptions : {}
+	if (isInitial) {
+		return normalized.initialLimit ?? Math.min(normalized.limit ?? DEFAULT_LAZY_INIT_LIMIT, DEFAULT_LAZY_INIT_LIMIT)
+	}
+	return normalized.limit ?? DEFAULT_LAZY_LIMIT
 }

@@ -22,6 +22,9 @@ export const useCommonReactSelectProps = <T>({
 	const styles = useCommonStyles(isInvalid)
 	const reactSelectState = useStateManager<ChoiceFieldData.SingleDatum<T>, boolean, never, {}>({
 		onInputChange: onSearch,
+		onFocus: e => {
+			onSearch?.(e.target.value)
+		},
 	})
 	return {
 		...reactSelectProps,

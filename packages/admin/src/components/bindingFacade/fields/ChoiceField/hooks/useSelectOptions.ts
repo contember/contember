@@ -22,7 +22,7 @@ export const useSelectOptions = (
 	optionProps: BaseDynamicChoiceField,
 	additionalAccessors: EntityAccessor[] = [],
 ): SelectOptions => {
-	const [input, setSearchInput] = useState('')
+	const [input, setSearchInput] = useState<string | undefined>(undefined)
 	const { renderedState, isLoading } = useOptionsLoader(optionProps, input)
 	const desugaredOptionPath = useDesugaredOptionPath(optionProps, renderedState.filter)
 
@@ -57,7 +57,7 @@ const useMergedEntities = (
 const useFuseFilteredOptions = (
 	optionProps: BaseDynamicChoiceField,
 	options: ChoiceFieldData.Data<EntityAccessor>,
-	input: string,
+	input: string | undefined,
 ) => {
 	const fuseOpts = optionProps.fuseOptions ?? true
 	const fuse = useMemo(
@@ -83,7 +83,7 @@ const useFuseFilteredOptions = (
 const useCustomTransformedOptions = (
 	optionProps: BaseDynamicChoiceField,
 	options: ChoiceFieldData.Data<EntityAccessor>,
-	input: string,
+	input: string | undefined,
 ) => {
 	const transformFn = optionProps.transformOptions
 	return useMemo(() => {
@@ -110,13 +110,13 @@ const useSlicedOptions = (
 interface OptionsLoaderRenderedState {
 	treeRootId: TreeRootId | undefined,
 	filter: Filter | undefined
-	query: string
+	query: string | undefined
 }
 
 
 const useOptionsLoader = (
 	optionProps: BaseDynamicChoiceField,
-	input: string,
+	input: string | undefined,
 ): {
 	renderedState: OptionsLoaderRenderedState,
 	isLoading: boolean,
@@ -131,7 +131,7 @@ const useOptionsLoader = (
 	const [renderedState, setRenderedState] = useState<OptionsLoaderRenderedState>({
 		treeRootId: useTreeRootId(),
 		filter: undefined,
-		query: '',
+		query: undefined,
 	})
 
 	const desugaredOptionPath = useDesugaredOptionPath(optionProps, undefined)
@@ -139,29 +139,32 @@ const useOptionsLoader = (
 	const extendTree = useExtendTree()
 	const environment = useEnvironment()
 	const createFilter = useCreateOptionsFilter(desugaredOptionPath, optionProps.searchByFields, optionProps.lazy)
-
+	const isEmptyInit = typeof optionProps.lazy === 'object' && optionProps.lazy.initialLimit === 0
 	useEffect(() => {
-		if (input === '') {
+		if (input === '' && !isEmptyInit) {
 			setRenderedState({
 				treeRootId: undefined,
 				filter: undefined,
 				query: '',
 			})
 		}
-	}, [input])
+	}, [input, isEmptyInit])
 
 	useEffect(() => {
 		if (
 			!optionProps.lazy
 			|| debouncedInput === renderedState.query
-			|| debouncedInput === ''
 			|| debouncedInput !== inputRef.current
+			|| debouncedInput === undefined
 		) {
+			return
+		}
+		if (debouncedInput === '' && !isEmptyInit) {
 			return
 		}
 
 		(async () => {
-			const filter = createFilter(debouncedInput)
+			const filter = debouncedInput === '' ? {} : createFilter(debouncedInput)
 			const { subTree } = renderDynamicChoiceFieldStatic({
 				...optionProps,
 				createNewForm: undefined,
@@ -176,7 +179,7 @@ const useOptionsLoader = (
 				})
 			}
 		})()
-	}, [createFilter, debouncedInput, environment, extendTree, optionProps, renderedState.query])
+	}, [createFilter, debouncedInput, environment, extendTree, isEmptyInit, optionProps, renderedState.query])
 
 	return {
 		renderedState,

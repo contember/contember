@@ -42,7 +42,7 @@ export type BaseDynamicChoiceField =
 		createNewForm?: ReactElement
 		lazy?: LazyChoiceFieldSettings
 		renderedOptionsLimit?: number
-		transformOptions?: (data: ChoiceFieldData.Data<EntityAccessor>, input: string) => ChoiceFieldData.Data<EntityAccessor>
+		transformOptions?: (data: ChoiceFieldData.Data<EntityAccessor>, input: string | undefined) => ChoiceFieldData.Data<EntityAccessor>
 	}
 
 export type LazyChoiceFieldSettings =

@@ -4,6 +4,7 @@ import { PgSchema, PgSchemaBuilder, PgTableSchema } from './PgSchemaBuilder'
 import TransactionLike = Connection.TransactionLike
 import { VersionedSchema } from '@contember/engine-system-api'
 import { asyncIterableTransaction } from '@contember/database'
+import { Buffer } from 'buffer'
 
 export class ContentExporter {
 	async* export(db: Client, projectSchema: VersionedSchema): AsyncIterable<Buffer> {
@@ -16,9 +17,10 @@ export class ContentExporter {
 	}
 
 	private async* toBuffer(commands: AsyncIterable<Command>): AsyncIterable<Buffer> {
+		const newLine = Buffer.from('\n')
 		for await (const command of commands) {
 			yield Buffer.from(JSON.stringify(command))
-			yield Buffer.from('\n')
+			yield newLine
 		}
 	}
 

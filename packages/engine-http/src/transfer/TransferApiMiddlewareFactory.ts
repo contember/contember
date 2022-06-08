@@ -6,6 +6,7 @@ import { ContentExporter } from './ContentExporter'
 import { ContentImporter, ImportError } from './ContentImporter'
 import { Logger } from '@contember/engine-common'
 import { Readable } from 'stream'
+import { TenantRole } from '@contember/engine-tenant-api'
 
 type TransferApiMiddlewareState =
 	& TimerMiddlewareState
@@ -32,8 +33,8 @@ export class TransferApiMiddlewareFactory {
 			const authResult = await groupContainer.authenticator.authenticate({ request, timer })
 			koaContext.state.authResult = authResult
 
-			if (!authResult.roles.includes('superadmin')) {
-				// TODO
+			if (!authResult.roles.includes(TenantRole.SUPER_ADMIN) && !authResult.roles.includes(TenantRole.PROJECT_ADMIN)) {
+				throw new HttpError(`Not allowed`, 403)
 			}
 
 			const logger = new Logger(console.log)

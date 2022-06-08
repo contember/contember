@@ -67,7 +67,7 @@ export const MultiSelectFieldInner = typedMemo(
 			onSearch,
 		})
 
-		const selectOnChange = useCallback((newValue: unknown, actionMeta: ActionMeta<ChoiceFieldData.SingleDatum<T>>) => {
+		const selectOnChange = useCallback((newValue: unknown, actionMeta: ActionMeta<ChoiceFieldData.SingleOption<T>>) => {
 			if (actionMeta.action === 'select-option') {
 					onAdd(actionMeta.option!)
 			} else if (actionMeta.action === 'remove-value') {
@@ -79,7 +79,7 @@ export const MultiSelectFieldInner = typedMemo(
 			}
 		}, [currentValues, onAdd, onClear, onRemove])
 
-		const allSelectProps: SelectProps<ChoiceFieldData.SingleDatum<T>, boolean, never> = {
+		const allSelectProps: SelectProps<ChoiceFieldData.SingleOption<T>, boolean, never> = {
 			...selectProps,
 			isMulti: true,
 			isClearable: true,
@@ -127,7 +127,7 @@ const getHelperContainer: HelperContainerGetter = () => {
 }
 
 
-const SortableSelect = SortableContainer(Select) as React.ComponentClass<SelectProps<ChoiceFieldData.SingleDatum<any>, boolean, never> & SortableContainerProps>
+const SortableSelect = SortableContainer(Select) as React.ComponentClass<SelectProps<ChoiceFieldData.SingleOption<any>, boolean, never> & SortableContainerProps>
 const SortableMultiValue = SortableElement(
 	(props: MultiValueProps<any, boolean, never>) => {
 		// this prevents the menu from being opened/closed when the user clicks

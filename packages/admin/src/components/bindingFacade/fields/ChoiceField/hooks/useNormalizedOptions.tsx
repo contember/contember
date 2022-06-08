@@ -9,13 +9,13 @@ export const useNormalizedOptions = (
 	optionEntities: EntityAccessor[],
 	desugaredOptionPath: DesugaredOptionPath,
 	{ searchByFields, ...props }: BaseDynamicChoiceField,
-): ChoiceFieldData.Data<EntityAccessor> => {
+): ChoiceFieldData.Options<EntityAccessor> => {
 	const desugaredSearchFields = useSearchFields(searchByFields)
 	const renderOption = 'renderOption' in props && props.renderOption ? props.renderOption : undefined
 	const optionLabel = 'optionLabel' in props && props.optionLabel ? props.optionLabel : undefined
 	return useMemo(
 		() =>
-			optionEntities.map((item, i): ChoiceFieldData.SingleDatum<EntityAccessor> => {
+			optionEntities.map((item, i): ChoiceFieldData.SingleOption<EntityAccessor> => {
 				let label
 				if (renderOption) {
 					label = renderOption(item)
@@ -44,7 +44,7 @@ export const useNormalizedOptions = (
 					key: item.id.toString(),
 					label,
 					searchKeywords,
-					actualValue: item,
+					value: item,
 				}
 			}),
 		[optionEntities, renderOption, optionLabel, desugaredOptionPath, desugaredSearchFields],

@@ -4,15 +4,15 @@ import Fuse from 'fuse.js'
 
 export interface SelectFuseOptionsProps<T> {
 	fuseOptions?:
-		| Fuse.IFuseOptions<ChoiceFieldData.SingleDatum<T>>
+		| Fuse.IFuseOptions<ChoiceFieldData.SingleOption<T>>
 		| boolean
 }
 
 export const useFuseFilteredOptions = <T>(
 	optionProps: SelectFuseOptionsProps<T>,
-	options: ChoiceFieldData.Data<T>,
+	options: ChoiceFieldData.Options<T>,
 	input: string,
-): ChoiceFieldData.Data<T> => {
+): ChoiceFieldData.Options<T> => {
 	const fuseOpts = optionProps.fuseOptions ?? true
 	const fuse = useMemo(
 		() => {

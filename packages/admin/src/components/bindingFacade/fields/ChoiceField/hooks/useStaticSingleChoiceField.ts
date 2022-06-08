@@ -13,12 +13,12 @@ export const useStaticSingleChoiceField = (
 	const data = useNormalizedOptions(props.options)
 	const filteredData = useFuseFilteredOptions(props, data, input)
 
-	const currentValue = useMemo(() => data.find(it => field.hasValue(it.actualValue)) ?? null, [data, field])
+	const currentValue = useMemo(() => data.find(it => field.hasValue(it.value)) ?? null, [data, field])
 
 	const errors = useAccessorErrors(field)
 
-	const onSelect = useCallback((value: ChoiceFieldData.SingleDatum<Scalar>) => {
-		field.updateValue(value.actualValue)
+	const onSelect = useCallback((value: ChoiceFieldData.SingleOption<Scalar>) => {
+		field.updateValue(value.value)
 	}, [field])
 	const onClear = useCallback(() => {
 		field.updateValue(null)
@@ -39,14 +39,14 @@ const useNormalizedOptions = (options: OptionallyVariableStaticOption[]) => {
 	const environment = useEnvironment()
 	return useMemo(
 		() =>
-			options.map(({ label, description, value: actualValue, searchKeywords }, i): ChoiceFieldData.SingleDatum<Scalar> => {
-				const value = VariableInputTransformer.transformValue(actualValue, environment)
+			options.map(({ label, description, value, searchKeywords }, i): ChoiceFieldData.SingleOption<Scalar> => {
+				const transformValue = VariableInputTransformer.transformValue(value, environment)
 				return ({
 					key: i.toString(),
-					searchKeywords: searchKeywords ?? `${label} ${value}`,
+					searchKeywords: searchKeywords ?? `${label} ${transformValue}`,
 					label,
 					description,
-					actualValue: value,
+					value: transformValue,
 				})
 			}),
 		[environment, options],

@@ -54,7 +54,7 @@ export interface NativeSelectFieldInnerProps<ActualValue> extends ChoiceFieldDat
 export const NativeSelectFieldInner = memo(forwardRef<HTMLSelectElement, NativeSelectFieldInnerProps<any>>((props, ref) => {
 	const isMutating = useMutationState()
 	const labelMiddleware = useLabelMiddleware()
-	const options: SelectOption<ChoiceFieldData.SingleDatum>[] = props.data.map(it => {
+	const options: SelectOption<ChoiceFieldData.SingleOption>[] = props.data.map(it => {
 		if (typeof it.label !== 'string') {
 			throw new BindingError(`The labels of <SelectField /> items must be strings!`)
 		}
@@ -74,7 +74,7 @@ export const NativeSelectFieldInner = memo(forwardRef<HTMLSelectElement, NativeS
 					notNull={props.notNull ?? flipValue(props.allowNull)}
 					value={props.currentValue}
 					placeholder={props.placeholder}
-					onChange={(value?: ChoiceFieldData.SingleDatum | null) => {
+					onChange={(value?: ChoiceFieldData.SingleOption | null) => {
 						if (value) {
 							props.onSelect(value)
 						} else {

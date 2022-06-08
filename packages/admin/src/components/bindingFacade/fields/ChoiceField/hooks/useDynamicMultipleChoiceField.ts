@@ -46,10 +46,10 @@ export const useDynamicMultipleChoiceField = (
 		errors,
 		onClear: clear,
 		onAdd: useCallback(value => {
-			getCurrentValues().connectEntity(value.actualValue)
+			getCurrentValues().connectEntity(value.value)
 		}, [getCurrentValues]),
 		onRemove: useCallback(value => {
-			getCurrentValues().disconnectEntity(value.actualValue)
+			getCurrentValues().disconnectEntity(value.value)
 		}, [getCurrentValues]),
 		onAddNew: useOnAddNew({
 			...props,

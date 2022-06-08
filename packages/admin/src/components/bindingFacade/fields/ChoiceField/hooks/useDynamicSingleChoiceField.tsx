@@ -43,7 +43,7 @@ export const useDynamicSingleChoiceField = (
 		errors,
 		currentValue: currentValues.length ? currentValues[0] : null,
 		onSelect: value => {
-				currentValueParent.connectEntityAtField(currentValueFieldName, value.actualValue)
+				currentValueParent.connectEntityAtField(currentValueFieldName, value.value)
 		},
 		onClear: () => {
 			currentValueParent.disconnectEntityAtField(currentValueFieldName)

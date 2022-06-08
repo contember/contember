@@ -80,7 +80,7 @@ export const SelectFieldInner = memo(
 						value={currentValue}
 						isLoading={isLoading}
 						onChange={(newValue, actionMeta) => {
-							const value = newValue as ChoiceFieldData.SingleDatum
+							const value = newValue as ChoiceFieldData.SingleOption
 							if (actionMeta.action === 'select-option') {
 								onSelect(value)
 							} else if (actionMeta.action === 'clear') {

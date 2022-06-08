@@ -69,10 +69,10 @@ export const useDynamicMultipleChoiceWithConnectingEntityField = (
 		errors,
 		onClear: clear,
 		onAdd: useCallback(value => {
-			onAdd(value.actualValue)
+			onAdd(value.value)
 		}, [onAdd]),
 		onRemove: useCallback(value => {
-			optionIdToConnectingEntityMap.get(value.actualValue.id)?.deleteEntity()
+			optionIdToConnectingEntityMap.get(value.value.id)?.deleteEntity()
 		}, [optionIdToConnectingEntityMap]),
 		onAddNew: useOnAddNew({
 			...props,

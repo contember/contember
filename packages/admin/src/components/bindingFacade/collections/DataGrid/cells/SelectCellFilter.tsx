@@ -24,8 +24,8 @@ type SelectCellFilterProps =
 export const SelectCellFilter = ({ filter, setFilter, optionProps }: SelectCellFilterProps) => {
 	const currentlyChosenEntities = useCurrentlyChosenEntities(optionProps, filter.id)
 	const { options, allOptions, onSearch, isLoading } = useSelectOptions(optionProps, currentlyChosenEntities)
-	const currentValues = useMemo<ChoiceFieldData.Data<EntityAccessor>>(() => {
-		return allOptions.filter(it => filter.id.includes(it.actualValue.id))
+	const currentValues = useMemo<ChoiceFieldData.Options<EntityAccessor>>(() => {
+		return allOptions.filter(it => filter.id.includes(it.value.id))
 	}, [filter.id, allOptions])
 	const formatMessage = useMessageFormatter(dataGridCellsDictionary)
 
@@ -33,8 +33,8 @@ export const SelectCellFilter = ({ filter, setFilter, optionProps }: SelectCellF
 		<MultiSelectFieldInner
 			label={undefined}
 			data={options}
-			onAdd={(val: ChoiceFieldData.SingleDatum<EntityAccessor>) => setFilter({ ...filter, id: [...filter.id, val.actualValue.id] })}
-			onRemove={val => setFilter({ ...filter, id: filter.id.filter(it => it !== val.actualValue.id) })}
+			onAdd={(val: ChoiceFieldData.SingleOption<EntityAccessor>) => setFilter({ ...filter, id: [...filter.id, val.value.id] })}
+			onRemove={val => setFilter({ ...filter, id: filter.id.filter(it => it !== val.value.id) })}
 			errors={undefined}
 			currentValues={currentValues}
 			onClear={() => {

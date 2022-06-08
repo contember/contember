@@ -37,7 +37,7 @@ export const DiscriminatedBlocks: FunctionComponent<DiscriminatedBlocksProps> = 
 						placeholder="Choose…"
 					/>
 				)}
-				{metadata.currentValue && normalizedBlocks.get(metadata.currentValue.actualValue)?.datum.children}
+				{metadata.currentValue && normalizedBlocks.get(metadata.currentValue.value)?.datum.children}
 			</>
 		)
 	},

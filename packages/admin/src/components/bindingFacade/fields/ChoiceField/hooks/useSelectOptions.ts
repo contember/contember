@@ -13,8 +13,8 @@ import Fuse from 'fuse.js'
 type OnSearch = (input: string) => void
 
 interface SelectOptions {
-	options: ChoiceFieldData.Data<EntityAccessor>,
-	allOptions: ChoiceFieldData.Data<EntityAccessor>,
+	options: ChoiceFieldData.Options<EntityAccessor>,
+	allOptions: ChoiceFieldData.Options<EntityAccessor>,
 	onSearch: OnSearch,
 	isLoading: boolean
 }
@@ -58,7 +58,7 @@ const useMergedEntities = (
 
 const useFuseFilteredOptions = (
 	optionProps: BaseDynamicChoiceField,
-	options: ChoiceFieldData.Data<EntityAccessor>,
+	options: ChoiceFieldData.Options<EntityAccessor>,
 	input: string | undefined,
 ) => {
 	const fuseOpts = optionProps.fuseOptions ?? true
@@ -84,7 +84,7 @@ const useFuseFilteredOptions = (
 
 const useCustomTransformedOptions = (
 	optionProps: BaseDynamicChoiceField,
-	options: ChoiceFieldData.Data<EntityAccessor>,
+	options: ChoiceFieldData.Options<EntityAccessor>,
 	input: string | undefined,
 ) => {
 	const transformFn = optionProps.transformOptions
@@ -97,7 +97,7 @@ const RENDERED_OPTIONS_LIMIT = 100
 
 const useSlicedOptions = (
 	optionProps: BaseDynamicChoiceField,
-	options: ChoiceFieldData.Data<EntityAccessor>,
+	options: ChoiceFieldData.Options<EntityAccessor>,
 ) => {
 	const renderedLimit = optionProps.renderedOptionsLimit ?? RENDERED_OPTIONS_LIMIT
 	return useMemo(() => {

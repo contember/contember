@@ -1,8 +1,9 @@
-import { asyncIterableTransaction, Client, Compiler, Connection } from '@contember/database'
+import { asyncIterableTransaction, Client, Compiler, Connection, wrapIdentifier } from '@contember/database'
 import { Command } from './Command'
 import { DbSchema, DbSchemaBuilder, DbTableSchema } from './DbSchemaBuilder'
 import { VersionedSchema } from '@contember/engine-system-api'
 import { Buffer } from 'buffer'
+import { Model } from '@contember/schema'
 
 const DB_FETCH_BATCH_SIZE = 100
 const OUTPUT_BUFFER_SIZE = 16 * 1024
@@ -69,8 +70,13 @@ export class ContentExporter {
 	private buildQuery(db: Client<Connection.TransactionLike>, table: DbTableSchema) {
 		let builder = db.selectBuilder().from(table.name)
 
-		for (const column of Object.keys(table.columns)) {
-			builder = builder.select(column)
+		for (const column of Object.values(table.columns)) {
+			if (column.type === Model.ColumnType.Json || column.type === Model.ColumnType.Date || column.type === Model.ColumnType.DateTime) {
+				builder = builder.select(expr => expr.raw(`${wrapIdentifier(column.name)}::text`))
+
+			} else {
+				builder = builder.select(column.name)
+			}
 		}
 
 		const namespaceContext = new Compiler.Context(db.schema, new Set())

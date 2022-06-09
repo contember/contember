@@ -193,7 +193,7 @@ export class ContentImporter {
 			}
 		}
 
-		if (chunks.length > 0) {
+		if (Buffer.concat(chunks).length > 0) {
 			throw new ImportError(`Unexpected stream end`)
 		}
 	}

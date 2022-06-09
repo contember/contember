@@ -4,9 +4,9 @@ import { BareUploadField, FileInputPublicProps } from '../internalComponents'
 import type { StockImageFileKindProps } from '../stockFileKinds'
 import { getStockImageFileKind } from '../stockFileKinds'
 
-export interface ImageUploadFieldProps<AcceptArtifacts = unknown>
-	extends StockImageFileKindProps<AcceptArtifacts>,
-		FileInputPublicProps {}
+export type ImageUploadFieldProps<AcceptArtifacts = unknown> =
+	& StockImageFileKindProps<AcceptArtifacts>
+	& FileInputPublicProps
 
 export const ImageUploadField = Component<ImageUploadFieldProps>(
 	props => (

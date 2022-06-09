@@ -4,14 +4,15 @@ import { BareFileRepeater, FileInputPublicProps } from '../internalComponents'
 import type { StockAnyFileKindProps } from '../stockFileKinds'
 import { getStockAnyFileKind } from '../stockFileKinds'
 
-export interface AnyFileRepeaterProps<AcceptArtifacts = unknown>
-	extends SugaredRelativeEntityList,
-		StockAnyFileKindProps<AcceptArtifacts>,
-		Omit<FileInputPublicProps, 'label'> {
-	sortableBy?: SugaredFieldProps['field']
-	boxLabel?: ReactNode
-	label: ReactNode
-}
+export type AnyFileRepeaterProps<AcceptArtifacts = unknown> =
+	& SugaredRelativeEntityList
+	& StockAnyFileKindProps<AcceptArtifacts>
+	& FileInputPublicProps
+	& {
+		sortableBy?: SugaredFieldProps['field']
+		boxLabel?: ReactNode
+		label: ReactNode
+	}
 
 export const AnyFileRepeater = Component<AnyFileRepeaterProps>(
 	props => (

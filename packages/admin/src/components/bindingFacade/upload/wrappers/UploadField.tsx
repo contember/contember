@@ -5,9 +5,12 @@ import type { FileInputPublicProps } from '../internalComponents'
 import { BareUploadField } from '../internalComponents'
 import { getResolvedFileKinds, HybridFileKindProps } from '../templating'
 
-export interface UploadFieldProps extends FileInputPublicProps, HybridFileKindProps {
-	children?: ReactNode
-}
+export type UploadFieldProps =
+	& FileInputPublicProps
+	&	HybridFileKindProps
+	& {
+		children?: ReactNode
+	}
 
 export const UploadField = Component<UploadFieldProps>(
 	({

@@ -4,14 +4,15 @@ import { BareFileRepeater, FileInputPublicProps } from '../internalComponents'
 import type { StockVideoFileKindProps } from '../stockFileKinds'
 import { getStockVideoFileKind } from '../stockFileKinds'
 
-export interface VideoFileRepeaterProps<AcceptArtifacts = unknown>
-	extends SugaredRelativeEntityList,
-		StockVideoFileKindProps<AcceptArtifacts>,
-		Omit<FileInputPublicProps, 'label'> {
-	sortableBy?: SugaredFieldProps['field']
-	boxLabel?: ReactNode
-	label: ReactNode
-}
+export type VideoFileRepeaterProps<AcceptArtifacts = unknown> =
+	& SugaredRelativeEntityList
+	& StockVideoFileKindProps<AcceptArtifacts>
+	& FileInputPublicProps
+	& {
+		sortableBy?: SugaredFieldProps['field']
+		boxLabel?: ReactNode
+		label: ReactNode
+	}
 
 export const VideoFileRepeater = Component<VideoFileRepeaterProps>(
 	props => (

@@ -5,12 +5,16 @@ import { useMemo } from 'react'
 import { BareFileRepeater, FileInputPublicProps } from '../internalComponents'
 import { getResolvedFileKinds, HybridFileKindProps } from '../templating'
 
-export interface FileRepeaterProps extends SugaredRelativeEntityList, HybridFileKindProps, Omit<FileInputPublicProps, 'label'> {
-	boxLabel?: ReactNode
-	label: ReactNode
-	sortableBy?: SugaredFieldProps['field']
-	children?: ReactNode
-}
+export type FileRepeaterProps =
+	& SugaredRelativeEntityList
+	& HybridFileKindProps
+	& Omit<FileInputPublicProps, 'label'>
+	& {
+		boxLabel?: ReactNode
+		label: ReactNode
+		sortableBy?: SugaredFieldProps['field']
+		children?: ReactNode
+	}
 
 export const FileRepeater = Component<FileRepeaterProps>(
 	({

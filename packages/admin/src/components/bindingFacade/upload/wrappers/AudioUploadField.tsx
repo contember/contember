@@ -4,9 +4,9 @@ import { BareUploadField, FileInputPublicProps } from '../internalComponents'
 import type { StockAudioFileKindProps } from '../stockFileKinds'
 import { getStockAudioFileKind } from '../stockFileKinds'
 
-export interface AudioUploadFieldProps<AcceptArtifacts = unknown>
-	extends StockAudioFileKindProps<AcceptArtifacts>,
-		FileInputPublicProps {}
+export type AudioUploadFieldProps<AcceptArtifacts = unknown> =
+	& StockAudioFileKindProps<AcceptArtifacts>
+	& FileInputPublicProps
 
 export const AudioUploadField = Component<AudioUploadFieldProps>(
 	props => (

@@ -11,7 +11,7 @@ type Cell = boolean | number | string | null
 type Row = readonly Cell[]
 
 type InsertContext = {
-	table: string,
+	table: string
 	columns: readonly string[]
 	rowType: Typesafe.Type<Row>
 	rows: Array<Row>

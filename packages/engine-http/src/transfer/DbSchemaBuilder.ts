@@ -3,9 +3,9 @@ import { acceptFieldVisitor } from '@contember/schema-utils'
 
 export type DbSchema = { tables: DbTableSchemaMap }
 export type DbTableSchemaMap = Record<string, DbTableSchema>
-export type DbTableSchema = { name: string, columns: DbColumnSchemaMap }
+export type DbTableSchema = { name: string; columns: DbColumnSchemaMap }
 export type DbColumnSchemaMap = Record<string, DbColumnSchema>
-export type DbColumnSchema = { name: string, type: Model.ColumnType, nullable: boolean }
+export type DbColumnSchema = { name: string; type: Model.ColumnType; nullable: boolean }
 
 export class DbSchemaBuilder {
 	static build(schema: Schema): DbSchema {

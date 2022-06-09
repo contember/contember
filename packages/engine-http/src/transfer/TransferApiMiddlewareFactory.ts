@@ -37,6 +37,7 @@ export class TransferApiMiddlewareFactory {
 				throw new HttpError(`Not allowed`, 403)
 			}
 
+			// eslint-disable-next-line no-console
 			const logger = new Logger(console.log)
 			const projectContainer = await groupContainer.projectContainerResolver.getProjectContainer(params.projectSlug, { alias: true, logger })
 

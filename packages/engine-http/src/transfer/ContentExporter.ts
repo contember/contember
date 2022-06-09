@@ -10,6 +10,7 @@ const OUTPUT_BUFFER_SIZE = 16 * 1024
 
 export class ContentExporter {
 	async* export(db: Client, projectSchema: VersionedSchema): AsyncIterable<Buffer> {
+		// eslint-disable-next-line @typescript-eslint/no-this-alias
 		const that = this
 		yield* asyncIterableTransaction(db, async function* (db) {
 			await db.query('SET TRANSACTION ISOLATION LEVEL SERIALIZABLE READ ONLY DEFERRABLE')

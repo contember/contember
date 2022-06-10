@@ -35,13 +35,6 @@ export const getVideoFileDataExtractor: (props: VideoFileDataExtractorProps) => 
 			video.src = objectUrl
 		})
 	},
-	destroy: ({ entity }) => {
-		entity.batchUpdates(getAccessor => {
-			widthField && getAccessor().getField(widthField).updateValue(null)
-			heightField && getAccessor().getField(heightField).updateValue(null)
-			durationField && getAccessor().getField(durationField).updateValue(null)
-		})
-	},
 	populateFields: ({ entity, extractedData }) => {
 		entity.batchUpdates(getAccessor => {
 			widthField && getAccessor().getField(widthField).updateValue(extractedData.videoWidth)

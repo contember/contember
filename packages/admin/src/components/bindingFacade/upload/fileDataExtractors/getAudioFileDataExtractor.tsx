@@ -25,9 +25,6 @@ export const getAudioFileDataExtractor: (props: AudioFileDataExtractorProps) => 
 			audio.src = objectUrl
 		})
 	},
-	destroy: ({ entity }) => {
-		!!durationField && entity.getField(durationField).updateValue(null)
-	},
 	populateFields: ({ entity, extractedData }) => {
 		!!durationField && entity.getField(durationField).updateValue(extractedData.duration)
 	},

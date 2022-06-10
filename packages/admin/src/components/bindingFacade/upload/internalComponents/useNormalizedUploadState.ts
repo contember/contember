@@ -45,12 +45,9 @@ export const useNormalizedUploadState = ({
 				}
 
 				for (const fileKind of eachFileKind(fileKinds)) {
-					const getExtractorEntity =
-						fileKind.baseEntity === undefined ? getEntity : getEntity().getEntity(fileKind.baseEntity).getAccessor
-
-					for (const extractor of fileKind.extractors) {
-						extractor.destroy?.({ entity: getExtractorEntity() })
-					}
+					const getExtractorEntity = fileKind.baseEntity === undefined
+						? getEntity
+						: getEntity().getEntity(fileKind.baseEntity).getAccessor
 
 					if (fileKind.baseEntity !== undefined) {
 						getExtractorEntity().deleteEntity()
@@ -70,8 +67,7 @@ export const useNormalizedUploadState = ({
 
 	const onDrop = useCallback(
 		(files: File[]) => {
-			const { getEntityByKey, getEntityListSubTree, getEntitySubTree, contentClient, systemClient, tenantClient } =
-				bindingOperations
+			const { getEntityByKey, getEntityListSubTree, getEntitySubTree, contentClient, systemClient, tenantClient } = bindingOperations
 
 			const idsByFile = new Map<File, FileId>()
 			const filesWithIds: [FileId, File][] = []

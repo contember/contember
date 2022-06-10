@@ -20,14 +20,6 @@ export const getGenericFileMetadataExtractor: (
 			{!!lastModifiedField && <SugaredField field={lastModifiedField} />}
 		</>
 	),
-	destroy: ({ entity }) => {
-		entity.batchUpdates(getAccessor => {
-			fileNameField && getAccessor().getField(fileNameField).updateValue(null)
-			fileSizeField && getAccessor().getField(fileSizeField).updateValue(null)
-			fileTypeField && getAccessor().getField(fileTypeField).updateValue(null)
-			lastModifiedField && getAccessor().getField(lastModifiedField).updateValue(null)
-		})
-	},
 	populateFields: ({ entity, file }) => {
 		entity.batchUpdates(getAccessor => {
 			fileNameField && getAccessor().getField(fileNameField).updateValue(file.name)

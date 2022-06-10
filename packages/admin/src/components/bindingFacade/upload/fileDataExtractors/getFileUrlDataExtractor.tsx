@@ -11,9 +11,6 @@ export const getFileUrlDataExtractor: (
 	props: FileUrlDataExtractorProps,
 ) => FileDataExtractor<unknown, S3FileUploader.SuccessMetadata> = ({ urlField }) => ({
 	staticRender: () => <SugaredField field={urlField} />,
-	destroy: ({ entity }) => {
-		entity.getField(urlField).updateValue(null)
-	},
 	populateFields: ({ entity, uploadResult }) => {
 		if (!uploadResult.fileUrl || typeof uploadResult.fileUrl !== 'string') {
 			return

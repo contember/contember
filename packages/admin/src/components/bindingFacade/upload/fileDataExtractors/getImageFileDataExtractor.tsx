@@ -32,12 +32,6 @@ export const getImageFileDataExtractor: (props: ImageFileDataExtractorProps) => 
 			image.src = objectUrl
 		})
 	},
-	destroy: ({ entity }) => {
-		entity.batchUpdates(getAccessor => {
-			widthField && getAccessor().getField(widthField).updateValue(null)
-			heightField && getAccessor().getField(heightField).updateValue(null)
-		})
-	},
 	populateFields: ({ entity, extractedData }) => {
 		entity.batchUpdates(getAccessor => {
 			widthField && getAccessor().getField(widthField).updateValue(extractedData.naturalWidth)

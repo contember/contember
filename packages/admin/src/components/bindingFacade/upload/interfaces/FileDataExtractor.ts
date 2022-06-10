@@ -40,6 +40,5 @@ export interface FileDataExtractor<ExtractedData = unknown, UploadResult = unkno
 	populateFields: (
 		options: FileDataExtractorPopulateFieldsOptions<ExtractedData, UploadResult, AcceptArtifacts>,
 	) => void
-	destroy?: (options: FileDataExtractorDestroyOptions) => void
 	getErrorsHolders?: (options: FileDataExtractorGetErrorsOptions) => AccessorErrorsHolder[]
 }

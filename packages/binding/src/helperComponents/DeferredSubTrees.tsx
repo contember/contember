@@ -1,11 +1,12 @@
 import { ReactNode, useCallback, useEffect, useState } from 'react'
-import { TreeRootIdProvider, useBindingOperations, useEnvironment } from '../accessorPropagation'
+import { TreeRootIdProvider, useBindingOperations, useHasEntity, useEnvironment } from '../accessorPropagation'
 import { useMutationState } from '../accessorTree'
 import { Component } from '../coreComponents'
 import { useEntityBeforePersist } from '../entityEvents'
 import { EntityFieldMarkersContainer, EntityFieldsWithHoistablesMarker } from '../markers'
 import { MarkerFactory } from '../queryLanguage'
 import type { TreeRootId } from '../treeParameters'
+import { useConstantValueInvariant } from '@contember/react-utils'
 
 export interface DeferredSubTreesProps {
 	fallback: ReactNode
@@ -29,17 +30,21 @@ export const DeferredSubTrees = Component<DeferredSubTreesProps>(
 
 		const [abortController] = useState(() => new AbortController())
 		const signal = abortController.signal
-		const environment = useEnvironment()
-		useEntityBeforePersist(
-			useCallback(getAccessor => {
-				// This is a hack. We're really just circumventing the change of ids after a creation so that nested
-				// components don't error.
-				if (getAccessor().existsOnServer) {
-					return
-				}
-				setLoadState({ name: 'initial' })
-			}, []),
-		)
+
+		const hasEntity = useHasEntity()
+		useConstantValueInvariant(hasEntity)
+		if (hasEntity) {
+			useEntityBeforePersist(
+				useCallback(getAccessor => {
+					// This is a hack. We're really just circumventing the change of ids after a creation so that nested
+					// components don't error.
+					if (getAccessor().existsOnServer) {
+						return
+					}
+					setLoadState({ name: 'initial' })
+				}, []),
+			)
+		}
 
 		useEffect(() => {
 			return () => {
@@ -47,6 +52,7 @@ export const DeferredSubTrees = Component<DeferredSubTreesProps>(
 			}
 		}, [abortController])
 
+		const environment = useEnvironment()
 		useEffect(() => {
 			if (isMutating || loadState.name !== 'initial' || signal.aborted) {
 				return

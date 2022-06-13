@@ -9,10 +9,9 @@ import { Plugin } from '@contember/engine-plugins'
 import {
 	compose,
 	ContentApiMiddlewareFactory,
-	ContentImporter,
-	ContentExporter,
 	ContentGraphQLContextFactory,
 	ContentQueryHandlerFactory,
+	ContentSchemaTransferMappingFactory,
 	createHomepageMiddleware,
 	createModuleInfoMiddleware,
 	createPlaygroundMiddleware,
@@ -20,6 +19,10 @@ import {
 	createProviders,
 	createTimerMiddleware,
 	ErrorMiddlewareFactory,
+	ExportApiMiddlewareFactory,
+	ExportExecutor,
+	ImportApiMiddlewareFactory,
+	ImportExecutor,
 	Koa,
 	NotModifiedChecker,
 	Providers,
@@ -27,10 +30,10 @@ import {
 	SystemApiMiddlewareFactory,
 	SystemGraphQLContextFactory,
 	SystemGraphQLHandlerFactory,
+	SystemSchemaTransferMappingFactory,
 	TenantApiMiddlewareFactory,
 	TenantGraphQLContextFactory,
 	TenantGraphQLHandlerFactory,
-	TransferApiMiddlewareFactory,
 } from '@contember/engine-http'
 import { ProjectContainerFactoryFactory } from './project'
 import koaCompress from 'koa-compress'
@@ -40,7 +43,8 @@ import { TenantConfigResolver } from './config/tenantConfigResolver'
 import { ProjectGroupContainerFactory } from './projectGroup/ProjectGroupContainer'
 import corsMiddleware from '@koa/cors'
 import { ProjectGroupResolver } from './projectGroup/ProjectGroupResolver'
-import { ProjectGroupContainer, ProjectGroupResolver as ProjectGroupResolverInterface } from '@contember/engine-http'
+import { ProjectGroupResolver as ProjectGroupResolverInterface } from '@contember/engine-http'
+import { Logger } from '@contember/engine-common'
 
 export interface MasterContainer {
 	initializer: Initializer
@@ -117,13 +121,22 @@ export class MasterContainerFactory {
 				new SystemGraphQLContextFactory())
 			.addService('systemApiMiddlewareFactory', ({ debugMode, projectGroupResolver, systemGraphQLContextFactory }) =>
 				new SystemApiMiddlewareFactory(debugMode, projectGroupResolver, systemGraphQLContextFactory))
-			.addService('contentImporter', () =>
-				new ContentImporter())
-			.addService('contentExporter', () =>
-				new ContentExporter())
-			.addService('transferApiMiddlewareFactory', ({ debugMode, projectGroupResolver, contentImporter, contentExporter }) =>
-				new TransferApiMiddlewareFactory(debugMode, projectGroupResolver, contentImporter, contentExporter))
-			.addService('koaMiddlewares', ({ contentApiMiddlewareFactory, tenantApiMiddlewareFactory, systemApiMiddlewareFactory, transferApiMiddlewareFactory, httpErrorMiddlewareFactory, debugMode, version, serverConfig }) =>
+			.addService('logger', () =>
+				// eslint-disable-next-line no-console
+				new Logger(console.log))
+			.addService('contentSchemaTransferMappingFactory', () =>
+				new ContentSchemaTransferMappingFactory())
+			.addService('systemSchemaTransferMappingFactory', () =>
+				new SystemSchemaTransferMappingFactory())
+			.addService('importExecutor', ({ contentSchemaTransferMappingFactory, systemSchemaTransferMappingFactory, logger }) =>
+				new ImportExecutor(contentSchemaTransferMappingFactory, systemSchemaTransferMappingFactory, logger))
+			.addService('exportExecutor', ({ contentSchemaTransferMappingFactory, systemSchemaTransferMappingFactory }) =>
+				new ExportExecutor(contentSchemaTransferMappingFactory, systemSchemaTransferMappingFactory))
+			.addService('importApiMiddlewareFactory', ({ projectGroupResolver, importExecutor }) =>
+				new ImportApiMiddlewareFactory(projectGroupResolver, importExecutor))
+			.addService('exportApiMiddlewareFactory', ({ projectGroupResolver, exportExecutor }) =>
+				new ExportApiMiddlewareFactory(projectGroupResolver, exportExecutor))
+			.addService('koaMiddlewares', ({ contentApiMiddlewareFactory, tenantApiMiddlewareFactory, systemApiMiddlewareFactory, importApiMiddlewareFactory, exportApiMiddlewareFactory, httpErrorMiddlewareFactory, debugMode, version, serverConfig }) =>
 				compose([
 					koaCompress({
 						br: false,
@@ -159,17 +172,17 @@ export class MasterContainerFactory {
 						]),
 					),
 					route(
-						'/export/:projectSlug/:stageSlug$',
+						'/import$',
 						compose([
 							createModuleInfoMiddleware('transfer'),
-							transferApiMiddlewareFactory.create('export'),
+							importApiMiddlewareFactory.create(),
 						]),
 					),
 					route(
-						'/import/:projectSlug/:stageSlug$',
+						'/export$',
 						compose([
 							createModuleInfoMiddleware('transfer'),
-							transferApiMiddlewareFactory.create('import'),
+							exportApiMiddlewareFactory.create(),
 						]),
 					),
 				]))

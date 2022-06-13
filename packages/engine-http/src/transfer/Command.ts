@@ -1,41 +1,59 @@
 import * as Typesafe from '@contember/typesafe'
 
-export const CheckSchemaVersion = Typesafe.tuple(
-	Typesafe.literal('checkSchemaVersion'),
-	Typesafe.string, // schemaVersion
+export type ImportTenantSchemaBegin = ReturnType<typeof ImportTenantSchemaBegin>
+export const ImportTenantSchemaBegin = Typesafe.tuple(
+	Typesafe.literal('importTenantSchemaBegin'),
 )
 
-export const DeferForeignKeyConstraintCommand = Typesafe.tuple(
-	Typesafe.literal('deferForeignKeyConstraints'),
+export type ImportSystemSchemaBegin = ReturnType<typeof ImportSystemSchemaBegin>
+export const ImportSystemSchemaBegin = Typesafe.tuple(
+	Typesafe.literal('importSystemSchemaBegin'),
+	Typesafe.object({
+		project: Typesafe.string,
+		tables: Typesafe.array(Typesafe.string),
+	}),
 )
 
-export const TruncateCommand = Typesafe.tuple(
-	Typesafe.literal('truncate'),
-	Typesafe.array(Typesafe.string), // tableNames
+export type ImportContentSchemaBegin = ReturnType<typeof ImportContentSchemaBegin>
+export const ImportContentSchemaBegin = Typesafe.tuple(
+	Typesafe.literal('importContentSchemaBegin'),
+	Typesafe.object({
+		project: Typesafe.string,
+		stage: Typesafe.string,
+		schemaVersion: Typesafe.string,
+		tables: Typesafe.array(Typesafe.string),
+	}),
 )
 
+export type InsertBeginCommand = ReturnType<typeof InsertBeginCommand>
 export const InsertBeginCommand = Typesafe.tuple(
 	Typesafe.literal('insertBegin'),
-	Typesafe.string, // tableName
-	Typesafe.array(Typesafe.string), // columnNames
+	Typesafe.object({
+		table: Typesafe.string,
+		columns: Typesafe.array(Typesafe.string),
+	}),
 )
 
+export type InsertRowCommand = ReturnType<typeof InsertRowCommand>
 export const InsertRowCommand = Typesafe.tuple(
 	Typesafe.literal('insertRow'),
 	Typesafe.array(Typesafe.anyJson), // values
 )
 
+export type InsertEndCommand = ReturnType<typeof InsertEndCommand>
 export const InsertEndCommand = Typesafe.tuple(
 	Typesafe.literal('insertEnd'),
 )
 
 export const Command = Typesafe.union(
-	CheckSchemaVersion,
-	DeferForeignKeyConstraintCommand,
-	TruncateCommand,
+	ImportTenantSchemaBegin,
+	ImportSystemSchemaBegin,
+	ImportContentSchemaBegin,
 	InsertBeginCommand,
 	InsertRowCommand,
 	InsertEndCommand,
 )
 
 export type Command = ReturnType<typeof Command>
+export type CommandName = Command[0]
+export type CommandArgsMap<S extends Command = Command> = { [K in S[0]]: S extends readonly [K, ...infer T] ? T : never }

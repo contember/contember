@@ -11,7 +11,7 @@ export const normalizeSchema = <S extends Schema>(schema: S): S => {
 				[ProjectRole.ADMIN]: {
 					stages: '*',
 					variables: {},
-					entities: new AllowAllPermissionFactory().create(schema.model),
+					entities: new AllowAllPermissionFactory().create(schema.model, true),
 					s3: {
 						'**': {
 							upload: true,
@@ -23,7 +23,7 @@ export const normalizeSchema = <S extends Schema>(schema: S): S => {
 				[ProjectRole.CONTENT_ADMIN]: {
 					stages: '*',
 					variables: {},
-					entities: new AllowAllPermissionFactory().create(schema.model),
+					entities: new AllowAllPermissionFactory().create(schema.model, true),
 					s3: {
 						'**': {
 							upload: true,

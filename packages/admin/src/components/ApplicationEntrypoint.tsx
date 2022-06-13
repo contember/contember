@@ -52,14 +52,14 @@ export const ApplicationEntrypoint = (props: ApplicationEntrypointProps) => {
 					<RoutingContext.Provider value={routing}>
 						<RequestProvider>
 							<ToasterProvider>
-								<DialogProvider>
-									<ContemberClient
-										apiBaseUrl={props.apiBaseUrl}
-										sessionToken={props.sessionToken}
-										loginToken={props.loginToken}
-										project={projectSlug}
-										stage={props.stage}
-									>
+								<ContemberClient
+									apiBaseUrl={props.apiBaseUrl}
+									sessionToken={props.sessionToken}
+									loginToken={props.loginToken}
+									project={projectSlug}
+									stage={props.stage}
+								>
+									<DialogProvider>
 										<NavigationProvider>
 											<IdentityProvider onInvalidIdentity={props.onInvalidIdentity}>
 												<SectionTabsProvider>
@@ -67,9 +67,9 @@ export const ApplicationEntrypoint = (props: ApplicationEntrypointProps) => {
 												</SectionTabsProvider>
 											</IdentityProvider>
 										</NavigationProvider>
-									</ContemberClient>
-									<Toaster />
-								</DialogProvider>
+										<Toaster />
+									</DialogProvider>
+								</ContemberClient>
 							</ToasterProvider>
 						</RequestProvider>
 					</RoutingContext.Provider>

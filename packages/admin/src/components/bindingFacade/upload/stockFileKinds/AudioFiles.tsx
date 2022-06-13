@@ -5,9 +5,11 @@ import type { DiscriminatedFileKind } from '../interfaces'
 import type { StockAudioFileKindProps } from './getStockAudioFileKind'
 import { getStockAudioFileKind } from './getStockAudioFileKind'
 
-export interface AudioFilesProps<AcceptArtifacts = unknown> extends StockAudioFileKindProps<AcceptArtifacts> {
-	discriminateBy: DiscriminatedFileKind['discriminateBy']
-}
+export type AudioFilesProps<AcceptArtifacts = unknown>
+	= StockAudioFileKindProps<AcceptArtifacts>
+	& {
+		discriminateBy: DiscriminatedFileKind['discriminateBy']
+	}
 
 export const AudioFiles = Component<AudioFilesProps>(
 	({ discriminateBy, ...props }) => <FileKind {...getStockAudioFileKind(props)} discriminateBy={discriminateBy} />,

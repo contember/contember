@@ -1,18 +1,31 @@
-import { Component, EntityAccessor, HasOne, SugaredField, useEntity, useEnvironment } from '@contember/binding'
+import {
+	Component,
+	EntityAccessor,
+	HasOne,
+	QueryLanguage,
+	SugaredField,
+	useEntity,
+	useEnvironment,
+} from '@contember/binding'
 import { Fragment, useCallback, useMemo, useState } from 'react'
 import { useMessageFormatter } from '../../../../i18n'
 import type { ResolvedFileKinds } from '../ResolvedFileKinds'
 import { uploadDictionary } from '../uploadDictionary'
-import { getEntityFileKind, hasUploadedFile, staticRenderFileKind } from '../utils'
+import { hasUploadedFile, staticRenderFileKind } from '../utils'
 import type { FileInputPublicProps } from './FileInput'
 import { FileInput } from './FileInput'
 import { SingleFilePreview } from './SingleFilePreview'
-import { useNormalizedUploadState } from './useNormalizedUploadState'
-import { useAccessorErrorFormatter } from '../../errors'
+import { useNormalizedUploadState } from '../hooks/useNormalizedUploadState'
+import { useConnectSelectedEntities } from '../hooks/useConnectSelectedEntities'
+import { FileId, useFileUpload } from '@contember/react-client'
+import { useRemoveUploadedFile } from '../hooks/useRemoveUploadedFile'
+import { useFileEntitiesErrors } from '../hooks/useFileEntitiesErrors'
 
-export interface BareUploadFieldProps extends FileInputPublicProps {
-	fileKinds: ResolvedFileKinds
-}
+export type BareUploadFieldProps =
+	& FileInputPublicProps
+	& {
+		fileKinds: ResolvedFileKinds
+	}
 
 export const BareUploadField = Component<BareUploadFieldProps>(
 	({ fileKinds: unstableFileKinds, ...fileInputProps }) => {
@@ -20,15 +33,33 @@ export const BareUploadField = Component<BareUploadFieldProps>(
 		const [fileKinds] = useState(() => unstableFileKinds)
 		const formatMessage = useMessageFormatter(uploadDictionary)
 
-		const prepareEntityForNewFile = useCallback<(initialize: EntityAccessor.BatchUpdatesHandler) => void>(
-			initialize => parentEntity.batchUpdates(initialize),
-			[parentEntity],
-		)
+		const fileUpload = useFileUpload()
+		const [, { purgeUpload }] = fileUpload
+		const removeUploadedFile = useRemoveUploadedFile(fileKinds)
+		const environment = useEnvironment()
+		const removeFile = useCallback((fileId: FileId) => {
+			purgeUpload([fileId])
+			const baseEntity = fileKinds.isDiscriminated ? fileKinds.baseEntity : fileKinds.fileKind.baseEntity
+			if (baseEntity) {
+				const desugaredBase = QueryLanguage.desugarRelativeSingleEntity(baseEntity, environment)
+				parentEntity.disconnectEntityAtField(desugaredBase.hasOneRelationPath[0].field)
+			} else {
+				removeUploadedFile(fileId)
+			}
+		}, [fileKinds, parentEntity, purgeUpload, removeUploadedFile, environment])
 
-		const { uploadState, dropzoneState, removeFile } = useNormalizedUploadState({
+		const prepareEntityForNewFile = useCallback<(initialize: EntityAccessor.BatchUpdatesHandler) => void>(
+			initialize => {
+				removeFile(parentEntity.key)
+				parentEntity.batchUpdates(initialize)
+			},
+			[parentEntity, removeFile],
+		)
+		const { uploadState, dropzoneState } = useNormalizedUploadState({
 			isMultiple: false,
 			fileKinds,
 			prepareEntityForNewFile,
+			fileUpload,
 		})
 
 		const fileUploadState = uploadState.get(parentEntity.key)
@@ -37,28 +68,13 @@ export const BareUploadField = Component<BareUploadFieldProps>(
 				? parentEntity.getEntity(fileKinds.baseEntity)
 				: parentEntity
 
-		const environment = useEnvironment()
-		const errorFormatter = useAccessorErrorFormatter()
-		const fileKind = getEntityFileKind(fileKinds, parentWithBase.getAccessor)
-		const extractorEntity = fileKind?.baseEntity ? parentWithBase.getEntity(fileKind.baseEntity) : parentWithBase
-		const extractorsErrors = useMemo(
-			() => fileKind?.extractors.flatMap(it => it.getErrorsHolders?.({ entity: extractorEntity, environment }) ?? []) ?? [],
-			[environment, extractorEntity, fileKind?.extractors],
-		)
-		const errors = useMemo(
-			() => [
-				parentWithBase,
-				...(parentWithBase === extractorEntity ? [] : [extractorEntity]),
-				...extractorsErrors,
-			].flatMap(it => errorFormatter(it.errors?.errors ?? [])),
-			[errorFormatter, extractorEntity, extractorsErrors, parentWithBase],
-		)
+		const errors = useFileEntitiesErrors(useMemo(() => [parentEntity], [parentEntity]), fileKinds)
 
-		const children =
-			hasUploadedFile(fileKinds, parentWithBase) || fileUploadState !== undefined ? (
+		const children = hasUploadedFile(fileKinds, parentWithBase) || fileUploadState !== undefined
+			? (
 				<div className="fileInput-preview">
 					<SingleFilePreview
-						getContainingEntity={parentEntity.getAccessor}
+						containingEntity={parentEntity}
 						fileId={parentEntity.key}
 						formatMessage={formatMessage}
 						removeFile={removeFile}
@@ -66,15 +82,21 @@ export const BareUploadField = Component<BareUploadFieldProps>(
 						fileKinds={fileKinds}
 					/>
 				</div>
-			) : undefined
+			)
+			: undefined
+
+		const onSelectConfirm = useConnectSelectedEntities(fileKinds, prepareEntityForNewFile)
 
 		return (
 			<FileInput
 				{...fileInputProps}
+				fileKinds={fileKinds}
+				isMultiple={false}
 				dropzoneState={dropzoneState}
 				formatMessage={formatMessage}
 				errors={errors}
 				children={children}
+				onSelectConfirm={onSelectConfirm}
 			/>
 		)
 	},
@@ -88,11 +110,11 @@ export const BareUploadField = Component<BareUploadFieldProps>(
 					))}
 				</>
 			)
-			return props.fileKinds.baseEntity === undefined ? (
-				children
-			) : (
-				<HasOne field={props.fileKinds.baseEntity}>{children}</HasOne>
-			)
+			return props.fileKinds.baseEntity === undefined
+				? children
+				: (
+					<HasOne field={props.fileKinds.baseEntity}>{children}</HasOne>
+				)
 		}
 		return staticRenderFileKind(props.fileKinds.fileKind, environment)
 	},

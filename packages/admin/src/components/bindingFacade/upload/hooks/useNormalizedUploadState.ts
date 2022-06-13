@@ -1,7 +1,12 @@
 import { EntityAccessor, useBindingOperations, useMutationState, VariableInputTransformer } from '@contember/binding'
 import { FileUploadError } from '@contember/client'
-import type { FileId, FileUploadCompoundState, FileWithMetadata, StartUploadFileOptions } from '@contember/react-client'
-import { useFileUpload } from '@contember/react-client'
+import type {
+	FileId,
+	FileUpload,
+	FileUploadCompoundState,
+	FileWithMetadata,
+	StartUploadFileOptions,
+} from '@contember/react-client'
 import { useCallback } from 'react'
 import { unstable_batchedUpdates } from 'react-dom'
 import { DropzoneState, useDropzone } from 'react-dropzone'
@@ -9,61 +14,31 @@ import { assertNever } from '../../../../utils'
 import type { DiscriminatedFileKind } from '../interfaces'
 import { AcceptFileKindError } from '../interfaces'
 import type { ResolvedFileKinds } from '../ResolvedFileKinds'
-import { eachFileKind, resolveAcceptingFileKind, ResolvedAcceptingFileKind, useAllAcceptedMimes } from '../utils'
+import { resolveAcceptingFileKind, ResolvedAcceptingFileKind, useAllAcceptedMimes } from '../utils'
 
 export interface NormalizedUploadStateOptions {
 	isMultiple: boolean
 	fileKinds: ResolvedFileKinds
 	prepareEntityForNewFile: (initialize: EntityAccessor.BatchUpdatesHandler) => void
+	fileUpload: FileUpload
 }
 
 export interface NormalizedUploadState {
 	uploadState: FileUploadCompoundState
 	dropzoneState: DropzoneState
-	removeFile: (fileId: FileId) => void
 }
 
 export const useNormalizedUploadState = ({
+	fileUpload,
 	isMultiple,
 	fileKinds,
 	prepareEntityForNewFile,
 }: NormalizedUploadStateOptions): NormalizedUploadState => {
-	const fileUpload = useFileUpload()
 	const isMutating = useMutationState()
 	const bindingOperations = useBindingOperations()
 	const resolvedAccept = useAllAcceptedMimes(fileKinds)
 
-	const [uploadState, { initializeUpload, startUpload, purgeUpload, failUpload }] = fileUpload
-
-	const removeFile = useCallback(
-		(fileId: FileId) => {
-			bindingOperations.getEntityByKey(fileId.toString()).batchUpdates(getEntity => {
-				purgeUpload([fileId])
-
-				if (fileKinds.isDiscriminated && fileKinds.baseEntity !== undefined) {
-					getEntity = getEntity().getEntity(fileKinds.baseEntity).getAccessor
-				}
-
-				for (const fileKind of eachFileKind(fileKinds)) {
-					const getExtractorEntity = fileKind.baseEntity === undefined
-						? getEntity
-						: getEntity().getEntity(fileKind.baseEntity).getAccessor
-
-					if (fileKind.baseEntity !== undefined) {
-						getExtractorEntity().deleteEntity()
-					}
-				}
-				if (fileKinds.isDiscriminated) {
-					getEntity().getField(fileKinds.discriminationField).updateValue(null)
-
-					if (fileKinds.baseEntity !== undefined) {
-						getEntity().deleteEntity()
-					}
-				}
-			})
-		},
-		[fileKinds, bindingOperations, purgeUpload],
-	)
+	const [uploadState, { initializeUpload, startUpload, failUpload }] = fileUpload
 
 	const onDrop = useCallback(
 		(files: File[]) => {
@@ -185,6 +160,5 @@ export const useNormalizedUploadState = ({
 	return {
 		uploadState,
 		dropzoneState,
-		removeFile,
 	}
 }

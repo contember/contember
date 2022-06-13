@@ -22,7 +22,7 @@ export const DataGridContainer: FunctionComponent<DataGridContainerProps> = Comp
 		entityName,
 		filter,
 		onEntityClick,
-		selectedEntityKeys,
+		selectedEntityIds,
 		setFilter,
 		setIsColumnHidden,
 		setLayout,
@@ -81,7 +81,7 @@ export const DataGridContainer: FunctionComponent<DataGridContainerProps> = Comp
 							emptyMessage={emptyMessage}
 							emptyMessageComponent={emptyMessageComponent}
 							onEntityClick={onEntityClick}
-							selectedEntityKeys={selectedEntityKeys}
+							selectedEntityIds={selectedEntityIds}
 							setFilter={setFilter}
 							setOrderBy={setOrderBy}
 						/>

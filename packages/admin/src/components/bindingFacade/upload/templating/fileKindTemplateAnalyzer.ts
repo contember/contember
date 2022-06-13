@@ -19,6 +19,7 @@ const fileKindLeaf = new Leaf<FileKindProps>(node => {
 		renderFilePreview,
 		renderUploadedFile,
 		uploader,
+		...rest
 	} = node.props
 	return new BoxedFileKind({
 		acceptFile,
@@ -30,6 +31,7 @@ const fileKindLeaf = new Leaf<FileKindProps>(node => {
 		renderFilePreview,
 		renderUploadedFile,
 		uploader,
+		...rest,
 	})
 }, FileKind)
 

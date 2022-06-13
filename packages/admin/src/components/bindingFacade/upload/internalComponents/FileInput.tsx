@@ -1,47 +1,46 @@
-import { Button, FieldContainer, FieldContainerProps, FieldErrors, FileDropZone } from '@contember/ui'
-import type { ReactNode } from 'react'
+import { Button, FieldContainer, FieldContainerProps, FieldErrors, FileDropZone, Stack } from '@contember/ui'
+import { ReactNode } from 'react'
 import type { DropzoneState } from 'react-dropzone'
 import type { MessageFormatter } from '../../../../i18n'
-import type { RepeaterFieldContainerPublicProps } from '../../collections'
+import type { AddEntityButtonProps } from '../../collections'
 import type { UploadDictionary } from '../uploadDictionary'
+import { SelectFileInput, SelectFileInputProps } from './SelectFileInput'
 
-export interface FileInputPublicProps
-	extends Omit<
-			RepeaterFieldContainerPublicProps,
-			'emptyMessage' | 'emptyMessageComponent' | 'emptyMessageComponentExtraProps'
-		>,
-		Pick<FieldContainerProps, 'label' | 'description' | 'labelDescription'> {
-	addButtonSubText?: ReactNode
-}
+export type FileInputPublicProps =
+	& Pick<FieldContainerProps, 'label' | 'description' | 'labelDescription'>
+	& AddEntityButtonProps
+	&	{
+		enableAddingNew?: boolean
+		addButtonSubText?: ReactNode
+	}
 
-export interface FileInputProps extends FileInputPublicProps {
-	dropzoneState: DropzoneState
-	formatMessage: MessageFormatter<UploadDictionary>
-	errors: FieldErrors | undefined
-	children: ReactNode
-}
 
-export function FileInput({
-	dropzoneState,
-	errors,
+export type FileInputProps =
+	& FileInputPublicProps
+	& Pick<SelectFileInputProps<{}>, 'isMultiple' | 'onSelectConfirm' | 'fileKinds'>
+	&	{
+		children: ReactNode
+		dropzoneState: DropzoneState
+		errors: FieldErrors | undefined
+		formatMessage: MessageFormatter<UploadDictionary>
+	}
 
-	label,
-	description,
-	labelDescription,
-	children,
-	formatMessage,
-	enableAddingNew = true,
-
-	// emptyMessage,
-	// emptyMessageComponent: EmptyMessageComponent = EmptyMessage,
-	// emptyMessageComponentExtraProps,
-
+export const FileInput = ({
 	addButtonComponent: AddButton = Button,
 	addButtonComponentExtraProps,
 	addButtonProps,
-	addButtonText,
 	addButtonSubText,
-}: FileInputProps) {
+	addButtonText,
+	children,
+	description,
+	dropzoneState,
+	enableAddingNew = true,
+	errors,
+	formatMessage,
+	label,
+	labelDescription,
+	...selectProps
+}: FileInputProps) => {
 	const { getRootProps, isDragActive, isDragAccept, isDragReject, getInputProps } = dropzoneState
 
 	return (
@@ -53,11 +52,6 @@ export function FileInput({
 			errors={errors}
 		>
 			<div className="fileInput">
-				{/*{children === undefined && (*/}
-				{/*	<EmptyMessageComponent {...emptyMessageComponentExtraProps}>*/}
-				{/*		{formatMessage(emptyMessage, 'upload.emptyMessage.text')}*/}
-				{/*	</EmptyMessageComponent>*/}
-				{/*)}*/}
 				{children !== undefined && children}
 				{enableAddingNew && (
 					<FileDropZone
@@ -69,13 +63,21 @@ export function FileInput({
 					>
 						<input {...getInputProps()} />
 						<div className="fileInput-cta">
-							<AddButton
-								size="small"
-								{...addButtonComponentExtraProps}
-								children={formatMessage(addButtonText, 'upload.addButton.text')}
-								{...addButtonProps}
-							/>
-							<span className="fileInput-cta-label">{formatMessage(addButtonSubText, 'upload.addButton.subText')}</span>
+							<Stack wrap justify="center" direction="horizontal">
+								{selectProps.fileKinds.hasFileSelection && (
+									<SelectFileInput {...selectProps} formatMessage={formatMessage} />
+								)}
+								<AddButton
+									size="small"
+									{...addButtonComponentExtraProps}
+									{...addButtonProps}
+								>
+									{formatMessage(addButtonText, 'upload.addButton.text')}
+								</AddButton>
+							</Stack>
+							<span className="fileInput-cta-label">
+								{formatMessage(addButtonSubText, 'upload.addButton.subText')}
+							</span>
 						</div>
 					</FileDropZone>
 				)}

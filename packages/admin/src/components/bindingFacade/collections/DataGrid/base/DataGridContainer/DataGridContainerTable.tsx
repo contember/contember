@@ -1,4 +1,4 @@
-import { Entity } from '@contember/binding'
+import { Entity, EntityId } from '@contember/binding'
 import { Table, TableCell, TableRow, useComponentClassName } from '@contember/ui'
 import { memo, useMemo } from 'react'
 import { useMessageFormatter } from '../../../../../../i18n'
@@ -16,7 +16,7 @@ type DataGridContainerTableProps=
 		| 'emptyMessageComponent'
 		| 'displayedState'
 		| 'onEntityClick'
-		| 'selectedEntityKeys'
+		| 'selectedEntityIds'
 		| 'setFilter'
 		| 'setOrderBy'
 	>
@@ -28,7 +28,7 @@ export const DataGridContainerTable = memo<DataGridContainerTableProps>(({
 	emptyMessage,
 	emptyMessageComponent,
 	onEntityClick,
-	selectedEntityKeys,
+	selectedEntityIds,
 	setFilter,
 	setOrderBy,
 }) => {
@@ -44,7 +44,7 @@ export const DataGridContainerTable = memo<DataGridContainerTableProps>(({
 		if (!onEntityClick) {
 			return undefined
 		}
-		return (id: string) => {
+		return (id: EntityId) => {
 			const entity = accessor.getChildEntityById(id)
 
 			if (entity) {
@@ -96,7 +96,7 @@ export const DataGridContainerTable = memo<DataGridContainerTableProps>(({
 						key={entity.id ?? entity.key}
 						accessor={entity}
 					>
-						<TableRow id={entity.id} onClick={onRowClick} active={selectedEntityKeys?.includes(entity.id)}>
+						<TableRow id={entity.id} onClick={onRowClick} active={selectedEntityIds?.includes(entity.id)}>
 							{Array.from(columns)
 								.filter(([columnKey]) => !desiredState.hiddenColumns[columnKey])
 								.map(([columnKey, column]) => {

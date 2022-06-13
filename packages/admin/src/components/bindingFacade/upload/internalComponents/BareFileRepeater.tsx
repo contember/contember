@@ -10,10 +10,13 @@ import {
 	BareFileRepeaterContainerPublicProps,
 } from './BareFileRepeaterContainer'
 
-export interface BareFileRepeaterProps extends SugaredRelativeEntityList, BareFileRepeaterContainerPublicProps {
-	sortableBy?: SugaredFieldProps['field']
-	fileKinds: ResolvedFileKinds
-}
+export type BareFileRepeaterProps =
+	& SugaredRelativeEntityList
+	& BareFileRepeaterContainerPublicProps
+	& {
+		sortableBy?: SugaredFieldProps['field']
+		fileKinds: ResolvedFileKinds
+	}
 
 export const BareFileRepeater: ComponentType<BareFileRepeaterProps> = Component<BareFileRepeaterProps>(
 	props => (
@@ -35,10 +38,9 @@ export const BareFileRepeater: ComponentType<BareFileRepeaterProps> = Component<
 					))}
 				</>
 			)
-			const repeaterChildren =
-				props.fileKinds.baseEntity === undefined ? (
-					renderedFileKinds
-				) : (
+			const repeaterChildren = props.fileKinds.baseEntity === undefined
+				? renderedFileKinds
+				: (
 					<HasOne field={props.fileKinds.baseEntity}>{renderedFileKinds}</HasOne>
 				)
 

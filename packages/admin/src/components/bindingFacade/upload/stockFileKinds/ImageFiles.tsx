@@ -5,11 +5,13 @@ import type { DiscriminatedFileKind } from '../interfaces'
 import type { StockImageFileKindProps } from './getStockImageFileKind'
 import { getStockImageFileKind } from './getStockImageFileKind'
 
-export interface ImageFilesProps<AcceptArtifacts = unknown> extends StockImageFileKindProps<AcceptArtifacts> {
-	discriminateBy: DiscriminatedFileKind['discriminateBy']
-}
+export type ImageFilesProps<AcceptArtifacts = unknown, SFExtraProps extends {} = {}> =
+	& StockImageFileKindProps<AcceptArtifacts, SFExtraProps>
+	& {
+		discriminateBy: DiscriminatedFileKind['discriminateBy']
+	}
 
 export const ImageFiles = Component<ImageFilesProps>(
 	({ discriminateBy, ...props }) => <FileKind {...getStockImageFileKind(props)} discriminateBy={discriminateBy} />,
 	'ImageFiles',
-) as <AcceptArtifacts = unknown>(props: ImageFilesProps<AcceptArtifacts>) => ReactElement | null
+) as <AcceptArtifacts = unknown, SFExtraProps extends {} = {}>(props: ImageFilesProps<AcceptArtifacts, SFExtraProps>) => ReactElement | null

@@ -9,13 +9,15 @@ import {
 	getGenericFileMetadataExtractor,
 } from '../fileDataExtractors'
 import type { FileDataExtractor, FullFileKind, RenderFilePreviewOptions } from '../interfaces'
+import { PublicFileKind } from '../interfaces/FullFileKind'
 
-export interface StockAnyFileKindProps<AcceptArtifacts = unknown>
-	extends Partial<Omit<FullFileKind<S3FileUploader.SuccessMetadata, AcceptArtifacts>, 'extractors'>>,
-		FileUrlDataExtractorProps,
-		GenericFileMetadataExtractorProps {
-	additionalExtractors?: FileDataExtractor<any, S3FileUploader.SuccessMetadata, AcceptArtifacts>[]
-}
+export type StockAnyFileKindProps<AcceptArtifacts = unknown, SFExtraProps extends {} = {}> =
+	& PublicFileKind<S3FileUploader.SuccessMetadata, AcceptArtifacts, SFExtraProps>
+	& FileUrlDataExtractorProps
+	& GenericFileMetadataExtractorProps
+	& {
+		additionalExtractors?: FileDataExtractor<any, S3FileUploader.SuccessMetadata, AcceptArtifacts>[]
+	}
 
 export const acceptAnyFile = () => true
 export const renderAnyFilePreview = ({ objectUrl }: RenderFilePreviewOptions) => (
@@ -43,6 +45,7 @@ export const getStockAnyFileKind = <AcceptArtifacts extends any = unknown>({
 	renderUploadedFile,
 	uploader = defaultUploader,
 	urlField,
+	...rest
 }: StockAnyFileKindProps<AcceptArtifacts>): FullFileKind<S3FileUploader.SuccessMetadata, AcceptArtifacts> => {
 	const extractors: FileDataExtractor<any, S3FileUploader.SuccessMetadata, AcceptArtifacts>[] = [
 		getFileUrlDataExtractor({ urlField }),
@@ -60,5 +63,6 @@ export const getStockAnyFileKind = <AcceptArtifacts extends any = unknown>({
 		renderFilePreview,
 		renderUploadedFile: renderUploadedAny,
 		uploader,
+		...rest,
 	}
 }

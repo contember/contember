@@ -1,138 +1,229 @@
-import { Component, EntityAccessor, EntityId, EntityListSubTree } from '@contember/binding'
-import { Button, DialogModal, DropdownContentContainerProvider, Heading, useChildrenAsLabel, useDialog } from '@contember/ui'
-import { MouseEventHandler, useCallback } from 'react'
+import {
+	AccessorTree,
+	Component,
+	DeferredSubTrees,
+	EntityAccessor,
+	EntityId,
+	FieldValue,
+	useAccessorTreeState,
+} from '@contember/binding'
+import {
+	Button,
+	DialogModal,
+	DropdownContentContainerProvider,
+	Heading,
+	Stack,
+	TabButton,
+	useChildrenAsLabel,
+	useDialog,
+} from '@contember/ui'
+import { ComponentType, MouseEventHandler, ReactNode, useCallback, useMemo, useState } from 'react'
 import { MessageFormatter } from '../../../../i18n'
-import { Toaster, ToasterProvider } from '../../../Toaster'
 import { SelectEntityButtonProps } from '../../collections'
-import { ResolvedFileKinds } from '../ResolvedFileKinds'
-import { SelectedEntitiesContext } from '../SelectedEntities'
 import type { UploadDictionary } from '../uploadDictionary'
+import { ResolvedFileKinds } from '../ResolvedFileKinds'
 
-export interface SelectFormArguments {
-	baseEntity?: never // TODO: remove
-	entityListAccessor?: never // TODO: remove
+export interface SelectFormProps {
 	onToggleSelect: (entity: EntityAccessor) => void
-	selectedEntityKeys: EntityId[]
-	selectEntity: string
+	selectedEntityIds: EntityId[]
 }
 
-export interface SelectFileInputPublicProps extends SelectEntityButtonProps {
-	baseEntity?: never
-	fileKinds: ResolvedFileKinds
-	insertSelectedText?: string
-	onSelectConfirm: (selectedEntities: EntityAccessor[]) => void
-	renderSelectForm: (args: SelectFormArguments) => JSX.Element
-	selectEntity: string
+export interface SelectFileInputFormComponentProps<SFExtraProps extends {}> {
+	selectFormComponent: ComponentType<SFExtraProps & SelectFormProps>
+	selectFormProps?: SFExtraProps
 }
 
-export interface SelectFileInputProps extends SelectFileInputPublicProps {
-	formatMessage: MessageFormatter<UploadDictionary>
-	disabled?: boolean
-}
+export type SelectFileInputPublicProps<SFExtraProps extends {}> =
+	& SelectEntityButtonProps
+	& {
+		insertSelectedText?: string
+	}
 
-export const SelectFileInput = Component<SelectFileInputProps>(
+export type SelectFileInputProps<SFExtraProps extends {}> =
+	& Partial<SelectFileInputPublicProps<SFExtraProps>>
+	& {
+		formatMessage: MessageFormatter<UploadDictionary>
+		onSelectConfirm: (selectedEntities: EntityAccessor[], discriminatedBy?: FieldValue) => void
+		fileKinds: ResolvedFileKinds
+		isMultiple: boolean
+	}
+
+export const SelectFileInput = Component(
 	({
-		disabled,
-		formatMessage,
-		insertSelectedText,
-		onSelectConfirm,
-		renderSelectForm,
-		selectButtonComponent: SelectButton = Button,
-		selectButtonComponentExtraProps,
-		selectButtonProps,
-		selectButtonText: selectButtonTextProp,
-		selectEntity,
-	}) => {
-		const { openDialog } = useDialog()
+		 formatMessage,
+		 insertSelectedText,
+		 onSelectConfirm,
+		 selectButtonComponent: SelectButton = Button,
+		 selectButtonComponentExtraProps,
+		 selectButtonProps,
+		 selectButtonText: selectButtonTextProp,
+		 isMultiple,
+		 fileKinds,
+	 }: SelectFileInputProps<any>) => {
+		const { openDialog } = useDialog<[entities: EntityAccessor[], discriminatedBy?: FieldValue]>()
 		const selectButtonText = formatMessage(selectButtonTextProp, 'upload.selectButton.text')
-		const heading = useChildrenAsLabel(selectButtonText)
+
+		const accessorTree = useAccessorTreeState()
 
 		const onClick: MouseEventHandler<HTMLButtonElement> = useCallback(async event => {
 			event.stopPropagation()
 
-			try {
-				const selectedEntities = await openDialog<EntityAccessor[]>({
-					type: 'captivating',
-					bare: true,
-					content: props => (
-						<ToasterProvider>
-							<DropdownContentContainerProvider>
-								<SelectedEntitiesContext.Consumer>
-									{({ onToggleSelect, onFlush, selectedEntityKeys }) => <>
-										<DialogModal
-											layout="wide"
-											onClose={props.reject}
-											header={<>
-												<Heading>{heading}</Heading>
-											</>}
-											footer={<>
-												<Button
-													distinction="primary"
-													onClick={() => {
-														props.resolve(onFlush())
-													}}
-												>
-													{formatMessage(insertSelectedText, 'upload.insertSelected.text')}
-												</Button>
-											</>}
-										>
-											{renderSelectForm({
-												onToggleSelect,
-												selectEntity,
-												selectedEntityKeys,
-											})}
-										</DialogModal>
-									</>}
-								</SelectedEntitiesContext.Consumer>
-							</DropdownContentContainerProvider>
-							<Toaster />
-						</ToasterProvider>
-					),
-				})
-
-				onSelectConfirm(selectedEntities)
-			} catch (error) {
-				if (error) {
-					throw error
-				}
+			const selectedEntities = await openDialog({
+				type: 'captivating',
+				bare: true,
+				content: props => (
+					<DropdownContentContainerProvider>
+						<AccessorTree state={accessorTree}>
+							<SelectFileDialog
+								formatMessage={formatMessage}
+								onCancel={() => props.resolve()}
+								onSelect={props.resolve}
+								insertSelectedText={insertSelectedText}
+								selectButtonText={selectButtonText}
+								isMultiple={isMultiple}
+								fileKinds={fileKinds}
+							/>
+						</AccessorTree>
+					</DropdownContentContainerProvider>
+				),
+			})
+			if (selectedEntities !== undefined) {
+				onSelectConfirm(...selectedEntities)
 			}
-		}, [formatMessage, heading, insertSelectedText, onSelectConfirm, openDialog, renderSelectForm, selectEntity])
+		}, [accessorTree, fileKinds, formatMessage, insertSelectedText, isMultiple, onSelectConfirm, openDialog, selectButtonText])
 
 		return (
 			<SelectButton
 				{...selectButtonComponentExtraProps}
 				size="small"
-				disabled={disabled}
 				children={selectButtonText}
 				onClick={onClick}
 				{...selectButtonProps}
 			/>
 		)
 	},
-	(props, environment) => {
-		// if (props.fileKinds.isDiscriminated) {
-		// 	const children = (
-		// 		<>
-		// 			<SugaredField field={props.fileKinds.discriminationField} isNonbearing />
-		// 			{Array.from(props.fileKinds.fileKinds.values(), (fileKind, i) => (
-		// 				<Fragment key={i}>{staticRenderFileKind(fileKind.datum, environment)}</Fragment>
-		// 			))}
-		// 		</>
-		// 	)
-		// 	return props.fileKinds.baseEntity === undefined ? (
-		// 		children
-		// 	) : (
-		// 		<HasOne field={props.fileKinds.baseEntity}>{children}</HasOne>
-		// 	)
-		// }
-		// return staticRenderFileKind(props.fileKinds.fileKind, environment)
-
-		// const entities = QueryLanguage.desugarQualifiedEntityList({ entities: props.baseEntity }, environment)
-
-		return <EntityListSubTree
-			entities={props.selectEntity}
-		/>
+	() => {
+		return null
 	},
 	'SelectFileInput',
 )
-SelectFileInput.displayName = 'SelectFileInput'
+
+
+type SelectFileDialogProps<P extends {}> =
+	& {
+		onSelect: (value: [entities: EntityAccessor[], discriminatedBy: FieldValue]) => void
+		onCancel: () => void
+		formatMessage: MessageFormatter<UploadDictionary>
+		insertSelectedText?: string
+		selectButtonText: ReactNode
+		isMultiple: boolean
+		fileKinds: ResolvedFileKinds
+	}
+
+type ResolvedSelectForm =
+	& SelectFileInputFormComponentProps<any>
+	& {
+		label?: ReactNode
+		discriminateBy: FieldValue | null
+	}
+const SelectFileDialog = (
+	{
+		onSelect,
+		onCancel,
+		formatMessage,
+		insertSelectedText,
+		selectButtonText,
+		isMultiple,
+		fileKinds,
+	}: SelectFileDialogProps<{}>,
+) => {
+	const forms = useMemo((): ResolvedSelectForm[] => {
+		if (fileKinds.isDiscriminated) {
+			if ('selectFormComponent' in fileKinds) {
+				return [{ selectFormComponent: fileKinds.selectFormComponent, selectFormProps: fileKinds.selectFormProps, discriminateBy: null }]
+			}
+			return Array.from(fileKinds.fileKinds.values()).flatMap((it): ResolvedSelectForm[] => {
+				if ('selectFormComponent' in it.datum) {
+					return [{
+						selectFormComponent: it.datum.selectFormComponent,
+						selectFormProps: it.datum.selectFormProps,
+						discriminateBy: it.discriminateBy,
+						label: it.datum.label,
+					}]
+				}
+				return []
+			})
+		}
+		if ('selectFormComponent' in fileKinds.fileKind) {
+			return [{ selectFormComponent: fileKinds.fileKind.selectFormComponent, selectFormProps: fileKinds.fileKind.selectFormProps, discriminateBy: null }]
+		}
+		return []
+	}, [fileKinds])
+	const [form, setForm] = useState(forms[0])
+	const changeForm = useCallback((kind: ResolvedSelectForm) => {
+		setForm(kind)
+		setEntities([])
+	}, [])
+
+	const heading = useChildrenAsLabel(selectButtonText)
+	const [selectedEntities, setEntities] = useState<EntityAccessor[]>([])
+	const onToggleSelect = useCallback((entity: EntityAccessor) => {
+		setEntities(current => {
+			const index = current.findIndex(it => it.id === entity.id)
+			if (index >= 0) {
+				const newValues = [...current]
+				newValues.splice(index, 1)
+				return newValues
+			}
+			if (isMultiple) {
+				return [...current, entity]
+			} else {
+				return [entity]
+			}
+		})
+	}, [isMultiple])
+	let FormComponent = form.selectFormComponent
+	let formComponentProps = form.selectFormProps
+
+	const onConfirm = useCallback(() => {
+		onSelect([selectedEntities, form.discriminateBy])
+	}, [form.discriminateBy, onSelect, selectedEntities])
+	const selectedEntityIds = useMemo(() => selectedEntities.map(it => it.id), [selectedEntities])
+
+	return <>
+		<DialogModal
+			layout="wide"
+			onClose={onCancel}
+			header={<>
+				<Heading>{heading}</Heading>
+			</>}
+			footer={<>
+				<Button
+					distinction="primary"
+					onClick={onConfirm}
+				>
+					{formatMessage(insertSelectedText, 'upload.insertSelected.text')}
+				</Button>
+			</>}
+		>
+			<Stack direction={'horizontal'}>
+				{forms.length > 1 && forms.map((it, index) => (
+					<TabButton
+						key={String(it.discriminateBy)}
+						onClick={() => changeForm(it)}
+						isSelected={it.discriminateBy === form.discriminateBy}
+					>
+						{it.label ?? `#${index}`}
+					</TabButton>
+				))}
+			</Stack>
+			<DeferredSubTrees fallback={<>Loading...</>}>
+				<FormComponent
+					{...formComponentProps}
+					onToggleSelect={onToggleSelect}
+					selectedEntityIds={selectedEntityIds}
+				/>
+			</DeferredSubTrees>
+		</DialogModal>
+	</>
+}

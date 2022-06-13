@@ -13,14 +13,16 @@ import {
 	getGenericFileMetadataExtractor,
 } from '../fileDataExtractors'
 import type { AcceptFileOptions, FileDataExtractor, FullFileKind, RenderFilePreviewOptions } from '../interfaces'
+import { PublicFileKind } from '../interfaces/FullFileKind'
 
-export interface StockAudioFileKindProps<AcceptArtifacts = unknown>
-	extends Partial<Omit<FullFileKind<S3FileUploader.SuccessMetadata, AcceptArtifacts>, 'extractors'>>,
-		FileUrlDataExtractorProps,
-		GenericFileMetadataExtractorProps,
-		AudioFileDataExtractorProps {
-	additionalExtractors?: FileDataExtractor<unknown, S3FileUploader.SuccessMetadata, AcceptArtifacts>[]
-}
+export type StockAudioFileKindProps<AcceptArtifacts = unknown, SFExtraProps extends {} = {}> =
+	& PublicFileKind<S3FileUploader.SuccessMetadata, AcceptArtifacts, SFExtraProps>
+	& FileUrlDataExtractorProps
+	& GenericFileMetadataExtractorProps
+	& AudioFileDataExtractorProps
+	& {
+		additionalExtractors?: FileDataExtractor<unknown, S3FileUploader.SuccessMetadata, AcceptArtifacts>[]
+	}
 
 export const acceptAudioFile = ({ file }: AcceptFileOptions) => file.type.startsWith('audio')
 export const renderAudioFilePreview = ({ objectUrl }: RenderFilePreviewOptions) => <audio src={objectUrl} controls />
@@ -40,6 +42,7 @@ export const getStockAudioFileKind = <AcceptArtifacts extends any = unknown>({
 	renderUploadedFile,
 	uploader = defaultUploader,
 	urlField,
+	...rest
 }: StockAudioFileKindProps<AcceptArtifacts>): FullFileKind<S3FileUploader.SuccessMetadata, AcceptArtifacts> => {
 	const extractors: FileDataExtractor<any, S3FileUploader.SuccessMetadata, AcceptArtifacts>[] = [
 		getFileUrlDataExtractor({ urlField }),
@@ -58,5 +61,6 @@ export const getStockAudioFileKind = <AcceptArtifacts extends any = unknown>({
 		renderFilePreview,
 		renderUploadedFile: renderUploadedAudio,
 		uploader,
+		...rest,
 	}
 }

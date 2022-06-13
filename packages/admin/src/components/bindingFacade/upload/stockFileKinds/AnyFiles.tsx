@@ -4,9 +4,11 @@ import { FileKind } from '../FileKind'
 import type { DiscriminatedFileKind } from '../interfaces'
 import { getStockAnyFileKind, StockAnyFileKindProps } from './getStockAnyFileKind'
 
-export interface AnyFilesProps<AcceptArtifacts = unknown> extends StockAnyFileKindProps<AcceptArtifacts> {
-	discriminateBy: DiscriminatedFileKind['discriminateBy']
-}
+export type AnyFilesProps<AcceptArtifacts = unknown> =
+	& StockAnyFileKindProps<AcceptArtifacts>
+	& {
+		discriminateBy: DiscriminatedFileKind['discriminateBy']
+	}
 
 export const AnyFiles = Component<AnyFilesProps>(
 	({ discriminateBy, ...props }) => <FileKind {...getStockAnyFileKind(props)} discriminateBy={discriminateBy} />,

@@ -4,8 +4,8 @@ import { BareUploadField, FileInputPublicProps } from '../internalComponents'
 import type { StockImageFileKindProps } from '../stockFileKinds'
 import { getStockImageFileKind } from '../stockFileKinds'
 
-export type ImageUploadFieldProps<AcceptArtifacts = unknown> =
-	& StockImageFileKindProps<AcceptArtifacts>
+export type ImageUploadFieldProps<AcceptArtifacts = unknown, SFExtraProps extends {} = {}> =
+	& StockImageFileKindProps<AcceptArtifacts, SFExtraProps>
 	& FileInputPublicProps
 
 export const ImageUploadField = Component<ImageUploadFieldProps>(
@@ -14,10 +14,11 @@ export const ImageUploadField = Component<ImageUploadFieldProps>(
 			{...props}
 			fileKinds={{
 				isDiscriminated: false,
+				hasFileSelection: 'selectFormComponent' in props,
 				fileKind: getStockImageFileKind(props),
 				hasUploadedFile: (entity: EntityAccessor) => entity.getField(props.urlField).value !== null,
 			}}
 		/>
 	),
 	'ImageUploadField',
-) as <AcceptArtifacts = unknown>(props: ImageUploadFieldProps<AcceptArtifacts>) => ReactElement | null
+) as <AcceptArtifacts = unknown, SFExtraProps extends {} = {}>(props: ImageUploadFieldProps<AcceptArtifacts, SFExtraProps>) => ReactElement | null

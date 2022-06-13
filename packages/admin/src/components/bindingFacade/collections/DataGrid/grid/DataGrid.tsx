@@ -50,8 +50,6 @@ export const DataGrid = Component(
 			fakeState,
 			environment,
 			{
-				onEntityClick: props.onEntityClick,
-				selectedEntityKeys: props.selectedEntityKeys,
 				tile: props.tile,
 			},
 			'component' in props ? props.component : undefined,

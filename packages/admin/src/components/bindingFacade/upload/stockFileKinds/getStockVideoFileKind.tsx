@@ -13,14 +13,16 @@ import {
 	getVideoFileDataExtractor,
 } from '../fileDataExtractors'
 import type { AcceptFileOptions, FileDataExtractor, FullFileKind, RenderFilePreviewOptions } from '../interfaces'
+import { PublicFileKind } from '../interfaces/FullFileKind'
 
-export interface StockVideoFileKindProps<AcceptArtifacts = unknown>
-	extends Partial<Omit<FullFileKind<S3FileUploader.SuccessMetadata, AcceptArtifacts>, 'extractors'>>,
-		FileUrlDataExtractorProps,
-		GenericFileMetadataExtractorProps,
-		VideoFileDataExtractorProps {
-	additionalExtractors?: FileDataExtractor<unknown, S3FileUploader.SuccessMetadata, AcceptArtifacts>[]
-}
+export type StockVideoFileKindProps<AcceptArtifacts = unknown, SFExtraProps extends {} = {}> =
+	& PublicFileKind<S3FileUploader.SuccessMetadata, AcceptArtifacts, SFExtraProps>
+	& FileUrlDataExtractorProps
+	& GenericFileMetadataExtractorProps
+	& VideoFileDataExtractorProps
+	& {
+		additionalExtractors?: FileDataExtractor<unknown, S3FileUploader.SuccessMetadata, AcceptArtifacts>[]
+	}
 
 export const acceptVideoFile = ({ file }: AcceptFileOptions) => file.type.startsWith('video')
 export const renderVideoFilePreview = ({ objectUrl }: RenderFilePreviewOptions) => <video src={objectUrl} controls />
@@ -42,6 +44,7 @@ export const getStockVideoFileKind = <AcceptArtifacts extends any = unknown>({
 	widthField,
 	uploader = defaultUploader,
 	urlField,
+	...rest
 }: StockVideoFileKindProps<AcceptArtifacts>): FullFileKind<S3FileUploader.SuccessMetadata, AcceptArtifacts> => {
 	const extractors: FileDataExtractor<any, S3FileUploader.SuccessMetadata, AcceptArtifacts>[] = [
 		getFileUrlDataExtractor({ urlField }),
@@ -60,5 +63,6 @@ export const getStockVideoFileKind = <AcceptArtifacts extends any = unknown>({
 		renderFilePreview,
 		renderUploadedFile: renderUploadedVideo,
 		uploader,
+		...rest,
 	}
 }

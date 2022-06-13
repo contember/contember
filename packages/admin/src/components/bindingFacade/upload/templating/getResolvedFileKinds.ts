@@ -1,22 +1,62 @@
 import type { Environment, SugaredFieldProps } from '@contember/binding'
-import { BindingError, EntityAccessor, VariableInputTransformer } from '@contember/binding'
+import { BindingError, EntityAccessor, useEnvironment, VariableInputTransformer } from '@contember/binding'
 import type { NormalizedDiscriminatedData } from '../../discrimination'
 import type { DiscriminatedFileKind, FullFileKind } from '../interfaces'
-import type { ResolvedFileKinds } from '../ResolvedFileKinds'
+import type { ResolvedDiscriminatedFileKinds, ResolvedFileKinds, ResolvedSimpleFileKinds } from '../ResolvedFileKinds'
 import { fileKindTemplateAnalyzer } from './fileKindTemplateAnalyzer'
+import { ReactNode, useMemo } from 'react'
+import { SelectFileInputFormComponentProps } from '../internalComponents/SelectFileInput'
 
-export interface HybridFileKindProps extends Partial<FullFileKind> {
-	discriminationField?: SugaredFieldProps['field']
-	hasUploadedFile?: (entity: EntityAccessor) => boolean
-}
+type DiscriminatedFileKindsProps<SFExtraProps extends {} = {}> =
+	& (
+		| SelectFileInputFormComponentProps<SFExtraProps>
+		| {}
+	)
+	& {
+		discriminationField: SugaredFieldProps['field']
+		children: ReactNode
+		baseEntity?: string
+	}
+
+type SimpleFileKindProps<SFExtraProps extends {} = {}> =
+	& FullFileKind<unknown, unknown, SFExtraProps>
+	& {
+		hasUploadedFile: (entity: EntityAccessor) => boolean
+	}
+
+export type HybridFileKindProps<SFExtraProps extends {} = {}> =
+	| DiscriminatedFileKindsProps<SFExtraProps>
+	| SimpleFileKindProps<SFExtraProps>
 
 export const getResolvedFileKinds = (
 	props: HybridFileKindProps,
 	environment: Environment,
 	componentName: string,
 ): ResolvedFileKinds => {
+	if (!('discriminationField' in props)) {
+		return createSimpleFileKind(props)
+	}
+	return createDiscriminatedFileKinds(props, environment, componentName)
+}
+
+export const useFileKinds = (
+	props: HybridFileKindProps,
+	componentName: string,
+) => {
+	const environment = useEnvironment()
+	return useMemo(
+		() => getResolvedFileKinds(props, environment, componentName),
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+		[environment, ...'discriminationField' in props
+			? [props.discriminationField, props.children, props.baseEntity]
+			: [props.hasUploadedFile, props.children, props.acceptFile, props.acceptMimeTypes, props.baseEntity, props.renderFilePreview, props.renderUploadedFile, props.extractors, props.uploader]],
+	)
+}
+
+export const createSimpleFileKind = (
+	props: SimpleFileKindProps<any>,
+): ResolvedSimpleFileKinds => {
 	const {
-		discriminationField,
 		hasUploadedFile,
 		children,
 		acceptFile,
@@ -26,84 +66,64 @@ export const getResolvedFileKinds = (
 		renderUploadedFile,
 		extractors,
 		uploader,
+		...rest
 	} = props
 
-	if (
-		acceptFile !== undefined ||
-		acceptMimeTypes !== undefined ||
-		// baseEntity !== undefined || // Deliberately left out
-		hasUploadedFile !== undefined ||
-		renderFilePreview !== undefined ||
-		renderUploadedFile !== undefined ||
-		extractors !== undefined ||
-		uploader !== undefined
-	) {
-		if (discriminationField !== undefined) {
-			throw new BindingError(
-				`${componentName}: with a top-level file-kind prop supplied, single file kind mode is in on. ` +
-					`Thus the 'discriminationField' prop has no effect.`,
-			)
-		}
-		const mandatoryPropNames = [
-			// 'acceptFile' // Deliberately left out
-			'acceptMimeTypes',
-			// 'baseEntity', // Deliberately left out
-			'hasUploadedFile',
-			'renderFilePreview',
-			'renderUploadedFile',
-			'extractors',
-			'uploader',
-		] as const
-		for (const propName of mandatoryPropNames) {
-			if (props[propName] === undefined) {
-				throw new BindingError(`${componentName}: the single file-kind mode is on but the '${propName}' is missing.`)
-			}
-		}
-
-		return {
-			isDiscriminated: false,
-			fileKind: {
-				acceptFile,
-				acceptMimeTypes: acceptMimeTypes!,
-				baseEntity,
-				children,
-				extractors: extractors!,
-				renderFilePreview: renderFilePreview!,
-				renderUploadedFile,
-				uploader: uploader!,
-			},
-			hasUploadedFile: hasUploadedFile!,
-		}
+	return {
+		isDiscriminated: false,
+		hasFileSelection: 'selectFormComponent' in rest,
+		fileKind: {
+			acceptFile,
+			acceptMimeTypes,
+			baseEntity,
+			children,
+			extractors,
+			renderFilePreview,
+			renderUploadedFile,
+			uploader,
+			...rest,
+		},
+		hasUploadedFile: hasUploadedFile!,
 	}
+}
+
+export const createDiscriminatedFileKinds = (
+	props: DiscriminatedFileKindsProps,
+	environment: Environment,
+	componentName: string,
+): ResolvedDiscriminatedFileKinds => {
+	const { discriminationField, children, baseEntity } = props
 	const processed = fileKindTemplateAnalyzer.processChildren(children, environment)
 	const fileKinds: DiscriminatedFileKind[] = processed.map(node => node.value)
 
-	if (discriminationField) {
-		const normalizedFileKinds: NormalizedDiscriminatedData<FullFileKind> = new Map()
-
-		for (const fileKind of fileKinds) {
-			const value = VariableInputTransformer.transformValue(fileKind.discriminateBy, environment)
-			normalizedFileKinds.set(value, {
-				discriminateBy: value,
-				datum: fileKind,
-			})
+	const normalizedFileKinds: NormalizedDiscriminatedData<FullFileKind> = new Map()
+	let hasFileSelection = 'selectFormComponent' in props
+	for (const fileKind of fileKinds) {
+		const value = VariableInputTransformer.transformValue(fileKind.discriminateBy, environment)
+		if ('selectFormComponent' in fileKind) {
+			hasFileSelection = true
 		}
-
-		if (!normalizedFileKinds.size) {
-			throw new BindingError(
-				`${componentName}: having supplied the 'discriminationField' prop, you must specify at least one file kind!`,
-			)
-		}
-
-		return {
-			isDiscriminated: true,
-			discriminationField,
-			baseEntity,
-			fileKinds: normalizedFileKinds,
-		}
+		normalizedFileKinds.set(value, {
+			discriminateBy: value,
+			datum: fileKind,
+		})
 	}
-	throw new BindingError(
-		`${componentName}: you must supply either the 'discriminationField' prop and at least one FileKind, ` +
-			`or specify all of the top-level file-kind props directly!`,
-	)
+
+	if (!normalizedFileKinds.size) {
+		throw new BindingError(
+			`${componentName}: having supplied the 'discriminationField' prop, you must specify at least one file kind!`,
+		)
+	}
+
+	return {
+		isDiscriminated: true,
+		hasFileSelection,
+		discriminationField,
+		baseEntity,
+		fileKinds: normalizedFileKinds,
+		...('selectFormComponent' in props ? {
+			selectFormComponent: props.selectFormComponent,
+			selectFormProps: props.selectFormProps,
+		} : {}),
+	}
 }

@@ -34,7 +34,7 @@ export const ControlledDataGrid = Component(
 				emptyMessageComponent: props.emptyMessageComponent,
 				emptyMessageComponentExtraProps: props.emptyMessageComponentExtraProps,
 				onEntityClick: props.onEntityClick,
-				selectedEntityKeys: props.selectedEntityKeys,
+				selectedEntityIds: props.selectedEntityIds,
 				tile: props.tile,
 			}),
 			[
@@ -42,7 +42,7 @@ export const ControlledDataGrid = Component(
 				props.emptyMessageComponent,
 				props.emptyMessageComponentExtraProps,
 				props.onEntityClick,
-				props.selectedEntityKeys,
+				props.selectedEntityIds,
 				props.tile,
 			],
 		)

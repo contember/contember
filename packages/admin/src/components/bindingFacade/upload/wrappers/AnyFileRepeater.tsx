@@ -4,9 +4,9 @@ import { BareFileRepeater, FileInputPublicProps } from '../internalComponents'
 import type { StockAnyFileKindProps } from '../stockFileKinds'
 import { getStockAnyFileKind } from '../stockFileKinds'
 
-export type AnyFileRepeaterProps<AcceptArtifacts = unknown> =
+export type AnyFileRepeaterProps<AcceptArtifacts = unknown, SFExtraProps extends {} = {}> =
 	& SugaredRelativeEntityList
-	& StockAnyFileKindProps<AcceptArtifacts>
+	& StockAnyFileKindProps<AcceptArtifacts, SFExtraProps>
 	& FileInputPublicProps
 	& {
 		sortableBy?: SugaredFieldProps['field']
@@ -20,10 +20,11 @@ export const AnyFileRepeater = Component<AnyFileRepeaterProps>(
 			{...props}
 			fileKinds={{
 				isDiscriminated: false,
+				hasFileSelection: 'selectFormComponent' in props,
 				fileKind: getStockAnyFileKind(props),
 				hasUploadedFile: (entity: EntityAccessor) => entity.getField(props.urlField).value !== null,
 			}}
 		/>
 	),
 	'AnyFileRepeater',
-) as <AcceptArtifacts = unknown>(props: AnyFileRepeaterProps<AcceptArtifacts>) => ReactElement | null
+) as <AcceptArtifacts = unknown, SFExtraProps extends {} = {}>(props: AnyFileRepeaterProps<AcceptArtifacts, SFExtraProps>) => ReactElement | null

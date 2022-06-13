@@ -15,7 +15,7 @@ export interface DataGridContainerPublicProps {
 	emptyMessageComponent?: ComponentType<EmptyMessageProps & any> // This can override 'emptyMessage'
 	emptyMessageComponentExtraProps?: {}
 	onEntityClick?: (entity: EntityAccessor) => void
-	selectedEntityKeys?: EntityId[]
+	selectedEntityIds?: EntityId[]
 	tile?: ReactNode
 	tileSize?: number
 }

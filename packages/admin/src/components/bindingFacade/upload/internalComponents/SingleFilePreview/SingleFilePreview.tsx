@@ -13,7 +13,7 @@ import { InitializingFilePreview } from './InitializingFilePreview'
 import { UploadedFilePreview } from './UploadedFilePreview'
 
 export interface SingleFilePreviewProps {
-	getContainingEntity: EntityAccessor.GetEntityAccessor
+	containingEntity: EntityAccessor
 	fileId: FileId
 	formatMessage: MessageFormatter<UploadDictionary>
 	removeFile: ((fileId: FileId) => void) | undefined
@@ -30,7 +30,7 @@ function viewFromMimeType(mimeType: string | string[] | undefined | null) {
 }
 
 export const SingleFilePreview = memo(
-	({ fileId, fileKinds, formatMessage, getContainingEntity, removeFile, uploadState }: SingleFilePreviewProps) => {
+	({ fileId, fileKinds, formatMessage, containingEntity, removeFile, uploadState }: SingleFilePreviewProps) => {
 		let fileKind: FullFileKind | undefined
 		let preview: ReactElement | null = null
 
@@ -44,14 +44,14 @@ export const SingleFilePreview = memo(
 		}, [fileId, removeFile])
 
 		if (fileKinds.isDiscriminated && fileKinds.baseEntity !== undefined) {
-			getContainingEntity = getContainingEntity().getEntity(fileKinds.baseEntity).getAccessor
+			containingEntity = containingEntity.getEntity(fileKinds.baseEntity)
 		}
 
 		if (uploadState !== undefined) {
 			if (uploadState.readyState === 'initializing') {
 				return <InitializingFilePreview formatMessage={formatMessage} />
 			}
-			fileKind = getEntityFileKind(fileKinds, getContainingEntity)
+			fileKind = getEntityFileKind(fileKinds, containingEntity)
 
 			if (uploadState.readyState === 'error' && fileKind === undefined) {
 				fileKind = undefined
@@ -64,13 +64,13 @@ export const SingleFilePreview = memo(
 					<InitializedFilePreview
 						fileKind={fileKind}
 						formatMessage={formatMessage}
-						getContainingEntity={getContainingEntity}
+						getContainingEntity={containingEntity.getAccessor}
 						uploadState={uploadState}
 					/>
 				)
 			}
-		} else if (hasUploadedFile(fileKinds, getContainingEntity())) {
-			fileKind = getEntityFileKind(fileKinds, getContainingEntity)
+		} else if (hasUploadedFile(fileKinds, containingEntity)) {
+			fileKind = getEntityFileKind(fileKinds, containingEntity)
 
 			if (fileKind === undefined) {
 				throw new BindingError()
@@ -80,13 +80,12 @@ export const SingleFilePreview = memo(
 			return null
 		}
 		const editContents = fileKind && fileKind.children ? <Box>{fileKind.children}</Box> : undefined
-		const containingEntity =
-			!fileKind || fileKind.baseEntity === undefined
-				? getContainingEntity()
-				: getContainingEntity().getEntity(fileKind.baseEntity)
+		const containingEntityWithBase = !fileKind || fileKind.baseEntity === undefined
+			? containingEntity
+			: containingEntity.getEntity(fileKind.baseEntity)
 
 		return (
-			<Entity accessor={containingEntity}>
+			<Entity accessor={containingEntityWithBase}>
 				<ActionableBox className={toEnumViewClass(viewFromMimeType(fileKind?.acceptMimeTypes))} onRemove={onRemove} editContents={editContents}>
 					{preview}
 				</ActionableBox>

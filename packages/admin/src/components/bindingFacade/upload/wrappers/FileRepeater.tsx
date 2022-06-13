@@ -1,14 +1,14 @@
 import type { SugaredFieldProps, SugaredRelativeEntityList } from '@contember/binding'
-import { Component, useEnvironment } from '@contember/binding'
+import { Component } from '@contember/binding'
 import type { ReactNode } from 'react'
-import { useMemo } from 'react'
+import { ReactElement } from 'react'
 import { BareFileRepeater, FileInputPublicProps } from '../internalComponents'
-import { getResolvedFileKinds, HybridFileKindProps } from '../templating'
+import { getResolvedFileKinds, HybridFileKindProps, useFileKinds } from '../templating'
 
-export type FileRepeaterProps =
+export type FileRepeaterProps<SFExtraProps extends {} = {}> =
 	& SugaredRelativeEntityList
-	& HybridFileKindProps
-	& Omit<FileInputPublicProps, 'label'>
+	& HybridFileKindProps<SFExtraProps>
+	& FileInputPublicProps
 	& {
 		boxLabel?: ReactNode
 		label: ReactNode
@@ -17,56 +17,12 @@ export type FileRepeaterProps =
 	}
 
 export const FileRepeater = Component<FileRepeaterProps>(
-	({
-		acceptFile,
-		acceptMimeTypes,
-		baseEntity,
-		children,
-		discriminationField,
-		extractors,
-		hasUploadedFile,
-		renderFilePreview,
-		renderUploadedFile,
-		uploader,
-		...props
-	}) => {
-		const environment = useEnvironment()
-		const fileKinds = useMemo(
-			() =>
-				getResolvedFileKinds(
-					{
-						acceptFile,
-						acceptMimeTypes,
-						baseEntity,
-						children,
-						discriminationField,
-						extractors,
-						hasUploadedFile,
-						renderFilePreview,
-						renderUploadedFile,
-						uploader,
-					},
-					environment,
-					'FileRepeater',
-				),
-			[
-				acceptFile,
-				acceptMimeTypes,
-				baseEntity,
-				children,
-				discriminationField,
-				extractors,
-				hasUploadedFile,
-				renderFilePreview,
-				renderUploadedFile,
-				uploader,
-				environment,
-			],
-		)
+	props => {
+		const fileKinds = useFileKinds(props, 'FileRepeater')
 		return <BareFileRepeater {...props} fileKinds={fileKinds} />
 	},
 	(props, environment) => (
 		<BareFileRepeater {...props} fileKinds={getResolvedFileKinds(props, environment, 'FileRepeater')} />
 	),
 	'FileRepeater',
-)
+) as <SFExtraProps extends {} = {}>(props: FileRepeaterProps<SFExtraProps>) => ReactElement | null

@@ -1,7 +1,8 @@
 import type { SugaredDiscriminateBy } from '../../discrimination'
 import type { FullFileKind } from './FullFileKind'
 
-export interface DiscriminatedFileKind<UploadResult = unknown, AcceptArtifacts = unknown>
-	extends FullFileKind<UploadResult, AcceptArtifacts> {
-	discriminateBy: SugaredDiscriminateBy
-}
+export type DiscriminatedFileKind<UploadResult = unknown, AcceptArtifacts = unknown, SFExtraProps extends {} = {}> =
+	& FullFileKind<UploadResult, AcceptArtifacts, SFExtraProps>
+	& {
+		discriminateBy: SugaredDiscriminateBy
+	}

@@ -1,64 +1,20 @@
-import { Component, useEnvironment } from '@contember/binding'
+import { Component } from '@contember/binding'
 import type { ReactNode } from 'react'
-import { useMemo } from 'react'
+import { ReactElement } from 'react'
 import type { FileInputPublicProps } from '../internalComponents'
 import { BareUploadField } from '../internalComponents'
-import { getResolvedFileKinds, HybridFileKindProps } from '../templating'
+import { getResolvedFileKinds, HybridFileKindProps, useFileKinds } from '../templating'
 
-export type UploadFieldProps =
+export type UploadFieldProps<SFExtraProps extends {} = {}> =
 	& FileInputPublicProps
-	&	HybridFileKindProps
+	&	HybridFileKindProps<SFExtraProps>
 	& {
 		children?: ReactNode
 	}
 
 export const UploadField = Component<UploadFieldProps>(
-	({
-		acceptFile,
-		acceptMimeTypes,
-		baseEntity,
-		children,
-		discriminationField,
-		extractors,
-		hasUploadedFile,
-		renderFilePreview,
-		renderUploadedFile,
-		uploader,
-		...props
-	}) => {
-		const environment = useEnvironment()
-		const fileKinds = useMemo(
-			() =>
-				getResolvedFileKinds(
-					{
-						acceptFile,
-						acceptMimeTypes,
-						baseEntity,
-						children,
-						discriminationField,
-						extractors,
-						hasUploadedFile,
-						renderFilePreview,
-						renderUploadedFile,
-						uploader,
-					},
-					environment,
-					'UploadField',
-				),
-			[
-				acceptFile,
-				acceptMimeTypes,
-				baseEntity,
-				children,
-				discriminationField,
-				extractors,
-				hasUploadedFile,
-				renderFilePreview,
-				renderUploadedFile,
-				uploader,
-				environment,
-			],
-		)
+	props => {
+		const fileKinds = useFileKinds(props, 'UploadField')
 
 		return <BareUploadField {...props} fileKinds={fileKinds} />
 	},
@@ -66,4 +22,4 @@ export const UploadField = Component<UploadFieldProps>(
 		<BareUploadField {...props} fileKinds={getResolvedFileKinds(props, environment, 'UploadField')} />
 	),
 	'UploadField',
-)
+) as <SFExtraProps extends {} = {}>(props: UploadFieldProps<SFExtraProps>) => ReactElement | null

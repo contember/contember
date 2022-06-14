@@ -18,12 +18,13 @@ export interface BareFileRepeaterContainerPrivateProps {
 	sortableBy?: SugaredFieldProps['field']
 }
 
-export type BareFileRepeaterContainerPublicProps =
-	& FileInputPublicProps
-	& {
-		boxLabel?: ReactNode
-		label: ReactNode
-	}
+export interface BareFileRepeaterContainerPublicProps extends Omit<FileInputPublicProps, 'label'> {
+	/**
+	 * @deprecated Use label instead
+	 */
+	boxLabel?: ReactNode
+	label: ReactNode
+}
 
 export type BareFileRepeaterContainerProps =
 	& BareFileRepeaterContainerPublicProps

@@ -151,7 +151,7 @@ export class ImportExecutor {
 		const [options] = it.commandArgs
 		const insertContext = await this.buildInsertContext(db, mapping, db.schema, options.table, options.columns)
 
-		return await this.match(await it.next(), {
+		const result = await this.match(await it.next(), {
 			insertRow: async it => {
 				const [values] = it.commandArgs
 
@@ -174,15 +174,17 @@ export class ImportExecutor {
 
 				return await it.next()
 			},
-
-			insertEnd: async it => {
-				if (insertContext.rows.length > 0) {
-					await this.insertRows(db, insertContext)
-				}
-
-				return await it.next()
-			},
 		})
+
+		if (insertContext.rows.length > 0) {
+			await this.insertRows(db, insertContext)
+		}
+
+		if (result === null || result.commandName !== 'insertEnd') {
+			throw new ImportError(`Missing insertEnd command`)
+		}
+
+		return await result.next()
 	}
 
 	private async createProjectContainer(groupContainer: ProjectGroupContainer, projectSlug: string) {

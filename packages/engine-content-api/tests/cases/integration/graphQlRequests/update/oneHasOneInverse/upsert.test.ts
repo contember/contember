@@ -53,11 +53,13 @@ test('upsert - exists', async () => {
 	})
 })
 test('upsert - not exists', async () => {
+	const settingId = testUuid(2)
+	const siteId = testUuid(1)
 	await execute({
 		schema: siteSettingSchema,
 		query: GQL`mutation {
         updateSiteSetting(
-            by: {id: "${testUuid(2)}"},
+            by: {id: "${settingId}"},
            data: {site: {upsert: {update: {name: "Mangoweb"}, create: {name: "Mgw"}}}}
           ) {
           ok
@@ -67,14 +69,14 @@ test('upsert - not exists', async () => {
 			...sqlTransaction([
 				{
 					sql: SQL`select "root_"."id" from "public"."site_setting" as "root_" where "root_"."id" = ?`,
-					parameters: [testUuid(2)],
-					response: { rows: [{ id: testUuid(2) }] },
+					parameters: [settingId],
+					response: { rows: [{ id: settingId }] },
 				},
 				{
 					sql: SQL`select "root_"."id"
                        from "public"."site" as "root_"
                        where "root_"."setting_id" = ?`,
-					parameters: [testUuid(2)],
+					parameters: [settingId],
 					response: {
 						rows: [],
 					},
@@ -86,8 +88,8 @@ test('upsert - not exists', async () => {
 							select "root_"."id", "root_"."name", "root_"."setting_id"
               from "root_"
 							returning "id"`,
-					parameters: [testUuid(1), 'Mgw', testUuid(2)],
-					response: { rows: [{ id: testUuid(1) }] },
+					parameters: [siteId, 'Mgw', settingId],
+					response: { rows: [{ id: siteId }] },
 				},
 			]),
 		],

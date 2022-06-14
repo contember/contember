@@ -266,7 +266,12 @@ export const true_ = literal(true)
 export const false_ = literal(false)
 
 export const nullable = <T extends Json>(inner: Type<T>): Type<T | null> => {
-	return union(null_, inner)
+	const type = (input: unknown, path: PropertyKey[] = []) => {
+		return input === null ? input : inner(input, path)
+	}
+
+	type.inner = inner
+	return type
 }
 
 export const transform = <Input extends Json, Result extends Json>(inner: Type<Input>, transform: (value: Input, input: unknown) => Result) => (input: unknown, path: PropertyKey[] = []): Result => {

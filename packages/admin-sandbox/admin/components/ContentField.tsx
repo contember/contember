@@ -15,7 +15,6 @@ import {
 	tableToolbarButton,
 	TextField,
 } from '@contember/admin'
-import * as React from 'react'
 import { withAnchorsAsReference } from './AnchorInsertHandler'
 import { InsertLink, LinkElement } from './customLinks'
 
@@ -109,7 +108,13 @@ export const ContentField = Component<ContentFieldProps>(
 			]}
 			toolbarScheme={toolbarScheme}
 		>
-			<Block discriminateBy="image" label="Image">
+			<Block discriminateBy="image" label="Image" alternate={
+				<SelectField field={'align	'} label={'Align'} options={[
+					{ value: 'left', label: 'Left' },
+					{ value: 'right', label: 'Right' },
+					{ value: 'center', label: 'Center' },
+				]} />
+			}>
 				<BlockEditor.ContentOutlet placeholder="Text" />
 				<ImageUploadField
 					label="Image"
@@ -125,11 +130,6 @@ export const ContentField = Component<ContentFieldProps>(
 					{ value: 'right', label: 'Right' },
 					{ value: 'center', label: 'Center' },
 				]} orientation={'horizontal'} />
-				<SelectField field={'align	'} label={'Align'} options={[
-					{ value: 'left', label: 'Left' },
-					{ value: 'right', label: 'Right' },
-					{ value: 'center', label: 'Center' },
-				]} />
 			</Block>
 			<Block discriminateBy="quote" label="Quote">
 				<BlockEditor.ContentOutlet />

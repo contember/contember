@@ -3,21 +3,22 @@ export { SchemaMigrator, MigrationsResolver } from '@contember/schema-migrations
 export { typeDefs, devTypeDefs, Schema } from './schema'
 
 export {
-	Identity,
 	DatabaseContext,
-	setupSystemVariables,
-	StageBySlugQuery,
-	unnamedIdentity,
-	SchemaVersionBuilder,
-	formatSchemaName,
-	VersionedSchema,
-	ProjectInitializer,
-	LatestTransactionIdByStageQuery,
 	DatabaseContextFactory,
-	ProjectMigrator,
-	StageCreator,
+	formatSchemaName,
 	getJunctionTables,
+	Identity,
+	LatestTransactionIdByStageQuery,
+	ProjectInitializer,
+	ProjectMigrator,
+	SchemaVersionBuilder,
+	setupSystemVariables,
 	Stage,
+	StageBySlugQuery,
+	StageCreator,
+	StagesQuery,
+	unnamedIdentity,
+	VersionedSchema,
 } from './model'
 export * from './SystemContainer'
 export * from './resolvers'

@@ -1,24 +1,27 @@
 import { Input, Model } from '@contember/schema'
 import { getColumnName } from '@contember/schema-utils'
-import { SelectGroupedObjects, SelectHydrator, SelectIndexedResultObjects, SelectResultObject } from './select'
-import { PathFactory } from './select'
+import {
+	OrderByHelper,
+	PathFactory,
+	SelectBuilderFactory,
+	SelectGroupedObjects,
+	SelectHydrator,
+	SelectIndexedResultObjects,
+	SelectResultObject,
+	WhereBuilder,
+} from './select'
 import * as database from '@contember/database'
-import { Client, SelectBuilder } from '@contember/database'
-import { SelectBuilderFactory } from './select'
+import { Client, ConstraintHelper, SelectBuilder } from '@contember/database'
 import { PredicatesInjector } from '../acl'
-import { WhereBuilder } from './select'
 import { JunctionTableManager } from './JunctionTableManager'
 import { DeletedEntitiesStorage, DeleteExecutor } from './delete'
 import { MutationEntryNotFoundError, MutationResultList } from './Result'
-import { Updater } from './update'
-import { Inserter } from './insert'
+import { UpdateBuilder, Updater } from './update'
+import { InsertBuilder, Inserter } from './insert'
 import { tryMutation } from './ErrorUtils'
-import { OrderByHelper } from './select'
-import {  ObjectNode, UniqueWhereExpander } from '../inputProcessing'
-import { UpdateBuilder } from './update'
+import { ObjectNode, UniqueWhereExpander } from '../inputProcessing'
 import { Mutex } from '../utils'
 import { CheckedPrimary } from './CheckedPrimary'
-import { ConstraintHelper } from '@contember/database'
 import { ImplementationException } from '../exception'
 
 export class Mapper {
@@ -163,15 +166,20 @@ export class Mapper {
 		return Object.fromEntries(result)
 	}
 
-	public async insert(entity: Model.Entity, data: Input.CreateDataInput): Promise<MutationResultList> {
+	public async insert(
+		entity: Model.Entity,
+		data: Input.CreateDataInput,
+		builderCb: (builder: InsertBuilder) => void = () => {},
+	): Promise<MutationResultList> {
 		if (entity.view) {
 			throw new ImplementationException()
 		}
+		const pushId = (id: string) => {
+			const where = { [entity.primary]: id }
+			this.primaryKeyCache[this.hashWhere(entity.name, where)] = id
+		}
 		return tryMutation(this.schema, () =>
-			this.inserter.insert(this, entity, data, id => {
-				const where = { [entity.primary]: id }
-				this.primaryKeyCache[this.hashWhere(entity.name, where)] = id
-			}),
+			this.inserter.insert(this, entity, data, pushId, builderCb),
 		)
 	}
 
@@ -196,18 +204,19 @@ export class Mapper {
 	public async updateInternal(
 		entity: Model.Entity,
 		by: Input.UniqueWhere,
-		predicateFields: string[],
 		builderCb: (builder: UpdateBuilder) => void,
 	): Promise<MutationResultList> {
+		if (entity.view) {
+			throw new ImplementationException()
+		}
 		return tryMutation(this.schema, async () => {
 			const primaryValue = await this.getPrimaryValue(entity, by)
 			if (primaryValue === undefined) {
 				return [new MutationEntryNotFoundError([], by)]
 			}
-			return await this.updater.updateCb(this, entity, primaryValue, predicateFields, builderCb)
+			return await this.updater.updateCb(this, entity, primaryValue, builderCb)
 		})
 	}
-
 	public async upsert(
 		entity: Model.Entity,
 		by: Input.UniqueWhere,
@@ -221,10 +230,11 @@ export class Mapper {
 		return tryMutation(this.schema, async () => {
 			const primaryValue = await this.getPrimaryValue(entity, by)
 			if (primaryValue === undefined) {
-				return await this.inserter.insert(this, entity, create, id => {
+				const pushIdCallback = (id: string) => {
 					const where = { [entity.primary]: id }
 					this.primaryKeyCache[this.hashWhere(entity.name, where)] = id
-				})
+				}
+				return await this.inserter.insert(this, entity, create, pushIdCallback, () => {})
 			}
 			return await this.updater.update(this, entity, primaryValue, update, filter)
 		})

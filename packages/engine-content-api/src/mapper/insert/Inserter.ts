@@ -22,7 +22,6 @@ import { rowDataToFieldValues } from '../ColumnValue'
 export class Inserter {
 	constructor(
 		private readonly schema: Model.Schema,
-		private readonly predicateFactory: PredicateFactory,
 		private readonly insertBuilderFactory: InsertBuilderFactory,
 		private readonly providers: Providers,
 	) {}
@@ -31,15 +30,14 @@ export class Inserter {
 		mapper: Mapper,
 		entity: Model.Entity,
 		data: Input.CreateDataInput,
-		pushId: (id: string) => void,
+		insertIdCallback: (id: string) => void,
+		builderCb: (builder: InsertBuilder) => void,
 	): Promise<MutationResultList> {
-		const where = this.predicateFactory.create(entity, Acl.Operation.create, Object.keys(data))
 		const insertBuilder = this.insertBuilderFactory.create(entity)
 		// eslint-disable-next-line promise/catch-or-return
-		insertBuilder.insert.then(id => id && pushId(String(id)))
+		insertBuilder.insert.then(id => id && insertIdCallback(String(id)))
 
-		insertBuilder.addWhere(where)
-
+		insertBuilder.addPredicates(Object.keys(data))
 		const visitor = new CreateInputVisitor<MutationResultList>(
 			new SqlCreateInputProcessor(insertBuilder, mapper, this.providers),
 			this.schema,
@@ -50,6 +48,7 @@ export class Inserter {
 			entity,
 			visitor,
 		)
+		builderCb(insertBuilder)
 
 		const okResultFactory = (primary: Value.PrimaryValue, values: RowValues) =>
 			new MutationCreateOk([], entity, primary, data, values)

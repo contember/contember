@@ -115,9 +115,7 @@ export class DeleteExecutor {
 		where: Input.Where,
 	): Promise<void> {
 		const updateBuilder = this.updateBuilderFactory.create(entity, where)
-		const predicateWhere = this.predicateFactory.create(entity, Acl.Operation.update, [relation.name])
-		updateBuilder.addOldWhere(predicateWhere)
-		updateBuilder.addNewWhere(predicateWhere)
+		updateBuilder.addPredicates([relation.name])
 		updateBuilder.addFieldValue(relation.name, null)
 		await updateBuilder.execute(db)
 	}

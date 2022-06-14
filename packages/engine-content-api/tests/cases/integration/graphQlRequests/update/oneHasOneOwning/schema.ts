@@ -13,3 +13,16 @@ export const siteSettingSchema = new SchemaBuilder()
 			),
 	)
 	.buildSchema()
+
+export const siteSettingSchemaWithOrphanRemoval = new SchemaBuilder()
+	.entity('Site', entity =>
+		entity
+			.column('name', c => c.type(Model.ColumnType.String))
+			.oneHasOne('setting', r =>
+				r
+					.inversedBy('site')
+					.target('SiteSetting', e => e.column('url', c => c.type(Model.ColumnType.String)))
+					.removeOrphan(),
+			),
+	)
+	.buildSchema()

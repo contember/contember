@@ -5,11 +5,14 @@ import { testUuid } from '../../../../../src/testUuid'
 import { siteSettingSchema } from './schema'
 
 test('create', async () => {
+	const settingId = testUuid(2)
+	const oldSiteId = testUuid(3)
+	const newSiteId = testUuid(1)
 	await execute({
 		schema: siteSettingSchema,
 		query: GQL`mutation {
         updateSiteSetting(
-            by: {id: "${testUuid(2)}"},
+            by: {id: "${settingId}"},
             data: {site: {create: {name: "Mangoweb"}}}
           ) {
           ok
@@ -19,8 +22,8 @@ test('create', async () => {
 			...sqlTransaction([
 				{
 					sql: SQL`select "root_"."id" from "public"."site_setting" as "root_" where "root_"."id" = ?`,
-					parameters: [testUuid(2)],
-					response: { rows: [{ id: testUuid(2) }] },
+					parameters: [settingId],
+					response: { rows: [{ id: settingId }] },
 				},
 				// {
 				// 	sql: SQL`select "root_"."id" as "root_id", "root_"."id" as "root_id" from "public"."site_setting" as "root_" where "root_"."id" = ?`,
@@ -40,19 +43,22 @@ test('create', async () => {
 					sql: SQL`select "root_"."id"
                        from "public"."site" as "root_"
                        where "root_"."setting_id" = ?`,
-					parameters: [testUuid(2)],
+					parameters: [settingId],
 					response: {
-						rows: [{ id: testUuid(3) }],
+						rows: [{ id: oldSiteId }],
 					},
 				},
 				{
-					sql: SQL`
-						with "newData_" as
-						(select ? :: uuid as "setting_id", "root_"."id", "root_"."name"  from "public"."site" as "root_"  where "root_"."id" = ?)
-						update  "public"."site" set  "setting_id" =  "newData_"."setting_id"
-						from "newData_"  where "site"."id" = "newData_"."id"
-					`,
-					parameters: [null, testUuid(3)],
+					sql: SQL`with "newData_" as
+              (select
+                 ? :: uuid as "setting_id",
+                 "root_"."id",
+                 "root_"."name"
+               from "public"."site" as "root_"
+               where "root_"."id" = ?) update "public"."site"
+              set "setting_id" = "newData_"."setting_id" from "newData_"
+              where "site"."id" = "newData_"."id"`,
+					parameters: [null, oldSiteId],
 					response: { rowCount: 1 },
 				},
 				{
@@ -62,8 +68,8 @@ test('create', async () => {
 							select "root_"."id", "root_"."name", "root_"."setting_id"
               from "root_"
 							returning "id"`,
-					parameters: [testUuid(1), 'Mangoweb', testUuid(2)],
-					response: { rows: [{ id: testUuid(1) }] },
+					parameters: [newSiteId, 'Mangoweb', settingId],
+					response: { rows: [{ id: newSiteId }] },
 				},
 			]),
 		],

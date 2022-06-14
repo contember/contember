@@ -1,6 +1,6 @@
 import { SqlUpdateInputProcessor } from './SqlUpdateInputProcessor'
-import { UniqueWhereExpander, UpdateInputVisitor } from '../../inputProcessing'
-import { Acl, Input, Model } from '@contember/schema'
+import { UpdateInputVisitor } from '../../inputProcessing'
+import { Input, Model } from '@contember/schema'
 import { PredicateFactory } from '../../acl'
 import { UpdateBuilderFactory } from './UpdateBuilderFactory'
 import { Mapper } from '../Mapper'
@@ -8,7 +8,6 @@ import { acceptEveryFieldVisitor } from '@contember/schema-utils'
 import { Client } from '@contember/database'
 import {
 	collectResults,
-	MutationEntryNotFoundError,
 	MutationNoResultError,
 	MutationNothingToDo,
 	MutationResultList,
@@ -39,9 +38,8 @@ export class Updater {
 		})
 
 		const predicateFields = Object.keys(data)
-		this.applyPredicates(entity, predicateFields, updateBuilder)
-
-		if (filter) {
+		updateBuilder.addPredicates(predicateFields)
+		if (filter && Object.keys(filter).length > 0) {
 			updateBuilder.addOldWhere(filter)
 		}
 
@@ -51,32 +49,28 @@ export class Updater {
 
 		const okResultFactory = (values: RowValues) => new MutationUpdateOk([], entity, primaryValue, data, values)
 		const mutationResultPromise = Updater.executeUpdate(updateBuilder, mapper.db, okResultFactory)
-
-		return await collectResults(this.schema, mutationResultPromise, Object.values(promises))
+		const otherPromises = Object.values(promises)
+		if (otherPromises.length === 0) {
+			return await mutationResultPromise
+		} else {
+			return await collectResults(this.schema, mutationResultPromise, otherPromises)
+		}
 	}
 
 	public async updateCb(
 		mapper: Mapper,
 		entity: Model.Entity,
 		primaryValue: Input.PrimaryValue,
-		predicateFields: string[],
 		builderCb: (builder: UpdateBuilder) => void,
 	): Promise<MutationResultList> {
 		const updateBuilder = this.updateBuilderFactory.create(entity, {
 			[entity.primary]: { eq: primaryValue },
 		})
-		this.applyPredicates(entity, predicateFields, updateBuilder)
 
 		const okResultFactory = (values: RowValues) => new MutationUpdateOk([], entity, primaryValue, {}, values)
 		builderCb(updateBuilder)
 
 		return Updater.executeUpdate(updateBuilder, mapper.db, okResultFactory)
-	}
-
-	private applyPredicates(entity: Model.Entity, predicateFields: string[], updateBuilder: UpdateBuilder): void {
-		const predicateWhere = this.predicateFactory.create(entity, Acl.Operation.update, predicateFields)
-		updateBuilder.addOldWhere(predicateWhere)
-		updateBuilder.addNewWhere(predicateWhere)
 	}
 
 	private static async executeUpdate(

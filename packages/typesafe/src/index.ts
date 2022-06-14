@@ -218,8 +218,9 @@ export const discriminatedUnion = <T extends Type<JsonObject>[]>(field: string, 
 	return type
 }
 
-type TupleFromTupledType<T extends Type<Json>[]> = T extends [Type<infer X>, ...infer Y] ?
-	Y extends Type<Json>[] ? readonly [X, ...TupleFromTupledType<Y>] : readonly [] : readonly []
+type TupleFromTupledType<T extends Type<Json>[]> = T extends [Type<infer X>, ...infer Y]
+	? (Y extends Type<Json>[] ? readonly [X, ...TupleFromTupledType<Y>] : readonly [])
+	: readonly []
 
 export const tuple = <T extends Type<Json>[]>(...inner: T): Type<TupleFromTupledType<T>> => {
 	const type = (input: unknown, path: PropertyKey[] = []): TupleFromTupledType<T> => {
@@ -232,6 +233,30 @@ export const tuple = <T extends Type<Json>[]>(...inner: T): Type<TupleFromTupled
 			}
 			return v(input[k as unknown as number], newPath)
 		}) as any
+	}
+
+	type.inner = inner
+
+	return type
+}
+
+type DiscriminatedTupleUnionType<T extends Record<string, Type<Json>[]>> =
+	{ [K in keyof T]: (readonly [K, ...TupleFromTupledType<T[K]>]) }[keyof T & string]
+
+export const discriminatedTupleUnion = <T extends Record<string, Type<Json>[]>>(inner: T): Type<DiscriminatedTupleUnionType<T>> => {
+	const type = (input: unknown, path: PropertyKey[] = []): DiscriminatedTupleUnionType<T> => {
+		if (!Array.isArray(input)) throw ParseError.format(input, path, 'array')
+		if (input.length === 0) throw ParseError.format(input, path, `non-empty array`)
+
+		const tupleType = inner[input[0]]
+		if (tupleType === undefined) throw ParseError.format(input, [...path, 0], `one of ${Object.keys(inner).join(', ')}`)
+		if (input.length !== tupleType.length + 1) throw ParseError.format(input, path, `array with length ${tupleType.length + 1}`)
+
+		for (let i = 0; i < tupleType.length; i++) {
+			tupleType[i](input[i + 1], [...path, i + 1])
+		}
+
+		return input as any
 	}
 
 	type.inner = inner

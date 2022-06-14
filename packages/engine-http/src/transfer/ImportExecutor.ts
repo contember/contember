@@ -167,7 +167,7 @@ export class ImportExecutor {
 					}
 				}
 
-				if (insertContext.rows.length === 100) {
+				if (insertContext.rows.length === 1000) {
 					await this.insertRows(db, insertContext)
 					insertContext.rows = []
 				}

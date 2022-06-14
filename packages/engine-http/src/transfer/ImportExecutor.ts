@@ -150,6 +150,7 @@ export class ImportExecutor {
 	private async insertBegin(db: Client<Connection.TransactionLike>, mapping: TransferMapping, it: CommandIterator<'insertBegin'>) {
 		const [options] = it.commandArgs
 		const insertContext = await this.buildInsertContext(db, mapping, db.schema, options.table, options.columns)
+		let insertRowsPromise: Promise<void> | null = null
 
 		const result = await this.match(await it.next(), {
 			insertRow: async it => {
@@ -168,7 +169,8 @@ export class ImportExecutor {
 				}
 
 				if (insertContext.rows.length === 1000) {
-					await this.insertRows(db, insertContext)
+					await insertRowsPromise
+					insertRowsPromise = this.insertRows(db, insertContext)
 					insertContext.rows = []
 				}
 
@@ -177,6 +179,7 @@ export class ImportExecutor {
 		})
 
 		if (insertContext.rows.length > 0) {
+			await insertRowsPromise
 			await this.insertRows(db, insertContext)
 		}
 

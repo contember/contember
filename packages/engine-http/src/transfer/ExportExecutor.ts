@@ -5,7 +5,7 @@ import { Model } from '@contember/schema'
 import { ContentSchemaTransferMappingFactory } from './ContentSchemaTransferMappingFactory'
 import { SystemSchemaTransferMappingFactory } from './SystemSchemaTransferMappingFactory'
 import * as Typesafe from '@contember/typesafe'
-import { StagesQuery } from '@contember/engine-system-api/dist/src/model/index'
+import { StagesQuery } from '@contember/engine-system-api'
 import { ProjectContainer } from '../ProjectContainer'
 
 export type ExportRequest = ReturnType<typeof ExportRequest>

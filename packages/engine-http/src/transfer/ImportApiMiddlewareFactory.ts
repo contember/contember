@@ -37,6 +37,10 @@ export class ImportApiMiddlewareFactory {
 				throw new HttpError(`Unsupported content type`, 400)
 			}
 
+			if (request.headers['content-encoding'] !== undefined && request.headers['content-encoding'] !== 'gzip') {
+				throw new HttpError(`Unsupported content encoding`, 415)
+			}
+
 			try {
 				const isGzip = request.headers['content-encoding'] === 'gzip'
 				const commands = fromBuffer(isGzip ? request.req.pipe(createGunzip()) : request.req)

@@ -96,10 +96,15 @@ export const createMapperContainer = ({ permissions, schema, identityVariables, 
 					)
 				}
 			})())
-		.addService('insertBuilderFactory', ({ whereBuilder, pathFactory }) =>
-			new InsertBuilderFactory(schema.model, whereBuilder, pathFactory))
-		.addService('updateBuilderFactory', ({ whereBuilder, pathFactory }) =>
-			new UpdateBuilderFactory(schema.model, whereBuilder, pathFactory))
+		.addService(
+			'insertBuilderFactory',
+			({ whereBuilder, pathFactory, predicateFactory }) =>
+				new InsertBuilderFactory(schema.model, whereBuilder, pathFactory, predicateFactory),
+		)
+		.addService(
+			'updateBuilderFactory',
+			({ whereBuilder, pathFactory, predicateFactory }) =>
+				new UpdateBuilderFactory(schema.model, whereBuilder, pathFactory, predicateFactory))
 		.addService('connectJunctionHandler', () =>
 			new JunctionConnectHandler())
 		.addService('disconnectJunctionHandler', ({}) =>
@@ -110,8 +115,7 @@ export const createMapperContainer = ({ permissions, schema, identityVariables, 
 			new DeleteExecutor(schema.model, predicateFactory, whereBuilder, updateBuilderFactory, pathFactory))
 		.addService('updater', ({ predicateFactory, updateBuilderFactory }) =>
 			new Updater(schema.model, predicateFactory, updateBuilderFactory))
-		.addService('inserter', ({ predicateFactory, insertBuilderFactory, providers }) =>
-			new Inserter(schema.model, predicateFactory, insertBuilderFactory, providers))
+		.addService('inserter', ({ insertBuilderFactory, providers }) => new Inserter(schema.model, insertBuilderFactory, providers))
 		.addService('mapperFactory', ({ predicatesInjector, selectBuilderFactory, uniqueWhereExpander, whereBuilder, junctionTableManager, deleteExecutor, updater, inserter, pathFactory }) => {
 			return (db: Client) =>
 				new Mapper(

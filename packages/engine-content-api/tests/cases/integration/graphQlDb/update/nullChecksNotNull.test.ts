@@ -69,7 +69,7 @@ test('update site & try to create contact page which however exists', async () =
 				ok: false,
 				errors: [
 					{
-						type: 'UniqueConstraintViolation',
+						type: 'NotNullConstraintViolation',
 					},
 				],
 			},

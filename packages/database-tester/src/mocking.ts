@@ -1,10 +1,13 @@
-import { Client, Connection, DatabaseConfig, EventManager, PoolStatus } from '@contember/database'
+import { Client, Connection, DatabaseConfig, EventManager } from '@contember/database'
 import { assert } from 'vitest'
 
 export interface ExpectedQuery {
 	sql: string
 	parameters?: any[]
 	response: Partial<Connection.Result>
+}
+class CounterRef {
+	public value = 0
 }
 
 export class ConnectionMock implements Connection.ConnectionType  {
@@ -13,6 +16,7 @@ export class ConnectionMock implements Connection.ConnectionType  {
 
 	constructor(
 		private readonly queries: ExpectedQuery[],
+		private counter = new CounterRef(),
 		public readonly eventManager = new EventManager(),
 	) {
 	}
@@ -27,8 +31,9 @@ export class ConnectionMock implements Connection.ConnectionType  {
 
 		const actualSql = sql.replace(/\s+/g, ' ').toLowerCase()
 		const expectedSql = expected.sql.replace(/\s+/g, ' ').toLowerCase()
-
-		const expectedMsg = `Expected query does not match SQL:
+		this.counter.value++
+		// console.log({sql, parameters, response: {}})
+		const expectedMsg = `Expected query #${this.counter.value} does not match SQL:
 ${sql}
 with following parameters
 ${JSON.stringify(parameters, undefined, '  ')}
@@ -66,7 +71,7 @@ ${expected.sql}`
 		options: { eventManager?: EventManager } = {},
 	): Promise<Result> {
 		await this.query('BEGIN;')
-		const transaction = new ConnectionMock(this.queries, new EventManager(options.eventManager ?? this.eventManager))
+		const transaction = new ConnectionMock(this.queries, this.counter, new EventManager(options.eventManager ?? this.eventManager))
 		const result = await trx(transaction)
 		if (!transaction.isClosed) {
 			await this.commit()

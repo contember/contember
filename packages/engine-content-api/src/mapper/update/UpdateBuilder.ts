@@ -1,10 +1,11 @@
 import { tuple } from '../../utils'
-import { Input, Model, Value } from '@contember/schema'
+import { Acl, Input, Model, Value } from '@contember/schema'
 import { acceptEveryFieldVisitor, getColumnName, getColumnType } from '@contember/schema-utils'
 import { Client, Operator, QueryBuilder, UpdateBuilder as DbUpdateBuilder, Value as DbValue } from '@contember/database'
 import { PathFactory, WhereBuilder } from '../select'
 import { ColumnValue, ResolvedColumnValue, resolveGenericValue, resolveRowData } from '../ColumnValue'
 import { AbortUpdate } from './Updater'
+import { PredicateFactory } from '../../acl'
 
 export interface UpdateResult {
 	values: ResolvedColumnValue[]
@@ -19,10 +20,10 @@ export class UpdateBuilder {
 	}
 	public readonly update: Promise<number | null> = new Promise(resolve => (this.resolver = resolve))
 
-	private rowData: ColumnValue<AbortUpdate>[] = []
+	private rowData: Map<string, ColumnValue<AbortUpdate>> = new Map()
 
-	private newWhere: Input.OptionalWhere = {}
-	private oldWhere: Input.OptionalWhere = {}
+	private newWhere: { and: Input.OptionalWhere[] } = { and: [] }
+	private oldWhere: { and: Input.OptionalWhere[] } = { and: [] }
 
 	constructor(
 		private readonly schema: Model.Schema,
@@ -30,31 +31,37 @@ export class UpdateBuilder {
 		private readonly whereBuilder: WhereBuilder,
 		private readonly uniqueWhere: Input.Where,
 		private readonly pathFactory: PathFactory,
+		private readonly predicateFactory: PredicateFactory,
 	) {}
 
-	public async addFieldValue(
+	public addFieldValue(
 		fieldName: string,
 		value: Value.GenericValueLike<Value.AtomicValue<AbortUpdate | undefined>>,
 	): Promise<Value.AtomicValue<AbortUpdate | undefined>> {
 		const columnName = getColumnName(this.schema, this.entity, fieldName)
 		const columnType = getColumnType(this.schema, this.entity, fieldName)
 		const resolvedValue = resolveGenericValue(value)
-		this.rowData.push({ columnName, value: resolvedValue, columnType, fieldName })
+		this.rowData.set(columnName, { columnName, value: resolvedValue, columnType, fieldName })
 		return resolvedValue
 	}
 
 	public addNewWhere(where: Input.OptionalWhere): void {
-		this.newWhere = { and: [where, this.newWhere] }
+		this.newWhere.and.push(where)
 	}
 
 	public addOldWhere(where: Input.OptionalWhere): void {
-		this.oldWhere = { and: [where, this.oldWhere] }
+		this.oldWhere.and.push(where)
+	}
+
+	public addPredicates(fields: string[]): void {
+		const predicate = this.predicateFactory.create(this.entity, Acl.Operation.update, fields)
+		this.addNewWhere(predicate)
+		this.addOldWhere(predicate)
 	}
 
 	public async execute(db: Client): Promise<UpdateResult> {
-		let resolvedDataFinal: ResolvedColumnValue[] | null = null
 		try {
-			const resolvedData = await resolveRowData<AbortUpdate>(this.rowData)
+			const resolvedData = await resolveRowData<AbortUpdate>([...this.rowData.values()])
 			if (Object.keys(resolvedData).length === 0) {
 				this.resolver(null)
 				return { values: [], affectedRows: null, executed: false, aborted: false }

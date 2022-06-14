@@ -249,7 +249,7 @@ export const discriminatedTupleUnion = <T extends Record<string, Type<Json>[]>>(
 		if (input.length === 0) throw ParseError.format(input, path, `non-empty array`)
 
 		const tupleType = inner[input[0]]
-		if (tupleType === undefined) throw ParseError.format(input, path, `TODO message`)
+		if (tupleType === undefined) throw ParseError.format(input, [...path, 0], `one of ${Object.keys(inner).join(', ')}`)
 		if (input.length !== tupleType.length + 1) throw ParseError.format(input, path, `array with length ${tupleType.length + 1}`)
 
 		for (let i = 0; i < tupleType.length; i++) {

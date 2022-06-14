@@ -105,12 +105,21 @@ export class ModelValidator {
 			})
 		}
 		if (partialEntity.view) {
+			if (field.type === Model.RelationType.ManyHasMany) {
+				return errors.add('Many-has-many relation is not allowed on a view entity.')
+			}
 			if (
-				field.type === Model.RelationType.ManyHasMany ||
-				field.type === Model.RelationType.OneHasMany ||
-				(field.type === Model.RelationType.OneHasOne && !('joiningColumn' in field))
+				!targetEntity.view &&
+				field.type === Model.RelationType.OneHasMany
 			) {
-				return errors.add('This relation type is not allowed on a view entity. Only one-has-one owning and many-has one are allowed.')
+				return errors.add('One-has-many relation fields on views must point to a view entity.')
+			}
+			if (
+				!targetEntity.view &&
+				field.type === Model.RelationType.OneHasOne && 
+				!('joiningColumn' in field)
+			) {
+				return errors.add('One-has-one relation fields on views must be owning or point to a view entity.')
 			}
 		}
 		if (isInverseRelation(field)) {

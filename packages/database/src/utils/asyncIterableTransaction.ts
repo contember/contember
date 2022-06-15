@@ -1,19 +1,19 @@
 import { Client, Connection } from '../client/index.js'
 
-export async function* asyncIterableTransaction<T>(db: Client, cb: (db2: Client<Connection.TransactionLike>) => AsyncIterable<T>): AsyncIterable<T> {
+interface AsyncIterableX<T, TReturn = any, TNext = undefined> {
+	[Symbol.asyncIterator](): AsyncIterator<T, TReturn, TNext>
+}
+
+export async function* asyncIterableTransaction<T, TReturn = any, TNext = undefined>(db: Client, cb: (db2: Client<Connection.TransactionLike>) => AsyncIterableX<T, TReturn, TNext>): AsyncIterableX<T, TReturn, TNext> {
 	// eslint-disable-next-line promise/param-names
-	yield* await new Promise<AsyncIterable<T>>(async resolveOuter => {
+	return yield* await new Promise(async resolveOuter => {
 		await db.transaction((db2: Client<Connection.TransactionLike>) => {
 			// eslint-disable-next-line promise/param-names
-			return new Promise<void>((resolveInner, rejectInner) => {
+			return new Promise<void>(resolveInner => {
 				resolveOuter((async function* () {
-					try {
-						yield* cb(db2)
-						resolveInner()
-
-					} catch (e) {
-						rejectInner(e)
-					}
+					const result = yield* cb(db2)
+					resolveInner()
+					return result
 				})())
 			})
 		})

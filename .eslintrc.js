@@ -32,6 +32,7 @@ module.exports = {
 			ignoredNodes: [
 				'TSTypeAnnotation',
 				'TSTypeParameterInstantiation',
+				'PropertyDefinition',
 			],
 		}],
 		'@typescript-eslint/semi': ['error', 'never'],

@@ -25,7 +25,7 @@ export class VimeoService {
 			}),
 		})
 		if (response.status !== 200) {
-			const { error_code, developer_message, error } = await response.json()
+			const { error_code, developer_message, error } = (await response.json()) as any
 			return {
 				ok: false,
 				errors: [
@@ -37,7 +37,7 @@ export class VimeoService {
 				],
 			}
 		}
-		const data = await response.json()
+		const data: any = await response.json()
 		if (!data.uri.startsWith('/videos/')) {
 			throw new Error(`Invalid vimeo response with following URI: ${data.uri}`)
 		}

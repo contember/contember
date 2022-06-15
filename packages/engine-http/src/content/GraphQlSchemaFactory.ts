@@ -9,8 +9,7 @@ import {
 } from '@contember/engine-content-api'
 import { Acl, Schema } from '@contember/schema'
 import { GraphQLSchema } from 'graphql'
-import { mergeSchemas } from '@graphql-tools/merge'
-import { makeExecutableSchema } from '@graphql-tools/schema'
+import { makeExecutableSchema, mergeSchemas } from '@graphql-tools/schema'
 import { GraphQLSchemaContributor } from '@contember/engine-plugins'
 import { JSONType } from '@contember/graphql-utils'
 

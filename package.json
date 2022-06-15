@@ -29,17 +29,21 @@
   "devDependencies": {
     "@actions/core": "^1.5.0",
     "@types/node": "^16",
-    "@typescript-eslint/eslint-plugin": "^4.28.1",
-    "@typescript-eslint/parser": "^4.28.1",
-    "esbuild": "^0.12.15",
-    "eslint": "^7.29.0",
-    "eslint-plugin-promise": "^5.1.0",
+    "@typescript-eslint/eslint-plugin": "^5.28.0",
+    "@typescript-eslint/parser": "^5.28.0",
+    "esbuild": "0.14.31",
+    "eslint": "^8.17.0",
+    "eslint-plugin-promise": "^6.0.0",
     "husky": "^4",
     "lint-staged": "^11.0.0",
     "oao": "^2.0.2",
     "typescript": "^4.7.3",
-    "vite": "^2.8.6",
-    "vitest": "^0.7.11"
+    "vite": "^2.9.12",
+    "vitest": "^0.15.1"
+  },
+  "resolutions": {
+    "esbuild": "0.14.31",
+    "@types/node": "16.11.40"
   },
   "workspaces": [
     "ee/*",

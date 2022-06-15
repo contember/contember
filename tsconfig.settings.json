@@ -13,7 +13,6 @@
 
 		"strict": true,
 		"incremental": true,
-
 		"lib": ["esnext"]
 	}
 }

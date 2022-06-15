@@ -10,7 +10,7 @@ import {
 	Authorizator,
 } from '@contember/engine-content-api'
 import { DocumentNode, printSchema } from 'graphql'
-import { mergeSchemas } from '@graphql-tools/merge'
+import { mergeSchemas } from '@graphql-tools/schema'
 import { loadSchema } from '../../utils/project/loadSchema'
 
 type Args = {

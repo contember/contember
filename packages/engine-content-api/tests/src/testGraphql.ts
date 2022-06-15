@@ -13,7 +13,9 @@ export const executeGraphQlTest = async (test: Test) => {
 	const rawResponse = await graphql(test.schema, test.query, null, test.context, test.queryVariables)
 	const response = JSON.parse(JSON.stringify(rawResponse))
 	if ('errors' in rawResponse) {
-		console.error((rawResponse.errors as any)[0])
+		if (rawResponse.errors?.length === 1 && 'originalError' in (rawResponse.errors as any)[0]) {
+			throw (rawResponse.errors as any)[0].originalError
+		}
 		rawResponse.errors = (rawResponse.errors as any).map(({ message }: any) => ({ message }))
 	}
 	assert.deepStrictEqual(response, test.return)

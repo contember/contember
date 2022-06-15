@@ -35,3 +35,14 @@ export const createPredefinedVariable = <R extends Role<string>, Name extends st
 		{ type: Acl.VariableType.predefined, value },
 	)
 }
+
+export const createConditionVariable = <R extends Role<string>, Name extends string>(
+	name: Name,
+	roles: R | R[],
+): VariableDefinition<Name, R, Acl.ConditionVariable> => {
+	return new VariableDefinition(
+		name,
+		Array.isArray(roles) ? roles : [roles],
+		{ type: Acl.VariableType.condition  },
+	)
+}

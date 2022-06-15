@@ -5,13 +5,14 @@ import { testUuid } from '@contember/engine-api-tester'
 
 describe('create acl variables', () => {
 
+	const definition: Acl.EntityVariable = { type: Acl.VariableType.entity, entityName: 'Author' }
 	it('prefix from memberships', () => {
 		assert.deepStrictEqual(createAclVariables({
 			roles: {
 				author: {
 					stages: '*',
 					variables: {
-						authorID: { type: Acl.VariableType.entity, entityName: 'Author' },
+						authorID: definition,
 					},
 					entities: {
 					},
@@ -22,7 +23,7 @@ describe('create acl variables', () => {
 			personId: null,
 			memberships: [{ role: 'author', variables: [{ name: 'authorID', values: [testUuid(2)] }] }],
 		}), {
-			author__authorID: [testUuid(2)],
+			author__authorID: { definition, value: [testUuid(2)] },
 		})
 	})
 
@@ -33,7 +34,7 @@ describe('create acl variables', () => {
 				author: {
 					stages: '*',
 					variables: {
-						authorID: { type: Acl.VariableType.entity, entityName: 'Author' },
+						authorID: definition,
 					},
 					entities: {},
 				},
@@ -43,18 +44,19 @@ describe('create acl variables', () => {
 			personId: null,
 			memberships: [{ role: 'author', variables: [] }],
 		}), {
-			author__authorID: [],
+			author__authorID: { definition, value: [] },
 		})
 	})
 
 
 	it('predefined', () => {
+		const definition: Acl.PredefinedVariable = { type: Acl.VariableType.predefined, value: 'identityID' }
 		assert.deepStrictEqual(createAclVariables({
 			roles: {
 				author: {
 					stages: '*',
 					variables: {
-						authorIdentity: { type: Acl.VariableType.predefined, value: 'identityID' },
+						authorIdentity: definition,
 					},
 					entities: {},
 				},
@@ -64,7 +66,7 @@ describe('create acl variables', () => {
 			personId: null,
 			memberships: [{ role: 'author', variables: [] }],
 		}), {
-			author__authorIdentity: [testUuid(1)],
+			author__authorIdentity: { definition, value: [testUuid(1)] },
 		})
 	})
 })

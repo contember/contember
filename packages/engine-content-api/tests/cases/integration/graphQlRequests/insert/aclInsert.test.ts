@@ -1,7 +1,7 @@
 import { test } from 'vitest'
 import { execute, sqlTransaction } from '../../../../src/test'
 import { SchemaBuilder } from '@contember/schema-definition'
-import { Model } from '@contember/schema'
+import { Acl, Model } from '@contember/schema'
 import { GQL, SQL } from '../../../../src/tags'
 import { testUuid } from '../../../../src/testUuid'
 
@@ -27,7 +27,12 @@ test('insert author (with acl)', async () => {
 			},
 		},
 		variables: {
-			name_variable: ['John', 'Jack'],
+			name_variable: {
+				definition: {
+					type: Acl.VariableType.condition,
+				},
+				value: [{ in: ['John', 'Jack'] }],
+			},
 		},
 		query: GQL`
         mutation {

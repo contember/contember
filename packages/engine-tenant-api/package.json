@@ -34,7 +34,7 @@
     "@graphql-codegen/typescript-resolvers": "^1.15.2",
     "@graphql-tools/schema": "^8.3.5",
     "@types/mustache": "^4.0.0",
-    "@types/node": "^17.0.5",
+    "@types/node": "^16",
     "@types/nodemailer": "^6.4.0",
     "graphql": "^15.4.0"
   },

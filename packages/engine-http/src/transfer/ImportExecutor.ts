@@ -1,4 +1,4 @@
-import { Client, Connection, ConstraintHelper, wrapIdentifier } from '@contember/database'
+import { asyncIterableTransaction, Client, Connection, ConstraintHelper, wrapIdentifier } from '@contember/database'
 import { Model } from '@contember/schema'
 import * as Typesafe from '@contember/typesafe'
 import { Command, CommandArgsMap, CommandName } from './Command'
@@ -23,7 +23,7 @@ type InsertContext = {
 export class ImportError extends Error {
 }
 
-type CommandProcessor<T extends CommandName> = (it: CommandIterator<T>) => Promise<CommandIterator | null>
+type CommandProcessor<T extends CommandName> = (it: CommandIterator<T>) => AsyncGenerator<string, CommandIterator | null>
 type CommandProcessorMap<T extends CommandName> = { [N in CommandName]?: N extends T ? CommandProcessor<N> : undefined }
 
 class CommandIterator<T extends CommandName = CommandName> {
@@ -67,27 +67,34 @@ export class ImportExecutor {
 	) {
 	}
 
-	async import(groupContainer: ProjectGroupContainer, commands: AsyncIterable<Command>) {
-		const it = await CommandIterator.create(commands)
+	async* import(groupContainer: ProjectGroupContainer, commands: AsyncIterable<Command>): AsyncIterable<string> {
+		try {
+			const it = await CommandIterator.create(commands)
 
-		const final = await this.match(it, {
-			importContentSchemaBegin: it => this.importContentSchemaBegin(groupContainer, it),
-			importSystemSchemaBegin: it => this.importSystemSchemaBegin(groupContainer, it),
-		})
+			const final = yield* this.match(it, {
+				importContentSchemaBegin: it => this.importContentSchemaBegin(groupContainer, it),
+				importSystemSchemaBegin: it => this.importSystemSchemaBegin(groupContainer, it),
+			})
 
-		if (final !== null) {
-			throw new ImportError(`Unexpected ${final.commandName}`)
+			if (final !== null) {
+				throw new ImportError(`Unexpected ${final.commandName}`)
+			}
+
+		} catch (e) {
+			if (e instanceof ImportError) {
+				yield `ERROR: ${e.message}\n`
+			}
 		}
 	}
 
-	private async match<T extends CommandName>(it: CommandIterator<T> | null, processors: CommandProcessorMap<T>) {
+	private async* match<T extends CommandName>(it: CommandIterator<T> | null, processors: CommandProcessorMap<T>) {
 		let next: CommandIterator | null = it
 
 		while (next !== null) {
 			const processor = processors[next.commandName]
 
 			if (processor) {
-				next = await processor(next as any)
+				next = yield* processor(next as any)
 
 			} else {
 				break
@@ -97,7 +104,7 @@ export class ImportExecutor {
 		return next
 	}
 
-	private async importContentSchemaBegin(groupContainer: ProjectGroupContainer, it: CommandIterator<'importContentSchemaBegin'>) {
+	private async* importContentSchemaBegin(groupContainer: ProjectGroupContainer, it: CommandIterator<'importContentSchemaBegin'>) {
 		const [options] = it.commandArgs
 		const projectContainer = await this.createProjectContainer(groupContainer, options.project)
 		const systemDatabaseContext = projectContainer.systemDatabaseContextFactory.create()
@@ -112,48 +119,55 @@ export class ImportExecutor {
 		const contentDatabaseClient = projectContainer.connection.createClient(stage.schema, {})
 		const mapping = this.contentSchemaTransferMappingFactory.createContentSchemaMapping(contentSchema)
 
-		return await contentDatabaseClient.transaction(async db => {
-			await this.disableTriggers(db, options.tables) // TODO: only sometimes?
-			await this.truncate(db, options.tables) // TODO: only sometimes?
+		// eslint-disable-next-line @typescript-eslint/no-this-alias
+		const that = this
+		return yield* asyncIterableTransaction(contentDatabaseClient, async function* (db) {
+			await that.disableTriggers(db, options.tables) // TODO: only sometimes?
+			await that.truncate(db, options.tables) // TODO: only sometimes?
 
 			const constraintHelper = new ConstraintHelper(db)
 			await constraintHelper.setFkConstraintsDeferred()
 
-			const result = await this.match(await it.next(), {
-				insertBegin: it => this.insertBegin(db, mapping, it),
+			const result = yield* that.match(await it.next(), {
+				insertBegin: it => that.insertBegin(db, mapping, it),
 			})
 
 			await constraintHelper.setFkConstraintsImmediate()
-			await this.enableTriggers(db, options.tables)
+			await that.enableTriggers(db, options.tables)
+
 			return result
 		})
 	}
 
-	private async importSystemSchemaBegin(groupContainer: ProjectGroupContainer, it: CommandIterator<'importSystemSchemaBegin'>) {
+	private async* importSystemSchemaBegin(groupContainer: ProjectGroupContainer, it: CommandIterator<'importSystemSchemaBegin'>) {
 		const [options] = it.commandArgs
 		const projectContainer = await this.createProjectContainer(groupContainer, options.project)
 		const systemDatabaseContext = projectContainer.systemDatabaseContextFactory.create()
 		const mapping = this.systemSchemaTransferMappingFactory.build()
 
-		return await systemDatabaseContext.client.transaction(async db => {
-			await this.truncate(db, options.tables)
+		// eslint-disable-next-line @typescript-eslint/no-this-alias
+		const that = this
+		return yield* asyncIterableTransaction(systemDatabaseContext.client, async function* (db) {
+			await that.truncate(db, options.tables)
 
 			const constraintHelper = new ConstraintHelper(db)
 			await constraintHelper.setFkConstraintsDeferred()
 
-			return await this.match(await it.next(), {
-				insertBegin: it => this.insertBegin(db, mapping, it),
+			return yield* that.match(await it.next(), {
+				insertBegin: it => that.insertBegin(db, mapping, it),
 			})
 		})
 	}
 
-	private async insertBegin(db: Client<Connection.TransactionLike>, mapping: TransferMapping, it: CommandIterator<'insertBegin'>) {
+	private async* insertBegin(db: Client<Connection.TransactionLike>, mapping: TransferMapping, it: CommandIterator<'insertBegin'>) {
 		const [options] = it.commandArgs
 		const insertContext = await this.buildInsertContext(db, mapping, db.schema, options.table, options.columns)
-		let insertRowsPromise: Promise<void> | null = null
+		let insertRowsPromise: AsyncIterable<string> = (async function* () {})()
 
-		const result = await this.match(await it.next(), {
-			insertRow: async it => {
+		// eslint-disable-next-line @typescript-eslint/no-this-alias
+		const that = this
+		const result = yield* this.match(await it.next(), {
+			insertRow: async function* (it) {
 				const [values] = it.commandArgs
 
 				try {
@@ -169,8 +183,8 @@ export class ImportExecutor {
 				}
 
 				if (insertContext.rows.length === 1000) {
-					await insertRowsPromise
-					insertRowsPromise = this.insertRows(db, insertContext)
+					yield* insertRowsPromise
+					insertRowsPromise = that.insertRows(db, insertContext)
 					insertContext.rows = []
 				}
 
@@ -179,8 +193,8 @@ export class ImportExecutor {
 		})
 
 		if (insertContext.rows.length > 0) {
-			await insertRowsPromise
-			await this.insertRows(db, insertContext)
+			yield* insertRowsPromise
+			yield* await this.insertRows(db, insertContext)
 		}
 
 		if (result === null || result.commandName !== 'insertEnd') {
@@ -230,7 +244,7 @@ export class ImportExecutor {
 		await db.query(`TRUNCATE ${tableNamesQuoted.join(', ')}`)
 	}
 
-	private async insertRows(db: Client, context: InsertContext) {
+	private async* insertRows(db: Client, context: InsertContext) {
 		const rowsFragment = context.rows.map(_ => context.rowFragment).join(',\n')
 		const sql = context.insertStartFragment + rowsFragment
 		const parameters: Cell[] = []
@@ -241,7 +255,8 @@ export class ImportExecutor {
 			}
 		}
 
-		await db.query(sql, parameters)
+		const result = await db.query(sql, parameters)
+		yield `INSERT BATCH ${Math.round((result.timing?.selfDuration ?? -1) / 1000)} ms\n`
 	}
 
 	private async buildInsertContext(db: Client, mapping: TransferMapping, schema: string, tableName: string, columnNames: readonly string[]): Promise<InsertContext> {

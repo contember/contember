@@ -627,6 +627,10 @@ const schema: DocumentNode = gql`
 		value: String!
 	}
 
+	type RoleConditionVariableDefinition implements RoleVariableDefinition {
+		name: String!
+	}
+
 	# ==== 2fa ====
 
 	type PrepareOtpResponse {

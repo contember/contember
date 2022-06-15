@@ -45,7 +45,12 @@ test('querying id and title', async () => {
 		schema: schema,
 		permissions: permissions,
 		variables: {
-			localeVariable: ['cs'],
+			localeVariable: {
+				definition: {
+					type: Acl.VariableType.condition,
+				},
+				value: [{ in: ['cs'] }],
+			},
 		},
 		query: GQL`
         query {
@@ -121,7 +126,12 @@ test('querying with extra where', async () => {
 		schema: schema,
 		permissions: permissions,
 		variables: {
-			localeVariable: ['cs'],
+			localeVariable: {
+				definition: {
+					type: Acl.VariableType.condition,
+				},
+				value: [{ in: ['cs'] }],
+			},
 		},
 		query: GQL`
         query {
@@ -167,7 +177,12 @@ test('querying only id', async () => {
 		schema: schema,
 		permissions: permissions,
 		variables: {
-			localeVariable: ['cs'],
+			localeVariable: {
+				definition: {
+					type: Acl.VariableType.condition,
+				},
+				value: [{ in: ['cs'] }],
+			},
 		},
 		query: GQL`
         query {
@@ -239,7 +254,12 @@ test('querying on nested field', async () => {
 		schema: schema,
 		permissions: permissions,
 		variables: {
-			localeVariable: ['cs'],
+			localeVariable: {
+				definition: {
+					type: Acl.VariableType.condition,
+				},
+				value: [{ in: ['cs'] }],
+			},
 		},
 		query: GQL`
         query {

@@ -5,18 +5,20 @@ namespace Acl {
 	export enum VariableType {
 		entity = 'entity',
 		predefined = 'predefined',
+		condition = 'condition',
 
 		// currently unsupported
 		// enum = 'enum',
 		// column = 'column',
 	}
 
-	export type Variable = EntityVariable | PredefinedVariable  // | EnumVariable | ColumnValueVariable
+	export type Variable =
+		| EntityVariable
+		| PredefinedVariable
+		| ConditionVariable
+		// | EnumVariable | ColumnValueVariable
 
-	// export interface EnumVariable {
-	// 	type: VariableType.enum
-	// 	enumName: string
-	// }
+
 
 	export type EntityVariable = {
 		readonly type: VariableType.entity
@@ -30,16 +32,29 @@ namespace Acl {
 	}
 
 
+	export type ConditionVariable = {
+		readonly type: VariableType.condition
+	}
+
+	// export interface EnumVariable {
+	// 	type: VariableType.enum
+	// 	enumName: string
+	// }
+
 	// export interface ColumnValueVariable {
 	// 	type: VariableType.column
 	// 	entityName: string
 	// 	fieldName: string
 	// }
 
-	export type VariableValue = string | number | readonly (string | number)[]
+	export type VariableValue = readonly JSONValue[]
 
+	export type VariableMapEntry = {
+		readonly definition: Variable
+		readonly value: VariableValue
+	}
 	export type VariablesMap = {
-		readonly [name: string]: VariableValue
+		readonly [name: string]: VariableMapEntry
 	}
 
 	export type PredicateVariable = string //{ name: string }

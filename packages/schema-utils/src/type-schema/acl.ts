@@ -47,6 +47,9 @@ const variablesSchema = Typesafe.record(
 			type: Typesafe.literal(Acl.VariableType.predefined),
 			value: Typesafe.enumeration('identityID', 'personID'),
 		}),
+		Typesafe.object({
+			type: Typesafe.literal(Acl.VariableType.condition),
+		}),
 	),
 )
 

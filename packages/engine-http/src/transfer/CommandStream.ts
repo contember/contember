@@ -3,17 +3,16 @@ import * as Typesafe from '@contember/typesafe'
 import { Command } from './Command'
 import { ImportError } from './ImportExecutor'
 
-export async function* toBuffer(commands: AsyncIterable<Command>): AsyncIterable<Buffer> {
-	const OUTPUT_BUFFER_SIZE = 16 * 1024
+export async function* toBuffer(lines: AsyncIterable<any>, bufferSize: number = 16 * 1024): AsyncIterable<Buffer> {
 	let chunks = []
 	let chunksLength = 0
 
-	for await (const command of commands) {
-		const chunk = Buffer.from(JSON.stringify(command) + '\n')
+	for await (const line of lines) {
+		const chunk = Buffer.from(JSON.stringify(line) + '\n')
 		chunks.push(chunk)
 		chunksLength += chunk.length
 
-		if (chunksLength >= OUTPUT_BUFFER_SIZE) {
+		if (chunksLength >= bufferSize) {
 			yield Buffer.concat(chunks)
 			chunks = []
 			chunksLength = 0

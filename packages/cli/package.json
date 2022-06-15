@@ -31,7 +31,7 @@
     "chalk-table": "^1.0.2",
     "esbuild": "0.14.31",
     "get-port": "^5.0.0",
-    "graphql": "^15.4.0",
+    "graphql": "^16.5.0",
     "graphql-request": "^4.3.0",
     "js-yaml": "^4.1.0",
     "node-fetch": "^3.2.6",

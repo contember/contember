@@ -30,20 +30,20 @@ const testSchema = async (test: Test) => {
 	const graphQlSchemaBuilder = schemaFactory.create(schemaWithAcl, authorizator)
 	const graphQlSchema = graphQlSchemaBuilder.build()
 
-	const result = await graphql(
-		graphQlSchema,
-		`
+	const result = await graphql({
+		schema: graphQlSchema,
+		source: `
 			{
 				_info {
 					description
 				}
 			}
 		`,
-	)
+	})
 	const errors = (result.errors || []).map(it => it.message)
 	assert.deepEqual(errors, [])
 
-	const textSchema = printSchema(graphQlSchema)
+	const textSchema = printSchema(graphQlSchema) + '\n'
 
 	const filename = path.join(__dirname, test.graphQlSchemaFile)
 	let expectedSchema: string

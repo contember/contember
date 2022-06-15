@@ -28,7 +28,7 @@
     "@graphql-codegen/typescript-operations": "^2.4.2",
     "@graphql-codegen/typescript-resolvers": "^2.6.6",
     "@types/node": "^16",
-    "graphql": "^15.4.0",
+    "graphql": "^16.5.0",
     "pg": "^8.5.0"
   },
   "peerDependencies": {

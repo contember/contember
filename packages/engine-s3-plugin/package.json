@@ -21,7 +21,7 @@
     "@types/mime-types": "^2.1.0",
     "@types/qs": "^6.9.6",
     "@types/uuid": "^8.3.0",
-    "graphql": "^15.4.0"
+    "graphql": "^16.5.0"
   },
   "peerDependencies": {
     "graphql": ">= 14.6.0"

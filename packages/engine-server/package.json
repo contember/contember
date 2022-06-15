@@ -28,7 +28,7 @@
     "@contember/schema-utils": "^1.2.0-alpha.2",
     "@koa/cors": "^3.1.0",
     "@sentry/node": "^7.1.1",
-    "graphql": "^15.4.0",
+    "graphql": "^16.5.0",
     "heapdump": "^0.3.15",
     "koa-bodyparser": "^4.3.0",
     "koa-compress": "^5.0.1",

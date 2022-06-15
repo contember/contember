@@ -41,6 +41,8 @@ export class ProjectTypeResolver implements ProjectResolvers {
 						return { __typename: 'RoleEntityVariableDefinition', name, entityName: variableDef.entityName }
 					case Acl.VariableType.predefined:
 						return { __typename: 'RolePredefinedVariableDefinition', name, value: variableDef.value }
+					case Acl.VariableType.condition:
+						return { __typename: 'RoleConditionVariableDefinition', name }
 				}
 			}),
 		}))

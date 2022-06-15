@@ -44,10 +44,18 @@ const permissions: Acl.Permissions = {
 
 describe('Predicates injector', () => {
 
+	const variables: Acl.VariablesMap = {
+		localeVariable: {
+			definition: {
+				type: Acl.VariableType.condition,
+			},
+			value: [{ in: ['cs'] }],
+		},
+	}
 	it('injects predicate', () => {
 		const injector = new PredicatesInjector(
 			schema,
-			new PredicateFactory(permissions, new VariableInjector(schema, { localeVariable: ['cs'] })),
+			new PredicateFactory(permissions, new VariableInjector(schema, variables)),
 		)
 		const result = injector.inject(schema.entities['PostLocale'], {})
 
@@ -59,7 +67,7 @@ describe('Predicates injector', () => {
 	it('merges predicate with explicit where', () => {
 		const injector = new PredicatesInjector(
 			schema,
-			new PredicateFactory(permissions, new VariableInjector(schema, { localeVariable: ['cs'] })),
+			new PredicateFactory(permissions, new VariableInjector(schema, variables)),
 		)
 		const result = injector.inject(schema.entities['PostLocale'], { id: { in: [1, 2] } })
 
@@ -71,9 +79,7 @@ describe('Predicates injector', () => {
 							id: { in: [1, 2] },
 						},
 						{
-							locale: {
-								in: ['cs'],
-							},
+							locale: { in: ['cs'] },
 						},
 					],
 				},
@@ -87,7 +93,7 @@ describe('Predicates injector', () => {
 	it('injects predicate to where', () => {
 		const injector = new PredicatesInjector(
 			schema,
-			new PredicateFactory(permissions, new VariableInjector(schema, { localeVariable: ['cs'] })),
+			new PredicateFactory(permissions, new VariableInjector(schema, variables)),
 		)
 
 		const result = injector.inject(schema.entities['PostLocale'], { title: { eq: 'abc' } })

@@ -1,5 +1,6 @@
 import { executeGraphql, gql, loginToken } from './tester'
 import { assert } from 'vitest'
+import { Membership } from '@contember/engine-tenant-api'
 
 export const signIn = async (email: string, password = '123456'): Promise<string> => {
 	const response = await executeGraphql(
@@ -50,18 +51,18 @@ export const signUp = async (email: string, password = '123456') => {
 }
 
 
-export const addProjectMember = async (identityId: string, projectSlug: string, role = 'admin') => {
+export const addProjectMember = async (identityId: string, projectSlug: string, membership: Membership = { role: 'admin', variables: [] }) => {
 	await executeGraphql(
 		'/tenant',
 		gql`
-			mutation ($identity: String!, $projectSlug: String!, $role: String!) {
-				addProjectMember(identityId: $identity, projectSlug: $projectSlug, memberships: [{ role: $role, variables: [] }]) {
+			mutation ($identity: String!, $projectSlug: String!, $membership: MembershipInput!) {
+				addProjectMember(identityId: $identity, projectSlug: $projectSlug, memberships: [$membership]) {
 					ok
 				}
 			}
 		`,
 		{
-			variables: { identity: identityId, projectSlug, role },
+			variables: { identity: identityId, projectSlug, membership },
 		},
 	)
 		.expect(200)

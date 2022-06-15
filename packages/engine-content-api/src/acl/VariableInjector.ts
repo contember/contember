@@ -23,16 +23,18 @@ export class VariableInjector {
 		})
 	}
 
-	private createCondition(variable: Acl.VariableValue | undefined): Input.Condition {
-		if (variable === undefined) {
+	private createCondition(variable: Acl.VariableMapEntry | undefined): Input.Condition {
+		if (variable === undefined || variable.value.length === 0) {
 			return { never: true }
 		}
-		if (Array.isArray(variable)) {
-			return { in: variable }
+
+		const { value, definition } = variable
+		if (definition.type === Acl.VariableType.condition) {
+			if (value.length === 1) {
+				return value[0] as Input.Condition
+			}
+			return { or: value as Input.Condition[] }
 		}
-		if (typeof variable === 'string' || typeof variable === 'number') {
-			return { eq: variable }
-		}
-		throw new Error('not implemented')
+		return { in: value as (string | number)[] }
 	}
 }

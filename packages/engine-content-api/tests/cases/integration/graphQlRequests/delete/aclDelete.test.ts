@@ -1,7 +1,7 @@
 import { test } from 'vitest'
 import { execute, sqlDeferred, sqlTransaction } from '../../../../src/test'
 import { SchemaBuilder } from '@contember/schema-definition'
-import { Model } from '@contember/schema'
+import { Acl, Model } from '@contember/schema'
 import { GQL, SQL } from '../../../../src/tags'
 import { testUuid } from '../../../../src/testUuid'
 
@@ -32,7 +32,12 @@ test('delete post with acl', async () => {
 			},
 		},
 		variables: {
-			locale_variable: ['cs'],
+			locale_variable: {
+				definition: {
+					type: Acl.VariableType.condition,
+				},
+				value: [{ in: ['cs'] }],
+			},
 		},
 		executes: [
 			...sqlTransaction([

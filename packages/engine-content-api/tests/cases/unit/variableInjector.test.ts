@@ -1,7 +1,7 @@
 import { VariableInjector } from '../../../src/acl'
 import { SchemaBuilder } from '@contember/schema-definition'
-import { Model } from '@contember/schema'
-import { describe, it, assert } from 'vitest'
+import { Acl, Model } from '@contember/schema'
+import { assert, describe, it } from 'vitest'
 
 describe('Variable injector', () => {
 
@@ -17,9 +17,21 @@ describe('Variable injector', () => {
 			)
 			.buildSchema()
 
+		const ids = ['91528a5c-839b-4114-9952-d661914a607f', '1e2f3937-a0b1-4105-8aae-6da8ac9fc146']
 		const injector = new VariableInjector(schema, {
-			site: [1, 2],
-			locale: 'cs',
+			site: {
+				definition: {
+					type: Acl.VariableType.entity,
+					entityName: 'Site',
+				},
+				value: ids,
+			},
+			locale: {
+				definition: {
+					type: Acl.VariableType.condition,
+				},
+				value: [{ eq: 'cs' }],
+			},
 		})
 		const result = injector.inject(schema.entities['PostLocale'], {
 			or: [
@@ -53,7 +65,7 @@ describe('Variable injector', () => {
 					and: [
 						{
 							post: {
-								site: { id: { in: [1, 2] } },
+								site: { id: { in: ids } },
 							},
 						},
 						{

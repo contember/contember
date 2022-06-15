@@ -1,7 +1,7 @@
 import { test } from 'vitest'
 import { execute, failedTransaction, sqlTransaction } from '../../../../../src/test'
 import { SchemaBuilder } from '@contember/schema-definition'
-import { Model } from '@contember/schema'
+import { Acl, Model } from '@contember/schema'
 import { GQL, SQL } from '../../../../../src/tags'
 import { testUuid } from '../../../../../src/testUuid'
 
@@ -35,7 +35,12 @@ test('update name', async () => {
 			},
 		},
 		variables: {
-			name_variable: ['John', 'Jack'],
+			name_variable: {
+				definition: {
+					type: Acl.VariableType.condition,
+				},
+				value: [{ in: ['John', 'Jack'] }],
+			},
 		},
 		executes: [
 			...sqlTransaction([
@@ -98,7 +103,12 @@ test('update name - denied', async () => {
 			},
 		},
 		variables: {
-			name_variable: ['John', 'Jack'],
+			name_variable: {
+				definition: {
+					type: Acl.VariableType.condition,
+				},
+				value: [{ in: ['John', 'Jack'] }],
+			},
 		},
 		executes: [
 			...failedTransaction([
@@ -176,8 +186,18 @@ test('update m:n', async () => {
 			},
 		},
 		variables: {
-			post_name_variable: ['Lorem ipsum', 'Dolor sit'],
-			category_name_variable: ['foo', 'bar'],
+			post_name_variable: {
+				definition: {
+					type: Acl.VariableType.condition,
+				},
+				value: [{ in: ['Lorem ipsum', 'Dolor sit'] }],
+			},
+			category_name_variable: {
+				definition: {
+					type: Acl.VariableType.condition,
+				},
+				value: [{ in: ['foo', 'bar'] }],
+			},
 		},
 		query: GQL`mutation  {
           updatePost(by: {id: "${testUuid(1)}"}, data: {categories: [

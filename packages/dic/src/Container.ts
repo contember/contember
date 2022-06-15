@@ -95,7 +95,7 @@ export class ContainerImpl<M extends ServiceTypeMap> {
 		}
 		const definition = this.definitions[name]
 		this.definitions[name] = { setup: [], factory: () => {
-			throw new Error(`Circular dependency when creating a service "${name}"`)
+			throw new Error(`Circular dependency when creating a service "${String(name)}"`)
 		} }
 		this.level++
 		const service = this.createService(definition)

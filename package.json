@@ -37,7 +37,6 @@
     "husky": "^4",
     "lint-staged": "^11.0.0",
     "oao": "^2.0.2",
-    "ts-node": "^10.2.0",
     "typescript": "^4.7.3",
     "vite": "^2.8.6",
     "vitest": "^0.7.11"

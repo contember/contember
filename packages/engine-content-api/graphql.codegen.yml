@@ -10,9 +10,6 @@ generates:
     plugins:
       - "typescript"
       - "typescript-operations"
-      - "typescript-resolvers"
-require:
-  - "ts-node/register"
 hooks:
   afterAllFileWrite:
     - eslint --fix

@@ -8,10 +8,10 @@
     "test": "vitest"
   },
   "dependencies": {
-    "@contember/typesafe": "^1.2.0-alpha.2",
     "@contember/engine-plugins": "^1.2.0-alpha.2",
     "@contember/graphql-utils": "^1.2.0-alpha.2",
     "@contember/schema": "^1.2.0-alpha.2",
+    "@contember/typesafe": "^1.2.0-alpha.2",
     "mime-types": "^2.1.24",
     "picomatch": "^2.2.1",
     "qs": "^6.10.1",

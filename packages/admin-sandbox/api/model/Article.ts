@@ -13,6 +13,13 @@ export class Article {
 	tags = d.manyHasMany(Tag)
 	state = d.enumColumn(ArticleState)
 	number = d.intColumn().default(1) // for testing NumberCell
+	sortedTags = d.oneHasMany(ArticleTag, 'article').orderBy('order')
+}
+
+export class ArticleTag {
+	article = d.manyHasOne(Article, 'sortedTags').notNull()
+	tag = d.manyHasOne(Tag).notNull()
+	order = d.intColumn().notNull()
 }
 
 export class Category {

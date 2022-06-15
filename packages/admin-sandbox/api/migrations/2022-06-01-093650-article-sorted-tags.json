@@ -1,0 +1,130 @@
+{
+	"formatVersion": 3,
+	"modifications": [
+		{
+			"modification": "createEntity",
+			"entity": {
+				"name": "ArticleTag",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "article_tag",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"columnType": "uuid",
+						"nullable": false,
+						"type": "Uuid"
+					}
+				},
+				"unique": {},
+				"eventLog": {
+					"enabled": true
+				}
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "ArticleTag",
+			"field": {
+				"name": "order",
+				"columnName": "order",
+				"columnType": "integer",
+				"nullable": false,
+				"type": "Integer"
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "ArticleTag",
+			"owningSide": {
+				"type": "ManyHasOne",
+				"name": "article",
+				"target": "Article",
+				"joiningColumn": {
+					"columnName": "article_id",
+					"onDelete": "restrict"
+				},
+				"nullable": false,
+				"inversedBy": "sortedTags"
+			},
+			"inverseSide": {
+				"type": "OneHasMany",
+				"name": "sortedTags",
+				"target": "ArticleTag",
+				"ownedBy": "article",
+				"orderBy": [
+					{
+						"path": [
+							"order"
+						],
+						"direction": "asc"
+					}
+				]
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "ArticleTag",
+			"owningSide": {
+				"type": "ManyHasOne",
+				"name": "tag",
+				"target": "Tag",
+				"joiningColumn": {
+					"columnName": "tag_id",
+					"onDelete": "restrict"
+				},
+				"nullable": false
+			}
+		},
+		{
+			"modification": "patchAclSchema",
+			"patch": [
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/ArticleTag",
+					"value": {
+						"predicates": {},
+						"operations": {
+							"read": {
+								"id": true,
+								"article": true,
+								"tag": true,
+								"order": true
+							},
+							"create": {
+								"id": true,
+								"article": true,
+								"tag": true,
+								"order": true
+							},
+							"update": {
+								"id": true,
+								"article": true,
+								"tag": true,
+								"order": true
+							},
+							"delete": true,
+							"customPrimary": true
+						}
+					}
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/Article/operations/create/sortedTags",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/Article/operations/update/sortedTags",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/Article/operations/read/sortedTags",
+					"value": true
+				}
+			]
+		}
+	]
+}

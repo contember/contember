@@ -1,8 +1,8 @@
-import type { CommonProps, InputProps } from 'react-select'
+import type { CommonProps, GroupBase, InputProps } from 'react-select'
 import cn from 'classnames'
 
 // This function is copied from react-select.
-export const cleanCommonProps = (props: CommonProps<any, boolean>): any => {
+export const cleanCommonProps = (props: CommonProps<any, boolean, never> & { className?: any }): any => {
 	//className
 	const {
 		className, // not listed in commonProps documentation, needs to be removed to allow Emotion to generate classNames
@@ -23,7 +23,7 @@ export const cleanCommonProps = (props: CommonProps<any, boolean>): any => {
 	return { ...innerProps }
 }
 
-export const SearchInput = (props: InputProps) => {
+export const SearchInput = (props: InputProps<any, boolean, never>) => {
 	const { innerRef, isDisabled, isHidden, ...innerProps } = cleanCommonProps(props as any)
 
 	return (

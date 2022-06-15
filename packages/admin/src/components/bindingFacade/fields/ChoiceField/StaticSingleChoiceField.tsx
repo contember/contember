@@ -3,11 +3,13 @@ import {
 	Field,
 	FieldValue,
 	OptionallyVariableFieldValue,
+	Scalar,
 	SugaredRelativeSingleField,
 } from '@contember/binding'
 import { FunctionComponent, ReactNode } from 'react'
 import type { ChoiceFieldData } from './ChoiceFieldData'
-import { useStaticSingleChoiceField } from './useStaticSingleChoiceField'
+import { useStaticSingleChoiceField } from './hooks/useStaticSingleChoiceField'
+import { SelectFuseOptionsProps } from './hooks/useFuseFilteredOptions'
 
 export interface StaticOption {
 	label: ReactNode
@@ -24,12 +26,15 @@ export interface OptionallyVariableStaticOption extends StaticOption {
 	searchKeywords?: string
 }
 
-export interface StaticSingleChoiceFieldProps extends SugaredRelativeSingleField {
-	options: OptionallyVariableStaticOption[]
-}
+export type StaticSingleChoiceFieldProps =
+	& SugaredRelativeSingleField
+	& SelectFuseOptionsProps<Scalar>
+	& {
+		options: OptionallyVariableStaticOption[]
+	}
 
 
-export const StaticSingleChoiceField: FunctionComponent<StaticSingleChoiceFieldProps & ChoiceFieldData.SingleChoiceFieldProps> =
+export const StaticSingleChoiceField: FunctionComponent<StaticSingleChoiceFieldProps & ChoiceFieldData.SingleChoiceFieldProps<Scalar>> =
 	Component(
 		props => props.children(useStaticSingleChoiceField(props)),
 		props => <Field {...props} />,

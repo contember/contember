@@ -1,50 +1,46 @@
-import type { EntityAccessor, EntityId, Environment, ErrorAccessor, FieldValue } from '@contember/binding'
 import type { ReactElement, ReactNode } from 'react'
 import { FieldErrors } from '@contember/ui'
 
 export namespace ChoiceFieldData {
 
-	export type StaticValue = FieldValue
-	export type DynamicValue = EntityAccessor['idOnServer']
-
-	// This is just the JS array index as specified in options or as returned from the server.
-	export type ValueRepresentation = number
-
-	export interface SingleDatum<ActualValue extends Environment.Value | EntityId = EntityId> {
-		key: ValueRepresentation
+	export interface SingleOption<Value = unknown > {
 		label: ReactNode
 		searchKeywords: string
 		description?: ReactNode
-		actualValue: ActualValue
+		value: Value
+		key: string
 	}
 
-	export type Data<ActualValue extends Environment.Value | EntityId = EntityId> = SingleDatum<ActualValue>[]
+	export type Options<Value = unknown> = SingleOption<Value>[]
 
-	export interface BaseChoiceMetadata {
-		data: Data<DynamicValue | StaticValue>
+	export interface BaseChoiceMetadata<Value = unknown> {
+		data: Options<Value>
 		errors: FieldErrors | undefined
-		environment: Environment
-		isMutating: boolean
+		onSearch?: (input: string) => void
+		isLoading?: boolean
 		onAddNew?: () => void
 	}
 
-	export interface SingleChoiceFieldMetadata extends BaseChoiceMetadata {
-		currentValue: ValueRepresentation
-		onChange: (newValue: ValueRepresentation) => void
+	export interface SingleChoiceFieldMetadata<Value = unknown> extends BaseChoiceMetadata<Value> {
+		currentValue: SingleOption<Value> | null
+		onSelect: (newValue: SingleOption<Value>) => void
+		onClear: () => void
 	}
 
-	export interface MultipleChoiceFieldMetadata extends BaseChoiceMetadata {
-		currentValues: ValueRepresentation[]
-		clear: () => void
-		onChange: (optionKey: ValueRepresentation, isChosen: boolean) => void
+	export interface MultipleChoiceFieldMetadata<Value> extends BaseChoiceMetadata<Value> {
+		currentValues: SingleOption<Value>[]
+		onClear: () => void
+		onAdd: (option: SingleOption<Value>) => void
+		onRemove: (option: SingleOption<Value>) => void
+		onMove?: (oldIndex: number, newIndex: number) => void
 	}
 
-	export interface SingleChoiceFieldProps {
-		children: (metadata: SingleChoiceFieldMetadata) => ReactElement | null
+	export interface SingleChoiceFieldProps<Value = unknown> {
+		children: (metadata: SingleChoiceFieldMetadata<Value>) => ReactElement | null
 	}
 
-	export interface MultiChoiceFieldProps {
-		children: (metadata: MultipleChoiceFieldMetadata) => ReactElement | null
+	export interface MultiChoiceFieldProps<Value = unknown> {
+		children: (metadata: MultipleChoiceFieldMetadata<Value>) => ReactElement | null
 	}
 
 }

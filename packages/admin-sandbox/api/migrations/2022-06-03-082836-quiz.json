@@ -1,0 +1,117 @@
+{
+	"formatVersion": 3,
+	"modifications": [
+		{
+			"modification": "createEnum",
+			"enumName": "QuizResultState",
+			"values": [
+				"pending",
+				"failed",
+				"succeed"
+			]
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"name": "QuizResult",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "quiz_result",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"columnType": "uuid",
+						"nullable": false,
+						"type": "Uuid"
+					}
+				},
+				"unique": {},
+				"eventLog": {
+					"enabled": true
+				}
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "QuizResult",
+			"field": {
+				"name": "answer",
+				"columnName": "answer",
+				"columnType": "text",
+				"nullable": false,
+				"type": "String"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "QuizResult",
+			"field": {
+				"name": "state",
+				"columnName": "state",
+				"columnType": "QuizResultState",
+				"nullable": false,
+				"type": "Enum"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "QuizResult",
+			"field": {
+				"name": "failReason",
+				"columnName": "fail_reason",
+				"columnType": "text",
+				"nullable": true,
+				"type": "String"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "QuizResult",
+			"field": {
+				"name": "successRating",
+				"columnName": "success_rating",
+				"columnType": "integer",
+				"nullable": true,
+				"type": "Integer"
+			}
+		},
+		{
+			"modification": "patchAclSchema",
+			"patch": [
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/QuizResult",
+					"value": {
+						"predicates": {},
+						"operations": {
+							"read": {
+								"id": true,
+								"answer": true,
+								"state": true,
+								"failReason": true,
+								"successRating": true
+							},
+							"create": {
+								"id": true,
+								"answer": true,
+								"state": true,
+								"failReason": true,
+								"successRating": true
+							},
+							"update": {
+								"id": true,
+								"answer": true,
+								"state": true,
+								"failReason": true,
+								"successRating": true
+							},
+							"delete": true,
+							"customPrimary": true
+						}
+					}
+				}
+			]
+		}
+	]
+}

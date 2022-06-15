@@ -1,12 +1,13 @@
 import { Checkbox, FieldContainer } from '@contember/ui'
 import { useMemo } from 'react'
 import { useMessageFormatter } from '../../../../../i18n'
-import { MultiSelectFieldInner } from '../../../fields'
+import { ChoiceFieldData, MultiSelectFieldInner } from '../../../fields'
 import { BaseDynamicChoiceField } from '../../../fields/ChoiceField/BaseDynamicChoiceField'
-import { useSelectOptions } from '../../../fields/ChoiceField/useSelectOptions'
+import { useSelectOptions } from '../../../fields/ChoiceField/hooks/useSelectOptions'
 import { FilterRendererProps } from '../base'
 import { dataGridCellsDictionary } from './dataGridCellsDictionary'
-import { EntityId } from '@contember/binding'
+import { EntityAccessor, EntityId } from '@contember/binding'
+import { useCurrentlyChosenEntities } from '../../../fields/ChoiceField/hooks/useCurrentlyChosenEntities'
 
 
 // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
@@ -20,39 +21,27 @@ type SelectCellFilterProps =
 		optionProps: BaseDynamicChoiceField
 	}
 
-export const SelectCellFilter = ({ filter, setFilter, environment, optionProps }: SelectCellFilterProps) => {
-	const [entities, options] = useSelectOptions(optionProps)
-	const currentValues = useMemo(() => {
-		const values: number[] = []
-		for (const id of filter.id) {
-			const val = entities.findIndex(it => it.id === id)
-			if (val >= 0) {
-				values.push(val)
-			}
-		}
-		return values
-	}, [entities, filter])
+export const SelectCellFilter = ({ filter, setFilter, optionProps }: SelectCellFilterProps) => {
+	const currentlyChosenEntities = useCurrentlyChosenEntities(optionProps, filter.id)
+	const { options, allOptions, onSearch, isLoading } = useSelectOptions(optionProps, currentlyChosenEntities)
+	const currentValues = useMemo<ChoiceFieldData.Options<EntityAccessor>>(() => {
+		return allOptions.filter(it => filter.id.includes(it.value.id))
+	}, [filter.id, allOptions])
 	const formatMessage = useMessageFormatter(dataGridCellsDictionary)
 
 	return <>
 		<MultiSelectFieldInner
 			label={undefined}
-			environment={environment}
-			onChange={(val, isChosen) => {
-				const id = entities[val].id
-				if (isChosen) {
-					setFilter({ ...filter, id: [...filter.id, id] })
-				} else {
-					setFilter({ ...filter, id: filter.id.filter(it => it !== id) })
-				}
-			}}
 			data={options}
+			onAdd={(val: ChoiceFieldData.SingleOption<EntityAccessor>) => setFilter({ ...filter, id: [...filter.id, val.value.id] })}
+			onRemove={val => setFilter({ ...filter, id: filter.id.filter(it => it !== val.value.id) })}
 			errors={undefined}
 			currentValues={currentValues}
-			clear={() => {
+			onClear={() => {
 				setFilter({ ...filter, id: [] })
 			}}
-			isMutating={false}
+			onSearch={onSearch}
+			isLoading={isLoading}
 		/>
 
 		<FieldContainer

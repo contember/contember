@@ -10,6 +10,7 @@ export const Navigation = () => (
 			<Menu.Item title="Homepage" to="homepage" />
 			<Menu.Item title="Locales" to="locales" />
 			<Menu.Item title="Seq ids" to="seq/list" />
+			<Menu.Item title="Quiz" to="quiz" />
 			<Menu.Item title="Foo" to="random/foo" />
 			<Menu.Item title="Foo Bar">
 				<Menu.Item title="Skip this1" />

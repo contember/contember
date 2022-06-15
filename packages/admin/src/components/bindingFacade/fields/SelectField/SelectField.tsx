@@ -1,8 +1,8 @@
-import { Component, FieldValue } from '@contember/binding'
+import { Component } from '@contember/binding'
 import { FieldContainer, FieldContainerProps, FieldErrors, SelectCreateNewWrapper } from '@contember/ui'
 import { FunctionComponent, memo } from 'react'
 import type { Props as SelectProps } from 'react-select'
-import AsyncSelect from 'react-select/async'
+import Select from 'react-select'
 import { useLabelMiddleware } from '../../environment/LabelMiddleware'
 import {
 	ChoiceField,
@@ -10,8 +10,7 @@ import {
 	DynamicSingleChoiceFieldProps,
 	StaticSingleChoiceFieldProps,
 } from '../ChoiceField'
-import { selectStyles } from './commonStyles'
-import { useCommonReactSelectAsyncProps } from './useCommonReactSelectAsyncProps'
+import { useCommonReactSelectProps } from './useCommonReactSelectProps'
 
 export type SelectFieldProps =
 	& SelectFieldInnerPublicProps
@@ -23,8 +22,8 @@ export type SelectFieldProps =
 export const SelectField: FunctionComponent<SelectFieldProps> = Component(
 	props => (
 		<ChoiceField {...props} >
-			{(choiceProps: ChoiceFieldData.SingleChoiceFieldMetadata) => (
-				<SelectFieldInner {...props}{...choiceProps} />
+			{(choiceProps: ChoiceFieldData.SingleChoiceFieldMetadata<any>) => (
+				<SelectFieldInner {...props} {...choiceProps} />
 			)}
 		</ChoiceField>
 	),
@@ -48,19 +47,21 @@ export const SelectFieldInner = memo(
 		allowNull,
 		currentValue,
 		data,
-		environment,
 		errors,
-		isMutating,
-		onChange,
+		onSelect,
+		onClear,
 		reactSelectProps,
 		onAddNew,
+		onSearch,
+		isLoading,
 		...fieldContainerProps
 	}: SelectFieldInnerProps) => {
-		const asyncProps = useCommonReactSelectAsyncProps({
+		const selectProps = useCommonReactSelectProps({
 			reactSelectProps,
 			placeholder,
 			data,
 			isInvalid: (errors?.length ?? 0) > 0,
+			onSearch,
 		})
 
 		const labelMiddleware = useLabelMiddleware()
@@ -72,33 +73,18 @@ export const SelectFieldInner = memo(
 				label={labelMiddleware(fieldContainerProps.label)}
 			>
 				<SelectCreateNewWrapper onClick={onAddNew}>
-					<AsyncSelect
-						{...asyncProps}
+					<Select
+						{...selectProps}
 						menuPlacement="auto"
 						isClearable={allowNull === true}
-						value={data[currentValue]}
-						styles={selectStyles as Object} // TODO: Too complex to fix styling related typesafety
+						value={currentValue}
+						isLoading={isLoading}
 						onChange={(newValue, actionMeta) => {
-							const value = newValue as ChoiceFieldData.SingleDatum<FieldValue | undefined>
-							switch (actionMeta.action) {
-								case 'select-option': {
-									onChange(value.key)
-									break
-								}
-								case 'clear': {
-									onChange(-1)
-									break
-								}
-								case 'create-option': {
-									// TODO not yet supported
-									break
-								}
-								case 'remove-value':
-								case 'pop-value':
-								case 'deselect-option': {
-									// When is this even called? 🤔
-									break
-								}
+							const value = newValue as ChoiceFieldData.SingleOption
+							if (actionMeta.action === 'select-option') {
+								onSelect(value)
+							} else if (actionMeta.action === 'clear') {
+								onClear()
 							}
 						}}
 					/>

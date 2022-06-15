@@ -9,9 +9,10 @@ import {
 import type { FunctionComponent } from 'react'
 import { DataGridColumn, DataGridColumnPublicProps } from '../base'
 import { renderDynamicChoiceFieldStatic } from '../../../fields/ChoiceField/renderDynamicChoiceFieldStatic'
-import { BaseDynamicChoiceField, useDesugaredOptionPath } from '../../../fields/ChoiceField/BaseDynamicChoiceField'
+import { BaseDynamicChoiceField } from '../../../fields/ChoiceField/BaseDynamicChoiceField'
 import { FieldFallbackView, FieldFallbackViewPublicProps } from '../../../fieldViews'
 import { SelectCellArtifacts, SelectCellFilter } from './SelectCellFilter'
+import { useDesugaredOptionPath } from '../../../fields/ChoiceField/hooks/useDesugaredOptionPath'
 
 export type HasOneSelectProps =
 	& DataGridColumnPublicProps
@@ -46,16 +47,19 @@ export const HasOneSelectCell: FunctionComponent<HasOneSelectProps> = Component(
 				id: [],
 				nullCondition: false,
 			}}
-			filterRenderer={filterProps => <SelectCellFilter optionProps={props} {...filterProps} />}
+			filterRenderer={filterProps => <SelectCellFilter optionProps={{
+				lazy: { initialLimit: 0 },
+				...props,
+			}} {...filterProps} />}
 		>
-			<HasOneSelectCellContent {...props} />
+			<HasOneSelectCellContent lazy={{ initialLimit: 0 }} {...props} />
 		</DataGridColumn>
 	)
 }, 'HasOneSelectField')
 
 const HasOneSelectCellContent = Component<BaseDynamicChoiceField & SugaredRelativeSingleEntity & FieldFallbackViewPublicProps>(
 	props => {
-		const desugaredOptionPath = useDesugaredOptionPath(props)
+		const desugaredOptionPath = useDesugaredOptionPath(props, undefined)
 		const entity = useEntity(props).getEntity({ field: desugaredOptionPath.hasOneRelationPath })
 
 		if ('renderOption' in props) {
@@ -75,10 +79,12 @@ const HasOneSelectCellContent = Component<BaseDynamicChoiceField & SugaredRelati
 	},
 	(props, environment) => {
 		const { subTree, renderedOption } = renderDynamicChoiceFieldStatic(props, environment)
+		const { subTree: currentValuesSubtree } = renderDynamicChoiceFieldStatic(props, environment, { id: { in: [] } })
 
 		return (
 			<>
 				{subTree}
+				{currentValuesSubtree}
 				<HasOne field={props.field} expectedMutation="none">
 					{renderedOption}
 				</HasOne>

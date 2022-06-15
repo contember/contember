@@ -1,8 +1,7 @@
 import { ReactNode, useEffect, useState } from 'react'
 import { DataGridState, DataGridStateMethods } from './DataGridState'
 import { renderGrid } from '../grid/renderGrid'
-import { DataBindingExtendAborted, TreeRootId, useBindingOperations, useEnvironment } from '@contember/binding'
-import { useAbortController, useIsMounted } from '@contember/react-utils'
+import { TreeRootId, useEnvironment, useExtendTree } from '@contember/binding'
 
 export const useDataGridDisplayedState = (stateMethods: DataGridStateMethods, desiredState: DataGridState, tile?: ReactNode): {
 	gridState: DataGridState | undefined
@@ -16,37 +15,26 @@ export const useDataGridDisplayedState = (stateMethods: DataGridStateMethods, de
 		treeRootId: undefined,
 	})
 
-	const abort = useAbortController()
-	const { extendTree } = useBindingOperations()
-	const isMountedRef = useIsMounted()
 	const environment = useEnvironment()
+	const extendTree = useExtendTree()
 	useEffect(() => {
 		(async () => {
 			if (displayedState.gridState === desiredState) {
 				return
 			}
-			try {
-				const newTreeRootId = await extendTree(
-					renderGrid(stateMethods, undefined, desiredState, desiredState, environment, {
-						tile,
-					}),
-					{ signal: abort() },
-				)
-				if (!isMountedRef.current) {
-					return
-				}
+			const newTreeRootId = await extendTree(
+				renderGrid(stateMethods, undefined, desiredState, desiredState, environment, {
+					tile,
+				}),
+			)
+			if (newTreeRootId) {
 				setDisplayedState({
 					gridState: desiredState,
 					treeRootId: newTreeRootId,
 				})
-			} catch (e) {
-				if (e === DataBindingExtendAborted) {
-					return
-				}
-				throw e
 			}
 		})()
-	}, [abort, desiredState, displayedState, environment, extendTree, stateMethods, isMountedRef, tile])
+	}, [desiredState, displayedState, environment, extendTree, stateMethods, tile])
 
 	return displayedState
 }

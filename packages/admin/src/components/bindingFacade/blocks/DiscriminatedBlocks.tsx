@@ -2,7 +2,7 @@ import { Component, SugaredRelativeSingleField } from '@contember/binding'
 import type { FieldContainerProps } from '@contember/ui'
 import { FunctionComponent, ReactNode, useMemo } from 'react'
 import { NativeSelectFieldInner, NormalizedStaticOption, StaticSingleChoiceField } from '../fields'
-import { useStaticSingleChoiceField } from '../fields/ChoiceField/useStaticSingleChoiceField'
+import { useStaticSingleChoiceField } from '../fields/ChoiceField/hooks/useStaticSingleChoiceField'
 import { useNormalizedBlocks } from './useNormalizedBlocks'
 
 export interface DiscriminatedBlocksProps extends Omit<FieldContainerProps, 'children'>, SugaredRelativeSingleField {
@@ -32,17 +32,12 @@ export const DiscriminatedBlocks: FunctionComponent<DiscriminatedBlocksProps> = 
 			<>
 				{props.allowBlockTypeChange !== false && (
 					<NativeSelectFieldInner
+						{...metadata}
 						label={props.label}
-						data={metadata.data}
-						currentValue={metadata.currentValue}
-						onChange={metadata.onChange}
-						environment={metadata.environment}
-						errors={metadata.errors}
 						placeholder="Choose…"
-						isMutating={metadata.isMutating}
 					/>
 				)}
-				{metadata.currentValue in blocksArray && blocksArray[metadata.currentValue].datum.children}
+				{metadata.currentValue && normalizedBlocks.get(metadata.currentValue.value)?.datum.children}
 			</>
 		)
 	},

@@ -8,11 +8,12 @@ import {
 	wrapFilterInHasOnes,
 } from '@contember/binding'
 import { Fragment, FunctionComponent, ReactElement, ReactNode, useMemo } from 'react'
-import { BaseDynamicChoiceField, useDesugaredOptionPath } from '../../../fields/ChoiceField/BaseDynamicChoiceField'
+import { BaseDynamicChoiceField } from '../../../fields/ChoiceField/BaseDynamicChoiceField'
 import { renderDynamicChoiceFieldStatic } from '../../../fields/ChoiceField/renderDynamicChoiceFieldStatic'
 import { FieldFallbackView, FieldFallbackViewPublicProps } from '../../../fieldViews'
 import { DataGridColumn, DataGridColumnPublicProps } from '../base'
 import { SelectCellArtifacts, SelectCellFilter } from './SelectCellFilter'
+import { useDesugaredOptionPath } from '../../../fields/ChoiceField/hooks/useDesugaredOptionPath'
 
 export type HasManySelectProps =
 	& DataGridColumnPublicProps
@@ -59,9 +60,12 @@ export const HasManySelectCell: FunctionComponent<HasManySelectProps> = Componen
 				id: [],
 				nullCondition: false,
 			}}
-			filterRenderer={filterProps => <SelectCellFilter optionProps={props} {...filterProps} />}
+			filterRenderer={filterProps => <SelectCellFilter optionProps={{
+				lazy: { initialLimit: 0 },
+				...props,
+			}} {...filterProps} />}
 		>
-			<HasManySelectCellContent {...props} />
+			<HasManySelectCellContent lazy={{ initialLimit: 0 }} {...props} />
 		</DataGridColumn>
 	)
 }, 'HasManySelectField')
@@ -69,7 +73,7 @@ export const HasManySelectCell: FunctionComponent<HasManySelectProps> = Componen
 
 const HasManySelectCellContent = Component<HasManySelectProps>(
 	props => {
-		const desugaredOptionPath = useDesugaredOptionPath(props)
+		const desugaredOptionPath = useDesugaredOptionPath(props, undefined)
 		const entities = useEntityList(props)
 		const entitiesArray = useMemo(
 			() => Array.from(entities, it => it.getEntity({ field: desugaredOptionPath.hasOneRelationPath })),
@@ -99,10 +103,12 @@ const HasManySelectCellContent = Component<HasManySelectProps>(
 	},
 	(props, environment) => {
 		const { subTree, renderedOption } = renderDynamicChoiceFieldStatic(props, environment)
+		const { subTree: currentValuesSubtree } = renderDynamicChoiceFieldStatic(props, environment, { id: { in: [] } })
 
 		return (
 			<>
 				{subTree}
+				{currentValuesSubtree}
 				<HasMany field={props.field} expectedMutation="none">
 					{renderedOption}
 				</HasMany>

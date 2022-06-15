@@ -4,13 +4,20 @@ import type { Alias, SugaredQualifiedSingleEntity, SugaredUnconstrainedQualified
 import { useAccessorUpdateSubscription } from './useAccessorUpdateSubscription'
 import { useEntitySubTreeParameters } from './useEntitySubTreeParameters'
 import { useGetEntitySubTree } from './useGetEntitySubTree'
+import { TreeRootId } from '../treeParameters'
 
 export const useEntitySubTree = (
 	qualifiedSingleEntity: Alias | SugaredQualifiedSingleEntity | SugaredUnconstrainedQualifiedSingleEntity,
+	...treeId: [TreeRootId | undefined] | []
 ): EntityAccessor => {
 	const getSubTree = useGetEntitySubTree()
 	const parameters = useEntitySubTreeParameters(qualifiedSingleEntity)
-	const getAccessor = useCallback(() => getSubTree(parameters), [getSubTree, parameters])
+	const hasTreeId = treeId.length > 0
+	const treeIdVal = treeId[0]
+	const getAccessor = useCallback(
+		() => getSubTree(parameters, ...(hasTreeId ? [treeIdVal] : [])),
+		[getSubTree, hasTreeId, parameters, treeIdVal],
+	)
 
 	// if (typeof parameters !== 'string' && parameters.hasOneRelationPath.length) {
 	// 	throw new BindingError(`useEntitySubTree: cannot use hasOneRelationPath!`)

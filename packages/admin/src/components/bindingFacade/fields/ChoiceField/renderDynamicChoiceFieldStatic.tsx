@@ -1,16 +1,9 @@
 import { ReactElement } from 'react'
-import {
-	EntityListSubTree,
-	Environment,
-	Field,
-	NIL_UUID,
-	QueryLanguage,
-	SugaredQualifiedEntityList,
-	SugaredQualifiedFieldList,
-} from '@contember/binding'
+import { EntityListSubTree, Environment, Field, Filter, NIL_UUID } from '@contember/binding'
 import { BaseDynamicChoiceField } from './BaseDynamicChoiceField'
+import { getDesugaredEntityList, getDesugaredFieldList } from './hooks/useDesugaredOptionPath'
 
-export const renderDynamicChoiceFieldStatic = (props: BaseDynamicChoiceField, environment: Environment): {
+export const renderDynamicChoiceFieldStatic = (props: BaseDynamicChoiceField, environment: Environment, filter?: Filter | undefined): {
 	subTree: ReactElement
 	renderedOption: ReactElement
 } => {
@@ -23,30 +16,33 @@ export const renderDynamicChoiceFieldStatic = (props: BaseDynamicChoiceField, en
 		))
 
 
-	if ('renderOption' in props) {
-		const renderedOptionBase =
-			typeof props.optionsStaticRender === 'function'
-				? props.optionsStaticRender(environment)
-				: props.optionsStaticRender
+	if ('renderOption' in props || 'optionLabel' in props) {
+		let renderedOptionBase
+		if ('renderOption' in props) {
+			renderedOptionBase =
+				typeof props.optionsStaticRender === 'function'
+					? props.optionsStaticRender(environment)
+					: props.optionsStaticRender
+
+		} else {
+			renderedOptionBase = props.optionLabel
+		}
 		const renderedOption = (
 			<>
 				{searchByFields}
 				{renderedOptionBase}
 			</>
 		)
-		const sugaredEntityList: SugaredQualifiedEntityList =
-			typeof props.options === 'string' || !('entities' in props.options)
-				? { entities: props.options }
-				: props.options
+		const entityList = getDesugaredEntityList(props.options, environment, props.lazy, filter)
 
 		const subTree = (
 			<>
-				<EntityListSubTree {...sugaredEntityList} expectedMutation="none">
+				<EntityListSubTree entities={entityList} {...entityList} expectedMutation="none">
 					{renderedOption}
 				</EntityListSubTree>
 				{props.createNewForm && (
 					<EntityListSubTree entities={{
-						entityName: typeof sugaredEntityList.entities === 'string' ? sugaredEntityList.entities : sugaredEntityList.entities.entityName,
+						entityName: entityList.entityName,
 						filter: { id: { eq: NIL_UUID } },
 					}} expectedMutation={'none'}>
 						{props.createNewForm}
@@ -59,9 +55,8 @@ export const renderDynamicChoiceFieldStatic = (props: BaseDynamicChoiceField, en
 		return { subTree, renderedOption }
 
 	} else {
-		const sugaredFieldList: SugaredQualifiedFieldList =
-			typeof props.options === 'string' || !('fields' in props.options) ? { fields: props.options } : props.options
-		const fieldList = QueryLanguage.desugarQualifiedFieldList(sugaredFieldList, environment)
+		const fieldList = getDesugaredFieldList(props.options, environment, props.lazy, filter)
+
 		const renderedOptionBase = <Field field={fieldList} />
 		const renderedOption = (
 			<>

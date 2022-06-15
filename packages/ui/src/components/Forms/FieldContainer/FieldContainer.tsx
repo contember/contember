@@ -38,7 +38,7 @@ export const FieldContainer = memo(
 		required,
 		size,
 		useLabelElement = true,
-		...rest
+		style,
 	}: FieldContainerProps) => {
 		const LabelElement = useLabelElement ? 'label' : 'div'
 		const componentClassName = `${useClassNamePrefix()}field-container`
@@ -47,7 +47,7 @@ export const FieldContainer = memo(
 
 		return (
 			<div
-				{...rest}
+				style={style}
 				className={classNames(
 					`${componentClassName}`,
 					toEnumViewClass(size),

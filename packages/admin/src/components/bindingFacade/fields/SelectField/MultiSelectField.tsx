@@ -1,12 +1,19 @@
-import { Component } from '@contember/binding'
+import { Component, EntityAccessor } from '@contember/binding'
 import { FieldContainer, FieldContainerProps, FieldErrors, SelectCreateNewWrapper } from '@contember/ui'
-import { FunctionComponent, memo } from 'react'
-import type { Props as SelectProps } from 'react-select'
-import AsyncSelect from 'react-select/async'
+import { ComponentType, FunctionComponent, memo, MouseEventHandler, useCallback } from 'react'
+import type { MultiValueGenericProps, MultiValueProps, Props as SelectProps } from 'react-select'
+import Select, { ActionMeta, components } from 'react-select'
 import { useLabelMiddleware } from '../../environment/LabelMiddleware'
 import { ChoiceFieldData, DynamicMultiChoiceField, DynamicMultipleChoiceFieldProps } from '../ChoiceField'
-import { selectStyles } from './commonStyles'
-import { useCommonReactSelectAsyncProps } from './useCommonReactSelectAsyncProps'
+import { useCommonReactSelectProps } from './useCommonReactSelectProps'
+import {
+	HelperContainerGetter,
+	SortableContainer,
+	SortableContainerProps,
+	SortableElement,
+	SortableHandle,
+	SortEndHandler,
+} from 'react-sortable-hoc'
 
 export type MultiSelectFieldProps =
 	& MultiSelectFieldInnerPublicProps
@@ -15,7 +22,7 @@ export type MultiSelectFieldProps =
 export const MultiSelectField: FunctionComponent<MultiSelectFieldProps> = Component(
 	props => (
 		<DynamicMultiChoiceField {...props} >
-			{(choiceProps: ChoiceFieldData.MultipleChoiceFieldMetadata) => (
+			{(choiceProps: ChoiceFieldData.MultipleChoiceFieldMetadata<EntityAccessor>) => (
 				<MultiSelectFieldInner {...props} {...choiceProps} />
 			)}
 		</DynamicMultiChoiceField>
@@ -28,33 +35,63 @@ export interface MultiSelectFieldInnerPublicProps extends Omit<FieldContainerPro
 	reactSelectProps?: Partial<SelectProps<any>>
 }
 
-export interface MultiSelectFieldInnerProps
-	extends ChoiceFieldData.MultipleChoiceFieldMetadata,
+export interface MultiSelectFieldInnerProps<ActualValue>
+	extends ChoiceFieldData.MultipleChoiceFieldMetadata<ActualValue>,
 		MultiSelectFieldInnerPublicProps {
 	errors: FieldErrors | undefined
 }
 
-export const MultiSelectFieldInner = memo(
-	({
+const typedMemo: <T>(c: T) => T = memo
+export const MultiSelectFieldInner = typedMemo(
+	<T extends any>({
 		currentValues,
 		data,
-		environment,
 		errors,
-		isMutating,
-		onChange,
-		clear,
+		onAdd,
+		onClear,
+		onRemove,
 		reactSelectProps,
 		placeholder,
 		onAddNew,
+		onMove,
+		onSearch,
+		isLoading,
 		...fieldContainerProps
-	}: MultiSelectFieldInnerProps) => {
+	}: MultiSelectFieldInnerProps<T>) => {
 		const labelMiddleware = useLabelMiddleware()
-		const asyncProps = useCommonReactSelectAsyncProps({
+		const selectProps = useCommonReactSelectProps<T>({
 			reactSelectProps,
 			placeholder,
 			data,
 			isInvalid: (errors?.length ?? 0) > 0,
+			onSearch,
 		})
+
+		const selectOnChange = useCallback((newValue: unknown, actionMeta: ActionMeta<ChoiceFieldData.SingleOption<T>>) => {
+			if (actionMeta.action === 'select-option') {
+					onAdd(actionMeta.option!)
+			} else if (actionMeta.action === 'remove-value') {
+				onRemove(actionMeta.removedValue!)
+			} else if (actionMeta.action === 'pop-value' && currentValues.length > 0) {
+				onRemove(currentValues[currentValues.length - 1])
+			} else if (actionMeta.action === 'clear') {
+				onClear()
+			}
+		}, [currentValues, onAdd, onClear, onRemove])
+
+		const allSelectProps: SelectProps<ChoiceFieldData.SingleOption<T>, boolean, never> = {
+			...selectProps,
+			isMulti: true,
+			isClearable: true,
+			closeMenuOnSelect: false,
+			value: currentValues,
+			onChange: selectOnChange,
+			isLoading,
+		}
+		const onSortEnd = useCallback<SortEndHandler>(({ oldIndex, newIndex }) => {
+			onMove?.(oldIndex, newIndex)
+		}, [onMove])
+
 		return (
 			<FieldContainer
 				{...fieldContainerProps}
@@ -62,47 +99,50 @@ export const MultiSelectFieldInner = memo(
 				label={labelMiddleware(fieldContainerProps.label)}
 			>
 				<SelectCreateNewWrapper onClick={onAddNew}>
-					<AsyncSelect
-						{...asyncProps}
-						menuPlacement="auto"
-						isMulti
-						isClearable
-						closeMenuOnSelect={false}
-						styles={selectStyles as Object} // TODO: Too complex to fix styling related typesafety
-						value={Array.from(currentValues, key => data[key])}
-						onChange={(newValues, actionMeta) => {
-							switch (actionMeta.action) {
-								case 'select-option': {
-									onChange(actionMeta.option!.key, true)
-									break
-								}
-								case 'remove-value': {
-									onChange(actionMeta.removedValue!.key, false)
-									break
-								}
-								case 'pop-value': {
-									if (currentValues.length > 0) {
-										onChange(currentValues[currentValues.length - 1], false)
-									}
-									break
-								}
-								case 'clear': {
-									clear()
-									break
-								}
-								case 'create-option': {
-									// TODO not yet supported
-									break
-								}
-								case 'deselect-option': {
-									// When is this even called? 🤔
-									break
-								}
-							}
-						}}
-					/>
+					{onMove
+						? <SortableSelect
+							{...allSelectProps}
+							useDragHandle
+							axis="xy"
+							onSortEnd={onSortEnd}
+							distance={4}
+							helperContainer={getHelperContainer}
+							helperClass={'sortable-dragged'}
+							components={{
+								...selectProps.components,
+								MultiValue: SortableMultiValue,
+								MultiValueLabel: SortableMultiValueLabel,
+							}}
+						/>
+						: <Select {...allSelectProps}/>
+					}
 				</SelectCreateNewWrapper>
 			</FieldContainer>
 		)
 	},
+)
+
+const getHelperContainer: HelperContainerGetter = () => {
+	return document.getElementById('portal-root') ?? document.body
+}
+
+
+const SortableSelect = SortableContainer(Select) as React.ComponentClass<SelectProps<ChoiceFieldData.SingleOption<any>, boolean, never> & SortableContainerProps>
+const SortableMultiValue = SortableElement(
+	(props: MultiValueProps<any, boolean, never>) => {
+		// this prevents the menu from being opened/closed when the user clicks
+		// on a value to begin dragging it. ideally, detecting a click (instead of
+		// a drag) would still focus the control and toggle the menu, but that
+		// requires some magic with refs that are out of scope for this example
+		const onMouseDown: MouseEventHandler<HTMLDivElement> = e => {
+			e.preventDefault()
+			e.stopPropagation()
+		}
+		const innerProps = { ...props.innerProps, onMouseDown }
+		return <components.MultiValue {...props} innerProps={innerProps} />
+	},
+)
+
+const SortableMultiValueLabel = SortableHandle(
+	(props: MultiValueGenericProps<any, boolean, never>) => <components.MultiValueLabel {...props} />,
 )

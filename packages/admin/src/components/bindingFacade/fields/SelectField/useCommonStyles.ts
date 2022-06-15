@@ -1,7 +1,8 @@
-import type { GroupTypeBase, OptionTypeBase, StylesConfig } from 'react-select'
+import type { StylesConfig } from 'react-select'
+import { useMemo } from 'react'
 
 // TODO: Not yet finished with all styles
-export const selectStyles: StylesConfig<OptionTypeBase, boolean, GroupTypeBase<OptionTypeBase>> = {
+export const useCommonStyles = (isInvalid: boolean): StylesConfig<any, boolean, never> => useMemo(() => ({
 	indicatorSeparator: (provided, { isFocused, isDisabled }) => {
 		const backgroundColor = isDisabled
 			? 'var(--cui-color--lower)'
@@ -77,8 +78,8 @@ export const selectStyles: StylesConfig<OptionTypeBase, boolean, GroupTypeBase<O
 	dropdownIndicator: (provided, { isFocused, isDisabled }) => {
 		return {
 			...provided,
-			'align-self': 'stretch',
-			'align-items': 'center',
+			'alignSelf': 'stretch',
+			'alignItems': 'center',
 			'color': isDisabled
 				? 'var(--cui-color--low)'
 				: isFocused
@@ -90,12 +91,10 @@ export const selectStyles: StylesConfig<OptionTypeBase, boolean, GroupTypeBase<O
 			},
 		}
 	},
-	clearIndicator: (provided, { isFocused, isDisabled }) => {
+	clearIndicator: (provided, { isFocused }) => {
 		return {
 			...provided,
-			'color': isDisabled
-				? 'var(--cui-color--low)'
-				: isFocused
+			'color': isFocused
 					? 'var(--cui-color--strong)'
 					: 'var(--cui-color--high)',
 			'&:hover': {
@@ -111,11 +110,13 @@ export const selectStyles: StylesConfig<OptionTypeBase, boolean, GroupTypeBase<O
 				? 'var(--cui-color--strong)'
 				: 'var(--cui-color)'
 
-		const borderColor = isDisabled
-			? 'var(--cui-color--lower)'
-			: isFocused
-				? 'var(--cui-color--low)'
-				: 'var(--cui-color--lower)'
+		const borderColor = isInvalid
+			? 'rgb(var(--cui-theme-danger-500))'
+			: isDisabled
+				? 'var(--cui-color--lower)'
+				: isFocused
+					? 'var(--cui-color--low)'
+					: 'var(--cui-color--lower)'
 
 		return {
 			...provided,
@@ -161,4 +162,16 @@ export const selectStyles: StylesConfig<OptionTypeBase, boolean, GroupTypeBase<O
 			color,
 		}
 	},
-}
+	placeholder: provided => {
+		return {
+			...provided,
+			position: 'absolute',
+		}
+	},
+	valueContainer: provided => {
+		return {
+			...provided,
+			display: 'flex',
+		}
+	},
+}), [isInvalid])

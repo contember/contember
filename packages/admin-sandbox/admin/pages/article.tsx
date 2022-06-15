@@ -6,7 +6,9 @@ import {
 	DeleteEntityButton,
 	EditPage,
 	EnumCell,
+	Field,
 	GenericCell,
+	HasMany,
 	HasManySelectCell,
 	HasOneSelectCell, If, ImageUploadField,
 	LinkButton,
@@ -73,31 +75,64 @@ const ArticleForm = Component(() => <>
 		<If condition={'[state = removed]'}>
 				<TextField field={'title'} label={'Title'} />
 		</If>
+
+
+
 	</>,
 	'ArticleForm',
 )
-
+const CategoryOptionItem = Component(() => {
+	return <>
+		<Field field={'name'}/>, locales:
+		<HasMany field={'locales'}>
+			<Field field={'name'} />
+		</HasMany>
+	</>
+})
 const ArticleSidebarForm = Component(() => <>
 		<SelectField field={'state'} label={'State'} options={Object.entries(stateOptions).map(([value, label]) => ({ value, label }))} allowNull />
+		{/*<MultiSelectField*/}
+		{/*	label={'tags'}*/}
+		{/*	field={'tags'}*/}
+		{/*	options={{*/}
+		{/*		fields: 'Tag.name',*/}
+		{/*		orderBy: 'name desc',*/}
+		{/*	}}*/}
+		{/*	createNewForm={<TextField field={'name'} label={'Name'} />}*/}
+		{/*/>*/}
 		<MultiSelectField
 			label={'tags'}
 			field={'tags'}
+			options={`Tag.locales(locale.code = 'cs').name`}
+			lazy
+		/>
+		<MultiSelectField
+			label={'Sortable tags'}
+			field={'sortedTags'}
 			options={{
 				fields: 'Tag.name',
 				orderBy: 'name desc',
 			}}
 			createNewForm={<TextField field={'name'} label={'Name'} />}
-		/>g
+
+			connectingEntityField={'tag'}
+			sortableBy={'order'}
+			lazy
+		/>
 
 		<SelectField
 			label={'category'}
 			field={'category'}
 			createNewForm={<CategoryForm />}
+			searchByFields={'name'}
 			options={{
-				fields: 'Category.name',
+				entities: 'Category',
 				orderBy: 'name desc',
 			}}
+			optionLabel={<CategoryOptionItem />}
+			lazy
 		/>
+
 	</>,
 	'ArticleSidebarForm',
 )

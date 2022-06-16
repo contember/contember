@@ -1,19 +1,17 @@
 import type {
-	Filter,
 	HasManyRelation,
 	HasOneRelation,
-	OrderBy,
 	QualifiedEntityList,
 	QualifiedSingleEntity,
 	UnconstrainedQualifiedEntityList,
 	UnconstrainedQualifiedSingleEntity,
-	UniqueWhere,
 } from '../treeParameters'
+import { Environment } from '../dao'
 
 // TODO update hashing so that for offset, 0 == undefined
 export class Hashing {
 	public static hashHasOneRelation(relation: HasOneRelation): number {
-		const where: Array<Filter | UniqueWhere | string | undefined> = [
+		const where = [
 			'upToOne',
 			relation.field,
 			relation.filter,
@@ -24,7 +22,7 @@ export class Hashing {
 	}
 
 	public static hashHasManyRelation(relation: HasManyRelation): number {
-		const where: Array<Filter | UniqueWhere | OrderBy | string | number | undefined> = [
+		const where = [
 			'possiblyMany',
 			relation.field,
 			relation.filter,
@@ -38,9 +36,14 @@ export class Hashing {
 
 	public static hashEntityListSubTreeParameters(
 		parameters: QualifiedEntityList | UnconstrainedQualifiedEntityList,
+		environment: Environment,
 	): number {
 		if (parameters.isCreating) {
-			return Hashing.hashArray([parameters.isCreating, parameters.entityName])
+			return Hashing.hashArray([
+				parameters.isCreating,
+				parameters.entityName,
+				environment.getAllVariables(),
+			])
 		}
 		return Hashing.hashArray([
 			parameters.isCreating,
@@ -49,16 +52,28 @@ export class Hashing {
 			parameters.orderBy,
 			parameters.offset,
 			parameters.limit,
+			environment.getAllVariables(),
 		])
 	}
 
 	public static hashEntitySubTreeParameters(
 		parameters: QualifiedSingleEntity | UnconstrainedQualifiedSingleEntity,
+		environment: Environment,
 	): number {
 		if (parameters.isCreating) {
-			return Hashing.hashArray([parameters.isCreating, parameters.entityName])
+			return Hashing.hashArray([
+				parameters.isCreating,
+				parameters.entityName,
+				environment.getAllVariables(),
+			])
 		}
-		return Hashing.hashArray([parameters.isCreating, parameters.where, parameters.entityName, parameters.filter])
+		return Hashing.hashArray([
+			parameters.isCreating,
+			parameters.where,
+			parameters.entityName,
+			parameters.filter,
+			environment.getAllVariables(),
+		])
 	}
 
 	private static hashArray(array: any[]): number {

@@ -11,7 +11,7 @@ export class EntitySubTreeMarker {
 		public readonly fields: EntityFieldMarkersContainer,
 		public readonly environment: Environment,
 	) {
-		this.placeholderName = PlaceholderGenerator.getEntitySubTreePlaceholder(this.parameters)
+		this.placeholderName = PlaceholderGenerator.getEntitySubTreePlaceholder(this.parameters, this.environment)
 	}
 
 	public get entityName() {

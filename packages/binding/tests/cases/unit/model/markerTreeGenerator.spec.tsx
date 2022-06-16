@@ -450,4 +450,38 @@ describe('Marker tree generator', () => {
 			expect(() => new MarkerTreeGenerator(faultyTop).generate()).toThrowError()
 		}
 	})
+
+	it('should generate different placeholder when env variable is different', () => {
+		const nodes = (
+			<EntityListSubTree entities={'Foo'}>
+				<Field field={'id'} />
+			</EntityListSubTree>
+		)
+		const schema = new Schema(SchemaPreprocessor.processRawSchema({
+			entities: [
+				{
+					name: 'Foo',
+					customPrimaryAllowed: false,
+					unique: [],
+					fields: [
+						{
+							__typename: '_Column',
+							name: 'id',
+							nullable: false,
+							defaultValue: null,
+							type: 'Uuid',
+							enumName: null,
+						},
+					],
+				},
+			],
+			enums: [],
+		}))
+		const env = Environment.create()
+			.withSchema(schema)
+		const first = new MarkerTreeGenerator(nodes, env.withVariables({ foo: 'bar' })).generate()
+		const second = new MarkerTreeGenerator(nodes, env.withVariables({ foo: 'lorem' })).generate()
+		expect(Array.from(first.subTrees.keys())[0]).eq('lst_732280646')
+		expect(Array.from(second.subTrees.keys())[0]).eq('lst_34956394')
+	})
 })

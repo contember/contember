@@ -107,7 +107,15 @@ class Environment {
 				newVariables[newName] = resolvedValue
 			}
 		}
-		return new Environment({ ...this.options, variables: newVariables })
+		return new Environment({
+			...this.options,
+			variables: newVariables,
+			parent: this,
+		})
+	}
+
+	public getAllVariables() {
+		return this.options.variables
 	}
 
 	public hasParameter(key: string): boolean {
@@ -125,6 +133,9 @@ class Environment {
 		return this.options.parameters[key] ?? fallback
 	}
 
+	public getAllParameters() {
+		return this.options.parameters
+	}
 
 	public withParameters(parameters: Environment.Parameters): Environment {
 		return new Environment({ ...this.options, parameters })

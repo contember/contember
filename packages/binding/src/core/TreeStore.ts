@@ -174,6 +174,7 @@ export class TreeStore {
 							environment,
 					  )
 					: QueryLanguage.desugarQualifiedEntityList(aliasOrParameters as SugaredQualifiedEntityList, environment),
+				environment,
 			)
 		} else if (mode === 'entity') {
 			placeholderName = PlaceholderGenerator.getEntitySubTreePlaceholder(
@@ -183,6 +184,7 @@ export class TreeStore {
 							environment,
 					  )
 					: QueryLanguage.desugarQualifiedSingleEntity(aliasOrParameters as SugaredQualifiedSingleEntity, environment),
+				environment,
 			)
 		} else {
 			throw new BindingError()

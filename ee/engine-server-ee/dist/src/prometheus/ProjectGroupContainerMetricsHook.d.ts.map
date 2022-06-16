@@ -1,0 +1,1 @@
+{"version":3,"file":"ProjectGroupContainerMetricsHook.d.ts","sourceRoot":"","sources":["../../../src/prometheus/ProjectGroupContainerMetricsHook.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,6BAA6B,EAAE,MAAM,+CAA+C,CAAA;AAC7F,OAAO,EAAE,QAAQ,EAAE,MAAM,aAAa,CAAA;AAGtC,qBAAa,gCAAgC;IAE3C,OAAO,CAAC,iBAAiB;gBAAjB,iBAAiB,EAAE,6BAA6B;IAIlD,QAAQ,CAAC,YAAY,EAAE,QAAQ;CAuBtC"}

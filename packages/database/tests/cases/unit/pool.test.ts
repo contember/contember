@@ -275,6 +275,8 @@ it('fails to reconnect on recoverable error', async () => {
 		reconnectIntervalMs: 5,
 		acquireTimeoutMs: 10,
 	})
+	pool.on('error', () => {
+	})
 	pgClientMock.connections.push(createRecoverableErrorPromise(), createRecoverableErrorPromise())
 	await expect(async () => await pool.acquire()).rejects.toThrowError('Failed to acquire a connection. Last error: too many connection')
 	await timeout(2)
@@ -300,12 +302,15 @@ it('fails to reconnect on unrecoverable error', async () => {
 		acquireTimeoutMs: 3,
 	})
 	pgClientMock.connections.push(createErrorPromise())
-	const poolError = new Promise((resolve, reject) => pool.once('error', e => {
-		reject(e)
+	pool.on('error', () => {
+
+	})
+	const poolError = new Promise(resolve => pool.once('error', e => {
+		resolve(e)
 	}))
 
 	await expect(pool.acquire.bind(pool)).rejects.toThrowError('Failed to acquire a connection')
-	await expect(poolError).rejects.toThrowError('my err')
+	await expect(poolError).resolves.toEqual(new Error('my err'))
 
 	await timeout(4)
 	expect(logger.messages).toMatchInlineSnapshot(`

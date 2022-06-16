@@ -312,7 +312,7 @@ class Pool extends EventEmitter {
 				if (this.poolConfig.reconnectIntervalMs * attempt >= this.poolConfig.acquireTimeoutMs) {
 					this.poolStats.connection_error_count++
 					this.log('Recoverable error, max retries reached.')
-					this.emit('e', e)
+					this.emit('error', e)
 					this.connectingCount--
 				} else {
 					this.poolStats.connection_recoverable_error_count++

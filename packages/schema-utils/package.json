@@ -12,6 +12,6 @@
     "@contember/typesafe": "^1.2.0-alpha.2"
   },
   "devDependencies": {
-    "@types/node": "^17.0.5"
+    "@types/node": "^16"
   }
 }

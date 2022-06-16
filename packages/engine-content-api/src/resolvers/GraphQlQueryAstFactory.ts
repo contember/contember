@@ -7,7 +7,7 @@ import {
 	GraphQLResolveInfo,
 	isListType,
 	isNonNullType,
-	isObjectType,
+	isObjectType, Kind,
 } from 'graphql'
 import { SelectionSetNode } from 'graphql/language/ast'
 import { getArgumentValues } from 'graphql/execution/values'
@@ -67,13 +67,13 @@ export class GraphQlQueryAstFactory {
 	): AnyNode[] {
 		const fields: ObjectNode | FieldNode[] = []
 		for (const subNode of selectionSet.selections) {
-			if (isIt<GraphQlFieldNode>(subNode, 'kind', 'Field')) {
+			if (isIt<GraphQlFieldNode>(subNode, 'kind', Kind.FIELD)) {
 				const field = this.createFromNode(info, parentType, subNode, path, filter)
 				if (field === null) {
 					continue
 				}
 				fields.push(field)
-			} else if (isIt<FragmentSpreadNode>(subNode, 'kind', 'FragmentSpread')) {
+			} else if (isIt<FragmentSpreadNode>(subNode, 'kind', Kind.FRAGMENT_SPREAD)) {
 				const fragmentDefinition = info.fragments[subNode.name.value]
 				if (!fragmentDefinition) {
 					throw new Error(`GraphQlQueryAstFactory: Fragment definition ${subNode.name.value} not found`)

@@ -1,4 +1,4 @@
-FROM node:14-alpine as builder
+FROM node:16-alpine as builder
 
 WORKDIR /src
 RUN apk --no-cache add bash
@@ -7,7 +7,7 @@ COPY ./ ./
 RUN test ! -f yarn.tar.gz || tar xf yarn.tar.gz -C "$(yarn cache dir)" .
 RUN /src/packages/cli/build.sh
 
-FROM node:14-alpine
+FROM node:16-alpine
 
 WORKDIR /src
 ENV NODE_ENV "production"

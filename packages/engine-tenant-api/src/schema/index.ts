@@ -1,9 +1,10 @@
 import { GraphQLResolveInfo, GraphQLScalarType, GraphQLScalarTypeConfig } from 'graphql'
 export type Maybe<T> = T | null
+export type InputMaybe<T> = Maybe<T>
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] }
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> }
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> }
-export type RequireFields<T, K extends keyof T> = { [X in Exclude<keyof T, K>]?: T[X] } & { [P in K]-?: NonNullable<T[P]> }
+export type RequireFields<T, K extends keyof T> = Omit<T, K> & { [P in K]-?: NonNullable<T[P]> }
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
 	ID: string
@@ -23,8 +24,8 @@ export type AddIdpError = {
 
 export enum AddIdpErrorCode {
 	AlreadyExists = 'ALREADY_EXISTS',
-	UnknownType = 'UNKNOWN_TYPE',
-	InvalidConfiguration = 'INVALID_CONFIGURATION'
+	InvalidConfiguration = 'INVALID_CONFIGURATION',
+	UnknownType = 'UNKNOWN_TYPE'
 }
 
 export type AddIdpResponse = {
@@ -48,36 +49,39 @@ export enum AddMailTemplateErrorCode {
 
 export type AddMailTemplateResponse = {
 	readonly __typename?: 'AddMailTemplateResponse'
-	readonly ok: Scalars['Boolean']
+	readonly error?: Maybe<AddMailTemplateError>
 	/** @deprecated Field no longer supported */
 	readonly errors: ReadonlyArray<AddMailTemplateError>
-	readonly error?: Maybe<AddMailTemplateError>
+	readonly ok: Scalars['Boolean']
 }
 
 export type AddProjectMemberError = {
 	readonly __typename?: 'AddProjectMemberError'
 	readonly code: AddProjectMemberErrorCode
-	readonly membershipValidation?: Maybe<ReadonlyArray<MembershipValidationError>>
 	readonly developerMessage: Scalars['String']
 	/** @deprecated Field no longer supported */
 	readonly endUserMessage?: Maybe<Scalars['String']>
+	readonly membershipValidation?: Maybe<ReadonlyArray<MembershipValidationError>>
 }
 
 export enum AddProjectMemberErrorCode {
-	ProjectNotFound = 'PROJECT_NOT_FOUND',
-	IdentityNotFound = 'IDENTITY_NOT_FOUND',
 	AlreadyMember = 'ALREADY_MEMBER',
+	IdentityNotFound = 'IDENTITY_NOT_FOUND',
 	InvalidMembership = 'INVALID_MEMBERSHIP',
+	ProjectNotFound = 'PROJECT_NOT_FOUND',
+	/** @deprecated Field no longer supported */
 	RoleNotFound = 'ROLE_NOT_FOUND',
+	/** @deprecated Field no longer supported */
 	VariableEmpty = 'VARIABLE_EMPTY',
+	/** @deprecated Field no longer supported */
 	VariableNotFound = 'VARIABLE_NOT_FOUND'
 }
 
 export type AddProjectMemberResponse = {
 	readonly __typename?: 'AddProjectMemberResponse'
-	readonly ok: Scalars['Boolean']
-	readonly errors: ReadonlyArray<AddProjectMemberError>
 	readonly error?: Maybe<AddProjectMemberError>
+	readonly errors: ReadonlyArray<AddProjectMemberError>
+	readonly ok: Scalars['Boolean']
 }
 
 export type ApiKey = {
@@ -89,8 +93,8 @@ export type ApiKey = {
 export type ApiKeyWithToken = {
 	readonly __typename?: 'ApiKeyWithToken'
 	readonly id: Scalars['String']
-	readonly token?: Maybe<Scalars['String']>
 	readonly identity: Identity
+	readonly token?: Maybe<Scalars['String']>
 }
 
 export type ChangeMyPasswordError = {
@@ -100,16 +104,16 @@ export type ChangeMyPasswordError = {
 }
 
 export enum ChangeMyPasswordErrorCode {
-	TooWeak = 'TOO_WEAK',
-	NotAPerson = 'NOT_A_PERSON',
 	InvalidPassword = 'INVALID_PASSWORD',
-	NoPasswordSet = 'NO_PASSWORD_SET'
+	NotAPerson = 'NOT_A_PERSON',
+	NoPasswordSet = 'NO_PASSWORD_SET',
+	TooWeak = 'TOO_WEAK'
 }
 
 export type ChangeMyPasswordResponse = {
 	readonly __typename?: 'ChangeMyPasswordResponse'
-	readonly ok: Scalars['Boolean']
 	readonly error?: Maybe<ChangeMyPasswordError>
+	readonly ok: Scalars['Boolean']
 }
 
 export type ChangePasswordError = {
@@ -127,17 +131,17 @@ export enum ChangePasswordErrorCode {
 
 export type ChangePasswordResponse = {
 	readonly __typename?: 'ChangePasswordResponse'
-	readonly ok: Scalars['Boolean']
+	readonly error?: Maybe<ChangePasswordError>
 	/** @deprecated Field no longer supported */
 	readonly errors: ReadonlyArray<ChangePasswordError>
-	readonly error?: Maybe<ChangePasswordError>
+	readonly ok: Scalars['Boolean']
 }
 
 export enum CheckResetPasswordTokenCode {
 	RequestNotFound = 'REQUEST_NOT_FOUND',
+	TokenExpired = 'TOKEN_EXPIRED',
 	TokenNotFound = 'TOKEN_NOT_FOUND',
-	TokenUsed = 'TOKEN_USED',
-	TokenExpired = 'TOKEN_EXPIRED'
+	TokenUsed = 'TOKEN_USED'
 }
 
 export type CheckResetPasswordTokenResult = {
@@ -146,8 +150,8 @@ export type CheckResetPasswordTokenResult = {
 }
 
 export type CommonSignInResult = {
-	readonly token: Scalars['String']
 	readonly person: Person
+	readonly token: Scalars['String']
 }
 
 export type ConfirmOtpError = {
@@ -165,35 +169,38 @@ export enum ConfirmOtpErrorCode {
 
 export type ConfirmOtpResponse = {
 	readonly __typename?: 'ConfirmOtpResponse'
-	readonly ok: Scalars['Boolean']
+	readonly error?: Maybe<ConfirmOtpError>
 	/** @deprecated Field no longer supported */
 	readonly errors: ReadonlyArray<ConfirmOtpError>
-	readonly error?: Maybe<ConfirmOtpError>
+	readonly ok: Scalars['Boolean']
 }
 
 export type CreateApiKeyError = {
 	readonly __typename?: 'CreateApiKeyError'
 	readonly code: CreateApiKeyErrorCode
 	readonly developerMessage: Scalars['String']
-	readonly membershipValidation?: Maybe<ReadonlyArray<MembershipValidationError>>
 	/** @deprecated Field no longer supported */
 	readonly endUserMessage?: Maybe<Scalars['String']>
+	readonly membershipValidation?: Maybe<ReadonlyArray<MembershipValidationError>>
 }
 
 export enum CreateApiKeyErrorCode {
-	ProjectNotFound = 'PROJECT_NOT_FOUND',
 	InvalidMembership = 'INVALID_MEMBERSHIP',
-	VariableNotFound = 'VARIABLE_NOT_FOUND',
+	ProjectNotFound = 'PROJECT_NOT_FOUND',
+	/** @deprecated Field no longer supported */
 	RoleNotFound = 'ROLE_NOT_FOUND',
-	VariableEmpty = 'VARIABLE_EMPTY'
+	/** @deprecated Field no longer supported */
+	VariableEmpty = 'VARIABLE_EMPTY',
+	/** @deprecated Field no longer supported */
+	VariableNotFound = 'VARIABLE_NOT_FOUND'
 }
 
 export type CreateApiKeyResponse = {
 	readonly __typename?: 'CreateApiKeyResponse'
-	readonly ok: Scalars['Boolean']
+	readonly error?: Maybe<CreateApiKeyError>
 	/** @deprecated Field no longer supported */
 	readonly errors: ReadonlyArray<CreateApiKeyError>
-	readonly error?: Maybe<CreateApiKeyError>
+	readonly ok: Scalars['Boolean']
 	readonly result?: Maybe<CreateApiKeyResult>
 }
 
@@ -216,21 +223,21 @@ export enum CreatePasswordResetRequestErrorCode {
 
 export type CreatePasswordResetRequestResponse = {
 	readonly __typename?: 'CreatePasswordResetRequestResponse'
-	readonly ok: Scalars['Boolean']
+	readonly error?: Maybe<CreatePasswordResetRequestError>
 	/** @deprecated Field no longer supported */
 	readonly errors: ReadonlyArray<CreatePasswordResetRequestError>
-	readonly error?: Maybe<CreatePasswordResetRequestError>
+	readonly ok: Scalars['Boolean']
 }
 
 export type CreateProjectOptions = {
-	readonly deployTokenHash?: Maybe<Scalars['String']>
-	readonly noDeployToken?: Maybe<Scalars['Boolean']>
+	readonly deployTokenHash?: InputMaybe<Scalars['String']>
+	readonly noDeployToken?: InputMaybe<Scalars['Boolean']>
 }
 
 export type CreateProjectResponse = {
 	readonly __typename?: 'CreateProjectResponse'
-	readonly ok: Scalars['Boolean']
 	readonly error?: Maybe<CreateProjectResponseError>
+	readonly ok: Scalars['Boolean']
 	readonly result?: Maybe<CreateProjectResult>
 }
 
@@ -251,8 +258,8 @@ export type CreateProjectResult = {
 }
 
 export type CreateResetPasswordRequestOptions = {
-	readonly mailProject?: Maybe<Scalars['String']>
-	readonly mailVariant?: Maybe<Scalars['String']>
+	readonly mailProject?: InputMaybe<Scalars['String']>
+	readonly mailVariant?: InputMaybe<Scalars['String']>
 }
 
 export type CreateSessionTokenError = {
@@ -267,17 +274,16 @@ export enum CreateSessionTokenErrorCode {
 
 export type CreateSessionTokenResponse = {
 	readonly __typename?: 'CreateSessionTokenResponse'
-	readonly ok: Scalars['Boolean']
 	readonly error?: Maybe<CreateSessionTokenError>
+	readonly ok: Scalars['Boolean']
 	readonly result?: Maybe<CreateSessionTokenResult>
 }
 
 export type CreateSessionTokenResult = CommonSignInResult & {
 	readonly __typename?: 'CreateSessionTokenResult'
-	readonly token: Scalars['String']
 	readonly person: Person
+	readonly token: Scalars['String']
 }
-
 
 export type DisableApiKeyError = {
 	readonly __typename?: 'DisableApiKeyError'
@@ -293,10 +299,10 @@ export enum DisableApiKeyErrorCode {
 
 export type DisableApiKeyResponse = {
 	readonly __typename?: 'DisableApiKeyResponse'
-	readonly ok: Scalars['Boolean']
+	readonly error?: Maybe<DisableApiKeyError>
 	/** @deprecated Field no longer supported */
 	readonly errors: ReadonlyArray<DisableApiKeyError>
-	readonly error?: Maybe<DisableApiKeyError>
+	readonly ok: Scalars['Boolean']
 }
 
 export type DisableIdpError = {
@@ -329,10 +335,10 @@ export enum DisableOtpErrorCode {
 
 export type DisableOtpResponse = {
 	readonly __typename?: 'DisableOtpResponse'
-	readonly ok: Scalars['Boolean']
+	readonly error?: Maybe<DisableOtpError>
 	/** @deprecated Field no longer supported */
 	readonly errors: ReadonlyArray<DisableOtpError>
-	readonly error?: Maybe<DisableOtpError>
+	readonly ok: Scalars['Boolean']
 }
 
 export type EnableIdpError = {
@@ -352,7 +358,7 @@ export type EnableIdpResponse = {
 }
 
 export type IdpOptions = {
-	readonly autoSignUp?: Maybe<Scalars['Boolean']>
+	readonly autoSignUp?: InputMaybe<Scalars['Boolean']>
 }
 
 export type IdpResponseInput = {
@@ -361,12 +367,12 @@ export type IdpResponseInput = {
 
 export type Identity = {
 	readonly __typename?: 'Identity'
-	readonly id: Scalars['String']
-	readonly description?: Maybe<Scalars['String']>
-	readonly person?: Maybe<Person>
 	readonly apiKey?: Maybe<ApiKey>
-	readonly projects: ReadonlyArray<IdentityProjectRelation>
+	readonly description?: Maybe<Scalars['String']>
+	readonly id: Scalars['String']
 	readonly permissions?: Maybe<IdentityGlobalPermissions>
+	readonly person?: Maybe<Person>
+	readonly projects: ReadonlyArray<IdentityProjectRelation>
 	readonly roles?: Maybe<ReadonlyArray<Scalars['String']>>
 }
 
@@ -377,16 +383,16 @@ export type IdentityGlobalPermissions = {
 
 export type IdentityProjectRelation = {
 	readonly __typename?: 'IdentityProjectRelation'
-	readonly project: Project
 	readonly memberships: ReadonlyArray<Membership>
+	readonly project: Project
 }
 
 export type IdentityProvider = {
 	readonly __typename?: 'IdentityProvider'
-	readonly slug: Scalars['String']
-	readonly type: Scalars['String']
 	readonly configuration: Scalars['Json']
 	readonly disabledAt: Scalars['DateTime']
+	readonly slug: Scalars['String']
+	readonly type: Scalars['String']
 }
 
 export type InitSignInIdpError = {
@@ -403,10 +409,10 @@ export enum InitSignInIdpErrorCode {
 
 export type InitSignInIdpResponse = {
 	readonly __typename?: 'InitSignInIDPResponse'
-	readonly ok: Scalars['Boolean']
+	readonly error?: Maybe<InitSignInIdpError>
 	/** @deprecated Field no longer supported */
 	readonly errors: ReadonlyArray<InitSignInIdpError>
-	readonly error?: Maybe<InitSignInIdpError>
+	readonly ok: Scalars['Boolean']
 	readonly result?: Maybe<InitSignInIdpResult>
 }
 
@@ -420,18 +426,21 @@ export type InviteError = {
 	readonly __typename?: 'InviteError'
 	readonly code: InviteErrorCode
 	readonly developerMessage: Scalars['String']
-	readonly membershipValidation?: Maybe<ReadonlyArray<MembershipValidationError>>
 	/** @deprecated Field no longer supported */
 	readonly endUserMessage?: Maybe<Scalars['String']>
+	readonly membershipValidation?: Maybe<ReadonlyArray<MembershipValidationError>>
 }
 
 export enum InviteErrorCode {
-	ProjectNotFound = 'PROJECT_NOT_FOUND',
 	AlreadyMember = 'ALREADY_MEMBER',
 	InvalidMembership = 'INVALID_MEMBERSHIP',
+	ProjectNotFound = 'PROJECT_NOT_FOUND',
+	/** @deprecated Field no longer supported */
 	RoleNotFound = 'ROLE_NOT_FOUND',
-	VariableNotFound = 'VARIABLE_NOT_FOUND',
-	VariableEmpty = 'VARIABLE_EMPTY'
+	/** @deprecated Field no longer supported */
+	VariableEmpty = 'VARIABLE_EMPTY',
+	/** @deprecated Field no longer supported */
+	VariableNotFound = 'VARIABLE_NOT_FOUND'
 }
 
 export enum InviteMethod {
@@ -440,40 +449,39 @@ export enum InviteMethod {
 }
 
 export type InviteOptions = {
-	readonly method?: Maybe<InviteMethod>
-	readonly mailVariant?: Maybe<Scalars['String']>
+	readonly mailVariant?: InputMaybe<Scalars['String']>
+	readonly method?: InputMaybe<InviteMethod>
 }
 
 export type InviteResponse = {
 	readonly __typename?: 'InviteResponse'
-	readonly ok: Scalars['Boolean']
+	readonly error?: Maybe<InviteError>
 	/** @deprecated Field no longer supported */
 	readonly errors: ReadonlyArray<InviteError>
-	readonly error?: Maybe<InviteError>
+	readonly ok: Scalars['Boolean']
 	readonly result?: Maybe<InviteResult>
 }
 
 export type InviteResult = {
 	readonly __typename?: 'InviteResult'
-	readonly person: Person
 	readonly isNew: Scalars['Boolean']
+	readonly person: Person
 }
 
-
 export type MailTemplate = {
-	readonly projectSlug?: Maybe<Scalars['String']>
-	readonly type: MailType
-	/** Custom mail variant identifier, e.g. a locale. */
-	readonly variant?: Maybe<Scalars['String']>
-	readonly subject: Scalars['String']
 	readonly content: Scalars['String']
-	readonly useLayout?: Maybe<Scalars['Boolean']>
+	readonly projectSlug?: InputMaybe<Scalars['String']>
+	readonly subject: Scalars['String']
+	readonly type: MailType
+	readonly useLayout?: InputMaybe<Scalars['Boolean']>
+	/** Custom mail variant identifier, e.g. a locale. */
+	readonly variant?: InputMaybe<Scalars['String']>
 }
 
 export type MailTemplateIdentifier = {
-	readonly projectSlug?: Maybe<Scalars['String']>
+	readonly projectSlug?: InputMaybe<Scalars['String']>
 	readonly type: MailType
-	readonly variant?: Maybe<Scalars['String']>
+	readonly variant?: InputMaybe<Scalars['String']>
 }
 
 export enum MailType {
@@ -507,79 +515,71 @@ export type MembershipValidationError = {
 
 export enum MembershipValidationErrorCode {
 	RoleNotFound = 'ROLE_NOT_FOUND',
-	VariableNotFound = 'VARIABLE_NOT_FOUND',
-	VariableEmpty = 'VARIABLE_EMPTY'
+	VariableEmpty = 'VARIABLE_EMPTY',
+	VariableNotFound = 'VARIABLE_NOT_FOUND'
 }
 
 export type Mutation = {
 	readonly __typename?: 'Mutation'
-	readonly signUp?: Maybe<SignUpResponse>
-	readonly signIn?: Maybe<SignInResponse>
-	readonly createSessionToken?: Maybe<CreateSessionTokenResponse>
-	readonly signOut?: Maybe<SignOutResponse>
-	readonly changePassword?: Maybe<ChangePasswordResponse>
-	readonly changeMyPassword?: Maybe<ChangeMyPasswordResponse>
-	readonly initSignInIDP?: Maybe<InitSignInIdpResponse>
-	readonly signInIDP?: Maybe<SignInIdpResponse>
 	readonly addIDP?: Maybe<AddIdpResponse>
-	readonly updateIDP?: Maybe<UpdateIdpResponse>
-	readonly disableIDP?: Maybe<DisableIdpResponse>
-	readonly enableIDP?: Maybe<EnableIdpResponse>
-	readonly prepareOtp?: Maybe<PrepareOtpResponse>
-	readonly confirmOtp?: Maybe<ConfirmOtpResponse>
-	readonly disableOtp?: Maybe<DisableOtpResponse>
-	readonly createResetPasswordRequest?: Maybe<CreatePasswordResetRequestResponse>
-	readonly resetPassword?: Maybe<ResetPasswordResponse>
-	readonly invite?: Maybe<InviteResponse>
-	readonly unmanagedInvite?: Maybe<InviteResponse>
-	readonly addProjectMember?: Maybe<AddProjectMemberResponse>
-	readonly removeProjectMember?: Maybe<RemoveProjectMemberResponse>
-	readonly updateProjectMember?: Maybe<UpdateProjectMemberResponse>
-	readonly createApiKey?: Maybe<CreateApiKeyResponse>
-	readonly createGlobalApiKey?: Maybe<CreateApiKeyResponse>
-	readonly disableApiKey?: Maybe<DisableApiKeyResponse>
 	readonly addMailTemplate?: Maybe<AddMailTemplateResponse>
-	readonly removeMailTemplate?: Maybe<RemoveMailTemplateResponse>
-	readonly createProject?: Maybe<CreateProjectResponse>
-	readonly setProjectSecret?: Maybe<SetProjectSecretResponse>
-	readonly updateProject?: Maybe<UpdateProjectResponse>
 	/** @deprecated use addMailtemplate */
 	readonly addProjectMailTemplate?: Maybe<AddMailTemplateResponse>
+	readonly addProjectMember?: Maybe<AddProjectMemberResponse>
+	readonly changeMyPassword?: Maybe<ChangeMyPasswordResponse>
+	readonly changePassword?: Maybe<ChangePasswordResponse>
+	readonly confirmOtp?: Maybe<ConfirmOtpResponse>
+	readonly createApiKey?: Maybe<CreateApiKeyResponse>
+	readonly createGlobalApiKey?: Maybe<CreateApiKeyResponse>
+	readonly createProject?: Maybe<CreateProjectResponse>
+	readonly createResetPasswordRequest?: Maybe<CreatePasswordResetRequestResponse>
+	readonly createSessionToken?: Maybe<CreateSessionTokenResponse>
+	readonly disableApiKey?: Maybe<DisableApiKeyResponse>
+	readonly disableIDP?: Maybe<DisableIdpResponse>
+	readonly disableOtp?: Maybe<DisableOtpResponse>
+	readonly enableIDP?: Maybe<EnableIdpResponse>
+	readonly initSignInIDP?: Maybe<InitSignInIdpResponse>
+	readonly invite?: Maybe<InviteResponse>
+	readonly prepareOtp?: Maybe<PrepareOtpResponse>
+	readonly removeMailTemplate?: Maybe<RemoveMailTemplateResponse>
 	/** @deprecated use removeMailtemplate */
 	readonly removeProjectMailTemplate?: Maybe<RemoveMailTemplateResponse>
+	readonly removeProjectMember?: Maybe<RemoveProjectMemberResponse>
+	readonly resetPassword?: Maybe<ResetPasswordResponse>
+	readonly setProjectSecret?: Maybe<SetProjectSecretResponse>
+	readonly signIn?: Maybe<SignInResponse>
+	readonly signInIDP?: Maybe<SignInIdpResponse>
+	readonly signOut?: Maybe<SignOutResponse>
+	readonly signUp?: Maybe<SignUpResponse>
+	readonly unmanagedInvite?: Maybe<InviteResponse>
+	readonly updateIDP?: Maybe<UpdateIdpResponse>
+	readonly updateProject?: Maybe<UpdateProjectResponse>
+	readonly updateProjectMember?: Maybe<UpdateProjectMemberResponse>
 }
 
 
-export type MutationSignUpArgs = {
-	email: Scalars['String']
-	password?: Maybe<Scalars['String']>
-	passwordHash?: Maybe<Scalars['String']>
-	roles?: Maybe<ReadonlyArray<Scalars['String']>>
+export type MutationAddIdpArgs = {
+	configuration: Scalars['Json']
+	identityProvider: Scalars['String']
+	options?: InputMaybe<IdpOptions>
+	type: Scalars['String']
 }
 
 
-export type MutationSignInArgs = {
-	email: Scalars['String']
-	password: Scalars['String']
-	expiration?: Maybe<Scalars['Int']>
-	otpToken?: Maybe<Scalars['String']>
+export type MutationAddMailTemplateArgs = {
+	template: MailTemplate
 }
 
 
-export type MutationCreateSessionTokenArgs = {
-	email: Scalars['String']
-	expiration?: Maybe<Scalars['Int']>
+export type MutationAddProjectMailTemplateArgs = {
+	template: MailTemplate
 }
 
 
-export type MutationSignOutArgs = {
-	all?: Maybe<Scalars['Boolean']>
-}
-
-
-export type MutationChangePasswordArgs = {
-	personId: Scalars['String']
-	password: Scalars['String']
+export type MutationAddProjectMemberArgs = {
+	identityId: Scalars['String']
+	memberships: ReadonlyArray<MembershipInput>
+	projectSlug: Scalars['String']
 }
 
 
@@ -589,33 +589,56 @@ export type MutationChangeMyPasswordArgs = {
 }
 
 
-export type MutationInitSignInIdpArgs = {
-	identityProvider: Scalars['String']
-	redirectUrl: Scalars['String']
+export type MutationChangePasswordArgs = {
+	password: Scalars['String']
+	personId: Scalars['String']
 }
 
 
-export type MutationSignInIdpArgs = {
-	identityProvider: Scalars['String']
-	idpResponse: IdpResponseInput
-	redirectUrl: Scalars['String']
-	sessionData: Scalars['Json']
-	expiration?: Maybe<Scalars['Int']>
+export type MutationConfirmOtpArgs = {
+	otpToken: Scalars['String']
 }
 
 
-export type MutationAddIdpArgs = {
-	identityProvider: Scalars['String']
-	type: Scalars['String']
-	configuration: Scalars['Json']
-	options?: Maybe<IdpOptions>
+export type MutationCreateApiKeyArgs = {
+	description: Scalars['String']
+	memberships: ReadonlyArray<MembershipInput>
+	projectSlug: Scalars['String']
+	tokenHash?: InputMaybe<Scalars['String']>
 }
 
 
-export type MutationUpdateIdpArgs = {
-	identityProvider: Scalars['String']
-	configuration?: Maybe<Scalars['Json']>
-	options?: Maybe<IdpOptions>
+export type MutationCreateGlobalApiKeyArgs = {
+	description: Scalars['String']
+	roles?: InputMaybe<ReadonlyArray<Scalars['String']>>
+	tokenHash?: InputMaybe<Scalars['String']>
+}
+
+
+export type MutationCreateProjectArgs = {
+	config?: InputMaybe<Scalars['Json']>
+	deployTokenHash?: InputMaybe<Scalars['String']>
+	name?: InputMaybe<Scalars['String']>
+	options?: InputMaybe<CreateProjectOptions>
+	projectSlug: Scalars['String']
+	secrets?: InputMaybe<ReadonlyArray<ProjectSecret>>
+}
+
+
+export type MutationCreateResetPasswordRequestArgs = {
+	email: Scalars['String']
+	options?: InputMaybe<CreateResetPasswordRequestOptions>
+}
+
+
+export type MutationCreateSessionTokenArgs = {
+	email: Scalars['String']
+	expiration?: InputMaybe<Scalars['Int']>
+}
+
+
+export type MutationDisableApiKeyArgs = {
+	id: Scalars['String']
 }
 
 
@@ -629,87 +652,22 @@ export type MutationEnableIdpArgs = {
 }
 
 
-export type MutationPrepareOtpArgs = {
-	label?: Maybe<Scalars['String']>
-}
-
-
-export type MutationConfirmOtpArgs = {
-	otpToken: Scalars['String']
-}
-
-
-export type MutationCreateResetPasswordRequestArgs = {
-	email: Scalars['String']
-	options?: Maybe<CreateResetPasswordRequestOptions>
-}
-
-
-export type MutationResetPasswordArgs = {
-	token: Scalars['String']
-	password: Scalars['String']
+export type MutationInitSignInIdpArgs = {
+	identityProvider: Scalars['String']
+	redirectUrl: Scalars['String']
 }
 
 
 export type MutationInviteArgs = {
 	email: Scalars['String']
-	projectSlug: Scalars['String']
 	memberships: ReadonlyArray<MembershipInput>
-	options?: Maybe<InviteOptions>
-}
-
-
-export type MutationUnmanagedInviteArgs = {
-	email: Scalars['String']
+	options?: InputMaybe<InviteOptions>
 	projectSlug: Scalars['String']
-	memberships: ReadonlyArray<MembershipInput>
-	options?: Maybe<UnmanagedInviteOptions>
-	password?: Maybe<Scalars['String']>
 }
 
 
-export type MutationAddProjectMemberArgs = {
-	projectSlug: Scalars['String']
-	identityId: Scalars['String']
-	memberships: ReadonlyArray<MembershipInput>
-}
-
-
-export type MutationRemoveProjectMemberArgs = {
-	projectSlug: Scalars['String']
-	identityId: Scalars['String']
-}
-
-
-export type MutationUpdateProjectMemberArgs = {
-	projectSlug: Scalars['String']
-	identityId: Scalars['String']
-	memberships: ReadonlyArray<MembershipInput>
-}
-
-
-export type MutationCreateApiKeyArgs = {
-	projectSlug: Scalars['String']
-	memberships: ReadonlyArray<MembershipInput>
-	description: Scalars['String']
-	tokenHash?: Maybe<Scalars['String']>
-}
-
-
-export type MutationCreateGlobalApiKeyArgs = {
-	description: Scalars['String']
-	roles?: Maybe<ReadonlyArray<Scalars['String']>>
-	tokenHash?: Maybe<Scalars['String']>
-}
-
-
-export type MutationDisableApiKeyArgs = {
-	id: Scalars['String']
-}
-
-
-export type MutationAddMailTemplateArgs = {
-	template: MailTemplate
+export type MutationPrepareOtpArgs = {
+	label?: InputMaybe<Scalars['String']>
 }
 
 
@@ -718,46 +676,96 @@ export type MutationRemoveMailTemplateArgs = {
 }
 
 
-export type MutationCreateProjectArgs = {
-	projectSlug: Scalars['String']
-	name?: Maybe<Scalars['String']>
-	config?: Maybe<Scalars['Json']>
-	secrets?: Maybe<ReadonlyArray<ProjectSecret>>
-	options?: Maybe<CreateProjectOptions>
-	deployTokenHash?: Maybe<Scalars['String']>
-}
-
-
-export type MutationSetProjectSecretArgs = {
-	projectSlug: Scalars['String']
-	key: Scalars['String']
-	value: Scalars['String']
-}
-
-
-export type MutationUpdateProjectArgs = {
-	projectSlug: Scalars['String']
-	name?: Maybe<Scalars['String']>
-	config?: Maybe<Scalars['Json']>
-	mergeConfig?: Maybe<Scalars['Boolean']>
-}
-
-
-export type MutationAddProjectMailTemplateArgs = {
-	template: MailTemplate
-}
-
-
 export type MutationRemoveProjectMailTemplateArgs = {
 	templateIdentifier: MailTemplateIdentifier
 }
 
+
+export type MutationRemoveProjectMemberArgs = {
+	identityId: Scalars['String']
+	projectSlug: Scalars['String']
+}
+
+
+export type MutationResetPasswordArgs = {
+	password: Scalars['String']
+	token: Scalars['String']
+}
+
+
+export type MutationSetProjectSecretArgs = {
+	key: Scalars['String']
+	projectSlug: Scalars['String']
+	value: Scalars['String']
+}
+
+
+export type MutationSignInArgs = {
+	email: Scalars['String']
+	expiration?: InputMaybe<Scalars['Int']>
+	otpToken?: InputMaybe<Scalars['String']>
+	password: Scalars['String']
+}
+
+
+export type MutationSignInIdpArgs = {
+	expiration?: InputMaybe<Scalars['Int']>
+	identityProvider: Scalars['String']
+	idpResponse: IdpResponseInput
+	redirectUrl: Scalars['String']
+	sessionData: Scalars['Json']
+}
+
+
+export type MutationSignOutArgs = {
+	all?: InputMaybe<Scalars['Boolean']>
+}
+
+
+export type MutationSignUpArgs = {
+	email: Scalars['String']
+	password?: InputMaybe<Scalars['String']>
+	passwordHash?: InputMaybe<Scalars['String']>
+	roles?: InputMaybe<ReadonlyArray<Scalars['String']>>
+}
+
+
+export type MutationUnmanagedInviteArgs = {
+	email: Scalars['String']
+	memberships: ReadonlyArray<MembershipInput>
+	options?: InputMaybe<UnmanagedInviteOptions>
+	password?: InputMaybe<Scalars['String']>
+	projectSlug: Scalars['String']
+}
+
+
+export type MutationUpdateIdpArgs = {
+	configuration?: InputMaybe<Scalars['Json']>
+	identityProvider: Scalars['String']
+	options?: InputMaybe<IdpOptions>
+}
+
+
+export type MutationUpdateProjectArgs = {
+	config?: InputMaybe<Scalars['Json']>
+	mergeConfig?: InputMaybe<Scalars['Boolean']>
+	name?: InputMaybe<Scalars['String']>
+	projectSlug: Scalars['String']
+}
+
+
+export type MutationUpdateProjectMemberArgs = {
+	identityId: Scalars['String']
+	memberships: ReadonlyArray<MembershipInput>
+	projectSlug: Scalars['String']
+}
+
 export type Person = {
 	readonly __typename?: 'Person'
-	readonly id: Scalars['String']
 	readonly email: Scalars['String']
-	readonly otpEnabled: Scalars['Boolean']
+	readonly id: Scalars['String']
 	readonly identity: Identity
+	readonly otpEnabled: Scalars['Boolean']
 }
 
 export type PrepareOtpResponse = {
@@ -768,23 +776,23 @@ export type PrepareOtpResponse = {
 
 export type PrepareOtpResult = {
 	readonly __typename?: 'PrepareOtpResult'
-	readonly otpUri: Scalars['String']
 	readonly otpSecret: Scalars['String']
+	readonly otpUri: Scalars['String']
 }
 
 export type Project = {
 	readonly __typename?: 'Project'
-	readonly id: Scalars['String']
-	readonly name: Scalars['String']
-	readonly slug: Scalars['String']
 	readonly config: Scalars['Json']
-	readonly roles: ReadonlyArray<RoleDefinition>
+	readonly id: Scalars['String']
 	readonly members: ReadonlyArray<ProjectIdentityRelation>
+	readonly name: Scalars['String']
+	readonly roles: ReadonlyArray<RoleDefinition>
+	readonly slug: Scalars['String']
 }
 
 
 export type ProjectMembersArgs = {
-	memberType?: Maybe<MemberType>
+	memberType?: InputMaybe<MemberType>
 }
 
 export type ProjectIdentityRelation = {
@@ -800,12 +808,18 @@ export type ProjectSecret = {
 
 export type Query = {
 	readonly __typename?: 'Query'
-	readonly me: Identity
-	readonly projects: ReadonlyArray<Project>
-	readonly projectBySlug?: Maybe<Project>
-	readonly projectMemberships: ReadonlyArray<Membership>
 	readonly checkResetPasswordToken: CheckResetPasswordTokenCode
 	readonly identityProviders: ReadonlyArray<IdentityProvider>
+	readonly me: Identity
+	readonly projectBySlug?: Maybe<Project>
+	readonly projectMemberships: ReadonlyArray<Membership>
+	readonly projects: ReadonlyArray<Project>
+}
+
+
+export type QueryCheckResetPasswordTokenArgs = {
+	requestId: Scalars['String']
+	token: Scalars['String']
 }
 
 
@@ -815,14 +829,8 @@ export type QueryProjectBySlugArgs = {
 
 
 export type QueryProjectMembershipsArgs = {
-	projectSlug: Scalars['String']
 	identityId: Scalars['String']
-}
-
-
-export type QueryCheckResetPasswordTokenArgs = {
-	requestId: Scalars['String']
-	token: Scalars['String']
+	projectSlug: Scalars['String']
 }
 
 export type RemoveMailTemplateError = {
@@ -840,9 +848,9 @@ export enum RemoveMailTemplateErrorCode {
 
 export type RemoveMailTemplateResponse = {
 	readonly __typename?: 'RemoveMailTemplateResponse'
-	readonly ok: Scalars['Boolean']
-	readonly errors: ReadonlyArray<RemoveMailTemplateError>
 	readonly error?: Maybe<RemoveMailTemplateError>
+	readonly errors: ReadonlyArray<RemoveMailTemplateError>
+	readonly ok: Scalars['Boolean']
 }
 
 export type RemoveProjectMemberError = {
@@ -860,9 +868,9 @@ export enum RemoveProjectMemberErrorCode {
 
 export type RemoveProjectMemberResponse = {
 	readonly __typename?: 'RemoveProjectMemberResponse'
-	readonly ok: Scalars['Boolean']
-	readonly errors: ReadonlyArray<RemoveProjectMemberError>
 	readonly error?: Maybe<RemoveProjectMemberError>
+	readonly errors: ReadonlyArray<RemoveProjectMemberError>
+	readonly ok: Scalars['Boolean']
 }
 
 export type ResetPasswordError = {
@@ -874,18 +882,18 @@ export type ResetPasswordError = {
 }
 
 export enum ResetPasswordErrorCode {
-	TokenNotFound = 'TOKEN_NOT_FOUND',
-	TokenUsed = 'TOKEN_USED',
+	PasswordTooWeak = 'PASSWORD_TOO_WEAK',
 	TokenExpired = 'TOKEN_EXPIRED',
-	PasswordTooWeak = 'PASSWORD_TOO_WEAK'
+	TokenNotFound = 'TOKEN_NOT_FOUND',
+	TokenUsed = 'TOKEN_USED'
 }
 
 export type ResetPasswordResponse = {
 	readonly __typename?: 'ResetPasswordResponse'
-	readonly ok: Scalars['Boolean']
+	readonly error?: Maybe<ResetPasswordError>
 	/** @deprecated Field no longer supported */
 	readonly errors: ReadonlyArray<ResetPasswordError>
-	readonly error?: Maybe<ResetPasswordError>
+	readonly ok: Scalars['Boolean']
 }
 
 export type RoleConditionVariableDefinition = RoleVariableDefinition & {
@@ -901,8 +909,8 @@ export type RoleDefinition = {
 
 export type RoleEntityVariableDefinition = RoleVariableDefinition & {
 	readonly __typename?: 'RoleEntityVariableDefinition'
-	readonly name: Scalars['String']
 	readonly entityName: Scalars['String']
+	readonly name: Scalars['String']
 }
 
 export type RolePredefinedVariableDefinition = RoleVariableDefinition & {
@@ -929,11 +937,11 @@ export type SignInError = {
 }
 
 export enum SignInErrorCode {
-	UnknownEmail = 'UNKNOWN_EMAIL',
+	InvalidOtpToken = 'INVALID_OTP_TOKEN',
 	InvalidPassword = 'INVALID_PASSWORD',
 	NoPasswordSet = 'NO_PASSWORD_SET',
 	OtpRequired = 'OTP_REQUIRED',
-	InvalidOtpToken = 'INVALID_OTP_TOKEN'
+	UnknownEmail = 'UNKNOWN_EMAIL'
 }
 
 export type SignInIdpError = {
@@ -945,39 +953,39 @@ export type SignInIdpError = {
 }
 
 export enum SignInIdpErrorCode {
-	InvalidIdpResponse = 'INVALID_IDP_RESPONSE',
 	IdpValidationFailed = 'IDP_VALIDATION_FAILED',
+	InvalidIdpResponse = 'INVALID_IDP_RESPONSE',
 	PersonNotFound = 'PERSON_NOT_FOUND'
 }
 
 export type SignInIdpResponse = {
 	readonly __typename?: 'SignInIDPResponse'
-	readonly ok: Scalars['Boolean']
+	readonly error?: Maybe<SignInIdpError>
 	/** @deprecated Field no longer supported */
 	readonly errors: ReadonlyArray<SignInIdpError>
-	readonly error?: Maybe<SignInIdpError>
+	readonly ok: Scalars['Boolean']
 	readonly result?: Maybe<SignInIdpResult>
 }
 
 export type SignInIdpResult = CommonSignInResult & {
 	readonly __typename?: 'SignInIDPResult'
-	readonly token: Scalars['String']
 	readonly person: Person
+	readonly token: Scalars['String']
 }
 
 export type SignInResponse = {
 	readonly __typename?: 'SignInResponse'
-	readonly ok: Scalars['Boolean']
+	readonly error?: Maybe<SignInError>
 	/** @deprecated Field no longer supported */
 	readonly errors: ReadonlyArray<SignInError>
-	readonly error?: Maybe<SignInError>
+	readonly ok: Scalars['Boolean']
 	readonly result?: Maybe<SignInResult>
 }
 
 export type SignInResult = CommonSignInResult & {
 	readonly __typename?: 'SignInResult'
-	readonly token: Scalars['String']
 	readonly person: Person
+	readonly token: Scalars['String']
 }
 
 export type SignOutError = {
@@ -994,10 +1002,10 @@ export enum SignOutErrorCode {
 
 export type SignOutResponse = {
 	readonly __typename?: 'SignOutResponse'
-	readonly ok: Scalars['Boolean']
+	readonly error?: Maybe<SignOutError>
 	/** @deprecated Field no longer supported */
 	readonly errors: ReadonlyArray<SignOutError>
-	readonly error?: Maybe<SignOutError>
+	readonly ok: Scalars['Boolean']
 }
 
 export type SignUpError = {
@@ -1015,10 +1023,10 @@ export enum SignUpErrorCode {
 
 export type SignUpResponse = {
 	readonly __typename?: 'SignUpResponse'
-	readonly ok: Scalars['Boolean']
+	readonly error?: Maybe<SignUpError>
 	/** @deprecated Field no longer supported */
 	readonly errors: ReadonlyArray<SignUpError>
-	readonly error?: Maybe<SignUpError>
+	readonly ok: Scalars['Boolean']
 	readonly result?: Maybe<SignUpResult>
 }
 
@@ -1028,8 +1036,8 @@ export type SignUpResult = {
 }
 
 export type UnmanagedInviteOptions = {
-	readonly password?: Maybe<Scalars['String']>
-	readonly resetTokenHash?: Maybe<Scalars['String']>
+	readonly password?: InputMaybe<Scalars['String']>
+	readonly resetTokenHash?: InputMaybe<Scalars['String']>
 }
 
 export type UpdateIdpError = {
@@ -1039,8 +1047,8 @@ export type UpdateIdpError = {
 }
 
 export enum UpdateIdpErrorCode {
-	NotFound = 'NOT_FOUND',
-	InvalidConfiguration = 'INVALID_CONFIGURATION'
+	InvalidConfiguration = 'INVALID_CONFIGURATION',
+	NotFound = 'NOT_FOUND'
 }
 
 export type UpdateIdpResponse = {
@@ -1053,26 +1061,29 @@ export type UpdateProjectMemberError = {
 	readonly __typename?: 'UpdateProjectMemberError'
 	readonly code: UpdateProjectMemberErrorCode
 	readonly developerMessage: Scalars['String']
-	readonly membershipValidation?: Maybe<ReadonlyArray<MembershipValidationError>>
 	/** @deprecated Field no longer supported */
 	readonly endUserMessage?: Maybe<Scalars['String']>
+	readonly membershipValidation?: Maybe<ReadonlyArray<MembershipValidationError>>
 }
 
 export enum UpdateProjectMemberErrorCode {
-	ProjectNotFound = 'PROJECT_NOT_FOUND',
-	NotMember = 'NOT_MEMBER',
 	InvalidMembership = 'INVALID_MEMBERSHIP',
+	NotMember = 'NOT_MEMBER',
+	ProjectNotFound = 'PROJECT_NOT_FOUND',
+	/** @deprecated Field no longer supported */
 	RoleNotFound = 'ROLE_NOT_FOUND',
+	/** @deprecated Field no longer supported */
 	VariableEmpty = 'VARIABLE_EMPTY',
+	/** @deprecated Field no longer supported */
 	VariableNotFound = 'VARIABLE_NOT_FOUND'
 }
 
 export type UpdateProjectMemberResponse = {
 	readonly __typename?: 'UpdateProjectMemberResponse'
-	readonly ok: Scalars['Boolean']
+	readonly error?: Maybe<UpdateProjectMemberError>
 	/** @deprecated Field no longer supported */
 	readonly errors: ReadonlyArray<UpdateProjectMemberError>
-	readonly error?: Maybe<UpdateProjectMemberError>
+	readonly ok: Scalars['Boolean']
 }
 
 export type UpdateProjectResponse = {
@@ -1099,21 +1110,7 @@ export type ResolverTypeWrapper<T> = Promise<T> | T
 export type ResolverWithResolve<TResult, TParent, TContext, TArgs> = {
 	resolve: ResolverFn<TResult, TParent, TContext, TArgs>
 }
-
-export type LegacyStitchingResolver<TResult, TParent, TContext, TArgs> = {
-	fragment: string
-	resolve: ResolverFn<TResult, TParent, TContext, TArgs>
-}
-
-export type NewStitchingResolver<TResult, TParent, TContext, TArgs> = {
-	selectionSet: string
-	resolve: ResolverFn<TResult, TParent, TContext, TArgs>
-}
-export type StitchingResolver<TResult, TParent, TContext, TArgs> = LegacyStitchingResolver<TResult, TParent, TContext, TArgs> | NewStitchingResolver<TResult, TParent, TContext, TArgs>
-export type Resolver<TResult, TParent = {}, TContext = {}, TArgs = {}> =
-  | ResolverFn<TResult, TParent, TContext, TArgs>
-  | ResolverWithResolve<TResult, TParent, TContext, TArgs>
-  | StitchingResolver<TResult, TParent, TContext, TArgs>
+export type Resolver<TResult, TParent = {}, TContext = {}, TArgs = {}> = ResolverFn<TResult, TParent, TContext, TArgs> | ResolverWithResolve<TResult, TParent, TContext, TArgs>
 
 export type ResolverFn<TResult, TParent, TContext, TArgs> = (
 	parent: TParent,
@@ -1127,7 +1124,7 @@ export type SubscriptionSubscribeFn<TResult, TParent, TContext, TArgs> = (
 	args: TArgs,
 	context: TContext,
 	info: GraphQLResolveInfo
-) => AsyncIterator<TResult> | Promise<AsyncIterator<TResult>>
+) => AsyncIterable<TResult> | Promise<AsyncIterable<TResult>>
 
 export type SubscriptionResolveFn<TResult, TParent, TContext, TArgs> = (
 	parent: TParent,
@@ -1175,10 +1172,8 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = {
 	AddIDPError: ResolverTypeWrapper<AddIdpError>
-	String: ResolverTypeWrapper<Scalars['String']>
 	AddIDPErrorCode: AddIdpErrorCode
 	AddIDPResponse: ResolverTypeWrapper<AddIdpResponse>
-	Boolean: ResolverTypeWrapper<Scalars['Boolean']>
 	AddMailTemplateError: ResolverTypeWrapper<AddMailTemplateError>
 	AddMailTemplateErrorCode: AddMailTemplateErrorCode
 	AddMailTemplateResponse: ResolverTypeWrapper<AddMailTemplateResponse>
@@ -1187,6 +1182,7 @@ export type ResolversTypes = {
 	AddProjectMemberResponse: ResolverTypeWrapper<AddProjectMemberResponse>
 	ApiKey: ResolverTypeWrapper<ApiKey>
 	ApiKeyWithToken: ResolverTypeWrapper<ApiKeyWithToken>
+	Boolean: ResolverTypeWrapper<Scalars['Boolean']>
 	ChangeMyPasswordError: ResolverTypeWrapper<ChangeMyPasswordError>
 	ChangeMyPasswordErrorCode: ChangeMyPasswordErrorCode
 	ChangeMyPasswordResponse: ResolverTypeWrapper<ChangeMyPasswordResponse>
@@ -1239,6 +1235,7 @@ export type ResolversTypes = {
 	InitSignInIDPErrorCode: InitSignInIdpErrorCode
 	InitSignInIDPResponse: ResolverTypeWrapper<InitSignInIdpResponse>
 	InitSignInIDPResult: ResolverTypeWrapper<InitSignInIdpResult>
+	Int: ResolverTypeWrapper<Scalars['Int']>
 	InviteError: ResolverTypeWrapper<InviteError>
 	InviteErrorCode: InviteErrorCode
 	InviteMethod: InviteMethod
@@ -1255,7 +1252,6 @@ export type ResolversTypes = {
 	MembershipValidationError: ResolverTypeWrapper<MembershipValidationError>
 	MembershipValidationErrorCode: MembershipValidationErrorCode
 	Mutation: ResolverTypeWrapper<{}>
-	Int: ResolverTypeWrapper<Scalars['Int']>
 	Person: ResolverTypeWrapper<Person>
 	PrepareOtpResponse: ResolverTypeWrapper<PrepareOtpResponse>
 	PrepareOtpResult: ResolverTypeWrapper<PrepareOtpResult>
@@ -1293,6 +1289,7 @@ export type ResolversTypes = {
 	SignUpErrorCode: SignUpErrorCode
 	SignUpResponse: ResolverTypeWrapper<SignUpResponse>
 	SignUpResult: ResolverTypeWrapper<SignUpResult>
+	String: ResolverTypeWrapper<Scalars['String']>
 	UnmanagedInviteOptions: UnmanagedInviteOptions
 	UpdateIDPError: ResolverTypeWrapper<UpdateIdpError>
 	UpdateIDPErrorCode: UpdateIdpErrorCode
@@ -1308,15 +1305,14 @@ export type ResolversTypes = {
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = {
 	AddIDPError: AddIdpError
-	String: Scalars['String']
 	AddIDPResponse: AddIdpResponse
-	Boolean: Scalars['Boolean']
 	AddMailTemplateError: AddMailTemplateError
 	AddMailTemplateResponse: AddMailTemplateResponse
 	AddProjectMemberError: AddProjectMemberError
 	AddProjectMemberResponse: AddProjectMemberResponse
 	ApiKey: ApiKey
 	ApiKeyWithToken: ApiKeyWithToken
+	Boolean: Scalars['Boolean']
 	ChangeMyPasswordError: ChangeMyPasswordError
 	ChangeMyPasswordResponse: ChangeMyPasswordResponse
 	ChangePasswordError: ChangePasswordError
@@ -1356,6 +1352,7 @@ export type ResolversParentTypes = {
 	InitSignInIDPError: InitSignInIdpError
 	InitSignInIDPResponse: InitSignInIdpResponse
 	InitSignInIDPResult: InitSignInIdpResult
+	Int: Scalars['Int']
 	InviteError: InviteError
 	InviteOptions: InviteOptions
 	InviteResponse: InviteResponse
@@ -1367,7 +1364,6 @@ export type ResolversParentTypes = {
 	MembershipInput: MembershipInput
 	MembershipValidationError: MembershipValidationError
 	Mutation: {}
-	Int: Scalars['Int']
 	Person: Person
 	PrepareOtpResponse: PrepareOtpResponse
 	PrepareOtpResult: PrepareOtpResult
@@ -1398,6 +1394,7 @@ export type ResolversParentTypes = {
 	SignUpError: SignUpError
 	SignUpResponse: SignUpResponse
 	SignUpResult: SignUpResult
+	String: Scalars['String']
 	UnmanagedInviteOptions: UnmanagedInviteOptions
 	UpdateIDPError: UpdateIdpError
 	UpdateIDPResponse: UpdateIdpResponse
@@ -1428,24 +1425,24 @@ export type AddMailTemplateErrorResolvers<ContextType = any, ParentType extends 
 }
 
 export type AddMailTemplateResponseResolvers<ContextType = any, ParentType extends ResolversParentTypes['AddMailTemplateResponse'] = ResolversParentTypes['AddMailTemplateResponse']> = {
-	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
-	errors?: Resolver<ReadonlyArray<ResolversTypes['AddMailTemplateError']>, ParentType, ContextType>
 	error?: Resolver<Maybe<ResolversTypes['AddMailTemplateError']>, ParentType, ContextType>
+	errors?: Resolver<ReadonlyArray<ResolversTypes['AddMailTemplateError']>, ParentType, ContextType>
+	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type AddProjectMemberErrorResolvers<ContextType = any, ParentType extends ResolversParentTypes['AddProjectMemberError'] = ResolversParentTypes['AddProjectMemberError']> = {
 	code?: Resolver<ResolversTypes['AddProjectMemberErrorCode'], ParentType, ContextType>
-	membershipValidation?: Resolver<Maybe<ReadonlyArray<ResolversTypes['MembershipValidationError']>>, ParentType, ContextType>
 	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	endUserMessage?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+	membershipValidation?: Resolver<Maybe<ReadonlyArray<ResolversTypes['MembershipValidationError']>>, ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type AddProjectMemberResponseResolvers<ContextType = any, ParentType extends ResolversParentTypes['AddProjectMemberResponse'] = ResolversParentTypes['AddProjectMemberResponse']> = {
-	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
-	errors?: Resolver<ReadonlyArray<ResolversTypes['AddProjectMemberError']>, ParentType, ContextType>
 	error?: Resolver<Maybe<ResolversTypes['AddProjectMemberError']>, ParentType, ContextType>
+	errors?: Resolver<ReadonlyArray<ResolversTypes['AddProjectMemberError']>, ParentType, ContextType>
+	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
@@ -1457,8 +1454,8 @@ export type ApiKeyResolvers<ContextType = any, ParentType extends ResolversParen
 
 export type ApiKeyWithTokenResolvers<ContextType = any, ParentType extends ResolversParentTypes['ApiKeyWithToken'] = ResolversParentTypes['ApiKeyWithToken']> = {
 	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	token?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
 	identity?: Resolver<ResolversTypes['Identity'], ParentType, ContextType>
+	token?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
@@ -1469,8 +1466,8 @@ export type ChangeMyPasswordErrorResolvers<ContextType = any, ParentType extends
 }
 
 export type ChangeMyPasswordResponseResolvers<ContextType = any, ParentType extends ResolversParentTypes['ChangeMyPasswordResponse'] = ResolversParentTypes['ChangeMyPasswordResponse']> = {
-	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	error?: Resolver<Maybe<ResolversTypes['ChangeMyPasswordError']>, ParentType, ContextType>
+	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
@@ -1482,9 +1479,9 @@ export type ChangePasswordErrorResolvers<ContextType = any, ParentType extends R
 }
 
 export type ChangePasswordResponseResolvers<ContextType = any, ParentType extends ResolversParentTypes['ChangePasswordResponse'] = ResolversParentTypes['ChangePasswordResponse']> = {
-	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
-	errors?: Resolver<ReadonlyArray<ResolversTypes['ChangePasswordError']>, ParentType, ContextType>
 	error?: Resolver<Maybe<ResolversTypes['ChangePasswordError']>, ParentType, ContextType>
+	errors?: Resolver<ReadonlyArray<ResolversTypes['ChangePasswordError']>, ParentType, ContextType>
+	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
@@ -1495,8 +1492,8 @@ export type CheckResetPasswordTokenResultResolvers<ContextType = any, ParentType
 
 export type CommonSignInResultResolvers<ContextType = any, ParentType extends ResolversParentTypes['CommonSignInResult'] = ResolversParentTypes['CommonSignInResult']> = {
 	__resolveType: TypeResolveFn<'CreateSessionTokenResult' | 'SignInIDPResult' | 'SignInResult', ParentType, ContextType>
-	token?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	person?: Resolver<ResolversTypes['Person'], ParentType, ContextType>
+	token?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 }
 
 export type ConfirmOtpErrorResolvers<ContextType = any, ParentType extends ResolversParentTypes['ConfirmOtpError'] = ResolversParentTypes['ConfirmOtpError']> = {
@@ -1507,24 +1504,24 @@ export type ConfirmOtpErrorResolvers<ContextType = any, ParentType extends Resol
 }
 
 export type ConfirmOtpResponseResolvers<ContextType = any, ParentType extends ResolversParentTypes['ConfirmOtpResponse'] = ResolversParentTypes['ConfirmOtpResponse']> = {
-	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
-	errors?: Resolver<ReadonlyArray<ResolversTypes['ConfirmOtpError']>, ParentType, ContextType>
 	error?: Resolver<Maybe<ResolversTypes['ConfirmOtpError']>, ParentType, ContextType>
+	errors?: Resolver<ReadonlyArray<ResolversTypes['ConfirmOtpError']>, ParentType, ContextType>
+	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type CreateApiKeyErrorResolvers<ContextType = any, ParentType extends ResolversParentTypes['CreateApiKeyError'] = ResolversParentTypes['CreateApiKeyError']> = {
 	code?: Resolver<ResolversTypes['CreateApiKeyErrorCode'], ParentType, ContextType>
 	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	membershipValidation?: Resolver<Maybe<ReadonlyArray<ResolversTypes['MembershipValidationError']>>, ParentType, ContextType>
 	endUserMessage?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+	membershipValidation?: Resolver<Maybe<ReadonlyArray<ResolversTypes['MembershipValidationError']>>, ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type CreateApiKeyResponseResolvers<ContextType = any, ParentType extends ResolversParentTypes['CreateApiKeyResponse'] = ResolversParentTypes['CreateApiKeyResponse']> = {
-	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
-	errors?: Resolver<ReadonlyArray<ResolversTypes['CreateApiKeyError']>, ParentType, ContextType>
 	error?: Resolver<Maybe<ResolversTypes['CreateApiKeyError']>, ParentType, ContextType>
+	errors?: Resolver<ReadonlyArray<ResolversTypes['CreateApiKeyError']>, ParentType, ContextType>
+	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	result?: Resolver<Maybe<ResolversTypes['CreateApiKeyResult']>, ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
@@ -1542,15 +1539,15 @@ export type CreatePasswordResetRequestErrorResolvers<ContextType = any, ParentTy
 }
 
 export type CreatePasswordResetRequestResponseResolvers<ContextType = any, ParentType extends ResolversParentTypes['CreatePasswordResetRequestResponse'] = ResolversParentTypes['CreatePasswordResetRequestResponse']> = {
-	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
-	errors?: Resolver<ReadonlyArray<ResolversTypes['CreatePasswordResetRequestError']>, ParentType, ContextType>
 	error?: Resolver<Maybe<ResolversTypes['CreatePasswordResetRequestError']>, ParentType, ContextType>
+	errors?: Resolver<ReadonlyArray<ResolversTypes['CreatePasswordResetRequestError']>, ParentType, ContextType>
+	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type CreateProjectResponseResolvers<ContextType = any, ParentType extends ResolversParentTypes['CreateProjectResponse'] = ResolversParentTypes['CreateProjectResponse']> = {
-	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	error?: Resolver<Maybe<ResolversTypes['CreateProjectResponseError']>, ParentType, ContextType>
+	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	result?: Resolver<Maybe<ResolversTypes['CreateProjectResult']>, ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
@@ -1573,15 +1570,15 @@ export type CreateSessionTokenErrorResolvers<ContextType = any, ParentType exten
 }
 
 export type CreateSessionTokenResponseResolvers<ContextType = any, ParentType extends ResolversParentTypes['CreateSessionTokenResponse'] = ResolversParentTypes['CreateSessionTokenResponse']> = {
-	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	error?: Resolver<Maybe<ResolversTypes['CreateSessionTokenError']>, ParentType, ContextType>
+	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	result?: Resolver<Maybe<ResolversTypes['CreateSessionTokenResult']>, ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type CreateSessionTokenResultResolvers<ContextType = any, ParentType extends ResolversParentTypes['CreateSessionTokenResult'] = ResolversParentTypes['CreateSessionTokenResult']> = {
-	token?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	person?: Resolver<ResolversTypes['Person'], ParentType, ContextType>
+	token?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
@@ -1597,9 +1594,9 @@ export type DisableApiKeyErrorResolvers<ContextType = any, ParentType extends Re
 }
 
 export type DisableApiKeyResponseResolvers<ContextType = any, ParentType extends ResolversParentTypes['DisableApiKeyResponse'] = ResolversParentTypes['DisableApiKeyResponse']> = {
-	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
-	errors?: Resolver<ReadonlyArray<ResolversTypes['DisableApiKeyError']>, ParentType, ContextType>
 	error?: Resolver<Maybe<ResolversTypes['DisableApiKeyError']>, ParentType, ContextType>
+	errors?: Resolver<ReadonlyArray<ResolversTypes['DisableApiKeyError']>, ParentType, ContextType>
+	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
@@ -1623,9 +1620,9 @@ export type DisableOtpErrorResolvers<ContextType = any, ParentType extends Resol
 }
 
 export type DisableOtpResponseResolvers<ContextType = any, ParentType extends ResolversParentTypes['DisableOtpResponse'] = ResolversParentTypes['DisableOtpResponse']> = {
-	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
-	errors?: Resolver<ReadonlyArray<ResolversTypes['DisableOtpError']>, ParentType, ContextType>
 	error?: Resolver<Maybe<ResolversTypes['DisableOtpError']>, ParentType, ContextType>
+	errors?: Resolver<ReadonlyArray<ResolversTypes['DisableOtpError']>, ParentType, ContextType>
+	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
@@ -1642,12 +1639,12 @@ export type EnableIdpResponseResolvers<ContextType = any, ParentType extends Res
 }
 
 export type IdentityResolvers<ContextType = any, ParentType extends ResolversParentTypes['Identity'] = ResolversParentTypes['Identity']> = {
-	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	description?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
-	person?: Resolver<Maybe<ResolversTypes['Person']>, ParentType, ContextType>
 	apiKey?: Resolver<Maybe<ResolversTypes['ApiKey']>, ParentType, ContextType>
-	projects?: Resolver<ReadonlyArray<ResolversTypes['IdentityProjectRelation']>, ParentType, ContextType>
+	description?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	permissions?: Resolver<Maybe<ResolversTypes['IdentityGlobalPermissions']>, ParentType, ContextType>
+	person?: Resolver<Maybe<ResolversTypes['Person']>, ParentType, ContextType>
+	projects?: Resolver<ReadonlyArray<ResolversTypes['IdentityProjectRelation']>, ParentType, ContextType>
 	roles?: Resolver<Maybe<ReadonlyArray<ResolversTypes['String']>>, ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
@@ -1658,16 +1655,16 @@ export type IdentityGlobalPermissionsResolvers<ContextType = any, ParentType ext
 }
 
 export type IdentityProjectRelationResolvers<ContextType = any, ParentType extends ResolversParentTypes['IdentityProjectRelation'] = ResolversParentTypes['IdentityProjectRelation']> = {
-	project?: Resolver<ResolversTypes['Project'], ParentType, ContextType>
 	memberships?: Resolver<ReadonlyArray<ResolversTypes['Membership']>, ParentType, ContextType>
+	project?: Resolver<ResolversTypes['Project'], ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type IdentityProviderResolvers<ContextType = any, ParentType extends ResolversParentTypes['IdentityProvider'] = ResolversParentTypes['IdentityProvider']> = {
-	slug?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	type?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	configuration?: Resolver<ResolversTypes['Json'], ParentType, ContextType>
 	disabledAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>
+	slug?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	type?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
@@ -1679,9 +1676,9 @@ export type InitSignInIdpErrorResolvers<ContextType = any, ParentType extends Re
 }
 
 export type InitSignInIdpResponseResolvers<ContextType = any, ParentType extends ResolversParentTypes['InitSignInIDPResponse'] = ResolversParentTypes['InitSignInIDPResponse']> = {
-	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
-	errors?: Resolver<ReadonlyArray<ResolversTypes['InitSignInIDPError']>, ParentType, ContextType>
 	error?: Resolver<Maybe<ResolversTypes['InitSignInIDPError']>, ParentType, ContextType>
+	errors?: Resolver<ReadonlyArray<ResolversTypes['InitSignInIDPError']>, ParentType, ContextType>
+	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	result?: Resolver<Maybe<ResolversTypes['InitSignInIDPResult']>, ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
@@ -1695,22 +1692,22 @@ export type InitSignInIdpResultResolvers<ContextType = any, ParentType extends R
 export type InviteErrorResolvers<ContextType = any, ParentType extends ResolversParentTypes['InviteError'] = ResolversParentTypes['InviteError']> = {
 	code?: Resolver<ResolversTypes['InviteErrorCode'], ParentType, ContextType>
 	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	membershipValidation?: Resolver<Maybe<ReadonlyArray<ResolversTypes['MembershipValidationError']>>, ParentType, ContextType>
 	endUserMessage?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+	membershipValidation?: Resolver<Maybe<ReadonlyArray<ResolversTypes['MembershipValidationError']>>, ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type InviteResponseResolvers<ContextType = any, ParentType extends ResolversParentTypes['InviteResponse'] = ResolversParentTypes['InviteResponse']> = {
-	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
-	errors?: Resolver<ReadonlyArray<ResolversTypes['InviteError']>, ParentType, ContextType>
 	error?: Resolver<Maybe<ResolversTypes['InviteError']>, ParentType, ContextType>
+	errors?: Resolver<ReadonlyArray<ResolversTypes['InviteError']>, ParentType, ContextType>
+	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	result?: Resolver<Maybe<ResolversTypes['InviteResult']>, ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type InviteResultResolvers<ContextType = any, ParentType extends ResolversParentTypes['InviteResult'] = ResolversParentTypes['InviteResult']> = {
-	person?: Resolver<ResolversTypes['Person'], ParentType, ContextType>
 	isNew?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	person?: Resolver<ResolversTypes['Person'], ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
@@ -1732,45 +1729,45 @@ export type MembershipValidationErrorResolvers<ContextType = any, ParentType ext
 }
 
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
-	signUp?: Resolver<Maybe<ResolversTypes['SignUpResponse']>, ParentType, ContextType, RequireFields<MutationSignUpArgs, 'email'>>
-	signIn?: Resolver<Maybe<ResolversTypes['SignInResponse']>, ParentType, ContextType, RequireFields<MutationSignInArgs, 'email' | 'password'>>
-	createSessionToken?: Resolver<Maybe<ResolversTypes['CreateSessionTokenResponse']>, ParentType, ContextType, RequireFields<MutationCreateSessionTokenArgs, 'email'>>
-	signOut?: Resolver<Maybe<ResolversTypes['SignOutResponse']>, ParentType, ContextType, RequireFields<MutationSignOutArgs, never>>
-	changePassword?: Resolver<Maybe<ResolversTypes['ChangePasswordResponse']>, ParentType, ContextType, RequireFields<MutationChangePasswordArgs, 'personId' | 'password'>>
-	changeMyPassword?: Resolver<Maybe<ResolversTypes['ChangeMyPasswordResponse']>, ParentType, ContextType, RequireFields<MutationChangeMyPasswordArgs, 'currentPassword' | 'newPassword'>>
-	initSignInIDP?: Resolver<Maybe<ResolversTypes['InitSignInIDPResponse']>, ParentType, ContextType, RequireFields<MutationInitSignInIdpArgs, 'identityProvider' | 'redirectUrl'>>
-	signInIDP?: Resolver<Maybe<ResolversTypes['SignInIDPResponse']>, ParentType, ContextType, RequireFields<MutationSignInIdpArgs, 'identityProvider' | 'idpResponse' | 'redirectUrl' | 'sessionData'>>
-	addIDP?: Resolver<Maybe<ResolversTypes['AddIDPResponse']>, ParentType, ContextType, RequireFields<MutationAddIdpArgs, 'identityProvider' | 'type' | 'configuration'>>
-	updateIDP?: Resolver<Maybe<ResolversTypes['UpdateIDPResponse']>, ParentType, ContextType, RequireFields<MutationUpdateIdpArgs, 'identityProvider'>>
-	disableIDP?: Resolver<Maybe<ResolversTypes['DisableIDPResponse']>, ParentType, ContextType, RequireFields<MutationDisableIdpArgs, 'identityProvider'>>
-	enableIDP?: Resolver<Maybe<ResolversTypes['EnableIDPResponse']>, ParentType, ContextType, RequireFields<MutationEnableIdpArgs, 'identityProvider'>>
-	prepareOtp?: Resolver<Maybe<ResolversTypes['PrepareOtpResponse']>, ParentType, ContextType, RequireFields<MutationPrepareOtpArgs, never>>
-	confirmOtp?: Resolver<Maybe<ResolversTypes['ConfirmOtpResponse']>, ParentType, ContextType, RequireFields<MutationConfirmOtpArgs, 'otpToken'>>
-	disableOtp?: Resolver<Maybe<ResolversTypes['DisableOtpResponse']>, ParentType, ContextType>
-	createResetPasswordRequest?: Resolver<Maybe<ResolversTypes['CreatePasswordResetRequestResponse']>, ParentType, ContextType, RequireFields<MutationCreateResetPasswordRequestArgs, 'email'>>
-	resetPassword?: Resolver<Maybe<ResolversTypes['ResetPasswordResponse']>, ParentType, ContextType, RequireFields<MutationResetPasswordArgs, 'token' | 'password'>>
-	invite?: Resolver<Maybe<ResolversTypes['InviteResponse']>, ParentType, ContextType, RequireFields<MutationInviteArgs, 'email' | 'projectSlug' | 'memberships'>>
-	unmanagedInvite?: Resolver<Maybe<ResolversTypes['InviteResponse']>, ParentType, ContextType, RequireFields<MutationUnmanagedInviteArgs, 'email' | 'projectSlug' | 'memberships'>>
-	addProjectMember?: Resolver<Maybe<ResolversTypes['AddProjectMemberResponse']>, ParentType, ContextType, RequireFields<MutationAddProjectMemberArgs, 'projectSlug' | 'identityId' | 'memberships'>>
-	removeProjectMember?: Resolver<Maybe<ResolversTypes['RemoveProjectMemberResponse']>, ParentType, ContextType, RequireFields<MutationRemoveProjectMemberArgs, 'projectSlug' | 'identityId'>>
-	updateProjectMember?: Resolver<Maybe<ResolversTypes['UpdateProjectMemberResponse']>, ParentType, ContextType, RequireFields<MutationUpdateProjectMemberArgs, 'projectSlug' | 'identityId' | 'memberships'>>
-	createApiKey?: Resolver<Maybe<ResolversTypes['CreateApiKeyResponse']>, ParentType, ContextType, RequireFields<MutationCreateApiKeyArgs, 'projectSlug' | 'memberships' | 'description'>>
-	createGlobalApiKey?: Resolver<Maybe<ResolversTypes['CreateApiKeyResponse']>, ParentType, ContextType, RequireFields<MutationCreateGlobalApiKeyArgs, 'description'>>
-	disableApiKey?: Resolver<Maybe<ResolversTypes['DisableApiKeyResponse']>, ParentType, ContextType, RequireFields<MutationDisableApiKeyArgs, 'id'>>
+	addIDP?: Resolver<Maybe<ResolversTypes['AddIDPResponse']>, ParentType, ContextType, RequireFields<MutationAddIdpArgs, 'configuration' | 'identityProvider' | 'type'>>
 	addMailTemplate?: Resolver<Maybe<ResolversTypes['AddMailTemplateResponse']>, ParentType, ContextType, RequireFields<MutationAddMailTemplateArgs, 'template'>>
-	removeMailTemplate?: Resolver<Maybe<ResolversTypes['RemoveMailTemplateResponse']>, ParentType, ContextType, RequireFields<MutationRemoveMailTemplateArgs, 'templateIdentifier'>>
-	createProject?: Resolver<Maybe<ResolversTypes['CreateProjectResponse']>, ParentType, ContextType, RequireFields<MutationCreateProjectArgs, 'projectSlug'>>
-	setProjectSecret?: Resolver<Maybe<ResolversTypes['SetProjectSecretResponse']>, ParentType, ContextType, RequireFields<MutationSetProjectSecretArgs, 'projectSlug' | 'key' | 'value'>>
-	updateProject?: Resolver<Maybe<ResolversTypes['UpdateProjectResponse']>, ParentType, ContextType, RequireFields<MutationUpdateProjectArgs, 'projectSlug'>>
 	addProjectMailTemplate?: Resolver<Maybe<ResolversTypes['AddMailTemplateResponse']>, ParentType, ContextType, RequireFields<MutationAddProjectMailTemplateArgs, 'template'>>
+	addProjectMember?: Resolver<Maybe<ResolversTypes['AddProjectMemberResponse']>, ParentType, ContextType, RequireFields<MutationAddProjectMemberArgs, 'identityId' | 'memberships' | 'projectSlug'>>
+	changeMyPassword?: Resolver<Maybe<ResolversTypes['ChangeMyPasswordResponse']>, ParentType, ContextType, RequireFields<MutationChangeMyPasswordArgs, 'currentPassword' | 'newPassword'>>
+	changePassword?: Resolver<Maybe<ResolversTypes['ChangePasswordResponse']>, ParentType, ContextType, RequireFields<MutationChangePasswordArgs, 'password' | 'personId'>>
+	confirmOtp?: Resolver<Maybe<ResolversTypes['ConfirmOtpResponse']>, ParentType, ContextType, RequireFields<MutationConfirmOtpArgs, 'otpToken'>>
+	createApiKey?: Resolver<Maybe<ResolversTypes['CreateApiKeyResponse']>, ParentType, ContextType, RequireFields<MutationCreateApiKeyArgs, 'description' | 'memberships' | 'projectSlug'>>
+	createGlobalApiKey?: Resolver<Maybe<ResolversTypes['CreateApiKeyResponse']>, ParentType, ContextType, RequireFields<MutationCreateGlobalApiKeyArgs, 'description'>>
+	createProject?: Resolver<Maybe<ResolversTypes['CreateProjectResponse']>, ParentType, ContextType, RequireFields<MutationCreateProjectArgs, 'projectSlug'>>
+	createResetPasswordRequest?: Resolver<Maybe<ResolversTypes['CreatePasswordResetRequestResponse']>, ParentType, ContextType, RequireFields<MutationCreateResetPasswordRequestArgs, 'email'>>
+	createSessionToken?: Resolver<Maybe<ResolversTypes['CreateSessionTokenResponse']>, ParentType, ContextType, RequireFields<MutationCreateSessionTokenArgs, 'email'>>
+	disableApiKey?: Resolver<Maybe<ResolversTypes['DisableApiKeyResponse']>, ParentType, ContextType, RequireFields<MutationDisableApiKeyArgs, 'id'>>
+	disableIDP?: Resolver<Maybe<ResolversTypes['DisableIDPResponse']>, ParentType, ContextType, RequireFields<MutationDisableIdpArgs, 'identityProvider'>>
+	disableOtp?: Resolver<Maybe<ResolversTypes['DisableOtpResponse']>, ParentType, ContextType>
+	enableIDP?: Resolver<Maybe<ResolversTypes['EnableIDPResponse']>, ParentType, ContextType, RequireFields<MutationEnableIdpArgs, 'identityProvider'>>
+	initSignInIDP?: Resolver<Maybe<ResolversTypes['InitSignInIDPResponse']>, ParentType, ContextType, RequireFields<MutationInitSignInIdpArgs, 'identityProvider' | 'redirectUrl'>>
+	invite?: Resolver<Maybe<ResolversTypes['InviteResponse']>, ParentType, ContextType, RequireFields<MutationInviteArgs, 'email' | 'memberships' | 'projectSlug'>>
+	prepareOtp?: Resolver<Maybe<ResolversTypes['PrepareOtpResponse']>, ParentType, ContextType, Partial<MutationPrepareOtpArgs>>
+	removeMailTemplate?: Resolver<Maybe<ResolversTypes['RemoveMailTemplateResponse']>, ParentType, ContextType, RequireFields<MutationRemoveMailTemplateArgs, 'templateIdentifier'>>
 	removeProjectMailTemplate?: Resolver<Maybe<ResolversTypes['RemoveMailTemplateResponse']>, ParentType, ContextType, RequireFields<MutationRemoveProjectMailTemplateArgs, 'templateIdentifier'>>
+	removeProjectMember?: Resolver<Maybe<ResolversTypes['RemoveProjectMemberResponse']>, ParentType, ContextType, RequireFields<MutationRemoveProjectMemberArgs, 'identityId' | 'projectSlug'>>
+	resetPassword?: Resolver<Maybe<ResolversTypes['ResetPasswordResponse']>, ParentType, ContextType, RequireFields<MutationResetPasswordArgs, 'password' | 'token'>>
+	setProjectSecret?: Resolver<Maybe<ResolversTypes['SetProjectSecretResponse']>, ParentType, ContextType, RequireFields<MutationSetProjectSecretArgs, 'key' | 'projectSlug' | 'value'>>
+	signIn?: Resolver<Maybe<ResolversTypes['SignInResponse']>, ParentType, ContextType, RequireFields<MutationSignInArgs, 'email' | 'password'>>
+	signInIDP?: Resolver<Maybe<ResolversTypes['SignInIDPResponse']>, ParentType, ContextType, RequireFields<MutationSignInIdpArgs, 'identityProvider' | 'idpResponse' | 'redirectUrl' | 'sessionData'>>
+	signOut?: Resolver<Maybe<ResolversTypes['SignOutResponse']>, ParentType, ContextType, Partial<MutationSignOutArgs>>
+	signUp?: Resolver<Maybe<ResolversTypes['SignUpResponse']>, ParentType, ContextType, RequireFields<MutationSignUpArgs, 'email'>>
+	unmanagedInvite?: Resolver<Maybe<ResolversTypes['InviteResponse']>, ParentType, ContextType, RequireFields<MutationUnmanagedInviteArgs, 'email' | 'memberships' | 'projectSlug'>>
+	updateIDP?: Resolver<Maybe<ResolversTypes['UpdateIDPResponse']>, ParentType, ContextType, RequireFields<MutationUpdateIdpArgs, 'identityProvider'>>
+	updateProject?: Resolver<Maybe<ResolversTypes['UpdateProjectResponse']>, ParentType, ContextType, RequireFields<MutationUpdateProjectArgs, 'projectSlug'>>
+	updateProjectMember?: Resolver<Maybe<ResolversTypes['UpdateProjectMemberResponse']>, ParentType, ContextType, RequireFields<MutationUpdateProjectMemberArgs, 'identityId' | 'memberships' | 'projectSlug'>>
 }
 
 export type PersonResolvers<ContextType = any, ParentType extends ResolversParentTypes['Person'] = ResolversParentTypes['Person']> = {
-	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	email?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	otpEnabled?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	identity?: Resolver<ResolversTypes['Identity'], ParentType, ContextType>
+	otpEnabled?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
@@ -1781,18 +1778,18 @@ export type PrepareOtpResponseResolvers<ContextType = any, ParentType extends Re
 }
 
 export type PrepareOtpResultResolvers<ContextType = any, ParentType extends ResolversParentTypes['PrepareOtpResult'] = ResolversParentTypes['PrepareOtpResult']> = {
-	otpUri?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	otpSecret?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	otpUri?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type ProjectResolvers<ContextType = any, ParentType extends ResolversParentTypes['Project'] = ResolversParentTypes['Project']> = {
-	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	name?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	slug?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	config?: Resolver<ResolversTypes['Json'], ParentType, ContextType>
+	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	members?: Resolver<ReadonlyArray<ResolversTypes['ProjectIdentityRelation']>, ParentType, ContextType, Partial<ProjectMembersArgs>>
+	name?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	roles?: Resolver<ReadonlyArray<ResolversTypes['RoleDefinition']>, ParentType, ContextType>
-	members?: Resolver<ReadonlyArray<ResolversTypes['ProjectIdentityRelation']>, ParentType, ContextType, RequireFields<ProjectMembersArgs, never>>
+	slug?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
@@ -1803,12 +1800,12 @@ export type ProjectIdentityRelationResolvers<ContextType = any, ParentType exten
 }
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
-	me?: Resolver<ResolversTypes['Identity'], ParentType, ContextType>
-	projects?: Resolver<ReadonlyArray<ResolversTypes['Project']>, ParentType, ContextType>
-	projectBySlug?: Resolver<Maybe<ResolversTypes['Project']>, ParentType, ContextType, RequireFields<QueryProjectBySlugArgs, 'slug'>>
-	projectMemberships?: Resolver<ReadonlyArray<ResolversTypes['Membership']>, ParentType, ContextType, RequireFields<QueryProjectMembershipsArgs, 'projectSlug' | 'identityId'>>
 	checkResetPasswordToken?: Resolver<ResolversTypes['CheckResetPasswordTokenCode'], ParentType, ContextType, RequireFields<QueryCheckResetPasswordTokenArgs, 'requestId' | 'token'>>
 	identityProviders?: Resolver<ReadonlyArray<ResolversTypes['IdentityProvider']>, ParentType, ContextType>
+	me?: Resolver<ResolversTypes['Identity'], ParentType, ContextType>
+	projectBySlug?: Resolver<Maybe<ResolversTypes['Project']>, ParentType, ContextType, RequireFields<QueryProjectBySlugArgs, 'slug'>>
+	projectMemberships?: Resolver<ReadonlyArray<ResolversTypes['Membership']>, ParentType, ContextType, RequireFields<QueryProjectMembershipsArgs, 'identityId' | 'projectSlug'>>
+	projects?: Resolver<ReadonlyArray<ResolversTypes['Project']>, ParentType, ContextType>
 }
 
 export type RemoveMailTemplateErrorResolvers<ContextType = any, ParentType extends ResolversParentTypes['RemoveMailTemplateError'] = ResolversParentTypes['RemoveMailTemplateError']> = {
@@ -1819,9 +1816,9 @@ export type RemoveMailTemplateErrorResolvers<ContextType = any, ParentType exten
 }
 
 export type RemoveMailTemplateResponseResolvers<ContextType = any, ParentType extends ResolversParentTypes['RemoveMailTemplateResponse'] = ResolversParentTypes['RemoveMailTemplateResponse']> = {
-	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
-	errors?: Resolver<ReadonlyArray<ResolversTypes['RemoveMailTemplateError']>, ParentType, ContextType>
 	error?: Resolver<Maybe<ResolversTypes['RemoveMailTemplateError']>, ParentType, ContextType>
+	errors?: Resolver<ReadonlyArray<ResolversTypes['RemoveMailTemplateError']>, ParentType, ContextType>
+	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
@@ -1833,9 +1830,9 @@ export type RemoveProjectMemberErrorResolvers<ContextType = any, ParentType exte
 }
 
 export type RemoveProjectMemberResponseResolvers<ContextType = any, ParentType extends ResolversParentTypes['RemoveProjectMemberResponse'] = ResolversParentTypes['RemoveProjectMemberResponse']> = {
-	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
-	errors?: Resolver<ReadonlyArray<ResolversTypes['RemoveProjectMemberError']>, ParentType, ContextType>
 	error?: Resolver<Maybe<ResolversTypes['RemoveProjectMemberError']>, ParentType, ContextType>
+	errors?: Resolver<ReadonlyArray<ResolversTypes['RemoveProjectMemberError']>, ParentType, ContextType>
+	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
@@ -1847,9 +1844,9 @@ export type ResetPasswordErrorResolvers<ContextType = any, ParentType extends Re
 }
 
 export type ResetPasswordResponseResolvers<ContextType = any, ParentType extends ResolversParentTypes['ResetPasswordResponse'] = ResolversParentTypes['ResetPasswordResponse']> = {
-	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
-	errors?: Resolver<ReadonlyArray<ResolversTypes['ResetPasswordError']>, ParentType, ContextType>
 	error?: Resolver<Maybe<ResolversTypes['ResetPasswordError']>, ParentType, ContextType>
+	errors?: Resolver<ReadonlyArray<ResolversTypes['ResetPasswordError']>, ParentType, ContextType>
+	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
@@ -1865,8 +1862,8 @@ export type RoleDefinitionResolvers<ContextType = any, ParentType extends Resolv
 }
 
 export type RoleEntityVariableDefinitionResolvers<ContextType = any, ParentType extends ResolversParentTypes['RoleEntityVariableDefinition'] = ResolversParentTypes['RoleEntityVariableDefinition']> = {
-	name?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	entityName?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	name?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
@@ -1901,30 +1898,30 @@ export type SignInIdpErrorResolvers<ContextType = any, ParentType extends Resolv
 }
 
 export type SignInIdpResponseResolvers<ContextType = any, ParentType extends ResolversParentTypes['SignInIDPResponse'] = ResolversParentTypes['SignInIDPResponse']> = {
-	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
-	errors?: Resolver<ReadonlyArray<ResolversTypes['SignInIDPError']>, ParentType, ContextType>
 	error?: Resolver<Maybe<ResolversTypes['SignInIDPError']>, ParentType, ContextType>
+	errors?: Resolver<ReadonlyArray<ResolversTypes['SignInIDPError']>, ParentType, ContextType>
+	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	result?: Resolver<Maybe<ResolversTypes['SignInIDPResult']>, ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type SignInIdpResultResolvers<ContextType = any, ParentType extends ResolversParentTypes['SignInIDPResult'] = ResolversParentTypes['SignInIDPResult']> = {
-	token?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	person?: Resolver<ResolversTypes['Person'], ParentType, ContextType>
+	token?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type SignInResponseResolvers<ContextType = any, ParentType extends ResolversParentTypes['SignInResponse'] = ResolversParentTypes['SignInResponse']> = {
-	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
-	errors?: Resolver<ReadonlyArray<ResolversTypes['SignInError']>, ParentType, ContextType>
 	error?: Resolver<Maybe<ResolversTypes['SignInError']>, ParentType, ContextType>
+	errors?: Resolver<ReadonlyArray<ResolversTypes['SignInError']>, ParentType, ContextType>
+	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	result?: Resolver<Maybe<ResolversTypes['SignInResult']>, ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type SignInResultResolvers<ContextType = any, ParentType extends ResolversParentTypes['SignInResult'] = ResolversParentTypes['SignInResult']> = {
-	token?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	person?: Resolver<ResolversTypes['Person'], ParentType, ContextType>
+	token?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
@@ -1936,9 +1933,9 @@ export type SignOutErrorResolvers<ContextType = any, ParentType extends Resolver
 }
 
 export type SignOutResponseResolvers<ContextType = any, ParentType extends ResolversParentTypes['SignOutResponse'] = ResolversParentTypes['SignOutResponse']> = {
-	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
-	errors?: Resolver<ReadonlyArray<ResolversTypes['SignOutError']>, ParentType, ContextType>
 	error?: Resolver<Maybe<ResolversTypes['SignOutError']>, ParentType, ContextType>
+	errors?: Resolver<ReadonlyArray<ResolversTypes['SignOutError']>, ParentType, ContextType>
+	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
@@ -1950,9 +1947,9 @@ export type SignUpErrorResolvers<ContextType = any, ParentType extends Resolvers
 }
 
 export type SignUpResponseResolvers<ContextType = any, ParentType extends ResolversParentTypes['SignUpResponse'] = ResolversParentTypes['SignUpResponse']> = {
-	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
-	errors?: Resolver<ReadonlyArray<ResolversTypes['SignUpError']>, ParentType, ContextType>
 	error?: Resolver<Maybe<ResolversTypes['SignUpError']>, ParentType, ContextType>
+	errors?: Resolver<ReadonlyArray<ResolversTypes['SignUpError']>, ParentType, ContextType>
+	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	result?: Resolver<Maybe<ResolversTypes['SignUpResult']>, ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
@@ -1977,15 +1974,15 @@ export type UpdateIdpResponseResolvers<ContextType = any, ParentType extends Res
 export type UpdateProjectMemberErrorResolvers<ContextType = any, ParentType extends ResolversParentTypes['UpdateProjectMemberError'] = ResolversParentTypes['UpdateProjectMemberError']> = {
 	code?: Resolver<ResolversTypes['UpdateProjectMemberErrorCode'], ParentType, ContextType>
 	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	membershipValidation?: Resolver<Maybe<ReadonlyArray<ResolversTypes['MembershipValidationError']>>, ParentType, ContextType>
 	endUserMessage?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+	membershipValidation?: Resolver<Maybe<ReadonlyArray<ResolversTypes['MembershipValidationError']>>, ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type UpdateProjectMemberResponseResolvers<ContextType = any, ParentType extends ResolversParentTypes['UpdateProjectMemberResponse'] = ResolversParentTypes['UpdateProjectMemberResponse']> = {
-	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
-	errors?: Resolver<ReadonlyArray<ResolversTypes['UpdateProjectMemberError']>, ParentType, ContextType>
 	error?: Resolver<Maybe<ResolversTypes['UpdateProjectMemberError']>, ParentType, ContextType>
+	errors?: Resolver<ReadonlyArray<ResolversTypes['UpdateProjectMemberError']>, ParentType, ContextType>
+	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
@@ -2088,9 +2085,3 @@ export type Resolvers<ContextType = any> = {
 	VariableEntry?: VariableEntryResolvers<ContextType>
 }
 
-
-/**
- * @deprecated
- * Use "Resolvers" root object instead. If you wish to get "IResolvers", add "typesPrefix: I" to your config.
- */
-export type IResolvers<ContextType = any> = Resolvers<ContextType>

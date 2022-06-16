@@ -168,13 +168,12 @@ export const createTenantTester = async (): Promise<TenantTester> => {
 				),
 				db: dbContext,
 			}
-			const result = await graphql(
+			const result = await graphql({
 				schema,
-				typeof query === 'string' ? query : query.query,
-				null,
-				context,
-				typeof query === 'string' ? undefined : query.variables,
-			)
+				source: typeof query === 'string' ? query : query.query,
+				contextValue: context,
+				variableValues: typeof query === 'string' ? undefined : query.variables,
+			})
 			const result2 = JSON.parse(JSON.stringify(result))
 			if (options.noErrorsCheck !== true) {
 				assert.deepStrictEqual(result2.errors ?? [], [])

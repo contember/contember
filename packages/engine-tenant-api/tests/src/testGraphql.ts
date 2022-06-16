@@ -10,7 +10,12 @@ export interface Test {
 }
 
 export const executeGraphQlTest = async (test: Test) => {
-	const response = await graphql(test.schema, test.query, null, test.context, test.queryVariables)
+	const response = await graphql({
+		schema: test.schema,
+		source: test.query,
+		contextValue: test.context,
+		variableValues: test.queryVariables,
+	})
 	if ('errors' in response) {
 		console.error((response.errors as any)[0])
 		response.errors = (response.errors as any).map(({ message }: any) => ({ message }))

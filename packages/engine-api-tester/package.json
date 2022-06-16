@@ -20,12 +20,12 @@
     "@contember/schema-migrations": "^1.2.0-alpha.2",
     "@contember/schema-utils": "^1.2.0-alpha.2",
     "@graphql-tools/schema": "^8.3.5",
-    "graphql": "^15.4.0",
-    "sinon": "^11.1.1",
+    "graphql": "^16.5.0",
+    "sinon": "^14.0.0",
     "uuid": "^8.3.1"
   },
   "devDependencies": {
-    "@types/node": "^17.0.5",
+    "@types/node": "^16",
     "@types/sinon": "^10.0.2",
     "@types/uuid": "^8.3.0",
     "pg": "^8.5.0"

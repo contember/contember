@@ -23,7 +23,7 @@ export const graphqlRequest = async (options: {
 	noTrx?: boolean
 }) => {
 	const response = await fetch(options.endpoint, createHttpOptions(options))
-	const jsonResponse = await response.json()
+	const jsonResponse: any = await response.json()
 
 	if (jsonResponse.errors) {
 		throw new Error('Graphql request failed: ' + JSON.stringify(jsonResponse.errors))

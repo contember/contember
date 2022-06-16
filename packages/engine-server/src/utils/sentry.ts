@@ -28,7 +28,7 @@ export const logSentryError = (error: any, context: SentryErrorContext) => {
 			scope.setTag('project', context.project)
 		}
 		scope.setTag('module', context.module)
-		scope.setLevel(Sentry.Severity.Error)
+		scope.setLevel('error')
 		scope.setUser({
 			id: context.user,
 		})

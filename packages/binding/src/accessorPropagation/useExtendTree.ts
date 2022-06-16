@@ -4,15 +4,17 @@ import { useBindingOperations } from './useBindingOperations'
 import { TreeRootId } from '../treeParameters'
 import { ExtendTreeOptions } from '../accessors'
 import { DataBindingExtendAborted } from '../core'
+import { useEnvironment } from './useEnvironment'
 
 export const useExtendTree = () => {
 	const abort = useAbortController()
 	const { extendTree } = useBindingOperations()
 	const isMountedRef = useIsMounted()
+	const environment = useEnvironment()
 	return useCallback(async (newFragment: ReactNode, options?: Omit<ExtendTreeOptions, 'signal'>): Promise<TreeRootId | undefined> => {
 		try {
 			const newTreeRootId = await extendTree(newFragment,
-				{ ...options, signal: abort() },
+				{ environment, ...options, signal: abort() },
 			)
 			if (!isMountedRef.current) {
 				return
@@ -24,5 +26,5 @@ export const useExtendTree = () => {
 			}
 			throw e
 		}
-	}, [abort, extendTree, isMountedRef])
+	}, [abort, environment, extendTree, isMountedRef])
 }

@@ -19,6 +19,8 @@
 		"pw:update-only": "cd packages/admin && docker-compose run --rm playwright npm run -- pw:update",
 		"pw:test": "pnpm run -- pw:build && pnpm run -- pw:test-only",
 		"pw:test-only": "cd packages/admin && docker-compose run --rm playwright npm run -- pw:test",
+		"pw:debug": "pnpm run -- pw:build && pnpm run -- pw:debug-only",
+		"pw:debug-only": "cd packages/admin && docker-compose run --rm playwright npm run -- pw:debug",
 		"start": "docker-compose up --detach && pnpm run -- contember migrations:execute . --yes",
 		"storybook": "cd packages/ui && pnpm run storybook",
 		"test": "pnpm run --recursive --parallel -- test run",

@@ -35,6 +35,7 @@
 		"pw:update": "playwright test --update-snapshots",
 		"pw:report": "playwright show-report",
 		"pw:test": "playwright test",
+		"pw:debug": "playwright test --debug --project='Desktop Chrome'",
 		"test": "vitest --environment jsdom tests/vitest"
 	},
 	"dependencies": {

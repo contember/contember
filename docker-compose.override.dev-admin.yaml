@@ -22,3 +22,6 @@ services:
 
   postgres:
     ports: ['3005:5432']
+
+  playwright:
+    ports: ['3007:3007']

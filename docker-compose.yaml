@@ -54,13 +54,11 @@ services:
 
   playwright:
     image: mcr.microsoft.com/playwright:v1.20.0-focal
-    command: ['npm', 'run', 'test:playwright']
+    command: ['npm', 'run', 'pw:dev']
     user: '1000:1000'
 
-    deploy:
-      replicas: 0
-
     environment:
+      DISPLAY: ${DISPLAY}
       CONTEMBER_API_URL: 'http://contember-engine:4000'
       CONTEMBER_API_TOKEN: '0000000000000000000000000000000000000000'
 

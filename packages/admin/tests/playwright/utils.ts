@@ -1,10 +1,15 @@
 import { Schema } from '@contember/schema'
 import { InputValidation, PermissionsBuilder, SchemaDefinition } from '@contember/schema-definition'
-import { Migration, ModificationHandlerFactory, SchemaDiffer, SchemaMigrator, VERSION_LATEST } from '@contember/schema-migrations'
+import * as SM from '@contember/schema-migrations'
+import type { Migration } from '@contember/schema-migrations'
 import { emptySchema } from '@contember/schema-utils'
 import { expect, Page, test, TestInfo } from '@playwright/test'
 import fetch from 'node-fetch'
 import { createHash } from 'crypto'
+
+// workaround for CommonJS + ESM incompatibilities
+const { SchemaDiffer, SchemaMigrator, VERSION_LATEST } = SM
+const ModificationHandlerFactory = SM.ModificationHandlerFactory ?? (SM as any).default.ModificationHandlerFactory
 
 export function buildSchema(definitions: SchemaDefinition.ModelDefinition<{}>): Schema {
 	const model = SchemaDefinition.createModel(definitions)
@@ -97,6 +102,18 @@ export async function contemberTruncate(projectSlug: string) {
 	`)
 
 	expect(payload.data.truncate.ok).toBe(true)
+}
+
+export async function initContemberProjectDev(definitions: SchemaDefinition.ModelDefinition<{}>) {
+	const schema = buildSchema(definitions)
+	const schemaHash = createHash('sha256').update(JSON.stringify(schema)).digest('hex').slice(0, 16)
+	const projectSlug = `dev_${schemaHash}`
+
+	if (await contemberCreateProject(projectSlug)) {
+		await contemberMigrate(projectSlug, [buildMigration(schema)])
+	}
+
+	return projectSlug
 }
 
 export async function initContemberProject(testInfo: TestInfo, definitions: SchemaDefinition.ModelDefinition<{}>) {

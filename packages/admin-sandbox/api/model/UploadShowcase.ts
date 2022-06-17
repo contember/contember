@@ -1,10 +1,12 @@
-import { InputValidation as val, SchemaDefinition as d } from '@contember/schema-definition'
+import { SchemaDefinition as d } from '@contember/schema-definition'
 import {
 	BasicImage,
 	ComplexFileList,
 	ComplexImage,
 	ComplexImageList,
 	DiscriminatedAttachment,
+	GalleryItem,
+	GalleryList,
 	TrivialImage,
 } from './Files'
 import { One } from './One'
@@ -12,18 +14,18 @@ import { One } from './One'
 export class UploadShowcase {
 	unique = d.enumColumn(One).notNull().unique()
 
-	@val.required('required UploadShowcase - singleTrivialImage')
 	singleTrivialImage = d.oneHasOne(TrivialImage)
-	@val.required('required UploadShowcase - singleBasicImage')
 	singleBasicImage = d.oneHasOne(BasicImage)
 	singleComplexImage = d.oneHasOne(ComplexImage)
 	multipleBasicImageList = d.oneHasMany(UploadShowcaseImage, 'page')
 
-	@val.required('required UploadShowcase - discriminatedAttachment')
-	discriminatedAttachment = d.oneHasOne(DiscriminatedAttachment)
+	discriminatedAttachment = d.oneHasOne(DiscriminatedAttachment).removeOrphan()
 
 	imageList = d.oneHasOne(ComplexImageList)
 	fileList = d.oneHasOne(ComplexFileList)
+
+	galleryItem = d.manyHasOne(GalleryItem)
+	galleryList = d.oneHasOne(GalleryList)
 }
 
 export class UploadShowcaseImage {

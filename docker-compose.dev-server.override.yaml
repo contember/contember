@@ -25,3 +25,6 @@ services:
 
   redis:
     ports: ['3006:6379']
+
+  playwright:
+    ports: ['3007:3007']

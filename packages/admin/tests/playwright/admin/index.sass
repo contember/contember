@@ -1,3 +1,5 @@
+@use '../../../src/index' with ($inter-font-path: '@contember/ui/assets/Inter')
+
 @font-face
 	font-family: 'Ahem'
 	src: url('./ahem.ttf') format('truetype')
@@ -6,7 +8,7 @@
 	--cui-font-family: 'Ahem'
 
 *, ::before, ::after
-	font-family: 'Ahem' !important
+	font-family: var(--cui-font-family) !important
 	font-kerning: none !important
 	font-smooth: never !important
 	-webkit-font-smoothing: none !important

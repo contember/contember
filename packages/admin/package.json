@@ -32,6 +32,7 @@
 		"build:css:copy-fonts": "rm -rf \"dist/assets/Inter\" && cp -R \"../ui/src/assets/Inter\" \"dist/assets/Inter\"",
 		"pw:build": "vite build tests/playwright/admin",
 		"pw:preview": "vite preview tests/playwright/admin",
+		"pw:dev": "vite dev tests/playwright/admin",
 		"pw:update": "playwright test --update-snapshots",
 		"pw:report": "playwright show-report",
 		"pw:test": "playwright test",

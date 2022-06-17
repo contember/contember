@@ -1,12 +1,7 @@
 @import '../common'
 
 .toaster
-	--cui-layout-page-padding-bottom: calc(var(--cui-padding-bottom, 0em) + var(--cui-edge-offset-bottom, 0em) + env(safe-area-inset-bottom, 0em))
-	--cui-layout-page-padding-right: calc(var(--cui-padding-right, 0em) + var(--cui-edge-offset-right, 0em) + env(safe-area-inset-right, 0em))
-
-	position: fixed
-	right: var(--cui-layout-page-padding-right, 1em)
-	bottom: var(--cui-layout-page-padding-bottom, 1em)
+	+fixed(0 0 0 $spacing-normal)
 	display: flex
 	flex-direction: column
 	align-items: stretch

@@ -9,6 +9,7 @@ namespace Model {
 		readonly tableName: string
 		readonly fields: { readonly [name: string]: AnyField }
 		readonly unique: UniqueConstraints
+		readonly indexes: Indexes
 		readonly view?: View
 		readonly eventLog: EventLogConfig
 	}
@@ -273,6 +274,15 @@ namespace Model {
 	}
 
 	export type UniqueConstraint = {
+		readonly fields: readonly string[]
+		readonly name: string
+	}
+
+	export type Indexes = {
+		readonly [name: string]: Index
+	}
+
+	export type Index = {
 		readonly fields: readonly string[]
 		readonly name: string
 	}

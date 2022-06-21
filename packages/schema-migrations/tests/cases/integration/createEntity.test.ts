@@ -35,6 +35,7 @@ testMigrations('create a table (no relations, unique on column)', {
 				eventLog: {
 					enabled: true,
 				},
+				indexes: {},
 			},
 		},
 		{
@@ -141,6 +142,7 @@ testMigrations('create a view', {
 				eventLog: {
 					enabled: true,
 				},
+				indexes: {},
 			},
 		},
 	],

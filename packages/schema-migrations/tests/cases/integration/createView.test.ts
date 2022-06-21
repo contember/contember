@@ -68,6 +68,7 @@ testMigrations('create view', {
 				eventLog: {
 					enabled: true,
 				},
+				indexes: {},
 			},
 		},
 		{

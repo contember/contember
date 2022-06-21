@@ -9,6 +9,7 @@ import { isEntityConstructor } from '../../utils'
 
 export * from './fieldDefinitions'
 export * from './EventLogDefinition'
+export * from './IndexDefinition'
 export * from './EnumDefinition'
 export * from './UniqueDefinition'
 export * from './ViewDefinition'

@@ -2,20 +2,20 @@ import { DecoratorFunction } from './types'
 import { extendEntity } from './extensions'
 import { NamingHelper } from '@contember/schema-utils'
 
-export type UniqueOptions<T> = { name?: string; fields: (keyof T)[] }
-export function Unique<T>(options: UniqueOptions<T>): DecoratorFunction<T>
-export function Unique<T>(...fields: (keyof T)[]): DecoratorFunction<T>
-export function Unique<T>(options: UniqueOptions<T> | keyof T, ...args: (keyof T)[]): DecoratorFunction<T> {
+export type IndexOptions<T> = { name?: string; fields: (keyof T)[] }
+export function Index<T>(options: IndexOptions<T>): DecoratorFunction<T>
+export function Index<T>(...fields: (keyof T)[]): DecoratorFunction<T>
+export function Index<T>(options: IndexOptions<T> | keyof T, ...args: (keyof T)[]): DecoratorFunction<T> {
 	return extendEntity(({ entity }) => {
 		const fields = (typeof options !== 'object' ? [options, ...args] : options.fields) as string[]
 		const name =
 			typeof options === 'object' && options.name
 				? options.name
-				: NamingHelper.createUniqueConstraintName(entity.name, fields)
+				: NamingHelper.createIndexName(entity.name, fields)
 		return {
 			...entity,
-			unique: {
-				...entity.unique,
+			indexes: {
+				...entity.indexes,
 				[name]: { name, fields },
 			},
 		}

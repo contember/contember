@@ -2,20 +2,31 @@ import crypto from 'crypto'
 
 export class NamingHelper {
 	public static createForeignKeyName(fromTable: string, fromColumn: string, toTable: string, toColumn: string): string {
-		const uniqueSuffix = crypto
-			.createHash('sha256')
-			.update(JSON.stringify([fromTable, fromColumn, toTable, toColumn]), 'ascii')
-			.digest('hex')
+		return 'fk_'
+			+ fromTable + '_'
+			+ fromColumn + '_'
+			+ this.createUniqueSuffix([fromTable, fromColumn, toTable, toColumn])
+	}
 
-		return 'fk_' + fromTable + '_' + fromColumn + '_' + uniqueSuffix.slice(0, 6)
+	public static createIndexName = (entityName: string, fields: readonly string[]): string => {
+		return 'idx_'
+			+ entityName + '_'
+			+ fields.join('_') + '_'
+			+ this.createUniqueSuffix([entityName, ...fields])
 	}
 
 	public static createUniqueConstraintName = (entityName: string, fields: readonly string[]): string => {
+		return 'unique_'
+			+ entityName + '_'
+			+ fields.join('_') + '_'
+			+ this.createUniqueSuffix([entityName, ...fields])
+	}
+
+	private static createUniqueSuffix = (values: string[]): string => {
 		const uniqueSuffix = crypto
 			.createHash('sha256')
-			.update(JSON.stringify([entityName, ...fields]), 'ascii')
+			.update(JSON.stringify(values), 'ascii')
 			.digest('hex')
-
-		return 'unique_' + entityName + '_' + fields.join('_') + '_' + uniqueSuffix.slice(0, 6)
+		return uniqueSuffix.slice(0, 6)
 	}
 }

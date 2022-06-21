@@ -28,6 +28,7 @@ import {
 	UpdateRelationOrderByModification,
 } from './relations'
 import { UpdateViewModification } from './entities/UpdateViewModification'
+import { CreateIndexModification, RemoveIndexModification } from './indexes'
 
 class ModificationHandlerFactory {
 	constructor(private readonly map: Record<string, ModificationHandlerStatic<any>>) {}
@@ -51,6 +52,8 @@ namespace ModificationHandlerFactory {
 		UpdateColumnNameModification,
 		CreateUniqueConstraintModification,
 		RemoveUniqueConstraintModification,
+		CreateIndexModification,
+		RemoveIndexModification,
 		CreateEntityModification,
 		RemoveEntityModification,
 		UpdateEntityNameModification,

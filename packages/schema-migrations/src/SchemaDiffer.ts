@@ -44,6 +44,7 @@ import { PatchValidationSchemaModification, UpdateValidationSchemaModification }
 import { CreateDiff, Differ } from './modifications/ModificationHandler'
 import { isDefined } from './utils/isDefined'
 import { ChangeViewNonViewDiffer, RemoveChangedFieldDiffer, RemoveChangedViewDiffer } from './modifications/differs'
+import { CreateIndexModification, RemoveIndexModification } from './modifications/indexes'
 
 export class SchemaDiffer {
 	constructor(private readonly schemaMigrator: SchemaMigrator) {}
@@ -63,6 +64,7 @@ export class SchemaDiffer {
 			ConvertOneHasManyToManyHasManyRelationModification.createDiff,
 
 			RemoveUniqueConstraintModification.createDiff,
+			RemoveIndexModification.createDiff,
 			new ChangeViewNonViewDiffer().createDiff,
 			new RemoveChangedViewDiffer().createDiff,
 			RemoveEntityModification.createDiff,
@@ -92,6 +94,7 @@ export class SchemaDiffer {
 			CreateRelationInverseSideModification.createDiff,
 
 			CreateUniqueConstraintModification.createDiff,
+			CreateIndexModification.createDiff,
 
 			RemoveEnumModification.createDiff,
 

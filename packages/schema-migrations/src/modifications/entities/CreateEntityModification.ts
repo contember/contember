@@ -3,6 +3,7 @@ import { Model, Schema } from '@contember/schema'
 import { SchemaUpdater, updateModel } from '../utils/schemaUpdateUtils'
 import { ModificationHandlerOptions, ModificationHandlerStatic } from '../ModificationHandler'
 import { createEventTrigger, createEventTrxTrigger } from '../utils/sqlUpdateUtils'
+import { PartialEntity } from '../../utils/PartialEntity.js'
 
 export const CreateEntityModification: ModificationHandlerStatic<CreateEntityModificationData> = class {
 	static id = 'createEntity'
@@ -43,6 +44,7 @@ export const CreateEntityModification: ModificationHandlerStatic<CreateEntityMod
 				...model.entities,
 				[this.data.entity.name]: {
 					eventLog: { enabled: true },
+					indexes: {},
 					...this.data.entity,
 				},
 			},
@@ -76,8 +78,6 @@ export const CreateEntityModification: ModificationHandlerStatic<CreateEntityMod
 	}
 }
 
-type SomePartial<E, K extends keyof E> = Omit<E, K> & Partial<Pick<E, K>>
-
 export interface CreateEntityModificationData {
-	entity: SomePartial<Model.Entity, 'eventLog'>
+	entity: PartialEntity
 }

@@ -3,6 +3,7 @@ import { Model, Schema } from '@contember/schema'
 import { SchemaUpdater, updateModel } from '../utils/schemaUpdateUtils'
 import { ModificationHandlerStatic } from '../ModificationHandler'
 import { Migration } from '../../Migration'
+import { PartialEntity } from '../../utils/PartialEntity.js'
 
 export const CreateViewModification: ModificationHandlerStatic<CreateViewModificationData> = class {
 	static id = 'createView'
@@ -22,6 +23,7 @@ export const CreateViewModification: ModificationHandlerStatic<CreateViewModific
 			entities: {
 				...model.entities,
 				[this.data.entity.name]: {
+					indexes: {},
 					eventLog: { enabled: true }, // not relevant here...
 					...this.data.entity,
 				},
@@ -63,8 +65,6 @@ export const CreateViewModification: ModificationHandlerStatic<CreateViewModific
 	}
 }
 
-type SomePartial<E, K extends keyof E> = Omit<E, K> & Partial<Pick<E, K>>
-
 export interface CreateViewModificationData {
-	entity: SomePartial<Model.Entity, 'eventLog'>
+	entity: PartialEntity
 }

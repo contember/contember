@@ -11,6 +11,7 @@ const entity: Model.Entity = {
 	fields: {},
 	unique: {},
 	eventLog: { enabled: true },
+	indexes: {},
 }
 
 describe('order by helper', () => {

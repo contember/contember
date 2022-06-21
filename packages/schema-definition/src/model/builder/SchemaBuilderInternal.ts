@@ -39,6 +39,7 @@ export default class SchemaBuilderInternal {
 			primaryColumn: primaryField.options.columnName || this.conventions.getColumnName(primaryName),
 			unique: this.createUnique(name, options, fieldOptions),
 			fields: {},
+			indexes: {},
 			tableName: options.tableName || this.conventions.getTableName(name),
 			eventLog: {
 				enabled: true,

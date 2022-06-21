@@ -37,6 +37,7 @@ testMigrations('create one has many relation (post with locales)', {
 				eventLog: {
 					enabled: true,
 				},
+				indexes: {},
 			},
 		},
 		{

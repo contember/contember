@@ -36,6 +36,7 @@ export class SchemaBuilder {
 				primary: primaryName,
 				primaryColumn: this.conventions.getColumnName(primaryName),
 				unique: this.createUnique(entityName, definitionInstance),
+				indexes: {},
 				fields: [
 					...definitionInstance[primaryName] ? [] : [tuple(primaryName, this.createPrimaryColumn())],
 					...Object.entries(definitionInstance),

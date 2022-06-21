@@ -34,6 +34,7 @@ testMigrations('create one has one relation (site with settings)', {
 				eventLog: {
 					enabled: true,
 				},
+				indexes: {},
 			},
 		},
 		{
@@ -56,6 +57,7 @@ testMigrations('create one has one relation (site with settings)', {
 				eventLog: {
 					enabled: true,
 				},
+				indexes: {},
 			},
 		},
 		{

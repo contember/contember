@@ -34,6 +34,7 @@ testMigrations('create many has many relation (post with categories)', {
 				eventLog: {
 					enabled: true,
 				},
+				indexes: {},
 			},
 		},
 		{

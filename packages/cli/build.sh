@@ -3,6 +3,7 @@ set -e
 
 mkdir --parent dist
 yarn install
+yarn workspace @contember/cli build
 node packages/cli/esbuild.js
 cd dist
 echo "{}" > package.json

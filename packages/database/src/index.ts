@@ -12,6 +12,7 @@ export * from './queryable'
 export * from './Literal'
 export * from './types'
 export {
+	asyncIterableTransaction,
 	wrapIdentifier,
 	retryTransaction,
 	ConstraintHelper,

@@ -83,6 +83,7 @@ testMigrations('update a view 1', {
 				eventLog: {
 					enabled: true,
 				},
+				indexes: {},
 			},
 		},
 		{
@@ -118,6 +119,7 @@ testMigrations('update a view 1', {
 				eventLog: {
 					enabled: true,
 				},
+				indexes: {},
 			},
 		},
 		{
@@ -153,6 +155,7 @@ testMigrations('update a view 1', {
 				eventLog: {
 					enabled: true,
 				},
+				indexes: {},
 			},
 		},
 	],
@@ -227,6 +230,7 @@ testMigrations('update a view 2', {
 				eventLog: {
 					enabled: true,
 				},
+				indexes: {},
 			},
 		},
 		{
@@ -262,6 +266,7 @@ testMigrations('update a view 2', {
 				eventLog: {
 					enabled: true,
 				},
+				indexes: {},
 			},
 		},
 	],
@@ -331,6 +336,7 @@ testMigrations('update a view 3', {
 				eventLog: {
 					enabled: true,
 				},
+				indexes: {},
 			},
 		},
 	],
@@ -402,6 +408,7 @@ testMigrations('update a view 4', {
 				eventLog: {
 					enabled: true,
 				},
+				indexes: {},
 			},
 		},
 		{
@@ -437,6 +444,7 @@ testMigrations('update a view 4', {
 				eventLog: {
 					enabled: true,
 				},
+				indexes: {},
 			},
 		},
 		{
@@ -472,6 +480,7 @@ testMigrations('update a view 4', {
 				eventLog: {
 					enabled: true,
 				},
+				indexes: {},
 			},
 		},
 	],

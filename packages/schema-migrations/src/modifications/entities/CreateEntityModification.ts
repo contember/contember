@@ -43,6 +43,7 @@ export const CreateEntityModification: ModificationHandlerStatic<CreateEntityMod
 				...model.entities,
 				[this.data.entity.name]: {
 					eventLog: { enabled: true },
+					indexes: {},
 					...this.data.entity,
 				},
 			},
@@ -79,5 +80,5 @@ export const CreateEntityModification: ModificationHandlerStatic<CreateEntityMod
 type SomePartial<E, K extends keyof E> = Omit<E, K> & Partial<Pick<E, K>>
 
 export interface CreateEntityModificationData {
-	entity: SomePartial<Model.Entity, 'eventLog'>
+	entity: SomePartial<Model.Entity, 'eventLog' | 'indexes'>
 }

@@ -45,7 +45,6 @@ export class ImportApiMiddlewareFactory {
 			const isGzip = request.headers['content-encoding'] === 'gzip'
 			const commands = fromBuffer(isGzip ? request.req.pipe(createGunzip()) : request.req)
 
-			koaContext.compress = true
 			response.status = 200
 			response.headers['Content-Type'] = 'application/x-ndjson'
 			response.body = Readable.from(toBuffer(this.importExecutor.import(groupContainer, commands), 0))

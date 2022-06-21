@@ -132,8 +132,9 @@ export class ImportExecutor {
 		// eslint-disable-next-line @typescript-eslint/no-this-alias
 		const that = this
 		return yield* asyncIterableTransaction(contentDatabaseClient, async function* (db) {
-			await that.disableTriggers(db, options.tables) // TODO: only sometimes?
-			await that.truncate(db, options.tables) // TODO: only sometimes?
+			await that.disableTriggers(db, options.tables)
+			await that.lockTables(db, options.tables)
+			await that.truncateTables(db, options.tables)
 
 			const constraintHelper = new ConstraintHelper(db)
 			await constraintHelper.setFkConstraintsDeferred()
@@ -158,7 +159,7 @@ export class ImportExecutor {
 		// eslint-disable-next-line @typescript-eslint/no-this-alias
 		const that = this
 		return yield* asyncIterableTransaction(systemDatabaseContext.client, async function* (db) {
-			await that.truncate(db, options.tables)
+			await that.truncateTables(db, options.tables)
 
 			const constraintHelper = new ConstraintHelper(db)
 			await constraintHelper.setFkConstraintsDeferred()
@@ -262,7 +263,12 @@ export class ImportExecutor {
 		}
 	}
 
-	private async truncate(db: Client, tableNames: readonly string[]) {
+	private async lockTables(db: Client, tableNames: readonly string[]) {
+		const tableNamesQuoted = tableNames.map(it => `${wrapIdentifier(db.schema)}.${wrapIdentifier(it)}`)
+		await db.query(`LOCK ${tableNamesQuoted.join(', ')} IN EXCLUSIVE MODE`)
+	}
+
+	private async truncateTables(db: Client, tableNames: readonly string[]) {
 		const tableNamesQuoted = tableNames.map(it => `${wrapIdentifier(db.schema)}.${wrapIdentifier(it)}`)
 		await db.query(`TRUNCATE ${tableNamesQuoted.join(', ')}`)
 	}

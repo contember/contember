@@ -8,13 +8,13 @@ import {
 	EntityId,
 	Field,
 	FileRepeater,
+	FileSelectionProps,
 	GenericCell,
 	HasOne,
 	ImageFileRepeater,
 	ImageFiles,
 	ImageUploadField,
 	Link,
-	SelectFormProps,
 	StaticRender,
 	SugaredQualifiedEntityList,
 	TextCell,
@@ -54,10 +54,11 @@ const GalleryItemTile = Component(({ onClick, selectedEntityIds }: {
 		</Block>
 	</DiscriminatedBlocks>
 })
-const GallerySelectForm = Component(({
-																			 onToggleSelect,
-																			 selectedEntityIds,
-																		 }: SelectFormProps & {}) => (
+const GallerySelectForm = Component((
+	{
+		onToggleSelect,
+		selectedEntityIds,
+	}: FileSelectionProps & {}) => (
 	<DataGrid
 		itemsPerPage={12}
 		entities={'GalleryItem'}
@@ -103,14 +104,15 @@ const GallerySelectForm = Component(({
 ))
 
 
-const ImageSelectForm = Component(({
-																		 entities,
-																		 onToggleSelect,
-																		 selectedEntityIds,
-																		 isComplex,
-																	 }: SelectFormProps & {
-	entities: SugaredQualifiedEntityList['entities']
-	isComplex: boolean
+const ImageSelectForm = Component((
+	{
+		entities,
+		onToggleSelect,
+		selectedEntityIds,
+		isComplex,
+	}: FileSelectionProps & {
+		entities: SugaredQualifiedEntityList['entities']
+		isComplex: boolean
 }) => (
 	<DataGrid
 		itemsPerPage={12}
@@ -153,8 +155,8 @@ export default () => (
 			baseEntity={'image'}
 			urlField="url"
 			sortableBy="order"
-			selectFormComponent={ImageSelectForm}
-			selectFormProps={{
+			fileSelectionComponent={ImageSelectForm}
+			fileSelectionProps={{
 				entities: 'BasicImage',
 				isComplex: false,
 			}}
@@ -168,8 +170,8 @@ export default () => (
 			// Select one > confirm
 			// Hide already attached entities (entityListAccessor)
 
-			selectFormComponent={ImageSelectForm}
-			selectFormProps={{
+			fileSelectionComponent={ImageSelectForm}
+			fileSelectionProps={{
 				entities: 'BasicImage',
 				isComplex: false,
 			}}
@@ -190,12 +192,12 @@ export default () => (
 				fileSizeField="size"
 				fileTypeField="type"
 				fileNameField="fileName"
-				selectFormComponent={ImageSelectForm}
-				selectFormProps={{
+				fileSelectionComponent={ImageSelectForm}
+				fileSelectionProps={{
 					entities: 'ComplexImage',
 					isComplex: true,
 				}}
-				label={'Complex image'}
+				fileSelectionLabel={'Complex image'}
 			>
 				<TextField field="alt" label="Image alternate" />
 			</ImageFiles>
@@ -203,12 +205,12 @@ export default () => (
 				discriminateBy="basicImage"
 				baseEntity="basicImage"
 				urlField="url"
-				selectFormComponent={ImageSelectForm}
-				selectFormProps={{
+				fileSelectionComponent={ImageSelectForm}
+				fileSelectionProps={{
 					entities: 'BasicImage',
 					isComplex: false,
 				}}
-				label={'Basic image'}
+				fileSelectionLabel={'Basic image'}
 			>
 			</ImageFiles>
 			<VideoFiles
@@ -234,12 +236,12 @@ export default () => (
 				fileSizeField="size"
 				fileTypeField="type"
 				fileNameField="fileName"
-				selectFormComponent={ImageSelectForm}
-				selectFormProps={{
+				fileSelectionComponent={ImageSelectForm}
+				fileSelectionProps={{
 					entities: 'ComplexImage',
 					isComplex: true,
 				}}
-				label={'Complex image'}
+				fileSelectionLabel={'Complex image'}
 			>
 				<TextField field="alt" label="Image alternate" />
 			</ImageFiles>
@@ -247,12 +249,12 @@ export default () => (
 				discriminateBy="basicImage"
 				baseEntity="basicImage"
 				urlField="url"
-				selectFormComponent={ImageSelectForm}
-				selectFormProps={{
+				fileSelectionComponent={ImageSelectForm}
+				fileSelectionProps={{
 					entities: 'BasicImage',
 					isComplex: false,
 				}}
-				label={'Basic image'}
+				fileSelectionLabel={'Basic image'}
 			>
 			</ImageFiles>
 			<VideoFiles
@@ -273,13 +275,12 @@ export default () => (
 			label="Gallery item"
 			baseEntity="galleryItem"
 			discriminationField="type"
-			selectFormComponent={GallerySelectForm}
+			fileSelectionComponent={GallerySelectForm}
 		>
 			<ImageFiles
 				discriminateBy="basicImage"
 				baseEntity="basicImage"
 				urlField="url"
-				label={'Basic image'}
 			>
 			</ImageFiles>
 			<ImageFiles
@@ -291,7 +292,6 @@ export default () => (
 				fileSizeField="size"
 				fileTypeField="type"
 				fileNameField="fileName"
-				label={'Complex image'}
 			>
 				<TextField field="alt" label="Image alternate" />
 			</ImageFiles>
@@ -313,13 +313,13 @@ export default () => (
 			boxLabel="Gallery list"
 			label="Gallery list"
 			sortableBy="order"
-			selectFormComponent={GallerySelectForm}
-			discriminationField="type">
+			fileSelectionComponent={GallerySelectForm}
+			discriminationField="type"
+		>
 			<ImageFiles
 				discriminateBy="basicImage"
 				baseEntity="basicImage"
 				urlField="url"
-				label={'Basic image'}
 			>
 			</ImageFiles>
 			<ImageFiles
@@ -331,7 +331,6 @@ export default () => (
 				fileSizeField="size"
 				fileTypeField="type"
 				fileNameField="fileName"
-				label={'Complex image'}
 			>
 				<TextField field="alt" label="Image alternate" />
 			</ImageFiles>

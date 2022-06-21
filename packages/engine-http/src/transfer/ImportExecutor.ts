@@ -140,6 +140,7 @@ export class ImportExecutor {
 			await constraintHelper.setFkConstraintsDeferred()
 
 			const result = yield* that.match(await it.next(), {
+				importSequence: it => that.importSequence(db, mapping, it),
 				insertBegin: it => that.insertBegin(db, mapping, it),
 			})
 
@@ -168,6 +169,17 @@ export class ImportExecutor {
 				insertBegin: it => that.insertBegin(db, mapping, it),
 			})
 		})
+	}
+
+	private async* importSequence(db: Client<Connection.TransactionLike>, mapping: TransferMapping, it: CommandIterator<'importSequence'>): AsyncGenerator<ImportProgress, CommandIterator | null> {
+		const [options] = it.commandArgs
+
+		await db.query(
+			'SELECT setval(pg_get_serial_sequence(?, ?), ?)',
+			[`${db.schema}.${options.table}`, options.column, options.value],
+		)
+
+		return it.next()
 	}
 
 	private async* insertBegin(db: Client<Connection.TransactionLike>, mapping: TransferMapping, it: CommandIterator<'insertBegin'>): AsyncGenerator<ImportProgress, CommandIterator | null> {

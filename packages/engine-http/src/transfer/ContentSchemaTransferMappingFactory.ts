@@ -1,7 +1,7 @@
 import { VersionedSchema } from '@contember/engine-system-api'
 import { Model } from '@contember/schema'
 import { acceptFieldVisitor } from '@contember/schema-utils'
-import { DbColumnSchemaMap, TransferMapping, TransferTableMapping } from './TransferMapping'
+import { DbColumnSchema, DbColumnSchemaMap, TransferMapping, TransferTableMapping } from './TransferMapping'
 
 export class ContentSchemaTransferMappingFactory {
 	createContentSchemaMapping(contentSchema: VersionedSchema): TransferMapping {
@@ -25,13 +25,22 @@ export class ContentSchemaTransferMappingFactory {
 		const columns: DbColumnSchemaMap = {}
 
 		for (const field of Object.values(entity.fields)) {
-			const column = acceptFieldVisitor(schema, entity, field, {
+			const column = acceptFieldVisitor<DbColumnSchema | null>(schema, entity, field, {
 				visitColumn: (entity, column) => {
-					if (column.type !== Model.ColumnType.Enum) {
+					if (column.type === Model.ColumnType.Enum) {
 						return {
 							name: column.columnName,
 							type: column.type,
 							nullable: column.nullable,
+							values: schema.enums[column.columnType],
+						}
+
+					} else if (column.type === Model.ColumnType.Int) {
+						return {
+							name: column.columnName,
+							type: column.type,
+							nullable: column.nullable,
+							sequence: column.sequence !== undefined,
 						}
 
 					} else {
@@ -39,7 +48,6 @@ export class ContentSchemaTransferMappingFactory {
 							name: column.columnName,
 							type: column.type,
 							nullable: column.nullable,
-							values: schema.enums[column.columnType],
 						}
 					}
 				},

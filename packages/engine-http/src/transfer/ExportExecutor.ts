@@ -60,9 +60,24 @@ export class ExportExecutor {
 		yield* asyncIterableTransaction(db, async function* (db) {
 			await db.query('SET TRANSACTION ISOLATION LEVEL SERIALIZABLE READ ONLY DEFERRABLE')
 			for (const table of Object.values(mapping.tables)) {
+				yield* that.exportSequences(db, table)
 				yield* that.exportTable(db, table)
 			}
 		})
+	}
+
+	private async* exportSequences(db: Client<Connection.TransactionLike>, table: TransferTableMapping): AsyncIterable<Command> {
+		for (const column of Object.values(table.columns)) {
+			if (column.type === Model.ColumnType.Int && column.sequence) {
+				const seqResult = await db.query<{ nextval: number }>(
+					'SELECT nextval(pg_get_serial_sequence(?, ?))',
+					[table.name, column.name],
+				)
+
+				const seqValue = seqResult.rows[0].nextval
+				yield ['importSequence', { table: table.name, column: column.name, value: seqValue }]
+			}
+		}
 	}
 
 	private async* exportTable(db: Client<Connection.TransactionLike>, table: TransferTableMapping): AsyncIterable<Command> {

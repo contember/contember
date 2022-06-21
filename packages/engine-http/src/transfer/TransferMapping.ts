@@ -18,8 +18,7 @@ export type TransferTableMapping = {
 
 export type DbColumnSchemaMap = Record<string, DbColumnSchema>
 export type DbColumnSchema =
-	| { name: string; nullable?: boolean; type: Exclude<Model.ColumnType, Model.ColumnType.Enum | Model.ColumnType.Json> }
+	| { name: string; nullable?: boolean; type: Exclude<Model.ColumnType, Model.ColumnType.Enum | Model.ColumnType.Json | Model.ColumnType.Int> }
+	| { name: string; nullable?: boolean; type: Model.ColumnType.Int; sequence?: boolean }
 	| { name: string; nullable?: boolean; type: Model.ColumnType.Json; schema?: Typesafe.Type }
 	| { name: string; nullable?: boolean; type: Model.ColumnType.Enum; values: readonly string[] }
-
-// TODO: content sequence

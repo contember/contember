@@ -18,6 +18,13 @@ export const Command = Typesafe.discriminatedTupleUnion({
 			tables: Typesafe.array(Typesafe.string),
 		}),
 	),
+	importSequence: tuple(
+		Typesafe.object({
+			table: Typesafe.string,
+			column: Typesafe.string,
+			value: Typesafe.number,
+		}),
+	),
 	insertBegin: tuple(
 		Typesafe.object({
 			table: Typesafe.string,

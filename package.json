@@ -26,9 +26,12 @@
 		"test": "pnpm run --recursive --parallel -- test run",
 		"ts:build": "tsc --build",
 		"ts:watch": "tsc --build --watch",
+		"ae:build": "pnpm run --recursive --parallel -- ae:build",
+		"ae:test": "pnpm run --recursive --parallel -- ae:test",
 		"vite": "cd packages/admin-sandbox && pnpm run -- start"
 	},
 	"devDependencies": {
+		"@microsoft/api-extractor": "^7.25.2",
 		"@types/classnames": "2.2.10",
 		"@types/react": "17.0.30",
 		"@types/react-dom": "17.0.9",

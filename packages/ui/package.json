@@ -27,6 +27,8 @@
 		"build:js:prod": "vite build --mode production",
 		"build:css": "sass --no-charset src/index.sass:dist/assets/style.css && pnpm run build:css:copy-fonts",
 		"build:css:copy-fonts": "rm -rf \"dist/assets/Inter\" && cp -R \"src/assets/Inter\" \"dist/assets/Inter\"",
+		"ae:build": "api-extractor run --local",
+		"ae:test": "api-extractor run",
 		"storybook": "start-storybook -p 6006",
 		"build-storybook": "build-storybook"
 	},

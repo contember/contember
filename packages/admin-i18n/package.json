@@ -26,7 +26,9 @@
 	"scripts": {
 		"build": "pnpm run build:js:dev && pnpm run build:js:prod",
 		"build:js:dev": "vite build --mode development",
-		"build:js:prod": "vite build --mode production"
+		"build:js:prod": "vite build --mode production",
+		"ae:build": "api-extractor run --local",
+		"ae:test": "api-extractor run"
 	},
 	"devDependencies": {
 		"@contember/admin": "workspace:*"

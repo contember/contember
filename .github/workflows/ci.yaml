@@ -19,6 +19,7 @@ jobs:
       - run: pnpm run eslint:lint
       - run: pnpm run build
       - run: pnpm run test
+      - run: pnpm run ae:test
 
   playwright:
     runs-on: ubuntu-latest

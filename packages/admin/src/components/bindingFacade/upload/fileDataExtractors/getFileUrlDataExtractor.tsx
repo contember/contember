@@ -1,7 +1,7 @@
 import type { SugaredFieldProps } from '@contember/binding'
 import { QueryLanguage, SugaredField } from '@contember/binding'
 import type { S3FileUploader } from '@contember/client'
-import type { FileDataExtractor } from '../interfaces'
+import { FileDataExtractor } from './FileDataExtractor'
 
 export interface FileUrlDataExtractorProps {
 	urlField: SugaredFieldProps['field']

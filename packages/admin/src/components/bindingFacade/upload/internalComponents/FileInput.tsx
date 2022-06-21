@@ -4,20 +4,20 @@ import type { DropzoneState } from 'react-dropzone'
 import type { MessageFormatter } from '../../../../i18n'
 import type { AddEntityButtonProps } from '../../collections'
 import type { UploadDictionary } from '../uploadDictionary'
-import { SelectFileInput, SelectFileInputProps } from './SelectFileInput'
+import { SelectFileInput, SelectFileInputProps, SelectFileInputPublicProps } from './selection/SelectFileInput'
 
 export type FileInputPublicProps =
 	& Pick<FieldContainerProps, 'label' | 'description' | 'labelDescription'>
 	& AddEntityButtonProps
+	& SelectFileInputPublicProps
 	&	{
 		enableAddingNew?: boolean
 		addButtonSubText?: ReactNode
 	}
 
-
 export type FileInputProps =
 	& FileInputPublicProps
-	& Pick<SelectFileInputProps<{}>, 'isMultiple' | 'onSelectConfirm' | 'fileKinds'>
+	& SelectFileInputProps<{}>
 	&	{
 		children: ReactNode
 		dropzoneState: DropzoneState
@@ -64,7 +64,7 @@ export const FileInput = ({
 						<input {...getInputProps()} />
 						<div className="fileInput-cta">
 							<Stack wrap justify="center" direction="horizontal">
-								{selectProps.fileKinds.hasFileSelection && (
+								{selectProps.fileSelection && (
 									<SelectFileInput {...selectProps} formatMessage={formatMessage} />
 								)}
 								<AddButton

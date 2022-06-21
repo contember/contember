@@ -1,26 +1,20 @@
-import {
-	EntityAccessor, FieldValue,
-	QueryLanguage,
-	SugaredFieldProps, useEnvironment,
-	useGetEntityByKey,
-	useMutationState,
-} from '@contember/binding'
+import { SugaredFieldProps, useGetEntityByKey, useMutationState } from '@contember/binding'
 import type { FileId } from '@contember/react-client'
-import { FunctionComponent, ReactNode, useCallback, useState } from 'react'
+import { useFileUpload } from '@contember/react-client'
+import { FunctionComponent, ReactNode, useCallback, useMemo, useState } from 'react'
 import { useMessageFormatter } from '../../../../i18n'
 import { RepeaterFieldContainerPrivateProps, SortableRepeaterItem } from '../../collections'
-import { useAccessorErrors } from '../../errors'
-import type { ResolvedFileKinds } from '../ResolvedFileKinds'
+import { useAccessorErrorFormatter } from '../../errors'
 import { uploadDictionary } from '../uploadDictionary'
 import { FileInput, FileInputPublicProps } from './FileInput'
 import { SingleFilePreview } from './SingleFilePreview'
-import { useNormalizedUploadState } from '../hooks/useNormalizedUploadState'
-import { useConnectSelectedEntities } from '../hooks/useConnectSelectedEntities'
-import { useFileUpload } from '@contember/react-client'
-import { useFileEntitiesErrors } from '../hooks/useFileEntitiesErrors'
+import { useNormalizedUploadState } from './hooks/useNormalizedUploadState'
+import { useConnectSelectedEntities } from './hooks/useConnectSelectedEntities'
+import { FileHandler } from '../fileHandler'
+import { SelectFileInputSelectionComponentProps } from './selection'
 
 export interface BareFileRepeaterContainerPrivateProps {
-	fileKinds: ResolvedFileKinds
+	fileHandler: FileHandler
 	sortableBy?: SugaredFieldProps['field']
 }
 
@@ -35,13 +29,14 @@ export type BareFileRepeaterContainerProps =
 	& BareFileRepeaterContainerPublicProps
 	& BareFileRepeaterContainerPrivateProps
 	& RepeaterFieldContainerPrivateProps
+	& SelectFileInputSelectionComponentProps<{}>
 
 export const BareFileRepeaterContainer: FunctionComponent<BareFileRepeaterContainerProps> = ({
 	accessor,
 	entities,
 	isEmpty,
 	label,
-	fileKinds: unstableFileKinds,
+	fileHandler,
 	createNewEntity,
 	sortableBy,
 
@@ -53,14 +48,13 @@ export const BareFileRepeaterContainer: FunctionComponent<BareFileRepeaterContai
 }) => {
 	const isMutating = useMutationState()
 	const getEntityByKey = useGetEntityByKey()
-	const [fileKinds] = useState(() => unstableFileKinds)
 	const formatMessage = useMessageFormatter(uploadDictionary)
 
 	const fileUpload = useFileUpload()
 	const [, { purgeUpload }] = fileUpload
 	const { uploadState, dropzoneState } = useNormalizedUploadState({
 		isMultiple: true,
-		fileKinds,
+		fileHandler,
 		prepareEntityForNewFile: createNewEntity,
 		fileUpload,
 	})
@@ -72,42 +66,52 @@ export const BareFileRepeaterContainer: FunctionComponent<BareFileRepeaterContai
 		},
 		[getEntityByKey, purgeUpload],
 	)
-	const errors = [...useFileEntitiesErrors(entities, fileKinds), ...(useAccessorErrors(accessor) ?? [])]
+	const resolvedEntities = useMemo(() => {
+		return Object.values(entities).map(it => fileHandler.resolveEntity(it))
+	}, [entities, fileHandler])
+
+	const fileErrorsHolders = useMemo(() => {
+		return [accessor, ...resolvedEntities.flatMap(it => it.getErrorHolders())]
+	}, [accessor, resolvedEntities])
+	const errorFormatter = useAccessorErrorFormatter()
+	const errors = useMemo(() => {
+		return errorFormatter(fileErrorsHolders.flatMap(it => it.errors?.errors ?? []))
+	}, [errorFormatter, fileErrorsHolders])
+
 	const previews: ReactNode[] = []
-	for (const [i, entity] of entities.entries()) {
-		const entityUploadState = uploadState.get(entity.key)
+	for (const [i, entity] of resolvedEntities.entries()) {
+		const fileKey = entity.parentEntity.key
+		const entityUploadState = uploadState.get(fileKey)
 		const preview = (
 			<SingleFilePreview
-				containingEntity={entity}
-				fileId={entity.key}
+				resolvedEntity={entity}
+				fileId={fileKey}
 				formatMessage={formatMessage}
 				removeFile={normalizedRemoveFile}
 				uploadState={entityUploadState}
-				fileKinds={fileKinds}
 			/>
 		)
 
 		if (sortableBy === undefined) {
 			previews.push(
-				<div key={entity.id ?? entity.key} className="fileInput-preview">
+				<div key={entity.parentEntity.id} className="fileInput-preview">
 					{preview}
 				</div>,
 			)
 		} else {
 			previews.push(
-				<SortableRepeaterItem index={i} key={entity.id ?? entity.key} disabled={isMutating}>
+				<SortableRepeaterItem index={i} key={entity.parentEntity.id} disabled={isMutating}>
 					<div className="fileInput-preview view-sortable">{preview}</div>
 				</SortableRepeaterItem>,
 			)
 		}
 	}
 
-	const onSelectConfirm = useConnectSelectedEntities(fileKinds, createNewEntity)
+	const onSelectConfirm = useConnectSelectedEntities(createNewEntity)
 
 	return (
 		<FileInput
 			{...fileInputProps}
-			fileKinds={fileKinds}
 			isMultiple={true}
 			label={label}
 			dropzoneState={dropzoneState}

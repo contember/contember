@@ -1,24 +1,21 @@
-import { BindingError, Entity, EntityAccessor } from '@contember/binding'
+import { BindingError, Entity } from '@contember/binding'
 import type { FileId, SingleFileUploadState } from '@contember/react-client'
 import { ActionableBox, Box, toEnumViewClass } from '@contember/ui'
 import { memo, ReactElement, useMemo } from 'react'
 import type { MessageFormatter } from '../../../../../i18n'
-import type { FullFileKind } from '../../interfaces'
-import type { ResolvedFileKinds } from '../../ResolvedFileKinds'
 import type { UploadDictionary } from '../../uploadDictionary'
-import { getEntityFileKind, hasUploadedFile } from '../../utils'
 import { ErrorFilePreview } from './ErrorFilePreview'
 import { InitializedFilePreview } from './InitializedFilePreview'
 import { InitializingFilePreview } from './InitializingFilePreview'
 import { UploadedFilePreview } from './UploadedFilePreview'
+import { ResolvedFileEntity } from '../../fileHandler'
 
 export interface SingleFilePreviewProps {
-	containingEntity: EntityAccessor
+	resolvedEntity: ResolvedFileEntity
 	fileId: FileId
 	formatMessage: MessageFormatter<UploadDictionary>
 	removeFile: ((fileId: FileId) => void) | undefined
 	uploadState: SingleFileUploadState | undefined
-	fileKinds: ResolvedFileKinds
 }
 
 const viewFromMimeTypeRegExp = new RegExp(/^(\w+).*/)
@@ -30,8 +27,7 @@ function viewFromMimeType(mimeType: string | string[] | undefined | null) {
 }
 
 export const SingleFilePreview = memo(
-	({ fileId, fileKinds, formatMessage, containingEntity, removeFile, uploadState }: SingleFilePreviewProps) => {
-		let fileKind: FullFileKind | undefined
+	({ fileId, resolvedEntity, formatMessage, removeFile, uploadState }: SingleFilePreviewProps) => {
 		let preview: ReactElement | null = null
 
 		const onRemove = useMemo(() => {
@@ -43,54 +39,45 @@ export const SingleFilePreview = memo(
 			}
 		}, [fileId, removeFile])
 
-		if (fileKinds.isDiscriminated && fileKinds.baseEntity !== undefined) {
-			containingEntity = containingEntity.getEntity(fileKinds.baseEntity)
-		}
 
 		if (uploadState !== undefined) {
 			if (uploadState.readyState === 'initializing') {
 				return <InitializingFilePreview formatMessage={formatMessage} />
 			}
-			fileKind = getEntityFileKind(fileKinds, containingEntity)
-
-			if (uploadState.readyState === 'error' && fileKind === undefined) {
-				fileKind = undefined
+			if (uploadState.readyState === 'error' && resolvedEntity.fileKind === undefined) {
 				preview = <ErrorFilePreview uploadState={uploadState} formatMessage={formatMessage} />
 			} else {
-				if (fileKind === undefined) {
+				if (resolvedEntity.fileKind === undefined) {
 					throw new BindingError()
 				}
 				preview = (
 					<InitializedFilePreview
-						fileKind={fileKind}
+						fileKind={resolvedEntity.fileKind}
 						formatMessage={formatMessage}
-						getContainingEntity={containingEntity.getAccessor}
+						resolvedEntity={resolvedEntity}
 						uploadState={uploadState}
 					/>
 				)
 			}
-		} else if (hasUploadedFile(fileKinds, containingEntity)) {
-			fileKind = getEntityFileKind(fileKinds, containingEntity)
-
-			if (fileKind === undefined) {
-				throw new BindingError()
-			}
-			preview = <UploadedFilePreview fileKind={fileKind} />
+		} else if (!resolvedEntity.isEmpty) {
+			preview = <UploadedFilePreview fileKind={resolvedEntity.fileKind} />
 		} else {
 			return null
 		}
-		const editContents = fileKind && fileKind.children ? <Box>{fileKind.children}</Box> : undefined
-		const containingEntityWithBase = !fileKind || fileKind.baseEntity === undefined
-			? containingEntity
-			: containingEntity.getEntity(fileKind.baseEntity)
+		const editContents = resolvedEntity.fileKind && resolvedEntity.fileKind.children ? <Box>{resolvedEntity.fileKind.children}</Box> : undefined
 
-		return (
-			<Entity accessor={containingEntityWithBase}>
-				<ActionableBox className={toEnumViewClass(viewFromMimeType(fileKind?.acceptMimeTypes))} onRemove={onRemove} editContents={editContents}>
-					{preview}
-				</ActionableBox>
-			</Entity>
+		const box = (
+			<ActionableBox className={toEnumViewClass(viewFromMimeType(resolvedEntity.fileKind?.acceptMimeTypes))} onRemove={onRemove} editContents={editContents}>
+				{preview}
+			</ActionableBox>
 		)
+		return resolvedEntity.fileEntity
+			? (
+				<Entity accessor={resolvedEntity.fileEntity}>
+					{box}
+				</Entity>
+			)
+			: box
 	},
 )
 SingleFilePreview.displayName = 'SingleFilePreview'

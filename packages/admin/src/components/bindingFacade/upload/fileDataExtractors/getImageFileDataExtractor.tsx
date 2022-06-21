@@ -1,6 +1,6 @@
 import type { SugaredFieldProps } from '@contember/binding'
 import { SugaredField } from '@contember/binding'
-import type { FileDataExtractor } from '../interfaces'
+import { FileDataExtractor } from './FileDataExtractor'
 
 export interface ImageFileDataExtractorProps {
 	widthField?: SugaredFieldProps['field']

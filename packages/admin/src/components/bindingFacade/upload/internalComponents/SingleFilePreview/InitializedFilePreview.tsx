@@ -1,14 +1,15 @@
-import type { EntityAccessor } from '@contember/binding'
+import { BindingError } from '@contember/binding'
 import type { SingleFileUploadState } from '@contember/react-client'
 import { ErrorList, FilePreview, Message, UploadProgress } from '@contember/ui'
 import { ReactNode, useEffect, useRef, useState } from 'react'
 import type { MessageFormatter } from '../../../../../i18n'
-import type { FullFileKind } from '../../interfaces'
 import type { UploadDictionary } from '../../uploadDictionary'
+import { ResolvedFileEntity } from '../../fileHandler'
+import { FullFileKind } from '../../fileKinds'
 
 export interface InitializedFilePreviewProps {
 	fileKind: FullFileKind
-	getContainingEntity: EntityAccessor.GetEntityAccessor
+	resolvedEntity: ResolvedFileEntity
 	formatMessage: MessageFormatter<UploadDictionary>
 	uploadState: SingleFileUploadState & { readyState: 'uploading' | 'success' | 'error' | 'aborted' }
 }
@@ -24,7 +25,7 @@ type ExtractionState =
 
 export function InitializedFilePreview({
 	fileKind,
-	getContainingEntity,
+	resolvedEntity,
 	formatMessage,
 	uploadState,
 }: InitializedFilePreviewProps) {
@@ -68,12 +69,11 @@ export function InitializedFilePreview({
 		if (uploadState.readyState !== 'success' || extractionState.name !== 'success') {
 			return
 		}
+		if (!resolvedEntity.fileEntity) {
+			throw new BindingError()
+		}
 
-		getContainingEntity().batchUpdates(getEntity => {
-			if (fileKind.baseEntity) {
-				getEntity = getEntity().getEntity(fileKind.baseEntity).getAccessor
-			}
-
+		resolvedEntity.fileEntity.batchUpdates(getEntity => {
 			for (let i = 0; i < fileKind.extractors.length; i++) {
 				const extractor = fileKind.extractors[i]
 				const extractedData = extractionState.data[i]
@@ -88,7 +88,7 @@ export function InitializedFilePreview({
 				})
 			}
 		})
-	}, [extractionState, fileKind.baseEntity, fileKind.extractors, getContainingEntity, uploadState])
+	}, [extractionState, fileKind.baseEntity, fileKind.extractors, resolvedEntity.fileEntity, uploadState])
 
 	useEffect(
 		() => () => {

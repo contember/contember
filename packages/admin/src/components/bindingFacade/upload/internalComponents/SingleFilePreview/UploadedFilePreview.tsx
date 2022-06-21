@@ -1,5 +1,5 @@
 import { FilePreview } from '@contember/ui'
-import type { FullFileKind } from '../../interfaces'
+import { FullFileKind } from '../../fileKinds'
 
 export interface UploadedFilePreviewProps {
 	fileKind: FullFileKind

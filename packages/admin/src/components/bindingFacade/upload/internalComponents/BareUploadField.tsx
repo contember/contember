@@ -1,96 +1,92 @@
-import {
-	Component,
-	EntityAccessor,
-	HasOne,
-	QueryLanguage,
-	SugaredField,
-	useEntity,
-	useEnvironment,
-} from '@contember/binding'
-import { Fragment, useCallback, useMemo, useState } from 'react'
+import { Component, EntityAccessor, useEntity } from '@contember/binding'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useMessageFormatter } from '../../../../i18n'
-import type { ResolvedFileKinds } from '../ResolvedFileKinds'
 import { uploadDictionary } from '../uploadDictionary'
-import { hasUploadedFile, staticRenderFileKind } from '../utils'
 import type { FileInputPublicProps } from './FileInput'
 import { FileInput } from './FileInput'
 import { SingleFilePreview } from './SingleFilePreview'
-import { useNormalizedUploadState } from '../hooks/useNormalizedUploadState'
-import { useConnectSelectedEntities } from '../hooks/useConnectSelectedEntities'
-import { FileId, useFileUpload } from '@contember/react-client'
-import { useRemoveUploadedFile } from '../hooks/useRemoveUploadedFile'
-import { useFileEntitiesErrors } from '../hooks/useFileEntitiesErrors'
+import { useNormalizedUploadState } from './hooks/useNormalizedUploadState'
+import { useConnectSelectedEntities } from './hooks/useConnectSelectedEntities'
+import { useFileUpload } from '@contember/react-client'
+import { FileHandler } from '../fileHandler'
+import { useAccessorErrorFormatter } from '../../errors'
+import { ResolvedFileSelectionComponent } from './selection'
 
 export type BareUploadFieldProps =
 	& FileInputPublicProps
 	& {
-		fileKinds: ResolvedFileKinds
+		fileHandler: FileHandler
+		fileSelection?: ResolvedFileSelectionComponent<any>
 	}
 
 export const BareUploadField = Component<BareUploadFieldProps>(
-	({ fileKinds: unstableFileKinds, ...fileInputProps }) => {
+	({ fileHandler,  ...fileInputProps }) => {
 		const parentEntity = useEntity()
-		const [fileKinds] = useState(() => unstableFileKinds)
 		const formatMessage = useMessageFormatter(uploadDictionary)
+
+		if (import.meta.env.DEV) {
+			useEffect(() => {
+				if (!fileHandler.hasBaseEntity) {
+					console.warn('To support all features like file removal, "baseEntity" prop should be set on a upload field component.')
+				}
+			}, [fileHandler.hasBaseEntity])
+		}
 
 		const fileUpload = useFileUpload()
 		const [, { purgeUpload }] = fileUpload
-		const removeUploadedFile = useRemoveUploadedFile(fileKinds)
-		const environment = useEnvironment()
-		const removeFile = useCallback((fileId: FileId) => {
-			purgeUpload([fileId])
-			const baseEntity = fileKinds.isDiscriminated ? fileKinds.baseEntity : fileKinds.fileKind.baseEntity
-			if (baseEntity) {
-				const desugaredBase = QueryLanguage.desugarRelativeSingleEntity(baseEntity, environment)
-				parentEntity.disconnectEntityAtField(desugaredBase.hasOneRelationPath[0].field)
-			} else {
-				removeUploadedFile(fileId)
+		const resolvedEntity = useMemo(() => fileHandler.resolveEntity(parentEntity), [fileHandler, parentEntity])
+
+		const destroyFile = useMemo(() => {
+			if (!resolvedEntity.isEmpty && !resolvedEntity.destroy) {
+				return undefined
 			}
-		}, [fileKinds, parentEntity, purgeUpload, removeUploadedFile, environment])
+			return () => {
+				purgeUpload([parentEntity.key])
+				resolvedEntity.destroy?.()
+			}
+		}, [parentEntity.key, purgeUpload, resolvedEntity])
 
 		const prepareEntityForNewFile = useCallback<(initialize: EntityAccessor.BatchUpdatesHandler) => void>(
 			initialize => {
-				removeFile(parentEntity.key)
+				destroyFile?.()
 				parentEntity.batchUpdates(initialize)
 			},
-			[parentEntity, removeFile],
+			[parentEntity, destroyFile],
 		)
 		const { uploadState, dropzoneState } = useNormalizedUploadState({
 			isMultiple: false,
-			fileKinds,
+			fileHandler,
 			prepareEntityForNewFile,
 			fileUpload,
 		})
 
 		const fileUploadState = uploadState.get(parentEntity.key)
-		const parentWithBase =
-			fileKinds.isDiscriminated && fileKinds.baseEntity !== undefined
-				? parentEntity.getEntity(fileKinds.baseEntity)
-				: parentEntity
 
-		const errors = useFileEntitiesErrors(useMemo(() => [parentEntity], [parentEntity]), fileKinds)
+		const errorHolders = useMemo(() => resolvedEntity.getErrorHolders(), [resolvedEntity])
+		const errorFormatter = useAccessorErrorFormatter()
+		const errors = useMemo(() => {
+			return errorFormatter(errorHolders.flatMap(it => it.errors?.errors ?? []))
+		}, [errorFormatter, errorHolders])
 
-		const children = hasUploadedFile(fileKinds, parentWithBase) || fileUploadState !== undefined
+		const children = !resolvedEntity.isEmpty || fileUploadState !== undefined
 			? (
 				<div className="fileInput-preview">
 					<SingleFilePreview
-						containingEntity={parentEntity}
+						resolvedEntity={resolvedEntity}
 						fileId={parentEntity.key}
 						formatMessage={formatMessage}
-						removeFile={removeFile}
+						removeFile={destroyFile}
 						uploadState={uploadState.get(parentEntity.key)}
-						fileKinds={fileKinds}
 					/>
 				</div>
 			)
 			: undefined
 
-		const onSelectConfirm = useConnectSelectedEntities(fileKinds, prepareEntityForNewFile)
+		const onSelectConfirm = useConnectSelectedEntities(prepareEntityForNewFile)
 
 		return (
 			<FileInput
 				{...fileInputProps}
-				fileKinds={fileKinds}
 				isMultiple={false}
 				dropzoneState={dropzoneState}
 				formatMessage={formatMessage}
@@ -101,22 +97,7 @@ export const BareUploadField = Component<BareUploadFieldProps>(
 		)
 	},
 	(props, environment) => {
-		if (props.fileKinds.isDiscriminated) {
-			const children = (
-				<>
-					<SugaredField field={props.fileKinds.discriminationField} isNonbearing />
-					{Array.from(props.fileKinds.fileKinds.values(), (fileKind, i) => (
-						<Fragment key={i}>{staticRenderFileKind(fileKind.datum, environment)}</Fragment>
-					))}
-				</>
-			)
-			return props.fileKinds.baseEntity === undefined
-				? children
-				: (
-					<HasOne field={props.fileKinds.baseEntity}>{children}</HasOne>
-				)
-		}
-		return staticRenderFileKind(props.fileKinds.fileKind, environment)
+		return props.fileHandler.staticRender(environment)
 	},
 	'BareUploadField',
 )

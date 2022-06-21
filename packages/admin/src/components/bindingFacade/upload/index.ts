@@ -1,8 +1,15 @@
 export * from './fileDataExtractors'
-export * from './interfaces'
-export * from './stockFileKinds'
-export * from './FileKind'
+export type { AcceptFileKindErrorOptions, FileHandler, AcceptedFile, ResolvedFileEntity } from './fileHandler'
+export { AcceptFileKindError } from './fileHandler'
+export * from './fileKinds'
 export * from './wrappers'
-export type { SelectFormProps } from './internalComponents'
+export type {
+	FileSelectionProps,
+	PublicSingleKindFileRepeaterProps,
+	SelectFileInputSelectionComponentProps,
+	PublicSingleKindUploadFieldProps,
+	FileInputPublicProps,
+	SelectFileInputPublicProps,
+} from './internalComponents'
 
 export type { UploadDictionary } from './uploadDictionary'

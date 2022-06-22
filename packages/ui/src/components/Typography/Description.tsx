@@ -1,15 +1,17 @@
+import classNames from 'classnames'
 import { memo, ReactNode } from 'react'
 import { useClassNamePrefix } from '../../auxiliary'
 
 export interface DescriptionProps {
+  className?: string
   children: ReactNode
 }
 
 export const Description = memo(
-  ({ children }: DescriptionProps) => {
+  ({ className, children }: DescriptionProps) => {
     const prefix = useClassNamePrefix()
 
-    return <span className={`${prefix}description`}>{children}</span>
+    return <span className={classNames(`${prefix}description`, className)}>{children}</span>
   },
 )
 

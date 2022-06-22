@@ -14,11 +14,12 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - run: npm install -g pnpm
+      - run: npm install -g pnpm@6
       - run: pnpm install
       - run: pnpm run eslint:lint
       - run: pnpm run build
       - run: pnpm run test
+      - run: pnpm run ae:test
 
   playwright:
     runs-on: ubuntu-latest
@@ -60,7 +61,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - run: npm install -g pnpm
+      - run: npm install -g pnpm@6
       - run: pnpm install
       - run: pnpm run --recursive --parallel -- build:js:prod
       - run: cd packages/admin && pnpm run pw:build
@@ -96,7 +97,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - run: npm install -g pnpm
+      - run: npm install -g pnpm@6
       - run: pnpm install
       - run: pnpm run build
       - run: pnpm config set "//registry.npmjs.org/:_authToken" "$NPM_TOKEN"

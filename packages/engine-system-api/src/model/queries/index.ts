@@ -1,3 +1,3 @@
-export * from './migrations'
-export * from './events'
-export * from './stages'
+export * from './migrations/index.js'
+export * from './events/index.js'
+export * from './stages/index.js'

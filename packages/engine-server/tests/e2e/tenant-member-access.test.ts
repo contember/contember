@@ -1,7 +1,7 @@
 import { assert, test } from 'vitest'
 import { createSchema, SchemaDefinition as def } from '@contember/schema-definition'
-import { createTester, gql } from '../src/tester'
-import { addProjectMember, signIn, signUp } from '../src/requests'
+import { createTester, gql } from '../src/tester.js'
+import { addProjectMember, signIn, signUp } from '../src/requests.js'
 
 
 namespace TagModel {

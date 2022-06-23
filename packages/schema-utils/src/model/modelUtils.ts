@@ -1,4 +1,4 @@
-import { assertNever, isIt } from '../utils'
+import { assertNever, isIt } from '../utils/index.js'
 import { Model } from '@contember/schema'
 
 export enum ModelErrorCode {

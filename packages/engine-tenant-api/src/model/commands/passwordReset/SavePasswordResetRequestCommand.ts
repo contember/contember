@@ -1,7 +1,7 @@
-import { Command } from '../Command'
+import { Command } from '../Command.js'
 import { InsertBuilder } from '@contember/database'
-import { plusMinutes } from '../../utils/time'
-import { TokenHash } from '../../utils'
+import { plusMinutes } from '../../utils/time.js'
+import { TokenHash } from '../../utils/index.js'
 
 const PASSWORD_RESET_EXPIRATION = 60
 

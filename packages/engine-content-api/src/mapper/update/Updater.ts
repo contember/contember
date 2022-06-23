@@ -1,9 +1,9 @@
-import { SqlUpdateInputProcessor } from './SqlUpdateInputProcessor'
-import { UniqueWhereExpander, UpdateInputVisitor } from '../../inputProcessing'
+import { SqlUpdateInputProcessor } from './SqlUpdateInputProcessor.js'
+import { UniqueWhereExpander, UpdateInputVisitor } from '../../inputProcessing/index.js'
 import { Acl, Input, Model } from '@contember/schema'
-import { PredicateFactory } from '../../acl'
-import { UpdateBuilderFactory } from './UpdateBuilderFactory'
-import { Mapper } from '../Mapper'
+import { PredicateFactory } from '../../acl/index.js'
+import { UpdateBuilderFactory } from './UpdateBuilderFactory.js'
+import { Mapper } from '../Mapper.js'
 import { acceptEveryFieldVisitor } from '@contember/schema-utils'
 import { Client } from '@contember/database'
 import {
@@ -16,9 +16,9 @@ import {
 	NothingToDoReason,
 	ResultListNotFlatten,
 	RowValues,
-} from '../Result'
-import { UpdateBuilder } from './UpdateBuilder'
-import { rowDataToFieldValues } from '../ColumnValue'
+} from '../Result.js'
+import { UpdateBuilder } from './UpdateBuilder.js'
+import { rowDataToFieldValues } from '../ColumnValue.js'
 
 export class Updater {
 	constructor(

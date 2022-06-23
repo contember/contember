@@ -1,5 +1,5 @@
-import { PermissionFactory } from './PermissionFactory'
-import { arrayEquals } from '../utils'
+import { PermissionFactory } from './PermissionFactory.js'
+import { arrayEquals } from '../utils/index.js'
 import { Acl, Schema } from '@contember/schema'
 
 export class PermissionsByIdentityFactory {

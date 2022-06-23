@@ -1,2 +1,2 @@
-export * from './ExecutedMigration'
-export * from './Stage'
+export * from './ExecutedMigration.js'
+export * from './Stage.js'

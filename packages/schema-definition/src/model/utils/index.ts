@@ -1,1 +1,1 @@
-export * from './getColumnType'
+export * from './getColumnType.js'

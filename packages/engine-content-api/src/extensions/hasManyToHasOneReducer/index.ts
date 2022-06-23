@@ -1,3 +1,3 @@
-export * from './HasManyToHasOneReducer'
-export * from './HasManyToHasOneReducerExecutionHandler'
-export * from './HasManyToHasOneRelationReducerVisitor'
+export * from './HasManyToHasOneReducer.js'
+export * from './HasManyToHasOneReducerExecutionHandler.js'
+export * from './HasManyToHasOneRelationReducerVisitor.js'

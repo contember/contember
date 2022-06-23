@@ -1,4 +1,4 @@
-import { TenantConfig } from './config'
+import { TenantConfig } from './config.js'
 import {
 	createObjectParametersResolver,
 	Merger,
@@ -6,7 +6,7 @@ import {
 	resolveParameters,
 	UndefinedParameterError,
 } from '@contember/config-loader'
-import { tenantConfigSchema } from './configSchema'
+import { tenantConfigSchema } from './configSchema.js'
 
 export type TenantConfigResolver =  (slug: string | undefined, additionalConfig: any) => TenantConfig
 

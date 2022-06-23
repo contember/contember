@@ -1,9 +1,9 @@
 import { test } from 'vitest'
-import { execute } from '../../../../../src/test'
+import { execute } from '../../../../../src/test.js'
 import { SchemaBuilder } from '@contember/schema-definition'
 import { Model } from '@contember/schema'
-import { GQL, SQL } from '../../../../../src/tags'
-import { testUuid } from '../../../../../src/testUuid'
+import { GQL, SQL } from '../../../../../src/tags.js'
+import { testUuid } from '../../../../../src/testUuid.js'
 
 test('Post by author name (where many has one)', async () => {
 	await execute({

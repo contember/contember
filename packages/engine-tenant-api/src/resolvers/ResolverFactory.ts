@@ -16,14 +16,14 @@ import {
 	SignUpMutationResolver,
 	UpdateProjectMemberMutationResolver,
 	UpdateProjectMutationResolver,
-} from './mutation'
+} from './mutation/index.js'
 
-import { Resolvers } from '../schema'
-import { MeQueryResolver, ProjectMembersQueryResolver, ProjectQueryResolver } from './query'
-import { IdentityTypeResolver, ProjectTypeResolver } from './types'
+import { Resolvers } from '../schema/index.js'
+import { MeQueryResolver, ProjectMembersQueryResolver, ProjectQueryResolver } from './query/index.js'
+import { IdentityTypeResolver, ProjectTypeResolver } from './types/index.js'
 import { DateTimeType, JSONType } from '@contember/graphql-utils'
-import { IDPQueryResolver } from './query/IDPQueryResolver'
-import { UpdateIDPMutationResolver } from './mutation/idp/UpdateIDPMutationResolver'
+import { IDPQueryResolver } from './query/IDPQueryResolver.js'
+import { UpdateIDPMutationResolver } from './mutation/idp/UpdateIDPMutationResolver.js'
 
 class ResolverFactory {
 	public constructor(

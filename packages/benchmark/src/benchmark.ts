@@ -4,7 +4,7 @@ import { join } from 'path'
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore-line
 import autocannon from 'autocannon'
-import { createHttpOptions, graphqlRequest } from './http'
+import { createHttpOptions, graphqlRequest } from './http.js'
 
 const fileRead = promisify(readFile)
 const dirCreate = promisify(mkdir)

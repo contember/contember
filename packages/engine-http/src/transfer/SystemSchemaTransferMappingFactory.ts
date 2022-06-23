@@ -1,8 +1,8 @@
-import { TransferMapping, TransferTableMapping } from './TransferMapping'
+import { TransferMapping, TransferTableMapping } from './TransferMapping.js'
 import { Model } from '@contember/schema'
 import * as Typesafe from '@contember/typesafe'
 import { Compiler, Operator, wrapIdentifier } from '@contember/database'
-import { ImportError } from './ImportExecutor'
+import { ImportError } from './ImportExecutor.js'
 
 export class SystemSchemaTransferMappingFactory {
 	build(): TransferMapping {

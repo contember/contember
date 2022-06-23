@@ -1,3 +1,3 @@
-export * from './compose'
-export * from './router'
-export * from './types'
+export * from './compose.js'
+export * from './router.js'
+export * from './types.js'

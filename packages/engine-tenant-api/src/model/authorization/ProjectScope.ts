@@ -1,11 +1,11 @@
 import { AccessNode, AuthorizationScope } from '@contember/authorization'
-import { Project } from '../type'
-import { TenantRole } from './Roles'
+import { Project } from '../type/index.js'
+import { TenantRole } from './Roles.js'
 import { Acl, ProjectRole } from '@contember/schema'
-import { SwitchEvaluatorNode } from './SwitchEvaluatorNode'
-import { AclSchemaEvaluatorFactory } from './AclSchemaEvaluatorFactory'
-import { Identity } from './Identity'
-import { MembershipAwareAccessNode } from './MembershipAwareAccessNode'
+import { SwitchEvaluatorNode } from './SwitchEvaluatorNode.js'
+import { AclSchemaEvaluatorFactory } from './AclSchemaEvaluatorFactory.js'
+import { Identity } from './Identity.js'
+import { MembershipAwareAccessNode } from './MembershipAwareAccessNode.js'
 
 export class ProjectScope implements AuthorizationScope<Identity> {
 	constructor(

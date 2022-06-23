@@ -1,4 +1,4 @@
-import { resolveS3Endpoint, S3Config } from './Config'
+import { resolveS3Endpoint, S3Config } from './Config.js'
 import { Providers } from '@contember/engine-plugins'
 import qs from 'qs'
 import { BinaryLike, createHash, createHmac } from 'crypto'

@@ -1,6 +1,6 @@
-import { Command } from '../Command'
+import { Command } from '../Command.js'
 import { ConflictActionType, InsertBuilder } from '@contember/database'
-import { MailTemplate } from '../../mailing'
+import { MailTemplate } from '../../mailing/index.js'
 
 export class AddMailTemplateCommand implements Command<void> {
 	constructor(private mailTemplate: MailTemplate) {}

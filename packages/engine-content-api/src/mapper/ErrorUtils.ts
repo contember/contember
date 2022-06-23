@@ -7,9 +7,9 @@ import {
 	MutationResultHint,
 	MutationResultList,
 	MutationSqlError,
-} from './Result'
+} from './Result.js'
 import * as Database from '@contember/database'
-import { UniqueWhereError } from '../inputProcessing'
+import { UniqueWhereError } from '../inputProcessing/index.js'
 import { Model } from '@contember/schema'
 import { isOwningRelation, isRelation, NamingHelper } from '@contember/schema-utils'
 import RelationType = Model.RelationType

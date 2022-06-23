@@ -1,10 +1,10 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Model, Schema } from '@contember/schema'
-import { SchemaUpdater, updateEntity, updateField, updateModel } from '../utils/schemaUpdateUtils'
-import { ModificationHandlerStatic } from '../ModificationHandler'
+import { SchemaUpdater, updateEntity, updateField, updateModel } from '../utils/schemaUpdateUtils.js'
+import { ModificationHandlerStatic } from '../ModificationHandler.js'
 import { getEntity, tryGetColumnName } from '@contember/schema-utils'
-import { isIt } from '../../utils/isIt'
-import { updateRelations } from '../utils/diffUtils'
+import { isIt } from '../../utils/isIt.js'
+import { updateRelations } from '../utils/diffUtils.js'
 
 export const MakeRelationNullableModification: ModificationHandlerStatic<MakeRelationNullableModificationData> = class {
 	static id = 'makeRelationNullable'

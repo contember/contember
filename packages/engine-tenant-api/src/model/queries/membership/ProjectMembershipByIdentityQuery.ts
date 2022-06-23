@@ -1,6 +1,6 @@
 import { DatabaseQuery, DatabaseQueryable, SelectBuilder } from '@contember/database'
-import { byProjectSlug } from './ProjectSlugSpecification'
-import { Membership } from '../../type/Membership'
+import { byProjectSlug } from './ProjectSlugSpecification.js'
+import { Membership } from '../../type/Membership.js'
 
 class ProjectMembershipByIdentityQuery extends DatabaseQuery<ProjectMembershipByIdentityQuery.Result> {
 	constructor(private readonly project: { id: string } | { slug: string }, private readonly identityId: string[]) {

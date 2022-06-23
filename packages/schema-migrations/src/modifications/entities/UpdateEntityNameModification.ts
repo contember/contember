@@ -10,15 +10,15 @@ import {
 	updateEveryField,
 	updateModel,
 	updateSchema,
-} from '../utils/schemaUpdateUtils'
-import { ModificationHandler, ModificationHandlerOptions, ModificationHandlerStatic } from '../ModificationHandler'
-import { isIt } from '../../utils/isIt'
-import { VERSION_ACL_PATCH, VERSION_UPDATE_CONSTRAINT_NAME } from '../ModificationVersions'
+} from '../utils/schemaUpdateUtils.js'
+import { ModificationHandler, ModificationHandlerOptions, ModificationHandlerStatic } from '../ModificationHandler.js'
+import { isIt } from '../../utils/isIt.js'
+import { VERSION_ACL_PATCH, VERSION_UPDATE_CONSTRAINT_NAME } from '../ModificationVersions.js'
 import { NamingHelper } from '@contember/schema-utils'
-import { UpdateEntityTableNameModification } from './UpdateEntityTableNameModification'
-import { NoopModification } from '../NoopModification'
-import { renameConstraintSchemaUpdater, renameConstraintsSqlBuilder } from '../utils/renameConstraintsHelper'
-import { changeValue } from '../utils/valueUtils'
+import { UpdateEntityTableNameModification } from './UpdateEntityTableNameModification.js'
+import { NoopModification } from '../NoopModification.js'
+import { renameConstraintSchemaUpdater, renameConstraintsSqlBuilder } from '../utils/renameConstraintsHelper.js'
+import { changeValue } from '../utils/valueUtils.js'
 
 export const UpdateEntityNameModification: ModificationHandlerStatic<UpdateEntityNameModificationData> = class {
 	static id = 'updateEntityName'

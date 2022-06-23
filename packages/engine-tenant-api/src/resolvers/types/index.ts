@@ -1,2 +1,2 @@
-export * from './IdentityTypeResolver'
-export * from './ProjectTypeResolver'
+export * from './IdentityTypeResolver.js'
+export * from './ProjectTypeResolver.js'

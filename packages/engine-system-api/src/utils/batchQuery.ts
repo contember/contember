@@ -1,4 +1,4 @@
-import { waitForTick } from './tick'
+import { waitForTick } from './tick.js'
 
 export type ItemLoader<Arg, Item> = (args: Arg) => Promise<Item>
 

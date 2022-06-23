@@ -1,9 +1,9 @@
 import { Model } from '@contember/schema'
-import { FieldMap } from '../EntityFieldsProvider'
-import { PaginatedHasManyFieldProviderExtension } from './PaginatedHasManyFieldProvider'
-import { capitalizeFirstLetter } from '../../utils'
-import { PaginatedFieldConfigFactory } from '../../schema/PaginatedFieldConfigFactory'
-import { aliasAwareResolver } from '../../schema'
+import { FieldMap } from '../EntityFieldsProvider.js'
+import { PaginatedHasManyFieldProviderExtension } from './PaginatedHasManyFieldProvider.js'
+import { capitalizeFirstLetter } from '../../utils/index.js'
+import { PaginatedFieldConfigFactory } from '../../schema/PaginatedFieldConfigFactory.js'
+import { aliasAwareResolver } from '../../schema/index.js'
 
 export class PaginatedHasManyFieldProviderVisitor implements
 	Model.ColumnVisitor<FieldMap<PaginatedHasManyFieldProviderExtension>>,

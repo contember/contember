@@ -1,7 +1,7 @@
-import { SetProjectSecretCommand, UpdateProjectCommand } from '../commands'
-import { Providers } from '../providers'
-import { ProjectSecretsQuery } from '../queries'
-import { DatabaseContext } from '../utils'
+import { SetProjectSecretCommand, UpdateProjectCommand } from '../commands/index.js'
+import { Providers } from '../providers.js'
+import { ProjectSecretsQuery } from '../queries/index.js'
+import { DatabaseContext } from '../utils/index.js'
 
 export class SecretsManager {
 	constructor(private providers: Providers) {}

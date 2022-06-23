@@ -1,6 +1,6 @@
 import { Model } from '@contember/schema'
-import { DecoratorFunction, EntityConstructor, FieldsDefinition } from './types'
-import { EntityRegistry } from './internal'
+import { DecoratorFunction, EntityConstructor, FieldsDefinition } from './types.js'
+import { EntityRegistry } from './internal/index.js'
 
 interface EntityExtensionArgs {
 	entity: Model.Entity

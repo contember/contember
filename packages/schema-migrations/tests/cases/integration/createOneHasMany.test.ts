@@ -1,7 +1,7 @@
-import { testMigrations } from '../../src/tests'
+import { testMigrations } from '../../src/tests.js'
 import { SchemaBuilder } from '@contember/schema-definition'
 import { Model } from '@contember/schema'
-import { SQL } from '../../src/tags'
+import { SQL } from '../../src/tags.js'
 
 testMigrations('create one has many relation (post with locales)', {
 	originalSchema: new SchemaBuilder().entity('Post', e => e).buildSchema(),

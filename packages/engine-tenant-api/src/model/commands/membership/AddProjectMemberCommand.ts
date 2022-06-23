@@ -1,8 +1,8 @@
-import { Command } from '../Command'
-import { CreateOrUpdateProjectMembershipCommand } from './CreateOrUpdateProjectMembershipCommand'
-import { Response, ResponseError, ResponseOk } from '../../utils/Response'
+import { Command } from '../Command.js'
+import { CreateOrUpdateProjectMembershipCommand } from './CreateOrUpdateProjectMembershipCommand.js'
+import { Response, ResponseError, ResponseOk } from '../../utils/Response.js'
 import { SelectBuilder } from '@contember/database'
-import { MembershipInput } from './types'
+import { MembershipInput } from './types.js'
 
 type CommandResponse = Response<undefined, AddProjectMemberCommandError>
 

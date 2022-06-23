@@ -1,7 +1,7 @@
-import { DeleteBuilder, InsertBuilder, SelectBuilder, UpdateBuilder } from '../builders'
-import { DatabaseQueryable } from '../queryable'
-import { Connection } from './Connection'
-import { EventManager } from './EventManager'
+import { DeleteBuilder, InsertBuilder, SelectBuilder, UpdateBuilder } from '../builders/index.js'
+import { DatabaseQueryable } from '../queryable/index.js'
+import { Connection } from './Connection.js'
+import { EventManager } from './EventManager.js'
 import { QueryHandler } from '@contember/queryable'
 
 class Client<ConnectionType extends Connection.ConnectionLike = Connection.ConnectionLike> implements Connection.Queryable {

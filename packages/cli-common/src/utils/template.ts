@@ -1,9 +1,9 @@
 import { isAbsolute, join } from 'path'
-import { pathExists, replaceFileContent } from './fs'
+import { pathExists, replaceFileContent } from './fs.js'
 import fsExtra from 'fs-extra'
-import { downloadPackage } from './npm'
-import { resourcesDir } from '../pathUtils'
-import { readYaml } from './yaml'
+import { downloadPackage } from './npm.js'
+import { resourcesDir } from '../pathUtils.js'
+import { readYaml } from './yaml.js'
 
 const localTemplates: Record<string, string> = {
 	['@contember/template-workspace']: join(resourcesDir, 'templates/template-workspace'),

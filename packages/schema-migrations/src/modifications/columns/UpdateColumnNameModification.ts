@@ -1,8 +1,8 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Model, Schema } from '@contember/schema'
-import { SchemaUpdater, updateEntity, updateField, updateModel } from '../utils/schemaUpdateUtils'
-import { ModificationHandlerStatic } from '../ModificationHandler'
-import { updateColumns } from '../utils/diffUtils'
+import { SchemaUpdater, updateEntity, updateField, updateModel } from '../utils/schemaUpdateUtils.js'
+import { ModificationHandlerStatic } from '../ModificationHandler.js'
+import { updateColumns } from '../utils/diffUtils.js'
 import { acceptFieldVisitor } from '@contember/schema-utils'
 
 export const UpdateColumnNameModification: ModificationHandlerStatic<UpdateColumnNameModificationData> = class {

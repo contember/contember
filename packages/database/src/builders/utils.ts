@@ -1,8 +1,8 @@
-import { Literal } from '../Literal'
-import { Value } from '../types'
-import { QueryBuilder } from './QueryBuilder'
-import { ColumnExpressionFactory } from './ColumnExpressionFactory'
-import { toFqnWrap } from './formatUtils'
+import { Literal } from '../Literal.js'
+import { Value } from '../types.js'
+import { QueryBuilder } from './QueryBuilder.js'
+import { ColumnExpressionFactory } from './ColumnExpressionFactory.js'
+import { toFqnWrap } from './formatUtils.js'
 
 export { toFqnWrap }
 

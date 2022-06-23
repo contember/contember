@@ -1,7 +1,7 @@
-import { singletonFactory } from '../../utils'
+import { singletonFactory } from '../../utils/index.js'
 import { GraphQLInputObjectType } from 'graphql'
 import { acceptFieldVisitor } from '@contember/schema-utils'
-import { UpdateEntityRelationInputFieldVisitor } from './UpdateEntityRelationInputFieldVisitor'
+import { UpdateEntityRelationInputFieldVisitor } from './UpdateEntityRelationInputFieldVisitor.js'
 import { Model } from '@contember/schema'
 
 export class UpdateEntityRelationInputProvider {

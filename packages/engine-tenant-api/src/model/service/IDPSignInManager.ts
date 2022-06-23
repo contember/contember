@@ -1,13 +1,13 @@
-import { ApiKeyManager } from './apiKey'
-import { IdentityProviderBySlugQuery, PersonQuery, PersonRow } from '../queries'
-import { IDPClaim, IDPHandlerRegistry, IDPResponse, IDPResponseError, IDPValidationError } from './idp'
-import { Response, ResponseError, ResponseOk } from '../utils/Response'
-import { InitSignInIdpErrorCode, SignInIdpErrorCode } from '../../schema'
-import { DatabaseContext } from '../utils'
-import { CreateIdentityCommand, CreatePersonCommand } from '../commands'
-import { TenantRole } from '../authorization'
-import { ImplementationException } from '../../exceptions'
-import { NoPassword } from '../dtos'
+import { ApiKeyManager } from './apiKey/index.js'
+import { IdentityProviderBySlugQuery, PersonQuery, PersonRow } from '../queries/index.js'
+import { IDPClaim, IDPHandlerRegistry, IDPResponse, IDPResponseError, IDPValidationError } from './idp/index.js'
+import { Response, ResponseError, ResponseOk } from '../utils/Response.js'
+import { InitSignInIdpErrorCode, SignInIdpErrorCode } from '../../schema/index.js'
+import { DatabaseContext } from '../utils/index.js'
+import { CreateIdentityCommand, CreatePersonCommand } from '../commands/index.js'
+import { TenantRole } from '../authorization/index.js'
+import { ImplementationException } from '../../exceptions.js'
+import { NoPassword } from '../dtos/index.js'
 
 class IDPSignInManager {
 	constructor(

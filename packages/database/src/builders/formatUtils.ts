@@ -1,5 +1,5 @@
-import { QueryBuilder } from './QueryBuilder'
-import { wrapIdentifier } from '../utils'
+import { QueryBuilder } from './QueryBuilder.js'
+import { wrapIdentifier } from '../utils/index.js'
 
 export function toFqn(columnName: QueryBuilder.ColumnIdentifier): string {
 	if (typeof columnName === 'string') {

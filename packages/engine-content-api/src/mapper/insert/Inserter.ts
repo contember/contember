@@ -6,18 +6,18 @@ import {
 	MutationResultList,
 	NothingToDoReason,
 	RowValues,
-} from '../Result'
-import { CreateInputVisitor } from '../../inputProcessing'
-import { SqlCreateInputProcessor } from './SqlCreateInputProcessor'
-import { Mapper } from '../Mapper'
+} from '../Result.js'
+import { CreateInputVisitor } from '../../inputProcessing/index.js'
+import { SqlCreateInputProcessor } from './SqlCreateInputProcessor.js'
+import { Mapper } from '../Mapper.js'
 import { Acl, Input, Model, Value } from '@contember/schema'
 import { acceptEveryFieldVisitor, Providers } from '@contember/schema-utils'
-import { PredicateFactory } from '../../acl'
-import { InsertBuilderFactory } from './InsertBuilderFactory'
+import { PredicateFactory } from '../../acl/index.js'
+import { InsertBuilderFactory } from './InsertBuilderFactory.js'
 import { Client } from '@contember/database'
-import { InsertBuilder } from './InsertBuilder'
-import { tryMutation } from '../ErrorUtils'
-import { rowDataToFieldValues } from '../ColumnValue'
+import { InsertBuilder } from './InsertBuilder.js'
+import { tryMutation } from '../ErrorUtils.js'
+import { rowDataToFieldValues } from '../ColumnValue.js'
 
 export class Inserter {
 	constructor(

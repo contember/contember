@@ -1,5 +1,5 @@
 import { MigrationBuilder } from '@contember/database-migrations'
-import { SystemMigrationArgs } from './types'
+import { SystemMigrationArgs } from './types.js'
 
 export default async function (builder: MigrationBuilder, args: SystemMigrationArgs) {
 	builder.createTable(

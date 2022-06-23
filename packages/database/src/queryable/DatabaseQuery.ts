@@ -1,6 +1,6 @@
 import { Query } from '@contember/queryable'
-import { DatabaseQueryable } from '../'
-import { ImplementationException } from '../exceptions'
+import { DatabaseQueryable } from '..//index.js'
+import { ImplementationException } from '../exceptions.js'
 
 export abstract class DatabaseQuery<T> implements Query<DatabaseQueryable, T> {
 	abstract fetch(queryable: DatabaseQueryable): Promise<T>

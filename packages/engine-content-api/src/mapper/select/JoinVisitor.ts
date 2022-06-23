@@ -1,5 +1,5 @@
 import { Model } from '@contember/schema'
-import { Path } from './Path'
+import { Path } from './Path.js'
 
 export class JoinVisitor implements Model.RelationByTypeVisitor<JoinDefinition[]> {
 	constructor(private readonly path: Path) {}

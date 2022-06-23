@@ -1,6 +1,6 @@
 import { CryptoWrapper, HttpError, ProjectGroupContainer } from '@contember/engine-http'
 import { Request } from 'koa'
-import { ProjectGroupContainerResolver } from './ProjectGroupContainerResolver'
+import { ProjectGroupContainerResolver } from './ProjectGroupContainerResolver.js'
 
 export class ProjectGroupResolver {
 	private groupRegex = (

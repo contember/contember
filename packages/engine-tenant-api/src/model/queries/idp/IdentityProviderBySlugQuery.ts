@@ -1,6 +1,6 @@
 import { DatabaseQuery, DatabaseQueryable } from '@contember/database'
-import { createBaseIdpQuery } from './helpers'
-import { IdentityProviderRow } from './types'
+import { createBaseIdpQuery } from './helpers.js'
+import { IdentityProviderRow } from './types.js'
 
 export class IdentityProviderBySlugQuery extends DatabaseQuery<IdentityProviderRow | null> {
 	constructor(private readonly slug: string) {

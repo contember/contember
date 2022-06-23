@@ -1,6 +1,6 @@
 import { unnamedIdentity } from '@contember/engine-system-api'
 import { CreateEvent, DeleteEvent, UpdateEvent } from '@contember/engine-common'
-import { testUuid } from './testUuid'
+import { testUuid } from './testUuid.js'
 
 export const createCreateEvent = (rowId: string, tableName: string, values: { [column: string]: any }) =>
 	new CreateEvent(testUuid(1), new Date(), new Date(), unnamedIdentity, testUuid(2), [rowId], tableName, values)

@@ -1,5 +1,5 @@
 import * as path from 'path'
-import { Workspace } from './Workspace'
+import { Workspace } from './Workspace.js'
 
 export class Project {
 	constructor(

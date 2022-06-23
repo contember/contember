@@ -7,25 +7,25 @@ import {
 	SchemaValidator,
 	ValidationError,
 } from '@contember/schema-utils'
-import { SchemaMigrator } from './SchemaMigrator'
-import { Migration } from './Migration'
-import { ImplementationException } from './exceptions'
-import { VERSION_LATEST } from './modifications/ModificationVersions'
-import { CreateUniqueConstraintModification, RemoveUniqueConstraintModification } from './modifications/constraints'
-import { RemoveFieldModification } from './modifications/fields'
+import { SchemaMigrator } from './SchemaMigrator.js'
+import { Migration } from './Migration.js'
+import { ImplementationException } from './exceptions.js'
+import { VERSION_LATEST } from './modifications/ModificationVersions.js'
+import { CreateUniqueConstraintModification, RemoveUniqueConstraintModification } from './modifications/constraints/index.js'
+import { RemoveFieldModification } from './modifications/fields/index.js'
 import {
 	CreateEntityModification,
 	CreateViewModification,
 	RemoveEntityModification,
 	ToggleEventLogModification,
 	UpdateEntityTableNameModification,
-} from './modifications/entities'
-import { CreateEnumModification, RemoveEnumModification, UpdateEnumModification } from './modifications/enums'
+} from './modifications/entities/index.js'
+import { CreateEnumModification, RemoveEnumModification, UpdateEnumModification } from './modifications/enums/index.js'
 import {
 	CreateColumnModification,
 	UpdateColumnDefinitionModification,
 	UpdateColumnNameModification,
-} from './modifications/columns'
+} from './modifications/columns/index.js'
 import {
 	ConvertOneHasManyToManyHasManyRelationModification,
 	ConvertOneToManyRelationModification,
@@ -38,12 +38,12 @@ import {
 	ToggleJunctionEventLogModification,
 	UpdateRelationOnDeleteModification,
 	UpdateRelationOrderByModification,
-} from './modifications/relations'
-import { PatchAclSchemaModification, UpdateAclSchemaModification } from './modifications/acl'
-import { PatchValidationSchemaModification, UpdateValidationSchemaModification } from './modifications/validation'
-import { CreateDiff, Differ } from './modifications/ModificationHandler'
-import { isDefined } from './utils/isDefined'
-import { ChangeViewNonViewDiffer, RemoveChangedFieldDiffer, RemoveChangedViewDiffer } from './modifications/differs'
+} from './modifications/relations/index.js'
+import { PatchAclSchemaModification, UpdateAclSchemaModification } from './modifications/acl/index.js'
+import { PatchValidationSchemaModification, UpdateValidationSchemaModification } from './modifications/validation/index.js'
+import { CreateDiff, Differ } from './modifications/ModificationHandler.js'
+import { isDefined } from './utils/isDefined.js'
+import { ChangeViewNonViewDiffer, RemoveChangedFieldDiffer, RemoveChangedViewDiffer } from './modifications/differs/index.js'
 
 export class SchemaDiffer {
 	constructor(private readonly schemaMigrator: SchemaMigrator) {}

@@ -1,9 +1,9 @@
-import { CreateInputProcessor } from '../../inputProcessing'
-import * as Context from '../../inputProcessing'
+import { CreateInputProcessor } from '../../inputProcessing/index.js'
+import * as Context from '../../inputProcessing/index.js'
 import { Input, Model } from '@contember/schema'
-import { appendRelationToPath, ValidationPath } from '../ValidationPath'
-import { Mapper } from '../../mapper'
-import { InputPreValidator } from './InputPreValidator'
+import { appendRelationToPath, ValidationPath } from '../ValidationPath.js'
+import { Mapper } from '../../mapper/index.js'
+import { InputPreValidator } from './InputPreValidator.js'
 
 type Result = any
 const NoResult = () => Promise.resolve([])

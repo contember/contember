@@ -1,4 +1,4 @@
-import { VariableInjector } from '../../../src/acl'
+import { VariableInjector } from '../../../src/acl/index.js'
 import { SchemaBuilder } from '@contember/schema-definition'
 import { Acl, Model } from '@contember/schema'
 import { assert, describe, it } from 'vitest'

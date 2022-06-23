@@ -1,5 +1,5 @@
 import { pathExists, formatWorkspaceConfigPath, Workspace } from '@contember/cli-common'
-import { updateYaml } from './yaml'
+import { updateYaml } from './yaml.js'
 
 export const updateWorkspaceApiVersion = async (workspace: Workspace, newVersion: string): Promise<string | null> => {
 	const possiblePaths = formatWorkspaceConfigPath(workspace.directory)

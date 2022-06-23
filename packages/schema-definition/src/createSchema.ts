@@ -1,6 +1,6 @@
-import { SchemaDefinition } from './model'
-import * as InputValidation from './validation'
-import * as AclDefinition from './acl/definition'
+import { SchemaDefinition } from './model/index.js'
+import * as InputValidation from './validation/index.js'
+import * as AclDefinition from './acl/definition/index.js'
 import { Schema } from '@contember/schema'
 
 export const createSchema = (definitions: Record<string, any>, modifyCallback?: (schema: Schema) => Schema): Schema => {

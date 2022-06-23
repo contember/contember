@@ -1,6 +1,6 @@
 export { SchemaMigrator, MigrationsResolver } from '@contember/schema-migrations'
 
-export { typeDefs, devTypeDefs, Schema } from './schema'
+export { typeDefs, devTypeDefs, Schema } from './schema/index.js'
 
 export {
 	DatabaseContext,
@@ -19,9 +19,9 @@ export {
 	StagesQuery,
 	unnamedIdentity,
 	VersionedSchema,
-} from './model'
-export * from './SystemContainer'
-export * from './resolvers'
-export * from './types'
-export * from './utils'
-export * from './migrations'
+} from './model/index.js'
+export * from './SystemContainer.js'
+export * from './resolvers/index.js'
+export * from './types.js'
+export * from './utils/index.js'
+export * from './migrations/index.js'

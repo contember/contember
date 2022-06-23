@@ -1,4 +1,4 @@
-import { FieldNode } from './FieldNode'
+import { FieldNode } from './FieldNode.js'
 
 export class ObjectNode<Args = any, Extensions extends Record<string, any> = Record<string, any>> {
 	constructor(

@@ -1,4 +1,4 @@
-import Value from './value'
+import Value from './value.js'
 
 namespace Result {
 	export type MutationFieldResult = CreateResult | UpdateResult | DeleteResult | UpsertResult

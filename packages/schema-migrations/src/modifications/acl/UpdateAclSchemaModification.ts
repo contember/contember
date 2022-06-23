@@ -1,10 +1,10 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Acl, Schema } from '@contember/schema'
-import { SchemaUpdater } from '../utils/schemaUpdateUtils'
-import { ModificationHandlerStatic } from '../ModificationHandler'
+import { SchemaUpdater } from '../utils/schemaUpdateUtils.js'
+import { ModificationHandlerStatic } from '../ModificationHandler.js'
 import deepEqual from 'fast-deep-equal'
 import { createPatch } from 'rfc6902'
-import { PatchAclSchemaModification } from './PatchAclSchemaModification'
+import { PatchAclSchemaModification } from './PatchAclSchemaModification.js'
 
 export const UpdateAclSchemaModification: ModificationHandlerStatic<UpdateAclSchemaModificationData> = class {
 	public static id = 'updateAclSchema'

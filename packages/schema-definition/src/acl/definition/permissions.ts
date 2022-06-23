@@ -1,9 +1,9 @@
 import { Acl } from '@contember/schema'
-import { Role } from './roles'
-import { VariableDefinition } from './variables'
-import { PredicateEvaluationReference } from './references'
-import { allowDefinitionsStore } from './internal/stores'
-import { DecoratorFunction, EntityConstructor } from '../../model/definition/types'
+import { Role } from './roles.js'
+import { VariableDefinition } from './variables.js'
+import { PredicateEvaluationReference } from './references.js'
+import { allowDefinitionsStore } from './internal/stores.js'
+import { DecoratorFunction, EntityConstructor } from '../../model/definition/types.js'
 
 export type PredicateExtra = PredicateEvaluationReference | VariableDefinition
 export type WhenDefinition = Acl.PredicateDefinition<PredicateExtra>

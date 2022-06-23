@@ -1,5 +1,5 @@
-import { DecoratorFunction } from './types'
-import { extendEntity } from './extensions'
+import { DecoratorFunction } from './types.js'
+import { extendEntity } from './extensions.js'
 import { NamingHelper } from '@contember/schema-utils'
 
 export type UniqueOptions<T> = { name?: string; fields: (keyof T)[] }

@@ -7,11 +7,11 @@ import {
 	GraphQLString, GraphQLInputObjectType,
 } from 'graphql'
 import { Model } from '@contember/schema'
-import { MutationProvider } from './MutationProvider'
-import { QueryProvider } from './QueryProvider'
-import { ValidationQueriesProvider } from './ValidationQueriesProvider'
-import { Context } from '../types'
-import { ResultSchemaTypeProvider } from './ResultSchemaTypeProvider'
+import { MutationProvider } from './MutationProvider.js'
+import { QueryProvider } from './QueryProvider.js'
+import { ValidationQueriesProvider } from './ValidationQueriesProvider.js'
+import { Context } from '../types.js'
+import { ResultSchemaTypeProvider } from './ResultSchemaTypeProvider.js'
 
 export class GraphQlSchemaBuilder {
 	constructor(

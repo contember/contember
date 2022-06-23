@@ -1,6 +1,6 @@
 import { Fragment, h } from 'preact'
 import { Acl } from '@contember/schema'
-import { SinglePermission } from './SinglePermission'
+import { SinglePermission } from './SinglePermission.js'
 
 export const FieldPermissions  = ({ entityPermissions, field }: { entityPermissions?: Acl.EntityPermissions; field: string }) => {
 	const readPermissions = entityPermissions?.operations.read?.[field]

@@ -1,10 +1,10 @@
 import { Acl, Model } from '@contember/schema'
 import { AllowAllPermissionFactory } from '@contember/schema-utils'
-import PermissionOverrider from './PermissionOverrider'
-import EntitySelector from './EntitySelector'
-import EntityPermissionsBuilder from './EntityPermissionsBuilder'
-import FieldSelector from './FieldSelector'
-import Reference from './PredicateReference'
+import PermissionOverrider from './PermissionOverrider.js'
+import EntitySelector from './EntitySelector.js'
+import EntityPermissionsBuilder from './EntityPermissionsBuilder.js'
+import FieldSelector from './FieldSelector.js'
+import Reference from './PredicateReference.js'
 
 class PermissionsBuilder {
 	constructor(public readonly schema: Model.Schema, public readonly permissions: Acl.Permissions) {}

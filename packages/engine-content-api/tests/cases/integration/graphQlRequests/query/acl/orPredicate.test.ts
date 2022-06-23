@@ -1,9 +1,9 @@
 import { SchemaBuilder } from '@contember/schema-definition'
 import { Acl } from '@contember/schema'
 import { test } from 'vitest'
-import { execute } from '../../../../../src/test'
-import { GQL, SQL } from '../../../../../src/tags'
-import { testUuid } from '../../../../../src/testUuid'
+import { execute } from '../../../../../src/test.js'
+import { GQL, SQL } from '../../../../../src/tags.js'
+import { testUuid } from '../../../../../src/testUuid.js'
 
 const schema = new SchemaBuilder()
 	.entity('Author', e => e.column('firstName').column('lastName').column('username'))

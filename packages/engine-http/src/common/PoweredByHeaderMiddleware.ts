@@ -1,4 +1,4 @@
-import { KoaMiddleware } from '../koa'
+import { KoaMiddleware } from '../koa/index.js'
 
 export const createPoweredByHeaderMiddleware = (debug: boolean, version: string): KoaMiddleware<{}> => {
 	const versionMatch = version.match(/^(0\.\d+|\d+)/)

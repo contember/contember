@@ -1,16 +1,16 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Model, Schema } from '@contember/schema'
-import { SchemaUpdater, updateEntity, updateField, updateModel } from '../utils/schemaUpdateUtils'
-import { ModificationHandlerOptions, ModificationHandlerStatic } from '../ModificationHandler'
+import { SchemaUpdater, updateEntity, updateField, updateModel } from '../utils/schemaUpdateUtils.js'
+import { ModificationHandlerOptions, ModificationHandlerStatic } from '../ModificationHandler.js'
 import {
 	createEventTrigger,
 	createEventTrxTrigger,
 	dropEventTrigger,
 	dropEventTrxTrigger,
-} from '../utils/sqlUpdateUtils'
+} from '../utils/sqlUpdateUtils.js'
 import { isOwningRelation, isRelation } from '@contember/schema-utils'
-import { updateRelations } from '../utils/diffUtils'
-import { isIt } from '../../utils/isIt'
+import { updateRelations } from '../utils/diffUtils.js'
+import { isIt } from '../../utils/isIt.js'
 
 export const ToggleJunctionEventLogModification: ModificationHandlerStatic<ToggleJunctionEventLogModificationData> = class {
 	static id = 'toggleJunctionEventLog'

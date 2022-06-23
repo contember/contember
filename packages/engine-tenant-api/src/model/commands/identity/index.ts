@@ -1,1 +1,1 @@
-export * from './CreateIdentityCommand'
+export * from './CreateIdentityCommand.js'

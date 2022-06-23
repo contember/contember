@@ -1,10 +1,10 @@
 import { Input, Model, Value } from '@contember/schema'
 import { Client, InsertBuilder as DbInsertBuilder, QueryBuilder, Value as DbValue } from '@contember/database'
-import { PathFactory, WhereBuilder } from '../select'
+import { PathFactory, WhereBuilder } from '../select/index.js'
 import { getColumnName, getColumnType } from '@contember/schema-utils'
-import { ColumnValue, ResolvedColumnValue, resolveGenericValue, resolveRowData } from '../ColumnValue'
-import { ImplementationException } from '../../exception'
-import { AbortInsert } from './Inserter'
+import { ColumnValue, ResolvedColumnValue, resolveGenericValue, resolveRowData } from '../ColumnValue.js'
+import { ImplementationException } from '../../exception.js'
+import { AbortInsert } from './Inserter.js'
 
 export interface InsertResult {
 	values: ResolvedColumnValue[]

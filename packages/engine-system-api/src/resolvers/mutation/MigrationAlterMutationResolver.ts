@@ -1,6 +1,6 @@
 import { GraphQLResolveInfo } from 'graphql'
-import { SystemResolverContext } from '../SystemResolverContext'
-import { MutationResolver } from '../Resolver'
+import { SystemResolverContext } from '../SystemResolverContext.js'
+import { MutationResolver } from '../Resolver.js'
 import {
 	MigrationDeleteErrorCode,
 	MigrationDeleteResponse,
@@ -8,8 +8,8 @@ import {
 	MigrationModifyResponse,
 	MutationMigrationDeleteArgs,
 	MutationMigrationModifyArgs,
-} from '../../schema'
-import { DeleteMigrationErrorCode, MigrationAlterer, UpdateMigrationErrorCode } from '../../model'
+} from '../../schema/index.js'
+import { DeleteMigrationErrorCode, MigrationAlterer, UpdateMigrationErrorCode } from '../../model/index.js'
 import { Migration } from '@contember/schema-migrations'
 
 export class MigrationAlterMutationResolver implements MutationResolver<'migrationModify'>, MutationResolver<'migrationDelete'> {

@@ -1,9 +1,9 @@
-import { SelectExecutionHandler, SelectExecutionHandlerContext } from '../SelectExecutionHandler'
-import { Path } from '../Path'
+import { SelectExecutionHandler, SelectExecutionHandlerContext } from '../SelectExecutionHandler.js'
+import { Path } from '../Path.js'
 import { Acl, Input } from '@contember/schema'
-import { PredicateFactory } from '../../../acl'
-import { WhereBuilder } from '../WhereBuilder'
-import { ObjectNode } from '../../../inputProcessing'
+import { PredicateFactory } from '../../../acl/index.js'
+import { WhereBuilder } from '../WhereBuilder.js'
+import { ObjectNode } from '../../../inputProcessing/index.js'
 
 export class MetaHandler implements SelectExecutionHandler<{}> {
 	constructor(private readonly whereBuilder: WhereBuilder, private readonly predicateFactory: PredicateFactory) {}

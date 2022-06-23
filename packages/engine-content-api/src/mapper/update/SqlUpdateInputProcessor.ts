@@ -1,8 +1,8 @@
 import { Input, Model, Value } from '@contember/schema'
-import { Mapper } from '../Mapper'
-import { UpdateBuilder } from './UpdateBuilder'
-import { UpdateInputProcessor } from '../../inputProcessing'
-import * as Context from '../../inputProcessing'
+import { Mapper } from '../Mapper.js'
+import { UpdateBuilder } from './UpdateBuilder.js'
+import { UpdateInputProcessor } from '../../inputProcessing/index.js'
+import * as Context from '../../inputProcessing/index.js'
 import {
 	ConstraintType,
 	getInsertPrimary,
@@ -12,11 +12,11 @@ import {
 	MutationResultList,
 	MutationResultType,
 	NothingToDoReason,
-} from '../Result'
-import { hasManyProcessor, hasOneProcessor } from '../MutationProcessorHelper'
-import { AbortUpdate } from './Updater'
-import { ImplementationException } from '../../exception'
-import { CheckedPrimary } from '../CheckedPrimary'
+} from '../Result.js'
+import { hasManyProcessor, hasOneProcessor } from '../MutationProcessorHelper.js'
+import { AbortUpdate } from './Updater.js'
+import { ImplementationException } from '../../exception.js'
+import { CheckedPrimary } from '../CheckedPrimary.js'
 
 export class SqlUpdateInputProcessor implements UpdateInputProcessor<MutationResultList> {
 	constructor(

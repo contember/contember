@@ -5,7 +5,7 @@ import {
 	ModificationHandlerFactory,
 	SchemaDiffer,
 	SchemaMigrator,
-} from '../../src'
+} from '../../src/index.js'
 import { emptySchema, schemaType } from '@contember/schema-utils'
 ;(async () => {
 	// eslint-disable-next-line no-console

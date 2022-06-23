@@ -1,10 +1,10 @@
 import { Input, Model } from '@contember/schema'
-import { RelationFetcher, SelectExecutionHandler, SelectExecutionHandlerContext } from '../../mapper'
-import { PaginatedHasManyFieldProviderExtension } from './PaginatedHasManyFieldProvider'
+import { RelationFetcher, SelectExecutionHandler, SelectExecutionHandlerContext } from '../../mapper/index.js'
+import { PaginatedHasManyFieldProviderExtension } from './PaginatedHasManyFieldProvider.js'
 import { acceptFieldVisitor } from '@contember/schema-utils'
-import { createPaginationHelper } from '../../utils'
-import { PaginatedHasManyCountVisitor } from './PaginatedHasManyCountVisitor'
-import { PaginatedHasManyNodesVisitor } from './PaginatedHasManyNodesVisitor'
+import { createPaginationHelper } from '../../utils/index.js'
+import { PaginatedHasManyCountVisitor } from './PaginatedHasManyCountVisitor.js'
+import { PaginatedHasManyNodesVisitor } from './PaginatedHasManyNodesVisitor.js'
 
 export class PaginatedHasManyExecutionHandler implements SelectExecutionHandler<Input.PaginationQueryInput, PaginatedHasManyFieldProviderExtension> {
 	constructor(private readonly schema: Model.Schema, private readonly relationFetcher: RelationFetcher) {}

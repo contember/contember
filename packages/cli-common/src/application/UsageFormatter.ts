@@ -1,6 +1,6 @@
-import { Argument } from './Argument'
-import { Option, OptionMode } from './Option'
-import { assertNever } from './assertNever'
+import { Argument } from './Argument.js'
+import { Option, OptionMode } from './Option.js'
+import { assertNever } from './assertNever.js'
 
 export type UsageFormat = 'line' | 'short' | 'multiline'
 export type UsageFormatOptions = { format?: UsageFormat; indent?: string }

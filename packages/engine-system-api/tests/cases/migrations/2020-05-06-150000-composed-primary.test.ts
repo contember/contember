@@ -1,4 +1,4 @@
-import migration from '../../../src/migrations/2020-05-06-150000-composed-primary'
+import migration from '../../../src/migrations/2020-05-06-150000-composed-primary.js'
 import { createMigrationBuilder } from '@contember/database-migrations'
 import { sampleProject } from '@contember/engine-api-tester'
 import { test, assert } from 'vitest'

@@ -4,13 +4,13 @@ import {
 	MutationResolvers,
 	MutationSignInIdpArgs,
 	SignInIdpResponse,
-} from '../../../schema'
-import { TenantResolverContext } from '../../TenantResolverContext'
-import { IDPSignInManager, PermissionActions, PermissionContextFactory } from '../../../model'
-import { createResolverContext } from '../../TenantResolverContextFactory'
-import { IdentityTypeResolver } from '../../types'
-import { createErrorResponse } from '../../errorUtils'
-import { SignInResponseFactory } from '../../responseHelpers/SignInResponseFactory'
+} from '../../../schema/index.js'
+import { TenantResolverContext } from '../../TenantResolverContext.js'
+import { IDPSignInManager, PermissionActions, PermissionContextFactory } from '../../../model/index.js'
+import { createResolverContext } from '../../TenantResolverContextFactory.js'
+import { IdentityTypeResolver } from '../../types/index.js'
+import { createErrorResponse } from '../../errorUtils.js'
+import { SignInResponseFactory } from '../../responseHelpers/SignInResponseFactory.js'
 
 export class IDPMutationResolver implements MutationResolvers {
 	constructor(

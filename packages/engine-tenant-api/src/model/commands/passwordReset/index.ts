@@ -1,3 +1,3 @@
-export * from './CreatePasswordResetRequestCommand'
-export * from './ResetPasswordCommand'
-export * from './SavePasswordResetRequestCommand'
+export * from './CreatePasswordResetRequestCommand.js'
+export * from './ResetPasswordCommand.js'
+export * from './SavePasswordResetRequestCommand.js'

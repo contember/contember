@@ -5,7 +5,7 @@ import {
 	IdentityResolvers,
 	Maybe,
 	Person,
-} from '../../schema'
+} from '../../schema/index.js'
 import {
 	IdentityQuery,
 	PermissionActions,
@@ -14,10 +14,10 @@ import {
 	PersonRow,
 	ProjectManager,
 	ProjectMemberManager,
-} from '../../model'
-import { TenantResolverContext } from '../TenantResolverContext'
-import { notEmpty } from '../../utils/array'
-import { batchLoader } from '../../utils/batchQuery'
+} from '../../model/index.js'
+import { TenantResolverContext } from '../TenantResolverContext.js'
+import { notEmpty } from '../../utils/array.js'
+import { batchLoader } from '../../utils/batchQuery.js'
 
 export class IdentityTypeResolver implements IdentityResolvers {
 	private personLoader = batchLoader<string, Record<string, PersonRow>, PersonRow>(

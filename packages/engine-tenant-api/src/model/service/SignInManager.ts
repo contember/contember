@@ -1,9 +1,9 @@
-import { CreateSessionTokenErrorCode, SignInErrorCode } from '../../schema'
-import { ApiKeyManager, OtpAuthenticator } from '../service'
-import { PersonQuery, PersonRow } from '../queries'
-import { Providers } from '../providers'
-import { DatabaseContext } from '../utils'
-import { Response, ResponseError, ResponseOk } from '../utils/Response'
+import { CreateSessionTokenErrorCode, SignInErrorCode } from '../../schema/index.js'
+import { ApiKeyManager, OtpAuthenticator } from '../service/index.js'
+import { PersonQuery, PersonRow } from '../queries/index.js'
+import { Providers } from '../providers.js'
+import { DatabaseContext } from '../utils/index.js'
+import { Response, ResponseError, ResponseOk } from '../utils/Response.js'
 
 class SignInManager {
 	constructor(

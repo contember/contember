@@ -1,4 +1,4 @@
-import { Command } from '../Command'
+import { Command } from '../Command.js'
 import { DeleteBuilder } from '@contember/database'
 
 export class RemoveProjectMembershipCommand implements Command<void> {

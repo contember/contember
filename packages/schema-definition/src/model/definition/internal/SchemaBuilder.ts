@@ -1,14 +1,14 @@
 import { Model, Writable } from '@contember/schema'
 import { NamingHelper } from '@contember/schema-utils'
 import 'reflect-metadata'
-import { tuple } from '../../../utils'
-import { EntityConstructor, FieldsDefinition } from '../types'
-import { NamingConventions } from '../NamingConventions'
-import { EnumDefinition } from '../EnumDefinition'
-import { EntityRegistry } from './EntityRegistry'
-import { EnumRegistry } from './EnumRegistry'
-import { ColumnDefinition } from '../fieldDefinitions'
-import { applyEntityExtensions } from '../extensions'
+import { tuple } from '../../../utils/index.js'
+import { EntityConstructor, FieldsDefinition } from '../types.js'
+import { NamingConventions } from '../NamingConventions.js'
+import { EnumDefinition } from '../EnumDefinition.js'
+import { EntityRegistry } from './EntityRegistry.js'
+import { EnumRegistry } from './EnumRegistry.js'
+import { ColumnDefinition } from '../fieldDefinitions/index.js'
+import { applyEntityExtensions } from '../extensions.js'
 
 export class SchemaBuilder {
 	private entityRegistry = new EntityRegistry()

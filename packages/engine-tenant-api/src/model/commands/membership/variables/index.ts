@@ -1,1 +1,1 @@
-export * from './PatchProjectMembershipVariablesCommand'
+export * from './PatchProjectMembershipVariablesCommand.js'

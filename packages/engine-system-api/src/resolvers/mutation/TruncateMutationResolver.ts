@@ -1,8 +1,8 @@
 import { GraphQLResolveInfo } from 'graphql'
-import { SystemResolverContext } from '../SystemResolverContext'
-import { MutationResolver } from '../Resolver'
-import { TruncateResponse } from '../../schema'
-import { ProjectTruncateExecutor } from '../../model'
+import { SystemResolverContext } from '../SystemResolverContext.js'
+import { MutationResolver } from '../Resolver.js'
+import { TruncateResponse } from '../../schema/index.js'
+import { ProjectTruncateExecutor } from '../../model/index.js'
 
 export class TruncateMutationResolver implements MutationResolver<'truncate'> {
 	constructor(private readonly projectTruncateExecutor: ProjectTruncateExecutor) {}

@@ -1,4 +1,4 @@
-import { tuple } from './tuple'
+import { tuple } from './tuple.js'
 import { readdir, lstat, access, readFile, unlink, writeFile } from 'fs/promises'
 import { join } from 'path'
 

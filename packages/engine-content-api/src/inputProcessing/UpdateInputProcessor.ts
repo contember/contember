@@ -1,5 +1,5 @@
 import { Input } from '@contember/schema'
-import * as Context from './InputContext'
+import * as Context from './InputContext.js'
 
 interface UpdateInputProcessor<Result = void> {
 	column(context: Context.ColumnContext): Promise<Result>

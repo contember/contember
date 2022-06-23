@@ -1,7 +1,7 @@
-import { Compiler } from '../Compiler'
-import { Literal } from '../../Literal'
-import { SelectBuilder } from '../SelectBuilder'
-import { QueryBuilder } from '../QueryBuilder'
+import { Compiler } from '../Compiler.js'
+import { Literal } from '../../Literal.js'
+import { SelectBuilder } from '../SelectBuilder.js'
+import { QueryBuilder } from '../QueryBuilder.js'
 
 export type SubQueryLiteralFactory<Builder extends QueryBuilder = QueryBuilder> = (context: Compiler.Context, preprocessor?: (query: SelectBuilder | Builder) => QueryBuilder) => Literal
 export type SubQueryExpression<Builder extends QueryBuilder = QueryBuilder> = SelectBuilder.Callback | Literal | Builder

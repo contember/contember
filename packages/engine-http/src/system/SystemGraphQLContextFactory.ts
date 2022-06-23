@@ -1,10 +1,10 @@
 import { Identity, SystemContainer } from '@contember/engine-system-api'
-import { SystemGraphQLContext } from './SystemGraphQLHandlerFactory'
-import { AuthMiddlewareState, AuthResult } from '../common'
+import { SystemGraphQLContext } from './SystemGraphQLHandlerFactory.js'
+import { AuthMiddlewareState, AuthResult } from '../common/index.js'
 import { Membership } from '@contember/engine-tenant-api'
-import { KoaContext } from '../koa'
-import { GraphQLKoaState } from '../graphql'
-import { ProjectContainer } from '../ProjectContainer'
+import { KoaContext } from '../koa/index.js'
+import { GraphQLKoaState } from '../graphql/index.js'
+import { ProjectContainer } from '../ProjectContainer.js'
 
 export class SystemGraphQLContextFactory {
 	public async create({ authResult, memberships, koaContext, projectContainer, systemContainer, onClearCache }: {

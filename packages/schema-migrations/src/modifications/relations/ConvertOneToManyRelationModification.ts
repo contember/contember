@@ -1,11 +1,11 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Model, Schema } from '@contember/schema'
-import { SchemaUpdater, updateEntity, updateField, updateModel, updateSchema } from '../utils/schemaUpdateUtils'
-import { ModificationHandler, ModificationHandlerOptions, ModificationHandlerStatic } from '../ModificationHandler'
+import { SchemaUpdater, updateEntity, updateField, updateModel, updateSchema } from '../utils/schemaUpdateUtils.js'
+import { ModificationHandler, ModificationHandlerOptions, ModificationHandlerStatic } from '../ModificationHandler.js'
 import { isOwningRelation, NamingHelper } from '@contember/schema-utils'
-import { updateRelations } from '../utils/diffUtils'
-import { UpdateFieldNameModification } from '../fields'
-import { NoopModification } from '../NoopModification'
+import { updateRelations } from '../utils/diffUtils.js'
+import { UpdateFieldNameModification } from '../fields/index.js'
+import { NoopModification } from '../NoopModification.js'
 
 export const ConvertOneToManyRelationModification: ModificationHandlerStatic<ConvertOneToManyRelationModificationData> = class {
 	static id = 'convertOneToManyRelation'

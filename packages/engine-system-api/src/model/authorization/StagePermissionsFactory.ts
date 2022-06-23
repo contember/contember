@@ -1,7 +1,7 @@
 import { Acl, Schema } from '@contember/schema'
 import { Permissions } from '@contember/authorization'
 import { filterSchemaByStage } from '@contember/schema-utils'
-import { AuthorizationActions } from './AuthorizationActions'
+import { AuthorizationActions } from './AuthorizationActions.js'
 
 export class StagePermissionsFactory {
 	constructor(private readonly schema: Schema) {}

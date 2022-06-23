@@ -1,5 +1,5 @@
-import { IdentityProviderHandler } from './IdentityProviderHandler'
-import { IdentityProviderNotFoundError } from './IdentityProviderNotFoundError'
+import { IdentityProviderHandler } from './IdentityProviderHandler.js'
+import { IdentityProviderNotFoundError } from './IdentityProviderNotFoundError.js'
 
 export class IDPHandlerRegistry {
 	private providers: Record<string, IdentityProviderHandler<any, any>> = {}

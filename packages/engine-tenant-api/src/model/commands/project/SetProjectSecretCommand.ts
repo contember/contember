@@ -1,4 +1,4 @@
-import { Command } from '../Command'
+import { Command } from '../Command.js'
 import { ConflictActionType, InsertBuilder } from '@contember/database'
 
 export class SetProjectSecretCommand implements Command<void> {

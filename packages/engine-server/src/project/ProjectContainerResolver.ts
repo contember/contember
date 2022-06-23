@@ -1,11 +1,11 @@
-import { ProjectContainerFactory } from './ProjectContainer'
+import { ProjectContainerFactory } from './ProjectContainer.js'
 import { ProjectContainer } from '@contember/engine-http'
 import { DatabaseContext, ProjectManager, ProjectWithSecrets } from '@contember/engine-tenant-api'
 import { ProjectInitializer as SystemProjectInitializer } from '@contember/engine-system-api'
-import { ProjectContainerStore } from './ProjectContainerStore'
+import { ProjectContainerStore } from './ProjectContainerStore.js'
 import { Logger } from '@contember/engine-common'
-import { ProjectConfigResolver } from '../config/projectConfigResolver'
-import { TenantConfig } from '../config/config'
+import { ProjectConfigResolver } from '../config/projectConfigResolver.js'
+import { TenantConfig } from '../config/config.js'
 
 export class ProjectContainerResolver {
 	private projectContainers = new ProjectContainerStore()

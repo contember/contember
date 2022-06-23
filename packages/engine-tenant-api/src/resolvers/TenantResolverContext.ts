@@ -1,4 +1,4 @@
-import { DatabaseContext, Identity, PermissionContext } from '../model'
+import { DatabaseContext, Identity, PermissionContext } from '../model/index.js'
 
 export interface TenantResolverContext {
 	readonly apiKeyId: string

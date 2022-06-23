@@ -1,2 +1,2 @@
-export * from './RemoveFieldModification'
-export * from './UpdateFieldNameModification'
+export * from './RemoveFieldModification.js'
+export * from './UpdateFieldNameModification.js'

@@ -1,8 +1,8 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Model, Schema } from '@contember/schema'
-import { SchemaUpdater, updateModel } from '../utils/schemaUpdateUtils'
-import { ModificationHandlerOptions, ModificationHandlerStatic } from '../ModificationHandler'
-import { createEventTrigger, createEventTrxTrigger } from '../utils/sqlUpdateUtils'
+import { SchemaUpdater, updateModel } from '../utils/schemaUpdateUtils.js'
+import { ModificationHandlerOptions, ModificationHandlerStatic } from '../ModificationHandler.js'
+import { createEventTrigger, createEventTrxTrigger } from '../utils/sqlUpdateUtils.js'
 
 export const CreateEntityModification: ModificationHandlerStatic<CreateEntityModificationData> = class {
 	static id = 'createEntity'

@@ -1,5 +1,5 @@
 import { test, assert } from 'vitest'
-import { S3Acl, S3Service } from '../../src'
+import { S3Acl, S3Service } from '../../src/index.js'
 
 const mocked = new Date('2021-07-02 17:22')
 const constantUuid = '9fce3907-ff2b-45bb-b4ce-eff5527dd315'

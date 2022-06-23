@@ -1,4 +1,4 @@
-import { Providers } from '../providers'
+import { Providers } from '../providers.js'
 
 
 export type MaybePassword = Password | typeof NoPassword

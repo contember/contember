@@ -1,8 +1,8 @@
-export * from './ImportApiMiddlewareFactory'
-export * from './ExportApiMiddlewareFactory'
+export * from './ImportApiMiddlewareFactory.js'
+export * from './ExportApiMiddlewareFactory.js'
 
-export * from './ImportExecutor'
-export * from './ExportExecutor'
+export * from './ImportExecutor.js'
+export * from './ExportExecutor.js'
 
-export * from './ContentSchemaTransferMappingFactory'
-export * from './SystemSchemaTransferMappingFactory'
+export * from './ContentSchemaTransferMappingFactory.js'
+export * from './SystemSchemaTransferMappingFactory.js'

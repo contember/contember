@@ -1,4 +1,4 @@
-import { Connection } from './Connection'
+import { Connection } from './Connection.js'
 
 class EventManager {
 	private readonly listeners = {

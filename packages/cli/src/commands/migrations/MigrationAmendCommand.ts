@@ -1,19 +1,19 @@
 import { Command, CommandConfiguration, Input } from '@contember/cli-common'
-import { printValidationErrors } from '../../utils/schema'
+import { printValidationErrors } from '../../utils/schema.js'
 import { InvalidSchemaException } from '@contember/schema-migrations'
-import { executeCreateMigrationCommand } from './MigrationCreateHelper'
+import { executeCreateMigrationCommand } from './MigrationCreateHelper.js'
 import {
 	createMigrationStatusTable,
 	getLatestMigration,
 	getMigrationByName,
 	printMigrationDescription,
-} from '../../utils/migrations'
-import { resolveMigrationStatus } from './MigrationExecuteHelper'
-import { resolveSystemApiClient } from './SystemApiClientResolver'
+} from '../../utils/migrations.js'
+import { resolveMigrationStatus } from './MigrationExecuteHelper.js'
+import { resolveSystemApiClient } from './SystemApiClientResolver.js'
 import prompts from 'prompts'
 import { emptySchema } from '@contember/schema-utils'
-import { validateMigrations } from './MigrationValidationHelper'
-import { loadSchema } from '../../utils/project/loadSchema'
+import { validateMigrations } from './MigrationValidationHelper.js'
+import { loadSchema } from '../../utils/project/loadSchema.js'
 
 type Args = {
 	project: string

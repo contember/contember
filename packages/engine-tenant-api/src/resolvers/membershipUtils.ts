@@ -1,5 +1,5 @@
-import { MembershipValidationError, MembershipValidationErrorType } from '../model/service/MembershipValidator'
-import { MembershipValidationError as MembershipValidationErrorSchema, MembershipValidationErrorCode } from '../schema'
+import { MembershipValidationError, MembershipValidationErrorType } from '../model/service/MembershipValidator.js'
+import { MembershipValidationError as MembershipValidationErrorSchema, MembershipValidationErrorCode } from '../schema/index.js'
 
 export enum MembershipErrorCode {
 	InvalidMembership = 'INVALID_MEMBERSHIP',

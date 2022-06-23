@@ -1,1 +1,1 @@
-export * from './WorkspaceCreateCommand'
+export * from './WorkspaceCreateCommand.js'

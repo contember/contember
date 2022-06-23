@@ -3,7 +3,7 @@ import {
 	renderPlaygroundPage,
 } from '@apollographql/graphql-playground-html'
 import accepts from 'accepts'
-import { get, KoaContext, KoaMiddleware, KoaRequestState } from '../koa'
+import { get, KoaContext, KoaMiddleware, KoaRequestState } from '../koa/index.js'
 
 export const createPlaygroundMiddleware = (): KoaMiddleware<KoaRequestState> => {
 	return get('/', (ctx: KoaContext<KoaRequestState>, next) => {

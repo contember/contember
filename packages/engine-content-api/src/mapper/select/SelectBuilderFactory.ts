@@ -1,5 +1,5 @@
-import { SelectBuilder } from './SelectBuilder'
-import { SelectHydrator } from './SelectHydrator'
+import { SelectBuilder } from './SelectBuilder.js'
+import { SelectHydrator } from './SelectHydrator.js'
 import { SelectBuilder as DbSelectBuilder } from '@contember/database'
 
 export interface SelectBuilderFactory {

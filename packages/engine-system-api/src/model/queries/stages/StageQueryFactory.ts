@@ -1,5 +1,5 @@
 import { SelectBuilder } from '@contember/database'
-import { Stage } from '../../dtos'
+import { Stage } from '../../dtos/index.js'
 
 export const prepareStageQueryBuilder = () => {
 	return SelectBuilder.create<Stage>()

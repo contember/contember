@@ -1,7 +1,7 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Model, Schema } from '@contember/schema'
-import { SchemaUpdater, updateEntity, updateModel } from '../utils/schemaUpdateUtils'
-import { ModificationHandlerStatic } from '../ModificationHandler'
+import { SchemaUpdater, updateEntity, updateModel } from '../utils/schemaUpdateUtils.js'
+import { ModificationHandlerStatic } from '../ModificationHandler.js'
 import { acceptFieldVisitor } from '@contember/schema-utils'
 
 export const CreateUniqueConstraintModification: ModificationHandlerStatic<CreateUniqueConstraintModificationData> = class {

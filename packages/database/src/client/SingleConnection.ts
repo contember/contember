@@ -1,12 +1,12 @@
 import pg from 'pg'
-import { EventManager } from './EventManager'
-import { Client } from './Client'
-import { Transaction } from './Transaction'
-import { executeQuery } from './execution'
-import { Connection } from './Connection'
-import { DatabaseConfig } from '../types'
-import { ClientError } from './errors'
-import { createPgClientFactory } from '../utils'
+import { EventManager } from './EventManager.js'
+import { Client } from './Client.js'
+import { Transaction } from './Transaction.js'
+import { executeQuery } from './execution.js'
+import { Connection } from './Connection.js'
+import { DatabaseConfig } from '../types.js'
+import { ClientError } from './errors.js'
+import { createPgClientFactory } from '../utils/index.js'
 
 export class SingleConnection implements Connection.ConnectionLike, Connection.ClientFactory {
 	private readonly pgClient: pg.Client

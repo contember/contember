@@ -1,6 +1,6 @@
 import { Acl, Input, Model } from '@contember/schema'
-import { Authorizator } from '../../acl'
-import { ImplementationException } from '../../exception'
+import { Authorizator } from '../../acl/index.js'
+import { ImplementationException } from '../../exception.js'
 
 export class CreateEntityRelationAllowedOperationsVisitor implements
 	Model.ColumnVisitor<never>,

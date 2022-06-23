@@ -1,4 +1,4 @@
-import { MasterContainerArgs, MasterContainerFactory } from './MasterContainer'
+import { MasterContainerArgs, MasterContainerFactory } from './MasterContainer.js'
 import { MasterContainerFactory as BaseMasterContainerFactory } from '@contember/engine-server'
 
 export const createContainer = (args: MasterContainerArgs) => {

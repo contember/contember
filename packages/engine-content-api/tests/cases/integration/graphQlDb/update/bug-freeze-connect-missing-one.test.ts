@@ -1,6 +1,6 @@
 import { test } from 'vitest'
 import { SchemaDefinition as def } from '@contember/schema-definition'
-import { GQL } from '../../../../src/tags'
+import { GQL } from '../../../../src/tags.js'
 import { executeDbTest } from '@contember/engine-api-tester'
 
 namespace Model {

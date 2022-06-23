@@ -1,7 +1,7 @@
-import { authenticatedIdentityId, executeTenantTest } from '../../../src/testTenant'
-import { testUuid } from '../../../src/testUuid'
-import { prepareOtpMutation } from './gql/prepareOtp'
-import { getPersonByIdentity } from './sql/getPersonByIdentity'
+import { authenticatedIdentityId, executeTenantTest } from '../../../src/testTenant.js'
+import { testUuid } from '../../../src/testUuid.js'
+import { prepareOtpMutation } from './gql/prepareOtp.js'
+import { getPersonByIdentity } from './sql/getPersonByIdentity.js'
 import { test, assert } from 'vitest'
 
 test('prepare otp', async () => {

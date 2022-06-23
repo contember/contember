@@ -1,7 +1,7 @@
 import { Model } from '@contember/schema'
-import { WhereTypeProvider } from './WhereTypeProvider'
-import { OrderByTypeProvider } from './OrderByTypeProvider'
-import { EntityTypeProvider } from './EntityTypeProvider'
+import { WhereTypeProvider } from './WhereTypeProvider.js'
+import { OrderByTypeProvider } from './OrderByTypeProvider.js'
+import { EntityTypeProvider } from './EntityTypeProvider.js'
 import { GraphQLFieldConfig, GraphQLInt, GraphQLList, GraphQLNonNull } from 'graphql'
 
 export class PaginatedFieldConfigFactory {

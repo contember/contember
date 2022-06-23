@@ -6,11 +6,11 @@ import {
 	GraphQLInputType,
 } from 'graphql'
 import { acceptFieldVisitor, getEntity } from '@contember/schema-utils'
-import { GqlTypeName } from '../utils'
+import { GqlTypeName } from '../utils.js'
 import { Acl, Model } from '@contember/schema'
-import { Authorizator } from '../../acl'
-import { singletonFactory } from '../../utils'
-import { ImplementationException } from '../../exception'
+import { Authorizator } from '../../acl/index.js'
+import { singletonFactory } from '../../utils/index.js'
+import { ImplementationException } from '../../exception.js'
 
 export class EntityInputProvider<Operation extends EntityInputType> {
 	private entityInputs = singletonFactory<

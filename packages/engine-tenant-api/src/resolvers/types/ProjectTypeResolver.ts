@@ -1,6 +1,6 @@
-import { ProjectIdentityRelation, ProjectMembersArgs, ProjectResolvers } from '../../schema'
-import { TenantResolverContext } from '../TenantResolverContext'
-import { PermissionActions, Project, ProjectMemberManager, ProjectSchemaResolver } from '../../model'
+import { ProjectIdentityRelation, ProjectMembersArgs, ProjectResolvers } from '../../schema/index.js'
+import { TenantResolverContext } from '../TenantResolverContext.js'
+import { PermissionActions, Project, ProjectMemberManager, ProjectSchemaResolver } from '../../model/index.js'
 import { getRoleVariables } from '@contember/schema-utils'
 import { Acl } from '@contember/schema'
 

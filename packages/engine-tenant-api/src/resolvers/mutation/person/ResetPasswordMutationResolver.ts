@@ -6,9 +6,9 @@ import {
 	MutationResolvers,
 	ResetPasswordErrorCode as SchemaResetPasswordErrorCode,
 	ResetPasswordResponse,
-} from '../../../schema'
+} from '../../../schema/index.js'
 import { GraphQLResolveInfo } from 'graphql'
-import { TenantResolverContext } from '../../TenantResolverContext'
+import { TenantResolverContext } from '../../TenantResolverContext.js'
 import {
 	PasswordResetManager,
 	PermissionActions,
@@ -16,8 +16,8 @@ import {
 	PersonQuery,
 	ResetPasswordCommandErrorCode,
 	ResetPasswordErrorCode,
-} from '../../../model'
-import { createErrorResponse } from '../../errorUtils'
+} from '../../../model/index.js'
+import { createErrorResponse } from '../../errorUtils.js'
 
 export class ResetPasswordMutationResolver implements MutationResolvers {
 	constructor(

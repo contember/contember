@@ -1,4 +1,4 @@
-import { FieldDefinition } from './fieldDefinitions'
+import { FieldDefinition } from './fieldDefinitions/index.js'
 
 export type Interface<T> = { [P in keyof T]: T[P] }
 export type RelationTarget = EntityConstructor

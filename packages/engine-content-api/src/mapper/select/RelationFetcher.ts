@@ -1,14 +1,14 @@
-import { PathFactory } from './Path'
-import { WhereBuilder } from './WhereBuilder'
+import { PathFactory } from './Path.js'
+import { WhereBuilder } from './WhereBuilder.js'
 import { Client, LimitByGroupWrapper, Operator, SelectBuilder } from '@contember/database'
 import { Input, Model, Value } from '@contember/schema'
-import { OrderByBuilder } from './OrderByBuilder'
-import { PredicatesInjector } from '../../acl'
-import { FieldNode, ObjectNode } from '../../inputProcessing'
-import { JoiningColumns } from '../types'
-import { OrderByHelper } from './OrderByHelper'
-import { SelectGroupedObjects, SelectResultObject, SelectRow } from './SelectHydrator'
-import { Mapper } from '../Mapper'
+import { OrderByBuilder } from './OrderByBuilder.js'
+import { PredicatesInjector } from '../../acl/index.js'
+import { FieldNode, ObjectNode } from '../../inputProcessing/index.js'
+import { JoiningColumns } from '../types.js'
+import { OrderByHelper } from './OrderByHelper.js'
+import { SelectGroupedObjects, SelectResultObject, SelectRow } from './SelectHydrator.js'
+import { Mapper } from '../Mapper.js'
 
 export type GroupedCounts = Record<Input.PrimaryValue, number>
 

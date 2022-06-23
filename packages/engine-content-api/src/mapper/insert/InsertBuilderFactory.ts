@@ -1,6 +1,6 @@
-import { PathFactory, WhereBuilder } from '../select'
+import { PathFactory, WhereBuilder } from '../select/index.js'
 import { Model } from '@contember/schema'
-import { InsertBuilder } from './InsertBuilder'
+import { InsertBuilder } from './InsertBuilder.js'
 
 export class InsertBuilderFactory {
 	constructor(

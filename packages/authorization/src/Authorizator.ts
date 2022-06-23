@@ -1,6 +1,6 @@
-import AuthorizationScope from './AuthorizationScope'
-import AccessEvaluator from './AccessEvaluator'
-import AccessNode from './AccessNode'
+import AuthorizationScope from './AuthorizationScope.js'
+import AccessEvaluator from './AccessEvaluator.js'
+import AccessNode from './AccessNode.js'
 
 interface Authorizator<Identity extends Authorizator.Identity = Authorizator.Identity> {
 	isAllowed(identity: Identity, scope: AuthorizationScope<Identity>, action: Authorizator.Action): Promise<boolean>

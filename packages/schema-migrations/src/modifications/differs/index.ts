@@ -1,3 +1,3 @@
-export * from './ChangeViewNonViewDiffer'
-export * from './RemoveChangedFieldDiffer'
-export * from './RemoveChangedViewDiffer'
+export * from './ChangeViewNonViewDiffer.js'
+export * from './RemoveChangedFieldDiffer.js'
+export * from './RemoveChangedViewDiffer.js'

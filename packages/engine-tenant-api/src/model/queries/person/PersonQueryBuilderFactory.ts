@@ -1,4 +1,4 @@
-import { PersonRow } from './types'
+import { PersonRow } from './types.js'
 import { SelectBuilder } from '@contember/database'
 
 export class PersonQueryBuilderFactory {

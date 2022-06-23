@@ -1,5 +1,5 @@
 import { AccessEvaluator, Permissions } from '@contember/authorization'
-import { PermissionActions } from './PermissionActions'
+import { PermissionActions } from './PermissionActions.js'
 import { Acl } from '@contember/schema'
 
 export class AclSchemaEvaluatorFactory {

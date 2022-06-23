@@ -1,10 +1,10 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Schema, Validation } from '@contember/schema'
-import { SchemaUpdater } from '../utils/schemaUpdateUtils'
-import { ModificationHandlerStatic } from '../ModificationHandler'
+import { SchemaUpdater } from '../utils/schemaUpdateUtils.js'
+import { ModificationHandlerStatic } from '../ModificationHandler.js'
 import deepEqual from 'fast-deep-equal'
 import { createPatch } from 'rfc6902'
-import { PatchValidationSchemaModification } from './PatchValidationSchemaModification'
+import { PatchValidationSchemaModification } from './PatchValidationSchemaModification.js'
 
 export const UpdateValidationSchemaModification: ModificationHandlerStatic<UpdateValidationSchemaModificationData> = class {
 	static id = 'updateValidationSchema'

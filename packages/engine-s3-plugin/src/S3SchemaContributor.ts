@@ -8,9 +8,9 @@ import {
 	GraphQLSchema,
 	GraphQLString,
 } from 'graphql'
-import { S3Acl, S3Service, S3ServiceFactory } from './S3Service'
-import { resolveS3Config, S3Config } from './Config'
-import { createObjectKeyVerifier, ObjectKeyVerifier } from './ObjectKeyVerifier'
+import { S3Acl, S3Service, S3ServiceFactory } from './S3Service.js'
+import { resolveS3Config, S3Config } from './Config.js'
+import { createObjectKeyVerifier, ObjectKeyVerifier } from './ObjectKeyVerifier.js'
 import { GraphQLSchemaContributor, SchemaContext, Providers } from '@contember/engine-plugins'
 
 interface Identity {

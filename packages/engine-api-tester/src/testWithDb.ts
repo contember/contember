@@ -1,5 +1,5 @@
 import { Model } from '@contember/schema'
-import { createMock } from './utils'
+import { createMock } from './utils.js'
 import {
 	Migration,
 	MigrationsResolver,
@@ -9,7 +9,7 @@ import {
 	VERSION_LATEST,
 } from '@contember/schema-migrations'
 import { emptySchema } from '@contember/schema-utils'
-import { ApiTester } from './ApiTester'
+import { ApiTester } from './ApiTester.js'
 import { SelectBuilder } from '@contember/database'
 import { assert } from 'vitest'
 

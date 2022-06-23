@@ -1,5 +1,5 @@
 import { DatabaseQuery, DatabaseQueryable, SelectBuilder } from '@contember/database'
-import { MailTemplateData, MailTemplateIdentifier } from '../../mailing'
+import { MailTemplateData, MailTemplateIdentifier } from '../../mailing/index.js'
 
 class MailTemplateQuery extends DatabaseQuery<MailTemplateQuery.Result> {
 	constructor(

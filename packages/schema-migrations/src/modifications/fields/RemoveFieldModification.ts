@@ -1,9 +1,9 @@
 import { acceptFieldVisitor, isInverseRelation, isRelation, NamingHelper } from '@contember/schema-utils'
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Schema } from '@contember/schema'
-import { removeField, SchemaUpdater } from '../utils/schemaUpdateUtils'
-import { ModificationHandlerOptions, ModificationHandlerStatic } from '../ModificationHandler'
-import { isDefined } from '../../utils/isDefined'
+import { removeField, SchemaUpdater } from '../utils/schemaUpdateUtils.js'
+import { ModificationHandlerOptions, ModificationHandlerStatic } from '../ModificationHandler.js'
+import { isDefined } from '../../utils/isDefined.js'
 
 export const RemoveFieldModification: ModificationHandlerStatic<RemoveFieldModificationData> = class {
 	static id = 'removeField'

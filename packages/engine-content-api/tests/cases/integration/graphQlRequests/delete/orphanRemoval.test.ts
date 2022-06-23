@@ -1,8 +1,8 @@
 import { test } from 'vitest'
-import { execute, sqlDeferred, sqlTransaction } from '../../../../src/test'
+import { execute, sqlDeferred, sqlTransaction } from '../../../../src/test.js'
 import { SchemaBuilder } from '@contember/schema-definition'
-import { GQL, SQL } from '../../../../src/tags'
-import { testUuid } from '../../../../src/testUuid'
+import { GQL, SQL } from '../../../../src/tags.js'
+import { testUuid } from '../../../../src/testUuid.js'
 
 test('delete post and orphaned content', async () => {
 	await execute({

@@ -1,3 +1,3 @@
-export * from './PersonByIdentityBatchQuery'
-export * from './PersonQuery'
-export * from './types'
+export * from './PersonByIdentityBatchQuery.js'
+export * from './PersonQuery.js'
+export * from './types.js'

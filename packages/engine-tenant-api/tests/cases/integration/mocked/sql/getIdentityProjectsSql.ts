@@ -1,4 +1,4 @@
-import { SQL } from '../../../../src/tags'
+import { SQL } from '../../../../src/tags.js'
 
 export const getIdentityProjectsSql = function ({ identityId, projectId }: { identityId: string; projectId: string }) {
 	return {

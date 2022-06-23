@@ -1,7 +1,7 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Model, Schema } from '@contember/schema'
-import { ModificationHandlerStatic } from '../ModificationHandler'
-import { SchemaUpdater, updateEntity, updateModel } from '../utils/schemaUpdateUtils'
+import { ModificationHandlerStatic } from '../ModificationHandler.js'
+import { SchemaUpdater, updateEntity, updateModel } from '../utils/schemaUpdateUtils.js'
 
 export const UpdateViewModification: ModificationHandlerStatic<UpdateViewModificationData> = class {
 	static id = 'updateView'

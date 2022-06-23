@@ -1,6 +1,6 @@
 import { ConditionBuilder, DatabaseQuery, DatabaseQueryable, Operator } from '@contember/database'
-import { MaybePersonRow } from './types'
-import { PersonQueryBuilderFactory } from './PersonQueryBuilderFactory'
+import { MaybePersonRow } from './types.js'
+import { PersonQueryBuilderFactory } from './PersonQueryBuilderFactory.js'
 
 class PersonQuery extends DatabaseQuery<MaybePersonRow> {
 	constructor(private readonly condition: { email: string } | { id: string } | { identity_id: string }) {

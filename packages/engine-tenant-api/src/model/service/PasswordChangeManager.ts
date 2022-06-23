@@ -1,10 +1,10 @@
-import { ChangeMyPasswordErrorCode, ChangePasswordErrorCode } from '../../schema'
-import { ChangePasswordCommand } from '../commands'
-import { getPasswordWeaknessMessage } from '../utils/password'
-import { Response, ResponseError, ResponseOk } from '../utils/Response'
-import { PersonRow } from '../queries'
-import { Providers } from '../providers'
-import { DatabaseContext } from '../utils'
+import { ChangeMyPasswordErrorCode, ChangePasswordErrorCode } from '../../schema/index.js'
+import { ChangePasswordCommand } from '../commands/index.js'
+import { getPasswordWeaknessMessage } from '../utils/password.js'
+import { Response, ResponseError, ResponseOk } from '../utils/Response.js'
+import { PersonRow } from '../queries/index.js'
+import { Providers } from '../providers.js'
+import { DatabaseContext } from '../utils/index.js'
 
 class PasswordChangeManager {
 	constructor(

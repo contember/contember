@@ -1,14 +1,14 @@
 import { Command, CommandConfiguration, Input } from '@contember/cli-common'
-import { printValidationErrors } from '../../utils/schema'
+import { printValidationErrors } from '../../utils/schema.js'
 import { InvalidSchemaException } from '@contember/schema-migrations'
-import { configureCreateMigrationCommand, executeCreateMigrationCommand } from './MigrationCreateHelper'
-import { createMigrationStatusTable, printMigrationDescription } from '../../utils/migrations'
-import { executeMigrations, resolveMigrationStatus } from './MigrationExecuteHelper'
+import { configureCreateMigrationCommand, executeCreateMigrationCommand } from './MigrationCreateHelper.js'
+import { createMigrationStatusTable, printMigrationDescription } from '../../utils/migrations.js'
+import { executeMigrations, resolveMigrationStatus } from './MigrationExecuteHelper.js'
 import prompts from 'prompts'
-import { interactiveResolveApiToken, TenantClient } from '../../utils/tenant'
-import { interactiveResolveInstanceEnvironmentFromInput } from '../../utils/instance'
-import { SystemClient } from '../../utils/system'
-import { loadSchema } from '../../utils/project/loadSchema'
+import { interactiveResolveApiToken, TenantClient } from '../../utils/tenant.js'
+import { interactiveResolveInstanceEnvironmentFromInput } from '../../utils/instance/index.js'
+import { SystemClient } from '../../utils/system/index.js'
+import { loadSchema } from '../../utils/project/loadSchema.js'
 
 type Args = {
 	project: string

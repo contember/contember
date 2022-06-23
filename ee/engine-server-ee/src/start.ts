@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 
-import { createContainer } from './index'
-import loadPlugins from './loadPlugins'
+import { createContainer } from './index.js'
+import loadPlugins from './loadPlugins.js'
 import os from 'os'
 import cluster from 'cluster'
-import { getClusterProcessType, notifyWorkerStarted, timeout, WorkerManager } from './utils'
+import { getClusterProcessType, notifyWorkerStarted, timeout, WorkerManager } from './utils/index.js'
 import {
 	getServerVersion,
 	initSentry,
@@ -14,7 +14,7 @@ import {
 	resolveServerConfig,
 	TerminationJob,
 } from '@contember/engine-server'
-import { serverConfigSchema } from './config/configSchema'
+import { serverConfigSchema } from './config/configSchema.js'
 
 (async () => {
 	if (process.env.NODE_HEAPDUMP === 'true') {

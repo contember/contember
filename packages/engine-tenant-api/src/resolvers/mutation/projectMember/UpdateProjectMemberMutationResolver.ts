@@ -3,19 +3,19 @@ import {
 	MutationUpdateProjectMemberArgs,
 	UpdateProjectMemberErrorCode,
 	UpdateProjectMemberResponse,
-} from '../../../schema'
-import { TenantResolverContext } from '../../TenantResolverContext'
+} from '../../../schema/index.js'
+import { TenantResolverContext } from '../../TenantResolverContext.js'
 import {
 	MembershipValidationErrorType,
 	MembershipValidator,
 	PermissionActions,
 	ProjectManager,
 	ProjectMemberManager,
-} from '../../../model'
-import { createMembershipValidationErrorResult } from '../../membershipUtils'
-import { createMembershipModification } from '../../../model/service/membershipUtils'
-import { Membership } from '../../../model/type/Membership'
-import { createErrorResponse, createProjectNotFoundResponse } from '../../errorUtils'
+} from '../../../model/index.js'
+import { createMembershipValidationErrorResult } from '../../membershipUtils.js'
+import { createMembershipModification } from '../../../model/service/membershipUtils.js'
+import { Membership } from '../../../model/type/Membership.js'
+import { createErrorResponse, createProjectNotFoundResponse } from '../../errorUtils.js'
 
 export class UpdateProjectMemberMutationResolver implements MutationResolvers {
 	constructor(

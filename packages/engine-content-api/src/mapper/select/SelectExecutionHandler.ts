@@ -1,9 +1,9 @@
-import { Path } from './Path'
+import { Path } from './Path.js'
 import { Input, Model } from '@contember/schema'
-import { SelectNestedData, SelectNestedDefaultValue } from './SelectHydrator'
+import { SelectNestedData, SelectNestedDefaultValue } from './SelectHydrator.js'
 import { SelectBuilder } from '@contember/database'
-import { Mapper } from '../Mapper'
-import { FieldNode, ObjectNode } from '../../inputProcessing'
+import { Mapper } from '../Mapper.js'
+import { FieldNode, ObjectNode } from '../../inputProcessing/index.js'
 
 export interface SelectExecutionHandler<
 	FieldArgs = unknown,

@@ -1,1 +1,1 @@
-export * from './VersionCommand'
+export * from './VersionCommand.js'

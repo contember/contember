@@ -1,1 +1,1 @@
-export * from './IdentityFetcher'
+export * from './IdentityFetcher.js'

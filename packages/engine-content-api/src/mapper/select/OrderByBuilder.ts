@@ -1,9 +1,9 @@
 import { Input, Model } from '@contember/schema'
-import { Path } from './Path'
-import { JoinBuilder } from './JoinBuilder'
+import { Path } from './Path.js'
+import { JoinBuilder } from './JoinBuilder.js'
 import { Literal, QueryBuilder, SelectBuilder } from '@contember/database'
 import { getColumnName, getTargetEntity } from '@contember/schema-utils'
-import { UserError } from '../../exception'
+import { UserError } from '../../exception.js'
 
 export class OrderByBuilder {
 	constructor(private readonly schema: Model.Schema, private readonly joinBuilder: JoinBuilder) {}

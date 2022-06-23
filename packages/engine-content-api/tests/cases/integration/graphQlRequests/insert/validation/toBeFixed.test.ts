@@ -1,7 +1,7 @@
 import { test } from 'vitest'
-import { execute, sqlTransaction } from '../../../../../src/test'
-import { GQL } from '../../../../../src/tags'
-import { testUuid } from '../../../../../src/testUuid'
+import { execute, sqlTransaction } from '../../../../../src/test.js'
+import { GQL } from '../../../../../src/tags.js'
+import { testUuid } from '../../../../../src/testUuid.js'
 import { Model, Validation } from '@contember/schema'
 import { InputValidation as v, SchemaBuilder } from '@contember/schema-definition'
 

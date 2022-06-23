@@ -1,7 +1,7 @@
 import { VersionedSchema } from '@contember/engine-system-api'
 import { Model } from '@contember/schema'
 import { acceptFieldVisitor } from '@contember/schema-utils'
-import { DbColumnSchema, DbColumnSchemaMap, TransferMapping, TransferTableMapping } from './TransferMapping'
+import { DbColumnSchema, DbColumnSchemaMap, TransferMapping, TransferTableMapping } from './TransferMapping.js'
 
 export class ContentSchemaTransferMappingFactory {
 	createContentSchemaMapping(contentSchema: VersionedSchema): TransferMapping {

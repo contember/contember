@@ -1,6 +1,6 @@
 import { assert, test } from 'vitest'
 import { testUuid } from '@contember/engine-api-tester'
-import { MembershipMatcher } from '../../../../src'
+import { MembershipMatcher } from '../../../../src/index.js'
 
 const siteIdA = testUuid(666)
 const siteIdB = testUuid(667)

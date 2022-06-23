@@ -1,7 +1,7 @@
-import { executeTenantTest } from '../../../src/testTenant'
-import { GQL } from '../../../src/tags'
-import { testUuid } from '../../../src/testUuid'
-import { disableApiKey } from './sql/disableApiKeySql'
+import { executeTenantTest } from '../../../src/testTenant.js'
+import { GQL } from '../../../src/tags.js'
+import { testUuid } from '../../../src/testUuid.js'
+import { disableApiKey } from './sql/disableApiKeySql.js'
 import { test } from 'vitest'
 
 test('disable api key', async () => {

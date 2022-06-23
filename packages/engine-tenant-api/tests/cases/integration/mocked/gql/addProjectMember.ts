@@ -1,6 +1,6 @@
-import { GraphQLTestQuery } from './types'
-import { GQL } from '../../../../src/tags'
-import { MembershipInput } from '../../../../../src/schema'
+import { GraphQLTestQuery } from './types.js'
+import { GQL } from '../../../../src/tags.js'
+import { MembershipInput } from '../../../../../src/schema/index.js'
 
 export const addProjectMemberMutation = (variables: {
 	projectSlug: string

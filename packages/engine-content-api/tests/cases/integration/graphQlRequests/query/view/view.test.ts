@@ -1,8 +1,8 @@
 import { test } from 'vitest'
-import { execute } from '../../../../../src/test'
+import { execute } from '../../../../../src/test.js'
 import { SchemaDefinition as def } from '@contember/schema-definition'
-import { GQL, SQL } from '../../../../../src/tags'
-import { testUuid } from '../../../../../src/testUuid'
+import { GQL, SQL } from '../../../../../src/tags.js'
+import { testUuid } from '../../../../../src/testUuid.js'
 
 namespace TestModel {
 	export class Author {

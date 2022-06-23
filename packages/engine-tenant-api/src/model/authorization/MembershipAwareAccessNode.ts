@@ -1,7 +1,7 @@
 import { AccessEvaluator, AccessNode, Authorizator } from '@contember/authorization'
-import { Membership } from '../type'
+import { Membership } from '../type/index.js'
 import { Acl } from '@contember/schema'
-import { MembershipMatcher } from './MembershipMatcher'
+import { MembershipMatcher } from './MembershipMatcher.js'
 
 export class MembershipAwareAccessNode implements AccessNode {
 	private readonly membershipMatcher: MembershipMatcher

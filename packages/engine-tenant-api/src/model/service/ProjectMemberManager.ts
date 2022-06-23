@@ -6,16 +6,16 @@ import {
 	RemoveProjectMemberResponse,
 	UpdateProjectMemberCommand,
 	UpdateProjectMemberResponse,
-} from '../commands'
-import { ProjectMembershipByIdentityQuery, ProjectMembersQuery, ProjectRolesByIdentityQuery } from '../queries'
-import { Membership, MembershipVariable } from '../type/Membership'
-import { AddProjectMemberErrorCode, MemberType } from '../../schema'
-import { AccessVerifier, PermissionActions, TenantRole } from '../authorization'
-import { indexListBy, notEmpty } from '../../utils/array'
-import { createSetMembershipVariables } from './membershipUtils'
+} from '../commands/index.js'
+import { ProjectMembershipByIdentityQuery, ProjectMembersQuery, ProjectRolesByIdentityQuery } from '../queries/index.js'
+import { Membership, MembershipVariable } from '../type/Membership.js'
+import { AddProjectMemberErrorCode, MemberType } from '../../schema/index.js'
+import { AccessVerifier, PermissionActions, TenantRole } from '../authorization/index.js'
+import { indexListBy, notEmpty } from '../../utils/array.js'
+import { createSetMembershipVariables } from './membershipUtils.js'
 import { ProjectRole } from '@contember/schema'
-import { Response, ResponseError, ResponseOk } from '../utils/Response'
-import { DatabaseContext } from '../utils'
+import { Response, ResponseError, ResponseOk } from '../utils/Response.js'
+import { DatabaseContext } from '../utils/index.js'
 
 export class ProjectMemberManager {
 

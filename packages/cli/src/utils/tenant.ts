@@ -1,6 +1,6 @@
 import prompts from 'prompts'
 import { GraphQLClient } from 'graphql-request'
-import { InstanceApiEnvironment } from './instance'
+import { InstanceApiEnvironment } from './instance/index.js'
 import { Workspace } from '@contember/cli-common'
 
 const validatePassword = (password: string) =>

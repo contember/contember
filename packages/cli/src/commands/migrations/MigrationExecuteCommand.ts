@@ -1,16 +1,16 @@
 import { Command, CommandConfiguration, Input, validateProjectName, Workspace } from '@contember/cli-common'
-import { MigrationsContainerFactory } from '../../MigrationsContainer'
+import { MigrationsContainerFactory } from '../../MigrationsContainer.js'
 import {
 	configureExecuteMigrationCommand,
 	ExecuteMigrationOptions,
 	executeMigrations,
 	resolveMigrationStatus,
-} from './MigrationExecuteHelper'
-import { createMigrationStatusTable, findMigration, MigrationState } from '../../utils/migrations'
-import { assertNever } from '../../utils/assertNever'
-import { interactiveResolveInstanceEnvironmentFromInput } from '../../utils/instance'
-import { interactiveResolveApiToken, TenantClient } from '../../utils/tenant'
-import { SystemClient } from '../../utils/system'
+} from './MigrationExecuteHelper.js'
+import { createMigrationStatusTable, findMigration, MigrationState } from '../../utils/migrations.js'
+import { assertNever } from '../../utils/assertNever.js'
+import { interactiveResolveInstanceEnvironmentFromInput } from '../../utils/instance/index.js'
+import { interactiveResolveApiToken, TenantClient } from '../../utils/tenant.js'
+import { SystemClient } from '../../utils/system/index.js'
 
 type Args = {
 	project: string

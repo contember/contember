@@ -1,12 +1,12 @@
 import { asyncIterableTransaction, Client, Compiler, Connection, wrapIdentifier } from '@contember/database'
-import { Command } from './Command'
-import { TransferMapping, TransferTableMapping } from './TransferMapping'
+import { Command } from './Command.js'
+import { TransferMapping, TransferTableMapping } from './TransferMapping.js'
 import { Model } from '@contember/schema'
-import { ContentSchemaTransferMappingFactory } from './ContentSchemaTransferMappingFactory'
-import { SystemSchemaTransferMappingFactory } from './SystemSchemaTransferMappingFactory'
+import { ContentSchemaTransferMappingFactory } from './ContentSchemaTransferMappingFactory.js'
+import { SystemSchemaTransferMappingFactory } from './SystemSchemaTransferMappingFactory.js'
 import * as Typesafe from '@contember/typesafe'
 import { StagesQuery } from '@contember/engine-system-api'
-import { ProjectContainer } from '../ProjectContainer'
+import { ProjectContainer } from '../ProjectContainer.js'
 
 export type ExportRequest = ReturnType<typeof ExportRequest>
 export const ExportRequest = Typesafe.object({

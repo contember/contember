@@ -1,5 +1,5 @@
 import { Key, pathToRegexp } from 'path-to-regexp'
-import { KoaContext, KoaMiddleware } from './types'
+import { KoaContext, KoaMiddleware } from './types.js'
 
 type Params = { [param: string]: string }
 type KoaRequestState = {

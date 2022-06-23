@@ -1,7 +1,7 @@
 import { Acl, Model, Writable } from '@contember/schema'
 import { getEntity, PredicateDefinitionProcessor } from '@contember/schema-utils'
-import { mapObject } from '../utils'
-import { prefixVariable } from './VariableUtils'
+import { mapObject } from '../utils/index.js'
+import { prefixVariable } from './VariableUtils.js'
 
 export class PermissionFactory {
 	constructor(private readonly schema: Model.Schema) {}

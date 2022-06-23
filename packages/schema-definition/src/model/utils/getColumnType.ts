@@ -1,5 +1,5 @@
 import { Model } from '@contember/schema'
-import { assertNever } from '../../utils'
+import { assertNever } from '../../utils/index.js'
 
 export const getColumnType = (type: Exclude<Model.ColumnType, Model.ColumnType.Enum>): string => {
 	switch (type) {

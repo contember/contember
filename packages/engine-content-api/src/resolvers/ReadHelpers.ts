@@ -1,9 +1,9 @@
 import { Input, Model } from '@contember/schema'
-import { Mapper } from '../mapper'
-import { ObjectNode } from '../inputProcessing'
-import { assertNever, createPaginationHelper } from '../utils'
-import { ImplementationException } from '../exception'
-import { Operation, readOperationMeta } from '../schema'
+import { Mapper } from '../mapper/index.js'
+import { ObjectNode } from '../inputProcessing/index.js'
+import { assertNever, createPaginationHelper } from '../utils/index.js'
+import { ImplementationException } from '../exception.js'
+import { Operation, readOperationMeta } from '../schema/index.js'
 import { GraphQLFieldMap } from 'graphql'
 
 export const paginate = async (

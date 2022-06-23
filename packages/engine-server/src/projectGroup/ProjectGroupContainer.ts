@@ -1,7 +1,7 @@
 import { Builder } from '@contember/dic'
 import { Connection } from '@contember/database'
 import { TenantContainerFactory } from '@contember/engine-tenant-api'
-import { TenantConfig } from '../config/config'
+import { TenantConfig } from '../config/config.js'
 import {
 	Authenticator,
 	CryptoWrapper,
@@ -19,9 +19,9 @@ import {
 	ProjectInitializerProxy,
 	ProjectSchemaResolver,
 	ProjectSchemaResolverProxy,
-} from '../project'
+} from '../project/index.js'
 import { SystemContainerFactory } from '@contember/engine-system-api'
-import { ProjectConfigResolver } from '../config/projectConfigResolver'
+import { ProjectConfigResolver } from '../config/projectConfigResolver.js'
 import { createSecretKey } from 'crypto'
 
 interface ProjectGroupContainerFactoryArgs

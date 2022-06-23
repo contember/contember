@@ -1,10 +1,10 @@
-import { signUpMutation } from '../mocked/gql/signUp'
-import { createResetPasswordRequestMutation } from '../mocked/gql/createResetPasswordRequest'
-import { TenantRole } from '../../../../src/model/authorization'
-import { resetPasswordMutation } from '../mocked/gql/resetPassword'
-import { signInMutation } from '../mocked/gql/signIn'
+import { signUpMutation } from '../mocked/gql/signUp.js'
+import { createResetPasswordRequestMutation } from '../mocked/gql/createResetPasswordRequest.js'
+import { TenantRole } from '../../../../src/model/authorization/index.js'
+import { resetPasswordMutation } from '../mocked/gql/resetPassword.js'
+import { signInMutation } from '../mocked/gql/signIn.js'
 import { test, assert } from 'vitest'
-import { testTenantDb } from '../../../src/testTenantDb'
+import { testTenantDb } from '../../../src/testTenantDb.js'
 
 test('execute password reset', testTenantDb(async ({ tester }) => {
 	const email = 'john@doe.com'

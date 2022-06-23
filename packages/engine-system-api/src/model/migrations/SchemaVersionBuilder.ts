@@ -1,8 +1,8 @@
 import { Schema } from '@contember/schema'
 import { SchemaMigrator } from '@contember/schema-migrations'
 import { emptySchema, normalizeSchema } from '@contember/schema-utils'
-import { ExecutedMigrationsResolver } from './ExecutedMigrationsResolver'
-import { DatabaseContext } from '../database'
+import { ExecutedMigrationsResolver } from './ExecutedMigrationsResolver.js'
+import { DatabaseContext } from '../database/index.js'
 
 export type VersionedSchema = Schema & { version: string; notNormalized: Schema & { version: string } }
 

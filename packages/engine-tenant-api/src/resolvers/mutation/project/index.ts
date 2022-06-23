@@ -1,3 +1,3 @@
-export * from './CreateProjectMutationResolver'
-export * from './SetProjectSecretMutationResolver'
-export * from './UpdateProjectMutationResolver'
+export * from './CreateProjectMutationResolver.js'
+export * from './SetProjectSecretMutationResolver.js'
+export * from './UpdateProjectMutationResolver.js'

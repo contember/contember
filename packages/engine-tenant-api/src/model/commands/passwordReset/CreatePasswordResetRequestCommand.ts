@@ -1,6 +1,6 @@
-import { Command } from '../Command'
-import { computeTokenHash, generateToken } from '../../utils'
-import { SavePasswordResetRequestCommand } from './SavePasswordResetRequestCommand'
+import { Command } from '../Command.js'
+import { computeTokenHash, generateToken } from '../../utils/index.js'
+import { SavePasswordResetRequestCommand } from './SavePasswordResetRequestCommand.js'
 
 export class CreatePasswordResetRequestCommand implements Command<CreatePasswordResetRequestResult> {
 	constructor(

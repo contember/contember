@@ -1,4 +1,4 @@
-import { Connection } from '../client'
+import { Connection } from '../client/index.js'
 
 export const withDatabaseAdvisoryLock = async <Cn extends Connection.Queryable, Result>(
 	connection: Cn,

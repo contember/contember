@@ -1,8 +1,8 @@
-import { authenticatedApiKeyId, authenticatedIdentityId, executeTenantTest } from '../../../src/testTenant'
-import { testUuid } from '../../../src/testUuid'
-import { GQL, SQL } from '../../../src/tags'
-import { disableApiKey } from './sql/disableApiKeySql'
-import { getPersonByIdentity } from './sql/getPersonByIdentity'
+import { authenticatedApiKeyId, authenticatedIdentityId, executeTenantTest } from '../../../src/testTenant.js'
+import { testUuid } from '../../../src/testUuid.js'
+import { GQL, SQL } from '../../../src/tags.js'
+import { disableApiKey } from './sql/disableApiKeySql.js'
+import { getPersonByIdentity } from './sql/getPersonByIdentity.js'
 import { test } from 'vitest'
 
 test('sign out', async () => {

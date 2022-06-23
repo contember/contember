@@ -1,5 +1,5 @@
 import { join } from 'path'
-import { packageRoot } from '../pathUtils'
+import { packageRoot } from '../pathUtils.js'
 import fs from 'fs/promises'
 
 export const getPackageVersion = async () => {

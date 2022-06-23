@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { ProjectMembershipFetcher, ProjectMembershipResolver } from '../../../src'
-import { createMock } from '../../utils'
+import { ProjectMembershipFetcher, ProjectMembershipResolver } from '../../../src/index.js'
+import { createMock } from '../../utils.js'
 import { Membership } from '@contember/engine-tenant-api'
 
 describe('membership resolver', () => {

@@ -1,9 +1,9 @@
-import { isIt } from '../../utils'
+import { isIt } from '../../utils/index.js'
 import { acceptFieldVisitor } from '@contember/schema-utils'
 import { Input, Model } from '@contember/schema'
-import { Path, PathFactory } from './Path'
-import { JoinBuilder } from './JoinBuilder'
-import { ConditionBuilder } from './ConditionBuilder'
+import { Path, PathFactory } from './Path.js'
+import { JoinBuilder } from './JoinBuilder.js'
+import { ConditionBuilder } from './ConditionBuilder.js'
 import { ConditionBuilder as SqlConditionBuilder, Operator, QueryBuilder, SelectBuilder } from '@contember/database'
 
 export class WhereBuilder {

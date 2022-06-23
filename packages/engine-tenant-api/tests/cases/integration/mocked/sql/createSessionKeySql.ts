@@ -1,4 +1,4 @@
-import { SQL } from '../../../../src/tags'
+import { SQL } from '../../../../src/tags.js'
 
 export const createSessionKeySql = function ({ apiKeyId, identityId }: { apiKeyId: string; identityId: string }) {
 	return {

@@ -6,12 +6,12 @@ import {
 	FieldAccessVisitor,
 	GqlTypeName,
 	WhereTypeProvider,
-} from '../../schema'
+} from '../../schema/index.js'
 import { acceptFieldVisitor } from '@contember/schema-utils'
-import { Authorizator } from '../../acl'
-import { getFieldsForUniqueWhere } from '../../utils'
-import { HasManyToHasOneReducerExtension } from './HasManyToHasOneReducer'
-import { FieldMap } from '../EntityFieldsProvider'
+import { Authorizator } from '../../acl/index.js'
+import { getFieldsForUniqueWhere } from '../../utils/index.js'
+import { HasManyToHasOneReducerExtension } from './HasManyToHasOneReducer.js'
+import { FieldMap } from '../EntityFieldsProvider.js'
 
 export class HasManyToHasOneRelationReducerFieldVisitor implements
 	Model.ColumnVisitor<FieldMap<HasManyToHasOneReducerExtension>>,

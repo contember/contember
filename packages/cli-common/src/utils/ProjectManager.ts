@@ -1,10 +1,10 @@
-import { Project, validateProjectName } from './Project'
+import { Project, validateProjectName } from './Project.js'
 import { basename, join } from 'path'
-import { Workspace } from './Workspace'
-import { resourcesDir } from '../pathUtils'
-import { installTemplate } from './template'
-import { getPathFromMapping, listEntriesInMapping, resolvePathMappingConfig } from './PathMapping'
-import { pathExists } from './fs'
+import { Workspace } from './Workspace.js'
+import { resourcesDir } from '../pathUtils.js'
+import { installTemplate } from './template.js'
+import { getPathFromMapping, listEntriesInMapping, resolvePathMappingConfig } from './PathMapping.js'
+import { pathExists } from './fs.js'
 
 export class ProjectManager {
 	constructor(private readonly workspace: Workspace) {}

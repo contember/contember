@@ -1,8 +1,8 @@
 import { test } from 'vitest'
-import { execute, sqlDeferred, sqlTransaction } from '../../../../../src/test'
-import { GQL, SQL } from '../../../../../src/tags'
-import { testUuid } from '../../../../../src/testUuid'
-import { siteSettingSchema } from './schema'
+import { execute, sqlDeferred, sqlTransaction } from '../../../../../src/test.js'
+import { GQL, SQL } from '../../../../../src/tags.js'
+import { testUuid } from '../../../../../src/testUuid.js'
+import { siteSettingSchema } from './schema.js'
 
 test('delete', async () => {
 	await execute({

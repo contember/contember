@@ -8,8 +8,8 @@ import {
 	evaluateValidation,
 	QueryAstFactory,
 	ValidationContext,
-} from '../../../src/input-validation'
-import { FieldNode, ObjectNode } from '../../../src/inputProcessing'
+} from '../../../src/input-validation/index.js'
+import { FieldNode, ObjectNode } from '../../../src/inputProcessing/index.js'
 import { describe, it, assert } from 'vitest'
 
 describe('input validation tests', () => {

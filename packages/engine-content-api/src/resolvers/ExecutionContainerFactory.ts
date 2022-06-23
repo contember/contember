@@ -1,8 +1,8 @@
 import { Builder, Container } from '@contember/dic'
 import { Acl, Schema } from '@contember/schema'
-import { Context } from '../types'
-import { ReadResolver } from './ReadResolver'
-import { MutationResolver } from './MutationResolver'
+import { Context } from '../types.js'
+import { ReadResolver } from './ReadResolver.js'
+import { MutationResolver } from './MutationResolver.js'
 import { Client } from '@contember/database'
 import {
 	ColumnValueResolver,
@@ -11,12 +11,12 @@ import {
 	InputPreValidator,
 	QueryAstFactory,
 	ValidationDataSelector,
-} from '../input-validation'
-import { ValidationResolver } from './ValidationResolver'
+} from '../input-validation/index.js'
+import { ValidationResolver } from './ValidationResolver.js'
 import { Providers } from '@contember/schema-utils'
-import { GraphQlQueryAstFactory } from './GraphQlQueryAstFactory'
+import { GraphQlQueryAstFactory } from './GraphQlQueryAstFactory.js'
 import { getArgumentValues } from 'graphql/execution/values'
-import { createMapperContainer } from '../mapper'
+import { createMapperContainer } from '../mapper/index.js'
 
 export interface ExecutionContainer {
 	readResolver: ReadResolver

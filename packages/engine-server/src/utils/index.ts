@@ -1,2 +1,2 @@
-export * from './sentry'
-export * from './strings'
+export * from './sentry.js'
+export * from './strings.js'

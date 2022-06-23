@@ -1,4 +1,4 @@
-import { ProjectConfig } from './ProjectContainer'
+import { ProjectConfig } from './ProjectContainer.js'
 import * as Typesafe from '@contember/typesafe'
 
 export type Env = Record<string, string>

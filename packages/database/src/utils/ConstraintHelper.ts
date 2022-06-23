@@ -1,5 +1,5 @@
-import { Client } from '../client'
-import { wrapIdentifier } from './sql'
+import { Client } from '../client/index.js'
+import { wrapIdentifier } from './sql.js'
 
 export class ConstraintHelper {
 	private fkConstraintNames: string[] | null = null

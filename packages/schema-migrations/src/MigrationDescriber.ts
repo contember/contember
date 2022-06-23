@@ -1,6 +1,6 @@
-import ModificationHandlerFactory from './modifications/ModificationHandlerFactory'
+import ModificationHandlerFactory from './modifications/ModificationHandlerFactory.js'
 import { createMigrationBuilder } from '@contember/database-migrations'
-import { Migration } from './Migration'
+import { Migration } from './Migration.js'
 import { Schema } from '@contember/schema'
 import {
 	emptyModificationDescriptionContext,
@@ -8,9 +8,9 @@ import {
 	ModificationDescriptionContext,
 	ModificationHandler,
 	ModificationHandlerOptions,
-} from './modifications/ModificationHandler'
-import { CreateEntityModification } from './modifications/entities'
-import { SchemaUpdateError } from './modifications/exceptions'
+} from './modifications/ModificationHandler.js'
+import { CreateEntityModification } from './modifications/entities/index.js'
+import { SchemaUpdateError } from './modifications/exceptions.js'
 
 export interface ModificationDescriptionResult {
 	modification: Migration.Modification

@@ -1,6 +1,6 @@
 import { ApiKeyManager, DatabaseContext, VerifyResult } from '@contember/engine-tenant-api'
-import { Timer } from './TimerMiddleware'
-import { HttpError } from './HttpError'
+import { Timer } from './TimerMiddleware.js'
+import { HttpError } from './HttpError.js'
 import { Request } from 'koa'
 
 export type AuthResult =

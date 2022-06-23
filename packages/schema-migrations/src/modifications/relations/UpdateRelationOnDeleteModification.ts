@@ -1,9 +1,9 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Model, Schema } from '@contember/schema'
-import { SchemaUpdater, updateEntity, updateField, updateModel } from '../utils/schemaUpdateUtils'
-import { ModificationHandlerStatic } from '../ModificationHandler'
-import { isIt } from '../../utils/isIt'
-import { updateRelations } from '../utils/diffUtils'
+import { SchemaUpdater, updateEntity, updateField, updateModel } from '../utils/schemaUpdateUtils.js'
+import { ModificationHandlerStatic } from '../ModificationHandler.js'
+import { isIt } from '../../utils/isIt.js'
+import { updateRelations } from '../utils/diffUtils.js'
 
 export const UpdateRelationOnDeleteModification: ModificationHandlerStatic<UpdateRelationOnDeleteModificationData> = class {
 	static id = 'updateRelationOnDelete'

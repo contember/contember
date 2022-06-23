@@ -1,8 +1,8 @@
-import { TenantGraphQLContext } from './TenantGraphQLHandlerFactory'
-import { AuthResult } from '../common'
+import { TenantGraphQLContext } from './TenantGraphQLHandlerFactory.js'
+import { AuthResult } from '../common/index.js'
 import { TenantContainer } from '@contember/engine-tenant-api'
-import { KoaContext } from '../koa'
-import { GraphQLKoaState } from '../graphql'
+import { KoaContext } from '../koa/index.js'
+import { GraphQLKoaState } from '../graphql/index.js'
 
 export class TenantGraphQLContextFactory {
 	public create({ authResult, tenantContainer, koaContext }: {

@@ -1,6 +1,6 @@
 import { Model } from '@contember/schema'
-import { CreateFieldContext, FieldDefinition } from './FieldDefinition'
-import { EntityConstructor, Interface, RelationTarget } from '../types'
+import { CreateFieldContext, FieldDefinition } from './FieldDefinition.js'
+import { EntityConstructor, Interface, RelationTarget } from '../types.js'
 
 export class ManyHasManyInverseDefinitionImpl extends FieldDefinition<ManyHasManyInverseDefinitionOptions> {
 	type = 'ManyHasManyInverseDefinition' as const

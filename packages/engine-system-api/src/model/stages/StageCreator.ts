@@ -1,7 +1,7 @@
-import { CreateStageCommand } from '../commands'
-import { StageBySlugQuery } from '../queries'
-import { StageConfig } from '../../types'
-import { DatabaseContext } from '../database'
+import { CreateStageCommand } from '../commands/index.js'
+import { StageBySlugQuery } from '../queries/index.js'
+import { StageConfig } from '../../types.js'
+import { DatabaseContext } from '../database/index.js'
 
 class StageCreator {
 	constructor() {}

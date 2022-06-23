@@ -1,9 +1,9 @@
 import { test } from 'vitest'
-import { execute, sqlTransaction } from '../../../../../src/test'
+import { execute, sqlTransaction } from '../../../../../src/test.js'
 import { SchemaBuilder } from '@contember/schema-definition'
 import { Model } from '@contember/schema'
-import { GQL, SQL } from '../../../../../src/tags'
-import { testUuid } from '../../../../../src/testUuid'
+import { GQL, SQL } from '../../../../../src/tags.js'
+import { testUuid } from '../../../../../src/testUuid.js'
 
 test('update name', async () => {
 	await execute({

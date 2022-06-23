@@ -1,9 +1,9 @@
-import { Command } from '../Command'
+import { Command } from '../Command.js'
 import { SelectBuilder, UpdateBuilder } from '@contember/database'
-import { computeTokenHash } from '../../utils'
-import { ImplementationException } from '../../../exceptions'
-import { ChangePasswordCommand } from '../person/ChangePasswordCommand'
-import { Response, ResponseError, ResponseOk } from '../../utils/Response'
+import { computeTokenHash } from '../../utils/index.js'
+import { ImplementationException } from '../../../exceptions.js'
+import { ChangePasswordCommand } from '../person/ChangePasswordCommand.js'
+import { Response, ResponseError, ResponseOk } from '../../utils/Response.js'
 
 export class ResetPasswordCommand implements Command<ResetPasswordCommandResponse> {
 	constructor(private readonly token: string, private readonly password: string) {}

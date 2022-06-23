@@ -1,4 +1,4 @@
-import { ProjectContainerResolver } from './ProjectContainer'
+import { ProjectContainerResolver } from './ProjectContainer.js'
 import {
 	DatabaseContext,
 	ProjectInitializer,
@@ -6,10 +6,10 @@ import {
 	TenantContainer,
 } from '@contember/engine-tenant-api'
 import { SystemContainer } from '@contember/engine-system-api'
-import { Authenticator } from './common'
-import { TenantGraphQLHandler } from './tenant'
-import { SystemGraphQLHandler } from './system'
-import { ProjectMembershipResolver } from './content'
+import { Authenticator } from './common/index.js'
+import { TenantGraphQLHandler } from './tenant/index.js'
+import { SystemGraphQLHandler } from './system/index.js'
+import { ProjectMembershipResolver } from './content/index.js'
 
 export interface ProjectGroupContainer {
 	slug: string | undefined

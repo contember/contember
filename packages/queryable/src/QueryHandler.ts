@@ -1,4 +1,4 @@
-import { Query, Queryable } from './'
+import { Query, Queryable } from './/index.js'
 
 export class QueryHandler<Q extends Queryable<Q>> {
 	constructor(private readonly queryable: Q) {}

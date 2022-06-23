@@ -1,5 +1,5 @@
 import { AnyEvent, CreateEvent, DeleteEvent, EventType, UpdateEvent } from '@contember/engine-common'
-import { assertNever } from '../../../utils'
+import { assertNever } from '../../../utils/index.js'
 
 export type EventRow = {
 	id: string

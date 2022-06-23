@@ -1,6 +1,6 @@
 import { DocumentNode, OperationTypeNode } from 'graphql'
-import { GraphQLListener } from './execution'
-import { KoaContext } from '../koa'
+import { GraphQLListener } from './execution.js'
+import { KoaContext } from '../koa/index.js'
 
 const getOperationFromDocument = (document: DocumentNode): OperationTypeNode | undefined => {
 	for (const node of document.definitions) {

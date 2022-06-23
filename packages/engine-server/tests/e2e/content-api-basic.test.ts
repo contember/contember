@@ -1,5 +1,5 @@
 import { assert, test } from 'vitest'
-import { createTester, gql } from '../src/tester'
+import { createTester, gql } from '../src/tester.js'
 import { createSchema, SchemaDefinition as def } from '@contember/schema-definition'
 
 namespace TagModel {

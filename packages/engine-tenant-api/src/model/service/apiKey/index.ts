@@ -1,2 +1,2 @@
-export * from './ApiKeyManager'
-export * from './ApiKeyService'
+export * from './ApiKeyManager.js'
+export * from './ApiKeyService.js'

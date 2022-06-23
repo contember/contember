@@ -1,4 +1,4 @@
-import { Providers } from '../providers'
+import { Providers } from '../providers.js'
 import { Secret, TOTP, URI } from 'otpauth'
 
 export interface OtpData {

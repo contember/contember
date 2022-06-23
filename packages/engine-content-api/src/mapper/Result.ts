@@ -1,6 +1,6 @@
 import { Input, Model, Value } from '@contember/schema'
-import { convertError } from './ErrorUtils'
-import { getFulfilledValues, getRejections } from '../utils'
+import { convertError } from './ErrorUtils.js'
+import { getFulfilledValues, getRejections } from '../utils/index.js'
 import { SerializationFailureError } from '@contember/database'
 
 export enum MutationResultType {

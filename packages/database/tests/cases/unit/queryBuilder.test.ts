@@ -1,6 +1,6 @@
-import { Client, ConflictActionType, EventManager, LimitByGroupWrapper, LockType, Operator } from '../../../src'
+import { Client, ConflictActionType, EventManager, LimitByGroupWrapper, LockType, Operator } from '../../../src/index.js'
 import { createConnectionMock } from '@contember/database-tester'
-import { SQL } from '../../src/tags'
+import { SQL } from '../../src/tags.js'
 import { test } from 'vitest'
 
 interface Test {

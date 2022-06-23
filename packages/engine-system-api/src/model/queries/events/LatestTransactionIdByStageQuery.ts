@@ -1,5 +1,5 @@
 import { DatabaseQuery, DatabaseQueryable } from '@contember/database'
-import { ImplementationException } from '../../../utils'
+import { ImplementationException } from '../../../utils/index.js'
 
 export class LatestTransactionIdByStageQuery extends DatabaseQuery<string> {
 	constructor(private readonly stageSlug: string) {

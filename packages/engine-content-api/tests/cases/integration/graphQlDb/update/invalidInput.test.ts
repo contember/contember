@@ -2,7 +2,7 @@ import { SchemaBuilder } from '@contember/schema-definition'
 import { Model } from '@contember/schema'
 import { test, assert } from 'vitest'
 import { executeDbTest } from '@contember/engine-api-tester'
-import { GQL } from '../../../../src/tags'
+import { GQL } from '../../../../src/tags.js'
 
 const schema = new SchemaBuilder()
 	.entity('Post', e =>

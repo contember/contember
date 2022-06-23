@@ -1,3 +1,3 @@
-export * from './AllowAllPermissionFactory'
-export * from './PredicateDefinitionProcessor'
-export * from './schemaUtils'
+export * from './AllowAllPermissionFactory.js'
+export * from './PredicateDefinitionProcessor.js'
+export * from './schemaUtils.js'

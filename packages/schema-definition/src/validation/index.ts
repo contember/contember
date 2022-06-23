@@ -1,8 +1,8 @@
-import { tuple } from '../utils'
-import { SchemaDefinition } from '../model'
+import { tuple } from '../utils/index.js'
+import { SchemaDefinition } from '../model/index.js'
 import 'reflect-metadata'
 import { Validation } from '@contember/schema'
-import { filterEntityDefinition } from '../utils'
+import { filterEntityDefinition } from '../utils/index.js'
 
 type MessageOrString = Validation.Message | string
 

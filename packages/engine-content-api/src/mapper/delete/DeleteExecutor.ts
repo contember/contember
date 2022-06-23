@@ -1,10 +1,10 @@
 import { Acl, Input, Model } from '@contember/schema'
-import { assertNever } from '../../utils'
+import { assertNever } from '../../utils/index.js'
 import { acceptEveryFieldVisitor } from '@contember/schema-utils'
 import { Client, DeleteBuilder, ForeignKeyViolationError, SelectBuilder } from '@contember/database'
-import { PathFactory, WhereBuilder } from '../select'
-import { PredicateFactory } from '../../acl'
-import { UpdateBuilderFactory } from '../update'
+import { PathFactory, WhereBuilder } from '../select/index.js'
+import { PredicateFactory } from '../../acl/index.js'
+import { UpdateBuilderFactory } from '../update/index.js'
 import {
 	MutationDeleteOk,
 	MutationEntryNotFoundError,
@@ -13,9 +13,9 @@ import {
 	MutationResultHint,
 	MutationResultList,
 	NothingToDoReason,
-} from '../Result'
-import { Mapper } from '../Mapper'
-import { CheckedPrimary } from '../CheckedPrimary'
+} from '../Result.js'
+import { Mapper } from '../Mapper.js'
+import { CheckedPrimary } from '../CheckedPrimary.js'
 
 type EntityOwningRelationTuple = [Model.Entity, Model.ManyHasOneRelation | Model.OneHasOneOwningRelation]
 type OneHasOneOwningRelationTuple = [Model.Entity, Model.OneHasOneOwningRelation]

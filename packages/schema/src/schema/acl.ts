@@ -1,5 +1,5 @@
-import Input from './input'
-import { JSONValue } from './json'
+import Input from './input.js'
+import { JSONValue } from './json.js'
 
 namespace Acl {
 	export enum VariableType {

@@ -1,7 +1,7 @@
-import { MutationResolvers, MutationSignOutArgs, SignOutErrorCode, SignOutResponse } from '../../../schema'
-import { TenantResolverContext } from '../../TenantResolverContext'
-import { ApiKeyManager, DatabaseContext, PermissionActions, PersonQuery } from '../../../model'
-import { createErrorResponse } from '../../errorUtils'
+import { MutationResolvers, MutationSignOutArgs, SignOutErrorCode, SignOutResponse } from '../../../schema/index.js'
+import { TenantResolverContext } from '../../TenantResolverContext.js'
+import { ApiKeyManager, DatabaseContext, PermissionActions, PersonQuery } from '../../../model/index.js'
+import { createErrorResponse } from '../../errorUtils.js'
 
 export class SignOutMutationResolver implements MutationResolvers {
 	constructor(private readonly apiKeyManager: ApiKeyManager) {}

@@ -1,4 +1,4 @@
-import { InstanceApiEnvironment } from './environment'
+import { InstanceApiEnvironment } from './environment.js'
 import { Workspace } from '@contember/cli-common'
 import prompts from 'prompts'
 

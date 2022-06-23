@@ -1,6 +1,6 @@
 import { Permissions } from '@contember/authorization'
-import { PermissionActions } from './PermissionActions'
-import { TenantRole } from './Roles'
+import { PermissionActions } from './PermissionActions.js'
+import { TenantRole } from './Roles.js'
 
 class PermissionsFactory {
 	public create(): Permissions {

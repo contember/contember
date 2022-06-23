@@ -1,9 +1,9 @@
 import { test } from 'vitest'
-import { execute, failedTransaction, sqlTransaction } from '../../../../../src/test'
+import { execute, failedTransaction, sqlTransaction } from '../../../../../src/test.js'
 import { SchemaBuilder } from '@contember/schema-definition'
 import { Acl, Model } from '@contember/schema'
-import { GQL, SQL } from '../../../../../src/tags'
-import { testUuid } from '../../../../../src/testUuid'
+import { GQL, SQL } from '../../../../../src/tags.js'
+import { testUuid } from '../../../../../src/testUuid.js'
 
 test('set a name - allowed', async () => {
 	await execute({

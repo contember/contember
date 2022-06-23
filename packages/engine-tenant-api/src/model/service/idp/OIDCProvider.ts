@@ -1,9 +1,9 @@
 import * as Typesafe from '@contember/typesafe'
 import { Client, custom, errors, generators, Issuer, ResponseType } from 'openid-client'
-import { IDPResponseError } from './IDPResponseError'
-import { IdentityProviderHandler, IDPClaim, IDPResponse, InitIDPAuthResult } from './IdentityProviderHandler'
-import { IDPValidationError } from './IDPValidationError'
-import { InvalidIDPConfigurationError } from './InvalidIDPConfigurationError'
+import { IDPResponseError } from './IDPResponseError.js'
+import { IdentityProviderHandler, IDPClaim, IDPResponse, InitIDPAuthResult } from './IdentityProviderHandler.js'
+import { IDPValidationError } from './IDPValidationError.js'
+import { InvalidIDPConfigurationError } from './InvalidIDPConfigurationError.js'
 
 custom.setHttpOptionsDefaults({
 	timeout: 5000,

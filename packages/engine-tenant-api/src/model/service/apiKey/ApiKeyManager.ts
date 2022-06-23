@@ -4,13 +4,13 @@ import {
 	DisableIdentityApiKeysCommand,
 	DisableOneOffApiKeyCommand,
 	ProlongApiKeyCommand,
-} from '../../commands'
-import { ApiKey } from '../../type'
-import { Membership } from '../../type/Membership'
-import { ApiKeyByTokenQuery } from '../../queries'
-import { Response, ResponseError, ResponseOk } from '../../utils/Response'
-import { DatabaseContext, TokenHash } from '../../utils'
-import { ApiKeyService, CreateApiKeyResponse } from './ApiKeyService'
+} from '../../commands/index.js'
+import { ApiKey } from '../../type/index.js'
+import { Membership } from '../../type/Membership.js'
+import { ApiKeyByTokenQuery } from '../../queries/index.js'
+import { Response, ResponseError, ResponseOk } from '../../utils/Response.js'
+import { DatabaseContext, TokenHash } from '../../utils/index.js'
+import { ApiKeyService, CreateApiKeyResponse } from './ApiKeyService.js'
 import assert from 'assert'
 
 export class ApiKeyManager {

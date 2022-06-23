@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { CommandManager, Application } from '@contember/cli-common'
-import { WorkspaceCreateCommand } from './commands'
+import { WorkspaceCreateCommand } from './commands/index.js'
 ;(async () => {
 	const commandManager = new CommandManager({
 		['workspace']: () => new WorkspaceCreateCommand(),

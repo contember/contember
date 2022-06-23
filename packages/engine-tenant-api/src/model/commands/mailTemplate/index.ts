@@ -1,2 +1,2 @@
-export * from './AddMailTemplateCommand'
-export * from './RemoveMailTemplateCommand'
+export * from './AddMailTemplateCommand.js'
+export * from './RemoveMailTemplateCommand.js'

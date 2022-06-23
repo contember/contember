@@ -1,8 +1,8 @@
 import { GraphQLInputFieldConfig, GraphQLList, GraphQLNonNull } from 'graphql'
 import { Acl, Model } from '@contember/schema'
-import { ColumnTypeResolver } from '../ColumnTypeResolver'
-import { UpdateEntityRelationInputProvider } from './UpdateEntityRelationInputProvider'
-import { Authorizator } from '../../acl'
+import { ColumnTypeResolver } from '../ColumnTypeResolver.js'
+import { UpdateEntityRelationInputProvider } from './UpdateEntityRelationInputProvider.js'
+import { Authorizator } from '../../acl/index.js'
 
 export class UpdateEntityInputFieldVisitor implements
 	Model.ColumnVisitor<GraphQLInputFieldConfig | undefined>,

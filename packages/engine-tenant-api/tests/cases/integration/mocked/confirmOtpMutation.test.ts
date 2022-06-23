@@ -1,10 +1,10 @@
-import { authenticatedIdentityId, executeTenantTest, now } from '../../../src/testTenant'
-import { testUuid } from '../../../src/testUuid'
-import { getPersonByIdentity } from './sql/getPersonByIdentity'
-import { confirmOtpMutation } from './gql/confirmOtp'
-import { ConfirmOtpErrorCode } from '../../../../src/schema'
+import { authenticatedIdentityId, executeTenantTest, now } from '../../../src/testTenant.js'
+import { testUuid } from '../../../src/testUuid.js'
+import { getPersonByIdentity } from './sql/getPersonByIdentity.js'
+import { confirmOtpMutation } from './gql/confirmOtp.js'
+import { ConfirmOtpErrorCode } from '../../../../src/schema/index.js'
 import { test } from 'vitest'
-import { OtpAuthenticator } from '../../../../src'
+import { OtpAuthenticator } from '../../../../src/index.js'
 import { Buffer } from 'buffer'
 
 test('confirm otp mutation with valid code', async () => {

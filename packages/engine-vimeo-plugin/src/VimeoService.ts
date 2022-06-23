@@ -1,4 +1,4 @@
-import { VimeoConfig } from './Config'
+import { VimeoConfig } from './Config.js'
 import fetch from 'node-fetch'
 
 export class VimeoService {

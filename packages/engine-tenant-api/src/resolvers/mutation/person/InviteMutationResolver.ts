@@ -6,8 +6,8 @@ import {
 	MutationInviteArgs,
 	MutationResolvers,
 	MutationUnmanagedInviteArgs,
-} from '../../../schema'
-import { TenantResolverContext } from '../../TenantResolverContext'
+} from '../../../schema/index.js'
+import { TenantResolverContext } from '../../TenantResolverContext.js'
 import {
 	DatabaseContext,
 	InviteManager,
@@ -17,9 +17,9 @@ import {
 	PermissionActions,
 	Project,
 	ProjectManager,
-} from '../../../model'
-import { createMembershipValidationErrorResult } from '../../membershipUtils'
-import { createErrorResponse, createProjectNotFoundResponse } from '../../errorUtils'
+} from '../../../model/index.js'
+import { createMembershipValidationErrorResult } from '../../membershipUtils.js'
+import { createErrorResponse, createProjectNotFoundResponse } from '../../errorUtils.js'
 import { UserInputError } from '@contember/graphql-utils'
 
 export class InviteMutationResolver implements MutationResolvers {

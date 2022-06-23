@@ -1,4 +1,4 @@
-import { PredicateFactory, PredicatesInjector, VariableInjector } from '../acl'
+import { PredicateFactory, PredicatesInjector, VariableInjector } from '../acl/index.js'
 import {
 	ConditionBuilder,
 	FieldsVisitorFactory,
@@ -7,9 +7,9 @@ import {
 	MetaHandler,
 	OrderByBuilder,
 	WhereBuilder,
-} from './select'
-import { UniqueWhereExpander } from '../inputProcessing'
-import { HasManyToHasOneReducer, HasManyToHasOneReducerExecutionHandler } from '../extensions'
+} from './select/index.js'
+import { UniqueWhereExpander } from '../inputProcessing/index.js'
+import { HasManyToHasOneReducer, HasManyToHasOneReducerExecutionHandler } from '../extensions/index.js'
 import {
 	DeleteExecutor,
 	InsertBuilderFactory,
@@ -25,13 +25,13 @@ import {
 	SelectHydrator,
 	UpdateBuilderFactory,
 	Updater,
-} from '../mapper'
+} from '../mapper/index.js'
 import { Builder } from '@contember/dic'
 import { Acl, Schema } from '@contember/schema'
 import { Client, SelectBuilder as DbSelectBuilder } from '@contember/database'
 import { Providers } from '@contember/schema-utils'
-import { PaginatedHasManyExecutionHandler } from '../extensions/paginatedHasMany/PaginatedHasManyExecutionHandler'
-import { PaginatedHasManyFieldProvider } from '../extensions/paginatedHasMany/PaginatedHasManyFieldProvider'
+import { PaginatedHasManyExecutionHandler } from '../extensions/paginatedHasMany/PaginatedHasManyExecutionHandler.js'
+import { PaginatedHasManyFieldProvider } from '../extensions/paginatedHasMany/PaginatedHasManyFieldProvider.js'
 
 type MapperContainerArgs = {
 	schema: Schema

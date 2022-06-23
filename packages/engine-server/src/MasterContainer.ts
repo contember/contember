@@ -1,10 +1,10 @@
 import { getSystemMigrations, SystemContainerFactory } from '@contember/engine-system-api'
 import { TenantContainerFactory } from '@contember/engine-tenant-api'
 import { Builder } from '@contember/dic'
-import { ServerConfig } from './config/config'
-import { logSentryError } from './utils'
+import { ServerConfig } from './config/config.js'
+import { logSentryError } from './utils/index.js'
 import { ModificationHandlerFactory } from '@contember/schema-migrations'
-import { Initializer } from './bootstrap'
+import { Initializer } from './bootstrap/index.js'
 import { Plugin } from '@contember/engine-plugins'
 import {
 	compose,
@@ -35,14 +35,14 @@ import {
 	TenantGraphQLContextFactory,
 	TenantGraphQLHandlerFactory,
 } from '@contember/engine-http'
-import { ProjectContainerFactoryFactory } from './project'
+import { ProjectContainerFactoryFactory } from './project/index.js'
 import koaCompress from 'koa-compress'
 import bodyParser from 'koa-bodyparser'
-import { ProjectConfigResolver } from './config/projectConfigResolver'
-import { TenantConfigResolver } from './config/tenantConfigResolver'
-import { ProjectGroupContainerFactory } from './projectGroup/ProjectGroupContainer'
+import { ProjectConfigResolver } from './config/projectConfigResolver.js'
+import { TenantConfigResolver } from './config/tenantConfigResolver.js'
+import { ProjectGroupContainerFactory } from './projectGroup/ProjectGroupContainer.js'
 import corsMiddleware from '@koa/cors'
-import { ProjectGroupResolver } from './projectGroup/ProjectGroupResolver'
+import { ProjectGroupResolver } from './projectGroup/ProjectGroupResolver.js'
 import { ProjectGroupResolver as ProjectGroupResolverInterface } from '@contember/engine-http'
 import { Logger } from '@contember/engine-common'
 

@@ -1,13 +1,13 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Schema } from '@contember/schema'
-import { SchemaUpdater, updateEntity, updateModel } from '../utils/schemaUpdateUtils'
-import { ModificationHandlerOptions, ModificationHandlerStatic } from '../ModificationHandler'
+import { SchemaUpdater, updateEntity, updateModel } from '../utils/schemaUpdateUtils.js'
+import { ModificationHandlerOptions, ModificationHandlerStatic } from '../ModificationHandler.js'
 import {
 	createEventTrigger,
 	createEventTrxTrigger,
 	dropEventTrigger,
 	dropEventTrxTrigger,
-} from '../utils/sqlUpdateUtils'
+} from '../utils/sqlUpdateUtils.js'
 
 export const ToggleEventLogModification: ModificationHandlerStatic<ToggleEventLogModificationData> = class {
 	static id = 'toggleEventLog'

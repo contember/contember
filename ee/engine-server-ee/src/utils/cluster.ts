@@ -1,5 +1,5 @@
 import cluster, { Worker } from 'cluster'
-import { timeout } from './timeout'
+import { timeout } from './timeout.js'
 
 export const getClusterProcessType = (isClusterMode: boolean) =>
 	!isClusterMode ? ProcessType.singleNode : cluster.isMaster ? ProcessType.clusterMaster : ProcessType.clusterWorker

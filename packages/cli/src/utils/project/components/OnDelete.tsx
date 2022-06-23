@@ -1,8 +1,8 @@
 import { h, Fragment } from 'preact'
 import { Model } from '@contember/schema'
-import { ReferenceMapEntry, ReferencesMap } from '../../schema/collectReferences'
-import { FieldLink } from './FieldLink'
-import { EntityLink } from './EntityLink'
+import { ReferenceMapEntry, ReferencesMap } from '../../schema/collectReferences.js'
+import { FieldLink } from './FieldLink.js'
+import { EntityLink } from './EntityLink.js'
 
 const sortReferences = (a: ReferenceMapEntry, b: ReferenceMapEntry) =>
 	a.owningRelation.joiningColumn.onDelete.localeCompare(b.owningRelation.joiningColumn.onDelete)

@@ -1,6 +1,6 @@
-import { createMetadataStore } from './MetadataStore'
-import { Role } from '../roles'
-import { AllowDefinition } from '../permissions'
+import { createMetadataStore } from './MetadataStore.js'
+import { Role } from '../roles.js'
+import { AllowDefinition } from '../permissions.js'
 
 export const allowCustomPrimaryStore = createMetadataStore<Role[]>([])
 export const allowCustomPrimaryAllRolesStore = createMetadataStore<boolean>(false)

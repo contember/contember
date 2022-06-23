@@ -1,6 +1,6 @@
 import  pg from 'pg'
-import { EventManager } from './EventManager'
-import { Connection } from './Connection'
+import { EventManager } from './EventManager.js'
+import { Connection } from './Connection.js'
 import {
 	QueryError,
 	ForeignKeyViolationError,
@@ -9,8 +9,8 @@ import {
 	SerializationFailureError,
 	TransactionAbortedError,
 	UniqueViolationError,
-} from './errors'
-import { ClientErrorCodes } from './errorCodes'
+} from './errors.js'
+import { ClientErrorCodes } from './errorCodes.js'
 
 function prepareSql(sql: string) {
 	let parameterIndex = 0

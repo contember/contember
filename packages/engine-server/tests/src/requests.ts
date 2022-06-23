@@ -1,4 +1,4 @@
-import { executeGraphql, gql, loginToken } from './tester'
+import { executeGraphql, gql, loginToken } from './tester.js'
 import { assert } from 'vitest'
 import { Membership } from '@contember/engine-tenant-api'
 

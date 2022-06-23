@@ -1,6 +1,6 @@
 import { makeExecutableSchema } from '@graphql-tools/schema'
 import { Schema, TenantResolverContext, typeDefs } from '@contember/engine-tenant-api'
-import { KoaContext } from '../koa'
+import { KoaContext } from '../koa/index.js'
 import {
 	createErrorListener,
 	createGraphQLQueryHandler,
@@ -8,7 +8,7 @@ import {
 	ErrorLogger,
 	GraphQLKoaState,
 	GraphQLQueryHandler,
-} from '../graphql'
+} from '../graphql/index.js'
 
 export type TenantGraphQLContext = TenantResolverContext & { identityId: string; koaContext: KoaContext<GraphQLKoaState> }
 

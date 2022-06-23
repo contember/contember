@@ -1,6 +1,6 @@
-import Permissions from './Permissions'
-import AccessNode from './AccessNode'
-import Authorizator from './Authorizator'
+import Permissions from './Permissions.js'
+import AccessNode from './AccessNode.js'
+import Authorizator from './Authorizator.js'
 
 interface AccessEvaluator {
 	evaluate(accessNode: AccessNode, action: Authorizator.Action): Promise<boolean>

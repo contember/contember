@@ -1,5 +1,5 @@
 import { Authorizator } from '@contember/authorization'
-import { Membership } from '../type/Membership'
+import { Membership } from '../type/Membership.js'
 
 namespace PermissionActions {
 	export enum Resources {

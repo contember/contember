@@ -1,6 +1,6 @@
-import { ProjectMemberManager } from '../service'
-import { Membership } from '../type/Membership'
-import { DatabaseContext } from '../utils'
+import { ProjectMemberManager } from '../service/index.js'
+import { Membership } from '../type/Membership.js'
+import { DatabaseContext } from '../utils/index.js'
 
 export interface Identity {
 	readonly id: string

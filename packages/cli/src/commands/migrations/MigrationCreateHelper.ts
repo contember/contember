@@ -1,5 +1,5 @@
 import { CommandConfiguration, Input, Workspace, Project } from '@contember/cli-common'
-import { MigrationsContainerFactory } from '../../MigrationsContainer'
+import { MigrationsContainerFactory } from '../../MigrationsContainer.js'
 import {
 	MigrationCreator,
 	MigrationDescriber,

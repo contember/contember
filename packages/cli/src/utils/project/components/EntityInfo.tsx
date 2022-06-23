@@ -1,10 +1,10 @@
 import { Model, Schema } from '@contember/schema'
-import { ReferencesMap } from '../../schema/collectReferences'
-import { formatEntityAnchor, formatFieldAnchor } from './utils'
-import { SinglePermission } from './SinglePermission'
-import { FieldType } from './FieldType'
-import { FieldPermissions } from './FieldPermissions'
-import { OnDelete } from './OnDelete'
+import { ReferencesMap } from '../../schema/collectReferences.js'
+import { formatEntityAnchor, formatFieldAnchor } from './utils.js'
+import { SinglePermission } from './SinglePermission.js'
+import { FieldType } from './FieldType.js'
+import { FieldPermissions } from './FieldPermissions.js'
+import { OnDelete } from './OnDelete.js'
 import { Fragment, h } from 'preact'
 
 interface EntityInfoProps {

@@ -1,3 +1,3 @@
-export * from './CreateInputPreValidationProcessor'
-export * from './InputPreValidator'
-export * from './UpdateInputPreValidationProcessor'
+export * from './CreateInputPreValidationProcessor.js'
+export * from './InputPreValidator.js'
+export * from './UpdateInputPreValidationProcessor.js'

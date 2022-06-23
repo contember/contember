@@ -1,7 +1,7 @@
-import { Command } from '../Command'
-import { RemoveProjectMemberErrorCode } from '../../../schema'
+import { Command } from '../Command.js'
+import { RemoveProjectMemberErrorCode } from '../../../schema/index.js'
 import { DeleteBuilder } from '@contember/database'
-import { Response, ResponseError, ResponseOk } from '../../utils/Response'
+import { Response, ResponseError, ResponseOk } from '../../utils/Response.js'
 
 export class RemoveProjectMemberCommand implements Command<RemoveProjectMemberResponse> {
 	constructor(private readonly projectId: string, private readonly identityId: string) {}

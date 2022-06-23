@@ -1,5 +1,5 @@
 import jsyaml from 'js-yaml'
-import { JSONObject } from './json'
+import { JSONObject } from './json.js'
 import { readFile } from 'fs/promises'
 
 

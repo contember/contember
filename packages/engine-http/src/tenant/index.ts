@@ -1,3 +1,3 @@
-export * from './TenantApiMiddlewareFactory'
-export * from './TenantGraphQLHandlerFactory'
-export * from './TenantGraphQLContextFactory'
+export * from './TenantApiMiddlewareFactory.js'
+export * from './TenantGraphQLHandlerFactory.js'
+export * from './TenantGraphQLContextFactory.js'

@@ -1,6 +1,6 @@
 import { DatabaseQuery, DatabaseQueryable } from '@contember/database'
-import { ExecutedMigration } from '../../dtos'
-import { createExecutedMigrationDto, createExecutedMigrationQueryBuilder } from './ExecutedMigrationsQueryHelper'
+import { ExecutedMigration } from '../../dtos/index.js'
+import { createExecutedMigrationDto, createExecutedMigrationQueryBuilder } from './ExecutedMigrationsQueryHelper.js'
 
 export class ExecutedMigrationByVersionQuery extends DatabaseQuery<ExecutedMigration | null> {
 	constructor(private version: string) {

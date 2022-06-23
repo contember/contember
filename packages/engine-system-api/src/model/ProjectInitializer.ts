@@ -1,8 +1,8 @@
-import { ProjectConfig } from '../types'
-import { ProjectMigrator, SchemaVersionBuilder } from './migrations'
-import { StageCreator } from './stages'
-import { DatabaseContext, DatabaseContextFactory } from './database'
-import { SystemDbMigrationsRunnerFactory } from '../SystemContainer'
+import { ProjectConfig } from '../types.js'
+import { ProjectMigrator, SchemaVersionBuilder } from './migrations/index.js'
+import { StageCreator } from './stages/index.js'
+import { DatabaseContext, DatabaseContextFactory } from './database/index.js'
+import { SystemDbMigrationsRunnerFactory } from '../SystemContainer.js'
 import {
 	Connection,
 	createDatabaseIfNotExists,
@@ -12,7 +12,7 @@ import {
 } from '@contember/database'
 import { Logger } from '@contember/engine-common'
 import { Migration } from '@contember/schema-migrations'
-import { StagesQuery } from './queries'
+import { StagesQuery } from './queries/index.js'
 
 export class ProjectInitializer {
 	constructor(

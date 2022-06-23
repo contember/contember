@@ -1,6 +1,6 @@
 import { MigrationBuilder, Name } from '@contember/database-migrations'
-import { SystemMigrationArgs } from './types'
-import { getJunctionTables } from '../model'
+import { SystemMigrationArgs } from './types.js'
+import { getJunctionTables } from '../model/index.js'
 
 const createTrxEvent = (builder: MigrationBuilder, tableName: Name) => {
 	builder.createTrigger(tableName, 'log_event_trx', {

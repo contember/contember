@@ -1,2 +1,2 @@
-export * from './EntityFieldsProvider'
-export * from './hasManyToHasOneReducer'
+export * from './EntityFieldsProvider.js'
+export * from './hasManyToHasOneReducer/index.js'

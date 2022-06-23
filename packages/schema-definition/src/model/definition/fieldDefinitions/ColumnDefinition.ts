@@ -1,8 +1,8 @@
 import { Model } from '@contember/schema'
-import { Interface } from '../types'
-import { CreateFieldContext, FieldDefinition } from './FieldDefinition'
-import { EnumDefinition } from '../EnumDefinition'
-import { getColumnType } from '../../utils'
+import { Interface } from '../types.js'
+import { CreateFieldContext, FieldDefinition } from './FieldDefinition.js'
+import { EnumDefinition } from '../EnumDefinition.js'
+import { getColumnType } from '../../utils/index.js'
 
 export class ColumnDefinition extends FieldDefinition<ColumnDefinitionOptions> {
 	type = 'ColumnDefinition' as const

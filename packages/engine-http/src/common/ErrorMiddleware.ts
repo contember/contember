@@ -1,6 +1,6 @@
-import { KoaMiddleware } from '../koa'
-import { HttpError } from './HttpError'
-import { AuthResult } from './Authorizator'
+import { KoaMiddleware } from '../koa/index.js'
+import { HttpError } from './HttpError.js'
+import { AuthResult } from './Authorizator.js'
 
 export class ErrorMiddlewareFactory {
 	constructor(

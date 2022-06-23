@@ -19,8 +19,8 @@ import {
 	ProjectTruncateExecutor,
 	SchemaVersionBuilder,
 	StageCreator,
-} from './model'
-import { UuidProvider } from './utils'
+} from './model/index.js'
+import { UuidProvider } from './utils/index.js'
 import {
 	EventsQueryResolver,
 	ExecutedMigrationsQueryResolver,
@@ -30,9 +30,9 @@ import {
 	StagesQueryResolver,
 	SystemResolverContextFactory,
 	TruncateMutationResolver,
-} from './resolvers'
-import { getSystemMigrations, SystemMigrationArgs } from './migrations'
-import { EventOldValuesResolver } from './resolvers/types'
+} from './resolvers/index.js'
+import { getSystemMigrations, SystemMigrationArgs } from './migrations/index.js'
+import { EventOldValuesResolver } from './resolvers/types/index.js'
 
 export interface SystemContainer {
 	systemResolversFactory: ResolverFactory

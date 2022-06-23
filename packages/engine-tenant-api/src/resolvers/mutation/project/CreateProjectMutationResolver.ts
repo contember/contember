@@ -3,10 +3,10 @@ import {
 	CreateProjectResponseErrorCode,
 	MutationCreateProjectArgs,
 	MutationResolvers,
-} from '../../../schema'
-import { TenantResolverContext } from '../../TenantResolverContext'
-import { isTokenHash, PermissionActions, ProjectManager, TenantRole } from '../../../model'
-import { createErrorResponse } from '../../errorUtils'
+} from '../../../schema/index.js'
+import { TenantResolverContext } from '../../TenantResolverContext.js'
+import { isTokenHash, PermissionActions, ProjectManager, TenantRole } from '../../../model/index.js'
+import { createErrorResponse } from '../../errorUtils.js'
 import { UserInputError } from '@contember/graphql-utils'
 
 export class CreateProjectMutationResolver implements MutationResolvers {

@@ -1,6 +1,6 @@
 import { InputValidation as v, SchemaDefinition as d } from '@contember/schema-definition'
-import { createSchema, testCreate, testUpdate } from './utils'
-import { testUuid } from '../../../../src/testUuid'
+import { createSchema, testCreate, testUpdate } from './utils.js'
+import { testUuid } from '../../../../src/testUuid.js'
 import { describe, it, assert } from 'vitest'
 
 export class Author {

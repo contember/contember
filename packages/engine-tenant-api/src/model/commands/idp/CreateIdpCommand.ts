@@ -1,6 +1,6 @@
-import { Command } from '../Command'
+import { Command } from '../Command.js'
 import { InsertBuilder } from '@contember/database'
-import { IdentityProvider } from '../../type'
+import { IdentityProvider } from '../../type/index.js'
 
 export class CreateIdpCommand implements Command<void> {
 	constructor(

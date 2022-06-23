@@ -1,10 +1,10 @@
-import { tuple } from '../../utils'
-import EntitySelector from './EntitySelector'
+import { tuple } from '../../utils/index.js'
+import EntitySelector from './EntitySelector.js'
 import { Acl, Model, Writable } from '@contember/schema'
-import FieldSelector from './FieldSelector'
-import FieldPermissionsBuilder from './FieldPermissionsBuilder'
-import { PermissionsBuilder } from './PermissionsBuilder'
-import PredicateReference, { resolvePredicateReference } from './PredicateReference'
+import FieldSelector from './FieldSelector.js'
+import FieldPermissionsBuilder from './FieldPermissionsBuilder.js'
+import { PermissionsBuilder } from './PermissionsBuilder.js'
+import PredicateReference, { resolvePredicateReference } from './PredicateReference.js'
 
 export default class EntityPermissionsBuilder {
 	public constructor(public readonly builder: PermissionsBuilder, private readonly entities: Model.Entity[]) {}

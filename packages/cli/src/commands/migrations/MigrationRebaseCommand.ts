@@ -1,10 +1,10 @@
 import { Command, CommandConfiguration, Input } from '@contember/cli-common'
 import { MigrationVersionHelper } from '@contember/schema-migrations'
-import { executeCreateMigrationCommand } from './MigrationCreateHelper'
-import { getMigrationByName } from '../../utils/migrations'
-import { resolveSystemApiClient } from './SystemApiClientResolver'
+import { executeCreateMigrationCommand } from './MigrationCreateHelper.js'
+import { getMigrationByName } from '../../utils/migrations.js'
+import { resolveSystemApiClient } from './SystemApiClientResolver.js'
 import { emptySchema } from '@contember/schema-utils'
-import { validateMigrations } from './MigrationValidationHelper'
+import { validateMigrations } from './MigrationValidationHelper.js'
 
 type Args = {
 	project: string

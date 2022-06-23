@@ -1,6 +1,6 @@
 import fs from 'fs/promises'
 import path, { join } from 'path'
-import { Migration } from './Migration'
+import { Migration } from './Migration.js'
 
 export const loadMigrations = async (sqlDir: string, additional: Migration[]): Promise<Migration[]> => {
 	return (

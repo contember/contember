@@ -1,11 +1,11 @@
-import SchemaBuilder from './builder/SchemaBuilder'
-import ColumnBuilder from './builder/ColumnBuilder'
-import ManyHasManyBuilder from './builder/ManyHasManyBuilder'
-import OneHasManyBuilder from './builder/OneHasManyBuilder'
-import ManyHasOneBuilder from './builder/ManyHasOneBuilder'
-import OneHasOneBuilder from './builder/OneHasOneBuilder'
-import FieldBuilder from './builder/FieldBuilder'
-import * as SchemaDefinition from './definition'
+import SchemaBuilder from './builder/SchemaBuilder.js'
+import ColumnBuilder from './builder/ColumnBuilder.js'
+import ManyHasManyBuilder from './builder/ManyHasManyBuilder.js'
+import OneHasManyBuilder from './builder/OneHasManyBuilder.js'
+import ManyHasOneBuilder from './builder/ManyHasOneBuilder.js'
+import OneHasOneBuilder from './builder/OneHasOneBuilder.js'
+import FieldBuilder from './builder/FieldBuilder.js'
+import * as SchemaDefinition from './definition/index.js'
 
 export {
 	SchemaBuilder,

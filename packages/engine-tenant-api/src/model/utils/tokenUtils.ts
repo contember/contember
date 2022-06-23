@@ -1,5 +1,5 @@
 import crypto from 'crypto'
-import { FixedLengthHexString, isFixedLengthHexString } from './typeUtils'
+import { FixedLengthHexString, isFixedLengthHexString } from './typeUtils.js'
 
 export const generateToken = async (generator: {
 	randomBytes: (bytes: number) => Promise<Buffer>

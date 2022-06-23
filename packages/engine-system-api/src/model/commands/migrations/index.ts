@@ -1,2 +1,2 @@
-export * from './DeleteMigrationCommand'
-export * from './SaveMigrationCommand'
+export * from './DeleteMigrationCommand.js'
+export * from './SaveMigrationCommand.js'

@@ -1,5 +1,5 @@
-import { testMigrations } from '../../src/tests'
-import { SQL } from '../../src/tags'
+import { testMigrations } from '../../src/tests.js'
+import { SQL } from '../../src/tags.js'
 import { SchemaDefinition as def } from '@contember/schema-definition'
 
 namespace ViewEntityOriginalSchema {

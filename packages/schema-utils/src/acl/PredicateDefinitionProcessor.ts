@@ -1,4 +1,4 @@
-import { acceptFieldVisitor } from '../model'
+import { acceptFieldVisitor } from '../model/index.js'
 import { Acl, Input, Model } from '@contember/schema'
 
 class PredicateDefinitionProcessor {

@@ -1,4 +1,4 @@
-import { PredicateFactory, PredicatesInjector, VariableInjector } from '../../../src/acl'
+import { PredicateFactory, PredicatesInjector, VariableInjector } from '../../../src/acl/index.js'
 import { SchemaBuilder } from '@contember/schema-definition'
 import { Acl, Model } from '@contember/schema'
 import { describe, it, assert } from 'vitest'

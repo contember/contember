@@ -1,6 +1,6 @@
 import { escapeValue, MigrationBuilder, Name } from '@contember/database-migrations'
-import { SystemMigrationArgs } from './types'
-import { getJunctionTables } from '../model'
+import { SystemMigrationArgs } from './types.js'
+import { getJunctionTables } from '../model/index.js'
 
 const createEventTrigger = (builder: MigrationBuilder, tableName: Name, primaryColumns: string[]) => {
 	builder.createTrigger(tableName, 'log_event', {

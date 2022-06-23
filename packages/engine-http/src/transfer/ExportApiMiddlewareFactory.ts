@@ -1,13 +1,13 @@
-import { KoaMiddleware, KoaRequestState } from '../koa'
-import { AuthResult, HttpError, TimerMiddlewareState } from '../common'
-import { ProjectGroupResolver, ProjectInfoMiddlewareState } from '../project-common'
+import { KoaMiddleware, KoaRequestState } from '../koa/index.js'
+import { AuthResult, HttpError, TimerMiddlewareState } from '../common/index.js'
+import { ProjectGroupResolver, ProjectInfoMiddlewareState } from '../project-common/index.js'
 import { Readable } from 'stream'
 import { TenantRole } from '@contember/engine-tenant-api'
-import { toBuffer } from './CommandStream'
-import { ExportExecutor, ExportRequest } from './ExportExecutor'
+import { toBuffer } from './CommandStream.js'
+import { ExportExecutor, ExportRequest } from './ExportExecutor.js'
 import { ParseError } from '@contember/typesafe'
 import { Logger } from '@contember/engine-common'
-import { ProjectContainer } from '../ProjectContainer'
+import { ProjectContainer } from '../ProjectContainer.js'
 
 type ExportApiMiddlewareState =
 	& TimerMiddlewareState

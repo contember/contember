@@ -1,9 +1,9 @@
-import { Differ } from '../ModificationHandler'
+import { Differ } from '../ModificationHandler.js'
 import { Model, Schema } from '@contember/schema'
 import deepEqual from 'fast-deep-equal'
-import { RemoveEntityModification } from '../entities'
-import { getViewDirectDependants } from '../utils/viewDependencies'
-import { Migration } from '../../Migration'
+import { RemoveEntityModification } from '../entities/index.js'
+import { getViewDirectDependants } from '../utils/viewDependencies.js'
+import { Migration } from '../../Migration.js'
 
 export class RemoveChangedViewDiffer implements Differ {
 	constructor() {

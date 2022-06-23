@@ -1,8 +1,8 @@
 import { test } from 'vitest'
-import { execute, sqlTransaction } from '../../../../../src/test'
-import { GQL, SQL } from '../../../../../src/tags'
-import { testUuid } from '../../../../../src/testUuid'
-import { postWithNullableLocale } from './schema'
+import { execute, sqlTransaction } from '../../../../../src/test.js'
+import { GQL, SQL } from '../../../../../src/tags.js'
+import { testUuid } from '../../../../../src/testUuid.js'
+import { postWithNullableLocale } from './schema.js'
 
 test('disconnect', async () => {
 	await execute({

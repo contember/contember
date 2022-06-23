@@ -6,8 +6,8 @@ import {
 	createGraphqlRequestInfoProviderListener,
 	ErrorLogger,
 	GraphQLListener, GraphQLQueryHandler,
-} from '../graphql'
-import { ExtendedGraphqlContext } from './ContentGraphQLContextFactory'
+} from '../graphql/index.js'
+import { ExtendedGraphqlContext } from './ContentGraphQLContextFactory.js'
 
 export type ContentQueryHandler = GraphQLQueryHandler<ExtendedGraphqlContext>
 

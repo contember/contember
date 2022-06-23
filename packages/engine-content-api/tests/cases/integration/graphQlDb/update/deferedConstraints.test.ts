@@ -1,7 +1,7 @@
 import { test } from 'vitest'
 import { SchemaBuilder } from '@contember/schema-definition'
-import { GQL } from '../../../../src/tags'
-import { testUuid } from '../../../../src/testUuid'
+import { GQL } from '../../../../src/tags.js'
+import { testUuid } from '../../../../src/testUuid.js'
 import { executeDbTest } from '@contember/engine-api-tester'
 
 test('delete without deferring constraints', async () => {

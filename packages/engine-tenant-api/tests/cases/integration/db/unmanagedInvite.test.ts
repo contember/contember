@@ -1,9 +1,9 @@
-import { testUuid } from '../../../src/testUuid'
-import { unmanagedInviteMutation } from '../mocked/gql/unmanagedInvite'
-import { signInMutation } from '../mocked/gql/signIn'
-import { TenantRole } from '../../../../src/model/authorization'
+import { testUuid } from '../../../src/testUuid.js'
+import { unmanagedInviteMutation } from '../mocked/gql/unmanagedInvite.js'
+import { signInMutation } from '../mocked/gql/signIn.js'
+import { TenantRole } from '../../../../src/model/authorization/index.js'
 import { test, assert } from 'vitest'
-import { testTenantDb } from '../../../src/testTenantDb'
+import { testTenantDb } from '../../../src/testTenantDb.js'
 
 test('does not send an email and sets given password', testTenantDb(async ({ tester }) => {
 	const languageId = testUuid(555)

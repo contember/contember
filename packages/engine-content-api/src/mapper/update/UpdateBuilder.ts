@@ -1,10 +1,10 @@
-import { tuple } from '../../utils'
+import { tuple } from '../../utils/index.js'
 import { Input, Model, Value } from '@contember/schema'
 import { acceptEveryFieldVisitor, getColumnName, getColumnType } from '@contember/schema-utils'
 import { Client, Operator, QueryBuilder, UpdateBuilder as DbUpdateBuilder, Value as DbValue } from '@contember/database'
-import { PathFactory, WhereBuilder } from '../select'
-import { ColumnValue, ResolvedColumnValue, resolveGenericValue, resolveRowData } from '../ColumnValue'
-import { AbortUpdate } from './Updater'
+import { PathFactory, WhereBuilder } from '../select/index.js'
+import { ColumnValue, ResolvedColumnValue, resolveGenericValue, resolveRowData } from '../ColumnValue.js'
+import { AbortUpdate } from './Updater.js'
 
 export interface UpdateResult {
 	values: ResolvedColumnValue[]

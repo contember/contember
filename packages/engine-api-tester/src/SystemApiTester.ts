@@ -1,4 +1,4 @@
-import { createUuidGenerator, testUuid } from './testUuid'
+import { createUuidGenerator, testUuid } from './testUuid.js'
 import { graphql, GraphQLSchema } from 'graphql'
 import {
 	DatabaseContext,

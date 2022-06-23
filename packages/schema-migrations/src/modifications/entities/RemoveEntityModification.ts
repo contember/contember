@@ -10,11 +10,11 @@ import {
 	updateAclEveryRole,
 	updateModel,
 	updateSchema,
-} from '../utils/schemaUpdateUtils'
-import { ModificationHandlerOptions, ModificationHandlerStatic } from '../ModificationHandler'
-import { VERSION_ACL_PATCH, VERSION_REMOVE_REFERENCING_RELATIONS } from '../ModificationVersions'
+} from '../utils/schemaUpdateUtils.js'
+import { ModificationHandlerOptions, ModificationHandlerStatic } from '../ModificationHandler.js'
+import { VERSION_ACL_PATCH, VERSION_REMOVE_REFERENCING_RELATIONS } from '../ModificationVersions.js'
 import { isRelation, PredicateDefinitionProcessor } from '@contember/schema-utils'
-import { RemoveFieldModification } from '../fields'
+import { RemoveFieldModification } from '../fields/index.js'
 
 export const RemoveEntityModification: ModificationHandlerStatic<RemoveEntityModificationData> = class {
 	static id = 'removeEntity'

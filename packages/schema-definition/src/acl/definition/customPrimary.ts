@@ -1,6 +1,6 @@
-import { Role } from './roles'
-import { allowCustomPrimaryAllRolesStore, allowCustomPrimaryStore } from './internal/stores'
-import { DecoratorFunction, EntityConstructor } from '../../model/definition/types'
+import { Role } from './roles.js'
+import { allowCustomPrimaryAllRolesStore, allowCustomPrimaryStore } from './internal/stores.js'
+import { DecoratorFunction, EntityConstructor } from '../../model/definition/types.js'
 
 export const allowCustomPrimary = (role?: Role | Role[]): DecoratorFunction<any> => {
 	return (entity: EntityConstructor) => {

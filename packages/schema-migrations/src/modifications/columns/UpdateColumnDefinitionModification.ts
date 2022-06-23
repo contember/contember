@@ -1,9 +1,9 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Model, Schema } from '@contember/schema'
-import { SchemaUpdater, updateEntity, updateField, updateModel } from '../utils/schemaUpdateUtils'
-import { ModificationHandlerStatic } from '../ModificationHandler'
+import { SchemaUpdater, updateEntity, updateField, updateModel } from '../utils/schemaUpdateUtils.js'
+import { ModificationHandlerStatic } from '../ModificationHandler.js'
 import deepEqual from 'fast-deep-equal'
-import { updateColumns } from '../utils/diffUtils'
+import { updateColumns } from '../utils/diffUtils.js'
 import { wrapIdentifier } from '@contember/database'
 
 export const UpdateColumnDefinitionModification: ModificationHandlerStatic<UpdateColumnDefinitionModificationData> = class {

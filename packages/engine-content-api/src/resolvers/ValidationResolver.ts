@@ -1,8 +1,8 @@
 import { Input, Model, Result } from '@contember/schema'
-import { assertNever } from '../utils'
-import { InputPreValidator, ValidationResult } from '../input-validation'
+import { assertNever } from '../utils/index.js'
+import { InputPreValidator, ValidationResult } from '../input-validation/index.js'
 import { Client } from '@contember/database'
-import { MapperFactory } from '../mapper'
+import { MapperFactory } from '../mapper/index.js'
 
 export class ValidationResolver {
 	constructor(

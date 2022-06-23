@@ -1,5 +1,5 @@
 import { expect, it, beforeAll } from 'vitest'
-import { ClientErrorCodes, Pool, PoolLogger } from '../../../src'
+import { ClientErrorCodes, Pool, PoolLogger } from '../../../src/index.js'
 import { Client as PgClient } from 'pg'
 import EventEmitter from 'events'
 

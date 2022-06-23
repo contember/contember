@@ -26,9 +26,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
 
-import { createMigrationBuilder } from './helpers'
+import { createMigrationBuilder } from './helpers.js'
 import { Connection, withDatabaseAdvisoryLock, wrapIdentifier } from '@contember/database'
-import { Migration } from './Migration'
+import { Migration } from './Migration.js'
 
 export type RunnerOption = {
 	migrationsTable: string

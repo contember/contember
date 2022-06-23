@@ -1,11 +1,11 @@
-import { CreateIdentityCommand, CreatePersonCommand } from '../commands'
-import { PersonQuery, PersonRow } from '../queries'
-import { SignUpErrorCode } from '../../schema'
-import { TenantRole } from '../authorization'
-import { getPasswordWeaknessMessage } from '../utils/password'
-import { Response, ResponseError, ResponseOk } from '../utils/Response'
-import { DatabaseContext } from '../utils'
-import { MaybePassword } from '../dtos'
+import { CreateIdentityCommand, CreatePersonCommand } from '../commands/index.js'
+import { PersonQuery, PersonRow } from '../queries/index.js'
+import { SignUpErrorCode } from '../../schema/index.js'
+import { TenantRole } from '../authorization/index.js'
+import { getPasswordWeaknessMessage } from '../utils/password.js'
+import { Response, ResponseError, ResponseOk } from '../utils/Response.js'
+import { DatabaseContext } from '../utils/index.js'
+import { MaybePassword } from '../dtos/index.js'
 
 export class SignUpManager {
 	async signUp(dbContext: DatabaseContext, email: string, password: MaybePassword, roles: readonly string[] = []): Promise<SignUpResponse> {

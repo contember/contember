@@ -1,5 +1,5 @@
-import { waitForTick } from './tick'
-import { DatabaseContext } from '../model'
+import { waitForTick } from './tick.js'
+import { DatabaseContext } from '../model/index.js'
 
 export type ItemLoader<Arg, Item> = (args: Arg) => Promise<Item>
 

@@ -1,4 +1,4 @@
-import { MutationResultList, prependPath } from './Result'
+import { MutationResultList, prependPath } from './Result.js'
 import { Model } from '@contember/schema'
 
 export const hasManyProcessor = <Context extends { relation: Model.AnyRelation; index: number; alias?: string }>(

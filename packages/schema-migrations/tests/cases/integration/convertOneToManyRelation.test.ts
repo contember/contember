@@ -1,7 +1,7 @@
-import { testMigrations } from '../../src/tests'
+import { testMigrations } from '../../src/tests.js'
 import { SchemaBuilder } from '@contember/schema-definition'
 import { Model } from '@contember/schema'
-import { SQL } from '../../src/tags'
+import { SQL } from '../../src/tags.js'
 
 testMigrations('convert one has one to many has one relation without inverse side', {
 	originalSchema: new SchemaBuilder()

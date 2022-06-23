@@ -1,7 +1,7 @@
 import { SchemaDefinition as def } from '@contember/schema-definition'
 import { Model } from '@contember/schema'
-import { SQL } from '../../src/tags'
-import { testMigrations } from '../../src/tests'
+import { SQL } from '../../src/tags.js'
+import { testMigrations } from '../../src/tests.js'
 
 testMigrations('create a column with default value', {
 	originalSchema: def.createModel({

@@ -1,9 +1,9 @@
 import { GraphQLBoolean, GraphQLEnumType, GraphQLFloat, GraphQLInt, GraphQLScalarType, GraphQLString } from 'graphql'
 import { Model } from '@contember/schema'
-import { EnumsProvider } from './EnumsProvider'
-import { CustomTypesProvider } from './CustomTypesProvider'
-import { ImplementationException } from '../exception'
-import { singletonFactory } from '../utils'
+import { EnumsProvider } from './EnumsProvider.js'
+import { CustomTypesProvider } from './CustomTypesProvider.js'
+import { ImplementationException } from '../exception.js'
+import { singletonFactory } from '../utils/index.js'
 
 type ScalarType = Exclude<Model.ColumnType, Model.ColumnType.Enum>
 

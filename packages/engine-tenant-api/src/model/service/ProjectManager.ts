@@ -3,18 +3,18 @@ import {
 	CreateProjectCommand,
 	SetProjectSecretCommand,
 	UpdateProjectCommand,
-} from '../commands'
-import { PermissionContext } from '../authorization'
-import { Project, ProjectInitializer, ProjectWithSecrets } from '../type'
-import { ProjectBySlugQuery, ProjectsByIdentityQuery, ProjectsQuery, ProjectUpdateTimestampQuery } from '../queries'
-import { SecretsManager } from './SecretsManager'
-import { DatabaseContext, TokenHash } from '../utils'
-import { createSetMembershipVariables } from './membershipUtils'
-import { ImplementationException } from '../../exceptions'
+} from '../commands/index.js'
+import { PermissionContext } from '../authorization/index.js'
+import { Project, ProjectInitializer, ProjectWithSecrets } from '../type/index.js'
+import { ProjectBySlugQuery, ProjectsByIdentityQuery, ProjectsQuery, ProjectUpdateTimestampQuery } from '../queries/index.js'
+import { SecretsManager } from './SecretsManager.js'
+import { DatabaseContext, TokenHash } from '../utils/index.js'
+import { createSetMembershipVariables } from './membershipUtils.js'
+import { ImplementationException } from '../../exceptions.js'
 import { ProjectRole } from '@contember/schema'
-import { ApiKeyService, CreateApiKeyResult } from './apiKey'
-import { Response, ResponseError, ResponseOk } from '../utils/Response'
-import { CreateProjectResponseErrorCode } from '../../schema'
+import { ApiKeyService, CreateApiKeyResult } from './apiKey/index.js'
+import { Response, ResponseError, ResponseOk } from '../utils/Response.js'
+import { CreateProjectResponseErrorCode } from '../../schema/index.js'
 
 export class ProjectManager {
 	constructor(

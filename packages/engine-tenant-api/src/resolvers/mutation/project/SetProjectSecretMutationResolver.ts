@@ -4,10 +4,10 @@ import {
 	MutationResolvers,
 	MutationSetProjectSecretArgs,
 	SetProjectSecretResponse,
-} from '../../../schema'
-import { TenantResolverContext } from '../../TenantResolverContext'
-import { PermissionActions, ProjectManager, SecretsManager } from '../../../model'
-import { createProjectNotFoundResponse } from '../../errorUtils'
+} from '../../../schema/index.js'
+import { TenantResolverContext } from '../../TenantResolverContext.js'
+import { PermissionActions, ProjectManager, SecretsManager } from '../../../model/index.js'
+import { createProjectNotFoundResponse } from '../../errorUtils.js'
 
 export class SetProjectSecretMutationResolver implements MutationResolvers {
 	constructor(private readonly projectManager: ProjectManager, private readonly secretManager: SecretsManager) {}

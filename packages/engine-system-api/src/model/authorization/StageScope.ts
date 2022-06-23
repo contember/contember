@@ -1,7 +1,7 @@
 import { AccessEvaluator, AccessNode, AuthorizationScope } from '@contember/authorization'
-import { Identity } from './Identity'
-import { SwitchEvaluatorNode } from './SwitchEvaluatorNode'
-import { StagePermissionsFactory } from './StagePermissionsFactory'
+import { Identity } from './Identity.js'
+import { SwitchEvaluatorNode } from './SwitchEvaluatorNode.js'
+import { StagePermissionsFactory } from './StagePermissionsFactory.js'
 
 export class StageScope implements AuthorizationScope<Identity> {
 	constructor(private readonly stage: string, private readonly stagePermissionsFactory: StagePermissionsFactory) {}

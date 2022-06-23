@@ -1,6 +1,6 @@
-import { Command } from './Command'
+import { Command } from './Command.js'
 import { Client, Connection } from '@contember/database'
-import { Providers } from '../providers'
+import { Providers } from '../providers.js'
 
 export class CommandBus<ConnectionType extends Connection.ConnectionLike = Connection.ConnectionLike> {
 	constructor(public readonly client: Client<ConnectionType>, private readonly providers: Providers) {}

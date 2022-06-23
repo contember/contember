@@ -1,5 +1,5 @@
-import { MutationResolvers, MutationSignUpArgs, SignUpResponse } from '../../../schema'
-import { TenantResolverContext } from '../../TenantResolverContext'
+import { MutationResolvers, MutationSignUpArgs, SignUpResponse } from '../../../schema/index.js'
+import { TenantResolverContext } from '../../TenantResolverContext.js'
 import {
 	ApiKeyManager,
 	NoPassword,
@@ -7,8 +7,8 @@ import {
 	PasswordPlain,
 	PermissionActions,
 	SignUpManager,
-} from '../../../model'
-import { createErrorResponse } from '../../errorUtils'
+} from '../../../model/index.js'
+import { createErrorResponse } from '../../errorUtils.js'
 import { UserInputError } from '@contember/graphql-utils'
 
 export class SignUpMutationResolver implements MutationResolvers {

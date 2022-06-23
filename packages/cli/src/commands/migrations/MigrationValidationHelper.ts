@@ -1,6 +1,6 @@
 import { Schema } from '@contember/schema'
 import { Migration, MigrationDescriber, SchemaMigrator, SchemaUpdateError } from '@contember/schema-migrations'
-import { validateSchemaAndPrintErrors } from '../../utils/schema'
+import { validateSchemaAndPrintErrors } from '../../utils/schema.js'
 
 export const validateMigrations = async (
 	initialSchema: Schema,

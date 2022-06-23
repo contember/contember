@@ -1,6 +1,6 @@
-import { QueryBuilder } from './QueryBuilder'
-import { Literal } from '../Literal'
-import { columnExpressionToLiteral } from './utils'
+import { QueryBuilder } from './QueryBuilder.js'
+import { Literal } from '../Literal.js'
+import { columnExpressionToLiteral } from './utils.js'
 
 class CaseStatement {
 	constructor(private readonly options: CaseStatement.Options) {}

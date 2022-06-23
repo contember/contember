@@ -1,12 +1,12 @@
 import { Input, Value } from '@contember/schema'
-import { Mapper } from '../Mapper'
-import { InsertBuilder } from './InsertBuilder'
+import { Mapper } from '../Mapper.js'
+import { InsertBuilder } from './InsertBuilder.js'
 import { Providers, resolveColumnValue } from '@contember/schema-utils'
-import { CreateInputProcessor } from '../../inputProcessing'
-import * as Context from '../../inputProcessing'
-import { getInsertPrimary, MutationEntryNotFoundError, MutationResultList } from '../Result'
-import { hasManyProcessor, hasOneProcessor } from '../MutationProcessorHelper'
-import { AbortInsert } from './Inserter'
+import { CreateInputProcessor } from '../../inputProcessing/index.js'
+import * as Context from '../../inputProcessing/index.js'
+import { getInsertPrimary, MutationEntryNotFoundError, MutationResultList } from '../Result.js'
+import { hasManyProcessor, hasOneProcessor } from '../MutationProcessorHelper.js'
+import { AbortInsert } from './Inserter.js'
 
 export class SqlCreateInputProcessor implements CreateInputProcessor<MutationResultList> {
 	constructor(

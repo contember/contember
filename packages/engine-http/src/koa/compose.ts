@@ -1,4 +1,4 @@
-import { KoaMiddleware } from './types'
+import { KoaMiddleware } from './types.js'
 import Koa from 'koa'
 
 export function compose(middlewares: (KoaMiddleware<any> | Koa.Middleware | null)[]): KoaMiddleware<any> {

@@ -1,5 +1,5 @@
 import { escapeValue, MigrationBuilder } from '@contember/database-migrations'
-import { TenantMigrationArgs } from './types'
+import { TenantMigrationArgs } from './types.js'
 
 export default async function (builder: MigrationBuilder, args: TenantMigrationArgs) {
 	const credentials = await args.getCredentials()

@@ -1,9 +1,9 @@
-import { MigrationFilesManager } from './MigrationFilesManager'
+import { MigrationFilesManager } from './MigrationFilesManager.js'
 import { Schema } from '@contember/schema'
-import { SchemaDiffer } from './SchemaDiffer'
-import { VERSION_LATEST } from './modifications/ModificationVersions'
-import { Migration } from './Migration'
-import { MigrationVersionHelper } from './MigrationVersionHelper'
+import { SchemaDiffer } from './SchemaDiffer.js'
+import { VERSION_LATEST } from './modifications/ModificationVersions.js'
+import { Migration } from './Migration.js'
+import { MigrationVersionHelper } from './MigrationVersionHelper.js'
 
 export class MigrationCreator {
 	constructor(

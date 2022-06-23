@@ -1,8 +1,8 @@
-import { Command } from '../Command'
+import { Command } from '../Command.js'
 import { ConflictActionType, DeleteBuilder, InsertBuilder } from '@contember/database'
-import { ImplementationException } from '../../../exceptions'
-import { MembershipInput } from './types'
-import { PatchProjectMembershipVariablesCommand } from './variables'
+import { ImplementationException } from '../../../exceptions.js'
+import { MembershipInput } from './types.js'
+import { PatchProjectMembershipVariablesCommand } from './variables/index.js'
 
 export class CreateOrUpdateProjectMembershipCommand implements Command<void> {
 	constructor(

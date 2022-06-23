@@ -1,1 +1,1 @@
-export * from './MailTemplateMutationResolver'
+export * from './MailTemplateMutationResolver.js'

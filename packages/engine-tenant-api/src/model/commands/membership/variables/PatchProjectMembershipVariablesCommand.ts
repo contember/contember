@@ -1,7 +1,7 @@
-import { Command } from '../../Command'
-import { SetProjectMembershipVariableValuesCommand } from './SetProjectMembershipVariableValuesCommand'
-import { PatchProjectMembershipVariableValuesCommand } from './PatchProjectMembershipVariableValuesCommand'
-import { VariableUpdateInput } from '../types'
+import { Command } from '../../Command.js'
+import { SetProjectMembershipVariableValuesCommand } from './SetProjectMembershipVariableValuesCommand.js'
+import { PatchProjectMembershipVariableValuesCommand } from './PatchProjectMembershipVariableValuesCommand.js'
+import { VariableUpdateInput } from '../types.js'
 
 export class PatchProjectMembershipVariablesCommand implements Command<Record<string, string[]>> {
 	constructor(private readonly membershipId: string, private readonly variables: readonly VariableUpdateInput[]) {}

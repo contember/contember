@@ -9,17 +9,17 @@ import {
 	MutationResultHint,
 	MutationResultList,
 	MutationResultType, tryMutation,
-} from '../mapper'
-import { ValidationResolver } from './ValidationResolver'
+} from '../mapper/index.js'
+import { ValidationResolver } from './ValidationResolver.js'
 import { GraphQLResolveInfo } from 'graphql'
-import { GraphQlQueryAstFactory } from './GraphQlQueryAstFactory'
-import { ImplementationException } from '../exception'
+import { GraphQlQueryAstFactory } from './GraphQlQueryAstFactory.js'
+import { ImplementationException } from '../exception.js'
 import { Client, Connection, retryTransaction } from '@contember/database'
-import { Operation, readOperationMeta } from '../schema'
-import { assertNever } from '../utils'
-import { InputPreValidator } from '../input-validation'
-import { ObjectNode } from '../inputProcessing'
-import { executeReadOperations } from './ReadHelpers'
+import { Operation, readOperationMeta } from '../schema/index.js'
+import { assertNever } from '../utils/index.js'
+import { InputPreValidator } from '../input-validation/index.js'
+import { ObjectNode } from '../inputProcessing/index.js'
+import { executeReadOperations } from './ReadHelpers.js'
 
 type WithoutNode<T extends { node: any }> = Pick<T, Exclude<keyof T, 'node'>>
 

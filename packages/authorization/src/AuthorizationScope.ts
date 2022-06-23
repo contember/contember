@@ -1,4 +1,4 @@
-import AccessNode from './AccessNode'
+import AccessNode from './AccessNode.js'
 
 interface AuthorizationScope<Identity> {
 	getIdentityAccess(identity: Identity): Promise<AccessNode>

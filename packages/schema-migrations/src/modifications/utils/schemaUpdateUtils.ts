@@ -1,8 +1,8 @@
 import { Acl, Model, Schema, Writable } from '@contember/schema'
-import { SchemaUpdateError } from '../exceptions'
-import { isDefined } from '../../utils/isDefined'
+import { SchemaUpdateError } from '../exceptions.js'
+import { isDefined } from '../../utils/isDefined.js'
 import { isInverseRelation, isOwningRelation, isRelation, PredicateDefinitionProcessor } from '@contember/schema-utils'
-import { VERSION_ACL_PATCH, VERSION_REMOVE_RELATION_INVERSE_SIDE } from '../ModificationVersions'
+import { VERSION_ACL_PATCH, VERSION_REMOVE_RELATION_INVERSE_SIDE } from '../ModificationVersions.js'
 
 export type SchemaUpdater = (args: { schema: Schema }) => Schema
 export type ModelUpdater = (args: { schema: Schema; model: Model.Schema }) => Model.Schema

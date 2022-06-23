@@ -1,9 +1,9 @@
-import { filterObject, mapObject } from '../utils'
+import { filterObject, mapObject } from '../utils/index.js'
 import { Model, Validation } from '@contember/schema'
 import { acceptEveryFieldVisitor, acceptFieldVisitor } from '@contember/schema-utils'
 import { InputValidation } from '@contember/schema-definition'
-import { DependencyCollector } from './dependencies'
-import { NotSupportedError } from './exceptions'
+import { DependencyCollector } from './dependencies/index.js'
+import { NotSupportedError } from './exceptions.js'
 
 export class EntityRulesResolver {
 	constructor(private readonly validationSchema: Validation.Schema, private readonly model: Model.Schema) {}

@@ -1,7 +1,7 @@
 import { test } from 'vitest'
-import { execute } from '../../../../../src/test'
+import { execute } from '../../../../../src/test.js'
 import { SchemaBuilder } from '@contember/schema-definition'
-import { GQL, SQL } from '../../../../../src/tags'
+import { GQL, SQL } from '../../../../../src/tags.js'
 
 test('order by desc nulls last', async () => {
 	await execute({

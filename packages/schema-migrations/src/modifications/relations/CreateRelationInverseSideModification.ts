@@ -1,8 +1,8 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Model, Schema } from '@contember/schema'
-import { addField, SchemaUpdater, updateEntity, updateField, updateModel } from '../utils/schemaUpdateUtils'
-import { ModificationHandlerStatic } from '../ModificationHandler'
-import { createFields } from '../utils/diffUtils'
+import { addField, SchemaUpdater, updateEntity, updateField, updateModel } from '../utils/schemaUpdateUtils.js'
+import { ModificationHandlerStatic } from '../ModificationHandler.js'
+import { createFields } from '../utils/diffUtils.js'
 import { isInverseRelation, isRelation } from '@contember/schema-utils'
 
 export const CreateRelationInverseSideModification: ModificationHandlerStatic<CreateRelationInverseSideModificationData> = class {

@@ -1,7 +1,7 @@
 import { DatabaseContextFactory } from '@contember/engine-system-api'
 import { Connection } from '@contember/database'
-import { ProjectConfig } from './config'
-import { ContentSchemaResolver, GraphQlSchemaFactory } from './content'
+import { ProjectConfig } from './config.js'
+import { ContentSchemaResolver, GraphQlSchemaFactory } from './content/index.js'
 import { Logger } from '@contember/engine-common'
 
 export interface ProjectContainer {

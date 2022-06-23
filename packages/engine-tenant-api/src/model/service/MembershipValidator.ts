@@ -1,5 +1,5 @@
-import { ProjectSchemaResolver } from '../type'
-import { Membership } from '../type/Membership'
+import { ProjectSchemaResolver } from '../type/index.js'
+import { Membership } from '../type/Membership.js'
 import { getRoleVariables } from '@contember/schema-utils'
 import { Acl } from '@contember/schema'
 

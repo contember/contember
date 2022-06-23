@@ -1,6 +1,6 @@
 import { Schema } from '@contember/schema'
-import ModificationHandlerFactory from './modifications/ModificationHandlerFactory'
-import { Migration } from './Migration'
+import ModificationHandlerFactory from './modifications/ModificationHandlerFactory.js'
+import { Migration } from './Migration.js'
 
 export class SchemaMigrator {
 	constructor(private readonly modificationHandlerFactory: ModificationHandlerFactory) {}

@@ -1,7 +1,7 @@
 import { SchemaBuilder } from '@contember/schema-definition'
 import { Model } from '@contember/schema'
-import { SQL } from '../../src/tags'
-import { testMigrations } from '../../src/tests'
+import { SQL } from '../../src/tags.js'
+import { testMigrations } from '../../src/tests.js'
 
 testMigrations('create many has one relation (post with author)', {
 	originalSchema: new SchemaBuilder()

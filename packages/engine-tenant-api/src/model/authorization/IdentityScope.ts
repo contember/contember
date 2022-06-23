@@ -1,6 +1,6 @@
 import { AuthorizationScope, AccessNode } from '@contember/authorization'
-import { TenantRole } from './Roles'
-import { Identity } from './Identity'
+import { TenantRole } from './Roles.js'
+import { Identity } from './Identity.js'
 
 class IdentityScope implements AuthorizationScope<Identity> {
 	constructor(private readonly identityId: string) {}

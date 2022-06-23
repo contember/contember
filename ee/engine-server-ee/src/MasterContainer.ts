@@ -1,17 +1,17 @@
-import { ProcessType } from './utils'
-import { createColllectHttpMetricsMiddleware, createShowMetricsMiddleware } from './http'
+import { ProcessType } from './utils/index.js'
+import { createColllectHttpMetricsMiddleware, createShowMetricsMiddleware } from './http/index.js'
 import { compose, CryptoWrapper, Koa, KoaMiddleware } from '@contember/engine-http'
 import { createSecretKey } from 'crypto'
-import { ProjectGroupContainerResolver } from './projectGroup/ProjectGroupContainerResolver'
-import { ProjectGroupResolver } from './projectGroup/ProjectGroupResolver'
+import { ProjectGroupContainerResolver } from './projectGroup/ProjectGroupContainerResolver.js'
+import { ProjectGroupResolver } from './projectGroup/ProjectGroupResolver.js'
 import {
 	MasterContainer as BaseMasterContainer,
 	MasterContainerArgs as BaseMasterContainerArgs,
 	MasterContainerFactory as BaseMasterContainerFactory,
 } from '@contember/engine-server'
-import { ServerConfig } from './config/configSchema'
-import { PrometheusRegistryFactory } from './prometheus/PrometheusRegistryFactory'
-import { ProjectGroupContainerMetricsHook } from './prometheus/ProjectGroupContainerMetricsHook'
+import { ServerConfig } from './config/configSchema.js'
+import { PrometheusRegistryFactory } from './prometheus/PrometheusRegistryFactory.js'
+import { ProjectGroupContainerMetricsHook } from './prometheus/ProjectGroupContainerMetricsHook.js'
 
 export interface MasterContainer extends BaseMasterContainer {
 	monitoringKoa: Koa

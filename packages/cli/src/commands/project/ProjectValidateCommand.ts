@@ -1,9 +1,9 @@
 import { Command, CommandConfiguration, Input, validateProjectName, Workspace } from '@contember/cli-common'
-import { MigrationsContainerFactory } from '../../MigrationsContainer'
-import { validateSchemaAndPrintErrors } from '../../utils/schema'
+import { MigrationsContainerFactory } from '../../MigrationsContainer.js'
+import { validateSchemaAndPrintErrors } from '../../utils/schema.js'
 import { emptySchema } from '@contember/schema-utils'
-import { validateMigrations } from '../migrations/MigrationValidationHelper'
-import { loadSchema } from '../../utils/project/loadSchema'
+import { validateMigrations } from '../migrations/MigrationValidationHelper.js'
+import { loadSchema } from '../../utils/project/loadSchema.js'
 
 type Args = {
 	project: string

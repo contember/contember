@@ -1,6 +1,6 @@
 import { join } from 'path'
 import { ConfigProcessor, Plugin } from '@contember/engine-plugins'
-import { ConfigSource, readConfig, ServerConfig } from '../config/config'
+import { ConfigSource, readConfig, ServerConfig } from '../config/config.js'
 import { Type } from '@contember/typesafe'
 
 export const getServerVersion = (): string => {

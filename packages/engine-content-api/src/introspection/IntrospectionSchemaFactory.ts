@@ -1,8 +1,8 @@
 import { Acl, Model, Validation } from '@contember/schema'
-import { EntityRulesResolver } from '../input-validation'
-import { Authorizator } from '../acl'
-import * as ContentSchema from './content-schema.types'
-import { assertNever } from '../utils'
+import { EntityRulesResolver } from '../input-validation/index.js'
+import { Authorizator } from '../acl/index.js'
+import * as ContentSchema from './content-schema.types.js'
+import { assertNever } from '../utils/index.js'
 import { acceptEveryFieldVisitor, getEntity } from '@contember/schema-utils'
 
 type AdditionalFieldInfo =

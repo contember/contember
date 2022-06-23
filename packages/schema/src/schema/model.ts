@@ -1,4 +1,4 @@
-import Input from './input'
+import Input from './input.js'
 
 namespace Model {
 

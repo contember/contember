@@ -1,3 +1,3 @@
-export * from './EventsQuery'
-export * from './LatestTransactionIdByStageQuery'
-export * from './OldValuesQuery'
+export * from './EventsQuery.js'
+export * from './LatestTransactionIdByStageQuery.js'
+export * from './OldValuesQuery.js'

@@ -1,4 +1,4 @@
-import { Command } from './Command'
+import { Command } from './Command.js'
 import chalk from 'chalk'
 
 type CommandFactoryList = { [command: string]: () => Command<any, any> }

@@ -1,4 +1,4 @@
-import { EventManager } from '../../../src'
+import { EventManager } from '../../../src/index.js'
 import { createConnectionMock } from '@contember/database-tester'
 import { test, assert } from 'vitest'
 

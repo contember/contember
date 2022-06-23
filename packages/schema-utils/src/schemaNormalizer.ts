@@ -1,5 +1,5 @@
 import { Acl, ProjectRole, Schema } from '@contember/schema'
-import { AllowAllPermissionFactory } from './acl'
+import { AllowAllPermissionFactory } from './acl/index.js'
 
 export const normalizeSchema = <S extends Schema>(schema: S): S => {
 	return {

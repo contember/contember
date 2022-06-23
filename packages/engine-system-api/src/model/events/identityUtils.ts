@@ -1,5 +1,5 @@
-import { TenantIdentity } from '../dependencies/tenant/IdentityFetcher'
-import { assertNever } from '../../utils'
+import { TenantIdentity } from '../dependencies/tenant/IdentityFetcher.js'
+import { assertNever } from '../../utils/index.js'
 
 export const formatIdentity = (identity: TenantIdentity): string => {
 	if (!identity) {

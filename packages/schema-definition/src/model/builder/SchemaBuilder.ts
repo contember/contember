@@ -1,8 +1,8 @@
 import { Model } from '@contember/schema'
-import EntityBuilder from './EntityBuilder'
-import { DefaultNamingConventions, NamingConventions } from '../definition/NamingConventions'
-import SchemaBuilderInternal from './SchemaBuilderInternal'
-import { EntityConfigurator } from './types'
+import EntityBuilder from './EntityBuilder.js'
+import { DefaultNamingConventions, NamingConventions } from '../definition/NamingConventions.js'
+import SchemaBuilderInternal from './SchemaBuilderInternal.js'
+import { EntityConfigurator } from './types.js'
 
 export default class SchemaBuilder {
 	private entities: { [name: string]: EntityConfigurator } = {}
@@ -39,4 +39,4 @@ export default class SchemaBuilder {
 	}
 }
 
-export * from './SchemaBuilderError'
+export * from './SchemaBuilderError.js'

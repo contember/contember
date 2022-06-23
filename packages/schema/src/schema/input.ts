@@ -1,4 +1,4 @@
-import Value from './value'
+import Value from './value.js'
 
 namespace Input {
 	export type PrimaryValue<E = never> = Value.PrimaryValue<E>

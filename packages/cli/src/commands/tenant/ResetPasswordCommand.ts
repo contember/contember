@@ -1,6 +1,6 @@
 import { Command, CommandConfiguration, Input, Workspace } from '@contember/cli-common'
-import { interactiveResetPassword, interactiveResolveLoginToken } from '../../utils/tenant'
-import { interactiveResolveInstanceEnvironmentFromInput } from '../../utils/instance'
+import { interactiveResetPassword, interactiveResolveLoginToken } from '../../utils/tenant.js'
+import { interactiveResolveInstanceEnvironmentFromInput } from '../../utils/instance/index.js'
 
 type Args = {
 	instance?: string

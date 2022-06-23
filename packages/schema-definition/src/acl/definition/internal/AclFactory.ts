@@ -1,17 +1,17 @@
 import { Acl, Model, Writable } from '@contember/schema'
 import { getEntity } from '@contember/schema-utils'
 
-import { EntityPredicatesResolver } from './EntityPredicateResolver'
-import { AllowDefinition } from '../permissions'
+import { EntityPredicatesResolver } from './EntityPredicateResolver.js'
+import { AllowDefinition } from '../permissions.js'
 import {
 	allowCustomPrimaryAllRolesStore,
 	allowCustomPrimaryStore,
 	allowDefinitionsStore,
 	EntityPermissionsDefinition,
-} from './stores'
-import { Role } from '../roles'
-import {  VariableDefinition } from '../variables'
-import { filterEntityDefinition } from '../../../utils'
+} from './stores.js'
+import { Role } from '../roles.js'
+import {  VariableDefinition } from '../variables.js'
+import { filterEntityDefinition } from '../../../utils/index.js'
 
 export class AclFactory {
 	constructor(

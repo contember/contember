@@ -1,7 +1,7 @@
 import { Model, Schema } from '@contember/schema'
-import { Migration } from '../../Migration'
+import { Migration } from '../../Migration.js'
 import { isColumn, isRelation } from '@contember/schema-utils'
-import { isDefined } from '../../utils/isDefined'
+import { isDefined } from '../../utils/isDefined.js'
 import deepEqual from 'fast-deep-equal'
 
 export const updateFields = (

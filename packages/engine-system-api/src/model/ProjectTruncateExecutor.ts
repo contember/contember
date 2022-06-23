@@ -1,10 +1,10 @@
-import { DatabaseContext } from './database'
-import { ProjectConfig } from '../types'
-import { TruncateEventsCommand } from './commands'
-import { getJunctionTables } from './helpers'
+import { DatabaseContext } from './database/index.js'
+import { ProjectConfig } from '../types.js'
+import { TruncateEventsCommand } from './commands/index.js'
+import { getJunctionTables } from './helpers/index.js'
 import { Schema } from '@contember/schema'
 import { wrapIdentifier } from '@contember/database'
-import { StagesQuery } from './queries'
+import { StagesQuery } from './queries/index.js'
 
 export class ProjectTruncateExecutor {
 	public async truncateProject(db: DatabaseContext, project: ProjectConfig, schema: Schema) {

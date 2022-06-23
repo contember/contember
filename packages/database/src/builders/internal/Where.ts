@@ -1,7 +1,7 @@
-import { wrapIdentifier } from '../../utils'
-import { Literal } from '../../Literal'
-import { ConditionBuilder, ConditionCallback } from '../ConditionBuilder'
-import { Value } from '../../types'
+import { wrapIdentifier } from '../../utils/index.js'
+import { Literal } from '../../Literal.js'
+import { ConditionBuilder, ConditionCallback } from '../ConditionBuilder.js'
+import { Value } from '../../types.js'
 
 namespace Where {
 	export interface Options {

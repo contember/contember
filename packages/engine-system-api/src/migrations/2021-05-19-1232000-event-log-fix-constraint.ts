@@ -1,6 +1,6 @@
 import { MigrationBuilder, Name } from '@contember/database-migrations'
-import { SystemMigrationArgs } from './types'
-import { getJunctionTables } from '../model'
+import { SystemMigrationArgs } from './types.js'
+import { getJunctionTables } from '../model/index.js'
 
 const recreateTrigger = (builder: MigrationBuilder, tableName: Name) => {
 	builder.dropTrigger(tableName, 'log_event_trx', { ifExists: true })

@@ -1,7 +1,7 @@
 import { Command, CommandConfiguration, Input, Workspace } from '@contember/cli-common'
-import { updateNpmPackages } from '../../utils/npm'
-import { updateWorkspaceApiVersion } from '../../utils/workspace'
-import { updateMainDockerComposeConfig } from '../../utils/dockerCompose'
+import { updateNpmPackages } from '../../utils/npm.js'
+import { updateWorkspaceApiVersion } from '../../utils/workspace.js'
+import { updateMainDockerComposeConfig } from '../../utils/dockerCompose.js'
 
 type Args = {
 	version: string

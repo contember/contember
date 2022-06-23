@@ -1,3 +1,3 @@
-export * from './events'
-export * from './Logger'
-export * from './utils'
+export * from './events/index.js'
+export * from './Logger.js'
+export * from './utils/index.js'

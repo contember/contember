@@ -1,7 +1,7 @@
 import { Model } from '@contember/schema'
 import { h, Fragment } from 'preact'
-import { EntityLink } from './EntityLink'
-import { FieldLink } from './FieldLink'
+import { EntityLink } from './EntityLink.js'
+import { FieldLink } from './FieldLink.js'
 
 export const FieldType = ({ field }: { field: Model.AnyField }) => {
 	if (field.type === 'ManyHasMany') {

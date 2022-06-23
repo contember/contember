@@ -1,5 +1,5 @@
-import { Membership, MembershipVariable } from '../type/Membership'
-import { MembershipInput, MembershipUpdateInput, VariableUpdateInput } from '../commands'
+import { Membership, MembershipVariable } from '../type/Membership.js'
+import { MembershipInput, MembershipUpdateInput, VariableUpdateInput } from '../commands/index.js'
 
 export const createSetMembershipVariables = (memberships: readonly Membership[]): MembershipInput[] => {
 	return memberships.map(it => ({

@@ -1,9 +1,9 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Schema } from '@contember/schema'
-import { SchemaUpdater, updateModel } from '../utils/schemaUpdateUtils'
-import { ModificationHandlerStatic } from '../ModificationHandler'
+import { SchemaUpdater, updateModel } from '../utils/schemaUpdateUtils.js'
+import { ModificationHandlerStatic } from '../ModificationHandler.js'
 import deepEqual from 'fast-deep-equal'
-import { createCheck, getConstraintName } from './enumUtils'
+import { createCheck, getConstraintName } from './enumUtils.js'
 
 export const UpdateEnumModification: ModificationHandlerStatic<UpdateEnumModificationData> = class {
 	static id = 'updateEnum'

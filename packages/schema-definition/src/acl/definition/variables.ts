@@ -1,4 +1,4 @@
-import { Role } from './roles'
+import { Role } from './roles.js'
 import { Acl } from '@contember/schema'
 
 export class VariableDefinition<Name extends string = string, Roles extends Role<string> = Role<string>, Variable extends Acl.Variable = Acl.Variable> {

@@ -1,5 +1,5 @@
 import { StageConfig } from '@contember/engine-system-api'
-import { testUuid } from './testUuid'
+import { testUuid } from './testUuid.js'
 
 class EventSequence {
 	constructor(

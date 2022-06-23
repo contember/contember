@@ -1,6 +1,6 @@
-import { Command } from '../Command'
-import { ApiKey } from '../../type'
-import { ApiKeyHelper } from './ApiKeyHelper'
+import { Command } from '../Command.js'
+import { ApiKey } from '../../type/index.js'
+import { ApiKeyHelper } from './ApiKeyHelper.js'
 import { UpdateBuilder } from '@contember/database'
 
 export class ProlongApiKeyCommand implements Command<void> {

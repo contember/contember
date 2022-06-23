@@ -1,6 +1,6 @@
-import { createSchema, testCreate, testUpdate } from './utils'
+import { createSchema, testCreate, testUpdate } from './utils.js'
 import { InputValidation as v, SchemaDefinition as d } from '@contember/schema-definition'
-import { testUuid } from '../../../../src/testUuid'
+import { testUuid } from '../../../../src/testUuid.js'
 import { describe, it } from 'vitest'
 
 describe('Nested validations', () => {

@@ -1,7 +1,7 @@
-import { EntityFieldsProvider, FieldMap } from '../EntityFieldsProvider'
+import { EntityFieldsProvider, FieldMap } from '../EntityFieldsProvider.js'
 import { acceptFieldVisitor } from '@contember/schema-utils'
 import { Model } from '@contember/schema'
-import { HasManyToHasOneRelationReducerFieldVisitor } from './HasManyToHasOneRelationReducerVisitor'
+import { HasManyToHasOneRelationReducerFieldVisitor } from './HasManyToHasOneRelationReducerVisitor.js'
 
 export class HasManyToHasOneReducer implements EntityFieldsProvider<HasManyToHasOneReducerExtension> {
 	static extensionName: string = 'HasManyToHasOneReducer'

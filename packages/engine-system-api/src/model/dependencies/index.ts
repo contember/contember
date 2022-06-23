@@ -1,1 +1,1 @@
-export * from './tenant'
+export * from './tenant/index.js'

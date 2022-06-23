@@ -1,7 +1,7 @@
 import { acceptFieldVisitor, getEntity } from '@contember/schema-utils'
 import { Model } from '@contember/schema'
-import { Dependencies } from './dependencies'
-import { FieldNode, ObjectNode } from '../inputProcessing'
+import { Dependencies } from './dependencies/index.js'
+import { FieldNode, ObjectNode } from '../inputProcessing/index.js'
 
 export class QueryAstFactory {
 	constructor(private readonly model: Model.Schema) {}

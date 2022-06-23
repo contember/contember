@@ -1,3 +1,3 @@
-export * from './MigrateMutationResolver'
-export * from './TruncateMutationResolver'
-export * from './MigrationAlterMutationResolver'
+export * from './MigrateMutationResolver.js'
+export * from './TruncateMutationResolver.js'
+export * from './MigrationAlterMutationResolver.js'

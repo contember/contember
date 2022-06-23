@@ -1,8 +1,8 @@
 import { test } from 'vitest'
-import { execute, failedTransaction, sqlTransaction } from '../../../../../src/test'
-import { GQL, SQL } from '../../../../../src/tags'
-import { testUuid } from '../../../../../src/testUuid'
-import { postWithLocale } from './schema'
+import { execute, failedTransaction, sqlTransaction } from '../../../../../src/test.js'
+import { GQL, SQL } from '../../../../../src/tags.js'
+import { testUuid } from '../../../../../src/testUuid.js'
+import { postWithLocale } from './schema.js'
 
 test('update (composed unique)', async () => {
 	await execute({

@@ -1,6 +1,6 @@
 import { Input, Model } from '@contember/schema'
-import { GroupedCounts, JoiningColumns, Mapper, RelationFetcher } from '../../mapper'
-import { ObjectNode } from '../../inputProcessing'
+import { GroupedCounts, JoiningColumns, Mapper, RelationFetcher } from '../../mapper/index.js'
+import { ObjectNode } from '../../inputProcessing/index.js'
 
 export class PaginatedHasManyCountVisitor implements
 	Model.ColumnVisitor<Promise<GroupedCounts>>,

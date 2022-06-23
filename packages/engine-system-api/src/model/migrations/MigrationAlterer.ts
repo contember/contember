@@ -1,8 +1,8 @@
-import { DatabaseContext } from '../database'
-import { DeleteMigrationCommand } from '../commands'
-import { Response, ResponseError, ResponseOk } from '../../utils'
+import { DatabaseContext } from '../database/index.js'
+import { DeleteMigrationCommand } from '../commands/index.js'
+import { Response, ResponseError, ResponseOk } from '../../utils/index.js'
 import { Migration } from '@contember/schema-migrations'
-import { ModifyMigrationCommand } from '../commands/migrations/ModifyMigrationCommand'
+import { ModifyMigrationCommand } from '../commands/migrations/ModifyMigrationCommand.js'
 
 export class MigrationAlterer {
 	public async deleteMigration(

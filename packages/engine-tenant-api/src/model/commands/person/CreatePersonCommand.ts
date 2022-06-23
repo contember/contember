@@ -1,7 +1,7 @@
-import { Command } from '../Command'
-import { PersonRow } from '../../queries'
+import { Command } from '../Command.js'
+import { PersonRow } from '../../queries/index.js'
 import { InsertBuilder } from '@contember/database'
-import { MaybePassword } from '../../dtos/Password'
+import { MaybePassword } from '../../dtos/Password.js'
 
 export class CreatePersonCommand implements Command<Omit<PersonRow, 'roles'>> {
 	constructor(private readonly identityId: string, private readonly email: string, private readonly password: MaybePassword) {}

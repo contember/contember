@@ -1,14 +1,14 @@
-import { MasterContainerFactory, MasterContainerArgs } from './MasterContainer'
+import { MasterContainerFactory, MasterContainerArgs } from './MasterContainer.js'
 import { ProjectConfig } from '@contember/engine-http'
-import { readConfig } from './config/config'
-import { serverConfigSchema } from './config/configSchema'
-import { TenantConfigResolver } from './config/tenantConfigResolver'
-import { ProjectGroupContainerFactory } from './projectGroup/ProjectGroupContainer'
+import { readConfig } from './config/config.js'
+import { serverConfigSchema } from './config/configSchema.js'
+import { TenantConfigResolver } from './config/tenantConfigResolver.js'
+import { ProjectGroupContainerFactory } from './projectGroup/ProjectGroupContainer.js'
 
-export * from './utils/serverStartup'
-export * from './utils/serverTermination'
-export * from './utils/sentry'
-export * from './MasterContainer'
+export * from './utils/serverStartup.js'
+export * from './utils/serverTermination.js'
+export * from './utils/sentry.js'
+export * from './MasterContainer.js'
 
 export {
 	ProjectConfig,

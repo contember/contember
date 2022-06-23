@@ -1,5 +1,5 @@
 import { DatabaseContext, LatestTransactionIdByStageQuery } from '@contember/engine-system-api'
-import { Timer } from '../common'
+import { Timer } from '../common/index.js'
 import { Request, Response } from 'koa'
 
 

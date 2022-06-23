@@ -1,5 +1,5 @@
-import AccessEvaluator from './AccessEvaluator'
-import Authorizator from './Authorizator'
+import AccessEvaluator from './AccessEvaluator.js'
+import Authorizator from './Authorizator.js'
 
 interface AccessNode {
 	isAllowed(accessEvaluator: AccessEvaluator, action: Authorizator.Action): Promise<boolean>

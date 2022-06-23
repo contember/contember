@@ -1,2 +1,2 @@
-export * from './environment'
-export { interactiveResolveInstanceEnvironmentFromInput } from './interactiveUtils'
+export * from './environment.js'
+export { interactiveResolveInstanceEnvironmentFromInput } from './interactiveUtils.js'

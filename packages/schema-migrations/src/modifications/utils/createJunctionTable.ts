@@ -1,7 +1,7 @@
-import { createEventTrigger, createEventTrxTrigger } from './sqlUpdateUtils'
+import { createEventTrigger, createEventTrxTrigger } from './sqlUpdateUtils.js'
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Model } from '@contember/schema'
-import { getPrimaryColumnType } from './getPrimaryColumnType'
+import { getPrimaryColumnType } from './getPrimaryColumnType.js'
 
 export const createJunctionTableSql = (
 	builder: MigrationBuilder,

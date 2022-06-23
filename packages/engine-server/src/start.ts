@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 
-import { createContainer, listenOnProcessTermination, serverConfigSchema, TerminationJob } from './index'
-import loadPlugins from './loadPlugins'
-import { initSentry } from './utils'
+import { createContainer, listenOnProcessTermination, serverConfigSchema, TerminationJob } from './index.js'
+import loadPlugins from './loadPlugins.js'
+import { initSentry } from './utils/index.js'
 
 
-import { getServerVersion, isDebugMode, printStartInfo, resolveServerConfig } from './utils/serverStartup'
+import { getServerVersion, isDebugMode, printStartInfo, resolveServerConfig } from './utils/serverStartup.js'
 
 (async () => {
 	if (process.env.NODE_HEAPDUMP === 'true') {

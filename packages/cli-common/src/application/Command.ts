@@ -1,5 +1,5 @@
-import { CommandConfiguration } from './CommandConfiguration'
-import { Arguments, Input, Options } from './Input'
+import { CommandConfiguration } from './CommandConfiguration.js'
+import { Arguments, Input, Options } from './Input.js'
 
 export abstract class Command<Args extends Arguments, TOptions extends Options> {
 	private configuration: CommandConfiguration<Args, TOptions> | undefined

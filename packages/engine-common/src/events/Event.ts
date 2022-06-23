@@ -1,4 +1,4 @@
-import { EventType } from './EventType'
+import { EventType } from './EventType.js'
 
 export type ContentEvent = UpdateEvent | CreateEvent | DeleteEvent
 export type AnyEvent = ContentEvent

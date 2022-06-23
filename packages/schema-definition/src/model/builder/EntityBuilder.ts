@@ -1,11 +1,11 @@
-import FieldBuilder from './FieldBuilder'
-import ColumnBuilder from './ColumnBuilder'
-import OneHasOneBuilder from './OneHasOneBuilder'
-import ManyHasManyBuilder from './ManyHasManyBuilder'
-import OneHasManyBuilder from './OneHasManyBuilder'
-import ManyHasOneBuilder from './ManyHasOneBuilder'
+import FieldBuilder from './FieldBuilder.js'
+import ColumnBuilder from './ColumnBuilder.js'
+import OneHasOneBuilder from './OneHasOneBuilder.js'
+import ManyHasManyBuilder from './ManyHasManyBuilder.js'
+import OneHasManyBuilder from './OneHasManyBuilder.js'
+import ManyHasOneBuilder from './ManyHasOneBuilder.js'
 import { Model } from '@contember/schema'
-import { AddEntityCallback } from './types'
+import { AddEntityCallback } from './types.js'
 
 class EntityBuilder {
 	constructor(

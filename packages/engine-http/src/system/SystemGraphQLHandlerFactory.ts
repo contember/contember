@@ -8,8 +8,8 @@ import {
 	GraphQLKoaState,
 	GraphQLListener,
 	GraphQLQueryHandler,
-} from '../graphql'
-import { KoaContext } from '../koa'
+} from '../graphql/index.js'
+import { KoaContext } from '../koa/index.js'
 import { DocumentNode } from 'graphql'
 import { mergeTypeDefs } from '@graphql-tools/merge'
 import { makeExecutableSchema } from '@graphql-tools/schema'

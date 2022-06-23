@@ -1,7 +1,7 @@
 import { QueryBuilder, UpdateBuilder } from '@contember/database'
 import { calculateMigrationChecksum, Migration } from '@contember/schema-migrations'
-import { Command } from '../Command'
-import { ExecutedMigrationByVersionQuery } from '../../queries'
+import { Command } from '../Command.js'
+import { ExecutedMigrationByVersionQuery } from '../../queries/index.js'
 
 export class ModifyMigrationCommand implements Command<boolean> {
 	constructor(private readonly version: string, private readonly migration: Partial<Migration>) {}

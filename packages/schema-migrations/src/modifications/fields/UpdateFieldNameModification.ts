@@ -12,14 +12,14 @@ import {
 	updateEveryField,
 	updateModel,
 	updateSchema,
-} from '../utils/schemaUpdateUtils'
-import { ModificationHandler, ModificationHandlerOptions, ModificationHandlerStatic } from '../ModificationHandler'
+} from '../utils/schemaUpdateUtils.js'
+import { ModificationHandler, ModificationHandlerOptions, ModificationHandlerStatic } from '../ModificationHandler.js'
 import { acceptFieldVisitor, NamingHelper, PredicateDefinitionProcessor } from '@contember/schema-utils'
-import { VERSION_ACL_PATCH, VERSION_UPDATE_CONSTRAINT_NAME } from '../ModificationVersions'
-import { renameConstraintSchemaUpdater, renameConstraintsSqlBuilder } from '../utils/renameConstraintsHelper'
-import { changeValue } from '../utils/valueUtils'
-import { UpdateColumnNameModification } from '../columns'
-import { NoopModification } from '../NoopModification'
+import { VERSION_ACL_PATCH, VERSION_UPDATE_CONSTRAINT_NAME } from '../ModificationVersions.js'
+import { renameConstraintSchemaUpdater, renameConstraintsSqlBuilder } from '../utils/renameConstraintsHelper.js'
+import { changeValue } from '../utils/valueUtils.js'
+import { UpdateColumnNameModification } from '../columns/index.js'
+import { NoopModification } from '../NoopModification.js'
 
 export const UpdateFieldNameModification: ModificationHandlerStatic<UpdateFieldNameModificationData> = class {
 	static id = 'updateFieldName'

@@ -1,5 +1,5 @@
-import { InvalidInputError } from './InputParser'
-import { CommandManager } from './CommandManager'
+import { InvalidInputError } from './InputParser.js'
+import { CommandManager } from './CommandManager.js'
 import chalk from 'chalk'
 
 export class Application {

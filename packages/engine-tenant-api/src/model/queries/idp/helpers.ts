@@ -1,5 +1,5 @@
 import { SelectBuilder } from '@contember/database'
-import { IdentityProviderRow } from './types'
+import { IdentityProviderRow } from './types.js'
 
 export const createBaseIdpQuery = () =>
 	SelectBuilder.create<IdentityProviderRow>()

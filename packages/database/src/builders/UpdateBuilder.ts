@@ -1,13 +1,13 @@
-import { Returning } from './internal/Returning'
-import { With } from './internal/With'
-import { Where } from './internal/Where'
-import { Compiler } from './Compiler'
-import { QueryBuilder } from './QueryBuilder'
-import { Client, Connection } from '../client'
-import { Literal } from '../Literal'
-import { SelectBuilder } from './SelectBuilder'
-import { resolveValues } from './utils'
-import { createSubQueryLiteralFactory, SubQueryExpression } from './internal/Subqueries'
+import { Returning } from './internal/Returning.js'
+import { With } from './internal/With.js'
+import { Where } from './internal/Where.js'
+import { Compiler } from './Compiler.js'
+import { QueryBuilder } from './QueryBuilder.js'
+import { Client, Connection } from '../client/index.js'
+import { Literal } from '../Literal.js'
+import { SelectBuilder } from './SelectBuilder.js'
+import { resolveValues } from './utils.js'
+import { createSubQueryLiteralFactory, SubQueryExpression } from './internal/Subqueries.js'
 
 class UpdateBuilder<Result extends UpdateBuilder.UpdateResult> implements With.Aware, Where.Aware, QueryBuilder {
 	private constructor(private readonly options: UpdateBuilder.Options) {}

@@ -1,4 +1,4 @@
-import sample from './sample'
+import sample from './sample/index.js'
 import { dirname, join } from 'path'
 import { fileURLToPath } from 'url'
 export { sample as sampleProject }

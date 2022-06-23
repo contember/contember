@@ -1,7 +1,7 @@
 import { Buffer } from 'node:buffer'
 import * as Typesafe from '@contember/typesafe'
-import { Command } from './Command'
-import { ImportError } from './ImportExecutor'
+import { Command } from './Command.js'
+import { ImportError } from './ImportExecutor.js'
 
 export async function* toBuffer(lines: AsyncIterable<any>, bufferSize: number = 16 * 1024): AsyncIterable<Buffer> {
 	let chunks = []

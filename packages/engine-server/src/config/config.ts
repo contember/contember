@@ -1,9 +1,9 @@
 import { ConfigLoader, createObjectParametersResolver, Merger, resolveParameters } from '@contember/config-loader'
 import { ConfigProcessor } from '@contember/engine-plugins'
-import { serverConfigSchema as defaultServerConfigSchema, tenantConfigSchema } from './configSchema'
-import { configTemplate } from './configTemplate'
-import { createProjectConfigResolver, ProjectConfigResolver } from './projectConfigResolver'
-import { createTenantConfigResolver, TenantConfigResolver } from './tenantConfigResolver'
+import { serverConfigSchema as defaultServerConfigSchema, tenantConfigSchema } from './configSchema.js'
+import { configTemplate } from './configTemplate.js'
+import { createProjectConfigResolver, ProjectConfigResolver } from './projectConfigResolver.js'
+import { createTenantConfigResolver, TenantConfigResolver } from './tenantConfigResolver.js'
 import { Type } from '@contember/typesafe'
 
 export type ServerConfig = ReturnType<typeof defaultServerConfigSchema>

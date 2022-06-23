@@ -1,9 +1,9 @@
 import { Command, CommandConfiguration, Input, Workspace } from '@contember/cli-common'
-import { MigrationsContainerFactory } from '../../MigrationsContainer'
-import { interactiveResolveInstanceEnvironmentFromInput } from '../../utils/instance'
-import { interactiveResolveApiToken } from '../../utils/tenant'
-import { SystemClient } from '../../utils/system'
-import { createMigrationStatusTable, getMigrationsStatus, MigrationState, sortMigrations } from '../../utils/migrations'
+import { MigrationsContainerFactory } from '../../MigrationsContainer.js'
+import { interactiveResolveInstanceEnvironmentFromInput } from '../../utils/instance/index.js'
+import { interactiveResolveApiToken } from '../../utils/tenant.js'
+import { SystemClient } from '../../utils/system/index.js'
+import { createMigrationStatusTable, getMigrationsStatus, MigrationState, sortMigrations } from '../../utils/migrations.js'
 import chalk from 'chalk'
 
 type Args = {

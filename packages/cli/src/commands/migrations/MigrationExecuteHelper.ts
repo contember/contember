@@ -1,6 +1,6 @@
 import { CommandConfiguration } from '@contember/cli-common'
-import { SystemClient } from '../../utils/system'
-import { getMigrationsStatus, MigrationToExecuteOkStatus, printMigrationDescription } from '../../utils/migrations'
+import { SystemClient } from '../../utils/system/index.js'
+import { getMigrationsStatus, MigrationToExecuteOkStatus, printMigrationDescription } from '../../utils/migrations.js'
 import { MigrationDescriber, MigrationsResolver, SchemaVersionBuilder } from '@contember/schema-migrations'
 import prompts from 'prompts'
 

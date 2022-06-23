@@ -1,10 +1,10 @@
-import { FieldsVisitor } from './FieldsVisitor'
-import { RelationFetcher } from '../RelationFetcher'
+import { FieldsVisitor } from './FieldsVisitor.js'
+import { RelationFetcher } from '../RelationFetcher.js'
 import { Model } from '@contember/schema'
-import { Mapper } from '../../Mapper'
-import { SelectExecutionHandlerContext } from '../SelectExecutionHandler'
-import { PredicateFactory } from '../../../acl'
-import { WhereBuilder } from '../WhereBuilder'
+import { Mapper } from '../../Mapper.js'
+import { SelectExecutionHandlerContext } from '../SelectExecutionHandler.js'
+import { PredicateFactory } from '../../../acl/index.js'
+import { WhereBuilder } from '../WhereBuilder.js'
 
 export class FieldsVisitorFactory {
 	constructor(

@@ -1,5 +1,5 @@
 import { Client } from '@contember/database'
-import { UuidProvider } from '../../utils'
+import { UuidProvider } from '../../utils/index.js'
 
 export const unnamedIdentity = '00000000-0000-0000-0000-000000000000'
 

@@ -1,3 +1,3 @@
-export * from './CreateColumnModification'
-export * from './UpdateColumnDefinitionModification'
-export * from './UpdateColumnNameModification'
+export * from './CreateColumnModification.js'
+export * from './UpdateColumnDefinitionModification.js'
+export * from './UpdateColumnNameModification.js'

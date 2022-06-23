@@ -1,6 +1,6 @@
-import { IdentityProvider, QueryResolvers } from '../../schema'
-import { IdentityProvidersQuery } from '../../model'
-import { TenantResolverContext } from '../TenantResolverContext'
+import { IdentityProvider, QueryResolvers } from '../../schema/index.js'
+import { IdentityProvidersQuery } from '../../model/index.js'
+import { TenantResolverContext } from '../TenantResolverContext.js'
 
 export class IDPQueryResolver implements QueryResolvers {
 	async identityProviders(parent: unknown, args: unknown, context: TenantResolverContext): Promise<IdentityProvider[]> {

@@ -1,4 +1,4 @@
-import { Membership } from '../type'
+import { Membership } from '../type/index.js'
 import { Acl } from '@contember/schema'
 
 export type MembershipWithSubMembershipMatchRules =

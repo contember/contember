@@ -1,8 +1,8 @@
 import { MigrationBuilder } from '@contember/database-migrations'
-import { SchemaUpdater } from '../utils/schemaUpdateUtils'
-import { ModificationHandlerStatic } from '../ModificationHandler'
+import { SchemaUpdater } from '../utils/schemaUpdateUtils.js'
+import { ModificationHandlerStatic } from '../ModificationHandler.js'
 import { applyPatch, Operation } from 'rfc6902'
-import deepCopy from '../../utils/deepCopy'
+import deepCopy from '../../utils/deepCopy.js'
 
 export const PatchAclSchemaModification: ModificationHandlerStatic<PatchAclSchemaModificationData> = class {
 	static id = 'patchAclSchema'

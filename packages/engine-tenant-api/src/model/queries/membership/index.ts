@@ -1,3 +1,3 @@
-export * from './ProjectMembershipByIdentityQuery'
-export * from './ProjectMembersQuery'
-export * from './ProjectRolesByIdentityQuery'
+export * from './ProjectMembershipByIdentityQuery.js'
+export * from './ProjectMembersQuery.js'
+export * from './ProjectRolesByIdentityQuery.js'

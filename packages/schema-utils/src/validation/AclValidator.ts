@@ -1,7 +1,7 @@
 import { Acl, Model } from '@contember/schema'
-import { PredicateDefinitionProcessor } from '../acl'
-import { getEntity } from '../model'
-import { ErrorBuilder, ValidationError } from './errors'
+import { PredicateDefinitionProcessor } from '../acl/index.js'
+import { getEntity } from '../model/index.js'
+import { ErrorBuilder, ValidationError } from './errors.js'
 
 
 export class AclValidator {

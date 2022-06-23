@@ -1,6 +1,6 @@
 import { Model, Writable } from '@contember/schema'
 import { MigrationBuilder } from '@contember/database-migrations'
-import { EntityUpdater } from './schemaUpdateUtils'
+import { EntityUpdater } from './schemaUpdateUtils.js'
 
 type NameGenerator = (constraint: Model.UniqueConstraint) => string | null
 export const renameConstraintsSqlBuilder = (

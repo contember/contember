@@ -1,5 +1,5 @@
-import { extendEntity } from './extensions'
-import { EntityConstructor } from './types'
+import { extendEntity } from './extensions.js'
+import { EntityConstructor } from './types.js'
 
 export const View = (sql: string, { dependencies }: { dependencies?: EntityConstructor[] } = {}) =>
 	extendEntity(({ entity, registry }) => ({

@@ -1,11 +1,11 @@
-import { CreatePasswordResetRequestCommand, ResetPasswordCommand, ResetPasswordCommandErrorCode } from '../commands'
-import { Response, ResponseError } from '../utils/Response'
-import { getPasswordWeaknessMessage } from '../utils/password'
-import { UserMailer } from '../mailing'
-import { PersonRow } from '../queries'
-import { PermissionContext } from '../authorization'
-import { ProjectManager } from './ProjectManager'
-import { DatabaseContext } from '../utils'
+import { CreatePasswordResetRequestCommand, ResetPasswordCommand, ResetPasswordCommandErrorCode } from '../commands/index.js'
+import { Response, ResponseError } from '../utils/Response.js'
+import { getPasswordWeaknessMessage } from '../utils/password.js'
+import { UserMailer } from '../mailing/index.js'
+import { PersonRow } from '../queries/index.js'
+import { PermissionContext } from '../authorization/index.js'
+import { ProjectManager } from './ProjectManager.js'
+import { DatabaseContext } from '../utils/index.js'
 
 interface MailOptions {
 	project?: string

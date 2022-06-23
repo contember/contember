@@ -31,7 +31,7 @@ import {
 	SignInManager,
 	SignUpManager,
 	UserMailer,
-} from './model'
+} from './model/index.js'
 import {
 	AddIDPMutationResolver,
 	AddProjectMemberMutationResolver,
@@ -60,15 +60,15 @@ import {
 	TenantResolverContextFactory,
 	UpdateProjectMemberMutationResolver,
 	UpdateProjectMutationResolver,
-} from './resolvers'
-import * as Schema from './schema'
-import { createMailer, MailerOptions, TemplateRenderer } from './utils'
-import { IdentityFetcher } from './bridges/system/IdentityFetcher'
-import { SignInResponseFactory } from './resolvers/responseHelpers/SignInResponseFactory'
-import { IDPManager } from './model/service/idp/IDPManager'
-import { IDPQueryResolver } from './resolvers/query/IDPQueryResolver'
-import { UpdateIDPMutationResolver } from './resolvers/mutation/idp/UpdateIDPMutationResolver'
-import { TenantCredentials, TenantMigrationsRunner } from './migrations'
+} from './resolvers/index.js'
+import * as Schema from './schema/index.js'
+import { createMailer, MailerOptions, TemplateRenderer } from './utils/index.js'
+import { IdentityFetcher } from './bridges/system/IdentityFetcher.js'
+import { SignInResponseFactory } from './resolvers/responseHelpers/SignInResponseFactory.js'
+import { IDPManager } from './model/service/idp/IDPManager.js'
+import { IDPQueryResolver } from './resolvers/query/IDPQueryResolver.js'
+import { UpdateIDPMutationResolver } from './resolvers/mutation/idp/UpdateIDPMutationResolver.js'
+import { TenantCredentials, TenantMigrationsRunner } from './migrations/index.js'
 
 export interface TenantContainer {
 	projectMemberManager: ProjectMemberManager

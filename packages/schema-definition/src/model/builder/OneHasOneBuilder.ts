@@ -1,6 +1,6 @@
 import { Model } from '@contember/schema'
-import FieldBuilder from './FieldBuilder'
-import { AddEntityCallback, EntityConfigurator } from './types'
+import FieldBuilder from './FieldBuilder.js'
+import { AddEntityCallback, EntityConfigurator } from './types.js'
 
 type PartialOptions<K extends keyof OneHasOneBuilder.Options> =
 	& Partial<OneHasOneBuilder.Options>

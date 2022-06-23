@@ -1,1 +1,1 @@
-export * from './MailTemplateQuery'
+export * from './MailTemplateQuery.js'

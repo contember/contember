@@ -1,10 +1,10 @@
-import { EventManager } from './EventManager'
-import { Client } from './Client'
-import { Transaction } from './Transaction'
-import { executeQuery } from './execution'
-import { Pool, PoolConfig, PoolStatus } from './Pool'
-import { createPgClientFactory } from '../utils'
-import { DatabaseConfig } from '../types'
+import { EventManager } from './EventManager.js'
+import { Client } from './Client.js'
+import { Transaction } from './Transaction.js'
+import { executeQuery } from './execution.js'
+import { Pool, PoolConfig, PoolStatus } from './Pool.js'
+import { createPgClientFactory } from '../utils/index.js'
+import { DatabaseConfig } from '../types.js'
 
 class Connection implements Connection.ConnectionLike, Connection.ClientFactory, Connection.PoolStatusProvider {
 	constructor(

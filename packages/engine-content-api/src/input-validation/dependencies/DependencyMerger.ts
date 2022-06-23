@@ -1,5 +1,5 @@
-import { tuple } from '../../utils'
-import { Dependencies } from './DependencyCollector'
+import { tuple } from '../../utils/index.js'
+import { Dependencies } from './DependencyCollector.js'
 
 export class DependencyMerger {
 	static merge(a: Dependencies, b: Dependencies): Dependencies {

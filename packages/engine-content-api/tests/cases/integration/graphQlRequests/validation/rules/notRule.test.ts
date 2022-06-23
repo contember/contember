@@ -1,5 +1,5 @@
 import { InputValidation as v, SchemaDefinition as d } from '@contember/schema-definition'
-import { createSchema, testCreate } from '../utils'
+import { createSchema, testCreate } from '../utils.js'
 import { describe, it, assert } from 'vitest'
 
 class Item {

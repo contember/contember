@@ -1,7 +1,7 @@
 import { Model } from '@contember/schema'
-import { WhereTypeProvider } from '../WhereTypeProvider'
+import { WhereTypeProvider } from '../WhereTypeProvider.js'
 import { GraphQLFieldConfigArgumentMap, GraphQLInt, GraphQLList, GraphQLNonNull } from 'graphql'
-import { OrderByTypeProvider } from '../OrderByTypeProvider'
+import { OrderByTypeProvider } from '../OrderByTypeProvider.js'
 
 export class FieldArgsVisitor implements
 	Model.ColumnVisitor<GraphQLFieldConfigArgumentMap | undefined>,

@@ -1,6 +1,6 @@
 import { test } from 'vitest'
 import supertest from 'supertest'
-import { apiUrl } from '../src/tester'
+import { apiUrl } from '../src/tester.js'
 
 test('show homepage', async () => {
 	await supertest(apiUrl)

@@ -1,9 +1,9 @@
 import { InputValidation as v, SchemaBuilder } from '@contember/schema-definition'
 import { Model, Validation } from '@contember/schema'
 import { test } from 'vitest'
-import { execute, sqlTransaction } from '../../../../../src/test'
-import { GQL, SQL } from '../../../../../src/tags'
-import { testUuid } from '../../../../../src/testUuid'
+import { execute, sqlTransaction } from '../../../../../src/test.js'
+import { GQL, SQL } from '../../../../../src/tags.js'
+import { testUuid } from '../../../../../src/testUuid.js'
 
 const bookSchema = new SchemaBuilder()
 	.entity('Book', entity =>

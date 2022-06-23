@@ -1,6 +1,6 @@
 import { Model } from '@contember/schema'
-import { NamingConventions } from '../NamingConventions'
-import { EntityRegistry, EnumRegistry } from '../internal'
+import { NamingConventions } from '../NamingConventions.js'
+import { EntityRegistry, EnumRegistry } from '../internal/index.js'
 
 export abstract class FieldDefinition<O> {
 	constructor(public readonly options: O) {}

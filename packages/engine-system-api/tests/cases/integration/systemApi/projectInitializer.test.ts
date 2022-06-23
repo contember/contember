@@ -1,5 +1,5 @@
 import { ApiTester } from '@contember/engine-api-tester'
-import { ProjectConfig, StageConfig } from '../../../../src'
+import { ProjectConfig, StageConfig } from '../../../../src/index.js'
 import { assert, test } from 'vitest'
 
 import { Logger } from '@contember/engine-common'

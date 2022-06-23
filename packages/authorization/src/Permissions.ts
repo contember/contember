@@ -1,4 +1,4 @@
-import Authorizator from './Authorizator'
+import Authorizator from './Authorizator.js'
 
 class Permissions {
 	private permissions: Permissions.PermissionsMap = {}

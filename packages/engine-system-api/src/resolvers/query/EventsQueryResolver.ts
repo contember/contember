@@ -1,8 +1,8 @@
 import { GraphQLResolveInfo } from 'graphql'
-import { SystemResolverContext } from '../SystemResolverContext'
-import { QueryResolver } from '../Resolver'
-import { EventsOrder, QueryEventsArgs, ResolversTypes } from '../../schema'
-import { AuthorizationActions, EventResponseBuilder, EventsQuery, StageBySlugQuery } from '../../model'
+import { SystemResolverContext } from '../SystemResolverContext.js'
+import { QueryResolver } from '../Resolver.js'
+import { EventsOrder, QueryEventsArgs, ResolversTypes } from '../../schema/index.js'
+import { AuthorizationActions, EventResponseBuilder, EventsQuery, StageBySlugQuery } from '../../model/index.js'
 import { UserInputError } from '@contember/graphql-utils'
 
 export class EventsQueryResolver implements QueryResolver<'events'> {

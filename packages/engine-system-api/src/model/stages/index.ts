@@ -1,1 +1,1 @@
-export * from './StageCreator'
+export * from './StageCreator.js'

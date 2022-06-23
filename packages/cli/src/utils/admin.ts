@@ -1,6 +1,6 @@
 import fetch, { Response } from 'node-fetch'
 import { readdir, readFile } from 'fs/promises'
-import { maskToken } from './token'
+import { maskToken } from './token.js'
 
 export class AdminClient {
 	constructor(private readonly url: string, private readonly apiToken: string) {}

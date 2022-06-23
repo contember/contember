@@ -1,6 +1,6 @@
 import { Command, CommandConfiguration, Input, Workspace } from '@contember/cli-common'
-import { MigrationsContainerFactory } from '../../MigrationsContainer'
-import { getLatestMigration, getMigrationByName } from '../../utils/migrations'
+import { MigrationsContainerFactory } from '../../MigrationsContainer.js'
+import { getLatestMigration, getMigrationByName } from '../../utils/migrations.js'
 import chalk from 'chalk'
 import { Migration, MigrationDescriber } from '@contember/schema-migrations'
 import { Schema } from '@contember/schema'

@@ -1,4 +1,4 @@
-import { MigrationVersionHelper } from './MigrationVersionHelper'
+import { MigrationVersionHelper } from './MigrationVersionHelper.js'
 import * as fs from 'fs'
 import { promisify } from 'util'
 import * as path from 'path'

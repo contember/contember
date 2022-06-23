@@ -1,8 +1,8 @@
-import FieldProcessor from './FieldProcessor'
-import ColumnBuilder from '../ColumnBuilder'
-import { NamingConventions } from '../../definition/NamingConventions'
+import FieldProcessor from './FieldProcessor.js'
+import ColumnBuilder from '../ColumnBuilder.js'
+import { NamingConventions } from '../../definition/NamingConventions.js'
 import { Model } from '@contember/schema'
-import { getColumnType } from '../../utils/getColumnType'
+import { getColumnType } from '../../utils/getColumnType.js'
 
 export default class ColumnProcessor implements FieldProcessor<ColumnBuilder.Options> {
 	private conventions: NamingConventions

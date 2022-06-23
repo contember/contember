@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { CustomTypesProvider } from '../../../src'
+import { CustomTypesProvider } from '../../../src/index.js'
 
 describe('uuid graphql type', () => {
 

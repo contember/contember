@@ -2,8 +2,8 @@ import { SchemaBuilder } from '@contember/schema-definition'
 import { Model } from '@contember/schema'
 import { test } from 'vitest'
 import { executeDbTest } from '@contember/engine-api-tester'
-import { GQL } from '../../../../src/tags'
-import { testUuid } from '../../../../src/testUuid'
+import { GQL } from '../../../../src/tags.js'
+import { testUuid } from '../../../../src/testUuid.js'
 
 const schema = new SchemaBuilder()
 	.entity('Site', e =>

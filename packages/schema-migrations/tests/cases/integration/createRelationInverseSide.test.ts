@@ -1,6 +1,6 @@
-import { testMigrations } from '../../src/tests'
+import { testMigrations } from '../../src/tests.js'
 import { Model } from '@contember/schema'
-import { SQL } from '../../src/tags'
+import { SQL } from '../../src/tags.js'
 import { SchemaBuilder } from '@contember/schema-definition'
 
 testMigrations('create inverse side relation (post with locales)', {

@@ -1,8 +1,8 @@
-import { Argument, ArgumentConfiguration } from './Argument'
-import { Option, OptionConfiguration, OptionMode } from './Option'
-import { InputParser } from './InputParser'
-import { UsageFormat, UsageFormatter } from './UsageFormatter'
-import { Arguments, Options } from './Input'
+import { Argument, ArgumentConfiguration } from './Argument.js'
+import { Option, OptionConfiguration, OptionMode } from './Option.js'
+import { InputParser } from './InputParser.js'
+import { UsageFormat, UsageFormatter } from './UsageFormatter.js'
+import { Arguments, Options } from './Input.js'
 
 export class CommandConfiguration<Args extends Arguments, TOptions extends Options> {
 	private descriptionValue: string = ''

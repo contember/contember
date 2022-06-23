@@ -1,7 +1,7 @@
-import { EntityFieldsProvider, FieldMap } from '../EntityFieldsProvider'
+import { EntityFieldsProvider, FieldMap } from '../EntityFieldsProvider.js'
 import { acceptFieldVisitor } from '@contember/schema-utils'
 import { Model } from '@contember/schema'
-import { PaginatedHasManyFieldProviderVisitor } from './PaginatedHasManyFieldProviderVisitor'
+import { PaginatedHasManyFieldProviderVisitor } from './PaginatedHasManyFieldProviderVisitor.js'
 
 export class PaginatedHasManyFieldProvider implements EntityFieldsProvider<PaginatedHasManyFieldProviderExtension> {
 	static extensionName: string = 'PaginatedHasMany'

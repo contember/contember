@@ -1,6 +1,6 @@
 import { GraphQLError } from 'graphql'
 import { UserError } from '@contember/engine-content-api'
-import { GraphQLListener } from './execution'
+import { GraphQLListener } from './execution.js'
 import { ForbiddenError } from '@contember/graphql-utils'
 
 interface ErrorContext {

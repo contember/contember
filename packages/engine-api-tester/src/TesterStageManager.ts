@@ -9,7 +9,7 @@ import {
 	StageCreator,
 } from '@contember/engine-system-api'
 import { Migration, MigrationVersionHelper } from '@contember/schema-migrations'
-import { testUuid } from './testUuid'
+import { testUuid } from './testUuid.js'
 
 export class TesterStageManager {
 	private createdStages = new Set<string>()

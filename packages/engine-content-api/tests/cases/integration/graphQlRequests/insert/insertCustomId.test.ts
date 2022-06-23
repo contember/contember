@@ -1,8 +1,8 @@
 import { AllowAllPermissionFactory, SchemaBuilder } from '@contember/schema-definition'
 import { Model } from '@contember/schema'
-import { execute, sqlTransaction } from '../../../../src/test'
-import { GQL, SQL } from '../../../../src/tags'
-import { testUuid } from '../../../../src/testUuid'
+import { execute, sqlTransaction } from '../../../../src/test.js'
+import { GQL, SQL } from '../../../../src/tags.js'
+import { testUuid } from '../../../../src/testUuid.js'
 import { test } from 'vitest'
 
 test('insert author with id', async () => {

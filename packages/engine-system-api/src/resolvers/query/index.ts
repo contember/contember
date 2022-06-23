@@ -1,3 +1,3 @@
-export * from './EventsQueryResolver'
-export * from './ExecutedMigrationsQueryResolver'
-export * from './StagesQueryResolver'
+export * from './EventsQueryResolver.js'
+export * from './ExecutedMigrationsQueryResolver.js'
+export * from './StagesQueryResolver.js'

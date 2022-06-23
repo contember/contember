@@ -1,8 +1,8 @@
-import { Connection } from './Connection'
-import { EventManager } from './EventManager'
+import { Connection } from './Connection.js'
+import { EventManager } from './EventManager.js'
 import pg from 'pg'
-import { wrapIdentifier } from '../utils'
-import { executeQuery } from './execution'
+import { wrapIdentifier } from '../utils/index.js'
+import { executeQuery } from './execution.js'
 
 export class Transaction implements Connection.TransactionLike {
 	private _isClosed = false

@@ -1,8 +1,8 @@
-import { KoaMiddleware, KoaRequestState } from '../koa'
-import { AuthResult, TimerMiddlewareState } from '../common'
-import { GraphQLKoaState } from '../graphql'
-import { ProjectGroupResolver, ProjectInfoMiddlewareState } from '../project-common'
-import { TenantGraphQLContextFactory } from './TenantGraphQLContextFactory'
+import { KoaMiddleware, KoaRequestState } from '../koa/index.js'
+import { AuthResult, TimerMiddlewareState } from '../common/index.js'
+import { GraphQLKoaState } from '../graphql/index.js'
+import { ProjectGroupResolver, ProjectInfoMiddlewareState } from '../project-common/index.js'
+import { TenantGraphQLContextFactory } from './TenantGraphQLContextFactory.js'
 
 type TenantApiMiddlewareState =
 	& TimerMiddlewareState

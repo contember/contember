@@ -1,2 +1,2 @@
-export * from './HomepageMiddlewareFactory'
-export * from './PlaygroundMiddlewareFactory'
+export * from './HomepageMiddlewareFactory.js'
+export * from './PlaygroundMiddlewareFactory.js'

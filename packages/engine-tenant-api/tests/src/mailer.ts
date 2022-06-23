@@ -1,4 +1,4 @@
-import { Mailer, MailMessage, SentInfo } from '../../src/utils'
+import { Mailer, MailMessage, SentInfo } from '../../src/utils/index.js'
 import { assert } from 'vitest'
 
 export type ExpectedMessage = { subject: string }

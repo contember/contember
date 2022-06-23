@@ -1,7 +1,7 @@
 import { Command, CommandConfiguration, Input, validateProjectName, Workspace } from '@contember/cli-common'
-import { validateSchemaAndPrintErrors } from '../../utils/schema'
-import { loadSchema } from '../../utils/project/loadSchema'
-import { renderProjectInfoHtml } from '../../utils/project/projectDescribe'
+import { validateSchemaAndPrintErrors } from '../../utils/schema.js'
+import { loadSchema } from '../../utils/project/loadSchema.js'
+import { renderProjectInfoHtml } from '../../utils/project/projectDescribe.js'
 import { writeFile } from 'fs/promises'
 import { join } from 'path'
 

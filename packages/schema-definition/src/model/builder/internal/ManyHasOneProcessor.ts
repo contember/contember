@@ -1,7 +1,7 @@
-import FieldProcessor from './FieldProcessor'
+import FieldProcessor from './FieldProcessor.js'
 import { Model } from '@contember/schema'
-import ManyHasOneBuilder from '../ManyHasOneBuilder'
-import { NamingConventions } from '../../definition/NamingConventions'
+import ManyHasOneBuilder from '../ManyHasOneBuilder.js'
+import { NamingConventions } from '../../definition/NamingConventions.js'
 
 export default class ManyHasOneProcessor implements FieldProcessor<ManyHasOneBuilder.Options> {
 	private conventions: NamingConventions

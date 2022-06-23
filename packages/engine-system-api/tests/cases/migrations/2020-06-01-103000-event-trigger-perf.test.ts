@@ -1,4 +1,4 @@
-import migration from '../../../src/migrations/2020-06-01-103000-event-trigger-perf'
+import migration from '../../../src/migrations/2020-06-01-103000-event-trigger-perf.js'
 import { createMigrationBuilder } from '@contember/database-migrations'
 import { sampleProject } from '@contember/engine-api-tester'
 import { test, assert } from 'vitest'

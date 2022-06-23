@@ -4,11 +4,11 @@ import {
 	MutationResolvers,
 	MutationSignInArgs,
 	SignInResponse,
-} from '../../../schema'
-import { TenantResolverContext } from '../../TenantResolverContext'
-import { PermissionActions, SignInManager } from '../../../model'
-import { createErrorResponse } from '../../errorUtils'
-import { SignInResponseFactory } from '../../responseHelpers/SignInResponseFactory'
+} from '../../../schema/index.js'
+import { TenantResolverContext } from '../../TenantResolverContext.js'
+import { PermissionActions, SignInManager } from '../../../model/index.js'
+import { createErrorResponse } from '../../errorUtils.js'
+import { SignInResponseFactory } from '../../responseHelpers/SignInResponseFactory.js'
 
 export class SignInMutationResolver implements MutationResolvers {
 	constructor(

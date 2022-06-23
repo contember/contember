@@ -1,6 +1,6 @@
-import { Maybe, Project, QueryProjectBySlugArgs, QueryResolvers } from '../../schema'
-import { TenantResolverContext } from '../TenantResolverContext'
-import { PermissionActions, ProjectManager } from '../../model'
+import { Maybe, Project, QueryProjectBySlugArgs, QueryResolvers } from '../../schema/index.js'
+import { TenantResolverContext } from '../TenantResolverContext.js'
+import { PermissionActions, ProjectManager } from '../../model/index.js'
 
 export class ProjectQueryResolver implements QueryResolvers {
 	constructor(private readonly projectManager: ProjectManager) {}

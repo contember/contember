@@ -1,5 +1,5 @@
 import { Connection } from '@contember/database'
-import { Migration } from './Migration'
+import { Migration } from './Migration.js'
 
 export class MigrationsRunner<MigrationArgs> {
 	constructor(

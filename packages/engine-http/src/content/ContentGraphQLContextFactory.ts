@@ -6,10 +6,10 @@ import { Client } from '@contember/database'
 import { Acl, Schema } from '@contember/schema'
 import { Membership } from '@contember/engine-tenant-api'
 
-import { AuthResult, Timer } from '../common'
-import { KoaContext } from '../koa'
-import { Providers } from '../providers'
-import { GraphQLKoaState } from '../graphql'
+import { AuthResult, Timer } from '../common/index.js'
+import { KoaContext } from '../koa/index.js'
+import { Providers } from '../providers.js'
+import { GraphQLKoaState } from '../graphql/index.js'
 
 export type ExtendedGraphqlContext = Context & { identityId: string; koaContext: KoaContext<GraphQLKoaState> }
 

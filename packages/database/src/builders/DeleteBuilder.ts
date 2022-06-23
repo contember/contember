@@ -1,11 +1,11 @@
-import { Returning } from './internal/Returning'
-import { With } from './internal/With'
-import { Where } from './internal/Where'
-import { Compiler } from './Compiler'
-import { QueryBuilder } from './QueryBuilder'
-import { Client, Connection } from '../client'
-import { Literal } from '../Literal'
-import { createSubQueryLiteralFactory, SubQueryExpression } from './internal/Subqueries'
+import { Returning } from './internal/Returning.js'
+import { With } from './internal/With.js'
+import { Where } from './internal/Where.js'
+import { Compiler } from './Compiler.js'
+import { QueryBuilder } from './QueryBuilder.js'
+import { Client, Connection } from '../client/index.js'
+import { Literal } from '../Literal.js'
+import { createSubQueryLiteralFactory, SubQueryExpression } from './internal/Subqueries.js'
 
 class DeleteBuilder<Result extends DeleteBuilder.DeleteResult> implements Returning.Aware, With.Aware, Where.Aware, QueryBuilder {
 

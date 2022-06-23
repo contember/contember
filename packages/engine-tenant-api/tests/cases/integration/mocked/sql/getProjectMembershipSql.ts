@@ -1,6 +1,6 @@
 import { ExpectedQuery } from '@contember/database-tester'
-import { SQL } from '../../../../src/tags'
-import { testUuid } from '../../../../src/testUuid'
+import { SQL } from '../../../../src/tags.js'
+import { testUuid } from '../../../../src/testUuid.js'
 
 export const getProjectMembershipSql = (
 	args: { identityId: string; projectId: string },

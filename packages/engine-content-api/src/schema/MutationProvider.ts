@@ -7,15 +7,15 @@ import {
 	GraphQLString,
 } from 'graphql'
 import { Acl, Input, Model } from '@contember/schema'
-import { Context } from '../types'
-import { EntityTypeProvider } from './EntityTypeProvider'
-import { WhereTypeProvider } from './WhereTypeProvider'
-import { Authorizator } from '../acl'
-import { EntityInputProvider, EntityInputType } from './mutations'
-import { filterObject } from '../utils'
-import { aliasAwareResolver, GqlTypeName } from './utils'
-import { ResultSchemaTypeProvider } from './ResultSchemaTypeProvider'
-import { ExtensionKey, Operation, OperationMeta } from './OperationExtension'
+import { Context } from '../types.js'
+import { EntityTypeProvider } from './EntityTypeProvider.js'
+import { WhereTypeProvider } from './WhereTypeProvider.js'
+import { Authorizator } from '../acl/index.js'
+import { EntityInputProvider, EntityInputType } from './mutations/index.js'
+import { filterObject } from '../utils/index.js'
+import { aliasAwareResolver, GqlTypeName } from './utils.js'
+import { ResultSchemaTypeProvider } from './ResultSchemaTypeProvider.js'
+import { ExtensionKey, Operation, OperationMeta } from './OperationExtension.js'
 
 type FieldConfig<TArgs> = GraphQLFieldConfig<any, Context, TArgs>
 

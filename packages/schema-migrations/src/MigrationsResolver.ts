@@ -1,7 +1,7 @@
-import { MigrationFilesManager } from './MigrationFilesManager'
-import { VERSION_INITIAL } from './modifications/ModificationVersions'
-import { MigrationVersionHelper } from './MigrationVersionHelper'
-import { Migration } from './Migration'
+import { MigrationFilesManager } from './MigrationFilesManager.js'
+import { VERSION_INITIAL } from './modifications/ModificationVersions.js'
+import { MigrationVersionHelper } from './MigrationVersionHelper.js'
+import { Migration } from './Migration.js'
 
 export class MigrationsResolver {
 	constructor(private readonly migrationFilesManager: MigrationFilesManager) {}

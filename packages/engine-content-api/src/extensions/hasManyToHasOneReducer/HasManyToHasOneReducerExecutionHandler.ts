@@ -1,10 +1,10 @@
 import { Input, Model } from '@contember/schema'
-import { isIt } from '../../utils'
+import { isIt } from '../../utils/index.js'
 import { acceptFieldVisitor } from '@contember/schema-utils'
-import { SelectExecutionHandler, SelectExecutionHandlerContext } from '../../mapper'
-import { ImplementationException } from '../../exception'
-import { UniqueWhereExpander } from '../../inputProcessing'
-import { HasManyToHasOneReducerExtension } from './HasManyToHasOneReducer'
+import { SelectExecutionHandler, SelectExecutionHandlerContext } from '../../mapper/index.js'
+import { ImplementationException } from '../../exception.js'
+import { UniqueWhereExpander } from '../../inputProcessing/index.js'
+import { HasManyToHasOneReducerExtension } from './HasManyToHasOneReducer.js'
 
 export class HasManyToHasOneReducerExecutionHandler implements SelectExecutionHandler<Input.UniqueQueryInput, HasManyToHasOneReducerExtension> {
 

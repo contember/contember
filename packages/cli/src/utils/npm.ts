@@ -1,5 +1,5 @@
 import { join } from 'path'
-import { runCommand } from './commands'
+import { runCommand } from './commands.js'
 import { pathExists, listDirectories } from '@contember/cli-common'
 import fs from 'fs/promises'
 

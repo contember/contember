@@ -1,2 +1,2 @@
-export * from './ChangePasswordCommand'
-export * from './CreatePersonCommand'
+export * from './ChangePasswordCommand.js'
+export * from './CreatePersonCommand.js'

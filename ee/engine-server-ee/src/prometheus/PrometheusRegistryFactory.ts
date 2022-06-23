@@ -1,6 +1,6 @@
-import { ProcessType } from '../utils'
+import { ProcessType } from '../utils/index.js'
 import prom, { Registry } from 'prom-client'
-import { createContemberEngineInfoMetric } from './contemberEngineInfoMetric'
+import { createContemberEngineInfoMetric } from './contemberEngineInfoMetric.js'
 
 export class PrometheusRegistryFactory {
 	constructor(

@@ -1,8 +1,8 @@
 import { Schema } from '@contember/schema'
-import { ValidationError } from './errors'
-import { AclValidator } from './AclValidator'
-import { ModelValidator } from './ModelValidator'
-import { ValidationValidator } from './ValidationValidator'
+import { ValidationError } from './errors.js'
+import { AclValidator } from './AclValidator.js'
+import { ModelValidator } from './ModelValidator.js'
+import { ValidationValidator } from './ValidationValidator.js'
 
 export class SchemaValidator {
 	public static validate(schema: Schema): ValidationError[] {

@@ -1,11 +1,11 @@
-import { Mailer, TemplateRenderer } from '../../utils'
-import NewUserInvited from './templates/NewUserInvited.mustache'
-import ExistingUserInvited from './templates/ExistingUserInvited.mustache'
-import PasswordReset from './templates/PasswordReset.mustache'
-import { MailTemplateData, MailTemplateIdentifier, MailType } from './type'
-import { MailTemplateQuery } from '../queries'
-import Layout from './templates/Layout.mustache'
-import { DatabaseContext } from '../utils'
+import { Mailer, TemplateRenderer } from '../../utils/index.js'
+import NewUserInvited from './templates/NewUserInvited.mustache.js'
+import ExistingUserInvited from './templates/ExistingUserInvited.mustache.js'
+import PasswordReset from './templates/PasswordReset.mustache.js'
+import { MailTemplateData, MailTemplateIdentifier, MailType } from './type.js'
+import { MailTemplateQuery } from '../queries/index.js'
+import Layout from './templates/Layout.mustache.js'
+import { DatabaseContext } from '../utils/index.js'
 
 export class UserMailer {
 	constructor(

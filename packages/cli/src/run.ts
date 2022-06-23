@@ -18,7 +18,7 @@ import {
 	SignInCommand,
 	VersionCommand,
 	WorkspaceUpdateApiCommand,
-} from './commands';
+} from './commands/index.js';
 
 (async () => {
 	const diffCommandFactory = () => new MigrationDiffCommand()

@@ -1,8 +1,8 @@
 import { Schema } from '@contember/schema'
 import { h } from 'preact'
-import { collectReferences } from '../../schema/collectReferences'
-import { EntityLink } from './EntityLink'
-import { EntityInfo } from './EntityInfo'
+import { collectReferences } from '../../schema/collectReferences.js'
+import { EntityLink } from './EntityLink.js'
+import { EntityInfo } from './EntityInfo.js'
 
 
 export const ProjectInfo = (props: { schema: Schema; projectName: string }) => {

@@ -1,9 +1,9 @@
 import { extension } from 'mime-types'
-import { resolveS3PublicBaseUrl, S3Config } from './Config'
-import { ObjectKeyVerifier } from './ObjectKeyVerifier'
+import { resolveS3PublicBaseUrl, S3Config } from './Config.js'
+import { ObjectKeyVerifier } from './ObjectKeyVerifier.js'
 import { ForbiddenError } from '@contember/graphql-utils'
 import { Providers } from '@contember/engine-plugins'
-import { S3Signer } from './S3Signer'
+import { S3Signer } from './S3Signer.js'
 
 export enum S3Acl {
 	None = 'none',

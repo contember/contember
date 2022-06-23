@@ -1,8 +1,8 @@
 import { Input, Model } from '@contember/schema'
-import { filterObject, isIt } from '../utils'
-import { UpdateInputProcessor } from './UpdateInputProcessor'
-import * as Context from './InputContext'
-import { ImplementationException, UserError } from '../exception'
+import { filterObject, isIt } from '../utils/index.js'
+import { UpdateInputProcessor } from './UpdateInputProcessor.js'
+import * as Context from './InputContext.js'
+import { ImplementationException, UserError } from '../exception.js'
 
 export class UpdateInputVisitor<Result> implements
 	Model.ColumnVisitor<Promise<Result | Result[] | undefined>>,

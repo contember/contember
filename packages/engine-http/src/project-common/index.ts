@@ -1,2 +1,2 @@
-export * from './ProjectGroupResolver'
-export * from './ProjectInfoMiddlewareState'
+export * from './ProjectGroupResolver.js'
+export * from './ProjectInfoMiddlewareState.js'

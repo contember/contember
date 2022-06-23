@@ -1,5 +1,5 @@
 import { Value } from '@contember/schema'
-import { getFulfilledValues, getRejections } from '../utils'
+import { getFulfilledValues, getRejections } from '../utils/index.js'
 
 export type ColumnValue<E = never> = {
 	value: PromiseLike<Value.AtomicValue<E> | undefined>

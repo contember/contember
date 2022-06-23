@@ -1,6 +1,6 @@
 import { DatabaseQuery, DatabaseQueryable } from '@contember/database'
-import { prepareStageQueryBuilder } from './StageQueryFactory'
-import { Stage } from '../../dtos'
+import { prepareStageQueryBuilder } from './StageQueryFactory.js'
+import { Stage } from '../../dtos/index.js'
 
 class StagesQuery extends DatabaseQuery<Stage[]> {
 	async fetch(queryable: DatabaseQueryable): Promise<Stage[]> {

@@ -1,11 +1,11 @@
 import { escapeValue, MigrationBuilder } from '@contember/database-migrations'
 import { Model, Schema } from '@contember/schema'
-import { addField, SchemaUpdater, updateEntity, updateModel } from '../utils/schemaUpdateUtils'
-import { ModificationHandlerStatic } from '../ModificationHandler'
-import { wrapIdentifier } from '../../utils/dbHelpers'
+import { addField, SchemaUpdater, updateEntity, updateModel } from '../utils/schemaUpdateUtils.js'
+import { ModificationHandlerStatic } from '../ModificationHandler.js'
+import { wrapIdentifier } from '../../utils/dbHelpers.js'
 import { getColumnName, isColumn } from '@contember/schema-utils'
-import { ImplementationException } from '../../exceptions'
-import { createFields } from '../utils/diffUtils'
+import { ImplementationException } from '../../exceptions.js'
+import { createFields } from '../utils/diffUtils.js'
 
 export const CreateColumnModification: ModificationHandlerStatic<CreateColumnModificationData> = class {
 	static id = 'createColumn'

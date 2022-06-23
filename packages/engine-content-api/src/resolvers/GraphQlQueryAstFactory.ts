@@ -7,9 +7,10 @@ import {
 	GraphQLResolveInfo,
 	isListType,
 	isNonNullType,
-	isObjectType, Kind,
+	isObjectType,
+	SelectionSetNode,
+	Kind,
 } from 'graphql'
-import { SelectionSetNode } from 'graphql/language/ast'
 import { getArgumentValues } from 'graphql/execution/values'
 import { FieldNode, ObjectNode } from '../inputProcessing'
 import { isDeepStrictEqual } from 'util'

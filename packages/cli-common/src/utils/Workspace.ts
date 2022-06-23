@@ -3,9 +3,9 @@ import { ProjectManager } from './ProjectManager'
 import { PathMapping } from './PathMapping'
 import { installTemplate } from './template'
 import { getPackageVersion } from './version'
-import { pathExists } from 'fs-extra'
 import { readYaml } from './yaml'
 import { CliEnv, readCliEnv } from '../application'
+import { pathExists } from './fs'
 
 export interface WorkspaceDirectoryArgument {
 	workspaceDirectory: string
@@ -19,7 +19,7 @@ type CreateWorkspaceArgs = {
 export const createWorkspace = async ({ workspaceDirectory, workspaceName, template }: CreateWorkspaceArgs) => {
 	template ??= '@contember/template-workspace'
 	await installTemplate(template, workspaceDirectory, 'workspace', {
-		version: getPackageVersion(),
+		version: await getPackageVersion(),
 		projectName: workspaceName,
 	})
 	const workspace = await Workspace.get(workspaceDirectory)

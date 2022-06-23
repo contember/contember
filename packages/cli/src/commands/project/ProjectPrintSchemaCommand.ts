@@ -1,6 +1,5 @@
-import { Command, CommandConfiguration, Input } from '@contember/cli-common'
+import { Command, CommandConfiguration, Input, Workspace, validateProjectName } from '@contember/cli-common'
 import { validateSchemaAndPrintErrors } from '../../utils/schema'
-import { Workspace, validateProjectName } from '@contember/cli-common'
 import {
 	EntityRulesResolver,
 	GraphQlSchemaBuilderFactory,
@@ -11,7 +10,7 @@ import {
 } from '@contember/engine-content-api'
 import { DocumentNode, printSchema } from 'graphql'
 import { mergeSchemas } from '@graphql-tools/schema'
-import { loadSchema } from '../../utils/project/loadSchema'
+import { loadSchema } from '../../utils/project/loadSchema.js'
 
 type Args = {
 	project: string

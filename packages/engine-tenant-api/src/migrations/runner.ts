@@ -1,8 +1,10 @@
-import { Connection, createDatabaseIfNotExists, DatabaseConfig, SingleConnection } from '@contember/database'
-import { TenantMigrationArgs } from './types'
+import { createDatabaseIfNotExists, DatabaseConfig, SingleConnection } from '@contember/database'
+import { TenantMigrationArgs } from './types.js'
 import { loadMigrations, Migration, MigrationsRunner as DbMigrationsRunner } from '@contember/database-migrations'
-import tenantCredentials from './2020-06-08-134000-tenant-credentials'
-import { computeTokenHash, Providers } from '../model'
+import tenantCredentials from './2020-06-08-134000-tenant-credentials.js'
+import { computeTokenHash, Providers } from '../model/index.js'
+import { dirname } from 'path'
+import { fileURLToPath } from 'url'
 
 export interface TenantCredentials {
 	loginToken?: string
@@ -13,7 +15,7 @@ export interface TenantCredentials {
 }
 
 const getMigrations = (): Promise<Migration[]> => {
-	return loadMigrations(process.env.CONTEMBER_TENANT_MIGRATIONS_DIR || __dirname, [
+	return loadMigrations(process.env.CONTEMBER_TENANT_MIGRATIONS_DIR || dirname(fileURLToPath(import.meta.url)), [
 		new Migration('2020-06-08-134000-tenant-credentials', tenantCredentials),
 	])
 }

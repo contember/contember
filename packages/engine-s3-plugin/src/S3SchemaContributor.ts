@@ -11,8 +11,7 @@ import {
 import { S3Acl, S3Service, S3ServiceFactory } from './S3Service'
 import { resolveS3Config, S3Config } from './Config'
 import { createObjectKeyVerifier, ObjectKeyVerifier } from './ObjectKeyVerifier'
-import { GraphQLSchemaContributor, SchemaContext } from '@contember/engine-plugins'
-import { Providers } from '@contember/engine-plugins'
+import { GraphQLSchemaContributor, SchemaContext, Providers } from '@contember/engine-plugins'
 
 interface Identity {
 	projectRoles: string[]

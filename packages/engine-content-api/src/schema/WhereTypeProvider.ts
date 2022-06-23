@@ -1,7 +1,6 @@
 import { Acl, Model } from '@contember/schema'
 import { acceptFieldVisitor, getEntity } from '@contember/schema-utils'
-import { GraphQLInputObjectType, GraphQLList } from 'graphql'
-import { GraphQLInputFieldConfig, GraphQLInputFieldConfigMap } from 'graphql/type/definition'
+import { GraphQLInputFieldConfig, GraphQLInputFieldConfigMap, GraphQLInputObjectType, GraphQLList } from 'graphql'
 import { capitalizeFirstLetter, getFieldsForUniqueWhere, singletonFactory } from '../utils'
 import { ColumnTypeResolver } from './ColumnTypeResolver'
 import { ConditionTypeProvider } from './ConditionTypeProvider'

@@ -1,4 +1,4 @@
-import { Client as PgClient, ClientConfig } from 'pg'
+import pg from 'pg'
 import { EventManager } from './EventManager'
 import { Client } from './Client'
 import { Transaction } from './Transaction'
@@ -9,11 +9,11 @@ import { ClientError } from './errors'
 import { createPgClientFactory } from '../utils'
 
 export class SingleConnection implements Connection.ConnectionLike, Connection.ClientFactory {
-	private readonly pgClient: PgClient
+	private readonly pgClient: pg.Client
 	private isConnected = false
 
 	constructor(
-		private readonly config: ClientConfig & DatabaseConfig,
+		private readonly config: pg.ClientConfig & DatabaseConfig,
 		private readonly queryConfig: Connection.QueryConfig,
 		public readonly eventManager: EventManager = new EventManager(null),
 	) {

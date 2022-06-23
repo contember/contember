@@ -12,7 +12,7 @@ ARG LICENSE_FILE
 
 WORKDIR /src
 
-COPY --from=builder /src/server/server.js /src/
+COPY --from=builder /src/server/server.cjs /src/
 COPY --from=builder /src/server/node_modules /src/node_modules
 COPY --from=builder /src/packages/engine-system-api/src/migrations /src/system-migrations
 COPY --from=builder /src/packages/engine-tenant-api/src/migrations /src/tenant-migrations
@@ -26,4 +26,4 @@ ENV CONTEMBER_TENANT_MIGRATIONS_DIR /src/tenant-migrations
 ENV CONTEMBER_SYSTEM_MIGRATIONS_DIR /src/system-migrations
 ENV CONTEMBER_PACKAGE_JSON /src/package.json
 
-CMD ["node", "./server.js"]
+CMD ["node", "./server.cjs"]

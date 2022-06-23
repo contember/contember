@@ -1,11 +1,18 @@
-import { GraphQLInputFieldConfig, GraphQLInputFieldConfigMap, GraphQLInputType } from 'graphql/type/definition'
+import {
+	GraphQLBoolean,
+	GraphQLEnumType,
+	GraphQLInputFieldConfig,
+	GraphQLInputFieldConfigMap,
+	GraphQLInputObjectType,
+	GraphQLInputType,
+	GraphQLInt,
+} from 'graphql'
 import { Acl, Model } from '@contember/schema'
 import { acceptFieldVisitor } from '@contember/schema-utils'
 import { singletonFactory } from '../utils'
 import { GqlTypeName } from './utils'
 import { Authorizator } from '../acl'
 import { FieldAccessVisitor } from './FieldAccessVisitor'
-import { GraphQLBoolean, GraphQLEnumType, GraphQLInputObjectType, GraphQLInt } from 'graphql'
 
 export class OrderByTypeProvider {
 	private orderBySingleton = singletonFactory(name => this.createEntityOrderByType(name))

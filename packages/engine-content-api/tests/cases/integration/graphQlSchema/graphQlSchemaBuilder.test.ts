@@ -8,10 +8,11 @@ import {
 	SchemaDefinition,
 	SchemaDefinition as def,
 } from '@contember/schema-definition'
-import { Authorizator, GraphQlSchemaBuilderFactory } from '../../../../src'
-import * as model from './model'
+import { Authorizator, GraphQlSchemaBuilderFactory } from '../../../../src/index.js'
+import * as model from './model.js'
 import { promises as fs } from 'fs'
 import { assert, describe, it } from 'vitest'
+import { fileURLToPath } from 'url'
 
 interface Test {
 	schema: (builder: SchemaBuilder) => SchemaBuilder | Model.Schema
@@ -45,7 +46,7 @@ const testSchema = async (test: Test) => {
 
 	const textSchema = printSchema(graphQlSchema) + '\n'
 
-	const filename = path.join(__dirname, test.graphQlSchemaFile)
+	const filename = path.join(path.dirname(fileURLToPath(import.meta.url)), test.graphQlSchemaFile)
 	let expectedSchema: string
 	try {
 		expectedSchema = await fs.readFile(filename, { encoding: 'utf8' })

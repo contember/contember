@@ -1,8 +1,7 @@
-import { SchemaBuilder } from '@contember/schema-definition'
+import { SchemaBuilder, SchemaDefinition as def } from '@contember/schema-definition'
 import { Model } from '@contember/schema'
 import { SQL } from '../../src/tags'
 import { testMigrations } from '../../src/tests'
-import { SchemaDefinition as def } from '@contember/schema-definition'
 
 testMigrations('create a table (no relations, unique on column)', {
 	originalSchema: new SchemaBuilder().buildSchema(),

@@ -16,6 +16,8 @@ COPY --from=builder /src/dist/ /opt/contember/
 COPY --from=builder /src/packages/cli/dist/src/utils/project/resources/out.css /opt/contember/resources/out.css
 COPY --from=builder /src/packages/cli-common/resources /opt/contember/resources
 COPY --from=builder /src/packages/cli/package.json /opt/contember/package.json
-RUN ln -s /opt/contember/run.js /usr/bin/contember
+RUN npm install -g typescript ts-node
+RUN ln -s /opt/contember/run.cjs /usr/bin/contember
 ENV CONTEMBER_CLI_PACKAGE_ROOT /opt/contember
-ENTRYPOINT ["node", "/opt/contember/run.js"]
+ENV NODE_OPTIONS "--loader ts-node/esm"
+ENTRYPOINT ["node", "/opt/contember/run.cjs"]

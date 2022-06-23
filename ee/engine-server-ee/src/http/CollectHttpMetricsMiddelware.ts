@@ -1,6 +1,10 @@
-import { KoaMiddleware, ModuleInfoMiddlewareState, ProjectInfoMiddlewareState } from '@contember/engine-http'
+import {
+	GraphQLKoaState,
+	KoaMiddleware,
+	ModuleInfoMiddlewareState,
+	ProjectInfoMiddlewareState,
+} from '@contember/engine-http'
 import prom from 'prom-client'
-import { GraphQLKoaState } from '@contember/engine-http'
 
 export const createColllectHttpMetricsMiddleware = (
 	registry: prom.Registry,

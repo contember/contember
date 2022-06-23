@@ -1,7 +1,7 @@
-import { pathExists } from 'fs-extra'
 import { join } from 'path'
 import { runCommand } from './commands'
-import { listDirectories } from '@contember/cli-common'
+import { pathExists, listDirectories } from '@contember/cli-common'
+import fs from 'fs/promises'
 
 export interface NpmPackageUpdate {
 	name: string
@@ -34,8 +34,7 @@ export const updateNpmPackages = async (packages: NpmPackageUpdate[], workspaceD
 		if (!(await pathExists(packageJsonFile))) {
 			return
 		}
-		// eslint-disable-next-line @typescript-eslint/no-var-requires
-		const packageJson = require(packageJsonFile) as any
+		const packageJson = JSON.parse(await fs.readFile(packageJsonFile, 'utf-8'))
 		const isRoot = workspaceDirectory === dir
 		const upgradeDeps = async (type: 'dependencies' | 'devDependencies') => {
 			const deps = packageJson[type] || {}

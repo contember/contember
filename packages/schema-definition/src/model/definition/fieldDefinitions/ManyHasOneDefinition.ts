@@ -1,7 +1,6 @@
-import { EntityConstructor, Interface } from '../types'
+import { EntityConstructor, Interface, RelationTarget } from '../types'
 import { Model } from '@contember/schema'
 import { CreateFieldContext, FieldDefinition } from './FieldDefinition'
-import { RelationTarget } from '../types'
 
 export class ManyHasOneDefinitionImpl extends FieldDefinition<ManyHasOneDefinitionOptions> {
 	type = 'ManyHasOneDefinition' as const

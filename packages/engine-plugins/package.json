@@ -1,7 +1,8 @@
 {
   "name": "@contember/engine-plugins",
-  "license": "Apache-2.0",
   "version": "1.2.0-alpha.2",
+  "license": "Apache-2.0",
+  "type": "module",
   "main": "dist/src/index.js",
   "scripts": {
     "test": "echo 'No tests'"

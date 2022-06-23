@@ -8,14 +8,16 @@ import {
 import { MigrationFilesManager, MigrationsResolver, ModificationHandlerFactory } from '@contember/schema-migrations'
 import { GraphQlSchemaBuilderFactory } from '@contember/engine-content-api'
 import { makeExecutableSchema } from '@graphql-tools/schema'
-import { ContentApiTester } from './ContentApiTester'
-import { SystemApiTester } from './SystemApiTester'
-import { TesterStageManager } from './TesterStageManager'
+import { ContentApiTester } from './ContentApiTester.js'
+import { SystemApiTester } from './SystemApiTester.js'
+import { TesterStageManager } from './TesterStageManager.js'
 import { Client, SingleConnection } from '@contember/database'
-import { createUuidGenerator } from './testUuid'
-import { project } from './project'
-import { createConnection, dbCredentials, recreateDatabase } from './dbUtils'
-import { join } from 'path'
+import { createUuidGenerator } from './testUuid.js'
+import { project } from './project.js'
+import { createConnection, dbCredentials, recreateDatabase } from './dbUtils.js'
+import { dirname, join } from 'path'
+import { fileURLToPath } from 'url'
+
 
 export class ApiTester {
 	public static project = project
@@ -125,6 +127,6 @@ export class ApiTester {
 	}
 
 	public static getMigrationsDir(): string {
-		return join(__dirname + '/../../src')
+		return join(dirname(fileURLToPath(import.meta.url)), '/../../src')
 	}
 }

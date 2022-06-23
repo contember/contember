@@ -1,6 +1,5 @@
 import { describe, it, assert } from 'vitest'
-import { InputValidation as v } from '@contember/schema-definition'
-import { SchemaDefinition as d } from '@contember/schema-definition'
+import { InputValidation as v, SchemaDefinition as d } from '@contember/schema-definition'
 import { createSchema, testCreate } from '../utils'
 
 

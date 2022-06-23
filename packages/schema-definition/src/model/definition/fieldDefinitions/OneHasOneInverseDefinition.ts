@@ -1,7 +1,6 @@
 import { Model } from '@contember/schema'
-import { EntityConstructor, Interface } from '../types'
+import { EntityConstructor, Interface, RelationTarget } from '../types'
 import { CreateFieldContext, FieldDefinition } from './FieldDefinition'
-import { RelationTarget } from '../types'
 
 export class OneHasOneInverseDefinitionImpl extends FieldDefinition<OneHasOneInverseDefinitionOptions> {
 	type = 'OneHasOneInverseDefinition' as const

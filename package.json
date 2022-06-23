@@ -1,5 +1,6 @@
 {
   "version": "1.2.0-alpha.2",
+  "type": "module",
   "private": true,
   "scripts": {
     "oao": "oao",
@@ -27,6 +28,7 @@
     ]
   },
   "devDependencies": {
+    "@contember/eslint-plugin-custom-rules": "0.0.0",
     "@actions/core": "^1.5.0",
     "@types/node": "^16",
     "@typescript-eslint/eslint-plugin": "^5.28.0",
@@ -47,7 +49,8 @@
   },
   "workspaces": [
     "ee/*",
-    "packages/*"
+    "packages/*",
+    "scripts/eslint-plugin-custom-rules"
   ],
   "dependencies": {}
 }

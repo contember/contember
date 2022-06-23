@@ -1,5 +1,4 @@
-import { JSONObject, JSONPrimitive } from '@contember/cli-common/dist/src/utils/json'
-import { pathExists } from 'fs-extra'
+import { pathExists, JSONObject, JSONPrimitive } from '@contember/cli-common'
 import YAWN from 'yawn-yaml/cjs'
 import { Merger } from '@contember/config-loader'
 import jsyaml from 'js-yaml'

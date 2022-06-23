@@ -1,9 +1,9 @@
 import { createTransport, Transporter, TransportOptions } from 'nodemailer'
-import { Options as MailMessage } from 'nodemailer/lib/mailer'
-import * as SMTPTransport from 'nodemailer/lib/smtp-transport'
-import * as SMTPPool from 'nodemailer/lib/smtp-pool'
-import * as SendmailTransport from 'nodemailer/lib/sendmail-transport'
-import * as SESTransport from 'nodemailer/lib/ses-transport'
+import type { Options as MailMessage } from 'nodemailer/lib/mailer'
+import type * as SMTPTransport from 'nodemailer/lib/smtp-transport'
+import type * as SMTPPool from 'nodemailer/lib/smtp-pool'
+import type * as SendmailTransport from 'nodemailer/lib/sendmail-transport'
+import type * as SESTransport from 'nodemailer/lib/ses-transport'
 
 export { MailMessage }
 

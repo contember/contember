@@ -1,6 +1,6 @@
 import { isAbsolute, join } from 'path'
-import { replaceFileContent } from './fs'
-import { copy, pathExists, remove, rename } from 'fs-extra'
+import { pathExists, replaceFileContent } from './fs'
+import fsExtra from 'fs-extra'
 import { downloadPackage } from './npm'
 import { resourcesDir } from '../pathUtils'
 import { readYaml } from './yaml'
@@ -22,7 +22,7 @@ export const installTemplate = async (
 	if (!isAbsolute(template)) {
 		template = await downloadPackage(template)
 		removeTemplate = async () => {
-			await remove(template)
+			await fsExtra.remove(template)
 		}
 	}
 	const templateConfigFile = join(template, 'contember.template.yaml')
@@ -39,7 +39,7 @@ export const installTemplate = async (
 	}
 	const nodeModulesDir = join(template, 'node_modules')
 	const skippedFiles = new Set([...(config.remove || []).map(it => join(template, it)), templateConfigFile])
-	await copy(template, targetDir, {
+	await fsExtra.copy(template, targetDir, {
 		filter: src => !src.startsWith(nodeModulesDir) && !skippedFiles.has(src),
 	})
 	await removeTemplate()
@@ -58,10 +58,10 @@ export const installTemplate = async (
 		})
 	}
 	for (const [source, target] of Object.entries(config.rename || {})) {
-		await rename(join(targetDir, source), join(targetDir, target))
+		await fsExtra.rename(join(targetDir, source), join(targetDir, target))
 	}
 	for (const [source, target] of Object.entries(config.copy || {})) {
-		await copy(join(targetDir, source), join(targetDir, target))
+		await fsExtra.copy(join(targetDir, source), join(targetDir, target))
 	}
 
 	for (const file of config.replaceVariables || []) {

@@ -1,6 +1,5 @@
 import { getEntity } from '@contember/schema-utils'
-import { PathFactory } from './select'
-import { WhereBuilder } from './select'
+import { PathFactory, WhereBuilder } from './select'
 import { PredicateFactory } from '../acl'
 import {
 	Client,

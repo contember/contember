@@ -6,7 +6,7 @@ export class VersionCommand extends Command<{}, {}> {
 	}
 
 	protected async execute(): Promise<void | number> {
-		console.log(getPackageVersion())
+		console.log(await getPackageVersion())
 		return 0
 	}
 }

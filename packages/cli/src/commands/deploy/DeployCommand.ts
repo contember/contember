@@ -1,20 +1,19 @@
-import { Command, CommandConfiguration, Input, Project, Workspace } from '@contember/cli-common'
+import { Command, CommandConfiguration, Input, pathExists, Project, Workspace } from '@contember/cli-common'
 import {
 	configureExecuteMigrationCommand,
 	ExecuteMigrationOptions,
 	executeMigrations,
 	resolveMigrationStatus,
-} from '../migrations/MigrationExecuteHelper'
-import { pathExists } from 'fs-extra'
-import { interactiveResolveApiToken, TenantClient } from '../../utils/tenant'
-import { interactiveResolveInstanceEnvironmentFromInput } from '../../utils/instance'
-import { SystemClient } from '../../utils/system'
-import { MigrationsContainerFactory } from '../../MigrationsContainer'
-import { AdminClient, readAdminFiles } from '../../utils/admin'
+} from '../migrations/MigrationExecuteHelper.js'
+import { interactiveResolveApiToken, TenantClient } from '../../utils/tenant.js'
+import { interactiveResolveInstanceEnvironmentFromInput } from '../../utils/instance/index.js'
+import { SystemClient } from '../../utils/system/index.js'
+import { MigrationsContainerFactory } from '../../MigrationsContainer.js'
+import { AdminClient, readAdminFiles } from '../../utils/admin.js'
 import { URL } from 'url'
 import prompts from 'prompts'
-import { printMigrationDescription } from '../../utils/migrations'
-import { maskToken } from '../../utils/token'
+import { printMigrationDescription } from '../../utils/migrations.js'
+import { maskToken } from '../../utils/token.js'
 
 type Args = {
 	dsn: string

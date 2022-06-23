@@ -1,5 +1,4 @@
-import { DatabaseQuery, SelectBuilder } from '@contember/database'
-import { DatabaseQueryable } from '@contember/database'
+import { DatabaseQuery, SelectBuilder, DatabaseQueryable } from '@contember/database'
 import { Project } from '../../type'
 
 export class ProjectBySlugQuery extends DatabaseQuery<(Project & { updatedAt: Date }) | null> {

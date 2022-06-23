@@ -1,4 +1,4 @@
-import { ClientBase } from 'pg'
+import  pg from 'pg'
 import { EventManager } from './EventManager'
 import { Connection } from './Connection'
 import {
@@ -19,7 +19,7 @@ function prepareSql(sql: string) {
 type SomeOptional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>
 
 export async function executeQuery<Row extends Record<string, any>>(
-	pgClient: ClientBase,
+	pgClient: pg.ClientBase,
 	eventManager: EventManager,
 	{ sql, parameters, meta, timing }: SomeOptional<Connection.Query, 'parameters' | 'meta'> & Connection.QueryConfig,
 	context: Connection.QueryContext = {},

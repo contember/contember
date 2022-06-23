@@ -1,5 +1,4 @@
-import { Command, CommandConfiguration, Input } from '@contember/cli-common'
-import { Workspace, validateProjectName } from '@contember/cli-common'
+import { Command, CommandConfiguration, Input, Workspace, validateProjectName } from '@contember/cli-common'
 
 type Args = {
 	project: string

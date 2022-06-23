@@ -1,10 +1,9 @@
-import { Command, CommandConfiguration, Input } from '@contember/cli-common'
+import { Command, CommandConfiguration, Input, Workspace } from '@contember/cli-common'
 import { MigrationsContainerFactory } from '../../MigrationsContainer'
 import { getLatestMigration, getMigrationByName } from '../../utils/migrations'
 import chalk from 'chalk'
 import { Migration, MigrationDescriber } from '@contember/schema-migrations'
 import { Schema } from '@contember/schema'
-import { Workspace } from '@contember/cli-common'
 
 type Args = {
 	project: string

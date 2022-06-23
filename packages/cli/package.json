@@ -2,6 +2,7 @@
   "name": "@contember/cli",
   "version": "1.2.0-alpha.2",
   "license": "Apache-2.0",
+  "type": "module",
   "bin": {
     "contember": "./dist/src/run.js"
   },

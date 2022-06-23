@@ -1,6 +1,6 @@
 import { Connection } from './Connection'
 import { EventManager } from './EventManager'
-import { ClientBase } from 'pg'
+import pg from 'pg'
 import { wrapIdentifier } from '../utils'
 import { executeQuery } from './execution'
 
@@ -16,7 +16,7 @@ export class Transaction implements Connection.TransactionLike {
 	}
 
 	constructor(
-		private readonly pgClient: ClientBase,
+		private readonly pgClient: pg.ClientBase,
 		public readonly eventManager: EventManager,
 		private readonly config: Connection.QueryConfig,
 	) {}
@@ -102,7 +102,7 @@ class SavePoint implements Connection.TransactionLike {
 	constructor(
 		public readonly savepointName: string,
 		private readonly transactionInst: Transaction,
-		private readonly pgClient: ClientBase,
+		private readonly pgClient: pg.ClientBase,
 		public readonly eventManager: EventManager,
 	) {}
 

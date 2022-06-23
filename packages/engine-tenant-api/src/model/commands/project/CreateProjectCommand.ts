@@ -1,7 +1,6 @@
-import { InsertBuilder } from '@contember/database'
+import { InsertBuilder, ConflictActionType } from '@contember/database'
 import { Command } from '../Command'
 import { Project } from '../../type'
-import { ConflictActionType } from '@contember/database'
 
 export class CreateProjectCommand implements Command<string | null> {
 	constructor(private readonly project: Pick<Project, 'name' | 'slug' | 'config'>, private readonly timestamp: Date) {}

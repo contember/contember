@@ -1,4 +1,4 @@
-import { CommandConfiguration, Input } from '@contember/cli-common'
+import { CommandConfiguration, Input, Workspace, Project } from '@contember/cli-common'
 import { MigrationsContainerFactory } from '../../MigrationsContainer'
 import {
 	MigrationCreator,
@@ -8,7 +8,6 @@ import {
 	SchemaMigrator,
 	SchemaVersionBuilder,
 } from '@contember/schema-migrations'
-import { Workspace, Project } from '@contember/cli-common'
 
 type Args = {
 	project: string

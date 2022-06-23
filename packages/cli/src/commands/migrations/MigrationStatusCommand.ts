@@ -1,11 +1,10 @@
-import { Command, CommandConfiguration, Input } from '@contember/cli-common'
+import { Command, CommandConfiguration, Input, Workspace } from '@contember/cli-common'
 import { MigrationsContainerFactory } from '../../MigrationsContainer'
 import { interactiveResolveInstanceEnvironmentFromInput } from '../../utils/instance'
 import { interactiveResolveApiToken } from '../../utils/tenant'
 import { SystemClient } from '../../utils/system'
 import { createMigrationStatusTable, getMigrationsStatus, MigrationState, sortMigrations } from '../../utils/migrations'
 import chalk from 'chalk'
-import { Workspace } from '@contember/cli-common'
 
 type Args = {
 	project: string

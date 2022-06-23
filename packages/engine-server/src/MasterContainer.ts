@@ -1,4 +1,4 @@
-import { SystemContainerFactory } from '@contember/engine-system-api'
+import { getSystemMigrations, SystemContainerFactory } from '@contember/engine-system-api'
 import { TenantContainerFactory } from '@contember/engine-tenant-api'
 import { Builder } from '@contember/dic'
 import { ServerConfig } from './config/config'

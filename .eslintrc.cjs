@@ -4,7 +4,7 @@ module.exports = {
 		'plugin:@typescript-eslint/recommended',
 		'plugin:promise/recommended',
 	],
-	plugins: [],
+	plugins: ['@contember/custom-rules'],
 	parserOptions: {
 		ecmaVersion: 2018,
 		sourceType: 'module',
@@ -63,5 +63,6 @@ module.exports = {
 		'space-in-parens': ['error', 'never'],
 		'space-infix-ops': ['error'],
 		'space-unary-ops': ['error', { words: true, nonwords: false }],
+		'@contember/custom-rules/es-import': 'error',
 	},
 }

@@ -4,6 +4,8 @@ import composedPrimary from './2020-05-06-150000-composed-primary'
 import eventTriggerPerf from './2020-06-01-103000-event-trigger-perf'
 import eventLogRework from './2021-05-07-155800-event-log-rework'
 import eventLogFixConstraint from './2021-05-19-1232000-event-log-fix-constraint'
+import { dirname } from 'path'
+import { fileURLToPath } from 'url'
 
 export const getSystemMigrations = (): Promise<Migration[]> => {
 	return loadMigrations(process.env.CONTEMBER_SYSTEM_MIGRATIONS_DIR || __dirname, [

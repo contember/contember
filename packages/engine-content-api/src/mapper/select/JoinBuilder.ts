@@ -2,8 +2,7 @@ import { Path } from './Path'
 import { acceptRelationTypeVisitor, getTargetEntity } from '@contember/schema-utils'
 import { Model } from '@contember/schema'
 import { JoinVisitor } from './JoinVisitor'
-import { Operator } from '@contember/database'
-import { SelectBuilder } from '@contember/database'
+import { Operator, SelectBuilder } from '@contember/database'
 
 export class JoinBuilder {
 	constructor(private readonly schema: Model.Schema) {}

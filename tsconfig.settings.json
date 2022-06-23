@@ -6,13 +6,22 @@
 		"composite": true,
 		"noEmitOnError": true,
 		"experimentalDecorators": true,
-
-		"target": "es2018",
+		"esModuleInterop": true,
+		"target": "ES2020",
 		"moduleResolution": "node",
-		"module": "commonjs",
-
+		"module": "ESNext",
 		"strict": true,
 		"incremental": true,
-		"lib": ["esnext"]
+		"lib": [
+			"esnext"
+		],
+		"plugins": [
+			{
+				"transform": "typescript-transform-extensions",
+				"extensions": {
+					".ts": ".js"
+				}
+			}
+		]
 	}
 }

@@ -1,8 +1,9 @@
 const path = require('path')
 const esbuild = require('esbuild')
 
-const root = path.dirname(path.dirname(__dirname))
-const resolvePlugin = {
+const root = path.dirname(path.dirname(path.dirname(fileURLToPath(import.meta.url))))
+
+export const resolvePlugin = {
 	name: 'resolve contember',
 	setup(build) {
 		build.onResolve({ filter: /^@contember\/.+$/ }, args => {

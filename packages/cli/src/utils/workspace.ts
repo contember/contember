@@ -1,5 +1,4 @@
-import { pathExists } from 'fs-extra'
-import { formatWorkspaceConfigPath, Workspace } from '@contember/cli-common'
+import { pathExists, formatWorkspaceConfigPath, Workspace } from '@contember/cli-common'
 import { updateYaml } from './yaml'
 
 export const updateWorkspaceApiVersion = async (workspace: Workspace, newVersion: string): Promise<string | null> => {

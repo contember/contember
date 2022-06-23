@@ -1,4 +1,4 @@
-import migration from './2020-06-08-134000-tenant-credentials'
+import migration from '../../../src/migrations/2020-06-08-134000-tenant-credentials'
 import { createMigrationBuilder } from '@contember/database-migrations'
 import { test, assert } from 'vitest'
 

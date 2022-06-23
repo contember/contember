@@ -1,6 +1,5 @@
-import { DatabaseContext } from '../../model'
+import { DatabaseContext, OldValuesQuery } from '../../model'
 import { createBatchLoader } from '../../utils/batchQuery'
-import { OldValuesQuery } from '../../model'
 
 export const oldValuesLoaderFactory = (db: DatabaseContext) =>
 	createBatchLoader<string, Record<string, object>, object>(

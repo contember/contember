@@ -1,5 +1,5 @@
 import { ImplementationException } from '../exceptions'
-import { Client as PgClient } from 'pg'
+import pg from 'pg'
 import { ClientErrorCodes } from './errorCodes'
 import EventEmitter from 'events'
 import { ClientError, DatabaseError } from './errors'
@@ -76,7 +76,7 @@ class PoolConnection {
 	public timerId: NodeJS.Timeout | undefined
 
 	constructor(
-		public readonly client: PgClient,
+		public readonly client: pg.Client,
 	) {
 	}
 }

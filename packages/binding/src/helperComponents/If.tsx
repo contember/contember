@@ -25,7 +25,7 @@ export interface IfCallbackProps {
 export const If = Component<IfProps>(props => {
 		return typeof props.condition !== 'function'
 			? <IfFilter condition={props.condition}>{props.children}</IfFilter>
-			: <IfCallback condition={props.condition}>{props.condition}</IfCallback>
+			: <IfCallback condition={props.condition}>{props.children}</IfCallback>
 	},
 	'If',
 )

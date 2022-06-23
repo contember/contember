@@ -1,5 +1,5 @@
 import { ReactNode, useCallback, useEffect, useState } from 'react'
-import { TreeRootIdProvider, useBindingOperations } from '../accessorPropagation'
+import { TreeRootIdProvider, useBindingOperations, useEnvironment } from '../accessorPropagation'
 import { useMutationState } from '../accessorTree'
 import { Component } from '../coreComponents'
 import { useEntityBeforePersist } from '../entityEvents'
@@ -29,7 +29,7 @@ export const DeferredSubTrees = Component<DeferredSubTreesProps>(
 
 		const [abortController] = useState(() => new AbortController())
 		const signal = abortController.signal
-
+		const environment = useEnvironment()
 		useEntityBeforePersist(
 			useCallback(getAccessor => {
 				// This is a hack. We're really just circumventing the change of ids after a creation so that nested
@@ -55,7 +55,7 @@ export const DeferredSubTrees = Component<DeferredSubTreesProps>(
 
 			const newFragment = <OnlyKeepSubTrees>{props.children}</OnlyKeepSubTrees>
 
-			extendTree(newFragment, { signal })
+			extendTree(newFragment, { signal, environment })
 				.then(treeRootId => !signal.aborted && setLoadState({ name: 'success', treeRootId }))
 				.catch(error => {
 					if (signal.aborted) {
@@ -63,7 +63,7 @@ export const DeferredSubTrees = Component<DeferredSubTreesProps>(
 					}
 					throw error
 				})
-		}, [extendTree, isMutating, loadState.name, props.children, signal])
+		}, [environment, extendTree, isMutating, loadState.name, props.children, signal])
 
 		switch (loadState.name) {
 			case 'initial':

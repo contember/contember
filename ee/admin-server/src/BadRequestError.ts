@@ -1,7 +1,8 @@
-export class BadRequestError {
+export class BadRequestError extends Error {
 	constructor(
 		public readonly code: number,
-		public readonly message: string,
+		message: string,
 	) {
+		super(message)
 	}
 }

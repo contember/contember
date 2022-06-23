@@ -670,6 +670,10 @@ export class Environment {
     // (undocumented)
     getAllDimensions(): Environment.SelectedDimensions;
     // (undocumented)
+    getAllParameters(): Environment.Parameters;
+    // (undocumented)
+    getAllVariables(): Environment.CustomVariables;
+    // (undocumented)
     getDimension<F>(dimensionName: string): string[];
     // (undocumented)
     getDimensionOrElse<F>(dimensionName: string, fallback: F): string[] | F;
@@ -1620,9 +1624,9 @@ export interface PersistSuccessOptions extends AsyncBatchUpdatesOptions {
 // @public (undocumented)
 export class PlaceholderGenerator {
     // (undocumented)
-    static getEntityListSubTreePlaceholder(subTreeParameters: QualifiedEntityList | UnconstrainedQualifiedEntityList): string;
+    static getEntityListSubTreePlaceholder(subTreeParameters: QualifiedEntityList | UnconstrainedQualifiedEntityList, environment: Environment): string;
     // (undocumented)
-    static getEntitySubTreePlaceholder(subTreeParameters: QualifiedSingleEntity | UnconstrainedQualifiedSingleEntity): string;
+    static getEntitySubTreePlaceholder(subTreeParameters: QualifiedSingleEntity | UnconstrainedQualifiedSingleEntity, environment: Environment): string;
     // (undocumented)
     static getFieldPlaceholder(fieldName: FieldName): string;
     // (undocumented)

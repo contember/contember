@@ -16,14 +16,24 @@ describe('entity operations', () => {
 					name: 'Foo',
 					customPrimaryAllowed: false,
 					unique: [],
-					fields: [{
+					fields: [
+						{
+							__typename: '_Column',
+							name: 'id',
+							nullable: false,
+							defaultValue: null,
+							type: 'Uuid',
+							enumName: null,
+						},
+						{
 						__typename: '_Column',
 						type: 'String',
 						enumName: null,
 						nullable: true,
 						defaultValue: null,
 						name: 'fooField',
-					}],
+					},
+],
 				}],
 			},
 		})

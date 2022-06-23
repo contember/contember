@@ -8,6 +8,7 @@ import type {
 	UnconstrainedQualifiedSingleEntity,
 } from '../treeParameters'
 import { Hashing } from '../utils'
+import { Environment } from '../dao'
 
 export class PlaceholderGenerator {
 	public static getFieldPlaceholder(fieldName: FieldName): string {
@@ -24,13 +25,15 @@ export class PlaceholderGenerator {
 
 	public static getEntitySubTreePlaceholder(
 		subTreeParameters: QualifiedSingleEntity | UnconstrainedQualifiedSingleEntity,
+		environment: Environment,
 	): string {
-		return `est_${Hashing.hashEntitySubTreeParameters(subTreeParameters)}`
+		return `est_${Hashing.hashEntitySubTreeParameters(subTreeParameters, environment)}`
 	}
 
 	public static getEntityListSubTreePlaceholder(
 		subTreeParameters: QualifiedEntityList | UnconstrainedQualifiedEntityList,
+		environment: Environment,
 	): string {
-		return `lst_${Hashing.hashEntityListSubTreeParameters(subTreeParameters)}`
+		return `lst_${Hashing.hashEntityListSubTreeParameters(subTreeParameters, environment)}`
 	}
 }

@@ -263,7 +263,7 @@ export const Card: NamedExoticComponent<CardProps>;
 // @public (undocumented)
 export type CardProps = Omit<CommonCardProps, 'type'> & Omit<NativeProps<HTMLDivElement>, 'onClick'> & {
     href?: never;
-    onClick?: never;
+    onClick?: () => void;
 };
 
 // @public (undocumented)
@@ -333,6 +333,7 @@ export type ColorString = string;
 
 // @public (undocumented)
 export type CommonCardProps = VisuallyDependentControlProps & {
+    active?: boolean;
     src?: string | null;
     children?: ReactNode;
     layout?: 'label-below' | 'label-inside';
@@ -539,6 +540,35 @@ export interface DevErrorListProps {
 export interface DevErrorProps extends DevErrorInnerProps {
     // (undocumented)
     source: string;
+}
+
+// @public (undocumented)
+export const DialogModal: MemoExoticComponent<({ bodyClassName, bodyProps, children, className, dividers, footer, footerClassName, footerProps, header, headerClassName, headerProps, layout, onClose, ...rest }: DialogModalProps) => JSX.Element>;
+
+// @public (undocumented)
+export interface DialogModalProps extends NativeProps<HTMLDivElement> {
+    // (undocumented)
+    bodyClassName?: string;
+    // (undocumented)
+    bodyProps?: Partial<Omit<StackProps, 'ref'>>;
+    // (undocumented)
+    dividers?: boolean;
+    // (undocumented)
+    footer?: ReactNode;
+    // (undocumented)
+    footerClassName?: string;
+    // (undocumented)
+    footerProps?: Partial<Omit<StackProps, 'ref'>>;
+    // (undocumented)
+    header?: ReactNode;
+    // (undocumented)
+    headerClassName?: string;
+    // (undocumented)
+    headerProps?: Partial<Omit<StackProps, 'ref'>>;
+    // (undocumented)
+    layout?: 'fit-content' | 'wide' | 'expanded';
+    // (undocumented)
+    onClose: () => void;
 }
 
 // @public (undocumented)
@@ -2279,7 +2309,7 @@ export interface TabItem {
 }
 
 // @public (undocumented)
-export const Table: MemoExoticComponent<({ bare, ...props }: TableProps) => JSX.Element>;
+export const Table: MemoExoticComponent<({ bare, className: classNameProp, ...props }: TableProps) => JSX.Element>;
 
 // @public (undocumented)
 const table: string[];
@@ -2327,6 +2357,8 @@ export interface TableProps {
     // (undocumented)
     children?: ReactNode;
     // (undocumented)
+    className?: string;
+    // (undocumented)
     heading?: ReactNode;
     // (undocumented)
     justification?: Justification;
@@ -2337,14 +2369,20 @@ export interface TableProps {
 }
 
 // @public (undocumented)
-export const TableRow: MemoExoticComponent<(props: TableRowProps) => JSX.Element>;
+export const TableRow: MemoExoticComponent<({ active, children, id, justification, onClick: onClickProp }: TableRowProps) => JSX.Element>;
 
 // @public (undocumented)
 export interface TableRowProps {
     // (undocumented)
+    active?: boolean;
+    // (undocumented)
     children?: ReactNode;
     // (undocumented)
+    id?: string | number;
+    // (undocumented)
     justification?: Justification;
+    // (undocumented)
+    onClick?: (id: number | string) => void;
 }
 
 // @public (undocumented)

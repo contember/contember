@@ -157,9 +157,9 @@ export namespace Input {
 		readonly or?: readonly Condition<T>[]
 		readonly not?: Condition<T>
 		readonly eq?: T
+		readonly notEq?: T
 		readonly null?: boolean // deprecated
 		readonly isNull?: boolean
-		readonly notEq?: T
 		readonly in?: readonly T[]
 		readonly notIn?: readonly T[]
 		readonly lt?: T

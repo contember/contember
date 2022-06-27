@@ -45,12 +45,7 @@ const permissions: Acl.Permissions = {
 describe('Predicates injector', () => {
 
 	const variables: Acl.VariablesMap = {
-		localeVariable: {
-			definition: {
-				type: Acl.VariableType.condition,
-			},
-			value: [{ in: ['cs'] }],
-		},
+		localeVariable: { in: ['cs'] },
 	}
 	it('injects predicate', () => {
 		const injector = new PredicatesInjector(

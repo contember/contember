@@ -18,34 +18,48 @@ export interface MembershipErrorVariable<Code> {
 export const createMembershipValidationErrorResult = <Code>(
 	result: MembershipValidationError[],
 ): MembershipErrorVariable<Code>[] => {
-	const legacyErrors = result.map(it => {
+	const formatDeveloperError = (it: MembershipValidationError) => {
+		switch (it.error) {
+			case MembershipValidationErrorType.ROLE_NOT_FOUND:
+				return `Role ${it.role} is not defined in a schema`
+			case MembershipValidationErrorType.VARIABLE_EMPTY:
+				return `Variable ${it.variable} of role ${it.role} is empty`
+			case MembershipValidationErrorType.VARIABLE_NOT_FOUND:
+				return `Variable ${it.variable} of role ${it.role} is not defined in a schema`
+			case MembershipValidationErrorType.VARIABLE_INVALID:
+				return `Variable ${it.variable} of role ${it.role} contains invalid value`
+		}
+	}
+
+	const legacyErrors = result.map((it): MembershipErrorVariable<Code> | undefined => {
 		switch (it.error) {
 			case MembershipValidationErrorType.ROLE_NOT_FOUND:
 				return {
 					code: MembershipErrorCode.RoleNotFound as unknown as Code,
 					endUserMessage: 'Given role not found',
-					developerMessage: `Role ${it.role} is not defined in a schema`,
+					developerMessage: formatDeveloperError(it),
 				}
 			case MembershipValidationErrorType.VARIABLE_EMPTY:
 				return {
 					code: MembershipErrorCode.VariableEmpty as unknown as Code,
 					endUserMessage: 'Required variable is empty',
-					developerMessage: `Variable ${it.variable} of role ${it.role} is empty`,
+					developerMessage: formatDeveloperError(it),
 				}
 			case MembershipValidationErrorType.VARIABLE_NOT_FOUND:
 				return {
 					code: MembershipErrorCode.VariableNotFound as unknown as Code,
 					endUserMessage: 'Provided variable does not exist',
-					developerMessage: `Variable ${it.variable} of role ${it.role} is not defined in a schema`,
+					developerMessage: formatDeveloperError(it),
 				}
 		}
-	})
+	}).filter((it): it is MembershipErrorVariable<Code> => it !== undefined)
+
 	return [
 		{
 			code: MembershipErrorCode.InvalidMembership as unknown as Code,
 			developerMessage:
 				'Provided membership is invalid: ' +
-				legacyErrors.map(it => it.developerMessage).join('. ') +
+				result.map(it => formatDeveloperError(it)).join('. ') +
 				'. You can also check membershipValidation field for structured details.',
 			membershipValidation: result.map(it => {
 				switch (it.error) {
@@ -63,6 +77,12 @@ export const createMembershipValidationErrorResult = <Code>(
 					case MembershipValidationErrorType.VARIABLE_NOT_FOUND:
 						return {
 							code: MembershipValidationErrorCode.VariableNotFound,
+							role: it.role,
+							variable: it.variable,
+						}
+					case MembershipValidationErrorType.VARIABLE_INVALID:
+						return {
+							code: MembershipValidationErrorCode.VariableInvalid,
 							role: it.role,
 							variable: it.variable,
 						}

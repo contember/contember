@@ -69,7 +69,7 @@ namespace ValidationContext {
 
 	export const createSingleNodeContext = (
 		parent: NodeContext | ValueContext,
-		value: object | null | string | number | boolean,
+		value: any,
 	): NodeContext | ValueContext => {
 		if (Array.isArray(value)) {
 			throw new Error('Nested arrays are not allowed')

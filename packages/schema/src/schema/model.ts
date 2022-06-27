@@ -1,6 +1,6 @@
-import Input from './input'
+import { Input } from './input'
 
-namespace Model {
+export namespace Model {
 
 	export type Entity = {
 		readonly name: string
@@ -277,5 +277,3 @@ namespace Model {
 		readonly name: string
 	}
 }
-
-export default Model

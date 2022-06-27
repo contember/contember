@@ -1,6 +1,6 @@
-import Value from './value'
+import { Value } from './value'
 
-namespace Input {
+export namespace Input {
 	export type PrimaryValue<E = never> = Value.PrimaryValue<E>
 	export type ColumnValue<E = never> = Value.FieldValue<E>
 
@@ -199,5 +199,3 @@ namespace Input {
 		updatable = 'updatable',
 	}
 }
-
-export default Input

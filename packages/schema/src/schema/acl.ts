@@ -1,7 +1,7 @@
-import Input from './input'
+import { Input } from './input'
 import { JSONValue } from './json'
 
-namespace Acl {
+export namespace Acl {
 	export enum VariableType {
 		entity = 'entity',
 		predefined = 'predefined',
@@ -162,5 +162,3 @@ namespace Acl {
 		readonly roles: Acl.Roles
 	}
 }
-
-export default Acl

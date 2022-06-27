@@ -1,4 +1,4 @@
-namespace Value {
+export namespace Value {
 	export type Object<E = never> = {
 		readonly [key: string]: FieldValue<E>
 	}
@@ -14,5 +14,3 @@ namespace Value {
 
 	export type ColumnValueLike<E = never> = GenericValueLike<FieldValue<E>>
 }
-
-export default Value

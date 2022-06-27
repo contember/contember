@@ -1,6 +1,6 @@
 import { JSONValue } from './json'
 
-namespace Validation {
+export namespace Validation {
 	export type ContextPath = readonly string[]
 
 	export enum ArgumentType {
@@ -66,5 +66,3 @@ namespace Validation {
 		readonly [entity: string]: EntityRules
 	}
 }
-
-export default Validation

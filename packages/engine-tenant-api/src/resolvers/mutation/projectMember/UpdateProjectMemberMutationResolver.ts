@@ -14,8 +14,8 @@ import {
 } from '../../../model'
 import { createMembershipValidationErrorResult } from '../../membershipUtils'
 import { createMembershipModification } from '../../../model/service/membershipUtils'
-import { Membership } from '../../../model/type/Membership'
 import { createErrorResponse, createProjectNotFoundResponse } from '../../errorUtils'
+import { Acl } from '@contember/schema'
 
 export class UpdateProjectMemberMutationResolver implements MutationResolvers {
 	constructor(
@@ -47,7 +47,7 @@ export class UpdateProjectMemberMutationResolver implements MutationResolvers {
 		)
 		const membershipPatch = createMembershipModification(visibleMemberships, memberships)
 
-		const aclMemberships: Membership[] = membershipPatch.map(it => ({
+		const aclMemberships: Acl.Membership[] = membershipPatch.map(it => ({
 			role: it.role,
 			variables: it.variables.map(it => ({
 				name: it.name,

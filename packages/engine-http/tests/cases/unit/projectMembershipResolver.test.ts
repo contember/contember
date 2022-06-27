@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest'
 import { ProjectMembershipFetcher, ProjectMembershipResolver } from '../../../src'
 import { createMock } from '../../utils'
-import { Membership } from '@contember/engine-tenant-api'
+import { Acl } from '@contember/schema'
 
 describe('membership resolver', () => {
 	it('should return implicit role', async () => {
 		const membershipResolver = new ProjectMembershipResolver(false, createMock<ProjectMembershipFetcher>({
-			fetchMemberships(): Promise<readonly Membership[]> {
+			fetchMemberships(): Promise<readonly Acl.Membership[]> {
 				return Promise.resolve([])
 			},
 		}))
@@ -35,7 +35,7 @@ describe('membership resolver', () => {
 
 	it('should return fetched memberships', async () => {
 		const membershipResolver = new ProjectMembershipResolver(false, createMock<ProjectMembershipFetcher>({
-			fetchMemberships(): Promise<readonly Membership[]> {
+			fetchMemberships(): Promise<readonly Acl.Membership[]> {
 				return Promise.resolve([{ role: 'test', variables: [] }])
 			},
 		}))
@@ -57,7 +57,7 @@ describe('membership resolver', () => {
 
 	it('should return assumed membership', async () => {
 		const membershipResolver = new ProjectMembershipResolver(false, createMock<ProjectMembershipFetcher>({
-			fetchMemberships(): Promise<readonly Membership[]> {
+			fetchMemberships(): Promise<readonly Acl.Membership[]> {
 				return Promise.resolve([{ role: 'admin', variables: [] }])
 			},
 		}))

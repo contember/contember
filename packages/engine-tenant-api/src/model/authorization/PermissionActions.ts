@@ -1,5 +1,5 @@
 import { Authorizator } from '@contember/authorization'
-import { Membership } from '../type/Membership'
+import { Acl } from '@contember/schema'
 
 namespace PermissionActions {
 	export enum Resources {
@@ -25,8 +25,8 @@ namespace PermissionActions {
 	export const PERSON_SIGN_IN_IDP = Authorizator.createAction(Resources.person, 'signInIdp')
 	export const PERSON_CREATE_SESSION_KEY = Authorizator.createAction(Resources.person, 'createSessionToken')
 
-	export const PERSON_INVITE = (memberships: readonly Membership[]) => Authorizator.createAction(Resources.person, 'invite', { memberships })
-	export const PERSON_INVITE_UNMANAGED = (memberships: readonly Membership[]) => Authorizator.createAction(Resources.person, 'invite_unmanaged', { memberships })
+	export const PERSON_INVITE = (memberships: readonly Acl.Membership[]) => Authorizator.createAction(Resources.person, 'invite', { memberships })
+	export const PERSON_INVITE_UNMANAGED = (memberships: readonly Acl.Membership[]) => Authorizator.createAction(Resources.person, 'invite_unmanaged', { memberships })
 
 	export const PROJECT_VIEW = Authorizator.createAction(Resources.project, 'view')
 	export const PROJECT_SET_SECRET = Authorizator.createAction(Resources.project, 'setSecret')
@@ -34,10 +34,10 @@ namespace PermissionActions {
 
 	export const PROJECT_CREATE = Authorizator.createAction(Resources.project, 'create')
 
-	export const PROJECT_VIEW_MEMBER = (memberships: readonly Membership[]) => Authorizator.createAction(Resources.project, 'viewMembers', { memberships })
-	export const PROJECT_ADD_MEMBER = (memberships: readonly Membership[]) => Authorizator.createAction(Resources.project, 'addMember', { memberships })
-	export const PROJECT_REMOVE_MEMBER = (memberships: readonly Membership[]) => Authorizator.createAction(Resources.project, 'removeMember', { memberships })
-	export const PROJECT_UPDATE_MEMBER = (memberships: readonly Membership[]) => Authorizator.createAction(Resources.project, 'updateMember', { memberships })
+	export const PROJECT_VIEW_MEMBER = (memberships: readonly Acl.Membership[]) => Authorizator.createAction(Resources.project, 'viewMembers', { memberships })
+	export const PROJECT_ADD_MEMBER = (memberships: readonly Acl.Membership[]) => Authorizator.createAction(Resources.project, 'addMember', { memberships })
+	export const PROJECT_REMOVE_MEMBER = (memberships: readonly Acl.Membership[]) => Authorizator.createAction(Resources.project, 'removeMember', { memberships })
+	export const PROJECT_UPDATE_MEMBER = (memberships: readonly Acl.Membership[]) => Authorizator.createAction(Resources.project, 'updateMember', { memberships })
 
 	export const API_KEY_CREATE = Authorizator.createAction(Resources.apiKey, 'create')
 	export const API_KEY_CREATE_GLOBAL = Authorizator.createAction(Resources.apiKey, 'createGlobal')

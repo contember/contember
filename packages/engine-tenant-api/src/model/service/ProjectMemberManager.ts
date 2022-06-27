@@ -8,12 +8,11 @@ import {
 	UpdateProjectMemberResponse,
 } from '../commands'
 import { ProjectMembershipByIdentityQuery, ProjectMembersQuery, ProjectRolesByIdentityQuery } from '../queries'
-import { Membership, MembershipVariable } from '../type/Membership'
 import { AddProjectMemberErrorCode, MemberType } from '../../schema'
 import { AccessVerifier, PermissionActions, TenantRole } from '../authorization'
 import { indexListBy, notEmpty } from '../../utils/array'
 import { createSetMembershipVariables } from './membershipUtils'
-import { ProjectRole } from '@contember/schema'
+import { Acl, ProjectRole } from '@contember/schema'
 import { Response, ResponseError, ResponseOk } from '../utils/Response'
 import { DatabaseContext } from '../utils'
 
@@ -35,7 +34,7 @@ export class ProjectMemberManager {
 		dbContext: DatabaseContext,
 		projectId: string,
 		identityId: string,
-		memberships: readonly Membership[],
+		memberships: readonly Acl.Membership[],
 	): Promise<AddProjectMemberResponse> {
 		return await dbContext.transaction(async db => {
 			const result = await db.commandBus.execute(
@@ -77,7 +76,7 @@ export class ProjectMemberManager {
 		project: { id: string } | { slug: string },
 		identity: { id: string; roles?: readonly string[] },
 		verifier: AccessVerifier | undefined,
-	): Promise<readonly Membership[]> {
+	): Promise<readonly Acl.Membership[]> {
 		if (identity.roles?.includes(TenantRole.SUPER_ADMIN) || identity.roles?.includes(TenantRole.PROJECT_ADMIN)) {
 			return [{ role: ProjectRole.ADMIN, variables: [] }]
 		}
@@ -107,7 +106,7 @@ export class ProjectMemberManager {
 		})
 	}
 
-	private async filterMemberships<T extends Membership>(
+	private async filterMemberships<T extends Acl.Membership>(
 		memberships: readonly T[],
 		verifier: AccessVerifier,
 	): Promise<T[]> {
@@ -132,10 +131,10 @@ export class ProjectMemberManager {
 	}
 
 	private async filterProjectMembershipVariableValues(
-		membership: Membership,
-		variable: MembershipVariable,
+		membership: Acl.Membership,
+		variable: Acl.MembershipVariable,
 		verifier: AccessVerifier,
-	): Promise<MembershipVariable['values']> {
+	): Promise<Acl.MembershipVariable['values']> {
 		const values = await Promise.all(
 			variable.values.map(async (value): Promise<string | null> => {
 				const subMembership = {
@@ -166,5 +165,5 @@ export class GetProjectRolesResponse {
 
 export type GetProjectMembersResponse = {
 	identity: { id: string }
-	memberships: readonly Membership[]
+	memberships: readonly Acl.Membership[]
 }[]

@@ -66,7 +66,7 @@ export class ExportApiMiddlewareFactory {
 					acl: schema.acl,
 					projectSlug: project.slug,
 					identity: {
-						id: authResult.identityId,
+						identityId: authResult.identityId,
 						roles: authResult.roles,
 					},
 				}))

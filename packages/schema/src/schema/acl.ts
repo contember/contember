@@ -156,16 +156,9 @@ export namespace Acl {
 		readonly roles: Acl.Roles
 	}
 
-	export type VariableValue = readonly JSONValue[]
-
-	export type VariableMapEntry = {
-		readonly definition: Variable
-		readonly value: VariableValue
-	}
 	export type VariablesMap = {
-		readonly [name: string]: VariableMapEntry
+		readonly [name: string]: Input.Condition
 	}
-
 
 	export interface MembershipVariable {
 		readonly name: string

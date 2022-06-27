@@ -5,7 +5,7 @@
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
   "scripts": {
-    "test": "echo 'No tests'"
+    "test": "vitest"
   },
   "dependencies": {
     "@contember/schema": "^1.2.0-alpha.3",

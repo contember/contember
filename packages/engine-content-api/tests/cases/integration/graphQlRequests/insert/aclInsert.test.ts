@@ -27,12 +27,7 @@ test('insert author (with acl)', async () => {
 			},
 		},
 		variables: {
-			name_variable: {
-				definition: {
-					type: Acl.VariableType.condition,
-				},
-				value: [{ in: ['John', 'Jack'] }],
-			},
+			name_variable: { in: ['John', 'Jack'] },
 		},
 		query: GQL`
         mutation {

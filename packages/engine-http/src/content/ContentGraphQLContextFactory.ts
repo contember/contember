@@ -9,6 +9,7 @@ import { AuthResult, Timer } from '../common'
 import { KoaContext } from '../koa'
 import { Providers } from '../providers'
 import { GraphQLKoaState } from '../graphql'
+import { ParsedMembership } from '@contember/schema-utils'
 
 export type ExtendedGraphqlContext = Context & { identityId: string; koaContext: KoaContext<GraphQLKoaState> }
 
@@ -23,17 +24,14 @@ export class ContentGraphQLContextFactory {
 		schema: Schema
 		permissions: Acl.Permissions
 		authResult: AuthResult
-		memberships: readonly Acl.Membership[]
+		memberships: readonly ParsedMembership[]
 		timer: Timer
 		koaContext: KoaContext<GraphQLKoaState>
 	}): ExtendedGraphqlContext {
 		const partialContext = {
 			db,
 			identityId: authResult.identityId,
-			identityVariables: createAclVariables(schema.acl, {
-				...authResult,
-				memberships,
-			}),
+			identityVariables: createAclVariables(schema.acl, memberships),
 		}
 		let identityId = authResult.identityId
 		if (

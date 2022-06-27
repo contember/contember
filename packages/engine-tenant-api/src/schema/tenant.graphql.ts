@@ -542,6 +542,7 @@ const schema: DocumentNode = gql`
 		ROLE_NOT_FOUND
 		VARIABLE_NOT_FOUND
 		VARIABLE_EMPTY
+		VARIABLE_INVALID
 	}
 
 	# === person ====

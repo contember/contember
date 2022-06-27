@@ -58,12 +58,7 @@ test('querying post + author name', async () => {
 		schema: schema,
 		permissions: permissions,
 		variables: {
-			countryVariable: {
-				definition: {
-					type: Acl.VariableType.condition,
-				},
-				value: [{ in: ['Czechia'] }],
-			},
+			countryVariable: { in: ['Czechia'] },
 		},
 		query: GQL`
         query {

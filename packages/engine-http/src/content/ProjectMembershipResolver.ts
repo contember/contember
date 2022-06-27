@@ -3,6 +3,7 @@ import * as Typesafe from '@contember/typesafe'
 import { Acl } from '@contember/schema'
 import { HttpError } from '../common'
 import { ProjectMembershipFetcher } from './ProjectMembershipFetcher'
+import { MembershipReader, ParsedMembership } from '@contember/schema-utils'
 
 const assumeMembershipHeader = 'x-contember-assume-membership'
 
@@ -21,10 +22,13 @@ export class ProjectMembershipResolver {
 		acl: Acl.Schema
 		request: HeaderAccessor
 		projectSlug: string
-		identity: { id: string; roles?: readonly string[] }
-	}): Promise<readonly Acl.Membership[]> {
+		identity: { identityId: string; personId?: string; roles?: readonly string[] }
+	}): Promise<readonly ParsedMembership[]> {
 
-		const explicitMemberships = await this.projectMembershipFetcher.fetchMemberships(projectSlug, identity)
+		const explicitMemberships = await this.projectMembershipFetcher.fetchMemberships(projectSlug, {
+			id: identity.identityId,
+			roles: identity.roles,
+		})
 
 		const implicitRoles = Object.entries(acl.roles).filter(([, role]) => role.implicit).map(([name]) => name)
 
@@ -35,11 +39,21 @@ export class ProjectMembershipResolver {
 			throw new HttpError(errorMessage, 404)
 		}
 
+		const membershipReader = new MembershipReader()
+
 		const assumedMemberships = this.readAssumedMemberships(request)
 		if (assumedMemberships.length > 0) {
+			const parsedMemberships = membershipReader.read(acl, assumedMemberships, identity)
+			if (parsedMemberships.errors.length > 0) {
+				throw new HttpError(
+					`Invalid memberships in ${assumeMembershipHeader} header:\n` +
+					parsedMemberships.errors.map(it => JSON.stringify(it)).join('\n'),
+					400,
+				)
+			}
 			this.verifyAssumedRoles(explicitMemberships, acl, assumedMemberships)
 
-			return assumedMemberships
+			return parsedMemberships.memberships
 		}
 
 
@@ -47,7 +61,8 @@ export class ProjectMembershipResolver {
 		const implicitRolesToAssign = implicitRoles.filter(it => !explicitProjectRoles.includes(it))
 
 		return [
-			...explicitMemberships,
+			// intentionally ignoring validation errors of stored memberships
+			...membershipReader.read(acl, explicitMemberships, identity).memberships,
 			...implicitRolesToAssign.map(it => ({ role: it, variables: [] })),
 		]
 	}

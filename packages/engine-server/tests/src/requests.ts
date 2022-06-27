@@ -58,6 +58,15 @@ export const addProjectMember = async (identityId: string, projectSlug: string, 
 			mutation ($identity: String!, $projectSlug: String!, $membership: MembershipInput!) {
 				addProjectMember(identityId: $identity, projectSlug: $projectSlug, memberships: [$membership]) {
 					ok
+					error {
+						code
+						developerMessage
+						membershipValidation {
+							code
+							role
+							variable
+						}
+					}
 				}
 			}
 		`,
@@ -67,6 +76,6 @@ export const addProjectMember = async (identityId: string, projectSlug: string, 
 	)
 		.expect(200)
 		.expect(response => {
-			assert.deepStrictEqual(response.body.data, { addProjectMember: { ok: true } })
+			assert.deepStrictEqual(response.body.data, { addProjectMember: { ok: true, error: null } })
 		})
 }

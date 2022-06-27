@@ -18,12 +18,8 @@ describe('create acl variables', () => {
 					},
 				},
 			},
-		}, {
-			identityId: testUuid(1),
-			personId: null,
-			memberships: [{ role: 'author', variables: [{ name: 'authorID', values: [testUuid(2)] }] }],
-		}), {
-			author__authorID: { definition, value: [testUuid(2)] },
+		}, [{ role: 'author', variables: [{ name: 'authorID', condition: { in: [testUuid(2)] } }] }]), {
+			author__authorID: { in: [testUuid(2)] },
 		})
 	})
 
@@ -39,34 +35,9 @@ describe('create acl variables', () => {
 					entities: {},
 				},
 			},
-		}, {
-			identityId: testUuid(1),
-			personId: null,
-			memberships: [{ role: 'author', variables: [] }],
-		}), {
-			author__authorID: { definition, value: [] },
-		})
-	})
-
-
-	it('predefined', () => {
-		const definition: Acl.PredefinedVariable = { type: Acl.VariableType.predefined, value: 'identityID' }
-		assert.deepStrictEqual(createAclVariables({
-			roles: {
-				author: {
-					stages: '*',
-					variables: {
-						authorIdentity: definition,
-					},
-					entities: {},
-				},
-			},
-		}, {
-			identityId: testUuid(1),
-			personId: null,
-			memberships: [{ role: 'author', variables: [] }],
-		}), {
-			author__authorIdentity: { definition, value: [testUuid(1)] },
+		}, [{ role: 'author', variables: [] }],
+		), {
+			author__authorID: { never: true },
 		})
 	})
 })

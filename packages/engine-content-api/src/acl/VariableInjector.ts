@@ -10,31 +10,16 @@ export class VariableInjector {
 		return predicateDefinitionProcessor.process(entity, where, {
 			handleColumn: ({ value }) => {
 				if (typeof value === 'string') {
-					return this.createCondition(this.variables[value] || undefined)
+					return this.variables[value] ?? { never: true }
 				}
 				return value as Input.Condition
 			},
 			handleRelation: ({ value, targetEntity }) => {
 				if (typeof value === 'string') {
-					return { [targetEntity.primary]: this.createCondition(this.variables[value] || undefined) }
+					return { [targetEntity.primary]: this.variables[value] ?? { never: true } }
 				}
 				return value
 			},
 		})
-	}
-
-	private createCondition(variable: Acl.VariableMapEntry | undefined): Input.Condition {
-		if (variable === undefined || variable.value.length === 0) {
-			return { never: true }
-		}
-
-		const { value, definition } = variable
-		if (definition.type === Acl.VariableType.condition) {
-			if (value.length === 1) {
-				return value[0] as Input.Condition
-			}
-			return { or: value as Input.Condition[] }
-		}
-		return { in: value as (string | number)[] }
 	}
 }

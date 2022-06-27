@@ -1,6 +1,6 @@
 import type { SugaredFieldProps } from '@contember/binding'
 import { SugaredField } from '@contember/binding'
-import type { FileDataExtractor } from '../interfaces'
+import { FileDataExtractor } from './FileDataExtractor'
 
 export interface AudioFileDataExtractorProps {
 	durationField?: SugaredFieldProps['field']
@@ -24,9 +24,6 @@ export const getAudioFileDataExtractor: (props: AudioFileDataExtractorProps) => 
 			})
 			audio.src = objectUrl
 		})
-	},
-	destroy: ({ entity }) => {
-		!!durationField && entity.getField(durationField).updateValue(null)
 	},
 	populateFields: ({ entity, extractedData }) => {
 		!!durationField && entity.getField(durationField).updateValue(extractedData.duration)

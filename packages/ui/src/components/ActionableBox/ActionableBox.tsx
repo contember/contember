@@ -1,8 +1,8 @@
 import classNames from 'classnames'
-import { HTMLAttributes, memo, MouseEvent as ReactMouseEvent, ReactNode } from 'react'
+import { HTMLAttributes, memo, MouseEvent as ReactMouseEvent, ReactNode, useMemo } from 'react'
 import { useClassNamePrefix } from '../../auxiliary'
 import { Box } from '../Box'
-import { Dropdown } from '../Dropdown'
+import { Dropdown, DropdownProps } from '../Dropdown'
 import { Button, ButtonOwnProps } from '../Forms'
 import { Icon, IconProps } from '../Icon'
 
@@ -23,6 +23,11 @@ const commonIconProps: IconProps = {
 export const ActionableBox = memo(({ className, children, editContents, onRemove }: ActionableBoxProps) => {
 	const prefix = useClassNamePrefix()
 
+	const buttonProps: DropdownProps['buttonProps'] = useMemo(() => ({
+		...commonButtonProps,
+		children: <Icon {...commonIconProps} contemberIcon="pencil" />,
+	}), [])
+
 	if (editContents === undefined && onRemove === undefined) {
 		return <>{children}</>
 	}
@@ -37,10 +42,7 @@ export const ActionableBox = memo(({ className, children, editContents, onRemove
 				{editContents && (
 					<li className={`${prefix}actionableBox-action`}>
 						<Dropdown
-							buttonProps={{
-								...commonButtonProps,
-								children: <Icon {...commonIconProps} contemberIcon="pencil" />,
-							}}
+							buttonProps={buttonProps}
 						>
 							<>{editContents}</>
 						</Dropdown>

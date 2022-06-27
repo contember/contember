@@ -30,7 +30,7 @@ export const EntityList = Component(
 			<>
 				{Array.from(props.accessor, entity => {
 					return (
-						<Entity key={entity.key} accessor={entity}>
+						<Entity key={entity.id ?? entity.key} accessor={entity}>
 							{props.children}
 						</Entity>
 					)

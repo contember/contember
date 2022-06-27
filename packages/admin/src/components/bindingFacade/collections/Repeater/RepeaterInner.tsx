@@ -90,7 +90,7 @@ export const RepeaterInner = Component<RepeaterInnerProps<any, any>, NonStaticPr
 					formatMessage={formatMessage}
 				>
 					{entities.map((entity, i) => (
-						<Entity accessor={entity} key={entity.key}>
+						<Entity accessor={entity} key={entity.id ?? entity.key}>
 							<Item
 								{...props.itemComponentExtraProps!}
 								label={label ? `${label} #${i + 1}` : `#${i + 1}`}
@@ -130,7 +130,7 @@ export const RepeaterInner = Component<RepeaterInnerProps<any, any>, NonStaticPr
 					formatMessage={formatMessage}
 				>
 					{entities.map((entity, i) => (
-						<SortableRepeaterItem index={i} key={entity.key} disabled={isMutating}>
+						<SortableRepeaterItem index={i} key={entity.id ?? entity.key} disabled={isMutating}>
 							<Entity accessor={entity}>
 								<Item
 									{...props.itemComponentExtraProps!}

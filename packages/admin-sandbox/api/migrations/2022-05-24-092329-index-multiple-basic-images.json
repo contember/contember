@@ -1,0 +1,119 @@
+{
+	"formatVersion": 3,
+	"modifications": [
+		{
+			"modification": "createEntity",
+			"entity": {
+				"name": "UploadShowcaseImage",
+				"primary": "id",
+				"primaryColumn": "id",
+				"unique": {},
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"nullable": false,
+						"type": "Uuid",
+						"columnType": "uuid"
+					}
+				},
+				"tableName": "upload_showcase_image"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "UploadShowcaseImage",
+			"field": {
+				"name": "order",
+				"columnName": "order",
+				"nullable": true,
+				"type": "Integer",
+				"columnType": "integer"
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "UploadShowcaseImage",
+			"owningSide": {
+				"name": "page",
+				"inversedBy": "multipleBasicImageList",
+				"nullable": true,
+				"type": "ManyHasOne",
+				"target": "UploadShowcase",
+				"joiningColumn": {
+					"columnName": "page_id",
+					"onDelete": "restrict"
+				}
+			},
+			"inverseSide": {
+				"name": "multipleBasicImageList",
+				"ownedBy": "page",
+				"type": "OneHasMany",
+				"target": "UploadShowcaseImage"
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "UploadShowcaseImage",
+			"owningSide": {
+				"name": "image",
+				"nullable": true,
+				"type": "ManyHasOne",
+				"target": "BasicImage",
+				"joiningColumn": {
+					"columnName": "image_id",
+					"onDelete": "restrict"
+				}
+			}
+		},
+		{
+			"modification": "patchAclSchema",
+			"patch": [
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/UploadShowcaseImage",
+					"value": {
+						"predicates": {},
+						"operations": {
+							"create": {
+								"id": true,
+								"page": true,
+								"image": true,
+								"order": true
+							},
+							"read": {
+								"id": true,
+								"page": true,
+								"image": true,
+								"order": true
+							},
+							"update": {
+								"id": true,
+								"page": true,
+								"image": true,
+								"order": true
+							},
+							"delete": true,
+							"customPrimary": true
+						}
+					}
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/UploadShowcase/operations/create/multipleBasicImageList",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/UploadShowcase/operations/update/multipleBasicImageList",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/UploadShowcase/operations/read/multipleBasicImageList",
+					"value": true
+				}
+			]
+		}
+	]
+}

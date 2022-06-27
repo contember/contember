@@ -1,100 +1,103 @@
-import { Component, EntityAccessor, HasOne, SugaredField, useEntity, useEnvironment } from '@contember/binding'
-import { Fragment, useCallback, useMemo, useState } from 'react'
+import { Component, EntityAccessor, useEntity } from '@contember/binding'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useMessageFormatter } from '../../../../i18n'
-import type { ResolvedFileKinds } from '../ResolvedFileKinds'
 import { uploadDictionary } from '../uploadDictionary'
-import { getEntityFileKind, hasUploadedFile, staticRenderFileKind } from '../utils'
 import type { FileInputPublicProps } from './FileInput'
 import { FileInput } from './FileInput'
 import { SingleFilePreview } from './SingleFilePreview'
-import { useNormalizedUploadState } from './useNormalizedUploadState'
+import { useNormalizedUploadState } from './hooks/useNormalizedUploadState'
+import { useConnectSelectedEntities } from './hooks/useConnectSelectedEntities'
+import { useFileUpload } from '@contember/react-client'
+import { FileHandler } from '../fileHandler'
 import { useAccessorErrorFormatter } from '../../errors'
+import { ResolvedFileSelectionComponent } from './selection'
 
-export interface BareUploadFieldProps extends FileInputPublicProps {
-	fileKinds: ResolvedFileKinds
-}
+export type BareUploadFieldProps =
+	& FileInputPublicProps
+	& {
+		fileHandler: FileHandler
+		fileSelection?: ResolvedFileSelectionComponent<any>
+	}
 
 export const BareUploadField = Component<BareUploadFieldProps>(
-	({ fileKinds: unstableFileKinds, ...fileInputProps }) => {
+	({ fileHandler,  ...fileInputProps }) => {
 		const parentEntity = useEntity()
-		const [fileKinds] = useState(() => unstableFileKinds)
 		const formatMessage = useMessageFormatter(uploadDictionary)
 
-		const prepareEntityForNewFile = useCallback<(initialize: EntityAccessor.BatchUpdatesHandler) => void>(
-			initialize => parentEntity.batchUpdates(initialize),
-			[parentEntity],
-		)
+		if (import.meta.env.DEV) {
+			useEffect(() => {
+				if (!fileHandler.hasBaseEntity) {
+					console.warn('To support all features like file removal, "baseEntity" prop should be set on a upload field component.')
+				}
+			}, [fileHandler.hasBaseEntity])
+		}
 
-		const { uploadState, dropzoneState, removeFile } = useNormalizedUploadState({
+		const fileUpload = useFileUpload()
+		const [, { purgeUpload }] = fileUpload
+		const resolvedEntity = useMemo(() => fileHandler.resolveEntity(parentEntity), [fileHandler, parentEntity])
+
+		const destroyFile = useMemo(() => {
+			if (!resolvedEntity.isEmpty && !resolvedEntity.destroy) {
+				return undefined
+			}
+			return () => {
+				purgeUpload([parentEntity.key])
+				resolvedEntity.destroy?.()
+			}
+		}, [parentEntity.key, purgeUpload, resolvedEntity])
+
+		const prepareEntityForNewFile = useCallback<(initialize: EntityAccessor.BatchUpdatesHandler) => void>(
+			initialize => {
+				destroyFile?.()
+				parentEntity.batchUpdates(initialize)
+			},
+			[parentEntity, destroyFile],
+		)
+		const { uploadState, dropzoneState } = useNormalizedUploadState({
 			isMultiple: false,
-			fileKinds,
+			fileHandler,
 			prepareEntityForNewFile,
+			fileUpload,
 		})
 
 		const fileUploadState = uploadState.get(parentEntity.key)
-		const parentWithBase =
-			fileKinds.isDiscriminated && fileKinds.baseEntity !== undefined
-				? parentEntity.getEntity(fileKinds.baseEntity)
-				: parentEntity
 
-		const environment = useEnvironment()
+		const errorHolders = useMemo(() => resolvedEntity.getErrorHolders(), [resolvedEntity])
 		const errorFormatter = useAccessorErrorFormatter()
-		const fileKind = getEntityFileKind(fileKinds, parentWithBase.getAccessor)
-		const extractorEntity = fileKind?.baseEntity ? parentWithBase.getEntity(fileKind.baseEntity) : parentWithBase
-		const extractorsErrors = useMemo(
-			() => fileKind?.extractors.flatMap(it => it.getErrorsHolders?.({ entity: extractorEntity, environment }) ?? []) ?? [],
-			[environment, extractorEntity, fileKind?.extractors],
-		)
-		const errors = useMemo(
-			() => [
-				parentWithBase,
-				...(parentWithBase === extractorEntity ? [] : [extractorEntity]),
-				...extractorsErrors,
-			].flatMap(it => errorFormatter(it.errors?.errors ?? [])),
-			[errorFormatter, extractorEntity, extractorsErrors, parentWithBase],
-		)
+		const errors = useMemo(() => {
+			return errorFormatter(errorHolders.flatMap(it => it.errors?.errors ?? []))
+		}, [errorFormatter, errorHolders])
 
-		const children =
-			hasUploadedFile(fileKinds, parentWithBase) || fileUploadState !== undefined ? (
+		const children = !resolvedEntity.isEmpty || fileUploadState !== undefined
+			? (
 				<div className="fileInput-preview">
 					<SingleFilePreview
-						getContainingEntity={parentEntity.getAccessor}
+						resolvedEntity={resolvedEntity}
 						fileId={parentEntity.key}
 						formatMessage={formatMessage}
-						removeFile={removeFile}
+						removeFile={destroyFile}
 						uploadState={uploadState.get(parentEntity.key)}
-						fileKinds={fileKinds}
 					/>
 				</div>
-			) : undefined
+			)
+			: undefined
+
+		const onSelectConfirm = useConnectSelectedEntities(prepareEntityForNewFile)
 
 		return (
 			<FileInput
 				{...fileInputProps}
+				isMultiple={false}
 				dropzoneState={dropzoneState}
 				formatMessage={formatMessage}
 				errors={errors}
 				children={children}
+				onSelectConfirm={onSelectConfirm}
 			/>
 		)
 	},
 	(props, environment) => {
-		if (props.fileKinds.isDiscriminated) {
-			const children = (
-				<>
-					<SugaredField field={props.fileKinds.discriminationField} isNonbearing />
-					{Array.from(props.fileKinds.fileKinds.values(), (fileKind, i) => (
-						<Fragment key={i}>{staticRenderFileKind(fileKind.datum, environment)}</Fragment>
-					))}
-				</>
-			)
-			return props.fileKinds.baseEntity === undefined ? (
-				children
-			) : (
-				<HasOne field={props.fileKinds.baseEntity}>{children}</HasOne>
-			)
-		}
-		return staticRenderFileKind(props.fileKinds.fileKind, environment)
+		return props.fileHandler.staticRender(environment)
 	},
 	'BareUploadField',
 )

@@ -1,5 +1,8 @@
 export * from './BareFileRepeater'
 export * from './BareFileRepeaterContainer'
 export * from './BareUploadField'
-
 export type { FileInputPublicProps } from './FileInput'
+export type { SelectFileInputPublicProps, FileSelectionProps } from './selection/SelectFileInput'
+export * from './selection'
+export * from './SingleKindFileRepeater'
+export * from './SingleKindUploadField'

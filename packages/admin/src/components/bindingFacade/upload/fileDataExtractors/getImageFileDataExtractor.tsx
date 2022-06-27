@@ -1,6 +1,6 @@
 import type { SugaredFieldProps } from '@contember/binding'
 import { SugaredField } from '@contember/binding'
-import type { FileDataExtractor } from '../interfaces'
+import { FileDataExtractor } from './FileDataExtractor'
 
 export interface ImageFileDataExtractorProps {
 	widthField?: SugaredFieldProps['field']
@@ -30,12 +30,6 @@ export const getImageFileDataExtractor: (props: ImageFileDataExtractorProps) => 
 				reject(e.message)
 			})
 			image.src = objectUrl
-		})
-	},
-	destroy: ({ entity }) => {
-		entity.batchUpdates(getAccessor => {
-			widthField && getAccessor().getField(widthField).updateValue(null)
-			heightField && getAccessor().getField(heightField).updateValue(null)
 		})
 	},
 	populateFields: ({ entity, extractedData }) => {

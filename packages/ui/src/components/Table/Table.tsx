@@ -1,6 +1,6 @@
-import cn from 'classnames'
+import classNames from 'classnames'
 import { createContext, memo, ReactNode } from 'react'
-import { useClassNamePrefix } from '../../auxiliary'
+import { useClassNamePrefix, useComponentClassName } from '../../auxiliary'
 import type { Justification, Size } from '../../types'
 import { toEnumViewClass } from '../../utils'
 import { Box } from '../Box'
@@ -9,6 +9,7 @@ import { FieldContainer } from '../Forms/FieldContainer'
 export const UseTableElementContext = createContext(true)
 
 export interface TableProps {
+	className?: string
 	children?: ReactNode
 	heading?: ReactNode
 	tableHead?: ReactNode
@@ -18,12 +19,16 @@ export interface TableProps {
 	//useTableElement?: boolean
 }
 
-export const Table = memo(({ /*useTableElement = true, */ bare, ...props }: TableProps) => {
+export const Table = memo(({ /*useTableElement = true, */ bare, className: classNameProp, ...props }: TableProps) => {
 	const prefix = useClassNamePrefix()
-	const className = cn(
-		`${prefix}table`,
+
+	const componentClassName = useComponentClassName('table')
+
+	const className = classNames(
+		componentClassName,
 		toEnumViewClass(props.size),
 		toEnumViewClass(props.justification, 'justifyStart'),
+		classNameProp,
 	)
 
 	const table = (
@@ -41,8 +46,8 @@ export const Table = memo(({ /*useTableElement = true, */ bare, ...props }: Tabl
 
 	return (
 		<UseTableElementContext.Provider value={/*useTableElement*/ true}>
-			<FieldContainer label={!bare && props.heading} useLabelElement={false}>
-				<Box padding="no-padding">
+			<FieldContainer className={`${componentClassName}-container`} label={!bare && props.heading} useLabelElement={false}>
+				<Box padding="no-padding" className={`${componentClassName}-container-box`}>
 					{table}
 				</Box>
 			</FieldContainer>

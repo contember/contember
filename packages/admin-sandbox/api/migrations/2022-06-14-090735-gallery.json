@@ -1,0 +1,517 @@
+{
+	"formatVersion": 3,
+	"modifications": [
+		{
+			"modification": "createEnum",
+			"enumName": "GalleryItemType",
+			"values": [
+				"image",
+				"basicImage",
+				"video"
+			]
+		},
+		{
+			"modification": "enableOrphanRemoval",
+			"entityName": "UploadShowcase",
+			"fieldName": "discriminatedAttachment"
+		},
+		{
+			"modification": "updateEnum",
+			"enumName": "ComplexFileListItemType",
+			"values": [
+				"image",
+				"basicImage",
+				"video"
+			]
+		},
+		{
+			"modification": "updateEnum",
+			"enumName": "DiscriminatedAttachmentType",
+			"values": [
+				"image",
+				"basicImage",
+				"video"
+			]
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"eventLog": {
+					"enabled": true
+				},
+				"name": "Gallery",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "gallery",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"columnType": "uuid",
+						"nullable": false,
+						"type": "Uuid"
+					}
+				},
+				"unique": {}
+			}
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"eventLog": {
+					"enabled": true
+				},
+				"name": "GalleryItem",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "gallery_item",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"columnType": "uuid",
+						"nullable": false,
+						"type": "Uuid"
+					}
+				},
+				"unique": {}
+			}
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"eventLog": {
+					"enabled": true
+				},
+				"name": "GalleryList",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "gallery_list",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"columnType": "uuid",
+						"nullable": false,
+						"type": "Uuid"
+					}
+				},
+				"unique": {}
+			}
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"eventLog": {
+					"enabled": true
+				},
+				"name": "GalleryListItem",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "gallery_list_item",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"columnType": "uuid",
+						"nullable": false,
+						"type": "Uuid"
+					}
+				},
+				"unique": {}
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "Gallery",
+			"field": {
+				"name": "unique",
+				"columnName": "unique",
+				"columnType": "One",
+				"nullable": false,
+				"type": "Enum"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "GalleryItem",
+			"field": {
+				"name": "type",
+				"columnName": "type",
+				"columnType": "GalleryItemType",
+				"nullable": false,
+				"type": "Enum"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "GalleryListItem",
+			"field": {
+				"name": "order",
+				"columnName": "order",
+				"columnType": "integer",
+				"nullable": false,
+				"type": "Integer"
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "UploadShowcase",
+			"owningSide": {
+				"type": "ManyHasOne",
+				"name": "galleryItem",
+				"target": "GalleryItem",
+				"joiningColumn": {
+					"columnName": "gallery_item_id",
+					"onDelete": "restrict"
+				},
+				"nullable": true
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "UploadShowcase",
+			"owningSide": {
+				"type": "OneHasOne",
+				"name": "galleryList",
+				"target": "GalleryList",
+				"joiningColumn": {
+					"columnName": "gallery_list_id",
+					"onDelete": "restrict"
+				},
+				"nullable": true
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "ComplexFileListItem",
+			"owningSide": {
+				"type": "OneHasOne",
+				"name": "basicImage",
+				"target": "BasicImage",
+				"joiningColumn": {
+					"columnName": "basic_image_id",
+					"onDelete": "restrict"
+				},
+				"nullable": true
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "DiscriminatedAttachment",
+			"owningSide": {
+				"type": "OneHasOne",
+				"name": "basicImage",
+				"target": "BasicImage",
+				"joiningColumn": {
+					"columnName": "basic_image_id",
+					"onDelete": "restrict"
+				},
+				"nullable": true
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "GalleryItem",
+			"owningSide": {
+				"type": "ManyHasOne",
+				"name": "gallery",
+				"target": "Gallery",
+				"joiningColumn": {
+					"columnName": "gallery_id",
+					"onDelete": "restrict"
+				},
+				"nullable": true,
+				"inversedBy": "items"
+			},
+			"inverseSide": {
+				"type": "OneHasMany",
+				"name": "items",
+				"target": "GalleryItem",
+				"ownedBy": "gallery"
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "GalleryItem",
+			"owningSide": {
+				"type": "OneHasOne",
+				"name": "image",
+				"target": "ComplexImage",
+				"joiningColumn": {
+					"columnName": "image_id",
+					"onDelete": "restrict"
+				},
+				"nullable": true
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "GalleryItem",
+			"owningSide": {
+				"type": "OneHasOne",
+				"name": "basicImage",
+				"target": "BasicImage",
+				"joiningColumn": {
+					"columnName": "basic_image_id",
+					"onDelete": "restrict"
+				},
+				"nullable": true
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "GalleryItem",
+			"owningSide": {
+				"type": "OneHasOne",
+				"name": "video",
+				"target": "BasicVideo",
+				"joiningColumn": {
+					"columnName": "video_id",
+					"onDelete": "restrict"
+				},
+				"nullable": true
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "GalleryListItem",
+			"owningSide": {
+				"type": "ManyHasOne",
+				"name": "list",
+				"target": "GalleryList",
+				"joiningColumn": {
+					"columnName": "list_id",
+					"onDelete": "restrict"
+				},
+				"nullable": true,
+				"inversedBy": "items"
+			},
+			"inverseSide": {
+				"type": "OneHasMany",
+				"name": "items",
+				"target": "GalleryListItem",
+				"ownedBy": "list",
+				"orderBy": [
+					{
+						"path": [
+							"order"
+						],
+						"direction": "asc"
+					}
+				]
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "GalleryListItem",
+			"owningSide": {
+				"type": "ManyHasOne",
+				"name": "item",
+				"target": "GalleryItem",
+				"joiningColumn": {
+					"columnName": "item_id",
+					"onDelete": "cascade"
+				},
+				"nullable": false
+			}
+		},
+		{
+			"modification": "createUniqueConstraint",
+			"entityName": "Gallery",
+			"unique": {
+				"fields": [
+					"unique"
+				],
+				"name": "unique_Gallery_unique_99eaad"
+			}
+		},
+		{
+			"modification": "patchAclSchema",
+			"patch": [
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/Gallery",
+					"value": {
+						"predicates": {},
+						"operations": {
+							"read": {
+								"id": true,
+								"unique": true,
+								"items": true
+							},
+							"create": {
+								"id": true,
+								"unique": true,
+								"items": true
+							},
+							"update": {
+								"id": true,
+								"unique": true,
+								"items": true
+							},
+							"delete": true,
+							"customPrimary": true
+						}
+					}
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/GalleryItem",
+					"value": {
+						"predicates": {},
+						"operations": {
+							"read": {
+								"id": true,
+								"gallery": true,
+								"type": true,
+								"image": true,
+								"basicImage": true,
+								"video": true
+							},
+							"create": {
+								"id": true,
+								"gallery": true,
+								"type": true,
+								"image": true,
+								"basicImage": true,
+								"video": true
+							},
+							"update": {
+								"id": true,
+								"gallery": true,
+								"type": true,
+								"image": true,
+								"basicImage": true,
+								"video": true
+							},
+							"delete": true,
+							"customPrimary": true
+						}
+					}
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/GalleryList",
+					"value": {
+						"predicates": {},
+						"operations": {
+							"read": {
+								"id": true,
+								"items": true
+							},
+							"create": {
+								"id": true,
+								"items": true
+							},
+							"update": {
+								"id": true,
+								"items": true
+							},
+							"delete": true,
+							"customPrimary": true
+						}
+					}
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/GalleryListItem",
+					"value": {
+						"predicates": {},
+						"operations": {
+							"read": {
+								"id": true,
+								"list": true,
+								"order": true,
+								"item": true
+							},
+							"create": {
+								"id": true,
+								"list": true,
+								"order": true,
+								"item": true
+							},
+							"update": {
+								"id": true,
+								"list": true,
+								"order": true,
+								"item": true
+							},
+							"delete": true,
+							"customPrimary": true
+						}
+					}
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/UploadShowcase/operations/create/galleryItem",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/UploadShowcase/operations/create/galleryList",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/UploadShowcase/operations/update/galleryItem",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/UploadShowcase/operations/update/galleryList",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/UploadShowcase/operations/read/galleryItem",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/UploadShowcase/operations/read/galleryList",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/ComplexFileListItem/operations/create/basicImage",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/ComplexFileListItem/operations/update/basicImage",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/ComplexFileListItem/operations/read/basicImage",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/DiscriminatedAttachment/operations/create/basicImage",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/DiscriminatedAttachment/operations/update/basicImage",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/DiscriminatedAttachment/operations/read/basicImage",
+					"value": true
+				}
+			]
+		},
+		{
+			"modification": "patchValidationSchema",
+			"patch": [
+				{
+					"op": "remove",
+					"path": "/UploadShowcase"
+				}
+			]
+		}
+	]
+}

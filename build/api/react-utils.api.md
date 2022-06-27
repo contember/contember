@@ -54,6 +54,9 @@ export const useForceRender: () => DispatchWithoutAction;
 export const useIsMounted: () => MutableRefObject<boolean>;
 
 // @public (undocumented)
+export const useObjectMemo: <A extends object>(value: A) => A;
+
+// @public (undocumented)
 export const usePreviousValue: <Value>(value: Value) => Value;
 
 // Warning: (ae-forgotten-export) The symbol "ValueInitializer" needs to be exported by the entry point index.d.ts

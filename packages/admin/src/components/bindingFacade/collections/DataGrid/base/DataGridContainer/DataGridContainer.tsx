@@ -1,35 +1,37 @@
-import { Component, Entity } from '@contember/binding'
-import { Grid, Stack } from '@contember/ui'
+import { Component } from '@contember/binding'
+import { Stack, useComponentClassName } from '@contember/ui'
 import { FunctionComponent } from 'react'
 import { useMessageFormatter } from '../../../../../../i18n'
 import { dataGridDictionary } from '../dataGridDictionary'
 import { useDataGridTotalCount } from '../useDataGridTotalCount'
 import { DataGridContainerFooter } from './DataGridContainerFooter'
+import { DataGridContainerGrid } from './DataGridContainerGrid'
 import { DataGridContainerHeader } from './DataGridContainerHeader'
 import { DataGridContainerTable } from './DataGridContainerTable'
 import type { DataGridContainerProps } from './Types'
 
 export const DataGridContainer: FunctionComponent<DataGridContainerProps> = Component(
 	({
-		children,
 		accessor,
-		setFilter,
-		setIsColumnHidden,
-		setOrderBy,
-		setLayout,
-		updatePaging,
-		desiredState,
-		displayedState,
-		entityName,
-		filter,
-
 		allowAggregateFilterControls,
 		allowColumnVisibilityControls,
+		desiredState,
+		displayedState,
 		emptyMessage,
 		emptyMessageComponent,
+		entityName,
+		filter,
+		onEntityClick,
+		selectedEntityIds,
+		setFilter,
+		setIsColumnHidden,
+		setLayout,
+		setOrderBy,
 		tile,
-		tileSize = 160,
+		tileSize,
+		updatePaging,
 	}) => {
+		const componentClassName = useComponentClassName('data-grid')
 		const {
 			paging: { pageIndex, itemsPerPage },
 			layout,
@@ -54,7 +56,7 @@ export const DataGridContainer: FunctionComponent<DataGridContainerProps> = Comp
 		)
 
 		return (
-			<Stack direction="vertical">
+			<Stack direction="vertical" className={`${componentClassName}-body`}>
 				<DataGridContainerHeader
 					allowAggregateFilterControls={allowAggregateFilterControls}
 					allowColumnVisibilityControls={allowColumnVisibilityControls}
@@ -67,31 +69,29 @@ export const DataGridContainer: FunctionComponent<DataGridContainerProps> = Comp
 					setLayout={setLayout}
 				/>
 				{tile && layout === 'tiles'
-					? <Grid columnWidth={tileSize}>
-						{!!accessor.length && Array.from(accessor, entity => (
-							<Entity
-								key={entity.key}
-								accessor={entity}
-							>
-								{tile}
-							</Entity>
-						))}
-					</Grid>
+					? <DataGridContainerGrid
+							accessor={accessor}
+							tile={tile}
+							tileSize={tileSize}
+						/>
 					: <DataGridContainerTable
-						accessor={accessor}
-						desiredState={desiredState}
-						displayedState={displayedState}
-						emptyMessage={emptyMessage}
-						emptyMessageComponent={emptyMessageComponent}
-						setFilter={setFilter}
-						setOrderBy={setOrderBy}
-					/>}
+							accessor={accessor}
+							desiredState={desiredState}
+							displayedState={displayedState}
+							emptyMessage={emptyMessage}
+							emptyMessageComponent={emptyMessageComponent}
+							onEntityClick={onEntityClick}
+							selectedEntityIds={selectedEntityIds}
+							setFilter={setFilter}
+							setOrderBy={setOrderBy}
+						/>
+				}
 				{!!normalizedItemCount && (
 					<DataGridContainerFooter
 						desiredState={desiredState}
+						pagesCount={pagesCount}
 						pagingSummary={pagingSummary}
 						updatePaging={updatePaging}
-						pagesCount={pagesCount}
 					/>
 				)}
 			</Stack>

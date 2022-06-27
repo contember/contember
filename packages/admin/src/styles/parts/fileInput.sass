@@ -21,12 +21,17 @@
 		flex-direction: column
 
 	&-dropZone
-		&:nth-child(1)
+		// TODO: Rewrite using Flexbox to cover more cases
+		&:last-child:nth-child(1)
 			grid-column: 1 / -1
-		&:nth-child(2)
+		&:last-child:nth-child(2)
 			grid-column: 2 / -1
-		&:nth-child(3)
+		&:last-child:nth-child(3)
 			grid-column: 3 / -1
+		&:last-child:nth-child(4)
+			grid-column: 4 / -1
+		&:last-child:nth-child(5)
+			grid-column: 5 / -1
 
 	&-cta
 		display: flex

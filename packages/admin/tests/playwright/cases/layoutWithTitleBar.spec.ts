@@ -1,4 +1,4 @@
-import { SchemaDefinition as def } from '@contember/schema-definition/dist/src/model'
+import { SchemaDefinition as def } from '@contember/schema-definition'
 import { expect, test } from '@playwright/test'
 import { expectNoConsoleErrors, initContemberProject } from '../utils'
 

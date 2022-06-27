@@ -1,6 +1,6 @@
 import type { Environment } from '@contember/binding'
-import { Box, Button, ButtonGroup, Dropdown, Icon, Table, TableCell, TableHeaderCell, TableRow } from '@contember/ui'
-import { createElement, Fragment, ReactElement } from 'react'
+import { Box, Button, ButtonGroup, Dropdown, DropdownProps, Icon, Table, TableCell, TableHeaderCell, TableRow } from '@contember/ui'
+import { createElement, Fragment, ReactElement, useMemo } from 'react'
 import type { MessageFormatter } from '../../../../../i18n'
 import { EmptyMessage } from '../../helpers'
 import type { DataGridDictionary } from './dataGridDictionary'
@@ -30,26 +30,40 @@ export function DataGridFullFilters({
 
 	const hasAnyFilters = Object.keys(desiredState.filterArtifacts).length > 0
 
+	const columnFilteringButtonProps: DropdownProps['buttonProps'] = useMemo(() => ({
+		intent: hasAnyFilters ? 'primary' : 'default',
+		distinction: 'seamless',
+		children: (
+			<>
+				<Icon
+					blueprintIcon="filter"
+					alignWithLowercase
+					style={{
+						marginRight: '0.2em',
+						opacity: hasAnyFilters ? '1' : '0.8',
+					}}
+				/>
+				{formatMessage('dataGrid.columnFiltering.showMenuButton.text')}
+			</>
+		),
+	}), [formatMessage, hasAnyFilters])
+
+	const filterButtonBrops: DropdownProps['buttonProps'] = useMemo(() => ({
+		distinction: 'seamless',
+		flow: 'block',
+		style: { marginTop: hasAnyFilters ? '1em' : 0 },
+		children: (
+			<>
+				<Icon alignWithLowercase blueprintIcon="add" style={{ marginRight: '0.2em' }} />
+				{formatMessage('dataGrid.columnFiltering.addFilterButton.text')}
+			</>
+		),
+	}), [formatMessage, hasAnyFilters])
+
 	return (
 		<Dropdown
 			alignment="end"
-			buttonProps={{
-				intent: hasAnyFilters ? 'primary' : 'default',
-				distinction: 'seamless',
-				children: (
-					<>
-						<Icon
-							blueprintIcon="filter"
-							alignWithLowercase
-							style={{
-								marginRight: '0.2em',
-								opacity: hasAnyFilters ? '1' : '0.8',
-							}}
-						/>
-						{formatMessage('dataGrid.columnFiltering.showMenuButton.text')}
-					</>
-				),
-			}}
+			buttonProps={columnFilteringButtonProps}
 			renderContent={({ update: updateOuterDropdown }) => (
 				<Box heading={formatMessage('dataGrid.columnFiltering.heading')}>
 					{hasAnyFilters || <EmptyMessage>{formatMessage('dataGrid.columnFiltering.emptyMessage.text')}</EmptyMessage>}
@@ -108,17 +122,7 @@ export function DataGridFullFilters({
 					{!!remainingColumns.length && (
 						<Dropdown
 							alignment="center"
-							buttonProps={{
-								distinction: 'seamless',
-								flow: 'block',
-								style: { marginTop: hasAnyFilters ? '1em' : 0 },
-								children: (
-									<>
-										<Icon alignWithLowercase blueprintIcon="add" style={{ marginRight: '0.2em' }} />
-										{formatMessage('dataGrid.columnFiltering.addFilterButton.text')}
-									</>
-								),
-							}}
+							buttonProps={filterButtonBrops}
 						>
 							{({ requestClose }) => (
 								<ButtonGroup orientation="vertical">

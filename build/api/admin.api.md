@@ -146,6 +146,14 @@ export const acceptAnyFile: () => boolean;
 export const acceptAudioFile: ({ file }: AcceptFileOptions) => boolean;
 
 // @public (undocumented)
+export interface AcceptedFile<AcceptArtifacts = any> {
+    // (undocumented)
+    fileKind: FullFileKind<any, AcceptArtifacts>;
+    // (undocumented)
+    finalizeEntity?: (entity: EntityAccessor) => void;
+}
+
+// @public (undocumented)
 export class AcceptFileKindError extends Error {
     constructor(options: AcceptFileKindErrorOptions);
     // (undocumented)
@@ -196,6 +204,18 @@ export interface AccessorErrorsHolder {
 export interface AccessorErrorsProps extends Omit<ErrorListProps, 'errors'> {
     // (undocumented)
     accessor: FieldAccessor | EntityAccessor | EntityListAccessor;
+}
+
+// @public (undocumented)
+export interface AddEntityButtonProps {
+    // (undocumented)
+    addButtonComponent?: ComponentType<CreateNewEntityButtonProps & any>;
+    // (undocumented)
+    addButtonComponentExtraProps?: {};
+    // (undocumented)
+    addButtonProps?: CreateNewEntityButtonProps;
+    // (undocumented)
+    addButtonText?: ReactNode;
 }
 
 // @public (undocumented)
@@ -253,35 +273,24 @@ export interface AnchorRendererProps extends Omit<RenderElementProps, 'element'>
 export const anchorToolbarButton: ElementToolbarButton<AnchorElement>;
 
 // @public (undocumented)
-export const AnyFileRepeater: <AcceptArtifacts = unknown>(props: AnyFileRepeaterProps<AcceptArtifacts>) => ReactElement | null;
-
-// Warning: (ae-forgotten-export) The symbol "FileInputPublicProps" needs to be exported by the entry point index.d.ts
-//
-// @public (undocumented)
-export interface AnyFileRepeaterProps<AcceptArtifacts = unknown> extends SugaredRelativeEntityList, StockAnyFileKindProps<AcceptArtifacts>, Omit<FileInputPublicProps, 'label'> {
-    // (undocumented)
-    boxLabel?: ReactNode;
-    // (undocumented)
-    label: ReactNode;
-    // (undocumented)
-    sortableBy?: SugaredFieldProps['field'];
-}
+export const AnyFileRepeater: <AcceptArtifacts = unknown, SFExtraProps extends {} = {}>(props: AnyFileRepeaterProps<AcceptArtifacts, SFExtraProps>) => ReactElement | null;
 
 // @public (undocumented)
-export const AnyFiles: <AcceptArtifacts = unknown>(props: AnyFilesProps<AcceptArtifacts>) => ReactElement | null;
+export type AnyFileRepeaterProps<AcceptArtifacts = unknown, SFExtraProps extends {} = {}> = PublicSingleKindFileRepeaterProps<AcceptArtifacts, SFExtraProps> & StockAnyFileKindProps<AcceptArtifacts>;
 
 // @public (undocumented)
-export interface AnyFilesProps<AcceptArtifacts = unknown> extends StockAnyFileKindProps<AcceptArtifacts> {
-    // (undocumented)
-    discriminateBy: DiscriminatedFileKind['discriminateBy'];
-}
+export const AnyFiles: <AcceptArtifacts = unknown>(props: AnyFilesProps<AcceptArtifacts, {}>) => ReactElement | null;
 
 // @public (undocumented)
-export const AnyUploadField: <AcceptArtifacts = unknown>(props: AnyUploadFieldProps<AcceptArtifacts>) => ReactElement | null;
+export type AnyFilesProps<AcceptArtifacts = unknown, SFExtraProps extends {} = {}> = StockAnyFileKindProps<AcceptArtifacts> & SelectFileInputSelectionComponentProps<SFExtraProps> & {
+    discriminateBy: SugaredDiscriminateBy;
+};
 
 // @public (undocumented)
-export interface AnyUploadFieldProps<AcceptArtifacts = unknown> extends StockAnyFileKindProps<AcceptArtifacts>, FileInputPublicProps {
-}
+export const AnyUploadField: <AcceptArtifacts = unknown, SFExtraProps extends {} = {}>(props: AnyUploadFieldProps<AcceptArtifacts, SFExtraProps>) => ReactElement | null;
+
+// @public (undocumented)
+export type AnyUploadFieldProps<AcceptArtifacts = unknown, SFExtraProps extends {} = {}> = PublicSingleKindUploadFieldProps<AcceptArtifacts, SFExtraProps> & StockAnyFileKindProps<AcceptArtifacts>;
 
 // @public (undocumented)
 export const ApiKeyList: NamedExoticComponent<ApiKeyListProps>;
@@ -330,33 +339,24 @@ export interface AudioFileDataExtractorProps {
 }
 
 // @public (undocumented)
-export const AudioFileRepeater: <AcceptArtifacts = unknown>(props: AudioFileRepeaterProps<AcceptArtifacts>) => ReactElement | null;
+export const AudioFileRepeater: <AcceptArtifacts = unknown, SFExtraProps extends {} = {}>(props: AudioFileRepeaterProps<AcceptArtifacts, SFExtraProps>) => ReactElement | null;
 
 // @public (undocumented)
-export interface AudioFileRepeaterProps<AcceptArtifacts = unknown> extends SugaredRelativeEntityList, StockAudioFileKindProps<AcceptArtifacts>, Omit<FileInputPublicProps, 'label'> {
-    // (undocumented)
-    boxLabel?: ReactNode;
-    // (undocumented)
-    label: ReactNode;
-    // (undocumented)
-    sortableBy?: SugaredFieldProps['field'];
-}
+export type AudioFileRepeaterProps<AcceptArtifacts = unknown, SFExtraProps extends {} = {}> = PublicSingleKindFileRepeaterProps<AcceptArtifacts, SFExtraProps> & StockAudioFileKindProps<AcceptArtifacts>;
 
 // @public (undocumented)
-export const AudioFiles: <AcceptArtifacts = unknown>(props: AudioFilesProps<AcceptArtifacts>) => ReactElement | null;
+export const AudioFiles: <AcceptArtifacts = unknown>(props: AudioFilesProps<AcceptArtifacts, {}>) => ReactElement | null;
 
 // @public (undocumented)
-export interface AudioFilesProps<AcceptArtifacts = unknown> extends StockAudioFileKindProps<AcceptArtifacts> {
-    // (undocumented)
-    discriminateBy: DiscriminatedFileKind['discriminateBy'];
-}
+export type AudioFilesProps<AcceptArtifacts = unknown, SFExtraProps extends {} = {}> = StockAudioFileKindProps<AcceptArtifacts> & SelectFileInputSelectionComponentProps<SFExtraProps> & {
+    discriminateBy: SugaredDiscriminateBy;
+};
 
 // @public (undocumented)
-export const AudioUploadField: <AcceptArtifacts = unknown>(props: AudioUploadFieldProps<AcceptArtifacts>) => ReactElement | null;
+export const AudioUploadField: <AcceptArtifacts = unknown, SFExtraProps extends {} = {}>(props: AudioUploadFieldProps<AcceptArtifacts, SFExtraProps>) => ReactElement | null;
 
 // @public (undocumented)
-export interface AudioUploadFieldProps<AcceptArtifacts = unknown> extends StockAudioFileKindProps<AcceptArtifacts>, FileInputPublicProps {
-}
+export type AudioUploadFieldProps<AcceptArtifacts = unknown, SFExtraProps extends {} = {}> = PublicSingleKindUploadFieldProps<AcceptArtifacts, SFExtraProps> & StockAudioFileKindProps<AcceptArtifacts>;
 
 // @public (undocumented)
 export const Avatar: FunctionComponent<AvatarProps>;
@@ -637,6 +637,11 @@ export const ColorField: NamedExoticComponent<ColorFieldProps>;
 
 // @public (undocumented)
 export type ColorFieldProps = SimpleRelativeSingleFieldProps & Omit<ColorInputProps, 'value' | 'validationState' | 'allowNewlines' | 'wrapLines'>;
+
+// @public (undocumented)
+export type CommonFileKindProps<AcceptArtifacts = unknown> = PublicFileKind<S3FileUploader.SuccessMetadata, AcceptArtifacts> & FileUrlDataExtractorProps & GenericFileMetadataExtractorProps & {
+    additionalExtractors?: FileDataExtractor<unknown, S3FileUploader.SuccessMetadata, AcceptArtifacts>[];
+};
 
 // @public (undocumented)
 export interface CommonToolbarButton extends IconSourceSpecification {
@@ -971,6 +976,10 @@ export interface DataGridContainerPublicProps {
     // (undocumented)
     emptyMessageComponentExtraProps?: {};
     // (undocumented)
+    onEntityClick?: (entity: EntityAccessor) => void;
+    // (undocumented)
+    selectedEntityIds?: EntityId[];
+    // (undocumented)
     tile?: ReactNode;
     // (undocumented)
     tileSize?: number;
@@ -1268,10 +1277,11 @@ export interface DiscriminatedDatum {
 }
 
 // @public (undocumented)
-export interface DiscriminatedFileKind<UploadResult = unknown, AcceptArtifacts = unknown> extends FullFileKind<UploadResult, AcceptArtifacts> {
-    // (undocumented)
-    discriminateBy: SugaredDiscriminateBy;
-}
+export type DiscriminatedFileKindsProps<SFExtraProps extends {} = {}> = SelectFileInputSelectionComponentProps<any> & {
+    discriminationField: SugaredFieldProps['field'];
+    children: ReactNode;
+    baseEntity?: string;
+};
 
 // @public (undocumented)
 export type DispatchChangePage = (action: GridPagingAction) => void;
@@ -1560,11 +1570,7 @@ export type FieldViewDictionary = typeof fieldViewDictionary;
 // @public (undocumented)
 export interface FileDataExtractor<ExtractedData = unknown, UploadResult = unknown, AcceptArtifacts = unknown> {
     // (undocumented)
-    destroy?: (options: FileDataExtractorDestroyOptions) => void;
-    // (undocumented)
     extractFileData?: (options: FileDataExtractorExtractFileDataOptions<AcceptArtifacts>) => Promise<ExtractedData> | null;
-    // Warning: (ae-forgotten-export) The symbol "FileDataExtractorGetErrorsOptions" needs to be exported by the entry point index.d.ts
-    //
     // (undocumented)
     getErrorsHolders?: (options: FileDataExtractorGetErrorsOptions) => AccessorErrorsHolder[];
     // (undocumented)
@@ -1590,6 +1596,14 @@ export interface FileDataExtractorExtractFileDataOptions<AcceptArtifacts = unkno
 }
 
 // @public (undocumented)
+export interface FileDataExtractorGetErrorsOptions {
+    // (undocumented)
+    entity: EntityAccessor;
+    // (undocumented)
+    environment: Environment;
+}
+
+// @public (undocumented)
 export interface FileDataExtractorPopulateFieldsOptions<ExtractedData = unknown, UploadResult = unknown, AcceptArtifacts = unknown> {
     // (undocumented)
     acceptArtifacts: AcceptArtifacts;
@@ -1612,6 +1626,20 @@ export interface FileDataExtractorStaticRenderOptions {
 }
 
 // @public (undocumented)
+export interface FileHandler {
+    // (undocumented)
+    acceptedMimes: string | string[] | null;
+    // (undocumented)
+    acceptFile(fileOptions: AcceptFileOptions): Promise<AcceptedFile | undefined>;
+    // (undocumented)
+    hasBaseEntity: boolean;
+    // (undocumented)
+    resolveEntity(accessor: EntityAccessor): ResolvedFileEntity;
+    // (undocumented)
+    staticRender(environment: Environment): ReactElement;
+}
+
+// @public (undocumented)
 export const FileInput: FunctionComponent<FileInputProps>;
 
 // @public (undocumented)
@@ -1621,27 +1649,37 @@ export interface FileInputProps {
 }
 
 // @public (undocumented)
-export function FileKind<UploadResult = unknown, AcceptArtifacts = unknown>(props: FileKindProps<UploadResult, AcceptArtifacts>): ReactElement | null;
+export type FileInputPublicProps = Pick<FieldContainerProps, 'label' | 'description' | 'labelDescription'> & AddEntityButtonProps & SelectFileInputPublicProps & {
+    enableAddingNew?: boolean;
+    addButtonSubText?: ReactNode;
+};
 
 // @public (undocumented)
-export interface FileKindProps<UploadResult = unknown, AcceptArtifacts = unknown> extends Omit<DiscriminatedFileKind<UploadResult, AcceptArtifacts>, 'children' | 'baseEntity'>, Partial<Pick<DiscriminatedFileKind<UploadResult, AcceptArtifacts>, 'children' | 'baseEntity'>> {
-}
+export function FileKind<UploadResult = unknown, AcceptArtifacts = unknown, SFExtraProps = unknown>(props: FileKindProps<UploadResult, AcceptArtifacts, SFExtraProps>): ReactElement | null;
 
 // @public (undocumented)
-export const FileRepeater: NamedExoticComponent<FileRepeaterProps>;
+export type FileKindProps<UploadResult = unknown, AcceptArtifacts = unknown, SFExtraProps = unknown> = FullFileKind<UploadResult, AcceptArtifacts> & {
+    discriminateBy: SugaredDiscriminateBy;
+    fileSelection: SelectFileInputSelectionComponentProps<SFExtraProps>;
+};
 
-// Warning: (ae-forgotten-export) The symbol "HybridFileKindProps" needs to be exported by the entry point index.d.ts
-//
 // @public (undocumented)
-export interface FileRepeaterProps extends SugaredRelativeEntityList, HybridFileKindProps, Omit<FileInputPublicProps, 'label'> {
-    // (undocumented)
+export const FileRepeater: <SFExtraProps extends {} = {}>(props: FileRepeaterProps<SFExtraProps>) => ReactElement | null;
+
+// @public (undocumented)
+export type FileRepeaterProps<SFExtraProps extends {} = {}> = SugaredRelativeEntityList & HybridFileKindProps & FileInputPublicProps & {
     boxLabel?: ReactNode;
-    // (undocumented)
-    children?: ReactNode;
-    // (undocumented)
     label: ReactNode;
-    // (undocumented)
     sortableBy?: SugaredFieldProps['field'];
+    children?: ReactNode;
+};
+
+// @public (undocumented)
+export interface FileSelectionProps {
+    // (undocumented)
+    onToggleSelect: (connector: EntityAccessor) => void;
+    // (undocumented)
+    selectedEntityIds: EntityId[];
 }
 
 // @public (undocumented)
@@ -1681,23 +1719,9 @@ export const FloatField: NamedExoticComponent<FloatFieldProps>;
 export type FloatFieldProps = SimpleRelativeSingleFieldProps & ControlProps<number>;
 
 // @public (undocumented)
-export interface FullFileKind<UploadResult = unknown, AcceptArtifacts = unknown> {
-    acceptFile: ((options: AcceptFileOptions) => boolean | Promise<AcceptArtifacts>) | undefined;
-    // (undocumented)
-    acceptMimeTypes: string | string[] | null;
-    // (undocumented)
-    baseEntity: string | undefined;
-    // (undocumented)
-    children: ReactNode;
-    // (undocumented)
+export type FullFileKind<UploadResult = unknown, AcceptArtifacts = unknown> = InternalFileKind<UploadResult, AcceptArtifacts> & {
     extractors: FileDataExtractor<unknown, UploadResult, AcceptArtifacts>[];
-    // (undocumented)
-    renderFilePreview: (options: RenderFilePreviewOptions<AcceptArtifacts>) => ReactNode;
-    // (undocumented)
-    renderUploadedFile: ReactNode;
-    // (undocumented)
-    uploader: FileUploader<UploadResult, FileUploadError>;
-}
+};
 
 // @public (undocumented)
 export const GenericCell: FunctionComponent<GenericCellProps>;
@@ -2028,6 +2052,9 @@ export interface HtmlDeserializerPlugin {
 }
 
 // @public (undocumented)
+export type HybridFileKindProps = DiscriminatedFileKindsProps | SingleKindFileProps;
+
+// @public (undocumented)
 export class I18nError extends Error {
 }
 
@@ -2146,33 +2173,24 @@ export interface ImageFileDataExtractorProps {
 }
 
 // @public (undocumented)
-export const ImageFileRepeater: <AcceptArtifacts = unknown>(props: ImageFileRepeaterProps<AcceptArtifacts>) => ReactElement | null;
+export const ImageFileRepeater: <AcceptArtifacts = unknown, SFExtraProps extends {} = {}>(props: ImageFileRepeaterProps<AcceptArtifacts, SFExtraProps>) => ReactElement | null;
 
 // @public (undocumented)
-export interface ImageFileRepeaterProps<AcceptArtifacts = unknown> extends SugaredRelativeEntityList, StockImageFileKindProps<AcceptArtifacts>, Omit<FileInputPublicProps, 'label'> {
-    // (undocumented)
-    boxLabel?: ReactNode;
-    // (undocumented)
-    label: ReactNode;
-    // (undocumented)
-    sortableBy?: SugaredFieldProps['field'];
-}
+export type ImageFileRepeaterProps<AcceptArtifacts = unknown, SFExtraProps extends {} = {}> = PublicSingleKindFileRepeaterProps<AcceptArtifacts, SFExtraProps> & StockImageFileKindProps<AcceptArtifacts>;
 
 // @public (undocumented)
-export const ImageFiles: <AcceptArtifacts = unknown>(props: ImageFilesProps<AcceptArtifacts>) => ReactElement | null;
+export const ImageFiles: <AcceptArtifacts = unknown, SFExtraProps extends {} = {}>(props: ImageFilesProps<AcceptArtifacts, SFExtraProps>) => ReactElement | null;
 
 // @public (undocumented)
-export interface ImageFilesProps<AcceptArtifacts = unknown> extends StockImageFileKindProps<AcceptArtifacts> {
-    // (undocumented)
-    discriminateBy: DiscriminatedFileKind['discriminateBy'];
-}
+export type ImageFilesProps<AcceptArtifacts = unknown, SFExtraProps extends {} = {}> = StockImageFileKindProps<AcceptArtifacts> & SelectFileInputSelectionComponentProps<SFExtraProps> & {
+    discriminateBy: SugaredDiscriminateBy;
+};
 
 // @public (undocumented)
-export const ImageUploadField: <AcceptArtifacts = unknown>(props: ImageUploadFieldProps<AcceptArtifacts>) => ReactElement | null;
+export const ImageUploadField: <AcceptArtifacts = unknown, SFExtraProps extends {} = {}>(props: ImageUploadFieldProps<AcceptArtifacts, SFExtraProps>) => ReactElement | null;
 
 // @public (undocumented)
-export interface ImageUploadFieldProps<AcceptArtifacts = unknown> extends StockImageFileKindProps<AcceptArtifacts>, FileInputPublicProps {
-}
+export type ImageUploadFieldProps<AcceptArtifacts = unknown, SFExtraProps extends {} = {}> = PublicSingleKindUploadFieldProps<AcceptArtifacts, SFExtraProps> & StockImageFileKindProps<AcceptArtifacts>;
 
 // @public (undocumented)
 export const ImmutableEntityListPageRenderer: <ContainerExtraProps, ItemExtraProps>(props: ImmutableEntityListPageRendererProps<ContainerExtraProps, ItemExtraProps>) => ReactElement;
@@ -2267,6 +2285,23 @@ export class InputGroup extends PureComponent<InputGroupProps & InputHTMLAttribu
 export interface InputGroupProps {
     // (undocumented)
     large?: boolean;
+}
+
+// @public (undocumented)
+export interface InternalFileKind<UploadResult = unknown, AcceptArtifacts = unknown> {
+    acceptFile: ((options: AcceptFileOptions) => boolean | Promise<AcceptArtifacts>) | undefined;
+    // (undocumented)
+    acceptMimeTypes: string | string[] | null;
+    // (undocumented)
+    baseEntity?: string | undefined;
+    // (undocumented)
+    children?: ReactNode;
+    // (undocumented)
+    renderFilePreview: (options: RenderFilePreviewOptions<AcceptArtifacts>) => ReactNode;
+    // (undocumented)
+    renderUploadedFile: ReactNode;
+    // (undocumented)
+    uploader: FileUploader<UploadResult, FileUploadError>;
 }
 
 // @public (undocumented)
@@ -2972,6 +3007,19 @@ export type ProjectUserRoles = Set<string>;
 export type PublicAnchorProps = Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'>;
 
 // @public (undocumented)
+export type PublicFileKind<UploadResult = unknown, AcceptArtifacts = unknown> = Partial<InternalFileKind<UploadResult, AcceptArtifacts>>;
+
+// @public (undocumented)
+export type PublicSingleKindFileRepeaterProps<AcceptArtifacts = unknown, SFExtraProps extends {} = {}> = SugaredRelativeEntityList & CommonFileKindProps<AcceptArtifacts> & SelectFileInputSelectionComponentProps<SFExtraProps> & FileInputPublicProps & {
+    sortableBy?: SugaredFieldProps['field'];
+    boxLabel?: ReactNode;
+    label: ReactNode;
+};
+
+// @public (undocumented)
+export type PublicSingleKindUploadFieldProps<AcceptArtifacts = unknown, SFExtraProps extends {} = {}> = CommonFileKindProps<AcceptArtifacts> & SelectFileInputSelectionComponentProps<SFExtraProps> & FileInputPublicProps;
+
+// @public (undocumented)
 export const PushRequestContext: Context<(req: RequestState) => void>;
 
 // @public (undocumented)
@@ -3115,12 +3163,8 @@ export interface RepeaterFieldContainerPrivateProps {
 export type RepeaterFieldContainerProps = RepeaterFieldContainerPublicProps & RepeaterFieldContainerPrivateProps;
 
 // @public (undocumented)
-export type RepeaterFieldContainerPublicProps = EmptyMessageOuterProps & {
+export type RepeaterFieldContainerPublicProps = EmptyMessageOuterProps & AddEntityButtonProps & {
     enableAddingNew?: boolean;
-    addButtonText?: ReactNode;
-    addButtonProps?: CreateNewEntityButtonProps;
-    addButtonComponent?: ComponentType<CreateNewEntityButtonProps & any>;
-    addButtonComponentExtraProps?: {};
 };
 
 // @public (undocumented)
@@ -3243,6 +3287,21 @@ export interface ResolvedDiscriminatedDatum<Datum> {
     // (undocumented)
     discriminateBy: FieldValue;
 }
+
+// @public (undocumented)
+export type ResolvedFileEntity = {
+    parentEntity: EntityAccessor;
+    destroy?: () => void;
+    getErrorHolders: () => AccessorErrorsHolder[];
+} & ({
+    fileEntity: EntityAccessor;
+    fileKind: FullFileKind<any, any>;
+    isEmpty: false;
+} | {
+    fileEntity: EntityAccessor | undefined;
+    fileKind: FullFileKind<any, any> | undefined;
+    isEmpty: true;
+});
 
 // @public (undocumented)
 export namespace RichEditor {
@@ -3450,6 +3509,18 @@ export interface SelectedDimension {
 export type SelectedDimensionRenderer = (dimensionData: StatefulDimensionDatum<true>[]) => ReactNode;
 
 // @public (undocumented)
+export interface SelectEntityButtonProps {
+    // (undocumented)
+    selectButtonComponent?: ComponentType<CreateNewEntityButtonProps & any>;
+    // (undocumented)
+    selectButtonComponentExtraProps?: {};
+    // (undocumented)
+    selectButtonProps?: CreateNewEntityButtonProps;
+    // (undocumented)
+    selectButtonText?: ReactNode;
+}
+
+// @public (undocumented)
 export const SelectField: FunctionComponent<SelectFieldProps>;
 
 // @public (undocumented)
@@ -3473,6 +3544,21 @@ export interface SelectFieldInnerPublicProps extends Omit<FieldContainerProps, '
 
 // @public (undocumented)
 export type SelectFieldProps = SelectFieldInnerPublicProps & (StaticSingleChoiceFieldProps | DynamicSingleChoiceFieldProps);
+
+// @public (undocumented)
+export type SelectFileInputPublicProps = SelectEntityButtonProps & {
+    insertSelectedText?: string;
+};
+
+// @public (undocumented)
+export interface SelectFileInputSelectionComponentProps<SFExtraProps extends {}> {
+    // (undocumented)
+    fileSelectionComponent?: ComponentType<SFExtraProps & FileSelectionProps>;
+    // (undocumented)
+    fileSelectionLabel?: ReactNode;
+    // (undocumented)
+    fileSelectionProps?: SFExtraProps;
+}
 
 // @public (undocumented)
 export interface SerializableEditorNode {
@@ -3589,6 +3675,11 @@ export type SimpleRelativeSingleFieldProxyProps = Omit<FieldContainerProps, 'chi
 };
 
 // @public (undocumented)
+export type SingleKindFileProps = FullFileKind & SelectFileInputSelectionComponentProps<any> & {
+    hasUploadedFile: (entity: EntityAccessor) => boolean;
+};
+
+// @public (undocumented)
 export const SlugField: NamedExoticComponent<SlugFieldProps>;
 
 // @public (undocumented)
@@ -3673,28 +3764,16 @@ export type StaticSingleChoiceFieldProps = SugaredRelativeSingleField & SelectFu
 };
 
 // @public (undocumented)
-export interface StockAnyFileKindProps<AcceptArtifacts = unknown> extends Partial<Omit<FullFileKind<S3FileUploader.SuccessMetadata, AcceptArtifacts>, 'extractors'>>, FileUrlDataExtractorProps, GenericFileMetadataExtractorProps {
-    // (undocumented)
-    additionalExtractors?: FileDataExtractor<any, S3FileUploader.SuccessMetadata, AcceptArtifacts>[];
-}
+export type StockAnyFileKindProps<AcceptArtifacts = unknown> = CommonFileKindProps<AcceptArtifacts>;
 
 // @public (undocumented)
-export interface StockAudioFileKindProps<AcceptArtifacts = unknown> extends Partial<Omit<FullFileKind<S3FileUploader.SuccessMetadata, AcceptArtifacts>, 'extractors'>>, FileUrlDataExtractorProps, GenericFileMetadataExtractorProps, AudioFileDataExtractorProps {
-    // (undocumented)
-    additionalExtractors?: FileDataExtractor<unknown, S3FileUploader.SuccessMetadata, AcceptArtifacts>[];
-}
+export type StockAudioFileKindProps<AcceptArtifacts = unknown> = CommonFileKindProps<AcceptArtifacts> & AudioFileDataExtractorProps;
 
 // @public (undocumented)
-export interface StockImageFileKindProps<AcceptArtifacts = unknown> extends Partial<Omit<FullFileKind<S3FileUploader.SuccessMetadata, AcceptArtifacts>, 'extractors'>>, FileUrlDataExtractorProps, GenericFileMetadataExtractorProps, ImageFileDataExtractorProps {
-    // (undocumented)
-    additionalExtractors?: FileDataExtractor<unknown, S3FileUploader.SuccessMetadata, AcceptArtifacts>[];
-}
+export type StockImageFileKindProps<AcceptArtifacts = unknown> = CommonFileKindProps<AcceptArtifacts> & ImageFileDataExtractorProps;
 
 // @public (undocumented)
-export interface StockVideoFileKindProps<AcceptArtifacts = unknown> extends Partial<Omit<FullFileKind<S3FileUploader.SuccessMetadata, AcceptArtifacts>, 'extractors'>>, FileUrlDataExtractorProps, GenericFileMetadataExtractorProps, VideoFileDataExtractorProps {
-    // (undocumented)
-    additionalExtractors?: FileDataExtractor<unknown, S3FileUploader.SuccessMetadata, AcceptArtifacts>[];
-}
+export type StockVideoFileKindProps<AcceptArtifacts = unknown> = CommonFileKindProps<AcceptArtifacts> & VideoFileDataExtractorProps;
 
 // @public (undocumented)
 export const strikeThroughToolbarButton: ToolbarButtonSpec;
@@ -3928,13 +4007,12 @@ export const unorderedListToolbarButton: ElementToolbarButton<UnorderedListEleme
 export type UploadDictionary = typeof uploadDictionary;
 
 // @public (undocumented)
-export const UploadField: NamedExoticComponent<UploadFieldProps>;
+export const UploadField: <SFExtraProps extends {} = {}>(props: UploadFieldProps<SFExtraProps>) => ReactElement | null;
 
 // @public (undocumented)
-export interface UploadFieldProps extends FileInputPublicProps, HybridFileKindProps {
-    // (undocumented)
+export type UploadFieldProps<SFExtraProps extends {} = {}> = FileInputPublicProps & HybridFileKindProps & {
     children?: ReactNode;
-}
+};
 
 // @public (undocumented)
 export const UrlField: NamedExoticComponent<UrlFieldProps>;
@@ -4296,33 +4374,24 @@ export interface VideoFileDataExtractorProps {
 }
 
 // @public (undocumented)
-export const VideoFileRepeater: <AcceptArtifacts = unknown>(props: VideoFileRepeaterProps<AcceptArtifacts>) => ReactElement | null;
+export const VideoFileRepeater: <AcceptArtifacts = unknown, SFExtraProps extends {} = {}>(props: VideoFileRepeaterProps<AcceptArtifacts, SFExtraProps>) => ReactElement | null;
 
 // @public (undocumented)
-export interface VideoFileRepeaterProps<AcceptArtifacts = unknown> extends SugaredRelativeEntityList, StockVideoFileKindProps<AcceptArtifacts>, Omit<FileInputPublicProps, 'label'> {
-    // (undocumented)
-    boxLabel?: ReactNode;
-    // (undocumented)
-    label: ReactNode;
-    // (undocumented)
-    sortableBy?: SugaredFieldProps['field'];
-}
+export type VideoFileRepeaterProps<AcceptArtifacts = unknown, SFExtraProps extends {} = {}> = PublicSingleKindFileRepeaterProps<AcceptArtifacts, SFExtraProps> & StockVideoFileKindProps<AcceptArtifacts>;
 
 // @public (undocumented)
-export const VideoFiles: <AcceptArtifacts = unknown>(props: VideoFilesProps<AcceptArtifacts>) => ReactElement | null;
+export const VideoFiles: <AcceptArtifacts = unknown>(props: VideoFilesProps<AcceptArtifacts, {}>) => ReactElement | null;
 
 // @public (undocumented)
-export interface VideoFilesProps<AcceptArtifacts = unknown> extends StockVideoFileKindProps<AcceptArtifacts> {
-    // (undocumented)
-    discriminateBy: DiscriminatedFileKind['discriminateBy'];
-}
+export type VideoFilesProps<AcceptArtifacts = unknown, SFExtraProps extends {} = {}> = StockVideoFileKindProps<AcceptArtifacts> & SelectFileInputSelectionComponentProps<SFExtraProps> & {
+    discriminateBy: SugaredDiscriminateBy;
+};
 
 // @public (undocumented)
-export const VideoUploadField: <AcceptArtifacts = unknown>(props: VideoUploadFieldProps<AcceptArtifacts>) => ReactElement | null;
+export const VideoUploadField: <AcceptArtifacts = unknown, SFExtraProps extends {} = {}>(props: VideoUploadFieldProps<AcceptArtifacts, SFExtraProps>) => ReactElement | null;
 
 // @public (undocumented)
-export interface VideoUploadFieldProps<AcceptArtifacts = unknown> extends StockVideoFileKindProps<AcceptArtifacts>, FileInputPublicProps {
-}
+export type VideoUploadFieldProps<AcceptArtifacts = unknown, SFExtraProps extends {} = {}> = PublicSingleKindUploadFieldProps<AcceptArtifacts, SFExtraProps> & StockVideoFileKindProps<AcceptArtifacts>;
 
 // @public (undocumented)
 export const withAnchors: <E extends Editor>(editor: E) => E;

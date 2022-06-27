@@ -1,3 +1,4 @@
+export * from './FileDataExtractor'
 export * from './getAudioFileDataExtractor'
 export * from './getFileUrlDataExtractor'
 export * from './getGenericFileMetadataExtractor'

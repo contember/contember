@@ -1,0 +1,116 @@
+.#{$cui-conf-globalPrefix}dialog-modal
+	$dialogModal: &
+
+	--cui-dialog-modal-border: var(--cui-control-border-width) solid var(--cui-color--lower)
+	--cui-dialog-modal-background-color: var(--cui-background-color--above)
+
+	--cui-dialog-modal-padding-left: calc(0.5 * var(--cui-padding-horizontal))
+	--cui-dialog-modal-padding-right: calc(0.5 * var(--cui-padding-horizontal))
+	--cui-dialog-modal-padding-top: calc(0.5 * var(--cui-padding-vertical))
+	--cui-dialog-modal-padding-bottom: calc(0.5 * var(--cui-padding-vertical))
+
+	--cui-dialog-modal-header-padding-left: var(--cui-dialog-modal-padding-left)
+	--cui-dialog-modal-header-padding-right: var(--cui-dialog-modal-padding-right)
+	--cui-dialog-modal-header-padding-top: var(--cui-dialog-modal-padding-top)
+	--cui-dialog-modal-header-padding-bottom: var(--cui-dialog-modal-padding-bottom)
+
+	--cui-dialog-modal-body-padding-left: var(--cui-dialog-modal-padding-left)
+	--cui-dialog-modal-body-padding-right: var(--cui-dialog-modal-padding-right)
+	--cui-dialog-modal-body-padding-top: var(--cui-dialog-modal-padding-top)
+	--cui-dialog-modal-body-padding-bottom: var(--cui-dialog-modal-padding-bottom)
+
+	--cui-dialog-modal-footer-padding-left: var(--cui-dialog-modal-padding-left)
+	--cui-dialog-modal-footer-padding-right: var(--cui-dialog-modal-padding-right)
+	--cui-dialog-modal-footer-padding-top: var(--cui-dialog-modal-padding-top)
+	--cui-dialog-modal-footer-padding-bottom: var(--cui-dialog-modal-padding-bottom)
+
+	--cui-layout-page-padding-left: 0px
+	--cui-layout-page-padding-right: 0px
+
+	background-color: var(--cui-dialog-modal-background-color)
+	border: var(--cui-dialog-modal-border)
+	border-radius: calc(2 * var(--cui-control-border-radius))
+
+	display: flex
+	align-items: stretch
+	flex-direction: column
+
+	.#{$cui-conf-globalPrefix}table-container-box
+		flex-grow: 1
+
+	.#{$cui-conf-globalPrefix}table-container
+		flex-grow: 1
+		> .#{$cui-conf-globalPrefix}field-container-label
+			flex-grow: 1
+			> .#{$cui-conf-globalPrefix}field-container-body
+				flex-grow: 1
+				> .#{$cui-conf-globalPrefix}field-container-body-content
+					flex-grow: 1
+
+	.#{$cui-conf-globalPrefix}data-grid-body
+		flex-grow: 1
+		overflow: hidden
+	.#{$cui-conf-globalPrefix}field-container-body-content .#{$cui-conf-globalPrefix}table-wrapper
+		overflow: auto
+	.#{$cui-conf-globalPrefix}data-grid-body-content-grid
+		flex: 1 1 0%
+		overflow: auto
+
+	&.view-wide,
+	&.view-fit-content
+		max-height: calc(100vh - 2 * var(--cui-padding-vertical))
+
+	&.view-fit-content
+		max-width: calc($breakpoint-max-medium - 2 * var(--cui-padding-horizontal))
+
+	&.view-wide
+		max-width: calc(100vw - 2 * var(--cui-padding-horizontal))
+		width: calc($breakpoint-max-large - var(--cui-padding-horizontal))
+
+	&.view-expanded
+		height: calc(100vh - var(--cui-padding-vertical))
+		width: calc(100vw - var(--cui-padding-horizontal))
+
+	&-close-button
+		margin-left: calc(-0.5 * (var(--cui-button-height) - 1em))
+		margin-right: calc(-0.5 * (var(--cui-button-height) - 1em))
+		margin-bottom: calc(-0.5 * (var(--cui-button-height) - 1em))
+		margin-top: calc(-0.5 * (var(--cui-button-height) - 1em))
+
+	&-header
+		padding-left: var(--cui-dialog-modal-header-padding-left)
+		padding-right: var(--cui-dialog-modal-header-padding-right)
+		padding-bottom: var(--cui-dialog-modal-header-padding-bottom)
+		padding-top: var(--cui-dialog-modal-header-padding-top)
+		min-height: calc(var(--cui-button-height) + var(--cui-dialog-modal-header-padding-top) + var(--cui-dialog-modal-header-padding-bottom))
+
+	&-body-wrapper
+		display: flex
+		flex: 1 1 0%
+		max-width: 100%
+		overflow: hidden
+
+	&-body
+		flex-grow: 1
+		max-width: 100%
+		padding-left: var(--cui-dialog-modal-body-padding-left)
+		padding-right: var(--cui-dialog-modal-body-padding-right)
+		padding-bottom: var(--cui-dialog-modal-body-padding-bottom)
+		padding-top: var(--cui-dialog-modal-body-padding-top)
+		min-height: calc(var(--cui-button-height) + var(--cui-dialog-modal-body-padding-top) + var(--cui-dialog-modal-body-padding-bottom))
+		// width: fit-content
+
+	&-footer
+		padding-left: var(--cui-dialog-modal-footer-padding-left)
+		padding-right: var(--cui-dialog-modal-footer-padding-right)
+		padding-bottom: var(--cui-dialog-modal-footer-padding-bottom)
+		padding-top: var(--cui-dialog-modal-footer-padding-top)
+		min-height: calc(var(--cui-button-height) + var(--cui-dialog-modal-footer-padding-top) + var(--cui-dialog-modal-footer-padding-bottom))
+
+	&.with-dividers
+		&-body,
+		&-footer
+			border-top: 1px solid var(--cui-color--lower)
+
+	@media (max-width: $breakpoint-max-medium)
+		max-width: calc(100vw - var(--cui-padding-horizontal))

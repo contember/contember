@@ -1,10 +1,24 @@
 import { EntityAccessor, useMutationState } from '@contember/binding'
 import { Button, ButtonProps, Icon, IconProps, useClassNamePrefix } from '@contember/ui'
-import { memo } from 'react'
+import { ComponentType, memo, ReactNode } from 'react'
 
 export type CreateNewEntityButtonProps = ButtonProps & {
 	createNewEntity: (initialize?: EntityAccessor.BatchUpdatesHandler) => void
 	iconProps?: IconProps
+}
+
+export interface AddEntityButtonProps {
+	addButtonText?: ReactNode
+	addButtonProps?: CreateNewEntityButtonProps // Children here override 'addButtonText'
+	addButtonComponent?: ComponentType<CreateNewEntityButtonProps & any> // This can override 'addButtonText' and 'addButtonProps'
+	addButtonComponentExtraProps?: {}
+}
+
+export interface SelectEntityButtonProps {
+	selectButtonText?: ReactNode
+	selectButtonProps?: CreateNewEntityButtonProps // Children here override 'updateButtonText'
+	selectButtonComponent?: ComponentType<CreateNewEntityButtonProps & any> // This can override 'updateButtonText' and 'updateButtonProps'
+	selectButtonComponentExtraProps?: {}
 }
 
 const defaultIconProps: IconProps = {

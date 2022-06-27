@@ -27,7 +27,7 @@ test('lazy select', async ({ page }) => {
 
 	//
 	await page.locator('.selectField-search-input').click()
-	await page.waitForTimeout(50)
+	await page.waitForTimeout(100)
 	expect(await page.screenshot({ animations: 'disabled' })).toMatchSnapshot('02-expanded.png')
 	//
 	await page.locator('.selectField-search-input').fill('lorem')

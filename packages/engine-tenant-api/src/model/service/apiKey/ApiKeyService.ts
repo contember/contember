@@ -1,4 +1,3 @@
-import { Membership } from '../../type/Membership'
 import { DatabaseContext, TokenHash } from '../../utils'
 import { AddProjectMemberCommand, CreateApiKeyCommand, CreateIdentityCommand } from '../../commands'
 import { ApiKey } from '../../type'
@@ -6,6 +5,7 @@ import { createSetMembershipVariables } from '../membershipUtils'
 import { ImplementationException } from '../../../exceptions'
 import { Response, ResponseOk } from '../../utils/Response'
 import { ApiKeyWithToken } from '../../../schema'
+import { Acl } from '@contember/schema'
 
 export class ApiKeyService {
 	async createPermanentApiKey(
@@ -23,7 +23,7 @@ export class ApiKeyService {
 	async createProjectPermanentApiKey(
 		db: DatabaseContext,
 		projectId: string,
-		memberships: readonly Membership[],
+		memberships: readonly Acl.Membership[],
 		description: string,
 		tokenHash?: TokenHash,
 	) {

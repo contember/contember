@@ -7,7 +7,7 @@ import {
 } from '../commands'
 import { Providers } from '../providers'
 import { PersonQuery, PersonRow } from '../queries'
-import { Membership, Project } from '../type'
+import { Project } from '../type'
 import { InviteErrorCode, InviteMethod } from '../../schema'
 import { TenantRole } from '../authorization'
 import { UserMailer } from '../mailing'
@@ -15,6 +15,7 @@ import { createAppendMembershipVariables } from './membershipUtils'
 import { Response, ResponseOk } from '../utils/Response'
 import { DatabaseContext, TokenHash } from '../utils'
 import { NoPassword, PasswordPlain } from '../dtos'
+import { Acl } from '@contember/schema'
 
 export interface InviteOptions {
 	noEmail?: boolean
@@ -36,7 +37,7 @@ export class InviteManager {
 		dbContext: DatabaseContext,
 		email: string,
 		project: Project,
-		memberships: readonly Membership[],
+		memberships: readonly Acl.Membership[],
 		{ method, emailVariant, noEmail = false, password, passwordResetTokenHash }: InviteOptions = {},
 	): Promise<InviteResponse> {
 		return await dbContext.transaction(async trx => {

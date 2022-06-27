@@ -1,4 +1,3 @@
-import { Membership } from '../../../../../src/model/type/Membership'
 import { SQL } from '../../../../src/tags'
 import { ExpectedQuery } from '@contember/database-tester'
 import { now } from '../../../../src/testTenant'

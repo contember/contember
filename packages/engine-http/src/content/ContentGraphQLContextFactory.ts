@@ -4,7 +4,6 @@ import { Context, createAclVariables, ExecutionContainerFactory } from '@contemb
 import { setupSystemVariables } from '@contember/engine-system-api'
 import { Client } from '@contember/database'
 import { Acl, Schema } from '@contember/schema'
-import { Membership } from '@contember/engine-tenant-api'
 
 import { AuthResult, Timer } from '../common'
 import { KoaContext } from '../koa'
@@ -24,7 +23,7 @@ export class ContentGraphQLContextFactory {
 		schema: Schema
 		permissions: Acl.Permissions
 		authResult: AuthResult
-		memberships: readonly Membership[]
+		memberships: readonly Acl.Membership[]
 		timer: Timer
 		koaContext: KoaContext<GraphQLKoaState>
 	}): ExtendedGraphqlContext {

@@ -1,4 +1,4 @@
-import { Membership, MembershipMatcher } from '@contember/engine-tenant-api'
+import { MembershipMatcher } from '@contember/engine-tenant-api'
 import * as Typesafe from '@contember/typesafe'
 import { Acl } from '@contember/schema'
 import { HttpError } from '../common'
@@ -22,7 +22,7 @@ export class ProjectMembershipResolver {
 		request: HeaderAccessor
 		projectSlug: string
 		identity: { id: string; roles?: readonly string[] }
-	}): Promise<readonly Membership[]> {
+	}): Promise<readonly Acl.Membership[]> {
 
 		const explicitMemberships = await this.projectMembershipFetcher.fetchMemberships(projectSlug, identity)
 
@@ -52,12 +52,12 @@ export class ProjectMembershipResolver {
 		]
 	}
 
-	private readAssumedMemberships(req: HeaderAccessor): readonly Membership[] {
+	private readAssumedMemberships(req: HeaderAccessor): readonly Acl.Membership[] {
 		const value = req.get(assumeMembershipHeader).trim()
 		if (value === '') {
 			return []
 		}
-		let parsedValue: { memberships: readonly Membership[] }
+		let parsedValue: { memberships: readonly Acl.Membership[] }
 		try {
 			parsedValue = assumeMembershipValueType(JSON.parse(value))
 		} catch (e: any) {
@@ -66,7 +66,7 @@ export class ProjectMembershipResolver {
 		return parsedValue.memberships
 	}
 
-	private verifyAssumedRoles(explicitMemberships: readonly Membership[], acl: Acl.Schema, assumedMemberships: readonly Membership[]) {
+	private verifyAssumedRoles(explicitMemberships: readonly Acl.Membership[], acl: Acl.Schema, assumedMemberships: readonly Acl.Membership[]) {
 		const membershipMatcher = new MembershipMatcher(explicitMemberships.map(it => ({
 			...it,
 			matchRule: acl.roles[it.role].content?.assumeMembership ?? {},

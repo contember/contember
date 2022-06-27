@@ -1,13 +1,13 @@
-import { Membership, MembershipVariable } from '../type/Membership'
 import { MembershipInput, MembershipUpdateInput, VariableUpdateInput } from '../commands'
+import { Acl } from '@contember/schema'
 
-export const createSetMembershipVariables = (memberships: readonly Membership[]): MembershipInput[] => {
+export const createSetMembershipVariables = (memberships: readonly Acl.Membership[]): MembershipInput[] => {
 	return memberships.map(it => ({
 		role: it.role,
 		variables: it.variables.map(it => ({ name: it.name, set: it.values })),
 	}))
 }
-export const createAppendMembershipVariables = (memberships: readonly Membership[]): MembershipInput[] => {
+export const createAppendMembershipVariables = (memberships: readonly Acl.Membership[]): MembershipInput[] => {
 	return memberships.map(it => ({
 		role: it.role,
 		variables: it.variables.map(it => ({ name: it.name, append: it.values, remove: [] })),
@@ -15,8 +15,8 @@ export const createAppendMembershipVariables = (memberships: readonly Membership
 }
 
 export const createMembershipModification = (
-	oldMemberships: readonly Membership[],
-	newMemberships: readonly Membership[],
+	oldMemberships: readonly Acl.Membership[],
+	newMemberships: readonly Acl.Membership[],
 ): MembershipUpdateInput[] => {
 	const input: MembershipUpdateInput[] = []
 	for (const membership of newMemberships) {
@@ -50,8 +50,8 @@ export const createMembershipModification = (
 }
 
 const createMembershipVariablePatch = (
-	oldVariables: readonly MembershipVariable[],
-	newVariables: readonly MembershipVariable[],
+	oldVariables: readonly Acl.MembershipVariable[],
+	newVariables: readonly Acl.MembershipVariable[],
 ): VariableUpdateInput[] => {
 	const update: VariableUpdateInput[] = []
 	const varANames = newVariables.map(it => it.name)

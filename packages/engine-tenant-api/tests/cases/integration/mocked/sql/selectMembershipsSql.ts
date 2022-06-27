@@ -1,11 +1,11 @@
-import { Membership } from '../../../../../src/model/type/Membership'
 import { SQL } from '../../../../src/tags'
 import { ExpectedQuery } from '@contember/database-tester'
+import { Acl } from '@contember/schema'
 
 export const selectMembershipsSql = (args: {
 	identityId: string
 	projectId: string
-	membershipsResponse: Membership[]
+	membershipsResponse: Acl.Membership[]
 }): ExpectedQuery => ({
 	sql: SQL`
 		with "memberships" as (select "project_membership"."id", "project_membership"."role", "project_membership"."identity_id"

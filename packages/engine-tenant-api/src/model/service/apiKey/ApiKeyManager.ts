@@ -6,12 +6,12 @@ import {
 	ProlongApiKeyCommand,
 } from '../../commands'
 import { ApiKey } from '../../type'
-import { Membership } from '../../type/Membership'
 import { ApiKeyByTokenQuery } from '../../queries'
 import { Response, ResponseError, ResponseOk } from '../../utils/Response'
 import { DatabaseContext, TokenHash } from '../../utils'
 import { ApiKeyService, CreateApiKeyResponse } from './ApiKeyService'
 import assert from 'assert'
+import { Acl } from '@contember/schema'
 
 export class ApiKeyManager {
 	constructor(
@@ -82,7 +82,7 @@ export class ApiKeyManager {
 	async createProjectPermanentApiKey(
 		dbContext: DatabaseContext,
 		projectId: string,
-		memberships: readonly Membership[],
+		memberships: readonly Acl.Membership[],
 		description: string,
 		tokenHash?: TokenHash,
 	): Promise<CreateApiKeyResponse> {

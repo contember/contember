@@ -1,21 +1,6 @@
-import { SchemaDefinition } from '@contember/schema-definition'
 import { Readable } from 'stream'
 import { defineConfig } from 'vite'
 import { initContemberProjectDev } from '../utils'
-
-import * as blockEditor from '../cases/blockEditor.model'
-import * as lazySelect from '../cases/lazySelect.model'
-import * as radioInput from '../cases/radioInput.model'
-import * as selectOrCreate from '../cases/selectOrCreate.model'
-import * as textInput from '../cases/textInput.model'
-
-const models: Record<string, SchemaDefinition.ModelDefinition<{}>> = {
-	blockEditor,
-	lazySelect,
-	radioInput,
-	selectOrCreate,
-	textInput,
-}
 
 const packagesDir = __dirname + '/../../../..'
 
@@ -67,16 +52,9 @@ export default defineConfig({
 			}
 
 			server.middlewares.use('/_init', async (req, res) => {
-				const { testSlug } = await toJson(req)
-
-				if (models[testSlug] === undefined) {
-					res.end(JSON.stringify({ projectSlug: 'NONE' }))
-
-				} else {
-					const projectSlug = await initContemberProjectDev(models[testSlug])
-					res.setHeader('Content-Type', 'application/json')
-					res.end(JSON.stringify({ projectSlug }))
-				}
+				const projectSlug = await initContemberProjectDev(await toJson(req))
+				res.setHeader('Content-Type', 'application/json')
+				res.end(JSON.stringify({ projectSlug }))
 			})
 		},
 	}],

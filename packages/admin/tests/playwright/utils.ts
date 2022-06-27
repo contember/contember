@@ -104,8 +104,7 @@ export async function contemberTruncate(projectSlug: string) {
 	expect(payload.data.truncate.ok).toBe(true)
 }
 
-export async function initContemberProjectDev(definitions: SchemaDefinition.ModelDefinition<{}>) {
-	const schema = buildSchema(definitions)
+export async function initContemberProjectDev(schema: Schema) {
 	const schemaHash = createHash('sha256').update(JSON.stringify(schema)).digest('hex').slice(0, 16)
 	const projectSlug = `dev_${schemaHash}`
 

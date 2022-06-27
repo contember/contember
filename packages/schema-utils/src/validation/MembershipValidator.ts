@@ -27,7 +27,7 @@ export class MembershipValidator {
 					continue
 				}
 				const inputVariable = membership.variables.find(it => it.name === variable)
-				if (!inputVariable || inputVariable.values.length === 0) {
+				if (!inputVariable) {
 					errors.push(
 						new MembershipValidationError(membership.role, MembershipValidationErrorType.VARIABLE_EMPTY, variable),
 					)

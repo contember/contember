@@ -53,6 +53,21 @@ jobs:
           DEFAULT_DB_USER: 'contember'
           DEFAULT_DB_PASSWORD: 'contember'
           TENANT_DB_NAME: 'contember'
+          DEFAULT_S3_ENDPOINT: 'http://minio:9000'
+          DEFAULT_S3_PROVIDER: 'minio'
+          DEFAULT_S3_REGION: ''
+          DEFAULT_S3_BUCKET: 'contember'
+          DEFAULT_S3_PREFIX: 'data'
+          DEFAULT_S3_KEY: 'contember'
+          DEFAULT_S3_SECRET: 'contember'
+
+      minio:
+        image: bitnami/minio
+
+        env:
+          MINIO_ROOT_USER: 'contember'
+          MINIO_ROOT_PASSWORD: 'contember'
+          MINIO_DEFAULT_BUCKETS: 'contember:download'
 
     env:
       CONTEMBER_API_URL: 'http://contember-engine:4000'

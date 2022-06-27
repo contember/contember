@@ -1,4 +1,5 @@
-import { DatabaseContext, Membership, ProjectMemberManager } from '@contember/engine-tenant-api'
+import { DatabaseContext, ProjectMemberManager } from '@contember/engine-tenant-api'
+import { Acl } from '@contember/schema'
 
 export class ProjectMembershipFetcher {
 	constructor(
@@ -7,7 +8,7 @@ export class ProjectMembershipFetcher {
 	) {
 	}
 
-	public async fetchMemberships(projectSlug: string, identity: { id: string; roles?: readonly string[] }): Promise<readonly Membership[]> {
+	public async fetchMemberships(projectSlug: string, identity: { id: string; roles?: readonly string[] }): Promise<readonly Acl.Membership[]> {
 		return await this.projectMemberManager.getProjectMemberships(
 			this.databaseContext,
 			{ slug: projectSlug },

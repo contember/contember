@@ -47,16 +47,6 @@ export namespace Acl {
 	// 	fieldName: string
 	// }
 
-	export type VariableValue = readonly JSONValue[]
-
-	export type VariableMapEntry = {
-		readonly definition: Variable
-		readonly value: VariableValue
-	}
-	export type VariablesMap = {
-		readonly [name: string]: VariableMapEntry
-	}
-
 	export type PredicateVariable = string //{ name: string }
 	export type PredicateDefinition<E = never> = Input.Where<PredicateVariable | Input.Condition | E>
 
@@ -160,5 +150,26 @@ export namespace Acl {
 	export type Schema = {
 		readonly customPrimary?: boolean
 		readonly roles: Acl.Roles
+	}
+
+	export type VariableValue = readonly JSONValue[]
+
+	export type VariableMapEntry = {
+		readonly definition: Variable
+		readonly value: VariableValue
+	}
+	export type VariablesMap = {
+		readonly [name: string]: VariableMapEntry
+	}
+
+
+	export interface MembershipVariable {
+		readonly name: string
+		readonly values: readonly string[]
+	}
+
+	export interface Membership {
+		readonly role: string
+		readonly variables: readonly MembershipVariable[]
 	}
 }

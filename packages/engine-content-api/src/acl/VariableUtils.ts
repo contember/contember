@@ -1,14 +1,13 @@
 import { Acl } from '@contember/schema'
 import { getRoleVariables } from '@contember/schema-utils'
 
-type Memberships = readonly { role: string; variables: readonly { name: string; values: readonly string[] }[] }[]
 
 export const createAclVariables = (
 	aclSchema: Acl.Schema,
 	identity: {
 		identityId: string
 		personId: string | null
-		memberships: Memberships
+		memberships: readonly Acl.Membership[]
 	},
 ): Acl.VariablesMap => {
 

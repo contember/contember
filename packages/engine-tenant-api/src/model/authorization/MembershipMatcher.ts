@@ -1,8 +1,7 @@
-import { Membership } from '../type'
 import { Acl } from '@contember/schema'
 
 export type MembershipWithSubMembershipMatchRules =
-	& Membership
+	& Acl.Membership
 	& {
 		matchRule: Acl.MembershipMatchRule
 	}
@@ -11,7 +10,7 @@ export class MembershipMatcher {
 	constructor(private readonly memberships: readonly MembershipWithSubMembershipMatchRules[]) {
 	}
 
-	matches(membership: Membership): boolean {
+	matches(membership: Acl.Membership): boolean {
 		return this.memberships.some(invokerMembership => {
 			const matchRule = invokerMembership.matchRule[membership.role]
 			if (!matchRule) {

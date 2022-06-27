@@ -1,8 +1,17 @@
 import { Schema } from '@contember/schema'
 import { InputValidation, PermissionsBuilder, SchemaDefinition } from '@contember/schema-definition'
-import { ApplicationEntrypoint, ContainerSpinner, Link, MiscPageLayout, Pages, ProjectSlugContext, runReactApp, useCurrentRequest } from '../../../src'
-import { CSSProperties, ReactNode, useEffect, useState } from 'react'
+import {
+	ApplicationEntrypoint,
+	ContainerSpinner,
+	Link,
+	MiscPageLayout,
+	Pages,
+	runReactApp,
+	useCurrentRequest,
+} from '../../../src'
+import { createContext, CSSProperties, ReactNode, useContext, useEffect, useState } from 'react'
 import './index.sass'
+import { useProjectSlug } from '@contember/react-client'
 
 const projectSlug = window.location.pathname.split('/')[1]
 const pages = import.meta.glob('../cases/**/*.tsx')
@@ -26,14 +35,28 @@ function buildSchema(definitions: SchemaDefinition.ModelDefinition<{}>): Schema 
 	return { acl, model, validation }
 }
 
+const SetProjectSlugContext = createContext<(slug: string | undefined) => void>(() => {
+	throw new Error()
+})
+
+const ProjectSlugProvider = ({ children }: { children: (projectSlug?: string) => ReactNode }) => {
+	const [projectSlug, setProjectSlug] = useState<string | undefined>(undefined)
+	return (
+		<SetProjectSlugContext.Provider value={setProjectSlug}>
+			{children(projectSlug)}
+		</SetProjectSlugContext.Provider>
+	)
+}
+
 const ProjectInitializingLayout = ({ children }: { children?: ReactNode }) => {
 	const request = useCurrentRequest()
-	const [projectSlug, setProjectSlug] = useState<string | null>(null)
+	const projectSlug = useProjectSlug()
+	const setProjectSlug = useContext(SetProjectSlugContext)
 	const pageName = request?.pageName
 
 	useEffect(
 		() => {
-			setProjectSlug(null)
+			setProjectSlug(undefined)
 
 			if (pageName === undefined) {
 				return
@@ -53,14 +76,14 @@ const ProjectInitializingLayout = ({ children }: { children?: ReactNode }) => {
 				setProjectSlug(projectSlug)
 			})()
 		},
-		[pageName],
+		[pageName, setProjectSlug],
 	)
 
-	if (projectSlug === null) {
+	if (projectSlug === undefined) {
 		return <ContainerSpinner />
 
 	} else {
-		return <ProjectSlugContext.Provider value={projectSlug} children={children} />
+		return <>{children}</>
 	}
 }
 
@@ -83,13 +106,18 @@ const IndexPage = () => {
 if (import.meta.env.DEV) {
 	runReactApp(
 		<div style={{ '--cui-font-family': 'Inter var' } as CSSProperties}>
-			<ApplicationEntrypoint
-				apiBaseUrl={import.meta.env.VITE_CONTEMBER_ADMIN_API_BASE_URL as string}
-				sessionToken={import.meta.env.VITE_CONTEMBER_ADMIN_SESSION_TOKEN as string}
-				stage={'live'}
-				basePath={'/'}
-				children={<Pages layout={ProjectInitializingLayout} children={{ index: IndexPage, ...pages }} />}
-			/>
+			<ProjectSlugProvider>
+				{slug => (
+					<ApplicationEntrypoint
+						apiBaseUrl={import.meta.env.VITE_CONTEMBER_ADMIN_API_BASE_URL as string}
+						sessionToken={import.meta.env.VITE_CONTEMBER_ADMIN_SESSION_TOKEN as string}
+						stage={'live'}
+						project={slug}
+						basePath={'/'}
+						children={<Pages layout={ProjectInitializingLayout} children={{ index: IndexPage, ...pages }} />}
+					/>
+				)}
+			</ProjectSlugProvider>
 		</div>,
 	)
 

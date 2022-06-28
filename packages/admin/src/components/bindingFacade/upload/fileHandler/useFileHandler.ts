@@ -69,7 +69,7 @@ export const createDiscriminatedFileKinds = (
 	const fileKinds: FileKindProps[] = processed.map(node => node.value)
 
 	const normalizedFileKinds: NormalizedDiscriminatedData<FullFileKind> = new Map()
-	for (const { acceptFile, acceptMimeTypes, baseEntity, children, extractors, renderFilePreview, renderUploadedFile, uploader, discriminateBy } of fileKinds) {
+	for (const { acceptFile, acceptMimeTypes, baseEntity, children, extractors, renderFilePreview, renderUploadedFile, uploader, discriminateBy, childrenOutsideBaseEntity } of fileKinds) {
 		const value = VariableInputTransformer.transformValue(discriminateBy, environment)
 		normalizedFileKinds.set(value, {
 			discriminateBy: value,
@@ -82,6 +82,7 @@ export const createDiscriminatedFileKinds = (
 				renderFilePreview,
 				renderUploadedFile,
 				uploader,
+				childrenOutsideBaseEntity,
 			},
 		})
 	}

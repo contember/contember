@@ -25,6 +25,7 @@ export interface InternalFileKind<UploadResult = unknown, AcceptArtifacts = unkn
 	uploader: FileUploader<UploadResult, FileUploadError>
 
 	baseEntity?: string | undefined
+	childrenOutsideBaseEntity?: boolean
 	children?: ReactNode
 }
 

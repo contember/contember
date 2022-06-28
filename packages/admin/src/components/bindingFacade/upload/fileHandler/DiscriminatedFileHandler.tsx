@@ -103,19 +103,27 @@ export class DiscriminatedFileHandler implements FileHandler {
 	}
 
 	staticRender(environment: Environment): ReactElement {
+		const staticKinds = Array.from(this.fileKinds.values(), fileKind => staticRenderFileKind(fileKind.datum, environment))
+		const childrenOutsideBase = <>
+			{staticKinds.map(([, it], index) => <Fragment key={index}>{it}</Fragment>)}
+		</>
 		const children = (
 			<>
 				<SugaredField field={this.discriminationField} isNonbearing />
-				{Array.from(this.fileKinds.values(), (fileKind, i) => (
-					<Fragment key={i}>{staticRenderFileKind(fileKind.datum, environment)}</Fragment>
+				{staticKinds.map(([children], i) => (
+					<Fragment key={i}>{children}</Fragment>
 				))}
 			</>
 		)
 		return this.baseEntity === undefined
-			? children
-			: (
+			? <>
+				{children}
+				{childrenOutsideBase}
+			</>
+			: <>
+				{childrenOutsideBase}
 				<HasOne field={this.baseEntity}>{children}</HasOne>
-			)
+			</>
 	}
 
 

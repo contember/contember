@@ -2332,6 +2332,8 @@ export interface InternalFileKind<UploadResult = unknown, AcceptArtifacts = unkn
     // (undocumented)
     children?: ReactNode;
     // (undocumented)
+    childrenOutsideBaseEntity?: boolean;
+    // (undocumented)
     renderFilePreview: (options: RenderFilePreviewOptions<AcceptArtifacts>) => ReactNode;
     // (undocumented)
     renderUploadedFile: ReactNode;

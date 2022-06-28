@@ -34,6 +34,7 @@ export const getStockVideoFileKind = <AcceptArtifacts extends any = unknown>({
 	widthField,
 	uploader = defaultUploader,
 	urlField,
+	childrenOutsideBaseEntity,
 }: StockVideoFileKindProps<AcceptArtifacts>): FullFileKind<S3FileUploader.SuccessMetadata, AcceptArtifacts> => {
 	const extractors: FileDataExtractor<any, S3FileUploader.SuccessMetadata, AcceptArtifacts>[] = [
 		getFileUrlDataExtractor({ urlField }),
@@ -48,6 +49,7 @@ export const getStockVideoFileKind = <AcceptArtifacts extends any = unknown>({
 		uploader,
 		renderUploadedFile: renderUploadedFile ?? <VideoFieldView srcField={urlField} />,
 		children,
+		childrenOutsideBaseEntity,
 		baseEntity,
 		extractors,
 	}

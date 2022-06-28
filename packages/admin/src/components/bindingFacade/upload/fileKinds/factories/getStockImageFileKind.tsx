@@ -33,6 +33,7 @@ export const getStockImageFileKind = <AcceptArtifacts extends any = unknown>({
 	widthField,
 	uploader = defaultUploader,
 	urlField,
+	childrenOutsideBaseEntity,
 }: StockImageFileKindProps<AcceptArtifacts>): FullFileKind<S3FileUploader.SuccessMetadata, AcceptArtifacts> => {
 	const extractors: FileDataExtractor<any, S3FileUploader.SuccessMetadata, AcceptArtifacts>[] = [
 		getFileUrlDataExtractor({ urlField }),
@@ -48,6 +49,7 @@ export const getStockImageFileKind = <AcceptArtifacts extends any = unknown>({
 		uploader,
 		renderUploadedFile: renderUploadedFile ?? <ImageFieldView srcField={urlField} />,
 		children,
+		childrenOutsideBaseEntity,
 		baseEntity,
 		extractors,
 	}

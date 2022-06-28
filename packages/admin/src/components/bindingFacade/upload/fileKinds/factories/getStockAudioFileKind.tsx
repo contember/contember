@@ -32,6 +32,7 @@ export const getStockAudioFileKind = <AcceptArtifacts extends any = unknown>({
 	renderUploadedFile,
 	uploader = defaultUploader,
 	urlField,
+	childrenOutsideBaseEntity,
 }: StockAudioFileKindProps<AcceptArtifacts>): FullFileKind<S3FileUploader.SuccessMetadata, AcceptArtifacts> => {
 	const extractors: FileDataExtractor<any, S3FileUploader.SuccessMetadata, AcceptArtifacts>[] = [
 		getFileUrlDataExtractor({ urlField }),
@@ -48,6 +49,7 @@ export const getStockAudioFileKind = <AcceptArtifacts extends any = unknown>({
 		renderUploadedFile: renderUploadedFile ?? <FileUrlFieldView fileUrlField={urlField} />,
 		baseEntity,
 		children,
+		childrenOutsideBaseEntity,
 		extractors,
 	}
 }

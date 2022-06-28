@@ -205,7 +205,7 @@ export class TreeNodeEnvironmentFactory {
 		for (let env = environment;; env = env.getParent()) {
 			const node = env.getSubTreeNode()
 			if (node.type === 'subtree-entity' || node.type === 'subtree-entity-list') {
-				return `entity '${loc.entity.name}' in path '${[node.entity.name, ...path].join('.')}'`
+				return `entity '${loc.entity.name}' in path '${[node.entity.name, ...path.reverse()].join('.')}'`
 			}
 			path.push(node.field.name)
 		}

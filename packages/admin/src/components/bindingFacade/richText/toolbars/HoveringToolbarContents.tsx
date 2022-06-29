@@ -29,8 +29,13 @@ export const HoveringToolbarContents = memo(({ buttons: rawButtons }: HoveringTo
 						let shouldDisplay: boolean
 						let isActive: boolean
 						let onMouseDown: () => void
-
-						if ('marks' in button) {
+						if ('toggle' in button) {
+							shouldDisplay = button.shouldDisplay?.({ editor }) ?? true
+							isActive = button.isActive?.({ editor }) ?? false
+							onMouseDown = () => {
+								button.toggle({ editor })
+							}
+						} else if ('marks' in button) {
 							shouldDisplay = editor.canToggleMarks(button.marks)
 							isActive = editor.hasMarks(button.marks)
 							onMouseDown = () => {

@@ -2,7 +2,7 @@ import type { EntityAccessor, EntityId } from '@contember/binding'
 import type { IconSourceSpecification } from '@contember/ui'
 import type { FunctionComponent, ReactNode } from 'react'
 import type { Range as SlateRange } from 'slate'
-import { Element as SlateElement, Text as SlateText } from 'slate'
+import { Editor, Element as SlateElement, Text as SlateText } from 'slate'
 import type { SugaredDiscriminateBy } from '../../discrimination'
 import type { TextSpecifics } from '../baseEditor'
 import type { EditorWithBlocks } from '../blockEditor'
@@ -35,8 +35,20 @@ export interface CommonToolbarButton extends IconSourceSpecification {
 	title?: string
 }
 
+export type GenericToolbarButton =
+	& CommonToolbarButton
+	& {
+		isActive?: (args: { editor: Editor }) => boolean
+		shouldDisplay?: (args: { editor: Editor }) => boolean
+		toggle: (args: { editor: Editor }) => void
+	}
+
 export type ElementToolbarButton<E extends SlateElement> = CommonToolbarButton & ElementSpecificToolbarButton<E>
 export type MarkToolbarButton<T extends SlateText> = CommonToolbarButton & MarkSpecificToolbarButton<T>
 export type InitializeReferenceToolbarButton = CommonToolbarButton & InitializeReferenceSpecificToolbarButton
 
-export type ToolbarButtonSpec = ElementToolbarButton<any> | MarkToolbarButton<any> | InitializeReferenceToolbarButton
+export type ToolbarButtonSpec =
+	| ElementToolbarButton<any>
+	| MarkToolbarButton<any>
+	| InitializeReferenceToolbarButton
+	| GenericToolbarButton

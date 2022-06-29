@@ -30,6 +30,7 @@ export interface WithEssentials {
 	canToggleElement: <E extends SlateElement>(elementType: E['type'], suchThat?: Partial<E>) => boolean
 	isElementActive: <E extends SlateElement>(elementType: E['type'], suchThat?: Partial<E>) => boolean
 	toggleElement: <E extends SlateElement>(elementType: E['type'], suchThat?: Partial<E>) => void
+	acceptsAttributes: <E extends SlateElement>(elementType: E['type'], suchThat: Partial<E>) => boolean
 
 	canContainAnyBlocks: (element: SlateElement | Editor) => boolean
 

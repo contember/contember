@@ -242,6 +242,21 @@ export interface AddNewBlockButtonProps extends Omit<AddNewBlockButtonInnerProps
 export type AdminDictionary = BlockRepeaterDictionary & DataGridCellsDictionary & DataGridDictionary & ErrorCodeDictionary & EditorDictionary & FieldViewDictionary & PersistFeedbackDictionary & RepeaterDictionary & UploadDictionary & ChoiceFieldDictionary;
 
 // @public (undocumented)
+export const alignCenterButton: GenericToolbarButton;
+
+// @public (undocumented)
+export type AlignDirection = 'start' | 'center' | 'end' | 'justify' | undefined;
+
+// @public (undocumented)
+export const alignEndButton: GenericToolbarButton;
+
+// @public (undocumented)
+export const alignJustifyButton: GenericToolbarButton;
+
+// @public (undocumented)
+export const alignStartButton: GenericToolbarButton;
+
+// @public (undocumented)
 export interface AnchorElement extends Element_2 {
     // (undocumented)
     children: Editor_2['children'];
@@ -828,6 +843,11 @@ export const CurrentRequestContext: Context<RequestState<RequestParameters<never
 
 // @public (undocumented)
 export interface CustomElementPlugin<T extends Element_2> {
+    // (undocumented)
+    acceptsAttributes?: (args: {
+        editor: Editor_2;
+        suchThat: Partial<T>;
+    }) => boolean;
     // (undocumented)
     canContainAnyBlocks?: boolean;
     // (undocumented)
@@ -1751,6 +1771,19 @@ export type GenericPageProps = Omit<LayoutPageProps, 'children'> & {
 };
 
 // @public (undocumented)
+export type GenericToolbarButton = CommonToolbarButton & {
+    isActive?: (args: {
+        editor: Editor_2;
+    }) => boolean;
+    shouldDisplay?: (args: {
+        editor: Editor_2;
+    }) => boolean;
+    toggle: (args: {
+        editor: Editor_2;
+    }) => void;
+};
+
+// @public (undocumented)
 export const getAudioFileDataExtractor: (props: AudioFileDataExtractorProps) => FileDataExtractor<HTMLAudioElement>;
 
 // @public (undocumented)
@@ -1881,6 +1914,8 @@ export type HasOneSelectProps = DataGridColumnPublicProps & BaseDynamicChoiceFie
 
 // @public (undocumented)
 export interface HeadingElement extends Element_2 {
+    // (undocumented)
+    align?: AlignDirection;
     // (undocumented)
     children: Editor_2['children'];
     // (undocumented)
@@ -2877,6 +2912,8 @@ export interface PagesProps {
 // @public (undocumented)
 export interface ParagraphElement extends Element_2 {
     // (undocumented)
+    align?: AlignDirection;
+    // (undocumented)
     children: Editor_2['children'];
     // (undocumented)
     isNumbered?: boolean;
@@ -3333,6 +3370,10 @@ export namespace RichEditor {
         italic: ToolbarButtonSpec;
         strikeThrough: ToolbarButtonSpec;
         underline: ToolbarButtonSpec;
+        alignStart: GenericToolbarButton;
+        alignEnd: GenericToolbarButton;
+        alignCenter: GenericToolbarButton;
+        alignJustify: GenericToolbarButton;
     };
 }
 
@@ -3969,7 +4010,7 @@ export type ToastId = string;
 export type ToastType = 'success' | 'error' | 'warning' | 'info';
 
 // @public (undocumented)
-export type ToolbarButtonSpec = ElementToolbarButton<any> | MarkToolbarButton<any> | InitializeReferenceToolbarButton;
+export type ToolbarButtonSpec = ElementToolbarButton<any> | MarkToolbarButton<any> | InitializeReferenceToolbarButton | GenericToolbarButton;
 
 // @public (undocumented)
 export interface ToolbarsState {
@@ -4416,6 +4457,8 @@ export const withCode: <E extends Editor>(editor: E) => E;
 
 // @public (undocumented)
 export interface WithEssentials {
+    // (undocumented)
+    acceptsAttributes: <E extends Element_2>(elementType: E['type'], suchThat: Partial<E>) => boolean;
     // (undocumented)
     canContainAnyBlocks: (element: Element_2 | Editor_2) => boolean;
     // (undocumented)

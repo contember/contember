@@ -1826,16 +1826,16 @@ export interface GetNewOrderByOptions {
 }
 
 // @public (undocumented)
-export const getStockAnyFileKind: <AcceptArtifacts extends unknown = unknown>({ additionalExtractors, acceptMimeTypes, acceptFile, baseEntity, children, fileSizeField, fileTypeField, lastModifiedField, fileNameField, renderFilePreview, renderUploadedFile, uploader, urlField, }: StockAnyFileKindProps<AcceptArtifacts>) => FullFileKind<S3FileUploader.SuccessMetadata, AcceptArtifacts>;
+export const getStockAnyFileKind: <AcceptArtifacts extends unknown = unknown>({ additionalExtractors, acceptMimeTypes, acceptFile, baseEntity, children, fileSizeField, fileTypeField, lastModifiedField, fileNameField, renderFilePreview, renderUploadedFile, uploader, urlField, childrenOutsideBaseEntity, }: StockAnyFileKindProps<AcceptArtifacts>) => FullFileKind<S3FileUploader.SuccessMetadata, AcceptArtifacts>;
 
 // @public (undocumented)
-export const getStockAudioFileKind: <AcceptArtifacts extends unknown = unknown>({ additionalExtractors, acceptMimeTypes, acceptFile, baseEntity, children, durationField, fileSizeField, fileTypeField, lastModifiedField, fileNameField, renderFilePreview, renderUploadedFile, uploader, urlField, }: StockAudioFileKindProps<AcceptArtifacts>) => FullFileKind<S3FileUploader.SuccessMetadata, AcceptArtifacts>;
+export const getStockAudioFileKind: <AcceptArtifacts extends unknown = unknown>({ additionalExtractors, acceptMimeTypes, acceptFile, baseEntity, children, durationField, fileSizeField, fileTypeField, lastModifiedField, fileNameField, renderFilePreview, renderUploadedFile, uploader, urlField, childrenOutsideBaseEntity, }: StockAudioFileKindProps<AcceptArtifacts>) => FullFileKind<S3FileUploader.SuccessMetadata, AcceptArtifacts>;
 
 // @public (undocumented)
-export const getStockImageFileKind: <AcceptArtifacts extends unknown = unknown>({ additionalExtractors, acceptMimeTypes, acceptFile, baseEntity, children, fileSizeField, fileTypeField, lastModifiedField, fileNameField, renderFilePreview, renderUploadedFile, heightField, widthField, uploader, urlField, }: StockImageFileKindProps<AcceptArtifacts>) => FullFileKind<S3FileUploader.SuccessMetadata, AcceptArtifacts>;
+export const getStockImageFileKind: <AcceptArtifacts extends unknown = unknown>({ additionalExtractors, acceptMimeTypes, acceptFile, baseEntity, children, fileSizeField, fileTypeField, lastModifiedField, fileNameField, renderFilePreview, renderUploadedFile, heightField, widthField, uploader, urlField, childrenOutsideBaseEntity, }: StockImageFileKindProps<AcceptArtifacts>) => FullFileKind<S3FileUploader.SuccessMetadata, AcceptArtifacts>;
 
 // @public (undocumented)
-export const getStockVideoFileKind: <AcceptArtifacts extends unknown = unknown>({ additionalExtractors, acceptMimeTypes, acceptFile, baseEntity, children, durationField, fileSizeField, fileTypeField, lastModifiedField, fileNameField, renderFilePreview, renderUploadedFile, heightField, widthField, uploader, urlField, }: StockVideoFileKindProps<AcceptArtifacts>) => FullFileKind<S3FileUploader.SuccessMetadata, AcceptArtifacts>;
+export const getStockVideoFileKind: <AcceptArtifacts extends unknown = unknown>({ additionalExtractors, acceptMimeTypes, acceptFile, baseEntity, children, durationField, fileSizeField, fileTypeField, lastModifiedField, fileNameField, renderFilePreview, renderUploadedFile, heightField, widthField, uploader, urlField, childrenOutsideBaseEntity, }: StockVideoFileKindProps<AcceptArtifacts>) => FullFileKind<S3FileUploader.SuccessMetadata, AcceptArtifacts>;
 
 // @public (undocumented)
 export const getTableElementColumnCount: (element: TableElement) => number;

@@ -8,6 +8,7 @@ import {
 	isHeadingElement,
 } from './HeadingElement'
 import { headingHtmlDeserializer } from './HeadingHtmlDeserializer'
+import { isReferenceElement } from '../../../blockEditor'
 
 export const withHeadings = <E extends Editor>(editor: E): E => {
 	const {
@@ -58,10 +59,14 @@ export const withHeadings = <E extends Editor>(editor: E): E => {
 		if (closestBlockEntry === undefined) {
 			return true
 		}
-		const [closestBlockElement, closestBlockPath] = closestBlockEntry
+		const [closestBlockElement] = closestBlockEntry
 
 		return (
-			closestBlockPath.length === 1 && SlateElement.isElement(closestBlockElement) && (editor.isDefaultElement(closestBlockElement) || isHeadingElement(closestBlockElement))
+			SlateElement.isElement(closestBlockElement) && (
+				editor.isDefaultElement(closestBlockElement)
+				|| isHeadingElement(closestBlockElement)
+				|| isReferenceElement(closestBlockElement)
+			)
 		)
 	}
 
@@ -79,8 +84,7 @@ export const withHeadings = <E extends Editor>(editor: E): E => {
 			const [topLevelElement, path] = SlateEditor.node(editor, selection, {
 				depth: 1,
 			})
-			// TODO this is too naive. If the next sibling already was a heading, this will ruin it.
-			if (isHeadingElement(topLevelElement)) {
+			if (isHeadingElement(topLevelElement) && SlateEditor.isEmpty(editor, topLevelElement)) {
 				ejectHeadingElement(editor, path)
 			}
 		})

@@ -31,26 +31,17 @@ export const headingElementPlugin: CustomElementPlugin<HeadingElement> = {
 	// 	include empty strings at the edges of top-level elements.
 	toggleElement: ({ editor, suchThat }) => {
 		SlateEditor.withoutNormalizing(editor, () => {
-			const topLevelNodes = Array.from(ContemberEditor.topLevelNodes(editor))
-
-			if (topLevelNodes.every(([node]) => isHeadingElement(node, suchThat))) {
-				for (const [, path] of topLevelNodes) {
-					ejectHeadingElement(editor, path)
+			const headings = Array.from(Editor.nodes(editor, { match: it => isHeadingElement(it, suchThat) }))
+			if (headings.length) {
+				for (const heading of headings) {
+					ejectHeadingElement(editor, heading[1])
 				}
 			} else {
-				for (const [node, path] of topLevelNodes) {
-					if (isHeadingElement(node, suchThat)) {
-						continue
-					}
-					ContemberEditor.ejectElement(editor, path)
-					const newProps: Partial<HeadingElement> = {
-						...suchThat,
-						type: headingElementType,
-					}
-					Transforms.setNodes(editor, newProps, {
-						at: path,
-					})
-				}
+				Transforms.setNodes(editor, {
+					...suchThat,
+					children: [],
+					type: headingElementType,
+				})
 			}
 		})
 	},

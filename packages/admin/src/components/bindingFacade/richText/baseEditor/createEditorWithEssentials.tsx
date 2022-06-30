@@ -54,8 +54,10 @@ export const createEditorWithEssentials = (defaultElementType: string): Editor =
 		isElementActive: <E extends SlateElement>(elementType: E['type'], suchThat?: Partial<E>) => {
 			return (
 				elements.get(elementType)?.isActive?.({ editor, suchThat })
-				?? Array.from(ContemberEditor.topLevelNodes(editor))
-						.every(([node]) => ContemberEditor.isElementType(node, elementType, suchThat))
+				?? Array.from(Editor.nodes(editor, {
+					match: node => SlateElement.isElement(node) && ContemberEditor.isElementType(node, elementType, suchThat),
+					voids: false,
+				})).length > 0
 			)
 		},
 

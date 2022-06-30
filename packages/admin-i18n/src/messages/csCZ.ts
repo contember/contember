@@ -115,7 +115,7 @@ export const csCZ: AdminDictionary = {
 			maxLimitReached: 'Bylo dosaženo maximálního počtu položek',
 		},
 		insertSelected: {
-			text: 'Vložiť vybraté',
+			text: 'Vložit vybrané',
 		},
 		fileState: {
 			inspectingFile: 'Zkoumám soubor…',

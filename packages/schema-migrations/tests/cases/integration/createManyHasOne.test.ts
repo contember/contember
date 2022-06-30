@@ -36,6 +36,7 @@ testMigrations('create many has one relation (post with author)', {
 				eventLog: {
 					enabled: true,
 				},
+				indexes: {},
 			},
 		},
 		{

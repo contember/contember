@@ -158,6 +158,10 @@ const entitySchema = Typesafe.intersection(
 			fields: Typesafe.array(Typesafe.string),
 			name: Typesafe.string,
 		})),
+		indexes: Typesafe.record(Typesafe.string, Typesafe.object({
+			fields: Typesafe.array(Typesafe.string),
+			name: Typesafe.string,
+		})),
 		eventLog: eventLogSchema,
 	}),
 	Typesafe.partial({

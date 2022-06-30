@@ -1,4 +1,8 @@
 import {
+	alignCenterButton,
+	alignEndButton,
+	alignJustifyButton,
+	alignStartButton,
 	anchorToolbarButton,
 	boldToolbarButton,
 	codeToolbarButton,
@@ -56,5 +60,10 @@ export namespace RichEditor {
 		italic: italicToolbarButton,
 		strikeThrough: strikeThroughToolbarButton,
 		underline: underlineToolbarButton,
+
+		alignStart: alignStartButton,
+		alignEnd: alignEndButton,
+		alignCenter: alignCenterButton,
+		alignJustify: alignJustifyButton,
 	}
 }

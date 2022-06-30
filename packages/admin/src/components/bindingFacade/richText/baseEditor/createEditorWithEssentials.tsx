@@ -61,6 +61,10 @@ export const createEditorWithEssentials = (defaultElementType: string): Editor =
 			)
 		},
 
+		acceptsAttributes: <E extends SlateElement>(elementType: E['type'], suchThat: Partial<E>) => {
+			return elements.get(elementType)?.acceptsAttributes?.({ editor, suchThat }) ?? false
+		},
+
 		toggleMarks: <T extends SlateText>(marks: TextSpecifics<T>) => {
 			if (!editor.canToggleMarks(marks)) {
 				return

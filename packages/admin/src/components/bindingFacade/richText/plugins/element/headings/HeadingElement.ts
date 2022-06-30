@@ -2,6 +2,7 @@ import type { CustomElementPlugin } from '../../../baseEditor'
 import { Editor, Editor as SlateEditor, Element, Node as SlateNode, Path as SlatePath, Transforms } from 'slate'
 import { ContemberEditor } from '../../../ContemberEditor'
 import { HeadingRenderer } from './HeadingRenderer'
+import { AlignDirection } from '../../attributes'
 
 export const headingElementType = 'heading' as const
 
@@ -9,6 +10,7 @@ export interface HeadingElement extends Element {
 	type: typeof headingElementType
 	level: 1 | 2 | 3 | 4 | 5 | 6
 	isNumbered?: boolean
+	align?: AlignDirection
 	children: SlateEditor['children']
 }
 
@@ -27,6 +29,9 @@ export const headingElementPlugin: CustomElementPlugin<HeadingElement> = {
 	type: headingElementType,
 	render: HeadingRenderer,
 	canContainAnyBlocks: false,
+	acceptsAttributes: ({ editor, suchThat }) => {
+		return 'align' in suchThat
+	},
 	// TODO in the following function, we need to conditionally trim the selection so that it doesn't potentially
 	// 	include empty strings at the edges of top-level elements.
 	toggleElement: ({ editor, suchThat }) => {

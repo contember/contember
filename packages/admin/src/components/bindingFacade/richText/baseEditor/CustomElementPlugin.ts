@@ -11,4 +11,5 @@ export interface CustomElementPlugin<T extends Element> {
 	isVoid?: boolean | ((args: { element: T, editor: Editor }) => boolean)
 	canContainAnyBlocks?: boolean
 	toggleElement?: (args: { editor: Editor, suchThat?: Partial<T> }) => void
+	acceptsAttributes?: (args: { editor: Editor, suchThat: Partial<T> }) => boolean
 }

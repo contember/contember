@@ -13,7 +13,7 @@ export const HeadingRenderer: FunctionComponent<HeadingRendererProps> = ({
 	children,
 }: HeadingRendererProps) => (
 	// TODO use BlockElement
-	<EditorHeading attributes={attributes} level={element.level} isNumbered={element.isNumbered}>
+	<EditorHeading attributes={attributes} level={element.level} align={element.align} isNumbered={element.isNumbered}>
 		{children}
 	</EditorHeading>
 )

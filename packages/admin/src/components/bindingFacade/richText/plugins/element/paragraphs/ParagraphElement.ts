@@ -2,6 +2,7 @@ import type { CustomElementPlugin } from '../../../baseEditor'
 import { Editor as SlateEditor, Editor, Element as SlateElement, Node as SlateNode, Transforms } from 'slate'
 import { ContemberEditor } from '../../../ContemberEditor'
 import { ParagraphRenderer } from './ParagraphRenderer'
+import { AlignDirection } from '../../attributes'
 
 export const paragraphElementType = 'paragraph' as const
 
@@ -9,6 +10,7 @@ export interface ParagraphElement extends SlateElement {
 	type: typeof paragraphElementType
 	isNumbered?: boolean
 	children: SlateEditor['children']
+	align?: AlignDirection
 }
 
 export const isParagraphElement = (
@@ -20,6 +22,9 @@ export const paragraphElementPlugin: CustomElementPlugin<ParagraphElement> = {
 	type: paragraphElementType,
 	render: ParagraphRenderer,
 	canContainAnyBlocks: false,
+	acceptsAttributes: ({ editor, suchThat }) => {
+		return 'align' in suchThat
+	},
 	toggleElement: ({ editor, suchThat }) => {
 		Editor.withoutNormalizing(editor, () => {
 			const topLevelNodes = Array.from(ContemberEditor.topLevelNodes(editor))

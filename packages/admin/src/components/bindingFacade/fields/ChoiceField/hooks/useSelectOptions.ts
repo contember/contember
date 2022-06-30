@@ -166,7 +166,7 @@ const useOptionsLoader = (
 		}
 
 		(async () => {
-			const filter = debouncedInput === '' ? {} : createFilter(debouncedInput)
+			const filter = createFilter(debouncedInput)
 			const { subTree } = renderDynamicChoiceFieldStatic({
 				...optionProps,
 				createNewForm: undefined,

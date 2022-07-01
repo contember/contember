@@ -1,4 +1,4 @@
-import { Client, Connection, DatabaseQueryable } from '@contember/database'
+import { Client, Connection, DatabaseQueryable, withDatabaseAdvisoryLock } from '@contember/database'
 import { QueryHandler } from '@contember/queryable'
 import { UuidProvider } from '../../utils'
 import { CommandBus } from '../commands'
@@ -7,6 +7,7 @@ export interface DatabaseContext<ConnectionType extends Connection.ConnectionLik
 	client: Client<ConnectionType>
 	queryHandler: QueryHandler<DatabaseQueryable>
 	transaction: <T>(cb: (db: DatabaseContext<Connection.TransactionLike>) => Promise<T> | T) => Promise<T>
+	locked: <T>(lock: number, cb: (db: DatabaseContext<Connection.ConnectionLike>) => Promise<T> | T) => Promise<T>
 	commandBus: CommandBus
 }
 
@@ -34,4 +35,5 @@ const createDatabaseContext = <ConnectionType extends Connection.ConnectionLike 
 			return cb(createDatabaseContext(client, providers))
 		}),
 	commandBus: new CommandBus(client, providers),
+	locked: (lock, cb) => client.locked(lock, client => cb(createDatabaseContext(client, providers))),
 })

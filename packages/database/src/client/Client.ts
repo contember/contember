@@ -3,6 +3,7 @@ import { DatabaseQueryable } from '../queryable'
 import { Connection } from './Connection'
 import { EventManager } from './EventManager'
 import { QueryHandler } from '@contember/queryable'
+import { withDatabaseAdvisoryLock } from '../utils'
 
 class Client<ConnectionType extends Connection.ConnectionLike = Connection.ConnectionLike> implements Connection.Queryable {
 	constructor(
@@ -43,6 +44,12 @@ class Client<ConnectionType extends Connection.ConnectionLike = Connection.Conne
 				),
 			),
 			{ eventManager: this.eventManager },
+		)
+	}
+
+	async locked<T>(lock: number, callback: (wrapper: Client<Connection.ConnectionLike>) => Promise<T> | T): Promise<T> {
+		return await this.scope(client =>
+			withDatabaseAdvisoryLock(client.connection, lock, () => callback(client)),
 		)
 	}
 

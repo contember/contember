@@ -339,7 +339,7 @@ export class DataBinding {
 		}
 
 		this.eventManager.syncOperation(() => {
-			this.treeAugmenter.extendPersistedData(aggregatePersistedData?.data ?? {})
+			this.treeAugmenter.extendPersistedData(aggregatePersistedData?.data ?? {}, aggregateMarkerTreeRoot)
 
 			for (const extension of pendingExtensions) {
 				this.treeAugmenter.extendTreeStates(extension.newTreeRootId, extension.markerTreeRoot)

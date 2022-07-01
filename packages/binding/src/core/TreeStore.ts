@@ -44,8 +44,8 @@ export class TreeStore {
 
 	public constructor() {}
 
-	public mergeInQueryResponse(response: ReceivedDataTree): void {
-		RequestResponseNormalizer.mergeInQueryResponse(this.persistedData, response)
+	public mergeInQueryResponse(response: ReceivedDataTree, markerTree: MarkerTreeRoot): void {
+		RequestResponseNormalizer.mergeInQueryResponse(this.persistedData, response, markerTree)
 	}
 
 	public mergeInMutationResponse(response: ReceivedDataTree): void {

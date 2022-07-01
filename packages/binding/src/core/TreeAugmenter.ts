@@ -23,9 +23,9 @@ export class TreeAugmenter {
 		private readonly treeStore: TreeStore,
 	) {}
 
-	public extendPersistedData(newPersistedData: ReceivedDataTree) {
+	public extendPersistedData(newPersistedData: ReceivedDataTree, markerTree: MarkerTreeRoot) {
 		// TODO this doesn't yet handle updates for entities whose persisted data just gets magically changed without notice.
-		this.treeStore.mergeInQueryResponse(newPersistedData)
+		this.treeStore.mergeInQueryResponse(newPersistedData, markerTree)
 	}
 
 	public extendTreeStates(newTreeId: TreeRootId | undefined, newMarkerTree: MarkerTreeRoot): void {

@@ -83,7 +83,9 @@ export class ProjectInitializer {
 		if (migrations) {
 			logger.group(`Executing project migrations`)
 			const stages = await db.queryHandler.fetch(new StagesQuery())
-			await this.projectMigrator.migrate(db, stages, migrations, logger.write.bind(logger))
+			await this.projectMigrator.migrate(db, stages, migrations, {
+				logger: logger.write.bind(logger),
+			})
 			logger.groupEnd()
 		}
 	}

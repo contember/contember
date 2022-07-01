@@ -1,6 +1,5 @@
 import { Migration, MigrationDescriber } from '@contember/schema-migrations'
 import { Client, QueryError, wrapIdentifier } from '@contember/database'
-import { formatSchemaName } from '../helpers'
 import { Schema } from '@contember/schema'
 import { SaveMigrationCommand } from '../commands'
 import { Stage } from '../dtos'
@@ -21,8 +20,10 @@ export class ProjectMigrator {
 		db: DatabaseContext,
 		stages: Stage[],
 		migrationsToExecute: readonly Migration[],
-		logger: (message: string) => void,
-		ignoreOrder: boolean = false,
+		{ logger, ignoreOrder = false }: {
+			logger: (message: string) => void
+			ignoreOrder?: boolean
+		},
 	) {
 		if (migrationsToExecute.length === 0) {
 			return

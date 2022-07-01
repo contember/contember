@@ -1,13 +1,13 @@
 import { ApiKeyManager } from './apiKey'
-import { IdentityProviderBySlugQuery, PersonQuery, PersonRow } from '../queries'
+import { IdentityProviderBySlugQuery, PersonByIdPQuery, PersonQuery, PersonRow } from '../queries'
 import { IDPClaim, IDPHandlerRegistry, IDPResponse, IDPResponseError, IDPValidationError } from './idp'
 import { Response, ResponseError, ResponseOk } from '../utils/Response'
 import { InitSignInIdpErrorCode, SignInIdpErrorCode } from '../../schema'
 import { DatabaseContext } from '../utils'
-import { CreateIdentityCommand, CreatePersonCommand } from '../commands'
+import { CreateIdentityCommand, CreatePersonCommand, CreatePersonIdentityProviderIdentifierCommand } from '../commands'
 import { TenantRole } from '../authorization'
-import { ImplementationException } from '../../exceptions'
 import { NoPassword } from '../dtos'
+import { IdentityProviderRow } from '../queries/idp/types'
 
 class IDPSignInManager {
 	constructor(
@@ -47,21 +47,9 @@ class IDPSignInManager {
 				}
 				throw e
 			}
-			let personRow = await db.queryHandler.fetch(PersonQuery.byEmail(claim.email))
+			const personRow = await this.resolvePerson(db, claim, provider)
 			if (!personRow) {
-				if (!provider.autoSignUp) {
-					return new ResponseError(SignInIdpErrorCode.PersonNotFound, `Person ${claim.email} not found`)
-				}
-				const roles = [TenantRole.PERSON]
-				const identityId = await db.commandBus.execute(new CreateIdentityCommand(roles))
-				const newPerson = await db.commandBus.execute(new CreatePersonCommand(identityId, claim.email, NoPassword))
-				personRow = {
-					...newPerson,
-					roles,
-				}
-			}
-			if (!personRow) {
-				throw new ImplementationException()
+				return new ResponseError(SignInIdpErrorCode.PersonNotFound, `Person ${claim.email} not found`)
 			}
 
 			const sessionToken = await this.apiKeyManager.createSessionApiKey(db, personRow.identity_id, expiration)
@@ -78,6 +66,40 @@ class IDPSignInManager {
 		const validatedConfig = providerService.validateConfiguration(provider.configuration)
 		const initResponse = await providerService.initAuth(validatedConfig, redirectUrl)
 		return new ResponseOk(initResponse)
+	}
+
+	private async resolvePerson(db: DatabaseContext, claim: IDPClaim, provider: IdentityProviderRow): Promise<PersonRow | null> {
+		const personByIdPQuery = new PersonByIdPQuery(provider.id, claim.externalIdentifier)
+		const personByIdp = await db.queryHandler.fetch(personByIdPQuery)
+		if (personByIdp) {
+			return personByIdp
+		}
+
+		const saveIdpIdentifier = async (personId: string) =>
+			await db.commandBus.execute(new CreatePersonIdentityProviderIdentifierCommand(provider.id, personId, claim.externalIdentifier))
+
+		const personByEmail = await db.queryHandler.fetch(PersonQuery.byEmail(claim.email))
+		if (personByEmail) {
+			await saveIdpIdentifier(personByEmail.id)
+			return personByEmail
+		}
+		if (provider.autoSignUp) {
+			const signedUpPerson = await this.signUp(db, claim)
+			await saveIdpIdentifier(signedUpPerson.id)
+			return signedUpPerson
+		}
+
+		return null
+	}
+
+	private async signUp(db: DatabaseContext, claim: IDPClaim): Promise<PersonRow> {
+		const roles = [TenantRole.PERSON]
+		const identityId = await db.commandBus.execute(new CreateIdentityCommand(roles))
+		const newPerson = await db.commandBus.execute(new CreatePersonCommand(identityId, claim.email, NoPassword))
+		return {
+			...newPerson,
+			roles,
+		}
 	}
 }
 

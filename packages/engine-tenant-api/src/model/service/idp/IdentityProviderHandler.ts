@@ -8,6 +8,7 @@ export interface IDPResponse {
 }
 
 export interface IDPClaim {
+	externalIdentifier: string
 	email: string
 }
 

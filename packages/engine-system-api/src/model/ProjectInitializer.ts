@@ -11,8 +11,6 @@ import {
 	SingleConnection,
 } from '@contember/database'
 import { Logger } from '@contember/engine-common'
-import { Migration } from '@contember/schema-migrations'
-import { StagesQuery } from './queries'
 
 export class ProjectInitializer {
 	constructor(
@@ -26,7 +24,6 @@ export class ProjectInitializer {
 		databaseContextFactory: DatabaseContextFactory,
 		project: ProjectConfig & { db?: DatabaseConfig },
 		logger: Logger,
-		migrations?: Migration[],
 	) {
 		const dbContext = databaseContextFactory.create()
 		if (project.db) {
@@ -52,7 +49,7 @@ export class ProjectInitializer {
 		}
 		const result = await retryTransaction(() =>
 			dbContext.transaction(async trx => {
-				await this.initStages(trx, project, logger, migrations)
+				await this.initStages(trx, project, logger)
 			}),
 		)
 		if (dbContext.client.connection instanceof Connection) {
@@ -61,12 +58,7 @@ export class ProjectInitializer {
 		return result
 	}
 
-	private async initStages(
-		db: DatabaseContext<Connection.TransactionLike>,
-		project: ProjectConfig,
-		logger: Logger,
-		migrations?: Migration[],
-	) {
+	private async initStages(db: DatabaseContext<Connection.TransactionLike>, project: ProjectConfig, logger: Logger) {
 
 		logger.group(`Creating stages`)
 
@@ -80,13 +72,5 @@ export class ProjectInitializer {
 		}
 
 		logger.groupEnd()
-		if (migrations) {
-			logger.group(`Executing project migrations`)
-			const stages = await db.queryHandler.fetch(new StagesQuery())
-			await this.projectMigrator.migrate(db, stages, migrations, {
-				logger: logger.write.bind(logger),
-			})
-			logger.groupEnd()
-		}
 	}
 }

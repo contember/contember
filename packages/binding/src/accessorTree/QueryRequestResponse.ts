@@ -1,6 +1,6 @@
-import type { EntityId, Scalar } from '../treeParameters'
+import type { EntityId, FieldValue } from '../treeParameters'
 
-export type ReceivedFieldData = Scalar | ReceivedEntityData | Array<ReceivedEntityData>
+export type ReceivedFieldData = FieldValue | ReceivedEntityData | Array<ReceivedEntityData>
 
 export type ReceivedEntityData =
 	& {

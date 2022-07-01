@@ -1,6 +1,6 @@
 import type { VariableFieldValue } from '../../dao'
-import type { Scalar } from './Scalar'
+import { JsonValue } from './Json'
 
-export type FieldValue = Scalar
+export type FieldValue = JsonValue
 
 export type OptionallyVariableFieldValue = FieldValue | VariableFieldValue

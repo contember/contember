@@ -1,34 +1,34 @@
-import type { FieldAccessor, Scalar } from '@contember/binding'
+import type { FieldAccessor, FieldValue } from '@contember/binding'
 import { useEntityBeforePersist } from '@contember/binding'
 import type { AllControlProps, ControlProps } from '@contember/ui'
 import { Ref, useCallback, useEffect, useRef, useState } from 'react'
 import type { SimpleRelativeSingleFieldMetadata } from '../auxiliary'
 
-export type ControlValueParser<ControlValue, Value extends Scalar> = (
-	value: ControlValue | null | undefined,
-	field: FieldAccessor<Value>,
-) => Value | null
+export type ControlValueParser<ControlVal, FieldVal extends FieldValue> = (
+	value: ControlVal | null | undefined,
+	field: FieldAccessor<FieldVal>,
+) => FieldVal | null
 
-export type FieldValueFormatter<FieldValue extends Scalar, ControlValue extends Scalar> = (
-	value: FieldValue | null | undefined,
-	field: FieldAccessor<FieldValue>,
-) => ControlValue | null
+export type FieldValueFormatter<FieldVal extends FieldValue, ControlVal extends FieldValue> = (
+	value: FieldVal | null | undefined,
+	field: FieldAccessor<FieldVal>,
+) => ControlVal | null
 
 type UseControlProps<
-	FieldValue extends Scalar,
-	ControlValue extends Scalar,
-> = ControlProps<FieldValue> & {
-	fieldMetadata: SimpleRelativeSingleFieldMetadata<FieldValue>
-	parse: ControlValueParser<ControlValue, FieldValue>
-	format: FieldValueFormatter<FieldValue, ControlValue>
+	FieldVal extends FieldValue,
+	ControlVal extends FieldValue,
+> = ControlProps<FieldVal> & {
+	fieldMetadata: SimpleRelativeSingleFieldMetadata<FieldVal>
+	parse: ControlValueParser<ControlVal, FieldVal>
+	format: FieldValueFormatter<FieldVal, ControlVal>
 }
 
-export const useFieldControl = <FieldValue extends Scalar, ControlValue extends Scalar, Type extends string | undefined = string | undefined>({
+export const useFieldControl = <FieldVal extends FieldValue, ControlVal extends FieldValue, Type extends string | undefined = string | undefined>({
 	fieldMetadata,
 	parse,
 	format,
 	...props
-}: UseControlProps<FieldValue, ControlValue>): AllControlProps<ControlValue> & {
+}: UseControlProps<FieldVal, ControlVal>): AllControlProps<ControlVal> & {
 	ref: Ref<any>,
 } => {
 	// TODO: fix unknow
@@ -66,7 +66,7 @@ export const useFieldControl = <FieldValue extends Scalar, ControlValue extends 
 
 		// ControlValueProps
 		defaultValue: format(field.current.defaultValue, field.current) ?? undefined,
-		onChange: useCallback((_value?: ControlValue | null) => {
+		onChange: useCallback((_value?: ControlVal | null) => {
 			const value = parse(_value, field.current) ?? null
 			const valueOrNull = value || value === 0 || value === false ? value : null
 

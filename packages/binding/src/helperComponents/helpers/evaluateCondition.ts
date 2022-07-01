@@ -1,5 +1,5 @@
 import { GraphQlLiteral, Input } from '@contember/client'
-import { Scalar } from '../../treeParameters'
+import { FieldValue } from '../../treeParameters'
 import { BindingError } from '../../BindingError'
 
 const unwrapGraphqlLiteral = (value: Input.ColumnValue<GraphQlLiteral>): any => {
@@ -9,7 +9,7 @@ const unwrapGraphqlLiteral = (value: Input.ColumnValue<GraphQlLiteral>): any => 
 	return value
 }
 
-export const evaluateCondition = (value: Scalar | null, condition: Input.Condition<Input.ColumnValue<GraphQlLiteral>>) => {
+export const evaluateCondition = (value: FieldValue | null, condition: Input.Condition<Input.ColumnValue<GraphQlLiteral>>) => {
 		const handlers: {
 			[K in keyof Required<Input.Condition<any>>]: (
 				param: Exclude<Input.Condition<any>[K], undefined>,

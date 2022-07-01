@@ -41,74 +41,7 @@ export class RequestResponseNormalizer {
 	public static mergeInMutationResponse(
 		original: NormalizedPersistedData,
 		newPersistedData: ReceivedDataTree,
-	): Set<string> {
-		const { subTreeDataStore, persistedEntityDataStore } = original
-		const presentIds: Set<string> = new Set()
-
-		for (const operationAlias in newPersistedData) {
-			const operation = MutationAlias.decodeTopLevel(operationAlias)
-
-			if (operation === undefined) {
-				return this.rejectData()
-			}
-			const { type, entityId, subTreeType, subTreePlaceholder } = operation
-
-			const treeDatum = newPersistedData[operationAlias]
-			const fieldData = this.createFieldData(persistedEntityDataStore, treeDatum)
-			if (!(fieldData instanceof ServerId)) {
-				return this.rejectData()
-			}
-
-			switch (type) {
-				case mutationOperationType.update:
-				case mutationOperationType.create: {
-
-					if (subTreeType === mutationOperationSubTreeType.singleEntity) {
-						subTreeDataStore.set(subTreePlaceholder, fieldData)
-					} else if (subTreeType === mutationOperationSubTreeType.entityList) {
-						if (type === mutationOperationType.create) {
-							const list = subTreeDataStore.get(subTreePlaceholder)
-
-							if (list instanceof Set) {
-								// TODO this is somewhat dubious because we're essentially just guessing the order of the entities
-								//		and just carelessly put the new one at the end.
-								list.add(fieldData.value)
-							} else if (list === undefined) {
-								// That's fine. This is probably just an isCreating sub-tree.
-								subTreeDataStore.set(subTreePlaceholder, new Set([fieldData.value]))
-							} else {
-								return this.rejectData()
-							}
-						}
-					} else {
-						return assertNever(subTreeType)
-					}
-
-					break
-				}
-				case mutationOperationType.delete: {
-					// TODO there are potentially some references to entityId that this whole process won't quite remove.
-					//		That's a memory leak. Probably not particularly severe in most cases but still.
-					persistedEntityDataStore.delete(fieldData.uniqueValue)
-					if (subTreeType === mutationOperationSubTreeType.singleEntity) {
-						subTreeDataStore.delete(subTreePlaceholder)
-					} else if (subTreeType === mutationOperationSubTreeType.entityList) {
-						const list = subTreeDataStore.get(subTreePlaceholder)
-
-						if (!(list instanceof Set)) {
-							return this.rejectData()
-						}
-						list.delete(entityId)
-					} else {
-						return assertNever(subTreeType)
-					}
-					break
-				}
-				default:
-					return assertNever(type)
-			}
-		}
-		return presentIds
+	): void {
 	}
 
 	private static createFieldData(

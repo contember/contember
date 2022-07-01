@@ -32,7 +32,10 @@ export class MigrateMutationResolver implements MutationResolver<'migrate'> {
 				await context.requireAccess(AuthorizationActions.PROJECT_MIGRATE, stage.slug)
 			}
 			try {
-				await this.projectMigrator.migrate(trx, stages, migrations, () => null, force)
+				await this.projectMigrator.migrate(trx, stages, migrations, {
+					logger: () => null,
+					ignoreOrder: force,
+				})
 			} catch (e) {
 				if (e instanceof MigrationError) {
 					await trx.client.connection.rollback()

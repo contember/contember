@@ -14,7 +14,7 @@ export type FieldValueFormatter<FieldVal extends FieldValue, ControlVal extends 
 	field: FieldAccessor<FieldVal>,
 ) => ControlVal | null
 
-type UseControlProps<
+export type UseControlProps<
 	FieldVal extends FieldValue,
 	ControlVal extends FieldValue,
 > = ControlProps<FieldVal> & {

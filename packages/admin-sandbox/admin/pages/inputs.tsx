@@ -12,12 +12,35 @@ import {
 	RadioField,
 	SearchField,
 	SelectField,
+	SimpleRelativeSingleField,
 	SlugField,
 	TextareaField,
+	TextareaInput,
 	TextField,
+	TextFieldProps,
 	TimeField,
 	UrlField,
+	useFieldControl,
 } from '@contember/admin'
+
+export const JsonField = SimpleRelativeSingleField<TextFieldProps, string>(
+	(fieldMetadata, {
+		allowNewlines,
+		label,
+		wrapLines,
+		...props
+	}) => {
+		const inputProps = useFieldControl<string, string>({
+			...props,
+			fieldMetadata,
+			parse: val => val ? JSON.parse(val) : null,
+			format: val => val ? JSON.stringify(val) : null,
+		})
+
+		return <TextareaInput {...inputProps} />
+	},
+	'JsonField',
+)
 
 
 export default () => (
@@ -59,10 +82,11 @@ export default () => (
 				<TextField field="primaryText" label="Headline" />
 			</Block>
 		</BlockRepeater>
-		<SelectField field={'selectValue	'} label={'Value'} options={[
+		<SelectField field={'selectValue'} label={'Value'} options={[
 			{ value: 'a', label: 'A option' },
 			{ value: 'b', label: 'B option' },
 			{ value: 'c', label: 'C option' },
 		]} />
+		<JsonField field={'jsonValue'} label={'JSON'} />
 	</EditPage>
 )

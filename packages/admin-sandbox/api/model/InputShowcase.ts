@@ -24,6 +24,7 @@ export class InputShowcase {
 	enumValue = d.enumColumn(SomeEnum)
 	selectValue = d.enumColumn(SomeEnum)
 	blocks = d.oneHasMany(RepeaterBlock, 'page')
+	jsonValue = d.jsonColumn()
 }
 
 export const ContentBlockType = d.createEnum(

@@ -64,6 +64,7 @@ export class OIDCProvider implements IdentityProviderHandler<SessionData, OIDCCo
 				throw new IDPValidationError('email is missing in IDP response')
 			}
 			return {
+				externalIdentifier: claims.sub,
 				email: claims.email,
 			}
 		} catch (e) {

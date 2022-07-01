@@ -93,7 +93,7 @@ export const DataGridContainerTable = memo<DataGridContainerTableProps>(({
 			{!!accessor.length &&
 				Array.from(accessor, entity => (
 					<Entity
-						key={entity.id ?? entity.key}
+						key={entity.key}
 						accessor={entity}
 					>
 						<TableRow id={entity.id} onClick={onRowClick} active={selectedEntityIds?.includes(entity.id)}>

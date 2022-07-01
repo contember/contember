@@ -94,13 +94,13 @@ export const BareFileRepeaterContainer: FunctionComponent<BareFileRepeaterContai
 
 		if (sortableBy === undefined) {
 			previews.push(
-				<div key={entity.parentEntity.id} className="fileInput-preview">
+				<div key={entity.parentEntity.key} className="fileInput-preview">
 					{preview}
 				</div>,
 			)
 		} else {
 			previews.push(
-				<SortableRepeaterItem index={i} key={entity.parentEntity.id} disabled={isMutating}>
+				<SortableRepeaterItem index={i} key={entity.parentEntity.key} disabled={isMutating}>
 					<div className="fileInput-preview view-sortable">{preview}</div>
 				</SortableRepeaterItem>,
 			)

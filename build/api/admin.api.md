@@ -2694,13 +2694,12 @@ export type MultiEditPageProps<ContainerExtraProps, ItemExtraProps> = SugaredQua
 export const MultiSelectField: FunctionComponent<MultiSelectFieldProps>;
 
 // @public (undocumented)
-export const MultiSelectFieldInner: <T extends unknown>({ currentValues, data, errors, onAdd, onClear, onRemove, reactSelectProps, placeholder, onAddNew, onMove, onSearch, isLoading, ...fieldContainerProps }: MultiSelectFieldInnerProps<T>) => JSX.Element;
+export const MultiSelectFieldInner: <T extends unknown>({ currentValues, data, errors, onAdd, onClear, onRemove, reactSelectProps, placeholder, menuZIndex, onAddNew, onMove, onSearch, isLoading, ...fieldContainerProps }: MultiSelectFieldInnerProps<T>) => JSX.Element;
 
 // @public (undocumented)
-export interface MultiSelectFieldInnerProps<ActualValue> extends ChoiceFieldData.MultipleChoiceFieldMetadata<ActualValue>, MultiSelectFieldInnerPublicProps {
-    // (undocumented)
+export type MultiSelectFieldInnerProps<ActualValue> = ChoiceFieldData.MultipleChoiceFieldMetadata<ActualValue> & MultiSelectFieldInnerPublicProps & PublicCommonReactSelectStylesProps & {
     errors: FieldErrors | undefined;
-}
+};
 
 // @public (undocumented)
 export interface MultiSelectFieldInnerPublicProps extends Omit<FieldContainerProps, 'children'> {
@@ -3060,6 +3059,11 @@ export type ProjectUserRoles = Set<string>;
 
 // @public (undocumented)
 export type PublicAnchorProps = Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'>;
+
+// @public (undocumented)
+export type PublicCommonReactSelectStylesProps = {
+    menuZIndex?: number;
+};
 
 // @public (undocumented)
 export type PublicFileKind<UploadResult = unknown, AcceptArtifacts = unknown> = Partial<InternalFileKind<UploadResult, AcceptArtifacts>>;
@@ -3583,13 +3587,12 @@ export interface SelectEntityButtonProps {
 export const SelectField: FunctionComponent<SelectFieldProps>;
 
 // @public (undocumented)
-export const SelectFieldInner: MemoExoticComponent<({ placeholder, allowNull, currentValue, data, errors, onSelect, onClear, reactSelectProps, onAddNew, onSearch, isLoading, ...fieldContainerProps }: SelectFieldInnerProps) => JSX.Element>;
+export const SelectFieldInner: MemoExoticComponent<({ placeholder, allowNull, currentValue, data, errors, menuZIndex, onSelect, onClear, reactSelectProps, onAddNew, onSearch, isLoading, ...fieldContainerProps }: SelectFieldInnerProps) => JSX.Element>;
 
 // @public (undocumented)
-export interface SelectFieldInnerProps extends ChoiceFieldData.SingleChoiceFieldMetadata, SelectFieldInnerPublicProps {
-    // (undocumented)
+export type SelectFieldInnerProps = ChoiceFieldData.SingleChoiceFieldMetadata & SelectFieldInnerPublicProps & PublicCommonReactSelectStylesProps & {
     errors: FieldErrors | undefined;
-}
+};
 
 // @public (undocumented)
 export interface SelectFieldInnerPublicProps extends Omit<FieldContainerProps, 'children'> {

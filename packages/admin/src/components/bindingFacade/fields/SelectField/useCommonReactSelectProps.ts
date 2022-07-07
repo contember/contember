@@ -1,10 +1,10 @@
 import type { Props as SelectProps } from 'react-select'
+import { useStateManager } from 'react-select'
 import type { ChoiceFieldData } from '../ChoiceField'
 import { SearchInput } from './SearchInput'
-import { useCommonStyles } from './useCommonStyles'
-import { useStateManager } from 'react-select'
+import { CommonReactSelectStylesProps, useCommonReactSelectStyles } from './useCommonReactSelectStyles'
 
-export interface UseCommonReactSelectPropsProps<T> {
+export interface UseCommonReactSelectPropsProps<T> extends Omit<CommonReactSelectStylesProps, 'isInvalid'> {
 	reactSelectProps: Partial<SelectProps<any, any, any>> | undefined
 	placeholder: string | undefined
 	data: ChoiceFieldData.Options<T>
@@ -17,9 +17,10 @@ export const useCommonReactSelectProps = <T>({
 	placeholder,
 	data,
 	isInvalid,
+	menuZIndex,
 	onSearch,
 }: UseCommonReactSelectPropsProps<T>): SelectProps<ChoiceFieldData.SingleOption<T>, boolean, never> => {
-	const styles = useCommonStyles(isInvalid)
+	const styles = useCommonReactSelectStyles({ isInvalid, menuZIndex })
 	const reactSelectState = useStateManager<ChoiceFieldData.SingleOption<T>, boolean, never, {}>({
 		onInputChange: onSearch,
 		onFocus: e => {

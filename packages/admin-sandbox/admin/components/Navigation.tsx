@@ -12,6 +12,7 @@ export const Navigation = () => (
 			<Menu.Item title="Seq ids" to="seq/list" />
 			<Menu.Item title="Quiz" to="quiz" />
 			<Menu.Item title="Foo" to="random/foo" />
+			<Menu.Item title="Nested Path" to="nested/path" />
 			<Menu.Item title="Foo Bar">
 				<Menu.Item title="Skip this1" />
 				<Menu.Item title="Foo Bar 1" to="random/fooBar1" />

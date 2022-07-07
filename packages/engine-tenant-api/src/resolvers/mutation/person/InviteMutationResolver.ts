@@ -2,7 +2,6 @@ import {
 	InviteErrorCode,
 	InviteMethod,
 	InviteResponse,
-	MembershipInput,
 	MutationInviteArgs,
 	MutationResolvers,
 	MutationUnmanagedInviteArgs,
@@ -10,17 +9,17 @@ import {
 import { TenantResolverContext } from '../../TenantResolverContext'
 import {
 	DatabaseContext,
+	InviteData,
 	InviteManager,
-	InviteOptions,
 	isTokenHash,
 	MembershipValidator,
 	PermissionActions,
-	Project,
 	ProjectManager,
 } from '../../../model'
 import { createMembershipValidationErrorResult } from '../../membershipUtils'
 import { createErrorResponse, createProjectNotFoundResponse } from '../../errorUtils'
 import { UserInputError } from '@contember/graphql-utils'
+import { PersonResponseFactory } from '../../responseHelpers/PersonResponseFactory'
 
 export class InviteMutationResolver implements MutationResolvers {
 	constructor(
@@ -31,7 +30,7 @@ export class InviteMutationResolver implements MutationResolvers {
 
 	async invite(
 		parent: any,
-		{ projectSlug, email, memberships, options }: MutationInviteArgs,
+		{ projectSlug, email, name, memberships, options }: MutationInviteArgs,
 		context: TenantResolverContext,
 	): Promise<InviteResponse> {
 		const project = await this.projectManager.getProjectBySlug(context.db, projectSlug)
@@ -43,7 +42,11 @@ export class InviteMutationResolver implements MutationResolvers {
 		if (!project) {
 			return createProjectNotFoundResponse(InviteErrorCode.ProjectNotFound, projectSlug)
 		}
-		return this.doInvite(context.db, project, memberships, email, {
+		return this.doInvite(context.db, {
+			email,
+			project,
+			memberships,
+			name: name ?? undefined,
 			emailVariant: options?.mailVariant || '',
 			method: options?.method ?? InviteMethod.CreatePassword,
 		})
@@ -66,7 +69,10 @@ export class InviteMutationResolver implements MutationResolvers {
 		if (typeof options?.resetTokenHash === 'string' && !isTokenHash(options?.resetTokenHash)) {
 			throw new UserInputError('Invalid format of resetTokenHash. Must be hex-encoded sha256.')
 		}
-		return this.doInvite(context.db, project, memberships, email, {
+		return this.doInvite(context.db, {
+			email,
+			project,
+			memberships,
 			noEmail: true,
 			password: password ?? options?.password ?? undefined,
 			passwordResetTokenHash: options?.resetTokenHash ?? undefined,
@@ -75,12 +81,9 @@ export class InviteMutationResolver implements MutationResolvers {
 
 	private async doInvite(
 		dbContext: DatabaseContext,
-		project: Project,
-		memberships: ReadonlyArray<MembershipInput>,
-		email: string,
-		inviteOptions: InviteOptions = {},
+		invite: InviteData,
 	): Promise<InviteResponse> {
-		const validationResult = await this.membershipValidator.validate(project.slug, memberships)
+		const validationResult = await this.membershipValidator.validate(invite.project.slug, invite.memberships)
 		if (validationResult.length > 0) {
 			const errors = createMembershipValidationErrorResult<InviteErrorCode>(validationResult)
 			return {
@@ -89,27 +92,18 @@ export class InviteMutationResolver implements MutationResolvers {
 				error: errors[0],
 			}
 		}
-		const response = await this.inviteManager.invite(dbContext, email, project, memberships, inviteOptions)
+		const response = await this.inviteManager.invite(dbContext, invite)
 
 		if (!response.ok) {
 			return createErrorResponse(response.error, response.errorMessage)
 		}
 		const result = response.result
 
-		const person = {
-			id: result.person.id,
-			email: result.person.email,
-			otpEnabled: !!result.person.otp_activated_at,
-			identity: {
-				id: result.person.identity_id,
-				projects: [],
-			},
-		}
 		return {
 			ok: true,
 			errors: [],
 			result: {
-				person,
+				person: PersonResponseFactory.createPersonResponse(result.person),
 				isNew: result.isNew,
 			},
 		}

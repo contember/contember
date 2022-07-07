@@ -1,6 +1,7 @@
 import { createResolverContext, IdentityTypeResolver, TenantResolverContext } from '../index'
 import { PermissionContextFactory, SignInResult } from '../../model'
 import { CommonSignInResult } from '../../schema'
+import { PersonResponseFactory } from './PersonResponseFactory'
 
 export class SignInResponseFactory {
 	constructor(
@@ -25,15 +26,7 @@ export class SignInResponseFactory {
 		)
 		return {
 			token: signInResult.token,
-			person: {
-				id: signInResult.person.id,
-				otpEnabled: !!signInResult.person.otp_activated_at,
-				email: signInResult.person.email,
-				identity: {
-					id: identityId,
-					projects,
-				},
-			},
+			person: PersonResponseFactory.createPersonResponse(signInResult.person, projects),
 		}
 	}
 }

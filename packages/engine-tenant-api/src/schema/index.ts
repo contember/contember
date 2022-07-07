@@ -662,6 +662,7 @@ export type MutationInitSignInIdpArgs = {
 export type MutationInviteArgs = {
 	email: Scalars['String']
 	memberships: ReadonlyArray<MembershipInput>
+	name?: InputMaybe<Scalars['String']>
 	options?: InputMaybe<InviteOptions>
 	projectSlug: Scalars['String']
 }
@@ -725,6 +726,7 @@ export type MutationSignOutArgs = {
 
 export type MutationSignUpArgs = {
 	email: Scalars['String']
+	name?: InputMaybe<Scalars['String']>
 	password?: InputMaybe<Scalars['String']>
 	passwordHash?: InputMaybe<Scalars['String']>
 	roles?: InputMaybe<ReadonlyArray<Scalars['String']>>
@@ -734,6 +736,7 @@ export type MutationSignUpArgs = {
 export type MutationUnmanagedInviteArgs = {
 	email: Scalars['String']
 	memberships: ReadonlyArray<MembershipInput>
+	name?: InputMaybe<Scalars['String']>
 	options?: InputMaybe<UnmanagedInviteOptions>
 	password?: InputMaybe<Scalars['String']>
 	projectSlug: Scalars['String']
@@ -766,6 +769,7 @@ export type Person = {
 	readonly email?: Maybe<Scalars['String']>
 	readonly id: Scalars['String']
 	readonly identity: Identity
+	readonly name?: Maybe<Scalars['String']>
 	readonly otpEnabled: Scalars['Boolean']
 }
 
@@ -1768,6 +1772,7 @@ export type PersonResolvers<ContextType = any, ParentType extends ResolversParen
 	email?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
 	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	identity?: Resolver<ResolversTypes['Identity'], ParentType, ContextType>
+	name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
 	otpEnabled?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }

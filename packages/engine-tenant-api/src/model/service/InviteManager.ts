@@ -17,7 +17,11 @@ import { DatabaseContext, TokenHash } from '../utils'
 import { NoPassword, PasswordPlain } from '../dtos'
 import { Acl } from '@contember/schema'
 
-export interface InviteOptions {
+export interface InviteData {
+	email: string
+	name?: string
+	project: Project
+	memberships: readonly Acl.Membership[]
 	noEmail?: boolean
 	password?: string
 	emailVariant?: string
@@ -35,10 +39,17 @@ export class InviteManager {
 
 	async invite(
 		dbContext: DatabaseContext,
-		email: string,
-		project: Project,
-		memberships: readonly Acl.Membership[],
-		{ method, emailVariant, noEmail = false, password, passwordResetTokenHash }: InviteOptions = {},
+		{
+			email,
+			project,
+			name,
+			memberships,
+			method,
+			emailVariant,
+			noEmail = false,
+			password,
+			passwordResetTokenHash,
+		}: InviteData,
 	): Promise<InviteResponse> {
 		return await dbContext.transaction(async trx => {
 			let person: Omit<PersonRow, 'roles'> | null = await trx.queryHandler.fetch(PersonQuery.byEmail(email))
@@ -52,7 +63,12 @@ export class InviteManager {
 					(method === InviteMethod.CreatePassword ? (await this.providers.randomBytes(9)).toString('base64') : null)
 				const passwordWrapper = generatedPassword !== null ? new PasswordPlain(generatedPassword) : NoPassword
 
-				person = await trx.commandBus.execute(new CreatePersonCommand(identityId, email, passwordWrapper))
+				person = await trx.commandBus.execute(new CreatePersonCommand({
+					identityId,
+					email,
+					name,
+					password: passwordWrapper,
+				}))
 				if (method === InviteMethod.ResetPassword) {
 					const result = await trx.commandBus.execute(new CreatePasswordResetRequestCommand(person.id, INVITATION_RESET_TOKEN_EXPIRATION_MINUTES))
 					resetToken = result.token

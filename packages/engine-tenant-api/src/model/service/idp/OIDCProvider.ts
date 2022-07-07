@@ -63,6 +63,7 @@ export class OIDCProvider implements IdentityProviderHandler<SessionData, OIDCCo
 			return {
 				externalIdentifier: claims.sub,
 				email: claims.email,
+				name: claims.name,
 			}
 		} catch (e) {
 			if (e instanceof errors.RPError) {

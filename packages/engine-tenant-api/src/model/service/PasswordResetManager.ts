@@ -6,6 +6,7 @@ import { PersonRow } from '../queries'
 import { PermissionContext } from '../authorization'
 import { ProjectManager } from './ProjectManager'
 import { DatabaseContext } from '../utils'
+import { ImplementationException } from '../../exceptions'
 
 interface MailOptions {
 	project?: string
@@ -34,6 +35,9 @@ export class PasswordResetManager {
 			}
 			return null
 		})()
+		if (!person.email) {
+			throw new ImplementationException()
+		}
 
 		await this.mailer.sendPasswordResetEmail(
 			dbContext,

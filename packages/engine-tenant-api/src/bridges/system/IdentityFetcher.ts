@@ -19,7 +19,7 @@ export class IdentityFetcher {
 				it =>
 					new PersonIdentity(it.identity_id, {
 						id: it.id,
-						name: it.email.substring(0, it.email.indexOf('@')), // todo
+						name: it.email ? it.email.substring(0, it.email.indexOf('@')) : 'unnamed', // todo
 					}),
 			),
 			...otherIdentities.map(it => new ApiKeyIdentity(it.id, it.description)),

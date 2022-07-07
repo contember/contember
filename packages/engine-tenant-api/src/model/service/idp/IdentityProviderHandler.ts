@@ -9,7 +9,7 @@ export interface IDPResponse {
 
 export interface IDPClaim {
 	externalIdentifier: string
-	email: string
+	email?: string
 }
 
 export interface IdentityProviderHandler<SessionData extends {}, Configuration extends {}> {

@@ -4,7 +4,7 @@ import { InsertBuilder } from '@contember/database'
 import { MaybePassword } from '../../dtos/Password'
 
 export class CreatePersonCommand implements Command<Omit<PersonRow, 'roles'>> {
-	constructor(private readonly identityId: string, private readonly email: string, private readonly password: MaybePassword) {}
+	constructor(private readonly identityId: string, private readonly email: string | undefined, private readonly password: MaybePassword) {}
 
 	async execute({ db, providers }: Command.Args): Promise<Omit<PersonRow, 'roles'>> {
 		const id = providers.uuid()
@@ -14,7 +14,7 @@ export class CreatePersonCommand implements Command<Omit<PersonRow, 'roles'>> {
 			.into('person')
 			.values({
 				id: id,
-				email: this.email,
+				email: this.email ?? null,
 				password_hash,
 				identity_id: this.identityId,
 			})

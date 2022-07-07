@@ -9,7 +9,7 @@ export class OtpManager {
 	) {}
 
 	async prepareOtp(dbContext: DatabaseContext, person: PersonRow, label: string): Promise<OtpData> {
-		const otp = await this.otpAuthenticator.create(person.email, label)
+		const otp = await this.otpAuthenticator.create(person.email ?? 'unnamed', label)
 		await dbContext.commandBus.execute(new PrepareOtpCommand(person.id, otp.uri))
 		return otp
 	}

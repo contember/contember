@@ -763,7 +763,7 @@ export type MutationUpdateProjectMemberArgs = {
 
 export type Person = {
 	readonly __typename?: 'Person'
-	readonly email: Scalars['String']
+	readonly email?: Maybe<Scalars['String']>
 	readonly id: Scalars['String']
 	readonly identity: Identity
 	readonly otpEnabled: Scalars['Boolean']
@@ -1765,7 +1765,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
 }
 
 export type PersonResolvers<ContextType = any, ParentType extends ResolversParentTypes['Person'] = ResolversParentTypes['Person']> = {
-	email?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	email?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
 	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	identity?: Resolver<ResolversTypes['Identity'], ParentType, ContextType>
 	otpEnabled?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>

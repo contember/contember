@@ -60,9 +60,6 @@ export class OIDCProvider implements IdentityProviderHandler<SessionData, OIDCCo
 		try {
 			const result = await client.callback(redirectUrl, params, sessionData)
 			const claims = result.claims()
-			if (!claims.email) {
-				throw new IDPValidationError('email is missing in IDP response')
-			}
 			return {
 				externalIdentifier: claims.sub,
 				email: claims.email,

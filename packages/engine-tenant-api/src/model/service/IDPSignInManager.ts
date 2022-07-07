@@ -78,7 +78,7 @@ class IDPSignInManager {
 		const saveIdpIdentifier = async (personId: string) =>
 			await db.commandBus.execute(new CreatePersonIdentityProviderIdentifierCommand(provider.id, personId, claim.externalIdentifier))
 
-		const personByEmail = await db.queryHandler.fetch(PersonQuery.byEmail(claim.email))
+		const personByEmail = claim.email ? await db.queryHandler.fetch(PersonQuery.byEmail(claim.email)) : null
 		if (personByEmail) {
 			await saveIdpIdentifier(personByEmail.id)
 			return personByEmail

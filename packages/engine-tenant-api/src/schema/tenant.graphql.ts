@@ -549,7 +549,7 @@ const schema: DocumentNode = gql`
 
 	type Person {
 		id: String!
-		email: String!
+		email: String
 		otpEnabled: Boolean!
 		identity: Identity!
 	}

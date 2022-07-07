@@ -8,7 +8,7 @@ test.beforeAll(async ({}, testInfo) => {
 	projectSlug = await initContemberProject(testInfo, modelDefinition)
 })
 
-test.only('file selection', async ({ page }) => {
+test('file selection', async ({ page }) => {
 	expectNoConsoleErrors(page)
 
 	await page.goto(`/${projectSlug}/file-selection`)

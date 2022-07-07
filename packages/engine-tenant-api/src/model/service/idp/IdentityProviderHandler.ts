@@ -10,6 +10,7 @@ export interface IDPResponse {
 export interface IDPClaim {
 	externalIdentifier: string
 	email?: string
+	name?: string
 }
 
 export interface IdentityProviderHandler<SessionData extends {}, Configuration extends {}> {

@@ -92,10 +92,16 @@ class IDPSignInManager {
 		return null
 	}
 
-	private async signUp(db: DatabaseContext, claim: IDPClaim): Promise<PersonRow> {
+	private async signUp(db: DatabaseContext, { email, name, externalIdentifier }: IDPClaim): Promise<PersonRow> {
 		const roles = [TenantRole.PERSON]
 		const identityId = await db.commandBus.execute(new CreateIdentityCommand(roles))
-		const newPerson = await db.commandBus.execute(new CreatePersonCommand(identityId, claim.email, NoPassword))
+		const newPerson = await db.commandBus.execute(new CreatePersonCommand({
+			identityId,
+			email,
+			password: NoPassword,
+			name: name ?? email?.split('@')[0] ?? externalIdentifier,
+		}))
+
 		return {
 			...newPerson,
 			roles,

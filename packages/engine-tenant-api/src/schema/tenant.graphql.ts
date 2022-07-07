@@ -21,7 +21,7 @@ const schema: DocumentNode = gql`
 	}
 
 	type Mutation {
-		signUp(email: String!, password: String, passwordHash: String, roles: [String!]): SignUpResponse
+		signUp(email: String!, password: String, passwordHash: String, roles: [String!], name: String): SignUpResponse
 		signIn(email: String!, password: String!, expiration: Int, otpToken: String): SignInResponse
 		createSessionToken(email: String!, expiration: Int): CreateSessionTokenResponse
 		signOut(all: Boolean): SignOutResponse
@@ -44,9 +44,10 @@ const schema: DocumentNode = gql`
 		createResetPasswordRequest(email: String!, options: CreateResetPasswordRequestOptions): CreatePasswordResetRequestResponse
 		resetPassword(token: String!, password: String!): ResetPasswordResponse
 
-		invite(email: String!, projectSlug: String!, memberships: [MembershipInput!]!, options: InviteOptions): InviteResponse
+		invite(email: String!, name: String, projectSlug: String!, memberships: [MembershipInput!]!, options: InviteOptions): InviteResponse
 		unmanagedInvite(
 			email: String!,
+			name: String,
 			projectSlug: String!,
 			memberships: [MembershipInput!]!,
 			options: UnmanagedInviteOptions,
@@ -550,6 +551,7 @@ const schema: DocumentNode = gql`
 	type Person {
 		id: String!
 		email: String
+		name: String
 		otpEnabled: Boolean!
 		identity: Identity!
 	}

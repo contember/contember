@@ -10,6 +10,7 @@ import {
 } from '../../../model'
 import { createErrorResponse } from '../../errorUtils'
 import { UserInputError } from '@contember/graphql-utils'
+import { PersonResponseFactory } from '../../responseHelpers/PersonResponseFactory'
 
 export class SignUpMutationResolver implements MutationResolvers {
 	constructor(private readonly signUpManager: SignUpManager, private readonly apiKeyManager: ApiKeyManager) {}
@@ -32,7 +33,12 @@ export class SignUpMutationResolver implements MutationResolvers {
 			return NoPassword
 		})()
 
-		const response = await this.signUpManager.signUp(context.db, args.email, password, args.roles ?? [])
+		const response = await this.signUpManager.signUp(context.db, {
+			email: args.email,
+			name: args.name ?? undefined,
+			password,
+			roles: args.roles ?? [],
+		})
 
 		if (!response.ok) {
 			return createErrorResponse(response.error, response.errorMessage)
@@ -44,15 +50,7 @@ export class SignUpMutationResolver implements MutationResolvers {
 			ok: true,
 			errors: [],
 			result: {
-				person: {
-					id: result.person.id,
-					otpEnabled: !!result.person.otp_activated_at,
-					email: result.person.email,
-					identity: {
-						id: result.person.identity_id,
-						projects: [],
-					},
-				},
+				person: PersonResponseFactory.createPersonResponse(result.person),
 			},
 		}
 	}

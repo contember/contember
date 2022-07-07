@@ -7,8 +7,15 @@ import { Response, ResponseError, ResponseOk } from '../utils/Response'
 import { DatabaseContext } from '../utils'
 import { MaybePassword } from '../dtos'
 
+type SignUpUser = {
+	email: string
+	name?: string
+	password: MaybePassword
+	roles?: readonly string[]
+}
+
 export class SignUpManager {
-	async signUp(dbContext: DatabaseContext, email: string, password: MaybePassword, roles: readonly string[] = []): Promise<SignUpResponse> {
+	async signUp(dbContext: DatabaseContext, { email, password, roles = [] }: SignUpUser): Promise<SignUpResponse> {
 		if (await this.isEmailAlreadyUsed(dbContext, email)) {
 			return new ResponseError(SignUpErrorCode.EmailAlreadyExists, `User with email ${email} already exists`)
 		}
@@ -19,7 +26,7 @@ export class SignUpManager {
 		}
 		const person = await dbContext.transaction(async db => {
 			const identityId = await db.commandBus.execute(new CreateIdentityCommand([...roles, TenantRole.PERSON]))
-			return await db.commandBus.execute(new CreatePersonCommand(identityId, email, password))
+			return await db.commandBus.execute(new CreatePersonCommand({ identityId, email, password }))
 		})
 		return new ResponseOk(new SignUpResult(person))
 	}

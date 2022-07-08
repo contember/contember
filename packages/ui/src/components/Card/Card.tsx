@@ -71,6 +71,7 @@ export const LinkCard = memo<LinkCardProps>(
 			componentClassName,
 			toEnumViewClass(layout),
 			toFeatureClass('focus', true),
+			toStateClass('active', active),
 			toFeatureClass('hover', true),
 			toFeatureClass('press', true),
 			toStateClass('active', active),

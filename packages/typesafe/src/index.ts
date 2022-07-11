@@ -5,12 +5,13 @@ type Unpacked<T> = T extends readonly (infer U)[] ? U : never
 export type JsonObject = {
 	readonly [P in string]?: Json
 }
-
-export type Json =
+export type Scalar =
 	| string
 	| number
 	| boolean
 	| null
+export type Json =
+	| Scalar
 	| readonly Json[]
 	| JsonObject
 
@@ -58,6 +59,27 @@ export const boolean = ((): Type<boolean> => {
 	return (input: unknown, path: PropertyKey[] = []) => {
 		if (typeof input !== 'boolean') throw ParseError.format(input, path, 'boolean')
 		return input
+	}
+})()
+
+
+export const scalar = ((): Type<Scalar> => {
+	return (input: unknown, path: PropertyKey[] = []): Scalar => {
+		if (input === null) {
+			return null
+		}
+		switch (typeof input) {
+			case 'string':
+			case 'boolean':
+				return input
+			case 'number':
+				if (!Number.isFinite(input)) {
+					throw new ParseError(path, 'must be finite number', 'number')
+				}
+				return input
+			default:
+				throw ParseError.format(input, path, 'string|boolean|number')
+		}
 	}
 })()
 

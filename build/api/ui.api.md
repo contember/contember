@@ -491,12 +491,14 @@ export const DateTimeInputStringRegExp: RegExp;
 export type Default = 'default';
 
 // @public (undocumented)
-export const Description: MemoExoticComponent<({ children }: DescriptionProps) => JSX.Element>;
+export const Description: MemoExoticComponent<({ className, children }: DescriptionProps) => JSX.Element>;
 
 // @public (undocumented)
 export interface DescriptionProps {
     // (undocumented)
     children: ReactNode;
+    // (undocumented)
+    className?: string;
 }
 
 // @public (undocumented)

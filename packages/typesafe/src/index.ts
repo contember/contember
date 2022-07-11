@@ -47,6 +47,13 @@ export const number = ((): Type<number> => {
 	}
 })()
 
+export const integer = ((): Type<number> => {
+	return (input: unknown, path: PropertyKey[] = []) => {
+		if (typeof input !== 'number' || !Number.isInteger(input)) throw ParseError.format(input, path, 'integer')
+		return input
+	}
+})()
+
 export const boolean = ((): Type<boolean> => {
 	return (input: unknown, path: PropertyKey[] = []) => {
 		if (typeof input !== 'boolean') throw ParseError.format(input, path, 'boolean')

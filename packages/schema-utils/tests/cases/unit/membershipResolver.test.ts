@@ -16,7 +16,7 @@ test('read membership with entity variable', () => {
 		},
 	}, [
 		{ role: 'editor', variables: [{ name: 'localeID', values: [id1] }] },
-	])
+	], MembershipResolver.UnknownIdentity)
 	assert.lengthOf(result.errors, 0)
 	assert.deepStrictEqual(result.memberships, [
 		{ role: 'editor', variables: [{ name: 'localeID', condition: { in: [id1] } }] },
@@ -36,7 +36,7 @@ test('read fails when variable is not provided', () => {
 		},
 	}, [
 		{ role: 'editor', variables: [] },
-	])
+	], MembershipResolver.UnknownIdentity)
 	assert.deepStrictEqual(result.errors, [{
 		error: MembershipValidationErrorType.VARIABLE_EMPTY,
 		role: 'editor',
@@ -83,7 +83,7 @@ test('read membership with condition variable', () => {
 		},
 	}, [
 		{ role: 'editor', variables: [{ name: 'cond', values: [JSON.stringify({ eq: 'foo' })] }] },
-	])
+	], MembershipResolver.UnknownIdentity)
 	assert.lengthOf(result.errors, 0)
 	assert.deepStrictEqual(result.memberships, [
 		{ role: 'editor', variables: [{ name: 'cond', condition: { eq: 'foo' } }] },
@@ -103,7 +103,7 @@ test('fails on invalid condition', () => {
 		},
 	}, [
 		{ role: 'editor', variables: [{ name: 'cond', values: [JSON.stringify('abcd')] }] },
-	])
+	], MembershipResolver.UnknownIdentity)
 
 	assert.deepStrictEqual(result.errors, [{
 		error: MembershipValidationErrorType.VARIABLE_INVALID,
@@ -147,7 +147,7 @@ test('fails on undefined variable', () => {
 		},
 	}, [
 		{ role: 'editor', variables: [{ name: 'cond', values: [JSON.stringify('abcd')] }] },
-	])
+	], MembershipResolver.UnknownIdentity)
 
 	assert.deepStrictEqual(result.errors, [{
 		error: MembershipValidationErrorType.VARIABLE_NOT_FOUND,

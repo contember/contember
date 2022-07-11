@@ -11,7 +11,7 @@ import { makeExecutableSchema } from '@graphql-tools/schema'
 import { ContentApiTester } from './ContentApiTester'
 import { SystemApiTester } from './SystemApiTester'
 import { TesterStageManager } from './TesterStageManager'
-import { Client, SingleConnection } from '@contember/database'
+import { Client, Connection } from '@contember/database'
 import { createUuidGenerator } from './testUuid'
 import { project } from './project'
 import { createConnection, dbCredentials, recreateDatabase } from './dbUtils'
@@ -72,18 +72,20 @@ export class ApiTester {
 
 		const db = databaseContextFactory.create()
 
-		const singleConnection = new SingleConnection(dbCredentials(dbName), {})
-		const dbContextMigrations = databaseContextFactory
-			.withClient(singleConnection.createClient('system', {}))
-			.create()
+		const singleConnection = Connection.createSingle(dbCredentials(dbName), {})
+		await singleConnection.scope(async connection => {
+			const dbContextMigrations = databaseContextFactory
+				.withClient(new Client(connection, 'system', {}))
+				.create()
 
-		const schemaResolver = () => systemContainer.schemaVersionBuilder.buildSchema(dbContextMigrations)
-		await systemContainer
-			.systemDbMigrationsRunnerFactory(singleConnection, 'system')
-			.migrate(() => null, {
-				schemaResolver,
-				project: projectConfig,
-			})
+			const schemaResolver = () => systemContainer.schemaVersionBuilder.buildSchema(dbContextMigrations)
+			await systemContainer
+				.systemDbMigrationsRunnerFactory(connection, 'system')
+				.migrate(() => null, {
+					schemaResolver,
+					project: projectConfig,
+				})
+		})
 		await singleConnection.end()
 
 		const systemSchema = makeExecutableSchema({

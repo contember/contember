@@ -4,11 +4,11 @@ import { StageCreator } from './stages'
 import { DatabaseContext, DatabaseContextFactory } from './database'
 import { SystemDbMigrationsRunnerFactory } from '../SystemContainer'
 import {
+	Client,
 	Connection,
 	createDatabaseIfNotExists,
 	DatabaseConfig,
 	retryTransaction,
-	SingleConnection,
 } from '@contember/database'
 import { Logger } from '@contember/engine-common'
 import { Migration } from '@contember/schema-migrations'
@@ -33,20 +33,22 @@ export class ProjectInitializer {
 			// todo: use dbContext
 			logger.group(`Executing system schema migration`)
 			await createDatabaseIfNotExists(project.db, logger.write.bind(logger))
-			const singleConnection = new SingleConnection(project.db, {})
-			const systemSchema = dbContext.client.schema
-			const dbContextMigrations = databaseContextFactory
-				.withClient(singleConnection.createClient(systemSchema, { module: 'system' }))
-				.create()
+			const singleConnection = Connection.createSingle(project.db, {})
+			await singleConnection.scope(async connection => {
+				const systemSchema = dbContext.client.schema
+				const dbContextMigrations = databaseContextFactory
+					.withClient(new Client(connection, systemSchema, { module: 'system' }))
+					.create()
 
-			const schemaResolver = () => this.schemaVersionBuilder.buildSchema(dbContextMigrations)
-			await this.systemDbMigrationsRunnerFactory(singleConnection, systemSchema).migrate(
-				logger.write.bind(logger),
-				{
-					schemaResolver,
-					project,
-				},
-			)
+				const schemaResolver = () => this.schemaVersionBuilder.buildSchema(dbContextMigrations)
+				await this.systemDbMigrationsRunnerFactory(connection, systemSchema).migrate(
+					logger.write.bind(logger),
+					{
+						schemaResolver,
+						project,
+					},
+				)
+			})
 			await singleConnection.end()
 			logger.groupEnd()
 		}

@@ -3,7 +3,7 @@ import * as Typesafe from '@contember/typesafe'
 import { Acl } from '@contember/schema'
 import { HttpError } from '../common'
 import { ProjectMembershipFetcher } from './ProjectMembershipFetcher'
-import { MembershipReader, ParsedMembership } from '@contember/schema-utils'
+import { MembershipResolver, ParsedMembership } from '@contember/schema-utils'
 
 const assumeMembershipHeader = 'x-contember-assume-membership'
 
@@ -43,7 +43,7 @@ export class ProjectMembershipResolver {
 			throwNotAllowed()
 		}
 
-		const membershipReader = new MembershipReader()
+		const membershipResolver = new MembershipResolver()
 
 		const assumedMemberships = this.readAssumedMemberships(request)
 		if (assumedMemberships !== null) {
@@ -52,7 +52,7 @@ export class ProjectMembershipResolver {
 				throwNotAllowed()
 			}
 
-			const parsedMemberships = membershipReader.read(acl, assumedMemberships, identity)
+			const parsedMemberships = membershipResolver.resolve(acl, assumedMemberships, identity)
 			if (parsedMemberships.errors.length > 0) {
 				throw new HttpError(
 					`Invalid memberships in ${assumeMembershipHeader} header:\n` +
@@ -71,7 +71,7 @@ export class ProjectMembershipResolver {
 
 		return [
 			// intentionally ignoring validation errors of stored memberships
-			...membershipReader.read(acl, explicitMemberships, identity).memberships,
+			...membershipResolver.resolve(acl, explicitMemberships, identity).memberships,
 			...implicitRolesToAssign.map(it => ({ role: it, variables: [] })),
 		]
 	}

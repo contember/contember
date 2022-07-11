@@ -3180,7 +3180,7 @@ export const RepeaterFieldContainer: MemoExoticComponent<({ accessor, addButtonT
 export interface RepeaterFieldContainerPrivateProps {
     // (undocumented)
     accessor: EntityListAccessor;
-    // (undocumented)
+    // @deprecated (undocumented)
     boxLabel?: ReactNode;
     // (undocumented)
     children: ReactNode;
@@ -3214,7 +3214,7 @@ export const RepeaterInner: (<ContainerExtraProps, ItemExtraProps>(props: Repeat
 export interface RepeaterInnerProps<ContainerExtraProps, ItemExtraProps> extends RepeaterFieldContainerPublicProps, Omit<RepeaterItemProps, 'children' | 'canBeRemoved' | 'label'> {
     // (undocumented)
     accessor: EntityListAccessor;
-    // (undocumented)
+    // @deprecated (undocumented)
     boxLabel?: ReactNode;
     // (undocumented)
     children?: ReactNode;

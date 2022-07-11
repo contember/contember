@@ -18,6 +18,9 @@ export interface RepeaterFieldContainerPrivateProps {
 	entities: EntityAccessor[]
 	formatMessage: MessageFormatter<RepeaterDictionary>
 	isEmpty: boolean
+	/**
+	 * @deprecated Use label instead
+	 */
 	boxLabel?: ReactNode
 	label: ReactNode
 	createNewEntity: (initialize?: EntityAccessor.BatchUpdatesHandler) => void

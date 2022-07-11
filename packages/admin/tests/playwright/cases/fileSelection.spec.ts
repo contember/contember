@@ -14,6 +14,7 @@ test.only('file selection', async ({ page }) => {
 	await page.goto(`/${projectSlug}/file-selection`)
 	await page.waitForLoadState('networkidle')
 
+	await page.waitForTimeout(200)
 	expect(await page.screenshot({ animations: 'disabled' })).toMatchSnapshot('01-initial.png')
 
 	// await page.locator('button:has-text("Upload files")').click()

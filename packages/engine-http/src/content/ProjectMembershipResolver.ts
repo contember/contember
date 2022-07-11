@@ -32,17 +32,26 @@ export class ProjectMembershipResolver {
 
 		const implicitRoles = Object.entries(acl.roles).filter(([, role]) => role.implicit).map(([name]) => name)
 
-		if (explicitMemberships.length === 0 && implicitRoles.length === 0) {
+		const throwNotAllowed = () => {
 			const errorMessage = this.debug
 				? `You are not allowed to access project ${projectSlug}`
 				: `Project ${projectSlug} NOT found`
 			throw new HttpError(errorMessage, 404)
 		}
 
+		if (explicitMemberships.length === 0 && implicitRoles.length === 0) {
+			throwNotAllowed()
+		}
+
 		const membershipReader = new MembershipReader()
 
 		const assumedMemberships = this.readAssumedMemberships(request)
-		if (assumedMemberships.length > 0) {
+		if (assumedMemberships !== null) {
+
+			if (assumedMemberships.length === 0) {
+				throwNotAllowed()
+			}
+
 			const parsedMemberships = membershipReader.read(acl, assumedMemberships, identity)
 			if (parsedMemberships.errors.length > 0) {
 				throw new HttpError(
@@ -67,10 +76,10 @@ export class ProjectMembershipResolver {
 		]
 	}
 
-	private readAssumedMemberships(req: HeaderAccessor): readonly Acl.Membership[] {
+	private readAssumedMemberships(req: HeaderAccessor): null | readonly Acl.Membership[] {
 		const value = req.get(assumeMembershipHeader).trim()
 		if (value === '') {
-			return []
+			return null
 		}
 		let parsedValue: { memberships: readonly Acl.Membership[] }
 		try {

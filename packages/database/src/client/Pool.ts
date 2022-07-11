@@ -1,9 +1,9 @@
 import { ImplementationException } from '../exceptions'
-import { Client as PgClient } from 'pg'
 import { ClientErrorCodes } from './errorCodes'
 import EventEmitter from 'events'
-import { ClientError, DatabaseError } from './errors'
+import { DatabaseError } from './errors'
 import { PgClientFactory } from '../utils'
+import { PgClient } from './PgClient'
 
 export type PoolLogger = (message: string, status: PoolStatus) => void
 

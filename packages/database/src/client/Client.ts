@@ -10,11 +10,26 @@ class Client<ConnectionType extends Connection.ConnectionLike = Connection.Conne
 		public readonly schema: string,
 		public readonly queryMeta: Record<string, any>,
 		public readonly eventManager: EventManager = new EventManager(connection.eventManager),
-	) {}
+	) {
+	}
 
 	public forSchema(schema: string): Client<ConnectionType> {
 		const eventManager = new EventManager(this.eventManager.parent)
 		return new Client<ConnectionType>(this.connection, schema, this.queryMeta, eventManager)
+	}
+
+	async scope<T>(callback: (wrapper: Client<Connection.ConnectionLike>) => Promise<T> | T): Promise<T> {
+		return await this.connection.scope(
+			connection =>
+				callback(
+					new Client(
+						connection,
+						this.schema,
+						this.queryMeta,
+						new EventManager(connection.eventManager),
+					)),
+			{ eventManager: this.eventManager },
+		)
 	}
 
 	async transaction<T>(transactionScope: (wrapper: Client<Connection.TransactionLike>) => Promise<T> | T): Promise<T> {

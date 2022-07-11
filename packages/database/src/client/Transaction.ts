@@ -1,67 +1,53 @@
 import { Connection } from './Connection'
 import { EventManager } from './EventManager'
-import { ClientBase } from 'pg'
 import { wrapIdentifier } from '../utils'
-import { executeQuery } from './execution'
 
 export class Transaction implements Connection.TransactionLike {
-	private _isClosed = false
-
-	private queryContext: Connection.QueryContext = {}
-
-	private savepointCounter = 1
-
 	public get isClosed(): boolean {
-		return this._isClosed
+		return this.state.isClosed
 	}
 
 	constructor(
-		private readonly pgClient: ClientBase,
-		public readonly eventManager: EventManager,
-		private readonly config: Connection.QueryConfig,
-	) {}
+		private readonly connection: Connection.ConnectionLike,
+		private readonly savepointManager = new SavepointState(),
+		private readonly state = new TransactionLikeState(),
+	) {
+	}
+
+	get eventManager() {
+		return this.connection.eventManager
+	}
+
+	async scope<Result>(
+		callback: (connection: Connection.TransactionLike) => Promise<Result> | Result,
+		{ eventManager = this.eventManager }: { eventManager?: EventManager } = {},
+	): Promise<Result> {
+		return await this.connection.scope(async connection => {
+			return await callback(new Transaction(connection, this.savepointManager, this.state))
+		}, { eventManager })
+	}
 
 	async transaction<Result>(
 		callback: (connection: Connection.TransactionLike) => Promise<Result> | Result,
 		options?: { eventManager?: EventManager },
 	): Promise<Result> {
-		const savepointName = `savepoint_${this.savepointCounter++}`
-		await this.query(`SAVEPOINT ${wrapIdentifier(savepointName)}`)
-		const savepoint = new SavePoint(
-			savepointName,
-			this,
-			this.pgClient,
-			new EventManager(options?.eventManager ?? this.eventManager),
-		)
-		try {
-			const result = await callback(savepoint)
-			if (!savepoint.isClosed) {
-				await savepoint.commit()
-			}
-			return result
-		} catch (e) {
-			if (!savepoint.isClosed) {
-				await savepoint.rollback()
-			}
-			throw e
-		}
+		return await this.scope(async connection => {
+			return await this.savepointManager.execute(connection, callback)
+		}, options)
 	}
 
 	async query<Row extends Record<string, any>>(
 		sql: string,
 		parameters: any[] = [],
 		meta: Record<string, any> = {},
-		config: Connection.QueryConfig = {},
+		{ eventManager = this.eventManager, ...config }: Connection.QueryConfig = {},
 	): Promise<Connection.Result<Row>> {
 		if (this.isClosed) {
 			throw new Error('Transaction is already closed')
 		}
-		return await executeQuery<Row>(
-			this.pgClient,
-			this.eventManager,
-			{ sql, parameters, meta, ...this.config, ...config },
-			this.queryContext,
-		)
+		return await this.connection.scope(async connection => {
+			return connection.query(sql, parameters, meta, config)
+		}, { eventManager })
 	}
 
 	async rollback(): Promise<void> {
@@ -88,42 +74,59 @@ export class Transaction implements Connection.TransactionLike {
 
 	private async close(command: string) {
 		await this.query(command)
-		this._isClosed = true
+		this.state.close()
 	}
 }
 
 class SavePoint implements Connection.TransactionLike {
-	private _isClosed = false
-
-	public get isClosed(): boolean {
-		return this._isClosed
-	}
 
 	constructor(
 		public readonly savepointName: string,
-		private readonly transactionInst: Transaction,
-		private readonly pgClient: ClientBase,
-		public readonly eventManager: EventManager,
-	) {}
+		public readonly savepointManager: SavepointState,
+		private readonly connection: Connection.ConnectionLike,
+		private readonly state = new TransactionLikeState(),
+	) {
+	}
+
+	get isClosed() {
+		return this.state.isClosed
+	}
+
+	get eventManager() {
+		return this.connection.eventManager
+	}
+
+	async scope<Result>(
+		callback: (connection: Connection.TransactionLike) => Promise<Result> | Result,
+		{ eventManager = this.eventManager }: { eventManager?: EventManager } = {},
+	): Promise<Result> {
+		return this.connection.scope(async connection => {
+			return await callback(new SavePoint(this.savepointName, this.savepointManager, connection, this.state))
+		}, { eventManager })
+	}
+
 
 	async transaction<Result>(
 		callback: (connection: Connection.TransactionLike) => Promise<Result> | Result,
-		options?: { eventManager?: EventManager },
+		options: { eventManager?: EventManager } = {},
 	): Promise<Result> {
-		return await this.transactionInst.transaction(callback, {
-			eventManager: options?.eventManager ?? this.eventManager,
-		})
+		return await this.scope(async connection => {
+			return await this.savepointManager.execute(connection, callback)
+		}, options)
 	}
 
 	async query<Row extends Record<string, any>>(
 		sql: string,
 		parameters: any[] = [],
 		meta: Record<string, any> = {},
+		{ eventManager = this.eventManager, ...config }: Connection.QueryConfig = {},
 	): Promise<Connection.Result<Row>> {
 		if (this.isClosed) {
 			throw new Error(`Savepoint ${this.savepointName} is already closed.`)
 		}
-		return await this.transactionInst.query<Row>(sql, parameters, meta)
+		return await this.connection.scope(connection => {
+			return connection.query(sql, parameters, meta, config)
+		}, { eventManager })
 	}
 
 	async rollback(): Promise<void> {
@@ -136,6 +139,48 @@ class SavePoint implements Connection.TransactionLike {
 
 	private async close(sql: string) {
 		await this.query(sql)
+		this.state.close()
+	}
+}
+
+class TransactionLikeState {
+	private _isClosed = false
+
+	public get isClosed(): boolean {
+		return this._isClosed
+	}
+
+	public close(): void {
 		this._isClosed = true
+	}
+}
+
+class SavepointState {
+	public counter = 1
+
+	public async execute<Result>(
+		connection: Connection.ConnectionLike,
+		callback: (connection: Connection.TransactionLike) => Promise<Result> | Result,
+	) {
+		const savepointName = `savepoint_${this.counter++}`
+
+		await connection.query(`SAVEPOINT ${wrapIdentifier(savepointName)}`)
+		const savepoint = new SavePoint(
+			savepointName,
+			this,
+			connection,
+		)
+		try {
+			const result = await callback(savepoint)
+			if (!savepoint.isClosed) {
+				await savepoint.commit()
+			}
+			return result
+		} catch (e) {
+			if (!savepoint.isClosed) {
+				await savepoint.rollback()
+			}
+			throw e
+		}
 	}
 }

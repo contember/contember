@@ -1,10 +1,9 @@
 import { EventManager } from './EventManager'
 import { Client } from './Client'
-import { Transaction } from './Transaction'
-import { executeQuery } from './execution'
 import { Pool, PoolConfig, PoolStatus } from './Pool'
 import { createPgClientFactory } from '../utils'
 import { DatabaseConfig } from '../types'
+import { AcquiredConnection } from './AcquiredConnection'
 
 class Connection implements Connection.ConnectionLike, Connection.ClientFactory, Connection.PoolStatusProvider {
 	constructor(
@@ -26,41 +25,42 @@ class Connection implements Connection.ConnectionLike, Connection.ClientFactory,
 		return new Connection(new Pool(createPgClientFactory(config), pool), queryConfig)
 	}
 
+	public static createSingle(
+		config: DatabaseConfig,
+		queryConfig: Connection.QueryConfig = {},
+	): Connection {
+		return new Connection(new Pool(createPgClientFactory(config), { maxConnections: 1, maxIdle: 0 }), queryConfig)
+	}
+
 	public createClient(schema: string, queryMeta: Record<string, any>): Client {
 		return new Client(this, schema, queryMeta, new EventManager(this.eventManager))
 	}
 
-	public async clearPool(): Promise<void> {
-		await this.pool.closeIdle()
+	async scope<Result>(
+		callback: (connection: Connection.ConnectionLike) => Promise<Result> | Result,
+		options: { eventManager?: EventManager } = {},
+	): Promise<Result> {
+		const acquired = await this.pool.acquire()
+		const eventManager = new EventManager(options.eventManager ?? this.eventManager)
+		try {
+			const connection = new AcquiredConnection(acquired.client, eventManager, this.queryConfig)
+			const result = await callback(connection)
+			this.pool.release(acquired)
+
+			return result
+		} catch (e) {
+			this.pool.dispose(acquired)
+			throw e
+		}
 	}
 
 	async transaction<Result>(
 		callback: (connection: Connection.TransactionLike) => Promise<Result> | Result,
 		options: { eventManager?: EventManager } = {},
 	): Promise<Result> {
-		const acquired = await this.pool.acquire()
-		const eventManager = new EventManager(options.eventManager ?? this.eventManager)
-		await executeQuery(acquired.client, eventManager, {
-			sql: 'BEGIN',
-			...this.queryConfig,
-		})
-		const transaction = new Transaction(acquired.client, eventManager, this.queryConfig)
-		try {
-			const result = await callback(transaction)
-
-			await transaction.commitUnclosed()
-			this.pool.release(acquired)
-
-			return result
-		} catch (e) {
-			await transaction.rollbackUnclosed()
-			this.pool.dispose(acquired)
-			throw e
-		}
-	}
-
-	async end(): Promise<void> {
-		await this.pool.end()
+		return await this.scope(async connection => {
+			return await connection.transaction(callback)
+		}, options)
 	}
 
 	async query<Row extends Record<string, any>>(
@@ -69,16 +69,17 @@ class Connection implements Connection.ConnectionLike, Connection.ClientFactory,
 		meta: Record<string, any> = {},
 		{ eventManager, ...config }: Connection.QueryConfig = {},
 	): Promise<Connection.Result<Row>> {
-		const client = await this.pool.acquire()
-		const query: Connection.Query = { sql, parameters, meta, ...this.queryConfig, ...config }
-		try {
-			const result = await executeQuery<Row>(client.client, eventManager ?? this.eventManager, query, {})
-			this.pool.release(client)
-			return result
-		} catch (e) {
-			this.pool.dispose(client)
-			throw e
-		}
+		return await this.scope(async connection => {
+			return await connection.query(sql, parameters, meta, config)
+		}, { eventManager })
+	}
+
+	async end(): Promise<void> {
+		await this.pool.end()
+	}
+
+	public async clearPool(): Promise<void> {
+		await this.pool.closeIdle()
 	}
 
 	getPoolStatus(): PoolStatus {
@@ -115,7 +116,12 @@ namespace Connection {
 		& Connection.ClientFactory
 		& Connection.PoolStatusProvider
 
-	export interface ConnectionLike extends Transactional, Queryable {}
+	export interface ConnectionLike extends Transactional, Queryable {
+		scope<Result>(
+			callback: (connection: ConnectionLike) => Promise<Result> | Result,
+			options?: { eventManager?: EventManager },
+		): Promise<Result>
+	}
 
 	export interface ClientFactory {
 		createClient(schema: string, queryMeta: Record<string, any>): Client
@@ -133,10 +139,6 @@ namespace Connection {
 		commit(): Promise<void>
 	}
 
-	export interface QueryContext {
-		previousQueryEnd?: number
-	}
-
 	export interface Query {
 		readonly sql: string
 		readonly parameters: any[]
@@ -147,8 +149,9 @@ namespace Connection {
 		readonly rowCount: number
 		readonly rows: Row[]
 		readonly timing?: {
-			totalDuration: number
 			selfDuration: number
+			/** @deprecated both selfDuration and totalDuration now contains same number */
+			totalDuration: number
 		}
 	}
 

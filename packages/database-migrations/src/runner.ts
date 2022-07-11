@@ -91,55 +91,57 @@ export default async (
 	options: RunnerOption,
 ): Promise<{ name: string }[]> => {
 	const logger = options.log
-	return await withDatabaseAdvisoryLock(connection, PG_MIGRATE_LOCK_ID, async db => {
-		await db.query(`CREATE SCHEMA IF NOT EXISTS ${wrapIdentifier(options.schema)}`)
-		await db.query(`SET search_path TO ${wrapIdentifier(options.schema)}`)
-		await ensureMigrationsTable(db, options)
+	return await connection.scope(db =>
+		withDatabaseAdvisoryLock(db, PG_MIGRATE_LOCK_ID, async () => {
+			await db.query(`CREATE SCHEMA IF NOT EXISTS ${wrapIdentifier(options.schema)}`)
+			await db.query(`SET search_path TO ${wrapIdentifier(options.schema)}`)
+			await ensureMigrationsTable(db, options)
 
 
-		const runNames = await getRunMigrations(db, options)
-		const migrations = await getMigrations()
-		checkOrder(runNames, migrations)
+			const runNames = await getRunMigrations(db, options)
+			const migrations = await getMigrations()
+			checkOrder(runNames, migrations)
 
-		const toRun: Migration[] = getMigrationsToRun(options, runNames, migrations)
+			const toRun: Migration[] = getMigrationsToRun(options, runNames, migrations)
 
-		if (!toRun.length) {
-			return []
-		}
-		logger(`Migrating ${toRun.length} file(s):`)
-		return await db.transaction(async trx => {
-			try {
-				for (const migration of toRun) {
-					try {
-						logger(`  Executing migration ${migration.name}...`)
-						const migrationsBuilder = createMigrationBuilder()
-						await migration.migration(migrationsBuilder, options.migrationArgs)
-						const steps = migrationsBuilder.getSqlSteps()
-
-						for (const sql of steps) {
-							await trx.query(sql)
-						}
-
-						await trx.query(
-							`INSERT INTO ${getMigrationsTableName(options)} (name, run_on) VALUES (?, NOW());`,
-							[migration.name],
-						)
-						logger(`  Done`)
-					} catch (e) {
-						logger(`  FAILED`)
-						throw e
-					}
-				}
-			} catch (err) {
-				logger('Rolling back attempted migration ...')
-				await trx.rollback()
-				throw err
+			if (!toRun.length) {
+				return []
 			}
-			return toRun.map(m => ({
-				name: m.name,
-			}))
+			logger(`Migrating ${toRun.length} file(s):`)
+			return await db.transaction(async trx => {
+				try {
+					for (const migration of toRun) {
+						try {
+							logger(`  Executing migration ${migration.name}...`)
+							const migrationsBuilder = createMigrationBuilder()
+							await migration.migration(migrationsBuilder, options.migrationArgs)
+							const steps = migrationsBuilder.getSqlSteps()
 
-		})
-	})
+							for (const sql of steps) {
+								await trx.query(sql)
+							}
+
+							await trx.query(
+								`INSERT INTO ${getMigrationsTableName(options)} (name, run_on) VALUES (?, NOW());`,
+								[migration.name],
+							)
+							logger(`  Done`)
+						} catch (e) {
+							logger(`  FAILED`)
+							throw e
+						}
+					}
+				} catch (err) {
+					logger('Rolling back attempted migration ...')
+					await trx.rollback()
+					throw err
+				}
+				return toRun.map(m => ({
+					name: m.name,
+				}))
+
+			})
+		}),
+	)
 
 }

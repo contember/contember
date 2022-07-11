@@ -1,11 +1,11 @@
 import { assert, test } from 'vitest'
-import { MembershipReader, MembershipValidationErrorType } from '../../../src'
+import { MembershipResolver, MembershipValidationErrorType } from '../../../src'
 import { Acl } from '@contember/schema'
 
 const id1 = 'bff057b3-11f7-4bc7-abe3-1f2ef266824d'
 test('read membership with entity variable', () => {
-	const reader = new MembershipReader()
-	const result = reader.read({
+	const reader = new MembershipResolver()
+	const result = reader.resolve({
 		roles: {
 			editor: {
 				variables: {
@@ -24,8 +24,8 @@ test('read membership with entity variable', () => {
 })
 
 test('read fails when variable is not provided', () => {
-	const reader = new MembershipReader()
-	const result = reader.read({
+	const reader = new MembershipResolver()
+	const result = reader.resolve({
 		roles: {
 			editor: {
 				variables: {
@@ -49,8 +49,8 @@ test('read fails when variable is not provided', () => {
 })
 
 test('read membership with predefined variable', () => {
-	const reader = new MembershipReader()
-	const result = reader.read({
+	const reader = new MembershipResolver()
+	const result = reader.resolve({
 		roles: {
 			editor: {
 				variables: {
@@ -71,8 +71,8 @@ test('read membership with predefined variable', () => {
 })
 
 test('read membership with condition variable', () => {
-	const reader = new MembershipReader()
-	const result = reader.read({
+	const reader = new MembershipResolver()
+	const result = reader.resolve({
 		roles: {
 			editor: {
 				variables: {
@@ -91,8 +91,8 @@ test('read membership with condition variable', () => {
 })
 
 test('fails on invalid condition', () => {
-	const reader = new MembershipReader()
-	const result = reader.read({
+	const reader = new MembershipResolver()
+	const result = reader.resolve({
 		roles: {
 			editor: {
 				variables: {
@@ -117,8 +117,8 @@ test('fails on invalid condition', () => {
 })
 
 test('fails on undefined role', () => {
-	const reader = new MembershipReader()
-	const result = reader.read({
+	const reader = new MembershipResolver()
+	const result = reader.resolve({
 		roles: {
 		},
 	}, [
@@ -137,8 +137,8 @@ test('fails on undefined role', () => {
 })
 
 test('fails on undefined variable', () => {
-	const reader = new MembershipReader()
-	const result = reader.read({
+	const reader = new MembershipResolver()
+	const result = reader.resolve({
 		roles: {
 			editor: {
 				variables: {},

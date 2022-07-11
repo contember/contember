@@ -1,11 +1,11 @@
 import { ProjectSchemaResolver } from '../type'
-import { MembershipValidationError, MembershipValidationErrorType, MembershipReader } from '@contember/schema-utils'
+import { MembershipValidationError, MembershipValidationErrorType, MembershipResolver } from '@contember/schema-utils'
 import { Acl } from '@contember/schema'
 
 export class MembershipValidator {
 	constructor(
 		private readonly schemaResolver: ProjectSchemaResolver,
-		private readonly reader: MembershipReader = new MembershipReader(),
+		private readonly resolver: MembershipResolver = new MembershipResolver(),
 	) {}
 
 	async validate(project: string, memberships: readonly Acl.Membership[]): Promise<MembershipValidationError[]> {
@@ -13,7 +13,7 @@ export class MembershipValidator {
 		if (!schema) {
 			throw new Error()
 		}
-		return this.reader.read(schema.acl, memberships).errors
+		return this.resolver.resolve(schema.acl, memberships).errors
 	}
 }
 

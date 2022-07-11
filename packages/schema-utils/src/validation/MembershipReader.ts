@@ -1,7 +1,6 @@
 import { Acl, Input } from '@contember/schema'
 import { getRoleVariables } from '../acl'
-import { conditionSchema } from '../type-schema/condition'
-import { anyJson } from '@contember/typesafe'
+import { conditionSchema } from '../type-schema'
 
 const NIL_UUID = '00000000-0000-0000-0000-000000000000'
 
@@ -84,7 +83,7 @@ export class MembershipReader {
 
 			} else if (variable.type === Acl.VariableType.condition) {
 				try {
-					const conditions = inputVariable.values.map(it => conditionSchema(anyJson)(JSON.parse(it)))
+					const conditions = inputVariable.values.map(it => conditionSchema()(JSON.parse(it)))
 					parsedVariables.push({
 						name,
 						condition: conditions.length === 1 ? conditions[0] : { or: conditions },

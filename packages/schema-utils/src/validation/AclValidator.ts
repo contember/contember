@@ -136,7 +136,7 @@ export class AclValidator {
 					}
 				} else {
 					try {
-						conditionSchema(anyJson)(ctx.value)
+						conditionSchema(ctx.column.type)(ctx.value)
 					} catch (e: any) {
 						errorBuilder.for(...ctx.path).add(`Invalid condition (${e.message}): ${JSON.stringify(ctx.value)}`)
 					}

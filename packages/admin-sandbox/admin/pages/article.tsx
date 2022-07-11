@@ -41,7 +41,7 @@ export const List = () => <DataGridPage
 	tileSize={100}
 	rendererProps={{
 		actions: <LinkButton to="article/create">Add article</LinkButton>,
-		layout: 'full-width',
+		pageContentLayout: 'stretch',
 		title: 'Articles',
 	}}
 >

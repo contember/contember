@@ -1746,18 +1746,20 @@ export interface LayoutChromeProps extends ThemeScheme {
 }
 
 // @public (undocumented)
-export const LayoutPage: MemoExoticComponent<({ afterTitle, actions, children, headingProps, layout, navigation, side, title, ...props }: LayoutPageProps) => JSX.Element>;
+export const LayoutPage: MemoExoticComponent<({ actions, afterTitle, children, fit, headingProps, layout, navigation, pageContentLayout, side, title, ...props }: LayoutPageProps) => JSX.Element>;
 
 // @public (undocumented)
 export const LayoutPageAside: MemoExoticComponent<({ children }: NativeProps<HTMLDivElement>) => JSX.Element>;
 
 // @public (undocumented)
-export const LayoutPageContent: MemoExoticComponent<({ children, layout }: LayoutPageContentProps) => JSX.Element>;
+export const LayoutPageContent: MemoExoticComponent<({ children, layout, pageContentLayout }: LayoutPageContentProps) => JSX.Element>;
 
 // @public (undocumented)
 export interface LayoutPageContentProps extends NativeProps<HTMLDivElement> {
-    // (undocumented)
+    // @deprecated (undocumented)
     layout?: 'default' | 'full-width';
+    // (undocumented)
+    pageContentLayout?: 'center' | 'start' | 'end' | 'stretch';
 }
 
 // @public (undocumented)
@@ -1767,7 +1769,11 @@ export interface LayoutPageProps extends Omit<TitleBarProps, 'after' | 'children
     // (undocumented)
     children?: ReactNode;
     // (undocumented)
-    layout?: LayoutPageContentProps['layout'];
+    fit?: 'content' | 'none';
+    // @deprecated (undocumented)
+    layout?: LayoutPageContentProps['pageContentLayout'];
+    // (undocumented)
+    pageContentLayout?: LayoutPageContentProps['pageContentLayout'];
     // (undocumented)
     side?: ReactNode;
     // (undocumented)
@@ -1944,7 +1950,7 @@ export type NumberInputProps = TextInputProps<number>;
 export type OpenDialog<Result> = (options: DialogSettings<Result>) => Promise<Result | undefined>;
 
 // @public @deprecated (undocumented)
-export const PageLayoutContent: MemoExoticComponent<({ children, layout }: LayoutPageContentProps) => JSX.Element>;
+export const PageLayoutContent: MemoExoticComponent<({ children, layout, pageContentLayout }: LayoutPageContentProps) => JSX.Element>;
 
 // @public (undocumented)
 const paragraphNumbered: string[];

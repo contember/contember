@@ -10,23 +10,25 @@ export type MutableEntityListPageRendererProps<ContainerExtraProps, ItemExtraPro
 
 export const MutableEntityListPageRenderer = Component(
 	<ContainerExtraProps, ItemExtraProps>({
+		actions,
 		children,
+		fit,
+		headingProps,
+		layout,
+		navigation,
+		pageContentLayout,
 		side,
 		title,
-		navigation,
-		headingProps,
-		actions,
-		layout,
-
 		...entityListProps
 	}: MutableEntityListPageRendererProps<ContainerExtraProps, ItemExtraProps>) => (
 		<LayoutRenderer
+			actions={actions ?? <PersistButton/>}
+			fit={fit}
+			headingProps={headingProps}
+			navigation={navigation}
+			pageContentLayout={pageContentLayout ?? layout}
 			side={side}
 			title={title}
-			navigation={navigation}
-			actions={actions ?? <PersistButton/>}
-			headingProps={headingProps}
-			layout={layout}
 		>
 			<MutableEntityListRenderer {...entityListProps}>{children}</MutableEntityListRenderer>
 		</LayoutRenderer>

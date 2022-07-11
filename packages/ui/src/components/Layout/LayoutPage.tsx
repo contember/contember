@@ -1,7 +1,7 @@
 import classNames from 'classnames'
 import { CSSProperties, memo, ReactNode, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { useClassNamePrefix } from '../../auxiliary'
-import { toSchemeClass, toThemeClass } from '../../utils'
+import { toEnumClass, toSchemeClass, toThemeClass } from '../../utils'
 import { SectionTabs } from '../SectionTabs'
 import { TitleBar, TitleBarProps } from '../TitleBar'
 import { LayoutPageAside } from './LayoutPageAside'
@@ -11,18 +11,23 @@ import { ThemeScheme } from './Types'
 export interface LayoutPageProps extends Omit<TitleBarProps, 'after' | 'children'>, ThemeScheme {
 	afterTitle?: TitleBarProps['after']
 	children?: ReactNode
-	layout?: LayoutPageContentProps['layout']
+	fit?: 'content' | 'none'
+	/** @deprecated Use `pageContentLayout` prop */
+	layout?: LayoutPageContentProps['pageContentLayout']
+	pageContentLayout?: LayoutPageContentProps['pageContentLayout']
 	side?: ReactNode
 	title?: ReactNode
 }
 
 export const LayoutPage = memo(({
-	afterTitle,
 	actions,
+	afterTitle,
 	children,
+	fit = 'content',
 	headingProps,
 	layout,
 	navigation,
+	pageContentLayout,
 	side,
 	title,
 	...props
@@ -100,11 +105,12 @@ export const LayoutPage = memo(({
 			ref={contentRef}
 			className={classNames(
 				`${prefix}layout-page-content-wrap`,
+				toEnumClass('fit-', fit),
 				showDivider ? 'view-aside-divider' : undefined,
 			)}
 			style={{ '--cui-content-offset-top': `${contentOffsetTop}px` } as CSSProperties}
 		>
-			<LayoutPageContent layout={layout}>
+			<LayoutPageContent pageContentLayout={pageContentLayout ?? layout}>
 				{children}
 			</LayoutPageContent>
 			{side && <LayoutPageAside>{side}</LayoutPageAside>}

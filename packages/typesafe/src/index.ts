@@ -22,7 +22,7 @@ export interface Type<T extends Json | {readonly [K in string]?: Json} | undefin
 
 export class ParseError extends Error {
 	constructor(readonly path: PropertyKey[], readonly reason: string, readonly expected?: string) {
-		super(`value at path /${path.join('/')}: ${reason}`)
+		super(`value at ${path.length ? `path /${path.join('/')}` : 'root'}: ${reason}`)
 	}
 
 	static format(input: unknown, path: PropertyKey[], expected: string) {
@@ -173,6 +173,26 @@ export const partial = <T extends Record<string, Type<Json | undefined>>>(inner:
 			}
 			return [[k, val]]
 		})) as any
+	}
+
+	type.inner = inner
+
+	return type
+}
+
+export const noExtraProps = <T extends JsonObject>(inner: Type<T>) => {
+	const type = (input: unknown, path: PropertyKey[] = []): T => {
+		const result = inner(input, path)
+		if (!(typeof input === 'object' && typeof input !== null && typeof result === 'object' && result !== null)) {
+			return result
+		}
+		const resultProps = new Set(Object.keys(result))
+		for (const key in input) {
+			if (!resultProps.has(key)) {
+				throw fail(path, `extra property ${key} found`)
+			}
+		}
+		return result
 	}
 
 	type.inner = inner

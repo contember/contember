@@ -13,7 +13,7 @@ export class MembershipValidator {
 		if (!schema) {
 			throw new Error()
 		}
-		return this.resolver.resolve(schema.acl, memberships).errors
+		return this.resolver.resolve(schema.acl, memberships, MembershipResolver.UnknownIdentity).errors
 	}
 }
 

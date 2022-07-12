@@ -1,7 +1,7 @@
 import { renderHook } from '@testing-library/react-hooks'
+import { createRef } from 'react'
 import { describe, expect, test } from 'vitest'
 import { useNativeInput } from '../../src'
-import { createRef } from 'react'
 
 
 describe('useNativeInput hook', () => {
@@ -12,6 +12,7 @@ describe('useNativeInput hook', () => {
 			{
 			  "className": "",
 			  "disabled": undefined,
+			  "id": undefined,
 			  "max": undefined,
 			  "min": undefined,
 			  "name": undefined,
@@ -48,6 +49,7 @@ describe('useNativeInput hook', () => {
 			{
 			  "className": "is-active is-focused is-hovered is-loading is-read-only is-required scheme-light cui-theme theme-danger view-seamless is-invalid",
 			  "disabled": true,
+			  "id": undefined,
 			  "max": "100",
 			  "min": "10",
 			  "name": "test,",

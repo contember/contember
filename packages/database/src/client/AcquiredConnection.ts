@@ -68,19 +68,17 @@ export class AcquiredConnection implements Connection.ConnectionLike {
 
 				let result: Connection.Result<Row>
 				if (timing) {
-					const startHrTime = process.hrtime()
-					const startTimeUs = startHrTime[0] * 1e6 + Math.floor(startHrTime[1] / 1000)
+					const startHrTime = process.hrtime.bigint()
 
 					result = await exec()
 
-					const endHrTime = process.hrtime()
-					const endTimeUs = endHrTime[0] * 1e6 + Math.floor(endHrTime[1] / 1000)
-					const duration = endTimeUs - startTimeUs
+					const endHrTime = process.hrtime.bigint()
+					const durationUs = Math.floor(Number(endHrTime - startHrTime) / 1000)
 					result = {
 						...result,
 						timing: {
-							selfDuration: duration,
-							totalDuration: duration,
+							selfDuration: durationUs,
+							totalDuration: durationUs,
 						},
 					}
 				} else {

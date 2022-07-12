@@ -8,6 +8,7 @@ import { ExportExecutor, ExportRequest } from './ExportExecutor'
 import { ParseError } from '@contember/typesafe'
 import { Logger } from '@contember/engine-common'
 import { ProjectContainer } from '../ProjectContainer'
+import { ProjectRole } from '@contember/schema'
 
 type ExportApiMiddlewareState =
 	& TimerMiddlewareState
@@ -31,10 +32,6 @@ export class ExportApiMiddlewareFactory {
 
 			const authResult = await groupContainer.authenticator.authenticate({ request, timer })
 			koaContext.state.authResult = authResult
-
-			if (!authResult.roles.includes(TenantRole.SUPER_ADMIN) && !authResult.roles.includes(TenantRole.PROJECT_ADMIN)) {
-				throw new HttpError(`Not allowed`, 403)
-			}
 
 			let exportRequest: ExportRequest
 
@@ -62,6 +59,28 @@ export class ExportApiMiddlewareFactory {
 
 				if (projectContainer === undefined) {
 					throw new HttpError(`Project ${project.slug} NOT found`, 400)
+				}
+
+				const systemContext = projectContainer.systemDatabaseContextFactory.create()
+				const schema = await projectContainer.contentSchemaResolver.getSchema(systemContext, project.slug)
+				const memberships = await timer('MembershipFetch', () => groupContainer.projectMembershipResolver.resolveMemberships({
+					request,
+					acl: schema.acl,
+					projectSlug: project.slug,
+					identity: {
+						id: authResult.identityId,
+						roles: authResult.roles,
+					},
+				}))
+
+				const projectRoles = memberships.map(it => it.role)
+
+				if (
+					!authResult.roles.includes(TenantRole.SUPER_ADMIN)
+					&& !authResult.roles.includes(TenantRole.PROJECT_ADMIN)
+					&& !projectRoles.includes(ProjectRole.ADMIN)
+				) {
+					throw new HttpError(`Not allowed`, 403)
 				}
 
 				projectContainers[project.slug] = projectContainer

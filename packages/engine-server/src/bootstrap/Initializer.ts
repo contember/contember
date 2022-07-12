@@ -17,7 +17,6 @@ export class Initializer {
 		await tenantContainer.migrationsRunner.run(logger.write.bind(logger))
 		logger.groupEnd()
 
-		const systemContainer = groupContainer.systemContainer
 		const projects: string[] = []
 
 		const tenantProjects = await tenantContainer.projectManager.getProjects(tenantContainer.databaseContext)
@@ -32,7 +31,6 @@ export class Initializer {
 			}
 			const project = projectContainer.project
 			projects.push(project.slug)
-			await systemContainer.projectInitializer.initialize(projectContainer.systemDatabaseContextFactory, project, logger)
 			logger.groupEnd()
 		}
 		// eslint-disable-next-line no-console

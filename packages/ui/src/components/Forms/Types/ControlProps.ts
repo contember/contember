@@ -8,7 +8,7 @@ type All<T> = {
 	[P in keyof Required<T>]: Pick<T, P> extends Required<Pick<T, P>> ? T[P] : (T[P] | undefined);
 }
 
-export interface ValidationSteteProps {
+export interface ValidationStateProps {
 	onValidationStateChange?: (error?: string) => void
 	validationState?: ValidationState
 }
@@ -37,31 +37,36 @@ export interface ControlDisplayProps {
 	scheme?: Scheme
 	size?: Size
 	type?: never
+	placeholder?: string | null
+	name?: string
 }
 
 export interface ControlValueProps<V> {
 	defaultValue?: V | null | undefined
 	onChange?: (value?: V | null) => void
+	notNull?: boolean
+	value?: V | null
+}
+
+export interface ControlConstraintProps<V> {
 	max?: V | null
 	min?: V | null
-	name?: string
-	notNull?: boolean
-	placeholder?: string | null
-	value?: V | null
 }
 
 export type ControlProps<V> =
 	& ControlDisplayProps
-	& ValidationSteteProps
+	& ValidationStateProps
 	& ControlStateProps
 	& ControlFocusProps
+	& ControlConstraintProps<V>
 	& ControlValueProps<V>
 
 export type AllControlProps<V> = Omit<All<ControlProps<V>>, 'type'>
 export type ControlPropsKeys<V> = keyof ControlProps<V>
 
 export type VisuallyDependentControlProps =
-	ControlStateProps
+	& ControlStateProps
 	& ControlDisplayProps
-	& Pick<ValidationSteteProps, 'validationState'>
+	& Pick<ValidationStateProps, 'validationState'>
+
 export type AllVisuallyDependentControlProps = Omit<All<VisuallyDependentControlProps>, 'type'>

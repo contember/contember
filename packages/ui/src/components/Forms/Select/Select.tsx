@@ -2,7 +2,8 @@ import classNames from 'classnames'
 import { AllHTMLAttributes, DetailedHTMLProps, ForwardedRef, forwardRef, memo, OptionHTMLAttributes, ReactElement, RefAttributes, useCallback, useMemo } from 'react'
 import { useComponentClassName } from '../../../auxiliary'
 import type { ControlProps, ControlPropsKeys } from '../Types'
-import { useNativeInput } from '../useNativeInput'
+import { useNativeInput } from '../hooks/useNativeInput'
+import { useTextBasedInput } from '../hooks/useTextBasedInput'
 
 export interface SelectOption<V = string> {
 	value: V
@@ -40,7 +41,7 @@ const SelectComponent = <V extends any>({
 	const notNullOrRequired = outerProps.notNull || outerProps.required
 	const displayBuiltinEmptyOption = !notNullOrRequired
 
-	const { props: inputProps } = useNativeInput<HTMLSelectElement>({
+	const inputProps = useTextBasedInput<HTMLSelectElement>({
 		...outerProps,
 		defaultValue: useMemo(() => defaultValue !== undefined
 			? deriveSelectIndexValue(options.findIndex(option => option.value === defaultValue))

@@ -2,8 +2,8 @@ import classNames from 'classnames'
 import { forwardRef, memo, useCallback, useRef } from 'react'
 import { useComponentClassName } from '../../../auxiliary'
 import { toViewClass } from '../../../utils'
-import { useNativeInput } from '../useNativeInput'
 import type { FloatInputProps } from './Types'
+import { useTextBasedInput } from '../hooks/useTextBasedInput'
 
 export const FloatInput = memo(
 	forwardRef<HTMLInputElement, FloatInputProps>(({
@@ -18,7 +18,7 @@ export const FloatInput = memo(
 	}, forwardedRed) => {
 		const number = useRef<string>()
 
-		const { props } = useNativeInput<HTMLInputElement>({
+		const props = useTextBasedInput<HTMLInputElement>({
 			...outerProps,
 			className: classNames(
 				useComponentClassName('text-input'),

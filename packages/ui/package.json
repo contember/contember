@@ -30,7 +30,8 @@
 		"ae:build": "api-extractor run --local",
 		"ae:test": "api-extractor run",
 		"storybook": "start-storybook -p 6006",
-		"build-storybook": "build-storybook"
+		"build-storybook": "build-storybook",
+		"test": "vitest"
 	},
 	"dependencies": {
 		"@blueprintjs/icons": "3.29.0",
@@ -51,12 +52,13 @@
 	},
 	"devDependencies": {
 		"@babel/core": "7.15.5",
-		"@storybook/addons": "6.5.7",
 		"@storybook/addon-actions": "6.5.7",
 		"@storybook/addon-essentials": "6.5.7",
 		"@storybook/addon-links": "6.5.7",
+		"@storybook/addons": "6.5.7",
 		"@storybook/preset-scss": "1.0.3",
 		"@storybook/react": "6.5.7",
+		"@testing-library/react-hooks": "^8.0.1",
 		"@types/node": "15.0.2",
 		"@types/react": "17.0.30",
 		"@types/react-dom": "17.0.9",

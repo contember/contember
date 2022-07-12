@@ -1,7 +1,7 @@
 import classNames from 'classnames'
-import { toEnumClass, toEnumStateClass, toEnumViewClass, toStateClass, toThemeClass } from '../../utils'
-import { AllVisuallyDependentControlProps } from './Types'
-import { VisuallyDependentControlProps } from './Types/ControlProps'
+import { toEnumClass, toEnumStateClass, toEnumViewClass, toStateClass, toThemeClass } from '../../../utils'
+import { AllVisuallyDependentControlProps } from '../Types'
+import { VisuallyDependentControlProps } from '../Types/ControlProps'
 
 /**
  * Generates className prop from the set of props
@@ -33,10 +33,10 @@ export function useInputClassName<P extends AllVisuallyDependentControlProps | V
   // ValidationSteteProps
   validationState,
 
-	...restNotImplementd
+	...restNotImplemented
 }: P): string {
-	if (import.meta.env.DEV && Object.keys(restNotImplementd).length !== 0) {
-		console.warn(`New props need to be implemented, see ...restNotImplementd: ${Object.keys(restNotImplementd).join(', ')}`)
+	if (import.meta.env.DEV && Object.keys(restNotImplemented).length !== 0) {
+		console.warn(`New props need to be implemented, see ...restNotImplemented: ${Object.keys(restNotImplemented).join(', ')}`)
 	}
 
   let finalIntent: typeof intent = disabled

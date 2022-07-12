@@ -2,8 +2,8 @@ import classNames from 'classnames'
 import { forwardRef, memo } from 'react'
 import { useComponentClassName } from '../../../auxiliary'
 import { toViewClass } from '../../../utils'
-import { useNativeInput } from '../useNativeInput'
 import type { UrlInputProps } from './Types'
+import { useTextBasedInput } from '../hooks/useTextBasedInput'
 
 export const UrlInput = memo(
 	forwardRef<HTMLInputElement, UrlInputProps>(({
@@ -11,7 +11,7 @@ export const UrlInput = memo(
 		withTopToolbar,
 		...outerProps
 	}, forwardedRed) => {
-		const { props } = useNativeInput<HTMLInputElement>({
+		const props = useTextBasedInput<HTMLInputElement>({
 			...outerProps,
 			className: classNames(
 				useComponentClassName('text-input'),

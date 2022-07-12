@@ -1,12 +1,13 @@
 import { AllHTMLAttributes } from 'react'
 import type {
-  ColorString,
-  ControlProps,
-  ControlPropsKeys,
-  DateInputString,
-  DateTimeInputString,
-  MonthInputString, TimeInputString,
-  WeekInputString,
+	ColorString,
+	ControlProps,
+	ControlPropsKeys,
+	DateInputString,
+	DateTimeInputString,
+	MonthInputString,
+	TimeInputString,
+	WeekInputString,
 } from '../Types'
 
 export interface RestHTMLTextInputProps extends Omit<AllHTMLAttributes<HTMLInputElement>, ControlPropsKeys<string>> {}

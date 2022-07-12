@@ -3,8 +3,8 @@ import { forwardRef, memo } from 'react'
 import { useComponentClassName } from '../../../auxiliary'
 import { toViewClass } from '../../../utils'
 import { assertTimeString } from '../Types'
-import { useNativeInput } from '../useNativeInput'
 import type { TimeInputProps } from './Types'
+import { useTextBasedInput } from '../hooks/useTextBasedInput'
 
 export const TimeInput = memo(
 	forwardRef<HTMLInputElement, TimeInputProps>(({
@@ -17,7 +17,7 @@ export const TimeInput = memo(
 		outerProps.min && assertTimeString(outerProps.min)
 		outerProps.value && assertTimeString(outerProps.value)
 
-		const { props } = useNativeInput<HTMLInputElement>({
+		const props = useTextBasedInput<HTMLInputElement>({
 			...outerProps,
 			className: classNames(
 				useComponentClassName('text-input'),

@@ -3,8 +3,8 @@ import { forwardRef, memo } from 'react'
 import { useComponentClassName } from '../../../auxiliary'
 import { toViewClass } from '../../../utils'
 import { assertWeekInputString } from '../Types'
-import { useNativeInput } from '../useNativeInput'
 import type { WeekInputProps } from './Types'
+import { useTextBasedInput } from '../hooks/useTextBasedInput'
 
 export const WeekInput = memo(
 	forwardRef<HTMLInputElement, WeekInputProps>(({
@@ -16,7 +16,7 @@ export const WeekInput = memo(
 		outerProps.min && assertWeekInputString(outerProps.min)
 		outerProps.value && assertWeekInputString(outerProps.value)
 
-		const { props } = useNativeInput<HTMLInputElement>({
+		const props = useTextBasedInput<HTMLInputElement>({
 			...outerProps,
 			className: classNames(
 				useComponentClassName('text-input'),

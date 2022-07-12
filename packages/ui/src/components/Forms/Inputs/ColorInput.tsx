@@ -3,8 +3,8 @@ import { forwardRef, memo } from 'react'
 import { useComponentClassName } from '../../../auxiliary'
 import { toViewClass } from '../../../utils'
 import { assertColorString } from '../Types'
-import { useNativeInput } from '../useNativeInput'
 import type { ColorInputProps } from './Types'
+import { useTextBasedInput } from '../hooks/useTextBasedInput'
 
 export const ColorInput = memo(
 	forwardRef<HTMLInputElement, ColorInputProps>(({
@@ -14,7 +14,7 @@ export const ColorInput = memo(
 	}, forwardedRed) => {
 		outerProps.value && assertColorString(outerProps.value)
 
-		const { props } = useNativeInput<HTMLInputElement>({
+		const props = useTextBasedInput<HTMLInputElement>({
 			...outerProps,
 			className: classNames(
 				useComponentClassName('text-input'),

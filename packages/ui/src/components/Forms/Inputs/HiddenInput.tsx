@@ -1,8 +1,8 @@
 import classNames from 'classnames'
 import { forwardRef, memo } from 'react'
 import { useComponentClassName } from '../../../auxiliary'
-import { useNativeInput } from '../useNativeInput'
 import type { TextInputProps } from './Types'
+import { useTextBasedInput } from '../hooks/useTextBasedInput'
 
 export const HiddenInput = memo(
 	forwardRef<HTMLInputElement, TextInputProps>(({
@@ -11,7 +11,7 @@ export const HiddenInput = memo(
 		type,
 		...outerProps
 	}, forwardedRed) => {
-		const { props } = useNativeInput<HTMLInputElement>({
+		const props = useTextBasedInput<HTMLInputElement>({
 			...outerProps,
 			className: classNames(
 				useComponentClassName('hidden-input'),

@@ -54,22 +54,8 @@ export class Transaction implements Connection.TransactionLike {
 		await this.close('ROLLBACK')
 	}
 
-	async rollbackUnclosed(): Promise<void> {
-		if (this.isClosed) {
-			return
-		}
-		await this.rollback()
-	}
-
 	async commit(): Promise<void> {
 		await this.close('COMMIT')
-	}
-
-	async commitUnclosed(): Promise<void> {
-		if (this.isClosed) {
-			return
-		}
-		await this.commit()
 	}
 
 	private async close(command: string) {
@@ -165,22 +151,25 @@ class SavepointState {
 		const savepointName = `savepoint_${this.counter++}`
 
 		await connection.query(`SAVEPOINT ${wrapIdentifier(savepointName)}`)
-		const savepoint = new SavePoint(
-			savepointName,
-			this,
-			connection,
-		)
-		try {
-			const result = await callback(savepoint)
-			if (!savepoint.isClosed) {
-				await savepoint.commit()
-			}
-			return result
-		} catch (e) {
-			if (!savepoint.isClosed) {
-				await savepoint.rollback()
-			}
-			throw e
+		const savepoint = new SavePoint(savepointName, this, connection)
+		return await executeTransaction(savepoint, callback)
+	}
+}
+
+export const executeTransaction =  async <Result>(
+	transaction: Connection.TransactionLike,
+	callback: (connection: Connection.TransactionLike) => Promise<Result> | Result,
+)  => {
+	try {
+		const result = await callback(transaction)
+		if (!transaction.isClosed) {
+			await transaction.commit()
 		}
+		return result
+	} catch (e) {
+		if (!transaction.isClosed) {
+			await transaction.rollback()
+		}
+		throw e
 	}
 }

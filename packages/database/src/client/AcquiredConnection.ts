@@ -1,7 +1,7 @@
 import { Connection } from './Connection'
 import { EventManager } from './EventManager'
 import { Mutex } from '../utils'
-import { Transaction } from './Transaction'
+import { executeTransaction, Transaction } from './Transaction'
 import { ClientErrorCodes } from './errorCodes'
 import {
 	ForeignKeyViolationError,
@@ -40,17 +40,7 @@ export class AcquiredConnection implements Connection.ConnectionLike {
 		return await this.scope(async connection => {
 			await connection.query('BEGIN', [])
 			const transaction = new Transaction(connection)
-			try {
-				const result = await callback(transaction)
-
-				await transaction.commitUnclosed()
-
-				return result
-			} catch (e) {
-				await transaction.rollbackUnclosed()
-				throw e
-			}
-
+			return await executeTransaction(transaction, callback)
 		}, options)
 	}
 

@@ -20,8 +20,7 @@ export class ProjectMigrator {
 		db: DatabaseContext,
 		stages: Stage[],
 		migrationsToExecute: readonly Migration[],
-		{ logger, ignoreOrder = false, skipExecuted = false }: {
-			logger: (message: string) => void
+		{ ignoreOrder = false, skipExecuted = false }: {
 			ignoreOrder?: boolean
 			skipExecuted?: boolean
 		},
@@ -35,7 +34,6 @@ export class ProjectMigrator {
 		const sorted = [...validated].sort((a, b) => a.version.localeCompare(b.version))
 
 		for (const migration of sorted) {
-			logger(`Executing migration ${migration.name}...`)
 			const formatVersion = migration.formatVersion
 
 			for (const modification of migration.modifications) {
@@ -50,10 +48,7 @@ export class ProjectMigrator {
 				)
 			}
 			await db.commandBus.execute(new SaveMigrationCommand(migration))
-			logger(`Done`)
 		}
-
-		logger(`Done`)
 	}
 
 	private async validateMigrations(

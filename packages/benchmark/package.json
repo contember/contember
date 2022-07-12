@@ -1,6 +1,6 @@
 {
   "name": "@contember/benchmark",
-  "version": "1.1.0-rc.3",
+  "version": "1.1.0",
   "license": "Apache-2.0",
   "scripts": {
     "start-server": "node dist/src/start-server.js",
@@ -11,9 +11,9 @@
     "test": "echo 'No tests'"
   },
   "dependencies": {
-    "@contember/engine-server": "^1.1.0-rc.3",
-    "@contember/schema": "^1.1.0-rc.3",
-    "@contember/schema-definition": "^1.1.0-rc.3",
+    "@contember/engine-server": "^1.1.0",
+    "@contember/schema": "^1.1.0",
+    "@contember/schema-definition": "^1.1.0",
     "autocannon": "^7.3.0",
     "autocannon-compare": "^0.4.0",
     "autocannon-reporter": "1.1.0",

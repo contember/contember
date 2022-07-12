@@ -35,7 +35,6 @@ export class MigrateMutationResolver implements MutationResolver<'migrate'> {
 			}
 			try {
 				await this.projectMigrator.migrate(trx, stages, migrations, {
-					logger: () => null,
 					ignoreOrder: force,
 					skipExecuted: true,
 				})

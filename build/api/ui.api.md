@@ -2640,7 +2640,7 @@ export function useMouseMove<E extends HTMLElement = HTMLElement>(observedElemen
 export function useMouseMoveContext(): RefObject<boolean>;
 
 // @public (undocumented)
-export function useNativeInput<E extends HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement, T>({ active, disabled, loading, readOnly, required, focused, hovered, onBlur, onFocus, onFocusChange, defaultValue, name, max, min, onChange, notNull: _notNull, placeholder, type, value, onValidationStateChange, validationState, className: outerClassName, distinction, intent, scheme, size, ...rest }: ControlProps<T>, forwardedRef: ForwardedRef<E>): AllHTMLAttributes<E> & {
+export function useNativeInput<E extends HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement, T>({ active, disabled, loading, readOnly, required, focused, hovered, onBlur, onFocus, onFocusChange, defaultValue, name, max, min, onChange, notNull, placeholder, type, value, onValidationStateChange, validationState, className: outerClassName, distinction, intent, scheme, size, ...rest }: ControlProps<T>, forwardedRef: ForwardedRef<E>): AllHTMLAttributes<E> & {
     ref: RefObject<E>;
 };
 

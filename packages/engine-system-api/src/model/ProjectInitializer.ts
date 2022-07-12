@@ -38,7 +38,7 @@ export class ProjectInitializer {
 					.create()
 
 				const schemaResolver = () => this.schemaVersionBuilder.buildSchema(dbContextMigrations)
-				await this.systemDbMigrationsRunnerFactory(singleConnection, systemSchema).migrate(
+				await this.systemDbMigrationsRunnerFactory(connection, systemSchema).migrate(
 					logger.write.bind(logger),
 					{
 						schemaResolver,

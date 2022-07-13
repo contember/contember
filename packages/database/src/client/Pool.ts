@@ -62,6 +62,7 @@ export const poolStatsDescription =  {
 
 	item_queued_count: 'Number of queued items requesting a connection.',
 	item_timeout_count: 'Number of items waiting for connection, which timed out.',
+	item_rejected_count: 'Number of items rejected with an error.',
 
 	item_resolved_new_ms_count: 'Number of queued items resolved with newly established connection.',
 	item_resolved_new_ms_sum: 'Waiting time of queued items, which was resolved with a new connection.',
@@ -142,6 +143,7 @@ class Pool extends EventEmitter {
 		connection_established_idle_count: 0,
 		item_queued_count: 0,
 		item_timeout_count: 0,
+		item_rejected_count: 0,
 		item_resolved_new_ms_count: 0,
 		item_resolved_new_ms_sum: 0,
 		item_resolved_released_ms_count: 0,
@@ -327,10 +329,12 @@ class Pool extends EventEmitter {
 			} else {
 				this.poolStats.connection_error_count++
 				this.connectingCount--
-				const pendingItem = this.queue.shift()
-				if (pendingItem) {
+				if (this.active.size === 0 && this.queue.length > 0) {
+					const pendingItem = this.queue.shift()
+					if (!pendingItem) throw new Error()
 					this.log('Connecting failed, rejecting pending item')
 					pendingItem.reject(new ClientError(e))
+					this.poolStats.item_rejected_count++
 				} else {
 					this.log('Connecting failed, emitting error')
 					this.emit('error', e)

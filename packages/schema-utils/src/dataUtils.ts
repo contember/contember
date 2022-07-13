@@ -7,6 +7,11 @@ export interface Providers {
 
 export const resolveDefaultValue = (column: Model.AnyColumn, providers: Pick<Providers, 'now'>) => {
 	const type = column.type
+
+	if (type === Model.ColumnType.Int && column.sequence) {
+		return undefined
+	}
+
 	switch (type) {
 		case Model.ColumnType.String:
 		case Model.ColumnType.Int:

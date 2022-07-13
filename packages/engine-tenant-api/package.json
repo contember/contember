@@ -1,6 +1,6 @@
 {
   "name": "@contember/engine-tenant-api",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "license": "Apache-2.0",
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
@@ -9,16 +9,16 @@
     "test": "vitest --no-threads"
   },
   "dependencies": {
-    "@contember/authorization": "^1.1.0",
-    "@contember/config-loader": "^1.1.0",
-    "@contember/database": "^1.1.0",
-    "@contember/database-migrations": "^1.1.0",
-    "@contember/dic": "^1.1.0",
-    "@contember/typesafe": "^1.1.0",
-    "@contember/graphql-utils": "^1.1.0",
-    "@contember/queryable": "^1.1.0",
-    "@contember/schema": "^1.1.0",
-    "@contember/schema-utils": "^1.1.0",
+    "@contember/authorization": "^1.1.1",
+    "@contember/config-loader": "^1.1.1",
+    "@contember/database": "^1.1.1",
+    "@contember/database-migrations": "^1.1.1",
+    "@contember/dic": "^1.1.1",
+    "@contember/typesafe": "^1.1.1",
+    "@contember/graphql-utils": "^1.1.1",
+    "@contember/queryable": "^1.1.1",
+    "@contember/schema": "^1.1.1",
+    "@contember/schema-utils": "^1.1.1",
     "@graphql-tools/utils": "^7.10.0",
     "graphql-tag": "^2.12.5",
     "mustache": "^4.0.0",
@@ -27,7 +27,7 @@
     "otpauth": "^7.0.6"
   },
   "devDependencies": {
-    "@contember/database-tester": "^1.1.0",
+    "@contember/database-tester": "^1.1.1",
     "@graphql-codegen/cli": "^1.15.2",
     "@graphql-codegen/typescript": "^1.15.2",
     "@graphql-codegen/typescript-operations": "^1.15.2",

@@ -35,7 +35,7 @@ export class EntityRulesResolver {
 
 	public getEntityRules(entityName: string): Validation.EntityRules {
 		const definedRules = this.validationSchema[entityName] || {}
-		const fieldsNotNullFlag = acceptEveryFieldVisitor(this.model, entityName, new NotNullFieldsVisitor())
+		const fieldsNotNullFlag = acceptEveryFieldVisitor(this.model, entityName, new RequiredFieldsVisitor())
 		const notNullFields = Object.keys(filterObject(fieldsNotNullFlag, (field, val) => val))
 		return notNullFields.reduce(
 			(entityRules, field) => ({
@@ -50,9 +50,9 @@ export class EntityRulesResolver {
 	}
 }
 
-class NotNullFieldsVisitor implements Model.RelationByTypeVisitor<boolean>, Model.ColumnVisitor<boolean> {
+class RequiredFieldsVisitor implements Model.RelationByTypeVisitor<boolean>, Model.ColumnVisitor<boolean> {
 	visitColumn(entity: Model.Entity, column: Model.AnyColumn): boolean {
-		return !column.nullable
+		return !column.nullable && typeof column.default === 'undefined' && !column.sequence
 	}
 
 	visitManyHasManyInverse(): boolean {

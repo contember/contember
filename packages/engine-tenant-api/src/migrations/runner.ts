@@ -12,7 +12,7 @@ export interface TenantCredentials {
 	rootPassword?: string
 }
 
-const getMigrations = (): Promise<Migration[]> => {
+const getMigrations = (): Promise<Migration<TenantMigrationArgs>[]> => {
 	return loadMigrations(process.env.CONTEMBER_TENANT_MIGRATIONS_DIR || __dirname, [
 		new Migration('2020-06-08-134000-tenant-credentials', tenantCredentials),
 	])

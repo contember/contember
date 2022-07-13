@@ -1,6 +1,6 @@
 export * from './MigrationsRunner'
 export * from './helpers'
 export { MigrationBuilder, Name } from 'node-pg-migrate'
-export { Migration } from './Migration'
+export { Migration, MigrationArgs } from './Migration'
 export { loadMigrations } from './migrationsLoader'
 export { DatabaseConfig } from '@contember/database'

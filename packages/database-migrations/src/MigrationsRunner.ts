@@ -5,12 +5,12 @@ export class MigrationsRunner<MigrationArgs> {
 	constructor(
 		private readonly connection: Connection.ConnectionLike,
 		private readonly schema: string,
-		private readonly migrations: () => Promise<Migration[]>,
+		private readonly migrations: () => Promise<Migration<MigrationArgs>[]>,
 	) {}
 
 	public async migrate(
 		log: (msg: string) => void,
-		migrationArgs?: MigrationArgs,
+		migrationArgs: MigrationArgs,
 	): Promise<{ name: string }[]> {
 		const migrate = (await import('./runner')).default
 		return await migrate(this.migrations, this.connection, {

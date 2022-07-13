@@ -30,11 +30,11 @@ import { createMigrationBuilder } from './helpers'
 import { Connection, withDatabaseAdvisoryLock, wrapIdentifier } from '@contember/database'
 import { Migration } from './Migration'
 
-export type RunnerOption = {
+export type RunnerOption<Args = unknown> = {
 	migrationsTable: string
 	schema: string
 	log: (msg: string) => void
-	migrationArgs?: any
+	migrationArgs: Args
 }
 
 
@@ -62,16 +62,16 @@ const ensureMigrationsTable = async (db: Connection.ConnectionLike, options: Run
 	}
 }
 
-const getRunMigrations = async (db: Connection.ConnectionLike, options: RunnerOption) => {
+const getRunMigrations = async (db: Connection.ConnectionLike, options: RunnerOption<unknown>) => {
 	const fullTableName = getMigrationsTableName(options)
 	return (await db.query<{name: string}>(`SELECT name FROM ${fullTableName} ORDER BY run_on, id`)).rows.map(it => it.name)
 }
 
-const getMigrationsToRun = (options: RunnerOption, runNames: string[], migrations: Migration[]): Migration[] => {
+const getMigrationsToRun = <Args>(options: RunnerOption, runNames: string[], migrations: Migration<Args>[]): Migration<Args>[] => {
 	return migrations.filter(({ name }) => runNames.indexOf(name) < 0)
 }
 
-const checkOrder = (runNames: string[], migrations: Migration[]) => {
+const checkOrder = (runNames: string[], migrations: Migration<any>[]) => {
 	const len = Math.min(runNames.length, migrations.length)
 	for (let i = 0; i < len; i += 1) {
 		const runName = runNames[i]
@@ -85,10 +85,10 @@ const checkOrder = (runNames: string[], migrations: Migration[]) => {
 	}
 }
 
-export default async (
-	getMigrations: () => Promise<Migration[]>,
+export default async <Args>(
+	getMigrations: () => Promise<Migration<Args>[]>,
 	connection: Connection.ConnectionLike,
-	options: RunnerOption,
+	options: RunnerOption<Args>,
 ): Promise<{ name: string }[]> => {
 	const logger = options.log
 	return await connection.scope(db =>
@@ -102,7 +102,7 @@ export default async (
 			const migrations = await getMigrations()
 			checkOrder(runNames, migrations)
 
-			const toRun: Migration[] = getMigrationsToRun(options, runNames, migrations)
+			const toRun: Migration<Args>[] = getMigrationsToRun(options, runNames, migrations)
 
 			if (!toRun.length) {
 				return []
@@ -114,7 +114,7 @@ export default async (
 						try {
 							logger(`  Executing migration ${migration.name}...`)
 							const migrationsBuilder = createMigrationBuilder()
-							await migration.migration(migrationsBuilder, options.migrationArgs)
+							await migration.migration(migrationsBuilder, { ...options.migrationArgs, connection: trx })
 							const steps = migrationsBuilder.getSqlSteps()
 
 							for (const sql of steps) {

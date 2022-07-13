@@ -1,6 +1,5 @@
-import { Button, FieldContainer, Stack, TextInput } from '@contember/ui'
+import { Button, FieldContainer, Stack, TextInput, useShowToast } from '@contember/ui'
 import { FC, useCallback } from 'react'
-import { useShowToast } from '../../../components'
 import { RoutingLinkTarget, useRedirect } from '../../../routing'
 import { useForm } from '../../lib'
 import { useCreateResetPasswordRequest } from '../../mutations'
@@ -19,26 +18,26 @@ export const CreateResetPasswordRequestForm: FC<CreateResetPasswordRequestFormPr
 	const createResetPasswordRequest = useCreateResetPasswordRequest()
 
 	const { register, isSubmitting, onSubmit } = useForm(initialValues, useCallback(
-			async values => {
-				const response = await createResetPasswordRequest({
-					email: values.email,
+		async values => {
+			const response = await createResetPasswordRequest({
+				email: values.email,
+			})
+			if (response.ok) {
+				addToast({
+					type: 'success',
+					message: `Check your inbox for the instructions.`,
+					dismiss: true,
 				})
-				if (response.ok) {
-					addToast({
-						type: 'success',
-						message: `Check your inbox for the instructions.`,
-						dismiss: true,
-					})
-					redirect(redirectOnSuccess)
-				} else {
-					switch (response.error.code) {
-						case 'PERSON_NOT_FOUND':
-							return addToast({ message: `E-mail not found`, type: 'error' })
-					}
+				redirect(redirectOnSuccess)
+			} else {
+				switch (response.error.code) {
+					case 'PERSON_NOT_FOUND':
+						return addToast({ message: `E-mail not found`, type: 'error' })
 				}
-			},
-			[addToast, createResetPasswordRequest, redirect, redirectOnSuccess],
-		),
+			}
+		},
+		[addToast, createResetPasswordRequest, redirect, redirectOnSuccess],
+	),
 	)
 
 

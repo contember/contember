@@ -1,7 +1,6 @@
 import { useProjectSlug } from '@contember/react-client'
-import { Button, LayoutPage, Stack } from '@contember/ui'
+import { Button, LayoutPage, Stack, useShowToast } from '@contember/ui'
 import { FC, memo, SyntheticEvent, useCallback, useEffect, useState } from 'react'
-import { useShowToast } from '../../../components'
 import { NavigateBackButton, RoutingLinkTarget, useRedirect } from '../../../routing'
 import { useUpdateProjectMembership } from '../../mutations'
 import { useProjectMembershipsQuery } from '../../queries'

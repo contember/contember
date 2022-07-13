@@ -1,9 +1,9 @@
 import { ErrorPersistResult, PersistOptions, SuccessfulPersistResult, usePersist } from '@contember/binding'
+import { useShowToast } from '@contember/ui'
 import { useCallback } from 'react'
 import { useMessageFormatter } from '../../i18n'
-import { persistFeedbackDictionary } from './persistFeedbackDictionary'
-import { useShowToast } from '../Toaster'
 import { useAccessorErrorFormatter } from '../bindingFacade/errors'
+import { persistFeedbackDictionary } from './persistFeedbackDictionary'
 
 export interface PersistWithFeedbackOptions extends PersistOptions {
 	successMessage?: string

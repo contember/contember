@@ -1,6 +1,5 @@
-import { Button, FieldContainer, Stack, TextInput } from '@contember/ui'
+import { Button, FieldContainer, Stack, TextInput, useShowToast } from '@contember/ui'
 import { FC, SyntheticEvent, useCallback, useState } from 'react'
-import { useShowToast } from '../../../components'
 import { RoutingLinkTarget, useRedirect } from '../../../routing'
 import { useForm } from '../../lib'
 import { useCreateApiKey } from '../../mutations'

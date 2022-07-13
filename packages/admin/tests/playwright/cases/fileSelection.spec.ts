@@ -31,7 +31,7 @@ test('file selection', async ({ page }) => {
 	expect(await page.screenshot({ animations: 'disabled' })).toMatchSnapshot('02-upload.png')
 
 	await page.locator('button:has-text("Save")').click()
-	await page.locator('.toaster button').click()
+	await page.locator('.cui-toaster button').click()
 
 	await page.locator('button:has-text("Select files")').click()
 

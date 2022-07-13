@@ -1,5 +1,5 @@
 import { ContemberClient } from '@contember/react-client'
-import { Button, ErrorList, Icon, Stack, StyleProvider } from '@contember/ui'
+import { Button, ErrorList, Icon, Stack, StyleProvider, Toaster, ToasterProvider } from '@contember/ui'
 import { FC, ReactNode, useCallback, useEffect, useMemo, useState } from 'react'
 import { Link, RequestProvider, RoutingContext, RoutingContextValue } from '../../routing'
 import {
@@ -15,7 +15,6 @@ import { IdentityProvider, useLogout, useOptionalIdentity } from '../Identity'
 import { MiscPageLayout } from '../MiscPageLayout'
 import { Page, Pages } from '../pageRouting'
 import { Project, ProjectListButtons } from '../Project'
-import { Toaster, ToasterProvider } from '../Toaster'
 
 
 export interface LoginEntrypointProps {

@@ -1,6 +1,5 @@
-import { Button, Divider, FieldContainer, Heading, Select, Stack, TextInput } from '@contember/ui'
+import { Button, Divider, FieldContainer, Heading, Select, Stack, TextInput, useShowToast } from '@contember/ui'
 import { FC, SyntheticEvent, useState } from 'react'
-import { useShowToast } from '../../../components'
 import { RoutingLinkTarget, useRedirect } from '../../../routing'
 import { useForm } from '../../lib'
 import { useCreateProject } from '../../mutations'
@@ -113,7 +112,7 @@ export const CreateProjectForm: FC<CreateProjectForm> = ({ projectListLink }) =>
 						{ value: '', label: 'default' },
 						{ value: 'yes', label: 'yes' },
 						{ value: 'no', label: 'no' },
-					]}/>
+					]} />
 				</FieldContainer>
 
 				<Divider />

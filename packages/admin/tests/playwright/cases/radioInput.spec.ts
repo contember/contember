@@ -29,6 +29,6 @@ test('basic test', async ({ page }) => {
 	expect(await page.screenshot()).toMatchSnapshot('selected-published.png')
 
 	await page.locator('button:has-text("Save")').click()
-	await page.waitForSelector('.toaster-item')
+	await page.waitForSelector('.cui-toaster-item')
 	expect(await page.screenshot()).toMatchSnapshot('after-save.png')
 })

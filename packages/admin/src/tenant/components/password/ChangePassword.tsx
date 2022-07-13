@@ -1,6 +1,5 @@
-import { Button, FieldContainer, Heading, Spacer, Stack, TextInput } from '@contember/ui'
+import { Button, FieldContainer, Heading, Spacer, Stack, TextInput, useShowToast } from '@contember/ui'
 import { FC, useCallback } from 'react'
-import { useShowToast } from '../../../components'
 import { useForm } from '../../lib'
 import { useChangePassword } from '../../mutations'
 
@@ -10,7 +9,7 @@ const initialValues = {
 	newPasswordAgain: '',
 }
 
-export const ChangePassword: FC<{}> = ({}) => {
+export const ChangePassword: FC<{}> = ({ }) => {
 	const changePassword = useChangePassword()
 	const addToast = useShowToast()
 	const { register, errors, isSubmitting, onSubmit } = useForm(initialValues, useCallback(async (val: typeof initialValues, setError, setValues) => {
@@ -54,22 +53,22 @@ export const ChangePassword: FC<{}> = ({}) => {
 						autoComplete="password"
 						{...register('currentPassword')}
 					/>
-			</FieldContainer>
-			<FieldContainer
-				label="New password"
-				errors={errors.newPassword === undefined ? undefined : [{ message: errors.newPassword }]}
-			>
-				<TextInput
-					type="password"
-					autoComplete="new-password"
-					{...register('newPassword')}
-				/>
-			</FieldContainer>
-			<FieldContainer
-				label="Confirm new password"
-				errors={errors.newPasswordAgain === undefined ? undefined : [{ message: errors.newPasswordAgain }]}
-			>
-				<TextInput
+				</FieldContainer>
+				<FieldContainer
+					label="New password"
+					errors={errors.newPassword === undefined ? undefined : [{ message: errors.newPassword }]}
+				>
+					<TextInput
+						type="password"
+						autoComplete="new-password"
+						{...register('newPassword')}
+					/>
+				</FieldContainer>
+				<FieldContainer
+					label="Confirm new password"
+					errors={errors.newPasswordAgain === undefined ? undefined : [{ message: errors.newPasswordAgain }]}
+				>
+					<TextInput
 						type="password"
 						autoComplete="new-password"
 						{...register('newPasswordAgain')}

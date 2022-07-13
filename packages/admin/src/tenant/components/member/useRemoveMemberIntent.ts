@@ -1,7 +1,7 @@
+import { getTenantErrorMessage } from '@contember/client'
+import { useShowToast } from '@contember/ui'
 import { useCallback } from 'react'
 import { useRemoveProjectMembership } from '../../mutations'
-import { useShowToast } from '../../../components'
-import { getTenantErrorMessage } from '@contember/client'
 
 export const useRemoveMemberIntent = (project: string, onRemove?: () => void | Promise<void>) => {
 	const [removeMemberInner] = useRemoveProjectMembership()

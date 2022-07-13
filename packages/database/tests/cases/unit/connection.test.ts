@@ -2,6 +2,7 @@ import { expect, it } from 'vitest'
 import { Connection, Pool } from '../../../src'
 import { PgClient } from '../../../src/client/PgClient'
 import EventEmitter from 'events'
+import { MutexDeadlockError } from '../../../src/utils'
 
 it('support nested scope', async () => {
 	const [connection, end] = createConnectionMock(
@@ -143,6 +144,13 @@ it('support nested transaction / savepoints', async () => {
 			}),
 		])
 	})
+	end()
+})
+
+it('detects deadlock', async () => {
+	const [connection, end] = createConnectionMock([])
+
+	await expect(async () => await connection.scope(async c1 => c1.scope(async () => await c1.query('SELECT 1')))).rejects.toThrow(MutexDeadlockError)
 	end()
 })
 

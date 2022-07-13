@@ -1,6 +1,7 @@
 import { MigrationBuilder, Name } from '@contember/database-migrations'
 import { SystemMigrationArgs } from './types'
 import { getJunctionTables } from '../model'
+import { MigrationArgs } from '@contember/database-migrations'
 
 const recreateTrigger = (builder: MigrationBuilder, tableName: Name) => {
 	builder.dropTrigger(tableName, 'log_event_trx', { ifExists: true })
@@ -19,8 +20,8 @@ const recreateTrigger = (builder: MigrationBuilder, tableName: Name) => {
 	})
 }
 
-export default async function (builder: MigrationBuilder, args: SystemMigrationArgs) {
-	const schema = await args.schemaResolver()
+export default async function (builder: MigrationBuilder, args: MigrationArgs<SystemMigrationArgs>) {
+	const schema = await args.schemaResolver(args.connection)
 	const junctionTables = getJunctionTables(schema.model)
 	const schemas = args.project.stages.map(it => `stage_${it.slug}`)
 

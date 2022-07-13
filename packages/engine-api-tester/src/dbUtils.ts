@@ -1,4 +1,4 @@
-import { Connection, wrapIdentifier } from '@contember/database'
+import { Connection, DatabaseConfig, wrapIdentifier } from '@contember/database'
 
 export const dbCredentials = (dbName: string) => {
 	return {
@@ -10,14 +10,14 @@ export const dbCredentials = (dbName: string) => {
 	}
 }
 
-export const createConnection = (dbName: string): Connection => {
-	return Connection.create({ ...dbCredentials(dbName) })
+export const createConnection = (config: DatabaseConfig): Connection => {
+	return Connection.create(config)
 }
 
-export const recreateDatabase = async (dbName: string): Promise<Connection> => {
-	const connection = createConnection(process.env.TEST_DB_MAINTENANCE_NAME || 'postgres')
+export const recreateDatabase = async ({ database, ...baseConfig }: DatabaseConfig): Promise<Connection> => {
+	const connection = createConnection({ ...baseConfig, database: process.env.TEST_DB_MAINTENANCE_NAME || 'postgres' })
 
-	await connection.query('DROP DATABASE IF EXISTS ' + wrapIdentifier(dbName), [])
-	await connection.query('CREATE DATABASE ' + wrapIdentifier(dbName), [])
+	await connection.query('DROP DATABASE IF EXISTS ' + wrapIdentifier(database), [])
+	await connection.query('CREATE DATABASE ' + wrapIdentifier(database), [])
 	return connection
 }

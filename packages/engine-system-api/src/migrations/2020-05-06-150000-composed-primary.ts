@@ -1,6 +1,7 @@
 import { escapeValue, MigrationBuilder, Name } from '@contember/database-migrations'
 import { SystemMigrationArgs } from './types'
 import { getJunctionTables } from '../model'
+import { MigrationArgs } from '@contember/database-migrations/dist/src/Migration'
 
 const createEventTrigger = (builder: MigrationBuilder, tableName: Name, primaryColumns: string[]) => {
 	builder.createTrigger(tableName, 'log_event', {
@@ -56,8 +57,8 @@ const migrateEvents = (builder: MigrationBuilder, tableName: string, primaryKeys
 `)
 }
 
-export default async function (builder: MigrationBuilder, args: SystemMigrationArgs) {
-	const schema = await args.schemaResolver()
+export default async function (builder: MigrationBuilder, args: MigrationArgs<SystemMigrationArgs>) {
+	const schema = await args.schemaResolver(args.connection)
 	const tablesToMigrate = getJunctionTables(schema.model)
 	const schemas = args.project.stages.map(it => `stage_${it.slug}`)
 	for (const table of tablesToMigrate) {

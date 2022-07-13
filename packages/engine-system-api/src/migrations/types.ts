@@ -1,7 +1,8 @@
 import { Schema } from '@contember/schema'
 import { ProjectConfig } from '../types'
+import { Connection } from '@contember/database'
 
 export interface SystemMigrationArgs {
-	schemaResolver: () => Promise<Schema>
+	schemaResolver: (connection: Connection.ConnectionLike) => Promise<Schema>
 	project: ProjectConfig
 }

@@ -33,11 +33,13 @@ export class ProjectInitializer {
 			const singleConnection = Connection.createSingle(project.db, {})
 			await singleConnection.scope(async connection => {
 				const systemSchema = dbContext.client.schema
-				const dbContextMigrations = databaseContextFactory
-					.withClient(new Client(connection, systemSchema, { module: 'system' }))
-					.create()
 
-				const schemaResolver = () => this.schemaVersionBuilder.buildSchema(dbContextMigrations)
+				const schemaResolver = (connection: Connection.ConnectionLike) => {
+					const dbContextMigrations = databaseContextFactory
+						.withClient(new Client(connection, systemSchema, { module: 'system' }))
+						.create()
+					return this.schemaVersionBuilder.buildSchema(dbContextMigrations)
+				}
 				await this.systemDbMigrationsRunnerFactory(connection, systemSchema).migrate(
 					logger.write.bind(logger),
 					{
@@ -49,7 +51,7 @@ export class ProjectInitializer {
 			await singleConnection.end()
 			logger.groupEnd()
 		}
-		const result = await retryTransaction(() =>
+		await retryTransaction(() =>
 			dbContext.transaction(async trx => {
 				await this.initStages(trx, project, logger)
 			}),
@@ -57,7 +59,6 @@ export class ProjectInitializer {
 		if (dbContext.client.connection instanceof Connection) {
 			await dbContext.client.connection.clearPool()
 		}
-		return result
 	}
 
 	private async initStages(db: DatabaseContext<Connection.TransactionLike>, project: ProjectConfig, logger: Logger) {

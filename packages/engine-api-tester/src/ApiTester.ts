@@ -16,6 +16,7 @@ import { createUuidGenerator } from './testUuid'
 import { project } from './project'
 import { createConnection, dbCredentials, recreateDatabase } from './dbUtils'
 import { join } from 'path'
+import { Logger } from '@contember/engine-common'
 
 export class ApiTester {
 	public static project = project
@@ -40,7 +41,8 @@ export class ApiTester {
 	}): Promise<ApiTester> {
 		const dbName = String(process.env.TEST_DB_NAME)
 
-		const projectConnection = createConnection(dbName)
+		const projectDbCredentials = dbCredentials(dbName)
+		const projectConnection = createConnection(projectDbCredentials)
 		const providers = { uuid: createUuidGenerator('a452'), now: () => new Date('2019-09-04 12:00') }
 		const databaseContextFactory = new DatabaseContextFactory(projectConnection.createClient('system', {}), providers)
 
@@ -65,28 +67,14 @@ export class ApiTester {
 		}
 		const systemContainer = systemContainerBuilder.build()
 
-		const connection = await recreateDatabase(dbName)
+		const connection = await recreateDatabase(projectDbCredentials)
 		await connection.end()
 
 		const projectConfig = { ...ApiTester.project, ...options.project }
 
 		const db = databaseContextFactory.create()
 
-		const singleConnection = Connection.createSingle(dbCredentials(dbName), {})
-		await singleConnection.scope(async connection => {
-			const dbContextMigrations = databaseContextFactory
-				.withClient(new Client(connection, 'system', {}))
-				.create()
-
-			const schemaResolver = () => systemContainer.schemaVersionBuilder.buildSchema(dbContextMigrations)
-			await systemContainer
-				.systemDbMigrationsRunnerFactory(connection, 'system')
-				.migrate(() => null, {
-					schemaResolver,
-					project: projectConfig,
-				})
-		})
-		await singleConnection.end()
+		await systemContainer.projectInitializer.initialize(databaseContextFactory, { ...projectConfig, db: projectDbCredentials }, new Logger(() => null))
 
 		const systemSchema = makeExecutableSchema({
 			typeDefs: systemTypeDefs,

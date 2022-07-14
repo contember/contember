@@ -9,24 +9,84 @@ export class SystemSchemaTransferMappingFactory {
 		return {
 			tables: this.associateByName([
 				this.buildEventDataMapping(),
-				{
-					name: 'stage',
-					columns: this.associateByName([
-						{ name: 'id', type: Model.ColumnType.Uuid },
-						{ name: 'name', type: Model.ColumnType.String },
-						{ name: 'slug', type: Model.ColumnType.String }, // TODO: validate?
-						{ name: 'schema', type: Model.ColumnType.String },
-					]),
-				},
-				{
-					name: 'stage_transaction',
-					columns: this.associateByName([
-						{ name: 'transaction_id', type: Model.ColumnType.Uuid },
-						{ name: 'stage_id', type: Model.ColumnType.Uuid },
-						{ name: 'applied_at', type: Model.ColumnType.DateTime },
-					]),
-				},
+				this.buildStageTransactionDataMapping(),
 			]),
+		}
+	}
+
+	private buildStageTransactionDataMapping(): TransferTableMapping {
+		return {
+			name: 'stage_transaction',
+
+			columns: this.associateByName([
+				{ name: 'transaction_id', type: Model.ColumnType.Uuid },
+				{ name: 'stage_slug', type: Model.ColumnType.String },
+				{ name: 'applied_at', type: Model.ColumnType.DateTime },
+			]),
+
+			createSelect: (db, table) => {
+				const namespaceContext = new Compiler.Context(db.schema, new Set())
+
+				let builder = db.selectBuilder()
+
+				for (const column of Object.values(table.columns)) {
+					if (column.name === 'stage_slug') {
+						builder = builder.select(['stage', 'slug'], 'stage_slug')
+
+					} else if (column.type === Model.ColumnType.Json || column.type === Model.ColumnType.Date || column.type === Model.ColumnType.DateTime) {
+						builder = builder.select(expr => expr.raw(`${wrapIdentifier('stage_transaction')}.${wrapIdentifier(column.name)}::text`))
+
+					} else {
+						builder = builder.select(['stage_transaction', column.name])
+					}
+				}
+
+				return builder
+					.from('stage_transaction')
+					.join(
+						'stage',
+						undefined,
+						expr => expr.compareColumns(['stage', 'id'], Operator.eq, ['stage_transaction', 'stage_id']),
+					)
+					.createQuery(namespaceContext)
+			},
+
+			createInsertStartFragment: (schema, tableName, columnNames) => {
+				const columnNames2 = columnNames.map(name => name === 'stage_slug' ? 'stage_id' : name)
+				const tableQuoted = `${wrapIdentifier(schema)}.${wrapIdentifier(tableName)}`
+				const columnsQuoted = '(' + columnNames2.map(it => wrapIdentifier(it)).join(', ') + ')'
+				return `INSERT INTO ${tableQuoted} ${columnsQuoted} VALUES\n`
+			},
+
+			createRowParser: async (db, columns, baseType) => {
+				const stages = await db.selectBuilder<{id: string; slug: string}>()
+					.select('id')
+					.select('slug')
+					.from('stage')
+					.getResult(db)
+
+				const stageSlugToId = new Map(stages.map(row => ([row.slug, row.id])))
+				const stageSlugColumnIndex = columns.indexOf('stage_slug')
+
+				if (stageSlugColumnIndex < 0) {
+					return baseType
+				}
+
+				return (input, path) => {
+					const row = baseType(input, path)
+					const stageSlug = Typesafe.string(row[stageSlugColumnIndex])
+					const stageSlugId = stageSlugToId.get(stageSlug)
+
+					if (stageSlugId === undefined) {
+						throw new ImportError(`Unknown stage slug ${stageSlug}`)
+					}
+
+					const newRow = [...row]
+					newRow[stageSlugColumnIndex] = stageSlugId
+
+					return newRow
+				}
+			},
 		}
 	}
 
@@ -74,18 +134,7 @@ export class SystemSchemaTransferMappingFactory {
 			},
 
 			createInsertStartFragment: (schema, tableName, columnNames) => {
-				const columnNames2 = [
-					'id',
-					'type',
-					'table_name',
-					'row_ids',
-					'values',
-					'created_at',
-					'schema_id',
-					'identity_id',
-					'transaction_id',
-				]
-
+				const columnNames2 = columnNames.map(name => name === 'schema_version' ? 'schema_id' : name)
 				const tableQuoted = `${wrapIdentifier(schema)}.${wrapIdentifier(tableName)}`
 				const columnsQuoted = '(' + columnNames2.map(it => wrapIdentifier(it)).join(', ') + ')'
 				return `INSERT INTO ${tableQuoted} ${columnsQuoted} VALUES\n`

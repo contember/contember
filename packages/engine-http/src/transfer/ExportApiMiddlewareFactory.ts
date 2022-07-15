@@ -2,13 +2,11 @@ import { KoaMiddleware, KoaRequestState } from '../koa'
 import { AuthResult, HttpError, TimerMiddlewareState } from '../common'
 import { ProjectGroupResolver, ProjectInfoMiddlewareState } from '../project-common'
 import { Readable } from 'stream'
-import { TenantRole } from '@contember/engine-tenant-api'
 import { toBuffer } from './CommandStream'
 import { ExportExecutor, ExportRequest } from './ExportExecutor'
 import { ParseError } from '@contember/typesafe'
 import { Logger } from '@contember/engine-common'
 import { ProjectContainer } from '../ProjectContainer'
-import { ProjectRole } from '@contember/schema'
 
 type ExportApiMiddlewareState =
 	& TimerMiddlewareState
@@ -64,7 +62,7 @@ export class ExportApiMiddlewareFactory {
 				const systemContext = projectContainer.systemDatabaseContextFactory.create()
 				const schema = await projectContainer.contentSchemaResolver.getSchema(systemContext, project.slug)
 				const memberships = await timer('MembershipFetch', () => groupContainer.projectMembershipResolver.resolveMemberships({
-					request,
+					request: { get: () => '' },
 					acl: schema.acl,
 					projectSlug: project.slug,
 					identity: {
@@ -75,11 +73,11 @@ export class ExportApiMiddlewareFactory {
 
 				const projectRoles = memberships.map(it => it.role)
 
-				if (
-					!authResult.roles.includes(TenantRole.SUPER_ADMIN)
-					&& !authResult.roles.includes(TenantRole.PROJECT_ADMIN)
-					&& !projectRoles.includes(ProjectRole.ADMIN)
-				) {
+				if (!projectRoles.some(role => schema.acl.roles[role]?.content?.export)) {
+					throw new HttpError(`Not allowed`, 403)
+				}
+
+				if (project.system && !projectRoles.some(role => schema.acl.roles[role]?.system?.export)) {
 					throw new HttpError(`Not allowed`, 403)
 				}
 

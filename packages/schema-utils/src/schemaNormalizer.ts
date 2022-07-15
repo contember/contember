@@ -43,10 +43,7 @@ export const normalizeSchema = <S extends Schema>(schema: S): S => {
 						import: true,
 					},
 					system: {
-						diff: Acl.SystemPermissionsLevel.any,
-						history: Acl.SystemPermissionsLevel.any,
-						release: Acl.SystemPermissionsLevel.any,
-						rebase: Acl.SystemPermissionsLevel.any,
+						history: true,
 						export: true,
 						import: true,
 					},

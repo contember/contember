@@ -79,7 +79,7 @@ export class ContentQueryHandlerFactory {
 		let identityId = ctx.state.authResult.identityId
 		if (
 			ctx.state.authResult.assumedIdentityId &&
-			Object.values(schema.acl.roles).find(it => it.system?.assumeIdentity)
+			ctx.state.projectMemberships.some(it => schema.acl.roles[it.role].system?.assumeIdentity)
 		) {
 			identityId = ctx.state.authResult.assumedIdentityId
 		}

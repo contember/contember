@@ -1,5 +1,4 @@
-import { MutationAddIdpArgs, MutationResolvers, AddIdpResponse } from '../../../schema'
-import { GraphQLResolveInfo } from 'graphql'
+import { AddIdpResponse, MutationAddIdpArgs, MutationResolvers } from '../../../schema'
 import { PermissionActions } from '../../../model'
 import { IDPManager } from '../../../model/service/idp/IDPManager'
 import { createErrorResponse } from '../../errorUtils'
@@ -20,6 +19,7 @@ export class AddIDPMutationResolver implements MutationResolvers {
 			type: args.type,
 			options: {
 				autoSignUp: args.options?.autoSignUp ?? false,
+				exclusive: args.options?.exclusive ?? false,
 			},
 		})
 		if (!result.ok) {

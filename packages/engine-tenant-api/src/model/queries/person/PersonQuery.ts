@@ -1,44 +1,30 @@
-import { ConditionBuilder, DatabaseQuery, DatabaseQueryable, Operator } from '@contember/database'
+import { DatabaseQuery, DatabaseQueryable, Operator, SelectBuilderSpecification } from '@contember/database'
 import { MaybePersonRow } from './types'
 import { PersonQueryBuilderFactory } from './PersonQueryBuilderFactory'
 
 class PersonQuery extends DatabaseQuery<MaybePersonRow> {
-	constructor(private readonly condition: { email: string } | { id: string } | { identity_id: string }) {
+	private constructor(private readonly spec: SelectBuilderSpecification) {
 		super()
 	}
 
 	static byId(id: string): PersonQuery {
-		return new PersonQuery({ id })
+		return new PersonQuery(qb => qb.where(it => it.compare(['person', 'id'], Operator.eq, id)))
 	}
 
 	static byEmail(email: string): PersonQuery {
-		return new PersonQuery({ email })
+		return new PersonQuery(qb => qb.where(it => it.compare(['person', 'email'], Operator.eq, email)))
 	}
 
 	static byIdentity(identity_id: string): PersonQuery {
-		return new PersonQuery({ identity_id })
+		return new PersonQuery(qb => qb.where(it => it.compare(['person', 'identity_id'], Operator.eq, identity_id)))
 	}
 
 	async fetch({ db }: DatabaseQueryable): Promise<MaybePersonRow> {
 		const rows = await PersonQueryBuilderFactory.createPersonQueryBuilder()
-			.where(expr => this.applyCondition(expr))
+			.match(this.spec)
 			.getResult(db)
 
 		return this.fetchOneOrNull(rows)
-	}
-
-	private applyCondition(conditionBuilder: ConditionBuilder): ConditionBuilder {
-		if ('email' in this.condition) {
-			return conditionBuilder.compare(['person', 'email'], Operator.eq, this.condition.email)
-		} else if ('id' in this.condition) {
-			return conditionBuilder.compare(['person', 'id'], Operator.eq, this.condition.id)
-		} else if ('identity_id' in this.condition) {
-			return conditionBuilder.compare(['person', 'identity_id'], Operator.eq, this.condition.identity_id)
-		} else {
-			((_: never): never => {
-				throw new Error()
-			})(this.condition)
-		}
 	}
 }
 

@@ -78,13 +78,16 @@ class IDPSignInManager {
 		const saveIdpIdentifier = async (personId: string) =>
 			await db.commandBus.execute(new CreatePersonIdentityProviderIdentifierCommand(provider.id, personId, claim.externalIdentifier))
 
-		const personByEmail = claim.email ? await db.queryHandler.fetch(PersonQuery.byEmail(claim.email)) : null
-		if (personByEmail) {
-			await saveIdpIdentifier(personByEmail.id)
-			return personByEmail
+		if (!provider.exclusive) {
+			const personByEmail = claim.email ? await db.queryHandler.fetch(PersonQuery.byEmail(claim.email)) : null
+			if (personByEmail) {
+				await saveIdpIdentifier(personByEmail.id)
+				return personByEmail
+			}
 		}
+
 		if (provider.autoSignUp) {
-			const signedUpPerson = await this.signUp(db, claim)
+			const signedUpPerson = await this.signUp(db, claim, provider)
 			await saveIdpIdentifier(signedUpPerson.id)
 			return signedUpPerson
 		}
@@ -92,14 +95,15 @@ class IDPSignInManager {
 		return null
 	}
 
-	private async signUp(db: DatabaseContext, { email, name, externalIdentifier }: IDPClaim): Promise<PersonRow> {
+	private async signUp(db: DatabaseContext, { email, name, externalIdentifier }: IDPClaim, provider: IdentityProviderRow): Promise<PersonRow> {
 		const roles = [TenantRole.PERSON]
 		const identityId = await db.commandBus.execute(new CreateIdentityCommand(roles))
 		const newPerson = await db.commandBus.execute(new CreatePersonCommand({
 			identityId,
-			email,
+			email: provider.exclusive ? undefined : email,
 			password: NoPassword,
 			name: name ?? email?.split('@')[0] ?? externalIdentifier,
+			idpOnly: provider.exclusive,
 		}))
 
 		return {

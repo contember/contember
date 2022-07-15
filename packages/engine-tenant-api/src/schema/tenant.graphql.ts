@@ -265,6 +265,7 @@ const schema: DocumentNode = gql`
 		IDP_VALIDATION_FAILED
 
 		PERSON_NOT_FOUND
+		PERSON_ALREADY_EXISTS
 	}
 
 	type SignInIDPResult implements CommonSignInResult {
@@ -337,10 +338,17 @@ const schema: DocumentNode = gql`
 		type: String!
 		configuration: Json!
 		disabledAt: DateTime!
+		options: IDPOptions!
+	}
+
+	type IDPOptions {
+		autoSignUp: Boolean!
+		exclusive: Boolean!
 	}
 
 	input IDPOptions {
 		autoSignUp: Boolean
+		exclusive: Boolean
 	}
 
 

@@ -1,7 +1,7 @@
 import { Response, ResponseError, ResponseOk } from '../../utils/Response'
 import { AddIdpErrorCode, DisableIdpErrorCode, EnableIdpErrorCode, UpdateIdpErrorCode } from '../../../schema'
 import { DatabaseContext } from '../../utils'
-import { IdentityProvider } from '../../type'
+import { IdentityProviderData } from '../../type'
 import { IdentityProviderBySlugQuery } from '../../queries'
 import { CreateIdpCommand } from '../../commands/idp/CreateIdpCommand'
 import { IDPHandlerRegistry } from './IDPHandlerRegistry'
@@ -17,7 +17,7 @@ export class IDPManager {
 	) {
 	}
 
-	public async addIDP(db: DatabaseContext, idp: IdentityProvider): Promise<RegisterIDPResponse> {
+	public async addIDP(db: DatabaseContext, idp: IdentityProviderData): Promise<RegisterIDPResponse> {
 		return await db.transaction(async db => {
 			try {
 				const providerService = this.idpRegistry.getHandler(idp.type)

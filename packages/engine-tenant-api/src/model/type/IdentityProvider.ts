@@ -1,4 +1,4 @@
-export interface IdentityProvider {
+export interface IdentityProviderData {
 	type: string
 	slug: string
 	configuration: Record<string, any>
@@ -7,4 +7,5 @@ export interface IdentityProvider {
 
 export interface IdentityProviderOptions {
 	autoSignUp: boolean
+	exclusive: boolean
 }

@@ -28,11 +28,15 @@ const systemPermissionsSchema = Typesafe.partial({
 	history: Typesafe.union(Typesafe.boolean, Typesafe.enumeration('any', 'none')),
 	migrate: Typesafe.boolean,
 	assumeIdentity: Typesafe.boolean,
+	export: Typesafe.boolean,
+	import: Typesafe.boolean,
 })
 const systemSchemaCheck: Typesafe.Equals<Acl.SystemPermissions, ReturnType<typeof systemPermissionsSchema>> = true
 
 const contentPermissionsSchema = Typesafe.partial({
 	assumeMembership: membershipMatchRuleSchema,
+	export: Typesafe.boolean,
+	import: Typesafe.boolean,
 })
 const contentSchemaCheck: Typesafe.Equals<Acl.ContentPermissions, ReturnType<typeof contentPermissionsSchema>> = true
 

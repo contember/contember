@@ -129,10 +129,14 @@ namespace Acl {
 		readonly history?: boolean | LimitedSystemPermissionsLevel
 		readonly migrate?: boolean
 		readonly assumeIdentity?: boolean
+		readonly export?: boolean
+		readonly import?: boolean
 	}
 
 	export type ContentPermissions = {
 		readonly assumeMembership?: MembershipMatchRule
+		readonly export?: boolean
+		readonly import?: boolean
 	}
 
 	export interface BaseRolePermissions {

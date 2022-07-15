@@ -39,7 +39,7 @@ export class ContentGraphQLContextFactory {
 		let identityId = authResult.identityId
 		if (
 			authResult.assumedIdentityId &&
-			Object.values(schema.acl.roles).find(it => it.system?.assumeIdentity)
+			memberships.some(it => schema.acl.roles[it.role].system?.assumeIdentity)
 		) {
 			identityId = authResult.assumedIdentityId
 		}

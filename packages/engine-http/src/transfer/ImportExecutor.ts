@@ -1,5 +1,5 @@
 import { asyncIterableTransaction, Client, Connection, ConstraintHelper, wrapIdentifier } from '@contember/database'
-import { Model } from '@contember/schema'
+import { Model, Schema } from '@contember/schema'
 import * as Typesafe from '@contember/typesafe'
 import { ParseError } from '@contember/typesafe'
 import { Command, CommandArgsMap, CommandName } from './Command'
@@ -9,6 +9,7 @@ import { DbColumnSchema, TransferMapping, TransferTableMapping } from './Transfe
 import { Logger } from '@contember/engine-common'
 import { ContentSchemaTransferMappingFactory } from './ContentSchemaTransferMappingFactory'
 import { SystemSchemaTransferMappingFactory } from './SystemSchemaTransferMappingFactory'
+import { AuthResult, HttpError } from '../common/index'
 
 type Cell = boolean | number | string | null
 type Row = readonly Cell[]
@@ -74,13 +75,13 @@ export class ImportExecutor {
 	) {
 	}
 
-	async* import(groupContainer: ProjectGroupContainer, commands: AsyncIterable<Command>): AsyncIterable<ImportProgress> {
+	async* import(groupContainer: ProjectGroupContainer, authResult: AuthResult, commands: AsyncIterable<Command>): AsyncIterable<ImportProgress> {
 		try {
 			const it = await CommandIterator.create(commands)
 
 			const final = yield* this.match(it, {
-				importContentSchemaBegin: it => this.importContentSchemaBegin(groupContainer, it),
-				importSystemSchemaBegin: it => this.importSystemSchemaBegin(groupContainer, it),
+				importContentSchemaBegin: it => this.importContentSchemaBegin(groupContainer, authResult, it),
+				importSystemSchemaBegin: it => this.importSystemSchemaBegin(groupContainer, authResult, it),
 			})
 
 			if (final !== null) {
@@ -114,7 +115,7 @@ export class ImportExecutor {
 		return next
 	}
 
-	private async* importContentSchemaBegin(groupContainer: ProjectGroupContainer, it: CommandIterator<'importContentSchemaBegin'>) {
+	private async* importContentSchemaBegin(groupContainer: ProjectGroupContainer, authResult: AuthResult, it: CommandIterator<'importContentSchemaBegin'>) {
 		const [options] = it.commandArgs
 		const projectContainer = await this.createProjectContainer(groupContainer, options.project)
 		const systemDatabaseContext = projectContainer.systemDatabaseContextFactory.create()
@@ -126,6 +127,7 @@ export class ImportExecutor {
 			throw new ImportError(`Incompatible schema version (import version ${options.schemaVersion} does not match server version ${contentSchema.version})`)
 		}
 
+		await this.requireImportAccess(groupContainer, contentSchema, authResult, options.project, 'content')
 		const contentDatabaseClient = projectContainer.connection.createClient(stage.schema, {})
 		const mapping = this.contentSchemaTransferMappingFactory.createContentSchemaMapping(contentSchema)
 
@@ -151,9 +153,16 @@ export class ImportExecutor {
 		})
 	}
 
-	private async* importSystemSchemaBegin(groupContainer: ProjectGroupContainer, it: CommandIterator<'importSystemSchemaBegin'>) {
+	private async* importSystemSchemaBegin(groupContainer: ProjectGroupContainer, authResult: AuthResult, it: CommandIterator<'importSystemSchemaBegin'>) {
 		const [options] = it.commandArgs
 		const projectContainer = await this.createProjectContainer(groupContainer, options.project)
+		const schema = await groupContainer.projectSchemaResolver.getSchema(options.project)
+
+		if (schema === undefined) {
+			throw new ImportError(`Project ${options.project} does not have schema`)
+		}
+
+		await this.requireImportAccess(groupContainer, schema, authResult, options.project, 'system')
 		const systemDatabaseContext = projectContainer.systemDatabaseContextFactory.create()
 		const mapping = this.systemSchemaTransferMappingFactory.build()
 
@@ -249,6 +258,24 @@ export class ImportExecutor {
 		}
 
 		return projectContainer
+	}
+
+	private async requireImportAccess(groupContainer: ProjectGroupContainer, schema: Schema, authResult: AuthResult, projectSlug: string, kind: 'content' | 'system') {
+		const memberships = await groupContainer.projectMembershipResolver.resolveMemberships({
+			request: { get: () => '' },
+			acl: schema.acl,
+			projectSlug: projectSlug,
+			identity: {
+				id: authResult.identityId,
+				roles: authResult.roles,
+			},
+		})
+
+		const projectRoles = memberships.map(it => it.role)
+
+		if (!projectRoles.some(role => schema.acl.roles[role]?.[kind]?.import)) {
+			throw new HttpError(`Not allowed`, 403)
+		}
 	}
 
 	private async fetchStageBySlug(systemDatabaseContext: DatabaseContext, projectSlug: string, stageSlug: string) {

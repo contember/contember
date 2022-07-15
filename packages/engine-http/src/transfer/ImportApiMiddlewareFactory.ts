@@ -30,10 +30,6 @@ export class ImportApiMiddlewareFactory {
 			const authResult = await groupContainer.authenticator.authenticate({ request, timer })
 			koaContext.state.authResult = authResult
 
-			if (!authResult.roles.includes(TenantRole.SUPER_ADMIN) && !authResult.roles.includes(TenantRole.PROJECT_ADMIN)) {
-				throw new HttpError(`Not allowed`, 403)
-			}
-
 			if (request.headers['content-type'] !== 'application/x-ndjson') {
 				throw new HttpError(`Unsupported content type`, 400)
 			}
@@ -47,7 +43,7 @@ export class ImportApiMiddlewareFactory {
 
 			response.status = 200
 			response.headers['Content-Type'] = 'application/x-ndjson'
-			response.body = Readable.from(toBuffer(this.importExecutor.import(groupContainer, commands), 0))
+			response.body = Readable.from(toBuffer(this.importExecutor.import(groupContainer, authResult, commands), 0))
 		}
 	}
 }

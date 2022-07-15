@@ -18,6 +18,14 @@ export const normalizeSchema = <S extends Schema>(schema: S): S => {
 							read: true,
 						},
 					},
+					content: {
+						export: true,
+						import: true,
+					},
+					system: {
+						export: true,
+						import: true,
+					},
 					...((schema.acl.roles?.[ProjectRole.ADMIN] as Acl.RolePermissions | undefined) || {}),
 				},
 				[ProjectRole.CONTENT_ADMIN]: {
@@ -30,11 +38,14 @@ export const normalizeSchema = <S extends Schema>(schema: S): S => {
 							read: true,
 						},
 					},
+					content: {
+						export: true,
+						import: true,
+					},
 					system: {
-						diff: Acl.SystemPermissionsLevel.any,
-						history: Acl.SystemPermissionsLevel.any,
-						release: Acl.SystemPermissionsLevel.any,
-						rebase: Acl.SystemPermissionsLevel.any,
+						history: true,
+						export: true,
+						import: true,
 					},
 					...((schema.acl.roles?.[ProjectRole.CONTENT_ADMIN] as Acl.RolePermissions | undefined) || {}),
 				},

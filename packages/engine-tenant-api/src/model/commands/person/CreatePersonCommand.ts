@@ -9,6 +9,7 @@ export class CreatePersonCommand implements Command<Omit<PersonRow, 'roles'>> {
 		email?: string
 		name?: string
 		password: MaybePassword
+		idpOnly?: boolean
 	}) {}
 
 	async execute({ db, providers }: Command.Args): Promise<Omit<PersonRow, 'roles'>> {
@@ -23,6 +24,7 @@ export class CreatePersonCommand implements Command<Omit<PersonRow, 'roles'>> {
 				name: this.data.name ?? this.data.email ?? null,
 				password_hash,
 				identity_id: this.data.identityId,
+				idp_only: this.data.idpOnly ?? false,
 			})
 			.execute(db)
 

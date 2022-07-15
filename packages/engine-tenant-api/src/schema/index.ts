@@ -358,7 +358,8 @@ export type EnableIdpResponse = {
 }
 
 export type IdpOptions = {
-	readonly autoSignUp?: InputMaybe<Scalars['Boolean']>
+	readonly autoSignUp: Scalars['Boolean']
+	readonly exclusive: Scalars['Boolean']
 }
 
 export type IdpResponseInput = {
@@ -391,6 +392,7 @@ export type IdentityProvider = {
 	readonly __typename?: 'IdentityProvider'
 	readonly configuration: Scalars['Json']
 	readonly disabledAt: Scalars['DateTime']
+	readonly options: IdpOptions
 	readonly slug: Scalars['String']
 	readonly type: Scalars['String']
 }
@@ -960,6 +962,7 @@ export type SignInIdpError = {
 export enum SignInIdpErrorCode {
 	IdpValidationFailed = 'IDP_VALIDATION_FAILED',
 	InvalidIdpResponse = 'INVALID_IDP_RESPONSE',
+	PersonAlreadyExists = 'PERSON_ALREADY_EXISTS',
 	PersonNotFound = 'PERSON_NOT_FOUND'
 }
 
@@ -1668,6 +1671,7 @@ export type IdentityProjectRelationResolvers<ContextType = any, ParentType exten
 export type IdentityProviderResolvers<ContextType = any, ParentType extends ResolversParentTypes['IdentityProvider'] = ResolversParentTypes['IdentityProvider']> = {
 	configuration?: Resolver<ResolversTypes['Json'], ParentType, ContextType>
 	disabledAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>
+	options?: Resolver<ResolversTypes['IDPOptions'], ParentType, ContextType>
 	slug?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	type?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>

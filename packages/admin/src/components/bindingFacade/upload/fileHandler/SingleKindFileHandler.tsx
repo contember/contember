@@ -37,7 +37,8 @@ export class SingleKindFileHandler implements FileHandler {
 	}
 
 	staticRender(environment: Environment): ReactElement {
-		return staticRenderFileKind(this.kind, environment)
+		const [upload, outsideChildren] = staticRenderFileKind(this.kind, environment)
+		return <>{upload}{outsideChildren}</>
 	}
 
 	resolveEntity(parentEntity: EntityAccessor): ResolvedFileEntity {

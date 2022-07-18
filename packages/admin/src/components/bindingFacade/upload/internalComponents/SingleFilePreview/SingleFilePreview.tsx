@@ -64,7 +64,10 @@ export const SingleFilePreview = memo(
 		} else {
 			return null
 		}
-		const editContents = resolvedEntity.fileKind && resolvedEntity.fileKind.children ? <Box>{resolvedEntity.fileKind.children}</Box> : undefined
+		let editContents = resolvedEntity.fileKind && resolvedEntity.fileKind.children ? <Box>{resolvedEntity.fileKind.children}</Box> : undefined
+		if (resolvedEntity.fileKind?.childrenOutsideBaseEntity) {
+			editContents = <Entity accessor={resolvedEntity.parentEntity}>{editContents}</Entity>
+		}
 
 		const box = (
 			<ActionableBox className={toEnumViewClass(viewFromMimeType(resolvedEntity.fileKind?.acceptMimeTypes))} onRemove={onRemove} editContents={editContents}>

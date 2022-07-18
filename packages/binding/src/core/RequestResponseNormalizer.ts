@@ -10,7 +10,6 @@ import { PRIMARY_KEY_NAME } from '../bindingTypes'
 import { EntityId } from '../treeParameters'
 import {
 	EntityFieldMarkers,
-	EntityFieldMarkersContainer,
 	EntityListSubTreeMarker,
 	EntitySubTreeMarker,
 	FieldMarker,
@@ -35,13 +34,20 @@ export class RequestResponseNormalizer {
 				if (data === null) {
 					subTreeDataStore.delete(placeholder)
 				} else {
-					const entityData = this.createEntityData(persistedEntityDataStore, data as ReceivedEntityData, marker.fields.markers)
-					subTreeDataStore.set(placeholder, entityData)
+					if (Array.isArray(data)) {
+						throw new BindingError()
+					}
+					const id = this.processEntityData(persistedEntityDataStore, data, marker.fields.markers)
+					subTreeDataStore.set(placeholder, id)
 				}
 			} else if (EntityListSubTreeMarker) {
 				const subTreeListIds = new Set<EntityId>()
-				for (const row of data as ReceivedEntityData[]) {
-					subTreeListIds.add(this.createEntityData(persistedEntityDataStore, row, marker.fields.markers).value)
+				if (!Array.isArray(data)) {
+					throw new BindingError()
+				}
+				for (const row of data) {
+					const id = this.processEntityData(persistedEntityDataStore, row, marker.fields.markers)
+					subTreeListIds.add(id.value)
 				}
 				subTreeDataStore.set(placeholder, subTreeListIds)
 			} else {
@@ -62,13 +68,12 @@ export class RequestResponseNormalizer {
 			const { subTreePlaceholder, subTreeType, alias } = operation
 
 			const receivedData = newPersistedData[alias]
+			if (!receivedData || Array.isArray(receivedData)) {
+				throw new BindingError()
+			}
 
-			const markers = 'markers' in operation ? operation.markers : undefined
-			const id = this.createEntityData(persistedEntityDataStore, receivedData as ReceivedEntityData, markers)
 			if (operation.type === 'update' || operation.type === 'create') {
-				if (!receivedData) {
-					throw new BindingError()
-				}
+				const id = this.processEntityData(persistedEntityDataStore, receivedData, operation.markers)
 				if (subTreeType === 'single') {
 					subTreeDataStore.set(subTreePlaceholder, id)
 				} else if (subTreeType === 'list') {
@@ -88,6 +93,7 @@ export class RequestResponseNormalizer {
 					return assertNever(subTreeType)
 				}
 			} else if (operation.type === 'delete') {
+				const id = this.extractId(receivedData)
 				// TODO there are potentially some references to entityId that this whole process won't quite remove.
 				//		That's a memory leak. Probably not particularly severe in most cases but still.
 				persistedEntityDataStore.delete(id.uniqueValue)
@@ -109,20 +115,10 @@ export class RequestResponseNormalizer {
 		}
 	}
 
-	private static createEntityData(entityMap: PersistedEntityDataStore, entityData: ReceivedEntityData, fields?: EntityFieldMarkers): ServerId {
-		const primaryKey: EntityId | undefined = entityData[PRIMARY_KEY_NAME]
-
-		if (primaryKey === undefined) {
-			throw new BindingError(`The server has responded with an entity that lacks a primary key.`)
-		}
-
-		const id = new ServerId(primaryKey, entityData.__typename)
+	private static processEntityData(entityMap: PersistedEntityDataStore, entityData: ReceivedEntityData, fields: EntityFieldMarkers): ServerId {
+		const id = this.extractId(entityData)
 		const presentEntityData = entityMap.get(id.uniqueValue) ?? new Map()
 		entityMap.set(id.uniqueValue, presentEntityData)
-
-		if (!fields) {
-			return id
-		}
 
 		for (const [placeholder, field] of fields) {
 			const value = entityData[placeholder]
@@ -132,7 +128,7 @@ export class RequestResponseNormalizer {
 				if (value === null) {
 					presentEntityData.set(placeholder, null)
 				} else {
-					presentEntityData.set(placeholder, this.createEntityData(entityMap, value as ReceivedEntityData, field.fields.markers))
+					presentEntityData.set(placeholder, this.processEntityData(entityMap, value as ReceivedEntityData, field.fields.markers))
 				}
 			} else if (field instanceof HasManyRelationMarker) {
 				const ids = presentEntityData.get(placeholder) ?? new Set()
@@ -142,7 +138,8 @@ export class RequestResponseNormalizer {
 				}
 				ids.clear()
 				for (const row of value as ReceivedEntityData[]) {
-					ids.add(this.createEntityData(entityMap, row, field.fields.markers).value)
+					const id = this.processEntityData(entityMap, row, field.fields.markers)
+					ids.add(id.value)
 				}
 			} else {
 				throw new Error()
@@ -150,5 +147,15 @@ export class RequestResponseNormalizer {
 		}
 
 		return id
+	}
+
+	private static extractId(entityData: ReceivedEntityData): ServerId {
+		const primaryKey: EntityId | undefined = entityData[PRIMARY_KEY_NAME]
+
+		if (primaryKey === undefined) {
+			throw new BindingError(`The server has responded with an entity that lacks a primary key.`)
+		}
+
+		return new ServerId(primaryKey, entityData.__typename)
 	}
 }

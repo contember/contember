@@ -19,6 +19,7 @@ import { createConnectionMock, ExpectedQuery } from '@contember/database-tester'
 import { Acl, Schema } from '@contember/schema'
 import { createMockedMailer, ExpectedMessage } from './mailer'
 import { dbCredentials } from './dbUtils'
+import { IdPMock } from './IdPMock'
 
 export interface Test {
 	query: GraphQLTestQuery
@@ -94,6 +95,9 @@ export const executeTenantTest = async (test: Test) => {
 			cryptoProviders: providers,
 		})
 		.replaceService('mailer', () => mailer)
+		.setupService('idpRegistry', reg => {
+			reg.registerHandler('mock', new IdPMock())
+		})
 		.build()
 
 	const databaseContext = tenantContainer.databaseContext

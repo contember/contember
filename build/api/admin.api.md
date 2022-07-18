@@ -7,6 +7,7 @@
 /// <reference types="react" />
 
 import type { AccessorTreeState } from '@contember/binding';
+import type { AllControlProps } from '@contember/ui';
 import { Ancestor } from 'slate';
 import { AnchorButtonProps } from '@contember/ui';
 import { AnchorHTMLAttributes } from 'react';
@@ -70,6 +71,8 @@ import { IconProps } from '@contember/ui';
 import { IconSourceSpecification } from '@contember/ui';
 import type { ImgHTMLAttributes } from 'react';
 import { InputHTMLAttributes } from 'react';
+import { JsonObject } from '@contember/binding';
+import { JsonValue } from '@contember/binding';
 import { Justification } from '@contember/ui';
 import type { KeyboardEvent as KeyboardEvent_2 } from 'react';
 import { LayoutPageProps } from '@contember/ui';
@@ -106,7 +109,7 @@ import { RenderLeafProps } from 'slate-react';
 import { RepeaterItemContainerProps } from '@contember/ui';
 import type { S3FileUploader } from '@contember/client';
 import { SaveButtonProps } from '@contember/ui';
-import { Scalar } from '@contember/binding';
+import type { Scalar } from '@contember/binding';
 import { Scheme } from '@contember/ui';
 import { SearchInputProps } from '@contember/ui';
 import { Selection as Selection_2 } from 'slate';
@@ -602,7 +605,7 @@ export const choiceFieldDictionary: {
 };
 
 // @public (undocumented)
-export type ChoiceFieldProps = (ChoiceFieldData.SingleChoiceFieldProps<Scalar> & StaticSingleChoiceFieldProps) | (ChoiceFieldData.SingleChoiceFieldProps<EntityAccessor> & DynamicSingleChoiceFieldProps);
+export type ChoiceFieldProps = (ChoiceFieldData.SingleChoiceFieldProps<FieldValue> & StaticSingleChoiceFieldProps) | (ChoiceFieldData.SingleChoiceFieldProps<EntityAccessor> & DynamicSingleChoiceFieldProps);
 
 // @public (undocumented)
 export const ClearFieldButton: NamedExoticComponent<ClearFieldButtonProps>;
@@ -628,7 +631,7 @@ export type ClearFieldButtonInnerPublicProps = ButtonProps;
 export type ClearFieldButtonProps = Omit<ClearFieldButtonInnerPublicProps, 'defaultValue'> & SimpleRelativeSingleFieldProps;
 
 // @public (undocumented)
-export const CoalesceFieldView: <Persisted extends Scalar = Scalar>(props: CoalesceFieldViewProps<Persisted>) => ReactElement;
+export const CoalesceFieldView: <Persisted extends FieldValue = FieldValue>(props: CoalesceFieldViewProps<Persisted>) => ReactElement;
 
 // @public (undocumented)
 export interface CoalesceFieldViewProps<Persisted extends FieldValue = FieldValue> extends FieldFallbackViewPublicProps {
@@ -749,6 +752,9 @@ export type ControlledDataGridProps<ComponentExtraProps extends {}> = DataGridCo
     component: ComponentType<DataGridContainerProps & ComponentExtraProps>;
     componentProps: ComponentExtraProps;
 });
+
+// @public (undocumented)
+export type ControlValueParser<ControlVal, FieldVal extends FieldValue> = (value: ControlVal | null | undefined, field: FieldAccessor<FieldVal>) => FieldVal | null;
 
 // Warning: (ae-forgotten-export) The symbol "CreateApiKeyFormProps" needs to be exported by the entry point index.d.ts
 //
@@ -1582,6 +1588,9 @@ export type FieldFallbackViewPublicProps = Partial<FieldFallbackViewProps>;
 // @public (undocumented)
 export type FieldFallbackViewStyle = 'n/a' | 'nothing' | 'unknown';
 
+// @public (undocumented)
+export type FieldValueFormatter<FieldVal extends FieldValue, ControlVal extends FieldValue> = (value: FieldVal | null | undefined, field: FieldAccessor<FieldVal>) => ControlVal | null;
+
 // Warning: (ae-forgotten-export) The symbol "fieldViewDictionary" needs to be exported by the entry point index.d.ts
 //
 // @public (undocumented)
@@ -1848,9 +1857,7 @@ export const getVideoFileDataExtractor: (props: VideoFileDataExtractorProps) => 
 
 // @public (undocumented)
 export namespace GQLVariable {
-    const // Warning: (ae-forgotten-export) The symbol "JsonValue" needs to be exported by the entry point index.d.ts
-    //
-    // (undocumented)
+    const // (undocumented)
     Json: GQLVariableType<JsonValue<undefined>, false>;
     const // (undocumented)
     String: GQLVariableType<string, false>;
@@ -2185,7 +2192,7 @@ export interface IDPResponseHandlerProps {
 }
 
 // @public (undocumented)
-export const ImageFieldView: <SrcField extends Scalar = string>(props: ImageFieldViewProps<SrcField>) => ReactElement;
+export const ImageFieldView: <SrcField extends FieldValue = string>(props: ImageFieldViewProps<SrcField>) => ReactElement;
 
 // @public (undocumented)
 export interface ImageFieldViewProps<SrcField extends FieldValue = string> extends Omit<ImgHTMLAttributes<HTMLImageElement>, 'src'>, FieldFallbackViewPublicProps {
@@ -3694,7 +3701,7 @@ export interface SignInIDPResult {
 export type SimpleDynamicSingleChoiceFieldProps = SugaredRelativeSingleEntity & BaseDynamicChoiceFieldOptions & Pick<DynamicSingleChoiceFieldProps, 'transformOptions'>;
 
 // @public (undocumented)
-export const SimpleRelativeSingleField: <P extends FieldBasicProps & Omit<FieldContainerProps, "children">, Value extends Scalar = Scalar>(render: (fieldMetadata: SimpleRelativeSingleFieldMetadata<Value>, props: P) => ReactNode, displayName: string, defaultProps?: Partial<P> | undefined) => NamedExoticComponent<P>;
+export const SimpleRelativeSingleField: <P extends FieldBasicProps & Omit<FieldContainerProps, "children">, Value extends FieldValue = FieldValue>(render: (fieldMetadata: SimpleRelativeSingleFieldMetadata<Value>, props: P) => ReactNode, displayName: string, defaultProps?: Partial<P> | undefined) => NamedExoticComponent<P>;
 
 // @public (undocumented)
 export interface SimpleRelativeSingleFieldMetadata<Value extends FieldValue = FieldValue> {
@@ -3797,12 +3804,12 @@ export interface StaticOption {
 }
 
 // @public (undocumented)
-export const StaticSingleChoiceField: FunctionComponent<StaticSingleChoiceFieldProps & ChoiceFieldData.SingleChoiceFieldProps<Scalar>>;
+export const StaticSingleChoiceField: FunctionComponent<StaticSingleChoiceFieldProps & ChoiceFieldData.SingleChoiceFieldProps<FieldValue>>;
 
 // Warning: (ae-forgotten-export) The symbol "SelectFuseOptionsProps" needs to be exported by the entry point index.d.ts
 //
 // @public (undocumented)
-export type StaticSingleChoiceFieldProps = SugaredRelativeSingleField & SelectFuseOptionsProps<Scalar> & {
+export type StaticSingleChoiceFieldProps = SugaredRelativeSingleField & SelectFuseOptionsProps<FieldValue> & {
     options: OptionallyVariableStaticOption[];
 };
 
@@ -4088,6 +4095,13 @@ token: GQLVariableType<string, true>;
 }>, TenantMutationResponse<never, ConfirmOtpErrors>>;
 
 // @public (undocumented)
+export type UseControlProps<FieldVal extends FieldValue, ControlVal extends FieldValue> = ControlProps<FieldVal> & {
+    fieldMetadata: SimpleRelativeSingleFieldMetadata<FieldVal>;
+    parse: ControlValueParser<ControlVal, FieldVal>;
+    format: FieldValueFormatter<FieldVal, ControlVal>;
+};
+
+// @public (undocumented)
 export const useCreateApiKey: () => TenantMutationExecutor<GQLVariableValues<    {
 projectSlug: GQLVariableType<string, true>;
 description: GQLVariableType<string, true>;
@@ -4152,6 +4166,11 @@ export const useFetchMe: () => () => Promise<{
     data: MeResponse;
 }>;
 
+// @public (undocumented)
+export const useFieldControl: <FieldVal extends FieldValue, ControlVal extends FieldValue, Type extends string | undefined = string | undefined>({ fieldMetadata, parse, format, ...props }: UseControlProps<FieldVal, ControlVal>) => AllControlProps<ControlVal> & {
+    ref: Ref<any>;
+};
+
 // Warning: (ae-forgotten-export) The symbol "FormHandler" needs to be exported by the entry point index.d.ts
 // Warning: (ae-forgotten-export) The symbol "FormMethods" needs to be exported by the entry point index.d.ts
 //
@@ -4210,8 +4229,6 @@ export const useLogout: () => ({ noRedirect }?: {
 // @public (undocumented)
 export const useMessageFormatter: <Dict extends MessageDictionary>(defaultDictionary: Dict) => MessageFormatter<Dict>;
 
-// Warning: (ae-forgotten-export) The symbol "JsonObject" needs to be exported by the entry point index.d.ts
-//
 // @public (undocumented)
 export const useMutation: <R, V extends JsonObject<never>>(client: GraphQlClient, query: string, apiToken?: string | undefined, headers?: Record<string, string> | undefined) => UseMutationReturn<R, V>;
 
@@ -4356,7 +4373,7 @@ export interface Variables {
 export const VariableSelector: FC<VariableSelectorProps>;
 
 // @public (undocumented)
-export const VideoFieldView: <SrcField extends Scalar = string>(props: VideoFieldViewProps<SrcField>) => ReactElement;
+export const VideoFieldView: <SrcField extends FieldValue = string>(props: VideoFieldViewProps<SrcField>) => ReactElement;
 
 // @public (undocumented)
 export interface VideoFieldViewProps<SrcField extends FieldValue = string> extends Omit<VideoHTMLAttributes<HTMLVideoElement>, 'src'>, FieldFallbackViewPublicProps {

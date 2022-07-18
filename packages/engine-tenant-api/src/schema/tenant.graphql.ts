@@ -338,10 +338,10 @@ const schema: DocumentNode = gql`
 		type: String!
 		configuration: Json!
 		disabledAt: DateTime!
-		options: IDPOptions!
+		options: IDPOptionsOutput!
 	}
 
-	type IDPOptions {
+	type IDPOptionsOutput {
 		autoSignUp: Boolean!
 		exclusive: Boolean!
 	}

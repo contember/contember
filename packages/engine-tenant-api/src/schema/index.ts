@@ -358,6 +358,12 @@ export type EnableIdpResponse = {
 }
 
 export type IdpOptions = {
+	readonly autoSignUp?: InputMaybe<Scalars['Boolean']>
+	readonly exclusive?: InputMaybe<Scalars['Boolean']>
+}
+
+export type IdpOptionsOutput = {
+	readonly __typename?: 'IDPOptionsOutput'
 	readonly autoSignUp: Scalars['Boolean']
 	readonly exclusive: Scalars['Boolean']
 }
@@ -392,7 +398,7 @@ export type IdentityProvider = {
 	readonly __typename?: 'IdentityProvider'
 	readonly configuration: Scalars['Json']
 	readonly disabledAt: Scalars['DateTime']
-	readonly options: IdpOptions
+	readonly options: IdpOptionsOutput
 	readonly slug: Scalars['String']
 	readonly type: Scalars['String']
 }
@@ -1234,6 +1240,7 @@ export type ResolversTypes = {
 	EnableIDPErrorCode: EnableIdpErrorCode
 	EnableIDPResponse: ResolverTypeWrapper<EnableIdpResponse>
 	IDPOptions: IdpOptions
+	IDPOptionsOutput: ResolverTypeWrapper<IdpOptionsOutput>
 	IDPResponseInput: IdpResponseInput
 	Identity: ResolverTypeWrapper<Identity>
 	IdentityGlobalPermissions: ResolverTypeWrapper<IdentityGlobalPermissions>
@@ -1352,6 +1359,7 @@ export type ResolversParentTypes = {
 	EnableIDPError: EnableIdpError
 	EnableIDPResponse: EnableIdpResponse
 	IDPOptions: IdpOptions
+	IDPOptionsOutput: IdpOptionsOutput
 	IDPResponseInput: IdpResponseInput
 	Identity: Identity
 	IdentityGlobalPermissions: IdentityGlobalPermissions
@@ -1646,6 +1654,12 @@ export type EnableIdpResponseResolvers<ContextType = any, ParentType extends Res
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
+export type IdpOptionsOutputResolvers<ContextType = any, ParentType extends ResolversParentTypes['IDPOptionsOutput'] = ResolversParentTypes['IDPOptionsOutput']> = {
+	autoSignUp?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	exclusive?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
 export type IdentityResolvers<ContextType = any, ParentType extends ResolversParentTypes['Identity'] = ResolversParentTypes['Identity']> = {
 	apiKey?: Resolver<Maybe<ResolversTypes['ApiKey']>, ParentType, ContextType>
 	description?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
@@ -1671,7 +1685,7 @@ export type IdentityProjectRelationResolvers<ContextType = any, ParentType exten
 export type IdentityProviderResolvers<ContextType = any, ParentType extends ResolversParentTypes['IdentityProvider'] = ResolversParentTypes['IdentityProvider']> = {
 	configuration?: Resolver<ResolversTypes['Json'], ParentType, ContextType>
 	disabledAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>
-	options?: Resolver<ResolversTypes['IDPOptions'], ParentType, ContextType>
+	options?: Resolver<ResolversTypes['IDPOptionsOutput'], ParentType, ContextType>
 	slug?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	type?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
@@ -2044,6 +2058,7 @@ export type Resolvers<ContextType = any> = {
 	DisableOtpResponse?: DisableOtpResponseResolvers<ContextType>
 	EnableIDPError?: EnableIdpErrorResolvers<ContextType>
 	EnableIDPResponse?: EnableIdpResponseResolvers<ContextType>
+	IDPOptionsOutput?: IdpOptionsOutputResolvers<ContextType>
 	Identity?: IdentityResolvers<ContextType>
 	IdentityGlobalPermissions?: IdentityGlobalPermissionsResolvers<ContextType>
 	IdentityProjectRelation?: IdentityProjectRelationResolvers<ContextType>

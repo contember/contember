@@ -1,6 +1,5 @@
-import { Button, FieldContainer, Message, Stack, TextInput } from '@contember/ui'
+import { Button, FieldContainer, Message, Stack, TextInput, useShowToast } from '@contember/ui'
 import { FC, useCallback } from 'react'
-import { useShowToast } from '../../../components'
 import { useForm } from '../../lib'
 import { PrepareOtpResult, usePrepareOtp } from '../../mutations'
 
@@ -19,19 +18,19 @@ export const PrepareOtpForm: FC<PrepareOtpFormProps> = ({ onPrepared, isReSetup,
 	const prepareOtp = usePrepareOtp()
 
 	const { isSubmitting, onSubmit, register } = useForm<typeof initialValues>(initialValues, useCallback(
-			async values => {
-				const response = await prepareOtp({ label: values.label })
-				if (response.ok) {
-					onPrepared(response.result)
-				} else {
-					switch (response.error.code) {
-						case 'OTP_NOT_ACTIVE':
-							return addToast({ message: `Two factor is not active`, type: 'error', dismiss: true })
-					}
+		async values => {
+			const response = await prepareOtp({ label: values.label })
+			if (response.ok) {
+				onPrepared(response.result)
+			} else {
+				switch (response.error.code) {
+					case 'OTP_NOT_ACTIVE':
+						return addToast({ message: `Two factor is not active`, type: 'error', dismiss: true })
 				}
-			},
-			[addToast, prepareOtp, onPrepared],
-		),
+			}
+		},
+		[addToast, prepareOtp, onPrepared],
+	),
 	)
 
 	return (

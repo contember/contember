@@ -1,6 +1,6 @@
-import { Button, FieldContainer, TextInput } from '@contember/ui'
+import { Button, FieldContainer, TextInput, useShowToast } from '@contember/ui'
 import { FC, useCallback, useContext } from 'react'
-import { IdentityRefreshContext, useShowToast } from '../../../components'
+import { IdentityRefreshContext } from '../../../components'
 import { RoutingLinkTarget, useRedirect } from '../../../routing'
 import { useForm } from '../../lib'
 import { useConfirmOtp } from '../../mutations'
@@ -21,28 +21,28 @@ export const ConfirmOtpForm: FC<ConfirmOtpFormProps> = ({ redirectOnSuccess, onS
 	const refreshIdentity = useContext(IdentityRefreshContext)
 
 	const { isSubmitting, onSubmit, register } = useForm<typeof initialValues>(initialValues, useCallback(
-			async values => {
-				const response = await confirmOtp({ token: values.token })
-				if (response.ok) {
-					addToast({
-						type: 'success',
-						message: `Two-factor authentication has been enabled`,
-						dismiss: true,
-					})
-					refreshIdentity()
-					redirectOnSuccess && redirect(redirectOnSuccess)
-					onSuccess && onSuccess()
-				} else {
-					switch (response.error.code) {
-						case 'INVALID_OTP_TOKEN':
-							return addToast({ message: `Provided code is not valid`, type: 'error' })
-						case 'NOT_PREPARED':
-							return addToast({ message: `Two factor setup was not initialized`, type: 'error' })
-					}
+		async values => {
+			const response = await confirmOtp({ token: values.token })
+			if (response.ok) {
+				addToast({
+					type: 'success',
+					message: `Two-factor authentication has been enabled`,
+					dismiss: true,
+				})
+				refreshIdentity()
+				redirectOnSuccess && redirect(redirectOnSuccess)
+				onSuccess && onSuccess()
+			} else {
+				switch (response.error.code) {
+					case 'INVALID_OTP_TOKEN':
+						return addToast({ message: `Provided code is not valid`, type: 'error' })
+					case 'NOT_PREPARED':
+						return addToast({ message: `Two factor setup was not initialized`, type: 'error' })
 				}
-			},
-			[addToast, confirmOtp, onSuccess, redirect, redirectOnSuccess, refreshIdentity],
-		),
+			}
+		},
+		[addToast, confirmOtp, onSuccess, redirect, redirectOnSuccess, refreshIdentity],
+	),
 	)
 
 

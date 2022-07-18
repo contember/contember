@@ -3977,39 +3977,6 @@ export const TimeField: NamedExoticComponent<TimeFieldProps>;
 export type TimeFieldProps = SimpleRelativeSingleFieldProps & TimeInputProps;
 
 // @public (undocumented)
-export interface Toast extends ToastDefinition {
-    // (undocumented)
-    id: ToastId;
-}
-
-// @public (undocumented)
-export interface ToastDefinition {
-    // (undocumented)
-    message: ReactNode;
-    // (undocumented)
-    type: ToastType;
-}
-
-// @public (undocumented)
-export const Toaster: React.FC;
-
-// @public (undocumented)
-export const ToasterContext: Context<    {
-toasts: Toast[];
-showToast: (toast: ToastDefinition) => ToastId;
-dismissToast: (toastId: ToastId) => void;
-} | undefined>;
-
-// @public (undocumented)
-export const ToasterProvider: React.FC;
-
-// @public (undocumented)
-export type ToastId = string;
-
-// @public (undocumented)
-export type ToastType = 'success' | 'error' | 'warning' | 'info';
-
-// @public (undocumented)
 export type ToolbarButtonSpec = ElementToolbarButton<any> | MarkToolbarButton<any> | InitializeReferenceToolbarButton | GenericToolbarButton;
 
 // @public (undocumented)
@@ -4330,11 +4297,6 @@ export interface UsersListProps {
 //
 // @public (undocumented)
 export const UsersManagement: FC<UsersManagementProps<any>>;
-
-// Warning: (ae-forgotten-export) The symbol "ToastData" needs to be exported by the entry point index.d.ts
-//
-// @public (undocumented)
-export const useShowToast: () => (toast: ToastData) => void;
 
 // @public (undocumented)
 export const useSignIn: () => TenantMutationExecutor<GQLVariableValues<    {

@@ -1,6 +1,6 @@
 import { useCallback, useContext } from 'react'
-import { ToasterContext } from './ToasterContext'
 import { ToastDefinition, ToastType } from './Toaster'
+import { ToasterContext } from './ToasterContext'
 
 type ToastData = ToastDefinition & { dismiss?: number | boolean}
 

@@ -30,6 +30,6 @@ test('select or create', async ({ page }) => {
 
 	//
 	await page.locator('button:has-text("Save")').click()
-	await page.waitForSelector('.toaster-item')
+	await page.waitForSelector('.cui-toaster-item')
 	expect(await page.screenshot()).toMatchSnapshot('04-after-save.png')
 })

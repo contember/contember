@@ -1,12 +1,11 @@
 import { Environment, EnvironmentContext } from '@contember/binding'
 import { ContemberClient, ContemberClientProps } from '@contember/react-client'
-import { DialogProvider, SectionTabsProvider, StyleProvider } from '@contember/ui'
+import { DialogProvider, SectionTabsProvider, StyleProvider, Toaster, ToasterProvider } from '@contember/ui'
 import { ReactNode } from 'react'
 import { I18nProvider, MessageDictionaryByLocaleCode } from '../i18n'
 import { RequestProvider, RouteMap, RoutingContext, RoutingContextValue, SelectedDimension } from '../routing'
 import { IdentityProvider } from './Identity'
 import { NavigationProvider } from './NavigationProvider'
-import { Toaster, ToasterProvider } from './Toaster'
 
 export interface ApplicationEntrypointProps extends ContemberClientProps {
 	basePath?: string

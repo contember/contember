@@ -19,6 +19,6 @@ test('basic test', async ({ page }) => {
 	await page.locator('input#pw-title').click()
 	await page.locator('input#pw-title').fill('My First Article')
 	await page.locator('button:has-text("Save")').click()
-	await page.waitForSelector('.toaster-item')
+	await page.waitForSelector('.cui-toaster-item')
 	expect(await page.screenshot()).toMatchSnapshot('after-save.png')
 })

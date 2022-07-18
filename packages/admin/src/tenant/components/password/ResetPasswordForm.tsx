@@ -1,6 +1,5 @@
-import { Button, FieldContainer, Stack, TextInput } from '@contember/ui'
+import { Button, FieldContainer, Stack, TextInput, useShowToast } from '@contember/ui'
 import { FC, useCallback } from 'react'
-import { useShowToast } from '../../../components'
 import { RoutingLinkTarget, useRedirect } from '../../../routing'
 import { useForm } from '../../lib'
 import { useResetPassword } from '../../mutations'
@@ -21,36 +20,35 @@ export const ResetPasswordForm: FC<ResetPasswordFormProps> = ({ redirectOnSucces
 	const resetPassword = useResetPassword()
 
 	const { register, isSubmitting, onSubmit } = useForm<typeof initialValues>(initialValues, useCallback(
-			async values => {
-				if (values.password !== values.passwordAgain) {
-					return addToast({ message: `Passwords does not match`, type: 'error', dismiss: true })
-				}
-				const response = await resetPassword({
-					password: values.password,
-					token,
+		async values => {
+			if (values.password !== values.passwordAgain) {
+				return addToast({ message: `Passwords does not match`, type: 'error', dismiss: true })
+			}
+			const response = await resetPassword({
+				password: values.password,
+				token,
+			})
+			if (response.ok) {
+				addToast({
+					type: 'success',
+					message: `Password successfully set.`,
+					dismiss: true,
 				})
-				if (response.ok) {
-					addToast({
-						type: 'success',
-						message: `Password successfully set.`,
-						dismiss: true,
-					})
-					redirect(redirectOnSuccess)
-				} else {
-					switch (response.error.code) {
-						case 'PASSWORD_TOO_WEAK':
-							return addToast({ message: `Password is too weak`, type: 'error', dismiss: true })
-						case 'TOKEN_NOT_FOUND':
-						case 'TOKEN_USED':
-						case 'TOKEN_EXPIRED':
-							return addToast({ message: `Reset link is not valid`, type: 'error', dismiss: true })
-					}
+				redirect(redirectOnSuccess)
+			} else {
+				switch (response.error.code) {
+					case 'PASSWORD_TOO_WEAK':
+						return addToast({ message: `Password is too weak`, type: 'error', dismiss: true })
+					case 'TOKEN_NOT_FOUND':
+					case 'TOKEN_USED':
+					case 'TOKEN_EXPIRED':
+						return addToast({ message: `Reset link is not valid`, type: 'error', dismiss: true })
 				}
-			},
-			[addToast, redirect, redirectOnSuccess, resetPassword, token],
-		),
+			}
+		},
+		[addToast, redirect, redirectOnSuccess, resetPassword, token],
+	),
 	)
-
 
 	return (
 		<form onSubmit={onSubmit}>

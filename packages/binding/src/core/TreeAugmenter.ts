@@ -15,6 +15,7 @@ import { OperationsHelpers } from './operations/OperationsHelpers'
 import type { EntityListState, EntityRealmState, EntityRealmStateStub, RootStateNode } from './state'
 import type { StateInitializer } from './StateInitializer'
 import type { TreeStore } from './TreeStore'
+import { SubMutationOperation } from './MutationGenerator'
 
 export class TreeAugmenter {
 	public constructor(
@@ -40,8 +41,8 @@ export class TreeAugmenter {
 		}
 	}
 
-	public updatePersistedData(response: ReceivedDataTree) {
-		this.treeStore.mergeInMutationResponse(response)
+	public updatePersistedData(response: ReceivedDataTree, operations: SubMutationOperation[]) {
+		this.treeStore.mergeInMutationResponse(response, operations)
 
 		this.eventManager.syncTransaction(() => {
 			for (const rootStates of this.treeStore.subTreeStatesByRoot.values()) {

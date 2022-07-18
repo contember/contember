@@ -143,9 +143,9 @@ export class DataBinding {
 						}
 
 						const generator = new MutationGenerator(this.treeStore)
-						const mutation = generator.getPersistMutation()
+						const mutationResult = generator.getPersistMutation()
 
-						if (mutation === undefined) {
+						if (mutationResult === undefined) {
 							this.dirtinessTracker.reset() // TODO This ideally shouldn't be necessary but given the current limitations, this makes for better UX.
 							const persistSuccessOptions: PersistSuccessOptions = {
 								...this.bindingOperations,
@@ -158,15 +158,16 @@ export class DataBinding {
 								type: 'nothingToPersist',
 							}
 						}
+						const { query, operations } = mutationResult
 
-						const mutationResponse: MutationRequestResponse = await this.contentApiClient.sendRequest(mutation, {
+						const mutationResponse: MutationRequestResponse = await this.contentApiClient.sendRequest(query, {
 							signal,
 						})
 
 						if (mutationResponse.errors !== undefined && mutationResponse.errors.length > 0) {
 							this.onError({
 								type: 'gqlError',
-								query: mutation,
+								query,
 								errors: mutationResponse.errors,
 							})
 						}
@@ -195,6 +196,7 @@ export class DataBinding {
 												subTreeResponse.node,
 											]),
 										),
+										operations,
 									)
 									const persistSuccessOptions: PersistSuccessOptions = {
 										...this.bindingOperations,

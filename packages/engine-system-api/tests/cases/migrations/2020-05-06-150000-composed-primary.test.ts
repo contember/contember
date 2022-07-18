@@ -6,6 +6,7 @@ import { test, assert } from 'vitest'
 test('many-has-many-primary migration sql', async () => {
 	const builder = createMigrationBuilder()
 	await migration(builder, {
+		connection: undefined as any,
 		schemaResolver: () => Promise.resolve(sampleProject),
 		project: {
 			slug: 'test',

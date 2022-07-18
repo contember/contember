@@ -1,4 +1,4 @@
-import { Client, Connection, DatabaseConfig, EventManager, PoolStatus } from '@contember/database'
+import { Client, Connection, DatabaseConfig, EventManager } from '@contember/database'
 import { assert } from 'vitest'
 
 export interface ExpectedQuery {
@@ -7,7 +7,7 @@ export interface ExpectedQuery {
 	response: Partial<Connection.Result>
 }
 
-export class ConnectionMock implements Connection.ConnectionType  {
+export class ConnectionMock implements Connection.ConnectionType, Connection.TransactionLike  {
 
 	public config: DatabaseConfig = { database: '', host: '', password: '', user: '', port: 5432 }
 
@@ -59,6 +59,13 @@ ${expected.sql}`
 		}, {} as any)
 
 		return expected.response as any
+	}
+
+	async scope<Result>(
+		callback: (connection: Connection.TransactionLike) => Promise<Result> | Result,
+		options: { eventManager?: EventManager } = {},
+	): Promise<Result> {
+		return await callback(new ConnectionMock(this.queries, new EventManager(options.eventManager ?? this.eventManager)))
 	}
 
 	async transaction<Result>(

@@ -67,7 +67,7 @@ export class TesterStageManager {
 			...it,
 			id: testUuid(0),
 			schema: formatSchemaName(it),
-		})), [migration], () => null)
+		})), [migration], { })
 	}
 
 	private getStageInternal(slug: string): StageConfig {

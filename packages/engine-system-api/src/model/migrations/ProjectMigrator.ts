@@ -1,6 +1,5 @@
-import { Migration, MigrationDescriber } from '@contember/schema-migrations'
+import { calculateMigrationChecksum, Migration, MigrationDescriber } from '@contember/schema-migrations'
 import { Client, QueryError, wrapIdentifier } from '@contember/database'
-import { formatSchemaName } from '../helpers'
 import { Schema } from '@contember/schema'
 import { SaveMigrationCommand } from '../commands'
 import { Stage } from '../dtos'
@@ -21,19 +20,20 @@ export class ProjectMigrator {
 		db: DatabaseContext,
 		stages: Stage[],
 		migrationsToExecute: readonly Migration[],
-		logger: (message: string) => void,
-		ignoreOrder: boolean = false,
+		{ ignoreOrder = false, skipExecuted = false }: {
+			ignoreOrder?: boolean
+			skipExecuted?: boolean
+		},
 	) {
 		if (migrationsToExecute.length === 0) {
 			return
 		}
 		let { version, notNormalized, ...schema }  = await this.schemaVersionBuilder.buildSchema(db)
-		await this.validateMigrations(db, schema, version, migrationsToExecute, ignoreOrder)
+		const validated = await this.validateMigrations(db, schema, version, migrationsToExecute, { ignoreOrder, skipExecuted })
 
-		const sorted = [...migrationsToExecute].sort((a, b) => a.version.localeCompare(b.version))
+		const sorted = [...validated].sort((a, b) => a.version.localeCompare(b.version))
 
 		for (const migration of sorted) {
-			logger(`Executing migration ${migration.name}...`)
 			const formatVersion = migration.formatVersion
 
 			for (const modification of migration.modifications) {
@@ -48,10 +48,7 @@ export class ProjectMigrator {
 				)
 			}
 			await db.commandBus.execute(new SaveMigrationCommand(migration))
-			logger(`Done`)
 		}
-
-		logger(`Done`)
 	}
 
 	private async validateMigrations(
@@ -59,12 +56,21 @@ export class ProjectMigrator {
 		schema: Schema,
 		version: string,
 		migrationsToExecute: readonly Migration[],
-		ignoreOrder: boolean = false,
-	) {
+		{ ignoreOrder, skipExecuted }: {
+			ignoreOrder: boolean
+			skipExecuted: boolean
+		},
+	): Promise<readonly Migration[]> {
 		const executedMigrations = await this.executedMigrationsResolver.getMigrations(db)
+		const toExecute = []
 		for (const migration of migrationsToExecute) {
-			if (executedMigrations.find(it => it.version === migration.version)) {
-				throw new AlreadyExecutedMigrationError(migration.version, `Migration is already executed`)
+			const executedMigration = executedMigrations.find(it => it.version === migration.version)
+			if (executedMigration) {
+				if (skipExecuted && executedMigration.checksum === calculateMigrationChecksum(migration)) {
+					continue
+				} else {
+					throw new AlreadyExecutedMigrationError(migration.version, `Migration is already executed`)
+				}
 			}
 			if (migration.version < version && !ignoreOrder) {
 				throw new MustFollowLatestMigrationError(migration.version, `Must follow latest executed migration ${version}`)
@@ -83,7 +89,9 @@ export class ProjectMigrator {
 					errors.map(it => it.path.join('.') + ': ' + it.message).join('\n'),
 				)
 			}
+			toExecute.push(migration)
 		}
+		return toExecute
 	}
 
 	private async applyModification(

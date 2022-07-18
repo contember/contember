@@ -11,11 +11,12 @@ import { makeExecutableSchema } from '@graphql-tools/schema'
 import { ContentApiTester } from './ContentApiTester'
 import { SystemApiTester } from './SystemApiTester'
 import { TesterStageManager } from './TesterStageManager'
-import { Client, SingleConnection } from '@contember/database'
+import { Client, Connection } from '@contember/database'
 import { createUuidGenerator } from './testUuid'
 import { project } from './project'
 import { createConnection, dbCredentials, recreateDatabase } from './dbUtils'
 import { join } from 'path'
+import { Logger } from '@contember/engine-common'
 
 export class ApiTester {
 	public static project = project
@@ -40,7 +41,8 @@ export class ApiTester {
 	}): Promise<ApiTester> {
 		const dbName = String(process.env.TEST_DB_NAME)
 
-		const projectConnection = createConnection(dbName)
+		const projectDbCredentials = dbCredentials(dbName)
+		const projectConnection = createConnection(projectDbCredentials)
 		const providers = { uuid: createUuidGenerator('a452'), now: () => new Date('2019-09-04 12:00') }
 		const databaseContextFactory = new DatabaseContextFactory(projectConnection.createClient('system', {}), providers)
 
@@ -65,26 +67,14 @@ export class ApiTester {
 		}
 		const systemContainer = systemContainerBuilder.build()
 
-		const connection = await recreateDatabase(dbName)
+		const connection = await recreateDatabase(projectDbCredentials)
 		await connection.end()
 
 		const projectConfig = { ...ApiTester.project, ...options.project }
 
 		const db = databaseContextFactory.create()
 
-		const singleConnection = new SingleConnection(dbCredentials(dbName), {})
-		const dbContextMigrations = databaseContextFactory
-			.withClient(singleConnection.createClient('system', {}))
-			.create()
-
-		const schemaResolver = () => systemContainer.schemaVersionBuilder.buildSchema(dbContextMigrations)
-		await systemContainer
-			.systemDbMigrationsRunnerFactory(singleConnection, 'system')
-			.migrate(() => null, {
-				schemaResolver,
-				project: projectConfig,
-			})
-		await singleConnection.end()
+		await systemContainer.projectInitializer.initialize(databaseContextFactory, { ...projectConfig, db: projectDbCredentials }, new Logger(() => null))
 
 		const systemSchema = makeExecutableSchema({
 			typeDefs: systemTypeDefs,

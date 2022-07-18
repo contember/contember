@@ -74,7 +74,8 @@ export class ContentApiMiddlewareFactory {
 				acl: schema.acl,
 				projectSlug: project.slug,
 				identity: {
-					id: authResult.identityId,
+					identityId: authResult.identityId,
+					personId: authResult.personId ?? undefined,
 					roles: authResult.roles,
 				},
 			}))

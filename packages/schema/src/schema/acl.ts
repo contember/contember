@@ -1,7 +1,7 @@
-import Input from './input'
+import { Input } from './input'
 import { JSONValue } from './json'
 
-namespace Acl {
+export namespace Acl {
 	export enum VariableType {
 		entity = 'entity',
 		predefined = 'predefined',
@@ -46,16 +46,6 @@ namespace Acl {
 	// 	entityName: string
 	// 	fieldName: string
 	// }
-
-	export type VariableValue = readonly JSONValue[]
-
-	export type VariableMapEntry = {
-		readonly definition: Variable
-		readonly value: VariableValue
-	}
-	export type VariablesMap = {
-		readonly [name: string]: VariableMapEntry
-	}
 
 	export type PredicateVariable = string //{ name: string }
 	export type PredicateDefinition<E = never> = Input.Where<PredicateVariable | Input.Condition | E>
@@ -165,6 +155,18 @@ namespace Acl {
 		readonly customPrimary?: boolean
 		readonly roles: Acl.Roles
 	}
-}
 
-export default Acl
+	export type VariablesMap = {
+		readonly [name: string]: Input.Condition
+	}
+
+	export interface MembershipVariable {
+		readonly name: string
+		readonly values: readonly string[]
+	}
+
+	export interface Membership {
+		readonly role: string
+		readonly variables: readonly MembershipVariable[]
+	}
+}

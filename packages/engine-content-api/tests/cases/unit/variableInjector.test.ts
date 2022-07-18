@@ -19,19 +19,8 @@ describe('Variable injector', () => {
 
 		const ids = ['91528a5c-839b-4114-9952-d661914a607f', '1e2f3937-a0b1-4105-8aae-6da8ac9fc146']
 		const injector = new VariableInjector(schema, {
-			site: {
-				definition: {
-					type: Acl.VariableType.entity,
-					entityName: 'Site',
-				},
-				value: ids,
-			},
-			locale: {
-				definition: {
-					type: Acl.VariableType.condition,
-				},
-				value: [{ eq: 'cs' }],
-			},
+			site: { in: ids },
+			locale: { eq: 'cs' },
 		})
 		const result = injector.inject(schema.entities['PostLocale'], {
 			or: [

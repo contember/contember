@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest'
 import { ProjectMembershipFetcher, ProjectMembershipResolver } from '../../../src'
 import { createMock } from '../../utils'
-import { Membership } from '@contember/engine-tenant-api'
+import { Acl } from '@contember/schema'
 
 describe('membership resolver', () => {
 	it('should return implicit role', async () => {
 		const membershipResolver = new ProjectMembershipResolver(false, createMock<ProjectMembershipFetcher>({
-			fetchMemberships(): Promise<readonly Membership[]> {
+			fetchMemberships(): Promise<readonly Acl.Membership[]> {
 				return Promise.resolve([])
 			},
 		}))
@@ -16,7 +16,7 @@ describe('membership resolver', () => {
 			},
 			projectSlug: 'test',
 			identity: {
-				id: 'd4141336-6512-41ef-a25a-374de35a2806',
+				identityId: 'd4141336-6512-41ef-a25a-374de35a2806',
 				roles: [],
 			},
 			acl: {
@@ -35,7 +35,7 @@ describe('membership resolver', () => {
 
 	it('should return fetched memberships', async () => {
 		const membershipResolver = new ProjectMembershipResolver(false, createMock<ProjectMembershipFetcher>({
-			fetchMemberships(): Promise<readonly Membership[]> {
+			fetchMemberships(): Promise<readonly Acl.Membership[]> {
 				return Promise.resolve([{ role: 'test', variables: [] }])
 			},
 		}))
@@ -45,11 +45,16 @@ describe('membership resolver', () => {
 			},
 			projectSlug: 'test',
 			identity: {
-				id: 'd4141336-6512-41ef-a25a-374de35a2806',
+				identityId: 'd4141336-6512-41ef-a25a-374de35a2806',
 				roles: [],
 			},
 			acl: {
-				roles: {},
+				roles: {
+					test: {
+						variables: {},
+						entities: {},
+					},
+				},
 			},
 		})
 		expect(resolvedMembership).deep.eq([{ role: 'test', variables: [] }])
@@ -57,19 +62,19 @@ describe('membership resolver', () => {
 
 	it('should return assumed membership', async () => {
 		const membershipResolver = new ProjectMembershipResolver(false, createMock<ProjectMembershipFetcher>({
-			fetchMemberships(): Promise<readonly Membership[]> {
+			fetchMemberships(): Promise<readonly Acl.Membership[]> {
 				return Promise.resolve([{ role: 'admin', variables: [] }])
 			},
 		}))
 		const resolvedMembership = await membershipResolver.resolveMemberships({
 			request: {
 				get: () => JSON.stringify({
-					memberships: [{ role: 'test', variables: [{ name: 'lang', values: ['cs'] }] }],
+					memberships: [{ role: 'test', variables: [{ name: 'lang', values: [JSON.stringify({ eq: 'cs' })] }] }],
 				}),
 			},
 			projectSlug: 'test',
 			identity: {
-				id: 'd4141336-6512-41ef-a25a-374de35a2806',
+				identityId: 'd4141336-6512-41ef-a25a-374de35a2806',
 				roles: [],
 			},
 			acl: {
@@ -85,10 +90,18 @@ describe('membership resolver', () => {
 							},
 						},
 					},
+					test: {
+						variables: {
+							lang: {
+								type: Acl.VariableType.condition,
+							},
+						},
+						entities: {},
+					},
 				},
 			},
 		})
-		expect(resolvedMembership).deep.eq([{ role: 'test', variables: [{ name: 'lang', values: ['cs'] }] }])
+		expect(resolvedMembership).deep.eq([{ role: 'test', variables: [{ name: 'lang', condition: { eq: 'cs' } }] }])
 	})
 
 })

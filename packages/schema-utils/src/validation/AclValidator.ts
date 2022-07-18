@@ -2,6 +2,8 @@ import { Acl, Model } from '@contember/schema'
 import { PredicateDefinitionProcessor } from '../acl'
 import { getEntity } from '../model'
 import { ErrorBuilder, ValidationError } from './errors'
+import { conditionSchema } from '../type-schema/condition'
+import { anyJson } from '@contember/typesafe'
 
 
 export class AclValidator {
@@ -128,8 +130,16 @@ export class AclValidator {
 		const processor = new PredicateDefinitionProcessor(this.model)
 		processor.process(entity, predicate, {
 			handleColumn: ctx => {
-				if (typeof ctx.value === 'string' && !variables[ctx.value]) {
-					errorBuilder.for(...ctx.path).add(`Undefined variable ${ctx.value}`)
+				if (typeof ctx.value === 'string') {
+					if (!variables[ctx.value]) {
+						errorBuilder.for(...ctx.path).add(`Undefined variable ${ctx.value}`)
+					}
+				} else {
+					try {
+						conditionSchema(ctx.column.type)(ctx.value)
+					} catch (e: any) {
+						errorBuilder.for(...ctx.path).add(`Invalid condition (${e.message}): ${JSON.stringify(ctx.value)}`)
+					}
 				}
 				return ctx.value
 			},

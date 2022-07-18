@@ -1,6 +1,6 @@
-import Value from './value'
+import { Value } from './value'
 
-namespace Input {
+export namespace Input {
 	export type PrimaryValue<E = never> = Value.PrimaryValue<E>
 	export type ColumnValue<E = never> = Value.FieldValue<E>
 
@@ -157,9 +157,9 @@ namespace Input {
 		readonly or?: readonly Condition<T>[]
 		readonly not?: Condition<T>
 		readonly eq?: T
+		readonly notEq?: T
 		readonly null?: boolean // deprecated
 		readonly isNull?: boolean
-		readonly notEq?: T
 		readonly in?: readonly T[]
 		readonly notIn?: readonly T[]
 		readonly lt?: T
@@ -199,5 +199,3 @@ namespace Input {
 		updatable = 'updatable',
 	}
 }
-
-export default Input

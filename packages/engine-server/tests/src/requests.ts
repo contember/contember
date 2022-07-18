@@ -1,6 +1,6 @@
 import { executeGraphql, gql, loginToken } from './tester'
 import { assert } from 'vitest'
-import { Membership } from '@contember/engine-tenant-api'
+import { Acl } from '@contember/schema'
 
 export const signIn = async (email: string, password = '123456'): Promise<string> => {
 	const response = await executeGraphql(
@@ -51,13 +51,22 @@ export const signUp = async (email: string, password = '123456') => {
 }
 
 
-export const addProjectMember = async (identityId: string, projectSlug: string, membership: Membership = { role: 'admin', variables: [] }) => {
+export const addProjectMember = async (identityId: string, projectSlug: string, membership: Acl.Membership = { role: 'admin', variables: [] }) => {
 	await executeGraphql(
 		'/tenant',
 		gql`
 			mutation ($identity: String!, $projectSlug: String!, $membership: MembershipInput!) {
 				addProjectMember(identityId: $identity, projectSlug: $projectSlug, memberships: [$membership]) {
 					ok
+					error {
+						code
+						developerMessage
+						membershipValidation {
+							code
+							role
+							variable
+						}
+					}
 				}
 			}
 		`,
@@ -67,6 +76,6 @@ export const addProjectMember = async (identityId: string, projectSlug: string, 
 	)
 		.expect(200)
 		.expect(response => {
-			assert.deepStrictEqual(response.body.data, { addProjectMember: { ok: true } })
+			assert.deepStrictEqual(response.body.data, { addProjectMember: { ok: true, error: null } })
 		})
 }

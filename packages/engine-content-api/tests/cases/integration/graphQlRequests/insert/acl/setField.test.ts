@@ -34,12 +34,7 @@ test('set a name - allowed', async () => {
 			},
 		},
 		variables: {
-			name_variable: {
-				definition: {
-					type: Acl.VariableType.condition,
-				},
-				value: [{ in: ['John', 'Jack'] }],
-			},
+			name_variable: { in: ['John', 'Jack'] },
 		},
 		executes: [
 			...sqlTransaction([
@@ -94,12 +89,7 @@ test('set a name - denied', async () => {
 			},
 		},
 		variables: {
-			name_variable: {
-				definition: {
-					type: Acl.VariableType.condition,
-				},
-				value: [{ in: ['John', 'Jack'] }],
-			},
+			name_variable: { in: ['John', 'Jack'] },
 		},
 		executes: [
 			...failedTransaction([

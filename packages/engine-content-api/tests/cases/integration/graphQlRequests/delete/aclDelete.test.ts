@@ -32,12 +32,7 @@ test('delete post with acl', async () => {
 			},
 		},
 		variables: {
-			locale_variable: {
-				definition: {
-					type: Acl.VariableType.condition,
-				},
-				value: [{ in: ['cs'] }],
-			},
+			locale_variable: { in: ['cs'] },
 		},
 		executes: [
 			...sqlTransaction([

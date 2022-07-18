@@ -1,41 +1,20 @@
-import { Acl } from '@contember/schema'
-import { getRoleVariables } from '@contember/schema-utils'
+import { Acl, Input } from '@contember/schema'
+import { getRoleVariables, ParsedMembership } from '@contember/schema-utils'
 
-type Memberships = readonly { role: string; variables: readonly { name: string; values: readonly string[] }[] }[]
 
 export const createAclVariables = (
 	aclSchema: Acl.Schema,
-	identity: {
-		identityId: string
-		personId: string | null
-		memberships: Memberships
-	},
+	memberships: readonly ParsedMembership[],
 ): Acl.VariablesMap => {
 
-	const variablesEntries = identity.memberships.flatMap(
+	const variablesEntries = memberships.flatMap(
 		membership => {
 			const roleVariables = getRoleVariables(membership.role, aclSchema)
-			const membershipVariablesMap = Object.fromEntries(membership.variables.map(it => [it.name, it.values]))
+			const membershipVariablesMap = Object.fromEntries(membership.variables.map(it => [it.name, it.condition]))
 
-			return Object.entries(roleVariables).map(([name, def]): [string, Acl.VariableMapEntry] => {
+			return Object.keys(roleVariables).map((name): [string, Input.Condition] => {
 				const prefixed = prefixVariable(membership.role, name)
-				const value = (() => {
-					switch (def.type) {
-						case Acl.VariableType.entity:
-							return membershipVariablesMap[name] ?? []
-						case Acl.VariableType.predefined:
-							switch (def.value) {
-								case 'identityID':
-									return [identity.identityId]
-								case 'personID':
-									return identity.personId ? [identity.personId] : []
-							}
-							throw new Error(`Unknown predefined variable ${def.value}`)
-						case Acl.VariableType.condition:
-							return (membershipVariablesMap[name] ?? []).map(it => JSON.parse(it))
-					}
-				})()
-				return [prefixed, { value: value, definition: def }]
+				return [prefixed, membershipVariablesMap[name] ?? { never: true }]
 			})
 		},
 	)

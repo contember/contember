@@ -1,6 +1,6 @@
-import Value from './value'
+import { Value } from './value'
 
-namespace Result {
+export namespace Result {
 	export type MutationFieldResult = CreateResult | UpdateResult | DeleteResult | UpsertResult
 
 	export interface CreateResult {
@@ -75,5 +75,3 @@ namespace Result {
 		text: string
 	}
 }
-
-export default Result

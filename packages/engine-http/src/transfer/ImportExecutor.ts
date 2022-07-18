@@ -266,7 +266,7 @@ export class ImportExecutor {
 			acl: schema.acl,
 			projectSlug: projectSlug,
 			identity: {
-				id: authResult.identityId,
+				identityId: authResult.identityId,
 				roles: authResult.roles,
 			},
 		})

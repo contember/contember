@@ -5,12 +5,13 @@ type Unpacked<T> = T extends readonly (infer U)[] ? U : never
 export type JsonObject = {
 	readonly [P in string]?: Json
 }
-
-export type Json =
+export type Scalar =
 	| string
 	| number
 	| boolean
 	| null
+export type Json =
+	| Scalar
 	| readonly Json[]
 	| JsonObject
 
@@ -21,7 +22,7 @@ export interface Type<T extends Json | {readonly [K in string]?: Json} | undefin
 
 export class ParseError extends Error {
 	constructor(readonly path: PropertyKey[], readonly reason: string, readonly expected?: string) {
-		super(`value at path /${path.join('/')}: ${reason}`)
+		super(`value at ${path.length ? `path /${path.join('/')}` : 'root'}: ${reason}`)
 	}
 
 	static format(input: unknown, path: PropertyKey[], expected: string) {
@@ -47,10 +48,38 @@ export const number = ((): Type<number> => {
 	}
 })()
 
+export const integer = ((): Type<number> => {
+	return (input: unknown, path: PropertyKey[] = []) => {
+		if (typeof input !== 'number' || !Number.isInteger(input)) throw ParseError.format(input, path, 'integer')
+		return input
+	}
+})()
+
 export const boolean = ((): Type<boolean> => {
 	return (input: unknown, path: PropertyKey[] = []) => {
 		if (typeof input !== 'boolean') throw ParseError.format(input, path, 'boolean')
 		return input
+	}
+})()
+
+
+export const scalar = ((): Type<Scalar> => {
+	return (input: unknown, path: PropertyKey[] = []): Scalar => {
+		if (input === null) {
+			return null
+		}
+		switch (typeof input) {
+			case 'string':
+			case 'boolean':
+				return input
+			case 'number':
+				if (!Number.isFinite(input)) {
+					throw new ParseError(path, 'must be finite number', 'number')
+				}
+				return input
+			default:
+				throw ParseError.format(input, path, 'string|boolean|number')
+		}
 	}
 })()
 
@@ -144,6 +173,26 @@ export const partial = <T extends Record<string, Type<Json | undefined>>>(inner:
 			}
 			return [[k, val]]
 		})) as any
+	}
+
+	type.inner = inner
+
+	return type
+}
+
+export const noExtraProps = <T extends JsonObject>(inner: Type<T>) => {
+	const type = (input: unknown, path: PropertyKey[] = []): T => {
+		const result = inner(input, path)
+		if (!(typeof input === 'object' && typeof input !== null && typeof result === 'object' && result !== null)) {
+			return result
+		}
+		const resultProps = new Set(Object.keys(result))
+		for (const key in input) {
+			if (!resultProps.has(key)) {
+				throw fail(path, `extra property ${key} found`)
+			}
+		}
+		return result
 	}
 
 	type.inner = inner

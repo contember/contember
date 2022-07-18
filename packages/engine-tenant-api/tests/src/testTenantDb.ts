@@ -17,7 +17,6 @@ import { Acl, Schema } from '@contember/schema'
 import { createMockedMailer, MockedMailer } from './mailer'
 import { dbCredentials, recreateDatabase } from './dbUtils'
 import { graphql } from 'graphql'
-import { Membership } from '../../src/model/type/Membership'
 import { Connection } from '@contember/database'
 import { assert } from 'vitest'
 
@@ -82,7 +81,7 @@ export const authenticatedIdentityId = testUuid(999)
 export const authenticatedApiKeyId = testUuid(998)
 
 interface TenantTestOptions {
-	membership?: Membership
+	membership?: Acl.Membership
 	roles?: string[]
 	noErrorsCheck?: boolean
 }

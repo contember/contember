@@ -516,6 +516,7 @@ export type MembershipValidationError = {
 export enum MembershipValidationErrorCode {
 	RoleNotFound = 'ROLE_NOT_FOUND',
 	VariableEmpty = 'VARIABLE_EMPTY',
+	VariableInvalid = 'VARIABLE_INVALID',
 	VariableNotFound = 'VARIABLE_NOT_FOUND'
 }
 

@@ -8,7 +8,6 @@ import { AcquiredConnection } from './AcquiredConnection'
 class Connection implements Connection.ConnectionLike, Connection.ClientFactory, Connection.PoolStatusProvider {
 	constructor(
 		private readonly pool: Pool,
-		private readonly queryConfig: Connection.QueryConfig,
 		public readonly eventManager: EventManager = new EventManager(null),
 	) {
 		this.pool.on('error', err => {
@@ -20,16 +19,14 @@ class Connection implements Connection.ConnectionLike, Connection.ClientFactory,
 
 	public static create(
 		{ pool = {}, ...config }: DatabaseConfig & { pool?: PoolConfig },
-		queryConfig: Connection.QueryConfig = {},
 	): Connection {
-		return new Connection(new Pool(createPgClientFactory(config), pool), queryConfig)
+		return new Connection(new Pool(createPgClientFactory(config), pool))
 	}
 
 	public static createSingle(
 		config: DatabaseConfig,
-		queryConfig: Connection.QueryConfig = {},
 	): Connection {
-		return new Connection(new Pool(createPgClientFactory(config), { maxConnections: 1, maxIdle: 0 }), queryConfig)
+		return new Connection(new Pool(createPgClientFactory(config), { maxConnections: 1, maxIdle: 0 }))
 	}
 
 	public createClient(schema: string, queryMeta: Record<string, any>): Client {
@@ -43,7 +40,7 @@ class Connection implements Connection.ConnectionLike, Connection.ClientFactory,
 		const acquired = await this.pool.acquire()
 		const eventManager = new EventManager(options.eventManager ?? this.eventManager)
 		try {
-			const connection = new AcquiredConnection(acquired.client, eventManager, this.queryConfig)
+			const connection = new AcquiredConnection(acquired.client, eventManager)
 			const result = await callback(connection)
 			this.pool.release(acquired)
 
@@ -67,11 +64,10 @@ class Connection implements Connection.ConnectionLike, Connection.ClientFactory,
 		sql: string,
 		parameters: any[] = [],
 		meta: Record<string, any> = {},
-		{ eventManager, ...config }: Connection.QueryConfig = {},
 	): Promise<Connection.Result<Row>> {
 		return await this.scope(async connection => {
-			return await connection.query(sql, parameters, meta, config)
-		}, { eventManager })
+			return await connection.query(sql, parameters, meta)
+		})
 	}
 
 	async end(): Promise<void> {
@@ -88,11 +84,6 @@ class Connection implements Connection.ConnectionLike, Connection.ClientFactory,
 }
 
 namespace Connection {
-	export interface QueryConfig {
-		timing?: boolean
-		eventManager?: EventManager
-	}
-
 	export interface Queryable {
 		readonly eventManager: EventManager
 
@@ -100,7 +91,6 @@ namespace Connection {
 			sql: string,
 			parameters?: readonly any[],
 			meta?: Record<string, any>,
-			config?: Connection.QueryConfig,
 		): Promise<Connection.Result<Row>>
 	}
 

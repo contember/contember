@@ -29,7 +29,7 @@ export class TenantMigrationsRunner {
 
 	public async run(log: (msg: string) => void): Promise<{ name: string }[]> {
 		await createDatabaseIfNotExists(this.db, log)
-		const connection = Connection.createSingle(this.db, {})
+		const connection = Connection.createSingle(this.db)
 		const result = await connection.scope(async connection => {
 			const innerRunner = new DbMigrationsRunner<TenantMigrationArgs>(connection, this.schema, getMigrations)
 			return await innerRunner.migrate(log, {

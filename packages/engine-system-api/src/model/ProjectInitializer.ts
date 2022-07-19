@@ -30,7 +30,7 @@ export class ProjectInitializer {
 			// todo: use dbContext
 			logger.group(`Executing system schema migration`)
 			await createDatabaseIfNotExists(project.db, logger.write.bind(logger))
-			const singleConnection = Connection.createSingle(project.db, {})
+			const singleConnection = Connection.createSingle(project.db)
 			await singleConnection.scope(async connection => {
 				const systemSchema = dbContext.client.schema
 

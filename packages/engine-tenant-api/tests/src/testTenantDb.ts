@@ -121,7 +121,7 @@ export const createTenantTester = async (): Promise<TenantTester> => {
 	const projectInitializer = {
 		initializeProject: () => Promise.resolve(),
 	}
-	const connection = Connection.create(credentials, {})
+	const connection = Connection.create(credentials)
 	const tenantContainer = new TenantContainerFactory(providers)
 		.createBuilder({
 			mailOptions: {},

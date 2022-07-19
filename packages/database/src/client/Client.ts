@@ -73,16 +73,10 @@ class Client<ConnectionType extends Connection.ConnectionLike = Connection.Conne
 		sql: string,
 		parameters: readonly any[] = [],
 		meta: Record<string, any> = {},
-		config: Connection.QueryConfig = {},
 	): Promise<Connection.Result<Row>> {
-		return this.connection.query<Row>(
-			sql,
-			parameters,
-			{ ...this.queryMeta, ...meta },
-			{
-				eventManager: this.eventManager,
-				...config,
-			},
+		return this.connection.scope(
+			connection => connection.query(sql, parameters, { ...this.queryMeta, ...meta }),
+			{ eventManager: this.eventManager },
 		)
 	}
 

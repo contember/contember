@@ -20,7 +20,6 @@ export class AcquiredConnection implements Connection.ConnectionLike {
 	constructor(
 		private readonly pgClient: PgClient,
 		public readonly eventManager: EventManager,
-		private readonly config: Connection.QueryConfig,
 	) {
 	}
 
@@ -29,7 +28,7 @@ export class AcquiredConnection implements Connection.ConnectionLike {
 		options: { eventManager?: EventManager } = {},
 	): Promise<Result> {
 		return await this.mutex.execute(async () => {
-			return await callback(new AcquiredConnection(this.pgClient, options.eventManager ?? this.eventManager, this.config))
+			return await callback(new AcquiredConnection(this.pgClient, options.eventManager ?? this.eventManager))
 		})
 	}
 
@@ -48,41 +47,34 @@ export class AcquiredConnection implements Connection.ConnectionLike {
 		sql: string,
 		parameters: any[] = [],
 		meta: Record<string, any> = {},
-		{ eventManager = this.eventManager, timing = false }: Connection.QueryConfig = {},
 	): Promise<Connection.Result<Row>> {
 		return await this.mutex.execute(async () => {
 			try {
-				eventManager.fire(EventManager.Event.queryStart, { sql, parameters, meta })
-
-				const exec = async () => await this.pgClient.query(prepareSql(sql), parameters)
+				this.eventManager.fire(EventManager.Event.queryStart, { sql, parameters, meta })
 
 				let result: Connection.Result<Row>
-				if (timing) {
-					const startHrTime = process.hrtime.bigint()
+				const startHrTime = process.hrtime.bigint()
 
-					result = await exec()
+				result = await this.pgClient.query(prepareSql(sql), parameters)
 
-					const endHrTime = process.hrtime.bigint()
-					const durationUs = Math.floor(Number(endHrTime - startHrTime) / 1000)
-					result = {
-						...result,
-						timing: {
-							selfDuration: durationUs,
-							totalDuration: durationUs,
-						},
-					}
-				} else {
-					result = await exec()
+				const endHrTime = process.hrtime.bigint()
+				const durationUs = Math.floor(Number(endHrTime - startHrTime) / 1000)
+				result = {
+					...result,
+					timing: {
+						selfDuration: durationUs,
+						totalDuration: durationUs,
+					},
 				}
 
-				eventManager.fire(EventManager.Event.queryEnd, { sql, parameters, meta }, result)
+				this.eventManager.fire(EventManager.Event.queryEnd, { sql, parameters, meta }, result)
 
 				return result
 			} catch (error) {
 				if (!(error instanceof Error)) {
 					throw error
 				}
-				eventManager.fire(EventManager.Event.queryError, { sql, parameters, meta }, error)
+				this.eventManager.fire(EventManager.Event.queryError, { sql, parameters, meta }, error)
 
 				switch ((error as any).code) {
 					case ClientErrorCodes.NOT_NULL_VIOLATION:

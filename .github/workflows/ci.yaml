@@ -80,7 +80,7 @@ jobs:
       - run: pnpm install
       - run: pnpm run --recursive --parallel -- build:js:prod
       - run: cd packages/admin && pnpm run pw:build
-      - run: cd packages/admin && pnpm run pw:test
+      - run: cd packages/admin && pnpm run -- pw:test --forbid-only
 
       - uses: jakejarvis/s3-sync-action@master
         if: always()

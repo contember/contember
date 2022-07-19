@@ -12,7 +12,9 @@ export class ContentSchemaTransferMappingFactory {
 				name: entity.tableName,
 				columns: this.buildDbColumnSchemaMap(contentSchema.model, entity),
 			}
+		}
 
+		for (const entity of Object.values(contentSchema.model.entities)) {
 			for (const joiningTable of this.collectManyHasManyOwned(contentSchema.model, entity)) {
 				tables[joiningTable.name] = joiningTable
 			}

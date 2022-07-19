@@ -4,7 +4,7 @@ import {
 	BlockEditorProps,
 	Component,
 	horizontalRuleToolbarButton,
-	ImageUploadField,
+	ImageUploadField, MultiSelectField,
 	paragraphNumberedToolbarButton,
 	paragraphToolbarButton,
 	RadioField,
@@ -135,6 +135,18 @@ export const ContentField = Component<ContentFieldProps>(
 				<BlockEditor.ContentOutlet />
 				<TextField field="primaryText" label="Quote" />
 				<TextField field="secondaryText" label="Author" />
+
+				<MultiSelectField
+					label={'Tags'}
+					field={'tags'}
+					options={{
+						fields: 'Tag.name',
+						orderBy: 'name desc',
+					}}
+					connectingEntityField={'tag'}
+					sortableBy={'order'}
+					lazy
+				/>
 			</Block>
 		</BlockEditor>
 	),

@@ -4,6 +4,7 @@ import { ErrorsPreprocessor } from './ErrorsPreprocessor'
 import { EventManager } from './EventManager'
 import { EntityListState, EntityRealmState, getEntityMarker, StateNode } from './state'
 import type { TreeStore } from './TreeStore'
+import { SubMutationOperation } from './MutationGenerator'
 
 export class AccessorErrorManager {
 	private errorsByState: Map<StateNode, ErrorAccessor.ErrorsById> = new Map()
@@ -45,11 +46,11 @@ export class AccessorErrorManager {
 		})
 	}
 
-	public replaceErrors(data: MutationDataResponse) {
+	public replaceErrors(data: MutationDataResponse, operations: SubMutationOperation[]) {
 		this.eventManager.syncOperation(() => {
 			this.clearErrors()
 
-			const preprocessor = new ErrorsPreprocessor(data)
+			const preprocessor = new ErrorsPreprocessor(data, operations)
 			const errorTreeRoot = preprocessor.preprocess()
 
 			this.setRootStateErrors(errorTreeRoot)

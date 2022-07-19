@@ -33,7 +33,7 @@ export type SubMutationOperation =
 	& (
 		| { type: 'delete', id: EntityId }
 		| { type: 'update', markers: EntityFieldMarkers, id: EntityId }
-		| { type: 'create', markers: EntityFieldMarkers }
+		| { type: 'create', markers: EntityFieldMarkers, id: EntityId }
 	)
 
 export type PersistMutationResult = {
@@ -145,6 +145,7 @@ export class MutationGenerator {
 		}
 		const fieldMarkers = getEntityMarker(realmState).fields.markers
 
+		const subTreeTypeNormalized = subTreeType === 'l' ? 'list' : 'single'
 		if (realmState.entity.isScheduledForDeletion) {
 			const alias = MutationAlias.encodeTopLevel({
 				treeRootId,
@@ -159,7 +160,16 @@ export class MutationGenerator {
 				alias,
 				queryBuilder,
 			)
-			return [builder, { alias, subTreePlaceholder, subTreeType: subTreeType === 'l' ? 'list' : 'single', type: 'delete', id: entityId }]
+			return [
+				builder,
+				{
+					alias,
+					subTreePlaceholder,
+					subTreeType: subTreeTypeNormalized,
+					type: 'delete',
+					id: entityId,
+				},
+			]
 		} else if (!realmState.entity.id.existsOnServer) {
 			const alias = MutationAlias.encodeTopLevel({
 				treeRootId,
@@ -176,7 +186,17 @@ export class MutationGenerator {
 				queryBuilder,
 				fieldMarkers,
 			)
-			return [builder, { alias, subTreePlaceholder, subTreeType: subTreeType === 'l' ? 'list' : 'single', type: 'create', markers: fieldMarkers }]
+			return [
+				builder,
+				{
+					alias,
+					subTreePlaceholder,
+					subTreeType: subTreeTypeNormalized,
+					type: 'create',
+					markers: fieldMarkers,
+					id: entityId,
+				},
+]
 		}
 
 		const alias = MutationAlias.encodeTopLevel({
@@ -194,7 +214,17 @@ export class MutationGenerator {
 			queryBuilder,
 			fieldMarkers,
 		)
-		return [builder, { alias, subTreePlaceholder, subTreeType: subTreeType === 'l' ? 'list' : 'single', type: 'update', id: entityId, markers: fieldMarkers }]
+		return [
+			builder,
+			{
+				alias,
+				subTreePlaceholder,
+				subTreeType: subTreeTypeNormalized,
+				type: 'update',
+				id: entityId,
+				markers: fieldMarkers,
+			},
+		]
 	}
 
 	private getNodeFragmentName(

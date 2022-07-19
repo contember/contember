@@ -42,6 +42,7 @@ export const SimpleRelativeSingleFieldProxy = memo(
 						labelPosition={labelPosition}
 						description={description}
 						errors={fieldErrors}
+						required={props.required}
 					>
 						{rendered}
 					</FieldContainer>

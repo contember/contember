@@ -3941,10 +3941,10 @@ export interface TextAttrs {
 export const TextCell: FunctionComponent<TextCellProps>;
 
 // @public (undocumented)
-export type TextCellProps<Persisted extends FieldValue = FieldValue> = DataGridColumnPublicProps & FieldFallbackViewPublicProps & SugaredRelativeSingleField & {
+export type TextCellProps = DataGridColumnPublicProps & FieldFallbackViewPublicProps & SugaredRelativeSingleField & {
     disableOrder?: boolean;
     initialOrder?: DataGridOrderDirection;
-    format?: (value: Persisted) => ReactNode;
+    format?: (value: string | null) => ReactNode;
 };
 
 // @public (undocumented)

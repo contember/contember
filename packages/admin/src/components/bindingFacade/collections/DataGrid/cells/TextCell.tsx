@@ -14,14 +14,14 @@ import { DataGridColumn, DataGridColumnPublicProps, DataGridOrderDirection } fro
 import { dataGridCellsDictionary } from './dataGridCellsDictionary'
 import { createGenericTextCellFilterCondition, GenericTextCellFilter } from './GenericTextCellFilter'
 
-export type TextCellProps<Persisted extends FieldValue = FieldValue> =
+export type TextCellProps =
 	& DataGridColumnPublicProps
 	& FieldFallbackViewPublicProps
 	& SugaredRelativeSingleField
 	& {
 		disableOrder?: boolean
 		initialOrder?: DataGridOrderDirection
-		format?: (value: Persisted) => ReactNode
+		format?: (value: string | null) => ReactNode
 	}
 
 // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
@@ -114,4 +114,4 @@ export const TextCell: FunctionComponent<TextCellProps> = Component(props => {
 			/>
 		</DataGridColumn>
 	)
-}, 'TextCell') as <Persisted extends FieldValue = FieldValue>(props: TextCellProps<Persisted>) => ReactElement
+}, 'TextCell')

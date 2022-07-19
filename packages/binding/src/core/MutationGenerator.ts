@@ -62,7 +62,7 @@ export class MutationGenerator {
 						continue
 					}
 					if (subTreeState.type === 'entityRealm') {
-						const [newBuilder, op] = this.addSubMutation(
+						const subMutation = this.addSubMutation(
 							processedPlaceholdersByEntity,
 							placeholderName,
 							'single',
@@ -70,9 +70,9 @@ export class MutationGenerator {
 							subTreeState,
 							builder,
 						)
-						builder = newBuilder
-						if (op) {
-							operations.push(op)
+						if (subMutation) {
+							builder = subMutation[0]
+							operations.push(subMutation[1])
 						}
 					} else if (subTreeState.type === 'entityList') {
 						for (const childState of subTreeState.children.values()) {
@@ -80,7 +80,7 @@ export class MutationGenerator {
 								// TODO there can be a forceCreate somewhere in there that we're hereby ignoring.
 								continue
 							}
-							const [newBuilder, op] = this.addSubMutation(
+							const subMutation = this.addSubMutation(
 								processedPlaceholdersByEntity,
 								placeholderName,
 								'list',
@@ -88,10 +88,10 @@ export class MutationGenerator {
 								childState,
 								builder,
 							)
-							if (op) {
-								operations.push(op)
+							if (subMutation) {
+								builder = subMutation[0]
+								operations.push(subMutation[1])
 							}
-							builder = newBuilder
 						}
 						if (subTreeState.plannedRemovals) {
 							for (const [removedId, removalType] of subTreeState.plannedRemovals) {
@@ -132,10 +132,10 @@ export class MutationGenerator {
 		entityId: EntityId,
 		realmState: EntityRealmState,
 		queryBuilder: QueryBuilder,
-	): [QueryBuilder, SubMutationOperation | undefined] {
+	): [QueryBuilder, SubMutationOperation] | undefined {
 		if (realmState.unpersistedChangesCount === 0) {
 			// Bail out early
-			return [queryBuilder, undefined]
+			return undefined
 		}
 		const fieldMarkers = getEntityMarker(realmState).fields.markers
 
@@ -167,6 +167,9 @@ export class MutationGenerator {
 				queryBuilder,
 				fieldMarkers,
 			)
+			if (!builder) {
+				return undefined
+			}
 			return [
 				builder,
 				{
@@ -187,6 +190,9 @@ export class MutationGenerator {
 			queryBuilder,
 			fieldMarkers,
 		)
+		if (!builder) {
+			return undefined
+		}
 		return [
 			builder,
 			{
@@ -237,7 +243,7 @@ export class MutationGenerator {
 		nodeFragmentName: string | undefined,
 		queryBuilder: QueryBuilder = new CrudQueryBuilder.CrudQueryBuilder(),
 		fieldMarkers: EntityFieldMarkers,
-	): QueryBuilder {
+	): QueryBuilder | undefined {
 		const updateBuilder: CrudQueryBuilder.WriteDataBuilder<CrudQueryBuilder.WriteOperation.Update> =
 			this.registerUpdateMutationPart(
 				processedPlaceholdersByEntity,
@@ -245,13 +251,13 @@ export class MutationGenerator {
 				new CrudQueryBuilder.WriteDataBuilder(),
 			)
 		if (updateBuilder.data === undefined || isEmptyObject(updateBuilder.data)) {
-			return queryBuilder
+			return undefined
 		}
 
 		const runtimeId = entityRealm.entity.id
 
 		if (!runtimeId.existsOnServer) {
-			return queryBuilder
+			return undefined
 		}
 
 		const readBuilder = QueryGenerator.registerQueryPart(
@@ -285,7 +291,7 @@ export class MutationGenerator {
 		nodeFragmentName: string | undefined,
 		queryBuilder: QueryBuilder = new CrudQueryBuilder.CrudQueryBuilder(),
 		fieldMarkers: EntityFieldMarkers,
-	): QueryBuilder {
+	): QueryBuilder | undefined {
 		const createBuilder: CrudQueryBuilder.WriteDataBuilder<CrudQueryBuilder.WriteOperation.Create> =
 			this.registerCreateMutationPart(
 				processedPlaceholdersByEntity,
@@ -293,7 +299,7 @@ export class MutationGenerator {
 				new CrudQueryBuilder.WriteDataBuilder(),
 			)
 		if (createBuilder.data === undefined || isEmptyObject(createBuilder.data)) {
-			return queryBuilder
+			return undefined
 		}
 		const readBuilder = QueryGenerator.registerQueryPart(
 			fieldMarkers,

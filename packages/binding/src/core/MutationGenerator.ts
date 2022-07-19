@@ -5,10 +5,10 @@ import { ClientGeneratedUuid, ServerId } from '../accessorTree'
 import { BindingError } from '../BindingError'
 import { PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
 import { EntityFieldMarkers, FieldMarker, HasManyRelationMarker, HasOneRelationMarker } from '../markers'
-import type { EntityId, EntityName, FieldValue, PlaceholderName, TreeRootId } from '../treeParameters'
+import type { EntityId, EntityName, FieldValue, PlaceholderName } from '../treeParameters'
 import { assertNever, isEmptyObject } from '../utils'
 import { QueryGenerator } from './QueryGenerator'
-import { MutationAlias, mutationOperationSubTreeType, mutationOperationType } from './requestAliases'
+import { MutationAlias } from './requestAliases'
 import {
 	EntityListState,
 	EntityRealmState,
@@ -43,6 +43,9 @@ export type PersistMutationResult = {
 
 // TODO enforce correct expected mutations in dev mode.
 export class MutationGenerator {
+
+	private aliasCounter = 1
+
 	public constructor(private readonly treeStore: TreeStore) {
 	}
 
@@ -61,9 +64,8 @@ export class MutationGenerator {
 					if (subTreeState.type === 'entityRealm') {
 						const [newBuilder, op] = this.addSubMutation(
 							processedPlaceholdersByEntity,
-							treeRootId,
 							placeholderName,
-							mutationOperationSubTreeType.singleEntity,
+							'single',
 							subTreeState.entity.id.value,
 							subTreeState,
 							builder,
@@ -80,9 +82,8 @@ export class MutationGenerator {
 							}
 							const [newBuilder, op] = this.addSubMutation(
 								processedPlaceholdersByEntity,
-								treeRootId,
 								placeholderName,
-								mutationOperationSubTreeType.entityList,
+								'list',
 								childState.entity.id.value,
 								childState,
 								builder,
@@ -98,13 +99,7 @@ export class MutationGenerator {
 									continue
 								}
 								if (removalType === 'delete') {
-									const alias = MutationAlias.encodeTopLevel({
-										treeRootId,
-										subTreePlaceholder: placeholderName,
-										type: mutationOperationType.delete,
-										subTreeType: mutationOperationSubTreeType.entityList,
-										entityId: removedId,
-									})
+									const alias = this.createAlias()
 									builder = this.addDeleteMutation(
 										subTreeState.entityName,
 										removedId,
@@ -132,9 +127,8 @@ export class MutationGenerator {
 
 	private addSubMutation(
 		processedPlaceholdersByEntity: ProcessedPlaceholdersByEntity,
-		treeRootId: TreeRootId | undefined,
 		subTreePlaceholder: PlaceholderName,
-		subTreeType: typeof mutationOperationSubTreeType[keyof typeof mutationOperationSubTreeType],
+		subTreeType: 'list' | 'single',
 		entityId: EntityId,
 		realmState: EntityRealmState,
 		queryBuilder: QueryBuilder,
@@ -145,15 +139,9 @@ export class MutationGenerator {
 		}
 		const fieldMarkers = getEntityMarker(realmState).fields.markers
 
-		const subTreeTypeNormalized = subTreeType === 'l' ? 'list' : 'single'
+		const alias = this.createAlias()
+
 		if (realmState.entity.isScheduledForDeletion) {
-			const alias = MutationAlias.encodeTopLevel({
-				treeRootId,
-				subTreePlaceholder,
-				type: mutationOperationType.delete,
-				subTreeType,
-				entityId,
-			})
 			const builder = this.addDeleteMutation(
 				realmState.entity.entityName,
 				entityId,
@@ -165,19 +153,12 @@ export class MutationGenerator {
 				{
 					alias,
 					subTreePlaceholder,
-					subTreeType: subTreeTypeNormalized,
+					subTreeType,
 					type: 'delete',
 					id: entityId,
 				},
 			]
 		} else if (!realmState.entity.id.existsOnServer) {
-			const alias = MutationAlias.encodeTopLevel({
-				treeRootId,
-				subTreePlaceholder,
-				type: mutationOperationType.create,
-				subTreeType,
-				entityId,
-			})
 			const builder = this.addCreateMutation(
 				processedPlaceholdersByEntity,
 				realmState,
@@ -191,21 +172,13 @@ export class MutationGenerator {
 				{
 					alias,
 					subTreePlaceholder,
-					subTreeType: subTreeTypeNormalized,
+					subTreeType,
 					type: 'create',
 					markers: fieldMarkers,
 					id: entityId,
 				},
 ]
 		}
-
-		const alias = MutationAlias.encodeTopLevel({
-			treeRootId,
-			subTreePlaceholder,
-			type: mutationOperationType.update,
-			subTreeType,
-			entityId,
-		})
 		const builder = this.addUpdateMutation(
 			processedPlaceholdersByEntity,
 			realmState,
@@ -219,7 +192,7 @@ export class MutationGenerator {
 			{
 				alias,
 				subTreePlaceholder,
-				subTreeType: subTreeTypeNormalized,
+				subTreeType,
 				type: 'update',
 				id: entityId,
 				markers: fieldMarkers,
@@ -229,10 +202,10 @@ export class MutationGenerator {
 
 	private getNodeFragmentName(
 		subTreePlaceholder: PlaceholderName,
-		subTreeType: typeof mutationOperationSubTreeType[keyof typeof mutationOperationSubTreeType],
+		subTreeType: 'single' | 'list',
 		realmState: EntityRealmState,
 	): string | undefined {
-		if (subTreeType !== mutationOperationSubTreeType.entityList) {
+		if (subTreeType !== 'list') {
 			return undefined
 		}
 		return `${realmState.entity.entityName}_${subTreePlaceholder}`
@@ -792,5 +765,9 @@ export class MutationGenerator {
 			throw new BindingError()
 		}
 		return fieldSchema.enumName === null ? value : new GraphQlBuilder.GraphQlLiteral(value)
+	}
+
+	private createAlias(): string {
+		return `op_${this.aliasCounter++}`
 	}
 }

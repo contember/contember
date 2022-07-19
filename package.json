@@ -27,6 +27,7 @@
 		"ts:build": "tsc --build",
 		"ts:watch": "tsc --build --watch",
 		"ae:build": "pnpm run --recursive --parallel -- ae:build",
+		"ae:update": "pnpm run clean:generated && pnpm run ts:build && pnpm run ae:build",
 		"ae:test": "pnpm run --recursive --parallel -- ae:test",
 		"vite": "cd packages/admin-sandbox && pnpm run -- start"
 	},

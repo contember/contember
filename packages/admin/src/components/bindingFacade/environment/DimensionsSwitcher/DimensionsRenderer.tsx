@@ -91,6 +91,7 @@ export function DimensionsRenderer(props: DimensionsRendererProps) {
 			} else {
 				return (
 					<FieldContainer
+						key={dimension.slug}
 						label={dimension.label}
 						labelPosition="labelInlineRight"
 					>

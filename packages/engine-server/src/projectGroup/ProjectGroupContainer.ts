@@ -51,7 +51,7 @@ export class ProjectGroupContainerFactory {
 			.addService('tenantDbCredentials', () =>
 				config.db)
 			.addService('tenantConnection', ({ tenantDbCredentials }): Connection.ConnectionType =>
-				Connection.create(tenantDbCredentials, {}))
+				Connection.create(tenantDbCredentials))
 			.addService('projectSchemaResolver', () =>
 				new ProjectSchemaResolverProxy())
 			.addService('projectInitializer', () =>

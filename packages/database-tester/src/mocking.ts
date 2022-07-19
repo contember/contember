@@ -21,7 +21,6 @@ export class ConnectionMock implements Connection.ConnectionType, Connection.Tra
 		sql: string,
 		parameters?: any[],
 		meta?: any,
-		config?: Connection.QueryConfig,
 	): Promise<Connection.Result<Row>> {
 		const expected = this.queries.shift() || { sql: '', parameters: [], response: {} }
 
@@ -36,7 +35,7 @@ ${JSON.stringify(parameters, undefined, '  ')}
 Expected:
 ${expected.sql}`
 		assert.equal(actualSql, expectedSql, expectedMsg)
-		const evm = config?.eventManager ?? this.eventManager
+		const evm = this.eventManager
 		if (expected.parameters) {
 			assert.lengthOf((parameters || []), expected.parameters.length, expectedMsg)
 

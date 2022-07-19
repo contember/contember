@@ -40,14 +40,13 @@ export class Transaction implements Connection.TransactionLike {
 		sql: string,
 		parameters: any[] = [],
 		meta: Record<string, any> = {},
-		{ eventManager = this.eventManager, ...config }: Connection.QueryConfig = {},
 	): Promise<Connection.Result<Row>> {
 		if (this.isClosed) {
 			throw new Error('Transaction is already closed')
 		}
 		return await this.connection.scope(async connection => {
-			return connection.query(sql, parameters, meta, config)
-		}, { eventManager })
+			return connection.query(sql, parameters, meta)
+		}, { eventManager: this.eventManager })
 	}
 
 	async rollback(): Promise<void> {
@@ -105,14 +104,13 @@ class SavePoint implements Connection.TransactionLike {
 		sql: string,
 		parameters: any[] = [],
 		meta: Record<string, any> = {},
-		{ eventManager = this.eventManager, ...config }: Connection.QueryConfig = {},
 	): Promise<Connection.Result<Row>> {
 		if (this.isClosed) {
 			throw new Error(`Savepoint ${this.savepointName} is already closed.`)
 		}
 		return await this.connection.scope(connection => {
-			return connection.query(sql, parameters, meta, config)
-		}, { eventManager })
+			return connection.query(sql, parameters, meta)
+		}, { eventManager: this.eventManager })
 	}
 
 	async rollback(): Promise<void> {

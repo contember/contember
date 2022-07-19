@@ -36,7 +36,7 @@ export const createConnectionMockAlt = (...queries: { sql: string; timeout?: num
 		})()
 	}, {})
 	return [
-		new Connection(pool, {}),
+		new Connection(pool),
 		() => {
 			allMocks.forEach(it => it.assertEmpty())
 		},

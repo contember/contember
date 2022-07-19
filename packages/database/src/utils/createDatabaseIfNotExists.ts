@@ -15,7 +15,7 @@ export const createDatabaseIfNotExists = async (db: DatabaseConfig, log: (messag
 	}
 
 	log(`Database ${db.database} does not exist, attempting to create it...`)
-	const connection = Connection.createSingle({ ...db, database: 'postgres' }, {})
+	const connection = Connection.createSingle({ ...db, database: 'postgres' })
 	await connection.query(`CREATE DATABASE ${wrapIdentifier(db.database)}`)
 	await connection.end()
 }

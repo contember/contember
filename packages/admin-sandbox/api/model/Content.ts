@@ -1,6 +1,7 @@
 import { SchemaDefinition as d } from '@contember/schema-definition'
 import { BasicImage } from './Files'
 import { Link } from './Link'
+import { Article, ArticleTag, Tag } from './Article'
 
 export class Content {
 	blocks = d.oneHasMany(ContentBlock, 'content').orderBy('order')
@@ -27,4 +28,12 @@ export class ContentReference {
 	image = d.manyHasOne(BasicImage)
 	link = d.manyHasOne(Link)
 	align = d.enumColumn(d.createEnum('left', 'right', 'center'))
+	tags = d.oneHasMany(ContentReferenceTag, 'reference').orderBy('order')
+}
+
+
+export class ContentReferenceTag {
+	reference = d.manyHasOne(ContentReference, 'tags').notNull()
+	tag = d.manyHasOne(Tag).notNull()
+	order = d.intColumn().notNull()
 }

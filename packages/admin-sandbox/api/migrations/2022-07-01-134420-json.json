@@ -1,0 +1,36 @@
+{
+	"formatVersion": 3,
+	"modifications": [
+		{
+			"modification": "createColumn",
+			"entityName": "InputShowcase",
+			"field": {
+				"name": "jsonValue",
+				"columnName": "json_value",
+				"columnType": "jsonb",
+				"nullable": true,
+				"type": "Json"
+			}
+		},
+		{
+			"modification": "patchAclSchema",
+			"patch": [
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/InputShowcase/operations/create/jsonValue",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/InputShowcase/operations/update/jsonValue",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/InputShowcase/operations/read/jsonValue",
+					"value": true
+				}
+			]
+		}
+	]
+}

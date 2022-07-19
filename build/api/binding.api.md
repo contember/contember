@@ -386,7 +386,7 @@ export class EntityFieldMarkersContainer {
 }
 
 // @public (undocumented)
-export type EntityFieldPersistedData = Scalar | ServerId | EntityListPersistedData;
+export type EntityFieldPersistedData = FieldValue | ServerId | EntityListPersistedData;
 
 // @public (undocumented)
 export type EntityFieldPlaceholders = Map<FieldName, PlaceholderName | Set<PlaceholderName>>;
@@ -972,7 +972,7 @@ export interface ExtendTreeOptions {
 }
 
 // @public (undocumented)
-export const Field: <Persisted extends Scalar = Scalar>(props: FieldProps<Persisted>) => ReactElement;
+export const Field: <Persisted extends FieldValue = FieldValue>(props: FieldProps<Persisted>) => ReactElement;
 
 // @public (undocumented)
 export class FieldAccessor<Value extends FieldValue = FieldValue> implements Errorable {
@@ -1074,9 +1074,9 @@ export type FieldEventListenerStore<Value extends FieldValue = FieldValue> = Eve
 
 // @public
 export class FieldMarker {
-    constructor(fieldName: FieldName, defaultValue?: Scalar | undefined, isNonbearing?: boolean);
+    constructor(fieldName: FieldName, defaultValue?: FieldValue | undefined, isNonbearing?: boolean);
     // (undocumented)
-    readonly defaultValue?: Scalar | undefined;
+    readonly defaultValue?: FieldValue | undefined;
     // (undocumented)
     readonly fieldName: FieldName;
     // (undocumented)
@@ -1107,31 +1107,31 @@ export interface FieldRuntimeProps<Persisted extends FieldValue = FieldValue> {
 }
 
 // @public (undocumented)
-export type FieldValue = Scalar;
+export type FieldValue = JsonValue;
 
 // @public (undocumented)
 export const FieldView: {
-    <FV1 extends Scalar>(props: FieldViewCommonProps & {
+    <FV1 extends FieldValue>(props: FieldViewCommonProps & {
         field: SRSF;
         render: (field1: FieldAccessor<FV1>) => RN;
     }): REN;
-    <FV1_1 extends Scalar>(props: FieldViewCommonProps & {
+    <FV1_1 extends FieldValue>(props: FieldViewCommonProps & {
         fields: [SRSF];
         render: (field1: FieldAccessor<FV1_1>) => RN;
     }): REN;
-    <FV1_2 extends Scalar, FV2 extends Scalar>(props: FieldViewCommonProps & {
+    <FV1_2 extends FieldValue, FV2 extends FieldValue>(props: FieldViewCommonProps & {
         fields: [SRSF, SRSF];
         render: (field1: FieldAccessor<FV1_2>, field2: FieldAccessor<FV2>) => RN;
     }): REN;
-    <FV1_3 extends Scalar, FV2_1 extends Scalar, FV3 extends Scalar>(props: FieldViewCommonProps & {
+    <FV1_3 extends FieldValue, FV2_1 extends FieldValue, FV3 extends FieldValue>(props: FieldViewCommonProps & {
         fields: [SRSF, SRSF, SRSF];
         render: (field1: FieldAccessor<FV1_3>, field2: FieldAccessor<FV2_1>, field3: FieldAccessor<FV3>) => RN;
     }): REN;
-    <FV1_4 extends Scalar, FV2_2 extends Scalar, FV3_1 extends Scalar, FV4 extends Scalar>(props: FieldViewCommonProps & {
+    <FV1_4 extends FieldValue, FV2_2 extends FieldValue, FV3_1 extends FieldValue, FV4 extends FieldValue>(props: FieldViewCommonProps & {
         fields: [SRSF, SRSF, SRSF, SRSF];
         render: (field1: FieldAccessor<FV1_4>, field2: FieldAccessor<FV2_2>, field3: FieldAccessor<FV3_1>, field4: FieldAccessor<FV4>) => RN;
     }): REN;
-    <FV1_5 extends Scalar, FV2_3 extends Scalar, FV3_2 extends Scalar, FV4_1 extends Scalar, FV5 extends Scalar>(props: FieldViewCommonProps & {
+    <FV1_5 extends FieldValue, FV2_3 extends FieldValue, FV3_2 extends FieldValue, FV4_1 extends FieldValue, FV5 extends FieldValue>(props: FieldViewCommonProps & {
         fields: [SRSF, SRSF, SRSF, SRSF, SRSF];
         render: (field1: FieldAccessor<FV1_5>, field2: FieldAccessor<FV2_3>, field3: FieldAccessor<FV3_2>, field4: FieldAccessor<FV4_1>, field5: FieldAccessor<FV5>) => RN;
     }): REN;
@@ -1296,6 +1296,19 @@ export interface InvalidResponseResult {
     // (undocumented)
     type: 'invalidResponse';
 }
+
+// @public (undocumented)
+export interface JsonArray<Ext = never> extends Array<JsonValue<Ext>> {
+}
+
+// @public (undocumented)
+export interface JsonObject<Ext = never> {
+    // (undocumented)
+    [key: string]: JsonValue<Ext>;
+}
+
+// @public (undocumented)
+export type JsonValue<Ext = never> = string | number | boolean | null | JsonObject<Ext> | JsonArray<Ext> | Ext;
 
 // @public (undocumented)
 export interface JustSuccessPersistResult {
@@ -1755,7 +1768,7 @@ export type ReceivedEntityData = {
 };
 
 // @public (undocumented)
-export type ReceivedFieldData = Scalar | ReceivedEntityData | Array<ReceivedEntityData>;
+export type ReceivedFieldData = FieldValue | ReceivedEntityData | Array<ReceivedEntityData>;
 
 // @public (undocumented)
 export interface Relation extends AnyField, EntityCreationParameters {
@@ -2011,7 +2024,7 @@ export interface SugarableUnconstrainedQualifiedSingleEntity extends SugarableQu
 }
 
 // @public (undocumented)
-export const SugaredField: <Persisted extends Scalar = Scalar>(props: SugaredFieldProps<Persisted>) => ReactElement;
+export const SugaredField: <Persisted extends FieldValue = FieldValue>(props: SugaredFieldProps<Persisted>) => ReactElement;
 
 // @public (undocumented)
 export interface SugaredFieldProps<Persisted extends FieldValue = FieldValue> extends Omit<FieldProps<Persisted>, 'field'> {
@@ -2385,7 +2398,7 @@ export const useBindingOperations: () => BindingOperations;
 export const useDataBinding: ({ nodeTree, refreshOnEnvironmentChange, refreshOnPersist, }: AccessorTreeStateOptions) => AccessorTreeState;
 
 // @public @deprecated
-export const useDerivedField: <SourceValue extends Scalar = Scalar>(sourceField: string | SugaredRelativeSingleField, derivedField: string | SugaredRelativeSingleField, transform?: (sourceValue: SourceValue | null) => SourceValue | null, agent?: string) => void;
+export const useDerivedField: <SourceValue extends FieldValue = FieldValue>(sourceField: string | SugaredRelativeSingleField, derivedField: string | SugaredRelativeSingleField, transform?: (sourceValue: SourceValue | null) => SourceValue | null, agent?: string) => void;
 
 // @public @deprecated (undocumented)
 export function useDesugaredRelativeEntityList(sugaredRelativeEntityList: string | SugaredRelativeEntityList): RelativeEntityList;
@@ -2544,7 +2557,7 @@ export class VariableInputTransformer {
     // (undocumented)
     static transformValue(value: OptionallyVariableFieldValue, environment: Environment): FieldValue;
     // (undocumented)
-    static transformVariableFieldValue(variableFieldValue: VariableFieldValue, environment: Environment): Scalar;
+    static transformVariableFieldValue(variableFieldValue: VariableFieldValue, environment: Environment): FieldValue;
 }
 
 // @public (undocumented)

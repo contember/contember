@@ -15,6 +15,7 @@ import { OperationsHelpers } from './operations/OperationsHelpers'
 import type { EntityListState, EntityRealmState, EntityRealmStateStub, RootStateNode } from './state'
 import type { StateInitializer } from './StateInitializer'
 import type { TreeStore } from './TreeStore'
+import { SubMutationOperation } from './MutationGenerator'
 
 export class TreeAugmenter {
 	public constructor(
@@ -23,9 +24,9 @@ export class TreeAugmenter {
 		private readonly treeStore: TreeStore,
 	) {}
 
-	public extendPersistedData(newPersistedData: ReceivedDataTree) {
+	public extendPersistedData(newPersistedData: ReceivedDataTree, markerTree: MarkerTreeRoot) {
 		// TODO this doesn't yet handle updates for entities whose persisted data just gets magically changed without notice.
-		this.treeStore.mergeInQueryResponse(newPersistedData)
+		this.treeStore.mergeInQueryResponse(newPersistedData, markerTree)
 	}
 
 	public extendTreeStates(newTreeId: TreeRootId | undefined, newMarkerTree: MarkerTreeRoot): void {
@@ -40,8 +41,8 @@ export class TreeAugmenter {
 		}
 	}
 
-	public updatePersistedData(response: ReceivedDataTree) {
-		this.treeStore.mergeInMutationResponse(response)
+	public updatePersistedData(response: ReceivedDataTree, operations: SubMutationOperation[]) {
+		this.treeStore.mergeInMutationResponse(response, operations)
 
 		this.eventManager.syncTransaction(() => {
 			for (const rootStates of this.treeStore.subTreeStatesByRoot.values()) {

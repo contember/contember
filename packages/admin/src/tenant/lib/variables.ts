@@ -1,4 +1,4 @@
-import { JsonValue } from '../../utils'
+import { JsonValue } from '@contember/binding'
 
 export interface GQLVariableType<Value = any, Required extends boolean = boolean> {
 	graphQlType: string

@@ -1,10 +1,10 @@
-import type { EntityId, PlaceholderName, Scalar } from '../treeParameters'
+import type { EntityId, FieldValue, PlaceholderName } from '../treeParameters'
 import type { ServerId, UniqueEntityId } from './RuntimeId'
 
 // HasMany relations are encoded as sets of entity ids.
 // HasOne relations are encoded as BoxedSingleEntityId just to make them different from actual strings.
 //		Not sure whether that is a reasonable precaution or just pure overhead.
-export type EntityFieldPersistedData = Scalar | ServerId | EntityListPersistedData
+export type EntityFieldPersistedData = FieldValue | ServerId | EntityListPersistedData
 
 export type SingleEntityPersistedData = Map<PlaceholderName, EntityFieldPersistedData>
 

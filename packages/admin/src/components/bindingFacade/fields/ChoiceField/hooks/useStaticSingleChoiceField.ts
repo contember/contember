@@ -1,5 +1,5 @@
 import { ChoiceFieldData } from '../ChoiceFieldData'
-import { Scalar, useEnvironment, useField, VariableInputTransformer } from '@contember/binding'
+import { FieldValue, useEnvironment, useField, VariableInputTransformer } from '@contember/binding'
 import { useCallback, useMemo, useState } from 'react'
 import { OptionallyVariableStaticOption, StaticSingleChoiceFieldProps } from '../StaticSingleChoiceField'
 import { useAccessorErrors } from '../../../errors'
@@ -7,7 +7,7 @@ import { useFuseFilteredOptions } from './useFuseFilteredOptions'
 
 export const useStaticSingleChoiceField = (
 	props: StaticSingleChoiceFieldProps,
-): ChoiceFieldData.SingleChoiceFieldMetadata<Scalar> => {
+): ChoiceFieldData.SingleChoiceFieldMetadata<FieldValue> => {
 	const [input, setSearchInput] = useState('')
 	const field = useField(props)
 	const data = useNormalizedOptions(props.options)
@@ -17,7 +17,7 @@ export const useStaticSingleChoiceField = (
 
 	const errors = useAccessorErrors(field)
 
-	const onSelect = useCallback((value: ChoiceFieldData.SingleOption<Scalar>) => {
+	const onSelect = useCallback((value: ChoiceFieldData.SingleOption<FieldValue>) => {
 		field.updateValue(value.value)
 	}, [field])
 	const onClear = useCallback(() => {
@@ -39,7 +39,7 @@ const useNormalizedOptions = (options: OptionallyVariableStaticOption[]) => {
 	const environment = useEnvironment()
 	return useMemo(
 		() =>
-			options.map(({ label, description, value, searchKeywords }, i): ChoiceFieldData.SingleOption<Scalar> => {
+			options.map(({ label, description, value, searchKeywords }, i): ChoiceFieldData.SingleOption<FieldValue> => {
 				const transformValue = VariableInputTransformer.transformValue(value, environment)
 				return ({
 					key: i.toString(),

@@ -3,7 +3,6 @@ import {
 	Field,
 	FieldValue,
 	OptionallyVariableFieldValue,
-	Scalar,
 	SugaredRelativeSingleField,
 } from '@contember/binding'
 import { FunctionComponent, ReactNode } from 'react'
@@ -28,13 +27,13 @@ export interface OptionallyVariableStaticOption extends StaticOption {
 
 export type StaticSingleChoiceFieldProps =
 	& SugaredRelativeSingleField
-	& SelectFuseOptionsProps<Scalar>
+	& SelectFuseOptionsProps<FieldValue>
 	& {
 		options: OptionallyVariableStaticOption[]
 	}
 
 
-export const StaticSingleChoiceField: FunctionComponent<StaticSingleChoiceFieldProps & ChoiceFieldData.SingleChoiceFieldProps<Scalar>> =
+export const StaticSingleChoiceField: FunctionComponent<StaticSingleChoiceFieldProps & ChoiceFieldData.SingleChoiceFieldProps<FieldValue>> =
 	Component(
 		props => props.children(useStaticSingleChoiceField(props)),
 		props => <Field {...props} />,

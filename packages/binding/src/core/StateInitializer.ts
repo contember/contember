@@ -10,13 +10,15 @@ import {
 } from '../markers'
 import { BijectiveIndexedMap } from '../structures'
 import type {
-	EntityEventListenerStore, EntityId,
+	EntityEventListenerStore,
+	EntityId,
 	EntityListEventListenerStore,
 	EntityName,
 	FieldEventListenerStore,
 	FieldName,
-	Scalar,
+	FieldValue,
 } from '../treeParameters'
+import { EventListenersStore } from '../treeParameters'
 import { assertNever } from '../utils'
 import type { AccessorErrorManager } from './AccessorErrorManager'
 import type { EventManager } from './EventManager'
@@ -35,7 +37,6 @@ import {
 } from './state'
 import { TreeParameterMerger } from './TreeParameterMerger'
 import type { TreeStore } from './TreeStore'
-import { EventListenersStore } from '../treeParameters'
 
 export class StateInitializer {
 	private readonly fieldOperations: FieldOperations
@@ -349,7 +350,7 @@ export class StateInitializer {
 		parent: EntityRealmState,
 		placeholderName: FieldName,
 		fieldMarker: FieldMarker,
-		persistedValue: Scalar | undefined,
+		persistedValue: FieldValue | undefined,
 		copyFromState: FieldState | undefined,
 	): FieldState {
 		const resolvedFieldValue = copyFromState ? copyFromState.value : (persistedValue ?? fieldMarker.defaultValue ?? null)

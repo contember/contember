@@ -27,6 +27,7 @@ import { MarkerComparator } from './MarkerComparator'
 import { RequestResponseNormalizer } from './RequestResponseNormalizer'
 import type { Schema } from './schema'
 import type { EntityListState, EntityRealmState, EntityRealmStateStub, EntityState, RootStateNode } from './state'
+import { SubMutationOperation } from './MutationGenerator'
 
 const emptyEntityIdSet: ReadonlySet<EntityId> = new Set()
 
@@ -44,12 +45,12 @@ export class TreeStore {
 
 	public constructor() {}
 
-	public mergeInQueryResponse(response: ReceivedDataTree): void {
-		RequestResponseNormalizer.mergeInQueryResponse(this.persistedData, response)
+	public mergeInQueryResponse(response: ReceivedDataTree, markerTree: MarkerTreeRoot): void {
+		RequestResponseNormalizer.mergeInQueryResponse(this.persistedData, response, markerTree)
 	}
 
-	public mergeInMutationResponse(response: ReceivedDataTree): void {
-		RequestResponseNormalizer.mergeInMutationResponse(this.persistedData, response)
+	public mergeInMutationResponse(response: ReceivedDataTree, operations: SubMutationOperation[]): void {
+		RequestResponseNormalizer.mergeInMutationResponse(this.persistedData, response, operations)
 	}
 
 	public setSchema(newSchema: Schema): void {

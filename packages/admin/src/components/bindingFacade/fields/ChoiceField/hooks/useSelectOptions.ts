@@ -130,8 +130,9 @@ const useOptionsLoader = (
 		inputRef.current = input
 	}, [input])
 
+	const initialRootId = useTreeRootId()
 	const [renderedState, setRenderedState] = useState<OptionsLoaderRenderedState>({
-		treeRootId: useTreeRootId(),
+		treeRootId: initialRootId,
 		filter: undefined,
 		query: undefined,
 	})
@@ -145,12 +146,12 @@ const useOptionsLoader = (
 	useEffect(() => {
 		if (input === '' && !isEmptyInit) {
 			setRenderedState({
-				treeRootId: undefined,
+				treeRootId: initialRootId,
 				filter: undefined,
 				query: '',
 			})
 		}
-	}, [input, isEmptyInit])
+	}, [initialRootId, input, isEmptyInit])
 
 	useEffect(() => {
 		if (

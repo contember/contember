@@ -1,3 +1,4 @@
+export * from './HasRole'
 export * from './IdentityEnvironmentExtension'
 export * from './IdentityProvider'
 export * from './useIdentity'

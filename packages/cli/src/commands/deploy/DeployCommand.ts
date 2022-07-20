@@ -35,28 +35,22 @@ export class DeployCommand extends Command<Args, Options> {
 	protected configure(configuration: CommandConfiguration<Args, Options>): void {
 		configuration.description('Deploy Contember project')
 		configuration.argument('dsn')
-		configuration.argument('project').optional()
+		if (!this.workspace.isSingleProjectMode()) {
+			configuration.argument('project').optional()
+		}
 		configuration.option('admin').valueRequired()
 		configureExecuteMigrationCommand(configuration)
 	}
 
 	protected async execute(input: Input<Args, Options>): Promise<void | number> {
 		const [dsn, projectName] = this.getNormalizedInput(input)
-		let project: Project
+		const project = await this.workspace.projects.getProject(projectName, { fuzzy: true })
 
 		let apiUrl = input.getOption('instance')
 		let adminEndpoint = input.getOption('admin')
 
 		let apiTokenFromDsn: string | undefined = undefined
-		if (projectName) {
-			project = await this.workspace.projects.getProject(projectName, { fuzzy: true })
-		} else {
-			const projects = await this.workspace.projects.listProjects()
-			if (projects.length !== 1) {
-				throw 'Please specify a local name project'
-			}
-			project = projects[0]
-		}
+
 		let remoteProject = input.getOption('remote-project') || project.name
 		if (dsn) {
 			const uri = new URL(dsn)

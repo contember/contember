@@ -7,7 +7,7 @@ import { emptySchema } from '@contember/schema-utils'
 import { validateMigrations } from './MigrationValidationHelper'
 
 type Args = {
-	project: string
+	project?: string
 	migration: string[]
 }
 
@@ -25,7 +25,9 @@ export class MigrationRebaseCommand extends Command<Args, Options> {
 
 	protected configure(configuration: CommandConfiguration<Args, Options>): void {
 		configuration.description('Rebase migrations on filesystem and in local instance')
-		configuration.argument('project')
+		if (!this.workspace.isSingleProjectMode()) {
+			configuration.argument('project')
+		}
 		configuration.argument('migration').variadic()
 		configuration //
 			.option('yes')

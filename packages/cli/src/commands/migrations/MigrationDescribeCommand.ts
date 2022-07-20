@@ -7,7 +7,7 @@ import { Schema } from '@contember/schema'
 import { Workspace } from '@contember/cli-common'
 
 type Args = {
-	project: string
+	project?: string
 	migration?: string
 }
 
@@ -56,7 +56,9 @@ export class MigrationDescribeCommand extends Command<Args, Options> {
 
 	protected configure(configuration: CommandConfiguration<Args, Options>): void {
 		configuration.description('Describes a migration')
-		configuration.argument('project')
+		if (!this.workspace.isSingleProjectMode()) {
+			configuration.argument('project')
+		}
 		configuration.argument('migration').optional()
 		configuration.option('sql-only').valueNone()
 		configuration.option('no-sql').valueNone()

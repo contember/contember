@@ -13,7 +13,7 @@ import { interactiveResolveApiToken, TenantClient } from '../../utils/tenant'
 import { SystemClient } from '../../utils/system'
 
 type Args = {
-	project: string
+	project?: string
 	migration?: string
 }
 
@@ -30,7 +30,9 @@ export class MigrationExecuteCommand extends Command<Args, Options> {
 
 	protected configure(configuration: CommandConfiguration<Args, Options>): void {
 		configuration.description('Executes migrations on an instance')
-		configuration.argument('project')
+		if (!this.workspace.isSingleProjectMode()) {
+			configuration.argument('project')
+		}
 		configuration.argument('migration').optional()
 		configuration.option('force').description('Ignore migrations order and missing migrations (dev only)')
 		configureExecuteMigrationCommand(configuration)
@@ -42,9 +44,6 @@ export class MigrationExecuteCommand extends Command<Args, Options> {
 		const workspace = this.workspace
 
 		const allProjects = projectName === '.'
-		if (!allProjects) {
-			validateProjectName(projectName)
-		}
 		const remoteProjectOption = input?.getOption('remote-project')
 		if (remoteProjectOption && allProjects) {
 			throw 'Option remote-project can be used only for a single project'

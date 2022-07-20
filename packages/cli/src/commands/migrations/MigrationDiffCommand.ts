@@ -1,7 +1,7 @@
 import { Command, CommandConfiguration, Input, Workspace } from '@contember/cli-common'
 import { printValidationErrors } from '../../utils/schema'
 import { InvalidSchemaException } from '@contember/schema-migrations'
-import { configureCreateMigrationCommand, executeCreateMigrationCommand } from './MigrationCreateHelper'
+import { executeCreateMigrationCommand } from './MigrationCreateHelper'
 import { createMigrationStatusTable, printMigrationDescription } from '../../utils/migrations'
 import { executeMigrations, resolveMigrationStatus } from './MigrationExecuteHelper'
 import prompts from 'prompts'
@@ -11,7 +11,7 @@ import { SystemClient } from '../../utils/system'
 import { loadSchema } from '../../utils/project/loadSchema'
 
 type Args = {
-	project: string
+	project?: string
 	migrationName: string
 }
 
@@ -29,7 +29,10 @@ export class MigrationDiffCommand extends Command<Args, Options> {
 
 	protected configure(configuration: CommandConfiguration<Args, Options>): void {
 		configuration.description('Creates schema migration diff for given project')
-		configureCreateMigrationCommand(configuration)
+		if (!this.workspace.isSingleProjectMode()) {
+			configuration.argument('project')
+		}
+		configuration.argument('migrationName')
 		configuration.option('execute').valueNone()
 		configuration //
 			.option('yes')

@@ -6,7 +6,7 @@ import { validateMigrations } from '../migrations/MigrationValidationHelper'
 import { loadSchema } from '../../utils/project/loadSchema'
 
 type Args = {
-	project: string
+	project?: string
 }
 
 type Options = {}
@@ -20,7 +20,9 @@ export class ProjectValidateCommand extends Command<Args, Options> {
 
 	protected configure(configuration: CommandConfiguration<Args, Options>): void {
 		configuration.description('Validates project schema')
-		configuration.argument('project')
+		if (!this.workspace.isSingleProjectMode()) {
+			configuration.argument('project')
+		}
 	}
 
 	protected async execute(input: Input<Args, Options>): Promise<number> {
@@ -28,9 +30,6 @@ export class ProjectValidateCommand extends Command<Args, Options> {
 		const workspace = this.workspace
 
 		const allProjects = projectName === '.'
-		if (!allProjects) {
-			validateProjectName(projectName)
-		}
 		const projects = allProjects
 			? await workspace.projects.listProjects()
 			: [await workspace.projects.getProject(projectName, { fuzzy: true })]

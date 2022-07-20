@@ -11,16 +11,11 @@ import {
 import { Workspace, Project } from '@contember/cli-common'
 
 type Args = {
-	project: string
+	project?: string
 	migrationName: string
 }
 
 type Options = {}
-
-export const configureCreateMigrationCommand = (configuration: CommandConfiguration<Args, Options>) => {
-	configuration.argument('project')
-	configuration.argument('migrationName')
-}
 
 export const executeCreateMigrationCommand = async (
 	input: Input<Pick<Args, 'project'>, Options>,

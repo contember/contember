@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { Application, CommandManager, getPackageVersion } from '@contember/cli-common'
+import { Application, CommandManager, getPackageVersion, Workspace } from '@contember/cli-common'
 import {
 	CreateApiKeyCommand,
 	DeployCommand,
@@ -21,24 +21,25 @@ import {
 } from './commands';
 
 (async () => {
+	const workspace = await Workspace.get(process.cwd())
 	const commandManager = new CommandManager({
-		['deploy']: () => new DeployCommand(),
+		['deploy']: () => new DeployCommand(workspace),
 		['version']: () => new VersionCommand(),
-		['migrations:diff']: () => new MigrationDiffCommand(),
-		['migrations:amend']: () => new MigrationAmendCommand(),
-		['migrations:describe']: () => new MigrationDescribeCommand(),
-		['migrations:execute']: () => new MigrationExecuteCommand(),
-		['migrations:rebase']: () => new MigrationRebaseCommand(),
-		['migrations:status']: () => new MigrationStatusCommand(),
-		['workspace:update:api']: () => new WorkspaceUpdateApiCommand(),
-		['project:create']: () => new ProjectCreateCommand(),
-		['project:validate']: () => new ProjectValidateCommand(),
-		['project:print-schema']: () => new ProjectPrintSchemaCommand(),
-		['project:generate-doc']: () => new ProjectGenerateDocumentation(),
-		['tenant:sign-in']: () => new SignInCommand(),
-		['tenant:create-api-key']: () => new CreateApiKeyCommand(),
-		['tenant:invite']: () => new InviteCommand(),
-		['tenant:reset-password']: () => new ResetPasswordCommand(),
+		['migrations:diff']: () => new MigrationDiffCommand(workspace),
+		['migrations:amend']: () => new MigrationAmendCommand(workspace),
+		['migrations:describe']: () => new MigrationDescribeCommand(workspace),
+		['migrations:execute']: () => new MigrationExecuteCommand(workspace),
+		['migrations:rebase']: () => new MigrationRebaseCommand(workspace),
+		['migrations:status']: () => new MigrationStatusCommand(workspace),
+		['workspace:update:api']: () => new WorkspaceUpdateApiCommand(workspace),
+		['project:create']: () => new ProjectCreateCommand(workspace),
+		['project:validate']: () => new ProjectValidateCommand(workspace),
+		['project:print-schema']: () => new ProjectPrintSchemaCommand(workspace),
+		['project:generate-doc']: () => new ProjectGenerateDocumentation(workspace),
+		['tenant:sign-in']: () => new SignInCommand(workspace),
+		['tenant:create-api-key']: () => new CreateApiKeyCommand(workspace),
+		['tenant:invite']: () => new InviteCommand(workspace),
+		['tenant:reset-password']: () => new ResetPasswordCommand(workspace),
 	})
 
 	const nodeVersion = process.version.match(/^v?(\d+)\..+$/)

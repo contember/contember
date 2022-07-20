@@ -10,6 +10,12 @@ type Args = {
 type Options = {}
 
 export class SignInCommand extends Command<Args, Options> {
+	constructor(
+		private readonly workspace: Workspace,
+	) {
+		super()
+	}
+
 	protected configure(configuration: CommandConfiguration<Args, Options>): void {
 		configuration.description('Signs in a user')
 		configuration //
@@ -22,7 +28,7 @@ export class SignInCommand extends Command<Args, Options> {
 		if (!process.stdin.isTTY) {
 			throw 'This command is interactive and requires TTY'
 		}
-		const workspace = await Workspace.get(process.cwd())
+		const workspace = this.workspace
 		const instance = await interactiveResolveInstanceEnvironmentFromInput(workspace, input.getArgument('instance'))
 		const loginToken = await interactiveResolveLoginToken(workspace)
 		const { sessionToken } = await interactiveSignIn({ apiUrl: instance.baseUrl, loginToken })

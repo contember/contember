@@ -24,6 +24,7 @@ export const configureCreateMigrationCommand = (configuration: CommandConfigurat
 
 export const executeCreateMigrationCommand = async (
 	input: Input<Pick<Args, 'project'>, Options>,
+	{ workspace }: {workspace: Workspace},
 	createMigrationCallback: (args: {
 		workspace: Workspace
 		project: Project
@@ -36,7 +37,6 @@ export const executeCreateMigrationCommand = async (
 	}) => Promise<number>,
 ) => {
 	const projectName = input.getArgument('project')
-	const workspace = await Workspace.get(process.cwd())
 	const allProjects = projectName === '.'
 	const projects = allProjects
 		? await workspace.projects.listProjects()

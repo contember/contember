@@ -14,6 +14,12 @@ type Options = {
 }
 
 export class ProjectGenerateDocumentation extends Command<Args, Options> {
+	constructor(
+		private readonly workspace: Workspace,
+	) {
+		super()
+	}
+
 	protected configure(configuration: CommandConfiguration<Args, Options>): void {
 		configuration.description('Generates HTML documentation from project schema')
 		configuration.argument('project')
@@ -22,7 +28,7 @@ export class ProjectGenerateDocumentation extends Command<Args, Options> {
 
 	protected async execute(input: Input<Args, Options>): Promise<number> {
 		const projectName = input.getArgument('project')
-		const workspace = await Workspace.get(process.cwd())
+		const workspace = this.workspace
 
 		validateProjectName(projectName)
 		const project = await workspace.projects.getProject(projectName, { fuzzy: true })

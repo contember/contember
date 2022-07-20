@@ -12,6 +12,12 @@ type Args = {
 type Options = {}
 
 export class ProjectValidateCommand extends Command<Args, Options> {
+	constructor(
+		private readonly workspace: Workspace,
+	) {
+		super()
+	}
+
 	protected configure(configuration: CommandConfiguration<Args, Options>): void {
 		configuration.description('Validates project schema')
 		configuration.argument('project')
@@ -19,7 +25,7 @@ export class ProjectValidateCommand extends Command<Args, Options> {
 
 	protected async execute(input: Input<Args, Options>): Promise<number> {
 		const [projectName] = [input.getArgument('project')]
-		const workspace = await Workspace.get(process.cwd())
+		const workspace = this.workspace
 
 		const allProjects = projectName === '.'
 		if (!allProjects) {

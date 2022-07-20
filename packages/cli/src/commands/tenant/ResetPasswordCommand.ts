@@ -10,6 +10,12 @@ type Args = {
 type Options = {}
 
 export class ResetPasswordCommand extends Command<Args, Options> {
+	constructor(
+		private readonly workspace: Workspace,
+	) {
+		super()
+	}
+
 	protected configure(configuration: CommandConfiguration<Args, Options>): void {
 		configuration.description('Resets user password')
 		configuration //
@@ -22,7 +28,7 @@ export class ResetPasswordCommand extends Command<Args, Options> {
 		if (!process.stdin.isTTY) {
 			throw 'This command is interactive and requires TTY'
 		}
-		const workspace = await Workspace.get(process.cwd())
+		const workspace = this.workspace
 		const instance = await interactiveResolveInstanceEnvironmentFromInput(workspace, input.getArgument('instance'))
 		const loginToken = await interactiveResolveLoginToken(workspace)
 		await interactiveResetPassword({ apiUrl: instance.baseUrl, loginToken })

@@ -48,6 +48,12 @@ let printMigrationDescription = async function (
 }
 
 export class MigrationDescribeCommand extends Command<Args, Options> {
+	constructor(
+		private readonly workspace: Workspace,
+	) {
+		super()
+	}
+
 	protected configure(configuration: CommandConfiguration<Args, Options>): void {
 		configuration.description('Describes a migration')
 		configuration.argument('project')
@@ -59,7 +65,7 @@ export class MigrationDescribeCommand extends Command<Args, Options> {
 	protected async execute(input: Input<Args, Options>): Promise<void> {
 		const projectName = input.getArgument('project')
 
-		const workspace = await Workspace.get(process.cwd())
+		const workspace = this.workspace
 		const project = await workspace.projects.getProject(projectName, { fuzzy: true })
 		const migrationsDir = await project.migrationsDir
 		const container = new MigrationsContainerFactory(migrationsDir).create()

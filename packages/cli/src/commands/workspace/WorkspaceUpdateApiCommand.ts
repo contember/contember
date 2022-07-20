@@ -10,6 +10,12 @@ type Args = {
 type Options = {}
 
 export class WorkspaceUpdateApiCommand extends Command<Args, Options> {
+	constructor(
+		private readonly workspace: Workspace,
+	) {
+		super()
+	}
+
 	protected configure(configuration: CommandConfiguration<Args, Options>): void {
 		configuration.description('Updates Contember API version and all related packages')
 		configuration.argument('version')
@@ -17,7 +23,7 @@ export class WorkspaceUpdateApiCommand extends Command<Args, Options> {
 
 	protected async execute(input: Input<Args, Options>): Promise<void> {
 		const version = input.getArgument('version')
-		const workspace = await Workspace.get(process.cwd())
+		const workspace = this.workspace
 		const upgradablePackages = ['@contember/schema', '@contember/schema-definition', '@contember/cli']
 
 		await updateNpmPackages(upgradablePackages.map(it => ({ name: it, version })), workspace.directory)

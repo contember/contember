@@ -1,4 +1,4 @@
-import { Command, CommandConfiguration, Input } from '@contember/cli-common'
+import { Command, CommandConfiguration, Input, Workspace } from '@contember/cli-common'
 import { printValidationErrors } from '../../utils/schema'
 import { InvalidSchemaException } from '@contember/schema-migrations'
 import { executeCreateMigrationCommand } from './MigrationCreateHelper'
@@ -26,6 +26,12 @@ type Options = {
 }
 
 export class MigrationAmendCommand extends Command<Args, Options> {
+	constructor(
+		private readonly workspace: Workspace,
+	) {
+		super()
+	}
+
 	protected configure(configuration: CommandConfiguration<Args, Options>): void {
 		configuration.description('Amends latest migration')
 		configuration.argument('project')
@@ -40,6 +46,7 @@ export class MigrationAmendCommand extends Command<Args, Options> {
 	protected async execute(input: Input<Args, Options>): Promise<number> {
 		return await executeCreateMigrationCommand(
 			input,
+			{ workspace: this.workspace },
 			async ({
 				schemaVersionBuilder,
 				migrationsResolver,

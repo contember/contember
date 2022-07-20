@@ -22,6 +22,12 @@ type Options = ExecuteMigrationOptions & {
 }
 
 export class MigrationExecuteCommand extends Command<Args, Options> {
+	constructor(
+		private readonly workspace: Workspace,
+	) {
+		super()
+	}
+
 	protected configure(configuration: CommandConfiguration<Args, Options>): void {
 		configuration.description('Executes migrations on an instance')
 		configuration.argument('project')
@@ -33,7 +39,7 @@ export class MigrationExecuteCommand extends Command<Args, Options> {
 	protected async execute(input: Input<Args, Options>): Promise<number> {
 		const projectName = input.getArgument('project')
 
-		const workspace = await Workspace.get(process.cwd())
+		const workspace = this.workspace
 
 		const allProjects = projectName === '.'
 		if (!allProjects) {

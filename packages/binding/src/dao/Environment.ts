@@ -190,16 +190,16 @@ class Environment {
 		return this.options.parent
 	}
 
-	public withExtension<S, R>(extension: Environment.ExtensionFactory<S, R>, state: S): Environment {
+	public withExtension<S, R>(extension: Environment.Extension<S, R>, state: S): Environment {
 		return new Environment({
 			...this.options,
-			extensions: new Map([...this.options.extensions, [extension, state]]),
+			extensions: new Map([...this.options.extensions, [extension, state] as [Environment.Extension<unknown, unknown>, unknown]]),
 		})
 	}
 
-	public getExtension<S, R>(extension: Environment.ExtensionFactory<S, R>): R {
-		const state = this.options.extensions.get(extension)
-		return extension(state, this)
+	public getExtension<S, R>(extension: Environment.Extension<S, R>): R {
+		const state = this.options.extensions.get(extension as Environment.Extension<unknown, unknown>)
+		return extension.create(state as S, this)
 	}
 
 	public merge(other: Environment): Environment {
@@ -248,7 +248,7 @@ namespace Environment {
 		parameters: Parameters
 		variables: CustomVariables
 		parent?: Environment
-		extensions: Map<ExtensionFactory<any, any>, any>
+		extensions: Map<Extension<unknown, unknown>, unknown>
 	}
 
 	export type SubTreeNode =
@@ -314,7 +314,16 @@ namespace Environment {
 			| Value
 	}
 
-	export type ExtensionFactory<State, Result> = (state: State | undefined, environment: Environment) => Result
+	export type Extension<State, Result> = {
+		create: (state: State | undefined, environment: Environment) => Result
+	}
+
+	export const createExtension = <S, R>(create: Extension<S, R>['create'], otherMethods?: Omit<Extension<S, R>, 'create'>): Extension<S, R> => {
+		return {
+			create,
+			...otherMethods,
+		}
+	}
 
 	/** @deprecated */
 	export type DeltaFactory = ValuesMapWithFactory

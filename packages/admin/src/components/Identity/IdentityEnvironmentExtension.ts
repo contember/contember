@@ -1,7 +1,7 @@
-import { BindingError } from '@contember/binding'
+import { BindingError, Environment } from '@contember/binding'
 import { Identity } from './IdentityProvider'
 
-export const identityEnvironmentExtension = (state: Identity | null | undefined) => {
+export const identityEnvironmentExtension = Environment.createExtension((state: Identity | null | undefined) => {
 	if (state === undefined) {
 		throw new BindingError('Environment does not contain identity state.')
 	}
@@ -9,4 +9,4 @@ export const identityEnvironmentExtension = (state: Identity | null | undefined)
 	return {
 		identity: state ?? undefined,
 	}
-}
+})

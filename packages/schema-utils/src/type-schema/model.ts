@@ -147,6 +147,12 @@ const viewSchemaInner = Typesafe.intersection(
 const viewSchemaCheck: Typesafe.Equals<Model.View, ReturnType<typeof viewSchemaInner>> = true
 const viewSchema: Typesafe.Type<Model.View> = viewSchemaInner
 
+
+const indexesSchema = Typesafe.coalesce<Model.Indexes, Model.Indexes>(Typesafe.record(Typesafe.string, Typesafe.object({
+	fields: Typesafe.array(Typesafe.string),
+	name: Typesafe.string,
+})), { })
+
 const entitySchema = Typesafe.intersection(
 	Typesafe.object({
 		name: Typesafe.string,
@@ -158,10 +164,7 @@ const entitySchema = Typesafe.intersection(
 			fields: Typesafe.array(Typesafe.string),
 			name: Typesafe.string,
 		})),
-		indexes: Typesafe.record(Typesafe.string, Typesafe.object({
-			fields: Typesafe.array(Typesafe.string),
-			name: Typesafe.string,
-		})),
+		indexes: indexesSchema,
 		eventLog: eventLogSchema,
 	}),
 	Typesafe.partial({

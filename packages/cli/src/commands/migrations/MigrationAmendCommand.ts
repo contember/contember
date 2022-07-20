@@ -16,7 +16,7 @@ import { validateMigrations } from './MigrationValidationHelper'
 import { loadSchema } from '../../utils/project/loadSchema'
 
 type Args = {
-	project: string
+	project?: string
 	migration?: string
 }
 
@@ -34,7 +34,9 @@ export class MigrationAmendCommand extends Command<Args, Options> {
 
 	protected configure(configuration: CommandConfiguration<Args, Options>): void {
 		configuration.description('Amends latest migration')
-		configuration.argument('project')
+		if (!this.workspace.isSingleProjectMode()) {
+			configuration.argument('project')
+		}
 		configuration.argument('migration').optional()
 		configuration.option('force').description('Ignore migrations order and missing migrations (dev only)')
 		configuration //

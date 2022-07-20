@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { Application, CommandManager, getPackageVersion, Workspace } from '@contember/cli-common'
+import { Application, CommandFactoryList, CommandManager, getPackageVersion, Workspace } from '@contember/cli-common'
 import {
 	CreateApiKeyCommand,
 	DeployCommand,
@@ -18,11 +18,11 @@ import {
 	SignInCommand,
 	VersionCommand,
 	WorkspaceUpdateApiCommand,
-} from './commands';
+} from './commands'
 
 (async () => {
 	const workspace = await Workspace.get(process.cwd())
-	const commandManager = new CommandManager({
+	const commands: CommandFactoryList = {
 		['deploy']: () => new DeployCommand(workspace),
 		['version']: () => new VersionCommand(),
 		['migrations:diff']: () => new MigrationDiffCommand(workspace),
@@ -32,7 +32,6 @@ import {
 		['migrations:rebase']: () => new MigrationRebaseCommand(workspace),
 		['migrations:status']: () => new MigrationStatusCommand(workspace),
 		['workspace:update:api']: () => new WorkspaceUpdateApiCommand(workspace),
-		['project:create']: () => new ProjectCreateCommand(workspace),
 		['project:validate']: () => new ProjectValidateCommand(workspace),
 		['project:print-schema']: () => new ProjectPrintSchemaCommand(workspace),
 		['project:generate-doc']: () => new ProjectGenerateDocumentation(workspace),
@@ -40,7 +39,11 @@ import {
 		['tenant:create-api-key']: () => new CreateApiKeyCommand(workspace),
 		['tenant:invite']: () => new InviteCommand(workspace),
 		['tenant:reset-password']: () => new ResetPasswordCommand(workspace),
-	})
+	}
+	if (!workspace.isSingleProjectMode()) {
+		commands['project:create'] = () => new ProjectCreateCommand(workspace)
+	}
+	const commandManager = new CommandManager(commands)
 
 	const nodeVersion = process.version.match(/^v?(\d+)\..+$/)
 	if (nodeVersion && Number(nodeVersion[1]) < 12) {

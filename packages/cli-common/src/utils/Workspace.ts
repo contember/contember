@@ -64,6 +64,10 @@ export class Workspace {
 		return this.config?.api?.version || undefined
 	}
 
+
+	public isSingleProjectMode(): boolean {
+		return !!this.env.projectName
+	}
 }
 
 export const formatWorkspaceConfigPath = (workspaceDirectory: string) => [

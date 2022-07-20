@@ -1,7 +1,7 @@
 import { Command } from './Command'
 import chalk from 'chalk'
 
-type CommandFactoryList = { [command: string]: () => Command<any, any> }
+export type CommandFactoryList = { [command: string]: () => Command<any, any> }
 
 export class CommandManager {
 	constructor(public readonly commands: CommandFactoryList) {}

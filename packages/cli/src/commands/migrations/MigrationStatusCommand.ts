@@ -8,7 +8,7 @@ import chalk from 'chalk'
 import { Workspace } from '@contember/cli-common'
 
 type Args = {
-	project: string
+	project?: string
 }
 
 type Options = {
@@ -28,7 +28,9 @@ export class MigrationStatusCommand extends Command<Args, Options> {
 
 	protected configure(configuration: CommandConfiguration<Args, Options>): void {
 		configuration.description('Shows status of executed migrations on an instance & sync status')
-		configuration.argument('project')
+		if (!this.workspace.isSingleProjectMode()) {
+			configuration.argument('project')
+		}
 		configuration //
 			.option('instance')
 			.valueRequired()

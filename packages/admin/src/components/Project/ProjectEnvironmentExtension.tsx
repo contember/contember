@@ -1,6 +1,4 @@
-import { BindingError, EnvironmentContext, useEnvironment } from '@contember/binding'
-import { useProjectSlug } from '@contember/react-client'
-import { ReactNode } from 'react'
+import { BindingError } from '@contember/binding'
 
 export const projectEnvironmentExtension = (slug: string | null | undefined) => {
 	if (slug === undefined) {
@@ -9,14 +7,4 @@ export const projectEnvironmentExtension = (slug: string | null | undefined) => 
 	return {
 		slug: slug ?? undefined,
 	}
-}
-
-export const ProjectEnvironmentExtensionProvider = ({ children }: {children?: ReactNode}) => {
-	const env = useEnvironment()
-	const slug = useProjectSlug()
-	return (
-		<EnvironmentContext.Provider value={env.withExtension(projectEnvironmentExtension, slug ?? null)}>
-			{children}
-		</EnvironmentContext.Provider>
-	)
 }

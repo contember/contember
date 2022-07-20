@@ -1,4 +1,4 @@
-import { Environment, EnvironmentContext } from '@contember/binding'
+import { Environment, EnvironmentContext, EnvironmentExtensionProvider } from '@contember/binding'
 import { ContemberClient, ContemberClientProps } from '@contember/react-client'
 import { DialogProvider, SectionTabsProvider, StyleProvider, Toaster, ToasterProvider } from '@contember/ui'
 import { ReactNode } from 'react'
@@ -6,7 +6,7 @@ import { I18nProvider, MessageDictionaryByLocaleCode } from '../i18n'
 import { RequestProvider, RouteMap, RoutingContext, RoutingContextValue, SelectedDimension } from '../routing'
 import { IdentityProvider } from './Identity'
 import { NavigationProvider } from './NavigationProvider'
-import { ProjectEnvironmentExtensionProvider } from './Project/ProjectEnvironmentExtension'
+import { projectEnvironmentExtension } from './Project/ProjectEnvironmentExtension'
 
 export interface ApplicationEntrypointProps extends ContemberClientProps {
 	basePath?: string
@@ -59,7 +59,7 @@ export const ApplicationEntrypoint = (props: ApplicationEntrypointProps) => {
 									project={projectSlug}
 									stage={props.stage}
 								>
-									<ProjectEnvironmentExtensionProvider>
+									<EnvironmentExtensionProvider extension={projectEnvironmentExtension} state={projectSlug ?? null}>
 										<DialogProvider>
 											<NavigationProvider>
 												<IdentityProvider onInvalidIdentity={props.onInvalidIdentity}>
@@ -70,7 +70,7 @@ export const ApplicationEntrypoint = (props: ApplicationEntrypointProps) => {
 											</NavigationProvider>
 											<Toaster />
 										</DialogProvider>
-									</ProjectEnvironmentExtensionProvider>
+									</EnvironmentExtensionProvider>
 								</ContemberClient>
 							</ToasterProvider>
 						</RequestProvider>

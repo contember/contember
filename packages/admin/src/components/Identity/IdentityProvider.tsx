@@ -5,7 +5,7 @@ import { ContainerSpinner, Message } from '@contember/ui'
 import { MiscPageLayout } from '../MiscPageLayout'
 import { InvalidIdentityFallback } from './InvalidIdentityFallback'
 import { useLogout } from './useLogout'
-import { EnvironmentContext, useEnvironment } from '@contember/binding'
+import { EnvironmentExtensionProvider } from '@contember/binding'
 import { identityEnvironmentExtension } from './IdentityEnvironmentExtension'
 
 export interface Identity {
@@ -55,7 +55,6 @@ export const IdentityProvider: React.FC<IdentityProviderProps> = ({ children, on
 	const logout = useLogout()
 
 	const clearIdentity = useCallback(() => setIdentityState({ state: 'cleared' }), [])
-	const environment = useEnvironment()
 
 	const refetch = useCallback(async () => {
 		setIdentityState({ state: 'loading' })
@@ -145,12 +144,12 @@ export const IdentityProvider: React.FC<IdentityProviderProps> = ({ children, on
 	}
 
 	return (
-		<EnvironmentContext.Provider value={environment.withExtension(identityEnvironmentExtension, identityContextValue?.identity ?? null)}>
+		<EnvironmentExtensionProvider extension={identityEnvironmentExtension} state={identityContextValue?.identity ?? null}>
 			<IdentityContext.Provider value={identityContextValue}>
 				<IdentityRefreshContext.Provider value={refetch}>
 					{children}
 				</IdentityRefreshContext.Provider>
 			</IdentityContext.Provider>
-		</EnvironmentContext.Provider>
+		</EnvironmentExtensionProvider>
 	)
 }

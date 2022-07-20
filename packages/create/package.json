@@ -1,6 +1,6 @@
 {
   "name": "@contember/create",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "license": "Apache-2.0",
   "bin": "dist/src/run.js",
   "scripts": {
@@ -8,6 +8,6 @@
   },
   "devDependencies": {},
   "dependencies": {
-    "@contember/cli-common": "^1.0.2"
+    "@contember/cli-common": "^1.0.3"
   }
 }

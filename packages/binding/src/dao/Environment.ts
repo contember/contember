@@ -215,6 +215,11 @@ class Environment {
 		if (this.options.dimensions !== other.options.dimensions) {
 			throw new BindingError(`Cannot merge two environments with different dimensions.`)
 		}
+		if (this.options.extensions !== other.options.extensions) {
+			// todo: deep compare?
+			throw new BindingError(`Cannot merge two environments with different extensions.`)
+		}
+
 		if (equal(this.options.variables, other.options.variables) && this.options.parent === other.options.parent) {
 			return this
 		}

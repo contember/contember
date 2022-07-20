@@ -13,7 +13,7 @@ import { MigrationsContainerFactory } from '../../MigrationsContainer'
 import { AdminClient, readAdminFiles } from '../../utils/admin'
 import { URL } from 'url'
 import prompts from 'prompts'
-import { printMigrationDescription } from '../../utils/migrations'
+import { createMigrationStatusTable, printMigrationDescription } from '../../utils/migrations'
 import { maskToken } from '../../utils/token'
 
 type Args = {
@@ -86,6 +86,12 @@ export class DeployCommand extends Command<Args, Options> {
 		}
 
 		const status = await resolveMigrationStatus(systemClient, container.migrationsResolver, false)
+
+		if (status.errorMigrations.length > 0) {
+			console.error(createMigrationStatusTable(status.errorMigrations))
+			throw `Cannot execute migrations`
+		}
+
 		if (status.migrationsToExecute.length === 0 && !adminEndpoint) {
 			console.log('Nothing to do.')
 			return 0

@@ -15,6 +15,7 @@ class Environment {
 			dimensions: {},
 			variables: {},
 			parameters: {},
+			extensions: new Map(),
 		})
 	}
 
@@ -189,6 +190,18 @@ class Environment {
 		return this.options.parent
 	}
 
+	public withExtension<S, R>(extension: Environment.ExtensionFactory<S, R>, state: S): Environment {
+		return new Environment({
+			...this.options,
+			extensions: new Map([...this.options.extensions, [extension, state]]),
+		})
+	}
+
+	public getExtension<S, R>(extension: Environment.ExtensionFactory<S, R>): R {
+		const state = this.options.extensions.get(extension)
+		return extension(state, this)
+	}
+
 	public merge(other: Environment): Environment {
 		if (other === this) {
 			return this
@@ -235,6 +248,7 @@ namespace Environment {
 		parameters: Parameters
 		variables: CustomVariables
 		parent?: Environment
+		extensions: Map<ExtensionFactory<any, any>, any>
 	}
 
 	export type SubTreeNode =
@@ -299,6 +313,8 @@ namespace Environment {
 			| ((environment: Environment) => Value)
 			| Value
 	}
+
+	export type ExtensionFactory<State, Result> = (state: State | undefined, environment: Environment) => Result
 
 	/** @deprecated */
 	export type DeltaFactory = ValuesMapWithFactory

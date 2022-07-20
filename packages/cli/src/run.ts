@@ -21,14 +21,12 @@ import {
 } from './commands';
 
 (async () => {
-	const diffCommandFactory = () => new MigrationDiffCommand()
-	const migrationsDescribeFactory = () => new MigrationDescribeCommand()
 	const commandManager = new CommandManager({
 		['deploy']: () => new DeployCommand(),
 		['version']: () => new VersionCommand(),
-		['migrations:diff']: diffCommandFactory,
+		['migrations:diff']: () => new MigrationDiffCommand(),
 		['migrations:amend']: () => new MigrationAmendCommand(),
-		['migrations:describe']: migrationsDescribeFactory,
+		['migrations:describe']: () => new MigrationDescribeCommand(),
 		['migrations:execute']: () => new MigrationExecuteCommand(),
 		['migrations:rebase']: () => new MigrationRebaseCommand(),
 		['migrations:status']: () => new MigrationStatusCommand(),
@@ -41,10 +39,6 @@ import {
 		['tenant:create-api-key']: () => new CreateApiKeyCommand(),
 		['tenant:invite']: () => new InviteCommand(),
 		['tenant:reset-password']: () => new ResetPasswordCommand(),
-
-		// deprecated
-		['migrations:dry-run']: migrationsDescribeFactory,
-		['diff']: diffCommandFactory,
 	})
 
 	const nodeVersion = process.version.match(/^v?(\d+)\..+$/)

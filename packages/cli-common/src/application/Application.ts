@@ -58,10 +58,13 @@ export class Application {
 			if (commandDescription) {
 				console.error(commandDescription)
 			}
-			console.error('\nUsage:')
-			console.error(chalk.green(configuration.getUsage({ format: 'short' })))
-			console.error('\nArguments and options:')
-			console.error(configuration.getUsage({ format: 'multiline' }))
+			const shortUsage = configuration.getUsage({ format: 'short' })
+			if (shortUsage) {
+				console.error('\nUsage:')
+				console.error(chalk.green(shortUsage))
+				console.error('\nArguments and options:')
+				console.error(configuration.getUsage({ format: 'multiline' }))
+			}
 
 			return process.exit(0)
 		}

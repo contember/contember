@@ -219,7 +219,7 @@ export class DataBinding {
 							this.onPersistSuccess(result)
 							return result
 						} else {
-							this.eventManager.syncTransaction(() => this.accessorErrorManager.replaceErrors(mutationData))
+							this.eventManager.syncTransaction(() => this.accessorErrorManager.replaceErrors(mutationData, operations))
 							await this.eventManager.triggerOnPersistError(persistErrorOptions)
 							await onPersistError?.(persistErrorOptions)
 							if (shouldTryAgain) {

@@ -2,10 +2,14 @@ import type { ErrorAccessor } from '../accessors'
 import type { ExecutionError, MutationDataResponse, MutationResponse, ValidationError } from '../accessorTree'
 import type { EntityId, FieldName, PlaceholderName } from '../treeParameters'
 import { assertNever } from '../utils'
-import { MutationAlias, mutationOperationSubTreeType } from './requestAliases'
+import { MutationAlias } from './requestAliases'
+import { SubMutationOperation } from './MutationGenerator'
 
 class ErrorsPreprocessor {
-	public constructor(private readonly requestResponse: MutationDataResponse) {}
+	public constructor(
+		private readonly requestResponse: MutationDataResponse,
+		private readonly operations: SubMutationOperation[],
+	) {}
 
 	public preprocess(): ErrorsPreprocessor.ErrorTreeRoot {
 		const treeRoot: ErrorsPreprocessor.ErrorTreeRoot = new Map()
@@ -14,43 +18,37 @@ class ErrorsPreprocessor {
 			return treeRoot
 		}
 
-		for (const mutationAlias in this.requestResponse) {
-			const mutationResponse = this.requestResponse[mutationAlias]
+		for (const operation of this.operations) {
+			const mutationResponse = this.requestResponse[operation.alias]
 			const processedResponse = this.processMutationResponse(mutationResponse)
 
 			if (processedResponse === undefined) {
 				continue
 			}
+			const { subTreeType, subTreePlaceholder, id } = operation
 
-			const operation = MutationAlias.decodeTopLevel(mutationAlias)
-
-			if (operation === undefined) {
-				continue
-			}
-
-			const { subTreeType, subTreePlaceholder, entityId } = operation
-
-			if (subTreeType === mutationOperationSubTreeType.singleEntity) {
+			if (subTreeType === 'single') {
 				if (treeRoot.has(subTreePlaceholder)) {
 					return this.rejectCorruptData()
 				}
 				treeRoot.set(subTreePlaceholder, processedResponse)
-			} else if (subTreeType === mutationOperationSubTreeType.entityList) {
+			} else if (subTreeType === 'list') {
 				const child = treeRoot.get(subTreePlaceholder)
 
 				if (child === undefined) {
 					treeRoot.set(subTreePlaceholder, {
 						nodeType: 'iNode',
-						children: new Map([[entityId, processedResponse]]),
+						children: new Map([[id, processedResponse]]),
 						validation: [],
 						execution: [],
 					})
 				} else if (child.nodeType === 'iNode') {
-					child.children.set(entityId, processedResponse)
+					child.children.set(id, processedResponse)
 				}
 			} else {
 				return assertNever(subTreeType)
 			}
+
 		}
 		return treeRoot
 	}

@@ -1,6 +1,6 @@
 import { Button, FieldContainer, Heading, Spacer, Stack, TextInput, useShowToast } from '@contember/ui'
 import { FC, useCallback } from 'react'
-import { useForm } from '../../lib'
+import { FormHandler, useForm } from '../../lib'
 import { useChangePassword } from '../../mutations'
 
 const initialValues = {
@@ -12,7 +12,7 @@ const initialValues = {
 export const ChangePassword: FC<{}> = ({ }) => {
 	const changePassword = useChangePassword()
 	const addToast = useShowToast()
-	const { register, errors, isSubmitting, onSubmit } = useForm(initialValues, useCallback(async (val: typeof initialValues, setError, setValues) => {
+	const { register, errors, isSubmitting, onSubmit } = useForm(initialValues, useCallback<FormHandler<typeof initialValues>>(async (val, setError, setValues) => {
 		if (val.newPassword !== val.newPasswordAgain) {
 			return setError('newPasswordAgain', 'Password confirmation doesn\'t match')
 		}

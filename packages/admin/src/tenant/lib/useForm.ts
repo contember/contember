@@ -15,10 +15,10 @@ interface FormMethods<V> {
 	}
 }
 
-type FormErrors<V> = {
+export type FormErrors<V> = {
 	[K in keyof V]?: string
 }
-type FormHandler<V> = (values: V, setError: (field: keyof V, error: string) => void, setValues: (values: V) => void) => void | Promise<any>
+export type FormHandler<V> = (values: V, setError: (field: keyof V, error: string) => void, setValues: (values: V) => void) => void | Promise<any>
 
 export const useForm = <V>(initialValues: V, handler?: FormHandler<V>): FormMethods<V> => {
 	const [values, setValues] = useState<V>(initialValues)

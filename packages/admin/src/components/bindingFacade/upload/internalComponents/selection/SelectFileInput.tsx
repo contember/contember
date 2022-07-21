@@ -50,7 +50,7 @@ export const SelectFileInput = Component(
 
 		const accessorTree = useAccessorTreeState()
 
-		const onClick: MouseEventHandler<HTMLButtonElement> = useCallback(async event => {
+		const onClick = useCallback<MouseEventHandler<HTMLButtonElement>>(async event => {
 			event.stopPropagation()
 
 			const selectedEntities = await openDialog({

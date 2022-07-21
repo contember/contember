@@ -71,7 +71,7 @@ export const InviteUser: FC<InviteUserProps> = ({ project, rolesConfig, userList
 						ref={emailInput}
 						validationState={emailNotValidError ? 'invalid' : 'default'}
 						value={email}
-						onChange={useCallback(value => setEmail?.(value), [setEmail])}
+						onChange={useCallback((value?: string | null) => setEmail?.(value ?? ''), [setEmail])}
 					/>
 				</FieldContainer>
 

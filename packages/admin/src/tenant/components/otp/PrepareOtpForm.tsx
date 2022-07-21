@@ -18,7 +18,7 @@ export const PrepareOtpForm: FC<PrepareOtpFormProps> = ({ onPrepared, isReSetup,
 	const prepareOtp = usePrepareOtp()
 
 	const { isSubmitting, onSubmit, register } = useForm<typeof initialValues>(initialValues, useCallback(
-		async values => {
+		async (values: typeof initialValues) => {
 			const response = await prepareOtp({ label: values.label })
 			if (response.ok) {
 				onPrepared(response.result)

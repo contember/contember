@@ -7,6 +7,7 @@ import { EntityFieldMarkersContainer, EntityFieldsWithHoistablesMarker } from '.
 import { MarkerFactory } from '../queryLanguage'
 import type { TreeRootId } from '../treeParameters'
 import { useConstantValueInvariant } from '@contember/react-utils'
+import { EntityAccessor } from '../accessors'
 
 export interface DeferredSubTreesProps {
 	fallback: ReactNode
@@ -35,7 +36,7 @@ export const DeferredSubTrees = Component<DeferredSubTreesProps>(
 		useConstantValueInvariant(hasEntity)
 		if (hasEntity) {
 			useEntityBeforePersist(
-				useCallback(getAccessor => {
+				useCallback((getAccessor: EntityAccessor.GetEntityAccessor) => {
 					// This is a hack. We're really just circumventing the change of ids after a creation so that nested
 					// components don't error.
 					if (getAccessor().existsOnServer) {

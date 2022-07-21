@@ -1,4 +1,4 @@
-import { Command, CommandConfiguration, Input } from '@contember/cli-common'
+import { Command, CommandConfiguration, Input, Workspace } from '@contember/cli-common'
 import { MigrationVersionHelper } from '@contember/schema-migrations'
 import { executeCreateMigrationCommand } from './MigrationCreateHelper'
 import { getMigrationByName } from '../../utils/migrations'
@@ -7,7 +7,7 @@ import { emptySchema } from '@contember/schema-utils'
 import { validateMigrations } from './MigrationValidationHelper'
 
 type Args = {
-	project: string
+	project?: string
 	migration: string[]
 }
 
@@ -16,9 +16,18 @@ type Options = {
 }
 
 export class MigrationRebaseCommand extends Command<Args, Options> {
+	constructor(
+		private readonly workspace: Workspace,
+	) {
+		super()
+	}
+
+
 	protected configure(configuration: CommandConfiguration<Args, Options>): void {
 		configuration.description('Rebase migrations on filesystem and in local instance')
-		configuration.argument('project')
+		if (!this.workspace.isSingleProjectMode()) {
+			configuration.argument('project')
+		}
 		configuration.argument('migration').variadic()
 		configuration //
 			.option('yes')
@@ -29,6 +38,7 @@ export class MigrationRebaseCommand extends Command<Args, Options> {
 	protected async execute(input: Input<Args, Options>): Promise<number> {
 		return await executeCreateMigrationCommand(
 			input,
+			{ workspace: this.workspace },
 			async ({
 				schemaVersionBuilder,
 				migrationsResolver,

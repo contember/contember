@@ -13,7 +13,21 @@ export class ProjectManager {
 		return await Promise.all(projects.map(it => this.getProject(it)))
 	}
 
-	public async getProject(name: string, options: { fuzzy?: boolean } = {}): Promise<Project> {
+	public async getSingleProject(): Promise<Project> {
+		if (!this.workspace.isSingleProjectMode()) {
+			throw `Please specify a local name project`
+		}
+		const projects = await this.listProjects()
+		if (projects.length !== 1) {
+			throw `Please specify a local name project`
+		}
+		return projects[0]
+	}
+
+	public async getProject(name: string | undefined, options: { fuzzy?: boolean } = {}): Promise<Project> {
+		if (name === undefined) {
+			return await this.getSingleProject()
+		}
 		validateProjectName(name)
 		const projectDir = await this.getDirectory(name)
 		if (projectDir && (await pathExists(projectDir))) {

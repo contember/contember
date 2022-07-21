@@ -14,7 +14,7 @@ import { mergeSchemas } from '@graphql-tools/schema'
 import { loadSchema } from '../../utils/project/loadSchema'
 
 type Args = {
-	project: string
+	project?: string
 }
 
 type Options = {
@@ -23,19 +23,26 @@ type Options = {
 }
 
 export class ProjectPrintSchemaCommand extends Command<Args, Options> {
+	constructor(
+		private readonly workspace: Workspace,
+	) {
+		super()
+	}
+
 	protected configure(configuration: CommandConfiguration<Args, Options>): void {
 		configuration.description('Prints project schema')
-		configuration.argument('project')
+		if (!this.workspace.isSingleProjectMode()) {
+			configuration.argument('project')
+		}
 		configuration.option('format').valueRequired().description('graphql|introspection|schema')
 		configuration.option('role').valueArray()
 	}
 
 	protected async execute(input: Input<Args, Options>): Promise<number> {
 		const projectName = input.getArgument('project')
-		const workspace = await Workspace.get(process.cwd())
+		const workspace = this.workspace
 		const format = input.getOption('format') || 'graphql'
 
-		validateProjectName(projectName)
 		const project = await workspace.projects.getProject(projectName, { fuzzy: true })
 		const schema = await loadSchema(project)
 		if (!validateSchemaAndPrintErrors(schema, 'Defined schema is invalid:')) {

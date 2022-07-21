@@ -11,19 +11,15 @@ import {
 import { Workspace, Project } from '@contember/cli-common'
 
 type Args = {
-	project: string
+	project?: string
 	migrationName: string
 }
 
 type Options = {}
 
-export const configureCreateMigrationCommand = (configuration: CommandConfiguration<Args, Options>) => {
-	configuration.argument('project')
-	configuration.argument('migrationName')
-}
-
 export const executeCreateMigrationCommand = async (
 	input: Input<Pick<Args, 'project'>, Options>,
+	{ workspace }: {workspace: Workspace},
 	createMigrationCallback: (args: {
 		workspace: Workspace
 		project: Project
@@ -36,7 +32,6 @@ export const executeCreateMigrationCommand = async (
 	}) => Promise<number>,
 ) => {
 	const projectName = input.getArgument('project')
-	const workspace = await Workspace.get(process.cwd())
 	const allProjects = projectName === '.'
 	const projects = allProjects
 		? await workspace.projects.listProjects()

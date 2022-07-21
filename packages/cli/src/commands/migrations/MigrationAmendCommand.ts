@@ -1,4 +1,4 @@
-import { Command, CommandConfiguration, Input } from '@contember/cli-common'
+import { Command, CommandConfiguration, Input, Workspace } from '@contember/cli-common'
 import { printValidationErrors } from '../../utils/schema'
 import { InvalidSchemaException } from '@contember/schema-migrations'
 import { executeCreateMigrationCommand } from './MigrationCreateHelper'
@@ -16,7 +16,7 @@ import { validateMigrations } from './MigrationValidationHelper'
 import { loadSchema } from '../../utils/project/loadSchema'
 
 type Args = {
-	project: string
+	project?: string
 	migration?: string
 }
 
@@ -26,9 +26,17 @@ type Options = {
 }
 
 export class MigrationAmendCommand extends Command<Args, Options> {
+	constructor(
+		private readonly workspace: Workspace,
+	) {
+		super()
+	}
+
 	protected configure(configuration: CommandConfiguration<Args, Options>): void {
 		configuration.description('Amends latest migration')
-		configuration.argument('project')
+		if (!this.workspace.isSingleProjectMode()) {
+			configuration.argument('project')
+		}
 		configuration.argument('migration').optional()
 		configuration.option('force').description('Ignore migrations order and missing migrations (dev only)')
 		configuration //
@@ -40,6 +48,7 @@ export class MigrationAmendCommand extends Command<Args, Options> {
 	protected async execute(input: Input<Args, Options>): Promise<number> {
 		return await executeCreateMigrationCommand(
 			input,
+			{ workspace: this.workspace },
 			async ({
 				schemaVersionBuilder,
 				migrationsResolver,

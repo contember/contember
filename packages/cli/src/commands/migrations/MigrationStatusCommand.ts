@@ -8,7 +8,7 @@ import chalk from 'chalk'
 import { Workspace } from '@contember/cli-common'
 
 type Args = {
-	project: string
+	project?: string
 }
 
 type Options = {
@@ -20,9 +20,17 @@ type Options = {
 }
 
 export class MigrationStatusCommand extends Command<Args, Options> {
+	constructor(
+		private readonly workspace: Workspace,
+	) {
+		super()
+	}
+
 	protected configure(configuration: CommandConfiguration<Args, Options>): void {
 		configuration.description('Shows status of executed migrations on an instance & sync status')
-		configuration.argument('project')
+		if (!this.workspace.isSingleProjectMode()) {
+			configuration.argument('project')
+		}
 		configuration //
 			.option('instance')
 			.valueRequired()
@@ -48,7 +56,7 @@ export class MigrationStatusCommand extends Command<Args, Options> {
 	protected async execute(input: Input<Args, Options>): Promise<number> {
 		const projectName = input.getArgument('project')
 
-		const workspace = await Workspace.get(process.cwd())
+		const workspace = this.workspace
 		const project = await workspace.projects.getProject(projectName, { fuzzy: true })
 		const migrationsDir = await project.migrationsDir
 		const container = new MigrationsContainerFactory(migrationsDir).create()

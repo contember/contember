@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { Application, CommandManager, getPackageVersion } from '@contember/cli-common'
+import { Application, CommandFactoryList, CommandManager, getPackageVersion, Workspace } from '@contember/cli-common'
 import {
 	CreateApiKeyCommand,
 	DeployCommand,
@@ -18,34 +18,32 @@ import {
 	SignInCommand,
 	VersionCommand,
 	WorkspaceUpdateApiCommand,
-} from './commands';
+} from './commands'
 
 (async () => {
-	const diffCommandFactory = () => new MigrationDiffCommand()
-	const migrationsDescribeFactory = () => new MigrationDescribeCommand()
-	const commandManager = new CommandManager({
-		['deploy']: () => new DeployCommand(),
+	const workspace = await Workspace.get(process.cwd())
+	const commands: CommandFactoryList = {
+		['deploy']: () => new DeployCommand(workspace),
 		['version']: () => new VersionCommand(),
-		['migrations:diff']: diffCommandFactory,
-		['migrations:amend']: () => new MigrationAmendCommand(),
-		['migrations:describe']: migrationsDescribeFactory,
-		['migrations:execute']: () => new MigrationExecuteCommand(),
-		['migrations:rebase']: () => new MigrationRebaseCommand(),
-		['migrations:status']: () => new MigrationStatusCommand(),
-		['workspace:update:api']: () => new WorkspaceUpdateApiCommand(),
-		['project:create']: () => new ProjectCreateCommand(),
-		['project:validate']: () => new ProjectValidateCommand(),
-		['project:print-schema']: () => new ProjectPrintSchemaCommand(),
-		['project:generate-doc']: () => new ProjectGenerateDocumentation(),
-		['tenant:sign-in']: () => new SignInCommand(),
-		['tenant:create-api-key']: () => new CreateApiKeyCommand(),
-		['tenant:invite']: () => new InviteCommand(),
-		['tenant:reset-password']: () => new ResetPasswordCommand(),
-
-		// deprecated
-		['migrations:dry-run']: migrationsDescribeFactory,
-		['diff']: diffCommandFactory,
-	})
+		['migrations:diff']: () => new MigrationDiffCommand(workspace),
+		['migrations:amend']: () => new MigrationAmendCommand(workspace),
+		['migrations:describe']: () => new MigrationDescribeCommand(workspace),
+		['migrations:execute']: () => new MigrationExecuteCommand(workspace),
+		['migrations:rebase']: () => new MigrationRebaseCommand(workspace),
+		['migrations:status']: () => new MigrationStatusCommand(workspace),
+		['workspace:update:api']: () => new WorkspaceUpdateApiCommand(workspace),
+		['project:validate']: () => new ProjectValidateCommand(workspace),
+		['project:print-schema']: () => new ProjectPrintSchemaCommand(workspace),
+		['project:generate-doc']: () => new ProjectGenerateDocumentation(workspace),
+		['tenant:sign-in']: () => new SignInCommand(workspace),
+		['tenant:create-api-key']: () => new CreateApiKeyCommand(workspace),
+		['tenant:invite']: () => new InviteCommand(workspace),
+		['tenant:reset-password']: () => new ResetPasswordCommand(workspace),
+	}
+	if (!workspace.isSingleProjectMode()) {
+		commands['project:create'] = () => new ProjectCreateCommand(workspace)
+	}
+	const commandManager = new CommandManager(commands)
 
 	const nodeVersion = process.version.match(/^v?(\d+)\..+$/)
 	if (nodeVersion && Number(nodeVersion[1]) < 12) {

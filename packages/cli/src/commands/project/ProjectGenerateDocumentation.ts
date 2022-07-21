@@ -1,4 +1,4 @@
-import { Command, CommandConfiguration, Input, validateProjectName, Workspace } from '@contember/cli-common'
+import { Command, CommandConfiguration, Input, Workspace } from '@contember/cli-common'
 import { validateSchemaAndPrintErrors } from '../../utils/schema'
 import { loadSchema } from '../../utils/project/loadSchema'
 import { renderProjectInfoHtml } from '../../utils/project/projectDescribe'
@@ -6,7 +6,7 @@ import { writeFile } from 'fs/promises'
 import { join } from 'path'
 
 type Args = {
-	project: string
+	project?: string
 }
 
 type Options = {
@@ -14,18 +14,23 @@ type Options = {
 }
 
 export class ProjectGenerateDocumentation extends Command<Args, Options> {
+	constructor(
+		private readonly workspace: Workspace,
+	) {
+		super()
+	}
+
 	protected configure(configuration: CommandConfiguration<Args, Options>): void {
 		configuration.description('Generates HTML documentation from project schema')
-		configuration.argument('project')
+		if (!this.workspace.isSingleProjectMode()) {
+			configuration.argument('project')
+		}
 		configuration.option('output').valueRequired().description('file name or "stdout"')
 	}
 
 	protected async execute(input: Input<Args, Options>): Promise<number> {
 		const projectName = input.getArgument('project')
-		const workspace = await Workspace.get(process.cwd())
-
-		validateProjectName(projectName)
-		const project = await workspace.projects.getProject(projectName, { fuzzy: true })
+		const project = await this.workspace.projects.getProject(projectName, { fuzzy: true })
 		const schema = await loadSchema(project)
 		if (!validateSchemaAndPrintErrors(schema, 'Defined schema is invalid:')) {
 			return 1

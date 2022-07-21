@@ -10,6 +10,12 @@ type Args = {
 type Options = {}
 
 export class CreateApiKeyCommand extends Command<Args, Options> {
+	constructor(
+		private readonly workspace: Workspace,
+	) {
+		super()
+	}
+
 	protected configure(configuration: CommandConfiguration<Args, Options>): void {
 		configuration.description('Creates an API key')
 		configuration //
@@ -22,7 +28,7 @@ export class CreateApiKeyCommand extends Command<Args, Options> {
 		if (!process.stdin.isTTY) {
 			throw 'This command is interactive and requires TTY'
 		}
-		const workspace = await Workspace.get(process.cwd())
+		const workspace = this.workspace
 		const instance = await interactiveResolveInstanceEnvironmentFromInput(workspace, input.getArgument('instance'))
 		const apiToken = await interactiveResolveApiToken({ workspace, instance })
 		const tenantClient = TenantClient.create(instance.baseUrl, apiToken)

@@ -13,7 +13,7 @@ import { MigrationsContainerFactory } from '../../MigrationsContainer'
 import { AdminClient, readAdminFiles } from '../../utils/admin'
 import { URL } from 'url'
 import prompts from 'prompts'
-import { createMigrationStatusTable, printMigrationDescription } from '../../utils/migrations'
+import { createMigrationStatusTable } from '../../utils/migrations'
 import { maskToken } from '../../utils/token'
 
 type Args = {
@@ -26,32 +26,31 @@ type Options = ExecuteMigrationOptions & {
 }
 
 export class DeployCommand extends Command<Args, Options> {
+	constructor(
+		private readonly workspace: Workspace,
+	) {
+		super()
+	}
+
 	protected configure(configuration: CommandConfiguration<Args, Options>): void {
 		configuration.description('Deploy Contember project')
 		configuration.argument('dsn')
-		configuration.argument('project').optional()
+		if (!this.workspace.isSingleProjectMode()) {
+			configuration.argument('project').optional()
+		}
 		configuration.option('admin').valueRequired()
 		configureExecuteMigrationCommand(configuration)
 	}
 
 	protected async execute(input: Input<Args, Options>): Promise<void | number> {
 		const [dsn, projectName] = this.getNormalizedInput(input)
-		const workspace = await Workspace.get(process.cwd())
-		let project: Project
+		const project = await this.workspace.projects.getProject(projectName, { fuzzy: true })
 
 		let apiUrl = input.getOption('instance')
 		let adminEndpoint = input.getOption('admin')
 
 		let apiTokenFromDsn: string | undefined = undefined
-		if (projectName) {
-			project = await workspace.projects.getProject(projectName, { fuzzy: true })
-		} else {
-			const projects = await workspace.projects.listProjects()
-			if (projects.length !== 1) {
-				throw 'Please specify a local name project'
-			}
-			project = projects[0]
-		}
+
 		let remoteProject = input.getOption('remote-project') || project.name
 		if (dsn) {
 			const uri = new URL(dsn)
@@ -62,8 +61,8 @@ export class DeployCommand extends Command<Args, Options> {
 			apiTokenFromDsn = uri.password
 			adminEndpoint = (uri.protocol === 'contember-unsecure:' ? 'http://' : 'https://') + uri.host
 		}
-		const instance = await interactiveResolveInstanceEnvironmentFromInput(workspace, apiUrl ?? (adminEndpoint ? adminEndpoint + '/_api' : undefined))
-		const apiToken = await interactiveResolveApiToken({ workspace, instance, apiToken: apiTokenFromDsn })
+		const instance = await interactiveResolveInstanceEnvironmentFromInput(this.workspace, apiUrl ?? (adminEndpoint ? adminEndpoint + '/_api' : undefined))
+		const apiToken = await interactiveResolveApiToken({ workspace: this.workspace, instance, apiToken: apiTokenFromDsn })
 		console.log('')
 		console.log('Contember project deployment configuration:')
 		console.log(`Local project name: ${project.name}`)

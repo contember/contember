@@ -24,6 +24,7 @@ const OIDCConfigurationSchema = Typesafe.intersection(
 	}),
 	Typesafe.partial({
 		responseType: Typesafe.enumeration<ResponseType>('code', 'code id_token', 'code id_token token', 'code token', 'id_token', 'id_token token', 'none'),
+		claims: Typesafe.string,
 	}),
 )
 
@@ -39,7 +40,7 @@ export class OIDCProvider implements IdentityProviderHandler<SessionData, OIDCCo
 		const state = generators.state()
 		const url = client.authorizationUrl({
 			redirect_uri: redirectUrl,
-			scope: 'openid email',
+			scope: configuration.claims ?? 'openid email',
 			nonce,
 			state,
 		})

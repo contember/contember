@@ -359,6 +359,13 @@ export type EnableIdpResponse = {
 
 export type IdpOptions = {
 	readonly autoSignUp?: InputMaybe<Scalars['Boolean']>
+	readonly exclusive?: InputMaybe<Scalars['Boolean']>
+}
+
+export type IdpOptionsOutput = {
+	readonly __typename?: 'IDPOptionsOutput'
+	readonly autoSignUp: Scalars['Boolean']
+	readonly exclusive: Scalars['Boolean']
 }
 
 export type IdpResponseInput = {
@@ -391,6 +398,7 @@ export type IdentityProvider = {
 	readonly __typename?: 'IdentityProvider'
 	readonly configuration: Scalars['Json']
 	readonly disabledAt: Scalars['DateTime']
+	readonly options: IdpOptionsOutput
 	readonly slug: Scalars['String']
 	readonly type: Scalars['String']
 }
@@ -662,6 +670,7 @@ export type MutationInitSignInIdpArgs = {
 export type MutationInviteArgs = {
 	email: Scalars['String']
 	memberships: ReadonlyArray<MembershipInput>
+	name?: InputMaybe<Scalars['String']>
 	options?: InputMaybe<InviteOptions>
 	projectSlug: Scalars['String']
 }
@@ -725,6 +734,7 @@ export type MutationSignOutArgs = {
 
 export type MutationSignUpArgs = {
 	email: Scalars['String']
+	name?: InputMaybe<Scalars['String']>
 	password?: InputMaybe<Scalars['String']>
 	passwordHash?: InputMaybe<Scalars['String']>
 	roles?: InputMaybe<ReadonlyArray<Scalars['String']>>
@@ -734,6 +744,7 @@ export type MutationSignUpArgs = {
 export type MutationUnmanagedInviteArgs = {
 	email: Scalars['String']
 	memberships: ReadonlyArray<MembershipInput>
+	name?: InputMaybe<Scalars['String']>
 	options?: InputMaybe<UnmanagedInviteOptions>
 	password?: InputMaybe<Scalars['String']>
 	projectSlug: Scalars['String']
@@ -763,9 +774,10 @@ export type MutationUpdateProjectMemberArgs = {
 
 export type Person = {
 	readonly __typename?: 'Person'
-	readonly email: Scalars['String']
+	readonly email?: Maybe<Scalars['String']>
 	readonly id: Scalars['String']
 	readonly identity: Identity
+	readonly name?: Maybe<Scalars['String']>
 	readonly otpEnabled: Scalars['Boolean']
 }
 
@@ -956,6 +968,7 @@ export type SignInIdpError = {
 export enum SignInIdpErrorCode {
 	IdpValidationFailed = 'IDP_VALIDATION_FAILED',
 	InvalidIdpResponse = 'INVALID_IDP_RESPONSE',
+	PersonAlreadyExists = 'PERSON_ALREADY_EXISTS',
 	PersonNotFound = 'PERSON_NOT_FOUND'
 }
 
@@ -1227,6 +1240,7 @@ export type ResolversTypes = {
 	EnableIDPErrorCode: EnableIdpErrorCode
 	EnableIDPResponse: ResolverTypeWrapper<EnableIdpResponse>
 	IDPOptions: IdpOptions
+	IDPOptionsOutput: ResolverTypeWrapper<IdpOptionsOutput>
 	IDPResponseInput: IdpResponseInput
 	Identity: ResolverTypeWrapper<Identity>
 	IdentityGlobalPermissions: ResolverTypeWrapper<IdentityGlobalPermissions>
@@ -1345,6 +1359,7 @@ export type ResolversParentTypes = {
 	EnableIDPError: EnableIdpError
 	EnableIDPResponse: EnableIdpResponse
 	IDPOptions: IdpOptions
+	IDPOptionsOutput: IdpOptionsOutput
 	IDPResponseInput: IdpResponseInput
 	Identity: Identity
 	IdentityGlobalPermissions: IdentityGlobalPermissions
@@ -1639,6 +1654,12 @@ export type EnableIdpResponseResolvers<ContextType = any, ParentType extends Res
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
+export type IdpOptionsOutputResolvers<ContextType = any, ParentType extends ResolversParentTypes['IDPOptionsOutput'] = ResolversParentTypes['IDPOptionsOutput']> = {
+	autoSignUp?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	exclusive?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
 export type IdentityResolvers<ContextType = any, ParentType extends ResolversParentTypes['Identity'] = ResolversParentTypes['Identity']> = {
 	apiKey?: Resolver<Maybe<ResolversTypes['ApiKey']>, ParentType, ContextType>
 	description?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
@@ -1664,6 +1685,7 @@ export type IdentityProjectRelationResolvers<ContextType = any, ParentType exten
 export type IdentityProviderResolvers<ContextType = any, ParentType extends ResolversParentTypes['IdentityProvider'] = ResolversParentTypes['IdentityProvider']> = {
 	configuration?: Resolver<ResolversTypes['Json'], ParentType, ContextType>
 	disabledAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>
+	options?: Resolver<ResolversTypes['IDPOptionsOutput'], ParentType, ContextType>
 	slug?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	type?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
@@ -1765,9 +1787,10 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
 }
 
 export type PersonResolvers<ContextType = any, ParentType extends ResolversParentTypes['Person'] = ResolversParentTypes['Person']> = {
-	email?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	email?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
 	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	identity?: Resolver<ResolversTypes['Identity'], ParentType, ContextType>
+	name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
 	otpEnabled?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
@@ -2035,6 +2058,7 @@ export type Resolvers<ContextType = any> = {
 	DisableOtpResponse?: DisableOtpResponseResolvers<ContextType>
 	EnableIDPError?: EnableIdpErrorResolvers<ContextType>
 	EnableIDPResponse?: EnableIdpResponseResolvers<ContextType>
+	IDPOptionsOutput?: IdpOptionsOutputResolvers<ContextType>
 	Identity?: IdentityResolvers<ContextType>
 	IdentityGlobalPermissions?: IdentityGlobalPermissionsResolvers<ContextType>
 	IdentityProjectRelation?: IdentityProjectRelationResolvers<ContextType>

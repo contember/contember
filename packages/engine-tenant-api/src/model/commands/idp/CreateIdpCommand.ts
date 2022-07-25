@@ -1,15 +1,15 @@
 import { Command } from '../Command'
 import { InsertBuilder } from '@contember/database'
-import { IdentityProvider } from '../../type'
+import { IdentityProviderData } from '../../type'
 
 export class CreateIdpCommand implements Command<void> {
 	constructor(
-		private data: IdentityProvider,
+		private data: IdentityProviderData,
 	) {
 	}
 
 	async execute({ db, providers }: Command.Args): Promise<void> {
-		const { configuration, options: { autoSignUp }, slug, type } = this.data
+		const { configuration, options: { autoSignUp, exclusive }, slug, type } = this.data
 		await InsertBuilder.create()
 			.into('identity_provider')
 			.values({
@@ -18,6 +18,7 @@ export class CreateIdpCommand implements Command<void> {
 				slug,
 				type,
 				auto_sign_up: autoSignUp,
+				exclusive,
 			})
 			.execute(db)
 	}

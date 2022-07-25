@@ -18,6 +18,7 @@ import {
 import { TenantResolverContext } from '../TenantResolverContext'
 import { notEmpty } from '../../utils/array'
 import { batchLoader } from '../../utils/batchQuery'
+import { PersonResponseFactory } from '../responseHelpers/PersonResponseFactory'
 
 export class IdentityTypeResolver implements IdentityResolvers {
 	private personLoader = batchLoader<string, Record<string, PersonRow>, PersonRow>(
@@ -48,9 +49,7 @@ export class IdentityTypeResolver implements IdentityResolvers {
 			return null
 		}
 		return {
-			id: person.id,
-			email: person.email,
-			otpEnabled: !!person.otp_activated_at,
+			...PersonResponseFactory.createPersonResponse(person),
 			identity: parent,
 		}
 	}

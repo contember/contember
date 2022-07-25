@@ -18,12 +18,12 @@ export class PermissionContext {
 		private readonly schemaResolver: ProjectSchemaResolver,
 	) {}
 
-	public async isAllowed({
+	public async isAllowed<Meta extends {} | undefined>({
 		scope,
 		action,
 	}: {
 		scope?: AuthorizationScope<Identity>
-		action: Authorizator.Action
+		action: Authorizator.Action<Meta>
 	}): Promise<boolean> {
 		return await this.authorizator.isAllowed(this.identity, scope || new AuthorizationScope.Global(), action)
 	}
@@ -32,13 +32,13 @@ export class PermissionContext {
 		return action => this.isAllowed({ scope, action })
 	}
 
-	public async requireAccess({
+	public async requireAccess<Meta>({
 		scope,
 		action,
 		message,
 	}: {
 		scope?: AuthorizationScope<Identity>
-		action: Authorizator.Action
+		action: Authorizator.Action<Meta>
 		message?: string
 	}): Promise<void> {
 		if (!(await this.isAllowed({ scope, action }))) {

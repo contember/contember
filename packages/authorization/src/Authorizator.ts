@@ -9,9 +9,9 @@ interface Authorizator<Identity extends Authorizator.Identity = Authorizator.Ide
 namespace Authorizator {
 	export type Resource = string
 	export type Privilege = string
-	export type Action<Meta = undefined> = Meta extends undefined
-		? { resource: Resource; privilege: Privilege }
-		: { resource: Resource; privilege: Privilege; meta: Meta }
+	export type Action<Meta extends undefined | {} = undefined | Record<string, unknown>> = Meta extends {}
+		? { resource: Resource; privilege: Privilege; meta: Meta }
+		: { resource: Resource; privilege: Privilege; meta?: Meta }
 
 	type ActionCreator =
 		| ((resource: Resource, privilege: Privilege) => Action)

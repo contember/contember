@@ -26,9 +26,9 @@ export class MembershipAwareAccessNode implements AccessNode {
 	}
 
 	private isActionWithMemberships(
-		action: Authorizator.Action<any>,
+		action: Authorizator.Action,
 	): action is Authorizator.Action<{ memberships: Acl.Membership[] }> {
-		if (!('meta' in action)) {
+		if (action.meta === undefined) {
 			return false
 		}
 		return 'memberships' in action.meta

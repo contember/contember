@@ -75,20 +75,17 @@ class IDPSignInManager {
 			return personByIdp
 		}
 
-		const saveIdpIdentifier = async (personId: string) =>
-			await db.commandBus.execute(new CreatePersonIdentityProviderIdentifierCommand(provider.id, personId, claim.externalIdentifier))
-
 		if (!provider.exclusive) {
 			const personByEmail = claim.email ? await db.queryHandler.fetch(PersonQuery.byEmail(claim.email)) : null
 			if (personByEmail) {
-				await saveIdpIdentifier(personByEmail.id)
+				await this.saveIdpIdentifier(db, provider, claim, personByEmail)
 				return personByEmail
 			}
 		}
 
 		if (provider.autoSignUp) {
 			const signedUpPerson = await this.signUp(db, claim, provider)
-			await saveIdpIdentifier(signedUpPerson.id)
+			await this.saveIdpIdentifier(db, provider, claim, signedUpPerson)
 			return signedUpPerson
 		}
 
@@ -110,6 +107,10 @@ class IDPSignInManager {
 			...newPerson,
 			roles,
 		}
+	}
+
+	private async saveIdpIdentifier(db: DatabaseContext, provider: IdentityProviderRow, claim: IDPClaim, person: PersonRow) {
+		await db.commandBus.execute(new CreatePersonIdentityProviderIdentifierCommand(provider.id, person.id, claim.externalIdentifier))
 	}
 }
 

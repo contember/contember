@@ -2762,6 +2762,15 @@ export type NativeSelectFieldProps = NativeSelectFieldInnerPublicProps & (Static
 export const NavigateBackButton: NamedExoticComponent<LinkButtonProps>;
 
 // @public (undocumented)
+export const NavigationProvider: (props: NavigationProviderProps) => JSX.Element;
+
+// @public (undocumented)
+export interface NavigationProviderProps {
+    // (undocumented)
+    children?: ReactNode;
+}
+
+// @public (undocumented)
 export type NodesWithType = NodesWithTypeFiltered | null;
 
 // @public (undocumented)

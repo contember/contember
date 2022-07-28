@@ -41,7 +41,7 @@ test('Categories with children filtered by back-referenced parent', async () => 
 				sql: SQL`select "root_"."parent_id" as "__grouping_key", "root_"."id" as "root_id"
 							from "public"."category" as "root_"
 							left join "public"."category" as "root_parent" on "root_"."parent_id" = "root_parent"."id"
-							where "root_parent"."name" = ? and "root_parent"."id" in (?, ?)`,
+							where "root_parent"."name" = ? and "root_"."parent_id" in (?, ?)`,
 				response: {
 					rows: [
 						{

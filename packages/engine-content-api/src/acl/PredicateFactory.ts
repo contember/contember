@@ -1,10 +1,17 @@
-import { Acl, Input, Model } from '@contember/schema'
+import { Acl, Input, Model, Writable } from '@contember/schema'
 import { VariableInjector } from './VariableInjector'
+import { isOwningRelation } from '@contember/schema-utils'
+import { ImplementationException } from '../exception'
+import deepEqual from 'fast-deep-equal'
 
 const getRowLevelPredicatePseudoField = (entity: Model.Entity) => entity.primary
 
 export class PredicateFactory {
-	constructor(private readonly permissions: Acl.Permissions, private readonly variableInjector: VariableInjector) {}
+	constructor(
+		private readonly permissions: Acl.Permissions,
+		private readonly model: Model.Schema,
+		private readonly variableInjector: VariableInjector,
+	) {}
 
 	public shouldApplyCellLevelPredicate(
 		entity: Model.Entity,
@@ -21,8 +28,9 @@ export class PredicateFactory {
 		entity: Model.Entity,
 		operation: Acl.Operation.update | Acl.Operation.read | Acl.Operation.create,
 		fieldNames?: string[],
+		overRelation?: Model.AnyRelation,
 	): Input.Where
-	public create(entity: Model.Entity, operation: Acl.Operation, fieldNames?: string[]): Input.Where {
+	public create(entity: Model.Entity, operation: Acl.Operation, fieldNames?: string[], overRelation?: Model.AnyRelation): Input.Where {
 		const entityPermissions: Acl.EntityPermissions = this.permissions[entity.name]
 		const neverCondition: Input.Where = { [entity.primary]: { never: true } }
 
@@ -68,11 +76,8 @@ export class PredicateFactory {
 		if (predicatesWhere.length === 0) {
 			return {}
 		}
-		if (predicatesWhere.length === 1) {
-			return predicatesWhere[0]
-		}
-
-		return { and: predicatesWhere }
+		const where: Input.Where = predicatesWhere.length === 1 ? predicatesWhere[0] : { and: predicatesWhere }
+		return this.optimizePredicates(where, overRelation)
 	}
 
 	private getRequiredPredicates(
@@ -93,5 +98,57 @@ export class PredicateFactory {
 			}
 		}
 		return predicates
+	}
+
+	private optimizePredicates(where: Input.Where, overRelation?: Model.AnyRelation) {
+		if (!overRelation) {
+			return where
+		}
+		const otherSide = isOwningRelation(overRelation) ? overRelation.inversedBy : overRelation.ownedBy
+		if (!otherSide) {
+			throw new ImplementationException()
+		}
+		const sourceEntity = this.model.entities[overRelation.target]
+		const sourcePredicate = this.create(sourceEntity, Acl.Operation.read, [otherSide])
+		if (Object.keys(sourcePredicate).length === 0) {
+			return where
+		}
+		return this.replaceEvaluatedPredicate(where, sourcePredicate, sourceEntity, overRelation, false)
+	}
+
+	private replaceEvaluatedPredicate(
+		where: Input.Where,
+		evaluatedPredicate: Input.Where,
+		sourceEntity: Model.Entity,
+		relation: Model.AnyRelation,
+		onRelation: boolean,
+	): Input.Where {
+		if (onRelation && deepEqual(where, evaluatedPredicate)) {
+			return { [sourceEntity.primary]: { always: true } }
+		}
+		const result: Writable<Input.Where> = {}
+		for (const [key, value] of Object.entries(where)) {
+			if (key === 'not') {
+				result['not'] = this.replaceEvaluatedPredicate(value as Input.Where, evaluatedPredicate, sourceEntity, relation, onRelation)
+				continue
+			}
+
+			if (key === 'and' || key === 'or') {
+				const parts = []
+				for (const sub of value as Input.Where[]) {
+					parts.push(this.replaceEvaluatedPredicate(sub, evaluatedPredicate, sourceEntity, relation, onRelation))
+				}
+				result[key] = parts
+				continue
+			}
+
+			if (key === relation.name) {
+				result[key] = this.replaceEvaluatedPredicate(value as Input.Where, evaluatedPredicate, sourceEntity, relation, true)
+				continue
+			}
+
+			result[key] = value
+		}
+		return result
 	}
 }

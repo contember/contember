@@ -12,6 +12,52 @@ import { Mapper } from '../Mapper'
 
 export type GroupedCounts = Record<Input.PrimaryValue, number>
 
+type CountOneHasManyGroupsArgs = {
+	mapper: Mapper
+	filter: Input.OptionalWhere | undefined
+	targetEntity: Model.Entity
+	targetRelation: Model.ManyHasOneRelation
+	ids: Input.PrimaryValue[]
+}
+
+type FetchOneHasManyGroupsArgs = {
+	mapper: Mapper
+	objectNode: ObjectNode<Input.ListQueryInput>
+	targetEntity: Model.Entity
+	relation: Model.OneHasManyRelation
+	targetRelation: Model.ManyHasOneRelation
+	ids: Input.PrimaryValue[]
+}
+
+type ManyHasManyBaseArgs =
+	& {
+		mapper: Mapper
+		targetEntity: Model.Entity
+		ids: Input.PrimaryValue[]
+	} & (
+		| {
+			directionFrom: 'owning'
+			sourceRelation: Model.ManyHasManyOwningRelation
+			targetRelation: Model.ManyHasManyInverseRelation | null
+		}
+		| {
+			directionFrom: 'inverse'
+			sourceRelation: Model.ManyHasManyInverseRelation
+			targetRelation: Model.ManyHasManyOwningRelation
+		}
+	)
+type CountManyHasManyGroupArgs =
+	& ManyHasManyBaseArgs
+	& {
+		filter: Input.OptionalWhere | undefined
+	}
+
+type FetchManyHasManyGroupsArgs =
+	& ManyHasManyBaseArgs
+	& {
+		field: ObjectNode<Input.ListQueryInput>
+	}
+
 export class RelationFetcher {
 	constructor(
 		private readonly whereBuilder: WhereBuilder,
@@ -20,25 +66,25 @@ export class RelationFetcher {
 		private readonly pathFactory: PathFactory,
 	) {}
 
-	public async countOneHasManyGroups(
-		mapper: Mapper,
-		filter: Input.OptionalWhere | undefined,
-		targetEntity: Model.Entity,
-		targetRelation: Model.ManyHasOneRelation,
-		ids: Input.PrimaryValue[],
-	): Promise<GroupedCounts> {
+	public async countOneHasManyGroups({
+		mapper,
+		filter,
+		targetEntity,
+		targetRelation,
+		ids,
+	}: CountOneHasManyGroupsArgs): Promise<GroupedCounts> {
 		const filterWithParent = this.createOneHasManyFilter(targetEntity, targetRelation, ids, filter)
 		return mapper.countGrouped(targetEntity, filterWithParent, targetRelation)
 	}
 
-	public async fetchOneHasManyGroups(
-		mapper: Mapper,
-		objectNode: ObjectNode<Input.ListQueryInput>,
-		targetEntity: Model.Entity,
-		relation: Model.OneHasManyRelation,
-		targetRelation: Model.ManyHasOneRelation,
-		ids: Input.PrimaryValue[],
-	): Promise<SelectGroupedObjects> {
+	public async fetchOneHasManyGroups({
+		mapper,
+		objectNode,
+		targetEntity,
+		relation,
+		targetRelation,
+		ids,
+	}: FetchOneHasManyGroupsArgs): Promise<SelectGroupedObjects> {
 		const filter = this.createOneHasManyFilter(targetEntity, targetRelation, ids, objectNode.args.filter)
 		const objectNodeWithWhere = objectNode.withArg<Input.ListQueryInput>('filter', filter)
 		const objectNodeWithOrder = OrderByHelper.appendDefaultOrderBy(
@@ -65,14 +111,17 @@ export class RelationFetcher {
 		}
 	}
 
-	public async countManyHasManyGroups(
-		mapper: Mapper,
-		filter: Input.OptionalWhere | undefined,
-		targetEntity: Model.Entity,
-		owningRelation: Model.ManyHasManyOwningRelation,
-		ids: Input.PrimaryValue[],
-		joiningColumns: JoiningColumns,
-	): Promise<GroupedCounts> {
+	public async countManyHasManyGroups({
+		mapper,
+		filter,
+		targetEntity,
+		directionFrom,
+		sourceRelation,
+		targetRelation,
+		ids,
+	}: CountManyHasManyGroupArgs): Promise<GroupedCounts> {
+		const owningRelation = directionFrom === 'owning' ? sourceRelation : targetRelation
+		const joiningColumns = this.resolveJoiningColumns({ directionFrom, owningRelation })
 		const qb = this.buildJunctionQb(owningRelation, ids, joiningColumns, targetEntity, { filter })
 			.select(['junction_', joiningColumns.sourceColumn.columnName])
 			.select(expr => expr.raw('count(*)'), 'row_count')
@@ -85,16 +134,18 @@ export class RelationFetcher {
 		return Object.fromEntries(result)
 	}
 
-	public async fetchManyHasManyGroups(
-		mapper: Mapper,
-		field: ObjectNode<Input.ListQueryInput>,
-		targetEntity: Model.Entity,
-		fromRelation: Model.ManyHasManyOwningRelation | Model.ManyHasManyInverseRelation,
-		owningRelation: Model.ManyHasManyOwningRelation,
-		joiningColumns: JoiningColumns,
-		ids: Input.PrimaryValue[],
-	): Promise<SelectGroupedObjects> {
-		const defaultOrderBy = fromRelation.orderBy || []
+	public async fetchManyHasManyGroups({
+		mapper,
+		field,
+		sourceRelation,
+		targetEntity,
+		targetRelation,
+		directionFrom,
+		ids,
+	}: FetchManyHasManyGroupsArgs): Promise<SelectGroupedObjects> {
+		const owningRelation = directionFrom === 'owning' ? sourceRelation : targetRelation
+		const joiningColumns = this.resolveJoiningColumns({ directionFrom, owningRelation })
+		const defaultOrderBy = sourceRelation.orderBy || []
 		const objectNode = OrderByHelper.appendDefaultOrderBy(targetEntity, field, defaultOrderBy)
 
 		const junctionValues = await this.fetchJunction(
@@ -122,11 +173,20 @@ export class RelationFetcher {
 				},
 			})
 			.withField(primaryField)
-		const result = await mapper.select(targetEntity, queryWithWhere)
+		const result = await mapper.select(targetEntity, queryWithWhere, targetRelation)
 
 		return this.buildManyHasManyGroups(targetEntity, joiningColumns, result, junctionValues)
 	}
 
+	private resolveJoiningColumns({ directionFrom, owningRelation }: { owningRelation: Model.ManyHasManyOwningRelation; directionFrom: 'owning' | 'inverse' }): JoiningColumns {
+		return directionFrom === 'owning' ? {
+			sourceColumn: owningRelation.joiningTable.joiningColumn,
+			targetColumn: owningRelation.joiningTable.inverseJoiningColumn,
+		} : {
+			sourceColumn: owningRelation.joiningTable.inverseJoiningColumn,
+			targetColumn: owningRelation.joiningTable.joiningColumn,
+		}
+	}
 	private buildManyHasManyGroups(
 		entity: Model.Entity,
 		joiningColumns: JoiningColumns,

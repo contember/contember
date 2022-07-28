@@ -32,6 +32,8 @@ import { Client, SelectBuilder as DbSelectBuilder } from '@contember/database'
 import { Providers } from '@contember/schema-utils'
 import { PaginatedHasManyExecutionHandler } from '../extensions/paginatedHasMany/PaginatedHasManyExecutionHandler'
 import { PaginatedHasManyFieldProvider } from '../extensions/paginatedHasMany/PaginatedHasManyFieldProvider'
+import { WhereOptimizer } from './select/WhereOptimizer'
+import { ConditionOptimizer } from './select/ConditionOptimizer'
 
 type MapperContainerArgs = {
 	schema: Schema
@@ -51,7 +53,7 @@ export const createMapperContainer = ({ permissions, schema, identityVariables, 
 		.addService('variableInjector', () =>
 			new VariableInjector(schema.model, identityVariables))
 		.addService('predicateFactory', ({ variableInjector }) =>
-			new PredicateFactory(permissions, variableInjector))
+			new PredicateFactory(permissions, schema.model, variableInjector))
 		.addService('predicatesInjector', ({ predicateFactory }) =>
 			new PredicatesInjector(schema.model, predicateFactory))
 		.addService('joinBuilder', () =>
@@ -60,8 +62,10 @@ export const createMapperContainer = ({ permissions, schema, identityVariables, 
 			new ConditionBuilder())
 		.addService('pathFactory', () =>
 			new PathFactory())
-		.addService('whereBuilder', ({ joinBuilder, conditionBuilder, pathFactory }) =>
-			new WhereBuilder(schema.model, joinBuilder, conditionBuilder, pathFactory))
+		.addService('whereOptimized', () =>
+			new WhereOptimizer(schema.model, new ConditionOptimizer()))
+		.addService('whereBuilder', ({ joinBuilder, conditionBuilder, pathFactory, whereOptimized }) =>
+			new WhereBuilder(schema.model, joinBuilder, conditionBuilder, pathFactory, whereOptimized))
 		.addService('orderByBuilder', ({ joinBuilder }) =>
 			new OrderByBuilder(schema.model, joinBuilder))
 		.addService('relationFetcher', ({ whereBuilder, orderByBuilder, predicatesInjector, pathFactory }) =>

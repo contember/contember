@@ -56,15 +56,17 @@ export class Mapper {
 		return result[0] !== undefined ? result[0][columnName] : undefined
 	}
 
-	public async select(entity: Model.Entity, input: ObjectNode<Input.ListQueryInput>): Promise<SelectResultObject[]>
+	public async select(entity: Model.Entity, input: ObjectNode<Input.ListQueryInput>, overRelation: Model.AnyRelation | null): Promise<SelectResultObject[]>
 	public async select(
 		entity: Model.Entity,
 		input: ObjectNode<Input.ListQueryInput>,
+		overRelation: Model.AnyRelation | null,
 		indexBy: string,
 	): Promise<SelectIndexedResultObjects>
 	public async select(
 		entity: Model.Entity,
 		input: ObjectNode<Input.ListQueryInput>,
+		overRelation: Model.AnyRelation | null,
 		indexBy?: string,
 	): Promise<SelectResultObject[] | SelectIndexedResultObjects> {
 		const hydrator = new SelectHydrator()
@@ -75,7 +77,7 @@ export class Mapper {
 			indexByAlias = path.for(indexBy).alias
 			qb = qb.select([path.alias, getColumnName(this.schema, entity, indexBy)], indexByAlias)
 		}
-		const rows = await this.selectRows(hydrator, qb, entity, input)
+		const rows = await this.selectRows(hydrator, qb, entity, input, overRelation)
 
 		return await (indexByAlias !== null ? hydrator.hydrateAll(rows, indexByAlias) : hydrator.hydrateAll(rows))
 	}
@@ -83,18 +85,19 @@ export class Mapper {
 	public async selectUnique(
 		entity: Model.Entity,
 		query: ObjectNode<Input.UniqueQueryInput>,
+		overRelation: Model.AnyRelation | null,
 	): Promise<SelectResultObject | null> {
 		const uniqueWhere = this.uniqueWhereExpander.expand(entity, query.args.by)
 		const where = query.args.filter ? { and: [uniqueWhere, query.args.filter] } : uniqueWhere
 		const queryExpanded = query.withArg<Input.ListQueryInput>('filter', where)
 
-		return (await this.select(entity, queryExpanded))[0] || null
+		return (await this.select(entity, queryExpanded, overRelation))[0] || null
 	}
 
 	public async selectGrouped(
 		entity: Model.Entity,
 		input: ObjectNode<Input.ListQueryInput>,
-		relation: Model.JoiningColumnRelation & Model.Relation,
+		relation: Model.JoiningColumnRelation & Model.AnyRelation,
 	) {
 		const hydrator = new SelectHydrator()
 		let qb: SelectBuilder<SelectBuilder.Result> = SelectBuilder.create()
@@ -102,7 +105,7 @@ export class Mapper {
 		const groupingKey = '__grouping_key'
 		qb = qb.select([path.alias, relation.joiningColumn.columnName], groupingKey)
 
-		const rows = await this.selectRows(hydrator, qb, entity, input, relation.name)
+		const rows = await this.selectRows(hydrator, qb, entity, input, relation, relation.name)
 		return await hydrator.hydrateGroups(rows, groupingKey)
 	}
 
@@ -111,6 +114,7 @@ export class Mapper {
 		qb: SelectBuilder<SelectBuilder.Result>,
 		entity: Model.Entity,
 		input: ObjectNode<Input.ListQueryInput>,
+		overRelation: Model.AnyRelation | null,
 		groupBy?: string,
 	) {
 		const inputWithOrder = OrderByHelper.appendDefaultOrderBy(entity, input, [])
@@ -118,7 +122,7 @@ export class Mapper {
 		const augmentedBuilder = qb.from(entity.tableName, path.alias).meta('path', [...input.path, input.alias])
 
 		const selector = this.selectBuilderFactory.create(augmentedBuilder, hydrator)
-		const filterWithPredicates = this.predicatesInjector.inject(entity, inputWithOrder.args.filter || {})
+		const filterWithPredicates = this.predicatesInjector.inject(entity, inputWithOrder.args.filter || {}, overRelation ?? undefined)
 		const inputWithPredicates = inputWithOrder.withArg('filter', filterWithPredicates)
 		selector.select(this, entity, inputWithPredicates, path, groupBy)
 		return await selector.execute(this.db)

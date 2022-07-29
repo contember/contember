@@ -155,7 +155,7 @@ export class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.C
 				}
 				const objectWithWhere = field.withArg('filter', where)
 
-				return this.mapper.select(targetEntity, objectWithWhere, targetRelation.name)
+				return this.mapper.select(targetEntity, objectWithWhere, targetRelation, targetRelation.name)
 			},
 			null,
 		)
@@ -184,13 +184,13 @@ export class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.C
 				}
 				const objectWithWhere = objectNode.withArg('filter', where)
 
-				return this.mapper.select(targetEntity, objectWithWhere, targetEntity.primary)
+				return this.mapper.select(targetEntity, objectWithWhere, targetRelation, targetEntity.primary)
 			},
 			null,
 		)
 	}
 
-	public visitManyHasOne(entity: Model.Entity, relation: Model.ManyHasOneRelation, targetEntity: Model.Entity): void {
+	public visitManyHasOne(entity: Model.Entity, relation: Model.ManyHasOneRelation, targetEntity: Model.Entity, targetRelation: Model.OneHasManyRelation | null): void {
 		this.executionContext.addData(
 			relation.name,
 			async ids => {
@@ -208,7 +208,7 @@ export class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.C
 				}
 				const objectWithWhere = objectNode.withArg('filter', where)
 
-				return this.mapper.select(targetEntity, objectWithWhere, targetEntity.primary)
+				return this.mapper.select(targetEntity, objectWithWhere, targetRelation, targetEntity.primary)
 			},
 			null,
 		)

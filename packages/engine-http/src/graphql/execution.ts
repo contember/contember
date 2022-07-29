@@ -38,11 +38,11 @@ export const createGraphQLQueryHandler = <Context>({
 	let schemaValidated = false
 	const hitCache = new LRUCache<string, true>({
 		max: hitCacheMax,
-		maxAge: hitCacheMaxAgeSeconds * 1000,
+		ttl: hitCacheMaxAgeSeconds * 1000,
 	})
 	const documentCache = new LRUCache<string, DocumentNode>({
 		max: documentCacheMax,
-		maxAge: documentCacheMaxAgeSeconds * 1000,
+		ttl: documentCacheMaxAgeSeconds * 1000,
 	})
 	let lastPrune = Date.now()
 

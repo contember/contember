@@ -113,10 +113,10 @@ test('update name - denied', async () => {
                  ? :: text as "name",
                  "root_"."id"
                from "public"."author" as "root_"
-               where "root_"."id" = ? and false) update "public"."author"
+               where false) update "public"."author"
               set "name" = "newData_"."name" from "newData_"
               where "author"."id" = "newData_"."id" and false`,
-					parameters: ['John', testUuid(1)],
+					parameters: ['John'],
 					response: 0,
 				},
 			]),

@@ -31,11 +31,14 @@ const permissions: Acl.Permissions = {
 			localePredicate: {
 				locale: 'localeVariable',
 			},
+			localePredicate2: {
+				locale: 'localeVariable',
+			},
 		},
 		operations: {
 			read: {
 				id: 'localePredicate',
-				title: 'localePredicate',
+				title: 'localePredicate2',
 				content: 'localePredicate',
 			},
 		},
@@ -50,7 +53,7 @@ describe('Predicates injector', () => {
 	it('injects predicate', () => {
 		const injector = new PredicatesInjector(
 			schema,
-			new PredicateFactory(permissions, new VariableInjector(schema, variables)),
+			new PredicateFactory(permissions, schema, new VariableInjector(schema, variables)),
 		)
 		const result = injector.inject(schema.entities['PostLocale'], {})
 
@@ -62,21 +65,14 @@ describe('Predicates injector', () => {
 	it('merges predicate with explicit where', () => {
 		const injector = new PredicatesInjector(
 			schema,
-			new PredicateFactory(permissions, new VariableInjector(schema, variables)),
+			new PredicateFactory(permissions, schema, new VariableInjector(schema, variables)),
 		)
 		const result = injector.inject(schema.entities['PostLocale'], { id: { in: [1, 2] } })
 
 		assert.deepStrictEqual(result, {
 			and: [
 				{
-					and: [
-						{
-							id: { in: [1, 2] },
-						},
-						{
-							locale: { in: ['cs'] },
-						},
-					],
+					id: { in: [1, 2] },
 				},
 				{
 					locale: { in: ['cs'] },
@@ -88,7 +84,7 @@ describe('Predicates injector', () => {
 	it('injects predicate to where', () => {
 		const injector = new PredicatesInjector(
 			schema,
-			new PredicateFactory(permissions, new VariableInjector(schema, variables)),
+			new PredicateFactory(permissions, schema, new VariableInjector(schema, variables)),
 		)
 
 		const result = injector.inject(schema.entities['PostLocale'], { title: { eq: 'abc' } })

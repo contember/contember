@@ -31,7 +31,7 @@ export class HasManyToHasOneReducerExecutionHandler implements SelectExecutionHa
 				}
 				const newObjectNode = objectNode.withArgs<Input.ListQueryInput>({ filter: whereWithParentId })
 
-				return context.mapper.select(targetEntity, newObjectNode, targetRelation.name)
+				return context.mapper.select(targetEntity, newObjectNode, targetRelation, targetRelation.name)
 			},
 			null,
 		)
@@ -40,7 +40,7 @@ export class HasManyToHasOneReducerExecutionHandler implements SelectExecutionHa
 	private getRelationTarget(
 		entity: Model.Entity,
 		relationName: string,
-	): [Model.Entity, Model.Relation & Model.JoiningColumnRelation] {
+	): [Model.Entity, Model.AnyRelation & Model.JoiningColumnRelation] {
 		return acceptFieldVisitor(this.schema, entity, relationName, {
 			visitColumn: (): never => {
 				throw new ImplementationException('HasManyToHasOneReducerExecutionHandler: Not applicable for a column')
@@ -50,7 +50,7 @@ export class HasManyToHasOneReducerExecutionHandler implements SelectExecutionHa
 				relation,
 				targetEntity,
 				targetRelation,
-			): [Model.Entity, Model.Relation & Model.JoiningColumnRelation] => {
+			): [Model.Entity, Model.AnyRelation & Model.JoiningColumnRelation] => {
 				if (!targetRelation || !isIt<Model.JoiningColumnRelation>(targetRelation, 'joiningColumn')) {
 					throw new Error('HasManyToHasOneReducerExecutionHandler: only applicable for relations with joiningColumn')
 				}

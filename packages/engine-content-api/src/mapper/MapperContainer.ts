@@ -51,7 +51,7 @@ export const createMapperContainer = ({ permissions, schema, identityVariables, 
 		.addService('variableInjector', () =>
 			new VariableInjector(schema.model, identityVariables))
 		.addService('predicateFactory', ({ variableInjector }) =>
-			new PredicateFactory(permissions, variableInjector))
+			new PredicateFactory(permissions, schema.model, variableInjector))
 		.addService('predicatesInjector', ({ predicateFactory }) =>
 			new PredicatesInjector(schema.model, predicateFactory))
 		.addService('joinBuilder', () =>

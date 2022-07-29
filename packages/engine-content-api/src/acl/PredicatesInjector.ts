@@ -5,17 +5,18 @@ import { PredicateFactory } from './PredicateFactory'
 export class PredicatesInjector {
 	constructor(private readonly schema: Model.Schema, private readonly predicateFactory: PredicateFactory) {}
 
-	public inject(entity: Model.Entity, where: Input.OptionalWhere): Input.OptionalWhere {
-		const restrictedWhere = this.injectToWhere(where, entity)
-		return this.createWhere(entity, undefined, restrictedWhere)
+	public inject(entity: Model.Entity, where: Input.OptionalWhere, overRelation?: Model.AnyRelation): Input.OptionalWhere {
+		const restrictedWhere = this.injectToWhere(where, entity, true)
+		return this.createWhere(entity, undefined, restrictedWhere, overRelation)
 	}
 
 	private createWhere(
 		entity: Model.Entity,
 		fieldNames: string[] | undefined,
 		where: Input.OptionalWhere,
+		overRelation?: Model.AnyRelation,
 	): Input.OptionalWhere {
-		const predicatesWhere: Input.Where = this.predicateFactory.create(entity, Acl.Operation.read, fieldNames)
+		const predicatesWhere: Input.Where = this.predicateFactory.create(entity, Acl.Operation.read, fieldNames, overRelation)
 
 		const and = [where, predicatesWhere].filter(it => Object.keys(it).length > 0)
 		if (and.length === 0) {
@@ -61,4 +62,5 @@ export class PredicatesInjector {
 
 		return this.createWhere(entity, fieldsForPredicate, resultWhere)
 	}
+
 }

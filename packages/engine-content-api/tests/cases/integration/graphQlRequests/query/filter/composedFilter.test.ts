@@ -19,7 +19,7 @@ test('Composed filter with nulls', async () => {
 			`,
 		executes: [
 			{
-				sql: SQL`select "root_"."id" as "root_id"  from "public"."post" as "root_"   where ("root_"."title" = ?)`,
+				sql: SQL`select "root_"."id" as "root_id"  from "public"."post" as "root_"   where "root_"."title" = ?`,
 				parameters: ['John'],
 				response: { rows: [{ root_id: testUuid(1) }] },
 			},

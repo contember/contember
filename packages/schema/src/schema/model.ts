@@ -66,7 +66,7 @@ export namespace Model {
 	}
 
 	export interface RelationVisitor<T> {
-		visitRelation(entity: Entity, relation: Relation, targetEntity: Entity, targetRelation: Relation | null): T
+		visitRelation(entity: Entity, relation: Relation, targetEntity: Entity, targetRelation: AnyRelation | null): T
 	}
 
 	export type FieldVisitor<T> =

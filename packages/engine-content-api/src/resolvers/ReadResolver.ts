@@ -33,12 +33,12 @@ export class ReadResolver {
 
 	public async resolveListQuery(entity: Model.Entity, info: GraphQLResolveInfo) {
 		const queryAst: ObjectNode<Input.ListQueryInput> = this.queryAstFactory.create(info)
-		return await this.mapperFactory(this.db).select(entity, queryAst)
+		return await this.mapperFactory(this.db).select(entity, queryAst, null)
 	}
 
 	public async resolveGetQuery(entity: Model.Entity, info: GraphQLResolveInfo) {
 		const queryAst: ObjectNode<Input.UniqueQueryInput> = this.queryAstFactory.create(info)
-		return await this.mapperFactory(this.db).selectUnique(entity, queryAst)
+		return await this.mapperFactory(this.db).selectUnique(entity, queryAst, null)
 	}
 
 	public async resolvePaginationQuery(entity: Model.Entity, info: GraphQLResolveInfo) {

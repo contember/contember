@@ -1,5 +1,5 @@
 import { Input, Model } from '@contember/schema'
-import { GroupedCounts, JoiningColumns, Mapper, RelationFetcher, SelectGroupedObjects } from '../../mapper'
+import { Mapper, RelationFetcher, SelectGroupedObjects } from '../../mapper'
 import { ObjectNode } from '../../inputProcessing'
 
 export class PaginatedHasManyNodesVisitor implements
@@ -20,12 +20,14 @@ export class PaginatedHasManyNodesVisitor implements
 		targetRelation: Model.ManyHasOneRelation,
 	): Promise<SelectGroupedObjects> {
 		return await this.relationFetcher.fetchOneHasManyGroups(
-			this.mapper,
-			this.objectNode,
-			targetEntity,
-			relation,
-			targetRelation,
-			this.ids,
+			{
+				mapper: this.mapper,
+				objectNode: this.objectNode,
+				targetEntity: targetEntity,
+				relation: relation,
+				targetRelation: targetRelation,
+				ids: this.ids,
+			},
 		)
 	}
 
@@ -35,19 +37,16 @@ export class PaginatedHasManyNodesVisitor implements
 		targetEntity: Model.Entity,
 		targetRelation: Model.ManyHasManyInverseRelation | null,
 	): Promise<SelectGroupedObjects> {
-		const joiningTable = relation.joiningTable
-		const columns: JoiningColumns = {
-			sourceColumn: joiningTable.joiningColumn,
-			targetColumn: joiningTable.inverseJoiningColumn,
-		}
 		return await this.relationFetcher.fetchManyHasManyGroups(
-			this.mapper,
-			this.objectNode,
-			targetEntity,
-			relation,
-			relation,
-			columns,
-			this.ids,
+			{
+				mapper: this.mapper,
+				field: this.objectNode,
+				targetEntity: targetEntity,
+				sourceRelation: relation,
+				targetRelation,
+				directionFrom: 'owning',
+				ids: this.ids,
+			},
 		)
 	}
 
@@ -57,19 +56,16 @@ export class PaginatedHasManyNodesVisitor implements
 		targetEntity: Model.Entity,
 		targetRelation: Model.ManyHasManyOwningRelation,
 	): Promise<SelectGroupedObjects> {
-		const joiningTable = targetRelation.joiningTable
-		const columns: JoiningColumns = {
-			targetColumn: joiningTable.joiningColumn,
-			sourceColumn: joiningTable.inverseJoiningColumn,
-		}
 		return await this.relationFetcher.fetchManyHasManyGroups(
-			this.mapper,
-			this.objectNode,
-			targetEntity,
-			relation,
-			targetRelation,
-			columns,
-			this.ids,
+			{
+				mapper: this.mapper,
+				field: this.objectNode,
+				targetEntity: targetEntity,
+				sourceRelation: relation,
+				targetRelation,
+				directionFrom: 'inverse',
+				ids: this.ids,
+			},
 		)
 	}
 

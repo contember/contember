@@ -7,7 +7,7 @@ import { testUuid } from '../../../../../src/testUuid'
 
 const schema = new SchemaBuilder()
 	.enum('locale', ['cs', 'en'])
-	.entity('Post', entityBuilder => entityBuilder.oneHasMany('locales', c => c.target('PostLocale')))
+	.entity('Post', entityBuilder => entityBuilder.oneHasMany('locales', c => c.target('PostLocale').ownedBy('post')))
 	.entity('PostLocale', entity =>
 		entity
 			.column('title', column => column.type(Model.ColumnType.String))
@@ -34,6 +34,7 @@ const permissions: Acl.Permissions = {
 		operations: {
 			read: {
 				id: true,
+				post: true,
 				title: 'localePredicate',
 			},
 		},
@@ -274,7 +275,7 @@ test('querying on nested field', async () => {
                          "root_"."id" as "root_id",
                          case when "root_"."locale" in (?) then "root_"."title" else null end as "root_title"
                        from "public"."post_locale" as "root_"
-                       where "root_"."post_id" in (?, ?) and false`,
+                       where "root_"."post_id" in (?, ?)`,
 				parameters: ['cs', testUuid(1), testUuid(2)],
 				response: {
 					rows: [

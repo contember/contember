@@ -173,7 +173,7 @@ export class RelationFetcher {
 				},
 			})
 			.withField(primaryField)
-		const result = await mapper.select(targetEntity, queryWithWhere)
+		const result = await mapper.select(targetEntity, queryWithWhere, targetRelation)
 
 		return this.buildManyHasManyGroups(targetEntity, joiningColumns, result, junctionValues)
 	}

@@ -448,3 +448,16 @@ test('definition with predefined variables', () => {
 		}
 	`)
 })
+
+namespace InvalidModel {
+	export const publicRole = acl.createRole('public')
+
+	@acl.allow(publicRole, { read: ['bar'] as any })
+	export class Book {
+		title = def.stringColumn()
+	}
+}
+
+test('invalid column', () => {
+	expect(() => createSchema(InvalidModel)).toThrow('Field "bar" does not exist on entity "Book" in read ACL definition.')
+})

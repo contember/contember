@@ -45,6 +45,20 @@ export class EntityPredicatesResolver {
 			predicates[predicateName] = resolvedPredicate
 			predicateNamesMap.set(permission.when, predicateName)
 		}
+		for (const op of ['read', 'update', 'create'] as const) {
+			for (const definition of aclDefinitions) {
+				const fields = definition[op]
+				if (!Array.isArray(fields)) {
+					continue
+				}
+				for (const field of fields) {
+					if (!(field in entity.fields)) {
+						throw `Field "${String(field)}" does not exist on entity "${entity.name}" in ${op} ACL definition.`
+					}
+				}
+			}
+		}
+
 		return new EntityPredicatesResolver(aclDefinitions, predicates, predicateNamesMap, generatedNames)
 	}
 

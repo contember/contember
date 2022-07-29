@@ -1,5 +1,5 @@
 import { Input, Model } from '@contember/schema'
-import { GroupedCounts, JoiningColumns, Mapper, RelationFetcher } from '../../mapper'
+import { GroupedCounts, Mapper, RelationFetcher } from '../../mapper'
 import { ObjectNode } from '../../inputProcessing'
 
 export class PaginatedHasManyCountVisitor implements
@@ -20,11 +20,13 @@ export class PaginatedHasManyCountVisitor implements
 		targetRelation: Model.ManyHasOneRelation,
 	): Promise<GroupedCounts> {
 		return await this.relationFetcher.countOneHasManyGroups(
-			this.mapper,
-			this.objectNode.args.filter,
-			targetEntity,
-			targetRelation,
-			this.ids,
+			{
+				mapper: this.mapper,
+				filter: this.objectNode.args.filter,
+				targetEntity: targetEntity,
+				targetRelation: targetRelation,
+				ids: this.ids,
+			},
 		)
 	}
 
@@ -34,18 +36,16 @@ export class PaginatedHasManyCountVisitor implements
 		targetEntity: Model.Entity,
 		targetRelation: Model.ManyHasManyInverseRelation | null,
 	): Promise<GroupedCounts> {
-		const joiningTable = relation.joiningTable
-		const columns: JoiningColumns = {
-			sourceColumn: joiningTable.joiningColumn,
-			targetColumn: joiningTable.inverseJoiningColumn,
-		}
 		return await this.relationFetcher.countManyHasManyGroups(
-			this.mapper,
-			this.objectNode.args.filter,
-			targetEntity,
-			relation,
-			this.ids,
-			columns,
+			{
+				mapper: this.mapper,
+				filter: this.objectNode.args.filter,
+				targetEntity: targetEntity,
+				sourceRelation: relation,
+				targetRelation,
+				directionFrom: 'owning',
+				ids: this.ids,
+			},
 		)
 	}
 
@@ -55,18 +55,16 @@ export class PaginatedHasManyCountVisitor implements
 		targetEntity: Model.Entity,
 		targetRelation: Model.ManyHasManyOwningRelation,
 	): Promise<GroupedCounts> {
-		const joiningTable = targetRelation.joiningTable
-		const columns: JoiningColumns = {
-			targetColumn: joiningTable.joiningColumn,
-			sourceColumn: joiningTable.inverseJoiningColumn,
-		}
 		return await this.relationFetcher.countManyHasManyGroups(
-			this.mapper,
-			this.objectNode.args.filter,
-			targetEntity,
-			targetRelation,
-			this.ids,
-			columns,
+			{
+				mapper: this.mapper,
+				filter: this.objectNode.args.filter,
+				targetEntity: targetEntity,
+				sourceRelation: relation,
+				targetRelation,
+				directionFrom: 'inverse',
+				ids: this.ids,
+			},
 		)
 	}
 

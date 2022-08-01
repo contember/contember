@@ -10,8 +10,8 @@ export class UpdateIDPMutationResolver implements MutationResolvers {
 
 	async updateIDP(parent: any, args: MutationUpdateIdpArgs, context: TenantResolverContext): Promise<UpdateIdpResponse> {
 		await context.requireAccess({
-			action: PermissionActions.IDP_ADD,
-			message: 'You are not allowed to add IDP',
+			action: PermissionActions.IDP_UPDATE,
+			message: 'You are not allowed to update IDP',
 		})
 		const result = await this.idpManager.updateIDP(context.db, args.identityProvider, {
 			configuration: args.configuration,

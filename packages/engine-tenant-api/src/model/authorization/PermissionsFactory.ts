@@ -30,6 +30,10 @@ class PermissionsFactory {
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.PERSON_INVITE_UNMANAGED([]))
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.MAIL_TEMPLATE_ADD)
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.MAIL_TEMPLATE_REMOVE)
+		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.IDP_ADD)
+		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.IDP_UPDATE)
+		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.IDP_DISABLE)
+		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.IDP_ENABLE)
 
 		permissions.allow(TenantRole.PROJECT_CREATOR, PermissionActions.PROJECT_CREATE)
 

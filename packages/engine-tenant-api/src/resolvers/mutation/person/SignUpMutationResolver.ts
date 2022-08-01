@@ -16,8 +16,9 @@ export class SignUpMutationResolver implements MutationResolvers {
 	constructor(private readonly signUpManager: SignUpManager, private readonly apiKeyManager: ApiKeyManager) {}
 
 	async signUp(parent: any, args: MutationSignUpArgs, context: TenantResolverContext): Promise<SignUpResponse> {
+		const roles = args.roles ?? []
 		await context.requireAccess({
-			action: PermissionActions.PERSON_SIGN_UP,
+			action: PermissionActions.PERSON_SIGN_UP(roles),
 			message: 'You are not allowed to sign up',
 		})
 		const password = (() => {
@@ -37,7 +38,7 @@ export class SignUpMutationResolver implements MutationResolvers {
 			email: args.email,
 			name: args.name ?? undefined,
 			password,
-			roles: args.roles ?? [],
+			roles,
 		})
 
 		if (!response.ok) {

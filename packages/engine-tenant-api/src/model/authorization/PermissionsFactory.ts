@@ -2,6 +2,12 @@ import { Permissions } from '@contember/authorization'
 import { PermissionActions } from './PermissionActions'
 import { TenantRole } from './Roles'
 
+const allowedRoles = new Set<string>([TenantRole.LOGIN, TenantRole.PROJECT_ADMIN])
+
+const allowedRolesVerifier = ({ roles }: {roles?: readonly string[]}) => {
+	return !!roles && roles.every(it => allowedRoles.has(it))
+}
+
 class PermissionsFactory {
 	public create(): Permissions {
 		const permissions = new Permissions()
@@ -22,6 +28,8 @@ class PermissionsFactory {
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.PROJECT_VIEW)
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.API_KEY_CREATE)
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.API_KEY_DISABLE)
+		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.API_KEY_CREATE_GLOBAL(), allowedRolesVerifier)
+		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.PERSON_SIGN_UP(), allowedRolesVerifier)
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.PROJECT_VIEW_MEMBER([]))
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.PROJECT_ADD_MEMBER([]))
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.PROJECT_UPDATE_MEMBER([]))

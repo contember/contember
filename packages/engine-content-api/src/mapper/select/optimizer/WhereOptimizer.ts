@@ -1,7 +1,7 @@
 import { Input, Model } from '@contember/schema'
 import { ConditionOptimizer } from './ConditionOptimizer'
 import { acceptFieldVisitor } from '@contember/schema-utils'
-import { optimizeAnd, optimizeOr } from './helpers'
+import { optimizeAnd, optimizeNot, optimizeOr } from './helpers'
 
 export class WhereOptimizer {
 	constructor(
@@ -23,13 +23,15 @@ export class WhereOptimizer {
 			Object.entries(where).map(([key, value]) => {
 				if (value === undefined || value === null) {
 					return undefined
-				} else if (key === 'or' || key === 'and') {
-					const parts = (value as readonly Input.Where[]).map(it => this.optimizeWhere(it, entity))
-					return key === 'and' ? optimizeAnd(parts) : optimizeOr(parts)
+
+				} else if (key === 'and') {
+					return optimizeAnd((value as readonly Input.Where[]).map(it => this.optimizeWhere(it, entity)))
+
+				} else if (key === 'or') {
+					return optimizeOr((value as readonly Input.Where[]).map(it => this.optimizeWhere(it, entity)))
 
 				} else if (key === 'not') {
-					const resolved = this.optimizeWhere(value as Input.Where, entity)
-					return typeof resolved === 'boolean' ? !resolved : { not: resolved }
+					return optimizeNot(this.optimizeWhere(value as Input.Where, entity))
 
 				} else {
 					return this.resolveFieldValue(entity, key, value)

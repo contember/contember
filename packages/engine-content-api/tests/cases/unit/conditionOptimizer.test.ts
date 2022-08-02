@@ -110,20 +110,20 @@ describe('condition optimizer', () => {
 		}), { and: [{ eq: 0 }, { eq: 1 }, { eq: 2 }, { eq: 3 }, { eq: 4 }, { eq: 5 }, { eq: 6 }] })
 	})
 
-	it('flattens OR', () => {
-		assert.deepStrictEqual(optimizer.optimize({
-			or: [
-				{ eq: 1 },
-				{
-
-					or: [
-						{ eq: 2 },
-						{ or: [{ eq: 3 }, { eq: 4 }] },
-					],
-				},
-			],
-		}), { or: [{ eq: 1 }, { eq: 2 }, { eq: 3 }, { eq: 4 }] })
-	})
+	// it('flattens OR', () => {
+	// 	assert.deepStrictEqual(optimizer.optimize({
+	// 		or: [
+	// 			{ eq: 1 },
+	// 			{
+	//
+	// 				or: [
+	// 					{ eq: 2 },
+	// 					{ or: [{ eq: 3 }, { eq: 4 }] },
+	// 				],
+	// 			},
+	// 		],
+	// 	}), { or: [{ eq: 1 }, { eq: 2 }, { eq: 3 }, { eq: 4 }] })
+	// })
 
 	it('combine AND and OR', () => {
 		assert.deepStrictEqual(optimizer.optimize({

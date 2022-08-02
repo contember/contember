@@ -67,7 +67,7 @@ describe('condition optimizer', () => {
 	})
 
 
-	it('flattens AND', () => {
+	it('expands AND', () => {
 		assert.deepStrictEqual(optimizer.optimize({
 			eq: 0,
 			and: [
@@ -83,7 +83,7 @@ describe('condition optimizer', () => {
 					],
 				},
 			],
-		}), { and: [{ eq: 0 }, { eq: 1 }, { eq: 2 }, { eq: 3 }, { eq: 4 }, { eq: 5 }, { eq: 6 }] })
+		}), { and: [{ eq: 0 }, { and: [{ eq: 1 }, { and: [{ eq: 2 }, { and: [{ eq: 3 }, { and: [{ eq: 4 }, { and: [{ eq: 5 }, { eq: 6 }] }] }] }] }] }] })
 	})
 
 	it('combine AND and OR', () => {
@@ -94,8 +94,15 @@ describe('condition optimizer', () => {
 			],
 		}), { or: [
 			{ and: [{ eq: 1 }, { eq: 2 }] },
-			{ and: [{ eq: 3 }, { eq: 4 }, { eq: 5 }] },
+			{ and: [{ and: [{ eq: 3 }, { eq: 4 }] }, { eq: 5 }] },
 		] })
 	})
 
+	it('remove conditions with null value', () => {
+		assert.deepStrictEqual(optimizer.optimize({ eq: null }), {})
+	})
+
+	it('remove conditions with undefined value', () => {
+		assert.deepStrictEqual(optimizer.optimize({ eq: undefined }), {})
+	})
 })

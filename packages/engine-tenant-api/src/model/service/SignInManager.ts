@@ -38,7 +38,12 @@ class SignInManager {
 		return new ResponseOk(new SignInResult(personRow, sessionToken))
 	}
 
-	async createSessionToken(dbContext: DatabaseContext, personIdentifier: PersonUniqueIdentifier, expiration?: number): Promise<CreateSessionTokenResponse> {
+	async createSessionToken(
+		dbContext: DatabaseContext,
+		personIdentifier: PersonUniqueIdentifier,
+		expiration?: number,
+		verifier?: (person: PersonRow) => Promise<void>,
+	): Promise<CreateSessionTokenResponse> {
 		const personRow = await dbContext.queryHandler.fetch(PersonQuery.byUniqueIdentifier(personIdentifier))
 		if (personRow === null) {
 			if (personIdentifier.type === 'email') {
@@ -49,6 +54,8 @@ class SignInManager {
 			}
 			throw new ImplementationException()
 		}
+		await verifier?.(personRow)
+
 		const sessionToken = await this.apiKeyManager.createSessionApiKey(dbContext, personRow.identity_id, expiration)
 		return new ResponseOk(new SignInResult(personRow, sessionToken))
 	}

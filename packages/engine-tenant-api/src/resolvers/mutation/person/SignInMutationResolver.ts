@@ -43,7 +43,7 @@ export class SignInMutationResolver implements MutationResolvers {
 
 	async createSessionToken(parent: any, args: MutationCreateSessionTokenArgs, context: TenantResolverContext): Promise<CreateSessionTokenResponse> {
 		await context.requireAccess({
-			action: PermissionActions.PERSON_CREATE_SESSION_KEY,
+			action: PermissionActions.PERSON_CREATE_SESSION_KEY(),
 			message: 'You are not allowed to create a session key',
 		})
 		const identifier = ((): PersonUniqueIdentifier => {
@@ -59,6 +59,10 @@ export class SignInMutationResolver implements MutationResolvers {
 			context.db,
 			identifier,
 			args.expiration || undefined,
+			async person => await context.requireAccess({
+				action: PermissionActions.PERSON_CREATE_SESSION_KEY(person.roles),
+				message: 'You are not allowed to create a session key for this person.',
+			}),
 		)
 
 		if (!response.ok) {

@@ -4,8 +4,14 @@ import { TenantRole } from './Roles'
 
 const allowedRoles = new Set<string>([TenantRole.LOGIN, TenantRole.PROJECT_ADMIN])
 
-const allowedRolesVerifier = ({ roles }: {roles?: readonly string[]}) => {
-	return !!roles && roles.every(it => allowedRoles.has(it))
+const projectAdminCreateRolesVerifier = ({ roles }: {roles?: readonly string[]}) => {
+	return roles === undefined || roles.every(it => allowedRoles.has(it))
+}
+
+const forbiddenRoles = new Set<string>([TenantRole.SUPER_ADMIN, TenantRole.PROJECT_CREATOR])
+
+const projectAdminUseRolesVerifier = ({ roles }: { roles?: readonly string[] }) => {
+	return roles === undefined || !roles.some(it => forbiddenRoles.has(it))
 }
 
 class PermissionsFactory {
@@ -28,8 +34,9 @@ class PermissionsFactory {
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.PROJECT_VIEW)
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.API_KEY_CREATE)
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.API_KEY_DISABLE)
-		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.API_KEY_CREATE_GLOBAL(), allowedRolesVerifier)
-		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.PERSON_SIGN_UP(), allowedRolesVerifier)
+		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.API_KEY_CREATE_GLOBAL(), projectAdminCreateRolesVerifier)
+		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.PERSON_SIGN_UP(), projectAdminCreateRolesVerifier)
+		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.PERSON_CREATE_SESSION_KEY(), projectAdminUseRolesVerifier)
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.PROJECT_VIEW_MEMBER([]))
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.PROJECT_ADD_MEMBER([]))
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.PROJECT_UPDATE_MEMBER([]))

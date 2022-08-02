@@ -1,8 +1,21 @@
-import { describe, it, assert } from 'vitest'
+import { assert, describe, it } from 'vitest'
 import { ConditionOptimizer } from '../../../src/mapper/select/optimizer/ConditionOptimizer'
+
 
 describe('condition optimizer', () => {
 	const optimizer = new ConditionOptimizer()
+
+	it('remove OR when only 1 ALT', () => {
+		assert.deepStrictEqual(optimizer.optimize({
+			or: [{ eq: 1 }], eq: 2,
+		}), { and: [{ eq: 1 }, { eq: 2 }] })
+	})
+
+	it('remove OR when only 1 ALT', () => {
+		assert.deepStrictEqual(optimizer.optimize({
+			eq: 2, or: [{ eq: 1 }],
+		}), { and: [{ eq: 2 }, { eq: 1 }] })
+	})
 
 	it('remove OR when only 1', () => {
 		assert.deepStrictEqual(optimizer.optimize({
@@ -42,6 +55,18 @@ describe('condition optimizer', () => {
 		}), { eq: 1 })
 	})
 
+	it('optimizes AND with always', () => {
+		assert.deepStrictEqual(optimizer.optimize({
+			eq: 1, always: true,
+		}), { eq: 1 })
+	})
+
+	it('optimizes AND with always', () => {
+		assert.deepStrictEqual(optimizer.optimize({
+			eq: 1, never: true,
+		}), false)
+	})
+
 	it('optimizes NOT with never', () => {
 		assert.deepStrictEqual(optimizer.optimize({
 			not: { never: true },
@@ -66,7 +91,6 @@ describe('condition optimizer', () => {
 		}), {})
 	})
 
-
 	it('flattens AND', () => {
 		assert.deepStrictEqual(optimizer.optimize({
 			eq: 0,
@@ -84,6 +108,21 @@ describe('condition optimizer', () => {
 				},
 			],
 		}), { and: [{ eq: 0 }, { eq: 1 }, { eq: 2 }, { eq: 3 }, { eq: 4 }, { eq: 5 }, { eq: 6 }] })
+	})
+
+	it('flattens OR', () => {
+		assert.deepStrictEqual(optimizer.optimize({
+			or: [
+				{ eq: 1 },
+				{
+
+					or: [
+						{ eq: 2 },
+						{ or: [{ eq: 3 }, { eq: 4 }] },
+					],
+				},
+			],
+		}), { or: [{ eq: 1 }, { eq: 2 }, { eq: 3 }, { eq: 4 }] })
 	})
 
 	it('combine AND and OR', () => {

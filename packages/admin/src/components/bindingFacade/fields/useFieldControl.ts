@@ -93,8 +93,8 @@ export const useFieldControl = <FieldVal extends FieldValue, ControlVal extends 
 
 		// ControlStateProps
 		active: props.active,
-		readOnly: fieldMetadata.isMutating,
-		disabled: fieldMetadata.isMutating,
+		readOnly: props.readOnly || fieldMetadata.isMutating,
+		disabled: props.disabled || fieldMetadata.isMutating,
 		loading: fieldMetadata.isMutating,
 		required: props.required, // TODO: ?? fieldMetadata.field.schema.required,
 		notNull: props.notNull ?? fieldMetadata.field.schema.nullable === false,

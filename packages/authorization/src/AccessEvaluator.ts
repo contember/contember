@@ -1,6 +1,6 @@
-import Permissions from './Permissions'
-import AccessNode from './AccessNode'
-import Authorizator from './Authorizator'
+import { Permissions } from './Permissions'
+import { AccessNode } from './AccessNode'
+import { Authorizator } from './Authorizator'
 
 interface AccessEvaluator {
 	evaluate(accessNode: AccessNode, action: Authorizator.Action): Promise<boolean>
@@ -26,4 +26,4 @@ namespace AccessEvaluator {
 	class UnsupportedAccessNodeError extends Error {}
 }
 
-export default AccessEvaluator
+export { AccessEvaluator }

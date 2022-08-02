@@ -1,4 +1,4 @@
-import Authorizator from './Authorizator'
+import { Authorizator } from './Authorizator'
 
 class Permissions {
 	private permissions: Permissions.PermissionsMap = {}
@@ -40,4 +40,4 @@ namespace Permissions {
 	}
 }
 
-export default Permissions
+export { Permissions }

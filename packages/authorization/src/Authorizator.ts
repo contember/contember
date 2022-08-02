@@ -1,6 +1,6 @@
-import AuthorizationScope from './AuthorizationScope'
-import AccessEvaluator from './AccessEvaluator'
-import AccessNode from './AccessNode'
+import { AuthorizationScope } from './AuthorizationScope'
+import { AccessEvaluator } from './AccessEvaluator'
+import { AccessNode } from './AccessNode'
 
 interface Authorizator<Identity extends Authorizator.Identity = Authorizator.Identity> {
 	isAllowed(identity: Identity, scope: AuthorizationScope<Identity>, action: Authorizator.Action): Promise<boolean>
@@ -47,4 +47,4 @@ namespace Authorizator {
 	}
 }
 
-export default Authorizator
+export { Authorizator }

@@ -269,7 +269,8 @@ export type CreateSessionTokenError = {
 }
 
 export enum CreateSessionTokenErrorCode {
-	UnknownEmail = 'UNKNOWN_EMAIL'
+	UnknownEmail = 'UNKNOWN_EMAIL',
+	UnknownPersonId = 'UNKNOWN_PERSON_ID'
 }
 
 export type CreateSessionTokenResponse = {
@@ -641,8 +642,9 @@ export type MutationCreateResetPasswordRequestArgs = {
 
 
 export type MutationCreateSessionTokenArgs = {
-	email: Scalars['String']
+	email?: InputMaybe<Scalars['String']>
 	expiration?: InputMaybe<Scalars['Int']>
+	personId?: InputMaybe<Scalars['String']>
 }
 
 
@@ -1763,7 +1765,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
 	createGlobalApiKey?: Resolver<Maybe<ResolversTypes['CreateApiKeyResponse']>, ParentType, ContextType, RequireFields<MutationCreateGlobalApiKeyArgs, 'description'>>
 	createProject?: Resolver<Maybe<ResolversTypes['CreateProjectResponse']>, ParentType, ContextType, RequireFields<MutationCreateProjectArgs, 'projectSlug'>>
 	createResetPasswordRequest?: Resolver<Maybe<ResolversTypes['CreatePasswordResetRequestResponse']>, ParentType, ContextType, RequireFields<MutationCreateResetPasswordRequestArgs, 'email'>>
-	createSessionToken?: Resolver<Maybe<ResolversTypes['CreateSessionTokenResponse']>, ParentType, ContextType, RequireFields<MutationCreateSessionTokenArgs, 'email'>>
+	createSessionToken?: Resolver<Maybe<ResolversTypes['CreateSessionTokenResponse']>, ParentType, ContextType, Partial<MutationCreateSessionTokenArgs>>
 	disableApiKey?: Resolver<Maybe<ResolversTypes['DisableApiKeyResponse']>, ParentType, ContextType, RequireFields<MutationDisableApiKeyArgs, 'id'>>
 	disableIDP?: Resolver<Maybe<ResolversTypes['DisableIDPResponse']>, ParentType, ContextType, RequireFields<MutationDisableIdpArgs, 'identityProvider'>>
 	disableOtp?: Resolver<Maybe<ResolversTypes['DisableOtpResponse']>, ParentType, ContextType>

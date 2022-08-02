@@ -1,9 +1,10 @@
 import { CreateSessionTokenErrorCode, SignInErrorCode } from '../../schema'
 import { ApiKeyManager, OtpAuthenticator } from '../service'
-import { PersonQuery, PersonRow } from '../queries'
+import { PersonQuery, PersonRow, PersonUniqueIdentifier } from '../queries'
 import { Providers } from '../providers'
 import { DatabaseContext } from '../utils'
 import { Response, ResponseError, ResponseOk } from '../utils/Response'
+import { ImplementationException } from '../../exceptions'
 
 class SignInManager {
 	constructor(
@@ -37,10 +38,16 @@ class SignInManager {
 		return new ResponseOk(new SignInResult(personRow, sessionToken))
 	}
 
-	async createSessionToken(dbContext: DatabaseContext, email: string, expiration?: number): Promise<CreateSessionTokenResponse> {
-		const personRow = await dbContext.queryHandler.fetch(PersonQuery.byEmail(email))
+	async createSessionToken(dbContext: DatabaseContext, personIdentifier: PersonUniqueIdentifier, expiration?: number): Promise<CreateSessionTokenResponse> {
+		const personRow = await dbContext.queryHandler.fetch(PersonQuery.byUniqueIdentifier(personIdentifier))
 		if (personRow === null) {
-			return new ResponseError(CreateSessionTokenErrorCode.UnknownEmail, `Person with email ${email} not found`)
+			if (personIdentifier.type === 'email') {
+				return new ResponseError(CreateSessionTokenErrorCode.UnknownEmail, `Person with email ${personIdentifier.email} not found`)
+
+			} else if (personIdentifier.type === 'id') {
+				return new ResponseError(CreateSessionTokenErrorCode.UnknownPersonId, `Person with id ${personIdentifier.id} not found`)
+			}
+			throw new ImplementationException()
 		}
 		const sessionToken = await this.apiKeyManager.createSessionApiKey(dbContext, personRow.identity_id, expiration)
 		return new ResponseOk(new SignInResult(personRow, sessionToken))

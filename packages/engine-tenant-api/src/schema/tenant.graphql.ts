@@ -23,7 +23,7 @@ const schema: DocumentNode = gql`
 	type Mutation {
 		signUp(email: String!, password: String, passwordHash: String, roles: [String!], name: String): SignUpResponse
 		signIn(email: String!, password: String!, expiration: Int, otpToken: String): SignInResponse
-		createSessionToken(email: String!, expiration: Int): CreateSessionTokenResponse
+		createSessionToken(email: String, personId: String, expiration: Int): CreateSessionTokenResponse
 		signOut(all: Boolean): SignOutResponse
 		changePassword(personId: String!, password: String!): ChangePasswordResponse
 		changeMyPassword(currentPassword: String!, newPassword: String!): ChangeMyPasswordResponse
@@ -157,6 +157,7 @@ const schema: DocumentNode = gql`
 
 	enum CreateSessionTokenErrorCode {
 		UNKNOWN_EMAIL
+		UNKNOWN_PERSON_ID
 	}
 
 	type CreateSessionTokenResult implements CommonSignInResult{

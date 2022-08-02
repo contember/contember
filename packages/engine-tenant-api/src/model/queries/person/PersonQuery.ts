@@ -2,9 +2,25 @@ import { DatabaseQuery, DatabaseQueryable, Operator, SelectBuilderSpecification 
 import { MaybePersonRow } from './types'
 import { PersonQueryBuilderFactory } from './PersonQueryBuilderFactory'
 
+export type PersonUniqueIdentifier =
+	| {type: 'id'; id: string}
+	| {type: 'identity'; id: string}
+	| {type: 'email'; email: string}
+
 class PersonQuery extends DatabaseQuery<MaybePersonRow> {
 	private constructor(private readonly spec: SelectBuilderSpecification) {
 		super()
+	}
+
+	static byUniqueIdentifier(identifier: PersonUniqueIdentifier): PersonQuery {
+		switch (identifier.type) {
+			case 'email':
+				return PersonQuery.byEmail(identifier.email)
+			case 'id':
+				return PersonQuery.byId(identifier.id)
+			case 'identity':
+				return PersonQuery.byIdentity(identifier.id)
+		}
 	}
 
 	static byId(id: string): PersonQuery {

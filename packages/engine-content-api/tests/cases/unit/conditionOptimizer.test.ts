@@ -11,6 +11,14 @@ describe('condition optimizer', () => {
 		}), { and: [{ eq: 1 }, { eq: 2 }] })
 	})
 
+	it('remove conditions with null value', () => {
+		assert.deepStrictEqual(optimizer.optimize({ eq: null }), {})
+	})
+
+	it('remove conditions with undefined value', () => {
+		assert.deepStrictEqual(optimizer.optimize({ eq: undefined }), {})
+	})
+
 	it('remove OR when only 1 ALT', () => {
 		assert.deepStrictEqual(optimizer.optimize({
 			eq: 2, or: [{ eq: 1 }],

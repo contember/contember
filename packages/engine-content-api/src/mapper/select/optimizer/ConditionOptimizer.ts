@@ -10,7 +10,7 @@ export class ConditionOptimizer {
 	}
 
 	private toTuple(condition: Input.Condition): ConditionTuple {
-		const entries = Object.entries(condition)
+		const entries = Object.entries(condition).filter(([k, v]) => v !== undefined && v !== null)
 
 		if (entries.length === 0) {
 			return [null, null]
@@ -48,53 +48,34 @@ export class ConditionOptimizer {
 	}
 
 	private optimizeAnd(items: ConditionTuple[]): ConditionTuple {
-		const resolved: ConditionTupleItem[] = []
-		let hasAlways = false
-
-		for (const item of items) {
-			const [subKey, subValue] = item
-
-			if (subKey === 'never') {
-				return item
-			} else if (subKey === 'always') {
-				hasAlways = true
-			} else if (subKey === 'and') {
-				resolved.push(...subValue.map(subCondition => this.toTuple(subCondition) as ConditionTupleItem))
-			} else if (subKey !== null) {
-				resolved.push(item)
-			}
-		}
-
-		if (resolved.length > 1) {
-			return ['and', resolved.map(([key, value]) => ({ [key]: value }))]
-		} else if (resolved.length === 1) {
-			return resolved[0]
-		} else if (hasAlways) {
-			return ['always', true]
-		} else {
-			return [null, null]
-		}
+		return this.optimizeJunction(items, 'and', 'never', ['always', true])
 	}
 
 	private optimizeOr(items: ConditionTuple[]): ConditionTuple {
+		return this.optimizeJunction(items, 'or', 'always')
+	}
+
+	private optimizeJunction(items: ConditionTuple[], key: 'and' | 'or', shortCircuiting: 'always' | 'never', emptyFallback?: ConditionTuple): ConditionTuple {
 		const resolved: ConditionTupleItem[] = []
 
 		for (const item of items) {
 			const [subKey, subValue] = item
 
-			if (subKey === 'always') {
+			if (subKey === shortCircuiting) {
 				return item
-			} else if (subKey === 'or') {
+			} else if (subKey === key) {
 				resolved.push(...subValue.map(subCondition => this.toTuple(subCondition) as ConditionTupleItem))
-			} else if (subKey !== 'never' && subKey !== null) {
+			} else if (subKey !== null && subKey !== 'always' && subKey !== 'never') {
 				resolved.push(item)
 			}
 		}
 
 		if (resolved.length > 1) {
-			return ['or', resolved.map(([key, value]) => ({ [key]: value }))]
+			return [key, resolved.map(([key, value]) => ({ [key]: value }))]
 		} else if (resolved.length === 1) {
 			return resolved[0]
+		} else if (emptyFallback && items.length > 0) {
+			return emptyFallback
 		} else {
 			return [null, null]
 		}

@@ -128,8 +128,11 @@ export class StateInitializer {
 				}
 				this.initializeFromFieldMarker(realm, field, undefined, value)
 			} else if (field instanceof HasManyRelationMarker) {
-				// todo: get from copyFrom
-				this.initializeFromHasManyRelationMarker(realm, field, new Set())
+				const value = copyFrom.children.get(placeholderName)
+				if (!value || value.type !== 'entityList') {
+					throw new BindingError()
+				}
+				this.initializeFromHasManyRelationMarker(realm, field, new Set(value.children.keys()))
 			} else if (field instanceof HasOneRelationMarker) {
 				let runtimeId: RuntimeId
 				let subCopyFrom: EntityRealmState | undefined = undefined

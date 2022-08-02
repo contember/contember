@@ -1,8 +1,8 @@
 import { Input, Value } from '@contember/schema'
 
-export type ConditionTupleQ<T = Value.FieldValue, S extends keyof Input.Condition<T> = keyof Input.Condition<T>> = Exclude<{ [K in S ]: [K, Exclude<Input.Condition<T>[K], undefined>] }[S], undefined>
-export type ConditionTuple<T = Value.FieldValue> = ConditionTupleQ<T> | [null, null]
-export type ConditionTupleItem<T = Value.FieldValue> = ConditionTupleQ<T, Exclude<keyof Input.Condition<T>, 'always' | 'never'>>
+export type ConditionTupleBase<T = Value.FieldValue, S extends keyof Input.Condition<T> = keyof Input.Condition<T>> = Exclude<{ [K in S ]: [K, Exclude<Input.Condition<T>[K], undefined>] }[S], undefined>
+export type ConditionTuple<T = Value.FieldValue> = ConditionTupleBase<T> | [null, null]
+export type ConditionTupleItem<T = Value.FieldValue> = ConditionTupleBase<T, Exclude<keyof Input.Condition<T>, 'always' | 'never'>>
 
 export class ConditionOptimizer {
 	public optimize(condition: Input.Condition): Input.Condition | boolean {
@@ -41,89 +41,95 @@ export class ConditionOptimizer {
 	private optimizeTuple(condition: ConditionTuple): ConditionTuple {
 		const [key, value] = condition
 
-		if (key === null) {
-			return condition
-
-		} else if (key === 'and') {
-			const subItems: ConditionTuple[] = []
-			let hasAlways = false
-
-			for (const subItem of value.map(subCondition => this.optimizeTuple(this.toTuple(subCondition)))) {
-				const [subKey, subValue] = subItem
-
-				if (subKey === null) {
-					continue
-
-				} else if (subKey === 'never') {
-					return subItem
-
-				} else if (subKey === 'always') {
-					hasAlways = true
-
-				} else if (subKey === 'and') {
-					subItems.push(...subValue.map(subCondition => this.toTuple(subCondition)).filter(subItem => subItem[0] !== null))
-
-				} else {
-					subItems.push(subItem)
-				}
-			}
-
-			if (subItems.length > 1) {
-				return ['and', subItems.map(([key, value]) => ({ [key]: value }))]
-
-			} else if (subItems.length === 1) {
-				return subItems[0]
-
-			} else if (hasAlways) {
-				return ['always', true]
-
-			} else {
-				return [null, null]
-			}
+		if (key === 'and') {
+			return this.optimizeAnd(value.map(item => this.optimizeTuple(this.toTuple(item))))
 
 		} else if (key === 'or') {
-			const subItems: ConditionTuple[] = []
-			for (const subItem of value.map(subCondition => this.optimizeTuple(this.toTuple(subCondition)))) {
-				const [subKey, subValue] = subItem
-
-				if (subKey === null) {
-					continue
-
-				} else if (subKey === 'always') {
-					return subItem
-
-				} else if (subKey === 'or') {
-					subItems.push(...subValue.map(subCondition => this.toTuple(subCondition)) as ConditionTuple[])
-
-				} else if (subKey !== 'never') {
-					subItems.push(subItem)
-				}
-			}
-
-			return subItems.length > 1
-				? ['or', subItems.map(([key, value]) => ({ [key]: value }))]
-				: subItems.length === 1
-					? subItems[0]
-					: [null, null]
+			return this.optimizeOr(value.map(item => this.optimizeTuple(this.toTuple(item))))
 
 		} else if (key === 'not') {
-			const subItem = this.optimizeTuple(this.toTuple(value))
-
-			if (subItem === null) {
-				return [null, null]
-
-			} else if (subItem[0] === 'always') {
-				return ['never', true]
-
-			} else if (subItem[0] === 'never') {
-				return ['always', true]
-
-			} else {
-				return ['not', { [subItem[0]]: subItem[1] }]
-			}
+			return this.optimizeNot(this.optimizeTuple(this.toTuple(value)))
 
 		} else {
 			return condition
+		}
+	}
+
+	private optimizeAnd(items: ConditionTuple[]): ConditionTuple {
+		const resolved: ConditionTupleItem[] = []
+		let hasAlways = false
+
+		for (const item of items) {
+			const [subKey, subValue] = item
+
+			if (subKey === 'never') {
+				return item
+
+			} else if (subKey === 'always') {
+				hasAlways = true
+
+			} else if (subKey === 'and') {
+				resolved.push(...subValue.map(subCondition => this.toTuple(subCondition) as ConditionTupleItem))
+
+			} else if (subKey !== null) {
+				resolved.push(item)
+			}
+		}
+
+		if (resolved.length > 1) {
+			return ['and', resolved.map(([key, value]) => ({ [key]: value }))]
+
+		} else if (resolved.length === 1) {
+			return resolved[0]
+
+		} else if (hasAlways) {
+			return ['always', true]
+
+		} else {
+			return [null, null]
+		}
+	}
+
+	private optimizeOr(items: ConditionTuple[]): ConditionTuple {
+		const resolved: ConditionTupleItem[] = []
+
+		for (const item of items) {
+			const [subKey, subValue] = item
+
+			if (subKey === 'always') {
+				return item
+
+			} else if (subKey === 'or') {
+				resolved.push(...subValue.map(subCondition => this.toTuple(subCondition) as ConditionTupleItem))
+
+			} else if (subKey !== 'never' && subKey !== null) {
+				resolved.push(item)
+			}
+		}
+
+		if (resolved.length > 1) {
+			return ['or', resolved.map(([key, value]) => ({ [key]: value }))]
+
+		} else if (resolved.length === 1) {
+			return resolved[0]
+
+		} else {
+			return [null, null]
+		}
+	}
+
+	private optimizeNot([key, value]: ConditionTuple): ConditionTuple {
+		if (key === null) {
+			return [null, null]
+
+		} else if (key === 'always') {
+			return ['never', true]
+
+		} else if (key === 'never') {
+			return ['always', true]
+
+		} else {
+			return ['not', { [key]: value }]
 		}
 	}
 }

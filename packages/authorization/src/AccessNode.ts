@@ -1,5 +1,5 @@
-import AccessEvaluator from './AccessEvaluator'
-import Authorizator from './Authorizator'
+import { AccessEvaluator } from './AccessEvaluator'
+import { Authorizator } from './Authorizator'
 
 interface AccessNode {
 	isAllowed(accessEvaluator: AccessEvaluator, action: Authorizator.Action): Promise<boolean>
@@ -80,4 +80,4 @@ namespace AccessNode {
 	}
 }
 
-export default AccessNode
+export { AccessNode }

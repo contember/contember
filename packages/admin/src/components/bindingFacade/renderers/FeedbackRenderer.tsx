@@ -9,13 +9,11 @@ export interface FeedbackRendererProps {
 }
 
 export function FeedbackRenderer({ accessorTreeState, children }: FeedbackRendererProps) {
-	const redirect = useRedirect()
-
 	useEffect(() => {
 		if (accessorTreeState.name === 'error' && accessorTreeState.error.type === 'unauthorized') {
 			window.location.href = '/' // redirect to login
 		}
-	}, [accessorTreeState, redirect])
+	}, [accessorTreeState])
 
 	if (accessorTreeState.name === 'initializing') {
 		return <ContainerSpinner />

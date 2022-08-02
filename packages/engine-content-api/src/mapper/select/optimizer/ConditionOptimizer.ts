@@ -1,45 +1,28 @@
 import { Input } from '@contember/schema'
-import { optimizeJunction, ResultCollector } from './helpers'
-
+import { optimizeAnd, optimizeJunction } from './helpers'
 
 export class ConditionOptimizer {
 	public optimize(condition: Input.Condition): Input.Condition | boolean {
-		const result = this.optimizeCondition(condition)
-
-		if (typeof result === 'boolean') {
-			return result
-		}
-
-		return result.length > 1 ? { and: result } : (result?.[0] ?? {})
-	}
-
-	private optimizeCondition(condition: Input.Condition): Input.Condition[] | boolean {
 		if (condition.never) {
 			return false
 		}
+		return optimizeAnd(
+			Object.entries(condition).map(([key, value]) => {
+				if (value === undefined || value === null) {
+					return undefined
+				} else if (key === 'always') {
+					return true
 
-		const resultCollector = new ResultCollector<Input.Condition>(true)
-
-		for (const [key, value] of Object.entries(condition)) {
-			if (value === undefined || value === null) {
-				// do nothing
-			} else if (key === 'always') {
-				resultCollector.add(true, 'and')
-
-			} else if (key === 'or' || key === 'and') {
-				const parts = (value as readonly Input.Condition[]).map(it => this.optimizeCondition(it))
-				resultCollector.add(optimizeJunction(key, parts), key)
-
-			} else if (key === 'not') {
-				const resolved = this.optimizeCondition(value as Input.Condition)
-				resultCollector.add(resolved, 'not')
-
-			} else {
-				resultCollector.add([{ [key]: value } as Input.Condition], 'and')
-
-			}
-		}
-
-		return resultCollector.getResult()
+				} else if (key === 'or' || key === 'and') {
+					const parts = (value as readonly Input.Condition[]).map(it => this.optimize(it))
+					return optimizeJunction(key, parts)
+				} else if (key === 'not') {
+					const resolved = this.optimize(value as Input.Condition)
+					return typeof resolved === 'boolean' ? !resolved : { not: resolved }
+				} else {
+					return { [key]: value } as Input.Condition
+				}
+			}),
+		)
 	}
 }

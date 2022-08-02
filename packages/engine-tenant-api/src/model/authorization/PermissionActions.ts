@@ -23,7 +23,7 @@ namespace PermissionActions {
 	export const PERSON_RESET_PASSWORD = Authorizator.createAction(Resources.person, 'resetPassword')
 	export const PERSON_CREATE_IDP_URL = Authorizator.createAction(Resources.person, 'createIdPUrl')
 	export const PERSON_SIGN_IN_IDP = Authorizator.createAction(Resources.person, 'signInIdp')
-	export const PERSON_CREATE_SESSION_KEY = Authorizator.createAction(Resources.person, 'createSessionToken')
+	export const PERSON_CREATE_SESSION_KEY = (roles?: readonly string[]) => Authorizator.createAction(Resources.person, 'createSessionToken', { roles })
 
 	export const PERSON_INVITE = (memberships: readonly Acl.Membership[]) => Authorizator.createAction(Resources.person, 'invite', { memberships })
 	export const PERSON_INVITE_UNMANAGED = (memberships: readonly Acl.Membership[]) => Authorizator.createAction(Resources.person, 'invite_unmanaged', { memberships })

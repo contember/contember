@@ -1,41 +1,41 @@
-export const optimizeOr = <P extends { or?: readonly P[] }>(parts: readonly (P | boolean)[]): P | { or?: P[] } | boolean => {
-	const resultParts: P[] = []
+export const optimizeOr = <P extends { or?: readonly P[] }>(operands: readonly (P | boolean)[]): P | { or?: P[] } | boolean => {
+	const normalized: P[] = []
 
-	for (const part of parts) {
-		if (part === true) {
+	for (const operand of operands) {
+		if (operand === true) {
 			return true
-		} else if (part !== false) {
-			resultParts.push(...Array.isArray(part.or) ? part.or : [part])
+		} else if (operand !== false) {
+			normalized.push(...Array.isArray(operand.or) ? operand.or : [operand])
 		}
 	}
 
-	if (resultParts.length > 1) {
-		return { or: resultParts }
-	} else if (resultParts.length === 1) {
-		return resultParts[0]
+	if (normalized.length > 1) {
+		return { or: normalized }
+	} else if (normalized.length === 1) {
+		return normalized[0]
 	} else {
 		return {}
 	}
 }
 
-export const optimizeAnd = <P extends { and: readonly P[] } | { [key: string]: unknown }>(parts: readonly (P | boolean | undefined)[]): P | { and?: P[] } | boolean => {
-	const resultParts: P[] = []
+export const optimizeAnd = <P extends { and: readonly P[] } | { [key: string]: unknown }>(operands: readonly (P | boolean | undefined)[]): P | { and?: P[] } | boolean => {
+	const normalized: P[] = []
 	let hasAlways = false
 
-	for (const part of parts) {
-		if (part === true) {
+	for (const operand of operands) {
+		if (operand === true) {
 			hasAlways = true
-		} else if (part === false) {
+		} else if (operand === false) {
 			return false
-		} else if (part !== undefined) {
-			resultParts.push(...Array.isArray(part.and) ? part.and : [part])
+		} else if (operand !== undefined) {
+			normalized.push(...Array.isArray(operand.and) ? operand.and : [operand])
 		}
 	}
 
-	if (resultParts.length > 1) {
-		return { and: resultParts }
-	} else if (resultParts.length === 1) {
-		return resultParts[0]
+	if (normalized.length > 1) {
+		return { and: normalized }
+	} else if (normalized.length === 1) {
+		return normalized[0]
 	} else if (hasAlways) {
 		return true
 	} else {
@@ -43,6 +43,6 @@ export const optimizeAnd = <P extends { and: readonly P[] } | { [key: string]: u
 	}
 }
 
-export const optimizeNot = <P extends object>(part: P | boolean): { not: P } | boolean => {
-	return typeof part === 'boolean' ? !part : { not: part }
+export const optimizeNot = <P extends object>(operand: P | boolean): { not: P } | boolean => {
+	return typeof operand === 'boolean' ? !operand : { not: operand }
 }

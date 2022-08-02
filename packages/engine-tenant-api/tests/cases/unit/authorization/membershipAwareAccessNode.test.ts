@@ -1,7 +1,6 @@
 import { test, assert } from 'vitest'
-import { MembershipAwareAccessNode } from '../../../../src/model/authorization/MembershipAwareAccessNode'
 import { testUuid } from '@contember/engine-api-tester'
-import { PermissionActions } from '../../../../src'
+import { AclSchemaAccessNodeFactory, PermissionActions } from '../../../../src'
 import { Acl } from '@contember/schema'
 
 const siteIdA = testUuid(666)
@@ -33,12 +32,12 @@ const editorOfSiteB = [
 const aclEvaluator = { evaluate: () => Promise.reject() }
 
 test('admin can assign editor role with matching variable', async () => {
-	const node = new MembershipAwareAccessNode(adminOfSiteA, aclSchemaAdminCanManageEditorWithMatchingVariables)
+	const node = new AclSchemaAccessNodeFactory().create(aclSchemaAdminCanManageEditorWithMatchingVariables, adminOfSiteA)
 
 	assert.ok(await node.isAllowed(aclEvaluator, PermissionActions.PROJECT_ADD_MEMBER(editorOfSiteA)))
 })
 
 test('admin cannot assign editor role with different variable', async () => {
-	const node = new MembershipAwareAccessNode(adminOfSiteA, aclSchemaAdminCanManageEditorWithMatchingVariables)
+	const node = new AclSchemaAccessNodeFactory().create(aclSchemaAdminCanManageEditorWithMatchingVariables, adminOfSiteA)
 	assert.notOk(await node.isAllowed(aclEvaluator, PermissionActions.PROJECT_ADD_MEMBER(editorOfSiteB)))
 })

@@ -1,12 +1,12 @@
 import { Project, ProjectSchemaResolver } from '../type'
-import { AclSchemaEvaluatorFactory } from './AclSchemaEvaluatorFactory'
+import { AclSchemaAccessNodeFactory } from './AclSchemaAccessNodeFactory'
 import { AuthorizationScope } from '@contember/authorization'
 import { ProjectScope } from './ProjectScope'
 import { Identity } from './Identity'
 
 export class ProjectScopeFactory {
 	constructor(
-		private readonly aclSchemaEvaluatorFactory: AclSchemaEvaluatorFactory,
+		private readonly schemaAccessNodeFactory: AclSchemaAccessNodeFactory,
 	) {}
 
 	async create(schemaResolver: ProjectSchemaResolver, project: Pick<Project, 'slug'>): Promise<AuthorizationScope<Identity> | null> {
@@ -14,6 +14,6 @@ export class ProjectScopeFactory {
 		if (!schema) {
 			return null
 		}
-		return new ProjectScope(project, schema.acl, this.aclSchemaEvaluatorFactory)
+		return new ProjectScope(project, schema.acl, this.schemaAccessNodeFactory)
 	}
 }

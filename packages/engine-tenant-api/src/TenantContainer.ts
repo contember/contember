@@ -2,7 +2,7 @@ import { AccessEvaluator, Authorizator } from '@contember/authorization'
 import { Connection, DatabaseConfig } from '@contember/database'
 import { Builder } from '@contember/dic'
 import {
-	AclSchemaEvaluatorFactory,
+	AclSchemaAccessNodeFactory,
 	ApiKeyManager,
 	ApiKeyService,
 	DatabaseContext,
@@ -146,7 +146,7 @@ export class TenantContainerFactory {
 			.addService('identityFactory', ({ projectMemberManager }) =>
 				new IdentityFactory(projectMemberManager))
 			.addService('projectScopeFactory', () =>
-				new ProjectScopeFactory(new AclSchemaEvaluatorFactory()))
+				new ProjectScopeFactory(new AclSchemaAccessNodeFactory()))
 			.addService('permissionContextFactory', ({ authorizator, identityFactory, projectScopeFactory, projectSchemaResolver }) =>
 				new PermissionContextFactory(authorizator, identityFactory, projectScopeFactory, projectSchemaResolver))
 			.addService('secretManager', ({ providers }) =>

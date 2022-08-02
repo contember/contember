@@ -1,4 +1,4 @@
-export * from './AclSchemaEvaluatorFactory'
+export * from './AclSchemaAccessNodeFactory'
 export * from './Identity'
 export * from './IdentityFactory'
 export * from './IdentityScope'

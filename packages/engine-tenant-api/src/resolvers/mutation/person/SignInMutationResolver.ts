@@ -6,9 +6,10 @@ import {
 	SignInResponse,
 } from '../../../schema'
 import { TenantResolverContext } from '../../TenantResolverContext'
-import { PermissionActions, SignInManager } from '../../../model'
+import { PermissionActions, PersonUniqueIdentifier, SignInManager } from '../../../model'
 import { createErrorResponse } from '../../errorUtils'
 import { SignInResponseFactory } from '../../responseHelpers/SignInResponseFactory'
+import { UserInputError } from '@contember/graphql-utils'
 
 export class SignInMutationResolver implements MutationResolvers {
 	constructor(
@@ -45,10 +46,18 @@ export class SignInMutationResolver implements MutationResolvers {
 			action: PermissionActions.PERSON_CREATE_SESSION_KEY,
 			message: 'You are not allowed to create a session key',
 		})
+		let identifier: PersonUniqueIdentifier
+		if (args.email) {
+			identifier = { type: 'email', email: args.email }
+		} else if (args.personId) {
+			identifier = { type: 'id', id: args.personId }
+		} else {
+			throw new UserInputError(`Please provide either email or personId`)
+		}
 
 		const response = await this.signInManager.createSessionToken(
 			context.db,
-			args.email,
+			identifier,
 			args.expiration || undefined,
 		)
 

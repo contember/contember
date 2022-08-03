@@ -1,10 +1,10 @@
 import { Input } from '@contember/schema'
 import { optimizeAnd, optimizeNot, optimizeOr } from './helpers'
 
-type ObjectEntry<T> = { [K in keyof Required<T>]: [K, T[K]] }[keyof Required<T>]
+type ObjectEntry<T> = { [K in keyof Required<T>]: [K, T[K]] }[keyof T]
 
 export class ConditionOptimizer {
-	public optimize(condition: Input.Condition): Input.Condition | boolean {
+	public optimize(condition: Input.Condition): Omit<Input.Condition, 'always' | 'never'> | boolean {
 		if (condition.never) {
 			return false
 		}

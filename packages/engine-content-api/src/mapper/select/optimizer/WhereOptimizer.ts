@@ -12,9 +12,11 @@ export class WhereOptimizer {
 
 	public optimize(where: Input.OptionalWhere, entity: Model.Entity): Input.Where {
 		const result = this.optimizeWhere(where, entity)
+
 		if (typeof result === 'boolean') {
 			return { [entity.primary]: { [result ? 'always' : 'never']: true } }
 		}
+
 		return result
 	}
 

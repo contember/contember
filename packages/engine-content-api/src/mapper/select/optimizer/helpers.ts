@@ -1,4 +1,4 @@
-export const optimizeOr = <P extends { or?: readonly P[] }>(operands: readonly (P | boolean)[]): P | { or?: P[] } | boolean => {
+export const optimizeOr = <P extends Record<string, unknown>>(operands: readonly (P | boolean)[]): P | { or?: P[] } | boolean => {
 	const normalized: P[] = []
 
 	for (const operand of operands) {
@@ -18,7 +18,7 @@ export const optimizeOr = <P extends { or?: readonly P[] }>(operands: readonly (
 	}
 }
 
-export const optimizeAnd = <P extends { and: readonly P[] } | { [key: string]: unknown }>(operands: readonly (P | boolean | undefined)[]): P | { and?: P[] } | boolean => {
+export const optimizeAnd = <P extends Record<string, unknown>>(operands: readonly (P | boolean | undefined)[]): P | { and?: P[] } | boolean => {
 	const normalized: P[] = []
 	let hasAlways = false
 

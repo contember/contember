@@ -25,7 +25,7 @@ test('Complex condition', async () => {
 			{
 				sql: SQL`select "root_"."id" as "root_id"
 from "public"."post" as "root_"
-where (("root_"."title" = ? or "root_"."title" = ?)
+where ("root_"."title" = ? or "root_"."title" = ?
       or not("root_"."title" < ?)
       or "root_"."title" is null and not("root_"."title" is null))`,
 				parameters: ['A', 'B', 'X'],

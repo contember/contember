@@ -1,44 +1,54 @@
-export const optimizeOr = <P>(parts: readonly (P | boolean)[]): P | boolean => {
-	const resultParts: P[] = []
+export const optimizeOr = <P extends Record<string, unknown>>(operands: readonly (P | boolean)[]): P | { or?: P[] } | boolean => {
+	const normalized: P[] = []
 
-	for (const part of parts) {
-		if (part === true) {
+	for (const operand of operands) {
+		if (operand === true) {
 			return true
-		} else if (part !== false) {
-			resultParts.push(part)
+		} else if (operand !== false) {
+			normalized.push(...Array.isArray(operand.or) ? operand.or : [operand])
 		}
 	}
 
-	if (resultParts.length === 1) {
-		return resultParts[0]
-	} else if (resultParts.length > 0) {
-		return { or: resultParts } as unknown as P
+	if (normalized.length > 1) {
+		return { or: normalized }
+	} else if (normalized.length === 1) {
+		return normalized[0]
 	} else {
-		return {} as unknown as P
+		return {}
 	}
 }
 
-export const optimizeAnd = <P>(parts: readonly (P | boolean | undefined)[]): P | boolean => {
-	const resultParts: P[] = []
+export const optimizeAnd = <P extends Record<string, unknown>>(operands: readonly (P | boolean | undefined)[]): P | { and?: P[] } | boolean => {
+	const normalized: P[] = []
 	let hasAlways = false
 
-	for (const part of parts) {
-		if (part === true) {
+	for (const operand of operands) {
+		if (operand === true) {
 			hasAlways = true
-		} else if (part === false) {
+		} else if (operand === false) {
 			return false
-		} else if (part !== undefined) {
-			resultParts.push(part)
+		} else if (operand !== undefined) {
+			normalized.push(...Array.isArray(operand.and) ? operand.and : [operand])
 		}
 	}
 
-	if (resultParts.length === 1) {
-		return resultParts[0]
-	} else if (resultParts.length > 0) {
-		return { and: resultParts } as unknown as P
+	if (normalized.length > 1) {
+		return { and: normalized }
+	} else if (normalized.length === 1) {
+		return normalized[0]
 	} else if (hasAlways) {
 		return true
 	} else {
-		return {} as unknown as P
+		return {}
+	}
+}
+
+export const optimizeNot = <P extends Record<string, unknown>>(operand: P | boolean): P['not'] | { not: P } | boolean => {
+	if (typeof operand === 'boolean') {
+		return !operand
+	} else if (operand.not) {
+		return operand.not as P['not']
+	} else {
+		return { not: operand }
 	}
 }

@@ -1,6 +1,6 @@
 import { QueryAstFactory } from './QueryAstFactory'
 import { Mapper } from '../mapper'
-import { Dependencies, DependencyCollector } from './dependencies'
+import { Dependencies } from './dependencies'
 import { Input, Model, Value } from '@contember/schema'
 
 export class ValidationDataSelector {
@@ -20,7 +20,7 @@ export class ValidationDataSelector {
 			return {}
 		}
 		const queryAst = this.queryAstFactory.create(entity.name, dependencies).withArg('by', where)
-		const node = await mapper.selectUnique(entity, queryAst)
+		const node = await mapper.selectUnique(entity, queryAst, null)
 		if (!node) {
 			return null
 		}

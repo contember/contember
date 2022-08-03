@@ -15,7 +15,7 @@ export const paginate = async (
 	const totalCount = paginationHelper.requiresTotalCount
 		? await mapper.count(entity, queryAst.args.filter || {})
 		: undefined
-	const nodes = paginationHelper.nodeField ? await mapper.select(entity, paginationHelper.nodeField) : undefined
+	const nodes = paginationHelper.nodeField ? await mapper.select(entity, paginationHelper.nodeField, null) : undefined
 
 	return paginationHelper.createResponse(totalCount, nodes)
 }
@@ -37,9 +37,9 @@ export const executeReadOperations = async (
 		trxResult[field.alias] = await (() => {
 			switch (meta.operation) {
 				case Operation.get:
-					return mapper.selectUnique(meta.entity, field)
+					return mapper.selectUnique(meta.entity, field, null)
 				case Operation.list:
-					return mapper.select(meta.entity, field)
+					return mapper.select(meta.entity, field, null)
 				case Operation.paginate:
 					return paginate(mapper, meta.entity, field)
 				case Operation.create:

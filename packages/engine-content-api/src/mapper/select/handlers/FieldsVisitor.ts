@@ -4,7 +4,6 @@ import { RelationFetcher } from '../RelationFetcher'
 import { SelectExecutionHandlerContext } from '../SelectExecutionHandler'
 import { PredicateFactory } from '../../../acl'
 import { WhereBuilder } from '../WhereBuilder'
-import { JoiningColumns } from '../../types'
 
 export class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.ColumnVisitor<void> {
 	constructor(
@@ -56,11 +55,6 @@ export class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.C
 		targetEntity: Model.Entity,
 		targetRelation: Model.ManyHasManyOwningRelation,
 	): void {
-		const joiningTable = targetRelation.joiningTable
-		const columns: JoiningColumns = {
-			sourceColumn: joiningTable.inverseJoiningColumn,
-			targetColumn: joiningTable.joiningColumn,
-		}
 		const field = this.executionContext.objectNode
 		if (!field) {
 			throw new Error()
@@ -69,13 +63,15 @@ export class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.C
 			entity.primary,
 			async ids =>
 				this.relationFetcher.fetchManyHasManyGroups(
-					this.mapper,
-					field,
-					targetEntity,
-					relation,
-					targetRelation,
-					columns,
-					ids,
+					{
+						mapper: this.mapper,
+						field: field,
+						targetEntity: targetEntity,
+						sourceRelation: relation,
+						targetRelation,
+						directionFrom: 'inverse',
+						ids: ids,
+					},
 				),
 			[],
 		)
@@ -85,12 +81,8 @@ export class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.C
 		entity: Model.Entity,
 		relation: Model.ManyHasManyOwningRelation,
 		targetEntity: Model.Entity,
+		targetRelation: Model.ManyHasManyInverseRelation | null,
 	): void {
-		const joiningTable = relation.joiningTable
-		const columns: JoiningColumns = {
-			sourceColumn: joiningTable.joiningColumn,
-			targetColumn: joiningTable.inverseJoiningColumn,
-		}
 		const field = this.executionContext.objectNode
 		if (!field) {
 			throw new Error()
@@ -99,7 +91,15 @@ export class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.C
 		this.executionContext.addData(
 			entity.primary,
 			async ids =>
-				this.relationFetcher.fetchManyHasManyGroups(this.mapper, field, targetEntity, relation, relation, columns, ids),
+				this.relationFetcher.fetchManyHasManyGroups({
+					mapper: this.mapper,
+					field: field,
+					targetEntity: targetEntity,
+					sourceRelation: relation,
+					targetRelation,
+					directionFrom: 'owning',
+					ids: ids,
+				}),
 			[],
 		)
 	}
@@ -118,7 +118,14 @@ export class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.C
 		this.executionContext.addData(
 			entity.primary,
 			async ids =>
-				this.relationFetcher.fetchOneHasManyGroups(this.mapper, field, targetEntity, relation, targetRelation, ids),
+				this.relationFetcher.fetchOneHasManyGroups({
+					mapper: this.mapper,
+					objectNode: field,
+					targetEntity: targetEntity,
+					relation: relation,
+					targetRelation: targetRelation,
+					ids: ids,
+				}),
 			[],
 		)
 	}
@@ -148,7 +155,7 @@ export class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.C
 				}
 				const objectWithWhere = field.withArg('filter', where)
 
-				return this.mapper.select(targetEntity, objectWithWhere, targetRelation.name)
+				return this.mapper.select(targetEntity, objectWithWhere, targetRelation, targetRelation.name)
 			},
 			null,
 		)
@@ -177,13 +184,13 @@ export class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.C
 				}
 				const objectWithWhere = objectNode.withArg('filter', where)
 
-				return this.mapper.select(targetEntity, objectWithWhere, targetEntity.primary)
+				return this.mapper.select(targetEntity, objectWithWhere, targetRelation, targetEntity.primary)
 			},
 			null,
 		)
 	}
 
-	public visitManyHasOne(entity: Model.Entity, relation: Model.ManyHasOneRelation, targetEntity: Model.Entity): void {
+	public visitManyHasOne(entity: Model.Entity, relation: Model.ManyHasOneRelation, targetEntity: Model.Entity, targetRelation: Model.OneHasManyRelation | null): void {
 		this.executionContext.addData(
 			relation.name,
 			async ids => {
@@ -201,7 +208,7 @@ export class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.C
 				}
 				const objectWithWhere = objectNode.withArg('filter', where)
 
-				return this.mapper.select(targetEntity, objectWithWhere, targetEntity.primary)
+				return this.mapper.select(targetEntity, objectWithWhere, targetRelation, targetEntity.primary)
 			},
 			null,
 		)

@@ -5,6 +5,7 @@ import { Path, PathFactory } from './Path'
 import { JoinBuilder } from './JoinBuilder'
 import { ConditionBuilder } from './ConditionBuilder'
 import { ConditionBuilder as SqlConditionBuilder, Operator, QueryBuilder, SelectBuilder } from '@contember/database'
+import { WhereOptimizer } from './optimizer/WhereOptimizer'
 
 export class WhereBuilder {
 	constructor(
@@ -12,6 +13,7 @@ export class WhereBuilder {
 		private readonly joinBuilder: JoinBuilder,
 		private readonly conditionBuilder: ConditionBuilder,
 		private readonly pathFactory: PathFactory,
+		private readonly whereOptimizer: WhereOptimizer,
 	) {}
 
 	public build(
@@ -31,9 +33,10 @@ export class WhereBuilder {
 		callback: (clauseCb: (clause: SqlConditionBuilder) => SqlConditionBuilder) => SelectBuilder<SelectBuilder.Result>,
 		allowManyJoin: boolean = false,
 	) {
+		const optimizedWhere = this.whereOptimizer.optimize(where, entity)
 		const joinList: WhereJoinDefinition[] = []
 
-		const qbWithWhere = callback(clause => this.buildInternal(clause, entity, path, where, allowManyJoin, joinList))
+		const qbWithWhere = callback(clause => this.buildInternal(clause, entity, path, optimizedWhere, allowManyJoin, joinList))
 		return joinList.reduce<SelectBuilder<SelectBuilder.Result>>(
 			(qb, { path, entity, relationName }) => this.joinBuilder.join(qb, path, entity, relationName),
 			qbWithWhere,
@@ -44,7 +47,7 @@ export class WhereBuilder {
 		conditionBuilder: SqlConditionBuilder,
 		entity: Model.Entity,
 		path: Path,
-		where: Input.OptionalWhere,
+		where: Input.Where,
 		allowManyJoin: boolean,
 		joinList: WhereJoinDefinition[],
 	): SqlConditionBuilder {

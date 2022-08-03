@@ -101,6 +101,12 @@ describe('condition optimizer', () => {
 		}), { or: [{ eq: 1 }, { eq: 2 }, { eq: 3 }, { eq: 4 }] })
 	})
 
+	it('flattens NOT', () => {
+		assert.deepStrictEqual(optimizer.optimize({
+			not: { not: { not: { eq: 1 } } },
+		}), { not: { eq: 1 } })
+	})
+
 	it('combine AND and OR', () => {
 		assert.deepStrictEqual(optimizer.optimize({
 			or: [

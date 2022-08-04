@@ -9,11 +9,10 @@ export class ProjectMembershipFetcher {
 	}
 
 	public async fetchMemberships(projectSlug: string, identity: { id: string; roles?: readonly string[] }): Promise<readonly Acl.Membership[]> {
-		return await this.projectMemberManager.getProjectMemberships(
+		return await this.projectMemberManager.getEffectiveProjectMemberships(
 			this.databaseContext,
 			{ slug: projectSlug },
 			identity,
-			undefined,
 		)
 	}
 }

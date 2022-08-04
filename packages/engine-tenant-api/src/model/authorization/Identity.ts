@@ -30,6 +30,6 @@ export class ProjectAwareIdentity implements Identity {
 	) {}
 
 	async getProjectMemberships(projectSlug: string): Promise<readonly Acl.Membership[]> {
-		return await this.memberManager.getProjectMemberships(this.dbContext, { slug: projectSlug }, this, undefined)
+		return await this.memberManager.getEffectiveProjectMemberships(this.dbContext, { slug: projectSlug }, this)
 	}
 }

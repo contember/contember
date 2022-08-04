@@ -71,7 +71,7 @@ export class IdentityTypeResolver implements IdentityResolvers {
 					const verifier = isSelf
 						? undefined
 						: context.permissionContext.createAccessVerifier(await context.permissionContext.createProjectScope(it))
-					const memberships = await this.projectMemberManager.getProjectMemberships(
+					const memberships = await this.projectMemberManager.getAllProjectMemberships(
 						context.db,
 						{ id: it.id },
 						{ id: parent.id, roles },

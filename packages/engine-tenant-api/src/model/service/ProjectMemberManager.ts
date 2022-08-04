@@ -7,7 +7,7 @@ import {
 	UpdateProjectMemberCommand,
 	UpdateProjectMemberResponse,
 } from '../commands'
-import { ProjectMembershipByIdentityQuery, ProjectMembersQuery, ProjectRolesByIdentityQuery } from '../queries'
+import { ProjectMembershipByIdentityQuery, ProjectMembersQuery } from '../queries'
 import { AddProjectMemberErrorCode, MemberType } from '../../schema'
 import { AccessVerifier, PermissionActions, TenantRole } from '../authorization'
 import { indexListBy, notEmpty } from '../../utils/array'
@@ -17,19 +17,6 @@ import { Response, ResponseError, ResponseOk } from '../utils/Response'
 import { DatabaseContext } from '../utils'
 
 export class ProjectMemberManager {
-
-	async getProjectRoles(dbContext: DatabaseContext, projectId: string, identityId: string): Promise<GetProjectRolesResponse> {
-		const row = await dbContext.queryHandler.fetch(new ProjectRolesByIdentityQuery({ id: projectId }, identityId))
-		return new GetProjectRolesResponse(row.roles)
-	}
-
-	async getProjectBySlugRoles(dbContext: DatabaseContext, projectSlug: string, identityId: string): Promise<GetProjectRolesResponse> {
-		const row = await dbContext.queryHandler.fetch(
-			new ProjectRolesByIdentityQuery({ slug: projectSlug }, identityId),
-		)
-		return new GetProjectRolesResponse(row.roles)
-	}
-
 	async addProjectMember(
 		dbContext: DatabaseContext,
 		projectId: string,
@@ -71,15 +58,36 @@ export class ProjectMemberManager {
 		)
 	}
 
-	async getProjectMemberships(
+	async getAllProjectMemberships(
 		dbContext: DatabaseContext,
 		project: { id: string } | { slug: string },
 		identity: { id: string; roles?: readonly string[] },
 		verifier: AccessVerifier | undefined,
 	): Promise<readonly Acl.Membership[]> {
-		if (identity.roles?.includes(TenantRole.SUPER_ADMIN) || identity.roles?.includes(TenantRole.PROJECT_ADMIN)) {
-			return [{ role: ProjectRole.ADMIN, variables: [] }]
+		return [
+			...this.getImplicitProjectMemberships(identity),
+			...await this.getStoredProjectsMemberships(dbContext, project, identity, verifier),
+		]
+	}
+
+	async getEffectiveProjectMemberships(
+		dbContext: DatabaseContext,
+		project: { id: string } | { slug: string },
+		identity: { id: string; roles?: readonly string[] },
+	): Promise<readonly Acl.Membership[]> {
+		const implicit = this.getImplicitProjectMemberships(identity)
+		if (implicit.length > 0) {
+			return implicit
 		}
+		return await this.getStoredProjectsMemberships(dbContext, project, identity, undefined)
+	}
+
+	async getStoredProjectsMemberships(
+		dbContext: DatabaseContext,
+		project: { id: string } | { slug: string },
+		identity: { id: string },
+		verifier: AccessVerifier | undefined,
+	): Promise<readonly Acl.Membership[]> {
 		const memberships = await dbContext.queryHandler.fetch(
 			new ProjectMembershipByIdentityQuery(project, [identity.id]),
 		)
@@ -88,6 +96,14 @@ export class ProjectMemberManager {
 		}
 		return await this.filterMemberships(memberships, verifier)
 	}
+
+	private getImplicitProjectMemberships(identity: { id: string; roles?: readonly string[] }): readonly Acl.Membership[] {
+		if (identity.roles?.includes(TenantRole.SUPER_ADMIN) || identity.roles?.includes(TenantRole.PROJECT_ADMIN)) {
+			return [{ role: ProjectRole.ADMIN, variables: [] }]
+		}
+		return []
+	}
+
 
 	async getProjectMembers(dbContext: DatabaseContext, projectId: string, accessVerifier: AccessVerifier, memberType?: MemberType): Promise<GetProjectMembersResponse> {
 		return dbContext.transaction(async db => {
@@ -158,10 +174,6 @@ export class ProjectMemberManager {
 }
 
 export type AddProjectMemberResponse = Response<null, AddProjectMemberErrorCode>
-
-export class GetProjectRolesResponse {
-	constructor(public readonly roles: string[]) {}
-}
 
 export type GetProjectMembersResponse = {
 	identity: { id: string }

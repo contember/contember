@@ -278,3 +278,17 @@
 			border-top-left-radius: 0
 			border-top-right-radius: 0
 			border-top: none
+
+// Fix: tailwind reset background color
+button.#{$cui-conf-globalPrefix}button, [type='button'].#{$cui-conf-globalPrefix}button
+	background: var(--cui-button-background-color)
+
+	&:focus
+		background: var(--cui-button-background-color--highlighted)
+
+	// Duplicate of focus rules to overcome Safaru bug ignoring :hover when selectors are combined
+	&:hover
+		background: var(--cui-button-background-color--highlighted)
+
+	&:active, &.is-active
+		background: var(--cui-button-background-color--pressed)

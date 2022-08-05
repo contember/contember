@@ -1,24 +1,35 @@
 import { Acl, Input, Model } from '@contember/schema'
 import { assertNever } from '../../utils'
-import { acceptEveryFieldVisitor } from '@contember/schema-utils'
-import { Client, DeleteBuilder, ForeignKeyViolationError, SelectBuilder } from '@contember/database'
+import { Client, DeleteBuilder, Literal, SelectBuilder } from '@contember/database'
 import { PathFactory, WhereBuilder } from '../select'
 import { PredicateFactory } from '../../acl'
 import { UpdateBuilderFactory } from '../update'
 import {
+	ConstraintType,
+	MutationConstraintViolationError,
 	MutationDeleteOk,
 	MutationEntryNotFoundError,
 	MutationNoResultError,
 	MutationNothingToDo,
-	MutationResultHint,
 	MutationResultList,
+	MutationUpdateOk,
 	NothingToDoReason,
 } from '../Result'
 import { Mapper } from '../Mapper'
 import { CheckedPrimary } from '../CheckedPrimary'
+import { DeleteState } from './DeleteState'
+import {
+	EntityReferenceRow,
+	findOwningRelations,
+	findRelationsWithOrphanRemoval,
+	formatConstraintViolationMessage,
+	OneHasOneOwningRelationTuple,
+} from './helpers'
+import { getEntity } from '@contember/schema-utils'
 
-type EntityOwningRelationTuple = [Model.Entity, Model.ManyHasOneRelation | Model.OneHasOneOwningRelation]
-type OneHasOneOwningRelationTuple = [Model.Entity, Model.OneHasOneOwningRelation]
+type DeleteQueue = [entity: Model.Entity, ids: Input.PrimaryValue[]][]
+
+type DeleteInfoRow = { allowed: boolean; id: Input.PrimaryValue } & { [K in `_${string}`]: Input.PrimaryValue }
 
 export class DeleteExecutor {
 	constructor(
@@ -27,7 +38,8 @@ export class DeleteExecutor {
 		private readonly whereBuilder: WhereBuilder,
 		private readonly updateBuilderFactory: UpdateBuilderFactory,
 		private readonly pathFactory: PathFactory,
-	) {}
+	) {
+	}
 
 	public async execute(
 		mapper: Mapper,
@@ -36,129 +48,243 @@ export class DeleteExecutor {
 		filter?: Input.OptionalWhere,
 	): Promise<MutationResultList> {
 		return mapper.mutex.execute(async () => {
-			await mapper.constraintHelper.setFkConstraintsDeferred()
 			const primaryValue = await mapper.getPrimaryValue(entity, by)
 			if (!primaryValue) {
 				return [new MutationEntryNotFoundError([], by as Input.UniqueWhere)]
 			}
+
 			if (mapper.deletedEntities.isDeleted(entity.name, primaryValue)) {
 				return [new MutationNothingToDo([], NothingToDoReason.alreadyDeleted)]
 			}
+
 			const primaryWhere = { [entity.primary]: { eq: primaryValue } }
-			const result = await this.delete(mapper, entity, filter ? { and: [primaryWhere, filter] } : primaryWhere)
-			if (result.length === 0) {
-				return [new MutationNoResultError([])]
+			const where = filter ? { and: [primaryWhere, filter] } : primaryWhere
+			const state = new DeleteState(mapper.deletedEntities)
+			const deletePrimary = await this.collectDeleteInfo(state, mapper, entity, where)
+
+			const deleteQueue: DeleteQueue = [[entity, deletePrimary]]
+			await this.collectOrphanRemovals(state, mapper, deleteQueue)
+			if (!state.isOk()) {
+				return state.getResult()
 			}
+			await this.executeDeletes(deleteQueue, mapper.db)
+			state.confirmDeleted()
 
-			await mapper.constraintHelper.setFkConstraintsImmediate()
-			return [new MutationDeleteOk([], entity, primaryValue)]
+			return state.getResult()
 		})
 	}
 
-	private async delete(mapper: Mapper, entity: Model.Entity, where: Input.OptionalWhere): Promise<string[]> {
-		const db = mapper.db
+	private async executeDeletes(deleteQueue: DeleteQueue, db: Client): Promise<void> {
+		for (const [entity, ids] of deleteQueue) {
+			if (ids.length === 0) {
+				continue
+			}
+			await DeleteBuilder.create()
+				.from(entity.tableName)
+				.where(expr => expr.in(entity.primaryColumn, ids))
+				.execute(db)
+		}
+	}
+
+	private async collectDeleteInfo(
+		state: DeleteState,
+		mapper: Mapper,
+		entity: Model.Entity,
+		where: Input.OptionalWhere,
+	): Promise<Input.PrimaryValue[]> {
 		const predicate = this.predicateFactory.createDeletePredicate(entity)
-		const inQb = SelectBuilder.create() //
+		const orphanRemovals = findRelationsWithOrphanRemoval(this.schema, entity)
+
+		const qb = SelectBuilder.create<DeleteInfoRow>()
 			.from(entity.tableName, 'root_')
-			.select(['root_', entity.primaryColumn])
-		const inQbWithWhere = this.whereBuilder.build(inQb, entity, this.pathFactory.create([]), {
-			and: [where, predicate],
-		})
-		const orphanRemovals = this.findRelationsWithOrphanRemoval(entity)
-		const orphanColumns = orphanRemovals.map(([, rel]) => rel.joiningColumn.columnName)
-		const qb = DeleteBuilder.create()
-			.from(entity.tableName)
-			.where(condition => condition.in(entity.primaryColumn, inQbWithWhere))
-			.returning(entity.primaryColumn, ...orphanColumns)
-		const result = await qb.execute(db)
-		const ids = result.map(it => it[entity.primaryColumn]) as string[]
-		for (const id of ids) {
-			mapper.deletedEntities.markDeleted(entity.name, id)
-		}
-		await this.executeOnDelete(mapper, entity, ids)
+			.select(['root_', entity.primaryColumn], 'id')
 
-		for (const [entity, relation] of orphanRemovals) {
-			const ids = result.map(it => it[relation.joiningColumn.columnName]).filter(it => it !== null)
-			const where: Input.Where = { [entity.primary]: { in: ids } }
-			await this.delete(mapper, entity, where)
+		const qbWithOrphanColumns = this.qbOrphanColumns(qb, orphanRemovals)
+		const qbWithAllowedFlag = this.qbWithAllowed(entity, predicate, qbWithOrphanColumns)
+		const qbWithWhere = this.whereBuilder.build(qbWithAllowedFlag, entity, this.pathFactory.create([]), where)
+
+		const fullResult = await qbWithWhere.getResult(mapper.db)
+
+		if (fullResult.length === 0) {
+			state.pushFailResult(new MutationNoResultError([]))
+			return []
 		}
 
-		return ids as string[]
+		const result = this.filterPlannedForDelete(state, entity, fullResult)
+
+		const disallowed: Input.PrimaryValue[] = result.filter(it => !it.allowed).map(it => it.id)
+		if (disallowed.length) {
+			state.pushFailResult(new MutationEntryNotFoundError([], { [entity.primary]: { in: disallowed } }))
+			return []
+		}
+
+		return await this.processDeleteResult(state, mapper, entity, result, orphanRemovals)
 	}
 
-	private async executeOnDelete(mapper: Mapper, entity: Model.Entity, values: Input.PrimaryValue[]): Promise<void> {
+
+	private async collectOnDeleteInfo(state: DeleteState, mapper: Mapper, entity: Model.Entity, values: Input.PrimaryValue[]): Promise<void> {
 		if (values.length === 0) {
 			return
 		}
-		const owningRelations = this.findOwningRelations(entity)
+		const owningRelations = findOwningRelations(this.schema, entity)
 		for (const [owningEntity, relation] of owningRelations) {
-			const relationWhere: Input.Where = { [relation.name]: { [entity.primary]: { in: values } } }
-			switch (relation.joiningColumn.onDelete) {
-				case Model.OnDelete.restrict:
-					break
-				case Model.OnDelete.cascade:
-					await this.delete(mapper, owningEntity, relationWhere)
-					break
-				case Model.OnDelete.setNull:
-					await this.setNull(mapper.db, owningEntity, relation, relationWhere)
-					break
-				default:
-					assertNever(relation.joiningColumn.onDelete)
+			if (relation.joiningColumn.onDelete === Model.OnDelete.restrict) {
+				await this.collectRestrictResult(state, mapper, owningEntity, relation, values)
+			} else if (relation.joiningColumn.onDelete === Model.OnDelete.cascade) {
+				await this.collectCascadeResult(state, mapper, owningEntity, relation, values)
+			} else if (relation.joiningColumn.onDelete === Model.OnDelete.setNull) {
+				await this.collectSetNullResult(state, mapper, owningEntity, relation, values)
+			} else {
+				assertNever(relation.joiningColumn.onDelete)
 			}
 		}
 	}
 
-	private async setNull(
-		db: Client,
+	private async collectCascadeResult(
+		state: DeleteState,
+		mapper: Mapper,
 		entity: Model.Entity,
-		relation: Model.Relation & Model.JoiningColumnRelation,
-		where: Input.Where,
+		relation: Model.ManyHasOneRelation | Model.OneHasOneOwningRelation,
+		values: Input.PrimaryValue[],
 	): Promise<void> {
-		const updateBuilder = this.updateBuilderFactory.create(entity, where)
-		const predicateWhere = this.predicateFactory.create(entity, Acl.Operation.update, [relation.name])
-		updateBuilder.addOldWhere(predicateWhere)
-		updateBuilder.addNewWhere(predicateWhere)
-		updateBuilder.addFieldValue(relation.name, null)
-		await updateBuilder.execute(db)
+		const predicate = this.predicateFactory.createDeletePredicate(entity)
+		const orphanRemovals = findRelationsWithOrphanRemoval(this.schema, entity)
+
+		const qb = this.createFetchByIdQueryBuilder(entity, relation, values)
+		const qbWithOrphanColumns = this.qbOrphanColumns(qb, orphanRemovals)
+		const qbWithAllowed = this.qbWithAllowed(entity, predicate, qbWithOrphanColumns)
+
+		const result = this.filterPlannedForDelete(state, entity, await qbWithAllowed.getResult(mapper.db))
+
+		const disallowed = result.filter(it => !it.allowed)
+
+		if (disallowed.length > 0) {
+			const message = formatConstraintViolationMessage(disallowed, entity, relation)
+				+ ' OnDelete behaviour of this relation is set to "cascade". This is possibly caused by ACL denial.'
+
+			state.pushFailResult(new MutationConstraintViolationError([], ConstraintType.foreignKey, message))
+			return
+		}
+
+		this.processDeleteResult(state, mapper, entity, result, orphanRemovals)
 	}
 
-	private findOwningRelations(entity: Model.Entity): EntityOwningRelationTuple[] {
-		return Object.values(this.schema.entities)
-			.map(entity =>
-				acceptEveryFieldVisitor<null | EntityOwningRelationTuple>(this.schema, entity, {
-					visitColumn: () => null,
-					visitManyHasManyInverse: () => null,
-					visitManyHasManyOwning: () => null,
-					visitOneHasOneInverse: () => null,
-					visitOneHasMany: () => null,
-					visitOneHasOneOwning: ({ relation }): EntityOwningRelationTuple => [entity, relation],
-					visitManyHasOne: ({ relation }): EntityOwningRelationTuple => [entity, relation],
-				}),
-			)
-			.reduce<EntityOwningRelationTuple[]>(
-				(acc, value) => [
-					...acc,
-					...Object.values(value).filter<EntityOwningRelationTuple>(
-						(it): it is EntityOwningRelationTuple => it !== null,
-					),
-				],
-				[],
-			)
-			.filter(([{}, relation]) => relation.target === entity.name)
+
+	private async collectSetNullResult(
+		state: DeleteState,
+		mapper: Mapper,
+		entity: Model.Entity,
+		relation: Model.ManyHasOneRelation | Model.OneHasOneOwningRelation,
+		values: Input.PrimaryValue[],
+	): Promise<void> {
+		const predicate = this.predicateFactory.create(entity, Acl.Operation.update, [relation.name])
+
+		const qb = this.createFetchByIdQueryBuilder(entity, relation, values)
+		const qbWithAllowed = this.qbWithAllowed(entity, predicate, qb)
+
+		const result = this.filterPlannedForDelete(state, entity, await qbWithAllowed.getResult(mapper.db))
+
+		const disallowed = result.filter(it => !it.allowed)
+
+		if (disallowed.length === 0) {
+			const input = { [relation.name]: { disconnect: true } }
+			const values = { [relation.joiningColumn.columnName]: null }
+
+			state.pushOkResult(result.map(it => it.id).map(id => new MutationUpdateOk([], entity, id, input, values)))
+			return
+		}
+
+		const message = formatConstraintViolationMessage(disallowed, entity, relation)
+			+ ' OnDelete behaviour of this relation is set to "set null". This is possibly caused by ACL denial.'
+		state.pushFailResult(new MutationConstraintViolationError([], ConstraintType.foreignKey, message))
 	}
 
-	private findRelationsWithOrphanRemoval(entity: Model.Entity): OneHasOneOwningRelationTuple[] {
-		return Object.values(
-			acceptEveryFieldVisitor<OneHasOneOwningRelationTuple | null>(this.schema, entity, {
-				visitColumn: () => null,
-				visitManyHasManyInverse: () => null,
-				visitManyHasManyOwning: () => null,
-				visitOneHasOneInverse: () => null,
-				visitOneHasMany: () => null,
-				visitOneHasOneOwning: ({ relation, targetEntity }) =>
-					relation.orphanRemoval ? [targetEntity, relation] : null,
-				visitManyHasOne: () => null,
-			}),
-		).filter((it): it is OneHasOneOwningRelationTuple => it !== null)
+
+	private async collectRestrictResult(
+		state: DeleteState,
+		mapper: Mapper,
+		entity: Model.Entity,
+		relation: Model.ManyHasOneRelation | Model.OneHasOneOwningRelation,
+		values: Input.PrimaryValue[],
+	): Promise<void> {
+		if (mapper.constraintHelper.areFkConstraintsDeferred()) {
+			return
+		}
+		const qb = this.createFetchByIdQueryBuilder(entity, relation, values)
+		const result = this.filterPlannedForDelete(state, entity, await qb.getResult(mapper.db))
+
+		if (result.length === 0) {
+			return
+		}
+
+		const message = formatConstraintViolationMessage(result, entity, relation)
+			+ ' OnDelete behaviour of this relation is set to "restrict". You might consider changing it to "setNull" or "cascade".'
+
+		state.pushFailResult(new MutationConstraintViolationError([], ConstraintType.foreignKey, message))
+	}
+
+	private async collectOrphanRemovals(state: DeleteState, mapper: Mapper, deleteQueue: DeleteQueue) {
+		do {
+			if (!state.isOk()) {
+				return
+			}
+
+			const orphanRemoval = state.fetchOrphanRemovals()
+			if (orphanRemoval === null) {
+				break
+			}
+
+			const entity = getEntity(this.schema, orphanRemoval[0])
+			const orphanResult = await this.collectDeleteInfo(state, mapper, entity, { [entity.primary]: { in: orphanRemoval[1] } })
+			deleteQueue.push([entity, orphanResult])
+
+		} while (true)
+	}
+
+	private qbWithAllowed<R>(entity: Model.Entity, predicate: Input.OptionalWhere, selectQb: SelectBuilder<R>): SelectBuilder<R & { allowed: boolean }> {
+		return this.whereBuilder.buildAdvanced<R & { allowed: boolean }>(entity, this.pathFactory.create([]), predicate, cb => {
+			const qb = selectQb.select(expr => expr.selectCondition(cb), 'allowed')
+			return (qb === selectQb ? qb.select(new Literal('true'), 'allowed') : qb) as SelectBuilder<R & { allowed: boolean }>
+		})
+	}
+
+	private qbOrphanColumns<R>(qb: SelectBuilder<R>, orphanRemovals: OneHasOneOwningRelationTuple[]): SelectBuilder<R> {
+		const orphanColumns = orphanRemovals.map(([, rel]) => rel.joiningColumn.columnName)
+		return orphanColumns.reduce((qb, column) => qb.select(['root_', column], `_${column}`), qb)
+	}
+
+	private createFetchByIdQueryBuilder(entity: Model.Entity, relation: Model.ManyHasOneRelation | Model.OneHasOneOwningRelation, values: Input.PrimaryValue[]) {
+		return SelectBuilder.create<EntityReferenceRow>()
+			.from(entity.tableName, 'root_')
+			.select(['root_', entity.primaryColumn], 'id')
+			.select(['root_', relation.joiningColumn.columnName], 'ref')
+			.where(expr => expr.in(relation.joiningColumn.columnName, values))
+	}
+
+	private filterPlannedForDelete<R extends {id: Input.PrimaryValue}>(state: DeleteState, entity: Model.Entity, values: R[]): R[] {
+		return values.filter(it => !state.isPlannedDelete(entity.name, it.id))
+	}
+
+
+	private async processDeleteResult(
+		state: DeleteState,
+		mapper: Mapper,
+		entity: Model.Entity,
+		result: DeleteInfoRow[],
+		orphanRemovals: OneHasOneOwningRelationTuple[],
+	): Promise<Input.PrimaryValue[]> {
+		const ids = result.map(it => it.id)
+		state.markPlannedDelete(entity.name, ids)
+		state.pushOkResult(ids.map(id => new MutationDeleteOk([], entity, id)))
+
+		await this.collectOnDeleteInfo(state, mapper, entity, ids)
+
+		for (const [entity, relation] of orphanRemovals) {
+			const ids = result.map(it => it[`_${relation.joiningColumn.columnName}`]).filter(it => it !== null)
+			if (ids.length) {
+				state.addOrphanRemoval(entity.name, ids)
+			}
+		}
+		return ids
 	}
 }

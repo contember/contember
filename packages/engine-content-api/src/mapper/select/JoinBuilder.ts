@@ -8,12 +8,12 @@ import { SelectBuilder } from '@contember/database'
 export class JoinBuilder {
 	constructor(private readonly schema: Model.Schema) {}
 
-	join<Filled extends keyof SelectBuilder.Options>(
-		qb: SelectBuilder<SelectBuilder.Result>,
+	join<R extends SelectBuilder.Result>(
+		qb: SelectBuilder<R>,
 		path: Path,
 		entity: Model.Entity,
 		relationName: string,
-	) {
+	): SelectBuilder<R> {
 		const targetEntity = getTargetEntity(this.schema, entity, relationName)
 		if (!targetEntity) {
 			throw new Error(`JoinBuilder: target entity for relation ${entity.name}::${relationName} not found`)
@@ -21,7 +21,7 @@ export class JoinBuilder {
 
 		const joins = acceptRelationTypeVisitor(this.schema, entity, relationName, new JoinVisitor(path))
 
-		return joins.reduce<SelectBuilder<SelectBuilder.Result>>((qb, join) => {
+		return joins.reduce<SelectBuilder<R>>((qb, join) => {
 			const targetAlias = join.targetAlias || path.alias
 			if (qb.options.join.find(it => it.alias === targetAlias)) {
 				return qb

@@ -1,5 +1,5 @@
 import { test } from 'vitest'
-import { execute, sqlDeferred, sqlTransaction } from '../../../../../src/test'
+import { execute, sqlTransaction } from '../../../../../src/test'
 import { GQL, SQL } from '../../../../../src/tags'
 import { testUuid } from '../../../../../src/testUuid'
 import { siteSettingSchema, siteSettingSchemaWithOrphanRemoval } from './schema'
@@ -121,13 +121,21 @@ test('create - orphan removal', async () => {
 					parameters: [currentSettingId],
 					response: { rows: [{ id: currentSettingId }] },
 				},
-				...sqlDeferred([
-					{
-						sql: 'delete from "public"."site_setting"   where "id" in (select "root_"."id"  from "public"."site_setting" as "root_"   where "root_"."id" = ?)  returning "id"',
-						parameters: [currentSettingId],
-						response: { rows: [{ id: currentSettingId }] },
-					},
-				]),
+				{
+					sql: 'select "root_"."id" as "id", true as "allowed" from "public"."site_setting" as "root_" where "root_"."id" = ?',
+					parameters: [currentSettingId],
+					response: { rows: [{ id: currentSettingId, allowed: true }] },
+				},
+				{
+					sql: 'select "root_"."id" as "id", "root_"."setting_id" as "ref" from "public"."site" as "root_" where "setting_id" in (?)',
+					parameters: [currentSettingId],
+					response: { rows: [] },
+				},
+				{
+					sql: 'DELETE FROM "public"."site_setting" WHERE "id" IN (?)',
+					parameters: [currentSettingId],
+					response: { rowCount: 1 },
+				},
 			]),
 		],
 		return: {

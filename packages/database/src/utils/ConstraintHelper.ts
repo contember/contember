@@ -7,6 +7,10 @@ export class ConstraintHelper {
 
 	constructor(private readonly client: Client) {}
 
+	public areFkConstraintsDeferred(): boolean {
+		return this.fkConstraintsLevel > 0
+	}
+
 	public async setFkConstraintsDeferred(): Promise<void> {
 		this.fkConstraintsLevel++
 		if (this.fkConstraintsLevel > 1) {

@@ -56,5 +56,5 @@ testMigrations('create inverse side relation together with changing onDelete beh
 			},
 		},
 	],
-	sql: SQL``,
+	sql: SQL`ALTER TABLE "post_locale" DROP CONSTRAINT "fk_post_locale_post_id_f3d2e5"; ALTER TABLE "post_locale" ADD CONSTRAINT "fk_post_locale_post_id_f3d2e5" FOREIGN KEY ("post_id") REFERENCES "post"("id") ON DELETE NO ACTION DEFERRABLE INITIALLY IMMEDIATE;`,
 })

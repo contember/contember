@@ -26,5 +26,6 @@ testMigrations('update relation ondelete to cascade', {
 			onDelete: Model.OnDelete.cascade,
 		},
 	],
-	sql: SQL``,
+	sql: SQL`ALTER TABLE "post" DROP CONSTRAINT "fk_post_category_id_820029";
+ALTER TABLE "post" ADD CONSTRAINT "fk_post_category_id_820029" FOREIGN KEY ("category_id") REFERENCES "category"("id") ON DELETE NO ACTION DEFERRABLE INITIALLY IMMEDIATE;`,
 })

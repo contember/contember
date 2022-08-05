@@ -1,5 +1,5 @@
 import { test } from 'vitest'
-import { execute, sqlDeferred, sqlTransaction } from '../../../../src/test'
+import { execute, sqlTransaction } from '../../../../src/test'
 import { SchemaBuilder } from '@contember/schema-definition'
 import { Model } from '@contember/schema'
 import { GQL, SQL } from '../../../../src/tags'
@@ -13,51 +13,32 @@ test('delete post with additional filter', async () => {
 		query: GQL`
         mutation {
           deletePost(by: {id: "${testUuid(1)}"}, filter: {locale: {eq: "cs"}}) {
-            node {
-              id
-            }
+            ok
           }
         }`,
 		executes: [
 			...sqlTransaction([
 				{
-					sql: SQL`select
-                     "root_"."id" as "root_id"
-                     from "public"."post" as "root_"
-                   where "root_"."id" = ?`,
+					sql: SQL`select "root_"."id" from "public"."post" as "root_" where "root_"."id" = ?`,
 					parameters: [testUuid(1)],
-					response: {
-						rows: [
-							{
-								root_id: testUuid(1),
-							},
-						],
-					},
+					response: { rows: [{ id: testUuid(1) }] },
 				},
-				...sqlDeferred([
-					{
-						sql: SQL`select "root_"."id" from "public"."post" as "root_" where "root_"."id" = ?`,
-						parameters: [testUuid(1)],
-						response: { rows: [{ id: testUuid(1) }] },
-					},
-					{
-						sql: SQL`delete from "public"."post"
-            where "id" in (select "root_"."id"
-                           from "public"."post" as "root_"
-                           where "root_"."id" = ? and "root_"."locale" = ?)
-            returning "id"`,
-						parameters: [testUuid(1), 'cs'],
-						response: { rows: [{ id: testUuid(1) }] },
-					},
-				]),
+				{
+					sql: SQL`select "root_"."id" as "id", true as "allowed" from "public"."post" as "root_" where "root_"."id" = ? and "root_"."locale" = ?`,
+					parameters: [testUuid(1), 'cs'],
+					response: { rows: [{ id: testUuid(1), allowed: true }] },
+				},
+				{
+					sql: SQL`delete from "public"."post" where "id" in (?)`,
+					parameters: [testUuid(1)],
+					response: {  },
+				},
 			]),
 		],
 		return: {
 			data: {
 				deletePost: {
-					node: {
-						id: testUuid(1),
-					},
+					ok: true,
 				},
 			},
 		},

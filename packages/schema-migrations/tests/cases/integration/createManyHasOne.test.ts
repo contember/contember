@@ -84,6 +84,6 @@ testMigrations('create many has one relation (post with author)', {
 	ALTER TABLE "post"
 		ADD "author_id" uuid;
 	ALTER TABLE "post"
-		ADD CONSTRAINT "fk_post_author_id_87ef9a" FOREIGN KEY ("author_id") REFERENCES "author"("id") ON DELETE NO ACTION DEFERRABLE INITIALLY IMMEDIATE;
+		ADD CONSTRAINT "fk_post_author_id_87ef9a" FOREIGN KEY ("author_id") REFERENCES "author"("id") ON DELETE CASCADE DEFERRABLE INITIALLY IMMEDIATE;
 	CREATE INDEX "post_author_id_index" ON "post" ("author_id");`,
 })

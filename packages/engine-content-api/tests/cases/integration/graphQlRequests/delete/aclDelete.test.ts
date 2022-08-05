@@ -1,11 +1,11 @@
 import { test } from 'vitest'
-import { execute, sqlDeferred, sqlTransaction } from '../../../../src/test'
+import { execute, failedTransaction } from '../../../../src/test'
 import { SchemaBuilder } from '@contember/schema-definition'
-import { Acl, Model } from '@contember/schema'
+import { Model } from '@contember/schema'
 import { GQL, SQL } from '../../../../src/tags'
 import { testUuid } from '../../../../src/testUuid'
 
-test('delete post with acl', async () => {
+test('delete post with acl (denied)', async () => {
 	await execute({
 		schema: new SchemaBuilder()
 			.entity('Post', entity => entity.column('locale', c => c.type(Model.ColumnType.String)))
@@ -13,9 +13,8 @@ test('delete post with acl', async () => {
 		query: GQL`
         mutation {
           deletePost(by: {id: "${testUuid(1)}"}) {
-            node {
-              id
-            }
+            ok
+            errorMessage
           }
         }`,
 		permissions: {
@@ -35,45 +34,27 @@ test('delete post with acl', async () => {
 			locale_variable: { in: ['cs'] },
 		},
 		executes: [
-			...sqlTransaction([
+			...failedTransaction([
 				{
-					sql: SQL`select
-                     "root_"."id" as "root_id"
-                     from "public"."post" as "root_"
-                   where "root_"."id" = ?`,
+					sql: SQL`select "root_"."id" from "public"."post" as "root_" where "root_"."id" = ?`,
 					parameters: [testUuid(1)],
+					response: { rows: [{ id: testUuid(1) }] },
+				},
+				{
+					sql: SQL`select "root_"."id" as "id", "root_"."locale" in (?) as "allowed" from "public"."post" as "root_" where "root_"."id" = ?`,
+					parameters: ['cs', testUuid(1)],
 					response: {
-						rows: [
-							{
-								root_id: testUuid(1),
-							},
-						],
+						rows: [{ id: testUuid(1), allowed: false }],
 					},
 				},
-				...sqlDeferred([
-					{
-						sql: SQL`select "root_"."id" from "public"."post" as "root_" where "root_"."id" = ?`,
-						parameters: [testUuid(1)],
-						response: { rows: [{ id: testUuid(1) }] },
-					},
-					{
-						sql: SQL`delete from "public"."post"
-            where "id" in (select "root_"."id"
-                           from "public"."post" as "root_"
-                           where "root_"."id" = ? and "root_"."locale" in (?))
-            returning "id"`,
-						parameters: [testUuid(1), 'cs'],
-						response: { rows: [{ id: testUuid(1) }] },
-					},
-				]),
 			]),
 		],
 		return: {
 			data: {
 				deletePost: {
-					node: {
-						id: testUuid(1),
-					},
+					ok: false,
+					errorMessage: 'Execution has failed:\n' +
+						'unknown field: NotFoundOrDenied (for input {"id":{"in":["123e4567-e89b-12d3-a456-000000000001"]}})',
 				},
 			},
 		},

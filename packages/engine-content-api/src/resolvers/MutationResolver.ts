@@ -427,7 +427,7 @@ export class MutationResolver {
 
 		const result = await mapper.delete(entity, queryAst.args.by, queryAst.args.filter)
 		if (
-			result.length === 1 &&
+			result.length >= 1 &&
 			(result[0].result === MutationResultType.ok || result[0].result === MutationResultType.nothingToDo)
 		) {
 			return { ok: true, errors: [], ...nodes }

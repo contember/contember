@@ -16,28 +16,28 @@ export class WhereBuilder {
 		private readonly whereOptimizer: WhereOptimizer,
 	) {}
 
-	public build(
-		qb: SelectBuilder<SelectBuilder.Result>,
+	public build<R extends SelectBuilder.Result>(
+		qb: SelectBuilder<R>,
 		entity: Model.Entity,
 		path: Path,
 		where: Input.OptionalWhere,
 		allowManyJoin: boolean = false,
-	) {
+	): SelectBuilder<R> {
 		return this.buildAdvanced(entity, path, where, cb => qb.where(clause => cb(clause)), allowManyJoin)
 	}
 
-	public buildAdvanced(
+	public buildAdvanced<R extends SelectBuilder.Result>(
 		entity: Model.Entity,
 		path: Path,
 		where: Input.OptionalWhere,
-		callback: (clauseCb: (clause: SqlConditionBuilder) => SqlConditionBuilder) => SelectBuilder<SelectBuilder.Result>,
+		callback: (clauseCb: (clause: SqlConditionBuilder) => SqlConditionBuilder) => SelectBuilder<R>,
 		allowManyJoin: boolean = false,
-	) {
+	): SelectBuilder<R> {
 		const optimizedWhere = this.whereOptimizer.optimize(where, entity)
 		const joinList: WhereJoinDefinition[] = []
 
 		const qbWithWhere = callback(clause => this.buildInternal(clause, entity, path, optimizedWhere, allowManyJoin, joinList))
-		return joinList.reduce<SelectBuilder<SelectBuilder.Result>>(
+		return joinList.reduce<SelectBuilder<R>>(
 			(qb, { path, entity, relationName }) => this.joinBuilder.join(qb, path, entity, relationName),
 			qbWithWhere,
 		)

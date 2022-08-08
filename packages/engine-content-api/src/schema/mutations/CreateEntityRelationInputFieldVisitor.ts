@@ -15,9 +15,7 @@ export class CreateEntityRelationInputFieldVisitor implements
 	constructor(
 		private readonly schema: Model.Schema,
 		private readonly whereTypeBuilder: WhereTypeProvider,
-		private readonly createEntityInputProviderAccessor: Accessor<
-			Interface<EntityInputProvider<EntityInputType.create>>
-		>,
+		private readonly createEntityInputProviderAccessor: Accessor<Interface<EntityInputProvider<EntityInputType.create>>>,
 		private readonly createEntityRelationAllowedOperationsVisitor: CreateEntityRelationAllowedOperationsVisitor,
 	) {}
 
@@ -66,13 +64,12 @@ export class CreateEntityRelationInputFieldVisitor implements
 		}
 		return new GraphQLInputObjectType({
 			name: GqlTypeName`${entity.name}Create${relation.name}EntityRelationInput`,
-			fields: () =>
-				withAliasField
-					? {
-						...fields,
-						alias: { type: GraphQLString },
+			fields: () => withAliasField
+				? {
+					...fields,
+					alias: { type: GraphQLString },
 					  }
-					: fields,
+				: fields,
 		})
 	}
 }

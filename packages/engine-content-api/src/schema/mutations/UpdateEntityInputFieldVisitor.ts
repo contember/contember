@@ -22,9 +22,7 @@ export class UpdateEntityInputFieldVisitor implements
 			return undefined
 		}
 		const type = this.columnTypeResolver.getType(column)
-		return {
-			type,
-		}
+		return { type }
 	}
 
 	public visitHasOne({ entity, relation }: Model.AnyHasOneRelationContext) {
@@ -32,9 +30,7 @@ export class UpdateEntityInputFieldVisitor implements
 		if (type === undefined) {
 			return undefined
 		}
-		return {
-			type,
-		}
+		return { type }
 	}
 
 	public visitHasMany({ entity, relation }: Model.AnyHasManyRelationContext) {

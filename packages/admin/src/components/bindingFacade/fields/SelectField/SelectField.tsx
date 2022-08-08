@@ -1,5 +1,5 @@
 import { Component } from '@contember/binding'
-import { FieldContainer, FieldContainerProps, FieldErrors, SelectCreateNewWrapper } from '@contember/ui'
+import { FieldContainer, FieldContainerProps, FieldErrors, getPortalRoot, SelectCreateNewWrapper } from '@contember/ui'
 import { FunctionComponent, memo } from 'react'
 import type { Props as SelectProps } from 'react-select'
 import Select from 'react-select'
@@ -11,6 +11,7 @@ import {
 	StaticSingleChoiceFieldProps,
 } from '../ChoiceField'
 import { useCommonReactSelectProps } from './useCommonReactSelectProps'
+import { PublicCommonReactSelectStylesProps } from './useCommonReactSelectStyles'
 
 export type SelectFieldProps =
 	& SelectFieldInnerPublicProps
@@ -36,10 +37,11 @@ export interface SelectFieldInnerPublicProps extends Omit<FieldContainerProps, '
 	reactSelectProps?: Partial<SelectProps<any>>
 }
 
-export interface SelectFieldInnerProps extends ChoiceFieldData.SingleChoiceFieldMetadata, SelectFieldInnerPublicProps {
-	errors: FieldErrors | undefined
-
-}
+export type SelectFieldInnerProps =
+	& ChoiceFieldData.SingleChoiceFieldMetadata
+	& SelectFieldInnerPublicProps
+	& PublicCommonReactSelectStylesProps
+	& { errors: FieldErrors | undefined }
 
 export const SelectFieldInner = memo(
 	({
@@ -48,6 +50,7 @@ export const SelectFieldInner = memo(
 		currentValue,
 		data,
 		errors,
+		menuZIndex,
 		onSelect,
 		onClear,
 		reactSelectProps,
@@ -62,6 +65,7 @@ export const SelectFieldInner = memo(
 			data,
 			isInvalid: (errors?.length ?? 0) > 0,
 			onSearch,
+			menuZIndex,
 		})
 
 		const labelMiddleware = useLabelMiddleware()
@@ -76,6 +80,7 @@ export const SelectFieldInner = memo(
 					<Select
 						{...selectProps}
 						menuPlacement="auto"
+						menuPortalTarget={getPortalRoot()}
 						isClearable={allowNull === true}
 						value={currentValue}
 						isLoading={isLoading}

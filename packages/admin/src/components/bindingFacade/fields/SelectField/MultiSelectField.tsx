@@ -1,22 +1,20 @@
 import { Component, EntityAccessor } from '@contember/binding'
-import { FieldContainer, FieldContainerProps, FieldErrors, SelectCreateNewWrapper } from '@contember/ui'
+import { FieldContainer, FieldContainerProps, FieldErrors, getPortalRoot, SelectCreateNewWrapper } from '@contember/ui'
 import { FunctionComponent, memo, MouseEventHandler, useCallback } from 'react'
 import type { MultiValueGenericProps, MultiValueProps, Props as SelectProps } from 'react-select'
 import Select, { ActionMeta, components } from 'react-select'
-import { useLabelMiddleware } from '../../environment/LabelMiddleware'
-import { ChoiceFieldData, DynamicMultiChoiceField, DynamicMultipleChoiceFieldProps } from '../ChoiceField'
-import { useCommonReactSelectProps } from './useCommonReactSelectProps'
 import {
-	HelperContainerGetter,
 	SortableContainer,
 	SortableContainerProps,
 	SortableElement,
 	SortableHandle,
 	SortEndHandler,
-	SortEvent,
-	SortEventWithTag,
 } from 'react-sortable-hoc'
+import { useLabelMiddleware } from '../../environment/LabelMiddleware'
 import { shouldCancelStart } from '../../helpers/shouldCancelStart'
+import { ChoiceFieldData, DynamicMultiChoiceField, DynamicMultipleChoiceFieldProps } from '../ChoiceField'
+import { useCommonReactSelectProps } from './useCommonReactSelectProps'
+import { PublicCommonReactSelectStylesProps } from './useCommonReactSelectStyles'
 
 export type MultiSelectFieldProps =
 	& MultiSelectFieldInnerPublicProps
@@ -38,11 +36,11 @@ export interface MultiSelectFieldInnerPublicProps extends Omit<FieldContainerPro
 	reactSelectProps?: Partial<SelectProps<any>>
 }
 
-export interface MultiSelectFieldInnerProps<ActualValue>
-	extends ChoiceFieldData.MultipleChoiceFieldMetadata<ActualValue>,
-		MultiSelectFieldInnerPublicProps {
-	errors: FieldErrors | undefined
-}
+export type MultiSelectFieldInnerProps<ActualValue> =
+	& ChoiceFieldData.MultipleChoiceFieldMetadata<ActualValue>
+	& MultiSelectFieldInnerPublicProps
+	& PublicCommonReactSelectStylesProps
+	& { errors: FieldErrors | undefined }
 
 const typedMemo: <T>(c: T) => T = memo
 export const MultiSelectFieldInner = typedMemo(
@@ -55,6 +53,7 @@ export const MultiSelectFieldInner = typedMemo(
 		onRemove,
 		reactSelectProps,
 		placeholder,
+		menuZIndex,
 		onAddNew,
 		onMove,
 		onSearch,
@@ -67,6 +66,7 @@ export const MultiSelectFieldInner = typedMemo(
 			placeholder,
 			data,
 			isInvalid: (errors?.length ?? 0) > 0,
+			menuZIndex,
 			onSearch,
 		})
 
@@ -109,7 +109,7 @@ export const MultiSelectFieldInner = typedMemo(
 							axis="xy"
 							onSortEnd={onSortEnd}
 							distance={4}
-							helperContainer={getHelperContainer}
+							helperContainer={getPortalRoot}
 							helperClass={'sortable-dragged'}
 							shouldCancelStart={shouldCancelStart}
 							components={{
@@ -118,17 +118,13 @@ export const MultiSelectFieldInner = typedMemo(
 								MultiValueLabel: SortableMultiValueLabel,
 							}}
 						/>
-						: <Select {...allSelectProps} />
+						: <Select menuPortalTarget={getPortalRoot()} {...allSelectProps} />
 					}
 				</SelectCreateNewWrapper>
 			</FieldContainer>
 		)
 	},
 )
-
-const getHelperContainer: HelperContainerGetter = () => {
-	return document.getElementById('portal-root') ?? document.body
-}
 
 
 const SortableSelect = SortableContainer(Select) as React.ComponentClass<SelectProps<ChoiceFieldData.SingleOption<any>, boolean, never> & SortableContainerProps>

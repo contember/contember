@@ -32,7 +32,7 @@
 		"vite": "cd packages/admin-sandbox && pnpm run -- start"
 	},
 	"devDependencies": {
-		"@microsoft/api-extractor": "^7.25.2",
+		"@microsoft/api-extractor": "^7.28.4",
 		"@types/classnames": "2.2.10",
 		"@types/react": "17.0.30",
 		"@types/react-dom": "17.0.9",

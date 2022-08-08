@@ -32,12 +32,7 @@ export class CreateInputVisitor<Result> implements
 	) {
 		return this.processManyRelationInput<Context.ManyHasManyInverseContext>(
 			this.createInputProcessor.manyHasManyInverse,
-			{
-				entity,
-				relation,
-				targetEntity,
-				targetRelation,
-			},
+			{ entity, relation, targetEntity, targetRelation },
 			this.data[relation.name] as Input.CreateManyRelationInput,
 		)
 	}
@@ -50,12 +45,7 @@ export class CreateInputVisitor<Result> implements
 	) {
 		return this.processManyRelationInput<Context.ManyHasManyOwningContext>(
 			this.createInputProcessor.manyHasManyOwning,
-			{
-				entity,
-				relation,
-				targetEntity,
-				targetRelation,
-			},
+			{ entity, relation, targetEntity, targetRelation },
 			this.data[relation.name] as Input.CreateManyRelationInput,
 		)
 	}
@@ -68,12 +58,7 @@ export class CreateInputVisitor<Result> implements
 	) {
 		return this.processRelationInput<Context.ManyHasOneContext>(
 			this.createInputProcessor.manyHasOne,
-			{
-				entity,
-				relation,
-				targetEntity,
-				targetRelation,
-			},
+			{ entity, relation, targetEntity, targetRelation },
 			this.data[relation.name] as Input.CreateOneRelationInput,
 		)
 	}
@@ -86,12 +71,7 @@ export class CreateInputVisitor<Result> implements
 	) {
 		return this.processManyRelationInput<Context.OneHasManyContext>(
 			this.createInputProcessor.oneHasMany,
-			{
-				entity,
-				relation,
-				targetEntity,
-				targetRelation,
-			},
+			{ entity, relation, targetEntity, targetRelation },
 			this.data[relation.name] as Input.CreateManyRelationInput,
 		)
 	}
@@ -104,12 +84,7 @@ export class CreateInputVisitor<Result> implements
 	) {
 		return this.processRelationInput<Context.OneHasOneInverseContext>(
 			this.createInputProcessor.oneHasOneInverse,
-			{
-				entity,
-				relation,
-				targetEntity,
-				targetRelation,
-			},
+			{ entity, relation, targetEntity, targetRelation },
 			this.data[relation.name] as Input.CreateOneRelationInput,
 		)
 	}
@@ -122,12 +97,7 @@ export class CreateInputVisitor<Result> implements
 	) {
 		return this.processRelationInput<Context.OneHasOneOwningContext>(
 			this.createInputProcessor.oneHasOneOwning,
-			{
-				entity,
-				relation,
-				targetEntity,
-				targetRelation,
-			},
+			{ entity, relation, targetEntity, targetRelation },
 			this.data[relation.name] as Input.CreateOneRelationInput,
 		)
 	}

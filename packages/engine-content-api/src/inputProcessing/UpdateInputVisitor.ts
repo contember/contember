@@ -56,12 +56,7 @@ export class UpdateInputVisitor<Result> implements
 	) {
 		return this.processRelationInput<Context.ManyHasOneContext>(
 			this.updateInputProcessor.manyHasOne,
-			{
-				entity,
-				relation,
-				targetEntity,
-				targetRelation,
-			},
+			{ entity, relation, targetEntity, targetRelation },
 			this.data[relation.name] as Input.CreateOneRelationInput,
 		)
 	}
@@ -87,12 +82,7 @@ export class UpdateInputVisitor<Result> implements
 	) {
 		return this.processRelationInput<Context.OneHasOneInverseContext>(
 			this.updateInputProcessor.oneHasOneInverse,
-			{
-				entity,
-				relation,
-				targetEntity,
-				targetRelation,
-			},
+			{ entity, relation, targetEntity, targetRelation },
 			this.data[relation.name] as Input.CreateOneRelationInput,
 		)
 	}
@@ -105,12 +95,7 @@ export class UpdateInputVisitor<Result> implements
 	) {
 		return this.processRelationInput<Context.OneHasOneOwningContext>(
 			this.updateInputProcessor.oneHasOneOwning,
-			{
-				entity,
-				relation,
-				targetEntity,
-				targetRelation,
-			},
+			{ entity, relation, targetEntity, targetRelation },
 			this.data[relation.name] as Input.CreateOneRelationInput,
 		)
 	}

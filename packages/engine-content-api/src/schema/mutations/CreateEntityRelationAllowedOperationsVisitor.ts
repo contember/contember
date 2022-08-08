@@ -72,7 +72,6 @@ export class CreateEntityRelationAllowedOperationsVisitor implements
 		if (canReadTargetEntity && canCreateOwning) {
 			result.push(Input.CreateRelationOperation.connect)
 		}
-
 		if (canCreateTargetEntity && canCreateOwning) {
 			result.push(Input.CreateRelationOperation.create)
 		}

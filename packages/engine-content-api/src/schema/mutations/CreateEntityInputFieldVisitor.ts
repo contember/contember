@@ -23,9 +23,7 @@ export class CreateEntityInputFieldVisitor implements
 			return undefined
 		}
 		const type = this.columnTypeResolver.getType(column)
-		return {
-			type,
-		}
+		return { type }
 	}
 
 	public visitHasOne(
@@ -36,9 +34,7 @@ export class CreateEntityInputFieldVisitor implements
 		if (type === undefined) {
 			return undefined
 		}
-		return {
-			type,
-		}
+		return { type }
 	}
 
 	public visitHasMany(entity: Model.Entity, relation: Model.Relation): GraphQLInputFieldConfig | undefined {

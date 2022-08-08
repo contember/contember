@@ -38,9 +38,6 @@ export class EntityInputProvider<Operation extends EntityInputType> {
 		}
 		const entityName = entity.name
 		const withoutSuffix = withoutRelation ? GqlTypeName`Without${withoutRelation}` : ''
-		if (entity.view) {
-			return undefined
-		}
 		const operation: Acl.Operation = (() => {
 			switch (this.operation) {
 				case EntityInputType.create:

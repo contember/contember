@@ -51,11 +51,14 @@ export type AccessorTreeState = InitializingAccessorTreeState | InitializedAcces
 export type AccessorTreeStateAction = {
     type: 'setData';
     data: TreeRootAccessor;
+    binding: DataBinding;
 } | {
     type: 'failWithError';
     error: RequestError;
+    binding: DataBinding;
 } | {
     type: 'reset';
+    binding: DataBinding;
 };
 
 // @public (undocumented)
@@ -181,7 +184,7 @@ export function Component<Props extends {}, NonStaticPropNames extends keyof Pro
 
 // @public (undocumented)
 export class DataBinding {
-    constructor(contentApiClient: GraphQlClient, systemApiClient: GraphQlClient, tenantApiClient: GraphQlClient, environment: Environment, onUpdate: (newData: TreeRootAccessor) => void, onError: (error: RequestError) => void, onPersistSuccess: (result: SuccessfulPersistResult) => void);
+    constructor(contentApiClient: GraphQlClient, systemApiClient: GraphQlClient, tenantApiClient: GraphQlClient, environment: Environment, onUpdate: (newData: TreeRootAccessor, binding: DataBinding) => void, onError: (error: RequestError, binding: DataBinding) => void, onPersistSuccess: (result: SuccessfulPersistResult, binding: DataBinding) => void);
     // (undocumented)
     extendTree(newFragment: ReactNode, options?: ExtendTreeOptions): Promise<TreeRootId | undefined>;
 }
@@ -895,6 +898,8 @@ export namespace ErrorAccessor {
 // @public (undocumented)
 export interface ErrorAccessorTreeState {
     // (undocumented)
+    binding: DataBinding;
+    // (undocumented)
     error: RequestError;
     // (undocumented)
     name: 'error';
@@ -1270,6 +1275,8 @@ export interface IndexPathErrorFragment {
 // @public (undocumented)
 export interface InitializedAccessorTreeState {
     // (undocumented)
+    binding: DataBinding;
+    // (undocumented)
     data: TreeRootAccessor;
     // (undocumented)
     name: 'initialized';
@@ -1277,6 +1284,8 @@ export interface InitializedAccessorTreeState {
 
 // @public (undocumented)
 export interface InitializingAccessorTreeState {
+    // (undocumented)
+    binding: DataBinding;
     // (undocumented)
     name: 'initializing';
 }

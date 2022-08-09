@@ -63,9 +63,9 @@ export class DataBinding {
 		private readonly systemApiClient: GraphQlClient,
 		private readonly tenantApiClient: GraphQlClient,
 		private readonly environment: Environment,
-		private readonly onUpdate: (newData: TreeRootAccessor) => void,
-		private readonly onError: (error: RequestError) => void,
-		private readonly onPersistSuccess: (result: SuccessfulPersistResult) => void,
+		private readonly onUpdate: (newData: TreeRootAccessor, binding: DataBinding) => void,
+		private readonly onError: (error: RequestError, binding: DataBinding) => void,
+		private readonly onPersistSuccess: (result: SuccessfulPersistResult, binding: DataBinding) => void,
 	) {
 		this.config = new Config()
 		this.treeStore = new TreeStore()
@@ -169,7 +169,7 @@ export class DataBinding {
 								type: 'gqlError',
 								query,
 								errors: mutationResponse.errors,
-							})
+							}, this)
 						}
 						if (!mutationResponse.data?.transaction) {
 							throw {
@@ -213,10 +213,10 @@ export class DataBinding {
 									...result,
 									afterPersistError: e,
 								}
-								this.onPersistSuccess(resultWithError)
+								this.onPersistSuccess(resultWithError, this)
 								return resultWithError
 							}
-							this.onPersistSuccess(result)
+							this.onPersistSuccess(result, this)
 							return result
 						} else {
 							this.eventManager.syncTransaction(() => this.accessorErrorManager.replaceErrors(mutationData, operations))
@@ -250,7 +250,7 @@ export class DataBinding {
 	}
 
 	private resolvedOnUpdate = ({ isMutating }: UpdateMetadata) => {
-		this.onUpdate(new TreeRootAccessor(this.dirtinessTracker.hasChanges(), isMutating, this.bindingOperations))
+		this.onUpdate(new TreeRootAccessor(this.dirtinessTracker.hasChanges(), isMutating, this.bindingOperations), this)
 	}
 
 	// This is currently useless but potentially future-compatible
@@ -370,7 +370,7 @@ export class DataBinding {
 			if (metadata.name === 'AbortError') {
 				return
 			}
-			this.onError(metadataToRequestError(metadata as GraphQlClientFailedRequestMetadata))
+			this.onError(metadataToRequestError(metadata as GraphQlClientFailedRequestMetadata), this)
 		}
 
 		if (queryResponse && queryResponse.errors !== undefined && queryResponse.errors.length > 0) {
@@ -378,7 +378,7 @@ export class DataBinding {
 				type: 'gqlError',
 				query: query ?? 'unknown query',
 				errors: queryResponse.errors,
-			})
+			}, this)
 		}
 
 		return queryResponse

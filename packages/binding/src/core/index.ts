@@ -1,3 +1,4 @@
+export * from './schema'
 export * from './DataBinding'
 export * from './MarkerMerger'
 export * from './MarkerTreeGenerator'

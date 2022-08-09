@@ -12,10 +12,6 @@ import type { AccessorTreeStateOptions } from './AccessorTreeStateOptions'
 import { accessorTreeStateReducer } from './accessorTreeStateReducer'
 import type { RequestError } from './RequestError'
 
-const initialState: AccessorTreeState = {
-	name: 'initializing',
-}
-
 export const useDataBinding = ({
 	nodeTree,
 	refreshOnEnvironmentChange = true,
@@ -26,27 +22,28 @@ export const useDataBinding = ({
 	const tenantClient = useTenantGraphQlClient()
 	const environment = useEnvironment()
 
-	const [state, dispatch] = useReducer(accessorTreeStateReducer, initialState)
 
 	const isFirstRenderRef = useRef(true)
 	const isMountedRef = useRef(true)
 
-	const onUpdate = useCallback((accessor: TreeRootAccessor) => {
+	const onUpdate = useCallback((accessor: TreeRootAccessor, binding: DataBinding) => {
 		if (!isMountedRef.current) {
 			return
 		}
 		dispatch({
 			type: 'setData',
 			data: accessor,
+			binding,
 		})
 	}, [])
-	const onError = useCallback((error: RequestError) => {
+	const onError = useCallback((error: RequestError, binding: DataBinding) => {
 		if (!isMountedRef.current) {
 			return
 		}
 		dispatch({
 			type: 'failWithError',
 			error,
+			binding,
 		})
 	}, [])
 
@@ -56,15 +53,18 @@ export const useDataBinding = ({
 				if (!isMountedRef.current || !refreshOnPersist) {
 					return
 				}
-				dispatch({ type: 'reset' })
-				setDataBinding(create())
+				const binding = create()
+				dispatch({ type: 'reset', binding })
 			})
 			return create()
 		},
 		[contentClient, systemClient, tenantClient, environment, onUpdate, onError, refreshOnPersist],
 	)
-
-	const [dataBinding, setDataBinding] = useState(() => createDataBinding())
+	const [initialState] = useState(() => ({
+		binding: createDataBinding(),
+		name: 'initializing' as const,
+	}))
+	const [state, dispatch] = useReducer(accessorTreeStateReducer, initialState)
 
 	useEffect(() => {
 		if (state.name !== 'initializing') {
@@ -74,16 +74,16 @@ export const useDataBinding = ({
 			// To make their lives a bit easier, we do this.
 			return
 		}
-		dataBinding.extendTree(nodeTree)
-	}, [nodeTree, dataBinding, state.name])
+		state.binding.extendTree(nodeTree)
+	}, [nodeTree, state.binding, state.name])
 
 	useEffect(() => {
 		if (isFirstRenderRef.current || !refreshOnEnvironmentChange) {
 			return
 		}
-		dispatch({ type: 'reset' })
 		// This essentially just reacts to new environments.
-		setDataBinding(createDataBinding())
+		const binding = createDataBinding()
+		dispatch({ type: 'reset', binding })
 	}, [createDataBinding, refreshOnEnvironmentChange])
 
 	useEffect(() => {

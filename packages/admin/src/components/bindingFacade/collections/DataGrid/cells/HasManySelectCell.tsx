@@ -1,5 +1,6 @@
 import {
 	Component,
+	Entity,
 	HasMany,
 	QueryLanguage,
 	SugaredRelativeEntityList,
@@ -96,6 +97,12 @@ const HasManySelectCellContent = Component<HasManySelectProps>(
 				}
 				return <FieldFallbackView key={it.key} fallback={props.fallback} fallbackStyle={props.fallbackStyle} />
 			}))
+		}
+
+		if ('optionLabel' in props) {
+			return elementsRenderer(entitiesArray.map(it => (
+				<Entity key={it.key} accessor={it}>{props.optionLabel}</Entity>
+			)))
 		}
 
 		return <></>

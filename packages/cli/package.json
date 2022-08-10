@@ -1,6 +1,6 @@
 {
   "name": "@contember/cli",
-  "version": "1.2.0-alpha.6",
+  "version": "1.2.0-alpha.7",
   "license": "Apache-2.0",
   "bin": {
     "contember": "./dist/src/run.js"
@@ -18,15 +18,15 @@
     "tailwindcss": "^3.0.24"
   },
   "dependencies": {
-    "@contember/cli-common": "^1.2.0-alpha.6",
-    "@contember/config-loader": "^1.2.0-alpha.6",
-    "@contember/database-migrations": "^1.2.0-alpha.6",
-    "@contember/dic": "^1.2.0-alpha.6",
-    "@contember/engine-content-api": "^1.2.0-alpha.6",
-    "@contember/schema": "^1.2.0-alpha.6",
-    "@contember/schema-definition": "^1.2.0-alpha.6",
-    "@contember/schema-migrations": "^1.2.0-alpha.6",
-    "@contember/schema-utils": "^1.2.0-alpha.6",
+    "@contember/cli-common": "^1.2.0-alpha.7",
+    "@contember/config-loader": "^1.2.0-alpha.7",
+    "@contember/database-migrations": "^1.2.0-alpha.7",
+    "@contember/dic": "^1.2.0-alpha.7",
+    "@contember/engine-content-api": "^1.2.0-alpha.7",
+    "@contember/schema": "^1.2.0-alpha.7",
+    "@contember/schema-definition": "^1.2.0-alpha.7",
+    "@contember/schema-migrations": "^1.2.0-alpha.7",
+    "@contember/schema-utils": "^1.2.0-alpha.7",
     "chalk": "^4.1.2",
     "chalk-table": "^1.0.2",
     "esbuild": "0.14.31",

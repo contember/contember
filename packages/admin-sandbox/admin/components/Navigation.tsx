@@ -29,8 +29,8 @@ export const Navigation = () => (
 			<Menu.Item title="Foo Bar 3" to="random/fooBar3">
 				<Menu.Item title="Skip this" />
 				<Menu.Item title="Skip this" />
-					<Menu.Item title="Skip this1" />
-					<Menu.Item title="Foo Bar Baz 4" to="random/fooBarBaz4">
+				<Menu.Item title="Skip this1" />
+				<Menu.Item title="Foo Bar Baz 4" to="random/fooBarBaz4">
 					<Menu.Item title="Skip this1" />
 					<Menu.Item title="Foo Bar 4" to="random/fooBar4">
 						<Menu.Item title="Foo Bar Baz 5" to="random/fooBarBaz5" />
@@ -38,15 +38,15 @@ export const Navigation = () => (
 						<Menu.Item title="Foo Bar Baz 6" to="random/fooBarBaz6" />
 						<Menu.Item title="Skip this1" />
 					</Menu.Item>
-				<Menu.Item title="Skip this1" />
+					<Menu.Item title="Skip this1" />
 				</Menu.Item>
 			</Menu.Item>
 
 			<Menu.Item title="Foo Bar 3" to="random/fooBar3">
 				<Menu.Item title="Skip this1" />
 				<Menu.Item title="Foo Bar Baz 3" to="random/fooBarBaz3" />
-					<Menu.Item title="Skip this1" />
-					<Menu.Item title="Foo Bar Baz 4" to="random/fooBarBaz4">
+				<Menu.Item title="Skip this1" />
+				<Menu.Item title="Foo Bar Baz 4" to="random/fooBarBaz4">
 					<Menu.Item title="Skip this" />
 					<Menu.Item title="Do not skip this!">
 						<Menu.Item title="Foo Bar Baz 5" to="random/fooBarBaz5" />
@@ -54,7 +54,7 @@ export const Navigation = () => (
 						<Menu.Item title="Foo Bar Baz 6" to="random/fooBarBaz6" />
 						<Menu.Item title="Skip this1" />
 					</Menu.Item>
-				<Menu.Item title="Skip this1" />
+					<Menu.Item title="Skip this1" />
 				</Menu.Item>
 			</Menu.Item>
 			<Menu.Item title="Skip this1" />

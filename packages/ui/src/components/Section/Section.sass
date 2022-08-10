@@ -15,7 +15,7 @@
   padding-left: var(--cui-section-padding-left)
   padding-right: var(--cui-section-padding-right)
   padding-top: var(--cui-section-padding-top)
-  scroll-margin-top: 6em // TODO: This is approximate, e.g. use some --cui-custom-property
+  scroll-margin-top: var(--cui-content-offset-top, 0px)
   &:first-child
     margin-top: calc(-1 * var(--cui-layout-page-padding-top, 0em))
     border-color: transparent
@@ -35,6 +35,3 @@
     display: none
   .sideDimensions-dimensions-dimension & .message--nesting-warning
     display: unset
-
-  @media (min-width: $breakpoint-large)
-    scroll-margin-top: 0

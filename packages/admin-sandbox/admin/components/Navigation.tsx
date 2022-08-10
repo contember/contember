@@ -3,6 +3,7 @@ import { Menu } from '@contember/admin'
 export const Navigation = () => (
 	<Menu id="sandbox-menu">
 		<Menu.Item title="Dashboard" to="index">
+			<Menu.Item title="Auto" to="auto" />
 			<Menu.Item title="Inputs" to="inputs" />
 			<Menu.Item title="Tags" to="tags" />
 			<Menu.Item title="Categories" to="categories" />

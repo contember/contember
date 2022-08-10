@@ -2,7 +2,7 @@ import { Component, useEntity } from '@contember/binding'
 import { LayoutPage, Message } from '@contember/ui'
 import { ReactChild, ReactNode } from 'react'
 
-export const NotFoundWrapper = Component<{ children: ReactChild, title?: ReactNode }>(
+export const NotFoundWrapper = Component<{ children: ReactNode, title?: ReactNode }>(
 	({ children, title }) => {
 		const accessor = useEntity()
 		const node = accessor.environment.getSubTree()

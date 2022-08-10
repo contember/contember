@@ -30,8 +30,9 @@
 		max-width: calc(460px + var(--cui-toaster-inset-left) + var(--cui-toaster-inset-right))
 		padding: var(--cui-toaster-inset)
 		overflow: auto
-		pointer-events: auto
 		width: 100%
+		& > *
+			pointer-events: auto
 
 	&-item
 		isolation: isolate

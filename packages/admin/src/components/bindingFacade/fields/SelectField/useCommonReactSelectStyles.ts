@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import type { StylesConfig } from 'react-select'
+import type { GroupBase, StylesConfig } from 'react-select'
 
 export type PublicCommonReactSelectStylesProps = {
 	/**
@@ -13,7 +13,7 @@ export type CommonReactSelectStylesProps =
 	& { isInvalid?: boolean }
 
 // TODO: Not yet finished with all styles
-export const useCommonReactSelectStyles = ({ isInvalid = false, menuZIndex }: CommonReactSelectStylesProps): StylesConfig<any, boolean, never> => useMemo(() => ({
+export const useCommonReactSelectStyles = <Option = unknown, IsMulti extends boolean = boolean, Group extends GroupBase<Option> = GroupBase<Option>>({ isInvalid = false, menuZIndex }: CommonReactSelectStylesProps): StylesConfig<Option, IsMulti, Group> => useMemo(() => ({
 	indicatorSeparator: (provided, { isFocused, isDisabled }) => {
 		const backgroundColor = isDisabled
 			? 'var(--cui-color--lower)'
@@ -159,14 +159,12 @@ export const useCommonReactSelectStyles = ({ isInvalid = false, menuZIndex }: Co
 		return {
 			...provided,
 			zIndex: menuZIndex ?? 'unset',
-			isolation: 'isolate',
 		}
 	},
 	menuPortal: (provided, props) => {
 		return {
 			...provided,
-			zIndex: menuZIndex ?? 'unset',
-			isolation: 'isolate',
+			zIndex: 150,
 		}
 	},
 	option: (provided, { isFocused, isSelected }) => {

@@ -10,24 +10,25 @@ import { Heading } from '../Typography/Heading'
 export interface SectionOwnProps {
 	id?: string
 	heading?: ReactNode
+	showTab?: boolean
 	actions?: ReactNode
 	children?: ReactNode
 }
 
-export interface SectionProps extends SectionOwnProps, Omit<NativeProps<HTMLElement>, 'children'> {}
+export interface SectionProps extends SectionOwnProps, Omit<NativeProps<HTMLElement>, 'children'> { }
 
 const randomId = () => (Math.random() + 1).toString(36).substring(7)
 
 export const Section = memo(
 	forwardRef<HTMLElement, SectionProps>(
-		({ actions, children, heading, id, className, ...divProps }: SectionProps, ref) => {
+		({ actions, children, heading, id, className, showTab = true, ...divProps }: SectionProps, ref) => {
 			const prefix = useClassNamePrefix()
 
 			const [registerTab, unregisterTab] = useSectionTabsRegistration()
 			const sectionId = useRef<string>(id ? `section-${id}` : 'section-' + randomId())
 
 			useLayoutEffect(() => {
-				if (!heading) {
+				if (!heading || !showTab) {
 					return
 				}
 
@@ -38,7 +39,7 @@ export const Section = memo(
 				return () => {
 					unregisterTab(tab)
 				}
-			}, [sectionId, heading, registerTab, unregisterTab])
+			}, [heading, registerTab, sectionId, showTab, unregisterTab])
 
 			return (
 				<section

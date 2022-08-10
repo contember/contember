@@ -29,7 +29,6 @@ import { MarkerMerger } from './MarkerMerger'
 import { MarkerTreeGenerator } from './MarkerTreeGenerator'
 import { MutationGenerator } from './MutationGenerator'
 import { QueryGenerator } from './QueryGenerator'
-import { Schema, SchemaLoader } from './schema'
 import { StateIterator } from './state'
 import { StateInitializer } from './StateInitializer'
 import { TreeAugmenter } from './TreeAugmenter'
@@ -39,8 +38,6 @@ import type { UpdateMetadata } from './UpdateMetadata'
 import { getCombinedSignal } from './utils'
 
 export class DataBinding {
-	private static readonly schemaLoadCache: Map<string, Schema | Promise<Schema>> = new Map()
-
 	private readonly accessorErrorManager: AccessorErrorManager
 	private readonly batchUpdatesOptions: BatchUpdatesOptions
 	private readonly asyncBatchUpdatesOptions: AsyncBatchUpdatesOptions
@@ -50,7 +47,6 @@ export class DataBinding {
 	private readonly eventManager: EventManager
 	private readonly stateInitializer: StateInitializer
 	private readonly treeAugmenter: TreeAugmenter
-	private readonly treeStore: TreeStore
 
 	// private treeRootListeners: {
 	// 	eventListeners: {}
@@ -62,13 +58,13 @@ export class DataBinding {
 		private readonly contentApiClient: GraphQlClient,
 		private readonly systemApiClient: GraphQlClient,
 		private readonly tenantApiClient: GraphQlClient,
+		private readonly treeStore: TreeStore,
 		private readonly environment: Environment,
 		private readonly onUpdate: (newData: TreeRootAccessor, binding: DataBinding) => void,
 		private readonly onError: (error: RequestError, binding: DataBinding) => void,
 		private readonly onPersistSuccess: (result: SuccessfulPersistResult, binding: DataBinding) => void,
 	) {
 		this.config = new Config()
-		this.treeStore = new TreeStore()
 		this.batchUpdatesOptions = createBatchUpdatesOptions(environment, this.treeStore)
 		this.asyncBatchUpdatesOptions = {
 			...this.batchUpdatesOptions,
@@ -271,9 +267,7 @@ export class DataBinding {
 		if (options.signal?.aborted) {
 			return Promise.reject(DataBindingExtendAborted)
 		}
-		const schema = await this.getOrLoadSchema()
-		this.treeStore.setSchema(schema)
-		const markerTreeRoot = new MarkerTreeGenerator(newFragment, (options.environment ?? this.environment).withSchema(schema)).generate()
+		const markerTreeRoot = new MarkerTreeGenerator(newFragment, options.environment ?? this.environment).generate()
 
 		if (this.treeStore.effectivelyHasTreeRoot(markerTreeRoot)) {
 			// This isn't perfectly accurate as theoretically, we could already have all the data necessary but this
@@ -421,20 +415,6 @@ export class DataBinding {
 				}
 			}
 		})
-	}
-
-	private getOrLoadSchema(): Schema | Promise<Schema> {
-		const existing = DataBinding.schemaLoadCache.get(this.contentApiClient.apiUrl)
-		if (existing !== undefined) {
-			return existing
-		}
-
-		const schemaPromise = SchemaLoader.loadSchema(this.contentApiClient, this.config.getValue('maxSchemaLoadAttempts'))
-		schemaPromise.then(schema => {
-			DataBinding.schemaLoadCache.set(this.contentApiClient.apiUrl, schema)
-		})
-		DataBinding.schemaLoadCache.set(this.contentApiClient.apiUrl, schemaPromise)
-		return schemaPromise
 	}
 
 	private static getNextTreeRootIdSeed = (() => {

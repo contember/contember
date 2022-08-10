@@ -58,6 +58,7 @@ export type AccessorTreeStateAction = {
 } | {
     type: 'reset';
     binding: DataBinding;
+    environment: Environment;
 };
 
 // @public (undocumented)
@@ -70,8 +71,6 @@ export interface AccessorTreeStateMetadata {
 export interface AccessorTreeStateOptions {
     // (undocumented)
     nodeTree: ReactNode;
-    // (undocumented)
-    refreshOnEnvironmentChange?: boolean;
     // (undocumented)
     refreshOnPersist?: boolean;
 }
@@ -119,8 +118,6 @@ export interface BindingConfig {
     beforeUpdateSettleLimit: number;
     // (undocumented)
     maxPersistAttempts: number;
-    // (undocumented)
-    maxSchemaLoadAttempts: number;
     // (undocumented)
     persistSuccessSettleLimit: number;
 }
@@ -183,7 +180,8 @@ export function Component<Props extends {}, NonStaticPropNames extends keyof Pro
 
 // @public (undocumented)
 export class DataBinding {
-    constructor(contentApiClient: GraphQlClient, systemApiClient: GraphQlClient, tenantApiClient: GraphQlClient, environment: Environment, onUpdate: (newData: TreeRootAccessor, binding: DataBinding) => void, onError: (error: RequestError, binding: DataBinding) => void, onPersistSuccess: (result: SuccessfulPersistResult, binding: DataBinding) => void);
+    // Warning: (ae-forgotten-export) The symbol "TreeStore" needs to be exported by the entry point index.d.ts
+    constructor(contentApiClient: GraphQlClient, systemApiClient: GraphQlClient, tenantApiClient: GraphQlClient, treeStore: TreeStore, environment: Environment, onUpdate: (newData: TreeRootAccessor, binding: DataBinding) => void, onError: (error: RequestError, binding: DataBinding) => void, onPersistSuccess: (result: SuccessfulPersistResult, binding: DataBinding) => void);
     // (undocumented)
     extendTree(newFragment: ReactNode, options?: ExtendTreeOptions): Promise<TreeRootId | undefined>;
 }
@@ -198,8 +196,6 @@ export const DataBindingProvider: <StateProps>(props: DataBindingProviderProps<S
 export interface DataBindingProviderBaseProps {
     // (undocumented)
     children?: ReactNode;
-    // (undocumented)
-    refreshOnEnvironmentChange?: boolean;
     // (undocumented)
     refreshOnPersist?: boolean;
 }
@@ -935,6 +931,8 @@ export interface ErrorAccessorTreeState {
     // (undocumented)
     binding: DataBinding;
     // (undocumented)
+    environment: Environment;
+    // (undocumented)
     error: RequestError;
     // (undocumented)
     name: 'error';
@@ -1314,13 +1312,17 @@ export interface InitializedAccessorTreeState {
     // (undocumented)
     data: TreeRootAccessor;
     // (undocumented)
+    environment: Environment;
+    // (undocumented)
     name: 'initialized';
 }
 
 // @public (undocumented)
 export interface InitializingAccessorTreeState {
     // (undocumented)
-    binding: DataBinding;
+    binding?: DataBinding;
+    // (undocumented)
+    environment: Environment;
     // (undocumented)
     name: 'initializing';
 }
@@ -2439,7 +2441,7 @@ export function useAccessorUpdateSubscription(getAccessor: () => EntityListAcces
 export const useBindingOperations: () => BindingOperations;
 
 // @public (undocumented)
-export const useDataBinding: ({ nodeTree, refreshOnEnvironmentChange, refreshOnPersist, }: AccessorTreeStateOptions) => AccessorTreeState;
+export const useDataBinding: ({ nodeTree, refreshOnPersist, }: AccessorTreeStateOptions) => AccessorTreeState;
 
 // @public @deprecated
 export const useDerivedField: <SourceValue extends FieldValue = FieldValue>(sourceField: string | SugaredRelativeSingleField, derivedField: string | SugaredRelativeSingleField, transform?: (sourceValue: SourceValue | null) => SourceValue | null, agent?: string) => void;

@@ -4,6 +4,8 @@ import { Schema } from './Schema'
 import { SchemaPreprocessor } from './SchemaPreprocessor'
 
 export class SchemaLoader {
+	private static readonly schemaLoadCache: Map<string, Promise<Schema>> = new Map()
+
 	private static readonly schemaQuery =
 		'query {\n' +
 		'  schema {\n' +
@@ -45,18 +47,18 @@ export class SchemaLoader {
 
 	public static async loadSchema(
 		client: GraphQlClient,
-		maxAttempts: number,
 		options?: GraphQlClientRequestOptions,
 	): Promise<Schema> {
-		return new Promise<Schema>(async (resolve, reject) => {
-			for (let attemptNumber = 0; attemptNumber < Math.max(1, maxAttempts); attemptNumber++) {
-				try {
-					const raw: { data: { schema: RawSchema } } = await client.sendRequest(this.schemaQuery, options)
-					const schema = new Schema(SchemaPreprocessor.processRawSchema(raw.data.schema))
-					return resolve(schema)
-				} catch {}
-			}
-			reject()
-		})
+
+		const existing = this.schemaLoadCache.get(client.apiUrl)
+		if (existing !== undefined) {
+			return existing
+		}
+		const schemaPromise = (async () => {
+			const raw: { data: { schema: RawSchema } } = await client.sendRequest(this.schemaQuery, options)
+			return new Schema(SchemaPreprocessor.processRawSchema(raw.data.schema))
+		})()
+		this.schemaLoadCache.set(client.apiUrl, schemaPromise)
+		return await schemaPromise
 	}
 }

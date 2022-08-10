@@ -40,10 +40,11 @@ export class TreeStore {
 	public readonly markerTrees: Map<TreeRootId | undefined, MarkerTreeRoot> = new Map()
 	public readonly subTreeStatesByRoot: Map<TreeRootId | undefined, Map<PlaceholderName, RootStateNode>> = new Map()
 
-	private _schema: Schema | undefined
 	public readonly persistedData: NormalizedPersistedData = new NormalizedPersistedData(new Map(), new Map())
 
-	public constructor() {}
+	public constructor(
+		private readonly _schema: Schema,
+	) {}
 
 	public mergeInQueryResponse(response: ReceivedDataTree, markerTree: MarkerTreeRoot): void {
 		RequestResponseNormalizer.mergeInQueryResponse(this.persistedData, response, markerTree)
@@ -51,13 +52,6 @@ export class TreeStore {
 
 	public mergeInMutationResponse(response: ReceivedDataTree, operations: SubMutationOperation[]): void {
 		RequestResponseNormalizer.mergeInMutationResponse(this.persistedData, response, operations)
-	}
-
-	public setSchema(newSchema: Schema): void {
-		// TODO
-		if (this._schema === undefined) {
-			this._schema = newSchema
-		}
 	}
 
 	public get persistedEntityData(): PersistedEntityDataStore {
@@ -69,9 +63,6 @@ export class TreeStore {
 	}
 
 	public get schema(): Schema {
-		if (this._schema === undefined) {
-			throw new BindingError(`Fatal error: failed to load api schema.`)
-		}
 		return this._schema
 	}
 

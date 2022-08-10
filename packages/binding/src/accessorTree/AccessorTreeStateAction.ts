@@ -1,6 +1,7 @@
 import type { TreeRootAccessor } from '../accessors'
 import type { RequestError } from './RequestError'
 import { DataBinding } from '../core'
+import { Environment } from '../dao'
 
 export type AccessorTreeStateAction =
 	| {
@@ -16,4 +17,5 @@ export type AccessorTreeStateAction =
 	| {
 			type: 'reset'
 			binding: DataBinding
-	  }
+			environment: Environment
+	}

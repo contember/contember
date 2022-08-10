@@ -3,5 +3,4 @@ export interface BindingConfig {
 	beforePersistSettleLimit: number
 	persistSuccessSettleLimit: number
 	maxPersistAttempts: number
-	maxSchemaLoadAttempts: number
 }

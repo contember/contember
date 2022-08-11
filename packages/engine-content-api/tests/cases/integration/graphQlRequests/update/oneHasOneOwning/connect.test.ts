@@ -197,17 +197,17 @@ test('connect - orphan removal', async () => {
 					parameters: [siteId],
 					response: { rows: [{ id: siteId }] },
 				},
-				// current inverse
-				{
-					sql: 'select "root_"."setting_id"  from "public"."site" as "root_"   where "root_"."id" = ?',
-					parameters: [siteId],
-					response: { rows: [{ setting_id: settingId2 }] },
-				},
 				// new inverse
 				{
 					sql: SQL`select "root_"."id" from "public"."site_setting" as "root_" where "root_"."id" = ?`,
 					parameters: [settingId],
 					response: { rows: [{ id: settingId }] },
+				},
+				// current inverse
+				{
+					sql: 'select "root_"."setting_id"  from "public"."site" as "root_"   where "root_"."id" = ?',
+					parameters: [siteId],
+					response: { rows: [{ setting_id: settingId2 }] },
 				},
 				// owner of new inverse
 				{

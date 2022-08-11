@@ -1,5 +1,6 @@
 import { Input } from '@contember/schema'
 import * as Context from './InputContext'
+import { ContextWithInput } from './InputContext'
 
 interface CreateInputProcessor<Result = void> {
 	column(context: Context.ColumnContext): Promise<Result>
@@ -15,7 +16,6 @@ interface CreateInputProcessor<Result = void> {
 }
 
 namespace CreateInputProcessor {
-	export type ContextWithInput<Context, Input> = Context & { input: Input }
 
 	export interface HasOneRelationProcessor<Context, Result> {
 		nothing?: (context: ContextWithInput<Context, undefined>) => Promise<Result>
@@ -24,12 +24,8 @@ namespace CreateInputProcessor {
 	}
 
 	export interface HasManyRelationProcessor<Context, Result> {
-		connect: (
-			context: ContextWithInput<Context, Input.UniqueWhere> & { index: number; alias?: string },
-		) => Promise<Result>
-		create: (
-			context: ContextWithInput<Context, Input.CreateDataInput> & { index: number; alias?: string },
-		) => Promise<Result>
+		connect: (context: ContextWithInput<Context, Input.UniqueWhere> & { index: number; alias?: string }) => Promise<Result>
+		create: (context: ContextWithInput<Context, Input.CreateDataInput> & { index: number; alias?: string }) => Promise<Result>
 	}
 }
 

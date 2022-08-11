@@ -1,5 +1,5 @@
 import { Input, Model } from '@contember/schema'
-import { getColumnName } from '@contember/schema-utils'
+import { acceptFieldVisitor, getColumnName } from '@contember/schema-utils'
 import {
 	OrderByHelper,
 	PathFactory,
@@ -45,7 +45,7 @@ export class Mapper {
 		this.constraintHelper = new ConstraintHelper(db)
 	}
 
-	public async selectField(entity: Model.Entity, where: Input.UniqueWhere, fieldName: string) {
+	public async selectField(entity: Model.Entity, where: Input.UniqueWhere | CheckedPrimary, fieldName: string) {
 		const columnName = getColumnName(this.schema, entity, fieldName)
 
 		const qb = SelectBuilder.create() //
@@ -199,7 +199,7 @@ export class Mapper {
 
 	public async updateInternal(
 		entity: Model.Entity,
-		by: Input.UniqueWhere,
+		by: Input.UniqueWhere | CheckedPrimary,
 		builderCb: (builder: UpdateBuilder) => void,
 	): Promise<MutationResultList> {
 		if (entity.view) {
@@ -208,7 +208,7 @@ export class Mapper {
 		return tryMutation(this.schema, async () => {
 			const primaryValue = await this.getPrimaryValue(entity, by)
 			if (primaryValue === undefined) {
-				return [new MutationEntryNotFoundError([], by)]
+				return [new MutationEntryNotFoundError([], by as Input.UniqueWhere)]
 			}
 			return await this.updater.updateCb(this, entity, primaryValue, builderCb)
 		})
@@ -248,33 +248,51 @@ export class Mapper {
 	}
 
 	public async connectJunction(
-		owningEntity: Model.Entity,
-		relation: Model.ManyHasManyOwningRelation,
-		owningPrimary: Input.PrimaryValue,
-		inversePrimary: Input.PrimaryValue,
+		entity: Model.Entity,
+		relation: Model.ManyHasManyOwningRelation | Model.ManyHasManyInverseRelation,
+		thisPrimary: Input.PrimaryValue,
+		otherPrimary: Input.PrimaryValue,
 	): Promise<MutationResultList> {
-		return await this.junctionTableManager.connectJunction(
-			this.db,
-			owningEntity,
-			relation,
-			owningPrimary,
-			inversePrimary,
-		)
+		const err = () => {
+			throw new ImplementationException()
+		}
+		return await acceptFieldVisitor(this.schema, entity, relation, {
+			visitManyHasManyOwning: (entity, relation) => {
+				return this.junctionTableManager.connectJunction(this.db, entity, relation, thisPrimary, otherPrimary)
+			},
+			visitManyHasManyInverse: (entity, relation, targetEntity, targetRelation) => {
+				return this.junctionTableManager.connectJunction(this.db, targetEntity, targetRelation, otherPrimary, thisPrimary)
+			},
+			visitColumn: err,
+			visitOneHasMany: err,
+			visitOneHasOneInverse: err,
+			visitOneHasOneOwning: err,
+			visitManyHasOne: err,
+		})
 	}
 
 	public async disconnectJunction(
-		owningEntity: Model.Entity,
-		relation: Model.ManyHasManyOwningRelation,
-		owningPrimary: Input.PrimaryValue,
-		inversePrimary: Input.PrimaryValue,
+		entity: Model.Entity,
+		relation: Model.ManyHasManyOwningRelation | Model.ManyHasManyInverseRelation,
+		thisPrimary: Input.PrimaryValue,
+		otherPrimary: Input.PrimaryValue,
 	): Promise<MutationResultList> {
-		return await this.junctionTableManager.disconnectJunction(
-			this.db,
-			owningEntity,
-			relation,
-			owningPrimary,
-			inversePrimary,
-		)
+		const err = () => {
+			throw new ImplementationException()
+		}
+		return await acceptFieldVisitor(this.schema, entity, relation, {
+			visitManyHasManyOwning: (entity, relation) => {
+				return this.junctionTableManager.disconnectJunction(this.db, entity, relation, thisPrimary, otherPrimary)
+			},
+			visitManyHasManyInverse: (entity, relation, targetEntity, targetRelation) => {
+				return this.junctionTableManager.disconnectJunction(this.db, targetEntity, targetRelation, otherPrimary, thisPrimary)
+			},
+			visitColumn: err,
+			visitOneHasMany: err,
+			visitOneHasOneInverse: err,
+			visitOneHasOneOwning: err,
+			visitManyHasOne: err,
+		})
 	}
 
 	public async getPrimaryValue(

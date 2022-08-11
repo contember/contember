@@ -4,8 +4,8 @@ import { acceptEveryFieldVisitor, getColumnName, getColumnType } from '@contembe
 import { Client, Operator, QueryBuilder, UpdateBuilder as DbUpdateBuilder, Value as DbValue } from '@contember/database'
 import { PathFactory, WhereBuilder } from '../select'
 import { ColumnValue, ResolvedColumnValue, resolveGenericValue, resolveRowData } from '../ColumnValue'
-import { AbortUpdate } from './Updater'
 import { PredicateFactory } from '../../acl'
+import { AbortDataManipulation, DataManipulationBuilder } from '../DataManipulationBuilder'
 
 export interface UpdateResult {
 	values: ResolvedColumnValue[]
@@ -14,13 +14,13 @@ export interface UpdateResult {
 	affectedRows: number | null
 }
 
-export class UpdateBuilder {
+export class UpdateBuilder implements DataManipulationBuilder {
 	private resolver: (value: number | null) => void = () => {
 		throw new Error('UpdateBuilder: Resolver called too soon')
 	}
 	public readonly update: Promise<number | null> = new Promise(resolve => (this.resolver = resolve))
 
-	private rowData: Map<string, ColumnValue<AbortUpdate>> = new Map()
+	private rowData: Map<string, ColumnValue<AbortDataManipulation>> = new Map()
 
 	private newWhere: { and: Input.OptionalWhere[] } = { and: [] }
 	private oldWhere: { and: Input.OptionalWhere[] } = { and: [] }
@@ -36,8 +36,8 @@ export class UpdateBuilder {
 
 	public addFieldValue(
 		fieldName: string,
-		value: Value.GenericValueLike<Value.AtomicValue<AbortUpdate | undefined>>,
-	): Promise<Value.AtomicValue<AbortUpdate | undefined>> {
+		value: Value.GenericValueLike<Value.AtomicValue<AbortDataManipulation | undefined>>,
+	): Promise<Value.AtomicValue<AbortDataManipulation | undefined>> {
 		const columnName = getColumnName(this.schema, this.entity, fieldName)
 		const columnType = getColumnType(this.schema, this.entity, fieldName)
 		const resolvedValue = resolveGenericValue(value)
@@ -61,12 +61,12 @@ export class UpdateBuilder {
 
 	public async execute(db: Client): Promise<UpdateResult> {
 		try {
-			const resolvedData = await resolveRowData<AbortUpdate>([...this.rowData.values()])
+			const resolvedData = await resolveRowData<AbortDataManipulation>([...this.rowData.values()])
 			if (Object.keys(resolvedData).length === 0) {
 				this.resolver(null)
 				return { values: [], affectedRows: null, executed: false, aborted: false }
 			}
-			if (resolvedData.find(it => it.resolvedValue === AbortUpdate)) {
+			if (resolvedData.find(it => it.resolvedValue === AbortDataManipulation)) {
 				this.resolver(null)
 				return { values: [], affectedRows: null, executed: false, aborted: true }
 			}

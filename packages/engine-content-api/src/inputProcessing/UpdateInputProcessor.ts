@@ -1,5 +1,6 @@
 import { Input } from '@contember/schema'
 import * as Context from './InputContext'
+import { ContextWithInput } from './InputContext'
 
 interface UpdateInputProcessor<Result = void> {
 	column(context: Context.ColumnContext): Promise<Result>
@@ -18,7 +19,6 @@ interface UpdateInputProcessor<Result = void> {
 }
 
 namespace UpdateInputProcessor {
-	export type ContextWithInput<Context, Input> = Context & { input: Input }
 	export type UpsertInput = { update: Input.UpdateDataInput; create: Input.CreateDataInput }
 	export type UpdateManyInput = { where: Input.UniqueWhere; data: Input.UpdateDataInput }
 	export type UpsertManyInput = {
@@ -44,17 +44,13 @@ namespace UpdateInputProcessor {
 	export interface HasManyRelationInputProcessor<Context, Result> {
 		connect(context: ContextWithInput<Context, Input.UniqueWhere> & { index: number; alias?: string }): Promise<Result>
 
-		create(
-			context: ContextWithInput<Context, Input.CreateDataInput> & { index: number; alias?: string },
-		): Promise<Result>
+		create(context: ContextWithInput<Context, Input.CreateDataInput> & { index: number; alias?: string }): Promise<Result>
 
 		update(context: ContextWithInput<Context, UpdateManyInput> & { index: number; alias?: string }): Promise<Result>
 
 		upsert(context: ContextWithInput<Context, UpsertManyInput> & { index: number; alias?: string }): Promise<Result>
 
-		disconnect(
-			context: ContextWithInput<Context, Input.UniqueWhere> & { index: number; alias?: string },
-		): Promise<Result>
+		disconnect(context: ContextWithInput<Context, Input.UniqueWhere> & { index: number; alias?: string }): Promise<Result>
 
 		delete(context: ContextWithInput<Context, Input.UniqueWhere> & { index: number; alias?: string }): Promise<Result>
 	}

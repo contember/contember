@@ -1,5 +1,7 @@
 import { Input, Model } from '@contember/schema'
 
+export type ContextWithInput<Context, Input> = Context & { input: Input }
+
 export interface ColumnContext {
 	entity: Model.Entity
 	column: Model.AnyColumn

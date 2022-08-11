@@ -4,8 +4,8 @@ import { PathFactory, WhereBuilder } from '../select'
 import { getColumnName, getColumnType } from '@contember/schema-utils'
 import { ColumnValue, ResolvedColumnValue, resolveGenericValue, resolveRowData } from '../ColumnValue'
 import { ImplementationException } from '../../exception'
-import { AbortInsert } from './Inserter'
 import { PredicateFactory } from '../../acl'
+import { AbortDataManipulation, DataManipulationBuilder } from '../DataManipulationBuilder'
 
 export interface InsertResult {
 	values: ResolvedColumnValue[]
@@ -14,13 +14,13 @@ export interface InsertResult {
 	primaryValue: Value.PrimaryValue | null
 }
 
-export class InsertBuilder {
+export class InsertBuilder implements DataManipulationBuilder{
 	private resolver: (value: Value.PrimaryValue | null) => void = () => {
 		throw new ImplementationException('InsertBuilder: Resolver called too soon')
 	}
 	public readonly insert: Promise<Value.PrimaryValue | null> = new Promise(resolve => (this.resolver = resolve))
 
-	private rowData: Map<string, ColumnValue<AbortInsert | undefined>> = new Map()
+	private rowData: Map<string, ColumnValue<AbortDataManipulation | undefined>> = new Map()
 	private where: { and: Input.Where[] } = { and: [] }
 
 	constructor(
@@ -33,8 +33,8 @@ export class InsertBuilder {
 
 	public addFieldValue(
 		fieldName: string,
-		value: Value.GenericValueLike<Value.AtomicValue<AbortInsert | undefined>>,
-	): Promise<Value.AtomicValue<AbortInsert | undefined>> {
+		value: Value.GenericValueLike<Value.AtomicValue<AbortDataManipulation | undefined>>,
+	): Promise<Value.AtomicValue<AbortDataManipulation | undefined>> {
 		const columnName = getColumnName(this.schema, this.entity, fieldName)
 		const columnType = getColumnType(this.schema, this.entity, fieldName)
 		const resolvedValue = resolveGenericValue(value)
@@ -51,14 +51,14 @@ export class InsertBuilder {
 		this.where.and.push(where)
 	}
 
-	public async getResolvedData(): Promise<ResolvedColumnValue<AbortInsert>[]> {
+	public async getResolvedData(): Promise<ResolvedColumnValue<AbortDataManipulation>[]> {
 		return resolveRowData([...this.rowData.values()])
 	}
 
 	public async execute(db: Client): Promise<InsertResult> {
 		try {
 			const resolvedData = await this.getResolvedData()
-			if (resolvedData.find(it => it.resolvedValue === AbortInsert)) {
+			if (resolvedData.find(it => it.resolvedValue === AbortDataManipulation)) {
 				this.resolver(null)
 				return { aborted: true, executed: false, primaryValue: null, values: [] }
 			}

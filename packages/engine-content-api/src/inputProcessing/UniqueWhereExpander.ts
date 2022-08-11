@@ -2,13 +2,17 @@ import { Input, Model, Writable } from '@contember/schema'
 import { getTargetEntity } from '@contember/schema-utils'
 import { UserError } from '../exception'
 import { getFieldsForUniqueWhere } from '../utils'
+import { CheckedPrimary } from '../mapper/CheckedPrimary'
 
 type ExtendedUniqueWhere = Input.UniqueWhere<Input.PrimaryValue[]>
 
 export class UniqueWhereExpander {
 	constructor(private readonly schema: Model.Schema) {}
 
-	expand(entity: Model.Entity, where: ExtendedUniqueWhere, path: string[] = []): Input.Where {
+	expand(entity: Model.Entity, where: ExtendedUniqueWhere | CheckedPrimary, path: string[] = []): Input.Where {
+		if (where instanceof CheckedPrimary) {
+			return { [entity.primary]: { eq: where.primaryValue } }
+		}
 		const isFilled = (field: string) => where[field] !== undefined && where[field] !== null
 
 		const isUnique = (() => {

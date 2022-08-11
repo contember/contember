@@ -10,9 +10,8 @@ import {
 import { CreateInputVisitor } from '../../inputProcessing'
 import { SqlCreateInputProcessor } from './SqlCreateInputProcessor'
 import { Mapper } from '../Mapper'
-import { Acl, Input, Model, Value } from '@contember/schema'
+import { Input, Model, Value } from '@contember/schema'
 import { acceptEveryFieldVisitor, Providers } from '@contember/schema-utils'
-import { PredicateFactory } from '../../acl'
 import { InsertBuilderFactory } from './InsertBuilderFactory'
 import { Client } from '@contember/database'
 import { InsertBuilder } from './InsertBuilder'
@@ -76,5 +75,3 @@ export class Inserter {
 	}
 }
 
-export const AbortInsert = Symbol('AbortInsert')
-export type AbortInsert = typeof AbortInsert

@@ -91,6 +91,3 @@ export class Updater {
 		return [okResultFactory(rowDataToFieldValues(result.values))]
 	}
 }
-
-export const AbortUpdate = Symbol('AbortUpdate')
-export type AbortUpdate = typeof AbortUpdate

@@ -1,5 +1,6 @@
 import { Input, Model } from '@contember/schema'
 
+
 interface UpdateInputProcessor<Result = void> {
 	column(context: UpdateInputProcessor.ContextWithInput<Model.ColumnContext, Input.ColumnValue | undefined>): Promise<Result>
 
@@ -43,17 +44,13 @@ namespace UpdateInputProcessor {
 	export interface HasManyRelationInputProcessor<Context, Result> {
 		connect(context: ContextWithInput<Context, Input.UniqueWhere> & { index: number; alias?: string }): Promise<Result>
 
-		create(
-			context: ContextWithInput<Context, Input.CreateDataInput> & { index: number; alias?: string },
-		): Promise<Result>
+		create(context: ContextWithInput<Context, Input.CreateDataInput> & { index: number; alias?: string }): Promise<Result>
 
 		update(context: ContextWithInput<Context, UpdateManyInput> & { index: number; alias?: string }): Promise<Result>
 
 		upsert(context: ContextWithInput<Context, UpsertManyInput> & { index: number; alias?: string }): Promise<Result>
 
-		disconnect(
-			context: ContextWithInput<Context, Input.UniqueWhere> & { index: number; alias?: string },
-		): Promise<Result>
+		disconnect(context: ContextWithInput<Context, Input.UniqueWhere> & { index: number; alias?: string }): Promise<Result>
 
 		delete(context: ContextWithInput<Context, Input.UniqueWhere> & { index: number; alias?: string }): Promise<Result>
 	}

@@ -15,7 +15,7 @@ export const FillResetPasswordTokenForm: FC<FillResetPasswordTokenFormProps> = (
 	const redirect = useRedirect()
 
 	const { register, isSubmitting, onSubmit } = useForm<typeof initialValues>(initialValues, useCallback(
-			async values => {
+			async (values: typeof initialValues) => {
 				redirect(resetLink(values.token))
 			},
 			[redirect, resetLink],

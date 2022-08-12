@@ -18,7 +18,7 @@ export const CreateResetPasswordRequestForm: FC<CreateResetPasswordRequestFormPr
 	const createResetPasswordRequest = useCreateResetPasswordRequest()
 
 	const { register, isSubmitting, onSubmit } = useForm(initialValues, useCallback(
-		async values => {
+		async (values: typeof initialValues) => {
 			const response = await createResetPasswordRequest({
 				email: values.email,
 			})

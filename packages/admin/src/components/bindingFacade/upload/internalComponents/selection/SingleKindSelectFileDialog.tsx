@@ -1,4 +1,4 @@
-import { DeferredSubTrees } from '@contember/binding'
+import { DeferredSubTrees, EntityAccessor } from '@contember/binding'
 import { ComponentType, useCallback } from 'react'
 import { EntityConnectorFactory } from '../hooks/useConnectSelectedEntities'
 import { FileSelectionProps } from './SelectFileInput'
@@ -24,7 +24,7 @@ export const SingleKindSelectFileDialog = (
 		innerProps,
 	}: SingleKindSelectFileDialogProps,
 ) => {
-	const onToggleSelect = useCallback(entity => {
+	const onToggleSelect = useCallback((entity: EntityAccessor) => {
 		onToggleSelectConnector(connectorFactory(entity))
 	}, [connectorFactory, onToggleSelectConnector])
 	return <>

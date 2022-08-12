@@ -21,7 +21,7 @@ export const ConfirmOtpForm: FC<ConfirmOtpFormProps> = ({ redirectOnSuccess, onS
 	const refreshIdentity = useContext(IdentityRefreshContext)
 
 	const { isSubmitting, onSubmit, register } = useForm<typeof initialValues>(initialValues, useCallback(
-		async values => {
+		async (values: typeof initialValues) => {
 			const response = await confirmOtp({ token: values.token })
 			if (response.ok) {
 				addToast({

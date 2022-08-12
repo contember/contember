@@ -15,6 +15,7 @@ class Environment {
 			dimensions: {},
 			variables: {},
 			parameters: {},
+			extensions: new Map(),
 		})
 	}
 
@@ -189,6 +190,18 @@ class Environment {
 		return this.options.parent
 	}
 
+	public withExtension<S, R>(extension: Environment.Extension<S, R>, state: S): Environment {
+		return new Environment({
+			...this.options,
+			extensions: new Map([...this.options.extensions, [extension, state] as [Environment.Extension<unknown, unknown>, unknown]]),
+		})
+	}
+
+	public getExtension<S, R>(extension: Environment.Extension<S, R>): R {
+		const state = this.options.extensions.get(extension as Environment.Extension<unknown, unknown>)
+		return extension.create(state as S, this)
+	}
+
 	public merge(other: Environment): Environment {
 		if (other === this) {
 			return this
@@ -202,6 +215,11 @@ class Environment {
 		if (this.options.dimensions !== other.options.dimensions) {
 			throw new BindingError(`Cannot merge two environments with different dimensions.`)
 		}
+		if (this.options.extensions !== other.options.extensions) {
+			// todo: deep compare?
+			throw new BindingError(`Cannot merge two environments with different extensions.`)
+		}
+
 		if (equal(this.options.variables, other.options.variables) && this.options.parent === other.options.parent) {
 			return this
 		}
@@ -235,6 +253,7 @@ namespace Environment {
 		parameters: Parameters
 		variables: CustomVariables
 		parent?: Environment
+		extensions: Map<Extension<unknown, unknown>, unknown>
 	}
 
 	export type SubTreeNode =
@@ -298,6 +317,17 @@ namespace Environment {
 		[key: string]:
 			| ((environment: Environment) => Value)
 			| Value
+	}
+
+	export type Extension<State, Result> = {
+		create: (state: State | undefined, environment: Environment) => Result
+	}
+
+	export const createExtension = <S, R>(create: Extension<S, R>['create'], otherMethods?: Omit<Extension<S, R>, 'create'>): Extension<S, R> => {
+		return {
+			create,
+			...otherMethods,
+		}
 	}
 
 	/** @deprecated */

@@ -5,6 +5,8 @@ import { ContainerSpinner, Message } from '@contember/ui'
 import { MiscPageLayout } from '../MiscPageLayout'
 import { InvalidIdentityFallback } from './InvalidIdentityFallback'
 import { useLogout } from './useLogout'
+import { EnvironmentExtensionProvider } from '@contember/binding'
+import { identityEnvironmentExtension } from './IdentityEnvironmentExtension'
 
 export interface Identity {
 	email: string
@@ -142,10 +144,12 @@ export const IdentityProvider: React.FC<IdentityProviderProps> = ({ children, on
 	}
 
 	return (
-		<IdentityContext.Provider value={identityContextValue}>
-			<IdentityRefreshContext.Provider value={refetch}>
-				{children}
-			</IdentityRefreshContext.Provider>
-		</IdentityContext.Provider>
+		<EnvironmentExtensionProvider extension={identityEnvironmentExtension} state={identityContextValue?.identity ?? null}>
+			<IdentityContext.Provider value={identityContextValue}>
+				<IdentityRefreshContext.Provider value={refetch}>
+					{children}
+				</IdentityRefreshContext.Provider>
+			</IdentityContext.Provider>
+		</EnvironmentExtensionProvider>
 	)
 }

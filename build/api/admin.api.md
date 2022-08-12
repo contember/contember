@@ -19,10 +19,8 @@ import { BoxProps } from '@contember/ui';
 import { ButtonProps } from '@contember/ui';
 import { ChildrenAnalyzer } from '@contember/react-multipass-rendering';
 import { ColorInputProps } from '@contember/ui';
-import { ComponentClass } from 'react';
 import { ComponentType } from 'react';
 import { ContemberClientProps } from '@contember/react-client';
-import { Context } from 'react';
 import { ControlProps } from '@contember/ui';
 import { DateInputProps } from '@contember/ui';
 import { DateTimeInputProps } from '@contember/ui';
@@ -59,7 +57,6 @@ import type { FileUploader } from '@contember/client';
 import type { FileUploadError } from '@contember/client';
 import { Filter } from '@contember/binding';
 import type { FocusEvent as FocusEvent_2 } from 'react';
-import { ForwardRefExoticComponent } from 'react';
 import { FunctionComponent } from 'react';
 import { default as Fuse_2 } from 'fuse.js';
 import type { GraphQlClient } from '@contember/client';
@@ -79,9 +76,8 @@ import { LayoutPageProps } from '@contember/ui';
 import { Location as Location_2 } from 'slate';
 import { MapProps } from 'react-leaflet';
 import { MarkerProps } from 'react-leaflet';
-import { MemoExoticComponent } from 'react';
 import { MouseEvent as MouseEvent_2 } from 'react';
-import { NamedExoticComponent } from 'react';
+import type { NamedExoticComponent } from 'react';
 import { Node as Node_2 } from 'slate';
 import { NodeEntry } from 'slate';
 import { OptionallyVariableFieldValue } from '@contember/binding';
@@ -222,10 +218,10 @@ export interface AddEntityButtonProps {
 }
 
 // @public (undocumented)
-export const AddNewBlockButton: NamedExoticComponent<AddNewBlockButtonProps>;
+export const AddNewBlockButton: React.NamedExoticComponent<AddNewBlockButtonProps>;
 
 // @public (undocumented)
-export const AddNewBlockButtonInner: NamedExoticComponent<AddNewBlockButtonInnerProps>;
+export const AddNewBlockButtonInner: React.NamedExoticComponent<AddNewBlockButtonInnerProps>;
 
 // @public (undocumented)
 export interface AddNewBlockButtonInnerProps extends DropdownRenderProps, CreateNewEntityButtonProps {
@@ -311,7 +307,7 @@ export const AnyUploadField: <AcceptArtifacts = unknown, SFExtraProps extends {}
 export type AnyUploadFieldProps<AcceptArtifacts = unknown, SFExtraProps extends {} = {}> = PublicSingleKindUploadFieldProps<AcceptArtifacts, SFExtraProps> & StockAnyFileKindProps<AcceptArtifacts>;
 
 // @public (undocumented)
-export const ApiKeyList: NamedExoticComponent<ApiKeyListProps>;
+export const ApiKeyList: React.NamedExoticComponent<ApiKeyListProps>;
 
 // @public (undocumented)
 export interface ApiKeyListProps {
@@ -447,7 +443,7 @@ export interface BlockEditorProps extends SugaredRelativeEntityList, CreateEdito
 }
 
 // @public (undocumented)
-export const BlockElement: NamedExoticComponent<BlockElementProps>;
+export const BlockElement: React.NamedExoticComponent<BlockElementProps>;
 
 // @public (undocumented)
 export interface BlockElementProps extends RenderElementProps {
@@ -518,7 +514,7 @@ export type BooleanFieldViewProps = {
 export const ChangePassword: FC<{}>;
 
 // @public (undocumented)
-export const CheckboxField: NamedExoticComponent<CheckboxFieldProps>;
+export const CheckboxField: React.NamedExoticComponent<CheckboxFieldProps>;
 
 // @public (undocumented)
 export type CheckboxFieldProps = SimpleRelativeSingleFieldProps & ControlProps<boolean>;
@@ -608,7 +604,7 @@ export const choiceFieldDictionary: {
 export type ChoiceFieldProps = (ChoiceFieldData.SingleChoiceFieldProps<FieldValue> & StaticSingleChoiceFieldProps) | (ChoiceFieldData.SingleChoiceFieldProps<EntityAccessor> & DynamicSingleChoiceFieldProps);
 
 // @public (undocumented)
-export const ClearFieldButton: NamedExoticComponent<ClearFieldButtonProps>;
+export const ClearFieldButton: React.NamedExoticComponent<ClearFieldButtonProps>;
 
 // @public (undocumented)
 export const ClearFieldButtonInner: (props: ClearFieldButtonInnerProps) => JSX.Element;
@@ -651,7 +647,7 @@ export type CoalesceTextCellProps<Persisted extends FieldValue = FieldValue> = D
 export const codeToolbarButton: ToolbarButtonSpec;
 
 // @public (undocumented)
-export const ColorField: NamedExoticComponent<ColorFieldProps>;
+export const ColorField: React.NamedExoticComponent<ColorFieldProps>;
 
 // @public (undocumented)
 export type ColorFieldProps = SimpleRelativeSingleFieldProps & Omit<ColorInputProps, 'value' | 'validationState' | 'allowNewlines' | 'wrapLines'>;
@@ -670,7 +666,7 @@ export interface CommonToolbarButton extends IconSourceSpecification {
 }
 
 // @public (undocumented)
-export const ConcealableField: MemoExoticComponent<({ buttonProps, concealTimeout, renderConcealedValue, isExtended, children }: ConcealableFieldProps) => JSX.Element>;
+export const ConcealableField: React.MemoExoticComponent<({ buttonProps, concealTimeout, renderConcealedValue, isExtended, children }: ConcealableFieldProps) => JSX.Element>;
 
 // @public (undocumented)
 export interface ConcealableFieldProps {
@@ -812,7 +808,7 @@ export const createEmptyTableRowElement: (columnCount?: number) => {
 export const createMarkHtmlDeserializer: (markType: string, tagMatcher: (el: HTMLElement) => boolean, attributeMatcher: (el: HTMLElement) => boolean) => HtmlDeserializerPlugin;
 
 // @public (undocumented)
-export const CreateNewEntityButton: MemoExoticComponent<({ createNewEntity, iconProps, children, ...buttonProps }: CreateNewEntityButtonProps) => JSX.Element>;
+export const CreateNewEntityButton: React.MemoExoticComponent<({ createNewEntity, iconProps, children, ...buttonProps }: CreateNewEntityButtonProps) => JSX.Element>;
 
 // @public (undocumented)
 export type CreateNewEntityButtonProps = ButtonProps & {
@@ -845,7 +841,7 @@ export const createReferenceElementPlugin: (args: ReferenceElementOptions) => Cu
 export const CreateResetPasswordRequestForm: FC<CreateResetPasswordRequestFormProps>;
 
 // @public (undocumented)
-export const CurrentRequestContext: Context<RequestState<RequestParameters<never>>>;
+export const CurrentRequestContext: React.Context<RequestState<RequestParameters<never>>>;
 
 // @public (undocumented)
 export interface CustomElementPlugin<T extends Element_2> {
@@ -1089,7 +1085,7 @@ export type DataGridPageProps = DataGridProps<{}> & {
 };
 
 // @public (undocumented)
-export const DataGridPageRenderer: NamedExoticComponent<LayoutRendererProps & DataGridContainerProps>;
+export const DataGridPageRenderer: React.NamedExoticComponent<LayoutRendererProps & DataGridContainerProps>;
 
 // @public (undocumented)
 export type DataGridPageRendererProps = LayoutRendererProps & DataGridContainerProps;
@@ -1162,7 +1158,7 @@ export type DateCellProps = DataGridColumnPublicProps & DateFieldViewProps & {
 };
 
 // @public (undocumented)
-export const DateField: NamedExoticComponent<DateFieldProps>;
+export const DateField: React.NamedExoticComponent<DateFieldProps>;
 
 // @public (undocumented)
 export type DateFieldProps = SimpleRelativeSingleFieldProps & DateInputProps;
@@ -1182,7 +1178,7 @@ export type DateFieldViewProps = {
 }) & FieldFallbackViewPublicProps;
 
 // @public (undocumented)
-export const DateTimeField: NamedExoticComponent<DateTimeFieldProps>;
+export const DateTimeField: React.NamedExoticComponent<DateTimeFieldProps>;
 
 // @public (undocumented)
 export type DateTimeFieldProps = SimpleRelativeSingleFieldProps & DateTimeInputProps;
@@ -1195,7 +1191,7 @@ export interface DefaultElementProps extends RenderElementProps {
 }
 
 // @public (undocumented)
-export const DeleteEntityButton: MemoExoticComponent<(props: DeleteEntityButtonProps) => JSX.Element | null>;
+export const DeleteEntityButton: React.MemoExoticComponent<(props: DeleteEntityButtonProps) => JSX.Element | null>;
 
 // @public (undocumented)
 export type DeleteEntityButtonProps = ButtonProps & {
@@ -1260,7 +1256,7 @@ export interface DimensionsRendererProps {
 }
 
 // @public (undocumented)
-export const DimensionsSwitcher: MemoExoticComponent<(props: DimensionsSwitcherProps) => JSX.Element>;
+export const DimensionsSwitcher: React.MemoExoticComponent<(props: DimensionsSwitcherProps) => JSX.Element>;
 
 // @public (undocumented)
 export interface DimensionsSwitcherBaseProps extends Omit<DimensionsRendererProps, 'accessor' | 'labelFactory' | 'minItems' | 'maxItems' | 'redirect'> {
@@ -1487,7 +1483,7 @@ export interface ElementWithReference extends Element_2 {
 }
 
 // @public (undocumented)
-export const EmailField: NamedExoticComponent<EmailFieldProps>;
+export const EmailField: React.NamedExoticComponent<EmailFieldProps>;
 
 // @public (undocumented)
 export type EmailFieldProps = SimpleRelativeSingleFieldProps & Omit<EmailInputProps, 'value' | 'validationState' | 'allowNewlines' | 'wrapLines'>;
@@ -1518,7 +1514,7 @@ export const EmbedHandlers: {
 };
 
 // @public (undocumented)
-export const EmptyMessage: MemoExoticComponent<({ children, component, distinction }: EmptyMessageProps) => JSX.Element>;
+export const EmptyMessage: React.MemoExoticComponent<({ children, component, distinction }: EmptyMessageProps) => JSX.Element>;
 
 // @public (undocumented)
 export interface EmptyMessageComponentProps {
@@ -1547,7 +1543,7 @@ export interface EmptyMessageProps {
 }
 
 // @public (undocumented)
-export const EnumCell: NamedExoticComponent<EnumCellProps>;
+export const EnumCell: React.NamedExoticComponent<EnumCellProps>;
 
 // @public (undocumented)
 export type EnumCellProps = DataGridColumnPublicProps & {
@@ -1742,10 +1738,18 @@ export interface FilterRendererProps<FA extends DataGridFilterArtifact> {
 }
 
 // @public (undocumented)
-export const FloatField: NamedExoticComponent<FloatFieldProps>;
+export const FloatField: React.NamedExoticComponent<FloatFieldProps>;
 
 // @public (undocumented)
 export type FloatFieldProps = SimpleRelativeSingleFieldProps & ControlProps<number>;
+
+// @public (undocumented)
+export type FormErrors<V> = {
+    [K in keyof V]?: string;
+};
+
+// @public (undocumented)
+export type FormHandler<V> = (values: V, setError: (field: keyof V, error: string) => void, setValues: (values: V) => void) => void | Promise<any>;
 
 // @public (undocumented)
 export type FullFileKind<UploadResult = unknown, AcceptArtifacts = unknown> = InternalFileKind<UploadResult, AcceptArtifacts> & {
@@ -1920,6 +1924,19 @@ export const HasOneSelectCell: FunctionComponent<HasOneSelectProps>;
 export type HasOneSelectProps = DataGridColumnPublicProps & BaseDynamicChoiceField & FieldFallbackViewPublicProps & SugaredRelativeSingleEntity;
 
 // @public (undocumented)
+export const HasRole: React.NamedExoticComponent<HasRoleProps>;
+
+// @public (undocumented)
+export interface HasRoleProps {
+    // (undocumented)
+    children?: ReactNode;
+    // Warning: (ae-forgotten-export) The symbol "RoleCondition" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    role: RoleCondition;
+}
+
+// @public (undocumented)
 export interface HeadingElement extends Element_2 {
     // (undocumented)
     align?: AlignDirection;
@@ -1988,7 +2005,7 @@ export const headingTwoNumberedToolbarButton: ElementToolbarButton<HeadingElemen
 export const headingTwoToolbarButton: ElementToolbarButton<HeadingElement>;
 
 // @public (undocumented)
-export const HiddenField: NamedExoticComponent<SimpleRelativeSingleFieldProps>;
+export const HiddenField: React.NamedExoticComponent<SimpleRelativeSingleFieldProps>;
 
 // @public (undocumented)
 export type HiddenFieldProps = SimpleRelativeSingleFieldProps;
@@ -2023,7 +2040,7 @@ export interface HorizontalRuleRendererProps extends Omit<RenderElementProps, 'e
 export const horizontalRuleToolbarButton: ElementToolbarButton<HorizontalRuleElement>;
 
 // @public (undocumented)
-export const HoveringToolbars: MemoExoticComponent<(props: HoveringToolbarsProps) => JSX.Element>;
+export const HoveringToolbars: React.MemoExoticComponent<(props: HoveringToolbarsProps) => JSX.Element>;
 
 // @public (undocumented)
 export interface HoveringToolbarsProps {
@@ -2132,7 +2149,12 @@ export interface Identity {
 // Warning: (ae-forgotten-export) The symbol "IdentityContext" needs to be exported by the entry point index.d.ts
 //
 // @public (undocumented)
-export const IdentityContext: Context<IdentityContext_2 | undefined>;
+export const IdentityContext: React.Context<IdentityContext_2 | undefined>;
+
+// @public (undocumented)
+export const identityEnvironmentExtension: Environment.Extension<Identity | null, {
+    identity: Identity | undefined;
+}>;
 
 // @public (undocumented)
 export const IdentityMembership: FC<IdentityMembershipProps>;
@@ -2161,7 +2183,7 @@ export interface IdentityProject {
 export const IdentityProvider: React.FC<IdentityProviderProps>;
 
 // @public (undocumented)
-export const IdentityRefreshContext: Context<() => void>;
+export const IdentityRefreshContext: React.Context<() => void>;
 
 // @public (undocumented)
 export interface IDP {
@@ -2433,10 +2455,10 @@ export interface LegacyDeprecatedEditorFormerlyKnownAsRichTextFieldProps extends
 }
 
 // @public (undocumented)
-export const Link: NamedExoticComponent<LinkProps>;
+export const Link: React.NamedExoticComponent<LinkProps>;
 
 // @public (undocumented)
-export const LinkButton: NamedExoticComponent<LinkButtonProps>;
+export const LinkButton: React.NamedExoticComponent<LinkButtonProps>;
 
 // @public (undocumented)
 export type LinkButtonProps = LinkProps & AnchorButtonProps;
@@ -2567,7 +2589,7 @@ export interface LoginProps {
 }
 
 // @public (undocumented)
-export const LogoutLink: NamedExoticComponent<LogoutLinkProps>;
+export const LogoutLink: React.NamedExoticComponent<LogoutLinkProps>;
 
 // @public (undocumented)
 export interface LogoutLinkProps {
@@ -2602,7 +2624,7 @@ export interface MemberIdentity {
 }
 
 // @public (undocumented)
-export const MemberList: NamedExoticComponent<MemberListProps>;
+export const MemberList: React.NamedExoticComponent<MemberListProps>;
 
 // @public (undocumented)
 export interface MemberListProps {
@@ -2672,7 +2694,7 @@ export type MessageFormatterFormatJSXChunk = (parts: ReactNode) => ReactNode;
 export type MessageFormatterPrimitiveType = string | number | boolean | null | undefined | Date;
 
 // @public (undocumented)
-export const MiscPageLayout: NamedExoticComponent<MiscPageLayoutProps>;
+export const MiscPageLayout: React.NamedExoticComponent<MiscPageLayoutProps>;
 
 // @public (undocumented)
 export interface MiscPageLayoutProps extends BoxOwnProps {
@@ -2734,7 +2756,7 @@ export type MutationRequestState<T> = QueryRequestState<T> | RequestStateUniniti
 export const NativeSelectField: FunctionComponent<NativeSelectFieldProps>;
 
 // @public (undocumented)
-export const NativeSelectFieldInner: MemoExoticComponent<ForwardRefExoticComponent<Pick<NativeSelectFieldInnerProps<any>, "data" | "label" | "style" | "key" | "description" | "className" | "placeholder" | "onSelect" | "size" | "errors" | "direction" | "gap" | "labelDescription" | "labelPosition" | "width" | "required" | "useLabelElement" | "notNull" | "isLoading" | "onSearch" | "currentValue" | "onClear" | "onAddNew" | "allowNull"> & RefAttributes<HTMLSelectElement>>>;
+export const NativeSelectFieldInner: React.MemoExoticComponent<React.ForwardRefExoticComponent<Pick<NativeSelectFieldInnerProps<any>, "data" | "label" | "style" | "key" | "description" | "className" | "placeholder" | "onSelect" | "size" | "errors" | "direction" | "gap" | "labelDescription" | "labelPosition" | "width" | "required" | "useLabelElement" | "notNull" | "isLoading" | "onSearch" | "currentValue" | "onClear" | "onAddNew" | "allowNull"> & RefAttributes<HTMLSelectElement>>>;
 
 // @public (undocumented)
 export interface NativeSelectFieldInnerProps<ActualValue> extends ChoiceFieldData.SingleChoiceFieldMetadata<ActualValue>, NativeSelectFieldInnerPublicProps, RefAttributes<HTMLSelectElement> {
@@ -2758,7 +2780,7 @@ export type NativeSelectFieldProps = NativeSelectFieldInnerPublicProps & (Static
 };
 
 // @public (undocumented)
-export const NavigateBackButton: NamedExoticComponent<LinkButtonProps>;
+export const NavigateBackButton: React.NamedExoticComponent<LinkButtonProps>;
 
 // @public (undocumented)
 export const NavigationProvider: (props: NavigationProviderProps) => JSX.Element;
@@ -2809,7 +2831,7 @@ export type NumberCellProps<Persisted extends FieldValue = FieldValue> = DataGri
 };
 
 // @public (undocumented)
-export const NumberField: NamedExoticComponent<NumberFieldProps>;
+export const NumberField: React.NamedExoticComponent<NumberFieldProps>;
 
 // @public (undocumented)
 export type NumberFieldProps = SimpleRelativeSingleFieldProps & ControlProps<number>;
@@ -2859,15 +2881,15 @@ export const Page: {
 };
 
 // @public @deprecated (undocumented)
-export const PageLink: NamedExoticComponent<LinkProps>;
+export const PageLink: React.NamedExoticComponent<LinkProps>;
 
 // @public @deprecated (undocumented)
-export const PageLinkButton: NamedExoticComponent<LinkButtonProps>;
+export const PageLinkButton: React.NamedExoticComponent<LinkButtonProps>;
 
 // Warning: (ae-forgotten-export) The symbol "PageLinkByIdProps" needs to be exported by the entry point index.d.ts
 //
 // @public @deprecated (undocumented)
-export const PageLinkById: NamedExoticComponent<PageLinkByIdProps>;
+export const PageLinkById: React.NamedExoticComponent<PageLinkByIdProps>;
 
 // @public (undocumented)
 export interface PageModule {
@@ -2969,7 +2991,7 @@ export const parseLinkTarget: (to: LinkTarget, env: Environment) => Exclude<Link
 export const pathToRequestState: (routing: RoutingContextValue, path: string, query: string) => RequestState;
 
 // @public (undocumented)
-export const PersistButton: MemoExoticComponent<ForwardRefExoticComponent<Omit<SaveButtonProps, "children" | "isDirty"> & RefAttributes<HTMLButtonElement>>>;
+export const PersistButton: React.MemoExoticComponent<React.ForwardRefExoticComponent<Omit<SaveButtonProps, "children" | "isDirty"> & React.RefAttributes<HTMLButtonElement>>>;
 
 // @public (undocumented)
 export type PersistButtonProps = Omit<SaveButtonProps, 'children' | 'isDirty'> & {};
@@ -3079,7 +3101,7 @@ export type PublicSingleKindFileRepeaterProps<AcceptArtifacts = unknown, SFExtra
 export type PublicSingleKindUploadFieldProps<AcceptArtifacts = unknown, SFExtraProps extends {} = {}> = CommonFileKindProps<AcceptArtifacts> & SelectFileInputSelectionComponentProps<SFExtraProps> & FileInputPublicProps;
 
 // @public (undocumented)
-export const PushRequestContext: Context<(req: RequestState) => void>;
+export const PushRequestContext: React.Context<(req: RequestState) => void>;
 
 // @public (undocumented)
 export interface QueryRequestObject<T> {
@@ -3096,7 +3118,7 @@ export type QueryRequestState<T> = RequestStateOk<T> | RequestStateError<T> | Re
 export const RadioField: FunctionComponent<RadioFieldProps>;
 
 // @public (undocumented)
-export const RadioFieldInner: MemoExoticComponent<(props: RadioFieldInnerProps) => JSX.Element>;
+export const RadioFieldInner: React.MemoExoticComponent<(props: RadioFieldInnerProps) => JSX.Element>;
 
 // @public (undocumented)
 export interface RadioFieldInnerProps extends ChoiceFieldData.SingleChoiceFieldMetadata, RadioFieldInnerPublicProps {
@@ -3149,7 +3171,7 @@ export interface ReferenceElementOptions {
 }
 
 // @public (undocumented)
-export const ReferenceElementRenderer: MemoExoticComponent<(props: ReferenceElementRendererProps) => JSX.Element>;
+export const ReferenceElementRenderer: React.MemoExoticComponent<(props: ReferenceElementRendererProps) => JSX.Element>;
 
 // @public (undocumented)
 export interface ReferenceElementRendererProps extends RenderElementProps, ReferenceElementOptions {
@@ -3196,7 +3218,7 @@ export const Repeater: <ContainerExtraProps, ItemExtraProps>(props: RepeaterProp
 export type RepeaterDictionary = typeof repeaterDictionary;
 
 // @public (undocumented)
-export const RepeaterFieldContainer: MemoExoticComponent<({ accessor, addButtonText, children, createNewEntity, addButtonComponent: AddButton, addButtonComponentExtraProps, addButtonProps, emptyMessage, emptyMessageComponent, enableAddingNew, formatMessage, isEmpty, label, }: RepeaterFieldContainerProps) => JSX.Element>;
+export const RepeaterFieldContainer: React.MemoExoticComponent<({ accessor, addButtonText, children, createNewEntity, addButtonComponent: AddButton, addButtonComponentExtraProps, addButtonProps, emptyMessage, emptyMessageComponent, enableAddingNew, formatMessage, isEmpty, label, }: RepeaterFieldContainerProps) => JSX.Element>;
 
 // @public (undocumented)
 export interface RepeaterFieldContainerPrivateProps {
@@ -3227,7 +3249,7 @@ export type RepeaterFieldContainerPublicProps = EmptyMessageOuterProps & AddEnti
 };
 
 // @public (undocumented)
-export const RepeaterHandle: MemoExoticComponent<() => JSX.Element>;
+export const RepeaterHandle: React.MemoExoticComponent<() => JSX.Element>;
 
 // @public (undocumented)
 export const RepeaterInner: (<ContainerExtraProps, ItemExtraProps>(props: RepeaterInnerProps<ContainerExtraProps, ItemExtraProps>) => ReactElement) & StaticRenderProvider<RepeaterInnerProps<unknown, unknown>, "accessor">;
@@ -3261,7 +3283,7 @@ export interface RepeaterInnerProps<ContainerExtraProps, ItemExtraProps> extends
 }
 
 // @public (undocumented)
-export const RepeaterItem: MemoExoticComponent<({ children, canBeRemoved, label, removalType, dragHandleComponent }: RepeaterItemProps) => JSX.Element>;
+export const RepeaterItem: React.MemoExoticComponent<({ children, canBeRemoved, label, removalType, dragHandleComponent }: RepeaterItemProps) => JSX.Element>;
 
 // @public (undocumented)
 export interface RepeaterItemProps {
@@ -3469,7 +3491,7 @@ export type RouteMap<N extends RouteName = RouteName> = {
 export const ROUTING_BINDING_PARAMETER_PREFIX = "entity.";
 
 // @public (undocumented)
-export const RoutingContext: Context<RoutingContextValue>;
+export const RoutingContext: React.Context<RoutingContextValue>;
 
 // @public (undocumented)
 export interface RoutingContextValue {
@@ -3484,7 +3506,7 @@ export interface RoutingContextValue {
 }
 
 // @public (undocumented)
-export const RoutingLink: NamedExoticComponent<RoutingLinkProps<{}> & PublicAnchorProps>;
+export const RoutingLink: React.NamedExoticComponent<RoutingLinkProps<{}> & PublicAnchorProps>;
 
 // @public (undocumented)
 export interface RoutingLinkParams {
@@ -3557,7 +3579,7 @@ export interface ScrollTargetRendererProps extends Omit<RenderElementProps, 'ele
 export const scrollTargetToolbarButton: ElementToolbarButton<ScrollTargetElement>;
 
 // @public (undocumented)
-export const SearchField: NamedExoticComponent<SearchFieldProps>;
+export const SearchField: React.NamedExoticComponent<SearchFieldProps>;
 
 // @public (undocumented)
 export type SearchFieldProps = SimpleRelativeSingleFieldProps & Omit<SearchInputProps, 'value' | 'validationState' | 'allowNewlines' | 'wrapLines'>;
@@ -3587,7 +3609,7 @@ export interface SelectEntityButtonProps {
 export const SelectField: FunctionComponent<SelectFieldProps>;
 
 // @public (undocumented)
-export const SelectFieldInner: MemoExoticComponent<({ placeholder, allowNull, currentValue, data, errors, menuZIndex, onSelect, onClear, reactSelectProps, onAddNew, onSearch, isLoading, ...fieldContainerProps }: SelectFieldInnerProps) => JSX.Element>;
+export const SelectFieldInner: React.MemoExoticComponent<({ placeholder, allowNull, currentValue, data, errors, menuZIndex, onSelect, onClear, reactSelectProps, onAddNew, onSearch, isLoading, ...fieldContainerProps }: SelectFieldInnerProps) => JSX.Element>;
 
 // @public (undocumented)
 export type SelectFieldInnerProps = ChoiceFieldData.SingleChoiceFieldMetadata & SelectFieldInnerPublicProps & PublicCommonReactSelectStylesProps & {
@@ -3729,7 +3751,7 @@ export interface SimpleRelativeSingleFieldMetadata<Value extends FieldValue = Fi
 export type SimpleRelativeSingleFieldProps = FieldBasicProps & Omit<FieldContainerProps, 'children'>;
 
 // @public (undocumented)
-export const SimpleRelativeSingleFieldProxy: MemoExoticComponent<({ render, label, labelDescription, labelPosition, description, ...props }: SimpleRelativeSingleFieldProxyProps) => JSX.Element>;
+export const SimpleRelativeSingleFieldProxy: React.MemoExoticComponent<({ render, label, labelDescription, labelPosition, description, ...props }: SimpleRelativeSingleFieldProxyProps) => JSX.Element>;
 
 // @public (undocumented)
 export type SimpleRelativeSingleFieldProxyProps = Omit<FieldContainerProps, 'children'> & SugaredRelativeSingleField & {
@@ -3742,10 +3764,10 @@ export type SingleKindFileProps = FullFileKind & SelectFileInputSelectionCompone
 };
 
 // @public (undocumented)
-export const SlugField: NamedExoticComponent<SlugFieldProps>;
+export const SlugField: React.NamedExoticComponent<SlugFieldProps>;
 
 // @public (undocumented)
-export const SlugFieldInner: NamedExoticComponent<SlugFieldProps>;
+export const SlugFieldInner: React.NamedExoticComponent<SlugFieldProps>;
 
 // @public (undocumented)
 export type SlugFieldProps = SimpleRelativeSingleFieldProps & ControlProps<string> & {
@@ -3757,7 +3779,7 @@ export type SlugFieldProps = SimpleRelativeSingleFieldProps & ControlProps<strin
 };
 
 // @public (undocumented)
-export const SortableBlock: NamedExoticComponent<SortableBlockProps>;
+export const SortableBlock: React.NamedExoticComponent<SortableBlockProps>;
 
 // @public (undocumented)
 export interface SortableBlockOwnProps {
@@ -3784,10 +3806,10 @@ export interface SortableRepeaterContainerProps extends SortableContainerProps {
 }
 
 // @public (undocumented)
-export const SortableRepeaterItem: MemoExoticComponent<ComponentClass<SortableRepeaterItemProps & SortableElementProps, any>>;
+export const SortableRepeaterItem: React.MemoExoticComponent<React.ComponentClass<SortableRepeaterItemProps & SortableElementProps, any>>;
 
 // @public (undocumented)
-export const SortableRepeaterItemHandle: MemoExoticComponent<ComponentClass<SortableRepeaterItemHandleProps, any>>;
+export const SortableRepeaterItemHandle: React.MemoExoticComponent<React.ComponentClass<SortableRepeaterItemHandleProps, any>>;
 
 // @public (undocumented)
 export interface SortableRepeaterItemHandleProps {
@@ -3935,10 +3957,10 @@ export interface TenantMutationOkResponse<Result> {
 export type TenantMutationResponse<Result, ErrorCode extends string> = TenantMutationErrorResponse<ErrorCode> | TenantMutationOkResponse<Result>;
 
 // @public @deprecated (undocumented)
-export const TextAreaField: NamedExoticComponent<TextareaFieldProps>;
+export const TextAreaField: React.NamedExoticComponent<TextareaFieldProps>;
 
 // @public (undocumented)
-export const TextareaField: NamedExoticComponent<TextareaFieldProps>;
+export const TextareaField: React.NamedExoticComponent<TextareaFieldProps>;
 
 // @public (undocumented)
 export type TextareaFieldProps = SimpleRelativeSingleFieldProps & ControlProps<string> & TextareaInputOwnProps;
@@ -3960,7 +3982,7 @@ export type TextCellProps = DataGridColumnPublicProps & FieldFallbackViewPublicP
 };
 
 // @public (undocumented)
-export const TextField: NamedExoticComponent<TextFieldProps>;
+export const TextField: React.NamedExoticComponent<TextFieldProps>;
 
 // @public (undocumented)
 export type TextFieldProps = SimpleRelativeSingleFieldProps & ControlProps<string> & {
@@ -3979,7 +4001,7 @@ export type TextFilterArtifacts = {
 export type TextSpecifics<Text extends Text_2> = Omit<Text, 'text'>;
 
 // @public (undocumented)
-export const Tile: NamedExoticComponent<TileProps>;
+export const Tile: React.NamedExoticComponent<TileProps>;
 
 // @public (undocumented)
 export class TileList extends PureComponent {
@@ -3992,7 +4014,7 @@ export interface TileProps extends BoxOwnProps {
 }
 
 // @public (undocumented)
-export const TimeField: NamedExoticComponent<TimeFieldProps>;
+export const TimeField: React.NamedExoticComponent<TimeFieldProps>;
 
 // @public (undocumented)
 export type TimeFieldProps = SimpleRelativeSingleFieldProps & TimeInputProps;
@@ -4044,7 +4066,7 @@ export type UploadFieldProps<SFExtraProps extends {} = {}> = FileInputPublicProp
 };
 
 // @public (undocumented)
-export const UrlField: NamedExoticComponent<UrlFieldProps>;
+export const UrlField: React.NamedExoticComponent<UrlFieldProps>;
 
 // @public (undocumented)
 export type UrlFieldProps = SimpleRelativeSingleFieldProps & Omit<UrlInputProps, 'value' | 'validationState' | 'allowNewlines' | 'wrapLines'>;
@@ -4183,7 +4205,6 @@ export const useFieldControl: <FieldVal extends FieldValue, ControlVal extends F
     ref: Ref<any>;
 };
 
-// Warning: (ae-forgotten-export) The symbol "FormHandler" needs to be exported by the entry point index.d.ts
 // Warning: (ae-forgotten-export) The symbol "FormMethods" needs to be exported by the entry point index.d.ts
 //
 // @public (undocumented)
@@ -4310,7 +4331,7 @@ export const useRoutingLink: (target: RoutingLinkTarget, parametersResolver?: Ro
 export const useRoutingLinkFactory: () => (target: RoutingLinkTarget, parameters?: RequestParameters<never> | undefined, parametersResolver?: RoutingParameterResolver | undefined) => RoutingLinkParams;
 
 // @public (undocumented)
-export const UsersList: NamedExoticComponent<UsersListProps>;
+export const UsersList: React.NamedExoticComponent<UsersListProps>;
 
 // @public (undocumented)
 export interface UsersListProps {
@@ -4371,7 +4392,7 @@ memberships: GQLVariableType<Membership[], true>;
 // Warning: (ae-forgotten-export) The symbol "VariableProps" needs to be exported by the entry point index.d.ts
 //
 // @public (undocumented)
-export const Variable: MemoExoticComponent<({ name, format }: VariableProps) => ReactElement>;
+export const Variable: React.MemoExoticComponent<({ name, format }: VariableProps) => ReactElement>;
 
 // @public (undocumented)
 export interface Variables {
@@ -4549,7 +4570,7 @@ export * from "@contember/ui";
 //
 // src/components/bindingFacade/fields/SlugField.tsx:23:3 - (ae-forgotten-export) The symbol "SlugPrefix" needs to be exported by the entry point index.d.ts
 // src/components/bindingFacade/richText/ContemberEditor/index.ts:24:29 - (ae-forgotten-export) The symbol "ElementDataAttributes" needs to be exported by the entry point index.d.ts
-// src/components/bindingFacade/richText/blockEditor/BlockEditor.tsx:322:25 - (ae-forgotten-export) The symbol "ContentOutletProps" needs to be exported by the entry point index.d.ts
+// src/components/bindingFacade/richText/blockEditor/BlockEditor.tsx:323:25 - (ae-forgotten-export) The symbol "ContentOutletProps" needs to be exported by the entry point index.d.ts
 // src/components/bindingFacade/richText/blockEditor/embed/index.ts:5:27 - (ae-forgotten-export) The symbol "GoogleFormEmbedHandler" needs to be exported by the entry point index.d.ts
 // src/components/bindingFacade/richText/blockEditor/embed/index.ts:5:27 - (ae-forgotten-export) The symbol "YouTubeEmbedHandler" needs to be exported by the entry point index.d.ts
 // src/components/bindingFacade/richText/blockEditor/embed/index.ts:5:27 - (ae-forgotten-export) The symbol "VimeoEmbedHandler" needs to be exported by the entry point index.d.ts

@@ -45,6 +45,7 @@ import { SortedBlocksContext } from './state/SortedBlocksContext'
 import { useBlockEditorState } from './state/useBlockEditorState'
 import { ContentOutlet, ContentOutletProps, useEditorReferenceBlocks } from './templating'
 import { useReferentiallyStableCallback } from './useReferentiallyStableCallback'
+import { SortEnd } from 'react-sortable-hoc'
 
 export interface BlockEditorProps extends SugaredRelativeEntityList, CreateEditorPublicOptions<EditorWithBlocks> {
 	label?: ReactNode
@@ -209,7 +210,7 @@ const BlockEditorComponent: FunctionComponent<BlockEditorProps> = Component(
 							lockToContainerEdges={true}
 							useWindowAsScrollContainer={true}
 							useDragHandle={true}
-							onSortEnd={useCallback(data => {
+							onSortEnd={useCallback((data: SortEnd) => {
 								Transforms.moveNodes(editor, {
 									at: [data.oldIndex],
 									to: [data.newIndex],

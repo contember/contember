@@ -20,7 +20,7 @@ export const ResetPasswordForm: FC<ResetPasswordFormProps> = ({ redirectOnSucces
 	const resetPassword = useResetPassword()
 
 	const { register, isSubmitting, onSubmit } = useForm<typeof initialValues>(initialValues, useCallback(
-		async values => {
+		async (values: typeof initialValues) => {
 			if (values.password !== values.passwordAgain) {
 				return addToast({ message: `Passwords does not match`, type: 'error', dismiss: true })
 			}

@@ -46,6 +46,21 @@ export class OneHasOneInverseCreateInputProcessor {
 		})
 	}
 
+	public async connectOrCreate(
+		{ entity, relation, targetEntity, targetRelation, input }: ContextWithInput<OneHasOneInverseContext, CreateInputProcessor.ConnectOrCreateInput>,
+	) {
+		const primary = await this.insertBuilder.insert
+		if (!primary) {
+			return []
+		}
+		const owner = await this.mapper.getPrimaryValue(targetEntity, input.connect)
+		if (owner) {
+			return await this.connectInternal({ targetEntity, input: new CheckedPrimary(owner), targetRelation, entity, relation }, primary)
+		}
+
+		return await this.createInternal({ entity, relation, targetEntity, targetRelation, input: input.create }, primary)
+	}
+
 	private async connectInternal(
 		{ entity, targetEntity, targetRelation, relation, input }: ContextWithInput<OneHasOneInverseContext, CheckedPrimary>,
 		primary: Input.PrimaryValue,

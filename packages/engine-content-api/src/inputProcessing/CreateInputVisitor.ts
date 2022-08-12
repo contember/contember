@@ -121,6 +121,9 @@ export class CreateInputVisitor<Result> implements
 		if (isIt<Input.CreateRelationInput>(input, 'create')) {
 			return processor.create({ ...context, input: input.create })
 		}
+		if (isIt<Input.ConnectOrCreateRelationInput>(input, 'connectOrCreate')) {
+			return processor.connectOrCreate({ ...context, input: input.connectOrCreate })
+		}
 		throw new ImplementationException()
 	}
 
@@ -145,6 +148,9 @@ export class CreateInputVisitor<Result> implements
 			if (isIt<Input.CreateRelationInput>(element, 'create')) {
 				result = processor.create({ ...context, input: element.create, index: i++, alias })
 			}
+			if (isIt<Input.ConnectOrCreateRelationInput>(element, 'connectOrCreate')) {
+				result = processor.connectOrCreate({ ...context, input: element.connectOrCreate, index: i++, alias })
+			}
 			if (result !== undefined) {
 				results.push(await result)
 			}
@@ -154,9 +160,12 @@ export class CreateInputVisitor<Result> implements
 
 	private verifyOperations(input: object) {
 		const keys = Object.keys(input).filter(it => it !== 'alias')
-		if (keys.length !== 1 || !['create', 'connect'].includes(keys[0])) {
+		const ops = Object.values(Input.CreateRelationOperation) as string[]
+		if (keys.length !== 1 || !ops.includes(keys[0])) {
 			const found = keys.length === 0 ? 'none' : keys.join(', ')
-			throw new UserError(`Expected either "create" or "connect". ${found} found.`)
+			throw new UserError(
+				`Expected exactly one of: ${ops.join(', ')}. ${found} found.`,
+			)
 		}
 	}
 }

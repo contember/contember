@@ -16,16 +16,22 @@ interface CreateInputProcessor<Result = void> {
 }
 
 namespace CreateInputProcessor {
+	export type ConnectOrCreateInput = {
+		connect: Input.UniqueWhere
+		create: Input.CreateDataInput
+	}
 
 	export interface HasOneRelationProcessor<Context, Result> {
 		nothing?: (context: ContextWithInput<Context, undefined>) => Promise<Result>
 		connect: (context: ContextWithInput<Context, Input.UniqueWhere>) => Promise<Result>
 		create: (context: ContextWithInput<Context, Input.CreateDataInput>) => Promise<Result>
+		connectOrCreate: (context: ContextWithInput<Context, ConnectOrCreateInput>) => Promise<Result>
 	}
 
 	export interface HasManyRelationProcessor<Context, Result> {
 		connect: (context: ContextWithInput<Context, Input.UniqueWhere> & { index: number; alias?: string }) => Promise<Result>
 		create: (context: ContextWithInput<Context, Input.CreateDataInput> & { index: number; alias?: string }) => Promise<Result>
+		connectOrCreate: (context: ContextWithInput<Context, ConnectOrCreateInput> & { index: number; alias?: string }) => Promise<Result>
 	}
 }
 

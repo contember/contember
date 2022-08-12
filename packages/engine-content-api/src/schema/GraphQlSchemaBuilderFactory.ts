@@ -28,6 +28,7 @@ import { PaginatedFieldConfigFactory } from './PaginatedFieldConfigFactory'
 import { PaginatedHasManyFieldProvider } from '../extensions/paginatedHasMany/PaginatedHasManyFieldProvider'
 import { PaginatedHasManyFieldProviderVisitor } from '../extensions/paginatedHasMany/PaginatedHasManyFieldProviderVisitor'
 import { Builder } from '@contember/dic'
+import { ConnectOrCreateRelationInputProvider } from './mutations/ConnectOrCreateRelationInputProvider'
 
 export class GraphQlSchemaBuilderFactory {
 	constructor() {}
@@ -72,8 +73,10 @@ export class GraphQlSchemaBuilderFactory {
 				new Accessor<EntityInputProvider<EntityInputType.create>>())
 			.addService('createEntityRelationAllowedOperationsVisitor', ({ authorizator }) =>
 				new CreateEntityRelationAllowedOperationsVisitor(authorizator))
-			.addService('createEntityRelationInputFieldVisitor', ({ schema,					whereTypeProvider,					createEntityInputProviderAccessor,					createEntityRelationAllowedOperationsVisitor				}) =>
-				new CreateEntityRelationInputFieldVisitor(schema, whereTypeProvider, createEntityInputProviderAccessor, createEntityRelationAllowedOperationsVisitor))
+			.addService('connectOrCreateRelationInputProvider', ({ schema, whereTypeProvider, createEntityInputProviderAccessor }) =>
+				 new ConnectOrCreateRelationInputProvider(schema, whereTypeProvider, createEntityInputProviderAccessor))
+			.addService('createEntityRelationInputFieldVisitor', ({ schema,	whereTypeProvider, createEntityInputProviderAccessor, createEntityRelationAllowedOperationsVisitor, connectOrCreateRelationInputProvider }) =>
+				new CreateEntityRelationInputFieldVisitor(schema, whereTypeProvider, createEntityInputProviderAccessor, createEntityRelationAllowedOperationsVisitor, connectOrCreateRelationInputProvider))
 			.addService('createEntityRelationInputProvider', ({ schema, createEntityRelationInputFieldVisitor }) =>
 				new CreateEntityRelationInputProvider(schema, createEntityRelationInputFieldVisitor))
 			.addService('createEntityInputFieldVisitor', ({ schema, authorizator, columnTypeResolver, createEntityRelationInputProvider }) =>
@@ -84,8 +87,8 @@ export class GraphQlSchemaBuilderFactory {
 				new Accessor<EntityInputProvider<EntityInputType.update>>())
 			.addService('updateEntityRelationAllowedOperationsVisitor', ({ authorizator }) =>
 				new UpdateEntityRelationAllowedOperationsVisitor(authorizator))
-			.addService('updateEntityRelationInputFieldVisitor', ({ schema, authorizator, whereTypeProvider, updateEntityInputProviderAccessor, createEntityInputProvider, updateEntityRelationAllowedOperationsVisitor }) =>
-				new UpdateEntityRelationInputFieldVisitor(schema, authorizator, whereTypeProvider, updateEntityInputProviderAccessor, createEntityInputProvider, updateEntityRelationAllowedOperationsVisitor))
+			.addService('updateEntityRelationInputFieldVisitor', ({ schema, authorizator, whereTypeProvider, updateEntityInputProviderAccessor, createEntityInputProvider, updateEntityRelationAllowedOperationsVisitor, connectOrCreateRelationInputProvider }) =>
+				new UpdateEntityRelationInputFieldVisitor(schema, authorizator, whereTypeProvider, updateEntityInputProviderAccessor, createEntityInputProvider, updateEntityRelationAllowedOperationsVisitor, connectOrCreateRelationInputProvider))
 			.addService('updateEntityRelationInputProvider', ({ schema, updateEntityRelationInputFieldVisitor }) =>
 				new UpdateEntityRelationInputProvider(schema, updateEntityRelationInputFieldVisitor))
 			.addService('updateEntityInputFieldVisitor', ({ authorizator, columnTypeResolver, updateEntityRelationInputProvider }) =>

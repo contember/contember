@@ -60,6 +60,27 @@ export class OneHasOneOwningUpdateInputProcessor {
 		result.push(...(await this.cleanupOrphan(relation, targetEntity, currentInverseSide)))
 		return result
 	}
+
+	public async connectOrCreate({ entity, relation, targetEntity, targetRelation, input: { connect, create } }: ContextWithInput<OneHasOneOwningContext, CreateInputProcessor.ConnectOrCreateInput>) {
+		const result: MutationResultList = []
+		let currentInverseSide: Input.PrimaryValue | undefined
+
+		const newInverseSide = await this.updateBuilder.addFieldValue(relation.name, async () => {
+			const newInverseSide = await this.mapper.getPrimaryValue(targetEntity, connect)
+			currentInverseSide = await this.getCurrentInverseSide(targetRelation, relation, entity)
+			if (newInverseSide) {
+				return await this.connectInternal({ entity, relation, targetEntity, targetRelation }, currentInverseSide, newInverseSide, result)
+			}
+			return await this.createInternal({ entity, relation, targetEntity, targetRelation, input: create }, currentInverseSide, result)
+		})
+
+		if (newInverseSide) {
+			result.push(...(await this.cleanupOrphan(relation, targetEntity, currentInverseSide)))
+		}
+
+		return result
+	}
+
 	private async createInternal(
 		{ targetEntity, targetRelation, relation, input }: ContextWithInput<OneHasOneOwningContext, Input.CreateDataInput>,
 		currentInverseSide: Input.PrimaryValue | undefined,

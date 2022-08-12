@@ -28,6 +28,21 @@ export class OneHasManyInputProcessor {
 		})
 	}
 
+	public async connectOrCreate(
+		{ entity, targetRelation, targetEntity, input: { connect, create } }: ContextWithInput<OneHasManyContext, CreateInputProcessor.ConnectOrCreateInput>,
+		primary: Input.PrimaryValue,
+	) {
+		const connectData = {
+			[targetRelation.name]: {
+				connect: { [entity.primary]: primary },
+			},
+		}
+		return await this.mapper.upsert(targetEntity, connect, connectData, {
+			...create,
+			...connectData,
+		})
+	}
+
 	public async update(
 		{ entity, targetEntity, targetRelation, input: { data, where } }: ContextWithInput<OneHasManyContext, UpdateInputProcessor.UpdateManyInput>,
 		primary: Input.PrimaryValue,

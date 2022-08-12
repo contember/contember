@@ -41,6 +41,20 @@ export class OneHasOneOwningCreateInputProcessor {
 		return result
 	}
 
+	public async connectOrCreate(
+		{ entity, relation, targetEntity, targetRelation, input }: ContextWithInput<OneHasOneOwningContext, CreateInputProcessor.ConnectOrCreateInput>,
+	) {
+		const result: MutationResultList = []
+		await this.insertBuilder.addFieldValue(relation.name, async () => {
+			const inverseSide = await this.mapper.getPrimaryValue(targetEntity, input.connect)
+			if (inverseSide) {
+				return await this.connectInternal({ entity, relation, targetEntity, targetRelation, input: inverseSide }, result)
+			}
+			return await this.createInternal({ entity, relation, targetEntity, targetRelation, input: input.create }, result)
+		})
+		return result
+	}
+
 	private async createInternal(
 		context: ContextWithInput<OneHasOneOwningContext, Input.CreateDataInput>,
 		result: MutationResultList,

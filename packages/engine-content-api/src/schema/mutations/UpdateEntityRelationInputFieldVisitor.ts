@@ -9,6 +9,7 @@ import { acceptFieldVisitor } from '@contember/schema-utils'
 import { UpdateEntityRelationAllowedOperationsVisitor } from './UpdateEntityRelationAllowedOperationsVisitor'
 import { Authorizator } from '../../acl'
 import { ImplementationException } from '../../exception'
+import { ConnectOrCreateRelationInputProvider } from './ConnectOrCreateRelationInputProvider'
 
 export class UpdateEntityRelationInputFieldVisitor implements Model.ColumnVisitor<never>,
 	Model.RelationByGenericTypeVisitor<GraphQLInputObjectType | undefined> {
@@ -20,7 +21,9 @@ export class UpdateEntityRelationInputFieldVisitor implements Model.ColumnVisito
 		private readonly updateEntityInputProviderAccessor: Accessor<EntityInputProvider<EntityInputType.update>>,
 		private readonly createEntityInputProvider: EntityInputProvider<EntityInputType.create>,
 		private readonly updateEntityRelationAllowedOperationsVisitor: UpdateEntityRelationAllowedOperationsVisitor,
-	) {}
+		private readonly connectOrCreateRelationInputProvider: ConnectOrCreateRelationInputProvider,
+	) {
+	}
 
 	public visitColumn(): never {
 		throw new Error('UpdateEntityRelationInputFieldVisitor: Not applicable for a column')
@@ -58,11 +61,16 @@ export class UpdateEntityRelationInputFieldVisitor implements Model.ColumnVisito
 			type: GraphQLBoolean,
 		}
 
+		const connectOrCreateInput = createInput && whereInput
+			? { type: this.connectOrCreateRelationInputProvider.getInput(entity.name, relation.name) }
+			: undefined
+
 		const fields = {
+			[Input.UpdateRelationOperation.connect]: whereInput,
 			[Input.UpdateRelationOperation.create]: createInput,
+			[Input.UpdateRelationOperation.connectOrCreate]: connectOrCreateInput,
 			[Input.UpdateRelationOperation.update]: updateInput,
 			[Input.UpdateRelationOperation.upsert]: upsertInput,
-			[Input.UpdateRelationOperation.connect]: whereInput,
 			[Input.UpdateRelationOperation.disconnect]: booleanInput,
 			[Input.UpdateRelationOperation.delete]: booleanInput,
 		}

@@ -8,6 +8,7 @@ import { GraphQLInputFieldConfigMap } from 'graphql/type/definition'
 import { CreateEntityRelationAllowedOperationsVisitor } from './CreateEntityRelationAllowedOperationsVisitor'
 import { acceptFieldVisitor } from '@contember/schema-utils'
 import { ImplementationException } from '../../exception'
+import { ConnectOrCreateRelationInputProvider } from './ConnectOrCreateRelationInputProvider'
 
 export class CreateEntityRelationInputFieldVisitor implements
 	Model.ColumnVisitor<never>,
@@ -18,6 +19,7 @@ export class CreateEntityRelationInputFieldVisitor implements
 		private readonly whereTypeBuilder: WhereTypeProvider,
 		private readonly createEntityInputProviderAccessor: Accessor<Interface<EntityInputProvider<EntityInputType.create>>>,
 		private readonly createEntityRelationAllowedOperationsVisitor: CreateEntityRelationAllowedOperationsVisitor,
+		private readonly connectOrCreateRelationInputProvider: ConnectOrCreateRelationInputProvider,
 	) {}
 
 	public visitColumn(): never {
@@ -58,12 +60,10 @@ export class CreateEntityRelationInputFieldVisitor implements
 			this.createEntityRelationAllowedOperationsVisitor,
 		)
 
-		if (allowedOperations.includes(Input.CreateRelationOperation.connect)) {
-			const uniqueWhere = this.whereTypeBuilder.getEntityUniqueWhereType(targetEntity.name)
-			if (uniqueWhere) {
-				fields[Input.CreateRelationOperation.connect] = {
-					type: uniqueWhere,
-				}
+		const uniqueWhere = this.whereTypeBuilder.getEntityUniqueWhereType(targetEntity.name)
+		if (allowedOperations.includes(Input.CreateRelationOperation.connect) && uniqueWhere) {
+			fields[Input.CreateRelationOperation.connect] = {
+				type: uniqueWhere,
 			}
 		}
 
@@ -71,6 +71,14 @@ export class CreateEntityRelationInputFieldVisitor implements
 		if (allowedOperations.includes(Input.CreateRelationOperation.create) && createInput !== undefined) {
 			fields[Input.CreateRelationOperation.create] = {
 				type: createInput,
+			}
+		}
+		if (allowedOperations.includes(Input.CreateRelationOperation.connectOrCreate) && uniqueWhere !== undefined && createInput !== undefined) {
+			const connectOrCreateInput = this.connectOrCreateRelationInputProvider.getInput(entity.name, relation.name)
+			if (connectOrCreateInput) {
+				fields[Input.CreateRelationOperation.connectOrCreate] = {
+					type: connectOrCreateInput,
+				}
 			}
 		}
 		if (Object.keys(fields).length === 0) {

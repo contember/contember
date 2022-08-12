@@ -26,11 +26,17 @@ namespace UpdateInputProcessor {
 		update: Input.UpdateDataInput
 		create: Input.CreateDataInput
 	}
+	export type ConnectOrCreateInput = {
+		connect: Input.UniqueWhere
+		create: Input.CreateDataInput
+	}
 
 	export interface HasOneRelationInputProcessor<Context, Result> {
 		connect(context: ContextWithInput<Context, Input.UniqueWhere>): Promise<Result>
 
 		create(context: ContextWithInput<Context, Input.CreateDataInput>): Promise<Result>
+
+		connectOrCreate(context: ContextWithInput<Context, ConnectOrCreateInput>): Promise<Result>
 
 		update(context: ContextWithInput<Context, Input.UpdateDataInput>): Promise<Result>
 
@@ -45,6 +51,8 @@ namespace UpdateInputProcessor {
 		connect(context: ContextWithInput<Context, Input.UniqueWhere> & { index: number; alias?: string }): Promise<Result>
 
 		create(context: ContextWithInput<Context, Input.CreateDataInput> & { index: number; alias?: string }): Promise<Result>
+
+		connectOrCreate(context: ContextWithInput<Context, ConnectOrCreateInput> & { index: number; alias?: string }): Promise<Result>
 
 		update(context: ContextWithInput<Context, UpdateManyInput> & { index: number; alias?: string }): Promise<Result>
 

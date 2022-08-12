@@ -41,6 +41,21 @@ export class ManyHasManyInputProcessor {
 		]
 	}
 
+	public async connectOrCreate(
+		context: ContextWithInput<ManyHasManyOwningContext | ManyHasManyInverseContext, CreateInputProcessor.ConnectOrCreateInput>,
+		primary: Input.PrimaryValue,
+	): Promise<MutationResultList> {
+		let otherPrimary = await this.mapper.getPrimaryValue(context.targetEntity, context.input.connect)
+		if (!otherPrimary) {
+			const insertResult = await this.mapper.insert(context.targetEntity, context.input.create)
+			otherPrimary = getInsertPrimary(insertResult)
+			if (!otherPrimary) {
+				return insertResult
+			}
+		}
+		return await this.mapper.connectJunction(context.entity, context.relation, primary, otherPrimary)
+	}
+
 	public async update(
 		{ entity, targetEntity, relation, input: { where, data } }: ContextWithInput<ManyHasManyOwningContext | ManyHasManyInverseContext, UpdateInputProcessor.UpdateManyInput>,
 		primary: Input.PrimaryValue,

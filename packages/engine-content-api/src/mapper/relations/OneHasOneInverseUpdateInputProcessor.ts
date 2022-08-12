@@ -26,6 +26,16 @@ export class OneHasOneInverseUpdateInputProcessor {
 		return await this.connectInternal(ctx, newOwner)
 	}
 
+	public async connectOrCreate(
+		{ input, ...ctx }: ContextWithInput<OneHasOneInverseContext, UpdateInputProcessor.ConnectOrCreateInput>,
+	) {
+		const newOwner = await this.mapper.getPrimaryValue(ctx.targetEntity, input.connect)
+		if (newOwner) {
+			return await this.connectInternal(ctx, newOwner)
+		}
+		return await this.create({ ...ctx, input: input.create })
+	}
+
 
 	private async connectInternal(
 		{ entity, targetEntity, targetRelation }: OneHasOneInverseContext,

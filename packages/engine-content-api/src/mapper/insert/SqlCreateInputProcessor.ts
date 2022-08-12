@@ -52,6 +52,13 @@ export class SqlCreateInputProcessor implements CreateInputProcessor<MutationRes
 			}
 			return this.manyHasManyCreateInputProcessor.create(ctx, primary)
 		}),
+		connectOrCreate: hasManyProcessor(async ctx => {
+			const primary = await this.insertBuilder.insert
+			if (!primary) {
+				return []
+			}
+			return this.manyHasManyCreateInputProcessor.connectOrCreate(ctx, primary)
+		}),
 	}
 
 	manyHasManyOwning: CreateInputProcessor<MutationResultList>['manyHasManyOwning'] = {
@@ -69,6 +76,13 @@ export class SqlCreateInputProcessor implements CreateInputProcessor<MutationRes
 			}
 			return this.manyHasManyCreateInputProcessor.create(ctx, primary)
 		}),
+		connectOrCreate: hasManyProcessor(async ctx => {
+			const primary = await this.insertBuilder.insert
+			if (!primary) {
+				return []
+			}
+			return this.manyHasManyCreateInputProcessor.connectOrCreate(ctx, primary)
+		}),
 	}
 
 	manyHasOne: CreateInputProcessor<MutationResultList>['manyHasOne'] = {
@@ -78,6 +92,7 @@ export class SqlCreateInputProcessor implements CreateInputProcessor<MutationRes
 		},
 		connect: hasOneProcessor(ctx => this.manyHasOneCreateInputProcessor.connect(ctx, this.insertBuilder)),
 		create: hasOneProcessor(ctx => this.manyHasOneCreateInputProcessor.create(ctx, this.insertBuilder)),
+		connectOrCreate: hasOneProcessor(ctx => this.manyHasOneCreateInputProcessor.connectOrCreate(ctx, this.insertBuilder)),
 	}
 
 	oneHasMany: CreateInputProcessor<MutationResultList>['oneHasMany'] = {
@@ -95,6 +110,13 @@ export class SqlCreateInputProcessor implements CreateInputProcessor<MutationRes
 			}
 			return this.oneHasManyCreateInputProcessor.create(ctx, primary)
 		}),
+		connectOrCreate: hasManyProcessor(async ctx => {
+			const primary = await this.insertBuilder.insert
+			if (!primary) {
+				return []
+			}
+			return this.oneHasManyCreateInputProcessor.connectOrCreate(ctx, primary)
+		}),
 	}
 
 
@@ -105,10 +127,12 @@ export class SqlCreateInputProcessor implements CreateInputProcessor<MutationRes
 		},
 		connect: hasOneProcessor(ctx => this.oneHasOneOwningCreateInputProcessor.connect(ctx)),
 		create: hasOneProcessor(ctx => this.oneHasOneOwningCreateInputProcessor.create(ctx)),
+		connectOrCreate: hasOneProcessor(ctx => this.oneHasOneOwningCreateInputProcessor.connectOrCreate(ctx)),
 	}
 
 	oneHasOneInverse: CreateInputProcessor<MutationResultList>['oneHasOneInverse'] = {
 		connect: hasOneProcessor(ctx => this.oneHasOneInverseCreateInputProcessor.connect(ctx)),
 		create: hasOneProcessor(ctx => this.oneHasOneInverseCreateInputProcessor.create(ctx)),
+		connectOrCreate: hasOneProcessor(ctx => this.oneHasOneInverseCreateInputProcessor.connectOrCreate(ctx)),
 	}
 }

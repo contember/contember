@@ -86,7 +86,6 @@ export class UpdateEntityRelationAllowedOperationsVisitor implements
 			result.push(Input.UpdateRelationOperation.connect)
 			result.push(Input.UpdateRelationOperation.disconnect)
 		}
-
 		if (canCreateTargetEntity && canUpdateOwningRelation) {
 			result.push(Input.UpdateRelationOperation.create)
 		}
@@ -98,6 +97,9 @@ export class UpdateEntityRelationAllowedOperationsVisitor implements
 		}
 		if (canDeleteTargetEntity && canUpdateOwningRelation) {
 			result.push(Input.UpdateRelationOperation.delete)
+		}
+		if (canReadTargetEntity && canUpdateOwningRelation && canCreateTargetEntity) {
+			result.push(Input.UpdateRelationOperation.connectOrCreate)
 		}
 
 		return result

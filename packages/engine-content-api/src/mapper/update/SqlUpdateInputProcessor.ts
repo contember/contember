@@ -35,6 +35,7 @@ export class SqlUpdateInputProcessor implements UpdateInputProcessor<MutationRes
 	manyHasManyInverse: UpdateInputProcessor<MutationResultList>['manyHasManyInverse'] = {
 		connect: hasManyProcessor(ctx => this.manyHasManyUpdateInputProcessor.connect(ctx, this.primaryValue)),
 		create: hasManyProcessor(ctx => this.manyHasManyUpdateInputProcessor.create(ctx, this.primaryValue)),
+		connectOrCreate: hasManyProcessor(ctx => this.manyHasManyUpdateInputProcessor.connectOrCreate(ctx, this.primaryValue)),
 		update: hasManyProcessor(ctx => this.manyHasManyUpdateInputProcessor.update(ctx, this.primaryValue)),
 		upsert: hasManyProcessor(ctx => this.manyHasManyUpdateInputProcessor.upsert(ctx, this.primaryValue)),
 		delete: hasManyProcessor(ctx => this.manyHasManyUpdateInputProcessor.delete(ctx, this.primaryValue)),
@@ -44,6 +45,7 @@ export class SqlUpdateInputProcessor implements UpdateInputProcessor<MutationRes
 	manyHasManyOwning: UpdateInputProcessor<MutationResultList>['manyHasManyOwning'] = {
 		connect: hasManyProcessor(ctx => this.manyHasManyUpdateInputProcessor.connect(ctx, this.primaryValue)),
 		create: hasManyProcessor(ctx => this.manyHasManyUpdateInputProcessor.create(ctx, this.primaryValue)),
+		connectOrCreate: hasManyProcessor(ctx => this.manyHasManyUpdateInputProcessor.connectOrCreate(ctx, this.primaryValue)),
 		update: hasManyProcessor(ctx => this.manyHasManyUpdateInputProcessor.update(ctx, this.primaryValue)),
 		upsert: hasManyProcessor(ctx => this.manyHasManyUpdateInputProcessor.upsert(ctx, this.primaryValue)),
 		delete: hasManyProcessor(ctx => this.manyHasManyUpdateInputProcessor.delete(ctx, this.primaryValue)),
@@ -53,6 +55,7 @@ export class SqlUpdateInputProcessor implements UpdateInputProcessor<MutationRes
 	manyHasOne: UpdateInputProcessor<MutationResultList>['manyHasOne'] = {
 		connect: hasOneProcessor(ctx => this.manyHasOneUpdateInputProcessor.connect(ctx, this.updateBuilder)),
 		create: hasOneProcessor(ctx => this.manyHasOneUpdateInputProcessor.create(ctx, this.updateBuilder)),
+		connectOrCreate: hasOneProcessor(ctx => this.manyHasOneUpdateInputProcessor.connectOrCreate(ctx, this.updateBuilder)),
 		update: hasOneProcessor(ctx => this.manyHasOneUpdateInputProcessor.update(ctx, this.primaryValue)),
 		upsert: hasOneProcessor(ctx => this.manyHasOneUpdateInputProcessor.upsert(ctx, this.updateBuilder, this.primaryValue)),
 		delete: hasOneProcessor(ctx => this.manyHasOneUpdateInputProcessor.delete(ctx, this.updateBuilder, this.primaryValue)),
@@ -62,6 +65,7 @@ export class SqlUpdateInputProcessor implements UpdateInputProcessor<MutationRes
 	oneHasMany: UpdateInputProcessor<MutationResultList>['oneHasMany'] = {
 		connect: hasManyProcessor(ctx => this.oneHasManyUpdateInputProcessor.connect(ctx, this.primaryValue)),
 		create: hasManyProcessor(ctx => this.oneHasManyUpdateInputProcessor.create(ctx, this.primaryValue)),
+		connectOrCreate: hasManyProcessor(ctx => this.oneHasManyUpdateInputProcessor.connectOrCreate(ctx, this.primaryValue)),
 		update: hasManyProcessor(ctx => this.oneHasManyUpdateInputProcessor.update(ctx, this.primaryValue)),
 		upsert: hasManyProcessor(ctx => this.oneHasManyUpdateInputProcessor.upsert(ctx, this.primaryValue)),
 		delete: hasManyProcessor(ctx => this.oneHasManyUpdateInputProcessor.delete(ctx, this.primaryValue)),
@@ -71,6 +75,7 @@ export class SqlUpdateInputProcessor implements UpdateInputProcessor<MutationRes
 	oneHasOneInverse: UpdateInputProcessor<MutationResultList>['oneHasOneInverse'] = {
 		connect: hasOneProcessor(ctx => this.oneHasOneInverseUpdateInputProcessor.connect(ctx)),
 		create: hasOneProcessor(ctx => this.oneHasOneInverseUpdateInputProcessor.create(ctx)),
+		connectOrCreate: hasOneProcessor(ctx => this.oneHasOneInverseUpdateInputProcessor.connectOrCreate(ctx)),
 		update: hasOneProcessor(ctx => this.oneHasOneInverseUpdateInputProcessor.update(ctx)),
 		upsert: hasOneProcessor(ctx => this.oneHasOneInverseUpdateInputProcessor.upsert(ctx)),
 		delete: hasOneProcessor(ctx => this.oneHasOneInverseUpdateInputProcessor.delete(ctx)),
@@ -80,6 +85,7 @@ export class SqlUpdateInputProcessor implements UpdateInputProcessor<MutationRes
 	oneHasOneOwning: UpdateInputProcessor<MutationResultList>['oneHasOneOwning'] = {
 		connect: hasOneProcessor(ctx => this.oneHasOneOwningUpdateInputProcessor.connect(ctx)),
 		create: hasOneProcessor(ctx => this.oneHasOneOwningUpdateInputProcessor.create(ctx)),
+		connectOrCreate: hasOneProcessor(ctx => this.oneHasOneOwningUpdateInputProcessor.connectOrCreate(ctx)),
 		update: hasOneProcessor(ctx => this.oneHasOneOwningUpdateInputProcessor.update(ctx)),
 		upsert: hasOneProcessor(ctx => this.oneHasOneOwningUpdateInputProcessor.upsert(ctx)),
 		delete: hasOneProcessor(ctx => this.oneHasOneOwningUpdateInputProcessor.delete(ctx)),

@@ -53,6 +53,28 @@ export class ManyHasOneInputProcessor {
 		return result
 	}
 
+	public async connectOrCreate(
+		{ input: { connect, create }, relation, targetEntity }: ContextWithInput<ManyHasOneContext, CreateInputProcessor.ConnectOrCreateInput>,
+		builder: DataManipulationBuilder,
+	) {
+		const result: MutationResultList = []
+		await builder.addFieldValue(relation.name, async () => {
+			const value = await this.mapper.getPrimaryValue(targetEntity, connect)
+			if (value) {
+				return value
+			}
+			const insertPromise = this.mapper.insert(targetEntity, create)
+			const insertResult = await insertPromise
+			const primary = getInsertPrimary(insertResult)
+			if (!primary) {
+				result.push(...insertResult)
+				return AbortDataManipulation
+			}
+			return primary
+		})
+		return result
+	}
+
 	public async update(
 		{ entity, relation, targetEntity, targetRelation, input }: ContextWithInput<ManyHasOneContext, Input.UpdateDataInput>,
 		primary: Input.PrimaryValue,

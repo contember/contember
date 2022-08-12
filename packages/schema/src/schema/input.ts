@@ -8,6 +8,7 @@ export namespace Input {
 		connect = 'connect',
 		disconnect = 'disconnect',
 		create = 'create',
+		connectOrCreate = 'connectOrCreate',
 		update = 'update',
 		upsert = 'upsert',
 		delete = 'delete',
@@ -16,6 +17,7 @@ export namespace Input {
 	export enum CreateRelationOperation {
 		connect = 'connect',
 		create = 'create',
+		connectOrCreate = 'connectOrCreate',
 	}
 
 	export interface ConnectRelationInput<E = never> {
@@ -24,6 +26,13 @@ export namespace Input {
 
 	export interface CreateRelationInput<E = never> {
 		create: CreateDataInput<E>
+	}
+
+	export interface ConnectOrCreateRelationInput<E = never> {
+		connectOrCreate: {
+			connect: UniqueWhere<E>
+			create: CreateDataInput<E>
+		}
 	}
 
 	export interface DisconnectSpecifiedRelationInput<E = never> {
@@ -65,6 +74,7 @@ export namespace Input {
 	export type CreateOneRelationInput<E = never> = { alias?: string } & (
 		| ConnectRelationInput<E>
 		| CreateRelationInput<E>
+		| ConnectOrCreateRelationInput<E>
 	)
 
 	export type CreateManyRelationInput<E = never> = Array<CreateOneRelationInput<E>>
@@ -120,6 +130,7 @@ export namespace Input {
 	export type UpdateOneRelationInput<E = never> =
 		| CreateRelationInput<E>
 		| ConnectRelationInput<E>
+		| ConnectOrCreateRelationInput<E>
 		| DeleteRelationInput
 		| DisconnectRelationInput
 		| UpdateRelationInput<E>
@@ -128,6 +139,7 @@ export namespace Input {
 	export type UpdateManyRelationInputItem<E = never> = { alias?: string } & (
 		| CreateRelationInput<E>
 		| ConnectRelationInput<E>
+		| ConnectOrCreateRelationInput<E>
 		| DeleteSpecifiedRelationInput<E>
 		| DisconnectSpecifiedRelationInput<E>
 		| UpdateSpecifiedRelationInput<E>

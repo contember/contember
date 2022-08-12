@@ -8,7 +8,7 @@ export const siteSettingSchema = new SchemaBuilder()
 			.oneHasOne('setting', r =>
 				r
 					.inversedBy('site')
-					.target('SiteSetting', e => e.column('url', c => c.type(Model.ColumnType.String)))
+					.target('SiteSetting', e => e.column('url', c => c.type(Model.ColumnType.String).unique()))
 					.onDelete(Model.OnDelete.setNull),
 			),
 	)

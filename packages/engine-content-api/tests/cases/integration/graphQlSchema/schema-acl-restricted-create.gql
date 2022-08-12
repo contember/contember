@@ -168,19 +168,19 @@ input OneHasManyEntityUpdateInput {
 }
 
 input OneHasManyEntityUpdateR2EntityRelationInput {
-  update: RootWithoutRUpdateInput
   connect: RootUniqueWhere
+  update: RootWithoutRUpdateInput
   disconnect: Boolean
   delete: Boolean
-}
-
-input RootWithoutRUpdateInput {
-  _dummy_field_: Boolean
 }
 
 input RootUniqueWhere {
   id: UUID
   r: OneHasManyEntityUniqueWhere
+}
+
+input RootWithoutRUpdateInput {
+  _dummy_field_: Boolean
 }
 
 type RootConnection {

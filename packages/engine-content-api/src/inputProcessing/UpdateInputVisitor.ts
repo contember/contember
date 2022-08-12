@@ -116,6 +116,9 @@ export class UpdateInputVisitor<Result> implements
 		if (isIt<Input.CreateRelationInput>(input, 'create')) {
 			return processor.create({ ...context, input: input.create })
 		}
+		if (isIt<Input.ConnectOrCreateRelationInput>(input, 'connectOrCreate')) {
+			return processor.connectOrCreate({ ...context, input: input.connectOrCreate })
+		}
 		if (isIt<Input.DeleteRelationInput>(input, 'delete')) {
 			return processor.delete({ ...context, input: undefined })
 		}
@@ -184,10 +187,11 @@ export class UpdateInputVisitor<Result> implements
 
 	private verifyOperations(input: object) {
 		const keys = Object.keys(input).filter(it => it !== 'alias')
-		if (keys.length !== 1 || !['create', 'connect', 'delete', 'disconnect', 'update', 'upsert'].includes(keys[0])) {
+		const ops = Object.values(Input.UpdateRelationOperation) as string[]
+		if (keys.length !== 1 || !ops.includes(keys[0])) {
 			const found = keys.length === 0 ? 'none' : keys.join(', ')
 			throw new UserError(
-				`Expected exactly one of: "create", "connect", "delete", "disconnect", "update" or "upsert". ${found} found.`,
+				`Expected exactly one of: ${ops.join(', ')}. ${found} found.`,
 			)
 		}
 	}

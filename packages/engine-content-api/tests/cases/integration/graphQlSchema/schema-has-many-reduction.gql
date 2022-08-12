@@ -211,11 +211,17 @@ input PostLocaleCreateInput {
 input PostLocaleCreatePostEntityRelationInput {
   connect: PostUniqueWhere
   create: PostWithoutLocalesCreateInput
+  connectOrCreate: PostLocaleConnectOrCreatePostRelationInput
 }
 
 input PostWithoutLocalesCreateInput {
   publishedAt: DateTime
   _dummy_field_: Boolean
+}
+
+input PostLocaleConnectOrCreatePostRelationInput {
+  connect: PostUniqueWhere
+  create: PostWithoutLocalesCreateInput
 }
 
 input PostLocaleUpdateInput {
@@ -226,10 +232,11 @@ input PostLocaleUpdateInput {
 }
 
 input PostLocaleUpdatePostEntityRelationInput {
+  connect: PostUniqueWhere
   create: PostWithoutLocalesCreateInput
+  connectOrCreate: PostLocaleConnectOrCreatePostRelationInput
   update: PostWithoutLocalesUpdateInput
   upsert: PostLocaleUpsertPostRelationInput
-  connect: PostUniqueWhere
   disconnect: Boolean
   delete: Boolean
 }
@@ -262,6 +269,7 @@ input PostCreateInput {
 input PostCreateLocalesEntityRelationInput {
   connect: PostLocaleUniqueWhere
   create: PostLocaleWithoutPostCreateInput
+  connectOrCreate: PostConnectOrCreateLocalesRelationInput
   alias: String
 }
 
@@ -269,6 +277,11 @@ input PostLocaleWithoutPostCreateInput {
   locale: String
   title: String
   _dummy_field_: Boolean
+}
+
+input PostConnectOrCreateLocalesRelationInput {
+  connect: PostLocaleUniqueWhere
+  create: PostLocaleWithoutPostCreateInput
 }
 
 input PostUpdateInput {

@@ -16,7 +16,6 @@ import { useCurrentValues } from './useCurrentValues'
 
 export interface DynamicMultipleChoiceWithConnectingEntityFieldProps {
 	connectingEntityField: string | SugaredRelativeSingleEntity
-	sortableBy?: SugaredFieldProps['field']
 }
 
 export const useDynamicMultipleChoiceWithConnectingEntityField = (

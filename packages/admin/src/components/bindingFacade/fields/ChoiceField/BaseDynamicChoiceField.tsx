@@ -2,6 +2,7 @@ import {
 	EntityAccessor,
 	Environment,
 	Filter,
+	SugaredFieldProps,
 	SugaredQualifiedEntityList,
 	SugaredQualifiedFieldList,
 	SugaredRelativeSingleField,
@@ -43,6 +44,7 @@ export type BaseDynamicChoiceField =
 		lazy?: LazyChoiceFieldSettings
 		renderedOptionsLimit?: number
 		transformOptions?: (data: ChoiceFieldData.Options<EntityAccessor>, input: string | undefined) => ChoiceFieldData.Options<EntityAccessor>
+		sortableBy?: SugaredFieldProps['field']
 	}
 
 export type LazyChoiceFieldSettings =

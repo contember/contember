@@ -30,7 +30,7 @@ export function useInputClassName<P extends AllVisuallyDependentControlProps | V
 	scheme,
 	size,
 
-  // ValidationSteteProps
+  // ValidationStateProps
   validationState,
 
 	...restNotImplemented

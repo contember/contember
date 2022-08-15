@@ -23,7 +23,7 @@ export const BooleanFieldView: FunctionComponent<BooleanFieldViewProps> = Compon
 		}
 		switch (booleanStyle) {
 			case 'checkCross':
-				return <>{booleanField.value ? '✔' : '❌'}</>
+				return <>{booleanField.value ? '✔' : '✗'}</>
 			case 'oneZero':
 				return <>{booleanField.value ? '1' : '0'}</>
 			case 'yesNo':

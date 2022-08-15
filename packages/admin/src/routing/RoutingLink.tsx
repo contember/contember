@@ -17,7 +17,7 @@ const defaultComponent: FunctionComponent<InnerRoutingLinkProps> = ({ active, ..
 	<a {...props} />
 )
 
-export const RoutingLink = memo<RoutingLinkProps & PublicAnchorProps>(({ onClick, to, parametersResolver, parameters, Component, componentProps, ...props }) => {
+export const RoutingLink = memo<RoutingLinkProps & PublicAnchorProps>(({ onClick, to, parametersResolver, parameters, Component, componentProps, target, ...props }) => {
 	const { navigate, isActive: active, href } = useRoutingLink(to, parametersResolver, parameters)
 
 	const innerOnClick = useCallback((e?: ReactMouseEvent<HTMLAnchorElement, MouseEvent>) => {
@@ -25,15 +25,15 @@ export const RoutingLink = memo<RoutingLinkProps & PublicAnchorProps>(({ onClick
 			if (onClick) {
 				onClick(e)
 			}
-			if (e.isDefaultPrevented() || isSpecialLinkClick(e.nativeEvent)) {
+			if (e.isDefaultPrevented() || isSpecialLinkClick(e.nativeEvent) || target) {
 				return
 			}
 		}
 		navigate(e)
-	}, [navigate, onClick])
+	}, [navigate, onClick, target])
 
 	const InnerComponent = Component ?? defaultComponent
-	return <InnerComponent active={active} href={href} {...componentProps} {...props} onClick={innerOnClick} />
+	return <InnerComponent active={active} href={href} target={target} {...componentProps} {...props} onClick={innerOnClick} />
 })
 RoutingLink.displayName = 'RoutingLink'
 

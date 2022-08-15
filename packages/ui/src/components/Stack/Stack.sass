@@ -1,26 +1,26 @@
 @import '../../styles/common'
 
 .#{$cui-conf-globalPrefix}stack
-  --stack-row-gap: calc(var(--cui-padding-vertical) / 2)
-  --stack-column-gap: calc(var(--cui-padding-horizontal) / 2)
+  --stack-row-gap: var(--cui-padding)
+  --stack-column-gap: var(--cui-padding)
 
-  &.gap-small
-    --stack-row-gap: var(--cui-gap-vertical)
-    --stack-column-gap: var(--cui-gap-horizontal)
-  &.gap-large
-    --stack-row-gap: var(--cui-padding-vertical)
-    --stack-column-gap: var(--cui-padding-horizontal)
-  &.gap-xlarge
-    --stack-row-gap: calc(1.5 * var(--cui-padding-vertical))
-    --stack-column-gap: calc(1.5 * var(--cui-padding-horizontal))
-  &.gap-none
-    --stack-row-gap: 0
-    --stack-column-gap: 0
-
-  display:  flex
+  display: flex
   flex-direction: column
   row-gap: var(--stack-row-gap)
   column-gap: var(--stack-column-gap)
+
+  &.gap-none
+    --stack-row-gap: 0
+    --stack-column-gap: 0
+  &.gap-small
+    --stack-row-gap: var(--cui-gap)
+    --stack-column-gap: var(--cui-gap)
+  &.gap-large
+    --stack-row-gap: calc(1.5 * var(--cui-padding))
+    --stack-column-gap: calc(1.5 * var(--cui-padding))
+  &.gap-xlarge
+    --stack-row-gap: calc(3 * var(--cui-padding))
+    --stack-column-gap: calc(3 * var(--cui-padding))
 
   &.is-evenly-distributed > *
     flex-basis: 0%

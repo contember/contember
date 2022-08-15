@@ -8,20 +8,20 @@
   border-top: var(--cui-section-border-width) solid var(--cui-color--lower)
   display: flex
   flex-direction: column
-  gap: $cui-gap * 6
+  gap: var(--cui-padding)
   margin-left: calc(-1 * var(--cui-section-padding-left))
   margin-right: calc(-1 * var(--cui-section-padding-right))
   padding-bottom: var(--cui-section-padding-bottom)
   padding-left: var(--cui-section-padding-left)
   padding-right: var(--cui-section-padding-right)
   padding-top: var(--cui-section-padding-top)
-  scroll-margin-top: var(--cui-content-offset-top, 0px)
+  scroll-margin-top: calc(var(--cui-content-offset-top, 0px) - var(--cui-section-border-width))
   &:first-child
     margin-top: calc(-1 * var(--cui-layout-page-padding-top, 0em))
     border-color: transparent
   & + &
     margin-bottom: 0
-    margin-top: calc(-1 * var(--cui-layout-section-gap, 0em))
+    margin-top: calc(-1 * (var(--cui-layout-section-gap, 0em) + var(--cui-section-border-width)))
   &:last-child
     margin-bottom: calc(-1 * var(--cui-layout-page-padding-bottom, 0em))
 

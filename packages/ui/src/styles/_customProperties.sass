@@ -23,16 +23,14 @@
 	--cui-logo-size--small: #{em(18px * 0.75)}
 	--cui-logo-size--large: #{em(18px * 2)}
 
-	--cui-gap-horizontal: #{em(4px)}
-	--cui-gap-vertical: #{em(4px)}
-	// TODO: Not yet possible to detech writing mode using the @media query
-	// Maybe use JS detection: https://stackoverflow.com/questions/56942964/is-it-possible-to-get-the-writing-mode-and-writing-direction-of-the-user
-	--cui-gap: var(--cui-gap-horizontal)
+	--cui-gap: #{em(4px)}
+	--cui-padding: calc(var(--cui-gap) * 4)
 
-	--cui-padding-horizontal: calc(var(--cui-gap-horizontal) * 3)
-	--cui-padding-left: var(--cui-padding-horizontal)
-	--cui-padding-right: var(--cui-padding-horizontal)
-	--cui-padding: var(--cui-padding-horizontal)
+	--cui-screen-gap-horizontal: #{em(4px)}
+	--cui-screen-gap-vertical: #{em(4px)}
+	--cui-screen-gap: var(--cui-screen-gap-horizontal)
+
+	--cui-screen-padding-horizontal: calc(var(--cui-screen-gap-horizontal) * 3)
 
 	--cui-edge-offset-horizontal: 0em
 	--cui-edge-offset-left: var(--cui-edge-offset-horizontal)
@@ -41,40 +39,38 @@
 	--cui-field-container-min-width: 100%
 
 	@media (min-width: $breakpoint-min-small)
-		--cui-gap-horizontal: #{em(5px)}
-		--cui-padding-horizontal: calc(var(--cui-gap-horizontal) * 4)
-		--cui-edge-offset-horizontal: calc(var(--cui-gap-horizontal) * 1)
+		--cui-screen-gap-horizontal: #{em(5px)}
+		--cui-screen-padding-horizontal: calc(var(--cui-screen-gap-horizontal) * 4)
+		--cui-edge-offset-horizontal: calc(var(--cui-screen-gap-horizontal) * 1)
 	@media (min-width: $breakpoint-min-medium)
-		--cui-padding-horizontal: calc(var(--cui-gap-horizontal) * 5)
-		--cui-edge-offset-horizontal: calc(var(--cui-gap-horizontal) * 2)
+		--cui-screen-padding-horizontal: calc(var(--cui-screen-gap-horizontal) * 5)
+		--cui-edge-offset-horizontal: calc(var(--cui-screen-gap-horizontal) * 2)
 		--cui-field-container-min-width: 20em
 	@media (min-width: $breakpoint-min-large)
-		--cui-gap-horizontal: #{em(6px)}
-		--cui-edge-offset-horizontal: calc(var(--cui-gap-horizontal) * 3)
+		--cui-screen-gap-horizontal: #{em(6px)}
+		--cui-edge-offset-horizontal: calc(var(--cui-screen-gap-horizontal) * 3)
 		--cui-field-container-min-width: 25em
 	@media (min-width: $breakpoint-min-xlarge)
-		--cui-padding-horizontal: calc(var(--cui-gap-horizontal) * 6)
-		--cui-edge-offset-horizontal: calc(var(--cui-gap-horizontal) * 4)
+		--cui-screen-padding-horizontal: calc(var(--cui-screen-gap-horizontal) * 6)
+		--cui-edge-offset-horizontal: calc(var(--cui-screen-gap-horizontal) * 4)
 
-	--cui-padding-vertical: calc(var(--cui-gap-vertical) * 3)
-	--cui-padding-bottom: var(--cui-padding-vertical)
-	--cui-padding-top: var(--cui-padding-vertical)
+	--cui-screen-padding-vertical: calc(var(--cui-screen-gap-vertical) * 3)
 
-	--cui-edge-offset-vertical: calc(var(--cui-gap-vertical) * 2)
+	--cui-edge-offset-vertical: calc(var(--cui-screen-gap-vertical) * 2)
 	--cui-edge-offset-bottom: var(--cui-edge-offset-vertical)
 	--cui-edge-offset-top: var(--cui-edge-offset-vertical)
 
 	@media (min-height: $breakpoint-min-small)
-		--cui-padding-vertical: calc(var(--cui-gap-vertical) * 4)
+		--cui-screen-padding-vertical: calc(var(--cui-screen-gap-vertical) * 4)
 	@media (min-height: $breakpoint-min-medium)
-		--cui-gap-vertical: #{em(5px)}
-		--cui-padding-vertical: calc(var(--cui-gap-vertical) * 5)
+		--cui-screen-gap-vertical: #{em(5px)}
+		--cui-screen-padding-vertical: calc(var(--cui-screen-gap-vertical) * 5)
 	@media (min-height: $breakpoint-min-large)
-		--cui-gap-vertical: #{em(6px)}
-		--cui-edge-offset-vertical: calc(var(--cui-gap-vertical) * 3)
+		--cui-screen-gap-vertical: #{em(6px)}
+		--cui-edge-offset-vertical: calc(var(--cui-screen-gap-vertical) * 3)
 	@media (min-height: $breakpoint-min-xlarge)
-		--cui-padding-vertical: calc(var(--cui-gap-vertical) * 6)
-		--cui-edge-offset-vertical: calc(var(--cui-gap-vertical) * 4)
+		--cui-screen-padding-vertical: calc(var(--cui-screen-gap-vertical) * 6)
+		--cui-edge-offset-vertical: calc(var(--cui-screen-gap-vertical) * 4)
 
 	--cui-control-font-size: 1em
 	--cui-control-font-size--small: 0.9em

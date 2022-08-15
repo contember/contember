@@ -4,10 +4,10 @@
 	--cui-tabs-padding-vertical: calc(3* var(--cui-gap, 0em))
 	--cui-tabs-padding-horizontal: calc(3* var(--cui-gap, 0em))
 
-	margin-bottom: calc(-1 * var(--cui-padding-vertical))
+	margin-bottom: calc(-1 * var(--cui-screen-padding-vertical))
 	margin-left: calc(-1 * var(--cui-tabs-padding-horizontal))
 	margin-right: calc(-1 * var(--cui-tabs-padding-horizontal))
-	margin-top: calc(-1 * var(--cui-title-bar-gap, var(--cui-padding-vertical)))
+	margin-top: calc(-1 * (var(--cui-title-bar-gap, var(--cui-screen-padding-vertical)) - var(--cui-control-border-width, 1px)))
 	padding-left: var(--cui-tabs-padding-horizontal)
 	padding-right: var(--cui-tabs-padding-horizontal)
 

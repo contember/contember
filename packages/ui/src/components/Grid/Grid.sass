@@ -1,6 +1,6 @@
 .#{$cui-conf-globalPrefix}grid
-  --grid-row-gap: calc(var(--cui-padding-vertical) / 2)
-  --grid-column-gap: calc(var(--cui-padding-horizontal) / 2)
+  --grid-row-gap: var(--cui-padding)
+  --grid-column-gap: var(--cui-padding)
   --cui-grid-column-width: 160px
 
   display: grid
@@ -8,15 +8,15 @@
   grid-column-gap: var(--grid-column-gap)
   grid-row-gap: var(--grid-row-gap)
 
-  &.gap-small
-    --grid-row-gap: var(--cui-gap-vertical)
-    --grid-column-gap: var(--cui-gap-horizontal)
-  &.gap-large
-    --grid-row-gap: var(--cui-padding-vertical)
-    --grid-column-gap: var(--cui-padding-horizontal)
-  &.gap-xlarge
-    --grid-row-gap: calc(1.5 * var(--cui-padding-vertical))
-    --grid-column-gap: calc(1.5 * var(--cui-padding-horizontal))
   &.gap-none
     --grid-row-gap: 0
     --grid-column-gap: 0
+  &.gap-small
+    --grid-row-gap: var(--cui-gap)
+    --grid-column-gap: var(--cui-gap)
+  &.gap-large
+    --grid-row-gap: calc(1.5 * var(--cui-padding))
+    --grid-column-gap: calc(1.5 * var(--cui-padding))
+  &.gap-xlarge
+    --grid-row-gap: calc(3 * var(--cui-padding))
+    --grid-column-gap: calc(3 * var(--cui-padding))

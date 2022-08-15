@@ -1,9 +1,10 @@
 @import '../../styles/common'
 
 .#{$cui-conf-globalPrefix}tab-button
-	--cui-tab-button-padding-vertical: var(--cui-tabs-padding-vertical, calc(3 * var(--cui-gap-vertical)))
-	--cui-tab-button-padding-horizontal: var(--cui-tabs-padding-horizontal, calc(3 * var(--cui-gap-horizontal)))
+	--cui-tab-button-padding-vertical: var(--cui-tabs-padding-vertical, calc(3 * var(--cui-gap)))
+	--cui-tab-button-padding-horizontal: var(--cui-tabs-padding-horizontal, calc(3 * var(--cui-gap)))
 	--cui-tab-button-label-padding: var(--cui-gap)
+	--cui-tab-button-margin: unset
 
 	appearance: unset
 	background-color: unset
@@ -11,6 +12,7 @@
 	display: inline-flex
 	font-family: inherit
 	font-size: inherit
+	margin: var(--cui-tab-button-margin)
 	overflow: visible
 	padding: var(--cui-tab-button-padding-vertical) var(--cui-tab-button-padding-horizontal)
 	position: relative

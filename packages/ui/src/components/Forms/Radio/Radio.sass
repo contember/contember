@@ -10,16 +10,15 @@
 
 	--control-font-size: var(--cui-control-font-size)
 
+	display: flex
+	flex-direction: column
+	gap: calc(3 * var(--cui-gap))
+
 	&.view-small
 		--control-font-size: var(--cui-control-font-size--small)
 	&.view-large
 		--control-font-size: var(--cui-control-font-size--large)
 
-	display: flex
-	flex-direction: column
-	gap: calc(3 * var(--cui-gap-vertical))
-
 	&.view-horizontal
 		flex-direction: row
 		flex-wrap: wrap
-		gap: calc(3 * var(--cui-gap-horizontal))

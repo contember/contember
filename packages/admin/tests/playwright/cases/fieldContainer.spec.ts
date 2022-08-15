@@ -10,12 +10,12 @@ namespace Model {
 
 let projectSlug: string
 
-test.beforeAll(async ({}, testInfo) => {
+test.beforeAll(async ({ }, testInfo) => {
 	projectSlug = await initContemberProject(testInfo, Model)
 })
 
 test('basic test', async ({ page, userAgent }) => {
-	test.skip(!!userAgent?.match(/\biPhone\b/), 'Unstable test on iPhone')
+	test.skip(!!userAgent?.match(/\biPhone|iPad\b/), 'Unstable test on iPhone')
 
 	expectNoConsoleErrors(page)
 

@@ -11,28 +11,27 @@
 	li
 		@extend %implementsCustomFocusEffects
 
-
 	li:focus > &-section-title .#{$cui-conf-globalPrefix}label,
-	li:focus > &-group-title  .#{$cui-conf-globalPrefix}label
+	li:focus > &-group-title .#{$cui-conf-globalPrefix}label
 		color: var(--cui-control-color--highlighted)
 		background-color: var(--cui-menu-background-color-focused)
 
 	.#{$cui-conf-globalPrefix}label
-		--cui-inset-vertical: calc(1.5 * var(--cui-gap))
-		--cui-inset-horizontal: calc(1.5 * var(--cui-gap-horizontal))
+		--cui-inset-vertical: calc(1.5 * var(--cui-screen-gap-horizontal))
+		--cui-inset-horizontal: calc(1.5 * var(--cui-screen-gap-horizontal))
 	.is-active > .#{$cui-conf-globalPrefix}label
 		background-color: var(--cui-filled-background-color)
 		color: var(--cui-control-color)
 
 	&-expand-toggle
-		--cui-expand-toggle-size: calc(5 * var(--cui-gap))
+		--cui-expand-toggle-size: calc(5 * var(--cui-screen-gap))
 		background: transparent
 		border: 0
 		color: inherit
 		height: var(--cui-expand-toggle-size)
 		padding: 0
 		position: absolute
-		right: calc(100% + 1.5 * var(--cui-gap))
+		right: calc(100% + 1.5 * var(--cui-screen-gap))
 		width: var(--cui-expand-toggle-size)
 		&::before
 			$caret-size: 0.4em
@@ -69,41 +68,41 @@
 				display: flex
 				flex-direction: column
 				flex: 1
-				margin: 0 calc(-2 * var(--cui-gap))
-				padding: calc(2 * var(--cui-gap))
+				margin: 0 calc(-2 * var(--cui-screen-gap))
+				padding: calc(2 * var(--cui-screen-gap))
 
 	&-section
 		margin-left: var(--cui-edge-offset-left)
-		padding-bottom: calc(var(--cui-padding-vertical) / 2)
+		padding-bottom: calc(var(--cui-screen-padding-vertical) / 2)
 		padding-right: 0
-		padding-top: calc(var(--cui-padding-vertical) / 2)
+		padding-top: calc(var(--cui-screen-padding-vertical) / 2)
 		position: relative
 		&::after
 			border-bottom: 1px solid var(--cui-color--lower)
 			content: ""
 			display: block
-			left: var(--cui-padding-left)
+			left: var(--cui-screen-padding-horizontal)
 			position: absolute
 			right: 0
 			top: 0
 		&-title
+			letter-spacing: 0.125em
+			margin-bottom: var(--cui-screen-gap)
+			margin-left: var(--cui-screen-padding-horizontal)
+			margin-right: var(--cui-screen-padding-horizontal)
+			margin-top: var(--cui-screen-gap)
+			padding-bottom: var(--cui-screen-gap-vertical)
+			padding-top: var(--cui-screen-gap-vertical)
+			text-transform: uppercase
 			&-content
 				font-size: var(--cui-font-size-note)
-			letter-spacing: 0.125em
-			margin-bottom: var(--cui-gap)
-			margin-left: var(--cui-padding-left)
-			margin-right: var(--cui-padding-right)
-			margin-top: var(--cui-gap)
-			padding-bottom: var(--cui-gap-vertical)
-			padding-top: var(--cui-gap-vertical)
-			text-transform: uppercase
 			&.is-active:after
 				visibility: unset
 		&-list
 			list-style: none
 			margin-bottom: 0
-			margin-left: var(--cui-padding-left)
-			margin-right: var(--cui-padding-right)
+			margin-left: var(--cui-screen-padding-horizontal)
+			margin-right: var(--cui-screen-padding-horizontal)
 			margin-top: 0
 			padding: 0
 
@@ -112,7 +111,7 @@
 			color: var(--cui-color--strong)
 		&-list
 			list-style: none
-			padding-left: calc(4 * var(--cui-gap-horizontal))
+			padding-left: calc(4 * var(--cui-screen-gap-horizontal))
 			position: relative
 
 a.#{$cui-conf-globalPrefix}menu-group-title-content .#{$cui-conf-globalPrefix}menu-group-title-label

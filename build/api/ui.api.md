@@ -642,7 +642,7 @@ export const Divider: MemoExoticComponent<({ className, gap, ...rest }: DividerP
 // @public (undocumented)
 export interface DividerProps extends Omit<NativeProps<HTMLDivElement>, 'children'> {
     // (undocumented)
-    gap?: Size | 'none';
+    gap?: Size | 'xlarge' | 'none';
 }
 
 // @public (undocumented)
@@ -2250,7 +2250,7 @@ export const Spacer: MemoExoticComponent<({ className, gap, ...rest }: SpacerPro
 // @public (undocumented)
 export interface SpacerProps extends Omit<NativeProps<HTMLDivElement>, 'children'> {
     // (undocumented)
-    gap?: Size;
+    gap?: Size | 'xlarge' | 'none';
 }
 
 // @public (undocumented)
@@ -2667,6 +2667,9 @@ export const useComponentClassName: (className: string) => string;
 
 // @public (undocumented)
 export const useDialog: <Result>() => DialogOptions<Result>;
+
+// @public (undocumented)
+export function useElementTopOffset(ref?: RefObject<HTMLElement>): number | undefined;
 
 // @public (undocumented)
 export function useFallbackRef<E extends HTMLDivElement>(forwardedRef?: ForwardedRef<E>): ((instance: E | null) => void) | MutableRefObject<E | null>;

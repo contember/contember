@@ -4,16 +4,15 @@
 	@extend %buttonStates
 	@extend %implementsCustomFocusEffects
 
-	$border-width-em: em(1px)
 	$button-list-separation-x: .5em !default
 	$button-list-separation-y: .5em !default
 
-	--cui-button-box-shadow-light-edge:    	  inset 0    0   0    1px rgba(255, 255, 255, 0.1)
-	--cui-button-box-shadow-dark-edge-bottom: inset 0   -2px 0   -1px rgba(0, 0, 0, 0.1)
-	--cui-button-box-shadow-dark-edge-top:    inset 0    1px 0    1px rgba(0, 0, 0, 0.025)
-	--cui-button-box-shadow-shadow-below: 		      0    0   1px      rgba(0, 0, 0, 0.1), 0 1px 0.5em rgba(0, 0, 0, 0.1)
-	--cui-button-box-shadow-highlighted: 		  inset 0 -0.5em 2em -1em rgba(0, 0, 0, 0.1)
-	--cui-button-box-shadow-pressed:          inset 0    0   1px      rgba(0, 0, 0, 0.1)
+	--cui-button-box-shadow-light-edge: inset 0 0 0 1px rgba(255, 255, 255, 0.1)
+	--cui-button-box-shadow-dark-edge-bottom: inset 0 -2px 0 -1px rgba(0, 0, 0, 0.1)
+	--cui-button-box-shadow-dark-edge-top: inset 0 1px 0 1px rgba(0, 0, 0, 0.025)
+	--cui-button-box-shadow-shadow-below: 0 0 1px rgba(0, 0, 0, 0.1), 0 1px 0.5em rgba(0, 0, 0, 0.1)
+	--cui-button-box-shadow-highlighted: inset 0 -0.5em 2em -1em rgba(0, 0, 0, 0.1)
+	--cui-button-box-shadow-pressed: inset 0 0 1px rgba(0, 0, 0, 0.1)
 
 	--cui-button-box-shadow: var(--cui-button-box-shadow-shadow-below), var(--cui-button-box-shadow-light-edge), var(--cui-button-box-shadow-dark-edge-bottom)
 	--cui-button-box-shadow--highlighted: var(--cui-button-box-shadow-shadow-below), var(--cui-button-box-shadow-highlighted), var(--cui-button-box-shadow-light-edge), var(--cui-button-box-shadow-dark-edge-bottom)
@@ -33,7 +32,7 @@
 	--cui-button-border-width: 0px
 	--cui-button-label-font-size: var(--cui-font-size-label)
 	--cui-button-height: var(--cui-control-height)
-	--cui-button-padding-horizontal: calc(3 * var(--cui-gap-horizontal))
+	--cui-button-padding-horizontal: calc(4 * var(--cui-gap))
 
 	align-items: center
 	background: var(--cui-button-background-color)
@@ -88,7 +87,7 @@
 	&-group.view-large &
 		--cui-button-label-font-size: var(--cui-font-size-body)
 		--cui-button-height: var(--cui-control-height--large)
-		--cui-button-padding-horizontal: calc(var(--cui-gap) * 5 - #{$border-width-em})
+		--cui-button-padding-horizontal: calc(var(--cui-gap) * 7 - var(--cui-control-border-width, 1px))
 
 	&.view-block,
 	&.view-generousBlock
@@ -114,7 +113,7 @@
 		width: var(--cui-button-height)
 	&.view-generous,
 	&.view-generousBlock
-		--cui-button-padding-horizontal: calc(var(--cui-gap) * 8 - #{$border-width-em})
+		--cui-button-padding-horizontal: calc(var(--cui-gap) * 11 - var(--cui-control-border-width, 1px))
 
 	&.view-seamless
 		--cui-button-background-color: transparent
@@ -125,10 +124,10 @@
 		--cui-button-color: var(--cui-control-color)
 		--cui-button-color--highlighted: var(--cui-control-color--highlighted)
 		--cui-button-color--pressed: var(--cui-control-color--pressed)
+		position: relative
 		&:not(.view-large):not(.view-generousBlock):not(.view-squarish):not(.view-circular)
 			--cui-button-height: auto
-			--cui-button-padding-horizontal: calc(var(--cui-gap) - #{$border-width-em})
-		position: relative
+			--cui-button-padding-horizontal: calc(var(--cui-gap) - var(--cui-control-border-width, 1px))
 	&.view-primary
 		--cui-button-color: var(--cui-filled-primary-control-color)
 		--cui-button-color--highlighted: var(--cui-filled-primary-control-color--highlighted)
@@ -192,8 +191,8 @@
 		font-size: var(--cui-button-label-font-size)
 		flex: 1
 		line-height: 1em
-		padding-bottom: $cui-gap - $border-width-em
-		padding-top: $cui-gap - $border-width-em
+		padding-bottom: calc(var(--cui-cui-gap) - var(--cui-control-border-width, 1px))
+		padding-top: calc(var(--cui-cui-gap) - var(--cui-control-border-width, 1px))
 		overflow: hidden
 		text-overflow: ellipsis
 		vertical-align: middle

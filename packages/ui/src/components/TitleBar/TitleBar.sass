@@ -1,21 +1,23 @@
 .#{$cui-conf-globalPrefix}titleBar
-	--cui-padding-top: var(--cui-layout-page-padding-top)
-	--cui-padding-left: var(--cui-layout-page-padding-left)
-	--cui-padding-right: var(--cui-layout-page-padding-right)
+	--cui-title-bar-padding-top: var(--cui-layout-page-padding-top)
+	--cui-title-bar-padding-left: var(--cui-layout-page-padding-left)
+	--cui-title-bar-padding-right: var(--cui-layout-page-padding-right)
 	--cui-title-bar-gap: calc(var(--cui-layout-section-gap) / 2)
 
 	align-items: stretch
 	background-color: var(--cui-background-color)
-	&.is-global-theme
-		background-color: var(--cui-background-color--below)
 	display: flex
 	flex-direction: column
 	gap: var(--cui-title-bar-gap)
-	padding-bottom: var(--cui-padding-bottom)
-	padding-left: var(--cui-padding-left)
-	padding-right: var(--cui-padding-right)
-	padding-top: var(--cui-padding-top)
+	justify-content: space-between
+	padding-bottom: var(--cui-screen-padding-vertical)
+	padding-left: var(--cui-title-bar-padding-left)
+	padding-right: var(--cui-title-bar-padding-right)
+	padding-top: var(--cui-title-bar-padding-top)
 	z-index: 1
+
+	&.is-global-theme
+		background-color: var(--cui-background-color--below)
 
 	&::after
 		content: ""
@@ -24,7 +26,7 @@
 		left: var(--cui-edge-offset-left)
 		right: var(--cui-edge-offset-right)
 		bottom: 0
-		border-bottom: 1px solid var(--cui-color--lower)
+		border-bottom: var(--cui-control-border-width, 1px) solid var(--cui-color--lower)
 
 	&-in
 		align-items: center
@@ -42,3 +44,7 @@
 	@media (max-width: $breakpoint-max-medium)
 		background: linear-gradient(to bottom, var(--cui-background-color), var(--cui-background-color--below))
 		border-bottom-color: transparent
+
+	@media (min-width: $breakpoint-medium)
+		flex-basis: calc(var(--cui-bar-content-offset-top) + var(--cui-control-border-width, 1px))
+		flex-shrink: 0

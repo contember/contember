@@ -23,6 +23,8 @@ const Entry = () => {
 				identityEdit: { path: '/project/edit/:project/:identity' },
 				apiKeyCreate: { path: '/project/api-key/:project' },
 				security: { path: '/security' },
+				studioGrid: { path: '/project/studio/:project/grid/:entity/:id?' },
+				studioForm: { path: '/project/studio/:project/form/:entity/:id?' },
 			}}
 			envVariables={config}
 			children={<Pages layout={PanelLayout} children={import.meta.globEager('./pages/**/*.tsx')} />}

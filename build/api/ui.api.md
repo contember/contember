@@ -267,12 +267,12 @@ export type CardProps = Omit<CommonCardProps, 'type'> & Omit<NativeProps<HTMLDiv
 
 // @public (undocumented)
 export const Checkbox: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<boolean> & ControlValueProps<boolean> & {
-CheckboxButtonComponent?: (({ id, checked, indeterminate, ...props }: CheckboxButtonProps) => JSX.Element) | undefined;
+CheckboxButtonComponent?: (({ id, name, placeholder, checked, indeterminate, ...props }: CheckboxButtonProps) => JSX.Element) | undefined;
 children?: undefined;
 } & RestHTMLCheckboxProps & RefAttributes<HTMLInputElement>>>;
 
 // @public (undocumented)
-export const CheckboxButton: ({ id, checked, indeterminate, ...props }: CheckboxButtonProps) => JSX.Element;
+export const CheckboxButton: ({ id, name, placeholder, checked, indeterminate, ...props }: CheckboxButtonProps) => JSX.Element;
 
 // @public (undocumented)
 export interface CheckboxButtonProps extends AllVisuallyDependentControlProps {

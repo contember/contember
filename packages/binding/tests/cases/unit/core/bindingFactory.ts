@@ -12,11 +12,10 @@ import { ReactNode } from 'react'
 import { RawSchema } from '../../../../src/core/schema/RawSchema'
 
 export const createBindingWithEntitySubtree = ({ node, schema }: {node: ReactNode, schema: RawSchema}) => {
-	const treeStore = new TreeStore()
 	const finalSchema = new Schema(SchemaPreprocessor.processRawSchema(schema))
+	const treeStore = new TreeStore(finalSchema)
 	const environment = Environment.create().withSchema(finalSchema)
 	const generator = new MarkerTreeGenerator(node, environment)
-	treeStore.setSchema(finalSchema)
 	const config = new Config()
 	const eventManager = new EventManager({} as any, {} as any, config, new DirtinessTracker(), () => null, treeStore)
 	const stateInitializer = new StateInitializer(

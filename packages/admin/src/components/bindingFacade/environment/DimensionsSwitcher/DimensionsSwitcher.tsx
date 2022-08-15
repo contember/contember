@@ -55,7 +55,7 @@ export const DimensionsSwitcher = memo((props: DimensionsSwitcherProps) => {
 	const labelFactory = <Field field={props.labelField} />
 
 	return (
-		<DataBindingProvider stateComponent={DimensionsStateRenderer} refreshOnEnvironmentChange={false} key={key}>
+		<DataBindingProvider stateComponent={DimensionsStateRenderer} key={key}>
 			<EntityListSubTree
 				entities={qualifiedEntityList}
 				orderBy={qualifiedEntityList.orderBy}

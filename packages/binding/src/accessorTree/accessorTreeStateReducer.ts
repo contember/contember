@@ -11,8 +11,9 @@ export const accessorTreeStateReducer = (
 				return previousState
 			}
 			return {
-				binding: previousState.binding,
 				name: 'initialized',
+				environment: previousState.environment,
+				binding: previousState.binding,
 				data: action.data,
 			}
 		case 'failWithError':
@@ -20,14 +21,16 @@ export const accessorTreeStateReducer = (
 				return previousState
 			}
 			return {
-				binding: previousState.binding,
 				name: 'error',
+				environment: previousState.environment,
+				binding: previousState.binding,
 				error: action.error,
 			}
 		case 'reset':
 			return {
-				binding: action.binding,
 				name: 'initializing',
+				environment: action.environment,
+				binding: action.binding,
 			}
 	}
 }

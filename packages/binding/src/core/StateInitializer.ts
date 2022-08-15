@@ -373,13 +373,8 @@ export class StateInitializer {
 
 			getAccessor: () => {
 				if (fieldState.accessor === undefined) {
-					const fieldSchema = this.treeStore.schema.getEntityField(parent.entity.entityName, fieldMarker.fieldName)
-					if (!fieldSchema) {
-						throw new BindingError(`Unknown field ${parent.entity.entityName}.${fieldMarker.fieldName}.`)
-					}
-					if (fieldSchema.__typename !== '_Column') {
-						throw new BindingError(`Invalid type of field ${parent.entity.entityName}.${fieldMarker.fieldName}. Expected '_Column', '${fieldSchema.__typename}' found.`)
-					}
+					const fieldSchema = this.treeStore.schema.getEntityColumn(parent.entity.entityName, fieldMarker.fieldName)
+
 					fieldState.accessor = new FieldAccessor(
 						fieldState,
 						this.fieldOperations,
@@ -493,11 +488,7 @@ export class StateInitializer {
 		entityRealm: EntityRealmState,
 		field: HasOneRelationMarker | HasManyRelationMarker,
 	): EntityName {
-		const targetField = this.treeStore.schema.getEntityField(entityRealm.entity.entityName, field.parameters.field)
-
-		if (targetField?.__typename !== '_Relation') {
-			throw new BindingError() // This should have been validated elsewhere.
-		}
+		const targetField = this.treeStore.schema.getEntityRelation(entityRealm.entity.entityName, field.parameters.field)
 		return targetField.targetEntity
 	}
 

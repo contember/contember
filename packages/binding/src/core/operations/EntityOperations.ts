@@ -51,7 +51,7 @@ export class EntityOperations {
 			const persistedData = this.treeStore.persistedEntityData.get(outerState.entity.id.uniqueValue)
 
 			const entityName = outerState.entity.entityName
-			const fieldSchema = this.treeStore.schema.getEntityField(entityName, fieldName)
+			const fieldSchema = this.treeStore.schema.getEntityFieldOrUndefined(entityName, fieldName)
 
 			if (fieldSchema === undefined) {
 				throw new BindingError(

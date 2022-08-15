@@ -763,13 +763,11 @@ export class MutationGenerator {
 		if (typeof value !== 'string') {
 			return value
 		}
-		const fieldSchema = this.treeStore.schema.getEntityField(
+		const fieldSchema = this.treeStore.schema.getEntityColumn(
 			fieldState.parent.entity.entityName,
 			fieldState.fieldMarker.fieldName,
 		)
-		if (fieldSchema === undefined || fieldSchema.__typename !== '_Column') {
-			throw new BindingError()
-		}
+
 		return fieldSchema.enumName === null ? value : new GraphQlBuilder.GraphQlLiteral(value)
 	}
 

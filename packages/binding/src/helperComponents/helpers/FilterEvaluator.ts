@@ -14,9 +14,7 @@ export class FilterEvaluator {
 
 	evaluateFilter(entity: EntityAccessor, filter: Filter): boolean {
 		const entitySchema = this.schema.getEntity(entity.name)
-		if (!entitySchema) {
-			throw new BindingError()
-		}
+
 		let acc = true
 		for (const [key, value] of Object.entries(filter)) {
 			if (key === 'and' || key === 'or') {

@@ -238,8 +238,8 @@ describe('Marker tree generator', () => {
 		)
 
 		const idMarker = [PRIMARY_KEY_NAME, new FieldMarker(PRIMARY_KEY_NAME)] as const
-		const fooEntity = schema.getEntity('Foo')!
-		const barEntity = schema.getEntity('Bar')!
+		const fooEntity = schema.getEntity('Foo')
+		const barEntity = schema.getEntity('Bar')
 		const subTreeEnv = environment.withSubTree({
 			entity: fooEntity,
 			expectedCardinality: 'one',
@@ -252,17 +252,17 @@ describe('Marker tree generator', () => {
 		})
 		const outerHasManyEnv = subTreeEnv.withSubTreeChild({
 			type: 'entity-list',
-			field: schema.getEntityField('Foo', 'hasMany')! as SchemaRelation,
+			field: schema.getEntityRelation('Foo', 'hasMany'),
 			entity: barEntity,
 		})
 		const hasOneEnv = outerHasManyEnv.withSubTreeChild({
 			type: 'entity',
-			field: schema.getEntityField('Bar', 'hasOne')! as SchemaRelation,
+			field: schema.getEntityRelation('Bar', 'hasOne'),
 			entity: fooEntity,
 		})
 		const innerHasManyEnv = hasOneEnv.withSubTreeChild({
 			type: 'entity-list',
-			field: schema.getEntityField('Foo', 'common')! as SchemaRelation,
+			field: schema.getEntityRelation('Foo', 'common'),
 			entity: barEntity,
 		})
 
@@ -420,7 +420,7 @@ describe('Marker tree generator', () => {
 			),
 			environment.withSubTree({
 				expectedCardinality: 'zero-to-many',
-				entity: schema.getEntity('Bar')!,
+				entity: schema.getEntity('Bar'),
 				filter: {},
 				type: 'subtree-entity-list',
 			}),

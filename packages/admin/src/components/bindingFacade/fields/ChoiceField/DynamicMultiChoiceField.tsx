@@ -1,4 +1,4 @@
-import { Component, EntityAccessor, HasMany, HasOne, SugaredField } from '@contember/binding'
+import { Component, EntityAccessor, HasMany, HasManyProps, HasOne, SugaredField } from '@contember/binding'
 import type { FunctionComponent } from 'react'
 import type { ChoiceFieldData } from './ChoiceFieldData'
 import { DynamicMultipleChoiceFieldProps, useDynamicMultipleChoiceField } from './hooks/useDynamicMultipleChoiceField'
@@ -16,14 +16,18 @@ export const DynamicMultiChoiceField: FunctionComponent<DynamicMultipleChoiceFie
 		(props, environment) => {
 			let { subTree, renderedOption } = renderDynamicChoiceFieldStatic(props, environment)
 
-			if ('connectingEntityField' in props) {
+			let expectedMutation: HasManyProps['expectedMutation'] = 'connectOrDisconnect'
+
+			if ('connectingEntityField' in props && props.connectingEntityField) {
+				expectedMutation = 'anyMutation'
+
 				const hasOneProps = typeof props.connectingEntityField === 'string'
 					? { field: props.connectingEntityField }
 					: props.connectingEntityField
 
 				renderedOption = <>
 					{props.sortableBy && <SugaredField field={props.sortableBy} />}
-					<HasOne {...hasOneProps}>
+					<HasOne {...hasOneProps} expectedMutation={'connectOrDisconnect'}>
 						{renderedOption}
 					</HasOne>
 				</>
@@ -32,7 +36,7 @@ export const DynamicMultiChoiceField: FunctionComponent<DynamicMultipleChoiceFie
 			return (
 				<>
 					{subTree}
-					<HasMany field={props.field} expectedMutation="connectOrDisconnect" initialEntityCount={0}>
+					<HasMany field={props.field} expectedMutation={expectedMutation} initialEntityCount={0}>
 						{renderedOption}
 					</HasMany>
 				</>

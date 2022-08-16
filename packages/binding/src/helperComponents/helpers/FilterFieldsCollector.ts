@@ -38,9 +38,6 @@ export class FilterFieldsCollector {
 					result.add([...path, key].join('.'))
 				} else {
 					const entity = this.schema.getEntity(field.targetEntity)
-					if (!entity) {
-						throw new BindingError()
-					}
 					this.collectFieldsInternal(value as Filter, entity, [...path, key], result)
 				}
 			}

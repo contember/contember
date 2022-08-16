@@ -1,36 +1,48 @@
-import { FunctionComponent, memo, NamedExoticComponent, ReactElement } from 'react'
+import { memo, NamedExoticComponent, PropsWithChildren, ReactElement } from 'react'
+import { useEnvironment } from '../accessorPropagation/useEnvironment'
 import type { Environment } from '../dao'
 import { assertNever } from '../utils'
 import type { MarkerProvider, StaticRenderProvider, StaticRenderProviderProps } from './MarkerProvider'
 
+interface EnvironmentAwareFunctionComponent<P> {
+	(props: PropsWithChildren<P>, environment: Environment): ReactElement<any, any> | null;
+	displayName?: string | undefined;
+}
+
 function Component<Props extends {}>(
-	statelessRender: FunctionComponent<Props>,
+	statelessRender: EnvironmentAwareFunctionComponent<Props>,
 	displayName?: string,
 ): NamedExoticComponent<Props>
+
 function Component<Props extends {}, NonStaticPropNames extends keyof Props = never>(
-	statefulRender: FunctionComponent<Props>,
+	statefulRender: EnvironmentAwareFunctionComponent<Props>,
 	staticRender: (
 		props: StaticRenderProviderProps<Props, NonStaticPropNames>,
 		environment: Environment,
 	) => ReactElement | null,
 	displayName?: string,
 ): NamedExoticComponent<Props>
+
 function Component<Props extends {}, NonStaticPropNames extends keyof Props = never>(
-	statefulRender: FunctionComponent<Props>,
+	statefulRender: EnvironmentAwareFunctionComponent<Props>,
 	markerProvisions: MarkerProvider<Props, NonStaticPropNames>,
 	displayName?: string,
 ): NamedExoticComponent<Props>
+
 function Component<Props extends {}, NonStaticPropNames extends keyof Props = never>(
-	render: FunctionComponent<Props>,
+	render: EnvironmentAwareFunctionComponent<Props>,
 	decider?:
 		| string
 		| ((props: StaticRenderProviderProps<Props, NonStaticPropNames>, environment: Environment) => ReactElement | null)
 		| MarkerProvider<Props, NonStaticPropNames>,
 	displayName?: string,
 ) {
+	const RenderWithEnv = (props: Props) => render(props, useEnvironment())
+	const renderWithEnv = typeof render !== 'function' || render.length < 2 ? render : RenderWithEnv
+
 	if (decider === undefined || typeof decider === 'string') {
 		render.displayName = decider
-		const augmentedRender: NamedExoticComponent<Props> & MarkerProvider<Props> = memo<Props>(render)
+		const augmentedRender: NamedExoticComponent<Props> & MarkerProvider<Props> = memo<Props>(renderWithEnv)
 		augmentedRender.staticRender = render as StaticRenderProvider<Props>['staticRender']
 		augmentedRender.displayName = decider
 
@@ -38,7 +50,7 @@ function Component<Props extends {}, NonStaticPropNames extends keyof Props = ne
 	}
 
 	render.displayName = displayName
-	const augmentedRender: NamedExoticComponent<Props> & MarkerProvider<Props, NonStaticPropNames> = memo<Props>(render)
+	const augmentedRender: NamedExoticComponent<Props> & MarkerProvider<Props, NonStaticPropNames> = memo<Props>(renderWithEnv)
 	augmentedRender.displayName = displayName
 
 	if (typeof decider === 'function') {
@@ -58,4 +70,5 @@ function Component<Props extends {}, NonStaticPropNames extends keyof Props = ne
 	assertNever(decider)
 }
 
+export type { EnvironmentAwareFunctionComponent }
 export { Component }

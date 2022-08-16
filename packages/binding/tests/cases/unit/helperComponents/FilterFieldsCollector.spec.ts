@@ -11,7 +11,7 @@ describe('Filter fields collector', () => {
 				eq: 'foo',
 			},
 		})
-		expect(collector.collectFields(schema.getEntity('Article')!)).toEqual(new Set(['title']))
+		expect(collector.collectFields(schema.getEntity('Article'))).toEqual(new Set(['title']))
 	})
 
 	it('collects multiple columns with AND', () => {
@@ -29,7 +29,7 @@ describe('Filter fields collector', () => {
 				},
 			],
 		})
-		expect(collector.collectFields(schema.getEntity('Article')!)).toEqual(new Set(['title', 'isPublished']))
+		expect(collector.collectFields(schema.getEntity('Article'))).toEqual(new Set(['title', 'isPublished']))
 	})
 
 	it('collects simple column with NOT', () => {
@@ -40,7 +40,7 @@ describe('Filter fields collector', () => {
 				},
 			},
 		})
-		expect(collector.collectFields(schema.getEntity('Article')!)).toEqual(new Set(['title']))
+		expect(collector.collectFields(schema.getEntity('Article'))).toEqual(new Set(['title']))
 	})
 
 	it('collects column over relation', () => {
@@ -51,6 +51,6 @@ describe('Filter fields collector', () => {
 				},
 			},
 		})
-		expect(collector.collectFields(schema.getEntity('Article')!)).toEqual(new Set(['category.title']))
+		expect(collector.collectFields(schema.getEntity('Article'))).toEqual(new Set(['category.title']))
 	})
 })

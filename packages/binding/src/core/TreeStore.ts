@@ -97,11 +97,7 @@ export class TreeStore {
 			return assertNever(blueprint)
 		}
 
-		const relationSchema = this.schema.getEntityField(parentEntityName, relationFromParent)
-
-		if (relationSchema?.__typename !== '_Relation') {
-			throw new BindingError()
-		}
+		const relationSchema = this.schema.getEntityRelation(parentEntityName, relationFromParent)
 		const fieldBack = (relationSchema.ownedBy || relationSchema.inversedBy) ?? null
 
 		// console.log(parentEntityName, relationFromParent, entityRealm.entity.entityName, fieldBack)

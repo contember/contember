@@ -81,7 +81,7 @@ export const useFieldControl = <FieldVal extends FieldValue, ControlVal extends 
 		min: format(props.min, field.current),
 		value: format(field.current.value, field.current),
 
-		// ValidationSteteProps
+		// ValidationStateProps
 		validationState: field.current.errors ? ('invalid' as const) : undefined,
 		onValidationStateChange: useCallback((error?: string) => {
 			if (field.current.isTouched) {

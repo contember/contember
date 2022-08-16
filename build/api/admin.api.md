@@ -106,6 +106,7 @@ import { RepeaterItemContainerProps } from '@contember/ui';
 import type { S3FileUploader } from '@contember/client';
 import { SaveButtonProps } from '@contember/ui';
 import type { Scalar } from '@contember/binding';
+import { Schema } from '@contember/binding';
 import { Scheme } from '@contember/ui';
 import { SearchInputProps } from '@contember/ui';
 import { Selection as Selection_2 } from 'slate';
@@ -135,6 +136,7 @@ import { Text as Text_2 } from 'slate';
 import { TextareaInputOwnProps } from '@contember/ui';
 import { TileLayerProps } from 'react-leaflet';
 import { TimeInputProps } from '@contember/ui';
+import { UnsugarableSingleEntityEventListeners } from '@contember/binding';
 import { UrlInputProps } from '@contember/ui';
 import type { VideoHTMLAttributes } from 'react';
 
@@ -371,6 +373,69 @@ export const AudioUploadField: <AcceptArtifacts = unknown, SFExtraProps extends 
 
 // @public (undocumented)
 export type AudioUploadFieldProps<AcceptArtifacts = unknown, SFExtraProps extends {} = {}> = PublicSingleKindUploadFieldProps<AcceptArtifacts, SFExtraProps> & StockAudioFileKindProps<AcceptArtifacts>;
+
+// @public (undocumented)
+export const AutoCell: React.NamedExoticComponent<AutoCellProps>;
+
+// @public (undocumented)
+export type AutoCellProps = {
+    schema: Schema;
+    entityName: string;
+    fieldName: string;
+    createEntityLink?: (entity: string) => RoutingLinkTarget;
+};
+
+// @public (undocumented)
+export const AutoField: React.NamedExoticComponent<AutoFieldProps>;
+
+// @public (undocumented)
+export type AutoFieldProps = {
+    schema: Schema;
+    entityName: string;
+    fieldName: string;
+    createEditLink?: (entity: string) => RoutingLinkTarget;
+    excludedEntities?: string[];
+};
+
+// @public (undocumented)
+export const AutoFields: React.NamedExoticComponent<AutoFieldsProps>;
+
+// @public (undocumented)
+export type AutoFieldsProps = {
+    createEditLink?: (entity: string) => RoutingLinkTarget;
+    excludedFields?: string[];
+    excludedEntities?: string[];
+};
+
+// @public (undocumented)
+export const AutoForm: React.NamedExoticComponent<AutoFormProps>;
+
+// @public (undocumented)
+export type AutoFormProps = {
+    entity: string;
+    id?: EntityId;
+    onCreateSuccess?: EntityAccessor.PersistSuccessHandler | Set<EntityAccessor.PersistSuccessHandler>;
+    createEditLink?: (entity: string) => RoutingLinkTarget;
+};
+
+// @public (undocumented)
+export const AutoGrid: React.NamedExoticComponent<AutoGridProps>;
+
+// @public (undocumented)
+export type AutoGridProps = DataGridContainerPublicProps & {
+    entities: DataGridProps<never>['entities'];
+    createViewLinkTarget?: (entity: string) => RoutingLinkTarget;
+    createEditLinkTarget?: (entity: string) => RoutingLinkTarget;
+};
+
+// @public (undocumented)
+export const AutoLabel: React.NamedExoticComponent<AutoLabelProps>;
+
+// @public (undocumented)
+export type AutoLabelProps = {
+    field: string;
+    createLink?: (entity: string) => RoutingLinkTarget;
+};
 
 // @public (undocumented)
 export const Avatar: FunctionComponent<AvatarProps>;
@@ -1549,6 +1614,7 @@ export const EnumCell: React.NamedExoticComponent<EnumCellProps>;
 export type EnumCellProps = DataGridColumnPublicProps & {
     field: SugaredFieldProps['field'];
     options: Record<string, string>;
+    format?: (value: string | null) => ReactNode;
 };
 
 // Warning: (ae-forgotten-export) The symbol "errorCodeDictionary" needs to be exported by the entry point index.d.ts
@@ -2819,6 +2885,12 @@ export interface NormalizedStaticOption extends StaticOption {
     // (undocumented)
     value: FieldValue;
 }
+
+// @public (undocumented)
+export const NotFoundWrapper: React.NamedExoticComponent<{
+    children: ReactNode;
+    title?: ReactNode;
+}>;
 
 // @public (undocumented)
 export const NumberCell: FunctionComponent<NumberCellProps>;
@@ -4270,6 +4342,14 @@ export type UseMutationReturn<R, V> = [(variables: V) => Promise<R>, MutationReq
 
 // @public (undocumented)
 export const useNormalizedBlocks: (children: ReactNode) => NormalizedBlocks;
+
+// @public (undocumented)
+export const useOnPersistSuccess: ({ redirectOnSuccess, onPersistSuccess }: UseOnPersistSuccessProps) => UnsugarableSingleEntityEventListeners['onPersistSuccess'];
+
+// @public (undocumented)
+export type UseOnPersistSuccessProps = Pick<UnsugarableSingleEntityEventListeners, 'onPersistSuccess'> & {
+    redirectOnSuccess?: RedirectOnSuccessTarget;
+};
 
 // @public (undocumented)
 export const useOptionalIdentity: () => Identity | undefined;

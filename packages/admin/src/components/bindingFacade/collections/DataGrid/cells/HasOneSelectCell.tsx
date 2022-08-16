@@ -74,6 +74,10 @@ const HasOneSelectCellContent = Component<BaseDynamicChoiceField & SugaredRelati
 			return <FieldFallbackView fallback={props.fallback} fallbackStyle={props.fallbackStyle} />
 		}
 
+		if ('optionLabel' in props) {
+			return <HasOne field={props.field} expectedMutation="none">{props.optionLabel}</HasOne>
+		}
+
 		return <></>
 
 	},

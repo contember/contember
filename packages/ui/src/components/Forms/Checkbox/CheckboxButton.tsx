@@ -5,28 +5,30 @@ import { AllVisuallyDependentControlProps } from '../Types'
 import { useInputClassName } from '../hooks/useInputClassName'
 
 export interface CheckboxButtonProps extends AllVisuallyDependentControlProps {
-  checked?: boolean | null
-  indeterminate?: boolean
+	checked?: boolean | null
+	indeterminate?: boolean
 }
 
 export const CheckboxButton = ({
-  id,
-  checked,
-  indeterminate,
-  ...props
+	id,
+	name,
+	placeholder,
+	checked,
+	indeterminate,
+	...props
 }: CheckboxButtonProps) => {
-  const componentClassName = useComponentClassName('checkbox-button')
+	const componentClassName = useComponentClassName('checkbox-button')
 
-  return <span
-    id={id}
-    className={classNames(
-      componentClassName,
-      toStateClass('checked', checked === true),
-      toStateClass('indeterminate', indeterminate),
-      useInputClassName(props),
-    )}
-    children={indeterminate
-      ? <span aria-hidden="true" className={`${componentClassName}-questionmark`}>?</span>
-      : undefined}
-  />
+	return <span
+		id={id}
+		className={classNames(
+			componentClassName,
+			toStateClass('checked', checked === true),
+			toStateClass('indeterminate', indeterminate),
+			useInputClassName(props),
+		)}
+		children={indeterminate
+			? <span aria-hidden="true" className={`${componentClassName}-questionmark`}>?</span>
+			: undefined}
+	/>
 }

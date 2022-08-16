@@ -8,7 +8,7 @@ import { useDynamicMultipleChoiceWithConnectingEntityField } from './hooks/useDy
 export const DynamicMultiChoiceField: FunctionComponent<DynamicMultipleChoiceFieldProps & ChoiceFieldData.MultiChoiceFieldProps<EntityAccessor>> =
 	Component(
 		props => {
-			const choiceFieldMetadata = 'connectingEntityField' in props
+			const choiceFieldMetadata = 'connectingEntityField' in props && props.connectingEntityField
 				? useDynamicMultipleChoiceWithConnectingEntityField(props)
 				: useDynamicMultipleChoiceField(props)
 			return props.children(choiceFieldMetadata)
@@ -26,7 +26,6 @@ export const DynamicMultiChoiceField: FunctionComponent<DynamicMultipleChoiceFie
 					: props.connectingEntityField
 
 				renderedOption = <>
-					{props.sortableBy && <SugaredField field={props.sortableBy} />}
 					<HasOne {...hasOneProps} expectedMutation={'connectOrDisconnect'}>
 						{renderedOption}
 					</HasOne>
@@ -37,6 +36,7 @@ export const DynamicMultiChoiceField: FunctionComponent<DynamicMultipleChoiceFie
 				<>
 					{subTree}
 					<HasMany field={props.field} expectedMutation={expectedMutation} initialEntityCount={0}>
+						{props.sortableBy && <SugaredField field={props.sortableBy} />}
 						{renderedOption}
 					</HasMany>
 				</>

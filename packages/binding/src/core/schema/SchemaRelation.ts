@@ -8,7 +8,7 @@ export interface BaseRelation {
 	// This *CAN* be null because the whole notion of nullability doesn't make sense for ManyHasMany
 	nullable: boolean | null
 	onDelete: 'restrict' | 'cascade' | 'setNull' | null
-	orderBy: SchemaRelationOrderBy | null
+	orderBy: SchemaRelationOrderBy[] | null
 	orphanRemoval: boolean | null
 	targetEntity: EntityName
 	type: 'OneHasOne' | 'OneHasMany' | 'ManyHasOne' | 'ManyHasMany'

@@ -87,9 +87,7 @@ export class TreeNodeEnvironmentFactory {
 		const field = this.assertHasManyRelation(hasOneEnvironment, hasManyField)
 
 		const targetEntity = environment.getSchema().getEntity(field.targetEntity)
-		if (!targetEntity) {
-			throw new BindingError('should not happen')
-		}
+
 		return hasOneEnvironment.withSubTreeChild({
 			type: 'entity-list',
 			field,
@@ -129,9 +127,7 @@ export class TreeNodeEnvironmentFactory {
 		for (const pathItem of hasOneRelationPath) {
 			const field = this.resolveHasOneRelation(environment, pathItem.field, !!pathItem.reducedBy)
 			const targetEntity = environment.getSchema().getEntity(field.targetEntity)
-			if (!targetEntity) {
-				throw new BindingError('should not happen')
-			}
+
 			environment = environment.withSubTreeChild({
 				type: 'entity',
 				field,
@@ -160,9 +156,9 @@ export class TreeNodeEnvironmentFactory {
 	}
 
 	private static resolveEntity(schema: Schema, entityName: string, type: 'entity' | 'entity list'): SchemaEntity {
-		const entity = schema.getEntity(entityName)
+		const entity = schema.getEntityOrUndefined(entityName)
 		if (!entity) {
-			const alternative = this.recommendAlternative(entityName, schema.store.entities.keys())
+			const alternative = this.recommendAlternative(entityName, schema.getEntityNames())
 			const didYouMean = alternative ? `Did you mean '${alternative}'?` : ''
 			throw new BindingError(`Invalid ${type} sub tree: Entity '${entityName}' doesn't exist. ${didYouMean}`)
 		}

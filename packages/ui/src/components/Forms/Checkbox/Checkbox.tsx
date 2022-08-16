@@ -53,7 +53,7 @@ export const Checkbox = memo(
 			value,
 		}, forwardedRef)
 
-		const { className, ...nativeInputProps } = props
+		const { className, indeterminate, ...nativeInputProps } = props
 
 		const { isFocusVisible: focused, focusProps } = useFocusRing()
 		const { isHovered: hovered, hoverProps } = useHover({ isDisabled: props.disabled })

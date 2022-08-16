@@ -1,4 +1,4 @@
-import { ChangeEvent, useCallback } from 'react'
+import { ChangeEvent, ReactNode, useCallback } from 'react'
 import { DataGridColumn, DataGridColumnPublicProps } from '../base'
 import { Component, QueryLanguage, SugaredField, SugaredFieldProps, wrapFilterInHasOnes } from '@contember/binding'
 import { GraphQlLiteral } from '@contember/client'
@@ -8,7 +8,8 @@ export type EnumCellProps =
 	& {
 		field: SugaredFieldProps['field']
 		options: Record<string, string>
-	}
+		format?: (value: string | null) => ReactNode
+}
 
 export const EnumCell = Component<EnumCellProps>(props => {
 	return (
@@ -53,7 +54,9 @@ export const EnumCell = Component<EnumCellProps>(props => {
 				return <>{checkboxList}</>
 			}}
 		>
-			<SugaredField<string> field={props.field} format={value => (value ? props.options[value] : '')} />
+			<SugaredField<string> field={props.field} format={value => {
+				return value ? (props.format ? props.format(props.options[value]) : props.options[value]) : ''
+			}} />
 		</DataGridColumn>
 	)
 }, 'EnumCell')

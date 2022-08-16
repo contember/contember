@@ -14,8 +14,6 @@ import { MenuItemProps, TAB_INDEX_FOCUSABLE, TAB_INDEX_NEVER_FOCUSABLE, TAB_INDE
 import { useActiveMenuItemContext } from './useActiveMenuItem'
 import { useKeyNavigation } from './useKeyNavigation'
 import { useMenuId } from './useMenuId'
-import { useMouseToFocus } from './useMouseToFocus'
-
 
 export function MenuItem<T extends any = any>({ children, ...props }: MenuItemProps<T>) {
 	const depth = useContext(DepthContext)
@@ -61,7 +59,7 @@ export function MenuItem<T extends any = any>({ children, ...props }: MenuItemPr
 	const menuId = useMenuId()
 	const [expanded, setExpanded] = useSessionStorageState<boolean>(
 		`menu-${menuId}-${menuItemId}`,
-			val => val ?? (props.expandedByDefault || depth === 0 || !label),
+		val => val ?? (props.expandedByDefault || depth === 0 || !label),
 	)
 
 	const preventMenuClose = usePreventCloseContext()
@@ -71,7 +69,7 @@ export function MenuItem<T extends any = any>({ children, ...props }: MenuItemPr
 			return
 		}
 
-		if (listItemRef.current !== document.activeElement)	{
+		if (listItemRef.current !== document.activeElement) {
 			listItemRef.current?.focus()
 		}
 
@@ -98,9 +96,6 @@ export function MenuItem<T extends any = any>({ children, ...props }: MenuItemPr
 
 		event.preventDefault()
 	}, [expanded, changeExpand, isInteractive, navigate, preventMenuClose])
-
-
-	useMouseToFocus({ listItemRef, listItemTitleRef, tabIndex })
 
 	const onKeyPress = useKeyNavigation({ changeExpand, expanded, depth, isInteractive, listItemRef, onClick: onLabelClick })
 

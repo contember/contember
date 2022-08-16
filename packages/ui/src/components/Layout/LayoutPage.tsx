@@ -2,7 +2,7 @@ import classNames from 'classnames'
 import { CSSProperties, memo, ReactNode, useEffect, useMemo, useRef, useState } from 'react'
 import { useClassNamePrefix } from '../../auxiliary'
 import { toEnumClass, toSchemeClass, toThemeClass } from '../../utils'
-import { SectionTabs } from '../SectionTabs'
+import { SectionTabs, useSectionTabs } from '../SectionTabs'
 import { TitleBar, TitleBarProps } from '../TitleBar'
 import { LayoutPageAside } from './LayoutPageAside'
 import { LayoutPageContent, LayoutPageContentProps } from './LayoutPageContent'
@@ -43,6 +43,7 @@ export const LayoutPage = memo(({
 
 	const contentRef = useRef<HTMLDivElement>(null)
 	const contentOffsetTop = useElementTopOffset(contentRef)
+	const hasTabs = Object.keys(useSectionTabs()).length > 0
 
 	const [showDivider, setShowDivider] = useState<boolean>(false)
 
@@ -75,7 +76,7 @@ export const LayoutPage = memo(({
 		toThemeClass(themeContent ?? theme, themeControls ?? theme),
 		toSchemeClass(scheme),
 	)}>
-		{(title || actions) && <TitleBar after={afterTitle === undefined ? <SectionTabs /> : afterTitle} navigation={navigation} actions={actions} headingProps={headingProps}>
+		{(title || actions) && <TitleBar after={afterTitle === undefined ? hasTabs ? <SectionTabs /> : undefined : afterTitle} navigation={navigation} actions={actions} headingProps={headingProps}>
 			{title}
 		</TitleBar>}
 		<div

@@ -17,21 +17,21 @@
 		background-color: var(--cui-menu-background-color-focused)
 
 	.#{$cui-conf-globalPrefix}label
-		--cui-inset-vertical: calc(1.5 * var(--cui-screen-gap-horizontal))
-		--cui-inset-horizontal: calc(1.5 * var(--cui-screen-gap-horizontal))
+		--cui-inset-vertical: calc(1.5 * var(--cui-gap))
+		--cui-inset-horizontal: calc(1.5 * var(--cui-gap))
 	.is-active > .#{$cui-conf-globalPrefix}label
 		background-color: var(--cui-filled-background-color)
 		color: var(--cui-control-color)
 
 	&-expand-toggle
-		--cui-expand-toggle-size: calc(5 * var(--cui-screen-gap))
+		--cui-expand-toggle-size: calc(5 * var(--cui-gap))
 		background: transparent
 		border: 0
 		color: inherit
 		height: var(--cui-expand-toggle-size)
 		padding: 0
 		position: absolute
-		right: calc(100% + 1.5 * var(--cui-screen-gap))
+		right: calc(100% + 1.5 * var(--cui-gap))
 		width: var(--cui-expand-toggle-size)
 		&::before
 			$caret-size: 0.4em
@@ -73,9 +73,9 @@
 
 	&-section
 		margin-left: var(--cui-edge-offset-left)
-		padding-bottom: calc(var(--cui-screen-padding-vertical) / 2)
+		padding-bottom: calc(var(--cui-padding) / 2)
 		padding-right: 0
-		padding-top: calc(var(--cui-screen-padding-vertical) / 2)
+		padding-top: calc(var(--cui-padding) / 2)
 		position: relative
 		&::after
 			border-bottom: 1px solid var(--cui-color--lower)
@@ -91,8 +91,8 @@
 			margin-left: var(--cui-screen-padding-horizontal)
 			margin-right: var(--cui-screen-padding-horizontal)
 			margin-top: var(--cui-screen-gap)
-			padding-bottom: var(--cui-screen-gap-vertical)
-			padding-top: var(--cui-screen-gap-vertical)
+			padding-bottom: var(--cui-gap)
+			padding-top: var(--cui-gap)
 			text-transform: uppercase
 			&-content
 				font-size: var(--cui-font-size-note)

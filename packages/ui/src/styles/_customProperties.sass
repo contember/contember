@@ -54,23 +54,14 @@
 		--cui-screen-padding-horizontal: calc(var(--cui-screen-gap-horizontal) * 6)
 		--cui-edge-offset-horizontal: calc(var(--cui-screen-gap-horizontal) * 4)
 
-	--cui-screen-padding-vertical: calc(var(--cui-screen-gap-vertical) * 3)
-
-	--cui-edge-offset-vertical: calc(var(--cui-screen-gap-vertical) * 2)
+	--cui-edge-offset-vertical: 0px
 	--cui-edge-offset-bottom: var(--cui-edge-offset-vertical)
 	--cui-edge-offset-top: var(--cui-edge-offset-vertical)
 
-	@media (min-height: $breakpoint-min-small)
-		--cui-screen-padding-vertical: calc(var(--cui-screen-gap-vertical) * 4)
 	@media (min-height: $breakpoint-min-medium)
 		--cui-screen-gap-vertical: #{em(5px)}
-		--cui-screen-padding-vertical: calc(var(--cui-screen-gap-vertical) * 5)
 	@media (min-height: $breakpoint-min-large)
 		--cui-screen-gap-vertical: #{em(6px)}
-		--cui-edge-offset-vertical: calc(var(--cui-screen-gap-vertical) * 3)
-	@media (min-height: $breakpoint-min-xlarge)
-		--cui-screen-padding-vertical: calc(var(--cui-screen-gap-vertical) * 6)
-		--cui-edge-offset-vertical: calc(var(--cui-screen-gap-vertical) * 4)
 
 	--cui-control-font-size: 1em
 	--cui-control-font-size--small: 0.9em
@@ -88,14 +79,6 @@
 	--cui-control-height--small: calc(var(--cui-tap-target-size) * 1.25)
 	--cui-control-height: calc(var(--cui-tap-target-size) * 1.75)
 	--cui-control-height--large: calc(var(--cui-tap-target-size) * 2)
-
-	// Touch devices like mobiles
-	@media (hover: none) and (pointer: coarse)
-		--cui-font-size-body: 17px
-
-		--cui-control-height--small: calc(var(--cui-tap-target-size) * 1.5 )
-		--cui-control-height: calc(var(--cui-tap-target-size) * 2)
-		--cui-control-height--large: calc(var(--cui-tap-target-size) * 2.5)
 
 	@media (prefers-reduced-motion: reduce)
 		--cui-transition-duration--immediate: 0s

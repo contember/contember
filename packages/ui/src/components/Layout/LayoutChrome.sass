@@ -15,23 +15,23 @@
 
 	&-bar,
 	&-body
-		--cui-layout-chrome-padding-bottom: calc(var(--cui-screen-padding-vertical) + var(--cui-edge-offset-bottom) + env(safe-area-inset-bottom, 0em))
+		--cui-layout-chrome-padding-bottom: calc(var(--cui-padding) + var(--cui-edge-offset-bottom) + env(safe-area-inset-bottom, 0em))
 		--cui-layout-chrome-padding-left: calc(var(--cui-screen-padding-horizontal) + var(--cui-edge-offset-left) + env(safe-area-inset-left, 0em))
 		--cui-layout-chrome-padding-right: calc(var(--cui-screen-padding-horizontal) + var(--cui-edge-offset-right) + env(safe-area-inset-right, 0em))
-		--cui-layout-chrome-padding-top: calc(var(--cui-screen-padding-vertical) + var(--cui-edge-offset-top) + env(safe-area-inset-top, 0em))
+		--cui-layout-chrome-padding-top: calc(var(--cui-padding) + var(--cui-edge-offset-top) + env(safe-area-inset-top, 0em))
 
 	&-body
-		--cui-layout-page-padding-bottom: calc(var(--cui-screen-padding-vertical, 0em) + var(--cui-edge-offset-bottom, 0em) + env(safe-area-inset-bottom, 0em))
+		--cui-layout-page-padding-bottom: calc(var(--cui-padding, 0em) + var(--cui-edge-offset-bottom, 0em) + env(safe-area-inset-bottom, 0em))
 		--cui-layout-page-padding-left: calc(var(--cui-screen-padding-horizontal, 0em) + var(--cui-edge-offset-left, 0em) + env(safe-area-inset-left, 0em))
 		--cui-layout-page-padding-right: calc(var(--cui-screen-padding-horizontal, 0em) + var(--cui-edge-offset-right, 0em) + env(safe-area-inset-right, 0em))
-		--cui-layout-page-padding-top: calc(var(--cui-screen-padding-vertical, 0em) + var(--cui-edge-offset-top, 0em) + env(safe-area-inset-top, 0em))
+		--cui-layout-page-padding-top: calc(var(--cui-padding, 0em) + var(--cui-edge-offset-top, 0em) + env(safe-area-inset-top, 0em))
 		--cui-layout-page-visible-width: calc(100vw - var(--layout-chrome-bar-width, 0))
 
 		--cui-layout-section-padding-bottom: var(--cui-layout-page-padding-bottom)
 		--cui-layout-section-padding-left: calc(var(--cui-layout-page-padding-left) - var(--cui-edge-offset-left, 0em))
 		--cui-layout-section-padding-right: calc(var(--cui-layout-page-padding-right) - var(--cui-edge-offset-right, 0em))
 		--cui-layout-section-padding-top: var(--cui-layout-page-padding-top)
-		--cui-layout-section-gap: calc(4 * var(--cui-screen-gap))
+		--cui-layout-section-gap: calc(4 * var(--cui-gap))
 
 	&-bar
 		background: var(--cui-background-color)
@@ -79,8 +79,8 @@
 		padding-right: var(--cui-layout-chrome-padding-right)
 		padding-top: var(--cui-layout-chrome-padding-top)
 	&-bar-switchers
-		margin-top: calc(-1* var(--cui-screen-padding-vertical) / 2)
-		padding-bottom: calc(var(--cui-screen-padding-vertical) / 2)
+		margin-top: calc(-1* var(--cui-padding) / 2)
+		padding-bottom: calc(var(--cui-padding) / 2)
 		padding-left: var(--cui-layout-chrome-padding-left)
 		padding-right: var(--cui-layout-chrome-padding-right)
 	&-body

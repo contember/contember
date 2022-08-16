@@ -133,7 +133,7 @@ export const useCommonReactSelectStyles = <Option = unknown, IsMulti extends boo
 			...provided,
 			backgroundColor,
 			borderColor,
-			'borderWidth': 'var(--cui-control-border-width)',
+			'borderWidth': 'var(--cui-control-border-width, 1px)',
 			color,
 			'borderRadius': 'var(--cui-control-border-radius)',
 			'boxShadow': isFocused ? 'var(--cui-control-focus-ring-box-shadow)' : undefined,
@@ -147,7 +147,7 @@ export const useCommonReactSelectStyles = <Option = unknown, IsMulti extends boo
 	},
 	menu: (provided, props) => {
 		const backgroundColor = 'var(--cui-background-color--above)'
-		const border = 'var(--cui-control-border-width) solid var(--cui-color--lower)'
+		const border = 'var(--cui-control-border-width, 1px) solid var(--cui-color--lower)'
 
 		return {
 			...provided,

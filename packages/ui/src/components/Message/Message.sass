@@ -29,7 +29,7 @@
 		align-items: center
 		align-self: stretch
 		display: flex
-		gap: var(--cui-gap--horizontal)
+		gap: var(--cui-gap)
 		.#{$cui-conf-globalPrefix}button:not(:hover)
 			color: inherit
 
@@ -43,12 +43,12 @@
 		display: flex
 
 	&.view-striking
-		--message-striking-padding-horizontal: calc(var(--cui-padding) / 2)
-		--message-striking-padding-vertical: calc(var(--cui-padding) / 2)
+		--message-striking-padding-horizontal: var(--cui-padding)
+		--message-striking-padding-vertical: var(--cui-padding)
 		font-weight: $fw-normal
 
 	&.view-generous,
 	&.view-generousBlock
-		--message-striking-padding-horizontal: var(--cui-padding-horizontal)
-		--message-striking-padding-vertical: var(--cui-padding-vertical)
+		--message-striking-padding-horizontal: calc(1.5 * var(--cui-padding))
+		--message-striking-padding-vertical: calc(1.5 * var(--cui-padding))
 		text-align: center

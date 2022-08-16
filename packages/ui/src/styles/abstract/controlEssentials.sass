@@ -2,8 +2,6 @@
 	--cui-control-line-height: var(--cui-line-height)
 
 	display: block
-	:root &
-		box-sizing: border-box
 	font-family: inherit
 	transition-duration: var(--cui-transition-duration--fast)
 	transition-property: box-shadow, color, background, opacity
@@ -13,12 +11,15 @@
 	position: relative
 	margin: 0
 	border-style: solid
-	border-width: var(--cui-control-border-width)
+	border-width: var(--cui-control-border-width, 1px)
 	border-radius: var(--cui-control-border-radius)
 	resize: none
 	width: 100%
 	overflow: hidden
 	line-height: var(--cui-control-line-height)
+
+	:root &
+		box-sizing: border-box
 
 	&:-webkit-autofill
 		-webkit-box-shadow: 0 0 0 1000px #FFFFFF inset !important

@@ -5,7 +5,7 @@ import { NativeProps, Size } from '../../types'
 import { toEnumViewClass } from '../../utils'
 
 export interface DividerProps extends Omit<NativeProps<HTMLDivElement>, 'children'> {
-  gap?: Size | 'none'
+  gap?: Size | 'xlarge' | 'none'
 }
 
 export const Divider = memo(({ className, gap, ...rest }: DividerProps) => {

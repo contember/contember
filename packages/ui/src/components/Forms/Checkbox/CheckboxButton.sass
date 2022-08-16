@@ -9,7 +9,7 @@
 
 	background: var(--checkbox-button-background-color)
 	border-radius: var(--checkbox-button-border-radius)
-	border: var(--cui-control-border-width) solid var(--tick-border-color)
+	border: var(--cui-control-border-width, 1px) solid var(--tick-border-color)
 	color: var(--tick-color)
 	display: block
 	max-height: var(--checkbox-button-size)
@@ -66,7 +66,7 @@
 	&.is-focused:not(.is-checked)
 		--tick-border-color: var(--cui-control-border-color--highlighted)
 	&.is-indeterminate
-		border-width: var(--cui-control-border-width)
+		border-width: var(--cui-control-border-width, 1px)
 		border-style: dashed
 	&.is-checked
 		// Repeating the color is easier than fiddling with another set of delays.

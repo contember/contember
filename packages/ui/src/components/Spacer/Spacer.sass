@@ -1,15 +1,14 @@
 .#{$cui-conf-globalPrefix}spacer
-  --spacer-margin: calc(var(--cui-padding-vertical) / 2)
-  .view-horizontal &
-    --spacer-margin: calc(var(--cui-padding-horizontal) / 2)
-  &.view-small
-    --spacer-margin: var(--cui-gap-vertical)
-    .view-horizontal &
-      --spacer-margin: var(--cui-gap-horizontal)
-  &.view-large
-    --spacer-margin: var(--cui-padding-vertical)
-    .view-horizontal &
-      --spacer-margin: var(--cui-padding-horizontal)
+  --spacer-margin: var(--cui-padding)
 
   min-height: var(--spacer-margin)
   min-width: var(--spacer-margin)
+
+  &.view-none
+    --spacer-margin: 0
+  &.view-small
+    --spacer-margin: var(--cui-gap)
+  &.view-large
+    --spacer-margin: calc(1.5 * var(--cui-padding))
+  &.view-xlarge
+    --spacer-margin: calc(3 * var(--cui-padding))

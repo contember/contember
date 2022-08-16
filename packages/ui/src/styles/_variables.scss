@@ -43,7 +43,6 @@ $breakpoint-max-xxxlarge: $breakpoint-min-xxxlarge + $breakpoint-max-offset;
 
 // Core configurations
 $cui-conf-globalPrefix: 'cui-' !default; // If you need to avoid a name conflict, you can prefix all CUI classes
-$cui-conf-rootSelector: ':root'; // Override this if you need to scope CUI custom properties. See _root.sass
 $cui-conf-defaultView: default !default;
 
 // Global values

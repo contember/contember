@@ -5,7 +5,7 @@ import { NativeProps, Size } from '../../types'
 import { toEnumViewClass } from '../../utils'
 
 export interface SpacerProps extends Omit<NativeProps<HTMLDivElement>, 'children'> {
-  gap?: Size
+  gap?: Size | 'xlarge' | 'none'
 }
 
 export const Spacer = memo(({ className, gap, ...rest }: SpacerProps) => {

@@ -3,13 +3,13 @@
 .#{$cui-conf-globalPrefix}editorCanvas
 	@extend %controlVariants
 
-	--cui-editor-canvas-element-padding-bottom: calc(2 * var(--cui-gap-vertical))
-	--cui-editor-canvas-element-padding-left: calc(3 * var(--cui-gap-horizontal))
-	--cui-editor-canvas-element-padding-right: calc(3 * var(--cui-gap-horizontal))
-	--cui-editor-canvas-element-padding-top: calc(2 * var(--cui-gap-vertical))
+	--cui-editor-canvas-element-padding-bottom: calc(2 * var(--cui-gap))
+	--cui-editor-canvas-element-padding-left: calc(3 * var(--cui-gap))
+	--cui-editor-canvas-element-padding-right: calc(3 * var(--cui-gap))
+	--cui-editor-canvas-element-padding-top: calc(2 * var(--cui-gap))
 	--cui-editor-blocks-gap: calc(2 * var(--cui-editor-canvas-element-padding-top))
 
-	border: var(--cui-control-border-width) solid var(--cui-color--lower)
+	border: var(--cui-control-border-width, 1px) solid var(--cui-color--lower)
 	border-radius: var(--cui-control-border-radius)
 	position: relative
 	width: 100%
@@ -29,7 +29,7 @@
 		box-shadow: var(--cui-control-focus-ring-box-shadow)
 
 	&.view-hovering-toolbar *[contenteditable="true"]
-		padding-bottom: calc(56px + 10 * var(--cui-gap-vertical)) // TODO: Measure the hovoering container
+		padding-bottom: calc(56px + 10 * var(--cui-gap)) // TODO: Measure the hovoering container
 
 	*[contenteditable="true"]
 		@extend %implementsCustomFocusEffects
@@ -59,10 +59,10 @@
 		gap: var(--cui-editor-blocks-gap)
 
 		$headingCounter: null
+		counter-reset: $headingCounter unquote($cui-editor-paragraph-counter)
 		@for $level from 1 through length($cui-editor-heading-counters)
 			$counter-name: nth($cui-editor-heading-counters, $level)
 			$headingCounter: $headingCounter unquote($counter-name)
-		counter-reset: $headingCounter unquote($cui-editor-paragraph-counter)
 
 		h1, h2, h3, h4, h5, h6
 			margin: 0
@@ -98,9 +98,9 @@
 			--cui-highlight-color: 255, 249, 51
 			color: var(--cui-color--strong)
 			background-color: rgb(var(--cui-highlight-color), var(--cui-opacity--medium, 0.5))
+			font-style: normal
 			@media (prefers-color-scheme: dark)
 				background-color: rgb(var(--cui-highlight-color), var(--cui-opacity--low, 0.3))
-			font-style: normal
 
 		hr
 			background-color: var(--cui-color--lower)

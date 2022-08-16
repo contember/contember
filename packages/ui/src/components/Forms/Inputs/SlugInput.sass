@@ -6,7 +6,7 @@
 	border-color: var(--cui-color--lower)
 	border-radius: var(--cui-control-border-radius)
 	border-style: solid
-	border-width: var(--cui-control-border-width)
+	border-width: var(--cui-control-border-width, 1px)
 	display: flex
 
 	&:focus-within
@@ -16,7 +16,7 @@
 		display: flex
 		align-items: center
 		line-height: normal
-		padding-left: calc(3 * var(--cui-gap-horizontal))
+		padding-left: calc(3 * var(--cui-gap))
 		color: var(--cui-color--medium)
 	.cui-field-container:hover &-prefix
 		border-color: var(--cui-color--low)

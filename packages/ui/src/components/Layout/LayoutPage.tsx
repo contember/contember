@@ -1,13 +1,14 @@
 import classNames from 'classnames'
-import { CSSProperties, memo, ReactNode, useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { CSSProperties, memo, ReactNode, useEffect, useMemo, useRef, useState } from 'react'
 import { useClassNamePrefix } from '../../auxiliary'
 import { toEnumClass, toSchemeClass, toThemeClass } from '../../utils'
-import { SectionTabs } from '../SectionTabs'
+import { SectionTabs, useSectionTabs } from '../SectionTabs'
 import { TitleBar, TitleBarProps } from '../TitleBar'
 import { LayoutPageAside } from './LayoutPageAside'
 import { LayoutPageContent, LayoutPageContentProps } from './LayoutPageContent'
 import { useThemeScheme } from './ThemeSchemeContext'
 import { ThemeScheme } from './Types'
+import { useElementTopOffset } from './useElementTopOffset'
 export interface LayoutPageProps extends Omit<TitleBarProps, 'after' | 'children'>, ThemeScheme {
 	afterTitle?: TitleBarProps['after']
 	children?: ReactNode
@@ -40,32 +41,9 @@ export const LayoutPage = memo(({
 		themeControls,
 	} = useThemeScheme(props)
 
-	const [contentOffsetTop, setContentOffsetTop] = useState<number | undefined>(undefined)
 	const contentRef = useRef<HTMLDivElement>(null)
-
-	useLayoutEffect(() => {
-		if (!contentRef.current) {
-			return
-		}
-
-		const ref = contentRef.current
-
-		function updateTopOffsetCallback() {
-			setContentOffsetTop(ref.offsetTop)
-		}
-
-		function updateTopOffsetHandler() {
-			requestAnimationFrame(updateTopOffsetCallback)
-		}
-
-		updateTopOffsetHandler()
-
-		window.addEventListener('resize', updateTopOffsetHandler, { passive: true })
-
-		return () => {
-			window.removeEventListener('resize', updateTopOffsetHandler)
-		}
-	}, [])
+	const contentOffsetTop = useElementTopOffset(contentRef)
+	const hasTabs = Object.keys(useSectionTabs()).length > 0
 
 	const [showDivider, setShowDivider] = useState<boolean>(false)
 
@@ -98,7 +76,7 @@ export const LayoutPage = memo(({
 		toThemeClass(themeContent ?? theme, themeControls ?? theme),
 		toSchemeClass(scheme),
 	)}>
-		{(title || actions) && <TitleBar after={afterTitle === undefined ? <SectionTabs /> : afterTitle} navigation={navigation} actions={actions} headingProps={headingProps}>
+		{(title || actions) && <TitleBar after={afterTitle === undefined ? hasTabs ? <SectionTabs /> : undefined : afterTitle} navigation={navigation} actions={actions} headingProps={headingProps}>
 			{title}
 		</TitleBar>}
 		<div
@@ -108,7 +86,7 @@ export const LayoutPage = memo(({
 				toEnumClass('fit-', fit),
 				showDivider ? 'view-aside-divider' : undefined,
 			)}
-			style={{ '--cui-content-offset-top': `${contentOffsetTop}px` } as CSSProperties}
+			style={useMemo(() => ({ '--cui-content-offset-top': `${contentOffsetTop}px` } as CSSProperties), [contentOffsetTop])}
 		>
 			<LayoutPageContent pageContentLayout={pageContentLayout ?? layout}>
 				{children}

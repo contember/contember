@@ -1,5 +1,5 @@
 import { default as classNames, default as classnames } from 'classnames'
-import { memo, ReactNode, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
+import { CSSProperties, memo, ReactNode, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { NavigationContext } from '../..'
 import { useClassNamePrefix } from '../../auxiliary'
 import { Intent, Scheme } from '../../types'
@@ -7,6 +7,7 @@ import { toSchemeClass, toStateClass, toThemeClass, toViewClass } from '../../ut
 import { DropdownContentContainerProvider } from '../Dropdown'
 import { Button } from '../Forms'
 import { Icon } from '../Icon'
+import { useElementTopOffset } from '../Layout/useElementTopOffset'
 import { PreventCloseContext } from '../PreventCloseContext'
 import { Stack } from '../Stack'
 import { ThemeSchemeContext, TitleThemeSchemeContext } from './ThemeSchemeContext'
@@ -74,6 +75,9 @@ export const LayoutChrome = memo(({
 	}, [collapsed, setCollapsed])
 
 	const contentRef = useRef<HTMLDivElement>(null)
+	const barContentOffsetTop = useElementTopOffset(contentRef)
+
+	console.log(barContentOffsetTop)
 
 	useEffect(() => {
 		const contentRefCopy = contentRef.current
@@ -155,14 +159,22 @@ export const LayoutChrome = memo(({
 	const barClassName = `${prefix}layout-chrome-bar`
 	const hasBar: boolean = !!(sidebarHeader || switchers || navigation || sidebarFooter)
 
-	return <div ref={layoutRef} className={classnames(
-		`${prefix}layout-chrome`,
-		toViewClass('no-bar', !hasBar),
-		toThemeClass(themeContent ?? theme, themeControls ?? theme),
-		toSchemeClass(scheme),
-		toViewClass('collapsed', collapsed),
-	)}>
-		{hasBar && <DropdownContentContainerProvider>
+	return <div
+		ref={layoutRef}
+		className={classnames(
+			`${prefix}layout-chrome`,
+			toViewClass('no-bar', !hasBar),
+			toThemeClass(themeContent ?? theme, themeControls ?? theme),
+			toSchemeClass(scheme),
+			toViewClass('collapsed', collapsed),
+		)}
+		style={useMemo(() => (barContentOffsetTop
+			? ({ '--cui-bar-content-offset-top': `${barContentOffsetTop}px` } as CSSProperties)
+			: undefined
+		), [barContentOffsetTop])}
+	>
+		{hasBar && (
+			<DropdownContentContainerProvider>
 				<PreventCloseContext.Provider value={preventMenuClose}>
 					<div className={barClassName}>
 						<div className={`${barClassName}-header`}>
@@ -173,10 +185,11 @@ export const LayoutChrome = memo(({
 							</Button>
 						</div>
 						{switchers && <div className={`${barClassName}-switchers`}>{switchers}</div>}
-						{navigation && <div ref={contentRef} className={classNames(
-							`${barClassName}-body`,
-							toStateClass('scrolled', isScrolled),
-						)}>
+						{navigation && <div ref={contentRef} className={`${barClassName}-body`}>
+							<span className={classNames(
+								`${barClassName}-body-scrolled-indicator`,
+								toStateClass('scrolled', isScrolled),
+							)} />
 							<Stack direction="vertical">
 								{navigation}
 							</Stack>
@@ -186,7 +199,8 @@ export const LayoutChrome = memo(({
 						</div>}
 					</div>
 				</PreventCloseContext.Provider>
-			</DropdownContentContainerProvider>}
+			</DropdownContentContainerProvider>
+		)}
 
 		<DropdownContentContainerProvider>
 			<div className={classNames(

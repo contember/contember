@@ -2,10 +2,9 @@
 
 .#{$cui-conf-globalPrefix}field-container
 	align-self: stretch
-	column-gap: calc(2 * var(--cui-gap-horizontal))
+	gap: calc(3 * var(--cui-gap))
 	display: flex
 	flex-direction: column
-	row-gap: calc(2 * var(--cui-gap-vertical))
 
 	&.width-fluid
 		max-width: 100%
@@ -26,8 +25,7 @@
 	&-label
 		display: flex
 		flex-direction: column
-		column-gap: calc(2 * var(--cui-gap-horizontal))
-		row-gap: calc(2 * var(--cui-gap-vertical))
+		gap: calc(2 * var(--cui-gap))
 	&:not(.is-active):not(:focus-within) > &-label
 		color: var(--cui-color--high)
 
@@ -38,7 +36,7 @@
 	&-body
 		display: flex
 		flex-direction: column
-		gap: var(--cui-gap-vertical)
+		gap: var(--cui-gap)
 
 	&-header
 		font-weight: 700

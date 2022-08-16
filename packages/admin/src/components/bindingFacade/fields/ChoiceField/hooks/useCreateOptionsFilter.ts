@@ -18,8 +18,8 @@ export const useCreateOptionsFilter = (
 		if (lazyFilter) {
 			return lazyFilter(input)
 		}
-		if (!input) {
-			return undefined
+		if (input === '') {
+			return {}
 		}
 		if (desugaredSearchFields.length) {
 			const or = []

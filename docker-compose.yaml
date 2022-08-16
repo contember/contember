@@ -54,13 +54,28 @@ services:
 
   playwright:
     image: mcr.microsoft.com/playwright:v1.20.0-focal
-    command: ['npm', 'run', 'pw:dev']
+    command: [ 'npm', 'run', 'pw:dev' ]
     user: '1000:1000'
 
     environment:
       DISPLAY: ${DISPLAY}
       CONTEMBER_API_URL: 'http://contember-engine:4000'
-      CONTEMBER_API_TOKEN: '0000000000000000000000000000000000000000'
+      VITE_CONTEMBER_ADMIN_SESSION_TOKEN: '0000000000000000000000000000000000000000'
+      VITE_CONTEMBER_ADMIN_API_BASE_URL: 'http://localhost:3001'
+
+    working_dir: /src/packages/admin
+    volumes:
+      - .:/src:cached
+
+  playwright-tests:
+    image: mcr.microsoft.com/playwright:v1.20.0-focal
+    command: ['npm', 'run', 'pw:dev']
+    user: '1000:1000'
+
+    environment:
+      DISPLAY: ${DISPLAY}
+      VITE_CONTEMBER_ADMIN_API_BASE_URL: 'http://playwright-contember-engine:4000'
+      VITE_CONTEMBER_ADMIN_SESSION_TOKEN: '0000000000000000000000000000000000000000'
 
     working_dir: /src/packages/admin
     volumes:
@@ -93,6 +108,44 @@ services:
       DEFAULT_S3_SECRET: 'contember'
 
       TENANT_DB_NAME: 'tenant'
+
+    healthcheck:
+      test: 'curl --fail http://localhost:4000'
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  playwright-contember-engine:
+    image: contember/engine:1.1.0-beta.4
+
+    environment:
+      NODE_ENV: 'development'
+
+      CONTEMBER_PORT: '4000'
+      CONTEMBER_ROOT_EMAIL: 'superadmin@localhost'
+      CONTEMBER_ROOT_PASSWORD: 'superadmin@localhost'
+      CONTEMBER_ROOT_TOKEN: '0000000000000000000000000000000000000000'
+      CONTEMBER_LOGIN_TOKEN: '1111111111111111111111111111111111111111'
+      CONTEMBER_ENCRYPTION_KEY: '0000000000000000000000000000000000000000000000000000000000000000'
+
+      DEFAULT_DB_HOST: 'postgres'
+      DEFAULT_DB_PORT: '5432'
+      DEFAULT_DB_USER: 'contember'
+      DEFAULT_DB_PASSWORD: 'contember'
+
+      DEFAULT_S3_ENDPOINT: 'http://minio:9000'
+      DEFAULT_S3_PROVIDER: 'minio'
+      DEFAULT_S3_REGION: ''
+      DEFAULT_S3_BUCKET: 'contember'
+      DEFAULT_S3_PREFIX: 'data'
+      DEFAULT_S3_KEY: 'contember'
+      DEFAULT_S3_SECRET: 'contember'
+
+      TENANT_DB_NAME: 'tenant-pw'
 
     healthcheck:
       test: 'curl --fail http://localhost:4000'

@@ -44,11 +44,11 @@ export function buildMigration(schema: Schema): Migration {
 }
 
 export async function sendContemberRequest(path: string, variables: Record<string, any>, query: string) {
-	const response = await fetch(`${process.env.CONTEMBER_API_URL}${path}`, {
+	const response = await fetch(`${process.env.CONTEMBER_API_URL ?? process.env.VITE_CONTEMBER_ADMIN_API_BASE_URL}${path}`, {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json',
-			'Authorization': `Bearer ${process.env.CONTEMBER_API_TOKEN}`,
+			'Authorization': `Bearer ${process.env.VITE_CONTEMBER_ADMIN_SESSION_TOKEN}`,
 		},
 		body: JSON.stringify({ query, variables }),
 	})

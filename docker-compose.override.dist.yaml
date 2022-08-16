@@ -24,3 +24,6 @@ services:
 
   playwright:
     ports: ['3007:3007']
+#  playwright-tests:
+#    volumes:
+#      - /tmp/.X11-unix:/tmp/.X11-unix

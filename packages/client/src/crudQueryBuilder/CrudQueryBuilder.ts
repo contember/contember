@@ -142,7 +142,15 @@ export class CrudQueryBuilder {
 	}
 
 	public inTransaction(alias: string = 'transaction', options: { deferForeignKeyConstraints?: boolean } = {}): CrudQueryBuilder {
-		const objectBuilder = new ObjectBuilder(undefined, { ...this.rootObjectBuilder.objects }, { options }, undefined, undefined, 'transaction')
+		const objectBuilder = new ObjectBuilder(
+			['ok', 'errorMessage'],
+			{ ...this.rootObjectBuilder.objects },
+			{ options },
+			undefined,
+			undefined,
+			'transaction',
+		)
+
 		return new CrudQueryBuilder(this.type, new RootObjectBuilder({ [alias]: objectBuilder }, this.rootObjectBuilder.fragmentDefinitions))
 	}
 

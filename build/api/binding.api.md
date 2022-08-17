@@ -1550,10 +1550,12 @@ export const MutationStateContext: React.Context<boolean>;
 
 // @public (undocumented)
 export interface MutationTransactionResponse {
-    // Warning: (ae-forgotten-export) The symbol "WithType" needs to be exported by the entry point index.d.ts
-    //
     // (undocumented)
-    transaction: WithType<MutationDataResponse, 'MutationTransaction'> | null;
+    transaction: (MutationDataResponse & {
+        __type: 'MutationTransaction';
+        ok: boolean;
+        errorMessage: string | null;
+    });
 }
 
 // @public (undocumented)

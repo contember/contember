@@ -173,7 +173,7 @@ export class DataBinding {
 								type: 'invalidResponse',
 							}
 						}
-						const { __typename, ...mutationData } = mutationResponse.data.transaction
+						const { __typename, ok, errorMessage, ...mutationData } = mutationResponse.data.transaction
 						const aliases = Object.keys(mutationData)
 						if (aliases.every(item => mutationData[item].ok)) {
 							const persistedEntityIds = aliases.map(alias => mutationData[alias].node?.id).filter(id => id !== undefined)
@@ -215,6 +215,9 @@ export class DataBinding {
 							this.onPersistSuccess(result, this)
 							return result
 						} else {
+							if (errorMessage) {
+								console.error(errorMessage)
+							}
 							this.eventManager.syncTransaction(() => this.accessorErrorManager.replaceErrors(mutationData, operations))
 							await this.eventManager.triggerOnPersistError(persistErrorOptions)
 							await onPersistError?.(persistErrorOptions)

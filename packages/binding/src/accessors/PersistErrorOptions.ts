@@ -7,6 +7,4 @@ export interface ScheduleAnotherPersistOptions {
 export type ScheduleAnotherPersist = (options?: ScheduleAnotherPersistOptions) => void
 
 export interface PersistErrorOptions extends AsyncBatchUpdatesOptions {
-	attemptNumber: number
-	tryAgain: ScheduleAnotherPersist
 }

@@ -22,10 +22,6 @@ export interface InvalidResponseResult {
 	errors: any // todo
 }
 
-export interface GivenUpPersistResult {
-	type: 'givenUp'
-}
-
 export type SuccessfulPersistResult = NothingToPersistPersistResult | JustSuccessPersistResult
 
-export type ErrorPersistResult = InvalidInputPersistResult | GivenUpPersistResult | RequestError | InvalidResponseResult
+export type ErrorPersistResult = InvalidInputPersistResult | RequestError | InvalidResponseResult

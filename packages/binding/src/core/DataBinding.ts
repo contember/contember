@@ -5,12 +5,13 @@ import {
 	BatchUpdatesOptions,
 	BindingOperations,
 	ExtendTreeOptions,
-	PersistErrorOptions,
+	PersistErrorOptions, PersistOptions,
 	PersistSuccessOptions,
 	TreeRootAccessor,
 } from '../accessors'
 import {
-	metadataToRequestError,
+	ErrorPersistResult,
+	metadataToRequestError, MutationDataResponse,
 	MutationRequestResponse,
 	QueryRequestResponse,
 	RequestError,
@@ -27,7 +28,7 @@ import { EventManager } from './EventManager'
 import { createBatchUpdatesOptions } from './factories'
 import { MarkerMerger } from './MarkerMerger'
 import { MarkerTreeGenerator } from './MarkerTreeGenerator'
-import { MutationGenerator } from './MutationGenerator'
+import { MutationGenerator, SubMutationOperation } from './MutationGenerator'
 import { QueryGenerator } from './QueryGenerator'
 import { StateIterator } from './state'
 import { StateInitializer } from './StateInitializer'
@@ -101,151 +102,138 @@ export class DataBinding {
 				this.eventManager.syncTransaction(() => performUpdates(this.bindingOperations))
 			},
 			extendTree: async (...args) => await this.extendTree(...args),
-			persist: async ({ signal, onPersistSuccess, onPersistError } = {}) =>
-				await this.eventManager.persistOperation(async () => {
-					for (let attemptNumber = 1; attemptNumber <= this.config.getValue('maxPersistAttempts'); attemptNumber++) {
-						// TODO if the tree is in an inconsistent state, wait for lock releases
-
-						this.eventManager.syncTransaction(() => {
-							this.accessorErrorManager.clearErrors()
-						})
-						await this.eventManager.triggerOnBeforePersist()
-
-						let shouldTryAgain = false
-						const proposedBackOffs: number[] = []
-						const persistErrorOptions: PersistErrorOptions = {
-							...this.bindingOperations,
-							tryAgain: options => {
-								shouldTryAgain = true
-								if (options?.proposedBackoff !== undefined && options.proposedBackoff > 0) {
-									proposedBackOffs.push(options.proposedBackoff)
-								}
-							},
-							attemptNumber,
-						}
-
-						if (this.accessorErrorManager.hasErrors()) {
-							await this.eventManager.triggerOnPersistError(persistErrorOptions)
-							await onPersistError?.(persistErrorOptions)
-
-							if (shouldTryAgain) {
-								continue // Trying again immediately
-							}
-
-							throw {
-								errors: this.accessorErrorManager.getErrors(),
-								type: 'invalidInput',
-							}
-						}
-
-						const generator = new MutationGenerator(this.treeStore)
-						const mutationResult = generator.getPersistMutation()
-
-						if (mutationResult === undefined) {
-							this.dirtinessTracker.reset() // TODO This ideally shouldn't be necessary but given the current limitations, this makes for better UX.
-							const persistSuccessOptions: PersistSuccessOptions = {
-								...this.bindingOperations,
-								successType: 'nothingToPersist',
-							}
-							await this.eventManager.triggerOnPersistSuccess(persistSuccessOptions)
-							await onPersistSuccess?.(persistSuccessOptions)
-
-							return {
-								type: 'nothingToPersist',
-							}
-						}
-						const { query, operations } = mutationResult
-
-						const mutationResponse: MutationRequestResponse = await this.contentApiClient.sendRequest(query, {
-							signal,
-						})
-
-						if (mutationResponse.errors !== undefined && mutationResponse.errors.length > 0) {
-							this.onError({
-								type: 'gqlError',
-								query,
-								errors: mutationResponse.errors,
-							}, this)
-						}
-						if (!mutationResponse.data?.transaction) {
-							throw {
-								errors: [],
-								type: 'invalidResponse',
-							}
-						}
-						const { __typename, ok, errorMessage, ...mutationData } = mutationResponse.data.transaction
-						const aliases = Object.keys(mutationData)
-						if (aliases.every(item => mutationData[item].ok)) {
-							const persistedEntityIds = aliases.map(alias => mutationData[alias].node?.id).filter(id => id !== undefined)
-							const result: SuccessfulPersistResult = {
-								type: 'justSuccess',
-								persistedEntityIds,
-							}
-
-							try {
-								await this.eventManager.asyncTransaction(async () => {
-									this.resetTreeAfterSuccessfulPersist()
-									this.treeAugmenter.updatePersistedData(
-										Object.fromEntries(
-											Object.entries(mutationData).map(([placeholderName, subTreeResponse]) => [
-												placeholderName,
-												subTreeResponse.node,
-											]),
-										),
-										operations,
-									)
-									const persistSuccessOptions: PersistSuccessOptions = {
-										...this.bindingOperations,
-										successType: result.type,
-									}
-									await this.eventManager.triggerOnPersistSuccess(persistSuccessOptions)
-									await onPersistSuccess?.(persistSuccessOptions)
-
-									this.treeAugmenter.resetCreatingSubTrees()
-								})
-							} catch (e) {
-								console.error(e)
-								const resultWithError = {
-									...result,
-									afterPersistError: e,
-								}
-								this.onPersistSuccess(resultWithError, this)
-								return resultWithError
-							}
-							this.onPersistSuccess(result, this)
-							return result
-						} else {
-							if (errorMessage) {
-								console.error(errorMessage)
-							}
-							this.eventManager.syncTransaction(() => this.accessorErrorManager.replaceErrors(mutationData, operations))
-							await this.eventManager.triggerOnPersistError(persistErrorOptions)
-							await onPersistError?.(persistErrorOptions)
-							if (shouldTryAgain) {
-								if (proposedBackOffs.length) {
-									const geometricMean = Math.round(
-										Math.pow(
-											proposedBackOffs.reduce((a, b) => a * b, 1),
-											1 / proposedBackOffs.length,
-										),
-									)
-									await new Promise(resolve => setTimeout(resolve, geometricMean))
-								}
-								continue
-							}
-							throw {
-								errors: this.accessorErrorManager.getErrors(),
-								type: 'invalidInput',
-							}
-						}
-					}
-					// Max attempts exceeded
-					// TODO fire persist error
-					throw {
-						type: 'givenUp',
-					}
-				}),
+			persist: async options => await this.persist(options),
 		})
+	}
+
+	private async persist({ onPersistError, onPersistSuccess, signal }: PersistOptions = {}) {
+		return await this.eventManager.persistOperation(async () => {
+			// TODO if the tree is in an inconsistent state, wait for lock releases
+
+			this.eventManager.syncTransaction(() => {
+				this.accessorErrorManager.clearErrors()
+			})
+			await this.eventManager.triggerOnBeforePersist()
+
+			await this.checkErrorsBeforePersist(onPersistError)
+
+			const generator = new MutationGenerator(this.treeStore)
+			const mutationResult = generator.getPersistMutation()
+
+			if (mutationResult === undefined) {
+				await this.processEmptyPersistMutation(onPersistSuccess)
+				return {
+					type: 'nothingToPersist',
+				}
+			}
+
+			const { query, operations } = mutationResult
+
+			const mutationResponse: MutationRequestResponse = await this.contentApiClient.sendRequest(query, {
+				signal,
+			})
+
+			if (mutationResponse.errors !== undefined && mutationResponse.errors.length > 0) {
+				this.onError({
+					type: 'gqlError',
+					query,
+					errors: mutationResponse.errors,
+				}, this)
+			}
+
+			if (!mutationResponse.data?.transaction) {
+				this.persistFail({
+					errors: [],
+					type: 'invalidResponse',
+				})
+			}
+
+			const { __typename, ok, errorMessage, ...mutationData } = mutationResponse.data.transaction
+			if (Object.values(mutationData).every(it => it.ok)) {
+				return await this.processSuccessfulPersistResult(mutationData, operations, onPersistSuccess)
+			} else {
+				if (errorMessage) {
+					console.error(errorMessage)
+				}
+
+				this.eventManager.syncTransaction(() => this.accessorErrorManager.replaceErrors(mutationData, operations))
+
+				await this.eventManager.triggerOnPersistError(this.bindingOperations)
+				await onPersistError?.(this.bindingOperations)
+				this.persistFail({
+					errors: this.accessorErrorManager.getErrors(),
+					type: 'invalidInput',
+				})
+
+			}
+		})
+	}
+
+	private async checkErrorsBeforePersist(onPersistError: PersistOptions['onPersistError']) {
+		if (this.accessorErrorManager.hasErrors()) {
+			await this.eventManager.triggerOnPersistError(this.bindingOperations)
+			await onPersistError?.(this.bindingOperations)
+			this.persistFail({
+					errors: this.accessorErrorManager.getErrors(),
+					type: 'invalidInput',
+				},
+			)
+		}
+	}
+
+	private async processEmptyPersistMutation(onPersistSuccess: PersistOptions['onPersistSuccess']): Promise<void> {
+		this.dirtinessTracker.reset() // TODO This ideally shouldn't be necessary but given the current limitations, this makes for better UX.
+		const persistSuccessOptions: PersistSuccessOptions = {
+			...this.bindingOperations,
+			successType: 'nothingToPersist',
+		}
+		await this.eventManager.triggerOnPersistSuccess(persistSuccessOptions)
+		await onPersistSuccess?.(persistSuccessOptions)
+	}
+
+	private async processSuccessfulPersistResult(mutationData: MutationDataResponse, operations: SubMutationOperation[], onPersistSuccess: PersistOptions['onPersistSuccess']) {
+		const persistedEntityIds = Object.values(mutationData).map(it => it.node?.id).filter(id => id !== undefined)
+		const result: SuccessfulPersistResult = {
+			type: 'justSuccess',
+			persistedEntityIds,
+		}
+
+		try {
+			await this.eventManager.asyncTransaction(async () => {
+				this.resetTreeAfterSuccessfulPersist()
+				this.treeAugmenter.updatePersistedData(
+					Object.fromEntries(
+						Object.entries(mutationData).map(([placeholderName, subTreeResponse]) => [
+							placeholderName,
+							subTreeResponse.node,
+						]),
+					),
+					operations,
+				)
+				const persistSuccessOptions: PersistSuccessOptions = {
+					...this.bindingOperations,
+					successType: result.type,
+				}
+				await this.eventManager.triggerOnPersistSuccess(persistSuccessOptions)
+				await onPersistSuccess?.(persistSuccessOptions)
+
+				this.treeAugmenter.resetCreatingSubTrees()
+			})
+		} catch (e) {
+			console.error(e)
+			const resultWithError = {
+				...result,
+				afterPersistError: e,
+			}
+			this.onPersistSuccess(resultWithError, this)
+			return resultWithError
+		}
+		this.onPersistSuccess(result, this)
+		return result
+	}
+
+	private persistFail(error: ErrorPersistResult): never {
+		throw error
 	}
 
 	private resolvedOnUpdate = ({ isMutating }: UpdateMetadata) => {

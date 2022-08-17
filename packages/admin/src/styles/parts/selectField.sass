@@ -3,6 +3,10 @@
 .selectField
 	&-search
 		display: inline-grid
+		flex-basis: 0px
+		flex-grow: 1
+		flex-shrink: 1
+		min-width: 0px
 		&::before
 			content: attr(data-value) " "
 			visibility: hidden
@@ -21,7 +25,7 @@
 			outline: 0
 			padding: 0 2px
 			resize: none
-			min-width: 1em
+			min-width: 0px
 			width: auto
 	&-search.is-hidden &-search-input
 		opacity: 0

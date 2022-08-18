@@ -13,7 +13,7 @@ import { RuntimeId } from '../accessorTree'
 
 class EntityListAccessor implements Errorable {
 	public constructor(
-		private readonly stateKey: EntityListState,
+		private readonly state: EntityListState,
 		private readonly operations: ListOperations,
 		private readonly _children: ReadonlyMap<EntityId, { getAccessor: EntityAccessor.GetEntityAccessor }>,
 		private readonly _idsPersistedOnServer: ReadonlySet<EntityId>,
@@ -94,14 +94,14 @@ class EntityListAccessor implements Errorable {
 	}
 
 	public addError(error: ErrorAccessor.Error | string): () => void {
-		return this.operations.addError(this.stateKey, ErrorAccessor.normalizeError(error))
+		return this.operations.addError(this.state, ErrorAccessor.normalizeError(error))
 	}
 
 	public addEventListener<Type extends keyof EntityListAccessor.RuntimeEntityListEventListenerMap>(
 		event: { type: Type; key?: string },
 		listener: EntityListAccessor.RuntimeEntityListEventListenerMap[Type],
 	) {
-		return this.operations.addEventListener(this.stateKey, event, listener)
+		return this.operations.addEventListener(this.state, event, listener)
 	}
 
 	public addChildEventListener<Type extends keyof EntityAccessor.EntityEventListenerMap>(
@@ -109,25 +109,25 @@ class EntityListAccessor implements Errorable {
 		event: { type: Type; key?: string },
 		listener: EntityAccessor.EntityEventListenerMap[Type],
 	) {
-		return this.operations.addChildEventListener(this.stateKey, event, listener)
+		return this.operations.addChildEventListener(this.state, event, listener)
 	}
 
 	public batchUpdates(performUpdates: EntityListAccessor.BatchUpdatesHandler): void {
-		this.operations.batchUpdates(this.stateKey, performUpdates)
+		this.operations.batchUpdates(this.state, performUpdates)
 	}
 
 	public connectEntity(entityToConnect: EntityAccessor): void {
-		this.operations.connectEntity(this.stateKey, entityToConnect)
+		this.operations.connectEntity(this.state, entityToConnect)
 	}
 
 	public createNewEntity(initialize?: EntityAccessor.BatchUpdatesHandler): RuntimeId {
-		return this.operations.createNewEntity(this.stateKey, initialize)
+		return this.operations.createNewEntity(this.state, initialize)
 	}
 	public disconnectEntity(childEntity: EntityAccessor, options: { noPersist?: boolean } = {}): void {
-		this.operations.disconnectEntity(this.stateKey, childEntity, options)
+		this.operations.disconnectEntity(this.state, childEntity, options)
 	}
 	public getChildEntityById(id: EntityId): EntityAccessor {
-		return this.operations.getChildEntityById(this.stateKey, id)
+		return this.operations.getChildEntityById(this.state, id)
 	}
 }
 

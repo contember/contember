@@ -9,7 +9,7 @@ import type { SchemaColumn } from '../core/schema/SchemaColumn'
 
 class FieldAccessor<Value extends FieldValue = FieldValue> implements Errorable {
 	constructor(
-		private readonly stateKey: FieldState<Value>,
+		private readonly state: FieldState<Value>,
 		private readonly operations: FieldOperations,
 		public readonly fieldName: FieldName,
 		public readonly value: Value | null,
@@ -23,22 +23,22 @@ class FieldAccessor<Value extends FieldValue = FieldValue> implements Errorable 
 	) {}
 
 	public addError(error: ErrorAccessor.Error | string): () => void {
-		return this.operations.addError(this.stateKey, ErrorAccessor.normalizeError(error))
+		return this.operations.addError(this.state, ErrorAccessor.normalizeError(error))
 	}
 
 	public clearErrors(): void {
-		this.operations.clearErrors(this.stateKey)
+		this.operations.clearErrors(this.state)
 	}
 
 	public addEventListener<Type extends keyof FieldAccessor.FieldEventListenerMap<Value>>(
 		event: { type: Type; key?: string },
 		listener: FieldAccessor.FieldEventListenerMap<Value>[Type],
 	): () => void {
-		return this.operations.addEventListener(this.stateKey, event, listener)
+		return this.operations.addEventListener(this.state, event, listener)
 	}
 
 	public updateValue(newValue: Value | null, options?: FieldAccessor.UpdateOptions): void {
-		this.operations.updateValue(this.stateKey, newValue, options)
+		this.operations.updateValue(this.state, newValue, options)
 	}
 
 	public hasValue(candidate: this['value']): boolean {

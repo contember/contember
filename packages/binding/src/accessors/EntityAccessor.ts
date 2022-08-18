@@ -26,10 +26,11 @@ import type { FieldAccessor } from './FieldAccessor'
 import type { PersistErrorOptions } from './PersistErrorOptions'
 import type { PersistSuccessOptions } from './PersistSuccessOptions'
 import type { EntityRealmState } from '../core/state'
+import { getEntityMarker } from '../core/state'
 
 class EntityAccessor implements Errorable {
 	public constructor(
-		private readonly stateKey: EntityRealmState,
+		private readonly state: EntityRealmState,
 		private readonly operations: EntityOperations,
 		private readonly runtimeId: RuntimeId,
 		public readonly key: EntityRealmKey, // ⚠️ This is *NOT* the id! ⚠️
@@ -60,30 +61,30 @@ class EntityAccessor implements Errorable {
 	//
 
 	public addError(error: ErrorAccessor.Error | string): () => void {
-		return this.operations.addError(this.stateKey, ErrorAccessor.normalizeError(error))
+		return this.operations.addError(this.state, ErrorAccessor.normalizeError(error))
 	}
 
 	public addEventListener<Type extends keyof EntityAccessor.RuntimeEntityEventListenerMap>(
 		event: { type: Type; key?: string },
 		listener: EntityAccessor.EntityEventListenerMap[Type],
 	): () => void {
-		return this.operations.addEventListener(this.stateKey, event, listener)
+		return this.operations.addEventListener(this.state, event, listener)
 	}
 
 	public batchUpdates(performUpdates: EntityAccessor.BatchUpdatesHandler): void {
-		this.operations.batchUpdates(this.stateKey, performUpdates)
+		this.operations.batchUpdates(this.state, performUpdates)
 	}
 
 	public connectEntityAtField(field: FieldName, entityToConnect: EntityAccessor): void {
-		this.operations.connectEntityAtField(this.stateKey, field, entityToConnect)
+		this.operations.connectEntityAtField(this.state, field, entityToConnect)
 	}
 
 	public disconnectEntityAtField(field: FieldName, initializeReplacement?: EntityAccessor.BatchUpdatesHandler): void {
-		this.operations.disconnectEntityAtField(this.stateKey, field, initializeReplacement)
+		this.operations.disconnectEntityAtField(this.state, field, initializeReplacement)
 	}
 
 	public deleteEntity(): void {
-		this.operations.deleteEntity(this.stateKey)
+		this.operations.deleteEntity(this.state)
 	}
 
 	//
@@ -142,6 +143,18 @@ class EntityAccessor implements Errorable {
 		return this.getRelativeSingleEntity(entityList).getAccessorByPlaceholder(
 			PlaceholderGenerator.getHasManyRelationPlaceholder(entityList.hasManyRelation),
 		) as EntityListAccessor
+	}
+
+	public getParent(): EntityAccessor | EntityListAccessor | undefined {
+		const blueprint = this.state.blueprint
+		if (blueprint.type === 'subTree') {
+			return undefined
+		}
+		return blueprint.parent.getAccessor()
+	}
+
+	public getMarker() {
+		return getEntityMarker(this.state)
 	}
 
 	private getAccessorByPlaceholder(placeholderName: FieldName): EntityAccessor.NestedAccessor {

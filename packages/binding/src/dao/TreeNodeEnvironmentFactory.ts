@@ -11,7 +11,6 @@ import {
 } from '../treeParameters'
 import { QueryLanguage } from '../queryLanguage'
 import { BindingError } from '../BindingError'
-import { NIL_UUID } from '../bindingTypes'
 import { whereToFilter } from '@contember/client'
 import { BaseRelation, Schema, SchemaColumn, SchemaEntity, SchemaField, SchemaRelation } from '../core/schema'
 import levenshtein from 'js-levenshtein'
@@ -28,7 +27,7 @@ export class TreeNodeEnvironmentFactory {
 
 		if (sugaredEntityList.isCreating) {
 			entityList = QueryLanguage.desugarUnconstrainedQualifiedEntityList(sugaredEntityList, environment)
-			rootWhere = { id: { eq: NIL_UUID } } as const
+			rootWhere = {} as const
 			expectedCardinality = 'zero'
 
 		} else {
@@ -56,7 +55,7 @@ export class TreeNodeEnvironmentFactory {
 		let expectedCardinality: Environment.SubTreeNode['expectedCardinality']
 
 		if (sugaredEntityList.isCreating) {
-			rootWhere = { id: { eq: NIL_UUID } } as const
+			rootWhere = { } as const
 			expectedCardinality = 'zero'
 			entity = QueryLanguage.desugarUnconstrainedQualifiedSingleEntity(sugaredEntityList, environment)
 

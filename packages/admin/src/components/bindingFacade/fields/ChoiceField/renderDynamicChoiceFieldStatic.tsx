@@ -1,5 +1,5 @@
 import { ReactElement } from 'react'
-import { EntityListSubTree, Environment, Field, Filter, NIL_UUID } from '@contember/binding'
+import { EntityListSubTree, Environment, Field, Filter } from '@contember/binding'
 import { BaseDynamicChoiceField } from './BaseDynamicChoiceField'
 import { getDesugaredEntityList, getDesugaredFieldList } from './hooks/useDesugaredOptionPath'
 
@@ -43,8 +43,7 @@ export const renderDynamicChoiceFieldStatic = (props: BaseDynamicChoiceField, en
 				{props.createNewForm && (
 					<EntityListSubTree entities={{
 						entityName: entityList.entityName,
-						filter: { id: { eq: NIL_UUID } },
-					}} expectedMutation={'none'}>
+					}} limit={0} expectedMutation={'none'}>
 						{props.createNewForm}
 						{renderedOption}
 					</EntityListSubTree>
@@ -80,8 +79,7 @@ export const renderDynamicChoiceFieldStatic = (props: BaseDynamicChoiceField, en
 				{props.createNewForm && (
 					<EntityListSubTree entities={{
 						entityName: fieldList.entityName,
-						filter: { id: { eq: NIL_UUID } },
-					}} expectedMutation={'none'}>
+					}} limit={0} expectedMutation={'none'}>
 						{props.createNewForm}
 						{searchByFields}
 						{renderedOptionBase}

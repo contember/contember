@@ -2,7 +2,6 @@ import {
 	AccessorTree,
 	Entity,
 	EntityAccessor,
-	NIL_UUID,
 	useAccessorTreeState,
 	useGetEntityListSubTree,
 } from '@contember/binding'
@@ -28,8 +27,8 @@ export const useOnAddNew = ({ createNewForm, connect, ...props }: BaseDynamicCho
 				const subTree = getSubTree({
 					entities: {
 						entityName: desugaredOptionPath.entityName,
-						filter: { id: { eq: NIL_UUID } },
 					},
+					limit: 0,
 				})
 				const newEntityId = subTree.createNewEntity()
 				const entity = subTree.getChildEntityById(newEntityId.value)

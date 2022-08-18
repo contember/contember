@@ -1,4 +1,3 @@
-import { whereToFilter } from '@contember/client'
 import { useConstantValueInvariant } from '@contember/react-utils'
 import { ComponentType, ReactElement, ReactNode, useCallback } from 'react'
 import {
@@ -6,9 +5,9 @@ import {
 	useEntityListSubTreeParameters,
 	useGetEntityListSubTree,
 } from '../accessorPropagation'
-import { NIL_UUID, PRIMARY_KEY_NAME } from '../bindingTypes'
+import { PRIMARY_KEY_NAME } from '../bindingTypes'
 import { Environment } from '../dao'
-import { MarkerFactory, QueryLanguage } from '../queryLanguage'
+import { MarkerFactory } from '../queryLanguage'
 import type { SugaredQualifiedEntityList, SugaredUnconstrainedQualifiedEntityList, TreeRootId } from '../treeParameters'
 import { Component } from './Component'
 import { EntityList, EntityListBaseProps } from './EntityList'

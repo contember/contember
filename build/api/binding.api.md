@@ -256,7 +256,7 @@ export const Entity: React.NamedExoticComponent<EntityBaseProps>;
 export class EntityAccessor implements Errorable {
     // Warning: (ae-forgotten-export) The symbol "EntityRealmState" needs to be exported by the entry point index.d.ts
     // Warning: (ae-forgotten-export) The symbol "EntityOperations" needs to be exported by the entry point index.d.ts
-    constructor(stateKey: EntityRealmState, operations: EntityOperations, runtimeId: RuntimeId, key: EntityRealmKey, // ⚠️ This is *NOT* the id! ⚠️
+    constructor(state: EntityRealmState, operations: EntityOperations, runtimeId: RuntimeId, key: EntityRealmKey, // ⚠️ This is *NOT* the id! ⚠️
     name: EntityName, fieldData: EntityAccessor.FieldData, dataFromServer: SingleEntityPersistedData | undefined, hasUnpersistedChanges: boolean, errors: ErrorAccessor | undefined, environment: Environment, getAccessor: EntityAccessor.GetEntityAccessor);
     // (undocumented)
     addError(error: ErrorAccessor.Error | string): () => void;
@@ -286,6 +286,10 @@ export class EntityAccessor implements Errorable {
     // (undocumented)
     getEntityList(entityList: SugaredRelativeEntityList | string): EntityListAccessor;
     getField<Value extends FieldValue = FieldValue>(field: SugaredRelativeSingleField | string): FieldAccessor<Value>;
+    // (undocumented)
+    getMarker(): HasOneRelationMarker | HasManyRelationMarker | EntityListSubTreeMarker | EntitySubTreeMarker;
+    // (undocumented)
+    getParent(): EntityAccessor | EntityListAccessor | undefined;
     // (undocumented)
     getRelativeEntityList(entityList: RelativeEntityList): EntityListAccessor;
     // (undocumented)
@@ -444,7 +448,7 @@ export class EntityListAccessor implements Errorable {
     [Symbol.iterator](): IterableIterator<EntityAccessor>;
     // Warning: (ae-forgotten-export) The symbol "EntityListState" needs to be exported by the entry point index.d.ts
     // Warning: (ae-forgotten-export) The symbol "ListOperations" needs to be exported by the entry point index.d.ts
-    constructor(stateKey: EntityListState, operations: ListOperations, _children: ReadonlyMap<EntityId, {
+    constructor(state: EntityListState, operations: ListOperations, _children: ReadonlyMap<EntityId, {
         getAccessor: EntityAccessor.GetEntityAccessor;
     }>, _idsPersistedOnServer: ReadonlySet<EntityId>, hasUnpersistedChanges: boolean, errors: ErrorAccessor | undefined, environment: Environment, getAccessor: EntityListAccessor.GetEntityListAccessor);
     // (undocumented)
@@ -1037,7 +1041,7 @@ export const Field: <Persisted extends FieldValue = FieldValue>(props: FieldProp
 export class FieldAccessor<Value extends FieldValue = FieldValue> implements Errorable {
     // Warning: (ae-forgotten-export) The symbol "FieldState" needs to be exported by the entry point index.d.ts
     // Warning: (ae-forgotten-export) The symbol "FieldOperations" needs to be exported by the entry point index.d.ts
-    constructor(stateKey: FieldState<Value>, operations: FieldOperations, fieldName: FieldName, value: Value | null, valueOnServer: Value | null, defaultValue: Value | undefined, errors: ErrorAccessor | undefined, hasUnpersistedChanges: boolean, touchLog: ReadonlySet<string> | undefined, getAccessor: FieldAccessor.GetFieldAccessor<Value>, schema: SchemaColumn);
+    constructor(state: FieldState<Value>, operations: FieldOperations, fieldName: FieldName, value: Value | null, valueOnServer: Value | null, defaultValue: Value | undefined, errors: ErrorAccessor | undefined, hasUnpersistedChanges: boolean, touchLog: ReadonlySet<string> | undefined, getAccessor: FieldAccessor.GetFieldAccessor<Value>, schema: SchemaColumn);
     // (undocumented)
     addError(error: ErrorAccessor.Error | string): () => void;
     // (undocumented)

@@ -482,7 +482,7 @@ export const useCurrentContentGraphQlClient: () => GraphQlClient;
 export const useCurrentSystemGraphQlClient: () => GraphQlClient;
 
 // @public (undocumented)
-export const useFileUpload: <Result = unknown, Metadata = undefined>(options?: FileUploadOptions | undefined) => FileUpload<Result, Metadata>;
+export const useFileUpload: <Result = unknown, Metadata = undefined>(options?: FileUploadOptions) => FileUpload<Result, Metadata>;
 
 // @public (undocumented)
 export const useGraphQlClient: (path: string) => GraphQlClient;

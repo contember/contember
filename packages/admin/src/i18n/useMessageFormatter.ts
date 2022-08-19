@@ -43,7 +43,7 @@ const formatMessage = (
 		const original = i18n.dictionaryResolver.getResolvedMessageForDebuggingPurposes(i18n.locale, key, fallback)
 
 		throw new I18nError(
-			`Failed to format key '${key}'.${original ? ` It resolved to\n${original}` : ''}\n\n${e.message}`,
+			`Failed to format key '${key}'.${original ? ` It resolved to\n${original}` : ''}\n\n${e instanceof Error ? e.message : null}`,
 		)
 	}
 
@@ -73,7 +73,7 @@ const formatMessage = (
 		return assignKeys(formatted as ReactNode[])
 	} catch (e) {
 		const original = i18n.dictionaryResolver.getResolvedMessageForDebuggingPurposes(i18n.locale, key, fallback)
-		throw new I18nError(`Failed to format key '${key}'. It resolved to\n${original}\n\n${e.message}`)
+		throw new I18nError(`Failed to format key '${key}'. It resolved to\n${original}\n\n${e instanceof Error ? e.message : null}`)
 	}
 }
 

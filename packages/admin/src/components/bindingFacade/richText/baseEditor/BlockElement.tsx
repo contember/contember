@@ -19,7 +19,7 @@ export const BlockElement = memo(function BlockElement({
 }: BlockElementProps) {
 	const editor = useSlateStatic()
 	const dataAttributes = ContemberEditor.getElementDataAttributes(element)
-	const El = domElement
+	const El = domElement as 'div'
 	const formatter = useMessageFormatter(editorDictionary)
 
 	return (

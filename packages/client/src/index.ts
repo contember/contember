@@ -20,25 +20,25 @@ export namespace CrudQueryBuilder {
 	export import WriteManyRelationBuilder = CrudQueryBuilderTmp.WriteManyRelationBuilder
 	export import WriteOneRelationBuilder = CrudQueryBuilderTmp.WriteOneRelationBuilder
 	export import WriteOperation = CrudQueryBuilderTmp.WriteOperation
-	export import CreateMutationArguments = CrudQueryBuilderTmp.CreateMutationArguments
-	export import CreateMutationFields = CrudQueryBuilderTmp.CreateMutationFields
-	export import DeleteMutationArguments = CrudQueryBuilderTmp.DeleteMutationArguments
-	export import DeleteMutationFields = CrudQueryBuilderTmp.DeleteMutationFields
-	export import GetQueryArguments = CrudQueryBuilderTmp.GetQueryArguments
-	export import HasManyArguments = CrudQueryBuilderTmp.HasManyArguments
-	export import HasOneArguments = CrudQueryBuilderTmp.HasOneArguments
-	export import ListQueryArguments = CrudQueryBuilderTmp.ListQueryArguments
-	export import Mutations = CrudQueryBuilderTmp.Mutations
-	export import OrderDirection = CrudQueryBuilderTmp.OrderDirection
-	export import PaginateQueryArguments = CrudQueryBuilderTmp.PaginateQueryArguments
-	export import Queries = CrudQueryBuilderTmp.Queries
-	export import ReadArguments = CrudQueryBuilderTmp.ReadArguments
-	export import ReductionArguments = CrudQueryBuilderTmp.ReductionArguments
-	export import UpdateMutationArguments = CrudQueryBuilderTmp.UpdateMutationArguments
-	export import UpdateMutationFields = CrudQueryBuilderTmp.UpdateMutationFields
-	export import WriteArguments = CrudQueryBuilderTmp.WriteArguments
-	export import WriteFields = CrudQueryBuilderTmp.WriteFields
-	export import WriteRelationOps = CrudQueryBuilderTmp.WriteRelationOps
+	export type CreateMutationArguments = CrudQueryBuilderTmp.CreateMutationArguments
+	export type CreateMutationFields = CrudQueryBuilderTmp.CreateMutationFields
+	export type DeleteMutationArguments = CrudQueryBuilderTmp.DeleteMutationArguments
+	export type DeleteMutationFields = CrudQueryBuilderTmp.DeleteMutationFields
+	export type GetQueryArguments = CrudQueryBuilderTmp.GetQueryArguments
+	export type HasManyArguments = CrudQueryBuilderTmp.HasManyArguments
+	export type HasOneArguments = CrudQueryBuilderTmp.HasOneArguments
+	export type ListQueryArguments = CrudQueryBuilderTmp.ListQueryArguments
+	export type Mutations = CrudQueryBuilderTmp.Mutations
+	export type OrderDirection = CrudQueryBuilderTmp.OrderDirection
+	export type PaginateQueryArguments = CrudQueryBuilderTmp.PaginateQueryArguments
+	export type Queries = CrudQueryBuilderTmp.Queries
+	export type ReadArguments = CrudQueryBuilderTmp.ReadArguments
+	export type ReductionArguments = CrudQueryBuilderTmp.ReductionArguments
+	export type UpdateMutationArguments = CrudQueryBuilderTmp.UpdateMutationArguments
+	export type UpdateMutationFields = CrudQueryBuilderTmp.UpdateMutationFields
+	export type WriteArguments = CrudQueryBuilderTmp.WriteArguments
+	export type WriteFields = CrudQueryBuilderTmp.WriteFields
+	export type WriteRelationOps = CrudQueryBuilderTmp.WriteRelationOps
 }
 
 export * from './content'

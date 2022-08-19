@@ -9,7 +9,7 @@ export interface LocationFieldProps extends Omit<FieldContainerProps, 'children'
 	longitudeField: SugaredFieldProps['field']
 	mapCenter?: [number, number]
 	zoom?: number
-	tileLayerProps?: TileLayerProps
+	tileLayerProps?: Partial<TileLayerProps>
 	mapProps?: MapProps
 	markerProps?: MarkerProps
 }

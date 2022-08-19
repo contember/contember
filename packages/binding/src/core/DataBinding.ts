@@ -364,7 +364,7 @@ export class DataBinding {
 							signal,
 					  })
 		} catch (metadata) {
-			if (metadata.name === 'AbortError') {
+			if (typeof metadata === 'object' && metadata !== null && (metadata as { name?: unknown }).name === 'AbortError') {
 				return
 			}
 			this.onError(metadataToRequestError(metadata as GraphQlClientFailedRequestMetadata), this)

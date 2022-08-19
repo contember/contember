@@ -54,11 +54,9 @@ export class ChildrenAnalyzer<AllLeavesRepresentation = any, AllBranchNodesRepre
 // @public (undocumented)
 export class ChildrenAnalyzerError extends Error {
     constructor(message: string, options?: {
-        cause: unknown;
+        cause: Error;
         details?: string;
     });
-    // (undocumented)
-    cause?: unknown;
     // (undocumented)
     details?: string;
 }

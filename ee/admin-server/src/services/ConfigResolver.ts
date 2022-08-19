@@ -16,7 +16,7 @@ export class ConfigResolver {
 			})
 			config = customConfig(JSON.parse(configContent))
 		} catch (e) {
-			if (!(typeof e === 'object' && e !== null && 'name' in e && e.name === 'NoSuchKey')) {
+			if (!(typeof e === 'object' && e !== null && 'name' in e && (e as { name?: unknown }).name === 'NoSuchKey')) {
 				throw e
 			}
 		}

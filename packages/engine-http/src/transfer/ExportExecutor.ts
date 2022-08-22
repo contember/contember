@@ -71,7 +71,7 @@ export class ExportExecutor {
 			if (column.type === Model.ColumnType.Int && column.sequence) {
 				const seqResult = await db.query<{ nextval: number }>(
 					'SELECT nextval(pg_get_serial_sequence(?, ?))',
-					[table.name, column.name],
+					[`${db.schema}.${table.name}`, column.name],
 				)
 
 				const seqValue = seqResult.rows[0].nextval

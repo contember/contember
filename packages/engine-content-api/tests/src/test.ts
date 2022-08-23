@@ -1,12 +1,10 @@
 import { Acl, Model, Schema, Validation } from '@contember/schema'
-import { Authorizator, ExecutionContainerFactory, GraphQlSchemaBuilderFactory } from '../../src'
+import { Authorizator, ExecutionContainerFactory, GraphQlSchemaBuilderFactory, MapperContainerFactory } from '../../src'
 import { AllowAllPermissionFactory, emptySchema } from '@contember/schema-utils'
 import { executeGraphQlTest } from './testGraphql'
 import { Client } from '@contember/database'
 import { createConnectionMock } from '@contember/database-tester'
 import { createUuidGenerator } from '@contember/engine-api-tester'
-import { getArgumentValues } from 'graphql/execution/values'
-import { SQL } from './tags'
 
 export interface SqlQuery {
 	sql: string
@@ -72,22 +70,23 @@ export const execute = async (test: Test) => {
 
 	const db = new Client(connection, 'public', {})
 	const schema: Schema = { ...emptySchema, model: test.schema, validation: test.validation || {} }
+	const providers = {
+		uuid: createUuidGenerator(),
+		now: () => new Date('2019-09-04 12:00'),
+	}
 	await executeGraphQlTest({
 		context: {
 			db: db,
 			identityVariables: test.variables || {},
 			executionContainer: new ExecutionContainerFactory(
-				schema,
-				permissions,
-				{
-					uuid: createUuidGenerator(),
-					now: () => new Date('2019-09-04 12:00'),
-				},
-				getArgumentValues,
-				() => Promise.resolve(),
+				providers,
+				new MapperContainerFactory(providers),
 			).create({
+				permissions,
+				schema,
 				db,
 				identityVariables: test.variables || {},
+				setupSystemVariables: () => Promise.resolve(),
 			}),
 			timer: (label: any, cb: any) => cb(),
 		},

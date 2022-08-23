@@ -1,4 +1,4 @@
-import { SystemContainerFactory } from '@contember/engine-system-api'
+import { setupSystemVariables, SystemContainerFactory } from '@contember/engine-system-api'
 import { TenantContainerFactory } from '@contember/engine-tenant-api'
 import { Builder } from '@contember/dic'
 import { ServerConfig } from './config/config'
@@ -45,6 +45,7 @@ import { ProjectGroupContainerFactory } from './projectGroup/ProjectGroupContain
 import corsMiddleware from '@koa/cors'
 import { ProjectGroupResolver } from './projectGroup/ProjectGroupResolver'
 import { Logger } from '@contember/logger'
+import { ExecutionContainerFactory, MapperContainerFactory } from '@contember/engine-content-api'
 
 export interface MasterContainer {
 	initializer: Initializer
@@ -111,8 +112,12 @@ export class MasterContainerFactory {
 				new ProjectGroupResolver(projectGroupContainer))
 			.addService('notModifiedChecker', () =>
 				new NotModifiedChecker())
-			.addService('contentGraphqlContextFactory', ({ providers }) =>
-				new ContentGraphQLContextFactory(providers))
+			.addService('mapperContainerFactory', ({ providers }) =>
+				new MapperContainerFactory(providers))
+			.addService('executionContainerFactory', ({ providers, mapperContainerFactory }) =>
+				new ExecutionContainerFactory(providers, mapperContainerFactory))
+			.addService('contentGraphqlContextFactory', ({ providers, executionContainerFactory }) =>
+				new ContentGraphQLContextFactory(providers, executionContainerFactory))
 			.addService('contentQueryHandlerFactory', ({ debugMode }) =>
 				new ContentQueryHandlerFactory(debugMode))
 			.addService('contentApiMiddlewareFactory', ({ projectGroupResolver, notModifiedChecker, contentGraphqlContextFactory, contentQueryHandlerFactory }) =>

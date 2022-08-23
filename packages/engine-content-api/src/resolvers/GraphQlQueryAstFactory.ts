@@ -2,15 +2,16 @@ import { isIt, ResolveInfoUtils } from '../utils'
 import {
 	FieldNode as GraphQlFieldNode,
 	FragmentSpreadNode,
+	getArgumentValues,
 	GraphQLObjectType,
 	GraphQLOutputType,
 	GraphQLResolveInfo,
 	isListType,
 	isNonNullType,
-	isObjectType, Kind,
+	isObjectType,
+	Kind,
+	SelectionSetNode,
 } from 'graphql'
-import { SelectionSetNode } from 'graphql/language/ast'
-import { getArgumentValues } from 'graphql/execution/values'
 import { FieldNode, ObjectNode } from '../inputProcessing'
 import { isDeepStrictEqual } from 'util'
 
@@ -18,7 +19,6 @@ type NodeFilter = (node: GraphQlFieldNode, path: string[]) => boolean
 type AnyNode = ObjectNode | FieldNode
 
 export class GraphQlQueryAstFactory {
-	constructor(private readonly argumentValuesResolver: typeof getArgumentValues) {}
 
 	public create<Args = any>(info: GraphQLResolveInfo, filter?: NodeFilter): ObjectNode<Args> {
 		const node = ResolveInfoUtils.extractFieldNode(info)
@@ -52,7 +52,7 @@ export class GraphQlQueryAstFactory {
 			name,
 			alias,
 			fields,
-			this.argumentValuesResolver(field, node, info.variableValues),
+			getArgumentValues(field, node, info.variableValues),
 			field.extensions || {},
 			path,
 		)

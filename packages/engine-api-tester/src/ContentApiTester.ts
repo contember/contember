@@ -5,12 +5,12 @@ import {
 	Context as ContentContext,
 	ExecutionContainerFactory,
 	GraphQlSchemaBuilderFactory,
+	MapperContainerFactory,
 } from '@contember/engine-content-api'
 import { graphql } from 'graphql'
 import { TesterStageManager } from './TesterStageManager'
 import { Schema } from '@contember/schema'
 import { createUuidGenerator } from './testUuid'
-import { getArgumentValues } from 'graphql/execution/values'
 
 export class ContentApiTester {
 	private trxUuidGenerator = createUuidGenerator('a453')
@@ -34,17 +34,18 @@ export class ContentApiTester {
 		const gqlSchema = gqlSchemaBuilder.build()
 		const db = this.db.client.forSchema(`stage_${stage.slug}`)
 
+		const providers = {
+			uuid: this.uuidGenerator,
+			now: () => new Date('2019-09-04 12:00'),
+		}
 		const executionContainer = new ExecutionContainerFactory(
+			providers,
+			new MapperContainerFactory(providers),
+		).create({
 			schema,
 			permissions,
-			{
-				uuid: this.uuidGenerator,
-				now: () => new Date('2019-09-04 12:00'),
-			},
-			getArgumentValues,
-			() => Promise.resolve(),
-		).create({
 			db,
+			setupSystemVariables: () => Promise.resolve(),
 			identityVariables: {},
 		})
 		const context: ContentContext = {

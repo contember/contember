@@ -1,5 +1,3 @@
-import { getArgumentValues } from 'graphql/execution/values'
-
 import { Context, createAclVariables, ExecutionContainerFactory } from '@contember/engine-content-api'
 import { setupSystemVariables } from '@contember/engine-system-api'
 import { Client } from '@contember/database'
@@ -16,6 +14,7 @@ export type ExtendedGraphqlContext = Context & { identityId: string; koaContext:
 export class ContentGraphQLContextFactory {
 	constructor(
 		private providers: Providers,
+		private executionContainerFactory: ExecutionContainerFactory,
 	) {
 	}
 
@@ -42,9 +41,12 @@ export class ContentGraphQLContextFactory {
 			identityId = authResult.assumedIdentityId
 		}
 
-		const executionContainer = new ExecutionContainerFactory(schema, permissions, this.providers, getArgumentValues, db =>
-			setupSystemVariables(db, identityId, this.providers),
-		).create(partialContext)
+		const executionContainer = this.executionContainerFactory.create({
+			...partialContext,
+			schema,
+			permissions,
+			setupSystemVariables: db => setupSystemVariables(db, identityId, this.providers),
+		})
 
 		return {
 			...partialContext,

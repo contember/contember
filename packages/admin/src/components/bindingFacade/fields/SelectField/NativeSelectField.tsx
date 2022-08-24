@@ -4,18 +4,19 @@ import {
 	FieldContainerProps,
 	FieldErrors,
 	flipValue,
+	HTMLReactSelectElement,
 	Select,
 	SelectCreateNewWrapper,
 	SelectOption,
 } from '@contember/ui'
 import { forwardRef, FunctionComponent, memo, RefAttributes } from 'react'
+import { useLabelMiddleware } from '../../environment/LabelMiddleware'
 import {
 	ChoiceField,
 	ChoiceFieldData,
 	DynamicSingleChoiceFieldProps,
 	StaticSingleChoiceFieldProps,
 } from '../ChoiceField'
-import { useLabelMiddleware } from '../../environment/LabelMiddleware'
 
 export type NativeSelectFieldProps =
 	& NativeSelectFieldInnerPublicProps
@@ -51,7 +52,7 @@ export interface NativeSelectFieldInnerProps<ActualValue> extends ChoiceFieldDat
 	errors: FieldErrors | undefined
 }
 
-export const NativeSelectFieldInner = memo(forwardRef<HTMLSelectElement, NativeSelectFieldInnerProps<any>>((props, ref) => {
+export const NativeSelectFieldInner = memo(forwardRef<HTMLReactSelectElement<ChoiceFieldData.SingleOption>, NativeSelectFieldInnerProps<any>>((props, ref) => {
 	const isMutating = useMutationState()
 	const labelMiddleware = useLabelMiddleware()
 	const options: SelectOption<ChoiceFieldData.SingleOption>[] = props.data.map(it => {

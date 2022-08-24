@@ -114,7 +114,7 @@ export const useCommonReactSelectStyles = <Option = unknown, IsMulti extends boo
 		}
 	},
 	control: (provided, { isFocused, isDisabled }) => {
-		const backgroundColor = 'var(--cui-background-color--above)'
+		const backgroundColor = 'var(--cui-filled-background-color)'
 		const color = isDisabled
 			? 'var(--cui-color--low)'
 			: isFocused
@@ -139,7 +139,7 @@ export const useCommonReactSelectStyles = <Option = unknown, IsMulti extends boo
 			'boxShadow': isFocused ? 'var(--cui-control-focus-ring-box-shadow)' : undefined,
 			'minHeight': 'var(--cui-control-height)',
 			'&:hover': {
-				backgroundColor: 'var(--cui-background-color--above)',
+				backgroundColor: 'var(--cui-filled-background-color--highlighted)',
 				color: 'var(--cui-color--strong)',
 				borderColor: 'var(--cui-color--low)',
 			},
@@ -174,10 +174,10 @@ export const useCommonReactSelectStyles = <Option = unknown, IsMulti extends boo
 				? 'var(--cui-toned-control-color)'
 				: 'var(--cui-control-color)'
 		const backgroundColor = isFocused
-			? 'var(--cui-filled-control-background-color)'
+			? 'var(--cui-control-background-color)'
 			: isSelected
 				? 'var(--cui-toned-control-background-color)'
-				: 'var(--cui-control-background-color)'
+				: 'var(--cui-filled-control-background-color)'
 
 		return {
 			...provided,

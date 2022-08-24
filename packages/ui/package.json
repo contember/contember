@@ -43,6 +43,7 @@
 		"classnames": "2.3.1",
 		"react-aria": "3.9.0",
 		"react-popper": "2.2.5",
+		"react-select": "5.3.2",
 		"react-stately": "3.8.0",
 		"react-textarea-autosize": "8.3.3"
 	},

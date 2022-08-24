@@ -64,6 +64,9 @@ export class DataBinding {
 		private readonly onUpdate: (newData: TreeRootAccessor, binding: DataBinding) => void,
 		private readonly onError: (error: RequestError, binding: DataBinding) => void,
 		private readonly onPersistSuccess: (result: SuccessfulPersistResult, binding: DataBinding) => void,
+		private readonly options: {
+			skipStateUpdateAfterPersist: boolean
+		},
 	) {
 		this.config = new Config()
 		this.batchUpdatesOptions = createBatchUpdatesOptions(environment, this.treeStore)
@@ -89,7 +92,7 @@ export class DataBinding {
 			this.eventManager,
 			this.treeStore,
 		)
-		this.treeAugmenter = new TreeAugmenter(this.eventManager, this.stateInitializer, this.treeStore)
+		this.treeAugmenter = new TreeAugmenter(this.eventManager, this.stateInitializer, this.treeStore, options.skipStateUpdateAfterPersist)
 
 		// TODO move this elsewhere
 		this.bindingOperations = Object.freeze<BindingOperations>({

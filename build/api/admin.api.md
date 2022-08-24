@@ -2459,7 +2459,7 @@ export const isAnchorElementActive: (editor: Editor_2) => boolean;
 export const isElementWithReference: (candidate: Node_2) => candidate is ElementWithReference;
 
 // @public (undocumented)
-export const isHeadingElement: (element: Node_2, suchThat?: Partial<HeadingElement> | undefined) => element is HeadingElement;
+export const isHeadingElement: (element: Node_2, suchThat?: Partial<HeadingElement>) => element is HeadingElement;
 
 // @public (undocumented)
 export const isHorizontalRuleElement: (element: Node_2) => element is HorizontalRuleElement;
@@ -2468,13 +2468,13 @@ export const isHorizontalRuleElement: (element: Node_2) => element is Horizontal
 export const isHorizontalRuleElementActive: (editor: Editor_2) => boolean;
 
 // @public (undocumented)
-export const isListItemElement: (element: Node_2, suchThat?: Partial<ListItemElement> | undefined) => element is ListItemElement;
+export const isListItemElement: (element: Node_2, suchThat?: Partial<ListItemElement>) => element is ListItemElement;
 
 // @public (undocumented)
-export const isOrderedListElement: (element: Node_2, suchThat?: Partial<OrderedListElement> | undefined) => element is OrderedListElement;
+export const isOrderedListElement: (element: Node_2, suchThat?: Partial<OrderedListElement>) => element is OrderedListElement;
 
 // @public (undocumented)
-export const isParagraphElement: (element: Node_2, suchThat?: Partial<ParagraphElement> | undefined) => element is ParagraphElement;
+export const isParagraphElement: (element: Node_2, suchThat?: Partial<ParagraphElement>) => element is ParagraphElement;
 
 // @public (undocumented)
 export const isReferenceElement: (node: Node_2) => node is ReferenceElement;
@@ -2498,7 +2498,7 @@ export const isTableElement: (element: Node_2) => element is TableElement;
 export const isTableRowElement: (element: Node_2) => element is TableRowElement;
 
 // @public (undocumented)
-export const isUnorderedListElement: (element: Node_2, suchThat?: Partial<UnorderedListElement> | undefined) => element is UnorderedListElement;
+export const isUnorderedListElement: (element: Node_2, suchThat?: Partial<UnorderedListElement>) => element is UnorderedListElement;
 
 // @public (undocumented)
 export const italicToolbarButton: ToolbarButtonSpec;
@@ -2611,7 +2611,7 @@ export interface LocationFieldProps extends Omit<FieldContainerProps, 'children'
     // (undocumented)
     markerProps?: MarkerProps;
     // (undocumented)
-    tileLayerProps?: TileLayerProps;
+    tileLayerProps?: Partial<TileLayerProps>;
     // (undocumented)
     zoom?: number;
 }
@@ -2738,7 +2738,27 @@ export interface MessageDictionaryByLocaleCode {
 
 // @public (undocumented)
 export type MessageDictionaryKeys<Dict extends MessageDictionary> = {
-    [Key in keyof Dict & string]: Dict[Key] extends MessageDictionary ? `${Key}.${MessageDictionaryKeys<Dict[Key]>}` : Key;
+    [Key in keyof Dict & string]: Dict[Key] extends MessageDictionary ? `${Key}.${MessageDictionaryKeys2<Dict[Key]>}` : Key;
+}[keyof Dict & string];
+
+// @public (undocumented)
+export type MessageDictionaryKeys2<Dict extends MessageDictionary> = {
+    [Key in keyof Dict & string]: Dict[Key] extends MessageDictionary ? `${Key}.${MessageDictionaryKeys3<Dict[Key]>}` : Key;
+}[keyof Dict & string];
+
+// @public (undocumented)
+export type MessageDictionaryKeys3<Dict extends MessageDictionary> = {
+    [Key in keyof Dict & string]: Dict[Key] extends MessageDictionary ? `${Key}.${MessageDictionaryKeys4<Dict[Key]>}` : Key;
+}[keyof Dict & string];
+
+// @public (undocumented)
+export type MessageDictionaryKeys4<Dict extends MessageDictionary> = {
+    [Key in keyof Dict & string]: Dict[Key] extends MessageDictionary ? `${Key}.${MessageDictionaryKeys5<Dict[Key]>}` : Key;
+}[keyof Dict & string];
+
+// @public (undocumented)
+export type MessageDictionaryKeys5<Dict extends MessageDictionary> = {
+    [Key in keyof Dict & string]: Dict[Key] extends MessageDictionary ? string : Key;
 }[keyof Dict & string];
 
 // @public (undocumented)
@@ -2822,7 +2842,7 @@ export type MutationRequestState<T> = QueryRequestState<T> | RequestStateUniniti
 export const NativeSelectField: FunctionComponent<NativeSelectFieldProps>;
 
 // @public (undocumented)
-export const NativeSelectFieldInner: React.MemoExoticComponent<React.ForwardRefExoticComponent<Pick<NativeSelectFieldInnerProps<any>, "data" | "label" | "style" | "key" | "description" | "className" | "placeholder" | "onSelect" | "size" | "errors" | "direction" | "gap" | "labelDescription" | "labelPosition" | "width" | "required" | "useLabelElement" | "notNull" | "isLoading" | "onSearch" | "currentValue" | "onClear" | "onAddNew" | "allowNull"> & RefAttributes<HTMLSelectElement>>>;
+export const NativeSelectFieldInner: React.MemoExoticComponent<React.ForwardRefExoticComponent<Pick<NativeSelectFieldInnerProps<any>, "data" | "label" | "style" | "key" | "className" | "placeholder" | "onSelect" | "size" | "errors" | "description" | "direction" | "gap" | "labelDescription" | "labelPosition" | "width" | "required" | "useLabelElement" | "notNull" | "isLoading" | "onSearch" | "currentValue" | "onClear" | "onAddNew" | "allowNull"> & RefAttributes<HTMLSelectElement>>>;
 
 // @public (undocumented)
 export interface NativeSelectFieldInnerProps<ActualValue> extends ChoiceFieldData.SingleChoiceFieldMetadata<ActualValue>, NativeSelectFieldInnerPublicProps, RefAttributes<HTMLSelectElement> {
@@ -3620,7 +3640,7 @@ export class RoutingParameter {
 export type RoutingParameterResolver = (name: string) => RequestParameterValue | undefined;
 
 // @public (undocumented)
-export const runReactApp: (reactElement: ReactElement, domRoot?: string | HTMLElement | null | undefined) => void;
+export const runReactApp: (reactElement: ReactElement, domRoot?: HTMLElement | string | null) => void;
 
 // @public (undocumented)
 export interface ScrollTargetElement extends Element_2 {
@@ -4335,7 +4355,7 @@ export const useLogout: () => ({ noRedirect }?: {
 export const useMessageFormatter: <Dict extends MessageDictionary>(defaultDictionary: Dict) => MessageFormatter<Dict>;
 
 // @public (undocumented)
-export const useMutation: <R, V extends JsonObject<never>>(client: GraphQlClient, query: string, apiToken?: string | undefined, headers?: Record<string, string> | undefined) => UseMutationReturn<R, V>;
+export const useMutation: <R, V extends JsonObject<never>>(client: GraphQlClient, query: string, apiToken?: string, headers?: Record<string, string>) => UseMutationReturn<R, V>;
 
 // @public (undocumented)
 export type UseMutationReturn<R, V> = [(variables: V) => Promise<R>, MutationRequestState<R>];
@@ -4374,10 +4394,10 @@ export const useProjectUserRoles: () => ProjectUserRoles;
 export const usePushRequest: () => (req: RequestState) => void;
 
 // @public (undocumented)
-export const useQuery: <R, V extends GraphQlClientVariables_2>(client: GraphQlClient, query: string, variables: V, apiToken?: string | undefined) => QueryRequestObject<R>;
+export const useQuery: <R, V extends GraphQlClientVariables_2>(client: GraphQlClient, query: string, variables: V, apiToken?: string) => QueryRequestObject<R>;
 
 // @public (undocumented)
-export const useRedirect: () => (target: RoutingLinkTarget, parameters?: RequestParameters<never> | undefined) => void;
+export const useRedirect: () => (target: RoutingLinkTarget, parameters?: RequestParameters) => void;
 
 // Warning: (ae-forgotten-export) The symbol "UpdateMembershipResult" needs to be exported by the entry point index.d.ts
 //
@@ -4385,7 +4405,7 @@ export const useRedirect: () => (target: RoutingLinkTarget, parameters?: Request
 export const useRemoveCurrentProjectMembership: () => [(identityId: string) => Promise<UpdateMembershipResult>, MutationRequestState<UpdateMembershipResult>];
 
 // @public (undocumented)
-export const useRemoveMemberIntent: (project: string, onRemove?: (() => void | Promise<void>) | undefined) => (id: string) => Promise<void>;
+export const useRemoveMemberIntent: (project: string, onRemove?: () => void | Promise<void>) => (id: string) => Promise<void>;
 
 // @public (undocumented)
 export const useRemoveProjectMembership: () => [(project: string, identityId: string) => Promise<UpdateMembershipResult>, MutationRequestState<UpdateMembershipResult>];
@@ -4405,10 +4425,10 @@ export const useRoleRenderer: (roleRendererFactory: RoleRendererFactory | undefi
 export const useRouting: () => RoutingContextValue;
 
 // @public (undocumented)
-export const useRoutingLink: (target: RoutingLinkTarget, parametersResolver?: RoutingParameterResolver | undefined, parameters?: RequestParameters<never> | undefined) => RoutingLinkParams;
+export const useRoutingLink: (target: RoutingLinkTarget, parametersResolver?: RoutingParameterResolver, parameters?: RequestParameters) => RoutingLinkParams;
 
 // @public (undocumented)
-export const useRoutingLinkFactory: () => (target: RoutingLinkTarget, parameters?: RequestParameters<never> | undefined, parametersResolver?: RoutingParameterResolver | undefined) => RoutingLinkParams;
+export const useRoutingLinkFactory: () => (target: RoutingLinkTarget, parameters?: RequestParameters, parametersResolver?: RoutingParameterResolver) => RoutingLinkParams;
 
 // @public (undocumented)
 export const UsersList: React.NamedExoticComponent<UsersListProps>;
@@ -4455,7 +4475,7 @@ expiration: GQLVariableType<number, false>;
 export const useSignOut: () => UseMutationReturn<SignOutResponse, {}>;
 
 // @public (undocumented)
-export const useSingleTenantMutation: <Result extends unknown, ErrorCode extends string, Variables extends Record<string, GQLVariableType<any, any>>>(mutation: string, variableDefinitions: Variables, options?: Omit<GraphQlClientRequestOptions, "variables"> | undefined) => TenantMutationExecutor<GQLVariableValues<Variables>, TenantMutationResponse<Result, ErrorCode>>;
+export const useSingleTenantMutation: <Result extends unknown, ErrorCode extends string, Variables extends Record<string, GQLVariableType<any, any>>>(mutation: string, variableDefinitions: Variables, options?: Omit<GraphQlClientRequestOptions, 'variables'>) => TenantMutationExecutor<GQLVariableValues<Variables>, TenantMutationResponse<Result, ErrorCode>>;
 
 // @public (undocumented)
 export const useToolbarState: () => ToolbarsState;

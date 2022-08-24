@@ -20,7 +20,7 @@ function updateToolbarStyle(container: HTMLDivElement, selectionState: EditorSel
 				document
 					.caretRangeFromPoint(selectionState.finishEvent.clientX, selectionState.finishEvent.clientY)
 					?.getBoundingClientRect() || undefined
-		} else {
+		} else if (document.caretPositionFromPoint) {
 			domRangeRect =
 				document
 					.caretPositionFromPoint(selectionState.finishEvent.clientX, selectionState.finishEvent.clientY)

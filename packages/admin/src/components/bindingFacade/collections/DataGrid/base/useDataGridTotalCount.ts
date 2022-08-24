@@ -29,7 +29,7 @@ export const useDataGridTotalCount = (entityName: EntityName, filter: Filter | u
 					signal: abortController(),
 				})
 			} catch (e) {
-				if (e.name === 'AbortError') {
+				if (e instanceof Error && e.name === 'AbortError') {
 					return
 				}
 				throw e

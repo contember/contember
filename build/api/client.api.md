@@ -9,6 +9,12 @@ import { Result } from '@contember/schema';
 import { Value } from '@contember/schema';
 
 // @public (undocumented)
+type CreateMutationArguments = 'data';
+
+// @public (undocumented)
+type CreateMutationFields = 'ok' | 'validation' | 'errors' | 'errorMessage' | 'node';
+
+// @public (undocumented)
 export namespace CrudQueryBuilder {
     import CrudQueryBuilder = CrudQueryBuilderTmp.CrudQueryBuilder;
     import ReadBuilder = CrudQueryBuilderTmp.ReadBuilder;
@@ -17,26 +23,79 @@ export namespace CrudQueryBuilder {
     import WriteManyRelationBuilder = CrudQueryBuilderTmp.WriteManyRelationBuilder;
     import WriteOneRelationBuilder = CrudQueryBuilderTmp.WriteOneRelationBuilder;
     import WriteOperation = CrudQueryBuilderTmp.WriteOperation;
-    import CreateMutationArguments = CrudQueryBuilderTmp.CreateMutationArguments;
-    import CreateMutationFields = CrudQueryBuilderTmp.CreateMutationFields;
-    import DeleteMutationArguments = CrudQueryBuilderTmp.DeleteMutationArguments;
-    import DeleteMutationFields = CrudQueryBuilderTmp.DeleteMutationFields;
-    import GetQueryArguments = CrudQueryBuilderTmp.GetQueryArguments;
-    import HasManyArguments = CrudQueryBuilderTmp.HasManyArguments;
-    import HasOneArguments = CrudQueryBuilderTmp.HasOneArguments;
-    import ListQueryArguments = CrudQueryBuilderTmp.ListQueryArguments;
-    import Mutations = CrudQueryBuilderTmp.Mutations;
-    import OrderDirection = CrudQueryBuilderTmp.OrderDirection;
-    import PaginateQueryArguments = CrudQueryBuilderTmp.PaginateQueryArguments;
-    import Queries = CrudQueryBuilderTmp.Queries;
-    import ReadArguments = CrudQueryBuilderTmp.ReadArguments;
-    import ReductionArguments = CrudQueryBuilderTmp.ReductionArguments;
-    import UpdateMutationArguments = CrudQueryBuilderTmp.UpdateMutationArguments;
-    import UpdateMutationFields = CrudQueryBuilderTmp.UpdateMutationFields;
-    import WriteArguments = CrudQueryBuilderTmp.WriteArguments;
-    import WriteFields = CrudQueryBuilderTmp.WriteFields;
-    import WriteRelationOps = CrudQueryBuilderTmp.WriteRelationOps;
+    // Warning: (ae-forgotten-export) The symbol "CrudQueryBuilderTmp" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    export type CreateMutationArguments = CrudQueryBuilderTmp.CreateMutationArguments;
+    // (undocumented)
+    export type CreateMutationFields = CrudQueryBuilderTmp.CreateMutationFields;
+    // (undocumented)
+    export type DeleteMutationArguments = CrudQueryBuilderTmp.DeleteMutationArguments;
+    // (undocumented)
+    export type DeleteMutationFields = CrudQueryBuilderTmp.DeleteMutationFields;
+    // (undocumented)
+    export type GetQueryArguments = CrudQueryBuilderTmp.GetQueryArguments;
+    // (undocumented)
+    export type HasManyArguments = CrudQueryBuilderTmp.HasManyArguments;
+    // (undocumented)
+    export type HasOneArguments = CrudQueryBuilderTmp.HasOneArguments;
+    // (undocumented)
+    export type ListQueryArguments = CrudQueryBuilderTmp.ListQueryArguments;
+    // (undocumented)
+    export type Mutations = CrudQueryBuilderTmp.Mutations;
+    // (undocumented)
+    export type OrderDirection = CrudQueryBuilderTmp.OrderDirection;
+    // (undocumented)
+    export type PaginateQueryArguments = CrudQueryBuilderTmp.PaginateQueryArguments;
+    // (undocumented)
+    export type Queries = CrudQueryBuilderTmp.Queries;
+    // (undocumented)
+    export type ReadArguments = CrudQueryBuilderTmp.ReadArguments;
+    // (undocumented)
+    export type ReductionArguments = CrudQueryBuilderTmp.ReductionArguments;
+    // (undocumented)
+    export type UpdateMutationArguments = CrudQueryBuilderTmp.UpdateMutationArguments;
+    // (undocumented)
+    export type UpdateMutationFields = CrudQueryBuilderTmp.UpdateMutationFields;
+    // (undocumented)
+    export type WriteArguments = CrudQueryBuilderTmp.WriteArguments;
+    // (undocumented)
+    export type WriteFields = CrudQueryBuilderTmp.WriteFields;
+    // (undocumented)
+    export type WriteRelationOps = CrudQueryBuilderTmp.WriteRelationOps;
 }
+
+// @public (undocumented)
+class CrudQueryBuilder_2 {
+    // Warning: (ae-forgotten-export) The symbol "RootObjectBuilder" needs to be exported by the entry point index.d.ts
+    constructor(type?: undefined | 'query' | 'mutation', rootObjectBuilder?: RootObjectBuilder);
+    // (undocumented)
+    create(name: string, query: WriteBuilder.BuilderFactory<CreateMutationArguments, CreateMutationFields, WriteOperation.Create>, alias?: string): Omit<CrudQueryBuilder_2, Queries>;
+    // (undocumented)
+    delete(name: string, query: WriteBuilder.BuilderFactory<DeleteMutationArguments, DeleteMutationFields, WriteOperation.Delete>, alias?: string): Omit<CrudQueryBuilder_2, Queries>;
+    // (undocumented)
+    fragment(name: string, typeName: string, query: ReadBuilder.BuilderFactory<never>): CrudQueryBuilder_2;
+    // (undocumented)
+    get(name: string, query: ReadBuilder.BuilderFactory<GetQueryArguments>, alias?: string): Omit<CrudQueryBuilder_2, Mutations>;
+    // (undocumented)
+    getGql(): string;
+    // (undocumented)
+    inTransaction(alias?: string, options?: {
+        deferForeignKeyConstraints?: boolean;
+    }): CrudQueryBuilder_2;
+    // (undocumented)
+    list(name: string, query: ReadBuilder.BuilderFactory<ListQueryArguments>, alias?: string): Omit<CrudQueryBuilder_2, Mutations>;
+    // (undocumented)
+    paginate(name: string, query: ReadBuilder.BuilderFactory<PaginateQueryArguments>, alias?: string): Omit<CrudQueryBuilder_2, Mutations>;
+    // (undocumented)
+    update(name: string, query: WriteBuilder.BuilderFactory<UpdateMutationArguments, UpdateMutationFields, WriteOperation.Update>, alias?: string): Omit<CrudQueryBuilder_2, Queries>;
+}
+
+// @public (undocumented)
+type DeleteMutationArguments = 'by';
+
+// @public (undocumented)
+type DeleteMutationFields = 'ok' | 'node' | 'errors' | 'errorMessage';
 
 // @public (undocumented)
 export interface FileUploader<Result = any, Error extends FileUploadError = FileUploadError> {
@@ -131,6 +190,9 @@ export namespace GenerateUploadUrlMutationBuilder {
 }
 
 // @public (undocumented)
+type GetQueryArguments = 'by';
+
+// @public (undocumented)
 export const getTenantErrorMessage: (errorCode: string) => string;
 
 // @public (undocumented)
@@ -184,7 +246,16 @@ export class GraphQlLiteral<Value extends string = string> {
     readonly value: Value;
 }
 
+// @public (undocumented)
+type HasManyArguments = 'filter' | 'orderBy' | 'offset' | 'limit';
+
+// @public (undocumented)
+type HasOneArguments = 'filter';
+
 export { Input }
+
+// @public (undocumented)
+type ListQueryArguments = 'filter' | 'orderBy' | 'offset' | 'limit';
 
 // @public (undocumented)
 export const loginMutation = "\n\tmutation($email: String!, $password: String!, $expiration: Int) {\n\t\tsignIn(email: $email, password: $password, expiration: $expiration) {\n\t\t\tok\n\t\t\terrors {\n\t\t\t\tendUserMessage\n\t\t\t\tcode\n\t\t\t}\n\t\t\tresult {\n\t\t\t\ttoken\n\t\t\t\tperson {\n\t\t\t\t\tid\n\t\t\t\t\temail\n\t\t\t\t\tidentity {\n\t\t\t\t\t\tid\n\t\t\t\t\t\tprojects {\n\t\t\t\t\t\t\tproject {\n\t\t\t\t\t\t\t\tid\n\t\t\t\t\t\t\t\tslug\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\tmemberships {\n\t\t\t\t\t\t\t\trole\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t}\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t}\n";
@@ -221,6 +292,77 @@ export interface LoginMutationResponse {
         };
     };
 }
+
+// @public (undocumented)
+type Mutations = 'create' | 'update' | 'delete';
+
+// @public (undocumented)
+type OrderDirection = GraphQlLiteral<'asc'> | GraphQlLiteral<'desc'>;
+
+// @public (undocumented)
+type PaginateQueryArguments = 'filter' | 'orderBy' | 'skip' | 'first';
+
+// @public (undocumented)
+type Queries = 'get' | 'list' | 'paginate';
+
+// @public (undocumented)
+type ReadArguments = GetQueryArguments | ListQueryArguments | PaginateQueryArguments | HasOneArguments | HasManyArguments;
+
+// @public (undocumented)
+class ReadBuilder<AllowedArgs extends ReadArguments = ReadArguments> {
+    protected constructor(objectBuilder?: ObjectBuilder);
+    // (undocumented)
+    anyRelation(name: string, builder: ReadBuilder.BuilderFactory<never>, alias?: string): ReadBuilder.Builder<AllowedArgs>;
+    // (undocumented)
+    applyFragment(fragmentName: string): ReadBuilder.Builder<AllowedArgs>;
+    // (undocumented)
+    by(by: Input.UniqueWhere<GraphQlLiteral>): ReadBuilder.Builder<Exclude<AllowedArgs, "by">>;
+    // (undocumented)
+    column(name: string): ReadBuilder.Builder<AllowedArgs>;
+    // (undocumented)
+    filter(where: Input.Where<Input.Condition<Input.ColumnValue<GraphQlLiteral>>>): ReadBuilder.Builder<Exclude<AllowedArgs, "filter">>;
+    // (undocumented)
+    first(limit: number): ReadBuilder.Builder<Exclude<AllowedArgs, "first">>;
+    // (undocumented)
+    hasManyRelation(name: string, builder: ReadBuilder.BuilderFactory<HasManyArguments>, alias?: string): ReadBuilder.Builder<AllowedArgs>;
+    // (undocumented)
+    hasOneRelation(name: string, builder: ReadBuilder.BuilderFactory<HasOneArguments>, alias?: string): ReadBuilder.Builder<AllowedArgs>;
+    // (undocumented)
+    inlineFragment(typeName: string, builder: ReadBuilder.BuilderFactory<never>): ReadBuilder.Builder<AllowedArgs>;
+    // (undocumented)
+    static instantiate<AllowedArgs extends ReadArguments = ReadArguments>(objectBuilder?: ObjectBuilder): ReadBuilder.Builder<AllowedArgs>;
+    // (undocumented)
+    protected instantiate<AA extends ReadArguments = ReadArguments>(objectBuilder?: ObjectBuilder): ReadBuilder.Builder<AA>;
+    // (undocumented)
+    static instantiateFromFactory<AllowedArgs extends ReadArguments>(builder: ReadBuilder.BuilderFactory<AllowedArgs>): ReadBuilder.Builder<never>;
+    // (undocumented)
+    limit(limit: number): ReadBuilder.Builder<Exclude<AllowedArgs, "limit">>;
+    // Warning: (ae-forgotten-export) The symbol "ObjectBuilder" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    readonly objectBuilder: ObjectBuilder;
+    // (undocumented)
+    offset(offset: number): ReadBuilder.Builder<Exclude<AllowedArgs, "offset">>;
+    // (undocumented)
+    orderBy(orderBy: Input.OrderBy<OrderDirection>[]): ReadBuilder.Builder<Exclude<AllowedArgs, "orderBy">>;
+    // (undocumented)
+    reductionRelation(name: string, builder: ReadBuilder.BuilderFactory<ReductionArguments>, alias?: string): ReadBuilder.Builder<AllowedArgs>;
+    // (undocumented)
+    protected relation<A extends ReadArguments>(name: string, builder: ReadBuilder.BuilderFactory<A>, alias?: string): ReadBuilder.Builder<AllowedArgs>;
+    // (undocumented)
+    skip(offset: number): ReadBuilder.Builder<Exclude<AllowedArgs, "skip">>;
+}
+
+// @public (undocumented)
+namespace ReadBuilder {
+    // (undocumented)
+    type Builder<AllowedArgs extends ReadArguments> = Omit<ReadBuilder<AllowedArgs>, Exclude<ReadArguments, AllowedArgs>>;
+    // (undocumented)
+    type BuilderFactory<AllowedArgs extends ReadArguments> = Builder<never> | ((builder: Builder<AllowedArgs>) => Builder<never>);
+}
+
+// @public (undocumented)
+type ReductionArguments = 'filter' | 'by';
 
 // @public (undocumented)
 export interface RelationFilter {
@@ -301,6 +443,12 @@ export interface TreeFilter {
 }
 
 // @public (undocumented)
+type UpdateMutationArguments = 'data' | 'by';
+
+// @public (undocumented)
+type UpdateMutationFields = 'ok' | 'validation' | 'errors' | 'errorMessage' | 'node';
+
+// @public (undocumented)
 export interface UploadedFileMetadata {
     // (undocumented)
     abortSignal: AbortSignal;
@@ -310,6 +458,193 @@ export { Value }
 
 // @public (undocumented)
 export const whereToFilter: (by: Input.UniqueWhere<GraphQlLiteral>) => Input.Where<Input.Condition<Input.ColumnValue<GraphQlLiteral>>>;
+
+// @public (undocumented)
+type WriteArguments = CreateMutationArguments | UpdateMutationArguments | DeleteMutationArguments;
+
+// @public (undocumented)
+class WriteBuilder<AA extends WriteArguments, AF extends WriteFields, Op extends WriteOperation.Operation> {
+    protected constructor(objectBuilder?: ObjectBuilder);
+    // (undocumented)
+    by(by: Input.UniqueWhere<GraphQlLiteral>): WriteBuilder.Builder<Exclude<AA, "by">, AF, Op>;
+    // (undocumented)
+    data<SubOp extends Op & WriteOperation.ContentfulOperation>(data: WriteDataBuilder.DataLike<SubOp>): WriteBuilder.Builder<Exclude<AA, "data">, AF, Op>;
+    // (undocumented)
+    errorMessage(): WriteBuilder.Builder<AA, Exclude<AF, "errorMessage">, Op>;
+    // (undocumented)
+    errors(): WriteBuilder.Builder<AA, Exclude<AF, "errors">, Op>;
+    // (undocumented)
+    static instantiate<AA extends WriteArguments, AF extends WriteFields, Op extends WriteOperation.Operation>(objectBuilder?: ObjectBuilder): WriteBuilder.Builder<AA, AF, Op>;
+    // (undocumented)
+    static instantiateFromFactory<AA extends WriteArguments, AF extends WriteFields, Op extends WriteOperation.Operation>(builder: WriteBuilder.BuilderFactory<AA, AF, Op>): WriteBuilder.Builder<never, never, Op>;
+    // (undocumented)
+    node(builder: ReadBuilder.BuilderFactory<never>): WriteBuilder.Builder<AA, Exclude<AF, "node">, Op>;
+    // (undocumented)
+    readonly objectBuilder: ObjectBuilder;
+    // (undocumented)
+    ok(): WriteBuilder.Builder<AA, Exclude<AF, "ok">, Op>;
+    // (undocumented)
+    validation(): WriteBuilder.Builder<AA, Exclude<AF, "validation">, Op>;
+}
+
+// @public (undocumented)
+namespace WriteBuilder {
+    // (undocumented)
+    type Builder<AA extends WriteArguments, AF extends WriteFields, Op extends WriteOperation.Operation> = Omit<Omit<WriteBuilder<AA, AF, Op>, Exclude<WriteArguments, AA>>, Exclude<WriteFields, AF>>;
+    // (undocumented)
+    type BuilderFactory<AA extends WriteArguments, AF extends WriteFields, Op extends WriteOperation.Operation> = Builder<never, never, Op> | ((builder: Builder<AA, AF, Op>) => Builder<never, never, Op>);
+}
+
+// @public (undocumented)
+class WriteDataBuilder<Op extends WriteOperation.ContentfulOperation> {
+    constructor(data?: WriteDataBuilder.DataFormat[Op['op']]);
+    // (undocumented)
+    readonly data: WriteDataBuilder.DataFormat[Op['op']];
+    // (undocumented)
+    many(fieldName: string, data: WriteManyRelationBuilder.BuilderFactory<Op>): WriteDataBuilder<Op>;
+    // (undocumented)
+    one(fieldName: string, data: WriteOneRelationBuilder.BuilderFactory<Op>): WriteDataBuilder<Op>;
+    // (undocumented)
+    static resolveData<Op extends WriteOperation.ContentfulOperation>(dataLike: WriteDataBuilder.DataLike<Op>): WriteDataBuilder.DataFormat[Op['op']] | undefined;
+    // (undocumented)
+    set(fieldName: string, value: Input.ColumnValue<GraphQlLiteral>): WriteDataBuilder<Op>;
+}
+
+// @public (undocumented)
+namespace WriteDataBuilder {
+    // (undocumented)
+    interface DataFormat {
+        // (undocumented)
+        create: Input.CreateDataInput<GraphQlLiteral>;
+        // (undocumented)
+        update: Input.UpdateDataInput<GraphQlLiteral>;
+    }
+    // (undocumented)
+    type DataLike<Op extends WriteOperation.ContentfulOperation> = DataFormat[Op['op']] | WriteDataBuilder<Op> | ((builder: WriteDataBuilder<Op>) => WriteDataBuilder<Op>);
+}
+
+// @public (undocumented)
+type WriteFields = UpdateMutationFields | CreateMutationFields;
+
+// @public (undocumented)
+class WriteManyRelationBuilder<Op extends WriteOperation.ContentfulOperation, Allowed extends WriteRelationOps[Op['op']]> {
+    // (undocumented)
+    connect(where: Input.UniqueWhere<GraphQlLiteral>, alias?: string): WriteManyRelationBuilder.Builder<Op, WriteRelationOps[Op["op"]]>;
+    // (undocumented)
+    create(data: WriteDataBuilder.DataLike<WriteOperation.Create>, alias?: string): WriteManyRelationBuilder.Builder<Op>;
+    // (undocumented)
+    readonly data: WriteManyRelationBuilder.DataFormat[Op['op']];
+    // (undocumented)
+    delete(where: Input.UniqueWhere<GraphQlLiteral>, alias?: string): WriteManyRelationBuilder.Builder<WriteOperation.Update, "create" | "update" | "delete" | "connect" | "disconnect" | "upsert">;
+    // (undocumented)
+    disconnect(where: Input.UniqueWhere<GraphQlLiteral>, alias?: string): WriteManyRelationBuilder.Builder<WriteOperation.Update, "create" | "update" | "delete" | "connect" | "disconnect" | "upsert">;
+    // (undocumented)
+    static instantiate<Op extends WriteOperation.ContentfulOperation, Allowed extends WriteRelationOps[Op['op']] = WriteRelationOps[Op['op']]>(data?: WriteManyRelationBuilder.DataFormat[Op['op']]): WriteManyRelationBuilder.Builder<Op, Allowed>;
+    // (undocumented)
+    static instantiateFromFactory<Op extends WriteOperation.ContentfulOperation, Allowed extends WriteRelationOps[Op['op']]>(builder: WriteManyRelationBuilder.BuilderFactory<Op, Allowed>): WriteManyRelationBuilder.Builder<Op, never>;
+    // (undocumented)
+    update(where: Input.UniqueWhere<GraphQlLiteral>, data: WriteDataBuilder.DataLike<WriteOperation.Update>, alias?: string): WriteManyRelationBuilder.Builder<WriteOperation.Update>;
+    // (undocumented)
+    upsert(where: Input.UniqueWhere<GraphQlLiteral>, update: WriteDataBuilder.DataLike<WriteOperation.Update>, create: WriteDataBuilder.DataLike<WriteOperation.Create>, alias?: string): WriteManyRelationBuilder.Builder<WriteOperation.Update>;
+}
+
+// @public (undocumented)
+namespace WriteManyRelationBuilder {
+    // (undocumented)
+    type Builder<Op extends WriteOperation.ContentfulOperation, Allowed extends WriteRelationOps[Op['op']] = WriteRelationOps[Op['op']]> = Omit<WriteManyRelationBuilder<Op, Allowed>, Exclude<WriteRelationOps[WriteOperation.ContentfulOperation['op']], Allowed>>;
+    // (undocumented)
+    type BuilderFactory<Op extends WriteOperation.ContentfulOperation, Allowed extends WriteRelationOps[Op['op']] = WriteRelationOps[Op['op']]> = DataFormat[Op['op']] | Builder<Op, never> | ((builder: Builder<Op, Allowed>) => Builder<Op, never>);
+    // (undocumented)
+    interface DataFormat {
+        // (undocumented)
+        create: Input.CreateManyRelationInput<GraphQlLiteral>;
+        // (undocumented)
+        update: Input.UpdateManyRelationInput<GraphQlLiteral>;
+    }
+}
+
+// @public (undocumented)
+class WriteOneRelationBuilder<Op extends WriteOperation.ContentfulOperation, Allowed extends WriteRelationOps[Op['op']] = WriteRelationOps[Op['op']], D extends WriteOneRelationBuilder.DataFormat[Op['op']] | undefined = WriteOneRelationBuilder.DataFormat[Op['op']]> {
+    protected constructor(data?: D);
+    // (undocumented)
+    connect(where: Input.UniqueWhere<GraphQlLiteral>): WriteOneRelationBuilder.Builder<Op, never, WriteOneRelationBuilder.DataFormat[Op["op"]]>;
+    // (undocumented)
+    create(data: WriteDataBuilder.DataLike<WriteOperation.Create>): this | WriteOneRelationBuilder.Builder<Op, never, WriteOneRelationBuilder.DataFormat[Op["op"]]>;
+    // (undocumented)
+    readonly data: D;
+    // (undocumented)
+    delete(): WriteOneRelationBuilder.Builder<WriteOperation.Update, never, Input.UpdateOneRelationInput<GraphQlLiteral<string>>>;
+    // (undocumented)
+    disconnect(): WriteOneRelationBuilder.Builder<WriteOperation.Update, never, Input.UpdateOneRelationInput<GraphQlLiteral<string>>>;
+    // (undocumented)
+    static instantiate<Op extends WriteOperation.ContentfulOperation, Allowed extends WriteRelationOps[Op['op']] = WriteRelationOps[Op['op']], D extends WriteOneRelationBuilder.DataFormat[Op['op']] | undefined = WriteOneRelationBuilder.DataFormat[Op['op']]>(data?: D): WriteOneRelationBuilder.Builder<Op, Allowed, D>;
+    // (undocumented)
+    static instantiateFromFactory<Op extends WriteOperation.ContentfulOperation, Allowed extends WriteRelationOps[Op['op']] = WriteRelationOps[Op['op']], D extends WriteOneRelationBuilder.DataFormat[Op['op']] | undefined = WriteOneRelationBuilder.DataFormat[Op['op']]>(builder: WriteOneRelationBuilder.BuilderFactory<Op, Allowed, D>): WriteOneRelationBuilder.Builder<Op, never, D>;
+    // (undocumented)
+    update(data: WriteDataBuilder.DataLike<WriteOperation.Update>): WriteOneRelationBuilder<WriteOperation.ContentfulOperation, "create" | "update" | "delete" | "connect" | "disconnect" | "upsert", {
+        update: Input.UpdateDataInput<GraphQlLiteral<string>>;
+    }>;
+    // (undocumented)
+    upsert(update: WriteDataBuilder.DataLike<WriteOperation.Update>, create: WriteDataBuilder.DataLike<WriteOperation.Create>): this | WriteOneRelationBuilder.Builder<WriteOperation.Update, never, Input.UpdateOneRelationInput<GraphQlLiteral<string>>>;
+}
+
+// @public (undocumented)
+namespace WriteOneRelationBuilder {
+    // (undocumented)
+    type Builder<Op extends WriteOperation.ContentfulOperation, Allowed extends WriteRelationOps[Op['op']] = WriteRelationOps[Op['op']], D extends WriteOneRelationBuilder.DataFormat[Op['op']] | undefined = WriteOneRelationBuilder.DataFormat[Op['op']]> = Omit<WriteOneRelationBuilder<Op, Allowed, D>, Exclude<WriteRelationOps[WriteOperation.ContentfulOperation['op']], Allowed>>;
+    // (undocumented)
+    type BuilderFactory<Op extends WriteOperation.ContentfulOperation, Allowed extends WriteRelationOps[Op['op']] = WriteRelationOps[Op['op']], D extends WriteOneRelationBuilder.DataFormat[Op['op']] | undefined = WriteOneRelationBuilder.DataFormat[Op['op']]> = D | Builder<Op, never, D> | ((builder: Builder<Op, Allowed, D>) => Builder<Op, never, D>);
+    // (undocumented)
+    interface DataFormat {
+        // (undocumented)
+        create: Input.CreateOneRelationInput<GraphQlLiteral>;
+        // (undocumented)
+        update: Input.UpdateOneRelationInput<GraphQlLiteral>;
+    }
+}
+
+// @public (undocumented)
+namespace WriteOperation {
+    // (undocumented)
+    interface ContentfulOperation {
+        // (undocumented)
+        op: 'create' | 'update';
+    }
+    // (undocumented)
+    abstract class ContentfulOperation extends Operation implements ContentfulOperation {
+    }
+    // (undocumented)
+    class Create extends ContentfulOperation {
+        // (undocumented)
+        readonly op: "create";
+    }
+    // (undocumented)
+    class Delete extends Operation {
+        // (undocumented)
+        readonly op: "delete";
+    }
+    // (undocumented)
+    interface Operation {
+        // (undocumented)
+        op: 'create' | 'update' | 'delete';
+    }
+    // (undocumented)
+    abstract class Operation implements Operation {
+    }
+    // (undocumented)
+    class Update extends ContentfulOperation {
+        // (undocumented)
+        readonly op: "update";
+    }
+}
+
+// @public (undocumented)
+interface WriteRelationOps {
+    // (undocumented)
+    create: 'create' | 'connect';
+    // (undocumented)
+    update: 'create' | 'connect' | 'delete' | 'disconnect' | 'update' | 'upsert';
+}
 
 // (No @packageDocumentation comment for this package)
 

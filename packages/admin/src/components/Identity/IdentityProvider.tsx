@@ -80,7 +80,7 @@ export const IdentityProvider: React.FC<IdentityProviderProps> = ({ children, on
 			})
 		} catch (e) {
 			console.error(e)
-			if ('status' in e && e.status === 401) {
+			if (typeof e === 'object' && e !== null && 'status' in e && (e as { status?: unknown }).status === 401) {
 				logout({ noRedirect: true })
 				clearIdentity()
 				if (onInvalidIdentity) {

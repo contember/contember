@@ -2,6 +2,7 @@ import { readFileAsArrayBuffer } from '../../utils'
 import type { FileUploader, FileUploaderInitializeOptions } from './FileUploader'
 import { GenerateUploadUrlMutationBuilder } from './GenerateUploadUrlMutationBuilder'
 import type { UploadedFileMetadata } from './UploadedFileMetadata'
+import { FileUploadError } from './FileUploadError'
 
 interface S3UploadState {
 	request?: XMLHttpRequest
@@ -97,7 +98,13 @@ class S3FileUploader implements FileUploader<S3FileUploader.SuccessMetadata> {
 				xhr.send(uploadRequestBody)
 			}
 		} catch (error) {
-			onError(Array.from(files).map(([file]) => [file, error]))
+			if (error instanceof FileUploadError) {
+				const fileUploadError = error
+				onError(Array.from(files).map(([file]) => [file, fileUploadError]))
+
+			} else {
+				throw error
+			}
 		}
 	}
 }

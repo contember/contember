@@ -1,8 +1,8 @@
+import { CommonReactSelectStylesProps, useCommonReactSelectStyles } from '@contember/ui'
 import type { Props as SelectProps } from 'react-select'
 import { StylesConfig, useStateManager } from 'react-select'
 import type { ChoiceFieldData } from '../ChoiceField'
 import { SearchInput } from './SearchInput'
-import { CommonReactSelectStylesProps, useCommonReactSelectStyles } from './useCommonReactSelectStyles'
 
 export interface UseCommonReactSelectPropsProps<T> extends Omit<CommonReactSelectStylesProps, 'isInvalid'> {
 	reactSelectProps: Partial<SelectProps<any>> | undefined

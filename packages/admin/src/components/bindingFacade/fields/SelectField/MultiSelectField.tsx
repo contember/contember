@@ -1,5 +1,5 @@
 import { Component, EntityAccessor } from '@contember/binding'
-import { FieldContainer, FieldContainerProps, FieldErrors, getPortalRoot, SelectCreateNewWrapper } from '@contember/ui'
+import { FieldContainer, FieldContainerProps, FieldErrors, getPortalRoot, PublicCommonReactSelectStylesProps, SelectCreateNewWrapper } from '@contember/ui'
 import { FunctionComponent, memo, MouseEventHandler, useCallback } from 'react'
 import type { MultiValueGenericProps, MultiValueProps, Props as SelectProps } from 'react-select'
 import Select, { ActionMeta, components } from 'react-select'
@@ -14,7 +14,6 @@ import { useLabelMiddleware } from '../../environment/LabelMiddleware'
 import { shouldCancelStart } from '../../helpers/shouldCancelStart'
 import { ChoiceFieldData, DynamicMultiChoiceField, DynamicMultipleChoiceFieldProps } from '../ChoiceField'
 import { useCommonReactSelectProps } from './useCommonReactSelectProps'
-import { PublicCommonReactSelectStylesProps } from './useCommonReactSelectStyles'
 
 export type MultiSelectFieldProps =
 	& MultiSelectFieldInnerPublicProps

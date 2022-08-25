@@ -71,11 +71,15 @@
 		height: calc(100vh - var(--cui-padding))
 		width: calc(100vw - var(--cui-padding))
 
-	&-close-button
-		margin-left: calc(-0.5 * (var(--cui-button-height) - 1em))
-		margin-right: calc(-0.5 * (var(--cui-button-height) - 1em))
-		margin-bottom: calc(-0.5 * (var(--cui-button-height) - 1em))
-		margin-top: calc(-0.5 * (var(--cui-button-height) - 1em))
+	&-close-button.cui-button.view-seamless
+		margin-bottom: calc(-1 * (var(--cui-button-height) - var(--cui-button-line-height)) / 2)
+		margin-top: calc(-1 * (var(--cui-button-height) - var(--cui-button-line-height)) / 2)
+		&:last-child
+			margin-right: calc(-1 * var(--cui-button-padding-horizontal))
+		&.view-squarish,
+		&.view-circular
+			&:last-child
+				margin-right: calc(-1 * (var(--cui-button-height) - var(--cui-button-line-height)) / 2)
 
 	&-header
 		padding-left: var(--cui-dialog-modal-header-padding-left)

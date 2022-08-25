@@ -21,4 +21,9 @@ test('basic test', async ({ page, userAgent }) => {
 	await page.waitForLoadState('networkidle') // wait for fonts
 	await page.waitForTimeout(200)
 	expect(await page.screenshot()).toMatchSnapshot('initial.png')
+
+	await page.goto(`/${projectSlug}/repeaterItemContainerWithActions`)
+	await page.waitForLoadState('networkidle') // wait for fonts
+	await page.waitForTimeout(200)
+	expect(await page.screenshot()).toMatchSnapshot('with-actions.png')
 })

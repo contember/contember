@@ -32,6 +32,7 @@
 	--cui-button-border-width: 0px
 	--cui-button-label-font-size: var(--cui-font-size-label)
 	--cui-button-height: var(--cui-control-height)
+	--cui-button-line-height: 1em
 	--cui-button-padding-horizontal: calc(4 * var(--cui-gap))
 
 	align-items: center
@@ -107,10 +108,16 @@
 	&.view-justifyEnd
 		justify-content: end
 
-	&.view-squarish,
-	&.view-circular
+	&.view-squarish
 		height: var(--cui-button-height)
 		width: var(--cui-button-height)
+	&.view-circular
+		// Radius of circle with same area as square is around 56.41% of the square width
+		// const radius = Math.sqrt(width * width / Math.PI)
+		--cui-circular-button-extra-optical-size: calc(var(--cui-button-height) * 0.5641895835477563 - var(--cui-button-height) / 2)
+		height: calc(var(--cui-button-height) + 2 * var(--cui-circular-button-extra-optical-size))
+		margin: calc(-1 * var(--cui-circular-button-extra-optical-size))
+		width: calc(var(--cui-button-height) + 2 * var(--cui-circular-button-extra-optical-size))
 	&.view-generous,
 	&.view-generousBlock
 		--cui-button-padding-horizontal: calc(var(--cui-gap) * 11 - var(--cui-control-border-width, 1px))
@@ -125,7 +132,7 @@
 		--cui-button-color--highlighted: var(--cui-control-color--highlighted)
 		--cui-button-color--pressed: var(--cui-control-color--pressed)
 		position: relative
-		&:not(.view-large):not(.view-generousBlock):not(.view-squarish):not(.view-circular)
+		&:not(.view-generousBlock):not(.view-squarish):not(.view-circular)
 			--cui-button-height: auto
 			--cui-button-padding-horizontal: calc(var(--cui-gap) - var(--cui-control-border-width, 1px))
 	&.view-primary
@@ -190,7 +197,7 @@
 	&-content
 		font-size: var(--cui-button-label-font-size)
 		flex: 1
-		line-height: 1em
+		line-height: var(--cui-button-line-height)
 		padding-bottom: calc(var(--cui-gap) - var(--cui-control-border-width, 1px))
 		padding-top: calc(var(--cui-gap) - var(--cui-control-border-width, 1px))
 		overflow: hidden

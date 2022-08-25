@@ -15,8 +15,10 @@
 	width: 100%
 
 	*[contenteditable="true"]
-		padding-bottom: var(--cui-gap)
-		padding-top: var(--cui-gap)
+		margin-bottom: calc(-1 * var(--cui-control-border-width))
+		margin-top: calc(-1 * var(--cui-control-border-width))
+		padding-bottom: calc(2 * var(--cui-gap) - var(--cui-control-border-width))
+		padding-top: calc(2 * var(--cui-gap) - var(--cui-control-border-width))
 		border-radius: var(--cui-control-border-radius)
 		flex-grow: 1
 

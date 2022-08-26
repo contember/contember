@@ -45,14 +45,13 @@ export class SystemApiMiddlewareFactory {
 
 			const tenantContainer = groupContainer.tenantContainer
 			const memberships = await timer('MembershipFetch', () =>
-				tenantContainer.projectMemberManager.getProjectMemberships(
+				tenantContainer.projectMemberManager.getEffectiveProjectMemberships(
 					tenantContainer.databaseContext,
 					{ slug: project.slug },
 					{
 						id: authResult.identityId,
 						roles: authResult.roles,
 					},
-					undefined,
 				),
 			)
 			if (memberships.length === 0) {

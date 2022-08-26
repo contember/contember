@@ -63,14 +63,15 @@ export class CreateApiKeyMutationResolver implements MutationResolvers {
 		context: TenantResolverContext,
 		info: GraphQLResolveInfo,
 	): Promise<CreateApiKeyResponse> {
+		roles ??= []
 		await context.requireAccess({
-			action: PermissionActions.API_KEY_CREATE_GLOBAL,
+			action: PermissionActions.API_KEY_CREATE_GLOBAL(roles),
 			message: 'You are not allowed to create a global API key',
 		})
 		if (typeof tokenHash === 'string' && !isTokenHash(tokenHash)) {
 			throw new UserInputError('Invalid format of tokenHash. Must be hex-encoded sha256.')
 		}
-		const result = await this.apiKeyManager.createGlobalPermanentApiKey(context.db, description, roles ?? [], tokenHash ?? undefined)
+		const result = await this.apiKeyManager.createGlobalPermanentApiKey(context.db, description, roles, tokenHash ?? undefined)
 		return {
 			ok: true,
 			errors: [],

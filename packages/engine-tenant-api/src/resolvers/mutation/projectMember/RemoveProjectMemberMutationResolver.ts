@@ -20,22 +20,23 @@ export class RemoveProjectMemberMutationResolver implements MutationResolvers {
 		context: TenantResolverContext,
 	): Promise<RemoveProjectMemberResponse> {
 		const project = await this.projectManager.getProjectBySlug(context.db, projectSlug)
+		const projectScope = await context.permissionContext.createProjectScope(project)
 		await context.requireAccess({
-			scope: await context.permissionContext.createProjectScope(project),
+			scope: projectScope,
 			action: PermissionActions.PROJECT_REMOVE_MEMBER([]),
 			message: 'You are not allowed to remove a project member',
 		})
 		if (!project) {
 			return createProjectNotFoundResponse(RemoveProjectMemberErrorCode.ProjectNotFound, projectSlug)
 		}
-		const memberships = await this.projectMemberManager.getProjectMemberships(
+		const memberships = await this.projectMemberManager.getStoredProjectsMemberships(
 			context.db,
 			{ id: project.id },
 			{ id: identityId },
-			undefined,
+			context.permissionContext.createAccessVerifier(projectScope),
 		)
 		await context.requireAccess({
-			scope: await context.permissionContext.createProjectScope(project),
+			scope: projectScope,
 			action: PermissionActions.PROJECT_REMOVE_MEMBER(memberships),
 			message: 'You are not allowed to remove a project member',
 		})

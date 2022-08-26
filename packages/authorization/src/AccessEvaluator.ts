@@ -1,6 +1,6 @@
-import Permissions from './Permissions'
-import AccessNode from './AccessNode'
-import Authorizator from './Authorizator'
+import { Permissions } from './Permissions'
+import { AccessNode } from './AccessNode'
+import { Authorizator } from './Authorizator'
 
 interface AccessEvaluator {
 	evaluate(accessNode: AccessNode, action: Authorizator.Action): Promise<boolean>
@@ -10,12 +10,12 @@ namespace AccessEvaluator {
 	export class PermissionEvaluator implements AccessEvaluator {
 		constructor(private readonly permissions: Permissions) {}
 
-		async evaluate(accessNode: AccessNode, { resource, privilege }: Authorizator.Action): Promise<boolean> {
+		async evaluate(accessNode: AccessNode, { resource, privilege, meta }: Authorizator.Action<any>): Promise<boolean> {
 			if (!(accessNode instanceof AccessNode.Roles)) {
 				throw new UnsupportedAccessNodeError()
 			}
 			for (let role of accessNode.roles) {
-				if (this.permissions.isAllowed(role, resource, privilege)) {
+				if (this.permissions.isAllowed(role, resource, privilege, meta)) {
 					return true
 				}
 			}
@@ -26,4 +26,4 @@ namespace AccessEvaluator {
 	class UnsupportedAccessNodeError extends Error {}
 }
 
-export default AccessEvaluator
+export { AccessEvaluator }

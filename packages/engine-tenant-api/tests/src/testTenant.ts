@@ -1,7 +1,7 @@
 import { GraphQLTestQuery } from '../cases/integration/mocked/gql/types'
 import { testUuid } from './testUuid'
 import {
-	AclSchemaEvaluatorFactory,
+	AclSchemaAccessNodeFactory,
 	createResolverContext,
 	PermissionContext,
 	ProjectSchemaResolver,
@@ -108,7 +108,7 @@ export const executeTenantTest = async (test: Test) => {
 				{
 					isAllowed: () => Promise.resolve(true),
 				},
-				new ProjectScopeFactory(new AclSchemaEvaluatorFactory()),
+				new ProjectScopeFactory(new AclSchemaAccessNodeFactory()),
 				projectSchemaResolver,
 			),
 			authenticatedApiKeyId,

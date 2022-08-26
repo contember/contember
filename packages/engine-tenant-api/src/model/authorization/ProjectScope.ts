@@ -2,16 +2,14 @@ import { AccessNode, AuthorizationScope } from '@contember/authorization'
 import { Project } from '../type'
 import { TenantRole } from './Roles'
 import { Acl, ProjectRole } from '@contember/schema'
-import { SwitchEvaluatorNode } from './SwitchEvaluatorNode'
-import { AclSchemaEvaluatorFactory } from './AclSchemaEvaluatorFactory'
+import { AclSchemaAccessNodeFactory } from './AclSchemaAccessNodeFactory'
 import { Identity } from './Identity'
-import { MembershipAwareAccessNode } from './MembershipAwareAccessNode'
 
 export class ProjectScope implements AuthorizationScope<Identity> {
 	constructor(
 		private readonly project: Pick<Project, 'slug'>,
 		private readonly aclSchema: Acl.Schema,
-		private readonly aclSchemaEvaluatorFactory: AclSchemaEvaluatorFactory,
+		private readonly aclSchemaAccessNodeFactory: AclSchemaAccessNodeFactory,
 	) {}
 
 	async getIdentityAccess(identity: Identity): Promise<AccessNode> {
@@ -24,13 +22,10 @@ export class ProjectScope implements AuthorizationScope<Identity> {
 		if (projectRoles.includes(ProjectRole.ADMIN)) {
 			tenantRoles.push(TenantRole.PROJECT_ADMIN)
 		}
-		const evaluator = await this.aclSchemaEvaluatorFactory.create(this.aclSchema)
+		const accessNode = this.aclSchemaAccessNodeFactory.create(this.aclSchema, projectMemberships)
 		return new AccessNode.Union([
 			new AccessNode.Roles(tenantRoles),
-			new AccessNode.Intersection([
-				new SwitchEvaluatorNode(new AccessNode.Roles(projectRoles), evaluator),
-				new MembershipAwareAccessNode(projectMemberships, this.aclSchema),
-			]),
+			accessNode,
 		])
 	}
 }

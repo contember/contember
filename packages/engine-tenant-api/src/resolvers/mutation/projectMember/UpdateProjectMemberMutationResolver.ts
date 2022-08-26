@@ -39,7 +39,7 @@ export class UpdateProjectMemberMutationResolver implements MutationResolvers {
 		if (!project) {
 			return createProjectNotFoundResponse(UpdateProjectMemberErrorCode.ProjectNotFound, projectSlug)
 		}
-		const visibleMemberships = await this.projectMemberManager.getProjectMemberships(
+		const visibleMemberships = await this.projectMemberManager.getStoredProjectsMemberships(
 			context.db,
 			{ id: project.id },
 			{ id: identityId },

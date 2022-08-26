@@ -1,6 +1,6 @@
-import AuthorizationScope from './AuthorizationScope'
-import AccessEvaluator from './AccessEvaluator'
-import AccessNode from './AccessNode'
+import { AuthorizationScope } from './AuthorizationScope'
+import { AccessEvaluator } from './AccessEvaluator'
+import { AccessNode } from './AccessNode'
 
 interface Authorizator<Identity extends Authorizator.Identity = Authorizator.Identity> {
 	isAllowed(identity: Identity, scope: AuthorizationScope<Identity>, action: Authorizator.Action): Promise<boolean>
@@ -9,9 +9,9 @@ interface Authorizator<Identity extends Authorizator.Identity = Authorizator.Ide
 namespace Authorizator {
 	export type Resource = string
 	export type Privilege = string
-	export type Action<Meta = undefined> = Meta extends undefined
-		? { resource: Resource; privilege: Privilege }
-		: { resource: Resource; privilege: Privilege; meta: Meta }
+	export type Action<Meta extends undefined | {} = undefined | Record<string, unknown>> = Meta extends {}
+		? { resource: Resource; privilege: Privilege; meta: Meta }
+		: { resource: Resource; privilege: Privilege; meta?: Meta }
 
 	type ActionCreator =
 		| ((resource: Resource, privilege: Privilege) => Action)
@@ -47,4 +47,4 @@ namespace Authorizator {
 	}
 }
 
-export default Authorizator
+export { Authorizator }

@@ -1,4 +1,4 @@
-import AccessNode from './AccessNode'
+import { AccessNode } from './AccessNode'
 
 interface AuthorizationScope<Identity> {
 	getIdentityAccess(identity: Identity): Promise<AccessNode>
@@ -44,4 +44,4 @@ namespace AuthorizationScope {
 	}
 }
 
-export default AuthorizationScope
+export { AuthorizationScope }

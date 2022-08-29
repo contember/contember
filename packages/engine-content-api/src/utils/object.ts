@@ -9,18 +9,18 @@ function filterObject<Input extends {}, Result extends { [Key in keyof Input]: I
 	object: Input,
 	callback: TypeGuard<Input, Result> | Filter<Input>,
 ): Result {
-	return (Object.entries(object) as any)
-		.filter(<K extends keyof Input>(it: [K, Input[K]]): it is [K, Result[K]] =>
-			(callback as any)(it[0] as K, it[1] as Input[K], object),
-		)
-		.reduce((result: Result, [key, value]: [string, any]) => ({ ...(result as any), [key]: value }), {} as Result)
+	return Object.fromEntries(Object.entries(object)
+		.filter(([key, value]) => (callback as any)(key, value, object)),
+	) as Result
 }
 
 function mapObject<Input, Result>(
 	input: { [key: string]: Input },
 	callback: (value: Input, key: string) => Result,
 ): { [key: string]: Result } {
-	return Object.keys(input).reduce((acc, key) => ({ ...acc, [key]: callback(input[key], key) }), {})
+	return Object.fromEntries(
+		Object.entries(input).map(([key, value]) => [key, callback(value, key)]),
+	)
 }
 
 export { filterObject, mapObject }

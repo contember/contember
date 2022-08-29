@@ -47,6 +47,8 @@ export class Router {
 
 				case '':
 				case '_static':
+				case 'favicon.ico':
+				case 'robots.txt':
 					return (req, res) => this.loginController.handle(req, res, { projectGroup })
 
 				case 'p':

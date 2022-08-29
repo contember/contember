@@ -17,7 +17,7 @@ export class PermissionFactory {
 			}
 			result = this.mergePermissions(result, rolePermissions)
 		}
-		this.makePrimaryPredicatesUnionOfAllFields(result)
+		result = this.makePrimaryPredicatesUnionOfAllFields(result)
 
 		return result
 	}
@@ -45,18 +45,20 @@ export class PermissionFactory {
 		}))
 	}
 
-	private makePrimaryPredicatesUnionOfAllFields(permissions: Acl.Permissions): void {
-		for (let entityName in permissions) {
+	private makePrimaryPredicatesUnionOfAllFields(permissions: Acl.Permissions): Acl.Permissions {
+		return mapObject(permissions, (permission, entityName): Acl.EntityPermissions => {
 			const entity = getEntity(this.schema, entityName)
-			const entityPermissions: Acl.EntityPermissions = permissions[entityName]
-			const entityPredicates: Writable<Acl.PredicateMap> = entityPermissions.predicates
+			const entityPredicates: Writable<Acl.PredicateMap> = { ...permission.predicates }
+			const entityOperations: Writable<Acl.EntityOperations> = { ...permission.operations }
 
 			const operationNames = ['read', 'create', 'update'] as const
 			for (let operation of operationNames) {
-				const fieldPermissions: Writable<Acl.FieldPermissions> | undefined = entityPermissions.operations[operation]
-				if (fieldPermissions === undefined) {
+				if (!entityOperations[operation]) {
 					continue
 				}
+				const fieldPermissions: Writable<Acl.FieldPermissions> = { ...entityOperations[operation] }
+				entityOperations[operation] = fieldPermissions
+
 				if (Object.values(fieldPermissions).some(it => it === true)) {
 					fieldPermissions[entity.primary] = true
 				}
@@ -70,25 +72,28 @@ export class PermissionFactory {
 					.filter((value, index, array): value is string => array.indexOf(value) === index)
 
 				let idPermissions: Acl.Predicate = fieldPermissions[entity.primary] || false
-				const predicates = { ...entityPermissions.predicates }
 
 				for (let predicateReference of predicateReferences) {
 					const [predicateDefinition, predicate] = this.mergePredicates(
-						predicates,
+						entityPredicates,
 						idPermissions,
-						predicates,
+						entityPredicates,
 						predicateReference,
 					)
 					if (typeof predicate !== 'string' || predicateDefinition === undefined) {
 						throw new Error('should not happen')
 					}
 					idPermissions = predicate
-					predicates[predicate] = predicateDefinition
+					entityPredicates[predicate] = predicateDefinition
 				}
 				fieldPermissions[entity.primary] = idPermissions
-				entityPredicates[idPermissions as Acl.PredicateReference] = predicates[idPermissions as Acl.PredicateReference]
+				entityPredicates[idPermissions as Acl.PredicateReference] = entityPredicates[idPermissions as Acl.PredicateReference]
 			}
-		}
+			return {
+				operations: entityOperations,
+				predicates: entityPredicates,
+			}
+		})
 	}
 
 	private mergePermissions(left: Acl.Permissions, right: Acl.Permissions): Acl.Permissions {

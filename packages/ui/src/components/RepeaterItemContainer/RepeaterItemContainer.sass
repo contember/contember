@@ -1,4 +1,4 @@
-.#{$cui-conf-globalPrefix}repeater-item-container
+.cui-repeater-item-container
 	$root: &
 
 	--cui-box-background-focused-overlay: linear-gradient(rgba(var(--cui-controls-1000), 0.01), rgba(var(--cui-controls-1000), 0.01))
@@ -10,8 +10,10 @@
 		--cui-box-content-padding-left: calc(2 * var(--cui-box-content-padding))
 
 	&-header
+		align-items: center
 		display: flex
 		justify-content: space-between
+		gap: calc(2 * var(--cui-gap))
 	&-content
 		//
 
@@ -32,11 +34,23 @@
 	&-label
 		font-weight: 800
 	&-actions
-		margin-left: var(--line-height-negative-vertical-space)
-		margin-right: calc(-1 * var(--line-height-negative-vertical-space))
-		margin-top: calc(-1 * var(--line-height-negative-vertical-space))
+		align-items: center
+		display: flex
+		gap: inherit
 
 	&.is-active,
 	&:focus-within
 		color: var(--cui-control-color)
 		background-image: var(--cui-box-background-focused-overlay)
+
+:where(.cui-repeater-item-container-actions) .cui-button.view-seamless
+	margin-bottom: calc(-1 * (var(--cui-button-height) - var(--cui-button-line-height)) / 2)
+	margin-top: calc(-1 * (var(--cui-button-height) - var(--cui-button-line-height)) / 2)
+
+:where(.cui-repeater-item-container-actions) .cui-button.view-seamless
+	&:last-child
+		margin-right: calc(-1 * var(--cui-button-padding-horizontal))
+	&.view-squarish,
+	&.view-circular
+		&:last-child
+			margin-right: calc(-1 * (var(--cui-button-height) - var(--cui-button-line-height)) / 2)

@@ -1,7 +1,6 @@
 import type { IncomingMessage, ServerResponse } from 'http'
 import { BaseController } from './BaseController'
 import { StaticFileHandler } from '../services/StaticFileHandler'
-import { S3Manager } from '../services/S3Manager'
 import { ConfigResolver } from '../services/ConfigResolver'
 
 const CONTEMBER_CONFIG_PLACEHOLDER = '{configuration}'
@@ -13,7 +12,6 @@ interface LoginParams {
 export class LoginController extends BaseController<LoginParams> {
 	constructor(
 		private staticFileHandler: StaticFileHandler,
-		private s3Manager: S3Manager,
 		private configResolver: ConfigResolver,
 	) {
 		super()

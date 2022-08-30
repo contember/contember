@@ -77,8 +77,6 @@ export const LayoutChrome = memo(({
 	const contentRef = useRef<HTMLDivElement>(null)
 	const barContentOffsetTop = useElementTopOffset(contentRef)
 
-	console.log(barContentOffsetTop)
-
 	useEffect(() => {
 		const contentRefCopy = contentRef.current
 		const listener = () => {

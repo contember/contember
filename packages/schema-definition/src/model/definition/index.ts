@@ -1,4 +1,4 @@
-import { EntityConstructor, Interface } from './types'
+import { Interface } from './types'
 import { Model } from '@contember/schema'
 import { EnumDefinition } from './EnumDefinition'
 import { SchemaBuilder } from './internal'

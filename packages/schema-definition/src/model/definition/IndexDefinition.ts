@@ -1,6 +1,6 @@
-import { DecoratorFunction } from './types'
 import { extendEntity } from './extensions'
 import { NamingHelper } from '@contember/schema-utils'
+import { DecoratorFunction } from '../../utils'
 
 export type IndexOptions<T> = { name?: string; fields: (keyof T)[] }
 export function Index<T>(options: IndexOptions<T>): DecoratorFunction<T>

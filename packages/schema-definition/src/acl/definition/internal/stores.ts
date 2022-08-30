@@ -1,4 +1,4 @@
-import { createMetadataStore } from './MetadataStore'
+import { createMetadataStore } from '../../../utils/MetadataStore'
 import { Role } from '../roles'
 import { AllowDefinition } from '../permissions'
 

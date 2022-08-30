@@ -1,4 +1,4 @@
-import { EntityConstructor } from '../model/definition/types'
+import { EntityConstructor } from './decorators'
 
 export const filterEntityDefinition = (definitions: Record<string, unknown>): [string, EntityConstructor][] => Object.entries(definitions)
 	.filter((it): it is [string, EntityConstructor] => isEntityConstructor(it[1]))

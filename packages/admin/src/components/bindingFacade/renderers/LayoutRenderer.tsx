@@ -10,6 +10,7 @@ export const LayoutRenderer: FunctionComponent<LayoutRendererProps> = Component(
 	props => (
 		<>
 			{props.title}
+			{props.afterTitle}
 			{props.children}
 			{props.side}
 			{props.actions}

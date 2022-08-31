@@ -963,6 +963,9 @@ export interface CustomMarkPlugin {
 export const cycleOrderDirection: (direction: DataGridOrderDirection) => DataGridOrderDirection;
 
 // @public (undocumented)
+export const DATA_GRID_DEFAULT_ITEMS_PER_PAGE = 50;
+
+// @public (undocumented)
 export const DataGrid: <ComponentProps>(props: DataGridProps<ComponentProps>) => ReactElement;
 
 // @public (undocumented)

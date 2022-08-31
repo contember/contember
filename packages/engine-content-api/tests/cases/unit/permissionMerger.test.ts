@@ -15,8 +15,10 @@ const execute = (test: Test) => {
 		.entity('Entity2', e => e.oneHasOne('xyz', r => r.target('Entity1')))
 		.buildSchema()
 	const merger = new PermissionFactory(schema)
+	const initialAcl = JSON.parse(JSON.stringify(test.acl))
 	const result = merger.create(test.acl, test.roles)
 	assert.deepStrictEqual(result, test.result)
+	assert.deepStrictEqual(test.acl, initialAcl)
 }
 
 describe('Permission merger', () => {

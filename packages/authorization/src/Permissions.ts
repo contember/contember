@@ -3,7 +3,7 @@ import { Authorizator } from './Authorizator'
 class Permissions {
 	private permissions: Permissions.PermissionsMap = {}
 
-	public allow<Meta = undefined>(
+	public allow<Meta extends {} | undefined = undefined>(
 		role: string,
 		{ resource, privilege }: Authorizator.Action<Meta>,
 		verifier: (meta: Meta) => boolean = () => true,

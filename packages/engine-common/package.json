@@ -8,6 +8,6 @@
   },
   "typings": "dist/src/index.d.ts",
   "devDependencies": {
-    "@types/node": "^16"
+    "@types/node": "^18"
   }
 }

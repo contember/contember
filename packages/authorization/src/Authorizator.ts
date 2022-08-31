@@ -15,10 +15,10 @@ namespace Authorizator {
 
 	type ActionCreator =
 		| ((resource: Resource, privilege: Privilege) => Action)
-		| (<Meta>(resource: Resource, privilege: Privilege, meta: Meta) => Action<Meta>)
+		| (<Meta extends {} | undefined>(resource: Resource, privilege: Privilege, meta: Meta) => Action<Meta>)
 
 	export function createAction(resource: Resource, privilege: Privilege): Action<undefined>
-	export function createAction<Meta>(resource: Resource, privilege: Privilege, meta: Meta): Action<Meta>
+	export function createAction<Meta extends {} | undefined>(resource: Resource, privilege: Privilege, meta: Meta): Action<Meta>
 	export function createAction<Meta>(resource: Resource, privilege: Privilege, meta?: Meta) {
 		return {
 			resource,

@@ -32,7 +32,7 @@ export class PermissionContext {
 		return action => this.isAllowed({ scope, action })
 	}
 
-	public async requireAccess<Meta>({
+	public async requireAccess<Meta extends {} | undefined>({
 		scope,
 		action,
 		message,

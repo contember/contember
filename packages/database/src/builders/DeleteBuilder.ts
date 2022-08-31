@@ -37,7 +37,7 @@ class DeleteBuilder<Result extends DeleteBuilder.DeleteResult> implements Return
 		return this.withOption('using', { ...this.options.using, [alias || tableName]: tableName })
 	}
 
-	public returning<R = Returning.Result>(...columns: Returning.ReturningColumn[]): DeleteBuilder<R[]> {
+	public returning<R extends Returning.Result = Returning.Result>(...columns: Returning.ReturningColumn[]): DeleteBuilder<R[]> {
 		return this.withOption('returning', new Returning(columns)) as DeleteBuilder<any>
 	}
 

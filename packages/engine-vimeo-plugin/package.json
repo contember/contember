@@ -15,7 +15,7 @@
     "node-fetch": "^2.0"
   },
   "devDependencies": {
-    "@types/node": "^16",
+    "@types/node": "^18",
     "@types/node-fetch": "^2.5.4",
     "graphql": "^16.5.0"
   },

@@ -11,6 +11,6 @@
     "@contember/schema": "^1.2.0-alpha.8"
   },
   "devDependencies": {
-    "@types/node": "^16"
+    "@types/node": "^18"
   }
 }

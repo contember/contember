@@ -39,7 +39,7 @@
   "devDependencies": {
     "@contember/engine-api-tester": "^1.2.0-alpha.8",
     "@types/koa-compress": "^4.0.1",
-    "@types/node": "^16",
+    "@types/node": "^18",
     "@types/supertest": "^2.0.8",
     "supertest": "^6.0.1"
   }

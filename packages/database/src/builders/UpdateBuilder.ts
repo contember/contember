@@ -35,7 +35,7 @@ class UpdateBuilder<Result extends UpdateBuilder.UpdateResult> implements With.A
 		return this.withOption('values', resolveValues(columns))
 	}
 
-	public returning<R = Returning.Result>(...columns: Returning.ReturningColumn[]): UpdateBuilder<R[]> {
+	public returning<R extends Returning.Result = Returning.Result>(...columns: Returning.ReturningColumn[]): UpdateBuilder<R[]> {
 		return this.withOption('returning', new Returning(columns)) as UpdateBuilder<any>
 	}
 

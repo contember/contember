@@ -9,7 +9,7 @@ type PermissionsMap = {
 export class DirectPermissionsAccessNode implements AccessNode {
 	private permissions: PermissionsMap = {}
 
-	public allow<Meta = undefined>(
+	public allow<Meta extends {} | undefined = undefined>(
 		{ resource, privilege }: Authorizator.Action<Meta>,
 		verifier: (meta: Meta) => boolean = () => true,
 	) {

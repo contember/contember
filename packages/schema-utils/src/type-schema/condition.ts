@@ -1,5 +1,5 @@
 import * as Typesafe from '@contember/typesafe'
-import { Type } from '@contember/typesafe'
+import { Json, Type } from '@contember/typesafe'
 import { Input, Model, Value } from '@contember/schema'
 
 export const conditionSchema = <T extends Value.FieldValue>(type?: Model.ColumnType): Type<Input.Condition<T>> => {
@@ -7,13 +7,13 @@ export const conditionSchema = <T extends Value.FieldValue>(type?: Model.ColumnT
 	return conditionSchemaInner(metadata)
 }
 
-interface ResolvedColumnMetadata<T> {
+interface ResolvedColumnMetadata<T extends Json> {
 	type: Typesafe.Type<T>
 	isJson?: boolean
 	isString?: boolean
 }
 
-const conditionSchemaInner = <T>(metadata: ResolvedColumnMetadata<T>): Type<Input.Condition<T>> => {
+const conditionSchemaInner = <T extends Json>(metadata: ResolvedColumnMetadata<T>): Type<Input.Condition<T>> => {
 	return (input: unknown, path: PropertyKey[] = []): Input.Condition<T> => {
 		const self = conditionSchemaInner(metadata)
 		const inner = metadata.type

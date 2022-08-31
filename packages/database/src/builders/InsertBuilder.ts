@@ -89,7 +89,7 @@ class InsertBuilder<Result extends InsertBuilder.InsertResult> implements With.A
 		return this.withOption('onConflict', conflictAction)
 	}
 
-	public returning<R = Returning.Result>(...columns: Returning.ReturningColumn[]): InsertBuilder<R[]> {
+	public returning<R extends Returning.Result = Returning.Result>(...columns: Returning.ReturningColumn[]): InsertBuilder<R[]> {
 		return this.withOption('returning', new Returning(columns)) as InsertBuilder<any>
 	}
 

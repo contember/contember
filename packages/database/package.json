@@ -12,7 +12,7 @@
   },
   "devDependencies": {
     "@contember/database-tester": "^1.2.0-alpha.8",
-    "@types/node": "^16",
+    "@types/node": "^18",
     "pg": "^8.5.0"
   },
   "peerDependencies": {

@@ -13,6 +13,6 @@
 
 		"strict": true,
 		"incremental": true,
-		"lib": ["esnext"]
+		"lib": ["esnext", "DOM"]
 	}
 }

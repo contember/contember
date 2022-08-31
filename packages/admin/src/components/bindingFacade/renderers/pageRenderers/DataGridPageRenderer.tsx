@@ -15,12 +15,14 @@ export const DataGridPageRenderer = Component(({
 		headingProps,
 		actions,
 		layout,
+		afterTitle,
 
 		...entityListProps
 	}: DataGridPageRendererProps) => (
 		<LayoutRenderer
 			side={side}
 			title={title}
+			afterTitle={afterTitle}
 			navigation={navigation}
 			actions={actions}
 			headingProps={headingProps}

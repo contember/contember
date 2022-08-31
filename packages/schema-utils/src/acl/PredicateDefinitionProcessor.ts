@@ -61,6 +61,7 @@ class PredicateDefinitionProcessor {
 					})
 					if (
 						typeof processedValue === 'object' &&
+						processedValue !== null &&
 						'constructor' in processedValue &&
 						processedValue.constructor.name === 'Object'
 					) {

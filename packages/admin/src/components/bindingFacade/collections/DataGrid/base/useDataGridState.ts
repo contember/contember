@@ -13,11 +13,13 @@ import { DataGridLayout } from './DataGridLayout'
 import { DataGridState, DataGridStateMethods } from './DataGridState'
 import { useDataGridKey } from './useDataGridKey'
 
+export const DATA_GRID_DEFAULT_ITEMS_PER_PAGE = 50
+
 export const useDataGridState = (props: Pick<DataGridProps<any>, 'children' | 'itemsPerPage' | 'entities' | 'dataGridKey' | 'tile'>): [DataGridState, DataGridStateMethods] => {
 	const dataGridKey = useDataGridKey(props)
 	const environment = useEnvironment()
 	const columns = useMemo(() => extractDataGridColumns(props.children), [props.children])
-	const [pageState, updatePaging] = useGridPagingState(props.itemsPerPage ?? null, dataGridKey)
+	const [pageState, updatePaging] = useGridPagingState(props.itemsPerPage ?? DATA_GRID_DEFAULT_ITEMS_PER_PAGE, dataGridKey)
 	const [hiddenColumns, setIsColumnHidden] = useHiddenColumnsState(columns, dataGridKey)
 	const [orderDirections, setOrderBy] = useOrderBys(columns, updatePaging, dataGridKey)
 	const [filterArtifacts, setFilter] = useFilters(columns, updatePaging, dataGridKey)

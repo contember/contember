@@ -1,6 +1,6 @@
 import { Component, QueryLanguage, SugaredQualifiedEntityList } from '@contember/binding'
 import { ComponentType, ReactElement, ReactNode } from 'react'
-import { DataGridContainerProps, DataGridContainerPublicProps, DataGridState, useDataGrid } from '../base'
+import { DataGridContainerProps, DataGridContainerPublicProps, DataGridState, DATA_GRID_DEFAULT_ITEMS_PER_PAGE, useDataGrid } from '../base'
 import { extractDataGridColumns } from '../structure'
 import { ControlledDataGrid } from './ControlledDataGrid'
 import { renderGrid } from './renderGrid'
@@ -31,7 +31,7 @@ export const DataGrid = Component(
 		const fakeState: DataGridState = {
 			columns,
 			paging: {
-				itemsPerPage: props.itemsPerPage ?? null,
+				itemsPerPage: props.itemsPerPage ?? DATA_GRID_DEFAULT_ITEMS_PER_PAGE,
 				pageIndex: 0,
 			},
 			hiddenColumns: {},

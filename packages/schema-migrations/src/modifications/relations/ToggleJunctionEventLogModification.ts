@@ -1,7 +1,12 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Model, Schema } from '@contember/schema'
 import { SchemaUpdater, updateEntity, updateField, updateModel } from '../utils/schemaUpdateUtils'
-import { ModificationHandlerOptions, ModificationHandlerStatic } from '../ModificationHandler'
+import {
+	createModificationType,
+	Differ,
+	ModificationHandler,
+	ModificationHandlerOptions,
+} from '../ModificationHandler'
 import {
 	createEventTrigger,
 	createEventTrxTrigger,
@@ -12,8 +17,7 @@ import { isOwningRelation, isRelation } from '@contember/schema-utils'
 import { updateRelations } from '../utils/diffUtils'
 import { isIt } from '../../utils/isIt'
 
-export const ToggleJunctionEventLogModification: ModificationHandlerStatic<ToggleJunctionEventLogModificationData> = class {
-	static id = 'toggleJunctionEventLog'
+export class ToggleJunctionEventLogModificationHandler implements ModificationHandler<ToggleJunctionEventLogModificationData> {
 
 	constructor(
 		private readonly data: ToggleJunctionEventLogModificationData,
@@ -67,12 +71,21 @@ export const ToggleJunctionEventLogModification: ModificationHandlerStatic<Toggl
 			message: `${this.data.enabled ? 'Enable' : 'Disable'} event log for ${this.data.entityName}.${this.data.fieldName}`,
 		}
 	}
+}
 
-	static createModification(data: ToggleJunctionEventLogModificationData) {
-		return { modification: this.id, ...data }
-	}
+export interface ToggleJunctionEventLogModificationData {
+	entityName: string
+	fieldName: string
+	enabled: boolean
+}
 
-	static createDiff(originalSchema: Schema, updatedSchema: Schema) {
+export const toggleJunctionEventLogModification = createModificationType({
+	id: 'toggleJunctionEventLog',
+	handler: ToggleJunctionEventLogModificationHandler,
+})
+
+export class ToggleJunctionEventLogDiffer implements Differ {
+	 createDiff(originalSchema: Schema, updatedSchema: Schema) {
 		return updateRelations(originalSchema, updatedSchema, ({ originalRelation, updatedRelation, updatedEntity }) => {
 			if (
 				originalRelation.type === updatedRelation.type &&
@@ -82,7 +95,7 @@ export const ToggleJunctionEventLogModification: ModificationHandlerStatic<Toggl
 				const newValue = updatedRelation.joiningTable.eventLog?.enabled ?? false
 				const oldValue = originalRelation.joiningTable.eventLog?.enabled ?? false
 				if (newValue !== oldValue) {
-					return ToggleJunctionEventLogModification.createModification({
+					return toggleJunctionEventLogModification.createModification({
 						entityName: updatedEntity.name,
 						fieldName: updatedRelation.name,
 						enabled: newValue,
@@ -93,10 +106,4 @@ export const ToggleJunctionEventLogModification: ModificationHandlerStatic<Toggl
 		})
 
 	}
-}
-
-export interface ToggleJunctionEventLogModificationData {
-	entityName: string
-	fieldName: string
-	enabled: boolean
 }

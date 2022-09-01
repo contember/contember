@@ -1,12 +1,12 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Schema } from '@contember/schema'
 import { SchemaUpdater, updateEntity, updateModel } from '../utils/schemaUpdateUtils'
-import { ModificationHandlerStatic } from '../ModificationHandler'
+import { createModificationType, Differ, ModificationHandler } from '../ModificationHandler'
 import deepEqual from 'fast-deep-equal'
 
-export const RemoveUniqueConstraintModification: ModificationHandlerStatic<RemoveUniqueConstraintModificationData> = class {
-	static id = 'removeUniqueConstraint'
-	constructor(private readonly data: RemoveUniqueConstraintModificationData, private readonly schema: Schema) {}
+export class RemoveUniqueConstraintModificationHandler implements ModificationHandler<RemoveUniqueConstraintModificationData> {
+	constructor(private readonly data: RemoveUniqueConstraintModificationData, private readonly schema: Schema) {
+	}
 
 	public createSql(builder: MigrationBuilder): void {
 		const entity = this.schema.model.entities[this.data.entityName]
@@ -32,12 +32,21 @@ export const RemoveUniqueConstraintModification: ModificationHandlerStatic<Remov
 		const fields = this.schema.model.entities[this.data.entityName].unique[this.data.constraintName].fields
 		return { message: `Remove unique constraint (${fields.join(', ')}) on entity ${this.data.entityName}` }
 	}
+}
 
-	static createModification(data: RemoveUniqueConstraintModificationData) {
-		return { modification: this.id, ...data }
-	}
+export interface RemoveUniqueConstraintModificationData {
+	entityName: string
+	constraintName: string
+}
 
-	static createDiff(originalSchema: Schema, updatedSchema: Schema) {
+export const removeUniqueConstraintModification = createModificationType({
+	id: 'removeUniqueConstraint',
+	handler: RemoveUniqueConstraintModificationHandler,
+})
+
+
+export class RemoveUniqueConstraintDiffer implements Differ {
+	createDiff(originalSchema: Schema, updatedSchema: Schema) {
 		return Object.values(originalSchema.model.entities).flatMap(entity =>
 			Object.values(entity.unique)
 				.filter(
@@ -47,16 +56,11 @@ export const RemoveUniqueConstraintModification: ModificationHandlerStatic<Remov
 							!deepEqual(it.fields, updatedSchema.model.entities[entity.name].unique[it.name].fields)),
 				)
 				.map(unique =>
-					RemoveUniqueConstraintModification.createModification({
+					removeUniqueConstraintModification.createModification({
 						entityName: entity.name,
 						constraintName: unique.name,
 					}),
 				),
 		)
 	}
-}
-
-export interface RemoveUniqueConstraintModificationData {
-	entityName: string
-	constraintName: string
 }

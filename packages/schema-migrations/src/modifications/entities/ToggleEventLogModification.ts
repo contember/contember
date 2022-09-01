@@ -1,7 +1,12 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Schema } from '@contember/schema'
 import { SchemaUpdater, updateEntity, updateModel } from '../utils/schemaUpdateUtils'
-import { ModificationHandlerOptions, ModificationHandlerStatic } from '../ModificationHandler'
+import {
+	createModificationType,
+	Differ,
+	ModificationHandler,
+	ModificationHandlerOptions,
+} from '../ModificationHandler'
 import {
 	createEventTrigger,
 	createEventTrxTrigger,
@@ -9,8 +14,7 @@ import {
 	dropEventTrxTrigger,
 } from '../utils/sqlUpdateUtils'
 
-export const ToggleEventLogModification: ModificationHandlerStatic<ToggleEventLogModificationData> = class {
-	static id = 'toggleEventLog'
+export class ToggleEventLogModificationHandler implements ModificationHandler<ToggleEventLogModificationData> {
 
 	constructor(
 		private readonly data: ToggleEventLogModificationData,
@@ -51,12 +55,20 @@ export const ToggleEventLogModification: ModificationHandlerStatic<ToggleEventLo
 			message: `${this.data.enabled ? 'Enable' : 'Disable'} event log for ${this.data.entityName}`,
 		}
 	}
+}
 
-	static createModification(data: ToggleEventLogModificationData) {
-		return { modification: this.id, ...data }
-	}
+export interface ToggleEventLogModificationData {
+	entityName: string
+	enabled: boolean
+}
 
-	static createDiff(originalSchema: Schema, updatedSchema: Schema) {
+export const toggleEventLogModification = createModificationType({
+	id: 'toggleEventLog',
+	handler: ToggleEventLogModificationHandler,
+})
+
+export class ToggleEventLogDiffer implements Differ {
+	createDiff(originalSchema: Schema, updatedSchema: Schema) {
 		return Object.values(updatedSchema.model.entities)
 			.flatMap(updatedEntity => {
 				const origEntity = originalSchema.model.entities[updatedEntity.name]
@@ -66,7 +78,7 @@ export const ToggleEventLogModification: ModificationHandlerStatic<ToggleEventLo
 				const newValue = updatedEntity.eventLog.enabled
 				const oldValue = origEntity.eventLog.enabled
 				if (newValue !== oldValue) {
-					return [ToggleEventLogModification.createModification({
+					return [toggleEventLogModification.createModification({
 						entityName: updatedEntity.name,
 						enabled: newValue,
 					})]
@@ -75,9 +87,4 @@ export const ToggleEventLogModification: ModificationHandlerStatic<ToggleEventLo
 			})
 
 	}
-}
-
-export interface ToggleEventLogModificationData {
-	entityName: string
-	enabled: boolean
 }

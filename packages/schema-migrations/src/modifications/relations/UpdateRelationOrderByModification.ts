@@ -1,12 +1,12 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Model, Schema } from '@contember/schema'
 import { SchemaUpdater, updateEntity, updateField, updateModel } from '../utils/schemaUpdateUtils'
-import { ModificationHandlerStatic } from '../ModificationHandler'
+import { createModificationType, Differ, ModificationHandler } from '../ModificationHandler'
 import deepEqual from 'fast-deep-equal'
 import { updateRelations } from '../utils/diffUtils'
 
-export const UpdateRelationOrderByModification: ModificationHandlerStatic<UpdateRelationOrderByModificationData> = class {
-	static id = 'updateRelationOrderBy'
+export class UpdateRelationOrderByModificationHandler implements ModificationHandler<UpdateRelationOrderByModificationData> {
+
 	constructor(private readonly data: UpdateRelationOrderByModificationData, private readonly schema: Schema) {}
 
 	public createSql(builder: MigrationBuilder): void {}
@@ -27,12 +27,21 @@ export const UpdateRelationOrderByModification: ModificationHandlerStatic<Update
 	describe() {
 		return { message: `Update order-by of relation ${this.data.entityName}.${this.data.fieldName}` }
 	}
+}
 
-	static createModification(data: UpdateRelationOrderByModificationData) {
-		return { modification: this.id, ...data }
-	}
+export interface UpdateRelationOrderByModificationData {
+	entityName: string
+	fieldName: string
+	orderBy: readonly Model.OrderBy[]
+}
 
-	static createDiff(originalSchema: Schema, updatedSchema: Schema) {
+export const updateRelationOrderByModification = createModificationType({
+	id: 'updateRelationOrderBy',
+	handler: UpdateRelationOrderByModificationHandler,
+})
+
+export class UpdateRelationOrderByDiffer implements Differ {
+	createDiff(originalSchema: Schema, updatedSchema: Schema) {
 		return updateRelations(originalSchema, updatedSchema, ({ updatedRelation, originalRelation, updatedEntity }) => {
 			const isItOrderable = (relation: Model.AnyRelation): relation is Model.OrderableRelation & Model.AnyRelation =>
 				relation.type === Model.RelationType.ManyHasMany || relation.type === Model.RelationType.OneHasMany
@@ -42,7 +51,7 @@ export const UpdateRelationOrderByModification: ModificationHandlerStatic<Update
 				isItOrderable(originalRelation) &&
 				!deepEqual(updatedRelation.orderBy || [], originalRelation.orderBy || [])
 			) {
-				return UpdateRelationOrderByModification.createModification({
+				return updateRelationOrderByModification.createModification({
 					entityName: updatedEntity.name,
 					fieldName: updatedRelation.name,
 					orderBy: updatedRelation.orderBy || [],
@@ -51,10 +60,4 @@ export const UpdateRelationOrderByModification: ModificationHandlerStatic<Update
 			return undefined
 		})
 	}
-}
-
-export interface UpdateRelationOrderByModificationData {
-	entityName: string
-	fieldName: string
-	orderBy: readonly Model.OrderBy[]
 }

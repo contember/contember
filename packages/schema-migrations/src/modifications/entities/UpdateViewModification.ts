@@ -1,11 +1,9 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Model, Schema } from '@contember/schema'
-import { ModificationHandlerStatic } from '../ModificationHandler'
+import { createModificationType, ModificationHandler } from '../ModificationHandler'
 import { SchemaUpdater, updateEntity, updateModel } from '../utils/schemaUpdateUtils'
 
-export const UpdateViewModification: ModificationHandlerStatic<UpdateViewModificationData> = class {
-	static id = 'updateView'
-
+export class UpdateViewModificationHandler implements ModificationHandler<UpdateViewModificationData> {
 	constructor(private readonly data: UpdateViewModificationData, private readonly schema: Schema) {}
 
 	public createSql(builder: MigrationBuilder): void {
@@ -32,12 +30,14 @@ export const UpdateViewModification: ModificationHandlerStatic<UpdateViewModific
 		return { message: `Update SQL definition of a view` }
 	}
 
-	static createModification(data: UpdateViewModificationData) {
-		return { modification: this.id, ...data }
-	}
 }
 
 export interface UpdateViewModificationData {
 	entityName: string
 	view: Model.View
 }
+
+export const updateViewModification = createModificationType({
+	id: 'updateView',
+	handler: UpdateViewModificationHandler,
+})

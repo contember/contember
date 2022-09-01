@@ -1,13 +1,12 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Model, Schema } from '@contember/schema'
 import { SchemaUpdater, updateEntity, updateField, updateModel } from '../utils/schemaUpdateUtils'
-import { ModificationHandlerStatic } from '../ModificationHandler'
+import { createModificationType, Differ, ModificationHandler } from '../ModificationHandler'
 import { getEntity, tryGetColumnName } from '@contember/schema-utils'
 import { isIt } from '../../utils/isIt'
 import { updateRelations } from '../utils/diffUtils'
 
-export const MakeRelationNullableModification: ModificationHandlerStatic<MakeRelationNullableModificationData> = class {
-	static id = 'makeRelationNullable'
+export class MakeRelationNullableModificationHandler implements ModificationHandler<MakeRelationNullableModificationData> {
 	constructor(private readonly data: MakeRelationNullableModificationData, private readonly schema: Schema) {}
 
 	public createSql(builder: MigrationBuilder): void {
@@ -43,11 +42,21 @@ export const MakeRelationNullableModification: ModificationHandlerStatic<MakeRel
 		}
 	}
 
-	static createModification(data: MakeRelationNullableModificationData) {
-		return { modification: this.id, ...data }
-	}
+}
 
-	static createDiff(originalSchema: Schema, updatedSchema: Schema) {
+export interface MakeRelationNullableModificationData {
+	entityName: string
+	fieldName: string
+}
+
+
+export const makeRelationNullableModification = createModificationType({
+	id: 'makeRelationNullable',
+	handler: MakeRelationNullableModificationHandler,
+})
+
+export class MakeRelationNullableDiffer implements Differ {
+	createDiff(originalSchema: Schema, updatedSchema: Schema) {
 		return updateRelations(originalSchema, updatedSchema, ({ originalRelation, updatedRelation, updatedEntity }) => {
 			if (
 				originalRelation.type === updatedRelation.type &&
@@ -56,7 +65,7 @@ export const MakeRelationNullableModification: ModificationHandlerStatic<MakeRel
 				updatedRelation.nullable &&
 				!originalRelation.nullable
 			) {
-				return MakeRelationNullableModification.createModification({
+				return makeRelationNullableModification.createModification({
 					entityName: updatedEntity.name,
 					fieldName: updatedRelation.name,
 				})
@@ -64,9 +73,4 @@ export const MakeRelationNullableModification: ModificationHandlerStatic<MakeRel
 			return undefined
 		})
 	}
-}
-
-export interface MakeRelationNullableModificationData {
-	entityName: string
-	fieldName: string
 }

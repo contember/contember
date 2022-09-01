@@ -1,12 +1,11 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Model, Schema } from '@contember/schema'
 import { SchemaUpdater, updateEntity, updateField, updateModel } from '../utils/schemaUpdateUtils'
-import { ModificationHandlerStatic } from '../ModificationHandler'
+import { createModificationType, Differ, ModificationHandler } from '../ModificationHandler'
 import { isIt } from '../../utils/isIt'
 import { updateRelations } from '../utils/diffUtils'
 
-export const UpdateRelationOnDeleteModification: ModificationHandlerStatic<UpdateRelationOnDeleteModificationData> = class {
-	static id = 'updateRelationOnDelete'
+export class UpdateRelationOnDeleteModificationHandler implements ModificationHandler<UpdateRelationOnDeleteModificationData> {
 	constructor(private readonly data: UpdateRelationOnDeleteModificationData, private readonly schema: Schema) {}
 
 	public createSql(builder: MigrationBuilder): void {}
@@ -27,12 +26,21 @@ export const UpdateRelationOnDeleteModification: ModificationHandlerStatic<Updat
 	describe() {
 		return { message: `Change on-delete policy of relation ${this.data.entityName}.${this.data.fieldName}` }
 	}
+}
 
-	static createModification(data: UpdateRelationOnDeleteModificationData) {
-		return { modification: this.id, ...data }
-	}
+export interface UpdateRelationOnDeleteModificationData {
+	entityName: string
+	fieldName: string
+	onDelete: Model.OnDelete
+}
 
-	static createDiff(originalSchema: Schema, updatedSchema: Schema) {
+export const updateRelationOnDeleteModification = createModificationType({
+	id: 'updateRelationOnDelete',
+	handler: UpdateRelationOnDeleteModificationHandler,
+})
+
+export class UpdateRelationOnDeleteDiffer implements Differ {
+	createDiff(originalSchema: Schema, updatedSchema: Schema) {
 		return updateRelations(originalSchema, updatedSchema, ({ originalRelation, updatedRelation, updatedEntity }) => {
 			if (
 				originalRelation.type === updatedRelation.type &&
@@ -40,7 +48,7 @@ export const UpdateRelationOnDeleteModification: ModificationHandlerStatic<Updat
 				isIt<Model.JoiningColumnRelation>(originalRelation, 'joiningColumn') &&
 				updatedRelation.joiningColumn.onDelete !== originalRelation.joiningColumn.onDelete
 			) {
-				return UpdateRelationOnDeleteModification.createModification({
+				return updateRelationOnDeleteModification.createModification({
 					entityName: updatedEntity.name,
 					fieldName: updatedRelation.name,
 					onDelete: updatedRelation.joiningColumn.onDelete,
@@ -49,10 +57,4 @@ export const UpdateRelationOnDeleteModification: ModificationHandlerStatic<Updat
 			return undefined
 		})
 	}
-}
-
-export interface UpdateRelationOnDeleteModificationData {
-	entityName: string
-	fieldName: string
-	onDelete: Model.OnDelete
 }

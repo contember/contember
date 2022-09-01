@@ -1,5 +1,5 @@
 import { Schema } from '@contember/schema'
-import ModificationHandlerFactory from './modifications/ModificationHandlerFactory'
+import { ModificationHandlerFactory } from './modifications'
 import { Migration } from './Migration'
 
 export class SchemaMigrator {

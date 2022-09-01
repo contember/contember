@@ -1,16 +1,20 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Model, Schema } from '@contember/schema'
 import { addField, SchemaUpdater, updateEntity, updateModel, updateSchema } from '../utils/schemaUpdateUtils'
-import { ModificationHandler, ModificationHandlerOptions, ModificationHandlerStatic } from '../ModificationHandler'
+import {
+	createModificationType,
+	Differ,
+	ModificationHandler,
+	ModificationHandlerOptions,
+} from '../ModificationHandler'
 import { isInverseRelation, isOwningRelation } from '@contember/schema-utils'
 import { updateRelations } from '../utils/diffUtils'
-import { UpdateFieldNameModification } from '../fields'
 import { createJunctionTableSql } from '../utils/createJunctionTable'
 import { wrapIdentifier } from '@contember/database'
 import { normalizeManyHasManyRelation, PartialManyHasManyRelation } from './normalization'
+import { updateFieldNameModification } from '../fields'
 
-export const ConvertOneHasManyToManyHasManyRelationModification: ModificationHandlerStatic<ConvertOneHasManyToManyHasManyRelationModificationData> = class {
-	static id = 'convertOneHasManyToManyHasManyRelation'
+export class ConvertOneHasManyToManyHasManyRelationModificationHandler implements ModificationHandler<ConvertOneHasManyToManyHasManyRelationModificationData> {
 	private subModification: ModificationHandler<any>
 
 	constructor(
@@ -18,7 +22,7 @@ export const ConvertOneHasManyToManyHasManyRelationModification: ModificationHan
 		private readonly schema: Schema,
 		private readonly options: ModificationHandlerOptions,
 	) {
-		this.subModification = new UpdateFieldNameModification(
+		this.subModification = updateFieldNameModification.createHandler(
 			{
 				entityName: this.data.entityName,
 				fieldName: this.data.fieldName,
@@ -63,11 +67,33 @@ export const ConvertOneHasManyToManyHasManyRelationModification: ModificationHan
 		}
 	}
 
-	static createModification(data: ConvertOneHasManyToManyHasManyRelationModificationData) {
-		return { modification: this.id, ...data }
-	}
 
-	static createDiff(originalSchema: Schema, updatedSchema: Schema) {
+
+
+	private getRelation(): { entity: Model.Entity; relation: Model.ManyHasOneRelation } {
+		const entity = this.schema.model.entities[this.data.entityName]
+		const relation = entity.fields[this.data.fieldName]
+		if (relation.type !== Model.RelationType.ManyHasOne) {
+			throw new Error()
+		}
+		return { entity, relation }
+	}
+}
+
+export const convertOneHasManyToManyHasManyRelationModification = createModificationType({
+	id: 'convertOneHasManyToManyHasManyRelation',
+	handler: ConvertOneHasManyToManyHasManyRelationModificationHandler,
+})
+
+export interface ConvertOneHasManyToManyHasManyRelationModificationData {
+	entityName: string
+	fieldName: string
+	owningSide: PartialManyHasManyRelation
+	inverseSide?: Model.ManyHasManyInverseRelation
+}
+
+export class ConvertOneHasManyToManyHasManyRelationDiffer implements Differ {
+	createDiff(originalSchema: Schema, updatedSchema: Schema) {
 		return updateRelations(originalSchema, updatedSchema, ({ originalRelation, updatedRelation, updatedEntity }) => {
 			if (
 				isInverseRelation(originalRelation) &&
@@ -81,7 +107,7 @@ export const ConvertOneHasManyToManyHasManyRelationModification: ModificationHan
 				if (owningSide.type !== Model.RelationType.ManyHasMany || !isOwningRelation(owningSide)) {
 					throw new Error()
 				}
-				return ConvertOneHasManyToManyHasManyRelationModification.createModification({
+				return convertOneHasManyToManyHasManyRelationModification.createModification({
 					entityName: updatedRelation.target,
 					fieldName: owningOldName,
 					owningSide,
@@ -91,20 +117,4 @@ export const ConvertOneHasManyToManyHasManyRelationModification: ModificationHan
 			return undefined
 		})
 	}
-
-	private getRelation(): { entity: Model.Entity; relation: Model.ManyHasOneRelation } {
-		const entity = this.schema.model.entities[this.data.entityName]
-		const relation = entity.fields[this.data.fieldName]
-		if (relation.type !== Model.RelationType.ManyHasOne) {
-			throw new Error()
-		}
-		return { entity, relation }
-	}
-}
-
-export interface ConvertOneHasManyToManyHasManyRelationModificationData {
-	entityName: string
-	fieldName: string
-	owningSide: PartialManyHasManyRelation
-	inverseSide?: Model.ManyHasManyInverseRelation
 }

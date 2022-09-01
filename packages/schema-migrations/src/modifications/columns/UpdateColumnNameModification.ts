@@ -1,13 +1,13 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Model, Schema } from '@contember/schema'
 import { SchemaUpdater, updateEntity, updateField, updateModel } from '../utils/schemaUpdateUtils'
-import { ModificationHandlerStatic } from '../ModificationHandler'
+import { createModificationType, Differ, ModificationHandler } from '../ModificationHandler'
 import { updateColumns } from '../utils/diffUtils'
 import { acceptFieldVisitor } from '@contember/schema-utils'
 
-export const UpdateColumnNameModification: ModificationHandlerStatic<UpdateColumnNameModificationData> = class {
-	static id = 'updateColumnName'
-	constructor(private readonly data: UpdateColumnNameModificationData, private readonly schema: Schema) {}
+export class UpdateColumnNameModificationHandler implements ModificationHandler<UpdateColumnNameModificationData> {
+	constructor(private readonly data: UpdateColumnNameModificationData, private readonly schema: Schema) {
+	}
 
 	public createSql(builder: MigrationBuilder): void {
 		const entity = this.schema.model.entities[this.data.entityName]
@@ -21,7 +21,7 @@ export const UpdateColumnNameModification: ModificationHandlerStatic<UpdateColum
 			visitManyHasOne: (entity, relation) => {
 				builder.renameColumn(entity.tableName, relation.joiningColumn.columnName, this.data.columnName)
 			},
-			visitOneHasOneOwning: (entity, relation) =>  {
+			visitOneHasOneOwning: (entity, relation) => {
 				builder.renameColumn(entity.tableName, relation.joiningColumn.columnName, this.data.columnName)
 			},
 			visitManyHasManyInverse: () => {
@@ -43,7 +43,10 @@ export const UpdateColumnNameModification: ModificationHandlerStatic<UpdateColum
 		return updateModel(
 			updateEntity(
 				this.data.entityName,
-				updateField(this.data.fieldName, ({ field, entity }) => acceptFieldVisitor<Model.AnyField>(this.schema.model, entity, field, {
+				updateField(this.data.fieldName, ({
+													  field,
+													  entity,
+												  }) => acceptFieldVisitor<Model.AnyField>(this.schema.model, entity, field, {
 					visitColumn: (entity, column) => {
 						return {
 							...column,
@@ -88,26 +91,30 @@ export const UpdateColumnNameModification: ModificationHandlerStatic<UpdateColum
 	describe() {
 		return { message: `Change column name of field ${this.data.entityName}.${this.data.fieldName}` }
 	}
+}
 
-	static createModification(data: UpdateColumnNameModificationData) {
-		return { modification: this.id, ...data }
-	}
+export interface UpdateColumnNameModificationData {
+	entityName: string
+	fieldName: string
+	columnName: string
+}
 
-	static createDiff(originalSchema: Schema, updatedSchema: Schema) {
+export const updateColumnNameModification = createModificationType({
+	id: 'updateColumnName',
+	handler: UpdateColumnNameModificationHandler,
+})
+
+export class UpdateColumnNameDiffer implements Differ {
+	createDiff(originalSchema: Schema, updatedSchema: Schema) {
 		return updateColumns(originalSchema, updatedSchema, ({ originalColumn, updatedColumn, updatedEntity }) => {
 			if (originalColumn.columnName === updatedColumn.columnName) {
 				return undefined
 			}
-			return UpdateColumnNameModification.createModification({
+			return updateColumnNameModification.createModification({
 				entityName: updatedEntity.name,
 				fieldName: updatedColumn.name,
 				columnName: updatedColumn.columnName,
 			})
 		})
 	}
-}
-export interface UpdateColumnNameModificationData {
-	entityName: string
-	fieldName: string
-	columnName: string
 }

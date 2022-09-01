@@ -1,11 +1,10 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Schema } from '@contember/schema'
 import { SchemaUpdater, updateEntity, updateModel } from '../utils/schemaUpdateUtils'
-import { ModificationHandlerStatic } from '../ModificationHandler'
+import { createModificationType, Differ, ModificationHandler } from '../ModificationHandler'
 import deepEqual from 'fast-deep-equal'
 
-export const RemoveIndexModification: ModificationHandlerStatic<RemoveIndexModificationData> = class {
-	static id = 'removeIndex'
+export class RemoveIndexModificationHandler implements ModificationHandler<RemoveIndexModificationData>  {
 	constructor(private readonly data: RemoveIndexModificationData, private readonly schema: Schema) {}
 
 	public createSql(builder: MigrationBuilder): void {
@@ -34,12 +33,17 @@ export const RemoveIndexModification: ModificationHandlerStatic<RemoveIndexModif
 		const fields = this.schema.model.entities[this.data.entityName].indexes[this.data.indexName].fields
 		return { message: `Remove index (${fields.join(', ')}) on entity ${this.data.entityName}` }
 	}
+}
 
-	static createModification(data: RemoveIndexModificationData) {
-		return { modification: this.id, ...data }
-	}
+export const removeIndexModification = createModificationType({
+	id: 'removeIndex',
+	handler: RemoveIndexModificationHandler,
+})
 
-	static createDiff(originalSchema: Schema, updatedSchema: Schema) {
+
+export class RemoveIndexDiffer implements Differ {
+
+	createDiff(originalSchema: Schema, updatedSchema: Schema) {
 		return Object.values(originalSchema.model.entities).flatMap(entity =>
 			Object.values(entity.indexes)
 				.filter(
@@ -49,7 +53,7 @@ export const RemoveIndexModification: ModificationHandlerStatic<RemoveIndexModif
 							!deepEqual(it.fields, updatedSchema.model.entities[entity.name].indexes[it.name].fields)),
 				)
 				.map(index =>
-					RemoveIndexModification.createModification({
+					removeIndexModification.createModification({
 						entityName: entity.name,
 						indexName: index.name,
 					}),

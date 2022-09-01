@@ -1,13 +1,12 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Model, Schema } from '@contember/schema'
 import { SchemaUpdater, updateEntity, updateField, updateModel } from '../utils/schemaUpdateUtils'
-import { ModificationHandlerStatic } from '../ModificationHandler'
+import { createModificationType, Differ, ModificationHandler } from '../ModificationHandler'
 import { getEntity, tryGetColumnName } from '@contember/schema-utils'
 import { isIt } from '../../utils/isIt'
 import { updateRelations } from '../utils/diffUtils'
 
-export const MakeRelationNotNullModification: ModificationHandlerStatic<MakeRelationNotNullModificationData> = class {
-	static id = 'makeRelationNotNull'
+export class MakeRelationNotNullModificationHandler implements ModificationHandler<MakeRelationNotNullModificationData> {
 	constructor(private readonly data: MakeRelationNotNullModificationData, private readonly schema: Schema) {}
 
 	public createSql(builder: MigrationBuilder): void {
@@ -43,12 +42,21 @@ export const MakeRelationNotNullModification: ModificationHandlerStatic<MakeRela
 			failureWarning: 'Changing to not-null may fail in runtime',
 		}
 	}
+}
 
-	static createModification(data: MakeRelationNotNullModificationData) {
-		return { modification: this.id, ...data }
-	}
+export interface MakeRelationNotNullModificationData {
+	entityName: string
+	fieldName: string
+	// todo fillValue
+}
 
-	static createDiff(originalSchema: Schema, updatedSchema: Schema) {
+export const makeRelationNotNullModification = createModificationType({
+	id: 'makeRelationNotNull',
+	handler: MakeRelationNotNullModificationHandler,
+})
+
+export class MakeRelationNotNullDiffer implements Differ {
+	createDiff(originalSchema: Schema, updatedSchema: Schema) {
 		return updateRelations(originalSchema, updatedSchema, ({ originalRelation, updatedRelation, updatedEntity }) => {
 			if (
 				originalRelation.type === updatedRelation.type &&
@@ -57,7 +65,7 @@ export const MakeRelationNotNullModification: ModificationHandlerStatic<MakeRela
 				!updatedRelation.nullable &&
 				originalRelation.nullable
 			) {
-				return MakeRelationNotNullModification.createModification({
+				return makeRelationNotNullModification.createModification({
 					entityName: updatedEntity.name,
 					fieldName: updatedRelation.name,
 				})
@@ -65,10 +73,4 @@ export const MakeRelationNotNullModification: ModificationHandlerStatic<MakeRela
 			return undefined
 		})
 	}
-}
-
-export interface MakeRelationNotNullModificationData {
-	entityName: string
-	fieldName: string
-	// todo fillValue
 }

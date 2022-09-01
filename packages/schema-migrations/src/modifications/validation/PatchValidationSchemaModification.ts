@@ -1,11 +1,10 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { SchemaUpdater } from '../utils/schemaUpdateUtils'
-import { ModificationHandlerStatic } from '../ModificationHandler'
+import { createModificationType, ModificationHandler } from '../ModificationHandler'
 import { applyPatch, Operation } from 'rfc6902'
 import deepCopy from '../../utils/deepCopy'
 
-export const PatchValidationSchemaModification: ModificationHandlerStatic<PatchValidationSchemaModificationData> = class {
-	static id = 'patchValidationSchema'
+export class PatchValidationSchemaModificationHandler implements ModificationHandler<PatchValidationSchemaModificationData> {
 	constructor(private readonly data: PatchValidationSchemaModificationData) {}
 
 	public createSql(builder: MigrationBuilder): void {}
@@ -28,12 +27,13 @@ export const PatchValidationSchemaModification: ModificationHandlerStatic<PatchV
 	describe() {
 		return { message: 'Update validation schema' }
 	}
-
-	static createModification(data: PatchValidationSchemaModificationData) {
-		return { modification: this.id, ...data }
-	}
 }
 
 export interface PatchValidationSchemaModificationData {
 	patch: Operation[]
 }
+
+export const patchValidationSchemaModification = createModificationType({
+	id: 'patchValidationSchema',
+	handler: PatchValidationSchemaModificationHandler,
+})

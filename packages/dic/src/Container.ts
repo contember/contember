@@ -30,7 +30,7 @@ export class Builder<M extends ServiceTypeMap = {}> {
 
 	replaceService<N extends ServiceName, T extends { [P in keyof M[N]]: M[N][P] }>(
 		name: N extends keyof M ? N : 'Service with this name does not exist',
-		factory: ServiceFactory<M & {inner: T}, T> | ServiceDefinition<M, T>,
+		factory: ServiceFactory<M & { inner: T }, T> | ServiceDefinition<M, T>,
 	): Builder<M> {
 		const currentFactory = this.factories[name]
 		return new Builder({
@@ -102,7 +102,9 @@ export class ContainerImpl<M extends ServiceTypeMap> {
 		this.services.set(name, service)
 		this.level--
 		if (this.level === 0) {
-			this.setups.forEach(it => it())
+			const setups = this.setups
+			this.setups = []
+			setups.forEach(it => it())
 		}
 		return service
 	}
@@ -120,11 +122,13 @@ export class ContainerImpl<M extends ServiceTypeMap> {
 				get: () => this.createService(innerDefinition),
 			})
 		}
-		this.setups.push(() => {
-			for (const setup of definition.setup) {
-				setup(service, accessors)
-			}
-		})
+		if (definition.setup.length > 0) {
+			this.setups.push(() => {
+				for (const setup of definition.setup) {
+					setup(service, accessors)
+				}
+			})
+		}
 		const service = definition.factory(accessors)
 		return service
 	}

@@ -6,6 +6,8 @@ import reactRefresh from '@vitejs/plugin-react-refresh'
 
 export default defineConfig({
 	root: 'public',
+	publicDir: '_public',
+
 	build: {
 		assetsDir: '_static',
 		outDir: resolve(rootDirectory, `ee/admin-server/dist/public`),

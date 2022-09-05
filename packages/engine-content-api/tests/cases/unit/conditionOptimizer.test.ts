@@ -18,6 +18,12 @@ describe('condition optimizer', () => {
 		})
 	})
 
+	it('keep never in OR', () => {
+		assert.deepStrictEqual(optimizer.optimize({
+			or: [{ never: true }],
+		}), false)
+	})
+
 	it('optimizes OR with never', () => {
 		assert.deepStrictEqual(optimizer.optimize({
 			or: [{ eq: 1 }, { never: true }],

@@ -74,4 +74,20 @@ describe('where optimized', () => {
 			},
 		})
 	})
+
+	it('keep never', () => {
+		assert.deepStrictEqual(whereOptimizer.optimize({
+			and: [
+				{
+					or: [
+						{ url: { never: true } },
+						{ url: { never: true } },
+					],
+				},
+			],
+		}, model.entities.Image), {
+			id: { never: true },
+		},
+		)
+	})
 })

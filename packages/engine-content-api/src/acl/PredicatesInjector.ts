@@ -28,16 +28,21 @@ export class PredicatesInjector {
 		return { and: and }
 	}
 
-	private injectToWhere(where: Input.OptionalWhere, entity: Model.Entity, isRoot: boolean): Input.OptionalWhere {
+	private injectToWhere(
+		where: Input.OptionalWhere,
+		entity: Model.Entity,
+		isRoot: boolean,
+		overRelation?: Model.AnyRelation,
+	): Input.OptionalWhere {
 		const resultWhere: Writable<Input.OptionalWhere> = {}
 		if (where.and) {
-			resultWhere.and = where.and.filter((it): it is Input.Where => !!it).map(it => this.injectToWhere(it, entity, isRoot))
+			resultWhere.and = where.and.filter((it): it is Input.Where => !!it).map(it => this.injectToWhere(it, entity, isRoot, overRelation))
 		}
 		if (where.or) {
-			resultWhere.or = where.or.filter((it): it is Input.Where => !!it).map(it => this.injectToWhere(it, entity, isRoot))
+			resultWhere.or = where.or.filter((it): it is Input.Where => !!it).map(it => this.injectToWhere(it, entity, isRoot, overRelation))
 		}
 		if (where.not) {
-			resultWhere.not = this.injectToWhere(where.not, entity, isRoot)
+			resultWhere.not = this.injectToWhere(where.not, entity, isRoot, overRelation)
 		}
 
 		const fields = Object.keys(where).filter(it => !['and', 'or', 'not'].includes(it))
@@ -46,12 +51,12 @@ export class PredicatesInjector {
 			return resultWhere
 		}
 		for (let field of fields) {
-			const targetEntity = acceptFieldVisitor(this.schema, entity, field, {
+			const [targetEntity, targetRelation] = acceptFieldVisitor(this.schema, entity, field, {
 				visitColumn: () => null,
-				visitRelation: (_a, _b, targetEntity) => targetEntity,
-			})
+				visitRelation: (_a, _b, targetEntity, targetRelation) => [targetEntity, targetRelation ?? undefined],
+			}) ?? []
 			if (targetEntity) {
-				resultWhere[field] = this.injectToWhere(where[field] as Input.Where, targetEntity, false)
+				resultWhere[field] = this.injectToWhere(where[field] as Input.Where, targetEntity, false, targetRelation)
 			} else {
 				resultWhere[field] = where[field]
 			}
@@ -60,7 +65,7 @@ export class PredicatesInjector {
 			? fields
 			: fields.filter(it => this.predicateFactory.shouldApplyCellLevelPredicate(entity, Acl.Operation.read, it))
 
-		return this.createWhere(entity, fieldsForPredicate, resultWhere)
+		return this.createWhere(entity, fieldsForPredicate, resultWhere, overRelation)
 	}
 
 }

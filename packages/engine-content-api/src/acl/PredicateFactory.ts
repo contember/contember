@@ -23,14 +23,22 @@ export class PredicateFactory {
 		return permissions?.[fieldName] !== permissions?.[rowLevelField]
 	}
 
-	public create(entity: Model.Entity, operation: Acl.Operation.delete): Input.Where
+	public create(
+		entity: Model.Entity,
+		operation: Acl.Operation.delete,
+	): Input.Where
 	public create(
 		entity: Model.Entity,
 		operation: Acl.Operation.update | Acl.Operation.read | Acl.Operation.create,
 		fieldNames?: string[],
 		overRelation?: Model.AnyRelation,
 	): Input.Where
-	public create(entity: Model.Entity, operation: Acl.Operation, fieldNames?: string[], overRelation?: Model.AnyRelation): Input.Where {
+	public create(
+		entity: Model.Entity,
+		operation: Acl.Operation,
+		fieldNames?: string[],
+		overRelation?: Model.AnyRelation,
+	): Input.Where {
 		const entityPermissions: Acl.EntityPermissions = this.permissions[entity.name]
 		const neverCondition: Input.Where = { [entity.primary]: { never: true } }
 

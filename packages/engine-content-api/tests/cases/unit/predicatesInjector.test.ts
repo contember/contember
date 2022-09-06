@@ -1,7 +1,10 @@
-import { PredicateFactory, PredicatesInjector, VariableInjector } from '../../../src/acl'
-import { SchemaBuilder } from '@contember/schema-definition'
+import { PermissionFactory, PredicateFactory, PredicatesInjector, VariableInjector } from '../../../src/acl'
+import { SchemaBuilder, SchemaDefinition as def, AclDefinition as acl, createSchema } from '@contember/schema-definition'
 import { Acl, Model } from '@contember/schema'
 import { describe, it, assert } from 'vitest'
+import { PermissionsFactory } from '@contember/engine-system-api/dist/src/model'
+import { WhereOptimizer } from '../../../src/mapper/select/optimizer/WhereOptimizer'
+import { ConditionOptimizer } from '../../../src/mapper/select/optimizer/ConditionOptimizer'
 
 
 
@@ -44,6 +47,7 @@ const permissions: Acl.Permissions = {
 		},
 	},
 }
+
 
 describe('Predicates injector', () => {
 
@@ -107,5 +111,66 @@ describe('Predicates injector', () => {
 			],
 		})
 	})
+
+
 })
 
+namespace DeepFilterModel {
+	export const readerRole = acl.createRole('reader')
+
+	@acl.allow(readerRole, {
+		when: { isPublished: { eq: true } },
+		read: ['coverPhoto'],
+	})
+	export class Article {
+		isPublished = def.boolColumn()
+		title = def.stringColumn()
+		coverPhoto = def.manyHasOne(ImageUse, 'articles')
+	}
+
+	@acl.allow(readerRole, {
+		when: { articles: acl.canRead('coverPhoto') },
+		read: true,
+	})
+	export class ImageUse {
+		articles = def.oneHasMany(Article, 'coverPhoto')
+		image = def.manyHasOne(Image, 'uses')
+	}
+
+	@acl.allow(readerRole, {
+		when: { uses: acl.canRead('image') },
+		read: true,
+	})
+	export class Image {
+		uses = def.oneHasMany(ImageUse, 'image')
+		url = def.stringColumn()
+		tags = def.manyHasMany(Tag)
+	}
+
+	@acl.allow(readerRole, {
+		read: true,
+	})
+	export class Tag {
+		label = def.stringColumn()
+	}
+}
+
+
+describe('predicates injector elimination', () => {
+	it.only('eliminates predicates in where', () => {
+		const schema = createSchema(DeepFilterModel)
+		const permissions = new PermissionFactory(schema.model).create(schema.acl, ['reader'])
+
+		const injector = new PredicatesInjector(
+			schema.model,
+			new PredicateFactory(permissions, schema.model, new VariableInjector(schema.model, {})),
+		)
+		const injected = injector.inject(schema.model.entities.Article, {
+			coverPhoto: { image: { tags: { label: { eq: 'foo' } } } },
+		})
+		const optimizer = new WhereOptimizer(schema.model, new ConditionOptimizer())
+		const result = optimizer.optimize(injected, schema.model.entities.Article)
+
+		assert.deepStrictEqual(result, { and: [{ coverPhoto: { image: { tags: { label: { eq: 'foo' } } } } }, { isPublished: { eq: true } }] })
+	})
+})

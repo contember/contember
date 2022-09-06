@@ -5,6 +5,7 @@ import {
 	ContainerSpinner,
 	Link,
 	MiscPageLayout,
+	PageModule,
 	Pages,
 	runReactApp,
 	useCurrentRequest,
@@ -14,8 +15,8 @@ import './index.sass'
 import { useProjectSlug } from '@contember/react-client'
 
 const projectSlug = window.location.pathname.split('/')[1]
-const pages = import.meta.glob('../cases/**/*.tsx')
-const models = import.meta.glob('../cases/**/*.model.ts')
+const pages = import.meta.glob<PageModule>('../cases/**/*.tsx')
+const models = import.meta.glob<PageModule>('../cases/**/*.model.ts')
 
 function buildSchema(definitions: SchemaDefinition.ModelDefinition<{}>): Schema {
 	const model = SchemaDefinition.createModel(definitions)

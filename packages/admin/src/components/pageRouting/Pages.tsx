@@ -119,7 +119,7 @@ export const Pages = ({ children, layout }: PagesProps) => {
 
 						return [[pageName, PageActionHandler]]
 
-					} else if (isEagerPageModule(k, v)) { // children={import.meta.globEager('./pages/**/*.tsx')}
+					} else if (isEagerPageModule(k, v)) { // children={import.meta.glob('./pages/**/*.tsx', { eager: false })}
 						const pageName = getPageNameFromFile(k)
 						const module = normalizeModule(v)
 

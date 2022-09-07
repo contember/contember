@@ -90,4 +90,106 @@ describe('where optimized', () => {
 		},
 		)
 	})
+
+
+	const A = { authors: { isPublic: { eq: true } } }
+	const B = { authors: { name: { eq: 'John' } } }
+	const C = { authors: { name: { eq: 'Jack' } } }
+
+	it('minimize: A || (A && B) => A', () => {
+		assert.deepStrictEqual(whereOptimizer.optimize({
+			or: [
+				A,
+				{ and: [A, B] },
+			],
+		}, model.entities.Image), A)
+	})
+
+	it('minimize: (A && B) || A => A', () => {
+		assert.deepStrictEqual(whereOptimizer.optimize({
+			or: [
+				{ and: [A, B] },
+				A,
+			],
+		}, model.entities.Image), A)
+	})
+
+	it('minimize: A && (A || B) => A', () => {
+		assert.deepStrictEqual(whereOptimizer.optimize({
+			and: [
+				A,
+				{ or: [A, B] },
+			],
+		}, model.entities.Image), A)
+	})
+
+	it('minimize: (A || B) && A => A', () => {
+		assert.deepStrictEqual(whereOptimizer.optimize({
+			and: [
+				{ or: [A, B] },
+				A,
+			],
+		}, model.entities.Image), A)
+	})
+
+	it('minimize: A && (!A || B) => A && B', () => {
+		assert.deepStrictEqual(whereOptimizer.optimize({
+			and: [
+				A,
+				{ or: [{ not: A }, B] },
+			],
+		}, model.entities.Image), { and: [A, B] })
+	})
+
+	it('minimize: A || (!A && B) => A || B', () => {
+		assert.deepStrictEqual(whereOptimizer.optimize({
+			or: [
+				A,
+				{ and: [{ not: A }, B] },
+			],
+		}, model.entities.Image), { or: [A, B] })
+	})
+
+
+	it('minimize: A || !A => 1', () => {
+		assert.deepStrictEqual(whereOptimizer.optimize({
+			or: [
+				A,
+				{ not: A },
+			],
+		}, model.entities.Image), { id: { always: true } })
+	})
+
+	it('minimize: A && !A => 0', () => {
+		assert.deepStrictEqual(whereOptimizer.optimize({
+			and: [
+				A,
+				{ not: A },
+			],
+		}, model.entities.Image), { id: { never: true } })
+	})
+
+	it('minimize: !A && !A => !A', () => {
+		assert.deepStrictEqual(whereOptimizer.optimize({
+			and: [
+				{ not: A },
+				{ not: A },
+			],
+		}, model.entities.Image), { not: A })
+	})
+
+
+	it('not minimize: (A && B) || (A && C)', () => {
+		assert.deepStrictEqual(whereOptimizer.optimize({
+			or: [
+				{ and: [A, B] },
+				{ and: [A, C] },
+			],
+		}, model.entities.Image), {
+			or: [
+				{ and: [A, B] },
+				{ and: [A, C] },
+			],
+		})
+	})
 })

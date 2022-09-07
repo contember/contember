@@ -1,4 +1,4 @@
-export const optimizeOr = <P extends Record<string, unknown>>(operands: readonly (P | boolean)[]): P | { or?: P[] } | boolean => {
+export const optimizeOr = <P extends Record<string, unknown>>(operands: readonly (P | boolean | undefined)[]): P | { or?: P[] } | boolean => {
 	const normalized: P[] = []
 	let hasNever = false
 	for (const operand of operands) {
@@ -6,7 +6,7 @@ export const optimizeOr = <P extends Record<string, unknown>>(operands: readonly
 			return true
 		} else if (operand === false) {
 			hasNever = true
-		} else  {
+		} else if (operand !== undefined)  {
 			normalized.push(...Array.isArray(operand.or) ? operand.or : [operand])
 		}
 	}

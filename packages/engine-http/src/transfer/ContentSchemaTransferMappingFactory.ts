@@ -8,9 +8,11 @@ export class ContentSchemaTransferMappingFactory {
 		const tables: Record<string, TransferTableMapping> = {}
 
 		for (const entity of Object.values(contentSchema.model.entities)) {
-			tables[entity.tableName] = {
-				name: entity.tableName,
-				columns: this.buildDbColumnSchemaMap(contentSchema.model, entity),
+			if (entity.view === undefined) {
+				tables[entity.tableName] = {
+					name: entity.tableName,
+					columns: this.buildDbColumnSchemaMap(contentSchema.model, entity),
+				}
 			}
 		}
 

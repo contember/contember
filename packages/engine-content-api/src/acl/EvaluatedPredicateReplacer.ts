@@ -1,5 +1,5 @@
 import { Input, Model, Writable } from '@contember/schema'
-import deepEqual from 'fast-deep-equal'
+import { replaceWhere } from '../mapper/select/optimizer/WhereReplacer'
 
 export class EvaluatedPredicateReplacer {
 	constructor(
@@ -10,23 +10,16 @@ export class EvaluatedPredicateReplacer {
 	}
 
 	public replace(where: Input.Where): Input.Where {
-		return this.replaceInternal(where, false)
-	}
-
-	private replaceInternal(where: Input.Where, onRelation: boolean): Input.Where {
-		if (onRelation && deepEqual(where, this.evaluatedPredicate)) {
-			return { [this.sourceEntity.primary]: { always: true } }
-		}
 		const result: Writable<Input.Where> = {}
 		for (const [key, value] of Object.entries(where)) {
 			if (key === 'not') {
-				result['not'] = this.replaceInternal(value as Input.Where, onRelation)
+				result['not'] = this.replace(value as Input.Where)
 
 			} else if (key === 'and' || key === 'or') {
-				result[key] = (value as Input.Where[]).map(it => this.replaceInternal(it, onRelation))
+				result[key] = (value as Input.Where[]).map(it => this.replace(it))
 
-			} else if (key === this.relation.name && !onRelation) {
-				result[key] = this.replaceInternal(value as Input.Where, true)
+			} else if (key === this.relation.name) {
+				result[key] = replaceWhere(value as Input.Where, this.evaluatedPredicate, { [this.sourceEntity.primary]: { always: true } })
 
 			} else {
 				result[key] = value
@@ -35,4 +28,5 @@ export class EvaluatedPredicateReplacer {
 		}
 		return result
 	}
+
 }

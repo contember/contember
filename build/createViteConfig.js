@@ -1,4 +1,4 @@
-import reactRefresh from '@vitejs/plugin-react-refresh'
+import react from '@vitejs/plugin-react'
 import { resolve } from 'path'
 import { defineConfig } from 'vite'
 import { getPackagePath, packageList } from './packageList.js'
@@ -10,19 +10,20 @@ export function createViteConfig(packageName) {
 	}
 
 	const packageDir = `packages/${packageName}`
+	const entry = resolve(rootDirectory, `${packageDir}/src/index.ts`)
 
 	return defineConfig(({ command, mode }) => {
 		return {
 			build: {
 				lib: {
-					entry: resolve(rootDirectory, `${packageDir}/src/index.ts`),
+					entry,
 					formats: ['es'],
 				},
 				minify: false,
 				outDir: resolve(rootDirectory, `${packageDir}/dist/${mode}`),
 				rollupOptions: {
 					external: (id, importer, resolved) => {
-						return !resolved && !id.startsWith('./') && !id.startsWith('../') && id !== '.'
+						return !resolved && !id.startsWith('./') && !id.startsWith('../') && id !== '.' && id !== entry
 					},
 					output: {
 						preserveModules: true,
@@ -35,12 +36,7 @@ export function createViteConfig(packageName) {
 				sourcemap: true,
 				target: 'es2020',
 			},
-			esbuild: {
-				jsxFactory: '_jsx',
-				jsxFragment: '_jsxFragment',
-				jsxInject: `import { createElement as _jsx, Fragment as _jsxFragment } from 'react'`,
-			},
-			plugins: [reactRefresh()],
+			plugins: [react()],
 			resolve: {
 				alias: packageList.map(packageName => ({
 					find: `@contember/${packageName}`,

@@ -2,7 +2,7 @@
 // Note: Does not work with pages containing content editor
 // import './wdyr' // THIS MUST BE THE FIRST IMPORT!
 
-import { ApplicationEntrypoint, Pages, runReactApp } from '@contember/admin'
+import { ApplicationEntrypoint, PageModule, Pages, runReactApp } from '@contember/admin'
 import { Layout } from './components/Layout'
 import './index.sass'
 
@@ -13,6 +13,6 @@ runReactApp(
 		project={'admin-sandbox'}
 		stage={'live'}
 		basePath={import.meta.env.BASE_URL}
-		children={<Pages layout={Layout} children={import.meta.glob('./pages/**/*.tsx')} />}
+		children={<Pages layout={Layout} children={import.meta.glob<PageModule>('./pages/**/*.tsx')} />}
 	/>,
 )

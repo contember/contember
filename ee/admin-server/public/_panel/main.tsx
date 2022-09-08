@@ -27,7 +27,7 @@ const Entry = () => {
 				studioForm: { path: '/project/studio/:project/form/:entity/:id?' },
 			}}
 			envVariables={config}
-			children={<Pages layout={PanelLayout} children={import.meta.globEager('./pages/**/*.tsx')} />}
+			children={<Pages layout={PanelLayout} children={import.meta.glob('./pages/**/*.tsx', { eager: true })} />}
 		/>
 	)
 }

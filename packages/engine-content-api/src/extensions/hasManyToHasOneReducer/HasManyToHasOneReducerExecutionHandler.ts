@@ -31,7 +31,7 @@ export class HasManyToHasOneReducerExecutionHandler implements SelectExecutionHa
 				}
 				const newObjectNode = objectNode.withArgs<Input.ListQueryInput>({ filter: whereWithParentId })
 
-				return context.mapper.select(targetEntity, newObjectNode, targetRelation, targetRelation.name)
+				return context.mapper.selectAssoc(targetEntity, newObjectNode, targetRelation, targetRelation.name)
 			},
 			null,
 		)

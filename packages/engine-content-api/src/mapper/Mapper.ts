@@ -1,6 +1,6 @@
 import { Input, Model } from '@contember/schema'
 import { getColumnName } from '@contember/schema-utils'
-import { SelectHydrator, SelectIndexedResultObjects, SelectResultObject } from './select'
+import { SelectGroupedObjects, SelectHydrator, SelectIndexedResultObjects, SelectResultObject } from './select'
 import { PathFactory } from './select'
 import * as database from '@contember/database'
 import { Client, SelectBuilder } from '@contember/database'
@@ -56,30 +56,28 @@ export class Mapper {
 		return result[0] !== undefined ? result[0][columnName] : undefined
 	}
 
-	public async select(entity: Model.Entity, input: ObjectNode<Input.ListQueryInput>, overRelation: Model.AnyRelation | null): Promise<SelectResultObject[]>
-	public async select(
+	public async selectAssoc(
 		entity: Model.Entity,
 		input: ObjectNode<Input.ListQueryInput>,
 		overRelation: Model.AnyRelation | null,
 		indexBy: string,
-	): Promise<SelectIndexedResultObjects>
-	public async select(
-		entity: Model.Entity,
-		input: ObjectNode<Input.ListQueryInput>,
-		overRelation: Model.AnyRelation | null,
-		indexBy?: string,
-	): Promise<SelectResultObject[] | SelectIndexedResultObjects> {
+	): Promise<SelectIndexedResultObjects> {
 		const hydrator = new SelectHydrator()
-		let qb: SelectBuilder<SelectBuilder.Result> = SelectBuilder.create()
-		let indexByAlias: string | null = null
-		if (indexBy) {
-			const path = this.pathFactory.create([])
-			indexByAlias = path.for(indexBy).alias
-			qb = qb.select([path.alias, getColumnName(this.schema, entity, indexBy)], indexByAlias)
-		}
+		const path = this.pathFactory.create([])
+		const indexByAlias: string = path.for(indexBy).alias
+		const qb: SelectBuilder = SelectBuilder.create()
+			.select([path.alias, getColumnName(this.schema, entity, indexBy)], indexByAlias)
+		const rows = await this.selectRows(hydrator, qb, entity, input, overRelation)
+		return await hydrator.hydrateAll(rows, indexByAlias)
+	}
+
+	public async select(entity: Model.Entity, input: ObjectNode<Input.ListQueryInput>, overRelation: Model.AnyRelation | null): Promise<SelectResultObject[]> {
+		const hydrator = new SelectHydrator()
+		const qb: SelectBuilder<SelectBuilder.Result> = SelectBuilder.create()
+
 		const rows = await this.selectRows(hydrator, qb, entity, input, overRelation)
 
-		return await (indexByAlias !== null ? hydrator.hydrateAll(rows, indexByAlias) : hydrator.hydrateAll(rows))
+		return await hydrator.hydrateAll(rows)
 	}
 
 	public async selectUnique(
@@ -91,21 +89,24 @@ export class Mapper {
 		const where = query.args.filter ? { and: [uniqueWhere, query.args.filter] } : uniqueWhere
 		const queryExpanded = query.withArg<Input.ListQueryInput>('filter', where)
 
-		return (await this.select(entity, queryExpanded, overRelation))[0] || null
+		const rows = await this.select(entity, queryExpanded, overRelation)
+
+		return rows[0] ?? null
 	}
 
 	public async selectGrouped(
 		entity: Model.Entity,
 		input: ObjectNode<Input.ListQueryInput>,
 		relation: Model.JoiningColumnRelation & Model.AnyRelation,
-	) {
+	): Promise<SelectGroupedObjects> {
 		const hydrator = new SelectHydrator()
-		let qb: SelectBuilder<SelectBuilder.Result> = SelectBuilder.create()
 		const path = this.pathFactory.create([])
 		const groupingKey = '__grouping_key'
-		qb = qb.select([path.alias, relation.joiningColumn.columnName], groupingKey)
+		const qb: SelectBuilder = SelectBuilder.create()
+			.select([path.alias, relation.joiningColumn.columnName], groupingKey)
 
 		const rows = await this.selectRows(hydrator, qb, entity, input, relation, relation.name)
+
 		return await hydrator.hydrateGroups(rows, groupingKey)
 	}
 

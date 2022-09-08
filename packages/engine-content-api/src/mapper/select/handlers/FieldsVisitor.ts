@@ -155,7 +155,7 @@ export class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.C
 				}
 				const objectWithWhere = field.withArg('filter', where)
 
-				return this.mapper.select(targetEntity, objectWithWhere, targetRelation, targetRelation.name)
+				return this.mapper.selectAssoc(targetEntity, objectWithWhere, targetRelation, targetRelation.name)
 			},
 			null,
 		)
@@ -184,7 +184,7 @@ export class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.C
 				}
 				const objectWithWhere = objectNode.withArg('filter', where)
 
-				return this.mapper.select(targetEntity, objectWithWhere, targetRelation, targetEntity.primary)
+				return this.mapper.selectAssoc(targetEntity, objectWithWhere, targetRelation, targetEntity.primary)
 			},
 			null,
 		)
@@ -208,7 +208,7 @@ export class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.C
 				}
 				const objectWithWhere = objectNode.withArg('filter', where)
 
-				return this.mapper.select(targetEntity, objectWithWhere, targetRelation, targetEntity.primary)
+				return this.mapper.selectAssoc(targetEntity, objectWithWhere, targetRelation, targetEntity.primary)
 			},
 			null,
 		)

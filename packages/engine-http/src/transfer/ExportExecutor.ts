@@ -11,10 +11,15 @@ import { ProjectContainer } from '../ProjectContainer'
 export type ExportRequest = ReturnType<typeof ExportRequest>
 export const ExportRequest = Typesafe.object({
 	// tenant: Typesafe.boolean,
-	projects: Typesafe.array(Typesafe.object({
-		slug: Typesafe.string,
-		system: Typesafe.boolean,
-	})),
+	projects: Typesafe.array(Typesafe.intersection(
+		Typesafe.object({
+			slug: Typesafe.string,
+			system: Typesafe.boolean,
+		}),
+		Typesafe.partial({
+			targetSlug: Typesafe.string,
+		}),
+	)),
 })
 
 export class ExportExecutor {
@@ -31,7 +36,7 @@ export class ExportExecutor {
 
 			if (project.system) {
 				const systemMapping = this.systemSchemaTransferMappingFactory.build()
-				yield ['importSystemSchemaBegin', { project: project.slug, tables: Object.keys(systemMapping.tables) }]
+				yield ['importSystemSchemaBegin', { project: project.targetSlug ?? project.slug, tables: Object.keys(systemMapping.tables) }]
 				yield* this.exportSchema(systemContext.client, systemMapping)
 			}
 
@@ -42,7 +47,7 @@ export class ExportExecutor {
 
 				yield [
 					'importContentSchemaBegin', {
-						project: project.slug,
+						project: project.targetSlug ?? project.slug,
 						stage: stage.slug,
 						schemaVersion: contentSchema.version,
 						tables: Object.keys(contentMapping.tables),

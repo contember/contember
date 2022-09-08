@@ -15,7 +15,7 @@ export class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.C
 		private readonly executionContext: SelectExecutionHandlerContext,
 	) {}
 
-	visitColumn(entity: Model.Entity, column: Model.AnyColumn): void {
+	visitColumn({ entity, column }: Model.ColumnContext): void {
 		const columnPath = this.executionContext.path
 		this.executionContext.addColumn(qb => {
 			const tableAlias = columnPath.back().alias
@@ -49,12 +49,7 @@ export class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.C
 		})
 	}
 
-	public visitManyHasManyInverse(
-		entity: Model.Entity,
-		relation: Model.ManyHasManyInverseRelation,
-		targetEntity: Model.Entity,
-		targetRelation: Model.ManyHasManyOwningRelation,
-	): void {
+	public visitManyHasManyInverse({ relation, entity, targetEntity, targetRelation }: Model.ManyHasManyInverseContext): void {
 		const field = this.executionContext.objectNode
 		if (!field) {
 			throw new Error()
@@ -77,12 +72,7 @@ export class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.C
 		)
 	}
 
-	public visitManyHasManyOwning(
-		entity: Model.Entity,
-		relation: Model.ManyHasManyOwningRelation,
-		targetEntity: Model.Entity,
-		targetRelation: Model.ManyHasManyInverseRelation | null,
-	): void {
+	public visitManyHasManyOwning({ targetRelation, relation, targetEntity, entity }: Model.ManyHasManyOwningContext): void {
 		const field = this.executionContext.objectNode
 		if (!field) {
 			throw new Error()
@@ -104,12 +94,7 @@ export class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.C
 		)
 	}
 
-	public visitOneHasMany(
-		entity: Model.Entity,
-		relation: Model.OneHasManyRelation,
-		targetEntity: Model.Entity,
-		targetRelation: Model.ManyHasOneRelation,
-	): void {
+	public visitOneHasMany({ entity, targetRelation, targetEntity, relation }: Model.OneHasManyContext): void {
 		const field = this.executionContext.objectNode
 		if (!field) {
 			throw new Error()
@@ -130,12 +115,7 @@ export class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.C
 		)
 	}
 
-	public visitOneHasOneInverse(
-		entity: Model.Entity,
-		relation: Model.OneHasOneInverseRelation,
-		targetEntity: Model.Entity,
-		targetRelation: Model.OneHasOneOwningRelation,
-	): void {
+	public visitOneHasOneInverse({ entity, targetRelation, targetEntity }: Model.OneHasOneInverseContext): void {
 		this.executionContext.addData(
 			entity.primary,
 			async ids => {
@@ -161,12 +141,7 @@ export class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.C
 		)
 	}
 
-	public visitOneHasOneOwning(
-		entity: Model.Entity,
-		relation: Model.OneHasOneOwningRelation,
-		targetEntity: Model.Entity,
-		targetRelation: Model.OneHasOneInverseRelation | null,
-	): void {
+	public visitOneHasOneOwning({ relation, targetRelation, targetEntity }: Model.OneHasOneOwningContext): void {
 		this.executionContext.addData(
 			relation.name,
 			async ids => {
@@ -190,7 +165,7 @@ export class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.C
 		)
 	}
 
-	public visitManyHasOne(entity: Model.Entity, relation: Model.ManyHasOneRelation, targetEntity: Model.Entity, targetRelation: Model.OneHasManyRelation | null): void {
+	public visitManyHasOne({ relation, targetEntity, targetRelation }: Model.ManyHasOneContext): void {
 		this.executionContext.addData(
 			relation.name,
 			async ids => {

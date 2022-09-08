@@ -87,11 +87,7 @@ export class WhereBuilder {
 				continue
 			}
 
-			const joinedWhere = (
-				entity: Model.Entity,
-				relation: Model.Relation,
-				targetEntity: Model.Entity,
-			): SqlConditionBuilder => {
+			const joinedWhere = ({ targetEntity, relation, entity }: Model.AnyRelationContext): SqlConditionBuilder => {
 				const targetPath = path.for(fieldName)
 				const relationWhere = where[fieldName] as Input.Where
 				if (Object.keys(relationWhere).length === 0) {
@@ -116,32 +112,33 @@ export class WhereBuilder {
 			}
 
 			conditionBuilder = acceptFieldVisitor<SqlConditionBuilder>(this.schema, entity, fieldName, {
-				visitColumn: (entity, column) => {
+				visitColumn: ({ entity, column }) => {
 					const subWhere: Input.Condition<Input.ColumnValue> = where[column.name] as Input.Condition<Input.ColumnValue>
 					return this.conditionBuilder.build(conditionBuilder, tableName, column.columnName, column.columnType, subWhere)
 				},
 				visitOneHasOneInverse: joinedWhere,
 				visitOneHasOneOwning: joinedWhere,
 				visitManyHasOne: joinedWhere,
-				visitManyHasManyInverse: (entity, relation, targetEntity, targetRelation) => {
+				visitManyHasManyInverse: context => {
 					if (allowManyJoin) {
-						return joinedWhere(entity, relation, targetEntity)
+						return joinedWhere(context)
 					}
+
 					const relationWhere = where[fieldName] as Input.Where
 
 					return conditionBuilder.exists(
 						this.createManyHasManySubquery(
 							[tableName, entity.primaryColumn],
 							relationWhere,
-							targetEntity,
-							targetRelation.joiningTable,
+							context.targetEntity,
+							context.targetRelation.joiningTable,
 							'inverse',
 						),
 					)
 				},
-				visitManyHasManyOwning: (entity, relation, targetEntity) => {
+				visitManyHasManyOwning: context => {
 					if (allowManyJoin) {
-						return joinedWhere(entity, relation, targetEntity)
+						return joinedWhere(context)
 					}
 
 					const relationWhere = where[fieldName] as Input.Where
@@ -150,15 +147,15 @@ export class WhereBuilder {
 						this.createManyHasManySubquery(
 							[tableName, entity.primaryColumn],
 							relationWhere,
-							targetEntity,
-							relation.joiningTable,
+							context.targetEntity,
+							context.relation.joiningTable,
 							'owning',
 						),
 					)
 				},
-				visitOneHasMany: (entity, relation, targetEntity, targetRelation) => {
+				visitOneHasMany: context => {
 					if (allowManyJoin) {
-						return joinedWhere(entity, relation, targetEntity)
+						return joinedWhere(context)
 					}
 
 					const relationWhere = where[fieldName] as Input.Where
@@ -167,9 +164,9 @@ export class WhereBuilder {
 						this.build(
 							SelectBuilder.create()
 								.select(it => it.raw('1'))
-								.from(targetEntity.tableName, 'sub_')
-								.where(it => it.columnsEq([tableName, entity.primaryColumn], ['sub_', targetRelation.joiningColumn.columnName])),
-							targetEntity,
+								.from(context.targetEntity.tableName, 'sub_')
+								.where(it => it.columnsEq([tableName, entity.primaryColumn], ['sub_', context.targetRelation.joiningColumn.columnName])),
+							context.targetEntity,
 							this.pathFactory.create([], 'sub_'),
 							relationWhere,
 							true,

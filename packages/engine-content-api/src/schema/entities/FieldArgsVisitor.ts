@@ -15,11 +15,11 @@ export class FieldArgsVisitor implements
 		this.whereTypeProvider = whereTypeProvider
 	}
 
-	public visitColumn(entity: Model.Entity, column: Model.AnyColumn) {
+	public visitColumn() {
 		return undefined
 	}
 
-	public visitHasMany(entity: Model.Entity, relation: Model.Relation) {
+	public visitHasMany({ relation }: Model.AnyHasManyRelationContext) {
 		const filter = this.getWhereArg(relation)
 		const orderBy = this.getOrderByArgs(relation)
 		return {
@@ -30,7 +30,7 @@ export class FieldArgsVisitor implements
 		}
 	}
 
-	public visitHasOne(entity: Model.Entity, relation: Model.Relation) {
+	public visitHasOne({ relation }: Model.ManyHasOneContext) {
 		const filter = this.getWhereArg(relation)
 		return { filter }
 	}

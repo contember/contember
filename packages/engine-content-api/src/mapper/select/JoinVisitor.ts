@@ -4,11 +4,7 @@ import { Path } from './Path'
 export class JoinVisitor implements Model.RelationByTypeVisitor<JoinDefinition[]> {
 	constructor(private readonly path: Path) {}
 
-	visitOneHasOneOwning(
-		entity: Model.Entity,
-		relation: Model.OneHasOneOwningRelation,
-		targetEntity: Model.Entity,
-	): JoinDefinition[] {
+	visitOneHasOneOwning({ targetEntity, relation }: Model.OneHasOneOwningContext): JoinDefinition[] {
 		return [
 			{
 				tableName: targetEntity.tableName,
@@ -18,12 +14,7 @@ export class JoinVisitor implements Model.RelationByTypeVisitor<JoinDefinition[]
 		]
 	}
 
-	visitOneHasOneInverse(
-		entity: Model.Entity,
-		relation: Model.OneHasOneInverseRelation,
-		targetEntity: Model.Entity,
-		targetRelation: Model.OneHasOneOwningRelation,
-	): JoinDefinition[] {
+	visitOneHasOneInverse({ targetEntity, entity, targetRelation }: Model.OneHasOneInverseContext): JoinDefinition[] {
 		return [
 			{
 				tableName: targetEntity.tableName,
@@ -33,11 +24,7 @@ export class JoinVisitor implements Model.RelationByTypeVisitor<JoinDefinition[]
 		]
 	}
 
-	visitManyHasOne(
-		entity: Model.Entity,
-		relation: Model.ManyHasOneRelation,
-		targetEntity: Model.Entity,
-	): JoinDefinition[] {
+	visitManyHasOne({ targetEntity, relation }: Model.ManyHasOneContext): JoinDefinition[] {
 		return [
 			{
 				tableName: targetEntity.tableName,
@@ -47,12 +34,7 @@ export class JoinVisitor implements Model.RelationByTypeVisitor<JoinDefinition[]
 		]
 	}
 
-	visitOneHasMany(
-		entity: Model.Entity,
-		relation: Model.OneHasManyRelation,
-		targetEntity: Model.Entity,
-		targetRelation: Model.ManyHasOneRelation,
-	): JoinDefinition[] {
+	visitOneHasMany({ targetEntity, targetRelation, entity }: Model.OneHasManyContext): JoinDefinition[] {
 		return [
 			{
 				tableName: targetEntity.tableName,
@@ -63,11 +45,7 @@ export class JoinVisitor implements Model.RelationByTypeVisitor<JoinDefinition[]
 		]
 	}
 
-	visitManyHasManyOwning(
-		entity: Model.Entity,
-		relation: Model.ManyHasManyOwningRelation,
-		targetEntity: Model.Entity,
-	): JoinDefinition[] {
+	visitManyHasManyOwning({ relation, entity, targetEntity }: Model.ManyHasManyOwningContext): JoinDefinition[] {
 		const sourceAlias = this.path.back().alias
 		const targetAlias = this.path.alias
 		const joiningAlias = this.path.back().for('x_' + this.path.alias).alias
@@ -90,12 +68,7 @@ export class JoinVisitor implements Model.RelationByTypeVisitor<JoinDefinition[]
 		]
 	}
 
-	visitManyHasManyInverse(
-		entity: Model.Entity,
-		relation: Model.ManyHasManyInverseRelation,
-		targetEntity: Model.Entity,
-		targetRelation: Model.ManyHasManyOwningRelation,
-	): JoinDefinition[] {
+	visitManyHasManyInverse({ targetRelation, entity, targetEntity }: Model.ManyHasManyInverseContext): JoinDefinition[] {
 		const sourceAlias = this.path.back().alias
 		const targetAlias = this.path.alias
 		const joiningAlias = this.path.back().for('x_' + this.path.alias).alias

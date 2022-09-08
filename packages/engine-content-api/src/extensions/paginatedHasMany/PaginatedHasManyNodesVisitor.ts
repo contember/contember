@@ -13,12 +13,7 @@ export class PaginatedHasManyNodesVisitor implements
 		private readonly mapper: Mapper,
 	) {}
 
-	async visitOneHasMany(
-		entity: Model.Entity,
-		relation: Model.OneHasManyRelation,
-		targetEntity: Model.Entity,
-		targetRelation: Model.ManyHasOneRelation,
-	): Promise<SelectGroupedObjects> {
+	async visitOneHasMany({ targetEntity, relation, targetRelation }: Model.OneHasManyContext) {
 		return await this.relationFetcher.fetchOneHasManyGroups(
 			{
 				mapper: this.mapper,
@@ -31,12 +26,7 @@ export class PaginatedHasManyNodesVisitor implements
 		)
 	}
 
-	async visitManyHasManyOwning(
-		entity: Model.Entity,
-		relation: Model.ManyHasManyOwningRelation,
-		targetEntity: Model.Entity,
-		targetRelation: Model.ManyHasManyInverseRelation | null,
-	): Promise<SelectGroupedObjects> {
+	async visitManyHasManyOwning({ targetEntity, relation, targetRelation }: Model.ManyHasManyOwningContext) {
 		return await this.relationFetcher.fetchManyHasManyGroups(
 			{
 				mapper: this.mapper,
@@ -50,12 +40,7 @@ export class PaginatedHasManyNodesVisitor implements
 		)
 	}
 
-	async visitManyHasManyInverse(
-		entity: Model.Entity,
-		relation: Model.ManyHasManyInverseRelation,
-		targetEntity: Model.Entity,
-		targetRelation: Model.ManyHasManyOwningRelation,
-	): Promise<SelectGroupedObjects> {
+	async visitManyHasManyInverse({ targetEntity, targetRelation, relation }: Model.ManyHasManyInverseContext) {
 		return await this.relationFetcher.fetchManyHasManyGroups(
 			{
 				mapper: this.mapper,

@@ -1,4 +1,4 @@
-import { Input, Value } from '@contember/schema'
+import { Input, Model, Value } from '@contember/schema'
 import { Mapper } from '../Mapper'
 import { InsertBuilder } from './InsertBuilder'
 import { Providers, resolveColumnValue } from '@contember/schema-utils'
@@ -15,7 +15,7 @@ export class SqlCreateInputProcessor implements CreateInputProcessor<MutationRes
 		private readonly providers: Providers,
 	) {}
 
-	public async column(context: Context.ColumnContext): Promise<MutationResultList> {
+	public async column(context: Model.ColumnContext & { input: Input.ColumnValue | undefined }): Promise<MutationResultList> {
 		this.insertBuilder.addFieldValue(
 			context.column.name,
 			((): Value.GenericValueLike<Value.AtomicValue | undefined> => {
@@ -159,7 +159,7 @@ export class SqlCreateInputProcessor implements CreateInputProcessor<MutationRes
 			return []
 		},
 		connect: hasOneProcessor(
-			async (context: Context.OneHasOneOwningContext & { input: Input.UniqueWhere }): Promise<MutationResultList> => {
+			async (context: Model.OneHasOneOwningContext & { input: Input.UniqueWhere }): Promise<MutationResultList> => {
 				const primaryValue = this.mapper.getPrimaryValue(context.targetEntity, context.input)
 				this.insertBuilder.addFieldValue(context.relation.name, async () => {
 					const value = await primaryValue

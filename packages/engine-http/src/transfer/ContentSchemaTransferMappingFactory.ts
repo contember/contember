@@ -28,7 +28,7 @@ export class ContentSchemaTransferMappingFactory {
 
 		for (const field of Object.values(entity.fields)) {
 			const column = acceptFieldVisitor<DbColumnSchema | null>(schema, entity, field, {
-				visitColumn: (entity, column) => {
+				visitColumn: ({ column }) => {
 					if (column.type === Model.ColumnType.Enum) {
 						return {
 							name: column.columnName,
@@ -53,12 +53,12 @@ export class ContentSchemaTransferMappingFactory {
 						}
 					}
 				},
-				visitOneHasOneOwning: (entity, relation, targetEntity) => ({
+				visitOneHasOneOwning: ({ relation, targetEntity }) => ({
 					name: relation.joiningColumn.columnName,
 					type: targetEntity.fields[targetEntity.primary].type as (Model.ColumnType.Uuid | Model.ColumnType.Int),
 					nullable: relation.nullable,
 				}),
-				visitManyHasOne: (entity, relation, targetEntity) => ({
+				visitManyHasOne: ({ relation, targetEntity }) => ({
 					name: relation.joiningColumn.columnName,
 					type: targetEntity.fields[targetEntity.primary].type as (Model.ColumnType.Uuid | Model.ColumnType.Int),
 					nullable: relation.nullable,
@@ -85,7 +85,7 @@ export class ContentSchemaTransferMappingFactory {
 				visitColumn: () => null,
 				visitOneHasOneOwning: () => null,
 				visitManyHasOne: () => null,
-				visitManyHasManyOwning: (entity, relation, targetEntity) => ({
+				visitManyHasManyOwning: ({ entity, relation, targetEntity }) => ({
 					name: relation.joiningTable.tableName,
 					columns: {
 						[relation.joiningTable.joiningColumn.columnName]: {

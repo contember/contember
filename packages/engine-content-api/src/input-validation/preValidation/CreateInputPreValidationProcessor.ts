@@ -1,5 +1,4 @@
 import { CreateInputProcessor } from '../../inputProcessing'
-import * as Context from '../../inputProcessing'
 import { Input, Model } from '@contember/schema'
 import { appendRelationToPath, ValidationPath } from '../ValidationPath'
 import { Mapper } from '../../mapper'
@@ -15,30 +14,30 @@ export class CreateInputPreValidationProcessor implements CreateInputProcessor<R
 		private readonly mapper: Mapper,
 	) {}
 
-	manyHasManyInverse: CreateInputProcessor.HasManyRelationProcessor<Context.ManyHasManyInverseContext, Result> = {
+	manyHasManyInverse: CreateInputProcessor.HasManyRelationProcessor<Model.ManyHasManyInverseContext, Result> = {
 		connect: NoResult,
 		create: context => this.validateCreate(context),
 	}
 
-	manyHasManyOwning: CreateInputProcessor.HasManyRelationProcessor<Context.ManyHasManyOwningContext, Result> = {
+	manyHasManyOwning: CreateInputProcessor.HasManyRelationProcessor<Model.ManyHasManyOwningContext, Result> = {
 		connect: NoResult,
 		create: context => this.validateCreate(context),
 	}
 
-	manyHasOne: CreateInputProcessor.HasOneRelationProcessor<Context.ManyHasOneContext, Result> = {
+	manyHasOne: CreateInputProcessor.HasOneRelationProcessor<Model.ManyHasOneContext, Result> = {
 		connect: NoResult,
 		create: context => this.validateCreate(context),
 	}
 
-	oneHasMany: CreateInputProcessor.HasManyRelationProcessor<Context.OneHasManyContext, Result> = {
+	oneHasMany: CreateInputProcessor.HasManyRelationProcessor<Model.OneHasManyContext, Result> = {
 		connect: NoResult,
 		create: context => this.validateCreate(context),
 	}
-	oneHasOneInverse: CreateInputProcessor.HasOneRelationProcessor<Context.OneHasOneInverseContext, Result> = {
+	oneHasOneInverse: CreateInputProcessor.HasOneRelationProcessor<Model.OneHasOneInverseContext, Result> = {
 		connect: NoResult,
 		create: context => this.validateCreate(context),
 	}
-	oneHasOneOwning: CreateInputProcessor.HasOneRelationProcessor<Context.OneHasOneOwningContext, Result> = {
+	oneHasOneOwning: CreateInputProcessor.HasOneRelationProcessor<Model.OneHasOneOwningContext, Result> = {
 		connect: NoResult,
 		create: context => this.validateCreate(context),
 	}
@@ -61,7 +60,7 @@ export class CreateInputPreValidationProcessor implements CreateInputProcessor<R
 		})
 	}
 
-	async column(context: Context.ColumnContext): Promise<Result> {
+	async column(context: Model.ColumnContext): Promise<Result> {
 		return []
 	}
 }

@@ -86,7 +86,7 @@ export class WhereOptimizer {
 
 				return { [key]: optimizedCondition }
 			},
-			visitRelation: (entity, relation, targetEntity) => {
+			visitRelation: ({ targetEntity }) => {
 				const optimizedWhere = this.optimizeWhere(value as Input.Where, targetEntity)
 
 				if (typeof optimizedWhere === 'boolean') {

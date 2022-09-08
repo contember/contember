@@ -45,12 +45,7 @@ export class HasManyToHasOneReducerExecutionHandler implements SelectExecutionHa
 			visitColumn: (): never => {
 				throw new ImplementationException('HasManyToHasOneReducerExecutionHandler: Not applicable for a column')
 			},
-			visitRelation: (
-				entity,
-				relation,
-				targetEntity,
-				targetRelation,
-			): [Model.Entity, Model.AnyRelation & Model.JoiningColumnRelation] => {
+			visitRelation: ({ entity, relation, targetEntity, targetRelation }) => {
 				if (!targetRelation || !isIt<Model.JoiningColumnRelation>(targetRelation, 'joiningColumn')) {
 					throw new Error('HasManyToHasOneReducerExecutionHandler: only applicable for relations with joiningColumn')
 				}

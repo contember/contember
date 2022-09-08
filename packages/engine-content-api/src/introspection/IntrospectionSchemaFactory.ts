@@ -40,7 +40,7 @@ export class IntrospectionSchemaFactory {
 			}
 		}
 		const additionalInfo = acceptEveryFieldVisitor<AdditionalFieldInfo>(this.model, entityName, {
-			visitManyHasManyInverse(entity: Model.Entity, relation: Model.ManyHasManyInverseRelation) {
+			visitManyHasManyInverse({ relation }) {
 				return {
 					__typename: '_Relation',
 					targetEntity: relation.target,
@@ -49,7 +49,7 @@ export class IntrospectionSchemaFactory {
 					orderBy: relation.orderBy?.map(convertOrderBy),
 				}
 			},
-			visitManyHasManyOwning(entity: Model.Entity, relation: Model.ManyHasManyOwningRelation) {
+			visitManyHasManyOwning({ relation }) {
 				return {
 					__typename: '_Relation',
 					targetEntity: relation.target,
@@ -58,7 +58,7 @@ export class IntrospectionSchemaFactory {
 					orderBy: relation.orderBy?.map(convertOrderBy),
 				}
 			},
-			visitManyHasOne(entity: Model.Entity, relation: Model.ManyHasOneRelation) {
+			visitManyHasOne({ relation }) {
 				return {
 					__typename: '_Relation',
 					targetEntity: relation.target,
@@ -68,7 +68,7 @@ export class IntrospectionSchemaFactory {
 					nullable: relation.nullable,
 				}
 			},
-			visitOneHasMany(entity: Model.Entity, relation: Model.OneHasManyRelation) {
+			visitOneHasMany({ relation }) {
 				return {
 					__typename: '_Relation',
 					targetEntity: relation.target,
@@ -77,7 +77,7 @@ export class IntrospectionSchemaFactory {
 					orderBy: relation.orderBy?.map(convertOrderBy),
 				}
 			},
-			visitOneHasOneInverse(entity: Model.Entity, relation: Model.OneHasOneInverseRelation) {
+			visitOneHasOneInverse({ relation }) {
 				return {
 					__typename: '_Relation',
 					targetEntity: relation.target,
@@ -86,7 +86,7 @@ export class IntrospectionSchemaFactory {
 					nullable: relation.nullable,
 				}
 			},
-			visitOneHasOneOwning(entity: Model.Entity, relation: Model.OneHasOneOwningRelation) {
+			visitOneHasOneOwning({ relation }) {
 				return {
 					__typename: '_Relation',
 					targetEntity: relation.target,
@@ -97,7 +97,7 @@ export class IntrospectionSchemaFactory {
 					orphanRemoval: relation.orphanRemoval === true,
 				}
 			},
-			visitColumn(entity: Model.Entity, column: Model.AnyColumn) {
+			visitColumn({ column }) {
 				return {
 					__typename: '_Column',
 					defaultValue: column.default ?? undefined,

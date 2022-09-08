@@ -48,10 +48,10 @@ class PredicateDefinitionProcessor {
 			const fieldWhere = acceptFieldVisitor<
 				WhereValue | Input.Where | Input.Condition | [string, WhereValue | Input.Where | Input.Condition] | undefined
 			>(this.schema, entity, key, {
-				visitColumn: (entity, column) => {
+				visitColumn: ({ entity, column }) => {
 					return handler.handleColumn({ entity, column, value: value as Input.Condition | PredicateExtension, path })
 				},
-				visitRelation: (entity, relation, targetEntity) => {
+				visitRelation: ({ entity, relation, targetEntity }) => {
 					const processedValue = handler.handleRelation({
 						relation,
 						entity,

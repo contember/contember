@@ -14,7 +14,7 @@ export class UpdateEntityInputFieldVisitor implements
 		private readonly updateEntityRelationInputProvider: UpdateEntityRelationInputProvider,
 	) {}
 
-	public visitColumn(entity: Model.Entity, column: Model.AnyColumn): GraphQLInputFieldConfig | undefined {
+	public visitColumn({ entity, column }: Model.ColumnContext) {
 		if (entity.primary === column.name) {
 			return undefined
 		}
@@ -27,10 +27,7 @@ export class UpdateEntityInputFieldVisitor implements
 		}
 	}
 
-	public visitHasOne(
-		entity: Model.Entity,
-		relation: Model.Relation & Model.NullableRelation,
-	): GraphQLInputFieldConfig | undefined {
+	public visitHasOne({ entity, relation }: Model.AnyHasOneRelationContext) {
 		const type = this.updateEntityRelationInputProvider.getUpdateEntityRelationInput(entity.name, relation.name)
 		if (type === undefined) {
 			return undefined
@@ -40,7 +37,7 @@ export class UpdateEntityInputFieldVisitor implements
 		}
 	}
 
-	public visitHasMany(entity: Model.Entity, relation: Model.Relation): GraphQLInputFieldConfig | undefined {
+	public visitHasMany({ entity, relation }: Model.AnyHasManyRelationContext) {
 		const type = this.updateEntityRelationInputProvider.getUpdateEntityRelationInput(entity.name, relation.name)
 		if (type === undefined) {
 			return undefined

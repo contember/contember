@@ -78,12 +78,12 @@ export class InputPreValidator {
 
 	private createContextForCreate(entity: Model.Entity, data: Input.CreateDataInput): ValidationContext.NodeContext {
 		const nodeData = acceptEveryFieldVisitor(this.model, entity, {
-			visitColumn: (entity, column) => {
+			visitColumn: ({ entity, column }) => {
 				const value = data[column.name] as Input.ColumnValue | undefined
 				const validationValue = this.columnValueResolver.getDefaultValidationValue({ entity, column, input: value })
 				return validationValue === undefined ? null : validationValue
 			},
-			visitHasOne: (entity, relation) => {
+			visitHasOne: ({ relation }) => {
 				const value = data[relation.name] as Input.CreateOneRelationInput | undefined
 				return value ? true : null
 			},
@@ -101,10 +101,10 @@ export class InputPreValidator {
 		dependencies: Dependencies,
 	): Promise<ValidationContext.NodeContext> {
 		const inputNodeData = acceptEveryFieldVisitor(this.model, entity, {
-			visitColumn: (entity, column) => {
+			visitColumn: ({ column }) => {
 				return data[column.name] as Input.ColumnValue | undefined
 			},
-			visitHasOne: (entity, relation) => {
+			visitHasOne: ({ relation }) => {
 				const value = data[relation.name] as Input.CreateOneRelationInput | Input.UpdateOneRelationInput | undefined | null
 				if (value === undefined || value === null) {
 					return undefined

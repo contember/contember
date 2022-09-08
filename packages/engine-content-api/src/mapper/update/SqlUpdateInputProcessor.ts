@@ -26,7 +26,7 @@ export class SqlUpdateInputProcessor implements UpdateInputProcessor<MutationRes
 		private readonly mapper: Mapper,
 	) {}
 
-	public column({ entity, column }: Context.ColumnContext) {
+	public column({ entity, column }: Model.ColumnContext) {
 		if (this.data[column.name] !== undefined) {
 			this.updateBuilder.addFieldValue(column.name, this.data[column.name] as Value.AtomicValue)
 		}

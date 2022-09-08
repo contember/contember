@@ -7,11 +7,11 @@ export class FieldAccessVisitor implements Model.ColumnVisitor<boolean>, Model.R
 		private readonly authorizator: Authorizator,
 	) {}
 
-	visitColumn(entity: Model.Entity, column: Model.AnyColumn) {
+	visitColumn({ column, entity }: Model.ColumnContext) {
 		return this.authorizator.getFieldPermissions(this.operation, entity.name, column.name) !== 'no'
 	}
 
-	visitRelation({}, {}, targetEntity: Model.Entity) {
+	visitRelation({ targetEntity }: Model.AnyRelationContext) {
 		return this.authorizator.getEntityPermission(this.operation, targetEntity.name) !== 'no'
 	}
 }

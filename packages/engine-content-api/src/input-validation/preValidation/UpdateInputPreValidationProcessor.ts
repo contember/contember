@@ -1,5 +1,4 @@
 import { UpdateInputProcessor } from '../../inputProcessing'
-import * as Context from '../../inputProcessing'
 import { Input, Model } from '@contember/schema'
 import { appendRelationToPath, ValidationPath } from '../ValidationPath'
 import { Mapper } from '../../mapper'
@@ -16,11 +15,11 @@ export class UpdateInputPreValidationProcessor implements UpdateInputProcessor<R
 		private readonly mapper: Mapper,
 	) {}
 
-	async column(context: Context.ColumnContext): Promise<Result> {
+	async column(context: Model.ColumnContext): Promise<Result> {
 		return []
 	}
 
-	manyHasManyInverse: UpdateInputProcessor.HasManyRelationInputProcessor<Context.ManyHasManyInverseContext, Result> = {
+	manyHasManyInverse: UpdateInputProcessor.HasManyRelationInputProcessor<Model.ManyHasManyInverseContext, Result> = {
 		create: ctx => this.processCreate(ctx),
 		update: ctx => this.processUpdate({ ...ctx, input: ctx.input.data }),
 		upsert: ctx => this.processUpsert(ctx),
@@ -28,7 +27,7 @@ export class UpdateInputPreValidationProcessor implements UpdateInputProcessor<R
 		disconnect: NoResult,
 		['delete']: NoResult,
 	}
-	manyHasManyOwning: UpdateInputProcessor.HasManyRelationInputProcessor<Context.ManyHasManyOwningContext, Result> = {
+	manyHasManyOwning: UpdateInputProcessor.HasManyRelationInputProcessor<Model.ManyHasManyOwningContext, Result> = {
 		create: ctx => this.processCreate(ctx),
 		update: ctx => this.processUpdate({ ...ctx, input: ctx.input.data }),
 		upsert: ctx => this.processUpsert(ctx),
@@ -36,7 +35,7 @@ export class UpdateInputPreValidationProcessor implements UpdateInputProcessor<R
 		disconnect: NoResult,
 		['delete']: NoResult,
 	}
-	manyHasOne: UpdateInputProcessor.HasOneRelationInputProcessor<Context.ManyHasOneContext, Result> = {
+	manyHasOne: UpdateInputProcessor.HasOneRelationInputProcessor<Model.ManyHasOneContext, Result> = {
 		create: ctx => this.processCreate(ctx),
 		update: ctx => this.processUpdate(ctx),
 		upsert: ctx => this.processUpsert(ctx),
@@ -44,7 +43,7 @@ export class UpdateInputPreValidationProcessor implements UpdateInputProcessor<R
 		disconnect: NoResult,
 		['delete']: NoResult,
 	}
-	oneHasMany: UpdateInputProcessor.HasManyRelationInputProcessor<Context.OneHasManyContext, Result> = {
+	oneHasMany: UpdateInputProcessor.HasManyRelationInputProcessor<Model.OneHasManyContext, Result> = {
 		create: ctx => this.processCreate(ctx),
 		update: ctx => this.processUpdate({ ...ctx, input: ctx.input.data }),
 		upsert: ctx => this.processUpsert(ctx),
@@ -52,7 +51,7 @@ export class UpdateInputPreValidationProcessor implements UpdateInputProcessor<R
 		disconnect: NoResult,
 		['delete']: NoResult,
 	}
-	oneHasOneInverse: UpdateInputProcessor.HasOneRelationInputProcessor<Context.OneHasOneInverseContext, Result> = {
+	oneHasOneInverse: UpdateInputProcessor.HasOneRelationInputProcessor<Model.OneHasOneInverseContext, Result> = {
 		create: ctx => this.processCreate(ctx),
 		update: ctx => this.processUpdate(ctx),
 		upsert: ctx => this.processUpsert(ctx),
@@ -61,7 +60,7 @@ export class UpdateInputPreValidationProcessor implements UpdateInputProcessor<R
 		['delete']: NoResult,
 	}
 
-	oneHasOneOwning: UpdateInputProcessor.HasOneRelationInputProcessor<Context.OneHasOneOwningContext, Result> = {
+	oneHasOneOwning: UpdateInputProcessor.HasOneRelationInputProcessor<Model.OneHasOneOwningContext, Result> = {
 		create: ctx => this.processCreate(ctx),
 		update: ctx => this.processUpdate(ctx),
 		upsert: ctx => this.processUpsert(ctx),

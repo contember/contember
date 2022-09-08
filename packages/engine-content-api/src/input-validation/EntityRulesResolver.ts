@@ -51,7 +51,7 @@ export class EntityRulesResolver {
 }
 
 class RequiredFieldsVisitor implements Model.RelationByTypeVisitor<boolean>, Model.ColumnVisitor<boolean> {
-	visitColumn(entity: Model.Entity, column: Model.AnyColumn): boolean {
+	visitColumn({ column }: Model.ColumnContext): boolean {
 		return !column.nullable && typeof column.default === 'undefined' && !column.sequence
 	}
 
@@ -63,7 +63,7 @@ class RequiredFieldsVisitor implements Model.RelationByTypeVisitor<boolean>, Mod
 		return false
 	}
 
-	visitManyHasOne(entity: Model.Entity, relation: Model.ManyHasOneRelation): boolean {
+	visitManyHasOne({ relation }: Model.ManyHasOneContext): boolean {
 		return !relation.nullable
 	}
 
@@ -71,11 +71,11 @@ class RequiredFieldsVisitor implements Model.RelationByTypeVisitor<boolean>, Mod
 		return false
 	}
 
-	visitOneHasOneInverse(entity: Model.Entity, relation: Model.OneHasOneInverseRelation, targetEntity: Model.Entity): boolean {
+	visitOneHasOneInverse({ targetEntity, relation }: Model.OneHasOneInverseContext): boolean {
 		return !relation.nullable && !targetEntity.view
 	}
 
-	visitOneHasOneOwning(entity: Model.Entity, relation: Model.OneHasOneOwningRelation): boolean {
+	visitOneHasOneOwning({ relation }: Model.OneHasOneOwningContext): boolean {
 		return !relation.nullable
 	}
 }

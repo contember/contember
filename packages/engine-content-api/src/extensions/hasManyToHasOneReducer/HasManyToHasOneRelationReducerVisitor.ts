@@ -48,12 +48,7 @@ export class HasManyToHasOneRelationReducerFieldVisitor implements
 		return {}
 	}
 
-	public visitOneHasMany(
-		entity: Model.Entity,
-		relation: Model.AnyRelation,
-		targetEntity: Model.Entity,
-		targetRelation: Model.AnyRelation | null,
-	) {
+	public visitOneHasMany({ entity, targetEntity, targetRelation, relation }: Model.OneHasManyContext) {
 		if (!targetRelation) {
 			return {}
 		}

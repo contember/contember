@@ -16,10 +16,10 @@ export class CreateUniqueConstraintModificationHandler implements ModificationHa
 		const fields = this.data.unique.fields
 		const columns = fields.map(fieldName => {
 			return acceptFieldVisitor(this.schema.model, entity, fieldName, {
-				visitColumn: ({}, column) => {
+				visitColumn: ({ column }) => {
 					return column.columnName
 				},
-				visitManyHasOne: ({}, relation) => {
+				visitManyHasOne: ({ relation }) => {
 					return relation.joiningColumn.columnName
 				},
 				visitOneHasMany: () => {

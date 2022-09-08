@@ -27,12 +27,7 @@ export class UpdateEntityRelationInputFieldVisitor implements
 		throw new Error('UpdateEntityRelationInputFieldVisitor: Not applicable for a column')
 	}
 
-	public visitHasOne(
-		entity: Model.Entity,
-		relation: Model.Relation & Model.NullableRelation,
-		targetEntity: Model.Entity,
-		targetRelation: Model.Relation | null,
-	): GraphQLInputObjectType | undefined {
+	public visitHasOne({ targetRelation, targetEntity, relation, entity }: Model.AnyHasOneRelationContext) {
 		const withoutRelation = targetRelation ? targetRelation.name : undefined
 
 		const whereInput = this.createWhereInput(targetEntity)
@@ -84,12 +79,7 @@ export class UpdateEntityRelationInputFieldVisitor implements
 		})
 	}
 
-	public visitHasMany(
-		entity: Model.Entity,
-		relation: Model.Relation,
-		targetEntity: Model.Entity,
-		targetRelation: Model.Relation | null,
-	): GraphQLInputObjectType | undefined {
+	public visitHasMany({ entity, relation, targetEntity, targetRelation }: Model.AnyHasManyRelationContext) {
 		const withoutRelation = targetRelation ? targetRelation.name : undefined
 
 		const whereInput = this.createWhereInput(targetEntity)

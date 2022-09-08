@@ -15,13 +15,13 @@ export class CreateIndexModificationHandler implements ModificationHandler<Creat
 		const fields = this.data.index.fields
 		const columns = fields.map(fieldName => {
 			return acceptFieldVisitor(this.schema.model, entity, fieldName, {
-				visitColumn: ({}, column) => {
+				visitColumn: ({ column }) => {
 					return column.columnName
 				},
-				visitManyHasOne: ({}, relation) => {
+				visitManyHasOne: ({ relation }) => {
 					return relation.joiningColumn.columnName
 				},
-				visitOneHasOneOwning: ({}, relation) => {
+				visitOneHasOneOwning: ({ relation }) => {
 					return relation.joiningColumn.columnName
 				},
 				visitOneHasMany: () => {

@@ -74,9 +74,9 @@ export class UpdateBuilder {
 					const columns = new Set(resolvedData.map(it => it.columnName))
 					const allColumns: string[] = Object.values(
 						acceptEveryFieldVisitor(this.schema, this.entity, {
-							visitColumn: (entity, column) => column.columnName,
-							visitManyHasOne: (entity, relation) => relation.joiningColumn.columnName,
-							visitOneHasOneOwning: (entity, relation) => relation.joiningColumn.columnName,
+							visitColumn: ({ column }) => column.columnName,
+							visitManyHasOne: ({ relation }) => relation.joiningColumn.columnName,
+							visitOneHasOneOwning: ({ relation }) => relation.joiningColumn.columnName,
 							visitManyHasManyInverse: () => null,
 							visitManyHasManyOwning: () => null,
 							visitOneHasOneInverse: () => null,

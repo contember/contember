@@ -53,7 +53,7 @@ export class PredicatesInjector {
 		for (let field of fields) {
 			const [targetEntity, targetRelation] = acceptFieldVisitor(this.schema, entity, field, {
 				visitColumn: () => null,
-				visitRelation: (_a, _b, targetEntity, targetRelation) => [targetEntity, targetRelation ?? undefined],
+				visitRelation: ({ targetEntity, targetRelation }) => [targetEntity, targetRelation ?? undefined],
 			}) ?? []
 			if (targetEntity) {
 				resultWhere[field] = this.injectToWhere(where[field] as Input.Where, targetEntity, false, targetRelation)

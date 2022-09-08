@@ -26,29 +26,16 @@ export class CreateEntityRelationInputFieldVisitor implements
 		throw new ImplementationException('CreateEntityRelationInputFieldVisitor: Not applicable for a column')
 	}
 
-	public visitHasOne(
-		entity: Model.Entity,
-		relation: Model.Relation & Model.NullableRelation,
-		targetEntity: Model.Entity,
-		targetRelation: Model.Relation | null,
-	): GraphQLInputObjectType | undefined {
-		return this.createInputObject(entity, relation, targetEntity, targetRelation, false)
+	public visitHasOne(context: Model.ManyHasOneContext): GraphQLInputObjectType | undefined {
+		return this.createInputObject(context, false)
 	}
 
-	public visitHasMany(
-		entity: Model.Entity,
-		relation: Model.Relation,
-		targetEntity: Model.Entity,
-		targetRelation: Model.Relation | null,
-	): GraphQLInputObjectType | undefined {
-		return this.createInputObject(entity, relation, targetEntity, targetRelation, true)
+	public visitHasMany(context: Model.OneHasManyContext): GraphQLInputObjectType | undefined {
+		return this.createInputObject(context, true)
 	}
 
 	public createInputObject(
-		entity: Model.Entity,
-		relation: Model.Relation,
-		targetEntity: Model.Entity,
-		targetRelation: Model.Relation | null,
+		{ entity, relation, targetEntity, targetRelation }: Model.AnyRelationContext,
 		withAliasField: boolean,
 	): GraphQLInputObjectType | undefined {
 		const targetName = targetRelation ? targetRelation.name : undefined

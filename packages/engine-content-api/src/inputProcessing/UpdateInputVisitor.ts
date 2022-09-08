@@ -1,7 +1,6 @@
 import { Input, Model } from '@contember/schema'
 import { filterObject, isIt } from '../utils'
 import { UpdateInputProcessor } from './UpdateInputProcessor'
-import * as Context from './InputContext'
 import { ImplementationException, UserError } from '../exception'
 
 export class UpdateInputVisitor<Result> implements
@@ -14,7 +13,7 @@ export class UpdateInputVisitor<Result> implements
 		private readonly data: Input.UpdateDataInput,
 	) {}
 
-	public visitColumn(entity: Model.Entity, column: Model.AnyColumn): Promise<Result> {
+	public visitColumn({ entity, column }: Model.ColumnContext): Promise<Result> {
 		return this.updateInputProcessor.column({
 			entity,
 			column,
@@ -22,96 +21,51 @@ export class UpdateInputVisitor<Result> implements
 		})
 	}
 
-	public visitManyHasManyInverse(
-		entity: Model.Entity,
-		relation: Model.ManyHasManyInverseRelation,
-		targetEntity: Model.Entity,
-		targetRelation: Model.ManyHasManyOwningRelation,
-	) {
-		return this.processManyRelationInput<Context.ManyHasManyInverseContext>(
+	public visitManyHasManyInverse(context: Model.ManyHasManyInverseContext) {
+		return this.processManyRelationInput(
 			this.updateInputProcessor.manyHasManyInverse,
-			{ entity, relation, targetEntity, targetRelation },
-			this.data[relation.name] as Input.CreateManyRelationInput,
+			context,
+			this.data[context.relation.name] as Input.CreateManyRelationInput,
 		)
 	}
 
-	public visitManyHasManyOwning(
-		entity: Model.Entity,
-		relation: Model.ManyHasManyOwningRelation,
-		targetEntity: Model.Entity,
-		targetRelation: Model.ManyHasManyInverseRelation | null,
-	) {
-		return this.processManyRelationInput<Context.ManyHasManyOwningContext>(
+	public visitManyHasManyOwning(context: Model.ManyHasManyOwningContext) {
+		return this.processManyRelationInput(
 			this.updateInputProcessor.manyHasManyOwning,
-			{ entity, relation, targetEntity, targetRelation },
-			this.data[relation.name] as Input.CreateManyRelationInput,
+			context,
+			this.data[context.relation.name] as Input.CreateManyRelationInput,
 		)
 	}
 
-	public visitManyHasOne(
-		entity: Model.Entity,
-		relation: Model.ManyHasOneRelation,
-		targetEntity: Model.Entity,
-		targetRelation: Model.OneHasManyRelation | null,
-	) {
-		return this.processRelationInput<Context.ManyHasOneContext>(
+	public visitManyHasOne(context: Model.ManyHasOneContext) {
+		return this.processRelationInput(
 			this.updateInputProcessor.manyHasOne,
-			{
-				entity,
-				relation,
-				targetEntity,
-				targetRelation,
-			},
-			this.data[relation.name] as Input.CreateOneRelationInput,
+			context,
+			this.data[context.relation.name] as Input.CreateOneRelationInput,
 		)
 	}
 
-	public visitOneHasMany(
-		entity: Model.Entity,
-		relation: Model.OneHasManyRelation,
-		targetEntity: Model.Entity,
-		targetRelation: Model.ManyHasOneRelation,
-	) {
-		return this.processManyRelationInput<Context.OneHasManyContext>(
+	public visitOneHasMany(context: Model.OneHasManyContext) {
+		return this.processManyRelationInput(
 			this.updateInputProcessor.oneHasMany,
-			{ entity, relation, targetEntity, targetRelation },
-			this.data[relation.name] as Input.CreateManyRelationInput,
+			context,
+			this.data[context.relation.name] as Input.CreateManyRelationInput,
 		)
 	}
 
-	public visitOneHasOneInverse(
-		entity: Model.Entity,
-		relation: Model.OneHasOneInverseRelation,
-		targetEntity: Model.Entity,
-		targetRelation: Model.OneHasOneOwningRelation,
-	) {
-		return this.processRelationInput<Context.OneHasOneInverseContext>(
+	public visitOneHasOneInverse(context: Model.OneHasOneInverseContext) {
+		return this.processRelationInput(
 			this.updateInputProcessor.oneHasOneInverse,
-			{
-				entity,
-				relation,
-				targetEntity,
-				targetRelation,
-			},
-			this.data[relation.name] as Input.CreateOneRelationInput,
+			context,
+			this.data[context.relation.name] as Input.CreateOneRelationInput,
 		)
 	}
 
-	public visitOneHasOneOwning(
-		entity: Model.Entity,
-		relation: Model.OneHasOneOwningRelation,
-		targetEntity: Model.Entity,
-		targetRelation: Model.OneHasOneInverseRelation | null,
-	) {
-		return this.processRelationInput<Context.OneHasOneOwningContext>(
+	public visitOneHasOneOwning(context: Model.OneHasOneOwningContext) {
+		return this.processRelationInput(
 			this.updateInputProcessor.oneHasOneOwning,
-			{
-				entity,
-				relation,
-				targetEntity,
-				targetRelation,
-			},
-			this.data[relation.name] as Input.CreateOneRelationInput,
+			context,
+			this.data[context.relation.name] as Input.CreateOneRelationInput,
 		)
 	}
 

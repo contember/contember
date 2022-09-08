@@ -69,12 +69,14 @@ export class ExportExecutor {
 	private async* exportSequences(db: Client<Connection.TransactionLike>, table: TransferTableMapping): AsyncIterable<Command> {
 		for (const column of Object.values(table.columns)) {
 			if (column.type === Model.ColumnType.Int && column.sequence) {
-				const seqResult = await db.query<{ nextval: number }>(
-					'SELECT nextval(pg_get_serial_sequence(?, ?))',
+				const seqNameResult = await db.query<{ name: string }>(
+					'SELECT pg_get_serial_sequence(?, ?) AS name',
 					[`${db.schema}.${table.name}`, column.name],
 				)
 
-				const seqValue = seqResult.rows[0].nextval
+				const seqNameQuoted = seqNameResult.rows[0].name.split('.').map(it => wrapIdentifier(it)).join('.')
+				const seqValueResult = await db.query<{ last_value: number }>(`SELECT last_value FROM ${seqNameQuoted}`)
+				const seqValue = seqValueResult.rows[0].last_value
 				yield ['importSequence', { table: table.name, column: column.name, value: seqValue }]
 			}
 		}

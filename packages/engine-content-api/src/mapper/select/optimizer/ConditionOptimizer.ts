@@ -23,6 +23,12 @@ export class ConditionOptimizer {
 				} else if (key === 'or') {
 					return optimizeOr(value.map(it => this.optimize(it)))
 
+				} else if (key === 'in' && value.length === 0) {
+					return false
+
+				} else if (key === 'notIn' && value.length === 0) {
+					return true
+
 				} else if (key === 'not') {
 					return optimizeNot(this.optimize(value))
 

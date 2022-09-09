@@ -124,7 +124,7 @@ export class Mapper {
 		const augmentedBuilder = qb.from(entity.tableName, path.alias).meta('path', [...input.path, input.alias])
 
 		const selector = this.selectBuilderFactory.create(augmentedBuilder, hydrator, relationPath)
-		const filterWithPredicates = this.predicatesInjector.inject(entity, inputWithOrder.args.filter || {}, relationPath[relationPath.length - 1]?.targetRelation ?? undefined)
+		const filterWithPredicates = this.predicatesInjector.inject(entity, inputWithOrder.args.filter || {}, relationPath[relationPath.length - 1])
 		const inputWithPredicates = inputWithOrder.withArg('filter', filterWithPredicates)
 		selector.select(this, entity, inputWithPredicates, path, groupBy)
 		return await selector.execute(this.db)

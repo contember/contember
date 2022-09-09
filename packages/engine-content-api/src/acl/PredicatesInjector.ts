@@ -5,18 +5,18 @@ import { PredicateFactory } from './PredicateFactory'
 export class PredicatesInjector {
 	constructor(private readonly schema: Model.Schema, private readonly predicateFactory: PredicateFactory) {}
 
-	public inject(entity: Model.Entity, where: Input.OptionalWhere, overRelation?: Model.AnyRelation): Input.OptionalWhere {
+	public inject(entity: Model.Entity, where: Input.OptionalWhere, relationContext?: Model.AnyRelationContext): Input.OptionalWhere {
 		const restrictedWhere = this.injectToWhere(where, entity, true)
-		return this.createWhere(entity, undefined, restrictedWhere, overRelation)
+		return this.createWhere(entity, undefined, restrictedWhere, relationContext)
 	}
 
 	private createWhere(
 		entity: Model.Entity,
 		fieldNames: string[] | undefined,
 		where: Input.OptionalWhere,
-		overRelation?: Model.AnyRelation,
+		relationContext?: Model.AnyRelationContext,
 	): Input.OptionalWhere {
-		const predicatesWhere: Input.Where = this.predicateFactory.create(entity, Acl.Operation.read, fieldNames, overRelation)
+		const predicatesWhere: Input.Where = this.predicateFactory.create(entity, Acl.Operation.read, fieldNames, relationContext)
 
 		const and = [where, predicatesWhere].filter(it => Object.keys(it).length > 0)
 		if (and.length === 0) {
@@ -32,17 +32,17 @@ export class PredicatesInjector {
 		where: Input.OptionalWhere,
 		entity: Model.Entity,
 		isRoot: boolean,
-		overRelation?: Model.AnyRelation,
+		relationContext?: Model.AnyRelationContext,
 	): Input.OptionalWhere {
 		const resultWhere: Writable<Input.OptionalWhere> = {}
 		if (where.and) {
-			resultWhere.and = where.and.filter((it): it is Input.Where => !!it).map(it => this.injectToWhere(it, entity, isRoot, overRelation))
+			resultWhere.and = where.and.filter((it): it is Input.Where => !!it).map(it => this.injectToWhere(it, entity, isRoot, relationContext))
 		}
 		if (where.or) {
-			resultWhere.or = where.or.filter((it): it is Input.Where => !!it).map(it => this.injectToWhere(it, entity, isRoot, overRelation))
+			resultWhere.or = where.or.filter((it): it is Input.Where => !!it).map(it => this.injectToWhere(it, entity, isRoot, relationContext))
 		}
 		if (where.not) {
-			resultWhere.not = this.injectToWhere(where.not, entity, isRoot, overRelation)
+			resultWhere.not = this.injectToWhere(where.not, entity, isRoot, relationContext)
 		}
 
 		const fields = Object.keys(where).filter(it => !['and', 'or', 'not'].includes(it))
@@ -51,21 +51,16 @@ export class PredicatesInjector {
 			return resultWhere
 		}
 		for (let field of fields) {
-			const [targetEntity, targetRelation] = acceptFieldVisitor(this.schema, entity, field, {
-				visitColumn: () => null,
-				visitRelation: ({ targetEntity, targetRelation }) => [targetEntity, targetRelation ?? undefined],
-			}) ?? []
-			if (targetEntity) {
-				resultWhere[field] = this.injectToWhere(where[field] as Input.Where, targetEntity, false, targetRelation)
-			} else {
-				resultWhere[field] = where[field]
-			}
+			resultWhere[field] = acceptFieldVisitor(this.schema, entity, field, {
+				visitColumn: () => where[field],
+				visitRelation: context => this.injectToWhere(where[field] as Input.Where, context.targetEntity, false, context),
+			})
 		}
 		const fieldsForPredicate = !isRoot
 			? fields
 			: fields.filter(it => this.predicateFactory.shouldApplyCellLevelPredicate(entity, Acl.Operation.read, it))
 
-		return this.createWhere(entity, fieldsForPredicate, resultWhere, overRelation)
+		return this.createWhere(entity, fieldsForPredicate, resultWhere, relationContext)
 	}
 
 }

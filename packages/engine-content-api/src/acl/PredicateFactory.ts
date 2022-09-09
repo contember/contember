@@ -1,7 +1,5 @@
 import { Acl, Input, Model } from '@contember/schema'
 import { VariableInjector } from './VariableInjector'
-import { isOwningRelation } from '@contember/schema-utils'
-import { ImplementationException } from '../exception'
 import { EvaluatedPredicateReplacer } from './EvaluatedPredicateReplacer'
 
 const getRowLevelPredicatePseudoField = (entity: Model.Entity) => entity.primary
@@ -31,13 +29,13 @@ export class PredicateFactory {
 		entity: Model.Entity,
 		operation: Acl.Operation.update | Acl.Operation.read | Acl.Operation.create,
 		fieldNames?: string[],
-		overRelation?: Model.AnyRelation,
+		relationContext?: Model.AnyRelationContext,
 	): Input.Where
 	public create(
 		entity: Model.Entity,
 		operation: Acl.Operation,
 		fieldNames?: string[],
-		overRelation?: Model.AnyRelation,
+		relationContext?: Model.AnyRelationContext,
 	): Input.Where {
 		const entityPermissions: Acl.EntityPermissions = this.permissions[entity.name]
 		const neverCondition: Input.Where = { [entity.primary]: { never: true } }
@@ -85,7 +83,7 @@ export class PredicateFactory {
 			return {}
 		}
 		const where: Input.Where = predicatesWhere.length === 1 ? predicatesWhere[0] : { and: predicatesWhere }
-		return this.optimizePredicates(where, overRelation)
+		return this.optimizePredicates(where, relationContext)
 	}
 
 	private getRequiredPredicates(
@@ -108,21 +106,16 @@ export class PredicateFactory {
 		return predicates
 	}
 
-	private optimizePredicates(where: Input.Where, overRelation?: Model.AnyRelation) {
-		if (!overRelation) {
+	private optimizePredicates(where: Input.Where, relationContext?: Model.AnyRelationContext) {
+		if (!relationContext || !relationContext.targetRelation) {
 			return where
 		}
-		const otherSide = isOwningRelation(overRelation) ? overRelation.inversedBy : overRelation.ownedBy
-		if (!otherSide) {
-			throw new ImplementationException()
-		}
-		const sourceEntity = this.model.entities[overRelation.target]
-		const sourcePredicate = this.create(sourceEntity, Acl.Operation.read, [otherSide])
+		const sourcePredicate = this.create(relationContext.entity, Acl.Operation.read, [relationContext.relation.name])
 		if (Object.keys(sourcePredicate).length === 0) {
 			return where
 		}
 
-		const replacer = new EvaluatedPredicateReplacer(sourcePredicate, sourceEntity, overRelation)
+		const replacer = new EvaluatedPredicateReplacer(sourcePredicate, relationContext.entity, relationContext.targetRelation)
 		return replacer.replace(where)
 	}
 }

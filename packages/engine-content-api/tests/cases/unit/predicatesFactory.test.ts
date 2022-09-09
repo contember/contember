@@ -76,8 +76,14 @@ describe('Predicates factory', () => {
 	it('eliminates a predicate', () => {
 		const predicateFactory = new PredicateFactory(permissions, schema, new VariableInjector(schema, {}))
 		const image = schema.entities['Image']
-		const authorRelation = image.fields['authors'] as Model.AnyRelation
-		const predicate = predicateFactory.create(image, Acl.Operation.read, undefined, authorRelation)
+		const authorRelation = image.fields['authors'] as Model.OneHasManyRelation
+		const predicate = predicateFactory.create(image, Acl.Operation.read, undefined, {
+			type: 'manyHasOne',
+			entity: schema.entities.Author,
+			relation: schema.entities.Author.fields.image as Model.ManyHasOneRelation,
+			targetEntity: image,
+			targetRelation: authorRelation,
+		})
 		assert.deepStrictEqual(predicate, {
 			or: [
 				{

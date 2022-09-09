@@ -20,7 +20,7 @@ export class ValidationDataSelector {
 			return {}
 		}
 		const queryAst = this.queryAstFactory.create(entity.name, dependencies).withArg('by', where)
-		const node = await mapper.selectUnique(entity, queryAst, null)
+		const node = await mapper.selectUnique(entity, queryAst, [])
 		if (!node) {
 			return null
 		}

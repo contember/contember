@@ -21,6 +21,7 @@ export type SelectExecutionHandlerContext<
 	mapper: Mapper
 	path: Path
 	entity: Model.Entity
+	relationPath: Model.AnyRelationContext[]
 
 	addColumn: (
 		queryCallback: (qb: SelectBuilder<SelectBuilder.Result>) => SelectBuilder<SelectBuilder.Result>,

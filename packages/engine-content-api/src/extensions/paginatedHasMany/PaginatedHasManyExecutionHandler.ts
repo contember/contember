@@ -7,7 +7,10 @@ import { PaginatedHasManyCountVisitor } from './PaginatedHasManyCountVisitor'
 import { PaginatedHasManyNodesVisitor } from './PaginatedHasManyNodesVisitor'
 
 export class PaginatedHasManyExecutionHandler implements SelectExecutionHandler<Input.PaginationQueryInput, PaginatedHasManyFieldProviderExtension> {
-	constructor(private readonly schema: Model.Schema, private readonly relationFetcher: RelationFetcher) {}
+	constructor(
+		private readonly schema: Model.Schema,
+		private readonly relationFetcher: RelationFetcher,
+	) {}
 
 	process(
 		context: SelectExecutionHandlerContext<Input.PaginationQueryInput, PaginatedHasManyFieldProviderExtension>,
@@ -25,7 +28,7 @@ export class PaginatedHasManyExecutionHandler implements SelectExecutionHandler<
 						this.schema,
 						entity,
 						objectNode.extensions.relationName,
-						new PaginatedHasManyCountVisitor(ids, objectNode, this.relationFetcher, mapper),
+						new PaginatedHasManyCountVisitor(ids, objectNode, this.relationFetcher, mapper, context.relationPath),
 					  )
 					: {}
 
@@ -34,7 +37,7 @@ export class PaginatedHasManyExecutionHandler implements SelectExecutionHandler<
 						this.schema,
 						entity,
 						objectNode.extensions.relationName,
-						new PaginatedHasManyNodesVisitor(ids, pagination.nodeField, this.relationFetcher, mapper),
+						new PaginatedHasManyNodesVisitor(ids, pagination.nodeField, this.relationFetcher, mapper, context.relationPath),
 					  )
 					: undefined
 				const result = new Map<Input.PrimaryValue, any>()

@@ -28,6 +28,14 @@ export const getEntity = (schema: Model.Schema, entityName: string): Model.Entit
 	return entity
 }
 
+export const getField = (entity: Model.Entity, fieldName: string): Model.AnyField => {
+	const field = entity.fields[fieldName]
+	if (!field) {
+		throw createFieldNotFoundError(entity.name, fieldName)
+	}
+	return field
+}
+
 export const getColumnName = (schema: Model.Schema, entity: Model.Entity, fieldName: string) => {
 	return acceptFieldVisitor(schema, entity, fieldName, {
 		visitColumn: ({ column }) => column.columnName,

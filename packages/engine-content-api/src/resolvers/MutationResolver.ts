@@ -457,7 +457,7 @@ export class MutationResolver {
 				throw new Error('MutationResolver: expected ObjectNode')
 			}
 			const objectWithArgs = singleNodeQuery.withArgs({ by: where })
-			nodes[singleNodeQuery.alias] = await mapper.selectUnique(entity, objectWithArgs, null)
+			nodes[singleNodeQuery.alias] = await mapper.selectUnique(entity, objectWithArgs, [])
 		}
 		return nodes
 	}

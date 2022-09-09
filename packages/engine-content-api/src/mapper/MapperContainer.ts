@@ -27,7 +27,7 @@ import {
 	Updater,
 } from '../mapper'
 import { Builder } from '@contember/dic'
-import { Acl, Schema } from '@contember/schema'
+import { Acl, Model, Schema } from '@contember/schema'
 import { Client, SelectBuilder as DbSelectBuilder } from '@contember/database'
 import { Providers } from '@contember/schema-utils'
 import { PaginatedHasManyExecutionHandler } from '../extensions/paginatedHasMany/PaginatedHasManyExecutionHandler'
@@ -86,7 +86,7 @@ export const createMapperContainer = ({ permissions, schema, identityVariables, 
 		}))
 		.addService('selectBuilderFactory', ({ whereBuilder, orderByBuilder, fieldsVisitorFactory, metaHandler, selectHandlers, pathFactory }) =>
 			new (class implements SelectBuilderFactory {
-				create(qb: DbSelectBuilder, hydrator: SelectHydrator): SelectBuilder {
+				create(qb: DbSelectBuilder, hydrator: SelectHydrator, relationPath: Model.AnyRelationContext[]): SelectBuilder {
 					return new SelectBuilder(
 						schema.model,
 						whereBuilder,
@@ -97,6 +97,7 @@ export const createMapperContainer = ({ permissions, schema, identityVariables, 
 						fieldsVisitorFactory,
 						selectHandlers,
 						pathFactory,
+						relationPath,
 					)
 				}
 			})())

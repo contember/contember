@@ -11,44 +11,40 @@ export class PaginatedHasManyNodesVisitor implements
 		private readonly objectNode: ObjectNode<Input.PaginationQueryInput>,
 		private readonly relationFetcher: RelationFetcher,
 		private readonly mapper: Mapper,
+		private readonly relationPath: Model.AnyRelationContext[],
 	) {}
 
-	async visitOneHasMany({ targetEntity, relation, targetRelation }: Model.OneHasManyContext) {
+	async visitOneHasMany(relationContext: Model.OneHasManyContext) {
 		return await this.relationFetcher.fetchOneHasManyGroups(
 			{
 				mapper: this.mapper,
 				objectNode: this.objectNode,
-				targetEntity: targetEntity,
-				relation: relation,
-				targetRelation: targetRelation,
+				relationContext,
+				relationPath: this.relationPath,
 				ids: this.ids,
 			},
 		)
 	}
 
-	async visitManyHasManyOwning({ targetEntity, relation, targetRelation }: Model.ManyHasManyOwningContext) {
+	async visitManyHasManyOwning(relationContext: Model.ManyHasManyOwningContext) {
 		return await this.relationFetcher.fetchManyHasManyGroups(
 			{
 				mapper: this.mapper,
 				field: this.objectNode,
-				targetEntity: targetEntity,
-				sourceRelation: relation,
-				targetRelation,
-				directionFrom: 'owning',
+				relationContext,
+				relationPath: this.relationPath,
 				ids: this.ids,
 			},
 		)
 	}
 
-	async visitManyHasManyInverse({ targetEntity, targetRelation, relation }: Model.ManyHasManyInverseContext) {
+	async visitManyHasManyInverse(relationContext: Model.ManyHasManyInverseContext) {
 		return await this.relationFetcher.fetchManyHasManyGroups(
 			{
 				mapper: this.mapper,
 				field: this.objectNode,
-				targetEntity: targetEntity,
-				sourceRelation: relation,
-				targetRelation,
-				directionFrom: 'inverse',
+				relationContext,
+				relationPath: this.relationPath,
 				ids: this.ids,
 			},
 		)

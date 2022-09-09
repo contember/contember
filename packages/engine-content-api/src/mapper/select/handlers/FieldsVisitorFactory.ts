@@ -22,6 +22,7 @@ export class FieldsVisitorFactory {
 			this.whereBuilder,
 			mapper,
 			context,
+			context.relationPath,
 		)
 	}
 }

@@ -11,43 +11,40 @@ export class PaginatedHasManyCountVisitor implements
 		private readonly objectNode: ObjectNode<Input.PaginationQueryInput>,
 		private readonly relationFetcher: RelationFetcher,
 		private readonly mapper: Mapper,
+		private readonly relationPath: Model.AnyRelationContext[],
 	) {}
 
-	async visitOneHasMany({ targetRelation, targetEntity }: Model.OneHasManyContext): Promise<GroupedCounts> {
+	async visitOneHasMany(relationContext: Model.OneHasManyContext): Promise<GroupedCounts> {
 		return await this.relationFetcher.countOneHasManyGroups(
 			{
 				mapper: this.mapper,
 				filter: this.objectNode.args.filter,
-				targetEntity: targetEntity,
-				targetRelation: targetRelation,
+				relationContext,
+				relationPath: this.relationPath,
 				ids: this.ids,
 			},
 		)
 	}
 
-	async visitManyHasManyOwning({ targetRelation, targetEntity, relation }: Model.ManyHasManyOwningContext): Promise<GroupedCounts> {
+	async visitManyHasManyOwning(relationContext: Model.ManyHasManyOwningContext): Promise<GroupedCounts> {
 		return await this.relationFetcher.countManyHasManyGroups(
 			{
 				mapper: this.mapper,
 				filter: this.objectNode.args.filter,
-				targetEntity: targetEntity,
-				sourceRelation: relation,
-				targetRelation,
-				directionFrom: 'owning',
+				relationContext,
+				relationPath: this.relationPath,
 				ids: this.ids,
 			},
 		)
 	}
 
-	async visitManyHasManyInverse({ targetRelation, targetEntity, relation }: Model.ManyHasManyInverseContext): Promise<GroupedCounts> {
+	async visitManyHasManyInverse(relationContext: Model.ManyHasManyInverseContext): Promise<GroupedCounts> {
 		return await this.relationFetcher.countManyHasManyGroups(
 			{
 				mapper: this.mapper,
 				filter: this.objectNode.args.filter,
-				targetEntity: targetEntity,
-				sourceRelation: relation,
-				targetRelation,
-				directionFrom: 'inverse',
+				relationContext,
+				relationPath: this.relationPath,
 				ids: this.ids,
 			},
 		)

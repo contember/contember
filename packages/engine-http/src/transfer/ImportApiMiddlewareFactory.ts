@@ -1,11 +1,9 @@
 import { KoaMiddleware, KoaRequestState } from '../koa'
 import { AuthResult, HttpError, TimerMiddlewareState } from '../common'
 import { ProjectGroupResolver, ProjectInfoMiddlewareState } from '../project-common'
-import { TenantRole } from '@contember/engine-tenant-api'
-import { fromBuffer, toBuffer } from './CommandStream'
-import { ImportExecutor } from './ImportExecutor'
+import { fromBuffer } from './CommandStream'
+import { ImportError, ImportExecutor } from './ImportExecutor'
 import { createGunzip } from 'zlib'
-import { Readable } from 'stream'
 
 type ImportApiMiddlewareState =
 	& TimerMiddlewareState
@@ -38,12 +36,24 @@ export class ImportApiMiddlewareFactory {
 				throw new HttpError(`Unsupported content encoding`, 415)
 			}
 
-			const isGzip = request.headers['content-encoding'] === 'gzip'
-			const commands = fromBuffer(isGzip ? request.req.pipe(createGunzip()) : request.req)
+			response.headers['Content-Type'] = 'application/json'
 
-			response.status = 200
-			response.headers['Content-Type'] = 'application/x-ndjson'
-			response.body = Readable.from(toBuffer(this.importExecutor.import(groupContainer, authResult, commands), 0))
+			try {
+				const isGzip = request.headers['content-encoding'] === 'gzip'
+				const commands = fromBuffer(isGzip ? request.req.pipe(createGunzip()) : request.req)
+				await this.importExecutor.import(groupContainer, authResult, commands)
+				response.status = 200
+				response.body = { ok: true }
+
+			} catch (e) {
+				if (e instanceof ImportError) {
+					response.status = 400
+					response.body = { ok: false, error: e.message }
+
+				} else {
+					throw e
+				}
+			}
 		}
 	}
 }

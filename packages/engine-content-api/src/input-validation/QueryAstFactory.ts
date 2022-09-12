@@ -22,7 +22,7 @@ export class QueryAstFactory {
 			fieldName,
 			{
 				visitColumn: () => [null, new FieldNode(fieldName, fieldName, {})],
-				visitRelation: ({}, {}, targetEntity) => [
+				visitRelation: ({ targetEntity }) => [
 					targetEntity,
 					new ObjectNode(fieldName, fieldName, [], {}, {}, []).withField(
 						new FieldNode(targetEntity.primary, targetEntity.primary, {}),

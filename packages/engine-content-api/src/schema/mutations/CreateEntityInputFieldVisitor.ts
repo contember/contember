@@ -15,7 +15,7 @@ export class CreateEntityInputFieldVisitor implements
 		private readonly createEntityRelationInputProvider: CreateEntityRelationInputProvider,
 	) {}
 
-	public visitColumn(entity: Model.Entity, column: Model.AnyColumn): GraphQLInputFieldConfig | undefined {
+	public visitColumn({ entity, column }: Model.ColumnContext): GraphQLInputFieldConfig | undefined {
 		if (entity.primary === column.name && !this.authorizator.isCustomPrimaryAllowed(entity.name)) {
 			return undefined
 		}
@@ -28,10 +28,7 @@ export class CreateEntityInputFieldVisitor implements
 		}
 	}
 
-	public visitHasOne(
-		entity: Model.Entity,
-		relation: Model.Relation & Model.NullableRelation,
-	): GraphQLInputFieldConfig | undefined {
+	public visitHasOne({ entity, relation }: Model.AnyHasOneRelationContext): GraphQLInputFieldConfig | undefined {
 		const type = this.createEntityRelationInputProvider.getCreateEntityRelationInput(entity.name, relation.name)
 		if (type === undefined) {
 			return undefined
@@ -41,7 +38,7 @@ export class CreateEntityInputFieldVisitor implements
 		}
 	}
 
-	public visitHasMany(entity: Model.Entity, relation: Model.Relation): GraphQLInputFieldConfig | undefined {
+	public visitHasMany({ entity, relation }: Model.AnyHasManyRelationContext): GraphQLInputFieldConfig | undefined {
 		const type = this.createEntityRelationInputProvider.getCreateEntityRelationInput(entity.name, relation.name)
 		if (type === undefined) {
 			return undefined

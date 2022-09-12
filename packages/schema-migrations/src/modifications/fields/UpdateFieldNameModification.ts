@@ -79,33 +79,33 @@ export class UpdateFieldNameModificationHandler implements ModificationHandler<U
 				}
 
 				return acceptFieldVisitor<Model.AnyField>(this.schema.model, entity, field, {
-					visitColumn: (entity, field) => field,
-					visitManyHasOne: (entity, relation, targetEntity, targetRelation) => {
+					visitColumn: ({ column }) => column,
+					visitManyHasOne: ({ targetEntity, relation, targetRelation }) => {
 						return isUpdatedRelation(targetEntity, targetRelation)
 							? { ...relation, inversedBy: this.data.newFieldName }
 							: relation
 					},
-					visitOneHasMany: (entity, relation, targetEntity, targetRelation) => {
+					visitOneHasMany: ({ relation, targetEntity, targetRelation }) => {
 						return isUpdatedRelation(targetEntity, targetRelation)
 							? { ...relation, ownedBy: this.data.newFieldName }
 							: relation
 					},
-					visitOneHasOneOwning: (entity, relation, targetEntity, targetRelation) => {
+					visitOneHasOneOwning: ({ relation, targetEntity, targetRelation }) => {
 						return isUpdatedRelation(targetEntity, targetRelation)
 							? { ...relation, inversedBy: this.data.newFieldName }
 							: relation
 					},
-					visitOneHasOneInverse: (entity, relation, targetEntity, targetRelation) => {
+					visitOneHasOneInverse: ({ relation, targetEntity, targetRelation }) => {
 						return isUpdatedRelation(targetEntity, targetRelation)
 							? { ...relation, ownedBy: this.data.newFieldName }
 							: relation
 					},
-					visitManyHasManyOwning: (entity, relation, targetEntity, targetRelation) => {
+					visitManyHasManyOwning: ({ relation, targetEntity, targetRelation }) => {
 						return isUpdatedRelation(targetEntity, targetRelation)
 							? { ...relation, inversedBy: this.data.newFieldName }
 							: relation
 					},
-					visitManyHasManyInverse: (entity, relation, targetEntity, targetRelation) => {
+					visitManyHasManyInverse: ({ relation, targetEntity, targetRelation }) => {
 						return isUpdatedRelation(targetEntity, targetRelation)
 							? { ...relation, ownedBy: this.data.newFieldName }
 							: relation

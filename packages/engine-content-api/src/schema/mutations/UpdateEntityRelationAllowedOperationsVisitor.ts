@@ -11,23 +11,19 @@ export class UpdateEntityRelationAllowedOperationsVisitor implements
 		throw new Error('UpdateEntityRelationAllowedOperationsVisitor: Not applicable for a column')
 	}
 
-	public visitManyHasManyInverse({}, {}, targetEntity: Model.Entity, targetRelation: Model.ManyHasManyOwningRelation) {
+	public visitManyHasManyInverse({ targetEntity, targetRelation }: Model.ManyHasManyInverseContext) {
 		return this.getAllowedOperations(targetEntity, targetEntity, targetRelation)
 	}
 
-	public visitManyHasManyOwning(
-		entity: Model.Entity,
-		relation: Model.ManyHasManyOwningRelation,
-		targetEntity: Model.Entity,
-	) {
+	public visitManyHasManyOwning({ entity, targetEntity, relation }: Model.ManyHasManyOwningContext) {
 		return this.getAllowedOperations(targetEntity, entity, relation)
 	}
 
-	public visitOneHasMany({}, {}, targetEntity: Model.Entity, targetRelation: Model.ManyHasOneRelation) {
+	public visitOneHasMany({ targetRelation, targetEntity }: Model.OneHasManyContext) {
 		return this.getAllowedOperations(targetEntity, targetEntity, targetRelation)
 	}
 
-	public visitManyHasOne(entity: Model.Entity, relation: Model.ManyHasOneRelation, targetEntity: Model.Entity) {
+	public visitManyHasOne({ targetEntity, relation, entity }: Model.ManyHasOneContext) {
 		const operations = this.getAllowedOperations(targetEntity, entity, relation)
 		if (relation.nullable) {
 			return operations
@@ -39,12 +35,7 @@ export class UpdateEntityRelationAllowedOperationsVisitor implements
 		return operations.filter(it => !forbiddenOperations.includes(it))
 	}
 
-	public visitOneHasOneInverse(
-		{},
-		relation: Model.OneHasOneInverseRelation,
-		targetEntity: Model.Entity,
-		targetRelation: Model.OneHasOneOwningRelation,
-	) {
+	public visitOneHasOneInverse({ relation, targetEntity, targetRelation }: Model.OneHasOneInverseContext) {
 		const operations = this.getAllowedOperations(targetEntity, targetEntity, targetRelation)
 		if (relation.nullable || targetRelation.nullable) {
 			return operations
@@ -52,12 +43,7 @@ export class UpdateEntityRelationAllowedOperationsVisitor implements
 		return operations.filter(it => it === Input.UpdateRelationOperation.update)
 	}
 
-	public visitOneHasOneOwning(
-		entity: Model.Entity,
-		relation: Model.OneHasOneOwningRelation,
-		targetEntity: Model.Entity,
-		targetRelation: Model.OneHasOneInverseRelation | null,
-	) {
+	public visitOneHasOneOwning({ targetEntity, entity, relation, targetRelation }: Model.OneHasOneOwningContext) {
 		const operations = this.getAllowedOperations(targetEntity, entity, relation)
 		if (relation.nullable || !targetRelation || targetRelation.nullable) {
 			return operations

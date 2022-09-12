@@ -74,7 +74,7 @@ export class WhereTypeProvider {
 					continue
 				}
 				fields[field] = acceptFieldVisitor<GraphQLInputFieldConfig>(this.schema, entity, field, {
-					visitRelation: (entity, relation, targetEntity) => {
+					visitRelation: ({ targetEntity }) => {
 						// if (!isIt<Model.JoiningColumnRelation>(relation, 'joiningColumn')) {
 						// 	throw new Error('Only column or owning relation can be a part of unique key')
 						// }
@@ -84,7 +84,7 @@ export class WhereTypeProvider {
 						}
 						return { type: uniqueWhere }
 					},
-					visitColumn: (entity, column) => ({ type: this.columnTypeResolver.getType(column) }),
+					visitColumn: ({ column }) => ({ type: this.columnTypeResolver.getType(column) }),
 				})
 			}
 		}
@@ -104,8 +104,8 @@ export class WhereTypeProvider {
 				continue
 			}
 			fields[fieldName] = acceptFieldVisitor(this.schema, name, fieldName, {
-				visitColumn: (entity, column) => ({ type: this.conditionTypeProvider.getCondition(column) }),
-				visitRelation: (entity, relation) => ({ type: this.getEntityWhereType(relation.target) }),
+				visitColumn: ({ column }) => ({ type: this.conditionTypeProvider.getCondition(column) }),
+				visitRelation: ({ relation }) => ({ type: this.getEntityWhereType(relation.target) }),
 			} as Model.FieldVisitor<GraphQLInputFieldConfig>)
 		}
 

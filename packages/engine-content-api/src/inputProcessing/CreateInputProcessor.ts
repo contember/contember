@@ -1,17 +1,16 @@
-import { Input } from '@contember/schema'
-import * as Context from './InputContext'
+import { Input, Model } from '@contember/schema'
 
 interface CreateInputProcessor<Result = void> {
-	column(context: Context.ColumnContext): Promise<Result>
+	column(context: CreateInputProcessor.ContextWithInput<Model.ColumnContext, Input.ColumnValue | undefined>): Promise<Result>
 
-	manyHasManyInverse: CreateInputProcessor.HasManyRelationProcessor<Context.ManyHasManyInverseContext, Result>
-	manyHasManyOwning: CreateInputProcessor.HasManyRelationProcessor<Context.ManyHasManyOwningContext, Result>
+	manyHasManyInverse: CreateInputProcessor.HasManyRelationProcessor<Model.ManyHasManyInverseContext, Result>
+	manyHasManyOwning: CreateInputProcessor.HasManyRelationProcessor<Model.ManyHasManyOwningContext, Result>
 
-	oneHasOneInverse: CreateInputProcessor.HasOneRelationProcessor<Context.OneHasOneInverseContext, Result>
-	oneHasOneOwning: CreateInputProcessor.HasOneRelationProcessor<Context.OneHasOneOwningContext, Result>
+	oneHasOneInverse: CreateInputProcessor.HasOneRelationProcessor<Model.OneHasOneInverseContext, Result>
+	oneHasOneOwning: CreateInputProcessor.HasOneRelationProcessor<Model.OneHasOneOwningContext, Result>
 
-	oneHasMany: CreateInputProcessor.HasManyRelationProcessor<Context.OneHasManyContext, Result>
-	manyHasOne: CreateInputProcessor.HasOneRelationProcessor<Context.ManyHasOneContext, Result>
+	oneHasMany: CreateInputProcessor.HasManyRelationProcessor<Model.OneHasManyContext, Result>
+	manyHasOne: CreateInputProcessor.HasOneRelationProcessor<Model.ManyHasOneContext, Result>
 }
 
 namespace CreateInputProcessor {

@@ -13,9 +13,10 @@ export class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.C
 		private readonly whereBuilder: WhereBuilder,
 		private readonly mapper: Mapper,
 		private readonly executionContext: SelectExecutionHandlerContext,
+		private readonly relationPath: Model.AnyRelationContext[],
 	) {}
 
-	visitColumn(entity: Model.Entity, column: Model.AnyColumn): void {
+	visitColumn({ entity, column }: Model.ColumnContext): void {
 		const columnPath = this.executionContext.path
 		this.executionContext.addColumn(qb => {
 			const tableAlias = columnPath.back().alias
@@ -49,27 +50,20 @@ export class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.C
 		})
 	}
 
-	public visitManyHasManyInverse(
-		entity: Model.Entity,
-		relation: Model.ManyHasManyInverseRelation,
-		targetEntity: Model.Entity,
-		targetRelation: Model.ManyHasManyOwningRelation,
-	): void {
+	public visitManyHasManyInverse(relationContext: Model.ManyHasManyInverseContext): void {
 		const field = this.executionContext.objectNode
 		if (!field) {
 			throw new Error()
 		}
 		this.executionContext.addData(
-			entity.primary,
+			relationContext.entity.primary,
 			async ids =>
 				this.relationFetcher.fetchManyHasManyGroups(
 					{
 						mapper: this.mapper,
 						field: field,
-						targetEntity: targetEntity,
-						sourceRelation: relation,
-						targetRelation,
-						directionFrom: 'inverse',
+						relationContext,
+						relationPath: this.relationPath,
 						ids: ids,
 					},
 				),
@@ -77,65 +71,48 @@ export class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.C
 		)
 	}
 
-	public visitManyHasManyOwning(
-		entity: Model.Entity,
-		relation: Model.ManyHasManyOwningRelation,
-		targetEntity: Model.Entity,
-		targetRelation: Model.ManyHasManyInverseRelation | null,
-	): void {
+	public visitManyHasManyOwning(relationContext: Model.ManyHasManyOwningContext): void {
 		const field = this.executionContext.objectNode
 		if (!field) {
 			throw new Error()
 		}
 
 		this.executionContext.addData(
-			entity.primary,
+			relationContext.entity.primary,
 			async ids =>
 				this.relationFetcher.fetchManyHasManyGroups({
 					mapper: this.mapper,
 					field: field,
-					targetEntity: targetEntity,
-					sourceRelation: relation,
-					targetRelation,
-					directionFrom: 'owning',
+					relationContext,
+					relationPath: this.relationPath,
 					ids: ids,
 				}),
 			[],
 		)
 	}
 
-	public visitOneHasMany(
-		entity: Model.Entity,
-		relation: Model.OneHasManyRelation,
-		targetEntity: Model.Entity,
-		targetRelation: Model.ManyHasOneRelation,
-	): void {
+	public visitOneHasMany(relationContext: Model.OneHasManyContext): void {
 		const field = this.executionContext.objectNode
 		if (!field) {
 			throw new Error()
 		}
 
 		this.executionContext.addData(
-			entity.primary,
+			relationContext.entity.primary,
 			async ids =>
 				this.relationFetcher.fetchOneHasManyGroups({
 					mapper: this.mapper,
 					objectNode: field,
-					targetEntity: targetEntity,
-					relation: relation,
-					targetRelation: targetRelation,
+					relationContext,
+					relationPath: this.relationPath,
 					ids: ids,
 				}),
 			[],
 		)
 	}
 
-	public visitOneHasOneInverse(
-		entity: Model.Entity,
-		relation: Model.OneHasOneInverseRelation,
-		targetEntity: Model.Entity,
-		targetRelation: Model.OneHasOneOwningRelation,
-	): void {
+	public visitOneHasOneInverse(relationContext: Model.OneHasOneInverseContext): void {
+		const { entity, targetRelation, targetEntity } = relationContext
 		this.executionContext.addData(
 			entity.primary,
 			async ids => {
@@ -155,18 +132,17 @@ export class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.C
 				}
 				const objectWithWhere = field.withArg('filter', where)
 
-				return this.mapper.select(targetEntity, objectWithWhere, targetRelation, targetRelation.name)
+				return this.mapper.selectAssoc(targetEntity, objectWithWhere, [
+					...this.relationPath,
+					relationContext,
+				], targetRelation.name)
 			},
 			null,
 		)
 	}
 
-	public visitOneHasOneOwning(
-		entity: Model.Entity,
-		relation: Model.OneHasOneOwningRelation,
-		targetEntity: Model.Entity,
-		targetRelation: Model.OneHasOneInverseRelation | null,
-	): void {
+	public visitOneHasOneOwning(relationContext: Model.OneHasOneOwningContext): void {
+		const { relation, targetEntity } = relationContext
 		this.executionContext.addData(
 			relation.name,
 			async ids => {
@@ -184,13 +160,17 @@ export class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.C
 				}
 				const objectWithWhere = objectNode.withArg('filter', where)
 
-				return this.mapper.select(targetEntity, objectWithWhere, targetRelation, targetEntity.primary)
+				return this.mapper.selectAssoc(targetEntity, objectWithWhere, [
+					...this.relationPath,
+					relationContext,
+				], targetEntity.primary)
 			},
 			null,
 		)
 	}
 
-	public visitManyHasOne(entity: Model.Entity, relation: Model.ManyHasOneRelation, targetEntity: Model.Entity, targetRelation: Model.OneHasManyRelation | null): void {
+	public visitManyHasOne(relationContext: Model.ManyHasOneContext): void {
+		const { relation, targetEntity } = relationContext
 		this.executionContext.addData(
 			relation.name,
 			async ids => {
@@ -208,7 +188,10 @@ export class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.C
 				}
 				const objectWithWhere = objectNode.withArg('filter', where)
 
-				return this.mapper.select(targetEntity, objectWithWhere, targetRelation, targetEntity.primary)
+				return this.mapper.selectAssoc(targetEntity, objectWithWhere, [
+					...this.relationPath,
+					relationContext,
+				], targetEntity.primary)
 			},
 			null,
 		)

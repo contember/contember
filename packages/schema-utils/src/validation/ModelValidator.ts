@@ -116,7 +116,7 @@ export class ModelValidator {
 			}
 			if (
 				!targetEntity.view &&
-				field.type === Model.RelationType.OneHasOne && 
+				field.type === Model.RelationType.OneHasOne &&
 				!('joiningColumn' in field)
 			) {
 				return errors.add('One-has-one relation fields on views must be owning or point to a view entity.')
@@ -221,7 +221,7 @@ export class ModelValidator {
 		for (const entity of entities) {
 			const entityErrorBuilder = errorBuilder.for(entity.name)
 			acceptEveryFieldVisitor(this.model, entity, {
-				visitManyHasManyOwning: (entity, relation) => {
+				visitManyHasManyOwning: ({ entity, relation }) => {
 					const joiningTable = relation.joiningTable
 					const description = `relation ${entity.name}::${relation.name}`
 					if (tableNames[joiningTable.tableName]) {
@@ -235,7 +235,7 @@ export class ModelValidator {
 						tableNames[joiningTable.tableName] = description
 					}
 				},
-				visitColumn: (entity, column) => {
+				visitColumn: ({ entity, column }) => {
 					if (!column.typeAlias) {
 						return
 					}

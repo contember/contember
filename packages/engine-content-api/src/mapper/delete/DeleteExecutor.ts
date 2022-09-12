@@ -131,8 +131,8 @@ export class DeleteExecutor {
 					visitManyHasManyOwning: () => null,
 					visitOneHasOneInverse: () => null,
 					visitOneHasMany: () => null,
-					visitOneHasOneOwning: ({}, relation): EntityOwningRelationTuple => [entity, relation],
-					visitManyHasOne: ({}, relation): EntityOwningRelationTuple => [entity, relation],
+					visitOneHasOneOwning: ({ relation }): EntityOwningRelationTuple => [entity, relation],
+					visitManyHasOne: ({ relation }): EntityOwningRelationTuple => [entity, relation],
 				}),
 			)
 			.reduce<EntityOwningRelationTuple[]>(
@@ -155,7 +155,7 @@ export class DeleteExecutor {
 				visitManyHasManyOwning: () => null,
 				visitOneHasOneInverse: () => null,
 				visitOneHasMany: () => null,
-				visitOneHasOneOwning: ({}, relation, targetEntity) =>
+				visitOneHasOneOwning: ({ relation, targetEntity }) =>
 					relation.orphanRemoval ? [targetEntity, relation] : null,
 				visitManyHasOne: () => null,
 			}),

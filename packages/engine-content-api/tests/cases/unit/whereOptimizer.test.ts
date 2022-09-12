@@ -2,18 +2,21 @@ import { describe, it, assert } from 'vitest'
 import { ConditionOptimizer } from '../../../src/mapper/select/optimizer/ConditionOptimizer'
 import { SchemaDefinition as def } from '@contember/schema-definition'
 import { WhereOptimizer } from '../../../src/mapper/select/optimizer/WhereOptimizer'
+import { acceptFieldVisitor } from '@contember/schema-utils'
 
 namespace TestModel {
 	export class Author {
 		name = def.stringColumn()
 		isPublic = def.boolColumn().notNull()
 		image = def.manyHasOne(Image, 'authors')
+		articles = def.oneHasMany(Article, 'author')
 	}
 
 	export class Article {
 		title = def.stringColumn()
 		isPublic = def.boolColumn().notNull()
 		image = def.manyHasOne(Image, 'articles')
+		author = def.manyHasOne(Author, 'articles')
 	}
 
 	export class Image {
@@ -192,4 +195,95 @@ describe('where optimized', () => {
 			],
 		})
 	})
+
+
+	describe('remove id predicates', () => {
+
+		it('remove ID predicate when traversing from a relation - always', () => {
+			assert.deepStrictEqual(whereOptimizer.optimize({
+				image: { id: { isNull: false } },
+			}, model.entities.Author, [acceptFieldVisitor(model, 'Image', 'authors', {
+				visitColumn: () => {
+					throw new Error()
+				},
+				visitRelation: context => context,
+			})]), {
+				id: { always: true },
+			})
+		})
+
+
+		it('remove ID predicate when traversing from a relation - never', () => {
+			assert.deepStrictEqual(whereOptimizer.optimize({
+				image: { id: { isNull: true } },
+			}, model.entities.Author, [acceptFieldVisitor(model, 'Image', 'authors', {
+				visitColumn: () => {
+					throw new Error()
+				},
+				visitRelation: context => context,
+			})]), {
+				id: { never: true },
+			})
+		})
+
+		it('remove ID predicate when traversing in where', () => {
+			assert.deepStrictEqual(whereOptimizer.optimize({
+				authors: { image: { id: { isNull: false } } },
+			}, model.entities.Image, []), {
+				id: { always: true },
+			})
+		})
+
+		it('do not remove ID predicate when traversing from a has-many relation', () => {
+			assert.deepStrictEqual(whereOptimizer.optimize({
+				authors: { id: { isNull: false } },
+			}, model.entities.Image, [acceptFieldVisitor(model, 'Author', 'image', {
+				visitColumn: () => {
+					throw new Error()
+				},
+				visitRelation: context => context,
+			})]), {
+				authors: { id: { isNull: false } },
+			})
+		})
+
+		it('do not remove ID predicate when traversing from a nested has-many relation', () => {
+			assert.deepStrictEqual(whereOptimizer.optimize({
+				articles: { author: { id: { isNull: false } } },
+			}, model.entities.Image, [
+				acceptFieldVisitor(model, 'Author', 'articles', {
+					visitColumn: () => {
+						throw new Error()
+					},
+					visitRelation: context => context,
+				}),
+				acceptFieldVisitor(model, 'Article', 'image', {
+					visitColumn: () => {
+						throw new Error()
+					},
+					visitRelation: context => context,
+				}),
+			]), {
+				articles: { author: { id: { isNull: false } } },
+			})
+		})
+
+		it('do not remove ID predicate when traversing in where over has-many relation', () => {
+			assert.deepStrictEqual(whereOptimizer.optimize({
+				image: { authors: { id: { isNull: false } } },
+			}, model.entities.Author, []), {
+				image: { authors: { id: { isNull: false } } },
+			})
+		})
+
+
+		it('do not remove ID predicate when traversing in where over has-many relation - nested', () => {
+			assert.deepStrictEqual(whereOptimizer.optimize({
+				image: { authors: { image: { id: { isNull: false } } } },
+			}, model.entities.Author, []), {
+				image: { authors: { image: { id: { isNull: false } } } },
+			})
+		})
+	})
 })
+

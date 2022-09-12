@@ -61,76 +61,6 @@ export namespace Model {
 			}
 		}
 
-	export interface ColumnVisitor<T> {
-		visitColumn(entity: Entity, column: AnyColumn): T
-	}
-
-	export interface RelationVisitor<T> {
-		visitRelation(entity: Entity, relation: Relation, targetEntity: Entity, targetRelation: AnyRelation | null): T
-	}
-
-	export type FieldVisitor<T> =
-		& ColumnVisitor<T>
-		& (
-			| RelationVisitor<T>
-			| RelationByTypeVisitor<T>
-			| RelationByGenericTypeVisitor<T>
-		)
-
-	export interface RelationByTypeVisitor<T> {
-		visitManyHasOne(
-			entity: Entity,
-			relation: ManyHasOneRelation,
-			targetEntity: Entity,
-			targetRelation: OneHasManyRelation | null,
-		): T
-
-		visitOneHasMany(
-			entity: Entity,
-			relation: OneHasManyRelation,
-			targetEntity: Entity,
-			targetRelation: ManyHasOneRelation,
-		): T
-
-		visitOneHasOneOwning(
-			entity: Entity,
-			relation: OneHasOneOwningRelation,
-			targetEntity: Entity,
-			targetRelation: OneHasOneInverseRelation | null,
-		): T
-
-		visitOneHasOneInverse(
-			entity: Entity,
-			relation: OneHasOneInverseRelation,
-			targetEntity: Entity,
-			targetRelation: OneHasOneOwningRelation,
-		): T
-
-		visitManyHasManyOwning(
-			entity: Entity,
-			relation: ManyHasManyOwningRelation,
-			targetEntity: Entity,
-			targetRelation: ManyHasManyInverseRelation | null,
-		): T
-
-		visitManyHasManyInverse(
-			entity: Entity,
-			relation: ManyHasManyInverseRelation,
-			targetEntity: Entity,
-			targetRelation: ManyHasManyOwningRelation,
-		): T
-	}
-
-	export interface RelationByGenericTypeVisitor<T> {
-		visitHasMany(entity: Entity, relation: Relation, targetEntity: Entity, targetRelation: Relation | null): T
-
-		visitHasOne(
-			entity: Entity,
-			relation: Relation & NullableRelation,
-			targetEntity: Entity,
-			targetRelation: Relation | null,
-		): T
-	}
 
 	export enum RelationType {
 		OneHasOne = 'OneHasOne',
@@ -285,5 +215,114 @@ export namespace Model {
 	export type Index = {
 		readonly fields: readonly string[]
 		readonly name: string
+	}
+
+
+	export interface ColumnContext {
+		entity: Model.Entity
+		column: Model.AnyColumn
+	}
+
+	export type AnyHasManyRelationContext =
+		| ManyHasManyInverseContext
+		| ManyHasManyOwningContext
+		| OneHasManyContext
+
+	export type AnyHasOneRelationContext =
+		| ManyHasOneContext
+		| OneHasOneOwningContext
+		| OneHasOneInverseContext
+
+	export type AnyRelationContext =
+		| AnyHasManyRelationContext
+		| AnyHasOneRelationContext
+
+	export type AnyFieldContext =
+		| ColumnContext
+		| AnyRelationContext
+
+	export interface ManyHasManyInverseContext {
+		type: 'manyHasManyInverse'
+		entity: Model.Entity
+		relation: Model.ManyHasManyInverseRelation
+		targetEntity: Model.Entity
+		targetRelation: Model.ManyHasManyOwningRelation
+	}
+
+	export interface ManyHasManyOwningContext {
+		type: 'manyHasManyOwning'
+		entity: Model.Entity
+		relation: Model.ManyHasManyOwningRelation
+		targetEntity: Model.Entity
+		targetRelation: Model.ManyHasManyInverseRelation | null
+	}
+
+	export interface ManyHasOneContext {
+		type: 'manyHasOne'
+		entity: Model.Entity
+		relation: Model.ManyHasOneRelation
+		targetEntity: Model.Entity
+		targetRelation: Model.OneHasManyRelation | null
+	}
+
+	export interface OneHasManyContext {
+		type: 'oneHasMany'
+		entity: Model.Entity
+		relation: Model.OneHasManyRelation
+		targetEntity: Model.Entity
+		targetRelation: Model.ManyHasOneRelation
+	}
+
+	export interface OneHasOneInverseContext {
+		type: 'oneHasOneInverse'
+		entity: Model.Entity
+		relation: Model.OneHasOneInverseRelation
+		targetEntity: Model.Entity
+		targetRelation: Model.OneHasOneOwningRelation
+	}
+
+	export interface OneHasOneOwningContext {
+		type: 'oneHasOneOwning'
+		entity: Model.Entity
+		relation: Model.OneHasOneOwningRelation
+		targetEntity: Model.Entity
+		targetRelation: Model.OneHasOneInverseRelation | null
+	}
+
+
+	export interface ColumnVisitor<T> {
+		visitColumn(context: ColumnContext): T
+	}
+
+	export interface RelationVisitor<T> {
+		visitRelation(context: AnyRelationContext): T
+	}
+
+	export type FieldVisitor<T> =
+		& ColumnVisitor<T>
+		& (
+			| RelationVisitor<T>
+			| RelationByTypeVisitor<T>
+			| RelationByGenericTypeVisitor<T>
+		)
+
+	export interface RelationByTypeVisitor<T> {
+		visitManyHasOne(context: ManyHasOneContext): T
+
+		visitOneHasMany(context: OneHasManyContext): T
+
+		visitOneHasOneOwning(context: OneHasOneOwningContext): T
+
+		visitOneHasOneInverse(context: OneHasOneInverseContext): T
+
+		visitManyHasManyOwning(context: ManyHasManyOwningContext): T
+
+		visitManyHasManyInverse(context: ManyHasManyInverseContext): T
+	}
+
+	export interface RelationByGenericTypeVisitor<T> {
+		visitHasMany(context: AnyHasManyRelationContext): T
+
+		visitHasOne(context: AnyHasOneRelationContext): T
 	}
 }

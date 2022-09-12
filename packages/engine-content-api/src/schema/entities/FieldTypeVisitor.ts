@@ -13,7 +13,7 @@ export class FieldTypeVisitor implements Model.ColumnVisitor<GraphQLOutputType>,
 	) {
 	}
 
-	public visitColumn(entity: Model.Entity, column: Model.AnyColumn): GraphQLOutputType {
+	public visitColumn({ column, entity }: Model.ColumnContext): GraphQLOutputType {
 		const basicType = this.columnTypeResolver.getType(column)
 		const fieldPredicate = this.authorizator.getFieldPredicate(Acl.Operation.read, entity.name, column.name)
 		const idPredicate = this.authorizator.getFieldPredicate(Acl.Operation.read, entity.name, entity.primary)
@@ -26,12 +26,12 @@ export class FieldTypeVisitor implements Model.ColumnVisitor<GraphQLOutputType>,
 		return basicType
 	}
 
-	public visitHasMany(entity: Model.Entity, relation: Model.Relation): GraphQLOutputType {
+	public visitHasMany({ relation }: Model.AnyHasManyRelationContext): GraphQLOutputType {
 		const entityType = this.entityTypeProvider.getEntity(relation.target)
 		return new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(entityType)))
 	}
 
-	public visitHasOne(entity: Model.Entity, relation: Model.Relation & Model.NullableRelation): GraphQLOutputType {
+	public visitHasOne({ relation }: Model.AnyHasOneRelationContext): GraphQLOutputType {
 		return this.entityTypeProvider.getEntity(relation.target)
 	}
 }

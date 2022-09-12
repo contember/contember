@@ -1,6 +1,6 @@
 import { Input, Model } from '@contember/schema'
 import { getColumnName } from '@contember/schema-utils'
-import { SelectHydrator, SelectIndexedResultObjects, SelectResultObject } from './select'
+import { SelectGroupedObjects, SelectHydrator, SelectIndexedResultObjects, SelectResultObject } from './select'
 import { PathFactory } from './select'
 import * as database from '@contember/database'
 import { Client, SelectBuilder } from '@contember/database'
@@ -14,7 +14,7 @@ import { Updater } from './update'
 import { Inserter } from './insert'
 import { tryMutation } from './ErrorUtils'
 import { OrderByHelper } from './select'
-import { ObjectNode, UniqueWhereExpander } from '../inputProcessing'
+import {  ObjectNode, UniqueWhereExpander } from '../inputProcessing'
 import { UpdateBuilder } from './update'
 import { Mutex } from '../utils'
 import { CheckedPrimary } from './CheckedPrimary'
@@ -50,62 +50,64 @@ export class Mapper {
 			.from(entity.tableName, 'root_')
 			.select(['root_', columnName])
 		const expandedWhere = this.uniqueWhereExpander.expand(entity, where)
-		const builtQb = this.whereBuilder.build(qb, entity, this.pathFactory.create([]), expandedWhere)
+		const builtQb = this.whereBuilder.build(qb, entity, this.pathFactory.create([]), expandedWhere, [])
 		const result = await builtQb.getResult(this.db)
 
 		return result[0] !== undefined ? result[0][columnName] : undefined
 	}
 
-	public async select(entity: Model.Entity, input: ObjectNode<Input.ListQueryInput>, overRelation: Model.AnyRelation | null): Promise<SelectResultObject[]>
-	public async select(
+	public async selectAssoc(
 		entity: Model.Entity,
 		input: ObjectNode<Input.ListQueryInput>,
-		overRelation: Model.AnyRelation | null,
+		relationPath: Model.AnyRelationContext[],
 		indexBy: string,
-	): Promise<SelectIndexedResultObjects>
-	public async select(
-		entity: Model.Entity,
-		input: ObjectNode<Input.ListQueryInput>,
-		overRelation: Model.AnyRelation | null,
-		indexBy?: string,
-	): Promise<SelectResultObject[] | SelectIndexedResultObjects> {
+	): Promise<SelectIndexedResultObjects> {
 		const hydrator = new SelectHydrator()
-		let qb: SelectBuilder<SelectBuilder.Result> = SelectBuilder.create()
-		let indexByAlias: string | null = null
-		if (indexBy) {
-			const path = this.pathFactory.create([])
-			indexByAlias = path.for(indexBy).alias
-			qb = qb.select([path.alias, getColumnName(this.schema, entity, indexBy)], indexByAlias)
-		}
-		const rows = await this.selectRows(hydrator, qb, entity, input, overRelation)
+		const path = this.pathFactory.create([])
+		const indexByAlias: string = path.for(indexBy).alias
+		const qb: SelectBuilder = SelectBuilder.create()
+			.select([path.alias, getColumnName(this.schema, entity, indexBy)], indexByAlias)
+		const rows = await this.selectRows(hydrator, qb, entity, input, relationPath)
+		return await hydrator.hydrateAll(rows, indexByAlias)
+	}
 
-		return await (indexByAlias !== null ? hydrator.hydrateAll(rows, indexByAlias) : hydrator.hydrateAll(rows))
+	public async select(entity: Model.Entity, input: ObjectNode<Input.ListQueryInput>, relationPath: Model.AnyRelationContext[]): Promise<SelectResultObject[]> {
+		const hydrator = new SelectHydrator()
+		const qb: SelectBuilder<SelectBuilder.Result> = SelectBuilder.create()
+
+		const rows = await this.selectRows(hydrator, qb, entity, input, relationPath)
+
+		return await hydrator.hydrateAll(rows)
 	}
 
 	public async selectUnique(
 		entity: Model.Entity,
 		query: ObjectNode<Input.UniqueQueryInput>,
-		overRelation: Model.AnyRelation | null,
+		relationPath: Model.AnyRelationContext[],
 	): Promise<SelectResultObject | null> {
 		const uniqueWhere = this.uniqueWhereExpander.expand(entity, query.args.by)
 		const where = query.args.filter ? { and: [uniqueWhere, query.args.filter] } : uniqueWhere
 		const queryExpanded = query.withArg<Input.ListQueryInput>('filter', where)
 
-		return (await this.select(entity, queryExpanded, overRelation))[0] || null
+		const rows = await this.select(entity, queryExpanded, relationPath)
+
+		return rows[0] ?? null
 	}
 
 	public async selectGrouped(
 		entity: Model.Entity,
 		input: ObjectNode<Input.ListQueryInput>,
 		relation: Model.JoiningColumnRelation & Model.AnyRelation,
-	) {
+		relationPath: Model.AnyRelationContext[],
+	): Promise<SelectGroupedObjects> {
 		const hydrator = new SelectHydrator()
-		let qb: SelectBuilder<SelectBuilder.Result> = SelectBuilder.create()
 		const path = this.pathFactory.create([])
 		const groupingKey = '__grouping_key'
-		qb = qb.select([path.alias, relation.joiningColumn.columnName], groupingKey)
+		const qb: SelectBuilder = SelectBuilder.create()
+			.select([path.alias, relation.joiningColumn.columnName], groupingKey)
 
-		const rows = await this.selectRows(hydrator, qb, entity, input, relation, relation.name)
+		const rows = await this.selectRows(hydrator, qb, entity, input, relationPath, relation.name)
+
 		return await hydrator.hydrateGroups(rows, groupingKey)
 	}
 
@@ -114,15 +116,15 @@ export class Mapper {
 		qb: SelectBuilder<SelectBuilder.Result>,
 		entity: Model.Entity,
 		input: ObjectNode<Input.ListQueryInput>,
-		overRelation: Model.AnyRelation | null,
+		relationPath: Model.AnyRelationContext[],
 		groupBy?: string,
 	) {
 		const inputWithOrder = OrderByHelper.appendDefaultOrderBy(entity, input, [])
 		const path = this.pathFactory.create([])
 		const augmentedBuilder = qb.from(entity.tableName, path.alias).meta('path', [...input.path, input.alias])
 
-		const selector = this.selectBuilderFactory.create(augmentedBuilder, hydrator)
-		const filterWithPredicates = this.predicatesInjector.inject(entity, inputWithOrder.args.filter || {}, overRelation ?? undefined)
+		const selector = this.selectBuilderFactory.create(augmentedBuilder, hydrator, relationPath)
+		const filterWithPredicates = this.predicatesInjector.inject(entity, inputWithOrder.args.filter || {}, relationPath[relationPath.length - 1])
 		const inputWithPredicates = inputWithOrder.withArg('filter', filterWithPredicates)
 		selector.select(this, entity, inputWithPredicates, path, groupBy)
 		return await selector.execute(this.db)
@@ -134,7 +136,7 @@ export class Mapper {
 			.from(entity.tableName, path.alias)
 			.select(expr => expr.raw('count(*)'), 'row_count')
 		const withPredicates = this.predicatesInjector.inject(entity, filter)
-		const qbWithWhere = this.whereBuilder.build(qb, entity, path, withPredicates)
+		const qbWithWhere = this.whereBuilder.build(qb, entity, path, withPredicates, [])
 		const result = await qbWithWhere.getResult(this.db)
 		return result[0].row_count
 	}
@@ -143,6 +145,7 @@ export class Mapper {
 		entity: Model.Entity,
 		filter: Input.OptionalWhere,
 		relation: Model.JoiningColumnRelation & Model.Relation,
+		relationPath: Model.AnyRelationContext[],
 	): Promise<Record<string, number>> {
 		const path = this.pathFactory.create([])
 		const qb = SelectBuilder.create()
@@ -151,7 +154,7 @@ export class Mapper {
 			.select([path.alias, relation.joiningColumn.columnName])
 			.groupBy([path.alias, relation.joiningColumn.columnName])
 		const withPredicates = this.predicatesInjector.inject(entity, filter)
-		const qbWithWhere = this.whereBuilder.build(qb, entity, path, withPredicates)
+		const qbWithWhere = this.whereBuilder.build(qb, entity, path, withPredicates, relationPath)
 		const rows = await qbWithWhere.getResult(this.db)
 		const result = new Map<string, number>()
 		for (const row of rows) {

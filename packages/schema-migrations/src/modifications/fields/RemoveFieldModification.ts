@@ -19,19 +19,19 @@ export class RemoveFieldModificationHandler implements ModificationHandler<Remov
 			return
 		}
 		acceptFieldVisitor(this.schema.model, this.data.entityName, this.data.fieldName, {
-			visitColumn: (entity, column) => {
+			visitColumn: ({ entity, column }) => {
 				builder.dropColumn(entity.tableName, column.columnName)
 			},
-			visitManyHasOne: (entity, relation, {}, _) => {
+			visitManyHasOne: ({ entity, relation }) => {
 				builder.dropColumn(entity.tableName, relation.joiningColumn.columnName)
 			},
 			visitOneHasMany: () => {},
-			visitOneHasOneOwning: (entity, relation, {}, _) => {
+			visitOneHasOneOwning: ({ entity, relation }) => {
 				builder.dropConstraint(entity.tableName, NamingHelper.createUniqueConstraintName(entity.name, [relation.name]))
 				builder.dropColumn(entity.tableName, relation.joiningColumn.columnName)
 			},
 			visitOneHasOneInverse: () => {},
-			visitManyHasManyOwning: ({}, relation, {}, _) => {
+			visitManyHasManyOwning: ({ relation }) => {
 				builder.dropTable(relation.joiningTable.tableName)
 			},
 			visitManyHasManyInverse: () => {},

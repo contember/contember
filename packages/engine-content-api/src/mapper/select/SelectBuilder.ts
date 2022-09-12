@@ -30,6 +30,7 @@ export class SelectBuilder {
 		private readonly fieldsVisitorFactory: FieldsVisitorFactory,
 		private readonly selectHandlers: { [key: string]: SelectExecutionHandler<any> },
 		private readonly pathFactory: PathFactory,
+		private readonly relationPath: Model.AnyRelationContext[],
 	) {}
 
 	public async execute(db: Client): Promise<SelectRow[]> {
@@ -53,7 +54,7 @@ export class SelectBuilder {
 		this.selectInternal(mapper, entity, path, input)
 		const where = input.args.filter
 		if (where) {
-			this.qb = this.whereBuilder.build(this.qb, entity, path, where)
+			this.qb = this.whereBuilder.build(this.qb, entity, path, where, this.relationPath)
 		}
 		const orderBy = input.args.orderBy || []
 
@@ -96,6 +97,7 @@ export class SelectBuilder {
 			})()
 			const executionContext: SelectExecutionHandlerContext = {
 				mapper,
+				relationPath: this.relationPath,
 				addData: async (fieldName, cb, defaultValue = null) => {
 					const columnName = getColumnName(this.schema, entity, fieldName)
 					const ids = (await this.getColumnValues(path.for(fieldName), columnName)).filter(it => it !== null)

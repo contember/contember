@@ -11,58 +11,40 @@ export class PaginatedHasManyCountVisitor implements
 		private readonly objectNode: ObjectNode<Input.PaginationQueryInput>,
 		private readonly relationFetcher: RelationFetcher,
 		private readonly mapper: Mapper,
+		private readonly relationPath: Model.AnyRelationContext[],
 	) {}
 
-	async visitOneHasMany(
-		entity: Model.Entity,
-		relation: Model.OneHasManyRelation,
-		targetEntity: Model.Entity,
-		targetRelation: Model.ManyHasOneRelation,
-	): Promise<GroupedCounts> {
+	async visitOneHasMany(relationContext: Model.OneHasManyContext): Promise<GroupedCounts> {
 		return await this.relationFetcher.countOneHasManyGroups(
 			{
 				mapper: this.mapper,
 				filter: this.objectNode.args.filter,
-				targetEntity: targetEntity,
-				targetRelation: targetRelation,
+				relationContext,
+				relationPath: this.relationPath,
 				ids: this.ids,
 			},
 		)
 	}
 
-	async visitManyHasManyOwning(
-		entity: Model.Entity,
-		relation: Model.ManyHasManyOwningRelation,
-		targetEntity: Model.Entity,
-		targetRelation: Model.ManyHasManyInverseRelation | null,
-	): Promise<GroupedCounts> {
+	async visitManyHasManyOwning(relationContext: Model.ManyHasManyOwningContext): Promise<GroupedCounts> {
 		return await this.relationFetcher.countManyHasManyGroups(
 			{
 				mapper: this.mapper,
 				filter: this.objectNode.args.filter,
-				targetEntity: targetEntity,
-				sourceRelation: relation,
-				targetRelation,
-				directionFrom: 'owning',
+				relationContext,
+				relationPath: this.relationPath,
 				ids: this.ids,
 			},
 		)
 	}
 
-	async visitManyHasManyInverse(
-		entity: Model.Entity,
-		relation: Model.ManyHasManyInverseRelation,
-		targetEntity: Model.Entity,
-		targetRelation: Model.ManyHasManyOwningRelation,
-	): Promise<GroupedCounts> {
+	async visitManyHasManyInverse(relationContext: Model.ManyHasManyInverseContext): Promise<GroupedCounts> {
 		return await this.relationFetcher.countManyHasManyGroups(
 			{
 				mapper: this.mapper,
 				filter: this.objectNode.args.filter,
-				targetEntity: targetEntity,
-				sourceRelation: relation,
-				targetRelation,
-				directionFrom: 'inverse',
+				relationContext,
+				relationPath: this.relationPath,
 				ids: this.ids,
 			},
 		)

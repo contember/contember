@@ -18,7 +18,19 @@ export class HasManyToHasOneReducerExecutionHandler implements SelectExecutionHa
 		addData(
 			entity.primary,
 			async (ids: Input.PrimaryValue[]) => {
-				const [targetEntity, targetRelation] = this.getRelationTarget(entity, objectNode.extensions.relationName)
+
+				const relationContext = acceptFieldVisitor(this.schema, entity, objectNode.extensions.relationName, {
+					visitRelation: context => context,
+					visitColumn: (): never => {
+						throw new ImplementationException('HasManyToHasOneReducerExecutionHandler: Not applicable for a column')
+					},
+				})
+
+				const { targetEntity, targetRelation } = relationContext
+				if (!targetRelation || !isIt<Model.JoiningColumnRelation>(targetRelation, 'joiningColumn')) {
+					throw new Error('HasManyToHasOneReducerExecutionHandler: only applicable for relations with joiningColumn')
+				}
+
 				const uniqueWhere = this.uniqueWhereExpander.expand(targetEntity, {
 					...objectNode.args.by,
 					[targetRelation.name]: { [entity.primary]: ids },
@@ -31,31 +43,12 @@ export class HasManyToHasOneReducerExecutionHandler implements SelectExecutionHa
 				}
 				const newObjectNode = objectNode.withArgs<Input.ListQueryInput>({ filter: whereWithParentId })
 
-				return context.mapper.select(targetEntity, newObjectNode, targetRelation, targetRelation.name)
+				return context.mapper.selectAssoc(targetEntity, newObjectNode, [
+					...context.relationPath,
+					relationContext,
+				], targetRelation.name)
 			},
 			null,
 		)
-	}
-
-	private getRelationTarget(
-		entity: Model.Entity,
-		relationName: string,
-	): [Model.Entity, Model.AnyRelation & Model.JoiningColumnRelation] {
-		return acceptFieldVisitor(this.schema, entity, relationName, {
-			visitColumn: (): never => {
-				throw new ImplementationException('HasManyToHasOneReducerExecutionHandler: Not applicable for a column')
-			},
-			visitRelation: (
-				entity,
-				relation,
-				targetEntity,
-				targetRelation,
-			): [Model.Entity, Model.AnyRelation & Model.JoiningColumnRelation] => {
-				if (!targetRelation || !isIt<Model.JoiningColumnRelation>(targetRelation, 'joiningColumn')) {
-					throw new Error('HasManyToHasOneReducerExecutionHandler: only applicable for relations with joiningColumn')
-				}
-				return [targetEntity, targetRelation]
-			},
-		})
 	}
 }

@@ -18,13 +18,13 @@ export default class EntitySelector {
 		return this.matching((schema, entity) => name.includes(entity.name))
 	}
 
-	public havingRelation(name: string, targetEntity?: string) {
+	public havingRelation(name: string, targetEntityName?: string) {
 		return this.matching(
 			(schema, entity) =>
 				entity.fields[name] &&
 				acceptFieldVisitor(schema, entity, name, {
 					visitColumn: () => false,
-					visitRelation: ({}, {}, target) => !targetEntity || target.name === targetEntity,
+					visitRelation: ({ targetEntity }) => !targetEntityName || targetEntity.name === targetEntityName,
 				}),
 		)
 	}

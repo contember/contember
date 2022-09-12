@@ -54,7 +54,7 @@ export class SelectBuilder {
 		this.selectInternal(mapper, entity, path, input)
 		const where = input.args.filter
 		if (where) {
-			this.qb = this.whereBuilder.build(this.qb, entity, path, where)
+			this.qb = this.whereBuilder.build(this.qb, entity, path, where, this.relationPath)
 		}
 		const orderBy = input.args.orderBy || []
 

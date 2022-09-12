@@ -118,12 +118,10 @@ export class RelationFetcher {
 
 		const joiningColumns = this.resolveJoiningColumns({ relationType: relationContext.type, joiningTable: owningRelation.joiningTable })
 
-		const qb = this.buildJunctionQb(owningRelation, ids, joiningColumns, relationContext.targetEntity, { filter })
+		const qb = this.buildJunctionQb(owningRelation, ids, joiningColumns, relationContext.targetEntity, { filter }, relationPath)
 			.select(['junction_', joiningColumns.sourceColumn.columnName])
 			.select(expr => expr.raw('count(*)'), 'row_count')
 			.groupBy(['junction_', joiningColumns.sourceColumn.columnName])
-
-		// todo missing acl????
 
 		const result = new Map<string, number>()
 		const rows = await qb.getResult(mapper.db)
@@ -153,6 +151,7 @@ export class RelationFetcher {
 			joiningColumns,
 			targetEntity,
 			objectNode,
+			relationPath,
 		)
 		if (junctionValues.length === 0) {
 			return {}
@@ -218,9 +217,10 @@ export class RelationFetcher {
 		column: JoiningColumns,
 		targetEntity: Model.Entity,
 		object: ObjectNode<Input.ListQueryInput>,
+		relationPath: Model.AnyRelationContext[],
 	): Promise<Record<string, Value.AtomicValue>[]> {
 		const joiningTable = relation.joiningTable
-		const qb = this.buildJunctionQb(relation, values, column, targetEntity, object.args)
+		const qb = this.buildJunctionQb(relation, values, column, targetEntity, object.args, relationPath)
 			.select(['junction_', joiningTable.inverseJoiningColumn.columnName])
 			.select(['junction_', joiningTable.joiningColumn.columnName])
 		const wrapper = new LimitByGroupWrapper(
@@ -250,6 +250,7 @@ export class RelationFetcher {
 		column: JoiningColumns,
 		targetEntity: Model.Entity,
 		objectArgs: Input.ListQueryInput,
+		relationPath: Model.AnyRelationContext[],
 	): SelectBuilder {
 		const joiningTable = relation.joiningTable
 
@@ -277,7 +278,7 @@ export class RelationFetcher {
 		}
 
 		if (where && hasWhere) {
-			qb = this.whereBuilder.build(qb, targetEntity, this.pathFactory.create([]), where)
+			qb = this.whereBuilder.build(qb, targetEntity, this.pathFactory.create([]), where, relationPath)
 		}
 		return qb
 	}

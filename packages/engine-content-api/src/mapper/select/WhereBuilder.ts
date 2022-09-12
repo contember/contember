@@ -21,8 +21,10 @@ export class WhereBuilder {
 		entity: Model.Entity,
 		path: Path,
 		where: Input.OptionalWhere,
+		relationPath: Model.AnyRelationContext[] = [],
 	) {
-		return this.buildInternal(entity, path, where, cb => qb.where(clause => cb(clause)), false)
+		const optimizedWhere = this.whereOptimizer.optimize(where, entity, relationPath)
+		return this.buildInternal(entity, path, optimizedWhere, cb => qb.where(clause => cb(clause)), false)
 	}
 
 
@@ -31,8 +33,10 @@ export class WhereBuilder {
 		path: Path,
 		where: Input.OptionalWhere,
 		callback: (clauseCb: (clause: SqlConditionBuilder) => SqlConditionBuilder) => SelectBuilder<SelectBuilder.Result>,
+		relationPath: Model.AnyRelationContext[] = [],
 	) {
-		return this.buildInternal(entity, path, where, callback, false)
+		const optimizedWhere = this.whereOptimizer.optimize(where, entity, relationPath)
+		return this.buildInternal(entity, path, optimizedWhere, callback, false)
 	}
 
 	private buildInternal(
@@ -42,10 +46,9 @@ export class WhereBuilder {
 		callback: (clauseCb: (clause: SqlConditionBuilder) => SqlConditionBuilder) => SelectBuilder<SelectBuilder.Result>,
 		allowManyJoin: boolean,
 	) {
-		const optimizedWhere = this.whereOptimizer.optimize(where, entity)
 		const joinList: WhereJoinDefinition[] = []
 
-		const qbWithWhere = callback(clause => this.buildRecursive(clause, entity, path, optimizedWhere, allowManyJoin, joinList))
+		const qbWithWhere = callback(clause => this.buildRecursive(clause, entity, path, where, allowManyJoin, joinList))
 		return joinList.reduce<SelectBuilder<SelectBuilder.Result>>(
 			(qb, { path, entity, relationName }) => this.joinBuilder.join(qb, path, entity, relationName),
 			qbWithWhere,
@@ -56,7 +59,7 @@ export class WhereBuilder {
 		conditionBuilder: SqlConditionBuilder,
 		entity: Model.Entity,
 		path: Path,
-		where: Input.Where,
+		where: Input.OptionalWhere,
 		allowManyJoin: boolean,
 		joinList: WhereJoinDefinition[],
 	): SqlConditionBuilder {

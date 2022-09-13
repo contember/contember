@@ -80,9 +80,9 @@ export class ExportExecutor {
 				)
 
 				const seqNameQuoted = seqNameResult.rows[0].name.split('.').map(it => wrapIdentifier(it)).join('.')
-				const seqValueResult = await db.query<{ last_value: number }>(`SELECT last_value FROM ${seqNameQuoted}`)
+				const seqValueResult = await db.query<{ last_value: number|string }>(`SELECT last_value FROM ${seqNameQuoted}`)
 				const seqValue = seqValueResult.rows[0].last_value
-				yield ['importSequence', { table: table.name, column: column.name, value: seqValue }]
+				yield ['importSequence', { table: table.name, column: column.name, value: Number(seqValue) }]
 			}
 		}
 	}

@@ -1,6 +1,6 @@
 {
   "name": "@contember/schema-utils",
-  "version": "1.2.0-alpha.11",
+  "version": "1.2.0-alpha.12",
   "license": "Apache-2.0",
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
@@ -8,8 +8,8 @@
     "test": "vitest"
   },
   "dependencies": {
-    "@contember/schema": "^1.2.0-alpha.11",
-    "@contember/typesafe": "^1.2.0-alpha.11"
+    "@contember/schema": "^1.2.0-alpha.12",
+    "@contember/typesafe": "^1.2.0-alpha.12"
   },
   "devDependencies": {
     "@types/node": "^18"

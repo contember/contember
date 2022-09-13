@@ -32,7 +32,7 @@ export class CreateColumnModificationHandler implements ModificationHandler<Crea
 			} else if (this.data.copyValue !== undefined) {
 				const copyFrom = getColumnName(this.schema.model, entity, this.data.copyValue)
 				builder.sql(`UPDATE ${wrapIdentifier(entity.tableName)}
-	  SET ${wrapIdentifier(column.columnName)} = ${wrapIdentifier(copyFrom)}`)
+	  SET ${wrapIdentifier(column.columnName)} = ${wrapIdentifier(copyFrom)}::${getColumnSqlType(column)}`)
 			} else {
 				throw new ImplementationException()
 			}

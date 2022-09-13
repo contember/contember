@@ -67,4 +67,18 @@ describe('where builder', () => {
 			' where exists (select 1  from "__SCHEMA__"."article" as "sub_"  where "root_"."id" = "sub_"."author_id" and "sub_"."is_public" = ? and "sub_"."title" = ?)',
 		)
 	})
+
+
+	it('where on has-many relation with isNull', () => {
+		const schema = createSchema(WhereBuilderModel)
+		const where = createWhere(schema, {
+			articles: {
+				id: { isNull: true },
+			},
+		})
+		assert.equal(
+			where,
+			' where exists (select 1  from (select "root_"."id") as "sub2_" left join  "__SCHEMA__"."article" as "sub_" on  "sub2_"."id" = "sub_"."author_id"  where "sub_"."id" is null)',
+		)
+	})
 })

@@ -33,7 +33,7 @@ export default defineConfig({
 	esbuild: {
 		target: 'esnext',
 	},
-	plugins: [react],
+	plugins: [react()],
 	resolve: {
 		alias: [
 			...packageList.map(packageName => ({

@@ -168,21 +168,22 @@ export const useCommonReactSelectStyles = <Option = unknown, IsMulti extends boo
 		}
 	},
 	option: (provided, { isFocused, isSelected }) => {
-		const color = isFocused
-			? 'var(--cui-filled-control-color)'
-			: isSelected
-				? 'var(--cui-toned-control-color)'
-				: 'var(--cui-control-color)'
-		const backgroundColor = isFocused
-			? 'var(--cui-control-background-color)'
-			: isSelected
-				? 'var(--cui-toned-control-background-color)'
-				: 'var(--cui-filled-control-background-color)'
-
 		return {
 			...provided,
-			backgroundColor,
-			color,
+			'backgroundColor': isFocused
+				? 'var(--cui-filled-primary-control-background-color--highlighted)'
+				: isSelected
+					? 'var(--cui-filled-primary-control-background-color)'
+					: 'transparent',
+			'color': isFocused
+				? 'var(--cui-filled-primary-control-color--highlighted)'
+				: isSelected
+					? 'var(--cui-filled-primary-control-color)'
+					: 'var(--cui-color)',
+			'&:hover': {
+				backgroundColor: 'var(--cui-filled-primary-control-background-color--highlighted)',
+				color: 'var(--cui-filled-primary-control-color--highlighted)',
+			},
 		}
 	},
 	placeholder: provided => {

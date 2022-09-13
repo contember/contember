@@ -7,18 +7,49 @@ on:
   pull_request:
   workflow_dispatch:
 
+env:
+  PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1'
+
 jobs:
+  eslint:
+    runs-on: ubuntu-latest
+    container: node:16-alpine
+
+    steps:
+      - uses: actions/checkout@v3
+      - run: npm install -g pnpm@6
+      - run: pnpm install
+      - run: pnpm run eslint:lint
+
+  build:
+    runs-on: ubuntu-latest
+    container: node:16-alpine
+
+    steps:
+      - uses: actions/checkout@v3
+      - run: npm install -g pnpm@6
+      - run: pnpm install
+      - run: pnpm run build
+
   test:
     runs-on: ubuntu-latest
     container: node:16-alpine
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - run: npm install -g pnpm@6
       - run: pnpm install
-      - run: pnpm run eslint:lint
-      - run: pnpm run build
       - run: pnpm run test
+
+  api-exporter:
+    runs-on: ubuntu-latest
+    container: node:16-alpine
+
+    steps:
+      - uses: actions/checkout@v3
+      - run: npm install -g pnpm@6
+      - run: pnpm install
+      - run: pnpm run ts:build
       - run: pnpm run ae:test
 
   playwright:
@@ -105,7 +136,7 @@ jobs:
     if: github.event_name == 'push' && github.ref_type == 'tag'
     runs-on: ubuntu-latest
     container: node:16-alpine
-    needs: [test]
+    needs: [build, test, eslint, api-exporter]
 
     env:
       NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -124,7 +155,7 @@ jobs:
   publish-docker:
     if: (github.event_name == 'push' && github.ref_type == 'tag') || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
-    needs: [test]
+    needs: [build, test, eslint, api-exporter]
 
     steps:
       - uses: actions/checkout@v2

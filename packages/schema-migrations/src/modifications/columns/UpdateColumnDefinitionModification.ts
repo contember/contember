@@ -5,6 +5,7 @@ import { createModificationType, Differ, ModificationHandler } from '../Modifica
 import deepEqual from 'fast-deep-equal'
 import { updateColumns } from '../utils/diffUtils'
 import { wrapIdentifier } from '@contember/database'
+import { getColumnSqlType } from '../utils/columnUtils'
 
 export class UpdateColumnDefinitionModificationHandler implements ModificationHandler<UpdateColumnDefinitionModificationData>  {
 	constructor(private readonly data: UpdateColumnDefinitionModificationData, private readonly schema: Schema) {}
@@ -14,34 +15,33 @@ export class UpdateColumnDefinitionModificationHandler implements ModificationHa
 		if (entity.view) {
 			return
 		}
-		const field = entity.fields[this.data.fieldName] as Model.AnyColumn
-		const definition = this.data.definition
-		const newType = definition.columnType !== field.columnType
-			? definition.type === Model.ColumnType.Enum
-				? `"${definition.columnType}"`
-				: definition.columnType
+		const oldColumn = entity.fields[this.data.fieldName] as Model.AnyColumn
+		const newColumn = this.data.definition
+		const newType = newColumn.columnType !== oldColumn.columnType
+			? getColumnSqlType(newColumn)
 			: undefined
-		builder.alterColumn(entity.tableName, field.columnName, {
+
+		builder.alterColumn(entity.tableName, oldColumn.columnName, {
 			type: newType,
-			notNull: field.nullable !== definition.nullable ? !definition.nullable : undefined,
-			using: newType !== undefined ? `${wrapIdentifier(field.columnName)}::${newType}` : undefined,
-			sequenceGenerated: field.sequence && !definition.sequence ? false : (!field.sequence ? definition.sequence : undefined),
+			notNull: oldColumn.nullable !== newColumn.nullable ? !newColumn.nullable : undefined,
+			using: newType !== undefined ? `${wrapIdentifier(oldColumn.columnName)}::${newType}` : undefined,
+			sequenceGenerated: oldColumn.sequence && !newColumn.sequence ? false : (!oldColumn.sequence ? newColumn.sequence : undefined),
 		})
 
 		const seqAlter = []
-		if (field.sequence && definition.sequence) {
-			if (field.sequence.precedence !== definition.sequence.precedence) {
-				seqAlter.push(`SET GENERATED ${definition.sequence.precedence}`)
+		if (oldColumn.sequence && newColumn.sequence) {
+			if (oldColumn.sequence.precedence !== newColumn.sequence.precedence) {
+				seqAlter.push(`SET GENERATED ${newColumn.sequence.precedence}`)
 			}
-			if (field.sequence.start !== definition.sequence.start && typeof definition.sequence.start == 'number') {
-				seqAlter.push(`SET START WITH ${definition.sequence.start}`)
+			if (oldColumn.sequence.start !== newColumn.sequence.start && typeof newColumn.sequence.start == 'number') {
+				seqAlter.push(`SET START WITH ${newColumn.sequence.start}`)
 			}
-			if (definition.sequence.restart) {
+			if (newColumn.sequence.restart) {
 				seqAlter.push('RESTART')
 			}
 		}
 		if (seqAlter.length > 0) {
-			builder.sql(`ALTER TABLE ${wrapIdentifier(entity.tableName)} ALTER ${wrapIdentifier(field.columnName)} ${seqAlter.join(' ')}`)
+			builder.sql(`ALTER TABLE ${wrapIdentifier(entity.tableName)} ALTER ${wrapIdentifier(oldColumn.columnName)} ${seqAlter.join(' ')}`)
 		}
 	}
 

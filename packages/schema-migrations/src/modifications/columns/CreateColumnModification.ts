@@ -6,6 +6,7 @@ import { wrapIdentifier } from '../../utils/dbHelpers'
 import { getColumnName, isColumn } from '@contember/schema-utils'
 import { ImplementationException } from '../../exceptions'
 import { createFields } from '../utils/diffUtils'
+import { getColumnSqlType } from '../utils/columnUtils'
 
 export class CreateColumnModificationHandler implements ModificationHandler<CreateColumnModificationData> {
 	constructor(private readonly data: CreateColumnModificationData, private readonly schema: Schema) {}
@@ -19,7 +20,7 @@ export class CreateColumnModificationHandler implements ModificationHandler<Crea
 		const hasSeed = this.data.fillValue !== undefined || this.data.copyValue !== undefined
 		builder.addColumn(entity.tableName, {
 			[column.columnName]: {
-				type: column.type === Model.ColumnType.Enum ? `"${column.columnType}"` : column.columnType,
+				type: getColumnSqlType(column),
 				notNull: !column.nullable && !hasSeed,
 				sequenceGenerated: column.sequence,
 			},

@@ -9,6 +9,7 @@ import {
 } from '../ModificationHandler'
 import { createEventTrigger, createEventTrxTrigger } from '../utils/sqlUpdateUtils'
 import { PartialEntity } from '../../utils/PartialEntity.js'
+import { getColumnSqlType } from '../utils/columnUtils'
 
 export class CreateEntityModificationHandler implements ModificationHandler<CreateEntityModificationData> {
 	constructor(
@@ -29,7 +30,7 @@ export class CreateEntityModificationHandler implements ModificationHandler<Crea
 		builder.createTable(entity.tableName, {
 			[primaryColumn.name]: {
 				primaryKey: true,
-				type: primaryColumn.type === Model.ColumnType.Enum ? `"${primaryColumn.columnType}"` : primaryColumn.columnType,
+				type: getColumnSqlType(primaryColumn),
 				notNull: true,
 				sequenceGenerated: primaryColumn.sequence,
 			},

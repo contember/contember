@@ -1,10 +1,16 @@
 import { isIt } from '../../utils'
-import { acceptFieldVisitor } from '@contember/schema-utils'
+import { acceptFieldVisitor, isColumn } from '@contember/schema-utils'
 import { Input, Model } from '@contember/schema'
 import { Path, PathFactory } from './Path'
 import { JoinBuilder } from './JoinBuilder'
 import { ConditionBuilder } from './ConditionBuilder'
-import { ConditionBuilder as SqlConditionBuilder, Operator, QueryBuilder, SelectBuilder } from '@contember/database'
+import {
+	ConditionBuilder as SqlConditionBuilder,
+	Literal,
+	Operator,
+	QueryBuilder,
+	SelectBuilder, wrapIdentifier,
+} from '@contember/database'
 import { WhereOptimizer } from './optimizer/WhereOptimizer'
 
 export class WhereBuilder {
@@ -172,10 +178,17 @@ export class WhereBuilder {
 
 					const relationWhere = where[fieldName] as Input.Where
 
-					const qb = SelectBuilder.create()
-						.select(it => it.raw('1'))
-						.from(context.targetEntity.tableName, 'sub_')
-						.where(it => it.columnsEq([tableName, entity.primaryColumn], ['sub_', context.targetRelation.joiningColumn.columnName]))
+					const qb = this.hasRootIsNull(relationWhere, context.targetEntity)
+						? SelectBuilder.create()
+							.select(it => it.raw('1'))
+							.from(new Literal(`(select ${wrapIdentifier(tableName)}.${wrapIdentifier(entity.primaryColumn)})`), 'sub2_')
+							.leftJoin(context.targetEntity.tableName, 'sub_', it =>
+								it.columnsEq(['sub2_', entity.primaryColumn], ['sub_', context.targetRelation.joiningColumn.columnName]),
+							)
+						: SelectBuilder.create()
+							.select(it => it.raw('1'))
+							.from(context.targetEntity.tableName, 'sub_')
+							.where(it => it.columnsEq([tableName, entity.primaryColumn], ['sub_', context.targetRelation.joiningColumn.columnName]))
 
 					return conditionBuilder.exists(
 						this.buildInternal(
@@ -191,6 +204,7 @@ export class WhereBuilder {
 		}
 		return conditionBuilder
 	}
+
 
 	private createManyHasManySubquery(
 		outerColumn: QueryBuilder.ColumnIdentifier,
@@ -270,6 +284,43 @@ export class WhereBuilder {
 			return where[primaryField] as Input.Condition<never>
 		}
 		return condition
+	}
+
+	private hasRootIsNull(where: Input.Where, entity: Model.Entity): boolean {
+		if (where.and && where.and.some(it => this.hasRootIsNull(it, entity))) {
+			return true
+		}
+		if (where.or && where.or.some(it => this.hasRootIsNull(it, entity))) {
+			return true
+		}
+		if (where.not && this.hasRootIsNull(where.not, entity)) {
+			return true
+		}
+		for (const key in where) {
+			if (key === 'and' || key === 'or' || key === 'not') {
+				continue
+			}
+			if (isColumn(entity.fields[key]) && this.conditionHasIsNull(where[key] as Input.Condition)) {
+				return true
+			}
+		}
+		return false
+	}
+
+	private conditionHasIsNull(cond: Input.Condition): boolean {
+		if (cond.isNull !== undefined) {
+			return true
+		}
+		if (cond.and && cond.and.some(it => this.conditionHasIsNull(it))) {
+			return true
+		}
+		if (cond.or && cond.or.some(it => this.conditionHasIsNull(it))) {
+			return true
+		}
+		if (cond.not && this.conditionHasIsNull(cond.not)) {
+			return true
+		}
+		return false
 	}
 }
 

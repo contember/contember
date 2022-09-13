@@ -64,6 +64,7 @@ import { GraphQlClientRequestOptions } from '@contember/react-client';
 import { GraphQlClientVariables } from '@contember/react-client';
 import { GraphQlClientVariables as GraphQlClientVariables_2 } from '@contember/client';
 import { HistoryEditor } from 'slate-history';
+import { HTMLReactSelectElement } from '@contember/ui';
 import { IconProps } from '@contember/ui';
 import { IconSourceSpecification } from '@contember/ui';
 import type { ImgHTMLAttributes } from 'react';
@@ -88,6 +89,7 @@ import { PersistOptions } from '@contember/binding';
 import type { PersistSuccessOptions } from '@contember/binding';
 import { Point } from 'slate';
 import type { Props } from 'react-select';
+import { PublicCommonReactSelectStylesProps } from '@contember/ui';
 import { PureComponent } from 'react';
 import { QualifiedEntityList } from '@contember/binding';
 import type { RadioProps } from '@contember/ui';
@@ -2899,7 +2901,7 @@ export type MutationRequestState<T> = QueryRequestState<T> | RequestStateUniniti
 export const NativeSelectField: FunctionComponent<NativeSelectFieldProps>;
 
 // @public (undocumented)
-export const NativeSelectFieldInner: React.MemoExoticComponent<React.ForwardRefExoticComponent<Pick<NativeSelectFieldInnerProps<any>, "data" | "label" | "style" | "key" | "className" | "placeholder" | "onSelect" | "size" | "errors" | "description" | "direction" | "gap" | "labelDescription" | "labelPosition" | "width" | "required" | "useLabelElement" | "notNull" | "isLoading" | "onSearch" | "currentValue" | "onClear" | "onAddNew" | "allowNull"> & RefAttributes<HTMLSelectElement>>>;
+export const NativeSelectFieldInner: React.MemoExoticComponent<React.ForwardRefExoticComponent<Pick<NativeSelectFieldInnerProps<any>, "data" | "label" | "style" | "key" | "className" | "placeholder" | "onSelect" | "size" | "errors" | "description" | "direction" | "gap" | "labelDescription" | "labelPosition" | "width" | "required" | "useLabelElement" | "notNull" | "isLoading" | "onSearch" | "currentValue" | "onClear" | "onAddNew" | "allowNull"> & RefAttributes<HTMLReactSelectElement<ChoiceFieldData.SingleOption<unknown>>>>>;
 
 // @public (undocumented)
 export interface NativeSelectFieldInnerProps<ActualValue> extends ChoiceFieldData.SingleChoiceFieldMetadata<ActualValue>, NativeSelectFieldInnerPublicProps, RefAttributes<HTMLSelectElement> {
@@ -3231,10 +3233,7 @@ export type ProjectUserRoles = Set<string>;
 // @public (undocumented)
 export type PublicAnchorProps = Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'>;
 
-// @public (undocumented)
-export type PublicCommonReactSelectStylesProps = {
-    menuZIndex?: number;
-};
+export { PublicCommonReactSelectStylesProps }
 
 // @public (undocumented)
 export type PublicFileKind<UploadResult = unknown, AcceptArtifacts = unknown> = Partial<InternalFileKind<UploadResult, AcceptArtifacts>>;

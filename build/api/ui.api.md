@@ -10,6 +10,7 @@ import { AllHTMLAttributes } from 'react';
 import { AnimationEventHandler } from 'react';
 import { AriaRole } from 'react';
 import { ClipboardEventHandler } from 'react';
+import { ComponentProps } from 'react';
 import { ComponentType } from 'react';
 import { CompositionEventHandler } from 'react';
 import { Context } from 'react';
@@ -22,6 +23,7 @@ import { FormEventHandler } from 'react';
 import { ForwardedRef } from 'react';
 import { ForwardRefExoticComponent } from 'react';
 import type { FunctionComponent } from 'react';
+import type { GroupBase } from 'react-select';
 import { HTMLAttributes } from 'react';
 import { IconName } from '@blueprintjs/icons';
 import { Key } from 'react';
@@ -37,9 +39,12 @@ import { ReactElement } from 'react';
 import { ReactEventHandler } from 'react';
 import { ReactNode } from 'react';
 import { ReactPortal } from 'react';
+import ReactSelect from 'react-select';
 import { Ref } from 'react';
 import { RefAttributes } from 'react';
 import { RefObject } from 'react';
+import SelectClass from 'react-select/dist/declarations/src/Select';
+import { StylesConfig } from 'react-select';
 import { SyntheticEvent } from 'react';
 import { TextareaAutosizeProps } from 'react-textarea-autosize';
 import { TextareaHTMLAttributes } from 'react';
@@ -335,6 +340,11 @@ export type CommonCardProps = VisuallyDependentControlProps & {
     src?: string | null;
     children?: ReactNode;
     layout?: 'label-below' | 'label-inside';
+};
+
+// @public (undocumented)
+export type CommonReactSelectStylesProps = PublicCommonReactSelectStylesProps & {
+    isInvalid?: boolean;
 };
 
 // @public (undocumented)
@@ -1640,6 +1650,12 @@ export interface HoveringToolbarProps {
 export type HoveringToolbarScope = 'contextual' | Default;
 
 // @public (undocumented)
+export type HTMLReactSelectElement<V> = SelectClass<SelectOption<V>, false, never>;
+
+// @public (undocumented)
+export type HTMLReactSelectElementWithKey<V> = SelectClass<SelectOptionWithKey<V>, false, never>;
+
+// @public (undocumented)
 export const Icon: MemoExoticComponent<ForwardRefExoticComponent<IconProps & RefAttributes<HTMLElement>>>;
 
 // @public (undocumented)
@@ -2021,6 +2037,11 @@ export interface ProgressBarProps {
 }
 
 // @public (undocumented)
+export type PublicCommonReactSelectStylesProps = {
+    menuZIndex?: number;
+};
+
+// @public (undocumented)
 const questionAnswer: string[];
 
 // @public (undocumented)
@@ -2103,10 +2124,6 @@ export interface RepeaterItemContainerProps {
 
 // @public (undocumented)
 export interface RestHTMLCheckboxProps extends Omit<AllHTMLAttributes<HTMLInputElement>, ControlPropsKeys<boolean> | 'checked' | 'children'> {
-}
-
-// @public (undocumented)
-export interface RestHTMLSelectProps<V> extends Omit<AllHTMLAttributes<HTMLSelectElement>, ControlPropsKeys<V> | 'children'> {
 }
 
 // @public (undocumented)
@@ -2196,10 +2213,12 @@ export const SectionTabs: MemoExoticComponent<() => JSX.Element | null>;
 export const SectionTabsProvider: MemoExoticComponent<({ children }: SectionTabsProps) => JSX.Element>;
 
 // @public (undocumented)
-export const Select: <V extends unknown>(props: Omit<ControlProps<V>, "max" | "min"> & RestHTMLSelectProps<V> & {
+export const Select: <V extends unknown>(props: Omit<ControlProps<V>, "type" | "max" | "min"> & {
     options: SelectOption<V>[];
-    rows?: number | undefined;
-} & RefAttributes<HTMLSelectElement>) => ReactElement | null;
+    rows?: undefined;
+    isSearchable?: ComponentProps<ReactSelect>['isSearchable'];
+    styles?: StylesConfig<any, boolean, never> | undefined;
+} & RefAttributes<HTMLReactSelectElement<V>>) => ReactElement | null;
 
 // Warning: (ae-forgotten-export) The symbol "SelectCreateNewWrapperProps" needs to be exported by the entry point index.d.ts
 //
@@ -2211,15 +2230,24 @@ export interface SelectOption<V = string> {
     // (undocumented)
     disabled?: boolean;
     // (undocumented)
+    key?: string;
+    // (undocumented)
     label: string;
     // (undocumented)
     value: V;
 }
 
 // @public (undocumented)
-export type SelectProps<V> = Omit<ControlProps<V>, 'min' | 'max'> & RestHTMLSelectProps<V> & {
+export type SelectOptionWithKey<V = string> = Omit<SelectOption<V>, 'key'> & {
+    key: string;
+};
+
+// @public (undocumented)
+export type SelectProps<V> = Omit<ControlProps<V>, 'type' | 'min' | 'max'> & {
     options: SelectOption<V>[];
-    rows?: number;
+    rows?: never;
+    isSearchable?: ComponentProps<ReactSelect>['isSearchable'];
+    styles?: StylesConfig<any, boolean, never>;
 };
 
 // @public (undocumented)
@@ -2642,6 +2670,12 @@ export type UrlInputProps = TextInputProps;
 export function useActiveSectionsTabs(): ActiveSectionTabsMap;
 
 // @public (undocumented)
+export const useChangeValidationState: ({ ref, onValidationStateChange }: {
+    ref: ForwardedRef<any>;
+    onValidationStateChange?: ((message: string) => void) | undefined;
+}) => () => void;
+
+// @public (undocumented)
 export function useChildrenAsLabel(children: ReactNode): string | undefined;
 
 // @public (undocumented)
@@ -2660,6 +2694,9 @@ export const useCloseOnEscape: ({ isOpen, close }: {
     isOpen: boolean;
     close: () => void;
 }) => void;
+
+// @public (undocumented)
+export const useCommonReactSelectStyles: <Option = unknown, IsMulti extends boolean = boolean, Group extends GroupBase<Option> = GroupBase<Option>>({ isInvalid, menuZIndex }: CommonReactSelectStylesProps) => StylesConfig<Option, IsMulti, Group>;
 
 // @public (undocumented)
 export const useComponentClassName: (className: string) => string;

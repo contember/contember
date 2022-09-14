@@ -90,17 +90,20 @@ test('querying post + author name', async () => {
 				},
 			},
 			{
-				sql: SQL`select
-                         "root_"."id" as "root_id",
-                         case when "root_country"."name" in (?) then "root_"."name" else null end as "root_name",
-                         "root_"."id" as "root_id"
-                       from "public"."author" as "root_" left join "public"."country" as "root_country" on "root_"."country_id" = "root_country"."id"
-                       where "root_"."id" in (?, ?)`,
+				sql: SQL`SELECT
+							 "root_"."id" AS "root_id",
+							 "root_country"."name" IN (?) AS "root___predicate_countryPredicate",
+							 "root_"."name" AS "root_name",
+							 "root_"."id" AS "root_id"
+						 FROM "public"."author" AS "root_"
+						 LEFT JOIN "public"."country" AS "root_country" ON "root_"."country_id" = "root_country"."id"
+						 WHERE "root_"."id" IN (?, ?)`,
 				parameters: ['Czechia', testUuid(3), testUuid(4)],
 				response: {
 					rows: [
 						{
 							root_id: testUuid(3),
+							root___predicate_countryPredicate: true,
 							root_name: 'John',
 						},
 					],

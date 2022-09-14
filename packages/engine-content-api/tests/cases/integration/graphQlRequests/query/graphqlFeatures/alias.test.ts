@@ -77,15 +77,13 @@ test('aliases', async () => {
         }`,
 		executes: [
 			{
-				sql: SQL`select
-                     "root_"."id" as "root_idx",
-                     "root_"."name" as "root_name1",
-                     "root_"."name" as "root_name2",
-                     true as "root_meta_name1_readable1",
-                     true as "root_meta_name1_readable2",
-                     "root_"."name" = ? as "root_meta_name1_updatable1",
-                     "root_"."id" as "root_id"
-                   from "public"."author" as "root_"`,
+				sql: SQL`SELECT
+							 "root_"."id" AS "root_idx",
+							 "root_"."name" AS "root_name1",
+							 "root_"."name" AS "root_name2",
+							 "root_"."name" = ? AS "root___predicate_name_eq",
+							 "root_"."id" AS "root_id"
+						 FROM "public"."author" AS "root_"`,
 				parameters: ['John'],
 				response: {
 					rows: [
@@ -94,9 +92,7 @@ test('aliases', async () => {
 							root_idx: testUuid(1),
 							root_name1: 'John',
 							root_name2: 'John',
-							root_meta_name1_readable1: true,
-							root_meta_name1_readable2: true,
-							root_meta_name1_updatable1: false,
+							root___predicate_name_eq: true,
 						},
 					],
 				},
@@ -111,7 +107,7 @@ test('aliases', async () => {
 							name1: {
 								readable1: true,
 								readable2: true,
-								updatable1: false,
+								updatable1: true,
 							},
 						},
 						name1: 'John',

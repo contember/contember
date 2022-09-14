@@ -1,6 +1,6 @@
-import { Input, Model } from '@contember/schema'
+import { Acl, Input, Model } from '@contember/schema'
 import { acceptFieldVisitor, getColumnName } from '@contember/schema-utils'
-import { SelectHydrator, SelectRow } from './SelectHydrator'
+import { ColumnValueGetter, SelectHydrator, SelectRow } from './SelectHydrator'
 import { Path, PathFactory } from './Path'
 import { WhereBuilder } from './WhereBuilder'
 import { Client, LimitByGroupWrapper, SelectBuilder as DbSelectBuilder } from '@contember/database'
@@ -11,6 +11,7 @@ import { MetaHandler } from './handlers'
 import { Mapper } from '../Mapper'
 import { FieldNode, ObjectNode } from '../../inputProcessing'
 import { assertNever } from '../../utils'
+import { PredicateFactory } from '../../acl'
 
 export class SelectBuilder {
 	private resolver: (value: SelectRow[]) => void = () => {
@@ -31,6 +32,7 @@ export class SelectBuilder {
 		private readonly selectHandlers: { [key: string]: SelectExecutionHandler<any> },
 		private readonly pathFactory: PathFactory,
 		private readonly relationPath: Model.AnyRelationContext[],
+		private readonly predicateFactory: PredicateFactory,
 	) {}
 
 	public async execute(db: Client): Promise<SelectRow[]> {
@@ -84,6 +86,35 @@ export class SelectBuilder {
 			input = input.withField(new FieldNode(entity.primary, entity.primary, {}))
 		}
 
+		const fetchedPredicates = new Set()
+		const addPredicate = (predicate: Acl.Predicate): ColumnValueGetter<boolean> => {
+			if (typeof predicate === 'boolean') {
+				return () => predicate
+			}
+			const predicatePath = path.for('__predicate').for(predicate)
+			if (!fetchedPredicates.has(predicate)) {
+				const predicateValue = this.predicateFactory.buildPredicates(entity, [predicate], this.relationPath[this.relationPath.length - 1])
+				this.qb = this.whereBuilder.buildAdvanced(
+					entity,
+					path.back(),
+					predicateValue,
+					apply => this.qb.select(expr =>
+						expr.selectCondition(condition => {
+							condition = apply(condition)
+							if (condition.isEmpty()) {
+								return condition.raw('true')
+							}
+							return condition
+						}),
+					predicatePath.alias,
+					),
+					this.relationPath,
+				)
+				fetchedPredicates.add(predicate)
+			}
+			return row => row[predicatePath.alias] === true
+		}
+
 		for (let field of input.fields) {
 			const fieldPath = path.for(field.alias)
 			const fieldProperty = (() => {
@@ -95,6 +126,8 @@ export class SelectBuilder {
 				}
 				return assertNever(field)
 			})()
+
+
 			const executionContext: SelectExecutionHandlerContext = {
 				mapper,
 				relationPath: this.relationPath,
@@ -105,10 +138,17 @@ export class SelectBuilder {
 					const data = (async () => (ids.length > 0 ? cb(ids) : {}))()
 					this.hydrator.addPromise(fieldPath, path.for(fieldName), data, defaultValue)
 				},
-				addColumn: (qbCallback, path) => {
-					this.qb = qbCallback(this.qb)
-					this.hydrator.addColumn(path || fieldPath)
+				addColumn: ({ path = fieldPath, predicate, query, valueGetter }) => {
+					const predicateGetter = predicate !== undefined ? addPredicate(predicate) : null
+					if (query) {
+						this.qb = query(this.qb)
+					}
+					this.hydrator.addColumn(
+						path,
+						valueGetter ?? (row => predicateGetter === null || predicateGetter(row) ? row[path.alias] : null),
+					)
 				},
+				addPredicate: addPredicate,
 				path: fieldPath,
 				entity: entity,
 				...fieldProperty,

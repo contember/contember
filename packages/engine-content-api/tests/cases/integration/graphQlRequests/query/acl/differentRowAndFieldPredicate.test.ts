@@ -41,16 +41,18 @@ test('different predicate on row and field level', async () => {
 		executes: [
 			{
 				sql: SQL`
-					select "root_"."id" as "root_id",
-						case when "root_"."username" = ? then "root_"."username" else null end as "root_username"
-					from "public"."author" as "root_"
-					where not("root_"."username" is null)
+					select
+					    "root_"."id" as "root_id",
+					    "root_"."username" = ? as "root___predicate_authorPredicate",
+					    "root_"."username" as "root_username"
+					from "public"."author" as "root_" where not("root_"."username" is null)
 				`,
 				parameters: ['johndoe'],
 				response: {
 					rows: [
 						{
 							root_id: testUuid(1),
+							root___predicate_authorPredicate: true,
 							root_username: 'johndoe',
 						},
 					],
@@ -63,6 +65,54 @@ test('different predicate on row and field level', async () => {
 					{
 						id: testUuid(1),
 						username: 'johndoe',
+					},
+				],
+			},
+		},
+	})
+})
+
+
+
+test('different predicate on row and field level - false', async () => {
+	await execute({
+		schema: schema,
+		permissions: permissions,
+		variables: {},
+		query: GQL`
+        query {
+          listAuthor {
+            id
+            username
+          }
+        }`,
+		executes: [
+			{
+				sql: SQL`
+					select
+					    "root_"."id" as "root_id",
+					    "root_"."username" = ? as "root___predicate_authorPredicate",
+					    "root_"."username" as "root_username"
+					from "public"."author" as "root_" where not("root_"."username" is null)
+				`,
+				parameters: ['johndoe'],
+				response: {
+					rows: [
+						{
+							root_id: testUuid(1),
+							root___predicate_authorPredicate: false,
+							root_username: 'johndoe',
+						},
+					],
+				},
+			},
+		],
+		return: {
+			data: {
+				listAuthor: [
+					{
+						id: testUuid(1),
+						username: null,
 					},
 				],
 			},

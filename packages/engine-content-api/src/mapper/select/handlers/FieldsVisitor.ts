@@ -18,35 +18,22 @@ export class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.C
 
 	visitColumn({ entity, column }: Model.ColumnContext): void {
 		const columnPath = this.executionContext.path
-		this.executionContext.addColumn(qb => {
-			const tableAlias = columnPath.back().alias
-			const columnAlias = columnPath.alias
+		const fieldPredicate = this.predicateFactory.getFieldPredicate(entity, Acl.Operation.read, column.name)
+		const tableAlias = columnPath.back().alias
+		const columnAlias = columnPath.alias
 
-			const fieldPredicate = this.predicateFactory.shouldApplyCellLevelPredicate(
-				entity,
-				Acl.Operation.read,
-				column.name,
-			)
-				? this.predicateFactory.create(entity, Acl.Operation.read, [column.name])
-				: undefined
+		if (fieldPredicate.predicate === false) {
+			this.executionContext.addColumn({
+				valueGetter: () => null,
+			})
+			return
+		}
 
-			if (!fieldPredicate || Object.keys(fieldPredicate).length === 0) {
-				return qb.select([tableAlias, column.columnName], columnAlias)
-			}
-			return this.whereBuilder.buildAdvanced(entity, columnPath.back(), fieldPredicate, cb =>
-				qb.select(
-					expr =>
-						expr.case(caseExpr =>
-							caseExpr
-								.when(
-									whenExpr => whenExpr.selectCondition(cb),
-									thenExpr => thenExpr.select([tableAlias, column.columnName]),
-								)
-								.else(elseExpr => elseExpr.raw('null')),
-						),
-					columnAlias,
-				),
-			)
+		this.executionContext.addColumn({
+			query: qb => qb.select([tableAlias, column.columnName], columnAlias),
+			predicate: !fieldPredicate.isSameAsPrimary
+				? fieldPredicate.predicate
+				: undefined,
 		})
 	}
 

@@ -84,7 +84,7 @@ export const createMapperContainer = ({ permissions, schema, identityVariables, 
 			[HasManyToHasOneReducer.extensionName]: hasManyToHasOneReducer,
 			[PaginatedHasManyFieldProvider.extensionName]: paginatedHasManyExecutionHandler,
 		}))
-		.addService('selectBuilderFactory', ({ whereBuilder, orderByBuilder, fieldsVisitorFactory, metaHandler, selectHandlers, pathFactory }) =>
+		.addService('selectBuilderFactory', ({ whereBuilder, orderByBuilder, fieldsVisitorFactory, metaHandler, selectHandlers, pathFactory, predicateFactory }) =>
 			new (class implements SelectBuilderFactory {
 				create(qb: DbSelectBuilder, hydrator: SelectHydrator, relationPath: Model.AnyRelationContext[]): SelectBuilder {
 					return new SelectBuilder(
@@ -98,6 +98,7 @@ export const createMapperContainer = ({ permissions, schema, identityVariables, 
 						selectHandlers,
 						pathFactory,
 						relationPath,
+						predicateFactory,
 					)
 				}
 			})())

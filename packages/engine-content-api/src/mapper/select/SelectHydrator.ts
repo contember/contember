@@ -16,12 +16,19 @@ type ResolvedData = {
 	defaultValue: SelectNestedDefaultValue
 }
 
+export type ColumnValueGetter<T extends Value.FieldValue = Value.FieldValue> = (row: SelectRow) => T
+
+type Column = {
+	path: Path
+	getValue: ColumnValueGetter
+}
+
 export class SelectHydrator {
-	private columns: Path[] = []
+	private columns: Column[] = []
 	private promises: DataPromises[] = []
 
-	public addColumn(path: Path) {
-		this.columns.push(path)
+	public addColumn(path: Path, getValue: ColumnValueGetter) {
+		this.columns.push({ path, getValue })
 	}
 
 	public addPromise(
@@ -72,12 +79,11 @@ export class SelectHydrator {
 		const result: SelectResultObject = {}
 
 		for (let columnPath of this.columns) {
-			const path = [...columnPath.path]
+			const path = [...columnPath.path.path]
 			const last: string = path.pop() as string
 			const currentObject = path.reduce<any>((obj, part) => (obj[part] = obj[part] || {}), result)
 
-			const field = row[columnPath.alias]
-			currentObject[last] = this.formatValue(field)
+			currentObject[last] = this.formatValue(columnPath.getValue(row))
 		}
 
 		for (let { path, parentKeyPath, data, defaultValue } of resolvedData) {
@@ -122,7 +128,7 @@ export class SelectHydrator {
 	}
 }
 
-export type SelectRow = { [key: string]: Value.AtomicValue }
+export type SelectRow = { [key: string]: Value.FieldValue }
 export type SelectResultObject = Value.Object
 export type SelectIndexedResultObjects = { [key: string]: SelectResultObject }
 export type SelectGroupedObjects = { [groupingKey: string]: SelectResultObject[] }

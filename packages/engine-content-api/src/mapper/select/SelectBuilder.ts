@@ -56,7 +56,7 @@ export class SelectBuilder {
 		this.selectInternal(mapper, entity, path, input)
 		const where = input.args.filter
 		if (where) {
-			this.qb = this.whereBuilder.build(this.qb, entity, path, where, this.relationPath)
+			this.qb = this.whereBuilder.build(this.qb, entity, path, where, { relationPath: this.relationPath })
 		}
 		const orderBy = input.args.orderBy || []
 
@@ -93,7 +93,9 @@ export class SelectBuilder {
 			}
 			const predicatePath = path.for('__predicate').for(predicate)
 			if (!fetchedPredicates.has(predicate)) {
-				const predicateValue = this.predicateFactory.buildPredicates(entity, [predicate], this.relationPath[this.relationPath.length - 1])
+				const relationContext = this.relationPath[this.relationPath.length - 1]
+				const evaluatedPredicate = this.predicateFactory.create(entity, Acl.Operation.read, undefined, relationContext)
+				const predicateValue = this.predicateFactory.buildPredicates(entity, [predicate], relationContext)
 				this.qb = this.whereBuilder.buildAdvanced(
 					entity,
 					path.back(),
@@ -108,7 +110,7 @@ export class SelectBuilder {
 						}),
 					predicatePath.alias,
 					),
-					this.relationPath,
+					{ relationPath: this.relationPath, evaluatedPredicates: [evaluatedPredicate] },
 				)
 				fetchedPredicates.add(predicate)
 			}

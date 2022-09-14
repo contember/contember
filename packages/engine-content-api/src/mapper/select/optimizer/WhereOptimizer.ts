@@ -11,6 +11,11 @@ type ExtendedRelationContext =
 		isLast: boolean
 	}
 
+export interface WhereOptimizationHints {
+	relationPath?: Model.AnyRelationContext[]
+	evaluatedPredicates?: Input.Where[]
+}
+
 export class WhereOptimizer {
 	private static eliminableRelations = new Set<Model.AnyRelationContext['type']>(['oneHasMany', 'oneHasOneInverse', 'oneHasOneOwning'])
 
@@ -20,7 +25,7 @@ export class WhereOptimizer {
 	) {
 	}
 
-	public optimize(where: Input.OptionalWhere, entity: Model.Entity, relationPath: Model.AnyRelationContext[] = []): Input.Where {
+	public optimize(where: Input.OptionalWhere, entity: Model.Entity, { relationPath = [], evaluatedPredicates = [] }: WhereOptimizationHints = {}): Input.Where {
 		let processedRelationPath: ExtendedRelationContext[] = []
 		for (const i in relationPath) {
 			const el = relationPath[i]
@@ -31,10 +36,18 @@ export class WhereOptimizer {
 			}
 			processedRelationPath.push({ ...el, canEliminate: true, isLast: Number(i) === relationPath.length })
 		}
-		const result = this.optimizeWhere(where, entity, processedRelationPath)
+		let result = this.optimizeWhere(where, entity, processedRelationPath)
 
 		if (typeof result === 'boolean') {
 			return { [entity.primary]: { [result ? 'always' : 'never']: true } }
+		}
+		const resultTracker = { count: 0 }
+		for (const evaluated of evaluatedPredicates) {
+			const evaluatedPredicate = this.optimize(evaluated, entity)
+			result = replaceWhere(result, evaluatedPredicate, { [entity.primary]: { always: true } }, resultTracker)
+		}
+		if (resultTracker.count > 0) {
+			return this.optimize(result, entity)
 		}
 
 		return result

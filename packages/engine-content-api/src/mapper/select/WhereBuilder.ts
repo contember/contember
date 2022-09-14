@@ -11,7 +11,7 @@ import {
 	QueryBuilder,
 	SelectBuilder, wrapIdentifier,
 } from '@contember/database'
-import { WhereOptimizer } from './optimizer/WhereOptimizer'
+import { WhereOptimizationHints, WhereOptimizer } from './optimizer/WhereOptimizer'
 
 export class WhereBuilder {
 	constructor(
@@ -27,9 +27,9 @@ export class WhereBuilder {
 		entity: Model.Entity,
 		path: Path,
 		where: Input.OptionalWhere,
-		relationPath: Model.AnyRelationContext[] = [],
+		optimizationHints: WhereOptimizationHints = {},
 	) {
-		const optimizedWhere = this.whereOptimizer.optimize(where, entity, relationPath)
+		const optimizedWhere = this.whereOptimizer.optimize(where, entity, optimizationHints)
 		return this.buildInternal(entity, path, optimizedWhere, cb => qb.where(clause => cb(clause)), false)
 	}
 
@@ -39,9 +39,9 @@ export class WhereBuilder {
 		path: Path,
 		where: Input.OptionalWhere,
 		callback: (clauseCb: (clause: SqlConditionBuilder) => SqlConditionBuilder) => SelectBuilder<SelectBuilder.Result>,
-		relationPath: Model.AnyRelationContext[] = [],
+		optimizationHints: WhereOptimizationHints = {},
 	) {
-		const optimizedWhere = this.whereOptimizer.optimize(where, entity, relationPath)
+		const optimizedWhere = this.whereOptimizer.optimize(where, entity, optimizationHints)
 		return this.buildInternal(entity, path, optimizedWhere, callback, false)
 	}
 

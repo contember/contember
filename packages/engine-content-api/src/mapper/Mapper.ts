@@ -50,7 +50,7 @@ export class Mapper {
 			.from(entity.tableName, 'root_')
 			.select(['root_', columnName])
 		const expandedWhere = this.uniqueWhereExpander.expand(entity, where)
-		const builtQb = this.whereBuilder.build(qb, entity, this.pathFactory.create([]), expandedWhere, [])
+		const builtQb = this.whereBuilder.build(qb, entity, this.pathFactory.create([]), expandedWhere)
 		const result = await builtQb.getResult(this.db)
 
 		return result[0] !== undefined ? result[0][columnName] : undefined
@@ -136,7 +136,7 @@ export class Mapper {
 			.from(entity.tableName, path.alias)
 			.select(expr => expr.raw('count(*)'), 'row_count')
 		const withPredicates = this.predicatesInjector.inject(entity, filter)
-		const qbWithWhere = this.whereBuilder.build(qb, entity, path, withPredicates, [])
+		const qbWithWhere = this.whereBuilder.build(qb, entity, path, withPredicates)
 		const result = await qbWithWhere.getResult(this.db)
 		return result[0].row_count
 	}
@@ -154,7 +154,7 @@ export class Mapper {
 			.select([path.alias, relation.joiningColumn.columnName])
 			.groupBy([path.alias, relation.joiningColumn.columnName])
 		const withPredicates = this.predicatesInjector.inject(entity, filter)
-		const qbWithWhere = this.whereBuilder.build(qb, entity, path, withPredicates, relationPath)
+		const qbWithWhere = this.whereBuilder.build(qb, entity, path, withPredicates, { relationPath })
 		const rows = await qbWithWhere.getResult(this.db)
 		const result = new Map<string, number>()
 		for (const row of rows) {

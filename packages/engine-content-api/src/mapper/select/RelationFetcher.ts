@@ -278,7 +278,7 @@ export class RelationFetcher {
 		}
 
 		if (where && hasWhere) {
-			qb = this.whereBuilder.build(qb, targetEntity, this.pathFactory.create([]), where, relationPath)
+			qb = this.whereBuilder.build(qb, targetEntity, this.pathFactory.create([]), where, { relationPath })
 		}
 		return qb
 	}

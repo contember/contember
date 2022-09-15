@@ -32,25 +32,14 @@ export class MetaHandler implements SelectExecutionHandler<{}> {
 		metaPath: Path,
 		operation: Acl.Operation.read | Acl.Operation.update,
 	): void {
-		const { entity, path } = context
+		const { entity } = context
 		if (entity.primary === fieldName) {
 			return
 		}
-		const fieldPredicate = this.predicateFactory.create(entity, operation, [fieldName])
-		context.addColumn(qb => {
-			return this.whereBuilder.buildAdvanced(entity, path.back(), fieldPredicate, cb =>
-				qb.select(
-					expr =>
-						expr.selectCondition(condition => {
-							condition = cb(condition)
-							if (condition.isEmpty()) {
-								return condition.raw('true')
-							}
-							return condition
-						}),
-					metaPath.alias,
-				),
-			)
-		}, metaPath)
+		const fieldPredicate = this.predicateFactory.getFieldPredicate(entity, operation, fieldName)
+		context.addColumn({
+			path: metaPath,
+			valueGetter: context.addPredicate(fieldPredicate.predicate),
+		})
 	}
 }

@@ -5,6 +5,8 @@ import { describe, it, assert } from 'vitest'
 import { PermissionsFactory } from '@contember/engine-system-api/dist/src/model'
 import { WhereOptimizer } from '../../../src/mapper/select/optimizer/WhereOptimizer'
 import { ConditionOptimizer } from '../../../src/mapper/select/optimizer/ConditionOptimizer'
+import { acceptFieldVisitor } from '@contember/schema-utils'
+import { testUuid } from '@contember/engine-api-tester'
 
 
 
@@ -157,14 +159,14 @@ namespace DeepFilterModel {
 
 
 describe('predicates injector elimination', () => {
-	it('eliminates predicates in where', () => {
-		const schema = createSchema(DeepFilterModel)
-		const permissions = new PermissionFactory(schema.model).create(schema.acl, ['reader'])
+	const schema = createSchema(DeepFilterModel)
+	const permissions = new PermissionFactory(schema.model).create(schema.acl, ['reader'])
 
-		const injector = new PredicatesInjector(
-			schema.model,
-			new PredicateFactory(permissions, schema.model, new VariableInjector(schema.model, {})),
-		)
+	const injector = new PredicatesInjector(
+		schema.model,
+		new PredicateFactory(permissions, schema.model, new VariableInjector(schema.model, {})),
+	)
+	it('eliminates predicates in where', () => {
 		const injected = injector.inject(schema.model.entities.Article, {
 			coverPhoto: { image: { tags: { label: { eq: 'foo' } } } },
 		})
@@ -172,5 +174,33 @@ describe('predicates injector elimination', () => {
 		const result = optimizer.optimize(injected, schema.model.entities.Article)
 
 		assert.deepStrictEqual(result, { and: [{ coverPhoto: { image: { tags: { label: { eq: 'foo' } } } } }, { isPublished: { eq: true } }] })
+	})
+
+	it('eliminate back referencing predicate', () => {
+		const relation = acceptFieldVisitor(schema.model, schema.model.entities.Article, 'coverPhoto', {
+			visitColumn: () => {
+				throw new Error()
+			},
+			visitRelation: ctx => ctx,
+		})
+		const injected = injector.inject(schema.model.entities.ImageUse, {
+			articles: { id: { in: [testUuid(1)] } },
+		}, relation)
+
+		assert.deepStrictEqual(injected, {
+			and: [
+				{
+					articles: {
+						and: [
+							{ id: { in: [testUuid(1)] } },
+							{ id: { always: true } },
+						],
+					},
+				},
+				{
+					articles: { id: { always: true } },
+				},
+			],
+		})
 	})
 })

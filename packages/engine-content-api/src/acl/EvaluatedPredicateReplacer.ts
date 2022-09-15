@@ -3,17 +3,17 @@ import { replaceWhere } from '../mapper/select/optimizer/WhereReplacer'
 
 export class EvaluatedPredicateReplacer {
 	constructor(
-		private readonly evaluatedPredicate: Input.Where,
+		private readonly evaluatedPredicate: Input.OptionalWhere,
 		private readonly sourceEntity: Model.Entity,
 		private readonly relation: Model.AnyRelation,
 	) {
 	}
 
-	public replace(where: Input.Where): Input.Where {
-		const result: Writable<Input.Where> = {}
+	public replace(where: Input.OptionalWhere): Input.OptionalWhere {
+		const result: Writable<Input.OptionalWhere> = {}
 		for (const [key, value] of Object.entries(where)) {
 			if (key === 'not') {
-				result['not'] = this.replace(value as Input.Where)
+				result['not'] = this.replace(value as Input.OptionalWhere)
 
 			} else if (key === 'and' || key === 'or') {
 				result[key] = (value as Input.Where[]).map(it => this.replace(it))

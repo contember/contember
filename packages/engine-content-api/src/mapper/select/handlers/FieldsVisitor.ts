@@ -18,35 +18,12 @@ export class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.C
 
 	visitColumn({ entity, column }: Model.ColumnContext): void {
 		const columnPath = this.executionContext.path
-		this.executionContext.addColumn(qb => {
-			const tableAlias = columnPath.back().alias
-			const columnAlias = columnPath.alias
+		const tableAlias = columnPath.back().alias
+		const columnAlias = columnPath.alias
 
-			const fieldPredicate = this.predicateFactory.shouldApplyCellLevelPredicate(
-				entity,
-				Acl.Operation.read,
-				column.name,
-			)
-				? this.predicateFactory.create(entity, Acl.Operation.read, [column.name])
-				: undefined
-
-			if (!fieldPredicate || Object.keys(fieldPredicate).length === 0) {
-				return qb.select([tableAlias, column.columnName], columnAlias)
-			}
-			return this.whereBuilder.buildAdvanced(entity, columnPath.back(), fieldPredicate, cb =>
-				qb.select(
-					expr =>
-						expr.case(caseExpr =>
-							caseExpr
-								.when(
-									whenExpr => whenExpr.selectCondition(cb),
-									thenExpr => thenExpr.select([tableAlias, column.columnName]),
-								)
-								.else(elseExpr => elseExpr.raw('null')),
-						),
-					columnAlias,
-				),
-			)
+		this.executionContext.addColumn({
+			query: qb => qb.select([tableAlias, column.columnName], columnAlias),
+			predicate: this.getRequiredPredicate(entity, column),
 		})
 	}
 
@@ -55,20 +32,19 @@ export class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.C
 		if (!field) {
 			throw new Error()
 		}
-		this.executionContext.addData(
-			relationContext.entity.primary,
-			async ids =>
-				this.relationFetcher.fetchManyHasManyGroups(
-					{
-						mapper: this.mapper,
-						field: field,
-						relationContext,
-						relationPath: this.relationPath,
-						ids: ids,
-					},
-				),
-			[],
-		)
+		this.executionContext.addData({
+			field: relationContext.entity.primary,
+			dataProvider: async ids =>
+				this.relationFetcher.fetchManyHasManyGroups({
+					mapper: this.mapper,
+					field: field,
+					relationContext,
+					relationPath: this.relationPath,
+					ids: ids,
+				}),
+			defaultValue: [],
+			predicate: this.getRequiredPredicate(relationContext.entity, relationContext.relation),
+		})
 	}
 
 	public visitManyHasManyOwning(relationContext: Model.ManyHasManyOwningContext): void {
@@ -77,9 +53,9 @@ export class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.C
 			throw new Error()
 		}
 
-		this.executionContext.addData(
-			relationContext.entity.primary,
-			async ids =>
+		this.executionContext.addData({
+			field: relationContext.entity.primary,
+			dataProvider: async ids =>
 				this.relationFetcher.fetchManyHasManyGroups({
 					mapper: this.mapper,
 					field: field,
@@ -87,8 +63,9 @@ export class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.C
 					relationPath: this.relationPath,
 					ids: ids,
 				}),
-			[],
-		)
+			defaultValue: [],
+			predicate: this.getRequiredPredicate(relationContext.entity, relationContext.relation),
+		})
 	}
 
 	public visitOneHasMany(relationContext: Model.OneHasManyContext): void {
@@ -97,9 +74,9 @@ export class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.C
 			throw new Error()
 		}
 
-		this.executionContext.addData(
-			relationContext.entity.primary,
-			async ids =>
+		this.executionContext.addData({
+			field: relationContext.entity.primary,
+			dataProvider: async ids =>
 				this.relationFetcher.fetchOneHasManyGroups({
 					mapper: this.mapper,
 					objectNode: field,
@@ -107,15 +84,16 @@ export class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.C
 					relationPath: this.relationPath,
 					ids: ids,
 				}),
-			[],
-		)
+			defaultValue: [],
+			predicate: this.getRequiredPredicate(relationContext.entity, relationContext.relation),
+		})
 	}
 
 	public visitOneHasOneInverse(relationContext: Model.OneHasOneInverseContext): void {
 		const { entity, targetRelation, targetEntity } = relationContext
-		this.executionContext.addData(
-			entity.primary,
-			async ids => {
+		this.executionContext.addData({
+			field: entity.primary,
+			dataProvider: async ids => {
 				const idsWhere: Input.Where = {
 					[targetRelation.name]: {
 						[entity.primary]: {
@@ -137,15 +115,16 @@ export class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.C
 					relationContext,
 				], targetRelation.name)
 			},
-			null,
-		)
+			defaultValue: null,
+			predicate: this.getRequiredPredicate(relationContext.entity, relationContext.relation),
+		})
 	}
 
 	public visitOneHasOneOwning(relationContext: Model.OneHasOneOwningContext): void {
 		const { relation, targetEntity } = relationContext
-		this.executionContext.addData(
-			relation.name,
-			async ids => {
+		this.executionContext.addData({
+			field: relation.name,
+			dataProvider: async ids => {
 				const idsWhere: Input.Where = {
 					[targetEntity.primary]: {
 						in: ids,
@@ -165,15 +144,16 @@ export class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.C
 					relationContext,
 				], targetEntity.primary)
 			},
-			null,
-		)
+			defaultValue: null,
+			predicate: this.getRequiredPredicate(relationContext.entity, relationContext.relation),
+		})
 	}
 
 	public visitManyHasOne(relationContext: Model.ManyHasOneContext): void {
 		const { relation, targetEntity } = relationContext
-		this.executionContext.addData(
-			relation.name,
-			async ids => {
+		this.executionContext.addData({
+			field: relation.name,
+			dataProvider: async ids => {
 				const idsWhere: Input.Where = {
 					[targetEntity.primary]: {
 						in: ids,
@@ -193,7 +173,13 @@ export class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.C
 					relationContext,
 				], targetEntity.primary)
 			},
-			null,
-		)
+			defaultValue: null,
+			predicate: this.getRequiredPredicate(relationContext.entity, relationContext.relation),
+		})
+	}
+
+	private getRequiredPredicate(entity: Model.Entity, field: Model.AnyField): Acl.Predicate | undefined {
+		const fieldPredicate = this.predicateFactory.getFieldPredicate(entity, Acl.Operation.read, field.name)
+		return fieldPredicate.isSameAsPrimary ? undefined : fieldPredicate.predicate
 	}
 }

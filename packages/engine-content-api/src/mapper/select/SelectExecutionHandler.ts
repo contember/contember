@@ -1,6 +1,6 @@
 import { Path } from './Path'
-import { Input, Model } from '@contember/schema'
-import { SelectNestedData, SelectNestedDefaultValue } from './SelectHydrator'
+import { Acl, Input, Model } from '@contember/schema'
+import { ColumnValueGetter, SelectNestedData, SelectNestedDefaultValue, SelectRow } from './SelectHydrator'
 import { SelectBuilder } from '@contember/database'
 import { Mapper } from '../Mapper'
 import { FieldNode, ObjectNode } from '../../inputProcessing'
@@ -22,12 +22,19 @@ export type SelectExecutionHandlerContext<
 	path: Path
 	entity: Model.Entity
 	relationPath: Model.AnyRelationContext[]
-
-	addColumn: (
-		queryCallback: (qb: SelectBuilder<SelectBuilder.Result>) => SelectBuilder<SelectBuilder.Result>,
-		path?: Path,
-	) => void
-	addData: (parentField: string, cb: DataCallback, defaultValue?: SelectNestedDefaultValue) => void
+	addPredicate: (predicate: Acl.Predicate) => (row: SelectRow) => boolean
+	addColumn: (args: {
+		predicate?: Acl.Predicate
+		query?: (qb: SelectBuilder<SelectBuilder.Result>) => SelectBuilder<SelectBuilder.Result>
+		path?: Path
+		valueGetter?: ColumnValueGetter
+	}) => void
+	addData: (args: {
+		field: string
+		dataProvider: DataCallback
+		predicate?: Acl.Predicate
+		defaultValue?: SelectNestedDefaultValue
+	}) => void
 } & (
 	| {
 		fieldNode: FieldNode<FieldExtensions>

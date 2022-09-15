@@ -4,12 +4,35 @@ import { EvaluatedPredicateReplacer } from './EvaluatedPredicateReplacer'
 
 const getRowLevelPredicatePseudoField = (entity: Model.Entity) => entity.primary
 
+export interface FieldRequiredPredicate {
+	predicate: Acl.Predicate
+	isSameAsPrimary: boolean
+}
+
 export class PredicateFactory {
 	constructor(
 		private readonly permissions: Acl.Permissions,
 		private readonly model: Model.Schema,
 		private readonly variableInjector: VariableInjector,
 	) {}
+
+	public getFieldPredicate(
+		entity: Model.Entity,
+		operation: Acl.Operation.update | Acl.Operation.read | Acl.Operation.create,
+		fieldName: string,
+	): FieldRequiredPredicate {
+		const permissions = this.permissions[entity.name]?.operations?.[operation]
+		const predicate = permissions?.[fieldName] ?? false
+		const rowLevelField = getRowLevelPredicatePseudoField(entity)
+
+		const primaryPredicate = permissions?.[rowLevelField] ?? false
+		const isSameAsPrimary = predicate === primaryPredicate
+
+		return {
+			isSameAsPrimary,
+			predicate,
+		}
+	}
 
 	public shouldApplyCellLevelPredicate(
 		entity: Model.Entity,
@@ -21,22 +44,28 @@ export class PredicateFactory {
 		return permissions?.[fieldName] !== permissions?.[rowLevelField]
 	}
 
-	public create(
-		entity: Model.Entity,
-		operation: Acl.Operation.delete,
-	): Input.Where
+	public createDeletePredicate(entity: Model.Entity) {
+		const neverCondition: Input.Where = { [entity.primary]: { never: true } }
+		const entityPermissions = this.permissions[entity.name]
+		if (!entityPermissions) {
+			return neverCondition
+		}
+		const deletePredicate = entityPermissions.operations.delete
+		if (deletePredicate === undefined || deletePredicate === false) {
+			return neverCondition
+		}
+		if (deletePredicate === true) {
+			return {}
+		}
+		return this.buildPredicates(entity, [deletePredicate])
+	}
+
 	public create(
 		entity: Model.Entity,
 		operation: Acl.Operation.update | Acl.Operation.read | Acl.Operation.create,
-		fieldNames?: string[],
+		fieldNames: string[] = [getRowLevelPredicatePseudoField(entity)],
 		relationContext?: Model.AnyRelationContext,
-	): Input.Where
-	public create(
-		entity: Model.Entity,
-		operation: Acl.Operation,
-		fieldNames?: string[],
-		relationContext?: Model.AnyRelationContext,
-	): Input.Where {
+	): Input.OptionalWhere {
 		const entityPermissions: Acl.EntityPermissions = this.permissions[entity.name]
 		const neverCondition: Input.Where = { [entity.primary]: { never: true } }
 
@@ -44,30 +73,23 @@ export class PredicateFactory {
 			return neverCondition
 		}
 
-		let predicates: Acl.PredicateReference[]
-		if (operation === Acl.Operation.delete) {
-			const deletePredicate = entityPermissions.operations.delete
-			if (deletePredicate === undefined || deletePredicate === false) {
-				return neverCondition
-			}
-			if (deletePredicate === true) {
-				return {}
-			}
-			predicates = [deletePredicate]
-		} else {
-			if (fieldNames === undefined) {
-				fieldNames = [getRowLevelPredicatePseudoField(entity)]
-			}
-			const fieldPermissions = entityPermissions.operations[operation]
-			if (fieldPermissions === undefined) {
-				return neverCondition
-			}
-			const operationPredicates = this.getRequiredPredicates(fieldNames, fieldPermissions)
-			if (operationPredicates === false) {
-				return neverCondition
-			}
-			predicates = operationPredicates
+		if (fieldNames === undefined) {
+			fieldNames = [getRowLevelPredicatePseudoField(entity)]
 		}
+		const fieldPermissions = entityPermissions.operations[operation]
+		if (fieldPermissions === undefined) {
+			return neverCondition
+		}
+		const operationPredicates = this.getRequiredPredicates(fieldNames, fieldPermissions)
+		if (operationPredicates === false) {
+			return neverCondition
+		}
+
+		return this.buildPredicates(entity, operationPredicates, relationContext)
+	}
+
+	public buildPredicates(entity: Model.Entity, predicates: Acl.PredicateReference[], relationContext?: Model.AnyRelationContext): Input.OptionalWhere {
+		const entityPermissions: Acl.EntityPermissions = this.permissions[entity.name] ?? {}
 
 		const predicatesWhere: Input.Where[] = predicates.reduce(
 			(result: Input.Where[], name: Acl.PredicateReference): Input.Where[] => {
@@ -84,6 +106,7 @@ export class PredicateFactory {
 		}
 		const where: Input.Where = predicatesWhere.length === 1 ? predicatesWhere[0] : { and: predicatesWhere }
 		return this.optimizePredicates(where, relationContext)
+
 	}
 
 	private getRequiredPredicates(
@@ -106,7 +129,7 @@ export class PredicateFactory {
 		return predicates
 	}
 
-	private optimizePredicates(where: Input.Where, relationContext?: Model.AnyRelationContext) {
+	public optimizePredicates(where: Input.OptionalWhere, relationContext?: Model.AnyRelationContext) {
 		if (!relationContext || !relationContext.targetRelation) {
 			return where
 		}

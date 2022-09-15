@@ -5,18 +5,18 @@ export interface ReplaceWhereResult {
 	count: number
 }
 
-export const replaceWhere = (subject: Input.Where, find: Input.Where, replace: Input.Where, resultTracker: ReplaceWhereResult = { count: 0 }): Input.Where => {
+export const replaceWhere = (subject: Input.OptionalWhere, find: Input.OptionalWhere, replace: Input.OptionalWhere, resultTracker: ReplaceWhereResult = { count: 0 }): Input.OptionalWhere => {
 	if (deepEqual(subject, find)) {
 		resultTracker.count++
 		return replace
 	}
-	const result: Writable<Input.Where> = {}
+	const result: Writable<Input.OptionalWhere> = {}
 	for (const [key, value] of Object.entries(subject)) {
 		if (key === 'not') {
-			result['not'] = replaceWhere(value as Input.Where, find, replace, resultTracker)
+			result['not'] = replaceWhere(value as Input.OptionalWhere, find, replace, resultTracker)
 
 		} else if (key === 'and' || key === 'or') {
-			result[key] = (value as Input.Where[]).map(it => replaceWhere(it, find, replace, resultTracker))
+			result[key] = (value as Input.OptionalWhere[]).map(it => replaceWhere(it, find, replace, resultTracker))
 
 		} else {
 			result[key] = value

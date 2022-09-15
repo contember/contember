@@ -16,7 +16,8 @@ export class PredicatesInjector {
 		where: Input.OptionalWhere,
 		relationContext?: Model.AnyRelationContext,
 	): Input.OptionalWhere {
-		const predicatesWhere: Input.Where = this.predicateFactory.create(entity, Acl.Operation.read, fieldNames, relationContext)
+		const predicatesWhere = this.predicateFactory.create(entity, Acl.Operation.read, fieldNames, relationContext)
+		where = this.predicateFactory.optimizePredicates(where, relationContext)
 
 		const and = [where, predicatesWhere].filter(it => Object.keys(it).length > 0)
 		if (and.length === 0) {

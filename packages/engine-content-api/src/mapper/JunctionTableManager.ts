@@ -87,7 +87,7 @@ export class JunctionTableManager {
 		}
 
 		const owningPredicate = this.predicateFactory.create(owningEntity, Acl.Operation.update, [relation.name])
-		let inversePredicate: Input.Where = {}
+		let inversePredicate: Input.OptionalWhere = {}
 		if (relation.inversedBy) {
 			inversePredicate = this.predicateFactory.create(inverseEntity, Acl.Operation.update, [relation.inversedBy])
 		}
@@ -99,11 +99,11 @@ export class JunctionTableManager {
 		if (hasNoPredicates) {
 			return await handler.executeSimple({ db, joiningTable, owningPrimary, inversePrimary, okResultFactory })
 		} else {
-			const owningWhere: Input.Where = {
+			const owningWhere: Input.OptionalWhere = {
 				and: [owningPredicate, { [owningEntity.primary]: { eq: owningPrimary } }],
 			}
 
-			const inverseWhere: Input.Where = {
+			const inverseWhere: Input.OptionalWhere = {
 				and: [inversePredicate, { [inverseEntity.primary]: { eq: inversePrimary } }],
 			}
 

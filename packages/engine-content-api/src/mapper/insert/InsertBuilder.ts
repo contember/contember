@@ -20,7 +20,7 @@ export class InsertBuilder {
 	public readonly insert: Promise<Value.PrimaryValue | null> = new Promise(resolve => (this.resolver = resolve))
 
 	private rowData: ColumnValue<AbortInsert | undefined>[] = []
-	private where: Input.Where = {}
+	private where: Input.OptionalWhere = {}
 
 	constructor(
 		private readonly schema: Model.Schema,
@@ -35,7 +35,7 @@ export class InsertBuilder {
 		this.rowData.push({ columnName, value: resolveGenericValue(value), columnType, fieldName })
 	}
 
-	public addWhere(where: Input.Where): void {
+	public addWhere(where: Input.OptionalWhere): void {
 		this.where = { and: [where, this.where] }
 	}
 

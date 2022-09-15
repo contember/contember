@@ -65,7 +65,7 @@ export class PredicateFactory {
 		operation: Acl.Operation.update | Acl.Operation.read | Acl.Operation.create,
 		fieldNames: string[] = [getRowLevelPredicatePseudoField(entity)],
 		relationContext?: Model.AnyRelationContext,
-	): Input.Where {
+	): Input.OptionalWhere {
 		const entityPermissions: Acl.EntityPermissions = this.permissions[entity.name]
 		const neverCondition: Input.Where = { [entity.primary]: { never: true } }
 
@@ -88,7 +88,7 @@ export class PredicateFactory {
 		return this.buildPredicates(entity, operationPredicates, relationContext)
 	}
 
-	public buildPredicates(entity: Model.Entity, predicates: Acl.PredicateReference[], relationContext?: Model.AnyRelationContext): Input.Where {
+	public buildPredicates(entity: Model.Entity, predicates: Acl.PredicateReference[], relationContext?: Model.AnyRelationContext): Input.OptionalWhere {
 		const entityPermissions: Acl.EntityPermissions = this.permissions[entity.name] ?? {}
 
 		const predicatesWhere: Input.Where[] = predicates.reduce(
@@ -129,7 +129,7 @@ export class PredicateFactory {
 		return predicates
 	}
 
-	private optimizePredicates(where: Input.Where, relationContext?: Model.AnyRelationContext) {
+	public optimizePredicates(where: Input.OptionalWhere, relationContext?: Model.AnyRelationContext) {
 		if (!relationContext || !relationContext.targetRelation) {
 			return where
 		}

@@ -13,7 +13,7 @@ type ExtendedRelationContext =
 
 export interface WhereOptimizationHints {
 	relationPath?: Model.AnyRelationContext[]
-	evaluatedPredicates?: Input.Where[]
+	evaluatedPredicates?: Input.OptionalWhere[]
 }
 
 export class WhereOptimizer {
@@ -25,7 +25,7 @@ export class WhereOptimizer {
 	) {
 	}
 
-	public optimize(where: Input.OptionalWhere, entity: Model.Entity, { relationPath = [], evaluatedPredicates = [] }: WhereOptimizationHints = {}): Input.Where {
+	public optimize(where: Input.OptionalWhere, entity: Model.Entity, { relationPath = [], evaluatedPredicates = [] }: WhereOptimizationHints = {}): Input.OptionalWhere {
 		let processedRelationPath: ExtendedRelationContext[] = []
 		for (const i in relationPath) {
 			const el = relationPath[i]
@@ -53,20 +53,20 @@ export class WhereOptimizer {
 		return result
 	}
 
-	private optimizeWhere(where: Input.OptionalWhere, entity: Model.Entity, relationPath: ExtendedRelationContext[]): Input.Where | boolean {
+	private optimizeWhere(where: Input.OptionalWhere, entity: Model.Entity, relationPath: ExtendedRelationContext[]): Input.OptionalWhere | boolean {
 		return this.optimizeAnd(
 			Object.entries(where).map(([key, value]) => {
 				if (value === undefined || value === null) {
 					return undefined
 
 				} else if (key === 'and') {
-					return this.optimizeAnd((value as readonly Input.Where[]).map(it => this.optimizeWhere(it, entity, relationPath)), entity, relationPath)
+					return this.optimizeAnd((value as readonly Input.OptionalWhere[]).map(it => this.optimizeWhere(it, entity, relationPath)), entity, relationPath)
 
 				} else if (key === 'or') {
-					return this.optimizeOr((value as readonly Input.Where[]).map(it => this.optimizeWhere(it, entity, relationPath)), entity, relationPath)
+					return this.optimizeOr((value as readonly Input.OptionalWhere[]).map(it => this.optimizeWhere(it, entity, relationPath)), entity, relationPath)
 
 				} else if (key === 'not') {
-					return optimizeNot(this.optimizeWhere(value as Input.Where, entity, relationPath))
+					return optimizeNot(this.optimizeWhere(value as Input.OptionalWhere, entity, relationPath))
 
 				} else {
 					return this.resolveFieldValue(entity, key, value, relationPath)
@@ -77,7 +77,7 @@ export class WhereOptimizer {
 		)
 	}
 
-	private optimizeOr(operands: readonly (Input.Where | undefined | boolean)[], entity: Model.Entity, relationPath: ExtendedRelationContext[]): Input.Where | boolean {
+	private optimizeOr(operands: readonly (Input.OptionalWhere | undefined | boolean)[], entity: Model.Entity, relationPath: ExtendedRelationContext[]): Input.OptionalWhere | boolean {
 		const optimized = optimizeOr(operands)
 		if (typeof optimized === 'boolean' || !Array.isArray(optimized.or)) {
 			return optimized
@@ -86,7 +86,7 @@ export class WhereOptimizer {
 		return optimizeOr(result)
 	}
 
-	private optimizeAnd(operands: readonly (Input.Where | undefined | boolean)[], entity: Model.Entity, relationPath: ExtendedRelationContext[]): Input.Where | boolean {
+	private optimizeAnd(operands: readonly (Input.OptionalWhere | undefined | boolean)[], entity: Model.Entity, relationPath: ExtendedRelationContext[]): Input.OptionalWhere | boolean {
 		const optimized = optimizeAnd(operands)
 		if (typeof optimized === 'boolean' || !Array.isArray(optimized.and)) {
 			return optimized
@@ -95,8 +95,8 @@ export class WhereOptimizer {
 		return optimizeAnd(result)
 	}
 
-	private crossOptimize(operands: Input.Where[], entity: Model.Entity, replacement: Input.Condition, relationPath: ExtendedRelationContext[]): (Input.Where | boolean)[] {
-		const result: (Input.Where | boolean)[] = [...operands]
+	private crossOptimize(operands: Input.OptionalWhere[], entity: Model.Entity, replacement: Input.Condition, relationPath: ExtendedRelationContext[]): (Input.OptionalWhere | boolean)[] {
+		const result: (Input.OptionalWhere | boolean)[] = [...operands]
 		const count = result.length
 		for (let i = 0; i < count; i++) {
 			for (let j = 0; j < count; j++) {
@@ -113,7 +113,7 @@ export class WhereOptimizer {
 	}
 
 	private resolveFieldValue(entity: Model.Entity, key: string, value: Input.OptionalWhere[string], relationPath: ExtendedRelationContext[]) {
-		return acceptFieldVisitor<Input.Where | boolean>(this.model, entity, key, {
+		return acceptFieldVisitor<Input.OptionalWhere | boolean>(this.model, entity, key, {
 			visitColumn: () => {
 				const optimizedCondition = this.conditionOptimizer.optimize(value as Input.Condition)
 
@@ -125,7 +125,7 @@ export class WhereOptimizer {
 			},
 			visitRelation: context => {
 				const { targetEntity, relation } = context
-				let where = value as Input.Where
+				let where = value as Input.OptionalWhere
 				const newRelationPath: ExtendedRelationContext[] = [...relationPath]
 				if (relationPath.length && relationPath[relationPath.length - 1].targetRelation?.name === relation.name) {
 					const item = newRelationPath.pop()

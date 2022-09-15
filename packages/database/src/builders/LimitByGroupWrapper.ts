@@ -26,7 +26,8 @@ class LimitByGroupWrapper {
 
 			qb = qb.select(window.compile(), 'rowNumber_')
 
-			let wrapperQb: SelectBuilder<R> = SelectBuilder.create<R>() //
+			let wrapperQb: SelectBuilder<R> = SelectBuilder.create<R>()
+				.meta(qb.options.meta)
 				.with('data', qb)
 				.from('data')
 				.select(['data', '*'])

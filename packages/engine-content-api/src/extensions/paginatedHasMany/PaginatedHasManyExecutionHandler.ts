@@ -20,9 +20,9 @@ export class PaginatedHasManyExecutionHandler implements SelectExecutionHandler<
 			throw new Error()
 		}
 		const pagination = createPaginationHelper(objectNode)
-		addData(
-			context.entity.primary,
-			async ids => {
+		addData({
+			field: context.entity.primary,
+			dataProvider: async ids => {
 				const counts = pagination.requiresTotalCount
 					? await acceptFieldVisitor(
 						this.schema,
@@ -46,7 +46,7 @@ export class PaginatedHasManyExecutionHandler implements SelectExecutionHandler<
 				}
 				return Object.fromEntries(result)
 			},
-			pagination.createResponse(0, []),
-		)
+			defaultValue: pagination.createResponse(0, []),
+		})
 	}
 }

@@ -15,9 +15,9 @@ export class HasManyToHasOneReducerExecutionHandler implements SelectExecutionHa
 		if (!objectNode) {
 			throw new Error()
 		}
-		addData(
-			entity.primary,
-			async (ids: Input.PrimaryValue[]) => {
+		addData({
+			field: entity.primary,
+			dataProvider: async (ids: Input.PrimaryValue[]) => {
 
 				const relationContext = acceptFieldVisitor(this.schema, entity, objectNode.extensions.relationName, {
 					visitRelation: context => context,
@@ -48,7 +48,7 @@ export class HasManyToHasOneReducerExecutionHandler implements SelectExecutionHa
 					relationContext,
 				], targetRelation.name)
 			},
-			null,
-		)
+			defaultValue: null,
+		})
 	}
 }

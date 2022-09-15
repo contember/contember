@@ -92,14 +92,17 @@ export class SelectBuilder {
 				return () => predicate
 			}
 			const predicatePath = path.for('__predicate').for(predicate)
+
 			if (!fetchedPredicates.has(predicate)) {
 				const relationContext = this.relationPath[this.relationPath.length - 1]
-				const evaluatedPredicate = this.predicateFactory.create(entity, Acl.Operation.read, undefined, relationContext)
-				const predicateValue = this.predicateFactory.buildPredicates(entity, [predicate], relationContext)
+
+				const primaryPredicate = this.predicateFactory.create(entity, Acl.Operation.read, undefined, relationContext)
+				const fieldPredicate = this.predicateFactory.buildPredicates(entity, [predicate], relationContext)
+
 				this.qb = this.whereBuilder.buildAdvanced(
 					entity,
 					path.back(),
-					predicateValue,
+					fieldPredicate,
 					apply => this.qb.select(expr =>
 						expr.selectCondition(condition => {
 							condition = apply(condition)
@@ -110,7 +113,7 @@ export class SelectBuilder {
 						}),
 					predicatePath.alias,
 					),
-					{ relationPath: this.relationPath, evaluatedPredicates: [evaluatedPredicate] },
+					{ relationPath: this.relationPath, evaluatedPredicates: [primaryPredicate] },
 				)
 				fetchedPredicates.add(predicate)
 			}
@@ -133,15 +136,24 @@ export class SelectBuilder {
 			const executionContext: SelectExecutionHandlerContext = {
 				mapper,
 				relationPath: this.relationPath,
-				addData: async (fieldName, cb, defaultValue = null) => {
-					const columnName = getColumnName(this.schema, entity, fieldName)
-					const ids = (await this.getColumnValues(path.for(fieldName), columnName)).filter(it => it !== null)
+				addData: async ({ field, dataProvider, defaultValue, predicate }) => {
+					if (predicate === false) {
+						this.hydrator.addPromise(fieldPath, path.for(field), Promise.resolve({}), defaultValue ?? null)
+						return
+					}
+					const predicateGetter = predicate !== undefined && predicate !== true ? addPredicate(predicate) : null
+					const columnName = getColumnName(this.schema, entity, field)
+					let ids = await this.getColumnValues(path.for(field), columnName, predicateGetter)
 
-					const data = (async () => (ids.length > 0 ? cb(ids) : {}))()
-					this.hydrator.addPromise(fieldPath, path.for(fieldName), data, defaultValue)
+					const data = ids.length > 0 ? dataProvider(ids) : Promise.resolve({})
+					this.hydrator.addPromise(fieldPath, path.for(field), data, defaultValue ?? null)
 				},
 				addColumn: ({ path = fieldPath, predicate, query, valueGetter }) => {
-					const predicateGetter = predicate !== undefined ? addPredicate(predicate) : null
+					if (predicate === false) {
+						this.hydrator.addColumn(path, () => null)
+						return
+					}
+					const predicateGetter = predicate !== undefined && predicate !== true ? addPredicate(predicate) : null
 					if (query) {
 						this.qb = query(this.qb)
 					}
@@ -180,10 +192,12 @@ export class SelectBuilder {
 		}
 	}
 
-	private async getColumnValues(columnPath: Path, columnName: string): Promise<Input.PrimaryValue[]> {
+	private async getColumnValues(columnPath: Path, columnName: string, predicateGetter: null | ColumnValueGetter<boolean>): Promise<Input.PrimaryValue[]> {
 		this.qb = this.qb.select([columnPath.back().alias, columnName], columnPath.alias)
 		const rows = await this.rows
+		const filteredRows = predicateGetter === null ? rows : rows.filter(predicateGetter)
 		const columnAlias = columnPath.alias
-		return Array.from(new Set(rows.map((it): Input.PrimaryValue => it[columnAlias] as Input.PrimaryValue)))
+		const ids = filteredRows.map((it): Input.PrimaryValue => it[columnAlias] as Input.PrimaryValue).filter(it => it !== null)
+		return Array.from(new Set(ids))
 	}
 }

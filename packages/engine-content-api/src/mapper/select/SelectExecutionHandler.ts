@@ -29,7 +29,12 @@ export type SelectExecutionHandlerContext<
 		path?: Path
 		valueGetter?: ColumnValueGetter
 	}) => void
-	addData: (parentField: string, cb: DataCallback, defaultValue?: SelectNestedDefaultValue) => void
+	addData: (args: {
+		field: string
+		dataProvider: DataCallback
+		predicate?: Acl.Predicate
+		defaultValue?: SelectNestedDefaultValue
+	}) => void
 } & (
 	| {
 		fieldNode: FieldNode<FieldExtensions>

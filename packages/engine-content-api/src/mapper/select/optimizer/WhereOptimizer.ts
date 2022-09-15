@@ -34,7 +34,6 @@ export class WhereOptimizer {
 			} else {
 				processedRelationPath.push({ ...el, canEliminate: true, isLast: Number(i) === relationPath.length })
 			}
-			processedRelationPath.push({ ...el, canEliminate: true, isLast: Number(i) === relationPath.length })
 		}
 		let result = this.optimizeWhere(where, entity, processedRelationPath)
 

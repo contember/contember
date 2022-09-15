@@ -5,8 +5,8 @@ import { optimizeAnd, optimizeNot, optimizeOr } from './helpers'
 import { replaceWhere } from './WhereReplacer'
 
 type ExtendedRelationContext =
-	& Model.AnyRelationContext
 	& {
+		context: Model.AnyRelationContext
 		canEliminate: boolean
 		isLast: boolean
 	}
@@ -32,7 +32,7 @@ export class WhereOptimizer {
 			if (!WhereOptimizer.eliminableRelations.has(el.type)) {
 				processedRelationPath = []
 			} else {
-				processedRelationPath.push({ ...el, canEliminate: true, isLast: Number(i) === relationPath.length })
+				processedRelationPath.push({ context: el, canEliminate: true, isLast: Number(i) === relationPath.length })
 			}
 		}
 		let result = this.optimizeWhere(where, entity, processedRelationPath)
@@ -123,21 +123,22 @@ export class WhereOptimizer {
 				return { [key]: optimizedCondition }
 			},
 			visitRelation: context => {
-				const { targetEntity, relation } = context
 				let where = value as Input.OptionalWhere
 				const newRelationPath: ExtendedRelationContext[] = [...relationPath]
-				if (relationPath.length && relationPath[relationPath.length - 1].targetRelation?.name === relation.name) {
+				const length = relationPath.length
+				if (length > 0 && relationPath[length - 1].context.targetRelation?.name === context.relation.name) {
 					const item = newRelationPath.pop()
-					if (item?.canEliminate && (item.type === 'oneHasMany' || item.type === 'oneHasOneOwning' || item.type === 'oneHasOneInverse')) {
-						where = replaceWhere(where, { [targetEntity.primary]: { isNull: true } }, { [targetEntity.primary]: { never: true } })
-						where = replaceWhere(where, { [targetEntity.primary]: { isNull: false } }, { [targetEntity.primary]: { always: true } })
+					const type = item!.context.type
+					if (item?.canEliminate && (type === 'oneHasMany' || type === 'oneHasOneOwning' || type === 'oneHasOneInverse')) {
+						where = replaceWhere(where, { [context.targetEntity.primary]: { isNull: true } }, { [context.targetEntity.primary]: { never: true } })
+						where = replaceWhere(where, { [context.targetEntity.primary]: { isNull: false } }, { [context.targetEntity.primary]: { always: true } })
 					}
 				} else {
 					// first level relation - we are sure root exists
-					const canEliminate = relationPath.length === 0 || relationPath[relationPath.length - 1].isLast
-					newRelationPath.push({ ...context, isLast: false, canEliminate })
+					const canEliminate = length === 0 || relationPath[length - 1].isLast
+					newRelationPath.push({ context, isLast: false, canEliminate })
 				}
-				const optimizedWhere = this.optimizeWhere(where, targetEntity, newRelationPath)
+				const optimizedWhere = this.optimizeWhere(where, context.targetEntity, newRelationPath)
 
 				if (typeof optimizedWhere === 'boolean') {
 					return optimizedWhere

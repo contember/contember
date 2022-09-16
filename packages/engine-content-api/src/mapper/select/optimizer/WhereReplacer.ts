@@ -1,27 +1,39 @@
 import { Input, Writable } from '@contember/schema'
 import deepEqual from 'fast-deep-equal'
 
-export interface ReplaceWhereResult {
-	count: number
-}
-
-export const replaceWhere = (subject: Input.OptionalWhere, find: Input.OptionalWhere, replace: Input.OptionalWhere, resultTracker: ReplaceWhereResult = { count: 0 }): Input.OptionalWhere => {
+export const replaceWhere = (subject: Input.OptionalWhere, find: Input.OptionalWhere, replace: Input.OptionalWhere): Input.OptionalWhere => {
 	if (deepEqual(subject, find)) {
-		resultTracker.count++
 		return replace
 	}
-	const result: Writable<Input.OptionalWhere> = {}
-	for (const [key, value] of Object.entries(subject)) {
+	let result: Writable<Input.OptionalWhere> = subject
+	let copied = false
+	for (const key in subject) {
+		const value = subject[key]
 		if (key === 'not') {
-			result['not'] = replaceWhere(value as Input.OptionalWhere, find, replace, resultTracker)
-
+			const newNot = replaceWhere(value as Input.OptionalWhere, find, replace)
+			if (newNot !== value) {
+				if (!copied) {
+					result = { ...result }
+				}
+				result['not'] = newNot
+			}
 		} else if (key === 'and' || key === 'or') {
-			result[key] = (value as Input.OptionalWhere[]).map(it => replaceWhere(it, find, replace, resultTracker))
-
-		} else {
-			result[key] = value
+			const items: Input.OptionalWhere[] = []
+			let itemChanged = false
+			for (const el of value as Input.OptionalWhere[]) {
+				const newEl = replaceWhere(el, find, replace)
+				if (newEl !== el) {
+					itemChanged = true
+				}
+				items.push(newEl)
+			}
+			if (itemChanged) {
+				if (!copied) {
+					result = { ...result }
+					result[key] = items
+				}
+			}
 		}
-
 	}
 	return result
 }

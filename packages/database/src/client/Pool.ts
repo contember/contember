@@ -163,7 +163,7 @@ class Pool extends EventEmitter {
 		this.poolConfig = {
 			maxConnections: 10,
 			maxConnecting: Math.ceil((poolConfig.maxConnections ?? 10) / 2),
-			maxIdle: Math.ceil((poolConfig.maxConnections ?? 10) / 2),
+			maxIdle: poolConfig.maxConnections ?? 10,
 			idleTimeoutMs: 10_000,
 			acquireTimeoutMs: 10_000,
 			reconnectIntervalMs: 100,

@@ -139,8 +139,13 @@ class SelectBuilder<Result = SelectBuilder.Result> implements With.Aware, Where.
 		return this.withOption('lock', type)
 	}
 
-	public meta(key: string, value: any): SelectBuilder<Result> {
-		return this.withOption('meta', { ...this.options.meta, [key]: value })
+	public meta(key: string, value: any): SelectBuilder<Result>
+	public meta(values: Record<string, any>): SelectBuilder<Result>
+	public meta(keyOrValues: string | Record<string, any>, value?: any): SelectBuilder<Result> {
+		return this.withOption('meta', {
+			...this.options.meta,
+			...(typeof keyOrValues === 'string' ? { [keyOrValues]: value } : keyOrValues),
+		})
 	}
 
 	public match(spec: SelectBuilderSpecification): SelectBuilder<Result> {

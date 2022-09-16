@@ -16,6 +16,8 @@ export interface WhereOptimizationHints {
 	evaluatedPredicates?: Input.OptionalWhere[]
 }
 
+type OptimizedOperand = Input.OptionalWhere | undefined | boolean
+
 export class WhereOptimizer {
 	private static eliminableRelations = new Set<Model.AnyRelationContext['type']>(['oneHasMany', 'oneHasOneInverse', 'oneHasOneOwning'])
 
@@ -40,12 +42,16 @@ export class WhereOptimizer {
 		if (typeof result === 'boolean') {
 			return { [entity.primary]: { [result ? 'always' : 'never']: true } }
 		}
-		const resultTracker = { count: 0 }
+		let changed = false
 		for (const evaluated of evaluatedPredicates) {
 			const evaluatedPredicate = this.optimize(evaluated, entity)
-			result = replaceWhere(result, evaluatedPredicate, { [entity.primary]: { always: true } }, resultTracker)
+			const newResult = replaceWhere(result, evaluatedPredicate, { [entity.primary]: { always: true } })
+			if (newResult !== result) {
+				result = newResult
+				changed = true
+			}
 		}
-		if (resultTracker.count > 0) {
+		if (changed) {
 			return this.optimize(result, entity)
 		}
 
@@ -53,58 +59,95 @@ export class WhereOptimizer {
 	}
 
 	private optimizeWhere(where: Input.OptionalWhere, entity: Model.Entity, relationPath: ExtendedRelationContext[]): Input.OptionalWhere | boolean {
-		return this.optimizeAnd(
-			Object.entries(where).map(([key, value]) => {
-				if (value === undefined || value === null) {
-					return undefined
+		const operands: OptimizedOperand[] = []
 
-				} else if (key === 'and') {
-					return this.optimizeAnd((value as readonly Input.OptionalWhere[]).map(it => this.optimizeWhere(it, entity, relationPath)), entity, relationPath)
-
-				} else if (key === 'or') {
-					return this.optimizeOr((value as readonly Input.OptionalWhere[]).map(it => this.optimizeWhere(it, entity, relationPath)), entity, relationPath)
-
-				} else if (key === 'not') {
-					return optimizeNot(this.optimizeWhere(value as Input.OptionalWhere, entity, relationPath))
-
-				} else {
-					return this.resolveFieldValue(entity, key, value, relationPath)
+		for (const key in where) {
+			const value = where[key]
+			let operand: OptimizedOperand = undefined
+			if (value === undefined || value === null) {
+				continue
+			} else if (key === 'and') {
+				const innerOperands: (Input.OptionalWhere | boolean)[] = []
+				for (const innerValue of value as readonly Input.OptionalWhere[]) {
+					const innerOperand = this.optimizeWhere(innerValue, entity, relationPath)
+					if (innerOperand === false) {
+						return false
+					}
+					innerOperands.push(innerOperand)
 				}
-			}),
-			entity,
-			relationPath,
-		)
+				operand = this.optimizeAnd(innerOperands, entity, relationPath)
+			} else if (key === 'or') {
+				const innerOperands: (Input.OptionalWhere | boolean)[] = []
+				for (const innerValue of value as readonly Input.OptionalWhere[]) {
+					const innerOperand = this.optimizeWhere(innerValue, entity, relationPath)
+					if (innerOperand === true) {
+						operand = true
+						break
+					}
+					innerOperands.push(innerOperand)
+				}
+				if (operand !== true) {
+					operand = this.optimizeOr(innerOperands, entity, relationPath)
+				}
+
+			} else if (key === 'not') {
+				operand = optimizeNot(this.optimizeWhere(value as Input.OptionalWhere, entity, relationPath))
+
+			} else {
+				operand = this.resolveFieldValue(entity, key, value, relationPath)
+			}
+
+			if (operand === false) {
+				return false
+
+			} else if (operand !== undefined) {
+				operands.push(operand)
+			}
+		}
+		return this.optimizeAnd(operands, entity, relationPath)
 	}
 
-	private optimizeOr(operands: readonly (Input.OptionalWhere | undefined | boolean)[], entity: Model.Entity, relationPath: ExtendedRelationContext[]): Input.OptionalWhere | boolean {
+	private optimizeOr(operands: readonly OptimizedOperand[], entity: Model.Entity, relationPath: ExtendedRelationContext[]): Input.OptionalWhere | boolean {
 		const optimized = optimizeOr(operands)
 		if (typeof optimized === 'boolean' || !Array.isArray(optimized.or)) {
 			return optimized
 		}
 		const result = this.crossOptimize(optimized.or, entity, { never: true }, relationPath)
+		if (result === optimized.or) {
+			return optimized
+		}
 		return optimizeOr(result)
 	}
 
-	private optimizeAnd(operands: readonly (Input.OptionalWhere | undefined | boolean)[], entity: Model.Entity, relationPath: ExtendedRelationContext[]): Input.OptionalWhere | boolean {
+	private optimizeAnd(operands: readonly OptimizedOperand[], entity: Model.Entity, relationPath: ExtendedRelationContext[]): Input.OptionalWhere | boolean {
 		const optimized = optimizeAnd(operands)
 		if (typeof optimized === 'boolean' || !Array.isArray(optimized.and)) {
 			return optimized
 		}
 		const result = this.crossOptimize(optimized.and, entity, { always: true }, relationPath)
+		if (result === optimized.and) {
+			return optimized
+		}
 		return optimizeAnd(result)
 	}
 
 	private crossOptimize(operands: Input.OptionalWhere[], entity: Model.Entity, replacement: Input.Condition, relationPath: ExtendedRelationContext[]): (Input.OptionalWhere | boolean)[] {
-		const result: (Input.OptionalWhere | boolean)[] = [...operands]
+		let result: (Input.OptionalWhere | boolean)[] = operands
+		let copied = false
 		const count = result.length
 		for (let i = 0; i < count; i++) {
 			for (let j = 0; j < count; j++) {
 				const a = result[j]
 				const b = result[i]
 				if (i !== j && typeof a !== 'boolean' && typeof b !== 'boolean') {
-					const tracker = { count: 0 }
-					const elResult = replaceWhere(a, b, { [entity.primary]: replacement }, tracker)
-					result[j] = tracker.count > 0 ? this.optimizeWhere(elResult, entity, relationPath) : elResult
+					const elResult = replaceWhere(a, b, { [entity.primary]: replacement })
+					if (elResult !== a) {
+						if (!copied) {
+							result = [...result]
+							copied = true
+						}
+						result[j] = this.optimizeWhere(elResult, entity, relationPath)
+					}
 				}
 			}
 		}

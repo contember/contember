@@ -1,5 +1,3 @@
-mod utils;
-
 use neon::prelude::*;
 
 fn log(cx: &mut FunctionContext, msg: &str) -> NeonResult<()> {

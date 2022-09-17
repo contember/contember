@@ -6,7 +6,6 @@
     "contember": "./dist/src/run.js"
   },
   "scripts": {
-    "build": "tailwindcss -i ./src/utils/project/resources/style.css -o ./dist/src/utils/project/resources/out.css",
     "test": "echo 'No tests'"
   },
   "devDependencies": {

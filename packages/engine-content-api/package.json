@@ -17,7 +17,8 @@
     "@contember/schema": "^1.2.0-alpha.14",
     "@contember/schema-utils": "^1.2.0-alpha.14",
     "@graphql-tools/schema": "^8.3.5",
-    "graphql-tag": "^2.12.5"
+    "graphql-tag": "^2.12.5",
+    "@contember/engine-content-api-native": "^1.2.0-alpha.14"
   },
   "devDependencies": {
     "@contember/database-tester": "^1.2.0-alpha.14",

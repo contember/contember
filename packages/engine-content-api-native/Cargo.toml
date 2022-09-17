@@ -1,0 +1,18 @@
+[package]
+name = "engine-content-api-native"
+version = "0.1.0"
+license = "ISC"
+edition = "2021"
+exclude = ["index.node"]
+
+[lib]
+crate-type = ["cdylib"]
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+
+[dependencies.neon]
+version = "1.0.0-alpha.1"
+default-features = false
+features = ["napi-6"]

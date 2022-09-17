@@ -14,7 +14,7 @@ sleep 5
 docker exec \
 	-w /src/packages/benchmark/src \
 	$CONTAINER_NAME node \
-	/src/packages/cli/dist/src/run.js migr:exe app --remote-project benchmark --yes
+	/src/packages/cli/dist/src/run.js migr:exe src --remote-project benchmark --yes
 
 docker exec \
 	$CONTAINER_NAME node \

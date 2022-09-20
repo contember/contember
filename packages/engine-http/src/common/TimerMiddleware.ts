@@ -7,9 +7,10 @@ export type Timer = <T>(event: string, cb?: () => T) => Promise<T>
 
 export interface TimerMiddlewareState {
 	timer: Timer
+	sendServerTimingHeader: boolean
 }
 
-export const createTimerMiddleware = (): KoaMiddleware<TimerMiddlewareState> => {
+export const createTimerMiddleware = ({ debugMode }: { debugMode: boolean }): KoaMiddleware<TimerMiddlewareState> => {
 	const timer: KoaMiddleware<TimerMiddlewareState> = async (ctx, next) => {
 		const times: EventTime[] = []
 		const globalStart = new Date().getTime()
@@ -28,6 +29,10 @@ export const createTimerMiddleware = (): KoaMiddleware<TimerMiddlewareState> => 
 		}
 
 		await next()
+
+		if (!ctx.headerSent && (ctx.state.sendServerTimingHeader || debugMode) && times.length) {
+			ctx.response.set('server-timing', times.map(it => `${it.label};desc="${it.label} T+${it.start}";dur=${it.duration ?? -1}`).join(', '))
+		}
 
 		const emit = () => {
 			const eventsDescription = times

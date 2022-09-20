@@ -30,9 +30,7 @@ export class ContentQueryHandlerFactory {
 			}),
 			createGraphqlRequestInfoProviderListener(),
 		]
-		if (this.debug) {
-			listeners.push(createDbQueriesListener(context => context.db))
-		}
+		listeners.push(createDbQueriesListener(context => context.db, this.debug))
 
 		return createGraphQLQueryHandler<ExtendedGraphqlContext>({
 			schema: graphQlSchema,

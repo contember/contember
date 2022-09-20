@@ -11,7 +11,7 @@ import { Providers } from '../providers'
 import { GraphQLKoaState } from '../graphql'
 import { ParsedMembership } from '@contember/schema-utils'
 
-export type ExtendedGraphqlContext = Context & { identityId: string; koaContext: KoaContext<GraphQLKoaState> }
+export type ExtendedGraphqlContext = Context & { identityId: string; koaContext: KoaContext<GraphQLKoaState>; requestDebug: boolean }
 
 export class ContentGraphQLContextFactory {
 	constructor(
@@ -19,7 +19,7 @@ export class ContentGraphQLContextFactory {
 	) {
 	}
 
-	create({ db, schema, authResult, memberships, permissions, timer, koaContext }: {
+	create({ db, schema, authResult, memberships, permissions, timer, koaContext, requestDebug }: {
 		db: Client
 		schema: Schema
 		permissions: Acl.Permissions
@@ -27,6 +27,7 @@ export class ContentGraphQLContextFactory {
 		memberships: readonly ParsedMembership[]
 		timer: Timer
 		koaContext: KoaContext<GraphQLKoaState>
+		requestDebug: boolean
 	}): ExtendedGraphqlContext {
 		const partialContext = {
 			db,
@@ -50,6 +51,7 @@ export class ContentGraphQLContextFactory {
 			executionContainer,
 			timer,
 			koaContext,
+			requestDebug,
 		}
 	}
 }

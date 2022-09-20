@@ -26,6 +26,7 @@ export const normalizeSchema = <S extends Schema>(schema: S): S => {
 						export: true,
 						import: true,
 					},
+					debug: true,
 					...((schema.acl.roles?.[ProjectRole.ADMIN] as Acl.RolePermissions | undefined) || {}),
 				},
 				[ProjectRole.CONTENT_ADMIN]: {

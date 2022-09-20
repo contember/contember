@@ -17,6 +17,8 @@ type ContentApiMiddlewareKoaState =
 	& { authResult: AuthResult }
 
 
+const debugHeader = 'x-contember-debug'
+
 export class ContentApiMiddlewareFactory {
 	constructor(
 		private readonly projectGroupResolver: ProjectGroupResolver,
@@ -67,18 +69,29 @@ export class ContentApiMiddlewareFactory {
 				response.status = 304
 				return
 			}
+
 			const schema = await projectContainer.contentSchemaResolver.getSchema(systemDatabase, stage.slug)
 
-			const memberships = await timer('MembershipFetch', () => groupContainer.projectMembershipResolver.resolveMemberships({
-				request,
-				acl: schema.acl,
-				projectSlug: project.slug,
-				identity: {
-					identityId: authResult.identityId,
-					personId: authResult.personId ?? undefined,
-					roles: authResult.roles,
-				},
-			}))
+			const { effective: memberships, fetched: fetchedMemberships } = await timer(
+				'MembershipFetch',
+				() => groupContainer.projectMembershipResolver.resolveMemberships({
+					request,
+					acl: schema.acl,
+					projectSlug: project.slug,
+					identity: {
+						identityId: authResult.identityId,
+						personId: authResult.personId ?? undefined,
+						roles: authResult.roles,
+					},
+				}),
+			)
+
+			const debugHeaderValue = request.get(debugHeader).trim()
+			const requestDebug = debugHeaderValue === '1' && fetchedMemberships.some(it => schema.acl.roles[it.role]?.debug)
+			if (requestDebug) {
+				koaContext.state.sendServerTimingHeader = true
+			}
+
 			const projectRoles = memberships.map(it => it.role)
 
 			const contentDatabase = projectContainer.connection.createClient(stage.schema, { module: 'content' })
@@ -106,6 +119,7 @@ export class ContentApiMiddlewareFactory {
 				schema,
 				timer,
 				koaContext,
+				requestDebug,
 			})
 
 			await timer('GraphQL', () => handler({

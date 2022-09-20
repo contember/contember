@@ -24,6 +24,32 @@ test('simple definitions', () => {
 	`)
 })
 
+
+namespace RoleOptions {
+	export const publicRole = acl.createRole('public', {
+		debug: true,
+		s3: {
+			foo: 'bar',
+		},
+	})
+}
+
+test('role options', () => {
+	const schema = createSchema(RoleOptions)
+	expect(schema.acl.roles.public).toMatchInlineSnapshot(`
+		{
+		  "debug": true,
+		  "entities": {},
+		  "s3": {
+		    "foo": "bar",
+		  },
+		  "stages": "*",
+		  "variables": {},
+		}
+	`)
+})
+
+
 namespace ModelWithPredicate {
 	export const publicRole = acl.createRole('public')
 

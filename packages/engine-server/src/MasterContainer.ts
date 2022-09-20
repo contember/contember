@@ -145,7 +145,7 @@ export class MasterContainerFactory {
 						jsonLimit: serverConfig.http.requestBodySize || '1mb',
 					}),
 					createPoweredByHeaderMiddleware(debugMode, version ?? 'unknown'),
-					createTimerMiddleware(),
+					createTimerMiddleware({ debugMode }),
 					httpErrorMiddlewareFactory.create(),
 					route('/playground$', createPlaygroundMiddleware()),
 					createHomepageMiddleware(),

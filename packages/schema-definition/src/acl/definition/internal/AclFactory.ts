@@ -34,6 +34,7 @@ export class AclFactory {
 				return [
 					role.name,
 					{
+						...role.options,
 						stages: role.options.stages ?? '*',
 						entities: this.createPermissions(rolePermissions),
 						variables: this.createVariables(role, variables),

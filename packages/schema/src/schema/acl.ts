@@ -138,7 +138,9 @@ export namespace Acl {
 		readonly variables: Acl.Variables
 		readonly stages?: StagesDefinition
 		readonly entities: Permissions
+		readonly debug?: boolean
 	}
+
 	export type RolePermissions =
 		& BaseRolePermissions
 		& {

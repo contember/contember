@@ -102,6 +102,7 @@ const baseRolePermissionsSchema = Typesafe.intersection(
 		tenant: tenantPermissionsSchema,
 		system: systemPermissionsSchema,
 		content: contentPermissionsSchema,
+		debug: Typesafe.boolean,
 	}),
 )
 const baseRolePermissionsCheck: Typesafe.Equals<Acl.BaseRolePermissions, ReturnType<typeof baseRolePermissionsSchema>> = true

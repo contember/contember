@@ -1,10 +1,10 @@
-import { Acl } from '@contember/schema'
+import { Acl, JSONValue } from '@contember/schema'
 
-export interface RoleOptions {
-	stages?: Acl.StagesDefinition
-	tenant?: Acl.TenantPermissions
-	system?: Acl.SystemPermissions
-}
+export type RoleOptions =
+	& Omit<Acl.BaseRolePermissions, 'variables' | 'entities' | 'inherits'>
+	& {
+		readonly [key: string]: JSONValue
+	}
 
 export class Role<Name extends string = string> {
 	public constructor(

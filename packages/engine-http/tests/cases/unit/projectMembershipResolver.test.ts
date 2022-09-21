@@ -1,3 +1,4 @@
+
 import { describe, expect, it } from 'vitest'
 import { ProjectMembershipFetcher, ProjectMembershipResolver } from '../../../src'
 import { createMock } from '../../utils'
@@ -29,7 +30,7 @@ describe('membership resolver', () => {
 				},
 			},
 		})
-		expect(resolvedMembership).deep.eq([{ role: 'test', variables: [] }])
+		expect(resolvedMembership.effective).deep.eq([{ role: 'test', variables: [] }])
 	})
 
 
@@ -57,7 +58,7 @@ describe('membership resolver', () => {
 				},
 			},
 		})
-		expect(resolvedMembership).deep.eq([{ role: 'test', variables: [] }])
+		expect(resolvedMembership.effective).deep.eq([{ role: 'test', variables: [] }])
 	})
 
 	it('should return assumed membership', async () => {
@@ -101,7 +102,7 @@ describe('membership resolver', () => {
 				},
 			},
 		})
-		expect(resolvedMembership).deep.eq([{ role: 'test', variables: [{ name: 'lang', condition: { eq: 'cs' } }] }])
+		expect(resolvedMembership.effective).deep.eq([{ role: 'test', variables: [{ name: 'lang', condition: { eq: 'cs' } }] }])
 	})
 
 })

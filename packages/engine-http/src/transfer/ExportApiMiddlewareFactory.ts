@@ -61,7 +61,7 @@ export class ExportApiMiddlewareFactory {
 
 				const systemContext = projectContainer.systemDatabaseContextFactory.create()
 				const schema = await projectContainer.contentSchemaResolver.getSchema(systemContext, project.slug)
-				const memberships = await timer('MembershipFetch', () => groupContainer.projectMembershipResolver.resolveMemberships({
+				const { effective: memberships } = await timer('MembershipFetch', () => groupContainer.projectMembershipResolver.resolveMemberships({
 					request: { get: () => '' },
 					acl: schema.acl,
 					projectSlug: project.slug,

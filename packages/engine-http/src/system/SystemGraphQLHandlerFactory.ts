@@ -61,7 +61,7 @@ export class SystemGraphQLHandlerFactory {
 					context.onClearCache()
 				},
 			})
-			listeners.push(createDbQueriesListener(context => context.db.client))
+			listeners.push(createDbQueriesListener(context => context.db.client, this.debugMode))
 		}
 		return createGraphQLQueryHandler<SystemGraphQLContext>({
 			schema,

@@ -3,8 +3,11 @@ import { GraphQLListener } from './execution'
 
 type Query = { sql: string; bindings: any; elapsed?: number; error?: string; meta?: any; rowCount?: number }
 
-export const createDbQueriesListener = <Context>(dbResolver: (state: Context) => Client): GraphQLListener<Context> => ({
+export const createDbQueriesListener = <Context extends { requestDebug: boolean } | {}>(dbResolver: (state: Context) => Client, globalDebug: boolean): GraphQLListener<Context> => ({
 	onExecute: ({ context }) => {
+		if (!globalDebug && !(context as any).requestDebug) {
+			return
+		}
 		const db = dbResolver(context)
 		if (!db) {
 			return {}

@@ -24,51 +24,51 @@ export class Router {
 	) {
 	}
 
-	getHandler(req: IncomingMessage): (req: IncomingMessage, res: ServerResponse) => Promise<void> {
-		const url = new URL(req.url ?? '/', `http://${req.headers.host}`)
-		const [prefix, ...rest] = url.pathname.substring(1).split('/')
-
+	async handle(req: IncomingMessage, res: ServerResponse) {
 		try {
+			const url = new URL(req.url ?? '/', `http://${req.headers.host}`)
+			const [prefix, ...rest] = url.pathname.substring(1).split('/')
 			const hostname = readHostFromHeader(req)
 			const projectGroup = this.projectGroupResolver.resolve(hostname)
 
 			switch (prefix) {
 				case '_api':
-					return (req, res) => this.apiController.handle(req, res, { path: rest.join('/'), projectGroup })
+					return await this.apiController.handle(req, res, { path: rest.join('/'), projectGroup })
 
 				case '_deploy':
-					return (req, res) => this.deployController.handle(req, res, { projectGroup })
+					return await this.deployController.handle(req, res, { projectGroup })
 
 				case '_me':
-					return (req, res) => this.meController.handle(req, res, { projectGroup })
+					return await this.meController.handle(req, res, { projectGroup })
 
 				case '_panel':
-					return (req, res) => this.panelController.handle(req, res)
+					return await this.panelController.handle(req, res)
 
 				case '':
 				case '_static':
 				case 'favicon.ico':
 				case 'robots.txt':
-					return (req, res) => this.loginController.handle(req, res, { projectGroup })
+					return await this.loginController.handle(req, res, { projectGroup })
 
 				case 'p':
 				case 'projects':
-					return (req, res) => this.legacyController.handle(req, res)
+					return await this.legacyController.handle(req, res)
 
 				default:
-					return (req, res) => this.projectController.handle(req, res, { projectSlug: prefix, path: rest.join('/'), projectGroup })
+					return await this.projectController.handle(req, res, { projectSlug: prefix, path: rest.join('/'), projectGroup })
 			}
 
 		} catch (e) {
 			console.error(e)
 
-			return async (req, res) => {
-				if (e instanceof BadRequestError) {
-					res.writeHead(e.code).end(e.message)
+			if (e instanceof BadRequestError) {
+				res.writeHead(e.code).end(e.message)
 
-				} else if (!res.headersSent) {
-					res.writeHead(500).end('Server error')
-				}
+			} else if (!res.headersSent) {
+				res.writeHead(500).end('Server error')
+
+			} else {
+				res.end()
 			}
 		}
 	}

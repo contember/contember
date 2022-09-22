@@ -146,9 +146,7 @@ export default new Builder({})
 
 		server.on('request', async (req, res) => {
 			const startTime = process.hrtime()
-
-			const handler = router.getHandler(req)
-			await handler(req, res)
+			await router.handle(req, res)
 
 			const elapsedTime = process.hrtime(startTime)
 			const elapsedTimeMs = ((elapsedTime[0] + elapsedTime[1] / 1e9) * 1e3).toFixed(0)

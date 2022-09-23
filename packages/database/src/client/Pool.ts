@@ -7,7 +7,7 @@ import { PgClient } from './PgClient'
 
 export type PoolLogger = (message: string, status: PoolStatus) => void
 
-export type PoolConfig = Partial<PoolConfigInternal>
+export type PoolConfig = Partial<PoolConfigInternal> & Pick<PoolConfigInternal, 'logError'>
 
 interface PoolConfigInternal {
 	/** maximum number of connections in a pool */
@@ -28,6 +28,8 @@ interface PoolConfigInternal {
 	maxAgeMs?: number
 	/** internal logging, mainly for debugging and testing */
 	log?: PoolLogger
+	/** logging of out-of-stack errors */
+	logError: (error: Error) => void
 }
 
 export type PoolStats = { [K in keyof typeof poolStatsDescription]: number }
@@ -292,6 +294,7 @@ class Pool extends EventEmitter {
 		const poolConnection = new PoolConnection(client)
 		client.on('error', e => {
 			this.log('Client error on idle connection has occurred: ' + e.message)
+			this.poolConfig.logError(e)
 			this.emit('error', e)
 		})
 		try {
@@ -314,6 +317,7 @@ class Pool extends EventEmitter {
 				if (this.poolConfig.reconnectIntervalMs * attempt >= this.poolConfig.acquireTimeoutMs) {
 					this.poolStats.connection_error_count++
 					this.log('Recoverable error, max retries reached.')
+					this.poolConfig.logError(e)
 					this.emit('error', e)
 					this.connectingCount--
 				} else {
@@ -337,6 +341,7 @@ class Pool extends EventEmitter {
 					this.poolStats.item_rejected_count++
 				} else {
 					this.log('Connecting failed, emitting error')
+					this.poolConfig.logError(e)
 					this.emit('error', e)
 				}
 			}

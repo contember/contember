@@ -20,6 +20,7 @@ import { Acl, Schema } from '@contember/schema'
 import { createMockedMailer, ExpectedMessage } from './mailer'
 import { dbCredentials } from './dbUtils'
 import { IdPMock } from './IdPMock'
+import { createLogger, Logger, PrettyPrintTransport } from '@contember/engine-common'
 
 export interface Test {
 	query: GraphQLTestQuery
@@ -113,6 +114,7 @@ export const executeTenantTest = async (test: Test) => {
 			),
 			authenticatedApiKeyId,
 		),
+		logger: createLogger(),
 		db: databaseContext,
 	}
 

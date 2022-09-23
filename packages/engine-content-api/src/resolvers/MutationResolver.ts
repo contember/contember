@@ -2,13 +2,13 @@ import { Input, Model, Result, Value } from '@contember/schema'
 import {
 	ConstraintType,
 	getInsertPrimary,
-	getUpdatePrimary,
 	InputErrorKind,
 	Mapper,
 	MapperFactory,
 	MutationResultHint,
 	MutationResultList,
-	MutationResultType, tryMutation,
+	MutationResultType,
+	tryMutation,
 } from '../mapper'
 import { ValidationResolver } from './ValidationResolver'
 import { GraphQLResolveInfo } from 'graphql'
@@ -20,6 +20,7 @@ import { assertNever } from '../utils'
 import { InputPreValidator } from '../input-validation'
 import { ObjectNode } from '../inputProcessing'
 import { executeReadOperations } from './ReadHelpers'
+import { logger } from '@contember/engine-common'
 
 type WithoutNode<T extends { node: any }> = Pick<T, Exclude<keyof T, 'node'>>
 
@@ -479,6 +480,7 @@ export class MutationResolver {
 					return result
 				})
 			},
+			message => logger.warn(message),
 			{
 				maxAttempts: 15,
 				minTimeout: 10,

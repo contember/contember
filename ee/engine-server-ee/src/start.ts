@@ -6,8 +6,9 @@ import os from 'os'
 import cluster from 'cluster'
 import { getClusterProcessType, notifyWorkerStarted, timeout, WorkerManager } from './utils'
 import {
+	createDefaultLogger,
+	createSentryTransport,
 	getServerVersion,
-	initSentry,
 	isDebugMode,
 	listenOnProcessTermination,
 	printStartInfo,
@@ -16,22 +17,26 @@ import {
 } from '@contember/engine-server'
 import { serverConfigSchema } from './config/configSchema'
 
-(async () => {
+const logger = createDefaultLogger()
+
+;(async () => {
+	const isDebug = isDebugMode()
 	if (process.env.NODE_HEAPDUMP === 'true') {
-		// eslint-disable-next-line no-console
-		console.log('Initializing heapdump')
+		logger.info('Initializing heapdump')
 		await import('heapdump')
 	}
-	const isDebug = isDebugMode()
 	const version = getServerVersion()
-	printStartInfo({ version, isDebug })
+	printStartInfo({ version, isDebug }, logger)
 	const plugins = await loadPlugins()
 	const { serverConfig, projectConfigResolver, tenantConfigResolver } = await resolveServerConfig({ plugins, serverConfigSchema })
 
 	if (process.argv[2] === 'validate') {
 		process.exit(0)
 	}
-	initSentry(serverConfig.logging.sentry?.dsn)
+	const sentryTransport = createSentryTransport(serverConfig.logging.sentry?.dsn)
+	if (sentryTransport !== null) {
+		logger.addTransport(sentryTransport)
+	}
 	const workerConfig = serverConfig.workerCount || 1
 
 	const workerCount = workerConfig === 'auto' ? os.cpus().length : Number(workerConfig)
@@ -47,22 +52,21 @@ import { serverConfigSchema } from './config/configSchema'
 		plugins,
 		processType,
 		version,
+		logger,
 	})
 
 	let initializedProjects: string[] = []
 	const terminationJobs: TerminationJob[] = []
-	listenOnProcessTermination(terminationJobs)
+	listenOnProcessTermination(terminationJobs, logger)
 
 	if (cluster.isMaster) {
 		const monitoringPort = serverConfig.monitoringPort
 		const monitoringServer = container.monitoringKoa.listen(monitoringPort, () => {
-			// eslint-disable-next-line no-console
-			console.log(`Monitoring running on http://localhost:${monitoringPort}`)
+			logger.info(`Monitoring running on http://localhost:${monitoringPort}`)
 		})
 		terminationJobs.push(async () => {
 			await new Promise<any>(resolve => monitoringServer.close(resolve))
-			// eslint-disable-next-line no-console
-			console.log('Monitoring server terminated')
+			logger.info('Monitoring server terminated')
 		})
 		if (!serverConfig.projectGroup) {
 			initializedProjects = await container.initializer.initialize()
@@ -72,31 +76,25 @@ import { serverConfigSchema } from './config/configSchema'
 	const port = serverConfig.port
 	const printStarted = () => {
 		if (serverConfig.projectGroup) {
-			// eslint-disable-next-line no-console
-			console.log('Contember Cloud running')
+			logger.info('Contember Cloud running')
 		} else {
-			// eslint-disable-next-line no-console
-			console.log(`Contember API running on http://localhost:${port}`)
-			// eslint-disable-next-line no-console
-			console.log(initializedProjects.length ? `Initialized projects: ${initializedProjects.join(', ')}` : 'No project initialized')
+			logger.info(`Contember API running on http://localhost:${port}`)
+			logger.info(initializedProjects.length ? `Initialized projects: ${initializedProjects.join(', ')}` : 'No project initialized')
 		}
 	}
 
 	if (isClusterMode) {
 		if (cluster.isMaster) {
-			// eslint-disable-next-line no-console
-			console.log(`Master ${process.pid} is running`)
+			logger.info(`Master ${process.pid} is running`)
 			const workerManager = new WorkerManager(workerCount)
 			terminationJobs.push(async ({ signal }) => {
 				await workerManager.terminate(signal)
-				// eslint-disable-next-line no-console
-				console.log('Workers terminated')
+				logger.info('Workers terminated')
 			})
 			await workerManager.start()
 			printStarted()
 		} else {
-			// eslint-disable-next-line no-console
-			console.log(`Starting worker ${process.pid}`)
+			logger.info(`Starting worker ${process.pid}`)
 
 			// this line somehow ensures, that worker waits for termination of all jobs
 			process.on('disconnect', () => timeout(0))
@@ -104,21 +102,18 @@ import { serverConfigSchema } from './config/configSchema'
 			const httpServer = container.koa.listen(port, () => notifyWorkerStarted())
 			terminationJobs.push(async () => {
 				await new Promise<any>(resolve => httpServer.close(resolve))
-				// eslint-disable-next-line no-console
-				console.log('API server terminated')
+				logger.info('API server terminated')
 			})
 		}
 	} else {
 		const httpServer = container.koa.listen(port, () => printStarted())
 		terminationJobs.push(async () => {
 			await new Promise<any>(resolve => httpServer.close(resolve))
-			// eslint-disable-next-line no-console
-			console.log('API server terminated')
+			logger.info('API server terminated')
 		})
 	}
 
 })().catch(e => {
-	// eslint-disable-next-line no-console
-	console.log(e)
+	logger.crit(e)
 	process.exit(1)
 })

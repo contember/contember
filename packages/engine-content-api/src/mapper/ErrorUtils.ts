@@ -12,6 +12,7 @@ import * as Database from '@contember/database'
 import { UniqueWhereError } from '../inputProcessing'
 import { Model } from '@contember/schema'
 import { isOwningRelation, isRelation, NamingHelper } from '@contember/schema-utils'
+import { logger } from '@contember/engine-common'
 import RelationType = Model.RelationType
 
 
@@ -108,8 +109,7 @@ export const convertError = (schema: Model.Schema, e: any): MutationResult => {
 		return new MutationSqlError([], e.originalMessage, [MutationResultHint.subSequentSqlError])
 	}
 	if (e instanceof Database.QueryError) {
-		// eslint-disable-next-line no-console
-		console.error(e)
+		logger.error(e, null, { loc: 'convertError' })
 		return new MutationSqlError([], e.originalMessage, [MutationResultHint.sqlError])
 	}
 	throw e

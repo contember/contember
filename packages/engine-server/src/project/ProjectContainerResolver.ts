@@ -3,9 +3,9 @@ import { ProjectContainer } from '@contember/engine-http'
 import { DatabaseContext, ProjectManager, ProjectWithSecrets } from '@contember/engine-tenant-api'
 import { ProjectInitializer as SystemProjectInitializer } from '@contember/engine-system-api'
 import { ProjectContainerStore } from './ProjectContainerStore'
-import { Logger } from '@contember/engine-common'
 import { ProjectConfigResolver } from '../config/projectConfigResolver'
 import { TenantConfig } from '../config/config'
+import { Logger } from '@contember/engine-common'
 
 export class ProjectContainerResolver {
 	private projectContainers = new ProjectContainerStore()
@@ -22,7 +22,7 @@ export class ProjectContainerResolver {
 	) {}
 
 
-	public async getProjectContainer(slug: string, { alias = false, logger }: {alias?: boolean; logger?: Logger} = {}): Promise<ProjectContainer | undefined> {
+	public async getProjectContainer(slug: string, { alias = false }: { alias?: boolean } = {}): Promise<ProjectContainer | undefined> {
 		const realSlug = this.projectContainers.resolveAlias(slug)
 		if (realSlug) {
 			slug = realSlug
@@ -43,7 +43,7 @@ export class ProjectContainerResolver {
 		if (!project) {
 			return undefined
 		}
-		const container = await this.createProjectContainer(project, logger)
+		const container = await this.createProjectContainer(project)
 		if (slug !== project.slug) {
 			this.projectContainers.setAlias(project.slug, slug)
 		}
@@ -59,7 +59,7 @@ export class ProjectContainerResolver {
 			await this.systemProjectInitializer.initialize(
 				projectContainer.systemDatabaseContextFactory,
 				projectContainer.project,
-				logger ?? new Logger(() => null),
+				logger ?? projectContainer.logger,
 			)
 			const cleanups = this.onCreate.map(it => it(projectContainer) || (() => null))
 			return {

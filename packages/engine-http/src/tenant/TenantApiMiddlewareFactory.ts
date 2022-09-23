@@ -1,14 +1,16 @@
 import { KoaMiddleware, KoaRequestState } from '../koa'
-import { AuthResult, TimerMiddlewareState } from '../common'
+import { AuthResult, LoggerMiddlewareState, LoggerRequestSymbol, TimerMiddlewareState } from '../common'
 import { GraphQLKoaState } from '../graphql'
 import { ProjectGroupResolver, ProjectInfoMiddlewareState } from '../project-common'
 import { TenantGraphQLContextFactory } from './TenantGraphQLContextFactory'
+import { withLogger } from '@contember/engine-common'
 
 type TenantApiMiddlewareState =
 	& TimerMiddlewareState
 	& KoaRequestState
 	& GraphQLKoaState
 	& ProjectInfoMiddlewareState
+	& LoggerMiddlewareState
 	& { authResult: AuthResult }
 
 export class TenantApiMiddlewareFactory {
@@ -26,12 +28,32 @@ export class TenantApiMiddlewareFactory {
 			koaContext.state.projectGroup = groupContainer.slug
 			const authResult = await groupContainer.authenticator.authenticate({ request, timer })
 			koaContext.state.authResult = authResult
+
+			const requestLogger = groupContainer.logger.child({
+				module: 'tenant',
+				method: koaContext.request.method,
+				url: koaContext.request.originalUrl,
+				user: authResult.identityId,
+				requestId: Math.random().toString().substring(2),
+				[LoggerRequestSymbol]: koaContext.request,
+			})
+			koaContext.state.logger = requestLogger
+
 			const tenantContainer = groupContainer.tenantContainer
-			const context = this.tenantGraphQLContextFactory.create({ authResult, tenantContainer, koaContext })
-			return await groupContainer.tenantGraphQLHandler({
-				request,
-				response,
-				context,
+			const graphqlLogger = requestLogger.child()
+			return await withLogger(graphqlLogger, async () => {
+				graphqlLogger.debug('Tenant query processing started', {
+					body: request.body,
+					query: request.query,
+				})
+				const context = this.tenantGraphQLContextFactory.create({ authResult, tenantContainer, koaContext, logger: requestLogger })
+
+				await timer('GraphQL', () => groupContainer.tenantGraphQLHandler({
+					request,
+					response,
+					context,
+				}))
+				graphqlLogger.debug('Tenant query finished')
 			})
 		}
 	}

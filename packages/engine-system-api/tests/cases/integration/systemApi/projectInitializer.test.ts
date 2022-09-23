@@ -1,10 +1,10 @@
 import { ApiTester } from '@contember/engine-api-tester'
 import { ProjectConfig, StageConfig } from '../../../../src'
 import { assert, test } from 'vitest'
+import { createLogger } from '@contember/engine-common'
 
-import { Logger } from '@contember/engine-common'
 
-const nullLogger = new Logger(() => {})
+const nullLogger = createLogger()
 
 test('create stage', async () => {
 	const prodStage: StageConfig = {

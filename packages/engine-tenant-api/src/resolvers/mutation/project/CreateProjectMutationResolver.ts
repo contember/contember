@@ -37,6 +37,7 @@ export class CreateProjectMutationResolver implements MutationResolvers {
 
 		const response = await this.projectManager.createProject(
 			context.db,
+			context.logger,
 			{
 				slug: projectSlug,
 				name: name || projectSlug,

@@ -2,6 +2,13 @@ import { join } from 'path'
 import { ConfigProcessor, Plugin } from '@contember/engine-plugins'
 import { ConfigSource, readConfig, ServerConfig } from '../config/config'
 import { Type } from '@contember/typesafe'
+import {
+	createLogger,
+	JsonStreamTransport,
+	Logger, LoggerTransport, LogLevels,
+	PrettyPrintTransport,
+	TransportList,
+} from '@contember/engine-common'
 
 export const getServerVersion = (): string => {
 	const packageJsonFile = process.env.CONTEMBER_PACKAGE_JSON || join(__dirname, '../../../package.json')
@@ -12,16 +19,12 @@ export const getServerVersion = (): string => {
 
 export const isDebugMode = (): boolean => process.env.NODE_ENV === 'development'
 
-export const printStartInfo = ({ version, isDebug }: { version: string; isDebug: boolean }) => {
-	// eslint-disable-next-line no-console
-	console.log(`Starting Contember ${version}`)
-	// eslint-disable-next-line no-console
-	console.log(`NODE_ENV is set to ${process.env.NODE_ENV}`)
+export const printStartInfo = ({ version, isDebug }: { version: string; isDebug: boolean }, logger: Logger) => {
+	logger.info(`Starting Contember ${version}`)
+	logger.info(`NODE_ENV is set to ${process.env.NODE_ENV}`)
 	if (isDebug) {
-		// eslint-disable-next-line no-console
-		console.log('Starting Contember in debug mode')
-		// eslint-disable-next-line no-console
-		console.log('NEVER USE debug mode in production environment')
+		logger.warn('Starting Contember in debug mode')
+		logger.warn('NEVER USE debug mode in production environment')
 	}
 }
 
@@ -39,4 +42,18 @@ export const resolveServerConfig = async <T extends ServerConfig>({ plugins, ser
 	}
 
 	return await readConfig(configSources, configProcessors, serverConfigSchema)
+}
+
+export const createDefaultLogger = (): Logger & { addTransport: (transport: LoggerTransport) => void } => {
+	const isDebug = isDebugMode()
+	const logger = createLogger({
+		pid: process.pid,
+		loggerId: Math.random().toString().substring(2),
+	}, {
+		logLevel: LogLevels[(process.env.CONTEMBER_LOGGER_LEVEL as keyof typeof LogLevels) ?? 'info'],
+	})
+	const loggerType = process.env.CONTEMBER_LOGGER_FORMAT ?? (isDebug ? 'pretty' : 'json')
+	const stream = process.stderr
+	logger.addTransport(loggerType === 'pretty' ? new PrettyPrintTransport(stream) : new JsonStreamTransport(stream))
+	return logger
 }

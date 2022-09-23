@@ -2,16 +2,7 @@ import { GraphQLError } from 'graphql'
 import { UserError } from '@contember/engine-content-api'
 import { GraphQLListener } from './execution'
 import { ForbiddenError } from '@contember/graphql-utils'
-
-interface ErrorContext {
-	user: string
-	body: string
-	project?: string
-	url: string
-	module: string
-}
-
-export type ErrorLogger = (error: any, context: ErrorContext) => void
+import { logger } from '@contember/engine-common'
 
 export const extractOriginalError = (e: Error): Error => {
 	if (e instanceof GraphQLError && e.originalError) {
@@ -23,7 +14,7 @@ export const extractOriginalError = (e: Error): Error => {
 	return e
 }
 
-const processError = (error: any, errorHandler: (error: any) => void) => {
+const processError = (error: any) => {
 	const originalError = extractOriginalError(error)
 	if (originalError instanceof GraphQLError || originalError instanceof ForbiddenError) {
 		return error
@@ -31,19 +22,15 @@ const processError = (error: any, errorHandler: (error: any) => void) => {
 	if (originalError instanceof UserError) {
 		return { message: error.message, locations: error.locations, path: error.path }
 	}
-	// eslint-disable-next-line no-console
-	console.error(originalError || error)
-	errorHandler(originalError || error)
+	logger.error(originalError || error)
 
 	return { message: 'Internal server error', locations: undefined, path: undefined }
 }
 
-export const createErrorListener = <State>(
-	errorHandler: (error: any, context: State) => void,
-): GraphQLListener<State> => ({
+export const createErrorListener = <State>(): GraphQLListener<State> => ({
 	onResponse: ({ response, context }) => {
 		if (response.errors) {
-			response.errors = response.errors.map((it: any) => processError(it, err => errorHandler(err, context)))
+			response.errors = response.errors.map((it: any) => processError(it))
 		}
 	},
 })

@@ -1,4 +1,5 @@
 import { Schema } from '@contember/schema'
+import { Logger } from '@contember/engine-common'
 
 export interface Project {
 	readonly id: string
@@ -19,5 +20,5 @@ export interface ProjectSchemaResolver {
 }
 
 export interface ProjectInitializer {
-	initializeProject(project: ProjectWithSecrets): Promise<void>
+	initializeProject(project: ProjectWithSecrets, logger: Logger): Promise<void>
 }

@@ -1,15 +1,16 @@
 import { KoaMiddleware, KoaRequestState } from '../koa'
 import { ProjectGroupResolver, ProjectInfoMiddlewareState } from '../project-common'
-import { AuthResult, HttpError, TimerMiddlewareState } from '../common'
+import { AuthResult, HttpError, LoggerMiddlewareState, LoggerRequestSymbol, TimerMiddlewareState } from '../common'
 import { GraphQLKoaState } from '../graphql'
 import { SystemGraphQLContextFactory } from './SystemGraphQLContextFactory'
-import { Logger } from '@contember/engine-common'
+import { withLogger } from '@contember/engine-common'
 
 type SystemApiMiddlewareKoaState =
 	& TimerMiddlewareState
 	& KoaRequestState
 	& GraphQLKoaState
 	& ProjectInfoMiddlewareState
+	& LoggerMiddlewareState
 	& { authResult: AuthResult }
 
 export class SystemApiMiddlewareFactory {
@@ -29,19 +30,24 @@ export class SystemApiMiddlewareFactory {
 			koaContext.state.authResult = authResult
 
 			const projectSlug = params.projectSlug
-			// eslint-disable-next-line no-console
-			const logger = new Logger(console.log)
-			logger.group(`Initializing ${groupContainer.slug}/${params.projectSlug}`)
-			const projectContainer = await groupContainer.projectContainerResolver.getProjectContainer(projectSlug, {
-				alias: true,
-				logger,
-			})
-			logger.groupEnd()
+
+			const projectContainer = await groupContainer.projectContainerResolver.getProjectContainer(projectSlug, { alias: true })
+
 			if (projectContainer === undefined) {
 				throw new HttpError(`Project ${projectSlug} NOT found`, 404)
 			}
+
 			const project = projectContainer.project
 			koaContext.state.project = project.slug
+
+			const requestLogger = projectContainer.logger.child({
+				module: 'system',
+				method: koaContext.request.method,
+				url: koaContext.request.originalUrl,
+				user: authResult.identityId,
+				requestId: Math.random().toString().substring(2),
+				[LoggerRequestSymbol]: koaContext.request,
+			})
 
 			const tenantContainer = groupContainer.tenantContainer
 			const memberships = await timer('MembershipFetch', () =>
@@ -61,24 +67,37 @@ export class SystemApiMiddlewareFactory {
 			}
 
 
-			const graphqlContext = await this.systemGraphqlContextFactory.create({
-				authResult,
-				memberships,
-				koaContext,
-				projectContainer,
-				systemContainer: groupContainer.systemContainer,
-				onClearCache: () => {
-					projectContainer.contentSchemaResolver.clearCache()
-					groupContainer.projectSchemaResolver.clearCache()
-				},
-			})
-			const handler = groupContainer.systemGraphQLHandler
 
-			await timer('GraphQL', () => handler({
-				request,
-				response,
-				context: graphqlContext,
-			}))
+			koaContext.state.logger = requestLogger
+
+			const graphqlLogger = requestLogger.child()
+
+			await withLogger(graphqlLogger, async () => {
+				graphqlLogger.debug('System query processing started', {
+					body: request.body,
+					query: request.query,
+				})
+				const graphqlContext = await this.systemGraphqlContextFactory.create({
+					authResult,
+					memberships,
+					koaContext,
+					projectContainer,
+					systemContainer: groupContainer.systemContainer,
+					onClearCache: () => {
+						projectContainer.contentSchemaResolver.clearCache()
+						groupContainer.projectSchemaResolver.clearCache()
+					},
+				})
+				const handler = groupContainer.systemGraphQLHandler
+
+				await timer('GraphQL', () => handler({
+					request,
+					response,
+					context: graphqlContext,
+				}))
+				graphqlLogger.debug('System query finished')
+			})
+
 		}
 	}
 }

@@ -1,6 +1,7 @@
 import { KoaMiddleware } from '../koa'
 import { HttpError } from './HttpError'
 import { AuthResult } from './Authorizator'
+import { LoggerMiddlewareState } from './LoggerMiddleware'
 
 export class ErrorMiddlewareFactory {
 	constructor(
@@ -8,7 +9,7 @@ export class ErrorMiddlewareFactory {
 	) {
 	}
 
-	public create(): KoaMiddleware<{ authResult?: AuthResult }> {
+	public create(): KoaMiddleware<{ authResult?: AuthResult } & LoggerMiddlewareState> {
 		return async (ctx, next) => {
 			try {
 				await next()
@@ -26,8 +27,7 @@ export class ErrorMiddlewareFactory {
 				} else {
 					ctx.status = 500
 					ctx.body = JSON.stringify({ errors: [{ message: 'Internal server error' }] })
-					// eslint-disable-next-line no-console
-					console.error(e)
+					ctx.state.logger.error(e)
 				}
 			}
 		}

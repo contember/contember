@@ -10,6 +10,7 @@ import { KoaContext } from '../koa'
 import { Providers } from '../providers'
 import { GraphQLKoaState } from '../graphql'
 import { ParsedMembership } from '@contember/schema-utils'
+import { Logger } from '@contember/engine-common'
 
 export type ExtendedGraphqlContext = Context & { identityId: string; koaContext: KoaContext<GraphQLKoaState>; requestDebug: boolean }
 

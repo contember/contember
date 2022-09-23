@@ -8,6 +8,7 @@ import { ExecutedMigrationsResolver } from './ExecutedMigrationsResolver'
 import { MigrateErrorCode } from '../../schema'
 import { SchemaVersionBuilder } from './SchemaVersionBuilder'
 import { SchemaValidator } from '@contember/schema-utils'
+import { logger } from '@contember/engine-common'
 
 export class ProjectMigrator {
 	constructor(
@@ -120,8 +121,7 @@ export class ProjectMigrator {
 			await db.query(sql)
 		} catch (e) {
 			if (e instanceof QueryError) {
-				// eslint-disable-next-line no-console
-				console.error(e)
+				logger.error(e, 'Migration failed')
 				throw new MigrationFailedError(migrationVersion, e.message)
 			}
 			throw e

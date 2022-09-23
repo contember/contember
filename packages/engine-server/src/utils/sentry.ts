@@ -1,46 +1,44 @@
 import * as Sentry from '@sentry/node'
+import { LogEntryBag, LoggerTransport } from '@contember/engine-common'
+import { LoggerRequestSymbol } from '@contember/engine-http'
 
-export const initSentry = (dsn?: string) => {
-	if (!dsn) {
-		return
+export class SentryTransport implements LoggerTransport {
+	dispatch(entry: LogEntryBag) {
+		if (!entry.base.error) {
+			return
+		}
+		Sentry.captureException(entry.base.error, scope => {
+			scope.setTag('project', entry.loggerAttributes.project ?? entry.base.attributes?.project)
+			scope.setTag('module', entry.loggerAttributes.module ?? entry.base.attributes?.module)
+			scope.setLevel('error')
+			scope.setUser({
+				id: entry.loggerAttributes.user ?? entry.base.attributes?.user,
+			})
+			scope.setExtra('requestId', entry.loggerAttributes.requestId)
+
+			scope.addEventProcessor(event => {
+				return {
+					...event,
+					request: {
+						url: entry.loggerAttributes.url ?? entry.base.attributes?.url,
+						data: entry.loggerAttributes[LoggerRequestSymbol]?.body,
+					},
+				}
+			})
+			return scope
+		})
 	}
-	// eslint-disable-next-line no-console
-	console.log(`Intializing sentry with dsn: ${dsn}`)
+}
+
+export const createSentryTransport = (dsn?: string): null | LoggerTransport => {
+	if (!dsn) {
+		return null
+	}
 	Sentry.init({
 		dsn: dsn,
 		integrations: integrations => {
 			return integrations.filter(integration => integration.name !== 'Console' && integration.name !== 'Http')
 		},
 	})
-}
-
-interface SentryErrorContext {
-	user: string
-	body: string
-	project?: string
-	url: string
-	module: string
-}
-
-export const logSentryError = (error: any, context: SentryErrorContext) => {
-	Sentry.withScope(scope => {
-		if (context.project) {
-			scope.setTag('project', context.project)
-		}
-		scope.setTag('module', context.module)
-		scope.setLevel('error')
-		scope.setUser({
-			id: context.user,
-		})
-		scope.addEventProcessor(event => {
-			return {
-				...event,
-				request: {
-					url: context.url,
-					data: context.body,
-				},
-			}
-		})
-		Sentry.captureException(error)
-	})
+	return new SentryTransport()
 }

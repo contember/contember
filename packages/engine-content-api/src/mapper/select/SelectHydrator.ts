@@ -1,6 +1,7 @@
 import { Path } from './Path'
 import { Value } from '@contember/schema'
 import { getFulfilledValues, getRejections } from '../../utils'
+import { logger } from '@contember/engine-common'
 
 type DataPromises = {
 	path: Path
@@ -109,10 +110,7 @@ export class SelectHydrator {
 		const failures = getRejections(results)
 		if (failures.length > 0) {
 			if (failures.length > 1) {
-				// eslint-disable-next-line no-console
-				console.error('Multiple error has occurred, printing them & rethrowing the first one')
-				// eslint-disable-next-line no-console
-				failures.slice(1).map(e => console.error(e))
+				failures.slice(1).map(e => logger.error(e, null, { loc: 'SelectHydrator' }))
 			}
 			throw failures[0]
 		}

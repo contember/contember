@@ -1,7 +1,10 @@
 #!/usr/bin/env node
 
 import { createContainer, readConfig } from '@contember/engine-server'
-;(async () => {
+
+import { createLogger } from '@contember/engine-common';
+
+(async () => {
 	const { serverConfig, projectConfigResolver, tenantConfigResolver } = await readConfig()
 	const container = await createContainer({
 		debugMode: false,
@@ -9,6 +12,7 @@ import { createContainer, readConfig } from '@contember/engine-server'
 		projectConfigResolver,
 		tenantConfigResolver,
 		plugins: [],
+		logger: createLogger(),
 	})
 	await container.initializer.initialize()
 	const server = await container.koa.listen(serverConfig.port)

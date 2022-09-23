@@ -5,7 +5,6 @@ import {
 	createErrorListener,
 	createGraphQLQueryHandler,
 	createGraphqlRequestInfoProviderListener,
-	ErrorLogger,
 	GraphQLKoaState,
 	GraphQLQueryHandler,
 } from '../graphql'
@@ -16,7 +15,6 @@ export type TenantGraphQLHandler = GraphQLQueryHandler<TenantGraphQLContext>
 
 export class TenantGraphQLHandlerFactory {
 	constructor(
-		private readonly errorLogger: ErrorLogger,
 	) {}
 
 	create(resolvers: Schema.Resolvers): TenantGraphQLHandler {
@@ -28,15 +26,7 @@ export class TenantGraphQLHandlerFactory {
 		return createGraphQLQueryHandler<TenantGraphQLContext>({
 			schema,
 			listeners: [
-				createErrorListener((err, ctx) => {
-					this.errorLogger(err, {
-						body: ctx.koaContext.request.body as string,
-						url: ctx.koaContext.request.originalUrl,
-						user: ctx.identityId,
-						module: 'tenant',
-						project: undefined,
-					})
-				}),
+				createErrorListener(),
 				createGraphqlRequestInfoProviderListener(),
 			],
 		})

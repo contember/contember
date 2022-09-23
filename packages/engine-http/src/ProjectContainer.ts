@@ -7,6 +7,7 @@ import { Logger } from '@contember/engine-common'
 export interface ProjectContainer {
 	systemDatabaseContextFactory: DatabaseContextFactory
 	project: ProjectConfig
+	logger: Logger
 	connection: Connection
 	graphQlSchemaFactory: GraphQlSchemaFactory
 	contentSchemaResolver: ContentSchemaResolver
@@ -15,6 +16,6 @@ export interface ProjectContainer {
 export interface ProjectContainerResolver {
 	onCreate: ((container: ProjectContainer) => void | (() => void))[]
 
-	getProjectContainer(slug: string, options?: { alias?: boolean; logger?: Logger }): Promise<ProjectContainer | undefined>
+	getProjectContainer(slug: string, options?: { alias?: boolean }): Promise<ProjectContainer | undefined>
 }
 

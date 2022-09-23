@@ -37,8 +37,7 @@ export class ProjectGroupContainerResolver {
 				slug,
 			})
 			const cleanups = this.onCreate.map(it => it(container, slug) || (() => null))
-			// eslint-disable-next-line no-console
-			await container.tenantContainer.migrationsRunner.run(console.log)
+			await container.tenantContainer.migrationsRunner.run(container.logger.child())
 			return { container, inputConfig: config, cleanups }
 		})).container
 	}

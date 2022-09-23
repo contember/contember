@@ -1,46 +1,56 @@
 import * as Sentry from '@sentry/node'
+import { LoggerRequestSymbol } from '@contember/engine-http'
+import { LogEntry, LoggerHandler, LogLevel, LogLevels } from '@contember/logger'
 
-export const initSentry = (dsn?: string) => {
-	if (!dsn) {
-		return
+export class SentryLoggerHandler implements LoggerHandler {
+	constructor(
+		private readonly logLevel: LogLevel,
+	) {
 	}
-	// eslint-disable-next-line no-console
-	console.log(`Intializing sentry with dsn: ${dsn}`)
+
+	getMinLevel(): number {
+		return this.logLevel.value
+	}
+
+	handle(entry: LogEntry) {
+		if (!entry.error || entry.level.value < this.logLevel.value) {
+			return
+		}
+		Sentry.captureException(entry.error, scope => {
+			scope.setTag('project', entry.loggerAttributes.project ?? entry.ownAttributes.project)
+			scope.setTag('module', entry.loggerAttributes.module ?? entry.ownAttributes.module)
+			scope.setLevel('error')
+			scope.setUser({
+				id: entry.loggerAttributes.user ?? entry.ownAttributes.user,
+			})
+			scope.setExtra('requestId', entry.loggerAttributes.requestId)
+
+			scope.addEventProcessor(event => {
+				return {
+					...event,
+					request: {
+						url: entry.loggerAttributes.url ?? entry.ownAttributes.url,
+						data: entry.loggerAttributes[LoggerRequestSymbol]?.body,
+					},
+				}
+			})
+			return scope
+		})
+	}
+
+	close(): void {
+	}
+}
+
+export const createSentryLoggerHandler = (dsn?: string): null | LoggerHandler => {
+	if (!dsn) {
+		return null
+	}
 	Sentry.init({
 		dsn: dsn,
 		integrations: integrations => {
 			return integrations.filter(integration => integration.name !== 'Console' && integration.name !== 'Http')
 		},
 	})
-}
-
-interface SentryErrorContext {
-	user: string
-	body: string
-	project?: string
-	url: string
-	module: string
-}
-
-export const logSentryError = (error: any, context: SentryErrorContext) => {
-	Sentry.withScope(scope => {
-		if (context.project) {
-			scope.setTag('project', context.project)
-		}
-		scope.setTag('module', context.module)
-		scope.setLevel('error')
-		scope.setUser({
-			id: context.user,
-		})
-		scope.addEventProcessor(event => {
-			return {
-				...event,
-				request: {
-					url: context.url,
-					data: context.body,
-				},
-			}
-		})
-		Sentry.captureException(error)
-	})
+	return new SentryLoggerHandler(LogLevels.warn)
 }

@@ -1,5 +1,6 @@
 import { KoaMiddleware } from '../koa'
 import { Readable } from 'stream'
+import { LoggerMiddlewareState } from './LoggerMiddleware'
 
 type EventTime = { label: string; start: number; duration?: number }
 
@@ -10,8 +11,8 @@ export interface TimerMiddlewareState {
 	sendServerTimingHeader: boolean
 }
 
-export const createTimerMiddleware = ({ debugMode }: { debugMode: boolean }): KoaMiddleware<TimerMiddlewareState> => {
-	const timer: KoaMiddleware<TimerMiddlewareState> = async (ctx, next) => {
+export const createTimerMiddleware = ({ debugMode }: { debugMode: boolean }): KoaMiddleware<TimerMiddlewareState & LoggerMiddlewareState> => {
+	const timer: KoaMiddleware<TimerMiddlewareState & LoggerMiddlewareState> = async (ctx, next) => {
 		const times: EventTime[] = []
 		const globalStart = new Date().getTime()
 		ctx.state.timer = async (name: string, cb) => {
@@ -34,17 +35,16 @@ export const createTimerMiddleware = ({ debugMode }: { debugMode: boolean }): Ko
 			ctx.response.set('server-timing', times.map(it => `${it.label};desc="${it.label} T+${it.start}";dur=${it.duration ?? -1}`).join(', '))
 		}
 
-		const emit = () => {
-			const eventsDescription = times
-				.map(it => `${it.label} T+${it.start}ms ${it.duration !== undefined ? it.duration : '[unknown]'}ms`)
-				.join('; ')
 
+		const emit = () => {
 			const total = new Date().getTime() - globalStart
 			const timeLabel = total > 500 ? 'TIME_SLOW' : 'TIME_OK'
-			// eslint-disable-next-line no-console
-			console.log(
-				`${ctx.request.method} ${ctx.request.url} [${ctx.response.status}] ${ctx.req.connection.remoteAddress} ${timeLabel} ${total}ms (${eventsDescription})`,
-			)
+			ctx.state.logger.info(ctx.response.status < 400 ? `Request successful` : 'Request failed', {
+				status: ctx.response.status,
+				timeLabel: timeLabel,
+				totalTimeMs: total,
+				events: times,
+			})
 		}
 
 		if (ctx.response.body instanceof Readable) {

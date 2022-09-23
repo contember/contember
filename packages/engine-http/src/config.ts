@@ -8,7 +8,7 @@ export type ProjectConfig = {
 	readonly db:
 		& DatabaseConfig
 		& {
-			pool?: PoolConfig
+			pool?: Omit<PoolConfig, 'logError'>
 			systemSchema?: string
 		}
 } & Record<string, unknown>

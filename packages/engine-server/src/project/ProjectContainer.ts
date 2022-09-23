@@ -10,6 +10,7 @@ import {
 	ProjectContainer,
 	Providers,
 } from '@contember/engine-http'
+import { Logger } from '@contember/logger'
 
 export class ProjectContainerFactoryFactory {
 	constructor(
@@ -19,8 +20,8 @@ export class ProjectContainerFactoryFactory {
 	) {
 	}
 
-	create(schemaVersionBuilder: SchemaVersionBuilder): ProjectContainerFactory {
-		return new ProjectContainerFactory(this.debug, this.plugins, schemaVersionBuilder, this.providers)
+	create(schemaVersionBuilder: SchemaVersionBuilder, logger: Logger): ProjectContainerFactory {
+		return new ProjectContainerFactory(this.debug, this.plugins, schemaVersionBuilder, this.providers, logger)
 	}
 }
 
@@ -34,6 +35,7 @@ export class ProjectContainerFactory {
 		private readonly plugins: Plugin[],
 		private readonly schemaVersionBuilder: SchemaVersionBuilder,
 		private readonly providers: Providers,
+		private readonly logger: Logger,
 	) {}
 
 	public createContainer(args: ProjectContainerFactoryArgs): ProjectContainer {
@@ -45,6 +47,7 @@ export class ProjectContainerFactory {
 				'systemDatabaseContextFactory',
 				'contentSchemaResolver',
 				'graphQlSchemaFactory',
+				'logger',
 			)
 	}
 
@@ -54,10 +57,12 @@ export class ProjectContainerFactory {
 				this.providers)
 			.addService('schemaVersionBuilder', () =>
 				this.schemaVersionBuilder)
+			.addService('logger', () =>
+				this.logger.child({ project: project.slug }))
 			.addService('project', () =>
 				project)
-			.addService('connection', ({ project }) =>
-				Connection.create(project.db))
+			.addService('connection', ({ project, logger }) =>
+				Connection.create(project.db, err => logger.error(err)))
 			.addService('graphQlSchemaBuilderFactory', () =>
 				new GraphQlSchemaBuilderFactory())
 			.addService('permissionsByIdentityFactory', ({}) =>

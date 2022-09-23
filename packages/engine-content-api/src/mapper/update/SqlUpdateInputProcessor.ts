@@ -2,7 +2,6 @@ import { Input, Model, Value } from '@contember/schema'
 import { Mapper } from '../Mapper'
 import { UpdateBuilder } from './UpdateBuilder'
 import { UpdateInputProcessor } from '../../inputProcessing'
-import * as Context from '../../inputProcessing'
 import {
 	ConstraintType,
 	getInsertPrimary,
@@ -17,6 +16,7 @@ import { hasManyProcessor, hasOneProcessor } from '../MutationProcessorHelper'
 import { AbortUpdate } from './Updater'
 import { ImplementationException } from '../../exception'
 import { CheckedPrimary } from '../CheckedPrimary'
+import { logger } from '@contember/logger'
 
 export class SqlUpdateInputProcessor implements UpdateInputProcessor<MutationResultList> {
 	constructor(
@@ -228,10 +228,7 @@ export class SqlUpdateInputProcessor implements UpdateInputProcessor<MutationRes
 				return [new MutationConstraintViolationError([], ConstraintType.notNull)]
 			}
 			if (relation.joiningColumn.onDelete === Model.OnDelete.restrict) {
-				// eslint-disable-next-line no-console
-				console.error(
-					'[DEPRECATED] You are deleting an entity over the relation where onDelete behaviour is set to restrict. This will fail in next version.',
-				)
+				logger.warn('You are deleting an entity over the relation where onDelete behaviour is set to restrict. This will fail in next version.', { loc: 'SqlUpdateInputProcessor' })
 				this.updateBuilder.addFieldValue(relation.name, null)
 			}
 			const inversePrimary = await this.mapper.selectField(
@@ -490,10 +487,7 @@ export class SqlUpdateInputProcessor implements UpdateInputProcessor<MutationRes
 				return [new MutationConstraintViolationError([], ConstraintType.notNull)]
 			}
 			if (relation.joiningColumn.onDelete === Model.OnDelete.restrict) {
-				// eslint-disable-next-line no-console
-				console.error(
-					'[DEPRECATED] You are deleting an entity over the relation where onDelete behaviour is set to restrict. This will fail in next version.',
-				)
+				logger.warn('You are deleting an entity over the relation where onDelete behaviour is set to restrict. This will fail in next version.', { loc: 'SqlUpdateInputProcessor' })
 				this.updateBuilder.addFieldValue(relation.name, null)
 			}
 			const targetPrimary = await this.mapper.selectField(

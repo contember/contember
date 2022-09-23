@@ -4,30 +4,19 @@ import {
 	createErrorListener,
 	createGraphQLQueryHandler,
 	createGraphqlRequestInfoProviderListener,
-	ErrorLogger,
-	GraphQLListener, GraphQLQueryHandler,
+	GraphQLListener,
+	GraphQLQueryHandler,
 } from '../graphql'
 import { ExtendedGraphqlContext } from './ContentGraphQLContextFactory'
 
 export type ContentQueryHandler = GraphQLQueryHandler<ExtendedGraphqlContext>
 
 export class ContentQueryHandlerFactory {
-	constructor(
-		private readonly debug: boolean,
-		private readonly errorLogger: ErrorLogger,
-	) {}
+	constructor(private readonly debug: boolean) {}
 
-	public create(graphQlSchema: GraphQLSchema, projectSlug: string): ContentQueryHandler {
+	public create(graphQlSchema: GraphQLSchema): ContentQueryHandler {
 		const listeners: GraphQLListener<ExtendedGraphqlContext>[] = [
-			createErrorListener((err, ctx) => {
-				this.errorLogger(err, {
-					body: ctx.koaContext.request.body as string,
-					url: ctx.koaContext.request.originalUrl,
-					user: ctx.identityId,
-					module: 'content',
-					project: projectSlug,
-				})
-			}),
+			createErrorListener(),
 			createGraphqlRequestInfoProviderListener(),
 		]
 		listeners.push(createDbQueriesListener(context => context.db, this.debug))

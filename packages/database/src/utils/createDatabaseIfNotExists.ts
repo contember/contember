@@ -2,9 +2,9 @@ import { DatabaseConfig } from '../types'
 import { ClientError, ClientErrorCodes, Connection } from '../client'
 import { wrapIdentifier } from './sql'
 
-export const createDatabaseIfNotExists = async (db: DatabaseConfig, log: (message: string) => void) => {
+export const createDatabaseIfNotExists = async (db: DatabaseConfig, log: (message: string | Error) => void) => {
 	try {
-		const connection = Connection.createSingle(db)
+		const connection = Connection.createSingle(db, log)
 		await connection.query('SELECT 1')
 		await connection.end()
 		return
@@ -15,7 +15,7 @@ export const createDatabaseIfNotExists = async (db: DatabaseConfig, log: (messag
 	}
 
 	log(`Database ${db.database} does not exist, attempting to create it...`)
-	const connection = Connection.createSingle({ ...db, database: 'postgres' })
+	const connection = Connection.createSingle({ ...db, database: 'postgres' }, log)
 	await connection.query(`CREATE DATABASE ${wrapIdentifier(db.database)}`)
 	await connection.end()
 }

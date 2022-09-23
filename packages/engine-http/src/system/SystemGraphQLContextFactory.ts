@@ -21,8 +21,11 @@ export class SystemGraphQLContextFactory {
 		)
 		const dbContextFactory = projectContainer.systemDatabaseContextFactory
 
+		const dbContext = dbContextFactory.create()
+		const schema = await projectContainer.contentSchemaResolver.getSchema(dbContext)
 		const systemContext = await systemContainer.resolverContextFactory.create(
-			dbContextFactory.create(),
+			schema,
+			dbContext,
 			projectContainer.project,
 			identity,
 		)

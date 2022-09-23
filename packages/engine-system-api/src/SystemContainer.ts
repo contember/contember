@@ -118,7 +118,7 @@ export class SystemContainerFactory {
 				new EventOldValuesResolver())
 			.addService('systemResolversFactory', ({ stagesQueryResolver, executedMigrationsQueryResolver, migrateMutationResolver, truncateMutationResolver, migrationAlterMutationResolver, eventsQueryResolver, eventOldValuesResolver }) =>
 				new ResolverFactory(stagesQueryResolver, executedMigrationsQueryResolver, migrateMutationResolver, truncateMutationResolver, migrationAlterMutationResolver, eventsQueryResolver, eventOldValuesResolver))
-			.addService('resolverContextFactory', ({ authorizator, schemaVersionBuilder }) =>
-				new SystemResolverContextFactory(authorizator, schemaVersionBuilder))
+			.addService('resolverContextFactory', ({ authorizator }) =>
+				new SystemResolverContextFactory(authorizator))
 	}
 }

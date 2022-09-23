@@ -1,8 +1,9 @@
-import { Connection, createDatabaseIfNotExists, DatabaseConfig } from '@contember/database'
+import { Connection, createDatabaseIfNotExists, DatabaseConfig, EventManager } from '@contember/database'
 import { TenantMigrationArgs } from './types'
 import { loadMigrations, Migration, MigrationsRunner as DbMigrationsRunner } from '@contember/database-migrations'
 import tenantCredentials from './2020-06-08-134000-tenant-credentials'
 import { computeTokenHash, Providers } from '../model'
+import { Logger } from '@contember/logger'
 
 export interface TenantCredentials {
 	loginToken?: string
@@ -27,12 +28,12 @@ export class TenantMigrationsRunner {
 	) {
 	}
 
-	public async run(log: (msg: string) => void): Promise<{ name: string }[]> {
-		await createDatabaseIfNotExists(this.db, log)
-		const connection = Connection.createSingle(this.db)
+	public async run(logger: Logger): Promise<{ name: string }[]> {
+		await createDatabaseIfNotExists(this.db, message => typeof message === 'string' ? logger.warn(message) : logger.error(message))
+		const connection = Connection.createSingle(this.db, err => logger.error(err))
 		const result = await connection.scope(async connection => {
 			const innerRunner = new DbMigrationsRunner<TenantMigrationArgs>(connection, this.schema, getMigrations)
-			return await innerRunner.migrate(log, {
+			return await innerRunner.migrate(message => logger.warn(message), {
 				getCredentials: async () => ({
 					loginTokenHash: this.tenantCredentials.loginToken ? computeTokenHash(this.tenantCredentials.loginToken) : undefined,
 					rootTokenHash: this.tenantCredentials.rootTokenHash

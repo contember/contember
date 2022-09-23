@@ -25,6 +25,7 @@ it('acquires and releases new connection from pool', async () => {
 	const logger = createPoolLogger()
 	const pool = new Pool(() => new PgClientMock() as unknown as PgClient, {
 		log: logger,
+		logError: () => null,
 	})
 	const connection = await pool.acquire()
 	await pool.release(connection)
@@ -46,6 +47,7 @@ it('disposes connection when maxIdle is reached', async () => {
 	const logger = createPoolLogger()
 	const pool = new Pool(() => new PgClientMock() as unknown as PgClient, {
 		log: logger,
+		logError: () => null,
 		maxIdle: 0,
 	})
 	const connection = await pool.acquire()
@@ -67,6 +69,7 @@ it('disposes connection after max uses', async () => {
 	const logger = createPoolLogger()
 	const pool = new Pool(() => new PgClientMock() as unknown as PgClient, {
 		log: logger,
+		logError: () => null,
 		maxUses: 1,
 	})
 	const connection = await pool.acquire()
@@ -89,6 +92,7 @@ it('disposes errored connection', async () => {
 	const logger = createPoolLogger()
 	const pool = new Pool(() => new PgClientMock() as unknown as PgClient, {
 		log: logger,
+		logError: () => null,
 		maxIdle: 0,
 	})
 	const connection = await pool.acquire()
@@ -114,6 +118,7 @@ it('time outs when waiting for a connection', async () => {
 	clientMock.connections.push(createSuccessfulPromise(5))
 	const pool = new Pool(() => clientMock as unknown as PgClient, {
 		log: logger,
+		logError: () => null,
 		acquireTimeoutMs: 2,
 	})
 	await expect(pool.acquire.bind(pool)).rejects.toThrowError('Failed to acquire a connection')
@@ -135,6 +140,7 @@ it('acquires idle connection from pool', async () => {
 	const logger = createPoolLogger()
 	const pool = new Pool(() => new PgClientMock() as unknown as PgClient, {
 		log: logger,
+		logError: () => null,
 	})
 	const connection = await pool.acquire()
 	await pool.release(connection)
@@ -154,6 +160,7 @@ it('acquires multiple new connections from pool', async () => {
 	const logger = createPoolLogger()
 	const pool = new Pool(() => new PgClientMock() as unknown as PgClient, {
 		log: logger,
+		logError: () => null,
 	})
 	const conn1 = await pool.acquire()
 	const conn2 = await pool.acquire()
@@ -184,6 +191,7 @@ it('releases idle connection', async () => {
 	const logger = createPoolLogger()
 	const pool = new Pool(() => new PgClientMock() as unknown as PgClient, {
 		log: logger,
+		logError: () => null,
 		idleTimeoutMs: 2,
 	})
 	const conn1 = await pool.acquire()
@@ -208,6 +216,7 @@ it('waits for idle connection when pool is full', async () => {
 	const pool = new Pool(() => new PgClientMock() as unknown as PgClient, {
 		maxConnections: 1,
 		log: logger,
+		logError: () => null,
 	})
 	const conn1 = await pool.acquire()
 	setTimeout(async () => {
@@ -241,6 +250,7 @@ it('tries to reconnect on recoverable error', async () => {
 	})
 	const pool = new Pool(() => pgClientMock as unknown as PgClient, {
 		log: logger,
+		logError: () => null,
 	})
 	pgClientMock.connections.push(createRecoverableErrorPromise(), createRecoverableErrorPromise())
 	await pool.acquire()
@@ -272,6 +282,7 @@ it('fails to reconnect on recoverable error', async () => {
 	})
 	const pool = new Pool(() => pgClientMock as unknown as PgClient, {
 		log: logger,
+		logError: () => null,
 		reconnectIntervalMs: 5,
 		acquireTimeoutMs: 10,
 	})
@@ -301,6 +312,7 @@ it('fails to reconnect on unrecoverable error', async () => {
 	})
 	const pool = new Pool(() => pgClientMock as unknown as PgClient, {
 		log: logger,
+		logError: () => null,
 	})
 	pool.on('error', () => {
 

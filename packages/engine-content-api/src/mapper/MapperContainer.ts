@@ -3,9 +3,9 @@ import {
 	ConditionBuilder,
 	FieldsVisitorFactory,
 	JoinBuilder,
-	RelationFetcher,
 	MetaHandler,
 	OrderByBuilder,
+	RelationFetcher,
 	WhereBuilder,
 } from './select'
 import { UniqueWhereExpander } from '../inputProcessing'

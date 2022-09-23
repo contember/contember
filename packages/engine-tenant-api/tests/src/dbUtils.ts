@@ -18,6 +18,7 @@ export const createConnection = (dbName: string): Connection => {
 				maxConnections: 1,
 			},
 		},
+		err => null,
 	)
 }
 

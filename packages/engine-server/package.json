@@ -21,6 +21,7 @@
     "@contember/engine-system-api": "^1.2.0-alpha.15",
     "@contember/engine-tenant-api": "^1.2.0-alpha.15",
     "@contember/engine-vimeo-plugin": "^1.2.0-alpha.15",
+    "@contember/logger": "0.0.0",
     "@contember/queryable": "^1.2.0-alpha.15",
     "@contember/schema": "^1.2.0-alpha.15",
     "@contember/schema-definition": "^1.2.0-alpha.15",

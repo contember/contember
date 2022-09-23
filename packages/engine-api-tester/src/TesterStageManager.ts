@@ -1,5 +1,4 @@
 import { SelectBuilder } from '@contember/database'
-import { Logger } from '@contember/engine-common'
 import {
 	DatabaseContext, formatSchemaName,
 	MigrationsResolver,

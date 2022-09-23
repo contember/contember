@@ -4,7 +4,6 @@ import {
 	createErrorListener,
 	createGraphQLQueryHandler,
 	createGraphqlRequestInfoProviderListener,
-	ErrorLogger,
 	GraphQLKoaState,
 	GraphQLListener,
 	GraphQLQueryHandler,
@@ -26,7 +25,6 @@ export type SystemGraphQLHandler = GraphQLQueryHandler<SystemGraphQLContext>
 
 export class SystemGraphQLHandlerFactory {
 	constructor(
-		private readonly errorLogger: ErrorLogger,
 		private readonly debugMode: boolean,
 	) {
 	}
@@ -44,15 +42,7 @@ export class SystemGraphQLHandlerFactory {
 		})
 
 		const listeners: GraphQLListener<SystemGraphQLContext>[] = [
-			createErrorListener((err, ctx) => {
-				this.errorLogger(err, {
-					body: ctx.koaContext.request.body as string,
-					url: ctx.koaContext.request.originalUrl,
-					user: ctx.identity.id,
-					module: 'system',
-					project: ctx.project.slug,
-				})
-			}),
+			createErrorListener(),
 			createGraphqlRequestInfoProviderListener(),
 		]
 		if (this.debugMode) {

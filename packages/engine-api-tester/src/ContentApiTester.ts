@@ -1,10 +1,7 @@
-import {
-	DatabaseContext,
-	SchemaVersionBuilder,
-	setupSystemVariables,
-} from '@contember/engine-system-api'
+import { DatabaseContext, SchemaVersionBuilder, setupSystemVariables } from '@contember/engine-system-api'
 import { AllowAllPermissionFactory } from '@contember/schema-utils'
 import {
+	Authorizator,
 	Context as ContentContext,
 	ExecutionContainerFactory,
 	GraphQlSchemaBuilderFactory,
@@ -14,7 +11,6 @@ import { TesterStageManager } from './TesterStageManager'
 import { Schema } from '@contember/schema'
 import { createUuidGenerator } from './testUuid'
 import { getArgumentValues } from 'graphql/execution/values'
-import { Authorizator } from '@contember/engine-content-api'
 
 export class ContentApiTester {
 	private trxUuidGenerator = createUuidGenerator('a453')

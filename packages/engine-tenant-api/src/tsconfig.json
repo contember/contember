@@ -6,31 +6,34 @@
 	},
 	"references": [
 		{
+			"path": "../../authorization/src"
+		},
+		{
 			"path": "../../config-loader/src"
-		},
-		{
-			"path": "../../typesafe/src"
-		},
-		{
-			"path": "../../queryable/src"
 		},
 		{
 			"path": "../../database/src"
 		},
 		{
-			"path": "../../authorization/src"
-		},
-		{
 			"path": "../../dic/src"
 		},
 		{
-			"path": "../../schema/src"
+			"path": "../../logger/src"
 		},
 		{
 			"path": "../../graphql-utils/src"
 		},
 		{
+			"path": "../../queryable/src"
+		},
+		{
+			"path": "../../schema/src"
+		},
+		{
 			"path": "../../schema-utils/src"
+		},
+		{
+			"path": "../../typesafe/src"
 		}
 	]
 }

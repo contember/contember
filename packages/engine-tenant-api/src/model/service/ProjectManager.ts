@@ -15,6 +15,7 @@ import { ProjectRole } from '@contember/schema'
 import { ApiKeyService, CreateApiKeyResult } from './apiKey'
 import { Response, ResponseError, ResponseOk } from '../utils/Response'
 import { CreateProjectResponseErrorCode } from '../../schema'
+import { Logger } from '@contember/logger'
 
 export class ProjectManager {
 	constructor(
@@ -25,6 +26,7 @@ export class ProjectManager {
 
 	public async createProject(
 		dbContext: DatabaseContext,
+		logger: Logger,
 		project: Pick<ProjectWithSecrets, 'name' | 'slug' | 'config' | 'secrets'>,
 		options: {
 			ownerIdentityId?: string
@@ -63,10 +65,9 @@ export class ProjectManager {
 					id: projectId,
 					...project,
 					updatedAt: now,
-				})
+				}, logger)
 			} catch (e) {
-				// eslint-disable-next-line no-console
-				console.error(e)
+				logger.error(e, { message: 'Project initialization failed' })
 				await db.client.connection.rollback()
 				return new ResponseError(
 					CreateProjectResponseErrorCode.InitError,

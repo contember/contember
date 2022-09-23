@@ -14,6 +14,7 @@ const defaultOptions: RetryOptions = {
 
 export const retryTransaction = async <R>(
 	cb: () => Promise<R> | R,
+	logger: (message: string) => void,
 	options: Partial<RetryOptions> = {},
 ): Promise<R> => {
 	let attempt = 0
@@ -36,11 +37,9 @@ export const retryTransaction = async <R>(
 			}
 			if (attempt < maxAttempts) {
 				const timeoutMs = await timeout(attempt)
-				// eslint-disable-next-line no-console
-				console.error(`RETRY: Serialization failure (attempt #${attempt}, retrying after ${timeoutMs}ms)`)
+				logger(`RETRY: Serialization failure (attempt #${attempt}, retrying after ${timeoutMs}ms)`)
 			} else {
-				// eslint-disable-next-line no-console
-				console.error(`ABORT: Serialization failure (attempt #${attempt})`)
+				logger(`ABORT: Serialization failure (attempt #${attempt})`)
 				throw e
 			}
 		}

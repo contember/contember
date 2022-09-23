@@ -4,6 +4,7 @@ import * as SMTPTransport from 'nodemailer/lib/smtp-transport'
 import * as SMTPPool from 'nodemailer/lib/smtp-pool'
 import * as SendmailTransport from 'nodemailer/lib/sendmail-transport'
 import * as SESTransport from 'nodemailer/lib/ses-transport'
+import { logger } from '@contember/logger'
 
 export { MailMessage }
 
@@ -33,10 +34,7 @@ export class NodeMailer implements Mailer {
 		try {
 			return await this.transport.sendMail({ ...message, from: message.from || this.from })
 		} catch (e) {
-			// eslint-disable-next-line no-console
-			console.log('Failed to send an email: \n' + JSON.stringify(message))
-			// eslint-disable-next-line no-console
-			console.error(e)
+			logger.error(e, { message: 'Mail sending failed', mail: message })
 			return { error: e }
 		}
 	}

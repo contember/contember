@@ -11,12 +11,12 @@ import { makeExecutableSchema } from '@graphql-tools/schema'
 import { ContentApiTester } from './ContentApiTester'
 import { SystemApiTester } from './SystemApiTester'
 import { TesterStageManager } from './TesterStageManager'
-import { Client, Connection } from '@contember/database'
+import { Client } from '@contember/database'
 import { createUuidGenerator } from './testUuid'
 import { project } from './project'
 import { createConnection, dbCredentials, recreateDatabase } from './dbUtils'
 import { join } from 'path'
-import { Logger } from '@contember/engine-common'
+import { createLogger, JsonStreamLoggerHandler, NullLoggerHandler } from '@contember/logger'
 
 export class ApiTester {
 	public static project = project
@@ -74,7 +74,7 @@ export class ApiTester {
 
 		const db = databaseContextFactory.create()
 
-		await systemContainer.projectInitializer.initialize(databaseContextFactory, { ...projectConfig, db: projectDbCredentials }, new Logger(() => null))
+		await systemContainer.projectInitializer.initialize(databaseContextFactory, { ...projectConfig, db: projectDbCredentials }, createLogger(new JsonStreamLoggerHandler(process.stderr)))
 
 		const systemSchema = makeExecutableSchema({
 			typeDefs: systemTypeDefs,

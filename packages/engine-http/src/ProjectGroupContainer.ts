@@ -10,10 +10,12 @@ import { Authenticator } from './common'
 import { TenantGraphQLHandler } from './tenant'
 import { SystemGraphQLHandler } from './system'
 import { ProjectMembershipResolver } from './content'
+import { Logger } from '@contember/logger'
 
 export interface ProjectGroupContainer {
 	slug: string | undefined
 
+	logger: Logger
 	authenticator: Authenticator
 	projectMembershipResolver: ProjectMembershipResolver
 

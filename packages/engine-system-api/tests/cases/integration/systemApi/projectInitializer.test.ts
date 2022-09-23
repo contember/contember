@@ -1,10 +1,10 @@
 import { ApiTester } from '@contember/engine-api-tester'
 import { ProjectConfig, StageConfig } from '../../../../src'
 import { assert, test } from 'vitest'
+import { createLogger, JsonStreamLoggerHandler } from '@contember/logger'
 
-import { Logger } from '@contember/engine-common'
 
-const nullLogger = new Logger(() => {})
+const logger = createLogger(new JsonStreamLoggerHandler(process.stderr))
 
 test('create stage', async () => {
 	const prodStage: StageConfig = {
@@ -22,7 +22,7 @@ test('create stage', async () => {
 		},
 	})
 
-	await tester.systemContainer.projectInitializer.initialize(tester.databaseContextFactory, project, nullLogger)
+	await tester.systemContainer.projectInitializer.initialize(tester.databaseContextFactory, project, logger)
 	const createdStagesA = await tester.stages.refreshCreatedStages()
 	assert.ok(createdStagesA.has('prod'))
 

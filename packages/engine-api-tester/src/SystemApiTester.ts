@@ -30,8 +30,8 @@ export class SystemApiTester {
 	): Promise<any> {
 		await setupSystemVariables(this.db.client, unnamedIdentity, { uuid: this.uuidGenerator })
 		const identity = options.identity || new Identity(testUuid(888), options.roles || [ProjectRole.ADMIN])
-
-		const context = await this.systemContainer.resolverContextFactory.create(this.db, this.project, identity)
+		const schema = await this.systemContainer.schemaVersionBuilder.buildSchema(this.db)
+		const context = await this.systemContainer.resolverContextFactory.create(schema, this.db, this.project, identity)
 		const result = await graphql({
 			schema: this.systemSchema,
 			source: gql,

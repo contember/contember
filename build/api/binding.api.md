@@ -71,9 +71,11 @@ export interface AccessorTreeStateMetadata {
 // @public (undocumented)
 export interface AccessorTreeStateOptions {
     // (undocumented)
-    nodeTree: ReactNode;
+    children?: ReactNode;
     // (undocumented)
     refreshOnPersist?: boolean;
+    // (undocumented)
+    skipStateUpdateAfterPersist?: boolean;
 }
 
 // @public (undocumented)
@@ -138,8 +140,6 @@ export interface BindingConfig {
     // (undocumented)
     beforeUpdateSettleLimit: number;
     // (undocumented)
-    maxPersistAttempts: number;
-    // (undocumented)
     persistSuccessSettleLimit: number;
 }
 
@@ -202,7 +202,9 @@ export function Component<Props extends {}, NonStaticPropNames extends keyof Pro
 // @public (undocumented)
 export class DataBinding {
     // Warning: (ae-forgotten-export) The symbol "TreeStore" needs to be exported by the entry point index.d.ts
-    constructor(contentApiClient: GraphQlClient, systemApiClient: GraphQlClient, tenantApiClient: GraphQlClient, treeStore: TreeStore, environment: Environment, onUpdate: (newData: TreeRootAccessor, binding: DataBinding) => void, onError: (error: RequestError, binding: DataBinding) => void, onPersistSuccess: (result: SuccessfulPersistResult, binding: DataBinding) => void);
+    constructor(contentApiClient: GraphQlClient, systemApiClient: GraphQlClient, tenantApiClient: GraphQlClient, treeStore: TreeStore, environment: Environment, onUpdate: (newData: TreeRootAccessor, binding: DataBinding) => void, onError: (error: RequestError, binding: DataBinding) => void, onPersistSuccess: (result: SuccessfulPersistResult, binding: DataBinding) => void, options: {
+        skipStateUpdateAfterPersist: boolean;
+    });
     // (undocumented)
     extendTree(newFragment: ReactNode, options?: ExtendTreeOptions): Promise<TreeRootId | undefined>;
 }
@@ -214,12 +216,7 @@ export const DataBindingExtendAborted: unique symbol;
 export const DataBindingProvider: <StateProps>(props: DataBindingProviderProps<StateProps>) => ReactElement;
 
 // @public (undocumented)
-export interface DataBindingProviderBaseProps {
-    // (undocumented)
-    children?: ReactNode;
-    // (undocumented)
-    refreshOnPersist?: boolean;
-}
+export type DataBindingProviderBaseProps = AccessorTreeStateOptions;
 
 // @public (undocumented)
 export type DataBindingProviderProps<StateProps> = DataBindingProviderBaseProps & ({} | {
@@ -967,7 +964,7 @@ export interface ErrorAccessorTreeState {
 export type ErrorPathNodeType = FieldPathErrorFragment | IndexPathErrorFragment;
 
 // @public (undocumented)
-export type ErrorPersistResult = InvalidInputPersistResult | GivenUpPersistResult | RequestError | InvalidResponseResult;
+export type ErrorPersistResult = InvalidInputPersistResult | RequestError | InvalidResponseResult;
 
 // Warning: (ae-forgotten-export) The symbol "GenericEventsMap" needs to be exported by the entry point index.d.ts
 //
@@ -1217,12 +1214,6 @@ export type GetEntityListSubTree = (parametersOrAlias: Alias | SugaredQualifiedE
 
 // @public (undocumented)
 export type GetEntitySubTree = (parametersOrAlias: Alias | SugaredQualifiedSingleEntity | SugaredUnconstrainedQualifiedSingleEntity, treeId?: TreeRootId, environment?: Environment) => EntityAccessor;
-
-// @public (undocumented)
-export interface GivenUpPersistResult {
-    // (undocumented)
-    type: 'givenUp';
-}
 
 // @public (undocumented)
 export interface GqlError {
@@ -1705,10 +1696,6 @@ export type PersistedEntityDataStore = Map<UniqueEntityId, SingleEntityPersisted
 
 // @public (undocumented)
 export interface PersistErrorOptions extends AsyncBatchUpdatesOptions {
-    // (undocumented)
-    attemptNumber: number;
-    // (undocumented)
-    tryAgain: ScheduleAnotherPersist;
 }
 
 // @public (undocumented)
@@ -2592,7 +2579,7 @@ export function useAccessorUpdateSubscription(getAccessor: () => EntityListAcces
 export const useBindingOperations: () => BindingOperations;
 
 // @public (undocumented)
-export const useDataBinding: ({ nodeTree, refreshOnPersist, }: AccessorTreeStateOptions) => AccessorTreeState;
+export const useDataBinding: ({ children, refreshOnPersist, skipStateUpdateAfterPersist, }: AccessorTreeStateOptions) => AccessorTreeState;
 
 // @public @deprecated
 export const useDerivedField: <SourceValue extends FieldValue = FieldValue>(sourceField: string | SugaredRelativeSingleField, derivedField: string | SugaredRelativeSingleField, transform?: (sourceValue: SourceValue | null) => SourceValue | null, agent?: string) => void;

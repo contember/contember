@@ -101,8 +101,8 @@ export class ProjectGroupContainerFactory {
 					config,
 				))
 
-			.setupService('projectSchemaResolver', (it, { projectContainerResolver, schemaVersionBuilder }) => {
-				it.setResolver(new ProjectSchemaResolver(projectContainerResolver, schemaVersionBuilder))
+			.setupService('projectSchemaResolver', (it, { projectContainerResolver }) => {
+				it.setResolver(new ProjectSchemaResolver(projectContainerResolver))
 			})
 			.setupService('projectInitializer', (it, { projectContainerResolver }) => {
 				it.setInitializer(new ProjectInitializer(projectContainerResolver))

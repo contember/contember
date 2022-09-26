@@ -22,6 +22,7 @@ export class TreeAugmenter {
 		private readonly eventManager: EventManager,
 		private readonly stateInitializer: StateInitializer,
 		private readonly treeStore: TreeStore,
+		private readonly skipStateUpdateAfterPersist: boolean = false,
 	) {}
 
 	public extendPersistedData(newPersistedData: ReceivedDataTree, markerTree: MarkerTreeRoot) {
@@ -43,7 +44,9 @@ export class TreeAugmenter {
 
 	public updatePersistedData(response: ReceivedDataTree, operations: SubMutationOperation[]) {
 		this.treeStore.mergeInMutationResponse(response, operations)
-
+		if (this.skipStateUpdateAfterPersist) {
+			return
+		}
 		this.eventManager.syncTransaction(() => {
 			for (const rootStates of this.treeStore.subTreeStatesByRoot.values()) {
 				// for (const rootPlaceholder in response) {

@@ -21,11 +21,16 @@ export type EditPageProps =
 		redirectOnSuccess?: RedirectOnSuccessTarget
 		rendererProps?: LayoutRendererProps
 		refreshDataBindingOnPersist?: boolean
+		skipBindingStateUpdateAfterPersist?: boolean
 	}
 
 const EditPage: Partial<PageProvider<EditPageProps>> & ComponentType<EditPageProps> = memo(
-	({ pageName, children, rendererProps, redirectOnSuccess, onPersistSuccess, refreshDataBindingOnPersist, ...entityProps }: EditPageProps) => (
-		<DataBindingProvider stateComponent={FeedbackRenderer} refreshOnPersist={refreshDataBindingOnPersist ?? true}>
+	({ pageName, children, rendererProps, redirectOnSuccess, onPersistSuccess, refreshDataBindingOnPersist, skipBindingStateUpdateAfterPersist, ...entityProps }: EditPageProps) => (
+		<DataBindingProvider
+			stateComponent={FeedbackRenderer}
+			refreshOnPersist={refreshDataBindingOnPersist ?? true}
+			skipStateUpdateAfterPersist={skipBindingStateUpdateAfterPersist}
+		>
 			<EntitySubTree {...entityProps} onPersistSuccess={useOnPersistSuccess({ redirectOnSuccess, onPersistSuccess })}>
 				<NotFoundWrapper title={rendererProps?.title}>
 					<LayoutRenderer {...rendererProps} actions={rendererProps?.actions ?? <PersistButton />}>

@@ -1,10 +1,8 @@
 import { ComponentType, createElement, memo, ReactElement, ReactNode } from 'react'
-import { AccessorTree, AccessorTreeState, useDataBinding } from '../accessorTree'
+import { AccessorTree, AccessorTreeState, AccessorTreeStateOptions, useDataBinding } from '../accessorTree'
 
-export interface DataBindingProviderBaseProps {
-	children?: ReactNode
-	refreshOnPersist?: boolean
-}
+export type DataBindingProviderBaseProps  =
+	& AccessorTreeStateOptions
 
 export interface DataBindingStateComponentProps {
 	accessorTreeState: AccessorTreeState
@@ -23,10 +21,7 @@ export type DataBindingProviderProps<StateProps> = DataBindingProviderBaseProps 
 export const DataBindingProvider = memo(function DataBindingProvider<StateProps extends DataBindingStateComponentProps>(
 	props: DataBindingProviderProps<StateProps>,
 ) {
-	const accessorTreeState = useDataBinding({
-		nodeTree: props.children,
-		refreshOnPersist: props.refreshOnPersist ?? false,
-	})
+	const accessorTreeState = useDataBinding(props)
 
 	const children =
 		'stateComponent' in props && props.stateComponent

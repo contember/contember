@@ -1522,6 +1522,7 @@ export type EditPageProps = SugaredQualifiedSingleEntity & EntitySubTreeAddition
     redirectOnSuccess?: RedirectOnSuccessTarget;
     rendererProps?: LayoutRendererProps;
     refreshDataBindingOnPersist?: boolean;
+    skipBindingStateUpdateAfterPersist?: boolean;
 };
 
 // @public (undocumented)

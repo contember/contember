@@ -5,7 +5,6 @@ export class Config {
 		beforePersistSettleLimit: 20,
 		beforeUpdateSettleLimit: 20,
 		persistSuccessSettleLimit: 20,
-		maxPersistAttempts: 5,
 	}
 
 	private readonly config: BindingConfig

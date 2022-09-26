@@ -85,7 +85,6 @@ export class SystemApiMiddlewareFactory {
 					systemContainer: groupContainer.systemContainer,
 					onClearCache: () => {
 						projectContainer.contentSchemaResolver.clearCache()
-						groupContainer.projectSchemaResolver.clearCache()
 					},
 				})
 				const handler = groupContainer.systemGraphQLHandler

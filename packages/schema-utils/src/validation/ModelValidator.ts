@@ -206,16 +206,16 @@ export class ModelValidator {
 	}
 
 	private validateCollisions(entities: Model.Entity[], errorBuilder: ErrorBuilder) {
-		const tableNames: Record<string, string> = {}
+		const relationNames: Record<string, string> = {}
 		const aliasedTypes = new Map<string, Model.ColumnType>()
 		for (const entity of entities) {
-			const description = `entity ${entity.name}`
-			if (tableNames[entity.tableName]) {
+			const description = `table name ${entity.tableName} of entity ${entity.name}`
+			if (relationNames[entity.tableName]) {
 				errorBuilder
 					.for(entity.name)
-					.add(`Table name ${entity.tableName} of ${description} collides with a table name of ${tableNames[entity.tableName]}`)
+					.add(`${description} collides with a ${relationNames[entity.tableName]}`)
 			} else {
-				tableNames[entity.tableName] = description
+				relationNames[entity.tableName] = description
 			}
 		}
 		for (const entity of entities) {
@@ -223,16 +223,16 @@ export class ModelValidator {
 			acceptEveryFieldVisitor(this.model, entity, {
 				visitManyHasManyOwning: ({ entity, relation }) => {
 					const joiningTable = relation.joiningTable
-					const description = `relation ${entity.name}::${relation.name}`
-					if (tableNames[joiningTable.tableName]) {
+					const description = `joining table name ${joiningTable.tableName} of relation ${entity.name}::${relation.name}`
+					if (relationNames[joiningTable.tableName]) {
 						entityErrorBuilder
 							.for(relation.name)
 							.add(
-								`Joining table name ${joiningTable.tableName} of ${description} collides with a table name of ${tableNames[joiningTable.tableName]}.` +
+								`${description} collides with a ${relationNames[joiningTable.tableName]}.` +
 								'Consider using plural for a relation name or change the joining table name using .joiningTable(...) in schema definition.',
 							)
 					} else {
-						tableNames[joiningTable.tableName] = description
+						relationNames[joiningTable.tableName] = description
 					}
 				},
 				visitColumn: ({ entity, column }) => {
@@ -252,6 +252,25 @@ export class ModelValidator {
 				visitOneHasOneOwning: () => {},
 				visitManyHasOne: () => {},
 			})
+		}
+		for (const entity of entities) {
+			const entityErrorBuilder = errorBuilder.for(entity.name)
+			for (const index of Object.values(entity.indexes)) {
+				const description = `index name ${index.name} of entity ${entity.name}`
+				if (relationNames[index.name]) {
+					entityErrorBuilder.add(`${description} collides with ${relationNames[index.name]}`)
+				} else {
+					relationNames[index.name] = description
+				}
+			}
+			for (const unique of Object.values(entity.unique)) {
+				const description = `unique index name ${unique.name} of entity ${entity.name}`
+				if (relationNames[unique.name]) {
+					entityErrorBuilder.add(`${description} collides with ${relationNames[unique.name]}`)
+				} else {
+					relationNames[unique.name] = description
+				}
+			}
 		}
 	}
 }

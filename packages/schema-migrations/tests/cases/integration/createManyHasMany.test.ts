@@ -90,9 +90,10 @@ testMigrations('create many has many relation (post with categories)', {
 		ADD "title" text;
 	CREATE TABLE "post_categories" (
 		"post_id"     uuid NOT NULL REFERENCES "post"("id") ON DELETE CASCADE,
-		"category_id" uuid NOT NULL REFERENCES "category"("id") ON DELETE CASCADE,
-		CONSTRAINT "post_categories_pkey" PRIMARY KEY ("post_id", "category_id")
+		"category_id" uuid NOT NULL REFERENCES "category"("id") ON DELETE CASCADE
 	);
+	ALTER TABLE "post_categories"
+		ADD CONSTRAINT "post_categories_pkey" PRIMARY KEY ("post_id", "category_id");
 	CREATE TRIGGER "log_event"
 		AFTER INSERT OR UPDATE OR DELETE
 		ON "post_categories"

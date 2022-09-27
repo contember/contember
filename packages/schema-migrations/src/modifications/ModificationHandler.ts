@@ -2,6 +2,7 @@ import { MigrationBuilder } from '@contember/database-migrations'
 import { SchemaUpdater } from './utils/schemaUpdateUtils'
 import { Schema } from '@contember/schema'
 import { Migration } from '../Migration'
+import { SchemaWithMeta } from './utils/schemaMeta'
 
 export interface ModificationDescription {
 	message: string
@@ -26,7 +27,7 @@ export interface ModificationHandlerOptions {
 }
 
 export interface ModificationHandlerConstructor<Data> {
-	new(data: Data, schema: Schema, options: ModificationHandlerOptions): ModificationHandler<Data>
+	new(data: Data, schema: SchemaWithMeta, options: ModificationHandlerOptions): ModificationHandler<Data>
 }
 
 export interface Differ {
@@ -37,7 +38,7 @@ export interface Differ {
 export interface ModificationType<Id extends String, Data> {
 	id: Id
 	createModification: (data: Data) => Migration.Modification<Data>
-	createHandler: (data: Data, schema: Schema, options: ModificationHandlerOptions) => ModificationHandler<Data>
+	createHandler: (data: Data, schema: SchemaWithMeta, options: ModificationHandlerOptions) => ModificationHandler<Data>
 }
 
 export const createModificationType = <Data, Id extends string>({ handler, id }: {

@@ -29,12 +29,13 @@ import {
 } from './relations'
 import { patchValidationSchemaModification, updateValidationSchemaModification } from './validation'
 import { createIndexModification, removeIndexModification } from './indexes'
+import { SchemaWithMeta } from './utils/schemaMeta'
 
 
 class ModificationHandlerFactory {
 	constructor(private readonly map: Record<string, ModificationType<string, any>>) {}
 
-	public create<D>(name: string, data: D, schema: Schema, options: ModificationHandlerOptions): ModificationHandler<D> {
+	public create<D>(name: string, data: D, schema: SchemaWithMeta, options: ModificationHandlerOptions): ModificationHandler<D> {
 		if (!this.map[name]) {
 			throw new Error(`Undefined modification handler for ${name}`)
 		}

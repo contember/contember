@@ -2,6 +2,7 @@ import { Migration, ModificationHandlerFactory, SchemaDiffer, SchemaMigrator, VE
 import { Acl, Model } from '@contember/schema'
 import { createMigrationBuilder } from '@contember/database-migrations'
 import { assert, describe, it } from 'vitest'
+import { SchemaWithMeta } from '../../src/modifications/utils/schemaMeta'
 
 const modificationFactory = new ModificationHandlerFactory(ModificationHandlerFactory.defaultFactoryMap)
 const schemaMigrator = new SchemaMigrator(modificationFactory)
@@ -32,11 +33,11 @@ export function testDiffSchemas(
 		false,
 	)
 	assert.deepStrictEqual(actualDiff, expectedDiff)
-	const schema = schemaMigrator.applyModifications(
+	const { meta, ...schema } = schemaMigrator.applyModifications(
 		{ model: originalModel, acl: originalAcl, validation: {} },
 		actualDiff,
 		VERSION_LATEST,
-	)
+	) as SchemaWithMeta
 	assert.deepStrictEqual(schema, {
 		model: updatedModel,
 		acl: updatedAcl,
@@ -51,11 +52,11 @@ export function testApplyDiff(
 	originalAcl: Acl.Schema = emptyAcl,
 	expectedAcl: Acl.Schema = emptyAcl,
 ) {
-	const actualSchema = schemaMigrator.applyModifications(
+	const { meta, ...actualSchema } = schemaMigrator.applyModifications(
 		{ model: originalModel, acl: originalAcl, validation: {} },
 		diff,
 		VERSION_LATEST,
-	)
+	) as SchemaWithMeta
 
 	assert.deepStrictEqual(actualSchema, {
 		model: expectedModel,

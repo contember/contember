@@ -1,6 +1,16 @@
 import crypto from 'crypto'
 
 export class NamingHelper {
+	public static createForeignKeyIndexName(tableName: string, column: string) {
+		// format matches https://github.com/salsita/node-pg-migrate/blob/9331f6fda98795e3f3733461f9b71345168b99d8/src/operations/indexes.ts#L21
+		return `${tableName}_${column}_index`
+	}
+
+	public static createJunctionTablePrimaryConstraintName(tableName: string) {
+		// format matches https://github.com/salsita/node-pg-migrate/blob/9331f6fda98795e3f3733461f9b71345168b99d8/src/operations/tables.ts#L204
+		return `${tableName}_pkey`
+	}
+
 	public static createForeignKeyName(fromTable: string, fromColumn: string, toTable: string, toColumn: string): string {
 		return 'fk_'
 			+ fromTable + '_'

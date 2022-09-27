@@ -7,7 +7,14 @@ import {
 	NamingHelper,
 } from '@contember/schema-utils'
 import { MigrationBuilder } from '@contember/database-migrations'
-import { addField, SchemaUpdater, updateEntity, updateModel } from '../utils/schemaUpdateUtils'
+import {
+	addField,
+	addTakenIndexName,
+	SchemaUpdater,
+	updateEntity,
+	updateModel,
+	updateSchema,
+} from '../utils/schemaUpdateUtils'
 import {
 	createModificationType,
 	Differ,
@@ -19,13 +26,14 @@ import { createFields } from '../utils/diffUtils'
 import { getPrimaryColumnType } from '../utils/getPrimaryColumnType'
 import { createJunctionTableSql } from '../utils/createJunctionTable'
 import { normalizeManyHasManyRelation, PartialManyHasManyRelation } from './normalization'
+import { resolveIndexName, SchemaWithMeta } from '../utils/schemaMeta'
 
 
 export class CreateRelationModificationHandler implements ModificationHandler<CreateRelationModificationData> {
 
 	constructor(
 		private readonly data: CreateRelationModificationData,
-		private readonly schema: Schema,
+		private readonly schema: SchemaWithMeta,
 		private readonly options: ModificationHandlerOptions,
 	) {}
 
@@ -61,7 +69,12 @@ export class CreateRelationModificationHandler implements ModificationHandler<Cr
 		acceptRelationTypeVisitor(this.schema.model, entity, this.getNormalizedOwningSide(), {
 			visitManyHasOne: ({ relation }) => {
 				createOwningSide(relation)
-				builder.addIndex(entity.tableName, relation.joiningColumn.columnName)
+				const columnName = relation.joiningColumn.columnName
+				const proposedIndexName = NamingHelper.createForeignKeyIndexName(entity.tableName, columnName)
+				const indexName = resolveIndexName(this.schema, proposedIndexName)
+				builder.addIndex(entity.tableName, columnName, {
+					name: indexName,
+				})
 			},
 			visitOneHasMany: () => {},
 			visitOneHasOneOwning: ({ relation }) => {
@@ -71,17 +84,26 @@ export class CreateRelationModificationHandler implements ModificationHandler<Cr
 			},
 			visitOneHasOneInverse: () => {},
 			visitManyHasManyOwning: ({ relation }) => {
-				createJunctionTableSql(builder, this.options.systemSchema,  entity, targetEntity, relation)
+				createJunctionTableSql(builder, this.options.systemSchema, this.schema, entity, targetEntity, relation)
 			},
 			visitManyHasManyInverse: () => {},
 		})
 	}
 
 	public getSchemaUpdater(): SchemaUpdater {
-		return updateModel(
-			updateEntity(this.data.entityName, addField(this.getNormalizedOwningSide())),
-			this.data.inverseSide !== undefined
-				? updateEntity(this.data.owningSide.target, addField(this.data.inverseSide))
+		const entity = this.schema.model.entities[this.data.entityName]
+		return updateSchema(
+			updateModel(
+				updateEntity(this.data.entityName, addField(this.getNormalizedOwningSide())),
+				this.data.inverseSide !== undefined
+					? updateEntity(this.data.owningSide.target, addField(this.data.inverseSide))
+					: undefined,
+			),
+			this.data.owningSide.type === Model.RelationType.ManyHasOne
+				? addTakenIndexName(NamingHelper.createForeignKeyIndexName(entity.tableName, this.data.owningSide.joiningColumn.columnName))
+				: undefined,
+			this.data.owningSide.type === Model.RelationType.ManyHasMany && isOwningRelation(this.data.owningSide)
+				? addTakenIndexName(NamingHelper.createJunctionTablePrimaryConstraintName(this.data.owningSide.joiningTable.tableName))
 				: undefined,
 		)
 	}

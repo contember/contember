@@ -20,13 +20,14 @@ import { renameConstraintSchemaUpdater, renameConstraintsSqlBuilder } from '../u
 import { changeValue } from '../utils/valueUtils'
 import { updateColumnNameModification } from '../columns'
 import { NoopModification } from '../NoopModification'
+import { SchemaWithMeta } from '../utils/schemaMeta'
 
 export class UpdateFieldNameModificationHandler implements ModificationHandler<UpdateFieldNameModificationData> {
 	private renameColumnSubModification: ModificationHandler<any> = new NoopModification()
 
 	constructor(
 		private readonly data: UpdateFieldNameModificationData,
-		private readonly schema: Schema,
+		private readonly schema: SchemaWithMeta,
 		private readonly options: ModificationHandlerOptions,
 	) {
 		if (this.data.columnName) {

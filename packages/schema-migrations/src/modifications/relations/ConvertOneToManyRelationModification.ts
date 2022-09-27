@@ -1,6 +1,13 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Model, Schema } from '@contember/schema'
-import { SchemaUpdater, updateEntity, updateField, updateModel, updateSchema } from '../utils/schemaUpdateUtils'
+import {
+	addTakenIndexName,
+	SchemaUpdater,
+	updateEntity,
+	updateField,
+	updateModel,
+	updateSchema,
+} from '../utils/schemaUpdateUtils'
 import {
 	createModificationType,
 	Differ,
@@ -11,13 +18,14 @@ import { isOwningRelation, NamingHelper } from '@contember/schema-utils'
 import { updateRelations } from '../utils/diffUtils'
 import { NoopModification } from '../NoopModification'
 import { updateFieldNameModification } from '../fields'
+import { resolveIndexName, SchemaWithMeta } from '../utils/schemaMeta'
 
 export class ConvertOneToManyRelationModificationHandler implements ModificationHandler<ConvertOneToManyRelationModificationData> {
 	private subModification: ModificationHandler<any>
 
 	constructor(
 		private readonly data: ConvertOneToManyRelationModificationData,
-		private readonly schema: Schema,
+		private readonly schema: SchemaWithMeta,
 		private readonly options: ModificationHandlerOptions,
 	) {
 		const { relation } = this.getRelation()
@@ -36,7 +44,12 @@ export class ConvertOneToManyRelationModificationHandler implements Modification
 
 	public createSql(builder: MigrationBuilder): void {
 		const { entity, relation } = this.getRelation()
-		builder.addIndex(entity.tableName, relation.joiningColumn.columnName)
+		const columnName = relation.joiningColumn.columnName
+		const proposedIndexName = NamingHelper.createForeignKeyIndexName(entity.tableName, columnName)
+		const indexName = resolveIndexName(this.schema, proposedIndexName)
+		builder.addIndex(entity.tableName, columnName, {
+			name: indexName,
+		})
 		const uniqueConstraintName = NamingHelper.createUniqueConstraintName(entity.name, [relation.name])
 		builder.dropConstraint(entity.tableName, uniqueConstraintName)
 		this.subModification.createSql(builder)
@@ -45,6 +58,8 @@ export class ConvertOneToManyRelationModificationHandler implements Modification
 	public getSchemaUpdater(): SchemaUpdater {
 		const { relation } = this.getRelation()
 		const { entityName, fieldName } = this.data
+		const entity = this.schema.model.entities[this.data.entityName]
+		const field = entity.fields[fieldName] as Model.OneHasOneOwningRelation
 		return updateSchema(
 			updateModel(
 				updateEntity(
@@ -72,6 +87,7 @@ export class ConvertOneToManyRelationModificationHandler implements Modification
 						),
 					),
 				) : undefined,
+			addTakenIndexName(NamingHelper.createForeignKeyIndexName(entity.tableName, field.joiningColumn.columnName)),
 		)
 	}
 

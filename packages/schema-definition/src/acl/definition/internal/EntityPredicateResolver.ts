@@ -129,7 +129,7 @@ export class EntityPredicatesResolver {
 						return { [ctx.targetEntity.primary]: { never: true } }
 					}
 					if (whens.includes(true)) {
-						return { [ctx.targetEntity.primary]: { always: true } }
+						return { [ctx.targetEntity.primary]: { isNull: false } }
 					}
 					const predicates = (whens as WhenDefinition[]).map(it =>
 						EntityPredicatesResolver.resolvePredicate(model, ctx.targetEntity, it, rolePermissionsByEntity),

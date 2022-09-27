@@ -1,5 +1,6 @@
 import { Acl, Model } from '@contember/schema'
 import * as Typesafe from '@contember/typesafe'
+import { conditionSchema } from './condition'
 
 const membershipMatchRuleSchema = Typesafe.record(
 	Typesafe.string,
@@ -40,20 +41,37 @@ const contentPermissionsSchema = Typesafe.partial({
 })
 const contentSchemaCheck: Typesafe.Equals<Acl.ContentPermissions, ReturnType<typeof contentPermissionsSchema>> = true
 
+const entityVariableSchema = Typesafe.intersection(
+	Typesafe.object({
+		type: Typesafe.literal(Acl.VariableType.entity),
+		entityName: Typesafe.string,
+	}),
+	Typesafe.partial({
+		fallback: conditionSchema(),
+	}),
+)
+const entityVariableSchemaCheck: Typesafe.Equals<Acl.EntityVariable, ReturnType<typeof entityVariableSchema>> = true
+
+const predefinedVariableSchema = Typesafe.object({
+	type: Typesafe.literal(Acl.VariableType.predefined),
+	value: Typesafe.enumeration('identityID', 'personID'),
+})
+const conditionVariableSchema = Typesafe.intersection(
+	Typesafe.object({
+		type: Typesafe.literal(Acl.VariableType.condition),
+	}),
+	Typesafe.partial({
+		fallback: conditionSchema(),
+	}),
+)
+const conditionVariableSchemaCheck: Typesafe.Equals<Acl.ConditionVariable, ReturnType<typeof conditionVariableSchema>> = true
+
 const variablesSchema = Typesafe.record(
 	Typesafe.string,
 	Typesafe.union(
-		Typesafe.object({
-			type: Typesafe.literal(Acl.VariableType.entity),
-			entityName: Typesafe.string,
-		}),
-		Typesafe.object({
-			type: Typesafe.literal(Acl.VariableType.predefined),
-			value: Typesafe.enumeration('identityID', 'personID'),
-		}),
-		Typesafe.object({
-			type: Typesafe.literal(Acl.VariableType.condition),
-		}),
+		entityVariableSchema as Typesafe.Type<Acl.EntityVariable>,
+		predefinedVariableSchema,
+		conditionVariableSchema as Typesafe.Type<Acl.ConditionVariable>,
 	),
 )
 

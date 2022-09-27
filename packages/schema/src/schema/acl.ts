@@ -23,6 +23,7 @@ export namespace Acl {
 	export type EntityVariable = {
 		readonly type: VariableType.entity
 		readonly entityName: string
+		readonly fallback?: Input.Condition
 	}
 
 	export type PredefinedVariableValue = 'identityID' | 'personID'
@@ -34,6 +35,7 @@ export namespace Acl {
 
 	export type ConditionVariable = {
 		readonly type: VariableType.condition
+		readonly fallback?: Input.Condition
 	}
 
 	// export interface EnumVariable {

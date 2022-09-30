@@ -34,8 +34,8 @@ export class ColumnDefinition extends FieldDefinition<ColumnDefinitionOptions> {
 		return this.withOption('nullable', false)
 	}
 
-	public sequence(options?: Model.ColumnTypeDefinition['sequence']): Interface<ColumnDefinition> {
-		return this.withOption('sequence', options ?? { precedence: 'BY DEFAULT' })
+	public sequence(options?: Partial<Model.ColumnTypeDefinition['sequence']>): Interface<ColumnDefinition> {
+		return this.withOption('sequence', { precedence: 'BY DEFAULT', ...options })
 	}
 
 	public unique(): Interface<ColumnDefinition> {

@@ -1,4 +1,4 @@
-import { MigrationBuilder } from '@contember/database-migrations'
+import { escapeValue, MigrationBuilder } from '@contember/database-migrations'
 import { Model, Schema } from '@contember/schema'
 import { SchemaUpdater, updateEntity, updateField, updateModel } from '../utils/schemaUpdateUtils'
 import { createModificationType, Differ, ModificationHandler } from '../ModificationHandler'
@@ -17,14 +17,21 @@ export class UpdateColumnDefinitionModificationHandler implements ModificationHa
 		}
 		const oldColumn = entity.fields[this.data.fieldName] as Model.AnyColumn
 		const newColumn = this.data.definition
-		const newType = newColumn.columnType !== oldColumn.columnType
-			? getColumnSqlType(newColumn)
-			: undefined
+
+		const hasNewSequence = !oldColumn.sequence && newColumn.sequence
+		const hasNewType = newColumn.columnType !== oldColumn.columnType
+		const columnType = getColumnSqlType(newColumn)
+
+		const usingCast = `${wrapIdentifier(oldColumn.columnName)}::${columnType}`
 
 		builder.alterColumn(entity.tableName, oldColumn.columnName, {
-			type: newType,
+			type: hasNewSequence || hasNewType ? columnType : undefined,
 			notNull: oldColumn.nullable !== newColumn.nullable ? !newColumn.nullable : undefined,
-			using: newType !== undefined ? `${wrapIdentifier(oldColumn.columnName)}::${newType}` : undefined,
+			using: hasNewSequence
+				? `COALESCE(${usingCast}, nextval(PG_GET_SERIAL_SEQUENCE(${escapeValue(entity.tableName)}, ${escapeValue(oldColumn.columnName)})))`
+				: hasNewType
+					? usingCast
+					: undefined,
 			sequenceGenerated: oldColumn.sequence && !newColumn.sequence ? false : (!oldColumn.sequence ? newColumn.sequence : undefined),
 		})
 
@@ -79,7 +86,7 @@ type SequenceDefinitionAlter =
 	}
 
 type ColumnDefinitionAlter =
-	& Model.AnyColumn
+	& Omit<Model.AnyColumn, 'sequence' | 'columnName' | 'name'>
 	& {
 		sequence?: SequenceDefinitionAlter
 	}
@@ -102,12 +109,12 @@ export class UpdateColumnDefinitionDiffer implements Differ {
 				name: {},
 				columnName: {},
 				...updatedDefinition
-			} = updatedColumn as any
+			} = updatedColumn
 			const {
 				name: {},
 				columnName: {},
 				...originalDefinition
-			} = originalColumn as any
+			} = originalColumn
 			if (deepEqual(updatedDefinition, originalDefinition)) {
 				return undefined
 			}

@@ -1,9 +1,8 @@
 import { Differ } from '../ModificationHandler'
-import { Model, Schema } from '@contember/schema'
+import { Schema } from '@contember/schema'
 import deepEqual from 'fast-deep-equal'
-import { removeEntityModification } from '../entities'
-import { getViewDirectDependants } from '../utils/viewDependencies'
-import { Migration } from '../../Migration'
+import { cascadeRemoveDependantViews } from '../utils/viewDependencies'
+import { UpdateColumnDefinitionDiffer } from '../columns'
 
 export class RemoveChangedViewDiffer implements Differ {
 	constructor() {
@@ -18,25 +17,13 @@ export class RemoveChangedViewDiffer implements Differ {
 				}
 				return !deepEqual(updatedEntity.view, it.view)
 			})
-		if (changedViews.length === 0) {
+		const columnDiffer = new UpdateColumnDefinitionDiffer()
+		const columnChanges = columnDiffer.createDiff(originalSchema, updatedSchema)
+		if (changedViews.length === 0 && columnChanges.length === 0) {
 			return []
 		}
-		const removed = new Set<string>()
-		const dependants = getViewDirectDependants(originalSchema.model)
-		const modifications: Migration.Modification[] = []
-		const removeCascade = (entity: Model.Entity) => {
-			if (removed.has(entity.name)) {
-				return
-			}
-			removed.add(entity.name)
-			for (const dependant of dependants.get(entity.name) ?? []) {
-				removeCascade(dependant)
-			}
-			modifications.push(removeEntityModification.createModification({ entityName: entity.name }))
-		}
-		for (const changed of changedViews) {
-			removeCascade(changed)
-		}
-		return modifications
+		const changedColumnsEntities = Array.from(new Set(columnChanges.map(it => it.entityName)))
+			.map(it => originalSchema.model.entities[it])
+		return cascadeRemoveDependantViews(originalSchema.model, [...changedViews, ...changedColumnsEntities])
 	}
 }

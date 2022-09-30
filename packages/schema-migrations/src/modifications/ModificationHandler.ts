@@ -29,8 +29,8 @@ export interface ModificationHandlerConstructor<Data> {
 	new(data: Data, schema: Schema, options: ModificationHandlerOptions): ModificationHandler<Data>
 }
 
-export interface Differ {
-	createDiff: (originalSchema: Schema, updatedSchema: Schema) => Migration.Modification[]
+export interface Differ<Data = { [field: string]: any }> {
+	createDiff: (originalSchema: Schema, updatedSchema: Schema) => Migration.Modification<Data>[]
 }
 
 

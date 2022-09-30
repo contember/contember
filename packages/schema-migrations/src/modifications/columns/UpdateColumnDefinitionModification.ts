@@ -6,6 +6,7 @@ import deepEqual from 'fast-deep-equal'
 import { updateColumns } from '../utils/diffUtils'
 import { wrapIdentifier } from '@contember/database'
 import { getColumnSqlType } from '../utils/columnUtils'
+import { getEntityDependantViews } from '../utils/viewDependencies'
 
 export class UpdateColumnDefinitionModificationHandler implements ModificationHandler<UpdateColumnDefinitionModificationData>  {
 	constructor(private readonly data: UpdateColumnDefinitionModificationData, private readonly schema: Schema) {}
@@ -95,7 +96,7 @@ export const updateColumnDefinitionModification = createModificationType({
 	handler: UpdateColumnDefinitionModificationHandler,
 })
 
-export class UpdateColumnDefinitionDiffer implements Differ {
+export class UpdateColumnDefinitionDiffer implements Differ<UpdateColumnDefinitionModificationData> {
 	createDiff(originalSchema: Schema, updatedSchema: Schema) {
 		return updateColumns(originalSchema, updatedSchema, ({ originalColumn, updatedColumn, updatedEntity }) => {
 			const {
@@ -111,6 +112,7 @@ export class UpdateColumnDefinitionDiffer implements Differ {
 			if (deepEqual(updatedDefinition, originalDefinition)) {
 				return undefined
 			}
+
 			return updateColumnDefinitionModification.createModification({
 				entityName: updatedEntity.name,
 				fieldName: updatedColumn.name,

@@ -4,7 +4,7 @@ import { isColumn, isRelation } from '@contember/schema-utils'
 import { isDefined } from '../../utils/isDefined'
 import deepEqual from 'fast-deep-equal'
 
-export const updateFields = (
+export const updateFields = <Data = { [field: string]: any }>(
 	originalSchema: Schema,
 	updatedSchema: Schema,
 	modificationGenerator: (args: {
@@ -12,8 +12,8 @@ export const updateFields = (
 		updatedEntity: Model.Entity
 		originalField: Model.AnyField
 		updatedField: Model.AnyField
-	}) => Migration.Modification | Migration.Modification[] | undefined,
-): Migration.Modification[] => {
+	}) => Migration.Modification<Data> | Migration.Modification<Data>[] | undefined,
+): Migration.Modification<Data>[] => {
 	return Object.values(updatedSchema.model.entities)
 		.filter(({ name }) => originalSchema.model.entities[name])
 		.flatMap(updatedEntity => {
@@ -43,7 +43,7 @@ export const updateFields = (
 		})
 }
 
-export const updateColumns = (
+export const updateColumns = <Data = { [field: string]: any }>(
 	originalSchema: Schema,
 	updatedSchema: Schema,
 	modificationGenerator: (args: {
@@ -51,8 +51,8 @@ export const updateColumns = (
 		originalColumn: Model.AnyColumn
 		updatedEntity: Model.Entity
 		updatedColumn: Model.AnyColumn
-	}) => Migration.Modification | undefined,
-) => {
+	}) => Migration.Modification<Data> | undefined,
+): Migration.Modification<Data>[] => {
 	return updateFields(
 		originalSchema,
 		updatedSchema,
@@ -70,7 +70,7 @@ export const updateColumns = (
 	)
 }
 
-export const updateRelations = (
+export const updateRelations = <Data = { [field: string]: any }>(
 	originalSchema: Schema,
 	updatedSchema: Schema,
 	modificationGenerator: (args: {
@@ -78,8 +78,8 @@ export const updateRelations = (
 		originalRelation: Model.AnyRelation
 		updatedEntity: Model.Entity
 		updatedRelation: Model.AnyRelation
-	}) => Migration.Modification | undefined,
-) => {
+	}) => Migration.Modification<Data> | undefined,
+): Migration.Modification<Data>[] => {
 	return updateFields(
 		originalSchema,
 		updatedSchema,
@@ -97,15 +97,15 @@ export const updateRelations = (
 	)
 }
 
-export const createFields = (
+export const createFields = <Data = { [field: string]: any }>(
 	originalSchema: Schema,
 	updatedSchema: Schema,
 	modificationGenerator: (args: {
 		originalEntity: Model.Entity
 		updatedEntity: Model.Entity
 		newField: Model.AnyField
-	}) => Migration.Modification | undefined,
-) => {
+	}) => Migration.Modification<Data> | undefined,
+): Migration.Modification<Data>[] => {
 	return Object.values(updatedSchema.model.entities)
 		.filter(({ name }) => originalSchema.model.entities[name])
 		.flatMap(updatedEntity => {

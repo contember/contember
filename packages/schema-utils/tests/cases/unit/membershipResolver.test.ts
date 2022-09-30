@@ -159,3 +159,25 @@ test('fails on undefined variable', () => {
 		{ role: 'editor', variables: [] },
 	])
 })
+
+
+test('use fallback value', () => {
+	const reader = new MembershipResolver()
+	const result = reader.resolve({
+		roles: {
+			editor: {
+				variables: {
+					localeID: { type: Acl.VariableType.condition, fallback: { always: true } },
+				},
+				entities: {},
+			},
+		},
+	}, [
+		{ role: 'editor', variables: [] },
+	], MembershipResolver.UnknownIdentity)
+	assert.deepStrictEqual(result.errors, [])
+
+	assert.deepStrictEqual(result.memberships, [
+		{ role: 'editor', variables: [{ name: 'localeID', condition: { always: true } }] },
+	])
+})

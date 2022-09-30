@@ -1,5 +1,5 @@
 import { Role } from './roles'
-import { Acl } from '@contember/schema'
+import { Acl, Input } from '@contember/schema'
 
 export class VariableDefinition<Name extends string = string, Roles extends Role<string> = Role<string>, Variable extends Acl.Variable = Acl.Variable> {
 	constructor(
@@ -10,24 +10,24 @@ export class VariableDefinition<Name extends string = string, Roles extends Role
 	}
 }
 
-
 export const createEntityVariable = <R extends Role<string>, Name extends string>(
 	name: Name,
 	entityName: string,
 	roles: R | R[],
+	fallback?: Input.Condition,
 ): VariableDefinition<Name, R, Acl.EntityVariable> => {
 	return new VariableDefinition(
 		name,
 		Array.isArray(roles) ? roles : [roles],
-		{ type: Acl.VariableType.entity, entityName },
+		{ type: Acl.VariableType.entity, entityName, ...(fallback ? { fallback } : {}) },
 	)
 }
-
 
 export const createPredefinedVariable = <R extends Role<string>, Name extends string>(
 	name: Name,
 	value: Acl.PredefinedVariableValue,
 	roles: R | R[],
+	fallback?: Input.Condition,
 ): VariableDefinition<Name, R, Acl.EntityVariable> => {
 	return new VariableDefinition(
 		name,
@@ -39,10 +39,11 @@ export const createPredefinedVariable = <R extends Role<string>, Name extends st
 export const createConditionVariable = <R extends Role<string>, Name extends string>(
 	name: Name,
 	roles: R | R[],
+	fallback?: Input.Condition,
 ): VariableDefinition<Name, R, Acl.ConditionVariable> => {
 	return new VariableDefinition(
 		name,
 		Array.isArray(roles) ? roles : [roles],
-		{ type: Acl.VariableType.condition  },
+		{ type: Acl.VariableType.condition, ...(fallback ? { fallback } : {}) },
 	)
 }

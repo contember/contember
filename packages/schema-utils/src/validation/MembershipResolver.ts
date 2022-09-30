@@ -1,6 +1,7 @@
 import { Acl, Input } from '@contember/schema'
 import { getRoleVariables } from '../acl'
 import { conditionSchema } from '../type-schema'
+import { assertNever } from '../utils'
 
 
 export class MembershipResolver {
@@ -51,7 +52,6 @@ export class MembershipResolver {
 		const errors: MembershipValidationError[] = []
 		const parsedVariables: ParsedMembershipVariable[] = []
 		for (const [name, variable] of Object.entries(roleVariables)) {
-			const inputVariable = membership.variables.find(it => it.name === name)
 			if (variable.type === Acl.VariableType.predefined) {
 				switch (variable.value) {
 					case 'identityID':
@@ -71,9 +71,14 @@ export class MembershipResolver {
 				continue
 			}
 
+			const inputVariable = membership.variables.find(it => it.name === name)
 			if (!inputVariable) {
-				errors.push(new MembershipValidationError(membership.role, MembershipValidationErrorType.VARIABLE_EMPTY, name))
-				parsedVariables.push({ name, condition: { never: true } })
+				if (variable.fallback) {
+					parsedVariables.push({ name, condition: variable.fallback })
+				} else {
+					errors.push(new MembershipValidationError(membership.role, MembershipValidationErrorType.VARIABLE_EMPTY, name))
+					parsedVariables.push({ name, condition: { never: true } })
+				}
 				continue
 			}
 
@@ -91,6 +96,8 @@ export class MembershipResolver {
 					errors.push(new MembershipValidationError(membership.role, MembershipValidationErrorType.VARIABLE_INVALID, name))
 					parsedVariables.push({ name, condition: { never: true } })
 				}
+			} else {
+				assertNever(variable)
 			}
 		}
 		return [errors, parsedVariables]

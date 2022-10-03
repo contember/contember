@@ -52,8 +52,6 @@ services:
       TENANT_MAILER_HOST: 'mailhog'
       TENANT_MAILER_PORT: '1025'
       TENANT_MAILER_FROM: 'contember@localhost'
-      CONTEMBER_TENANT_MIGRATIONS_DIR: /src/packages/engine-tenant-api/src/migrations
-      CONTEMBER_SYSTEM_MIGRATIONS_DIR: /src/packages/engine-system-api/src/migrations
       CONTEMBER_EXAMPLE_PROJECTS_DIRECTORY: /src/packages/engine-api-tester/src/projects
     command:
       - node

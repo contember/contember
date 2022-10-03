@@ -1,1 +1,0 @@
-ALTER TABLE person ALTER COLUMN password_hash DROP NOT NULL;

@@ -36,8 +36,6 @@ jobs:
         run: yarn run build
       - name: Fill env
         run: |
-          echo "CONTEMBER_TENANT_MIGRATIONS_DIR=`pwd`/packages/engine-tenant-api/src/migrations" >> $GITHUB_ENV
-          echo "CONTEMBER_SYSTEM_MIGRATIONS_DIR=`pwd`/packages/engine-system-api/src/migrations" >> $GITHUB_ENV
           echo "CONTEMBER_EXAMPLE_PROJECTS_DIRECTORY=`pwd`/packages/engine-api-tester/src/projects" >> $GITHUB_ENV
       - name: "Run tests"
         run: yarn run test

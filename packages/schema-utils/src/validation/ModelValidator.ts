@@ -72,6 +72,10 @@ export class ModelValidator {
 		this.validateIdentifier(field.name, errors)
 		if (isRelation(field)) {
 			this.validateRelation(partialEntity, field, errors)
+		} else {
+			if (field.sequence && field.nullable) {
+				errors.add('Column with sequence cannot be nullable.')
+			}
 		}
 	}
 

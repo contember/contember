@@ -43,6 +43,7 @@ import {
 } from './modifications'
 import { ChangeViewNonViewDiffer, RemoveChangedFieldDiffer, RemoveChangedViewDiffer } from './modifications/differs'
 import { CreateIndexDiffer, RemoveIndexDiffer } from './modifications/indexes'
+import { SchemaWithMeta } from './modifications/utils/schemaMeta'
 
 export class SchemaDiffer {
 	constructor(private readonly schemaMigrator: SchemaMigrator) {}
@@ -103,7 +104,8 @@ export class SchemaDiffer {
 
 
 		if (checkRecreate) {
-			const errors = deepCompare(updatedSchema, appliedDiffsSchema, [])
+			const { meta, ...appliedDiffsSchema2 } = appliedDiffsSchema as SchemaWithMeta
+			const errors = deepCompare(updatedSchema, appliedDiffsSchema2, [])
 			if (errors.length === 0) {
 				return diffs
 			}

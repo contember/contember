@@ -20,11 +20,12 @@ import {
 import { VERSION_ACL_PATCH, VERSION_REMOVE_REFERENCING_RELATIONS } from '../ModificationVersions'
 import { isRelation, PredicateDefinitionProcessor } from '@contember/schema-utils'
 import { removeFieldModification } from '../fields'
+import { SchemaWithMeta } from '../utils/schemaMeta'
 
 export class RemoveEntityModificationHandler implements ModificationHandler<RemoveEntityModificationData> {
 	constructor(
 		private readonly data: RemoveEntityModificationData,
-		private readonly schema: Schema,
+		private readonly schema: SchemaWithMeta,
 		private readonly options: ModificationHandlerOptions,
 	) {}
 

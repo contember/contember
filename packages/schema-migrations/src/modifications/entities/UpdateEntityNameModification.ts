@@ -19,13 +19,14 @@ import { NoopModification } from '../NoopModification'
 import { renameConstraintSchemaUpdater, renameConstraintsSqlBuilder } from '../utils/renameConstraintsHelper'
 import { changeValue } from '../utils/valueUtils'
 import { updateEntityTableNameModification } from './UpdateEntityTableNameModification'
+import { SchemaWithMeta } from '../utils/schemaMeta'
 
 export class UpdateEntityNameModificationHandler implements ModificationHandler<UpdateEntityNameModificationData> {
 	private subModification: ModificationHandler<any>
 
 	constructor(
 		private readonly data: UpdateEntityNameModificationData,
-		private readonly schema: Schema,
+		private readonly schema: SchemaWithMeta,
 		private readonly options: ModificationHandlerOptions,
 	) {
 		this.subModification = data.tableName

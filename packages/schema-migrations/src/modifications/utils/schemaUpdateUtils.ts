@@ -3,8 +3,10 @@ import { SchemaUpdateError } from '../exceptions'
 import { isDefined } from '../../utils/isDefined'
 import { isInverseRelation, isOwningRelation, isRelation, PredicateDefinitionProcessor } from '@contember/schema-utils'
 import { VERSION_ACL_PATCH, VERSION_REMOVE_RELATION_INVERSE_SIDE } from '../ModificationVersions'
+import { resolveIndexName, SchemaWithMeta } from './schemaMeta'
 
-export type SchemaUpdater = (args: { schema: Schema }) => Schema
+
+export type SchemaUpdater = (args: { schema: SchemaWithMeta }) => SchemaWithMeta
 export type ModelUpdater = (args: { schema: Schema; model: Model.Schema }) => Model.Schema
 export type EntityUpdater = (args: { schema: Schema; model: Model.Schema; entity: Model.Entity }) => Model.Entity
 export type FieldUpdater<In extends Model.AnyField, Out extends Model.AnyField> = (args: {
@@ -281,3 +283,14 @@ export const removeField = (entityName: string, fieldName: string, version: numb
 		)({ schema })
 	}
 }
+
+export const addTakenIndexName = (indexName: string): SchemaUpdater => ({ schema }) => ({
+	...schema,
+	meta: {
+		...schema.meta,
+		takenIndexNames: {
+			...schema.meta?.takenIndexNames,
+			[resolveIndexName(schema, indexName)]: true,
+		},
+	},
+})

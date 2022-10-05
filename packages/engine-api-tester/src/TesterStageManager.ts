@@ -29,17 +29,6 @@ export class TesterStageManager {
 		return stage
 	}
 
-	public async refreshCreatedStages(): Promise<Set<string>> {
-		const stages = await SelectBuilder.create<{ slug: string }>() //
-			.select('slug')
-			.from('stage')
-			.getResult(this.db.client)
-
-		this.createdStages = new Set(stages.map(it => it.slug))
-
-		return this.createdStages
-	}
-
 	public async createAll(): Promise<void> {
 		for (const stage of this.project.stages) {
 			await this.createStage(stage.slug)

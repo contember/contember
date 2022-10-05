@@ -1,0 +1,4 @@
+`)
+
+	await createCredentials(builder, args)
+}

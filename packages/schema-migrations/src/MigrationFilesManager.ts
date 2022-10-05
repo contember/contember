@@ -1,4 +1,4 @@
-import { MigrationVersionHelper } from './MigrationVersionHelper'
+import { MigrationVersionHelper } from '@contember/engine-common'
 import * as fs from 'node:fs/promises'
 import * as path from 'node:path'
 

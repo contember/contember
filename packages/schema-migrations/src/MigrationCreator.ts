@@ -3,7 +3,7 @@ import { Schema } from '@contember/schema'
 import { SchemaDiffer } from './SchemaDiffer'
 import { VERSION_LATEST } from './modifications/ModificationVersions'
 import { Migration } from './Migration'
-import { MigrationVersionHelper } from './MigrationVersionHelper'
+import { MigrationVersionHelper } from '@contember/engine-common'
 
 export class MigrationCreator {
 	constructor(

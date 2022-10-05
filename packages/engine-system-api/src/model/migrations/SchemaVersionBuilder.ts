@@ -7,7 +7,7 @@ import { normalizeSchema } from '@contember/schema-utils'
 
 export type VersionedSchema = Schema & { version: string; notNormalized: Schema & { version: string } }
 
-const emptyVersionedSchema = { ...normalizeSchema(emptySchema), version: '', notNormalized: { ...emptySchema, version: '' } }
+export const emptyVersionedSchema = { ...normalizeSchema(emptySchema), version: '', notNormalized: { ...emptySchema, version: '' } }
 
 export class SchemaVersionBuilder {
 	constructor(

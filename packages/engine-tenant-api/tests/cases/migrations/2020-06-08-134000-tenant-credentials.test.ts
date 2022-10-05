@@ -2,6 +2,8 @@ import migration from '../../../src/migrations/2020-06-08-134000-tenant-credenti
 import { createMigrationBuilder } from '@contember/database-migrations'
 import { test, assert } from 'vitest'
 
+let uuidNum = 0
+export const testUuid = () => '123e4567-e89b-12d3-a456-' + (uuidNum++).toString().padStart(12, '0')
 test('generate sql with root token and login token', async () => {
 	const builder = createMigrationBuilder()
 	await migration(builder, {
@@ -9,6 +11,9 @@ test('generate sql with root token and login token', async () => {
 			loginTokenHash: '936a185caaa266bb9cbe981e9e05cb78cd732b0b3280eb944412bb6f8f8f07af',
 			rootTokenHash: 'c3ab8ff13720e8ad9047dd39466b3c8974e592c2fa383d4a3960714caef0c4f2',
 		}),
+		providers: {
+			uuid: testUuid,
+		},
 	})
 	assert.equal(
 		builder.getSql(),
@@ -60,6 +65,9 @@ test('generate sql with both root user and token', async () => {
 			rootTokenHash: 'd96f62ea0f2f543aa7822a58114f75dbcc05bdf970fb15eb55eea836a1439e43',
 			rootEmail: 'john@doe.com',
 		}),
+		providers: {
+			uuid: testUuid,
+		},
 	})
 	assert.equal(
 		builder.getSql(),

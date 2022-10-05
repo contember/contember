@@ -1,15 +1,14 @@
 import {
 	DatabaseContextFactory,
-	ProjectConfig, ProjectInitializer, StageCreator,
-	SystemContainer,
-	SystemContainerFactory, SystemMigrationsRunner,
-	typeDefs as systemTypeDefs,
+	ProjectConfig,
+	ProjectInitializer,
+	StageCreator,
+	SystemContainerFactory,
+	SystemMigrationsRunner,
 } from '@contember/engine-system-api'
 import { MigrationFilesManager, MigrationsResolver, ModificationHandlerFactory } from '@contember/schema-migrations'
 import { GraphQlSchemaBuilderFactory } from '@contember/engine-content-api'
-import { makeExecutableSchema } from '@graphql-tools/schema'
 import { ContentApiTester } from './ContentApiTester'
-import { SystemApiTester } from './SystemApiTester'
 import { TesterStageManager } from './TesterStageManager'
 import { Client } from '@contember/database'
 import { createUuidGenerator } from './testUuid'
@@ -24,10 +23,7 @@ export class ApiTester {
 
 	constructor(
 		public readonly client: Client,
-		public readonly databaseContextFactory: DatabaseContextFactory,
-		public readonly systemContainer: SystemContainer,
 		public readonly content: ContentApiTester,
-		public readonly system: SystemApiTester,
 		public readonly stages: TesterStageManager,
 		public readonly cleanup: () => Promise<void>,
 	) {
@@ -36,9 +32,6 @@ export class ApiTester {
 	public static async create(options: {
 		project?: Partial<ProjectConfig>
 		migrationsResolver?: MigrationsResolver
-		systemContainerHook?: (
-			container: ReturnType<SystemContainerFactory['createBuilder']>,
-		) => ReturnType<SystemContainerFactory['createBuilder']>
 		mapperContainerFactoryFactory?: (providers: Providers) => MapperContainerFactory
 	}): Promise<ApiTester> {
 		const dbName = String(process.env.TEST_DB_NAME)
@@ -64,9 +57,6 @@ export class ApiTester {
 				},
 			},
 		})
-		if (options.systemContainerHook) {
-			systemContainerBuilder = options.systemContainerHook(systemContainerBuilder)
-		}
 		const systemContainer = systemContainerBuilder.build()
 
 		const connection = await recreateDatabase(projectDbCredentials)
@@ -86,11 +76,6 @@ export class ApiTester {
 
 		await projectInitializer.initialize(createLogger(new JsonStreamLoggerHandler(process.stderr)))
 
-		const systemSchema = makeExecutableSchema({
-			typeDefs: systemTypeDefs,
-			resolvers: systemContainer.get('systemResolversFactory').create(false) as any,
-		})
-
 		const stageManager = new TesterStageManager(
 			projectConfig,
 			db,
@@ -105,15 +90,11 @@ export class ApiTester {
 			stageManager,
 			systemContainer.schemaVersionBuilder,
 		)
-		const systemApiTester = new SystemApiTester(db, projectConfig, systemSchema, systemContainer)
 		let closed = false
 
 		return new ApiTester(
 			db.client,
-			databaseContextFactory,
-			systemContainer,
 			contentApiTester,
-			systemApiTester,
 			stageManager,
 			async () => {
 				if (!closed) {

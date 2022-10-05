@@ -42,7 +42,7 @@ export default async function (builder: MigrationBuilder, args: MigrationArgs<Sy
 		identity_id UUID NOT NULL,
 		transaction_id UUID DEFAULT COALESCE(
 			(NULLIF(CURRENT_SETTING('system.transaction_id'::TEXT, TRUE), ''::TEXT))::UUID,
-			(SET_CONFIG('system.transaction_id'::TEXT, (uuid_generate_v4())::TEXT, TRUE))::UUID) NOT NULL
+			(SET_CONFIG('system.transaction_id'::TEXT, ("uuid_generate_v4"())::TEXT, TRUE))::UUID) NOT NULL
 		)
 	`)
 	builder.sql(`
@@ -210,7 +210,7 @@ export default async function (builder: MigrationBuilder, args: MigrationArgs<Sy
 
 			INSERT INTO "event_data" ("id", "type", "table_name", "row_ids", "values", "created_at", schema_id, identity_id)
 			VALUES (
-				uuid_generate_v4(),
+				"uuid_generate_v4"(),
 				new_event_type,
 				table_name,
 				primary_values,

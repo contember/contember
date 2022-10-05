@@ -1,6 +1,6 @@
 import { Connection, createDatabaseIfNotExists, DatabaseConfig, EventManager } from '@contember/database'
 import { TenantMigrationArgs } from './types'
-import { Migration, MigrationsRunner as DbMigrationsRunner } from '@contember/database-migrations'
+import { MigrationsRunner as DbMigrationsRunner, SnapshotMigrationResolver } from '@contember/database-migrations'
 import _20180802174310init from './2018-08-02-174310-init'
 import _20180903140621identityproject from './2018-09-03-140621-identity-project'
 import _20181026165450setupapikey from './2018-10-26-165450-setup-api-key'
@@ -32,8 +32,10 @@ import _20220629105000personidp from './2022-06-29-105000-person-idp'
 import _20220707135000personemailoptuniq from './2022-07-07-135000-person-email-opt-uniq'
 import _20220707141000persondisplayname from './2022-07-07-141000-person-display-name'
 import _20220714145000personloginoptions from './2022-07-14-145000-person-login-options'
+import snapshot from './snapshot'
 import { computeTokenHash, Providers } from '../model'
 import { Logger } from '@contember/logger'
+import { MigrationVersionHelper } from '@contember/engine-common'
 
 export interface TenantCredentials {
 	loginToken?: string
@@ -77,18 +79,12 @@ const migrations = {
 	'2022-07-14-145000-person-login-options': _20220714145000personloginoptions,
 }
 
-
-
-const getMigrations = (): Promise<Migration<TenantMigrationArgs>[]> => {
-	return Promise.resolve(Object.entries(migrations).map(([name, migration]) => new Migration(name, migration)))
-}
-
 export class TenantMigrationsRunner {
 	constructor(
 		private readonly db: DatabaseConfig,
 		private readonly schema: string,
 		private readonly tenantCredentials: TenantCredentials,
-		private readonly providers: Providers,
+		private readonly providers: Pick<Providers, 'bcrypt' | 'uuid'>,
 	) {
 	}
 
@@ -96,7 +92,9 @@ export class TenantMigrationsRunner {
 		await createDatabaseIfNotExists(this.db, message => typeof message === 'string' ? logger.warn(message) : logger.error(message))
 		const connection = Connection.createSingle(this.db, err => logger.error(err))
 		const result = await connection.scope(async connection => {
-			const innerRunner = new DbMigrationsRunner<TenantMigrationArgs>(connection, this.schema, getMigrations)
+			const migrationsResolver = new SnapshotMigrationResolver(snapshot, migrations)
+
+			const innerRunner = new DbMigrationsRunner<TenantMigrationArgs>(connection, this.schema, migrationsResolver)
 			return await innerRunner.migrate(message => logger.warn(message), {
 				getCredentials: async () => ({
 					loginTokenHash: this.tenantCredentials.loginToken ? computeTokenHash(this.tenantCredentials.loginToken) : undefined,
@@ -105,6 +103,7 @@ export class TenantMigrationsRunner {
 					rootEmail: this.tenantCredentials.rootEmail,
 					rootPasswordBcrypted: this.tenantCredentials.rootPassword ? await this.providers.bcrypt(this.tenantCredentials.rootPassword) : undefined,
 				}),
+				providers: this.providers,
 			})
 		})
 		await connection.end()

@@ -26,9 +26,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
 
-import { createMigrationBuilder } from './helpers'
+import {
+	createMigrationBuilder,
+	createMigrationVersionPrefixGenerator,
+	createMigrationVersionTimePrefix,
+} from './helpers'
 import { Connection, withDatabaseAdvisoryLock, wrapIdentifier } from '@contember/database'
-import { Migration } from './Migration'
+import { Migration, RunMigration } from './Migration'
+import { MigrationsResolver } from './MigrationsResolver'
 
 export type RunnerOption<Args = unknown> = {
 	migrationsTable: string
@@ -54,6 +59,7 @@ const ensureMigrationsTable = async (db: Connection.ConnectionLike, options: Run
 				run_on timestamp NOT NULL
 			)`,
 		)
+		await db.query(`ALTER TABLE ${fullTableName} ADD COLUMN IF NOT EXISTS "group" TEXT DEFAULT NULL`)
 	} catch (err) {
 		if (!(err instanceof Error)) {
 			throw err
@@ -64,29 +70,15 @@ const ensureMigrationsTable = async (db: Connection.ConnectionLike, options: Run
 
 const getRunMigrations = async (db: Connection.ConnectionLike, options: RunnerOption<unknown>) => {
 	const fullTableName = getMigrationsTableName(options)
-	return (await db.query<{name: string}>(`SELECT name FROM ${fullTableName} ORDER BY run_on, id`)).rows.map(it => it.name)
+	return (await db.query<{name: string; group: string | null}>(`SELECT name, "group" FROM ${fullTableName} ORDER BY run_on, id`)).rows
 }
 
 const getMigrationsToRun = <Args>(options: RunnerOption, runNames: string[], migrations: Migration<Args>[]): Migration<Args>[] => {
 	return migrations.filter(({ name }) => runNames.indexOf(name) < 0)
 }
 
-const checkOrder = (runNames: string[], migrations: Migration<any>[]) => {
-	const len = Math.min(runNames.length, migrations.length)
-	for (let i = 0; i < len; i += 1) {
-		const runName = runNames[i]
-		const migrationName = migrations[i].name
-		if (runName < migrationName) {
-			throw new Error(`Previously run migration ${runName} is missing`)
-		}
-		if (runName !== migrationName) {
-			throw new Error(`Not run migration ${migrationName} is preceding already run migration ${runName}`)
-		}
-	}
-}
-
 export default async <Args>(
-	getMigrations: () => Promise<Migration<Args>[]>,
+	migrationsResolver: MigrationsResolver<Args>,
 	connection: Connection.ConnectionLike,
 	options: RunnerOption<Args>,
 ): Promise<{ name: string }[]> => {
@@ -98,10 +90,13 @@ export default async <Args>(
 			await ensureMigrationsTable(db, options)
 
 
-			const runNames = await getRunMigrations(db, options)
-			const migrations = await getMigrations()
-			checkOrder(runNames, migrations)
+			const runMigrations = await getRunMigrations(db, options)
+			const migrations = await migrationsResolver.resolveMigrations({
+				runMigrations,
+				createTimeVersionPrefix: createMigrationVersionPrefixGenerator(),
+			})
 
+			const runNames = runMigrations.map(it => it.name)
 			const toRun: Migration<Args>[] = getMigrationsToRun(options, runNames, migrations)
 
 			if (!toRun.length) {
@@ -122,8 +117,8 @@ export default async <Args>(
 							}
 
 							await trx.query(
-								`INSERT INTO ${getMigrationsTableName(options)} (name, run_on) VALUES (?, NOW());`,
-								[migration.name],
+								`INSERT INTO ${getMigrationsTableName(options)} (name, run_on, "group") VALUES (?, NOW(), ?);`,
+								[migration.name, migration.group],
 							)
 							logger(`  Done`)
 						} catch (e) {

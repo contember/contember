@@ -1,8 +1,8 @@
 import {
 	DatabaseContextFactory,
-	ProjectConfig,
+	ProjectConfig, ProjectInitializer, StageCreator,
 	SystemContainer,
-	SystemContainerFactory,
+	SystemContainerFactory, SystemMigrationsRunner,
 	typeDefs as systemTypeDefs,
 } from '@contember/engine-system-api'
 import { MigrationFilesManager, MigrationsResolver, ModificationHandlerFactory } from '@contember/schema-migrations'
@@ -17,6 +17,7 @@ import { project } from './project'
 import { createConnection, dbCredentials, recreateDatabase } from './dbUtils'
 import { join } from 'path'
 import { createLogger, JsonStreamLoggerHandler, NullLoggerHandler } from '@contember/logger'
+import { Providers } from '@contember/schema-utils'
 
 export class ApiTester {
 	public static project = project
@@ -38,6 +39,7 @@ export class ApiTester {
 		systemContainerHook?: (
 			container: ReturnType<SystemContainerFactory['createBuilder']>,
 		) => ReturnType<SystemContainerFactory['createBuilder']>
+		mapperContainerFactoryFactory?: (providers: Providers) => MapperContainerFactory
 	}): Promise<ApiTester> {
 		const dbName = String(process.env.TEST_DB_NAME)
 
@@ -74,7 +76,15 @@ export class ApiTester {
 
 		const db = databaseContextFactory.create()
 
-		await systemContainer.projectInitializer.initialize(databaseContextFactory, { ...projectConfig, db: projectDbCredentials }, createLogger(new JsonStreamLoggerHandler(process.stderr)))
+		const stageCreator = new StageCreator()
+		const projectConfigWithDb = {
+			...projectConfig,
+			db: projectDbCredentials,
+		}
+		const systemMigrationsRunner = new SystemMigrationsRunner(databaseContextFactory, projectConfigWithDb, 'system', systemContainer.schemaVersionBuilder)
+		const projectInitializer = new ProjectInitializer(stageCreator, systemMigrationsRunner, databaseContextFactory, projectConfigWithDb)
+
+		await projectInitializer.initialize(createLogger(new JsonStreamLoggerHandler(process.stderr)))
 
 		const systemSchema = makeExecutableSchema({
 			typeDefs: systemTypeDefs,
@@ -84,7 +94,7 @@ export class ApiTester {
 		const stageManager = new TesterStageManager(
 			projectConfig,
 			db,
-			systemContainer.stageCreator,
+			stageCreator,
 			systemContainer.projectMigrator,
 			migrationsResolver,
 		)

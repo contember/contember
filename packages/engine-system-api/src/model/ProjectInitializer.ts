@@ -1,64 +1,28 @@
 import { ProjectConfig } from '../types'
-import { ProjectMigrator, SchemaVersionBuilder } from './migrations'
 import { StageCreator } from './stages'
 import { DatabaseContext, DatabaseContextFactory } from './database'
-import { SystemDbMigrationsRunnerFactory } from '../SystemContainer'
-import {
-	Client,
-	Connection,
-	createDatabaseIfNotExists,
-	DatabaseConfig,
-	EventManager,
-	retryTransaction,
-} from '@contember/database'
+import { Connection, retryTransaction } from '@contember/database'
 import { FingerCrossedLoggerHandler, Logger } from '@contember/logger'
+import { SystemMigrationsRunner } from '../migrations'
 
 export class ProjectInitializer {
 	constructor(
-		private readonly projectMigrator: ProjectMigrator,
 		private readonly stageCreator: StageCreator,
-		private readonly systemDbMigrationsRunnerFactory: SystemDbMigrationsRunnerFactory,
-		private readonly schemaVersionBuilder: SchemaVersionBuilder,
+		private readonly migrationsRunner: SystemMigrationsRunner,
+		private readonly databaseContextFactory: DatabaseContextFactory,
+		private readonly project: ProjectConfig,
 	) {}
 
-	public async initialize(
-		databaseContextFactory: DatabaseContextFactory,
-		project: ProjectConfig & { db?: DatabaseConfig },
-		logger: Logger,
-	) {
-		const dbContext = databaseContextFactory.create()
+	public async initialize(logger: Logger) {
 		return await logger.scope(async initLogger => {
-			if (project.db) {
-				// todo: use dbContext
-				initLogger.debug('Executing system schema migrations')
-				await createDatabaseIfNotExists(project.db, message => typeof message === 'string' ? initLogger.warn(message) : initLogger.error(message))
-				const singleConnection = Connection.createSingle(project.db, err => initLogger.error(err))
-				singleConnection.eventManager.on(EventManager.Event.clientError, err => logger.error(err, { message: 'Database client error' }))
-
-				await singleConnection.scope(async connection => {
-					const systemSchema = dbContext.client.schema
-
-					const schemaResolver = (connection: Connection.ConnectionLike) => {
-						const dbContextMigrations = databaseContextFactory
-							.withClient(new Client(connection, systemSchema, { module: 'system' }))
-							.create()
-						return this.schemaVersionBuilder.buildSchema(dbContextMigrations)
-					}
-					await this.systemDbMigrationsRunnerFactory(connection, systemSchema).migrate(
-						message => initLogger.warn(message),
-						{
-							schemaResolver,
-							project,
-						},
-					)
-				})
-				await singleConnection.end()
-			}
-			await retryTransaction(() =>
-				dbContext.transaction(async trx => {
-					await this.initStages(trx, project, initLogger)
+			initLogger.debug('Executing system schema migrations')
+			await this.migrationsRunner.run(initLogger)
+			const dbContext = this.databaseContextFactory.create()
+			await retryTransaction(
+				() => dbContext.transaction(async trx => {
+					await this.initStages(trx, logger)
 				}),
-			message => initLogger.warn(message),
+				message => initLogger.warn(message),
 			)
 			if (dbContext.client.connection instanceof Connection) {
 				await dbContext.client.connection.clearPool()
@@ -66,9 +30,9 @@ export class ProjectInitializer {
 		}, {}, { handler: FingerCrossedLoggerHandler.factory() })
 	}
 
-	private async initStages(db: DatabaseContext<Connection.TransactionLike>, project: ProjectConfig, logger: Logger) {
+	private async initStages(db: DatabaseContext<Connection.TransactionLike>, logger: Logger) {
 		logger.debug(`Creating stages`)
-		for (const stage of project.stages) {
+		for (const stage of this.project.stages) {
 			const created = await this.stageCreator.createStage(db, stage)
 			if (created) {
 				logger.warn(`Created stage ${stage.slug}`, { stage: stage.slug })

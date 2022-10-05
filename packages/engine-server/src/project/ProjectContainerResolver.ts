@@ -1,7 +1,6 @@
 import { ProjectContainerFactory } from './ProjectContainer'
 import { ProjectContainer } from '@contember/engine-http'
 import { DatabaseContext, ProjectManager, ProjectWithSecrets } from '@contember/engine-tenant-api'
-import { ProjectInitializer as SystemProjectInitializer } from '@contember/engine-system-api'
 import { ProjectContainerStore } from './ProjectContainerStore'
 import { ProjectConfigResolver } from '../config/projectConfigResolver'
 import { TenantConfig } from '../config/config'
@@ -16,7 +15,6 @@ export class ProjectContainerResolver {
 		private readonly projectContainerFactory: ProjectContainerFactory,
 		private readonly projectConfigResolver: ProjectConfigResolver,
 		private readonly projectManager: ProjectManager,
-		private readonly systemProjectInitializer: SystemProjectInitializer,
 		private readonly tenantDatabase: DatabaseContext,
 		private readonly tenantConfig: TenantConfig,
 	) {}
@@ -56,11 +54,7 @@ export class ProjectContainerResolver {
 			const projectContainer = this.projectContainerFactory.createContainer({
 				project: projectConfig,
 			})
-			await this.systemProjectInitializer.initialize(
-				projectContainer.systemDatabaseContextFactory,
-				projectContainer.project,
-				logger ?? projectContainer.logger,
-			)
+			await projectContainer.projectInitializer.initialize(logger ?? projectContainer.logger)
 			const cleanups = this.onCreate.map(it => it(projectContainer) || (() => null))
 			return {
 				container: projectContainer,

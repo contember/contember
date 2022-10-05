@@ -1,4 +1,4 @@
-import { Migration } from '@contember/database-migrations'
+import { Migration, MigrationsRunner as DbMigrationsRunner } from '@contember/database-migrations'
 import _20180804102200init from './2018-08-04-102200-init'
 import _20180805130501triggereventfunction from './2018-08-05-130501-trigger-event-function'
 import _20190114143432eventtrxid from './2019-01-14-143432-event-trx-id'
@@ -19,6 +19,10 @@ import _20220208144400dynamicstageschema from './2022-02-08-144400-dynamic-stage
 import _20221003110000tableondelete from './2022-10-03-110000-table-on-delete'
 
 import { SystemMigrationArgs } from './types'
+import { Client, Connection, createDatabaseIfNotExists, DatabaseConfig } from '@contember/database'
+import { DatabaseContextFactory, SchemaVersionBuilder } from '../model'
+import { ProjectConfig } from '../types'
+import { Logger } from '@contember/logger'
 
 const migrations = {
 	'2018-08-04-102200-init': _20180804102200init,
@@ -43,4 +47,34 @@ const migrations = {
 
 export const getSystemMigrations = (): Promise<Migration<SystemMigrationArgs>[]> => {
 	return Promise.resolve(Object.entries(migrations).map(([name, migration]) => new Migration(name, migration)))
+}
+
+export class SystemMigrationsRunner {
+	constructor(
+		private readonly databaseContextFactory: DatabaseContextFactory,
+		private readonly project: ProjectConfig & { db: DatabaseConfig },
+		private readonly schema: string,
+		private readonly schemaVersionBuilder: SchemaVersionBuilder,
+	) {
+	}
+	async run(logger: Logger) {
+		await createDatabaseIfNotExists(this.project.db, message => typeof message === 'string' ? logger.warn(message) : logger.error(message))
+		const singleConnection = Connection.createSingle(this.project.db, err => logger.error(err))
+		await singleConnection.scope(async connection => {
+			const systemSchema = this.schema
+
+			const schemaResolver = (connection: Connection.ConnectionLike) => {
+				const dbContextMigrations = this.databaseContextFactory
+					.withClient(new Client(connection, systemSchema, { module: 'system' }))
+					.create()
+				return this.schemaVersionBuilder.buildSchema(dbContextMigrations)
+			}
+			const migrationsRunner = new DbMigrationsRunner(connection, this.schema, getSystemMigrations)
+			await migrationsRunner.migrate(message => logger.warn(message), {
+				project: this.project,
+				schemaResolver,
+			})
+		})
+		await singleConnection.end()
+	}
 }

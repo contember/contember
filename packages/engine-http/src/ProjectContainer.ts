@@ -1,4 +1,4 @@
-import { DatabaseContextFactory } from '@contember/engine-system-api'
+import { DatabaseContextFactory, ProjectInitializer } from '@contember/engine-system-api'
 import { Connection } from '@contember/database'
 import { ProjectConfig } from './config'
 import { ContentSchemaResolver, GraphQlSchemaFactory } from './content'
@@ -12,6 +12,7 @@ export interface ProjectContainer {
 	readConnection: Connection
 	graphQlSchemaFactory: GraphQlSchemaFactory
 	contentSchemaResolver: ContentSchemaResolver
+	projectInitializer: ProjectInitializer
 }
 
 export interface ProjectContainerResolver {

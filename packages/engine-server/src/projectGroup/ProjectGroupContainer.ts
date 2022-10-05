@@ -91,12 +91,11 @@ export class ProjectGroupContainerFactory {
 				this.projectContainerFactoryFactory.create(schemaVersionBuilder, logger))
 			.addService('tenantProjectManager', ({ tenantContainer }) =>
 				tenantContainer.projectManager)
-			.addService('projectContainerResolver', ({ projectContainerFactory, tenantProjectManager, systemContainer, tenantContainer }) =>
+			.addService('projectContainerResolver', ({ projectContainerFactory, tenantProjectManager, tenantContainer }) =>
 				new ProjectContainerResolver(
 					projectContainerFactory,
 					this.projectConfigResolver,
 					tenantProjectManager,
-					systemContainer.projectInitializer,
 					tenantContainer.databaseContext,
 					config,
 				))

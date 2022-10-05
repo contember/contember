@@ -1,6 +1,11 @@
 import { Builder } from '@contember/dic'
 import { Connection } from '@contember/database'
-import { DatabaseContextFactory, SchemaVersionBuilder } from '@contember/engine-system-api'
+import {
+	DatabaseContextFactory,
+	ProjectInitializer,
+	SchemaVersionBuilder, StageCreator,
+	SystemMigrationsRunner,
+} from '@contember/engine-system-api'
 import { GraphQlSchemaBuilderFactory, PermissionsByIdentityFactory } from '@contember/engine-content-api'
 import { GraphQLSchemaContributor, Plugin } from '@contember/engine-plugins'
 import {
@@ -48,6 +53,7 @@ export class ProjectContainerFactory {
 				'systemDatabaseContextFactory',
 				'contentSchemaResolver',
 				'graphQlSchemaFactory',
+				'projectInitializer',
 				'logger',
 			)
 	}
@@ -91,5 +97,9 @@ export class ProjectContainerFactory {
 				new ContentSchemaResolver(schemaVersionBuilder))
 			.addService('systemDatabaseContextFactory', ({ connection, providers, project }) =>
 				new DatabaseContextFactory(connection.createClient(project.db.systemSchema ?? 'system', { module: 'system' }), providers))
+			.addService('systemMigrationsRunner', ({ systemDatabaseContextFactory, project }) =>
+				new SystemMigrationsRunner(systemDatabaseContextFactory, project, project.db.systemSchema ?? 'system', this.schemaVersionBuilder))
+			.addService('projectInitializer', ({ systemMigrationsRunner, systemDatabaseContextFactory, project }) =>
+				new ProjectInitializer(new StageCreator(), systemMigrationsRunner, systemDatabaseContextFactory, project))
 	}
 }

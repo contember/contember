@@ -17,6 +17,11 @@ namespace WhereBuilderModel {
 		title = def.stringColumn()
 		isPublic = def.boolColumn().notNull()
 		author = def.manyHasOne(Author, 'articles')
+		tags = def.manyHasMany(Tag)
+	}
+
+	export class Tag {
+		name = def.stringColumn()
 	}
 }
 
@@ -48,7 +53,7 @@ describe('where builder', () => {
 		})
 		assert.equal(
 			where,
-			' where exists (select 1  from "__SCHEMA__"."article" as "sub_"  where "root_"."id" = "sub_"."author_id" and "sub_"."is_public" = ?) and exists (select 1  from "__SCHEMA__"."article" as "sub_"  where "root_"."id" = "sub_"."author_id" and "sub_"."title" = ?)',
+			' where exists (select 1  from "__SCHEMA__"."article" as "root_articles"  where "root_"."id" = "root_articles"."author_id" and "root_articles"."is_public" = ?) and exists (select 1  from "__SCHEMA__"."article" as "root_articles"  where "root_"."id" = "root_articles"."author_id" and "root_articles"."title" = ?)',
 		)
 	})
 
@@ -64,7 +69,7 @@ describe('where builder', () => {
 		})
 		assert.equal(
 			where,
-			' where exists (select 1  from "__SCHEMA__"."article" as "sub_"  where "root_"."id" = "sub_"."author_id" and "sub_"."is_public" = ? and "sub_"."title" = ?)',
+			' where exists (select 1  from "__SCHEMA__"."article" as "root_articles"  where "root_"."id" = "root_articles"."author_id" and "root_articles"."is_public" = ? and "root_articles"."title" = ?)',
 		)
 	})
 
@@ -78,7 +83,24 @@ describe('where builder', () => {
 		})
 		assert.equal(
 			where,
-			' where exists (select 1  from (select "root_"."id") as "sub2_" left join  "__SCHEMA__"."article" as "sub_" on  "sub2_"."id" = "sub_"."author_id"  where "sub_"."id" is null)',
+			' where exists (select 1  from (select "root_"."id") as "root_articles_tmp_" left join  "__SCHEMA__"."article" as "root_articles" on  "root_articles_tmp_"."id" = "root_articles"."author_id"  where "root_articles"."id" is null)',
+		)
+	})
+
+	it('where with nested has-many', () => {
+		const schema = createSchema(WhereBuilderModel)
+		const where = createWhere(schema, {
+			articles: {
+				and: [
+					{ tags: { name: { eq: 'Hello' } } },
+					{ tags: { name: { eq: 'World' } } },
+				],
+			},
+		})
+		console.log(where)
+		assert.equal(
+			where,
+			' where exists (select 1  from "__SCHEMA__"."article" as "root_articles"  where "root_"."id" = "root_articles"."author_id" and exists (select 1  from "__SCHEMA__"."article_tags" as "root_articles_tags_junction_" inner join  "__SCHEMA__"."tag" as "root_articles_tags" on  "root_articles_tags_junction_"."tag_id" = "root_articles_tags"."id"  where "root_articles"."id" = "root_articles_tags_junction_"."article_id" and "root_articles_tags"."name" = ?) and exists (select 1  from "__SCHEMA__"."article_tags" as "root_articles_tags_junction_" inner join  "__SCHEMA__"."tag" as "root_articles_tags" on  "root_articles_tags_junction_"."tag_id" = "root_articles_tags"."id"  where "root_articles"."id" = "root_articles_tags_junction_"."article_id" and "root_articles_tags"."name" = ?))',
 		)
 	})
 })

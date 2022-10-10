@@ -28,9 +28,11 @@ test('Post by post locale (one-has-many unique)', async () => {
         }`,
 		executes: [
 			{
-				sql: SQL`SELECT "root_"."id" AS "root_id"
-						         FROM "public"."post" AS "root_"
-						         WHERE EXISTS (SELECT 1 FROM "public"."post_locale" AS "sub_" WHERE "root_"."id" = "sub_"."post_id" AND "sub_"."id" = ?)`,
+				sql: SQL`select "root_"."id" as "root_id"
+						from "public"."post" as "root_"
+						where exists (select 1
+						              from "public"."post_locale" as "root_locales"
+						              where "root_"."id" = "root_locales"."post_id" and "root_locales"."id" = ?)`,
 				parameters: [testUuid(1)],
 				response: { rows: [{ root_id: testUuid(2) }] },
 			},

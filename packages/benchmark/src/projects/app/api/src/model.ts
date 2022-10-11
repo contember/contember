@@ -1,5 +1,6 @@
 import { AllowAllPermissionFactory, SchemaBuilder } from '@contember/schema-definition'
 import { Acl, Model, Schema } from '@contember/schema'
+import { emptySchema } from '@contember/schema-utils'
 
 const builder = new SchemaBuilder()
 
@@ -252,9 +253,9 @@ const acl: Acl.Schema = {
 }
 
 const schema: Schema = {
+	...emptySchema,
 	model: model,
 	acl: acl,
-	validation: {},
 }
 
 export default schema

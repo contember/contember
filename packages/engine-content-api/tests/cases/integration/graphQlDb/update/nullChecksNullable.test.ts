@@ -5,7 +5,7 @@ import { executeDbTest } from '@contember/engine-api-tester'
 import { GQL } from '../../../../src/tags'
 import { testUuid } from '../../../../src/testUuid'
 
-const schema = new SchemaBuilder()
+const model = new SchemaBuilder()
 	.entity('Site', e => e.column('slug', c => c.unique().type(Model.ColumnType.String)))
 	.entity('ContactPage', e =>
 		e.column('title').oneHasOne('site', r => r.target('Site').inversedBy('contactPage').notNull()),
@@ -14,7 +14,7 @@ const schema = new SchemaBuilder()
 
 test('update site & create contact page', async () => {
 	await executeDbTest({
-		schema,
+		schema: { model },
 		seed: [
 			{
 				query: GQL`mutation {
@@ -43,7 +43,7 @@ test('update site & create contact page', async () => {
 
 test('update site & try to create contact page which however exists', async () => {
 	await executeDbTest({
-		schema,
+		schema: { model },
 		seed: [
 			{
 				query: GQL`mutation {

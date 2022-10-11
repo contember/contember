@@ -1,5 +1,5 @@
 import { DatabaseContext, SchemaVersionBuilder, setupSystemVariables } from '@contember/engine-system-api'
-import { AllowAllPermissionFactory } from '@contember/schema-utils'
+import { AllowAllPermissionFactory, Providers } from '@contember/schema-utils'
 import {
 	Authorizator,
 	Context as ContentContext,
@@ -21,6 +21,7 @@ export class ContentApiTester {
 		private readonly graphqlSchemaBuilderFactory: GraphQlSchemaBuilderFactory,
 		private readonly stageManager: TesterStageManager,
 		private readonly schemaVersionBuilder: SchemaVersionBuilder,
+		private readonly mapperContainerFactoryFactory?: (providers: Providers) => MapperContainerFactory,
 	) {}
 
 	public async queryContent(stageSlug: string, gql: string, variables?: { [key: string]: any }): Promise<any> {
@@ -40,7 +41,7 @@ export class ContentApiTester {
 		}
 		const executionContainer = new ExecutionContainerFactory(
 			providers,
-			new MapperContainerFactory(providers),
+			(this.mapperContainerFactoryFactory ?? (providers => new MapperContainerFactory(providers)))(providers),
 		).create({
 			schema,
 			permissions,

@@ -1,4 +1,4 @@
-import { Model } from '@contember/schema'
+import { Model, Schema } from '@contember/schema'
 import { createMock } from './utils'
 import {
 	Migration,
@@ -8,13 +8,14 @@ import {
 	SchemaMigrator,
 	VERSION_LATEST,
 } from '@contember/schema-migrations'
-import { emptySchema } from '@contember/schema-utils'
+import { emptySchema, Providers } from '@contember/schema-utils'
 import { ApiTester } from './ApiTester'
 import { SelectBuilder } from '@contember/database'
 import { assert } from 'vitest'
+import { MapperContainerFactory } from '@contember/engine-content-api'
 
 type Test = {
-	schema: Model.Schema
+	schema: Partial<Schema>
 	seed: {
 		query: string
 		queryVariables?: Record<string, any>
@@ -22,6 +23,7 @@ type Test = {
 	query: string
 	queryVariables?: Record<string, any>
 	expectDatabase?: Record<string, Record<string, any>[]>
+	mapperContainerFactoryFactory?: (providers: Providers) => MapperContainerFactory
 } & ({ return: object | ((response: any) => void) } | { throws: { message: string } })
 
 export const executeDbTest = async (test: Test) => {
@@ -29,9 +31,8 @@ export const executeDbTest = async (test: Test) => {
 	const schemaMigrator = new SchemaMigrator(modificationFactory)
 	const schemaDiffer = new SchemaDiffer(schemaMigrator)
 	const modifications = schemaDiffer.diffSchemas(emptySchema, {
-		model: test.schema,
-		acl: { roles: {} },
-		validation: {},
+		...emptySchema,
+		...test.schema,
 	})
 
 	const migrationsResolver = createMock<MigrationsResolver>({
@@ -55,6 +56,7 @@ export const executeDbTest = async (test: Test) => {
 				},
 			],
 		},
+		mapperContainerFactoryFactory: test.mapperContainerFactoryFactory,
 	})
 	try {
 		await tester.stages.createAll()

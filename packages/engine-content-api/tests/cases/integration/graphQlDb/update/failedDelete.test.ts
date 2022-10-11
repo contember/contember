@@ -6,14 +6,14 @@ import { executeDbTest } from '@contember/engine-api-tester'
 
 test('fails when deleting entity without proper cascade', async () => {
 	await executeDbTest({
-		schema: new SchemaBuilder()
+		schema: { model: new SchemaBuilder()
 			.entity('Post', entity =>
 				entity.column('slug').unique(['slug']),
 			)
 			.entity('PostLocales', entity =>
 				entity.manyHasOne('post', relation => relation.target('Post').inversedBy('locales')).column('title'),
 			)
-			.buildSchema(),
+			.buildSchema() },
 		seed: [
 			{
 				query: `mutation {

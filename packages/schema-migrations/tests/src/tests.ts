@@ -3,6 +3,7 @@ import { Acl, Model } from '@contember/schema'
 import { createMigrationBuilder } from '@contember/database-migrations'
 import { assert, describe, it } from 'vitest'
 import { SchemaWithMeta } from '../../src/modifications/utils/schemaMeta'
+import { emptySchema } from '@contember/schema-utils'
 
 const modificationFactory = new ModificationHandlerFactory(ModificationHandlerFactory.defaultFactoryMap)
 const schemaMigrator = new SchemaMigrator(modificationFactory)
@@ -28,20 +29,20 @@ export function testDiffSchemas(
 	updatedAcl: Acl.Schema = emptyAcl,
 ) {
 	const actualDiff = schemaDiffer.diffSchemas(
-		{ model: originalModel, acl: originalAcl, validation: {} },
-		{ model: updatedModel, acl: updatedAcl, validation: {} },
+		{ ...emptySchema, model: originalModel, acl: originalAcl },
+		{ ...emptySchema, model: updatedModel, acl: updatedAcl },
 		false,
 	)
 	assert.deepStrictEqual(actualDiff, expectedDiff)
 	const { meta, ...schema } = schemaMigrator.applyModifications(
-		{ model: originalModel, acl: originalAcl, validation: {} },
+		{ ...emptySchema, model: originalModel, acl: originalAcl },
 		actualDiff,
 		VERSION_LATEST,
 	) as SchemaWithMeta
 	assert.deepStrictEqual(schema, {
+		...emptySchema,
 		model: updatedModel,
 		acl: updatedAcl,
-		validation: {},
 	})
 }
 
@@ -53,20 +54,20 @@ export function testApplyDiff(
 	expectedAcl: Acl.Schema = emptyAcl,
 ) {
 	const { meta, ...actualSchema } = schemaMigrator.applyModifications(
-		{ model: originalModel, acl: originalAcl, validation: {} },
+		{ ...emptySchema, model: originalModel, acl: originalAcl },
 		diff,
 		VERSION_LATEST,
 	) as SchemaWithMeta
 
 	assert.deepStrictEqual(actualSchema, {
+		...emptySchema,
 		model: expectedModel,
 		acl: expectedAcl,
-		validation: {},
 	})
 }
 
 export function testGenerateSql(originalSchema: Model.Schema, diff: Migration.Modification[], expectedSql: string) {
-	let schema = { model: originalSchema, acl: emptyAcl, validation: {} }
+	let schema = { ...emptySchema, model: originalSchema, acl: emptyAcl }
 	const builder = createMigrationBuilder()
 	for (let { modification, ...data } of diff) {
 		const modificationHandler = modificationFactory.create(modification, data, schema, { formatVersion: VERSION_LATEST, systemSchema: 'system' })

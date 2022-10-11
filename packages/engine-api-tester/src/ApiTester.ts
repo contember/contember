@@ -7,7 +7,7 @@ import {
 	SystemMigrationsRunner,
 } from '@contember/engine-system-api'
 import { MigrationFilesManager, MigrationsResolver, ModificationHandlerFactory } from '@contember/schema-migrations'
-import { GraphQlSchemaBuilderFactory } from '@contember/engine-content-api'
+import { GraphQlSchemaBuilderFactory, MapperContainerFactory } from '@contember/engine-content-api'
 import { ContentApiTester } from './ContentApiTester'
 import { TesterStageManager } from './TesterStageManager'
 import { Client } from '@contember/database'
@@ -89,6 +89,7 @@ export class ApiTester {
 			gqlSchemaBuilderFactory,
 			stageManager,
 			systemContainer.schemaVersionBuilder,
+			options.mapperContainerFactoryFactory,
 		)
 		let closed = false
 

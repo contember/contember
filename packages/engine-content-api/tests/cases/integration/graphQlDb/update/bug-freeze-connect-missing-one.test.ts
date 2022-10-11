@@ -18,7 +18,7 @@ namespace Model {
 }
 test('create redirect to non-existing target', async () => {
 	await executeDbTest({
-		schema: def.createModel(Model),
+		schema: { model: def.createModel(Model) },
 		query: GQL`
 		mutation {
   createRedirect(

@@ -4,7 +4,7 @@ import { test, assert } from 'vitest'
 import { executeDbTest } from '@contember/engine-api-tester'
 import { GQL } from '../../../../src/tags'
 
-const schema = new SchemaBuilder()
+const model = new SchemaBuilder()
 	.entity('Post', e =>
 		e
 			.column('slug', c => c.type(Model.ColumnType.String).unique())
@@ -13,7 +13,7 @@ const schema = new SchemaBuilder()
 	.buildSchema()
 test('returns error for invalid date input', async () => {
 	await executeDbTest({
-		schema,
+		schema: { model },
 		seed: [
 			{
 				query: GQL`mutation {

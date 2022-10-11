@@ -89,6 +89,7 @@ export class ApiTester {
 			gqlSchemaBuilderFactory,
 			stageManager,
 			systemContainer.schemaVersionBuilder,
+			options.mapperContainerFactoryFactory,
 		)
 		let closed = false
 

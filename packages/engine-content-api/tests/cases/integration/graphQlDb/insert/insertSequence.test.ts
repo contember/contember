@@ -10,9 +10,9 @@ namespace SeqModel {
 }
 
 test('insert author with id', async () => {
-	const schema = def.createModel(SeqModel)
+	const model = def.createModel(SeqModel)
 	await executeDbTest({
-		schema: schema,
+		schema: { model },
 		query: GQL`
           mutation {
               createOrder(data: {}) {

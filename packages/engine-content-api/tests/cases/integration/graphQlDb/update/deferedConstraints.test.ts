@@ -6,7 +6,7 @@ import { executeDbTest } from '@contember/engine-api-tester'
 
 test('delete without deferring constraints', async () => {
 	await executeDbTest({
-		schema: new SchemaBuilder()
+		schema: { model: new SchemaBuilder()
 			.entity('Post', entity =>
 				entity
 					.column('slug')
@@ -25,7 +25,7 @@ test('delete without deferring constraints', async () => {
 					.manyHasOne('attachment', relation => relation.target('Attachment').inversedBy('refereces'))
 					.unique(['slug']),
 			)
-			.buildSchema(),
+			.buildSchema() },
 		seed: [
 			{
 				query: `mutation {
@@ -73,7 +73,7 @@ test('delete without deferring constraints', async () => {
 
 test('delete with successfully deferring constraints', async () => {
 	await executeDbTest({
-		schema: new SchemaBuilder()
+		schema: { model: new SchemaBuilder()
 			.entity('Post', entity =>
 				entity
 					.column('slug')
@@ -92,7 +92,7 @@ test('delete with successfully deferring constraints', async () => {
 					.manyHasOne('attachment', relation => relation.target('Attachment').inversedBy('refereces'))
 					.unique(['slug']),
 			)
-			.buildSchema(),
+			.buildSchema() },
 		seed: [
 			{
 				query: `mutation {
@@ -140,7 +140,7 @@ test('delete with successfully deferring constraints', async () => {
 
 test('delete with unsuccessfully deferring constraints', async () => {
 	await executeDbTest({
-		schema: new SchemaBuilder()
+		schema: { model: new SchemaBuilder()
 			.entity('Post', entity =>
 				entity
 					.column('slug')
@@ -159,7 +159,7 @@ test('delete with unsuccessfully deferring constraints', async () => {
 					.manyHasOne('attachment', relation => relation.target('Attachment').inversedBy('refereces'))
 					.unique(['slug']),
 			)
-			.buildSchema(),
+			.buildSchema() },
 		seed: [
 			{
 				query: `mutation {

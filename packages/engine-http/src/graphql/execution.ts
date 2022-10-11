@@ -122,14 +122,14 @@ export const createGraphQLQueryHandler = <Context>({
 				it.onResponse && listenersQueue.push(it.onResponse({ context, response }) || {})
 			})
 			if (response.errors && response.errors.length > 0) {
-				const errors = processErrors(response.errors)
-				respond(200, { ...response, errors })
+				const [code, errors] = processErrors(response.errors)
+				respond(code && response.data === null ? code : 200, { ...response, errors })
 			} else {
 				respond(200, response)
 			}
 		} catch (e) {
 			if (e instanceof GraphQLError) {
-				return respond(400, { errors: [e] })
+				return respond(e instanceof ForbiddenError ? 403 : 400, { errors: [e] })
 			}
 			return respond(500, { errors: [{ message: 'Internal error' }] })
 		}
@@ -147,8 +147,11 @@ const extractOriginalError = (e: Error): Error => {
 	return e
 }
 
-const processErrors = (errors: readonly any[]): any[] => {
+const processErrors = (errors: readonly any[]): [number | null, any[]] => {
 	const resultErrors = []
+	let has400 = false
+	let has403 = false
+	let has500 = false
 	for (const error of errors) {
 		const originalError = extractOriginalError(error)
 		if (originalError instanceof GraphQLError) {
@@ -162,6 +165,6 @@ const processErrors = (errors: readonly any[]): any[] => {
 			resultErrors.push({ message: 'Internal server error', locations: undefined, path: undefined })
 		}
 	}
-	return resultErrors
+	return [has500 ? 500 : has400 ? 400 : has403 ? 403 : null, resultErrors]
 }
 

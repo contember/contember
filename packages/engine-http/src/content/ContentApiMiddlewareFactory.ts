@@ -133,7 +133,7 @@ export class ContentApiMiddlewareFactory {
 				await timer('GraphQL', () => handler({
 					request,
 					response,
-					context: graphqlContext,
+					createContext: () => graphqlContext,
 				}))
 				logger.debug('Content query finished')
 			})

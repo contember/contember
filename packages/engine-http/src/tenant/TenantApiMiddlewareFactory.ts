@@ -44,7 +44,7 @@ export class TenantApiMiddlewareFactory {
 				await timer('GraphQL', () => groupContainer.tenantGraphQLHandler({
 					request,
 					response,
-					context,
+					createContext: () => context,
 				}))
 				logger.debug('Tenant query finished')
 			})

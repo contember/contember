@@ -84,7 +84,7 @@ export class SystemApiMiddlewareFactory {
 				await timer('GraphQL', () => handler({
 					request,
 					response,
-					context: graphqlContext,
+					createContext: () => graphqlContext,
 				}))
 				logger.debug('System query finished')
 			})

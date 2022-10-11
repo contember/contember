@@ -38,7 +38,7 @@ interface FactoryArgs<Context> {
 	listeners: GraphQLListener<Context>[]
 }
 
-export type GraphQLQueryHandler<Context> = (args: {request: Request; response: Response; context: Context }) => any
+export type GraphQLQueryHandler<Context> = (args: { request: Request; response: Response; createContext: ({}: { operation: OperationTypeNode }) => Context }) => any
 
 const hitCacheMaxAgeSeconds = 10 * 60
 const documentCacheMaxAgeSeconds = hitCacheMaxAgeSeconds * 10
@@ -61,7 +61,7 @@ export const createGraphQLQueryHandler = <Context>({
 	})
 	let lastPrune = Date.now()
 
-	return async ({ request, response, context }) => {
+	return async ({ request, response, createContext }) => {
 
 		const now = Date.now()
 		if ((now - lastPrune) > pruneIntervalSeconds * 1000) {
@@ -121,10 +121,12 @@ export const createGraphQLQueryHandler = <Context>({
 			}
 			const document = doc
 			const operationName = resolvedRequest.operationName ?? null
-			const operationType = resolveOperationType(document, operationName)
+			const operation = resolveOperationType(document, operationName)
 
+
+			const context = createContext({ operation })
 			listenersQueue.forEach(it => {
-				it.onExecute && listenersQueue.push(it.onExecute({ context, document, operation: operationType }) || {})
+				it.onExecute && listenersQueue.push(it.onExecute({ context, document, operation }) || {})
 			})
 			const response = await execute({
 				schema,

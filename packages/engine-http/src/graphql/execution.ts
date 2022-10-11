@@ -81,7 +81,7 @@ export const createGraphQLQueryHandler = <Context>({
 			const resolvedRequest = request.method === 'POST' ? (request.body as any) : request.query
 			if (!resolvedRequest.query) {
 				return respond(400, {
-					errors: { message: 'Missing request query' },
+					errors: [{ message: 'Missing request query' }],
 				})
 			}
 			const queryHash = createHash('md5').update(resolvedRequest.query).digest('hex')

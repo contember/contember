@@ -12,6 +12,9 @@
 		},
 		{
 			"path": "../../typesafe/src"
+		},
+		{
+			"path": "../../database-migrations/src"
 		}
 	]
 }

@@ -1,4 +1,4 @@
-import { MigrationsRunner as DbMigrationsRunner, SnapshotMigrationResolver } from '@contember/database-migrations'
+import { MigrationGroup, MigrationsRunner as DbMigrationsRunner } from '@contember/database-migrations'
 import _20180804102200init from './2018-08-04-102200-init'
 import _20180805130501triggereventfunction from './2018-08-05-130501-trigger-event-function'
 import _20190114143432eventtrxid from './2019-01-14-143432-event-trx-id'
@@ -23,6 +23,8 @@ import { Client, Connection, createDatabaseIfNotExists, DatabaseConfig } from '@
 import { DatabaseContextFactory, SchemaVersionBuilder } from '../model'
 import { ProjectConfig } from '../types'
 import { Logger } from '@contember/logger'
+import { GroupMigrationsResolver } from '@contember/database-migrations'
+import { SnapshotMigrationResolver } from '@contember/database-migrations'
 
 const migrations = {
 	'2018-08-04-102200-init': _20180804102200init,
@@ -52,6 +54,7 @@ export class SystemMigrationsRunner {
 		private readonly project: ProjectConfig & { db: DatabaseConfig },
 		private readonly schema: string,
 		private readonly schemaVersionBuilder: SchemaVersionBuilder,
+		private readonly migrationGroups: MigrationGroup<unknown>[],
 	) {
 	}
 	async run(logger: Logger) {
@@ -66,7 +69,10 @@ export class SystemMigrationsRunner {
 					.create()
 				return this.schemaVersionBuilder.buildSchema(dbContextMigrations)
 			}
-			const migrationResolver = new SnapshotMigrationResolver(snapshot, migrations)
+			const migrationResolver = new GroupMigrationsResolver(
+				new SnapshotMigrationResolver(snapshot, migrations),
+				Object.fromEntries(this.migrationGroups.map(it => [it.group, new SnapshotMigrationResolver(it.snapshot, it.migrations)])),
+			)
 			const migrationsRunner = new DbMigrationsRunner(connection, this.schema, migrationResolver)
 
 			await migrationsRunner.migrate(message => logger.warn(message), {

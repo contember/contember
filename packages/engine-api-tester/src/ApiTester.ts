@@ -71,7 +71,7 @@ export class ApiTester {
 			...projectConfig,
 			db: projectDbCredentials,
 		}
-		const systemMigrationsRunner = new SystemMigrationsRunner(databaseContextFactory, projectConfigWithDb, 'system', systemContainer.schemaVersionBuilder)
+		const systemMigrationsRunner = new SystemMigrationsRunner(databaseContextFactory, projectConfigWithDb, 'system', systemContainer.schemaVersionBuilder, [])
 		const projectInitializer = new ProjectInitializer(stageCreator, systemMigrationsRunner, databaseContextFactory, projectConfigWithDb)
 
 		await projectInitializer.initialize(createLogger(new JsonStreamLoggerHandler(process.stderr)))

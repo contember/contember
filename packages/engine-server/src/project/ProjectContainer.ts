@@ -3,7 +3,8 @@ import { Connection } from '@contember/database'
 import {
 	DatabaseContextFactory,
 	ProjectInitializer,
-	SchemaVersionBuilder, StageCreator,
+	SchemaVersionBuilder,
+	StageCreator,
 	SystemMigrationsRunner,
 } from '@contember/engine-system-api'
 import { GraphQlSchemaBuilderFactory, PermissionsByIdentityFactory } from '@contember/engine-content-api'
@@ -16,6 +17,7 @@ import {
 	Providers,
 } from '@contember/engine-http'
 import { Logger } from '@contember/logger'
+import { MigrationGroup } from '@contember/database-migrations'
 
 export class ProjectContainerFactoryFactory {
 	constructor(
@@ -97,8 +99,10 @@ export class ProjectContainerFactory {
 				new ContentSchemaResolver(schemaVersionBuilder))
 			.addService('systemDatabaseContextFactory', ({ connection, providers, project }) =>
 				new DatabaseContextFactory(connection.createClient(project.db.systemSchema ?? 'system', { module: 'system' }), providers))
-			.addService('systemMigrationsRunner', ({ systemDatabaseContextFactory, project }) =>
-				new SystemMigrationsRunner(systemDatabaseContextFactory, project, project.db.systemSchema ?? 'system', this.schemaVersionBuilder))
+			.addService('systemMigrationGroups', () =>
+				this.plugins.map(it => it.getSystemMigrations?.()).filter((it): it is MigrationGroup => it !== undefined))
+			.addService('systemMigrationsRunner', ({ systemDatabaseContextFactory, project, systemMigrationGroups }) =>
+				new SystemMigrationsRunner(systemDatabaseContextFactory, project, project.db.systemSchema ?? 'system', this.schemaVersionBuilder, systemMigrationGroups))
 			.addService('projectInitializer', ({ systemMigrationsRunner, systemDatabaseContextFactory, project }) =>
 				new ProjectInitializer(new StageCreator(), systemMigrationsRunner, systemDatabaseContextFactory, project))
 	}

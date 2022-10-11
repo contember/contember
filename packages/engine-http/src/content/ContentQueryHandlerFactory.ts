@@ -1,7 +1,6 @@
 import { GraphQLSchema } from 'graphql'
 import {
 	createDbQueriesListener,
-	createErrorListener,
 	createGraphQLQueryHandler,
 	createGraphqlRequestInfoProviderListener,
 	GraphQLListener,
@@ -16,7 +15,6 @@ export class ContentQueryHandlerFactory {
 
 	public create(graphQlSchema: GraphQLSchema): ContentQueryHandler {
 		const listeners: GraphQLListener<ExtendedGraphqlContext>[] = [
-			createErrorListener(),
 			createGraphqlRequestInfoProviderListener(),
 		]
 		listeners.push(createDbQueriesListener(context => context.db, this.debug))

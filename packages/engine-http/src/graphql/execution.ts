@@ -2,6 +2,9 @@ import { DocumentNode, execute, GraphQLError, GraphQLSchema, parse, validate, va
 import LRUCache from 'lru-cache'
 import { createHash } from 'crypto'
 import { Request, Response } from 'koa'
+import { logger } from '@contember/logger'
+import { ForbiddenError } from '@contember/graphql-utils'
+import { UserError } from '@contember/engine-content-api'
 
 export interface GraphQLListener<Context> {
 	onStart?: (ctx: {}) => Omit<GraphQLListener<Context>, 'onStart'> | void
@@ -118,7 +121,12 @@ export const createGraphQLQueryHandler = <Context>({
 			listenersQueue.forEach(it => {
 				it.onResponse && listenersQueue.push(it.onResponse({ context, response }) || {})
 			})
-			respond(200, response)
+			if (response.errors && response.errors.length > 0) {
+				const errors = processErrors(response.errors)
+				respond(200, { ...response, errors })
+			} else {
+				respond(200, response)
+			}
 		} catch (e) {
 			if (e instanceof GraphQLError) {
 				return respond(400, { errors: [e] })
@@ -127,3 +135,33 @@ export const createGraphQLQueryHandler = <Context>({
 		}
 	}
 }
+
+
+const extractOriginalError = (e: Error): Error => {
+	if (e instanceof GraphQLError && e.originalError) {
+		return extractOriginalError(e.originalError)
+	}
+	if ('errors' in e && Array.isArray((e as any).errors) && (e as any).errors.length === 1) {
+		return extractOriginalError((e as any).errors[0])
+	}
+	return e
+}
+
+const processErrors = (errors: readonly any[]): any[] => {
+	const resultErrors = []
+	for (const error of errors) {
+		const originalError = extractOriginalError(error)
+		if (originalError instanceof GraphQLError) {
+			resultErrors.push(error)
+		} else if (originalError instanceof ForbiddenError) {
+			resultErrors.push(error)
+		} else if (originalError instanceof UserError) {
+			resultErrors.push({ message: error.message, locations: error.locations, path: error.path })
+		} else {
+			logger.error(originalError || error)
+			resultErrors.push({ message: 'Internal server error', locations: undefined, path: undefined })
+		}
+	}
+	return resultErrors
+}
+

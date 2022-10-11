@@ -2,7 +2,6 @@ import { makeExecutableSchema } from '@graphql-tools/schema'
 import { Schema, TenantResolverContext, typeDefs } from '@contember/engine-tenant-api'
 import { KoaContext } from '../koa'
 import {
-	createErrorListener,
 	createGraphQLQueryHandler,
 	createGraphqlRequestInfoProviderListener,
 	GraphQLKoaState,
@@ -26,7 +25,6 @@ export class TenantGraphQLHandlerFactory {
 		return createGraphQLQueryHandler<TenantGraphQLContext>({
 			schema,
 			listeners: [
-				createErrorListener(),
 				createGraphqlRequestInfoProviderListener(),
 			],
 		})

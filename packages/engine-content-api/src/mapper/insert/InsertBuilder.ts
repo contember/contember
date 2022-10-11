@@ -5,6 +5,8 @@ import { getColumnName, getColumnType } from '@contember/schema-utils'
 import { ColumnValue, ResolvedColumnValue, resolveGenericValue, resolveRowData } from '../ColumnValue'
 import { ImplementationException } from '../../exception'
 import { AbortInsert } from './Inserter'
+import { AfterInsertEvent, BeforeInsertEvent, EventManager } from '../EventManager'
+import { Mapper } from '../Mapper'
 
 export interface InsertResult {
 	values: ResolvedColumnValue[]
@@ -43,8 +45,7 @@ export class InsertBuilder {
 		return resolveRowData(this.rowData)
 	}
 
-	public async execute(db: Client): Promise<InsertResult> {
-		let resolvedDataFinal: ResolvedColumnValue[] | null = null
+	public async execute(mapper: Mapper): Promise<InsertResult> {
 		try {
 			const resolvedData = await this.getResolvedData()
 			if (resolvedData.find(it => it.resolvedValue === AbortInsert)) {
@@ -72,8 +73,16 @@ export class InsertBuilder {
 				})
 				.returning(this.entity.primaryColumn)
 
-			const returning = (await qb.execute(db)).map(it => it[this.entity.primaryColumn])
+			const beforeInsertEvent = new BeforeInsertEvent(this.entity, resolvedData as ResolvedColumnValue[])
+			await mapper.eventManager.fire(beforeInsertEvent)
+
+			const returning = (await qb.execute(mapper.db)).map(it => it[this.entity.primaryColumn])
 			const result = returning.length === 1 ? returning[0] : null
+
+			const afterInsertEvent = new AfterInsertEvent(this.entity, resolvedData as ResolvedColumnValue[], result)
+			beforeInsertEvent.afterEvent = afterInsertEvent
+			await mapper.eventManager.fire(afterInsertEvent)
+
 			this.resolver(result)
 			return { values: resolvedData as ResolvedColumnValue[], executed: true, primaryValue: result, aborted: false }
 		} catch (e) {

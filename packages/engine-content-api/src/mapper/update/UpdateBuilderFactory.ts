@@ -9,7 +9,7 @@ export class UpdateBuilderFactory {
 		private readonly pathFactory: PathFactory,
 	) {}
 
-	public create(entity: Model.Entity, uniqueWhere: Input.Where): UpdateBuilder {
-		return new UpdateBuilder(this.schema, entity, this.whereBuilder, uniqueWhere, this.pathFactory)
+	public create(entity: Model.Entity, primary: Input.PrimaryValue): UpdateBuilder {
+		return new UpdateBuilder(this.schema, entity, this.whereBuilder, primary, this.pathFactory)
 	}
 }

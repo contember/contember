@@ -26,6 +26,8 @@ import {
 	OneHasOneOwningRelationTuple,
 } from './helpers'
 import { getEntity } from '@contember/schema-utils'
+import { AfterUpdateEvent, BeforeDeleteEvent, BeforeUpdateEvent, EventManager } from '../EventManager'
+import { ImplementationException } from '../../exception'
 
 type DeleteQueue = [entity: Model.Entity, ids: Input.PrimaryValue[]][]
 
@@ -67,7 +69,46 @@ export class DeleteExecutor {
 			if (!state.isOk()) {
 				return state.getResult()
 			}
+			const result = state.getResult()
+			const entryToEventMap = new Map<MutationUpdateOk, BeforeUpdateEvent>()
+			for (const entry of result) {
+				if (entry instanceof MutationDeleteOk) {
+					await mapper.eventManager.fire(new BeforeDeleteEvent(entry.entity, entry.primary))
+				} else if (entry instanceof MutationUpdateOk) {
+					const beforeUpdateEvent = new BeforeUpdateEvent(entry.entity, [{
+						columnName: Object.keys(entry.values)[0],
+						fieldName: Object.keys(entry.input)[0],
+						columnType: 'text',
+						resolvedValue: null,
+						value: Promise.resolve(null),
+					}], entry.primary)
+					entryToEventMap.set(entry, beforeUpdateEvent)
+					await mapper.eventManager.fire(beforeUpdateEvent)
+				}
+			}
+
 			await this.executeDeletes(deleteQueue, mapper.db)
+
+			for (const entry of result) {
+				if (entry instanceof MutationUpdateOk) {
+					const beforeEvent = entryToEventMap.get(entry)
+					if (!beforeEvent) {
+						throw new ImplementationException()
+					}
+					const data = [{
+						columnName: Object.keys(entry.values)[0],
+						fieldName: Object.keys(entry.input)[0],
+						columnType: 'text',
+						resolvedValue: null,
+						value: Promise.resolve(null),
+						old: Object.values(entry.oldValues ?? {})[0],
+					}]
+					const afterEvent = new AfterUpdateEvent(entry.entity, data, entry.primary)
+					beforeEvent.afterEvent = afterEvent
+					await mapper.eventManager.fire(afterEvent)
+				}
+			}
+
 			state.confirmDeleted()
 
 			return state.getResult()
@@ -190,7 +231,7 @@ export class DeleteExecutor {
 			const input = { [relation.name]: { disconnect: true } }
 			const values = { [relation.joiningColumn.columnName]: null }
 
-			state.pushOkResult(result.map(it => it.id).map(id => new MutationUpdateOk([], entity, id, input, values)))
+			state.pushOkResult(result.map(it => new MutationUpdateOk([], entity, it.id, input, values, { [relation.joiningColumn.columnName]: it.ref })))
 			return
 		}
 

@@ -20,12 +20,15 @@ import { Mutex } from '../utils'
 import { CheckedPrimary } from './CheckedPrimary'
 import { ConstraintHelper } from '@contember/database'
 import { ImplementationException } from '../exception'
+import { EventManager } from './EventManager'
 
 export class Mapper {
 	private primaryKeyCache: Record<string, Promise<string> | string> = {}
 	public readonly deletedEntities = new DeletedEntitiesStorage()
 	public readonly mutex = new Mutex()
 	public readonly constraintHelper: ConstraintHelper
+
+	public readonly eventManager: EventManager
 
 	constructor(
 		private readonly schema: Model.Schema,
@@ -41,6 +44,7 @@ export class Mapper {
 		private readonly pathFactory: PathFactory,
 	) {
 		this.constraintHelper = new ConstraintHelper(db)
+		this.eventManager = new EventManager(this)
 	}
 
 	public async selectField(entity: Model.Entity, where: Input.UniqueWhere, fieldName: string) {
@@ -168,10 +172,7 @@ export class Mapper {
 			throw new ImplementationException()
 		}
 		return tryMutation(this.schema, () =>
-			this.inserter.insert(this, entity, data, id => {
-				const where = { [entity.primary]: id }
-				this.primaryKeyCache[this.hashWhere(entity.name, where)] = id
-			}),
+			this.insertInternal(entity, data),
 		)
 	}
 
@@ -221,12 +222,16 @@ export class Mapper {
 		return tryMutation(this.schema, async () => {
 			const primaryValue = await this.getPrimaryValue(entity, by)
 			if (primaryValue === undefined) {
-				return await this.inserter.insert(this, entity, create, id => {
-					const where = { [entity.primary]: id }
-					this.primaryKeyCache[this.hashWhere(entity.name, where)] = id
-				})
+				return await this.insertInternal(entity, create)
 			}
 			return await this.updater.update(this, entity, primaryValue, update, filter)
+		})
+	}
+
+	private insertInternal(entity: Model.Entity, data: Input.CreateDataInput) {
+		return this.inserter.insert(this, entity, data, id => {
+			const where = { [entity.primary]: id }
+			this.primaryKeyCache[this.hashWhere(entity.name, where)] = id
 		})
 	}
 
@@ -248,7 +253,7 @@ export class Mapper {
 		inversePrimary: Input.PrimaryValue,
 	): Promise<MutationResultList> {
 		return await this.junctionTableManager.connectJunction(
-			this.db,
+			this,
 			owningEntity,
 			relation,
 			owningPrimary,
@@ -263,7 +268,7 @@ export class Mapper {
 		inversePrimary: Input.PrimaryValue,
 	): Promise<MutationResultList> {
 		return await this.junctionTableManager.disconnectJunction(
-			this.db,
+			this,
 			owningEntity,
 			relation,
 			owningPrimary,
@@ -296,5 +301,3 @@ export class Mapper {
 		return JSON.stringify([entityName, where])
 	}
 }
-
-export type MapperFactory = (db: Client) => Mapper

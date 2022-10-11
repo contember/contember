@@ -8,5 +8,25 @@ export * from './types'
 export { graphql } from 'graphql'
 export { UserError } from './exception'
 export {
+	DataModificationEvent,
+	AfterCommitEvent,
+	AfterInsertEvent,
+	AfterJunctionUpdateEvent,
+	AfterUpdateEvent,
+	BeforeCommitEvent,
+	BeforeDeleteEvent,
+	BeforeInsertEvent,
+	BeforeJunctionUpdateEvent,
+	BeforeUpdateEvent,
+	EventManager,
+	Mapper,
+	MapperFactory,
+	MapperContainer,
+	MapperContainerBuilder,
+	Path,
+	WhereBuilder,
+	PathFactory,
 	MapperContainerFactory,
+	MapperContainerHook,
+	MapperContainerArgs,
 } from './mapper'

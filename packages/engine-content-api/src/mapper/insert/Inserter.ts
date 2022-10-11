@@ -53,18 +53,18 @@ export class Inserter {
 
 		const okResultFactory = (primary: Value.PrimaryValue, values: RowValues) =>
 			new MutationCreateOk([], entity, primary, data, values)
-		const insertPromise = this.executeInsert(insertBuilder, mapper.db, okResultFactory)
+		const insertPromise = this.executeInsert(insertBuilder, mapper, okResultFactory)
 
 		return await collectResults(this.schema, insertPromise, Object.values(promises))
 	}
 
 	private async executeInsert(
 		insertBuilder: InsertBuilder,
-		db: Client,
+		mapper: Mapper,
 		okResultFactory: (primary: Value.PrimaryValue, values: RowValues) => MutationCreateOk,
 	): Promise<MutationResultList> {
 		return tryMutation(this.schema, async () => {
-			const result = await insertBuilder.execute(db)
+			const result = await insertBuilder.execute(mapper)
 			if (result.aborted) {
 				return [new MutationNothingToDo([], NothingToDoReason.aborted)]
 			}

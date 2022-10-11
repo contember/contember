@@ -2,14 +2,14 @@ import { Value } from '@contember/schema'
 import { getFulfilledValues, getRejections } from '../utils'
 
 export type ColumnValue<E = never> = {
-	value: PromiseLike<Value.AtomicValue<E> | undefined>
+	value: PromiseLike<Value.FieldValue<E> | undefined>
 	fieldName: string
 	columnName: string
 	columnType: string
 }
 
 export type ResolvedColumnValue<E = never> = ColumnValue<E> & {
-	resolvedValue: Value.AtomicValue<E>
+	resolvedValue: Value.FieldValue<E>
 }
 
 export const resolveGenericValue = <T>(value: Value.GenericValueLike<T>): Promise<T> => {

@@ -16,7 +16,7 @@ export class ReadResolver {
 	public async resolveQuery(info: GraphQLResolveInfo) {
 		const queryAst = this.queryAstFactory.create(info)
 		const fields = GraphQlQueryAstFactory.resolveObjectType(info.returnType).getFields()
-		const mapper = this.mapperFactory(this.db)
+		const mapper = this.mapperFactory.create(this.db)
 		return executeReadOperations(queryAst, fields, mapper)
 	}
 
@@ -26,24 +26,24 @@ export class ReadResolver {
 
 		return this.db.transaction(async trx => {
 			await trx.connection.query(Connection.REPEATABLE_READ)
-			const mapper = this.mapperFactory(trx)
+			const mapper = this.mapperFactory.create(trx)
 			return executeReadOperations(queryAst, fields, mapper)
 		})
 	}
 
 	public async resolveListQuery(entity: Model.Entity, info: GraphQLResolveInfo) {
 		const queryAst: ObjectNode<Input.ListQueryInput> = this.queryAstFactory.create(info)
-		return await this.mapperFactory(this.db).select(entity, queryAst, [])
+		return await this.mapperFactory.create(this.db).select(entity, queryAst, [])
 	}
 
 	public async resolveGetQuery(entity: Model.Entity, info: GraphQLResolveInfo) {
 		const queryAst: ObjectNode<Input.UniqueQueryInput> = this.queryAstFactory.create(info)
-		return await this.mapperFactory(this.db).selectUnique(entity, queryAst, [])
+		return await this.mapperFactory.create(this.db).selectUnique(entity, queryAst, [])
 	}
 
 	public async resolvePaginationQuery(entity: Model.Entity, info: GraphQLResolveInfo) {
 		const queryAst: ObjectNode<Input.PaginationQueryInput> = this.queryAstFactory.create(info)
-		const mapper = this.mapperFactory(this.db)
+		const mapper = this.mapperFactory.create(this.db)
 		return await paginate(mapper, entity, queryAst)
 	}
 }

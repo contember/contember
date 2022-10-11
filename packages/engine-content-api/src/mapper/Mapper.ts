@@ -324,5 +324,3 @@ export class Mapper {
 		return JSON.stringify([entityName, where])
 	}
 }
-
-export type MapperFactory = (db: Client) => Mapper

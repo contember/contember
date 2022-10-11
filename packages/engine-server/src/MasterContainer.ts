@@ -1,4 +1,4 @@
-import { setupSystemVariables, SystemContainerFactory } from '@contember/engine-system-api'
+import { SystemContainerFactory } from '@contember/engine-system-api'
 import { TenantContainerFactory } from '@contember/engine-tenant-api'
 import { Builder } from '@contember/dic'
 import { ServerConfig } from './config/config'
@@ -201,6 +201,13 @@ export class MasterContainerFactory {
 			})
 			.addService('initializer', ({ projectGroupContainer }) =>
 				new Initializer(projectGroupContainer))
+			.setupService('mapperContainerFactory', (it, { plugins }) => {
+				for (const plugin of plugins) {
+					if (plugin.getMapperContainerHook) {
+						it.hooks.push(plugin.getMapperContainerHook())
+					}
+				}
+			})
 
 	}
 

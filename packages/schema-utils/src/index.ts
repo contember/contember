@@ -2,6 +2,7 @@ import { Schema } from '@contember/schema'
 import { emptyModelSchema } from './model'
 import * as Typesafe from '@contember/typesafe'
 import { aclSchema, modelSchema, validationSchema } from './type-schema'
+import { actionsSchema } from './type-schema/actions'
 
 export * from './model'
 export * from './acl'
@@ -15,10 +16,12 @@ export const emptySchema: Schema = {
 	model: emptyModelSchema,
 	acl: { roles: {} },
 	validation: {},
+	actions: { triggers: {}, targets: {} },
 }
 
 export const schemaType: Typesafe.Type<Schema> = Typesafe.object({
 	model: modelSchema,
 	acl: aclSchema,
 	validation: validationSchema,
+	actions: actionsSchema,
 })

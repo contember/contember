@@ -30,6 +30,10 @@ import {
 import { patchValidationSchemaModification, updateValidationSchemaModification } from './validation'
 import { createIndexModification, removeIndexModification } from './indexes'
 import { SchemaWithMeta } from './utils/schemaMeta'
+import { createTriggerModification, removeTriggerModification, updateTriggerModification } from './actions'
+import { createTargetModification } from './actions/CreateTargetModification'
+import { removeTargetModification } from './actions/RemoveTargetModification'
+import { updateTargetModification } from './actions/UpdateTargetModification'
 
 
 class ModificationHandlerFactory {
@@ -81,6 +85,12 @@ namespace ModificationHandlerFactory {
 		toggleEventLogModification,
 		toggleJunctionEventLogModification,
 		convertOneHasManyToManyHasManyRelationModification,
+		createTriggerModification,
+		updateTriggerModification,
+		removeTriggerModification,
+		createTargetModification,
+		updateTargetModification,
+		removeTargetModification,
 	]
 
 	export const defaultFactoryMap: HandlerMap<any> = Object.fromEntries(handlers.map(it => [it.id, it]))

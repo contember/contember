@@ -12,5 +12,10 @@
     "@contember/schema-utils": "^1.2.0-alpha.18",
     "reflect-metadata": "^0.1.13"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "graphql": "^16.5.0"
+  },
+  "peerDependencies": {
+    "graphql": ">= 14.6.0"
+  }
 }

@@ -1,6 +1,6 @@
 import { ImplementationException } from '../exceptions'
 import { ClientErrorCodes } from './errorCodes'
-import EventEmitter from 'events'
+import { EventEmitter } from 'events'
 import { ClientError, DatabaseError } from './errors'
 import { PgClientFactory } from '../utils'
 import { PgClient } from './PgClient'

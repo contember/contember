@@ -6,6 +6,8 @@ import { PathFactory, WhereBuilder } from '../select'
 import { ColumnValue, ResolvedColumnValue, resolveGenericValue, resolveRowData } from '../ColumnValue'
 import { PredicateFactory } from '../../acl'
 import { AbortDataManipulation, DataManipulationBuilder } from '../DataManipulationBuilder'
+import { AfterUpdateEvent, BeforeUpdateEvent, EventManager } from '../EventManager'
+import { Mapper } from '../Mapper'
 
 export interface UpdateResult {
 	values: ResolvedColumnValue[]
@@ -29,7 +31,7 @@ export class UpdateBuilder implements DataManipulationBuilder {
 		private readonly schema: Model.Schema,
 		private readonly entity: Model.Entity,
 		private readonly whereBuilder: WhereBuilder,
-		private readonly uniqueWhere: Input.Where,
+		private readonly primary: Input.PrimaryValue,
 		private readonly pathFactory: PathFactory,
 		private readonly predicateFactory: PredicateFactory,
 	) {}
@@ -59,7 +61,7 @@ export class UpdateBuilder implements DataManipulationBuilder {
 		this.addOldWhere(predicate)
 	}
 
-	public async execute(db: Client): Promise<UpdateResult> {
+	public async execute(mapper: Mapper): Promise<UpdateResult> {
 		try {
 			const resolvedData = await resolveRowData<AbortDataManipulation>([...this.rowData.values()])
 			if (Object.keys(resolvedData).length === 0) {
@@ -70,12 +72,15 @@ export class UpdateBuilder implements DataManipulationBuilder {
 				this.resolver(null)
 				return { values: [], affectedRows: null, executed: false, aborted: true }
 			}
+			const oldColSuffix = '_old__'
 
 			const qb = DbUpdateBuilder.create()
 				.with('newData_', qb => {
 					qb = resolvedData.reduce(
 						(qb, value) =>
-							qb.select(expr => expr.selectValue(value.resolvedValue as DbValue, value.columnType), value.columnName),
+							qb
+								.select(expr => expr.selectValue(value.resolvedValue as DbValue, value.columnType), value.columnName)
+								.select(['root_', value.columnName], value.columnName + oldColSuffix),
 						qb,
 					)
 					const columns = new Set(resolvedData.map(it => it.columnName))
@@ -97,7 +102,9 @@ export class UpdateBuilder implements DataManipulationBuilder {
 					qb = remainingColumns.reduce((qb, columnName) => qb.select(['root_', columnName]), qb)
 
 					qb = this.whereBuilder.build(qb, this.entity, this.pathFactory.create([]), {
-						and: [this.uniqueWhere, this.oldWhere],
+						and: [{
+							[this.entity.primary]: { eq: this.primary },
+						}, this.oldWhere],
 					})
 
 					return qb
@@ -112,6 +119,7 @@ export class UpdateBuilder implements DataManipulationBuilder {
 						{},
 					),
 				)
+				.returning(...resolvedData.map(it => it.columnName + oldColSuffix))
 				.from(qb => {
 					qb = qb.from('newData_')
 					const col1 = tuple(this.entity.tableName, this.entity.primaryColumn)
@@ -121,9 +129,24 @@ export class UpdateBuilder implements DataManipulationBuilder {
 					return qb
 				})
 
-			const result = await qb.execute(db)
-			this.resolver(result)
-			return { values: resolvedData as ResolvedColumnValue[], affectedRows: result, executed: true, aborted: false }
+
+			const beforeEvent = new BeforeUpdateEvent(this.entity, resolvedData as ResolvedColumnValue[], this.primary)
+			await mapper.eventManager.fire(beforeEvent)
+
+			const result = await qb.execute(mapper.db)
+			this.resolver(result.length)
+
+			if (result.length === 1) {
+				const eventData = (resolvedData as ResolvedColumnValue[]).map(it => ({
+					...it,
+					old: result[0][it.columnName + oldColSuffix],
+				}))
+				const afterUpdateEvent = new AfterUpdateEvent(this.entity, eventData, this.primary)
+				beforeEvent.afterEvent = afterUpdateEvent
+				await mapper.eventManager.fire(afterUpdateEvent)
+			}
+
+			return { values: resolvedData as ResolvedColumnValue[], affectedRows: result.length, executed: true, aborted: false }
 		} catch (e) {
 			this.resolver(null)
 			throw e

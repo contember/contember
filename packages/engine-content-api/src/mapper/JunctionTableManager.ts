@@ -1,6 +1,5 @@
 import { getEntity } from '@contember/schema-utils'
-import { PathFactory } from './select'
-import { WhereBuilder } from './select'
+import { PathFactory, WhereBuilder } from './select'
 import { PredicateFactory } from '../acl'
 import {
 	Client,
@@ -16,13 +15,20 @@ import {
 	MutationJunctionUpdateOk,
 	MutationNoResultError,
 	MutationNothingToDo,
-	MutationResult,
 	MutationResultList,
+	MutationResultType,
 	NothingToDoReason,
 } from './Result'
 import { ImplementationException } from '../exception'
+import { AfterJunctionUpdateEvent, BeforeJunctionUpdateEvent } from './EventManager'
+import { Mapper } from './Mapper'
 
 type OkResultFactory = () => MutationJunctionUpdateOk
+
+type JunctionMutationResult =
+	| MutationJunctionUpdateOk
+	| MutationNothingToDo
+	| MutationNoResultError
 
 export class JunctionTableManager {
 	constructor(
@@ -35,42 +41,54 @@ export class JunctionTableManager {
 	) {}
 
 	public async connectJunction(
-		db: Client,
+		mapper: Mapper,
 		owningEntity: Model.Entity,
 		relation: Model.ManyHasManyOwningRelation,
 		owningUnique: Input.PrimaryValue,
 		inverseUnique: Input.PrimaryValue,
 	): Promise<MutationResultList> {
-		return [
-			await this.executeJunctionModification(
-				db,
-				owningEntity,
-				relation,
-				owningUnique,
-				inverseUnique,
-				this.connectJunctionHandler,
-			),
-		]
+		const beforeEvent = new BeforeJunctionUpdateEvent(owningEntity, relation, owningUnique, inverseUnique, 'connect')
+		await mapper.eventManager.fire(beforeEvent)
+		const result = await this.executeJunctionModification(
+			mapper.db,
+			owningEntity,
+			relation,
+			owningUnique,
+			inverseUnique,
+			this.connectJunctionHandler,
+		)
+		if (result.result !== MutationResultType.noResultError) {
+			const afterEvent = new AfterJunctionUpdateEvent(owningEntity, relation, owningUnique, inverseUnique, 'connect', result.result === MutationResultType.ok)
+			await mapper.eventManager.fire(afterEvent)
+		}
+		return [result]
 	}
 
 	public async disconnectJunction(
-		db: Client,
+		mapper: Mapper,
 		owningEntity: Model.Entity,
 		relation: Model.ManyHasManyOwningRelation,
 		owningUnique: Input.PrimaryValue,
 		inverseUnique: Input.PrimaryValue,
 	): Promise<MutationResultList> {
-		return [
-			await this.executeJunctionModification(
-				db,
-				owningEntity,
-				relation,
-				owningUnique,
-				inverseUnique,
-				this.disconnectJunctionHandler,
-			),
-		]
+		const beforeEvent = new BeforeJunctionUpdateEvent(owningEntity, relation, owningUnique, inverseUnique, 'connect')
+		await mapper.eventManager.fire(beforeEvent)
+		const result = await this.executeJunctionModification(
+			mapper.db,
+			owningEntity,
+			relation,
+			owningUnique,
+			inverseUnique,
+			this.disconnectJunctionHandler,
+		)
+		if (result.result !== MutationResultType.noResultError) {
+			const afterEvent = new AfterJunctionUpdateEvent(owningEntity, relation, owningUnique, inverseUnique, 'disconnect', result.result === MutationResultType.ok)
+			beforeEvent.afterEvent = afterEvent
+			await mapper.eventManager.fire(afterEvent)
+		}
+		return [result]
 	}
+
 
 	private async executeJunctionModification(
 		db: Client,
@@ -79,7 +97,7 @@ export class JunctionTableManager {
 		owningPrimary: Input.PrimaryValue,
 		inversePrimary: Input.PrimaryValue,
 		handler: JunctionHandler,
-	): Promise<MutationResult> {
+	): Promise<JunctionMutationResult> {
 		const joiningTable = relation.joiningTable
 		const inverseEntity = getEntity(this.schema, relation.target)
 		if (inverseEntity.view || owningEntity.view) {
@@ -145,9 +163,9 @@ interface JunctionComplexExecutionArgs {
 }
 
 interface JunctionHandler {
-	executeSimple(args: JunctionSimpleExecutionArgs): Promise<MutationResult>
+	executeSimple(args: JunctionSimpleExecutionArgs): Promise<JunctionMutationResult>
 
-	executeComplex(args: JunctionComplexExecutionArgs): Promise<MutationResult>
+	executeComplex(args: JunctionComplexExecutionArgs): Promise<JunctionMutationResult>
 }
 
 export class JunctionConnectHandler implements JunctionHandler {
@@ -157,7 +175,7 @@ export class JunctionConnectHandler implements JunctionHandler {
 		owningPrimary,
 		inversePrimary,
 		okResultFactory,
-	}: JunctionSimpleExecutionArgs): Promise<MutationResult> {
+	}: JunctionSimpleExecutionArgs): Promise<JunctionMutationResult> {
 		const result = await InsertBuilder.create()
 			.into(joiningTable.tableName)
 			.values({
@@ -177,7 +195,7 @@ export class JunctionConnectHandler implements JunctionHandler {
 		joiningTable,
 		dataCallback,
 		okResultFactory,
-	}: JunctionComplexExecutionArgs): Promise<MutationResult> {
+	}: JunctionComplexExecutionArgs): Promise<JunctionMutationResult> {
 		const insert = InsertBuilder.create()
 			.into(joiningTable.tableName)
 			.values({
@@ -216,7 +234,7 @@ export class JunctionDisconnectHandler implements JunctionHandler {
 		owningPrimary,
 		inversePrimary,
 		okResultFactory,
-	}: JunctionSimpleExecutionArgs): Promise<MutationResult> {
+	}: JunctionSimpleExecutionArgs): Promise<JunctionMutationResult> {
 		const qb = DeleteBuilder.create()
 			.from(joiningTable.tableName)
 			.where(cond => cond.compare(joiningTable.joiningColumn.columnName, Operator.eq, owningPrimary))
@@ -234,7 +252,7 @@ export class JunctionDisconnectHandler implements JunctionHandler {
 		joiningTable,
 		dataCallback,
 		okResultFactory,
-	}: JunctionComplexExecutionArgs): Promise<MutationResult> {
+	}: JunctionComplexExecutionArgs): Promise<JunctionMutationResult> {
 		const deleteQb = DeleteBuilder.create()
 			.from(joiningTable.tableName)
 			.using('data')

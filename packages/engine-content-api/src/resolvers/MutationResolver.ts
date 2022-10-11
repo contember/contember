@@ -1,5 +1,7 @@
 import { Input, Model, Result, Value } from '@contember/schema'
 import {
+	AfterCommitEvent,
+	BeforeCommitEvent,
 	ConstraintType,
 	getInsertPrimary,
 	InputErrorKind,
@@ -472,7 +474,7 @@ export class MutationResolver {
 	): Promise<R> {
 		return await retryTransaction(
 			async () => {
-				return await this.db.transaction(async trx => {
+				const [result, mapper] = await this.db.transaction(async trx => {
 					logger.debug('MutationResolver: Starting mutation transaction')
 					await trx.connection.query(Connection.REPEATABLE_READ)
 					await this.systemVariablesSetup(trx)
@@ -485,8 +487,11 @@ export class MutationResolver {
 					} else {
 						logger.debug('MutationResolver: Transaction ok, committing')
 					}
-					return result
+					await mapper.eventManager.fire(new BeforeCommitEvent())
+					return [result, mapper]
 				})
+				await mapper.eventManager.fire(new AfterCommitEvent())
+				return result
 			},
 			message => logger.warn(message),
 			{

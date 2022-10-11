@@ -5,7 +5,6 @@ import { PredicateFactory } from '../../acl'
 import { UpdateBuilderFactory } from './UpdateBuilderFactory'
 import { Mapper } from '../Mapper'
 import { acceptEveryFieldVisitor } from '@contember/schema-utils'
-import { Client } from '@contember/database'
 import {
 	collectResults,
 	MutationNoResultError,
@@ -33,9 +32,7 @@ export class Updater {
 		data: Input.UpdateDataInput,
 		filter?: Input.OptionalWhere,
 	): Promise<MutationResultList> {
-		const updateBuilder = this.updateBuilderFactory.create(entity, {
-			[entity.primary]: { eq: primaryValue },
-		})
+		const updateBuilder = this.updateBuilderFactory.create(entity, primaryValue)
 
 		const predicateFields = Object.keys(data)
 		updateBuilder.addPredicates(predicateFields)
@@ -48,7 +45,7 @@ export class Updater {
 		const promises = acceptEveryFieldVisitor<Promise<ResultListNotFlatten | undefined>>(this.schema, entity, visitor)
 
 		const okResultFactory = (values: RowValues) => new MutationUpdateOk([], entity, primaryValue, data, values)
-		const mutationResultPromise = Updater.executeUpdate(updateBuilder, mapper.db, okResultFactory)
+		const mutationResultPromise = Updater.executeUpdate(updateBuilder, mapper, okResultFactory)
 		const otherPromises = Object.values(promises)
 		if (otherPromises.length === 0) {
 			return await mutationResultPromise
@@ -63,22 +60,20 @@ export class Updater {
 		primaryValue: Input.PrimaryValue,
 		builderCb: (builder: UpdateBuilder) => void,
 	): Promise<MutationResultList> {
-		const updateBuilder = this.updateBuilderFactory.create(entity, {
-			[entity.primary]: { eq: primaryValue },
-		})
+		const updateBuilder = this.updateBuilderFactory.create(entity, primaryValue)
 
 		const okResultFactory = (values: RowValues) => new MutationUpdateOk([], entity, primaryValue, {}, values)
 		builderCb(updateBuilder)
 
-		return Updater.executeUpdate(updateBuilder, mapper.db, okResultFactory)
+		return Updater.executeUpdate(updateBuilder, mapper, okResultFactory)
 	}
 
 	private static async executeUpdate(
 		updateBuilder: UpdateBuilder,
-		db: Client,
+		mapper: Mapper,
 		okResultFactory: (values: RowValues) => MutationUpdateOk,
 	): Promise<MutationResultList> {
-		const result = await updateBuilder.execute(db)
+		const result = await updateBuilder.execute(mapper)
 		if (result.aborted) {
 			return [new MutationNothingToDo([], NothingToDoReason.aborted)]
 		}

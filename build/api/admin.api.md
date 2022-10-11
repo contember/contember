@@ -64,7 +64,6 @@ import { GraphQlClientRequestOptions } from '@contember/react-client';
 import { GraphQlClientVariables } from '@contember/react-client';
 import { GraphQlClientVariables as GraphQlClientVariables_2 } from '@contember/client';
 import { HistoryEditor } from 'slate-history';
-import { HTMLReactSelectElement } from '@contember/ui';
 import { IconProps } from '@contember/ui';
 import { IconSourceSpecification } from '@contember/ui';
 import type { ImgHTMLAttributes } from 'react';
@@ -98,7 +97,6 @@ import { ReactEditor } from 'slate-react';
 import { ReactElement } from 'react';
 import { ReactNode } from 'react';
 import { Ref } from 'react';
-import { RefAttributes } from 'react';
 import { RefObject } from 'react';
 import { RelativeSingleField } from '@contember/binding';
 import { RemovalType } from '@contember/binding';
@@ -2896,33 +2894,6 @@ export type MutableEntityListRendererProps<ContainerExtraProps, ItemExtraProps> 
 
 // @public (undocumented)
 export type MutationRequestState<T> = QueryRequestState<T> | RequestStateUninitialized<T>;
-
-// @public (undocumented)
-export const NativeSelectField: FunctionComponent<NativeSelectFieldProps>;
-
-// @public (undocumented)
-export const NativeSelectFieldInner: React.MemoExoticComponent<React.ForwardRefExoticComponent<Pick<NativeSelectFieldInnerProps<any>, "data" | "label" | "style" | "key" | "className" | "placeholder" | "onSelect" | "size" | "errors" | "description" | "direction" | "gap" | "labelDescription" | "labelPosition" | "width" | "required" | "useLabelElement" | "notNull" | "isLoading" | "onSearch" | "currentValue" | "onClear" | "onAddNew" | "allowNull"> & RefAttributes<HTMLReactSelectElement<ChoiceFieldData.SingleOption<unknown>>>>>;
-
-// @public (undocumented)
-export interface NativeSelectFieldInnerProps<ActualValue> extends ChoiceFieldData.SingleChoiceFieldMetadata<ActualValue>, NativeSelectFieldInnerPublicProps, RefAttributes<HTMLSelectElement> {
-    // (undocumented)
-    errors: FieldErrors | undefined;
-}
-
-// @public (undocumented)
-export interface NativeSelectFieldInnerPublicProps extends Omit<FieldContainerProps, 'children'> {
-    // @deprecated (undocumented)
-    allowNull?: boolean;
-    // (undocumented)
-    notNull?: boolean;
-    // (undocumented)
-    placeholder?: string;
-}
-
-// @public (undocumented)
-export type NativeSelectFieldProps = NativeSelectFieldInnerPublicProps & (StaticSingleChoiceFieldProps | DynamicSingleChoiceFieldProps) & {
-    searchByFields?: never;
-};
 
 // @public (undocumented)
 export const NavigateBackButton: React.NamedExoticComponent<LinkButtonProps>;

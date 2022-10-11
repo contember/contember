@@ -471,7 +471,7 @@ export class MutationResolver {
 				return await this.db.transaction(async trx => {
 					await trx.connection.query(Connection.REPEATABLE_READ)
 					await this.systemVariablesSetup(trx)
-					const mapper = this.mapperFactory(trx)
+					const mapper = this.mapperFactory.create(trx)
 
 					const result = await cb(mapper, trx)
 					if (!result.ok) {

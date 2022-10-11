@@ -10,6 +10,7 @@
   "dependencies": {
     "@contember/dic": "^1.2.0-alpha.18",
     "@contember/database-migrations": "^1.2.0-alpha.18",
+    "@contember/engine-content-api": "^1.2.0-alpha.18",
     "@contember/graphql-utils": "^1.2.0-alpha.18",
     "@contember/schema": "^1.2.0-alpha.18",
     "@contember/typesafe": "^1.2.0-alpha.18"

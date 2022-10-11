@@ -17,7 +17,6 @@ import {
 	JunctionConnectHandler,
 	JunctionDisconnectHandler,
 	JunctionTableManager,
-	Mapper,
 	MapperFactory,
 	PathFactory,
 	SelectBuilder,
@@ -28,14 +27,14 @@ import {
 } from '../mapper'
 import { Builder } from '@contember/dic'
 import { Acl, Model, Schema } from '@contember/schema'
-import { Client, SelectBuilder as DbSelectBuilder } from '@contember/database'
+import { SelectBuilder as DbSelectBuilder } from '@contember/database'
 import { Providers } from '@contember/schema-utils'
 import { PaginatedHasManyExecutionHandler } from '../extensions/paginatedHasMany/PaginatedHasManyExecutionHandler'
 import { PaginatedHasManyFieldProvider } from '../extensions/paginatedHasMany/PaginatedHasManyFieldProvider'
 import { WhereOptimizer } from './select/optimizer/WhereOptimizer'
 import { ConditionOptimizer } from './select/optimizer/ConditionOptimizer'
 
-type MapperContainerArgs = {
+export type MapperContainerArgs = {
 	schema: Schema
 	identityVariables: Acl.VariablesMap
 	permissions: Acl.Permissions
@@ -45,14 +44,26 @@ export interface MapperContainer {
 	mapperFactory: MapperFactory
 }
 
+export type MapperContainerBuilder = ReturnType<MapperContainerFactory['createBuilderInternal']>
+export type MapperContainerHook = (builder: MapperContainerBuilder) => MapperContainerBuilder
+
 export class MapperContainerFactory {
+	public readonly hooks: MapperContainerHook[] = []
+
 	constructor(
 		private readonly providers: Providers,
 	) {
 	}
 
-	protected createBuilder({ permissions, schema, identityVariables }: MapperContainerArgs) {
+	createBuilder(args: MapperContainerArgs): MapperContainerBuilder {
+		const builder = this.createBuilderInternal(args)
+		return this.hooks.reduce((acc, cb) => cb(acc), builder)
+	}
+
+	createBuilderInternal({ permissions, schema, identityVariables }: MapperContainerArgs) {
 		return new Builder({})
+			.addService('schema', () =>
+				schema)
 			.addService('providers', () =>
 				this.providers)
 			.addService('variableInjector', () =>
@@ -102,8 +113,8 @@ export class MapperContainerFactory {
 							fieldsVisitorFactory,
 							selectHandlers,
 							pathFactory,
-						relationPath,
-						predicateFactory,
+							relationPath,
+							predicateFactory,
 						)
 					}
 				})())
@@ -124,20 +135,18 @@ export class MapperContainerFactory {
 			.addService('inserter', ({ predicateFactory, insertBuilderFactory, providers }) =>
 				new Inserter(schema.model, predicateFactory, insertBuilderFactory, providers))
 			.addService('mapperFactory', ({ predicatesInjector, selectBuilderFactory, uniqueWhereExpander, whereBuilder, junctionTableManager, deleteExecutor, updater, inserter, pathFactory }) => {
-				return (db: Client) =>
-					new Mapper(
-						schema.model,
-						db,
-						predicatesInjector,
-						selectBuilderFactory,
-						uniqueWhereExpander,
-						whereBuilder,
-						junctionTableManager,
-						deleteExecutor,
-						updater,
-						inserter,
-						pathFactory,
-					)
+				return new MapperFactory(
+					schema.model,
+					predicatesInjector,
+					selectBuilderFactory,
+					uniqueWhereExpander,
+					whereBuilder,
+					junctionTableManager,
+					deleteExecutor,
+					updater,
+					inserter,
+					pathFactory,
+				)
 			})
 	}
 

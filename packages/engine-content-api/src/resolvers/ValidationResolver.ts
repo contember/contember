@@ -12,7 +12,7 @@ export class ValidationResolver {
 	) {}
 
 	public async validateUpdate(entity: Model.Entity, input: Input.UpdateInput): Promise<Result.ValidationResult> {
-		const mapper = this.mapperFactory(this.db)
+		const mapper = this.mapperFactory.create(this.db)
 		const validationResult = await this.inputValidator.validateUpdate({
 			mapper,
 			entity,
@@ -31,7 +31,7 @@ export class ValidationResolver {
 	}
 
 	public async validateCreate(entity: Model.Entity, input: Input.CreateInput): Promise<Result.ValidationResult> {
-		const mapper = this.mapperFactory(this.db)
+		const mapper = this.mapperFactory.create(this.db)
 		const validationResult = await this.inputValidator.validateCreate({
 			mapper,
 			entity,

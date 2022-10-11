@@ -1,4 +1,15 @@
-import { DocumentNode, execute, GraphQLError, GraphQLSchema, parse, validate, validateSchema } from 'graphql'
+import {
+	DocumentNode,
+	execute,
+	GraphQLError,
+	GraphQLSchema,
+	Kind,
+	OperationDefinitionNode,
+	OperationTypeNode,
+	parse,
+	validate,
+	validateSchema,
+} from 'graphql'
 import LRUCache from 'lru-cache'
 import { createHash } from 'crypto'
 import { Request, Response } from 'koa'
@@ -11,6 +22,7 @@ export interface GraphQLListener<Context> {
 	onExecute?: (ctx: {
 		context: Context
 		document: DocumentNode
+		operation: OperationTypeNode
 	}) => Omit<GraphQLListener<Context>, 'onStart' | 'onExecute'> | void
 	onResponse?: (ctx: {
 		response: any
@@ -108,13 +120,16 @@ export const createGraphQLQueryHandler = <Context>({
 				}
 			}
 			const document = doc
+			const operationName = resolvedRequest.operationName ?? null
+			const operationType = resolveOperationType(document, operationName)
 
 			listenersQueue.forEach(it => {
-				it.onExecute && listenersQueue.push(it.onExecute({ context, document }) || {})
+				it.onExecute && listenersQueue.push(it.onExecute({ context, document, operation: operationType }) || {})
 			})
 			const response = await execute({
 				schema,
 				document,
+				operationName: operationName,
 				variableValues: resolvedRequest.variables,
 				contextValue: context,
 			})
@@ -172,3 +187,14 @@ const processErrors = (errors: readonly any[]): [number | null, any[]] => {
 	return [has500 ? 500 : has400 ? 400 : has403 ? 403 : null, resultErrors]
 }
 
+
+const resolveOperationType = (document: DocumentNode, operationName: string | null): OperationTypeNode => {
+	for (const definition of document.definitions) {
+		if (definition.kind === Kind.OPERATION_DEFINITION) {
+			if (operationName === null || definition.name?.value === operationName) {
+				return definition.operation
+			}
+		}
+	}
+	throw new GraphQLError('Must provide an operation.')
+}

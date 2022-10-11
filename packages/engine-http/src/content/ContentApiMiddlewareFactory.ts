@@ -101,7 +101,6 @@ export class ContentApiMiddlewareFactory {
 
 			const projectRoles = memberships.map(it => it.role)
 
-			const contentDatabase = projectContainer.connection.createClient(stage.schema, { module: 'content' })
 
 			const [graphQlSchema, permissions] = await timer('GraphQLSchemaCreate', () => projectContainer.graphQlSchemaFactory.create(schema, {
 				projectRoles: projectRoles,
@@ -119,21 +118,25 @@ export class ContentApiMiddlewareFactory {
 
 			await requestLogger.scope(async logger => {
 				logger.debug('Content query processing started')
-				const graphqlContext = this.contentGraphqlContextFactory.create({
-					db: contentDatabase,
-					authResult,
-					memberships,
-					permissions,
-					schema,
-					timer,
-					koaContext,
-					requestDebug,
-				})
 
 				await timer('GraphQL', () => handler({
 					request,
 					response,
-					createContext: () => graphqlContext,
+					createContext: ({ operation }) => {
+						const connection = operation === 'query' ? projectContainer.readConnection : projectContainer.connection
+						const contentDatabase = connection.createClient(stage.schema, { module: 'content' })
+
+						return this.contentGraphqlContextFactory.create({
+							db: contentDatabase,
+							authResult,
+							memberships,
+							permissions,
+							schema,
+							timer,
+							koaContext,
+							requestDebug,
+						})
+					},
 				}))
 				logger.debug('Content query finished')
 			})

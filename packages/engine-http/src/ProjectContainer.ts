@@ -9,6 +9,7 @@ export interface ProjectContainer {
 	project: ProjectConfig
 	logger: Logger
 	connection: Connection
+	readConnection: Connection
 	graphQlSchemaFactory: GraphQlSchemaFactory
 	contentSchemaResolver: ContentSchemaResolver
 }

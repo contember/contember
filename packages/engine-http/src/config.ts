@@ -10,6 +10,11 @@ export type ProjectConfig = {
 		& {
 			pool?: Omit<PoolConfig, 'logError'>
 			systemSchema?: string
+			read?:
+				& Partial<DatabaseConfig>
+				& {
+					pool?: Omit<PoolConfig, 'logError'>
+				}
 		}
 } & Record<string, unknown>
 

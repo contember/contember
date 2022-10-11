@@ -173,13 +173,17 @@ const processErrors = (errors: readonly any[]): [number | null, any[]] => {
 		const originalError = extractOriginalError(error)
 		if (originalError instanceof GraphQLError) {
 			resultErrors.push(error)
+			has400 = true
 		} else if (originalError instanceof ForbiddenError) {
 			resultErrors.push(error)
+			has403 = true
 		} else if (originalError instanceof UserError) {
 			resultErrors.push({ message: error.message, locations: error.locations, path: error.path })
+			has400 = true
 		} else {
 			logger.error(originalError || error)
 			resultErrors.push({ message: 'Internal server error', locations: undefined, path: undefined })
+			has500 = true
 		}
 	}
 	return [has500 ? 500 : has400 ? 400 : has403 ? 403 : null, resultErrors]

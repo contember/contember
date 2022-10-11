@@ -1,5 +1,5 @@
 import { QueryConfig, QueryResult, QueryResultRow } from 'pg'
-import EventEmitter from 'node:events'
+import { EventEmitter } from 'node:events'
 
 export interface PgClient extends EventEmitter {
 	connect(): Promise<void>

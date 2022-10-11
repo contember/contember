@@ -1,5 +1,5 @@
 import { KoaMiddleware, KoaRequestState } from '../koa'
-import { AuthResult, TimerMiddlewareState } from '../common'
+import { AuthResult, LoggerMiddlewareState, TimerMiddlewareState } from '../common'
 import { GraphQLKoaState } from '../graphql'
 import { ProjectGroupResolver, ProjectInfoMiddlewareState } from '../project-common'
 import { TenantGraphQLContextFactory } from './TenantGraphQLContextFactory'
@@ -9,6 +9,7 @@ type TenantApiMiddlewareState =
 	& KoaRequestState
 	& GraphQLKoaState
 	& ProjectInfoMiddlewareState
+	& LoggerMiddlewareState
 	& { authResult: AuthResult }
 
 export class TenantApiMiddlewareFactory {
@@ -25,13 +26,27 @@ export class TenantApiMiddlewareFactory {
 			const groupContainer = await this.projectGroupResolver.resolveContainer({ request })
 			koaContext.state.projectGroup = groupContainer.slug
 			const authResult = await groupContainer.authenticator.authenticate({ request, timer })
+			koaContext.state.logger.debug('User authenticated', { authResult })
 			koaContext.state.authResult = authResult
+
+			const requestLogger = koaContext.state.logger.child({
+				...groupContainer.logger.attributes,
+				module: 'tenant',
+				user: authResult.identityId,
+			})
+			koaContext.state.logger = requestLogger
+
 			const tenantContainer = groupContainer.tenantContainer
-			const context = this.tenantGraphQLContextFactory.create({ authResult, tenantContainer, koaContext })
-			return await groupContainer.tenantGraphQLHandler({
-				request,
-				response,
-				context,
+			return await requestLogger.scope(async logger => {
+				logger.debug('Tenant query processing started')
+				const context = this.tenantGraphQLContextFactory.create({ authResult, tenantContainer, koaContext, logger: requestLogger })
+
+				await timer('GraphQL', () => groupContainer.tenantGraphQLHandler({
+					request,
+					response,
+					context,
+				}))
+				logger.debug('Tenant query finished')
 			})
 		}
 	}

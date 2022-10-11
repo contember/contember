@@ -19,6 +19,7 @@ import { dbCredentials, recreateDatabase } from './dbUtils'
 import { graphql } from 'graphql'
 import { Connection } from '@contember/database'
 import { assert } from 'vitest'
+import { createLogger, JsonStreamLoggerHandler } from '@contember/logger'
 
 export interface TenantTest {
 	query: GraphQLTestQuery
@@ -73,8 +74,6 @@ const schema: Schema = {
 
 const projectSchemaResolver: ProjectSchemaResolver = {
 	getSchema: project => Promise.resolve(schema),
-	clearCache() {
-	},
 }
 
 export const authenticatedIdentityId = testUuid(999)
@@ -111,17 +110,17 @@ export const createTenantTester = async (): Promise<TenantTester> => {
 		},
 		hash: (value: any) => Buffer.from(value.toString()),
 	}
-
+	const logger = createLogger(new JsonStreamLoggerHandler(process.stderr))
 	const migrationsRunner = new TenantMigrationsRunner(credentials, 'tenant', {
 		rootToken: process.env.CONTEMBER_ROOT_TOKEN,
 	}, providers)
 	let counter = 0
-	await migrationsRunner.run(() => null)
+	await migrationsRunner.run(logger)
 	const mailer = createMockedMailer()
 	const projectInitializer = {
 		initializeProject: () => Promise.resolve(),
 	}
-	const connection = Connection.create(credentials)
+	const connection = Connection.create(credentials, err => logger.error(err))
 	const tenantContainer = new TenantContainerFactory(providers)
 		.createBuilder({
 			mailOptions: {},
@@ -153,6 +152,7 @@ export const createTenantTester = async (): Promise<TenantTester> => {
 
 	return {
 		async execute(query: GraphQLTestQuery, options: TenantTestOptions = {}): Promise<any> {
+
 			const context: TenantResolverContext = {
 				...createResolverContext(
 					new PermissionContext(
@@ -165,6 +165,7 @@ export const createTenantTester = async (): Promise<TenantTester> => {
 					),
 					authenticatedApiKeyId,
 				),
+				logger: logger,
 				db: dbContext,
 			}
 			const result = await graphql({

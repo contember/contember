@@ -1,20 +1,22 @@
 import { KoaMiddleware, KoaRequestState } from '../koa'
 import { ProjectGroupResolver, ProjectInfoMiddlewareState } from '../project-common'
-import { AuthResult, HttpError, TimerMiddlewareState } from '../common'
+import { AuthResult, HttpError, LoggerMiddlewareState, TimerMiddlewareState } from '../common'
 import { StageBySlugQuery } from '@contember/engine-system-api'
 import { NotModifiedChecker } from './NotModifiedChecker'
 import { ContentGraphQLContextFactory } from './ContentGraphQLContextFactory'
 import { ContentQueryHandler, ContentQueryHandlerFactory } from './ContentQueryHandlerFactory'
 import { GraphQLSchema } from 'graphql'
 import { GraphQLKoaState } from '../graphql'
-import { Logger } from '@contember/engine-common'
 
 type ContentApiMiddlewareKoaState =
 	& TimerMiddlewareState
 	& KoaRequestState
 	& GraphQLKoaState
 	& ProjectInfoMiddlewareState
-	& { authResult: AuthResult }
+	& LoggerMiddlewareState
+	& {
+		authResult: AuthResult
+	}
 
 
 const debugHeader = 'x-contember-debug'
@@ -37,20 +39,24 @@ export class ContentApiMiddlewareFactory {
 			koaContext.state.projectGroup = groupContainer.slug
 
 			const authResult = await groupContainer.authenticator.authenticate({ request, timer })
+			koaContext.state.logger.debug('User authenticated', { authResult })
 			koaContext.state.authResult = authResult
 
-			// eslint-disable-next-line no-console
-			const logger = new Logger(console.log)
-			logger.group(`Initializing ${groupContainer.slug}/${params.projectSlug}`)
 
 			const projectContainer = await groupContainer.projectContainerResolver.getProjectContainer(params.projectSlug, {
 				alias: true,
-				logger,
 			})
-			logger.groupEnd()
+
 			if (projectContainer === undefined) {
 				throw new HttpError(`Project ${params.projectSlug} NOT found`, 404)
 			}
+			const requestLogger = koaContext.state.logger.child({
+				...projectContainer.logger.attributes,
+				module: 'content',
+				user: authResult.identityId,
+			})
+			koaContext.state.logger = requestLogger
+
 			const project = projectContainer.project
 			koaContext.state.project = project.slug
 
@@ -85,6 +91,7 @@ export class ContentApiMiddlewareFactory {
 					},
 				}),
 			)
+			requestLogger.debug('Memberships fetched', { memberships })
 
 			const debugHeaderValue = request.get(debugHeader).trim()
 			const requestDebug = debugHeaderValue === '1' && fetchedMemberships.some(it => schema.acl.roles[it.role]?.debug)
@@ -105,28 +112,31 @@ export class ContentApiMiddlewareFactory {
 				if (existingHandler) {
 					return existingHandler
 				}
-				const newHandler = await this.handlerFactory.create(graphQlSchema, project.slug)
+				const newHandler = await this.handlerFactory.create(graphQlSchema)
 				handlerCache.set(graphQlSchema, newHandler)
 				return newHandler
 			})()
 
+			await requestLogger.scope(async logger => {
+				logger.debug('Content query processing started')
+				const graphqlContext = this.contentGraphqlContextFactory.create({
+					db: contentDatabase,
+					authResult,
+					memberships,
+					permissions,
+					schema,
+					timer,
+					koaContext,
+					requestDebug,
+				})
 
-			const graphqlContext = this.contentGraphqlContextFactory.create({
-				db: contentDatabase,
-				authResult,
-				memberships,
-				permissions,
-				schema,
-				timer,
-				koaContext,
-				requestDebug,
+				await timer('GraphQL', () => handler({
+					request,
+					response,
+					context: graphqlContext,
+				}))
+				logger.debug('Content query finished')
 			})
-
-			await timer('GraphQL', () => handler({
-				request,
-				response,
-				context: graphqlContext,
-			}))
 
 
 			notModifiedRes?.setResponseHeader(response)

@@ -23,6 +23,7 @@ import {
 import { SystemContainerFactory } from '@contember/engine-system-api'
 import { ProjectConfigResolver } from '../config/projectConfigResolver'
 import { createSecretKey } from 'crypto'
+import { Logger } from '@contember/logger'
 
 interface ProjectGroupContainerFactoryArgs
 {
@@ -40,18 +41,21 @@ export class ProjectGroupContainerFactory {
 		private readonly projectConfigResolver: ProjectConfigResolver,
 		private readonly tenantGraphQLHandlerFactory: TenantGraphQLHandlerFactory,
 		private readonly systemGraphQLHandlerFactory: SystemGraphQLHandlerFactory,
+		private readonly logger: Logger,
 	) {}
 
 	public create({ config, slug }: ProjectGroupContainerFactoryArgs): ProjectGroupContainer {
 		return new Builder({})
 			.addService('slug', () =>
 				slug)
+			.addService('logger', ({ slug }) =>
+				this.logger.child({ projectGroup: slug }))
 			.addService('providers', () =>
 				this.providers)
 			.addService('tenantDbCredentials', () =>
 				config.db)
-			.addService('tenantConnection', ({ tenantDbCredentials }): Connection.ConnectionType =>
-				Connection.create(tenantDbCredentials))
+			.addService('tenantConnection', ({ tenantDbCredentials, logger }): Connection.ConnectionType =>
+				Connection.create(tenantDbCredentials, err => logger.error(err)))
 			.addService('projectSchemaResolver', () =>
 				new ProjectSchemaResolverProxy())
 			.addService('projectInitializer', () =>
@@ -83,8 +87,8 @@ export class ProjectGroupContainerFactory {
 				this.systemContainerFactory.create({ identityFetcher }))
 			.addService('schemaVersionBuilder', ({ systemContainer }) =>
 				systemContainer.schemaVersionBuilder)
-			.addService('projectContainerFactory', ({  schemaVersionBuilder }) =>
-				this.projectContainerFactoryFactory.create(schemaVersionBuilder))
+			.addService('projectContainerFactory', ({  schemaVersionBuilder, logger }) =>
+				this.projectContainerFactoryFactory.create(schemaVersionBuilder, logger))
 			.addService('tenantProjectManager', ({ tenantContainer }) =>
 				tenantContainer.projectManager)
 			.addService('projectContainerResolver', ({ projectContainerFactory, tenantProjectManager, systemContainer, tenantContainer }) =>
@@ -97,8 +101,8 @@ export class ProjectGroupContainerFactory {
 					config,
 				))
 
-			.setupService('projectSchemaResolver', (it, { projectContainerResolver, schemaVersionBuilder }) => {
-				it.setResolver(new ProjectSchemaResolver(projectContainerResolver, schemaVersionBuilder))
+			.setupService('projectSchemaResolver', (it, { projectContainerResolver }) => {
+				it.setResolver(new ProjectSchemaResolver(projectContainerResolver))
 			})
 			.setupService('projectInitializer', (it, { projectContainerResolver }) => {
 				it.setInitializer(new ProjectInitializer(projectContainerResolver))
@@ -124,6 +128,7 @@ export class ProjectGroupContainerFactory {
 				'projectMembershipResolver',
 				'tenantGraphQLHandler',
 				'slug',
+				'logger',
 			)
 	}
 }

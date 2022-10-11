@@ -1,23 +1,28 @@
 import { DatabaseContext, SchemaVersionBuilder, VersionedSchema } from '@contember/engine-system-api'
-import { Schema } from '@contember/schema'
 import { filterSchemaByStage } from '@contember/schema-utils'
 
+
 export class ContentSchemaResolver {
-	private schemaCache: { [stage: string]: VersionedSchema } = {}
+	private baseSchemaCache: VersionedSchema | undefined
+	private stageSchemaCache: { [stage: string]: VersionedSchema } = {}
 
-	constructor(private readonly schemaVersionBuilder: SchemaVersionBuilder) {}
-
-	public clearCache() {
-		this.schemaCache = {}
+	constructor(private readonly schemaVersionBuilder: SchemaVersionBuilder) {
 	}
 
-	public async getSchema(db: DatabaseContext, stage: string): Promise<VersionedSchema> {
-		const cachedSchema = this.schemaCache[stage]
-		let newSchema = await this.schemaVersionBuilder.buildSchema(db, cachedSchema)
-		if (newSchema !== cachedSchema) {
-			newSchema = filterSchemaByStage(newSchema, stage)
+	public clearCache() {
+		this.baseSchemaCache = undefined
+		this.stageSchemaCache = {}
+	}
+
+	public async getSchema(db: DatabaseContext, stage?: string): Promise<VersionedSchema> {
+		const prevBaseSchema = this.baseSchemaCache
+		this.baseSchemaCache = await this.schemaVersionBuilder.buildSchema(db, prevBaseSchema)
+		if (prevBaseSchema !== this.baseSchemaCache) {
+			this.stageSchemaCache = {}
 		}
-		this.schemaCache[stage] = newSchema
-		return newSchema
+		if (!stage) {
+			return this.baseSchemaCache
+		}
+		return this.stageSchemaCache[stage] ??= filterSchemaByStage(this.baseSchemaCache, stage)
 	}
 }

@@ -11,22 +11,22 @@ class Connection implements Connection.ConnectionLike, Connection.ClientFactory,
 		public readonly eventManager: EventManager = new EventManager(null),
 	) {
 		this.pool.on('error', err => {
-			// eslint-disable-next-line no-console
-			console.error(err)
 			this.eventManager.fire(EventManager.Event.clientError, err)
 		})
 	}
 
 	public static create(
-		{ pool = {}, ...config }: DatabaseConfig & { pool?: PoolConfig },
+		{ pool = {}, ...config }: DatabaseConfig & { pool?: Omit<PoolConfig, 'logError'> },
+		logError: (error: Error) => void,
 	): Connection {
-		return new Connection(new Pool(createPgClientFactory(config), pool))
+		return new Connection(new Pool(createPgClientFactory(config), { ...pool, logError }))
 	}
 
 	public static createSingle(
 		config: DatabaseConfig,
+		logError: (error: Error) => void,
 	): Connection {
-		return new Connection(new Pool(createPgClientFactory(config), { maxConnections: 1, maxIdle: 0 }))
+		return new Connection(new Pool(createPgClientFactory(config), { maxConnections: 1, maxIdle: 0, logError }))
 	}
 
 	public createClient(schema: string, queryMeta: Record<string, any>): Client {

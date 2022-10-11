@@ -1,0 +1,16 @@
+{
+  "name": "@contember/logger",
+  "version": "0.0.0",
+  "license": "Apache-2.0",
+  "main": "dist/src/index.js",
+  "scripts": {
+    "test": "echo 'No tests'"
+  },
+  "typings": "dist/src/index.d.ts",
+  "devDependencies": {
+    "@types/node": "^18"
+  },
+  "dependencies": {
+    "chalk": "^4.1.2"
+  }
+}

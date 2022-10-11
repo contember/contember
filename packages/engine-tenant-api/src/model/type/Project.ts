@@ -1,4 +1,5 @@
 import { Schema } from '@contember/schema'
+import { Logger } from '@contember/logger'
 
 export interface Project {
 	readonly id: string
@@ -15,9 +16,8 @@ export interface ProjectWithSecrets extends Project {
 
 export interface ProjectSchemaResolver {
 	getSchema(projectSlug: string): Promise<Schema | undefined>
-	clearCache(): void
 }
 
 export interface ProjectInitializer {
-	initializeProject(project: ProjectWithSecrets): Promise<void>
+	initializeProject(project: ProjectWithSecrets, logger: Logger): Promise<void>
 }

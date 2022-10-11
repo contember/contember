@@ -9,7 +9,16 @@
 			"path": "../../database/src"
 		},
 		{
+			"path": "../../dic/src"
+		},
+		{
 			"path": "../../engine-common/src"
+		},
+		{
+			"path": "../../graphql-utils/src"
+		},
+		{
+			"path": "../../logger/src"
 		},
 		{
 			"path": "../../schema/src"
@@ -19,12 +28,6 @@
 		},
 		{
 			"path": "../../schema-utils/src"
-		},
-		{
-			"path": "../../dic/src"
-		},
-		{
-			"path": "../../graphql-utils/src"
 		}
 	]
 }

@@ -1,5 +1,5 @@
 import { Acl, Model, Schema, Validation } from '@contember/schema'
-import { ExecutionContainerFactory, GraphQlSchemaBuilderFactory, Authorizator } from '../../src'
+import { Authorizator, ExecutionContainerFactory, GraphQlSchemaBuilderFactory } from '../../src'
 import { AllowAllPermissionFactory, emptySchema } from '@contember/schema-utils'
 import { executeGraphQlTest } from './testGraphql'
 import { Client } from '@contember/database'

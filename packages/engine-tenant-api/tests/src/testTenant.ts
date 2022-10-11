@@ -20,6 +20,7 @@ import { Acl, Schema } from '@contember/schema'
 import { createMockedMailer, ExpectedMessage } from './mailer'
 import { dbCredentials } from './dbUtils'
 import { IdPMock } from './IdPMock'
+import { createLogger, JsonStreamLoggerHandler } from '@contember/logger'
 
 export interface Test {
 	query: GraphQLTestQuery
@@ -55,8 +56,6 @@ const schema: Schema = {
 
 const projectSchemaResolver: ProjectSchemaResolver = {
 	getSchema: project => Promise.resolve(schema),
-	clearCache() {
-	},
 }
 
 export const authenticatedIdentityId = testUuid(999)
@@ -113,6 +112,7 @@ export const executeTenantTest = async (test: Test) => {
 			),
 			authenticatedApiKeyId,
 		),
+		logger: createLogger(new JsonStreamLoggerHandler(process.stderr)),
 		db: databaseContext,
 	}
 

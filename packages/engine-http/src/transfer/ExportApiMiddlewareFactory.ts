@@ -5,7 +5,6 @@ import { Readable } from 'stream'
 import { toBuffer } from './CommandStream'
 import { ExportExecutor, ExportRequest } from './ExportExecutor'
 import { ParseError } from '@contember/typesafe'
-import { Logger } from '@contember/engine-common'
 import { ProjectContainer } from '../ProjectContainer'
 
 type ExportApiMiddlewareState =
@@ -48,12 +47,10 @@ export class ExportApiMiddlewareFactory {
 				}
 			}
 
-			// eslint-disable-next-line no-console
-			const logger = new Logger(console.log)
 			const projectContainers: Record<string, ProjectContainer> = {}
 
 			for (const project of exportRequest.projects) {
-				const projectContainer = await groupContainer.projectContainerResolver.getProjectContainer(project.slug, { alias: true, logger })
+				const projectContainer = await groupContainer.projectContainerResolver.getProjectContainer(project.slug, { alias: true })
 
 				if (projectContainer === undefined) {
 					throw new HttpError(`Project ${project.slug} NOT found`, 400)

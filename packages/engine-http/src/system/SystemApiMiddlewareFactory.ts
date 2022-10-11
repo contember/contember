@@ -1,15 +1,15 @@
 import { KoaMiddleware, KoaRequestState } from '../koa'
 import { ProjectGroupResolver, ProjectInfoMiddlewareState } from '../project-common'
-import { AuthResult, HttpError, TimerMiddlewareState } from '../common'
+import { AuthResult, HttpError, LoggerMiddlewareState, TimerMiddlewareState } from '../common'
 import { GraphQLKoaState } from '../graphql'
 import { SystemGraphQLContextFactory } from './SystemGraphQLContextFactory'
-import { Logger } from '@contember/engine-common'
 
 type SystemApiMiddlewareKoaState =
 	& TimerMiddlewareState
 	& KoaRequestState
 	& GraphQLKoaState
 	& ProjectInfoMiddlewareState
+	& LoggerMiddlewareState
 	& { authResult: AuthResult }
 
 export class SystemApiMiddlewareFactory {
@@ -26,22 +26,24 @@ export class SystemApiMiddlewareFactory {
 			const groupContainer = await this.projectGroupResolver.resolveContainer({ request })
 			koaContext.state.projectGroup = groupContainer.slug
 			const authResult = await groupContainer.authenticator.authenticate({ request, timer })
+			koaContext.state.logger.debug('User authenticated', { authResult })
 			koaContext.state.authResult = authResult
 
 			const projectSlug = params.projectSlug
-			// eslint-disable-next-line no-console
-			const logger = new Logger(console.log)
-			logger.group(`Initializing ${groupContainer.slug}/${params.projectSlug}`)
-			const projectContainer = await groupContainer.projectContainerResolver.getProjectContainer(projectSlug, {
-				alias: true,
-				logger,
-			})
-			logger.groupEnd()
+			const projectContainer = await groupContainer.projectContainerResolver.getProjectContainer(projectSlug, { alias: true })
+
 			if (projectContainer === undefined) {
 				throw new HttpError(`Project ${projectSlug} NOT found`, 404)
 			}
+
 			const project = projectContainer.project
 			koaContext.state.project = project.slug
+
+			const requestLogger = koaContext.state.logger.child({
+				...projectContainer.logger.attributes,
+				module: 'system',
+				user: authResult.identityId,
+			})
 
 			const tenantContainer = groupContainer.tenantContainer
 			const memberships = await timer('MembershipFetch', () =>
@@ -54,6 +56,8 @@ export class SystemApiMiddlewareFactory {
 					},
 				),
 			)
+			requestLogger.debug('Memberships fetched', { memberships })
+
 			if (memberships.length === 0) {
 				throw this.debug
 					? new HttpError(`You are not allowed to access project ${project.slug}`, 403)
@@ -61,24 +65,29 @@ export class SystemApiMiddlewareFactory {
 			}
 
 
-			const graphqlContext = await this.systemGraphqlContextFactory.create({
-				authResult,
-				memberships,
-				koaContext,
-				projectContainer,
-				systemContainer: groupContainer.systemContainer,
-				onClearCache: () => {
-					projectContainer.contentSchemaResolver.clearCache()
-					groupContainer.projectSchemaResolver.clearCache()
-				},
-			})
-			const handler = groupContainer.systemGraphQLHandler
+			koaContext.state.logger = requestLogger
 
-			await timer('GraphQL', () => handler({
-				request,
-				response,
-				context: graphqlContext,
-			}))
+			await requestLogger.scope(async logger => {
+				logger.debug('System query processing started')
+				const graphqlContext = await this.systemGraphqlContextFactory.create({
+					authResult,
+					memberships,
+					koaContext,
+					projectContainer,
+					systemContainer: groupContainer.systemContainer,
+					onClearCache: () => {
+						projectContainer.contentSchemaResolver.clearCache()
+					},
+				})
+				const handler = groupContainer.systemGraphQLHandler
+
+				await timer('GraphQL', () => handler({
+					request,
+					response,
+					context: graphqlContext,
+				}))
+				logger.debug('System query finished')
+			})
 		}
 	}
 }

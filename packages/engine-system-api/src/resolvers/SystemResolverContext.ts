@@ -10,15 +10,14 @@ import { ItemLoader } from '../utils/batchQuery'
 export class SystemResolverContextFactory {
 	constructor(
 		private readonly authorizator: Authorizator<Identity>,
-		private readonly schemaVersionBuilder: SchemaVersionBuilder,
 	) {}
 
 	public async create(
+		schema: Schema,
 		systemDbContext: DatabaseContext,
 		project: ProjectConfig,
 		identity: Identity,
 	): Promise<SystemResolverContext> {
-		const schema = await this.schemaVersionBuilder.buildSchema(systemDbContext)
 		const stagePermissionsFactory = new StagePermissionsFactory(schema)
 		const loaders = new Map<LoaderFactory<any, any>, ItemLoader<any, any>>()
 		return {

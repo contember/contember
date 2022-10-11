@@ -34,7 +34,7 @@ export const createConnectionMockAlt = (...queries: { sql: string; timeout?: num
 		return connectionMocks.shift() ?? (() => {
 			throw new Error('No connection')
 		})()
-	}, {})
+	}, { logError: () => null })
 	return [
 		new Connection(pool),
 		() => {

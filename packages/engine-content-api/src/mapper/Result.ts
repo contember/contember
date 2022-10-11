@@ -2,6 +2,7 @@ import { Input, Model, Value } from '@contember/schema'
 import { convertError } from './ErrorUtils'
 import { getFulfilledValues, getRejections } from '../utils'
 import { SerializationFailureError } from '@contember/database'
+import { logger } from '@contember/logger'
 
 export enum MutationResultType {
 	ok = 'ok',
@@ -225,10 +226,7 @@ export const collectResults = async (
 	const failures = getRejections(results)
 	if (failures.length > 0) {
 		if (failures.length > 1 && !failures.every(it => it instanceof SerializationFailureError)) {
-			// eslint-disable-next-line no-console
-			console.error('Multiple error has occurred, printing them & rethrowing the first one')
-			// eslint-disable-next-line no-console
-			failures.slice(1).map(e => console.error(e))
+			failures.slice(1).map(e => logger.error(e))
 		}
 		throw failures[0]
 	}

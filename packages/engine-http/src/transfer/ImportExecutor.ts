@@ -6,7 +6,6 @@ import { Command, CommandArgsMap, CommandName } from './Command'
 import { DatabaseContext, StageBySlugQuery } from '@contember/engine-system-api'
 import { ProjectGroupContainer } from '../ProjectGroupContainer'
 import { DbColumnSchema, TransferMapping, TransferTableMapping } from './TransferMapping'
-import { Logger } from '@contember/engine-common'
 import { ContentSchemaTransferMappingFactory } from './ContentSchemaTransferMappingFactory'
 import { SystemSchemaTransferMappingFactory } from './SystemSchemaTransferMappingFactory'
 import { AuthResult, HttpError } from '../common/index'
@@ -65,7 +64,6 @@ export class ImportExecutor {
 	constructor(
 		private readonly contentSchemaTransferMappingFactory: ContentSchemaTransferMappingFactory,
 		private readonly systemSchemaTransferMappingFactory: SystemSchemaTransferMappingFactory,
-		private readonly logger: Logger,
 	) {
 	}
 
@@ -219,7 +217,7 @@ export class ImportExecutor {
 
 	private async createProjectContainer(groupContainer: ProjectGroupContainer, projectSlug: string) {
 		const projectContainerResolver = groupContainer.projectContainerResolver
-		const projectContainer = await projectContainerResolver.getProjectContainer(projectSlug, { alias: true, logger: this.logger })
+		const projectContainer = await projectContainerResolver.getProjectContainer(projectSlug, { alias: true })
 
 		if (projectContainer === undefined) {
 			throw new ImportError(`Project ${projectSlug} does not exists.`)

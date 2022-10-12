@@ -24,10 +24,10 @@ export interface ExecutionContainer {
 
 export interface ExecutionContainerArgs {
 	db: Client
+	identityId: string
 	identityVariables: Acl.VariablesMap
 	schema: Schema
 	permissions: Acl.Permissions
-	setupSystemVariables: (db: Client) => Promise<void>
 }
 
 export class ExecutionContainerFactory {
@@ -36,12 +36,8 @@ export class ExecutionContainerFactory {
 		private readonly mapperContainerFactory: MapperContainerFactory,
 	) {}
 
-	public create({ db, identityVariables, permissions, schema, setupSystemVariables }: ExecutionContainerArgs): Container<ExecutionContainer> {
-		const mapperContainer = this.mapperContainerFactory.create({
-			permissions: permissions,
-			identityVariables: identityVariables,
-			schema: schema,
-		})
+	public create({ db, identityVariables, permissions, schema, identityId }: ExecutionContainerArgs): Container<ExecutionContainer> {
+		const mapperContainer = this.mapperContainerFactory.create({ permissions, identityVariables, schema, db, identityId })
 		const innerDic = new Builder({})
 			.addService('db', () =>
 				db)
@@ -51,8 +47,8 @@ export class ExecutionContainerFactory {
 				mapperContainer.mapperFactory)
 			.addService('queryAstFactory', () =>
 				new GraphQlQueryAstFactory())
-			.addService('readResolver', ({ db, mapperFactory, queryAstFactory }) =>
-				new ReadResolver(db, mapperFactory, queryAstFactory))
+			.addService('readResolver', ({ mapperFactory, queryAstFactory }) =>
+				new ReadResolver(mapperFactory, queryAstFactory))
 			.addService('validationDependencyCollector', () =>
 				new DependencyCollector())
 			.addService('validationQueryAstFactory', () =>
@@ -65,10 +61,10 @@ export class ExecutionContainerFactory {
 				new EntityRulesResolver(schema.validation, schema.model))
 			.addService('inputPreValidator', ({ entityRulesResolver, columnValueResolver, dataSelector }) =>
 				new InputPreValidator(schema.model, entityRulesResolver, columnValueResolver, dataSelector))
-			.addService('mutationResolver', ({ db, mapperFactory, inputPreValidator, queryAstFactory }) =>
-				new MutationResolver(schema.model, db, mapperFactory, setupSystemVariables, inputPreValidator, queryAstFactory))
-			.addService('validationResolver', ({ inputPreValidator, db, mapperFactory }) =>
-				new ValidationResolver(db, mapperFactory, inputPreValidator))
+			.addService('mutationResolver', ({ mapperFactory, inputPreValidator, queryAstFactory }) =>
+				new MutationResolver(schema.model, mapperFactory, inputPreValidator, queryAstFactory))
+			.addService('validationResolver', ({ inputPreValidator, mapperFactory }) =>
+				new ValidationResolver(mapperFactory, inputPreValidator))
 			.build()
 
 		return innerDic.pick('readResolver', 'mutationResolver', 'validationResolver')

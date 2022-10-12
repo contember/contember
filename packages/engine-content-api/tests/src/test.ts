@@ -86,7 +86,7 @@ export const execute = async (test: Test) => {
 				schema,
 				db,
 				identityVariables: test.variables || {},
-				setupSystemVariables: () => Promise.resolve(),
+				identityId: '00000000-0000-0000-0000-000000000000',
 			}),
 			timer: (label: any, cb: any) => cb(),
 		},

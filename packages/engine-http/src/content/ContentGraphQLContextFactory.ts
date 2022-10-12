@@ -1,5 +1,4 @@
 import { Context, createAclVariables, ExecutionContainerFactory } from '@contember/engine-content-api'
-import { setupSystemVariables } from '@contember/engine-system-api'
 import { Client } from '@contember/database'
 import { Acl, Schema } from '@contember/schema'
 
@@ -9,7 +8,11 @@ import { Providers } from '../providers'
 import { GraphQLKoaState } from '../graphql'
 import { ParsedMembership } from '@contember/schema-utils'
 
-export type ExtendedGraphqlContext = Context & { identityId: string; koaContext: KoaContext<GraphQLKoaState>; requestDebug: boolean }
+export type ExtendedGraphqlContext = Context & {
+	identityId: string
+	koaContext: KoaContext<GraphQLKoaState>
+	requestDebug: boolean
+}
 
 export class ContentGraphQLContextFactory {
 	constructor(
@@ -28,11 +31,7 @@ export class ContentGraphQLContextFactory {
 		koaContext: KoaContext<GraphQLKoaState>
 		requestDebug: boolean
 	}): ExtendedGraphqlContext {
-		const partialContext = {
-			db,
-			identityId: authResult.identityId,
-			identityVariables: createAclVariables(schema.acl, memberships),
-		}
+		const identityVariables = createAclVariables(schema.acl, memberships)
 		let identityId = authResult.identityId
 		if (
 			authResult.assumedIdentityId &&
@@ -42,14 +41,17 @@ export class ContentGraphQLContextFactory {
 		}
 
 		const executionContainer = this.executionContainerFactory.create({
-			...partialContext,
+			db,
+			identityVariables,
+			identityId,
 			schema,
 			permissions,
-			setupSystemVariables: db => setupSystemVariables(db, identityId, this.providers),
 		})
 
 		return {
-			...partialContext,
+			db,
+			identityVariables,
+			identityId,
 			executionContainer,
 			timer,
 			koaContext,

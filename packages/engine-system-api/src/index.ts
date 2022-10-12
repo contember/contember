@@ -12,12 +12,10 @@ export {
 	ProjectInitializer,
 	ProjectMigrator,
 	SchemaVersionBuilder,
-	setupSystemVariables,
 	Stage,
 	StageBySlugQuery,
 	StageCreator,
 	StagesQuery,
-	unnamedIdentity,
 	VersionedSchema,
 } from './model'
 export * from './SystemContainer'

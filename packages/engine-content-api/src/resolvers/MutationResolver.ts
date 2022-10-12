@@ -16,7 +16,7 @@ import { ValidationResolver } from './ValidationResolver'
 import { GraphQLResolveInfo } from 'graphql'
 import { GraphQlQueryAstFactory } from './GraphQlQueryAstFactory'
 import { ImplementationException } from '../exception'
-import { Client, Connection, retryTransaction } from '@contember/database'
+import { retryTransaction } from '@contember/database'
 import { Operation, readOperationMeta } from '../schema'
 import { assertNever } from '../utils'
 import { InputPreValidator } from '../input-validation'
@@ -31,9 +31,7 @@ type TransactionOptions = { deferForeignKeyConstraints?: boolean }
 export class MutationResolver {
 	constructor(
 		private readonly schema: Model.Schema,
-		private readonly db: Client,
 		private readonly mapperFactory: MapperFactory,
-		private readonly systemVariablesSetup: (db: Client) => Promise<void>,
 		private readonly inputValidator: InputPreValidator,
 		private readonly graphqlQueryAstFactory: GraphQlQueryAstFactory,
 	) {}
@@ -62,7 +60,7 @@ export class MutationResolver {
 					: undefined,
 			}))
 
-		return this.transaction(async (mapper, trx) => {
+		return this.transaction(async mapper => {
 			if (options?.deferForeignKeyConstraints) {
 				await mapper.constraintHelper.setFkConstraintsDeferred()
 			}
@@ -466,18 +464,14 @@ export class MutationResolver {
 	}
 
 	private async transaction<R extends { ok: boolean }>(
-		cb: (mapper: Mapper, db: Client<Connection.TransactionLike>) => Promise<R>,
+		cb: (mapper: Mapper) => Promise<R>,
 	): Promise<R> {
 		return await retryTransaction(
 			async () => {
-				const [result, mapper] = await this.db.transaction(async trx => {
-					await trx.connection.query(Connection.REPEATABLE_READ)
-					await this.systemVariablesSetup(trx)
-					const mapper = this.mapperFactory.create(trx)
-
-					const result = await cb(mapper, trx)
+				const [result, mapper] = await this.mapperFactory.transaction(async mapper => {
+					const result = await cb(mapper)
 					if (!result.ok) {
-						await trx.connection.rollback()
+						await mapper.db.connection.rollback()
 					}
 					await mapper.eventManager.fire(new BeforeCommitEvent())
 					return [result, mapper]

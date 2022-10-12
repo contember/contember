@@ -41,8 +41,6 @@ export class ApiTester {
 		const providers = { uuid: createUuidGenerator('a452'), now: () => new Date('2019-09-04 12:00') }
 		const databaseContextFactory = new DatabaseContextFactory(projectConnection.createClient('system', {}), providers)
 
-		// await setupSystemVariables(projectDb, unnamedIdentity, { uuid: createUuidGenerator('a450') })
-
 		const modificationHandlerFactory = new ModificationHandlerFactory(ModificationHandlerFactory.defaultFactoryMap)
 		const gqlSchemaBuilderFactory = new GraphQlSchemaBuilderFactory()
 

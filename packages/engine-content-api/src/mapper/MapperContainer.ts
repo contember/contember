@@ -27,7 +27,7 @@ import {
 } from '../mapper'
 import { Builder } from '@contember/dic'
 import { Acl, Model, Schema } from '@contember/schema'
-import { SelectBuilder as DbSelectBuilder } from '@contember/database'
+import { Client, SelectBuilder as DbSelectBuilder } from '@contember/database'
 import { Providers } from '@contember/schema-utils'
 import { PaginatedHasManyExecutionHandler } from '../extensions/paginatedHasMany/PaginatedHasManyExecutionHandler'
 import { PaginatedHasManyFieldProvider } from '../extensions/paginatedHasMany/PaginatedHasManyFieldProvider'
@@ -36,6 +36,8 @@ import { ConditionOptimizer } from './select/optimizer/ConditionOptimizer'
 
 export type MapperContainerArgs = {
 	schema: Schema
+	db: Client
+	identityId: string
 	identityVariables: Acl.VariablesMap
 	permissions: Acl.Permissions
 }
@@ -60,7 +62,7 @@ export class MapperContainerFactory {
 		return this.hooks.reduce((acc, cb) => cb(acc), builder)
 	}
 
-	createBuilderInternal({ permissions, schema, identityVariables }: MapperContainerArgs) {
+	createBuilderInternal({ permissions, schema, identityVariables, identityId, db }: MapperContainerArgs) {
 		return new Builder({})
 			.addService('schema', () =>
 				schema)
@@ -134,8 +136,10 @@ export class MapperContainerFactory {
 				new Updater(schema.model, predicateFactory, updateBuilderFactory))
 			.addService('inserter', ({ predicateFactory, insertBuilderFactory, providers }) =>
 				new Inserter(schema.model, predicateFactory, insertBuilderFactory, providers))
-			.addService('mapperFactory', ({ predicatesInjector, selectBuilderFactory, uniqueWhereExpander, whereBuilder, junctionTableManager, deleteExecutor, updater, inserter, pathFactory }) => {
+			.addService('mapperFactory', ({ predicatesInjector, selectBuilderFactory, uniqueWhereExpander, whereBuilder, junctionTableManager, deleteExecutor, updater, inserter, pathFactory, providers }) => {
 				return new MapperFactory(
+					db,
+					identityId,
 					schema.model,
 					predicatesInjector,
 					selectBuilderFactory,
@@ -146,6 +150,7 @@ export class MapperContainerFactory {
 					updater,
 					inserter,
 					pathFactory,
+					providers,
 				)
 			})
 	}

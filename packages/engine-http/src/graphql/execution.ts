@@ -102,22 +102,15 @@ export const createGraphQLQueryHandler = <Context>({
 			const queryHash = createHash('md5').update(resolvedRequest.query).digest('hex')
 			let doc = documentCache.get(queryHash)
 			if (!doc) {
-				try {
-					doc = parse(resolvedRequest.query)
-					const validationResult = validate(schema, doc)
-					if (validationResult.length) {
-						return respond(400, { errors: validationResult })
-					}
-					if (hitCache.get(queryHash)) {
-						documentCache.set(queryHash, doc)
-					}
-					hitCache.set(queryHash, true)
-				} catch (e) {
-					if (e instanceof GraphQLError) {
-						return respond(400, { errors: [e] })
-					}
-					throw e
+				doc = parse(resolvedRequest.query)
+				const validationResult = validate(schema, doc)
+				if (validationResult.length) {
+					return respond(400, { errors: validationResult })
 				}
+				if (hitCache.get(queryHash)) {
+					documentCache.set(queryHash, doc)
+				}
+				hitCache.set(queryHash, true)
 			}
 			const document = doc
 			const operationName = resolvedRequest.operationName ?? null

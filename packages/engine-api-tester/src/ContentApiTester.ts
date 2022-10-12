@@ -1,4 +1,4 @@
-import { DatabaseContext, SchemaVersionBuilder, setupSystemVariables } from '@contember/engine-system-api'
+import { DatabaseContext, SchemaVersionBuilder } from '@contember/engine-system-api'
 import { AllowAllPermissionFactory, Providers } from '@contember/schema-utils'
 import {
 	Authorizator,
@@ -13,7 +13,6 @@ import { Schema } from '@contember/schema'
 import { createUuidGenerator } from './testUuid'
 
 export class ContentApiTester {
-	private trxUuidGenerator = createUuidGenerator('a453')
 	private uuidGenerator = createUuidGenerator()
 
 	constructor(
@@ -25,7 +24,6 @@ export class ContentApiTester {
 	) {}
 
 	public async queryContent(stageSlug: string, gql: string, variables?: { [key: string]: any }): Promise<any> {
-		await setupSystemVariables(this.db.client, '00000000-0000-0000-0000-000000000000', { uuid: this.trxUuidGenerator })
 		const stage = this.stageManager.getStage(stageSlug)
 		const schema = await this.getSchema()
 		const model = schema.model
@@ -46,7 +44,7 @@ export class ContentApiTester {
 			schema,
 			permissions,
 			db,
-			setupSystemVariables: () => Promise.resolve(),
+			identityId: '00000000-0000-0000-0000-000000000000',
 			identityVariables: {},
 		})
 		const context: ContentContext = {

@@ -1,18 +1,16 @@
 import { Input, Model, Result } from '@contember/schema'
 import { assertNever } from '../utils'
 import { InputPreValidator, ValidationResult } from '../input-validation'
-import { Client } from '@contember/database'
 import { MapperFactory } from '../mapper'
 
 export class ValidationResolver {
 	constructor(
-		private readonly db: Client,
 		private readonly mapperFactory: MapperFactory,
 		private readonly inputValidator: InputPreValidator,
 	) {}
 
 	public async validateUpdate(entity: Model.Entity, input: Input.UpdateInput): Promise<Result.ValidationResult> {
-		const mapper = this.mapperFactory.create(this.db)
+		const mapper = this.mapperFactory.create()
 		const validationResult = await this.inputValidator.validateUpdate({
 			mapper,
 			entity,
@@ -31,7 +29,7 @@ export class ValidationResolver {
 	}
 
 	public async validateCreate(entity: Model.Entity, input: Input.CreateInput): Promise<Result.ValidationResult> {
-		const mapper = this.mapperFactory.create(this.db)
+		const mapper = this.mapperFactory.create()
 		const validationResult = await this.inputValidator.validateCreate({
 			mapper,
 			entity,

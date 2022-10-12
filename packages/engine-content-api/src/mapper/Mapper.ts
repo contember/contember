@@ -10,8 +10,7 @@ import {
 	SelectResultObject,
 	WhereBuilder,
 } from './select'
-import * as database from '@contember/database'
-import { Client, ConstraintHelper, SelectBuilder } from '@contember/database'
+import { Client, Connection, ConstraintHelper, SelectBuilder } from '@contember/database'
 import { PredicatesInjector } from '../acl'
 import { JunctionTableManager } from './JunctionTableManager'
 import { DeletedEntitiesStorage, DeleteExecutor } from './delete'
@@ -25,8 +24,9 @@ import { CheckedPrimary } from './CheckedPrimary'
 import { ImplementationException } from '../exception'
 import { EventManager } from './EventManager'
 
-export class Mapper {
+export class Mapper<ConnectionType extends Connection.ConnectionLike = Connection.ConnectionLike> {
 	private primaryKeyCache: Record<string, Promise<string> | string> = {}
+	private systemVariablesSetupDone: Promise<void> | undefined
 	public readonly deletedEntities = new DeletedEntitiesStorage()
 	public readonly mutex = new Mutex()
 	public readonly constraintHelper: ConstraintHelper
@@ -34,8 +34,10 @@ export class Mapper {
 	public readonly eventManager: EventManager
 
 	constructor(
+		public readonly db: Client<ConnectionType>,
+		private readonly identityId: string,
+		private readonly transactionId: string,
 		private readonly schema: Model.Schema,
-		public readonly db: database.Client,
 		private readonly predicatesInjector: PredicatesInjector,
 		private readonly selectBuilderFactory: SelectBuilderFactory,
 		private readonly uniqueWhereExpander: UniqueWhereExpander,
@@ -178,6 +180,7 @@ export class Mapper {
 		if (entity.view) {
 			throw new ImplementationException()
 		}
+		await this.setupSystemVariables()
 		return tryMutation(this.schema, () =>
 			this.insertInternal(entity, data, builderCb),
 		)
@@ -192,6 +195,7 @@ export class Mapper {
 		if (entity.view) {
 			throw new ImplementationException()
 		}
+		await this.setupSystemVariables()
 		return tryMutation(this.schema, async () => {
 			const primaryValue = await this.getPrimaryValue(entity, by)
 			if (primaryValue === undefined) {
@@ -209,6 +213,7 @@ export class Mapper {
 		if (entity.view) {
 			throw new ImplementationException()
 		}
+		await this.setupSystemVariables()
 		return tryMutation(this.schema, async () => {
 			const primaryValue = await this.getPrimaryValue(entity, by)
 			if (primaryValue === undefined) {
@@ -227,6 +232,7 @@ export class Mapper {
 		if (entity.view) {
 			throw new ImplementationException()
 		}
+		await this.setupSystemVariables()
 		return tryMutation(this.schema, async () => {
 			const primaryValue = await this.getPrimaryValue(entity, by)
 			if (primaryValue === undefined) {
@@ -251,6 +257,7 @@ export class Mapper {
 		if (entity.view) {
 			throw new ImplementationException()
 		}
+		await this.setupSystemVariables()
 		return tryMutation(this.schema, () => this.deleteExecutor.execute(this, entity, by, filter))
 	}
 
@@ -260,6 +267,7 @@ export class Mapper {
 		thisPrimary: Input.PrimaryValue,
 		otherPrimary: Input.PrimaryValue,
 	): Promise<MutationResultList> {
+		await this.setupSystemVariables()
 		const err = () => {
 			throw new ImplementationException()
 		}
@@ -284,6 +292,7 @@ export class Mapper {
 		thisPrimary: Input.PrimaryValue,
 		otherPrimary: Input.PrimaryValue,
 	): Promise<MutationResultList> {
+		await this.setupSystemVariables()
 		const err = () => {
 			throw new ImplementationException()
 		}
@@ -325,5 +334,13 @@ export class Mapper {
 
 	private hashWhere(entityName: string, where: Input.UniqueWhere): string {
 		return JSON.stringify([entityName, where])
+	}
+
+	private async setupSystemVariables() {
+		this.systemVariablesSetupDone ??= (async () => {
+			await this.db.query('SELECT set_config(?, ?, false)', ['tenant.identity_id', this.identityId]) // todo rename to system.identity_id
+			await this.db.query('SELECT set_config(?, ?, false)', ['system.transaction_id', this.transactionId])
+		})()
+		await this.systemVariablesSetupDone
 	}
 }

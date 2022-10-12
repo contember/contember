@@ -44,6 +44,7 @@ export class ProjectContainerFactory {
 			.pick(
 				'project',
 				'connection',
+				'readConnection',
 				'systemDatabaseContextFactory',
 				'contentSchemaResolver',
 				'graphQlSchemaFactory',
@@ -63,6 +64,19 @@ export class ProjectContainerFactory {
 				project)
 			.addService('connection', ({ project, logger }) =>
 				Connection.create(project.db, err => logger.error(err)))
+			.addService('readConnection', ({ project, logger, connection }) => {
+				if (!project.db.read) {
+					return connection
+				}
+				return Connection.create({
+					...project.db,
+					...project.db.read,
+					pool: {
+						...project.db.pool,
+						...project.db.read.pool,
+					},
+				}, err => logger.error(err))
+			})
 			.addService('graphQlSchemaBuilderFactory', () =>
 				new GraphQlSchemaBuilderFactory())
 			.addService('permissionsByIdentityFactory', ({}) =>

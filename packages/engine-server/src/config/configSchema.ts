@@ -3,30 +3,33 @@ import { MailerOptions } from '@contember/engine-tenant-api'
 import { upperCaseFirst } from '../utils'
 
 
+const dbConfigRequired = {
+	host: Typesafe.string,
+	port: Typesafe.number,
+	user: Typesafe.string,
+	password: Typesafe.string,
+	database: Typesafe.string,
+}
+const dbConfigOptional = {
+	ssl: Typesafe.boolean,
+	queryTimeoutMs: Typesafe.number,
+	statementTimeoutMs: Typesafe.number,
+	connectionTimeoutMs: Typesafe.number,
+	pool: Typesafe.partial({
+		maxConnections: Typesafe.number,
+		maxConnecting: Typesafe.number,
+		maxIdle: Typesafe.number,
+		reconnectIntervalMs: Typesafe.number,
+		idleTimeoutMs: Typesafe.number,
+		acquireTimeoutMs: Typesafe.number,
+		maxUses: Typesafe.number,
+		maxAgeMs: Typesafe.number,
+	}),
+}
+
 export const dbConfigSchema = Typesafe.intersection(
-	Typesafe.object({
-		host: Typesafe.string,
-		port: Typesafe.number,
-		user: Typesafe.string,
-		password: Typesafe.string,
-		database: Typesafe.string,
-	}),
-	Typesafe.partial({
-		ssl: Typesafe.boolean,
-		queryTimeoutMs: Typesafe.number,
-		statementTimeoutMs: Typesafe.number,
-		connectionTimeoutMs: Typesafe.number,
-		pool: Typesafe.partial({
-			maxConnections: Typesafe.number,
-			maxConnecting: Typesafe.number,
-			maxIdle: Typesafe.number,
-			reconnectIntervalMs: Typesafe.number,
-			idleTimeoutMs: Typesafe.number,
-			acquireTimeoutMs: Typesafe.number,
-			maxUses: Typesafe.number,
-			maxAgeMs: Typesafe.number,
-		}),
-	}),
+	Typesafe.object(dbConfigRequired),
+	Typesafe.partial(dbConfigOptional),
 )
 
 export const tenantConfigSchema = Typesafe.intersection(
@@ -91,6 +94,10 @@ export const stageConfig = Typesafe.record(
 	),
 )
 
+const readDbSchema = Typesafe.intersection(
+	Typesafe.partial(dbConfigRequired),
+	Typesafe.partial(dbConfigOptional),
+)
 export const projectConfigSchema = Typesafe.object({
 	name: Typesafe.union(
 		Typesafe.string,
@@ -107,6 +114,13 @@ export const projectConfigSchema = Typesafe.object({
 		),
 		Typesafe.partial({
 			systemSchema: Typesafe.string,
+			read: (val: unknown) => {
+				const readDb = readDbSchema(val)
+				if ('host' in readDb) {
+					return readDb
+				}
+				return undefined
+			},
 		}),
 	),
 })

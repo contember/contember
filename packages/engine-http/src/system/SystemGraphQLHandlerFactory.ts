@@ -1,7 +1,6 @@
 import { devTypeDefs, ResolverFactory, SystemResolverContext, typeDefs } from '@contember/engine-system-api'
 import {
 	createDbQueriesListener,
-	createErrorListener,
 	createGraphQLQueryHandler,
 	createGraphqlRequestInfoProviderListener,
 	GraphQLKoaState,
@@ -42,7 +41,6 @@ export class SystemGraphQLHandlerFactory {
 		})
 
 		const listeners: GraphQLListener<SystemGraphQLContext>[] = [
-			createErrorListener(),
 			createGraphqlRequestInfoProviderListener(),
 		]
 		if (this.debugMode) {

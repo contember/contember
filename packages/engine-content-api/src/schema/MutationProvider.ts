@@ -58,7 +58,7 @@ export class MutationProvider {
 					if (parent && info.path) {
 						return parent[info.path.key]
 					}
-					return context.executionContainer.get('mutationResolver').resolveCreate(entity, info)
+					return context.executionContainer.mutationResolver.resolveCreate(entity, info)
 				})
 			},
 		}
@@ -92,7 +92,7 @@ export class MutationProvider {
 					if (parent && info.path) {
 						return parent[info.path.key]
 					}
-					return context.executionContainer.get('mutationResolver').resolveDelete(entity, info)
+					return context.executionContainer.mutationResolver.resolveDelete(entity, info)
 				})
 			},
 		}
@@ -126,7 +126,7 @@ export class MutationProvider {
 					if (parent && info.path) {
 						return parent[info.path.key]
 					}
-					return context.executionContainer.get('mutationResolver').resolveUpdate(entity, info)
+					return context.executionContainer.mutationResolver.resolveUpdate(entity, info)
 				})
 			},
 		}
@@ -165,7 +165,7 @@ export class MutationProvider {
 					if (parent && info.path) {
 						return parent[info.path.key]
 					}
-					return context.executionContainer.get('mutationResolver').resolveUpsert(entity, info)
+					return context.executionContainer.mutationResolver.resolveUpsert(entity, info)
 				})
 			},
 		}

@@ -45,7 +45,7 @@ import { ProjectGroupContainerFactory } from './projectGroup/ProjectGroupContain
 import corsMiddleware from '@koa/cors'
 import { ProjectGroupResolver } from './projectGroup/ProjectGroupResolver'
 import { Logger } from '@contember/logger'
-import { ExecutionContainerFactory, MapperContainerFactory } from '@contember/engine-content-api'
+import { ExecutionContainerFactory } from '@contember/engine-content-api'
 
 export interface MasterContainer {
 	initializer: Initializer
@@ -112,10 +112,8 @@ export class MasterContainerFactory {
 				new ProjectGroupResolver(projectGroupContainer))
 			.addService('notModifiedChecker', () =>
 				new NotModifiedChecker())
-			.addService('mapperContainerFactory', ({ providers }) =>
-				new MapperContainerFactory(providers))
-			.addService('executionContainerFactory', ({ providers, mapperContainerFactory }) =>
-				new ExecutionContainerFactory(providers, mapperContainerFactory))
+			.addService('executionContainerFactory', ({ providers }) =>
+				new ExecutionContainerFactory(providers))
 			.addService('contentGraphqlContextFactory', ({ providers, executionContainerFactory }) =>
 				new ContentGraphQLContextFactory(providers, executionContainerFactory))
 			.addService('contentQueryHandlerFactory', ({ debugMode }) =>
@@ -201,10 +199,10 @@ export class MasterContainerFactory {
 			})
 			.addService('initializer', ({ projectGroupContainer }) =>
 				new Initializer(projectGroupContainer))
-			.setupService('mapperContainerFactory', (it, { plugins }) => {
+			.setupService('executionContainerFactory', (it, { plugins }) => {
 				for (const plugin of plugins) {
-					if (plugin.getMapperContainerHook) {
-						it.hooks.push(plugin.getMapperContainerHook())
+					if (plugin.getExecutionContainerHook) {
+						it.hooks.push(plugin.getExecutionContainerHook())
 					}
 				}
 			})

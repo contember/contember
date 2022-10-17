@@ -1,5 +1,5 @@
 import { Acl, Model, Schema, Validation } from '@contember/schema'
-import { Authorizator, ExecutionContainerFactory, GraphQlSchemaBuilderFactory, MapperContainerFactory } from '../../src'
+import { Authorizator, GraphQlSchemaBuilderFactory, ExecutionContainerFactory } from '../../src'
 import { AllowAllPermissionFactory, emptySchema } from '@contember/schema-utils'
 import { executeGraphQlTest } from './testGraphql'
 import { Client } from '@contember/database'
@@ -78,16 +78,16 @@ export const execute = async (test: Test) => {
 		context: {
 			db: db,
 			identityVariables: test.variables || {},
-			executionContainer: new ExecutionContainerFactory(
-				providers,
-				new MapperContainerFactory(providers),
-			).create({
-				permissions,
-				schema,
-				db,
-				identityVariables: test.variables || {},
-				identityId: '00000000-0000-0000-0000-000000000000',
-			}),
+			executionContainer: new ExecutionContainerFactory(providers)
+				.create({
+					permissions,
+					schema: { ...schema, id: 1 },
+					db,
+					identityVariables: test.variables || {},
+					identityId: '00000000-0000-0000-0000-000000000000',
+					systemSchema: 'system',
+					stage: { id: '00000000-0000-0000-0000-000000000000', slug: 'live' },
+				}),
 			timer: (label: any, cb: any) => cb(),
 		},
 		query: test.query,

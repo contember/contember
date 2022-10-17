@@ -5,9 +5,9 @@ import { ExecutedMigrationsResolver } from './ExecutedMigrationsResolver'
 import { DatabaseContext } from '../database'
 import { normalizeSchema } from '@contember/schema-utils'
 
-export type VersionedSchema = Schema & { version: string; notNormalized: Schema & { version: string } }
+export type VersionedSchema = Schema & { version: string; id: number; notNormalized: Schema & { version: string; id: number } }
 
-export const emptyVersionedSchema = { ...normalizeSchema(emptySchema), version: '', notNormalized: { ...emptySchema, version: '' } }
+export const emptyVersionedSchema = { ...normalizeSchema(emptySchema), version: '', id: -1, notNormalized: { ...emptySchema, version: '', id: -1 } }
 
 export class SchemaVersionBuilder {
 	constructor(
@@ -25,6 +25,7 @@ export class SchemaVersionBuilder {
 			(schema, migration) => ({
 				...this.schemaMigrator.applyModifications(schema, migration.modifications, migration.formatVersion),
 				version: migration.version,
+				id: migration.id,
 			}),
 			after?.notNormalized ?? emptyVersionedSchema.notNormalized,
 		)

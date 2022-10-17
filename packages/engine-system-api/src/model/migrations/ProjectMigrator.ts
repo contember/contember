@@ -29,7 +29,7 @@ export class ProjectMigrator {
 		if (migrationsToExecute.length === 0) {
 			return
 		}
-		let { version, notNormalized, ...schema }  = await this.schemaVersionBuilder.buildSchema(db)
+		let { version, notNormalized, id, ...schema }  = await this.schemaVersionBuilder.buildSchema(db)
 		const validated = await this.validateMigrations(db, schema, version, migrationsToExecute, { ignoreOrder, skipExecuted })
 
 		const sorted = [...validated].sort((a, b) => a.version.localeCompare(b.version))

@@ -5,6 +5,7 @@ export * from './schema'
 export * from './inputProcessing'
 export { EntityRulesResolver } from './input-validation'
 export * from './types'
+export * from './ExecutionContainer'
 export { graphql } from 'graphql'
 export { UserError } from './exception'
 export {
@@ -21,12 +22,12 @@ export {
 	EventManager,
 	Mapper,
 	MapperFactory,
-	MapperContainer,
-	MapperContainerBuilder,
+	ExecutionContainer,
+	ExecutionContainerBuilder,
 	Path,
 	WhereBuilder,
 	PathFactory,
-	MapperContainerFactory,
-	MapperContainerHook,
-	MapperContainerArgs,
+	ExecutionContainerFactory,
+	ExecutionContainerHook,
+	ExecutionContainerArgs,
 } from './mapper'

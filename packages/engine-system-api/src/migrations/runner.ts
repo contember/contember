@@ -67,7 +67,7 @@ export class SystemMigrationsRunner {
 			}
 			const migrationResolver = new GroupMigrationsResolver(
 				new SnapshotMigrationResolver(snapshot, migrations),
-				Object.fromEntries(this.migrationGroups.map(it => [it.group, new SnapshotMigrationResolver(it.snapshot, it.migrations)])),
+				Object.fromEntries(this.migrationGroups.map(it => [it.group, new SnapshotMigrationResolver(it.snapshot, it.migrations, it.group)])),
 			)
 			const migrationsRunner = new DbMigrationsRunner(connection, this.schema, migrationResolver)
 

@@ -32,8 +32,8 @@ class InsertBuilder<Result extends InsertBuilder.InsertResult> implements With.A
 		return this.withOption('into', intoTable)
 	}
 
-	public values(columns: QueryBuilder.Values): InsertBuilder<Result> {
-		return this.withOption('values', resolveValues(columns))
+	public values(values: QueryBuilder.Values | QueryBuilder.Values[]): InsertBuilder<Result> {
+		return this.withOption('values', (Array.isArray(values) ? values : [values]).map(resolveValues))
 	}
 
 	public onConflict(
@@ -102,14 +102,17 @@ class InsertBuilder<Result extends InsertBuilder.InsertResult> implements With.A
 		const into = this.options.into
 
 		if (into === undefined || values === undefined) {
-			throw Error()
+			throw new Error('InsertBuilder: specify "into" and "values"')
 		}
 
 		let from: Literal | undefined
 
 		if (this.options.from !== undefined) {
 			let queryBuilder: SelectBuilder<SelectBuilder.Result> = SelectBuilder.create()
-			queryBuilder = Object.values(values).reduce((qb, raw) => qb.select(raw), queryBuilder)
+			if (values.length !== 1) {
+				throw new Error('InsertBuilder: cannot use multiple values when using "from"')
+			}
+			queryBuilder = Object.values(values[0]).reduce((qb, raw) => qb.select(raw), queryBuilder)
 			queryBuilder = this.options.from(queryBuilder)
 			from = queryBuilder.createQuery(context.withAlias(...this.options.with.getAliases()))
 		}
@@ -139,7 +142,7 @@ namespace InsertBuilder {
 
 	export type Options = {
 		into: string | undefined
-		values: QueryBuilder.ResolvedValues | undefined
+		values: QueryBuilder.ResolvedValues[] | undefined
 		onConflict: ConflictAction | undefined
 		returning: Returning
 		from: SelectBuilder.Callback | undefined

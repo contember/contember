@@ -1,4 +1,3 @@
-export * from './ApiTester'
 export * from './testUuid'
 export * from './tags'
 export * from './testWithDb'

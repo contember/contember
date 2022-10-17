@@ -61,12 +61,8 @@ export class SystemMigrationsRunner {
 		await createDatabaseIfNotExists(this.project.db, message => typeof message === 'string' ? logger.warn(message) : logger.error(message))
 		const singleConnection = Connection.createSingle(this.project.db, err => logger.error(err))
 		await singleConnection.scope(async connection => {
-			const systemSchema = this.schema
-
 			const schemaResolver = (connection: Connection.ConnectionLike) => {
-				const dbContextMigrations = this.databaseContextFactory
-					.withClient(new Client(connection, systemSchema, { module: 'system' }))
-					.create()
+				const dbContextMigrations = this.databaseContextFactory.create(connection)
 				return this.schemaVersionBuilder.buildSchema(dbContextMigrations)
 			}
 			const migrationResolver = new GroupMigrationsResolver(

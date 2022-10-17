@@ -1,6 +1,6 @@
 import { SystemMigrationsRunner } from '../migrations'
 import { DatabaseContextFactory, emptyVersionedSchema, SchemaVersionBuilder } from '../model'
-import { Client, Connection } from '@contember/database'
+import { Connection } from '@contember/database'
 import { createLogger, PrettyPrintLoggerHandler } from '@contember/logger'
 
 let uuidNum = 0
@@ -17,7 +17,7 @@ export const testUuid = () => '123e4567-e89b-12d3-a456-' + (uuidNum++).toString(
 	// eslint-disable-next-line no-console
 	const connection = Connection.createSingle(dbConfig, err => console.error(err))
 	const migrationsRunner = new SystemMigrationsRunner(
-		new DatabaseContextFactory(new Client(connection, 'system', {}), {
+		new DatabaseContextFactory('system', connection, {
 			uuid: testUuid,
 		}),
 		{ db: dbConfig, slug: 'test', stages: [] },

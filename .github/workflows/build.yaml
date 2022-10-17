@@ -36,9 +36,6 @@ jobs:
         run: yarn tsc --esModuleInterop scripts/lint/module-import-linter.ts && node ./scripts/lint/module-import-linter.js
       - name: "Build app"
         run: yarn run build
-      - name: Fill env
-        run: |
-          echo "CONTEMBER_EXAMPLE_PROJECTS_DIRECTORY=`pwd`/packages/engine-api-tester/src/projects" >> $GITHUB_ENV
       - name: "Run tests"
         run: yarn run test
         env:

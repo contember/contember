@@ -139,18 +139,7 @@ class Compiler {
 		if (!lock) {
 			return Literal.empty
 		}
-		switch (lock) {
-			case LockType.forUpdate:
-				return new Literal(' for update')
-			case LockType.forNoKeyUpdate:
-				return new Literal(' for no key update')
-			case LockType.forShare:
-				return new Literal(' for share')
-			case LockType.forKeyShare:
-				return new Literal(' for key share')
-			default:
-				return assertNever(lock)
-		}
+		return new Literal(` ${lock.type} ${lock.modifier}`)
 	}
 
 	private compileJoin(join: SelectBuilder.Options['join'], namespaceContext: Compiler.Context): Literal {

@@ -135,6 +135,8 @@ export class ContentApiMiddlewareFactory {
 							timer,
 							koaContext,
 							requestDebug,
+							systemSchema: projectContainer.systemDatabaseContextFactory.schemaName,
+							stage,
 						})
 					},
 				}))

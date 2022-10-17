@@ -2,9 +2,10 @@ import { SelectBuilder } from '@contember/database'
 import { ExecutedMigration } from '../../dtos'
 import { VERSION_INITIAL } from '@contember/schema-migrations'
 
-type ExecutedMigrationRow = { name: string; migration: any; checksum: string; executed_at: Date }
+type ExecutedMigrationRow = { id: number; name: string; migration: any; checksum: string; executed_at: Date }
 export const createExecutedMigrationQueryBuilder = () =>
 	SelectBuilder.create<ExecutedMigrationRow>()
+		.select('id')
 		.select('name')
 		.select('migration')
 		.select('checksum')
@@ -14,6 +15,7 @@ export const createExecutedMigrationQueryBuilder = () =>
 
 export const createExecutedMigrationDto = (row: ExecutedMigrationRow) =>
 	new ExecutedMigration(
+		row.id,
 		row.name,
 		row.migration.formatVersion || VERSION_INITIAL,
 		row.migration.modifications,

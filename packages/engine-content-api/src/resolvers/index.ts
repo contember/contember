@@ -1,4 +1,3 @@
-export * from './ExecutionContainerFactory'
 export * from './GraphQlQueryAstFactory'
 export * from './MutationResolver'
 export * from './ReadResolver'

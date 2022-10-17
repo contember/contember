@@ -35,8 +35,8 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 
 	constructor(
 		public readonly db: Client<ConnectionType>,
-		private readonly identityId: string,
-		private readonly transactionId: string,
+		public readonly identityId: string,
+		public readonly transactionId: string,
 		private readonly schema: Model.Schema,
 		private readonly predicatesInjector: PredicatesInjector,
 		private readonly selectBuilderFactory: SelectBuilderFactory,

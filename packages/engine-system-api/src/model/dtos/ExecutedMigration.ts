@@ -4,6 +4,7 @@ export class ExecutedMigration implements Migration {
 	public readonly version: string
 
 	constructor(
+		public readonly id: number,
 		public readonly name: string,
 		public readonly formatVersion: number,
 		public readonly modifications: Migration.Modification[],

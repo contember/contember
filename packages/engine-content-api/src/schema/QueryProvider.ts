@@ -52,7 +52,7 @@ export class QueryProvider {
 					if (parent && info.path) {
 						return parent[info.path.key]
 					}
-					return context.executionContainer.get('readResolver').resolveGetQuery(entity, info)
+					return context.executionContainer.readResolver.resolveGetQuery(entity, info)
 				})
 			},
 		}
@@ -84,7 +84,7 @@ export class QueryProvider {
 					if (parent && info.path) {
 						return parent[info.path.key]
 					}
-					return context.executionContainer.get('readResolver').resolveListQuery(entity, info)
+					return context.executionContainer.readResolver.resolveListQuery(entity, info)
 				})
 			},
 		}
@@ -99,7 +99,7 @@ export class QueryProvider {
 					if (parent && info.path) {
 						return parent[info.path.key]
 					}
-					return context.executionContainer.get('readResolver').resolvePaginationQuery(entity, info)
+					return context.executionContainer.readResolver.resolvePaginationQuery(entity, info)
 				})
 			},
 		}

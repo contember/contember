@@ -205,8 +205,11 @@ class Compiler {
 		values: Exclude<InsertBuilder.Options['values'], undefined>,
 		namespaceContext: Compiler.Context,
 	): Literal {
+		if (values.length === 0) {
+			throw new Error()
+		}
 		return this.prependSchema(into, namespaceContext).appendAll(
-			values.map(it => new Literal(wrapIdentifier(it.columnName))),
+			values[0].map(it => new Literal(wrapIdentifier(it.columnName))),
 			', ',
 			[' (', ')'],
 		)
@@ -259,11 +262,14 @@ class Compiler {
 		)
 	}
 
-	private createValues(values: QueryBuilder.ResolvedValues): Literal {
+	private createValues(values: QueryBuilder.ResolvedValues[]): Literal {
 		return Literal.empty.appendAll(
-			values.map(({ columnName, value }) => value),
+			values.map(it => Literal.empty.appendAll(
+				it.map(({ value }) => value),
+				', ',
+				['(', ')'],
+			)),
 			', ',
-			['(', ')'],
 		)
 	}
 

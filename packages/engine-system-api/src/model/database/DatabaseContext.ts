@@ -1,4 +1,4 @@
-import { Client, Connection, DatabaseQueryable, withDatabaseAdvisoryLock } from '@contember/database'
+import { Client, Connection, DatabaseQueryable } from '@contember/database'
 import { QueryHandler } from '@contember/queryable'
 import { UuidProvider } from '../../utils'
 import { CommandBus } from '../commands'
@@ -12,14 +12,15 @@ export interface DatabaseContext<ConnectionType extends Connection.ConnectionLik
 }
 
 export class DatabaseContextFactory {
-	constructor(private readonly client: Client, private readonly providers: UuidProvider) {}
+	constructor(
+		public readonly schemaName: string,
+		private readonly connection: Connection,
+		private readonly providers: UuidProvider,
+	) {}
 
-	public create(): DatabaseContext {
-		return createDatabaseContext(this.client, this.providers)
-	}
-
-	public withClient(client: Client) {
-		return new DatabaseContextFactory(client, this.providers)
+	public create(connection?: Connection.ConnectionLike): DatabaseContext {
+		const client = new Client(connection ?? this.connection, this.schemaName, { module: 'system' })
+		return createDatabaseContext(client, this.providers)
 	}
 }
 

@@ -97,12 +97,14 @@ export class ProjectContainerFactory {
 			})
 			.addService('contentSchemaResolver', ({ schemaVersionBuilder }) =>
 				new ContentSchemaResolver(schemaVersionBuilder))
-			.addService('systemDatabaseContextFactory', ({ connection, providers, project }) =>
-				new DatabaseContextFactory(connection.createClient(project.db.systemSchema ?? 'system', { module: 'system' }), providers))
+			.addService('systemSchemaName', ({ project }) =>
+				project.db.systemSchema ?? 'system')
+			.addService('systemDatabaseContextFactory', ({ connection, providers, systemSchemaName }) =>
+				new DatabaseContextFactory(systemSchemaName, connection, providers))
 			.addService('systemMigrationGroups', () =>
 				this.plugins.map(it => it.getSystemMigrations?.()).filter((it): it is MigrationGroup => it !== undefined))
-			.addService('systemMigrationsRunner', ({ systemDatabaseContextFactory, project, systemMigrationGroups }) =>
-				new SystemMigrationsRunner(systemDatabaseContextFactory, project, project.db.systemSchema ?? 'system', this.schemaVersionBuilder, systemMigrationGroups))
+			.addService('systemMigrationsRunner', ({ systemDatabaseContextFactory, project, systemSchemaName, systemMigrationGroups }) =>
+				new SystemMigrationsRunner(systemDatabaseContextFactory, project, systemSchemaName, this.schemaVersionBuilder, systemMigrationGroups))
 			.addService('projectInitializer', ({ systemMigrationsRunner, systemDatabaseContextFactory, project }) =>
 				new ProjectInitializer(new StageCreator(), systemMigrationsRunner, systemDatabaseContextFactory, project))
 	}

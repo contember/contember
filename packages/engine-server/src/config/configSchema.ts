@@ -27,9 +27,27 @@ const dbConfigOptional = {
 	}),
 }
 
-export const dbConfigSchema = Typesafe.intersection(
+const dbConfigSchemaInner = Typesafe.intersection(
 	Typesafe.object(dbConfigRequired),
 	Typesafe.partial(dbConfigOptional),
+)
+
+const readDbSchema = Typesafe.intersection(
+	Typesafe.partial(dbConfigRequired),
+	Typesafe.partial(dbConfigOptional),
+)
+
+export const dbConfigSchema = Typesafe.intersection(
+	dbConfigSchemaInner,
+	Typesafe.partial({
+		read: (val: unknown) => {
+			const readDb = readDbSchema(val)
+			if ('host' in readDb) {
+				return readDb
+			}
+			return undefined
+		},
+	}),
 )
 
 export const tenantConfigSchema = Typesafe.intersection(
@@ -94,10 +112,6 @@ export const stageConfig = Typesafe.record(
 	),
 )
 
-const readDbSchema = Typesafe.intersection(
-	Typesafe.partial(dbConfigRequired),
-	Typesafe.partial(dbConfigOptional),
-)
 export const projectConfigSchema = Typesafe.object({
 	name: Typesafe.union(
 		Typesafe.string,
@@ -114,13 +128,6 @@ export const projectConfigSchema = Typesafe.object({
 		),
 		Typesafe.partial({
 			systemSchema: Typesafe.string,
-			read: (val: unknown) => {
-				const readDb = readDbSchema(val)
-				if ('host' in readDb) {
-					return readDb
-				}
-				return undefined
-			},
 		}),
 	),
 })

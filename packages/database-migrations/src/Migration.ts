@@ -26,7 +26,6 @@ export interface RunMigration {
 
 export class MigrationGroup<Args = unknown> {
 	constructor(
-		public readonly group: string,
 		public readonly snapshot: MigrationExecutor<Args>,
 		public readonly migrations: Record<string, MigrationExecutor<Args>>,
 	) {

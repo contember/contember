@@ -102,7 +102,7 @@ export class ProjectContainerFactory {
 			.addService('systemDatabaseContextFactory', ({ connection, providers, systemSchemaName }) =>
 				new DatabaseContextFactory(systemSchemaName, connection, providers))
 			.addService('systemMigrationGroups', () =>
-				this.plugins.map(it => it.getSystemMigrations?.()).filter((it): it is MigrationGroup => it !== undefined))
+				Object.fromEntries(this.plugins.flatMap(it => it.getSystemMigrations ? [[it.name, it.getSystemMigrations()]] : [])))
 			.addService('systemMigrationsRunner', ({ systemDatabaseContextFactory, project, systemSchemaName, systemMigrationGroups }) =>
 				new SystemMigrationsRunner(systemDatabaseContextFactory, project, systemSchemaName, this.schemaVersionBuilder, systemMigrationGroups))
 			.addService('projectInitializer', ({ systemMigrationsRunner, systemDatabaseContextFactory, project }) =>

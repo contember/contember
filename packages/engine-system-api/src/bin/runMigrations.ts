@@ -25,7 +25,7 @@ export const testUuid = () => '123e4567-e89b-12d3-a456-' + (uuidNum++).toString(
 		{
 			buildSchema: () => Promise.resolve(emptyVersionedSchema),
 		} as unknown as SchemaVersionBuilder,
-		[],
+		{},
 	)
 	// eslint-disable-next-line no-console
 	await migrationsRunner.run(createLogger(new PrettyPrintLoggerHandler(process.stderr)))

@@ -34,7 +34,7 @@ type Test = {
 	queryVariables?: Record<string, any>
 	expectDatabase?: Record<string, Record<string, any>[]>
 	executionContainerFactoryFactory?: (providers: Providers) => ExecutionContainerFactory
-	migrationGroups?: MigrationGroup<unknown>[]
+	migrationGroups?: Record<string, MigrationGroup<unknown>>
 } & ({ return: object | ((response: any) => void) } | { throws: { message: string } })
 
 export const executeDbTest = async (test: Test) => {
@@ -77,7 +77,7 @@ export const executeDbTest = async (test: Test) => {
 		db: projectDbCredentials,
 		stages: [{ slug: 'live', name: 'live' }],
 	}
-	const systemMigrationsRunner = new SystemMigrationsRunner(databaseContextFactory, projectConfigWithDb, 'system', systemContainer.schemaVersionBuilder, test.migrationGroups ?? [])
+	const systemMigrationsRunner = new SystemMigrationsRunner(databaseContextFactory, projectConfigWithDb, 'system', systemContainer.schemaVersionBuilder, test.migrationGroups ?? {})
 	const stageCreator = new StageCreator()
 	const projectInitializer = new ProjectInitializer(stageCreator, systemMigrationsRunner, databaseContextFactory, projectConfigWithDb)
 

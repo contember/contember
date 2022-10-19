@@ -54,7 +54,7 @@ export class SystemMigrationsRunner {
 		private readonly project: ProjectConfig & { db: DatabaseConfig },
 		private readonly schema: string,
 		private readonly schemaVersionBuilder: SchemaVersionBuilder,
-		private readonly migrationGroups: MigrationGroup<unknown>[],
+		private readonly migrationGroups: Record<string, MigrationGroup<unknown>>,
 	) {
 	}
 	async run(logger: Logger) {
@@ -67,7 +67,7 @@ export class SystemMigrationsRunner {
 			}
 			const migrationResolver = new GroupMigrationsResolver(
 				new SnapshotMigrationResolver(snapshot, migrations),
-				Object.fromEntries(this.migrationGroups.map(it => [it.group, new SnapshotMigrationResolver(it.snapshot, it.migrations, it.group)])),
+				Object.fromEntries(Object.entries(this.migrationGroups).map(([group, it]) => [group, new SnapshotMigrationResolver(it.snapshot, it.migrations, group.replace(/[^-_\w]+/g, '-'))])),
 			)
 			const migrationsRunner = new DbMigrationsRunner(connection, this.schema, migrationResolver)
 

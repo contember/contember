@@ -3,6 +3,7 @@ import { ProjectGroupResolver, ProjectInfoMiddlewareState } from '../project-com
 import { AuthResult, HttpError, LoggerMiddlewareState, TimerMiddlewareState } from '../common'
 import { GraphQLKoaState } from '../graphql'
 import { SystemGraphQLContextFactory } from './SystemGraphQLContextFactory'
+import { ProjectContextResolver } from '../project-common/ProjectContextResolver'
 
 type SystemApiMiddlewareKoaState =
 	& TimerMiddlewareState
@@ -15,35 +16,16 @@ type SystemApiMiddlewareKoaState =
 export class SystemApiMiddlewareFactory {
 	constructor(
 		private readonly debug: boolean,
-		private readonly projectGroupResolver: ProjectGroupResolver,
 		private readonly systemGraphqlContextFactory: SystemGraphQLContextFactory,
+		private readonly projectContextResolver: ProjectContextResolver,
 	) {
 	}
 
 	create(): KoaMiddleware<SystemApiMiddlewareKoaState> {
 		return async koaContext => {
-			const { request, response, state: { timer, params } } = koaContext
-			const groupContainer = await this.projectGroupResolver.resolveContainer({ request })
-			koaContext.state.projectGroup = groupContainer.slug
-			const authResult = await groupContainer.authenticator.authenticate({ request, timer })
-			koaContext.state.logger.debug('User authenticated', { authResult })
-			koaContext.state.authResult = authResult
+			const { request, response, state: { timer } } = koaContext
+			const { groupContainer, projectContainer, requestLogger, project, authResult } = await this.projectContextResolver.resolve(koaContext)
 
-			const projectSlug = params.projectSlug
-			const projectContainer = await groupContainer.projectContainerResolver.getProjectContainer(projectSlug, { alias: true })
-
-			if (projectContainer === undefined) {
-				throw new HttpError(`Project ${projectSlug} NOT found`, 404)
-			}
-
-			const project = projectContainer.project
-			koaContext.state.project = project.slug
-
-			const requestLogger = koaContext.state.logger.child({
-				...projectContainer.logger.attributes,
-				module: 'system',
-				user: authResult.identityId,
-			})
 
 			const tenantContainer = groupContainer.tenantContainer
 			const memberships = await timer('MembershipFetch', () =>
@@ -63,9 +45,6 @@ export class SystemApiMiddlewareFactory {
 					? new HttpError(`You are not allowed to access project ${project.slug}`, 403)
 					: new HttpError(`Project ${project.slug} NOT found`, 404)
 			}
-
-
-			koaContext.state.logger = requestLogger
 
 			await requestLogger.scope(async logger => {
 				logger.debug('System query processing started')

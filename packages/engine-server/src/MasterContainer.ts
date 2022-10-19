@@ -25,6 +25,7 @@ import {
 	ImportExecutor,
 	Koa,
 	NotModifiedChecker,
+	ProjectContextResolver,
 	ProjectGroupResolver as ProjectGroupResolverInterface,
 	Providers,
 	route,
@@ -118,16 +119,18 @@ export class MasterContainerFactory {
 				new ContentGraphQLContextFactory(providers, executionContainerFactory))
 			.addService('contentQueryHandlerFactory', ({ debugMode }) =>
 				new ContentQueryHandlerFactory(debugMode))
-			.addService('contentApiMiddlewareFactory', ({ projectGroupResolver, notModifiedChecker, contentGraphqlContextFactory, contentQueryHandlerFactory }) =>
-				new ContentApiMiddlewareFactory(projectGroupResolver, notModifiedChecker, contentGraphqlContextFactory, contentQueryHandlerFactory))
+			.addService('projectContextResolver', ({ projectGroupResolver }) =>
+				new ProjectContextResolver(projectGroupResolver))
+			.addService('contentApiMiddlewareFactory', ({ projectContextResolver, notModifiedChecker, contentGraphqlContextFactory, contentQueryHandlerFactory }) =>
+				new ContentApiMiddlewareFactory(notModifiedChecker, contentGraphqlContextFactory, contentQueryHandlerFactory, projectContextResolver))
 			.addService('tenantGraphQLContextFactory', () =>
 				new TenantGraphQLContextFactory())
 			.addService('tenantApiMiddlewareFactory', ({ debugMode, projectGroupResolver, tenantGraphQLContextFactory }) =>
 				new TenantApiMiddlewareFactory(debugMode, projectGroupResolver, tenantGraphQLContextFactory))
 			.addService('systemGraphQLContextFactory', () =>
 				new SystemGraphQLContextFactory())
-			.addService('systemApiMiddlewareFactory', ({ debugMode, projectGroupResolver, systemGraphQLContextFactory }) =>
-				new SystemApiMiddlewareFactory(debugMode, projectGroupResolver, systemGraphQLContextFactory))
+			.addService('systemApiMiddlewareFactory', ({ debugMode, systemGraphQLContextFactory, projectContextResolver }) =>
+				new SystemApiMiddlewareFactory(debugMode, systemGraphQLContextFactory, projectContextResolver))
 			.addService('contentSchemaTransferMappingFactory', () =>
 				new ContentSchemaTransferMappingFactory())
 			.addService('systemSchemaTransferMappingFactory', () =>

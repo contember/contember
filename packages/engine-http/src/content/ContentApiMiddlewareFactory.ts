@@ -7,6 +7,7 @@ import { ContentGraphQLContextFactory } from './ContentGraphQLContextFactory'
 import { ContentQueryHandler, ContentQueryHandlerFactory } from './ContentQueryHandlerFactory'
 import { GraphQLSchema } from 'graphql'
 import { GraphQLKoaState } from '../graphql'
+import { ProjectContextResolver } from '../project-common/ProjectContextResolver'
 
 type ContentApiMiddlewareKoaState =
 	& TimerMiddlewareState
@@ -23,42 +24,18 @@ const debugHeader = 'x-contember-debug'
 
 export class ContentApiMiddlewareFactory {
 	constructor(
-		private readonly projectGroupResolver: ProjectGroupResolver,
 		private readonly notModifiedChecker: NotModifiedChecker,
 		private readonly contentGraphqlContextFactory: ContentGraphQLContextFactory,
 		private readonly handlerFactory: ContentQueryHandlerFactory,
+		private readonly projectContextResolver: ProjectContextResolver,
 	) {
 	}
 
 	create(): KoaMiddleware<ContentApiMiddlewareKoaState> {
 		const handlerCache = new WeakMap<GraphQLSchema, ContentQueryHandler>()
-
 		return async koaContext => {
 			const { request, response, state: { timer, params } } = koaContext
-			const groupContainer = await this.projectGroupResolver.resolveContainer({ request })
-			koaContext.state.projectGroup = groupContainer.slug
-
-			const authResult = await groupContainer.authenticator.authenticate({ request, timer })
-			koaContext.state.logger.debug('User authenticated', { authResult })
-			koaContext.state.authResult = authResult
-
-
-			const projectContainer = await groupContainer.projectContainerResolver.getProjectContainer(params.projectSlug, {
-				alias: true,
-			})
-
-			if (projectContainer === undefined) {
-				throw new HttpError(`Project ${params.projectSlug} NOT found`, 404)
-			}
-			const requestLogger = koaContext.state.logger.child({
-				...projectContainer.logger.attributes,
-				module: 'content',
-				user: authResult.identityId,
-			})
-			koaContext.state.logger = requestLogger
-
-			const project = projectContainer.project
-			koaContext.state.project = project.slug
+			const { groupContainer, projectContainer, requestLogger, project, authResult } = await this.projectContextResolver.resolve(koaContext)
 
 			const systemDatabase = projectContainer.systemDatabaseContextFactory.create()
 			const stage = await systemDatabase.queryHandler.fetch(new StageBySlugQuery(params.stageSlug))

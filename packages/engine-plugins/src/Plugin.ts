@@ -5,6 +5,8 @@ import { MigrationGroup } from '@contember/database-migrations'
 import { ExecutionContainerHook } from '@contember/engine-content-api'
 
 export interface Plugin<ProjectConf extends ProjectConfig = ProjectConfig> {
+	readonly name: string
+
 	getConfigProcessor?(): ConfigProcessor<ProjectConf>
 
 	getSchemaContributor?(container: ProjectContainer<ProjectConf>): GraphQLSchemaContributor | undefined

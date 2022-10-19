@@ -8,6 +8,8 @@ export * from './S3SchemaContributor'
 export * from './S3Service'
 
 export default class S3 implements Plugin<ProjectWithS3Config> {
+	name = 'contember/s3'
+
 	getConfigProcessor() {
 		return new S3ConfigProcessor()
 	}

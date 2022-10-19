@@ -8,6 +8,8 @@ export * from './VimeoSchemaContributor'
 export * from './VimeoService'
 
 export default class VimeoPlugin implements Plugin<ProjectWithVimeoConfig> {
+	name = 'contember/vimeo'
+
 	getConfigProcessor() {
 		return new VimeoConfigProcessor()
 	}

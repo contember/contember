@@ -5,6 +5,7 @@ import * as Typesafe from '@contember/typesafe'
 import { GraphQLSchemaContributor } from '../content'
 import { Providers } from '../providers'
 import { ProjectConfig } from '../project/config'
+import { MasterContainerHook } from '../MasterContainer'
 
 export interface SchemaContributorArgs<CustomConfig extends Typesafe.JsonObject = Typesafe.JsonObject> {
 	project: ProjectConfig & CustomConfig
@@ -21,4 +22,6 @@ export interface Plugin<CustomConfig extends Typesafe.JsonObject = Typesafe.Json
 	getSystemMigrations?(): MigrationGroup<unknown>
 
 	getExecutionContainerHook?(): ExecutionContainerHook
+
+	getMasterContainerHook?(): MasterContainerHook
 }

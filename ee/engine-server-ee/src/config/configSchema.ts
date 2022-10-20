@@ -1,5 +1,5 @@
 import * as Typesafe from '@contember/typesafe'
-import { serverConfigSchema as baseServerConfigSchema } from '@contember/engine-server'
+import { serverConfigSchema as baseServerConfigSchema } from '@contember/engine-http'
 
 export const serverConfigSchema = Typesafe.intersection(
 	baseServerConfigSchema,

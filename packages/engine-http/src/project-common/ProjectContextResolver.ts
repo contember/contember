@@ -1,7 +1,7 @@
 import { AuthResult, HttpError, LoggerMiddlewareState, TimerMiddlewareState } from '../common'
 import { KoaContext, KoaRequestState } from '../koa'
 import { ProjectInfoMiddlewareState } from './ProjectInfoMiddlewareState'
-import { ProjectGroupResolver } from './ProjectGroupResolver'
+import { ProjectGroupResolver } from '../projectGroup/ProjectGroupResolver'
 
 export type ProjectContextResolverState =
 	& TimerMiddlewareState

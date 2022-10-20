@@ -34,7 +34,7 @@ export class S3Service {
 
 	private readonly signer: S3Signer
 
-	constructor(public readonly config: S3Config, private readonly providers: Providers) {
+	constructor(public readonly config: S3Config, private readonly providers: Pick<Providers, 'uuid' | 'now'>) {
 		this.publicBaseUrl = resolveS3PublicBaseUrl(config)
 		this.signer = new S3Signer(config, providers)
 	}

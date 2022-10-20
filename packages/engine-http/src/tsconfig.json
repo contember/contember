@@ -1,7 +1,8 @@
 {
 	"extends": "../tsconfig.settings.json",
 	"compilerOptions": {
-		"outDir": "../dist/src"
+		"outDir": "../dist/src",
+		"esModuleInterop": true
 	},
 	"references": [
 
@@ -19,9 +20,6 @@
 		},
 		{
 			"path": "../../engine-content-api/src"
-		},
-		{
-			"path": "../../engine-plugins/src"
 		},
 		{
 			"path": "../../graphql-utils/src"

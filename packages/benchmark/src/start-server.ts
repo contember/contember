@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { createContainer, readConfig } from '@contember/engine-server'
+import { createContainer, readConfig } from '@contember/engine-http'
 
 import { createLogger, JsonStreamLoggerHandler } from '@contember/logger';
 

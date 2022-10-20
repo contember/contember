@@ -1,29 +1,42 @@
 import { Builder } from '@contember/dic'
 import { Connection } from '@contember/database'
-import { TenantContainerFactory } from '@contember/engine-tenant-api'
+import { DatabaseContext, TenantContainer, TenantContainerFactory, ProjectSchemaResolver as ProjectSchemaResolverInterface, ProjectInitializer as ProjectInitializerInterface } from '@contember/engine-tenant-api'
 import { TenantConfig } from '../config/config'
 import {
-	Authenticator,
-	CryptoWrapper,
-	ProjectGroupContainer,
-	ProjectMembershipFetcher,
-	ProjectMembershipResolver,
-	Providers,
-	SystemGraphQLHandlerFactory,
-	TenantGraphQLHandlerFactory,
-} from '@contember/engine-http'
-import {
-	ProjectContainerFactoryFactory,
-	ProjectContainerResolver,
-	ProjectInitializer,
-	ProjectInitializerProxy,
-	ProjectSchemaResolver,
+	ProjectContainerFactoryFactory, ProjectContainerResolver, ProjectInitializer,
+	ProjectInitializerProxy, ProjectSchemaResolver,
 	ProjectSchemaResolverProxy,
 } from '../project'
-import { SystemContainerFactory } from '@contember/engine-system-api'
+import { SystemContainer, SystemContainerFactory } from '@contember/engine-system-api'
 import { ProjectConfigResolver } from '../config/projectConfigResolver'
 import { createSecretKey } from 'crypto'
 import { Logger } from '@contember/logger'
+import { TenantGraphQLHandler, TenantGraphQLHandlerFactory } from '../tenant'
+import { SystemGraphQLHandler, SystemGraphQLHandlerFactory } from '../system'
+import { Authenticator } from '../common'
+import { ProjectMembershipFetcher, ProjectMembershipResolver } from '../content'
+import { Providers } from '../providers'
+import { CryptoWrapper } from '../utils/CryptoWrapper'
+
+export interface ProjectGroupContainer {
+	slug: string | undefined
+
+	logger: Logger
+	authenticator: Authenticator
+	projectMembershipResolver: ProjectMembershipResolver
+
+	projectContainerResolver: ProjectContainerResolver
+	projectSchemaResolver: ProjectSchemaResolverInterface
+	projectInitializer: ProjectInitializerInterface
+
+	tenantContainer: TenantContainer
+	tenantDatabase: DatabaseContext
+	tenantGraphQLHandler: TenantGraphQLHandler
+
+	systemContainer: SystemContainer
+	systemGraphQLHandler: SystemGraphQLHandler
+}
+
 
 interface ProjectGroupContainerFactoryArgs
 {

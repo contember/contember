@@ -1,4 +1,4 @@
-import { ProjectGroupContainer } from '@contember/engine-http'
+import { ProjectGroupContainer } from '../projectGroup/ProjectGroupContainer'
 
 export class Initializer {
 	constructor(

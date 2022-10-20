@@ -1,11 +1,12 @@
 import { KoaMiddleware, KoaRequestState } from '../koa'
 import { AuthResult, HttpError, TimerMiddlewareState } from '../common'
-import { ProjectGroupResolver, ProjectInfoMiddlewareState } from '../project-common'
+import { ProjectInfoMiddlewareState } from '../project-common'
 import { Readable } from 'stream'
 import { toBuffer } from './CommandStream'
 import { ExportExecutor, ExportRequest } from './ExportExecutor'
 import { ParseError } from '@contember/typesafe'
-import { ProjectContainer } from '../ProjectContainer'
+import { ProjectGroupResolver } from '../projectGroup/ProjectGroupResolver'
+import { ProjectContainer } from '../project'
 
 type ExportApiMiddlewareState =
 	& TimerMiddlewareState

@@ -1,25 +1,24 @@
-import { Plugin, ProjectContainer } from '@contember/engine-plugins'
+import { Plugin, SchemaContributorArgs } from '@contember/engine-plugins'
 import { S3ConfigProcessor } from './S3ConfigProcessor'
 import { S3SchemaContributor } from './S3SchemaContributor'
 import { S3ServiceFactory } from './S3Service'
-import { ProjectWithS3Config } from './Config'
+import { Project3Config } from './Config'
 
 export * from './S3SchemaContributor'
 export * from './S3Service'
 
-export default class S3 implements Plugin<ProjectWithS3Config> {
+export default class S3 implements Plugin<Project3Config> {
 	name = 'contember/s3'
 
 	getConfigProcessor() {
 		return new S3ConfigProcessor()
 	}
 
-	getSchemaContributor(container: ProjectContainer<ProjectWithS3Config>) {
-		const projectConfig = container.project
-		if (!projectConfig.s3) {
+	getSchemaContributor({ project, providers }: SchemaContributorArgs<Project3Config>) {
+		if (!project.s3) {
 			return undefined
 		}
 		const s3ServiceFactory = new S3ServiceFactory()
-		return new S3SchemaContributor(projectConfig.s3, s3ServiceFactory, container.providers)
+		return new S3SchemaContributor(project.s3, s3ServiceFactory, providers)
 	}
 }

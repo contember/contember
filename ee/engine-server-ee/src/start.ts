@@ -13,7 +13,7 @@ import {
 	printStartInfo,
 	resolveServerConfig,
 	TerminationJob,
-} from '@contember/engine-server'
+} from '@contember/engine-http'
 import { serverConfigSchema } from './config/configSchema'
 
 const logger = createDefaultLogger()

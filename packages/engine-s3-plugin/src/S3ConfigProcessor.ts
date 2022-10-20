@@ -1,8 +1,8 @@
 import { ConfigProcessor, ConfigTemplate, ConfigTemplateContext } from '@contember/engine-plugins'
-import { ProjectWithS3Config, s3ConfigSchema } from './Config'
+import { Project3Config, s3ConfigSchema } from './Config'
 import * as Typesafe from '@contember/typesafe'
 
-export class S3ConfigProcessor implements ConfigProcessor<ProjectWithS3Config> {
+export class S3ConfigProcessor implements ConfigProcessor<Project3Config> {
 	getDefaultEnv(): Record<string, string> {
 		return {
 			DEFAULT_S3_ENDPOINT: '',

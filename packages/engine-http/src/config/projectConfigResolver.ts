@@ -1,9 +1,9 @@
-import { ProjectConfig, ProjectSecrets } from '@contember/engine-http'
-import { ConfigProcessor } from '@contember/engine-plugins'
 import { Merger, ParametersResolver, resolveParameters, UndefinedParameterError } from '@contember/config-loader'
 import * as Typesafe from '@contember/typesafe'
 import { projectConfigSchema } from './configSchema'
 import { TenantConfig } from './config'
+import { ProjectConfig, ProjectSecrets } from '../project/config'
+import { ConfigProcessor } from './ConfigProcessor'
 
 export type ProjectConfigResolver = (
 	slug: string,
@@ -14,7 +14,7 @@ export type ProjectConfigResolver = (
 
 type Env = Record<string, string>
 
-export const createProjectConfigResolver = (env: Env, config: any, configProcessors: ConfigProcessor[]): ProjectConfigResolver =>
+export const createProjectConfigResolver = (env: Env, config: any, configProcessors: ConfigProcessor<any>[]): ProjectConfigResolver =>
 	(slug, additionalConfig, secrets, tenantConfig): ProjectConfig => {
 		const mergedConfig = Merger.merge(
 			config.projectDefaults as any,

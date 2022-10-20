@@ -8,16 +8,23 @@ import {
 	SystemMigrationsRunner,
 } from '@contember/engine-system-api'
 import { GraphQlSchemaBuilderFactory, PermissionsByIdentityFactory } from '@contember/engine-content-api'
-import { GraphQLSchemaContributor, Plugin } from '@contember/engine-plugins'
-import {
-	ContentSchemaResolver,
-	GraphQlSchemaFactory,
-	ProjectConfig,
-	ProjectContainer,
-	Providers,
-} from '@contember/engine-http'
 import { Logger } from '@contember/logger'
-import { MigrationGroup } from '@contember/database-migrations'
+import { ProjectConfig } from './config'
+import { ContentSchemaResolver, GraphQlSchemaFactory } from '../content'
+import { Providers } from '../providers'
+import { Plugin } from '../plugin/Plugin'
+import { GraphQLSchemaContributor } from '../content/GraphQLSchemaContributor'
+
+export interface ProjectContainer {
+	systemDatabaseContextFactory: DatabaseContextFactory
+	project: ProjectConfig
+	logger: Logger
+	connection: Connection
+	readConnection: Connection
+	graphQlSchemaFactory: GraphQlSchemaFactory
+	contentSchemaResolver: ContentSchemaResolver
+	projectInitializer: ProjectInitializer
+}
 
 export class ProjectContainerFactoryFactory {
 	constructor(
@@ -39,7 +46,7 @@ interface ProjectContainerFactoryArgs {
 export class ProjectContainerFactory {
 	constructor(
 		private readonly debug: boolean,
-		private readonly plugins: Plugin[],
+		private readonly plugins: Plugin<any>[],
 		private readonly schemaVersionBuilder: SchemaVersionBuilder,
 		private readonly providers: Providers,
 		private readonly logger: Logger,

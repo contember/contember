@@ -1,9 +1,10 @@
 import { KoaMiddleware, KoaRequestState } from '../koa'
 import { AuthResult, HttpError, TimerMiddlewareState } from '../common'
-import { ProjectGroupResolver, ProjectInfoMiddlewareState } from '../project-common'
+import { ProjectInfoMiddlewareState } from '../project-common'
 import { fromBuffer } from './CommandStream'
 import { ImportError, ImportExecutor } from './ImportExecutor'
 import { createGunzip } from 'zlib'
+import { ProjectGroupResolver } from '../projectGroup/ProjectGroupResolver'
 
 type ImportApiMiddlewareState =
 	& TimerMiddlewareState

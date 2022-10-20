@@ -4,11 +4,11 @@ import * as Typesafe from '@contember/typesafe'
 import { ParseError } from '@contember/typesafe'
 import { Command, CommandArgsMap, CommandName } from './Command'
 import { DatabaseContext, StageBySlugQuery } from '@contember/engine-system-api'
-import { ProjectGroupContainer } from '../ProjectGroupContainer'
 import { DbColumnSchema, TransferMapping, TransferTableMapping } from './TransferMapping'
 import { ContentSchemaTransferMappingFactory } from './ContentSchemaTransferMappingFactory'
 import { SystemSchemaTransferMappingFactory } from './SystemSchemaTransferMappingFactory'
-import { AuthResult, HttpError } from '../common/index'
+import { AuthResult, HttpError } from '../common'
+import { ProjectGroupContainer } from '../projectGroup/ProjectGroupContainer'
 
 type Cell = boolean | number | string | null
 type Row = readonly Cell[]

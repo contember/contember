@@ -1,8 +1,9 @@
 import { join } from 'path'
-import { ConfigProcessor, Plugin } from '@contember/engine-plugins'
 import { ConfigSource, readConfig, ServerConfig } from '../config/config'
 import { Type } from '@contember/typesafe'
 import { createLogger, JsonStreamLoggerHandler, Logger, LogLevels, PrettyPrintLoggerHandler } from '@contember/logger'
+import { ConfigProcessor } from '../config/ConfigProcessor'
+import { Plugin } from '../plugin/Plugin'
 
 export const getServerVersion = (): string => {
 	const packageJsonFile = process.env.CONTEMBER_PACKAGE_JSON || join(__dirname, '../../../package.json')
@@ -25,7 +26,7 @@ export const printStartInfo = ({ version, isDebug }: { version: string; isDebug:
 export const resolveServerConfig = async <T extends ServerConfig>({ plugins, serverConfigSchema }: { plugins: Plugin[]; serverConfigSchema: Type<T> }) => {
 	const configProcessors = plugins
 		.map(it => (it.getConfigProcessor ? it.getConfigProcessor() : null))
-		.filter((it): it is ConfigProcessor => it !== null)
+		.filter((it): it is ConfigProcessor<any> => it !== null)
 
 	const configSources: ConfigSource[] = []
 	for (const configType of ['file', 'yaml', 'json'] as const) {

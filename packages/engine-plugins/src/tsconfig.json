@@ -1,23 +1,15 @@
 {
 	"extends": "../tsconfig.settings.json",
 	"compilerOptions": {
-		"outDir": "../dist/src"
+		"outDir": "../dist/src",
+		"esModuleInterop": true
 	},
 	"references": [
 		{
-			"path": "../../graphql-utils/src"
-		},
-		{
-			"path": "../../schema/src"
-		},
-		{
-			"path": "../../dic/src"
-		},
-		{
-			"path": "../../typesafe/src"
-		},
-		{
 			"path": "../../database-migrations/src"
+		},
+		{
+			"path": "../../engine-http/src"
 		}
 	]
 }

@@ -3,8 +3,8 @@ import { SystemGraphQLContext } from './SystemGraphQLHandlerFactory'
 import { AuthMiddlewareState, AuthResult } from '../common'
 import { KoaContext } from '../koa'
 import { GraphQLKoaState } from '../graphql'
-import { ProjectContainer } from '../ProjectContainer'
 import { Acl } from '@contember/schema'
+import { ProjectContainer } from '../project'
 
 export class SystemGraphQLContextFactory {
 	public async create({ authResult, memberships, koaContext, projectContainer, systemContainer, onClearCache }: {

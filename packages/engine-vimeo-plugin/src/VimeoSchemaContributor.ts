@@ -10,7 +10,7 @@ import {
 } from 'graphql'
 import { VimeoService, VimeoServiceFactory } from './VimeoService'
 import { VimeoConfig } from './Config'
-import { GraphQLSchemaContributor, SchemaContext } from '@contember/engine-plugins'
+import { GraphQLSchemaContributor, GraphQLSchemaContributorContext } from '@contember/engine-plugins'
 
 interface VimeoAcl {
 	upload?: boolean
@@ -22,13 +22,13 @@ export class VimeoSchemaContributor implements GraphQLSchemaContributor {
 		private readonly vimeoServiceFactory: VimeoServiceFactory,
 	) {}
 
-	getCacheKey(context: SchemaContext): string {
+	getCacheKey(context: GraphQLSchemaContributorContext): string {
 		const roles = context.identity.projectRoles
 		roles.sort()
 		return roles.join('||')
 	}
 
-	createSchema(context: SchemaContext): GraphQLSchema | undefined {
+	createSchema(context: GraphQLSchemaContributorContext): GraphQLSchema | undefined {
 		if (!this.vimeoConfig) {
 			return undefined
 		}

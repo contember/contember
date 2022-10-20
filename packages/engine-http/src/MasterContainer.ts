@@ -20,7 +20,7 @@ import Koa from 'koa'
 import { TenantApiMiddlewareFactory, TenantGraphQLContextFactory, TenantGraphQLHandlerFactory } from './tenant'
 import { SystemApiMiddlewareFactory, SystemGraphQLContextFactory, SystemGraphQLHandlerFactory } from './system'
 import {
-	createLoggerMiddleware, createModuleInfoMiddleware,
+	createLoggerMiddleware,
 	createPoweredByHeaderMiddleware,
 	createTimerMiddleware,
 	ErrorMiddlewareFactory,
@@ -33,12 +33,14 @@ import {
 } from './content'
 import { ProjectContextResolver } from './project-common'
 import {
-	ContentSchemaTransferMappingFactory, ExportApiMiddlewareFactory,
-	ExportExecutor, ImportApiMiddlewareFactory,
+	ContentSchemaTransferMappingFactory,
+	ExportApiMiddlewareFactory,
+	ExportExecutor,
+	ImportApiMiddlewareFactory,
 	ImportExecutor,
 	SystemSchemaTransferMappingFactory,
 } from './transfer'
-import { compose, route } from './koa'
+import { compose, Router } from './koa'
 import { createHomepageMiddleware, createPlaygroundMiddleware } from './misc'
 import { Plugin } from './plugin/Plugin'
 
@@ -65,8 +67,10 @@ export class MasterContainerFactory {
 
 	createBuilder(args: MasterContainerArgs): MasterContainerBuilder {
 		const builder = this.createBuilderInternal(args)
-		return builder
-		// return this.hooks.reduce((acc, cb) => cb(acc), builder)
+		const hooks = args.plugins
+			.map(it => it.getMasterContainerHook?.())
+			.filter((it): it is MasterContainerHook => it !== undefined)
+		return hooks.reduce((acc, cb) => cb(acc), builder)
 	}
 
 	createBuilderInternal({
@@ -147,7 +151,19 @@ export class MasterContainerFactory {
 				new ImportApiMiddlewareFactory(projectGroupResolver, importExecutor))
 			.addService('exportApiMiddlewareFactory', ({ projectGroupResolver, exportExecutor }) =>
 				new ExportApiMiddlewareFactory(projectGroupResolver, exportExecutor))
-			.addService('koaMiddlewares', ({ contentApiMiddlewareFactory, tenantApiMiddlewareFactory, systemApiMiddlewareFactory, importApiMiddlewareFactory, exportApiMiddlewareFactory, httpErrorMiddlewareFactory, debugMode, version, serverConfig, logger }) =>
+			.addService('router', () =>
+				new Router())
+			.setupService('router', (it, { contentApiMiddlewareFactory, tenantApiMiddlewareFactory, systemApiMiddlewareFactory, importApiMiddlewareFactory, exportApiMiddlewareFactory }) => {
+				it.add('content', '/content/:projectSlug/:stageSlug$', contentApiMiddlewareFactory.create())
+				it.add('tenant', '/tenant$', tenantApiMiddlewareFactory.create())
+				it.add('system', '/system/:projectSlug$', systemApiMiddlewareFactory.create())
+				it.add('transfer', '/import$', importApiMiddlewareFactory.create())
+				it.add('transfer', '/export$', exportApiMiddlewareFactory.create())
+				it.add('misc', '/playground$', createPlaygroundMiddleware())
+				it.add('misc', '/$', createHomepageMiddleware())
+
+			})
+			.addService('koaMiddlewares', ({ router, httpErrorMiddlewareFactory, debugMode, version, serverConfig, logger }) =>
 				compose([
 					koaCompress({
 						br: false,
@@ -159,44 +175,8 @@ export class MasterContainerFactory {
 					createLoggerMiddleware(logger),
 					createTimerMiddleware({ debugMode }),
 					httpErrorMiddlewareFactory.create(),
-					route('/playground$', createPlaygroundMiddleware()),
-					createHomepageMiddleware(),
 					corsMiddleware(),
-					route(
-						'/content/:projectSlug/:stageSlug$',
-						compose([
-							createModuleInfoMiddleware('content'),
-							contentApiMiddlewareFactory.create(),
-						]),
-					),
-					route(
-						'/tenant$',
-						compose([
-							createModuleInfoMiddleware('tenant'),
-							tenantApiMiddlewareFactory.create(),
-						]),
-					),
-					route(
-						'/system/:projectSlug$',
-						compose([
-							createModuleInfoMiddleware('system'),
-							systemApiMiddlewareFactory.create(),
-						]),
-					),
-					route(
-						'/import$',
-						compose([
-							createModuleInfoMiddleware('transfer'),
-							importApiMiddlewareFactory.create(),
-						]),
-					),
-					route(
-						'/export$',
-						compose([
-							createModuleInfoMiddleware('transfer'),
-							exportApiMiddlewareFactory.create(),
-						]),
-					),
+					router.build(),
 				]))
 			.addService('koa', ({ koaMiddlewares }) => {
 				const app = new Koa()

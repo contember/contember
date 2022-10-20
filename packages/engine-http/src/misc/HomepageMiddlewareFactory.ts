@@ -1,8 +1,8 @@
 import * as Koa from 'koa'
-import { route } from '../koa'
+import { KoaMiddleware, route } from '../koa'
 
-export const createHomepageMiddleware = () => {
-	return route('/$', (ctx: Koa.Context, next) => {
+export const createHomepageMiddleware = (): KoaMiddleware<any> => {
+	return (ctx: Koa.Context, next) => {
 		ctx.body = 'App is running'
-	})
+	}
 }

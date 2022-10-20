@@ -1,5 +1,7 @@
 import { Key, pathToRegexp } from 'path-to-regexp'
 import { KoaContext, KoaMiddleware } from './types'
+import { compose } from './compose'
+import { createModuleInfoMiddleware } from '../common'
 
 type Params = { [param: string]: string }
 type KoaRequestState = {
@@ -70,3 +72,15 @@ function post(mask: string, middleware: KoaMiddleware<KoaRequestState>): KoaMidd
 }
 
 export { route, get, post, ContextWithRequest, KoaRequestState }
+
+export class Router {
+	private middlewares: KoaMiddleware<any>[] = []
+
+	public add(module: string, mark: string, middleware: KoaMiddleware<any>): void {
+		this.middlewares.push(route(mark, compose([createModuleInfoMiddleware(module), middleware])))
+	}
+
+	public build(): KoaMiddleware<any> {
+		return compose(this.middlewares)
+	}
+}

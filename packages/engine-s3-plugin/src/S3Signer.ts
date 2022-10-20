@@ -22,7 +22,7 @@ const sortMap = <T extends Record<string, any>>(input: T): T => {
 export class S3Signer {
 	private region: string
 
-	constructor(private readonly config: S3Config, private readonly providers: Providers) {
+	constructor(private readonly config: S3Config, private readonly providers: Pick<Providers, 'now'>) {
 		this.region = config.region || 'eu-west-1'
 	}
 

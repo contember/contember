@@ -1,6 +1,6 @@
 import * as Typesafe from '@contember/typesafe'
 import { MailerOptions } from '@contember/engine-tenant-api'
-import { upperCaseFirst } from '../utils'
+import { upperCaseFirst } from '../utils/strings'
 
 
 const dbConfigRequired = {

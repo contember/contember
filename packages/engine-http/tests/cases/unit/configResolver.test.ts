@@ -1,7 +1,7 @@
 import { assert, it } from 'vitest'
-import { createTenantConfigResolver } from '../../src/config/tenantConfigResolver'
-import { configTemplate } from '../../src/config/configTemplate'
-import { createProjectConfigResolver } from '../../src/config/projectConfigResolver'
+import { createTenantConfigResolver } from '../../../src/config/tenantConfigResolver'
+import { configTemplate } from '../../../src/config/configTemplate'
+import { createProjectConfigResolver } from '../../../src/config/projectConfigResolver'
 
 const env = {
 	DEFAULT_DB_POOL_IDLE_TIMEOUT_MS: '60000',

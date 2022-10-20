@@ -1,5 +1,4 @@
-import { ProjectContainerFactory } from './ProjectContainer'
-import { ProjectContainer } from '@contember/engine-http'
+import { ProjectContainer, ProjectContainerFactory } from './ProjectContainer'
 import { DatabaseContext, ProjectManager, ProjectWithSecrets } from '@contember/engine-tenant-api'
 import { ProjectContainerStore } from './ProjectContainerStore'
 import { ProjectConfigResolver } from '../config/projectConfigResolver'

@@ -1,6 +1,7 @@
 export * from './ContentApiMiddlewareFactory'
 export * from './ContentGraphQLContextFactory'
 export * from './ContentQueryHandlerFactory'
+export * from './GraphQLSchemaContributor'
 export * from './ContentSchemaResolver'
 export * from './GraphQlSchemaFactory'
 export * from './NotModifiedChecker'

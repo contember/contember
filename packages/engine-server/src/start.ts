@@ -6,9 +6,9 @@ import {
 	listenOnProcessTermination,
 	serverConfigSchema,
 	TerminationJob,
-} from './index'
+	getServerVersion, isDebugMode, printStartInfo, resolveServerConfig,
+} from '@contember/engine-http'
 import loadPlugins from './loadPlugins'
-import { getServerVersion, isDebugMode, printStartInfo, resolveServerConfig } from './utils/serverStartup'
 
 const logger = createDefaultLogger()
 process.on('warning', message => {
@@ -26,7 +26,10 @@ process.on('warning', message => {
 	const version = getServerVersion()
 	printStartInfo({ version, isDebug }, logger)
 	const plugins = await loadPlugins()
-	const { serverConfig, projectConfigResolver, tenantConfigResolver } = await resolveServerConfig({ plugins, serverConfigSchema })
+	const { serverConfig, projectConfigResolver, tenantConfigResolver } = await resolveServerConfig({
+		plugins,
+		serverConfigSchema,
+	})
 
 	const sentryTransport = createSentryLoggerHandler(serverConfig.logging.sentry?.dsn)
 	if (sentryTransport !== null) {

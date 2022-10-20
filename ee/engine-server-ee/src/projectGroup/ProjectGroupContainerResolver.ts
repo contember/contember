@@ -1,4 +1,4 @@
-import { ProjectGroupContainerFactory, TenantConfigResolver } from '@contember/engine-server'
+import { ProjectGroupContainerFactory, TenantConfigResolver } from '@contember/engine-http'
 import {
 	ProjectGroupContainer,
 } from '@contember/engine-http'

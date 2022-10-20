@@ -4,39 +4,7 @@ import { Builder } from '@contember/dic'
 import { ServerConfig } from './config/config'
 import { ModificationHandlerFactory } from '@contember/schema-migrations'
 import { Initializer } from './bootstrap'
-import { Plugin } from '@contember/engine-plugins'
-import {
-	compose,
-	ContentApiMiddlewareFactory,
-	ContentGraphQLContextFactory,
-	ContentQueryHandlerFactory,
-	ContentSchemaTransferMappingFactory,
-	createHomepageMiddleware,
-	createLoggerMiddleware,
-	createModuleInfoMiddleware,
-	createPlaygroundMiddleware,
-	createPoweredByHeaderMiddleware,
-	createProviders,
-	createTimerMiddleware,
-	ErrorMiddlewareFactory,
-	ExportApiMiddlewareFactory,
-	ExportExecutor,
-	ImportApiMiddlewareFactory,
-	ImportExecutor,
-	Koa,
-	NotModifiedChecker,
-	ProjectContextResolver,
-	ProjectGroupResolver as ProjectGroupResolverInterface,
-	Providers,
-	route,
-	SystemApiMiddlewareFactory,
-	SystemGraphQLContextFactory,
-	SystemGraphQLHandlerFactory,
-	SystemSchemaTransferMappingFactory,
-	TenantApiMiddlewareFactory,
-	TenantGraphQLContextFactory,
-	TenantGraphQLHandlerFactory,
-} from '@contember/engine-http'
+
 import { ProjectContainerFactoryFactory } from './project'
 import koaCompress from 'koa-compress'
 import bodyParser from 'koa-bodyparser'
@@ -44,9 +12,35 @@ import { ProjectConfigResolver } from './config/projectConfigResolver'
 import { TenantConfigResolver } from './config/tenantConfigResolver'
 import { ProjectGroupContainerFactory } from './projectGroup/ProjectGroupContainer'
 import corsMiddleware from '@koa/cors'
-import { ProjectGroupResolver } from './projectGroup/ProjectGroupResolver'
+import { ProjectGroupResolver, SingleProjectGroupResolver } from './projectGroup/ProjectGroupResolver'
 import { Logger } from '@contember/logger'
 import { ExecutionContainerFactory } from '@contember/engine-content-api'
+import { createProviders, Providers } from './providers'
+import Koa from 'koa'
+import { TenantApiMiddlewareFactory, TenantGraphQLContextFactory, TenantGraphQLHandlerFactory } from './tenant'
+import { SystemApiMiddlewareFactory, SystemGraphQLContextFactory, SystemGraphQLHandlerFactory } from './system'
+import {
+	createLoggerMiddleware, createModuleInfoMiddleware,
+	createPoweredByHeaderMiddleware,
+	createTimerMiddleware,
+	ErrorMiddlewareFactory,
+} from './common'
+import {
+	ContentApiMiddlewareFactory,
+	ContentGraphQLContextFactory,
+	ContentQueryHandlerFactory,
+	NotModifiedChecker,
+} from './content'
+import { ProjectContextResolver } from './project-common'
+import {
+	ContentSchemaTransferMappingFactory, ExportApiMiddlewareFactory,
+	ExportExecutor, ImportApiMiddlewareFactory,
+	ImportExecutor,
+	SystemSchemaTransferMappingFactory,
+} from './transfer'
+import { compose, route } from './koa'
+import { createHomepageMiddleware, createPlaygroundMiddleware } from './misc'
+import { Plugin } from './plugin/Plugin'
 
 export interface MasterContainer {
 	initializer: Initializer
@@ -64,8 +58,18 @@ export interface MasterContainerArgs {
 	version?: string
 }
 
+export type MasterContainerBuilder = ReturnType<MasterContainerFactory['createBuilderInternal']>
+export type MasterContainerHook = (builder: MasterContainerBuilder) => MasterContainerBuilder
+
 export class MasterContainerFactory {
-	createBuilder({
+
+	createBuilder(args: MasterContainerArgs): MasterContainerBuilder {
+		const builder = this.createBuilderInternal(args)
+		return builder
+		// return this.hooks.reduce((acc, cb) => cb(acc), builder)
+	}
+
+	createBuilderInternal({
 		serverConfig,
 		debugMode,
 		plugins,
@@ -109,8 +113,8 @@ export class MasterContainerFactory {
 				projectGroupContainerFactory.create({ slug: undefined, config: tenantConfigResolver(undefined, {}) }))
 			.addService('httpErrorMiddlewareFactory', ({ debugMode }) =>
 				new ErrorMiddlewareFactory(debugMode))
-			.addService('projectGroupResolver', ({ projectGroupContainer }): ProjectGroupResolverInterface =>
-				new ProjectGroupResolver(projectGroupContainer))
+			.addService('projectGroupResolver', ({ projectGroupContainer }): ProjectGroupResolver =>
+				new SingleProjectGroupResolver(projectGroupContainer))
 			.addService('notModifiedChecker', () =>
 				new NotModifiedChecker())
 			.addService('executionContainerFactory', ({ providers }) =>

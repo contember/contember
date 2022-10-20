@@ -5,7 +5,6 @@
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
   "scripts": {
-    "test": "vitest tests/cases",
     "test-e2e": "vitest --no-threads tests/e2e"
   },
   "dependencies": {

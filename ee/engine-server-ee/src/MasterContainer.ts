@@ -8,7 +8,7 @@ import {
 	MasterContainer as BaseMasterContainer,
 	MasterContainerArgs as BaseMasterContainerArgs,
 	MasterContainerFactory as BaseMasterContainerFactory,
-} from '@contember/engine-server'
+} from '@contember/engine-http'
 import { ServerConfig } from './config/configSchema'
 import { PrometheusRegistryFactory } from './prometheus/PrometheusRegistryFactory'
 import { ProjectGroupContainerMetricsHook } from './prometheus/ProjectGroupContainerMetricsHook'

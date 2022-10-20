@@ -1,6 +1,6 @@
 import * as Sentry from '@sentry/node'
-import { LoggerRequestSymbol } from '@contember/engine-http'
 import { LogEntry, LoggerHandler, LogLevel, LogLevels } from '@contember/logger'
+import { LoggerRequestSymbol } from '../common'
 
 export class SentryLoggerHandler implements LoggerHandler {
 	constructor(

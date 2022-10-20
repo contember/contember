@@ -1,5 +1,5 @@
 import { KoaMiddleware, KoaRequestState } from '../koa'
-import { ProjectGroupResolver, ProjectInfoMiddlewareState } from '../project-common'
+import { ProjectInfoMiddlewareState } from '../project-common'
 import { AuthResult, HttpError, LoggerMiddlewareState, TimerMiddlewareState } from '../common'
 import { StageBySlugQuery } from '@contember/engine-system-api'
 import { NotModifiedChecker } from './NotModifiedChecker'
@@ -7,7 +7,7 @@ import { ContentGraphQLContextFactory } from './ContentGraphQLContextFactory'
 import { ContentQueryHandler, ContentQueryHandlerFactory } from './ContentQueryHandlerFactory'
 import { GraphQLSchema } from 'graphql'
 import { GraphQLKoaState } from '../graphql'
-import { ProjectContextResolver } from '../project-common/ProjectContextResolver'
+import { ProjectContextResolver } from '../project-common'
 
 type ContentApiMiddlewareKoaState =
 	& TimerMiddlewareState

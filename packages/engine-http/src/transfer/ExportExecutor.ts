@@ -6,7 +6,7 @@ import { ContentSchemaTransferMappingFactory } from './ContentSchemaTransferMapp
 import { SystemSchemaTransferMappingFactory } from './SystemSchemaTransferMappingFactory'
 import * as Typesafe from '@contember/typesafe'
 import { StagesQuery } from '@contember/engine-system-api'
-import { ProjectContainer } from '../ProjectContainer'
+import { ProjectContainer } from '../project'
 
 export type ExportRequest = ReturnType<typeof ExportRequest>
 export const ExportRequest = Typesafe.object({

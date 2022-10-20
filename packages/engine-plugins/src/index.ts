@@ -1,5 +1,12 @@
-export * from './ConfigProcessor'
-export * from './Plugin'
-export * from './ProjectContainer'
-export * from './GraphQLSchemaContributor'
 export { MigrationsResolver, Migration, RunMigration } from '@contember/database-migrations'
+export {
+	ConfigProcessor,
+	Plugin,
+	SchemaContributorArgs,
+	ProjectConfig,
+	Providers,
+	ConfigTemplate,
+	ConfigTemplateContext,
+	GraphQLSchemaContributor,
+	GraphQLSchemaContributorContext,
+} from '@contember/engine-http'

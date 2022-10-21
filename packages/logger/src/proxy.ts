@@ -21,7 +21,7 @@ class CurrentLoggerProxy implements Logger {
 	}
 
 	debug(a: any, b?: any, c?: any) {
-		getLogger().crit(a, b)
+		getLogger().debug(a, b)
 	}
 
 	child(attributes?: LoggerAttributes, options?: Partial<LoggerOptions>): Logger {

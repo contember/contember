@@ -1,7 +1,7 @@
 version: '2.4'
 services:
   ts_watch:
-    image: node:16
+    image: node:18
     volumes:
       - ./:/src:cached
     working_dir: /src
@@ -22,7 +22,7 @@ services:
       timeout: 5s
       retries: 10
   api:
-    image: node:16
+    image: node:18
     working_dir: /src
     depends_on:
       db:

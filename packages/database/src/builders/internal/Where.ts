@@ -37,7 +37,7 @@ namespace Where {
 				)
 
 			return new Literal(' where ').appendAll(
-				this.values.map(it => (it instanceof Literal ? it : valueWhereToLiteral(it))),
+				this.values.map(it => (it instanceof Literal ? it : valueWhereToLiteral(it))).filter(it => it.sql !== ''),
 				' and ',
 			)
 		}

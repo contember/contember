@@ -11,11 +11,11 @@ export interface NotModifiedCheckResult {
 }
 
 export class NotModifiedChecker {
-	public async checkNotModified({ request, timer, systemDatabase, stageSlug }: {
+	public async checkNotModified({ request, timer, systemDatabase, stageId }: {
 		request: Request
 		timer: Timer
 		systemDatabase: DatabaseContext
-		stageSlug: string
+		stageId: string
 	}): Promise<NotModifiedCheckResult | null> {
 		if (request.headers[NotModifiedHeaderName] === undefined) {
 			return null
@@ -28,7 +28,7 @@ export class NotModifiedChecker {
 		}
 		const latestRef = await timer('NotModifiedCheck', () => {
 			const queryHandler = systemDatabase.queryHandler
-			return queryHandler.fetch(new LatestTransactionIdByStageQuery(stageSlug))
+			return queryHandler.fetch(new LatestTransactionIdByStageQuery(stageId))
 		})
 
 		return {

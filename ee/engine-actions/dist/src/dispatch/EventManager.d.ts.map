@@ -1,0 +1,1 @@
+{"version":3,"file":"EventManager.d.ts","sourceRoot":"","sources":["../../../src/dispatch/EventManager.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,MAAM,EAA6B,MAAM,qBAAqB,CAAA;AAEvE,qBAAa,YAAY;IAEvB,OAAO,CAAC,QAAQ,CAAC,EAAE;gBAAF,EAAE,EAAE,MAAM;IAIf,kBAAkB,CAAC,KAAK,EAAE,MAAM;CAa7C"}

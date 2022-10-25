@@ -1,0 +1,1 @@
+{"version":3,"file":"WebhookInvoker.d.ts","sourceRoot":"","sources":["../../../src/triggers/WebhookInvoker.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,OAAO,EAAE,MAAM,mBAAmB,CAAA;AAC3C,OAAO,EAAE,eAAe,EAAE,MAAM,WAAW,CAAA;AAI3C,qBAAa,cAAc;IACb,IAAI,CAAC,UAAU,EAAE,OAAO,CAAC,iBAAiB,EAAE,QAAQ,EAAE,eAAe,EAAE;CAqBpF"}

@@ -1,8 +1,8 @@
 import { CreatePage, Layout, TextField } from '../../../src'
 
-export default function() {
+export default function () {
 	return (
-		<Layout>
+		<Layout scheme="system">
 			<CreatePage entity="Article">
 				<TextField id="pw-title" field="title" label="Title" />
 				<TextField field="lead" label="Lead" />

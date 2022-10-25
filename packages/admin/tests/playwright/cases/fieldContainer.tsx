@@ -19,7 +19,7 @@ const dummyInput = (
 export default function () {
 	return (
 		<StyleProvider>
-			<Layout>
+			<Layout scheme="system">
 				<LayoutPage>
 					<div style={verticalStack}>
 						{positions.map(position => <Fragment key={position}>

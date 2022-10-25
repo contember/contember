@@ -10,7 +10,7 @@ const side = (
 
 export default function () {
 	return (
-		<Layout navigation={navigation}>
+		<Layout navigation={navigation} scheme="system">
 			<LayoutPage side={side}>
 				<div style={{ backgroundColor: 'blue', width: '100%' }}>Content</div>
 			</LayoutPage>

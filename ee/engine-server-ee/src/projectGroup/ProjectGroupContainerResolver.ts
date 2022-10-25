@@ -37,6 +37,11 @@ export class ProjectGroupContainerResolver {
 				slug,
 			})
 			const cleanups = this.onCreate.map(it => it(container, slug) || (() => null))
+
+			container.projectContainerResolver.onCreate.push(projectContainer => {
+				cleanups.push(() => container.projectContainerResolver.destroyContainer(projectContainer.project.slug))
+			})
+
 			await container.tenantContainer.migrationsRunner.run(container.logger.child())
 			return { container, inputConfig: config, cleanups }
 		})).container

@@ -53,7 +53,7 @@ export class ContentApiMiddlewareFactory {
 				request,
 				timer,
 				systemDatabase,
-				stageSlug: stage.slug,
+				stageId: stage.id,
 			})
 			if (notModifiedRes?.isModified === false) {
 				response.status = 304

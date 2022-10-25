@@ -2,7 +2,7 @@ import prom from 'prom-client'
 import { Connection, EventManager, PoolStats, poolStatsDescription } from '@contember/database'
 import { CustomMetric } from './CustomMetric'
 
-const labelNames = ['contember_project' as const, 'contember_module' as const, 'contember_project_group' as const]
+const labelNames = ['contember_project' as const, 'contember_module' as const, 'contember_project_group' as const, 'database_instance']
 type LabelNames = typeof labelNames[number]
 type Labels = { [K in LabelNames]: string }
 type DatabaseMetricsEntry = {
@@ -32,7 +32,7 @@ export const createDbMetricsRegistrar = (registry: prom.Registry): DatabaseMetri
 
 const createDbPoolMetricsCollector = (registry: prom.Registry) => {
 
-	const descriptionSuffix = 'Dimensions: contember_module (tenant or content; system is not used since it uses the same connection), contember_project_group and contember_project for contember_module=content.'
+	const descriptionSuffix = 'Dimensions: contember_module (tenant or content; system is not used since it uses the same connection), contember_project_group, contember_project for contember_module=content, database_instance (single, primary, replica).'
 	const totalCount = new prom.Gauge({
 		registers: [registry],
 		name: `contember_db_pool_total_count`,

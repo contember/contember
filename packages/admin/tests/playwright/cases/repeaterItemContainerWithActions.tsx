@@ -15,7 +15,7 @@ const intent: Intent = 'danger'
 export default function () {
 	return (
 		<StyleProvider>
-			<Layout>
+			<Layout scheme="system">
 				<LayoutPage>
 					<style>{`
 					.cui-repeater-item-container-header:hover { background-color: #00CCFF33; }

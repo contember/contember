@@ -9,7 +9,7 @@ const Handle = () => <>=</>
 export default function () {
 	return (
 		<StyleProvider>
-			<Layout>
+			<Layout scheme="system">
 				<LayoutPage>
 					<RepeaterItemContainer dragHandleComponent={Handle}>
 						{dummyInput}

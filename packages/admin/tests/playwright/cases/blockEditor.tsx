@@ -1,8 +1,8 @@
 import { BlockEditor, CreatePage, Layout, RichEditor, TextField } from '../../../src'
 
-export default function() {
+export default function () {
 	return (
-		<Layout>
+		<Layout scheme="system">
 			<CreatePage entity="Article">
 				<BlockEditor
 					contentField="json"
@@ -16,9 +16,9 @@ export default function() {
 }
 
 
-export const inlineButtonsOrderedList = function() {
+export const inlineButtonsOrderedList = function () {
 	return (
-		<Layout>
+		<Layout scheme="system">
 			<CreatePage entity="Article">
 				<BlockEditor
 					contentField="json"
@@ -44,9 +44,9 @@ export const inlineButtonsOrderedList = function() {
 
 
 
-export const inlineButtonsUnorderedList = function() {
+export const inlineButtonsUnorderedList = function () {
 	return (
-		<Layout>
+		<Layout scheme="system">
 			<CreatePage entity="Article">
 				<BlockEditor
 					contentField="json"

@@ -28,7 +28,7 @@ const back = (
 
 export default function () {
 	return (
-		<Layout navigation={navigation}>
+		<Layout scheme="system" navigation={navigation}>
 			<LayoutPage
 				actions={action}
 				afterTitle={afterTitle}

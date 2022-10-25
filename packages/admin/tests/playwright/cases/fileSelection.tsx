@@ -1,11 +1,11 @@
-import { CreatePage, DataGrid, EditPage, FileSelectionProps, GenericCell, ImageUploadField, Layout, TextCell } from '../../../src'
-import { useCallback, useMemo } from 'react'
 import { Component, EntityAccessor, EntityId, Field, StaticRender, useEntity } from '@contember/binding'
 import { Card, LinkCardProps } from '@contember/ui'
+import { useCallback, useMemo } from 'react'
+import { CreatePage, DataGrid, EditPage, FileSelectionProps, GenericCell, ImageUploadField, Layout, TextCell } from '../../../src'
 
 export default function () {
 	return (
-		<Layout>
+		<Layout scheme="system">
 			<CreatePage entity="Upload">
 				<ImageUploadField
 					label="Image"
@@ -55,30 +55,30 @@ const ImageSelectForm = Component((
 type DataGridTileProps =
 	& Omit<LinkCardProps, 'src' | 'title' | 'href' | 'active' | 'onClick'>
 	& {
-	thumbnailField: string
-	onClick?: (entity: EntityAccessor) => void
-	selectedEntityIds?: EntityId[]
-}
+		thumbnailField: string
+		onClick?: (entity: EntityAccessor) => void
+		selectedEntityIds?: EntityId[]
+	}
 
 export const DataGridTile = Component((props: DataGridTileProps) => {
-		const entityAccessor = useEntity()
+	const entityAccessor = useEntity()
 
-		const src = entityAccessor.getField<string>(props.thumbnailField).value
-		const active = useMemo(() => props.selectedEntityIds?.includes(entityAccessor.id), [entityAccessor.id, props.selectedEntityIds])
+	const src = entityAccessor.getField<string>(props.thumbnailField).value
+	const active = useMemo(() => props.selectedEntityIds?.includes(entityAccessor.id), [entityAccessor.id, props.selectedEntityIds])
 
-		const { onClick } = props
+	const { onClick } = props
 
-		const onEntityClick = useCallback(() => {
-			onClick?.(entityAccessor)
-		}, [entityAccessor, onClick])
+	const onEntityClick = useCallback(() => {
+		onClick?.(entityAccessor)
+	}, [entityAccessor, onClick])
 
-		return <Card
-			onClick={onEntityClick}
-			src={src}
-			active={active}
-		/>
-	}, ({ thumbnailField }) => <>
-		<Field field={thumbnailField} />
-	</>,
+	return <Card
+		onClick={onEntityClick}
+		src={src}
+		active={active}
+	/>
+}, ({ thumbnailField }) => <>
+	<Field field={thumbnailField} />
+</>,
 )
 DataGridTile.displayName = 'DataGridTile'

@@ -37,7 +37,7 @@ export const LayoutChrome = memo(({
 	pageTheme,
 	pageThemeContent,
 	pageThemeControls,
-	scheme,
+	scheme = 'light',
 	sidebarFooter,
 	sidebarHeader,
 	switchers,

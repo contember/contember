@@ -1,8 +1,8 @@
 import { CreatePage, Layout, RadioField } from '../../../src'
 
-export default function() {
+export default function () {
 	return (
-		<Layout>
+		<Layout scheme="system">
 			<CreatePage entity="Article">
 				<RadioField
 					field="status"

@@ -1,4 +1,4 @@
-import { LazyChoiceFieldSettings, SearchByFields } from '../BaseDynamicChoiceField'
+import { LazyChoiceFieldSettings, ChoiceFieldSearchByFields } from '../BaseDynamicChoiceField'
 import { useCallback } from 'react'
 import { useSearchFields } from './useSearchFields'
 import { BindingError, Filter, wrapFilterInHasOnes } from '@contember/binding'
@@ -6,7 +6,7 @@ import { DesugaredOptionPath } from './useDesugaredOptionPath'
 
 export const useCreateOptionsFilter = (
 	desugaredOptionPath: DesugaredOptionPath,
-	searchByFields: SearchByFields | undefined,
+	searchByFields: ChoiceFieldSearchByFields | undefined,
 	lazy: LazyChoiceFieldSettings,
 ) => {
 	const desugaredSearchFields = useSearchFields(searchByFields)

@@ -1,8 +1,8 @@
-import { SearchByFields } from '../BaseDynamicChoiceField'
+import { ChoiceFieldSearchByFields } from '../BaseDynamicChoiceField'
 import { useMemo } from 'react'
 import { QueryLanguage, RelativeSingleField, useEnvironment } from '@contember/binding'
 
-export const useSearchFields = (searchByFields: SearchByFields | undefined): RelativeSingleField[] => {
+export const useSearchFields = (searchByFields: ChoiceFieldSearchByFields | undefined): RelativeSingleField[] => {
 	const sugaredSearchFields = useMemo(
 		() => (searchByFields === undefined ? [] : Array.isArray(searchByFields) ? searchByFields : [searchByFields]),
 		[searchByFields],

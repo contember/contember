@@ -1,4 +1,4 @@
-import { KoaMiddleware } from '../koa'
+import { KoaMiddleware } from '../application'
 
 export interface ModuleInfoMiddlewareState {
 	module: string

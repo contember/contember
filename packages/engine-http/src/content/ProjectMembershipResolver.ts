@@ -1,7 +1,7 @@
 import { MembershipMatcher } from '@contember/engine-tenant-api'
 import * as Typesafe from '@contember/typesafe'
 import { Acl } from '@contember/schema'
-import { HttpError } from '../common'
+import { HttpErrorResponse } from '../common'
 import { ProjectMembershipFetcher } from './ProjectMembershipFetcher'
 import { MembershipResolver, ParsedMembership } from '@contember/schema-utils'
 
@@ -37,7 +37,7 @@ export class ProjectMembershipResolver {
 			const errorMessage = this.debug
 				? `You are not allowed to access project ${projectSlug}`
 				: `Project ${projectSlug} NOT found`
-			throw new HttpError(errorMessage, 404)
+			throw new HttpErrorResponse(404, errorMessage)
 		}
 
 		if (explicitMemberships.length === 0 && implicitRoles.length === 0) {
@@ -55,10 +55,10 @@ export class ProjectMembershipResolver {
 
 			const parsedMemberships = membershipResolver.resolve(acl, assumedMemberships, identity)
 			if (parsedMemberships.errors.length > 0) {
-				throw new HttpError(
+				throw new HttpErrorResponse(
+					400,
 					`Invalid memberships in ${assumeMembershipHeader} header:\n` +
 					parsedMemberships.errors.map(it => JSON.stringify(it)).join('\n'),
-					400,
 				)
 			}
 			this.verifyAssumedRoles(explicitMemberships, acl, assumedMemberships)
@@ -88,7 +88,7 @@ export class ProjectMembershipResolver {
 		try {
 			return assumeMembershipValueType(value).memberships
 		} catch (e: any) {
-			throw new HttpError(`Invalid format of "assume membership": ${e.message}`, 400)
+			throw new HttpErrorResponse(400, `Invalid format of "assume membership": ${e.message}`)
 		}
 	}
 
@@ -108,7 +108,7 @@ export class ProjectMembershipResolver {
 
 		for (const assumed of assumedMemberships) {
 			if (!membershipMatcher.matches(assumed)) {
-				throw new HttpError(`You are not allow to assume membership ${JSON.stringify(assumed)}`, 403)
+				throw new HttpErrorResponse(403, `You are not allow to assume membership ${JSON.stringify(assumed)}`)
 			}
 		}
 	}

@@ -15,7 +15,7 @@ import { createLogger, JsonStreamLoggerHandler } from '@contember/logger';
 		logger: createLogger(new JsonStreamLoggerHandler(process.stderr)),
 	})
 	await container.initializer.initialize()
-	const server = await container.koa.listen(serverConfig.port)
+	const server = await container.application.listen()
 
 	const signals = [
 		['SIGHUP', 1],
@@ -24,7 +24,7 @@ import { createLogger, JsonStreamLoggerHandler } from '@contember/logger';
 	] as const
 	for (const [signal, code] of signals) {
 		process.on(signal, async () => {
-			await new Promise(resolve => server.close(() => resolve(null)))
+			await server.close()
 			process.exit(128 + code)
 		})
 	}

@@ -6,27 +6,17 @@ import { ModificationHandlerFactory } from '@contember/schema-migrations'
 import { Initializer } from './bootstrap'
 
 import { ProjectContainerFactoryFactory } from './project'
-import koaCompress from 'koa-compress'
-import bodyParser from 'koa-bodyparser'
 import { ProjectConfigResolver } from './config/projectConfigResolver'
 import { TenantConfigResolver } from './config/tenantConfigResolver'
 import { ProjectGroupContainerFactory } from './projectGroup/ProjectGroupContainer'
-import corsMiddleware from '@koa/cors'
 import { ProjectGroupResolver, SingleProjectGroupResolver } from './projectGroup/ProjectGroupResolver'
 import { Logger } from '@contember/logger'
 import { ExecutionContainerFactory } from '@contember/engine-content-api'
 import { createProviders, Providers } from './providers'
-import Koa from 'koa'
 import { TenantApiMiddlewareFactory, TenantGraphQLContextFactory, TenantGraphQLHandlerFactory } from './tenant'
 import { SystemApiMiddlewareFactory, SystemGraphQLContextFactory, SystemGraphQLHandlerFactory } from './system'
 import {
-	createLoggerMiddleware,
-	createPoweredByHeaderMiddleware,
-	createTimerMiddleware,
-	ErrorMiddlewareFactory,
-} from './common'
-import {
-	ContentApiMiddlewareFactory,
+	ContentApiControllerFactory,
 	ContentGraphQLContextFactory,
 	ContentQueryHandlerFactory,
 	NotModifiedChecker,
@@ -34,19 +24,19 @@ import {
 import { ProjectContextResolver } from './project-common'
 import {
 	ContentSchemaTransferMappingFactory,
-	ExportApiMiddlewareFactory,
+	ExportApiControllerFactory,
 	ExportExecutor,
 	ImportApiMiddlewareFactory,
 	ImportExecutor,
 	SystemSchemaTransferMappingFactory,
 } from './transfer'
-import { compose, Router } from './koa'
-import { createHomepageMiddleware, createPlaygroundMiddleware } from './misc'
+import { homepageController, playgroundController } from './misc'
 import { Plugin } from './plugin/Plugin'
+import { Application } from './application/application'
 
 export interface MasterContainer {
 	initializer: Initializer
-	koa: Koa
+	application: Application
 	providers: Providers
 }
 
@@ -115,8 +105,6 @@ export class MasterContainerFactory {
 				new ProjectGroupContainerFactory(debugMode, providers, systemContainerFactory, tenantContainerFactory, projectContainerFactoryFactory, projectConfigResolver, tenantGraphQLHandlerFactory, systemGraphQLHandlerFactory, logger))
 			.addService('projectGroupContainer', ({ tenantConfigResolver, projectGroupContainerFactory }) =>
 				projectGroupContainerFactory.create({ slug: undefined, config: tenantConfigResolver(undefined, {}) }))
-			.addService('httpErrorMiddlewareFactory', ({ debugMode }) =>
-				new ErrorMiddlewareFactory(debugMode))
 			.addService('projectGroupResolver', ({ projectGroupContainer }): ProjectGroupResolver =>
 				new SingleProjectGroupResolver(projectGroupContainer))
 			.addService('notModifiedChecker', () =>
@@ -127,10 +115,10 @@ export class MasterContainerFactory {
 				new ContentGraphQLContextFactory(providers, executionContainerFactory))
 			.addService('contentQueryHandlerFactory', ({ debugMode }) =>
 				new ContentQueryHandlerFactory(debugMode))
-			.addService('projectContextResolver', ({ projectGroupResolver }) =>
-				new ProjectContextResolver(projectGroupResolver))
+			.addService('projectContextResolver', () =>
+				new ProjectContextResolver())
 			.addService('contentApiMiddlewareFactory', ({ projectContextResolver, notModifiedChecker, contentGraphqlContextFactory, contentQueryHandlerFactory }) =>
-				new ContentApiMiddlewareFactory(notModifiedChecker, contentGraphqlContextFactory, contentQueryHandlerFactory, projectContextResolver))
+				new ContentApiControllerFactory(notModifiedChecker, contentGraphqlContextFactory, contentQueryHandlerFactory, projectContextResolver))
 			.addService('tenantGraphQLContextFactory', () =>
 				new TenantGraphQLContextFactory())
 			.addService('tenantApiMiddlewareFactory', ({ debugMode, projectGroupResolver, tenantGraphQLContextFactory }) =>
@@ -150,39 +138,26 @@ export class MasterContainerFactory {
 			.addService('importApiMiddlewareFactory', ({ projectGroupResolver, importExecutor }) =>
 				new ImportApiMiddlewareFactory(projectGroupResolver, importExecutor))
 			.addService('exportApiMiddlewareFactory', ({ projectGroupResolver, exportExecutor }) =>
-				new ExportApiMiddlewareFactory(projectGroupResolver, exportExecutor))
-			.addService('router', () =>
-				new Router())
-			.setupService('router', (it, { contentApiMiddlewareFactory, tenantApiMiddlewareFactory, systemApiMiddlewareFactory, importApiMiddlewareFactory, exportApiMiddlewareFactory }) => {
-				it.add('content', '/content/:projectSlug/:stageSlug$', contentApiMiddlewareFactory.create())
-				it.add('tenant', '/tenant$', tenantApiMiddlewareFactory.create())
-				it.add('system', '/system/:projectSlug$', systemApiMiddlewareFactory.create())
-				it.add('transfer', '/import$', importApiMiddlewareFactory.create())
-				it.add('transfer', '/export$', exportApiMiddlewareFactory.create())
-				it.add('misc', '/playground$', createPlaygroundMiddleware())
-				it.add('misc', '/$', createHomepageMiddleware())
-
-			})
-			.addService('koaMiddlewares', ({ router, httpErrorMiddlewareFactory, debugMode, version, serverConfig, logger }) =>
-				compose([
-					koaCompress({
-						br: false,
-					}),
-					bodyParser({
-						jsonLimit: serverConfig.http.requestBodySize || '1mb',
-					}),
-					createPoweredByHeaderMiddleware(debugMode, version ?? 'unknown'),
-					createLoggerMiddleware(logger),
-					createTimerMiddleware({ debugMode }),
-					httpErrorMiddlewareFactory.create(),
-					corsMiddleware(),
-					router.build(),
-				]))
-			.addService('koa', ({ koaMiddlewares }) => {
-				const app = new Koa()
-				app.use(koaMiddlewares)
+				new ExportApiControllerFactory(projectGroupResolver, exportExecutor))
+			.addService('application', ({ projectGroupResolver, serverConfig, logger, debugMode, version }) => {
+				const app = new Application(
+					projectGroupResolver,
+					serverConfig,
+					debugMode,
+					version,
+					logger,
+				)
 
 				return app
+			})
+			.setupService('application', (it, { contentApiMiddlewareFactory, tenantApiMiddlewareFactory, systemApiMiddlewareFactory, importApiMiddlewareFactory, exportApiMiddlewareFactory }) => {
+				it.addRoute('content', '/content/:projectSlug/:stageSlug', contentApiMiddlewareFactory.create())
+				it.addRoute('tenant', '/tenant', tenantApiMiddlewareFactory.create())
+				it.addRoute('system', '/system/:projectSlug', systemApiMiddlewareFactory.create())
+				it.addRoute('transfer', '/import', importApiMiddlewareFactory.create())
+				it.addRoute('transfer', '/export', exportApiMiddlewareFactory.create())
+				it.addRoute('misc', '/playground', playgroundController)
+				it.addRoute('misc', '/', homepageController)
 			})
 			.addService('initializer', ({ projectGroupContainer }) =>
 				new Initializer(projectGroupContainer))
@@ -198,6 +173,6 @@ export class MasterContainerFactory {
 
 	create(args: MasterContainerArgs): MasterContainer {
 		const container = this.createBuilder(args).build()
-		return container.pick('initializer', 'koa', 'providers')
+		return container.pick('initializer', 'application', 'providers')
 	}
 }

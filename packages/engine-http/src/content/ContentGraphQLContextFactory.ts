@@ -2,8 +2,8 @@ import { Context, createAclVariables, ExecutionContainerFactory } from '@contemb
 import { Client } from '@contember/database'
 import { Acl, Schema } from '@contember/schema'
 
-import { AuthResult, Timer } from '../common'
-import { KoaContext } from '../koa'
+import { AuthResult } from '../common'
+import { KoaContext, Timer } from '../application'
 import { Providers } from '../providers'
 import { GraphQLKoaState } from '../graphql'
 import { ParsedMembership } from '@contember/schema-utils'

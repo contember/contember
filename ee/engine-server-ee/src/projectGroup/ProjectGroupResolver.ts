@@ -1,8 +1,13 @@
-import { CryptoWrapper, HttpError, ProjectGroupContainer } from '@contember/engine-http'
-import { Request } from 'koa'
+import {
+	CryptoWrapper,
+	HttpErrorResponse,
+	ProjectGroupContainer,
+	ProjectGroupResolver as ProjectGroupResolverInterface,
+} from '@contember/engine-http'
 import { ProjectGroupContainerResolver } from './ProjectGroupContainerResolver'
+import { IncomingMessage } from 'http'
 
-export class ProjectGroupResolver {
+export class ProjectGroupResolver implements ProjectGroupResolverInterface {
 	private groupRegex = (
 		this.projectGroupDomainMapping
 			? new RegExp(
@@ -23,19 +28,20 @@ export class ProjectGroupResolver {
 		this.projectGroupConfigHeader = projectGroupConfigHeader?.toLowerCase()
 	}
 
-	async resolveContainer({ request }: { request: Request }): Promise<ProjectGroupContainer> {
+	async resolveContainer({ request }: { request: IncomingMessage }): Promise<ProjectGroupContainer> {
 		let group: string | undefined = undefined
 		let config = {}
 		if (this.groupRegex) {
-			const match = request.host.match(this.groupRegex)
+			const host = request.headers.host
+			const match = host?.match(this.groupRegex)
 			if (!match) {
-				throw new HttpError('Project group not found', 404)
+				throw new HttpErrorResponse(404, 'Project group not found')
 			}
 			group = match[1]
 			if (this.projectGroupConfigHeader) {
-				const configHeader = request.get(this.projectGroupConfigHeader.toLowerCase())
-				if (configHeader === '') {
-					throw new HttpError(`${this.projectGroupConfigHeader} header is missing`, 400)
+				const configHeader = request.headers[this.projectGroupConfigHeader.toLowerCase()]
+				if (typeof configHeader !== 'string' || configHeader === '') {
+					throw new HttpErrorResponse(400, `${this.projectGroupConfigHeader} header is missing`)
 				}
 				const configValue = Buffer.from(configHeader, 'base64')
 				const decryptedValue = this.projectGroupConfigCrypto
@@ -44,7 +50,7 @@ export class ProjectGroupResolver {
 				try {
 					config = JSON.parse(decryptedValue.toString())
 				} catch (e: any) {
-					throw new HttpError(`Cannot parse config: ${e.message}`, 400)
+					throw new HttpErrorResponse(400, `Cannot parse config: ${e.message}`)
 				}
 			}
 		}

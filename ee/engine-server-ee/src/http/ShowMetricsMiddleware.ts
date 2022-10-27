@@ -1,12 +1,12 @@
-import { KoaMiddleware, route } from '@contember/engine-http'
+import { HttpController, HttpResponse } from '@contember/engine-http'
 import prom from 'prom-client'
 
-export const createShowMetricsMiddleware = (registry: prom.Registry): KoaMiddleware<any> => {
-	return route('/metrics', async ctx => {
+export const createShowMetricsMiddleware = (registry: prom.Registry): HttpController => {
+	return async () => {
 		if (registry instanceof prom.AggregatorRegistry) {
-			ctx.body = await registry.clusterMetrics()
+			return new HttpResponse(200, await registry.clusterMetrics())
 		} else {
-			ctx.body = registry.metrics()
+			return new HttpResponse(200, registry.metrics())
 		}
-	})
+	}
 }

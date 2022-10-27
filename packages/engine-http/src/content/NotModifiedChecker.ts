@@ -1,18 +1,19 @@
 import { DatabaseContext, LatestTransactionIdByStageQuery } from '@contember/engine-system-api'
-import { Timer } from '../common'
-import { Request, Response } from 'koa'
+import { Timer } from '../application'
+import { IncomingMessage, ServerResponse } from 'http'
 
 
 const NotModifiedHeaderName = 'x-contember-ref'
 
 export interface NotModifiedCheckResult {
 	isModified: boolean
-	setResponseHeader: (response: Response) => void
+	setResponseHeader: (response: ServerResponse) => void
 }
 
 export class NotModifiedChecker {
-	public async checkNotModified({ request, timer, systemDatabase, stageId }: {
-		request: Request
+	public async checkNotModified({ request, body, timer, systemDatabase, stageId }: {
+		body: any
+		request: IncomingMessage
 		timer: Timer
 		systemDatabase: DatabaseContext
 		stageId: string
@@ -20,9 +21,8 @@ export class NotModifiedChecker {
 		if (request.headers[NotModifiedHeaderName] === undefined) {
 			return null
 		}
-		const requestRef = request.get(NotModifiedHeaderName)
-		const body = request.body
-		const isMutation = typeof body === 'object' && 'query' in body && String(body.query).includes('mutation')
+		const requestRef = request.headers[NotModifiedHeaderName]
+		const isMutation = typeof body === 'object' && body !== null && 'query' in body && String(body.query).includes('mutation')
 		if (isMutation) {
 			return null
 		}
@@ -34,8 +34,8 @@ export class NotModifiedChecker {
 		return {
 			isModified: latestRef !== requestRef,
 			setResponseHeader: res => {
-				if (res.status === 200) {
-					res.set(NotModifiedHeaderName, latestRef)
+				if (res.statusCode === 200) {
+					res.setHeader(NotModifiedHeaderName, latestRef)
 				}
 			},
 		}

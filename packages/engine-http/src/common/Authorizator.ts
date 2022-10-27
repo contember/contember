@@ -1,20 +1,16 @@
 import { ApiKeyManager, DatabaseContext, VerifyResult } from '@contember/engine-tenant-api'
-import { Timer } from './TimerMiddleware'
-import { HttpError } from './HttpError'
-import { Request } from 'koa'
+import { HttpErrorResponse } from './HttpResponse'
+import { Timer } from '../application'
+import { IncomingMessage } from 'http'
 
 export type AuthResult =
 	& VerifyResult
 	& { assumedIdentityId?: string }
 
-export interface AuthMiddlewareState {
-	authResult: AuthResult
-}
-
 const assumeIdentityHeader = 'x-contember-assume-identity'
 
 export class Authenticator {
-	private createAuthError = (message: string) => new HttpError(`Authorization failure: ${message}`, 401)
+	private createAuthError = (message: string) => new HttpErrorResponse(401, `Authorization failure: ${message}`)
 
 	constructor(
 		private readonly tenantDatabase: DatabaseContext,
@@ -22,10 +18,10 @@ export class Authenticator {
 	) {
 	}
 
-	public async authenticate({ request, timer }: { request: Request; timer: Timer }): Promise<AuthResult> {
-		const authHeader = request.get('Authorization')
-		if (typeof authHeader !== 'string' || authHeader === '') {
-			throw this.createAuthError(`Authorization header is missing`)
+	public async authenticate({ request, timer }: { request: IncomingMessage; timer: Timer }): Promise<AuthResult | null> {
+		const authHeader = request.headers.authorization
+		if (!authHeader) {
+			return null
 		}
 
 		const authHeaderPattern = /^Bearer\s+(\w+)$/i
@@ -39,9 +35,13 @@ export class Authenticator {
 		if (!authResult.ok) {
 			throw this.createAuthError(authResult.errorMessage)
 		}
+		const assumedIdentityId = request.headers[assumeIdentityHeader] ?? undefined
+		if (Array.isArray(assumedIdentityId)) {
+			throw new HttpErrorResponse(400, `Invalid ${assumedIdentityId} header format`)
+		}
 		return {
 			...authResult.result,
-			assumedIdentityId: request.get(assumeIdentityHeader) || undefined,
+			assumedIdentityId,
 		}
 	}
 }

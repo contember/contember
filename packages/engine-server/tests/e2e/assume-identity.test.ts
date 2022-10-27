@@ -10,7 +10,6 @@ namespace TagModel {
 	}
 }
 
-
 test('Content API: assume identity', async () => {
 	const tester = await createTester(createSchema(TagModel, schema => {
 		return {

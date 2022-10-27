@@ -1,15 +1,14 @@
 import { MembershipMatcher } from '@contember/engine-tenant-api'
 import * as Typesafe from '@contember/typesafe'
 import { Acl } from '@contember/schema'
-import { HttpError } from '../common'
+import { HttpErrorResponse } from '../common'
 import { ProjectMembershipFetcher } from './ProjectMembershipFetcher'
 import { MembershipResolver, ParsedMembership } from '@contember/schema-utils'
+import { IncomingMessage } from 'http'
 
 const assumeMembershipHeader = 'x-contember-assume-membership'
 
-interface HeaderAccessor {
-	get(header: string): string
-}
+type HeaderAccessor = (header: string) => string
 
 export class ProjectMembershipResolver {
 	constructor(
@@ -18,9 +17,9 @@ export class ProjectMembershipResolver {
 	) {
 	}
 
-	public async resolveMemberships({ request, acl, projectSlug, identity }: {
+	public async resolveMemberships({ getHeader, acl, projectSlug, identity }: {
 		acl: Acl.Schema
-		request: HeaderAccessor
+		getHeader: HeaderAccessor
 		projectSlug: string
 		identity: { identityId: string; personId?: string; roles?: readonly string[] }
 	}): Promise<{ effective: readonly ParsedMembership[]; fetched: readonly Acl.Membership[] }> {
@@ -36,7 +35,7 @@ export class ProjectMembershipResolver {
 			const errorMessage = this.debug
 				? `You are not allowed to access project ${projectSlug}`
 				: `Project ${projectSlug} NOT found`
-			throw new HttpError(errorMessage, 404)
+			throw new HttpErrorResponse(404, errorMessage)
 		}
 
 		if (explicitMemberships.length === 0 && implicitRoles.length === 0) {
@@ -45,7 +44,7 @@ export class ProjectMembershipResolver {
 
 		const membershipResolver = new MembershipResolver()
 
-		const assumedMemberships = this.readAssumedMemberships(request)
+		const assumedMemberships = this.readAssumedMemberships(getHeader)
 		if (assumedMemberships !== null) {
 
 			if (assumedMemberships.length === 0) {
@@ -54,10 +53,10 @@ export class ProjectMembershipResolver {
 
 			const parsedMemberships = membershipResolver.resolve(acl, assumedMemberships, identity)
 			if (parsedMemberships.errors.length > 0) {
-				throw new HttpError(
+				throw new HttpErrorResponse(
+					400,
 					`Invalid memberships in ${assumeMembershipHeader} header:\n` +
 					parsedMemberships.errors.map(it => JSON.stringify(it)).join('\n'),
-					400,
 				)
 			}
 			this.verifyAssumedRoles(explicitMemberships, acl, assumedMemberships)
@@ -79,8 +78,8 @@ export class ProjectMembershipResolver {
 		}
 	}
 
-	private readAssumedMemberships(req: HeaderAccessor): null | readonly Acl.Membership[] {
-		const value = req.get(assumeMembershipHeader).trim()
+	private readAssumedMemberships(getHeader: HeaderAccessor): null | readonly Acl.Membership[] {
+		const value = getHeader(assumeMembershipHeader)
 		if (value === '') {
 			return null
 		}
@@ -88,7 +87,7 @@ export class ProjectMembershipResolver {
 		try {
 			parsedValue = assumeMembershipValueType(JSON.parse(value))
 		} catch (e: any) {
-			throw new HttpError(`Invalid content of ${assumeMembershipHeader}: ${e.message}`, 400)
+			throw new HttpErrorResponse(400, `Invalid content of ${assumeMembershipHeader}: ${e.message}`)
 		}
 		return parsedValue.memberships
 	}
@@ -101,7 +100,7 @@ export class ProjectMembershipResolver {
 
 		for (const assumed of assumedMemberships) {
 			if (!membershipMatcher.matches(assumed)) {
-				throw new HttpError(`You are not allow to assume membership ${JSON.stringify(assumed)}`, 403)
+				throw new HttpErrorResponse(403, `You are not allow to assume membership ${JSON.stringify(assumed)}`)
 			}
 		}
 	}

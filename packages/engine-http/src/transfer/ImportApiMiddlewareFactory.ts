@@ -1,16 +1,9 @@
-import { KoaMiddleware, KoaRequestState } from '../koa'
-import { AuthResult, HttpError, TimerMiddlewareState } from '../common'
-import { ProjectInfoMiddlewareState } from '../project-common'
+import { HttpController } from '../application'
+import { HttpErrorResponse } from '../common'
 import { fromBuffer } from './CommandStream'
 import { ImportError, ImportExecutor } from './ImportExecutor'
 import { createGunzip } from 'zlib'
 import { ProjectGroupResolver } from '../projectGroup/ProjectGroupResolver'
-
-type ImportApiMiddlewareState =
-	& TimerMiddlewareState
-	& KoaRequestState
-	& ProjectInfoMiddlewareState
-	& { authResult: AuthResult }
 
 export class ImportApiMiddlewareFactory {
 	constructor(
@@ -19,22 +12,20 @@ export class ImportApiMiddlewareFactory {
 	) {
 	}
 
-	create(): KoaMiddleware<ImportApiMiddlewareState> {
-		return async koaContext => {
-			const { request, response, state: { timer } } = koaContext
-
-			const groupContainer = await this.projectGroupResolver.resolveContainer({ request })
-			koaContext.state.projectGroup = groupContainer.slug
-
-			const authResult = await groupContainer.authenticator.authenticate({ request, timer })
-			koaContext.state.authResult = authResult
+	create(): HttpController {
+		return async ctx => {
+			const { projectGroup, authResult, koa } = ctx
+			const { request, response } = koa
+			if (!authResult) {
+				return new HttpErrorResponse(401, 'Authentication required')
+			}
 
 			if (request.headers['content-type'] !== 'application/x-ndjson') {
-				throw new HttpError(`Unsupported content type`, 400)
+				throw new HttpErrorResponse(400, `Unsupported content type`)
 			}
 
 			if (request.headers['content-encoding'] !== undefined && request.headers['content-encoding'] !== 'gzip') {
-				throw new HttpError(`Unsupported content encoding`, 415)
+				throw new HttpErrorResponse(415, `Unsupported content encoding`)
 			}
 
 			response.headers['Content-Type'] = 'application/json'
@@ -42,7 +33,7 @@ export class ImportApiMiddlewareFactory {
 			try {
 				const isGzip = request.headers['content-encoding'] === 'gzip'
 				const commands = fromBuffer(isGzip ? request.req.pipe(createGunzip()) : request.req)
-				await this.importExecutor.import(groupContainer, authResult, commands)
+				await this.importExecutor.import(projectGroup, authResult, commands)
 				response.status = 200
 				response.body = { ok: true }
 

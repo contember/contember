@@ -12,9 +12,7 @@ describe('membership resolver', () => {
 			},
 		}))
 		const resolvedMembership = await membershipResolver.resolveMemberships({
-			request: {
-				get: () => '',
-			},
+			getHeader: () => '',
 			projectSlug: 'test',
 			identity: {
 				identityId: 'd4141336-6512-41ef-a25a-374de35a2806',
@@ -41,9 +39,7 @@ describe('membership resolver', () => {
 			},
 		}))
 		const resolvedMembership = await membershipResolver.resolveMemberships({
-			request: {
-				get: () => '',
-			},
+			getHeader: () => '',
 			projectSlug: 'test',
 			identity: {
 				identityId: 'd4141336-6512-41ef-a25a-374de35a2806',
@@ -68,11 +64,9 @@ describe('membership resolver', () => {
 			},
 		}))
 		const resolvedMembership = await membershipResolver.resolveMemberships({
-			request: {
-				get: () => JSON.stringify({
-					memberships: [{ role: 'test', variables: [{ name: 'lang', values: [JSON.stringify({ eq: 'cs' })] }] }],
-				}),
-			},
+			getHeader: () => JSON.stringify({
+				memberships: [{ role: 'test', variables: [{ name: 'lang', values: [JSON.stringify({ eq: 'cs' })] }] }],
+			}),
 			projectSlug: 'test',
 			identity: {
 				identityId: 'd4141336-6512-41ef-a25a-374de35a2806',

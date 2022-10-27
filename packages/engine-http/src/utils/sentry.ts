@@ -1,6 +1,6 @@
 import * as Sentry from '@sentry/node'
 import { LogEntry, LoggerHandler, LogLevel, LogLevels } from '@contember/logger'
-import { LoggerRequestSymbol } from '../common'
+import { LoggerRequestBody } from '../application'
 
 export class SentryLoggerHandler implements LoggerHandler {
 	constructor(
@@ -30,7 +30,7 @@ export class SentryLoggerHandler implements LoggerHandler {
 					...event,
 					request: {
 						url: entry.loggerAttributes.url ?? entry.ownAttributes.url,
-						data: entry.loggerAttributes[LoggerRequestSymbol]?.body,
+						data: entry.loggerAttributes[LoggerRequestBody],
 					},
 				}
 			})

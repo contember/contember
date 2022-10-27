@@ -1,5 +1,5 @@
 export * from './ImportApiMiddlewareFactory'
-export * from './ExportApiMiddlewareFactory'
+export * from './ExportApiControllerFactory'
 
 export * from './ImportExecutor'
 export * from './ExportExecutor'

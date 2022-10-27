@@ -100,14 +100,14 @@ const logger = createDefaultLogger()
 			// this line somehow ensures, that worker waits for termination of all jobs
 			process.on('disconnect', () => timeout(0))
 
-			const httpServer = container.koa.listen(port, () => notifyWorkerStarted())
+			const httpServer = container.application.listen(port, () => notifyWorkerStarted())
 			terminationJobs.push(async () => {
 				await new Promise<any>(resolve => httpServer.close(resolve))
 				logger.info('API server terminated')
 			})
 		}
 	} else {
-		const httpServer = container.koa.listen(port, () => printStarted())
+		const httpServer = container.application.listen(port, () => printStarted())
 		terminationJobs.push(async () => {
 			await new Promise<any>(resolve => httpServer.close(resolve))
 			logger.info('API server terminated')

@@ -1,14 +1,15 @@
 import { ProcessType } from './utils'
 import { createColllectHttpMetricsMiddleware, createShowMetricsMiddleware } from './http'
-import { compose, CryptoWrapper, Koa, KoaMiddleware } from '@contember/engine-http'
-import { createSecretKey } from 'crypto'
-import { ProjectGroupContainerResolver } from './projectGroup/ProjectGroupContainerResolver'
-import { ProjectGroupResolver } from './projectGroup/ProjectGroupResolver'
 import {
+	CryptoWrapper,
+	Koa,
 	MasterContainer as BaseMasterContainer,
 	MasterContainerArgs as BaseMasterContainerArgs,
 	MasterContainerFactory as BaseMasterContainerFactory,
 } from '@contember/engine-http'
+import { createSecretKey } from 'crypto'
+import { ProjectGroupContainerResolver } from './projectGroup/ProjectGroupContainerResolver'
+import { ProjectGroupResolver } from './projectGroup/ProjectGroupResolver'
 import { ServerConfig } from './config/configSchema'
 import { PrometheusRegistryFactory } from './prometheus/PrometheusRegistryFactory'
 import { ProjectGroupContainerMetricsHook } from './prometheus/ProjectGroupContainerMetricsHook'
@@ -43,11 +44,8 @@ export class MasterContainerFactory {
 				projectGroupContainerMetricsHook.register(registry)
 				return registry
 			})
-			.replaceService<'koaMiddlewares', KoaMiddleware<any>>('koaMiddlewares', ({ inner, promRegistry }) => {
-				return compose([
-					createColllectHttpMetricsMiddleware(promRegistry),
-					inner,
-				])
+			.setupService('application', (app, { promRegistry }) => {
+				app.addMiddleware(createColllectHttpMetricsMiddleware(promRegistry))
 			})
 			.replaceService('projectGroupResolver', ({ projectGroupContainerResolver }) => {
 				const encryptionKey = serverConfig.projectGroup?.configEncryptionKey
@@ -70,6 +68,6 @@ export class MasterContainerFactory {
 
 	create(args: MasterContainerArgs): MasterContainer {
 		const container = this.createBuilder(args).build()
-		return container.pick('initializer', 'koa', 'monitoringKoa', 'providers')
+		return container.pick('initializer', 'application', 'monitoringKoa', 'providers')
 	}
 }

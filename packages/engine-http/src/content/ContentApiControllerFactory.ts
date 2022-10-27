@@ -1,28 +1,15 @@
-import { KoaMiddleware, KoaRequestState } from '../koa'
-import { ProjectInfoMiddlewareState } from '../project-common'
-import { AuthResult, HttpError, LoggerMiddlewareState, TimerMiddlewareState } from '../common'
+import { HttpController } from '../application'
+import { ProjectContextResolver } from '../project-common'
+import { HttpErrorResponse, HttpResponse } from '../common'
 import { StageBySlugQuery } from '@contember/engine-system-api'
 import { NotModifiedChecker } from './NotModifiedChecker'
 import { ContentGraphQLContextFactory } from './ContentGraphQLContextFactory'
 import { ContentQueryHandler, ContentQueryHandlerFactory } from './ContentQueryHandlerFactory'
 import { GraphQLSchema } from 'graphql'
-import { GraphQLKoaState } from '../graphql'
-import { ProjectContextResolver } from '../project-common'
-
-type ContentApiMiddlewareKoaState =
-	& TimerMiddlewareState
-	& KoaRequestState
-	& GraphQLKoaState
-	& ProjectInfoMiddlewareState
-	& LoggerMiddlewareState
-	& {
-		authResult: AuthResult
-	}
-
 
 const debugHeader = 'x-contember-debug'
 
-export class ContentApiMiddlewareFactory {
+export class ContentApiControllerFactory {
 	constructor(
 		private readonly notModifiedChecker: NotModifiedChecker,
 		private readonly contentGraphqlContextFactory: ContentGraphQLContextFactory,
@@ -31,34 +18,43 @@ export class ContentApiMiddlewareFactory {
 	) {
 	}
 
-	create(): KoaMiddleware<ContentApiMiddlewareKoaState> {
+	create(): HttpController {
 		const handlerCache = new WeakMap<GraphQLSchema, ContentQueryHandler>()
-		return async koaContext => {
-			const { request, response, state: { timer, params } } = koaContext
-			const { groupContainer, projectContainer, requestLogger, project, authResult } = await this.projectContextResolver.resolve(koaContext)
+		return async context => {
+			const { params, timer, projectGroup, authResult, request, logger, koa } = context
+			if (!authResult) {
+				return new HttpErrorResponse(401, 'Authentication required')
+			}
+			const { projectContainer, project } = await this.projectContextResolver.resolve(context)
 
 			const systemDatabase = projectContainer.systemDatabaseContextFactory.create()
 			const stage = await systemDatabase.queryHandler.fetch(new StageBySlugQuery(params.stageSlug))
 			if (!stage) {
-				throw new HttpError(`Stage ${params.stageSlug} NOT found`, 404)
+				return new HttpErrorResponse(404, `Stage ${params.stageSlug} NOT found`)
 			}
 			const notModifiedRes = await this.notModifiedChecker.checkNotModified({
-				request,
-				timer,
+				request: context.request,
+				body: context.body,
+				timer: context.timer,
 				systemDatabase,
 				stageId: stage.id,
 			})
 			if (notModifiedRes?.isModified === false) {
-				response.status = 304
-				return
+				return new HttpResponse(304)
 			}
 
 			const schema = await projectContainer.contentSchemaResolver.getSchema(systemDatabase, stage.slug)
 
 			const { effective: memberships, fetched: fetchedMemberships } = await timer(
 				'MembershipFetch',
-				() => groupContainer.projectMembershipResolver.resolveMemberships({
-					request,
+				() => projectGroup.projectMembershipResolver.resolveMemberships({
+					getHeader: header => {
+						const value = request.headers[header]
+						if (Array.isArray(value)) {
+							throw new HttpErrorResponse(400, `Invalid format of ${header}`)
+						}
+						return value ?? ''
+					},
 					acl: schema.acl,
 					projectSlug: project.slug,
 					identity: {
@@ -68,16 +64,18 @@ export class ContentApiMiddlewareFactory {
 					},
 				}),
 			)
-			requestLogger.debug('Memberships fetched', { memberships })
+			logger.debug('Memberships fetched', { memberships })
 
-			const debugHeaderValue = request.get(debugHeader).trim()
+			const debugHeaderValue = request.headers[debugHeader]
+			if (Array.isArray(debugHeaderValue)) {
+				return new HttpErrorResponse(400, `Invalid format of ${debugHeader}`)
+			}
 			const requestDebug = debugHeaderValue === '1' && fetchedMemberships.some(it => schema.acl.roles[it.role]?.debug)
 			if (requestDebug) {
-				koaContext.state.sendServerTimingHeader = true
+				context.requestDebugMode = true
 			}
 
 			const projectRoles = memberships.map(it => it.role)
-
 
 			const [graphQlSchema, permissions] = await timer('GraphQLSchemaCreate', () => projectContainer.graphQlSchemaFactory.create(schema, {
 				projectRoles: projectRoles,
@@ -93,12 +91,12 @@ export class ContentApiMiddlewareFactory {
 				return newHandler
 			})()
 
-			await requestLogger.scope(async logger => {
+			await logger.scope(async logger => {
 				logger.debug('Content query processing started')
 
 				await timer('GraphQL', () => handler({
-					request,
-					response,
+					request: koa.request,
+					response: koa.response,
 					createContext: ({ operation }) => {
 						const connection = operation === 'query' ? projectContainer.readConnection : projectContainer.connection
 						const contentDatabase = connection.createClient(stage.schema, { module: 'content' })
@@ -110,7 +108,7 @@ export class ContentApiMiddlewareFactory {
 							permissions,
 							schema,
 							timer,
-							koaContext,
+							koaContext: koa,
 							requestDebug,
 							systemSchema: projectContainer.systemDatabaseContextFactory.schemaName,
 							stage,
@@ -121,7 +119,7 @@ export class ContentApiMiddlewareFactory {
 			})
 
 
-			notModifiedRes?.setResponseHeader(response)
+			notModifiedRes?.setResponseHeader(context.response)
 		}
 	}
 }

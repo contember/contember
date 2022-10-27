@@ -1,23 +1,12 @@
-import {
-	RenderPageOptions as PlaygroundRenderPageOptions,
-	renderPlaygroundPage,
-} from '@apollographql/graphql-playground-html'
-import accepts from 'accepts'
-import { get, KoaContext, KoaMiddleware, KoaRequestState } from '../koa'
+import { renderPlaygroundPage } from '@apollographql/graphql-playground-html'
+import { HttpController } from '../application'
+import { HttpResponse } from '../common'
 
-export const createPlaygroundMiddleware = (): KoaMiddleware<KoaRequestState> => {
-	return get('/', (ctx: KoaContext<KoaRequestState>, next) => {
-		const accept = accepts(ctx.req)
-		const types = accept.types() as string[]
-		const prefersHTML = types.find((x: string) => x === 'text/html' || x === 'application/json') === 'text/html'
-		if (!prefersHTML) {
-			return next()
-		}
-		const playgroundRenderPageOptions: PlaygroundRenderPageOptions = {
-			endpoint: ctx.originalUrl,
-		}
-
-		ctx.set('Content-Type', 'text/html')
-		ctx.body = renderPlaygroundPage(playgroundRenderPageOptions)
-	})
-}
+export const playgroundController: HttpController = ctx =>
+	new HttpResponse(
+		200,
+		renderPlaygroundPage({
+			endpoint: ctx.path,
+		}),
+		'text/html',
+	)

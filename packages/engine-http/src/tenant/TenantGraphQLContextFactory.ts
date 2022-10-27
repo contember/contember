@@ -1,7 +1,7 @@
 import { TenantGraphQLContext } from './TenantGraphQLHandlerFactory'
 import { AuthResult } from '../common'
 import { TenantContainer } from '@contember/engine-tenant-api'
-import { KoaContext } from '../koa'
+import { KoaContext } from '../application'
 import { GraphQLKoaState } from '../graphql'
 import { Logger } from '@contember/logger'
 

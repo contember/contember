@@ -48,7 +48,7 @@ process.on('warning', message => {
 
 	const initializedProjects: string[] = await container.initializer.initialize()
 
-	const httpServer = container.koa.listen(serverConfig.port, () => {
+	const httpServer = container.application.listen(serverConfig.port, () => {
 		logger.info(`Contember API running on http://localhost:${(serverConfig.port)}`)
 		logger.info(initializedProjects.length ? `Initialized projects: ${initializedProjects.join(', ')}` : 'No project initialized')
 	})

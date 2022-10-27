@@ -7,7 +7,7 @@ import { DatabaseContext, StageBySlugQuery } from '@contember/engine-system-api'
 import { DbColumnSchema, TransferMapping, TransferTableMapping } from './TransferMapping'
 import { ContentSchemaTransferMappingFactory } from './ContentSchemaTransferMappingFactory'
 import { SystemSchemaTransferMappingFactory } from './SystemSchemaTransferMappingFactory'
-import { AuthResult, HttpError } from '../common'
+import { AuthResult, HttpErrorResponse } from '../common'
 import { ProjectGroupContainer } from '../projectGroup/ProjectGroupContainer'
 
 type Cell = boolean | number | string | null
@@ -228,7 +228,7 @@ export class ImportExecutor {
 
 	private async requireImportAccess(groupContainer: ProjectGroupContainer, schema: Schema, authResult: AuthResult, projectSlug: string, kind: 'content' | 'system') {
 		const { effective: memberships } = await groupContainer.projectMembershipResolver.resolveMemberships({
-			request: { get: () => '' },
+			getHeader: () => '',
 			acl: schema.acl,
 			projectSlug: projectSlug,
 			identity: {
@@ -240,7 +240,7 @@ export class ImportExecutor {
 		const projectRoles = memberships.map(it => it.role)
 
 		if (!projectRoles.some(role => schema.acl.roles[role]?.[kind]?.import)) {
-			throw new HttpError(`You are not allowed to import ${kind} in ${projectSlug}`, 403)
+			throw new HttpErrorResponse(403, `You are not allowed to import ${kind} in ${projectSlug}`)
 		}
 	}
 

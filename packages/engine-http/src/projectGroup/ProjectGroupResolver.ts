@@ -1,8 +1,8 @@
 import { ProjectGroupContainer } from './ProjectGroupContainer'
-import { Request } from 'koa'
+import { IncomingMessage } from 'http'
 
 export interface ProjectGroupResolver {
-	resolveContainer({ request }: { request: Request }): Promise<ProjectGroupContainer>
+	resolveContainer({ request }: { request: IncomingMessage }): Promise<ProjectGroupContainer>
 }
 
 export class SingleProjectGroupResolver {

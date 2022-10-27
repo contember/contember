@@ -3,23 +3,25 @@ import { KoaContext, KoaMiddleware } from './types'
 import { AuthResult, HttpErrorResponse, HttpResponse } from '../common'
 import Koa from 'koa'
 import * as http from 'http'
-import { IncomingMessage, ServerResponse } from 'http'
-import { WebSocketServer } from 'ws'
+import { IncomingMessage, Server, ServerResponse } from 'http'
+import { WebSocket, WebSocketServer } from 'ws'
 import { FingerCrossedLoggerHandler, Logger } from '@contember/logger'
 import koaCompress from 'koa-compress'
 import bodyParser from 'koa-bodyparser'
 import { ServerConfig } from '../config/config'
 import corsMiddleware from '@koa/cors'
-import { Readable } from 'stream'
+import { Duplex, Readable } from 'stream'
 import { ProjectGroupResolver } from '../projectGroup/ProjectGroupResolver'
 import { ProjectGroupContainer } from '../projectGroup/ProjectGroupContainer'
+import stream from 'node:stream'
 
-
+type Route<C> = { match: RequestMatcher; controller: C; module: string }
 export class Application {
 
 	private middlewares: KoaMiddleware<any>[] = []
 
-	private routes: { match: RequestMatcher; controller: HttpController; module: string }[] = []
+	private routes: Route<HttpController>[] = []
+	private websocketRoutes: Route<WebSocketController>[] = []
 
 	constructor(
 		private readonly projectGroupResolver: ProjectGroupResolver,
@@ -34,7 +36,6 @@ export class Application {
 		this.middlewares.push(middleware)
 	}
 
-
 	public addRoute(module: string, mask: string, controller: HttpController): void {
 		this.routes.push({
 			module,
@@ -43,9 +44,17 @@ export class Application {
 		})
 	}
 
-	listen: http.Server['listen'] = (...args) => {
+	public addWebsocketRoute(module: string, mask: string, controller: WebSocketController): void {
+		this.websocketRoutes.push({
+			module,
+			controller,
+			match: createRequestMatcher(mask),
+		})
+	}
+
+	async listen(): Promise<RunningApplication> {
 		const koa = new Koa()
-		const ws = new WebSocketServer({ noServer: true })
+		const wss = new WebSocketServer({ noServer: true })
 		for (const middleware of this.middlewares) {
 			koa.use(middleware)
 		}
@@ -64,19 +73,105 @@ export class Application {
 		})
 
 		const server = http.createServer(koa.callback())
+		const abortController = new AbortController()
 
-		// server.on('upgrade', (req, socket, head) => {
-		// 	ws.handleUpgrade()
-		// })
-		return server.listen(...(args as any))
+		const wsRequests: (Promise<void>)[] = []
+		server.on('upgrade', (req, socket, head) => {
+			 wsRequests.push(this.handleWebsocketRequest(wss, abortController.signal, req, socket, head))
+		})
+		await new Promise<void>(resolve => {
+			server.listen(this.serverConfig.port, () => resolve())
+		})
+
+		return {
+			server,
+			close: async () => {
+				abortController.abort()
+				await Promise.all(wsRequests)
+				await new Promise(resolve => server.close(resolve))
+			},
+		}
+	}
+
+	private async handleWebsocketRequest(
+		wss: WebSocketServer,
+		abortSignal: AbortSignal,
+		req: IncomingMessage,
+		socket: stream.Duplex,
+		head: Buffer,
+	): Promise<void> {
+		let webSocketContext: WebSocketContext | null = null
+		let requestLogger = this.logger
+		const { timer, send: sendTimer } = this.createTimer()
+		try {
+			const url = new URL(req.url ?? '/', `http://${req.headers.host}`)
+			const matchedRequest = this.matchRequest(this.websocketRoutes, url)
+			if (!matchedRequest) {
+				throw new HttpErrorResponse(404, 'Route not found')
+			}
+			requestLogger = this.createRequestLogger(req, undefined, matchedRequest.module)
+
+			const groupContainer = await this.projectGroupResolver.resolveContainer({ request: req })
+			const authResult = await groupContainer.authenticator.authenticate({ request: req, timer })
+			requestLogger.debug('User authenticated', { authResult })
+			requestLogger = requestLogger.child({
+				user: authResult?.identityId,
+			})
+
+			const ws = await new Promise<WebSocket>(resolve => wss.handleUpgrade(req, socket, head, (ws, request) => {
+				resolve(ws)
+			}))
+			const wsEstablished = new Date().getTime()
+			webSocketContext = {
+				ws,
+				abortSignal,
+				logger: requestLogger,
+				timer,
+				url,
+				request: req,
+				requestDebugMode: false,
+				authResult,
+				params: matchedRequest.params,
+				projectGroup: groupContainer,
+			}
+			await matchedRequest.controller(webSocketContext)
+			requestLogger.debug('Websocket connection established')
+			ws.on('error', e => {
+				requestLogger.error(e, {
+					websocketOpenMs: new Date().getTime() - wsEstablished,
+				})
+			})
+
+			return new Promise<void>(resolve => {
+				ws.on('close', () => {
+					requestLogger.debug('Websocket connection closed', {
+						websocketOpenMs: new Date().getTime() - wsEstablished,
+					})
+					resolve()
+				})
+			})
+		} catch (e) {
+			if (e instanceof HttpResponse) {
+				this.sendRawHttpResponse(socket, e)
+			} else {
+				this.sendRawHttpResponse(socket, new HttpErrorResponse(500, 'Internal server error'))
+				requestLogger.error(e)
+			}
+			requestLogger.debug('Websocket connection failed')
+		} finally {
+			sendTimer({
+				requestDebugMode: false,
+				logger: requestLogger,
+			})
+		}
 	}
 
 	private async handleHttpRequest(ctx: KoaContext<{module?: string}>) {
 		let httpContext: HttpContext | null = null
 		let requestLogger = this.logger
-		const { timer, send: sendTimer } = this.createTimer(requestLogger)
+		const { timer, send: sendTimer } = this.createTimer()
 		try {
-			const matchedRequest = this.matchRequest(ctx.request)
+			const matchedRequest = this.matchRequest(this.routes, ctx.request.URL)
 			if (!matchedRequest) {
 				throw new HttpErrorResponse(404, 'Route not found')
 			}
@@ -101,7 +196,7 @@ export class Application {
 				httpContext = {
 					koa: ctx,
 					body: ctx.request.body,
-					path: ctx.request.path,
+					url: ctx.request.URL,
 					logger,
 					timer,
 					request: ctx.req,
@@ -111,7 +206,6 @@ export class Application {
 					params: matchedRequest.params,
 					projectGroup: groupContainer,
 				}
-				requestLogger = logger
 				return await matchedRequest.controller(httpContext)
 			})
 			if (response) {
@@ -129,6 +223,7 @@ export class Application {
 				response: ctx.res,
 				body: ctx.response.body,
 				requestDebugMode: (httpContext as HttpContext | null)?.requestDebugMode ?? false,
+				logger: requestLogger,
 			})
 			requestLogger.debug('Request processing finished')
 		}
@@ -144,6 +239,25 @@ export class Application {
 		}
 	}
 
+	private sendRawHttpResponse(socket: Duplex, response: HttpResponse) {
+		const headers: Record<string, string> = {
+			'Connection': 'close',
+			'Content-Type': response.contentType ?? 'text/plain',
+			'Content-Length': String(response.body?.length ?? 0),
+		}
+
+		socket.once('finish', socket.destroy)
+
+		socket.end(
+			`HTTP/1.1 ${response.code} ${http.STATUS_CODES[response.code]}\r\n` +
+			Object.keys(headers)
+				.map(h => `${h}: ${headers[h]}`)
+				.join('\r\n') +
+			'\r\n\r\n' +
+			response.body ?? '',
+		)
+	}
+
 	private createRequestLogger(request: IncomingMessage, body: any, module: string): Logger {
 		return this.logger.child({
 			method: request.method,
@@ -156,7 +270,7 @@ export class Application {
 		})
 	}
 
-	private createTimer(logger: Logger) {
+	private createTimer() {
 		const times: EventTime[] = []
 		const globalStart = new Date().getTime()
 		const timer: Timer = async (name: string, cb) => {
@@ -173,16 +287,16 @@ export class Application {
 			return res as any
 		}
 
-		const send = (ctx: { response: ServerResponse; body: unknown; requestDebugMode: boolean }) => {
-			if (!ctx.response.headersSent && (ctx.requestDebugMode || this.debugMode) && times.length) {
+		const send = (ctx: { response?: ServerResponse; body?: unknown; requestDebugMode: boolean; logger: Logger }) => {
+			if (ctx.response && !ctx.response.headersSent && (ctx.requestDebugMode || this.debugMode) && times.length) {
 				ctx.response.setHeader('server-timing', times.map(it => `${it.label};desc="${it.label} T+${it.start}";dur=${it.duration ?? -1}`).join(', '))
 			}
 
 			const emit = () => {
 				const total = new Date().getTime() - globalStart
 				const timeLabel = total > 500 ? 'TIME_SLOW' : 'TIME_OK'
-				logger.info(ctx.response.statusCode < 400 ? `Request successful` : 'Request failed', {
-					status: ctx.response.statusCode,
+				ctx.logger.info(!ctx.response ? 'Connection established' : ctx.response.statusCode < 400 ? `Request successful` : 'Request failed', {
+					status: ctx.response?.statusCode,
 					timeLabel: timeLabel,
 					totalTimeMs: total,
 					events: times,
@@ -209,9 +323,9 @@ export class Application {
 		return { timer, send }
 	}
 
-	private matchRequest(request: { path: string; method: string }): { params: Params; controller: HttpController; module: string } | null {
-		for (const route of this.routes) {
-			const params = route.match(request)
+	private matchRequest<C>(routes: Route<C>[], url: URL): { params: Params; controller: C; module: string } | null {
+		for (const route of routes) {
+			const params = route.match({ url })
 			if (params !== null) {
 				return { params, controller: route.controller, module: route.module }
 			}
@@ -229,7 +343,7 @@ export interface ApplicationContext {
 	logger: Logger
 	timer: Timer
 	request: IncomingMessage
-	path: string
+	url: URL
 
 	projectGroup: ProjectGroupContainer
 	authResult: AuthResult | null
@@ -244,15 +358,18 @@ export interface HttpContext extends ApplicationContext {
 	response: ServerResponse
 }
 
-export interface WebSocketContext {
-
+export interface WebSocketContext extends ApplicationContext {
+	ws: WebSocket
+	abortSignal: AbortSignal
 }
 
 export type HttpController = (context: HttpContext) => Promise<HttpErrorResponse | undefined | void> | HttpErrorResponse | undefined | void
 
+export type WebSocketController = (context: WebSocketContext) => void
+
 type Params = { [param: string]: string }
 
-type RequestMatcher = (args: { path: string; method: string }) => Params | null
+type RequestMatcher = (args: { url: URL }) => Params | null
 const createRequestMatcher = (
 	mask: string,
 ): RequestMatcher => {
@@ -268,8 +385,13 @@ const createRequestMatcher = (
 	}
 
 	return request => {
-		return match(request.path)
+		return match(request.url.pathname)
 	}
 }
 
 export const LoggerRequestBody = Symbol('RequestBody')
+
+export interface RunningApplication {
+	close(): Promise<void>
+	readonly server: Server
+}

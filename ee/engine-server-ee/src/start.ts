@@ -84,6 +84,15 @@ const logger = createDefaultLogger()
 		}
 	}
 
+	const startApplication = async () => {
+		const httpServerPromise = await container.application.listen()
+		terminationJobs.push(async () => {
+			await (await httpServerPromise).close()
+			logger.info('API server terminated')
+		})
+		await httpServerPromise
+	}
+
 	if (isClusterMode) {
 		if (cluster.isMaster) {
 			logger.info(`Master ${process.pid} is running`)
@@ -100,18 +109,12 @@ const logger = createDefaultLogger()
 			// this line somehow ensures, that worker waits for termination of all jobs
 			process.on('disconnect', () => timeout(0))
 
-			const httpServer = container.application.listen(port, () => notifyWorkerStarted())
-			terminationJobs.push(async () => {
-				await new Promise<any>(resolve => httpServer.close(resolve))
-				logger.info('API server terminated')
-			})
+			await startApplication()
+			notifyWorkerStarted()
 		}
 	} else {
-		const httpServer = container.application.listen(port, () => printStarted())
-		terminationJobs.push(async () => {
-			await new Promise<any>(resolve => httpServer.close(resolve))
-			logger.info('API server terminated')
-		})
+		await startApplication()
+		printStarted()
 	}
 
 })().catch(e => {

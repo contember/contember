@@ -6,7 +6,7 @@ export const playgroundController: HttpController = ctx =>
 	new HttpResponse(
 		200,
 		renderPlaygroundPage({
-			endpoint: ctx.path,
+			endpoint: ctx.url.pathname,
 		}),
 		'text/html',
 	)

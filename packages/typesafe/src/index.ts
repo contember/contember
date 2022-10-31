@@ -242,7 +242,7 @@ export const union = <T extends Type<Json>[]>(...inner: T): Type<ReturnType<Unpa
 	return type
 }
 
-export const discriminatedUnion = <T extends Type<JsonObject>[]>(field: string, ...inner: T): Type<ReturnType<Unpacked<T>>> => {
+export const partiallyDiscriminatedUnion = <T extends Type<JsonObject>[]>(field: string, ...inner: T): Type<ReturnType<Unpacked<T>>> => {
 	const type = (input: unknown, path: PropertyKey[] = []): ReturnType<Unpacked<T>> => {
 		const errors = []
 		for (const innerInner of inner) {
@@ -262,6 +262,25 @@ export const discriminatedUnion = <T extends Type<JsonObject>[]>(field: string, 
 		throw new ParseError(path, 'all variants of union has failed:\n' + errors.join('\n'))
 	}
 
+	type.inner = inner
+
+	return type
+}
+
+export const discriminatedUnion = <F extends string, T extends {[key: string]: JsonObject}>(field: F, inner: {[K in keyof T]: Type<T[K]>}): Type<{ [K in keyof T]: { [X in F]: K } & T[K] }[keyof T]> => {
+	const type = (input: unknown, path: PropertyKey[] = []): { [K in keyof T]: { [X in F]: K } & T[K] }[keyof T] => {
+		if (input === null || typeof input !== 'object') throw ParseError.format(input, path, 'object')
+		const key = (input as any)[field]
+		if (typeof key !== 'string') throw ParseError.format(key, [...path, field], 'string')
+
+		const discriminatedType = inner[key]
+		if (discriminatedType === undefined) throw ParseError.format(key, [...path, field], Object.keys(inner).join('|'))
+
+		const { [field]: _, ...inputWithoutDiscr } = input
+
+		return { [field]: key, ...discriminatedType(inputWithoutDiscr) }
+
+	}
 	type.inner = inner
 
 	return type

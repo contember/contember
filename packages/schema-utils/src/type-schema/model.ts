@@ -125,7 +125,7 @@ const columnSchema = Typesafe.intersection(
 )
 const columnSchemaCheck: Typesafe.Equals<Model.AnyColumn, ReturnType<typeof columnSchema>> = true
 
-const fieldSchema: Typesafe.Type<Model.AnyField> = Typesafe.discriminatedUnion(
+const fieldSchema: Typesafe.Type<Model.AnyField> = Typesafe.partiallyDiscriminatedUnion(
 	'type',
 	oneHasOneInverseRelationSchema,
 	oneHasOneOwningRelationSchema,

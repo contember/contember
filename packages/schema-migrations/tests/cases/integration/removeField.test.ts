@@ -2,6 +2,8 @@ import { testMigrations } from '../../src/tests'
 import { SchemaBuilder } from '@contember/schema-definition'
 import { Model } from '@contember/schema'
 import { SQL } from '../../src/tags'
+import { SchemaDefinition as def } from '@contember/schema-definition'
+
 
 testMigrations('remove relation (many has one)', {
 	originalSchema: new SchemaBuilder()
@@ -128,3 +130,59 @@ testMigrations('remove relation inverse side', {
 	],
 	sql: SQL``,
 })
+
+
+namespace DropIndexOrigSchema {
+
+	@def.Unique('title', 'author')
+	@def.Index('title', 'author')
+	export class Article {
+		title = def.stringColumn()
+		author = def.manyHasOne(Author)
+	}
+
+	export class Author {
+		name = def.stringColumn()
+	}
+}
+
+namespace DropIndexUpSchema {
+	@def.Unique('title', 'author')
+	@def.Index('title', 'author')
+	export class Article {
+		title = def.stringColumn()
+		author = def.stringColumn()
+	}
+
+	export class Author {
+		name = def.stringColumn()
+	}
+}
+
+
+testMigrations('test drop index / unique when removing a field', {
+	originalSchema: def.createModel(DropIndexOrigSchema),
+	updatedSchema: def.createModel(DropIndexUpSchema),
+	diff: [{
+		modification: 'removeField',
+		entityName: 'Article',
+		fieldName: 'author',
+	}, {
+		modification: 'createColumn',
+		entityName: 'Article',
+		field: { name: 'author', columnName: 'author', nullable: true, type: 'String', columnType: 'text' },
+	}, {
+		modification: 'createUniqueConstraint',
+		entityName: 'Article',
+		unique: { name: 'unique_Article_title_author_7157ea', fields: ['title', 'author'] },
+	}, {
+		modification: 'createIndex',
+		entityName: 'Article',
+		index: { name: 'idx_Article_title_author_7157ea', fields: ['title', 'author'] },
+	}],
+	sql: SQL`ALTER TABLE "article" DROP "author_id";
+ALTER TABLE "article" ADD "author" text;
+ALTER TABLE "article" ADD CONSTRAINT "unique_Article_title_author_7157ea" UNIQUE ("title", "author");
+CREATE INDEX "idx_Article_title_author_7157ea" ON "article" ("title", "author");`,
+})
+

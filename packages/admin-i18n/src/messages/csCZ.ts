@@ -61,7 +61,7 @@ export const csCZ: AdminDictionary = {
 			matches: 'Obsahuje',
 			doesNotMatch: 'Neobsahuje',
 			matchesExactly: 'Přesně odpovídá',
-			startsWith: 'Začáná na',
+			startsWith: 'Začíná na',
 			endsWith: 'Končí na',
 
 			queryPlaceholder: 'Hledaný výraz',

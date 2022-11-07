@@ -4,11 +4,18 @@ import { ProjectContainerStore } from './ProjectContainerStore'
 import { ProjectConfigResolver } from '../config/projectConfigResolver'
 import { TenantConfig } from '../config/config'
 import { Logger } from '@contember/logger'
+import { EventEmitter, EventManager } from '@contember/engine-common'
 
-export class ProjectContainerResolver {
+export type ProjectContainerResolverEvents = {
+	create: (args: { container: ProjectContainer}) => (() => void) | void
+	destroy: (args: { container: ProjectContainer}) => void
+}
+
+export class ProjectContainerResolver implements EventEmitter<ProjectContainerResolverEvents> {
 	private projectContainers = new ProjectContainerStore()
+	private eventManager = new EventManager<ProjectContainerResolverEvents>()
 
-	public readonly onCreate: ((container: ProjectContainer) => void | (() => void))[] = []
+	public readonly on = this.eventManager.on.bind(this.eventManager)
 
 	constructor(
 		private readonly projectContainerFactory: ProjectContainerFactory,
@@ -29,7 +36,7 @@ export class ProjectContainerResolver {
 			const existingAwaited = await existing
 			const state = await this.projectManager.getProjectState(this.tenantDatabase, slug, existingAwaited.timestamp)
 			if (state === 'valid') {
-				return (await existingAwaited).container
+				return existingAwaited.container
 			}
 			await this.destroyContainer(slug)
 			if (state === 'not_found') {
@@ -54,7 +61,8 @@ export class ProjectContainerResolver {
 				project: projectConfig,
 			})
 			await projectContainer.projectInitializer.initialize(logger ?? projectContainer.logger)
-			const cleanups = this.onCreate.map(it => it(projectContainer) || (() => null))
+
+			const cleanups = this.eventManager.fire('create', { container: projectContainer }).map(it => it ?? (() => null))
 			return {
 				container: projectContainer,
 				cleanups,
@@ -68,6 +76,7 @@ export class ProjectContainerResolver {
 		if (existing) {
 			const existingAwaited = await existing
 			existingAwaited.cleanups.forEach(it => it())
+			this.eventManager.fire('destroy', ({ container: existingAwaited.container }))
 			existingAwaited.container.project.alias?.forEach(it => this.projectContainers.removeAlias(it))
 			this.projectContainers.removeContainer(slug)
 		}

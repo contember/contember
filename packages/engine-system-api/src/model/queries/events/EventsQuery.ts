@@ -6,11 +6,11 @@ import {
 	SelectBuilder,
 	SelectBuilderSpecification, Value,
 } from '@contember/database'
-import { AnyEvent, ContentEvent } from '@contember/engine-common'
+import { ContentEvent } from '../../events'
 import { EventsFilter, EventsFilterDate, EventsOrder } from '../../../schema'
 import { createEventsFromRows, EventRow } from './EventQueryHelpers'
 
-export class EventsQuery extends DatabaseQuery<AnyEvent[]> {
+export class EventsQuery extends DatabaseQuery<ContentEvent[]> {
 	constructor(
 		private readonly filter: EventsFilter,
 		private readonly order: EventsOrder,

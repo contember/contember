@@ -1,7 +1,10 @@
-import { EventType } from './EventType'
+export enum EventType {
+	delete = 'delete',
+	update = 'update',
+	create = 'create',
+}
 
 export type ContentEvent = UpdateEvent | CreateEvent | DeleteEvent
-export type AnyEvent = ContentEvent
 
 export interface Event {
 	readonly type: EventType
@@ -23,7 +26,8 @@ export class UpdateEvent implements Event {
 		public readonly rowId: string[],
 		public readonly tableName: string,
 		public readonly values: { [column: string]: any },
-	) {}
+	) {
+	}
 }
 
 export class CreateEvent implements Event {
@@ -38,7 +42,8 @@ export class CreateEvent implements Event {
 		public readonly rowId: string[],
 		public readonly tableName: string,
 		public readonly values: { [column: string]: any },
-	) {}
+	) {
+	}
 }
 
 export class DeleteEvent implements Event {
@@ -52,5 +57,7 @@ export class DeleteEvent implements Event {
 		public readonly transactionId: string,
 		public readonly rowId: string[],
 		public readonly tableName: string,
-	) {}
+	) {
+	}
 }
+

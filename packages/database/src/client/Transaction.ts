@@ -1,6 +1,7 @@
 import { Connection } from './Connection'
 import { EventManager } from './EventManager'
 import { wrapIdentifier } from '../utils'
+import { Notification } from 'pg'
 
 export class Transaction implements Connection.TransactionLike {
 	public get isClosed(): boolean {
@@ -8,7 +9,7 @@ export class Transaction implements Connection.TransactionLike {
 	}
 
 	constructor(
-		private readonly connection: Connection.ConnectionLike,
+		private readonly connection: Connection.AcquiredConnectionLike,
 		private readonly savepointManager = new SavepointState(),
 		private readonly state = new TransactionLikeState(),
 	) {
@@ -61,6 +62,9 @@ export class Transaction implements Connection.TransactionLike {
 		await this.query(command)
 		this.state.close()
 	}
+
+	on = this.connection.on.bind(this.connection)
+
 }
 
 class SavePoint implements Connection.TransactionLike {
@@ -68,7 +72,7 @@ class SavePoint implements Connection.TransactionLike {
 	constructor(
 		public readonly savepointName: string,
 		public readonly savepointManager: SavepointState,
-		private readonly connection: Connection.ConnectionLike,
+		private readonly connection: Connection.AcquiredConnectionLike,
 		private readonly state = new TransactionLikeState(),
 	) {
 	}
@@ -125,6 +129,8 @@ class SavePoint implements Connection.TransactionLike {
 		await this.query(sql)
 		this.state.close()
 	}
+
+	on = this.connection.on.bind(this.connection)
 }
 
 class TransactionLikeState {
@@ -143,7 +149,7 @@ class SavepointState {
 	public counter = 1
 
 	public async execute<Result>(
-		connection: Connection.ConnectionLike,
+		connection: Connection.AcquiredConnectionLike,
 		callback: (connection: Connection.TransactionLike) => Promise<Result> | Result,
 	) {
 		const savepointName = `savepoint_${this.counter++}`

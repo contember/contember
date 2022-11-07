@@ -96,6 +96,10 @@ ${expected.sql}`
 		return new Client(this, schema, meta, new EventManager(this.eventManager))
 	}
 
+	public on() {
+		return () => null
+	}
+
 	getPoolStatus() {
 		return undefined
 	}

@@ -4,6 +4,7 @@ import { Pool, PoolConfig, PoolStatus } from './Pool'
 import { createPgClientFactory } from '../utils'
 import { DatabaseConfig } from '../types'
 import { AcquiredConnection } from './AcquiredConnection'
+import { Notification } from 'pg'
 
 class Connection implements Connection.ConnectionLike, Connection.ClientFactory, Connection.PoolStatusProvider {
 	constructor(
@@ -34,7 +35,7 @@ class Connection implements Connection.ConnectionLike, Connection.ClientFactory,
 	}
 
 	async scope<Result>(
-		callback: (connection: Connection.ConnectionLike) => Promise<Result> | Result,
+		callback: (connection: Connection.AcquiredConnectionLike) => Promise<Result> | Result,
 		options: { eventManager?: EventManager } = {},
 	): Promise<Result> {
 		const acquired = await this.pool.acquire()
@@ -106,14 +107,17 @@ namespace Connection {
 		& Connection.ClientFactory
 		& Connection.PoolStatusProvider
 
-	export interface Scopable<Sub> {
+	export interface ConnectionLike<T = {}> extends Transactional, Queryable {
 		scope<Result>(
-			callback: (connection: Sub) => Promise<Result> | Result,
+			callback: (connection: T & AcquiredConnectionLike) => Promise<Result> | Result,
 			options?: { eventManager?: EventManager },
 		): Promise<Result>
 	}
 
-	export interface ConnectionLike extends Transactional, Queryable, Scopable<ConnectionLike> {
+	export interface AcquiredConnectionLike<T = {}> extends ConnectionLike<T> {
+		on(event: 'notification', listener: (message: Notification) => void): () => void
+		on(event: 'end', listener: () => void): () => void
+		on(event: 'error', listener: (error: any) => void): () => void
 	}
 
 	export interface ClientFactory {
@@ -124,7 +128,7 @@ namespace Connection {
 		getPoolStatus(): PoolStatus | undefined
 	}
 
-	export interface TransactionLike extends Transactional, Queryable, Scopable<TransactionLike> {
+	export interface TransactionLike extends AcquiredConnectionLike<TransactionLike> {
 		readonly isClosed: boolean
 
 		rollback(): Promise<void>

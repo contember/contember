@@ -13,8 +13,9 @@ import {
 	UniqueViolationError,
 } from './errors'
 import { PgClient } from './PgClient'
+import { Notification } from 'pg'
 
-export class AcquiredConnection implements Connection.ConnectionLike {
+export class AcquiredConnection implements Connection.AcquiredConnectionLike {
 	private mutex = new Mutex()
 
 	constructor(
@@ -24,7 +25,7 @@ export class AcquiredConnection implements Connection.ConnectionLike {
 	}
 
 	async scope<Result>(
-		callback: (connection: Connection.ConnectionLike) => Promise<Result> | Result,
+		callback: (connection: Connection.AcquiredConnectionLike) => Promise<Result> | Result,
 		options: { eventManager?: EventManager } = {},
 	): Promise<Result> {
 		return await this.mutex.execute(async () => {
@@ -95,6 +96,11 @@ export class AcquiredConnection implements Connection.ConnectionLike {
 				}
 			}
 		})
+	}
+
+	on(event: 'end' | 'notification' | 'error', cb: (() => void) | ((notification: Notification) => void) | ((error: any) => void)) {
+		this.pgClient.on(event as any, cb)
+		return () => this.pgClient.off(event as any, cb)
 	}
 }
 

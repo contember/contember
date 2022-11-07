@@ -1,4 +1,5 @@
 export * from './acl'
 export * from './condition'
 export * from './model'
+export * from './settings'
 export * from './validation'

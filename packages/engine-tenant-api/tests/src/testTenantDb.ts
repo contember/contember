@@ -20,6 +20,7 @@ import { graphql } from 'graphql'
 import { Connection } from '@contember/database'
 import { assert } from 'vitest'
 import { createLogger, JsonStreamLoggerHandler } from '@contember/logger'
+import { emptySchema } from '@contember/schema-utils'
 
 export interface TenantTest {
 	query: GraphQLTestQuery
@@ -34,8 +35,7 @@ export const createUuidGenerator = () => {
 
 export const now = new Date('2019-09-04 12:00')
 const schema: Schema = {
-	model: { entities: {}, enums: {} },
-	validation: {},
+	...emptySchema,
 	acl: {
 		roles: {
 			superEditor: {

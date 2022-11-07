@@ -30,6 +30,7 @@ import {
 import { patchValidationSchemaModification, updateValidationSchemaModification } from './validation'
 import { createIndexModification, removeIndexModification } from './indexes'
 import { SchemaWithMeta } from './utils/schemaMeta'
+import { updateSettingsModification } from './settings'
 
 
 class ModificationHandlerFactory {
@@ -47,6 +48,7 @@ namespace ModificationHandlerFactory {
 	type HandlerMap<D> = { [modificationName: string]: ModificationType<string, D> }
 
 	const handlers = [
+		updateSettingsModification,
 		updateAclSchemaModification,
 		patchAclSchemaModification,
 		createColumnModification,

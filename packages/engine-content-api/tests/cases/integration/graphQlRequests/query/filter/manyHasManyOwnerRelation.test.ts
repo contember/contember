@@ -22,11 +22,13 @@ test('Post by category name (where many has many owning)', async () => {
         }`,
 		executes: [
 			{
-				sql: SQL`select "root_"."id" as "root_id"
-                     from "public"."post" as "root_"
-                     where exists (select 1
-                                            from "public"."post_categories" as "junction_" inner join "public"."category" as "sub_" on "junction_"."category_id" = "sub_"."id"
-                                            where "root_"."id" = "junction_"."post_id"  and "sub_"."name" = ?)`,
+				sql: SQL`
+					select "root_"."id" as "root_id"
+					from "public"."post" as "root_"
+					where exists (select 1
+						from "public"."post_categories" as "root_categories_junction_"
+						inner join  "public"."category" as "root_categories" on  "root_categories_junction_"."category_id" = "root_categories"."id"
+						where "root_"."id" = "root_categories_junction_"."post_id" and "root_categories"."name" = ?)`,
 				parameters: ['Stuff'],
 				response: {
 					rows: [
@@ -73,10 +75,11 @@ test('Post by category ids (where many has many owning)', async () => {
 		executes: [
 			{
 				sql: SQL`select "root_"."id" as "root_id"
-                     from "public"."post" as "root_"
-                     where exists (select 1
-                                            from "public"."post_categories" as "junction_"
-                                            where "root_"."id" = "junction_"."post_id" and "junction_"."category_id" in (?, ?))`,
+						from "public"."post" as "root_"
+						where exists (select 1
+						              from "public"."post_categories" as "root_categories_junction_"
+						              where "root_"."id" = "root_categories_junction_"."post_id" and "root_categories_junction_"."category_id" in (?, ?))
+				`,
 				parameters: [testUuid(10), testUuid(11)],
 				response: {
 					rows: [
@@ -131,12 +134,11 @@ test('Post by category tag name (where multiple many has many owning)', async ()
 			{
 				sql: SQL`
 					select "root_"."id" as "root_id"  from "public"."post" as "root_"
-					where exists (select 1
-						from "public"."post_categories" as "junction_"
-						inner join  "public"."category" as "sub_" on  "junction_"."category_id" = "sub_"."id"
-						left join  "public"."category_tags_but_with_very_very_very_long_name_so_it_reaches_postgresql_alias_length_limit" as "sub_x_sub_tagsButWithVeryVeryVeryLongNameSoItReachesPostgresq_2" on  "sub_"."id" = "sub_x_sub_tagsButWithVeryVeryVeryLongNameSoItReachesPostgresq_2"."category_id"
-						left join  "public"."tag" as "sub_tagsButWithVeryVeryVeryLongNameSoItReachesPostgresqlAlias_1" on  "sub_x_sub_tagsButWithVeryVeryVeryLongNameSoItReachesPostgresq_2"."tag_id" = "sub_tagsButWithVeryVeryVeryLongNameSoItReachesPostgresqlAlias_1"."id"
-						where "root_"."id" = "junction_"."post_id" and "sub_tagsButWithVeryVeryVeryLongNameSoItReachesPostgresqlAlias_1"."name" = ?)`,
+					where exists (select 1  from "public"."post_categories" as "root_categories_junction_"
+					    inner join  "public"."category" as "root_categories" on  "root_categories_junction_"."category_id" = "root_categories"."id"
+					    left join  "public"."category_tags_but_with_very_very_very_long_name_so_it_reaches_postgresql_alias_length_limit" as "root_categoriesx_root_categoriestagsButWithVeryVeryVeryLongNa_3" on  "root_categories"."id" = "root_categoriesx_root_categoriestagsButWithVeryVeryVeryLongNa_3"."category_id"
+					    left join  "public"."tag" as "root_categoriestagsButWithVeryVeryVeryLongNameSoItReachesPost_1" on  "root_categoriesx_root_categoriestagsButWithVeryVeryVeryLongNa_3"."tag_id" = "root_categoriestagsButWithVeryVeryVeryLongNameSoItReachesPost_1"."id"
+					    where "root_"."id" = "root_categories_junction_"."post_id" and "root_categoriestagsButWithVeryVeryVeryLongNameSoItReachesPost_1"."name" = ?)`,
 				parameters: ['Stuff'],
 				response: {
 					rows: [

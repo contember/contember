@@ -21,6 +21,7 @@ import { createMockedMailer, ExpectedMessage } from './mailer'
 import { dbCredentials } from './dbUtils'
 import { IdPMock } from './IdPMock'
 import { createLogger, JsonStreamLoggerHandler } from '@contember/logger'
+import { emptySchema } from '@contember/schema-utils'
 
 export interface Test {
 	query: GraphQLTestQuery
@@ -36,8 +37,7 @@ export const createUuidGenerator = () => {
 
 export const now = new Date('2019-09-04 12:00')
 const schema: Schema = {
-	model: { entities: {}, enums: {} },
-	validation: {},
+	...emptySchema,
 	acl: {
 		roles: {
 			editor: {

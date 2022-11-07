@@ -65,7 +65,7 @@ export const createMapperContainer = ({ permissions, schema, identityVariables, 
 		.addService('whereOptimized', () =>
 			new WhereOptimizer(schema.model, new ConditionOptimizer()))
 		.addService('whereBuilder', ({ joinBuilder, conditionBuilder, pathFactory, whereOptimized }) =>
-			new WhereBuilder(schema.model, joinBuilder, conditionBuilder, pathFactory, whereOptimized))
+			new WhereBuilder(schema.model, joinBuilder, conditionBuilder, pathFactory, whereOptimized, schema.settings.useExistsInHasManyFilter === true))
 		.addService('orderByBuilder', ({ joinBuilder }) =>
 			new OrderByBuilder(schema.model, joinBuilder))
 		.addService('relationFetcher', ({ whereBuilder, orderByBuilder, predicatesInjector, pathFactory }) =>

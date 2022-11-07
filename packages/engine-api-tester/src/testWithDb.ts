@@ -29,9 +29,8 @@ export const executeDbTest = async (test: Test) => {
 	const schemaMigrator = new SchemaMigrator(modificationFactory)
 	const schemaDiffer = new SchemaDiffer(schemaMigrator)
 	const modifications = schemaDiffer.diffSchemas(emptySchema, {
+		...emptySchema,
 		model: test.schema,
-		acl: { roles: {} },
-		validation: {},
 	})
 
 	const migrationsResolver = createMock<MigrationsResolver>({

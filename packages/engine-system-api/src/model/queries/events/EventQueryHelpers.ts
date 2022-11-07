@@ -1,4 +1,4 @@
-import { AnyEvent, CreateEvent, DeleteEvent, EventType, UpdateEvent } from '@contember/engine-common'
+import { ContentEvent, CreateEvent, DeleteEvent, EventType, UpdateEvent } from '../../events'
 import { assertNever } from '../../../utils'
 
 export type EventRow = {
@@ -13,7 +13,7 @@ export type EventRow = {
 	transaction_id: string
 }
 
-export const createEventsFromRows = (rows: EventRow[]): AnyEvent[] => {
+export const createEventsFromRows = (rows: EventRow[]): ContentEvent[] => {
 	return rows.map(event => {
 		switch (event.type) {
 			case EventType.create:

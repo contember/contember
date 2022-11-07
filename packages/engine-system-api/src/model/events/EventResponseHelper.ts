@@ -1,4 +1,4 @@
-import { AnyEvent, ContentEvent, CreateEvent, DeleteEvent, UpdateEvent } from '@contember/engine-common'
+import { CreateEvent, DeleteEvent, UpdateEvent } from './types'
 
 export const appendUpdateSpecificData = <T>(commonData: T, event: UpdateEvent) => ({
 	...commonData,

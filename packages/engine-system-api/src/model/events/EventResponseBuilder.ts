@@ -1,4 +1,4 @@
-import { AnyEvent, EventType } from '@contember/engine-common'
+import { ContentEvent, EventType } from './types'
 import { CreateEvent, DeleteEvent, EventType as ApiEventType, UpdateEvent } from '../../schema'
 import { assertNever } from '../../utils'
 import { IdentityFetcher } from '../dependencies'
@@ -8,7 +8,7 @@ import { appendCreateSpecificData, appendDeleteSpecificData, appendUpdateSpecifi
 export class EventResponseBuilder {
 	constructor(private readonly identityFetcher: IdentityFetcher) {}
 
-	public async buildResponse(events: AnyEvent[]): Promise<(CreateEvent | DeleteEvent | UpdateEvent)[]> {
+	public async buildResponse(events: ContentEvent[]): Promise<(CreateEvent | DeleteEvent | UpdateEvent)[]> {
 		const apiEventTypeMapping = {
 			[EventType.create]: ApiEventType.Create,
 			[EventType.update]: ApiEventType.Update,
@@ -41,7 +41,7 @@ export class EventResponseBuilder {
 		})
 	}
 
-	private formatDescription(event: AnyEvent): string {
+	private formatDescription(event: ContentEvent): string {
 		switch (event.type) {
 			case EventType.create:
 				return `Creating ${event.tableName}#${event.rowId.join(';')}`

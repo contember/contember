@@ -84,13 +84,16 @@ export class LoggerImpl implements Logger {
 
 	private log(level: LogLevel, errorOrMessage: unknown, { error: errorAttr, message: messageAttr, ...attributes }: LoggerAttributes = {}) {
 		const error: unknown | undefined = typeof errorOrMessage !== 'string' ? errorOrMessage : errorAttr
-		const message: string = typeof errorOrMessage === 'string'
+		const errorMessage = typeof error === 'object' && error !== null && typeof (error as any).message === 'string'
+			? (error as any).message : undefined
+
+		const passedMessage = typeof errorOrMessage === 'string'
 			? errorOrMessage
 			: (typeof messageAttr === 'string')
 				? messageAttr
-				: typeof error === 'object' && error !== null && typeof (error as any).message === 'string'
-					? (error as any).message
-					: 'unknown error'
+				: undefined
+
+		const message = errorMessage && passedMessage ? `${passedMessage}: ${errorMessage}` : (passedMessage ?? errorMessage ?? 'undefined message')
 
 		const now = new Date()
 		let formatted: LogEntryFormatted

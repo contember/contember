@@ -10,8 +10,8 @@ export class ProjectGroupContainerMetricsHook {
 
 	public register(promRegistry: Registry) {
 		const registrar = createDbMetricsRegistrar(promRegistry)
-		this.containerResolver.onCreate.push((groupContainer, slug) => {
-			groupContainer.projectContainerResolver.onCreate.push(projectContainer => {
+		this.containerResolver.on('create', ({ container: groupContainer, slug }) => {
+			groupContainer.projectContainerResolver.on('create', ({ container: projectContainer }) => {
 				const primaryConnection = projectContainer.connection
 				const readConnection = projectContainer.readConnection
 				const hasDifferentReadConnection = primaryConnection !== readConnection

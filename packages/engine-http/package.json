@@ -10,6 +10,7 @@
   "dependencies": {
     "@apollographql/graphql-playground-html": "^1.6.24",
     "@contember/database": "^1.2.0-alpha.18",
+    "@contember/engine-common": "^1.2.0-alpha.18",
     "@contember/engine-content-api": "^1.2.0-alpha.18",
     "@contember/engine-system-api": "^1.2.0-alpha.18",
     "@contember/engine-tenant-api": "^1.2.0-alpha.18",

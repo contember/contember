@@ -271,7 +271,14 @@ export const removeField = (entityName: string, fieldName: string, version: numb
 			updateModel(
 				updateEntity(entity.name, ({ entity }) => {
 					const { [field.name]: removed, ...fields } = entity.fields
-					return { ...entity, fields }
+					const indexes = Object.entries(entity.indexes).filter(([, index]) => !index.fields.includes(field.name))
+					const unique = Object.entries(entity.unique).filter(([, index]) => !index.fields.includes(field.name))
+					return {
+						...entity,
+						fields,
+						indexes: Object.fromEntries(indexes),
+						unique: Object.fromEntries(unique),
+					}
 				}),
 				isRelation(field) && isInverseRelation(field)
 					? updateEntity(

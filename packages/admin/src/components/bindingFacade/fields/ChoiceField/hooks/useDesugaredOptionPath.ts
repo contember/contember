@@ -2,8 +2,8 @@ import { useMemo } from 'react'
 import {
 	BaseDynamicChoiceField,
 	LazyChoiceFieldSettings,
-	OptionsAsEntityList,
-	OptionsAsFieldList,
+	ChoiceFieldOptionsAsEntityList,
+	ChoiceFieldOptionsAsFieldList,
 } from '../BaseDynamicChoiceField'
 import {
 	Environment,
@@ -11,6 +11,8 @@ import {
 	QualifiedEntityList,
 	QualifiedFieldList,
 	QueryLanguage,
+	SugaredQualifiedEntityList,
+	SugaredQualifiedFieldList,
 	useEnvironment,
 } from '@contember/binding'
 
@@ -23,16 +25,16 @@ export const useDesugaredOptionPath = (props: BaseDynamicChoiceField, filter: Fi
 	const lazy = props.lazy
 	return useMemo(() => {
 		if (isEntityList) {
-			return getDesugaredEntityList(props.options as OptionsAsEntityList, environment, lazy, filter)
+			return getDesugaredEntityList(props.options as ChoiceFieldOptionsAsEntityList, environment, lazy, filter)
 		}
-		return getDesugaredFieldList(props.options as OptionsAsFieldList, environment, lazy, filter)
+		return getDesugaredFieldList(props.options as ChoiceFieldOptionsAsFieldList, environment, lazy, filter)
 	}, [environment, filter, isEntityList, lazy, props.options])
 }
 
-export const getDesugaredEntityList = (options: OptionsAsEntityList, environment: Environment, lazyOptions: LazyChoiceFieldSettings, filter: Filter | undefined): QualifiedEntityList => {
+export const getDesugaredEntityList = (options: ChoiceFieldOptionsAsEntityList, environment: Environment, lazyOptions: LazyChoiceFieldSettings, filter: Filter | undefined): QualifiedEntityList => {
 	const sugaredList = typeof options === 'string' || !('entities' in options)
 		? { entities: options }
-		: options
+		: (options as SugaredQualifiedEntityList)
 
 	const qualifiedEntityList = QueryLanguage.desugarQualifiedEntityList(sugaredList, environment)
 	return {
@@ -42,10 +44,10 @@ export const getDesugaredEntityList = (options: OptionsAsEntityList, environment
 	}
 }
 
-export const getDesugaredFieldList = (options: OptionsAsFieldList, environment: Environment, lazyOptions: LazyChoiceFieldSettings, filter: Filter | undefined): QualifiedFieldList => {
+export const getDesugaredFieldList = (options: ChoiceFieldOptionsAsFieldList, environment: Environment, lazyOptions: LazyChoiceFieldSettings, filter: Filter | undefined): QualifiedFieldList => {
 	const sugaredList = typeof options === 'string' || !('fields' in options)
 		? { fields: options }
-		: options
+		: (options as SugaredQualifiedFieldList)
 
 	const desugarQualifiedFieldList = QueryLanguage.desugarQualifiedFieldList(sugaredList, environment)
 	return {

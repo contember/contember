@@ -451,6 +451,24 @@ export interface AvatarProps {
 }
 
 // @public (undocumented)
+export type BaseDynamicChoiceField = BaseDynamicChoiceFieldOptions & SelectFuseOptionsProps<EntityAccessor> & {
+    searchByFields?: ChoiceFieldSearchByFields;
+    createNewForm?: ReactElement;
+    lazy?: LazyChoiceFieldSettings;
+    renderedOptionsLimit?: number;
+    transformOptions?: (data: ChoiceFieldData.Options<EntityAccessor>, input: string | undefined) => ChoiceFieldData.Options<EntityAccessor>;
+    sortableBy?: SugaredFieldProps['field'];
+};
+
+// @public (undocumented)
+export type BaseDynamicChoiceFieldOptions = {
+    options: ChoiceFieldOptionsAsEntityList;
+    optionLabel: ReactNode;
+} | {
+    options: ChoiceFieldOptionsAsFieldList;
+} | LegacyChoiceFieldWithOptionRenderer;
+
+// @public (undocumented)
 export const Block: FunctionComponent<BlockProps>;
 
 // @public (undocumented)
@@ -666,7 +684,16 @@ export const choiceFieldDictionary: {
 };
 
 // @public (undocumented)
+export type ChoiceFieldOptionsAsEntityList = string | (SugaredQualifiedEntityList['entities'] & ForbidKeys<SugaredQualifiedEntityList, SugaredQualifiedEntityList['entities']>) | (SugaredQualifiedEntityList & ForbidKeys<SugaredQualifiedEntityList['entities'], SugaredQualifiedEntityList>);
+
+// @public (undocumented)
+export type ChoiceFieldOptionsAsFieldList = string | (SugaredQualifiedFieldList['fields'] & ForbidKeys<SugaredQualifiedFieldList, SugaredQualifiedFieldList['fields']>) | (SugaredQualifiedFieldList & ForbidKeys<SugaredQualifiedFieldList['fields'], SugaredQualifiedFieldList>);
+
+// @public (undocumented)
 export type ChoiceFieldProps = (ChoiceFieldData.SingleChoiceFieldProps<FieldValue> & StaticSingleChoiceFieldProps) | (ChoiceFieldData.SingleChoiceFieldProps<EntityAccessor> & DynamicSingleChoiceFieldProps);
+
+// @public (undocumented)
+export type ChoiceFieldSearchByFields = SugaredRelativeSingleField['field'] | SugaredRelativeSingleField['field'][];
 
 // @public (undocumented)
 export const ClearFieldButton: React.NamedExoticComponent<ClearFieldButtonProps>;
@@ -1382,11 +1409,14 @@ export const DragHandle: () => JSX.Element;
 // @public (undocumented)
 export const DynamicMultiChoiceField: FunctionComponent<DynamicMultipleChoiceFieldProps & ChoiceFieldData.MultiChoiceFieldProps<EntityAccessor>>;
 
-// Warning: (ae-forgotten-export) The symbol "BaseDynamicChoiceField" needs to be exported by the entry point index.d.ts
-// Warning: (ae-forgotten-export) The symbol "DynamicMultipleChoiceWithConnectingEntityFieldProps" needs to be exported by the entry point index.d.ts
-//
 // @public (undocumented)
 export type DynamicMultipleChoiceFieldProps = SugaredRelativeEntityList & BaseDynamicChoiceField & ({} | DynamicMultipleChoiceWithConnectingEntityFieldProps);
+
+// @public (undocumented)
+export interface DynamicMultipleChoiceWithConnectingEntityFieldProps {
+    // (undocumented)
+    connectingEntityField: string | SugaredRelativeSingleEntity;
+}
 
 // @public (undocumented)
 export type DynamicRequestParameters = RequestParameters<RoutingParameter>;
@@ -1812,6 +1842,11 @@ export const FloatField: React.NamedExoticComponent<FloatFieldProps>;
 
 // @public (undocumented)
 export type FloatFieldProps = SimpleRelativeSingleFieldProps & ControlProps<number>;
+
+// @public (undocumented)
+export type ForbidKeys<A, B> = {
+    [K in Exclude<keyof A, keyof B>]?: never;
+};
 
 // @public (undocumented)
 export type FormErrors<V> = {
@@ -2515,7 +2550,25 @@ export interface LayoutRendererProps extends LayoutPageProps {
 }
 
 // @public (undocumented)
+export type LazyChoiceFieldSettings = undefined | boolean | {
+    limit?: number;
+    initialLimit?: number;
+    createFilter?: (input: string) => Filter;
+    inputDebounceDelay?: number;
+};
+
+// @public (undocumented)
 export type LazyPageModule = () => Promise<PageModule>;
+
+// @public @deprecated (undocumented)
+export interface LegacyChoiceFieldWithOptionRenderer {
+    // (undocumented)
+    options: string | SugaredQualifiedEntityList['entities'] | SugaredQualifiedEntityList;
+    // (undocumented)
+    optionsStaticRender: ReactElement | ((environment: Environment) => ReactElement);
+    // (undocumented)
+    renderOption: (entityAccessor: EntityAccessor) => ReactNode;
+}
 
 // @public (undocumented)
 export const LegacyDeprecatedEditorFormerlyKnownAsRichTextField: FunctionComponent<LegacyDeprecatedEditorFormerlyKnownAsRichTextFieldProps>;
@@ -3741,6 +3794,12 @@ export interface SelectFileInputSelectionComponentProps<SFExtraProps extends {}>
 }
 
 // @public (undocumented)
+export interface SelectFuseOptionsProps<T> {
+    // (undocumented)
+    fuseOptions?: Fuse_2.IFuseOptions<ChoiceFieldData.SingleOption<T>> | boolean;
+}
+
+// @public (undocumented)
 export interface SerializableEditorNode {
     // (undocumented)
     children: Array<Element_2 | Text_2>;
@@ -3825,8 +3884,6 @@ export interface SignInIDPResult {
     token: string;
 }
 
-// Warning: (ae-forgotten-export) The symbol "BaseDynamicChoiceFieldOptions" needs to be exported by the entry point index.d.ts
-//
 // @public (undocumented)
 export type SimpleDynamicSingleChoiceFieldProps = SugaredRelativeSingleEntity & BaseDynamicChoiceFieldOptions & Pick<DynamicSingleChoiceFieldProps, 'transformOptions'>;
 
@@ -3936,8 +3993,6 @@ export interface StaticOption {
 // @public (undocumented)
 export const StaticSingleChoiceField: FunctionComponent<StaticSingleChoiceFieldProps & ChoiceFieldData.SingleChoiceFieldProps<FieldValue>>;
 
-// Warning: (ae-forgotten-export) The symbol "SelectFuseOptionsProps" needs to be exported by the entry point index.d.ts
-//
 // @public (undocumented)
 export type StaticSingleChoiceFieldProps = SugaredRelativeSingleField & SelectFuseOptionsProps<FieldValue> & {
     options: OptionallyVariableStaticOption[];

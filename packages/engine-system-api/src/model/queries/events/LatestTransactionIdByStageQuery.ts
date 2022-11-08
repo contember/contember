@@ -1,34 +1,20 @@
-import { DatabaseQuery, DatabaseQueryable } from '@contember/database'
+import { DatabaseQuery, DatabaseQueryable, SelectBuilder } from '@contember/database'
 import { ImplementationException } from '../../../utils'
 
 export class LatestTransactionIdByStageQuery extends DatabaseQuery<string> {
-	constructor(private readonly stageSlug: string) {
+	constructor(private readonly stageId: string) {
 		super()
 	}
 
 	async fetch(queryable: DatabaseQueryable): Promise<string> {
-		const stageId = (
-			await queryable.db.query<{ id: string }>(
-				`
-				SELECT id
-				FROM system.stage
-				WHERE slug = ?
-				`,
-				[this.stageSlug],
-			)
-		).rows[0].id
-		const rows = (
-			await queryable.db.query<{ transaction_id: string }>(
-				`
-				SELECT transaction_id
-				FROM system.stage_transaction
-				WHERE stage_id = ?
-				ORDER BY applied_at DESC
-				LIMIT 1
-				`,
-				[stageId],
-			)
-		).rows
+		const rows = await SelectBuilder.create<{ transaction_id: string }>()
+			.from('stage_transaction')
+			.select('transaction_id')
+			.where({ stage_id: this.stageId })
+			.orderBy('applied_at', 'desc')
+			.limit(1)
+			.getResult(queryable.db)
+
 		if (rows.length !== 1) {
 			throw new ImplementationException()
 		}

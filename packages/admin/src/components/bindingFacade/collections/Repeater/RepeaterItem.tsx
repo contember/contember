@@ -2,13 +2,16 @@ import { BindingError, RemovalType } from '@contember/binding'
 import { RepeaterItemContainer, RepeaterItemContainerProps } from '@contember/ui'
 import { memo, ReactNode } from 'react'
 import { DeleteEntityButton } from '../helpers'
+import { RepeaterCreateNewEntity } from './RepeaterFieldContainer'
 
 export interface RepeaterItemProps {
 	label: ReactNode
 	children: ReactNode
 	canBeRemoved: boolean
+	index: number
+	createNewEntity: RepeaterCreateNewEntity
 	dragHandleComponent?: RepeaterItemContainerProps['dragHandleComponent']
-	removalType?: RemovalType
+	removalType: RemovalType
 }
 
 export const RepeaterItem = memo(

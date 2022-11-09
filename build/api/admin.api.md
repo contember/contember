@@ -3361,6 +3361,9 @@ export const renderVideoFilePreview: ({ objectUrl }: RenderFilePreviewOptions) =
 // @public (undocumented)
 export const Repeater: <ContainerExtraProps, ItemExtraProps>(props: RepeaterProps<ContainerExtraProps, ItemExtraProps>) => ReactElement;
 
+// @public (undocumented)
+export type RepeaterCreateNewEntity = (initialize?: EntityAccessor.BatchUpdatesHandler, index?: number) => void;
+
 // Warning: (ae-forgotten-export) The symbol "repeaterDictionary" needs to be exported by the entry point index.d.ts
 //
 // @public (undocumented)
@@ -3378,7 +3381,7 @@ export interface RepeaterFieldContainerPrivateProps {
     // (undocumented)
     children: ReactNode;
     // (undocumented)
-    createNewEntity: (initialize?: EntityAccessor.BatchUpdatesHandler) => void;
+    createNewEntity: RepeaterCreateNewEntity;
     // (undocumented)
     entities: EntityAccessor[];
     // (undocumented)
@@ -3404,7 +3407,7 @@ export const RepeaterHandle: React.MemoExoticComponent<() => JSX.Element>;
 export const RepeaterInner: (<ContainerExtraProps, ItemExtraProps>(props: RepeaterInnerProps<ContainerExtraProps, ItemExtraProps>) => ReactElement) & StaticRenderProvider<RepeaterInnerProps<unknown, unknown>, "accessor">;
 
 // @public (undocumented)
-export interface RepeaterInnerProps<ContainerExtraProps, ItemExtraProps> extends RepeaterFieldContainerPublicProps, Omit<RepeaterItemProps, 'children' | 'canBeRemoved' | 'label'> {
+export interface RepeaterInnerProps<ContainerExtraProps, ItemExtraProps> extends RepeaterFieldContainerPublicProps {
     // (undocumented)
     accessor: EntityListAccessor;
     // @deprecated (undocumented)
@@ -3416,6 +3419,8 @@ export interface RepeaterInnerProps<ContainerExtraProps, ItemExtraProps> extends
     // (undocumented)
     containerComponentExtraProps?: ContainerExtraProps;
     // (undocumented)
+    dragHandleComponent?: RepeaterItemContainerProps['dragHandleComponent'];
+    // (undocumented)
     enableRemoving?: boolean;
     // (undocumented)
     itemComponent?: ComponentType<RepeaterItemProps & ItemExtraProps>;
@@ -3423,6 +3428,8 @@ export interface RepeaterInnerProps<ContainerExtraProps, ItemExtraProps> extends
     itemComponentExtraProps?: ItemExtraProps;
     // (undocumented)
     label: ReactNode;
+    // (undocumented)
+    removalType?: RemovalType;
     // (undocumented)
     sortableBy?: SugaredFieldProps['field'];
     // (undocumented)
@@ -3441,11 +3448,15 @@ export interface RepeaterItemProps {
     // (undocumented)
     children: ReactNode;
     // (undocumented)
+    createNewEntity: RepeaterCreateNewEntity;
+    // (undocumented)
     dragHandleComponent?: RepeaterItemContainerProps['dragHandleComponent'];
+    // (undocumented)
+    index: number;
     // (undocumented)
     label: ReactNode;
     // (undocumented)
-    removalType?: RemovalType;
+    removalType: RemovalType;
 }
 
 // @public (undocumented)

@@ -1,6 +1,7 @@
 import {
 	Component,
 	Entity,
+	EntityAccessor,
 	EntityListAccessor,
 	RemovalType,
 	StaticRenderProvider,
@@ -14,17 +15,22 @@ import { ComponentType, Fragment, ReactElement, ReactNode, useCallback } from 'r
 import type { SortEndHandler } from 'react-sortable-hoc'
 import { useMessageFormatter } from '../../../../i18n'
 import { repeaterDictionary } from './repeaterDictionary'
-import { RepeaterFieldContainer, RepeaterFieldContainerProps, RepeaterFieldContainerPublicProps } from './RepeaterFieldContainer'
+import {
+	RepeaterCreateNewEntity,
+	RepeaterFieldContainer,
+	RepeaterFieldContainerProps,
+	RepeaterFieldContainerPublicProps,
+} from './RepeaterFieldContainer'
 import { RepeaterItem, RepeaterItemProps } from './RepeaterItem'
 import { shouldCancelStart } from '../../helpers/shouldCancelStart'
 import { SortableRepeaterContainer } from './SortableRepeaterContainer'
 import { SortableRepeaterItem } from './SortableRepeaterItem'
 import { SortableRepeaterItemHandle } from './SortableRepeaterItemHandle'
+import { RepeaterItemContainerProps } from '@contember/ui'
 
 // TODO alt content for collapsing
 export interface RepeaterInnerProps<ContainerExtraProps, ItemExtraProps>
-	extends RepeaterFieldContainerPublicProps,
-		Omit<RepeaterItemProps, 'children' | 'canBeRemoved' | 'label'> {
+	extends RepeaterFieldContainerPublicProps {
 	accessor: EntityListAccessor
 	/**
 	 * @deprecated Use label instead
@@ -36,6 +42,7 @@ export interface RepeaterInnerProps<ContainerExtraProps, ItemExtraProps>
 	sortableBy?: SugaredFieldProps['field']
 
 	enableRemoving?: boolean
+	removalType?: RemovalType
 
 	containerComponent?: ComponentType<RepeaterFieldContainerProps & ContainerExtraProps>
 	containerComponentExtraProps?: ContainerExtraProps
@@ -45,6 +52,7 @@ export interface RepeaterInnerProps<ContainerExtraProps, ItemExtraProps>
 
 	unstable__sortAxis?: 'x' | 'y' | 'xy'
 	useDragHandle?: boolean
+	dragHandleComponent?: RepeaterItemContainerProps['dragHandleComponent']
 }
 
 type NonStaticPropNames = 'accessor'
@@ -52,7 +60,12 @@ type NonStaticPropNames = 'accessor'
 export const RepeaterInner = Component<RepeaterInnerProps<any, any>, NonStaticPropNames>(
 	<ContainerExtraProps, ItemExtraProps>(props: RepeaterInnerProps<ContainerExtraProps, ItemExtraProps>) => {
 		const isMutating = useMutationState()
-		const { entities, moveEntity, appendNew } = useSortedEntities(props.accessor, props.sortableBy)
+		const { entities, moveEntity, addNewAtIndex } = useSortedEntities(props.accessor, props.sortableBy)
+
+		const createNewEntity = useCallback<RepeaterCreateNewEntity>((initialize?: EntityAccessor.BatchUpdatesHandler, index?: number) => {
+			addNewAtIndex(index ?? entities.length, initialize)
+		}, [addNewAtIndex, entities.length])
+
 		const onSortEnd = useCallback<SortEndHandler>(
 			({ oldIndex, newIndex }) => {
 				moveEntity(oldIndex, newIndex)
@@ -88,7 +101,7 @@ export const RepeaterInner = Component<RepeaterInnerProps<any, any>, NonStaticPr
 					{...props}
 					removalType={removalType}
 					isEmpty={isEmpty}
-					createNewEntity={appendNew}
+					createNewEntity={createNewEntity}
 					entities={entities}
 					formatMessage={formatMessage}
 				>
@@ -97,6 +110,8 @@ export const RepeaterInner = Component<RepeaterInnerProps<any, any>, NonStaticPr
 							<Item
 								{...props.itemComponentExtraProps!}
 								label={label ? `${label} #${i + 1}` : `#${i + 1}`}
+								index={i}
+								createNewEntity={createNewEntity}
 								removalType={removalType}
 								canBeRemoved={itemRemovingEnabled}
 								dragHandleComponent={undefined}
@@ -128,7 +143,7 @@ export const RepeaterInner = Component<RepeaterInnerProps<any, any>, NonStaticPr
 					{...props}
 					removalType={removalType}
 					isEmpty={isEmpty}
-					createNewEntity={appendNew}
+					createNewEntity={createNewEntity}
 					entities={entities}
 					formatMessage={formatMessage}
 				>
@@ -138,6 +153,8 @@ export const RepeaterInner = Component<RepeaterInnerProps<any, any>, NonStaticPr
 								<Item
 									{...props.itemComponentExtraProps!}
 									label={label ? `${label} #${i + 1}` : `#${i + 1}`}
+									index={i}
+									createNewEntity={createNewEntity}
 									removalType={removalType}
 									canBeRemoved={itemRemovingEnabled}
 									dragHandleComponent={useDragHandle ? sortableHandle : undefined}

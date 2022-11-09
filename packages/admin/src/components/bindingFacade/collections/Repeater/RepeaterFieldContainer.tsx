@@ -13,6 +13,8 @@ export type RepeaterFieldContainerPublicProps =
 		enableAddingNew?: boolean
 	}
 
+export type RepeaterCreateNewEntity = (initialize?: EntityAccessor.BatchUpdatesHandler, index?: number) => void
+
 export interface RepeaterFieldContainerPrivateProps {
 	accessor: EntityListAccessor
 	entities: EntityAccessor[]
@@ -23,7 +25,7 @@ export interface RepeaterFieldContainerPrivateProps {
 	 */
 	boxLabel?: ReactNode
 	label: ReactNode
-	createNewEntity: (initialize?: EntityAccessor.BatchUpdatesHandler) => void
+	createNewEntity: RepeaterCreateNewEntity
 	children: ReactNode
 }
 

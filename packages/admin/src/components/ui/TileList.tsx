@@ -1,7 +1,5 @@
-import { PureComponent } from 'react'
+import { ReactNode } from 'react'
 
-export class TileList extends PureComponent {
-	override render() {
-		return <div className="tileList">{this.props.children}</div>
-	}
-}
+export const TileList = ({ children }: {children?: ReactNode}) => (
+	<div className="tileList">{children}</div>
+)

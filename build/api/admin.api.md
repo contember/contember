@@ -74,7 +74,7 @@ import { Justification } from '@contember/ui';
 import type { KeyboardEvent as KeyboardEvent_2 } from 'react';
 import { LayoutPageProps } from '@contember/ui';
 import { Location as Location_2 } from 'slate';
-import { MapProps } from 'react-leaflet';
+import { MapContainerProps } from 'react-leaflet';
 import { MarkerProps } from 'react-leaflet';
 import { MouseEvent as MouseEvent_2 } from 'react';
 import type { NamedExoticComponent } from 'react';
@@ -919,10 +919,14 @@ export type CreatePageProps = Omit<SugaredUnconstrainedQualifiedSingleEntity, 'i
     rendererProps?: LayoutRendererProps;
 };
 
-// Warning: (ae-forgotten-export) The symbol "CreateProjectForm" needs to be exported by the entry point index.d.ts
-//
 // @public (undocumented)
-export const CreateProjectForm: FC<CreateProjectForm_2>;
+export const CreateProjectForm: FC<CreateProjectFormProps>;
+
+// @public (undocumented)
+export interface CreateProjectFormProps {
+    // (undocumented)
+    projectListLink: RoutingLinkTarget;
+}
 
 // @public (undocumented)
 export const createReferenceElementPlugin: (args: ReferenceElementOptions) => CustomElementPlugin<ReferenceElement>;
@@ -1039,13 +1043,12 @@ export type DataGridColumnOrdering = {
 };
 
 // @public (undocumented)
-export type DataGridColumnProps<FA extends DataGridFilterArtifact = DataGridFilterArtifact> = DataGridColumnPublicProps & DataGridColumnFiltering<FA> & DataGridColumnOrdering & {
-    children: ReactNode;
-};
+export type DataGridColumnProps<FA extends DataGridFilterArtifact = DataGridFilterArtifact> = DataGridColumnPublicProps & DataGridColumnFiltering<FA> & DataGridColumnOrdering;
 
 // @public (undocumented)
 export type DataGridColumnPublicProps = DataGridHeaderCellPublicProps & DataGridCellPublicProps & {
     columnKey?: string;
+    children?: ReactNode;
 };
 
 // @public (undocumented)
@@ -1770,6 +1773,8 @@ export const FileInput: FunctionComponent<FileInputProps>;
 // @public (undocumented)
 export interface FileInputProps {
     // (undocumented)
+    children?: ReactNode;
+    // (undocumented)
     onChange?: DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>['onChange'];
 }
 
@@ -2251,7 +2256,7 @@ export interface Identity {
     projects: IdentityProject[];
 }
 
-// Warning: (ae-forgotten-export) The symbol "IdentityContext" needs to be exported by the entry point index.d.ts
+// Warning: (ae-forgotten-export) The symbol "IdentityContext_2" needs to be exported by the entry point index.d.ts
 //
 // @public (undocumented)
 export const IdentityContext: React.Context<IdentityContext_2 | undefined>;
@@ -2664,7 +2669,7 @@ export interface LocationFieldProps extends Omit<FieldContainerProps, 'children'
     // (undocumented)
     mapCenter?: [number, number];
     // (undocumented)
-    mapProps?: MapProps;
+    mapProps?: MapContainerProps;
     // (undocumented)
     markerProps?: MarkerProps;
     // (undocumented)
@@ -2946,10 +2951,10 @@ export const NotFoundWrapper: React.NamedExoticComponent<{
 export const NumberCell: FunctionComponent<NumberCellProps>;
 
 // @public (undocumented)
-export type NumberCellProps<Persisted extends FieldValue = FieldValue> = DataGridHeaderCellPublicProps & DataGridCellPublicProps & FieldFallbackViewPublicProps & SugaredRelativeSingleField & {
+export type NumberCellProps = DataGridHeaderCellPublicProps & DataGridCellPublicProps & FieldFallbackViewPublicProps & SugaredRelativeSingleField & {
     disableOrder?: boolean;
     initialOrder?: DataGridOrderDirection;
-    format?: (value: Persisted) => ReactNode;
+    format?: (value: number) => ReactNode;
 };
 
 // @public (undocumented)
@@ -3016,7 +3021,7 @@ export const PageLinkById: React.NamedExoticComponent<PageLinkByIdProps>;
 // @public (undocumented)
 export interface PageModule {
     // (undocumented)
-    [action: string]: ComponentType | ReactElement | undefined;
+    [action: string]: ComponentType<any> | ReactElement<any> | undefined;
 }
 
 // @public (undocumented)
@@ -3039,7 +3044,7 @@ export interface PageProvider<P> {
 }
 
 // @public (undocumented)
-export type PageProviderElement = ReactElement<any, ComponentType & PageProvider<any>>;
+export type PageProviderElement = ReactElement<any, ComponentType<any> & PageProvider<any>>;
 
 // @public (undocumented)
 export interface PageRequest<P extends RequestParameters<RoutingParameter> = RequestParameters> {
@@ -3058,7 +3063,7 @@ export const Pages: ({ children, layout }: PagesProps) => JSX.Element;
 export type PagesMap = Record<string, PagesMapElement>;
 
 // @public (undocumented)
-export type PagesMapElement = LazyPageModule | PageModule | ComponentType | ReactElement | PageProviderElement;
+export type PagesMapElement = LazyPageModule | PageModule | ComponentType<any> | ReactElement<any> | PageProviderElement;
 
 // @public (undocumented)
 export interface PagesProps {
@@ -3251,6 +3256,9 @@ export interface RadioFieldInnerPublicProps extends Omit<FieldContainerProps, 'c
 
 // @public (undocumented)
 export type RadioFieldProps = RadioFieldInnerPublicProps & (StaticSingleChoiceFieldProps | SimpleDynamicSingleChoiceFieldProps);
+
+// @public (undocumented)
+export type ReactRenderer = (domElement: Element, reactElement: ReactElement, onRecoverableError: (e: any) => void) => void;
 
 // @public (undocumented)
 export function readEventStream(lines: AsyncIterable<string>): AsyncIterable<{
@@ -3448,7 +3456,9 @@ export type RequestParameters<Extra extends RoutingParameter = never> = {
 export type RequestParameterValue = number | string;
 
 // @public (undocumented)
-export const RequestProvider: FC;
+export const RequestProvider: FC<{
+    children: ReactNode;
+}>;
 
 // @public (undocumented)
 export type RequestState<Parameters extends RequestParameters<RoutingParameter> = RequestParameters> = PageRequest<Parameters> | null;
@@ -3576,7 +3586,7 @@ export type RoleRenderer = React.FC<{
     variables: Variables;
 }>;
 
-// Warning: (ae-forgotten-export) The symbol "RoleDefinition" needs to be exported by the entry point index.d.ts
+// Warning: (ae-forgotten-export) The symbol "RoleDefinition_2" needs to be exported by the entry point index.d.ts
 //
 // @public (undocumented)
 export type RoleRendererFactory = (roleDefinitions: RoleDefinition_2[]) => Promise<RoleRenderer>;
@@ -3678,7 +3688,7 @@ export class RoutingParameter {
 export type RoutingParameterResolver = (name: string) => RequestParameterValue | undefined;
 
 // @public (undocumented)
-export const runReactApp: (reactElement: ReactElement, domRoot?: HTMLElement | string | null) => void;
+export const runReactApp: (reactElement: ReactElement, domRoot?: HTMLElement | string | null, render?: ReactRenderer) => void;
 
 // @public (undocumented)
 export interface ScrollTargetElement extends Element_2 {
@@ -3807,14 +3817,12 @@ export namespace SideDimensions {
     export interface CommonDimensionProps {
         // (undocumented)
         hasOneField?: string | SugaredRelativeSingleEntity;
-        // Warning: (ae-forgotten-export) The symbol "LabelMiddleware" needs to be exported by the entry point index.d.ts
-        //
         // (undocumented)
         labelMiddleware?: LabelMiddleware;
         // (undocumented)
         variableName?: Environment.Name;
         // (undocumented)
-        variables?: Environment.ValuesMapWithFactory | ((dimensionValue: Environment.Value) => Environment.ValuesMapWithFactory);
+        variables?: ValuesMapWithLegacyLabelMiddleware | ((dimensionValue: Environment.Value) => ValuesMapWithLegacyLabelMiddleware);
     }
     // (undocumented)
     export class SingleDimension extends PureComponent<SingleDimensionProps> {
@@ -3840,6 +3848,11 @@ export namespace SideDimensions {
         // (undocumented)
         renderDimensionValue: boolean;
     }
+    // (undocumented)
+    export type ValuesMapWithLegacyLabelMiddleware = Environment.ValuesMapWithFactory & {
+        labelMiddleware?: LabelMiddleware;
+    };
+        {};
 }
 
 // @public (undocumented)
@@ -4136,10 +4149,9 @@ export type TextSpecifics<Text extends Text_2> = Omit<Text, 'text'>;
 export const Tile: React.NamedExoticComponent<TileProps>;
 
 // @public (undocumented)
-export class TileList extends PureComponent {
-    // (undocumented)
-    render(): JSX.Element;
-}
+export const TileList: ({ children }: {
+    children?: ReactNode;
+}) => JSX.Element;
 
 // @public (undocumented)
 export interface TileProps extends BoxOwnProps {
@@ -4708,6 +4720,7 @@ export * from "@contember/ui";
 
 // Warnings were encountered during analysis:
 //
+// src/components/bindingFacade/environment/SideDimensions.tsx:88:81 - (ae-forgotten-export) The symbol "LabelMiddleware" needs to be exported by the entry point index.d.ts
 // src/components/bindingFacade/fields/SlugField.tsx:23:3 - (ae-forgotten-export) The symbol "SlugPrefix" needs to be exported by the entry point index.d.ts
 // src/components/bindingFacade/richText/ContemberEditor/index.ts:24:29 - (ae-forgotten-export) The symbol "ElementDataAttributes" needs to be exported by the entry point index.d.ts
 // src/components/bindingFacade/richText/blockEditor/BlockEditor.tsx:323:25 - (ae-forgotten-export) The symbol "ContentOutletProps" needs to be exported by the entry point index.d.ts

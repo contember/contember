@@ -1,10 +1,11 @@
 import { ReactElement } from 'react'
+import { legacyReactRenderer, ReactRenderer } from './render'
 import { createErrorHandler } from './errorHandling'
-import * as ReactDOM from 'react-dom'
 
 export const runReactApp = (
 	reactElement: ReactElement,
 	domRoot?: HTMLElement | string | null,
+	render: ReactRenderer = legacyReactRenderer,
 ) => {
 	const rootEl = domRoot instanceof HTMLElement
 		? domRoot
@@ -12,6 +13,9 @@ export const runReactApp = (
 		? document.querySelector<HTMLElement>(domRoot)
 		: document.body.appendChild(document.createElement('div'))
 
-	const handler = createErrorHandler()
-	handler(() => ReactDOM.render(reactElement, rootEl))
+	if (!rootEl) {
+		throw new Error(`Undefined react root element`)
+	}
+	const errorHandler = createErrorHandler(render)
+	errorHandler(onRecoverableError => render(rootEl, reactElement, onRecoverableError))
 }

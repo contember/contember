@@ -56,7 +56,7 @@ export const AutoField = Component<AutoFieldProps>(
 				return <SelectField {...common} options={options} allowNull={field.nullable} />
 
 			} else if (field.type === 'Json') {
-				return <FieldContainer {...common}><Field field={field.name} format={it => <pre>{it}</pre>} /></FieldContainer>
+				return <FieldContainer {...common}><Field field={field.name} format={it => <pre>{JSON.stringify(it)}</pre>} /></FieldContainer>
 
 			} else {
 				return <FieldContainer {...common}>Unsupported field type {field.type}</FieldContainer>

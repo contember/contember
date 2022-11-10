@@ -7,7 +7,7 @@ import { FieldFallbackView, FieldFallbackViewPublicProps } from '../../../fieldV
 import { DataGridCellPublicProps, DataGridColumn, DataGridHeaderCellPublicProps, DataGridOrderDirection } from '../base'
 import { dataGridCellsDictionary } from './dataGridCellsDictionary'
 
-export type NumberCellProps<Persisted extends FieldValue = FieldValue> =
+export type NumberCellProps =
 	& DataGridHeaderCellPublicProps
 	& DataGridCellPublicProps
 	& FieldFallbackViewPublicProps
@@ -15,7 +15,7 @@ export type NumberCellProps<Persisted extends FieldValue = FieldValue> =
 	& {
 		disableOrder?: boolean
 		initialOrder?: DataGridOrderDirection
-		format?: (value: Persisted) => ReactNode
+		format?: (value: number) => ReactNode
 	}
 
 // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
@@ -97,7 +97,7 @@ export const NumberCell: FunctionComponent<NumberCellProps> = Component(props =>
 				)
 			}}
 		>
-			<Field
+			<Field<number>
 				{...props}
 				format={value => {
 					if (value === null) {
@@ -111,4 +111,4 @@ export const NumberCell: FunctionComponent<NumberCellProps> = Component(props =>
 			/>
 		</DataGridColumn>
 	)
-}, 'NumberCell') as <Persisted extends FieldValue = FieldValue>(props: NumberCellProps<Persisted>) => ReactElement
+}, 'NumberCell')

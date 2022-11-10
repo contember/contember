@@ -80,7 +80,7 @@ export class ChildrenAnalyzer<
 	}
 
 	private processNode(
-		node: ReactNode | Function,
+		node: ReactNode,
 		staticContext: StaticContext,
 		componentPath: ReactElement[],
 	): RawNodeRepresentation<AllLeavesRepresentation, AllBranchNodesRepresentation> {

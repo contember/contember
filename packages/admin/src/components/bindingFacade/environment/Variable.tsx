@@ -8,7 +8,7 @@ interface VariableProps {
 
 export const Variable = memo(({ name, format }: VariableProps): ReactElement => {
 	const environment = useEnvironment()
-	const value = environment.getVariableOrElse(name, undefined) ?? environment.getParameter(name)
+	const value = environment.getVariableOrElse<undefined, ReactNode>(name, undefined) ?? environment.getParameter(name)
 
 	const formatted = useMemo(() => (format ? format(value) : value), [format, value])
 

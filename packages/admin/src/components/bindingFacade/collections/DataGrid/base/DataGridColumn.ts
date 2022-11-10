@@ -42,15 +42,13 @@ export type DataGridColumnPublicProps =
 	& DataGridCellPublicProps
 	& {
 		columnKey?: string
+		children?: ReactNode
 	}
 
 export type DataGridColumnProps<FA extends DataGridFilterArtifact = DataGridFilterArtifact> =
 	& DataGridColumnPublicProps
 	& DataGridColumnFiltering<FA>
 	& DataGridColumnOrdering
-	& {
-		children: ReactNode
-	}
 
 export type DataGridColumns = Map<DataGridColumnKey, DataGridColumnProps>
 

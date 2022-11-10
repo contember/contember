@@ -37,13 +37,13 @@
 		"uuid": "8.3.2"
 	},
 	"peerDependencies": {
-		"react": "^17",
-		"react-dom": "^17"
+		"react": "^17 || ^18",
+		"react-dom": "^17 || ^18"
 	},
 	"devDependencies": {
 		"@types/js-levenshtein": "1.1.0",
 		"@types/uuid": "8.3.1",
-		"react": "^17",
-		"react-dom": "^17"
+		"react": "^18",
+		"react-dom": "^18"
 	}
 }

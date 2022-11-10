@@ -16,7 +16,7 @@
 	"dependencies": {
 		"@contember/schema": "^1.1.0-beta",
 		"@contember/schema-definition": "^1.1.0-beta",
-		"react": "^17",
-		"react-dom": "^17"
+		"react": "^17 || ^18",
+		"react-dom": "^17 || ^18"
 	}
 }

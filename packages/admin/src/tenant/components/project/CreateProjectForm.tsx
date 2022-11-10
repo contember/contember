@@ -15,11 +15,11 @@ const emptyForm = {
 	dbSsl: '',
 }
 
-interface CreateProjectForm {
+export interface CreateProjectFormProps {
 	projectListLink: RoutingLinkTarget
 }
 
-export const CreateProjectForm: FC<CreateProjectForm> = ({ projectListLink }) => {
+export const CreateProjectForm: FC<CreateProjectFormProps> = ({ projectListLink }) => {
 	const { register, values } = useForm(emptyForm)
 	const [isSubmitting, setSubmitting] = useState(false)
 	const createProject = useCreateProject()

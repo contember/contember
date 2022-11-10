@@ -68,7 +68,7 @@ export const createDiscriminatedFileKinds = (
 		const label = fileSelectionLabel ?? VariableInputTransformer.transformValue(discriminateBy, environment)
 		const connectorFactory = createEntityConnectorFactory(environment, baseEntity, kindBaseEntity)
 		components.push({
-			label,
+			label: String(label),
 			innerComponent: fileSelectionComponent,
 			innerProps: fileSelectionProps,
 			connectorFactory: (selected: EntityAccessor) => {

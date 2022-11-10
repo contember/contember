@@ -3,6 +3,7 @@ import { useLogout } from './Identity'
 
 interface InnerProps {
 	onClick: () => void
+	children?: ReactNode
 }
 
 export interface LogoutLinkProps {

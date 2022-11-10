@@ -3,6 +3,7 @@
 // import './wdyr' // THIS MUST BE THE FIRST IMPORT!
 
 import { ApplicationEntrypoint, PageModule, Pages, runReactApp } from '@contember/admin'
+import { createRoot } from 'react-dom/client'
 import { Layout } from './components/Layout'
 import './index.sass'
 
@@ -15,4 +16,6 @@ runReactApp(
 		basePath={import.meta.env.BASE_URL}
 		children={<Pages layout={Layout} children={import.meta.glob<PageModule>('./pages/**/*.tsx')} />}
 	/>,
+	null,
+	(dom, react, onRecoverableError) => createRoot(dom, { onRecoverableError }).render(react),
 )

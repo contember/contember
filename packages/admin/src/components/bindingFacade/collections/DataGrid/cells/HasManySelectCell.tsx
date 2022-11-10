@@ -91,7 +91,7 @@ const HasManySelectCellContent = Component<HasManySelectProps>(
 				return <FieldFallbackView fallback={props.fallback} fallbackStyle={props.fallbackStyle} />
 			}
 			return elementsRenderer(entitiesArray.map(it => {
-				const val = it.getField(desugaredOptionPath.field).value
+				const val = it.getField<string | number>(desugaredOptionPath.field).value
 				if (val !== null) {
 					return <Fragment key={it.key}>{val}</Fragment>
 				}

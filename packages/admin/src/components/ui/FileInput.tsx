@@ -1,7 +1,9 @@
 import type { DetailedHTMLProps, FunctionComponent, InputHTMLAttributes } from 'react'
+import { ReactNode } from 'react'
 
 export interface FileInputProps {
 	onChange?: DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>['onChange']
+	children?: ReactNode
 }
 
 export const FileInput: FunctionComponent<FileInputProps> = props => (

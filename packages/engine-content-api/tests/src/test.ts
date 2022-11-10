@@ -88,6 +88,7 @@ export const execute = async (test: Test) => {
 					identityId: '00000000-0000-0000-0000-000000000000',
 					systemSchema: 'system',
 					stage: { id: '00000000-0000-0000-0000-000000000000', slug: 'live' },
+					project: { slug: 'test' },
 				}),
 			timer: (label: any, cb: any) => cb(),
 		},

@@ -27,6 +27,12 @@ export class DatabaseContext<Conn extends Connection.ConnectionLike = Connection
 		})
 	}
 
+	public async scope<T>(cb: (dbContext: DatabaseContext<Connection.AcquiredConnectionLike>) => Promise<T>): Promise<T> {
+		return await this.client.scope(async db => {
+			return await cb(new DatabaseContext(db, this.providers))
+		})
+	}
+
 	public batchLoad<Arg, Result, Item>(loaderArgs: BatchLoaderArgs<Arg, Result, Item>, arg: Arg): Promise<Item> {
 		const existing = this.loaders.get(loaderArgs)
 		if (existing) {

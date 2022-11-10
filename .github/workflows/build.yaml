@@ -1,13 +1,10 @@
 name: Build
 on:
   push:
-    branches:
-      - '**'
-    tags-ignore:
-      - '**'
+    branches: [ 'master' ]
+    tags: [ '**' ]
   pull_request:
-    branches-ignore:
-      - '**'
+  workflow_dispatch:
 jobs:
   build:
     runs-on: ubuntu-latest

@@ -4,6 +4,32 @@ import { createCredentials } from './tenantCredentials'
 
 export default async function (builder: MigrationBuilder, args: TenantMigrationArgs) {
 	builder.sql(`
+CREATE FUNCTION "project_deleted"() RETURNS "trigger"
+    LANGUAGE "plpgsql"
+    AS $$
+BEGIN
+	PERFORM pg_notify('project_updated', old.id::text);
+	RETURN NULL;
+END;
+$$;
+CREATE FUNCTION "project_secret_updated"() RETURNS "trigger"
+    LANGUAGE "plpgsql"
+    AS $$
+BEGIN
+	UPDATE project SET updated_at = 'now' WHERE id = COALESCE(new.project_id, old.project_id);
+	PERFORM pg_notify('project_updated', COALESCE(new.project_id, old.project_id)::TEXT);
+	RETURN NULL;
+END;
+$$;
+CREATE FUNCTION "project_updated"() RETURNS "trigger"
+    LANGUAGE "plpgsql"
+    AS $$
+BEGIN
+	NEW.updated_at = 'now';
+	PERFORM pg_notify('project_updated', new.id::text);
+	RETURN new;
+END;
+$$;
 CREATE TABLE "api_key" (
     "id" "uuid" NOT NULL,
     "token_hash" "text" NOT NULL,
@@ -139,6 +165,9 @@ CREATE UNIQUE INDEX "project_membership_unique" ON "project_membership" USING "b
 CREATE INDEX "project_secret_project_index" ON "project_secret" USING "btree" ("project_id");
 CREATE UNIQUE INDEX "project_secret_unique" ON "project_secret" USING "btree" ("project_id", "key");
 CREATE UNIQUE INDEX "project_slug" ON "project" USING "btree" ("slug");
+CREATE TRIGGER "project_deleted" AFTER DELETE ON "project" FOR EACH ROW EXECUTE FUNCTION "project_deleted"();
+CREATE TRIGGER "project_secret_updated" AFTER INSERT OR DELETE OR UPDATE ON "project_secret" FOR EACH ROW EXECUTE FUNCTION "project_secret_updated"();
+CREATE TRIGGER "project_updated" BEFORE INSERT OR UPDATE OF "name", "slug", "config" ON "project" FOR EACH ROW EXECUTE FUNCTION "project_updated"();
 ALTER TABLE ONLY "api_key"
     ADD CONSTRAINT "api_key_identity_id_fkey" FOREIGN KEY ("identity_id") REFERENCES "identity"("id");
 ALTER TABLE ONLY "identity"
@@ -161,6 +190,12 @@ ALTER TABLE ONLY "project_membership_variable"
     ADD CONSTRAINT "project_membership_variable_membership" FOREIGN KEY ("membership_id") REFERENCES "project_membership"("id") ON DELETE CASCADE;
 ALTER TABLE ONLY "project_secret"
     ADD CONSTRAINT "project_secret_project" FOREIGN KEY ("project_id") REFERENCES "project"("id") ON DELETE CASCADE;
+DO LANGUAGE plpgsql
+$$
+	BEGIN
+		EXECUTE FORMAT('ALTER FUNCTION project_secret_updated() SET SEARCH_PATH = %s', QUOTE_IDENT(CURRENT_SCHEMA()));
+	END
+$$;
 `)
 
 	await createCredentials(builder, args)

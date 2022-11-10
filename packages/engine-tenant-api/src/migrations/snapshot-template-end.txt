@@ -1,3 +1,9 @@
+DO LANGUAGE plpgsql
+$$
+	BEGIN
+		EXECUTE FORMAT('ALTER FUNCTION project_secret_updated() SET SEARCH_PATH = %s', QUOTE_IDENT(CURRENT_SCHEMA()));
+	END
+$$;
 `)
 
 	await createCredentials(builder, args)

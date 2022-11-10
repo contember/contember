@@ -112,6 +112,7 @@ export class ContentApiControllerFactory {
 							requestDebug,
 							systemSchema: projectContainer.systemDatabaseContextFactory.schemaName,
 							stage,
+							project,
 						})
 					},
 				}))

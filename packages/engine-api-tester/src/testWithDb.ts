@@ -121,6 +121,7 @@ export const executeDbTest = async (test: Test) => {
 					identityVariables: {},
 					systemSchema: 'system',
 					stage: stage,
+					project: { slug: 'test' },
 				})
 			const context: ContentContext = {
 				db: projectDb,

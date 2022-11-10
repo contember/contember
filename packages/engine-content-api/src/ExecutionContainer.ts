@@ -49,6 +49,7 @@ export type ExecutionContainerArgs = {
 	identityVariables: Acl.VariablesMap
 	permissions: Acl.Permissions
 	systemSchema: string
+	project: { slug: string }
 	stage: { id: string; slug: string }
 }
 
@@ -74,12 +75,14 @@ export class ExecutionContainerFactory {
 		return this.hooks.reduce((acc, cb) => cb(acc), builder)
 	}
 
-	createBuilderInternal({ permissions, identityVariables, identityId, db, schema, systemSchema, stage }: ExecutionContainerArgs) {
+	createBuilderInternal({ permissions, identityVariables, identityId, db, schema, systemSchema, stage, project }: ExecutionContainerArgs) {
 		return new Builder({})
 			.addService('systemSchema', () =>
 				systemSchema)
 			.addService('db', () =>
 				db)
+			.addService('project', () =>
+				project)
 			.addService('stage', () =>
 				stage)
 			.addService('schema', () =>

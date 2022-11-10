@@ -212,6 +212,7 @@ export class ModelValidator {
 	private validateCollisions(entities: Model.Entity[], errorBuilder: ErrorBuilder) {
 		const relationNames: Record<string, string> = {}
 		const aliasedTypes = new Map<string, Model.ColumnType>()
+		const entityNames = new Set(entities.map(it => it.name))
 		for (const entity of entities) {
 			const description = `table name ${entity.tableName} of entity ${entity.name}`
 			if (relationNames[entity.tableName]) {
@@ -220,6 +221,14 @@ export class ModelValidator {
 					.add(`${description} collides with a ${relationNames[entity.tableName]}`)
 			} else {
 				relationNames[entity.tableName] = description
+			}
+
+			if (entity.name.endsWith('Meta')) {
+				const baseName = entity.name.substring(0, entity.name.length - 4)
+				if (entityNames.has(baseName)) {
+					errorBuilder.for(entity.name)
+						.add(`entity ${entity.name} collides with entity ${baseName}, because a GraphQL type with "Meta" suffix is created for every entity`)
+				}
 			}
 		}
 		for (const entity of entities) {

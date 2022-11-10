@@ -4,13 +4,13 @@
   "license": "Apache-2.0",
   "main": "dist/src/index.js",
   "scripts": {
-    "test": "echo 'No tests'"
+    "test": "vitest"
   },
   "typings": "dist/src/index.d.ts",
   "devDependencies": {
     "@types/node": "^18"
   },
   "dependencies": {
-    "chalk": "^4.1.2"
+    "@contember/logger": "^1.2.0-alpha.17"
   }
 }

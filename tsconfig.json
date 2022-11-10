@@ -3,6 +3,7 @@
 	"include": [],
 	"references": [
 		{ "path": "./ee/engine-server-ee" },
+		{ "path": "./ee/engine-actions" },
 		{ "path": "./packages/authorization" },
 		{ "path": "./packages/benchmark" },
 		{ "path": "./packages/cli" },

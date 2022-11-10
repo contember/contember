@@ -1,30 +1,30 @@
 import { Schema } from '@contember/schema'
 import { ModificationHandlerFactory, SchemaDiffer, SchemaMigrator, VERSION_LATEST } from '@contember/schema-migrations'
 import { AllowAllPermissionFactory, emptySchema, Providers } from '@contember/schema-utils'
-import { SelectBuilder } from '@contember/database'
+import { Client, SelectBuilder } from '@contember/database'
 import { assert } from 'vitest'
-import { NullLoggerHandler, withLogger } from '@contember/logger'
+import { createLogger, NullLoggerHandler, withLogger } from '@contember/logger'
 import {
 	Authorizator,
+	Context as ContentContext,
 	ExecutionContainerFactory,
 	GraphQlSchemaBuilderFactory,
-	Context as ContentContext,
 } from '@contember/engine-content-api'
 import { MigrationGroup } from '@contember/database-migrations'
 import { createUuidGenerator } from './testUuid'
 import {
-	DatabaseContextFactory, formatSchemaName,
+	DatabaseContextFactory,
+	formatSchemaName,
 	ProjectInitializer,
 	StageBySlugQuery,
 	StageCreator,
 	SystemContainerFactory,
 	SystemMigrationsRunner,
-
 } from '@contember/engine-system-api'
 import { createConnection, dbCredentials, recreateDatabase } from './dbUtils'
-import { createLogger, JsonStreamLoggerHandler } from '@contember/logger'
 import { graphql } from 'graphql'
 
+type DatabaseExpectation = Record<string, Record<string, any>[]>
 type Test = {
 	schema: Partial<Schema>
 	seed: {
@@ -33,7 +33,8 @@ type Test = {
 	}[]
 	query: string
 	queryVariables?: Record<string, any>
-	expectDatabase?: Record<string, Record<string, any>[]>
+	expectDatabase?: DatabaseExpectation
+	expectSystemDatabase?: DatabaseExpectation
 	executionContainerFactoryFactory?: (providers: Providers) => ExecutionContainerFactory
 	migrationGroups?: Record<string, MigrationGroup<unknown>>
 } & ({ return: object | ((response: any) => void) } | { throws: { message: string } })
@@ -63,7 +64,7 @@ export const executeDbTest = async (test: Test) => {
 	})
 	const systemContainer = systemContainerBuilder.build()
 
-	const dbName = String(process.env.TEST_DB_NAME)
+	const dbName = String(process.env.TEST_DB_NAME + Date.now().toString())
 
 	const projectDbCredentials = dbCredentials(dbName)
 	const connection = await recreateDatabase(projectDbCredentials)
@@ -82,7 +83,7 @@ export const executeDbTest = async (test: Test) => {
 	const stageCreator = new StageCreator()
 	const projectInitializer = new ProjectInitializer(stageCreator, systemMigrationsRunner, databaseContextFactory, projectConfigWithDb)
 
-	await projectInitializer.initialize(createLogger(new JsonStreamLoggerHandler(process.stderr)))
+	await projectInitializer.initialize(createLogger(new NullLoggerHandler()))
 
 
 	try {
@@ -167,15 +168,26 @@ export const executeDbTest = async (test: Test) => {
 			}
 		})
 
-		const dbData: Record<string, Record<string, any>[]> = {}
-		for (const table of Object.keys(test.expectDatabase || {})) {
-			const qb = SelectBuilder.create().from(table)
 
-			const columns = Object.keys((test.expectDatabase || {})[table][0] || { id: null })
-			const qbWithSelect = columns.reduce<SelectBuilder<Record<string, any>>>((qb, column) => qb.select(column), qb)
-			dbData[table] = await qbWithSelect.getResult(projectDb)
+		const checkDb = async (db: Client, expectation: DatabaseExpectation) => {
+			const dbData: DatabaseExpectation = {}
+			for (const table of Object.keys(expectation || {})) {
+				const qb = SelectBuilder.create().from(table)
+
+				const columns = Object.keys((expectation || {})[table][0] ?? {})
+				const qbWithSelect = columns.length ? columns.reduce<SelectBuilder<Record<string, any>>>((qb, column) => qb.select(column), qb) : qb.select(it => it.raw('*'))
+				dbData[table] = await qbWithSelect.getResult(db)
+			}
+			try {
+				assert.deepStrictEqual(dbData, expectation ?? {})
+			} catch (e) {
+				// eslint-disable-next-line no-console
+				console.log(JSON.stringify(dbData))
+				throw e
+			}
 		}
-		assert.deepStrictEqual(dbData, test.expectDatabase ?? {})
+		await checkDb(projectDb, test.expectDatabase ?? {})
+		await checkDb(db.client, test.expectSystemDatabase ?? {})
 	} finally {
 		await projectConnection.end()
 	}

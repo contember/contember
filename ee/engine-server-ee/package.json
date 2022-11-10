@@ -8,6 +8,7 @@
   "dependencies": {
     "@contember/database": "^1.3.0-alpha.2",
     "@contember/typesafe": "^1.3.0-alpha.2",
+    "@contember/engine-actions": "0.0.0",
     "@contember/engine-common": "^1.3.0-alpha.2",
     "@contember/engine-http": "^1.3.0-alpha.2",
     "@contember/engine-plugins": "^1.3.0-alpha.2",

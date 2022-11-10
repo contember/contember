@@ -1,0 +1,29 @@
+{
+	"extends": "../tsconfig.settings.json",
+	"compilerOptions": {
+		"outDir": "../dist/src"
+	},
+	"references": [
+		{
+			"path": "../../../packages/database/src"
+		},
+		{
+			"path": "../../../packages/engine-content-api/src"
+		},
+		{
+			"path": "../../../packages/logger/src"
+		},
+		{
+			"path": "../../../packages/schema/src"
+		},
+		{
+			"path": "../../../packages/schema-utils/src"
+		},
+		{
+			"path": "../../../packages/engine-plugins/src"
+		},
+		{
+			"path": "../../../packages/engine-http/src"
+		}
+	]
+}

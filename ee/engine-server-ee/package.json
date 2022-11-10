@@ -12,6 +12,7 @@
     "@contember/database-migrations": "^1.2.0-alpha.18",
     "@contember/dic": "^1.2.0-alpha.18",
     "@contember/typesafe": "^1.2.0-alpha.18",
+    "@contember/engine-actions": "0.0.0",
     "@contember/engine-content-api": "^1.2.0-alpha.18",
     "@contember/engine-http": "^1.2.0-alpha.18",
     "@contember/engine-server": "^1.2.0-alpha.18",

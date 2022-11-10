@@ -5,6 +5,9 @@
 	},
 	"references": [
 		{
+			"path": "../../engine-actions/src"
+		},
+		{
 			"path": "../../../packages/database-migrations/src"
 		},
 		{

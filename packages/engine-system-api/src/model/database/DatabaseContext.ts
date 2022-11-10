@@ -7,6 +7,7 @@ export interface DatabaseContext<ConnectionType extends Connection.ConnectionLik
 	client: Client<ConnectionType>
 	queryHandler: QueryHandler<DatabaseQueryable>
 	transaction: <T>(cb: (db: DatabaseContext<Connection.TransactionLike>) => Promise<T> | T) => Promise<T>
+	scope: <T>(cb: (db: DatabaseContext<ConnectionType & Connection.AcquiredConnectionLike>) => Promise<T> | T) => Promise<T>
 	locked: <T>(lock: number, cb: (db: DatabaseContext<Connection.ConnectionLike>) => Promise<T> | T) => Promise<T>
 	commandBus: CommandBus
 }
@@ -35,6 +36,8 @@ const createDatabaseContext = <ConnectionType extends Connection.ConnectionLike 
 			await client.query(Connection.REPEATABLE_READ)
 			return cb(createDatabaseContext(client, providers))
 		}),
+	scope: cb =>
+		client.scope(client => cb(createDatabaseContext(client, providers))),
 	commandBus: new CommandBus(client, providers),
 	locked: (lock, cb) => client.locked(lock, client => cb(createDatabaseContext(client, providers))),
 })

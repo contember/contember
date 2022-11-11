@@ -20,26 +20,16 @@ export const UsersList = memo<UsersListProps>(({ editUserLink, ...props }) => (
 	/>
 ))
 
-export type UsersManagementProps<T> = {
-	rolesDataQuery: string
-	roleRenderers: RoleRenderers<T>
-	addUserLink?: RoutingLinkTarget
-	editUserLink?: RoutingLinkTarget
-}
+export type UsersManagementProps<T>  =
+	& UseRoleRendererFactoryProps<T>
+	& {
+		addUserLink?: RoutingLinkTarget
+		editUserLink?: RoutingLinkTarget
+	}
 
 export const UsersManagement = <T extends {}>(props: UsersManagementProps<T>) => {
 	const project = useProjectSlug()
-	const contentClient = useCurrentContentGraphQlClient()
-	const roleRendererFactory: RoleRendererFactory = useCallback(async () => {
-		const rolesData = await contentClient.sendRequest(props.rolesDataQuery)
-		return ({ role, variables }) => {
-			const Renderer = props.roleRenderers[role]
-			if (!Renderer) {
-				return <>Unknown role {role}</>
-			}
-			return <Renderer rolesData={rolesData} variables={variables} />
-		}
-	}, [contentClient, props.roleRenderers, props.rolesDataQuery])
+	const roleRendererFactory = useRoleRendererFactory(props)
 	if (!project) {
 		return <>Not in project.</>
 	}
@@ -55,4 +45,26 @@ export const UsersManagement = <T extends {}>(props: UsersManagementProps<T>) =>
 				/>
 			</LayoutPage>
 		)
+}
+
+export interface UseRoleRendererFactoryProps<T> {
+	rolesDataQuery?: string
+	roleRenderers?: RoleRenderers<T>
+}
+
+export const useRoleRendererFactory = <T extends {}>({ rolesDataQuery, roleRenderers }: UseRoleRendererFactoryProps<T>) => {
+	const contentClient = useCurrentContentGraphQlClient()
+	return useCallback<RoleRendererFactory>(async () => {
+		const rolesData = rolesDataQuery ? await contentClient.sendRequest(rolesDataQuery) : undefined
+		return ({ role, variables }) => {
+			if (!roleRenderers) {
+				return <>{role}</>
+			}
+			const Renderer = roleRenderers?.[role]
+			if (!Renderer) {
+				return <>Unknown role {role}</>
+			}
+			return <Renderer rolesData={rolesData} variables={variables} />
+		}
+	}, [contentClient, roleRenderers, rolesDataQuery])
 }

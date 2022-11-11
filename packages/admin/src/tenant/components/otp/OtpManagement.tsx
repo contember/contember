@@ -11,6 +11,14 @@ export const OtpManagement = () => {
 	const [initializingOtp, setInitializingOtp] = useState(false)
 	const [otpUri, setOtpUri] = useState<string>()
 
+	const person = identity.person
+
+	if (!person) {
+		return <>
+			Cannot setup OTP for API key.
+		</>
+	}
+
 	if (initializingOtp) {
 		return (
 			<>
@@ -19,7 +27,7 @@ export const OtpManagement = () => {
 						setInitializingOtp(false)
 						setOtpUri(otpUri)
 					}}
-					isReSetup={identity.otpEnabled}
+					isReSetup={person.otpEnabled}
 					onCancel={() => setInitializingOtp(false)}
 				/>
 			</>
@@ -40,7 +48,7 @@ export const OtpManagement = () => {
 		</>
 	}
 
-	if (identity.otpEnabled) {
+	if (person.otpEnabled) {
 		return <>
 			<p>
 				Two factor authentication is ENABLED.

@@ -4,6 +4,7 @@ import { useCallback } from 'react'
 const ME_QUERY = `
 	query {
 		me {
+			id
 			person {
 				id
 				email
@@ -34,7 +35,8 @@ const ME_QUERY = `
 
 interface MeResponse {
 	me: {
-		person: {
+		id: string
+		person?: {
 			id: string,
 			email: string,
 			otpEnabled: boolean,

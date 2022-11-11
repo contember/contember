@@ -1,7 +1,7 @@
 import { Component, SugaredRelativeSingleField } from '@contember/binding'
 import type { FieldContainerProps } from '@contember/ui'
 import { FunctionComponent, ReactNode, useMemo } from 'react'
-import { NativeSelectFieldInner, NormalizedStaticOption, StaticSingleChoiceField } from '../fields'
+import { ChoiceFieldData, NormalizedStaticOption, SelectFieldInner, StaticSingleChoiceField } from '../fields'
 import { useStaticSingleChoiceField } from '../fields/ChoiceField/hooks/useStaticSingleChoiceField'
 import { useNormalizedBlocks } from './useNormalizedBlocks'
 
@@ -24,14 +24,14 @@ export const DiscriminatedBlocks: FunctionComponent<DiscriminatedBlocksProps> = 
 				})),
 			[blocksArray],
 		)
-		const metadata = useStaticSingleChoiceField({
+		const metadata: ChoiceFieldData.SingleChoiceFieldMetadata<any> = useStaticSingleChoiceField({
 			...props,
 			options: transformedBlockList,
 		})
 		return (
 			<>
 				{props.allowBlockTypeChange !== false && (
-					<NativeSelectFieldInner
+					<SelectFieldInner
 						{...metadata}
 						label={props.label}
 						placeholder="Choose…"

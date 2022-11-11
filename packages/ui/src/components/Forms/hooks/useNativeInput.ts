@@ -121,7 +121,7 @@ export function useNativeInput<E extends HTMLInputElement | HTMLTextAreaElement 
 	}
 }
 
-const useChangeValidationState = ({ ref, onValidationStateChange }: { ref: ForwardedRef<any>, onValidationStateChange?: (message: string) => void }) => {
+export const useChangeValidationState = ({ ref, onValidationStateChange }: { ref: ForwardedRef<any>, onValidationStateChange?: (message: string) => void }) => {
 	const validationMessage = useRef<string>()
 	const changeValidationState = useCallback(() => {
 		if (!(ref && typeof ref === 'object' && onValidationStateChange)) {

@@ -88,6 +88,7 @@ import { PersistOptions } from '@contember/binding';
 import type { PersistSuccessOptions } from '@contember/binding';
 import { Point } from 'slate';
 import type { Props } from 'react-select';
+import { PublicCommonReactSelectStylesProps } from '@contember/ui';
 import { PureComponent } from 'react';
 import { QualifiedEntityList } from '@contember/binding';
 import type { RadioProps } from '@contember/ui';
@@ -96,7 +97,6 @@ import { ReactEditor } from 'slate-react';
 import { ReactElement } from 'react';
 import { ReactNode } from 'react';
 import { Ref } from 'react';
-import { RefAttributes } from 'react';
 import { RefObject } from 'react';
 import { RelativeSingleField } from '@contember/binding';
 import { RemovalType } from '@contember/binding';
@@ -2896,33 +2896,6 @@ export type MutableEntityListRendererProps<ContainerExtraProps, ItemExtraProps> 
 export type MutationRequestState<T> = QueryRequestState<T> | RequestStateUninitialized<T>;
 
 // @public (undocumented)
-export const NativeSelectField: FunctionComponent<NativeSelectFieldProps>;
-
-// @public (undocumented)
-export const NativeSelectFieldInner: React.MemoExoticComponent<React.ForwardRefExoticComponent<Pick<NativeSelectFieldInnerProps<any>, "data" | "label" | "style" | "key" | "className" | "placeholder" | "onSelect" | "size" | "errors" | "description" | "direction" | "gap" | "labelDescription" | "labelPosition" | "width" | "required" | "useLabelElement" | "notNull" | "isLoading" | "onSearch" | "currentValue" | "onClear" | "onAddNew" | "allowNull"> & RefAttributes<HTMLSelectElement>>>;
-
-// @public (undocumented)
-export interface NativeSelectFieldInnerProps<ActualValue> extends ChoiceFieldData.SingleChoiceFieldMetadata<ActualValue>, NativeSelectFieldInnerPublicProps, RefAttributes<HTMLSelectElement> {
-    // (undocumented)
-    errors: FieldErrors | undefined;
-}
-
-// @public (undocumented)
-export interface NativeSelectFieldInnerPublicProps extends Omit<FieldContainerProps, 'children'> {
-    // @deprecated (undocumented)
-    allowNull?: boolean;
-    // (undocumented)
-    notNull?: boolean;
-    // (undocumented)
-    placeholder?: string;
-}
-
-// @public (undocumented)
-export type NativeSelectFieldProps = NativeSelectFieldInnerPublicProps & (StaticSingleChoiceFieldProps | DynamicSingleChoiceFieldProps) & {
-    searchByFields?: never;
-};
-
-// @public (undocumented)
 export const NavigateBackButton: React.NamedExoticComponent<LinkButtonProps>;
 
 // @public (undocumented)
@@ -3231,10 +3204,7 @@ export type ProjectUserRoles = Set<string>;
 // @public (undocumented)
 export type PublicAnchorProps = Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'>;
 
-// @public (undocumented)
-export type PublicCommonReactSelectStylesProps = {
-    menuZIndex?: number;
-};
+export { PublicCommonReactSelectStylesProps }
 
 // @public (undocumented)
 export type PublicFileKind<UploadResult = unknown, AcceptArtifacts = unknown> = Partial<InternalFileKind<UploadResult, AcceptArtifacts>>;

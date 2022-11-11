@@ -1,7 +1,7 @@
 import { useCallback, useState } from '@storybook/addons'
 import { ComponentMeta, ComponentStory, forceReRender } from '@storybook/react'
 import * as React from 'react'
-import { Select } from '../../src'
+import { HTMLReactSelectElement, Select } from '../../src'
 import { Button } from '../ui/Button'
 import { booleanControl, disabledControlsForAttributes } from './Helpers'
 
@@ -23,7 +23,7 @@ export default {
 } as ComponentMeta<typeof Select>
 
 const Template: ComponentStory<typeof Select> = args => {
-	const ref = React.useRef<HTMLSelectElement>(null)
+	const ref = React.useRef<HTMLReactSelectElement<typeof args.options[number]['value']>>(null)
 	const [value, setValue] = useState<unknown | null | undefined>(args.value as unknown)
 	const [error, setError] = useState<string | undefined>(undefined)
 	const [touched, setTouched] = useState<boolean | undefined>(undefined)
@@ -151,5 +151,4 @@ Boolean_Values.args = {
 		value: false,
 		label: 'Off',
 	}],
-	rows: 2,
 }

@@ -8,24 +8,26 @@ export interface UsersListProps {
 	project: string
 	children?: undefined
 	createRoleRenderer?: RoleRendererFactory
-	createUserEditLink: (id: string) => RoutingLinkTarget
+	editUserLink: RoutingLinkTarget
 }
 
-export const UsersList = memo<UsersListProps>(({ createUserEditLink, ...props }) => (
+export const UsersList = memo<UsersListProps>(({ editUserLink, ...props }) => (
 	<MemberList
 		{...props}
-		createEditIdentityLink={createUserEditLink}
+		editIdentityLink={editUserLink}
 		memberType={'PERSON'}
 		Identity={({ identity }) => <>{identity.person ? identity.person.email : '?'}</>}
 	/>
 ))
 
-interface UsersManagementProps<T> {
+export type UsersManagementProps<T> = {
 	rolesDataQuery: string
 	roleRenderers: RoleRenderers<T>
+	addUserLink?: RoutingLinkTarget
+	editUserLink?: RoutingLinkTarget
 }
 
-export const UsersManagement: FC<UsersManagementProps<any>> = <T extends {}>(props: UsersManagementProps<T>) => {
+export const UsersManagement = <T extends {}>(props: UsersManagementProps<T>) => {
 	const project = useProjectSlug()
 	const contentClient = useCurrentContentGraphQlClient()
 	const roleRendererFactory: RoleRendererFactory = useCallback(async () => {
@@ -38,19 +40,19 @@ export const UsersManagement: FC<UsersManagementProps<any>> = <T extends {}>(pro
 			return <Renderer rolesData={rolesData} variables={variables} />
 		}
 	}, [contentClient, props.roleRenderers, props.rolesDataQuery])
-	if (project) {
+	if (!project) {
+		return <>Not in project.</>
+	}
 		return (
 			<LayoutPage
-				actions={<LinkButton to={'tenantInviteUser'}>Add a user</LinkButton>}
+				actions={<LinkButton to={props.addUserLink ?? 'tenantInviteUser'}>Add a user</LinkButton>}
 				title="Users in project"
 			>
 				<UsersList
 					project={project}
 					createRoleRenderer={roleRendererFactory}
-					createUserEditLink={id => ({ pageName: 'tenantEditUser', parameters: { id } })}
+					editUserLink={props.editUserLink ?? `tenantEditUser(id: $id)`}
 				/>
 			</LayoutPage>
 		)
-	}
-	return null
 }

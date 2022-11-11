@@ -85,7 +85,7 @@ export const InviteUser: FC<InviteUserProps> = ({ project, rolesConfig, userList
 	)
 }
 
-export const InviteUserToProject: FC<{ rolesConfig: RolesConfig }> = memo(({ rolesConfig }) => {
+export const InviteUserToProject: FC<{ rolesConfig?: RolesConfig, userListLink?: RoutingLinkTarget }> = memo(({ rolesConfig, userListLink = 'tenantUsers' }) => {
 	const project = useProjectSlug()
 	if (!project) {
 		return <>Not in project.</>
@@ -93,9 +93,9 @@ export const InviteUserToProject: FC<{ rolesConfig: RolesConfig }> = memo(({ rol
 	return (
 		<LayoutPage
 			title="Invite user"
-			navigation={<NavigateBackButton to={'tenantUsers'}>Back to list of users</NavigateBackButton>}
+			navigation={<NavigateBackButton to={userListLink}>Back to list of users</NavigateBackButton>}
 		>
-			<InviteUser project={project} rolesConfig={rolesConfig} userListLink={'tenantUsers'} />
+			<InviteUser project={project} rolesConfig={rolesConfig} userListLink={userListLink} />
 		</LayoutPage>
 	)
 })

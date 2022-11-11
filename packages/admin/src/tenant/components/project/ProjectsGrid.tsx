@@ -5,10 +5,10 @@ import { LinkButton, RoutingLinkTarget } from '../../../routing'
 import { QueryLoader } from '../QueryLoader'
 
 interface ProjectGridProps {
-	createProjectDetailLink: (project: string) => RoutingLinkTarget
+	projectDetailLink: RoutingLinkTarget
 }
 
-export const ProjectsGrid: FC<ProjectGridProps> = ({ createProjectDetailLink }) => {
+export const ProjectsGrid: FC<ProjectGridProps> = ({ projectDetailLink }) => {
 	const { state: query } = useAuthedTenantQuery<{ projects: { slug: string, name: string }[] }, {}>(`
 		query {
 			projects {
@@ -36,7 +36,7 @@ export const ProjectsGrid: FC<ProjectGridProps> = ({ createProjectDetailLink }) 
 								<span style={{ fontFamily: 'monospace' }}>{project.slug}</span>
 							</TableCell>
 							<TableCell shrunk>
-								<LinkButton to={createProjectDetailLink(project.slug)}>Overview and users</LinkButton>
+								<LinkButton to={projectDetailLink} parameters={{ projectSlug: project.slug }}>Overview and users</LinkButton>
 							</TableCell>
 						</TableRow>
 					))}

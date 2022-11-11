@@ -4,7 +4,7 @@ import { RoutingLinkTarget, useRedirect } from '../../../routing'
 import { useForm } from '../../lib'
 
 interface FillResetPasswordTokenFormProps {
-	resetLink: (token: string) => RoutingLinkTarget
+	resetLink: RoutingLinkTarget
 }
 
 const initialValues = {
@@ -16,7 +16,7 @@ export const FillResetPasswordTokenForm: FC<FillResetPasswordTokenFormProps> = (
 
 	const { register, isSubmitting, onSubmit } = useForm<typeof initialValues>(initialValues, useCallback(
 			async (values: typeof initialValues) => {
-				redirect(resetLink(values.token))
+				redirect(resetLink, { token: values.token })
 			},
 			[redirect, resetLink],
 		),

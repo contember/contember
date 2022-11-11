@@ -12,7 +12,7 @@ export default () => {
 			actions={actions}
 			children={(
 				<ProjectsGrid
-					createProjectDetailLink={project => ({ pageName: 'projectOverview', parameters: { project } })}
+					projectDetailLink={`projectOverview(project: $projectSlug)`}
 				/>
 			)}
 		/>

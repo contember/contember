@@ -12,12 +12,12 @@ export interface MemberListProps {
 	project: string
 	children?: undefined
 	createRoleRenderer?: RoleRendererFactory
-	createEditIdentityLink: (id: string) => RoutingLinkTarget
 	memberType: ListMembersMemberType
 	Identity: ComponentType<{ identity: MemberIdentity }>
+	editIdentityLink: RoutingLinkTarget
 }
 
-export const MemberList = memo<MemberListProps>(({ project, createRoleRenderer, createEditIdentityLink, Identity, memberType }) => {
+export const MemberList = memo<MemberListProps>(({ project, createRoleRenderer, editIdentityLink, Identity, memberType }) => {
 		const { state: query, refetch: refetchMembersList } = useListMembersQuery(project, memberType)
 		const removeMember = useRemoveMemberIntent(project, refetchMembersList)
 		const RoleRenderer = useRoleRenderer(createRoleRenderer, query)
@@ -45,7 +45,7 @@ export const MemberList = memo<MemberListProps>(({ project, createRoleRenderer, 
 											<IdentityMembership RoleRenderer={RoleRenderer} memberships={member.memberships} />
 										</TableCell>
 										<TableCell shrunk>
-											<LinkButton size="small" to={createEditIdentityLink(member.identity.id)}>
+											<LinkButton size="small" to={editIdentityLink} parameters={{ identityId: member.identity.id, projectSlug: project }}>
 												Edit roles
 											</LinkButton>
 										</TableCell>

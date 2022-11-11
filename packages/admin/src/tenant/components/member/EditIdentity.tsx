@@ -78,17 +78,19 @@ export const EditIdentity: FC<EditUserProps> = ({ project, rolesConfig, identity
 	)
 }
 
-export const EditUserInProject: FC<{ rolesConfig: RolesConfig; identityId: string }> = memo(
-	({ rolesConfig, identityId }) => {
+export const EditUserInProject: FC<{ rolesConfig?: RolesConfig; identityId: string; userListLink?: RoutingLinkTarget }> = memo(
+	({ rolesConfig, identityId, userListLink = 'tenantUsers' }) => {
 		const project = useProjectSlug()
 		if (!project) {
 			return <>Not in project.</>
 		}
-		return <LayoutPage
-			title="Edit user"
-			navigation={<NavigateBackButton to={'tenantUsers'}>Back to list of users</NavigateBackButton>}
-		>
-			<EditIdentity project={project} rolesConfig={rolesConfig} identityId={identityId} userListLink={'tenantUsers'} />
-		</LayoutPage>
+		return (
+			<LayoutPage
+				title="Edit user"
+				navigation={<NavigateBackButton to={userListLink}>Back to list of users</NavigateBackButton>}
+			>
+				<EditIdentity project={project} rolesConfig={rolesConfig} identityId={identityId} userListLink={userListLink} />
+			</LayoutPage>
+		)
 	},
 )

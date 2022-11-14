@@ -6,7 +6,7 @@ import { InviteMethod, useInvite } from '../../mutations'
 import { Membership } from '../../types'
 import { EditMembership, RolesConfig } from '../member'
 
-interface InviteUserProps {
+export interface InviteUserProps {
 	project: string
 	rolesConfig?: RolesConfig
 	userListLink: RoutingLinkTarget
@@ -85,7 +85,13 @@ export const InviteUser: FC<InviteUserProps> = ({ project, rolesConfig, userList
 	)
 }
 
-export const InviteUserToProject: FC<{ rolesConfig?: RolesConfig, userListLink?: RoutingLinkTarget }> = memo(({ rolesConfig, userListLink = 'tenantUsers' }) => {
+export type InviteUserToProjectProps = {
+	rolesConfig?: RolesConfig,
+	userListLink?: RoutingLinkTarget
+	method?: InviteMethod
+}
+
+export const InviteUserToProject: FC<InviteUserToProjectProps> = memo(({ rolesConfig, userListLink = 'tenantUsers', method }) => {
 	const project = useProjectSlug()
 	if (!project) {
 		return <>Not in project.</>
@@ -95,7 +101,7 @@ export const InviteUserToProject: FC<{ rolesConfig?: RolesConfig, userListLink?:
 			title="Invite user"
 			navigation={<NavigateBackButton to={userListLink}>Back to list of users</NavigateBackButton>}
 		>
-			<InviteUser project={project} rolesConfig={rolesConfig} userListLink={userListLink} />
+			<InviteUser project={project} rolesConfig={rolesConfig} userListLink={userListLink} method={method} />
 		</LayoutPage>
 	)
 })

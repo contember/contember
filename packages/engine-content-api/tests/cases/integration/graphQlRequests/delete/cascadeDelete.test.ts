@@ -39,12 +39,12 @@ test('delete author with posts and locales cascade delete', async () => {
 						],
 					},
 				},
+				{
+					sql: SQL`select "root_"."id" from "public"."author" as "root_" where "root_"."id" = ?`,
+					parameters: [testUuid(1)],
+					response: { rows: [{ id: testUuid(1) }] },
+				},
 				...sqlDeferred([
-					{
-						sql: SQL`select "root_"."id" from "public"."author" as "root_" where "root_"."id" = ?`,
-						parameters: [testUuid(1)],
-						response: { rows: [{ id: testUuid(1) }] },
-					},
 					{
 						sql: SQL`delete from "public"."author"
             where "id" in (select "root_"."id"

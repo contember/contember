@@ -22,12 +22,12 @@ test('delete', async () => {
 					parameters: [testUuid(2)],
 					response: { rows: [{ id: testUuid(2) }] },
 				},
+				{
+					sql: SQL`select "root_"."id" from "public"."site" as "root_" where "root_"."setting_id" = ?`,
+					parameters: [testUuid(2)],
+					response: { rows: [{ id: testUuid(1) }] },
+				},
 				...sqlDeferred([
-					{
-						sql: SQL`select "root_"."id" from "public"."site" as "root_" where "root_"."setting_id" = ?`,
-						parameters: [testUuid(2)],
-						response: { rows: [{ id: testUuid(1) }] },
-					},
 					{
 						sql: SQL`delete from "public"."site"
               where "id" in (select "root_"."id"

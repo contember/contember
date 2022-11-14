@@ -22,12 +22,12 @@ test('delete and create', async () => {
 					parameters: [testUuid(2)],
 					response: { rows: [{ id: testUuid(2) }] },
 				},
+				{
+					sql: SQL`select "root_"."id" from "public"."post_locale" as "root_" where "root_"."locale" = ? and "root_"."post_id" = ?`,
+					parameters: ['cs', testUuid(2)],
+					response: { rows: [{ id: testUuid(9) }] },
+				},
 				...sqlDeferred([
-					{
-						sql: SQL`select "root_"."id" from "public"."post_locale" as "root_" where "root_"."locale" = ? and "root_"."post_id" = ?`,
-						parameters: ['cs', testUuid(2)],
-						response: { rows: [{ id: testUuid(9) }] },
-					},
 					{
 						sql: SQL`delete from "public"."post_locale"
               where "id" in (select "root_"."id"

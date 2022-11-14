@@ -54,6 +54,7 @@ export class MutationGenerator {
 			let builder: QueryBuilder = new CrudQueryBuilder.CrudQueryBuilder()
 			const operations: SubMutationOperation[] = []
 			const processedPlaceholdersByEntity: ProcessedPlaceholdersByEntity = new Map()
+			const processedDeletes = new Set<string>()
 
 
 			for (const [treeRootId, rootStates] of this.treeStore.subTreeStatesByRoot.entries()) {
@@ -99,6 +100,11 @@ export class MutationGenerator {
 									continue
 								}
 								if (removalType === 'delete') {
+									const key = `${subTreeState.entityName}#${removedId}`
+									if (processedDeletes.has(key)) {
+										continue
+									}
+									processedDeletes.add(key)
 									const alias = this.createAlias()
 									builder = this.addDeleteMutation(
 										subTreeState.entityName,

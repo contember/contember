@@ -12,6 +12,7 @@ import { emptySchema } from '@contember/schema-utils'
 import { ApiTester } from './ApiTester'
 import { SelectBuilder } from '@contember/database'
 import { assert } from 'vitest'
+import { createLogger, NullLoggerHandler, withLogger } from '@contember/logger'
 
 type Test = {
 	schema: Model.Schema
@@ -58,25 +59,28 @@ export const executeDbTest = async (test: Test) => {
 	try {
 		await tester.stages.createAll()
 		await tester.stages.migrate('2019-01-01-100000')
-		for (const { query, queryVariables } of test.seed) {
-			await tester.content.queryContent('prod', query, queryVariables)
-		}
-		try {
-			const response = await tester.content.queryContent('prod', test.query, test.queryVariables)
-			if ('return' in test) {
-				if (typeof test.return === 'function') {
-					test.return(response)
+		const logger = createLogger(new NullLoggerHandler())
+		await withLogger(logger, async () => {
+			for (const { query, queryVariables } of test.seed) {
+				await tester.content.queryContent('prod', query, queryVariables)
+			}
+			try {
+				const response = await tester.content.queryContent('prod', test.query, test.queryVariables)
+				if ('return' in test) {
+					if (typeof test.return === 'function') {
+						test.return(response)
+					} else {
+						assert.deepStrictEqual(response, test.return)
+					}
+				}
+			} catch (e) {
+				if ('throws' in test && e instanceof Error) {
+					assert.equal(e.message, test.throws.message)
 				} else {
-					assert.deepStrictEqual(response, test.return)
+					throw e
 				}
 			}
-		} catch (e) {
-			if ('throws' in test && e instanceof Error) {
-				assert.equal(e.message, test.throws.message)
-			} else {
-				throw e
-			}
-		}
+		})
 
 		const dbData: Record<string, Record<string, any>[]> = {}
 		for (const table of Object.keys(test.expectDatabase || {})) {

@@ -1,3 +1,4 @@
+import { NullLoggerHandler, withLogger, createLogger } from '@contember/logger'
 import { graphql, GraphQLSchema } from 'graphql'
 import { assert } from 'vitest'
 
@@ -10,11 +11,14 @@ export interface Test {
 }
 
 export const executeGraphQlTest = async (test: Test) => {
-	const rawResponse = await graphql({
-		schema: test.schema,
-		source: test.query,
-		contextValue: test.context,
-		variableValues: test.queryVariables,
+	const logger = createLogger(new NullLoggerHandler())
+	const rawResponse = await withLogger(logger, () => {
+		return graphql({
+			schema: test.schema,
+			source: test.query,
+			contextValue: test.context,
+			variableValues: test.queryVariables,
+		})
 	})
 	const response = JSON.parse(JSON.stringify(rawResponse))
 	if ('errors' in rawResponse) {

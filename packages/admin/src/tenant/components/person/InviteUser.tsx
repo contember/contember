@@ -1,7 +1,6 @@
-import { useProjectSlug } from '@contember/react-client'
-import { Button, FieldContainer, LayoutPage, Stack, TextInput, useShowToast } from '@contember/ui'
-import { FC, memo, SyntheticEvent, useCallback, useRef, useState } from 'react'
-import { NavigateBackButton, RoutingLinkTarget, useRedirect } from '../../../routing'
+import { Button, FieldContainer, Stack, TextInput, useShowToast } from '@contember/ui'
+import { FC, SyntheticEvent, useCallback, useRef, useState } from 'react'
+import { RoutingLinkTarget, useRedirect } from '../../../routing'
 import { InviteMethod, useInvite } from '../../mutations'
 import { Membership } from '../../types'
 import { EditMembership, RolesConfig } from '../member'
@@ -84,24 +83,3 @@ export const InviteUser: FC<InviteUserProps> = ({ project, rolesConfig, userList
 		</form>
 	)
 }
-
-export type InviteUserToProjectProps = {
-	rolesConfig?: RolesConfig,
-	userListLink?: RoutingLinkTarget
-	method?: InviteMethod
-}
-
-export const InviteUserToProject: FC<InviteUserToProjectProps> = memo(({ rolesConfig, userListLink = 'tenantUsers', method }) => {
-	const project = useProjectSlug()
-	if (!project) {
-		return <>Not in project.</>
-	}
-	return (
-		<LayoutPage
-			title="Invite user"
-			navigation={<NavigateBackButton to={userListLink}>Back to list of users</NavigateBackButton>}
-		>
-			<InviteUser project={project} rolesConfig={rolesConfig} userListLink={userListLink} method={method} />
-		</LayoutPage>
-	)
-})

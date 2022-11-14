@@ -1,7 +1,6 @@
-import { useCurrentContentGraphQlClient, useProjectSlug } from '@contember/react-client'
-import { LayoutPage } from '@contember/ui'
-import { FC, memo, useCallback } from 'react'
-import { LinkButton, RoutingLinkTarget } from '../../../routing'
+import { useCurrentContentGraphQlClient } from '@contember/react-client'
+import { memo, useCallback } from 'react'
+import { RoutingLinkTarget } from '../../../routing'
 import { MemberList, RoleRendererFactory, RoleRenderers } from '../member'
 
 export interface UsersListProps {
@@ -20,32 +19,6 @@ export const UsersList = memo<UsersListProps>(({ editUserLink, ...props }) => (
 	/>
 ))
 
-export type UsersManagementProps<T>  =
-	& UseRoleRendererFactoryProps<T>
-	& {
-		addUserLink?: RoutingLinkTarget
-		editUserLink?: RoutingLinkTarget
-	}
-
-export const UsersManagement = <T extends {}>(props: UsersManagementProps<T>) => {
-	const project = useProjectSlug()
-	const roleRendererFactory = useRoleRendererFactory(props)
-	if (!project) {
-		return <>Not in project.</>
-	}
-		return (
-			<LayoutPage
-				actions={<LinkButton to={props.addUserLink ?? 'tenantInviteUser'}>Add a user</LinkButton>}
-				title="Users in project"
-			>
-				<UsersList
-					project={project}
-					createRoleRenderer={roleRendererFactory}
-					editUserLink={props.editUserLink ?? `tenantEditUser(id: $id)`}
-				/>
-			</LayoutPage>
-		)
-}
 
 export interface UseRoleRendererFactoryProps<T> {
 	rolesDataQuery?: string

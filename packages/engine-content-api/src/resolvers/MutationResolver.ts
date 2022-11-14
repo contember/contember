@@ -62,6 +62,7 @@ export class MutationResolver {
 
 		return this.transaction(async (mapper, trx) => {
 			if (options?.deferForeignKeyConstraints) {
+				logger.debug('MutationResolver: deferring foreign constraints')
 				await mapper.constraintHelper.setFkConstraintsDeferred()
 			}
 			const validationResult: Record<string, Result.MutationFieldResult> = {}
@@ -145,7 +146,7 @@ export class MutationResolver {
 				}
 
 				const meta = readOperationMeta(fieldConfig.extensions)
-
+				logger.debug('MutationResolver: Resolving a field', { field: field.alias })
 				const result: {
 					ok: boolean
 					validation?: Result.ValidationResult
@@ -169,6 +170,7 @@ export class MutationResolver {
 				})()
 
 				if (!result.ok) {
+					logger.debug('MutationResolver: Field evaluation failed', { result, field: field.alias })
 					const validationErrors = result.validation ? prefixErrors(result.validation.errors, field.alias) : []
 					const executionErrors = prefixErrors(result.errors, field.alias)
 					return {
@@ -193,12 +195,14 @@ export class MutationResolver {
 				trxResult[field.alias] = result
 			}
 			if (options?.deferForeignKeyConstraints) {
+				logger.debug('MutationResolver: validating fk constraints')
 				const constraintsResult = await tryMutation(this.schema, async () => {
 					await mapper.constraintHelper.setFkConstraintsImmediate()
 					return []
 				})
 				const errorResponse = this.createErrorResponse(constraintsResult)
 				if (errorResponse) {
+					logger.debug('MutationResolver: deferred fk validation failed', { errorResponse })
 					return { ...errorResponse, ...validationResult }
 				}
 			}
@@ -469,13 +473,17 @@ export class MutationResolver {
 		return await retryTransaction(
 			async () => {
 				return await this.db.transaction(async trx => {
+					logger.debug('MutationResolver: Starting mutation transaction')
 					await trx.connection.query(Connection.REPEATABLE_READ)
 					await this.systemVariablesSetup(trx)
 					const mapper = this.mapperFactory(trx)
 
 					const result = await cb(mapper, trx)
 					if (!result.ok) {
+						logger.debug('MutationResolver: Transaction failed, rolling back', { result })
 						await trx.connection.rollback()
+					} else {
+						logger.debug('MutationResolver: Transaction ok, committing')
 					}
 					return result
 				})

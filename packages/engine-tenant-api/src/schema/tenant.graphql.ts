@@ -607,7 +607,21 @@ const schema: DocumentNode = gql`
 		slug: String!
 		config: Json!
 		roles: [RoleDefinition!]!
-		members(memberType: MemberType): [ProjectIdentityRelation!]!
+		members(
+			input: ProjectMembersInput,
+			memberType: MemberType @deprecated(reason: "Use args")
+		): [ProjectIdentityRelation!]!
+	}
+
+	input ProjectMembersInput {
+		limit: Int
+		offset: Int
+		filter: ProjectMembersFilter
+	}
+
+	input ProjectMembersFilter {
+		memberType: MemberType
+		email: String
 	}
 
 	enum MemberType {

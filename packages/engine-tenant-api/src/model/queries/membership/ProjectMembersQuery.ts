@@ -1,10 +1,12 @@
-import { ConditionBuilder, DatabaseQuery, DatabaseQueryable, SelectBuilder } from '@contember/database'
-import { MemberType } from '../../../schema'
+import { DatabaseQuery, DatabaseQueryable, SelectBuilder } from '@contember/database'
+import { MemberType, ProjectMembersInput } from '../../../schema'
+import { ImplementationException } from '../../../exceptions'
 
 export class ProjectMembersQuery extends DatabaseQuery<ProjectMembersQueryResult> {
+
 	constructor(
 		private readonly projectId: string,
-		private readonly memberType?: MemberType,
+		private readonly projectMemberInput: ProjectMembersInput,
 	) {
 		super()
 	}
@@ -17,22 +19,29 @@ export class ProjectMembersQuery extends DatabaseQuery<ProjectMembersQueryResult
 			.where(it => it.exists(
 				builder => builder
 					.from('project_membership')
-					.where(expr => expr.columnsEq(['project_membership', 'identity_id'], ['identity', 'id'])),
+					.where(expr => expr.columnsEq(['project_membership', 'identity_id'], ['identity', 'id']))
+					.where({ project_id: this.projectId }),
 			))
 			.match(qb => {
-				if (!this.memberType) {
-					return qb
+				const { email, memberType } = this.projectMemberInput.filter ?? {}
+				if (email && memberType === MemberType.ApiKey) {
+					throw new ImplementationException()
 				}
-				const expr = ConditionBuilder.create().exists(
-					builder => builder
-						.from('person')
-						.where(expr => expr.columnsEq(['person', 'identity_id'], ['identity', 'id'])),
-				)
-				if (this.memberType === MemberType.Person) {
-					return qb.where(expr)
+				const baseExpr = SelectBuilder.create()
+					.from('person')
+					.where(expr => expr.columnsEq(['person', 'identity_id'], ['identity', 'id']))
+				if (email) {
+					return qb.where(it => it.exists(baseExpr.where({ email })))
 				}
-				return qb.where(ConditionBuilder.not(expr))
+				switch (memberType) {
+					case MemberType.ApiKey:
+						return qb.where(it => it.not(it => it.exists(baseExpr)))
+					case MemberType.Person:
+						return qb.where(it => it.exists(baseExpr))
+				}
+				return qb
 			})
+			.limit(this.projectMemberInput.limit ?? undefined, this.projectMemberInput.offset ?? undefined)
 			.getResult(db)
 	}
 }

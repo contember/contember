@@ -1,8 +1,9 @@
-import { ProjectIdentityRelation, ProjectMembersArgs, ProjectResolvers } from '../../schema'
+import { MemberType, ProjectIdentityRelation, ProjectMembersArgs, ProjectResolvers } from '../../schema'
 import { TenantResolverContext } from '../TenantResolverContext'
 import { PermissionActions, Project, ProjectMemberManager, ProjectSchemaResolver } from '../../model'
 import { getRoleVariables } from '@contember/schema-utils'
 import { Acl } from '@contember/schema'
+import { UserInputError } from '@contember/graphql-utils'
 
 export class ProjectTypeResolver implements ProjectResolvers {
 	constructor(
@@ -20,8 +21,14 @@ export class ProjectTypeResolver implements ProjectResolvers {
 		if (!(await verifier(PermissionActions.PROJECT_VIEW_MEMBER([])))) {
 			return []
 		}
+		if (args.input?.filter?.email && args.input.filter.memberType === MemberType.ApiKey) {
+			throw new UserInputError(`Cannot use email filter for ApiKey member type.`)
+		}
+		if (args.memberType && args.input) {
+			throw new UserInputError(`Cannot use both deprecated memberType parameter and new input parameter`)
+		}
 
-		const members = await this.projectMemberManager.getProjectMembers(context.db, parent.id, verifier, args.memberType ?? undefined)
+		const members = await this.projectMemberManager.getProjectMembers(context.db, parent.id, verifier, args.input ?? { filter: { memberType: args.memberType } })
 		return members.map(it => ({
 			...it,
 			identity: { ...it.identity, projects: [] },

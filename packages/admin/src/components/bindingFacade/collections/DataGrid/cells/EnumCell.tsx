@@ -4,9 +4,11 @@ import { Component, QueryLanguage, SugaredField, SugaredFieldProps, wrapFilterIn
 import { GraphQlLiteral, Input } from '@contember/client'
 import { useMessageFormatter } from '../../../../../i18n'
 import { dataGridCellsDictionary } from './dataGridCellsDictionary'
+import { FieldFallbackView, FieldFallbackViewPublicProps } from '../../../fieldViews'
 
 export type EnumCellProps =
 	& DataGridColumnPublicProps
+	& FieldFallbackViewPublicProps
 	& {
 		field: SugaredFieldProps['field']
 		options: Record<string, string>
@@ -102,7 +104,13 @@ export const EnumCell = Component<EnumCellProps>(props => {
 			}}
 		>
 			<SugaredField<string> field={props.field} format={value => {
-				return value ? (props.format ? props.format(props.options[value]) : props.options[value]) : ''
+				if (value === null) {
+					return <FieldFallbackView fallback={props.fallback} fallbackStyle={props.fallbackStyle} />
+				}
+				if (props.format) {
+					return props.format(props.options[value])
+				}
+				return props.options[value]
 			}} />
 		</DataGridColumn>
 	)

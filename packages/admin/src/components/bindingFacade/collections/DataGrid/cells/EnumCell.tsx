@@ -5,6 +5,7 @@ import { GraphQlLiteral, Input } from '@contember/client'
 import { useMessageFormatter } from '../../../../../i18n'
 import { dataGridCellsDictionary } from './dataGridCellsDictionary'
 import { FieldFallbackView, FieldFallbackViewPublicProps } from '../../../fieldViews'
+import { Checkbox, FieldContainer } from '@contember/ui'
 
 export type EnumCellProps =
 	& DataGridColumnPublicProps
@@ -67,36 +68,50 @@ export const EnumCell = Component<EnumCellProps>(props => {
 				const fieldSchema = entitySchema.fields.get(desugared.field)
 
 				const onChange = useCallback(
-					(event: ChangeEvent<HTMLInputElement>) => {
-						if (event.target.checked) {
-							setFilter({ nullCondition, values: [...values, event.target.value] })
+					(checked: boolean, value: string) => {
+						if (checked) {
+							setFilter({ nullCondition, values: [...values, value] })
 						} else {
-							setFilter({ nullCondition, values: values.filter(it => it !== event.target.value) })
+							setFilter({ nullCondition, values: values.filter(it => it !== value) })
 						}
 					},
 					[nullCondition, setFilter, values],
 				)
 
 				const checkboxList = Object.entries(props.options).map(([value, label]) => (
-					<label key={value} style={{ display: 'block' }}>
-						<input type="checkbox" value={value} checked={values.includes(value)} onChange={onChange} />
-						{label}
-					</label>
+					<FieldContainer
+						key={value}
+						label={label}
+						labelPosition="labelInlineRight"
+					>
+						<Checkbox
+							notNull
+							value={values.includes(value)}
+							onChange={checked => onChange(!!checked, value)}
+						/>
+					</FieldContainer>
 				))
 				const formatMessage = useMessageFormatter(dataGridCellsDictionary)
 				if (fieldSchema?.nullable) {
 					checkboxList.push(
-						<label key={'__null'} style={{ display: 'block' }}>
-							<input type="checkbox" checked={nullCondition} onChange={e => {
-								setFilter({
-									values,
-									nullCondition: e.target.checked,
-								})
-							}} />
-							<i style={{ opacity: 0.8 }}>
+						<FieldContainer
+							key={'__null'}
+							label={<i style={{ opacity: 0.8, fontWeight: 'normal' }}>
 								{formatMessage('dataGridCells.enumCell.includeNull')}
-							</i>
-						</label>,
+							</i>}
+							labelPosition="labelInlineRight"
+						>
+							<Checkbox
+								notNull
+								value={nullCondition}
+								onChange={checked => {
+									setFilter({
+										values,
+										nullCondition: !!checked,
+									})
+								}}
+							/>
+						</FieldContainer>,
 					)
 				}
 

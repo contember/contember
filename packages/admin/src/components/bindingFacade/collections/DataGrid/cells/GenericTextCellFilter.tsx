@@ -5,7 +5,6 @@ import { useMessageFormatter } from '../../../../../i18n'
 import { dataGridCellsDictionary } from './dataGridCellsDictionary'
 import { TextFilterArtifacts } from './TextCell'
 
-// eslint-disable-next-line @typescript-eslint/consistent-type-definitions
 export type GenericTextCellFilterArtifacts = {
 	mode: 'matches' | 'matchesExactly' | 'startsWith' | 'endsWith' | 'doesNotMatch'
 	query: string

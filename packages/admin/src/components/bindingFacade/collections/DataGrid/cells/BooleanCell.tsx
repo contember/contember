@@ -15,7 +15,6 @@ export type BooleanCellProps =
 		initialOrder?: DataGridOrderDirection
 	}
 
-// eslint-disable-next-line @typescript-eslint/consistent-type-definitions
 type BooleanFilterArtifacts = {
 	includeTrue: boolean
 	includeFalse: boolean

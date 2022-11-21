@@ -9,7 +9,7 @@ import {
 	wrapFilterInHasOnes,
 } from '@contember/binding'
 import { Fragment, FunctionComponent, ReactElement, ReactNode, useMemo } from 'react'
-import { BaseDynamicChoiceField } from '../../../fields/ChoiceField/BaseDynamicChoiceField'
+import { BaseDynamicChoiceField } from '../../../fields'
 import { renderDynamicChoiceFieldStatic } from '../../../fields/ChoiceField/renderDynamicChoiceFieldStatic'
 import { FieldFallbackView, FieldFallbackViewPublicProps } from '../../../fieldViews'
 import { DataGridColumn, DataGridColumnPublicProps } from '../base'

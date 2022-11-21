@@ -16,7 +16,6 @@ export type DateCellProps =
 		initialOrder?: DataGridOrderDirection
 	}
 
-// eslint-disable-next-line @typescript-eslint/consistent-type-definitions
 type DateRange = {
 	start: string | null
 	end: string | null

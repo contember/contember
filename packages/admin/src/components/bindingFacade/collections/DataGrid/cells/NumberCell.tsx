@@ -18,7 +18,6 @@ export type NumberCellProps =
 		format?: (value: number) => ReactNode
 	}
 
-// eslint-disable-next-line @typescript-eslint/consistent-type-definitions
 export type NumberFilterArtifacts = {
 	mode: 'eq' | 'gte' | 'lte'
 	query: number | null

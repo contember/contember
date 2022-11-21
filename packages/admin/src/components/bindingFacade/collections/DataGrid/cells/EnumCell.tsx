@@ -1,7 +1,9 @@
 import { ChangeEvent, ReactNode, useCallback } from 'react'
 import { DataGridColumn, DataGridColumnPublicProps } from '../base'
 import { Component, QueryLanguage, SugaredField, SugaredFieldProps, wrapFilterInHasOnes } from '@contember/binding'
-import { GraphQlLiteral } from '@contember/client'
+import { GraphQlLiteral, Input } from '@contember/client'
+import { useMessageFormatter } from '../../../../../i18n'
+import { dataGridCellsDictionary } from './dataGridCellsDictionary'
 
 export type EnumCellProps =
 	& DataGridColumnPublicProps
@@ -11,45 +13,90 @@ export type EnumCellProps =
 		format?: (value: string | null) => ReactNode
 }
 
+export type EnumCellArtifacts = {
+	values: string[]
+	nullCondition: boolean
+}
+
+/** @deprecated */
+type LegacyEnumCellArtifacts = string[]
+
 export const EnumCell = Component<EnumCellProps>(props => {
 	return (
-		<DataGridColumn<string[]>
+		<DataGridColumn<EnumCellArtifacts | LegacyEnumCellArtifacts>
 			{...props}
 			enableOrdering={true}
 			getNewOrderBy={(newDirection, { environment }) =>
 				newDirection ? QueryLanguage.desugarOrderBy(`${props.field as string} ${newDirection}`, environment) : undefined
 			}
 			enableFiltering={true}
-			getNewFilter={(filterArtefact, { environment }) => {
-				if (filterArtefact.length === 0) {
+			getNewFilter={(filter, { environment }) => {
+				const { values, nullCondition = false } = Array.isArray(filter) ? {
+					values: filter,
+				} : filter
+
+				if (values.length === 0 && !nullCondition) {
 					return undefined
 				}
 				const desugared = QueryLanguage.desugarRelativeSingleField(props.field, environment)
+
+				const conditions: Input.Condition<GraphQlLiteral>[] = []
+
+				if (nullCondition) {
+					conditions.push({ isNull: true })
+				}
+
+				conditions.push({
+					in: values.map(it => new GraphQlLiteral(it)),
+				})
+
 				return wrapFilterInHasOnes(desugared.hasOneRelationPath, {
-					[desugared.field]: {
-						in: filterArtefact.map(it => new GraphQlLiteral(it)),
-					},
+					[desugared.field]: { or: conditions },
 				})
 			}}
-			emptyFilter={[]}
+			emptyFilter={{ nullCondition: false, values: [] }}
 			filterRenderer={({ filter, setFilter, environment }) => {
+				const { values, nullCondition = false } = Array.isArray(filter) ? {
+					values: filter,
+				} : filter
+
+				const desugared = QueryLanguage.desugarRelativeSingleField(props.field, environment)
+				const entitySchema = environment.getSubTreeNode().entity
+				const fieldSchema = entitySchema.fields.get(desugared.field)
+
 				const onChange = useCallback(
 					(event: ChangeEvent<HTMLInputElement>) => {
 						if (event.target.checked) {
-							setFilter([...filter, event.target.value])
+							setFilter({ nullCondition, values: [...values, event.target.value] })
 						} else {
-							setFilter(filter.filter(it => it !== event.target.value))
+							setFilter({ nullCondition, values: values.filter(it => it !== event.target.value) })
 						}
 					},
-					[filter, setFilter],
+					[nullCondition, setFilter, values],
 				)
 
 				const checkboxList = Object.entries(props.options).map(([value, label]) => (
 					<label key={value} style={{ display: 'block' }}>
-						<input type="checkbox" value={value} checked={filter.includes(value)} onChange={onChange} />
+						<input type="checkbox" value={value} checked={values.includes(value)} onChange={onChange} />
 						{label}
 					</label>
 				))
+				const formatMessage = useMessageFormatter(dataGridCellsDictionary)
+				if (fieldSchema?.nullable) {
+					checkboxList.push(
+						<label key={'__null'} style={{ display: 'block' }}>
+							<input type="checkbox" checked={nullCondition} onChange={e => {
+								setFilter({
+									values,
+									nullCondition: e.target.checked,
+								})
+							}} />
+							<i style={{ opacity: 0.8 }}>
+								{formatMessage('dataGridCells.enumCell.includeNull')}
+							</i>
+						</label>,
+					)
+				}
 
 				return <>{checkboxList}</>
 			}}

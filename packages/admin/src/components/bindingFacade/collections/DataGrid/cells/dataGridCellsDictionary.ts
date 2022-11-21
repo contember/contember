@@ -5,6 +5,9 @@ export const dataGridCellsDictionary = {
 			includeFalse: 'No',
 			includeNull: 'N/A',
 		},
+		enumCell: {
+			includeNull: 'N/A',
+		},
 		dateCell: {
 			fromLabel: 'From',
 			toLabel: 'To',

@@ -53,6 +53,9 @@ export const csCZ: AdminDictionary = {
 			includeFalse: 'Ne',
 			includeNull: 'Neznámé',
 		},
+		enumCell: {
+			includeNull: 'Neznámé',
+		},
 		dateCell: {
 			fromLabel: 'Od',
 			toLabel: 'Do',

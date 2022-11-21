@@ -1,15 +1,15 @@
-import { ChangeEvent, ReactNode, useCallback } from 'react'
+import { ReactNode, useMemo } from 'react'
 import { DataGridColumn, DataGridColumnPublicProps } from '../base'
 import { Component, QueryLanguage, SugaredField, SugaredFieldProps, wrapFilterInHasOnes } from '@contember/binding'
 import { GraphQlLiteral, Input } from '@contember/client'
-import { useMessageFormatter } from '../../../../../i18n'
-import { dataGridCellsDictionary } from './dataGridCellsDictionary'
 import { FieldFallbackView, FieldFallbackViewPublicProps } from '../../../fieldViews'
 import { Checkbox, FieldContainer } from '@contember/ui'
+import { NullConditionFilter, NullConditionFilterPublicProps } from './NullConditionFilter'
 
 export type EnumCellProps =
 	& DataGridColumnPublicProps
 	& FieldFallbackViewPublicProps
+	& NullConditionFilterPublicProps
 	& {
 		field: SugaredFieldProps['field']
 		options: Record<string, string>
@@ -58,25 +58,9 @@ export const EnumCell = Component<EnumCellProps>(props => {
 				})
 			}}
 			emptyFilter={{ nullCondition: false, values: [] }}
-			filterRenderer={({ filter, setFilter, environment }) => {
-				const { values, nullCondition = false } = Array.isArray(filter) ? {
-					values: filter,
-				} : filter
-
-				const desugared = QueryLanguage.desugarRelativeSingleField(props.field, environment)
-				const entitySchema = environment.getSubTreeNode().entity
-				const fieldSchema = entitySchema.fields.get(desugared.field)
-
-				const onChange = useCallback(
-					(checked: boolean, value: string) => {
-						if (checked) {
-							setFilter({ nullCondition, values: [...values, value] })
-						} else {
-							setFilter({ nullCondition, values: values.filter(it => it !== value) })
-						}
-					},
-					[nullCondition, setFilter, values],
-				)
+			filterRenderer={({ filter: inFilter, setFilter, environment }) => {
+				const filter = useMemo(() => Array.isArray(inFilter) ? { nullCondition: false, values: inFilter } : inFilter, [inFilter])
+				const values = filter.values
 
 				const checkboxList = Object.entries(props.options).map(([value, label]) => (
 					<FieldContainer
@@ -87,35 +71,17 @@ export const EnumCell = Component<EnumCellProps>(props => {
 						<Checkbox
 							notNull
 							value={values.includes(value)}
-							onChange={checked => onChange(!!checked, value)}
+							onChange={checked => {
+								setFilter({ ...filter, values: checked ? [...values, value] : values.filter(it => it !== value) })
+							}}
 						/>
 					</FieldContainer>
 				))
-				const formatMessage = useMessageFormatter(dataGridCellsDictionary)
-				if (fieldSchema?.nullable) {
-					checkboxList.push(
-						<FieldContainer
-							key={'__null'}
-							label={<i style={{ opacity: 0.8, fontWeight: 'normal' }}>
-								{formatMessage('dataGridCells.enumCell.includeNull')}
-							</i>}
-							labelPosition="labelInlineRight"
-						>
-							<Checkbox
-								notNull
-								value={nullCondition}
-								onChange={checked => {
-									setFilter({
-										values,
-										nullCondition: !!checked,
-									})
-								}}
-							/>
-						</FieldContainer>,
-					)
-				}
 
-				return <>{checkboxList}</>
+				return <>
+					{checkboxList}
+					<NullConditionFilter filter={filter} setFilter={setFilter} environment={environment} field={props.field} showNullConditionFilter={props.showNullConditionFilter} />
+				</>
 			}}
 		>
 			<SugaredField<string> field={props.field} format={value => {

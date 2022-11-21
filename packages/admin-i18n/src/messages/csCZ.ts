@@ -48,12 +48,10 @@ export const csCZ: AdminDictionary = {
 		},
 	},
 	dataGridCells: {
+		includeNull: 'Zahrnout neznámé',
 		booleanCell: {
 			includeTrue: 'Ano',
 			includeFalse: 'Ne',
-			includeNull: 'Neznámé',
-		},
-		enumCell: {
 			includeNull: 'Neznámé',
 		},
 		dateCell: {

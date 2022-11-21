@@ -1,12 +1,10 @@
 export const dataGridCellsDictionary = {
 	dataGridCells: {
+		includeNull: 'Include N/A',
 		booleanCell: {
 			includeTrue: 'Yes',
 			includeFalse: 'No',
 			includeNull: 'N/A',
-		},
-		enumCell: {
-			includeNull: 'Include N/A',
 		},
 		dateCell: {
 			fromLabel: 'From',

@@ -1,10 +1,10 @@
 import { Project, validateProjectName } from './Project'
-import { basename, join } from 'path'
+import { basename, join } from 'node:path'
 import { Workspace } from './Workspace'
 import { resourcesDir } from '../pathUtils'
 import { installTemplate } from './template'
-import { pathExists } from 'fs-extra'
 import { getPathFromMapping, listEntriesInMapping, resolvePathMappingConfig } from './PathMapping'
+import { pathExists } from './fs'
 
 export class ProjectManager {
 	constructor(private readonly workspace: Workspace) {}

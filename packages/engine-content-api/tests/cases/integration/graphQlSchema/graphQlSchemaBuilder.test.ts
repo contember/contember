@@ -1,7 +1,7 @@
 import { graphql, printSchema } from 'graphql'
 import { Acl, Model } from '@contember/schema'
-import * as path from 'path'
-
+import * as fs from 'node:fs/promises'
+import * as path from 'node:path'
 import {
 	AllowAllPermissionFactory,
 	SchemaBuilder,
@@ -10,7 +10,6 @@ import {
 } from '@contember/schema-definition'
 import { Authorizator, GraphQlSchemaBuilderFactory } from '../../../../src'
 import * as model from './model'
-import { promises as fs } from 'fs'
 import { assert, describe, it } from 'vitest'
 
 interface Test {

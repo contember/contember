@@ -1,5 +1,5 @@
-import { join } from 'path'
-import { pathExists } from 'fs-extra'
+import { join } from 'node:path'
+import { pathExists } from '@contember/cli-common'
 import { JsonUpdateCallback, updateYaml } from './yaml'
 
 const MAIN_CONFIGS = ['docker-compose.yaml', 'docker-compose.yml']

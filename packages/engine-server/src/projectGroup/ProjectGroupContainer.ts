@@ -22,7 +22,7 @@ import {
 } from '../project'
 import { SystemContainerFactory } from '@contember/engine-system-api'
 import { ProjectConfigResolver } from '../config/projectConfigResolver'
-import { createSecretKey } from 'crypto'
+import { createSecretKey } from 'node:crypto'
 import { Logger } from '@contember/logger'
 
 interface ProjectGroupContainerFactoryArgs

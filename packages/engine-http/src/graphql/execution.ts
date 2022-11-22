@@ -11,7 +11,7 @@ import {
 	validateSchema,
 } from 'graphql'
 import LRUCache from 'lru-cache'
-import { createHash } from 'crypto'
+import { createHash } from 'node:crypto'
 import { Request, Response } from 'koa'
 import { logger } from '@contember/logger'
 import { ForbiddenError } from '@contember/graphql-utils'

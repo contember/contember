@@ -1,6 +1,6 @@
 import { test, assert } from 'vitest'
 import { CryptoWrapper } from '../../../src'
-import * as crypto from 'crypto'
+import * as crypto from 'node:crypto'
 
 const encryptionKey = crypto.createSecretKey(Buffer.from('0000000000000000000000000000000000000000000000000000000000000000', 'hex'))
 const iv = Buffer.alloc(16).fill('a')

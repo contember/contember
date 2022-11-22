@@ -3,7 +3,7 @@ import {
 	ProjectGroupContainer,
 } from '@contember/engine-http'
 import { PromiseMap } from '@contember/engine-common'
-import { isDeepStrictEqual } from 'util'
+import { isDeepStrictEqual } from 'node:util'
 
 interface ContainerWithMeta {
 	container: ProjectGroupContainer

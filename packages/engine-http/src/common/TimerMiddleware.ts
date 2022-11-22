@@ -1,5 +1,5 @@
 import { KoaMiddleware } from '../koa'
-import { Readable } from 'stream'
+import { Readable } from 'node:stream'
 import { LoggerMiddlewareState } from './LoggerMiddleware'
 
 type EventTime = { label: string; start: number; duration?: number }

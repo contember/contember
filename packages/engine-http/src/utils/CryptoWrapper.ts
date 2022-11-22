@@ -1,4 +1,4 @@
-import * as crypto from 'crypto'
+import * as crypto from 'node:crypto'
 
 export class CryptoWrapper {
 	public static cryptoAlgo = 'aes-256-gcm' as const

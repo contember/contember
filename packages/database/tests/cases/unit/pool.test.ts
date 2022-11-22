@@ -1,7 +1,7 @@
 import { expect, it, beforeAll } from 'vitest'
 import { ClientErrorCodes, Pool, PoolLogger } from '../../../src'
 import { Client as PgClient } from 'pg'
-import EventEmitter from 'events'
+import EventEmitter from 'node:events'
 
 const createPoolLogger = () => {
 	const logger: PoolLogger & {messages: string; clear: () => void} = (message, pool) => {

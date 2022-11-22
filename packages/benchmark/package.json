@@ -12,11 +12,11 @@
   },
   "dependencies": {
     "@contember/engine-server": "^1.2.0-alpha.18",
+    "@contember/logger": "^1.2.0-alpha.18",
     "@contember/schema": "^1.2.0-alpha.18",
     "@contember/schema-definition": "^1.2.0-alpha.18",
     "autocannon": "^7.3.0",
     "autocannon-compare": "^0.4.0",
-    "autocannon-reporter": "1.1.0",
     "node-fetch": "^2.0",
     "pg": "^8.5.0"
   },

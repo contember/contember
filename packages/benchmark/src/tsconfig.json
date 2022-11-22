@@ -5,6 +5,7 @@
 	},
 	"references": [
 		{ "path": "../../engine-server/src" },
+		{ "path": "../../logger/src" },
 		{ "path": "../../schema/src" },
 		{ "path": "../../schema-definition/src" }
 	]

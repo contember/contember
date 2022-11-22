@@ -4,10 +4,6 @@
 		"outDir": "../dist/src"
 	},
 	"references": [
-
-		{
-			"path": "../../config-loader/src"
-		},
 		{
 			"path": "../../database/src"
 		},
@@ -37,6 +33,9 @@
 		},
 		{
 			"path": "../../schema-utils/src"
+		},
+		{
+			"path": "../../typesafe/src"
 		}
 	]
 }

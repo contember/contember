@@ -3,7 +3,7 @@ import { AuthResult, HttpError, TimerMiddlewareState } from '../common'
 import { ProjectGroupResolver, ProjectInfoMiddlewareState } from '../project-common'
 import { fromBuffer } from './CommandStream'
 import { ImportError, ImportExecutor } from './ImportExecutor'
-import { createGunzip } from 'zlib'
+import { createGunzip } from 'node:zlib'
 
 type ImportApiMiddlewareState =
 	& TimerMiddlewareState

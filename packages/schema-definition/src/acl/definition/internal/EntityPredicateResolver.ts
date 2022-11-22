@@ -1,4 +1,4 @@
-import { isDeepStrictEqual } from 'util'
+import { isDeepStrictEqual } from 'node:util'
 
 import { Acl, Input, Model, Writable } from '@contember/schema'
 import { PredicateDefinitionProcessor } from '@contember/schema-utils'

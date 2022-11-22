@@ -15,7 +15,7 @@ import { Client } from '@contember/database'
 import { createUuidGenerator } from './testUuid'
 import { project } from './project'
 import { createConnection, dbCredentials, recreateDatabase } from './dbUtils'
-import { join } from 'path'
+import { join } from 'node:path'
 import { createLogger, JsonStreamLoggerHandler, NullLoggerHandler } from '@contember/logger'
 
 export class ApiTester {

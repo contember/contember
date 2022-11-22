@@ -1,4 +1,4 @@
-import { basename, join, resolve } from 'path'
+import { basename, join, resolve } from 'node:path'
 import { listDirectories } from './fs'
 
 export type PathMapping = Record<string, string>

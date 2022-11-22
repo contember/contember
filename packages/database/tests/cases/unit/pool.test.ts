@@ -283,12 +283,12 @@ it('fails to reconnect on recoverable error', async () => {
 	const pool = new Pool(() => pgClientMock as unknown as PgClient, {
 		log: logger,
 		logError: () => null,
-		reconnectIntervalMs: 5,
-		acquireTimeoutMs: 10,
+		reconnectIntervalMs: 20,
+		acquireTimeoutMs: 30,
 	})
 	pgClientMock.connections.push(createRecoverableErrorPromise(), createRecoverableErrorPromise())
 	await expect(async () => await pool.acquire()).rejects.toThrowError('Failed to acquire a connection. Last error: too many connection')
-	await timeout(2)
+	await timeout(20)
 	expect(logger.messages).toMatchInlineSnapshot(`
 		CAI P
 		000 1: Item added to a queue.
@@ -315,7 +315,7 @@ it('fails to reconnect on unrecoverable error', async () => {
 		logError: () => null,
 	})
 	pgClientMock.connections.push(createErrorPromise())
-	await expect(async () => await pool.acquire()).rejects.toThrowError('Database client error: my err')
+	await expect(async () => await pool.acquire()).rejects.toThrowError('Database client connection error: my err')
 	await timeout()
 	expect(logger.messages).toMatchInlineSnapshot(`
 		CAI P

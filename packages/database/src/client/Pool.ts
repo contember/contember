@@ -445,7 +445,7 @@ class Pool extends EventEmitter {
 			connection.disposed = true
 			await connection.client.end()
 		} catch (e: any) {
-			this.on('error', e)
+			this.emit('error', e)
 		}
 	}
 

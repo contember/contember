@@ -312,7 +312,11 @@ class Pool extends EventEmitter {
 				await client.end()
 			} catch {
 			}
-			if (e.code === ClientErrorCodes.TOO_MANY_CONNECTIONS || e.code === ClientErrorCodes.CANNOT_CONNECT_NOW) {
+			if (
+				e.code === ClientErrorCodes.TOO_MANY_CONNECTIONS
+				|| e.code === ClientErrorCodes.CANNOT_CONNECT_NOW // server starting
+				|| e.message === 'timeout expired' // https://github.com/brianc/node-postgres/blob/c7dc621d3fb52c158eb23aa31dea6bd440700a4a/packages/pg/lib/client.js#L105
+			) {
 				this.lastRecoverableError = { error: e, time: Date.now() }
 				if (this.poolConfig.reconnectIntervalMs * attempt >= this.poolConfig.acquireTimeoutMs) {
 					this.poolStats.connection_error_count++

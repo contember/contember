@@ -286,8 +286,6 @@ it('fails to reconnect on recoverable error', async () => {
 		reconnectIntervalMs: 5,
 		acquireTimeoutMs: 10,
 	})
-	pool.on('error', () => {
-	})
 	pgClientMock.connections.push(createRecoverableErrorPromise(), createRecoverableErrorPromise())
 	await expect(async () => await pool.acquire()).rejects.toThrowError('Failed to acquire a connection. Last error: too many connection')
 	await timeout(2)
@@ -300,8 +298,10 @@ it('fails to reconnect on recoverable error', async () => {
 		000 1: Retrying
 		000 1: Creating a new connection
 		100 1: Connection error occurred: too many connection
-		100 1: Recoverable error, max retries reached.
-		000 0: Queued item timed out
+		100 1: Recoverable error, retrying in a moment.
+		100 0: Queued item timed out
+		000 0: Retrying
+		000 0: Not connecting, queue is empty.
 	`)
 })
 
@@ -313,9 +313,6 @@ it('fails to reconnect on unrecoverable error', async () => {
 	const pool = new Pool(() => pgClientMock as unknown as PgClient, {
 		log: logger,
 		logError: () => null,
-	})
-	pool.on('error', () => {
-
 	})
 	pgClientMock.connections.push(createErrorPromise())
 	await expect(async () => await pool.acquire()).rejects.toThrowError('Database client error: my err')

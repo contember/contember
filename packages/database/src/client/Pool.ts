@@ -318,22 +318,14 @@ class Pool extends EventEmitter {
 				|| e.message === 'timeout expired' // https://github.com/brianc/node-postgres/blob/c7dc621d3fb52c158eb23aa31dea6bd440700a4a/packages/pg/lib/client.js#L105
 			) {
 				this.lastRecoverableError = { error: e, time: Date.now() }
-				if (this.poolConfig.reconnectIntervalMs * attempt >= this.poolConfig.acquireTimeoutMs) {
-					this.poolStats.connection_error_count++
-					this.log('Recoverable error, max retries reached.')
-					this.poolConfig.logError(e)
-					this.emit('error', e)
+				this.poolStats.connection_recoverable_error_count++
+				this.log('Recoverable error, retrying in a moment.')
+				this.emit('recoverableError', e)
+				setTimeout(() => {
 					this.connectingCount--
-				} else {
-					this.poolStats.connection_recoverable_error_count++
-					this.log('Recoverable error, retrying in a moment.')
-					this.emit('recoverableError', e)
-					setTimeout(() => {
-						this.connectingCount--
-						this.log('Retrying')
-						this.maybeCreateNew(attempt + 1)
-					}, this.poolConfig.reconnectIntervalMs)
-				}
+					this.log('Retrying')
+					this.maybeCreateNew(attempt + 1)
+				}, this.poolConfig.reconnectIntervalMs)
 			} else {
 				this.poolStats.connection_error_count++
 				this.connectingCount--

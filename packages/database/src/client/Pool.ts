@@ -29,7 +29,7 @@ interface PoolConfigInternal {
 	/** internal logging, mainly for debugging and testing */
 	log?: PoolLogger
 	/** logging of out-of-stack errors */
-	logError: (error: Error) => void
+	logError: (error: ClientError) => void
 }
 
 export type PoolStats = { [K in keyof typeof poolStatsDescription]: number }
@@ -94,13 +94,7 @@ class PendingItem {
 	}
 }
 
-interface Pool {
-	on(event: 'error', listener: (err: Error) => void): this
-
-	on(event: 'recoverableError', listener: (err: Error) => void): this
-}
-
-class Pool extends EventEmitter {
+class Pool {
 
 	/**
 	 * pool was closed by calling end().
@@ -161,7 +155,6 @@ class Pool extends EventEmitter {
 		private clientFactory: PgClientFactory,
 		poolConfig: PoolConfig,
 	) {
-		super()
 		this.poolConfig = {
 			maxConnections: 10,
 			maxConnecting: Math.ceil((poolConfig.maxConnections ?? 10) / 2),
@@ -294,8 +287,7 @@ class Pool extends EventEmitter {
 		const poolConnection = new PoolConnection(client)
 		client.on('error', e => {
 			this.log('Client error on idle connection has occurred: ' + e.message)
-			this.poolConfig.logError(e)
-			this.emit('error', e)
+			this.poolConfig.logError(new ClientError(e, 'runtime error'))
 		})
 		try {
 			await client.connect()
@@ -310,7 +302,8 @@ class Pool extends EventEmitter {
 			this.log('Connection error occurred: ' + e.message)
 			try {
 				await client.end()
-			} catch {
+			} catch (e2: unknown) {
+				this.poolConfig.logError(new ClientError(e2, 'disposal error'))
 			}
 			if (
 				e.code === ClientErrorCodes.TOO_MANY_CONNECTIONS
@@ -320,7 +313,7 @@ class Pool extends EventEmitter {
 				this.lastRecoverableError = { error: e, time: Date.now() }
 				this.poolStats.connection_recoverable_error_count++
 				this.log('Recoverable error, retrying in a moment.')
-				this.emit('recoverableError', e)
+				this.poolConfig.logError(new ClientError(e, 'recoverable connection error'))
 				setTimeout(() => {
 					this.connectingCount--
 					this.log('Retrying')
@@ -329,16 +322,16 @@ class Pool extends EventEmitter {
 			} else {
 				this.poolStats.connection_error_count++
 				this.connectingCount--
+				const clientError = new ClientError(e, 'connection error')
 				if (this.active.size === 0 && this.queue.length > 0) {
 					const pendingItem = this.queue.shift()
 					if (!pendingItem) throw new Error()
 					this.log('Connecting failed, rejecting pending item')
-					pendingItem.reject(new ClientError(e))
+					pendingItem.reject(clientError)
 					this.poolStats.item_rejected_count++
 				} else {
 					this.log('Connecting failed, emitting error')
-					this.poolConfig.logError(e)
-					this.emit('error', e)
+					this.poolConfig.logError(clientError)
 				}
 			}
 			return
@@ -437,7 +430,7 @@ class Pool extends EventEmitter {
 			connection.disposed = true
 			await connection.client.end()
 		} catch (e: any) {
-			this.emit('error', e)
+			this.poolConfig.logError(new ClientError(e, 'disposal error'))
 		}
 	}
 

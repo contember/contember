@@ -10,9 +10,6 @@ class Connection implements Connection.ConnectionLike, Connection.ClientFactory,
 		private readonly pool: Pool,
 		public readonly eventManager: EventManager = new EventManager(null),
 	) {
-		this.pool.on('error', err => {
-			this.eventManager.fire(EventManager.Event.clientError, err)
-		})
 	}
 
 	public static create(

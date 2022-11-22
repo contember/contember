@@ -1,3 +1,5 @@
+import { ClientErrorCodes } from './errorCodes'
+
 export class DatabaseError extends Error {
 	public readonly code?: string
 	public readonly originalMessage?: string
@@ -15,9 +17,15 @@ export class DatabaseError extends Error {
 	}
 }
 
+export type ClientErrorType =
+	| 'recoverable connection error'
+	| 'connection error'
+	| 'runtime error'
+	| 'disposal error'
+
 export class ClientError extends DatabaseError {
-	constructor(previous: Error | any) {
-		super(`Database client error: ${'message' in previous ? previous.message : JSON.stringify(previous)}`, previous)
+	constructor(previous: Error | any, public readonly type: ClientErrorType) {
+		super(`Database client ${type}: ${'message' in previous ? previous.message : JSON.stringify(previous)}`, previous)
 	}
 }
 

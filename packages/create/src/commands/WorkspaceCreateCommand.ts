@@ -1,5 +1,5 @@
 import { createWorkspace, Command, CommandConfiguration, Input } from '@contember/cli-common'
-import { join } from 'path'
+import { join } from 'node:path'
 import chalk from 'chalk'
 type Args = {
 	workspaceName: string

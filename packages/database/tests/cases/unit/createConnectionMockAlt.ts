@@ -1,6 +1,6 @@
 import { Connection, Pool } from '../../../src'
 import { PgClient } from '../../../src/client/PgClient'
-import EventEmitter from 'events'
+import EventEmitter from 'node:events'
 import { expect } from 'vitest'
 
 export const createConnectionMockAlt = (...queries: { sql: string; timeout?: number }[][]): [Connection, () => void] => {

@@ -5,7 +5,7 @@ import { executeGraphQlTest } from './testGraphql'
 import { Client } from '@contember/database'
 import { createConnectionMock } from '@contember/database-tester'
 import { createUuidGenerator } from '@contember/engine-api-tester'
-import { getArgumentValues } from 'graphql/execution/values'
+import { getArgumentValues } from 'graphql'
 import { SQL } from './tags'
 
 export interface SqlQuery {

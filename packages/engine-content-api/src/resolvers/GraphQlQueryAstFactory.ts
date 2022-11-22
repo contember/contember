@@ -2,17 +2,18 @@ import { isIt, ResolveInfoUtils } from '../utils'
 import {
 	FieldNode as GraphQlFieldNode,
 	FragmentSpreadNode,
+	getArgumentValues,
 	GraphQLObjectType,
 	GraphQLOutputType,
 	GraphQLResolveInfo,
 	isListType,
 	isNonNullType,
-	isObjectType, Kind,
+	isObjectType,
+	Kind,
+	SelectionSetNode,
 } from 'graphql'
-import { SelectionSetNode } from 'graphql/language/ast'
-import { getArgumentValues } from 'graphql/execution/values'
 import { FieldNode, ObjectNode } from '../inputProcessing'
-import { isDeepStrictEqual } from 'util'
+import { isDeepStrictEqual } from 'node:util'
 
 type NodeFilter = (node: GraphQlFieldNode, path: string[]) => boolean
 type AnyNode = ObjectNode | FieldNode

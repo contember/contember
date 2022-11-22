@@ -1,9 +1,8 @@
-import { JSONObject, JSONPrimitive } from '@contember/cli-common/dist/src/utils/json'
-import { pathExists } from 'fs-extra'
+import { JSONObject, JSONPrimitive, pathExists } from '@contember/cli-common'
 import YAWN from 'yawn-yaml/cjs'
 import { Merger } from '@contember/config-loader'
 import jsyaml from 'js-yaml'
-import { readFile, writeFile } from 'fs/promises'
+import { readFile, writeFile } from 'node:fs/promises'
 
 export type JsonUpdateCallback<Value = JSONObject> = (
 	data: Partial<Value>,

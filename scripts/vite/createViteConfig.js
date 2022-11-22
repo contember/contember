@@ -1,6 +1,6 @@
 import { defineConfig } from 'vitest/config'
-import { dirname, join } from 'path'
-import { fileURLToPath } from 'url'
+import { dirname, join } from 'node:path'
+import { fileURLToPath } from 'node:url'
 
 export const rootDirectory = dirname(dirname(dirname(fileURLToPath(import.meta.url))))
 const packages = [

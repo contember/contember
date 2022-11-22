@@ -15,6 +15,9 @@
 			"path": "../../database/src"
 		},
 		{
+			"path": "../../database-migrations/src"
+		},
+		{
 			"path": "../../dic/src"
 		},
 		{
@@ -22,9 +25,6 @@
 		},
 		{
 			"path": "../../graphql-utils/src"
-		},
-		{
-			"path": "../../queryable/src"
 		},
 		{
 			"path": "../../schema/src"

@@ -1,4 +1,4 @@
-import crypto from 'crypto'
+import crypto from 'node:crypto'
 
 export interface MigrationInfo {
 	readonly version: string // YYYY-MM-DD-HHIISS

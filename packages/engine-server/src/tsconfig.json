@@ -5,9 +5,6 @@
 	},
 	"references": [
 		{
-			"path": "../../database-migrations/src"
-		},
-		{
 			"path": "../../dic/src"
 		},
 		{
@@ -17,19 +14,7 @@
 			"path": "../../schema/src"
 		},
 		{
-			"path": "../../schema-utils/src"
-		},
-		{
-			"path": "../../schema-definition/src"
-		},
-		{
-			"path": "../../authorization/src"
-		},
-		{
 			"path": "../../database/src"
-		},
-		{
-			"path": "../../queryable/src"
 		},
 		{
 			"path": "../../engine-common/src"
@@ -60,6 +45,9 @@
 		},
 		{
 			"path": "../../typesafe/src"
+		},
+		{
+			"path": "../../schema-migrations/src"
 		}
 	]
 }

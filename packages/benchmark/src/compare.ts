@@ -1,25 +1,30 @@
-import * as fs from 'fs'
-import { promisify } from 'util'
-import * as path from 'path'
+import { access, readdir, readFile } from 'node:fs/promises'
+import * as path from 'node:path'
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore-line
 import autocannonCompare from 'autocannon-compare'
 
-const fileRead = promisify(fs.readFile)
-const dirRead = promisify(fs.readdir)
-const fileExists = promisify(fs.exists)
+const exists = async (path: string) => {
+	try {
+		await access(path)
+		return true
+	} catch {
+		return false
+	}
+}
+
 ;(async () => {
 	const [{}, {}, aName, bName] = process.argv
 	const resultsPath = path.join(__dirname, '/../../results/')
-	for (const file of await dirRead(path.join(resultsPath, aName))) {
+	for (const file of await readdir(path.join(resultsPath, aName))) {
 		const aFile = path.join(resultsPath, aName, file)
 		const bFile = path.join(resultsPath, bName, file)
-		if (!(await fileExists(bFile))) {
+		if (!(await exists(bFile))) {
 			continue
 		}
 		console.log('\n\nFile: ' + file)
-		const readFile = async (path: string): Promise<any> => JSON.parse(await fileRead(path, { encoding: 'utf8' }))
-		const [aData, bData] = await Promise.all([readFile(aFile), readFile(bFile)])
+		const readJson = async (path: string): Promise<any> => JSON.parse(await readFile(path, 'utf8'))
+		const [aData, bData] = await Promise.all([readJson(aFile), readJson(bFile)])
 
 		const result = autocannonCompare(aData, bData)
 

@@ -34,6 +34,7 @@
     "esbuild": "^0.14.54",
     "eslint": "^8.23.0",
     "eslint-plugin-promise": "^6.0.1",
+    "fast-glob": "^3.2.12",
     "husky": "^4",
     "lint-staged": "^11.0.0",
     "oao": "^2.0.2",

@@ -6,11 +6,10 @@ import {
 	ExecutionContainerFactory,
 	GraphQlSchemaBuilderFactory,
 } from '@contember/engine-content-api'
-import { graphql } from 'graphql'
+import { getArgumentValues, graphql } from 'graphql'
 import { TesterStageManager } from './TesterStageManager'
 import { Schema } from '@contember/schema'
 import { createUuidGenerator } from './testUuid'
-import { getArgumentValues } from 'graphql/execution/values'
 
 export class ContentApiTester {
 	private trxUuidGenerator = createUuidGenerator('a453')

@@ -9,25 +9,19 @@
   },
   "dependencies": {
     "@contember/database": "^1.2.0-alpha.18",
-    "@contember/database-migrations": "^1.2.0-alpha.18",
+    "@contember/logger": "^1.2.0-alpha.18",
     "@contember/engine-common": "^1.2.0-alpha.18",
     "@contember/engine-content-api": "^1.2.0-alpha.18",
     "@contember/engine-system-api": "^1.2.0-alpha.18",
-    "@contember/graphql-utils": "^1.2.0-alpha.18",
-    "@contember/queryable": "^1.2.0-alpha.18",
     "@contember/schema": "^1.2.0-alpha.18",
     "@contember/schema-definition": "^1.2.0-alpha.18",
     "@contember/schema-migrations": "^1.2.0-alpha.18",
     "@contember/schema-utils": "^1.2.0-alpha.18",
     "@graphql-tools/schema": "^8.3.5",
-    "graphql": "^16.5.0",
-    "sinon": "^14.0.0",
-    "uuid": "^8.3.1"
+    "graphql": "^16.5.0"
   },
   "devDependencies": {
     "@types/node": "^18",
-    "@types/sinon": "^10.0.2",
-    "@types/uuid": "^8.3.0",
     "pg": "^8.5.0"
   },
   "peerDependencies": {

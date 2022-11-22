@@ -1,10 +1,15 @@
-import { GraphQLBoolean, GraphQLInputObjectType, GraphQLString } from 'graphql'
+import {
+	GraphQLBoolean,
+	GraphQLInputFieldConfig,
+	GraphQLInputFieldConfigMap,
+	GraphQLInputObjectType,
+	GraphQLString,
+} from 'graphql'
 import { Acl, Input, Model } from '@contember/schema'
 import { GqlTypeName } from '../utils'
 import { WhereTypeProvider } from '../WhereTypeProvider'
 import { Accessor, filterObject } from '../../utils'
 import { EntityInputProvider, EntityInputType } from './EntityInputProvider'
-import { GraphQLInputFieldConfig, GraphQLInputFieldConfigMap } from 'graphql/type/definition'
 import { acceptFieldVisitor } from '@contember/schema-utils'
 import { UpdateEntityRelationAllowedOperationsVisitor } from './UpdateEntityRelationAllowedOperationsVisitor'
 import { Authorizator } from '../../acl'

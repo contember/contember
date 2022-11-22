@@ -7,9 +7,7 @@
   "scripts": {
     "test": "echo 'No tests'"
   },
-  "dependencies": {
-    "@contember/schema": "^1.2.0-alpha.18"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@types/node": "^18"
   }

@@ -1,17 +1,16 @@
-import { Command, CommandConfiguration, Input, Project, Workspace } from '@contember/cli-common'
+import { Command, CommandConfiguration, Input, pathExists, Project, Workspace } from '@contember/cli-common'
 import {
 	configureExecuteMigrationCommand,
 	ExecuteMigrationOptions,
 	executeMigrations,
 	resolveMigrationStatus,
 } from '../migrations/MigrationExecuteHelper'
-import { pathExists } from 'fs-extra'
 import { interactiveResolveApiToken, TenantClient } from '../../utils/tenant'
 import { interactiveResolveInstanceEnvironmentFromInput } from '../../utils/instance'
 import { SystemClient } from '../../utils/system'
 import { MigrationsContainerFactory } from '../../MigrationsContainer'
 import { AdminClient, readAdminFiles } from '../../utils/admin'
-import { URL } from 'url'
+import { URL } from 'node:url'
 import prompts from 'prompts'
 import { createMigrationStatusTable } from '../../utils/migrations'
 import { maskToken } from '../../utils/token'

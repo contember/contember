@@ -2,8 +2,8 @@ import { Command, CommandConfiguration, Input, Workspace } from '@contember/cli-
 import { validateSchemaAndPrintErrors } from '../../utils/schema'
 import { loadSchema } from '../../utils/project/loadSchema'
 import { renderProjectInfoHtml } from '../../utils/project/projectDescribe'
-import { writeFile } from 'fs/promises'
-import { join } from 'path'
+import { writeFile } from 'node:fs/promises'
+import { join } from 'node:path'
 
 type Args = {
 	project?: string

@@ -2,8 +2,8 @@
 
 import { createContainer } from './index'
 import loadPlugins from './loadPlugins'
-import os from 'os'
-import cluster from 'cluster'
+import os from 'node:os'
+import cluster from 'node:cluster'
 import { getClusterProcessType, notifyWorkerStarted, timeout, WorkerManager } from './utils'
 import {
 	createDefaultLogger, createSentryLoggerHandler,

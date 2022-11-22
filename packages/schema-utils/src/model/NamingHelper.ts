@@ -1,4 +1,4 @@
-import crypto from 'crypto'
+import crypto from 'node:crypto'
 
 export class NamingHelper {
 	public static createForeignKeyIndexName(tableName: string, column: string) {

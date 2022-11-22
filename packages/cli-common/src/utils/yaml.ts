@@ -1,6 +1,6 @@
 import jsyaml from 'js-yaml'
 import { JSONObject } from './json'
-import { readFile } from 'fs/promises'
+import { readFile } from 'node:fs/promises'
 
 
 export const readYaml = async <T = JSONObject>(path: string): Promise<T> => {

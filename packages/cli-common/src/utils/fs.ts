@@ -1,6 +1,7 @@
 import { tuple } from './tuple'
-import { promises as fs } from 'fs'
-import { join } from 'path'
+import * as fs from 'node:fs/promises'
+import { join } from 'node:path'
+import { access } from 'node:fs/promises'
 
 export const listDirectories = async (dir: string): Promise<string[]> => {
 	try {
@@ -29,5 +30,14 @@ export const tryUnlink = async (path: string): Promise<void> => {
 			return
 		}
 		throw e
+	}
+}
+
+export const pathExists = async (path: string) => {
+	try {
+		await access(path)
+		return true
+	} catch {
+		return false
 	}
 }

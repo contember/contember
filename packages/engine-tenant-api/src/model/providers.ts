@@ -1,4 +1,4 @@
-import { BinaryLike } from 'crypto'
+import { BinaryLike } from 'node:crypto'
 
 export interface Providers {
 	uuid: () => string

@@ -1,7 +1,7 @@
 import { resolveS3Endpoint, S3Config } from './Config'
 import { Providers } from '@contember/engine-plugins'
 import qs from 'qs'
-import { BinaryLike, createHash, createHmac } from 'crypto'
+import { BinaryLike, createHash, createHmac } from 'node:crypto'
 
 interface S3Request {
 	action: 'read' | 'upload'

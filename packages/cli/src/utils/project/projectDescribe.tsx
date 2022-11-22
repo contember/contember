@@ -2,7 +2,7 @@ import { Schema } from '@contember/schema'
 import { h } from 'preact'
 import render from 'preact-render-to-string'
 import { ProjectInfo } from './components/ProjectInfo'
-import { readFile } from 'fs/promises'
+import { readFile } from 'node:fs/promises'
 
 export const renderProjectInfoHtml = async (schema: Schema, projectName: string) => {
 	const html = render(<ProjectInfo schema={schema} projectName={projectName} />)

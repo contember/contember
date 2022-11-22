@@ -1,6 +1,7 @@
-import { isAbsolute, join } from 'path'
-import { replaceFileContent } from './fs'
-import { copy, pathExists, remove, rename } from 'fs-extra'
+import { isAbsolute, join } from 'node:path'
+import * as fs from 'node:fs/promises'
+import { copy } from 'fs-extra'
+import { replaceFileContent, pathExists } from './fs'
 import { downloadPackage } from './npm'
 import { resourcesDir } from '../pathUtils'
 import { readYaml } from './yaml'
@@ -22,7 +23,7 @@ export const installTemplate = async (
 	if (!isAbsolute(template)) {
 		template = await downloadPackage(template)
 		removeTemplate = async () => {
-			await remove(template)
+			await fs.unlink(template)
 		}
 	}
 	const templateConfigFile = join(template, 'contember.template.yaml')
@@ -58,7 +59,7 @@ export const installTemplate = async (
 		})
 	}
 	for (const [source, target] of Object.entries(config.rename || {})) {
-		await rename(join(targetDir, source), join(targetDir, target))
+		await fs.rename(join(targetDir, source), join(targetDir, target))
 	}
 	for (const [source, target] of Object.entries(config.copy || {})) {
 		await copy(join(targetDir, source), join(targetDir, target))

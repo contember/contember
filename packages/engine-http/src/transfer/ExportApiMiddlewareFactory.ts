@@ -1,7 +1,7 @@
 import { KoaMiddleware, KoaRequestState } from '../koa'
 import { AuthResult, HttpError, TimerMiddlewareState } from '../common'
 import { ProjectGroupResolver, ProjectInfoMiddlewareState } from '../project-common'
-import { Readable } from 'stream'
+import { Readable } from 'node:stream'
 import { toBuffer } from './CommandStream'
 import { ExportExecutor, ExportRequest } from './ExportExecutor'
 import { ParseError } from '@contember/typesafe'

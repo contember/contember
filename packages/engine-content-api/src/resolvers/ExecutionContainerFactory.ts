@@ -15,7 +15,7 @@ import {
 import { ValidationResolver } from './ValidationResolver'
 import { Providers } from '@contember/schema-utils'
 import { GraphQlQueryAstFactory } from './GraphQlQueryAstFactory'
-import { getArgumentValues } from 'graphql/execution/values'
+import { getArgumentValues } from 'graphql'
 import { createMapperContainer } from '../mapper'
 
 export interface ExecutionContainer {

@@ -6,7 +6,7 @@
 	},
 	"references": [
 		{
-			"path": "../../queryable/src"
+			"path": "../../authorization/src"
 		},
 		{
 			"path": "../../database/src"
@@ -15,13 +15,16 @@
 			"path": "../../database-migrations/src"
 		},
 		{
-			"path": "../../authorization/src"
-		},
-		{
 			"path": "../../engine-common/src"
 		},
 		{
 			"path": "../../graphql-utils/src"
+		},
+		{
+			"path": "../../logger/src"
+		},
+		{
+			"path": "../../queryable/src"
 		},
 		{
 			"path": "../../schema/src"

@@ -5,46 +5,13 @@
 	},
 	"references": [
 		{
-			"path": "../../../packages/database-migrations/src"
-		},
-		{
-			"path": "../../../packages/dic/src"
-		},
-		{
-			"path": "../../../packages/config-loader/src"
-		},
-		{
-			"path": "../../../packages/schema/src"
-		},
-		{
-			"path": "../../../packages/schema-utils/src"
-		},
-		{
-			"path": "../../../packages/schema-definition/src"
-		},
-		{
-			"path": "../../../packages/authorization/src"
-		},
-		{
 			"path": "../../../packages/database/src"
-		},
-		{
-			"path": "../../../packages/queryable/src"
 		},
 		{
 			"path": "../../../packages/engine-common/src"
 		},
 		{
 			"path": "../../../packages/engine-http/src"
-		},
-		{
-			"path": "../../../packages/engine-tenant-api/src"
-		},
-		{
-			"path": "../../../packages/engine-system-api/src"
-		},
-		{
-			"path": "../../../packages/engine-content-api/src"
 		},
 		{
 			"path": "../../../packages/engine-plugins/src"

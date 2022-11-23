@@ -1,8 +1,6 @@
 import {
-	GraphQLEnumType,
 	GraphQLFieldConfig,
 	GraphQLInt,
-	GraphQLList,
 	GraphQLNonNull,
 	GraphQLObjectType,
 	GraphQLSchema,
@@ -11,8 +9,8 @@ import {
 import { S3Acl, S3Service, S3ServiceFactory } from './S3Service'
 import { resolveS3Config, S3Config } from './Config'
 import { createObjectKeyVerifier, ObjectKeyVerifier } from './ObjectKeyVerifier'
-import { GraphQLSchemaContributor, SchemaContext } from '@contember/engine-plugins'
-import { Providers } from '@contember/engine-plugins'
+import { GraphQLSchemaContributor, Providers, SchemaContext } from '@contember/engine-plugins'
+import * as types from './S3SchemaTypes'
 
 interface Identity {
 	projectRoles: string[]
@@ -27,22 +25,6 @@ type S3SchemaAcl = Record<
 >
 
 export class S3SchemaContributor implements GraphQLSchemaContributor {
-	private s3HeadersType: GraphQLFieldConfig<any, any> = {
-		type: new GraphQLNonNull(
-			new GraphQLList(
-				new GraphQLNonNull(
-					new GraphQLObjectType({
-						name: 'S3Header',
-						fields: {
-							key: { type: new GraphQLNonNull(GraphQLString) },
-							value: { type: new GraphQLNonNull(GraphQLString) },
-						},
-					}),
-				),
-			),
-		),
-	}
-
 	constructor(
 		private readonly s3Config: S3Config | undefined,
 		private readonly s3Factory: S3ServiceFactory,
@@ -97,21 +79,7 @@ export class S3SchemaContributor implements GraphQLSchemaContributor {
 	private createReadMutation(s3: S3Service, allowedKeyPatterns: string[]): GraphQLFieldConfig<any, any, any> {
 		let verifier: ObjectKeyVerifier
 		return {
-			type: new GraphQLNonNull(
-				new GraphQLObjectType({
-					name: 'S3SignedRead',
-					fields: {
-						url: { type: new GraphQLNonNull(GraphQLString) },
-						headers: this.s3HeadersType,
-						method: { type: new GraphQLNonNull(GraphQLString) },
-						objectKey: {
-							type: new GraphQLNonNull(GraphQLString),
-							description: `Allowed patterns:\n${allowedKeyPatterns.join('\n')}`,
-						},
-						bucket: { type: new GraphQLNonNull(GraphQLString) },
-					},
-				}),
-			),
+			type: new GraphQLNonNull(types.createS3SignedRead({ allowedKeyPatterns })),
 			args: {
 				objectKey: {
 					type: new GraphQLNonNull(GraphQLString),
@@ -135,23 +103,9 @@ export class S3SchemaContributor implements GraphQLSchemaContributor {
 		allowedKeyPatterns: string[],
 	): GraphQLFieldConfig<any, any, any> {
 		let verifier: ObjectKeyVerifier
+
 		return {
-			type: new GraphQLNonNull(
-				new GraphQLObjectType({
-					name: 'S3SignedUpload',
-					fields: {
-						url: { type: new GraphQLNonNull(GraphQLString) },
-						headers: this.s3HeadersType,
-						method: { type: new GraphQLNonNull(GraphQLString) },
-						objectKey: {
-							type: new GraphQLNonNull(GraphQLString),
-							description: `Allowed patterns:\n${allowedKeyPatterns.join('\n')}`,
-						},
-						bucket: { type: new GraphQLNonNull(GraphQLString) },
-						publicUrl: { type: new GraphQLNonNull(GraphQLString) },
-					},
-				}),
-			),
+			type: new GraphQLNonNull(types.createS3SignedUpload({ allowedKeyPatterns })),
 			args: {
 				contentType: {
 					type: new GraphQLNonNull(GraphQLString),
@@ -166,14 +120,7 @@ export class S3SchemaContributor implements GraphQLSchemaContributor {
 					? {}
 					: {
 						acl: {
-							type: new GraphQLEnumType({
-								name: 'S3Acl',
-								values: {
-									PUBLIC_READ: {},
-									PRIVATE: {},
-									NONE: {},
-								},
-							}),
+							type: types.S3Acl,
 						},
 					  }),
 			},

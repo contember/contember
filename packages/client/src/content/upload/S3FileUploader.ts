@@ -48,6 +48,10 @@ class S3FileUploader implements FileUploader<S3FileUploader.SuccessMetadata> {
 			parameters[S3FileUploader.formatFullAlias(alias)] = {
 				contentType: uploadOptions?.fileType ?? file.type,
 				prefix: uploadOptions?.filePrefix,
+				suffix: uploadOptions?.fileSuffix,
+				size: uploadOptions?.fileSize,
+				extension: uploadOptions?.fileExtension,
+				fileName: uploadOptions?.fileName,
 				expiration: uploadOptions?.fileExpiration,
 				acl: uploadOptions?.fileAcl,
 			}
@@ -134,9 +138,13 @@ namespace S3FileUploader {
 
 	export interface S3UploadOptions {
 		fileType?: GenerateUploadUrlMutationBuilder.FileParameters['contentType']
-		fileExpiration?: GenerateUploadUrlMutationBuilder.FileParameters['expiration']
-		filePrefix?: GenerateUploadUrlMutationBuilder.FileParameters['prefix']
-		fileAcl?: GenerateUploadUrlMutationBuilder.FileParameters['acl']
+		fileExpiration?: number
+		fileSize?: number
+		filePrefix?: string
+		fileSuffix?: string
+		fileName?: string
+		fileExtension?: string
+		fileAcl?: GenerateUploadUrlMutationBuilder.Acl
 	}
 }
 

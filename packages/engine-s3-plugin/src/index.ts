@@ -4,6 +4,7 @@ import { S3SchemaContributor } from './S3SchemaContributor'
 import { S3ServiceFactory } from './S3Service'
 import { ProjectWithS3Config } from './Config'
 
+export * from './S3ObjectAuthorizator'
 export * from './S3SchemaContributor'
 export * from './S3Service'
 

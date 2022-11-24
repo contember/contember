@@ -6,23 +6,31 @@ import {
 	GraphQLSchema,
 	GraphQLString,
 } from 'graphql'
-import { S3Acl, S3Service, S3ServiceFactory } from './S3Service'
+import { S3Service, S3ServiceFactory } from './S3Service'
 import { resolveS3Config, S3Config } from './Config'
-import { createObjectKeyVerifier, ObjectKeyVerifier } from './ObjectKeyVerifier'
 import { GraphQLSchemaContributor, Providers, SchemaContext } from '@contember/engine-plugins'
 import * as types from './S3SchemaTypes'
+import { S3Acl, S3GenerateSignedUploadInput, S3SignedRead, S3SignedUpload } from './S3SchemaTypes'
+import { S3ObjectAuthorizator } from './S3ObjectAuthorizator'
 
 interface Identity {
 	projectRoles: string[]
 }
 
-type S3SchemaAcl = Record<
+export type S3SchemaUploadAcl =
+	| boolean
+	| {
+		maxSize?: number
+	}
+
+export type S3SchemaAcl = Record<
 	string, // public/*.jpg
 	{
 		read?: boolean
-		upload?: boolean
+		upload?: S3SchemaUploadAcl
 	}
 >
+
 
 export class S3SchemaContributor implements GraphQLSchemaContributor {
 	constructor(
@@ -45,17 +53,24 @@ export class S3SchemaContributor implements GraphQLSchemaContributor {
 			Object.entries((context.schema.acl.roles[it]?.s3 as S3SchemaAcl) || {}),
 		)
 
-		const allowedUploads = rules.filter(([, it]) => it.upload).map(([it]) => it)
-		const allowedReads = rules.filter(([, it]) => it.read).map(([it]) => it)
 
-		if (allowedUploads.length === 0 && allowedReads.length == 0) {
+		const uploadRules = rules.filter(([, it]) => it.upload).map(([it, val]) => ({
+			pattern: it,
+			...(typeof val.upload !== 'boolean' ? val.upload : {}),
+		}))
+		const readRules = rules.filter(([, it]) => it.read).map(([it]) => ({
+			pattern: it,
+		}))
+
+		if (uploadRules.length === 0 && readRules.length == 0) {
 			return undefined
 		}
 
 		const s3Config = resolveS3Config(this.s3Config)
-		const s3 = this.s3Factory.create(s3Config, this.providers)
-		const uploadMutation = this.createUploadMutation(s3Config, s3, allowedUploads)
-		const readMutation = this.createReadMutation(s3, allowedReads)
+		const authorizator = new S3ObjectAuthorizator(uploadRules, readRules)
+		const s3 = this.s3Factory.create(s3Config, this.providers, authorizator)
+		const uploadMutation = this.createUploadMutation(s3)
+		const readMutation = this.createReadMutation(s3)
 		const mutation = {
 			generateUploadUrl: uploadMutation as GraphQLFieldConfig<any, any, any>,
 			generateReadUrl: readMutation,
@@ -76,10 +91,9 @@ export class S3SchemaContributor implements GraphQLSchemaContributor {
 		})
 	}
 
-	private createReadMutation(s3: S3Service, allowedKeyPatterns: string[]): GraphQLFieldConfig<any, any, any> {
-		let verifier: ObjectKeyVerifier
+	private createReadMutation(s3: S3Service): GraphQLFieldConfig<any, any, any> {
 		return {
-			type: new GraphQLNonNull(types.createS3SignedRead({ allowedKeyPatterns })),
+			type: new GraphQLNonNull(S3SignedRead),
 			args: {
 				objectKey: {
 					type: new GraphQLNonNull(GraphQLString),
@@ -89,55 +103,36 @@ export class S3SchemaContributor implements GraphQLSchemaContributor {
 				},
 			},
 			resolve: async (parent: any, args: { objectKey: string; expiration?: number }) => {
-				if (!verifier) {
-					verifier = createObjectKeyVerifier(allowedKeyPatterns)
-				}
-				return s3.getSignedReadUrl(args.objectKey, verifier, args.expiration)
+				return s3.getSignedReadUrl({ objectKey: args.objectKey, expiration: args.expiration ?? null })
 			},
 		} as GraphQLFieldConfig<any, any, any>
 	}
 
-	private createUploadMutation(
-		s3Config: S3Config,
-		s3: S3Service,
-		allowedKeyPatterns: string[],
-	): GraphQLFieldConfig<any, any, any> {
-		let verifier: ObjectKeyVerifier
-
+	private createUploadMutation(s3: S3Service): GraphQLFieldConfig<any, any, any> {
 		return {
-			type: new GraphQLNonNull(types.createS3SignedUpload({ allowedKeyPatterns })),
+			type: new GraphQLNonNull(S3SignedUpload),
 			args: {
-				contentType: {
-					type: new GraphQLNonNull(GraphQLString),
-				},
-				expiration: {
-					type: GraphQLInt,
-				},
-				prefix: {
-					type: GraphQLString,
-				},
-				...(s3Config.noAcl
-					? {}
-					: {
-						acl: {
-							type: types.S3Acl,
-						},
-					  }),
+				input: { type: types.S3GenerateSignedUploadInput },
+				contentType: { type: GraphQLString, deprecationReason: 'Use input.contentType' },
+				expiration: { type: GraphQLInt, deprecationReason: 'Use input.expiration' },
+				prefix: { type: GraphQLString, deprecationReason: 'Use input.prefix' },
+				acl: { type: types.S3Acl, deprecationReason: 'Use input.acl' },
 			},
 			resolve: async (
 				parent: any,
-				args: { contentType: string; acl?: string; expiration?: number; prefix?: string },
+				args: { input?: Partial<S3GenerateSignedUploadInput>; contentType?: string; acl?: S3Acl; expiration?: number; prefix?: string },
 			) => {
-				if (!verifier) {
-					verifier = createObjectKeyVerifier(allowedKeyPatterns)
-				}
-				const aclMapping: Record<string, S3Acl> = {
-					PUBLIC_READ: S3Acl.PublicRead,
-					PRIVATE: S3Acl.Private,
-					NONE: S3Acl.None,
-				}
-				const acl: S3Acl | undefined = args.acl ? aclMapping[args.acl] || undefined : undefined
-				return s3.getSignedUploadUrl(args.contentType, verifier, acl, args.expiration, args.prefix)
+				return s3.getSignedUploadUrl({
+					acl: args.input?.acl ?? args.acl ?? null,
+					contentDisposition: args.input?.contentDisposition ?? null,
+					contentType: args.input?.contentType ?? args.contentType ?? null,
+					expiration: args.input?.expiration ?? args.expiration ?? null,
+					extension: args.input?.extension ?? null,
+					fileName: args.input?.fileName ?? null,
+					prefix: args.input?.prefix ?? args.prefix ?? null,
+					suffix: args.input?.suffix ?? null,
+					size: args.input?.size ?? null,
+				})
 			},
 		}
 	}

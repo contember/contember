@@ -14,7 +14,7 @@ const hmac = (secret: BinaryLike, data: BinaryLike) => createHmac('sha256', secr
 
 const hash = (data: BinaryLike) => createHash('sha256').update(data).digest('hex')
 
-const unsignableHeaders = ['authorization', 'content-type', 'content-length', 'user-agent', 'expect', 'x-amzn-trace-id']
+const unsignableHeaders = ['authorization', 'user-agent', 'content-type', 'expect', 'x-amzn-trace-id']
 
 const sortMap = <T extends Record<string, any>>(input: T): T => {
 	return Object.fromEntries(Object.entries(input).sort((a, b) => (a[0] < b[0] ? -1 : 1))) as T

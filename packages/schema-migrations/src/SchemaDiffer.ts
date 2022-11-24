@@ -44,6 +44,7 @@ import {
 import { ChangeViewNonViewDiffer, RemoveChangedFieldDiffer, RemoveChangedViewDiffer } from './modifications/differs'
 import { CreateIndexDiffer, RemoveIndexDiffer } from './modifications/indexes'
 import { SchemaWithMeta } from './modifications/utils/schemaMeta'
+import { UpdateSettingsDiffer } from './modifications/settings'
 
 export class SchemaDiffer {
 	constructor(private readonly schemaMigrator: SchemaMigrator) {}
@@ -59,6 +60,7 @@ export class SchemaDiffer {
 		}
 
 		const differs: Differ[] = [
+			new UpdateSettingsDiffer(),
 			new ConvertOneToManyRelationDiffer(),
 			new ConvertOneHasManyToManyHasManyRelationDiffer(),
 			new RemoveUniqueConstraintDiffer(),

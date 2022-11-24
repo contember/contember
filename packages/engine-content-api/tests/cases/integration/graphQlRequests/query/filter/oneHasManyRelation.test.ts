@@ -23,11 +23,10 @@ test('Author by post title (where one has many)', async () => {
         }`,
 		executes: [
 			{
-				sql: SQL`select "root_"."id" as "root_id"
-                     from "public"."author" as "root_"
-                     where exists (select 1
-                                            from "public"."post" as "sub_"
-                                            where "root_"."id" = "sub_"."author_id" and "sub_"."title" = ?)`,
+				sql: SQL`select "root_"."id" as "root_id" from "public"."author" as "root_"
+                                 where exists (select 1
+                                               from "public"."post" as "root_posts"
+                                               where "root_"."id" = "root_posts"."author_id" and "root_posts"."title" = ?)`,
 				parameters: ['Hello'],
 				response: {
 					rows: [

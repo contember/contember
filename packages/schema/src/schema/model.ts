@@ -26,11 +26,10 @@ export namespace Model {
 
 	export type FieldType = RelationType | ColumnType
 	export type Field<T extends FieldType> = {
+		readonly name: string
 		readonly type: T
 	}
-
 	export type AnyField = AnyColumn | AnyRelation
-	export type AnyColumn<T extends ColumnType = ColumnType> = Column<T>
 
 	export enum ColumnType {
 		Uuid = 'Uuid',
@@ -44,23 +43,25 @@ export namespace Model {
 		Json = 'Json',
 	}
 
-	export type Column<T extends ColumnType> = ColumnTypeDefinition<T> & {
-		readonly name: string
-		readonly columnName: string
-	}
+	export type AnyColumn<T extends ColumnType = ColumnType> = Column<T>
 
-	export type ColumnTypeDefinition<T extends ColumnType = ColumnType>  =
+	export type Column<T extends ColumnType> =
 		& Field<T>
+		& ColumnTypeDefinition
 		& {
-			readonly columnType: string
-			readonly typeAlias?: string
-			readonly nullable: boolean
-			readonly default?: string | number | boolean | null
-			readonly sequence?: {
-				readonly precedence: 'ALWAYS' | 'BY DEFAULT'
-				readonly start?: number
-			}
+			readonly columnName: string
 		}
+
+	export type ColumnTypeDefinition = {
+		readonly columnType: string
+		readonly typeAlias?: string
+		readonly nullable: boolean
+		readonly default?: string | number | boolean | null
+		readonly sequence?: {
+			readonly precedence: 'ALWAYS' | 'BY DEFAULT'
+			readonly start?: number
+		}
+	}
 
 
 	export enum RelationType {

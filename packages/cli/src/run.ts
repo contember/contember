@@ -19,12 +19,18 @@ import {
 	VersionCommand,
 	WorkspaceUpdateApiCommand,
 } from './commands'
+import { ExportCommand } from './commands/transfer/ExportCommand'
+import { ImportCommand } from './commands/transfer/ImportCommand'
+import { TransferCommand } from './commands/transfer/TransferCommand';
 
 (async () => {
 	const workspace = await Workspace.get(process.cwd())
 	const commands: CommandFactoryList = {
 		['deploy']: () => new DeployCommand(workspace),
 		['version']: () => new VersionCommand(),
+		['data:export']: () => new ExportCommand(workspace),
+		['data:import']: () => new ImportCommand(workspace),
+		['data:transfer']: () => new TransferCommand(workspace),
 		['migrations:diff']: () => new MigrationDiffCommand(workspace),
 		['migrations:amend']: () => new MigrationAmendCommand(workspace),
 		['migrations:describe']: () => new MigrationDescribeCommand(workspace),

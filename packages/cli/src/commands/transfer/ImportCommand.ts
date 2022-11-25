@@ -1,0 +1,64 @@
+import { Command, CommandConfiguration, Input, Workspace } from '@contember/cli-common'
+import { createReadStream } from 'fs'
+import { createGunzip } from 'zlib'
+import { confirmImport, dataImport, readStream, resolveProject } from './utils'
+import { maskToken } from '../../utils/token'
+
+type Args = {
+	file: string
+	target?: string
+}
+type Options = {
+	'yes': boolean
+}
+
+export class ImportCommand extends Command<Args, Options> {
+	constructor(
+		private readonly workspace: Workspace,
+	) {
+		super()
+	}
+
+	protected configure(configuration: CommandConfiguration<Args, Options>): void {
+		configuration.description('Import data into a project')
+		configuration.argument('file')
+		const from = configuration.argument('target')
+		if (this.workspace.isSingleProjectMode()) {
+			from.optional()
+		}
+		configuration.option('yes').valueNone()
+	}
+
+	protected async execute(input: Input<Args, Options>): Promise<void | number> {
+		const from = input.getArgument('target')
+		const project = await resolveProject({ projectOrDsn: from, workspace: this.workspace })
+		console.log('')
+		console.log('Importing data into a following project')
+		console.log('')
+		console.log(`Project name: ${project.project}`)
+		console.log(`API URL: ${project.baseUrl}`)
+		console.log(`Token: ${maskToken(project.token)}`)
+		console.log('')
+		if (!await confirmImport(input)) {
+			return 1
+		}
+		const file = input.getArgument('file')
+		const baseInputStream = createReadStream(file)
+		const stream = (file.endsWith('.gz') ? baseInputStream.pipe(createGunzip()) : baseInputStream)
+		const response = await dataImport({ stream: stream, project, printProgress: rewriteStdoutLine })
+		console.log('')
+		const responseData = JSON.parse((await readStream(response)).toString())
+		if (responseData.ok) {
+			console.log('Import done.')
+		} else {
+			console.error('Import failed:')
+			console.log(responseData)
+		}
+	}
+}
+
+export const rewriteStdoutLine = (message: string) => {
+	process.stdout.clearLine(0)
+	process.stdout.cursorTo(0)
+	process.stdout.write(message)
+}

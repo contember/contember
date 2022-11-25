@@ -14,6 +14,7 @@ import { URL } from 'node:url'
 import prompts from 'prompts'
 import { createMigrationStatusTable } from '../../utils/migrations'
 import { maskToken } from '../../utils/token'
+import { parseDsn } from '../../utils/dsn'
 
 type Args = {
 	dsn: string
@@ -52,13 +53,7 @@ export class DeployCommand extends Command<Args, Options> {
 
 		let remoteProject = input.getOption('remote-project') || project.name
 		if (dsn) {
-			const uri = new URL(dsn)
-			if (uri.protocol !== 'contember:' && uri.protocol !== 'contember-unsecure:') {
-				throw 'Invalid deploy DSN'
-			}
-			remoteProject = uri.username
-			apiTokenFromDsn = uri.password
-			adminEndpoint = (uri.protocol === 'contember-unsecure:' ? 'http://' : 'https://') + uri.host
+			({ project: remoteProject, endpoint: adminEndpoint, token: apiTokenFromDsn  } = parseDsn(dsn))
 		}
 		const instance = await interactiveResolveInstanceEnvironmentFromInput(this.workspace, apiUrl ?? (adminEndpoint ? adminEndpoint + '/_api' : undefined))
 		const apiToken = await interactiveResolveApiToken({ workspace: this.workspace, instance, apiToken: apiTokenFromDsn })

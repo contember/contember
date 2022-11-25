@@ -61,7 +61,14 @@ export class SchemaBuilder {
 					enabled: true,
 				},
 			}
-			return applyEntityExtensions(definition, { entity,  definition: definitionInstance, registry: this.entityRegistry })
+			return applyEntityExtensions(definition, {
+				entity,
+				definition: definitionInstance,
+				registry: this.entityRegistry,
+				entityRegistry: this.entityRegistry,
+				conventions: this.conventions,
+				enumRegistry: this.enumRegistry,
+			})
 		})
 
 		return {

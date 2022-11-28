@@ -14,9 +14,12 @@ const schema: Schema = {
 				entities: PermissionsBuilder.create(model).allowAll().allowCustomPrimary().permissions,
 				s3: {
 					'**': {
-						upload: true,
+						upload: {
+							maxSize: 1024 * 1024,
+						},
 						read: true,
 					},
+
 				},
 			},
 		},

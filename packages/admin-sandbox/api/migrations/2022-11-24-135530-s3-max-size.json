@@ -1,0 +1,17 @@
+{
+	"formatVersion": 3,
+	"modifications": [
+		{
+			"modification": "patchAclSchema",
+			"patch": [
+				{
+					"op": "replace",
+					"path": "/roles/admin/s3/**/upload",
+					"value": {
+						"maxSize": 1048576
+					}
+				}
+			]
+		}
+	]
+}

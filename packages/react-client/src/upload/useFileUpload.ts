@@ -24,30 +24,23 @@ export type FileUpload<Result = unknown, Metadata = undefined> = [
 ]
 
 export interface FileUploadOptions {
-	maxUpdateFrequency?: number // This does NOT apply to all kinds of updates.
 }
 
-export const useFileUpload = <Result = unknown, Metadata = undefined>(
-	options?: FileUploadOptions,
-): FileUpload<Result, Metadata> => {
-	const maxUpdateFrequency = options?.maxUpdateFrequency ?? 100
-
+export const useFileUpload = <Result = unknown, Metadata = undefined>({}: FileUploadOptions = {}): FileUpload<Result, Metadata> => {
 	const contentApiClient = useCurrentContentGraphQlClient()
 
-	const updateTimeoutRef = useRef<number | undefined>(undefined)
-	const isFirstRenderRef = useRef(true)
 	const fileIdSeedRef = useRef(1)
 
-	const [multiTemporalState, dispatch] = useReducer<
+	const [internalState, dispatch] = useReducer<
 		Reducer<FileUploadMultiTemporalState<Result, Metadata>, FileUploadAction<Result, Metadata>>,
 		undefined
 	>(fileUploadReducer, undefined, initializeFileUploadState)
-	const multiTemporalStateRef = useRef(multiTemporalState)
+	const internalStateRef = useRef(internalState)
 
 	const defaultUploader = useMemo(() => new S3FileUploader(), [])
 
 	useEffect(() => {
-		multiTemporalStateRef.current = multiTemporalState
+		internalStateRef.current = internalState
 	})
 
 	const purgeUpload = useCallback<PurgeUpload>(files => {
@@ -119,7 +112,7 @@ export const useFileUpload = <Result = unknown, Metadata = undefined>(
 			const filesById = new Map<FileId, FileUploadMetadata<Metadata>>()
 			const groupedByUploader: Map<FileUploader, Map<File, UploadedFileMetadata>> = new Map()
 
-			const currentState = multiTemporalStateRef.current
+			const currentState = internalStateRef.current
 
 			for (const fileOrIdMaybeWithOptions of files) {
 				let fileOrId: File | FileId
@@ -135,7 +128,7 @@ export const useFileUpload = <Result = unknown, Metadata = undefined>(
 				const { uploader = defaultUploader, metadata } = options
 
 				const fileId = toFileId(currentState, fileOrId)
-				const fileState = currentState.liveState.get(fileId)
+				const fileState = currentState.state.get(fileId)
 
 				if (fileState === undefined || fileState.readyState !== 'initializing') {
 					throw new Error(
@@ -207,56 +200,15 @@ export const useFileUpload = <Result = unknown, Metadata = undefined>(
 		[failUpload, initializeUpload, purgeUpload, startUpload],
 	)
 
-	useEffect(() => {
-		if (isFirstRenderRef.current) {
-			return
-		}
-		if (multiTemporalState.isLiveStateDirty) {
-			const now = Date.now()
-			const timeDelta = Math.max(now - multiTemporalState.lastUpdateTime, 0) // The max is just a sanity check
-			if (timeDelta > maxUpdateFrequency) {
-				if (updateTimeoutRef.current !== undefined) {
-					clearTimeout(updateTimeoutRef.current)
-				}
-				dispatch({
-					type: 'publishNewestState',
-				})
-			} else {
-				if (updateTimeoutRef.current !== undefined) {
-					return
-				}
-				updateTimeoutRef.current = window.setTimeout(() => {
-					dispatch({
-						type: 'publishNewestState',
-					})
-					updateTimeoutRef.current = undefined
-				}, maxUpdateFrequency - timeDelta)
-			}
-		}
-	}, [
-		multiTemporalState.isLiveStateDirty,
-		multiTemporalState.lastUpdateTime,
-		multiTemporalState.liveState,
-		multiTemporalState.publicState,
-		maxUpdateFrequency,
-	])
 
 	useEffect(
 		() => () => {
-			for (const [, state] of multiTemporalStateRef.current.liveState) {
-				URL.revokeObjectURL(state.previewUrl)
-			}
-			for (const [, state] of multiTemporalStateRef.current.publicState) {
+			for (const [, state] of internalStateRef.current.state) {
 				URL.revokeObjectURL(state.previewUrl)
 			}
 		},
 		[],
 	)
 
-	// For this to work, this effect must be the last one to run.
-	useEffect(() => {
-		isFirstRenderRef.current = false
-	}, [])
-
-	return [multiTemporalState.publicState, operations]
+	return [internalState.state, operations]
 }

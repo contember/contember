@@ -127,8 +127,6 @@ export interface FileUploadOperations<Metadata = undefined> {
 
 // @public (undocumented)
 export interface FileUploadOptions {
-    // (undocumented)
-    maxUpdateFrequency?: number;
 }
 
 // @public (undocumented)
@@ -483,7 +481,7 @@ export const useCurrentContentGraphQlClient: () => GraphQlClient;
 export const useCurrentSystemGraphQlClient: () => GraphQlClient;
 
 // @public (undocumented)
-export const useFileUpload: <Result = unknown, Metadata = undefined>(options?: FileUploadOptions) => FileUpload<Result, Metadata>;
+export const useFileUpload: <Result = unknown, Metadata = undefined>({}?: FileUploadOptions) => FileUpload<Result, Metadata>;
 
 // @public (undocumented)
 export const useGraphQlClient: (path: string) => GraphQlClient;

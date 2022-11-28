@@ -56,7 +56,7 @@ export const useNormalizedUploadState = ({
 				metadataByFileId = initializeUpload(filesWithIds)
 			})
 
-			Promise.resolve().then(async () => {
+			new Promise(resolve => setTimeout(resolve, 1)).then(async () => {
 				const resolvedKindPromises: Array<Promise<AcceptedFile | undefined>> = []
 
 				for (const fileMetadata of metadataByFileId.values()) {

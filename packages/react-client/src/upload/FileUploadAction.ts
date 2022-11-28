@@ -5,9 +5,6 @@ import type { FileWithMetadata } from './FileWithMetadata'
 
 export type FileUploadAction<Result = unknown, Metadata = undefined> =
 	| {
-			type: 'publishNewestState'
-	  }
-	| {
 			type: 'initialize'
 			files: Iterable<[FileId, FileWithMetadata]>
 	  }

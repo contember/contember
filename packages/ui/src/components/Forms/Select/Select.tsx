@@ -3,6 +3,7 @@ import { ComponentProps, CSSProperties, ForwardedRef, forwardRef, memo, ReactEle
 import ReactSelect, { StylesConfig, useStateManager } from 'react-select'
 import SelectClass from 'react-select/dist/declarations/src/Select'
 import { useComponentClassName } from '../../../auxiliary'
+import { noop } from '../../../utils'
 import { getPortalRoot } from '../../Portal'
 import { useInputClassName } from '../hooks/useInputClassName'
 import { useChangeValidationState } from '../hooks/useNativeInput'
@@ -120,7 +121,7 @@ const SelectComponent = <V extends any>({
 	const defaultInputValue = defaultValue?.label
 
 	const nativeValidationInput = useRef<HTMLInputElement>(null)
-	const changeValidationState = useChangeValidationState({ ref: nativeValidationInput, onValidationStateChange })
+	useChangeValidationState({ ref: nativeValidationInput, onValidationStateChange })
 
 	const reactSelectState = useStateManager<SelectOptionWithKey<V>, false, never, {}>({
 		defaultInputValue,
@@ -131,7 +132,6 @@ const SelectComponent = <V extends any>({
 			if (valueProp !== next) {
 				if (nativeValidationInput.current) {
 					nativeValidationInput.current.value = optionsWithKeys.find(option => option.value === next)?.key ?? ''
-					changeValidationState()
 				}
 				onChange?.(next)
 			}
@@ -139,7 +139,6 @@ const SelectComponent = <V extends any>({
 		onBlur: () => {
 			onBlur?.()
 			onFocusChange?.(false)
-			changeValidationState()
 		},
 		onFocus: () => {
 			onFocus?.()
@@ -174,10 +173,7 @@ const SelectComponent = <V extends any>({
 		<input
 			ref={nativeValidationInput}
 			value={value?.key ?? ''}
-			onChange={useCallback(() => {
-				console.log('change')
-				changeValidationState()
-			}, [changeValidationState])}
+			onChange={noop}
 			tabIndex={-1}
 			required={required || notNull}
 			style={nativeValidationInputStyle} />

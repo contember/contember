@@ -38,14 +38,14 @@ type BaseButtonProps = ButtonOwnProps & (ButtonBasedProps | AnchorBasedProps)
 
 export const AnchorButton = memo(
 	forwardRef<HTMLAnchorElement, AnchorButtonProps>((props, ref) => {
-		return <BaseButton {...props} ref={ref} Component={'a'}/>
+		return <BaseButton {...props} ref={ref} Component={'a'} />
 	}),
 )
 AnchorButton.displayName = 'AnchorButton'
 
 export const Button = memo(
 	forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => {
-		return <BaseButton {...props} ref={ref} Component={'button'}/>
+		return <BaseButton {...props} ref={ref} Component={'button'} />
 	}),
 )
 Button.displayName = 'Button'
@@ -56,7 +56,7 @@ export const BaseButton = memo(
 			props
 
 		if (props.disabled === true) {
-			rest['aria-disabled'] = true,
+			rest['aria-disabled'] = true
 			rest['tabIndex'] = -1
 		}
 
@@ -84,6 +84,7 @@ export const BaseButton = memo(
 			ref: ref,
 			...(props.disabled ? {
 				href: null,
+				onClick: null,
 			} : undefined),
 		}
 		const content = (

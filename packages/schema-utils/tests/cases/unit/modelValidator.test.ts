@@ -59,10 +59,12 @@ test('index name collision', () => {
 	const validator = new ModelValidator(model)
 	assert.deepStrictEqual(validator.validate(), [
 		{
+			code: 'MODEL_NAME_COLLISION',
 			message: 'index name foo of entity Bar collides with table name foo of entity Foo',
 			path: ['entities', 'Bar'],
 		},
 		{
+			code: 'MODEL_NAME_COLLISION',
 			message: 'unique index name test of entity Bar collides with index name test of entity Foo',
 			path: ['entities', 'Bar'],
 		},
@@ -133,6 +135,7 @@ test('"meta" collision', () => {
 	const validator = new ModelValidator(model)
 	assert.deepStrictEqual(validator.validate(), [
 		{
+			code: 'MODEL_NAME_COLLISION',
 			message: 'entity FooMeta collides with entity Foo, because a GraphQL type with "Meta" suffix is created for every entity',
 			path: ['entities', 'FooMeta'],
 		},

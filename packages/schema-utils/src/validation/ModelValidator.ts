@@ -30,7 +30,7 @@ export class ModelValidator {
 		for (const [entityName, entity] of Object.entries(entities)) {
 			const entityErrors = errors.for(entityName)
 			if (entity.name !== entityName) {
-				entityErrors.add(`Entity name "${entity.name}" does not match the name in a map "${entityName}"`)
+				entityErrors.add('MODEL_NAME_MISMATCH', `Entity name "${entity.name}" does not match the name in a map "${entityName}"`)
 			}
 			this.validateEntity(entity, entityErrors)
 		}
@@ -43,7 +43,7 @@ export class ModelValidator {
 			const fieldErrors = errors.for(fieldName)
 			this.validateField(entity, field, fieldErrors)
 			if (field.name !== fieldName) {
-				fieldErrors.add(`Field name "${field.name}" does not match the name in a map "${fieldName}"`)
+				fieldErrors.add('MODEL_NAME_MISMATCH', `Field name "${field.name}" does not match the name in a map "${fieldName}"`)
 			}
 		}
 		this.validateUniqueConstraints(
@@ -57,12 +57,12 @@ export class ModelValidator {
 		for (const [constraintName, constraint] of Object.entries(uniqueConstraints)) {
 			const uniqueErrors = errors.for(constraintName)
 			if (constraint.name !== constraintName) {
-				uniqueErrors.add(`Constraint name ${constraint.name} does not match the name in a map "${constraintName}"`)
+				uniqueErrors.add('MODEL_NAME_MISMATCH', `Constraint name ${constraint.name} does not match the name in a map "${constraintName}"`)
 				continue
 			}
 			for (const field of constraint.fields) {
 				if (!fields.has(field)) {
-					uniqueErrors.add(`Referenced field ${field} in a constraint does not exists`)
+					uniqueErrors.add('MODEL_UNDEFINED_FIELD', `Referenced field ${field} in a constraint does not exists`)
 				}
 			}
 		}
@@ -74,7 +74,7 @@ export class ModelValidator {
 			this.validateRelation(partialEntity, field, errors)
 		} else {
 			if (field.sequence && field.nullable) {
-				errors.add('Column with sequence cannot be nullable.')
+				errors.add('MODEL_INVALID_COLUMN_DEFINITION', 'Column with sequence cannot be nullable.')
 			}
 		}
 	}
@@ -84,7 +84,7 @@ export class ModelValidator {
 		const targetEntityName = field.target
 		const targetEntity = this.model.entities[targetEntityName] || undefined
 		if (!targetEntity) {
-			return errors.add(`Target entity ${targetEntityName} not found`)
+			return errors.add('MODEL_UNDEFINED_ENTITY', `Target entity ${targetEntityName} not found`)
 		}
 		if (((it: Model.AnyRelation): it is Model.AnyRelation & Model.OrderableRelation => 'orderBy' in it)(field)) {
 			(field as Model.OrderableRelation).orderBy?.forEach(it => {
@@ -94,13 +94,13 @@ export class ModelValidator {
 					const orderByField = entity.fields[it.path[i]]
 					const pathStr = it.path.slice(0, i + 1).join('.')
 					if (!orderByField) {
-						errors.add(`Invalid orderBy of ${entityName}::${field.name}: field ${pathStr} is not defined`)
+						errors.add('ACL_UNDEFINED_FIELD', `Invalid orderBy of ${entityName}::${field.name}: field ${pathStr} is not defined`)
 						return
 					}
 					if (i + 1 < it.path.length) {
 						const targetEntity = getTargetEntity(this.model, entity, orderByField.name)
 						if (!targetEntity) {
-							errors.add(`Invalid orderBy of ${entityName}::${field.name}: field ${pathStr} is not a relation`)
+							errors.add('MODEL_RELATION_REQUIRED', `Invalid orderBy of ${entityName}::${field.name}: field ${pathStr} is not a relation`)
 							return
 						}
 						entity = targetEntity
@@ -110,20 +110,20 @@ export class ModelValidator {
 		}
 		if (partialEntity.view) {
 			if (field.type === Model.RelationType.ManyHasMany) {
-				return errors.add('Many-has-many relation is not allowed on a view entity.')
+				return errors.add('MODEL_INVALID_VIEW_USAGE', 'Many-has-many relation is not allowed on a view entity.')
 			}
 			if (
 				!targetEntity.view &&
 				field.type === Model.RelationType.OneHasMany
 			) {
-				return errors.add('One-has-many relation fields on views must point to a view entity.')
+				return errors.add('MODEL_INVALID_VIEW_USAGE', 'One-has-many relation fields on views must point to a view entity.')
 			}
 			if (
 				!targetEntity.view &&
 				field.type === Model.RelationType.OneHasOne &&
 				!('joiningColumn' in field)
 			) {
-				return errors.add('One-has-one relation fields on views must be owning or point to a view entity.')
+				return errors.add('MODEL_INVALID_VIEW_USAGE', 'One-has-one relation fields on views must be owning or point to a view entity.')
 			}
 		}
 		if (isInverseRelation(field)) {
@@ -131,70 +131,70 @@ export class ModelValidator {
 			const targetField = targetEntity.fields[ownedBy]
 			const relationDescription = `Target relation ${targetEntityName}::${ownedBy}:`
 			if (!targetField) {
-				return errors.add(`${relationDescription} not exists`)
+				return errors.add('MODEL_UNDEFINED_FIELD', `${relationDescription} not exists`)
 			}
 
 			if (!isRelation(targetField)) {
-				return errors.add(`${relationDescription} not a relation`)
+				return errors.add('MODEL_RELATION_REQUIRED', `${relationDescription} not a relation`)
 			}
 			if (targetField.target !== entityName) {
-				return errors.add(`${relationDescription} back reference to entity ${entityName} expected, but ${targetField.target} given`)
+				return errors.add('MODEL_INVALID_RELATION_DEFINITION', `${relationDescription} back reference to entity ${entityName} expected, but ${targetField.target} given`)
 			}
 			if (!isOwningRelation(targetField)) {
-				errors.add(`${relationDescription} not an owning relation`)
+				errors.add('MODEL_INVALID_RELATION_DEFINITION', `${relationDescription} not an owning relation`)
 				return
 			}
 			if (!targetField.inversedBy) {
-				return errors.add(`${relationDescription} inverse relation is not set`)
+				return errors.add('MODEL_INVALID_RELATION_DEFINITION', `${relationDescription} inverse relation is not set`)
 			}
 			if (targetField.inversedBy !== field.name) {
-				return errors.add(`${relationDescription} back reference ${entityName}::${field.name} exepcted, ${targetField.target}::${targetField.inversedBy} given`)
+				return errors.add('MODEL_INVALID_RELATION_DEFINITION', `${relationDescription} back reference ${entityName}::${field.name} exepcted, ${targetField.target}::${targetField.inversedBy} given`)
 			}
 			if (field.type === Model.RelationType.OneHasOne && targetField.type !== Model.RelationType.OneHasOne) {
-				return errors.add(`${relationDescription} "OneHasOne" type expected, "${targetField.type}" given`)
+				return errors.add('MODEL_INVALID_RELATION_DEFINITION', `${relationDescription} "OneHasOne" type expected, "${targetField.type}" given`)
 			}
 			if (field.type === Model.RelationType.OneHasMany && targetField.type !== Model.RelationType.ManyHasOne) {
-				return errors.add(`${relationDescription} "ManyHasOne" type expected, "${targetField.type}" given`)
+				return errors.add('MODEL_INVALID_RELATION_DEFINITION', `${relationDescription} "ManyHasOne" type expected, "${targetField.type}" given`)
 			}
 			if (field.type === Model.RelationType.ManyHasMany && targetField.type !== Model.RelationType.ManyHasMany) {
-				return errors.add(`${relationDescription} "ManyHasMany" type expected, "${targetField.type}" given`)
+				return errors.add('MODEL_INVALID_RELATION_DEFINITION', `${relationDescription} "ManyHasMany" type expected, "${targetField.type}" given`)
 			}
 		} else {
 			const inversedBy = field.inversedBy
 			if (targetEntity.view) {
 				if ('joiningColumn' in field) {
-					return errors.add(`View entity ${targetEntity.name} cannot be referenced from an owning relation. Try switching the owning side.`)
+					return errors.add('MODEL_INVALID_VIEW_USAGE', `View entity ${targetEntity.name} cannot be referenced from an owning relation. Try switching the owning side.`)
 				}
 			}
 			if (inversedBy) {
 				const targetField = targetEntity.fields[inversedBy]
 				const relationDescription = `Target relation ${targetEntityName}::${inversedBy}:`
 				if (!targetField) {
-					return errors.add(`${relationDescription} not exists`)
+					return errors.add('MODEL_UNDEFINED_FIELD', `${relationDescription} not exists`)
 				}
 				if (!isRelation(targetField)) {
-					return errors.add(`${relationDescription} not a relation`)
+					return errors.add('MODEL_RELATION_REQUIRED', `${relationDescription} not a relation`)
 				}
 				if (targetField.target !== entityName) {
-					return errors.add(`${relationDescription} back reference to entity ${entityName} expected, but ${targetField.target} given`)
+					return errors.add('MODEL_INVALID_RELATION_DEFINITION', `${relationDescription} back reference to entity ${entityName} expected, but ${targetField.target} given`)
 				}
 				if (!isInverseRelation(targetField)) {
-					return errors.add(`${relationDescription} not an inverse relation`)
+					return errors.add('MODEL_INVALID_RELATION_DEFINITION', `${relationDescription} not an inverse relation`)
 				}
 				if (!targetField.ownedBy) {
-					return errors.add(`${relationDescription} owning relation is not set`)
+					return errors.add('MODEL_INVALID_RELATION_DEFINITION', `${relationDescription} owning relation is not set`)
 				}
 				if (targetField.ownedBy !== field.name) {
-					return errors.add(`${relationDescription} back reference ${entityName}::${field.name} exepcted, ${targetField.target}::${targetField.ownedBy} given`)
+					return errors.add('MODEL_INVALID_RELATION_DEFINITION', `${relationDescription} back reference ${entityName}::${field.name} exepcted, ${targetField.target}::${targetField.ownedBy} given`)
 				}
 				if (field.type === Model.RelationType.OneHasOne && targetField.type !== Model.RelationType.OneHasOne) {
-					return errors.add(`${relationDescription} "OneHasOne" type expected, "${targetField.type}" given`)
+					return errors.add('MODEL_INVALID_RELATION_DEFINITION', `${relationDescription} "OneHasOne" type expected, "${targetField.type}" given`)
 				}
 				if (field.type === Model.RelationType.ManyHasOne && targetField.type !== Model.RelationType.OneHasMany) {
-					return errors.add(`${relationDescription} "ManyHasOne" type expected, "${targetField.type}" given`)
+					return errors.add('MODEL_INVALID_RELATION_DEFINITION', `${relationDescription} "ManyHasOne" type expected, "${targetField.type}" given`)
 				}
 				if (field.type === Model.RelationType.ManyHasMany && targetField.type !== Model.RelationType.ManyHasMany) {
-					return errors.add(`${relationDescription} "ManyHasMany" type expected, "${targetField.type}" given`)
+					return errors.add('MODEL_INVALID_RELATION_DEFINITION', `${relationDescription} "ManyHasMany" type expected, "${targetField.type}" given`)
 				}
 			}
 		}
@@ -202,10 +202,10 @@ export class ModelValidator {
 
 	private validateIdentifier(value: string, errorBuilder: ErrorBuilder) {
 		if (!value.match(IDENTIFIER_PATTERN)) {
-			return errorBuilder.add(`${value} must match pattern ${IDENTIFIER_PATTERN.source}`)
+			return errorBuilder.add('MODEL_INVALID_IDENTIFIER', `${value} must match pattern ${IDENTIFIER_PATTERN.source}`)
 		}
 		if (RESERVED_WORDS.includes(value)) {
-			errorBuilder.add(`${value} is reserved word`)
+			errorBuilder.add('MODEL_INVALID_IDENTIFIER', `${value} is reserved word`)
 		}
 	}
 
@@ -218,7 +218,7 @@ export class ModelValidator {
 			if (relationNames[entity.tableName]) {
 				errorBuilder
 					.for(entity.name)
-					.add(`${description} collides with a ${relationNames[entity.tableName]}`)
+					.add('MODEL_NAME_COLLISION', `${description} collides with a ${relationNames[entity.tableName]}`)
 			} else {
 				relationNames[entity.tableName] = description
 			}
@@ -227,7 +227,7 @@ export class ModelValidator {
 				const baseName = entity.name.substring(0, entity.name.length - 4)
 				if (entityNames.has(baseName)) {
 					errorBuilder.for(entity.name)
-						.add(`entity ${entity.name} collides with entity ${baseName}, because a GraphQL type with "Meta" suffix is created for every entity`)
+						.add('MODEL_NAME_COLLISION', `entity ${entity.name} collides with entity ${baseName}, because a GraphQL type with "Meta" suffix is created for every entity`)
 				}
 			}
 		}
@@ -240,7 +240,7 @@ export class ModelValidator {
 					if (relationNames[joiningTable.tableName]) {
 						entityErrorBuilder
 							.for(relation.name)
-							.add(
+							.add('MODEL_NAME_COLLISION',
 								`${description} collides with a ${relationNames[joiningTable.tableName]}.` +
 								'Consider using plural for a relation name or change the joining table name using .joiningTable(...) in schema definition.',
 							)
@@ -255,7 +255,7 @@ export class ModelValidator {
 					if (aliasedTypes.has(column.typeAlias) && aliasedTypes.get(column.typeAlias) !== column.type) {
 						errorBuilder
 							.for(column.name)
-							.add(`Type alias ${column.typeAlias} already exists for base type ${column.type}`)
+							.add('MODEL_NAME_COLLISION', `Type alias ${column.typeAlias} already exists for base type ${column.type}`)
 					}
 					aliasedTypes.set(column.typeAlias, column.type)
 				},
@@ -271,7 +271,7 @@ export class ModelValidator {
 			for (const index of Object.values(entity.indexes)) {
 				const description = `index name ${index.name} of entity ${entity.name}`
 				if (relationNames[index.name]) {
-					entityErrorBuilder.add(`${description} collides with ${relationNames[index.name]}`)
+					entityErrorBuilder.add('MODEL_NAME_COLLISION', `${description} collides with ${relationNames[index.name]}`)
 				} else {
 					relationNames[index.name] = description
 				}
@@ -279,7 +279,7 @@ export class ModelValidator {
 			for (const unique of Object.values(entity.unique)) {
 				const description = `unique index name ${unique.name} of entity ${entity.name}`
 				if (relationNames[unique.name]) {
-					entityErrorBuilder.add(`${description} collides with ${relationNames[unique.name]}`)
+					entityErrorBuilder.add('MODEL_NAME_COLLISION', `${description} collides with ${relationNames[unique.name]}`)
 				} else {
 					relationNames[unique.name] = description
 				}

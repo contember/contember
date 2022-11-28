@@ -11,7 +11,7 @@ export class ValidationValidator {
 			const entity = this.model.entities[entityName]
 			const entityErrorBuilder = errorBuilder.for(entityName)
 			if (!entity) {
-				entityErrorBuilder.add('Entity not found')
+				entityErrorBuilder.add('VALIDATION_UNDEFINED_ENTITY', 'Entity not found')
 			} else {
 				this.validateEntityRules(entityErrorBuilder, schema[entityName], entity)
 			}
@@ -28,7 +28,7 @@ export class ValidationValidator {
 			const field = entity.fields[fieldName]
 			const fieldErrorBuilder = errorBuilder.for(fieldName)
 			if (!field) {
-				fieldErrorBuilder.add('Field not found')
+				fieldErrorBuilder.add('VALIDATION_UNDEFINED_FIELD', 'Field not found')
 			} else {
 				this.validateFieldRules(fieldErrorBuilder, entitySchema[fieldName], entity, field)
 			}
@@ -60,7 +60,7 @@ export class ValidationValidator {
 			},
 		})
 		if (errorMessage) {
-			return errorBuilder.add(errorMessage)
+			return errorBuilder.add('VALIDATION_NOT_IMPLEMENTED', errorMessage)
 		}
 		this.validateValidator(errorBuilder.for('validator'), rule.validator, entity, field)
 	}
@@ -146,7 +146,7 @@ export class ValidationValidator {
 			visitRelation: () => true,
 		})
 		if (isRelation) {
-			errorBuilder.add('Rules depending on relations are currently not supported.')
+			errorBuilder.add('VALIDATION_NOT_IMPLEMENTED', 'Rules depending on relations are currently not supported.')
 			return undefined
 		}
 		return entity.fields[argument.path[0]]

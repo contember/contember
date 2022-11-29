@@ -116,7 +116,7 @@ describe('children analyzer', () => {
 	})
 	it('should not ignore unhandled nodes when appropriate', () => {
 		const fooLeaf = new Leaf(node => node.props, FooComponent)
-		const Container: FunctionComponent = props => <>{props.children}</>
+		const Container: FunctionComponent<{ children: ReactNode }> = props => <>{props.children}</>
 		;(Container as any).staticRender = (props: any) => props.children
 
 		const analyzer = new ChildrenAnalyzer<FooComponentProps>([fooLeaf], {
@@ -125,8 +125,8 @@ describe('children analyzer', () => {
 			unhandledNodeErrorMessage: 'Only foo children are supported.',
 		})
 
-		const RendersIgnoredNodes1: FunctionComponent = props => <>{props.children}</>
-		const RendersIgnoredNodes2: FunctionComponent = props => <>{props.children}</>
+		const RendersIgnoredNodes1: FunctionComponent<{ children?: ReactNode }> = props => <>{props.children}</>
+		const RendersIgnoredNodes2: FunctionComponent<{ children?: ReactNode }> = props => <>{props.children}</>
 		;(RendersIgnoredNodes1 as any).staticRender = () => (
 			<>
 				{null}

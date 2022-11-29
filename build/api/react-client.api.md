@@ -16,7 +16,7 @@ import type { GraphQlClientRequestOptions } from '@contember/client';
 import type { GraphQlClientVariables } from '@contember/client';
 import { NamedExoticComponent } from 'react';
 import { ReactElement } from 'react';
-import type { ReactNode } from 'react';
+import { ReactNode } from 'react';
 
 // @public (undocumented)
 export const ApiBaseUrlContext: Context<string | undefined>;
@@ -345,6 +345,7 @@ export type RichTextRendererProps<CustomElements extends RichTextElement = never
     attributeNamePrefix?: string;
     renderBlock?: ComponentType<{
         block: unknown;
+        children?: ReactNode;
     }>;
 } & (RichTextRendererFieldProps | RichTextRendererBlockProps<CustomElements, CustomLeaves>);
 

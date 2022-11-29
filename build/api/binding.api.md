@@ -554,7 +554,7 @@ export interface EntityListEventListeners {
     eventListeners: EntityListEventListenerStore | undefined;
 }
 
-// Warning: (ae-forgotten-export) The symbol "Events" needs to be exported by the entry point index.d.ts
+// Warning: (ae-forgotten-export) The symbol "Events_2" needs to be exported by the entry point index.d.ts
 //
 // @public (undocumented)
 export type EntityListEventListenerStore = EventListenersStore<keyof Events_2, Partial<Events_2>>;
@@ -817,7 +817,7 @@ export namespace Environment {
         [K in string]?: string | number;
     };
     // (undocumented)
-    export type ResolvedValue = Value | Filter;
+    export type ResolvedValue = Value;
     // (undocumented)
     export interface SelectedDimensions {
         // (undocumented)
@@ -848,7 +848,7 @@ export namespace Environment {
     // (undocumented)
     export type SubTreeNode = SubTreeEntityNode | SubTreeEntityListNode;
     // (undocumented)
-    export type Value = ReactNode;
+    export type Value = ReactNode | GraphQlLiteral | Filter;
     const // (undocumented)
     createExtension: <S, R>(create: (state: S | undefined, environment: Environment) => R, otherMethods?: Omit<Extension<S, R>, "create"> | undefined) => Extension<S, R>;
     // (undocumented)
@@ -1127,7 +1127,7 @@ export interface FieldEventListeners {
     eventListeners: FieldEventListenerStore | undefined;
 }
 
-// Warning: (ae-forgotten-export) The symbol "Events" needs to be exported by the entry point index.d.ts
+// Warning: (ae-forgotten-export) The symbol "Events_3" needs to be exported by the entry point index.d.ts
 //
 // @public (undocumented)
 export type FieldEventListenerStore<Value extends FieldValue = FieldValue> = EventListenersStore<keyof Events_3<Value>, Partial<Events_3<Value>>>;

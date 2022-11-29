@@ -85,10 +85,12 @@ class SideDimensions extends PureComponent<SideDimensionsProps> {
 }
 
 namespace SideDimensions {
+	type ValuesMapWithLegacyLabelMiddleware = Environment.ValuesMapWithFactory & { labelMiddleware?: LabelMiddleware}
+
 	export interface CommonDimensionProps {
 		hasOneField?: string | SugaredRelativeSingleEntity
 		variableName?: Environment.Name
-		variables?: Environment.ValuesMapWithFactory | ((dimensionValue: Environment.Value) => Environment.ValuesMapWithFactory)
+		variables?: ValuesMapWithLegacyLabelMiddleware | ((dimensionValue: Environment.Value) => ValuesMapWithLegacyLabelMiddleware)
 		labelMiddleware?: LabelMiddleware
 	}
 
@@ -108,7 +110,7 @@ namespace SideDimensions {
 			const inner = (
 				<EnvironmentContext.Provider value={SingleDimension.generateEnvironment(this.props, this.props.environment)}>
 					<div className="sideDimensions-dimensions-dimension">
-						{this.props.renderDimensionValue && <span className="sideDimensions-dimensions-dimensionValue">{this.props.dimensionValue}</span>}
+						{this.props.renderDimensionValue && <span className="sideDimensions-dimensions-dimensionValue">{this.props.dimensionValue as string}</span>}
 						{children}
 					</div>
 				</EnvironmentContext.Provider>
@@ -132,7 +134,7 @@ namespace SideDimensions {
 			}
 			const variables = typeof this.props.variables === 'function' ? this.props.variables(this.props.dimensionValue) : this.props.variables
 			if ('labelMiddleware' in variables) {
-				return variables.labelMiddleware as LabelMiddleware
+				return variables.labelMiddleware
 			}
 			return undefined
 		}
@@ -151,7 +153,7 @@ namespace SideDimensions {
 		}
 
 		public static generateEnvironment(props: SingleDimensionProps, oldEnvironment: Environment): Environment {
-			const deltaFactory: Environment.ValuesMapWithFactory = typeof props.variables === 'function'
+			const deltaFactory: ValuesMapWithLegacyLabelMiddleware = typeof props.variables === 'function'
 				? props.variables(props.dimensionValue)
 				: props.variables ?? {}
 

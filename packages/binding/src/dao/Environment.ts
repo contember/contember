@@ -3,6 +3,7 @@ import { BindingError } from '../BindingError'
 import type { Filter } from '../treeParameters'
 import equal from 'fast-deep-equal/es6'
 import { Schema, SchemaColumn, SchemaEntity, SchemaRelation } from '../core/schema'
+import { GraphQlLiteral } from '@contember/client'
 
 class Environment {
 	private constructor(
@@ -83,7 +84,7 @@ class Environment {
 	/** @deprecated use getVariableOrElse or getParameterOrElse */
 	public getValueOrElse<F, V extends Environment.Value = Environment.Value>(key: string, fallback: F): V | F {
 		console.warn('Environment.getValueOrElse() is deprecated, use Environment.getVariableOrElse() or Environment.getParameterOrElse() instead.')
-		return this.getVariableOrElse(key, undefined) ?? this.getParameterOrElse(key, fallback) as V | F
+		return this.getVariableOrElse(key, undefined) ?? this.getParameterOrElse(key, fallback) as any
 	}
 
 	/** @deprecated */
@@ -242,9 +243,9 @@ class Environment {
 namespace Environment {
 	export type Name = string
 
-	export type Value = ReactNode
+	export type Value = ReactNode | GraphQlLiteral | Filter
 
-	export type ResolvedValue = Value | Filter
+	export type ResolvedValue = Value
 
 	export interface Options {
 		node?: AnyNode

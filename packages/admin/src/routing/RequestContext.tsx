@@ -1,4 +1,4 @@
-import { createContext, FC, useCallback, useContext, useEffect, useState } from 'react'
+import { createContext, FC, ReactNode, useCallback, useContext, useEffect, useState } from 'react'
 import { RequestParameters, PageRequest, RequestChange, RequestState } from './types'
 import { RoutingContextValue, useRouting } from './RoutingContext'
 import { pathToRequestState, requestStateToPath } from './urlMapper'
@@ -22,7 +22,7 @@ PushRequestContext.displayName = 'PushRequestContext'
 export const useCurrentRequest = () => useContext(CurrentRequestContext)
 export const usePushRequest = () => useContext(PushRequestContext)
 
-export const RequestProvider: FC = ({ children }) => {
+export const RequestProvider: FC<{ children: ReactNode }> = ({ children }) => {
 	const routing = useRouting()
 	const [request, setRequest] = useState<RequestState>(() => populateRequest(routing, window.location))
 

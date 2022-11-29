@@ -100,7 +100,7 @@ export const TextCell: FunctionComponent<TextCellProps> = Component(props => {
 				)
 			}}
 		>
-			<Field
+			<Field<string>
 				{...props}
 				format={value => {
 					if (value === null) {

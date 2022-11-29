@@ -1,6 +1,16 @@
-import { Environment, EnvironmentContext, useEnvironment } from '@contember/binding'
+import { EnvironmentContext, useEnvironment } from '@contember/binding'
 import { ContainerSpinner, Message } from '@contember/ui'
-import { ComponentType, Fragment, isValidElement, lazy, ReactElement, ReactNode, Suspense, useMemo, useRef } from 'react'
+import {
+	ComponentType,
+	Fragment,
+	isValidElement,
+	lazy,
+	ReactElement,
+	ReactNode,
+	Suspense,
+	useMemo,
+	useRef,
+} from 'react'
 import { useCurrentRequest } from '../../routing'
 import { MiscPageLayout } from '../MiscPageLayout'
 import { PageErrorBoundary } from './PageErrorBoundary'
@@ -9,10 +19,10 @@ export interface PageProvider<P> {
 	getPageName(props: P, fallback?: string): string
 }
 
-export type PageProviderElement = ReactElement<any, ComponentType & PageProvider<any>>
+export type PageProviderElement = ReactElement<any, ComponentType<any> & PageProvider<any>>
 
 export interface PageModule {
-	[action: string]: ComponentType | ReactElement | undefined
+	[action: string]: ComponentType<any> | ReactElement<any> | undefined
 }
 
 export type LazyPageModule = () => Promise<PageModule>
@@ -20,8 +30,8 @@ export type LazyPageModule = () => Promise<PageModule>
 export type PagesMapElement =
 	| LazyPageModule
 	| PageModule
-	| ComponentType
-	| ReactElement
+	| ComponentType<any>
+	| ReactElement<any>
 	| PageProviderElement
 
 export type PagesMap = Record<string, PagesMapElement>
@@ -197,7 +207,7 @@ function isPageProvider(it: any): it is PageProvider<any> {
 	return typeof it.getPageName === 'function'
 }
 
-function isPageProviderElement(el: ReactNode): el is PageProviderElement {
+function isPageProviderElement(el: {} | null | undefined): el is PageProviderElement {
 	return isValidElement(el) && typeof el.type !== 'string' && isPageProvider(el.type)
 }
 

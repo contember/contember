@@ -36,7 +36,7 @@ export type RichTextRendererProps<
 	renderElement?: RenderElement<CustomElements, CustomLeaves>
 	renderLeaf?: RenderLeaf<CustomLeaves>
 	attributeNamePrefix?: string
-	renderBlock?: ComponentType<{ block: unknown }>
+	renderBlock?: ComponentType<{ block: unknown, children?: ReactNode }>
 } & (RichTextRendererFieldProps | RichTextRendererBlockProps<CustomElements, CustomLeaves>)
 
 export const RichTextRenderer = memo(function RichTextRenderer<

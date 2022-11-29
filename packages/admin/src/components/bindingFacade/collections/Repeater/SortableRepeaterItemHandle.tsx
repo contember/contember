@@ -5,7 +5,5 @@ export interface SortableRepeaterItemHandleProps {
 	children: ReactNode
 }
 
-export const SortableRepeaterItemHandle = memo(
-	SortableHandle(({ children }: SortableRepeaterItemHandleProps) => <>{children}</>),
-)
+export const SortableRepeaterItemHandle = memo(SortableHandle<SortableRepeaterItemHandleProps>(({ children }: SortableRepeaterItemHandleProps) => <>{children}</>))
 SortableRepeaterItemHandle.displayName = 'SortableRepeaterItemHandle'

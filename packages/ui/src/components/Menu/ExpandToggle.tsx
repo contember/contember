@@ -1,4 +1,5 @@
 import classNames from 'classnames'
+import { KeyboardEventHandler, MouseEventHandler } from 'react'
 import { forwardRef, memo, useCallback } from 'react'
 import { useComponentClassName } from '../../auxiliary'
 import { toStateClass } from '../../utils'
@@ -30,10 +31,10 @@ export const MenuExpandToggle = memo(forwardRef<HTMLButtonElement, MenuExpandTog
 		aria-haspopup="true"
 		aria-controls={controls}
 		aria-expanded={checked}
-		onClick={useCallback(event => {
+		onClick={useCallback(() => {
 			onChange(!checked)
 		}, [checked, onChange])}
-		onKeyPress={useCallback(event => {
+		onKeyPress={useCallback<KeyboardEventHandler>(event => {
 			switch (event.code) {
 				case 'ArrowRight': onChange(true)
 					break

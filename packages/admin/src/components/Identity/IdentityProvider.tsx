@@ -1,4 +1,4 @@
-import { createContext, useCallback, useEffect, useMemo, useState } from 'react'
+import { createContext, ReactNode, useCallback, useEffect, useMemo, useState } from 'react'
 import { useSessionToken } from '@contember/react-client'
 import { useFetchMe } from '../../tenant'
 import { ContainerSpinner, Message } from '@contember/ui'
@@ -35,6 +35,7 @@ export const IdentityRefreshContext = createContext<(() => void)>(() => {
 })
 
 interface IdentityProviderProps {
+	children: ReactNode
 	onInvalidIdentity?: () => void
 	allowUnauthenticated?: boolean
 }

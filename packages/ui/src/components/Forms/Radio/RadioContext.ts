@@ -9,4 +9,5 @@ export const RadioContext = createContext<RadioGroupState>({
 	lastFocusedValue: '',
 	setSelectedValue: () => {},
 	setLastFocusedValue: () => {},
+	validationState: 'valid',
 })

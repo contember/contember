@@ -1,4 +1,4 @@
-import { createContext, useCallback, useMemo, useReducer, useState } from 'react'
+import { createContext, ReactNode, useCallback, useMemo, useReducer, useState } from 'react'
 import { Toast, ToastDefinition, ToastId } from './Toaster'
 
 export const ToasterContext = createContext<{
@@ -21,7 +21,7 @@ const toasterReducer = (toasts: Toast[], action: ToasterReducerAction): Toast[] 
 	}
 }
 
-export const ToasterProvider: React.FC = props => {
+export const ToasterProvider: React.FC<{ children: ReactNode }> = props => {
 	const [counter, setCounter] = useState(1)
 	const [toasts, dispatch] = useReducer(toasterReducer, [])
 

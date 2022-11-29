@@ -207,6 +207,72 @@ test('definition with multiple predicates on a single field', () => {
 })
 
 
+namespace ModelWithJoinedPredicateCollision {
+	export const publicRole = acl.createRole('public')
+
+	@acl.allow(publicRole, {
+		when: { isPublishedLoremIpsumDolorSitAmet: { eq: true } },
+		read: ['title'],
+	})
+	@acl.allow(publicRole, {
+		when: { isPublishedLoremIpsumDolorSitAmet: { eq: false } },
+		read: ['title', 'isPublishedLoremIpsumDolorSitAmet'],
+	})
+	@acl.allow(publicRole, {
+		when: { isPublishedLoremIpsumDolorSitAmet: { eq: false } },
+		read: ['isPublishedLoremIpsumDolorSitAmet'],
+	})
+	export class Book {
+		title = def.stringColumn()
+		isPublishedLoremIpsumDolorSitAmet = def.boolColumn()
+	}
+}
+
+test('definition with collision', () => {
+	const schema = createSchema(ModelWithJoinedPredicateCollision)
+	expect(schema.acl.roles.public.entities.Book).toMatchInlineSnapshot(`
+		{
+		  "operations": {
+		    "read": {
+		      "isPublishedLoremIpsumDolorSitAmet": "or_isPublishedLoremIpsumDolor_1",
+		      "title": "or_isPublishedLoremIpsumDolor",
+		    },
+		  },
+		  "predicates": {
+		    "or_isPublishedLoremIpsumDolor": {
+		      "or": [
+		        {
+		          "isPublishedLoremIpsumDolorSitAmet": {
+		            "eq": false,
+		          },
+		        },
+		        {
+		          "isPublishedLoremIpsumDolorSitAmet": {
+		            "eq": true,
+		          },
+		        },
+		      ],
+		    },
+		    "or_isPublishedLoremIpsumDolor_1": {
+		      "or": [
+		        {
+		          "isPublishedLoremIpsumDolorSitAmet": {
+		            "eq": false,
+		          },
+		        },
+		        {
+		          "isPublishedLoremIpsumDolorSitAmet": {
+		            "eq": false,
+		          },
+		        },
+		      ],
+		    },
+		  },
+		}
+	`)
+})
+
+
 namespace ModelWithMultipleRolesForSinglePredicate {
 	export const publicRole = acl.createRole('public')
 	export const adminRole = acl.createRole('admin')

@@ -82,11 +82,17 @@ export class EntityPredicatesResolver {
 
 
 		const predicate = { or: predicateNames.map(it => this.predicates[it]) }
-		const predicateName = predicateNames.every(it => this.generatedNames.has(it)) ? createPredicateName(predicate) : predicateNames.join('_or_')
-		if (!(predicateName in this.predicates)) {
-			this.predicates[predicateName] = predicate
-		} else if (!isDeepStrictEqual(predicate, this.predicates[predicateName])) {
-			throw new Error('Duplicate predicate')
+		const origName = predicateNames.every(it => this.generatedNames.has(it)) ? createPredicateName(predicate) : predicateNames.join('_or_')
+		let predicateName = origName
+		for (let i = 1;; i++) {
+			if (!(predicateName in this.predicates)) {
+				this.predicates[predicateName] = predicate
+				break
+			} else if (isDeepStrictEqual(predicate, this.predicates[predicateName])) {
+				break
+			} else {
+				predicateName = `${origName}_${i}`
+			}
 		}
 		this.usedPredicates.push(predicateName)
 		return predicateName

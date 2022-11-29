@@ -2,7 +2,7 @@ import { extendEntity } from './extensions'
 import { EntityConstructor } from './types'
 
 export const View = (sql: string, { dependencies }: { dependencies?: (() => EntityConstructor[]) | EntityConstructor[] } = {}) =>
-	extendEntity(({ entity, registry }) => {
+	extendEntity(({ entity, entityRegistry }) => {
 		const dependenciesResolved = typeof dependencies === 'function' ? dependencies() : dependencies
 		if (dependenciesResolved?.some(it => it === undefined)) {
 			throw `"undefined" value detected in dependencies of view entity ${entity.name}. This is possibly caused by circular imports.
@@ -18,7 +18,7 @@ dependencies: () => [MyEntity]
 			...entity,
 			view: {
 				sql,
-				...(dependenciesResolved ? { dependencies: dependenciesResolved.map(it => registry.getName(it)) } : {}),
+				...(dependenciesResolved ? { dependencies: dependenciesResolved.map(it => entityRegistry.getName(it)) } : {}),
 			},
 		})
 	})

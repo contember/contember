@@ -34,7 +34,8 @@ export const useCommonReactSelectStyles = <Option = unknown, IsMulti extends boo
 		return {
 			...provided,
 			color,
-			'padding': '0 var(--cui-gap)',
+			margin: 'calc(-1 * var(--cui-control-border-width, 1px)) 0',
+			padding: '0 var(--cui-gap)',
 		}
 	},
 	singleValue: (provided, { isDisabled }) => {

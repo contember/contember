@@ -1,4 +1,4 @@
-import { SchemaValidator, ValidationError } from '@contember/schema-utils'
+import { SchemaValidator, SchemaValidatorSkippedErrors, ValidationError } from '@contember/schema-utils'
 import { Schema } from '@contember/schema'
 
 export const printValidationErrors = (errors: ValidationError[], message?: string) => {
@@ -7,13 +7,13 @@ export const printValidationErrors = (errors: ValidationError[], message?: strin
 	}
 	console.group(message || 'Schema is invalid:')
 	for (const err of errors) {
-		console.log(err.path.join('.') + ': ' + err.message)
+		console.log(`${err.path.join('.')}: [${err.code}] ${err.message}`)
 	}
 	console.groupEnd()
 }
 
-export const validateSchemaAndPrintErrors = (schema: Schema, message?: string): boolean => {
-	const errors = SchemaValidator.validate(schema)
+export const validateSchemaAndPrintErrors = (schema: Schema, message?: string, skippedErrors?: SchemaValidatorSkippedErrors[]): boolean => {
+	const errors = SchemaValidator.validate(schema, skippedErrors)
 	printValidationErrors(errors, message)
 	return errors.length === 0
 }

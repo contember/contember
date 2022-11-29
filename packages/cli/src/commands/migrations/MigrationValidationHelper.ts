@@ -22,9 +22,9 @@ export const validateMigrations = async (
 			}
 			throw e
 		}
-		projectValid =
-			validateSchemaAndPrintErrors(migratedSchema, `Migration ${migration.name} produces invalid schema:`) &&
-			projectValid
+		const errorMessage = `Migration ${migration.name} produces invalid schema:`
+		projectValid = validateSchemaAndPrintErrors(migratedSchema, errorMessage, migration.skippedErrors)
+			&& projectValid
 	}
 	return projectValid
 }

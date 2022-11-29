@@ -1,4 +1,4 @@
-import cluster from 'cluster'
+import cluster from 'node:cluster'
 import { Logger } from '@contember/logger'
 
 const signals = {

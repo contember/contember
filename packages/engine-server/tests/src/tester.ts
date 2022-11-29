@@ -1,4 +1,4 @@
-import nodeAssert from 'assert'
+import nodeAssert from 'node:assert'
 import supertest from 'supertest'
 import { Schema } from '@contember/schema'
 import {

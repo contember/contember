@@ -1,4 +1,4 @@
-import { join } from 'path'
+import { join } from 'node:path'
 import { ConfigProcessor, Plugin } from '@contember/engine-plugins'
 import { ConfigSource, readConfig, ServerConfig } from '../config/config'
 import { Type } from '@contember/typesafe'

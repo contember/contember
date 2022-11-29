@@ -1,4 +1,4 @@
-import { getArgumentValues } from 'graphql/execution/values'
+import { getArgumentValues } from 'graphql'
 
 import { Context, createAclVariables, ExecutionContainerFactory } from '@contember/engine-content-api'
 import { setupSystemVariables } from '@contember/engine-system-api'

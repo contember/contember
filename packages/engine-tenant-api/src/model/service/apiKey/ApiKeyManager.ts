@@ -10,7 +10,7 @@ import { ApiKeyByTokenQuery } from '../../queries'
 import { Response, ResponseError, ResponseOk } from '../../utils/Response'
 import { DatabaseContext, TokenHash } from '../../utils'
 import { ApiKeyService, CreateApiKeyResponse } from './ApiKeyService'
-import assert from 'assert'
+import assert from 'node:assert'
 import { Acl } from '@contember/schema'
 
 export class ApiKeyManager {

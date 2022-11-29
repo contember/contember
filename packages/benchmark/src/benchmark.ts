@@ -1,14 +1,9 @@
-import { mkdir, readFile, writeFile } from 'fs'
-import { promisify } from 'util'
-import { join } from 'path'
+import { mkdir, writeFile } from 'node:fs/promises'
+import { join } from 'node:path'
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore-line
 import autocannon from 'autocannon'
 import { createHttpOptions, graphqlRequest } from './http'
-
-const fileRead = promisify(readFile)
-const dirCreate = promisify(mkdir)
-const fileWrite = promisify(writeFile)
 
 const readStdin = (): Promise<string> => {
 	return new Promise(resolve => {
@@ -31,7 +26,7 @@ const sleep = (delay: number) => new Promise(resolve => setTimeout(resolve, dela
 ;(async () => {
 	const testName = process.argv[2]
 	if (testName) {
-		await dirCreate(join(__dirname, '/../../results/', testName))
+		await mkdir(join(__dirname, '/../../results/', testName))
 	}
 
 	const variables = {}
@@ -80,7 +75,7 @@ const sleep = (delay: number) => new Promise(resolve => setTimeout(resolve, dela
 					testName,
 					'test' + String(connections).padStart(2, '0') + '.json',
 				)
-				await fileWrite(filename, JSON.stringify(result), { encoding: 'utf8' })
+				await writeFile(filename, JSON.stringify(result), { encoding: 'utf8' })
 			}
 
 			if (connections <= 8) {

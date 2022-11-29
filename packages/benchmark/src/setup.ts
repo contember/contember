@@ -1,14 +1,9 @@
-import { readFile } from 'fs'
-import { promisify } from 'util'
-import { join } from 'path'
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore-line
+import { readFile } from 'node:fs/promises'
+import { join } from 'node:path'
 import { graphqlRequest } from './http'
 
-const fileRead = promisify(readFile)
-
 const dataInit = async (contentEndpoint: string, accessToken: string) => {
-	const initGql = await fileRead(join(__dirname, '/../../src/init.graphql'), { encoding: 'utf8' })
+	const initGql = await readFile(join(__dirname, '/../../src/init.graphql'), { encoding: 'utf8' })
 
 	await graphqlRequest({
 		endpoint: contentEndpoint,

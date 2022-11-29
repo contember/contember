@@ -32,6 +32,8 @@ jobs:
         run: yarn install
       - name: "Run linter"
         run: yarn run eslint:lint
+      - name: "Lint imports"
+        run: yarn tsc --esModuleInterop scripts/lint/module-import-linter.ts && node ./scripts/lint/module-import-linter.js
       - name: "Build app"
         run: yarn run build
       - name: Fill env

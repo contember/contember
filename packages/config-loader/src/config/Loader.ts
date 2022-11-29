@@ -1,5 +1,5 @@
-import { dirname, extname, join } from 'path'
-import { promises as fs } from 'fs'
+import { dirname, extname, join } from 'node:path'
+import * as fs from 'node:fs/promises'
 import { YamlAdapter } from './adapters/YamlAdapter'
 import { JsonAdapter } from './adapters/JsonAdapter'
 import Merger from './Merger'

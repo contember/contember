@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid'
 import bcrypt from 'bcrypt'
-import crypto, { BinaryLike } from 'crypto'
+import crypto, { BinaryLike } from 'node:crypto'
 
 
 export const createProviders = () => ({

@@ -1,38 +1,28 @@
 import { MigrationVersionHelper } from './MigrationVersionHelper'
-import * as fs from 'fs'
-import { promisify } from 'util'
-import * as path from 'path'
-
-const readFile = promisify(fs.readFile)
-const fsWrite = promisify(fs.writeFile)
-const fsRemove = promisify(fs.unlink)
-const fsRealpath = promisify(fs.realpath)
-const mkdir = promisify(fs.mkdir)
-const lstatFile = promisify(fs.lstat)
-const readDir = promisify(fs.readdir)
-const mvFile = promisify(fs.rename)
+import * as fs from 'node:fs/promises'
+import * as path from 'node:path'
 
 class MigrationFilesManager {
 	constructor(public readonly directory: string) {}
 
 	public async createFile(content: string, name: string): Promise<string> {
 		const path = this.formatPath(name)
-		await fsWrite(path, content, { encoding: 'utf8' })
-		return await fsRealpath(path)
+		await fs.writeFile(path, content, { encoding: 'utf8' })
+		return await fs.realpath(path)
 	}
 
 	public async removeFile(name: string) {
 		const path = this.formatPath(name)
-		await fsRemove(path)
+		await fs.unlink(path)
 	}
 
 	public async moveFile(oldName: string, newName: string) {
-		await mvFile(this.formatPath(oldName), this.formatPath(newName))
+		await fs.rename(this.formatPath(oldName), this.formatPath(newName))
 	}
 
 	public async createDirIfNotExist(): Promise<void> {
 		try {
-			await mkdir(this.directory)
+			await fs.mkdir(this.directory)
 		} catch (e) {
 			if (!(e instanceof Error) || !('code' in e) || (e as any).code !== 'EEXIST') {
 				throw e
@@ -47,7 +37,7 @@ class MigrationFilesManager {
 			files
 				.filter(file => file.endsWith(`.json`))
 				.filter(async file => {
-					return (await lstatFile(`${this.directory}/${file}`)).isFile()
+					return (await fs.lstat(`${this.directory}/${file}`)).isFile()
 				}),
 		)
 		return filteredFiles.sort()
@@ -55,7 +45,7 @@ class MigrationFilesManager {
 
 	private async tryReadDir(): Promise<string[]> {
 		try {
-			return await readDir(this.directory)
+			return await fs.readdir(this.directory)
 		} catch (e) {
 			if (e instanceof Error && 'code' in e && (e as any).code === 'ENOENT') {
 				return []
@@ -72,7 +62,7 @@ class MigrationFilesManager {
 		const filesWithContent = files.map(async filename => ({
 			filename: filename,
 			path: `${this.directory}/${filename}`,
-			content: await readFile(`${this.directory}/${filename}`, { encoding: 'utf8' }),
+			content: await fs.readFile(`${this.directory}/${filename}`, { encoding: 'utf8' }),
 		}))
 
 		return await Promise.all(filesWithContent)

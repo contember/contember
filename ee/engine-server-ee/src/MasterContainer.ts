@@ -1,7 +1,7 @@
 import { ProcessType } from './utils'
 import { createColllectHttpMetricsMiddleware, createShowMetricsMiddleware } from './http'
 import { compose, CryptoWrapper, Koa, KoaMiddleware } from '@contember/engine-http'
-import { createSecretKey } from 'crypto'
+import { createSecretKey } from 'node:crypto'
 import { ProjectGroupContainerResolver } from './projectGroup/ProjectGroupContainerResolver'
 import { ProjectGroupResolver } from './projectGroup/ProjectGroupResolver'
 import {

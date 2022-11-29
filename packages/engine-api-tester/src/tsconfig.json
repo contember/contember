@@ -6,16 +6,10 @@
 	},
 	"references": [
 		{
-			"path": "../../database-migrations/src"
-		},
-		{
-			"path": "../../queryable/src"
-		},
-		{
 			"path": "../../database/src"
 		},
 		{
-			"path": "../../authorization/src"
+			"path": "../../logger/src"
 		},
 		{
 			"path": "../../engine-common/src"
@@ -30,13 +24,13 @@
 			"path": "../../schema/src"
 		},
 		{
+			"path": "../../schema-definition/src"
+		},
+		{
 			"path": "../../schema-utils/src"
 		},
 		{
 			"path": "../../schema-migrations/src"
-		},
-		{
-			"path": "../../graphql-utils/src"
 		}
 	]
 }

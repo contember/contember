@@ -15,6 +15,7 @@
     "@contember/dic": "^1.2.0-alpha.18",
     "@contember/engine-common": "^1.2.0-alpha.18",
     "@contember/graphql-utils": "^1.2.0-alpha.18",
+    "@contember/logger": "^1.2.0-alpha.18",
     "@contember/queryable": "^1.2.0-alpha.18",
     "@contember/schema": "^1.2.0-alpha.18",
     "@contember/schema-migrations": "^1.2.0-alpha.18",

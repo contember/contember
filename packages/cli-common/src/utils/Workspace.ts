@@ -1,11 +1,11 @@
-import { basename, join } from 'path'
+import { basename, join } from 'node:path'
 import { ProjectManager } from './ProjectManager'
 import { PathMapping } from './PathMapping'
 import { installTemplate } from './template'
 import { getPackageVersion } from './version'
-import { pathExists } from 'fs-extra'
 import { readYaml } from './yaml'
 import { CliEnv, readCliEnv } from '../application'
+import { pathExists } from './fs'
 
 export interface WorkspaceDirectoryArgument {
 	workspaceDirectory: string

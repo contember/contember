@@ -1,4 +1,4 @@
-import * as path from 'path'
+import * as path from 'node:path'
 import { Workspace } from './Workspace'
 
 export class Project {

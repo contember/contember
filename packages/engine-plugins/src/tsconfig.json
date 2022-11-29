@@ -5,9 +5,6 @@
 	},
 	"references": [
 		{
-			"path": "../../graphql-utils/src"
-		},
-		{
 			"path": "../../schema/src"
 		},
 		{

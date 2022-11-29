@@ -1,5 +1,5 @@
-import { ChildProcessWithoutNullStreams, spawn } from 'child_process'
-import { Readable, Writable } from 'stream'
+import { ChildProcessWithoutNullStreams, spawn } from 'node:child_process'
+import { Readable, Writable } from 'node:stream'
 import chalk from 'chalk'
 
 export type RunningCommand = { child: ChildProcessWithoutNullStreams; output: Promise<string> }

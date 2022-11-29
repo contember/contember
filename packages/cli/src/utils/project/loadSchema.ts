@@ -1,7 +1,7 @@
 import { Project } from '@contember/cli-common'
 import { Schema } from '@contember/schema'
 import * as esbuild from 'esbuild'
-import { join } from 'path'
+import { join } from 'node:path'
 import { NodeVM } from 'vm2'
 import { schemaType } from '@contember/schema-utils'
 

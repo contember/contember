@@ -1,5 +1,5 @@
-import { pathExists } from 'fs-extra'
-import { join } from 'path'
+import { pathExists } from '@contember/cli-common'
+import { join } from 'node:path'
 import { runCommand } from './commands'
 import { listDirectories } from '@contember/cli-common'
 

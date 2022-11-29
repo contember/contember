@@ -1,4 +1,4 @@
-import { isDeepStrictEqual } from 'util'
+import { isDeepStrictEqual } from 'node:util'
 
 type Unpacked<T> = T extends readonly (infer U)[] ? U : never
 

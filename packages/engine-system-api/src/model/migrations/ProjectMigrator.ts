@@ -82,15 +82,24 @@ export class ProjectMigrator {
 			}
 			const latestModification = described[described.length - 1]
 			schema = latestModification.schema
-			const errors = SchemaValidator.validate(schema)
+			const errors = SchemaValidator.validate(schema, migration.skippedErrors)
 			if (errors.length > 0) {
 				throw new InvalidSchemaError(
 					migration.version,
 					'Migration generates invalid schema: \n' +
-					errors.map(it => it.path.join('.') + ': ' + it.message).join('\n'),
+					errors.map(it => `${it.path.join('.')}: [${it.code}] ${it.message}`).join('\n'),
 				)
 			}
 			toExecute.push(migration)
+		}
+		// intentionally not using skippedErrors here
+		const errors = SchemaValidator.validate(schema)
+		if (errors.length > 0) {
+			throw new InvalidSchemaError(
+				toExecute[toExecute.length - 1].version,
+				'Migration generates invalid schema: \n' +
+				errors.map(it => it.path.join('.') + ': ' + it.message).join('\n'),
+			)
 		}
 		return toExecute
 	}

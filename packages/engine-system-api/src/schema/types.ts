@@ -145,6 +145,7 @@ export type Migration = {
 	readonly formatVersion: Scalars['Int']
 	readonly modifications: ReadonlyArray<Scalars['Json']>
 	readonly name: Scalars['String']
+	readonly skippedErrors?: InputMaybe<ReadonlyArray<MigrationSkippedError>>
 	readonly version: Scalars['String']
 }
 
@@ -186,6 +187,11 @@ export type MigrationModifyResponse = {
 	readonly __typename?: 'MigrationModifyResponse'
 	readonly error?: Maybe<MigrationModifyError>
 	readonly ok: Scalars['Boolean']
+}
+
+export type MigrationSkippedError = {
+	readonly code: Scalars['String']
+	readonly path?: InputMaybe<Scalars['String']>
 }
 
 export type Mutation = {
@@ -358,6 +364,7 @@ export type ResolversTypes = {
 	MigrationModifyError: ResolverTypeWrapper<MigrationModifyError>
 	MigrationModifyErrorCode: MigrationModifyErrorCode
 	MigrationModifyResponse: ResolverTypeWrapper<MigrationModifyResponse>
+	MigrationSkippedError: MigrationSkippedError
 	Mutation: ResolverTypeWrapper<{}>
 	PrimaryKey: ResolverTypeWrapper<Scalars['PrimaryKey']>
 	Query: ResolverTypeWrapper<{}>
@@ -390,6 +397,7 @@ export type ResolversParentTypes = {
 	MigrationModification: MigrationModification
 	MigrationModifyError: MigrationModifyError
 	MigrationModifyResponse: MigrationModifyResponse
+	MigrationSkippedError: MigrationSkippedError
 	Mutation: {}
 	PrimaryKey: Scalars['PrimaryKey']
 	Query: {}

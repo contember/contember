@@ -18,6 +18,7 @@ type Args = {
 type Options = {
 	execute?: true
 	yes?: true
+	'skip-initial-schema-validation'?: true
 }
 
 export class MigrationDiffCommand extends Command<Args, Options> {
@@ -38,6 +39,8 @@ export class MigrationDiffCommand extends Command<Args, Options> {
 			.option('yes')
 			.valueNone()
 			.description('Do not ask for confirmation.')
+
+		configuration.option('skip-initial-schema-validation')
 	}
 
 	protected async execute(input: Input<Args, Options>): Promise<number> {
@@ -56,7 +59,9 @@ export class MigrationDiffCommand extends Command<Args, Options> {
 				try {
 					const migrationName = input.getArgument('migrationName')
 					const initialSchema = await schemaVersionBuilder.buildSchema()
-					const result = await migrationCreator.prepareMigration(initialSchema, schema, migrationName)
+					const result = await migrationCreator.prepareMigration(initialSchema, schema, migrationName, {
+						skipInitialSchemaValidation: input.getOption('skip-initial-schema-validation') === true,
+					})
 					if (result === null) {
 						console.log('Nothing to do')
 						return 0

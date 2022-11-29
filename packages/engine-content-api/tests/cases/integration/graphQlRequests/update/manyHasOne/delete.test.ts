@@ -31,12 +31,12 @@ test('delete', async () => {
 						rows: [{ author_id: testUuid(1) }],
 					},
 				},
+				{
+					sql: SQL`select "root_"."id" from "public"."author" as "root_" where "root_"."id" = ?`,
+					parameters: [testUuid(1)],
+					response: { rows: [{ id: testUuid(1) }] },
+				},
 				...sqlDeferred([
-					{
-						sql: SQL`select "root_"."id" from "public"."author" as "root_" where "root_"."id" = ?`,
-						parameters: [testUuid(1)],
-						response: { rows: [{ id: testUuid(1) }] },
-					},
 					{
 						sql: SQL`delete from "public"."author"
               where "id" in (select "root_"."id"
@@ -99,12 +99,12 @@ test('delete with cascade', async () => {
 						rows: [{ author_id: testUuid(1) }],
 					},
 				},
+				{
+					sql: SQL`select "root_"."id" from "public"."author" as "root_" where "root_"."id" = ?`,
+					parameters: [testUuid(1)],
+					response: { rows: [{ id: testUuid(1) }] },
+				},
 				...sqlDeferred([
-					{
-						sql: SQL`select "root_"."id" from "public"."author" as "root_" where "root_"."id" = ?`,
-						parameters: [testUuid(1)],
-						response: { rows: [{ id: testUuid(1) }] },
-					},
 					{
 						sql: SQL`delete from "public"."author"
               where "id" in (select "root_"."id"

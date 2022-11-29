@@ -36,7 +36,6 @@ export class DeleteExecutor {
 		filter?: Input.OptionalWhere,
 	): Promise<MutationResultList> {
 		return mapper.mutex.execute(async () => {
-			await mapper.constraintHelper.setFkConstraintsDeferred()
 			const primaryValue = await mapper.getPrimaryValue(entity, by)
 			if (!primaryValue) {
 				return [new MutationEntryNotFoundError([], by as Input.UniqueWhere)]
@@ -44,13 +43,14 @@ export class DeleteExecutor {
 			if (mapper.deletedEntities.isDeleted(entity.name, primaryValue)) {
 				return [new MutationNothingToDo([], NothingToDoReason.alreadyDeleted)]
 			}
+			await mapper.constraintHelper.setFkConstraintsDeferred()
 			const primaryWhere = { [entity.primary]: { eq: primaryValue } }
 			const result = await this.delete(mapper, entity, filter ? { and: [primaryWhere, filter] } : primaryWhere)
+			await mapper.constraintHelper.setFkConstraintsImmediate()
 			if (result.length === 0) {
 				return [new MutationNoResultError([])]
 			}
 
-			await mapper.constraintHelper.setFkConstraintsImmediate()
 			return [new MutationDeleteOk([], entity, primaryValue)]
 		})
 	}

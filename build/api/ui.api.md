@@ -2588,7 +2588,7 @@ export function useActiveSectionsTabs(): ActiveSectionTabsMap;
 export const useChangeValidationState: ({ ref, onValidationStateChange }: {
     ref: ForwardedRef<any>;
     onValidationStateChange?: ((message: string) => void) | undefined;
-}) => () => void;
+}) => void;
 
 // @public (undocumented)
 export function useChildrenAsLabel(children: ReactNode): string | undefined;

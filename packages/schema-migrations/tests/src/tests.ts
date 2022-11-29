@@ -33,7 +33,13 @@ export function testDiffSchemas(
 		{ ...emptySchema, model: updatedModel, acl: updatedAcl, validation: {} },
 		false,
 	)
-	assert.deepStrictEqual(actualDiff, expectedDiff)
+	try {
+		assert.deepStrictEqual(actualDiff, expectedDiff)
+	} catch (e) {
+		// eslint-disable-next-line no-console
+		console.log(JSON.stringify(actualDiff))
+		throw e
+	}
 	const { meta, ...schema } = schemaMigrator.applyModifications(
 		{ ...emptySchema, model: originalModel, acl: originalAcl, validation: {} },
 		actualDiff,

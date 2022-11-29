@@ -46,13 +46,20 @@ import { CreateIndexDiffer, RemoveIndexDiffer } from './modifications/indexes'
 import { SchemaWithMeta } from './modifications/utils/schemaMeta'
 import { UpdateSettingsDiffer } from './modifications/settings'
 
+type DiffOptions = { skipRecreateValidation?: boolean; skipInitialSchemaValidation?: boolean }
+
 export class SchemaDiffer {
 	constructor(private readonly schemaMigrator: SchemaMigrator) {}
 
-	diffSchemas(originalSchema: Schema, updatedSchema: Schema, checkRecreate: boolean = true): Migration.Modification[] {
-		const originalErrors = SchemaValidator.validate(originalSchema)
-		if (originalErrors.length > 0) {
-			throw new InvalidSchemaException('original schema is not valid', originalErrors)
+	diffSchemas(originalSchema: Schema, updatedSchema: Schema, {
+		skipInitialSchemaValidation = false,
+		skipRecreateValidation = false,
+	}: DiffOptions = {}): Migration.Modification[] {
+		if (!skipInitialSchemaValidation) {
+			const originalErrors = SchemaValidator.validate(originalSchema)
+			if (originalErrors.length > 0) {
+				throw new InvalidSchemaException('original schema is not valid', originalErrors)
+			}
 		}
 		const updatedErrors = SchemaValidator.validate(updatedSchema)
 		if (updatedErrors.length > 0) {
@@ -105,7 +112,7 @@ export class SchemaDiffer {
 		}
 
 
-		if (checkRecreate) {
+		if (!skipRecreateValidation) {
 			const { meta, ...appliedDiffsSchema2 } = appliedDiffsSchema as SchemaWithMeta
 			const errors = deepCompare(updatedSchema, appliedDiffsSchema2, [])
 			if (errors.length === 0) {

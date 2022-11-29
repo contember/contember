@@ -59,7 +59,7 @@ export function useNativeInput<E extends HTMLInputElement | HTMLTextAreaElement 
 	const ref = useRef<E>(null)
 	useImperativeHandle(forwardedRef, () => ref.current as unknown as E)
 
-	const changeValidationState = useChangeValidationState({ ref, onValidationStateChange })
+	useChangeValidationState({ ref, onValidationStateChange })
 
 	const onBlurListener = useCallback<FocusEventHandler<E>>((event => {
 		if (event.defaultPrevented) {
@@ -68,8 +68,7 @@ export function useNativeInput<E extends HTMLInputElement | HTMLTextAreaElement 
 
 		onBlur?.()
 		onFocusChange?.(false)
-		changeValidationState()
-	}), [onBlur, onFocusChange, changeValidationState])
+	}), [onBlur, onFocusChange])
 
 	const onFocusListener = useCallback<FocusEventHandler<E>>(event => {
 		onFocus?.()
@@ -121,9 +120,10 @@ export function useNativeInput<E extends HTMLInputElement | HTMLTextAreaElement 
 	}
 }
 
-export const useChangeValidationState = ({ ref, onValidationStateChange }: { ref: ForwardedRef<any>, onValidationStateChange?: (message: string) => void }) => {
+export const useChangeValidationState = ({ ref, onValidationStateChange }: { ref: ForwardedRef<any>, onValidationStateChange?: (message: string) => void }): void => {
 	const validationMessage = useRef<string>()
-	const changeValidationState = useCallback(() => {
+
+	useEffect(() => {
 		if (!(ref && typeof ref === 'object' && onValidationStateChange)) {
 			return
 		}
@@ -133,11 +133,5 @@ export const useChangeValidationState = ({ ref, onValidationStateChange }: { ref
 			validationMessage.current = message
 			onValidationStateChange(message)
 		}
-	}, [onValidationStateChange, ref])
-
-	useEffect(() => {
-		changeValidationState()
-	}, [changeValidationState])
-
-	return changeValidationState
+	})
 }

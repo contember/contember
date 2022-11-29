@@ -45,12 +45,12 @@ export const JsonField = SimpleRelativeSingleField<TextFieldProps, string>(
 
 export default () => (
 	<EditPage entity="InputShowcase(unique = One)" setOnCreate="(unique = One)">
-		<TextField field={'textValue'} label={'Text'} />
+		<TextField required field={'textValue'} label={'Text'} />
 		<TextField field={'notNullTextValue'} label={'Not null text'} />
 		<EmailField field={'emailValue'} label={'Your email'} />
 		<SearchField field={'searchValue'} label={'Search page'} />
 		<UrlField field={'urlValue'} label={'URL'} />
-		<SlugField derivedFrom={'textValue'} field={'slugValue'} label={'Slug with prefix'} unpersistedHardPrefix="https://www.contember.com/" linkToExternalUrl />
+		<SlugField required derivedFrom={'textValue'} field={'slugValue'} label={'Slug with prefix'} unpersistedHardPrefix="https://www.contember.com/" linkToExternalUrl />
 		<SlugField derivedFrom={'textValue'} field={'slugValue'} label={'Slug without prefix'} />
 		<TextareaField field={'multilineValue'} label={'Multiline text'} />
 		<CheckboxField field={'boolValue'} label={'Bool'} />

@@ -265,12 +265,14 @@ export class MarkerMerger {
 		if (original === fresh) {
 			return original
 		}
-		if (original.isNonbearing !== fresh.isNonbearing && original.isNonbearing) {
-			// If only one isNonbearing, then the whole field is bearing
-			return fresh
+		if (original.defaultValue !== undefined && fresh.defaultValue !== undefined && original.defaultValue !== fresh.defaultValue) {
+			throw new BindingError(`MarkerTreeGenerator merging: multiple fields "${original.fieldName}" with different defaultValue found: ${JSON.stringify([original.defaultValue, fresh.defaultValue])}, `)
 		}
-		// TODO warn in case of defaultValue differences
-		return original
+		return new FieldMarker(
+			original.fieldName,
+			original.defaultValue ?? fresh.defaultValue,
+			original.isNonbearing && fresh.isNonbearing,
+		)
 	}
 
 	public static mergeInSystemFields(original: EntityFieldMarkersContainer | undefined): EntityFieldMarkersContainer {

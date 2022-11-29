@@ -97,3 +97,4 @@ export const SelectFieldInner = memo(
 		)
 	},
 )
+SelectFieldInner.displayName = 'SelectFieldInner'

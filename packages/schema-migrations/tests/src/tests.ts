@@ -31,7 +31,7 @@ export function testDiffSchemas(
 	const actualDiff = schemaDiffer.diffSchemas(
 		{ ...emptySchema, model: originalModel, acl: originalAcl, validation: {} },
 		{ ...emptySchema, model: updatedModel, acl: updatedAcl, validation: {} },
-		false,
+		{ skipRecreateValidation: true },
 	)
 	assert.deepStrictEqual(actualDiff, expectedDiff)
 	const { meta, ...schema } = schemaMigrator.applyModifications(

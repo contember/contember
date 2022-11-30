@@ -40,7 +40,7 @@ export class IDPMutationResolver implements MutationResolvers {
 		const signIn = await this.idpSignInManager.signInIDP(
 			context.db,
 			args.identityProvider,
-			{
+			args.data ?? {
 				sessionData: args.sessionData,
 				url: args.idpResponse?.url,
 				redirectUrl: args.redirectUrl,

@@ -29,7 +29,14 @@ const schema: DocumentNode = gql`
 		changeMyPassword(currentPassword: String!, newPassword: String!): ChangeMyPasswordResponse
 
 		initSignInIDP(identityProvider: String!, redirectUrl: String!): InitSignInIDPResponse
-		signInIDP(identityProvider: String!, idpResponse: IDPResponseInput!, redirectUrl: String!, sessionData: Json!, expiration: Int): SignInIDPResponse
+		signInIDP(
+			identityProvider: String!, 
+			data: Json,
+			expiration: Int
+            idpResponse: IDPResponseInput, @deprecated(reason: "pass idpResponse.url as data.url")
+			redirectUrl: String @deprecated(reason: "use data.redirectUrl"), 
+			sessionData: Json @deprecated(reason: "use data.sessionData"), 
+		): SignInIDPResponse
 
 		# IDP management
 		addIDP(identityProvider: String!, type: String!, configuration: Json!, options: IDPOptions): AddIDPResponse
@@ -78,10 +85,10 @@ const schema: DocumentNode = gql`
 		updateProject(projectSlug: String!, name: String, config: Json, mergeConfig: Boolean): UpdateProjectResponse
 
 		addProjectMailTemplate(template: MailTemplate!): AddMailTemplateResponse
-			@deprecated(reason: "use addMailtemplate")
+			@deprecated(reason: "use addMailTemplate")
 
 		removeProjectMailTemplate(templateIdentifier: MailTemplateIdentifier!): RemoveMailTemplateResponse
-			@deprecated(reason: "use removeMailtemplate")
+			@deprecated(reason: "use removeMailTemplate")
 
 	}
 

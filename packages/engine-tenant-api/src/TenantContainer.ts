@@ -6,7 +6,7 @@ import {
 	ApiKeyManager,
 	ApiKeyService,
 	DatabaseContext,
-	DatabaseContextFactory,
+	DatabaseContextFactory, FacebookProvider,
 	Identity,
 	IdentityFactory,
 	IDPHandlerRegistry,
@@ -158,6 +158,7 @@ export class TenantContainerFactory {
 			.addService('idpRegistry', () => {
 				const idpRegistry = new IDPHandlerRegistry()
 				idpRegistry.registerHandler('oidc', new OIDCProvider())
+				idpRegistry.registerHandler('facebook', new FacebookProvider())
 				return idpRegistry
 			})
 			.addService('idpSignInManager', ({ apiKeyManager, idpRegistry }) =>

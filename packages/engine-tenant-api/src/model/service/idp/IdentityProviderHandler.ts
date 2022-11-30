@@ -11,11 +11,11 @@ export interface IDPClaim {
 
 export interface IdentityProviderHandler<SessionData extends {}, ResponseData extends {}, Configuration extends {}> {
 
-	initAuth(configuration: Configuration, redirectUrl: string): Promise<InitIDPAuthResult<SessionData>>
+	initAuth: (configuration: Configuration, redirectUrl: string) => Promise<InitIDPAuthResult<SessionData>>
 
-	processResponse(configuration: Configuration, responseData: ResponseData): Promise<IDPClaim>
+	processResponse: (configuration: Configuration, responseData: ResponseData) =>  Promise<IDPClaim>
 
-	validateResponseData(data: unknown): ResponseData
+	validateResponseData: (data: unknown) =>  ResponseData
 
-	validateConfiguration(config: unknown): Configuration
+	validateConfiguration: (config: unknown) => Configuration
 }

@@ -2,9 +2,9 @@ import { IdentityProviderHandler } from './IdentityProviderHandler'
 import { IdentityProviderNotFoundError } from './IdentityProviderNotFoundError'
 
 export class IDPHandlerRegistry {
-	private providers: Record<string, IdentityProviderHandler<{}, {}, {}>> = {}
+	private providers: Record<string, IdentityProviderHandler<any, any, any>> = {}
 
-	public registerHandler(type: string, provider: IdentityProviderHandler<{}, {}, {}>): void {
+	public registerHandler(type: string, provider: IdentityProviderHandler<any, any, any>): void {
 		this.providers[type] = provider
 	}
 

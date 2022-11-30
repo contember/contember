@@ -1,11 +1,11 @@
 import { Client, errors, generators } from 'openid-client'
-import { OIDCConfiguration, OIDCResponseData, OIDCSessionData } from './OIDCTypes'
+import { OIDCResponseData, OIDCSessionData } from './OIDCTypes'
 import { IDPValidationError } from '../IDPValidationError'
 import { IDPResponseError } from '../IDPResponseError'
 import { IDPClaim, InitIDPAuthResult } from '../IdentityProviderHandler'
 
 
-export const initOIDCAuth = async (client: Client, redirectUrl: string, configuration: OIDCConfiguration): Promise<InitIDPAuthResult<OIDCSessionData>> => {
+export const initOIDCAuth = async (client: Client, redirectUrl: string, configuration: { claims?: string }): Promise<InitIDPAuthResult<OIDCSessionData>> => {
 	const nonce = generators.nonce()
 	const state = generators.state()
 	const url = client.authorizationUrl({

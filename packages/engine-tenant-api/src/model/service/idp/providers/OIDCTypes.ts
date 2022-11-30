@@ -6,16 +6,17 @@ export interface OIDCSessionData {
 	state: string
 }
 
+export const OIDCConfigurationOptions = Typesafe.partial({
+	responseType: Typesafe.enumeration<ResponseType>('code', 'code id_token', 'code id_token token', 'code token', 'id_token', 'id_token token', 'none'),
+	claims: Typesafe.string,
+})
 export const BaseOIDCConfiguration = Typesafe.intersection(
 	Typesafe.object({
 		url: Typesafe.string,
 		clientId: Typesafe.string,
 		clientSecret: Typesafe.string,
 	}),
-	Typesafe.partial({
-		responseType: Typesafe.enumeration<ResponseType>('code', 'code id_token', 'code id_token token', 'code token', 'id_token', 'id_token token', 'none'),
-		claims: Typesafe.string,
-	}),
+	OIDCConfigurationOptions,
 )
 
 export const OIDCConfiguration = Typesafe.intersection(
@@ -30,7 +31,7 @@ export type OIDCConfiguration = ReturnType<typeof OIDCConfiguration>
 export const OIDCResponseData = Typesafe.object({
 	url: Typesafe.string,
 	redirectUrl: Typesafe.string,
-	sessionData: Typesafe.object({
+	sessionData: Typesafe.partial({
 		nonce: Typesafe.string,
 		state: Typesafe.string,
 	}),

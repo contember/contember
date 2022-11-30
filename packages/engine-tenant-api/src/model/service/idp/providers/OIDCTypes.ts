@@ -38,3 +38,13 @@ export const OIDCResponseData = Typesafe.object({
 })
 
 export type OIDCResponseData = ReturnType<typeof OIDCResponseData>
+
+export const OIDCInitData = Typesafe.noExtraProps(Typesafe.intersection(
+	Typesafe.object({
+		redirectUrl: Typesafe.string,
+	}),
+	Typesafe.partial({
+	}),
+))
+
+export type OIDCInitData = ReturnType<typeof OIDCInitData>

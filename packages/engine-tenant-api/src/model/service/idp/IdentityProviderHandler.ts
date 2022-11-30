@@ -1,6 +1,6 @@
-export interface InitIDPAuthResult<SessionData extends {}> {
+export interface InitIDPAuthResult {
 	authUrl: string
-	sessionData: SessionData
+	sessionData: unknown
 }
 
 export interface IDPClaim {
@@ -9,13 +9,11 @@ export interface IDPClaim {
 	name?: string
 }
 
-export interface IdentityProviderHandler<SessionData extends {}, ResponseData extends {}, Configuration extends {}> {
+export interface IdentityProviderHandler<Configuration extends {}> {
 
-	initAuth: (configuration: Configuration, redirectUrl: string) => Promise<InitIDPAuthResult<SessionData>>
+	initAuth: (configuration: Configuration, data: unknown) => Promise<InitIDPAuthResult>
 
-	processResponse: (configuration: Configuration, responseData: ResponseData) =>  Promise<IDPClaim>
-
-	validateResponseData: (data: unknown) =>  ResponseData
+	processResponse: (configuration: Configuration, responseData: unknown) =>  Promise<IDPClaim>
 
 	validateConfiguration: (config: unknown) => Configuration
 }

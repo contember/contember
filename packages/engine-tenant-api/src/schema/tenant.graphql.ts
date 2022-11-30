@@ -28,7 +28,11 @@ const schema: DocumentNode = gql`
 		changePassword(personId: String!, password: String!): ChangePasswordResponse
 		changeMyPassword(currentPassword: String!, newPassword: String!): ChangeMyPasswordResponse
 
-		initSignInIDP(identityProvider: String!, redirectUrl: String!): InitSignInIDPResponse
+		initSignInIDP(
+			identityProvider: String!,
+			data: Json
+			redirectUrl: String @deprecated(reason: "use data.redirectUrl")
+		): InitSignInIDPResponse
 		signInIDP(
 			identityProvider: String!, 
 			data: Json,
@@ -249,6 +253,7 @@ const schema: DocumentNode = gql`
 
 	enum InitSignInIDPErrorCode {
 		PROVIDER_NOT_FOUND
+        IDP_VALIDATION_FAILED
 	}
 
 	input IDPResponseInput {

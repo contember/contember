@@ -30,10 +30,9 @@ class IDPSignInManager {
 			const validatedConfig = providerService.validateConfiguration(provider.configuration)
 			let claim: IDPClaim
 			try {
-				const data = providerService.validateResponseData(responseData)
 				claim = await providerService.processResponse(
 					validatedConfig,
-					data,
+					responseData,
 				)
 			} catch (e) {
 				if (e instanceof IDPResponseError) {
@@ -54,15 +53,22 @@ class IDPSignInManager {
 		})
 	}
 
-	async initSignInIDP(dbContext: DatabaseContext, idpSlug: string, redirectUrl: string): Promise<IDPSignInManager.InitSignInIDPResponse> {
+	async initSignInIDP(dbContext: DatabaseContext, idpSlug: string, data: unknown): Promise<IDPSignInManager.InitSignInIDPResponse> {
 		const provider = await dbContext.queryHandler.fetch(new IdentityProviderBySlugQuery(idpSlug))
 		if (!provider || provider.disabledAt) {
 			return new ResponseError(InitSignInIdpErrorCode.ProviderNotFound, `Identity provider ${idpSlug} not found`)
 		}
 		const providerService = this.idpRegistry.getHandler(provider.type)
 		const validatedConfig = providerService.validateConfiguration(provider.configuration)
-		const initResponse = await providerService.initAuth(validatedConfig, redirectUrl)
-		return new ResponseOk(initResponse)
+		try {
+			const initResponse = await providerService.initAuth(validatedConfig, data)
+			return new ResponseOk(initResponse)
+		} catch (e) {
+			if (e instanceof IDPValidationError) {
+				return new ResponseError(InitSignInIdpErrorCode.IdpValidationFailed, e.message)
+			}
+			throw e
+		}
 	}
 
 	private async resolvePerson(db: DatabaseContext, claim: IDPClaim, provider: IdentityProviderRow): Promise<PersonRow | null> {

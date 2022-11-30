@@ -4,7 +4,7 @@ import { IdentityProviderHandler, IDPClaim, InitIDPAuthResult } from '../Identit
 import { IDPValidationError } from '../IDPValidationError'
 import { InvalidIDPConfigurationError } from '../InvalidIDPConfigurationError'
 import { catchTypesafe } from './helpers'
-import { BaseOIDCConfiguration, OIDCResponseData, OIDCSessionData } from './OIDCTypes'
+import { BaseOIDCConfiguration, OIDCInitData, OIDCResponseData } from './OIDCTypes'
 import { handleOIDCResponse, initOIDCAuth } from './OIDCHelpers'
 import { createHmac } from 'node:crypto'
 import { IDPResponseError } from '../IDPResponseError'
@@ -33,7 +33,7 @@ const FacebookResponsePayload = Typesafe.object({
 type FacebookResponseData = ReturnType<typeof FacebookResponseData>
 
 
-export class FacebookProvider implements IdentityProviderHandler<OIDCSessionData, FacebookResponseData, FacebookConfiguration> {
+export class FacebookProvider implements IdentityProviderHandler<FacebookConfiguration> {
 	// based on https://www.facebook.com/.well-known/openid-configuration/
 	// facebook .well-known endpoint does have "token_endpoint" field
 	private facebookIssuer = new Issuer({
@@ -76,15 +76,20 @@ export class FacebookProvider implements IdentityProviderHandler<OIDCSessionData
 		token_endpoint: 'https://graph.facebook.com/v11.0/oauth/access_token',
 	})
 
-	validateResponseData = catchTypesafe(FacebookResponseData, IDPValidationError)
 	validateConfiguration = catchTypesafe(FacebookConfiguration, InvalidIDPConfigurationError)
 
-	public async initAuth(configuration: FacebookConfiguration, redirectUrl: string): Promise<InitIDPAuthResult<OIDCSessionData>> {
+	public async initAuth(configuration: FacebookConfiguration, data: unknown): Promise<InitIDPAuthResult> {
+		const initData = catchTypesafe(OIDCInitData, IDPValidationError)(data)
 		const client = await this.createOIDCClient(configuration)
-		return await initOIDCAuth(client, redirectUrl, configuration)
+		return await initOIDCAuth(client, {
+			claims: configuration.claims,
+			...initData,
+		})
 	}
 
-	public async processResponse(configuration: FacebookConfiguration, responseData: FacebookResponseData): Promise<IDPClaim> {
+	public async processResponse(configuration: FacebookConfiguration, data: unknown): Promise<IDPClaim> {
+		const responseData = catchTypesafe(FacebookResponseData, IDPValidationError)(data)
+
 		if ('url' in responseData) {
 			const client = await this.createOIDCClient(configuration)
 			return await handleOIDCResponse(client, responseData)

@@ -5,12 +5,13 @@ import { IDPResponseError } from '../IDPResponseError'
 import { IDPClaim, InitIDPAuthResult } from '../IdentityProviderHandler'
 
 
-export const initOIDCAuth = async (client: Client, redirectUrl: string, configuration: { claims?: string }): Promise<InitIDPAuthResult<OIDCSessionData>> => {
+export const initOIDCAuth = async (client: Client, { redirectUrl, claims, responseMode }: { redirectUrl: string; claims?: string; responseMode?: string }): Promise<InitIDPAuthResult> => {
 	const nonce = generators.nonce()
 	const state = generators.state()
 	const url = client.authorizationUrl({
 		redirect_uri: redirectUrl,
-		scope: configuration.claims ?? 'openid email',
+		response_mode: responseMode,
+		scope: claims ?? 'openid email',
 		nonce,
 		state,
 	})

@@ -1,27 +1,32 @@
 import { Client, custom, Issuer } from 'openid-client'
 import { IdentityProviderHandler, IDPClaim, InitIDPAuthResult } from '../IdentityProviderHandler'
-import { IDPValidationError } from '../IDPValidationError'
 import { InvalidIDPConfigurationError } from '../InvalidIDPConfigurationError'
 import { catchTypesafe } from './helpers'
-import { OIDCConfiguration, OIDCResponseData, OIDCSessionData } from './OIDCTypes'
+import { OIDCConfiguration, OIDCInitData, OIDCResponseData } from './OIDCTypes'
 import { handleOIDCResponse, initOIDCAuth } from './OIDCHelpers'
+import { IDPValidationError } from '../IDPValidationError'
 
 custom.setHttpOptionsDefaults({
 	timeout: 5000,
 })
 
 
-export class OIDCProvider implements IdentityProviderHandler<OIDCSessionData, OIDCResponseData, OIDCConfiguration> {
+export class OIDCProvider implements IdentityProviderHandler<OIDCConfiguration> {
 	private issuerCache: Record<string, Issuer<Client>> = {}
-	validateResponseData = catchTypesafe(OIDCResponseData, IDPValidationError)
+
 	validateConfiguration = catchTypesafe(OIDCConfiguration, InvalidIDPConfigurationError)
 
-	public async initAuth(configuration: OIDCConfiguration, redirectUrl: string): Promise<InitIDPAuthResult<OIDCSessionData>> {
+	public async initAuth(configuration: OIDCConfiguration, data: unknown): Promise<InitIDPAuthResult> {
+		const initData = catchTypesafe(OIDCInitData, IDPValidationError)(data)
 		const client = await this.createOIDCClient(configuration)
-		return await initOIDCAuth(client, redirectUrl, configuration)
+		return await initOIDCAuth(client, {
+			claims: configuration.claims,
+			...initData,
+		})
 	}
 
-	public async processResponse(configuration: OIDCConfiguration, responseData: OIDCResponseData): Promise<IDPClaim> {
+	public async processResponse(configuration: OIDCConfiguration, data: unknown): Promise<IDPClaim> {
+		const responseData = catchTypesafe(OIDCResponseData, IDPValidationError)(data)
 		const client = await this.createOIDCClient(configuration)
 		return await handleOIDCResponse(client, responseData)
 	}

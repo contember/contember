@@ -1,6 +1,6 @@
 import * as Typesafe from '@contember/typesafe'
 import { IdentityProviderHandler, IDPClaim, InitIDPAuthResult } from '../IdentityProviderHandler'
-import { OIDCConfigurationOptions, OIDCResponseData, OIDCSessionData } from './OIDCTypes'
+import { OIDCConfigurationOptions, OIDCInitData, OIDCResponseData, OIDCSessionData } from './OIDCTypes'
 import { catchTypesafe } from './helpers'
 import { IDPValidationError } from '../IDPValidationError'
 import { InvalidIDPConfigurationError } from '../InvalidIDPConfigurationError'
@@ -22,18 +22,22 @@ type AppleConfiguration = ReturnType<typeof AppleConfiguration>
 
 const APPLE_OIDC_CONFIGURATION_ENDPOINT = 'https://appleid.apple.com/.well-known/openid-configuration'
 
-export class AppleProvider implements IdentityProviderHandler<OIDCSessionData, OIDCResponseData, AppleConfiguration> {
+export class AppleProvider implements IdentityProviderHandler<AppleConfiguration> {
 	private issuer: Issuer<Client> | undefined
 
-	validateResponseData = catchTypesafe(OIDCResponseData, IDPValidationError)
 	validateConfiguration = catchTypesafe(AppleConfiguration, InvalidIDPConfigurationError)
 
-	public async initAuth(configuration: AppleConfiguration, redirectUrl: string): Promise<InitIDPAuthResult<OIDCSessionData>> {
+	public async initAuth(configuration: AppleConfiguration, data: unknown): Promise<InitIDPAuthResult> {
+		const initData = catchTypesafe(OIDCInitData, IDPValidationError)(data)
 		const client = await this.createOIDCClient(configuration)
-		return await initOIDCAuth(client, redirectUrl, { claims: 'openid' })
+		return await initOIDCAuth(client, {
+			claims: configuration.claims,
+			...initData,
+		})
 	}
 
-	public async processResponse(configuration: AppleConfiguration, responseData: OIDCResponseData): Promise<IDPClaim> {
+	public async processResponse(configuration: AppleConfiguration, data: unknown): Promise<IDPClaim> {
+		const responseData = catchTypesafe(OIDCResponseData, IDPValidationError)(data)
 		const client = await this.createOIDCClient(configuration)
 		return await handleOIDCResponse(client, responseData)
 	}

@@ -44,6 +44,7 @@ export const OIDCInitData = Typesafe.noExtraProps(Typesafe.intersection(
 		redirectUrl: Typesafe.string,
 	}),
 	Typesafe.partial({
+		responseMode: Typesafe.string,
 	}),
 ))
 

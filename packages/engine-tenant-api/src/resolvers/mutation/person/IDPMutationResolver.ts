@@ -6,9 +6,7 @@ import {
 	SignInIdpResponse,
 } from '../../../schema'
 import { TenantResolverContext } from '../../TenantResolverContext'
-import { IDPSignInManager, PermissionActions, PermissionContextFactory } from '../../../model'
-import { createResolverContext } from '../../TenantResolverContextFactory'
-import { IdentityTypeResolver } from '../../types'
+import { IDPSignInManager, PermissionActions } from '../../../model'
 import { createErrorResponse } from '../../errorUtils'
 import { SignInResponseFactory } from '../../responseHelpers/SignInResponseFactory'
 
@@ -42,9 +40,11 @@ export class IDPMutationResolver implements MutationResolvers {
 		const signIn = await this.idpSignInManager.signInIDP(
 			context.db,
 			args.identityProvider,
-			args.redirectUrl,
-			args.idpResponse,
-			args.sessionData,
+			{
+				sessionData: args.sessionData,
+				url: args.idpResponse?.url,
+				redirectUrl: args.redirectUrl,
+			},
 			args.expiration ?? undefined,
 		)
 		if (!signIn.ok) {

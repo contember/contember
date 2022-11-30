@@ -1,6 +1,6 @@
-import { IdentityProviderHandler, IDPClaim, IDPResponse, InitIDPAuthResult } from '../../src'
+import { IdentityProviderHandler, IDPClaim, InitIDPAuthResult } from '../../src'
 
-export class IdPMock implements IdentityProviderHandler<any, any> {
+export class IdPMock implements IdentityProviderHandler<any, any, any> {
 	initAuth(configuration: any, redirectUrl: string): Promise<InitIDPAuthResult<any>> {
 		return Promise.resolve({
 			authUrl: 'http://localhost',
@@ -8,7 +8,7 @@ export class IdPMock implements IdentityProviderHandler<any, any> {
 		})
 	}
 
-	processResponse(configuration: any, redirectUrl: string, idpResponse: IDPResponse, sessionData: any): Promise<IDPClaim> {
+	processResponse(configuration: any, responseData: any): Promise<IDPClaim> {
 		return Promise.resolve({
 			externalIdentifier: configuration.externalIdentifier,
 			email: configuration.email,
@@ -17,5 +17,9 @@ export class IdPMock implements IdentityProviderHandler<any, any> {
 
 	validateConfiguration(config: unknown): any {
 		return config
+	}
+
+	validateResponseData(data: unknown): any {
+		return data
 	}
 }

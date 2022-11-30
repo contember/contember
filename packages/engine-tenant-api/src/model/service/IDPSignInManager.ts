@@ -1,6 +1,6 @@
 import { ApiKeyManager } from './apiKey'
 import { IdentityProviderBySlugQuery, PersonByIdPQuery, PersonQuery, PersonRow } from '../queries'
-import { IDPClaim, IDPHandlerRegistry, IDPResponse, IDPResponseError, IDPValidationError } from './idp'
+import { IDPClaim, IDPHandlerRegistry, IDPResponseError, IDPValidationError } from './idp'
 import { Response, ResponseError, ResponseOk } from '../utils/Response'
 import { InitSignInIdpErrorCode, SignInIdpErrorCode } from '../../schema'
 import { DatabaseContext } from '../utils'
@@ -18,9 +18,7 @@ class IDPSignInManager {
 	async signInIDP(
 		dbContext: DatabaseContext,
 		idpSlug: string,
-		redirectUrl: string,
-		idpResponse: IDPResponse,
-		sessionData: any,
+		responseData: unknown,
 		expiration?: number,
 	): Promise<IDPSignInManager.SignInIDPResponse> {
 		return dbContext.transaction(async db => {
@@ -32,11 +30,10 @@ class IDPSignInManager {
 			const validatedConfig = providerService.validateConfiguration(provider.configuration)
 			let claim: IDPClaim
 			try {
+				const data = providerService.validateResponseData(responseData)
 				claim = await providerService.processResponse(
 					validatedConfig,
-					redirectUrl,
-					idpResponse,
-					sessionData,
+					data,
 				)
 			} catch (e) {
 				if (e instanceof IDPResponseError) {

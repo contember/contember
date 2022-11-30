@@ -1,7 +1,7 @@
 import * as Typesafe from '@contember/typesafe'
 import { Client, custom, errors, generators, Issuer, ResponseType } from 'openid-client'
 import { IDPResponseError } from './IDPResponseError'
-import { IdentityProviderHandler, IDPClaim, IDPResponse, InitIDPAuthResult } from './IdentityProviderHandler'
+import { IdentityProviderHandler, IDPClaim, InitIDPAuthResult } from './IdentityProviderHandler'
 import { IDPValidationError } from './IDPValidationError'
 import { InvalidIDPConfigurationError } from './InvalidIDPConfigurationError'
 
@@ -9,14 +9,13 @@ custom.setHttpOptionsDefaults({
 	timeout: 5000,
 })
 
-export type OIDCConfiguration = ReturnType<typeof OIDCConfigurationSchema>
 
 export interface SessionData {
 	nonce: string
 	state: string
 }
 
-const OIDCConfigurationSchema = Typesafe.intersection(
+const OIDCConfiguration = Typesafe.intersection(
 	Typesafe.object({
 		url: Typesafe.string,
 		clientId: Typesafe.string,
@@ -28,7 +27,20 @@ const OIDCConfigurationSchema = Typesafe.intersection(
 	}),
 )
 
-export class OIDCProvider implements IdentityProviderHandler<SessionData, OIDCConfiguration> {
+export type OIDCConfiguration = ReturnType<typeof OIDCConfiguration>
+
+const OIDCResponseData = Typesafe.object({
+	url: Typesafe.string,
+	redirectUrl: Typesafe.string,
+	sessionData: Typesafe.object({
+		nonce: Typesafe.string,
+		state: Typesafe.string,
+	}),
+})
+
+export type OIDCResponseData = ReturnType<typeof OIDCResponseData>
+
+export class OIDCProvider implements IdentityProviderHandler<SessionData, OIDCResponseData, OIDCConfiguration> {
 	private issuerCache: Record<string, Issuer<Client>> = {}
 
 	public async initAuth(
@@ -52,12 +64,10 @@ export class OIDCProvider implements IdentityProviderHandler<SessionData, OIDCCo
 
 	public async processResponse(
 		configuration: OIDCConfiguration,
-		redirectUrl: string,
-		idpResponse: IDPResponse,
-		sessionData: SessionData,
+		{ url, sessionData, redirectUrl }: OIDCResponseData,
 	): Promise<IDPClaim> {
 		const client = await this.createOIDCClient(configuration)
-		const params = client.callbackParams(idpResponse.url)
+		const params = client.callbackParams(url)
 		try {
 			const result = await client.callback(redirectUrl, params, sessionData)
 			const claims = result.claims()
@@ -66,12 +76,27 @@ export class OIDCProvider implements IdentityProviderHandler<SessionData, OIDCCo
 				email: claims.email,
 				name: claims.name,
 			}
-		} catch (e) {
+		} catch (e: any) {
 			if (e instanceof errors.RPError) {
 				throw new IDPValidationError(e.message)
 			}
 			if (e instanceof errors.OPError) {
+				const body = e.response?.body as any
+				if (typeof body === 'object' && typeof body?.error === 'object' && typeof body.error?.message === 'string') {
+					throw new IDPResponseError(body.error.message)
+				}
 				throw new IDPResponseError(e.message)
+			}
+			throw e
+		}
+	}
+
+	public validateResponseData(config: unknown): OIDCResponseData {
+		try {
+			return OIDCResponseData(config)
+		} catch (e) {
+			if (e instanceof Typesafe.ParseError) {
+				throw new IDPValidationError(e.message)
 			}
 			throw e
 		}
@@ -79,7 +104,7 @@ export class OIDCProvider implements IdentityProviderHandler<SessionData, OIDCCo
 
 	public validateConfiguration(config: unknown): OIDCConfiguration {
 		try {
-			return OIDCConfigurationSchema(config)
+			return OIDCConfiguration(config)
 		} catch (e) {
 			if (e instanceof Typesafe.ParseError) {
 				throw new InvalidIDPConfigurationError(e.message)

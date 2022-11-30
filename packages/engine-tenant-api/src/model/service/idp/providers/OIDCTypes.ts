@@ -1,0 +1,32 @@
+import * as Typesafe from '@contember/typesafe'
+import { ResponseType } from 'openid-client'
+
+export interface OIDCSessionData {
+	nonce: string
+	state: string
+}
+
+export const OIDCConfiguration = Typesafe.intersection(
+	Typesafe.object({
+		url: Typesafe.string,
+		clientId: Typesafe.string,
+		clientSecret: Typesafe.string,
+	}),
+	Typesafe.partial({
+		responseType: Typesafe.enumeration<ResponseType>('code', 'code id_token', 'code id_token token', 'code token', 'id_token', 'id_token token', 'none'),
+		claims: Typesafe.string,
+	}),
+)
+
+export type OIDCConfiguration = ReturnType<typeof OIDCConfiguration>
+
+export const OIDCResponseData = Typesafe.object({
+	url: Typesafe.string,
+	redirectUrl: Typesafe.string,
+	sessionData: Typesafe.object({
+		nonce: Typesafe.string,
+		state: Typesafe.string,
+	}),
+})
+
+export type OIDCResponseData = ReturnType<typeof OIDCResponseData>

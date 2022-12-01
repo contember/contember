@@ -28,14 +28,24 @@ export const OIDCConfiguration = Typesafe.intersection(
 
 export type OIDCConfiguration = ReturnType<typeof OIDCConfiguration>
 
-export const OIDCResponseData = Typesafe.object({
-	url: Typesafe.string,
-	redirectUrl: Typesafe.string,
-	sessionData: Typesafe.partial({
-		nonce: Typesafe.string,
-		state: Typesafe.string,
+export const OIDCResponseData = Typesafe.intersection(
+	Typesafe.union(
+		Typesafe.object({
+			url: Typesafe.string,
+		}),
+		Typesafe.object({
+			parameters: Typesafe.record(Typesafe.string, Typesafe.string),
+		}),
+	),
+	Typesafe.partial({
+		redirectUrl: Typesafe.string,
+		sessionData: Typesafe.partial({
+			nonce: Typesafe.string,
+			state: Typesafe.string,
+		}),
+
 	}),
-})
+)
 
 export type OIDCResponseData = ReturnType<typeof OIDCResponseData>
 

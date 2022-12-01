@@ -90,7 +90,7 @@ export class FacebookProvider implements IdentityProviderHandler<FacebookConfigu
 	public async processResponse(configuration: FacebookConfiguration, data: unknown): Promise<IDPClaim> {
 		const responseData = catchTypesafe(FacebookResponseData, IDPValidationError)(data)
 
-		if ('url' in responseData) {
+		if (!('authResponse' in responseData)) {
 			const client = await this.createOIDCClient(configuration)
 			return await handleOIDCResponse(client, responseData)
 		} else {

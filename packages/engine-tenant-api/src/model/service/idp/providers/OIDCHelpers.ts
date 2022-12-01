@@ -22,8 +22,8 @@ export const initOIDCAuth = async (client: Client, { redirectUrl, claims, respon
 	}
 }
 
-export const handleOIDCResponse = async (client: Client, { url, sessionData, redirectUrl }: OIDCResponseData): Promise<IDPClaim> => {
-	const params = client.callbackParams(url)
+export const handleOIDCResponse = async (client: Client, { sessionData, redirectUrl, ...otherData }: OIDCResponseData): Promise<IDPClaim> => {
+	const params = 'parameters' in otherData ? otherData.parameters : client.callbackParams(otherData.url)
 	try {
 		const result = await client.callback(redirectUrl, params, sessionData)
 		const claims = result.claims()

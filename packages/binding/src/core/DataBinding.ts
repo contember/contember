@@ -324,12 +324,12 @@ export class DataBinding {
 
 		const aggregatePersistedData = await this.fetchPersistedData(aggregateMarkerTreeRoot, aggregateSignal)
 
-		if (aggregateSignal?.aborted) {
+		if (aggregateSignal?.aborted || aggregatePersistedData === undefined) {
 			return
 		}
 
 		this.eventManager.syncOperation(() => {
-			this.treeAugmenter.extendPersistedData(aggregatePersistedData?.data ?? {}, aggregateMarkerTreeRoot)
+			this.treeAugmenter.extendPersistedData(aggregatePersistedData.data, aggregateMarkerTreeRoot)
 
 			for (const extension of pendingExtensions) {
 				this.treeAugmenter.extendTreeStates(extension.newTreeRootId, extension.markerTreeRoot)

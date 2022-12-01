@@ -1,4 +1,5 @@
 import {
+	GraphQlClientFailedRequestMetadata,
 	useCurrentContentGraphQlClient,
 	useCurrentSystemGraphQlClient,
 	useTenantGraphQlClient,
@@ -10,6 +11,7 @@ import { DataBinding } from '../core'
 import type { AccessorTreeState } from './AccessorTreeState'
 import type { AccessorTreeStateOptions } from './AccessorTreeStateOptions'
 import { accessorTreeStateReducer } from './accessorTreeStateReducer'
+import { metadataToRequestError } from './metadataToRequestError'
 import type { RequestError } from './RequestError'
 import { Environment } from '../dao'
 import { Schema, SchemaLoader } from '../core/schema'
@@ -64,10 +66,29 @@ export const useDataBinding = ({
 	})
 
 	useEffect(() => {
+		if (schema !== undefined) {
+			return
+		}
+
 		(async () => {
-			setSchema(await SchemaLoader.loadSchema(contentClient))
+			try {
+				setSchema(await SchemaLoader.loadSchema(contentClient))
+
+			} catch (metadata) {
+				if (typeof metadata === 'object' && metadata !== null && (metadata as { name?: unknown }).name === 'AbortError') {
+					return
+				}
+
+				if (isMountedRef.current) {
+					dispatch({
+						type: 'failWithError',
+						error: metadataToRequestError(metadata as GraphQlClientFailedRequestMetadata),
+						binding: state.binding!,
+					})
+				}
+			}
 		})()
-	}, [contentClient])
+	}, [contentClient, isMountedRef, schema, state.binding])
 
 	useEffect(() => {
 		if (schema) {

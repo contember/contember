@@ -24,6 +24,9 @@ export const initOIDCAuth = async (client: Client, { redirectUrl, claims, respon
 
 export const handleOIDCResponse = async (client: Client, { sessionData, redirectUrl, ...otherData }: OIDCResponseData): Promise<IDPClaim> => {
 	const params = 'parameters' in otherData ? otherData.parameters : client.callbackParams(otherData.url)
+	if (params.state && !sessionData?.state) {
+		throw new IDPValidationError(`state is present in parameters, but missing in session data`)
+	}
 	try {
 		const result = await client.callback(redirectUrl, params, sessionData)
 		const claims = result.claims()

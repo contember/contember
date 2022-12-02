@@ -356,3 +356,44 @@ const PgClientMock = class extends EventEmitter {
 		return createSuccessfulPromise()
 	}
 }
+
+
+it('rate limit', async () => {
+	const logger = createPoolLogger()
+	const pool = new Pool(() => new PgClientMock() as unknown as PgClient, {
+		rateLimitCount: 1,
+		rateLimitPeriodMs: 50,
+		log: logger,
+		logError: () => null,
+	})
+	const conn1 = await pool.acquire()
+	setTimeout(async () => {
+		await pool.release(conn1)
+	}, 20)
+	const conn2 = await pool.acquire()
+	await pool.dispose(conn2)
+	await timeout(10)
+	const conn3 = await pool.acquire()
+	expect(logger.messages).toMatchInlineSnapshot(`
+		CAI P
+		000 1: Item added to a queue.
+		000 1: Creating a new connection
+		100 1: Connection established
+		010 0: Queued item fulfilled with new connection.
+		010 0: Not connecting, queue is empty.
+		010 1: Item added to a queue.
+		010 1: Not connecting, rate limit reached.
+		010 1: Releasing a connection.
+		010 0: Queued item fulfilled with released connection.
+		010 0: Releasing and disposing a connection.
+		000 0: Not connecting, queue is empty.
+		000 0: Connection errored and was disposed.
+		000 1: Item added to a queue.
+		000 1: Not connecting, rate limit reached.
+		000 1: Rate limit renewed.
+		000 1: Creating a new connection
+		100 1: Connection established
+		010 0: Queued item fulfilled with new connection.
+		010 0: Not connecting, queue is empty.
+	`)
+})

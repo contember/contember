@@ -14,6 +14,10 @@ interface PoolConfigInternal {
 	maxConnections: number
 	/** maximum number of connections concurrently establishing*/
 	maxConnecting: number
+	/** maximum connection attempts during given period */
+	rateLimitCount: number
+	/** period for rate limiting */
+	rateLimitPeriodMs: number
 	/** maximum number of idle connections. when reached, will be disposed immediately */
 	maxIdle: number
 	/** interval between retries of recoverable errors */
@@ -98,7 +102,7 @@ class Pool {
 
 	/**
 	 * pool was closed by calling end().
-	 * All connection was disposed and it is not possible to acquire new one
+	 * All connection was disposed, and it is not possible to acquire new one
 	 */
 	private ended = false
 
@@ -107,6 +111,11 @@ class Pool {
 	 * also includes timeout between recoverable retries
 	 */
 	private connectingCount = 0
+
+	/**
+	 * Remaining number of connections per floating period.
+	 */
+	private remainingRateLimit: number
 
 	/**
 	 * available idle connections
@@ -155,15 +164,20 @@ class Pool {
 		private clientFactory: PgClientFactory,
 		poolConfig: PoolConfig,
 	) {
+		const maxConnections = poolConfig.maxConnections ?? 10
+		const maxConnecting = Math.ceil(maxConnections / 2)
 		this.poolConfig = {
-			maxConnections: 10,
-			maxConnecting: Math.ceil((poolConfig.maxConnections ?? 10) / 2),
-			maxIdle: poolConfig.maxConnections ?? 10,
+			maxConnections,
+			maxConnecting,
+			maxIdle: maxConnections,
+			rateLimitCount: maxConnecting * 5,
+			rateLimitPeriodMs: 1000,
 			idleTimeoutMs: 10_000,
 			acquireTimeoutMs: 10_000,
 			reconnectIntervalMs: 100,
 			...poolConfig,
 		}
+		this.remainingRateLimit = this.poolConfig.rateLimitCount
 	}
 
 	public acquire(): Promise<PoolConnection> {
@@ -259,7 +273,7 @@ class Pool {
 	}
 
 
-	private async maybeCreateNew(attempt = 1): Promise<void> {
+	private async maybeCreateNew(): Promise<void> {
 		if (this.ended) {
 			return
 		}
@@ -281,15 +295,21 @@ class Pool {
 			this.log('Not connecting, maximum concurrent connection attempts in progress.')
 			return
 		}
+		if (this.remainingRateLimit <= 0) {
+			this.log('Not connecting, rate limit reached.')
+			return
+		}
+
 		this.log('Creating a new connection')
 		const client = this.clientFactory()
-		this.connectingCount++
 		const poolConnection = new PoolConnection(client)
 		client.on('error', e => {
 			this.log('Client error on idle connection has occurred: ' + e.message)
 			this.poolConfig.logError(new ClientError(e, 'runtime error'))
 		})
 		try {
+			this.connectingCount++
+			this.remainingRateLimit--
 			await client.connect()
 			this.poolStats.connection_established_count++
 			this.log('Connection established')
@@ -317,7 +337,7 @@ class Pool {
 				setTimeout(() => {
 					this.connectingCount--
 					this.log('Retrying')
-					this.maybeCreateNew(attempt + 1)
+					this.maybeCreateNew()
 				}, this.poolConfig.reconnectIntervalMs)
 			} else {
 				this.poolStats.connection_error_count++
@@ -335,6 +355,14 @@ class Pool {
 				}
 			}
 			return
+		} finally {
+			setTimeout(() => {
+				if (this.remainingRateLimit === 0) {
+					this.log('Rate limit renewed.')
+				}
+				this.remainingRateLimit++
+				this.maybeCreateNew()
+			}, this.poolConfig.rateLimitPeriodMs)
 		}
 		this.handleAvailableConnection(poolConnection)
 		this.maybeCreateNew()

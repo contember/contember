@@ -2,8 +2,7 @@ import { Acl, Model } from '@contember/schema'
 import { PredicateDefinitionProcessor } from '../acl'
 import { getEntity } from '../model'
 import { ErrorBuilder, ValidationError } from './errors'
-import { conditionSchema } from '../type-schema/condition'
-import { anyJson } from '@contember/typesafe'
+import { conditionSchema } from '../type-schema'
 
 
 export class AclValidator {
@@ -42,7 +41,7 @@ export class AclValidator {
 		}
 		for (const inheritsFrom of inherits) {
 			if (!roles.includes(inheritsFrom)) {
-				errorBuilder.for(inheritsFrom).add('Referenced role not exists.')
+				errorBuilder.for(inheritsFrom).add('ACL_UNDEFINED_ROLE', 'Referenced role not exists.')
 			}
 		}
 	}
@@ -60,7 +59,7 @@ export class AclValidator {
 		switch (variable.type) {
 			case 'entity':
 				if (!this.model.entities[variable.entityName]) {
-					errorBuilder.add(`Entity "${variable.entityName}" not found`)
+					errorBuilder.add('ACL_UNDEFINED_ENTITY', `Entity "${variable.entityName}" not found`)
 					return
 				}
 		}
@@ -73,7 +72,7 @@ export class AclValidator {
 				continue
 			}
 			if (!this.model.entities[entityName]) {
-				errorBuilder.add(`Entity ${entityName} not found`)
+				errorBuilder.add('ACL_UNDEFINED_ENTITY', `Entity ${entityName} not found`)
 				continue
 			}
 			const entity = getEntity(this.model, entityName)
@@ -132,25 +131,25 @@ export class AclValidator {
 			handleColumn: ctx => {
 				if (typeof ctx.value === 'string') {
 					if (!variables[ctx.value]) {
-						errorBuilder.for(...ctx.path).add(`Undefined variable ${ctx.value}`)
+						errorBuilder.for(...ctx.path).add('ACL_UNDEFINED_VARIABLE', `Undefined variable ${ctx.value}`)
 					}
 				} else {
 					try {
 						conditionSchema(ctx.column.type)(ctx.value)
 					} catch (e: any) {
-						errorBuilder.for(...ctx.path).add(`Invalid condition (${e.message}): ${JSON.stringify(ctx.value)}`)
+						errorBuilder.for(...ctx.path).add('ACL_INVALID_CONDITION', `Invalid condition (${e.message}): ${JSON.stringify(ctx.value)}`)
 					}
 				}
 				return ctx.value
 			},
 			handleRelation: ctx => {
 				if (typeof ctx.value === 'string' && !variables[ctx.value]) {
-					errorBuilder.for(...ctx.path).add(`Undefined variable ${ctx.value}`)
+					errorBuilder.for(...ctx.path).add('ACL_UNDEFINED_VARIABLE', `Undefined variable ${ctx.value}`)
 				}
 				return ctx.value
 			},
 			handleUndefinedField: ctx => {
-				errorBuilder.for(...ctx.path).add(`Undefined field ${ctx.name} on entity ${ctx.entity.name}`)
+				errorBuilder.for(...ctx.path).add('ACL_UNDEFINED_FIELD', `Undefined field ${ctx.name} on entity ${ctx.entity.name}`)
 				return ctx.value
 			},
 		})
@@ -184,7 +183,7 @@ export class AclValidator {
 				continue
 			}
 			if (!entity.fields[field]) {
-				errorBuilder.add(`Field ${field} not found on entity ${entity.name}`)
+				errorBuilder.add('ACL_UNDEFINED_FIELD', `Field ${field} not found on entity ${entity.name}`)
 			}
 			this.validatePredicate(permissions[field], predicates, errorBuilder.for(field))
 		}
@@ -199,7 +198,7 @@ export class AclValidator {
 			return
 		}
 		if (!predicates[predicate]) {
-			errorBuilder.add(`Predicate ${predicate} not found`)
+			errorBuilder.add('ACL_UNDEFINED_PREDICATE', `Predicate ${predicate} not found`)
 		}
 	}
 }

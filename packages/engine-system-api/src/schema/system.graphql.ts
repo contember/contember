@@ -139,6 +139,12 @@ const schema: DocumentNode = gql`
 		name: String!
 		formatVersion: Int!
 		modifications: [Json!]!
+		skippedErrors: [MigrationSkippedError!]
+	}
+
+	input MigrationSkippedError {
+		code: String!
+		path: String
 	}
 
 	enum MigrateErrorCode {

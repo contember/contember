@@ -1,9 +1,11 @@
+import { SchemaValidatorSkippedErrors } from '@contember/schema-utils'
 import crypto from 'node:crypto'
 
 export interface MigrationInfo {
 	readonly version: string // YYYY-MM-DD-HHIISS
 	readonly name: string // version-label
 	readonly formatVersion: number
+	readonly skippedErrors?: SchemaValidatorSkippedErrors[]
 }
 
 interface Migration extends MigrationInfo {

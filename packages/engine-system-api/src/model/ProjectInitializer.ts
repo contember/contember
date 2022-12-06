@@ -32,8 +32,7 @@ export class ProjectInitializer {
 				// todo: use dbContext
 				initLogger.debug('Executing system schema migrations')
 				await createDatabaseIfNotExists(project.db, message => typeof message === 'string' ? initLogger.warn(message) : initLogger.error(message))
-				const singleConnection = Connection.createSingle(project.db, err => initLogger.error(err))
-				singleConnection.eventManager.on(EventManager.Event.clientError, err => logger.error(err, { message: 'Database client error' }))
+				const singleConnection = Connection.createSingle(project.db, err => initLogger.error(err, { message: 'Database client error' }))
 
 				await singleConnection.scope(async connection => {
 					const systemSchema = dbContext.client.schema

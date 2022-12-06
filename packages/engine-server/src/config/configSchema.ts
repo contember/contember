@@ -20,6 +20,8 @@ const dbConfigOptional = {
 		maxConnecting: Typesafe.number,
 		maxIdle: Typesafe.number,
 		reconnectIntervalMs: Typesafe.number,
+		rateLimitCount: Typesafe.number,
+		rateLimitPeriodMs: Typesafe.number,
 		idleTimeoutMs: Typesafe.number,
 		acquireTimeoutMs: Typesafe.number,
 		maxUses: Typesafe.number,

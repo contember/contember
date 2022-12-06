@@ -14,6 +14,10 @@ interface PoolConfigInternal {
 	maxConnections: number
 	/** maximum number of connections concurrently establishing*/
 	maxConnecting: number
+	/** maximum connection attempts during given period */
+	rateLimitCount: number
+	/** period for rate limiting */
+	rateLimitPeriodMs: number
 	/** maximum number of idle connections. when reached, will be disposed immediately */
 	maxIdle: number
 	/** interval between retries of recoverable errors */
@@ -29,7 +33,7 @@ interface PoolConfigInternal {
 	/** internal logging, mainly for debugging and testing */
 	log?: PoolLogger
 	/** logging of out-of-stack errors */
-	logError: (error: Error) => void
+	logError: (error: ClientError) => void
 }
 
 export type PoolStats = { [K in keyof typeof poolStatsDescription]: number }
@@ -94,17 +98,11 @@ class PendingItem {
 	}
 }
 
-interface Pool {
-	on(event: 'error', listener: (err: Error) => void): this
-
-	on(event: 'recoverableError', listener: (err: Error) => void): this
-}
-
-class Pool extends EventEmitter {
+class Pool {
 
 	/**
 	 * pool was closed by calling end().
-	 * All connection was disposed and it is not possible to acquire new one
+	 * All connection was disposed, and it is not possible to acquire new one
 	 */
 	private ended = false
 
@@ -113,6 +111,11 @@ class Pool extends EventEmitter {
 	 * also includes timeout between recoverable retries
 	 */
 	private connectingCount = 0
+
+	/**
+	 * Remaining number of connections per floating period.
+	 */
+	private remainingRateLimit: number
 
 	/**
 	 * available idle connections
@@ -161,16 +164,20 @@ class Pool extends EventEmitter {
 		private clientFactory: PgClientFactory,
 		poolConfig: PoolConfig,
 	) {
-		super()
+		const maxConnections = poolConfig.maxConnections ?? 10
+		const maxConnecting = Math.ceil(maxConnections / 2)
 		this.poolConfig = {
-			maxConnections: 10,
-			maxConnecting: Math.ceil((poolConfig.maxConnections ?? 10) / 2),
-			maxIdle: poolConfig.maxConnections ?? 10,
+			maxConnections,
+			maxConnecting,
+			maxIdle: maxConnections,
+			rateLimitCount: maxConnecting * 5,
+			rateLimitPeriodMs: 1000,
 			idleTimeoutMs: 10_000,
 			acquireTimeoutMs: 10_000,
 			reconnectIntervalMs: 100,
 			...poolConfig,
 		}
+		this.remainingRateLimit = this.poolConfig.rateLimitCount
 	}
 
 	public acquire(): Promise<PoolConnection> {
@@ -266,7 +273,7 @@ class Pool extends EventEmitter {
 	}
 
 
-	private async maybeCreateNew(attempt = 1): Promise<void> {
+	private async maybeCreateNew(): Promise<void> {
 		if (this.ended) {
 			return
 		}
@@ -288,16 +295,21 @@ class Pool extends EventEmitter {
 			this.log('Not connecting, maximum concurrent connection attempts in progress.')
 			return
 		}
+		if (this.remainingRateLimit <= 0) {
+			this.log('Not connecting, rate limit reached.')
+			return
+		}
+
 		this.log('Creating a new connection')
 		const client = this.clientFactory()
-		this.connectingCount++
 		const poolConnection = new PoolConnection(client)
 		client.on('error', e => {
 			this.log('Client error on idle connection has occurred: ' + e.message)
-			this.poolConfig.logError(e)
-			this.emit('error', e)
+			this.poolConfig.logError(new ClientError(e, 'runtime error'))
 		})
 		try {
+			this.connectingCount++
+			this.remainingRateLimit--
 			await client.connect()
 			this.poolStats.connection_established_count++
 			this.log('Connection established')
@@ -310,42 +322,47 @@ class Pool extends EventEmitter {
 			this.log('Connection error occurred: ' + e.message)
 			try {
 				await client.end()
-			} catch {
+			} catch (e2: unknown) {
+				this.poolConfig.logError(new ClientError(e2, 'disposal error'))
 			}
-			if (e.code === ClientErrorCodes.TOO_MANY_CONNECTIONS || e.code === ClientErrorCodes.CANNOT_CONNECT_NOW) {
+			if (
+				e.code === ClientErrorCodes.TOO_MANY_CONNECTIONS
+				|| e.code === ClientErrorCodes.CANNOT_CONNECT_NOW // server starting
+				|| e.message === 'timeout expired' // https://github.com/brianc/node-postgres/blob/c7dc621d3fb52c158eb23aa31dea6bd440700a4a/packages/pg/lib/client.js#L105
+			) {
 				this.lastRecoverableError = { error: e, time: Date.now() }
-				if (this.poolConfig.reconnectIntervalMs * attempt >= this.poolConfig.acquireTimeoutMs) {
-					this.poolStats.connection_error_count++
-					this.log('Recoverable error, max retries reached.')
-					this.poolConfig.logError(e)
-					this.emit('error', e)
+				this.poolStats.connection_recoverable_error_count++
+				this.log('Recoverable error, retrying in a moment.')
+				this.poolConfig.logError(new ClientError(e, 'recoverable connection error'))
+				setTimeout(() => {
 					this.connectingCount--
-				} else {
-					this.poolStats.connection_recoverable_error_count++
-					this.log('Recoverable error, retrying in a moment.')
-					this.emit('recoverableError', e)
-					setTimeout(() => {
-						this.connectingCount--
-						this.log('Retrying')
-						this.maybeCreateNew(attempt + 1)
-					}, this.poolConfig.reconnectIntervalMs)
-				}
+					this.log('Retrying')
+					this.maybeCreateNew()
+				}, this.poolConfig.reconnectIntervalMs)
 			} else {
 				this.poolStats.connection_error_count++
 				this.connectingCount--
+				const clientError = new ClientError(e, 'connection error')
 				if (this.active.size === 0 && this.queue.length > 0) {
 					const pendingItem = this.queue.shift()
 					if (!pendingItem) throw new Error()
 					this.log('Connecting failed, rejecting pending item')
-					pendingItem.reject(new ClientError(e))
+					pendingItem.reject(clientError)
 					this.poolStats.item_rejected_count++
 				} else {
 					this.log('Connecting failed, emitting error')
-					this.poolConfig.logError(e)
-					this.emit('error', e)
+					this.poolConfig.logError(clientError)
 				}
 			}
 			return
+		} finally {
+			setTimeout(() => {
+				if (this.remainingRateLimit === 0) {
+					this.log('Rate limit renewed.')
+				}
+				this.remainingRateLimit++
+				this.maybeCreateNew()
+			}, this.poolConfig.rateLimitPeriodMs)
 		}
 		this.handleAvailableConnection(poolConnection)
 		this.maybeCreateNew()
@@ -441,7 +458,7 @@ class Pool extends EventEmitter {
 			connection.disposed = true
 			await connection.client.end()
 		} catch (e: any) {
-			this.on('error', e)
+			this.poolConfig.logError(new ClientError(e, 'disposal error'))
 		}
 	}
 

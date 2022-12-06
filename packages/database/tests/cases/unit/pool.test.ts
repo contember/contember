@@ -283,14 +283,12 @@ it('fails to reconnect on recoverable error', async () => {
 	const pool = new Pool(() => pgClientMock as unknown as PgClient, {
 		log: logger,
 		logError: () => null,
-		reconnectIntervalMs: 5,
-		acquireTimeoutMs: 10,
-	})
-	pool.on('error', () => {
+		reconnectIntervalMs: 20,
+		acquireTimeoutMs: 30,
 	})
 	pgClientMock.connections.push(createRecoverableErrorPromise(), createRecoverableErrorPromise())
 	await expect(async () => await pool.acquire()).rejects.toThrowError('Failed to acquire a connection. Last error: too many connection')
-	await timeout(2)
+	await timeout(20)
 	expect(logger.messages).toMatchInlineSnapshot(`
 		CAI P
 		000 1: Item added to a queue.
@@ -300,8 +298,10 @@ it('fails to reconnect on recoverable error', async () => {
 		000 1: Retrying
 		000 1: Creating a new connection
 		100 1: Connection error occurred: too many connection
-		100 1: Recoverable error, max retries reached.
-		000 0: Queued item timed out
+		100 1: Recoverable error, retrying in a moment.
+		100 0: Queued item timed out
+		000 0: Retrying
+		000 0: Not connecting, queue is empty.
 	`)
 })
 
@@ -314,11 +314,8 @@ it('fails to reconnect on unrecoverable error', async () => {
 		log: logger,
 		logError: () => null,
 	})
-	pool.on('error', () => {
-
-	})
 	pgClientMock.connections.push(createErrorPromise())
-	await expect(async () => await pool.acquire()).rejects.toThrowError('Database client error: my err')
+	await expect(async () => await pool.acquire()).rejects.toThrowError('Database client connection error: my err')
 	await timeout()
 	expect(logger.messages).toMatchInlineSnapshot(`
 		CAI P
@@ -359,3 +356,44 @@ const PgClientMock = class extends EventEmitter {
 		return createSuccessfulPromise()
 	}
 }
+
+
+it('rate limit', async () => {
+	const logger = createPoolLogger()
+	const pool = new Pool(() => new PgClientMock() as unknown as PgClient, {
+		rateLimitCount: 1,
+		rateLimitPeriodMs: 50,
+		log: logger,
+		logError: () => null,
+	})
+	const conn1 = await pool.acquire()
+	setTimeout(async () => {
+		await pool.release(conn1)
+	}, 20)
+	const conn2 = await pool.acquire()
+	await pool.dispose(conn2)
+	await timeout(10)
+	const conn3 = await pool.acquire()
+	expect(logger.messages).toMatchInlineSnapshot(`
+		CAI P
+		000 1: Item added to a queue.
+		000 1: Creating a new connection
+		100 1: Connection established
+		010 0: Queued item fulfilled with new connection.
+		010 0: Not connecting, queue is empty.
+		010 1: Item added to a queue.
+		010 1: Not connecting, rate limit reached.
+		010 1: Releasing a connection.
+		010 0: Queued item fulfilled with released connection.
+		010 0: Releasing and disposing a connection.
+		000 0: Not connecting, queue is empty.
+		000 0: Connection errored and was disposed.
+		000 1: Item added to a queue.
+		000 1: Not connecting, rate limit reached.
+		000 1: Rate limit renewed.
+		000 1: Creating a new connection
+		100 1: Connection established
+		010 0: Queued item fulfilled with new connection.
+		010 0: Not connecting, queue is empty.
+	`)
+})

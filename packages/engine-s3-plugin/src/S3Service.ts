@@ -61,15 +61,13 @@ export class S3Service {
 		}
 
 		if (!this.config.noAcl && acl !== 'NONE') {
-			headers['x-amz-acl'] = {
-				PUBLIC_READ: 'public-read',
-				PRIVATE: 'private',
-			}[acl ?? 'PUBLIC_READ']
+			const mapping = { PUBLIC_READ: 'public-read', PRIVATE: 'private' }
+			headers['x-amz-acl'] = mapping[acl ?? 'PUBLIC_READ']
 		}
 		if (fileName || contentDisposition) {
-			let contentDispositionHeader = `${contentDisposition?.toLowerCase() ?? 'inline'}`
+			let contentDispositionHeader = contentDisposition?.toLowerCase() ?? 'inline'
 			if (fileName) {
-				contentDispositionHeader += `; filename="${encodeURIComponent(fileName)}"`
+				contentDispositionHeader += `; filename*=UTF-8''${encodeURIComponent(fileName)}`
 			}
 			headers['Content-Disposition'] = contentDispositionHeader
 		}

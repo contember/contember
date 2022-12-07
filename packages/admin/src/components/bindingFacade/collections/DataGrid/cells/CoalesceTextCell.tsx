@@ -10,7 +10,6 @@ export type CoalesceTextCellProps<Persisted extends FieldValue = FieldValue> =
 	& FieldFallbackViewPublicProps
 	& CoalesceFieldViewProps<Persisted>
 
-// eslint-disable-next-line @typescript-eslint/consistent-type-definitions
 type CoalesceTextFilterArtifacts = {
 	mode: 'matches' | 'matchesExactly' | 'startsWith' | 'endsWith' | 'doesNotMatch'
 	query: string

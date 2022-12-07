@@ -24,7 +24,6 @@ export type TextCellProps =
 		format?: (value: string | null) => ReactNode
 	}
 
-// eslint-disable-next-line @typescript-eslint/consistent-type-definitions
 export type TextFilterArtifacts = {
 	mode: 'matches' | 'matchesExactly' | 'startsWith' | 'endsWith' | 'doesNotMatch'
 	query: string

@@ -14,6 +14,7 @@ export const LayoutRenderer: FunctionComponent<LayoutRendererProps> = Component(
 			{props.children}
 			{props.side}
 			{props.actions}
+			{props.navigation}
 		</>
 	),
 	'LayoutRenderer',

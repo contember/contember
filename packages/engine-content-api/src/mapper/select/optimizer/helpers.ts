@@ -47,11 +47,11 @@ export const optimizeAnd = <P extends Record<string, unknown>>(operands: readonl
 	}
 }
 
-export const optimizeNot = <P extends Record<string, unknown>>(operand: P | boolean): P['not'] | { not: P } | boolean => {
+export const optimizeNot = <P extends Record<string, unknown>>(operand: P | boolean): Exclude<P['not'] | { not: P } | boolean, null | undefined> => {
 	if (typeof operand === 'boolean') {
 		return !operand
 	} else if (operand.not) {
-		return operand.not as P['not']
+		return operand.not as Exclude<P['not'], null | undefined>
 	} else {
 		return { not: operand }
 	}

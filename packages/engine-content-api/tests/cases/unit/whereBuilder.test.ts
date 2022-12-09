@@ -25,7 +25,7 @@ namespace WhereBuilderModel {
 	}
 }
 
-const createWhere = (schema: Schema, where: Input.Where) => {
+const createWhere = (schema: Schema, where: Input.OptionalWhere) => {
 	const pathFactory = new PathFactory()
 	const joinBuilder = new JoinBuilder(schema.model)
 	const conditionBuilder = new ConditionBuilder()
@@ -131,6 +131,26 @@ describe('where builder', () => {
 				left join "__SCHEMA__"."article_tags" as "root_articles_x_root_articles_tags" on "root_articles"."id" = "root_articles_x_root_articles_tags"."article_id"
 				left join "__SCHEMA__"."tag" as "root_articles_tags" on "root_articles_x_root_articles_tags"."tag_id" = "root_articles_tags"."id"
 				where "root_"."id" = "root_articles"."author_id" and "root_articles_tags"."name" = ? and "root_articles_tags"."name" = ?)`,
+		)
+	})
+
+
+	it('handles nulls', () => {
+		const schema: Schema = { ...createSchema(WhereBuilderModel) }
+		const where = createWhere(schema, {
+			name: null,
+			articles: {
+				and: [
+					null,
+					{ and: null },
+					{ tags: null },
+				],
+				not: null,
+			},
+		})
+		compareWhere(
+			where,
+			`where exists (select 1 from "__SCHEMA__"."article" as "root_articles" where "root_"."id" = "root_articles"."author_id")`,
 		)
 	})
 })

@@ -87,7 +87,7 @@ export class WhereBuilder {
 	): SqlConditionBuilder {
 		const tableName = path.alias
 
-		if (where.and !== undefined && where.and.length > 0) {
+		if (where.and !== undefined && where.and !== null && where.and.length > 0) {
 			const expr = where.and
 			conditionBuilder = conditionBuilder.and(clause =>
 				expr.reduce(
@@ -104,7 +104,7 @@ export class WhereBuilder {
 				),
 			)
 		}
-		if (where.or !== undefined && where.or.length > 0) {
+		if (where.or !== undefined && where.or !== null && where.or.length > 0) {
 			const expr = where.or
 			conditionBuilder = conditionBuilder.or(clause =>
 				expr.reduce(
@@ -123,7 +123,7 @@ export class WhereBuilder {
 				),
 			)
 		}
-		if (where.not !== undefined) {
+		if (where.not !== undefined && where.not !== null) {
 			const expr = where.not
 			conditionBuilder = conditionBuilder.not(clause =>
 				this.buildRecursive({
@@ -141,12 +141,16 @@ export class WhereBuilder {
 			if (fieldName === 'and' || fieldName === 'or' || fieldName === 'not') {
 				continue
 			}
+			const fieldWhere = where[fieldName]
+			if (!fieldWhere) {
+				continue
+			}
 
 			const targetPath = path.for(fieldName)
 
 			const joinedWhere = ({ targetEntity, relation, entity }: Model.AnyRelationContext): SqlConditionBuilder => {
-				const relationWhere = where[fieldName] as Input.Where
-				if (Object.keys(relationWhere).length === 0) {
+				const relationWhere = where[fieldName] as Input.OptionalWhere | null
+				if (!relationWhere || Object.keys(relationWhere).length === 0) {
 					return conditionBuilder
 				}
 				if (isIt<Model.JoiningColumnRelation>(relation, 'joiningColumn')) {
@@ -174,10 +178,11 @@ export class WhereBuilder {
 				})
 			}
 
+
+
 			conditionBuilder = acceptFieldVisitor<SqlConditionBuilder>(this.schema, entity, fieldName, {
 				visitColumn: ({ entity, column }) => {
-					const subWhere: Input.Condition<Input.ColumnValue> = where[column.name] as Input.Condition<Input.ColumnValue>
-					return this.conditionBuilder.build(conditionBuilder, tableName, column.columnName, column.columnType, subWhere)
+					return this.conditionBuilder.build(conditionBuilder, tableName, column.columnName, column.columnType, fieldWhere as Input.Condition<Input.ColumnValue>)
 				},
 				visitOneHasOneInverse: joinedWhere,
 				visitOneHasOneOwning: joinedWhere,
@@ -187,12 +192,10 @@ export class WhereBuilder {
 						return joinedWhere(context)
 					}
 
-					const relationWhere = where[fieldName] as Input.Where
-
 					return conditionBuilder.exists(
 						this.createManyHasManySubquery(
 							[tableName, entity.primaryColumn],
-							relationWhere,
+							fieldWhere as Input.OptionalWhere,
 							context.targetEntity,
 							context.targetRelation.joiningTable,
 							'inverse',
@@ -205,12 +208,12 @@ export class WhereBuilder {
 						return joinedWhere(context)
 					}
 
-					const relationWhere = where[fieldName] as Input.Where
+					const relationWhere = where[fieldName] as Input.Where | null
 
 					return conditionBuilder.exists(
 						this.createManyHasManySubquery(
 							[tableName, entity.primaryColumn],
-							relationWhere,
+							fieldWhere as Input.OptionalWhere,
 							context.targetEntity,
 							context.relation.joiningTable,
 							'owning',
@@ -223,7 +226,7 @@ export class WhereBuilder {
 						return joinedWhere(context)
 					}
 
-					const relationWhere = where[fieldName] as Input.Where
+					const relationWhere = fieldWhere as Input.OptionalWhere
 
 					const qb = this.hasRootIsNull(relationWhere, context.targetEntity)
 						? SelectBuilder.create()
@@ -255,7 +258,7 @@ export class WhereBuilder {
 
 	private createManyHasManySubquery(
 		outerColumn: QueryBuilder.ColumnIdentifier,
-		relationWhere: Input.Where,
+		relationWhere: Input.OptionalWhere,
 		targetEntity: Model.Entity,
 		joiningTable: Model.JoiningTable,
 		fromSide: 'owning' | 'inverse',
@@ -291,7 +294,7 @@ export class WhereBuilder {
 		})
 	}
 
-	private transformWhereToPrimaryCondition(where: Input.Where, primaryField: string): Input.Condition<never> | null {
+	private transformWhereToPrimaryCondition(where: Input.OptionalWhere, primaryField: string): Input.Condition<never> | null {
 		const keys = Object.keys(where)
 		if (keys.filter(it => !['and', 'or', 'not', primaryField].includes(it)).length > 0) {
 			return null
@@ -335,10 +338,10 @@ export class WhereBuilder {
 		return condition
 	}
 
-	private hasRootIsNull(where: Input.Where, entity: Model.Entity): boolean {
+	private hasRootIsNull(where: Input.OptionalWhere, entity: Model.Entity): boolean {
 		for (const key in where) {
 			if (key === 'and' || key === 'or') {
-				if (where[key]?.some(it => this.hasRootIsNull(it, entity))) {
+				if (where[key]?.some(it => it && this.hasRootIsNull(it, entity))) {
 					return true
 				}
 			} else if (key === 'not') {

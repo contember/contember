@@ -1,5 +1,5 @@
 import { Button } from '@contember/ui'
-import { useCallback } from 'react'
+import { useCallback, useEffect, useMemo } from 'react'
 import { useInitSignInIDP } from '../../mutations'
 import { getBaseHref, IDP, IDP_CODE, IDP_SESSION_KEY } from './common'
 
@@ -24,6 +24,20 @@ export const IDPInitButton = ({ provider, onError }: IDPInitButtonProps) => {
 			window.location.href = response.result.authUrl
 		}
 	}, [initRequest, onError])
+
+	useEffect(() => {
+		const params = new URLSearchParams(window.location.search)
+		const backlink = params.get('backlink')
+
+		if (backlink !== null) {
+			const resolvedBacklink = new URL(backlink, window.location.href)
+			const idp = resolvedBacklink.searchParams.get('idp')
+
+			if (idp !== null && idp === provider.provider) {
+				onInitIDP(provider.provider)
+			}
+		}
+	}, [provider, onInitIDP])
 
 	return (
 		<Button onClick={() => onInitIDP(provider.provider)}>Login using {provider.name ?? provider.provider}</Button>

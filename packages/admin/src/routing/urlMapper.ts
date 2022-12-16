@@ -6,6 +6,7 @@ import { RequestState } from './types'
 
 const matchFunctionsCache: Record<string, MatchFunction> = {}
 const pathFunctionsCache: Record<string, PathFunction> = {}
+const pathKeysCache: Record<string, string[]> = {}
 
 export const dimensionsIn = (dimensions: string): Environment.SelectedDimensions => {
 	return dimensions
@@ -28,6 +29,15 @@ export const pageNameOut = (pageName: string): string => {
 	return pageName.replace(/([A-Z])/g, '-$1').toLowerCase()
 }
 
+const parseQuery = (query: string): Record<string, string | number> => {
+	const searchParams = new URLSearchParams(query)
+
+	return Object.fromEntries(Array.from(
+		searchParams,
+		([key, val]) => [key, parseInt(val, 10).toString() === val ? parseInt(val, 10) : val]),
+	)
+}
+
 export const pathToRequestState = (routing: RoutingContextValue, path: string, query: string): RequestState => {
 	if (!path.startsWith(routing.basePath.slice(0, -1))) {
 		return null
@@ -45,27 +55,32 @@ export const pathToRequestState = (routing: RoutingContextValue, path: string, q
 		const matchResult = matchFunctionsCache[config.path](pagePathNormalized)
 
 		if (matchResult !== false) {
+			const queryParameters = parseQuery(query)
+			const pathParameters = config.paramsToObject ? config.paramsToObject(matchResult.params) : matchResult.params
+			const parameters = { ...queryParameters, ...pathParameters }
+
 			return {
-				pageName: pageName,
-				parameters: config.paramsToObject ? config.paramsToObject(matchResult.params) : matchResult.params as Record<string, string>,
+				pageName,
+				parameters,
 				dimensions: dimensions ?? {},
 			}
 		}
 	}
 
-	const searchParams = new URLSearchParams(query)
-	let pageName = pageNameIn(pagePathNormalized.slice(1, -1))
+	const parameters = parseQuery(query)
+	let pageName: string
+
 	if (routing.pageInQuery) {
-		pageName = searchParams.get('page') || 'index'
-		searchParams.delete('page')
+		pageName = typeof parameters.page === 'string' ? parameters.page : 'index'
+		delete parameters.page
+
+	} else {
+		pageName = pageNameIn(pagePathNormalized.slice(1, -1))
 	}
+
 	return {
 		pageName,
-		parameters: Object.fromEntries(
-			Array.from(
-				searchParams,
-				([key, val]) => [key, parseInt(val, 10).toString() === val ? parseInt(val, 10) : val]),
-		),
+		parameters,
 		dimensions: dimensions ?? {},
 	}
 }
@@ -79,25 +94,31 @@ export const requestStateToPath = (routing: RoutingContextValue, request: Reques
 	const dimensionsSegment = dimensionsString ? `/${dimensionsString}` : ''
 	const prefix = routing.basePath.slice(0, -1) + dimensionsSegment
 
+	let pathSegment: string
+	const query = new URLSearchParams(request.parameters as Record<string, string>)
+
 	if (!routing.routes[request.pageName]) {
-		const pageSegment = routing.pageInQuery ? '' : '/' + pageNameOut(request.pageName)
-		const query = new URLSearchParams(request.parameters as Record<string, string>)
+		pathSegment = routing.pageInQuery ? '' : '/' + pageNameOut(request.pageName)
+
 		if (routing.pageInQuery && request.pageName !== 'index') {
 			query.append('page', request.pageName)
 		}
-		const queryString = query.toString()
-		const querySegment = queryString ? `?${queryString}` : ''
 
-		return (prefix + pageSegment + querySegment) || '/'
+	} else {
+		const route = routing.routes[request.pageName]
+		const pathParameters = route.objectToParams ? route.objectToParams(request.parameters) : request.parameters
+
+		pathFunctionsCache[route.path] ??= pathToRegexp.compile(route.path, { encode: encodeURIComponent })
+		pathSegment = pathFunctionsCache[route.path](pathParameters)
+
+		pathKeysCache[route.path] ??= pathToRegexp.parse(route.path).flatMap(it => typeof it !== 'string' && typeof it.name === 'string' ? [it.name] : [])
+		pathKeysCache[route.path].forEach(key => query.delete(key))
 	}
 
-	const route = routing.routes[request.pageName]
-	const pathParameters = route.objectToParams ? route.objectToParams(request.parameters) : request.parameters
+	const queryString = query.toString()
+	const querySegment = queryString ? `?${queryString}` : ''
 
-	pathFunctionsCache[route.path] ??= pathToRegexp.compile(route.path, { encode: encodeURIComponent })
-	const pageSegment = pathFunctionsCache[route.path](pathParameters)
-
-	return prefix + pageSegment
+	return (prefix + pathSegment + querySegment) || '/'
 }
 
 export class PageNotFound extends Error {

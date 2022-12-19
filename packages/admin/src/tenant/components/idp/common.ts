@@ -6,6 +6,7 @@ export const getBaseHref = () => {
 
 export const IDP_SESSION_KEY = 'idp_session_key'
 export const IDP_CODE = 'idp_code'
+export const IDP_BACKLINK = 'idp_backlink'
 
 
 export interface IDP {

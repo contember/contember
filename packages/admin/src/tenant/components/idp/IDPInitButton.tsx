@@ -1,7 +1,7 @@
 import { Button } from '@contember/ui'
 import { useCallback, useEffect, useMemo } from 'react'
 import { useInitSignInIDP } from '../../mutations'
-import { getBaseHref, IDP, IDP_CODE, IDP_SESSION_KEY } from './common'
+import { getBaseHref, IDP, IDP_BACKLINK, IDP_CODE, IDP_SESSION_KEY } from './common'
 
 export interface IDPInitButtonProps {
 	provider: IDP,
@@ -21,6 +21,7 @@ export const IDPInitButton = ({ provider, onError }: IDPInitButtonProps) => {
 		} else {
 			localStorage.setItem(IDP_SESSION_KEY, JSON.stringify(response.result.sessionData))
 			localStorage.setItem(IDP_CODE, provider)
+			localStorage.setItem(IDP_BACKLINK, window.location.href)
 			window.location.href = response.result.authUrl
 		}
 	}, [initRequest, onError])

@@ -1,7 +1,7 @@
 import { useSignInIDP } from '../../mutations'
 import { useEffect, useState } from 'react'
 import { ContainerSpinner, ErrorList } from '@contember/ui'
-import { getBaseHref, IDP_CODE, IDP_SESSION_KEY } from './common'
+import { getBaseHref, IDP_BACKLINK, IDP_CODE, IDP_SESSION_KEY } from './common'
 import { useSetSessionToken } from '@contember/react-client'
 
 export interface IDPResponseHandlerProps {
@@ -34,6 +34,13 @@ export const IDPResponseHandler = ({ onLogin }: IDPResponseHandlerProps) => {
 				}
 			} else {
 				setSessionToken(response.result.token)
+
+				const backlink = localStorage.getItem(IDP_BACKLINK)
+
+				if (backlink !== null) {
+					window.history.replaceState({}, document.title, backlink)
+				}
+
 				onLogin?.()
 			}
 		})()

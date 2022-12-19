@@ -22,5 +22,5 @@ export const schemaType: Typesafe.Type<Schema> = Typesafe.object({
 	model: modelSchema,
 	acl: aclSchema,
 	validation: validationSchema,
-	settings: settingsSchema,
+	settings: Typesafe.coalesce(settingsSchema, {}),
 })

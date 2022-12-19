@@ -18,7 +18,7 @@ export class MigrationsResolver {
 				name: MigrationVersionHelper.extractName(filename),
 				formatVersion: parsed.formatVersion || VERSION_INITIAL,
 				modifications: parsed.modifications,
-				skippedErrors: parsed.skippedErrors ?? [],
+				...(parsed.skippedErrors ? { skippedErrors: parsed.skippedErrors } : {}),
 			}
 		})
 	}

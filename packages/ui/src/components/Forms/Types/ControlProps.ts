@@ -50,7 +50,10 @@ export interface ControlValueProps<V> {
 
 export interface ControlConstraintProps<V> {
 	max?: V | null
+	maxLength?: number
 	min?: V | null
+	minLength?: number
+	pattern?: string
 }
 
 export type ControlProps<V> =

@@ -77,9 +77,14 @@ export const useFieldControl = <FieldVal extends FieldValue, ControlVal extends 
 		}, [parse]),
 		placeholder: props.placeholder,
 		name: props.name,
-		max: format(props.max, field.current),
-		min: format(props.min, field.current),
 		value: format(field.current.value, field.current),
+
+		// ControlConstraintProps
+		max: format(props.max, field.current),
+		maxLength: props.maxLength,
+		min: format(props.min, field.current),
+		minLength: props.minLength,
+		pattern: props.pattern,
 
 		// ValidationStateProps
 		validationState: field.current.errors ? ('invalid' as const) : undefined,

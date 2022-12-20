@@ -7,7 +7,7 @@ import { noop } from '../../../utils'
 import { getPortalRoot } from '../../Portal'
 import { useInputClassName } from '../hooks/useInputClassName'
 import { useChangeValidationState } from '../hooks/useNativeInput'
-import type { ControlProps } from '../Types'
+import type { ControlConstraintProps, ControlProps } from '../Types'
 import { useCommonReactSelectStyles } from './useCommonReactSelectStyles'
 
 export interface SelectOption<V = string> {
@@ -24,7 +24,7 @@ export type SelectOptionWithKey<V = string> =
 export type HTMLReactSelectElement<V> = SelectClass<SelectOption<V>, false, never>
 export type HTMLReactSelectElementWithKey<V> = SelectClass<SelectOptionWithKey<V>, false, never>
 
-export type SelectProps<V> = Omit<ControlProps<V>, 'type' | 'min' | 'max'> & {
+export type SelectProps<V> = Omit<ControlProps<V>, 'type' | keyof ControlConstraintProps<any>> & {
 	options: SelectOption<V>[]
 	/**
 	 * @deprecated No need for React Select component.

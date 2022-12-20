@@ -383,7 +383,13 @@ export interface ControlConstraintProps<V> {
     // (undocumented)
     max?: V | null;
     // (undocumented)
+    maxLength?: number;
+    // (undocumented)
     min?: V | null;
+    // (undocumented)
+    minLength?: number;
+    // (undocumented)
+    pattern?: string;
 }
 
 // @public (undocumented)
@@ -2135,7 +2141,7 @@ export const SectionTabs: MemoExoticComponent<() => JSX.Element | null>;
 export const SectionTabsProvider: MemoExoticComponent<({ children }: SectionTabsProps) => JSX.Element>;
 
 // @public (undocumented)
-export const Select: <V extends unknown>(props: Omit<ControlProps<V>, "type" | "max" | "min"> & {
+export const Select: <V extends unknown>(props: Omit<ControlProps<V>, "type" | keyof ControlConstraintProps<any>> & {
     options: SelectOption<V>[];
     rows?: undefined;
     isSearchable?: ComponentProps<ReactSelect>['isSearchable'];
@@ -2165,7 +2171,7 @@ export type SelectOptionWithKey<V = string> = Omit<SelectOption<V>, 'key'> & {
 };
 
 // @public (undocumented)
-export type SelectProps<V> = Omit<ControlProps<V>, 'type' | 'min' | 'max'> & {
+export type SelectProps<V> = Omit<ControlProps<V>, 'type' | keyof ControlConstraintProps<any>> & {
     options: SelectOption<V>[];
     rows?: never;
     isSearchable?: ComponentProps<ReactSelect>['isSearchable'];
@@ -2632,7 +2638,7 @@ export function useMouseMove<E extends HTMLElement = HTMLElement>(observedElemen
 export function useMouseMoveContext(): RefObject<boolean>;
 
 // @public (undocumented)
-export function useNativeInput<E extends HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement, T>({ active, disabled, loading, readOnly, required, focused, hovered, onBlur, onFocus, onFocusChange, defaultValue, id, name, max, min, onChange, notNull, placeholder, type, value, onValidationStateChange, validationState, className: outerClassName, distinction, intent, scheme, size, ...rest }: ControlProps<T>, forwardedRef: ForwardedRef<E>): AllHTMLAttributes<E> & {
+export function useNativeInput<E extends HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement, T>({ active, disabled, loading, readOnly, required, focused, hovered, onBlur, onFocus, onFocusChange, defaultValue, id, name, onChange, notNull, placeholder, type, value, max, maxLength, min, minLength, pattern, onValidationStateChange, validationState, className: outerClassName, distinction, intent, scheme, size, ...rest }: ControlProps<T>, forwardedRef: ForwardedRef<E>): AllHTMLAttributes<E> & {
     ref: RefObject<E>;
 };
 

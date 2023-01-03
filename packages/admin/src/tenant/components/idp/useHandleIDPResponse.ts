@@ -1,5 +1,5 @@
 import { SignInIDPErrors, useSignInIDP } from '../../mutations'
-import { getBaseHref, IDP_BACKLINK } from './common'
+import { getBaseHref } from './common'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useSetSessionToken } from '@contember/react-client'
 import { useIDPStateStore } from './useIDPStateStore'
@@ -63,16 +63,10 @@ export const useHandleIDPResponse = ({ onLogin, onError }: UseHandleIDPResponseP
 				setSessionToken(response.result.token)
 				setState({ type: 'succeed' })
 
-				const backlink = localStorage.getItem(IDP_BACKLINK)
-
-				if (backlink !== null) {
-					window.history.replaceState({}, document.title, backlink)
-				}
-
 				onLogin?.()
 			}
 		})()
-	}, [idpSignIn, onLogin, setSessionToken, hasOauthResponse, onError, setError])
+	}, [idpSignIn, onLogin, setSessionToken, hasOauthResponse, onError, setError, loadIdpState])
 
 	return state
 }

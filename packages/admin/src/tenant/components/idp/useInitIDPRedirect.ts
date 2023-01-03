@@ -1,7 +1,8 @@
-import { getBaseHref, IDP, IDP_BACKLINK } from './common'
+import { getBaseHref, IDP } from './common'
 import { useCallback } from 'react'
 import { useInitSignInIDP } from '../../mutations'
 import { useIDPStateStore } from './useIDPStateStore'
+import { useSaveBacklink } from '../person'
 
 export interface UseInitIDPRedirectProps {
 	onError: (message: string) => void
@@ -9,6 +10,7 @@ export interface UseInitIDPRedirectProps {
 
 export const useInitIDPRedirect = ({ onError }: UseInitIDPRedirectProps) => {
 	const initRequest = useInitSignInIDP()
+	const saveBacklink = useSaveBacklink()
 	const { set: saveIdpState }  = useIDPStateStore()
 
 	return useCallback(async ({ provider }: IDP) => {
@@ -23,10 +25,10 @@ export const useInitIDPRedirect = ({ onError }: UseInitIDPRedirectProps) => {
 
 		} else {
 			saveIdpState({ provider, sessionData: response.result.sessionData })
-			localStorage.setItem(IDP_BACKLINK, window.location.href)
+			saveBacklink()
 
 			window.location.href = response.result.authUrl
 		}
 
-	}, [initRequest, onError, saveIdpState])
+	}, [initRequest, onError, saveBacklink, saveIdpState])
 }

@@ -20,7 +20,9 @@ export const useIDPAutoInit = ({ onError, providers }: UseIDPAutoInitProps) => {
 		const provider = providers.find(it => it.provider === idp)
 		if (provider) {
 			onInitIDP(provider)
+		} else {
+			onError(`Undefined IdP ${idp}`)
 		}
 
-	}, [onInitIDP, providers])
+	}, [onError, onInitIDP, providers])
 }

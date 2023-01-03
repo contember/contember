@@ -36,7 +36,7 @@ export interface SignInIDPResult {
 	}
 }
 
-type SignInIDPErrors =
+export type SignInIDPErrors =
 	| 'INVALID_IDP_RESPONSE'
 	| 'IDP_VALIDATION_FAILED'
 	| 'PERSON_NOT_FOUND'

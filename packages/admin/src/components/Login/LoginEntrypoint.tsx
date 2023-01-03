@@ -7,9 +7,9 @@ import {
 	FillResetPasswordTokenForm,
 	IDP,
 	IDPInitButton,
-	IDPResponseHandler,
 	Login,
 	ResetPasswordForm,
+	useResponseHandlerFeedback,
 } from '../../tenant'
 import { IdentityProvider, useLogout, useOptionalIdentity } from '../Identity'
 import { MiscPageLayout } from '../MiscPageLayout'
@@ -179,13 +179,9 @@ const LoginContainer = ({ identityProviders, collapsedEmailLogin: initialCollaps
 		}
 	}, [])
 
-	const hasOauthResponse = useMemo(() => {
-		const params = new URLSearchParams(window.location.search)
-		return params.has('state') && (params.has('code') || params.has('id_token'))
-	}, [])
-
-	if (hasOauthResponse) {
-		return <IDPResponseHandler onLogin={onLoginHandler}/>
+	const idpHandlerFeedback = useResponseHandlerFeedback({ onLogin: onLoginHandler })
+	if (idpHandlerFeedback !== null) {
+		return idpHandlerFeedback
 	}
 
 	return <>

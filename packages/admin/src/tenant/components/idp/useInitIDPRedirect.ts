@@ -1,6 +1,7 @@
-import { getBaseHref, IDP, IDP_BACKLINK, IDP_CODE, IDP_SESSION_KEY } from './common'
+import { getBaseHref, IDP, IDP_BACKLINK } from './common'
 import { useCallback } from 'react'
 import { useInitSignInIDP } from '../../mutations'
+import { useIDPStateStore } from './useIDPStateStore'
 
 export interface UseInitIDPRedirectProps {
 	onError: (message: string) => void
@@ -8,6 +9,7 @@ export interface UseInitIDPRedirectProps {
 
 export const useInitIDPRedirect = ({ onError }: UseInitIDPRedirectProps) => {
 	const initRequest = useInitSignInIDP()
+	const { set: saveIdpState }  = useIDPStateStore()
 
 	return useCallback(async ({ provider }: IDP) => {
 		const response = await initRequest({
@@ -20,11 +22,11 @@ export const useInitIDPRedirect = ({ onError }: UseInitIDPRedirectProps) => {
 			onError('Failed to initiate login.')
 
 		} else {
-			localStorage.setItem(IDP_SESSION_KEY, JSON.stringify(response.result.sessionData))
-			localStorage.setItem(IDP_CODE, provider)
+			saveIdpState({ provider, sessionData: response.result.sessionData })
 			localStorage.setItem(IDP_BACKLINK, window.location.href)
+
 			window.location.href = response.result.authUrl
 		}
 
-	}, [initRequest, onError])
+	}, [initRequest, onError, saveIdpState])
 }

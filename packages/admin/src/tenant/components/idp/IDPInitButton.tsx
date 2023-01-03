@@ -1,7 +1,7 @@
 import { Button } from '@contember/ui'
-import { useCallback, useEffect, useMemo } from 'react'
-import { useInitSignInIDP } from '../../mutations'
-import { getBaseHref, IDP, IDP_BACKLINK, IDP_CODE, IDP_SESSION_KEY } from './common'
+import { useEffect } from 'react'
+import { IDP } from './common'
+import { useInitIDPRedirect } from './useInitIDPRedirect'
 
 export interface IDPInitButtonProps {
 	provider: IDP,
@@ -9,22 +9,7 @@ export interface IDPInitButtonProps {
 }
 
 export const IDPInitButton = ({ provider, onError }: IDPInitButtonProps) => {
-	const initRequest = useInitSignInIDP()
-	const onInitIDP = useCallback(async (provider: string) => {
-		const response = await initRequest({
-			redirectUrl: getBaseHref(),
-			identityProvider: provider,
-		})
-		if (!response.ok) {
-			console.error(response.error)
-			onError('Failed to initiate login.')
-		} else {
-			localStorage.setItem(IDP_SESSION_KEY, JSON.stringify(response.result.sessionData))
-			localStorage.setItem(IDP_CODE, provider)
-			localStorage.setItem(IDP_BACKLINK, window.location.href)
-			window.location.href = response.result.authUrl
-		}
-	}, [initRequest, onError])
+	const onInitIDP = useInitIDPRedirect({ onError })
 
 	useEffect(() => {
 		const params = new URLSearchParams(window.location.search)
@@ -35,12 +20,12 @@ export const IDPInitButton = ({ provider, onError }: IDPInitButtonProps) => {
 			const idp = resolvedBacklink.searchParams.get('idp')
 
 			if (idp !== null && idp === provider.provider) {
-				onInitIDP(provider.provider)
+				onInitIDP(provider)
 			}
 		}
 	}, [provider, onInitIDP])
 
 	return (
-		<Button onClick={() => onInitIDP(provider.provider)}>Login using {provider.name ?? provider.provider}</Button>
+		<Button onClick={() => onInitIDP(provider)}>Login using {provider.name ?? provider.provider}</Button>
 	)
 }

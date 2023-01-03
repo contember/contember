@@ -9,6 +9,7 @@ import {
 	IDPInitButton,
 	Login,
 	ResetPasswordForm,
+	useIDPAutoInit,
 	useResponseHandlerFeedback,
 } from '../../tenant'
 import { IdentityProvider, useLogout, useOptionalIdentity } from '../Identity'
@@ -165,7 +166,7 @@ interface LoginContainerProps {
 	collapsedEmailLogin?: boolean
 }
 
-const LoginContainer = ({ identityProviders, collapsedEmailLogin: initialCollapsedEmailLogin }: LoginContainerProps) => {
+const LoginContainer = ({ identityProviders = [], collapsedEmailLogin: initialCollapsedEmailLogin }: LoginContainerProps) => {
 	const [collapsedEmailLogin, setCollapsedEmailLogin] = useState(initialCollapsedEmailLogin ?? false)
 	const [error, setError] = useState<string>()
 	const onLoginHandler = useCallback(() => {
@@ -179,6 +180,8 @@ const LoginContainer = ({ identityProviders, collapsedEmailLogin: initialCollaps
 		}
 	}, [])
 
+	useIDPAutoInit({ onError: setError, providers: identityProviders })
+
 	const idpHandlerFeedback = useResponseHandlerFeedback({ onLogin: onLoginHandler })
 	if (idpHandlerFeedback !== null) {
 		return idpHandlerFeedback
@@ -187,9 +190,9 @@ const LoginContainer = ({ identityProviders, collapsedEmailLogin: initialCollaps
 	return <>
 		<ErrorList errors={error ? [{ message: error }] : []} />
 		{!collapsedEmailLogin && <Login resetLink={resetRequestPageName} onLogin={onLoginHandler} />}
-		{((identityProviders?.length ?? 0) > 0 || collapsedEmailLogin) && (
+		{((identityProviders.length ?? 0) > 0 || collapsedEmailLogin) && (
 			<Stack direction="vertical">
-				{identityProviders?.map((it, i) => <IDPInitButton key={i} provider={it} onError={setError}/>)}
+				{identityProviders.map((it, i) => <IDPInitButton key={i} provider={it} onError={setError}/>)}
 				{collapsedEmailLogin && <Button onClick={() => setCollapsedEmailLogin(false)}>Login with email</Button>}
 			</Stack>
 		)}

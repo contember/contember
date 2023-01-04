@@ -2034,6 +2034,9 @@ export type GridPagingState = {
 };
 
 // @public (undocumented)
+export type HandleIdpResponseError = SignInIDPErrors | 'INVALID_LOCAL_STATE';
+
+// @public (undocumented)
 export const HasManyAbsentCell: FunctionComponent<HasManyAbsentCellProps>;
 
 // @public (undocumented)
@@ -2338,19 +2341,31 @@ export const IDPInitButton: ({ provider, onError }: IDPInitButtonProps) => JSX.E
 // @public (undocumented)
 export interface IDPInitButtonProps {
     // (undocumented)
-    onError: (message: string) => void;
+    onError: UseInitIDPRedirectProps['onError'];
     // (undocumented)
     provider: IDP;
 }
 
 // @public (undocumented)
-export const IDPResponseHandler: ({ onLogin }: IDPResponseHandlerProps) => JSX.Element;
+export const IDPResponseHandler: ({ onLogin }: IDPResponseHandlerProps) => JSX.Element | null;
 
 // @public (undocumented)
 export interface IDPResponseHandlerProps {
     // (undocumented)
     onLogin?: () => void;
 }
+
+// @public (undocumented)
+export type IDPResponseState = {
+    type: 'nothing';
+} | {
+    type: 'processing';
+} | {
+    type: 'succeed';
+} | {
+    type: 'failed';
+    error: HandleIdpResponseError;
+};
 
 // @public (undocumented)
 export const ImageFieldView: <SrcField extends FieldValue = string>(props: ImageFieldViewProps<SrcField>) => ReactElement;
@@ -2527,6 +2542,8 @@ export type InviteUserPageProps = {
 
 // @public (undocumented)
 export interface InviteUserProps {
+    // (undocumented)
+    mailVariant?: string;
     // (undocumented)
     method?: InviteMethod;
     // (undocumented)
@@ -3962,6 +3979,9 @@ export interface SideDimensionsProps extends SideDimensions.CommonDimensionProps
 }
 
 // @public (undocumented)
+export type SignInIDPErrors = 'INVALID_IDP_RESPONSE' | 'IDP_VALIDATION_FAILED' | 'PERSON_NOT_FOUND';
+
+// @public (undocumented)
 export interface SignInIDPResult {
     // (undocumented)
     person: {
@@ -4452,7 +4472,38 @@ export const useForm: <V>(initialValues: V, handler?: FormHandler<V> | undefined
 export const useGridPagingState: (itemsPerPage: number | null, dataGridKey: string) => [GridPagingState, DispatchChangePage];
 
 // @public (undocumented)
+export const useHandleIDPResponse: ({ onLogin, onError }: UseHandleIDPResponseProps) => IDPResponseState;
+
+// @public (undocumented)
+export interface UseHandleIDPResponseProps {
+    // (undocumented)
+    onError?: (error: HandleIdpResponseError) => void;
+    // (undocumented)
+    onLogin?: () => void;
+}
+
+// @public (undocumented)
 export const useIdentity: () => Identity;
+
+// @public (undocumented)
+export const useIDPAutoInit: ({ onError, providers }: UseIDPAutoInitProps) => void;
+
+// @public (undocumented)
+export interface UseIDPAutoInitProps {
+    // (undocumented)
+    onError: UseInitIDPRedirectProps['onError'];
+    // (undocumented)
+    providers: readonly IDP[];
+}
+
+// @public (undocumented)
+export const useInitIDPRedirect: ({ onError }: UseInitIDPRedirectProps) => ({ provider }: IDP) => Promise<void>;
+
+// @public (undocumented)
+export interface UseInitIDPRedirectProps {
+    // (undocumented)
+    onError: (message: string) => void;
+}
 
 // @public (undocumented)
 export const useInitSignInIDP: () => TenantMutationExecutor<GQLVariableValues<    {
@@ -4468,6 +4519,7 @@ projectSlug: GQLVariableType<string, true>;
 email: GQLVariableType<string, true>;
 memberships: GQLVariableType<Membership[], true>;
 method: GQLVariableType<InviteMethod, false>;
+mailVariant: GQLVariableType<string, false>;
 }>, TenantMutationResponse<never, InviteErrorCodes>>;
 
 // Warning: (ae-forgotten-export) The symbol "ListMembersQueryVariables" needs to be exported by the entry point index.d.ts
@@ -4545,6 +4597,12 @@ export const useQuery: <R, V extends GraphQlClientVariables_2>(client: GraphQlCl
 // @public (undocumented)
 export const useRedirect: () => (target: RoutingLinkTarget, parameters?: RequestParameters) => void;
 
+// @public (undocumented)
+export const useRedirectToBacklink: () => void;
+
+// @public (undocumented)
+export const useRedirectToBacklinkCallback: () => () => void;
+
 // Warning: (ae-forgotten-export) The symbol "UpdateMembershipResult" needs to be exported by the entry point index.d.ts
 //
 // @public (undocumented)
@@ -4563,6 +4621,9 @@ export const useResetPassword: () => TenantMutationExecutor<GQLVariableValues<  
 token: GQLVariableType<string, true>;
 password: GQLVariableType<string, true>;
 }>, TenantMutationResponse<never, PasswordResetErrors>>;
+
+// @public (undocumented)
+export const useResponseHandlerFeedback: ({ onLogin }: IDPResponseHandlerProps) => JSX.Element | null;
 
 // @public (undocumented)
 export const UserListPage: <T extends {}>(props: UserListPageProps<T>) => JSX.Element;
@@ -4615,6 +4676,9 @@ export interface UsersListProps {
 export const UsersManagement: <T extends {}>(props: UserListPageProps<T>) => JSX.Element;
 
 // @public (undocumented)
+export const useSaveBacklink: () => () => void;
+
+// @public (undocumented)
 export const useSignIn: () => TenantMutationExecutor<GQLVariableValues<    {
 email: GQLVariableType<string, true>;
 password: GQLVariableType<string, true>;
@@ -4622,8 +4686,6 @@ expiration: GQLVariableType<number, false>;
 otpToken: GQLVariableType<string, false>;
 }>, TenantMutationResponse<LoginResult, LoginErrors>>;
 
-// Warning: (ae-forgotten-export) The symbol "SignInIDPErrors" needs to be exported by the entry point index.d.ts
-//
 // @public (undocumented)
 export const useSignInIDP: () => TenantMutationExecutor<GQLVariableValues<    {
 redirectUrl: GQLVariableType<string, true>;

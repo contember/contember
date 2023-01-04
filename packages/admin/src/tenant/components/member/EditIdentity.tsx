@@ -1,20 +1,19 @@
-import { useProjectSlug } from '@contember/react-client'
-import { Button, LayoutPage, Stack, useShowToast } from '@contember/ui'
-import { FC, memo, SyntheticEvent, useCallback, useEffect, useState } from 'react'
-import { NavigateBackButton, RoutingLinkTarget, useRedirect } from '../../../routing'
+import { Button, Stack, useShowToast } from '@contember/ui'
+import { FC, SyntheticEvent, useCallback, useEffect, useState } from 'react'
+import { RoutingLinkTarget, useRedirect } from '../../../routing'
 import { useUpdateProjectMembership } from '../../mutations'
 import { useProjectMembershipsQuery } from '../../queries'
 import { Membership } from '../../types'
 import { EditMembership, RolesConfig } from './EditMembership'
 
-interface EditUserProps {
+export interface EditIdentityProps {
 	project: string
 	rolesConfig?: RolesConfig
 	identityId: string
 	userListLink: RoutingLinkTarget
 }
 
-export const EditIdentity: FC<EditUserProps> = ({ project, rolesConfig, identityId, userListLink }) => {
+export const EditIdentity: FC<EditIdentityProps> = ({ project, rolesConfig, identityId, userListLink }) => {
 	const { state: previousMembershipsState } = useProjectMembershipsQuery(project, identityId)
 	const [memberships, setMemberships] = useState<(Membership | undefined)[]>([undefined])
 
@@ -77,18 +76,3 @@ export const EditIdentity: FC<EditUserProps> = ({ project, rolesConfig, identity
 		</form>
 	)
 }
-
-export const EditUserInProject: FC<{ rolesConfig: RolesConfig; identityId: string }> = memo(
-	({ rolesConfig, identityId }) => {
-		const project = useProjectSlug()
-		if (!project) {
-			return <>Not in project.</>
-		}
-		return <LayoutPage
-			title="Edit user"
-			navigation={<NavigateBackButton to={'tenantUsers'}>Back to list of users</NavigateBackButton>}
-		>
-			<EditIdentity project={project} rolesConfig={rolesConfig} identityId={identityId} userListLink={'tenantUsers'} />
-		</LayoutPage>
-	},
-)

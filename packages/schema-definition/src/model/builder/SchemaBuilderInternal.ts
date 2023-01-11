@@ -8,7 +8,7 @@ import ManyHasManyProcessor from './internal/ManyHasManyProcessor'
 import OneHasOneProcessor from './internal/OneHasOneProcessor'
 import OneHasManyProcessor from './internal/OneHasManyProcessor'
 import ManyHasOneProcessor from './internal/ManyHasOneProcessor'
-import { NamingConventions } from './../definition/NamingConventions'
+import { NamingConventions } from '@contember/schema-utils'
 import FieldBuilder from './FieldBuilder'
 
 export default class SchemaBuilderInternal {

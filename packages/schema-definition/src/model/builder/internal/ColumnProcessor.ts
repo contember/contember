@@ -1,8 +1,7 @@
 import FieldProcessor from './FieldProcessor'
 import ColumnBuilder from '../ColumnBuilder'
-import { NamingConventions } from '../../definition/NamingConventions'
 import { Model } from '@contember/schema'
-import { getColumnType } from '../../utils/getColumnType'
+import { NamingConventions, resolveDefaultColumnType } from '@contember/schema-utils'
 
 export default class ColumnProcessor implements FieldProcessor<ColumnBuilder.Options> {
 	private conventions: NamingConventions
@@ -34,7 +33,7 @@ export default class ColumnProcessor implements FieldProcessor<ColumnBuilder.Opt
 		return {
 			...common,
 			type,
-			columnType: getColumnType(type),
+			columnType: resolveDefaultColumnType(type),
 			...(options.typeAlias !== undefined ? { typeAlias: options.typeAlias } : {}),
 		}
 	}

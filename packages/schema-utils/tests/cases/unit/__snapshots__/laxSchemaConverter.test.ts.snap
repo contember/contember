@@ -1,0 +1,310 @@
+// Vitest Snapshot v1
+
+exports[`lax schema converter basic 1`] = `
+{
+  "acl": {
+    "roles": {},
+  },
+  "model": {
+    "entities": {
+      "Article": {
+        "eventLog": {
+          "enabled": true,
+        },
+        "fields": {
+          "content": {
+            "columnName": "content",
+            "columnType": "jsonb",
+            "name": "content",
+            "nullable": true,
+            "type": "Json",
+          },
+          "id": {
+            "columnName": "id",
+            "columnType": "uuid",
+            "name": "id",
+            "nullable": false,
+            "type": "Uuid",
+          },
+          "state": {
+            "columnName": "state",
+            "columnType": "ArticleState",
+            "name": "state",
+            "nullable": true,
+            "type": "Enum",
+          },
+          "title": {
+            "columnName": "title",
+            "columnType": "text",
+            "name": "title",
+            "nullable": false,
+            "type": "String",
+          },
+        },
+        "indexes": {},
+        "name": "Article",
+        "primary": "id",
+        "primaryColumn": "id",
+        "tableName": "article",
+        "unique": {},
+      },
+    },
+    "enums": {
+      "ArticleState": [
+        "draft",
+        "published",
+        "archived",
+      ],
+    },
+  },
+  "settings": {},
+  "validation": {},
+}
+`;
+
+exports[`lax schema converter many-has-many 1`] = `
+{
+  "acl": {
+    "roles": {},
+  },
+  "model": {
+    "entities": {
+      "Article": {
+        "eventLog": {
+          "enabled": true,
+        },
+        "fields": {
+          "id": {
+            "columnName": "id",
+            "columnType": "uuid",
+            "name": "id",
+            "nullable": false,
+            "type": "Uuid",
+          },
+          "tags": {
+            "inversedBy": "articles",
+            "joiningTable": {
+              "eventLog": {
+                "enabled": true,
+              },
+              "inverseJoiningColumn": {
+                "columnName": "tag_id",
+                "onDelete": "cascade",
+              },
+              "joiningColumn": {
+                "columnName": "article_id",
+                "onDelete": "cascade",
+              },
+              "tableName": "article_tags",
+            },
+            "name": "tags",
+            "target": "Tag",
+            "type": "ManyHasMany",
+          },
+          "title": {
+            "columnName": "title",
+            "columnType": "text",
+            "name": "title",
+            "nullable": false,
+            "type": "String",
+          },
+        },
+        "indexes": {},
+        "name": "Article",
+        "primary": "id",
+        "primaryColumn": "id",
+        "tableName": "article",
+        "unique": {},
+      },
+      "Tag": {
+        "eventLog": {
+          "enabled": true,
+        },
+        "fields": {
+          "articles": {
+            "name": "articles",
+            "ownedBy": "tags",
+            "target": "Article",
+            "type": "ManyHasMany",
+          },
+          "id": {
+            "columnName": "id",
+            "columnType": "uuid",
+            "name": "id",
+            "nullable": false,
+            "type": "Uuid",
+          },
+        },
+        "indexes": {},
+        "name": "Tag",
+        "primary": "id",
+        "primaryColumn": "id",
+        "tableName": "tag",
+        "unique": {},
+      },
+    },
+    "enums": {},
+  },
+  "settings": {},
+  "validation": {},
+}
+`;
+
+exports[`lax schema converter one-has-many 1`] = `
+{
+  "acl": {
+    "roles": {},
+  },
+  "model": {
+    "entities": {
+      "Article": {
+        "eventLog": {
+          "enabled": true,
+        },
+        "fields": {
+          "category": {
+            "inversedBy": "articles",
+            "joiningColumn": {
+              "columnName": "category_id",
+              "onDelete": "restrict",
+            },
+            "name": "category",
+            "nullable": true,
+            "target": "Category",
+            "type": "ManyHasOne",
+          },
+          "id": {
+            "columnName": "id",
+            "columnType": "uuid",
+            "name": "id",
+            "nullable": false,
+            "type": "Uuid",
+          },
+          "title": {
+            "columnName": "title",
+            "columnType": "text",
+            "name": "title",
+            "nullable": false,
+            "type": "String",
+          },
+        },
+        "indexes": {},
+        "name": "Article",
+        "primary": "id",
+        "primaryColumn": "id",
+        "tableName": "article",
+        "unique": {},
+      },
+      "Category": {
+        "eventLog": {
+          "enabled": true,
+        },
+        "fields": {
+          "articles": {
+            "name": "articles",
+            "ownedBy": "category",
+            "target": "Article",
+            "type": "OneHasMany",
+          },
+          "id": {
+            "columnName": "id",
+            "columnType": "uuid",
+            "name": "id",
+            "nullable": false,
+            "type": "Uuid",
+          },
+        },
+        "indexes": {},
+        "name": "Category",
+        "primary": "id",
+        "primaryColumn": "id",
+        "tableName": "category",
+        "unique": {},
+      },
+    },
+    "enums": {},
+  },
+  "settings": {},
+  "validation": {},
+}
+`;
+
+exports[`lax schema converter one-has-one 1`] = `
+{
+  "acl": {
+    "roles": {},
+  },
+  "model": {
+    "entities": {
+      "Article": {
+        "eventLog": {
+          "enabled": true,
+        },
+        "fields": {
+          "content": {
+            "inversedBy": "article",
+            "joiningColumn": {
+              "columnName": "content_id",
+              "onDelete": "restrict",
+            },
+            "name": "content",
+            "nullable": true,
+            "target": "Content",
+            "type": "OneHasOne",
+          },
+          "id": {
+            "columnName": "id",
+            "columnType": "uuid",
+            "name": "id",
+            "nullable": false,
+            "type": "Uuid",
+          },
+          "title": {
+            "columnName": "title",
+            "columnType": "text",
+            "name": "title",
+            "nullable": false,
+            "type": "String",
+          },
+        },
+        "indexes": {},
+        "name": "Article",
+        "primary": "id",
+        "primaryColumn": "id",
+        "tableName": "article",
+        "unique": {},
+      },
+      "Content": {
+        "eventLog": {
+          "enabled": true,
+        },
+        "fields": {
+          "article": {
+            "name": "article",
+            "nullable": true,
+            "ownedBy": "content",
+            "target": "Article",
+            "type": "OneHasOne",
+          },
+          "id": {
+            "columnName": "id",
+            "columnType": "uuid",
+            "name": "id",
+            "nullable": false,
+            "type": "Uuid",
+          },
+        },
+        "indexes": {},
+        "name": "Content",
+        "primary": "id",
+        "primaryColumn": "id",
+        "tableName": "content",
+        "unique": {},
+      },
+    },
+    "enums": {},
+  },
+  "settings": {},
+  "validation": {},
+}
+`;

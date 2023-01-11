@@ -26,7 +26,7 @@ const LaxSchemaRelationInner = Typesafe.intersection(
 	}),
 )
 
-export const LaxSchemaField = Typesafe.discriminatedUnion('type', {
+const LaxSchemaField = Typesafe.discriminatedUnion('type', {
 	oneHasOne: LaxSchemaRelationInner,
 	oneHasOneInverse: LaxSchemaRelationInner,
 	manyHasMany: LaxSchemaRelationInner,
@@ -48,7 +48,7 @@ export type LaxSchemaEnum = Extract<LaxSchemaField, { type: 'enum' }>
 export type LaxSchemaColumn = Extract<LaxSchemaField, { type: 'int' | 'float' | 'boolean' | 'string' | 'json' | 'datetime' | 'date' | 'uuid' }>
 export type LaxSchemaRelation = Extract<LaxSchemaField, {type: 'oneHasOne' | 'oneHasOneInverse' | 'manyHasMany' | 'manyHasManyInverse' | 'oneHasMany' | 'manyHasOne' }>
 
-export const LaxSchemaEntity = Typesafe.object({
+const LaxSchemaEntity = Typesafe.object({
 	fields: Typesafe.record(Typesafe.string, LaxSchemaField),
 })
 export type LaxSchemaEntity = ReturnType<typeof LaxSchemaEntity>

@@ -1,9 +1,2 @@
-export type {
-	LaxSchema,
-	LaxSchemaColumn,
-	LaxSchemaEntity,
-	LaxSchemaEnum,
-	LaxSchemaField,
-	LaxSchemaRelation,
-} from './schema'
+export * from './schema'
 export { LaxSchemaConverter } from './LaxSchemaConverter'

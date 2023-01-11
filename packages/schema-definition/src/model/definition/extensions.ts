@@ -1,7 +1,7 @@
 import { Model } from '@contember/schema'
 import { DecoratorFunction, EntityConstructor, FieldsDefinition } from './types'
 import { EntityRegistry, EnumRegistry } from './internal'
-import { NamingConventions } from './NamingConventions'
+import { NamingConventions } from '@contember/schema-utils'
 
 interface EntityExtensionArgs {
 	entity: Model.Entity

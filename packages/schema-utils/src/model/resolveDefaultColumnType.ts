@@ -1,7 +1,7 @@
 import { Model } from '@contember/schema'
-import { assertNever } from '../../utils'
+import { assertNever } from '../utils'
 
-export const getColumnType = (type: Exclude<Model.ColumnType, Model.ColumnType.Enum>): string => {
+export const resolveDefaultColumnType = (type: Exclude<Model.ColumnType, Model.ColumnType.Enum>): string => {
 	switch (type) {
 		case Model.ColumnType.Int:
 			return 'integer'

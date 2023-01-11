@@ -2,7 +2,7 @@ import { Model } from '@contember/schema'
 import { Interface } from '../types'
 import { CreateFieldContext, FieldDefinition } from './FieldDefinition'
 import { EnumDefinition } from '../EnumDefinition'
-import { getColumnType } from '../../utils'
+import { resolveDefaultColumnType } from '@contember/schema-utils'
 
 export class ColumnDefinition extends FieldDefinition<ColumnDefinitionOptions> {
 	type = 'ColumnDefinition' as const
@@ -79,7 +79,7 @@ export class ColumnDefinition extends FieldDefinition<ColumnDefinitionOptions> {
 		return {
 			...common,
 			type: type,
-			columnType: columnType || getColumnType(type),
+			columnType: columnType || resolveDefaultColumnType(type),
 			...(typeAlias !== undefined ? { typeAlias } : {}),
 		}
 	}

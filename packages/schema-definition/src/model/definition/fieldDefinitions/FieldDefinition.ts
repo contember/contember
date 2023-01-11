@@ -1,5 +1,5 @@
 import { Model } from '@contember/schema'
-import { NamingConventions } from '../NamingConventions'
+import { NamingConventions } from '@contember/schema-utils'
 import { EntityRegistry, EnumRegistry } from '../internal'
 
 export abstract class FieldDefinition<O> {

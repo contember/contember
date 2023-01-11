@@ -3,6 +3,7 @@ import { emptyModelSchema } from './model'
 import * as Typesafe from '@contember/typesafe'
 import { aclSchema, modelSchema, validationSchema, settingsSchema } from './type-schema'
 
+export * from './lax'
 export * from './model'
 export * from './acl'
 export * from './dataUtils'

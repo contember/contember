@@ -8,8 +8,11 @@ export class ConditionBuilder {
 		tableName: string,
 		columnName: string,
 		columnType: string,
-		condition: Input.Condition<any>,
+		condition: Input.Condition<any> | null,
 	): SqlConditionBuilder {
+		if (condition === null) {
+			return builder
+		}
 		const entries = Object.entries(condition)
 			.filter(<T extends keyof Input.Condition>(it: [string, any]): it is [T, Input.Condition[T]] =>
 				it[1] !== null,

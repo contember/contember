@@ -181,18 +181,19 @@ export namespace Input {
 	}
 
 	export type ComposedWhere<C, Opt = never> = {
-		readonly and?: readonly (Where<C, Opt> | Opt)[]
-		readonly or?: readonly (Where<C, Opt> | Opt)[]
-		readonly not?: Where<C, Opt>
+		readonly and?: (readonly (Where<C, Opt> | Opt)[]) | Opt
+		readonly or?: (readonly (Where<C, Opt> | Opt)[]) | Opt
+		readonly not?: Where<C, Opt> | Opt
 	}
 
 	export interface FieldWhere<C = Condition, Opt = never> {
-		readonly [name: string]: C | Where<C, Opt> |  readonly (Where<C, Opt> | Opt)[] //last one if for ComposedWhere
+		readonly [name: string]: Opt | C | Where<C, Opt> |  readonly (Where<C, Opt> | Opt)[] //last one if for ComposedWhere
 	}
 
 	export type Where<C = Condition, Opt = never> = ComposedWhere<C, Opt> & FieldWhere<C, Opt>
 
 	export type OptionalWhere<E = never> = Where<Condition<Value.FieldValue<E>>, null | undefined>
+	export type OptionalFieldWhere<E = never> = FieldWhere<Condition<Value.FieldValue<E>>, null | undefined>
 
 	export enum FieldMeta {
 		readable = 'readable',

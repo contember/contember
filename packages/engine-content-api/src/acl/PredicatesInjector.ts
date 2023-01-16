@@ -54,7 +54,13 @@ export class PredicatesInjector {
 		for (let field of fields) {
 			resultWhere[field] = acceptFieldVisitor(this.schema, entity, field, {
 				visitColumn: () => where[field],
-				visitRelation: context => this.injectToWhere(where[field] as Input.Where, context.targetEntity, false, context),
+				visitRelation: context => {
+					const relationWhere = where[field] as Input.OptionalWhere | null
+					if (relationWhere === null) {
+						return null
+					}
+					return this.injectToWhere(relationWhere, context.targetEntity, false, context)
+				},
 			})
 		}
 		const fieldsForPredicate = !isRoot

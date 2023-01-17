@@ -75,6 +75,9 @@ class UpdateBuilder<Result extends UpdateBuilder.UpdateResult> implements With.A
 	}
 
 	public async execute(db: Client): Promise<Result> {
+		if (this.options.values?.length === 0) {
+			return this.options.returning.parseResponse<Result>({ rows: [], rowCount: 0 })
+		}
 		const namespaceContext = new Compiler.Context(db.schema, new Set())
 		const query = this.createQuery(namespaceContext)
 		const result: Connection.Result = await db.query(query.sql, query.parameters)

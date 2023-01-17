@@ -1,10 +1,11 @@
-import { Input, Model, Value } from '@contember/schema'
+import { Acl, Input, Model, Value } from '@contember/schema'
 import { Client, InsertBuilder as DbInsertBuilder, QueryBuilder, Value as DbValue } from '@contember/database'
 import { PathFactory, WhereBuilder } from '../select'
 import { getColumnName, getColumnType } from '@contember/schema-utils'
 import { ColumnValue, ResolvedColumnValue, resolveGenericValue, resolveRowData } from '../ColumnValue'
 import { ImplementationException } from '../../exception'
-import { AbortInsert } from './Inserter'
+import { PredicateFactory } from '../../acl'
+import { AbortDataManipulation, DataManipulationBuilder } from '../DataManipulationBuilder'
 
 export interface InsertResult {
 	values: ResolvedColumnValue[]
@@ -13,41 +14,51 @@ export interface InsertResult {
 	primaryValue: Value.PrimaryValue | null
 }
 
-export class InsertBuilder {
+export class InsertBuilder implements DataManipulationBuilder {
 	private resolver: (value: Value.PrimaryValue | null) => void = () => {
 		throw new ImplementationException('InsertBuilder: Resolver called too soon')
 	}
 	public readonly insert: Promise<Value.PrimaryValue | null> = new Promise(resolve => (this.resolver = resolve))
 
-	private rowData: ColumnValue<AbortInsert | undefined>[] = []
-	private where: Input.OptionalWhere = {}
+	private rowData: Map<string, ColumnValue<AbortDataManipulation | undefined>> = new Map()
+	private where: { and: Input.OptionalWhere[] } = { and: [] }
 
 	constructor(
 		private readonly schema: Model.Schema,
 		private readonly entity: Model.Entity,
 		private readonly whereBuilder: WhereBuilder,
 		private readonly pathFactory: PathFactory,
+		private readonly predicateFactory: PredicateFactory,
 	) {}
 
-	public addFieldValue(fieldName: string, value: Value.GenericValueLike<Value.AtomicValue<AbortInsert | undefined>>) {
+	public addFieldValue(
+		fieldName: string,
+		value: Value.GenericValueLike<Value.AtomicValue<AbortDataManipulation | undefined>>,
+	): Promise<Value.AtomicValue<AbortDataManipulation | undefined>> {
 		const columnName = getColumnName(this.schema, this.entity, fieldName)
 		const columnType = getColumnType(this.schema, this.entity, fieldName)
-		this.rowData.push({ columnName, value: resolveGenericValue(value), columnType, fieldName })
+		const resolvedValue = resolveGenericValue(value)
+		this.rowData.set(columnName, { columnName, value: resolvedValue, columnType, fieldName })
+		return resolvedValue
+	}
+
+	public addPredicates(fields: string[]): void {
+		const where = this.predicateFactory.create(this.entity, Acl.Operation.create, fields)
+		this.addWhere(where)
 	}
 
 	public addWhere(where: Input.OptionalWhere): void {
-		this.where = { and: [where, this.where] }
+		this.where.and.push(where)
 	}
 
-	public async getResolvedData(): Promise<ResolvedColumnValue<AbortInsert>[]> {
-		return resolveRowData(this.rowData)
+	public async getResolvedData(): Promise<ResolvedColumnValue<AbortDataManipulation>[]> {
+		return resolveRowData([...this.rowData.values()])
 	}
 
 	public async execute(db: Client): Promise<InsertResult> {
-		let resolvedDataFinal: ResolvedColumnValue[] | null = null
 		try {
 			const resolvedData = await this.getResolvedData()
-			if (resolvedData.find(it => it.resolvedValue === AbortInsert)) {
+			if (resolvedData.find(it => it.resolvedValue === AbortDataManipulation)) {
 				this.resolver(null)
 				return { aborted: true, executed: false, primaryValue: null, values: [] }
 			}

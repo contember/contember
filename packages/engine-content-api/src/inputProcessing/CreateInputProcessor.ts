@@ -23,12 +23,8 @@ namespace CreateInputProcessor {
 	}
 
 	export interface HasManyRelationProcessor<Context, Result> {
-		connect: (
-			context: ContextWithInput<Context, Input.UniqueWhere> & { index: number; alias?: string },
-		) => Promise<Result>
-		create: (
-			context: ContextWithInput<Context, Input.CreateDataInput> & { index: number; alias?: string },
-		) => Promise<Result>
+		connect: (context: ContextWithInput<Context, Input.UniqueWhere> & { index: number; alias?: string }) => Promise<Result>
+		create: (context: ContextWithInput<Context, Input.CreateDataInput> & { index: number; alias?: string }) => Promise<Result>
 	}
 }
 

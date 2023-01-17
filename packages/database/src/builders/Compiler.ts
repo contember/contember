@@ -206,7 +206,7 @@ class Compiler {
 		namespaceContext: Compiler.Context,
 	): Literal {
 		return this.prependSchema(into, namespaceContext).appendAll(
-			Object.keys(values).map(it => new Literal(wrapIdentifier(it))),
+			values.map(it => new Literal(wrapIdentifier(it.columnName))),
 			', ',
 			[' (', ')'],
 		)
@@ -254,14 +254,14 @@ class Compiler {
 
 	private createSet(values: QueryBuilder.ResolvedValues): Literal {
 		return Literal.empty.appendAll(
-			Object.entries(values).map(([col, value]) => new Literal(wrapIdentifier(col) + ' = ').append(value)),
+			values.map(({ columnName, value }) => new Literal(wrapIdentifier(columnName) + ' = ').append(value)),
 			', ',
 		)
 	}
 
 	private createValues(values: QueryBuilder.ResolvedValues): Literal {
 		return Literal.empty.appendAll(
-			Object.entries(values).map(([col, value]) => value),
+			values.map(({ columnName, value }) => value),
 			', ',
 			['(', ')'],
 		)

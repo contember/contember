@@ -811,6 +811,7 @@ export type Project = {
 
 
 export type ProjectMembersArgs = {
+	input?: InputMaybe<ProjectMembersInput>
 	memberType?: InputMaybe<MemberType>
 }
 
@@ -818,6 +819,17 @@ export type ProjectIdentityRelation = {
 	readonly __typename?: 'ProjectIdentityRelation'
 	readonly identity: Identity
 	readonly memberships: ReadonlyArray<Membership>
+}
+
+export type ProjectMembersFilter = {
+	readonly email?: InputMaybe<Scalars['String']>
+	readonly memberType?: InputMaybe<MemberType>
+}
+
+export type ProjectMembersInput = {
+	readonly filter?: InputMaybe<ProjectMembersFilter>
+	readonly limit?: InputMaybe<Scalars['Int']>
+	readonly offset?: InputMaybe<Scalars['Int']>
 }
 
 export type ProjectSecret = {
@@ -1278,6 +1290,8 @@ export type ResolversTypes = {
 	PrepareOtpResult: ResolverTypeWrapper<PrepareOtpResult>
 	Project: ResolverTypeWrapper<Project>
 	ProjectIdentityRelation: ResolverTypeWrapper<ProjectIdentityRelation>
+	ProjectMembersFilter: ProjectMembersFilter
+	ProjectMembersInput: ProjectMembersInput
 	ProjectSecret: ProjectSecret
 	Query: ResolverTypeWrapper<{}>
 	RemoveMailTemplateError: ResolverTypeWrapper<RemoveMailTemplateError>
@@ -1391,6 +1405,8 @@ export type ResolversParentTypes = {
 	PrepareOtpResult: PrepareOtpResult
 	Project: Project
 	ProjectIdentityRelation: ProjectIdentityRelation
+	ProjectMembersFilter: ProjectMembersFilter
+	ProjectMembersInput: ProjectMembersInput
 	ProjectSecret: ProjectSecret
 	Query: {}
 	RemoveMailTemplateError: RemoveMailTemplateError

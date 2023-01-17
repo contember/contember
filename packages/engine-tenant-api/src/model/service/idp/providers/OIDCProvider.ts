@@ -1,14 +1,10 @@
-import { Client, custom, Issuer } from 'openid-client'
+import { Client, Issuer } from 'openid-client'
 import { IdentityProviderHandler, IDPClaim, InitIDPAuthResult } from '../IdentityProviderHandler'
 import { InvalidIDPConfigurationError } from '../InvalidIDPConfigurationError'
 import { catchTypesafe } from './helpers'
 import { OIDCConfiguration, OIDCInitData, OIDCResponseData } from './OIDCTypes'
 import { handleOIDCResponse, initOIDCAuth } from './OIDCHelpers'
 import { IDPValidationError } from '../IDPValidationError'
-
-custom.setHttpOptionsDefaults({
-	timeout: 5000,
-})
 
 
 export class OIDCProvider implements IdentityProviderHandler<OIDCConfiguration> {

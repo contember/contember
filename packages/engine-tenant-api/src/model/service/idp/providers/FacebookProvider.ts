@@ -1,5 +1,5 @@
 import * as Typesafe from '@contember/typesafe'
-import { Client, custom, Issuer } from 'openid-client'
+import { Client, Issuer } from 'openid-client'
 import { IdentityProviderHandler, IDPClaim, InitIDPAuthResult } from '../IdentityProviderHandler'
 import { IDPValidationError } from '../IDPValidationError'
 import { InvalidIDPConfigurationError } from '../InvalidIDPConfigurationError'
@@ -9,9 +9,7 @@ import { handleOIDCResponse, initOIDCAuth } from './OIDCHelpers'
 import { createHmac } from 'node:crypto'
 import { IDPResponseError } from '../IDPResponseError'
 
-custom.setHttpOptionsDefaults({
-	timeout: 5000,
-})
+
 
 const FacebookConfiguration = BaseOIDCConfiguration
 type FacebookConfiguration = ReturnType<typeof FacebookConfiguration>

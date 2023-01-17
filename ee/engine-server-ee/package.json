@@ -1,19 +1,19 @@
 {
   "name": "@contember/engine-server-ee",
-  "version": "1.2.0-beta.3",
+  "version": "1.2.0-rc.1",
   "license": "proprietary",
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
   "scripts": {},
   "dependencies": {
-    "@contember/database": "^1.2.0-beta.3",
-    "@contember/typesafe": "^1.2.0-beta.3",
-    "@contember/engine-common": "^1.2.0-beta.3",
-    "@contember/engine-http": "^1.2.0-beta.3",
-    "@contember/engine-server": "^1.2.0-beta.3",
-    "@contember/engine-plugins": "^1.2.0-beta.3",
-    "@contember/engine-s3-plugin": "^1.2.0-beta.3",
-    "@contember/engine-vimeo-plugin": "^1.2.0-beta.3",
+    "@contember/database": "^1.2.0-rc.1",
+    "@contember/typesafe": "^1.2.0-rc.1",
+    "@contember/engine-common": "^1.2.0-rc.1",
+    "@contember/engine-http": "^1.2.0-rc.1",
+    "@contember/engine-server": "^1.2.0-rc.1",
+    "@contember/engine-plugins": "^1.2.0-rc.1",
+    "@contember/engine-s3-plugin": "^1.2.0-rc.1",
+    "@contember/engine-vimeo-plugin": "^1.2.0-rc.1",
     "graphql": "^16.5.0",
     "koa": "^2.11.0",
     "heapdump": "^0.3.15",
@@ -22,7 +22,7 @@
     "uuid": "^8.3.1"
   },
   "devDependencies": {
-    "@contember/engine-api-tester": "^1.2.0-beta.3",
+    "@contember/engine-api-tester": "^1.2.0-rc.1",
     "@types/koa": "^2.11.3",
     "@types/node": "^18"
   }

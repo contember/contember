@@ -76,7 +76,9 @@ export class IDPManager {
 			}
 			try {
 				const providerService = this.idpRegistry.getHandler(existing.type)
-				providerService.validateConfiguration(data.configuration)
+				if (data.configuration !== undefined) {
+					providerService.validateConfiguration(data.configuration)
+				}
 			} catch (e) {
 				if (e instanceof InvalidIDPConfigurationError) {
 					return new ResponseError(UpdateIdpErrorCode.InvalidConfiguration, `Invalid IDP configuration: ${e.message}`)

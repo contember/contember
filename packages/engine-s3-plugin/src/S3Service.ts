@@ -1,15 +1,10 @@
-import { extension } from 'mime-types'
+import { extension as resolveExtension } from 'mime-types'
 import { resolveS3PublicBaseUrl, S3Config } from './Config'
-import { ObjectKeyVerifier } from './ObjectKeyVerifier'
-import { ForbiddenError } from '@contember/graphql-utils'
+import { ForbiddenError, UserInputError } from '@contember/graphql-utils'
 import { Providers } from '@contember/engine-plugins'
 import { S3Signer } from './S3Signer'
-
-export enum S3Acl {
-	None = 'none',
-	PublicRead = 'public-read',
-	Private = 'private',
-}
+import { S3GenerateSignedUploadInput } from './S3SchemaTypes'
+import { S3ObjectAuthorizator } from './S3ObjectAuthorizator'
 
 type SignedReadUrl = {
 	url: string
@@ -34,82 +29,95 @@ export class S3Service {
 
 	private readonly signer: S3Signer
 
-	constructor(public readonly config: S3Config, private readonly providers: Providers) {
+	constructor(
+		public readonly config: S3Config,
+		private readonly providers: Providers,
+		private readonly authorizator: S3ObjectAuthorizator,
+	) {
 		this.publicBaseUrl = resolveS3PublicBaseUrl(config)
 		this.signer = new S3Signer(config, providers)
 	}
 
 	public getSignedUploadUrl(
-		contentType: string,
-		verifyKey: ObjectKeyVerifier,
-		acl?: S3Acl,
-		expiration?: number,
-		prefix?: string,
+		{ acl, contentDisposition, contentType, expiration, prefix, suffix, fileName, extension, size }: S3GenerateSignedUploadInput,
 	): SignedUploadUrl {
-		const ext = extension(contentType) || 'bin'
+		const ext = extension ?? ((contentType ? resolveExtension(contentType) : null) || 'bin')
 		const id = this.providers.uuid()
-		const localObjectKey = (prefix ? prefix + '/' : '') + `${id}.${ext}`
-		verifyKey(localObjectKey)
+		const localObjectKey = (prefix ? prefix + '/' : '') + `${id}${suffix ?? ''}.${ext}`
+		this.authorizator.verifyUploadAccess({ key: localObjectKey, size })
+
 		const objectKey = (this.config.prefix ? this.config.prefix + '/' : '') + localObjectKey
 
 		const bucket = this.config.bucket
 		if (acl && this.config.noAcl) {
-			throw new Error('ACL is not supported')
+			throw new UserInputError('ACL is not supported')
 		}
 
-		const aclValue = this.config.noAcl || acl === S3Acl.None ? undefined : acl || S3Acl.PublicRead
+		const headers: Record<string, string> = {
+			'Cache-Control': 'immutable',
+		}
+		if (contentType) {
+			headers['Content-Type'] = contentType
+		}
+
+		if (!this.config.noAcl && acl !== 'NONE') {
+			const mapping = { PUBLIC_READ: 'public-read', PRIVATE: 'private' }
+			headers['x-amz-acl'] = mapping[acl ?? 'PUBLIC_READ']
+		}
+		if (fileName || contentDisposition) {
+			let contentDispositionHeader = contentDisposition?.toLowerCase() ?? 'inline'
+			if (fileName) {
+				contentDispositionHeader += `; filename*=UTF-8''${encodeURIComponent(fileName)}`
+			}
+			headers['Content-Disposition'] = contentDispositionHeader
+		}
+		const headersToSend = Object.entries(headers).map(([key, value]) => ({ key, value }))
+
+		// intentionally not sending following headers
+		if (size) {
+			headers['Content-Length'] = String(size)
+		}
+
 		const url = this.signer.sign({
 			action: 'upload',
-			expiration: expiration || 3600,
+			expiration: expiration ?? 3600,
 			key: objectKey,
-			headers: {
-				'Content-Type': contentType,
-				'Cache-Control': 'immutable',
-				...(aclValue ? { 'x-amz-acl': aclValue } : {}),
-			},
+			headers: { ...headers },
 		})
+
 		const publicUrl = this.formatPublicUrl(objectKey)
 		return {
 			bucket,
 			objectKey,
 			url,
 			publicUrl,
-			headers: [
-				{
-					key: 'Content-Type',
-					value: contentType,
-				},
-				{
-					key: 'Cache-Control',
-					value: 'immutable',
-				},
-				...(aclValue ? [{ key: 'X-Amz-Acl', value: aclValue }] : []),
-			],
+			headers: headersToSend,
 			method: 'PUT',
 		}
 	}
 
-	public getSignedReadUrl(objectKey: string, verifyKey: ObjectKeyVerifier, expiration?: number): SignedReadUrl {
+	public getSignedReadUrl({ objectKey, expiration }: { objectKey: string; expiration: number | null}): SignedReadUrl {
 		const bucket = this.config.bucket
 
 		const publicPrefix = this.formatPublicUrl('')
 		if (objectKey.startsWith(publicPrefix)) {
-			objectKey = objectKey.substr(publicPrefix.length)
+			objectKey = objectKey.substring(publicPrefix.length)
 		}
 		if (this.config.prefix && !objectKey.startsWith(this.config.prefix)) {
 			throw new ForbiddenError(
 				`Given object key "${objectKey}" does not start with a project prefix "${this.config.prefix}"`,
 			)
 		}
-		objectKey = objectKey.substr(this.config.prefix.length + 1)
-		verifyKey(objectKey)
+		objectKey = objectKey.substring(this.config.prefix.length + 1)
+		this.authorizator.verifyReadAccess({ key: objectKey })
 
 		const url = this.signer.sign({
 			action: 'read',
-			expiration: expiration || 3600,
+			expiration: expiration ?? 3600,
 			key: objectKey,
 			headers: {},
 		})
+
 		return {
 			bucket,
 			objectKey,
@@ -125,7 +133,7 @@ export class S3Service {
 }
 
 export class S3ServiceFactory {
-	public create(config: S3Config, providers: Providers) {
-		return new S3Service(config, providers)
+	public create(config: S3Config, providers: Providers, authorizator: S3ObjectAuthorizator) {
+		return new S3Service(config, providers, authorizator)
 	}
 }

@@ -4,9 +4,9 @@ import { Builder } from '@contember/dic'
 import {
 	AclSchemaAccessNodeFactory,
 	ApiKeyManager,
-	ApiKeyService,
+	ApiKeyService, AppleProvider,
 	DatabaseContext,
-	DatabaseContextFactory,
+	DatabaseContextFactory, FacebookProvider,
 	Identity,
 	IdentityFactory,
 	IDPHandlerRegistry,
@@ -158,6 +158,8 @@ export class TenantContainerFactory {
 			.addService('idpRegistry', () => {
 				const idpRegistry = new IDPHandlerRegistry()
 				idpRegistry.registerHandler('oidc', new OIDCProvider())
+				idpRegistry.registerHandler('facebook', new FacebookProvider())
+				idpRegistry.registerHandler('apple', new AppleProvider())
 				return idpRegistry
 			})
 			.addService('idpSignInManager', ({ apiKeyManager, idpRegistry }) =>

@@ -28,4 +28,5 @@ export class UpdateIdpCommand implements Command<void> {
 export type UpdateIdpData = {
 	options?: Partial<IdentityProviderData['options']>
 	configuration?: IdentityProviderData['configuration']
+	type?: string
 }

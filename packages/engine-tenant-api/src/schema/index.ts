@@ -413,6 +413,7 @@ export type InitSignInIdpError = {
 }
 
 export enum InitSignInIdpErrorCode {
+	IdpValidationFailed = 'IDP_VALIDATION_FAILED',
 	ProviderNotFound = 'PROVIDER_NOT_FOUND'
 }
 
@@ -533,7 +534,7 @@ export type Mutation = {
 	readonly __typename?: 'Mutation'
 	readonly addIDP?: Maybe<AddIdpResponse>
 	readonly addMailTemplate?: Maybe<AddMailTemplateResponse>
-	/** @deprecated use addMailtemplate */
+	/** @deprecated use addMailTemplate */
 	readonly addProjectMailTemplate?: Maybe<AddMailTemplateResponse>
 	readonly addProjectMember?: Maybe<AddProjectMemberResponse>
 	readonly changeMyPassword?: Maybe<ChangeMyPasswordResponse>
@@ -552,7 +553,7 @@ export type Mutation = {
 	readonly invite?: Maybe<InviteResponse>
 	readonly prepareOtp?: Maybe<PrepareOtpResponse>
 	readonly removeMailTemplate?: Maybe<RemoveMailTemplateResponse>
-	/** @deprecated use removeMailtemplate */
+	/** @deprecated use removeMailTemplate */
 	readonly removeProjectMailTemplate?: Maybe<RemoveMailTemplateResponse>
 	readonly removeProjectMember?: Maybe<RemoveProjectMemberResponse>
 	readonly resetPassword?: Maybe<ResetPasswordResponse>
@@ -664,8 +665,9 @@ export type MutationEnableIdpArgs = {
 
 
 export type MutationInitSignInIdpArgs = {
+	data?: InputMaybe<Scalars['Json']>
 	identityProvider: Scalars['String']
-	redirectUrl: Scalars['String']
+	redirectUrl?: InputMaybe<Scalars['String']>
 }
 
 
@@ -721,11 +723,12 @@ export type MutationSignInArgs = {
 
 
 export type MutationSignInIdpArgs = {
+	data?: InputMaybe<Scalars['Json']>
 	expiration?: InputMaybe<Scalars['Int']>
 	identityProvider: Scalars['String']
-	idpResponse: IdpResponseInput
-	redirectUrl: Scalars['String']
-	sessionData: Scalars['Json']
+	idpResponse?: InputMaybe<IdpResponseInput>
+	redirectUrl?: InputMaybe<Scalars['String']>
+	sessionData?: InputMaybe<Scalars['Json']>
 }
 
 
@@ -757,6 +760,7 @@ export type MutationUpdateIdpArgs = {
 	configuration?: InputMaybe<Scalars['Json']>
 	identityProvider: Scalars['String']
 	options?: InputMaybe<IdpOptions>
+	type?: InputMaybe<Scalars['String']>
 }
 
 
@@ -1770,7 +1774,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
 	disableIDP?: Resolver<Maybe<ResolversTypes['DisableIDPResponse']>, ParentType, ContextType, RequireFields<MutationDisableIdpArgs, 'identityProvider'>>
 	disableOtp?: Resolver<Maybe<ResolversTypes['DisableOtpResponse']>, ParentType, ContextType>
 	enableIDP?: Resolver<Maybe<ResolversTypes['EnableIDPResponse']>, ParentType, ContextType, RequireFields<MutationEnableIdpArgs, 'identityProvider'>>
-	initSignInIDP?: Resolver<Maybe<ResolversTypes['InitSignInIDPResponse']>, ParentType, ContextType, RequireFields<MutationInitSignInIdpArgs, 'identityProvider' | 'redirectUrl'>>
+	initSignInIDP?: Resolver<Maybe<ResolversTypes['InitSignInIDPResponse']>, ParentType, ContextType, RequireFields<MutationInitSignInIdpArgs, 'identityProvider'>>
 	invite?: Resolver<Maybe<ResolversTypes['InviteResponse']>, ParentType, ContextType, RequireFields<MutationInviteArgs, 'email' | 'memberships' | 'projectSlug'>>
 	prepareOtp?: Resolver<Maybe<ResolversTypes['PrepareOtpResponse']>, ParentType, ContextType, Partial<MutationPrepareOtpArgs>>
 	removeMailTemplate?: Resolver<Maybe<ResolversTypes['RemoveMailTemplateResponse']>, ParentType, ContextType, RequireFields<MutationRemoveMailTemplateArgs, 'templateIdentifier'>>
@@ -1779,7 +1783,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
 	resetPassword?: Resolver<Maybe<ResolversTypes['ResetPasswordResponse']>, ParentType, ContextType, RequireFields<MutationResetPasswordArgs, 'password' | 'token'>>
 	setProjectSecret?: Resolver<Maybe<ResolversTypes['SetProjectSecretResponse']>, ParentType, ContextType, RequireFields<MutationSetProjectSecretArgs, 'key' | 'projectSlug' | 'value'>>
 	signIn?: Resolver<Maybe<ResolversTypes['SignInResponse']>, ParentType, ContextType, RequireFields<MutationSignInArgs, 'email' | 'password'>>
-	signInIDP?: Resolver<Maybe<ResolversTypes['SignInIDPResponse']>, ParentType, ContextType, RequireFields<MutationSignInIdpArgs, 'identityProvider' | 'idpResponse' | 'redirectUrl' | 'sessionData'>>
+	signInIDP?: Resolver<Maybe<ResolversTypes['SignInIDPResponse']>, ParentType, ContextType, RequireFields<MutationSignInIdpArgs, 'identityProvider'>>
 	signOut?: Resolver<Maybe<ResolversTypes['SignOutResponse']>, ParentType, ContextType, Partial<MutationSignOutArgs>>
 	signUp?: Resolver<Maybe<ResolversTypes['SignUpResponse']>, ParentType, ContextType, RequireFields<MutationSignUpArgs, 'email'>>
 	unmanagedInvite?: Resolver<Maybe<ResolversTypes['InviteResponse']>, ParentType, ContextType, RequireFields<MutationUnmanagedInviteArgs, 'email' | 'memberships' | 'projectSlug'>>

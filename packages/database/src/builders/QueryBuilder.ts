@@ -14,7 +14,8 @@ namespace QueryBuilder {
 	export type ColumnIdentifier = ColumnFqn | TableAliasAndColumn
 
 	export type Values = { [columnName: string]: QueryBuilder.ColumnExpression | Value }
-	export type ResolvedValues = { [columnName: string]: Literal }
+	export type ResolvedValue = { columnName: string; value: Literal }
+	export type ResolvedValues = ResolvedValue[]
 
 	export type ColumnExpression = Literal | ((expressionFactory: ColumnExpressionFactory) => Literal | undefined)
 	export type ColumnExpressionMap = { [columnName: string]: QueryBuilder.ColumnExpression }

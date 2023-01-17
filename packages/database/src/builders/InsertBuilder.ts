@@ -109,7 +109,7 @@ class InsertBuilder<Result extends InsertBuilder.InsertResult> implements With.A
 
 		if (this.options.from !== undefined) {
 			let queryBuilder: SelectBuilder<SelectBuilder.Result> = SelectBuilder.create()
-			queryBuilder = Object.values(values).reduce((qb, raw) => qb.select(raw), queryBuilder)
+			queryBuilder = values.reduce((qb, { value }) => qb.select(value), queryBuilder)
 			queryBuilder = this.options.from(queryBuilder)
 			from = queryBuilder.createQuery(context.withAlias(...this.options.with.getAliases()))
 		}

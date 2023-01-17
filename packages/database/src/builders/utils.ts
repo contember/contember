@@ -1,5 +1,4 @@
 import { Literal } from '../Literal'
-import { Value } from '../types'
 import { QueryBuilder } from './QueryBuilder'
 import { ColumnExpressionFactory } from './ColumnExpressionFactory'
 import { toFqnWrap } from './formatUtils'
@@ -8,16 +7,14 @@ export { toFqnWrap }
 
 export function resolveValues(values: QueryBuilder.Values): QueryBuilder.ResolvedValues {
 	return Object.entries(values)
-		.map(([key, value]): [string, Literal | Value | undefined] => {
-			if (typeof value === 'function') {
-				return [key, value(new ColumnExpressionFactory())]
-			} else if (value instanceof Literal) {
-				return [key, value]
+		.map(([key, value]) => {
+			const resolved = typeof value === 'function' ? value(new ColumnExpressionFactory()) : value
+			return {
+				columnName: key,
+				value: resolved === undefined || resolved instanceof Literal ? resolved : new Literal('?', [resolved]),
 			}
-			return [key, new Literal('?', [value])]
 		})
-		.filter((it): it is [string, Literal] => it[1] !== undefined)
-		.reduce((result, [key, value]) => ({ ...result, [key]: value }), {})
+		.filter((it): it is QueryBuilder.ResolvedValue => it.value !== undefined)
 }
 
 export function columnExpressionToLiteral(

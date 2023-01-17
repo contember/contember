@@ -1,6 +1,6 @@
 import { ApiKeyManager } from './apiKey'
 import { IdentityProviderBySlugQuery, PersonByIdPQuery, PersonQuery, PersonRow } from '../queries'
-import { IDPClaim, IDPHandlerRegistry, IDPResponse, IDPResponseError, IDPValidationError } from './idp'
+import { IDPClaim, IDPHandlerRegistry, IDPResponseError, IDPValidationError } from './idp'
 import { Response, ResponseError, ResponseOk } from '../utils/Response'
 import { InitSignInIdpErrorCode, SignInIdpErrorCode } from '../../schema'
 import { DatabaseContext } from '../utils'
@@ -18,9 +18,7 @@ class IDPSignInManager {
 	async signInIDP(
 		dbContext: DatabaseContext,
 		idpSlug: string,
-		redirectUrl: string,
-		idpResponse: IDPResponse,
-		sessionData: any,
+		responseData: unknown,
 		expiration?: number,
 	): Promise<IDPSignInManager.SignInIDPResponse> {
 		return dbContext.transaction(async db => {
@@ -34,9 +32,7 @@ class IDPSignInManager {
 			try {
 				claim = await providerService.processResponse(
 					validatedConfig,
-					redirectUrl,
-					idpResponse,
-					sessionData,
+					responseData,
 				)
 			} catch (e) {
 				if (e instanceof IDPResponseError) {
@@ -57,15 +53,22 @@ class IDPSignInManager {
 		})
 	}
 
-	async initSignInIDP(dbContext: DatabaseContext, idpSlug: string, redirectUrl: string): Promise<IDPSignInManager.InitSignInIDPResponse> {
+	async initSignInIDP(dbContext: DatabaseContext, idpSlug: string, data: unknown): Promise<IDPSignInManager.InitSignInIDPResponse> {
 		const provider = await dbContext.queryHandler.fetch(new IdentityProviderBySlugQuery(idpSlug))
 		if (!provider || provider.disabledAt) {
 			return new ResponseError(InitSignInIdpErrorCode.ProviderNotFound, `Identity provider ${idpSlug} not found`)
 		}
 		const providerService = this.idpRegistry.getHandler(provider.type)
 		const validatedConfig = providerService.validateConfiguration(provider.configuration)
-		const initResponse = await providerService.initAuth(validatedConfig, redirectUrl)
-		return new ResponseOk(initResponse)
+		try {
+			const initResponse = await providerService.initAuth(validatedConfig, data)
+			return new ResponseOk(initResponse)
+		} catch (e) {
+			if (e instanceof IDPValidationError) {
+				return new ResponseError(InitSignInIdpErrorCode.IdpValidationFailed, e.message)
+			}
+			throw e
+		}
 	}
 
 	private async resolvePerson(db: DatabaseContext, claim: IDPClaim, provider: IdentityProviderRow): Promise<PersonRow | null> {

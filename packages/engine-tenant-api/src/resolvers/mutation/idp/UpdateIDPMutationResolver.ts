@@ -15,6 +15,7 @@ export class UpdateIDPMutationResolver implements MutationResolvers {
 		})
 		const result = await this.idpManager.updateIDP(context.db, args.identityProvider, {
 			configuration: args.configuration,
+			type: args.type ?? undefined,
 			options: {
 				autoSignUp: args.options?.autoSignUp ?? undefined,
 				exclusive: args.options?.exclusive ?? undefined,

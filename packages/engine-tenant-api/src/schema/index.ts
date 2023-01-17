@@ -760,6 +760,7 @@ export type MutationUpdateIdpArgs = {
 	configuration?: InputMaybe<Scalars['Json']>
 	identityProvider: Scalars['String']
 	options?: InputMaybe<IdpOptions>
+	type?: InputMaybe<Scalars['String']>
 }
 
 

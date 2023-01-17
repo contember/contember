@@ -75,9 +75,11 @@ export class IDPManager {
 				return new ResponseError(UpdateIdpErrorCode.NotFound, `IDP ${slug} not found`)
 			}
 			try {
-				const providerService = this.idpRegistry.getHandler(existing.type)
-				if (data.configuration !== undefined) {
-					providerService.validateConfiguration(data.configuration)
+				const type = data.type ?? existing.type
+				const configuration = data.configuration ?? existing.configuration
+				const providerService = this.idpRegistry.getHandler(type)
+				if (data.configuration !== undefined || type !== existing.type) {
+					providerService.validateConfiguration(configuration)
 				}
 			} catch (e) {
 				if (e instanceof InvalidIDPConfigurationError) {

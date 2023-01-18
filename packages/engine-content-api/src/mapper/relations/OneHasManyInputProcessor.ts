@@ -10,7 +10,7 @@ export class OneHasManyInputProcessor {
 	}
 
 	public async connect(
-		{ entity, targetEntity, targetRelation, input }: UpdateInputProcessor.ContextWithInput<Model.OneHasManyContext, Input.UniqueWhere>,
+		{ entity, targetEntity, targetRelation, input }: Model.OneHasManyContext & { input: Input.UniqueWhere },
 		primary: Input.PrimaryValue,
 	) {
 		return await this.mapper.update(targetEntity, input, {
@@ -19,7 +19,7 @@ export class OneHasManyInputProcessor {
 	}
 
 	public async create(
-		{ entity, targetEntity, targetRelation, input }: UpdateInputProcessor.ContextWithInput<Model.OneHasManyContext, Input.CreateDataInput>,
+		{ entity, targetEntity, targetRelation, input }: Model.OneHasManyContext & { input: Input.CreateDataInput },
 		primary: Input.PrimaryValue,
 	) {
 		return await this.mapper.insert(targetEntity, {
@@ -28,8 +28,23 @@ export class OneHasManyInputProcessor {
 		})
 	}
 
+	public async connectOrCreate(
+		{ entity, targetRelation, targetEntity, input: { connect, create } }: Model.OneHasManyContext & { input: Input.ConnectOrCreateInput },
+		primary: Input.PrimaryValue,
+	) {
+		const connectData = {
+			[targetRelation.name]: {
+				connect: { [entity.primary]: primary },
+			},
+		}
+		return await this.mapper.upsert(targetEntity, connect, connectData, {
+			...create,
+			...connectData,
+		})
+	}
+
 	public async update(
-		{ entity, targetEntity, targetRelation, input: { data, where } }: UpdateInputProcessor.ContextWithInput<Model.OneHasManyContext, UpdateInputProcessor.UpdateManyInput>,
+		{ entity, targetEntity, targetRelation, input: { data, where } }: Model.OneHasManyContext & { input: UpdateInputProcessor.UpdateManyInput },
 		primary: Input.PrimaryValue,
 	) {
 		return await this.mapper.update(
@@ -43,7 +58,7 @@ export class OneHasManyInputProcessor {
 	}
 
 	public async upsert(
-		{ entity, targetEntity, targetRelation, input: { create, update, where } }: UpdateInputProcessor.ContextWithInput<Model.OneHasManyContext, UpdateInputProcessor.UpsertManyInput>,
+		{ entity, targetEntity, targetRelation, input: { create, update, where } }: Model.OneHasManyContext & { input: UpdateInputProcessor.UpsertManyInput },
 		primary: Input.PrimaryValue,
 	) {
 		const result = await this.mapper.update(
@@ -64,7 +79,7 @@ export class OneHasManyInputProcessor {
 	}
 
 	public async disconnect(
-		{ entity, targetEntity, relation, targetRelation, input }: UpdateInputProcessor.ContextWithInput<Model.OneHasManyContext, Input.UniqueWhere>,
+		{ entity, targetEntity, relation, targetRelation, input }: Model.OneHasManyContext & { input: Input.UniqueWhere },
 		primary: Input.PrimaryValue,
 	) {
 		return await this.mapper.update(
@@ -75,7 +90,7 @@ export class OneHasManyInputProcessor {
 	}
 
 	public async delete(
-		{ entity, targetEntity, relation, targetRelation, input }: UpdateInputProcessor.ContextWithInput<Model.OneHasManyContext, Input.UniqueWhere>,
+		{ entity, targetEntity, relation, targetRelation, input }: Model.OneHasManyContext & { input: Input.UniqueWhere },
 		primary: Input.PrimaryValue,
 	) {
 		return await this.mapper.delete(targetEntity, {

@@ -1,7 +1,7 @@
 import { Input, Model } from '@contember/schema'
 
 interface CreateInputProcessor<Result = void> {
-	column(context: CreateInputProcessor.ContextWithInput<Model.ColumnContext, Input.ColumnValue | undefined>): Promise<Result>
+	column(context: Model.ColumnContext & { input: Input.ColumnValue | undefined }): Promise<Result>
 
 	manyHasManyInverse: CreateInputProcessor.HasManyRelationProcessor<Model.ManyHasManyInverseContext, Result>
 	manyHasManyOwning: CreateInputProcessor.HasManyRelationProcessor<Model.ManyHasManyOwningContext, Result>
@@ -14,17 +14,18 @@ interface CreateInputProcessor<Result = void> {
 }
 
 namespace CreateInputProcessor {
-	export type ContextWithInput<Context, Input> = Context & { input: Input }
 
 	export interface HasOneRelationProcessor<Context, Result> {
-		nothing?: (context: ContextWithInput<Context, undefined>) => Promise<Result>
-		connect: (context: ContextWithInput<Context, Input.UniqueWhere>) => Promise<Result>
-		create: (context: ContextWithInput<Context, Input.CreateDataInput>) => Promise<Result>
+		nothing?: (context: Context & { input: undefined }) => Promise<Result>
+		connect: (context: Context & { input: Input.UniqueWhere }) => Promise<Result>
+		create: (context: Context & { input: Input.CreateDataInput }) => Promise<Result>
+		connectOrCreate: (context: Context & { input: Input.ConnectOrCreateInput }) => Promise<Result>
 	}
 
 	export interface HasManyRelationProcessor<Context, Result> {
-		connect: (context: ContextWithInput<Context, Input.UniqueWhere> & { index: number; alias?: string }) => Promise<Result>
-		create: (context: ContextWithInput<Context, Input.CreateDataInput> & { index: number; alias?: string }) => Promise<Result>
+		connect: (context: Context & { input: Input.UniqueWhere } & { index: number; alias?: string }) => Promise<Result>
+		create: (context: Context & { input: Input.CreateDataInput } & { index: number; alias?: string }) => Promise<Result>
+		connectOrCreate: (context: Context & { input: Input.ConnectOrCreateInput } & { index: number; alias?: string }) => Promise<Result>
 	}
 }
 

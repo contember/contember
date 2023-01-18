@@ -21,7 +21,7 @@ export class ManyHasOneInputProcessor {
 	}
 
 	public async connect(
-		{ targetEntity, relation, input }: UpdateInputProcessor.ContextWithInput<Model.ManyHasOneContext, Input.UniqueWhere>,
+		{ targetEntity, relation, input }: Model.ManyHasOneContext & { input: Input.UniqueWhere },
 		builder: DataManipulationBuilder,
 	) {
 		const result: MutationResultList = []
@@ -37,7 +37,7 @@ export class ManyHasOneInputProcessor {
 	}
 
 	public async create(
-		{ relation, targetEntity, input }: UpdateInputProcessor.ContextWithInput<Model.ManyHasOneContext, Input.CreateDataInput>,
+		{ relation, targetEntity, input }: Model.ManyHasOneContext & { input: Input.CreateDataInput },
 		builder: DataManipulationBuilder,
 	) {
 		const result: MutationResultList = []
@@ -53,8 +53,30 @@ export class ManyHasOneInputProcessor {
 		return result
 	}
 
+	public async connectOrCreate(
+		{ input: { connect, create }, relation, targetEntity }: Model.ManyHasOneContext & { input: Input.ConnectOrCreateInput },
+		builder: DataManipulationBuilder,
+	) {
+		const result: MutationResultList = []
+		await builder.addFieldValue(relation.name, async () => {
+			const value = await this.mapper.getPrimaryValue(targetEntity, connect)
+			if (value) {
+				return value
+			}
+			const insertPromise = this.mapper.insert(targetEntity, create)
+			const insertResult = await insertPromise
+			const primary = getInsertPrimary(insertResult)
+			if (!primary) {
+				result.push(...insertResult)
+				return AbortDataManipulation
+			}
+			return primary
+		})
+		return result
+	}
+
 	public async update(
-		{ entity, relation, targetEntity, targetRelation, input }: UpdateInputProcessor.ContextWithInput<Model.ManyHasOneContext, Input.UpdateDataInput>,
+		{ entity, relation, targetEntity, targetRelation, input }: Model.ManyHasOneContext & { input: Input.UpdateDataInput },
 		primary: Input.PrimaryValue,
 	) {
 		const inversePrimary = await this.mapper.selectField(
@@ -69,7 +91,7 @@ export class ManyHasOneInputProcessor {
 	}
 
 	public async upsert(
-		{ entity, relation, targetEntity, input: { create, update } }: UpdateInputProcessor.ContextWithInput<Model.ManyHasOneContext, UpdateInputProcessor.UpsertInput>,
+		{ entity, relation, targetEntity, input: { create, update } }: Model.ManyHasOneContext & { input: UpdateInputProcessor.UpsertInput },
 		builder: DataManipulationBuilder,
 		primary: Input.PrimaryValue,
 	) {
@@ -100,7 +122,7 @@ export class ManyHasOneInputProcessor {
 	}
 
 	public async disconnect(
-		{ entity, targetEntity, relation, targetRelation }: UpdateInputProcessor.ContextWithInput<Model.ManyHasOneContext, undefined>,
+		{ entity, targetEntity, relation, targetRelation }: Model.ManyHasOneContext & { input: undefined },
 		builder: DataManipulationBuilder,
 	) {
 		if (!relation.nullable) {
@@ -111,7 +133,7 @@ export class ManyHasOneInputProcessor {
 	}
 
 	public async delete(
-		{ entity, targetEntity, relation, targetRelation }: UpdateInputProcessor.ContextWithInput<Model.ManyHasOneContext, undefined>,
+		{ entity, targetEntity, relation, targetRelation }: Model.ManyHasOneContext & { input: undefined },
 		builder: UpdateBuilder,
 		primary: Input.PrimaryValue,
 	) {

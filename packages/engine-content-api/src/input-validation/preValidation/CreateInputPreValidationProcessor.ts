@@ -17,29 +17,35 @@ export class CreateInputPreValidationProcessor implements CreateInputProcessor<R
 	manyHasManyInverse: CreateInputProcessor.HasManyRelationProcessor<Model.ManyHasManyInverseContext, Result> = {
 		connect: NoResult,
 		create: context => this.validateCreate(context),
+		connectOrCreate: context => this.validateCreate({ ...context, input: context.input.create }),
 	}
 
 	manyHasManyOwning: CreateInputProcessor.HasManyRelationProcessor<Model.ManyHasManyOwningContext, Result> = {
 		connect: NoResult,
 		create: context => this.validateCreate(context),
+		connectOrCreate: context => this.validateCreate({ ...context, input: context.input.create }),
 	}
 
 	manyHasOne: CreateInputProcessor.HasOneRelationProcessor<Model.ManyHasOneContext, Result> = {
 		connect: NoResult,
 		create: context => this.validateCreate(context),
+		connectOrCreate: context => this.validateCreate({ ...context, input: context.input.create }),
 	}
 
 	oneHasMany: CreateInputProcessor.HasManyRelationProcessor<Model.OneHasManyContext, Result> = {
 		connect: NoResult,
 		create: context => this.validateCreate(context),
+		connectOrCreate: context => this.validateCreate({ ...context, input: context.input.create }),
 	}
 	oneHasOneInverse: CreateInputProcessor.HasOneRelationProcessor<Model.OneHasOneInverseContext, Result> = {
 		connect: NoResult,
 		create: context => this.validateCreate(context),
+		connectOrCreate: context => this.validateCreate({ ...context, input: context.input.create }),
 	}
 	oneHasOneOwning: CreateInputProcessor.HasOneRelationProcessor<Model.OneHasOneOwningContext, Result> = {
 		connect: NoResult,
 		create: context => this.validateCreate(context),
+		connectOrCreate: context => this.validateCreate({ ...context, input: context.input.create }),
 	}
 
 	async validateCreate(context: {

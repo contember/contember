@@ -2,7 +2,7 @@ import { Input, Model } from '@contember/schema'
 
 
 interface UpdateInputProcessor<Result = void> {
-	column(context: UpdateInputProcessor.ContextWithInput<Model.ColumnContext, Input.ColumnValue | undefined>): Promise<Result>
+	column(context: Model.ColumnContext & { input: Input.ColumnValue | undefined }): Promise<Result>
 
 	manyHasManyInverse: UpdateInputProcessor.HasManyRelationInputProcessor<Model.ManyHasManyInverseContext, Result>
 
@@ -18,7 +18,6 @@ interface UpdateInputProcessor<Result = void> {
 }
 
 namespace UpdateInputProcessor {
-	export type ContextWithInput<Context, Input> = Context & { input: Input }
 	export type UpsertInput = { update: Input.UpdateDataInput; create: Input.CreateDataInput }
 	export type UpdateManyInput = { where: Input.UniqueWhere; data: Input.UpdateDataInput }
 	export type UpsertManyInput = {
@@ -28,31 +27,35 @@ namespace UpdateInputProcessor {
 	}
 
 	export interface HasOneRelationInputProcessor<Context, Result> {
-		connect(context: ContextWithInput<Context, Input.UniqueWhere>): Promise<Result>
+		connect(context: Context & { input: Input.UniqueWhere }): Promise<Result>
 
-		create(context: ContextWithInput<Context, Input.CreateDataInput>): Promise<Result>
+		create(context: Context & { input: Input.CreateDataInput }): Promise<Result>
 
-		update(context: ContextWithInput<Context, Input.UpdateDataInput>): Promise<Result>
+		connectOrCreate(context: Context & { input: Input.ConnectOrCreateInput }): Promise<Result>
 
-		upsert(context: ContextWithInput<Context, UpsertInput>): Promise<Result>
+		update(context: Context & { input: Input.UpdateDataInput }): Promise<Result>
 
-		disconnect(context: ContextWithInput<Context, undefined>): Promise<Result>
+		upsert(context: Context & { input: UpdateInputProcessor.UpsertInput }): Promise<Result>
 
-		delete(context: ContextWithInput<Context, undefined>): Promise<Result>
+		disconnect(context: Context & { input: undefined }): Promise<Result>
+
+		delete(context: Context & { input: undefined }): Promise<Result>
 	}
 
 	export interface HasManyRelationInputProcessor<Context, Result> {
-		connect(context: ContextWithInput<Context, Input.UniqueWhere> & { index: number; alias?: string }): Promise<Result>
+		connect(context: Context & { input: Input.UniqueWhere; index: number; alias?: string }): Promise<Result>
 
-		create(context: ContextWithInput<Context, Input.CreateDataInput> & { index: number; alias?: string }): Promise<Result>
+		create(context: Context & { input: Input.CreateDataInput; index: number; alias?: string }): Promise<Result>
 
-		update(context: ContextWithInput<Context, UpdateManyInput> & { index: number; alias?: string }): Promise<Result>
+		connectOrCreate(context: Context & { input: Input.ConnectOrCreateInput; index: number; alias?: string }): Promise<Result>
 
-		upsert(context: ContextWithInput<Context, UpsertManyInput> & { index: number; alias?: string }): Promise<Result>
+		update(context: Context & { input: UpdateInputProcessor.UpdateManyInput; index: number; alias?: string }): Promise<Result>
 
-		disconnect(context: ContextWithInput<Context, Input.UniqueWhere> & { index: number; alias?: string }): Promise<Result>
+		upsert(context: Context & { input: UpdateInputProcessor.UpsertManyInput; index: number; alias?: string }): Promise<Result>
 
-		delete(context: ContextWithInput<Context, Input.UniqueWhere> & { index: number; alias?: string }): Promise<Result>
+		disconnect(context: Context & { input: Input.UniqueWhere; index: number; alias?: string }): Promise<Result>
+
+		delete(context: Context & { input: Input.UniqueWhere; index: number; alias?: string }): Promise<Result>
 	}
 }
 

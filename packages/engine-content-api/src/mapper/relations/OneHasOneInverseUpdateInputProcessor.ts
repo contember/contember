@@ -18,12 +18,22 @@ export class OneHasOneInverseUpdateInputProcessor {
 	) {
 	}
 
-	public async connect({ input, ...ctx  }: UpdateInputProcessor.ContextWithInput<Model.OneHasOneInverseContext, Input.UniqueWhere>) {
+	public async connect({ input, ...ctx  }: Model.OneHasOneInverseContext & { input: Input.UniqueWhere }) {
 		const newOwner = await this.mapper.getPrimaryValue(ctx.targetEntity, input)
 		if (!newOwner) {
 			return [new MutationEntryNotFoundError([], input)]
 		}
 		return await this.connectInternal(ctx, newOwner)
+	}
+
+	public async connectOrCreate(
+		{ input, ...ctx }: Model.OneHasOneInverseContext & { input: Input.ConnectOrCreateInput },
+	) {
+		const newOwner = await this.mapper.getPrimaryValue(ctx.targetEntity, input.connect)
+		if (newOwner) {
+			return await this.connectInternal(ctx, newOwner)
+		}
+		return await this.create({ ...ctx, input: input.create })
 	}
 
 
@@ -66,7 +76,7 @@ export class OneHasOneInverseUpdateInputProcessor {
 		return result
 	}
 
-	public async create({ entity, targetEntity, targetRelation, input }: UpdateInputProcessor.ContextWithInput<Model.OneHasOneInverseContext, Input.CreateDataInput>) {
+	public async create({ entity, targetEntity, targetRelation, input }: Model.OneHasOneInverseContext & { input: Input.CreateDataInput }) {
 		const currentOwner = await this.mapper.getPrimaryValue(targetEntity, {
 			[targetRelation.name]: { [entity.primary]: this.primaryValue },
 		})
@@ -92,7 +102,7 @@ export class OneHasOneInverseUpdateInputProcessor {
 		return result
 	}
 
-	public async update({ entity, targetEntity, targetRelation, input }: UpdateInputProcessor.ContextWithInput<Model.OneHasOneInverseContext, Input.UpdateDataInput>) {
+	public async update({ entity, targetEntity, targetRelation, input }: Model.OneHasOneInverseContext & { input: Input.UpdateDataInput }) {
 		return await this.mapper.update(
 			targetEntity,
 			{ [targetRelation.name]: { [entity.primary]: this.primaryValue } },
@@ -100,7 +110,7 @@ export class OneHasOneInverseUpdateInputProcessor {
 		)
 	}
 
-	public async upsert(context: UpdateInputProcessor.ContextWithInput<Model.OneHasOneInverseContext, UpdateInputProcessor.UpsertInput>) {
+	public async upsert(context: Model.OneHasOneInverseContext & { input: UpdateInputProcessor.UpsertInput }) {
 		const { targetEntity, targetRelation, entity, input: { update, create } } = context
 		const result = await this.mapper.update(
 			targetEntity,
@@ -116,7 +126,7 @@ export class OneHasOneInverseUpdateInputProcessor {
 		return result
 	}
 
-	public async disconnect({ entity, targetEntity, relation, targetRelation }: UpdateInputProcessor.ContextWithInput<Model.OneHasOneInverseContext, undefined>) {
+	public async disconnect({ entity, targetEntity, relation, targetRelation }: Model.OneHasOneInverseContext & { input: undefined }) {
 		if (!relation.nullable && !targetRelation.orphanRemoval) {
 			return [new MutationConstraintViolationError([], ConstraintType.notNull)]
 		}
@@ -144,7 +154,7 @@ export class OneHasOneInverseUpdateInputProcessor {
 		return result
 	}
 
-	public async delete({ entity, targetEntity, relation, targetRelation }: UpdateInputProcessor.ContextWithInput<Model.OneHasOneInverseContext, undefined>) {
+	public async delete({ entity, targetEntity, relation, targetRelation }: Model.OneHasOneInverseContext & { input: undefined }) {
 		if (!relation.nullable && !targetRelation.orphanRemoval) {
 			return [new MutationConstraintViolationError([], ConstraintType.notNull)]
 		}

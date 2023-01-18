@@ -5,11 +5,10 @@ import {
 	MutationEntryNotFoundError,
 	MutationResultList,
 } from '../Result'
-import { InsertBuilder } from '../insert/InsertBuilder'
+import { InsertBuilder } from '../insert'
 import { Mapper } from '../Mapper'
 import { Input, Model } from '@contember/schema'
 import { AbortDataManipulation } from '../DataManipulationBuilder'
-import { UpdateInputProcessor } from '../../inputProcessing'
 
 export class OneHasOneOwningCreateInputProcessor {
 	constructor(
@@ -18,7 +17,7 @@ export class OneHasOneOwningCreateInputProcessor {
 	) {
 	}
 
-	public async connect(context: UpdateInputProcessor.ContextWithInput<Model.OneHasOneOwningContext, Input.UniqueWhere>) {
+	public async connect(context: Model.OneHasOneOwningContext & { input: Input.UniqueWhere }) {
 		const { input, relation, targetEntity } = context
 		const result: MutationResultList = []
 		await this.insertBuilder.addFieldValue(relation.name, async () => {
@@ -32,7 +31,7 @@ export class OneHasOneOwningCreateInputProcessor {
 		return result
 	}
 
-	public async create(context: UpdateInputProcessor.ContextWithInput<Model.OneHasOneOwningContext, Input.CreateDataInput>) {
+	public async create(context: Model.OneHasOneOwningContext & { input: Input.CreateDataInput }) {
 		const result: MutationResultList = []
 		await this.insertBuilder.addFieldValue(context.relation.name, async () => {
 			return await this.createInternal(context, result)
@@ -40,8 +39,20 @@ export class OneHasOneOwningCreateInputProcessor {
 		return result
 	}
 
+	public async connectOrCreate({ input, ...context }: Model.OneHasOneOwningContext & { input: Input.ConnectOrCreateInput }) {
+		const result: MutationResultList = []
+		await this.insertBuilder.addFieldValue(context.relation.name, async () => {
+			const inverseSide = await this.mapper.getPrimaryValue(context.targetEntity, input.connect)
+			if (inverseSide) {
+				return await this.connectInternal({ ...context, input: inverseSide }, result)
+			}
+			return await this.createInternal({ ...context, input: input.create }, result)
+		})
+		return result
+	}
+
 	private async createInternal(
-		context: UpdateInputProcessor.ContextWithInput<Model.OneHasOneOwningContext, Input.CreateDataInput>,
+		context: Model.OneHasOneOwningContext & { input: Input.CreateDataInput },
 		result: MutationResultList,
 	) {
 		const insertResult = await this.mapper.insert(context.targetEntity, context.input)
@@ -54,7 +65,7 @@ export class OneHasOneOwningCreateInputProcessor {
 	}
 
 	private async connectInternal(
-		{ entity, relation, targetEntity, input }: UpdateInputProcessor.ContextWithInput<Model.OneHasOneOwningContext, Input.PrimaryValue>,
+		{ entity, relation, targetEntity, input }: Model.OneHasOneOwningContext & { input: Input.PrimaryValue },
 		result: MutationResultList,
 	) {
 		const currentOwnerOfInverseSide = await this.mapper.getPrimaryValue(entity, {

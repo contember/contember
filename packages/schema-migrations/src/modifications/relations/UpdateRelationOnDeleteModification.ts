@@ -4,11 +4,30 @@ import { SchemaUpdater, updateEntity, updateField, updateModel } from '../utils/
 import { createModificationType, Differ, ModificationHandler } from '../ModificationHandler'
 import { isIt } from '../../utils/isIt'
 import { updateRelations } from '../utils/diffUtils'
+import { acceptRelationTypeVisitor } from '@contember/schema-utils'
+import { addForeignKeyConstraint } from './helpers'
 
 export class UpdateRelationOnDeleteModificationHandler implements ModificationHandler<UpdateRelationOnDeleteModificationData> {
 	constructor(private readonly data: UpdateRelationOnDeleteModificationData, private readonly schema: Schema) {}
 
-	public createSql(builder: MigrationBuilder): void {}
+	public createSql(builder: MigrationBuilder): void {
+		const entity = this.schema.model.entities[this.data.entityName]
+		if (entity.view) {
+			return
+		}
+		acceptRelationTypeVisitor(this.schema.model, entity, this.data.fieldName, {
+			visitManyHasOne: ({ entity, relation, targetEntity }) => {
+				addForeignKeyConstraint({ builder, entity, targetEntity, relation, recreate: true })
+			},
+			visitOneHasOneOwning: ({ entity, relation, targetEntity }) => {
+				addForeignKeyConstraint({ builder, entity, targetEntity, relation, recreate: true })
+			},
+			visitOneHasMany: () => {},
+			visitOneHasOneInverse: () => {},
+			visitManyHasManyOwning: () => {},
+			visitManyHasManyInverse: () => {},
+		})
+	}
 
 	public getSchemaUpdater(): SchemaUpdater {
 		const { entityName, fieldName, onDelete } = this.data

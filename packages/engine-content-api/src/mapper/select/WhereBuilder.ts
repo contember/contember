@@ -23,13 +23,13 @@ export class WhereBuilder {
 		private readonly useExistsInHasManyFilter: boolean,
 	) {}
 
-	public build(
-		qb: SelectBuilder<SelectBuilder.Result>,
+	public build<R extends SelectBuilder.Result>(
+		qb: SelectBuilder<R>,
 		entity: Model.Entity,
 		path: Path,
 		where: Input.OptionalWhere,
 		optimizationHints: WhereOptimizationHints = {},
-	) {
+	): SelectBuilder<R> {
 		const optimizedWhere = this.whereOptimizer.optimize(where, entity, optimizationHints)
 		return this.buildInternal({
 			entity,
@@ -41,13 +41,13 @@ export class WhereBuilder {
 	}
 
 
-	public buildAdvanced(
+	public buildAdvanced<R extends SelectBuilder.Result>(
 		entity: Model.Entity,
 		path: Path,
 		where: Input.OptionalWhere,
-		callback: (clauseCb: (clause: SqlConditionBuilder) => SqlConditionBuilder) => SelectBuilder<SelectBuilder.Result>,
+		callback: (clauseCb: (clause: SqlConditionBuilder) => SqlConditionBuilder) => SelectBuilder<R>,
 		optimizationHints: WhereOptimizationHints = {},
-	) {
+	): SelectBuilder<R> {
 		const optimizedWhere = this.whereOptimizer.optimize(where, entity, optimizationHints)
 		return this.buildInternal({
 			entity,
@@ -58,11 +58,11 @@ export class WhereBuilder {
 		})
 	}
 
-	private buildInternal({
+	private buildInternal<R extends SelectBuilder.Result>({
 		callback,
 		...args
-	}: { entity: Model.Entity; path: Path; where: Input.OptionalWhere; callback: (clauseCb: (clause: SqlConditionBuilder) => SqlConditionBuilder) => SelectBuilder<SelectBuilder.Result>; allowManyJoin: boolean },
-	) {
+	}: { entity: Model.Entity; path: Path; where: Input.OptionalWhere; callback: (clauseCb: (clause: SqlConditionBuilder) => SqlConditionBuilder) => SelectBuilder<R>; allowManyJoin: boolean },
+	): SelectBuilder<R> {
 		const joinList: WhereJoinDefinition[] = []
 
 		const qbWithWhere = callback(clause => this.buildRecursive({
@@ -70,8 +70,8 @@ export class WhereBuilder {
 			joinList: joinList,
 			...args,
 		}))
-		return joinList.reduce<SelectBuilder<SelectBuilder.Result>>(
-			(qb, { path, entity, relationName }) => this.joinBuilder.join(qb, path, entity, relationName),
+		return joinList.reduce<SelectBuilder<R>>(
+			(qb, { path, entity, relationName }) => this.joinBuilder.join<R>(qb, path, entity, relationName),
 			qbWithWhere,
 		)
 	}

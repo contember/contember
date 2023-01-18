@@ -138,7 +138,7 @@ CREATE CONSTRAINT TRIGGER "log_event_trx"
 ALTER TABLE "post"
   ADD "author_id" uuid;
 ALTER TABLE "post"
-  ADD CONSTRAINT "fk_post_author_id_87ef9a" FOREIGN KEY ("author_id") REFERENCES "author"("id") ON DELETE NO ACTION DEFERRABLE INITIALLY IMMEDIATE;
+  ADD CONSTRAINT "fk_post_author_id_87ef9a" FOREIGN KEY ("author_id") REFERENCES "author"("id") ON DELETE CASCADE DEFERRABLE INITIALLY IMMEDIATE;
 CREATE INDEX "post_author_id_index" ON "post" ("author_id");
 ALTER TABLE "post" RENAME TO "article";
 CREATE TABLE "post" (
@@ -156,7 +156,7 @@ CREATE CONSTRAINT TRIGGER "log_event_trx"
 ALTER TABLE "post"
   ADD "author_id" uuid;
 ALTER TABLE "post"
-  ADD CONSTRAINT "fk_post_author_id_87ef9a" FOREIGN KEY ("author_id") REFERENCES "author"("id") ON DELETE NO ACTION DEFERRABLE INITIALLY IMMEDIATE;
+  ADD CONSTRAINT "fk_post_author_id_87ef9a" FOREIGN KEY ("author_id") REFERENCES "author"("id") ON DELETE CASCADE DEFERRABLE INITIALLY IMMEDIATE;
 CREATE INDEX "post_author_id_index1" ON "post" ("author_id");`)
 })
 

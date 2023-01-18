@@ -37,7 +37,7 @@ test('fails when deleting entity without proper cascade', async () => {
         }`,
 		return: {
 			deletePost: {
-				errorMessage: 'Execution has failed:\nunknown field: ForeignKeyConstraintViolation (Cannot delete row 123e4567-e89b-12d3-a456-000000000001 of entity Post, because it is still referenced from PostLocales::post. This is possibly caused by ACL denial or by missing "on delete cascade")',
+				errorMessage: 'Execution has failed:\nunknown field: ForeignKeyConstraintViolation (Cannot delete 123e4567-e89b-12d3-a456-000000000001 row(s) of entity Post, because it is still referenced from 123e4567-e89b-12d3-a456-000000000002 row(s) of entity PostLocales in relation post. OnDelete behaviour of this relation is set to "restrict". You might consider changing it to "setNull" or "cascade".)',
 				node: null,
 			},
 		},

@@ -1,5 +1,5 @@
 import { test } from 'vitest'
-import { execute, sqlDeferred, sqlTransaction } from '../../../../../src/test'
+import { execute, sqlTransaction } from '../../../../../src/test'
 import { GQL, SQL } from '../../../../../src/tags'
 import { testUuid } from '../../../../../src/testUuid'
 import { siteSettingSchema, siteSettingSchemaWithOrphanRemoval } from './schema'
@@ -257,13 +257,21 @@ test('connect - different owner & orphan removal enabled', async () => {
 					response: { rows: [{ id: testUuid(4) }] },
 				},
 				// delete orphaned inverse side
-				...sqlDeferred([
-					{
-						sql: 'delete from "public"."site_setting"   where "id" in (select "root_"."id"  from "public"."site_setting" as "root_"   where "root_"."id" = ?)  returning "id"',
-						parameters: [testUuid(4)],
-						response: { rows: [{ id: testUuid(4) }] },
-					},
-				]),
+				{
+					sql: 'select "root_"."id" as "id", true as "allowed" from "public"."site_setting" as "root_" where "root_"."id" = ?',
+					parameters: [testUuid(4)],
+					response: { rows: [{ id: testUuid(4), allowed: true }] },
+				},
+				{
+					sql: 'select "root_"."id" as "id", "root_"."setting_id" as "ref" from "public"."site" as "root_" where "setting_id" in (?)',
+					parameters: [testUuid(4)],
+					response: { rows: [] },
+				},
+				{
+					sql: 'DELETE FROM "public"."site_setting" WHERE "id" IN (?)',
+					parameters: [testUuid(4)],
+					response: { rowCount: 1 },
+				},
 
 			]),
 		],

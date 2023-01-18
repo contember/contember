@@ -1,4 +1,4 @@
-import { InsertBuilder } from '../insert/InsertBuilder'
+import { InsertBuilder } from '../insert'
 import { Mapper } from '../Mapper'
 import {
 	ConstraintType,
@@ -8,7 +8,6 @@ import {
 } from '../Result'
 import { CheckedPrimary } from '../CheckedPrimary'
 import { Input, Model } from '@contember/schema'
-import { UpdateInputProcessor } from '../../inputProcessing'
 
 export class OneHasOneInverseCreateInputProcessor {
 	constructor(
@@ -17,7 +16,7 @@ export class OneHasOneInverseCreateInputProcessor {
 	) {
 	}
 
-	public async connect(context: UpdateInputProcessor.ContextWithInput<Model.OneHasOneInverseContext, Input.UniqueWhere>) {
+	public async connect(context: Model.OneHasOneInverseContext & { input: Input.UniqueWhere }) {
 		const { targetEntity, input } = context
 		const primary = await this.insertBuilder.insert
 		if (!primary) {
@@ -33,7 +32,7 @@ export class OneHasOneInverseCreateInputProcessor {
 
 
 	public async create(
-		context: UpdateInputProcessor.ContextWithInput<Model.OneHasOneInverseContext, Input.CreateDataInput>,
+		context: Model.OneHasOneInverseContext & { input: Input.CreateDataInput },
 	) {
 		const primary = await this.insertBuilder.insert
 		if (!primary) {
@@ -45,8 +44,23 @@ export class OneHasOneInverseCreateInputProcessor {
 		})
 	}
 
+	public async connectOrCreate(
+		{ input, ...context }: Model.OneHasOneInverseContext & { input: Input.ConnectOrCreateInput },
+	) {
+		const primary = await this.insertBuilder.insert
+		if (!primary) {
+			return []
+		}
+		const owner = await this.mapper.getPrimaryValue(context.targetEntity, input.connect)
+		if (owner) {
+			return await this.connectInternal({ ...context, input: new CheckedPrimary(owner) }, primary)
+		}
+
+		return await this.createInternal({ input: input.create, ...context }, primary)
+	}
+
 	private async connectInternal(
-		{ entity, targetEntity, targetRelation, relation, input }: UpdateInputProcessor.ContextWithInput<Model.OneHasOneInverseContext, CheckedPrimary>,
+		{ entity, targetEntity, targetRelation, relation, input }: Model.OneHasOneInverseContext & { input: CheckedPrimary },
 		primary: Input.PrimaryValue,
 	) {
 
@@ -74,7 +88,7 @@ export class OneHasOneInverseCreateInputProcessor {
 	}
 
 	private async createInternal(
-		context: UpdateInputProcessor.ContextWithInput<Model.OneHasOneInverseContext, Input.CreateDataInput>,
+		context: Model.OneHasOneInverseContext & { input: Input.CreateDataInput },
 		primary: Input.PrimaryValue,
 	) {
 		return await this.mapper.insert(context.targetEntity, context.input, builder => {

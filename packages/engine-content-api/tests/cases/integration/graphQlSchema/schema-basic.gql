@@ -314,6 +314,7 @@ input AuthorCreateInput {
 input AuthorCreatePostsEntityRelationInput {
   connect: PostUniqueWhere
   create: PostWithoutAuthorCreateInput
+  connectOrCreate: AuthorConnectOrCreatePostsRelationInput
   alias: String
 }
 
@@ -327,6 +328,7 @@ input PostWithoutAuthorCreateInput {
 input PostCreateLocalesEntityRelationInput {
   connect: PostLocaleUniqueWhere
   create: PostLocaleWithoutPostCreateInput
+  connectOrCreate: PostConnectOrCreateLocalesRelationInput
   alias: String
 }
 
@@ -335,9 +337,15 @@ input PostLocaleWithoutPostCreateInput {
   _dummy_field_: Boolean
 }
 
+input PostConnectOrCreateLocalesRelationInput {
+  connect: PostLocaleUniqueWhere
+  create: PostLocaleWithoutPostCreateInput
+}
+
 input PostCreateCategoriesEntityRelationInput {
   connect: CategoryUniqueWhere
   create: CategoryWithoutPostsCreateInput
+  connectOrCreate: PostConnectOrCreateCategoriesRelationInput
   alias: String
 }
 
@@ -348,6 +356,16 @@ input CategoryUniqueWhere {
 input CategoryWithoutPostsCreateInput {
   name: String
   _dummy_field_: Boolean
+}
+
+input PostConnectOrCreateCategoriesRelationInput {
+  connect: CategoryUniqueWhere
+  create: CategoryWithoutPostsCreateInput
+}
+
+input AuthorConnectOrCreatePostsRelationInput {
+  connect: PostUniqueWhere
+  create: PostWithoutAuthorCreateInput
 }
 
 input AuthorUpdateInput {
@@ -445,6 +463,7 @@ input CategoryCreateInput {
 input CategoryCreatePostsEntityRelationInput {
   connect: PostUniqueWhere
   create: PostWithoutCategoriesCreateInput
+  connectOrCreate: CategoryConnectOrCreatePostsRelationInput
   alias: String
 }
 
@@ -458,11 +477,22 @@ input PostWithoutCategoriesCreateInput {
 input PostCreateAuthorEntityRelationInput {
   connect: AuthorUniqueWhere
   create: AuthorWithoutPostsCreateInput
+  connectOrCreate: PostConnectOrCreateAuthorRelationInput
 }
 
 input AuthorWithoutPostsCreateInput {
   name: String
   _dummy_field_: Boolean
+}
+
+input PostConnectOrCreateAuthorRelationInput {
+  connect: AuthorUniqueWhere
+  create: AuthorWithoutPostsCreateInput
+}
+
+input CategoryConnectOrCreatePostsRelationInput {
+  connect: PostUniqueWhere
+  create: PostWithoutCategoriesCreateInput
 }
 
 input CategoryUpdateInput {
@@ -494,10 +524,11 @@ input PostWithoutCategoriesUpdateInput {
 }
 
 input PostUpdateAuthorEntityRelationInput {
+  connect: AuthorUniqueWhere
   create: AuthorWithoutPostsCreateInput
+  connectOrCreate: PostConnectOrCreateAuthorRelationInput
   update: AuthorWithoutPostsUpdateInput
   upsert: PostUpsertAuthorRelationInput
-  connect: AuthorUniqueWhere
   disconnect: Boolean
   delete: Boolean
 }
@@ -527,6 +558,7 @@ input PostLocaleCreateInput {
 input PostLocaleCreatePostEntityRelationInput {
   connect: PostUniqueWhere
   create: PostWithoutLocalesCreateInput
+  connectOrCreate: PostLocaleConnectOrCreatePostRelationInput
 }
 
 input PostWithoutLocalesCreateInput {
@@ -536,6 +568,11 @@ input PostWithoutLocalesCreateInput {
   _dummy_field_: Boolean
 }
 
+input PostLocaleConnectOrCreatePostRelationInput {
+  connect: PostUniqueWhere
+  create: PostWithoutLocalesCreateInput
+}
+
 input PostLocaleUpdateInput {
   title: String
   Post: PostLocaleUpdatePostEntityRelationInput
@@ -543,10 +580,11 @@ input PostLocaleUpdateInput {
 }
 
 input PostLocaleUpdatePostEntityRelationInput {
+  connect: PostUniqueWhere
   create: PostWithoutLocalesCreateInput
+  connectOrCreate: PostLocaleConnectOrCreatePostRelationInput
   update: PostWithoutLocalesUpdateInput
   upsert: PostLocaleUpsertPostRelationInput
-  connect: PostUniqueWhere
   disconnect: Boolean
   delete: Boolean
 }

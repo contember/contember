@@ -218,6 +218,7 @@ input VideoCreateInput {
 input VideoCreateFrontPageForIntroEntityRelationInput {
   connect: FrontPageUniqueWhere
   create: FrontPageWithoutIntroVideoCreateInput
+  connectOrCreate: VideoConnectOrCreateFrontPageForIntroRelationInput
 }
 
 input FrontPageWithoutIntroVideoCreateInput {
@@ -229,6 +230,7 @@ input FrontPageWithoutIntroVideoCreateInput {
 input FrontPageCreateInHouseVideosEntityRelationInput {
   connect: VideoUniqueWhere
   create: VideoWithoutFrontPageCreateInput
+  connectOrCreate: FrontPageConnectOrCreateInHouseVideosRelationInput
   alias: String
 }
 
@@ -238,9 +240,20 @@ input VideoWithoutFrontPageCreateInput {
   _dummy_field_: Boolean
 }
 
+input FrontPageConnectOrCreateInHouseVideosRelationInput {
+  connect: VideoUniqueWhere
+  create: VideoWithoutFrontPageCreateInput
+}
+
+input VideoConnectOrCreateFrontPageForIntroRelationInput {
+  connect: FrontPageUniqueWhere
+  create: FrontPageWithoutIntroVideoCreateInput
+}
+
 input VideoCreateFrontPageEntityRelationInput {
   connect: FrontPageUniqueWhere
   create: FrontPageWithoutInHouseVideosCreateInput
+  connectOrCreate: VideoConnectOrCreateFrontPageRelationInput
 }
 
 input FrontPageWithoutInHouseVideosCreateInput {
@@ -252,12 +265,23 @@ input FrontPageWithoutInHouseVideosCreateInput {
 input FrontPageCreateIntroVideoEntityRelationInput {
   connect: VideoUniqueWhere
   create: VideoWithoutFrontPageForIntroCreateInput
+  connectOrCreate: FrontPageConnectOrCreateIntroVideoRelationInput
 }
 
 input VideoWithoutFrontPageForIntroCreateInput {
   vimeoId: String
   frontPage: VideoCreateFrontPageEntityRelationInput
   _dummy_field_: Boolean
+}
+
+input FrontPageConnectOrCreateIntroVideoRelationInput {
+  connect: VideoUniqueWhere
+  create: VideoWithoutFrontPageForIntroCreateInput
+}
+
+input VideoConnectOrCreateFrontPageRelationInput {
+  connect: FrontPageUniqueWhere
+  create: FrontPageWithoutInHouseVideosCreateInput
 }
 
 input VideoUpdateInput {
@@ -268,10 +292,11 @@ input VideoUpdateInput {
 }
 
 input VideoUpdateFrontPageForIntroEntityRelationInput {
+  connect: FrontPageUniqueWhere
   create: FrontPageWithoutIntroVideoCreateInput
+  connectOrCreate: VideoConnectOrCreateFrontPageForIntroRelationInput
   update: FrontPageWithoutIntroVideoUpdateInput
   upsert: VideoUpsertFrontPageForIntroRelationInput
-  connect: FrontPageUniqueWhere
   disconnect: Boolean
   delete: Boolean
 }
@@ -315,10 +340,11 @@ input VideoUpsertFrontPageForIntroRelationInput {
 }
 
 input VideoUpdateFrontPageEntityRelationInput {
+  connect: FrontPageUniqueWhere
   create: FrontPageWithoutInHouseVideosCreateInput
+  connectOrCreate: VideoConnectOrCreateFrontPageRelationInput
   update: FrontPageWithoutInHouseVideosUpdateInput
   upsert: VideoUpsertFrontPageRelationInput
-  connect: FrontPageUniqueWhere
   disconnect: Boolean
   delete: Boolean
 }
@@ -330,10 +356,11 @@ input FrontPageWithoutInHouseVideosUpdateInput {
 }
 
 input FrontPageUpdateIntroVideoEntityRelationInput {
+  connect: VideoUniqueWhere
   create: VideoWithoutFrontPageForIntroCreateInput
+  connectOrCreate: FrontPageConnectOrCreateIntroVideoRelationInput
   update: VideoWithoutFrontPageForIntroUpdateInput
   upsert: FrontPageUpsertIntroVideoRelationInput
-  connect: VideoUniqueWhere
   disconnect: Boolean
   delete: Boolean
 }

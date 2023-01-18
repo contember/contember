@@ -1,7 +1,9 @@
-import { CreateInputProcessor, UpdateInputProcessor } from '../../inputProcessing'
+import { UpdateInputProcessor } from '../../inputProcessing'
 import { Input, Model } from '@contember/schema'
-import { getInsertPrimary, MutationEntryNotFoundError } from '../Result'
+import { getInsertPrimary, MutationEntryNotFoundError, MutationResultList } from '../Result'
 import { Mapper } from '../Mapper'
+
+type RelationContext = Model.ManyHasManyOwningContext | Model.ManyHasManyInverseContext
 
 export class ManyHasManyInputProcessor {
 	constructor(
@@ -10,7 +12,7 @@ export class ManyHasManyInputProcessor {
 	}
 
 	public async connect(
-		{ entity, targetEntity, relation, targetRelation, input }: CreateInputProcessor.ContextWithInput<Model.ManyHasManyOwningContext | Model.ManyHasManyInverseContext, Input.UniqueWhere>,
+		{ entity, targetEntity, relation, targetRelation, input }: RelationContext & { input: Input.UniqueWhere },
 		primary: Input.PrimaryValue,
 	) {
 		const otherPrimary = await this.mapper.getPrimaryValue(targetEntity, input)
@@ -21,7 +23,7 @@ export class ManyHasManyInputProcessor {
 	}
 
 	public async create(
-		{ entity, targetEntity, relation, input }: CreateInputProcessor.ContextWithInput<Model.ManyHasManyOwningContext | Model.ManyHasManyInverseContext, Input.CreateDataInput>,
+		{ entity, targetEntity, relation, input }: RelationContext & { input: Input.CreateDataInput },
 		primary: Input.PrimaryValue,
 	) {
 		const insertResult = await this.mapper.insert(targetEntity, input)
@@ -35,8 +37,23 @@ export class ManyHasManyInputProcessor {
 		]
 	}
 
+	public async connectOrCreate(
+		context: RelationContext & { input: Input.ConnectOrCreateInput },
+		primary: Input.PrimaryValue,
+	): Promise<MutationResultList> {
+		let otherPrimary = await this.mapper.getPrimaryValue(context.targetEntity, context.input.connect)
+		if (!otherPrimary) {
+			const insertResult = await this.mapper.insert(context.targetEntity, context.input.create)
+			otherPrimary = getInsertPrimary(insertResult)
+			if (!otherPrimary) {
+				return insertResult
+			}
+		}
+		return await this.mapper.connectJunction(context.entity, context.relation, primary, otherPrimary)
+	}
+
 	public async update(
-		{ entity, targetEntity, relation, input: { where, data } }: CreateInputProcessor.ContextWithInput<Model.ManyHasManyOwningContext | Model.ManyHasManyInverseContext, UpdateInputProcessor.UpdateManyInput>,
+		{ entity, targetEntity, relation, input: { where, data } }: RelationContext & { input: UpdateInputProcessor.UpdateManyInput },
 		primary: Input.PrimaryValue,
 	) {
 		const otherPrimary = await this.mapper.getPrimaryValue(targetEntity, where)
@@ -50,7 +67,7 @@ export class ManyHasManyInputProcessor {
 	}
 
 	public async upsert(
-		{ entity, relation, targetEntity, input: { create, update, where } }: CreateInputProcessor.ContextWithInput<Model.ManyHasManyOwningContext | Model.ManyHasManyInverseContext, UpdateInputProcessor.UpsertManyInput>,
+		{ entity, relation, targetEntity, input: { create, update, where } }: RelationContext & { input: UpdateInputProcessor.UpsertManyInput },
 		primary: Input.PrimaryValue,
 	) {
 		const otherPrimary = await this.mapper.getPrimaryValue(targetEntity, where)
@@ -71,7 +88,7 @@ export class ManyHasManyInputProcessor {
 	}
 
 	public async disconnect(
-		{ entity, targetEntity, relation, input }: CreateInputProcessor.ContextWithInput<Model.ManyHasManyOwningContext | Model.ManyHasManyInverseContext, Input.UniqueWhere>,
+		{ entity, targetEntity, relation, input }: RelationContext & { input: Input.UniqueWhere },
 		primary: Input.PrimaryValue,
 	) {
 		const otherPrimary = await this.mapper.getPrimaryValue(targetEntity, input)
@@ -83,7 +100,7 @@ export class ManyHasManyInputProcessor {
 	}
 
 	public async delete(
-		{ entity, targetEntity, relation, targetRelation, input }: CreateInputProcessor.ContextWithInput<Model.ManyHasManyOwningContext | Model.ManyHasManyInverseContext, Input.UniqueWhere>,
+		{ entity, targetEntity, relation, targetRelation, input }: RelationContext & { input: Input.UniqueWhere },
 		primary: Input.PrimaryValue,
 	) {
 		return await this.mapper.delete(targetEntity, input)

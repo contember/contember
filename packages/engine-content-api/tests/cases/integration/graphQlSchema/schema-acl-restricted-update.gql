@@ -171,6 +171,7 @@ input OneHasManyEntityCreateInput {
 input OneHasManyEntityCreateR2EntityRelationInput {
   connect: RootUniqueWhere
   create: RootWithoutRCreateInput
+  connectOrCreate: OneHasManyEntityConnectOrCreateR2RelationInput
 }
 
 input RootUniqueWhere {
@@ -180,6 +181,11 @@ input RootUniqueWhere {
 
 input RootWithoutRCreateInput {
   _dummy_field_: Boolean
+}
+
+input OneHasManyEntityConnectOrCreateR2RelationInput {
+  connect: RootUniqueWhere
+  create: RootWithoutRCreateInput
 }
 
 type RootConnection {
@@ -199,12 +205,18 @@ input RootCreateInput {
 input RootCreateREntityRelationInput {
   connect: OneHasManyEntityUniqueWhere
   create: OneHasManyEntityWithoutR2CreateInput
+  connectOrCreate: RootConnectOrCreateRRelationInput
   alias: String
 }
 
 input OneHasManyEntityWithoutR2CreateInput {
   a: String
   _dummy_field_: Boolean
+}
+
+input RootConnectOrCreateRRelationInput {
+  connect: OneHasManyEntityUniqueWhere
+  create: OneHasManyEntityWithoutR2CreateInput
 }
 
 input RootUpdateInput {

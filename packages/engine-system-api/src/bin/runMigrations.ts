@@ -3,9 +3,6 @@ import { DatabaseContextFactory, emptyVersionedSchema, SchemaVersionBuilder } fr
 import { Connection } from '@contember/database'
 import { createLogger, PrettyPrintLoggerHandler } from '@contember/logger'
 
-let uuidNum = 0
-export const testUuid = () => '123e4567-e89b-12d3-a456-' + (uuidNum++).toString().padStart(12, '0')
-
 ;(async () => {
 	const dbConfig = {
 		database: process.env.PGDATABASE as string,
@@ -18,7 +15,9 @@ export const testUuid = () => '123e4567-e89b-12d3-a456-' + (uuidNum++).toString(
 	const connection = Connection.createSingle(dbConfig, err => console.error(err))
 	const migrationsRunner = new SystemMigrationsRunner(
 		new DatabaseContextFactory('system', connection, {
-			uuid: testUuid,
+			uuid: () => {
+				throw new Error()
+			},
 		}),
 		{ db: dbConfig, slug: 'test', stages: [] },
 		'system',

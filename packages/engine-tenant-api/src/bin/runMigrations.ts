@@ -2,7 +2,7 @@ import { TenantMigrationsRunner } from '../migrations'
 import { createLogger, PrettyPrintLoggerHandler } from '@contember/logger'
 
 let uuidNum = 0
-export const testUuid = () => '123e4567-e89b-12d3-a456-' + (uuidNum++).toString().padStart(12, '0')
+const dummyUuid = () => '123e4567-e89b-12d3-a456-' + (uuidNum++).toString().padStart(12, '0')
 
 ;(async () => {
 	const migrationsRunner = new TenantMigrationsRunner(
@@ -21,7 +21,7 @@ export const testUuid = () => '123e4567-e89b-12d3-a456-' + (uuidNum++).toString(
 			bcrypt: () => {
 				throw new Error()
 			},
-			uuid: testUuid,
+			uuid: dummyUuid,
 		},
 	)
 	await migrationsRunner.run(createLogger(new PrettyPrintLoggerHandler(process.stderr)))

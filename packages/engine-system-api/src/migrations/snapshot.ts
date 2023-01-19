@@ -1,36 +1,5 @@
-import { MigrationArgs, MigrationBuilder } from '@contember/database-migrations'
-import { SystemMigrationArgs } from './types'
-
-export default async function (builder: MigrationBuilder, args: MigrationArgs<SystemMigrationArgs>) {
-	const hasGenRandomUuid = await args.connection.query(`
-		SELECT 1
-		FROM pg_proc
-		JOIN pg_namespace ON pg_proc.pronamespace = pg_namespace.oid
-		WHERE pg_namespace.nspname ='pg_catalog' AND pg_proc.proname = 'gen_random_uuid'
-	`)
-	let randomUuidFn: string = 'uuid_generate_v4'
-	if (hasGenRandomUuid.rowCount > 0) {
-		randomUuidFn = 'gen_random_uuid'
-	} else {
-		const hasUuidGenV4 = await args.connection.query(`
-			SELECT 1
-			FROM pg_proc
-			JOIN pg_namespace ON pg_proc.pronamespace = pg_namespace.oid
-			WHERE pg_namespace.nspname ='pg_catalog' AND pg_proc.proname = 'gen_random_uuid'
-		`)
-		if (hasUuidGenV4.rowCount === 0) {
-			builder.sql(`
-				CREATE FUNCTION "uuid_generate_v4"() RETURNS "uuid"
-    			LANGUAGE "sql"
-    			AS $$
-            		SELECT OVERLAY(OVERLAY(md5(random()::TEXT || ':' || clock_timestamp()::TEXT) PLACING '4' FROM 13) PLACING
-                           to_hex(floor(random() * (11 - 8 + 1) + 8)::INT)::TEXT FROM 17)::UUID;
-            	$$;
-            `)
-		}
-	}
-
-	builder.sql(`
+import { snapshotMigration } from './snapshot-factory'
+export default snapshotMigration(({ randomUuidFn }) => `
 CREATE DOMAIN "event_data_type" AS "text"
 	CONSTRAINT "event_data_type_check" CHECK ((VALUE = ANY (ARRAY['create'::"text", 'update'::"text", 'delete'::"text"])));
 CREATE DOMAIN "event_type" AS "text"
@@ -197,13 +166,4 @@ ALTER TABLE ONLY "event_data"
     ADD CONSTRAINT "event_data_schema_id_fkey" FOREIGN KEY ("schema_id") REFERENCES "schema_migration"("id");
 ALTER TABLE ONLY "stage_transaction"
     ADD CONSTRAINT "stage_transaction_stage_id_fkey" FOREIGN KEY ("stage_id") REFERENCES "stage"("id") ON DELETE CASCADE;
-DO LANGUAGE plpgsql
-$$
-	BEGIN
-		EXECUTE FORMAT('ALTER FUNCTION trigger_event_commit() SET SEARCH_PATH = %s', QUOTE_IDENT(CURRENT_SCHEMA()));
-		EXECUTE FORMAT('ALTER FUNCTION trigger_event() SET SEARCH_PATH = %s', QUOTE_IDENT(CURRENT_SCHEMA()));
-	END
-$$
-
 `)
-}

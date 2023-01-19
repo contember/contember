@@ -4,29 +4,12 @@
 		"outDir": "../dist/src"
 	},
 	"references": [
-		{
-			"path": "../../../packages/database/src"
-		},
-		{
-			"path": "../../../packages/engine-common/src"
-		},
-		{
-			"path": "../../../packages/engine-http/src"
-		},
-		{
-			"path": "../../../packages/engine-plugins/src"
-		},
-		{
-			"path": "../../../packages/engine-s3-plugin/src"
-		},
-		{
-			"path": "../../../packages/engine-vimeo-plugin/src"
-		},
-		{
-			"path": "../../../packages/typesafe/src"
-		},
-		{
-			"path": "../../../packages/engine-server/src"
-		}
+		{ "path": "../../../packages/database/src" },
+		{ "path": "../../../packages/engine-common/src" },
+		{ "path": "../../../packages/engine-http/src" },
+		{ "path": "../../../packages/engine-plugins/src" },
+		{ "path": "../../../packages/engine-s3-plugin/src" },
+		{ "path": "../../../packages/engine-vimeo-plugin/src" },
+		{ "path": "../../../packages/typesafe/src" }
 	]
 }

@@ -1,6 +1,6 @@
 import { DatabaseContext, LatestTransactionIdByStageQuery } from '@contember/engine-system-api'
 import { Timer } from '../application'
-import { IncomingMessage, ServerResponse } from 'http'
+import { IncomingMessage, ServerResponse } from 'node:http'
 
 
 const NotModifiedHeaderName = 'x-contember-ref'

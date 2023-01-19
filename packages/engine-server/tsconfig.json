@@ -2,11 +2,7 @@
 	"files": [],
 	"include": [],
 	"references": [
-		{
-			"path": "./src"
-		},
-		{
-			"path": "./tests"
-		}
+		{ "path": "./src" },
+		{ "path": "./tests" }
 	]
 }

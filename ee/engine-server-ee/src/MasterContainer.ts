@@ -7,7 +7,7 @@ import {
 	MasterContainerArgs as BaseMasterContainerArgs,
 	MasterContainerFactory as BaseMasterContainerFactory,
 } from '@contember/engine-http'
-import { createSecretKey } from 'crypto'
+import { createSecretKey } from 'node:crypto'
 import { ProjectGroupContainerResolver } from './projectGroup/ProjectGroupContainerResolver'
 import { ProjectGroupResolver } from './projectGroup/ProjectGroupResolver'
 import { ServerConfig } from './config/configSchema'

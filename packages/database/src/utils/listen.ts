@@ -1,6 +1,6 @@
 import { Client, Connection } from '../client'
 import { wrapIdentifier } from './sql'
-import { clearInterval } from 'timers'
+import { clearInterval } from 'node:timers'
 
 type ListenArgs<P> = {
 	client: Client<Connection.AcquiredConnectionLike>

@@ -5,35 +5,15 @@
 		"esModuleInterop": true
 	},
 	"references": [
-		{
-			"path": "../../authorization/src"
-		},
-		{
-			"path": "../../config-loader/src"
-		},
-		{
-			"path": "../../database/src"
-		},
-		{
-			"path": "../../database-migrations/src"
-		},
-		{
-			"path": "../../dic/src"
-		},
-		{
-			"path": "../../logger/src"
-		},
-		{
-			"path": "../../graphql-utils/src"
-		},
-		{
-			"path": "../../schema/src"
-		},
-		{
-			"path": "../../schema-utils/src"
-		},
-		{
-			"path": "../../typesafe/src"
-		}
+		{ "path": "../../authorization/src" },
+		{ "path": "../../config-loader/src" },
+		{ "path": "../../database/src" },
+		{ "path": "../../database-migrations/src" },
+		{ "path": "../../dic/src" },
+		{ "path": "../../logger/src" },
+		{ "path": "../../graphql-utils/src" },
+		{ "path": "../../schema/src" },
+		{ "path": "../../schema-utils/src" },
+		{ "path": "../../typesafe/src" }
 	]
 }

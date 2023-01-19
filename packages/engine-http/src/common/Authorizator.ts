@@ -1,7 +1,7 @@
 import { ApiKeyManager, DatabaseContext, VerifyResult } from '@contember/engine-tenant-api'
 import { HttpErrorResponse } from './HttpResponse'
 import { Timer } from '../application'
-import { IncomingMessage } from 'http'
+import { IncomingMessage } from 'node:http'
 
 export type AuthResult =
 	& VerifyResult

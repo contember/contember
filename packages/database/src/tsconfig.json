@@ -4,8 +4,6 @@
 		"outDir": "../dist/src"
 	},
 	"references": [
-		{
-			"path": "../../queryable/src"
-		}
+		{ "path": "../../queryable/src" }
 	]
 }

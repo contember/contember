@@ -1,5 +1,5 @@
 import { ProjectGroupContainer } from './ProjectGroupContainer'
-import { IncomingMessage } from 'http'
+import { IncomingMessage } from 'node:http'
 
 export interface ProjectGroupResolver {
 	resolveContainer({ request }: { request: IncomingMessage }): Promise<ProjectGroupContainer>

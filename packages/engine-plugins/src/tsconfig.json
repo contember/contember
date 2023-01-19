@@ -5,11 +5,7 @@
 		"esModuleInterop": true
 	},
 	"references": [
-		{
-			"path": "../../database-migrations/src"
-		},
-		{
-			"path": "../../engine-http/src"
-		}
+		{ "path": "../../database-migrations/src" },
+		{ "path": "../../engine-http/src" }
 	]
 }

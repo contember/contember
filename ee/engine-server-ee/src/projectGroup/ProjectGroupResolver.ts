@@ -5,7 +5,7 @@ import {
 	ProjectGroupResolver as ProjectGroupResolverInterface,
 } from '@contember/engine-http'
 import { ProjectGroupContainerResolver } from './ProjectGroupContainerResolver'
-import { IncomingMessage } from 'http'
+import { IncomingMessage } from 'node:http'
 
 export class ProjectGroupResolver implements ProjectGroupResolverInterface {
 	private groupRegex = (

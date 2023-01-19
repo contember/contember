@@ -5,11 +5,7 @@
 		"esModuleInterop": true
 	},
 	"references": [
-		{
-			"path": "../src"
-		},
-		{
-			"path": "../../schema-definition/src"
-		}
+		{ "path": "../src" },
+		{ "path": "../../schema-definition/src" }
 	]
 }

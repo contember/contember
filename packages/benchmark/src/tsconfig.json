@@ -4,7 +4,7 @@
 		"outDir": "../dist/src"
 	},
 	"references": [
-		{ "path": "../../engine-server/src" },
+		{ "path": "../../engine-http/src" },
 		{ "path": "../../logger/src" },
 		{ "path": "../../schema/src" },
 		{ "path": "../../schema-utils/src" },

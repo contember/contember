@@ -4,50 +4,9 @@
 		"outDir": "../dist/src"
 	},
 	"references": [
-		{
-			"path": "../../dic/src"
-		},
-		{
-			"path": "../../config-loader/src"
-		},
-		{
-			"path": "../../schema/src"
-		},
-		{
-			"path": "../../database/src"
-		},
-		{
-			"path": "../../engine-common/src"
-		},
-		{
-			"path": "../../engine-http/src"
-		},
-		{
-			"path": "../../engine-tenant-api/src"
-		},
-		{
-			"path": "../../engine-system-api/src"
-		},
-		{
-			"path": "../../engine-content-api/src"
-		},
-		{
-			"path": "../../engine-plugins/src"
-		},
-		{
-			"path": "../../engine-s3-plugin/src"
-		},
-		{
-			"path": "../../engine-vimeo-plugin/src"
-		},
-		{
-			"path": "../../logger/src"
-		},
-		{
-			"path": "../../typesafe/src"
-		},
-		{
-			"path": "../../schema-migrations/src"
-		}
+		{ "path": "../../engine-http/src" },
+		{ "path": "../../engine-plugins/src" },
+		{ "path": "../../engine-s3-plugin/src" },
+		{ "path": "../../engine-vimeo-plugin/src" }
 	]
 }

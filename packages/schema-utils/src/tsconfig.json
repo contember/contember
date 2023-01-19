@@ -5,11 +5,7 @@
 		"esModuleInterop": true
 	},
 	"references": [
-		{
-			"path": "../../schema/src"
-		},
-		{
-			"path": "../../typesafe/src"
-		}
+		{ "path": "../../schema/src" },
+		{ "path": "../../typesafe/src" }
 	]
 }

@@ -35,8 +35,8 @@ test('update site & create contact page', async () => {
 			},
 		},
 		expectDatabase: {
-			site: [{ id: testUuid(1), slug: 'en' }],
-			contact_page: [{ site_id: testUuid(1), id: testUuid(2), title: 'Test' }],
+			site: [{ id: testUuid(3), slug: 'en' }],
+			contact_page: [{ site_id: testUuid(3), id: testUuid(5), title: 'Test' }],
 		},
 	})
 })
@@ -72,8 +72,8 @@ test('update site & try to create contact page which however exists', async () =
 			},
 		},
 		expectDatabase: {
-			site: [{ id: testUuid(1), slug: 'en' }],
-			contact_page: [{ site_id: testUuid(1), id: testUuid(2), title: 'Test' }],
+			site: [{ id: testUuid(3), slug: 'en' }],
+			contact_page: [{ site_id: testUuid(3), id: testUuid(4), title: 'Test' }],
 		},
 	})
 })

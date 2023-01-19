@@ -37,16 +37,10 @@ test('update', async () => {
 					response: { rows: [{ id: testUuid(1) }] },
 				},
 				{
-					sql: SQL`with "newData_" as
-              (select
-                 ? :: text as "name",
-                 "root_"."id"
-               from "public"."author" as "root_"
-               where "root_"."id" = ?) update "public"."author"
-              set "name" = "newData_"."name" from "newData_"
-              where "author"."id" = "newData_"."id"`,
+					sql: SQL`with "newData_" as (select ? :: text as "name", "root_"."name" as "name_old__", "root_"."id"  from "public"."author" as "root_"  where "root_"."id" = ?) 
+							update  "public"."author" set  "name" =  "newData_"."name"   from "newData_"  where "author"."id" = "newData_"."id"  returning "name_old__"`,
 					parameters: ['John', testUuid(1)],
-					response: { rowCount: 1 },
+					response: { rows: [{ name_old__: 'Jack' }] },
 				},
 			]),
 		],

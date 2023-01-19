@@ -32,13 +32,10 @@ test('update', async () => {
 					},
 				},
 				{
-					sql: SQL`
-						with "newData_" as
-						(select ? :: text as "name", "root_"."id", "root_"."setting_id"  from "public"."site" as "root_"  where "root_"."id" = ?)
-						update  "public"."site" set  "name" =  "newData_"."name"
- 						from "newData_"  where "site"."id" = "newData_"."id"`,
+					sql: SQL`with "newData_" as (select ? :: text as "name", "root_"."name" as "name_old__", "root_"."id", "root_"."setting_id"  from "public"."site" as "root_"  where "root_"."id" = ?) 
+						update  "public"."site" set  "name" =  "newData_"."name"   from "newData_"  where "site"."id" = "newData_"."id"  returning "name_old__"`,
 					parameters: ['Mangoweb', testUuid(1)],
-					response: { rowCount: 1 },
+					response: { rows: [{ name_old__: 'Foo' }] },
 				},
 			]),
 		],

@@ -31,11 +31,10 @@ test('query portal', async () => {
 					parameters: [testUuid(1)],
 				},
 				{
-					sql: SQL`with "newData_" as
-    					(select ? :: text as "title", "root_"."id"  from "public"."post" as "root_"  where "root_"."id" = ?)
-						update  "public"."post" set  "title" =  "newData_"."title"   from "newData_"  where "post"."id" = "newData_"."id"`,
+					sql: SQL`with "newData_" as (select ? :: text as "title", "root_"."title" as "title_old__", "root_"."id"  from "public"."post" as "root_"  where "root_"."id" = ?) 
+						update  "public"."post" set  "title" =  "newData_"."title"   from "newData_"  where "post"."id" = "newData_"."id"  returning "title_old__"`,
 					parameters: ['Hello', testUuid(1)],
-					response: { rowCount: 1 },
+					response: { rows: [{ title_old__: 'Hi' }] },
 				},
 			]),
 			{
@@ -90,11 +89,10 @@ test('transaction with query portal', async () => {
 					parameters: [testUuid(1)],
 				},
 				{
-					sql: SQL`with "newData_" as
-    					(select ? :: text as "title", "root_"."id"  from "public"."post" as "root_"  where "root_"."id" = ?)
-						update  "public"."post" set  "title" =  "newData_"."title"   from "newData_"  where "post"."id" = "newData_"."id"`,
+					sql: SQL`with "newData_" as (select ? :: text as "title", "root_"."title" as "title_old__", "root_"."id"  from "public"."post" as "root_"  where "root_"."id" = ?) 
+						update  "public"."post" set  "title" =  "newData_"."title"   from "newData_"  where "post"."id" = "newData_"."id"  returning "title_old__"`,
 					parameters: ['Hello', testUuid(1)],
-					response: { rowCount: 1 },
+					response: { rows: [{ title_old__: 'Hi' }] },
 				},
 				{
 					sql: SQL`select "root_"."id" as "root_id"

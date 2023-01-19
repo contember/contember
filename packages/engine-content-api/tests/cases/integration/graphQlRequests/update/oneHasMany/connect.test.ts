@@ -28,18 +28,10 @@ test('connect', async () => {
 					response: { rows: [{ id: testUuid(1) }] },
 				},
 				{
-					sql: SQL`with "newData_" as
-              (select
-                 ? :: uuid as "post_id",
-                 "root_"."id",
-                 "root_"."title",
-                 "root_"."locale"
-               from "public"."post_locale" as "root_"
-               where "root_"."id" = ?) update "public"."post_locale"
-              set "post_id" = "newData_"."post_id" from "newData_"
-              where "post_locale"."id" = "newData_"."id"`,
+					sql: SQL`with "newData_" as (select ? :: uuid as "post_id", "root_"."post_id" as "post_id_old__", "root_"."id", "root_"."title", "root_"."locale"  from "public"."post_locale" as "root_"  where "root_"."id" = ?) 
+						update  "public"."post_locale" set  "post_id" =  "newData_"."post_id"   from "newData_"  where "post_locale"."id" = "newData_"."id"  returning "post_id_old__"`,
 					parameters: [testUuid(2), testUuid(1)],
-					response: { rowCount: 1 },
+					response: { rows: [{ post_id__old: testUuid(99) }] },
 				},
 			]),
 		],

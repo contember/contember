@@ -45,16 +45,10 @@ test('update name', async () => {
 					response: { rows: [{ id: testUuid(1) }] },
 				},
 				{
-					sql: SQL`with "newData_" as
-              (select
-                 ? :: text as "name",
-                 "root_"."id"
-               from "public"."author" as "root_"
-               where "root_"."id" = ? and "root_"."name" in (?, ?)) update "public"."author"
-              set "name" = "newData_"."name" from "newData_"
-              where "author"."id" = "newData_"."id" and "newData_"."name" in (?, ?)`,
+					sql: SQL`with "newData_" as (select ? :: text as "name", "root_"."name" as "name_old__", "root_"."id"  from "public"."author" as "root_"  where "root_"."id" = ? and "root_"."name" in (?, ?)) 
+						update  "public"."author" set  "name" =  "newData_"."name"   from "newData_"  where "author"."id" = "newData_"."id" and "newData_"."name" in (?, ?)  returning "name_old__"`,
 					parameters: ['John', testUuid(1), 'John', 'Jack', 'John', 'Jack'],
-					response: { rowCount: 1 },
+					response: { rows: [{ name_old__: 'John' }] },
 				},
 			]),
 		],
@@ -108,16 +102,10 @@ test('update name - denied', async () => {
 					response: { rows: [{ id: testUuid(1) }] },
 				},
 				{
-					sql: SQL`with "newData_" as
-              (select
-                 ? :: text as "name",
-                 "root_"."id"
-               from "public"."author" as "root_"
-               where false) update "public"."author"
-              set "name" = "newData_"."name" from "newData_"
-              where "author"."id" = "newData_"."id" and false`,
+					sql: SQL`with "newData_" as (select ? :: text as "name", "root_"."name" as "name_old__", "root_"."id"  from "public"."author" as "root_"  where false) 
+							update  "public"."author" set  "name" =  "newData_"."name"   from "newData_"  where "author"."id" = "newData_"."id" and false  returning "name_old__"`,
 					parameters: ['John'],
-					response: 0,
+					response: { rows: [] },
 				},
 			]),
 		],

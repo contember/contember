@@ -49,7 +49,7 @@ export const executeDbTest = async (test: Test) => {
 	const modifications = schemaDiffer.diffSchemas(emptySchema, schema)
 
 
-	const uuidGenerator = createUuidGenerator('1111')
+	const uuidGenerator = createUuidGenerator('a456')
 	const providers = { uuid: uuidGenerator, now: () => new Date('2019-09-04 12:00') }
 
 	const modificationHandlerFactory = new ModificationHandlerFactory(ModificationHandlerFactory.defaultFactoryMap)

@@ -28,16 +28,10 @@ test('update', async () => {
 					response: { rows: [{ id: testUuid(1) }] },
 				},
 				{
-					sql: SQL`with "newData_" as
-              (select
-                 ? :: text as "title",
-                 "root_"."id"
-               from "public"."post" as "root_"
-               where "root_"."id" = ?) update "public"."post"
-              set "title" = "newData_"."title" from "newData_"
-             where "post"."id" = "newData_"."id"`,
+					sql: SQL`with "newData_" as (select ? :: text as "title", "root_"."title" as "title_old__", "root_"."id"  from "public"."post" as "root_"  where "root_"."id" = ?) 
+							update  "public"."post" set  "title" =  "newData_"."title"   from "newData_"  where "post"."id" = "newData_"."id"  returning "title_old__"`,
 					parameters: ['Lorem', testUuid(1)],
-					response: { rowCount: 1 },
+					response: { rows: [{ title_old__: 'Foo bar' }] },
 				},
 				{
 					sql: SQL`insert into "public"."post_categories" ("post_id", "category_id")

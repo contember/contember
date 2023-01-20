@@ -1,6 +1,7 @@
-import { DatabaseQuery, DatabaseQueryable, Operator, SelectBuilderSpecification } from '@contember/database'
+import { DatabaseQuery, DatabaseQueryable, Literal, Operator, SelectBuilderSpecification } from '@contember/database'
 import { MaybePersonRow } from './types'
 import { PersonQueryBuilderFactory } from './PersonQueryBuilderFactory'
+import { normalizeEmail } from '../../utils/email'
 
 export type PersonUniqueIdentifier =
 	| { type: 'id'; id: string }
@@ -12,7 +13,7 @@ class PersonQuery extends DatabaseQuery<MaybePersonRow> {
 		super()
 	}
 
-	static byUniqueIdentifier(identifier: PersonUniqueIdentifier): PersonQuery {
+	static byUniqueIdentifier(identifier: PersonUniqueIdentifier): DatabaseQuery<MaybePersonRow> {
 		switch (identifier.type) {
 			case 'email':
 				return PersonQuery.byEmail(identifier.email)
@@ -27,7 +28,11 @@ class PersonQuery extends DatabaseQuery<MaybePersonRow> {
 		return new PersonQuery(qb => qb.where(it => it.compare(['person', 'id'], Operator.eq, id)))
 	}
 
-	static byEmail(email: string): PersonQuery {
+	static byEmail(email: string): DatabaseQuery<MaybePersonRow> {
+		return new PersonByEmailFallbackQuery(email)
+	}
+
+	static byExactEmail(email: string): PersonQuery {
 		return new PersonQuery(qb => qb.where(it => it.compare(['person', 'email'], Operator.eq, email)))
 	}
 
@@ -42,6 +47,28 @@ class PersonQuery extends DatabaseQuery<MaybePersonRow> {
 
 		return this.fetchOneOrNull(rows)
 	}
+}
+
+class PersonByEmailFallbackQuery extends DatabaseQuery<MaybePersonRow> {
+	constructor(
+		private readonly email: string,
+	) {
+		super()
+	}
+
+	async fetch(ctx: DatabaseQueryable): Promise<MaybePersonRow> {
+		const handler = ctx.getHandler()
+		const exact = await handler.fetch(PersonQuery.byExactEmail(this.email))
+		if (exact) {
+			return exact
+		}
+		const normalizedEmail = normalizeEmail(this.email)
+		if (normalizedEmail === this.email) {
+			return null
+		}
+		return await handler.fetch(PersonQuery.byExactEmail(normalizedEmail))
+	}
+
 }
 
 export { PersonQuery }

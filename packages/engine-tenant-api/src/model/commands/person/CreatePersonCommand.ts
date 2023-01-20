@@ -1,7 +1,8 @@
 import { Command } from '../Command'
 import { PersonRow } from '../../queries'
-import { InsertBuilder } from '@contember/database'
+import { InsertBuilder, Literal } from '@contember/database'
 import { MaybePassword } from '../../dtos/Password'
+import { normalizeEmail } from '../../utils/email'
 
 export class CreatePersonCommand implements Command<Omit<PersonRow, 'roles'>> {
 	constructor(private readonly data: {
@@ -16,12 +17,14 @@ export class CreatePersonCommand implements Command<Omit<PersonRow, 'roles'>> {
 		const id = providers.uuid()
 
 		const password_hash = await this.data.password.getHash(providers)
+		const email = this.data.email ? normalizeEmail(this.data.email) : null
+		const name = this.data.name ?? this.data.email?.split('@')[0] ?? null
 		await InsertBuilder.create()
 			.into('person')
 			.values({
 				id: id,
-				email: this.data.email ?? null,
-				name: this.data.name ?? this.data.email?.split('@')[0] ?? null,
+				email,
+				name: name,
 				password_hash,
 				identity_id: this.data.identityId,
 				idp_only: this.data.idpOnly ?? false,
@@ -30,7 +33,8 @@ export class CreatePersonCommand implements Command<Omit<PersonRow, 'roles'>> {
 
 		return {
 			id,
-			email: this.data.email,
+			email,
+			name,
 			password_hash, identity_id:
 			this.data.identityId,
 			otp_uri: null,

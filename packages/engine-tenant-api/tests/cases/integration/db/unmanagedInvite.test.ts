@@ -27,9 +27,9 @@ test('does not send an email and sets given password', testTenantDb(async ({ tes
 		errors: [],
 		result: {
 			person: {
-				id: testUuid(3),
+				id: testUuid(6),
 				identity: {
-					id: testUuid(2),
+					id: testUuid(5),
 				},
 			},
 		},

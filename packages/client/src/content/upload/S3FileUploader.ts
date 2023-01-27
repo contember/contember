@@ -45,7 +45,7 @@ class S3FileUploader implements FileUploader<S3FileUploader.SuccessMetadata> {
 			const uploadOptions = this.options.getUploadOptions?.(file)
 
 			parameters[S3FileUploader.formatFullAlias(alias)] = {
-				contentType: file.type,
+				contentType: uploadOptions?.fileType ?? file.type,
 				prefix: uploadOptions?.filePrefix,
 				expiration: uploadOptions?.fileExpiration,
 				acl: uploadOptions?.fileAcl,
@@ -119,6 +119,7 @@ namespace S3FileUploader {
 	}
 
 	export interface S3UploadOptions {
+		fileType?: GenerateUploadUrlMutationBuilder.FileParameters['contentType']
 		fileExpiration?: GenerateUploadUrlMutationBuilder.FileParameters['expiration']
 		filePrefix?: GenerateUploadUrlMutationBuilder.FileParameters['prefix']
 		fileAcl?: GenerateUploadUrlMutationBuilder.FileParameters['acl']

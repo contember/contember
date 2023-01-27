@@ -277,6 +277,8 @@ export namespace S3FileUploader {
         fileExpiration?: GenerateUploadUrlMutationBuilder.FileParameters['expiration'];
         // (undocumented)
         filePrefix?: GenerateUploadUrlMutationBuilder.FileParameters['prefix'];
+        // (undocumented)
+        fileType?: GenerateUploadUrlMutationBuilder.FileParameters['contentType'];
     }
     // (undocumented)
     export interface SuccessMetadata {

@@ -7,7 +7,8 @@ import { MembershipResolver, ParsedMembership } from '@contember/schema-utils'
 
 const assumeMembershipHeader = 'x-contember-assume-membership'
 
-interface HeaderAccessor {
+interface HttpRequest {
+	body?: unknown
 	get(header: string): string
 }
 
@@ -20,7 +21,7 @@ export class ProjectMembershipResolver {
 
 	public async resolveMemberships({ request, acl, projectSlug, identity }: {
 		acl: Acl.Schema
-		request: HeaderAccessor
+		request: HttpRequest
 		projectSlug: string
 		identity: { identityId: string; personId?: string; roles?: readonly string[] }
 	}): Promise<{ effective: readonly ParsedMembership[]; fetched: readonly Acl.Membership[] }> {
@@ -79,18 +80,24 @@ export class ProjectMembershipResolver {
 		}
 	}
 
-	private readAssumedMemberships(req: HeaderAccessor): null | readonly Acl.Membership[] {
-		const value = req.get(assumeMembershipHeader).trim()
-		if (value === '') {
+	private readAssumedMemberships(req: HttpRequest): null | readonly Acl.Membership[] {
+		const value = this.readAssumeMembershipJson(req)
+		if (value === null) {
 			return null
 		}
-		let parsedValue: { memberships: readonly Acl.Membership[] }
 		try {
-			parsedValue = assumeMembershipValueType(JSON.parse(value))
+			return assumeMembershipValueType(value).memberships
 		} catch (e: any) {
-			throw new HttpError(`Invalid content of ${assumeMembershipHeader}: ${e.message}`, 400)
+			throw new HttpError(`Invalid format of "assume membership": ${e.message}`, 400)
 		}
-		return parsedValue.memberships
+	}
+
+	private readAssumeMembershipJson(req: HttpRequest): unknown {
+		if (typeof req.body === 'object' && req.body !== null && 'assumeMembership' in req.body) {
+			return (req.body as any).assumeMembership
+		}
+		const value = req.get(assumeMembershipHeader).trim()
+		return value !== '' ? JSON.parse(value) : null
 	}
 
 	private verifyAssumedRoles(explicitMemberships: readonly Acl.Membership[], acl: Acl.Schema, assumedMemberships: readonly Acl.Membership[]) {

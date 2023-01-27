@@ -13,6 +13,7 @@ describe('membership resolver', () => {
 		}))
 		const resolvedMembership = await membershipResolver.resolveMemberships({
 			request: {
+				body: {},
 				get: () => '',
 			},
 			projectSlug: 'test',
@@ -42,6 +43,7 @@ describe('membership resolver', () => {
 		}))
 		const resolvedMembership = await membershipResolver.resolveMemberships({
 			request: {
+				body: {},
 				get: () => '',
 			},
 			projectSlug: 'test',
@@ -69,6 +71,7 @@ describe('membership resolver', () => {
 		}))
 		const resolvedMembership = await membershipResolver.resolveMemberships({
 			request: {
+				body: {},
 				get: () => JSON.stringify({
 					memberships: [{ role: 'test', variables: [{ name: 'lang', values: [JSON.stringify({ eq: 'cs' })] }] }],
 				}),
@@ -105,4 +108,56 @@ describe('membership resolver', () => {
 		expect(resolvedMembership.effective).deep.eq([{ role: 'test', variables: [{ name: 'lang', condition: { eq: 'cs' } }] }])
 	})
 
+	it('should return assumed membership from a body', async () => {
+		const membershipResolver = new ProjectMembershipResolver(false, createMock<ProjectMembershipFetcher>({
+			fetchMemberships(): Promise<readonly Acl.Membership[]> {
+				return Promise.resolve([{ role: 'admin', variables: [] }])
+			},
+		}))
+		const resolvedMembership = await membershipResolver.resolveMemberships({
+			request: {
+				body: {
+					assumeMembership: {
+						memberships: [{
+							role: 'test',
+							variables: [{ name: 'lang', values: [JSON.stringify({ eq: 'cs' })] }],
+						}],
+					},
+				},
+				get: () => '',
+			},
+			projectSlug: 'test',
+			identity: {
+				identityId: 'd4141336-6512-41ef-a25a-374de35a2806',
+				roles: [],
+			},
+			acl: {
+				roles: {
+					admin: {
+						variables: {},
+						entities: {},
+						content: {
+							assumeMembership: {
+								test: {
+									variables: true,
+								},
+							},
+						},
+					},
+					test: {
+						variables: {
+							lang: {
+								type: Acl.VariableType.condition,
+							},
+						},
+						entities: {},
+					},
+				},
+			},
+		})
+		expect(resolvedMembership.effective).deep.eq([{
+			role: 'test',
+			variables: [{ name: 'lang', condition: { eq: 'cs' } }],
+		}])
+	})
 })

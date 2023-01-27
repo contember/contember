@@ -1,0 +1,21 @@
+{
+  "name": "@contember/graphql-client-tenant",
+  "version": "1.2.0-rc.1",
+  "license": "Apache-2.0",
+  "main": "dist/src/index.js",
+  "scripts": {
+    "test": "echo 'No tests'",
+    "build": "tsx ./scripts/generateClient.ts && tsc --build ./src"
+  },
+  "typings": "dist/src/index.d.ts",
+  "dependencies": {
+    "graphql-ts-client-api": "^3.1.14"
+  },
+  "devDependencies": {
+    "@contember/engine-tenant-api": "^1.2.0-rc.1",
+    "@graphql-tools/schema": "^8.3.5",
+    "@types/node": "^18",
+    "graphql-ts-client-codegen": "^3.1.14",
+    "tsx": "^3.12.2"
+  }
+}

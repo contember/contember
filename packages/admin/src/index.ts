@@ -5,7 +5,6 @@ export * from './deprecated'
 export * from './i18n'
 export * from './routing'
 export * from './tenant'
-export * from './utils/eventSourceReader'
 
 export type { AdminDictionary } from './adminDictionary'
 

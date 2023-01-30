@@ -7,6 +7,7 @@ import { RequestProvider, RouteMap, RoutingContext, RoutingContextValue, Selecte
 import { IdentityProvider } from './Identity'
 import { NavigationProvider } from './NavigationProvider'
 import { projectEnvironmentExtension } from './Project/ProjectEnvironmentExtension'
+import { OutdatedApplicationChecker } from './Application/OutdatedApplicationChecker'
 
 export interface ApplicationEntrypointProps extends ContemberClientProps {
 	basePath?: string
@@ -63,6 +64,7 @@ export const ApplicationEntrypoint = (props: ApplicationEntrypointProps) => {
 										<DialogProvider>
 											<NavigationProvider>
 												<IdentityProvider onInvalidIdentity={props.onInvalidIdentity}>
+													<OutdatedApplicationChecker />
 													<SectionTabsProvider>
 														{props.children}
 													</SectionTabsProvider>

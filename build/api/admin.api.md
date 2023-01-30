@@ -240,7 +240,7 @@ export interface AddNewBlockButtonProps extends Omit<AddNewBlockButtonInnerProps
 }
 
 // @public (undocumented)
-export type AdminDictionary = BlockRepeaterDictionary & DataGridCellsDictionary & DataGridDictionary & ErrorCodeDictionary & EditorDictionary & FieldViewDictionary & PersistFeedbackDictionary & RepeaterDictionary & UploadDictionary & ChoiceFieldDictionary;
+export type AdminDictionary = BlockRepeaterDictionary & DataGridCellsDictionary & DataGridDictionary & ErrorCodeDictionary & EditorDictionary & FieldViewDictionary & PersistFeedbackDictionary & RepeaterDictionary & UploadDictionary & ChoiceFieldDictionary & OutdatedApplicationDictionary;
 
 // @public (undocumented)
 export const alignCenterButton: GenericToolbarButton;
@@ -3060,6 +3060,19 @@ export const orderedListToolbarButton: ElementToolbarButton<OrderedListElement>;
 
 // @public (undocumented)
 export const OtpManagement: () => JSX.Element;
+
+// @public (undocumented)
+export type OutdatedApplicationDictionary = typeof outdatedApplicationDictionary;
+
+// @public (undocumented)
+export const outdatedApplicationDictionary: {
+    outdatedApplication: {
+        heading: string;
+        text: string;
+        reloadButton: string;
+        postponeButton: string;
+    };
+};
 
 // @public (undocumented)
 export const overrideDeleteBackward: <E extends Editor>(editor: E) => void;

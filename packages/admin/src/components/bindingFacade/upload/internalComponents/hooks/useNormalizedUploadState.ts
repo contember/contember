@@ -1,5 +1,6 @@
+import { AcceptFileKindError, AcceptedFile, FileHandler } from '../../fileHandler'
+import { DropzoneState, useDropzone } from 'react-dropzone'
 import { EntityAccessor, useBindingOperations, useMutationState } from '@contember/binding'
-import { FileUploadError } from '@contember/client'
 import type {
 	FileId,
 	FileUpload,
@@ -7,11 +8,11 @@ import type {
 	FileWithMetadata,
 	StartUploadFileOptions,
 } from '@contember/react-client'
-import { useCallback } from 'react'
-import { unstable_batchedUpdates } from 'react-dom'
-import { DropzoneState, useDropzone } from 'react-dropzone'
+
+import { FileUploadError } from '@contember/client'
 import { assertNever } from '../../../../../utils'
-import { AcceptedFile, AcceptFileKindError, FileHandler } from '../../fileHandler'
+import { unstable_batchedUpdates } from 'react-dom'
+import { useCallback } from 'react'
 
 export interface NormalizedUploadStateOptions {
 	isMultiple: boolean
@@ -39,11 +40,12 @@ export const useNormalizedUploadState = ({
 	const onDrop = useCallback(
 		(files: File[]) => {
 			const { getEntityByKey, getEntityListSubTree, getEntitySubTree, contentClient, systemClient, tenantClient } = bindingOperations
+			const reversedFiles = files.reverse() // Reverse the files order so that the entities are created in the same order as the files are dropped.
 
 			const filesWithIds: [string, File][] = []
 			let metadataByFileId: Map<FileId, FileWithMetadata>
 			unstable_batchedUpdates(() => {
-				for (const file of files) {
+				for (const file of reversedFiles) {
 					prepareEntityForNewFile(getNewAccessor => {
 						const fileId = getNewAccessor().key
 						filesWithIds.push([fileId, file])
@@ -85,10 +87,10 @@ export const useNormalizedUploadState = ({
 						if (result.status === 'fulfilled') {
 							const resolvedKind = result.value
 							if (resolvedKind === undefined) {
-								rejected.push(files[i])
+								rejected.push(reversedFiles[i])
 								continue
 							}
-							resolved.set(files[i], {
+							resolved.set(reversedFiles[i], {
 								uploader: resolvedKind.fileKind.uploader,
 							})
 							if (resolvedKind.finalizeEntity) {
@@ -110,7 +112,7 @@ export const useNormalizedUploadState = ({
 								}
 							}
 
-							const file = files[i]
+							const file = reversedFiles[i]
 							if (errors.length) {
 								rejected.push([file, errors])
 							} else {

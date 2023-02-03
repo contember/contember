@@ -131,7 +131,7 @@ const createSqlMetricsRegistrar = (registry: prom.Registry): SqlMetricsRegistrar
 					...labels,
 					contember_module: meta.module || labels.contember_module,
 				},
-				timing ? timing.selfDuration / 1000 : 0,
+				timing ? Math.round(timing.selfDuration / 1000) : 0,
 			)
 		}
 		const queryErrorCallback: EventManager.ListenerTypes[EventManager.Event.queryError] = ({ meta }) => {

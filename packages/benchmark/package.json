@@ -19,7 +19,7 @@
     "autocannon": "^7.3.0",
     "autocannon-compare": "^0.4.0",
     "node-fetch": "^2.0",
-    "pg": "^8.5.0"
+    "pg": "^8.9.0"
   },
   "devDependencies": {
     "@types/node-fetch": "^2.5.10",

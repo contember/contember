@@ -19,6 +19,6 @@
     "@contember/schema-definition": "^1.2.0-rc.1"
   },
   "peerDependencies": {
-    "pg": "^8.5.0"
+    "pg": "^8.9.0"
   }
 }

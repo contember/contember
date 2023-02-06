@@ -12,9 +12,9 @@
     "node-pg-migrate": "^5.9.0"
   },
   "devDependencies": {
-    "pg": "^8.5.0"
+    "pg": "^8.9.0"
   },
   "peerDependencies": {
-    "pg": "^8.5.0"
+    "pg": "^8.9.0"
   }
 }

@@ -22,9 +22,9 @@
   },
   "devDependencies": {
     "@types/node": "^18",
-    "pg": "^8.5.0"
+    "pg": "^8.9.0"
   },
   "peerDependencies": {
-    "pg": "^8.5.0"
+    "pg": "^8.9.0"
   }
 }

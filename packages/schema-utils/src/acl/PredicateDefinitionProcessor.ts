@@ -1,5 +1,5 @@
 import { acceptFieldVisitor } from '../model'
-import { Acl, Input, Model } from '@contember/schema'
+import { Acl, Input, Model, Writable } from '@contember/schema'
 
 class PredicateDefinitionProcessor {
 	constructor(private readonly schema: Model.Schema) {}
@@ -11,78 +11,77 @@ class PredicateDefinitionProcessor {
 	): Input.Where<WhereValue> {
 		return this.processInternal(entity, definition, handler, [])
 	}
+
 	private processInternal<WhereValue, PredicateExtension = never>(
 		entity: Model.Entity,
 		definition: Acl.PredicateDefinition<PredicateExtension>,
 		handler: PredicateDefinitionProcessor.Handler<WhereValue, PredicateExtension>,
 		path: string[],
 	): Input.Where<WhereValue> {
-		return Object.entries(definition).reduce((result, [key, value]) => {
+		const result: Writable<Input.Where<WhereValue>> = {}
+		for (const [key, value] of Object.entries(definition)) {
 			if (value === undefined) {
-				return result
-			}
-			if (key === 'not') {
-				return {
-					...result,
-					not: this.processInternal(entity, value as Acl.PredicateDefinition<PredicateExtension>, handler, [
-						...path,
-						key,
-					]),
-				}
+				// do nothing
+			} else if (key === 'not') {
+				result.not = this.processInternal(entity, value as Acl.PredicateDefinition<PredicateExtension>, handler, [
+					...path,
+					key,
+				])
 			} else if (key === 'and' || key === 'or') {
-				return {
-					...result,
-					[key]: (value as Acl.PredicateDefinition[]).map(it =>
-						this.processInternal(entity, it, handler, [...path, key]),
-					),
-				}
-			}
-
-			if (!entity.fields[key] && handler.handleUndefinedField) {
+				result[key] = (value as Acl.PredicateDefinition[]).map(it =>
+					this.processInternal(entity, it, handler, [...path, key]),
+				)
+			} else if (!entity.fields[key] && handler.handleUndefinedField) {
 				const undefinedResult = handler.handleUndefinedField({ entity, name: key, value, path })
 				if (undefinedResult !== undefined) {
-					return { ...result, [key]: undefinedResult }
+					result[key] = undefinedResult as (typeof result)[keyof typeof result]
+				}
+			} else {
+				const fieldWhere = acceptFieldVisitor<
+					WhereValue | Input.Where | Input.Condition | [string, WhereValue | Input.Where | Input.Condition] | undefined
+				>(this.schema, entity, key, {
+					visitColumn: ({ entity, column }) => {
+						return handler.handleColumn({
+							entity,
+							column,
+							value: value as Input.Condition | PredicateExtension,
+							path,
+						})
+					},
+					visitRelation: ({ entity, relation, targetEntity }) => {
+						const processedValue = handler.handleRelation({
+							relation,
+							entity,
+							targetEntity,
+							value: value as Acl.PredicateVariable | PredicateExtension,
+							path,
+						})
+						if (
+							typeof processedValue === 'object' &&
+							processedValue !== null &&
+							'constructor' in processedValue &&
+							processedValue.constructor.name === 'Object'
+						) {
+							return this.processInternal(
+								targetEntity,
+								processedValue as Acl.PredicateDefinition<PredicateExtension>,
+								handler,
+								[...path, key],
+							)
+						}
+						return processedValue
+					},
+				})
+				if (fieldWhere === undefined) {
+					// do nothing
+				} else if (Array.isArray(fieldWhere) && fieldWhere.length === 2) {
+					result[fieldWhere[0]] = fieldWhere[1] as (typeof result)[keyof typeof result]
+				} else {
+					result[key] = fieldWhere as (typeof result)[keyof typeof result]
 				}
 			}
-
-			const fieldWhere = acceptFieldVisitor<
-				WhereValue | Input.Where | Input.Condition | [string, WhereValue | Input.Where | Input.Condition] | undefined
-			>(this.schema, entity, key, {
-				visitColumn: ({ entity, column }) => {
-					return handler.handleColumn({ entity, column, value: value as Input.Condition | PredicateExtension, path })
-				},
-				visitRelation: ({ entity, relation, targetEntity }) => {
-					const processedValue = handler.handleRelation({
-						relation,
-						entity,
-						targetEntity,
-						value: value as Acl.PredicateVariable | PredicateExtension,
-						path,
-					})
-					if (
-						typeof processedValue === 'object' &&
-						processedValue !== null &&
-						'constructor' in processedValue &&
-						processedValue.constructor.name === 'Object'
-					) {
-						return this.processInternal(
-							targetEntity,
-							processedValue as Acl.PredicateDefinition<PredicateExtension>,
-							handler,
-							[...path, key],
-						)
-					}
-					return processedValue
-				},
-			})
-			if (fieldWhere === undefined) {
-				return result
-			}
-			if (Array.isArray(fieldWhere) && fieldWhere.length === 2) {
-				return { ...result, [fieldWhere[0]]: fieldWhere[1] }
-			}
-			return { ...result, [key]: fieldWhere }
-		}, {})
+		}
+		return result
 	}
 }
 

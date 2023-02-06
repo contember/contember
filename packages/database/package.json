@@ -13,9 +13,9 @@
   "devDependencies": {
     "@contember/database-tester": "^1.2.0-rc.1",
     "@types/node": "^18",
-    "pg": "^8.5.0"
+    "pg": "^8.9.0"
   },
   "peerDependencies": {
-    "pg": "^8.5.0"
+    "pg": "^8.9.0"
   }
 }

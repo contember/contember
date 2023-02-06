@@ -11,6 +11,6 @@
     "test": "echo 'No tests'"
   },
   "peerDependencies": {
-    "pg": "^8.5.0"
+    "pg": "^8.9.0"
   }
 }

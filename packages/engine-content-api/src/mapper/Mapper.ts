@@ -156,7 +156,7 @@ export class Mapper {
 			.select(expr => expr.raw('count(*)'), 'row_count')
 			.select([path.alias, relation.joiningColumn.columnName])
 			.groupBy([path.alias, relation.joiningColumn.columnName])
-		const withPredicates = this.predicatesInjector.inject(entity, filter)
+		const withPredicates = this.predicatesInjector.inject(entity, filter, relationPath[relationPath.length - 1])
 		const qbWithWhere = this.whereBuilder.build(qb, entity, path, withPredicates, { relationPath })
 		const rows = await qbWithWhere.getResult(this.db)
 		const result = new Map<string, number>()

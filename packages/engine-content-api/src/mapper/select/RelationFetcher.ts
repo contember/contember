@@ -262,7 +262,7 @@ export class RelationFetcher {
 			.from(joiningTable.tableName, 'junction_')
 			.where(clause => clause.in(['junction_', whereColumn], ids))
 
-		const where = this.predicateInjector.inject(targetEntity, objectArgs.filter || {})
+		const where = this.predicateInjector.inject(targetEntity, objectArgs.filter || {}, relationPath[relationPath.length - 1])
 		const hasWhere = where && Object.keys(where).length > 0
 		const hasFieldOrderBy =
 			objectArgs.orderBy &&

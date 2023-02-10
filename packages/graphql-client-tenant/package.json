@@ -1,6 +1,6 @@
 {
   "name": "@contember/graphql-client-tenant",
-  "version": "1.2.0-rc.2",
+  "version": "1.2.0-rc.3",
   "license": "Apache-2.0",
   "main": "dist/src/index.js",
   "scripts": {
@@ -12,7 +12,7 @@
     "graphql-ts-client-api": "^3.1.14"
   },
   "devDependencies": {
-    "@contember/engine-tenant-api": "^1.2.0-rc.2",
+    "@contember/engine-tenant-api": "^1.2.0-rc.3",
     "@graphql-tools/schema": "^8.3.5",
     "@types/node": "^18",
     "graphql-ts-client-codegen": "^3.1.14",

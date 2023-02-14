@@ -6,34 +6,32 @@ import {
 	useEntity,
 	wrapFilterInHasOnes,
 } from '@contember/react-binding'
-import type { FunctionComponent } from 'react'
-import { DataGridColumn, DataGridColumnPublicProps } from '../base'
+import type { ComponentType, FunctionComponent } from 'react'
 import { renderDynamicChoiceFieldStatic } from '../../../fields/ChoiceField/renderDynamicChoiceFieldStatic'
 import { BaseDynamicChoiceField } from '../../../fields'
-import { FieldFallbackView, FieldFallbackViewPublicProps } from '../../../fieldViews'
-import { SelectCellArtifacts, SelectCellFilter } from './SelectCellFilter'
 import { useDesugaredOptionPath } from '../../../fields/ChoiceField/hooks/useDesugaredOptionPath'
+import { SelectCellArtifacts, SelectCellFilterExtraProps } from './common'
+import { DataGridColumnCommonProps, FilterRendererProps } from '../types'
+import { useCurrentlyChosenEntities } from '../../../fields/ChoiceField/hooks/useCurrentlyChosenEntities'
+import { useSelectOptions } from '../../../fields/ChoiceField/hooks/useSelectOptions'
+import { DataGridColumn } from '../grid'
 
-export type HasOneSelectProps =
-	& DataGridColumnPublicProps
+export type HasOneSelectRendererProps =
 	& BaseDynamicChoiceField
-	& FieldFallbackViewPublicProps
 	& SugaredRelativeSingleEntity
 	& {
 		initialFilter?: SelectCellArtifacts
 	}
 
-/**
- * DataGrid cell which allows displaying and filtering by has-one relations.
- *
- * @example
- * ```
- * <HasOneSelectCell header="Category" field="category" options="Category.name" />
- * ```
- *
- * @group Data grid
- */
-export const HasOneSelectCell: FunctionComponent<HasOneSelectProps> = Component(props => {
+export type HasOneSelectProps =
+	& HasOneSelectRendererProps
+	& DataGridColumnCommonProps
+
+
+export const createHasOneSelectCell = <ColumnProps extends {}, ValueRendererProps extends {}>({ FilterRenderer, ValueRenderer }: {
+	FilterRenderer: ComponentType<FilterRendererProps<SelectCellArtifacts, SelectCellFilterExtraProps>>,
+	ValueRenderer: ComponentType<HasOneSelectRendererProps & ValueRendererProps>
+}): FunctionComponent<HasOneSelectProps & ColumnProps & ValueRendererProps> => Component(props => {
 	return (
 		<DataGridColumn<SelectCellArtifacts>
 			{...props}
@@ -59,17 +57,25 @@ export const HasOneSelectCell: FunctionComponent<HasOneSelectProps> = Component(
 				id: [],
 				nullCondition: false,
 			}}
-			filterRenderer={filterProps => <SelectCellFilter optionProps={{
-				lazy: { initialLimit: 0 },
-				...props,
-			}} {...filterProps} />}
+			filterRenderer={filterProps => {
+				const optionProps = {
+					lazy: { initialLimit: 0 },
+					...props,
+				}
+				const currentlyChosenEntities = useCurrentlyChosenEntities(optionProps, filterProps.filter.id)
+				const selectProps = useSelectOptions(optionProps, currentlyChosenEntities)
+
+				return <FilterRenderer {...selectProps} {...filterProps} />
+			}}
 		>
-			<HasOneSelectCellContent lazy={{ initialLimit: 0 }} {...props} />
+			<ValueRenderer lazy={{ initialLimit: 0 }} {...props} />
 		</DataGridColumn>
 	)
 }, 'HasOneSelectField')
 
-const HasOneSelectCellContent = Component<BaseDynamicChoiceField & SugaredRelativeSingleEntity & FieldFallbackViewPublicProps>(
+export const createHasOneSelectCellRenderer = <FallbackProps extends {}>({ FallbackRenderer = () => null }: {
+	FallbackRenderer?: ComponentType<FallbackProps>
+}) => Component<HasOneSelectRendererProps & FallbackProps>(
 	props => {
 		const desugaredOptionPath = useDesugaredOptionPath(props, undefined)
 		const entity = useEntity(props).getEntity({ field: desugaredOptionPath.hasOneRelationPath })
@@ -83,7 +89,7 @@ const HasOneSelectCellContent = Component<BaseDynamicChoiceField & SugaredRelati
 			if (val !== null) {
 				return <>{val}</>
 			}
-			return <FieldFallbackView fallback={props.fallback} fallbackStyle={props.fallbackStyle} />
+			return <FallbackRenderer {...props} />
 		}
 
 		if ('optionLabel' in props) {

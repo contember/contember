@@ -4,40 +4,36 @@ import {
 	HasMany,
 	QueryLanguage,
 	SugaredRelativeEntityList,
-	SugaredRelativeSingleEntity,
 	useEntityList,
 	wrapFilterInHasOnes,
 } from '@contember/react-binding'
-import { Fragment, FunctionComponent, ReactElement, ReactNode, useMemo } from 'react'
+import { ComponentType, Fragment, FunctionComponent, ReactElement, ReactNode, useMemo } from 'react'
 import { BaseDynamicChoiceField } from '../../../fields'
 import { renderDynamicChoiceFieldStatic } from '../../../fields/ChoiceField/renderDynamicChoiceFieldStatic'
-import { FieldFallbackView, FieldFallbackViewPublicProps } from '../../../fieldViews'
-import { DataGridColumn, DataGridColumnPublicProps } from '../base'
-import { SelectCellArtifacts, SelectCellFilter } from './SelectCellFilter'
 import { useDesugaredOptionPath } from '../../../fields/ChoiceField/hooks/useDesugaredOptionPath'
+import { DataGridColumnCommonProps, FilterRendererProps } from '../types'
+import { DataGridColumn } from '../grid'
+import { SelectCellArtifacts, SelectCellFilterExtraProps } from './common'
+import { useCurrentlyChosenEntities } from '../../../fields/ChoiceField/hooks/useCurrentlyChosenEntities'
+import { useSelectOptions } from '../../../fields/ChoiceField/hooks/useSelectOptions'
 
-export type HasManySelectProps =
-	& DataGridColumnPublicProps
+export type HasManySelectRendererProps =
 	& SugaredRelativeEntityList
 	& BaseDynamicChoiceField
-	& FieldFallbackViewPublicProps
-	& SugaredRelativeSingleEntity
 	& {
-		renderElements?: (elements: ReactNode[]) => ReactElement
 		initialFilter?: SelectCellArtifacts
 	}
 
-/**
- * DataGrid cell which allows displaying and filtering by has-many relations.
- *
- * @example
- * ```
- * <HasManySelectCell header="Tags" field="tags" options="Tag.name" />
- * ```
- *
- * @group Data grid
- */
-export const HasManySelectCell: FunctionComponent<HasManySelectProps> = Component(props => {
+
+export type HasManySelectProps =
+	& HasManySelectRendererProps
+	& DataGridColumnCommonProps
+
+
+export const createHasManySelectCell = <ColumnProps extends {}, ValueRendererProps extends {}>({ FilterRenderer, ValueRenderer }: {
+	FilterRenderer: ComponentType<FilterRendererProps<SelectCellArtifacts, SelectCellFilterExtraProps>>,
+	ValueRenderer: ComponentType<HasManySelectRendererProps & ValueRendererProps>
+}): FunctionComponent<HasManySelectProps & ColumnProps & ValueRendererProps> => Component(props => {
 	return (
 		<DataGridColumn<SelectCellArtifacts>
 			{...props}
@@ -71,18 +67,30 @@ export const HasManySelectCell: FunctionComponent<HasManySelectProps> = Componen
 				id: [],
 				nullCondition: false,
 			}}
-			filterRenderer={filterProps => <SelectCellFilter optionProps={{
-				lazy: { initialLimit: 0 },
-				...props,
-			}} {...filterProps} />}
+			filterRenderer={filterProps => {
+				const optionProps = {
+					lazy: { initialLimit: 0 },
+					...props,
+				}
+				const currentlyChosenEntities = useCurrentlyChosenEntities(optionProps, filterProps.filter.id)
+				const selectProps = useSelectOptions(optionProps, currentlyChosenEntities)
+
+				return <FilterRenderer {...selectProps}  {...filterProps} />
+			}}
 		>
-			<HasManySelectCellContent lazy={{ initialLimit: 0 }} {...props} />
+			<ValueRenderer lazy={{ initialLimit: 0 }} {...props} />
 		</DataGridColumn>
 	)
 }, 'HasManySelectField')
 
+export type HasManySelectCellElementsRenderer = (elements: ReactNode[]) => ReactElement
 
-const HasManySelectCellContent = Component<HasManySelectProps>(
+export const createHasManySelectCellRenderer = <FallbackProps extends {}>({ renderElements = defaultElementsRenderer, FallbackRenderer = () => null }: {
+	renderElements?: HasManySelectCellElementsRenderer
+	FallbackRenderer?: ComponentType<FallbackProps>
+}) => Component<HasManySelectRendererProps & {
+	renderElements?: (elements: ReactNode[]) => ReactElement
+} & FallbackProps>(
 	props => {
 		const desugaredOptionPath = useDesugaredOptionPath(props, undefined)
 		const entities = useEntityList(props)
@@ -91,21 +99,21 @@ const HasManySelectCellContent = Component<HasManySelectProps>(
 			[desugaredOptionPath.hasOneRelationPath, entities],
 		)
 
-		const elementsRenderer = props.renderElements ?? defaultElementsRenderer
+		const elementsRenderer = props.renderElements ?? renderElements
 		if ('renderOption' in props) {
 			return elementsRenderer(entitiesArray.map(it => props.renderOption(it)))
 		}
 
 		if ('field' in desugaredOptionPath) {
 			if (entitiesArray.length === 0) {
-				return <FieldFallbackView fallback={props.fallback} fallbackStyle={props.fallbackStyle} />
+				return <FallbackRenderer {...props} />
 			}
 			return elementsRenderer(entitiesArray.map(it => {
 				const val = it.getField<string | number>(desugaredOptionPath.field).value
 				if (val !== null) {
 					return <Fragment key={it.key}>{val}</Fragment>
 				}
-				return <FieldFallbackView key={it.key} fallback={props.fallback} fallbackStyle={props.fallbackStyle} />
+				return <FallbackRenderer key={it.key} {...props} />
 			}))
 		}
 

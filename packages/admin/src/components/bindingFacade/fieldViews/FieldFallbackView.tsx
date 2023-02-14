@@ -6,11 +6,11 @@ import { fieldViewDictionary } from './fieldViewDictionary'
 export type FieldFallbackViewStyle = 'n/a' | 'nothing' | 'unknown'
 
 export interface FieldFallbackViewProps {
-	fallback: ReactNode | undefined
-	fallbackStyle: FieldFallbackViewStyle | undefined
+	fallback?: ReactNode | undefined
+	fallbackStyle?: FieldFallbackViewStyle | undefined
 }
 
-export type FieldFallbackViewPublicProps = Partial<FieldFallbackViewProps>
+export type FieldFallbackViewPublicProps = FieldFallbackViewProps
 
 /**
  * @group Field Views

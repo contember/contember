@@ -1,2 +1,4 @@
-export * from './ControlledDataGrid'
-export * from './DataGrid'
+export * from './DataGridColumn'
+export * from './createControlledDataGrid'
+export * from './createDataGridRenderer'
+export * from './createDataGrid'

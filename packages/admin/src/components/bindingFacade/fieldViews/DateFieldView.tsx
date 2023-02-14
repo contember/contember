@@ -2,13 +2,16 @@ import { Component, SugaredField, SugaredFieldProps, useField } from '@contember
 import type { FunctionComponent, ReactNode } from 'react'
 import { FieldFallbackView, FieldFallbackViewPublicProps } from './FieldFallbackView'
 
-export type DateFieldViewProps = {
-	field: SugaredFieldProps['field']
-} & (
+export type DateFieldViewFormattingProps =
 	| { format?: ((date: Date) => ReactNode) | Intl.DateTimeFormatOptions; locale?: never }
 	| { format?: Intl.DateTimeFormatOptions; locale: string | string[] }
-) &
-	FieldFallbackViewPublicProps
+
+export type DateFieldViewProps =
+	& {
+		field: SugaredFieldProps['field']
+	}
+	& DateFieldViewFormattingProps
+ 	& FieldFallbackViewPublicProps
 
 /**
  * @group Field Views

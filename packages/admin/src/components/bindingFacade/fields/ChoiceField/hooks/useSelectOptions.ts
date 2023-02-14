@@ -12,7 +12,7 @@ import Fuse from 'fuse.js'
 
 type OnSearch = (input: string) => void
 
-interface SelectOptions {
+export interface SelectOptions {
 	options: ChoiceFieldData.Options<EntityAccessor>,
 	allOptions: ChoiceFieldData.Options<EntityAccessor>,
 	onSearch: OnSearch,

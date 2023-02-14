@@ -1,15 +1,16 @@
-import { Component, QueryLanguage, wrapFilterInHasOnes } from '@contember/react-binding'
+import { Component, QueryLanguage, SugarableRelativeSingleField, wrapFilterInHasOnes } from '@contember/react-binding'
 import type { Input } from '@contember/client'
-import { Checkbox, FieldContainer, Stack } from '@contember/ui'
-import type { FunctionComponent } from 'react'
-import { useMessageFormatter } from '../../../../../i18n'
-import { BooleanFieldView, BooleanFieldViewProps } from '../../../fieldViews'
-import { DataGridColumn, DataGridColumnPublicProps, DataGridOrderDirection } from '../base'
-import { dataGridCellsDictionary } from './dataGridCellsDictionary'
+import type { ComponentType, FunctionComponent } from 'react'
+import { DataGridColumnCommonProps, DataGridOrderDirection, FilterRendererProps } from '../types'
+import { DataGridColumn } from '../grid'
+
+export type BooleanCellRendererProps = {
+	field: SugarableRelativeSingleField | string
+}
 
 export type BooleanCellProps =
-	& DataGridColumnPublicProps
-	& BooleanFieldViewProps
+	& DataGridColumnCommonProps
+	& BooleanCellRendererProps
 	& {
 		disableOrder?: boolean
 		initialOrder?: DataGridOrderDirection
@@ -22,20 +23,12 @@ export type BooleanFilterArtifacts = {
 	includeNull: boolean
 }
 
-/**
- * DataGrid cell for displaying a content of boolean field.
- *
- * @example
- * ```
- * <BooleanCell field="isPublished" header="Is published?" />
- * ```
- *
- * @group Data grid
- */
-export const BooleanCell: FunctionComponent<BooleanCellProps> = Component(props => {
+export const createBooleanCell = <ColumnProps extends {}, ValueRendererProps extends {}>({ FilterRenderer, ValueRenderer }: {
+	FilterRenderer: ComponentType<FilterRendererProps<BooleanFilterArtifacts>>,
+	ValueRenderer: ComponentType<BooleanCellRendererProps & ValueRendererProps>
+}): FunctionComponent<BooleanCellProps & ColumnProps & ValueRendererProps> => Component(props => {
 	return (
 		<DataGridColumn<BooleanFilterArtifacts>
-			shrunk
 			{...props}
 			enableOrdering={!props.disableOrder as true}
 			getNewOrderBy={(newDirection, { environment }) =>
@@ -67,38 +60,9 @@ export const BooleanCell: FunctionComponent<BooleanCellProps> = Component(props 
 				includeTrue: false,
 				includeNull: false,
 			}}
-			filterRenderer={({ filter, setFilter }) => {
-				const formatMessage = useMessageFormatter(dataGridCellsDictionary)
-				return (
-					<Stack horizontal align="center">
-						{(
-							[
-								['includeTrue', formatMessage('dataGridCells.booleanCell.includeTrue')],
-								['includeFalse', formatMessage('dataGridCells.booleanCell.includeFalse')],
-								['includeNull', formatMessage('dataGridCells.booleanCell.includeNull')],
-							] as const
-						).map(([item, label], index) => (
-							<FieldContainer
-								key={`${index}-${label}`}
-								display="inline"
-								label={label}
-								labelPosition="right"
-							>
-								<Checkbox
-									key={item}
-									notNull
-									value={filter[item]}
-									onChange={checked => {
-										setFilter({ ...filter, [item]: checked })
-									}}
-								/>
-							</FieldContainer>
-						))}
-					</Stack>
-				)
-			}}
+			filterRenderer={FilterRenderer}
 		>
-			<BooleanFieldView {...props} />
+			<ValueRenderer {...props} />
 		</DataGridColumn>
 	)
 }, 'BooleanCell')

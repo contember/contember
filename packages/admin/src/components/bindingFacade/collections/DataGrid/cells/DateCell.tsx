@@ -1,40 +1,32 @@
-import { Component, QueryLanguage, wrapFilterInHasOnes } from '@contember/react-binding'
+import { Component, QueryLanguage, SugarableRelativeSingleField, wrapFilterInHasOnes } from '@contember/react-binding'
 import type { Input } from '@contember/client'
-import { DateInput, FieldContainer, Stack, toDateString } from '@contember/ui'
-import { FunctionComponent, ReactNode, forwardRef, memo, useCallback } from 'react'
-import { useMessageFormatter } from '../../../../../i18n'
-import { dateToStringWithoutTimezone } from '../../../../../utils'
-import { DateFieldView, DateFieldViewProps } from '../../../fieldViews'
-import { DataGridColumn, DataGridColumnPublicProps, DataGridOrderDirection } from '../base'
-import { dataGridCellsDictionary } from './dataGridCellsDictionary'
+import { ComponentType, FunctionComponent } from 'react'
+import { DataGridColumnCommonProps, DataGridOrderDirection, FilterRendererProps } from '../types'
+import { DataGridColumn } from '../grid'
 
+export type DateCellRendererProps = {
+	field: SugarableRelativeSingleField | string
+}
 export type DateCellProps =
-	& DataGridColumnPublicProps
-	& DateFieldViewProps
+	& DateCellRendererProps
+	& DataGridColumnCommonProps
 	& {
 		disableOrder?: boolean
 		initialOrder?: DataGridOrderDirection
-		initialFilter?: DateRange
+		initialFilter?: DateRangeFilterArtifacts
 	}
 
-export type DateRange = {
+export type DateRangeFilterArtifacts = {
 	start: string | null
 	end: string | null
 }
 
-/**
- * DataGrid cell for displaying a date field value.
- *
- * @example
- * ```
- * <DateCell header="Created at" field="createdAt" />
- * ```
- *
- * @group Data grid
- */
-export const DateCell: FunctionComponent<DateCellProps> = Component(props => {
+export const createDateCell = <ColumnProps extends {}, ValueRendererProps extends {}>({ FilterRenderer, ValueRenderer }: {
+	FilterRenderer: ComponentType<FilterRendererProps<DateRangeFilterArtifacts>>,
+	ValueRenderer: ComponentType<DateCellRendererProps & ValueRendererProps>
+}): FunctionComponent<DateCellProps & ColumnProps & ValueRendererProps> => Component(props => {
 	return (
-		<DataGridColumn<DateRange>
+		<DataGridColumn<DateRangeFilterArtifacts>
 			{...props}
 			enableOrdering={!props.disableOrder as true}
 			getNewOrderBy={(newDirection, { environment }) =>
@@ -63,54 +55,11 @@ export const DateCell: FunctionComponent<DateCellProps> = Component(props => {
 				start: null,
 				end: null,
 			}}
-			filterRenderer={({ filter, setFilter }) => {
-				const formatMessage = useMessageFormatter(dataGridCellsDictionary)
-
-				const start = toDateString(filter.start) ?? ''
-				const end = toDateString(filter.end) ?? ''
-
-				const onDateStartChange = useCallback((value?: string | null) => {
-					setFilter({
-						...filter,
-						start: value ? dateToStringWithoutTimezone(new Date(value)) : null,
-					})
-				}, [filter, setFilter])
-				const onDateEndChange = useCallback((value?: string | null) => {
-					setFilter({
-						...filter,
-						end: value ? dateToStringWithoutTimezone(new Date(value)) : null,
-					})
-				}, [filter, setFilter])
-
-				return (
-					<Stack horizontal align="center">
-						<DateBoundInput label={formatMessage('dataGridCells.dateCell.fromLabel')}>
-							<DateInput
-								value={start}
-								onChange={onDateStartChange}
-								max={end}
-							/>
-						</DateBoundInput>
-						<DateBoundInput label={formatMessage('dataGridCells.dateCell.toLabel')}>
-							<DateInput
-								value={end}
-								onChange={onDateEndChange}
-								min={start}
-							/>
-						</DateBoundInput>
-					</Stack>
-				)
-			}}
+			filterRenderer={FilterRenderer}
 		>
-			<DateFieldView {...props} />
+			<ValueRenderer {...props} />
 		</DataGridColumn>
 	)
 }, 'DateCell')
 
-const DateBoundInput = memo(
-	forwardRef(({ label, children }: { label: string, children: ReactNode }, ref: any) => (
-		<FieldContainer label={label} display="inline" labelPosition="left">
-			{children}
-		</FieldContainer>
-	)),
-)
+

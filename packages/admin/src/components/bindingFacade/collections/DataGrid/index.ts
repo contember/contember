@@ -1,4 +1,4 @@
-export * from './base'
+export * from './types'
 export * from './cells'
 export * from './grid'
-export * from './paging'
+export * from './ui'

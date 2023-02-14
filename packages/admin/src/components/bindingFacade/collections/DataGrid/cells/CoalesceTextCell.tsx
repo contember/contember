@@ -1,14 +1,23 @@
-import { Component, FieldValue, Filter, QueryLanguage, wrapFilterInHasOnes } from '@contember/react-binding'
-import { Stack } from '@contember/ui'
-import { FC, ReactElement } from 'react'
-import { CoalesceFieldView, CoalesceFieldViewProps, FieldFallbackViewPublicProps } from '../../../fieldViews'
-import { DataGridColumn, DataGridColumnPublicProps } from '../base'
-import { GenericTextCellFilter, createGenericTextCellFilterCondition } from './GenericTextCellFilter'
+import {
+	Component,
+	Filter,
+	QueryLanguage,
+	SugarableRelativeSingleField,
+	wrapFilterInHasOnes,
+} from '@contember/react-binding'
+import { ComponentType, FunctionComponent } from 'react'
+import { DataGridColumnCommonProps, FilterRendererProps } from '../types'
+import { DataGridColumn } from '../grid'
+import { createGenericTextCellFilterCondition } from './common'
 
-export type CoalesceTextCellProps<Persisted extends FieldValue = FieldValue> =
-	& DataGridColumnPublicProps
-	& FieldFallbackViewPublicProps
-	& CoalesceFieldViewProps<Persisted>
+export type CoalesceCellRendererProps = {
+	fields: (SugarableRelativeSingleField | string)[]
+	initialFilter?: CoalesceTextFilterArtifacts
+}
+
+export type CoalesceTextCellProps =
+	& DataGridColumnCommonProps
+	& CoalesceCellRendererProps
 	& {
 		initialFilter?: CoalesceTextFilterArtifacts
 	}
@@ -18,17 +27,10 @@ export type CoalesceTextFilterArtifacts = {
 	query: string
 }
 
-/**
- * DataGrid cells with for text fields with a fallback support.
- *
- * @example
- * ```
- * <CoalesceTextCell fields={['email', 'user.email']} header="E-mail" />
- * ```
- *
- * @group Data grid
- */
-export const CoalesceTextCell: FC<CoalesceTextCellProps> = Component(props => {
+export const createCoalesceCell = <ColumnProps extends {}, ValueRendererProps extends {}>({ FilterRenderer, ValueRenderer }: {
+	FilterRenderer: ComponentType<FilterRendererProps<CoalesceTextFilterArtifacts>>,
+	ValueRenderer: ComponentType<CoalesceCellRendererProps & ValueRendererProps>
+}): FunctionComponent<CoalesceTextCellProps & ColumnProps & ValueRendererProps> => Component(props => {
 	return (
 		<DataGridColumn<CoalesceTextFilterArtifacts>
 			{...props}
@@ -52,17 +54,9 @@ export const CoalesceTextCell: FC<CoalesceTextCellProps> = Component(props => {
 				mode: 'matches',
 				query: '',
 			}}
-			filterRenderer={props => {
-				return (
-					<Stack horizontal align="center">
-						<GenericTextCellFilter {...props} />
-					</Stack>
-				)
-			}}
+			filterRenderer={FilterRenderer}
 		>
-			<CoalesceFieldView {...props} />
+			<ValueRenderer {...props} />
 		</DataGridColumn>
 	)
-}, 'CoalesceTextCell') as <Persisted extends FieldValue = FieldValue>(
-	props: CoalesceTextCellProps<Persisted>,
-) => ReactElement
+}, 'CoalesceTextCell')

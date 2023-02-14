@@ -1,26 +1,19 @@
-import {
-	Component,
-	Field,
-	QueryLanguage,
-	SugaredRelativeSingleField,
-	wrapFilterInHasOnes,
-} from '@contember/react-binding'
-import { Checkbox, FieldContainer, Stack } from '@contember/ui'
-import type { FunctionComponent, ReactNode } from 'react'
-import { useMessageFormatter } from '../../../../../i18n'
-import { FieldFallbackView, FieldFallbackViewPublicProps } from '../../../fieldViews'
-import { DataGridColumn, DataGridColumnPublicProps, DataGridOrderDirection } from '../base'
-import { GenericTextCellFilter, createGenericTextCellFilterCondition } from './GenericTextCellFilter'
-import { dataGridCellsDictionary } from './dataGridCellsDictionary'
+import { Component, QueryLanguage, SugarableRelativeSingleField, wrapFilterInHasOnes } from '@contember/react-binding'
+import type { ComponentType, FunctionComponent } from 'react'
+import { DataGridColumn } from '../grid'
+import { DataGridColumnCommonProps, DataGridOrderDirection, FilterRendererProps } from '../types'
+import { createGenericTextCellFilterCondition } from './common'
+
+export type TextCellRendererProps = {
+	field: SugarableRelativeSingleField | string
+}
 
 export type TextCellProps =
-	& DataGridColumnPublicProps
-	& FieldFallbackViewPublicProps
-	& SugaredRelativeSingleField
+	& TextCellRendererProps
+	& DataGridColumnCommonProps
 	& {
 		disableOrder?: boolean
 		initialOrder?: DataGridOrderDirection
-		format?: (value: string | null) => ReactNode
 		initialFilter?: TextFilterArtifacts
 	}
 
@@ -30,17 +23,10 @@ export type TextFilterArtifacts = {
 	nullCondition: boolean
 }
 
-/**
- * DataGrid cell for displaying a content of text field.
- *
- * @example
- * ```
- * <TextCell field="author.name" header="Author name" />
- * ```
- *
- * @group Data grid
- */
-export const TextCell: FunctionComponent<TextCellProps> = Component(props => {
+export const createTextCell = <ColumnProps extends {}, ValueRendererProps extends {}>({ FilterRenderer, ValueRenderer }: {
+	FilterRenderer: ComponentType<FilterRendererProps<TextFilterArtifacts>>,
+	ValueRenderer: ComponentType<TextCellRendererProps & ValueRendererProps>
+}): FunctionComponent<TextCellProps & ColumnProps & ValueRendererProps> => Component(props => {
 	return (
 		<DataGridColumn<TextFilterArtifacts>
 			{...props}
@@ -67,7 +53,7 @@ export const TextCell: FunctionComponent<TextCellProps> = Component(props => {
 					}
 				}
 
-				const desugared = QueryLanguage.desugarRelativeSingleField(props, environment)
+				const desugared = QueryLanguage.desugarRelativeSingleField(props.field, environment)
 				return wrapFilterInHasOnes(desugared.hasOneRelationPath, {
 					[desugared.field]: condition,
 				})
@@ -77,51 +63,9 @@ export const TextCell: FunctionComponent<TextCellProps> = Component(props => {
 				query: '',
 				nullCondition: false,
 			}}
-			filterRenderer={({ filter, setFilter, ...props }) => {
-				const formatMessage = useMessageFormatter(dataGridCellsDictionary)
-				return (
-					<Stack horizontal align="center">
-						<GenericTextCellFilter {...props} filter={filter} setFilter={setFilter} />
-						<FieldContainer
-							display="inline"
-							label={<span style={{ whiteSpace: 'nowrap' }}>
-								{filter.mode === 'doesNotMatch'
-									? formatMessage('dataGridCells.textCell.excludeNull', {
-										strong: chunks => <strong>{chunks}</strong>,
-									})
-									: formatMessage('dataGridCells.textCell.includeNull', {
-										strong: chunks => <strong>{chunks}</strong>,
-									})}
-							</span>}
-							labelPosition="right"
-						>
-							<Checkbox
-								notNull
-								value={filter.nullCondition}
-								onChange={checked => {
-									setFilter({
-										...filter,
-										nullCondition: !!checked,
-									})
-								}}
-							/>
-						</FieldContainer>
-					</Stack>
-				)
-			}}
+			filterRenderer={FilterRenderer}
 		>
-			<Field<string>
-				{...props}
-				format={value => {
-					if (value === null) {
-						return <FieldFallbackView fallback={props.fallback} fallbackStyle={props.fallbackStyle} />
-					}
-					if (props.format) {
-						return props.format(value as any)
-					}
-					return value
-				}}
-			/>
+			<ValueRenderer {...props} />
 		</DataGridColumn>
 	)
 }, 'TextCell')

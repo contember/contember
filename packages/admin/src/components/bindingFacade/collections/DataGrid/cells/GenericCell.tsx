@@ -1,23 +1,11 @@
 import { Component } from '@contember/react-binding'
 import type { FunctionComponent } from 'react'
-import { DataGridColumn, DataGridColumnPublicProps } from '../base'
+import { DataGridColumnCommonProps } from '../types'
+import { DataGridColumn } from '../grid'
 
-export type GenericCellProps = DataGridColumnPublicProps
+export type GenericCellProps = DataGridColumnCommonProps
 
-/**
- * Cell for displaying arbitrary content such as buttons. This cell does not support sorting or filtering.
- *
- * @example
- * ```
- * <GenericCell canBeHidden={false} justification="justifyEnd">
- * 	<LinkButton to={`article/edit(id: $entity.id)`} Component={AnchorButton}>Edit</LinkButton>
- * 	<DeleteEntityButton title="Delete" immediatePersist={true} />
- * </GenericCell>
- * ```
- *
- * @group Data grid
- */
-export const GenericCell: FunctionComponent<GenericCellProps> = Component(props => {
+export const createGenericCell = <ColumnProps extends {}>(): FunctionComponent<GenericCellProps & ColumnProps> => Component(props => {
 	return (
 		<DataGridColumn<string> {...props} enableOrdering={false} enableFiltering={false}>
 			{props.children}

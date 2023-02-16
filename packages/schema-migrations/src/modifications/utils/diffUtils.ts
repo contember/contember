@@ -97,6 +97,29 @@ export const updateRelations = <Data = { [field: string]: any }>(
 	)
 }
 
+export const updateEntityDiff = <Data = { [field: string]: any }>(
+	originalSchema: Schema,
+	updatedSchema: Schema,
+	modificationGenerator: (args: {
+		originalEntity: Model.Entity
+		updatedEntity: Model.Entity
+	}) => Migration.Modification<Data> | undefined,
+): Migration.Modification<Data>[] => {
+	return updateFields(
+		originalSchema,
+		updatedSchema,
+		({ updatedEntity, originalEntity, originalField, updatedField }) => {
+			if (!isRelation(updatedField) || !isRelation(originalField)) {
+				return undefined
+			}
+			return modificationGenerator({
+				originalEntity,
+				updatedEntity,
+			})
+		},
+	)
+}
+
 export const createFields = <Data = { [field: string]: any }>(
 	originalSchema: Schema,
 	updatedSchema: Schema,

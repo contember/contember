@@ -44,6 +44,7 @@ export default class SchemaBuilderInternal {
 			eventLog: {
 				enabled: true,
 			},
+			orderBy: options.orderBy,
 		}
 	}
 

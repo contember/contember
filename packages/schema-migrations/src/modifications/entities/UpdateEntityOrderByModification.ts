@@ -3,7 +3,6 @@ import { Model, Schema } from '@contember/schema'
 import { SchemaUpdater, updateEntity, updateField, updateModel } from '../utils/schemaUpdateUtils'
 import { createModificationType, Differ, ModificationHandler } from '../ModificationHandler'
 import deepEqual from 'fast-deep-equal'
-import { updateEntityDiff } from '../utils/diffUtils'
 
 export class UpdateEntityOrderByModificationHandler implements ModificationHandler<UpdateEntityOrderByModificationData> {
 

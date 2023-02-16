@@ -137,4 +137,10 @@ export const csCZ: AdminDictionary = {
 			dialogTitle: 'Nová položka',
 		},
 	},
+	outdatedApplication: {
+		heading: 'Nová verze je k dispozici',
+		text: 'Prosím, obnovte stránku, abyste mohli využívat nejnovější funkce aplikace.',
+		reloadButton: 'Obnovit nyní',
+		postponeButton: 'Nechat na později',
+	},
 }

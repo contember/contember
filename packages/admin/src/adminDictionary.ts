@@ -6,6 +6,7 @@ import type {
 	EditorDictionary,
 	ErrorCodeDictionary,
 	FieldViewDictionary,
+	OutdatedApplicationDictionary,
 	PersistFeedbackDictionary,
 	RepeaterDictionary,
 	UploadDictionary,
@@ -26,3 +27,4 @@ export type AdminDictionary =
 	& RepeaterDictionary
 	& UploadDictionary
 	& ChoiceFieldDictionary
+	& OutdatedApplicationDictionary

@@ -89,6 +89,16 @@ class EntityBuilder {
 	getFields(): FieldBuilder.Map {
 		return this.fields
 	}
+
+	orderBy(field: string | string[], direction: Model.OrderDirection = Model.OrderDirection.asc): EntityBuilder {
+		const path = typeof field === 'string' ? [field] : field
+
+		return new EntityBuilder(
+			{ ...this.options, orderBy: [...(this.options.orderBy ?? []), { path, direction }] },
+			this.fields,
+			this.addEntity,
+		)
+	}
 }
 
 namespace EntityBuilder {
@@ -102,6 +112,7 @@ namespace EntityBuilder {
 	export type EntityOptions = {
 		primary?: string
 		tableName?: string
+		orderBy?: Model.OrderBy[]
 		unique?: UniqueOptions[]
 	}
 }

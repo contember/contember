@@ -118,7 +118,10 @@ export class RelationFetcher {
 
 		const joiningColumns = this.resolveJoiningColumns({ relationType: relationContext.type, joiningTable: owningRelation.joiningTable })
 
-		const qb = this.buildJunctionQb(owningRelation, ids, joiningColumns, relationContext.targetEntity, { filter }, relationPath)
+		const qb = this.buildJunctionQb(owningRelation, ids, joiningColumns, relationContext.targetEntity, { filter }, [
+			...relationPath,
+			relationContext,
+		])
 			.select(['junction_', joiningColumns.sourceColumn.columnName])
 			.select(expr => expr.raw('count(*)'), 'row_count')
 			.groupBy(['junction_', joiningColumns.sourceColumn.columnName])
@@ -151,7 +154,7 @@ export class RelationFetcher {
 			joiningColumns,
 			targetEntity,
 			objectNode,
-			relationPath,
+			[...relationPath, relationContext],
 		)
 		if (junctionValues.length === 0) {
 			return {}
@@ -259,7 +262,7 @@ export class RelationFetcher {
 			.from(joiningTable.tableName, 'junction_')
 			.where(clause => clause.in(['junction_', whereColumn], ids))
 
-		const where = this.predicateInjector.inject(targetEntity, objectArgs.filter || {})
+		const where = this.predicateInjector.inject(targetEntity, objectArgs.filter || {}, relationPath[relationPath.length - 1])
 		const hasWhere = where && Object.keys(where).length > 0
 		const hasFieldOrderBy =
 			objectArgs.orderBy &&

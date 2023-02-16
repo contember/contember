@@ -140,7 +140,9 @@ export class WhereOptimizer {
 				const a = result[j]
 				const b = result[i]
 				if (i !== j && typeof a !== 'boolean' && typeof b !== 'boolean') {
-					const elResult = replaceWhere(a, b, { [entity.primary]: replacement })
+					const elResult = replaceWhere(a, b, { [entity.primary]: replacement }, {
+						replaceSubOperands: true,
+					})
 					if (elResult !== a) {
 						if (!copied) {
 							result = [...result]

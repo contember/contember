@@ -95,9 +95,11 @@ describe('where optimized', () => {
 	})
 
 
-	const A = { authors: { isPublic: { eq: true } } }
-	const B = { authors: { name: { eq: 'John' } } }
-	const C = { authors: { name: { eq: 'Jack' } } }
+	const A = { name: { eq: 'A' } }
+	const B = { name: { eq: 'B' } }
+	const C = { name: { eq: 'C' } }
+	const D = { name: { eq: 'D' } }
+	const E = { name: { eq: 'E' } }
 
 	it('minimize: A || (A && B) => A', () => {
 		assert.deepStrictEqual(whereOptimizer.optimize({
@@ -105,7 +107,7 @@ describe('where optimized', () => {
 				A,
 				{ and: [A, B] },
 			],
-		}, model.entities.Image), A)
+		}, model.entities.Author), A)
 	})
 
 	it('minimize: (A && B) || A => A', () => {
@@ -114,7 +116,7 @@ describe('where optimized', () => {
 				{ and: [A, B] },
 				A,
 			],
-		}, model.entities.Image), A)
+		}, model.entities.Author), A)
 	})
 
 	it('minimize: A && (A || B) => A', () => {
@@ -123,7 +125,7 @@ describe('where optimized', () => {
 				A,
 				{ or: [A, B] },
 			],
-		}, model.entities.Image), A)
+		}, model.entities.Author), A)
 	})
 
 	it('minimize: (A || B) && A => A', () => {
@@ -132,7 +134,7 @@ describe('where optimized', () => {
 				{ or: [A, B] },
 				A,
 			],
-		}, model.entities.Image), A)
+		}, model.entities.Author), A)
 	})
 
 	it('minimize: A && (!A || B) => A && B', () => {
@@ -141,7 +143,7 @@ describe('where optimized', () => {
 				A,
 				{ or: [{ not: A }, B] },
 			],
-		}, model.entities.Image), { and: [A, B] })
+		}, model.entities.Author), { and: [A, B] })
 	})
 
 	it('minimize: A || (!A && B) => A || B', () => {
@@ -150,7 +152,7 @@ describe('where optimized', () => {
 				A,
 				{ and: [{ not: A }, B] },
 			],
-		}, model.entities.Image), { or: [A, B] })
+		}, model.entities.Author), { or: [A, B] })
 	})
 
 
@@ -160,7 +162,7 @@ describe('where optimized', () => {
 				A,
 				{ not: A },
 			],
-		}, model.entities.Image), { id: { always: true } })
+		}, model.entities.Author), { id: { always: true } })
 	})
 
 	it('minimize: A && !A => 0', () => {
@@ -169,7 +171,7 @@ describe('where optimized', () => {
 				A,
 				{ not: A },
 			],
-		}, model.entities.Image), { id: { never: true } })
+		}, model.entities.Author), { id: { never: true } })
 	})
 
 	it('minimize: !A && !A => !A', () => {
@@ -178,7 +180,7 @@ describe('where optimized', () => {
 				{ not: A },
 				{ not: A },
 			],
-		}, model.entities.Image), { not: A })
+		}, model.entities.Author), { not: A })
 	})
 
 
@@ -188,7 +190,7 @@ describe('where optimized', () => {
 				{ and: [A, B] },
 				{ and: [A, C] },
 			],
-		}, model.entities.Image), {
+		}, model.entities.Author), {
 			or: [
 				{ and: [A, B] },
 				{ and: [A, C] },
@@ -196,6 +198,111 @@ describe('where optimized', () => {
 		})
 	})
 
+	it('minimize: (A || B) && (A || B || C) => A || B', () => {
+		assert.deepStrictEqual(whereOptimizer.optimize({
+			and: [
+				{
+					or: [A, B],
+				},
+				{
+					or: [A, B, C],
+				},
+			],
+		}, model.entities.Author), { or: [A, B] })
+	})
+
+	it('not minimize: (A || B) && (A || C)', () => {
+		assert.deepStrictEqual(whereOptimizer.optimize({
+			and: [
+				{
+					or: [A, B],
+				},
+				{
+					or: [A, C],
+				},
+			],
+		}, model.entities.Author), { and: [{ or: [A, B] }, { or: [A, C] }] })
+	})
+
+	it('minimize: (A && B) || (A && B && C) => A && B', () => {
+		assert.deepStrictEqual(whereOptimizer.optimize({
+			or: [
+				{
+					and: [A, B],
+				},
+				{
+					and: [A, B, C],
+				},
+			],
+		}, model.entities.Author), { and: [A, B] })
+	})
+
+	it('minimize: (A && B) || (A && B) || (A && B) => A && B', () => {
+		assert.deepStrictEqual(whereOptimizer.optimize({
+			or: [
+				{
+					and: [A, B],
+				},
+				{
+					and: [A, B],
+				},
+				{
+					and: [A, B],
+				},
+			],
+		}, model.entities.Author), { and: [A, B] })
+	})
+
+	it('minimize: (a && b) || (a && b && c) || (a && c) => (a && b) || (a && c)', () => {
+		assert.deepStrictEqual(whereOptimizer.optimize({
+			or: [
+				{
+					and: [A, B],
+				},
+				{
+					and: [A, B, C],
+				},
+				{
+					and: [A, C],
+				},
+			],
+		}, model.entities.Author), {
+			or: [
+				{
+					and: [A, B],
+				},
+				{
+					and: [A, C],
+				},
+			],
+		})
+	})
+
+	it('minimize: (a && b) || (c && (d || (a && b && e))) => (a && b) || (c && d)', () => {
+		assert.deepStrictEqual(whereOptimizer.optimize({
+			or: [
+				{
+					and: [A, B],
+				},
+				{
+					and: [C, { or: [D, { and: [A, B, E] }] }],
+				},
+			],
+		}, model.entities.Author), { or: [{ and: [A, B] }, { and: [C, D] }] })
+	})
+
+	it('minimize: (a || b) && (c || (d && (a || b || e))) => (A || B) && (C || D)', () => {
+		assert.deepStrictEqual(whereOptimizer.optimize({
+			and: [
+				{
+					or: [A, B],
+				},
+				{
+					or: [C, { and: [D, { or: [A, B, E] }] }],
+				},
+			],
+		}, model.entities.Author), { and: [{ or: [A, B] }, { or: [C, D] }] })
+	})
 
 	describe('remove id predicates', () => {
 

@@ -38,6 +38,7 @@ import {
 	UpdateEnumDiffer,
 	UpdateRelationOnDeleteDiffer,
 	UpdateRelationOrderByDiffer,
+	UpdateEntityOrderByDiffer,
 	UpdateValidationSchemaDiffer,
 	VERSION_LATEST,
 } from './modifications'
@@ -101,6 +102,7 @@ export class SchemaDiffer {
 			new RemoveEnumDiffer(),
 			new UpdateAclSchemaDiffer(),
 			new UpdateValidationSchemaDiffer(),
+			new UpdateEntityOrderByDiffer(),
 		]
 
 		const diffs: Migration.Modification[] = []

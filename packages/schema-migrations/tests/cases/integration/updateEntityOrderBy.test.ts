@@ -17,7 +17,7 @@ namespace SchemaWithOrderBy {
 	}
 }
 
-testMigrations('update entity order by', {
+testMigrations('update entity add order by', {
 	originalSchema: def.createModel(SchemaWithoutOrderBy),
 	updatedSchema: def.createModel(SchemaWithOrderBy),
 	diff: [
@@ -25,6 +25,18 @@ testMigrations('update entity order by', {
 			modification: 'updateEntityOrderBy',
 			entityName: 'Article',
 			orderBy: [{ path: ['title'], direction: 'asc' }],
+		},
+	],
+	sql: SQL``,
+})
+
+testMigrations('update entity remove order by', {
+	originalSchema: def.createModel(SchemaWithOrderBy),
+	updatedSchema: def.createModel(SchemaWithoutOrderBy),
+	diff: [
+		{
+			modification: 'updateEntityOrderBy',
+			entityName: 'Article',
 		},
 	],
 	sql: SQL``,

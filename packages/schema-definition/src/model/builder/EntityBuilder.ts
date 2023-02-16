@@ -94,7 +94,7 @@ class EntityBuilder {
 		const path = typeof field === 'string' ? [field] : field
 
 		return new EntityBuilder(
-			{ ...this.options, orderBy: [...(this.options.orderBy || []), { path, direction }] },
+			{ ...this.options, orderBy: [...(this.options.orderBy ?? []), { path, direction }] },
 			this.fields,
 			this.addEntity,
 		)

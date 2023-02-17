@@ -7,6 +7,7 @@
 import { Input } from '@contember/schema';
 import { Result } from '@contember/schema';
 import { Value } from '@contember/schema';
+import { Writable } from '@contember/schema';
 
 // @public (undocumented)
 export namespace CrudQueryBuilder {
@@ -335,6 +336,8 @@ export { Value }
 
 // @public (undocumented)
 export const whereToFilter: (by: Input.UniqueWhere<GraphQlLiteral>) => Input.Where<Input.Condition<Input.ColumnValue<GraphQlLiteral>>>;
+
+export { Writable }
 
 // (No @packageDocumentation comment for this package)
 

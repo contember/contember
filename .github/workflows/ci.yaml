@@ -70,7 +70,7 @@ jobs:
           --health-retries 5
 
       contember-engine:
-        image: contember/engine:1.1.0-rc.3
+        image: contember/engine:1.2.0
         env:
           NODE_ENV: 'development'
           CONTEMBER_PORT: '4000'

@@ -1,4 +1,4 @@
-import { GraphQlBuilder } from '@contember/client'
+import { GraphQlBuilder, Writable } from '@contember/client'
 import { BindingError } from '../BindingError'
 import type {
 	Alias,
@@ -186,7 +186,7 @@ export class TreeParameterMerger {
 		if (fresh === undefined) {
 			return original
 		}
-		const originalCopy: UniqueWhere = { ...original }
+		const originalCopy: Writable<UniqueWhere> = { ...original }
 
 		for (const field in fresh) {
 			if (field in originalCopy) {

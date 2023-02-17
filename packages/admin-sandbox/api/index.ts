@@ -5,6 +5,7 @@ import * as modelDefinition from './model'
 const model = SchemaDefinition.createModel(modelDefinition)
 
 const schema: Schema = {
+	settings: {},
 	acl: {
 		roles: {
 			admin: {

@@ -46,4 +46,4 @@ export * from './graphQlClient'
 export * from './system'
 export * from './tenant'
 
-export type { Input, Value, Result } from '@contember/schema'
+export type { Input, Value, Result, Writable } from '@contember/schema'

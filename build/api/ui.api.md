@@ -1952,6 +1952,9 @@ export interface PortalProps {
 }
 
 // @public (undocumented)
+export const PreventCloseContext: Context<() => void>;
+
+// @public (undocumented)
 export interface ProcessedError {
     // (undocumented)
     cause?: ProcessedError;
@@ -2641,6 +2644,9 @@ export function useMouseMoveContext(): RefObject<boolean>;
 export function useNativeInput<E extends HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement, T>({ active, disabled, loading, readOnly, required, focused, hovered, onBlur, onFocus, onFocusChange, defaultValue, id, name, onChange, notNull, placeholder, type, value, max, maxLength, min, minLength, pattern, onValidationStateChange, validationState, className: outerClassName, distinction, intent, scheme, size, ...rest }: ControlProps<T>, forwardedRef: ForwardedRef<E>): AllHTMLAttributes<E> & {
     ref: RefObject<E>;
 };
+
+// @public (undocumented)
+export function usePreventCloseContext(): () => void;
 
 // @public (undocumented)
 export function UserMiniControl({ name, note, avatarUrl }: UserMiniControlProps): JSX.Element;

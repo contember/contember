@@ -101,8 +101,8 @@ export class S3Service {
 				`Given object key "${objectKey}" does not start with a project prefix "${this.config.prefix}"`,
 			)
 		}
-		objectKey = objectKey.substr(this.config.prefix.length + 1)
-		verifyKey(objectKey)
+		const localObjectKey = this.config.prefix ? objectKey.substring(this.config.prefix.length + 1) : objectKey
+		verifyKey(localObjectKey)
 
 		const url = this.signer.sign({
 			action: 'read',

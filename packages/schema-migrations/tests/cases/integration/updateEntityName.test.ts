@@ -62,6 +62,27 @@ testMigrations('rename entity with a constraint', {
 	noDiff: true,
 })
 
+testMigrations('rename entity with one-has-one (constraint)', {
+	originalSchema: new SchemaBuilder()
+		.entity('Author', e => e.oneHasOne('content', r => r.target('Content')))
+		.entity('Content', e => e.column('foo'))
+		.buildSchema(),
+	updatedSchema: new SchemaBuilder()
+		.entity('User', e => e.tableName('author').oneHasOne('content', r => r.target('Content')))
+		.entity('Content', e => e.column('foo'))
+		.buildSchema(),
+	diff: [
+		{
+			modification: 'updateEntityName',
+			entityName: 'Author',
+			newEntityName: 'User',
+		},
+	],
+	sql: SQL`ALTER TABLE "author"
+			RENAME CONSTRAINT "unique_Author_content_b64856" TO "unique_User_content_43c77f";`,
+	noDiff: true,
+})
+
 testMigrations('rename table with acl', {
 	originalSchema: new SchemaBuilder()
 		.entity('Site', entity => entity.column('name', c => c.type(Model.ColumnType.String)))

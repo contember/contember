@@ -3,6 +3,7 @@ import type { FileUploader, FileUploaderInitializeOptions } from './FileUploader
 import { GenerateUploadUrlMutationBuilder } from './GenerateUploadUrlMutationBuilder'
 import type { UploadedFileMetadata } from './UploadedFileMetadata'
 import { FileUploadError } from './FileUploadError'
+import pLimit from 'p-limit'
 
 interface S3UploadState {
 	request?: XMLHttpRequest
@@ -27,7 +28,7 @@ class S3FileUploader implements FileUploader<S3FileUploader.SuccessMetadata> {
 
 	public async upload(
 		files: Map<File, UploadedFileMetadata>,
-		{ contentApiClient, onSuccess, onError, onProgress }: FileUploaderInitializeOptions,
+		options: FileUploaderInitializeOptions,
 	) {
 		const parameters: GenerateUploadUrlMutationBuilder.MutationParameters = {}
 
@@ -58,54 +59,66 @@ class S3FileUploader implements FileUploader<S3FileUploader.SuccessMetadata> {
 
 		const mutation = GenerateUploadUrlMutationBuilder.buildQuery(parameters)
 		try {
-			const response = await contentApiClient.sendRequest(mutation)
+			const response = await options.contentApiClient.sendRequest(mutation)
 			const responseData: GenerateUploadUrlMutationBuilder.MutationResponse = response.data
-
+			const limit = pLimit(this.options.concurrency ?? 5)
+			const promises: Promise<void>[] = []
 			for (const [file] of files) {
-				const fileState = this.uploadState.get(file)!
-				const datumBody = responseData[S3FileUploader.formatFullAlias(fileState.alias)]
-				const uploadRequestBody = await readFileAsArrayBuffer(file)
-				const xhr = new XMLHttpRequest()
-
-				fileState.request = xhr
-
-				xhr.open(datumBody.method, datumBody.url)
-
-				for (const header of datumBody.headers) {
-					xhr.setRequestHeader(header.key, header.value)
-				}
-				xhr.addEventListener('load', () => {
-					const successMetadata: S3FileUploader.SuccessMetadata = {
-						fileUrl: datumBody.publicUrl,
-					}
-					onSuccess([[file, successMetadata]])
-				})
-				onError &&
-					xhr.addEventListener('error', e => {
-						onError([file])
-					})
-				onProgress &&
-					xhr.upload?.addEventListener('progress', e => {
-						onProgress([
-							[
-								file,
-								{
-									progress: e.loaded / e.total,
-								},
-							],
-						])
-					})
-				xhr.send(uploadRequestBody)
+				promises.push(limit(() => this.uploadSingleFile(file, responseData, options)))
 			}
+			await Promise.all(promises)
 		} catch (error) {
 			if (error instanceof FileUploadError) {
 				const fileUploadError = error
-				onError(Array.from(files).map(([file]) => [file, fileUploadError]))
+				options.onError(Array.from(files).map(([file]) => [file, fileUploadError]))
 
 			} else {
 				throw error
 			}
 		}
+	}
+
+	private uploadSingleFile(
+		file: File,
+		responseData: GenerateUploadUrlMutationBuilder.MutationResponse,
+		{ onProgress, onError, onSuccess }: FileUploaderInitializeOptions,
+	) {
+		return new Promise<void>(async (resolve, reject) => {
+			const fileState = this.uploadState.get(file)!
+			const datumBody = responseData[S3FileUploader.formatFullAlias(fileState.alias)]
+			const uploadRequestBody = await readFileAsArrayBuffer(file)
+			const xhr = new XMLHttpRequest()
+
+			fileState.request = xhr
+
+			xhr.open(datumBody.method, datumBody.url)
+
+			for (const header of datumBody.headers) {
+				xhr.setRequestHeader(header.key, header.value)
+			}
+			xhr.addEventListener('load', () => {
+				const successMetadata: S3FileUploader.SuccessMetadata = {
+					fileUrl: datumBody.publicUrl,
+				}
+				onSuccess([[file, successMetadata]])
+				resolve()
+			})
+			xhr.addEventListener('error', e => {
+				onError([file])
+				reject(e)
+			})
+			 xhr.upload?.addEventListener('progress', e => {
+				onProgress([
+					[
+						file,
+						{
+							progress: e.loaded / e.total,
+						},
+					],
+				])
+			})
+			xhr.send(uploadRequestBody)
+		})
 	}
 }
 
@@ -116,6 +129,7 @@ namespace S3FileUploader {
 
 	export interface Options {
 		getUploadOptions?: (file: File) => S3UploadOptions
+		concurrency?: number
 	}
 
 	export interface S3UploadOptions {

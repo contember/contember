@@ -259,13 +259,15 @@ export class S3FileUploader implements FileUploader<S3FileUploader.SuccessMetada
     // (undocumented)
     readonly options: S3FileUploader.Options;
     // (undocumented)
-    upload(files: Map<File, UploadedFileMetadata>, { contentApiClient, onSuccess, onError, onProgress }: FileUploaderInitializeOptions): Promise<void>;
+    upload(files: Map<File, UploadedFileMetadata>, options: FileUploaderInitializeOptions): Promise<void>;
 }
 
 // @public (undocumented)
 export namespace S3FileUploader {
     // (undocumented)
     export interface Options {
+        // (undocumented)
+        concurrency?: number;
         // (undocumented)
         getUploadOptions?: (file: File) => S3UploadOptions;
     }

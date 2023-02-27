@@ -27,7 +27,6 @@ export class RemoveFieldModificationHandler implements ModificationHandler<Remov
 			},
 			visitOneHasMany: () => {},
 			visitOneHasOneOwning: ({ entity, relation }) => {
-				builder.dropConstraint(entity.tableName, NamingHelper.createUniqueConstraintName(entity.name, [relation.name]))
 				builder.dropColumn(entity.tableName, relation.joiningColumn.columnName)
 			},
 			visitOneHasOneInverse: () => {},

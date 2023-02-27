@@ -27,6 +27,7 @@
 		"test": "vitest"
 	},
 	"dependencies": {
-		"@contember/schema": "^0.11.5"
+		"@contember/schema": "^0.11.5",
+		"p-limit": "^4.0.0"
 	}
 }

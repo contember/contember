@@ -69,6 +69,7 @@ export const configTemplate: any = {
 		port: '%env.CONTEMBER_PORT::number%',
 		monitoringPort: '%env.CONTEMBER_MONITORING_PORT::number%',
 		workerCount: '%?env.CONTEMBER_WORKER_COUNT::string%',
+		applicationWorker: '%?env.CONTEMBER_APPLICATION_WORKER::string%',
 		http: {
 			requestBodySize: '%?env.CONTEMBER_HTTP_REQUEST_BODY_SIZE::string%',
 		},

@@ -68,6 +68,6 @@ export class MasterContainerFactory {
 
 	create(args: MasterContainerArgs): MasterContainer {
 		const container = this.createBuilder(args).build()
-		return container.pick('initializer', 'application', 'monitoringKoa', 'providers')
+		return container.pick('initializer', 'application', 'monitoringKoa', 'providers', 'applicationWorkers')
 	}
 }

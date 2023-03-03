@@ -33,11 +33,13 @@ import {
 import { homepageController, playgroundController } from './misc'
 import { Plugin } from './plugin/Plugin'
 import { Application } from './application/application'
+import { ApplicationWorkerManager } from './workers/ApplicationWorkerManager'
 
 export interface MasterContainer {
 	initializer: Initializer
 	application: Application
 	providers: Providers
+	applicationWorkers: ApplicationWorkerManager
 }
 
 export interface MasterContainerArgs {
@@ -161,6 +163,8 @@ export class MasterContainerFactory {
 			})
 			.addService('initializer', ({ projectGroupContainer }) =>
 				new Initializer(projectGroupContainer))
+			.addService('applicationWorkers', () =>
+				new ApplicationWorkerManager())
 			.setupService('executionContainerFactory', (it, { plugins }) => {
 				for (const plugin of plugins) {
 					if (plugin.getExecutionContainerHook) {
@@ -173,6 +177,6 @@ export class MasterContainerFactory {
 
 	create(args: MasterContainerArgs): MasterContainer {
 		const container = this.createBuilder(args).build()
-		return container.pick('initializer', 'application', 'providers')
+		return container.pick('initializer', 'application', 'providers', 'applicationWorkers')
 	}
 }

@@ -41,42 +41,43 @@ export const notifyWorkerStarted = () =>
 
 export class WorkerManager {
 
-	private state: 'none' | 'initializing' | 'running' | 'terminating' | 'closed' = 'none'
+	private isTerminating = false
 
-	constructor(
-		private readonly workerCount: number,
-	) {
-	}
+	private workers: Set<Worker> = new Set()
 
-	public async start(): Promise<void> {
-		if (this.state !== 'none') {
-			throw new Error(`Worker manager is ${this.state}`)
+	public async start({ workerCount, env }: { workerCount: number; env?: any }): Promise<void> {
+		if (this.isTerminating) {
+			throw new Error(`Worker manager is terminating`)
 		}
-		this.state = 'initializing'
-		cluster.on('exit', async (worker, code, signal) => {
-			if (this.state === 'running' || this.state === 'initializing') {
-				// eslint-disable-next-line no-console
-				console.log(`Worker ${worker.process.pid} died with signal ${signal}, restarting`)
-				await timeout(2000)
-				cluster.fork()
-			}
-		})
-		for (let i = 0; i < this.workerCount; i++) {
-			const worker = cluster.fork()
-			await waitForWorker(worker, 15000)
-			if (this.state !== 'initializing') {
+		for (let i = 0; i < workerCount; i++) {
+			await this.startWorker(env)
+			if (this.isTerminating) {
 				return
 			}
 		}
-		this.state = 'running'
+	}
+
+	private async startWorker(env?: any) {
+		const worker = cluster.fork(env)
+		worker.on('exit', async (code, signal) => {
+			this.workers.delete(worker)
+			if (!this.isTerminating) {
+				// eslint-disable-next-line no-console
+				console.log(`Worker ${worker.process.pid} died with signal ${signal}, restarting`)
+				await timeout(2000)
+				await this.startWorker(env)
+			}
+		})
+		this.workers.add(worker)
+		await waitForWorker(worker, 15000)
 	}
 
 	public async terminate(signal: NodeJS.Signals): Promise<void> {
-		if (this.state !== 'running') {
-			throw new Error(`Worker manager is ${this.state}`)
+		if (this.isTerminating) {
+			throw new Error(`Worker manager is terminating`)
 		}
-		this.state = 'terminating'
-		await Promise.allSettled(Array.from(cluster.workers ? Object.values(cluster.workers) : []).map(async it => {
+		this.isTerminating = true
+		await Promise.allSettled(Array.from(this.workers).map(async it => {
 			if (!it) {
 				return
 			}
@@ -91,6 +92,5 @@ export class WorkerManager {
 			// eslint-disable-next-line no-console
 			console.log(`Worker ${it.process.pid} terminated`)
 		}))
-		this.state = 'closed'
 	}
 }

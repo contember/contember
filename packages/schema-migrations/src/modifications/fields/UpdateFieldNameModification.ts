@@ -15,7 +15,11 @@ import {
 } from '../utils/schemaUpdateUtils'
 import { createModificationType, ModificationHandler, ModificationHandlerOptions } from '../ModificationHandler'
 import { acceptFieldVisitor, NamingHelper, PredicateDefinitionProcessor } from '@contember/schema-utils'
-import { VERSION_ACL_PATCH, VERSION_UPDATE_CONSTRAINT_NAME } from '../ModificationVersions'
+import {
+	VERSION_ACL_PATCH,
+	VERSION_UPDATE_CONSTRAINT_NAME,
+	VERSION_UPDATE_CONSTRAINT_NAME_ONE_HAS_ONE,
+} from '../ModificationVersions'
 import { renameConstraintSchemaUpdater, renameConstraintsSqlBuilder } from '../utils/renameConstraintsHelper'
 import { changeValue } from '../utils/valueUtils'
 import { updateColumnNameModification } from '../columns'
@@ -47,6 +51,23 @@ export class UpdateFieldNameModificationHandler implements ModificationHandler<U
 		if (this.options.formatVersion >= VERSION_UPDATE_CONSTRAINT_NAME) {
 			renameConstraintsSqlBuilder(builder, entity, this.getNewConstraintName.bind(this))
 		}
+
+		if (this.options.formatVersion >= VERSION_UPDATE_CONSTRAINT_NAME_ONE_HAS_ONE) {
+			acceptFieldVisitor(this.schema.model, this.data.entityName,  this.data.fieldName, {
+				visitColumn: () => {},
+				visitManyHasManyOwning: () => {},
+				visitManyHasManyInverse: () => {},
+				visitOneHasOneInverse: () => {},
+				visitManyHasOne: () => {},
+				visitOneHasMany: () => {},
+				visitOneHasOneOwning: ({ relation }) => {
+					const uniqueConstraintName = NamingHelper.createUniqueConstraintName(entity.name, [relation.name])
+					const newUniqueConstraintName = NamingHelper.createUniqueConstraintName(entity.name, [this.data.newFieldName])
+					builder.renameConstraint(entity.tableName, uniqueConstraintName, newUniqueConstraintName)
+				},
+			})
+		}
+
 		this.renameColumnSubModification.createSql(builder)
 	}
 

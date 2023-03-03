@@ -63,6 +63,28 @@ testMigrations('rename a field with a constraint', {
 	noDiff: true,
 })
 
+testMigrations('rename a field with one-has-one', {
+	originalSchema: new SchemaBuilder()
+		.entity('Author', e => e.oneHasOne('content', r => r.target('Content')))
+		.entity('Content', e => e.column('foo'))
+		.buildSchema(),
+	updatedSchema: new SchemaBuilder()
+		.entity('Author', e => e.oneHasOne('description', r => r.target('Content').joiningColumn('content_id')))
+		.entity('Content', e => e.column('foo'))
+		.buildSchema(),
+	diff: [
+		{
+			modification: 'updateFieldName',
+			entityName: 'Author',
+			fieldName: 'content',
+			newFieldName: 'description',
+		},
+	],
+	sql: SQL`ALTER TABLE "author"
+        RENAME CONSTRAINT "unique_Author_content_b64856" TO "unique_Author_description_00f1ef";`,
+	noDiff: true,
+})
+
 testMigrations('rename a relation', {
 	originalSchema: new SchemaBuilder()
 		.entity('Post', e => e.column('title').manyHasOne('user', r => r.target('Author').inversedBy('posts')))

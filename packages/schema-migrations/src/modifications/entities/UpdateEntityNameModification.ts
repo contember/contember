@@ -13,8 +13,12 @@ import {
 } from '../utils/schemaUpdateUtils'
 import { createModificationType, ModificationHandler, ModificationHandlerOptions } from '../ModificationHandler'
 import { isIt } from '../../utils/isIt'
-import { VERSION_ACL_PATCH, VERSION_UPDATE_CONSTRAINT_NAME } from '../ModificationVersions'
-import { NamingHelper } from '@contember/schema-utils'
+import {
+	VERSION_ACL_PATCH,
+	VERSION_UPDATE_CONSTRAINT_NAME,
+	VERSION_UPDATE_CONSTRAINT_NAME_ONE_HAS_ONE,
+} from '../ModificationVersions'
+import { acceptEveryFieldVisitor, NamingHelper } from '@contember/schema-utils'
 import { NoopModification } from '../NoopModification'
 import { renameConstraintSchemaUpdater, renameConstraintsSqlBuilder } from '../utils/renameConstraintsHelper'
 import { changeValue } from '../utils/valueUtils'
@@ -43,6 +47,23 @@ export class UpdateEntityNameModificationHandler implements ModificationHandler<
 		if (!entity.view && this.options.formatVersion >= VERSION_UPDATE_CONSTRAINT_NAME) {
 			renameConstraintsSqlBuilder(builder, entity, this.getNewConstraintName.bind(this))
 		}
+
+		if (this.options.formatVersion >= VERSION_UPDATE_CONSTRAINT_NAME_ONE_HAS_ONE) {
+			acceptEveryFieldVisitor(this.schema.model, this.data.entityName, {
+				visitColumn: () => {},
+				visitManyHasManyOwning: () => {},
+				visitManyHasManyInverse: () => {},
+				visitOneHasOneInverse: () => {},
+				visitManyHasOne: () => {},
+				visitOneHasMany: () => {},
+				visitOneHasOneOwning: ({ relation }) => {
+					const uniqueConstraintName = NamingHelper.createUniqueConstraintName(entity.name, [relation.name])
+					const newUniqueConstraintName = NamingHelper.createUniqueConstraintName(this.data.newEntityName, [relation.name])
+					builder.renameConstraint(entity.tableName, uniqueConstraintName, newUniqueConstraintName)
+				},
+			})
+		}
+
 		this.subModification.createSql(builder)
 	}
 

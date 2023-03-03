@@ -102,8 +102,7 @@ testMigrations('remove relation (one has one)', {
 			fieldName: 'setting',
 		},
 	],
-	sql: SQL`ALTER TABLE "site" DROP CONSTRAINT "unique_Site_setting_8653a0";
-						ALTER TABLE "site" DROP "setting_id";`,
+	sql: SQL`ALTER TABLE "site" DROP "setting_id";`,
 })
 
 testMigrations('remove relation inverse side', {

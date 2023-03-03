@@ -7,6 +7,7 @@ import {
 	LinkButton,
 	PersistButton,
 	RoutingParameter,
+	SugaredFilter,
 	useCurrentRequest,
 } from '@contember/admin'
 
@@ -26,9 +27,10 @@ export default function StudioGrid() {
 		</>
 	)
 
+	const filter: SugaredFilter = id === undefined ? {} : { id: { eq: id } }
 	const entities = {
 		entityName: entity,
-		filter: id === undefined ? {} : { id: { eq: id } },
+		filter,
 	}
 
 	return (

@@ -1,10 +1,10 @@
-import type { Input } from '@contember/schema'
+import type { Input, Writable } from '@contember/schema'
 import { GraphQlLiteral } from '../../graphQlBuilder'
 
 export const whereToFilter = (
 	by: Input.UniqueWhere<GraphQlLiteral>,
 ): Input.Where<Input.Condition<Input.ColumnValue<GraphQlLiteral>>> => {
-	const where: Input.Where<Input.Condition<Input.ColumnValue<GraphQlLiteral>>> = {}
+	const where: Writable<Input.Where<Input.Condition<Input.ColumnValue<GraphQlLiteral>>>> = {}
 	for (const key in by) {
 		const value = by[key]
 

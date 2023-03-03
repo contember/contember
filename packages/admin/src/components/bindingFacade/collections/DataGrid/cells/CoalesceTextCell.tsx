@@ -20,7 +20,7 @@ export const CoalesceTextCell: FC<CoalesceTextCellProps> = Component(props => {
 		<DataGridColumn<CoalesceTextFilterArtifacts>
 			{...props}
 			enableOrdering={false}
-			getNewFilter={(filter, { environment }) => {
+			getNewFilter={(filter, { environment }): Filter | undefined => {
 				if (filter.query === '') {
 					return undefined
 				}

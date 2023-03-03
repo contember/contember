@@ -57,7 +57,7 @@ importers:
       '@aws-sdk/client-s3': ^3.37.0
       '@aws-sdk/signature-v4-crt': ^3.37.0
       '@contember/admin': workspace:*
-      '@contember/dic': ^0.11.5
+      '@contember/dic': ^1.2.0
       '@types/cookie': ^0.4.1
       '@types/mime': ^2.0.3
       '@types/node': ^16.11.1
@@ -72,7 +72,7 @@ importers:
     dependencies:
       '@aws-sdk/client-s3': 3.202.0_0fc82157768ba4ccce4f52c60e80a14a
       '@aws-sdk/signature-v4-crt': 3.201.0
-      '@contember/dic': 0.11.5
+      '@contember/dic': 1.2.0
       cookie: 0.4.2
       ipaddr.js: 2.0.1
       mime: 2.6.0
@@ -95,10 +95,10 @@ importers:
       '@contember/react-client': workspace:*
       '@contember/react-multipass-rendering': workspace:*
       '@contember/react-utils': workspace:*
-      '@contember/schema': ^1.0.0-rc.16
-      '@contember/schema-definition': ^1.0.0-rc.16
-      '@contember/schema-migrations': ^1.0.0-rc.16
-      '@contember/schema-utils': ^1.0.0-rc.16
+      '@contember/schema': ^1.2.0
+      '@contember/schema-definition': ^1.2.0
+      '@contember/schema-migrations': ^1.2.0
+      '@contember/schema-utils': ^1.2.0
       '@contember/ui': workspace:*
       '@formatjs/icu-messageformat-parser': 2.0.11
       '@mangoweb/sass-base': 0.0.8
@@ -171,10 +171,10 @@ importers:
       slate-react: 0.74.0_074dc00aeea1d00864bc5e42658aeea3
       stacktracey: 2.1.7
     devDependencies:
-      '@contember/schema': 1.1.3
-      '@contember/schema-definition': 1.1.3
-      '@contember/schema-migrations': 1.1.3_pg@8.8.0
-      '@contember/schema-utils': 1.1.3
+      '@contember/schema': 1.2.0
+      '@contember/schema-definition': 1.2.0
+      '@contember/schema-migrations': 1.2.0_pg@8.8.0
+      '@contember/schema-utils': 1.2.0
       '@playwright/test': 1.20.0
       '@types/blueimp-md5': 2.18.0
       '@types/debounce': 1.2.0
@@ -203,14 +203,14 @@ importers:
   packages/admin-sandbox:
     specifiers:
       '@contember/admin': workspace:*
-      '@contember/schema': ^1.1.0-beta
-      '@contember/schema-definition': ^1.1.0-beta
+      '@contember/schema': ^1.2.0
+      '@contember/schema-definition': ^1.2.0
       '@welldone-software/why-did-you-render': ^6.2.3
       react: ^17 || ^18
       react-dom: ^17 || ^18
     dependencies:
-      '@contember/schema': 1.1.3
-      '@contember/schema-definition': 1.1.3
+      '@contember/schema': 1.2.0
+      '@contember/schema-definition': 1.2.0
       react: 18.2.0
       react-dom: 18.2.0_react@18.2.0
     devDependencies:
@@ -248,10 +248,10 @@ importers:
 
   packages/client:
     specifiers:
-      '@contember/schema': ^0.11.5
+      '@contember/schema': ^1.2.0
       p-limit: ^4.0.0
     dependencies:
-      '@contember/schema': 0.11.5
+      '@contember/schema': 1.2.0
       p-limit: 4.0.0
 
   packages/react-client:
@@ -4084,75 +4084,65 @@ packages:
     dev: true
     optional: true
 
-  /@contember/database-migrations/1.1.3_pg@8.8.0:
-    resolution: {integrity: sha512-OpNryvNHMr8Cs8cqTnAGmG6UL4fU0p4XF5rqHA8Wu/aMAdLV70he5FEBabqSkFIEaa/RFchibf8ujT7mOLK5vw==}
+  /@contember/database-migrations/1.2.0_pg@8.8.0:
+    resolution: {integrity: sha512-t2sEzsWH2keKAaWfAZI/+k1kbJwyohbShEo2tWT+bQJ+dQwlymp5UgqTsjQPIQNzsB8qgCjE/L7s1XcebxgrKg==}
     peerDependencies:
-      pg: ^8.5.0
+      pg: ^8.9.0
     dependencies:
-      '@contember/database': 1.1.3_pg@8.8.0
+      '@contember/database': 1.2.0_pg@8.8.0
       node-pg-migrate: 5.10.0_pg@8.8.0
       pg: 8.8.0
     dev: true
 
-  /@contember/database/1.1.3_pg@8.8.0:
-    resolution: {integrity: sha512-i6MXOwXWcEIxTlUy2X+ppzTrs97CMQ8kxf/JgyzLAtSiAt/3U2Hyoq5O3qNrQyrm+5rmNh++CiQE2M8lEKHTtw==}
+  /@contember/database/1.2.0_pg@8.8.0:
+    resolution: {integrity: sha512-OQQBpomiadlU/RAZh31tgnLpe95NV88u+P+PReo/aIvYGG58WZnYk9dJzFIJaYC+kwV8jzbgJ+ZE70i7zPBR+w==}
     peerDependencies:
-      pg: ^8.5.0
+      pg: ^8.9.0
     dependencies:
-      '@contember/queryable': 1.1.3
+      '@contember/queryable': 1.2.0
       pg: 8.8.0
     dev: true
 
-  /@contember/dic/0.11.5:
-    resolution: {integrity: sha512-I6fJPHQsgfHWN753DgPue9L+X2Lopfy5gbtUymQrTi9bs2Qmju9kl6BGrNqCx0t3oURQLgDUdnNmq6sRiTEjbg==}
+  /@contember/dic/1.2.0:
+    resolution: {integrity: sha512-K9IEP9g0e6waq6w6aNO569Z10jLb7CHUxaAnQDdr+4mMbCtxp75wnKNedX94z8B8Iqv2umm6Ks6Df+rBvWvWyQ==}
     dev: false
 
-  /@contember/engine-common/1.1.3:
-    resolution: {integrity: sha512-5OB0MP8vyIVfo8QIlSJgiriKEquTyibvcvo1TXKBMqpNK0KmEzZFyFBb8lAEUTxRSgiozth/JH4x4ZH6hl/QaQ==}
+  /@contember/queryable/1.2.0:
+    resolution: {integrity: sha512-JD9cRIrmV2FsaLjEfOdPKdrDAYlto32QZr6+jVUiJclFRQbYunU1QfQLGoIl6WoNCYgR4r0S096E9bRPD1FdZw==}
     dev: true
 
-  /@contember/queryable/1.1.3:
-    resolution: {integrity: sha512-qXF5e+sdNzKjmCYvyv/I9qn286fyLYN79YPJ/Ncadz+m49um+9I5QDThnf5WaySLvViHH5nNULgNsr5UA9/zEg==}
-    dev: true
-
-  /@contember/schema-definition/1.1.3:
-    resolution: {integrity: sha512-vTb88AZhRNEOt2PEDwGTG5sqnDTVo4rSA8N5RdSuFUioZQCgCdJS0cD+1PISr4lguyL2RzdgAZlxDKdAKi2wPw==}
+  /@contember/schema-definition/1.2.0:
+    resolution: {integrity: sha512-U85k3Vmg97QjQlE/sj0z8sV2T50iPyRRXkxdKO+DbAGEu3guouMTIamCG/ZGSwSq9Qg6lZvndoYEuBRspxFdBg==}
     dependencies:
-      '@contember/schema': 1.1.3
-      '@contember/schema-utils': 1.1.3
+      '@contember/schema': 1.2.0
+      '@contember/schema-utils': 1.2.0
       reflect-metadata: 0.1.13
 
-  /@contember/schema-migrations/1.1.3_pg@8.8.0:
-    resolution: {integrity: sha512-LTAiz/2bwjMChlmJ0KeDtnsWUgvJdL9llhBvkgzStrEbs+Fp40mWpx64xCLKlhtKx8Tpp8n7RKOsmmxXXr6YHw==}
+  /@contember/schema-migrations/1.2.0_pg@8.8.0:
+    resolution: {integrity: sha512-C3oc+nlHInx7sD/57F9MWgcPyyCrQqIydygYILsseOjdQd2jkNrUyrolHieJh4WEBPs95rBKaQ3clH2X42NxOw==}
     peerDependencies:
-      pg: ^8.5.0
+      pg: ^8.9.0
     dependencies:
-      '@contember/database-migrations': 1.1.3_pg@8.8.0
-      '@contember/engine-common': 1.1.3
-      '@contember/schema': 1.1.3
-      '@contember/schema-utils': 1.1.3
+      '@contember/database': 1.2.0_pg@8.8.0
+      '@contember/database-migrations': 1.2.0_pg@8.8.0
+      '@contember/schema': 1.2.0
+      '@contember/schema-utils': 1.2.0
       fast-deep-equal: 3.1.3
       pg: 8.8.0
-      rfc6902: 4.0.2
+      rfc6902: 5.0.1
     dev: true
 
-  /@contember/schema-utils/1.1.3:
-    resolution: {integrity: sha512-Ee7nYZcH+wlrNtwGbj33Xhy2MS+HBherQIehPFLHbH1vJWUH67ic+7MKRt18bguie4pxnEIlmlUciNeDnRd6iw==}
+  /@contember/schema-utils/1.2.0:
+    resolution: {integrity: sha512-ZzGhmn7UHfH3OO6VQtw0i5QDwHfxmXJPUYub2RCggStdfkBYFJTgbDRzcgGUfXYrQdisiWOvai2NZjoTXPhQhQ==}
     dependencies:
-      '@contember/schema': 1.1.3
-      '@contember/typesafe': 1.1.3
+      '@contember/schema': 1.2.0
+      '@contember/typesafe': 1.2.0
 
-  /@contember/schema/0.11.5:
-    resolution: {integrity: sha512-5suwt1OSEKcRpGwuNyVRCPTnZFuM4GmxU7B2E+js5o+QkJWfVQHmcQJ3kCu7pspf7zx4/1hY13kVNbzHlFCGGw==}
-    dev: false
+  /@contember/schema/1.2.0:
+    resolution: {integrity: sha512-qGM6Y7KyI//7M19+Fnn0U14M3wl0mNcYlwhv72yG9zmDNzjhqg55wkb5eXc9HOuy79lyRvBRD6v5L5/LLUNWWg==}
 
-  /@contember/schema/1.1.3:
-    resolution: {integrity: sha512-W8UJWUA4UaXUuAPBvjbpn1uQW1aMviP/OWVoZbjasqwUkzIQP/7ZMpZhoJIxskT8kqxICxaMpdawbAb6JiXZQw==}
-
-  /@contember/typesafe/1.1.3:
-    resolution: {integrity: sha512-xcuaSZ89BR6aoW9t72ISvv713vDNgzIwZdJa2AYrPagCJ4VKQBtNLb0/OTWpQMMmrO+d2/yC6SbrzBvNOYVXfA==}
-    dependencies:
-      '@contember/schema': 1.1.3
+  /@contember/typesafe/1.2.0:
+    resolution: {integrity: sha512-5uhC4j2DxX+F11ZwHd9zj6DlWrsfdyDM9D+S1bB4a0dp8jB8q8AbbzJwrZZHQqbEu0Rk2X06FYeCoYY9L2X5ig==}
 
   /@discoveryjs/json-ext/0.5.7:
     resolution: {integrity: sha512-dBVuXR082gk3jsFp7Rd/JI4kytwGHecnCoTtXFb7DB6CNHp4rg5k1bhg0nWdLGLnOV71lmDzGQaLMy8iPLY0pw==}
@@ -16434,8 +16424,8 @@ packages:
     engines: {iojs: '>=1.0.0', node: '>=0.10.0'}
     dev: true
 
-  /rfc6902/4.0.2:
-    resolution: {integrity: sha512-MJOC4iDSv3Qn5/QvhPbrNoRongti6moXSShcRmtbNqOk0WPxlviEdMV4bb9PaULhSxLUXzWd4AjAMKQ3j3y54w==}
+  /rfc6902/5.0.1:
+    resolution: {integrity: sha512-tYGfLpKIq9X7lrt4o3IkD9w9bpeAtsejfAqWNR98AoxfTsZqCepKa8eDlRiX8QMiCOD9vMx0/YbKLx0G1nPi5w==}
     dev: true
 
   /rfdc/1.3.0:

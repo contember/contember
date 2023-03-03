@@ -26,7 +26,7 @@ export function buildSchema(definitions: SchemaDefinition.ModelDefinition<{}>): 
 	}
 
 	const validation = InputValidation.parseDefinition(definitions)
-	return { acl, model, validation }
+	return { acl, model, validation, settings: {} }
 }
 
 export function buildMigration(schema: Schema): Migration {

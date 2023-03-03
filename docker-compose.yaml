@@ -82,7 +82,7 @@ services:
       - .:/src:cached
 
   contember-engine:
-    image: contember/engine:1.1.0-beta.4
+    image: contember/engine:1.2.0
 
     environment:
       NODE_ENV: 'development'
@@ -120,7 +120,7 @@ services:
         condition: service_healthy
 
   playwright-contember-engine:
-    image: contember/engine:1.1.0-beta.4
+    image: contember/engine:1.2.0
 
     environment:
       NODE_ENV: 'development'
@@ -159,7 +159,7 @@ services:
 
 
   contember-cli:
-    image: contember/cli:1.1.0-beta.4
+    image: contember/cli:1.2.0
 
     deploy:
       replicas: 0

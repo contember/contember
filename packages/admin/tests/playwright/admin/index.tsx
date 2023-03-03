@@ -33,7 +33,7 @@ function buildSchema(definitions: SchemaDefinition.ModelDefinition<{}>): Schema 
 	}
 
 	const validation = InputValidation.parseDefinition(definitions)
-	return { acl, model, validation }
+	return { acl, model, validation, settings: {} }
 }
 
 const SetProjectSlugContext = createContext<(slug: string | undefined) => void>(() => {

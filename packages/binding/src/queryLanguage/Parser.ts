@@ -1,4 +1,4 @@
-import { CrudQueryBuilder, GraphQlBuilder, GraphQlLiteral, Input } from '@contember/client'
+import { CrudQueryBuilder, GraphQlBuilder, Input, Writable } from '@contember/client'
 import { EmbeddedActionsParser, Lexer } from 'chevrotain'
 import { Environment } from '../dao'
 import type { EntityName, FieldName, Filter, OrderBy, UniqueWhere } from '../treeParameters'
@@ -345,7 +345,7 @@ class Parser extends EmbeddedActionsParser {
 	private condition: () => Parser.AST.Condition = this.RULE('condition', () => {
 		const operator = this.SUBRULE(this.conditionOperator)
 		const columnValue = this.SUBRULE(this.columnValue)
-		const condition: Parser.AST.Condition = {}
+		const condition: Writable<Parser.AST.Condition> = {}
 
 		return this.ACTION(() => {
 			if (columnValue === null) {
@@ -435,7 +435,7 @@ class Parser extends EmbeddedActionsParser {
 	})
 
 	private uniqueWhere = this.RULE('uniqueWhere', () => {
-		const where: UniqueWhere = {}
+		const where: Writable<UniqueWhere> = {}
 
 		this.CONSUME(tokens.LeftParenthesis)
 		this.AT_LEAST_ONE_SEP({

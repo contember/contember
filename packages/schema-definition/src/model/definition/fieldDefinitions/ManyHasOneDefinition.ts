@@ -37,6 +37,11 @@ export class ManyHasOneDefinition extends FieldDefinition<ManyHasOneDefinitionOp
 		return this.withOption('deprecationReason', deprecationReason || 'This field is deprecated')
 	}
 
+
+	public description(description: string): Interface<ManyHasOneDefinition> {
+		return this.withOption('description', description)
+	}
+
 	public createField({ name, conventions, entityName, entityRegistry, strictDefinitionValidator }: CreateFieldContext): Model.AnyField {
 		const options = this.options
 		const joiningColumn = options.joiningColumn || {}
@@ -54,6 +59,7 @@ export class ManyHasOneDefinition extends FieldDefinition<ManyHasOneDefinitionOp
 				onDelete: joiningColumn.onDelete || Model.OnDelete.restrict,
 			},
 			...(options.deprecationReason !== undefined ? { deprecationReason: options.deprecationReason } : {}),
+			...(options.description ? { description: options.description } : {}),
 		}
 	}
 
@@ -72,4 +78,5 @@ export type ManyHasOneDefinitionOptions = {
 	joiningColumn?: Partial<Model.JoiningColumn>
 	nullable?: boolean
 	deprecationReason?: string
+	description?: string
 }

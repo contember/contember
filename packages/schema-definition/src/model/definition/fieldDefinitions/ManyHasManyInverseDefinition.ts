@@ -1,6 +1,7 @@
 import { Model } from '@contember/schema'
 import { CreateFieldContext, FieldDefinition } from './FieldDefinition'
 import { EntityConstructor, RelationTarget } from '../types'
+import { ManyHasManyDefinition } from './ManyHasManyDefinition'
 
 export class ManyHasManyInverseDefinition extends FieldDefinition<ManyHasManyInverseDefinitionOptions> {
 	type = 'ManyHasManyInverseDefinition' as const
@@ -17,6 +18,10 @@ export class ManyHasManyInverseDefinition extends FieldDefinition<ManyHasManyInv
 		return this.withOption('deprecationReason', deprecationReason || 'This field is deprecated')
 	}
 
+	public description(description: string): ManyHasManyInverseDefinition {
+		return this.withOption('description', description)
+	}
+
 	public createField({ name, conventions, entityName, entityRegistry }: CreateFieldContext): Model.AnyField {
 		const options = this.options
 		return {
@@ -26,6 +31,7 @@ export class ManyHasManyInverseDefinition extends FieldDefinition<ManyHasManyInv
 			type: Model.RelationType.ManyHasMany,
 			...(options.orderBy ? { orderBy: options.orderBy } : {}),
 			...(options.deprecationReason !== undefined ? { deprecationReason: options.deprecationReason } : {}),
+			...(options.description ? { description: options.description } : {}),
 		}
 	}
 
@@ -44,4 +50,5 @@ export type ManyHasManyInverseDefinitionOptions = {
 	ownedBy: string
 	orderBy?: Model.OrderBy[]
 	deprecationReason?: string
+	description?: string
 }

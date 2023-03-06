@@ -72,11 +72,12 @@ export class CreateEntityRelationInputFieldVisitor implements
 		}
 		return new GraphQLInputObjectType({
 			name: GqlTypeName`${entity.name}Create${relation.name}EntityRelationInput`,
+			description: relation.description,
 			fields: () => withAliasField
 				? {
 					...fields,
 					alias: { type: GraphQLString },
-					  }
+				}
 				: fields,
 		})
 	}

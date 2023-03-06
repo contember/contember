@@ -1,13 +1,16 @@
 import { Model } from '@contember/schema'
 import { EntityConstructor } from '../types'
 import { CreateFieldContext, FieldDefinition } from './FieldDefinition'
-import { RelationTarget } from '../types'
 
 export class OneHasOneInverseDefinition extends FieldDefinition<OneHasOneInverseDefinitionOptions> {
 	type = 'OneHasOneInverseDefinition' as const
 
 	notNull() {
 		return this.withOption('nullable', false)
+	}
+
+	public description(description: string): Interface<OneHasOneInverseDefinition> {
+		return this.withOption('description', description)
 	}
 
 	createField({ name, conventions, entityRegistry }: CreateFieldContext): Model.AnyField {
@@ -18,6 +21,7 @@ export class OneHasOneInverseDefinition extends FieldDefinition<OneHasOneInverse
 			target: entityRegistry.getName(options.target),
 			type: Model.RelationType.OneHasOne,
 			nullable: options.nullable === undefined ? true : options.nullable,
+			...(options.description ? { description: options.description } : {}),
 		}
 	}
 
@@ -36,4 +40,5 @@ export type OneHasOneInverseDefinitionOptions = {
 	target: RelationTarget
 	ownedBy: string
 	nullable?: boolean
+	description?: string
 }

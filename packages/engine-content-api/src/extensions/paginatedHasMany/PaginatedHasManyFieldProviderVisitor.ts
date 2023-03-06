@@ -36,6 +36,7 @@ export class PaginatedHasManyFieldProviderVisitor implements
 				`paginate${capitalizeFirstLetter(relation.name)}`,
 				{
 					...this.paginatedFieldFactory.createFieldConfig(entity),
+					description: relation.description,
 					extensions: {
 						relationName: relation.name,
 						extensionKey: PaginatedHasManyFieldProvider.extensionName,

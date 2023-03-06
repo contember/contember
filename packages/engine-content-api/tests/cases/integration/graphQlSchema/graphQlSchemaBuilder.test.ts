@@ -1,4 +1,4 @@
-import { graphql, printSchema } from 'graphql'
+import { graphql, printIntrospectionSchema, printSchema } from 'graphql'
 import { Acl, Model } from '@contember/schema'
 import * as fs from 'node:fs/promises'
 import * as path from 'node:path'
@@ -387,11 +387,46 @@ describe('GraphQL schema builder', () => {
 			graphQlSchemaFile: 'schema-view-entity.gql',
 		})
 	})
+
+	it('descriptions', async () => {
+		await testSchema({
+			schema: () => SchemaDefinition.createModel(ModelWithDescriptions),
+			permissions: schema => new AllowAllPermissionFactory().create(schema),
+			graphQlSchemaFile: 'schema-description.gql',
+		})
+	})
 })
 
 namespace ViewEntity {
 	@def.View("SELECT null as id, 'John' AS name")
 	export class Author {
 		name = def.stringColumn()
+	}
+}
+
+namespace ModelWithDescriptions {
+	@def.Description('description of entity Article')
+	export class Article {
+		title = def.stringColumn().description('description of Article.title')
+		category = def.manyHasOne(Category, 'articles').description('description of Article.category')
+		tags = def.manyHasMany(Tag, 'articles').description('description of Article.tags')
+		stats = def.oneHasOne(ArticleStats, 'article').description('description of Article.stats')
+	}
+
+	@def.Description('description of entity ArticleStats')
+	export class ArticleStats {
+		article = def.manyHasManyInverse(Article, 'stats').description('description of ArticleStats.article')
+	}
+
+	@def.Description('description of entity Category')
+	export class Category {
+		name = def.stringColumn().description('description of Category.name')
+		articles = def.oneHasMany(Article, 'category').description('description of Category.articles')
+	}
+
+	@def.Description('description of entity Tag')
+	export class Tag {
+		name = def.stringColumn().description('description of Tag.name')
+		articles = def.manyHasManyInverse(Article, 'tags').description('description of Tag.articles')
 	}
 }

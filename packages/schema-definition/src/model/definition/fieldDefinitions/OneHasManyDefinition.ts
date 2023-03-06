@@ -12,6 +12,11 @@ export class OneHasManyDefinition extends FieldDefinition<OneHasManyDefinitionOp
 		const path = typeof field === 'string' ? [field] : field
 		return this.withOption('orderBy', [...(this.options.orderBy || []), { path, direction: direction as Model.OrderDirection }])
 	}
+
+	public description(description: string): Interface<OneHasManyDefinition> {
+		return this.withOption('description', description)
+	}
+
 	createField({ name, entityRegistry }: CreateFieldContext): Model.AnyField {
 		const options = this.options
 		return {
@@ -20,6 +25,7 @@ export class OneHasManyDefinition extends FieldDefinition<OneHasManyDefinitionOp
 			type: Model.RelationType.OneHasMany,
 			target: entityRegistry.getName(options.target),
 			...(options.orderBy ? { orderBy: options.orderBy } : {}),
+			...(options.description ? { description: options.description } : {}),
 		}
 	}
 
@@ -37,4 +43,5 @@ export type OneHasManyDefinitionOptions = {
 	target: RelationTarget
 	ownedBy: string
 	orderBy?: Model.OrderBy[]
+	description?: string
 }

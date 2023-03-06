@@ -23,7 +23,10 @@ export class CreateEntityInputFieldVisitor implements
 			return undefined
 		}
 		const type = this.columnTypeResolver.getType(column)
-		return { type }
+		return {
+			type,
+			description: column.description,
+		}
 	}
 
 	public visitHasOne({ entity, relation }: Model.AnyHasOneRelationContext): GraphQLInputFieldConfig | undefined {
@@ -31,7 +34,10 @@ export class CreateEntityInputFieldVisitor implements
 		if (type === undefined) {
 			return undefined
 		}
-		return { type }
+		return {
+			type,
+			description: relation.description,
+		}
 	}
 
 	public visitHasMany({ entity, relation }: Model.AnyHasManyRelationContext): GraphQLInputFieldConfig | undefined {
@@ -41,6 +47,7 @@ export class CreateEntityInputFieldVisitor implements
 		}
 		return {
 			type: new GraphQLList(new GraphQLNonNull(type)),
+			description: relation.description,
 		}
 	}
 }

@@ -68,4 +68,17 @@ describe('order by helper', () => {
 		const newNode = OrderByHelper.appendDefaultOrderBy(entity, objectNode, [])
 		assert.isUndefined(newNode.args.orderBy)
 	})
+
+	it('set default order by without defined order', () => {
+		const objectNode = new ObjectNode('test', 'test', [], {}, {}, [])
+
+		const newNode = OrderByHelper.appendDefaultOrderBy({
+			...entity,
+			orderBy: [{ path: ['lorem', 'ipsum'], direction: Input.OrderDirection.desc }],
+		}, objectNode, undefined)
+		assert.deepStrictEqual(newNode.args.orderBy, [
+			{ lorem: { ipsum: Input.OrderDirection.desc } },
+			{ id: Input.OrderDirection.asc },
+		])
+	})
 })

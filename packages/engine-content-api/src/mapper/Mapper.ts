@@ -122,7 +122,7 @@ export class Mapper {
 		relationPath: Model.AnyRelationContext[],
 		groupBy?: string,
 	) {
-		const inputWithOrder = OrderByHelper.appendDefaultOrderBy(entity, input, [])
+		const inputWithOrder = OrderByHelper.appendDefaultOrderBy(entity, input, undefined)
 		const path = this.pathFactory.create([])
 		const augmentedBuilder = qb.from(entity.tableName, path.alias).meta('path', [...input.path, input.alias])
 

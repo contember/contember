@@ -5,10 +5,11 @@ export class OrderByHelper {
 	public static appendDefaultOrderBy(
 		entity: Model.Entity,
 		objectNode: ObjectNode<Input.ListQueryInput>,
-		defaultOrderBy: readonly Model.OrderBy[],
+		relationOrderBy: readonly Model.OrderBy[] | undefined,
 	): ObjectNode<Input.ListQueryInput> {
 		const inputOrder = objectNode.args.orderBy || []
 		const hasOrderBy = inputOrder.length > 0
+		const defaultOrderBy = relationOrderBy ?? entity.orderBy ?? []
 		if (!hasOrderBy && defaultOrderBy.length > 0) {
 			const defaultOrderByWithPrimary = [...defaultOrderBy, ...this.getPrimaryOrderBy(inputOrder, entity)]
 			return objectNode.withArg('orderBy', this.buildOrderBy(defaultOrderByWithPrimary))

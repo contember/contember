@@ -12,6 +12,7 @@ export namespace Model {
 		readonly indexes: Indexes
 		readonly view?: View
 		readonly eventLog: EventLogConfig
+		readonly orderBy?: readonly OrderBy[]
 	}
 
 	export type View = {

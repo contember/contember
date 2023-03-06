@@ -83,7 +83,7 @@ export class RelationFetcher {
 		const objectNodeWithOrder = OrderByHelper.appendDefaultOrderBy(
 			targetEntity,
 			objectNodeWithWhere,
-			relation.orderBy || [],
+			relation.orderBy,
 		)
 
 		return mapper.selectGrouped(targetEntity, objectNodeWithOrder, targetRelation, [
@@ -144,7 +144,7 @@ export class RelationFetcher {
 	}: FetchManyHasManyGroupsArgs): Promise<SelectGroupedObjects> {
 		const owningRelation = relationContext.type === 'manyHasManyInverse' ? relationContext.targetRelation : relationContext.relation
 		const joiningColumns = this.resolveJoiningColumns({ relationType: relationContext.type, joiningTable: owningRelation.joiningTable })
-		const defaultOrderBy = relationContext.relation.orderBy || []
+		const defaultOrderBy = relationContext.relation.orderBy
 		const objectNode = OrderByHelper.appendDefaultOrderBy(relationContext.targetEntity, field, defaultOrderBy)
 		const { targetEntity } = relationContext
 		const junctionValues = await this.fetchJunction(

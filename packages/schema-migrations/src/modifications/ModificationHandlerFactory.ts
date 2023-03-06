@@ -31,6 +31,7 @@ import { patchValidationSchemaModification, updateValidationSchemaModification }
 import { createIndexModification, removeIndexModification } from './indexes'
 import { SchemaWithMeta } from './utils/schemaMeta'
 import { updateSettingsModification } from './settings'
+import { updateEntityOrderByModification } from './entities/UpdateEntityOrderByModification'
 
 
 class ModificationHandlerFactory {
@@ -83,6 +84,7 @@ namespace ModificationHandlerFactory {
 		toggleEventLogModification,
 		toggleJunctionEventLogModification,
 		convertOneHasManyToManyHasManyRelationModification,
+		updateEntityOrderByModification,
 	]
 
 	export const defaultFactoryMap: HandlerMap<any> = Object.fromEntries(handlers.map(it => [it.id, it]))

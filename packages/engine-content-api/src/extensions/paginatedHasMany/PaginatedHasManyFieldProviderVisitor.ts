@@ -37,6 +37,7 @@ export class PaginatedHasManyFieldProviderVisitor implements
 				{
 					...this.paginatedFieldFactory.createFieldConfig(entity),
 					...(isIt<Model.DeprecatedRelation>(relation, 'deprecationReason') ? { deprecationReason: relation.deprecationReason } : {}),
+					description: relation.description,
 					extensions: {
 						relationName: relation.name,
 						extensionKey: PaginatedHasManyFieldProvider.extensionName,

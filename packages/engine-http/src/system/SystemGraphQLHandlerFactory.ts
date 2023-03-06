@@ -7,7 +7,7 @@ import {
 	GraphQLListener,
 	GraphQLQueryHandler,
 } from '../graphql'
-import { KoaContext } from '../koa'
+import { KoaContext } from '../application'
 import { DocumentNode } from 'graphql'
 import { mergeTypeDefs } from '@graphql-tools/merge'
 import { makeExecutableSchema } from '@graphql-tools/schema'

@@ -5,32 +5,14 @@
 		"esModuleInterop": true
 	},
 	"references": [
-		{
-			"path": "../../database/src"
-		},
-		{
-			"path": "../../logger/src"
-		},
-		{
-			"path": "../../engine-common/src"
-		},
-		{
-			"path": "../../engine-system-api/src"
-		},
-		{
-			"path": "../../engine-content-api/src"
-		},
-		{
-			"path": "../../schema/src"
-		},
-		{
-			"path": "../../schema-definition/src"
-		},
-		{
-			"path": "../../schema-utils/src"
-		},
-		{
-			"path": "../../schema-migrations/src"
-		}
+		{ "path": "../../database/src" },
+		{ "path": "../../database-migrations/src" },
+		{ "path": "../../logger/src" },
+		{ "path": "../../engine-system-api/src" },
+		{ "path": "../../engine-content-api/src" },
+		{ "path": "../../schema/src" },
+		{ "path": "../../schema-definition/src" },
+		{ "path": "../../schema-utils/src" },
+		{ "path": "../../schema-migrations/src" }
 	]
 }

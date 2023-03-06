@@ -1,51 +1,27 @@
-import { KoaMiddleware, KoaRequestState } from '../koa'
-import { ProjectGroupResolver, ProjectInfoMiddlewareState } from '../project-common'
-import { AuthResult, HttpError, LoggerMiddlewareState, TimerMiddlewareState } from '../common'
-import { GraphQLKoaState } from '../graphql'
+import { HttpController } from '../application'
+import { ProjectContextResolver } from '../project-common'
+import { HttpErrorResponse } from '../common'
 import { SystemGraphQLContextFactory } from './SystemGraphQLContextFactory'
 
-type SystemApiMiddlewareKoaState =
-	& TimerMiddlewareState
-	& KoaRequestState
-	& GraphQLKoaState
-	& ProjectInfoMiddlewareState
-	& LoggerMiddlewareState
-	& { authResult: AuthResult }
 
 export class SystemApiMiddlewareFactory {
 	constructor(
 		private readonly debug: boolean,
-		private readonly projectGroupResolver: ProjectGroupResolver,
 		private readonly systemGraphqlContextFactory: SystemGraphQLContextFactory,
+		private readonly projectContextResolver: ProjectContextResolver,
 	) {
 	}
 
-	create(): KoaMiddleware<SystemApiMiddlewareKoaState> {
-		return async koaContext => {
-			const { request, response, state: { timer, params } } = koaContext
-			const groupContainer = await this.projectGroupResolver.resolveContainer({ request })
-			koaContext.state.projectGroup = groupContainer.slug
-			const authResult = await groupContainer.authenticator.authenticate({ request, timer })
-			koaContext.state.logger.debug('User authenticated', { authResult })
-			koaContext.state.authResult = authResult
-
-			const projectSlug = params.projectSlug
-			const projectContainer = await groupContainer.projectContainerResolver.getProjectContainer(projectSlug, { alias: true })
-
-			if (projectContainer === undefined) {
-				throw new HttpError(`Project ${projectSlug} NOT found`, 404)
+	create(): HttpController {
+		return async context => {
+			const { timer, projectGroup, authResult, logger, koa } = context
+			if (!authResult) {
+				return new HttpErrorResponse(401, 'Authentication required')
 			}
+			const { projectContainer, project } = await this.projectContextResolver.resolve(context)
 
-			const project = projectContainer.project
-			koaContext.state.project = project.slug
 
-			const requestLogger = koaContext.state.logger.child({
-				...projectContainer.logger.attributes,
-				module: 'system',
-				user: authResult.identityId,
-			})
-
-			const tenantContainer = groupContainer.tenantContainer
+			const tenantContainer = projectGroup.tenantContainer
 			const memberships = await timer('MembershipFetch', () =>
 				tenantContainer.projectMemberManager.getEffectiveProjectMemberships(
 					tenantContainer.databaseContext,
@@ -56,38 +32,33 @@ export class SystemApiMiddlewareFactory {
 					},
 				),
 			)
-			requestLogger.debug('Memberships fetched', { memberships })
+			logger.debug('Memberships fetched', { memberships })
 
 			if (memberships.length === 0) {
 				throw this.debug
-					? new HttpError(`You are not allowed to access project ${project.slug}`, 403)
-					: new HttpError(`Project ${project.slug} NOT found`, 404)
+					? new HttpErrorResponse(403, `You are not allowed to access project ${project.slug}`)
+					: new HttpErrorResponse(404, `Project ${project.slug} NOT found`)
 			}
 
-
-			koaContext.state.logger = requestLogger
-
-			await requestLogger.scope(async logger => {
-				logger.debug('System query processing started')
-				const graphqlContext = await this.systemGraphqlContextFactory.create({
-					authResult,
-					memberships,
-					koaContext,
-					projectContainer,
-					systemContainer: groupContainer.systemContainer,
-					onClearCache: () => {
-						projectContainer.contentSchemaResolver.clearCache()
-					},
-				})
-				const handler = groupContainer.systemGraphQLHandler
-
-				await timer('GraphQL', () => handler({
-					request,
-					response,
-					createContext: () => graphqlContext,
-				}))
-				logger.debug('System query finished')
+			logger.debug('System query processing started')
+			const graphqlContext = await this.systemGraphqlContextFactory.create({
+				authResult,
+				memberships,
+				koaContext: koa,
+				projectContainer,
+				systemContainer: projectGroup.systemContainer,
+				onClearCache: () => {
+					projectContainer.contentSchemaResolver.clearCache()
+				},
 			})
+			const handler = projectGroup.systemGraphQLHandler
+
+			await timer('GraphQL', () => handler({
+				request: koa.request,
+				response: koa.response,
+				createContext: () => graphqlContext,
+			}))
+			logger.debug('System query finished')
 		}
 	}
 }

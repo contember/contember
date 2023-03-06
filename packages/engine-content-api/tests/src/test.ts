@@ -1,12 +1,12 @@
 import { Acl, Model, Schema, Validation } from '@contember/schema'
-import { Authorizator, ExecutionContainerFactory, GraphQlSchemaBuilderFactory } from '../../src'
+import { Authorizator, GraphQlSchemaBuilderFactory, ExecutionContainerFactory } from '../../src'
 import { AllowAllPermissionFactory, emptySchema } from '@contember/schema-utils'
 import { executeGraphQlTest } from './testGraphql'
 import { Client } from '@contember/database'
 import { createConnectionMock } from '@contember/database-tester'
 import { createUuidGenerator } from '@contember/engine-api-tester'
-import { getArgumentValues } from 'graphql'
 import { SQL } from './tags'
+import { testUuid } from './testUuid'
 
 export interface SqlQuery {
 	sql: string
@@ -35,6 +35,19 @@ const SQL_REPEATABLE_READ = {
 	parameters: [],
 	response: {},
 }
+
+export const systemVariableQueries: SqlQuery[] = [
+	{
+		sql: 'select set_config(?, ?, false)',
+		parameters: ['tenant.identity_id', '00000000-0000-0000-0000-000000000000'],
+		response: {},
+	},
+	{
+		sql: 'select set_config(?, ?, false)',
+		parameters: ['system.transaction_id', testUuid(1)],
+		response: {},
+	},
+]
 
 export const sqlTransaction = (executes: SqlQuery[]): SqlQuery[] => {
 	return [
@@ -72,23 +85,33 @@ export const execute = async (test: Test) => {
 
 	const db = new Client(connection, 'public', {})
 	const schema: Schema = { ...emptySchema, model: test.schema, validation: test.validation || {} }
+	const providers = {
+		uuid: createUuidGenerator('a456', 0),
+		now: () => new Date('2019-09-04 12:00'),
+	}
+	const executionContainerFactory = new ExecutionContainerFactory(providers)
+	executionContainerFactory.hooks.push(it => {
+		return it.setupService('mapperFactory', mapperFactory => {
+			mapperFactory.hooks.push(mapper => {
+				(mapper as any).systemVariablesSetupDone = Promise.resolve(true)
+			})
+		})
+	})
 	await executeGraphQlTest({
 		context: {
 			db: db,
 			identityVariables: test.variables || {},
-			executionContainer: new ExecutionContainerFactory(
-				schema,
-				permissions,
-				{
-					uuid: createUuidGenerator(),
-					now: () => new Date('2019-09-04 12:00'),
-				},
-				getArgumentValues,
-				() => Promise.resolve(),
-			).create({
-				db,
-				identityVariables: test.variables || {},
-			}),
+			executionContainer: executionContainerFactory
+				.create({
+					permissions,
+					schema: { ...schema, id: 1 },
+					db,
+					identityVariables: test.variables || {},
+					identityId: '00000000-0000-0000-0000-000000000000',
+					systemSchema: 'system',
+					stage: { id: '00000000-0000-0000-0000-000000000000', slug: 'live' },
+					project: { slug: 'test' },
+				}),
 			timer: (label: any, cb: any) => cb(),
 		},
 		query: test.query,

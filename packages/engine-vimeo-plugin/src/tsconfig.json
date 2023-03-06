@@ -5,11 +5,7 @@
 		"outDir": "../dist/src"
 	},
 	"references": [
-		{
-			"path": "../../typesafe/src"
-		},
-		{
-			"path": "../../engine-plugins/src"
-		}
+		{ "path": "../../typesafe/src" },
+		{ "path": "../../engine-plugins/src" }
 	]
 }

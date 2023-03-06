@@ -43,17 +43,10 @@ test('create', async () => {
 					response: { rows: [{ id: testUuid(1) }] },
 				},
 				{
-					sql: SQL`with "newData_" as
-              (select
-                 ? :: uuid as "setting_id",
-                 "root_"."id",
-                 "root_"."name"
-               from "public"."site" as "root_"
-               where "root_"."id" = ?) update "public"."site"
-              set "setting_id" = "newData_"."setting_id" from "newData_"
-              where "site"."id" = "newData_"."id"`,
+					sql: SQL`with "newData_" as (select ? :: uuid as "setting_id", "root_"."setting_id" as "setting_id_old__", "root_"."id", "root_"."name"  from "public"."site" as "root_"  where "root_"."id" = ?) 
+							update  "public"."site" set  "setting_id" =  "newData_"."setting_id"   from "newData_"  where "site"."id" = "newData_"."id"  returning "setting_id_old__"`,
 					parameters: [testUuid(1), testUuid(2)],
-					response: { rowCount: 1 },
+					response: { rows: [{ setting_id_old__: testUuid(99) }] },
 				},
 			]),
 		],
@@ -104,17 +97,10 @@ test('create - orphan removal', async () => {
 					response: { rows: [{ id: testUuid(1) }] },
 				},
 				{
-					sql: SQL`with "newData_" as
-              (select
-                 ? :: uuid as "setting_id",
-                 "root_"."id",
-                 "root_"."name"
-               from "public"."site" as "root_"
-               where "root_"."id" = ?) update "public"."site"
-              set "setting_id" = "newData_"."setting_id" from "newData_"
-              where "site"."id" = "newData_"."id"`,
+					sql: SQL`with "newData_" as (select ? :: uuid as "setting_id", "root_"."setting_id" as "setting_id_old__", "root_"."id", "root_"."name"  from "public"."site" as "root_"  where "root_"."id" = ?) 
+						update  "public"."site" set  "setting_id" =  "newData_"."setting_id"   from "newData_"  where "site"."id" = "newData_"."id"  returning "setting_id_old__"`,
 					parameters: [testUuid(1), siteId],
-					response: { rowCount: 1 },
+					response: { rows: [{ setting_id_old__: testUuid(99) }] },
 				},
 				{
 					sql: 'select "root_"."id"  from "public"."site_setting" as "root_"   where "root_"."id" = ?',

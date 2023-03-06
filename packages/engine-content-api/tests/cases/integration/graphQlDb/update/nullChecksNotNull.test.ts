@@ -5,7 +5,7 @@ import { executeDbTest } from '@contember/engine-api-tester'
 import { GQL } from '../../../../src/tags'
 import { testUuid } from '../../../../src/testUuid'
 
-const schema = new SchemaBuilder()
+const model = new SchemaBuilder()
 	.entity('Site', e =>
 		e
 			.column('slug', c => c.unique().type(Model.ColumnType.String))
@@ -17,7 +17,7 @@ const schema = new SchemaBuilder()
 
 test('update site & create contact page', async () => {
 	await executeDbTest({
-		schema,
+		schema: { model },
 		seed: [
 			{
 				query: GQL`mutation {
@@ -38,15 +38,15 @@ test('update site & create contact page', async () => {
 			},
 		},
 		expectDatabase: {
-			site: [{ id: testUuid(1), slug: 'en', contact_page_id: testUuid(2) }],
-			contact_page: [{ id: testUuid(2), title: 'Test' }],
+			site: [{ id: testUuid(3), slug: 'en', contact_page_id: testUuid(5) }],
+			contact_page: [{ id: testUuid(5), title: 'Test' }],
 		},
 	})
 })
 
 test('update site & try to create contact page which however exists', async () => {
 	await executeDbTest({
-		schema,
+		schema: { model },
 		seed: [
 			{
 				query: GQL`mutation {
@@ -75,8 +75,8 @@ test('update site & try to create contact page which however exists', async () =
 			},
 		},
 		expectDatabase: {
-			site: [{ id: testUuid(1), slug: 'en', contact_page_id: testUuid(2) }],
-			contact_page: [{ id: testUuid(2), title: 'Test' }],
+			site: [{ id: testUuid(3), slug: 'en', contact_page_id: testUuid(4) }],
+			contact_page: [{ id: testUuid(4), title: 'Test' }],
 		},
 	})
 })

@@ -1,6 +1,6 @@
 import { MigrationFilesManager } from './MigrationFilesManager'
 import { VERSION_INITIAL } from './modifications/ModificationVersions'
-import { MigrationVersionHelper } from './MigrationVersionHelper'
+import { MigrationVersionHelper } from '@contember/engine-common'
 import { Migration } from './Migration'
 
 export class MigrationsResolver {

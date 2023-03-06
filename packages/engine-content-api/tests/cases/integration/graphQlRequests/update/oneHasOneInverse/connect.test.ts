@@ -84,17 +84,10 @@ test('connect - no owner', async () => {
 					},
 				},
 				{
-					sql: SQL`with "newData_" as
-              (select
-                 ? :: uuid as "setting_id",
-                 "root_"."id",
-                 "root_"."name"
-               from "public"."site" as "root_"
-               where "root_"."id" = ?) update "public"."site"
-              set "setting_id" = "newData_"."setting_id" from "newData_"
-              where "site"."id" = "newData_"."id"`,
+					sql: SQL`with "newData_" as (select ? :: uuid as "setting_id", "root_"."setting_id" as "setting_id_old__", "root_"."id", "root_"."name"  from "public"."site" as "root_"  where "root_"."id" = ?) 
+							update  "public"."site" set  "setting_id" =  "newData_"."setting_id"   from "newData_"  where "site"."id" = "newData_"."id"  returning "setting_id_old__"`,
 					parameters: [testUuid(2), testUuid(1)],
-					response: { rowCount: 1 },
+					response: { rows: [{}] },
 				},
 			]),
 		],
@@ -143,30 +136,16 @@ test('connect - different owner', async () => {
 					},
 				},
 				{
-					sql: SQL`with "newData_" as
-              (select
-                 ? :: uuid as "setting_id",
-                 "root_"."id",
-                 "root_"."name"
-               from "public"."site" as "root_"
-               where "root_"."id" = ?) update "public"."site"
-              set "setting_id" = "newData_"."setting_id" from "newData_"
-              where "site"."id" = "newData_"."id"`,
+					sql: SQL`with "newData_" as (select ? :: uuid as "setting_id", "root_"."setting_id" as "setting_id_old__", "root_"."id", "root_"."name"  from "public"."site" as "root_"  where "root_"."id" = ?) 
+						update  "public"."site" set  "setting_id" =  "newData_"."setting_id"   from "newData_"  where "site"."id" = "newData_"."id"  returning "setting_id_old__"`,
 					parameters: [null, testUuid(3)],
-					response: { rowCount: 1 },
+					response: { rows: [{}] },
 				},
 				{
-					sql: SQL`with "newData_" as
-              (select
-                 ? :: uuid as "setting_id",
-                 "root_"."id",
-                 "root_"."name"
-               from "public"."site" as "root_"
-               where "root_"."id" = ?) update "public"."site"
-              set "setting_id" = "newData_"."setting_id" from "newData_"
-              where "site"."id" = "newData_"."id"`,
+					sql: SQL`with "newData_" as (select ? :: uuid as "setting_id", "root_"."setting_id" as "setting_id_old__", "root_"."id", "root_"."name"  from "public"."site" as "root_"  where "root_"."id" = ?) 
+							update  "public"."site" set  "setting_id" =  "newData_"."setting_id"   from "newData_"  where "site"."id" = "newData_"."id"  returning "setting_id_old__"`,
 					parameters: [testUuid(2), testUuid(1)],
-					response: { rowCount: 1 },
+					response: { rows: [{}] },
 				},
 			]),
 		],
@@ -219,17 +198,10 @@ test('connect - different owner & orphan removal enabled', async () => {
 				},
 				// set current owner to null
 				{
-					sql: SQL`with "newData_" as
-              (select
-                 ? :: uuid as "setting_id",
-                 "root_"."id",
-                 "root_"."name"
-               from "public"."site" as "root_"
-               where "root_"."id" = ?) update "public"."site"
-              set "setting_id" = "newData_"."setting_id" from "newData_"
-              where "site"."id" = "newData_"."id"`,
+					sql: SQL`with "newData_" as (select ? :: uuid as "setting_id", "root_"."setting_id" as "setting_id_old__", "root_"."id", "root_"."name"  from "public"."site" as "root_"  where "root_"."id" = ?) 
+							update  "public"."site" set  "setting_id" =  "newData_"."setting_id"   from "newData_"  where "site"."id" = "newData_"."id"  returning "setting_id_old__"`,
 					parameters: [null, testUuid(3)],
-					response: { rowCount: 1 },
+					response: { rows: [{}] },
 				},
 				// current inverse of new owner
 				{
@@ -239,17 +211,10 @@ test('connect - different owner & orphan removal enabled', async () => {
 				},
 				// update inverse of new owner
 				{
-					sql: SQL`with "newData_" as
-              (select
-                 ? :: uuid as "setting_id",
-                 "root_"."id",
-                 "root_"."name"
-               from "public"."site" as "root_"
-               where "root_"."id" = ?) update "public"."site"
-              set "setting_id" = "newData_"."setting_id" from "newData_"
-              where "site"."id" = "newData_"."id"`,
+					sql: SQL`with "newData_" as (select ? :: uuid as "setting_id", "root_"."setting_id" as "setting_id_old__", "root_"."id", "root_"."name"  from "public"."site" as "root_"  where "root_"."id" = ?) 
+							update  "public"."site" set  "setting_id" =  "newData_"."setting_id"   from "newData_"  where "site"."id" = "newData_"."id"  returning "setting_id_old__"`,
 					parameters: [testUuid(2), testUuid(1)],
-					response: { rowCount: 1 },
+					response: { rows: [{}] },
 				},
 				{
 					sql: 'select "root_"."id"  from "public"."site_setting" as "root_"   where "root_"."id" = ?',

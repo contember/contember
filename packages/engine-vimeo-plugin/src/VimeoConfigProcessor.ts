@@ -1,9 +1,9 @@
 import { ConfigProcessor, ConfigTemplate, ConfigTemplateContext } from '@contember/engine-plugins'
 import * as Typesafe from '@contember/typesafe'
-import { ProjectWithVimeoConfig, vimeoConfigSchema } from './Config'
+import { ProjectVimeoConfig, vimeoConfigSchema } from './Config'
 
-export class VimeoConfigProcessor implements ConfigProcessor<ProjectWithVimeoConfig> {
-	getProjectConfigSchema?(slug: string): Typesafe.Type<Record<string, any>> {
+export class VimeoConfigProcessor implements ConfigProcessor<ProjectVimeoConfig> {
+	getProjectConfigSchema?(slug: string): Typesafe.Type<ProjectVimeoConfig> {
 		return Typesafe.union(
 			(input, path = []) => Typesafe.valueAt(input, ['vimeo', 'token']) === undefined ? {} : Typesafe.fail(path),
 			Typesafe.object({

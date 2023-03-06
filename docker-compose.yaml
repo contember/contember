@@ -40,6 +40,7 @@ services:
       CONTEMBER_LOGIN_TOKEN: '1111111111111111111111111111111111111111'
       CONTEMBER_INSTANCE: 'http://localhost:4000'
       CONTEMBER_API_URL: 'http://localhost:4000'
+      CONTEMBER_APPLICATION_WORKER: 'all'
       DEFAULT_DB_HOST: 'db'
       DEFAULT_DB_PORT: '5432'
       DEFAULT_DB_USER: 'contember'
@@ -52,9 +53,6 @@ services:
       TENANT_MAILER_HOST: 'mailhog'
       TENANT_MAILER_PORT: '1025'
       TENANT_MAILER_FROM: 'contember@localhost'
-      CONTEMBER_TENANT_MIGRATIONS_DIR: /src/packages/engine-tenant-api/src/migrations
-      CONTEMBER_SYSTEM_MIGRATIONS_DIR: /src/packages/engine-system-api/src/migrations
-      CONTEMBER_EXAMPLE_PROJECTS_DIRECTORY: /src/packages/engine-api-tester/src/projects
       DEFAULT_S3_PROVIDER: 'minio'
       DEFAULT_S3_REGION: ''
       DEFAULT_S3_BUCKET: 'contember'

@@ -5,7 +5,7 @@ import { executeDbTest } from '@contember/engine-api-tester'
 import { GQL } from '../../../../src/tags'
 import { testUuid } from '../../../../src/testUuid'
 
-const schema = new SchemaBuilder()
+const model = new SchemaBuilder()
 	.entity('Site', e => e.column('slug', c => c.unique().type(Model.ColumnType.String)))
 	.entity('ContactPage', e =>
 		e.column('title').oneHasOne('site', r => r.target('Site').inversedBy('contactPage').notNull()),
@@ -14,7 +14,7 @@ const schema = new SchemaBuilder()
 
 test('update site & create contact page', async () => {
 	await executeDbTest({
-		schema,
+		schema: { model },
 		seed: [
 			{
 				query: GQL`mutation {
@@ -35,15 +35,15 @@ test('update site & create contact page', async () => {
 			},
 		},
 		expectDatabase: {
-			site: [{ id: testUuid(1), slug: 'en' }],
-			contact_page: [{ site_id: testUuid(1), id: testUuid(2), title: 'Test' }],
+			site: [{ id: testUuid(3), slug: 'en' }],
+			contact_page: [{ site_id: testUuid(3), id: testUuid(5), title: 'Test' }],
 		},
 	})
 })
 
 test('update site & try to create contact page which however exists', async () => {
 	await executeDbTest({
-		schema,
+		schema: { model },
 		seed: [
 			{
 				query: GQL`mutation {
@@ -72,8 +72,8 @@ test('update site & try to create contact page which however exists', async () =
 			},
 		},
 		expectDatabase: {
-			site: [{ id: testUuid(1), slug: 'en' }],
-			contact_page: [{ site_id: testUuid(1), id: testUuid(2), title: 'Test' }],
+			site: [{ id: testUuid(3), slug: 'en' }],
+			contact_page: [{ site_id: testUuid(3), id: testUuid(4), title: 'Test' }],
 		},
 	})
 })

@@ -6,14 +6,14 @@ import { executeDbTest } from '@contember/engine-api-tester'
 
 test('fails when deleting entity without proper cascade', async () => {
 	await executeDbTest({
-		schema: new SchemaBuilder()
+		schema: { model: new SchemaBuilder()
 			.entity('Post', entity =>
 				entity.column('slug').unique(['slug']),
 			)
 			.entity('PostLocales', entity =>
 				entity.manyHasOne('post', relation => relation.target('Post').inversedBy('locales')).column('title'),
 			)
-			.buildSchema(),
+			.buildSchema() },
 		seed: [
 			{
 				query: `mutation {
@@ -37,7 +37,7 @@ test('fails when deleting entity without proper cascade', async () => {
         }`,
 		return: {
 			deletePost: {
-				errorMessage: 'Execution has failed:\nunknown field: ForeignKeyConstraintViolation (Cannot delete 123e4567-e89b-12d3-a456-000000000001 row(s) of entity Post, because it is still referenced from 123e4567-e89b-12d3-a456-000000000002 row(s) of entity PostLocales in relation post. OnDelete behaviour of this relation is set to "restrict". You might consider changing it to "setNull" or "cascade".)',
+				errorMessage: 'Execution has failed:\nunknown field: ForeignKeyConstraintViolation (Cannot delete 123e4567-e89b-12d3-a456-000000000003 row(s) of entity Post, because it is still referenced from 123e4567-e89b-12d3-a456-000000000004 row(s) of entity PostLocales in relation post. OnDelete behaviour of this relation is set to "restrict". You might consider changing it to "setNull" or "cascade".)',
 				node: null,
 			},
 		},

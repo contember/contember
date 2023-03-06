@@ -5,26 +5,12 @@
 		"esModuleInterop": true
 	},
 	"references": [
-		{
-			"path": "../../database/src"
-		},
-		{
-			"path": "../../dic/src"
-		},
-		{
-			"path": "../../graphql-utils/src"
-		},
-		{
-			"path": "../../logger/src"
-		},
-		{
-			"path": "../../schema/src"
-		},
-		{
-			"path": "../../schema-definition/src"
-		},
-		{
-			"path": "../../schema-utils/src"
-		}
+		{ "path": "../../database/src" },
+		{ "path": "../../dic/src" },
+		{ "path": "../../graphql-utils/src" },
+		{ "path": "../../logger/src" },
+		{ "path": "../../schema/src" },
+		{ "path": "../../schema-definition/src" },
+		{ "path": "../../schema-utils/src" }
 	]
 }

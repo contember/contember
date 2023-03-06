@@ -4,7 +4,7 @@ import { test } from 'vitest'
 import { executeDbTest } from '@contember/engine-api-tester'
 import { GQL } from '../../../../src/tags'
 
-const schema = new SchemaBuilder()
+const model = new SchemaBuilder()
 	.entity('Site', e =>
 		e.column('slug', c => c.unique().type(Model.ColumnType.String)),
 	)
@@ -12,7 +12,7 @@ const schema = new SchemaBuilder()
 
 test('fail when creating a non-unique site', async () => {
 	await executeDbTest({
-		schema,
+		schema: { model },
 		seed: [
 			{
 				query: GQL`mutation {

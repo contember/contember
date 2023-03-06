@@ -1,8 +1,5 @@
-import * as Koa from 'koa'
-import { route } from '../koa'
+import { HttpController } from '../application'
+import { HttpResponse } from '../common'
 
-export const createHomepageMiddleware = () => {
-	return route('/$', (ctx: Koa.Context, next) => {
-		ctx.body = 'App is running'
-	})
-}
+export const homepageController: HttpController = () =>
+	Promise.resolve(new HttpResponse(200, 'App is running'))

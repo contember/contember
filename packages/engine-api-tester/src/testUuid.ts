@@ -4,7 +4,7 @@ export const testUuid = (number: number, prefix = 'a456') => {
 	return testUuidPrefix + prefix + '-' + number.toString().padStart(12, '0')
 }
 
-export const createUuidGenerator = (prefix = 'a456') => {
-	let id = 1
+export const createUuidGenerator = (prefix = 'a456', start = 1) => {
+	let id = start
 	return () => testUuid(id++, prefix)
 }

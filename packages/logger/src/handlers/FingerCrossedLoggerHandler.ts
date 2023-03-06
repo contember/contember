@@ -53,6 +53,9 @@ export class FingerCrossedLoggerHandler implements LoggerHandler {
 			this.doFlush(this.options.logWhenActivatedLevel)
 			this.inner.handle(logEntry)
 
+		} else if (this.buffer.length === 0 && logEntryLevel >= this.options.logAlwaysLevel.value) {
+			this.inner.handle(logEntry)
+
 		} else {
 			this.buffer.push(logEntry)
 

@@ -41,11 +41,11 @@ test('insert category and connect existing post (one has many)', async () => {
 					},
 				},
 				{
-					sql: SQL`with "newdata_" as (select ? :: uuid as "category_id", "root_"."id", "root_"."name" from "public"."post" as "root_" where "root_"."id" = ?)
-						update "public"."post" set "category_id" = "newdata_"."category_id" from "newdata_" where "post"."id" = "newdata_"."id"`,
+					sql: SQL`with "newData_" as (select ? :: uuid as "category_id", "root_"."category_id" as "category_id_old__", "root_"."id", "root_"."name"  from "public"."post" as "root_"  where "root_"."id" = ?) 
+							update  "public"."post" set  "category_id" =  "newData_"."category_id"   from "newData_"  where "post"."id" = "newData_"."id"  returning "category_id_old__"`,
 					parameters: [testUuid(1), testUuid(5)],
 					response: {
-						rowCount: 1,
+						rows: [{ category_id_old__: testUuid(99) }],
 					},
 				},
 				{

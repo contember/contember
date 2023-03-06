@@ -4,8 +4,6 @@
   "scripts": {
     "oao": "oao",
     "bootstrap": "oao bootstrap",
-    "ci-clean": "rm -rf packages/*/node_modules/typescript",
-    "clean": "rm -rf node_modules/ packages/*/{dist,node_modules}",
     "ts:build": "tsc --build",
     "ts:watch": "tsc --build --watch --pretty",
     "ts:clean": "tsc --build --clean",

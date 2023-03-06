@@ -1,6 +1,6 @@
 import { makeExecutableSchema } from '@graphql-tools/schema'
 import { Schema, TenantResolverContext, typeDefs } from '@contember/engine-tenant-api'
-import { KoaContext } from '../koa'
+import { KoaContext } from '../application'
 import {
 	createGraphQLQueryHandler,
 	createGraphqlRequestInfoProviderListener,

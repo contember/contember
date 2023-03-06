@@ -28,17 +28,10 @@ test('connect', async () => {
 					response: { rows: [{ id: testUuid(1) }] },
 				},
 				{
-					sql: SQL`with "newData_" as
-              (select
-                 ? :: uuid as "author_id",
-                 "root_"."id",
-                 "root_"."title"
-               from "public"."post" as "root_"
-               where "root_"."id" = ?) update "public"."post"
-              set "author_id" = "newData_"."author_id" from "newData_"
-              where "post"."id" = "newData_"."id"`,
+					sql: SQL`with "newData_" as (select ? :: uuid as "author_id", "root_"."author_id" as "author_id_old__", "root_"."id", "root_"."title"  from "public"."post" as "root_"  where "root_"."id" = ?) 
+							update  "public"."post" set  "author_id" =  "newData_"."author_id"   from "newData_"  where "post"."id" = "newData_"."id"  returning "author_id_old__"`,
 					parameters: [testUuid(1), testUuid(2)],
-					response: { rowCount: 1 },
+					response: { rows: [{ author_id_old__: testUuid(99) }] },
 				},
 			]),
 		],

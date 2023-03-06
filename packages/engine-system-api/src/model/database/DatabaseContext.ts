@@ -1,4 +1,4 @@
-import { Client, Connection, DatabaseQueryable, withDatabaseAdvisoryLock } from '@contember/database'
+import { Client, Connection, DatabaseQueryable } from '@contember/database'
 import { QueryHandler } from '@contember/queryable'
 import { UuidProvider } from '../../utils'
 import { CommandBus } from '../commands'
@@ -7,19 +7,21 @@ export interface DatabaseContext<ConnectionType extends Connection.ConnectionLik
 	client: Client<ConnectionType>
 	queryHandler: QueryHandler<DatabaseQueryable>
 	transaction: <T>(cb: (db: DatabaseContext<Connection.TransactionLike>) => Promise<T> | T) => Promise<T>
+	scope: <T>(cb: (db: DatabaseContext<ConnectionType & Connection.AcquiredConnectionLike>) => Promise<T> | T) => Promise<T>
 	locked: <T>(lock: number, cb: (db: DatabaseContext<Connection.ConnectionLike>) => Promise<T> | T) => Promise<T>
 	commandBus: CommandBus
 }
 
 export class DatabaseContextFactory {
-	constructor(private readonly client: Client, private readonly providers: UuidProvider) {}
+	constructor(
+		public readonly schemaName: string,
+		private readonly connection: Connection,
+		private readonly providers: UuidProvider,
+	) {}
 
-	public create(): DatabaseContext {
-		return createDatabaseContext(this.client, this.providers)
-	}
-
-	public withClient(client: Client) {
-		return new DatabaseContextFactory(client, this.providers)
+	public create(connection?: Connection.ConnectionLike): DatabaseContext {
+		const client = new Client(connection ?? this.connection, this.schemaName, { module: 'system' })
+		return createDatabaseContext(client, this.providers)
 	}
 }
 
@@ -34,6 +36,8 @@ const createDatabaseContext = <ConnectionType extends Connection.ConnectionLike 
 			await client.query(Connection.REPEATABLE_READ)
 			return cb(createDatabaseContext(client, providers))
 		}),
+	scope: cb =>
+		client.scope(client => cb(createDatabaseContext(client, providers))),
 	commandBus: new CommandBus(client, providers),
 	locked: (lock, cb) => client.locked(lock, client => cb(createDatabaseContext(client, providers))),
 })

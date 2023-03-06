@@ -50,7 +50,7 @@ interface MutationResultInterface {
 	hints: MutationResultHint[]
 }
 
-export type RowValues = { [fieldName: string]: Value.AtomicValue }
+export type RowValues = { [fieldName: string]: Value.FieldValue }
 
 export class MutationUpdateOk implements MutationResultInterface {
 	result = MutationResultType.ok as const
@@ -63,6 +63,7 @@ export class MutationUpdateOk implements MutationResultInterface {
 		public readonly primary: Value.PrimaryValue,
 		public readonly input: Input.UpdateDataInput,
 		public readonly values: RowValues,
+		public readonly oldValues?: RowValues,
 	) {}
 }
 

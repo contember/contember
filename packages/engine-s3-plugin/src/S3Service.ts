@@ -31,7 +31,7 @@ export class S3Service {
 
 	constructor(
 		public readonly config: S3Config,
-		private readonly providers: Providers,
+		private readonly providers: Pick<Providers, 'uuid' | 'now'>,
 		private readonly authorizator: S3ObjectAuthorizator,
 	) {
 		this.publicBaseUrl = resolveS3PublicBaseUrl(config)

@@ -6,7 +6,7 @@ import { QueryBuilder } from './QueryBuilder'
 import { Client, Connection } from '../client'
 import { Literal } from '../Literal'
 import { ConditionBuilder, ConditionCallback, ConditionExpression } from './ConditionBuilder'
-import { LockType } from './LockType'
+import { LockModifier, LockType } from './LockType'
 import { columnExpressionToLiteral, toFqnWrap } from './utils'
 import { createSubQueryLiteralFactory, SubQueryExpression, SubQueryLiteralFactory } from './internal/Subqueries'
 
@@ -135,8 +135,8 @@ class SelectBuilder<Result = SelectBuilder.Result> implements With.Aware, Where.
 		return this.withOption('limit', [limit, offset])
 	}
 
-	public lock(type: LockType): SelectBuilder<Result> {
-		return this.withOption('lock', type)
+	public lock(type: LockType, modifier?: LockModifier): SelectBuilder<Result> {
+		return this.withOption('lock', { type, modifier })
 	}
 
 	public meta(key: string, value: any): SelectBuilder<Result>
@@ -200,7 +200,7 @@ namespace SelectBuilder {
 			grouping: {
 				groupingElement: Literal[]
 			}
-			lock?: LockType
+			lock?: { type: LockType; modifier?: LockModifier }
 			meta: Record<string, any>
 			union?: {
 				type: 'all' | 'distinct'

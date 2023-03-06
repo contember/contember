@@ -5,8 +5,6 @@
 		"esModuleInterop": true
 	},
 	"references": [
-		{
-			"path": "../../database/src"
-		}
+		{ "path": "../../database/src" }
 	]
 }

@@ -5,14 +5,8 @@
 		"outDir": "../dist/src"
 	},
 	"references": [
-		{
-			"path": "../../typesafe/src"
-		},
-		{
-			"path": "../../engine-plugins/src"
-		},
-		{
-			"path": "../../graphql-utils/src"
-		}
+		{ "path": "../../typesafe/src" },
+		{ "path": "../../engine-plugins/src" },
+		{ "path": "../../graphql-utils/src" }
 	]
 }

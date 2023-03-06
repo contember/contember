@@ -1,7 +1,8 @@
 import { Model } from '@contember/schema'
-import { DecoratorFunction, EntityConstructor, FieldsDefinition } from './types'
+import { EntityConstructor, FieldsDefinition } from './types'
 import { EntityRegistry, EnumRegistry } from './internal'
 import { NamingConventions } from '@contember/schema-utils'
+import { createMetadataStore, DecoratorFunction } from '../../utils'
 
 interface EntityExtensionArgs {
 	entity: Model.Entity
@@ -14,11 +15,12 @@ interface EntityExtensionArgs {
 	registry: EntityRegistry
 }
 
+const entityExtensionsStore = createMetadataStore<EntityExtension[]>([])
+
 export type EntityExtension = (args: EntityExtensionArgs) => Model.Entity
 export const extendEntity = <T>(extension: EntityExtension): DecoratorFunction<T> => {
 	return function (cls: EntityConstructor) {
-		const extensions = Reflect.getMetadata('extensions', cls) || []
-		Reflect.defineMetadata('extensions', [...extensions, extension], cls)
+		entityExtensionsStore.update(cls, current => [...current, extension])
 	}
 }
 
@@ -26,7 +28,7 @@ export const applyEntityExtensions = (
 	cls: EntityConstructor,
 	args: EntityExtensionArgs,
 ): Model.Entity =>
-	((Reflect.getMetadata('extensions', cls) || []) as EntityExtension[]).reduce(
+	entityExtensionsStore.get(cls).reduce(
 		(entity, ext) => ext({ ...args, entity }),
 		args.entity,
 	)

@@ -6,9 +6,9 @@ import {
 	listenOnProcessTermination,
 	serverConfigSchema,
 	TerminationJob,
-} from './index'
+	getServerVersion, isDebugMode, printStartInfo, resolveServerConfig,
+} from '@contember/engine-http'
 import loadPlugins from './loadPlugins'
-import { getServerVersion, isDebugMode, printStartInfo, resolveServerConfig } from './utils/serverStartup'
 
 const logger = createDefaultLogger()
 process.on('warning', message => {
@@ -26,7 +26,10 @@ process.on('warning', message => {
 	const version = getServerVersion()
 	printStartInfo({ version, isDebug }, logger)
 	const plugins = await loadPlugins()
-	const { serverConfig, projectConfigResolver, tenantConfigResolver } = await resolveServerConfig({ plugins, serverConfigSchema })
+	const { serverConfig, projectConfigResolver, tenantConfigResolver } = await resolveServerConfig({
+		plugins,
+		serverConfigSchema,
+	})
 
 	const sentryTransport = createSentryLoggerHandler(serverConfig.logging.sentry?.dsn)
 	if (sentryTransport !== null) {
@@ -45,11 +48,10 @@ process.on('warning', message => {
 
 	const initializedProjects: string[] = await container.initializer.initialize()
 
-	const httpServer = container.koa.listen(serverConfig.port, () => {
-		logger.info(`Contember API running on http://localhost:${(serverConfig.port)}`)
-		logger.info(initializedProjects.length ? `Initialized projects: ${initializedProjects.join(', ')}` : 'No project initialized')
-	})
-	terminationJobs.push(() => new Promise<any>(resolve => httpServer.close(resolve)))
+	const httpServerPromise = container.application.listen()
+	terminationJobs.push(async () => await (await httpServerPromise).close())
+	logger.info(`Contember API running on http://localhost:${(serverConfig.port)}`)
+	logger.info(initializedProjects.length ? `Initialized projects: ${initializedProjects.join(', ')}` : 'No project initialized')
 })().catch(e => {
 	logger.crit(e)
 	process.exit(1)

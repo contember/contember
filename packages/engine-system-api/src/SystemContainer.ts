@@ -6,19 +6,15 @@ import {
 	SchemaDiffer,
 	SchemaMigrator,
 } from '@contember/schema-migrations'
-import { MigrationsRunner } from '@contember/database-migrations'
-import { Connection } from '@contember/database'
 import {
 	EventResponseBuilder,
 	ExecutedMigrationsResolver,
 	IdentityFetcher,
 	MigrationAlterer,
 	PermissionsFactory,
-	ProjectInitializer,
 	ProjectMigrator,
 	ProjectTruncateExecutor,
 	SchemaVersionBuilder,
-	StageCreator,
 } from './model'
 import { UuidProvider } from './utils'
 import {
@@ -31,7 +27,6 @@ import {
 	SystemResolverContextFactory,
 	TruncateMutationResolver,
 } from './resolvers'
-import { getSystemMigrations, SystemMigrationArgs } from './migrations'
 import { EventOldValuesResolver } from './resolvers/types'
 
 export interface SystemContainer {
@@ -39,10 +34,7 @@ export interface SystemContainer {
 	authorizator: Authorizator
 	resolverContextFactory: SystemResolverContextFactory
 	schemaVersionBuilder: SchemaVersionBuilder
-	projectInitializer: ProjectInitializer
 }
-
-export type SystemDbMigrationsRunnerFactory = (db: Connection.ConnectionLike, schema: string) => MigrationsRunner<SystemMigrationArgs>
 
 type Args = {
 	identityFetcher: IdentityFetcher
@@ -63,7 +55,6 @@ export class SystemContainerFactory {
 				'authorizator',
 				'resolverContextFactory',
 				'schemaVersionBuilder',
-				'projectInitializer',
 			)
 	}
 	public createBuilder({ identityFetcher }: Args) {
@@ -74,8 +65,6 @@ export class SystemContainerFactory {
 				this.modificationHandlerFactory)
 			.addService('identityFetcher', () =>
 				identityFetcher)
-			.addService('systemDbMigrationsRunnerFactory', (): SystemDbMigrationsRunnerFactory =>
-				(db, schema) => new MigrationsRunner(db, schema, getSystemMigrations))
 			.addService('schemaMigrator', ({ modificationHandlerFactory }) =>
 				new SchemaMigrator(modificationHandlerFactory))
 			.addService('executedMigrationsResolver', ({}) =>
@@ -92,8 +81,6 @@ export class SystemContainerFactory {
 				new MigrationDescriber(modificationHandlerFactory))
 			.addService('projectMigrator', ({ migrationDescriber, schemaVersionBuilder, executedMigrationsResolver }) =>
 				new ProjectMigrator(migrationDescriber, schemaVersionBuilder, executedMigrationsResolver))
-			.addService('stageCreator', () =>
-				new StageCreator())
 			.addService('projectTruncateExecutor', () =>
 				new ProjectTruncateExecutor())
 			.addService('migrationAlterer', () =>
@@ -110,8 +97,6 @@ export class SystemContainerFactory {
 				new TruncateMutationResolver(projectTruncateExecutor))
 			.addService('migrationAlterMutationResolver', ({ migrationAlterer }) =>
 				new MigrationAlterMutationResolver(migrationAlterer))
-			.addService('projectInitializer', ({ projectMigrator, stageCreator, systemDbMigrationsRunnerFactory, schemaVersionBuilder }) =>
-				new ProjectInitializer(projectMigrator, stageCreator, systemDbMigrationsRunnerFactory, schemaVersionBuilder))
 			.addService('eventsQueryResolver', ({ eventResponseBuilder }) =>
 				new EventsQueryResolver(eventResponseBuilder))
 			.addService('eventOldValuesResolver', () =>

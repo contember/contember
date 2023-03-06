@@ -4,8 +4,6 @@
 		"outDir": "../dist/src"
 	},
 	"references": [
-		{
-			"path": "../../cli-common/src"
-		}
+		{ "path": "../../cli-common/src" }
 	]
 }

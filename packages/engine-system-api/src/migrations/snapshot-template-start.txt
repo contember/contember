@@ -1,0 +1,2 @@
+import { snapshotMigration } from './snapshot-factory'
+export default snapshotMigration(({randomUuidFn}) => `

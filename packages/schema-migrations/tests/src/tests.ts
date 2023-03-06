@@ -29,8 +29,8 @@ export function testDiffSchemas(
 	updatedAcl: Acl.Schema = emptyAcl,
 ) {
 	const actualDiff = schemaDiffer.diffSchemas(
-		{ ...emptySchema, model: originalModel, acl: originalAcl, validation: {} },
-		{ ...emptySchema, model: updatedModel, acl: updatedAcl, validation: {} },
+		{ ...emptySchema, model: originalModel, acl: originalAcl },
+		{ ...emptySchema, model: updatedModel, acl: updatedAcl },
 		{ skipRecreateValidation: true },
 	)
 	try {
@@ -41,7 +41,7 @@ export function testDiffSchemas(
 		throw e
 	}
 	const { meta, ...schema } = schemaMigrator.applyModifications(
-		{ ...emptySchema, model: originalModel, acl: originalAcl, validation: {} },
+		{ ...emptySchema, model: originalModel, acl: originalAcl },
 		actualDiff,
 		VERSION_LATEST,
 	) as SchemaWithMeta
@@ -49,7 +49,6 @@ export function testDiffSchemas(
 		...emptySchema,
 		model: updatedModel,
 		acl: updatedAcl,
-		validation: {},
 	})
 }
 
@@ -61,7 +60,7 @@ export function testApplyDiff(
 	expectedAcl: Acl.Schema = emptyAcl,
 ) {
 	const { meta, ...actualSchema } = schemaMigrator.applyModifications(
-		{ ...emptySchema, model: originalModel, acl: originalAcl, validation: {} },
+		{ ...emptySchema, model: originalModel, acl: originalAcl },
 		diff,
 		VERSION_LATEST,
 	) as SchemaWithMeta
@@ -70,12 +69,11 @@ export function testApplyDiff(
 		...emptySchema,
 		model: expectedModel,
 		acl: expectedAcl,
-		validation: {},
 	})
 }
 
 export function testGenerateSql(originalSchema: Model.Schema, diff: Migration.Modification[], expectedSql: string) {
-	let schema = { ...emptySchema, model: originalSchema, acl: emptyAcl, validation: {} }
+	let schema = { ...emptySchema, model: originalSchema, acl: emptyAcl }
 	const builder = createMigrationBuilder()
 	for (let { modification, ...data } of diff) {
 		const modificationHandler = modificationFactory.create(modification, data, schema, { formatVersion: VERSION_LATEST, systemSchema: 'system' })

@@ -40,13 +40,13 @@ test('admin can invite a user with a membership', testTenantDb(async ({ tester }
 				}
 			}
 		`)
-	assert.equal(identity, testUuid(2))
+	assert.equal(identity, testUuid(5))
 	assert.deepStrictEqual(resultListMembers.data, {
 		projectBySlug: {
 			members: [
 				{
 					identity: {
-						id: testUuid(2),
+						id: testUuid(5),
 					},
 					memberships: [
 						{

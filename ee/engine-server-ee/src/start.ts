@@ -13,7 +13,7 @@ import {
 	printStartInfo,
 	resolveServerConfig,
 	TerminationJob,
-} from '@contember/engine-server'
+} from '@contember/engine-http'
 import { serverConfigSchema } from './config/configSchema'
 
 const logger = createDefaultLogger()
@@ -41,7 +41,7 @@ const logger = createDefaultLogger()
 	const workerConfig = serverConfig.workerCount || 1
 
 	const workerCount = workerConfig === 'auto' ? os.cpus().length : Number(workerConfig)
-	const isClusterMode = workerCount > 1
+	const isClusterMode = serverConfig.workerCount !== undefined
 
 	const processType = getClusterProcessType(isClusterMode)
 
@@ -80,19 +80,64 @@ const logger = createDefaultLogger()
 			logger.info('Contember Cloud running')
 		} else {
 			logger.info(`Contember API running on http://localhost:${port}`)
-			logger.info(initializedProjects.length ? `Initialized projects: ${initializedProjects.join(', ')}` : 'No project initialized')
+		}
+		if (initializedProjects.length) {
+			logger.info(`Initialized projects: ${initializedProjects.join(', ')}`)
 		}
 	}
 
-	if (isClusterMode) {
+	const startApplication = async () => {
+		const httpServerPromise = container.application.listen()
+		terminationJobs.push(async () => {
+			await (await httpServerPromise).close()
+			logger.info('API server terminated')
+		})
+		await httpServerPromise
+	}
+
+	const startWorker = async (workerName: string) => {
+		const worker = container.applicationWorkers.getWorker(workerName)
+		const runningWorker = worker.run({
+			logger,
+			onError: e => {
+				logger.crit(e)
+				process.exit(1)
+			},
+		})
+		terminationJobs.push(async () => {
+			(await runningWorker).end()
+		})
+		await runningWorker
+		logger.info(`Contember Worker ${workerName} started.`)
+
+	}
+
+	const applicationWorker = serverConfig.applicationWorker
+	if (applicationWorker && applicationWorker !== 'all') {
+		await startWorker(applicationWorker)
+		if (isClusterMode) {
+			notifyWorkerStarted()
+		}
+	} else if (isClusterMode) {
 		if (cluster.isMaster) {
 			logger.info(`Master ${process.pid} is running`)
-			const workerManager = new WorkerManager(workerCount)
+			const workerManager = new WorkerManager()
 			terminationJobs.push(async ({ signal }) => {
 				await workerManager.terminate(signal)
 				logger.info('Workers terminated')
 			})
-			await workerManager.start()
+
+			await workerManager.start({ workerCount })
+
+			if (applicationWorker === 'all') {
+				for (const workerName of container.applicationWorkers.getWorkerNames()) {
+					await workerManager.start({
+						workerCount, env: {
+							CONTEMBER_APPLICATION_WORKER: workerName,
+						},
+					})
+				}
+			}
 			printStarted()
 		} else {
 			logger.info(`Starting worker ${process.pid}`)
@@ -100,18 +145,17 @@ const logger = createDefaultLogger()
 			// this line somehow ensures, that worker waits for termination of all jobs
 			process.on('disconnect', () => timeout(0))
 
-			const httpServer = container.koa.listen(port, () => notifyWorkerStarted())
-			terminationJobs.push(async () => {
-				await new Promise<any>(resolve => httpServer.close(resolve))
-				logger.info('API server terminated')
-			})
+			await startApplication()
+			notifyWorkerStarted()
 		}
 	} else {
-		const httpServer = container.koa.listen(port, () => printStarted())
-		terminationJobs.push(async () => {
-			await new Promise<any>(resolve => httpServer.close(resolve))
-			logger.info('API server terminated')
-		})
+		await startApplication()
+		if (applicationWorker === 'all') {
+			for (const workerName of container.applicationWorkers.getWorkerNames()) {
+				await startWorker(workerName)
+			}
+		}
+		printStarted()
 	}
 
 })().catch(e => {

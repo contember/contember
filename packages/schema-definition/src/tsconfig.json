@@ -4,11 +4,7 @@
 		"outDir": "../dist/src"
 	},
 	"references": [
-		{
-			"path": "../../schema/src"
-		},
-		{
-			"path": "../../schema-utils/src"
-		}
+		{ "path": "../../schema/src" },
+		{ "path": "../../schema-utils/src" }
 	]
 }

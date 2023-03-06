@@ -19,4 +19,6 @@ export {
 	withDatabaseAdvisoryLock,
 	createDatabaseIfNotExists,
 	createPgClientFactory,
+	Listener,
+	AcquiringListener,
 } from './utils'

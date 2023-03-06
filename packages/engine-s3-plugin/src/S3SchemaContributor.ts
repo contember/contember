@@ -8,7 +8,7 @@ import {
 } from 'graphql'
 import { S3Service, S3ServiceFactory } from './S3Service'
 import { resolveS3Config, S3Config } from './Config'
-import { GraphQLSchemaContributor, Providers, SchemaContext } from '@contember/engine-plugins'
+import { GraphQLSchemaContributor, Providers, GraphQLSchemaContributorContext } from '@contember/engine-plugins'
 import * as types from './S3SchemaTypes'
 import { S3Acl, S3GenerateSignedUploadInput, S3SignedRead, S3SignedUpload } from './S3SchemaTypes'
 import { S3ObjectAuthorizator } from './S3ObjectAuthorizator'
@@ -39,13 +39,13 @@ export class S3SchemaContributor implements GraphQLSchemaContributor {
 		private readonly providers: Providers,
 	) {}
 
-	getCacheKey(context: SchemaContext): string {
+	getCacheKey(context: GraphQLSchemaContributorContext): string {
 		const roles = context.identity.projectRoles
 		roles.sort()
 		return roles.join('||')
 	}
 
-	createSchema(context: SchemaContext): GraphQLSchema | undefined {
+	createSchema(context: GraphQLSchemaContributorContext): GraphQLSchema | undefined {
 		if (!this.s3Config) {
 			return undefined
 		}

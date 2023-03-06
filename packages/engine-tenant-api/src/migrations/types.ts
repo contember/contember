@@ -1,3 +1,5 @@
+import { Providers } from '../model'
+
 export interface TenantMigrationArgs {
 	getCredentials: () =>  Promise<{
 		loginTokenHash?: string
@@ -5,4 +7,5 @@ export interface TenantMigrationArgs {
 		rootTokenHash?: string
 		rootPasswordBcrypted?: string
 	}>
+	providers: Pick<Providers, 'uuid'>
 }

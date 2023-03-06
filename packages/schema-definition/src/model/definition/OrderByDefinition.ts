@@ -1,6 +1,6 @@
 import { Model } from '@contember/schema'
-import { DecoratorFunction } from './types'
 import { extendEntity } from './extensions'
+import { DecoratorFunction } from '../../utils'
 
 
 export type OrderByOptions = { path: string[]; direction?: Model.OrderDirection }

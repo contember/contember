@@ -1,4 +1,3 @@
-import { ProjectConfig } from '@contember/engine-plugins'
 import * as Typesafe from '@contember/typesafe'
 
 export enum S3Providers {
@@ -30,7 +29,7 @@ export const s3ConfigSchema = Typesafe.intersection(
 
 export type S3Config = ReturnType<typeof s3ConfigSchema>
 
-export type ProjectWithS3Config = ProjectConfig<{ s3?: S3Config }>
+export type Project3Config = { s3?: S3Config }
 
 // todo
 const serversWithoutAclSupport = [S3Providers.minio]

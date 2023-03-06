@@ -8,26 +8,12 @@
 		"jsxFragmentFactory": "Fragment"
 	},
 	"references": [
-		{
-			"path": "../../cli-common/src"
-		},
-		{
-			"path": "../../config-loader/src"
-		},
-		{
-			"path": "../../dic/src"
-		},
-		{
-			"path": "../../engine-content-api/src"
-		},
-		{
-			"path": "../../schema/src"
-		},
-		{
-			"path": "../../schema-migrations/src"
-		},
-		{
-			"path": "../../schema-utils/src"
-		}
+		{ "path": "../../cli-common/src" },
+		{ "path": "../../config-loader/src" },
+		{ "path": "../../dic/src" },
+		{ "path": "../../engine-content-api/src" },
+		{ "path": "../../schema/src" },
+		{ "path": "../../schema-migrations/src" },
+		{ "path": "../../schema-utils/src" }
 	]
 }

@@ -1,2 +1,2 @@
-export * from './ProjectGroupResolver'
+export * from './ProjectContextResolver'
 export * from './ProjectInfoMiddlewareState'

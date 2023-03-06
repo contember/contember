@@ -10,7 +10,7 @@ import {
 import { Acl, Schema } from '@contember/schema'
 import { GraphQLSchema } from 'graphql'
 import { makeExecutableSchema, mergeSchemas } from '@graphql-tools/schema'
-import { GraphQLSchemaContributor } from '@contember/engine-plugins'
+import { GraphQLSchemaContributor } from './GraphQLSchemaContributor'
 import { JSONType } from '@contember/graphql-utils'
 
 type Context = { schema: Schema; identity: Identity }

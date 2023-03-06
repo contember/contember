@@ -5,14 +5,8 @@
 		"esModuleInterop": true
 	},
 	"references": [
-		{
-			"path": "../src"
-		},
-		{
-			"path": "../../engine-api-tester/src"
-		},
-		{
-			"path": "../../schema-definition/src"
-		}
+		{ "path": "../src" },
+		{ "path": "../../engine-api-tester/src" },
+		{ "path": "../../schema-definition/src" }
 	]
 }

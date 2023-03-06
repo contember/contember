@@ -3,5 +3,8 @@
 	"compilerOptions": {
 		"esModuleInterop": true,
 		"outDir": "../dist/src"
-	}
+	},
+	"references": [
+		{ "path": "../../logger/src" }
+	]
 }

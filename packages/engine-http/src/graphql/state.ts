@@ -1,5 +1,5 @@
 import { GraphQLListener } from './execution'
-import { KoaContext } from '../koa'
+import { KoaContext } from '../application'
 
 export const createGraphqlRequestInfoProviderListener = (): GraphQLListener<{
 	koaContext: KoaContext<GraphQLKoaState>

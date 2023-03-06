@@ -139,18 +139,8 @@ class Compiler {
 		if (!lock) {
 			return Literal.empty
 		}
-		switch (lock) {
-			case LockType.forUpdate:
-				return new Literal(' for update')
-			case LockType.forNoKeyUpdate:
-				return new Literal(' for no key update')
-			case LockType.forShare:
-				return new Literal(' for share')
-			case LockType.forKeyShare:
-				return new Literal(' for key share')
-			default:
-				return assertNever(lock)
-		}
+		const modifier = lock.modifier ? ` ${lock.modifier}` : ''
+		return new Literal(` ${lock.type}` + modifier)
 	}
 
 	private compileJoin(join: SelectBuilder.Options['join'], namespaceContext: Compiler.Context): Literal {
@@ -205,8 +195,11 @@ class Compiler {
 		values: Exclude<InsertBuilder.Options['values'], undefined>,
 		namespaceContext: Compiler.Context,
 	): Literal {
+		if (values.length === 0) {
+			throw new Error()
+		}
 		return this.prependSchema(into, namespaceContext).appendAll(
-			values.map(it => new Literal(wrapIdentifier(it.columnName))),
+			values[0].map(it => new Literal(wrapIdentifier(it.columnName))),
 			', ',
 			[' (', ')'],
 		)
@@ -259,11 +252,14 @@ class Compiler {
 		)
 	}
 
-	private createValues(values: QueryBuilder.ResolvedValues): Literal {
+	private createValues(values: QueryBuilder.ResolvedValues[]): Literal {
 		return Literal.empty.appendAll(
-			values.map(({ columnName, value }) => value),
+			values.map(it => Literal.empty.appendAll(
+				it.map(({ value }) => value),
+				', ',
+				['(', ')'],
+			)),
 			', ',
-			['(', ')'],
 		)
 	}
 

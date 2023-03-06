@@ -1,4 +1,3 @@
-import { ProjectConfig } from '@contember/engine-plugins'
 import * as Typesafe from '@contember/typesafe'
 
 export const vimeoConfigSchema = Typesafe.object({
@@ -7,4 +6,4 @@ export const vimeoConfigSchema = Typesafe.object({
 
 export type VimeoConfig = ReturnType<typeof vimeoConfigSchema>
 
-export type ProjectWithVimeoConfig = ProjectConfig<{ vimeo?: VimeoConfig | undefined }>
+export type ProjectVimeoConfig = { vimeo?: VimeoConfig | undefined }

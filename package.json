@@ -1,35 +1,34 @@
 {
 	"type": "module",
 	"scripts": {
-		"build": "pnpm run -- ts:build && pnpm run --recursive --parallel -- build",
-		"changeset": "changeset",
+		"build": "yarn workspaces foreach -pt run build",
 		"check": "./scripts/runChecks.sh",
 		"reinstall": "docker run --rm --interactive --tty --network=host -v \"$PWD:$PWD\" -w \"$PWD\" -u \"1000\" node:16-alpine npx pnpm@6 install",
-		"clean": "pnpm run -- clean:dependencies && pnpm run -- clean:generated",
+		"clean": "yarn clean:dependencies && yarn clean:generated",
 		"clean:dependencies": "rm -rf node_modules ee/*/node_modules packages/*/node_modules",
 		"clean:generated": "rm -rf dist ee/*/dist ee/*/temp packages/*/dist packages/*/temp",
 		"contember": "docker-compose run contember-cli",
-		"deploy": "pnpm run --recursive -- deploy",
+		"deploy": "yarn workspaces foreach -pt run deploy",
 		"eslint:fix": "eslint --fix \"**/*.{ts,tsx}\" ",
 		"eslint:lint": "eslint \"**/*.{ts,tsx}\" ",
 		"pw:build": "cd packages/admin && docker-compose run --rm playwright-tests npm run -- pw:build",
 		"pw:preview": "cd packages/admin && docker-compose run --rm playwright-tests npm run -- pw:preview",
-		"pw:report": "cd packages/admin && pnpm run -- pw:report",
-		"pw:update": "pnpm run -- pw:build && pnpm run -- pw:update-only",
+		"pw:report": "cd packages/admin && yarn pw:report",
+		"pw:update": "yarn pw:build && yarn pw:update-only",
 		"pw:update-only": "cd packages/admin && docker-compose run --rm playwright-tests npm run -- pw:update",
-		"pw:test": "pnpm run -- pw:build && pnpm run -- pw:test-only",
+		"pw:test": "yarn pw:build && yarn pw:test-only",
 		"pw:test-only": "cd packages/admin && docker-compose run --rm playwright-tests npm run -- pw:test",
-		"pw:debug": "pnpm run -- pw:build && pnpm run -- pw:debug-only",
+		"pw:debug": "yarn pw:build && yarn pw:debug-only",
 		"pw:debug-only": "cd packages/admin && docker-compose run --rm playwright-tests npm run -- pw:debug",
-		"start": "docker-compose up --detach && pnpm run -- contember migrations:execute . --yes",
-		"storybook": "cd packages/ui && pnpm run storybook",
-		"test": "pnpm run --recursive -- test --run",
+		"start": "docker-compose up --detach && yarn contember migrations:execute . --yes & yarn start:sandbox",
+		"start:sandbox": "yarn workspace @contember/admin-sandbox start",
+		"storybook": "yarn workspace @contember/ui storybook",
+		"test": "yarn workspaces foreach -pt run test --run",
 		"ts:build": "tsc --build",
 		"ts:watch": "tsc --build --watch",
-		"ae:build": "pnpm run --recursive --parallel -- ae:build",
-		"ae:update": "pnpm run clean:generated && pnpm run ts:build && pnpm run ae:build",
-		"ae:test": "pnpm run --recursive --parallel -- ae:test",
-		"vite": "cd packages/admin-sandbox && pnpm run -- start"
+		"ae:build": "yarn workspaces foreach -pt run ae:build",
+		"ae:update": "yarn clean:generated && yarn ts:build && yarn ae:build",
+		"ae:test": "yarn workspaces foreach -pt run ae:test"
 	},
 	"devDependencies": {
 		"@microsoft/api-extractor": "^7.33.5",
@@ -55,5 +54,9 @@
 		"typescript": "^5.0.2",
 		"vite": "3.1.0",
 		"vitest": "0.23.1"
-	}
+	},
+	"workspaces": [
+		"ee/*",
+		"packages/*"
+	]
 }

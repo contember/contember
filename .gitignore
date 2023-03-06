@@ -1,5 +1,6 @@
 /.pnpm-store
 /.npmrc
+/.yarn
 /dist
 /ee/**/dist
 /ee/**/temp

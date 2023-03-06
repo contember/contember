@@ -9,7 +9,7 @@
 		"incremental": true,
 		"isolatedModules": true,
 		"jsx": "react-jsx",
-		"lib": ["esnext", "dom", "dom.iterable"],
+		"lib": [ "esnext", "dom", "dom.iterable" ],
 		"module": "esnext",
 		"moduleResolution": "node",
 		"noEmitOnError": true,
@@ -18,7 +18,7 @@
 		"skipLibCheck": true,
 		"sourceMap": true,
 		"strict": true,
-		"target": "ES2019",
+		"target": "ES2020",
 		"useDefineForClassFields": true
 	}
 }

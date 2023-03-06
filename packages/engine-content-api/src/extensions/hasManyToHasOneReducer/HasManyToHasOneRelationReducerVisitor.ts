@@ -119,6 +119,7 @@ export class HasManyToHasOneRelationReducerFieldVisitor implements
 				const uniqueWhere: GraphQLInputObjectType = new GraphQLInputObjectType({
 					//todo this can be simplified to ${targetEntity.name}By${fieldName}, but singleton must be used
 					name: GqlTypeName`${entity.name}${relation.name}By${fieldName}UniqueWhere`,
+					description: relation.description,
 					fields: () => {
 						return this.whereTypeProvider.getUniqueWhereFields(targetEntity, [[fieldName]])
 					},
@@ -129,6 +130,7 @@ export class HasManyToHasOneRelationReducerFieldVisitor implements
 					{
 						type: entityType,
 						deprecationReason: relation.deprecationReason,
+						description: relation.description,
 						extensions: {
 							relationName: relation.name,
 							extensionKey: HasManyToHasOneReducer.extensionName,

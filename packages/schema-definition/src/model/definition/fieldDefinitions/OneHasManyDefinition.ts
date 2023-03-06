@@ -17,6 +17,10 @@ export class OneHasManyDefinition extends FieldDefinition<OneHasManyDefinitionOp
 		return this.withOption('deprecationReason', deprecationReason || 'This field is deprecated')
 	}
 
+	public description(description: string): OneHasManyDefinition {
+		return this.withOption('description', description)
+	}
+
 	public createField({ name, entityRegistry }: CreateFieldContext): Model.AnyField {
 		const options = this.options
 		return {
@@ -26,6 +30,7 @@ export class OneHasManyDefinition extends FieldDefinition<OneHasManyDefinitionOp
 			target: entityRegistry.getName(options.target),
 			...(options.orderBy ? { orderBy: options.orderBy } : {}),
 			...(options.deprecationReason !== undefined ? { deprecationReason: options.deprecationReason } : {}),
+			...(options.description ? { description: options.description } : {}),
 		}
 	}
 
@@ -44,4 +49,5 @@ export type OneHasManyDefinitionOptions = {
 	ownedBy: string
 	orderBy?: Model.OrderBy[]
 	deprecationReason?: string
+	description?: string
 }

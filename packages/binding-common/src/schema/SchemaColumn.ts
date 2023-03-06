@@ -10,6 +10,7 @@ export interface SchemaColumn {
 	type: SchemaColumnType
 	enumName: SchemaEnumName | null
 	deprecationReason?: string
+	description?: string
 
 	// rules
 	// validators

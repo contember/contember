@@ -42,6 +42,11 @@ export class OneHasOneDefinition extends FieldDefinition<OneHasOneDefinitionOpti
 		return this.withOption('orphanRemoval', true)
 	}
 
+
+	public description(description: string): Interface<OneHasOneDefinition> {
+		return this.withOption('description', description)
+	}
+
 	public createField({ name, conventions, entityRegistry, strictDefinitionValidator, entityName }: CreateFieldContext): Model.AnyField {
 		const options = this.options
 		const joiningColumn: Partial<Model.JoiningColumn> = options.joiningColumn || {}
@@ -61,6 +66,7 @@ export class OneHasOneDefinition extends FieldDefinition<OneHasOneDefinitionOpti
 			},
 			...(options.orphanRemoval ? { orphanRemoval: true } : {}),
 			...(options.deprecationReason !== undefined ? { deprecationReason: options.deprecationReason } : {}),
+			...(options.description ? { description: options.description } : {}),
 		}
 	}
 
@@ -81,4 +87,5 @@ export type OneHasOneDefinitionOptions = {
 	nullable?: boolean
 	orphanRemoval?: true
 	deprecationReason?: string
+	description?: string
 }

@@ -25,6 +25,10 @@ export class ManyHasManyDefinition extends FieldDefinition<ManyHasManyDefinition
 		return this.withOption('deprecationReason', deprecationReason || 'This field is deprecated')
 	}
 
+	public description(description: string): ManyHasManyDefinition {
+		return this.withOption('description', description)
+	}
+
 	public createField({ name, conventions, entityName, entityRegistry, strictDefinitionValidator }: CreateFieldContext): Model.AnyField {
 		const options = this.options
 		const columnNames = conventions.getJoiningTableColumnNames(
@@ -51,6 +55,7 @@ export class ManyHasManyDefinition extends FieldDefinition<ManyHasManyDefinition
 			joiningTable: joiningTable,
 			...(options.orderBy ? { orderBy: options.orderBy } : {}),
 			...(options.deprecationReason !== undefined ? { deprecationReason: options.deprecationReason } : {}),
+			...(options.description ? { description: options.description } : {}),
 		}
 	}
 
@@ -71,4 +76,5 @@ export type ManyHasManyDefinitionOptions = {
 	joiningTable?: Partial<Model.JoiningTable>
 	orderBy?: Model.OrderBy[]
 	deprecationReason?: string
+	description?: string
 }

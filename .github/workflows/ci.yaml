@@ -17,9 +17,23 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - run: npm install -g pnpm@6
-      - run: pnpm install
-      - run: pnpm run eslint:lint
+      - run: corepack enable
+      - run: corepack prepare yarn@stable --activate
+
+      - name: Get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
+
+      - uses: actions/cache@v3
+        id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-v3-
+
+      - run: yarn install
+      - run: yarn eslint:lint
 
   build:
     runs-on: ubuntu-latest
@@ -27,9 +41,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - run: npm install -g pnpm@6
-      - run: pnpm install
-      - run: pnpm run build
+      - run: yarn install --immutable
+      - run: yarn run build
 
   test:
     runs-on: ubuntu-latest
@@ -37,9 +50,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - run: npm install -g pnpm@6
-      - run: pnpm install
-      - run: pnpm run test
+      - run: yarn install --immutable
+      - run: yarn run test
 
   api-exporter:
     runs-on: ubuntu-latest
@@ -47,10 +59,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - run: npm install -g pnpm@6
-      - run: pnpm install
-      - run: pnpm run ts:build
-      - run: pnpm run ae:test
+      - run: yarn install --immutable
+      - run: yarn run ts:build
+      - run: yarn run ae:test
 
   playwright:
     runs-on: ubuntu-latest
@@ -106,12 +117,11 @@ jobs:
       HOME: '/root'
 
     steps:
-      - uses: actions/checkout@v2
-      - run: npm install -g pnpm@6
-      - run: pnpm install
-      - run: pnpm run --recursive --parallel -- build:js:prod
-      - run: cd packages/admin && pnpm run pw:build
-      - run: cd packages/admin && pnpm run -- pw:test --forbid-only
+      - uses: actions/checkout@v3
+      - run: yarn install --immutable
+      - run: yarn workspaces foreach -pt build:js:prod
+      - run: yarn workspace @contember/admin pw:build
+      - run: yarn workspace @contember/admin pw:test --forbid-only
 
       - uses: jakejarvis/s3-sync-action@master
         if: always()
@@ -142,14 +152,13 @@ jobs:
       NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
     steps:
-      - uses: actions/checkout@v2
-      - run: npm install -g pnpm@6
-      - run: pnpm install
-      - run: pnpm run build
-      - run: pnpm config set "//registry.npmjs.org/:_authToken" "$NPM_TOKEN"
-      - run: pnpm config set "git-tag-version" "false"
-      - run: pnpm recursive exec npm version "${GITHUB_REF:11}"
-      - run: pnpm recursive publish --access public --no-git-checks
+      - uses: actions/checkout@v3
+      - run: yarn install --immutable
+      - run: yarn build
+      - run: yarn config set "//registry.npmjs.org/:_authToken" "$NPM_TOKEN"
+      - run: yarn config set "git-tag-version" "false"
+      - run: yarn workspaces foreach set version "${GITHUB_REF:11}"
+      - run: yarn workspaces foreach publish --access public --no-git-checks
 
 
   publish-docker:
@@ -158,7 +167,7 @@ jobs:
     needs: [build, test, eslint, api-exporter]
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: docker/setup-qemu-action@v1
       - uses: docker/setup-buildx-action@v1
 

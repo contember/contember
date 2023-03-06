@@ -18,6 +18,7 @@ const oneHasManyRelationSchema = Typesafe.intersection(
 	}),
 	Typesafe.partial({
 		orderBy: orderBySchema,
+		description: Typesafe.string,
 	}),
 )
 const oneHasManyRelationSchemaCheck: Typesafe.Equals<Model.OneHasManyRelation, ReturnType<typeof oneHasManyRelationSchema>> = true
@@ -32,18 +33,24 @@ const manyHasOneRelationSchema = Typesafe.intersection(
 	}),
 	Typesafe.partial({
 		inversedBy: Typesafe.string,
+		description: Typesafe.string,
 	}),
 )
 
 const manyHasOneRelationSchemaCheck: Typesafe.Equals<Model.ManyHasOneRelation, ReturnType<typeof manyHasOneRelationSchema>> = true
 
-const oneHasOneInverseRelationSchema = Typesafe.object({
-	type: Typesafe.literal(Model.RelationType.OneHasOne),
-	name: Typesafe.string,
-	target: Typesafe.string,
-	ownedBy: Typesafe.string,
-	nullable: Typesafe.boolean,
-})
+const oneHasOneInverseRelationSchema = Typesafe.intersection(
+	Typesafe.object({
+		type: Typesafe.literal(Model.RelationType.OneHasOne),
+		name: Typesafe.string,
+		target: Typesafe.string,
+		ownedBy: Typesafe.string,
+		nullable: Typesafe.boolean,
+	}),
+	Typesafe.partial({
+		description: Typesafe.string,
+	}),
+)
 const oneHasOneInverseRelationSchemaCheck: Typesafe.Equals<Model.OneHasOneInverseRelation, ReturnType<typeof oneHasOneInverseRelationSchema>> = true
 
 
@@ -58,6 +65,7 @@ const oneHasOneOwningRelationSchema = Typesafe.intersection(
 	Typesafe.partial({
 		inversedBy: Typesafe.string,
 		orphanRemoval: Typesafe.literal(true),
+		description: Typesafe.string,
 	}),
 )
 
@@ -82,6 +90,7 @@ const manyHasManyOwningRelationSchema = Typesafe.intersection(
 	Typesafe.partial({
 		inversedBy: Typesafe.string,
 		orderBy: orderBySchema,
+		description: Typesafe.string,
 	}),
 )
 const manyHasManyOwningRelationSchemaCheck: Typesafe.Equals<Model.ManyHasManyOwningRelation, ReturnType<typeof manyHasManyOwningRelationSchema>> = true
@@ -95,6 +104,7 @@ const manyHasManyInverseRelationSchema = Typesafe.intersection(
 	}),
 	Typesafe.partial({
 		orderBy: orderBySchema,
+		description: Typesafe.string,
 	}),
 )
 const manyHasManyInverseRelationSchemaCheck: Typesafe.Equals<Model.ManyHasManyInverseRelation, ReturnType<typeof manyHasManyInverseRelationSchema>> = true
@@ -121,6 +131,7 @@ const columnSchema = Typesafe.intersection(
 		typeAlias: Typesafe.string,
 		default: Typesafe.union(Typesafe.string, Typesafe.number, Typesafe.boolean, Typesafe.null_),
 		sequence: intersectionSchema as Typesafe.Type<Model.AnyColumn['sequence']>,
+		description: Typesafe.string,
 	}),
 )
 const columnSchemaCheck: Typesafe.Equals<Model.AnyColumn, ReturnType<typeof columnSchema>> = true
@@ -170,6 +181,7 @@ const entitySchema = Typesafe.intersection(
 	Typesafe.partial({
 		view: viewSchema,
 		orderBy: orderBySchema,
+		description: Typesafe.string,
 	}),
 )
 

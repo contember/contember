@@ -21,6 +21,10 @@ export class ManyHasManyDefinitionImpl extends FieldDefinition<ManyHasManyDefini
 		return this.withOption('orderBy', [...(this.options.orderBy || []), { path, direction }])
 	}
 
+	public description(description: string): Interface<ManyHasManyDefinition> {
+		return this.withOption('description', description)
+	}
+
 	createField({ name, conventions, entityName, entityRegistry }: CreateFieldContext): Model.AnyField {
 		const options = this.options
 		const columnNames = conventions.getJoiningTableColumnNames(
@@ -44,6 +48,7 @@ export class ManyHasManyDefinitionImpl extends FieldDefinition<ManyHasManyDefini
 			target: entityRegistry.getName(options.target),
 			joiningTable: joiningTable,
 			...(options.orderBy ? { orderBy: options.orderBy } : {}),
+			...(options.description ? { description: options.description } : {}),
 		}
 	}
 }
@@ -59,4 +64,5 @@ export type ManyHasManyDefinitionOptions = {
 	inversedBy?: string
 	joiningTable?: Partial<Model.JoiningTable>
 	orderBy?: Model.OrderBy[]
+	description?: string
 }

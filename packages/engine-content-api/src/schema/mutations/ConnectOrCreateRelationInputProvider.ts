@@ -42,6 +42,7 @@ export class ConnectOrCreateRelationInputProvider {
 
 				return new GraphQLInputObjectType({
 					name: GqlTypeName`${entity.name}ConnectOrCreate${relation.name}RelationInput`,
+					description: relation.description,
 					fields: () => ({
 						connect: { type: uniqueWhere },
 						create: { type: createInput },

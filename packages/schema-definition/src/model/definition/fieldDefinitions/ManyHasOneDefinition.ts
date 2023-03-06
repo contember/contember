@@ -2,6 +2,7 @@ import { EntityConstructor, Interface } from '../types'
 import { Model } from '@contember/schema'
 import { CreateFieldContext, FieldDefinition } from './FieldDefinition'
 import { RelationTarget } from '../types'
+import { ManyHasManyDefinition } from './ManyHasManyDefinition'
 
 export class ManyHasOneDefinitionImpl extends FieldDefinition<ManyHasOneDefinitionOptions> {
 	type = 'ManyHasOneDefinition' as const
@@ -30,6 +31,10 @@ export class ManyHasOneDefinitionImpl extends FieldDefinition<ManyHasOneDefiniti
 		return this.withOption('nullable', false)
 	}
 
+	public description(description: string): Interface<ManyHasOneDefinition> {
+		return this.withOption('description', description)
+	}
+
 	createField({ name, conventions, entityName, entityRegistry }: CreateFieldContext): Model.AnyField {
 		const options = this.options
 		const joiningColumn = options.joiningColumn || {}
@@ -43,6 +48,7 @@ export class ManyHasOneDefinitionImpl extends FieldDefinition<ManyHasOneDefiniti
 				columnName: joiningColumn.columnName || conventions.getJoiningColumnName(name),
 				onDelete: joiningColumn.onDelete || Model.OnDelete.restrict,
 			},
+			...(options.description ? { description: options.description } : {}),
 		}
 	}
 }
@@ -58,4 +64,5 @@ export type ManyHasOneDefinitionOptions = {
 	inversedBy?: string
 	joiningColumn?: Partial<Model.JoiningColumn>
 	nullable?: boolean
+	description?: string
 }

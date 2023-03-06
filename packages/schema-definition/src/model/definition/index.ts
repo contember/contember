@@ -8,6 +8,7 @@ import { isEntityConstructor } from '../../utils'
 import { DefaultNamingConventions } from '@contember/schema-utils'
 
 export * from './fieldDefinitions'
+export * from './DescriptionDefinition'
 export * from './EventLogDefinition'
 export * from './IndexDefinition'
 export * from './OrderByDefinition'

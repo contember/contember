@@ -13,6 +13,7 @@ export namespace Model {
 		readonly view?: View
 		readonly eventLog: EventLogConfig
 		readonly orderBy?: readonly OrderBy[]
+		readonly description?: string
 	}
 
 	export type View = {
@@ -28,6 +29,7 @@ export namespace Model {
 	export type Field<T extends FieldType> = {
 		readonly name: string
 		readonly type: T
+		readonly description?: string
 	}
 	export type AnyField = AnyColumn | AnyRelation
 

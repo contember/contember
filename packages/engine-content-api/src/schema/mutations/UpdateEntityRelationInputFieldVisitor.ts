@@ -48,15 +48,15 @@ export class UpdateEntityRelationInputFieldVisitor implements Model.ColumnVisito
 		const upsertInput = updateInput && createInput
 			? {
 				type: new GraphQLInputObjectType({
+					description: relation.description,
 					name: GqlTypeName`${entity.name}Upsert${relation.name}RelationInput`,
 					fields: () => ({
 						update: updateInput,
 						create: createInput,
 					}),
 				}),
-			}
+				  }
 			: undefined
-
 		const booleanInput = {
 			type: GraphQLBoolean,
 		}
@@ -82,6 +82,7 @@ export class UpdateEntityRelationInputFieldVisitor implements Model.ColumnVisito
 
 		return new GraphQLInputObjectType({
 			name: GqlTypeName`${entity.name}Update${relation.name}EntityRelationInput`,
+			description: relation.description,
 			fields: () => filteredFields,
 		})
 	}
@@ -101,25 +102,27 @@ export class UpdateEntityRelationInputFieldVisitor implements Model.ColumnVisito
 			? {
 				type: new GraphQLInputObjectType({
 					name: GqlTypeName`${entity.name}Update${relation.name}RelationInput`,
+					description: relation.description,
 					fields: () => ({
 						by: whereInput,
 						data: updateInput,
 					}),
 				}),
-			}
+				  }
 			: undefined
 
 		const upsertInput = updateInput && createInput && whereInput
 			? {
 				type: new GraphQLInputObjectType({
 					name: GqlTypeName`${entity.name}Upsert${relation.name}RelationInput`,
+					description: relation.description,
 					fields: () => ({
 						by: whereInput,
 						update: updateInput,
 						create: createInput,
 					}),
 				}),
-			}
+				  }
 			: undefined
 
 		const fields = {
@@ -138,6 +141,7 @@ export class UpdateEntityRelationInputFieldVisitor implements Model.ColumnVisito
 
 		return new GraphQLInputObjectType({
 			name: GqlTypeName`${entity.name}Update${relation.name}EntityRelationInput`,
+			description: relation.description,
 			fields: () => ({
 				...filteredFields,
 				alias: { type: GraphQLString },

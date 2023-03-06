@@ -50,8 +50,12 @@ export class ColumnDefinition extends FieldDefinition<ColumnDefinitionOptions> {
 		return this.withOption('typeAlias', alias)
 	}
 
+	public description(description: string): Interface<ColumnDefinition> {
+		return this.withOption('description', description)
+	}
+
 	createField({ name, conventions, enumRegistry, entityName }: CreateFieldContext): Model.AnyField {
-		const { type, nullable, columnName, enumDefinition, default: defaultValue, columnType, typeAlias, sequence } = this.options
+		const { type, nullable, columnName, enumDefinition, default: defaultValue, columnType, typeAlias, sequence, description } = this.options
 		const common = {
 			name: name,
 			columnName: columnName || conventions.getColumnName(name),
@@ -81,6 +85,7 @@ export class ColumnDefinition extends FieldDefinition<ColumnDefinitionOptions> {
 			type: type,
 			columnType: columnType || resolveDefaultColumnType(type),
 			...(typeAlias !== undefined ? { typeAlias } : {}),
+			...(description ? { description } : {}),
 		}
 	}
 }
@@ -137,4 +142,5 @@ export type ColumnDefinitionOptions = {
 	nullable?: boolean
 	default?: Model.ColumnTypeDefinition['default']
 	sequence?: Model.ColumnTypeDefinition['sequence']
+	description?: string
 } & ColumnTypeOptions

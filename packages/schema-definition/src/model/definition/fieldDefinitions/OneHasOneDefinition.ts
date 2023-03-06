@@ -1,6 +1,7 @@
 import { Model } from '@contember/schema'
 import { EntityConstructor, Interface, RelationTarget } from '../types'
 import { CreateFieldContext, FieldDefinition } from './FieldDefinition'
+import { ManyHasManyDefinition } from './ManyHasManyDefinition'
 
 export class OneHasOneDefinitionImpl extends FieldDefinition<OneHasOneDefinitionOptions> {
 	type = 'OneHasOneDefinition' as const
@@ -33,6 +34,10 @@ export class OneHasOneDefinitionImpl extends FieldDefinition<OneHasOneDefinition
 		return this.withOption('orphanRemoval', true)
 	}
 
+	public description(description: string): Interface<OneHasOneDefinition> {
+		return this.withOption('description', description)
+	}
+
 	createField({ name, conventions, entityRegistry }: CreateFieldContext): Model.AnyField {
 		const options = this.options
 		const joiningColumn: Partial<Model.JoiningColumn> = options.joiningColumn || {}
@@ -48,6 +53,7 @@ export class OneHasOneDefinitionImpl extends FieldDefinition<OneHasOneDefinition
 				onDelete: joiningColumn.onDelete || Model.OnDelete.restrict,
 			},
 			...(options.orphanRemoval ? { orphanRemoval: true } : {}),
+			...(options.description ? { description: options.description } : {}),
 		}
 	}
 }
@@ -64,4 +70,5 @@ export type OneHasOneDefinitionOptions = {
 	joiningColumn?: Partial<Model.JoiningColumn>
 	nullable?: boolean
 	orphanRemoval?: true
+	description?: string
 }

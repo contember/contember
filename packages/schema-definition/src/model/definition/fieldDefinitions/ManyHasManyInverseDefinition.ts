@@ -1,6 +1,7 @@
 import { Model } from '@contember/schema'
 import { CreateFieldContext, FieldDefinition } from './FieldDefinition'
 import { EntityConstructor, Interface, RelationTarget } from '../types'
+import { ManyHasManyDefinition } from './ManyHasManyDefinition'
 
 export class ManyHasManyInverseDefinitionImpl extends FieldDefinition<ManyHasManyInverseDefinitionOptions> {
 	type = 'ManyHasManyInverseDefinition' as const
@@ -13,6 +14,10 @@ export class ManyHasManyInverseDefinitionImpl extends FieldDefinition<ManyHasMan
 		return this.withOption('orderBy', [...(this.options.orderBy || []), { path, direction }])
 	}
 
+	public description(description: string): Interface<ManyHasManyInverseDefinition> {
+		return this.withOption('description', description)
+	}
+
 	createField({ name, conventions, entityName, entityRegistry }: CreateFieldContext): Model.AnyField {
 		const options = this.options
 		return {
@@ -21,6 +26,7 @@ export class ManyHasManyInverseDefinitionImpl extends FieldDefinition<ManyHasMan
 			target: entityRegistry.getName(options.target),
 			type: Model.RelationType.ManyHasMany,
 			...(options.orderBy ? { orderBy: options.orderBy } : {}),
+			...(options.description ? { description: options.description } : {}),
 		}
 	}
 }
@@ -42,4 +48,5 @@ export type ManyHasManyInverseDefinitionOptions = {
 	target: RelationTarget
 	ownedBy: string
 	orderBy?: Model.OrderBy[]
+	description?: string
 }

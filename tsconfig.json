@@ -13,7 +13,7 @@
 		{ "path": "./packages/react-utils" },
 		{ "path": "./packages/ui" },
 		{ "path": "./packages/vimeo-file-uploader" },
-		{ "path": "./packages/vite" }
+		{ "path": "./packages/vite-plugin" }
 	],
 	"ts-node": {
 		"moduleTypes": {

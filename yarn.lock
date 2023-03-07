@@ -3311,9 +3311,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@contember/vite@workspace:packages/vite":
+"@contember/vite-plugin@workspace:packages/vite-plugin":
   version: 0.0.0-use.local
-  resolution: "@contember/vite@workspace:packages/vite"
+  resolution: "@contember/vite-plugin@workspace:packages/vite-plugin"
   dependencies:
     vite: ^4.1.4
   languageName: unknown

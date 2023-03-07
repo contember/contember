@@ -1,3 +1,3 @@
 import { createViteConfig } from './../../build/createViteConfig.js'
 
-export default createViteConfig('vite')
+export default createViteConfig('vite-plugin')

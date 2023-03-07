@@ -1,5 +1,5 @@
 {
-	"name": "@contember/vite",
+	"name": "@contember/vite-plugin",
 	"license": "Apache-2.0",
 	"version": "0.0.0",
 	"type": "module",

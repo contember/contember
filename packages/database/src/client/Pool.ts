@@ -306,6 +306,12 @@ class Pool {
 		client.on('error', e => {
 			this.log('Client error on idle connection has occurred: ' + e.message)
 			this.poolConfig.logError(new ClientError(e, 'runtime error'))
+			this.poolStats.connection_error_count++
+
+			if (!this.active.has(poolConnection)) {
+				this.removeIdleConnection(poolConnection)
+				this.disposeConnection(poolConnection)
+			}
 		})
 		try {
 			this.connectingCount++
@@ -410,7 +416,6 @@ class Pool {
 		})
 	}
 
-
 	private handleAvailableConnection(poolConnection: PoolConnection) {
 		const item = this.queue.shift()
 		const isNew = poolConnection.uses === 0
@@ -437,9 +442,7 @@ class Pool {
 			})
 		} else {
 			poolConnection.timerId = setTimeout(async () => {
-				const index = this.idle.indexOf(poolConnection)
-				if (index > -1) {
-					this.idle.splice(index, 1)
+				if (this.removeIdleConnection(poolConnection)) {
 					await this.disposeConnection(poolConnection)
 					this.poolStats.connection_disposed_idle_timeout_count++
 					this.log('Idle connection disposed after timeout.')
@@ -448,6 +451,16 @@ class Pool {
 			this.idle.push(poolConnection)
 			this.log('Connection is idle and available.')
 		}
+	}
+
+
+	private removeIdleConnection(poolConnection: PoolConnection) {
+		const index = this.idle.indexOf(poolConnection)
+		if (index > -1) {
+			this.idle.splice(index, 1)
+			return true
+		}
+		return false
 	}
 
 	private async disposeConnection(connection: PoolConnection) {

@@ -12,6 +12,7 @@
 		"lib": [ "esnext", "dom", "dom.iterable" ],
 		"module": "esnext",
 		"moduleResolution": "node",
+		"esModuleInterop": true,
 		"noEmitOnError": true,
 		"noImplicitOverride": true,
 		"outDir": "dist",

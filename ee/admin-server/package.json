@@ -6,8 +6,8 @@
 	"type": "module",
 	"scripts": {
 		"start": "tsx watch src/run-admin.ts",
-		"build": "pnpm run build:public && pnpm run build:server",
-		"watch": "pnpm run watch:public && pnpm run watch:server",
+		"build": "yarn build:public && yarn build:server",
+		"watch": "yarn watch:public && yarn watch:server",
 		"build:public": "vite build public --config vite.config.js",
 		"watch:public": "vite build public --config vite.config.js --watch",
 		"build:server": "esbuild src/run-admin.ts --bundle --sourcemap --platform=node --outdir=dist/server",

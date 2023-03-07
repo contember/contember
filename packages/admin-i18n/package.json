@@ -25,7 +25,7 @@
 		"directory": "packages/admin-i18n"
 	},
 	"scripts": {
-		"build": "pnpm run build:js:dev && pnpm run build:js:prod",
+		"build": "yarn build:js:dev && yarn build:js:prod",
 		"build:js:dev": "vite build --mode development",
 		"build:js:prod": "vite build --mode production",
 		"ae:build": "api-extractor run --local",

@@ -1,9 +1,9 @@
 FROM node:16-alpine as builder
 WORKDIR /src
 
-RUN npm install -g pnpm@6
 
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY package.json yarn.lock .yarnrc.yaml             ./
+COPY .yarn                                           ./.yarn
 COPY ee/admin-server/package.json                    ./ee/admin-server/package.json
 COPY packages/admin/package.json                     ./packages/admin/package.json
 COPY packages/admin-i18n/package.json                ./packages/admin-i18n/package.json
@@ -16,11 +16,11 @@ COPY packages/react-utils/package.json               ./packages/react-utils/pack
 COPY packages/ui/package.json                        ./packages/ui/package.json
 COPY packages/vimeo-file-uploader/package.json       ./packages/vimeo-file-uploader/package.json
 
-RUN cd ee/admin-server && pnpm install
+RUN cd ee/admin-server && yarn
 
 COPY ./ ./
 
-RUN cd ee/admin-server && pnpm run build
+RUN cd ee/admin-server && yarn build
 
 FROM node:16-alpine
 

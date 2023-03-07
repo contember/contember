@@ -6,7 +6,7 @@
 	"scripts": {
 		"build": "vite build --config vite.config.ts --base /admin-sandbox/",
 		"contember": "docker-compose run contember-cli",
-		"deploy": "pnpm run -- contember deploy admin-sandbox --admin http://admin-server:4000 --yes",
+		"deploy": "yarn -- contember deploy admin-sandbox --admin http://admin-server:4000 --yes",
 		"start": "vite --config vite.config.ts --port ${VITE_PORT:-3000} --host 0.0.0.0"
 	},
 	"devDependencies": {

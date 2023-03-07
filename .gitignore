@@ -1,15 +1,28 @@
-/.pnpm-store
-/.npmrc
-/.yarn
+# yarn
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+
+# node_modules
+/ee/**/node_modules
+/packages/**/node_modules
+/node_modules
+
+# build
 /dist
 /ee/**/dist
 /ee/**/temp
-/ee/**/node_modules
 /packages/**/dist
 /packages/**/temp
-/packages/**/node_modules
+
+# env / config
+/packages/admin-sandbox/.env.development.local
+/docker-compose.override.yaml
+
+# tests
 /packages/admin/tests/playwright/output
 /packages/admin/tests/playwright/report
-/packages/admin-sandbox/.env.development.local
-/node_modules
-/docker-compose.override.yaml

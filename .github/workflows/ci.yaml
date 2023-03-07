@@ -17,23 +17,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - run: corepack enable
-      - run: corepack prepare yarn@stable --activate
-
-      - name: Get yarn cache directory path
-        id: yarn-cache-dir-path
-        run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
-
-      - uses: actions/cache@v3
-        id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
-        with:
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-v3-
-
+      - run: yarn --version
+      - run: yarn set version berry
       - run: yarn install
-      - run: yarn eslint:lint
+      - run: yarn run eslint:lint
 
   build:
     runs-on: ubuntu-latest
@@ -41,7 +28,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - run: yarn install --immutable
+      - run: yarn --version
+      - run: yarn set version berry
+      - run: yarn install
       - run: yarn run build
 
   test:
@@ -50,7 +39,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - run: yarn install --immutable
+      - run: yarn --version
+      - run: yarn set version berry
+      - run: yarn install
       - run: yarn run test
 
   api-exporter:
@@ -59,7 +50,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - run: yarn install --immutable
+      - run: yarn --version
+      - run: yarn set version berry
+      - run: yarn install
       - run: yarn run ts:build
       - run: yarn run ae:test
 
@@ -118,10 +111,12 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - run: yarn install --immutable
-      - run: yarn workspaces foreach -pt build:js:prod
-      - run: yarn workspace @contember/admin pw:build
-      - run: yarn workspace @contember/admin pw:test --forbid-only
+      - run: yarn --version
+      - run: yarn set version berry
+      - run: yarn install
+      - run: yarn run build:js:prod
+      - run: yarn run admin:pw:build
+      - run: yarn run admin:pw:test --forbid-only
 
       - uses: jakejarvis/s3-sync-action@master
         if: always()
@@ -153,12 +148,14 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - run: yarn install --immutable
-      - run: yarn build
+      - run: yarn --version
+      - run: yarn set version berry
+      - run: yarn install
+      - run: yarn run build
       - run: yarn config set "//registry.npmjs.org/:_authToken" "$NPM_TOKEN"
       - run: yarn config set "git-tag-version" "false"
-      - run: yarn workspaces foreach set version "${GITHUB_REF:11}"
-      - run: yarn workspaces foreach publish --access public --no-git-checks
+      - run: yarn recursive exec npm version "${GITHUB_REF:11}"
+      - run: yarn recursive publish --access public --no-git-checks
 
 
   publish-docker:

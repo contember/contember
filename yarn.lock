@@ -3070,7 +3070,6 @@ __metadata:
     "@playwright/test": 1.20.0
     "@sindresorhus/slugify": 0.11.0
     "@types/blueimp-md5": 2.18.0
-    "@types/debounce": 1.2.0
     "@types/is-hotkey": 0.1.5
     "@types/leaflet": ^1.9.0
     "@types/node": ^16
@@ -3082,7 +3081,6 @@ __metadata:
     buffer: 6.0.3
     classnames: 2.3.1
     csstype: 3.0.8
-    debounce: 1.2.1
     fuse.js: 6.4.6
     intl-messageformat: 9.9.1
     is-hotkey: 0.1.8
@@ -3294,7 +3292,6 @@ __metadata:
     sass-loader: 10.1.1
     source-map-loader: 2.0.1
     style-loader: 2.0.0
-    typescript: 4.3.5
     webpack: 5.72.0
   peerDependencies:
     react: ^17 || ^18
@@ -7445,13 +7442,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/debounce@npm:1.2.0":
-  version: 1.2.0
-  resolution: "@types/debounce@npm:1.2.0"
-  checksum: 640fd8c5e608ffa4aeaa4a88a08e4275db76ee67e35484bf9d425a52103ce5a0ca8f89ecb7051848a66f192f12c084cbccefd4647584c4f153b36122c284c062
-  languageName: node
-  linkType: hard
-
 "@types/eslint-scope@npm:^3.7.3":
   version: 3.7.4
   resolution: "@types/eslint-scope@npm:3.7.4"
@@ -10837,13 +10827,6 @@ __metadata:
     whatwg-mimetype: ^3.0.0
     whatwg-url: ^11.0.0
   checksum: 033fc3dd0fba6d24bc9a024ddcf9923691dd24f90a3d26f6545d6a2f71ec6956f93462f2cdf2183cc46f10dc01ed3bcb36731a8208456eb1a08147e571fe2a76
-  languageName: node
-  linkType: hard
-
-"debounce@npm:1.2.1":
-  version: 1.2.1
-  resolution: "debounce@npm:1.2.1"
-  checksum: 682a89506d9e54fb109526f4da255c5546102fbb8e3ae75eef3b04effaf5d4853756aee97475cd4650641869794e44f410eeb20ace2b18ea592287ab2038519e
   languageName: node
   linkType: hard
 
@@ -19486,7 +19469,7 @@ __metadata:
     sass: 1.49.11
     tsm: 2.2.1
     tsx: 3.2.1
-    typescript: 4.7.4
+    typescript: ^5.0.2
     vite: 3.1.0
     vitest: 0.23.1
   languageName: unknown
@@ -21247,23 +21230,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@npm:4.3.5":
-  version: 4.3.5
-  resolution: "typescript@npm:4.3.5"
+"typescript@npm:^5.0.2":
+  version: 5.0.2
+  resolution: "typescript@npm:5.0.2"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
-  checksum: bab033b5e2b0790dd35b77fd005df976ef80b8d84fd2c6e63cc31808151875beae9216e5a315fe7068e8499905c3c354248fe83272cdfc13b7705635f0c66c97
-  languageName: node
-  linkType: hard
-
-"typescript@npm:4.7.4":
-  version: 4.7.4
-  resolution: "typescript@npm:4.7.4"
-  bin:
-    tsc: bin/tsc
-    tsserver: bin/tsserver
-  checksum: 5750181b1cd7e6482c4195825547e70f944114fb47e58e4aa7553e62f11b3f3173766aef9c281783edfd881f7b8299cf35e3ca8caebe73d8464528c907a164df
+  checksum: bef1dcd166acfc6934b2ec4d72f93edb8961a5fab36b8dd2aaf6f4f4cd5c0210f2e0850aef4724f3b4913d5aef203a94a28ded731b370880c8bcff7e4ff91fc1
   languageName: node
   linkType: hard
 
@@ -21277,23 +21250,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@patch:typescript@4.3.5#~builtin<compat/typescript>":
-  version: 4.3.5
-  resolution: "typescript@patch:typescript@npm%3A4.3.5#~builtin<compat/typescript>::version=4.3.5&hash=dba6d9"
+"typescript@patch:typescript@^5.0.2#~builtin<compat/typescript>":
+  version: 5.0.2
+  resolution: "typescript@patch:typescript@npm%3A5.0.2#~builtin<compat/typescript>::version=5.0.2&hash=85af82"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
-  checksum: 365df18cf979c971ef9543b2acaa8694377a803f98e1804c41d0ede0b09d7046cb0cd98f2eaf3884b0fe923c01a60af1f653841bd8805c9715d5479c09a4ebe4
-  languageName: node
-  linkType: hard
-
-"typescript@patch:typescript@4.7.4#~builtin<compat/typescript>":
-  version: 4.7.4
-  resolution: "typescript@patch:typescript@npm%3A4.7.4#~builtin<compat/typescript>::version=4.7.4&hash=65a307"
-  bin:
-    tsc: bin/tsc
-    tsserver: bin/tsserver
-  checksum: 9096d8f6c16cb80ef3bf96fcbbd055bf1c4a43bd14f3b7be45a9fbe7ada46ec977f604d5feed3263b4f2aa7d4c7477ce5f9cd87de0d6feedec69a983f3a4f93e
+  checksum: b63cb742fbb9aeb3085e002ad8f10d5fd963606aa4d6b3b65b4e76c396ff09739f03b5dbae08e1698c3bce9d5619d3f67aeb7ee470ed4016bd345b3cfe37b54a
   languageName: node
   linkType: hard
 

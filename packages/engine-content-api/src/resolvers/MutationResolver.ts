@@ -18,7 +18,7 @@ import { GraphQLResolveInfo } from 'graphql'
 import { GraphQlQueryAstFactory } from './GraphQlQueryAstFactory'
 import { ImplementationException } from '../exception'
 import { DatabaseMetadata, retryTransaction } from '@contember/database'
-import { Operation, readOperationMeta } from '../schema'
+import { getMutationOperationInfo } from '../schema'
 import { assertNever } from '../utils'
 import { InputPreValidator } from '../input-validation'
 import { ObjectNode } from '../inputProcessing'
@@ -87,24 +87,20 @@ export class MutationResolver {
 				if (!fieldConfig) {
 					throw new ImplementationException()
 				}
-				const meta = readOperationMeta(fieldConfig.extensions)
+				const info = getMutationOperationInfo(fieldConfig.extensions)
 
 				const result: Result.ValidationResult | null = await (() => {
-					switch (meta.operation) {
-						case Operation.create:
-							return this.validateCreate(mapper, meta.entity, field)
-						case Operation.update:
-							return this.validateUpdate(mapper, meta.entity, field)
-						case Operation.upsert:
-							return this.validateUpsert(mapper, meta.entity, field)
-						case Operation.delete:
+					switch (info.operation) {
+						case 'create':
+							return this.validateCreate(mapper, info.entity, field)
+						case 'update':
+							return this.validateUpdate(mapper, info.entity, field)
+						case 'upsert':
+							return this.validateUpsert(mapper, info.entity, field)
+						case 'delete':
 							return null
-						case Operation.get:
-						case Operation.paginate:
-						case Operation.list:
-							throw new ImplementationException(`Invalid OperationMeta: ${String(meta)}`)
 					}
-					return assertNever(meta.operation)
+					return assertNever(info.operation)
 				})()
 				if (result !== null) {
 					validationResult[field.alias] = {
@@ -154,28 +150,24 @@ export class MutationResolver {
 					continue
 				}
 
-				const meta = readOperationMeta(fieldConfig.extensions)
+				const info = getMutationOperationInfo(fieldConfig.extensions)
 				logger.debug('MutationResolver: Resolving a field', { field: field.alias })
 				const result: {
 					ok: boolean
 					validation?: Result.ValidationResult
 					errors: Result.ExecutionError[]
 				} = await (() => {
-					switch (meta.operation) {
-						case Operation.create:
-							return this.resolveCreateInternal(mapper, meta.entity, field)
-						case Operation.update:
-							return this.resolveUpdateInternal(mapper, meta.entity, field)
-						case Operation.delete:
-							return this.resolveDeleteInternal(mapper, meta.entity, field)
-						case Operation.upsert:
-							return this.resolveUpsertInternal(mapper, meta.entity, field)
-						case Operation.get:
-						case Operation.paginate:
-						case Operation.list:
-							throw new ImplementationException()
+					switch (info.operation) {
+						case 'create':
+							return this.resolveCreateInternal(mapper, info.entity, field)
+						case 'update':
+							return this.resolveUpdateInternal(mapper, info.entity, field)
+						case 'delete':
+							return this.resolveDeleteInternal(mapper, info.entity, field)
+						case 'upsert':
+							return this.resolveUpsertInternal(mapper, info.entity, field)
 					}
-					return assertNever(meta.operation)
+					return assertNever(info.operation)
 				})()
 
 				if (!result.ok) {

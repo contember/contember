@@ -1,30 +1,36 @@
 import { Model } from '@contember/schema'
 import { ImplementationException } from '../exception'
 
-export class OperationMeta {
-	constructor(public readonly operation: Operation, public readonly entity: Model.Entity) {}
+export class OperationInfo<T extends string> {
+	constructor(public readonly operation: T, public readonly entity: Model.Entity) {}
 }
 
-export const ExtensionKey = 'OperationMeta'
+export const ReadOperationInfoExtensionKey = 'ReadOperation'
+export const MutationOperationInfoExtensionKey = 'MutationOperation'
 
-export const readOperationMeta = (data: Record<string, unknown> | undefined | null): OperationMeta => {
+const getOperationInfo = <T extends string>() => (data: Record<string, unknown> | undefined | null): OperationInfo<T> => {
 	if (!data) {
-		debugger
 		throw new ImplementationException()
 	}
-	const meta = data[ExtensionKey]
-	if (!(meta instanceof OperationMeta)) {
+	const info = data[ReadOperationInfoExtensionKey]
+	if (!(info instanceof OperationInfo)) {
 		throw new ImplementationException('OperationMeta not found')
 	}
-	return meta
+	return info
 }
 
-export const enum Operation {
-	create = 'create',
-	update = 'update',
-	upsert = 'upsert',
-	delete = 'delete',
-	list = 'list',
-	get = 'get',
-	paginate = 'paginate',
-}
+
+export const getReadOperationInfo = getOperationInfo<ReadOperation>()
+export const getMutationOperationInfo = getOperationInfo<MutationOperation>()
+
+export type ReadOperation =
+	| 'list'
+	| 'get'
+	| 'paginate'
+
+
+export type MutationOperation =
+	| 'create'
+	| 'update'
+	| 'upsert'
+	| 'delete'

@@ -5,7 +5,7 @@ import { EntityTypeProvider } from './EntityTypeProvider'
 import { WhereTypeProvider } from './WhereTypeProvider'
 import { Authorizator } from '../acl'
 import { OrderByTypeProvider } from './OrderByTypeProvider'
-import { ExtensionKey, Operation, OperationMeta } from './OperationExtension'
+import { OperationInfo, ReadOperationInfoExtensionKey } from './OperationExtension'
 import { ImplementationException } from '../exception'
 import { PaginatedFieldConfigFactory } from './PaginatedFieldConfigFactory'
 
@@ -46,7 +46,7 @@ export class QueryProvider {
 					type: this.whereTypeProvider.getEntityWhereType(entityName),
 				},
 			},
-			extensions: { [ExtensionKey]: new OperationMeta(Operation.get, entity) },
+			extensions: { [ReadOperationInfoExtensionKey]: new OperationInfo('get', entity) },
 			resolve: (parent, args, context, info) => {
 				return context.timer(`GraphQL.query.${info.fieldName}`, () => {
 					if (parent && info.path) {
@@ -78,7 +78,7 @@ export class QueryProvider {
 					type: GraphQLInt,
 				},
 			},
-			extensions: { [ExtensionKey]: new OperationMeta(Operation.list, entity) },
+			extensions: { [ReadOperationInfoExtensionKey]: new OperationInfo('list', entity) },
 			resolve: (parent, args, context, info) => {
 				return context.timer(`GraphQL.query.${info.fieldName}`, () => {
 					if (parent && info.path) {
@@ -93,7 +93,7 @@ export class QueryProvider {
 	private getPaginationQuery(entity: Model.Entity): GraphQLFieldConfig<any, Context, Input.ListQueryInput> {
 		return {
 			...this.paginatedFieldConfigFactory.createFieldConfig(entity),
-			extensions: { [ExtensionKey]: new OperationMeta(Operation.paginate, entity) },
+			extensions: { [ReadOperationInfoExtensionKey]: new OperationInfo('paginate', entity) },
 			resolve: (parent, args, context, info) => {
 				return context.timer(`GraphQL.query.${info.fieldName}`, () => {
 					if (parent && info.path) {

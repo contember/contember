@@ -3,8 +3,8 @@ import { Mapper } from '../mapper'
 import { ObjectNode } from '../inputProcessing'
 import { assertNever, createPaginationHelper } from '../utils'
 import { ImplementationException } from '../exception'
-import { Operation, readOperationMeta } from '../schema'
 import { GraphQLFieldMap } from 'graphql'
+import { getReadOperationInfo } from '../schema'
 
 export const paginate = async (
 	mapper: Mapper,
@@ -33,22 +33,17 @@ export const executeReadOperations = async (
 			throw new ImplementationException()
 		}
 		const fieldConfig = fields[field.name]
-		const meta = readOperationMeta(fieldConfig.extensions)
+		const info = getReadOperationInfo(fieldConfig.extensions)
 		trxResult[field.alias] = await (() => {
-			switch (meta.operation) {
-				case Operation.get:
-					return mapper.selectUnique(meta.entity, field, [])
-				case Operation.list:
-					return mapper.select(meta.entity, field, [])
-				case Operation.paginate:
-					return paginate(mapper, meta.entity, field)
-				case Operation.create:
-				case Operation.update:
-				case Operation.delete:
-				case Operation.upsert:
-					throw new ImplementationException()
+			switch (info.operation) {
+				case 'get':
+					return mapper.selectUnique(info.entity, field, [])
+				case 'list':
+					return mapper.select(info.entity, field, [])
+				case 'paginate':
+					return paginate(mapper, info.entity, field)
 			}
-			return assertNever(meta.operation)
+			return assertNever(info.operation)
 		})()
 	}
 	return trxResult

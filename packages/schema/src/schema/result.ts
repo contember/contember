@@ -1,38 +1,75 @@
 import { Value } from './value'
 
 export namespace Result {
-	export type MutationFieldResult = CreateResult | UpdateResult | DeleteResult | UpsertResult
+	export type MutationFieldResult =
+		| CreateResult
+		| MultiCreateResult
+		| UpdateResult
+		| MultiUpdateResult
+		| DeleteResult
+		| MultiDeleteResult
+		| UpsertResult
+		| MultiUpsertResult
 
-	export interface CreateResult {
+	export interface MutationResult {
 		ok: boolean
 		errorMessage?: string
 		errors: ExecutionError[]
-		validation: ValidationResult
-		node: Value.Object | null
 	}
 
-	export interface UpsertResult {
-		ok: boolean
-		errorMessage?: string
-		errors: ExecutionError[]
-		validation: ValidationResult
-		node: Value.Object | null
-	}
+	export type CreateResult =
+		& MutationResult
+		& {
+			validation: ValidationResult
+			node: Value.Object | null
+		}
 
-	export interface UpdateResult {
-		ok: boolean
-		errorMessage?: string
-		errors: ExecutionError[]
-		validation: ValidationResult
-		node: Value.Object | null
-	}
+	export type MultiCreateResult =
+		& MutationResult
+		& {
+			validation: ValidationResult
+			nodes: Value.Object[]
+		}
 
-	export interface DeleteResult {
-		ok: boolean
-		errorMessage?: string
-		errors: ExecutionError[]
-		node: Value.Object | null
-	}
+	export type UpsertResult =
+		& MutationResult
+		& {
+			validation: ValidationResult
+			node: Value.Object | null
+		}
+
+	export type MultiUpsertResult =
+		& MutationResult
+		& {
+			validation: ValidationResult
+			nodes: Value.Object[]
+		}
+
+	export type UpdateResult =
+		& MutationResult
+		& {
+			validation: ValidationResult
+			node: Value.Object | null
+		}
+
+	export type MultiUpdateResult =
+		& MutationResult
+		& {
+			validation: ValidationResult
+			nodes: Value.Object[]
+		}
+
+	export type DeleteResult =
+		& MutationResult
+		& {
+			node: Value.Object | null
+		}
+
+	export type MultiDeleteResult =
+		& MutationResult
+		& {
+			nodes: Value.Object[]
+		}
 
 	export interface TransactionResult {
 		ok: boolean

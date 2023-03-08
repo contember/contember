@@ -34,3 +34,7 @@ export type MutationOperation =
 	| 'update'
 	| 'upsert'
 	| 'delete'
+	// | 'multiCreate'
+	// | 'multiUpdate'
+	// | 'multiUpsert'
+	// | 'multiDelete'

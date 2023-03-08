@@ -16,13 +16,11 @@ import { EntityInputProvider, EntityInputType } from './mutations'
 import { filterObject } from '../utils'
 import { aliasAwareResolver, GqlTypeName } from './utils'
 import { ResultSchemaTypeProvider } from './ResultSchemaTypeProvider'
-import { MutationOperationInfoExtensionKey, OperationInfo } from './OperationExtension'
+import { MutationOperation, MutationOperationInfoExtensionKey, OperationInfo } from './OperationExtension'
 import { GraphQLFieldConfigArgumentMap } from 'graphql/type/definition'
 import { MutationResolver } from '../resolvers'
 
 type FieldConfig = GraphQLFieldConfig<any, Context>
-
-type MutationOperation = 'create' | 'update' | 'delete' | 'upsert'
 
 export class MutationProvider {
 	constructor(
@@ -59,6 +57,19 @@ export class MutationProvider {
 		}
 
 		return this.createMutation(entity, 'create', args, (resolver, info) => resolver.resolveCreate(entity, info))
+	}
+
+	protected getMultiCreateMutation(entity: Model.Entity): FieldConfig | undefined {
+		const dataType = this.createEntityInputProvider.getInput(entity.name)
+		if (dataType === undefined) {
+			return undefined
+		}
+
+		const args = {
+			data: { type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(dataType))) },
+		}
+
+		return this.createMutation(entity, 'multiCreate', args, (resolver, info) => resolver.resolveCreate(entity, info))
 	}
 
 	protected getDeleteMutation(entity: Model.Entity): FieldConfig | undefined {

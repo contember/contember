@@ -102,6 +102,10 @@ export namespace Input {
 		data: CreateDataInput<E>
 	}
 
+	export interface MultiCreateInput<E = never> {
+		data: CreateDataInput<E>[]
+	}
+
 	export interface DeleteInput<E = never> {
 		by: UniqueWhere<E>
 		filter?: OptionalWhere<E>

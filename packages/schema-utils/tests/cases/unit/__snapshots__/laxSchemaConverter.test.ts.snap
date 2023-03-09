@@ -5,6 +5,10 @@ exports[`lax schema converter basic 1`] = `
   "acl": {
     "roles": {},
   },
+  "actions": {
+    "targets": {},
+    "triggers": {},
+  },
   "model": {
     "entities": {
       "Article": {
@@ -66,6 +70,10 @@ exports[`lax schema converter many-has-many 1`] = `
 {
   "acl": {
     "roles": {},
+  },
+  "actions": {
+    "targets": {},
+    "triggers": {},
   },
   "model": {
     "entities": {
@@ -155,6 +163,10 @@ exports[`lax schema converter one-has-many 1`] = `
   "acl": {
     "roles": {},
   },
+  "actions": {
+    "targets": {},
+    "triggers": {},
+  },
   "model": {
     "entities": {
       "Article": {
@@ -233,6 +245,10 @@ exports[`lax schema converter one-has-one 1`] = `
 {
   "acl": {
     "roles": {},
+  },
+  "actions": {
+    "targets": {},
+    "triggers": {},
   },
   "model": {
     "entities": {

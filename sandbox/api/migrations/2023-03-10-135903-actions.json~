@@ -1,0 +1,25 @@
+{
+	"formatVersion": 4,
+	"modifications": [
+		{
+			"modification": "createTarget",
+			"target": {
+				"type": "webhook",
+				"name": "foo_watch_target",
+				"url": "{{foo_watch_url}}"
+			}
+		},
+		{
+			"modification": "createTrigger",
+			"trigger": {
+				"type": "watch",
+				"name": "foo_watch",
+				"entity": "Foo",
+				"watch": [
+					"title"
+				],
+				"target": "foo_watch_target"
+			}
+		}
+	]
+}

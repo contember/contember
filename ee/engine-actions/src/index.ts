@@ -7,7 +7,7 @@ import { MasterContainerBuilder, MasterContainerHook } from '@contember/engine-h
 import { ActionsApiMiddlewareFactory } from './graphql/http/ActionsApiMiddlewareFactory'
 import { ActionsGraphQLHandlerFactory } from './graphql/http/ActionsGraphQLHandlerFactory'
 import { ResolversFactory } from './graphql/resolvers/ResolversFactory'
-import { EventsQueryResolver, ProcessBatchMutationResolver } from './graphql/resolvers'
+import { EventsQueryResolver, ProcessBatchMutationResolver, SetVariablesMutationResolver } from './graphql/resolvers'
 import { EventDispatcher } from './dispatch/EventDispatcher'
 import { EventsRepository } from './dispatch/EventsRepository'
 import { TargetHandlerResolver } from './dispatch/TargetHandlerResolver'
@@ -16,6 +16,8 @@ import { ActionsContextResolver } from './graphql/http/ActionsContextResolver'
 import { ActionsWebsocketControllerFactory } from './graphql/http/ActionsWebsocketControllerFactory'
 import { DispatchWorkerSupervisorFactory } from './dispatch/DispatchWorkerSupervisor'
 import { ProjectDispatcherFactory } from './dispatch/ProjectDispatcher'
+import { VariablesQueryResolver } from './graphql/resolvers/query/VariablesQueryResolver'
+import { VariablesManager } from './model/VariablesManager'
 
 export {
 	TriggerListenersFactory,
@@ -42,21 +44,31 @@ export default class ActionsPlugin implements Plugin {
 	getMasterContainerHook() {
 		const hook: MasterContainerHook = (builder: MasterContainerBuilder) => {
 			return builder
-				.addService('actions_eventDispatcher', () => {
+				.addService('actions_variableManager', () => {
+					return new VariablesManager()
+				})
+				.addService('actions_eventDispatcher', ({ actions_variableManager }) => {
 					const eventsRepository = new EventsRepository()
 					const webhookTargetHandler = new WebhookTargetHandler()
 					const targetHandlerResolver = new TargetHandlerResolver(webhookTargetHandler)
-					return new EventDispatcher(eventsRepository, targetHandlerResolver)
+					return new EventDispatcher(eventsRepository, actions_variableManager, targetHandlerResolver)
 				})
 				.addService('actions_dispatchWorkerSupervisorFactory', ({ actions_eventDispatcher }) => {
 					const projectDispatcherFactory = new ProjectDispatcherFactory(actions_eventDispatcher)
 					return new DispatchWorkerSupervisorFactory(projectDispatcherFactory)
 				})
-				.setupService('application', (it, { projectContextResolver, debugMode, actions_eventDispatcher, actions_dispatchWorkerSupervisorFactory }) => {
+				.setupService('application', (it, { projectContextResolver, debugMode, actions_eventDispatcher, actions_dispatchWorkerSupervisorFactory, actions_variableManager }) => {
 					const handlerFactory = new ActionsGraphQLHandlerFactory()
 					const eventsQueryResolver = new EventsQueryResolver()
 					const processBatchMutationResolver = new ProcessBatchMutationResolver(actions_eventDispatcher)
-					const resolversFactory = new ResolversFactory(eventsQueryResolver, processBatchMutationResolver)
+					const variablesQueryResolver = new VariablesQueryResolver(actions_variableManager)
+					const setVariablesMutationResolver = new SetVariablesMutationResolver(actions_variableManager)
+					const resolversFactory = new ResolversFactory(
+						eventsQueryResolver,
+						processBatchMutationResolver,
+						variablesQueryResolver,
+						setVariablesMutationResolver,
+					)
 
 					const actionsContextResolver = new ActionsContextResolver(debugMode, projectContextResolver)
 					const actionsMiddlewareFactory = new ActionsApiMiddlewareFactory(actionsContextResolver, handlerFactory.create(resolversFactory))

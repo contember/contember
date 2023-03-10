@@ -4,6 +4,7 @@ import { HandledEvent } from './types'
 import { Logger } from '@contember/logger'
 import { ContentSchemaResolver } from '@contember/engine-http'
 import { DatabaseContext } from '@contember/engine-system-api'
+import { VariablesManager } from '../model/VariablesManager'
 
 
 type ProcessBatchArgs = {
@@ -22,6 +23,7 @@ export class EventDispatcher {
 
 	constructor(
 		private readonly eventsRepository: EventsRepository,
+		private readonly variablesManager: VariablesManager,
 		private readonly invokeResolver: TargetHandlerResolver,
 	) {
 	}
@@ -43,7 +45,8 @@ export class EventDispatcher {
 			batchLogger.debug('Processing started', {
 				events: batch.events.map(it => it.id),
 			})
-			const handledEvents = await handler.handle(target, events, batchLogger)
+			const variables = await this.variablesManager.fetchVariables(db)
+			const handledEvents = await handler.handle({ target, events, logger: batchLogger, variables })
 			const [succeed, failed] = await this.eventsRepository.persistProcessed(db.client, handledEvents)
 			batchLogger.debug('Processing done', { succeed, failed })
 			return { succeed, failed, backoffMs: 0 }

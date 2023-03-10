@@ -4,6 +4,7 @@ export type InputMaybe<T> = Maybe<T>
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] }
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> }
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> }
+export type RequireFields<T, K extends keyof T> = Omit<T, K> & { [P in K]-?: NonNullable<T[P]> }
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
 	ID: string
@@ -49,6 +50,12 @@ export type EventState =
 export type Mutation = {
 	readonly __typename?: 'Mutation'
 	readonly processBatch: ProcessBatchResponse
+	readonly setVariables: SetVariablesResponse
+}
+
+
+export type MutationSetVariablesArgs = {
+	args: SetVariablesArgs
 }
 
 export type ProcessBatchResponse = {
@@ -61,6 +68,7 @@ export type Query = {
 	readonly eventsInProcessing: ReadonlyArray<Event>
 	readonly eventsToProcess: ReadonlyArray<Event>
 	readonly failedEvents: ReadonlyArray<Event>
+	readonly variables: ReadonlyArray<Variable>
 }
 
 
@@ -76,6 +84,38 @@ export type QueryEventsToProcessArgs = {
 
 export type QueryFailedEventsArgs = {
 	args?: InputMaybe<EventArgs>
+}
+
+export type SetVariablesArgs = {
+	readonly mode?: InputMaybe<SetVariablesMode>
+	readonly variables: ReadonlyArray<VariableInput>
+}
+
+/**
+ * Defines how it handles original variables.
+ * - MERGE merges with new values (default behaviour)
+ * - SET replaces all variables
+ * - APPEND_ONLY_MISSING appends values if not already exist
+ */
+export type SetVariablesMode =
+  | 'APPEND_ONLY_MISSING'
+  | 'MERGE'
+  | 'SET'
+
+export type SetVariablesResponse = {
+	readonly __typename?: 'SetVariablesResponse'
+	readonly ok: Scalars['Boolean']
+}
+
+export type Variable = {
+	readonly __typename?: 'Variable'
+	readonly name: Scalars['String']
+	readonly value: Scalars['String']
+}
+
+export type VariableInput = {
+	readonly name: Scalars['String']
+	readonly value: Scalars['String']
 }
 
 
@@ -157,8 +197,13 @@ export type ResolversTypes = {
 	Mutation: ResolverTypeWrapper<{}>
 	ProcessBatchResponse: ResolverTypeWrapper<ProcessBatchResponse>
 	Query: ResolverTypeWrapper<{}>
+	SetVariablesArgs: SetVariablesArgs
+	SetVariablesMode: SetVariablesMode
+	SetVariablesResponse: ResolverTypeWrapper<SetVariablesResponse>
 	String: ResolverTypeWrapper<Scalars['String']>
 	Uuid: ResolverTypeWrapper<Scalars['Uuid']>
+	Variable: ResolverTypeWrapper<Variable>
+	VariableInput: VariableInput
 }
 
 /** Mapping between all available schema types and the resolvers parents */
@@ -172,8 +217,12 @@ export type ResolversParentTypes = {
 	Mutation: {}
 	ProcessBatchResponse: ProcessBatchResponse
 	Query: {}
+	SetVariablesArgs: SetVariablesArgs
+	SetVariablesResponse: SetVariablesResponse
 	String: Scalars['String']
 	Uuid: Scalars['Uuid']
+	Variable: Variable
+	VariableInput: VariableInput
 }
 
 export interface DateTimeScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['DateTime'], any> {
@@ -202,6 +251,7 @@ export interface JsonScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes
 
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
 	processBatch?: Resolver<ResolversTypes['ProcessBatchResponse'], ParentType, ContextType>
+	setVariables?: Resolver<ResolversTypes['SetVariablesResponse'], ParentType, ContextType, RequireFields<MutationSetVariablesArgs, 'args'>>
 }
 
 export type ProcessBatchResponseResolvers<ContextType = any, ParentType extends ResolversParentTypes['ProcessBatchResponse'] = ResolversParentTypes['ProcessBatchResponse']> = {
@@ -213,10 +263,22 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
 	eventsInProcessing?: Resolver<ReadonlyArray<ResolversTypes['Event']>, ParentType, ContextType, Partial<QueryEventsInProcessingArgs>>
 	eventsToProcess?: Resolver<ReadonlyArray<ResolversTypes['Event']>, ParentType, ContextType, Partial<QueryEventsToProcessArgs>>
 	failedEvents?: Resolver<ReadonlyArray<ResolversTypes['Event']>, ParentType, ContextType, Partial<QueryFailedEventsArgs>>
+	variables?: Resolver<ReadonlyArray<ResolversTypes['Variable']>, ParentType, ContextType>
+}
+
+export type SetVariablesResponseResolvers<ContextType = any, ParentType extends ResolversParentTypes['SetVariablesResponse'] = ResolversParentTypes['SetVariablesResponse']> = {
+	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export interface UuidScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['Uuid'], any> {
 	name: 'Uuid'
+}
+
+export type VariableResolvers<ContextType = any, ParentType extends ResolversParentTypes['Variable'] = ResolversParentTypes['Variable']> = {
+	name?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	value?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type Resolvers<ContextType = any> = {
@@ -226,6 +288,8 @@ export type Resolvers<ContextType = any> = {
 	Mutation?: MutationResolvers<ContextType>
 	ProcessBatchResponse?: ProcessBatchResponseResolvers<ContextType>
 	Query?: QueryResolvers<ContextType>
+	SetVariablesResponse?: SetVariablesResponseResolvers<ContextType>
 	Uuid?: GraphQLScalarType
+	Variable?: VariableResolvers<ContextType>
 }
 

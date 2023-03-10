@@ -34,5 +34,14 @@ export default async function (builder: MigrationBuilder) {
 		);
 
 		CREATE INDEX ON actions_event (priority DESC, visible_at) WHERE state IN ('created', 'retrying', 'processing');
+		
+		CREATE TABLE actions_variable
+    	(
+        	id              UUID PRIMARY KEY NOT NULL,
+        	created_at      TIMESTAMPTZ      NOT NULL DEFAULT NOW(),
+        	updated_at      TIMESTAMPTZ      NOT NULL DEFAULT NOW(),
+        	name            TEXT             NOT NULL UNIQUE,
+        	value           TEXT             NOT NULL
+    	)
 	`)
 }

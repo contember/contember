@@ -1,11 +1,19 @@
 import { Logger } from '@contember/logger'
 import { Actions } from '@contember/schema'
 import { EventRow } from '../model/types'
+import { VariablesMap } from '../model/VariablesManager'
 
 export { EventRow }
 
-export interface InvokeHandler<Type extends Actions.AnyTarget> {
-	handle(invocation: Type, events: EventRow[], logger: Logger): Promise<HandledEvent[]>
+export interface InvokeHandler<Target extends Actions.AnyTarget> {
+	handle(args: InvokeHandlerArgs<Target>): Promise<HandledEvent[]>
+}
+
+export interface InvokeHandlerArgs<Target extends Actions.AnyTarget> {
+	target: Target
+	events: EventRow[]
+	logger: Logger
+	variables: VariablesMap
 }
 
 export type HandledEvent = {

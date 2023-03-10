@@ -1,23 +1,28 @@
 import { Actions } from '@contember/schema'
-import { EventRow, InvokeHandler, HandledEvent } from './types'
-import { Logger } from '@contember/logger'
+import { HandledEvent, InvokeHandler, InvokeHandlerArgs } from './types'
+import { VariablesMap } from '../model/VariablesManager'
 
 const DEFAULT_TIMEOUT_MS = 30_000 // 30 seconds
 
 export class WebhookTargetHandler implements InvokeHandler<Actions.WebhookTarget> {
-	public async handle(invocation: Actions.WebhookTarget, events: EventRow[], logger: Logger): Promise<HandledEvent[]> {
+	public async handle({ target, events, logger, variables }: InvokeHandlerArgs<Actions.WebhookTarget>): Promise<HandledEvent[]> {
 		const abortController = new AbortController()
-		const timeoutMs = invocation.timeoutMs
+		const timeoutMs = target.timeoutMs
 
 		const start = process.hrtime.bigint()
 		const getDuration = () => Math.floor(Number((process.hrtime.bigint() - start) / BigInt(1_000_000)))
 		try {
+			const resolvedUrl = this.resolveVariables(target.url, variables)
+			const resolvedHeaders = Object.fromEntries(Object.entries(target.headers ?? {})
+				.map(([key, value]) => [key, this.resolveVariables(value, variables)]))
+
 			const response = await withTimeout({ abortController, timeoutMs }, async () => {
-				return await fetch(invocation.url, {
+
+				return await fetch(resolvedUrl, {
 					method: 'POST',
 					headers: {
 						['User-Agent']: 'Contember Actions',
-						...invocation.headers,
+						...resolvedHeaders,
 						['Content-type']: 'application/json',
 					},
 					signal: abortController.signal,
@@ -43,7 +48,7 @@ export class WebhookTargetHandler implements InvokeHandler<Actions.WebhookTarget
 
 			// todo: per-event response format
 
-			return events.map(it => ({ invocation, row: it, result }))
+			return events.map(it => ({ target, row: it, result }))
 		} catch (e) {
 			logger.warn(e)
 			const errorMessages = []
@@ -57,8 +62,17 @@ export class WebhookTargetHandler implements InvokeHandler<Actions.WebhookTarget
 				errorMessage: errorMessages.length ? errorMessages.join('; ') : undefined,
 				durationMs: getDuration(),
 			}
-			return events.map(it => ({ invocation, row: it, result }))
+			return events.map(it => ({ target, row: it, result }))
 		}
+	}
+
+	private resolveVariables(subject: string, variables: VariablesMap) {
+		return subject.replace(/\{\{([\w_]+)}}/gm, (_, name) => {
+			if (!variables[name]) {
+				throw new Error(`Undefined variable ${name}`)
+			}
+			return variables[name]
+		})
 	}
 }
 

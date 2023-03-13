@@ -45,6 +45,10 @@ import {
 import { ChangeViewNonViewDiffer, RemoveChangedFieldDiffer, RemoveChangedViewDiffer } from './modifications/differs'
 import { CreateIndexDiffer, RemoveIndexDiffer } from './modifications/indexes'
 import { SchemaWithMeta } from './modifications/utils/schemaMeta'
+import { CreateTriggerDiffer, RemoveTriggerDiffer, UpdateTriggerDiffer } from './modifications/actions'
+import { UpdateTargetDiffer } from './modifications/actions/UpdateTargetModification'
+import { CreateTargetDiffer } from './modifications/actions/CreateTargetModification'
+import { RemoveTargetDiffer } from './modifications/actions/RemoveTargetModification'
 import { UpdateSettingsDiffer } from './modifications/settings'
 
 type DiffOptions = { skipRecreateValidation?: boolean; skipInitialSchemaValidation?: boolean }
@@ -103,6 +107,12 @@ export class SchemaDiffer {
 			new UpdateAclSchemaDiffer(),
 			new UpdateValidationSchemaDiffer(),
 			new UpdateEntityOrderByDiffer(),
+			new UpdateTargetDiffer(),
+			new CreateTargetDiffer(),
+			new UpdateTriggerDiffer(),
+			new CreateTriggerDiffer(),
+			new RemoveTriggerDiffer(),
+			new RemoveTargetDiffer(),
 		]
 
 		const diffs: Migration.Modification[] = []

@@ -1,6 +1,7 @@
 import { Model, Schema, Writable } from '@contember/schema'
 import { LaxSchema, LaxSchemaColumn, LaxSchemaEnum, LaxSchemaField, LaxSchemaRelation } from './schema'
 import { DefaultNamingConventions, NamingConventions, resolveDefaultColumnType } from '../model'
+import { emptySchema } from '../index'
 
 const simpleColumnTypes: { [K in LaxSchemaColumn['type']]: { type: Model.ColumnType; columnType: string } } = {
 	boolean: { type: Model.ColumnType.Bool, columnType: 'boolean' },
@@ -53,9 +54,7 @@ class LaxSchemaBuilder {
 			}
 		}
 		return {
-			acl: { roles: {} },
-			settings: {},
-			validation: {},
+			...emptySchema,
 			model: {
 				enums: this.enums,
 				entities: this.entities,

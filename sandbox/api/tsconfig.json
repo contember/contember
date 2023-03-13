@@ -1,0 +1,7 @@
+{
+	"extends": "../tsconfig.settings.json",
+	"compilerOptions": {
+		"experimentalDecorators": true,
+		"noEmit": true
+	}
+}

@@ -1,0 +1,16 @@
+{
+	"extends": "../tsconfig.settings.json",
+	"compilerOptions": {
+		"outDir": "../dist/tests",
+		"esModuleInterop": true,
+		"experimentalDecorators": true
+	},
+	"references": [
+		{
+			"path": "../src"
+		},
+		{
+			"path": "../../../packages/engine-api-tester/src"
+		}
+	]
+}

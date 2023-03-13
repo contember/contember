@@ -1,0 +1,21 @@
+schema:
+  - "./src/graphql/schema/actions.graphql.ts"
+documents: []
+config:
+  immutableTypes: "1"
+generates:
+  ./src/graphql/schema/index.ts:
+    config:
+      immutableTypes: "1"
+      enumsAsTypes: "1"
+      scalars:
+        DateTime: Date
+        Uuid: String
+        Json: any
+    plugins:
+      - "typescript"
+      - "typescript-operations"
+      - "typescript-resolvers"
+hooks:
+  afterAllFileWrite:
+    - eslint --fix

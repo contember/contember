@@ -21,6 +21,22 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
+  cli-sandbox:
+    image: node:18
+    working_dir: /src/sandbox
+    depends_on:
+      api:
+        condition: service_started
+    volumes:
+      - .:/src
+    environment:
+      NODE_ENV: development
+      CONTEMBER_API_TOKEN: '0000000000000000000000000000000000000000'
+      CONTEMBER_INSTANCE: 'http://api:4000'
+      CONTEMBER_PROJECT_NAME: 'sandbox'
+    entrypoint:
+      - node
+      - /src/packages/cli/dist/src/run.js
   api:
     image: node:18
     working_dir: /src

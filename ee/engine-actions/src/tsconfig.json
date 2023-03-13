@@ -1,0 +1,21 @@
+{
+	"extends": "../tsconfig.settings.json",
+	"compilerOptions": {
+		"outDir": "../dist/src"
+	},
+	"references": [
+		{ "path": "../../../packages/database/src" },
+		{ "path": "../../../packages/database-migrations/src" },
+		{ "path": "../../../packages/engine-common/src" },
+		{ "path": "../../../packages/engine-content-api/src" },
+		{ "path": "../../../packages/engine-system-api/src" },
+		{ "path": "../../../packages/engine-tenant-api/src" },
+		{ "path": "../../../packages/graphql-utils/src" },
+		{ "path": "../../../packages/logger/src" },
+		{ "path": "../../../packages/schema/src" },
+		{ "path": "../../../packages/schema-utils/src" },
+		{ "path": "../../../packages/typesafe/src" },
+		{ "path": "../../../packages/engine-plugins/src" },
+		{ "path": "../../../packages/engine-http/src" }
+	]
+}

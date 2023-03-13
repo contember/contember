@@ -5,6 +5,7 @@ export { typeDefs, devTypeDefs, Schema } from './schema'
 export {
 	DatabaseContext,
 	DatabaseContextFactory,
+	Command,
 	formatSchemaName,
 	getJunctionTables,
 	Identity,

@@ -3,6 +3,7 @@ import { ValidationError, ValidationErrorCode } from './errors'
 import { AclValidator } from './AclValidator'
 import { ModelValidator } from './ModelValidator'
 import { ValidationValidator } from './ValidationValidator'
+import { ActionsValidator } from './ActionsValidator'
 
 export interface SchemaValidatorSkippedErrors {
 	code: ValidationErrorCode
@@ -20,7 +21,11 @@ export class SchemaValidator {
 
 		const validationValidator = new ValidationValidator(schema.model)
 		const validationErrors = validationValidator.validate(schema.validation)
-		const allErrors = [...aclErrors, ...modelErrors, ...validationErrors]
+
+		const actionsValidator = new ActionsValidator(schema.model)
+		const actionsErrors  = actionsValidator.validate(schema.actions)
+
+		const allErrors = [...aclErrors, ...modelErrors, ...validationErrors, ...actionsErrors]
 		if (skippedErrors.length === 0) {
 			return allErrors
 		}

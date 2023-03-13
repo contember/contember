@@ -94,7 +94,7 @@ export class ModelValidator {
 					const orderByField = entity.fields[it.path[i]]
 					const pathStr = it.path.slice(0, i + 1).join('.')
 					if (!orderByField) {
-						errors.add('ACL_UNDEFINED_FIELD', `Invalid orderBy of ${entityName}::${field.name}: field ${pathStr} is not defined`)
+						errors.add('MODEL_UNDEFINED_FIELD', `Invalid orderBy of ${entityName}::${field.name}: field ${pathStr} is not defined`)
 						return
 					}
 					if (i + 1 < it.path.length) {

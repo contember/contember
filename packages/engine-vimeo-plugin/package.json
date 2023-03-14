@@ -1,15 +1,15 @@
 {
   "name": "@contember/engine-vimeo-plugin",
   "license": "Apache-2.0",
-  "version": "1.3.0-alpha.2",
+  "version": "1.3.0-alpha.3",
   "main": "dist/src/index.js",
   "scripts": {
     "test": "echo 'No tests'"
   },
   "typings": "dist/src/index.d.ts",
   "dependencies": {
-    "@contember/engine-plugins": "^1.3.0-alpha.2",
-    "@contember/typesafe": "^1.3.0-alpha.2",
+    "@contember/engine-plugins": "^1.3.0-alpha.3",
+    "@contember/typesafe": "^1.3.0-alpha.3",
     "node-fetch": "^2.0"
   },
   "devDependencies": {

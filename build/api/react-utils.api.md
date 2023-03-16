@@ -46,6 +46,9 @@ export const useConstantValueInvariant: <Value extends unknown>(value: Value, me
 export const useDebounce: <T>(value: T, debounceMs: number) => T;
 
 // @public (undocumented)
+export const useDebounceCallback: (cb: () => any, debounceMs: number) => () => void;
+
+// @public (undocumented)
 export const useForceRender: () => DispatchWithoutAction;
 
 // @public (undocumented)

@@ -9,7 +9,8 @@
 		".": {
 			"import": {
 				"development": "./dist/development/index.js",
-				"production": "./dist/production/index.js"
+				"production": "./dist/production/index.js",
+				"default": "./dist/production/index.js"
 			}
 		}
 	},

@@ -1,5 +1,6 @@
 import { AcceptFileKindError, AcceptedFile, FileHandler } from '../../fileHandler'
-import { DropzoneState, useDropzone } from 'react-dropzone'
+import * as dropzone from 'react-dropzone'
+import type { DropzoneState } from 'react-dropzone'
 import { EntityAccessor, useBindingOperations, useMutationState } from '@contember/binding'
 import type {
 	FileId,
@@ -25,6 +26,8 @@ export interface NormalizedUploadState {
 	uploadState: FileUploadCompoundState
 	dropzoneState: DropzoneState
 }
+
+const { useDropzone } = dropzone
 
 export const useNormalizedUploadState = ({
 	fileUpload,

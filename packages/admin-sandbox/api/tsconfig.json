@@ -3,5 +3,8 @@
 	"compilerOptions": {
 		"noEmit": true,
 		"emitDeclarationOnly": false
-	}
+	},
+	"references": [
+		{ "path": "../../admin/src" }
+	]
 }

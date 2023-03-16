@@ -105,7 +105,6 @@ importers:
       '@playwright/test': 1.20.0
       '@sindresorhus/slugify': 0.11.0
       '@types/blueimp-md5': 2.18.0
-      '@types/debounce': 1.2.0
       '@types/is-hotkey': 0.1.5
       '@types/leaflet': ^1.9.0
       '@types/node': ^16
@@ -117,7 +116,6 @@ importers:
       buffer: 6.0.3
       classnames: 2.3.1
       csstype: 3.0.8
-      debounce: 1.2.1
       fuse.js: 6.4.6
       intl-messageformat: 9.9.1
       is-hotkey: 0.1.8
@@ -154,7 +152,6 @@ importers:
       blueimp-md5: 2.18.0
       buffer: 6.0.3
       classnames: 2.3.1
-      debounce: 1.2.1
       fuse.js: 6.4.6
       intl-messageformat: 9.9.1
       is-hotkey: 0.1.8
@@ -177,7 +174,6 @@ importers:
       '@contember/schema-utils': 1.2.0
       '@playwright/test': 1.20.0
       '@types/blueimp-md5': 2.18.0
-      '@types/debounce': 1.2.0
       '@types/is-hotkey': 0.1.5
       '@types/leaflet': 1.9.0
       '@types/node': 16.18.3
@@ -7710,10 +7706,6 @@ packages:
     resolution: {integrity: sha512-XW/Aa8APYr6jSVVA1y/DEIZX0/GMKLEVekNG727R8cs56ahETkRAy/3DR7+fJyh7oUgGwNQaRfXCun0+KbWY7Q==}
     dev: true
 
-  /@types/debounce/1.2.0:
-    resolution: {integrity: sha512-bWG5wapaWgbss9E238T0R6bfo5Fh3OkeoSt245CM7JJwVwpw6MEBCbIxLq5z8KzsE3uJhzcIuQkyiZmzV3M/Dw==}
-    dev: true
-
   /@types/eslint-scope/3.7.4:
     resolution: {integrity: sha512-9K4zoImiZc3HlIp6AVUDE4CWYx22a+lhSZMYNpbjW04+YF0KWj4pJXnEMjdnFTiQibFFmElcsasJXDbdI/EPhA==}
     dependencies:
@@ -10182,10 +10174,6 @@ packages:
       whatwg-mimetype: 3.0.0
       whatwg-url: 11.0.0
     dev: true
-
-  /debounce/1.2.1:
-    resolution: {integrity: sha512-XRRe6Glud4rd/ZGQfiV1ruXSfbvfJedlV9Y6zOlP+2K04vBYiJEte6stfFkCP03aMnY5tsipamumUjL14fofug==}
-    dev: false
 
   /debug/2.6.9:
     resolution: {integrity: sha512-bC7ElrdJaJnPbAP+1EotYvqZsb3ecl5wi6Bfi6BJTUcNowp6cvspg0jXznRTKDjm/E7AdgFBVeAPVMNcKGsHMA==}

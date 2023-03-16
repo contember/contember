@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import { BindingError } from '../BindingError'
 import type { Filter } from '../treeParameters'
-import equal from 'fast-deep-equal/es6'
+import equal from 'fast-deep-equal/es6/index.js'
 import { Schema, SchemaColumn, SchemaEntity, SchemaRelation } from '../core/schema'
 import { GraphQlLiteral } from '@contember/client'
 

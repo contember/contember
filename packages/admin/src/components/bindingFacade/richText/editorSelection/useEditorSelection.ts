@@ -1,4 +1,4 @@
-import { debounce } from 'debounce'
+import { useDebounceCallback } from '@contember/react-utils'
 import { useCallback, useEffect, useReducer, useRef } from 'react'
 import { Editor, Range as SlateRange } from 'slate'
 import { ReactEditor, useSlateStatic } from 'slate-react'
@@ -12,7 +12,7 @@ export const useEditorSelection = (maxInterval: number = 100): EditorSelectionSt
 
 	selectionStateRef.current = selectionState
 
-	const onDOMSelectionChange = debounce(
+	const onDOMSelectionChange = useDebounceCallback(
 		useCallback(() => {
 			const domSelection = getSelection()
 			const isRelevant =

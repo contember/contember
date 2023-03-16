@@ -3272,6 +3272,11 @@ export interface Project {
 export const PROJECT_ROLES_FRAGMENT = "\n\tfragment ProjectRoles on Project {\n\t\troles {\n\t\t\tname\n\t\t\tvariables {\n\t\t\t\t... on RoleEntityVariableDefinition {\n\t\t\t\t\tname\n\t\t\t\t\tentityName\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t}\n";
 
 // @public (undocumented)
+export const projectEnvironmentExtension: Environment.Extension<string | null, {
+    slug: string | undefined;
+}>;
+
+// @public (undocumented)
 export const ProjectList: (props: ProjectListProps) => JSX.Element;
 
 // @public (undocumented)

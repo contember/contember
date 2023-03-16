@@ -6,7 +6,7 @@ import { I18nProvider, MessageDictionaryByLocaleCode } from '../i18n'
 import { RequestProvider, RouteMap, RoutingContext, RoutingContextValue, SelectedDimension } from '../routing'
 import { IdentityProvider } from './Identity'
 import { NavigationProvider } from './NavigationProvider'
-import { projectEnvironmentExtension } from './Project/ProjectEnvironmentExtension'
+import { projectEnvironmentExtension } from './Project'
 import { OutdatedApplicationChecker } from './Application/OutdatedApplicationChecker'
 
 export interface ApplicationEntrypointProps extends ContemberClientProps {

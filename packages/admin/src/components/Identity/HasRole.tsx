@@ -2,7 +2,7 @@ import { Component } from '@contember/binding'
 import { ReactNode } from 'react'
 import { identityEnvironmentExtension } from './IdentityEnvironmentExtension'
 import { useProjectUserRoles } from '../../acl'
-import { projectEnvironmentExtension } from '../Project/ProjectEnvironmentExtension'
+import { projectEnvironmentExtension } from '../Project'
 
 type RoleCondition = string | ((roles: Set<string>) => boolean);
 

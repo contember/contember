@@ -1,0 +1,44 @@
+{
+	"name": "@contember/interface-tester",
+	"license": "Apache-2.0",
+	"version": "0.0.0",
+	"type": "module",
+	"sideEffects": false,
+	"main": "./dist/production/index.js",
+	"exports": {
+		".": {
+			"import": {
+				"development": "./dist/development/index.js",
+				"production": "./dist/production/index.js",
+				"default": "./dist/production/index.js"
+			}
+		}
+	},
+	"files": [
+		"dist/",
+		"src/"
+	],
+	"typings": "./dist/types/index.d.ts",
+	"scripts": {
+		"build": "yarn build:js:dev && yarn build:js:prod",
+		"build:js:dev": "vite build --mode development",
+		"build:js:prod": "vite build --mode production",
+		"ae:build": "api-extractor run --local",
+		"ae:test": "api-extractor run"
+	},
+	"dependencies": {
+		"@contember/admin": "workspace:*",
+		"@contember/schema": "^1.2.0",
+		"@contember/schema-utils": "^1.2.0",
+		"fast-glob": "^3.2.12",
+		"micromatch": "^4.0.5"
+	},
+	"peerDependencies": {
+		"react": "^17 || ^18",
+		"vitest": "^0.29.3"
+	},
+	"devDependencies": {
+		"@types/micromatch": "^4.0.2",
+		"@types/node": "^16.11.1"
+	}
+}

@@ -4,6 +4,8 @@
 
 ```ts
 
+/// <reference types="react" />
+
 import { DispatchWithoutAction } from 'react';
 import { MutableRefObject } from 'react';
 

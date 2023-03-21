@@ -121,7 +121,7 @@ export const Pages = ({ children, layout }: PagesProps) => {
 									throw new Error(`No such page as ${pageName}${props.action ? '/' + props.action : ''}.`)
 								}
 
-								return { default: isValidElement(page) ? () => page : page }
+								return { default: isValidElement<any>(page) ? () => page : page }
 							})
 
 							return <Suspense fallback={<ContainerSpinner />}><Lazy /></Suspense>
@@ -140,7 +140,7 @@ export const Pages = ({ children, layout }: PagesProps) => {
 								throw new Error(`No such page as ${pageName}${props.action ? '/' + props.action : ''}.`)
 							}
 
-							return isValidElement(Page) ? Page : <Page />
+							return isValidElement<any>(Page) ? Page : <Page />
 						}
 
 						return [[pageName, PageActionHandler]]
@@ -151,7 +151,7 @@ export const Pages = ({ children, layout }: PagesProps) => {
 						if (isPageProviderElement(v)) {
 							return [[v.type.getPageName(v.props, pageName), disallowAction(() => v)]]
 
-						} else if (isValidElement(v)) {
+						} else if (isValidElement<any>(v)) {
 							return [[pageName, disallowAction(() => v)]]
 
 						} else {

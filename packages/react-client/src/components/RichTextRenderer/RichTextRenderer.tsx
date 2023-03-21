@@ -68,7 +68,7 @@ export const RichTextRenderer = memo(function RichTextRenderer<
 				},
 			]
 		}
-		if ('blocks' in sourceProps) {
+		if (!('source' in sourceProps)) {
 			const sourceField = sourceProps.sourceField ?? 'source'
 			const referencesField = sourceProps.referencesField ?? 'references'
 			const referenceDiscriminationField = sourceProps.referenceDiscriminationField ?? 'type'

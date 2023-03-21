@@ -81,4 +81,4 @@ export const ControlledDataGrid = Component(
 		)
 	},
 	'ControlledDataGrid',
-) as <ComponentProps>(props: ControlledDataGridProps<ComponentProps>) => ReactElement
+) as <ComponentProps extends {}>(props: ControlledDataGridProps<ComponentProps>) => ReactElement

@@ -3018,6 +3018,7 @@ __metadata:
   resolution: "@contember/admin-sandbox@workspace:packages/admin-sandbox"
   dependencies:
     "@contember/admin": "workspace:*"
+    "@contember/interface-tester": "workspace:*"
     "@contember/schema": ^1.2.0
     "@contember/schema-definition": ^1.2.0
     "@welldone-software/why-did-you-render": ^6.2.3
@@ -3170,7 +3171,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@contember/interface-tester@workspace:packages/interface-tester":
+"@contember/interface-tester@workspace:*, @contember/interface-tester@workspace:packages/interface-tester":
   version: 0.0.0-use.local
   resolution: "@contember/interface-tester@workspace:packages/interface-tester"
   dependencies:

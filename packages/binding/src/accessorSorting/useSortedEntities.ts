@@ -13,12 +13,11 @@ const addNewAtIndexImplementation = (
 	callbackName: keyof SortedEntities,
 	entityList: EntityListAccessor,
 	desugaredSortableByField: RelativeSingleField | undefined,
-	sortedEntitiesCount: number,
 	index: number,
 	preprocess?: EntityAccessor.BatchUpdatesHandler,
 ) => {
 	if (!desugaredSortableByField) {
-		if (index === sortedEntitiesCount) {
+		if (index === entityList.length) {
 			return entityList.createNewEntity(preprocess)
 		}
 		return throwNoopError(callbackName)
@@ -31,58 +30,56 @@ export const useSortedEntities = (
 	sortableByField: SugaredFieldProps['field'] | undefined,
 ): SortedEntities => {
 	const desugaredSortableByField = useDesugaredRelativeSingleField(sortableByField)
-	const sortedEntities = useMemo(() => {
-		return sortEntities(Array.from(entityList), desugaredSortableByField)
-	}, [desugaredSortableByField, entityList])
 
 	const addNewAtIndex = useCallback<SortedEntities['addNewAtIndex']>(
-		(index: number, preprocess?: EntityAccessor.BatchUpdatesHandler) => {
+		(index: number | undefined, preprocess?: EntityAccessor.BatchUpdatesHandler) => {
 			addNewAtIndexImplementation(
 				'addNewAtIndex',
-				entityList,
+				entityList.getAccessor(),
 				desugaredSortableByField,
-				sortedEntities.length,
-				index,
+				index ?? entityList.getAccessor().length,
 				preprocess,
 			)
 		},
-		[desugaredSortableByField, entityList, sortedEntities.length],
+		[desugaredSortableByField, entityList],
 	)
 	const prependNew = useCallback<SortedEntities['prependNew']>(
 		preprocess => {
 			addNewAtIndexImplementation(
 				'prependNew',
-				entityList,
+				entityList.getAccessor(),
 				desugaredSortableByField,
-				sortedEntities.length,
 				0,
 				preprocess,
 			)
 		},
-		[desugaredSortableByField, entityList, sortedEntities.length],
+		[desugaredSortableByField, entityList],
 	)
 	const appendNew = useCallback<SortedEntities['appendNew']>(
 		preprocess => {
 			addNewAtIndexImplementation(
 				'appendNew',
-				entityList,
+				entityList.getAccessor(),
 				desugaredSortableByField,
-				sortedEntities.length,
-				sortedEntities.length,
+				entityList.getAccessor().length,
 				preprocess,
 			)
 		},
-		[desugaredSortableByField, entityList, sortedEntities.length],
+		[desugaredSortableByField, entityList],
 	)
 	const normalizedMoveEntity = useCallback<SortedEntities['moveEntity']>(
 		(oldIndex, newIndex) => {
 			if (!desugaredSortableByField) {
 				return throwNoopError('moveEntity')
 			}
-			moveEntity(entityList, desugaredSortableByField, oldIndex, newIndex)
+			moveEntity(entityList.getAccessor(), desugaredSortableByField, oldIndex, newIndex)
 		},
 		[desugaredSortableByField, entityList],
 	)
+
+	const sortedEntities = useMemo(() => {
+		return sortEntities(Array.from(entityList), desugaredSortableByField)
+	}, [desugaredSortableByField, entityList])
 
 	// This wasn't such a great idea…
 	// useEffect(() => {

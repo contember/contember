@@ -2070,7 +2070,7 @@ export type SingleEntityPersistedData = Map<PlaceholderName, EntityFieldPersiste
 // @public (undocumented)
 export interface SortedEntities {
     // (undocumented)
-    addNewAtIndex: (index: number, preprocess?: EntityAccessor.BatchUpdatesHandler) => void;
+    addNewAtIndex: (index: number | undefined, preprocess?: EntityAccessor.BatchUpdatesHandler) => void;
     // (undocumented)
     appendNew: (initialize?: EntityAccessor.BatchUpdatesHandler) => void;
     // (undocumented)

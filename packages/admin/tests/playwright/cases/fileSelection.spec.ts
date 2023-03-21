@@ -36,6 +36,7 @@ test('file selection', async ({ page }) => {
 	await page.locator('button:has-text("Select files")').click()
 
 	await page.locator('.cui-card-thumbnail').click()
+	await page.waitForTimeout(500)
 	expect(await page.screenshot({ animations: 'disabled' })).toMatchSnapshot('03-select.png')
 
 	await page.locator('button:has-text("Confirm")').click()

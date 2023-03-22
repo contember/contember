@@ -519,7 +519,7 @@ export class MutationGenerator {
 
 		if (reducedBy === undefined) {
 			return builder.one(marker.parameters.field, builder => {
-				if (runtimeId.existsOnServer) {
+				if (this.shouldConnectInsteadOfCreate(processedPlaceholdersByEntity, fieldState)) {
 					// TODO also potentially update
 					return builder.connect({ [PRIMARY_KEY_NAME]: runtimeId.value })
 				}
@@ -528,7 +528,7 @@ export class MutationGenerator {
 		}
 		return builder.many(marker.parameters.field, builder => {
 			const alias = MutationAlias.encodeEntityId(runtimeId)
-			if (runtimeId.existsOnServer) {
+			if (this.shouldConnectInsteadOfCreate(processedPlaceholdersByEntity, fieldState)) {
 				// TODO also potentially update
 				return builder.connect({ [PRIMARY_KEY_NAME]: runtimeId.value }, alias)
 			}
@@ -544,16 +544,27 @@ export class MutationGenerator {
 	) {
 		return builder.many(marker.parameters.field, builder => {
 			for (const entityRealm of fieldState.children.values()) {
-				const alias = MutationAlias.encodeEntityId(entityRealm.entity.id)
-				if (entityRealm.entity.id.existsOnServer) {
+				const runtimeId = entityRealm.entity.id
+				const alias = MutationAlias.encodeEntityId(runtimeId)
+				if (this.shouldConnectInsteadOfCreate(processedPlaceholdersByEntity, entityRealm)) {
 					// TODO also potentially update
-					builder = builder.connect({ [PRIMARY_KEY_NAME]: entityRealm.entity.id.value }, alias)
+					builder = builder.connect({ [PRIMARY_KEY_NAME]: runtimeId.value }, alias)
 				} else {
 					builder = builder.create(this.registerCreateMutationPart(processedPlaceholdersByEntity, entityRealm), alias)
 				}
 			}
 			return builder
 		})
+	}
+
+	private shouldConnectInsteadOfCreate(
+		processedPlaceholdersByEntity: ProcessedPlaceholdersByEntity,
+		currentState: EntityRealmState | EntityRealmStateStub,
+	): boolean {
+		const runtimeId = currentState.entity.id
+		const processedPlaceholders = processedPlaceholdersByEntity.get(currentState.entity)
+
+		return runtimeId.existsOnServer || (runtimeId instanceof ClientGeneratedUuid && (processedPlaceholders?.has(PRIMARY_KEY_NAME) ?? false))
 	}
 
 	private registerUpdateMutationPart(

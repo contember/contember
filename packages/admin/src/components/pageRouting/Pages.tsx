@@ -1,4 +1,4 @@
-import { EnvironmentContext, useEnvironment } from '@contember/binding'
+import { DataBindingProvider, EnvironmentContext, useEnvironment } from '@contember/binding'
 import { ContainerSpinner, Message } from '@contember/ui'
 import {
 	ComponentType,
@@ -13,6 +13,7 @@ import {
 } from 'react'
 import { useCurrentRequest } from '../../routing'
 import { MiscPageLayout } from '../MiscPageLayout'
+import { FeedbackRenderer } from '../bindingFacade'
 import { PageErrorBoundary } from './PageErrorBoundary'
 
 export interface PageProvider<P> {
@@ -196,7 +197,11 @@ export const Pages = ({ children, layout }: PagesProps) => {
 	return (
 		<EnvironmentContext.Provider value={requestEnv}>
 			<Layout>
-				<PageErrorBoundary key={requestId.current++}><Page action={pageAction} /></PageErrorBoundary>
+				<PageErrorBoundary key={requestId.current++}>
+					<DataBindingProvider stateComponent={FeedbackRenderer}>
+						<Page action={pageAction} />
+					</DataBindingProvider>
+				</PageErrorBoundary>
 			</Layout>
 		</EnvironmentContext.Provider>
 	)

@@ -2399,7 +2399,7 @@ export type TextareaInputProps = ControlProps<string> & TextareaInputOwnProps & 
 };
 
 // @public (undocumented)
-export const TextInput: MemoExoticComponent<ForwardRefExoticComponent<Omit<TextInputProps<string>, "type"> & {
+export const TextInput: MemoExoticComponent<ForwardRefExoticComponent<Omit<TextInputProps, "type"> & {
 type?: "search" | "time" | "color" | "range" | "tel" | "url" | "email" | "date" | "datetime-local" | "month" | "password" | "week" | "datetime" | undefined;
 } & RefAttributes<HTMLInputElement>>>;
 

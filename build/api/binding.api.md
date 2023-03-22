@@ -1547,7 +1547,7 @@ export const MutationStateContext: React.Context<boolean>;
 export interface MutationTransactionResponse {
     // (undocumented)
     transaction: (MutationDataResponse & {
-        __type: 'MutationTransaction';
+        __typename: 'MutationTransaction';
         ok: boolean;
         errorMessage: string | null;
     });
@@ -1784,7 +1784,7 @@ export class QueryLanguage {
     // (undocumented)
     static desugarEventListener<F extends Function>(listener: F | Set<F> | undefined): Set<F> | undefined;
     // (undocumented)
-    static desugarFilter: (input: string | Filter<GraphQlLiteral<string>>, environment: Environment) => Filter<GraphQlLiteral<string>>;
+    static desugarFilter: (input: string | Filter, environment: Environment) => Filter;
     // (undocumented)
     static desugarOrderBy: (input: string | OrderBy, environment: Environment) => OrderBy;
     // (undocumented)
@@ -1812,7 +1812,7 @@ export class QueryLanguage {
     // (undocumented)
     static desugarUnconstrainedQualifiedSingleEntity({ entity, ...unsugarableSingleEntity }: SugaredUnconstrainedQualifiedSingleEntity, environment: Environment): UnconstrainedQualifiedSingleEntity;
     // (undocumented)
-    static desugarUniqueWhere: (input: string | UniqueWhere<GraphQlLiteral<string>>, environment: Environment) => UniqueWhere<GraphQlLiteral<string>>;
+    static desugarUniqueWhere: (input: string | UniqueWhere, environment: Environment) => UniqueWhere;
 }
 
 // @public (undocumented)

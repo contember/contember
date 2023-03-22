@@ -51,7 +51,7 @@ export interface MutationTransactionResponse {
 	transaction: (
 		& MutationDataResponse
 		& {
-			__type: 'MutationTransaction'
+			__typename: 'MutationTransaction'
 			ok: boolean
 			errorMessage: string | null
 		}

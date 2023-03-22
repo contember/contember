@@ -57,4 +57,4 @@ export const DataGrid = Component(
 		)
 	},
 	'DataGrid',
-) as <ComponentProps>(props: DataGridProps<ComponentProps>) => ReactElement
+) as <ComponentProps extends {}>(props: DataGridProps<ComponentProps>) => ReactElement

@@ -826,7 +826,7 @@ export const ContemberEditor: {
 };
 
 // @public (undocumented)
-export const ControlledDataGrid: <ComponentProps>(props: ControlledDataGridProps<ComponentProps>) => ReactElement;
+export const ControlledDataGrid: <ComponentProps extends {}>(props: ControlledDataGridProps<ComponentProps>) => ReactElement;
 
 // @public (undocumented)
 export type ControlledDataGridProps<ComponentExtraProps extends {}> = DataGridContainerPublicProps & {
@@ -937,7 +937,7 @@ export const createReferenceElementPlugin: (args: ReferenceElementOptions) => Cu
 export const CreateResetPasswordRequestForm: FC<CreateResetPasswordRequestFormProps>;
 
 // @public (undocumented)
-export const CurrentRequestContext: React.Context<RequestState<RequestParameters<never>>>;
+export const CurrentRequestContext: React.Context<RequestState>;
 
 // @public (undocumented)
 export interface CustomElementPlugin<T extends Element_2> {
@@ -997,7 +997,7 @@ export const cycleOrderDirection: (direction: DataGridOrderDirection) => DataGri
 export const DATA_GRID_DEFAULT_ITEMS_PER_PAGE = 50;
 
 // @public (undocumented)
-export const DataGrid: <ComponentProps>(props: DataGridProps<ComponentProps>) => ReactElement;
+export const DataGrid: <ComponentProps extends {}>(props: DataGridProps<ComponentProps>) => ReactElement;
 
 // @public (undocumented)
 export interface DataGridCellPublicProps {
@@ -1808,10 +1808,10 @@ export type FileInputPublicProps = Pick<FieldContainerProps, 'label' | 'descript
 };
 
 // @public (undocumented)
-export function FileKind<UploadResult = unknown, AcceptArtifacts = unknown, SFExtraProps = unknown>(props: FileKindProps<UploadResult, AcceptArtifacts, SFExtraProps>): ReactElement | null;
+export function FileKind<UploadResult = unknown, AcceptArtifacts = unknown, SFExtraProps extends {} = {}>(props: FileKindProps<UploadResult, AcceptArtifacts, SFExtraProps>): ReactElement | null;
 
 // @public (undocumented)
-export type FileKindProps<UploadResult = unknown, AcceptArtifacts = unknown, SFExtraProps = unknown> = FullFileKind<UploadResult, AcceptArtifacts> & {
+export type FileKindProps<UploadResult = unknown, AcceptArtifacts = unknown, SFExtraProps extends {} = {}> = FullFileKind<UploadResult, AcceptArtifacts> & {
     discriminateBy: SugaredDiscriminateBy;
     fileSelection: SelectFileInputSelectionComponentProps<SFExtraProps>;
 };
@@ -3537,7 +3537,7 @@ export interface RepeaterProps<ContainerExtraProps, ItemExtraProps> extends Suga
 export type RequestChange = (currentState: RequestState) => IncompleteRequestState;
 
 // @public (undocumented)
-export const requestChangeFactory: <P extends RequestParameters<never>>(pageName: string, parameters?: P | undefined) => RequestChange;
+export const requestChangeFactory: <P extends RequestParameters>(pageName: string, parameters?: P | undefined) => RequestChange;
 
 // @public (undocumented)
 export type RequestParameters<Extra extends RoutingParameter = never> = {
@@ -4405,10 +4405,10 @@ email: GQLVariableType<string, true>;
 }>, TenantMutationResponse<never, "PERSON_NOT_FOUND">>;
 
 // @public (undocumented)
-export const useCurrentRequest: () => RequestState<RequestParameters<never>>;
+export const useCurrentRequest: () => RequestState;
 
 // @public (undocumented)
-export const useDataGrid: <T>(props: DataGridProps<T>) => ControlledDataGridProps<T>;
+export const useDataGrid: <T extends {}>(props: DataGridProps<T>) => ControlledDataGridProps<T>;
 
 // @public (undocumented)
 export const useDataGridState: (props: Pick<DataGridProps<any>, 'children' | 'itemsPerPage' | 'entities' | 'dataGridKey' | 'tile'>) => [DataGridState, DataGridStateMethods];

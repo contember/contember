@@ -6,7 +6,7 @@ type ContemberOptions = {
 
 export function contember(options: ContemberOptions) {
 	return ({
-		name: 'contember-build-version',
+		name: 'contember',
 		transformIndexHtml: options.buildVersion === false
 			? undefined : {
 				order: 'post',

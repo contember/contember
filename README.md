@@ -17,11 +17,7 @@ If you wish to send a pull request, be sure to first consult the maintainers by 
 very quickly and are happy to provide any guidance.
 
 ### Local development setup
-1. Install [yarn v3](https://yarnpkg.com/getting-started/install) if you haven't already.
-```bash
-corepack enable
-corepack prepare yarn@stable --activate
-```
+1. Install [yarn classic](https://classic.yarnpkg.com/en/docs/install) or [yarn v3](https://yarnpkg.com/getting-started/install) if you haven't already.
 2. Run `yarn install`
 3. Run `docker-compose up`
 4. Run `test -f docker-compose.override.yaml || cp docker-compose.override.dist.yaml docker-compose.override.yaml`

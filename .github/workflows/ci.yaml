@@ -9,7 +9,7 @@ on:
 
 env:
   PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1'
-  YARN_CACHE_FOLDER: './.yarn/cache'
+  ACTIONS_CACHE_DEBUG: true
 
 jobs:
   eslint:
@@ -22,6 +22,9 @@ jobs:
       - name: Get yarn cache directory path
         id: yarn-cache-dir-path
         run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
+
+      - name: Install GNU tar
+        run: apk add --no-cache tar
 
       - name: Set up yarn cache
         uses: actions/cache@v3
@@ -48,6 +51,9 @@ jobs:
         id: yarn-cache-dir-path
         run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
 
+      - name: Install GNU tar
+        run: apk add --no-cache tar
+
       - name: Set up yarn cache
         uses: actions/cache@v3
         id: yarn-cache
@@ -73,6 +79,9 @@ jobs:
         id: yarn-cache-dir-path
         run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
 
+      - name: Install GNU tar
+        run: apk add --no-cache tar
+
       - name: Set up yarn cache
         uses: actions/cache@v3
         id: yarn-cache
@@ -97,6 +106,9 @@ jobs:
       - name: Get yarn cache directory path
         id: yarn-cache-dir-path
         run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
+
+      - name: Install GNU tar
+        run: apk add --no-cache tar
 
       - name: Set up yarn cache
         uses: actions/cache@v3
@@ -223,6 +235,9 @@ jobs:
       - name: Get yarn cache directory path
         id: yarn-cache-dir-path
         run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
+
+      - name: Install GNU tar
+        run: apk add --no-cache tar
 
       - name: Set up yarn cache
         uses: actions/cache@v3

@@ -1,12 +1,20 @@
-import { describe, expect, it } from 'vitest'
-import * as renderer from 'react-test-renderer'
-import { CurrentRequestContext, Page, Pages, RequestState } from '../../../../src'
 import { ReactNode } from 'react'
+import * as renderer from 'react-test-renderer'
+import { describe, expect, it } from 'vitest'
+import { ContemberClient, CurrentRequestContext, Page, Pages, RequestState } from '../../../../src'
 
 function expectRequest(pages: ReactNode, request: RequestState) {
 	const el = renderer.create(
 		<CurrentRequestContext.Provider value={request}>
-			{pages}
+			<ContemberClient
+				apiBaseUrl={'apiBaseUrl'}
+				sessionToken={'sessionToken'}
+				loginToken={'loginToken'}
+				project={'projectSlug'}
+				stage={'stage'}
+			>
+				{pages}
+			</ContemberClient>
 		</CurrentRequestContext.Provider>,
 	)
 

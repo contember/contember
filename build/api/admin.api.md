@@ -2138,10 +2138,12 @@ export const headingTwoNumberedToolbarButton: ElementToolbarButton<HeadingElemen
 export const headingTwoToolbarButton: ElementToolbarButton<HeadingElement>;
 
 // @public (undocumented)
-export const HiddenField: React.NamedExoticComponent<SimpleRelativeSingleFieldProps>;
+export const HiddenField: React.NamedExoticComponent<HiddenFieldProps>;
 
 // @public (undocumented)
-export type HiddenFieldProps = SimpleRelativeSingleFieldProps;
+export type HiddenFieldProps = FieldBasicProps & {
+    label?: ReactNode;
+};
 
 // @public (undocumented)
 export const highlightToolbarButton: ToolbarButtonSpec;

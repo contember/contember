@@ -1,7 +1,23 @@
-import { SimpleRelativeSingleField, SimpleRelativeSingleFieldProps } from '../auxiliary'
+import { Component, Field, FieldBasicProps } from '@contember/binding'
+import { ReactNode } from 'react'
 
-export type HiddenFieldProps = SimpleRelativeSingleFieldProps
+export type HiddenFieldProps =
+	& FieldBasicProps
+	& {
+		/**
+		 * @deprecated label makes no sense for hidden field
+		 */
+		label?: ReactNode
+	}
 
-export const HiddenField = SimpleRelativeSingleField<HiddenFieldProps>(() => null, 'HiddenField', {
-	isNonbearing: true,
-})
+export const HiddenField = Component<HiddenFieldProps>(
+	() => null,
+	props => (
+		<Field
+			defaultValue={props.defaultValue}
+			field={props.field}
+			isNonbearing={props.isNonbearing ?? true}
+		/>
+	),
+	'HiddenField',
+)

@@ -1,36 +1,26 @@
 import {
-	DataBindingProvider,
 	EntityListSubTree,
 	EntityListSubTreeAdditionalProps,
 	SugaredQualifiedEntityList,
 } from '@contember/binding'
 import { ReactElement, ReactNode, memo } from 'react'
-import { FeedbackRenderer, MutableEntityListPageRenderer, MutableEntityListPageRendererProps } from '../../bindingFacade'
+import { MutableEntityListPageRenderer } from '../../bindingFacade'
 import type { PageProvider } from '../Pages'
 
-export type MultiEditScopeProps<ContainerExtraProps, ItemExtraProps> =
+export type MultiEditScopeProps =
 	& SugaredQualifiedEntityList
 	& EntityListSubTreeAdditionalProps
 	& {
-		pageName?: string
 		children?: ReactNode
-		rendererProps?: Omit<MutableEntityListPageRendererProps<ContainerExtraProps, ItemExtraProps>, 'accessor' | 'children'>
 	}
 
 export const MultiEditScope = memo(
-	<ContainerExtraProps, ItemExtraProps>({
+	({
 		children,
-		rendererProps,
-		pageName,
 		...entityListProps
-	}: MultiEditScopeProps<ContainerExtraProps, ItemExtraProps>) => (
-		<DataBindingProvider stateComponent={FeedbackRenderer}>
-			<EntityListSubTree {...entityListProps} listComponent={MutableEntityListPageRenderer} listProps={rendererProps}>
-				{children}
-			</EntityListSubTree>
-		</DataBindingProvider>
+	}: MultiEditScopeProps) => (
+		<EntityListSubTree {...entityListProps} listComponent={MutableEntityListPageRenderer}>
+			{children}
+		</EntityListSubTree>
 	),
-) as (<ContainerExtraProps, ItemExtraProps>(
-	props: MultiEditScopeProps<ContainerExtraProps, ItemExtraProps>,
-) => ReactElement) &
-	Partial<PageProvider<MultiEditScopeProps<never, never>>>
+) as ((props: MultiEditScopeProps) => ReactElement) & Partial<PageProvider<MultiEditScopeProps>>

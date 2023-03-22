@@ -15,7 +15,6 @@ export type EditScopeProps =
 	& SugaredQualifiedSingleEntity
 	& EntitySubTreeAdditionalProps
 	& {
-		pageName?: string
 		children: ReactNode
 		redirectOnSuccess?: RedirectOnSuccessTarget
 		refreshDataBindingOnPersist?: boolean
@@ -23,7 +22,7 @@ export type EditScopeProps =
 	}
 
 export const EditScope: Partial<PageProvider<EditScopeProps>> & ComponentType<EditScopeProps> = memo(
-	({ pageName, children, redirectOnSuccess, onPersistSuccess, refreshDataBindingOnPersist, skipBindingStateUpdateAfterPersist, ...entityProps }: EditScopeProps) => (
+	({ children, redirectOnSuccess, onPersistSuccess, refreshDataBindingOnPersist, skipBindingStateUpdateAfterPersist, ...entityProps }: EditScopeProps) => (
 		<DataBindingProvider
 			stateComponent={FeedbackRenderer}
 			refreshOnPersist={refreshDataBindingOnPersist ?? true}

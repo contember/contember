@@ -1,7 +1,6 @@
 import type { AccessorTreeState } from '@contember/binding'
 import { ContainerSpinner, Message } from '@contember/ui'
 import { ReactNode, useEffect } from 'react'
-import { useRedirect } from '../../../routing'
 
 export interface FeedbackRendererProps {
 	accessorTreeState: AccessorTreeState

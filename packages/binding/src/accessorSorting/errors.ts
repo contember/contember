@@ -9,10 +9,3 @@ export const throwNoopError = (callbackName: keyof SortedEntities) => {
 			`hook is undefined.`,
 	)
 }
-
-export const throwNonWritableError = (target: FieldName | EntityListAccessor) => {
-	if (target instanceof EntityListAccessor) {
-		throw new BindingError(`Trying to add a new entity to a list that is not writable.`)
-	}
-	throw new BindingError(`Trying to interactively sort by the '${target}' field but it is not writable.`)
-}

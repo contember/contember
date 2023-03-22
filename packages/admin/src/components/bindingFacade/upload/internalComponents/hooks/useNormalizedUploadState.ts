@@ -43,12 +43,11 @@ export const useNormalizedUploadState = ({
 	const onDrop = useCallback(
 		(files: File[]) => {
 			const { getEntityByKey, getEntityListSubTree, getEntitySubTree, contentClient, systemClient, tenantClient } = bindingOperations
-			const reversedFiles = files.reverse() // Reverse the files order so that the entities are created in the same order as the files are dropped.
 
 			const filesWithIds: [string, File][] = []
 			let metadataByFileId: Map<FileId, FileWithMetadata>
 			unstable_batchedUpdates(() => {
-				for (const file of reversedFiles) {
+				for (const file of files) {
 					prepareEntityForNewFile(getNewAccessor => {
 						const fileId = getNewAccessor().key
 						filesWithIds.push([fileId, file])
@@ -90,10 +89,10 @@ export const useNormalizedUploadState = ({
 						if (result.status === 'fulfilled') {
 							const resolvedKind = result.value
 							if (resolvedKind === undefined) {
-								rejected.push(reversedFiles[i])
+								rejected.push(files[i])
 								continue
 							}
-							resolved.set(reversedFiles[i], {
+							resolved.set(files[i], {
 								uploader: resolvedKind.fileKind.uploader,
 							})
 							if (resolvedKind.finalizeEntity) {
@@ -115,7 +114,7 @@ export const useNormalizedUploadState = ({
 								}
 							}
 
-							const file = reversedFiles[i]
+							const file = files[i]
 							if (errors.length) {
 								rejected.push([file, errors])
 							} else {

@@ -63,8 +63,8 @@ export const RepeaterInner = Component<RepeaterInnerProps<any, any>, NonStaticPr
 		const { entities, moveEntity, addNewAtIndex } = useSortedEntities(props.accessor, props.sortableBy)
 
 		const createNewEntity = useCallback<RepeaterCreateNewEntity>((initialize?: EntityAccessor.BatchUpdatesHandler, index?: number) => {
-			addNewAtIndex(index ?? entities.length, initialize)
-		}, [addNewAtIndex, entities.length])
+			addNewAtIndex(index, initialize)
+		}, [addNewAtIndex])
 
 		const onSortEnd = useCallback<SortEndHandler>(
 			({ oldIndex, newIndex }) => {

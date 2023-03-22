@@ -4,7 +4,7 @@ import { ReactNode, useEffect } from 'react'
 
 export interface FeedbackRendererProps {
 	accessorTreeState: AccessorTreeState
-	children: ReactNode
+	children?: ReactNode
 }
 
 export function FeedbackRenderer({ accessorTreeState, children }: FeedbackRendererProps) {

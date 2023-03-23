@@ -16,16 +16,21 @@ jobs:
     strategy:
       matrix:
         include:
+
           - job_name: eslint
             run_script: yarn run eslint:lint
+
           - job_name: build
             run_script: yarn run build
+
           - job_name: test
             run_script: yarn run test
+
           - job_name: api-exporter
             run_script: |
               yarn run ts:build
               yarn run ae:test
+
     container: node:16-alpine
     steps:
       - name: Checkout code
@@ -46,13 +51,13 @@ jobs:
           key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-yarn-
-
-      - name: Run ${{ matrix.job_name }}
+      - name: Install yarn deps
         run: |
           yarn --version
-          yarn set version berry
           yarn install --immutable
-          ${{ matrix.run_script }}
+
+      - name: Run ${{ matrix.job_name }}
+        run: ${{ matrix.run_script }}
 
   playwright:
     needs: [test]

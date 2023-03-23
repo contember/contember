@@ -31,6 +31,9 @@ jobs:
               yarn run ts:build
               yarn run ae:test
 
+          - job_name: lint-imports
+            run_script: yarn tsx ./scripts/lint/module-import-linter.ts
+
     container: node:16-alpine
     steps:
       - name: Checkout code

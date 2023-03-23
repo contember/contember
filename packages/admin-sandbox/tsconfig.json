@@ -3,6 +3,7 @@
 	"include": [],
 	"references": [
 		{ "path": "./admin" },
+		{ "path": "./tests" },
 		{ "path": "./api" }
 	]
 }

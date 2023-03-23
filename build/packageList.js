@@ -5,6 +5,7 @@ export const packageList = [
 	'admin-server',
 	'binding',
 	'client',
+	'interface-tester',
 	'react-client',
 	'react-multipass-rendering',
 	'react-utils',

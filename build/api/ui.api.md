@@ -43,7 +43,7 @@ import ReactSelect from 'react-select';
 import { Ref } from 'react';
 import { RefAttributes } from 'react';
 import { RefObject } from 'react';
-import SelectClass from 'react-select/dist/declarations/src/Select';
+import { SelectInstance } from 'react-select';
 import { StylesConfig } from 'react-select';
 import { SyntheticEvent } from 'react';
 import { TextareaAutosizeProps } from 'react-textarea-autosize';
@@ -1602,10 +1602,10 @@ export interface HoveringToolbarProps {
 export type HoveringToolbarScope = 'contextual' | Default;
 
 // @public (undocumented)
-export type HTMLReactSelectElement<V> = SelectClass<SelectOption<V>, false, never>;
+export type HTMLReactSelectElement<V> = SelectInstance<SelectOption<V>, false, never>;
 
 // @public (undocumented)
-export type HTMLReactSelectElementWithKey<V> = SelectClass<SelectOptionWithKey<V>, false, never>;
+export type HTMLReactSelectElementWithKey<V> = SelectInstance<SelectOptionWithKey<V>, false, never>;
 
 // @public (undocumented)
 export const Icon: MemoExoticComponent<ForwardRefExoticComponent<IconProps & RefAttributes<HTMLElement>>>;

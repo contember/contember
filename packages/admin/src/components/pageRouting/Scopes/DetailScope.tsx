@@ -1,9 +1,11 @@
 import {
+	DataBindingProvider,
 	EntitySubTree,
 	EntitySubTreeAdditionalProps,
 	SugaredQualifiedSingleEntity,
 } from '@contember/binding'
 import { ComponentType, ReactNode, memo } from 'react'
+import { FeedbackRenderer } from '../../bindingFacade'
 import type { PageProvider } from '../Pages'
 import { NotFoundBoundary } from './NotFoundBoundary'
 
@@ -14,13 +16,16 @@ export type DetailScopeProps =
 		children: ReactNode
 	}
 
-export const DetailScope: Partial<PageProvider<DetailScopeProps>> & ComponentType<DetailScopeProps> = memo(
+export const DetailScope: Partial<DetailScopeProps> & ComponentType<DetailScopeProps> = memo(
 	({ children, ...entityProps }: DetailScopeProps) => (
-		<EntitySubTree {...entityProps}>
-			<NotFoundBoundary>
-				{children}
-			</NotFoundBoundary>
-		</EntitySubTree>
+		// TODO: Remove this DataBindingProvider and use only the one from parent Pages.tsx
+		<DataBindingProvider stateComponent={FeedbackRenderer}>
+			<EntitySubTree {...entityProps}>
+				<NotFoundBoundary>
+					{children}
+				</NotFoundBoundary>
+			</EntitySubTree>
+		</DataBindingProvider>
 	),
 )
 

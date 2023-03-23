@@ -1,26 +1,37 @@
 import {
+	DataBindingProvider,
 	EntityListSubTree,
 	EntityListSubTreeAdditionalProps,
 	SugaredQualifiedEntityList,
 } from '@contember/binding'
 import { ReactElement, ReactNode, memo } from 'react'
-import { ImmutableEntityListRenderer } from '../../bindingFacade'
-import type { PageProvider } from '../Pages'
+import { FeedbackRenderer, ImmutableEntityListRenderer, ImmutableEntityListRendererProps } from '../../bindingFacade'
 
-export type ListScopeProps =
+export type ListScopeProps<ContainerExtraProps, ItemExtraProps> =
 	& SugaredQualifiedEntityList
 	& EntityListSubTreeAdditionalProps
 	& {
 		children?: ReactNode
+		listProps?: Omit<ImmutableEntityListRendererProps<ContainerExtraProps, ItemExtraProps>, 'accessor' | 'children'>
 	}
 
 export const ListScope = memo(
-	({
+	<ContainerExtraProps, ItemExtraProps>({
 		children,
 		...entityListProps
-	}: ListScopeProps) => (
-		<EntityListSubTree {...entityListProps} listComponent={ImmutableEntityListRenderer}>
-			{children}
-		</EntityListSubTree>
+	}: ListScopeProps<ContainerExtraProps, ItemExtraProps>) => (
+		// TODO: Remove this DataBindingProvider and use only the one from parent Pages.tsx
+		<DataBindingProvider stateComponent={FeedbackRenderer}>
+			<EntityListSubTree {...entityListProps} listComponent={ImmutableEntityListRenderer}>
+				{children}
+			</EntityListSubTree>
+		</DataBindingProvider>
 	),
-) as ((props: ListScopeProps) => ReactElement) & Partial<PageProvider<ListScopeProps>>
+) as (<ContainerExtraProps, ItemExtraProps>(
+	props: ListScopeProps<ContainerExtraProps, ItemExtraProps>,
+) => ReactElement) &
+	Partial<ListScopeProps<never, never>> & {
+		displayName?: string;
+	}
+
+ListScope.displayName = 'ListScope'

@@ -1,11 +1,12 @@
 import {
+	DataBindingProvider,
 	EntitySubTree,
 	EntitySubTreeAdditionalCreationProps,
 	EntitySubTreeAdditionalProps,
 	SugaredUnconstrainedQualifiedSingleEntity,
 } from '@contember/binding'
 import { ComponentType, ReactNode, memo } from 'react'
-import type { PageProvider } from '../Pages'
+import { FeedbackRenderer } from '../../bindingFacade'
 import { RedirectOnSuccessTarget } from '../useEntityRedirectOnPersistSuccess'
 import { useOnPersistSuccess } from '../useOnPersistSuccess'
 
@@ -18,12 +19,15 @@ export type CreateScopeProps =
 		redirectOnSuccess?: RedirectOnSuccessTarget
 	}
 
-export const CreateScope: Partial<PageProvider<CreateScopeProps>> & ComponentType<CreateScopeProps> = memo(
+export const CreateScope: Partial<CreateScopeProps> & ComponentType<CreateScopeProps> = memo(
 	({ children, redirectOnSuccess, onPersistSuccess, ...entityProps }: CreateScopeProps) => {
 		return (
-			<EntitySubTree {...entityProps} onPersistSuccess={useOnPersistSuccess({ redirectOnSuccess, onPersistSuccess })} isCreating>
-				{children}
-			</EntitySubTree>
+			// TODO: Remove this DataBindingProvider and use only the one from parent Pages.tsx
+			<DataBindingProvider stateComponent={FeedbackRenderer}>
+				<EntitySubTree {...entityProps} onPersistSuccess={useOnPersistSuccess({ redirectOnSuccess, onPersistSuccess })} isCreating>
+					{children}
+				</EntitySubTree>
+			</DataBindingProvider>
 		)
 	},
 )

@@ -2,7 +2,7 @@ import {
 	DataBindingProvider,
 	DataBindingStateComponentProps,
 	EnvironmentContext,
-	useEnvironment
+	useEnvironment,
 } from '@contember/binding'
 import { ContainerSpinner, Message } from '@contember/ui'
 import {

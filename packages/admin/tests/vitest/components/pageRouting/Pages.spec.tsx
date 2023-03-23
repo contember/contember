@@ -76,7 +76,7 @@ describe('Pages', () => {
 				bindingFeedbackRenderer={({ children }) => <>{children}</>}
 				children={{
 					fooX: <Page name="foo">Foo</Page>,
-					barX: <Page name="bar">Bar</Page>
+					barX: <Page name="bar">Bar</Page>,
 				}}
 			/>
 		)

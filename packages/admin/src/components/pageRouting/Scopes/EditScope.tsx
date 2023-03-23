@@ -6,7 +6,6 @@ import {
 } from '@contember/binding'
 import { ComponentType, ReactNode, memo } from 'react'
 import { FeedbackRenderer } from '../../bindingFacade'
-import type { PageProvider } from '../Pages'
 import { RedirectOnSuccessTarget } from '../useEntityRedirectOnPersistSuccess'
 import { useOnPersistSuccess } from '../useOnPersistSuccess'
 import { NotFoundBoundary } from './NotFoundBoundary'
@@ -21,8 +20,9 @@ export type EditScopeProps =
 		skipBindingStateUpdateAfterPersist?: boolean
 	}
 
-export const EditScope: Partial<PageProvider<EditScopeProps>> & ComponentType<EditScopeProps> = memo(
+export const EditScope: Partial<EditScopeProps> & ComponentType<EditScopeProps> = memo(
 	({ children, redirectOnSuccess, onPersistSuccess, refreshDataBindingOnPersist, skipBindingStateUpdateAfterPersist, ...entityProps }: EditScopeProps) => (
+		// TODO: Remove this DataBindingProvider and use only the one from parent Pages.tsx
 		<DataBindingProvider
 			stateComponent={FeedbackRenderer}
 			refreshOnPersist={refreshDataBindingOnPersist ?? true}

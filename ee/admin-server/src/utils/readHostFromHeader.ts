@@ -1,4 +1,4 @@
-import { IncomingMessage } from 'http'
+import { IncomingMessage } from 'node:http'
 import { BadRequestError } from '../BadRequestError'
 
 export const readHostFromHeader = (req: IncomingMessage): string => {

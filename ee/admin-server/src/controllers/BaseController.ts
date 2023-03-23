@@ -1,6 +1,6 @@
-import type { IncomingMessage, ServerResponse } from 'http'
+import type { IncomingMessage, ServerResponse } from 'node:http'
 import type { Json, Type } from '../utils/schema'
-import { Buffer } from 'buffer'
+import { Buffer } from 'node:buffer'
 
 export abstract class BaseController<T = {}> {
 	abstract handle(req: IncomingMessage, res: ServerResponse, params: T): Promise<void>

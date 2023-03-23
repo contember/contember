@@ -6,10 +6,10 @@ import {
 	PutObjectCommandOutput,
 	S3Client,
 } from '@aws-sdk/client-s3'
-import type * as Buffer from 'buffer'
+import type * as Buffer from 'node:buffer'
 import mime from 'mime'
 import { S3LocationResolver } from './S3LocationResolver'
-import { Readable } from 'stream'
+import { Readable } from 'node:stream'
 import { readReadable } from '../utils/readReadable'
 
 export class S3Manager {

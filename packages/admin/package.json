@@ -43,7 +43,6 @@
 		"test": "vitest --environment jsdom tests/vitest"
 	},
 	"dependencies": {
-		"@babel/core": "7.17.10",
 		"@contember/binding": "workspace:*",
 		"@contember/client": "workspace:*",
 		"@contember/react-client": "workspace:*",
@@ -51,7 +50,6 @@
 		"@contember/react-utils": "workspace:*",
 		"@contember/ui": "workspace:*",
 		"@formatjs/icu-messageformat-parser": "2.0.11",
-		"@mangoweb/sass-base": "0.0.8",
 		"@sindresorhus/slugify": "0.11.0",
 		"blueimp-md5": "2.18.0",
 		"buffer": "6.0.3",
@@ -77,10 +75,12 @@
 		"react-dom": "^17 || ^18"
 	},
 	"devDependencies": {
+		"@babel/core": "7.17.10",
 		"@contember/schema": "^1.2.0",
 		"@contember/schema-definition": "^1.2.0",
 		"@contember/schema-migrations": "^1.2.0",
 		"@contember/schema-utils": "^1.2.0",
+		"@mangoweb/sass-base": "0.0.8",
 		"@playwright/test": "1.20.0",
 		"@types/blueimp-md5": "2.18.0",
 		"@types/is-hotkey": "0.1.5",

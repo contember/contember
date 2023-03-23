@@ -1,7 +1,6 @@
 import classNames from 'classnames'
 import { ComponentProps, CSSProperties, ForwardedRef, forwardRef, memo, ReactElement, RefAttributes, useCallback, useMemo, useRef } from 'react'
-import ReactSelect, { StylesConfig, useStateManager } from 'react-select'
-import SelectClass from 'react-select/dist/declarations/src/Select'
+import ReactSelect, { StylesConfig, useStateManager, SelectInstance } from 'react-select'
 import { useComponentClassName } from '../../../auxiliary'
 import { noop } from '../../../utils'
 import { getPortalRoot } from '../../Portal'
@@ -21,8 +20,8 @@ export type SelectOptionWithKey<V = string> =
 	& Omit<SelectOption<V>, 'key'>
 	& { key: string }
 
-export type HTMLReactSelectElement<V> = SelectClass<SelectOption<V>, false, never>
-export type HTMLReactSelectElementWithKey<V> = SelectClass<SelectOptionWithKey<V>, false, never>
+export type HTMLReactSelectElement<V> = SelectInstance<SelectOption<V>, false, never>
+export type HTMLReactSelectElementWithKey<V> = SelectInstance<SelectOptionWithKey<V>, false, never>
 
 export type SelectProps<V> = Omit<ControlProps<V>, 'type' | keyof ControlConstraintProps<any>> & {
 	options: SelectOption<V>[]

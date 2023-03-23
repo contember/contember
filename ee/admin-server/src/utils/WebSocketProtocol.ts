@@ -1,6 +1,6 @@
 import { WebSocket, WebSocketServer } from 'ws'
-import { IncomingMessage } from 'http'
-import { Socket } from 'net'
+import { IncomingMessage } from 'node:http'
+import { Socket } from 'node:net'
 import { intersection, JsonObject, literal, object, ParseError, string, Type, union } from './schema'
 
 interface ProtocolDefinition<C extends Context<unknown>> {

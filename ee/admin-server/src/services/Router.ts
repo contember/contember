@@ -1,5 +1,5 @@
-import { IncomingMessage, ServerResponse } from 'http'
-import { URL } from 'url'
+import { IncomingMessage, ServerResponse } from 'node:http'
+import { URL } from 'node:url'
 import { readHostFromHeader } from '../utils/readHostFromHeader'
 import { BadRequestError } from '../BadRequestError'
 import { ProjectGroupResolver } from './ProjectGroupResolver'

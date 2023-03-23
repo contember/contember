@@ -1,6 +1,6 @@
-import { IncomingMessage } from 'http'
+import { IncomingMessage } from 'node:http'
 import ipaddr from 'ipaddr.js'
-import { TLSSocket } from 'tls'
+import { TLSSocket } from 'node:tls'
 
 export const isProxyRequest = (req: IncomingMessage): boolean => {
 	const ip = ipaddr.parse(req.socket.remoteAddress ?? '0.0.0.0')

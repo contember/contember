@@ -1,4 +1,4 @@
-import { randomInt } from 'crypto'
+import { randomInt } from 'node:crypto'
 import { ClientIdentity, CollaborationStorage, Scope } from '../services/CollaborationStorage'
 import { ProjectGroupResolver } from '../services/ProjectGroupResolver'
 import { TenantClient } from '../services/TenantClient'

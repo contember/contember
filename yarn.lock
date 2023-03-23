@@ -3278,7 +3278,6 @@ __metadata:
   dependencies:
     "@babel/core": 7.15.5
     "@blueprintjs/icons": 3.29.0
-    "@contember/react-multipass-rendering": "workspace:*"
     "@contember/react-utils": "workspace:*"
     "@mangoweb/sass-base": 0.0.8
     "@popperjs/core": 2.10.2
@@ -3294,7 +3293,6 @@ __metadata:
     "@types/react-dom": ^18
     babel-loader: 8.2.2
     babel-plugin-transform-vite-meta-env: 1.0.3
-    chroma-js: 2.1.2
     classnames: 2.3.1
     css-loader: 5.2.4
     csstype: 3.0.8
@@ -10044,15 +10042,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"chroma-js@npm:2.1.2":
-  version: 2.1.2
-  resolution: "chroma-js@npm:2.1.2"
-  dependencies:
-    cross-env: ^6.0.3
-  checksum: abbd70377446e3cc401ac58c40cdac6c70c41a349e6aca08881d0deb775051ba69c93099f4d47ef83c41b4562b0480b5dfd56d77e2e6f3a81ebb6667ce8d4627
-  languageName: node
-  linkType: hard
-
 "chrome-trace-event@npm:^1.0.2":
   version: 1.0.3
   resolution: "chrome-trace-event@npm:1.0.3"
@@ -10650,18 +10639,6 @@ __metadata:
     safe-buffer: ^5.0.1
     sha.js: ^2.4.8
   checksum: ba12bb2257b585a0396108c72830e85f882ab659c3320c83584b1037f8ab72415095167ced80dc4ce8e446a8ecc4b2acf36d87befe0707d73b26cf9dc77440ed
-  languageName: node
-  linkType: hard
-
-"cross-env@npm:^6.0.3":
-  version: 6.0.3
-  resolution: "cross-env@npm:6.0.3"
-  dependencies:
-    cross-spawn: ^7.0.0
-  bin:
-    cross-env: src/bin/cross-env.js
-    cross-env-shell: src/bin/cross-env-shell.js
-  checksum: 1b2d532ad7beff8017db7c28fbee8f902377969b8090cd2b8716ec93bef958bb2838cd061c89c30e904d72f3ff7d3a4e80f0d762b14e60e8191a576be1376578
   languageName: node
   linkType: hard
 
@@ -19498,6 +19475,7 @@ __metadata:
     eslint-plugin-prettier: 3.4.0
     eslint-plugin-react: 7.24.0
     eslint-plugin-react-hooks: 4.2.0
+    fast-glob: ^3.2.12
     jsdom: ^17.0.0
     prettier: 2.3.2
     react: ^18.2.0

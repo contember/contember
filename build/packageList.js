@@ -10,6 +10,7 @@ export const packageList = [
 	'react-utils',
 	'ui',
 	'vimeo-file-uploader',
+	'vite-plugin',
 ]
 
 export const getPackagePath = name => {

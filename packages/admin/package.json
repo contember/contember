@@ -26,10 +26,10 @@
 		"directory": "packages/admin"
 	},
 	"scripts": {
-		"build": "pnpm run build:js:dev && pnpm run build:js:prod && pnpm run build:css",
+		"build": "yarn build:js:dev && yarn build:js:prod && yarn build:css",
 		"build:js:dev": "vite build --mode development",
 		"build:js:prod": "vite build --mode production",
-		"build:css": "sass --no-charset src/index.sass:dist/assets/style.css && pnpm run build:css:copy-fonts",
+		"build:css": "sass --no-charset src/index.sass:dist/assets/style.css && yarn build:css:copy-fonts",
 		"build:css:copy-fonts": "rm -rf \"dist/assets/Inter\" && cp -R \"../ui/src/assets/Inter\" \"dist/assets/Inter\"",
 		"pw:build": "vite build tests/playwright/admin",
 		"pw:preview": "vite preview tests/playwright/admin",

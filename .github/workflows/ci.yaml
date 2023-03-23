@@ -11,48 +11,51 @@ env:
   PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1'
 
 jobs:
-  eslint:
-    runs-on: ubuntu-latest
-    container: node:16-alpine
-
-    steps:
-      - uses: actions/checkout@v3
-      - run: npm install -g pnpm@6
-      - run: pnpm install
-      - run: pnpm run eslint:lint
-
-  build:
-    runs-on: ubuntu-latest
-    container: node:16-alpine
-
-    steps:
-      - uses: actions/checkout@v3
-      - run: npm install -g pnpm@6
-      - run: pnpm install
-      - run: pnpm run build
-
   test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - job_name: eslint
+            run_script: yarn run eslint:lint
+          - job_name: build
+            run_script: yarn run build
+          - job_name: test
+            run_script: yarn run test
+          - job_name: api-exporter
+            run_script: |
+              yarn run ts:build
+              yarn run ae:test
     container: node:16-alpine
-
     steps:
-      - uses: actions/checkout@v3
-      - run: npm install -g pnpm@6
-      - run: pnpm install
-      - run: pnpm run test
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-  api-exporter:
-    runs-on: ubuntu-latest
-    container: node:16-alpine
+      - name: Get yarn cache directory path
+        run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
+        id: yarn-cache-dir-path
 
-    steps:
-      - uses: actions/checkout@v3
-      - run: npm install -g pnpm@6
-      - run: pnpm install
-      - run: pnpm run ts:build
-      - run: pnpm run ae:test
+      - name: Install GNU tar
+        run: apk add --no-cache tar
+
+      - name: Set up yarn cache
+        uses: actions/cache@v3
+        id: yarn-cache
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+
+      - name: Run ${{ matrix.job_name }}
+        run: |
+          yarn --version
+          yarn set version berry
+          yarn install --immutable
+          ${{ matrix.run_script }}
 
   playwright:
+    needs: [test]
     runs-on: ubuntu-latest
     container: mcr.microsoft.com/playwright:v1.20.0-focal
 
@@ -106,12 +109,27 @@ jobs:
       HOME: '/root'
 
     steps:
-      - uses: actions/checkout@v2
-      - run: npm install -g pnpm@6
-      - run: pnpm install
-      - run: pnpm run --recursive --parallel -- build:js:prod
-      - run: cd packages/admin && pnpm run pw:build
-      - run: cd packages/admin && pnpm run -- pw:test --forbid-only
+      - uses: actions/checkout@v3
+
+      - name: Get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
+
+      - name: Set up yarn cache
+        uses: actions/cache@v3
+        id: yarn-cache
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+
+      - run: yarn --version
+      - run: yarn set version berry
+      - run: yarn install --immutable
+      - run: yarn run build:js:prod
+      - run: yarn run admin:pw:build
+      - run: yarn run admin:pw:test --forbid-only
 
       - uses: jakejarvis/s3-sync-action@master
         if: always()
@@ -134,31 +152,49 @@ jobs:
 
   publish-npm:
     if: github.event_name == 'push' && github.ref_type == 'tag'
+    needs: [test, playwright]
     runs-on: ubuntu-latest
     container: node:16-alpine
-    needs: [build, test, eslint, api-exporter]
 
     env:
       NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
     steps:
-      - uses: actions/checkout@v2
-      - run: npm install -g pnpm@6
-      - run: pnpm install
-      - run: pnpm run build
-      - run: pnpm config set "//registry.npmjs.org/:_authToken" "$NPM_TOKEN"
-      - run: pnpm config set "git-tag-version" "false"
-      - run: pnpm recursive exec npm version "${GITHUB_REF:11}"
-      - run: pnpm recursive publish --access public --no-git-checks
+      - uses: actions/checkout@v3
+
+      - name: Get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
+
+      - name: Install GNU tar
+        run: apk add --no-cache tar
+
+      - name: Set up yarn cache
+        uses: actions/cache@v3
+        id: yarn-cache
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+
+      - run: yarn --version
+      - run: yarn set version berry
+      - run: yarn install --immutable
+      - run: yarn run build
+      - run: yarn config set "//registry.npmjs.org/:_authToken" "$NPM_TOKEN"
+      - run: yarn config set "git-tag-version" "false"
+      - run: yarn recursive exec npm version "${GITHUB_REF:11}"
+      - run: yarn recursive publish --access public --no-git-checks
 
 
   publish-docker:
     if: (github.event_name == 'push' && github.ref_type == 'tag') || github.event_name == 'workflow_dispatch'
+    needs: [test, playwright]
     runs-on: ubuntu-latest
-    needs: [build, test, eslint, api-exporter]
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: docker/setup-qemu-action@v1
       - uses: docker/setup-buildx-action@v1
 

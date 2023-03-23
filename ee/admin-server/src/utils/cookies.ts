@@ -1,4 +1,4 @@
-import { IncomingMessage, OutgoingMessage } from 'http'
+import { IncomingMessage, OutgoingMessage } from 'node:http'
 import * as cookie from 'cookie'
 import { isRequestSecure } from './forwared'
 

@@ -1,5 +1,5 @@
 import { BaseController } from './BaseController'
-import type { IncomingMessage, ServerResponse } from 'http'
+import type { IncomingMessage, ServerResponse } from 'node:http'
 import type { TenantClient } from '../services/TenantClient'
 import type { S3Manager } from '../services/S3Manager'
 import { readAuthCookie } from '../utils/cookies'

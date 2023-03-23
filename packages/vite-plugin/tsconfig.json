@@ -1,9 +1,7 @@
 {
-	"files": [ ],
-	"include": [ ],
+	"files": [],
+	"include": [],
 	"references": [
-		{
-			"path": "./src/",
-		},
+		{ "path": "./src/" }
 	]
 }

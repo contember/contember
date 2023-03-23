@@ -1,4 +1,4 @@
-import { Readable } from 'stream'
+import { Readable } from 'node:stream'
 
 export const readReadable = (readable: Readable): Promise<string> => {
 	return new Promise((resolve, reject) => {

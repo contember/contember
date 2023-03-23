@@ -1,4 +1,4 @@
-import type { IncomingMessage, ServerResponse } from 'http'
+import type { IncomingMessage, ServerResponse } from 'node:http'
 import { array, object, ParseError, string } from '../utils/schema'
 import { BaseController } from './BaseController'
 import type { TenantClient } from '../services/TenantClient'

@@ -1,4 +1,4 @@
-import type { IncomingMessage, ServerResponse } from 'http'
+import type { IncomingMessage, ServerResponse } from 'node:http'
 import { BaseController } from './BaseController'
 import { StaticFileHandler } from '../services/StaticFileHandler'
 import { PanelConfig } from '../config'

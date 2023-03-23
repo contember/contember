@@ -1,7 +1,7 @@
-import { IncomingMessage, ServerResponse } from 'http'
-import { URL } from 'url'
+import { IncomingMessage, ServerResponse } from 'node:http'
+import { URL } from 'node:url'
 import mime from 'mime'
-import { readFile } from 'fs/promises'
+import { readFile } from 'node:fs/promises'
 
 export type ProcessFile = (path: string, content: Buffer, req: IncomingMessage) => Promise<string | Buffer>
 

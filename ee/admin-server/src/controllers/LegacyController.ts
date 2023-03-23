@@ -1,6 +1,6 @@
 import { BaseController } from './BaseController'
-import type { IncomingMessage, ServerResponse } from 'http'
-import { URL } from 'url'
+import type { IncomingMessage, ServerResponse } from 'node:http'
+import { URL } from 'node:url'
 
 const OLD_PROJECT_URL_PATTERN = /^\/p\/([^\/]+)(\/[^\/]+(\/null)?)?/
 

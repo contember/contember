@@ -15,6 +15,7 @@ import {
 	ImageFiles,
 	ImageUploadField,
 	Link,
+	S3FileUploader,
 	StaticRender,
 	SugaredQualifiedEntityList,
 	TextCell,
@@ -144,6 +145,14 @@ const ImageSelectForm = Component((
 	</DataGrid>
 ))
 
+const s3FileUploader = new S3FileUploader({
+	getUploadOptions: file => ({
+		fileSuffix: 'foobar',
+		fileName: file.name,
+		fileSize: file.size,
+	}),
+})
+
 export default () => (
 	<EditPage entity="UploadShowcase(unique = One)" setOnCreate="(unique = One)">
 		<Link to="second">SECOND</Link>
@@ -160,6 +169,7 @@ export default () => (
 				entities: 'BasicImage',
 				isComplex: false,
 			}}
+			uploader={s3FileUploader}
 		/>
 
 		<ImageUploadField

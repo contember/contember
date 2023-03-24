@@ -116,15 +116,25 @@ export class GenerateUploadUrlMutationBuilder {
 // @public (undocumented)
 export namespace GenerateUploadUrlMutationBuilder {
     // (undocumented)
+    export type Acl = GraphQlLiteral<'PUBLIC_READ' | 'PRIVATE' | 'NONE'>;
+    // (undocumented)
     export interface FileParameters {
         // (undocumented)
-        acl?: GraphQlLiteral<'PUBLIC_READ' | 'PRIVATE' | 'NONE'>;
+        acl?: Acl;
         // (undocumented)
         contentType: string;
         // (undocumented)
         expiration?: number;
         // (undocumented)
+        extension?: string;
+        // (undocumented)
+        fileName?: string;
+        // (undocumented)
         prefix?: string;
+        // (undocumented)
+        size?: number;
+        // (undocumented)
+        suffix?: string;
     }
     // (undocumented)
     export interface MutationParameters {
@@ -275,11 +285,19 @@ export namespace S3FileUploader {
     // (undocumented)
     export interface S3UploadOptions {
         // (undocumented)
-        fileAcl?: GenerateUploadUrlMutationBuilder.FileParameters['acl'];
+        fileAcl?: GenerateUploadUrlMutationBuilder.Acl;
         // (undocumented)
-        fileExpiration?: GenerateUploadUrlMutationBuilder.FileParameters['expiration'];
+        fileExpiration?: number;
         // (undocumented)
-        filePrefix?: GenerateUploadUrlMutationBuilder.FileParameters['prefix'];
+        fileExtension?: string;
+        // (undocumented)
+        fileName?: string;
+        // (undocumented)
+        filePrefix?: string;
+        // (undocumented)
+        fileSize?: number;
+        // (undocumented)
+        fileSuffix?: string;
         // (undocumented)
         fileType?: GenerateUploadUrlMutationBuilder.FileParameters['contentType'];
     }

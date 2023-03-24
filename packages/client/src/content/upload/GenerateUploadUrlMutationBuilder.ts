@@ -12,15 +12,23 @@ class GenerateUploadUrlMutationBuilder {
 		return new QueryBuilder().mutation(builder => {
 			for (const alias in parameters) {
 				const fileParameters = parameters[alias]
-
-				builder = builder.object(
-					alias,
-					GenerateUploadUrlMutationBuilder.generateUploadUrlFields
-						.argument('contentType', fileParameters.contentType)
-						.argument('expiration', fileParameters.expiration)
-						.argument('prefix', fileParameters.prefix)
-						.argument('acl', fileParameters.acl),
-				)
+				if (fileParameters.suffix || fileParameters.fileName || fileParameters.extension) {
+					builder = builder.object(
+						alias,
+						GenerateUploadUrlMutationBuilder.generateUploadUrlFields
+							.argument('input', fileParameters),
+					)
+				} else {
+					// BC
+					builder = builder.object(
+						alias,
+						GenerateUploadUrlMutationBuilder.generateUploadUrlFields
+							.argument('contentType', fileParameters.contentType)
+							.argument('expiration', fileParameters.expiration)
+							.argument('prefix', fileParameters.prefix)
+							.argument('acl', fileParameters.acl),
+					)
+				}
 			}
 
 			return builder
@@ -29,11 +37,17 @@ class GenerateUploadUrlMutationBuilder {
 }
 
 namespace GenerateUploadUrlMutationBuilder {
+	export type Acl = GraphQlLiteral<'PUBLIC_READ' | 'PRIVATE' | 'NONE'>;
+
 	export interface FileParameters {
 		contentType: string
 		expiration?: number
+		size?: number
 		prefix?: string
-		acl?: GraphQlLiteral<'PUBLIC_READ' | 'PRIVATE' | 'NONE'>
+		extension?: string
+		suffix?: string
+		fileName?: string
+		acl?: Acl
 	}
 
 	export interface MutationParameters {

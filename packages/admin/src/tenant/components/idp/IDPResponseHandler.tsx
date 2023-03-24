@@ -1,46 +1,38 @@
-import { useSignInIDP } from '../../mutations'
-import { useEffect, useState } from 'react'
+import { useCallback } from 'react'
 import { ContainerSpinner, ErrorList } from '@contember/ui'
-import { getBaseHref, IDP_CODE, IDP_SESSION_KEY } from './common'
-import { useSetSessionToken } from '@contember/react-client'
+import { useHandleIDPResponse } from './useHandleIDPResponse'
 
 export interface IDPResponseHandlerProps {
 	onLogin?: () => void,
 }
 
-export const IDPResponseHandler = ({ onLogin }: IDPResponseHandlerProps) => {
-	const idpSignIn = useSignInIDP()
-	const [error, setError] = useState<string>()
-	const setSessionToken = useSetSessionToken()
+export const useResponseHandlerFeedback = ({ onLogin }: IDPResponseHandlerProps) => {
+	const responseState = useHandleIDPResponse({
+		onLogin,
+		onError: useCallback(() => {
+			window.history.pushState({}, document.title, '/')
+		}, []),
+	})
 
-	useEffect(() => {
-		(async () => {
-			const response = await idpSignIn({
-				url: window.location.href,
-				redirectUrl: getBaseHref(),
-				session: JSON.parse(localStorage.getItem(IDP_SESSION_KEY) || '{}'),
-				identityProvider: localStorage.getItem(IDP_CODE) ?? '',
-				expiration: 3600 * 24 * 14,
-			})
-			setError(undefined)
-			if (!response.ok) {
-				window.history.pushState({}, document.title, '/')
-				switch (response.error.code) {
-					case 'IDP_VALIDATION_FAILED':
-					case 'INVALID_IDP_RESPONSE':
-						return setError('Login failed')
-					case 'PERSON_NOT_FOUND':
-						return setError('User not found')
-				}
-			} else {
-				setSessionToken(response.result.token)
-				onLogin?.()
-			}
-		})()
-	}, [idpSignIn, setError, onLogin, setSessionToken])
+	switch (responseState.type) {
+		case 'nothing':
+			return null
 
-	if (error) {
-		return <ErrorList errors={[{ message: error }]} />
+		case 'failed':
+			const error = {
+				INVALID_IDP_RESPONSE: 'Login failed',
+				IDP_VALIDATION_FAILED: 'Login failed',
+				INVALID_LOCAL_STATE: 'Login failed',
+				PERSON_NOT_FOUND: 'User not found',
+			}[responseState.error]
+
+			return <ErrorList errors={[{ message: error }]} />
+
+		default:
+			return <ContainerSpinner />
 	}
-	return <ContainerSpinner />
+}
+
+export const IDPResponseHandler = ({ onLogin }: IDPResponseHandlerProps) => {
+	return useResponseHandlerFeedback({ onLogin })
 }

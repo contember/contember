@@ -1,15 +1,17 @@
 import { ContemberClient } from '@contember/react-client'
 import { Button, ErrorList, Icon, Stack, StyleProvider, Toaster, ToasterProvider } from '@contember/ui'
-import { FC, ReactNode, useCallback, useEffect, useMemo, useState } from 'react'
+import { FC, ReactNode, useEffect, useMemo, useState } from 'react'
 import { Link, RequestProvider, RoutingContext, RoutingContextValue } from '../../routing'
 import {
 	CreateResetPasswordRequestForm,
 	FillResetPasswordTokenForm,
 	IDP,
 	IDPInitButton,
-	IDPResponseHandler,
 	Login,
 	ResetPasswordForm,
+	useIDPAutoInit, useRedirectToBacklink,
+	useRedirectToBacklinkCallback,
+	useResponseHandlerFeedback,
 } from '../../tenant'
 import { IdentityProvider, useLogout, useOptionalIdentity } from '../Identity'
 import { MiscPageLayout } from '../MiscPageLayout'
@@ -123,6 +125,8 @@ const LoginEntrypointIndex: FC<Pick<LoginEntrypointProps, 'projects' | 'formatPr
 		return identity?.projects.filter(it => projectSlugs?.includes(it.slug))
 	}, [identity?.projects, projectSlugs])
 
+	useRedirectToBacklink()
+
 	if (identity === undefined) {
 		return (
 			<MiscPageLayout heading={props.heading ?? 'Contember Admin'}>
@@ -165,35 +169,27 @@ interface LoginContainerProps {
 	collapsedEmailLogin?: boolean
 }
 
-const LoginContainer = ({ identityProviders, collapsedEmailLogin: initialCollapsedEmailLogin }: LoginContainerProps) => {
+const LoginContainer = ({ identityProviders = [], collapsedEmailLogin: initialCollapsedEmailLogin }: LoginContainerProps) => {
 	const [collapsedEmailLogin, setCollapsedEmailLogin] = useState(initialCollapsedEmailLogin ?? false)
 	const [error, setError] = useState<string>()
-	const onLoginHandler = useCallback(() => {
-		const params = new URLSearchParams(window.location.search)
-		const backlink = params.get('backlink')
-		if (backlink) {
-			const resolvedBacklink = new URL(backlink, window.location.href)
-			if (resolvedBacklink.origin === window.location.origin) {
-				window.location.href = resolvedBacklink.toString()
-			}
-		}
-	}, [])
 
-	const hasOauthResponse = useMemo(() => {
-		const params = new URLSearchParams(window.location.search)
-		return params.has('state') && (params.has('code') || params.has('id_token'))
-	}, [])
+	const redirectToBacklink = useRedirectToBacklinkCallback()
 
-	if (hasOauthResponse) {
-		return <IDPResponseHandler onLogin={onLoginHandler}/>
+	useIDPAutoInit({ onError: setError, providers: identityProviders })
+
+	const idpHandlerFeedback = useResponseHandlerFeedback({ onLogin: redirectToBacklink })
+	if (idpHandlerFeedback !== null) {
+		return idpHandlerFeedback
 	}
+
+	const showAlternativeLoginButtons = identityProviders.length > 0 || collapsedEmailLogin
 
 	return <>
 		<ErrorList errors={error ? [{ message: error }] : []} />
-		{!collapsedEmailLogin && <Login resetLink={resetRequestPageName} onLogin={onLoginHandler} />}
-		{((identityProviders?.length ?? 0) > 0 || collapsedEmailLogin) && (
+		{!collapsedEmailLogin && <Login resetLink={resetRequestPageName} onLogin={redirectToBacklink} />}
+		{showAlternativeLoginButtons && (
 			<Stack direction="vertical">
-				{identityProviders?.map((it, i) => <IDPInitButton key={i} provider={it} onError={setError}/>)}
+				{identityProviders.map((it, i) => <IDPInitButton key={i} provider={it} onError={setError}/>)}
 				{collapsedEmailLogin && <Button onClick={() => setCollapsedEmailLogin(false)}>Login with email</Button>}
 			</Stack>
 		)}

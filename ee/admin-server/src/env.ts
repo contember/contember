@@ -20,6 +20,7 @@ const Env = intersection(
 		CONTEMBER_API_HOSTNAME: string,
 		CONTEMBER_PROJECT_GROUP_DOMAIN_MAPPING: string,
 		CONTEMBER_INVITE_METHOD: union(literal('CREATE_PASSWORD'), literal('RESET_PASSWORD')),
+		CONTEMBER_CUSTOM_CONFIG: string,
 
 		REDIS_HOST: string,
 		REDIS_PREFIX: string,

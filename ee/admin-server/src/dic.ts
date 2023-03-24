@@ -22,6 +22,7 @@ import { ApiRequestSender } from './services/ApiRequestSender'
 import { SystemClient } from './services/SystemClient'
 import { ConfigResolver } from './services/ConfigResolver'
 import { Router } from './services/Router'
+import { customConfig } from './config'
 
 export default new Builder({})
 	.addService('env', env)
@@ -86,8 +87,8 @@ export default new Builder({})
 		return new S3Manager(s3Client, s3LocationResolver)
 	})
 
-	.addService('configResolver', ({ s3 }) => {
-		return new ConfigResolver(s3)
+	.addService('configResolver', ({ s3, env }) => {
+		return new ConfigResolver(s3, customConfig(JSON.parse(env.CONTEMBER_CUSTOM_CONFIG ?? '{}')))
 	})
 
 	.addService('staticFileHandler', ({ env }) => {

@@ -6,7 +6,7 @@ const INVITE_MUTATION = `
 		email: $email,
 		projectSlug: $projectSlug,
 		memberships: $memberships,
-		options: { method: $method },
+		options: { method: $method, mailVariant: $mailVariant },
 	) {
 		ok
 		errors {
@@ -22,6 +22,7 @@ const inviteVariables = {
 	email: GQLVariable.Required(GQLVariable.String),
 	memberships: GQLVariable.Required(GQLVariable.List(MembershipInput)),
 	method: GQLVariable.Enum<InviteMethod>('InviteMethod'),
+	mailVariant: GQLVariable.String,
 }
 
 type InviteErrorCodes =

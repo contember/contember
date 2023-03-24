@@ -10,9 +10,10 @@ export interface InviteUserProps {
 	rolesConfig?: RolesConfig
 	userListLink: RoutingLinkTarget
 	method?: InviteMethod
+	mailVariant?: string
 }
 
-export const InviteUser: FC<InviteUserProps> = ({ project, rolesConfig, userListLink, method }) => {
+export const InviteUser: FC<InviteUserProps> = ({ project, rolesConfig, userListLink, method, mailVariant }) => {
 	const [email, setEmailInner] = useState('')
 	const redirect = useRedirect()
 	const addToast = useShowToast()
@@ -35,7 +36,7 @@ export const InviteUser: FC<InviteUserProps> = ({ project, rolesConfig, userList
 			if (!email.match(/^.+@.+$/)) {
 				return setEmailNotValidError(true)
 			}
-			const inviteResult = await invite({ email, memberships: membershipsToSave, projectSlug: project, method })
+			const inviteResult = await invite({ email, memberships: membershipsToSave, projectSlug: project, method, mailVariant })
 			setSubmitting(false)
 			if (inviteResult.ok) {
 				addToast({
@@ -55,7 +56,7 @@ export const InviteUser: FC<InviteUserProps> = ({ project, rolesConfig, userList
 				}
 			}
 		},
-		[memberships, email, invite, project, method, redirect, userListLink, addToast],
+		[memberships, email, invite, project, method, mailVariant, addToast, redirect, userListLink],
 	)
 
 	const editUserMembershipProps = { project, rolesConfig, memberships, setMemberships }

@@ -16,7 +16,6 @@ import type {
 } from './FileUploadOperations'
 import { fileUploadReducer, initializeFileUploadState } from './fileUploadReducer'
 import type { FileWithMetadata } from './FileWithMetadata'
-import { toFileId } from './toFileId'
 
 export type FileUpload<Result = unknown, Metadata = undefined> = [
 	FileUploadCompoundState<Result, Metadata>,
@@ -35,13 +34,8 @@ export const useFileUpload = <Result = unknown, Metadata = undefined>({}: FileUp
 		Reducer<FileUploadMultiTemporalState<Result, Metadata>, FileUploadAction<Result, Metadata>>,
 		undefined
 	>(fileUploadReducer, undefined, initializeFileUploadState)
-	const internalStateRef = useRef(internalState)
 
 	const defaultUploader = useMemo(() => new S3FileUploader(), [])
-
-	useEffect(() => {
-		internalStateRef.current = internalState
-	})
 
 	const purgeUpload = useCallback<PurgeUpload>(files => {
 		dispatch({
@@ -55,6 +49,11 @@ export const useFileUpload = <Result = unknown, Metadata = undefined>({}: FileUp
 			error,
 		})
 	}, [])
+
+	const previewUrls = useRef(new Set<string>())
+	const fileIds = useRef(new WeakMap<File, FileId>())
+	const filesWithMetadataById = useRef(new Map<FileId, WeakRef<FileWithMetadata>>)
+
 	const initializeUpload = useCallback<InitializeUpload>(
 		files => {
 			const newFileIds = new Set<FileId>()
@@ -78,14 +77,20 @@ export const useFileUpload = <Result = unknown, Metadata = undefined>({}: FileUp
 					purgeUpload([fileId])
 				})
 
-				fileWithMetadataByFileConfig.set(fileId, {
-					previewUrl: URL.createObjectURL(file),
+				const previewUrl = URL.createObjectURL(file)
+				const fileWithMetadata: FileWithMetadata = {
+					previewUrl: previewUrl,
 					abortController,
 					file,
 					fileId,
-				})
+				}
+				fileWithMetadataByFileConfig.set(fileId, fileWithMetadata)
 
 				newFileIds.add(fileId)
+
+				previewUrls.current.add(previewUrl)
+				fileIds.current.set(file, fileId)
+				filesWithMetadataById.current.set(fileId, new WeakRef(fileWithMetadata))
 			}
 			if (fileWithMetadataByFileConfig.size === 0) {
 				return fileWithMetadataByFileConfig
@@ -112,8 +117,6 @@ export const useFileUpload = <Result = unknown, Metadata = undefined>({}: FileUp
 			const filesById = new Map<FileId, FileUploadMetadata<Metadata>>()
 			const groupedByUploader: Map<FileUploader, Map<File, UploadedFileMetadata>> = new Map()
 
-			const currentState = internalStateRef.current
-
 			for (const fileOrIdMaybeWithOptions of files) {
 				let fileOrId: File | FileId
 				let options: StartUploadFileOptions<Metadata>
@@ -127,15 +130,16 @@ export const useFileUpload = <Result = unknown, Metadata = undefined>({}: FileUp
 				}
 				const { uploader = defaultUploader, metadata } = options
 
-				const fileId = toFileId(currentState, fileOrId)
-				const fileState = currentState.state.get(fileId)
+				const fileId = fileOrId instanceof File ? fileIds.current.get(fileOrId) : fileOrId
+				const fileState = fileId ? filesWithMetadataById.current.get(fileId)?.deref() : undefined
 
-				if (fileState === undefined || fileState.readyState !== 'initializing') {
+				if (fileId === undefined || fileState === undefined) {
 					throw new Error(
 						`Trying to startUpload a file that hasn't been previously initialized. ` +
 							`This will be possible in future, but isn't yet.`,
 					)
 				}
+
 
 				filesById.set(fileId, {
 					uploader,
@@ -203,8 +207,8 @@ export const useFileUpload = <Result = unknown, Metadata = undefined>({}: FileUp
 
 	useEffect(
 		() => () => {
-			for (const [, state] of internalStateRef.current.state) {
-				URL.revokeObjectURL(state.previewUrl)
+			for (const previewUrl of Array.from(previewUrls.current)) {
+				URL.revokeObjectURL(previewUrl)
 			}
 		},
 		[],

@@ -26,10 +26,7 @@ const parse: ControlValueParser<string, string> = value => value ?? null
 const format: FieldValueFormatter<string, string> = value => value ?? null
 
 const TitleSelectField = SimpleRelativeSingleField<TitleSelectFieldProps, string>(
-	(fieldMetadata, {
-		label,
-		...props
-	}) => {
+	(fieldMetadata, props) => {
 		const inputProps = useFieldControl<string, string>({
 			...props,
 			fieldMetadata,

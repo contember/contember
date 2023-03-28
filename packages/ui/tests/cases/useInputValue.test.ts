@@ -1,8 +1,7 @@
 import { renderHook } from '@testing-library/react-hooks'
-import { describe, expect, test } from 'vitest'
-import { ControlProps } from '../../src'
-import { useInputValue } from '../../src/components/Forms/hooks/useInputValue'
 import { useCallback } from 'react'
+import { describe, expect, test } from 'vitest'
+import { ControlProps, useInputValue } from '../../src'
 
 const useTextBasedInputValue = <E extends HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>(
 	props: ControlProps<string>,

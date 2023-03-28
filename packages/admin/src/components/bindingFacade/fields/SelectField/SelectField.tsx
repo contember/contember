@@ -55,6 +55,7 @@ export const SelectFieldInner = memo(
 		currentValue,
 		data,
 		errors,
+		// supressErrors,
 		menuZIndex,
 		onSelect,
 		onClear,

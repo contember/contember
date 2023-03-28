@@ -9,19 +9,14 @@ import {
 export type EmailFieldProps = SimpleRelativeSingleFieldProps &
 	Omit<EmailInputProps, 'value' | 'validationState' | 'allowNewlines' | 'wrapLines'>
 
-const parse: ControlValueParser<string, string> = value => value ??  null
+const parse: ControlValueParser<string, string> = value => value ?? null
 const format: FieldValueFormatter<string, string> = value => value ?? null
 
 /**
  * @group Form Fields
  */
 export const EmailField = SimpleRelativeSingleField<EmailFieldProps, string>(
-	(fieldMetadata, {
-		defaultValue,
-		name,
-		label,
-		...props
-	}) => {
+	(fieldMetadata, props) => {
 		const inputProps = useFieldControl<string, string>({
 			...props,
 			fieldMetadata,

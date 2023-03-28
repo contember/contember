@@ -41,6 +41,7 @@ export function useNativeInput<E extends HTMLInputElement | HTMLTextAreaElement 
 	min,
 	minLength,
 	pattern,
+	step,
 
 	// ValidationStateProps
 	onValidationStateChange,
@@ -52,6 +53,7 @@ export function useNativeInput<E extends HTMLInputElement | HTMLTextAreaElement 
 	intent,
 	scheme,
 	size,
+	style,
 
 	// Common own props
 	...rest
@@ -125,6 +127,8 @@ export function useNativeInput<E extends HTMLInputElement | HTMLTextAreaElement 
 		min: typeof min === 'number' || typeof min === 'string' ? min : undefined,
 		minLength,
 		pattern,
+		step,
+		style,
 	}
 }
 

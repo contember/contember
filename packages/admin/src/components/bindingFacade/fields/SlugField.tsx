@@ -35,7 +35,7 @@ const useNormalizedPrefix = (value?: SlugPrefix) => {
  * @group Form Fields
  */
 export const SlugField = Component<SlugFieldProps>(
-	props => <SlugFieldInner {...props}/>,
+	props => <SlugFieldInner {...props} />,
 	props => <>
 		<Field field={props.derivedFrom} />
 		<SlugFieldInner {...props} />
@@ -44,7 +44,6 @@ export const SlugField = Component<SlugFieldProps>(
 
 export const SlugFieldInner = SimpleRelativeSingleField<SlugFieldProps, string>(
 	(fieldMetadata, {
-		label,
 		unpersistedHardPrefix,
 		persistedHardPrefix,
 		persistedSoftPrefix,

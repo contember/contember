@@ -9,19 +9,14 @@ import {
 export type SearchFieldProps = SimpleRelativeSingleFieldProps &
 	Omit<SearchInputProps, 'value' | 'validationState' | 'allowNewlines' | 'wrapLines'>
 
-const parse: ControlValueParser<string, string> = value => value ??  null
+const parse: ControlValueParser<string, string> = value => value ?? null
 const format: FieldValueFormatter<string, string> = value => value ?? null
 
 /**
  * @group Form Fields
  */
 export const SearchField = SimpleRelativeSingleField<SearchFieldProps, string>(
-	(fieldMetadata, {
-		defaultValue,
-		name,
-		label,
-		...props
-	}) => {
+	(fieldMetadata, props) => {
 		const inputProps = useFieldControl<string, string>({
 			...props,
 			fieldMetadata,

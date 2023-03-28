@@ -1,4 +1,4 @@
-import { ControlProps, TextareaInput, TextareaInputOwnProps } from '@contember/ui'
+import { ControlProps, TextareaInput, TextareaInputProps } from '@contember/ui'
 import { SimpleRelativeSingleField, SimpleRelativeSingleFieldProps } from '../auxiliary'
 import {
 	ControlValueParser,
@@ -7,11 +7,11 @@ import {
 } from './useFieldControl'
 
 export type TextareaFieldProps =
-	& SimpleRelativeSingleFieldProps
+	& Omit<SimpleRelativeSingleFieldProps, 'style'>
 	& ControlProps<string>
-	& TextareaInputOwnProps
+	& TextareaInputProps
 
-const parse: ControlValueParser<string, string> = value => value ??  null
+const parse: ControlValueParser<string, string> = value => value ?? null
 const format: FieldValueFormatter<string, string> = value => value ?? null
 
 /**
@@ -21,8 +21,8 @@ const format: FieldValueFormatter<string, string> = value => value ?? null
  */
 export const TextareaField = SimpleRelativeSingleField<TextareaFieldProps, string>(
 	(fieldMetadata, {
-		label,
 		minRows,
+		style,
 		...props
 	}) => {
 		const inputProps = useFieldControl<string, string>({
@@ -32,7 +32,13 @@ export const TextareaField = SimpleRelativeSingleField<TextareaFieldProps, strin
 			format,
 		})
 
-		return <TextareaInput {...inputProps} minRows={minRows || 3} />
+		return (
+			<TextareaInput
+				{...inputProps}
+				minRows={minRows || 3}
+				style={style}
+			/>
+		)
 	},
 	'TextareaField',
 )
@@ -43,12 +49,12 @@ export const TextareaField = SimpleRelativeSingleField<TextareaFieldProps, strin
  */
 export const TextAreaField = SimpleRelativeSingleField<TextareaFieldProps, string>(
 	(fieldMetadata, {
-		label,
 		minRows,
+		style,
 		...props
 	}) => {
 		if (import.meta.env.DEV) {
-			console.warn('TextAreaField is deprecated. Plese use TextareaField to align with HTML/UI naming of components')
+			console.warn('TextAreaField is deprecated. Please use TextareaField to align with HTML/UI naming of components')
 		}
 
 		const inputProps = useFieldControl<string, string>({
@@ -58,7 +64,13 @@ export const TextAreaField = SimpleRelativeSingleField<TextareaFieldProps, strin
 			format,
 		})
 
-		return <TextareaInput {...inputProps} minRows={minRows || 3} />
+		return (
+			<TextareaInput
+				{...inputProps}
+				minRows={minRows || 3}
+				style={style}
+			/>
+		)
 	},
 	'TextAreaField',
 )

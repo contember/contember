@@ -9,18 +9,9 @@ import {
 export type TextFieldProps =
 	& SimpleRelativeSingleFieldProps
 	& ControlProps<string>
-	& {
-		/**
-		 * @deprecated Use TextareaField
-		 */
-		allowNewlines?: boolean
-		/**
-		 * @deprecated Use TextareaField
-		 */
-		wrapLines?: boolean
-	}
 
-const parse: ControlValueParser<string, string> = value => value ??  null
+
+const parse: ControlValueParser<string, string> = value => value ?? null
 const format: FieldValueFormatter<string, string> = value => value ?? null
 
 /**
@@ -30,9 +21,7 @@ const format: FieldValueFormatter<string, string> = value => value ?? null
  */
 export const TextField = SimpleRelativeSingleField<TextFieldProps, string>(
 	(fieldMetadata, {
-		allowNewlines,
-		label,
-		wrapLines,
+
 		...props
 	}) => {
 		const inputProps = useFieldControl<string, string>({
@@ -42,13 +31,9 @@ export const TextField = SimpleRelativeSingleField<TextFieldProps, string>(
 			format,
 		})
 
-		if (import.meta.env.DEV && (allowNewlines || wrapLines)) {
-			console.warn('Props `allowNewlines` and `wrapLines` are deprecated. Use TextareaField instead.')
-		}
-
-		return allowNewlines || wrapLines
-			? <TextareaInput {...inputProps} />
-			: <TextInput {...inputProps} />
+		return (
+			<TextInput {...inputProps} />
+		)
 	},
 	'TextField',
 )

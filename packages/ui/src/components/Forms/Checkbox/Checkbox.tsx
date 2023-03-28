@@ -3,11 +3,11 @@ import { AllHTMLAttributes, DetailedHTMLProps, forwardRef, InputHTMLAttributes, 
 import { mergeProps, useFocusRing, useHover } from 'react-aria'
 import { useComponentClassName } from '../../../auxiliary'
 import { toStateClass } from '../../../utils'
+import { useCheckboxInput } from '../Hooks'
 import { ControlProps, ControlPropsKeys } from '../Types'
 import { CheckboxButton as DefaultCheckboxButton } from './CheckboxButton'
-import { useCheckboxInput } from '../hooks/useCheckboxInput'
 
-export interface RestHTMLCheckboxProps extends Omit<AllHTMLAttributes<HTMLInputElement>, ControlPropsKeys<boolean> | 'checked' | 'children'> {}
+export interface RestHTMLCheckboxProps extends Omit<AllHTMLAttributes<HTMLInputElement>, ControlPropsKeys<boolean> | 'checked' | 'children'> { }
 
 export type CheckoboxOwnProps = ControlProps<boolean> & {
 	CheckboxButtonComponent?: typeof DefaultCheckboxButton
@@ -111,6 +111,7 @@ export const Checkbox = memo(forwardRef<HTMLInputElement, CheckboxProps>(({
 				scheme={outerProps.scheme}
 				size={outerProps.size}
 				validationState={outerProps.validationState}
+				style={outerProps.style}
 			/>
 		</div>
 	)

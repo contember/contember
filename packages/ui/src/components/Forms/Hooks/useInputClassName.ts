@@ -1,20 +1,23 @@
 import classNames from 'classnames'
 import { toEnumClass, toEnumStateClass, toEnumViewClass, toStateClass, toThemeClass } from '../../../utils'
-import { AllVisuallyDependentControlProps } from '../Types'
+import { NonOptionalVisuallyDependentControlProps } from '../Types'
 import { VisuallyDependentControlProps } from '../Types/ControlProps'
+
+export type UseInputClassNameProps = Omit<VisuallyDependentControlProps, 'id' | 'name' | 'placeholder' | 'style'>
+export type NonOptionalUseInputClassNameProps = Omit<NonOptionalVisuallyDependentControlProps, 'id' | 'name' | 'placeholder' | 'style'>
 
 /**
  * Generates className prop from the set of props
  *
- * `AllVisuallyDependentControlProps` and `VisuallyDependentControlProps` are basically the same.
- *  Hover `All*` has all props required and is the default which ensures none of the props are unintentionaly left out.
+ * By default all props are required to ensure none of the props are unintentionally left out,
+ * but you can pass `UseInputClassNameProps` to P of `useInputClassName<P>()` to make them optional.
  *
- * Use `useInputClassName<VisuallyDependentControlProps>(...)` to ease usage of the hook.
+ * @param props - Props to generate className from
+ * @returns className CSS class name string
  *
  */
-
-export function useInputClassName<P extends AllVisuallyDependentControlProps | VisuallyDependentControlProps = AllVisuallyDependentControlProps>({
-  // ControlStateProps
+export function useInputClassName<P extends NonOptionalUseInputClassNameProps | UseInputClassNameProps = NonOptionalUseInputClassNameProps>({
+	// ControlStateProps
 	active,
 	disabled,
 	loading,
@@ -23,15 +26,15 @@ export function useInputClassName<P extends AllVisuallyDependentControlProps | V
 	focused,
 	hovered,
 
-  // ControlDisplayProps
-  className: outerClassName,
+	// ControlDisplayProps
+	className: outerClassName,
 	distinction,
-  intent,
+	intent,
 	scheme,
 	size,
 
-  // ValidationStateProps
-  validationState,
+	// ValidationStateProps
+	validationState,
 
 	...restNotImplemented
 }: P): string {
@@ -47,7 +50,7 @@ export function useInputClassName<P extends AllVisuallyDependentControlProps | V
 		finalIntent = 'danger'
 	}
 
-  return classNames(
+	return classNames(
 		toStateClass('active', active),
 		toStateClass('disabled', disabled),
 		toStateClass('focused', focused),

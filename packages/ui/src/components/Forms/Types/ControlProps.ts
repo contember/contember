@@ -1,9 +1,11 @@
+import { CSSProperties, HTMLAttributes } from 'react'
 import { ControlDistinction, Intent, Scheme, Size, ValidationState } from '../../../types'
 
 /**
- * Returns new type where all the properties are required but some of them may be undefined
+ * Returns new type where all the properties are required
+ * and previously optional properties will accept undefined.
  */
-export type All<T> = {
+export type NonOptional<T> = {
 	[P in keyof Required<T>]: Pick<T, P> extends Required<Pick<T, P>> ? T[P] : (T[P] | undefined);
 }
 
@@ -18,8 +20,8 @@ export interface ControlStateProps {
 	loading?: boolean
 	readOnly?: boolean
 	required?: boolean
-  focused?: boolean
-  hovered?: boolean
+	focused?: boolean
+	hovered?: boolean
 }
 
 export interface ControlFocusProps {
@@ -38,6 +40,7 @@ export interface ControlDisplayProps {
 	type?: never
 	placeholder?: string | null
 	name?: string
+	style?: CSSProperties;
 }
 
 export interface ControlValueProps<V> {
@@ -53,6 +56,7 @@ export interface ControlConstraintProps<V> {
 	min?: V | null
 	minLength?: number
 	pattern?: string
+	step?: number
 }
 
 export type ControlProps<V> =
@@ -63,7 +67,7 @@ export type ControlProps<V> =
 	& ControlConstraintProps<V>
 	& ControlValueProps<V>
 
-export type AllControlProps<V> = Omit<All<ControlProps<V>>, 'type'>
+export type NonOptionalControlProps<V> = Omit<NonOptional<ControlProps<V>>, 'type'>
 export type ControlPropsKeys<V> = keyof ControlProps<V>
 
 export type VisuallyDependentControlProps =
@@ -71,4 +75,4 @@ export type VisuallyDependentControlProps =
 	& ControlDisplayProps
 	& Pick<ValidationStateProps, 'validationState'>
 
-export type AllVisuallyDependentControlProps = Omit<All<VisuallyDependentControlProps>, 'type'>
+export type NonOptionalVisuallyDependentControlProps = Omit<NonOptional<VisuallyDependentControlProps>, 'type'>

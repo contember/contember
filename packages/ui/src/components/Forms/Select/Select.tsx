@@ -4,8 +4,7 @@ import ReactSelect, { SelectInstance, StylesConfig, useStateManager } from 'reac
 import { useComponentClassName } from '../../../auxiliary'
 import { noop } from '../../../utils'
 import { getPortalRoot } from '../../Portal'
-import { useInputClassName } from '../hooks/useInputClassName'
-import { useChangeValidationState } from '../hooks/useNativeInput'
+import { useChangeValidationState, useInputClassName } from '../Hooks'
 import type { ControlConstraintProps, ControlProps } from '../Types'
 import { useCommonReactSelectStyles } from './useCommonReactSelectStyles'
 
@@ -23,7 +22,7 @@ export type SelectOptionWithKey<V = string> =
 export type HTMLReactSelectElement<V> = SelectInstance<SelectOption<V>, false, never>
 export type HTMLReactSelectElementWithKey<V> = SelectInstance<SelectOptionWithKey<V>, false, never>
 
-export type SelectProps<V> = Omit<ControlProps<V>, 'type' | keyof ControlConstraintProps<any>> & {
+export type SelectProps<V> = Omit<ControlProps<V>, 'type' | 'style' | keyof ControlConstraintProps<any>> & {
 	options: SelectOption<V>[]
 	/**
 	 * @deprecated No need for React Select component.

@@ -11,19 +11,14 @@ export type FloatFieldProps =
 	& ControlProps<number>
 
 
-const parse: ControlValueParser<number, number> = value => value ??  null
+const parse: ControlValueParser<number, number> = value => value ?? null
 const format: FieldValueFormatter<number, number> = value => value ?? null
 
 /**
  * @group Form Fields
  */
 export const FloatField = SimpleRelativeSingleField<FloatFieldProps, number>(
-	(fieldMetadata, {
-		defaultValue,
-		name,
-		label,
-		...props
-	}) => {
+	(fieldMetadata, props) => {
 		const inputProps = useFieldControl<number, number>({
 			...props,
 			fieldMetadata,

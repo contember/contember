@@ -41,7 +41,7 @@ function deriveSelectIndexValue(index: number) {
 	return index === -1 ? '' : index.toString()
 }
 
-const SelectComponent = <V = any>({
+const SelectComponent = <V = unknown>({
 	active,
 	className: outerClassName,
 	defaultValue: defaultValueProp,

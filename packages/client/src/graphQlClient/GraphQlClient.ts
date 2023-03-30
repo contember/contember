@@ -14,9 +14,9 @@ export type GraphQlClientFailedRequestMetadata = Pick<Response, 'status' | 'stat
 }
 
 export class GraphQlClient {
-	constructor(public readonly apiUrl: string, private readonly apiToken?: string) {}
+	constructor(public readonly apiUrl: string, private readonly apiToken?: string) { }
 
-	async sendRequest<T = any>(
+	async sendRequest<T = unknown>(
 		query: string,
 		{ apiTokenOverride, signal, variables, headers }: GraphQlClientRequestOptions = {},
 	): Promise<T> {

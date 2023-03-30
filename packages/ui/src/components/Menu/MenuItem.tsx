@@ -15,7 +15,7 @@ import { useActiveMenuItemContext } from './useActiveMenuItem'
 import { useKeyNavigation } from './useKeyNavigation'
 import { useMenuId } from './useMenuId'
 
-export function MenuItem<T = any>({ children, ...props }: MenuItemProps<T>) {
+export function MenuItem<T = unknown>({ children, ...props }: MenuItemProps<T>) {
 	const depth = useContext(DepthContext)
 
 	const { isActive, href, navigate } = useNavigationLink(props.to, props.href)

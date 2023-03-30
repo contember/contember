@@ -2928,7 +2928,7 @@ export type MultiEditPageProps<ContainerExtraProps, ItemExtraProps> = SugaredQua
 export const MultiSelectField: FunctionComponent<MultiSelectFieldProps>;
 
 // @public (undocumented)
-export const MultiSelectFieldInner: <T = any>({ currentValues, data, errors, onAdd, onClear, onRemove, reactSelectProps, placeholder, menuZIndex, onAddNew, onMove, onSearch, isLoading, ...fieldContainerProps }: MultiSelectFieldInnerProps<T>) => JSX.Element;
+export const MultiSelectFieldInner: <T = unknown>({ currentValues, data, errors, onAdd, onClear, onRemove, reactSelectProps, placeholder, menuZIndex, onAddNew, onMove, onSearch, isLoading, ...fieldContainerProps }: MultiSelectFieldInnerProps<T>) => JSX.Element;
 
 // @public (undocumented)
 export type MultiSelectFieldInnerProps<ActualValue> = ChoiceFieldData.MultipleChoiceFieldMetadata<ActualValue> & MultiSelectFieldInnerPublicProps & PublicCommonReactSelectStylesProps & {
@@ -3098,7 +3098,7 @@ export const overrideDeleteBackward: <E extends Editor>(editor: E) => void;
 
 // @public
 export const Page: {
-    <P = any>(props: PageProps<P>): JSX.Element | null;
+    <P = unknown>(props: PageProps<P>): JSX.Element | null;
     displayName: string;
     getPageName(props: PageProps<unknown>): string;
 };
@@ -4641,12 +4641,13 @@ export const useRoleRenderer: (roleRendererFactory: RoleRendererFactory | undefi
 export const useRoleRendererFactory: <T extends {}>({ rolesDataQuery, roleRenderers }: UseRoleRendererFactoryProps<T>) => RoleRendererFactory;
 
 // @public (undocumented)
-export interface UseRoleRendererFactoryProps<T> {
-    // (undocumented)
-    roleRenderers?: RoleRenderers<T>;
-    // (undocumented)
-    rolesDataQuery?: string;
-}
+export type UseRoleRendererFactoryProps<T> = {
+    rolesDataQuery: string;
+    roleRenderers?: never;
+} | {
+    rolesDataQuery?: never;
+    roleRenderers?: RoleRenderers<T | undefined>;
+};
 
 // @public (undocumented)
 export const useRouting: () => RoutingContextValue;

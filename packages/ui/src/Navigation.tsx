@@ -21,7 +21,7 @@ export const NavigationContext = createContext<NavigationContext>(to => {
 	}
 })
 
-export const useNavigationLink = <T = any>(to: T, href?: string) => {
+export const useNavigationLink = <T = unknown>(to: T, href?: string) => {
 	const navigationContext = useContext(NavigationContext)
 	return useMemo((): Partial<NavigationLinkProps> => {
 		if (to === undefined) {

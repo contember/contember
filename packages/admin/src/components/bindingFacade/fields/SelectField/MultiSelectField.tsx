@@ -43,7 +43,7 @@ export type MultiSelectFieldInnerProps<ActualValue> =
 
 const typedMemo: <T>(c: T) => T = memo
 export const MultiSelectFieldInner = typedMemo(
-	<T = any>({
+	<T = unknown>({
 		currentValues,
 		data,
 		errors,

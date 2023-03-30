@@ -1822,7 +1822,7 @@ export const Menu: MemoExoticComponent<(props: PropsWithChildren<MenuProps>) => 
 // Warning: (ae-forgotten-export) The symbol "MenuItemPropsTitleOptional" needs to be exported by the entry point index.d.ts
 //
 // @public (undocumented)
-export type MenuItemProps<T = any> = (MenuItemPropsTitleRequired<T> | MenuItemPropsTitleOptional) & {
+export type MenuItemProps<T = unknown> = (MenuItemPropsTitleRequired<T> | MenuItemPropsTitleOptional) & {
     children?: ReactNode;
     href?: string;
     external?: boolean;
@@ -2144,7 +2144,7 @@ export const SectionTabs: MemoExoticComponent<() => JSX.Element | null>;
 export const SectionTabsProvider: MemoExoticComponent<({ children }: SectionTabsProps) => JSX.Element>;
 
 // @public (undocumented)
-export const Select: <V = any>(props: Omit<ControlProps<V>, "type" | keyof ControlConstraintProps<any>> & {
+export const Select: <V = unknown>(props: Omit<ControlProps<V>, "type" | keyof ControlConstraintProps<any>> & {
     options: SelectOption<V>[];
     rows?: undefined;
     isSearchable?: ComponentProps<ReactSelect>['isSearchable'];

@@ -24,7 +24,7 @@ interface MenuItemPropsTitleOptional {
   to?: never
 }
 
-export type MenuItemProps<T = any> = (MenuItemPropsTitleRequired<T> | MenuItemPropsTitleOptional) & {
+export type MenuItemProps<T = unknown> = (MenuItemPropsTitleRequired<T> | MenuItemPropsTitleOptional) & {
   children?: ReactNode
   href?: string
   external?: boolean

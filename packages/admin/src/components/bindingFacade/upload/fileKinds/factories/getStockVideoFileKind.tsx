@@ -7,8 +7,8 @@ import {
 	getGenericFileMetadataExtractor,
 	getVideoFileDataExtractor,
 } from '../../fileDataExtractors'
-import { CommonFileKindProps } from '../types'
 import { AcceptFileOptions, FullFileKind, RenderFilePreviewOptions } from '../FullFileKind'
+import { CommonFileKindProps } from '../types'
 
 export type StockVideoFileKindProps<AcceptArtifacts = unknown> =
 	& CommonFileKindProps<AcceptArtifacts>
@@ -17,7 +17,7 @@ export type StockVideoFileKindProps<AcceptArtifacts = unknown> =
 export const acceptVideoFile = ({ file }: AcceptFileOptions) => file.type.startsWith('video')
 export const renderVideoFilePreview = ({ objectUrl }: RenderFilePreviewOptions) => <video src={objectUrl} controls />
 
-export const getStockVideoFileKind = <AcceptArtifacts extends any = unknown>({
+export const getStockVideoFileKind = <AcceptArtifacts = unknown>({
 	additionalExtractors = [],
 	acceptMimeTypes = 'video/*',
 	acceptFile = acceptVideoFile,

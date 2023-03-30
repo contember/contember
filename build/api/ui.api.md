@@ -1528,7 +1528,7 @@ export interface FilePreviewProps {
 }
 
 // @public (undocumented)
-export function flipValue<V extends any = any, T extends any = boolean, F extends any = boolean>(value: V, truthy?: T, falsy?: F): boolean | NonNullable<T> | NonNullable<F> | undefined;
+export function flipValue<V = any, T = boolean, F = boolean>(value: V, truthy?: T, falsy?: F): boolean | NonNullable<T> | NonNullable<F> | undefined;
 
 // @public (undocumented)
 export const FloatInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<number> & ControlValueProps<number> & {
@@ -1822,7 +1822,7 @@ export const Menu: MemoExoticComponent<(props: PropsWithChildren<MenuProps>) => 
 // Warning: (ae-forgotten-export) The symbol "MenuItemPropsTitleOptional" needs to be exported by the entry point index.d.ts
 //
 // @public (undocumented)
-export type MenuItemProps<T extends any = any> = (MenuItemPropsTitleRequired<T> | MenuItemPropsTitleOptional) & {
+export type MenuItemProps<T = any> = (MenuItemPropsTitleRequired<T> | MenuItemPropsTitleOptional) & {
     children?: ReactNode;
     href?: string;
     external?: boolean;
@@ -1893,7 +1893,7 @@ export type NativeProps<El extends Element> = DetailedHTMLProps<HTMLAttributes<E
 // Warning: (ae-forgotten-export) The symbol "NavigationLinkProps" needs to be exported by the entry point index.d.ts
 //
 // @public (undocumented)
-export type NavigationContext = <T extends any>(to: T) => NavigationLinkProps;
+export type NavigationContext = <T>(to: T) => NavigationLinkProps;
 
 // @public (undocumented)
 export const NavigationContext: Context<NavigationContext>;
@@ -2144,7 +2144,7 @@ export const SectionTabs: MemoExoticComponent<() => JSX.Element | null>;
 export const SectionTabsProvider: MemoExoticComponent<({ children }: SectionTabsProps) => JSX.Element>;
 
 // @public (undocumented)
-export const Select: <V extends unknown>(props: Omit<ControlProps<V>, "type" | keyof ControlConstraintProps<any>> & {
+export const Select: <V = any>(props: Omit<ControlProps<V>, "type" | keyof ControlConstraintProps<any>> & {
     options: SelectOption<V>[];
     rows?: undefined;
     isSearchable?: ComponentProps<ReactSelect>['isSearchable'];

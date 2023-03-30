@@ -1,14 +1,14 @@
 import { Component, EntityAccessor } from '@contember/binding'
-import { FieldContainer, FieldContainerProps, FieldErrors, getPortalRoot, PublicCommonReactSelectStylesProps, SelectCreateNewWrapper } from '@contember/ui'
-import { FunctionComponent, memo, MouseEventHandler, useCallback } from 'react'
+import { FieldContainer, FieldContainerProps, FieldErrors, PublicCommonReactSelectStylesProps, SelectCreateNewWrapper, getPortalRoot } from '@contember/ui'
+import { FunctionComponent, MouseEventHandler, memo, useCallback } from 'react'
 import type { MultiValueGenericProps, MultiValueProps, Props as SelectProps } from 'react-select'
 import Select, { ActionMeta, components } from 'react-select'
 import {
+	SortEndHandler,
 	SortableContainer,
 	SortableContainerProps,
 	SortableElement,
 	SortableHandle,
-	SortEndHandler,
 } from 'react-sortable-hoc'
 import { useLabelMiddleware } from '../../environment/LabelMiddleware'
 import { shouldCancelStart } from '../../helpers/shouldCancelStart'
@@ -43,7 +43,7 @@ export type MultiSelectFieldInnerProps<ActualValue> =
 
 const typedMemo: <T>(c: T) => T = memo
 export const MultiSelectFieldInner = typedMemo(
-	<T extends any>({
+	<T = any>({
 		currentValues,
 		data,
 		errors,

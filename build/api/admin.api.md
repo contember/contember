@@ -1972,16 +1972,16 @@ export interface GetNewOrderByOptions {
 }
 
 // @public (undocumented)
-export const getStockAnyFileKind: <AcceptArtifacts extends unknown = unknown>({ additionalExtractors, acceptMimeTypes, acceptFile, baseEntity, children, fileSizeField, fileTypeField, lastModifiedField, fileNameField, renderFilePreview, renderUploadedFile, uploader, urlField, childrenOutsideBaseEntity, }: StockAnyFileKindProps<AcceptArtifacts>) => FullFileKind<S3FileUploader.SuccessMetadata, AcceptArtifacts>;
+export const getStockAnyFileKind: <AcceptArtifacts = unknown>({ additionalExtractors, acceptMimeTypes, acceptFile, baseEntity, children, fileSizeField, fileTypeField, lastModifiedField, fileNameField, renderFilePreview, renderUploadedFile, uploader, urlField, childrenOutsideBaseEntity, }: StockAnyFileKindProps<AcceptArtifacts>) => FullFileKind<S3FileUploader.SuccessMetadata, AcceptArtifacts>;
 
 // @public (undocumented)
-export const getStockAudioFileKind: <AcceptArtifacts extends unknown = unknown>({ additionalExtractors, acceptMimeTypes, acceptFile, baseEntity, children, durationField, fileSizeField, fileTypeField, lastModifiedField, fileNameField, renderFilePreview, renderUploadedFile, uploader, urlField, childrenOutsideBaseEntity, }: StockAudioFileKindProps<AcceptArtifacts>) => FullFileKind<S3FileUploader.SuccessMetadata, AcceptArtifacts>;
+export const getStockAudioFileKind: <AcceptArtifacts = unknown>({ additionalExtractors, acceptMimeTypes, acceptFile, baseEntity, children, durationField, fileSizeField, fileTypeField, lastModifiedField, fileNameField, renderFilePreview, renderUploadedFile, uploader, urlField, childrenOutsideBaseEntity, }: StockAudioFileKindProps<AcceptArtifacts>) => FullFileKind<S3FileUploader.SuccessMetadata, AcceptArtifacts>;
 
 // @public (undocumented)
-export const getStockImageFileKind: <AcceptArtifacts extends unknown = unknown>({ additionalExtractors, acceptMimeTypes, acceptFile, baseEntity, children, fileSizeField, fileTypeField, lastModifiedField, fileNameField, renderFilePreview, renderUploadedFile, heightField, widthField, uploader, urlField, childrenOutsideBaseEntity, }: StockImageFileKindProps<AcceptArtifacts>) => FullFileKind<S3FileUploader.SuccessMetadata, AcceptArtifacts>;
+export const getStockImageFileKind: <AcceptArtifacts = unknown>({ additionalExtractors, acceptMimeTypes, acceptFile, baseEntity, children, fileSizeField, fileTypeField, lastModifiedField, fileNameField, renderFilePreview, renderUploadedFile, heightField, widthField, uploader, urlField, childrenOutsideBaseEntity, }: StockImageFileKindProps<AcceptArtifacts>) => FullFileKind<S3FileUploader.SuccessMetadata, AcceptArtifacts>;
 
 // @public (undocumented)
-export const getStockVideoFileKind: <AcceptArtifacts extends unknown = unknown>({ additionalExtractors, acceptMimeTypes, acceptFile, baseEntity, children, durationField, fileSizeField, fileTypeField, lastModifiedField, fileNameField, renderFilePreview, renderUploadedFile, heightField, widthField, uploader, urlField, childrenOutsideBaseEntity, }: StockVideoFileKindProps<AcceptArtifacts>) => FullFileKind<S3FileUploader.SuccessMetadata, AcceptArtifacts>;
+export const getStockVideoFileKind: <AcceptArtifacts = unknown>({ additionalExtractors, acceptMimeTypes, acceptFile, baseEntity, children, durationField, fileSizeField, fileTypeField, lastModifiedField, fileNameField, renderFilePreview, renderUploadedFile, heightField, widthField, uploader, urlField, childrenOutsideBaseEntity, }: StockVideoFileKindProps<AcceptArtifacts>) => FullFileKind<S3FileUploader.SuccessMetadata, AcceptArtifacts>;
 
 // @public (undocumented)
 export const getTableElementColumnCount: (element: TableElement) => number;
@@ -2001,9 +2001,9 @@ export namespace GQLVariable {
     const // (undocumented)
     Int: GQLVariableType<number, false>;
     const // (undocumented)
-    Required: <V extends unknown>(type: GQLVariableType<V, boolean>) => GQLVariableType<V, true>;
+    Required: <V>(type: GQLVariableType<V, boolean>) => GQLVariableType<V, true>;
     const // (undocumented)
-    List: <V extends unknown>(type: GQLVariableType<V, false>) => GQLVariableType<V[], false>;
+    List: <V>(type: GQLVariableType<V, false>) => GQLVariableType<V[], false>;
     const // (undocumented)
     Enum: <V extends string>(name: string) => GQLVariableType<V, false>;
 }
@@ -2928,7 +2928,7 @@ export type MultiEditPageProps<ContainerExtraProps, ItemExtraProps> = SugaredQua
 export const MultiSelectField: FunctionComponent<MultiSelectFieldProps>;
 
 // @public (undocumented)
-export const MultiSelectFieldInner: <T extends unknown>({ currentValues, data, errors, onAdd, onClear, onRemove, reactSelectProps, placeholder, menuZIndex, onAddNew, onMove, onSearch, isLoading, ...fieldContainerProps }: MultiSelectFieldInnerProps<T>) => JSX.Element;
+export const MultiSelectFieldInner: <T = any>({ currentValues, data, errors, onAdd, onClear, onRemove, reactSelectProps, placeholder, menuZIndex, onAddNew, onMove, onSearch, isLoading, ...fieldContainerProps }: MultiSelectFieldInnerProps<T>) => JSX.Element;
 
 // @public (undocumented)
 export type MultiSelectFieldInnerProps<ActualValue> = ChoiceFieldData.MultipleChoiceFieldMetadata<ActualValue> & MultiSelectFieldInnerPublicProps & PublicCommonReactSelectStylesProps & {
@@ -3098,7 +3098,7 @@ export const overrideDeleteBackward: <E extends Editor>(editor: E) => void;
 
 // @public
 export const Page: {
-    <P extends unknown = any>(props: PageProps<P>): JSX.Element | null;
+    <P = any>(props: PageProps<P>): JSX.Element | null;
     displayName: string;
     getPageName(props: PageProps<unknown>): string;
 };
@@ -4200,7 +4200,7 @@ export interface TenantMutationErrorResponse<Code extends string> {
 }
 
 // @public (undocumented)
-export type TenantMutationExecutor<VariableValues extends any, Res extends TenantMutationResponse<any, string>> = (variables: VariableValues, option?: {
+export type TenantMutationExecutor<VariableValues, Res extends TenantMutationResponse<any, string>> = (variables: VariableValues, option?: {
     onResponse?: (response: any) => void;
 }) => Promise<Res>;
 
@@ -4701,7 +4701,7 @@ expiration: GQLVariableType<number, false>;
 export const useSignOut: () => UseMutationReturn<SignOutResponse, {}>;
 
 // @public (undocumented)
-export const useSingleTenantMutation: <Result extends unknown, ErrorCode extends string, Variables extends Record<string, GQLVariableType<any, any>>>(mutation: string, variableDefinitions: Variables, options?: Omit<GraphQlClientRequestOptions, 'variables'>) => TenantMutationExecutor<GQLVariableValues<Variables>, TenantMutationResponse<Result, ErrorCode>>;
+export const useSingleTenantMutation: <Result, ErrorCode extends string, Variables extends Record<string, GQLVariableType<any, any>>>(mutation: string, variableDefinitions: Variables, options?: Omit<GraphQlClientRequestOptions, 'variables'>) => TenantMutationExecutor<GQLVariableValues<Variables>, TenantMutationResponse<Result, ErrorCode>>;
 
 // @public (undocumented)
 export const useToolbarState: () => ToolbarsState;

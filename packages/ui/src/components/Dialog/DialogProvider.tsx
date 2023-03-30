@@ -16,7 +16,7 @@ export const DialogProvider = memo((props: DialogProviderProps) => {
 
 	const options = useMemo<DialogOptions<any>>(() => {
 		return {
-			openDialog: <Success extends unknown>(settings: DialogSettings<Success>) =>
+			openDialog: <Success = unknown>(settings: DialogSettings<Success>) =>
 				new Promise<Success>(promiseResolve => {
 					const dialogId = idSeed.current++
 					const resolve = (value: Success) => {

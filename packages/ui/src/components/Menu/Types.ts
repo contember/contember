@@ -15,18 +15,18 @@ export interface MenuProps {
 }
 
 interface MenuItemPropsTitleRequired<T> {
-	title: ReactNode
+  title: ReactNode
   to: T
 }
 
 interface MenuItemPropsTitleOptional {
-	title?: ReactNode
+  title?: ReactNode
   to?: never
 }
 
-export type MenuItemProps<T extends any = any> = (MenuItemPropsTitleRequired<T> | MenuItemPropsTitleOptional) & {
-	children?: ReactNode
-	href?: string
-	external?: boolean
-	expandedByDefault?: boolean
+export type MenuItemProps<T = unknown> = (MenuItemPropsTitleRequired<T> | MenuItemPropsTitleOptional) & {
+  children?: ReactNode
+  href?: string
+  external?: boolean
+  expandedByDefault?: boolean
 }

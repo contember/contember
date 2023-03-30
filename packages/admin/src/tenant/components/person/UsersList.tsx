@@ -20,15 +20,20 @@ export const UsersList = memo<UsersListProps>(({ editUserLink, ...props }) => (
 ))
 
 
-export interface UseRoleRendererFactoryProps<T> {
-	rolesDataQuery?: string
-	roleRenderers?: RoleRenderers<T>
-}
+export type UseRoleRendererFactoryProps<T> =
+	| {
+		rolesDataQuery: string
+		roleRenderers?: never
+	}
+	| {
+		rolesDataQuery?: never
+		roleRenderers?: RoleRenderers<T | undefined>
+	}
 
 export const useRoleRendererFactory = <T extends {}>({ rolesDataQuery, roleRenderers }: UseRoleRendererFactoryProps<T>) => {
 	const contentClient = useCurrentContentGraphQlClient()
 	return useCallback<RoleRendererFactory>(async () => {
-		const rolesData = rolesDataQuery ? await contentClient.sendRequest(rolesDataQuery) : undefined
+		const rolesData: T | undefined = rolesDataQuery ? await contentClient.sendRequest<T>(rolesDataQuery) : undefined
 		return ({ role, variables }) => {
 			if (!roleRenderers) {
 				return <>{role}</>

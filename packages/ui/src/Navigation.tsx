@@ -5,7 +5,7 @@ export interface NavigationLinkProps {
 	navigate: (e?: SyntheticEvent) => void
 	isActive: boolean
 }
-export type NavigationContext = <T extends any>(to: T) => NavigationLinkProps
+export type NavigationContext = <T>(to: T) => NavigationLinkProps
 
 export const NavigationContext = createContext<NavigationContext>(to => {
 	if (typeof to !== 'string') {
@@ -21,7 +21,7 @@ export const NavigationContext = createContext<NavigationContext>(to => {
 	}
 })
 
-export const useNavigationLink = <T extends any>(to: T, href?: string) => {
+export const useNavigationLink = <T = unknown>(to: T, href?: string) => {
 	const navigationContext = useContext(NavigationContext)
 	return useMemo((): Partial<NavigationLinkProps> => {
 		if (to === undefined) {

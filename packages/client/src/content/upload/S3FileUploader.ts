@@ -1,9 +1,9 @@
+import pLimit from 'p-limit'
 import { readFileAsArrayBuffer } from '../../utils'
+import { FileUploadError } from './FileUploadError'
 import type { FileUploader, FileUploaderInitializeOptions } from './FileUploader'
 import { GenerateUploadUrlMutationBuilder } from './GenerateUploadUrlMutationBuilder'
 import type { UploadedFileMetadata } from './UploadedFileMetadata'
-import { FileUploadError } from './FileUploadError'
-import pLimit from 'p-limit'
 
 interface S3UploadState {
 	request?: XMLHttpRequest
@@ -63,8 +63,8 @@ class S3FileUploader implements FileUploader<S3FileUploader.SuccessMetadata> {
 
 		const mutation = GenerateUploadUrlMutationBuilder.buildQuery(parameters)
 		try {
-			const response = await options.contentApiClient.sendRequest(mutation)
-			const responseData: GenerateUploadUrlMutationBuilder.MutationResponse = response.data
+			const response = await options.contentApiClient.sendRequest<{ data: GenerateUploadUrlMutationBuilder.MutationResponse }>(mutation)
+			const responseData = response.data
 			const limit = pLimit(this.options.concurrency ?? 5)
 			const promises: Promise<void>[] = []
 			for (const [file] of files) {
@@ -111,7 +111,7 @@ class S3FileUploader implements FileUploader<S3FileUploader.SuccessMetadata> {
 				onError([file])
 				reject(e)
 			})
-			 xhr.upload?.addEventListener('progress', e => {
+			xhr.upload?.addEventListener('progress', e => {
 				onProgress([
 					[
 						file,

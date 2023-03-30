@@ -10,7 +10,7 @@ interface VimeoFileUploaderState {
 class VimeoFileUploader implements FileUploader {
 	private readonly uploadState: WeakMap<File, VimeoFileUploaderState> = new WeakMap()
 
-	public constructor(private readonly options: VimeoFileUploader.Options = {}) {}
+	public constructor(private readonly options: VimeoFileUploader.Options = {}) { }
 
 	private generateNewAlias = (() => {
 		let alias = 1
@@ -53,21 +53,23 @@ class VimeoFileUploader implements FileUploader {
 
 		const mutation = this.buildAPIQuery(parameters)
 		try {
-			const response = await contentApiClient.sendRequest(mutation)
-			const responseData: {
-				[fileAlias: string]: {
-					ok: boolean
-					errors: {
-						endUserMessage: string
-						developerMessage: string
-						code: string
-					}
-					result: {
-						uploadUrl: string
-						vimeoId: string
+			const response = await contentApiClient.sendRequest<{
+				data: {
+					[fileAlias: string]: {
+						ok: boolean
+						errors: {
+							endUserMessage: string
+							developerMessage: string
+							code: string
+						}
+						result: {
+							uploadUrl: string
+							vimeoId: string
+						}
 					}
 				}
-			} = response.data
+			}>(mutation)
+			const responseData = response.data
 
 			for (const [file] of files) {
 				const fileState = this.uploadState.get(file)!
@@ -93,10 +95,10 @@ class VimeoFileUploader implements FileUploader {
 						const successMetadata = this.options.mapVimeoIdToResult
 							? this.options.mapVimeoIdToResult(vimeoId)
 							: {
-									// Structurally piggybacking on the stock S3FileUploader.
-									// This is kind of crap but it means we don't have to force the user to write a custom populator.
-									fileUrl: vimeoId,
-							  }
+								// Structurally piggybacking on the stock S3FileUploader.
+								// This is kind of crap but it means we don't have to force the user to write a custom populator.
+								fileUrl: vimeoId,
+							}
 						onSuccess([[file, successMetadata]])
 					},
 				})
@@ -113,9 +115,9 @@ class VimeoFileUploader implements FileUploader {
 		return `
 mutation {
 	${Array.from(parameters)
-		.map(
-			([alias, { size }]) =>
-				`${alias}: generateVimeoUploadUrl(size: ${size}) {
+				.map(
+					([alias, { size }]) =>
+						`${alias}: generateVimeoUploadUrl(size: ${size}) {
 		ok
 		errors {
 			endUserMessage
@@ -127,8 +129,8 @@ mutation {
 			vimeoId
 		}
 	}`,
-		)
-		.join('\n')}
+				)
+				.join('\n')}
 }
 `
 	}

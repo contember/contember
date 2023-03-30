@@ -1,19 +1,19 @@
-import { useCallback } from 'react'
 import { GraphQlClientRequestOptions, useTenantGraphQlClient } from '@contember/react-client'
+import { useCallback } from 'react'
 import { GQLVariableType, GQLVariableValues } from './variables'
 
 
-export type TenantMutationExecutor<VariableValues extends any, Res extends TenantMutationResponse<any, string>> =
+export type TenantMutationExecutor<VariableValues, Res extends TenantMutationResponse<any, string>> =
 	(variables: VariableValues, option?: { onResponse?: (response: any) => void }) => Promise<Res>
 
 export const useSingleTenantMutation = <
-	Result extends any,
+	Result,
 	ErrorCode extends string,
 	Variables extends Record<string, GQLVariableType<any, any>>
-	>(
-		mutation: string,
-		variableDefinitions: Variables,
-		options?: Omit<GraphQlClientRequestOptions, 'variables'>,
+>(
+	mutation: string,
+	variableDefinitions: Variables,
+	options?: Omit<GraphQlClientRequestOptions, 'variables'>,
 ): TenantMutationExecutor<GQLVariableValues<Variables>, TenantMutationResponse<Result, ErrorCode>> => {
 
 	const client = useTenantGraphQlClient()
@@ -49,4 +49,3 @@ export interface TenantMutationOkResponse<Result> {
 export type TenantMutationResponse<Result, ErrorCode extends string> =
 	| TenantMutationErrorResponse<ErrorCode>
 	| TenantMutationOkResponse<Result>
-

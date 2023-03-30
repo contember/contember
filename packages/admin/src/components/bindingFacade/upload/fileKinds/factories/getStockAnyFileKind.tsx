@@ -2,8 +2,8 @@ import type { S3FileUploader } from '@contember/client'
 import { FileUrlFieldView } from '../../../fieldViews'
 import { defaultUploader } from '../../defaultUploader'
 import { FileDataExtractor, getFileUrlDataExtractor, getGenericFileMetadataExtractor } from '../../fileDataExtractors'
-import { CommonFileKindProps } from '../types'
 import { FullFileKind, RenderFilePreviewOptions } from '../FullFileKind'
+import { CommonFileKindProps } from '../types'
 
 export type StockAnyFileKindProps<AcceptArtifacts = unknown> =
 	& CommonFileKindProps<AcceptArtifacts>
@@ -20,7 +20,7 @@ export const renderAnyFilePreview = ({ objectUrl }: RenderFilePreviewOptions) =>
 	</a>
 )
 
-export const getStockAnyFileKind = <AcceptArtifacts extends any = unknown>({
+export const getStockAnyFileKind = <AcceptArtifacts = unknown>({
 	additionalExtractors = [],
 	acceptMimeTypes = null,
 	acceptFile = acceptAnyFile,

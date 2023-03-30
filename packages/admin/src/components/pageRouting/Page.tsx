@@ -9,7 +9,7 @@ export interface PageProps<P> {
 /**
  * Page specifies one page. It must have a `name` prop and it's child must be a function which takes page's params and returns React node to render.
  */
-export const Page = <P extends unknown = any>(props: PageProps<P>) => {
+export const Page = <P = unknown>(props: PageProps<P>) => {
 	const request = useCurrentRequest()
 
 	if (request === null) {

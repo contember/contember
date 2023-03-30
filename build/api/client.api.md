@@ -181,7 +181,7 @@ export class GraphQlClient {
     // (undocumented)
     readonly apiUrl: string;
     // (undocumented)
-    sendRequest<T = any>(query: string, { apiTokenOverride, signal, variables, headers }?: GraphQlClientRequestOptions): Promise<T>;
+    sendRequest<T = unknown>(query: string, { apiTokenOverride, signal, variables, headers }?: GraphQlClientRequestOptions): Promise<T>;
 }
 
 // @public (undocumented)

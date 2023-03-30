@@ -7,8 +7,8 @@ import {
 	getFileUrlDataExtractor,
 	getGenericFileMetadataExtractor,
 } from '../../fileDataExtractors'
-import { CommonFileKindProps } from '../types'
 import { AcceptFileOptions, FullFileKind, RenderFilePreviewOptions } from '../FullFileKind'
+import { CommonFileKindProps } from '../types'
 
 export type StockAudioFileKindProps<AcceptArtifacts = unknown> =
 	& CommonFileKindProps<AcceptArtifacts>
@@ -17,7 +17,7 @@ export type StockAudioFileKindProps<AcceptArtifacts = unknown> =
 export const acceptAudioFile = ({ file }: AcceptFileOptions) => file.type.startsWith('audio')
 export const renderAudioFilePreview = ({ objectUrl }: RenderFilePreviewOptions) => <audio src={objectUrl} controls />
 
-export const getStockAudioFileKind = <AcceptArtifacts extends any = unknown>({
+export const getStockAudioFileKind = <AcceptArtifacts = unknown>({
 	additionalExtractors = [],
 	acceptMimeTypes = 'audio/*',
 	acceptFile = acceptAudioFile,

@@ -1,6 +1,6 @@
 import classNames from 'classnames'
 import { ComponentProps, CSSProperties, ForwardedRef, forwardRef, memo, ReactElement, RefAttributes, useCallback, useMemo, useRef } from 'react'
-import ReactSelect, { StylesConfig, useStateManager, SelectInstance } from 'react-select'
+import ReactSelect, { SelectInstance, StylesConfig, useStateManager } from 'react-select'
 import { useComponentClassName } from '../../../auxiliary'
 import { noop } from '../../../utils'
 import { getPortalRoot } from '../../Portal'
@@ -41,7 +41,7 @@ function deriveSelectIndexValue(index: number) {
 	return index === -1 ? '' : index.toString()
 }
 
-const SelectComponent = <V extends any>({
+const SelectComponent = <V = unknown>({
 	active,
 	className: outerClassName,
 	defaultValue: defaultValueProp,
@@ -74,7 +74,7 @@ const SelectComponent = <V extends any>({
 	...outerProps
 }: SelectProps<V>, forwardedRef: ForwardedRef<HTMLReactSelectElement<V>>) => {
 	if (import.meta.env.DEV) {
-		// Spread fixes TS error "Index signature for type 'string' is missing in type '{}'."
+		// Spread fixes TS error "Index signature for type 'string' is missing in type '{ }'."
 		const _exhaust: { [key: string]: never } = { ...outerProps }
 	}
 

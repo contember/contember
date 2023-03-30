@@ -39,10 +39,10 @@ export const useAbortController: () => () => AbortSignal;
 export const useArrayMapMemo: <Item, OutputItem>(items: Item[], map: (value: Item, index: number, array: Item[]) => OutputItem) => OutputItem[];
 
 // @public (undocumented)
-export const useConstantLengthInvariant: <Item extends unknown>(items: Item[], message?: string) => void;
+export const useConstantLengthInvariant: <Item>(items: Item[], message?: string) => void;
 
 // @public (undocumented)
-export const useConstantValueInvariant: <Value extends unknown>(value: Value, message?: string) => void;
+export const useConstantValueInvariant: <Value>(value: Value, message?: string) => void;
 
 // @public (undocumented)
 export const useDebounce: <T>(value: T, debounceMs: number) => T;

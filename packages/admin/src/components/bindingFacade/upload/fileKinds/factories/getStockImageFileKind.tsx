@@ -7,8 +7,8 @@ import {
 	getGenericFileMetadataExtractor,
 	getImageFileDataExtractor,
 } from '../../fileDataExtractors'
-import { CommonFileKindProps } from '../types'
 import { AcceptFileOptions, FullFileKind, RenderFilePreviewOptions } from '../FullFileKind'
+import { CommonFileKindProps } from '../types'
 
 export type StockImageFileKindProps<AcceptArtifacts = unknown> =
 	& CommonFileKindProps<AcceptArtifacts>
@@ -17,7 +17,7 @@ export type StockImageFileKindProps<AcceptArtifacts = unknown> =
 export const acceptImageFile = ({ file }: AcceptFileOptions) => file.type.startsWith('image')
 export const renderImageFilePreview = ({ objectUrl }: RenderFilePreviewOptions) => <img src={objectUrl} alt="" />
 
-export const getStockImageFileKind = <AcceptArtifacts extends any = unknown>({
+export const getStockImageFileKind = <AcceptArtifacts = unknown>({
 	additionalExtractors = [],
 	acceptMimeTypes = 'image/*',
 	acceptFile = acceptImageFile,

@@ -3,11 +3,11 @@ import { ContainerSpinner, Message } from '@contember/ui'
 import {
 	ComponentType,
 	Fragment,
-	isValidElement,
-	lazy,
 	ReactElement,
 	ReactNode,
 	Suspense,
+	isValidElement,
+	lazy,
 	useMemo,
 	useRef,
 } from 'react'
@@ -38,9 +38,9 @@ export type PagesMap = Record<string, PagesMapElement>
 
 export interface PagesProps {
 	children:
-		| PagesMap
-		| PageProviderElement[]
-		| PageProviderElement
+	| PagesMap
+	| PageProviderElement[]
+	| PageProviderElement
 	layout?: ComponentType<{ children?: ReactNode }>
 }
 
@@ -223,6 +223,6 @@ function lowerFirst(val: string) {
 	return val.slice(0, 1).toLowerCase() + val.slice(1)
 }
 
-function normalizeModule<V extends any>(map: Record<string, V>): Record<string, V> {
+function normalizeModule<V>(map: Record<string, V>): Record<string, V> {
 	return Object.fromEntries(Object.entries(map).map(([k, v]) => [lowerFirst(k), v]))
 }

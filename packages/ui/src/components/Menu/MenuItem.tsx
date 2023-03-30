@@ -1,8 +1,8 @@
 import { useSessionStorageState } from '@contember/react-utils'
 import classNames from 'classnames'
 import { SyntheticEvent, useCallback, useContext, useEffect, useMemo, useRef } from 'react'
-import { randomId, useComponentClassName } from '../../auxiliary'
 import { useNavigationLink } from '../../Navigation'
+import { randomId, useComponentClassName } from '../../auxiliary'
 import { toStateClass, useChildrenAsLabel } from '../../utils'
 import { Collapsible } from '../Collapsible'
 import { usePreventCloseContext } from '../PreventCloseContext'
@@ -15,7 +15,7 @@ import { useActiveMenuItemContext } from './useActiveMenuItem'
 import { useKeyNavigation } from './useKeyNavigation'
 import { useMenuId } from './useMenuId'
 
-export function MenuItem<T extends any = any>({ children, ...props }: MenuItemProps<T>) {
+export function MenuItem<T = unknown>({ children, ...props }: MenuItemProps<T>) {
 	const depth = useContext(DepthContext)
 
 	const { isActive, href, navigate } = useNavigationLink(props.to, props.href)

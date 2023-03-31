@@ -37,7 +37,7 @@ ${enums}${entities}`
 			...Object.values(entity.unique).map(constraint => this.generateUniqueConstraint({ entity, constraint })),
 			...Object.values(entity.indexes).map(index => this.generateIndex({ entity, index })),
 			this.generateView({ entity }),
-		].filter(it => !!it).map(it => `${it}\n`)
+		].filter(it => !!it).map(it => `${it}\n`).join('')
 
 		return `\n${decorators}export class ${this.formatIdentifier(entity.name)} {
 ${Object.values(entity.fields).map(field => this.generateField({ field, entity })).filter(it => !!it).join('\n')}

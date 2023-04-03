@@ -54,6 +54,7 @@ jobs:
           key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-yarn-
+
       - name: Install yarn deps
         run: |
           yarn --version
@@ -117,7 +118,8 @@ jobs:
       HOME: '/root'
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
       - name: Get yarn cache directory path
         id: yarn-cache-dir-path
@@ -132,11 +134,18 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-
 
-      - run: yarn --version
-      - run: yarn install --immutable
-      - run: yarn run build:js:prod
-      - run: yarn run admin:pw:build
-      - run: yarn run admin:pw:test --forbid-only
+      - name: Install yarn deps
+        run: |
+          yarn --version
+          yarn install --immutable
+
+      - name: Prepare for playwright tests
+        run: |
+          yarn run build:js:prod
+          yarn run admin:pw:build
+
+      - name: Run playwright tests
+        run: yarn run admin:pw:test --forbid-only
 
       - uses: jakejarvis/s3-sync-action@master
         if: always()
@@ -167,7 +176,8 @@ jobs:
       NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
       - name: Get yarn cache directory path
         id: yarn-cache-dir-path
@@ -185,13 +195,25 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-
 
-      - run: yarn --version
-      - run: yarn install --immutable
-      - run: yarn run build
-      - run: yarn config set npmAuthToken "$NPM_TOKEN"
-      - run: yarn config set "git-tag-version" "false"
-      - run: yarn workspaces foreach -pt version "${GITHUB_REF:11}"
-      - run: yarn workspaces foreach -pt npm publish --access public
+      - name: Extract version from tag
+        run: echo "PACKAGE_VERSION=${GITHUB_REF:11}" >> $GITHUB_ENV
+
+      - name: Apply version from Git tag
+        run: yarn version apply --all --deferred
+
+      - name: Install yarn deps
+        run: |
+          yarn --version
+          yarn install --immutable
+
+      - name: Build
+        run: yarn run build
+
+      - name: Publish
+        run: |
+          yarn config set npmAuthToken "$NPM_TOKEN"
+          yarn workspaces foreach -pt version "${GITHUB_REF:11}"
+          yarn workspaces foreach -pt npm publish --access public
 
 
   publish-docker:

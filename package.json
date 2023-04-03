@@ -33,7 +33,8 @@
 		"build:js:prod": "yarn workspaces foreach run build",
 		"admin:pw:build": "yarn workspace @contember/admin run pw:build",
 		"admin:pw:test": "yarn workspace @contember/admin run pw:test",
-		"vite": "cd packages/admin-sandbox && yarn run start"
+		"vite": "cd packages/admin-sandbox && yarn run start",
+		"as:build": "yarn workspace @contember/admin-server run build"
 	},
 	"devDependencies": {
 		"@microsoft/api-extractor": "^7.34.4",

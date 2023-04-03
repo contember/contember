@@ -198,9 +198,6 @@ jobs:
       - name: Extract version from tag
         run: echo "PACKAGE_VERSION=${GITHUB_REF:11}" >> $GITHUB_ENV
 
-      - name: Apply version from Git tag
-        run: yarn version apply --all --deferred
-
       - name: Install yarn deps
         run: |
           yarn --version

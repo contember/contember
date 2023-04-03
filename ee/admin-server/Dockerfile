@@ -1,31 +1,35 @@
 FROM node:16-alpine as builder
 WORKDIR /src
 
+COPY package.json yarn.lock .yarnrc.yml								./
+COPY .yarn																						./.yarn
 
-COPY package.json yarn.lock .yarnrc.yml              ./
-COPY .yarn                                           ./.yarn
-COPY ee/admin-server/package.json                    ./ee/admin-server/package.json
-COPY packages/admin/package.json                     ./packages/admin/package.json
-COPY packages/admin-i18n/package.json                ./packages/admin-i18n/package.json
-COPY packages/admin-sandbox/package.json             ./packages/admin-sandbox/package.json
-COPY packages/binding/package.json                   ./packages/binding/package.json
-COPY packages/client/package.json                    ./packages/client/package.json
-COPY packages/react-client/package.json              ./packages/react-client/package.json
-COPY packages/react-multipass-rendering/package.json ./packages/react-multipass-rendering/package.json
-COPY packages/react-utils/package.json               ./packages/react-utils/package.json
-COPY packages/ui/package.json                        ./packages/ui/package.json
-COPY packages/vimeo-file-uploader/package.json       ./packages/vimeo-file-uploader/package.json
+# Enterprise Edition
+COPY ee/admin-server/package.json											./ee/admin-server/package.json
 
-RUN cd ee/admin-server && yarn
+# Community Edition
+COPY packages/admin-i18n/package.json									./packages/admin-i18n/package.json
+COPY packages/admin-sandbox/package.json							./packages/admin-sandbox/package.json
+COPY packages/admin/package.json											./packages/admin/package.json
+COPY packages/binding/package.json										./packages/binding/package.json
+COPY packages/client/package.json											./packages/client/package.json
+COPY packages/interface-tester/package.json						./packages/interface-tester/package.json
+COPY packages/react-client/package.json								./packages/react-client/package.json
+COPY packages/react-multipass-rendering/package.json	./packages/react-multipass-rendering/package.json
+COPY packages/react-utils/package.json								./packages/react-utils/package.json
+COPY packages/ui/package.json													./packages/ui/package.json
+COPY packages/vimeo-file-uploader/package.json				./packages/vimeo-file-uploader/package.json
 
-COPY ./ ./
+RUN yarn install
 
-RUN cd ee/admin-server && yarn build
+COPY ./																								./
+
+RUN yarn as:build
 
 FROM node:16-alpine
 
 WORKDIR /src
-COPY --from=builder /src/ee/admin-server/dist/ ./
+COPY --from=builder /src/ee/admin-server/dist/				./
 
 ENV NODE_ENV "production"
 ENV CONTEMBER_PORT "4000"

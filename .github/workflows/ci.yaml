@@ -190,10 +190,10 @@ jobs:
       - run: yarn set version berry
       - run: yarn install --immutable
       - run: yarn run build
-      - run: yarn config set "//registry.npmjs.org/:_authToken" "$NPM_TOKEN"
+      - run: yarn config set npmAuthToken "$NPM_TOKEN"
       - run: yarn config set "git-tag-version" "false"
-      - run: yarn recursive exec npm version "${GITHUB_REF:11}"
-      - run: yarn recursive publish --access public --no-git-checks
+      - run: yarn recursive version "${GITHUB_REF:11}"
+      - run: yarn recursive npm publish --access public
 
 
   publish-docker:

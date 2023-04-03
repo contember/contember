@@ -2,7 +2,7 @@ FROM node:16-alpine as builder
 WORKDIR /src
 
 
-COPY package.json yarn.lock .yarnrc.yaml             ./
+COPY package.json yarn.lock .yarnrc.yml              ./
 COPY .yarn                                           ./.yarn
 COPY ee/admin-server/package.json                    ./ee/admin-server/package.json
 COPY packages/admin/package.json                     ./packages/admin/package.json

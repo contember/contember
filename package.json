@@ -65,6 +65,7 @@
 		"ee/*",
 		"packages/*"
 	],
-	"version": "0.0.0",
-	"packageManager": "yarn@3.5.0"
+	"version": "1.1.0-rc.6",
+	"packageManager": "yarn@3.5.0",
+	"stableVersion": "0.0.0"
 }

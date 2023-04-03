@@ -210,7 +210,7 @@ jobs:
         run: |
           yarn config set npmAuthToken "$NPM_TOKEN"
           yarn workspaces foreach -pt version "${GITHUB_REF:11}"
-          yarn workspaces foreach -pt npm publish --access public --no-private
+          yarn workspaces foreach -pt --no-private npm publish --access public
 
 
   publish-docker:

@@ -133,7 +133,6 @@ jobs:
             ${{ runner.os }}-yarn-
 
       - run: yarn --version
-      - run: yarn set version berry
       - run: yarn install --immutable
       - run: yarn run build:js:prod
       - run: yarn run admin:pw:build
@@ -187,13 +186,12 @@ jobs:
             ${{ runner.os }}-yarn-
 
       - run: yarn --version
-      - run: yarn set version berry
       - run: yarn install --immutable
       - run: yarn run build
       - run: yarn config set npmAuthToken "$NPM_TOKEN"
       - run: yarn config set "git-tag-version" "false"
-      - run: yarn recursive version "${GITHUB_REF:11}"
-      - run: yarn recursive npm publish --access public
+      - run: yarn workspaces foreach -pt version "${GITHUB_REF:11}"
+      - run: yarn workspaces foreach -pt npm publish --access public
 
 
   publish-docker:

@@ -1,16 +1,24 @@
+// @ts-check
 import react from '@vitejs/plugin-react'
 import { resolve } from 'path'
 import { defineConfig } from 'vite'
-import { getPackagePath, packageList } from './packageList.js'
+import { entries } from './packageList.js'
 import { rootDirectory } from './rootDirectory.js'
 
+export const packages = new Map(entries)
+
+/**
+ * @param {string} packageName
+ * @returns {import('vite').UserConfigExport}
+ */
 export function createViteConfig(packageName) {
-	if (!packageList.includes(packageName)) {
-		throw new Error(`Invalid package name ${packageName}.`)
+	const packagePath = packages.get(packageName)
+
+	if (!packagePath) {
+		throw new Error(`Undefined package path for package "${packageName}".`)
 	}
 
-	const packageDir = `packages/${packageName}`
-	const entry = resolve(rootDirectory, `${packageDir}/src/index.ts`)
+	const entry = resolve(rootDirectory, `${packagePath}/src/index.ts`)
 
 	return defineConfig(({ command, mode }) => {
 		return {
@@ -20,7 +28,7 @@ export function createViteConfig(packageName) {
 					formats: ['es'],
 				},
 				minify: false,
-				outDir: resolve(rootDirectory, `${packageDir}/dist/${mode}`),
+				outDir: resolve(rootDirectory, `${packagePath}/dist/${mode}`),
 				rollupOptions: {
 					external: (id, importer, resolved) => {
 						return !resolved && !id.startsWith('./') && !id.startsWith('../') && id !== '.' && id !== entry
@@ -37,13 +45,16 @@ export function createViteConfig(packageName) {
 				target: 'es2020',
 			},
 			plugins: [react()],
-			resolve: {
-				alias: packageList.map(packageName => ({
-					find: `@contember/${packageName}`,
-					replacement: resolve(rootDirectory, getPackagePath(packageName)),
-				})),
-				dedupe: packageList.map(packageName => `@contember/${packageName}`),
-			},
+			resolve: resolveConfig,
 		}
 	})
+}
+
+/** @type {import('vite').UserConfig['resolve']} */
+export const resolveConfig = {
+	alias: entries.map(([packageName, packagePath]) => ({
+		find: `@contember/${packageName}`,
+		replacement: resolve(rootDirectory, `${packagePath}/src`),
+	})),
+	dedupe: entries.map(([packageName]) => `@contember/${packageName}`),
 }

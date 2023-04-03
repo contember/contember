@@ -1,8 +1,8 @@
-import { defineConfig } from 'vite'
-import { resolve } from 'path'
-import { getPackagePath, packageList } from '../../build/packageList.js'
-import { rootDirectory } from '../../build/rootDirectory.js'
+// @ts-check
 import react from '@vitejs/plugin-react'
+import { resolve } from 'path'
+import { defineConfig } from 'vite'
+import { resolveConfig, rootDirectory } from '../../build'
 
 export default defineConfig({
 	root: 'public',
@@ -34,12 +34,5 @@ export default defineConfig({
 		target: 'esnext',
 	},
 	plugins: [react()],
-	resolve: {
-		alias: [
-			...packageList.map(packageName => ({
-				find: `@contember/${packageName}`,
-				replacement: resolve(rootDirectory, getPackagePath(packageName)),
-			})),
-		],
-	},
+	resolve: resolveConfig,
 })

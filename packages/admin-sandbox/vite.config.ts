@@ -1,18 +1,11 @@
-import { defineConfig } from 'vite'
-import { resolve } from 'path'
-import { getPackagePath, packageList } from '../../build/packageList.js'
-import { rootDirectory } from '../../build/rootDirectory.js'
 import react from '@vitejs/plugin-react'
+import { defineConfig } from 'vite'
+import { resolveConfig } from '../../build'
 
 export default defineConfig({
 	root: 'admin',
 	plugins: [react()],
-	resolve: {
-		alias: packageList.map(packageName => ({
-			find: `@contember/${packageName}`,
-			replacement: resolve(rootDirectory, getPackagePath(packageName)),
-		})),
-	},
+	resolve: resolveConfig,
 	css: {
 		preprocessorOptions: {
 			sass: {

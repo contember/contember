@@ -4,6 +4,10 @@
   "license": "proprietary",
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
+  "exports": {
+    "typescript": "./src/index.ts",
+    "default": "./dist/src/index.js"
+  },
   "scripts": {},
   "dependencies": {
     "@contember/database": "^1.3.0-alpha.4",

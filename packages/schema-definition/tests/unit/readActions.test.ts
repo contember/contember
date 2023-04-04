@@ -1,6 +1,6 @@
 import { SchemaDefinition as def, ActionsDefinition as actions } from '../../src'
 import { Model } from '@contember/schema'
-import { test } from 'vitest'
+import { expect, test } from 'vitest'
 import { createActions } from '../../src/actions/definition'
 
 namespace SimpleActions {
@@ -49,6 +49,35 @@ namespace SimpleActions {
 	}
 }
 
-test('xxx', () => {
-	createActions(SimpleActions)
+test('read actions schema', () => {
+	expect(createActions(SimpleActions)).toMatchInlineSnapshot(`
+		{
+		  "targets": {
+		    "book_watch_target": {
+		      "name": "book_watch_target",
+		      "type": "webhook",
+		      "url": "%webhookUrl%/book/updated",
+		    },
+		  },
+		  "triggers": {
+		    "book_watch": {
+		      "entity": "Book",
+		      "name": "book_watch",
+		      "selection": undefined,
+		      "target": "book_watch_target",
+		      "type": "watch",
+		      "watch": [
+		        "title",
+		        [
+		          "tags",
+		          {},
+		          [
+		            "name",
+		          ],
+		        ],
+		      ],
+		    },
+		  },
+		}
+	`)
 })

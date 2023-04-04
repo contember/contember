@@ -7,6 +7,10 @@
     "test": "vitest"
   },
   "typings": "dist/src/index.d.ts",
+  "exports": {
+    "typescript": "./src/index.ts",
+    "default": "./dist/src/index.js"
+  },
   "devDependencies": {
     "@types/node": "^18"
   },

@@ -7,6 +7,10 @@
   "license": "Apache-2.0",
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
+  "exports": {
+    "typescript": "./src/index.ts",
+    "default": "./dist/src/index.js"
+  },
   "dependencies": {
     "@contember/database": "^1.3.0-alpha.4",
     "node-pg-migrate": "^5.9.0"

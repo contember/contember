@@ -75,11 +75,13 @@ services:
       DEFAULT_S3_PREFIX: 'data'
       DEFAULT_S3_KEY: 'contember'
       DEFAULT_S3_SECRET: 'contember'
+      CONTEMBER_PACKAGE_JSON: /src/packages/engine-server/package.json
     command:
-      - node
-      - --expose-gc
-      - --inspect=0.0.0.0:4002
-      - ./ee/engine-server-ee/dist/src/start.js
+      - yarn
+      - tsx
+      - watch
+      - "--conditions=tsx"
+      - ./ee/engine-server-ee/src/start.ts
   mailhog:
     image: mailhog/mailhog
 

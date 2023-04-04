@@ -25,8 +25,9 @@ test('file selection', async ({ page }) => {
 	])
 	await fileChooser.setFiles('./tests/playwright/cases/data/logo.png')
 
-	await page.waitForTimeout(1000)
+	await page.waitForTimeout(500)
 	await page.waitForLoadState('networkidle')
+	await page.waitForTimeout(1000)
 
 	expect(await page.screenshot({ animations: 'disabled' })).toMatchSnapshot('02-upload.png')
 

@@ -15660,7 +15660,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"json5@npm:^2.1.2, json5@npm:^2.1.3, json5@npm:^2.2.1, json5@npm:^2.2.2":
+"json5@npm:^2.1.2, json5@npm:^2.1.3, json5@npm:^2.2.1, json5@npm:^2.2.2, json5@npm:^2.2.3":
   version: 2.2.3
   resolution: "json5@npm:2.2.3"
   bin:
@@ -19604,6 +19604,7 @@ __metadata:
     eslint-plugin-react-hooks: ^4.6.0
     fast-glob: ^3.2.12
     jsdom: ^17.0.0
+    json5: ^2.2.3
     prettier: 2.3.2
     react: ^18.2.0
     react-dom: ^18.2.0

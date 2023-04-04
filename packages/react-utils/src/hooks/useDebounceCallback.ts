@@ -6,7 +6,7 @@ export const useDebounceCallback = (cb: () => any, debounceMs: number) => {
 	cbRef.current = cb
 
 	useEffect(() => {
-		return () => timerRef.current && clearTimeout(timerRef.current)
+		return () => clearTimeout(timerRef.current)
 	}, [])
 
 	return useCallback(() => {

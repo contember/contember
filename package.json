@@ -32,6 +32,9 @@
 		"ae:test": "yarn workspaces foreach -pt run ae:test",
 		"build:js:prod": "yarn workspaces foreach run build",
 		"admin:pw:build": "yarn workspace @contember/admin run pw:build",
+		"admin:pw:preview": "yarn workspace @contember/admin run pw:preview",
+		"admin:pw:update": "yarn workspace @contember/admin run pw:update",
+		"admin:pw:report": "yarn workspace @contember/admin run pw:report",
 		"admin:pw:test": "yarn workspace @contember/admin run pw:test",
 		"vite": "cd packages/admin-sandbox && yarn run start",
 		"as:build": "yarn workspace @contember/admin-server run build"

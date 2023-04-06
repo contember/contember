@@ -1,4 +1,9 @@
-import { EnvironmentContext, useEnvironment } from '@contember/binding'
+import {
+	DataBindingProvider,
+	DataBindingStateComponentProps,
+	EnvironmentContext,
+	useEnvironment,
+} from '@contember/binding'
 import { ContainerSpinner, Message } from '@contember/ui'
 import {
 	ComponentType,
@@ -13,6 +18,7 @@ import {
 } from 'react'
 import { useCurrentRequest } from '../../routing'
 import { MiscPageLayout } from '../MiscPageLayout'
+import { FeedbackRenderer } from '../bindingFacade'
 import { PageErrorBoundary } from './PageErrorBoundary'
 
 export interface PageProvider<P> {
@@ -42,6 +48,7 @@ export interface PagesProps {
 	| PageProviderElement[]
 	| PageProviderElement
 	layout?: ComponentType<{ children?: ReactNode }>
+	bindingFeedbackRenderer?: ComponentType<DataBindingStateComponentProps>
 }
 
 type PageActionHandler = ComponentType<{ action?: string }>
@@ -84,7 +91,7 @@ function disallowAction(Component: ComponentType): PageActionHandler {
 /**
  * Pages element specifies collection of pages (component Page or component with getPageName static method).
  */
-export const Pages = ({ children, layout }: PagesProps) => {
+export const Pages = ({ children, layout, bindingFeedbackRenderer }: PagesProps) => {
 	const rootEnv = useEnvironment()
 	const request = useCurrentRequest()
 	const requestId = useRef<number>(0)
@@ -196,7 +203,11 @@ export const Pages = ({ children, layout }: PagesProps) => {
 	return (
 		<EnvironmentContext.Provider value={requestEnv}>
 			<Layout>
-				<PageErrorBoundary key={requestId.current++}><Page action={pageAction} /></PageErrorBoundary>
+				<PageErrorBoundary key={requestId.current++}>
+					<DataBindingProvider stateComponent={bindingFeedbackRenderer ?? FeedbackRenderer}>
+						<Page action={pageAction} />
+					</DataBindingProvider>
+				</PageErrorBoundary>
 			</Layout>
 		</EnvironmentContext.Provider>
 	)

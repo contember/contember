@@ -22,6 +22,7 @@ import { ColorInputProps } from '@contember/ui';
 import { ComponentType } from 'react';
 import { ContemberClientProps } from '@contember/react-client';
 import { ControlProps } from '@contember/ui';
+import { DataBindingStateComponentProps } from '@contember/binding';
 import { DateInputProps } from '@contember/ui';
 import { DateTimeInputProps } from '@contember/ui';
 import { Default } from '@contember/ui';
@@ -937,6 +938,15 @@ export const createReferenceElementPlugin: (args: ReferenceElementOptions) => Cu
 export const CreateResetPasswordRequestForm: FC<CreateResetPasswordRequestFormProps>;
 
 // @public (undocumented)
+export const CreateScope: Partial<CreateScopeProps> & ComponentType<CreateScopeProps>;
+
+// @public (undocumented)
+export type CreateScopeProps = Omit<SugaredUnconstrainedQualifiedSingleEntity, 'isCreating'> & EntitySubTreeAdditionalProps & EntitySubTreeAdditionalCreationProps & {
+    children: ReactNode;
+    redirectOnSuccess?: RedirectOnSuccessTarget;
+};
+
+// @public (undocumented)
 export const CurrentRequestContext: React.Context<RequestState>;
 
 // @public (undocumented)
@@ -1323,6 +1333,14 @@ export type DetailPageProps = SugaredQualifiedSingleEntity & EntitySubTreeAdditi
 };
 
 // @public (undocumented)
+export const DetailScope: Partial<DetailScopeProps> & ComponentType<DetailScopeProps>;
+
+// @public (undocumented)
+export type DetailScopeProps = SugaredQualifiedSingleEntity & EntitySubTreeAdditionalProps & {
+    children: ReactNode;
+};
+
+// @public (undocumented)
 export interface DimensionDatum {
     // (undocumented)
     label: ReactNode;
@@ -1568,6 +1586,17 @@ export type EditPageProps = SugaredQualifiedSingleEntity & EntitySubTreeAddition
     skipBindingStateUpdateAfterPersist?: boolean;
 };
 
+// @public (undocumented)
+export const EditScope: Partial<EditScopeProps> & ComponentType<EditScopeProps>;
+
+// @public (undocumented)
+export type EditScopeProps = SugaredQualifiedSingleEntity & EntitySubTreeAdditionalProps & {
+    children: ReactNode;
+    redirectOnSuccess?: RedirectOnSuccessTarget;
+    refreshDataBindingOnPersist?: boolean;
+    skipBindingStateUpdateAfterPersist?: boolean;
+};
+
 // @public @deprecated (undocumented)
 export const EditUserInProject: FC<EditUserPageProps>;
 
@@ -1690,7 +1719,7 @@ export interface FeedbackRendererProps {
     // (undocumented)
     accessorTreeState: AccessorTreeState;
     // (undocumented)
-    children: ReactNode;
+    children?: ReactNode;
 }
 
 // @public (undocumented)
@@ -2722,6 +2751,17 @@ export type ListPageProps<ContainerExtraProps, ItemExtraProps> = SugaredQualifie
 };
 
 // @public (undocumented)
+export const ListScope: (<ContainerExtraProps, ItemExtraProps>(props: ListScopeProps<ContainerExtraProps, ItemExtraProps>) => ReactElement) & Partial<ListScopeProps<never, never>> & {
+    displayName?: string | undefined;
+};
+
+// @public (undocumented)
+export type ListScopeProps<ContainerExtraProps, ItemExtraProps> = SugaredQualifiedEntityList & EntityListSubTreeAdditionalProps & {
+    children?: ReactNode;
+    listProps?: Omit<ImmutableEntityListRendererProps<ContainerExtraProps, ItemExtraProps>, 'accessor' | 'children'>;
+};
+
+// @public (undocumented)
 export const LocationField: FunctionComponent<LocationFieldProps>;
 
 // @public (undocumented)
@@ -2922,6 +2962,19 @@ export type MultiEditPageProps<ContainerExtraProps, ItemExtraProps> = SugaredQua
     pageName?: string;
     children?: ReactNode;
     rendererProps?: Omit<MutableEntityListPageRendererProps<ContainerExtraProps, ItemExtraProps>, 'accessor' | 'children'>;
+};
+
+// @public (undocumented)
+export const MultiEditScope: (<ContainerExtraProps, ItemExtraProps>(props: MultiEditScopeProps<ContainerExtraProps, ItemExtraProps>) => ReactElement) & Partial<MultiEditScopeProps<never, never>> & {
+    displayName?: string | undefined;
+};
+
+// @public (undocumented)
+export type MultiEditScopeProps<ContainerExtraProps, ItemExtraProps> = SugaredQualifiedEntityList & EntityListSubTreeAdditionalProps & {
+    children?: ReactNode;
+    refreshDataBindingOnPersist?: boolean;
+    skipBindingStateUpdateAfterPersist?: boolean;
+    listProps?: Omit<MutableEntityListRendererProps<ContainerExtraProps, ItemExtraProps>, 'accessor' | 'children'>;
 };
 
 // @public (undocumented)
@@ -3153,7 +3206,7 @@ export interface PageRequest<P extends RequestParameters<RoutingParameter> = Req
 }
 
 // @public
-export const Pages: ({ children, layout }: PagesProps) => JSX.Element;
+export const Pages: ({ children, layout, bindingFeedbackRenderer }: PagesProps) => JSX.Element;
 
 // @public (undocumented)
 export type PagesMap = Record<string, PagesMapElement>;
@@ -3163,6 +3216,8 @@ export type PagesMapElement = LazyPageModule | PageModule | ComponentType<any> |
 
 // @public (undocumented)
 export interface PagesProps {
+    // (undocumented)
+    bindingFeedbackRenderer?: ComponentType<DataBindingStateComponentProps>;
     // (undocumented)
     children: PagesMap | PageProviderElement[] | PageProviderElement;
     // (undocumented)

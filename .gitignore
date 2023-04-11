@@ -15,6 +15,7 @@
 # build
 /dist
 /ee/**/dist
+/ee/**/LICENSE
 /ee/**/temp
 /packages/**/dist
 /packages/**/temp

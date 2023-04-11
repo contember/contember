@@ -4,7 +4,6 @@ import {
 	DataBindingProvider,
 	EntityId,
 	FeedbackRenderer,
-	LayoutRenderer,
 	Link,
 	LinkButton,
 	PersistButton,
@@ -13,6 +12,9 @@ import {
 	useEnvironment,
 	useOnPersistSuccess,
 } from '@contember/admin'
+import { NavigateBackLink } from '@contember/cms-layout'
+import { Actions, Back, ContentStack, Title } from '../components/Layout'
+import { MetaDirective } from '../components/MetaDirectives'
 
 const AutoGridList = () => {
 	const env = useEnvironment()
@@ -29,11 +31,14 @@ const AutoGridList = () => {
 }
 
 export default (
-	<DataBindingProvider stateComponent={FeedbackRenderer}>
-		<LayoutRenderer title={`Auto Admin`}>
-			<AutoGridList />
-		</LayoutRenderer>
-	</DataBindingProvider>
+	<>
+		<Title>Auto Admin</Title>
+		<ContentStack>
+			<DataBindingProvider stateComponent={FeedbackRenderer}>
+				<AutoGridList />
+			</DataBindingProvider>
+		</ContentStack>
+	</>
 )
 
 export function Grid() {
@@ -53,9 +58,18 @@ export function Grid() {
 
 	return (
 		<DataBindingProvider stateComponent={FeedbackRenderer}>
-			<LayoutRenderer title={`List ${entity}`} actions={actions} pageContentLayout="start">
+			<MetaDirective name="layout" content="legacy" />
+
+			<Back>
+				<NavigateBackLink to={{ pageName: 'auto' }}>Back to Auto</NavigateBackLink>
+			</Back>
+
+			<Title>{`List ${entity}`}</Title>
+
+			<Actions>{actions}</Actions>
+			<ContentStack>
 				<AutoGrid entities={entity + filter} createViewLinkTarget={createViewLinkTarget} createEditLinkTarget={createEditLinkTarget} />
-			</LayoutRenderer>
+			</ContentStack>
 		</DataBindingProvider>
 	)
 }
@@ -70,18 +84,22 @@ export function Form() {
 	const onCreateSuccess = useOnPersistSuccess({ redirectOnSuccess })
 	const createEditLink = (entity: string) => ({ pageName: 'auto/form', parameters: { entity, id: new RoutingParameter('entity.id') } })
 
-	const actions = (
-		<>
-			<LinkButton to={{ pageName: 'auto/grid', parameters: { entity } }}>Back to Grid</LinkButton>
-			<PersistButton />
-		</>
-	)
-
 	return (
-		<DataBindingProvider stateComponent={FeedbackRenderer}>
-			<LayoutRenderer title={title} actions={actions}>
-				<AutoForm entity={entity} id={id} onCreateSuccess={onCreateSuccess} createEditLink={createEditLink} />
-			</LayoutRenderer>
-		</DataBindingProvider>
+		<>
+			<Title>{title}</Title>
+			<Back>
+				<NavigateBackLink to={{ pageName: 'auto/grid', parameters: { entity } }}>Back to Grid</NavigateBackLink>
+			</Back>
+
+			<Actions>
+				<PersistButton />
+			</Actions>
+
+			<ContentStack>
+				<DataBindingProvider stateComponent={FeedbackRenderer} >
+					<AutoForm entity={entity} id={id} onCreateSuccess={onCreateSuccess} createEditLink={createEditLink} />
+				</DataBindingProvider>
+			</ContentStack>
+		</>
 	)
 }

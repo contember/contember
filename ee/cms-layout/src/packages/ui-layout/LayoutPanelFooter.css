@@ -1,0 +1,13 @@
+:where(.layout-panel-footer) {
+	bottom: 0;
+	position: sticky;
+	z-index: 1;
+}
+
+:where(.layout-panel-footer):empty {
+	display: none;
+}
+
+:where(.layout-panel-footer-spacer) {
+	flex-grow: 1;
+}

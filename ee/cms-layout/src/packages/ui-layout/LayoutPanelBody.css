@@ -1,0 +1,25 @@
+:where(.layout-panel-body) {
+	flex-basis: 100%;
+	max-width: var(--panel-max-width);
+	min-width: var(--panel-min-width, 0px);
+	overflow: auto;
+}
+:where(.layout-panel-body):empty {
+	display: none;
+}
+
+
+:where(.layout-panel-body.layout-panel-body-behavior-modal) {
+	max-width: unset;
+}
+
+:where(.layout-panel-body) {
+	transition-property: transform, opacity;
+	transition-timing-function: ease-in;
+	transition-duration: var(--cui-transition-duration);
+}
+
+:where(.layout-panel-body):where(.layout-panel-body-behavior-overlay, .layout-panel-body-behavior-modal) {
+	overscroll-behavior: contain;
+	overflow: hidden;
+}

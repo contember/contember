@@ -1,0 +1,18 @@
+:where(.layout) {
+	display: flex;
+	flex-direction: row;
+	flex: 1;
+}
+:where(.layout):where(
+	.cui-theme,
+	.scheme-light,
+	.scheme-dark,
+	.scheme-system,
+) {
+	background-color: var(--cui-background-color);
+	color: var(--cui-color);
+}
+
+.disable-transitions-on-resize, .disable-transitions-on-resize * {
+	transition-duration: 0ms !important;
+}

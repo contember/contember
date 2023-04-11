@@ -1,0 +1,53 @@
+html, body {
+	display: flex;
+	min-height: 100vh;
+	min-height: 100dvh;
+	min-width: 100vw;
+	min-width: 100dvw;
+	margin: 0;
+	padding: 0;
+}
+
+html {
+	min-height: 100vh;
+	min-height: 100dvh;
+	-webkit-text-size-adjust: 100%;
+}
+
+html, body {
+	overscroll-behavior: none;
+}
+
+:where(h1, h2, h3, h4, h5, h6, p, pre):last-child {
+	margin-bottom: 0;
+}
+
+:where(h1, h2, h3, h4, h5, h6, p, pre):first-child {
+	margin-top: 0;
+}
+
+:root {
+	--cui-rounding-grow: 0.05642;
+	--cui-gutter: calc(3 * var(--cui-gap));
+}
+
+.lucide,
+.svg-icon {
+	--size: 1.5em;
+	display: inline-block;
+	height: var(--size);
+	line-height: 1em;
+	margin: calc((1em - var(--size)) / 2) -0.125em;
+	vertical-align: text-bottom;
+	width: var(--size);
+}
+
+/* HOTFIX: Firefox */
+.cui-breadcrumbs-item {
+	display: inline-flex;
+}
+
+.cui-button.view-squarish {
+	min-width: var(--cui-button-height);
+	min-height: var(--cui-button-height);
+}

@@ -1,3 +1,3 @@
-import { GenericPage } from '@contember/admin'
+import { Title } from '../components/Layout'
 
-export default () => <GenericPage>Hello from Lorem</GenericPage>
+export default () => <Title>Hello from Lorem</Title>

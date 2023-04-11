@@ -1,4 +1,5 @@
-import { Component, MultiEditPage, Repeater, SelectField, TextField } from '@contember/admin'
+import { Component, MultiEditScope, PersistButton, Repeater, SelectField, TextField } from '@contember/admin'
+import { Actions, Content, Title } from '../components/Layout'
 
 export const CategoryForm = Component(() => <>
 	<TextField field={'name'} label={'Name'} />
@@ -9,7 +10,16 @@ export const CategoryForm = Component(() => <>
 </>)
 
 export default () => (
-	<MultiEditPage entities="Category" rendererProps={{ title: 'Categories', sortableBy: 'order' }}>
-		<CategoryForm/>
-	</MultiEditPage>
+	// TODO: Implement `rendererProps={{  }}` for MultiEditScope
+	<>
+		<Title>Categories</Title>
+		<Content>
+			<MultiEditScope entities="Category" listProps={{
+				sortableBy: 'order',
+				beforeContent: <Actions><PersistButton /></Actions>,
+			}}>
+				<CategoryForm />
+			</MultiEditScope>
+		</Content>
+	</>
 )

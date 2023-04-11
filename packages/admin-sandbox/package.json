@@ -12,7 +12,9 @@
 	},
 	"devDependencies": {
 		"@contember/admin": "workspace:*",
+		"@contember/cms-layout": "workspace:*",
 		"@contember/interface-tester": "workspace:*",
+		"@contember/ui": "workspace:*",
 		"@welldone-software/why-did-you-render": "^6.2.3"
 	},
 	"dependencies": {

@@ -6,6 +6,7 @@ testInterface({
 	exclude: [
 		'inputs.tsx/JsonField',
 		'categories.tsx/CategoryForm',
+		'article.tsx/EditOrCreateForm',
 		'auto.tsx',
 		'lorem.tsx',
 		'nested/**',

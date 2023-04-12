@@ -1,4 +1,6 @@
-import crypto from 'node:crypto'
+import Sha256 from 'crypto-js/sha256'
+import EncHex from 'crypto-js/enc-hex'
+
 
 export class NamingHelper {
 	public static createForeignKeyIndexName(tableName: string, column: string) {
@@ -33,10 +35,7 @@ export class NamingHelper {
 	}
 
 	private static createUniqueSuffix = (values: string[]): string => {
-		const uniqueSuffix = crypto
-			.createHash('sha256')
-			.update(JSON.stringify(values), 'ascii')
-			.digest('hex')
+		const uniqueSuffix = Sha256(JSON.stringify(values)).toString(EncHex)
 		return uniqueSuffix.slice(0, 6)
 	}
 }

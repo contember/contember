@@ -1,3 +1,4 @@
+import react from '@vitejs/plugin-react'
 import { Readable } from 'stream'
 import { defineConfig } from 'vite'
 import { initContemberProjectDev } from '../utils'
@@ -5,13 +6,14 @@ import { initContemberProjectDev } from '../utils'
 const packagesDir = __dirname + '/../../../..'
 
 export default defineConfig({
-	esbuild: {
-		jsxFactory: '_jsx',
-		jsxFragment: '_jsxFragment',
-		jsxInject: `import { createElement as _jsx, Fragment as _jsxFragment } from 'react'`,
-	},
+	root: 'tests/playwright/admin',
 	build: {
-		chunkSizeWarningLimit: undefined,
+		minify: false,
+		rollupOptions: {
+			input: 'tests/playwright/admin/index.html',
+			output: { dir: 'tests/playwright/admin/dist' },
+			treeshake: { moduleSideEffects: true },
+		},
 	},
 	css: {
 		preprocessorOptions: {
@@ -42,7 +44,7 @@ export default defineConfig({
 		port: 3007,
 		host: '0.0.0.0',
 	},
-	plugins: [{
+	plugins: [react(), {
 		name: 'initContemberProject',
 		configureServer(server) {
 			async function toJson(stream: Readable) {

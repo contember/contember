@@ -1,5 +1,8 @@
+import { useProjectSlug } from '@contember/react-client'
 import { Schema } from '@contember/schema'
 import { InputValidation, PermissionsBuilder, SchemaDefinition } from '@contember/schema-definition'
+import { CSSProperties, ReactNode, createContext, useContext, useEffect, useState } from 'react'
+import { createRoot } from 'react-dom/client'
 import {
 	ApplicationEntrypoint,
 	ContainerSpinner,
@@ -10,9 +13,7 @@ import {
 	runReactApp,
 	useCurrentRequest,
 } from '../../../src'
-import { createContext, CSSProperties, ReactNode, useContext, useEffect, useState } from 'react'
 import './index.sass'
-import { useProjectSlug } from '@contember/react-client'
 
 const projectSlug = window.location.pathname.split('/')[1]
 const pages = import.meta.glob<PageModule>('../cases/**/*.tsx')
@@ -120,6 +121,8 @@ if (import.meta.env.DEV) {
 				)}
 			</ProjectSlugProvider>
 		</div>,
+		null,
+		(dom, react, onRecoverableError) => createRoot(dom, { onRecoverableError }).render(react),
 	)
 
 } else {
@@ -132,5 +135,7 @@ if (import.meta.env.DEV) {
 			basePath={'/' + projectSlug + '/'}
 			children={<Pages children={pages} />}
 		/>,
+		null,
+		(dom, react, onRecoverableError) => createRoot(dom, { onRecoverableError }).render(react),
 	)
 }

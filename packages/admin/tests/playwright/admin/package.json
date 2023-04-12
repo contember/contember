@@ -1,0 +1,5 @@
+{
+	"name": "playwright-tests",
+	"private": "true",
+	"sideEffects": true
+}

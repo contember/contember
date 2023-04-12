@@ -3118,18 +3118,16 @@ __metadata:
   linkType: soft
 
 "@contember/admin@npm:^1.1.0-rc.2":
-  version: 1.1.0-rc.5
-  resolution: "@contember/admin@npm:1.1.0-rc.5"
+  version: 1.1.0
+  resolution: "@contember/admin@npm:1.1.0"
   dependencies:
-    "@babel/core": 7.17.10
-    "@contember/binding": 1.1.0-rc.5
-    "@contember/client": 1.1.0-rc.5
-    "@contember/react-client": 1.1.0-rc.5
-    "@contember/react-multipass-rendering": 1.1.0-rc.5
-    "@contember/react-utils": 1.1.0-rc.5
-    "@contember/ui": 1.1.0-rc.5
+    "@contember/binding": 1.1.0
+    "@contember/client": 1.1.0
+    "@contember/react-client": 1.1.0
+    "@contember/react-multipass-rendering": 1.1.0
+    "@contember/react-utils": 1.1.0
+    "@contember/ui": 1.1.0
     "@formatjs/icu-messageformat-parser": 2.0.11
-    "@mangoweb/sass-base": 0.0.8
     "@sindresorhus/slugify": 0.11.0
     blueimp-md5: 2.18.0
     buffer: 6.0.3
@@ -3152,7 +3150,7 @@ __metadata:
   peerDependencies:
     react: ^17 || ^18
     react-dom: ^17 || ^18
-  checksum: c1e54f488b81174646c3e2b357140c4402b44a0ad40c3efd6d8f64b30708ed6fa179d5c68b8cb88db4efc38207bfb4b251d5ebbd32c74086f1d080403e0c5814
+  checksum: 411b30043c07fc4a510644a6577a715521041a50172a8a024c571ca6dbc3b65f86933c56864dc87f7cb9757f8982e4ad5f38c5dbb761ea45f68e7f5d4e3b186f
   languageName: node
   linkType: hard
 
@@ -3215,14 +3213,14 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@contember/binding@npm:1.1.0-rc.5":
-  version: 1.1.0-rc.5
-  resolution: "@contember/binding@npm:1.1.0-rc.5"
+"@contember/binding@npm:1.1.0":
+  version: 1.1.0
+  resolution: "@contember/binding@npm:1.1.0"
   dependencies:
-    "@contember/client": 1.1.0-rc.5
-    "@contember/react-client": 1.1.0-rc.5
-    "@contember/react-multipass-rendering": 1.1.0-rc.5
-    "@contember/react-utils": 1.1.0-rc.5
+    "@contember/client": 1.1.0
+    "@contember/react-client": 1.1.0
+    "@contember/react-multipass-rendering": 1.1.0
+    "@contember/react-utils": 1.1.0
     chevrotain: 6.5.0
     fast-deep-equal: ^3.1.3
     js-levenshtein: 1.1.6
@@ -3230,7 +3228,7 @@ __metadata:
   peerDependencies:
     react: ^17 || ^18
     react-dom: ^17 || ^18
-  checksum: 1d8b8f18728618fde4aabc7d5c49a243f9d09e26d0111a2089f35cad11ed7946f0492d93b4ca2dbbce3095885125fdc277c5e2cb6df1d80d9e955ab2ce7ac40c
+  checksum: 40f1e1c050cddf9057b3b2dff62eb1ed866b0f48c26ca6a78e984d71f9ef8eb74441dc272c192efd93c7fd1f7549411406c1e1fcdf78bf5136bceec5df13b692
   languageName: node
   linkType: hard
 
@@ -3256,13 +3254,13 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@contember/client@npm:1.1.0-rc.5":
-  version: 1.1.0-rc.5
-  resolution: "@contember/client@npm:1.1.0-rc.5"
+"@contember/client@npm:1.1.0":
+  version: 1.1.0
+  resolution: "@contember/client@npm:1.1.0"
   dependencies:
     "@contember/schema": ^1.2.0
     p-limit: ^4.0.0
-  checksum: 60c8379470eb07c493304d792d9ed5e989e12de3eb2cc083757711bc190f0fe8ac5a8c7b13761088f9d0a8eca481988f398d930b8ae6f731bf829a67426489ab
+  checksum: 7d5b537c43c67c960a2926e7b8d8b4c1fbf4b67ff273bbf088027e8a1187702cd4fc5cfcd552796dd591ac5d8006b2a9ca60e9d79c5d4fcc5a693e03eeb8bbe1
   languageName: node
   linkType: hard
 
@@ -3348,14 +3346,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@contember/react-client@npm:1.1.0-rc.5":
-  version: 1.1.0-rc.5
-  resolution: "@contember/react-client@npm:1.1.0-rc.5"
+"@contember/react-client@npm:1.1.0":
+  version: 1.1.0
+  resolution: "@contember/react-client@npm:1.1.0"
   dependencies:
-    "@contember/client": 1.1.0-rc.5
+    "@contember/client": 1.1.0
   peerDependencies:
     react: ^17 || ^18
-  checksum: ebd12ed1935d42791192b3b96b48314233a1ef883413487ab6271f59ffc33c8c17f4d225e0e4c1d3f181fc78db3eb32314e52ecbfb364d4db5cb1c9c93de7e71
+  checksum: 6f8b1505b2ed36853a43e8a8a7afd1de1a1991f7dabcf1ac2a0ebff37ee9cf4442b165851a1859edd97ee8d1baaf8ce390dce16eba936be7d375331e240e2187
   languageName: node
   linkType: hard
 
@@ -3369,12 +3367,12 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@contember/react-multipass-rendering@npm:1.1.0-rc.5":
-  version: 1.1.0-rc.5
-  resolution: "@contember/react-multipass-rendering@npm:1.1.0-rc.5"
+"@contember/react-multipass-rendering@npm:1.1.0":
+  version: 1.1.0
+  resolution: "@contember/react-multipass-rendering@npm:1.1.0"
   peerDependencies:
     react: ^17 || ^18
-  checksum: 76a1abbd26d77a07bc791fe7969102b9e07c08c9d4ff09b33e5cb05fe05ad2086ede3e03c988dd88aa79155a41b258248ad9c085d6e80b237abc1d196a617525
+  checksum: 1aee4a5fa8d990b314475165f490c635c2e9e7e8a31dba4460ed20f1a57d39027e2ab11d235177a4ffca32cb9b8bd1aba0f47c157561a2210df6359be39c7997
   languageName: node
   linkType: hard
 
@@ -3392,15 +3390,6 @@ __metadata:
   peerDependencies:
     react: ^17 || ^18
   checksum: e182e8debe891c09c6a128601954c02d81e50f19587dee9b198940ea66b116179ec6010db99c0ea56b1520caf11eda80619a06eb0166d144a56047cf52ce6f35
-  languageName: node
-  linkType: hard
-
-"@contember/react-utils@npm:1.1.0-rc.5":
-  version: 1.1.0-rc.5
-  resolution: "@contember/react-utils@npm:1.1.0-rc.5"
-  peerDependencies:
-    react: ^17 || ^18
-  checksum: bd365377e0f4ffb4fb0b4bbaee450a49e3795d4dfab92d0d1073f7239cb671e44a3155b8d6429645e6d3ece2cf9db7173254adf2e2bd7a655c32b12cb73a1948
   languageName: node
   linkType: hard
 
@@ -3463,30 +3452,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@contember/ui@npm:1.1.0-rc.5":
-  version: 1.1.0-rc.5
-  resolution: "@contember/ui@npm:1.1.0-rc.5"
-  dependencies:
-    "@blueprintjs/icons": 3.29.0
-    "@contember/react-multipass-rendering": 1.1.0-rc.5
-    "@contember/react-utils": 1.1.0-rc.5
-    "@mangoweb/sass-base": 0.0.8
-    "@popperjs/core": 2.10.2
-    chroma-js: 2.1.2
-    classnames: 2.3.1
-    react-aria: ^3.20.0
-    react-popper: ^2.3.0
-    react-select: 5.3.2
-    react-stately: ^3.18.0
-    react-textarea-autosize: ^8.3.4
-  peerDependencies:
-    react: ^17 || ^18
-    react-dom: ^17 || ^18
-  checksum: f5565d05ec5119ba6f6c2adf7f0f8590caff75cd5c5e7d81fd3d0d8d9f24e9b2b7c72c61c6d5b9e0b529daf46b37e0e16a8423996c8f1f0ded3896433e60cd39
-  languageName: node
-  linkType: hard
-
-"@contember/ui@npm:^1.1.0-rc.2":
+"@contember/ui@npm:1.1.0, @contember/ui@npm:^1.1.0-rc.2":
   version: 1.1.0
   resolution: "@contember/ui@npm:1.1.0"
   dependencies:
@@ -10544,15 +10510,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"chroma-js@npm:2.1.2":
-  version: 2.1.2
-  resolution: "chroma-js@npm:2.1.2"
-  dependencies:
-    cross-env: ^6.0.3
-  checksum: abbd70377446e3cc401ac58c40cdac6c70c41a349e6aca08881d0deb775051ba69c93099f4d47ef83c41b4562b0480b5dfd56d77e2e6f3a81ebb6667ce8d4627
-  languageName: node
-  linkType: hard
-
 "chrome-trace-event@npm:^1.0.2":
   version: 1.0.3
   resolution: "chrome-trace-event@npm:1.0.3"
@@ -11166,18 +11123,6 @@ __metadata:
     safe-buffer: ^5.0.1
     sha.js: ^2.4.8
   checksum: ba12bb2257b585a0396108c72830e85f882ab659c3320c83584b1037f8ab72415095167ced80dc4ce8e446a8ecc4b2acf36d87befe0707d73b26cf9dc77440ed
-  languageName: node
-  linkType: hard
-
-"cross-env@npm:^6.0.3":
-  version: 6.0.3
-  resolution: "cross-env@npm:6.0.3"
-  dependencies:
-    cross-spawn: ^7.0.0
-  bin:
-    cross-env: src/bin/cross-env.js
-    cross-env-shell: src/bin/cross-env-shell.js
-  checksum: 1b2d532ad7beff8017db7c28fbee8f902377969b8090cd2b8716ec93bef958bb2838cd061c89c30e904d72f3ff7d3a4e80f0d762b14e60e8191a576be1376578
   languageName: node
   linkType: hard
 
@@ -21525,12 +21470,12 @@ __metadata:
   linkType: hard
 
 "typescript@npm:^5.0.2":
-  version: 5.0.4
-  resolution: "typescript@npm:5.0.4"
+  version: 5.0.2
+  resolution: "typescript@npm:5.0.2"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
-  checksum: 82b94da3f4604a8946da585f7d6c3025fff8410779e5bde2855ab130d05e4fd08938b9e593b6ebed165bda6ad9292b230984f10952cf82f0a0ca07bbeaa08172
+  checksum: bef1dcd166acfc6934b2ec4d72f93edb8961a5fab36b8dd2aaf6f4f4cd5c0210f2e0850aef4724f3b4913d5aef203a94a28ded731b370880c8bcff7e4ff91fc1
   languageName: node
   linkType: hard
 
@@ -21545,12 +21490,12 @@ __metadata:
   linkType: hard
 
 "typescript@patch:typescript@^5.0.2#~builtin<compat/typescript>":
-  version: 5.0.4
-  resolution: "typescript@patch:typescript@npm%3A5.0.4#~builtin<compat/typescript>::version=5.0.4&hash=85af82"
+  version: 5.0.2
+  resolution: "typescript@patch:typescript@npm%3A5.0.2#~builtin<compat/typescript>::version=5.0.2&hash=85af82"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
-  checksum: bb309d320c59a26565fb3793dba550576ab861018ff3fd1b7fccabbe46ae4a35546bc45f342c0a0b6f265c801ccdf64ffd68f548f117ceb7f0eac4b805cd52a9
+  checksum: b63cb742fbb9aeb3085e002ad8f10d5fd963606aa4d6b3b65b4e76c396ff09739f03b5dbae08e1698c3bce9d5619d3f67aeb7ee470ed4016bd345b3cfe37b54a
   languageName: node
   linkType: hard
 

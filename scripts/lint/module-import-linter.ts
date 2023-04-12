@@ -13,6 +13,8 @@ const allowedDirectoryImports = new Set([
 	'nodemailer/lib/smtp-pool',
 	'nodemailer/lib/sendmail-transport',
 	'nodemailer/lib/ses-transport',
+	'crypto-js/sha256',
+	'crypto-js/enc-hex',
 ])
 
 const processPackage = async (dir: string, projectList: ProjectList) => {

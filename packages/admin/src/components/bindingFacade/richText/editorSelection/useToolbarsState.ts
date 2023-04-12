@@ -30,12 +30,11 @@ function updateToolbarStyle(container: HTMLDivElement, selectionState: EditorSel
 
 	if (domRangeRect) {
 		top = `${domRangeRect.top + window.pageYOffset - container.offsetHeight}px`
-		left = `${
-			Math.min(
-				Math.max(0, document.documentElement.clientWidth - container.offsetWidth),
-				Math.max(0, domRangeRect.left + window.pageXOffset - container.offsetWidth / 2 + domRangeRect.width / 2),
-			)
-		}px`
+		left = `${Math.min(
+			Math.max(0, document.documentElement.clientWidth - container.offsetWidth),
+			Math.max(0, domRangeRect.left + window.pageXOffset - container.offsetWidth / 2 + domRangeRect.width / 2),
+		)
+			}px`
 		maxWidth = `${document.documentElement.clientWidth}px`
 	} else {
 		top = '-1000vh'
@@ -69,7 +68,7 @@ export const useToolbarState = (): ToolbarsState => {
 
 	useEffect(() => {
 		const container = inlineToolbarRef.current
-		let timeoutId: NodeJS.Timeout
+		let timeoutId: ReturnType<typeof setTimeout>
 
 		function resize() {
 			if (!container) {

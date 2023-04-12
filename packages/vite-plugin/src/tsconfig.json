@@ -1,6 +1,7 @@
 {
 	"extends": "../../../tsconfig.settings.json",
 	"compilerOptions": {
-		"outDir": "../dist/types"
+		"outDir": "../dist/types",
+		"types": ["node"],
 	}
 }

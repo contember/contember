@@ -1,7 +1,8 @@
-import ts from 'typescript'
-import * as fs from 'fs/promises'
-import { join, normalize } from 'path'
 import glob from 'fast-glob'
+import * as fs from 'fs/promises'
+import JSON5 from 'json5'
+import { join, normalize } from 'path'
+import ts from 'typescript'
 
 const globalModules = new Set(['vitest'])
 const allowedUnused = new Set([
@@ -19,7 +20,7 @@ const processPackage = async (dir: string, projectList: ProjectList) => {
 	const files = await glob(`${dir}/src/**/*.{ts,tsx}`, { onlyFiles: true })
 	const contents = await Promise.all(files.map(async (it): Promise<[file: string, content: string]> => [it, await fs.readFile(it, 'utf-8')]))
 	const imports = new Set<string>()
-	const errors: {file: string; message: string}[] = []
+	const errors: { file: string; message: string }[] = []
 	for (const [file, content] of contents) {
 		const sourceFile = ts.createSourceFile(file, content, ts.ScriptTarget.ESNext)
 		sourceFile.forEachChild(node => {
@@ -118,8 +119,8 @@ interface Project {
 
 	const projects = await Promise.all(dirs.map(async (dir): Promise<Project> => {
 		try {
-			const packageJson = JSON.parse(await fs.readFile(`${dir}/package.json`, 'utf8'))
-			const tsconfig = JSON.parse(await fs.readFile(`${dir}/src/tsconfig.json`, 'utf8'))
+			const packageJson = JSON5.parse(await fs.readFile(`${dir}/package.json`, 'utf8'))
+			const tsconfig = JSON5.parse(await fs.readFile(`${dir}/src/tsconfig.json`, 'utf8'))
 			return {
 				dir,
 				name: packageJson.name,

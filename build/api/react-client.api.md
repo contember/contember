@@ -4,8 +4,6 @@
 
 ```ts
 
-/// <reference types="react" />
-
 import { ComponentType } from 'react';
 import { Context } from 'react';
 import type { FileUploader } from '@contember/client';

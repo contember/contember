@@ -1,5 +1,3 @@
-import { isDeepStrictEqual } from 'node:util'
-
 type Unpacked<T> = T extends readonly (infer U)[] ? U : never
 
 export type JsonObject = {
@@ -242,6 +240,18 @@ export const union = <T extends Type<Json>[]>(...inner: T): Type<ReturnType<Unpa
 	return type
 }
 
+const isSamePath = (a: PropertyKey[], b: PropertyKey[]) => {
+	if (a.length !== b.length) {
+		return false
+	}
+	for (let i = 0; i < a.length; i++) {
+		if (a[i] !== b[i]) {
+			return false
+		}
+	}
+	return true
+}
+
 export const partiallyDiscriminatedUnion = <T extends Type<JsonObject>[]>(field: string, ...inner: T): Type<ReturnType<Unpacked<T>>> => {
 	const type = (input: unknown, path: PropertyKey[] = []): ReturnType<Unpacked<T>> => {
 		const errors = []
@@ -250,7 +260,7 @@ export const partiallyDiscriminatedUnion = <T extends Type<JsonObject>[]>(field:
 				return innerInner(input, path) as any
 			} catch (e) {
 				if (e instanceof ParseError) {
-					if (isDeepStrictEqual(e.path, [...path, field])) {
+					if (isSamePath(e.path, [...path, field])) {
 						continue
 					}
 					errors.push(' '.repeat('ParseError: '.length) + e.message)

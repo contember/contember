@@ -148,7 +148,7 @@ export class ModelValidator {
 				return errors.add('MODEL_INVALID_RELATION_DEFINITION', `${relationDescription} inverse relation is not set`)
 			}
 			if (targetField.inversedBy !== field.name) {
-				return errors.add('MODEL_INVALID_RELATION_DEFINITION', `${relationDescription} back reference ${entityName}::${field.name} exepcted, ${targetField.target}::${targetField.inversedBy} given`)
+				return errors.add('MODEL_INVALID_RELATION_DEFINITION', `${relationDescription} back reference ${entityName}::${field.name} expected, ${targetField.target}::${targetField.inversedBy} given`)
 			}
 			if (field.type === Model.RelationType.OneHasOne && targetField.type !== Model.RelationType.OneHasOne) {
 				return errors.add('MODEL_INVALID_RELATION_DEFINITION', `${relationDescription} "OneHasOne" type expected, "${targetField.type}" given`)
@@ -185,7 +185,7 @@ export class ModelValidator {
 					return errors.add('MODEL_INVALID_RELATION_DEFINITION', `${relationDescription} owning relation is not set`)
 				}
 				if (targetField.ownedBy !== field.name) {
-					return errors.add('MODEL_INVALID_RELATION_DEFINITION', `${relationDescription} back reference ${entityName}::${field.name} exepcted, ${targetField.target}::${targetField.ownedBy} given`)
+					return errors.add('MODEL_INVALID_RELATION_DEFINITION', `${relationDescription} back reference ${entityName}::${field.name} expected, ${targetField.target}::${targetField.ownedBy} given`)
 				}
 				if (field.type === Model.RelationType.OneHasOne && targetField.type !== Model.RelationType.OneHasOne) {
 					return errors.add('MODEL_INVALID_RELATION_DEFINITION', `${relationDescription} "OneHasOne" type expected, "${targetField.type}" given`)

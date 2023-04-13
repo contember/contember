@@ -7,7 +7,7 @@ const RESERVED_WORDS = ['and', 'or', 'not']
 
 
 export class ModelValidator {
-	constructor(private readonly model: Model.Schema) {}
+	constructor(private readonly model: Model.Schema) { }
 
 	public validate(): ValidationError[] {
 		const errorBuilder = new ErrorBuilder([], [])
@@ -79,7 +79,7 @@ export class ModelValidator {
 		}
 	}
 
-	private validateRelation(partialEntity: Model.Entity, field: Model.AnyRelation, errors: ErrorBuilder):  void {
+	private validateRelation(partialEntity: Model.Entity, field: Model.AnyRelation, errors: ErrorBuilder): void {
 		const entityName = partialEntity.name
 		const targetEntityName = field.target
 		const targetEntity = this.model.entities[targetEntityName] || undefined
@@ -259,11 +259,11 @@ export class ModelValidator {
 					}
 					aliasedTypes.set(column.typeAlias, column.type)
 				},
-				visitManyHasManyInverse: () => {},
-				visitOneHasMany: () => {},
-				visitOneHasOneInverse: () => {},
-				visitOneHasOneOwning: () => {},
-				visitManyHasOne: () => {},
+				visitManyHasManyInverse: () => { },
+				visitOneHasMany: () => { },
+				visitOneHasOneInverse: () => { },
+				visitOneHasOneOwning: () => { },
+				visitManyHasOne: () => { },
 			})
 		}
 		for (const entity of entities) {

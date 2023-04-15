@@ -1,4 +1,4 @@
-import { Model, Schema, Writable } from '@contember/schema'
+import { Acl, Model, Schema, Writable } from '@contember/schema'
 import {
 	acceptFieldVisitor,
 	DefaultNamingConventions,
@@ -18,19 +18,41 @@ export class TsDefinitionGenerator {
 	}
 
 	public generate() {
+		const roles = Object.entries(this.schema.acl.roles).map(([name, values]) => this.generateRole({ name, values })).join('')
+		const aclVariables = this.generateAclVariables().join('')
 		const enums = Object.entries(this.schema.model.enums).map(([name, values]) => this.generateEnum({
 			name,
 			values,
 		})).join('')
 		const entities = Object.values(this.schema.model.entities).map(entity => this.generateEntity({ entity })).join('')
-		return `import { SchemaDefinition as def } from '@contember/schema-definition'
-${enums}${entities}`
+		return `import { SchemaDefinition as def, AclDefinition as acl } from '@contember/schema-definition'
+${roles}${aclVariables}${enums}${entities}`
+	}
+
+	private generateRole({ name, values }: { name: string; values: Acl.RolePermissions }): string {
+		return `\nexport const ${this.roleName(name)} = acl.createRole('${name}', {
+	s3: ${JSON.stringify(values.s3, null, '\t').replace(/^/gm, '\t').trim()},
+	stages: ${JSON.stringify(values.stages, null, '\t').replace(/^/gm, '\t').trim()},
+}) \n`
+	}
+
+	private generateAclVariables(): string[] {
+		const variablesOutput: string[] = []
+
+		Object.entries(this.schema.acl.roles).map(([roleName, roleValues]) => {
+			Object.entries(roleValues.variables).map(([variableName, variableValues]) => {
+				if (variableValues.type === Acl.VariableType.predefined) {
+					variablesOutput.push(`\nexport const ${this.variableName(roleName, variableName)} = acl.createPredefinedVariable('${this.variableName(roleName, variableName)}', '${variableValues.value}', [${this.roleName(roleName)}])\n`)
+				}
+			})
+		})
+
+		return variablesOutput
 	}
 
 	private generateEnum({ name, values }: { name: string; values: readonly string[] }): string {
 		return `\nexport const ${this.formatIdentifier(name)} = def.createEnum(${values.map(it => this.formatLiteral(it)).join(', ')})\n`
 	}
-
 
 	public generateEntity({ entity }: { entity: Model.Entity }): string {
 		const decorators = [
@@ -38,8 +60,9 @@ ${enums}${entities}`
 			...Object.values(entity.indexes).map(index => this.generateIndex({ entity, index })),
 			this.generateView({ entity }),
 		].filter(it => !!it).map(it => `${it}\n`).join('')
+		const acl = this.generateEntityAcl({ entity })
 
-		return `\n${decorators}export class ${this.formatIdentifier(entity.name)} {
+		return `\n${decorators}${acl}export class ${this.formatIdentifier(entity.name)} {
 ${Object.values(entity.fields).map(field => this.generateField({ field, entity })).filter(it => !!it).join('\n')}
 }\n`
 	}
@@ -60,6 +83,71 @@ ${Object.values(entity.fields).map(field => this.generateField({ field, entity }
 			return `@def.Index(${fieldsList})`
 		}
 		return `@def.Index(${this.formatLiteral(index)})`
+	}
+
+	private generateEntityAcl({ entity }: { entity: Model.Entity }): string {
+		const aclOutput: string[] = []
+		const numberOfEntityFieldsWithoutId = Object.keys(entity.fields).length - 1
+		Object.entries(this.schema.acl.roles).map(([roleName, roleValues]) => {
+			if (entity.name in roleValues.entities) {
+				if (roleValues.entities[entity.name].operations.read) {
+					roleValues.entities[entity.name].operations.read
+				}
+				const whenCondition = this.getPredicate({ predicates: roleValues.entities[entity.name].predicates, roleName })
+				const operationRead = this.getEnabledFieldsForOperation({ permissions: roleValues.entities[entity.name].operations.read, numberOfEntityFieldsWithoutId })
+				const operationCreate = this.getEnabledFieldsForOperation({ permissions: roleValues.entities[entity.name].operations.create, numberOfEntityFieldsWithoutId })
+				const operationUpdate = this.getEnabledFieldsForOperation({ permissions: roleValues.entities[entity.name].operations.update, numberOfEntityFieldsWithoutId })
+				const operationDelete = roleValues.entities[entity.name].operations.delete
+				aclOutput.push(`@acl.allow(${this.roleName(roleName)}, {${whenCondition} read: ${operationRead}, create: ${operationCreate}, update: ${operationUpdate}, delete: ${operationDelete} })\n`)
+			}
+		})
+		if (!aclOutput.length) {
+			return ''
+		}
+		return `\n${aclOutput.join('')}`
+	}
+
+	private getPredicate({ predicates, roleName }: { predicates: Acl.PredicateMap; roleName: string }): string {
+		const predicatesOutput: object[] = []
+		const predicatesEntries = Object.entries(predicates)
+
+		if (!predicatesEntries.length) {
+			return ''
+		}
+
+		predicatesEntries.map(([name, values]) => {
+			predicatesOutput.push(values)
+		})
+
+		let predicatesString = ` when: ${JSON.stringify(
+			// TODO: more predicates
+			predicatesOutput[0],
+			(key, value) => {
+				const variables = Object.keys(this.schema.acl.roles[roleName].variables)
+				if (variables.includes(value)) {
+					return this.variableName(roleName, value)
+				}
+				return value
+			},
+			1)},`
+		predicatesString = predicatesString.replace(/^ +/gm, ' ')
+		predicatesString = predicatesString.replace(/\n/g, '')
+		predicatesString = predicatesString.replaceAll('"', '')
+
+		return predicatesString
+	}
+
+	private getEnabledFieldsForOperation({ permissions, numberOfEntityFieldsWithoutId }: { permissions: Acl.FieldPermissions | undefined; numberOfEntityFieldsWithoutId: number }): string | boolean {
+		if (!permissions) {
+			return false
+		}
+		const enabledFields = Object.entries(permissions).filter(([name, value]) => Boolean(value))
+
+		if (enabledFields.length === numberOfEntityFieldsWithoutId) {
+			return true
+		}
+
+		return `[${enabledFields.map(([name]) => `'${name}'`).join(', ')}]`
 	}
 
 	private generateView({ entity }: { entity: Model.Entity }): string | undefined {
@@ -258,6 +346,14 @@ ${Object.values(entity.fields).map(field => this.generateField({ field, entity }
 
 	private isSimpleIdentifier(identifier: string): boolean {
 		return !!identifier.match(/^[_$a-zA-Z\xA0-\uFFFF][_$a-zA-Z0-9\xA0-\uFFFF]*$/)
+	}
+
+	private roleName(id: string): string {
+		return this.formatIdentifier(`${id}Role`)
+	}
+
+	private variableName(role: string, id: string): string {
+		return this.formatIdentifier(`${id}${role.charAt(0).toUpperCase() + role.slice(1)}Variable`)
 	}
 }
 

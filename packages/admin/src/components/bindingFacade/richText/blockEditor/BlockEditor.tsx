@@ -11,16 +11,17 @@ import {
 	useEnvironment,
 	VariableInputTransformer,
 } from '@contember/binding'
-import { emptyArray, noop } from '@contember/react-utils'
+import { emptyArray, noop, useReferentiallyStableCallback } from '@contember/react-utils'
 import { EditorCanvas, EditorCanvasSize, FieldContainer, Scheme } from '@contember/ui'
 import { Fragment, FunctionComponent, ReactElement, ReactNode, useCallback, useLayoutEffect, useMemo, useState } from 'react'
+import { SortEnd } from 'react-sortable-hoc'
 import { Range as SlateRange, Transforms } from 'slate'
 import { Slate } from 'slate-react'
 import { getDiscriminatedBlock, useNormalizedBlocks } from '../../blocks'
 import { Repeater, SortableRepeaterContainer } from '../../collections'
-import { shouldCancelStart } from '../../helpers/shouldCancelStart'
 import { SugaredDiscriminateBy, useDiscriminatedData } from '../../discrimination'
 import { TextareaField } from '../../fields'
+import { shouldCancelStart } from '../../helpers/shouldCancelStart'
 import { createEditorWithEssentials } from '../baseEditor'
 import { EditableCanvas } from '../baseEditor/EditableCanvas'
 import type { CreateEditorPublicOptions } from '../editorFactory'
@@ -44,8 +45,6 @@ import { useInsertElementWithReference } from './references/useInsertElementWith
 import { SortedBlocksContext } from './state/SortedBlocksContext'
 import { useBlockEditorState } from './state/useBlockEditorState'
 import { ContentOutlet, ContentOutletProps, useEditorReferenceBlocks } from './templating'
-import { useReferentiallyStableCallback } from './useReferentiallyStableCallback'
-import { SortEnd } from 'react-sortable-hoc'
 
 export interface BlockEditorProps extends SugaredRelativeEntityList, CreateEditorPublicOptions<EditorWithBlocks> {
 	label?: ReactNode
@@ -271,8 +270,8 @@ const BlockEditorComponent: FunctionComponent<BlockEditorProps> = Component(
 
 		const inlineButtons: ToolbarButtonSpec[] = props.inlineButtons
 			? (
-					(Array.isArray(props.inlineButtons[0]) ? props.inlineButtons : [props.inlineButtons]) as ToolbarButtonSpec[][]
-			  ).flat()
+				(Array.isArray(props.inlineButtons[0]) ? props.inlineButtons : [props.inlineButtons]) as ToolbarButtonSpec[][]
+			).flat()
 			: emptyArray
 
 		const references = !!(props.referencesField && props.referenceDiscriminationField) && (
@@ -365,14 +364,14 @@ const assertStaticBlockEditorInvariants = (props: BlockEditorProps, environment:
 		if (props.referencesField !== undefined && props.referenceDiscriminationField === undefined) {
 			throw new BindingError(
 				`BlockEditor: missing the 'referenceDiscriminationField' prop. ` +
-					`Without it the editor cannot tell different kinds of references apart!`,
+				`Without it the editor cannot tell different kinds of references apart!`,
 			)
 		}
 		if (props.referencesField === undefined && props.referenceDiscriminationField !== undefined) {
 			throw new BindingError(
 				`BlockEditor: supplied the 'referenceDiscriminationField' prop but missing 'referencesField'. ` +
-					`Either remove 'referenceDiscriminationField' to get rid of this error ` +
-					`or provide 'referencesField' to enable content references.`,
+				`Either remove 'referenceDiscriminationField' to get rid of this error ` +
+				`or provide 'referencesField' to enable content references.`,
 			)
 		}
 		if (
@@ -386,7 +385,7 @@ const assertStaticBlockEditorInvariants = (props: BlockEditorProps, environment:
 		) {
 			throw new BindingError(
 				`BlockEditor: trying to enable embeds without content references being enabled. In order to use embeds, ` +
-					`provide both the 'referenceDiscriminationField' as well as the 'referencesField' prop`,
+				`provide both the 'referenceDiscriminationField' as well as the 'referencesField' prop`,
 			)
 		}
 
@@ -394,15 +393,15 @@ const assertStaticBlockEditorInvariants = (props: BlockEditorProps, environment:
 			if (props.embedContentDiscriminationField === undefined) {
 				throw new BindingError(
 					`BlockEditor: You enabled embed blocks by supplying the 'embedReferenceDiscriminateBy' prop but then ` +
-						`failed to also supply the 'embedContentDiscriminationField'. Without it, the editor would not be ` +
-						`able to distinguish between the kinds of embedded content.`,
+					`failed to also supply the 'embedContentDiscriminationField'. Without it, the editor would not be ` +
+					`able to distinguish between the kinds of embedded content.`,
 				)
 			}
 			if (!props.embedHandlers || Array.from(props.embedHandlers).length === 0) {
 				throw new BindingError(
 					`BlockEditor: You enabled embed blocks by supplying the 'embedReferenceDiscriminateBy' prop but then ` +
-						`failed to also supply any embed handlers. Without them, the editor would not be able to ` +
-						`recognize any embedded content.`,
+					`failed to also supply any embed handlers. Without them, the editor would not be able to ` +
+					`recognize any embedded content.`,
 				)
 			}
 		}

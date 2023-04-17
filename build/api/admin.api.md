@@ -4953,7 +4953,7 @@ export * from "@contember/ui";
 // src/components/bindingFacade/environment/SideDimensions.tsx:88:81 - (ae-forgotten-export) The symbol "LabelMiddleware" needs to be exported by the entry point index.d.ts
 // src/components/bindingFacade/fields/SlugField.tsx:23:3 - (ae-forgotten-export) The symbol "SlugPrefix" needs to be exported by the entry point index.d.ts
 // src/components/bindingFacade/richText/ContemberEditor/index.ts:24:29 - (ae-forgotten-export) The symbol "ElementDataAttributes" needs to be exported by the entry point index.d.ts
-// src/components/bindingFacade/richText/blockEditor/BlockEditor.tsx:323:25 - (ae-forgotten-export) The symbol "ContentOutletProps" needs to be exported by the entry point index.d.ts
+// src/components/bindingFacade/richText/blockEditor/BlockEditor.tsx:322:25 - (ae-forgotten-export) The symbol "ContentOutletProps" needs to be exported by the entry point index.d.ts
 // src/components/bindingFacade/richText/blockEditor/embed/index.ts:5:27 - (ae-forgotten-export) The symbol "GoogleFormEmbedHandler" needs to be exported by the entry point index.d.ts
 // src/components/bindingFacade/richText/blockEditor/embed/index.ts:5:27 - (ae-forgotten-export) The symbol "YouTubeEmbedHandler" needs to be exported by the entry point index.d.ts
 // src/components/bindingFacade/richText/blockEditor/embed/index.ts:5:27 - (ae-forgotten-export) The symbol "VimeoEmbedHandler" needs to be exported by the entry point index.d.ts

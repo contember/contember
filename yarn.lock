@@ -2940,43 +2940,6 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@contember/admin@npm:^1.1.0-rc.2":
-  version: 1.1.0
-  resolution: "@contember/admin@npm:1.1.0"
-  dependencies:
-    "@contember/binding": 1.1.0
-    "@contember/client": 1.1.0
-    "@contember/react-client": 1.1.0
-    "@contember/react-multipass-rendering": 1.1.0
-    "@contember/react-utils": 1.1.0
-    "@contember/ui": 1.1.0
-    "@formatjs/icu-messageformat-parser": 2.0.11
-    "@sindresorhus/slugify": 0.11.0
-    blueimp-md5: 2.18.0
-    buffer: 6.0.3
-    classnames: 2.3.1
-    fuse.js: 6.4.6
-    intl-messageformat: 9.9.1
-    is-hotkey: 0.1.8
-    leaflet: ^1.9.2
-    path-to-regexp: 6.2.0
-    qrcode-generator: ^1.4.4
-    react-dropzone: 10.2.2
-    react-error-boundary: 3.1.3
-    react-leaflet: ^4.1.0
-    react-select: 5.3.2
-    react-sortable-hoc: 2.0.0
-    slate: 0.73.1
-    slate-history: 0.66.0
-    slate-react: 0.74.0
-    stacktracey: 2.1.7
-  peerDependencies:
-    react: ^17 || ^18
-    react-dom: ^17 || ^18
-  checksum: 411b30043c07fc4a510644a6577a715521041a50172a8a024c571ca6dbc3b65f86933c56864dc87f7cb9757f8982e4ad5f38c5dbb761ea45f68e7f5d4e3b186f
-  languageName: node
-  linkType: hard
-
 "@contember/admin@workspace:*, @contember/admin@workspace:packages/admin":
   version: 0.0.0-use.local
   resolution: "@contember/admin@workspace:packages/admin"
@@ -3036,25 +2999,6 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@contember/binding@npm:1.1.0":
-  version: 1.1.0
-  resolution: "@contember/binding@npm:1.1.0"
-  dependencies:
-    "@contember/client": 1.1.0
-    "@contember/react-client": 1.1.0
-    "@contember/react-multipass-rendering": 1.1.0
-    "@contember/react-utils": 1.1.0
-    chevrotain: 6.5.0
-    fast-deep-equal: ^3.1.3
-    js-levenshtein: 1.1.6
-    uuid: 8.3.2
-  peerDependencies:
-    react: ^17 || ^18
-    react-dom: ^17 || ^18
-  checksum: 40f1e1c050cddf9057b3b2dff62eb1ed866b0f48c26ca6a78e984d71f9ef8eb74441dc272c192efd93c7fd1f7549411406c1e1fcdf78bf5136bceec5df13b692
-  languageName: node
-  linkType: hard
-
 "@contember/binding@workspace:*, @contember/binding@workspace:packages/binding":
   version: 0.0.0-use.local
   resolution: "@contember/binding@workspace:packages/binding"
@@ -3077,16 +3021,6 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@contember/client@npm:1.1.0":
-  version: 1.1.0
-  resolution: "@contember/client@npm:1.1.0"
-  dependencies:
-    "@contember/schema": ^1.2.0
-    p-limit: ^4.0.0
-  checksum: 7d5b537c43c67c960a2926e7b8d8b4c1fbf4b67ff273bbf088027e8a1187702cd4fc5cfcd552796dd591ac5d8006b2a9ca60e9d79c5d4fcc5a693e03eeb8bbe1
-  languageName: node
-  linkType: hard
-
 "@contember/client@workspace:*, @contember/client@workspace:packages/client":
   version: 0.0.0-use.local
   resolution: "@contember/client@workspace:packages/client"
@@ -3100,8 +3034,9 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@contember/cms-layout@workspace:ee/cms-layout"
   dependencies:
-    "@contember/admin": ^1.1.0-rc.2
-    "@contember/ui": ^1.1.0-rc.2
+    "@contember/admin": "workspace:*"
+    "@contember/react-utils": "workspace:*"
+    "@contember/ui": "workspace:*"
     "@react-aria/utils": ^3.15.0
     "@types/deep-equal": ^1.0.1
     deep-equal: ^2.2.0
@@ -3169,17 +3104,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@contember/react-client@npm:1.1.0":
-  version: 1.1.0
-  resolution: "@contember/react-client@npm:1.1.0"
-  dependencies:
-    "@contember/client": 1.1.0
-  peerDependencies:
-    react: ^17 || ^18
-  checksum: 6f8b1505b2ed36853a43e8a8a7afd1de1a1991f7dabcf1ac2a0ebff37ee9cf4442b165851a1859edd97ee8d1baaf8ce390dce16eba936be7d375331e240e2187
-  languageName: node
-  linkType: hard
-
 "@contember/react-client@workspace:*, @contember/react-client@workspace:packages/react-client":
   version: 0.0.0-use.local
   resolution: "@contember/react-client@workspace:packages/react-client"
@@ -3190,15 +3114,6 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@contember/react-multipass-rendering@npm:1.1.0":
-  version: 1.1.0
-  resolution: "@contember/react-multipass-rendering@npm:1.1.0"
-  peerDependencies:
-    react: ^17 || ^18
-  checksum: 1aee4a5fa8d990b314475165f490c635c2e9e7e8a31dba4460ed20f1a57d39027e2ab11d235177a4ffca32cb9b8bd1aba0f47c157561a2210df6359be39c7997
-  languageName: node
-  linkType: hard
-
 "@contember/react-multipass-rendering@workspace:*, @contember/react-multipass-rendering@workspace:packages/react-multipass-rendering":
   version: 0.0.0-use.local
   resolution: "@contember/react-multipass-rendering@workspace:packages/react-multipass-rendering"
@@ -3206,15 +3121,6 @@ __metadata:
     react: ^17 || ^18
   languageName: unknown
   linkType: soft
-
-"@contember/react-utils@npm:1.1.0":
-  version: 1.1.0
-  resolution: "@contember/react-utils@npm:1.1.0"
-  peerDependencies:
-    react: ^17 || ^18
-  checksum: e182e8debe891c09c6a128601954c02d81e50f19587dee9b198940ea66b116179ec6010db99c0ea56b1520caf11eda80619a06eb0166d144a56047cf52ce6f35
-  languageName: node
-  linkType: hard
 
 "@contember/react-utils@workspace:*, @contember/react-utils@workspace:packages/react-utils":
   version: 0.0.0-use.local
@@ -3272,26 +3178,6 @@ __metadata:
   version: 1.2.0
   resolution: "@contember/typesafe@npm:1.2.0"
   checksum: 84f4fd70834327f4dac3babec97386eeb09f8a2b0808532b9c92c88d45af40d841e47c5669e8e731460060a2dfcc37597ada73e2f6078c1b30ca17fe362f0c08
-  languageName: node
-  linkType: hard
-
-"@contember/ui@npm:1.1.0, @contember/ui@npm:^1.1.0-rc.2":
-  version: 1.1.0
-  resolution: "@contember/ui@npm:1.1.0"
-  dependencies:
-    "@blueprintjs/icons": 3.29.0
-    "@contember/react-utils": 1.1.0
-    "@popperjs/core": 2.10.2
-    classnames: 2.3.1
-    react-aria: ^3.20.0
-    react-popper: ^2.3.0
-    react-select: 5.3.2
-    react-stately: ^3.18.0
-    react-textarea-autosize: ^8.3.4
-  peerDependencies:
-    react: ^17 || ^18
-    react-dom: ^17 || ^18
-  checksum: 16d69d86943b60cbfbbdb5e8203b9b022963d94070bd2e1883fb6445d9e804a926c9ad3507951c3ddc3cc076396b999417887362fc81fe2cbf838bba748c00b3
   languageName: node
   linkType: hard
 

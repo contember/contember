@@ -1,10 +1,10 @@
 import { expect, test } from '@playwright/test'
-import { expectNoConsoleErrors, initContemberProject } from '../utils'
-import * as modelDefinition from './textInput.model'
+import { expectNoConsoleErrors, initContemberProject } from '../utils.ts'
+import * as modelDefinition from './textInput.model.ts'
 
 let projectSlug: string
 
-test.beforeAll(async ({}, testInfo) => {
+test.beforeAll(async ({ }, testInfo) => {
 	projectSlug = await initContemberProject(testInfo, modelDefinition)
 })
 

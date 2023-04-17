@@ -1,0 +1,8 @@
+{
+	"compilerOptions": {
+		"composite": true,
+		"allowImportingTsExtensions": true,
+		"noEmit": true,
+		"emitDeclarationOnly": false,
+	}
+}

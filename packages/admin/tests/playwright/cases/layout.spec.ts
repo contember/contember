@@ -1,6 +1,6 @@
-import { expect, test } from '@playwright/test'
-import { expectNoConsoleErrors, initContemberProject } from '../utils'
 import { SchemaDefinition as def } from '@contember/schema-definition'
+import { expect, test } from '@playwright/test'
+import { expectNoConsoleErrors, initContemberProject } from '../utils.ts'
 
 namespace Model {
 	export class Dummy {
@@ -10,7 +10,7 @@ namespace Model {
 
 let projectSlug: string
 
-test.beforeAll(async ({}, testInfo) => {
+test.beforeAll(async ({ }, testInfo) => {
 	projectSlug = await initContemberProject(testInfo, Model)
 })
 

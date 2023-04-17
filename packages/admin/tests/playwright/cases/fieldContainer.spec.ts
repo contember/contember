@@ -1,6 +1,6 @@
 import { SchemaDefinition as def } from '@contember/schema-definition'
 import { expect, test } from '@playwright/test'
-import { expectNoConsoleErrors, initContemberProject } from '../utils'
+import { expectNoConsoleErrors, initContemberProject } from '../utils.ts'
 
 namespace Model {
 	export class Dummy {
@@ -15,12 +15,12 @@ test.beforeAll(async ({ }, testInfo) => {
 })
 
 test('basic test', async ({ page, userAgent }) => {
-	test.skip(!!userAgent?.match(/\biPhone|iPad\b/), 'Unstable test on iPhone')
-
 	expectNoConsoleErrors(page)
 
 	await page.goto(`/${projectSlug}/fieldContainer`)
 	await page.waitForLoadState('networkidle') // wait for fonts
 	await page.waitForTimeout(200)
-	expect(await page.screenshot()).toMatchSnapshot('initial.png')
+	await page.waitForSelector('div.cui-field-container')
+	await page.waitForTimeout(200)
+	expect(await page.screenshot({ animations: 'disabled' })).toMatchSnapshot('initial.png')
 })

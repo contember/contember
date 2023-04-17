@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
-import { expectNoConsoleErrors, initContemberProject } from '../utils'
-import * as modelDefinition from './select.model'
+import { expectNoConsoleErrors, initContemberProject } from '../utils.ts'
+import * as modelDefinition from './select.model.ts'
 
 let projectSlug: string
 

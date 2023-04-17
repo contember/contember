@@ -3,9 +3,10 @@
 	"compilerOptions": {
 		"jsx": "react-jsx",
 		"noEmit": true,
-		"emitDeclarationOnly": false
+		"emitDeclarationOnly": false,
+		"allowImportingTsExtensions": true,
 	},
 	"references": [
-		{ "path": "../src" }
+		{ "path": "../src" },
 	]
 }

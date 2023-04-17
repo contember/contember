@@ -53,7 +53,7 @@ services:
       - .:/src:cached
 
   playwright:
-    image: mcr.microsoft.com/playwright:v1.20.0-focal
+    image: mcr.microsoft.com/playwright:v1.32.3-focal
     command: [ 'npm', 'run', 'pw:dev' ]
     user: '1000:1000'
 
@@ -68,8 +68,8 @@ services:
       - .:/src:cached
 
   playwright-tests:
-    image: mcr.microsoft.com/playwright:v1.20.0-focal
-    command: ['npm', 'run', 'pw:dev']
+    image: mcr.microsoft.com/playwright:v1.32.3-focal
+    command: [ 'npm', 'run', 'pw:dev' ]
     user: '1000:1000'
 
     environment:

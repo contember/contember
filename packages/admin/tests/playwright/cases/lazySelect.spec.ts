@@ -1,10 +1,10 @@
 import { expect, test } from '@playwright/test'
-import { expectNoConsoleErrors, initContemberProject, sendContemberRequest } from '../utils'
-import * as modelDefinition from './lazySelect.model'
+import { expectNoConsoleErrors, initContemberProject, sendContemberRequest } from '../utils.ts'
+import * as modelDefinition from './lazySelect.model.ts'
 
 let projectSlug: string
 
-test.beforeAll(async ({}, testInfo) => {
+test.beforeAll(async ({ }, testInfo) => {
 	projectSlug = await initContemberProject(testInfo, modelDefinition)
 })
 

@@ -1,4 +1,5 @@
-import { Button, MultiEditPage, Repeater, RepeaterItem, RepeaterItemProps, SelectField, TextField } from '@contember/admin'
+import { Button, MultiEditScope, PersistButton, Repeater, RepeaterItem, RepeaterItemProps, SelectField, TextField } from '@contember/admin'
+import { Actions, ContentStack, Title } from '../components/Layout'
 
 const CustomRepeaterItem = (props: RepeaterItemProps) => {
 	return <>
@@ -8,12 +9,18 @@ const CustomRepeaterItem = (props: RepeaterItemProps) => {
 }
 
 export default () => (
-	<MultiEditPage entities="Tag" rendererProps={{ title: 'Abcd' }}>
-		<TextField field={'name'} label={'Name'} />
-		<Repeater field={'locales'} label={'Locales'} sortableBy={'order'} itemComponent={CustomRepeaterItem}>
-			<SelectField label={'Locale'} options={'Locale.code'} field={'locale'}
-									 createNewForm={<TextField field={'code'} label={'Locale code'} />} />
-			<TextField field={'name'} label={'Name'} />
-		</Repeater>
-	</MultiEditPage>
+	<>
+		<Title>Tags</Title>
+
+		<ContentStack>
+			<MultiEditScope entities="Tag" listProps={{ beforeContent: <Actions><PersistButton /></Actions> }}>
+				<TextField field={'name'} label={'Name'} />
+				<Repeater field={'locales'} label={'Locales'} sortableBy={'order'} itemComponent={CustomRepeaterItem}>
+					<SelectField label={'Locale'} options={'Locale.code'} field={'locale'}
+						createNewForm={<TextField field={'code'} label={'Locale code'} />} />
+					<TextField field={'name'} label={'Name'} />
+				</Repeater>
+			</MultiEditScope>
+		</ContentStack>
+	</>
 )

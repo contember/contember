@@ -1,5 +1,6 @@
 import { useCallback, useRef } from 'react'
 
+// TODO: Should be possible to remove when React.useEvent() lands
 export const useReferentiallyStableCallback = <T extends (...args: any[]) => any>(callback: T): T => {
 	const ref = useRef(callback)
 	ref.current = callback

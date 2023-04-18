@@ -1,8 +1,14 @@
-import { MultiEditPage, TextField } from '@contember/admin'
+import { MultiEditScope, PersistButton, TextField } from '@contember/admin'
+import { Actions, Content, Title } from '../components/Layout'
 
 export default () => (
-	<MultiEditPage entities="Locale" pageName="locales" rendererProps={{ title: 'Languages' }}>
-		<TextField label="Code" field="code" />
-		<TextField label="Label" field="label" />
-	</MultiEditPage>
+	<>
+		<Title>Languages</Title>
+		<Content>
+			<MultiEditScope entities="Locale" listProps={{ beforeContent: <Actions><PersistButton /></Actions> }}>
+				<TextField label="Code" field="code" />
+				<TextField label="Label" field="label" />
+			</MultiEditScope>
+		</Content>
+	</>
 )

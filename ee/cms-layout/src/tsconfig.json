@@ -1,0 +1,11 @@
+{
+  "extends": "../../../tsconfig.settings.json",
+  "compilerOptions": {
+    "outDir": "../dist/types",
+  },
+	"references": [
+		{ "path": "../../../packages/admin/src" },
+		{ "path": "../../../packages/react-utils/src" },
+		{ "path": "../../../packages/ui/src" },
+	]
+}

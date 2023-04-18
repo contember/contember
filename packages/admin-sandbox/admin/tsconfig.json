@@ -5,7 +5,7 @@
 		"emitDeclarationOnly": false
 	},
 	"references": [
-		{ "path": "../../admin/src" },
-		{ "path": "../../ui/src" }
+		{ "path": "../../../ee/cms-layout/src" },
+		{ "path": "../../admin/src" }
 	]
 }

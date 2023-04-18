@@ -1,0 +1,57 @@
+{
+	"name": "@contember/cms-layout",
+	"license": "proprietary",
+	"version": "0.0.0",
+	"type": "module",
+	"sideEffects": [
+		"*.css"
+	],
+	"main": "./dist/production/index.js",
+	"exports": {
+		".": {
+			"import": {
+				"development": "./dist/development/index.js",
+				"production": "./dist/production/index.js",
+				"default": "./dist/production/index.js"
+			}
+		},
+		"./style.css": "./dist/assets/style.css"
+	},
+	"files": [
+		"dist/",
+		"src/"
+	],
+	"typings": "./dist/types/index.d.ts",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/contember/admin.git",
+		"directory": "ee/cms-layout"
+	},
+	"scripts": {
+		"build": "yarn run build:js:dev && yarn run build:js:prod && yarn run build:css && yarn build:license",
+		"build:js:dev": "vite build --mode development",
+		"build:js:prod": "vite build --mode production",
+		"build:css": "vite build --config vite.config.css.js",
+		"build:license": "cp ../LICENSE ./LICENSE",
+		"ae:build": "api-extractor run --local",
+		"ae:test": "api-extractor run"
+	},
+	"dependencies": {
+		"@contember/admin": "workspace:*",
+		"@contember/react-utils": "workspace:*",
+		"@contember/ui": "workspace:*",
+		"@react-aria/utils": "^3.15.0",
+		"deep-equal": "^2.2.0",
+		"lucide-react": "^0.108.0",
+		"wait-for-element-transition": "^3.3.1"
+	},
+	"peerDependencies": {
+		"react": "^17 || ^18",
+		"react-dom": "^17 || ^18"
+	},
+	"devDependencies": {
+		"@types/deep-equal": "^1.0.1",
+		"react": "^18",
+		"react-dom": "^18"
+	}
+}

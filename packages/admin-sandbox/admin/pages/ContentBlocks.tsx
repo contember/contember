@@ -1,7 +1,9 @@
-import { Block, BlockRepeater, EditPage } from '@contember/admin'
+import { Block, BlockRepeater, EditScope } from '@contember/admin'
+import { Title } from '../components/Layout'
 
 export const ContentBlockPage = (
-	<EditPage entity="ContentBlockPage(unique = One)" setOnCreate="(unique = One)">
+	<EditScope entity="ContentBlockPage(unique = One)" setOnCreate="(unique = One)">
+		<Title>Edit Content Block</Title>
 		<BlockRepeater
 			field="blocks"
 			label="Block repeater"
@@ -10,5 +12,5 @@ export const ContentBlockPage = (
 		>
 			<Block discriminateBy="heroSection" label="Hero section" />
 		</BlockRepeater>
-	</EditPage>
+	</EditScope>
 )

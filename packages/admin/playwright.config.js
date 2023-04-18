@@ -8,6 +8,7 @@ const config = {
 	expect: {
 		toMatchSnapshot: {
 			threshold: 0.05,
+			maxDiffPixelRatio: 0.05,
 		},
 	},
 

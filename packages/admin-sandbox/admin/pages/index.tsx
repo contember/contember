@@ -3,7 +3,7 @@ import {
 	Component,
 	DataGrid,
 	DiscriminatedBlocks,
-	EditPage,
+	EditScope,
 	EntityAccessor,
 	EntityId,
 	Field,
@@ -15,6 +15,7 @@ import {
 	ImageFiles,
 	ImageUploadField,
 	Link,
+	PersistButton,
 	S3FileUploader,
 	StaticRender,
 	SugaredQualifiedEntityList,
@@ -24,6 +25,7 @@ import {
 	VideoFiles,
 } from '@contember/admin'
 import { DataGridTile } from '../components/DataGridTile'
+import { Actions, ContentStack, Title } from '../components/Layout'
 
 const GalleryItemTile = Component(({ onClick, selectedEntityIds }: {
 	onClick?: (entity: EntityAccessor) => void
@@ -104,7 +106,6 @@ const GallerySelectForm = Component((
 	</DataGrid>
 ))
 
-
 const ImageSelectForm = Component((
 	{
 		entities,
@@ -114,7 +115,7 @@ const ImageSelectForm = Component((
 	}: FileSelectionProps & {
 		entities: SugaredQualifiedEntityList['entities']
 		isComplex: boolean
-}) => (
+	}) => (
 	<DataGrid
 		itemsPerPage={12}
 		entities={entities}
@@ -154,206 +155,210 @@ const s3FileUploader = new S3FileUploader({
 })
 
 export default () => (
-	<EditPage entity="UploadShowcase(unique = One)" setOnCreate="(unique = One)">
-		<Link to="second">SECOND</Link>
-		<ImageUploadField urlField="singleTrivialImage.url" label="Trivial image" />
+	<EditScope entity="UploadShowcase(unique = One)" setOnCreate="(unique = One)">
+		<Title>Welcome to Contember!</Title>
 
-		<ImageFileRepeater
-			label="Many basic image"
-			field="multipleBasicImageList"
-			baseEntity={'image'}
-			urlField="url"
-			sortableBy="order"
-			fileSelectionComponent={ImageSelectForm}
-			fileSelectionProps={{
-				entities: 'BasicImage',
-				isComplex: false,
-			}}
-			uploader={s3FileUploader}
-		/>
+		<Actions><PersistButton /></Actions>
 
-		<ImageUploadField
-			label="Single basic image"
-			baseEntity="singleBasicImage"
+		<ContentStack>
+			<Link to="second">GO TO SECOND &rarr;</Link>
+			<ImageUploadField urlField="singleTrivialImage.url" label="Trivial image" />
 
-			// Feature: immediatePersist
-			// Select one > confirm
-			// Hide already attached entities (entityListAccessor)
-
-			fileSelectionComponent={ImageSelectForm}
-			fileSelectionProps={{
-				entities: 'BasicImage',
-				isComplex: false,
-			}}
-
-			urlField="url"
-			widthField="width"
-			heightField="height"
-			fileSizeField="size"
-			fileTypeField="type"
-		/>
-		<UploadField label="Discriminated has one" baseEntity="discriminatedAttachment" discriminationField="type">
-			<ImageFiles
-				discriminateBy="image"
-				baseEntity="image"
+			<ImageFileRepeater
+				label="Many basic image"
+				field="multipleBasicImageList"
+				baseEntity={'image'}
 				urlField="url"
-				widthField="width"
-				heightField="height"
-				fileSizeField="size"
-				fileTypeField="type"
-				fileNameField="fileName"
-				fileSelectionComponent={ImageSelectForm}
-				fileSelectionProps={{
-					entities: 'ComplexImage',
-					isComplex: true,
-				}}
-				fileSelectionLabel={'Complex image'}
-			>
-				<TextField field="alt" label="Image alternate" />
-			</ImageFiles>
-			<ImageFiles
-				discriminateBy="basicImage"
-				baseEntity="basicImage"
-				urlField="url"
+				sortableBy="order"
 				fileSelectionComponent={ImageSelectForm}
 				fileSelectionProps={{
 					entities: 'BasicImage',
 					isComplex: false,
 				}}
-				fileSelectionLabel={'Basic image'}
-			>
-			</ImageFiles>
-			<VideoFiles
-				discriminateBy="video"
-				baseEntity="video"
-				urlField="url"
-				widthField="width"
-				heightField="height"
-				fileSizeField="size"
-				fileTypeField="type"
-			>
-				test test
-			</VideoFiles>
-		</UploadField>
-		<FileRepeater field="fileList.items" boxLabel="Complex file list" label="Complex file list item" sortableBy="order"
-									discriminationField="type">
-			<ImageFiles
-				discriminateBy="image"
-				baseEntity="image"
-				urlField="url"
-				widthField="width"
-				heightField="height"
-				fileSizeField="size"
-				fileTypeField="type"
-				fileNameField="fileName"
-				fileSelectionComponent={ImageSelectForm}
-				fileSelectionProps={{
-					entities: 'ComplexImage',
-					isComplex: true,
-				}}
-				fileSelectionLabel={'Complex image'}
-			>
-				<TextField field="alt" label="Image alternate" />
-			</ImageFiles>
-			<ImageFiles
-				discriminateBy="basicImage"
-				baseEntity="basicImage"
-				urlField="url"
+				uploader={s3FileUploader}
+			/>
+
+			<ImageUploadField
+				label="Single basic image"
+				baseEntity="singleBasicImage"
+
+				// Feature: immediatePersist
+				// Select one > confirm
+				// Hide already attached entities (entityListAccessor)
+
 				fileSelectionComponent={ImageSelectForm}
 				fileSelectionProps={{
 					entities: 'BasicImage',
 					isComplex: false,
 				}}
-				fileSelectionLabel={'Basic image'}
-			>
-			</ImageFiles>
-			<VideoFiles
-				discriminateBy="video"
-				baseEntity="video"
-				urlField="url"
-				widthField="width"
-				heightField="height"
-				fileSizeField="size"
-				fileTypeField="type"
-			>
-				test test
-			</VideoFiles>
-		</FileRepeater>
 
+				urlField="url"
+				widthField="width"
+				heightField="height"
+				fileSizeField="size"
+				fileTypeField="type"
+			/>
+			<UploadField label="Discriminated has one" baseEntity="discriminatedAttachment" discriminationField="type">
+				<ImageFiles
+					discriminateBy="image"
+					baseEntity="image"
+					urlField="url"
+					widthField="width"
+					heightField="height"
+					fileSizeField="size"
+					fileTypeField="type"
+					fileNameField="fileName"
+					fileSelectionComponent={ImageSelectForm}
+					fileSelectionProps={{
+						entities: 'ComplexImage',
+						isComplex: true,
+					}}
+					fileSelectionLabel={'Complex image'}
+				>
+					<TextField field="alt" label="Image alternate" />
+				</ImageFiles>
+				<ImageFiles
+					discriminateBy="basicImage"
+					baseEntity="basicImage"
+					urlField="url"
+					fileSelectionComponent={ImageSelectForm}
+					fileSelectionProps={{
+						entities: 'BasicImage',
+						isComplex: false,
+					}}
+					fileSelectionLabel={'Basic image'}
+				>
+				</ImageFiles>
+				<VideoFiles
+					discriminateBy="video"
+					baseEntity="video"
+					urlField="url"
+					widthField="width"
+					heightField="height"
+					fileSizeField="size"
+					fileTypeField="type"
+				>
+					test test
+				</VideoFiles>
+			</UploadField>
+			<FileRepeater field="fileList.items" boxLabel="Complex file list" label="Complex file list item" sortableBy="order" discriminationField="type">
+				<ImageFiles
+					discriminateBy="image"
+					baseEntity="image"
+					urlField="url"
+					widthField="width"
+					heightField="height"
+					fileSizeField="size"
+					fileTypeField="type"
+					fileNameField="fileName"
+					fileSelectionComponent={ImageSelectForm}
+					fileSelectionProps={{
+						entities: 'ComplexImage',
+						isComplex: true,
+					}}
+					fileSelectionLabel={'Complex image'}
+				>
+					<TextField field="alt" label="Image alternate" />
+				</ImageFiles>
+				<ImageFiles
+					discriminateBy="basicImage"
+					baseEntity="basicImage"
+					urlField="url"
+					fileSelectionComponent={ImageSelectForm}
+					fileSelectionProps={{
+						entities: 'BasicImage',
+						isComplex: false,
+					}}
+					fileSelectionLabel={'Basic image'}
+				>
+				</ImageFiles>
+				<VideoFiles
+					discriminateBy="video"
+					baseEntity="video"
+					urlField="url"
+					widthField="width"
+					heightField="height"
+					fileSizeField="size"
+					fileTypeField="type"
+				>
+					test test
+				</VideoFiles>
+			</FileRepeater>
 
-		<UploadField
-			label="Gallery item"
-			baseEntity="galleryItem"
-			discriminationField="type"
-			fileSelectionComponent={GallerySelectForm}
-		>
-			<ImageFiles
-				discriminateBy="basicImage"
-				baseEntity="basicImage"
-				urlField="url"
+			<UploadField
+				label="Gallery item"
+				baseEntity="galleryItem"
+				discriminationField="type"
+				fileSelectionComponent={GallerySelectForm}
 			>
-			</ImageFiles>
-			<ImageFiles
-				discriminateBy="image"
-				baseEntity="image"
-				urlField="url"
-				widthField="width"
-				heightField="height"
-				fileSizeField="size"
-				fileTypeField="type"
-				fileNameField="fileName"
-			>
-				<TextField field="alt" label="Image alternate" />
-			</ImageFiles>
-			<VideoFiles
-				discriminateBy="video"
-				baseEntity="video"
-				urlField="url"
-				widthField="width"
-				heightField="height"
-				fileSizeField="size"
-				fileTypeField="type"
-			>
-			</VideoFiles>
-		</UploadField>
+				<ImageFiles
+					discriminateBy="basicImage"
+					baseEntity="basicImage"
+					urlField="url"
+				>
+				</ImageFiles>
+				<ImageFiles
+					discriminateBy="image"
+					baseEntity="image"
+					urlField="url"
+					widthField="width"
+					heightField="height"
+					fileSizeField="size"
+					fileTypeField="type"
+					fileNameField="fileName"
+				>
+					<TextField field="alt" label="Image alternate" />
+				</ImageFiles>
+				<VideoFiles
+					discriminateBy="video"
+					baseEntity="video"
+					urlField="url"
+					widthField="width"
+					heightField="height"
+					fileSizeField="size"
+					fileTypeField="type"
+				>
+				</VideoFiles>
+			</UploadField>
 
-		<FileRepeater
-			field="galleryList.items"
-			baseEntity={'item'}
-			boxLabel="Gallery list"
-			label="Gallery list"
-			sortableBy="order"
-			fileSelectionComponent={GallerySelectForm}
-			discriminationField="type"
-		>
-			<ImageFiles
-				discriminateBy="basicImage"
-				baseEntity="basicImage"
-				urlField="url"
+			<FileRepeater
+				field="galleryList.items"
+				baseEntity={'item'}
+				boxLabel="Gallery list"
+				label="Gallery list"
+				sortableBy="order"
+				fileSelectionComponent={GallerySelectForm}
+				discriminationField="type"
 			>
-			</ImageFiles>
-			<ImageFiles
-				discriminateBy="image"
-				baseEntity="image"
-				urlField="url"
-				widthField="width"
-				heightField="height"
-				fileSizeField="size"
-				fileTypeField="type"
-				fileNameField="fileName"
-			>
-				<TextField field="alt" label="Image alternate" />
-			</ImageFiles>
-			<VideoFiles
-				discriminateBy="video"
-				baseEntity="video"
-				urlField="url"
-				widthField="width"
-				heightField="height"
-				fileSizeField="size"
-				fileTypeField="type"
-			>
-			</VideoFiles>
-		</FileRepeater>
-	</EditPage>
+				<ImageFiles
+					discriminateBy="basicImage"
+					baseEntity="basicImage"
+					urlField="url"
+				>
+				</ImageFiles>
+				<ImageFiles
+					discriminateBy="image"
+					baseEntity="image"
+					urlField="url"
+					widthField="width"
+					heightField="height"
+					fileSizeField="size"
+					fileTypeField="type"
+					fileNameField="fileName"
+				>
+					<TextField field="alt" label="Image alternate" />
+				</ImageFiles>
+				<VideoFiles
+					discriminateBy="video"
+					baseEntity="video"
+					urlField="url"
+					widthField="width"
+					heightField="height"
+					fileSizeField="size"
+					fileTypeField="type"
+				>
+				</VideoFiles>
+			</FileRepeater>
+		</ContentStack>
+	</EditScope>
 )

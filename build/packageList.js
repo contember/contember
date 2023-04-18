@@ -13,6 +13,7 @@ function directoryPackageEntry(directory, packages) {
 export const list = {
 	ee: [
 		'admin-server',
+		'cms-layout',
 	],
 	packages: [
 		'admin',

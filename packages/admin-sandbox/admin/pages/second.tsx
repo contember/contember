@@ -1,7 +1,15 @@
-import { EditPage, Link } from '@contember/admin'
+import { EditScope, Link } from '@contember/admin'
+import { NavigateBackLink } from '@contember/cms-layout'
+import { Back, Content, Title } from '../components/Layout'
 
 export default () => (
-	<EditPage entity="UploadShowcase(unique = One)" setOnCreate="(unique = One)">
-		<Link to="index">DASHBOARD</Link>
-	</EditPage>
+	<EditScope entity="UploadShowcase(unique = One)" setOnCreate="(unique = One)">
+		<Back>
+			<NavigateBackLink to="index" />
+		</Back>
+		<Title>Second screen</Title>
+		<Content>
+			There is nothing here yet.
+		</Content>
+	</EditScope>
 )

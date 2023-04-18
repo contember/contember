@@ -60,6 +60,9 @@ export const useObjectMemo: <A extends object>(value: A) => A;
 // @public (undocumented)
 export const usePreviousValue: <Value>(value: Value) => Value;
 
+// @public (undocumented)
+export const useReferentiallyStableCallback: <T extends (...args: any[]) => any>(callback: T) => T;
+
 // Warning: (ae-forgotten-export) The symbol "ValueInitializer" needs to be exported by the entry point index.d.ts
 // Warning: (ae-forgotten-export) The symbol "SetState" needs to be exported by the entry point index.d.ts
 //

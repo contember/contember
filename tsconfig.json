@@ -3,6 +3,7 @@
 	"include": [ ],
 	"references": [
 		{ "path": "./ee/admin-server" },
+		{ "path": "./ee/cms-layout" },
 		{ "path": "./packages/admin" },
 		{ "path": "./packages/admin-i18n" },
 		{ "path": "./packages/admin-sandbox" },

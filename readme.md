@@ -1,5 +1,11 @@
-<img src="https://user-images.githubusercontent.com/47249487/159670980-2ccedc7c-90ca-4262-957d-9d000f4a4a25.svg#gh-light-mode-only" width="100%" />
-<img src="https://user-images.githubusercontent.com/47249487/159670893-6ac23242-386a-482b-98b5-481488208403.svg#gh-dark-mode-only" width="100%" />
+<div align="center">
+	<a href="https://www.contember.com/" target="_blank">
+			<picture>
+				<source media="(prefers-color-scheme: dark)" srcset=".github/assets/logo_l.svg">
+				<img height="220" alt="Contember Interface logo (dark or light)" src=".github/assets/logo_d.svg">
+		</picture>
+	</a>
+</div>
 
 # Contember Engine
 

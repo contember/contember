@@ -53,6 +53,7 @@ export interface PoolStatus {
 }
 
 export const poolStatsDescription =  {
+	connection_started_count: 'Total number of connection attempts when started.',
 	connection_established_count: 'Total number of established connections.',
 	connection_recoverable_error_count: 'Number of connections that failed on recoverable error (e.g. 53300) and retry was tried.',
 	connection_error_count: 'Number of non-recoverable errors or recoverable errors reaching max attempts.',
@@ -135,6 +136,7 @@ class Pool {
 	private poolConfig: PoolConfigInternal
 
 	private poolStats: PoolStats = {
+		connection_started_count: 0,
 		connection_established_count: 0,
 		connection_recoverable_error_count: 0,
 		connection_error_count: 0,
@@ -316,7 +318,10 @@ class Pool {
 		try {
 			this.connectingCount++
 			this.remainingRateLimit--
+			this.poolStats.connection_started_count++
+
 			await client.connect()
+
 			this.poolStats.connection_established_count++
 			this.log('Connection established')
 			this.connectingCount--

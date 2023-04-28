@@ -18,7 +18,7 @@ export function contember(options: ContemberOptions) {
 							injectTo: 'head',
 							attrs: {
 								name: 'contember-build-version',
-								value: fileHash,
+								content: fileHash,
 							},
 						},
 					])

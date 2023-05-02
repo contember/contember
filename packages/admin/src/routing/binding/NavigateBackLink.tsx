@@ -1,9 +1,9 @@
-import { Link, LinkProps, useMessageFormatter } from '@contember/admin'
-import { Stack } from '@contember/ui'
+import { Stack, VisuallyHidden } from '@contember/ui'
+import { assert, isNonEmptyTrimmedString } from '@contember/utilities'
 import { ArrowLeftIcon } from 'lucide-react'
 import { ReactNode, memo } from 'react'
-import { assert, isNonEmptyTrimmedString } from './packages/assert-types'
-import { VisuallyHidden } from './packages/ui-visually-hidden'
+import { useMessageFormatter } from '../../i18n'
+import { Link, LinkProps } from './Link'
 
 export const navigationBackLinkDictionary = {
 	navigationBackLink: {
@@ -24,7 +24,6 @@ export type NavigateBackLinkProps =
 	& LabeledProps
 	& {
 		icon?: ReactNode;
-		breakpoint?: number | null | undefined;
 	}
 
 export const NavigateBackLink = memo<NavigateBackLinkProps>(({

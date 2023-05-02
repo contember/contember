@@ -1,4 +1,3 @@
-export * from './NavigateBackLink'
 export * from './lib'
 export * from './packages/class-name'
 export * from './packages/typescript-utilities'

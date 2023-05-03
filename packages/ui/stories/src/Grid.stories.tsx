@@ -25,9 +25,9 @@ const Template: ComponentStory<typeof Grid> = args => <Grid {...args} style={sty
 	</>}
 </Grid>
 
-export const Defaut = Template.bind({})
+export const Default = Template.bind({})
 
-Defaut.args = {
+Default.args = {
 	columnWidth: 120,
 }
 

@@ -1,4 +1,5 @@
 import type { ComponentMeta, ComponentStory } from '@storybook/react'
+import { FunctionComponent } from 'react'
 import { SaveButton } from '../../src'
 import { booleanControl } from './Helpers'
 
@@ -9,20 +10,20 @@ export default {
 		isPrimary: booleanControl(true),
 	},
 	decorators: [
-		Story => <div style={{ display: 'flex', flex: 1, flexDirection: 'column' }}>
+		(Story: FunctionComponent) => <div style={{ display: 'flex', flex: 1, flexDirection: 'column' }}>
 			<p>Container set to align children flex-start:</p>
 			<div style={{ display: 'flex', gap: '1em', justifyContent: 'flex-start' }}>
-					<Story />
+				<Story />
 			</div>
 
 			<p>Container set align children center:</p>
 			<div style={{ display: 'flex', gap: '1em', justifyContent: 'center' }}>
-					<Story />
+				<Story />
 			</div>
 
 			<p>Container set to align children flex-end:</p>
 			<div style={{ display: 'flex', gap: '1em', justifyContent: 'flex-end' }}>
-					<Story />
+				<Story />
 			</div>
 
 			<p>Container set to stretch children:</p>
@@ -35,9 +36,9 @@ export default {
 
 const Template: ComponentStory<typeof SaveButton> = args => <SaveButton {...args} />
 
-export const Defaut = Template.bind({})
+export const Default = Template.bind({})
 
-Defaut.args = {}
+Default.args = {}
 
 export const Translated = Template.bind({})
 

@@ -6,7 +6,7 @@ export default {
 	component: Spinner,
 } as ComponentMeta<typeof Spinner>
 
-export const Defaut: ComponentStory<typeof Spinner> = () => <Spinner />
+export const Default: ComponentStory<typeof Spinner> = () => <Spinner />
 
 export const InheritColor: ComponentStory<typeof Spinner> = () => <div style={{ color: 'blue' }}>
 	<Spinner />

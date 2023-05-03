@@ -10,9 +10,9 @@ export default {
 
 const Template: ComponentStory<typeof FieldContainer> = args => <FieldContainer {...args} />
 
-export const Defaut = Template.bind({})
+export const Default = Template.bind({})
 
-Defaut.args = {
+Default.args = {
 	label: 'Label',
 	labelDescription: 'Hint to fill valid value',
 	description: 'Description comes here',

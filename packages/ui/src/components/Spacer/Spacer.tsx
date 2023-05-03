@@ -5,18 +5,18 @@ import { NativeProps, Size } from '../../types'
 import { toEnumViewClass } from '../../utils'
 
 export interface SpacerProps extends Omit<NativeProps<HTMLDivElement>, 'children'> {
-  gap?: Size | 'xlarge' | 'none'
+	gap?: Size | 'xlarge' | 'none'
 }
 
-export const Spacer = memo(({ className, gap, ...rest }: SpacerProps) => {
-  const componentClassName = `${useClassNamePrefix()}spacer`
+export const Spacer = memo<SpacerProps>(({ className, gap, ...rest }) => {
+	const componentClassName = `${useClassNamePrefix()}spacer`
 
-  return <div
-    className={classNames(
-      componentClassName,
-      toEnumViewClass(gap),
-      className,
-    )}
-    {...rest}
-  />
+	return <div
+		className={classNames(
+			componentClassName,
+			toEnumViewClass(gap),
+			className,
+		)}
+		{...rest}
+	/>
 })

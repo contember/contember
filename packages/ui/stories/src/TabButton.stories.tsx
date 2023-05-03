@@ -1,5 +1,5 @@
 import type { ComponentMeta, ComponentStory } from '@storybook/react'
-import { TabButton } from '../../src'
+import { TabButton, TabButtonProps } from '../../src'
 import { booleanControl } from './Helpers'
 
 export default {
@@ -11,7 +11,7 @@ export default {
 	},
 } as ComponentMeta<typeof TabButton>
 
-const Template: ComponentStory<typeof TabButton> = args => <>
+const Template: ComponentStory<typeof TabButton> = (args: TabButtonProps) => <>
 	<TabButton {...args} />
 	<TabButton>Content</TabButton>
 	<TabButton>Lorem ipsum dolor sit amet</TabButton>

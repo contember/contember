@@ -2201,7 +2201,7 @@ export type SlugInputProps = TextInputProps & {
 };
 
 // @public (undocumented)
-export const Spacer: MemoExoticComponent<({ className, gap, ...rest }: SpacerProps) => JSX.Element>;
+export const Spacer: NamedExoticComponent<SpacerProps>;
 
 // @public (undocumented)
 export interface SpacerProps extends Omit<NativeProps<HTMLDivElement>, 'children'> {

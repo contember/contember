@@ -1,5 +1,5 @@
 import type { ComponentMeta, ComponentStory } from '@storybook/react'
-import { Stack } from '../../src'
+import { Stack, StackOwnProps } from '../../src'
 import { Block, booleanControl, disabledControlsForAttributes } from './Helpers'
 
 export default {
@@ -12,7 +12,7 @@ export default {
 	},
 } as ComponentMeta<typeof Stack>
 
-const Template: ComponentStory<typeof Stack> = args => <Stack {...args}>
+const Template: ComponentStory<typeof Stack> = (args: StackOwnProps) => <Stack {...args}>
 	{args.children ?? <>
 		<Block />
 		<Block />
@@ -22,9 +22,9 @@ const Template: ComponentStory<typeof Stack> = args => <Stack {...args}>
 	</>}
 </Stack>
 
-export const Defaut = Template.bind({})
+export const Default = Template.bind({})
 
-Defaut.args = {
+Default.args = {
 	direction: 'vertical',
 }
 

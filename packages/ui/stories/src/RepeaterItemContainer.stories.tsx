@@ -17,9 +17,9 @@ export default {
 
 const Template: ComponentStory<typeof RepeaterItemContainer> = args => <RepeaterItemContainer {...args} />
 
-export const Defaut = Template.bind({})
+export const Default = Template.bind({})
 
-Defaut.args = {
+Default.args = {
 	children: <>
 		<Block />
 		<Block />

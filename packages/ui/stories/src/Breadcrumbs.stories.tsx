@@ -10,8 +10,8 @@ export default {
 
 const Template: ComponentStory<typeof Breadcrumbs> = args => <Breadcrumbs {...args} />
 
-export const Defaut = Template.bind({})
+export const Default = Template.bind({})
 
-Defaut.args = {
-  items: [<a key={0} href="#">Content</a>, <a key={1} href="#">Posts</a>, 'Edit post'],
+Default.args = {
+	items: [<a key={0} href="#">Content</a>, <a key={1} href="#">Posts</a>, 'Edit post'],
 }

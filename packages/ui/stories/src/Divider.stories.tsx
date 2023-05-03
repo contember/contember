@@ -19,7 +19,7 @@ const Template: ComponentStory<typeof Divider> = args => <DirectionStack>
 	<Block />
 </DirectionStack>
 
-export const Defaut = Template.bind({})
+export const Default = Template.bind({})
 
-Defaut.args = {
+Default.args = {
 }

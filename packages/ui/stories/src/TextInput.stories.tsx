@@ -1,5 +1,5 @@
 import { useCallback, useState } from '@storybook/addons'
-import { ComponentMeta, ComponentStory, forceReRender } from '@storybook/react'
+import { ComponentMeta, ComponentStory } from '@storybook/react'
 import * as React from 'react'
 import { TextInput } from '../../src'
 import { Button } from '../ui/Button'
@@ -26,7 +26,9 @@ export default {
 	},
 } as ComponentMeta<typeof TextInput>
 
-const Template: ComponentStory<typeof TextInput> = args => {
+const Template: ComponentStory<typeof TextInput> = (args: {
+	value?: string | null | undefined;
+}) => {
 	const ref = React.useRef<HTMLInputElement>(null)
 	const [value, setValue] = useState<string | null | undefined>(args.value)
 	const [error, setError] = useState<string | undefined>(undefined)
@@ -34,12 +36,10 @@ const Template: ComponentStory<typeof TextInput> = args => {
 
 	const onChange = useCallback((value?: string | null) => {
 		setValue(value)
-		forceReRender()
 	}, [])
 
 	React.useEffect(() => {
 		setValue(args.value)
-		forceReRender()
 	}, [args.value])
 
 	return <>
@@ -63,6 +63,6 @@ const Template: ComponentStory<typeof TextInput> = args => {
 	</>
 }
 
-export const Defaut = Template.bind({})
+export const Default = Template.bind({})
 
-Defaut.args = {}
+Default.args = {}

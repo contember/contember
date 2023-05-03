@@ -1,5 +1,5 @@
 import { useCallback, useState } from '@storybook/addons'
-import { ComponentMeta, ComponentStory, forceReRender } from '@storybook/react'
+import { ComponentMeta, ComponentStory } from '@storybook/react'
 import * as React from 'react'
 import { Checkbox } from '../../src'
 import { booleanControl, disabledControlsForAttributes, enumControl } from './Helpers'
@@ -16,12 +16,13 @@ export default {
 	},
 } as ComponentMeta<typeof Checkbox>
 
-const Template: ComponentStory<typeof Checkbox> = args => {
+const Template: ComponentStory<typeof Checkbox> = (args: {
+	value?: boolean | undefined | null;
+}) => {
 	const [value, setValue] = useState<boolean | undefined | null>(args.value)
 
 	const onChange = useCallback((value?: boolean | null) => {
 		setValue(value)
-		forceReRender()
 	}, [])
 
 	React.useEffect(() => {
@@ -34,6 +35,6 @@ const Template: ComponentStory<typeof Checkbox> = args => {
 	</>
 }
 
-export const Defaut = Template.bind({})
+export const Default = Template.bind({})
 
-Defaut.args = {}
+Default.args = {}

@@ -1,5 +1,5 @@
 import type { ComponentMeta, ComponentStory } from '@storybook/react'
-import { Spacer } from '../../src'
+import { Spacer, SpacerProps } from '../../src'
 import { Block, DirectionStack } from './Helpers'
 
 export default {
@@ -7,7 +7,7 @@ export default {
 	component: Spacer,
 } as ComponentMeta<typeof Spacer>
 
-const Template: ComponentStory<typeof Spacer> = args => <DirectionStack>
+const Template: ComponentStory<typeof Spacer> = (args: SpacerProps) => <DirectionStack>
 	<Block />
 	<Spacer {...args} />
 	<Block />
@@ -19,7 +19,6 @@ const Template: ComponentStory<typeof Spacer> = args => <DirectionStack>
 	<Block />
 </DirectionStack>
 
-export const Defaut = Template.bind({})
+export const Default = Template.bind({})
 
-Defaut.args = {
-}
+Default.args = {}

@@ -1,5 +1,5 @@
 import { useCallback, useState } from '@storybook/addons'
-import { ComponentMeta, ComponentStory, forceReRender } from '@storybook/react'
+import { ComponentMeta, ComponentStory } from '@storybook/react'
 import * as React from 'react'
 import { HTMLReactSelectElement, Select } from '../../src'
 import { Button } from '../ui/Button'
@@ -22,7 +22,11 @@ export default {
 	},
 } as ComponentMeta<typeof Select>
 
-const Template: ComponentStory<typeof Select> = args => {
+const Template: ComponentStory<typeof Select> = (args: {
+	options: { value: unknown, label: string }[],
+	defaultValue?: unknown | null | undefined;
+	value?: unknown | null | undefined;
+}) => {
 	const ref = React.useRef<HTMLReactSelectElement<typeof args.options[number]['value']>>(null)
 	const [value, setValue] = useState<unknown | null | undefined>(args.value as unknown)
 	const [error, setError] = useState<string | undefined>(undefined)
@@ -30,13 +34,11 @@ const Template: ComponentStory<typeof Select> = args => {
 
 	const onChange = useCallback((value?: unknown | null) => {
 		setValue(value)
-		forceReRender()
 		console.log('Changed value:', value)
 	}, [])
 
 	React.useEffect(() => {
 		setValue(args.value)
-		forceReRender()
 	}, [args.value])
 
 	return <>
@@ -61,9 +63,9 @@ const Template: ComponentStory<typeof Select> = args => {
 	</>
 }
 
-export const Defaut = Template.bind({})
+export const Default = Template.bind({})
 
-Defaut.args = {
+Default.args = {
 	options: [{
 		value: '1',
 		label: 'Fist option',

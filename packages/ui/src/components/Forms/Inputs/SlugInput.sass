@@ -36,10 +36,12 @@
 			color: var(--cui-control-color)
 
 	&-input
+		display: flex
 		flex: 1 1 auto
 		position: relative
 
-		.#{$cui-conf-globalPrefix}input
+		.#{$cui-conf-globalPrefix}text-input
+			border: none
 			@extend %implementsCustomFocusEffects
 
 	&-prefix + &-input

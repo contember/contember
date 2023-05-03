@@ -1,14 +1,15 @@
 .#{$cui-conf-globalPrefix}table
 	@each $name, $data in $cui-table-sizes
 		$view: toView($name)
+		color: var(--cui-color)
+		display: table
+		border-collapse: collapse
+		width: 100%
+
 		&#{$view}
 			--cui-table-spacingX: #{map-get($data, 'spacingX')}
 			--cui-table-spacingY: #{map-get($data, 'spacingY')}
 			font-size: map-get($data, 'font-size')
-
-	display: table
-	border-collapse: collapse
-	width: 100%
 
 	&-wrapper
 		padding-bottom: 1px // Top-quality hack to remove a vertical scrollbar
@@ -35,7 +36,6 @@
 		&.is-active
 			background-color: var(--cui-toned-control-background-color)
 			color: var(--cui-control-color--highlighted)
-
 
 	& thead &-row
 		background-color: rgba(#000000, .05)

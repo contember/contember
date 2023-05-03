@@ -91,12 +91,12 @@ export function Form() {
 				<NavigateBackLink to={{ pageName: 'auto/grid', parameters: { entity } }}>Back to Grid</NavigateBackLink>
 			</Back>
 
-			<Actions>
-				<PersistButton />
-			</Actions>
 
 			<ContentStack>
 				<DataBindingProvider stateComponent={FeedbackRenderer} >
+					<Actions>
+						<PersistButton />
+					</Actions>
 					<AutoForm entity={entity} id={id} onCreateSuccess={onCreateSuccess} createEditLink={createEditLink} />
 				</DataBindingProvider>
 			</ContentStack>

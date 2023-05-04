@@ -1,28 +1,35 @@
 import classNames from 'classnames'
-import { memo, ReactNode } from 'react'
+import { CSSProperties, memo, ReactNode } from 'react'
 import { useClassNamePrefix } from '../../../auxiliary'
 import type { Size } from '../../../types'
 import { toEnumClass, toEnumViewClass, toThemeClass } from '../../../utils'
 import { Stack, StackProps } from '../../Stack'
-import { Description } from '../../Typography/Description'
-import { Label } from '../../Typography/Label'
+import { Description } from '../../Typography'
+import { Label } from '../../Typography'
 import { ErrorList, ErrorListProps } from '../ErrorList'
 import type { FieldContainerLabelPosition } from './Types'
 
-export interface FieldContainerProps extends ErrorListProps, Pick<JSX.IntrinsicElements['div'], 'className' | 'style'> {
-	children: ReactNode // The actual field
-	description?: ReactNode // Can explain e.g. the kinds of values to be filled
-	direction?: StackProps['direction']
-	gap?: Size | 'none'
-	label: ReactNode
-	labelDescription?: ReactNode // Expands on the label e.g. to provide the additional explanation
-	labelPosition?: FieldContainerLabelPosition
-	width?: 'column' | 'fluid' | 'none'
-	required?: boolean
-	size?: Size
-	useLabelElement?: boolean
-}
+export type FieldContainerProps =
+	& {
+		children: ReactNode // The actual field
+		description?: ReactNode // Can explain e.g. the kinds of values to be filled
+		direction?: StackProps['direction']
+		gap?: Size | 'none'
+		label: ReactNode
+		labelDescription?: ReactNode // Expands on the label e.g. to provide the additional explanation
+		labelPosition?: FieldContainerLabelPosition
+		width?: 'column' | 'fluid' | 'none'
+		required?: boolean
+		size?: Size
+		useLabelElement?: boolean
+		style?: CSSProperties
+		className?: string
+	}
+	& ErrorListProps
 
+/**
+ * @group Forms UI
+ */
 export const FieldContainer = memo(
 	({
 		children,

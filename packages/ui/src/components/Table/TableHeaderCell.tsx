@@ -13,6 +13,9 @@ export interface TableHeaderCellProps {
 	onClick?: MouseEventHandler<HTMLTableHeaderCellElement>
 }
 
+/**
+ * @group UI
+ */
 export const TableHeaderCell = memo(({ shrunk = false, ...props }: TableHeaderCellProps) => {
 	const useTableElement = useContext(UseTableElementContext)
 	const className = cn(

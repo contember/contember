@@ -1,5 +1,6 @@
 export * from './auxiliary'
 export * from './components'
 export { NavigationContext } from './Navigation'
+export type { NavigationLinkProps } from './Navigation'
 export * from './utils'
 export * from './types'

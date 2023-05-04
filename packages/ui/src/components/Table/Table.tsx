@@ -19,6 +19,9 @@ export interface TableProps {
 	//useTableElement?: boolean
 }
 
+/**
+ * @group UI
+ */
 export const Table = memo(({ /*useTableElement = true, */ bare, className: classNameProp, ...props }: TableProps) => {
 	const prefix = useClassNamePrefix()
 

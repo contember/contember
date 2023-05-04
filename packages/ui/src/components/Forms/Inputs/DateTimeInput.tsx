@@ -1,11 +1,12 @@
 import classNames from 'classnames'
-import { DetailedHTMLProps, forwardRef, InputHTMLAttributes, memo, Ref } from 'react'
+import { forwardRef, memo, Ref } from 'react'
 import { useComponentClassName } from '../../../auxiliary'
 import { toViewClass } from '../../../utils'
 import { assertDatetimeString } from '../Types'
 import { DateTimeInputFallback } from './DateTimeInputFallback'
 import { DateTimeInputProps } from './Types'
 import { useTextBasedInput } from '../hooks/useTextBasedInput'
+import { HTMLInputElementProps } from '../../../types'
 
 let _isInputDateTimeLocalSupported: boolean | null = null
 
@@ -22,27 +23,28 @@ function isInputDateTimeLocalSupported() {
 	return _isInputDateTimeLocalSupported
 }
 
-type InnerInputProps = DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>
+type InnerInputProps = HTMLInputElementProps
 
-const InnerDatetimeInput = memo(
-	forwardRef((props: InnerInputProps, ref: Ref<HTMLInputElement>) => {
-		if (props.value) {
-			assertDatetimeString(props.value)
-		}
+const InnerDatetimeInput = memo(forwardRef((props: InnerInputProps, ref: Ref<HTMLInputElement>) => {
+	if (props.value) {
+		assertDatetimeString(props.value)
+	}
 
-		if (props.max) {
-			assertDatetimeString(props.max)
-		}
+	if (props.max) {
+		assertDatetimeString(props.max)
+	}
 
-		if (props.min) {
-			assertDatetimeString(props.min)
-		}
+	if (props.min) {
+		assertDatetimeString(props.min)
+	}
 
-		return <input ref={ref} {...props} type="datetime-local" />
-	}),
-)
+	return <input ref={ref} {...props} type="datetime-local" />
+}))
 InnerDatetimeInput.displayName = 'InnerDatetimeInput'
 
+/**
+ * @group Forms UI
+ */
 export const DateTimeInput = memo(
 	forwardRef(({
 		className,

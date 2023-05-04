@@ -8,6 +8,9 @@ export type AutoFieldsProps = {
 	excludedEntities?: string[]
 }
 
+/**
+ * @group Auto Admin
+ */
 export const AutoFields = Component<AutoFieldsProps>(
 	(props, env) => {
 		const schema = env.getSchema()

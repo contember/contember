@@ -3,7 +3,7 @@ import { FC, useCallback } from 'react'
 import { RoutingLinkTarget, useRedirect } from '../../../routing'
 import { useForm } from '../../lib'
 
-interface FillResetPasswordTokenFormProps {
+export interface FillResetPasswordTokenFormProps {
 	resetLink: RoutingLinkTarget
 }
 

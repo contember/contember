@@ -29,6 +29,9 @@ const markerIcon = Leaflet.divIcon({
 
 const defaultZoom = 5
 
+/**
+ * @group Form Fields
+ */
 export const LocationField: FunctionComponent<LocationFieldProps> = Component(
 	({
 		latitudeField,

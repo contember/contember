@@ -5,12 +5,11 @@ import {
 	EntitySubTreeAdditionalProps,
 	SugaredUnconstrainedQualifiedSingleEntity,
 } from '@contember/binding'
-import { ComponentType, memo, ReactNode } from 'react'
+import { ReactNode } from 'react'
 import { FeedbackRenderer, LayoutRenderer, LayoutRendererProps, PersistButton } from '../../bindingFacade'
-import type { PageProvider } from '../Pages'
 import { RedirectOnSuccessTarget } from '../useEntityRedirectOnPersistSuccess'
 import { useOnPersistSuccess } from '../useOnPersistSuccess'
-import { getPageName } from './getPageName'
+import { pageComponent } from './pageComponent'
 
 export type CreatePageProps =
 	& Omit<SugaredUnconstrainedQualifiedSingleEntity, 'isCreating'>
@@ -23,7 +22,21 @@ export type CreatePageProps =
 		rendererProps?: LayoutRendererProps
 	}
 
-const CreatePage: Partial<PageProvider<CreatePageProps>> & ComponentType<CreatePageProps> = memo(
+/**
+ * @example
+ * ```
+ * <CreatePage
+ *   entity="Article"
+ *   redirectOnSuccess="articleEdit(id: $entity.id)"
+ *   rendererProps={{ title: 'Create article' }}
+ * >
+ *   <TextField label="Name" name="name" />
+ * </CreatePage>
+ * ```
+ *
+ * @group Pages
+ */
+export const CreatePage = pageComponent(
 	({ pageName, children, rendererProps, redirectOnSuccess, onPersistSuccess, ...entityProps }: CreatePageProps) => {
 		return (
 			<DataBindingProvider stateComponent={FeedbackRenderer}>
@@ -35,9 +48,5 @@ const CreatePage: Partial<PageProvider<CreatePageProps>> & ComponentType<CreateP
 			</DataBindingProvider>
 		)
 	},
+	'CreatePage',
 )
-
-CreatePage.displayName = 'CreatePage'
-CreatePage.getPageName = getPageName
-
-export { CreatePage }

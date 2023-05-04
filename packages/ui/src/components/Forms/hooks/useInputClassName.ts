@@ -39,13 +39,13 @@ export function useInputClassName<P extends AllVisuallyDependentControlProps | V
 		console.warn(`New props need to be implemented, see ...restNotImplemented: ${Object.keys(restNotImplemented).join(', ')}`)
 	}
 
-  let finalIntent: typeof intent = disabled
+	let finalIntent: typeof intent = disabled
 		? 'default'
 		: intent
 
-  if (validationState === 'invalid') {
-      finalIntent = 'danger'
-  }
+	if (validationState === 'invalid') {
+		finalIntent = 'danger'
+	}
 
   return classNames(
 		toStateClass('active', active),

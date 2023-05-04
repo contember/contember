@@ -10,6 +10,9 @@ export interface EntityBaseProps {
 
 export type EntityProps = EntityBaseProps
 
+/**
+ * @group Data binding
+ */
 export const Entity = Component(
 	({ children, accessor }: EntityProps) => {
 	return (

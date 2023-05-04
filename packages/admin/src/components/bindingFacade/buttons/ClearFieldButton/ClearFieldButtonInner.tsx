@@ -11,6 +11,9 @@ export interface ClearFieldButtonInnerInternalProps {
 
 export type ClearFieldButtonInnerProps = ClearFieldButtonInnerPublicProps & ClearFieldButtonInnerInternalProps
 
+/**
+ * @internal
+ */
 export const ClearFieldButtonInner = (props: ClearFieldButtonInnerProps) => {
 	const { field, isMutating, ...buttonProps } = props
 	const onClick = useCallback(() => {

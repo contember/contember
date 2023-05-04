@@ -26,13 +26,13 @@ const loginVariables = {
 	otpToken: GQLVariable.String,
 }
 
-type LoginErrors =
+export type LoginErrors =
 	| 'UNKNOWN_EMAIL'
 	| 'INVALID_PASSWORD'
 	| 'OTP_REQUIRED'
 	| 'INVALID_OTP_TOKEN'
 
-interface LoginResult {
+export interface LoginResult {
 	token: string
 	person: {
 		id: string

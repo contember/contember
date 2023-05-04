@@ -6,27 +6,28 @@ import { assertWeekInputString } from '../Types'
 import type { WeekInputProps } from './Types'
 import { useTextBasedInput } from '../hooks/useTextBasedInput'
 
-export const WeekInput = memo(
-	forwardRef<HTMLInputElement, WeekInputProps>(({
-		className,
-		withTopToolbar,
-		...outerProps
-	}, forwardedRed) => {
-		outerProps.max && assertWeekInputString(outerProps.max)
-		outerProps.min && assertWeekInputString(outerProps.min)
-		outerProps.value && assertWeekInputString(outerProps.value)
+/**
+ * @group Forms UI
+ */
+export const WeekInput = memo(forwardRef<HTMLInputElement, WeekInputProps>(({
+	className,
+	withTopToolbar,
+	...outerProps
+}, forwardedRed) => {
+	outerProps.max && assertWeekInputString(outerProps.max)
+	outerProps.min && assertWeekInputString(outerProps.min)
+	outerProps.value && assertWeekInputString(outerProps.value)
 
-		const props = useTextBasedInput<HTMLInputElement>({
-			...outerProps,
-			className: classNames(
-				useComponentClassName('text-input'),
-				useComponentClassName('week-input'),
-				toViewClass('withTopToolbar', withTopToolbar),
-				className,
-			),
-		}, forwardedRed)
+	const props = useTextBasedInput<HTMLInputElement>({
+		...outerProps,
+		className: classNames(
+			useComponentClassName('text-input'),
+			useComponentClassName('week-input'),
+			toViewClass('withTopToolbar', withTopToolbar),
+			className,
+		),
+	}, forwardedRed)
 
-		return <input {...props} type="week" />
-	}),
-)
+	return <input {...props} type="week" />
+}))
 WeekInput.displayName = 'WeekInput'

@@ -19,6 +19,11 @@ type SelectCellFilterProps =
 		optionProps: BaseDynamicChoiceField
 	}
 
+/**
+ * DataGrid filter component for rendering selects in custom cells. Usually, you just use {@link HasManySelectCell} or {@link HasOneSelectCell}
+ *
+ * @group Data grid
+ */
 export const SelectCellFilter = ({ filter, setFilter, optionProps }: SelectCellFilterProps) => {
 	const currentlyChosenEntities = useCurrentlyChosenEntities(optionProps, filter.id)
 	const { options, allOptions, onSearch, isLoading } = useSelectOptions(optionProps, currentlyChosenEntities)

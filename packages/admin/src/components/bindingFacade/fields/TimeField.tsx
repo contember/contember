@@ -6,6 +6,9 @@ export type TimeFieldProps = SimpleRelativeSingleFieldProps & TimeInputProps
 
 const parse: ControlValueParser<string, string> = value => value ??  null
 
+/**
+ * @group Form Fields
+ */
 export const TimeField = SimpleRelativeSingleField<TimeFieldProps, string>(
 	(fieldMetadata, props) => {
 		const inputProps = useFieldControl<string, string>({

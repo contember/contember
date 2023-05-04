@@ -4,13 +4,12 @@ import {
 	EntitySubTreeAdditionalProps,
 	SugaredQualifiedSingleEntity,
 } from '@contember/binding'
-import { ComponentType, memo, ReactNode } from 'react'
+import { ReactNode } from 'react'
 import { FeedbackRenderer, LayoutRenderer, LayoutRendererProps, PersistButton } from '../../bindingFacade'
-import type { PageProvider } from '../Pages'
 import { RedirectOnSuccessTarget } from '../useEntityRedirectOnPersistSuccess'
 import { useOnPersistSuccess } from '../useOnPersistSuccess'
 import { NotFoundWrapper } from './NotFoundWrapper'
-import { getPageName } from './getPageName'
+import { pageComponent } from './pageComponent'
 
 export type EditPageProps =
 	& SugaredQualifiedSingleEntity
@@ -24,7 +23,20 @@ export type EditPageProps =
 		skipBindingStateUpdateAfterPersist?: boolean
 	}
 
-const EditPage: Partial<PageProvider<EditPageProps>> & ComponentType<EditPageProps> = memo(
+/**
+ * @example
+ * ```
+ * <EditPage
+ *   entity="Article(id = $id)"
+ *   rendererProps={{ title: 'Edit article' }}
+ * >
+ *   <TextField label="Name" name="name" />
+ * </EditPage>
+ * ```
+ *
+ * @group Pages
+ */
+export const EditPage = pageComponent(
 	({ pageName, children, rendererProps, redirectOnSuccess, onPersistSuccess, refreshDataBindingOnPersist, skipBindingStateUpdateAfterPersist, ...entityProps }: EditPageProps) => (
 		<DataBindingProvider
 			stateComponent={FeedbackRenderer}
@@ -40,9 +52,5 @@ const EditPage: Partial<PageProvider<EditPageProps>> & ComponentType<EditPagePro
 			</EntitySubTree>
 		</DataBindingProvider>
 	),
+	'EditPage',
 )
-
-EditPage.displayName = 'EditPage'
-EditPage.getPageName = getPageName
-
-export { EditPage }

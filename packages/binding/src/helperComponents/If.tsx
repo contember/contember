@@ -22,6 +22,9 @@ export interface IfCallbackProps {
 	children?: ReactNode
 }
 
+/**
+ * @group Logic Components
+ */
 export const If = Component<IfProps>(props => {
 		return typeof props.condition !== 'function'
 			? <IfFilter condition={props.condition}>{props.children}</IfFilter>

@@ -18,6 +18,16 @@ export type DataBindingProviderProps<StateProps> = DataBindingProviderBaseProps 
 		  }
 	)
 
+/**
+ * The `DataBindingProvider` is a root component for all other data binding related components.
+ *
+ * @example
+ * ```
+ * <DataBindingProvider stateComponent={FeedbackRenderer} />
+ * ```
+ *
+ * @group Data binding
+ */
 export const DataBindingProvider = memo(function DataBindingProvider<StateProps extends DataBindingStateComponentProps>(
 	props: DataBindingProviderProps<StateProps>,
 ) {

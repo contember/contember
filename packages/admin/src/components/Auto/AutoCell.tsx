@@ -28,6 +28,9 @@ export type AutoCellProps = {
 	createEntityLink?: (entity: string) => RoutingLinkTarget
 }
 
+/**
+ * @group Auto Admin
+ */
 export const AutoCell = Component<AutoCellProps>(
 	({ schema, entityName, fieldName, createEntityLink }) => {
 		const field = schema.getEntityField(entityName, fieldName)

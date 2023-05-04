@@ -17,6 +17,9 @@ export type FileRepeaterProps<SFExtraProps extends {} = {}> =
 		children?: ReactNode
 	}
 
+/**
+ * @group Uploads
+ */
 export const FileRepeater = Component<FileRepeaterProps>(
 	props => {
 		const fileHandler = useFileHandler(props, 'FileRepeater')

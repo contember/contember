@@ -7,6 +7,9 @@ export interface ErrorListProps {
 	errors?: FieldErrors
 }
 
+/**
+ * @group Forms UI
+ */
 export const ErrorList = memo(({ errors = [] }: ErrorListProps) => {
 	const prefix = useClassNamePrefix()
 	const messages = useMemo(() => [...new Set(errors.map(it => it.message))], [errors])

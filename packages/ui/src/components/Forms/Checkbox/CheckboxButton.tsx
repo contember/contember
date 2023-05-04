@@ -9,6 +9,9 @@ export interface CheckboxButtonProps extends AllVisuallyDependentControlProps {
 	indeterminate?: boolean
 }
 
+/**
+ * @group Forms UI
+ */
 export const CheckboxButton = ({
 	id,
 	name,

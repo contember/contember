@@ -1,6 +1,6 @@
 import { SyntheticEvent, useCallback, useState } from 'react'
 
-interface FormMethods<V> {
+export interface FormMethods<V> {
 	values: V
 	setValues: (values: V) => void
 	isSubmitting: boolean

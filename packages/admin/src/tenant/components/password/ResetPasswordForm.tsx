@@ -4,7 +4,7 @@ import { RoutingLinkTarget, useRedirect } from '../../../routing'
 import { useForm } from '../../lib'
 import { useResetPassword } from '../../mutations'
 
-interface ResetPasswordFormProps {
+export interface ResetPasswordFormProps {
 	token: string
 	redirectOnSuccess: RoutingLinkTarget
 }

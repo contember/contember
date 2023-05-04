@@ -10,6 +10,9 @@ export type BooleanFieldViewProps = {
 	format?: (date: boolean) => ReactNode
 } & FieldFallbackViewPublicProps
 
+/**
+ * @group Field Views
+ */
 export const BooleanFieldView: FunctionComponent<BooleanFieldViewProps> = Component(
 	({ field, booleanStyle, format, fallback, fallbackStyle }) => {
 		const booleanField = useField<boolean>(field)

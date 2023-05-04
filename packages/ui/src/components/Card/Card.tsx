@@ -1,6 +1,7 @@
 import classNames from 'classnames'
 import { memo, MouseEvent, ReactNode } from 'react'
 import { useComponentClassName } from '../../auxiliary'
+import { HTMLAnchorElementProps, HTMLDivElementProps } from '../../types'
 import { toEnumViewClass, toFeatureClass, toStateClass } from '../../utils'
 import { VisuallyDependentControlProps } from '../Forms'
 import { useInputClassName } from '../Forms/hooks/useInputClassName'
@@ -26,7 +27,7 @@ const CardInner = ({
 	</div>
 )
 
-interface LinkCompatibleProps {
+export interface LinkCompatibleProps {
 	active: boolean
 	href: string
 	onClick: (e?: MouseEvent<HTMLAnchorElement>) => void
@@ -45,7 +46,7 @@ export type CommonCardProps =
 
 export type CardProps =
 	& Omit<CommonCardProps, 'type'>
-	& Omit<JSX.IntrinsicElements['div'], 'onClick'>
+	& Omit<HTMLDivElementProps, 'onClick'>
 	& {
 		href?: never
 		onClick?: () => void
@@ -53,9 +54,12 @@ export type CardProps =
 
 export type LinkCardProps =
 	& Omit<CommonCardProps, 'active' | 'type'>
-	& Omit<JSX.IntrinsicElements['a'], 'href' | 'onClick'>
+	& Omit<HTMLAnchorElementProps, 'href' | 'onClick'>
 	& LinkCompatibleProps
 
+/**
+ * @group UI
+ */
 export const LinkCard = memo<LinkCardProps>(
 	({
 		active,
@@ -86,6 +90,9 @@ export const LinkCard = memo<LinkCardProps>(
 )
 LinkCard.displayName = 'LinkCard'
 
+/**
+ * @group UI
+ */
 export const Card = memo<CardProps>(
 	({
 		children,

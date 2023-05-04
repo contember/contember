@@ -11,6 +11,9 @@ export type UserListPageProps<T> =
 		editUserLink?: RoutingLinkTarget
 	}
 
+/**
+ * @group Tenant
+ */
 export const UserListPage = <T extends {}>(props: UserListPageProps<T>) => {
 	const project = useProjectSlug()
 	const roleRendererFactory = useRoleRendererFactory(props)

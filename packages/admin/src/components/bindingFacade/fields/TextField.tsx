@@ -23,6 +23,11 @@ export type TextFieldProps =
 const parse: ControlValueParser<string, string> = value => value ??  null
 const format: FieldValueFormatter<string, string> = value => value ?? null
 
+/**
+ * Renders a text field used for basic string editing and has no rich text editing capabilities.
+ *
+ * @group Form Fields
+ */
 export const TextField = SimpleRelativeSingleField<TextFieldProps, string>(
 	(fieldMetadata, {
 		allowNewlines,

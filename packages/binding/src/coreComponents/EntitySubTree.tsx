@@ -32,6 +32,16 @@ export type EntitySubTreeProps<EntityProps> =
 		| (SugaredUnconstrainedQualifiedSingleEntity & EntitySubTreeAdditionalCreationProps)
 	)
 
+/**
+ * Creates a single entity subtree in current data binding context.
+ *
+ * @example
+ * ```
+ * <EntitySubTree entity="Post(id = $id)" />
+ * ```
+ *
+ * @group Data binding
+ */
 export const EntitySubTree = Component(
 	<EntityProps extends {}>(props: EntitySubTreeProps<EntityProps>) => {
 		useConstantValueInvariant(props.isCreating, 'EntitySubTree: cannot update isCreating')

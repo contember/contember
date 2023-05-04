@@ -19,12 +19,12 @@ const UPDATE_MEMBERSHIP_QUERY = `
 	}
 `
 
-interface UpdateMembershipVariables {
+export interface UpdateMembershipVariables {
 	projectSlug: string
 	identityId: string
 }
 
-interface UpdateMembershipResult {
+export interface UpdateMembershipResult {
 	removeProjectMember: {
 		ok: boolean
 		errors: { code: string }[]

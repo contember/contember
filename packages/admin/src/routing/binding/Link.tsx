@@ -10,6 +10,9 @@ import { ROUTING_BINDING_PARAMETER_PREFIX, useBindingLinkParametersResolver } fr
 export interface LinkProps extends Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'>, Omit<RoutingLinkProps, 'parametersResolver'> {
 }
 
+/**
+ * @group Routing
+ */
 export const Link = Component(({ to, ...props }: LinkProps) => {
 	const parametersResolver = useBindingLinkParametersResolver()
 	const env = useEnvironment()

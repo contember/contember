@@ -1,16 +1,16 @@
 import classnames from 'classnames'
-import { memo, ReactNode, useContext, useRef } from 'react'
+import { ComponentType, memo, ReactNode, useContext, useRef } from 'react'
 import { useFocusRing, useHover, useRadio, VisuallyHidden } from 'react-aria'
 import { useClassNamePrefix } from '../../../auxiliary'
 import { Size, ValidationState } from '../../../types'
 import { toEnumStateClass, toStateClass } from '../../../utils'
 import { FieldContainer } from '../FieldContainer'
-import { RadioButton as DefaultRadioButton } from './RadioButton'
+import { RadioButton as DefaultRadioButton, RadioButtonProps } from './RadioButton'
 import { RadioContext } from './RadioContext'
 import type { RadioOption } from './types'
 
-interface RadioProps {
-	RadioButtonComponent?: typeof DefaultRadioButton
+export interface RadioControlProps {
+	RadioButtonComponent?: ComponentType<RadioButtonProps>
 	children: ReactNode
 	description: ReactNode
 	name?: string
@@ -19,7 +19,10 @@ interface RadioProps {
 	size?: Size
 }
 
-export const RadioControl = memo(({ RadioButtonComponent, description, size, validationState, ...props }: RadioProps) => {
+/**
+ * @group Forms UI
+ */
+export const RadioControl = memo(({ RadioButtonComponent, description, size, validationState, ...props }: RadioControlProps) => {
 	const { children, value } = props
 
 	const componentClassName = `${useClassNamePrefix()}radio-control`

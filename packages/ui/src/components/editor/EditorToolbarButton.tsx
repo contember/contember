@@ -16,47 +16,40 @@ export interface ToolbarButton extends IconSourceSpecification {
 	onMouseDown?: MouseEventHandler
 }
 
-export const EditorToolbarButton = memo(
-	forwardRef<any, ToolbarButton>(
-		(
-			{
-				label,
-				title,
-				contemberIcon,
-				customIcon,
-				blueprintIcon,
-				showLabel,
-				isActive,
-				layout = 'grid',
-				onClick,
-				onMouseDown,
-			},
-			ref,
-		) => {
-			return (
-				<button
-					ref={ref}
-					role="button"
-					type="button"
-					tabIndex={0}
-					onMouseDown={onMouseDown}
-					onClick={onClick}
-					title={title || String(label)}
-					className={cn(
-						useComponentClassName('editorToolbarButton'),
-						toViewClass('showLabel', showLabel),
-						toViewClass('active', isActive),
-						toViewClass(`layout-${layout}`, true),
-					)}
-				>
-					<span className={cn(useComponentClassName('editorToolbarButton-icon'))}>
-						<Icon size="large" {...{ contemberIcon, customIcon, blueprintIcon }} />
-					</span>
-					<span className={cn(useComponentClassName('editorToolbarButton-label'))}>{label}</span>
-				</button>
-			)
-		},
-	),
-)
+export const EditorToolbarButton = memo(forwardRef<any, ToolbarButton>(({
+	label,
+	title,
+	contemberIcon,
+	customIcon,
+	blueprintIcon,
+	showLabel,
+	isActive,
+	layout = 'grid',
+	onClick,
+	onMouseDown,
+}, ref) => {
+	return (
+		<button
+			ref={ref}
+			role="button"
+			type="button"
+			tabIndex={0}
+			onMouseDown={onMouseDown}
+			onClick={onClick}
+			title={title || String(label)}
+			className={cn(
+				useComponentClassName('editorToolbarButton'),
+				toViewClass('showLabel', showLabel),
+				toViewClass('active', isActive),
+				toViewClass(`layout-${layout}`, true),
+			)}
+		>
+			<span className={cn(useComponentClassName('editorToolbarButton-icon'))}>
+				<Icon size="large" {...{ contemberIcon, customIcon, blueprintIcon }} />
+			</span>
+			<span className={cn(useComponentClassName('editorToolbarButton-label'))}>{label}</span>
+		</button>
+	)
+}))
 
 EditorToolbarButton.displayName = 'EditorToolbarButton'

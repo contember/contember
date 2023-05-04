@@ -10,6 +10,9 @@ export interface ContainerSpinnerProps {
 	size?: Size
 }
 
+/**
+ * @group UI
+ */
 export const ContainerSpinner = memo(({ size }: ContainerSpinnerProps) => (
 	<Aether className={cn(useComponentClassName('containerSpinner'), toEnumViewClass(size))}>
 		<Spinner />

@@ -6,6 +6,11 @@ export interface RepeaterProps<ContainerExtraProps, ItemExtraProps>
 	extends SugaredRelativeEntityList,
 		Omit<RepeaterInnerProps<ContainerExtraProps, ItemExtraProps>, 'accessor'> {}
 
+/**
+ * The `Repeater` component renders a repeater with given child components.
+ *
+ * @group Blocks and repeaters
+ */
 export const Repeater = Component(
 	<ContainerExtraProps, ItemExtraProps>(props: RepeaterProps<ContainerExtraProps, ItemExtraProps>) => {
 		if (import.meta.env.DEV) {

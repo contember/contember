@@ -8,6 +8,9 @@ export interface IdentityMembershipProps {
 	memberships: Membership[]
 }
 
+/**
+ * @group Tenant
+ */
 export const IdentityMembership: FC<IdentityMembershipProps> = ({ RoleRenderer, memberships }) => {
 	return (
 		<>

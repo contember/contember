@@ -10,6 +10,9 @@ export type GenericTextCellFilterArtifacts = {
 	query: string
 }
 
+/**
+ * @group Data grid
+ */
 export const GenericTextCellFilter = <Filter extends GenericTextCellFilterArtifacts>({ filter, setFilter }: {
 	filter: Filter,
 	setFilter: (filter: Filter) => void,

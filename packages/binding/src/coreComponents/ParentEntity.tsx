@@ -7,6 +7,9 @@ export interface ParentEntityProps extends SugaredParentEntityParameters {
 	children?: ReactNode
 }
 
+/**
+ * @group Data binding
+ */
 export const ParentEntity = Component<ParentEntityProps>(
 	props => <>{props.children}</>,
 	{

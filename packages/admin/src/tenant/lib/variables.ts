@@ -26,10 +26,12 @@ export namespace GQLVariable {
 	})
 }
 
-type KeysMatching<T, V> = NonNullable<{ [K in keyof T]: T[K] extends V ? K : never }[keyof T]>
+export type KeysMatching<T, V> = NonNullable<{ [K in keyof T]: T[K] extends V ? K : never }[keyof T]>
 
-export type GQLVariableValues<VariableMap extends Record<string, GQLVariableType>> = {
-	[K in KeysMatching<VariableMap, GQLVariableType<any, true>>]: VariableMap[K] extends GQLVariableType<infer Value, boolean> ? Value : never
-} & {
+export type GQLVariableValues<VariableMap extends Record<string, GQLVariableType>> =
+	& {
+		[K in KeysMatching<VariableMap, GQLVariableType<any, true>>]: VariableMap[K] extends GQLVariableType<infer Value, boolean> ? Value : never
+	}
+	& {
 		[K in KeysMatching<VariableMap, GQLVariableType<any, false>>]?: VariableMap[K] extends GQLVariableType<infer Value, boolean> ? Value : never
 	}

@@ -8,6 +8,9 @@ export interface DerivedFieldLinkProps<SourcePersisted extends FieldValue = Fiel
 	agent?: string
 }
 
+/**
+ * @group Data binding
+ */
 export const DerivedFieldLink: FunctionComponent<DerivedFieldLinkProps> = Component(
 	props => {
 		useDerivedField(props.sourceField, props.derivedField, props.transform, props.agent)

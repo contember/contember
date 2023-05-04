@@ -19,6 +19,9 @@ export type MultiSelectFieldProps =
 	& MultiSelectFieldInnerPublicProps
 	& DynamicMultipleChoiceFieldProps
 
+/**
+ * @group Form Fields
+ */
 export const MultiSelectField: FunctionComponent<MultiSelectFieldProps> = Component(
 	props => (
 		<DynamicMultiChoiceField {...props} >
@@ -42,6 +45,10 @@ export type MultiSelectFieldInnerProps<ActualValue> =
 	& { errors: FieldErrors | undefined }
 
 const typedMemo: <T>(c: T) => T = memo
+
+/**
+ * @internal
+ */
 export const MultiSelectFieldInner = typedMemo(
 	<T = unknown>({
 		currentValues,

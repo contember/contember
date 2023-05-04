@@ -24,6 +24,24 @@ export type EnumCellArtifacts = {
 /** @deprecated */
 type LegacyEnumCellArtifacts = string[]
 
+/**
+ * DataGrid cells for enums fields.
+ *
+ * @example
+ * ```
+ * <EnumCell
+ * 	field={'state'}
+ * 	options={{
+ * 		draft: 'Draft',
+ * 		published: 'Published',
+ * 		removed: 'Removed',
+ * 	}}
+ * 	header={'State'}
+ * />
+ * ```
+ *
+ * @group Data grid
+ */
 export const EnumCell = Component<EnumCellProps>(props => {
 	return (
 		<DataGridColumn<EnumCellArtifacts | LegacyEnumCellArtifacts>

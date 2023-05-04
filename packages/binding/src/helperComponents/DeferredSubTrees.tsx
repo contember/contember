@@ -22,6 +22,9 @@ type LoadState =
 			treeRootId: TreeRootId | undefined
 	  }
 
+/**
+ * @group Data binding
+ */
 export const DeferredSubTrees = Component<DeferredSubTreesProps>(
 	props => {
 		const { extendTree } = useBindingOperations()

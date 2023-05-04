@@ -52,7 +52,12 @@ export type DataGridColumnProps<FA extends DataGridFilterArtifact = DataGridFilt
 
 export type DataGridColumns = Map<DataGridColumnKey, DataGridColumnProps>
 
-// This is deliberately not a Component!
+// This is deliberately not a Contember Component!
+/**
+ * Constructor for custom DataGrid cell.
+ *
+ * @group Data grid
+ */
 export const DataGridColumn: <FA extends DataGridFilterArtifact = DataGridFilterArtifact>(
 	props: DataGridColumnProps<FA>,
 ) => ReactElement = <FA extends DataGridFilterArtifact = DataGridFilterArtifact>(

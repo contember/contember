@@ -7,6 +7,9 @@ export interface SugaredFieldProps<Persisted extends FieldValue = FieldValue> ex
 	field: string | SugaredRelativeSingleField
 }
 
+/**
+ * @group Data binding
+ */
 export const SugaredField = Component(<Persisted extends FieldValue = FieldValue>(props: SugaredFieldProps<Persisted>) => {
 	if (typeof props.field === 'string') {
 		return <Field {...props} field={props.field} />

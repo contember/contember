@@ -13,7 +13,7 @@ import type { SimpleRelativeSingleFieldProps } from '../auxiliary'
 import { SimpleRelativeSingleField } from '../auxiliary'
 import { useFieldControl } from './useFieldControl'
 
-type SlugPrefix = string | ((environment: Environment) => string)
+export type SlugPrefix = string | ((environment: Environment) => string)
 
 export type SlugFieldProps =
 	& SimpleRelativeSingleFieldProps
@@ -31,6 +31,9 @@ const useNormalizedPrefix = (value?: SlugPrefix) => {
 	return useMemo(() => typeof value === 'function' ? value(environment) : value ?? '', [value, environment])
 }
 
+/**
+ * @group Form Fields
+ */
 export const SlugField = Component<SlugFieldProps>(
 	props => <SlugFieldInner {...props}/>,
 	props => <>

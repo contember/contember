@@ -18,7 +18,7 @@ const changePasswordVariables = {
 	newPassword: GQLVariable.Required(GQLVariable.String),
 }
 
-type ChangePasswordErrors =
+export type ChangePasswordErrors =
 	| 'TOO_WEAK'
 	| 'NOT_A_PERSON'
 	| 'INVALID_PASSWORD'

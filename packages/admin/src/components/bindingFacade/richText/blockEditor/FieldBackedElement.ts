@@ -2,14 +2,14 @@ import { SugarableRelativeSingleField } from '@contember/binding'
 import { EditorCanvasDistinction, Size } from '@contember/ui'
 import { ReactNode } from 'react'
 
-interface RichTextFieldBackedElement {
+export interface RichTextFieldBackedElement {
 	field: string | SugarableRelativeSingleField
 	placeholder: string
 	format: 'richText'
 	distinction?: EditorCanvasDistinction
 }
 
-interface PlainTextFieldBackedElement {
+export interface PlainTextFieldBackedElement {
 	field: string | SugarableRelativeSingleField
 	placeholder: string
 	format: 'plainText'
@@ -17,7 +17,7 @@ interface PlainTextFieldBackedElement {
 	size?: Size
 }
 
-interface CustomFieldBackedElement {
+export interface CustomFieldBackedElement {
 	element: ReactNode
 }
 

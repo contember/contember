@@ -1,13 +1,19 @@
 import { Component } from '@contember/binding'
 import type { ReactElement } from 'react'
-import type { StockAnyFileKindProps } from '../../fileKinds'
 import { getStockAnyFileKind } from '../../fileKinds'
 import { PublicSingleKindUploadFieldProps, SingleKindUploadField } from '../../internalComponents'
 
 export type AnyUploadFieldProps<AcceptArtifacts = unknown, SFExtraProps extends {} = {}> =
 	& PublicSingleKindUploadFieldProps<AcceptArtifacts, SFExtraProps>
-	& StockAnyFileKindProps<AcceptArtifacts>
 
+/**
+ * @example
+ * ```
+ * <AnyUploadField field="file" urlField="file.url" />
+ * ```
+ *
+ * @group Uploads
+ */
 export const AnyUploadField = Component<AnyUploadFieldProps>(
 	props => (
 		<SingleKindUploadField {...props} kindFactory={getStockAnyFileKind}/>

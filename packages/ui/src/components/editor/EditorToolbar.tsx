@@ -8,7 +8,7 @@ import { EditorToolbarButton, ToolbarButton } from './EditorToolbarButton'
 
 export type EditorToolbarLayout = 'bar' | 'list' | 'grid'
 
-interface ToolbarButtonOrDropdown extends ToolbarButton {
+export interface ToolbarButtonOrDropdown extends ToolbarButton {
 	groups?: ToolbarGroup[]
 }
 
@@ -72,67 +72,69 @@ function ButtonOrDropdown(props: ToolbarButtonOrDropdown & WithPopupProps) {
 	)
 }
 
-export const EditorToolbar = memo(
-	forwardRef<HTMLDivElement, EditorToolbarProps>(
-		({ isActive, scope, groups, showLabels, restGroups, layout }: EditorToolbarProps, ref) => {
-			layout = layout ?? 'bar'
-			const buttonLayout = layout === 'list' ? 'list' : 'grid'
-			if (restGroups) {
-				switch (layout) {
-					case 'grid':
-					case 'list':
-						groups = [...groups, ...restGroups]
-						restGroups = undefined
-				}
-			}
-			const groupClassName = useComponentClassName('editorToolbar-group')
-			return (
-				<div
-					className={cn(
-						useComponentClassName('editorToolbar'),
-						toStateClass('active', isActive),
-						toEnumViewClass(scope),
-						toViewClass(`layout-${layout}`, true),
-					)}
-					ref={ref}
-				>
-					<div className={cn(useComponentClassName('editorToolbar-groups'))}>
-						{groups.map((g, i) => (
-							<div key={i} className={cn(groupClassName)}>
-								{g.buttons.map((b, i) => (
-									<ButtonOrDropdown
-										key={i}
-										layout={buttonLayout}
-										showLabel={showLabels}
-										popup={{
-											layout: 'list',
-											showLabels: true,
-											scope: scope,
-										}}
-										{...b}
-									/>
-								))}
-							</div>
+export const EditorToolbar = memo(forwardRef<HTMLDivElement, EditorToolbarProps>(({
+	isActive,
+	scope, groups,
+	showLabels,
+	restGroups,
+	layout,
+}, ref) => {
+	layout = layout ?? 'bar'
+	const buttonLayout = layout === 'list' ? 'list' : 'grid'
+	if (restGroups) {
+		switch (layout) {
+			case 'grid':
+			case 'list':
+				groups = [...groups, ...restGroups]
+				restGroups = undefined
+		}
+	}
+	const groupClassName = useComponentClassName('editorToolbar-group')
+	return (
+		<div
+			className={cn(
+				useComponentClassName('editorToolbar'),
+				toStateClass('active', isActive),
+				toEnumViewClass(scope),
+				toViewClass(`layout-${layout}`, true),
+			)}
+			ref={ref}
+		>
+			<div className={cn(useComponentClassName('editorToolbar-groups'))}>
+				{groups.map((g, i) => (
+					<div key={i} className={cn(groupClassName)}>
+						{g.buttons.map((b, i) => (
+							<ButtonOrDropdown
+								key={i}
+								layout={buttonLayout}
+								showLabel={showLabels}
+								popup={{
+									layout: 'list',
+									showLabels: true,
+									scope: scope,
+								}}
+								{...b}
+							/>
 						))}
-						{restGroups && !!restGroups.length && (
-							<div className={cn(groupClassName, 'view-rest')}>
-								<ButtonOrDropdown
-									label="More…"
-									contemberIcon="ellipsis"
-									groups={restGroups}
-									showLabel={showLabels}
-									popup={{
-										layout: 'grid',
-										showLabels: true,
-										scope: scope,
-									}}
-								/>
-							</div>
-						)}
 					</div>
-				</div>
-			)
-		},
-	),
-)
+				))}
+				{restGroups && !!restGroups.length && (
+					<div className={cn(groupClassName, 'view-rest')}>
+						<ButtonOrDropdown
+							label="More…"
+							contemberIcon="ellipsis"
+							groups={restGroups}
+							showLabel={showLabels}
+							popup={{
+								layout: 'grid',
+								showLabels: true,
+								scope: scope,
+							}}
+						/>
+					</div>
+				)}
+			</div>
+		</div>
+	)
+}))
 EditorToolbar.displayName = 'EditorToolbar'

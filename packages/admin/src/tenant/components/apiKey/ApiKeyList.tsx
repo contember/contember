@@ -9,6 +9,9 @@ export interface ApiKeyListProps {
 	editApiKeyLink: RoutingLinkTarget
 }
 
+/**
+ * @group Tenant
+ */
 export const ApiKeyList = memo<ApiKeyListProps>(({ editApiKeyLink, ...props }) => (
 	<MemberList
 		{...props}

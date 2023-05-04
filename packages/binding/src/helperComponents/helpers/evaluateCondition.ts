@@ -47,6 +47,6 @@ export const evaluateCondition = (value: FieldValue | null, condition: Input.Con
 			if (!handler) {
 				throw new BindingError()
 			}
-			return handler(argument)
+			return (handler as any)(argument)
 		})
 	}

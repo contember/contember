@@ -4,7 +4,13 @@ export interface ContentOutletProps {
 	placeholder?: string
 }
 
-// This is deliberately not a Component!
+/**
+ * Marker for Content in Block Editor blocks
+ *
+ * This is deliberately not a Contember Component!
+ *
+ * @group Block Editor
+ */
 export const ContentOutlet = (props: ContentOutletProps) => {
 	throw new BindingError(
 		`BlockEditor.ContentOutlet may only appear as an immediate child of a block!\n\n` +

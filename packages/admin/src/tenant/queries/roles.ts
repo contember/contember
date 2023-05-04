@@ -23,11 +23,11 @@ const LIST_ROLES_QUERY = `
 	}
 `
 
-interface RoleVariableDefinitionBase {
+export interface RoleVariableDefinitionBase {
 	name: string
 }
 
-interface RoleEntityVariableDefinition {
+export interface RoleEntityVariableDefinition {
 	entityName: string
 }
 
@@ -38,14 +38,14 @@ export interface RoleDefinition {
 	variables: RoleVariableDefinition[]
 }
 
-interface ListRolesQueryResult {
+export interface ListRolesQueryResult {
 	project: {
 		id: string
 		roles: RoleDefinition[]
 	}
 }
 
-interface ListRolesQueryVariables {
+export interface ListRolesQueryVariables {
 	slug: string
 }
 

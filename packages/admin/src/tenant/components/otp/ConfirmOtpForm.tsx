@@ -5,7 +5,7 @@ import { RoutingLinkTarget, useRedirect } from '../../../routing'
 import { useForm } from '../../lib'
 import { useConfirmOtp } from '../../mutations'
 
-interface ConfirmOtpFormProps {
+export interface ConfirmOtpFormProps {
 	redirectOnSuccess?: RoutingLinkTarget
 	onSuccess?: () => void
 }

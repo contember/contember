@@ -12,15 +12,15 @@ const SIGNOUT_MUTATION = `
 	}
 `
 
-type SignOutResponse = SignOutResponseOk | SignOutResponseError
+export type SignOutResponse = SignOutResponseOk | SignOutResponseError
 
-interface SignOutResponseOk {
+export interface SignOutResponseOk {
 	signOut: {
 		ok: true
 	}
 }
 
-interface SignOutResponseError {
+export interface SignOutResponseError {
 	signOut: {
 		ok: false
 		error?: {

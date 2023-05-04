@@ -193,4 +193,7 @@ const nativeValidationInputStyle: CSSProperties = {
 type MemoForwardRefComponentWithGenericProps = <A, B, R>(Component: (props: A, ref: ForwardedRef<R>) => B) => (props: A & RefAttributes<R>) => ReactElement | null
 const memoizedForwardedComponentWithGenericProps: MemoForwardRefComponentWithGenericProps = <A, B, R>(Component: (props: A, ref: ForwardedRef<R>) => B) => ((memo(forwardRef(Component as any)) as any) as (props: A & RefAttributes<R>) => ReactElement | null)
 
+/**
+ * @group Forms UI
+ */
 export const Select = memoizedForwardedComponentWithGenericProps(SelectComponent) // as typeof SelectComponent

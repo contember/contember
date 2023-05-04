@@ -31,6 +31,19 @@ type CP = FieldViewCommonProps
 type RN = ReactNode
 type REN = ReactElement | null
 
+/**
+ * Base field view component with no default formatting.
+ *
+ * @example
+ * ```
+ * <FieldView
+ *   field="startsAt"
+ *   render={(accessor) => <>{accessor.value}</>}
+ * />
+ * ```
+ *
+ * @group Field Views
+ */
 export const FieldView = Component<FieldViewProps>(
 	props => {
 		const { fallbackIfUnpersisted, render } = props

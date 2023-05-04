@@ -22,6 +22,22 @@ export type DataGridProps<ComponentExtraProps extends {}> =
 		}
 	)
 
+/**
+ * Main DataGrid component. Requires cells as a children.
+ *
+ * @example
+ * ```
+ * <DataGrid
+ *   entities="Article"
+ *   itemsPerPage={50}
+ * >
+ *   <TextCell header="Title" field="title" />
+ *   <TextCell header="Author" field="author.name" />
+ * </DataGrid>
+ * ```
+ *
+ * @group Data grid
+ */
 export const DataGrid = Component(
 	<ComponentProps extends {}>(props: DataGridProps<ComponentProps>) => {
 		return <ControlledDataGrid {...useDataGrid(props)} />

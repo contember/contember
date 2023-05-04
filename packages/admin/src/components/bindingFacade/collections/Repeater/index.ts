@@ -1,5 +1,5 @@
 export * from './Repeater'
-export type { RepeaterDictionary } from './repeaterDictionary'
+export * from './repeaterDictionary'
 export * from './RepeaterFieldContainer'
 export * from './RepeaterHandle'
 export * from './RepeaterInner'

@@ -17,6 +17,9 @@ export interface MemberListProps {
 	editIdentityLink: RoutingLinkTarget
 }
 
+/**
+ * @group Tenant
+ */
 export const MemberList = memo<MemberListProps>(({ project, createRoleRenderer, editIdentityLink, Identity, memberType }) => {
 		const { state: query, refetch: refetchMembersList } = useListMembersQuery(project, memberType)
 		const removeMember = useRemoveMemberIntent(project, refetchMembersList)

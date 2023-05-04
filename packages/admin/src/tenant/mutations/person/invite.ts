@@ -25,7 +25,7 @@ const inviteVariables = {
 	mailVariant: GQLVariable.String,
 }
 
-type InviteErrorCodes =
+export type InviteErrorCodes =
 	| 'PROJECT_NOT_FOUND'
 	| 'ALREADY_MEMBER'
 	| 'INVALID_MEMBERSHIP'

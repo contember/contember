@@ -11,6 +11,9 @@ export type AutoGridProps =
 		createEditLinkTarget?: (entity: string) => RoutingLinkTarget
 	}
 
+/**
+ * @group Auto Admin
+ */
 export const AutoGrid = Component<AutoGridProps>(
 	(props: AutoGridProps, env) => {
 		const schema = env.getSchema()

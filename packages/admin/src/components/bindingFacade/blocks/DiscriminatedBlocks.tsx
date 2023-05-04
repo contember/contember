@@ -5,11 +5,31 @@ import { ChoiceFieldData, NormalizedStaticOption, SelectFieldInner, StaticSingle
 import { useStaticSingleChoiceField } from '../fields/ChoiceField/hooks/useStaticSingleChoiceField'
 import { useNormalizedBlocks } from './useNormalizedBlocks'
 
-export interface DiscriminatedBlocksProps extends Omit<FieldContainerProps, 'children'>, SugaredRelativeSingleField {
-	children: ReactNode
-	allowBlockTypeChange?: boolean
-}
+export type DiscriminatedBlocksProps =
+	& {
+		children: ReactNode
+		allowBlockTypeChange?: boolean
+	}
+	& FieldContainerProps
+	& SugaredRelativeSingleField
 
+/**
+ * Renders different blocks based on a value in a discrimination field.
+ *
+ * @example
+ * ```
+ * <DiscriminatedBlocks label="Link" field="type">
+ *   <Block discriminateBy="article" label="Articles">
+ *     <SelectField options="Article.slug" field="article" label="Article" />
+ *   </Block>
+ *   <Block discriminateBy="url" label="External link">
+ *     <TextField label="Url" field="url" />
+ *   </Block>
+ * </DiscriminatedBlocks>
+ * ```
+ *
+ * @group Blocks and repeaters
+ */
 export const DiscriminatedBlocks: FunctionComponent<DiscriminatedBlocksProps> = Component(
 	props => {
 		const normalizedBlocks = useNormalizedBlocks(props.children)

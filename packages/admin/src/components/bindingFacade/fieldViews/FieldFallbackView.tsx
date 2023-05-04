@@ -12,6 +12,9 @@ export interface FieldFallbackViewProps {
 
 export type FieldFallbackViewPublicProps = Partial<FieldFallbackViewProps>
 
+/**
+ * @group Field Views
+ */
 export const FieldFallbackView: FunctionComponent<FieldFallbackViewProps> = Component(
 	props => {
 		const formatMessage = useMessageFormatter(fieldViewDictionary)

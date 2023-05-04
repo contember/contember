@@ -3,7 +3,7 @@ import { useClassNamePrefix } from '../../../auxiliary'
 import { Icon } from '../../Icon'
 import { Button } from '../Button'
 
-interface SelectCreateNewWrapperProps {
+export interface SelectCreateNewWrapperProps {
 	onClick?: () => void
 	children: ReactChild
 }

@@ -2,9 +2,9 @@ import { ListMembersQuery } from '../../queries'
 import { ComponentType, useEffect, useState } from 'react'
 import { QueryRequestState } from '../../lib'
 
-type RoleDefinition = any // todo
+export type RoleRendererRoleDefinition = any // todo
 export type RoleRenderer = React.FC<{ role: string; variables: Variables }>
-export type RoleRendererFactory = (roleDefinitions: RoleDefinition[]) => Promise<RoleRenderer>
+export type RoleRendererFactory = (roleDefinitions: RoleRendererRoleDefinition[]) => Promise<RoleRenderer>
 
 export interface Variables {
 	[name: string]: string[]

@@ -1,24 +1,30 @@
 import cn from 'classnames'
-import { HTMLAttributes, memo, ReactNode } from 'react'
+import { memo, ReactNode } from 'react'
 import { useClassNamePrefix } from '../../auxiliary'
-import type { Intent, MessageDistinction, MessageFlow, Size } from '../../types'
+import type { HTMLDivElementProps, Intent, MessageDistinction, MessageFlow, Size } from '../../types'
 import { toEnumViewClass, toThemeClass, toViewClass } from '../../utils'
 
-export interface MessageProps extends HTMLAttributes<HTMLDivElement> {
-	intent?: Intent
-	type?: 'prop is deprecated, use intent'
-	size?: Size
-	flow?: MessageFlow
-	distinction?: MessageDistinction
-	lifted?: boolean
-	children?: ReactNode
-	action?: ReactNode
-}
+export type MessageProps =
+	& {
+		intent?: Intent
+		type?: 'prop is deprecated, use intent'
+		size?: Size
+		flow?: MessageFlow
+		distinction?: MessageDistinction
+		lifted?: boolean
+		children?: ReactNode
+		action?: ReactNode
+	}
+	& HTMLDivElementProps
 
-export const Message = memo(({ className, children, intent, size, flow, distinction, type, lifted, action }: MessageProps) => {
+/**
+ * @group UI
+ */
+export const Message = memo(({ className, children, intent, size, flow, distinction, type, lifted, action, ...props }: MessageProps) => {
 	const prefix = useClassNamePrefix()
 	return (
 		<div
+			{...props}
 			className={cn(
 				`${prefix}message`,
 				toThemeClass(intent, intent),

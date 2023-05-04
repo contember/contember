@@ -9,7 +9,12 @@ export interface EditorBlockProps {
 	isDragged?: boolean
 }
 
-export const EditorBlock = memo(forwardRef<HTMLDivElement, EditorBlockProps>(function EditorBlockBoundary({ children, dragHandle, dragLine, isDragged }, ref) {
+export const EditorBlock = memo(forwardRef<HTMLDivElement, EditorBlockProps>(({
+  children,
+  dragHandle,
+  dragLine,
+  isDragged,
+}, ref) => {
 	const prefix = useClassNamePrefix()
 	return (
 		<div className={cn(`${prefix}editorBlock`, isDragged && 'is-dragged')} ref={ref}>

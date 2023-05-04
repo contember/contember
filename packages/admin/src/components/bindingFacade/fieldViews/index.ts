@@ -6,4 +6,4 @@ export * from './FileUrlFieldView'
 export * from './ImageFieldView'
 export * from './VideoFieldView'
 
-export type { FieldViewDictionary } from './fieldViewDictionary'
+export * from './fieldViewDictionary'

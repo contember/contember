@@ -12,4 +12,4 @@ export type {
 	SelectFileInputPublicProps,
 } from './internalComponents'
 
-export type { UploadDictionary } from './uploadDictionary'
+export * from './uploadDictionary'

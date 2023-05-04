@@ -5,7 +5,7 @@ import { disabledControlsForAttributes } from './Helpers'
 export default {
 	title: 'Containers/Aether',
 	component: Aether,
-  argTypes: disabledControlsForAttributes<typeof Aether>('children', 'ref', 'style'),
+	argTypes: disabledControlsForAttributes<typeof Aether>('children', 'style'),
 } as ComponentMeta<typeof Aether>
 
 const Template: ComponentStory<typeof Aether> = args => <Aether {...args} />

@@ -17,6 +17,9 @@ export interface ConcealableFieldProps {
 	editButtonLabel?: ReactNode
 }
 
+/**
+ * @group UI
+ */
 export const ConcealableField = memo(
 	({ buttonProps, concealTimeout = 2000, renderConcealedValue, isExtended, children }: ConcealableFieldProps) => {
 		const [isEditing, setIsEditing] = useState(false)

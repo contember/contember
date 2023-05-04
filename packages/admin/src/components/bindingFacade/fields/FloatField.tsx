@@ -14,6 +14,9 @@ export type FloatFieldProps =
 const parse: ControlValueParser<number, number> = value => value ??  null
 const format: FieldValueFormatter<number, number> = value => value ?? null
 
+/**
+ * @group Form Fields
+ */
 export const FloatField = SimpleRelativeSingleField<FloatFieldProps, number>(
 	(fieldMetadata, {
 		defaultValue,

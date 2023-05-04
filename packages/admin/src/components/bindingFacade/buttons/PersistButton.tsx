@@ -3,9 +3,18 @@ import { SaveButton, SaveButtonProps } from '@contember/ui'
 import { forwardRef, memo, useCallback } from 'react'
 import { usePersistWithFeedback } from '../../ui'
 
-export type PersistButtonProps = Omit<SaveButtonProps, 'children' | 'isDirty'> & {
-}
+export type PersistButtonProps = Omit<SaveButtonProps, 'children' | 'isDirty'>
 
+/**
+ * Renders a button which triggers persist on a click.
+ *
+ * @example
+ * ```
+ * <PersistButton />
+ * ```
+ *
+ * @group Action buttons
+ */
 export const PersistButton = memo(
 	forwardRef<HTMLButtonElement, PersistButtonProps>((props, ref) => {
 	const isMutating = useMutationState()

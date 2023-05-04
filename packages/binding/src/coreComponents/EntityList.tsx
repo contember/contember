@@ -17,6 +17,9 @@ export type EntityListProps<ListProps> = EntityListBaseProps &
 		  }
 	)
 
+/**
+ * @group Data binding
+ */
 export const EntityList = Component(
 	<ListProps extends {}>(props: EntityListProps<ListProps>) => {
 		if ('listComponent' in props && props.listComponent) {

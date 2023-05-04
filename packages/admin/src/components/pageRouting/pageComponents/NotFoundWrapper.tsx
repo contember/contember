@@ -1,6 +1,6 @@
 import { Component, useEntity } from '@contember/binding'
 import { LayoutPage, Message } from '@contember/ui'
-import { ReactChild, ReactNode } from 'react'
+import { ReactNode } from 'react'
 
 export const NotFoundWrapper = Component<{ children: ReactNode, title?: ReactNode }>(
 	({ children, title }) => {

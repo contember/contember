@@ -13,6 +13,9 @@ export type InviteUserPageProps = {
 	method?: InviteMethod
 }
 
+/**
+ * @group Tenant
+ */
 export const InviteUserPage: FC<InviteUserPageProps> = memo(({ rolesConfig, userListLink = 'tenantUsers', method }) => {
 	const project = useProjectSlug()
 	if (!project) {

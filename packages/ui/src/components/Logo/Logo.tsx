@@ -9,6 +9,10 @@ export interface LogoProps {
 	image?: ReactNode
 	size?: Size | number
 }
+
+/**
+ * @group UI
+ */
 export function Logo({ children, image, size }: LogoProps) {
 	const prefix = useClassNamePrefix()
 

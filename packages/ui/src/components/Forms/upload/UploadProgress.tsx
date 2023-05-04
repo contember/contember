@@ -12,7 +12,9 @@ export interface UploadProgressProps {
 const defaultFormatProgressMessage = (progress?: number): ReactNode =>
 	`Uploading${progress === undefined ? '' : ` (${(progress * 100).toFixed()}%)`}`
 
-// Deliberately no memo
+/**
+ * @group Forms UI
+ */
 export const UploadProgress: FunctionComponent<UploadProgressProps> = ({
 	progress,
 	formatProgressMessage = defaultFormatProgressMessage,

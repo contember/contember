@@ -21,6 +21,16 @@ type BooleanFilterArtifacts = {
 	includeNull: boolean
 }
 
+/**
+ * DataGrid cell for displaying a content of boolean field.
+ *
+ * @example
+ * ```
+ * <BooleanCell field="isPublished" header="Is published?" />
+ * ```
+ *
+ * @group Data grid
+ */
 export const BooleanCell: FunctionComponent<BooleanCellProps> = Component(props => {
 	return (
 		<DataGridColumn<BooleanFilterArtifacts>

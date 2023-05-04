@@ -11,6 +11,10 @@ export interface LogoSymbolProps {
 }
 
 // TODO: repeated IDS
+
+/**
+ * @group UI
+ */
 export const LogoSymbol = memo(({ className, children, size }: LogoSymbolProps) => {
 	const prefix = useClassNamePrefix()
 	return (

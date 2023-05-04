@@ -37,6 +37,10 @@ const resetRequestPageName = 'resetRequest'
 const redirectOnSuccessPageName = 'resetRequestSuccess'
 const passwordResetPageName = 'passwordReset'
 
+
+/**
+ * @group Entrypoints
+ */
 export const LoginEntrypoint = (props: LoginEntrypointProps) => {
 	const routing: RoutingContextValue = {
 		basePath: props.basePath ?? '/',

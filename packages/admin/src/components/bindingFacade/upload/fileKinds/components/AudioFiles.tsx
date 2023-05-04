@@ -14,6 +14,9 @@ export type AudioFilesProps<AcceptArtifacts = unknown, SFExtraProps extends {} =
 		discriminateBy: SugaredDiscriminateBy
 	}
 
+/**
+ * @group Uploads
+ */
 export const AudioFiles = Component<AudioFilesProps>(
 	({
 		 discriminateBy,

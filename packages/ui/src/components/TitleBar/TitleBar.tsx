@@ -16,6 +16,9 @@ export interface TitleBarProps extends ThemeScheme {
 	actions?: ReactNode // This can contain any number of buttons but only buttons
 }
 
+/**
+ * @group UI
+ */
 export const TitleBar = memo(({ after, navigation, children, headingProps, actions, ...props }: TitleBarProps) => {
 	const prefix = useClassNamePrefix()
 	const {

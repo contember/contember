@@ -56,7 +56,7 @@ export interface ListMembersQuery {
 
 export type ListMembersMemberType = 'PERSON' | 'API_KEY'
 
-interface ListMembersQueryVariables {
+export interface ListMembersQueryVariables {
 	slug: string
 	memberType?: ListMembersMemberType
 }

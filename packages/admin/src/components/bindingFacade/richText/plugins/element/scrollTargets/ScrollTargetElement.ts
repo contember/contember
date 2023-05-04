@@ -1,12 +1,12 @@
 import type { CustomElementPlugin } from '../../../baseEditor'
 import { ScrollTargetRenderer } from './ScrollTargetRenderer'
 import {
-    Editor as SlateEditor,
-    Editor,
-    Element as SlateElement,
-    Node as SlateNode,
-    Range as SlateRange,
-    Transforms,
+	Editor as SlateEditor,
+	Editor,
+	Element as SlateElement,
+	Node as SlateNode,
+	Range as SlateRange,
+	Transforms,
 } from 'slate'
 
 export const scrollTargetElementType = 'scrollTarget' as const

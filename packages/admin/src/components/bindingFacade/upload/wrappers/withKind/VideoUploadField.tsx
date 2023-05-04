@@ -1,13 +1,21 @@
 import { Component } from '@contember/binding'
 import type { ReactElement } from 'react'
-import type { StockVideoFileKindProps } from '../../fileKinds'
 import { getStockVideoFileKind } from '../../fileKinds'
 import { PublicSingleKindUploadFieldProps, SingleKindUploadField } from '../../internalComponents'
+import { VideoFileDataExtractorProps } from '../../fileDataExtractors'
 
 export type VideoUploadFieldProps<AcceptArtifacts = unknown, SFExtraProps extends {} = {}> =
 	& PublicSingleKindUploadFieldProps<AcceptArtifacts, SFExtraProps>
-	& StockVideoFileKindProps<AcceptArtifacts>
+	& VideoFileDataExtractorProps
 
+/**
+ * @example
+ * ```
+ * <VideoUploadField urlField="video.url" label="Video upload" />
+ * ```
+ *
+ * @group Uploads
+ */
 export const VideoUploadField = Component<VideoUploadFieldProps>(
 	props => (
 		<SingleKindUploadField {...props} kindFactory={getStockVideoFileKind} />

@@ -33,7 +33,7 @@ const ME_QUERY = `
 	}
 `
 
-interface MeResponse {
+export interface MeResponse {
 	me: {
 		id: string
 		person?: {

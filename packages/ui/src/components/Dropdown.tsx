@@ -64,6 +64,9 @@ const noop = () => {}
 export const DropdownContentContainerContext = createContext<HTMLElement | undefined>(undefined)
 DropdownContentContainerContext.displayName = 'DropdownContentContainerContext'
 
+/**
+ * @group UI
+ */
 export const Dropdown = memo((props: DropdownProps) => {
 	const [isOpen, setIsOpen] = useState(false)
 	const [isTransitioning, setIsTransitioning] = useState(false)

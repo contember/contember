@@ -27,6 +27,11 @@ export interface RichTextFieldProps
 	distinction?: EditorCanvasDistinction
 }
 
+/**
+ * Rich text field supports more advanced formatting capabilities. Output of this field is a JSON.
+ *
+ * @group Form Fields
+ */
 export const RichTextField: FunctionComponent<RichTextFieldProps> = Component(
 	props => {
 		const entity = useEntity()

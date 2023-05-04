@@ -20,6 +20,11 @@ export type HasManyAbsentCellProps =
 		children: ReactNode
 	}
 
+/**
+ * Cell for displaying has-many values. Allows only simple filter whether the list is empty or not. For most cases, {@link HasManySelectCell} is recommended.
+ *
+ * @group Data grid
+ */
 export const HasManyAbsentCell: FunctionComponent<HasManyAbsentCellProps> = Component(props => {
 	return (
 		<DataGridColumn<boolean>

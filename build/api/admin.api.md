@@ -65,9 +65,11 @@ import { GraphQlClientRequestOptions } from '@contember/react-client';
 import { GraphQlClientVariables } from '@contember/react-client';
 import { GraphQlClientVariables as GraphQlClientVariables_2 } from '@contember/client';
 import { HistoryEditor } from 'slate-history';
+import { HTMLAnchorElementProps } from '@contember/ui';
+import { HTMLImageElementProps } from '@contember/ui';
+import { HTMLVideoElementProps } from '@contember/ui';
 import { IconProps } from '@contember/ui';
 import { IconSourceSpecification } from '@contember/ui';
-import type { ImgHTMLAttributes } from 'react';
 import { InputHTMLAttributes } from 'react';
 import { JsonObject } from '@contember/binding';
 import { JsonValue } from '@contember/binding';
@@ -94,6 +96,7 @@ import { PureComponent } from 'react';
 import { QualifiedEntityList } from '@contember/binding';
 import type { RadioProps } from '@contember/ui';
 import { Range as Range_2 } from 'slate';
+import { ReactChild } from 'react';
 import { ReactEditor } from 'slate-react';
 import { ReactElement } from 'react';
 import { ReactNode } from 'react';
@@ -139,7 +142,6 @@ import { TileLayerProps } from 'react-leaflet';
 import { TimeInputProps } from '@contember/ui';
 import { UnsugarableSingleEntityEventListeners } from '@contember/binding';
 import { UrlInputProps } from '@contember/ui';
-import type { VideoHTMLAttributes } from 'react';
 
 // @public (undocumented)
 export const acceptAnyFile: () => boolean;
@@ -220,10 +222,10 @@ export interface AddEntityButtonProps {
     addButtonText?: ReactNode;
 }
 
-// @public (undocumented)
+// @internal (undocumented)
 export const AddNewBlockButton: React.NamedExoticComponent<AddNewBlockButtonProps>;
 
-// @public (undocumented)
+// @internal (undocumented)
 export const AddNewBlockButtonInner: React.NamedExoticComponent<AddNewBlockButtonInnerProps>;
 
 // @public (undocumented)
@@ -293,7 +295,7 @@ export const anchorToolbarButton: ElementToolbarButton<AnchorElement>;
 export const AnyFileRepeater: <AcceptArtifacts = unknown, SFExtraProps extends {} = {}>(props: AnyFileRepeaterProps<AcceptArtifacts, SFExtraProps>) => ReactElement | null;
 
 // @public (undocumented)
-export type AnyFileRepeaterProps<AcceptArtifacts = unknown, SFExtraProps extends {} = {}> = PublicSingleKindFileRepeaterProps<AcceptArtifacts, SFExtraProps> & StockAnyFileKindProps<AcceptArtifacts>;
+export type AnyFileRepeaterProps<AcceptArtifacts = unknown, SFExtraProps extends {} = {}> = PublicSingleKindFileRepeaterProps<AcceptArtifacts, SFExtraProps>;
 
 // @public (undocumented)
 export const AnyFiles: <AcceptArtifacts = unknown>(props: AnyFilesProps<AcceptArtifacts, {}>) => ReactElement | null;
@@ -307,7 +309,7 @@ export type AnyFilesProps<AcceptArtifacts = unknown, SFExtraProps extends {} = {
 export const AnyUploadField: <AcceptArtifacts = unknown, SFExtraProps extends {} = {}>(props: AnyUploadFieldProps<AcceptArtifacts, SFExtraProps>) => ReactElement | null;
 
 // @public (undocumented)
-export type AnyUploadFieldProps<AcceptArtifacts = unknown, SFExtraProps extends {} = {}> = PublicSingleKindUploadFieldProps<AcceptArtifacts, SFExtraProps> & StockAnyFileKindProps<AcceptArtifacts>;
+export type AnyUploadFieldProps<AcceptArtifacts = unknown, SFExtraProps extends {} = {}> = PublicSingleKindUploadFieldProps<AcceptArtifacts, SFExtraProps>;
 
 // @public (undocumented)
 export const ApiKeyList: React.NamedExoticComponent<ApiKeyListProps>;
@@ -361,7 +363,7 @@ export interface AudioFileDataExtractorProps {
 export const AudioFileRepeater: <AcceptArtifacts = unknown, SFExtraProps extends {} = {}>(props: AudioFileRepeaterProps<AcceptArtifacts, SFExtraProps>) => ReactElement | null;
 
 // @public (undocumented)
-export type AudioFileRepeaterProps<AcceptArtifacts = unknown, SFExtraProps extends {} = {}> = PublicSingleKindFileRepeaterProps<AcceptArtifacts, SFExtraProps> & StockAudioFileKindProps<AcceptArtifacts>;
+export type AudioFileRepeaterProps<AcceptArtifacts = unknown, SFExtraProps extends {} = {}> = PublicSingleKindFileRepeaterProps<AcceptArtifacts, SFExtraProps> & AudioFileDataExtractorProps;
 
 // @public (undocumented)
 export const AudioFiles: <AcceptArtifacts = unknown>(props: AudioFilesProps<AcceptArtifacts, {}>) => ReactElement | null;
@@ -375,7 +377,7 @@ export type AudioFilesProps<AcceptArtifacts = unknown, SFExtraProps extends {} =
 export const AudioUploadField: <AcceptArtifacts = unknown, SFExtraProps extends {} = {}>(props: AudioUploadFieldProps<AcceptArtifacts, SFExtraProps>) => ReactElement | null;
 
 // @public (undocumented)
-export type AudioUploadFieldProps<AcceptArtifacts = unknown, SFExtraProps extends {} = {}> = PublicSingleKindUploadFieldProps<AcceptArtifacts, SFExtraProps> & StockAudioFileKindProps<AcceptArtifacts>;
+export type AudioUploadFieldProps<AcceptArtifacts = unknown, SFExtraProps extends {} = {}> = PublicSingleKindUploadFieldProps<AcceptArtifacts, SFExtraProps> & AudioFileDataExtractorProps;
 
 // @public (undocumented)
 export const AutoCell: React.NamedExoticComponent<AutoCellProps>;
@@ -464,30 +466,21 @@ export type BaseDynamicChoiceField = BaseDynamicChoiceFieldOptions & SelectFuseO
 };
 
 // @public (undocumented)
-export type BaseDynamicChoiceFieldOptions = {
-    options: ChoiceFieldOptionsAsEntityList;
-    optionLabel: ReactNode;
-} | {
-    options: ChoiceFieldOptionsAsFieldList;
-} | LegacyChoiceFieldWithOptionRenderer;
+export type BaseDynamicChoiceFieldOptions = DynamicChoiceFieldOptionProps | DynamicChoiceFieldWithCustomLabelProps | LegacyChoiceFieldWithOptionRenderer;
 
-// @public (undocumented)
+// @public
 export const Block: FunctionComponent<BlockProps>;
 
 // @public (undocumented)
 export const blockAnalyzer: ChildrenAnalyzer<BlockProps, never, Environment>;
 
-// @public (undocumented)
+// @public
 export const BlockEditor: FunctionComponent<BlockEditorProps> & {
     ContentOutlet: (props: ContentOutletProps) => ReactElement | null;
 };
 
-// Warning: (ae-forgotten-export) The symbol "CreateEditorPublicOptions" needs to be exported by the entry point index.d.ts
-//
 // @public (undocumented)
 export interface BlockEditorProps extends SugaredRelativeEntityList, CreateEditorPublicOptions<EditorWithBlocks> {
-    // Warning: (ae-forgotten-export) The symbol "BlockHoveringToolbarContentsProps" needs to be exported by the entry point index.d.ts
-    //
     // (undocumented)
     blockButtons?: BlockHoveringToolbarContentsProps['blockButtons'];
     // (undocumented)
@@ -504,8 +497,6 @@ export interface BlockEditorProps extends SugaredRelativeEntityList, CreateEdito
     inlineButtons?: HoveringToolbarsProps['inlineButtons'];
     // (undocumented)
     label?: ReactNode;
-    // Warning: (ae-forgotten-export) The symbol "FieldBackedElement" needs to be exported by the entry point index.d.ts
-    //
     // (undocumented)
     leadingFieldBackedElements?: FieldBackedElement[];
     // (undocumented)
@@ -540,6 +531,23 @@ export interface BlockElementProps extends RenderElementProps {
 }
 
 // @public (undocumented)
+export type BlockHoveringToolbarConfig = IconSourceSpecification & {
+    title?: string;
+} & ({
+    discriminateBy: SugaredDiscriminateBy;
+} | ElementSpecificToolbarButton<any>);
+
+// @public (undocumented)
+export interface BlockHoveringToolbarContentsProps {
+    // (undocumented)
+    blockButtons?: BlockHoveringToolbarConfig[] | BlockHoveringToolbarConfig[][];
+    // (undocumented)
+    editorReferenceBlocks: EditorReferenceBlocks;
+    // (undocumented)
+    otherBlockButtons?: BlockHoveringToolbarConfig[];
+}
+
+// @public (undocumented)
 export interface BlockProps {
     // (undocumented)
     alternate?: ReactNode;
@@ -547,13 +555,12 @@ export interface BlockProps {
     children?: ReactNode;
     // (undocumented)
     description?: ReactNode;
-    // (undocumented)
     discriminateBy: SugaredDiscriminateBy;
     // (undocumented)
     label?: ReactNode;
 }
 
-// @public (undocumented)
+// @public
 export const BlockRepeater: FunctionComponent<BlockRepeaterProps>;
 
 // @public (undocumented)
@@ -569,15 +576,14 @@ export const blockRepeaterDictionary: {
 };
 
 // @public (undocumented)
-export interface BlockRepeaterProps extends Omit<RepeaterProps<unknown, unknown>, 'containerComponent' | 'containerComponentExtraProps' | 'itemComponent' | 'itemComponentExtraProps'> {
-    // (undocumented)
+export type BlockRepeaterProps = {
     discriminationField: SugaredFieldProps['field'];
-}
+} & Omit<RepeaterProps<unknown, unknown>, 'containerComponent' | 'containerComponentExtraProps' | 'itemComponent' | 'itemComponentExtraProps'>;
 
 // @public (undocumented)
 export const boldToolbarButton: ToolbarButtonSpec;
 
-// @public (undocumented)
+// @public
 export const BooleanCell: FunctionComponent<BooleanCellProps>;
 
 // @public (undocumented)
@@ -597,7 +603,19 @@ export type BooleanFieldViewProps = {
 } & FieldFallbackViewPublicProps;
 
 // @public (undocumented)
+export type BuiltinEditorPlugins = BuiltinElementBased | BuiltinTextBased;
+
+// @public (undocumented)
+export type BuiltinElementBased = 'anchor' | 'heading' | 'list' | 'horizontalRule' | 'paragraph' | 'scrollTarget' | 'table';
+
+// @public (undocumented)
+export type BuiltinTextBased = 'bold' | 'code' | 'italic' | 'highlight' | 'newline' | 'strikeThrough' | 'underline';
+
+// @public (undocumented)
 export const ChangePassword: FC<{}>;
+
+// @public (undocumented)
+export type ChangePasswordErrors = 'TOO_WEAK' | 'NOT_A_PERSON' | 'INVALID_PASSWORD';
 
 // @public (undocumented)
 export const CheckboxField: React.NamedExoticComponent<CheckboxFieldProps>;
@@ -698,10 +716,10 @@ export type ChoiceFieldProps = (ChoiceFieldData.SingleChoiceFieldProps<FieldValu
 // @public (undocumented)
 export type ChoiceFieldSearchByFields = SugaredRelativeSingleField['field'] | SugaredRelativeSingleField['field'][];
 
-// @public (undocumented)
+// @public
 export const ClearFieldButton: React.NamedExoticComponent<ClearFieldButtonProps>;
 
-// @public (undocumented)
+// @internal (undocumented)
 export const ClearFieldButtonInner: (props: ClearFieldButtonInnerProps) => JSX.Element;
 
 // @public (undocumented)
@@ -719,7 +737,7 @@ export type ClearFieldButtonInnerProps = ClearFieldButtonInnerPublicProps & Clea
 export type ClearFieldButtonInnerPublicProps = ButtonProps;
 
 // @public (undocumented)
-export type ClearFieldButtonProps = Omit<ClearFieldButtonInnerPublicProps, 'defaultValue'> & SimpleRelativeSingleFieldProps;
+export type ClearFieldButtonProps = SimpleRelativeSingleFieldProps & ClearFieldButtonInnerPublicProps;
 
 // @public (undocumented)
 export const CoalesceFieldView: <Persisted extends FieldValue = FieldValue>(props: CoalesceFieldViewProps<Persisted>) => ReactElement;
@@ -732,7 +750,7 @@ export interface CoalesceFieldViewProps<Persisted extends FieldValue = FieldValu
     format?: (value: Persisted) => ReactNode;
 }
 
-// @public (undocumented)
+// @public
 export const CoalesceTextCell: FC<CoalesceTextCellProps>;
 
 // @public (undocumented)
@@ -789,10 +807,19 @@ export interface ConcealableFieldRendererProps {
     onFocus: () => void;
 }
 
-// Warning: (ae-forgotten-export) The symbol "ConfirmOtpFormProps" needs to be exported by the entry point index.d.ts
-//
+// @public (undocumented)
+export type ConfirmOtpErrors = 'INVALID_OTP_TOKEN' | 'NOT_PREPARED';
+
 // @public (undocumented)
 export const ConfirmOtpForm: FC<ConfirmOtpFormProps>;
+
+// @public (undocumented)
+export interface ConfirmOtpFormProps {
+    // (undocumented)
+    onSuccess?: () => void;
+    // (undocumented)
+    redirectOnSuccess?: RoutingLinkTarget;
+}
 
 // @public (undocumented)
 export const ContemberEditor: {
@@ -829,6 +856,12 @@ export const ContemberEditor: {
 };
 
 // @public (undocumented)
+export interface ContentOutletProps {
+    // (undocumented)
+    placeholder?: string;
+}
+
+// @public
 export const ControlledDataGrid: <ComponentProps extends {}>(props: ControlledDataGridProps<ComponentProps>) => ReactElement;
 
 // @public (undocumented)
@@ -847,24 +880,41 @@ export type ControlledDataGridProps<ComponentExtraProps extends {}> = DataGridCo
 // @public (undocumented)
 export type ControlValueParser<ControlVal, FieldVal extends FieldValue> = (value: ControlVal | null | undefined, field: FieldAccessor<FieldVal>) => FieldVal | null;
 
-// Warning: (ae-forgotten-export) The symbol "CreateApiKeyFormProps" needs to be exported by the entry point index.d.ts
-//
 // @public (undocumented)
 export const CreateApiKeyForm: FC<CreateApiKeyFormProps>;
 
 // @public (undocumented)
+export interface CreateApiKeyFormProps {
+    // (undocumented)
+    apiKeyListLink: RoutingLinkTarget;
+    // (undocumented)
+    project: string;
+    // (undocumented)
+    rolesConfig?: RolesConfig;
+}
+
+// @public (undocumented)
 export const createBindingLinkParametersResolver: (entity: EntityAccessor | undefined) => RoutingParameterResolver;
 
-// Warning: (ae-forgotten-export) The symbol "OverrideCreateElementReferenceOptions" needs to be exported by the entry point index.d.ts
-// Warning: (ae-forgotten-export) The symbol "OverrideInsertDataOptions" needs to be exported by the entry point index.d.ts
-// Warning: (ae-forgotten-export) The symbol "OverrideInsertElementWithReferenceOptions" needs to be exported by the entry point index.d.ts
-//
 // @public (undocumented)
 export interface CreateEditorOptions extends OverrideCreateElementReferenceOptions, ReferenceElementOptions, OverrideInsertDataOptions, OverrideInsertElementWithReferenceOptions, CreateEditorPublicOptions<EditorWithBlocks> {
 }
 
 // @public (undocumented)
+export interface CreateEditorPublicOptions<E extends Editor_2 = Editor_2> {
+    // (undocumented)
+    augmentEditor?: (baseEditor: Editor_2) => Editor_2 | void;
+    // (undocumented)
+    augmentEditorBuiltins?: (editor: E) => E | void;
+    // (undocumented)
+    plugins?: BuiltinEditorPlugins[];
+}
+
+// @public (undocumented)
 export const createEditorWithEssentials: (defaultElementType: string) => Editor_2;
+
+// @public (undocumented)
+export type CreateElementReferences = (editor: Editor_2, targetPath: Slate.Path, referenceDiscriminant: FieldValue, initialize?: EntityAccessor.BatchUpdatesHandler) => EntityAccessor;
 
 // @public (undocumented)
 export const createEmptyTableCellElement: () => {
@@ -912,7 +962,7 @@ export type CreateNewEntityButtonProps = ButtonProps & {
 };
 
 // @public (undocumented)
-export const CreatePage: Partial<PageProvider<CreatePageProps>> & ComponentType<CreatePageProps>;
+export const CreatePage: PageComponent<({ pageName, children, rendererProps, redirectOnSuccess, onPersistSuccess, ...entityProps }: CreatePageProps) => JSX.Element>;
 
 // @public (undocumented)
 export type CreatePageProps = Omit<SugaredUnconstrainedQualifiedSingleEntity, 'isCreating'> & EntitySubTreeAdditionalProps & EntitySubTreeAdditionalCreationProps & {
@@ -934,10 +984,14 @@ export interface CreateProjectFormProps {
 // @public (undocumented)
 export const createReferenceElementPlugin: (args: ReferenceElementOptions) => CustomElementPlugin<ReferenceElement>;
 
-// Warning: (ae-forgotten-export) The symbol "CreateResetPasswordRequestFormProps" needs to be exported by the entry point index.d.ts
-//
 // @public (undocumented)
 export const CreateResetPasswordRequestForm: FC<CreateResetPasswordRequestFormProps>;
+
+// @public (undocumented)
+export interface CreateResetPasswordRequestFormProps {
+    // (undocumented)
+    redirectOnSuccess: RoutingLinkTarget;
+}
 
 // @public (undocumented)
 export const CreateScope: Partial<CreateScopeProps> & ComponentType<CreateScopeProps>;
@@ -993,6 +1047,12 @@ export interface CustomElementPlugin<T extends Element_2> {
 }
 
 // @public (undocumented)
+export interface CustomFieldBackedElement {
+    // (undocumented)
+    element: ReactNode;
+}
+
+// @public (undocumented)
 export interface CustomMarkPlugin {
     // (undocumented)
     isHotKey: (e: KeyboardEvent) => boolean;
@@ -1008,7 +1068,7 @@ export const cycleOrderDirection: (direction: DataGridOrderDirection) => DataGri
 // @public (undocumented)
 export const DATA_GRID_DEFAULT_ITEMS_PER_PAGE = 50;
 
-// @public (undocumented)
+// @public
 export const DataGrid: <ComponentProps extends {}>(props: DataGridProps<ComponentProps>) => ReactElement;
 
 // @public (undocumented)
@@ -1023,12 +1083,41 @@ export interface DataGridCellPublicProps {
     shrunk?: boolean;
 }
 
-// Warning: (ae-forgotten-export) The symbol "dataGridCellsDictionary" needs to be exported by the entry point index.d.ts
-//
 // @public (undocumented)
 export type DataGridCellsDictionary = typeof dataGridCellsDictionary;
 
 // @public (undocumented)
+export const dataGridCellsDictionary: {
+    dataGridCells: {
+        includeNull: string;
+        booleanCell: {
+            includeTrue: string;
+            includeFalse: string;
+            includeNull: string;
+        };
+        dateCell: {
+            fromLabel: string;
+            toLabel: string;
+        };
+        textCell: {
+            matches: string;
+            doesNotMatch: string;
+            matchesExactly: string;
+            startsWith: string;
+            endsWith: string;
+            queryPlaceholder: string;
+            includeNull: string;
+            excludeNull: string;
+        };
+        numberCell: {
+            equals: string;
+            greaterThan: string;
+            lessThan: string;
+        };
+    };
+};
+
+// @public
 export const DataGridColumn: <FA extends DataGridFilterArtifact = DataGridFilterArtifact>(props: DataGridColumnProps<FA>) => ReactElement;
 
 // @public (undocumented)
@@ -1117,10 +1206,52 @@ export interface DataGridContainerPublicProps {
     tileSize?: number;
 }
 
-// Warning: (ae-forgotten-export) The symbol "dataGridDictionary" needs to be exported by the entry point index.d.ts
-//
 // @public (undocumented)
 export type DataGridDictionary = typeof dataGridDictionary;
+
+// @public (undocumented)
+export const dataGridDictionary: {
+    dataGrid: {
+        emptyMessage: {
+            text: string;
+        };
+        columnFiltering: {
+            showMenuButton: {
+                text: string;
+            };
+            heading: string;
+            emptyMessage: {
+                text: string;
+            };
+            columnColumn: {
+                text: string;
+            };
+            filterColumn: {
+                text: string;
+            };
+            addFilterButton: {
+                text: string;
+            };
+        };
+        columnHiding: {
+            showMenuButton: {
+                text: string;
+            };
+            heading: string;
+        };
+        paging: {
+            first: string;
+            previous: string;
+            next: string;
+            last: string;
+            status: {
+                unknownPageTotal: string;
+                knownPageTotal: string;
+                itemCount: string;
+            };
+        };
+    };
+};
 
 // @public (undocumented)
 export type DataGridFilterArtifact = Serializable;
@@ -1185,7 +1316,7 @@ export type DataGridOrderDirection = 'asc' | 'desc' | null;
 export type DataGridOrderDirectionStore = Record<DataGridColumnKey, Exclude<DataGridOrderDirection, null>>;
 
 // @public (undocumented)
-export const DataGridPage: Partial<PageProvider<DataGridPageProps>> & ComponentType<DataGridPageProps>;
+export const DataGridPage: PageComponent<({ children, rendererProps, pageName, ...dataGridProps }: DataGridPageProps) => JSX.Element>;
 
 // @public (undocumented)
 export type DataGridPageProps = DataGridProps<{}> & {
@@ -1258,7 +1389,7 @@ export interface DataGridStateMethods {
     updatePaging: DispatchChangePage;
 }
 
-// @public (undocumented)
+// @public
 export const DateCell: FunctionComponent<DateCellProps>;
 
 // @public (undocumented)
@@ -1300,14 +1431,14 @@ export const DefaultElement: FunctionComponent<DefaultElementProps>;
 export interface DefaultElementProps extends RenderElementProps {
 }
 
-// @public (undocumented)
+// @public
 export const DeleteEntityButton: React.MemoExoticComponent<(props: DeleteEntityButtonProps) => JSX.Element | null>;
 
 // @public (undocumented)
-export type DeleteEntityButtonProps = ButtonProps & {
+export type DeleteEntityButtonProps = {
     immediatePersist?: true;
     children?: ReactNode;
-};
+} & ButtonProps;
 
 // @public (undocumented)
 export const DerivedFieldLink: FunctionComponent<DerivedFieldLinkProps>;
@@ -1325,7 +1456,7 @@ export interface DerivedFieldLinkProps<SourcePersisted extends FieldValue = Fiel
 }
 
 // @public (undocumented)
-export const DetailPage: Partial<PageProvider<DetailPageProps>> & ComponentType<DetailPageProps>;
+export const DetailPage: PageComponent<({ pageName, children, rendererProps, ...entityProps }: DetailPageProps) => JSX.Element>;
 
 // @public (undocumented)
 export type DetailPageProps = SugaredQualifiedSingleEntity & EntitySubTreeAdditionalProps & {
@@ -1394,21 +1525,28 @@ export interface DimensionsSwitcherBaseProps extends Omit<DimensionsRendererProp
 export interface DimensionsSwitcherProps extends DimensionsSwitcherBaseProps {
 }
 
-// Warning: (ae-forgotten-export) The symbol "DisableOtpFormProps" needs to be exported by the entry point index.d.ts
-//
+// @public (undocumented)
+export type DisableOtpErrors = 'OTP_NOT_ACTIVE';
+
 // @public (undocumented)
 export const DisableOtpForm: FC<DisableOtpFormProps>;
 
 // @public (undocumented)
+export interface DisableOtpFormProps {
+    // (undocumented)
+    onSuccess?: () => void;
+    // (undocumented)
+    redirectOnSuccess?: RoutingLinkTarget;
+}
+
+// @public
 export const DiscriminatedBlocks: FunctionComponent<DiscriminatedBlocksProps>;
 
 // @public (undocumented)
-export interface DiscriminatedBlocksProps extends Omit<FieldContainerProps, 'children'>, SugaredRelativeSingleField {
-    // (undocumented)
-    allowBlockTypeChange?: boolean;
-    // (undocumented)
+export type DiscriminatedBlocksProps = {
     children: ReactNode;
-}
+    allowBlockTypeChange?: boolean;
+} & FieldContainerProps & SugaredRelativeSingleField;
 
 // @public (undocumented)
 export interface DiscriminatedDatum {
@@ -1428,6 +1566,17 @@ export type DispatchChangePage = (action: GridPagingAction) => void;
 
 // @public (undocumented)
 export const DragHandle: () => JSX.Element;
+
+// @public (undocumented)
+export type DynamicChoiceFieldOptionProps = {
+    options: ChoiceFieldOptionsAsFieldList;
+};
+
+// @public (undocumented)
+export type DynamicChoiceFieldWithCustomLabelProps = {
+    options: ChoiceFieldOptionsAsEntityList;
+    optionLabel: ReactNode;
+};
 
 // @public (undocumented)
 export const DynamicMultiChoiceField: FunctionComponent<DynamicMultipleChoiceFieldProps & ChoiceFieldData.MultiChoiceFieldProps<EntityAccessor>>;
@@ -1527,6 +1676,15 @@ export type EditorPoint = Point;
 export type EditorRange = Range_2;
 
 // @public (undocumented)
+export interface EditorReferenceBlock extends BlockProps {
+    // (undocumented)
+    template: EditorTemplate;
+}
+
+// @public (undocumented)
+export type EditorReferenceBlocks = NormalizedDiscriminatedData<EditorReferenceBlock>;
+
+// @public (undocumented)
 export type EditorRenderElementProps = RenderElementProps;
 
 // @public (undocumented)
@@ -1558,6 +1716,11 @@ export type EditorSelectionState = {
 };
 
 // @public (undocumented)
+export type EditorTemplate = undefined | {
+    blockContent: EditorTemplateAtom<ContentOutletProps> | undefined;
+};
+
+// @public (undocumented)
 export type EditorText = {
     [K in string]: unknown;
 } & {
@@ -1576,7 +1739,7 @@ export type EditorWithBlocks = Editor_2 & WithBlockElements;
 export type EditorWithEssentials<E extends BaseEditor> = WithEssentials & E;
 
 // @public (undocumented)
-export const EditPage: Partial<PageProvider<EditPageProps>> & ComponentType<EditPageProps>;
+export const EditPage: PageComponent<({ pageName, children, rendererProps, redirectOnSuccess, onPersistSuccess, refreshDataBindingOnPersist, skipBindingStateUpdateAfterPersist, ...entityProps }: EditPageProps) => JSX.Element>;
 
 // @public (undocumented)
 export type EditPageProps = SugaredQualifiedSingleEntity & EntitySubTreeAdditionalProps & {
@@ -1614,6 +1777,12 @@ export type EditUserPageProps = {
 
 // @public (undocumented)
 export const ejectHeadingElement: (editor: Editor_2, elementPath: Path) => void;
+
+// @public (undocumented)
+export interface ElementDataAttributes {
+    // (undocumented)
+    [dataAttribute: string]: Scalar;
+}
 
 // @public (undocumented)
 export interface ElementSpecificToolbarButton<E extends Element_2> {
@@ -1692,7 +1861,7 @@ export interface EmptyMessageProps {
     distinction?: BoxProps['distinction'];
 }
 
-// @public (undocumented)
+// @public
 export const EnumCell: React.NamedExoticComponent<EnumCellProps>;
 
 // @public (undocumented)
@@ -1708,10 +1877,17 @@ export type EnumCellProps = DataGridColumnPublicProps & FieldFallbackViewPublicP
     format?: (value: string | null) => ReactNode;
 };
 
-// Warning: (ae-forgotten-export) The symbol "errorCodeDictionary" needs to be exported by the entry point index.d.ts
-//
 // @public (undocumented)
 export type ErrorCodeDictionary = typeof errorCodeDictionary;
+
+// @public (undocumented)
+export const errorCodeDictionary: {
+    errorCodes: {
+        fieldRequired: string;
+        notUnique: string;
+        unknownExecutionError: string;
+    };
+};
 
 // @public (undocumented)
 export function FeedbackRenderer({ accessorTreeState, children }: FeedbackRendererProps): JSX.Element | null;
@@ -1723,6 +1899,9 @@ export interface FeedbackRendererProps {
     // (undocumented)
     children?: ReactNode;
 }
+
+// @public (undocumented)
+export type FieldBackedElement = RichTextFieldBackedElement | PlainTextFieldBackedElement | CustomFieldBackedElement;
 
 // @public (undocumented)
 export const FieldFallbackView: FunctionComponent<FieldFallbackViewProps>;
@@ -1744,10 +1923,22 @@ export type FieldFallbackViewStyle = 'n/a' | 'nothing' | 'unknown';
 // @public (undocumented)
 export type FieldValueFormatter<FieldVal extends FieldValue, ControlVal extends FieldValue> = (value: FieldVal | null | undefined, field: FieldAccessor<FieldVal>) => ControlVal | null;
 
-// Warning: (ae-forgotten-export) The symbol "fieldViewDictionary" needs to be exported by the entry point index.d.ts
-//
 // @public (undocumented)
 export type FieldViewDictionary = typeof fieldViewDictionary;
+
+// @public (undocumented)
+export const fieldViewDictionary: {
+    fieldView: {
+        boolean: {
+            yes: string;
+            no: string;
+        };
+        fallback: {
+            unknown: string;
+            notAvailable: string;
+        };
+    };
+};
 
 // @public (undocumented)
 export interface FileDataExtractor<ExtractedData = unknown, UploadResult = unknown, AcceptArtifacts = unknown> {
@@ -1876,15 +2067,18 @@ export interface FileUrlDataExtractorProps {
 export const FileUrlFieldView: FunctionComponent<FileUrlFieldViewProps>;
 
 // @public (undocumented)
-export interface FileUrlFieldViewProps extends Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> {
-    // (undocumented)
+export type FileUrlFieldViewProps = {
     fileUrlField: SugaredFieldProps['field'];
-}
+} & HTMLAnchorElementProps;
 
-// Warning: (ae-forgotten-export) The symbol "FillResetPasswordTokenFormProps" needs to be exported by the entry point index.d.ts
-//
 // @public (undocumented)
 export const FillResetPasswordTokenForm: FC<FillResetPasswordTokenFormProps>;
+
+// @public (undocumented)
+export interface FillResetPasswordTokenFormProps {
+    // (undocumented)
+    resetLink: RoutingLinkTarget;
+}
 
 // @public (undocumented)
 export interface FilterRendererProps<FA extends DataGridFilterArtifact> {
@@ -1916,11 +2110,32 @@ export type FormErrors<V> = {
 export type FormHandler<V> = (values: V, setError: (field: keyof V, error: string) => void, setValues: (values: V) => void) => void | Promise<any>;
 
 // @public (undocumented)
+export interface FormMethods<V> {
+    // (undocumented)
+    errors: FormErrors<V>;
+    // (undocumented)
+    isSubmitting: boolean;
+    // (undocumented)
+    onSubmit: (e: SyntheticEvent) => void;
+    // (undocumented)
+    register: <K extends keyof V>(field: K, options?: {
+        type?: 'number';
+    }) => {
+        value: V[K];
+        onChange: (value: V[K] | null | undefined) => void;
+    };
+    // (undocumented)
+    setValues: (values: V) => void;
+    // (undocumented)
+    values: V;
+}
+
+// @public (undocumented)
 export type FullFileKind<UploadResult = unknown, AcceptArtifacts = unknown> = InternalFileKind<UploadResult, AcceptArtifacts> & {
     extractors: FileDataExtractor<unknown, UploadResult, AcceptArtifacts>[];
 };
 
-// @public (undocumented)
+// @public
 export const GenericCell: FunctionComponent<GenericCellProps>;
 
 // @public (undocumented)
@@ -1938,8 +2153,8 @@ export interface GenericFileMetadataExtractorProps {
     lastModifiedField?: SugaredFieldProps['field'];
 }
 
-// @public (undocumented)
-export const GenericPage: Partial<PageProvider<GenericPageProps>> & ComponentType<GenericPageProps>;
+// @public
+export const GenericPage: PageComponent<({ children, ...props }: GenericPageProps) => JSX.Element>;
 
 // @public (undocumented)
 export type GenericPageProps = Omit<LayoutPageProps, 'children'> & {
@@ -2048,6 +2263,13 @@ export interface GQLVariableType<Value = any, Required extends boolean = boolean
 }
 
 // @public (undocumented)
+export type GQLVariableValues<VariableMap extends Record<string, GQLVariableType>> = {
+    [K in KeysMatching<VariableMap, GQLVariableType<any, true>>]: VariableMap[K] extends GQLVariableType<infer Value, boolean> ? Value : never;
+} & {
+    [K in KeysMatching<VariableMap, GQLVariableType<any, false>>]?: VariableMap[K] extends GQLVariableType<infer Value, boolean> ? Value : never;
+};
+
+// @public (undocumented)
 export type GridPagingAction = {
     type: 'goToPage';
     newPageIndex: number;
@@ -2067,7 +2289,7 @@ export type GridPagingState = {
 // @public (undocumented)
 export type HandleIdpResponseError = SignInIDPErrors | 'INVALID_LOCAL_STATE';
 
-// @public (undocumented)
+// @public
 export const HasManyAbsentCell: FunctionComponent<HasManyAbsentCellProps>;
 
 // @public (undocumented)
@@ -2076,7 +2298,7 @@ export type HasManyAbsentCellProps = DataGridColumnPublicProps & FieldFallbackVi
     children: ReactNode;
 };
 
-// @public (undocumented)
+// @public
 export const HasManySelectCell: FunctionComponent<HasManySelectProps>;
 
 // @public (undocumented)
@@ -2084,7 +2306,7 @@ export type HasManySelectProps = DataGridColumnPublicProps & SugaredRelativeEnti
     renderElements?: (elements: ReactNode[]) => ReactElement;
 };
 
-// @public (undocumented)
+// @public
 export const HasOneSelectCell: FunctionComponent<HasOneSelectProps>;
 
 // @public (undocumented)
@@ -2097,8 +2319,6 @@ export const HasRole: React.NamedExoticComponent<HasRoleProps>;
 export interface HasRoleProps {
     // (undocumented)
     children?: ReactNode;
-    // Warning: (ae-forgotten-export) The symbol "RoleCondition" needs to be exported by the entry point index.d.ts
-    //
     // (undocumented)
     role: RoleCondition;
 }
@@ -2171,7 +2391,7 @@ export const headingTwoNumberedToolbarButton: ElementToolbarButton<HeadingElemen
 // @public (undocumented)
 export const headingTwoToolbarButton: ElementToolbarButton<HeadingElement>;
 
-// @public (undocumented)
+// @public
 export const HiddenField: React.NamedExoticComponent<HiddenFieldProps>;
 
 // @public (undocumented)
@@ -2209,14 +2429,18 @@ export interface HorizontalRuleRendererProps extends Omit<RenderElementProps, 'e
 export const horizontalRuleToolbarButton: ElementToolbarButton<HorizontalRuleElement>;
 
 // @public (undocumented)
+export interface HoveringToolbarContentsProps {
+    // (undocumented)
+    buttons: ToolbarButtonSpec[] | ToolbarButtonSpec[][];
+}
+
+// @public (undocumented)
 export const HoveringToolbars: React.MemoExoticComponent<(props: HoveringToolbarsProps) => JSX.Element>;
 
 // @public (undocumented)
 export interface HoveringToolbarsProps {
     // (undocumented)
     blockButtons?: HoveringToolbarContentsProps['buttons'] | ReactElement;
-    // Warning: (ae-forgotten-export) The symbol "HoveringToolbarContentsProps" needs to be exported by the entry point index.d.ts
-    //
     // (undocumented)
     inlineButtons?: HoveringToolbarContentsProps['buttons'];
     // (undocumented)
@@ -2319,10 +2543,16 @@ export interface Identity {
     projects: IdentityProject[];
 }
 
-// Warning: (ae-forgotten-export) The symbol "IdentityContext_2" needs to be exported by the entry point index.d.ts
-//
 // @public (undocumented)
-export const IdentityContext: React.Context<IdentityContext_2 | undefined>;
+export const IdentityContext: React.Context<IdentityContextValue | undefined>;
+
+// @public (undocumented)
+export interface IdentityContextValue {
+    // (undocumented)
+    clearIdentity: () => void;
+    // (undocumented)
+    identity: Identity;
+}
 
 // @public (undocumented)
 export const identityEnvironmentExtension: Environment.Extension<Identity | null, {
@@ -2350,10 +2580,18 @@ export interface IdentityProject {
     slug: string;
 }
 
-// Warning: (ae-forgotten-export) The symbol "IdentityProviderProps" needs to be exported by the entry point index.d.ts
-//
 // @public (undocumented)
 export const IdentityProvider: React.FC<IdentityProviderProps>;
+
+// @public (undocumented)
+export interface IdentityProviderProps {
+    // (undocumented)
+    allowUnauthenticated?: boolean;
+    // (undocumented)
+    children: ReactNode;
+    // (undocumented)
+    onInvalidIdentity?: () => void;
+}
 
 // @public (undocumented)
 export const IdentityRefreshContext: React.Context<() => void>;
@@ -2402,16 +2640,12 @@ export type IDPResponseState = {
 export const ImageFieldView: <SrcField extends FieldValue = string>(props: ImageFieldViewProps<SrcField>) => ReactElement;
 
 // @public (undocumented)
-export interface ImageFieldViewProps<SrcField extends FieldValue = string> extends Omit<ImgHTMLAttributes<HTMLImageElement>, 'src'>, FieldFallbackViewPublicProps {
-    // (undocumented)
-    altField?: SugaredFieldProps['field'];
-    // (undocumented)
-    formatUrl?: (srcFieldValue: SrcField) => string;
-    // (undocumented)
+export type ImageFieldViewProps<SrcField extends FieldValue = string> = {
     srcField: SugaredFieldProps['field'];
-    // (undocumented)
+    altField?: SugaredFieldProps['field'];
     titleField?: SugaredFieldProps['field'];
-}
+    formatUrl?: (srcFieldValue: SrcField) => string;
+} & FieldFallbackViewPublicProps & Omit<HTMLImageElementProps, 'src'>;
 
 // @public (undocumented)
 export interface ImageFileDataExtractorProps {
@@ -2425,7 +2659,7 @@ export interface ImageFileDataExtractorProps {
 export const ImageFileRepeater: <AcceptArtifacts = unknown, SFExtraProps extends {} = {}>(props: ImageFileRepeaterProps<AcceptArtifacts, SFExtraProps>) => ReactElement | null;
 
 // @public (undocumented)
-export type ImageFileRepeaterProps<AcceptArtifacts = unknown, SFExtraProps extends {} = {}> = PublicSingleKindFileRepeaterProps<AcceptArtifacts, SFExtraProps> & StockImageFileKindProps<AcceptArtifacts>;
+export type ImageFileRepeaterProps<AcceptArtifacts = unknown, SFExtraProps extends {} = {}> = PublicSingleKindFileRepeaterProps<AcceptArtifacts, SFExtraProps> & ImageFileDataExtractorProps;
 
 // @public (undocumented)
 export const ImageFiles: <AcceptArtifacts = unknown, SFExtraProps extends {} = {}>(props: ImageFilesProps<AcceptArtifacts, SFExtraProps>) => ReactElement | null;
@@ -2439,7 +2673,7 @@ export type ImageFilesProps<AcceptArtifacts = unknown, SFExtraProps extends {} =
 export const ImageUploadField: <AcceptArtifacts = unknown, SFExtraProps extends {} = {}>(props: ImageUploadFieldProps<AcceptArtifacts, SFExtraProps>) => ReactElement | null;
 
 // @public (undocumented)
-export type ImageUploadFieldProps<AcceptArtifacts = unknown, SFExtraProps extends {} = {}> = PublicSingleKindUploadFieldProps<AcceptArtifacts, SFExtraProps> & StockImageFileKindProps<AcceptArtifacts>;
+export type ImageUploadFieldProps<AcceptArtifacts = unknown, SFExtraProps extends {} = {}> = PublicSingleKindUploadFieldProps<AcceptArtifacts, SFExtraProps> & ImageFileDataExtractorProps;
 
 // @public (undocumented)
 export const ImmutableEntityListPageRenderer: <ContainerExtraProps, ItemExtraProps>(props: ImmutableEntityListPageRendererProps<ContainerExtraProps, ItemExtraProps>) => ReactElement;
@@ -2537,6 +2771,9 @@ export interface InputGroupProps {
 }
 
 // @public (undocumented)
+export type InsertElementWithReference = (element: Omit<Element_2, 'referenceId'>, referenceDiscriminant: FieldValue, initialize?: EntityAccessor.BatchUpdatesHandler) => void;
+
+// @public (undocumented)
 export interface InternalFileKind<UploadResult = unknown, AcceptArtifacts = unknown> {
     acceptFile: ((options: AcceptFileOptions) => boolean | Promise<AcceptArtifacts>) | undefined;
     // (undocumented)
@@ -2554,6 +2791,9 @@ export interface InternalFileKind<UploadResult = unknown, AcceptArtifacts = unkn
     // (undocumented)
     uploader: FileUploader<UploadResult, FileUploadError>;
 }
+
+// @public (undocumented)
+export type InviteErrorCodes = 'PROJECT_NOT_FOUND' | 'ALREADY_MEMBER' | 'INVALID_MEMBERSHIP';
 
 // @public (undocumented)
 export type InviteMethod = 'CREATE_PASSWORD' | 'RESET_PASSWORD';
@@ -2643,6 +2883,11 @@ export const isUnorderedListElement: (element: Node_2, suchThat?: Partial<Unorde
 export const italicToolbarButton: ToolbarButtonSpec;
 
 // @public (undocumented)
+export type KeysMatching<T, V> = NonNullable<{
+    [K in keyof T]: T[K] extends V ? K : never;
+}[keyof T]>;
+
+// @public (undocumented)
 export type LabeledProps = {
     ariaLabel: string;
     children: Exclude<ReactNode, string | null | undefined>;
@@ -2650,6 +2895,18 @@ export type LabeledProps = {
     ariaLabel?: string;
     children?: string | null | undefined;
 };
+
+// @public (undocumented)
+export type LabelMiddleware = (label: ReactNode, environment: Environment) => ReactNode;
+
+// @public (undocumented)
+export const LabelMiddlewareContext: React.Context<LabelMiddleware>;
+
+// @public (undocumented)
+export const LabelMiddlewareProvider: ({ value, children }: {
+    value: LabelMiddleware;
+    children: ReactChild;
+}) => JSX.Element;
 
 // @public (undocumented)
 export const LayoutRenderer: FunctionComponent<LayoutRendererProps>;
@@ -2689,7 +2946,7 @@ export interface LegacyDeprecatedEditorFormerlyKnownAsRichTextFieldProps extends
 // @public (undocumented)
 export const Link: React.NamedExoticComponent<LinkProps>;
 
-// @public (undocumented)
+// @public
 export const LinkButton: React.NamedExoticComponent<LinkButtonProps>;
 
 // @public (undocumented)
@@ -2752,7 +3009,15 @@ export interface ListMembersQuery {
 }
 
 // @public (undocumented)
-export const ListPage: (<ContainerExtraProps, ItemExtraProps>(props: ListPageProps<ContainerExtraProps, ItemExtraProps>) => ReactElement) & Partial<PageProvider<ListPageProps<never, never>>>;
+export interface ListMembersQueryVariables {
+    // (undocumented)
+    memberType?: ListMembersMemberType;
+    // (undocumented)
+    slug: string;
+}
+
+// @public (undocumented)
+export const ListPage: PageComponent<(<ContainerExtraProps, ItemExtraProps>({ children, rendererProps, pageName, ...entityListProps }: ListPageProps<ContainerExtraProps, ItemExtraProps>) => JSX.Element)>;
 
 // @public (undocumented)
 export type ListPageProps<ContainerExtraProps, ItemExtraProps> = SugaredQualifiedEntityList & EntityListSubTreeAdditionalProps & {
@@ -2760,6 +3025,21 @@ export type ListPageProps<ContainerExtraProps, ItemExtraProps> = SugaredQualifie
     children?: ReactNode;
     rendererProps?: Omit<ImmutableEntityListPageRendererProps<ContainerExtraProps, ItemExtraProps>, 'accessor' | 'children'>;
 };
+
+// @public (undocumented)
+export interface ListRolesQueryResult {
+    // (undocumented)
+    project: {
+        id: string;
+        roles: RoleDefinition[];
+    };
+}
+
+// @public (undocumented)
+export interface ListRolesQueryVariables {
+    // (undocumented)
+    slug: string;
+}
 
 // @public (undocumented)
 export const ListScope: (<ContainerExtraProps, ItemExtraProps>(props: ListScopeProps<ContainerExtraProps, ItemExtraProps>) => ReactElement) & Partial<ListScopeProps<never, never>> & {
@@ -2771,6 +3051,12 @@ export type ListScopeProps<ContainerExtraProps, ItemExtraProps> = SugaredQualifi
     children?: ReactNode;
     listProps?: Omit<ImmutableEntityListRendererProps<ContainerExtraProps, ItemExtraProps>, 'accessor' | 'children'>;
 };
+
+// @public (undocumented)
+export interface ListUserQueryResult {
+    // (undocumented)
+    memberships: Membership[];
+}
 
 // @public (undocumented)
 export const LocationField: FunctionComponent<LocationFieldProps>;
@@ -2824,6 +3110,9 @@ export interface LoginEntrypointProps {
 }
 
 // @public (undocumented)
+export type LoginErrors = 'UNKNOWN_EMAIL' | 'INVALID_PASSWORD' | 'OTP_REQUIRED' | 'INVALID_OTP_TOKEN';
+
+// @public (undocumented)
 export interface LoginProps {
     // (undocumented)
     onLogin?: () => void;
@@ -2832,16 +3121,33 @@ export interface LoginProps {
 }
 
 // @public (undocumented)
+export interface LoginResult {
+    // (undocumented)
+    person: {
+        id: string;
+        email: string;
+    };
+    // (undocumented)
+    token: string;
+}
+
+// @public (undocumented)
 export const LogoutLink: React.NamedExoticComponent<LogoutLinkProps>;
+
+// @public (undocumented)
+export interface LogoutLinkInnerProps {
+    // (undocumented)
+    children?: ReactNode;
+    // (undocumented)
+    onClick: () => void;
+}
 
 // @public (undocumented)
 export interface LogoutLinkProps {
     // (undocumented)
     children?: ReactNode;
-    // Warning: (ae-forgotten-export) The symbol "InnerProps" needs to be exported by the entry point index.d.ts
-    //
     // (undocumented)
-    Component?: ComponentType<InnerProps>;
+    Component?: ComponentType<LogoutLinkInnerProps>;
 }
 
 // @public (undocumented)
@@ -2900,6 +3206,35 @@ export interface Membership {
 
 // @public (undocumented)
 export const MembershipInput: GQLVariableType<Membership, false>;
+
+// @public (undocumented)
+export interface MeResponse {
+    // (undocumented)
+    me: {
+        id: string;
+        person?: {
+            id: string;
+            email: string;
+            otpEnabled: boolean;
+        };
+        projects: Array<{
+            project: {
+                slug: string;
+                name: string;
+            };
+            memberships: Array<{
+                role: string;
+                variables: Array<{
+                    name: string;
+                    values: string[];
+                }>;
+            }>;
+        }>;
+        permissions: {
+            canCreateProject: boolean;
+        };
+    };
+}
 
 // @public (undocumented)
 export interface MessageDictionary {
@@ -2966,7 +3301,7 @@ export interface MiscPageLayoutProps extends BoxOwnProps {
 }
 
 // @public (undocumented)
-export const MultiEditPage: (<ContainerExtraProps, ItemExtraProps>(props: MultiEditPageProps<ContainerExtraProps, ItemExtraProps>) => ReactElement) & Partial<PageProvider<MultiEditPageProps<never, never>>>;
+export const MultiEditPage: PageComponent<(<ContainerExtraProps, ItemExtraProps>({ children, rendererProps, pageName, ...entityListProps }: MultiEditPageProps<ContainerExtraProps, ItemExtraProps>) => JSX.Element)>;
 
 // @public (undocumented)
 export type MultiEditPageProps<ContainerExtraProps, ItemExtraProps> = SugaredQualifiedEntityList & EntityListSubTreeAdditionalProps & {
@@ -2991,7 +3326,7 @@ export type MultiEditScopeProps<ContainerExtraProps, ItemExtraProps> = SugaredQu
 // @public (undocumented)
 export const MultiSelectField: FunctionComponent<MultiSelectFieldProps>;
 
-// @public (undocumented)
+// @internal (undocumented)
 export const MultiSelectFieldInner: <T = unknown>({ currentValues, data, errors, onAdd, onClear, onRemove, reactSelectProps, placeholder, menuZIndex, onAddNew, onMove, onSearch, isLoading, ...fieldContainerProps }: MultiSelectFieldInnerProps<T>) => JSX.Element;
 
 // @public (undocumented)
@@ -3108,7 +3443,7 @@ export type NullConditionFilterPublicProps = {
     showNullConditionFilter?: boolean;
 };
 
-// @public (undocumented)
+// @public
 export const NumberCell: FunctionComponent<NumberCellProps>;
 
 // @public (undocumented)
@@ -3173,7 +3508,29 @@ export const outdatedApplicationDictionary: {
 };
 
 // @public (undocumented)
+export interface OverrideCreateElementReferenceOptions {
+    // (undocumented)
+    createElementReferences: CreateElementReferences;
+}
+
+// @public (undocumented)
 export const overrideDeleteBackward: <E extends Editor>(editor: E) => void;
+
+// @public (undocumented)
+export interface OverrideInsertDataOptions {
+    // (undocumented)
+    embedContentDiscriminationField: RelativeSingleField | undefined;
+    // (undocumented)
+    embedHandlers: NormalizedEmbedHandlers | undefined;
+    // (undocumented)
+    embedReferenceDiscriminateBy: FieldValue | undefined;
+}
+
+// @public (undocumented)
+export interface OverrideInsertElementWithReferenceOptions {
+    // (undocumented)
+    insertElementWithReference: InsertElementWithReference;
+}
 
 // @public
 export const Page: {
@@ -3181,6 +3538,9 @@ export const Page: {
     displayName: string;
     getPageName(props: PageProps<unknown>): string;
 };
+
+// @public (undocumented)
+export type PageComponent<T> = T & PageProvider<T extends (props: infer P) => any ? P : never>;
 
 // @public @deprecated (undocumented)
 export const PageLink: React.NamedExoticComponent<LinkProps>;
@@ -3292,18 +3652,28 @@ export const paragraphToolbarButton: ElementToolbarButton<ParagraphElement>;
 export const parseLinkTarget: (to: LinkTarget, env: Environment) => Exclude<LinkTarget, string>;
 
 // @public (undocumented)
+export type PasswordResetErrors = 'TOKEN_NOT_FOUND' | 'TOKEN_USED' | 'TOKEN_EXPIRED' | 'PASSWORD_TOO_WEAK';
+
+// @public (undocumented)
 export const pathToRequestState: (routing: RoutingContextValue, path: string, query: string) => RequestState;
 
-// @public (undocumented)
-export const PersistButton: React.MemoExoticComponent<React.ForwardRefExoticComponent<Omit<SaveButtonProps, "children" | "isDirty"> & React.RefAttributes<HTMLButtonElement>>>;
+// @public
+export const PersistButton: React.MemoExoticComponent<React.ForwardRefExoticComponent<PersistButtonProps & React.RefAttributes<HTMLButtonElement>>>;
 
 // @public (undocumented)
-export type PersistButtonProps = Omit<SaveButtonProps, 'children' | 'isDirty'> & {};
+export type PersistButtonProps = Omit<SaveButtonProps, 'children' | 'isDirty'>;
 
-// Warning: (ae-forgotten-export) The symbol "persistFeedbackDictionary" needs to be exported by the entry point index.d.ts
-//
 // @public (undocumented)
 export type PersistFeedbackDictionary = typeof persistFeedbackDictionary;
+
+// @public (undocumented)
+export const persistFeedbackDictionary: {
+    persistFeedback: {
+        successMessage: string;
+        afterPersistErrorMessage: string;
+        errorMessage: string;
+    };
+};
 
 // @public (undocumented)
 export interface PersistWithFeedbackOptions extends PersistOptions {
@@ -3332,6 +3702,20 @@ export interface Person {
 }
 
 // @public (undocumented)
+export interface PlainTextFieldBackedElement {
+    // (undocumented)
+    distinction?: EditorCanvasDistinction;
+    // (undocumented)
+    field: string | SugarableRelativeSingleField;
+    // (undocumented)
+    format: 'plainText';
+    // (undocumented)
+    placeholder: string;
+    // (undocumented)
+    size?: Size;
+}
+
+// @public (undocumented)
 export interface PopulateEmbedDataOptions<EmbedArtifacts = any> {
     // (undocumented)
     embedArtifacts: EmbedArtifacts;
@@ -3347,10 +3731,18 @@ export const populateRequest: (routing: RoutingContextValue, location: Location)
 // @public (undocumented)
 export const prepareElementForInsertion: (editor: Editor_2, node: Node_2) => Path;
 
-// Warning: (ae-forgotten-export) The symbol "PrepareOtpFormProps" needs to be exported by the entry point index.d.ts
-//
 // @public (undocumented)
 export const PrepareOtpForm: FC<PrepareOtpFormProps>;
+
+// @public (undocumented)
+export interface PrepareOtpFormProps {
+    // (undocumented)
+    isReSetup?: boolean;
+    // (undocumented)
+    onCancel?: () => void;
+    // (undocumented)
+    onPrepared: (data: PrepareOtpResult) => void;
+}
 
 // @public (undocumented)
 export interface PrepareOtpResult {
@@ -3377,6 +3769,12 @@ export const projectEnvironmentExtension: Environment.Extension<string | null, {
 }>;
 
 // @public (undocumented)
+export interface ProjectGridProps {
+    // (undocumented)
+    projectDetailLink: RoutingLinkTarget;
+}
+
+// @public (undocumented)
 export const ProjectList: (props: ProjectListProps) => JSX.Element;
 
 // @public (undocumented)
@@ -3390,8 +3788,6 @@ export interface ProjectListProps {
     projects: readonly Project[];
 }
 
-// Warning: (ae-forgotten-export) The symbol "ProjectGridProps" needs to be exported by the entry point index.d.ts
-//
 // @public (undocumented)
 export const ProjectsGrid: FC<ProjectGridProps>;
 
@@ -3462,17 +3858,19 @@ export function readEventStream(lines: AsyncIterable<string>): AsyncIterable<{
 export function readLines(reader: ReadableStreamDefaultReader): AsyncIterable<string>;
 
 // @public (undocumented)
+export type RedirectOnSuccessHandler = (currentState: PageRequest<any>, persistedId: EntityId, entity: EntityAccessor, options: PersistSuccessOptions) => IncompleteRequestState;
+
+// @public (undocumented)
+export type RedirectOnSuccessTarget = string | IncompleteRequestState | RedirectOnSuccessHandler;
+
+// @public (undocumented)
 export interface ReferenceElement extends ElementWithReference {
-    // Warning: (ae-forgotten-export) The symbol "ReferenceElementType" needs to be exported by the entry point index.d.ts
-    //
     // (undocumented)
-    type: ReferenceElementType;
+    type: typeof referenceElementType;
 }
 
 // @public (undocumented)
 export interface ReferenceElementOptions {
-    // Warning: (ae-forgotten-export) The symbol "EditorReferenceBlocks" needs to be exported by the entry point index.d.ts
-    //
     // (undocumented)
     editorReferenceBlocks: EditorReferenceBlocks;
     // (undocumented)
@@ -3501,7 +3899,7 @@ export interface ReferenceElementRendererProps extends RenderElementProps, Refer
 }
 
 // @public (undocumented)
-export const referenceElementType: ReferenceElementType;
+export const referenceElementType: "reference";
 
 // @public (undocumented)
 export const renderAnyFilePreview: ({ objectUrl }: RenderFilePreviewOptions) => JSX.Element;
@@ -3528,16 +3926,26 @@ export const renderImageFilePreview: ({ objectUrl }: RenderFilePreviewOptions) =
 // @public (undocumented)
 export const renderVideoFilePreview: ({ objectUrl }: RenderFilePreviewOptions) => JSX.Element;
 
-// @public (undocumented)
+// @public
 export const Repeater: <ContainerExtraProps, ItemExtraProps>(props: RepeaterProps<ContainerExtraProps, ItemExtraProps>) => ReactElement;
 
 // @public (undocumented)
 export type RepeaterCreateNewEntity = (initialize?: EntityAccessor.BatchUpdatesHandler, index?: number) => void;
 
-// Warning: (ae-forgotten-export) The symbol "repeaterDictionary" needs to be exported by the entry point index.d.ts
-//
 // @public (undocumented)
 export type RepeaterDictionary = typeof repeaterDictionary;
+
+// @public (undocumented)
+export const repeaterDictionary: {
+    repeater: {
+        emptyMessage: {
+            text: string;
+        };
+        addButton: {
+            text: string;
+        };
+    };
+};
 
 // @public (undocumented)
 export const RepeaterFieldContainer: React.MemoExoticComponent<({ accessor, addButtonText, children, createNewEntity, addButtonComponent: AddButton, addButtonComponentExtraProps, addButtonProps, emptyMessage, emptyMessageComponent, enableAddingNew, formatMessage, isEmpty, label, }: RepeaterFieldContainerProps) => JSX.Element>;
@@ -3688,10 +4096,16 @@ export interface RequestStateUninitialized<T> {
     state: 'initial';
 }
 
-// Warning: (ae-forgotten-export) The symbol "ResetPasswordFormProps" needs to be exported by the entry point index.d.ts
-//
 // @public (undocumented)
 export const ResetPasswordForm: FC<ResetPasswordFormProps>;
+
+// @public (undocumented)
+export interface ResetPasswordFormProps {
+    // (undocumented)
+    redirectOnSuccess: RoutingLinkTarget;
+    // (undocumented)
+    token: string;
+}
 
 // @public (undocumented)
 export interface ResolvedDiscriminatedDatum<Datum> {
@@ -3753,8 +4167,20 @@ export namespace RichEditor {
     };
 }
 
-// @public (undocumented)
+// @public
 export const RichTextField: FunctionComponent<RichTextFieldProps>;
+
+// @public (undocumented)
+export interface RichTextFieldBackedElement {
+    // (undocumented)
+    distinction?: EditorCanvasDistinction;
+    // (undocumented)
+    field: string | SugarableRelativeSingleField;
+    // (undocumented)
+    format: 'richText';
+    // (undocumented)
+    placeholder: string;
+}
 
 // @public (undocumented)
 export interface RichTextFieldProps extends FieldBasicProps, Omit<FieldContainerProps, 'children' | 'errors'>, CreateEditorPublicOptions, HoveringToolbarsProps {
@@ -3762,6 +4188,17 @@ export interface RichTextFieldProps extends FieldBasicProps, Omit<FieldContainer
     distinction?: EditorCanvasDistinction;
     // (undocumented)
     placeholder?: string;
+}
+
+// @public (undocumented)
+export type RoleCondition = string | ((roles: Set<string>) => boolean);
+
+// @public (undocumented)
+export interface RoleConfig {
+    // (undocumented)
+    name: string;
+    // (undocumented)
+    variables: VariablesConfig;
 }
 
 // @public (undocumented)
@@ -3773,15 +4210,22 @@ export interface RoleDefinition {
 }
 
 // @public (undocumented)
+export interface RoleEntityVariableDefinition {
+    // (undocumented)
+    entityName: string;
+}
+
+// @public (undocumented)
 export type RoleRenderer = React.FC<{
     role: string;
     variables: Variables;
 }>;
 
-// Warning: (ae-forgotten-export) The symbol "RoleDefinition_2" needs to be exported by the entry point index.d.ts
-//
 // @public (undocumented)
-export type RoleRendererFactory = (roleDefinitions: RoleDefinition_2[]) => Promise<RoleRenderer>;
+export type RoleRendererFactory = (roleDefinitions: RoleRendererRoleDefinition[]) => Promise<RoleRenderer>;
+
+// @public (undocumented)
+export type RoleRendererRoleDefinition = any;
 
 // @public (undocumented)
 export interface RoleRenderers<T> {
@@ -3792,32 +4236,60 @@ export interface RoleRenderers<T> {
     }>;
 }
 
-// Warning: (ae-forgotten-export) The symbol "RoleConfig" needs to be exported by the entry point index.d.ts
-//
 // @public (undocumented)
 export type RolesConfig = {
     [K in string]?: RoleConfig;
 };
 
-// Warning: (ae-forgotten-export) The symbol "RoleVariableDefinitionBase" needs to be exported by the entry point index.d.ts
-// Warning: (ae-forgotten-export) The symbol "RoleEntityVariableDefinition" needs to be exported by the entry point index.d.ts
-//
 // @public (undocumented)
 export type RoleVariableDefinition = RoleVariableDefinitionBase & (RoleEntityVariableDefinition | {});
 
-// Warning: (ae-forgotten-export) The symbol "RouteConfigWithMapping" needs to be exported by the entry point index.d.ts
-// Warning: (ae-forgotten-export) The symbol "RouteConfigWithoutMapping" needs to be exported by the entry point index.d.ts
-//
+// @public (undocumented)
+export interface RoleVariableDefinitionBase {
+    // (undocumented)
+    name: string;
+}
+
 // @public (undocumented)
 export type RouteConfig<N> = RouteConfigWithMapping<N> | RouteConfigWithoutMapping;
 
-// Warning: (ae-forgotten-export) The symbol "RouteName" needs to be exported by the entry point index.d.ts
-// Warning: (ae-forgotten-export) The symbol "ParamsByName" needs to be exported by the entry point index.d.ts
-//
+// @public (undocumented)
+export interface RouteConfigWithMapping<N, T extends RouteParams = any> {
+    // (undocumented)
+    objectToParams: (params: N) => T;
+    // (undocumented)
+    paramsToObject: (params: T) => {
+        [K in Exclude<keyof N, 'name'>]: N[K];
+    };
+    // (undocumented)
+    path: string;
+}
+
+// @public (undocumented)
+export interface RouteConfigWithoutMapping {
+    // (undocumented)
+    objectToParams?: undefined;
+    // (undocumented)
+    paramsToObject?: undefined;
+    // (undocumented)
+    path: string;
+}
+
 // @public (undocumented)
 export type RouteMap<N extends RouteName = RouteName> = {
-    [K in N]: RouteConfig<ParamsByName<N>>;
+    [K in N]: RouteConfig<RouteParamsByName<N>>;
 };
+
+// @public (undocumented)
+export type RouteName = string;
+
+// @public (undocumented)
+export type RouteParams = any;
+
+// @public (undocumented)
+export type RouteParamsByName<K extends RouteName, T = RouteParams> = T extends {
+    name: K;
+} ? T : never;
 
 // @public (undocumented)
 export const ROUTING_BINDING_PARAMETER_PREFIX = "entity.";
@@ -3837,7 +4309,7 @@ export interface RoutingContextValue {
     routes: RouteMap;
 }
 
-// @public (undocumented)
+// @public
 export const RoutingLink: React.NamedExoticComponent<RoutingLinkProps<{}> & PublicAnchorProps>;
 
 // @public (undocumented)
@@ -3940,7 +4412,7 @@ export interface SelectEntityButtonProps {
 // @public (undocumented)
 export const SelectField: FunctionComponent<SelectFieldProps>;
 
-// @public (undocumented)
+// @internal (undocumented)
 export const SelectFieldInner: React.MemoExoticComponent<({ placeholder, allowNull, currentValue, data, errors, menuZIndex, onSelect, onClear, reactSelectProps, onAddNew, onSearch, isLoading, ...fieldContainerProps }: SelectFieldInnerProps) => JSX.Element>;
 
 // @public (undocumented)
@@ -4074,6 +4546,29 @@ export interface SignInIDPResult {
 }
 
 // @public (undocumented)
+export type SignOutResponse = SignOutResponseOk | SignOutResponseError;
+
+// @public (undocumented)
+export interface SignOutResponseError {
+    // (undocumented)
+    signOut: {
+        ok: false;
+        error?: {
+            code: string;
+            endUserMessage?: string;
+        };
+    };
+}
+
+// @public (undocumented)
+export interface SignOutResponseOk {
+    // (undocumented)
+    signOut: {
+        ok: true;
+    };
+}
+
+// @public (undocumented)
 export type SimpleDynamicSingleChoiceFieldProps = SugaredRelativeSingleEntity & BaseDynamicChoiceFieldOptions & Pick<DynamicSingleChoiceFieldProps, 'transformOptions'>;
 
 // @public (undocumented)
@@ -4092,13 +4587,13 @@ export interface SimpleRelativeSingleFieldMetadata<Value extends FieldValue = Fi
 // @public (undocumented)
 export type SimpleRelativeSingleFieldProps = FieldBasicProps & Omit<FieldContainerProps, 'children'>;
 
-// @public (undocumented)
+// @internal (undocumented)
 export const SimpleRelativeSingleFieldProxy: React.MemoExoticComponent<({ render, label, labelDescription, labelPosition, description, ...props }: SimpleRelativeSingleFieldProxyProps) => JSX.Element>;
 
 // @public (undocumented)
-export type SimpleRelativeSingleFieldProxyProps = Omit<FieldContainerProps, 'children'> & SugaredRelativeSingleField & {
+export type SimpleRelativeSingleFieldProxyProps = {
     render: (fieldMetadata: SimpleRelativeSingleFieldMetadata<any>, props: any) => ReactNode;
-};
+} & Omit<FieldContainerProps, 'children'> & SugaredRelativeSingleField;
 
 // @public (undocumented)
 export type SingleKindFileProps = FullFileKind & SelectFileInputSelectionComponentProps<any> & {
@@ -4121,6 +4616,9 @@ export type SlugFieldProps = SimpleRelativeSingleFieldProps & ControlProps<strin
 };
 
 // @public (undocumented)
+export type SlugPrefix = string | ((environment: Environment) => string);
+
+// @internal (undocumented)
 export const SortableBlock: React.NamedExoticComponent<SortableBlockProps>;
 
 // @public (undocumented)
@@ -4244,7 +4742,7 @@ export const tableElementPlugin: CustomElementPlugin<TableElement>;
 export const tableElementType: "table";
 
 // @public (undocumented)
-export const TablePage: (<ContainerExtraProps, ItemExtraProps>(props: TablePageProps<ContainerExtraProps, ItemExtraProps>) => ReactElement) & Partial<PageProvider<TablePageProps<never, never>>>;
+export const TablePage: PageComponent<(<ContainerExtraProps, ItemExtraProps>({ rendererProps, children, pageName, ...entityListProps }: TablePageProps<ContainerExtraProps, ItemExtraProps>) => JSX.Element)>;
 
 // @public (undocumented)
 export type TablePageProps<ContainerExtraProps, ItemExtraProps> = SugaredQualifiedEntityList & EntityListSubTreeAdditionalProps & {
@@ -4314,7 +4812,7 @@ export type TenantMutationResponse<Result, ErrorCode extends string> = TenantMut
 // @public @deprecated (undocumented)
 export const TextAreaField: React.NamedExoticComponent<TextareaFieldProps>;
 
-// @public (undocumented)
+// @public
 export const TextareaField: React.NamedExoticComponent<TextareaFieldProps>;
 
 // @public (undocumented)
@@ -4326,7 +4824,7 @@ export interface TextAttrs {
     [key: string]: any;
 }
 
-// @public (undocumented)
+// @public
 export const TextCell: FunctionComponent<TextCellProps>;
 
 // @public (undocumented)
@@ -4336,7 +4834,7 @@ export type TextCellProps = DataGridColumnPublicProps & FieldFallbackViewPublicP
     format?: (value: string | null) => ReactNode;
 };
 
-// @public (undocumented)
+// @public
 export const TextField: React.NamedExoticComponent<TextFieldProps>;
 
 // @public (undocumented)
@@ -4406,10 +4904,55 @@ export const unorderedListElementType: "unorderedList";
 // @public (undocumented)
 export const unorderedListToolbarButton: ElementToolbarButton<UnorderedListElement>;
 
-// Warning: (ae-forgotten-export) The symbol "uploadDictionary" needs to be exported by the entry point index.d.ts
-//
+// @public (undocumented)
+export type UpdateMembershipErrorCodes = 'PROJECT_NOT_FOUND' | 'NOT_MEMBER' | 'INVALID_MEMBERSHIP';
+
+// @public (undocumented)
+export interface UpdateMembershipResult {
+    // (undocumented)
+    removeProjectMember: {
+        ok: boolean;
+        errors: {
+            code: string;
+        }[];
+    };
+}
+
+// @public (undocumented)
+export interface UpdateMembershipVariables {
+    // (undocumented)
+    identityId: string;
+    // (undocumented)
+    projectSlug: string;
+}
+
 // @public (undocumented)
 export type UploadDictionary = typeof uploadDictionary;
+
+// @public (undocumented)
+export const uploadDictionary: {
+    upload: {
+        addButton: {
+            text: string;
+            subText: string;
+        };
+        selectButton: {
+            text: string;
+        };
+        selectModal: {
+            maxLimitReached: string;
+        };
+        insertSelected: {
+            text: string;
+        };
+        fileState: {
+            inspectingFile: string;
+            invalidFile: string;
+            failedUpload: string;
+            finalizing: string;
+        };
+    };
+};
 
 // @public (undocumented)
 export const UploadField: <SFExtraProps extends {} = {}>(props: UploadFieldProps<SFExtraProps>) => ReactElement | null;
@@ -4466,17 +5009,12 @@ export interface UseBlockEditorSlateNodesOptions {
 // @public (undocumented)
 export const useBlockProps: (children: ReactNode) => BlockProps[];
 
-// Warning: (ae-forgotten-export) The symbol "GQLVariableValues" needs to be exported by the entry point index.d.ts
-// Warning: (ae-forgotten-export) The symbol "ChangePasswordErrors" needs to be exported by the entry point index.d.ts
-//
 // @public (undocumented)
 export const useChangePassword: () => TenantMutationExecutor<GQLVariableValues<    {
 currentPassword: GQLVariableType<string, true>;
 newPassword: GQLVariableType<string, true>;
 }>, TenantMutationResponse<never, ChangePasswordErrors>>;
 
-// Warning: (ae-forgotten-export) The symbol "ConfirmOtpErrors" needs to be exported by the entry point index.d.ts
-//
 // @public (undocumented)
 export const useConfirmOtp: () => TenantMutationExecutor<GQLVariableValues<    {
 token: GQLVariableType<string, true>;
@@ -4559,8 +5097,6 @@ export const useFieldControl: <FieldVal extends FieldValue, ControlVal extends F
     ref: Ref<any>;
 };
 
-// Warning: (ae-forgotten-export) The symbol "FormMethods" needs to be exported by the entry point index.d.ts
-//
 // @public (undocumented)
 export const useForm: <V>(initialValues: V, handler?: FormHandler<V> | undefined) => FormMethods<V>;
 
@@ -4607,8 +5143,6 @@ redirectUrl: GQLVariableType<string, true>;
 identityProvider: GQLVariableType<string, true>;
 }>, TenantMutationResponse<InitSignInIDPResult, "PROVIDER_NOT_FOUND">>;
 
-// Warning: (ae-forgotten-export) The symbol "InviteErrorCodes" needs to be exported by the entry point index.d.ts
-//
 // @public (undocumented)
 export const useInvite: () => TenantMutationExecutor<GQLVariableValues<    {
 projectSlug: GQLVariableType<string, true>;
@@ -4618,19 +5152,16 @@ method: GQLVariableType<InviteMethod, false>;
 mailVariant: GQLVariableType<string, false>;
 }>, TenantMutationResponse<never, InviteErrorCodes>>;
 
-// Warning: (ae-forgotten-export) The symbol "ListMembersQueryVariables" needs to be exported by the entry point index.d.ts
-//
+// @public (undocumented)
+export const useLabelMiddleware: () => (it: ReactNode) => ReactNode;
+
 // @public (undocumented)
 export const useListMembersQuery: (projectSlug: string, memberType: ListMembersQueryVariables['memberType']) => QueryRequestObject<ListMembersQuery>;
 
-// Warning: (ae-forgotten-export) The symbol "ListRolesQueryResult" needs to be exported by the entry point index.d.ts
-//
 // @public (undocumented)
 export const useListRolesQuery: (projectSlug: string) => QueryRequestObject<ListRolesQueryResult>;
 
 // Warning: (tsdoc-missing-deprecation-message) The @deprecated block must include a deprecation message, e.g. describing the recommended alternative
-// Warning: (ae-forgotten-export) The symbol "LoginResult" needs to be exported by the entry point index.d.ts
-// Warning: (ae-forgotten-export) The symbol "LoginErrors" needs to be exported by the entry point index.d.ts
 //
 // @public @deprecated (undocumented)
 export const useLogin: () => TenantMutationExecutor<GQLVariableValues<    {
@@ -4676,8 +5207,6 @@ export const usePrepareOtp: () => TenantMutationExecutor<GQLVariableValues<    {
 label: GQLVariableType<string, false>;
 }>, TenantMutationResponse<PrepareOtpResult, never>>;
 
-// Warning: (ae-forgotten-export) The symbol "ListUserQueryResult" needs to be exported by the entry point index.d.ts
-//
 // @public (undocumented)
 export const useProjectMembershipsQuery: (projectSlug: string, identityId: string) => QueryRequestObject<ListUserQueryResult>;
 
@@ -4699,8 +5228,6 @@ export const useRedirectToBacklink: () => void;
 // @public (undocumented)
 export const useRedirectToBacklinkCallback: () => () => void;
 
-// Warning: (ae-forgotten-export) The symbol "UpdateMembershipResult" needs to be exported by the entry point index.d.ts
-//
 // @public (undocumented)
 export const useRemoveCurrentProjectMembership: () => [(identityId: string) => Promise<UpdateMembershipResult>, MutationRequestState<UpdateMembershipResult>];
 
@@ -4710,8 +5237,6 @@ export const useRemoveMemberIntent: (project: string, onRemove?: () => void | Pr
 // @public (undocumented)
 export const useRemoveProjectMembership: () => [(project: string, identityId: string) => Promise<UpdateMembershipResult>, MutationRequestState<UpdateMembershipResult>];
 
-// Warning: (ae-forgotten-export) The symbol "PasswordResetErrors" needs to be exported by the entry point index.d.ts
-//
 // @public (undocumented)
 export const useResetPassword: () => TenantMutationExecutor<GQLVariableValues<    {
 token: GQLVariableType<string, true>;
@@ -4792,8 +5317,6 @@ session: GQLVariableType<JsonValue<undefined>, true>;
 expiration: GQLVariableType<number, false>;
 }>, TenantMutationResponse<SignInIDPResult, SignInIDPErrors>>;
 
-// Warning: (ae-forgotten-export) The symbol "SignOutResponse" needs to be exported by the entry point index.d.ts
-//
 // @public (undocumented)
 export const useSignOut: () => UseMutationReturn<SignOutResponse, {}>;
 
@@ -4803,8 +5326,6 @@ export const useSingleTenantMutation: <Result, ErrorCode extends string, Variabl
 // @public (undocumented)
 export const useToolbarState: () => ToolbarsState;
 
-// Warning: (ae-forgotten-export) The symbol "UpdateMembershipErrorCodes" needs to be exported by the entry point index.d.ts
-//
 // @public (undocumented)
 export const useUpdateProjectMembership: () => TenantMutationExecutor<GQLVariableValues<    {
 projectSlug: GQLVariableType<string, true>;
@@ -4812,10 +5333,25 @@ identityId: GQLVariableType<string, true>;
 memberships: GQLVariableType<Membership[], true>;
 }>, TenantMutationResponse<never, UpdateMembershipErrorCodes>>;
 
-// Warning: (ae-forgotten-export) The symbol "VariableProps" needs to be exported by the entry point index.d.ts
-//
 // @public (undocumented)
 export const Variable: React.MemoExoticComponent<({ name, format }: VariableProps) => ReactElement>;
+
+// @public (undocumented)
+export interface VariableConfig {
+    // (undocumented)
+    render: ComponentType<{
+        value: string[];
+        onChange: (newValues: string[]) => void;
+    }>;
+}
+
+// @public (undocumented)
+export interface VariableProps {
+    // (undocumented)
+    format?: (value: ReactNode) => ReactNode;
+    // (undocumented)
+    name: Environment.Name;
+}
 
 // @public (undocumented)
 export interface Variables {
@@ -4823,23 +5359,35 @@ export interface Variables {
     [name: string]: string[];
 }
 
-// Warning: (ae-forgotten-export) The symbol "VariableSelectorProps" needs to be exported by the entry point index.d.ts
-//
+// @public (undocumented)
+export type VariablesConfig = {
+    [K in string]?: VariableConfig;
+};
+
 // @public (undocumented)
 export const VariableSelector: FC<VariableSelectorProps>;
+
+// @public (undocumented)
+export interface VariableSelectorProps {
+    // (undocumented)
+    membership: Membership;
+    // (undocumented)
+    onChange: (newMembership: Membership) => void;
+    // (undocumented)
+    rolesConfig?: RolesConfig;
+    // (undocumented)
+    variable: RoleVariableDefinition;
+}
 
 // @public (undocumented)
 export const VideoFieldView: <SrcField extends FieldValue = string>(props: VideoFieldViewProps<SrcField>) => ReactElement;
 
 // @public (undocumented)
-export interface VideoFieldViewProps<SrcField extends FieldValue = string> extends Omit<VideoHTMLAttributes<HTMLVideoElement>, 'src'>, FieldFallbackViewPublicProps {
-    // (undocumented)
-    formatUrl?: (srcFieldValue: SrcField) => string;
-    // (undocumented)
+export type VideoFieldViewProps<SrcField extends FieldValue = string> = {
     srcField: SugaredFieldProps['field'];
-    // (undocumented)
     titleField?: SugaredFieldProps['field'];
-}
+    formatUrl?: (srcFieldValue: SrcField) => string;
+} & FieldFallbackViewPublicProps & Omit<HTMLVideoElementProps, 'src'>;
 
 // @public (undocumented)
 export interface VideoFileDataExtractorProps {
@@ -4855,7 +5403,7 @@ export interface VideoFileDataExtractorProps {
 export const VideoFileRepeater: <AcceptArtifacts = unknown, SFExtraProps extends {} = {}>(props: VideoFileRepeaterProps<AcceptArtifacts, SFExtraProps>) => ReactElement | null;
 
 // @public (undocumented)
-export type VideoFileRepeaterProps<AcceptArtifacts = unknown, SFExtraProps extends {} = {}> = PublicSingleKindFileRepeaterProps<AcceptArtifacts, SFExtraProps> & StockVideoFileKindProps<AcceptArtifacts>;
+export type VideoFileRepeaterProps<AcceptArtifacts = unknown, SFExtraProps extends {} = {}> = PublicSingleKindFileRepeaterProps<AcceptArtifacts, SFExtraProps> & VideoFileDataExtractorProps;
 
 // @public (undocumented)
 export const VideoFiles: <AcceptArtifacts = unknown>(props: VideoFilesProps<AcceptArtifacts, {}>) => ReactElement | null;
@@ -4869,7 +5417,7 @@ export type VideoFilesProps<AcceptArtifacts = unknown, SFExtraProps extends {} =
 export const VideoUploadField: <AcceptArtifacts = unknown, SFExtraProps extends {} = {}>(props: VideoUploadFieldProps<AcceptArtifacts, SFExtraProps>) => ReactElement | null;
 
 // @public (undocumented)
-export type VideoUploadFieldProps<AcceptArtifacts = unknown, SFExtraProps extends {} = {}> = PublicSingleKindUploadFieldProps<AcceptArtifacts, SFExtraProps> & StockVideoFileKindProps<AcceptArtifacts>;
+export type VideoUploadFieldProps<AcceptArtifacts = unknown, SFExtraProps extends {} = {}> = PublicSingleKindUploadFieldProps<AcceptArtifacts, SFExtraProps> & VideoFileDataExtractorProps;
 
 // @public (undocumented)
 export const withAnchors: <E extends Editor>(editor: E) => E;
@@ -4991,17 +5539,12 @@ export * from "@contember/ui";
 
 // Warnings were encountered during analysis:
 //
-// src/components/bindingFacade/environment/SideDimensions.tsx:88:81 - (ae-forgotten-export) The symbol "LabelMiddleware" needs to be exported by the entry point index.d.ts
-// src/components/bindingFacade/fields/SlugField.tsx:23:3 - (ae-forgotten-export) The symbol "SlugPrefix" needs to be exported by the entry point index.d.ts
-// src/components/bindingFacade/richText/ContemberEditor/index.ts:24:29 - (ae-forgotten-export) The symbol "ElementDataAttributes" needs to be exported by the entry point index.d.ts
-// src/components/bindingFacade/richText/blockEditor/BlockEditor.tsx:322:25 - (ae-forgotten-export) The symbol "ContentOutletProps" needs to be exported by the entry point index.d.ts
 // src/components/bindingFacade/richText/blockEditor/embed/index.ts:5:27 - (ae-forgotten-export) The symbol "GoogleFormEmbedHandler" needs to be exported by the entry point index.d.ts
 // src/components/bindingFacade/richText/blockEditor/embed/index.ts:5:27 - (ae-forgotten-export) The symbol "YouTubeEmbedHandler" needs to be exported by the entry point index.d.ts
 // src/components/bindingFacade/richText/blockEditor/embed/index.ts:5:27 - (ae-forgotten-export) The symbol "VimeoEmbedHandler" needs to be exported by the entry point index.d.ts
 // src/components/bindingFacade/richText/blockEditor/embed/index.ts:5:27 - (ae-forgotten-export) The symbol "SoundCloudEmbedHandler" needs to be exported by the entry point index.d.ts
 // src/components/bindingFacade/richText/blockEditor/embed/index.ts:5:27 - (ae-forgotten-export) The symbol "SpotifyEmbedHandler" needs to be exported by the entry point index.d.ts
-// src/components/pageRouting/pageComponents/CreatePage.tsx:22:3 - (ae-forgotten-export) The symbol "RedirectOnSuccessTarget" needs to be exported by the entry point index.d.ts
-// src/tenant/queries/me.ts:63:47 - (ae-forgotten-export) The symbol "MeResponse" needs to be exported by the entry point index.d.ts
+// src/components/bindingFacade/richText/blockEditor/templating/getEditorTemplate.tsx:16:4 - (ae-forgotten-export) The symbol "EditorTemplateAtom" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

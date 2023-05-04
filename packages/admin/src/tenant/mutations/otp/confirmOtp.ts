@@ -14,7 +14,7 @@ const confirmOtpVariables = {
 	token: GQLVariable.Required(GQLVariable.String),
 }
 
-type ConfirmOtpErrors =
+export type ConfirmOtpErrors =
 	| 'INVALID_OTP_TOKEN'
 	| 'NOT_PREPARED'
 

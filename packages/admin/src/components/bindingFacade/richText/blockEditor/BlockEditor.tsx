@@ -319,6 +319,11 @@ const BlockEditorComponent: FunctionComponent<BlockEditorProps> = Component(
 	'BlockEditor',
 )
 
+/**
+ * The `BlockEditor` component is the main component of the editor. It is responsible for rendering the content editor.
+ *
+ * @group Blocks and repeaters
+ */
 export const BlockEditor = Object.assign<
 	typeof BlockEditorComponent,
 	{

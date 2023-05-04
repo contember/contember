@@ -6,6 +6,9 @@ export interface TagProps {
 	children: ReactNode
 }
 
+/**
+ * @group UI
+ */
 export const Tag = memo<TagProps>(({ children, onRemove }) => {
 	const prefix = useClassNamePrefix()
 	return (

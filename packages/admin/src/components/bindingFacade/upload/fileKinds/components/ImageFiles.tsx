@@ -13,6 +13,9 @@ export type ImageFilesProps<AcceptArtifacts = unknown, SFExtraProps extends {} =
 		discriminateBy: SugaredDiscriminateBy
 	}
 
+/**
+ * @group Uploads
+ */
 export const ImageFiles = Component<ImageFilesProps>(
 	({
 		 discriminateBy,

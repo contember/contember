@@ -1,14 +1,15 @@
 import cn from 'classnames'
-import { ComponentType, createElement, HTMLAttributes, ReactNode } from 'react'
+import { ComponentType, createElement, ReactNode } from 'react'
 import { useClassNamePrefix } from '../../auxiliary'
 import { toViewClass } from '../../utils'
+import { HTMLDivElementProps, HTMLSpanElementProps } from '../../types'
 
 export type EditorNonEditableProps =
-	| (Omit<HTMLAttributes<HTMLSpanElement>, 'contentEditable'> & {
+	| (Omit<HTMLSpanElementProps, 'contentEditable'> & {
 			children: ReactNode
 			inline: true
 	  })
-	| (Omit<HTMLAttributes<HTMLDivElement>, 'contentEditable'> & {
+	| (Omit<HTMLDivElementProps, 'contentEditable'> & {
 			children: ReactNode
 			inline?: false
 	  })

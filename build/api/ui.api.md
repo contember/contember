@@ -13,7 +13,6 @@ import { ComponentType } from 'react';
 import { CompositionEventHandler } from 'react';
 import { Context } from 'react';
 import { CSSProperties } from 'react';
-import { DetailedHTMLProps } from 'react';
 import { DetailedReactHTMLElement } from 'react';
 import { DragEventHandler } from 'react';
 import { FocusEventHandler } from 'react';
@@ -52,39 +51,56 @@ import { UIEventHandler } from 'react';
 import { WheelEventHandler } from 'react';
 
 // @public (undocumented)
-export const ActionableBox: MemoExoticComponent<({ className, children, editContents, onRemove }: ActionableBoxProps) => JSX.Element>;
+export const ActionableBox: NamedExoticComponent<ActionableBoxProps>;
 
 // @public (undocumented)
-export interface ActionableBoxProps extends HTMLAttributes<HTMLDivElement> {
-    // (undocumented)
-    children: ReactNode;
-    // (undocumented)
+export type ActionableBoxProps = {
     editContents?: ReactNode;
-    // (undocumented)
     onRemove?: (e: MouseEvent_2<HTMLButtonElement>) => void;
+    children: ReactNode;
+} & HTMLDivElementProps;
+
+// @public (undocumented)
+export type ActiveSectionsTabsContextType = ActiveSectionTabsMap;
+
+// @public (undocumented)
+export interface ActiveSectionTabProps {
+    // (undocumented)
+    id: string;
+    // (undocumented)
+    intersectionRatio: number;
+    // (undocumented)
+    time: number;
+}
+
+// @public (undocumented)
+export interface ActiveSectionTabsMap {
+    // (undocumented)
+    [id: string]: ActiveSectionTabProps;
 }
 
 // @public (undocumented)
 export const Aether: MemoExoticComponent<({ children, className, ...divProps }: AetherProps) => JSX.Element>;
 
 // @public (undocumented)
-export type AetherProps = JSX.IntrinsicElements['div'];
+export type AetherProps = HTMLDivElementProps;
 
 // @public (undocumented)
 export type Alignment = Default | 'alignStart' | 'alignCenter' | 'alignEnd';
 
-// Warning: (ae-forgotten-export) The symbol "All" needs to be exported by the entry point index.d.ts
-//
+// @public
+export type All<T> = {
+    [P in keyof Required<T>]: Pick<T, P> extends Required<Pick<T, P>> ? T[P] : (T[P] | undefined);
+};
+
 // @public (undocumented)
 export type AllControlProps<V> = Omit<All<ControlProps<V>>, 'type'>;
 
 // @public (undocumented)
 export type AllVisuallyDependentControlProps = Omit<All<VisuallyDependentControlProps>, 'type'>;
 
-// Warning: (ae-forgotten-export) The symbol "PropBlackList" needs to be exported by the entry point index.d.ts
-//
 // @public (undocumented)
-export interface AnchorBasedProps extends Omit<JSX.IntrinsicElements['a'], PropBlackList> {
+export interface AnchorBasedProps extends Omit<HTMLAnchorElementProps, 'ref' | 'size'> {
     // (undocumented)
     Component: 'a';
 }
@@ -116,16 +132,17 @@ export function assertTimeString(value: unknown): asserts value is TimeInputStri
 // @public (undocumented)
 export function assertWeekInputString(value: unknown): asserts value is WeekInputString;
 
-// Warning: (ae-forgotten-export) The symbol "BaseButtonProps" needs to be exported by the entry point index.d.ts
-//
 // @public (undocumented)
 export const BaseButton: MemoExoticComponent<ForwardRefExoticComponent<BaseButtonProps & RefAttributes<any>>>;
 
 // @public (undocumented)
-export type BlueprintIconName = IconName;
+export type BaseButtonProps = ButtonOwnProps & (ButtonBasedProps | AnchorBasedProps);
 
 // @public (undocumented)
-export const Box: MemoExoticComponent<ForwardRefExoticComponent<Omit<BoxProps, "ref"> & RefAttributes<HTMLDivElement>>>;
+export type BlueprintIconName = IconName;
+
+// @public
+export const Box: MemoExoticComponent<ForwardRefExoticComponent<BoxOwnProps & HTMLDivElementProps & RefAttributes<HTMLDivElement>>>;
 
 // @public (undocumented)
 export type BoxDepth = 1 | 2 | 3 | 4 | 5 | 6;
@@ -156,8 +173,7 @@ export interface BoxOwnProps {
 }
 
 // @public (undocumented)
-export interface BoxProps extends BoxOwnProps, Omit<JSX.IntrinsicElements['div'], 'children'> {
-}
+export type BoxProps = BoxOwnProps & HTMLDivElementProps;
 
 // @public (undocumented)
 export const Breadcrumbs: NamedExoticComponent<BreadcrumbsProps>;
@@ -172,7 +188,7 @@ export interface BreadcrumbsProps {
 export const Button: MemoExoticComponent<ForwardRefExoticComponent<ButtonOwnProps & Omit<ButtonBasedProps, "Component"> & RefAttributes<HTMLButtonElement>>>;
 
 // @public (undocumented)
-export interface ButtonBasedProps extends Omit<JSX.IntrinsicElements['button'], PropBlackList> {
+export interface ButtonBasedProps extends Omit<HTMLButtonElementProps, 'ref' | 'size'> {
     // (undocumented)
     Component: 'button';
 }
@@ -262,7 +278,7 @@ export type ButtonProps = ButtonOwnProps & Omit<ButtonBasedProps, 'Component'>;
 export const Card: NamedExoticComponent<CardProps>;
 
 // @public (undocumented)
-export type CardProps = Omit<CommonCardProps, 'type'> & Omit<JSX.IntrinsicElements['div'], 'onClick'> & {
+export type CardProps = Omit<CommonCardProps, 'type'> & Omit<HTMLDivElementProps, 'onClick'> & {
     href?: never;
     onClick?: () => void;
 };
@@ -393,7 +409,7 @@ export interface ControlConstraintProps<V> {
 // @public (undocumented)
 export interface ControlDisplayProps {
     // (undocumented)
-    className?: HTMLAttributes<HTMLElement>['className'];
+    className?: string;
     // (undocumented)
     distinction?: ControlDistinction;
     // (undocumented)
@@ -567,7 +583,7 @@ export const DevPanel: ({ heading, children, preview }: {
 export const DialogModal: MemoExoticComponent<({ bodyClassName, bodyProps, children, className, dividers, footer, footerClassName, footerProps, header, headerClassName, headerProps, layout, onClose, ...rest }: DialogModalProps) => JSX.Element>;
 
 // @public (undocumented)
-export type DialogModalProps = JSX.IntrinsicElements['div'] & {
+export type DialogModalProps = {
     bodyClassName?: string;
     dividers?: boolean;
     footer?: ReactNode;
@@ -579,7 +595,7 @@ export type DialogModalProps = JSX.IntrinsicElements['div'] & {
     footerClassName?: string;
     layout?: 'fit-content' | 'wide' | 'expanded';
     onClose: () => void;
-};
+} & HTMLDivElementProps;
 
 // @public (undocumented)
 export interface DialogOptions<Result> {
@@ -645,10 +661,9 @@ export interface DimensionSwitcherValue {
 export const Divider: MemoExoticComponent<({ className, gap, ...rest }: DividerProps) => JSX.Element>;
 
 // @public (undocumented)
-export interface DividerProps extends Omit<JSX.IntrinsicElements['div'], 'children'> {
-    // (undocumented)
+export type DividerProps = {
     gap?: Size | 'xlarge' | 'none';
-}
+} & Omit<HTMLDivElementProps, 'children'>;
 
 // @public (undocumented)
 export const Dropdown: MemoExoticComponent<(props: DropdownProps) => JSX.Element>;
@@ -733,7 +748,7 @@ export interface EditorBlockProps {
 
 // @public (undocumented)
 export const EditorCanvas: {
-    <P extends TextareaHTMLAttributes<HTMLDivElement>>(props: EditorCanvasProps<P>): ReactElement;
+    <P extends HTMLTextAreaDivTargetProps>(props: EditorCanvasProps<P>): ReactElement;
     displayName?: string | undefined;
 };
 
@@ -741,7 +756,7 @@ export const EditorCanvas: {
 export type EditorCanvasDistinction = 'seamless' | 'seamless-with-padding' | Default;
 
 // @public (undocumented)
-export interface EditorCanvasProps<P extends TextareaHTMLAttributes<HTMLDivElement>> {
+export interface EditorCanvasProps<P extends HTMLTextAreaDivTargetProps> {
     // (undocumented)
     children?: ReactNode;
     // (undocumented)
@@ -817,7 +832,7 @@ is?: string | undefined;
 'aria-colindex'?: number | undefined;
 'aria-colspan'?: number | undefined;
 'aria-controls'?: string | undefined;
-'aria-current'?: boolean | "time" | "page" | "false" | "true" | "step" | "location" | "date" | undefined;
+'aria-current'?: boolean | "time" | "page" | "false" | "true" | "date" | "step" | "location" | undefined;
 'aria-describedby'?: string | undefined;
 'aria-details'?: string | undefined;
 'aria-disabled'?: (boolean | "false" | "true") | undefined;
@@ -1029,7 +1044,7 @@ export interface EditorHeadingProps {
     // (undocumented)
     align?: 'start' | 'end' | 'center' | 'justify';
     // (undocumented)
-    attributes: HTMLAttributes<HTMLHeadingElement>;
+    attributes: HTMLHeadingElementProps;
     // (undocumented)
     children: ReactNode;
     // (undocumented)
@@ -1042,10 +1057,10 @@ export interface EditorHeadingProps {
 export const EditorNonEditable: ComponentType<EditorNonEditableProps>;
 
 // @public (undocumented)
-export type EditorNonEditableProps = (Omit<HTMLAttributes<HTMLSpanElement>, 'contentEditable'> & {
+export type EditorNonEditableProps = (Omit<HTMLSpanElementProps, 'contentEditable'> & {
     children: ReactNode;
     inline: true;
-}) | (Omit<HTMLAttributes<HTMLDivElement>, 'contentEditable'> & {
+}) | (Omit<HTMLDivElementProps, 'contentEditable'> & {
     children: ReactNode;
     inline?: false;
 });
@@ -1109,7 +1124,7 @@ is?: string | undefined;
 'aria-colindex'?: number | undefined;
 'aria-colspan'?: number | undefined;
 'aria-controls'?: string | undefined;
-'aria-current'?: boolean | "time" | "page" | "false" | "true" | "step" | "location" | "date" | undefined;
+'aria-current'?: boolean | "time" | "page" | "false" | "true" | "date" | "step" | "location" | undefined;
 'aria-describedby'?: string | undefined;
 'aria-details'?: string | undefined;
 'aria-disabled'?: (boolean | "false" | "true") | undefined;
@@ -1320,7 +1335,7 @@ export interface EditorParagraphProps {
     // (undocumented)
     align?: 'start' | 'end' | 'center' | 'justify';
     // (undocumented)
-    attributes: HTMLAttributes<HTMLParagraphElement>;
+    attributes: HTMLParagraphElementProps;
     // (undocumented)
     children: ReactNode;
     // (undocumented)
@@ -1445,30 +1460,21 @@ export const FieldContainer: MemoExoticComponent<({ children, className, descrip
 export type FieldContainerLabelPosition = Default | 'labelLeft' | 'labelRight' | 'labelInlineLeft' | 'labelInlineRight';
 
 // @public (undocumented)
-export interface FieldContainerProps extends ErrorListProps, Pick<JSX.IntrinsicElements['div'], 'className' | 'style'> {
-    // (undocumented)
+export type FieldContainerProps = {
     children: ReactNode;
-    // (undocumented)
     description?: ReactNode;
-    // (undocumented)
     direction?: StackProps['direction'];
-    // (undocumented)
     gap?: Size | 'none';
-    // (undocumented)
     label: ReactNode;
-    // (undocumented)
     labelDescription?: ReactNode;
-    // (undocumented)
     labelPosition?: FieldContainerLabelPosition;
-    // (undocumented)
-    required?: boolean;
-    // (undocumented)
-    size?: Size;
-    // (undocumented)
-    useLabelElement?: boolean;
-    // (undocumented)
     width?: 'column' | 'fluid' | 'none';
-}
+    required?: boolean;
+    size?: Size;
+    useLabelElement?: boolean;
+    style?: CSSProperties;
+    className?: string;
+} & ErrorListProps;
 
 // @public (undocumented)
 export interface FieldError {
@@ -1493,23 +1499,23 @@ export interface FieldSetOwnProps {
 }
 
 // @public (undocumented)
-export interface FieldSetProps extends FieldSetOwnProps, Omit<JSX.IntrinsicElements['div'], 'children'> {
-}
+export type FieldSetProps = FieldSetOwnProps & HTMLDivElementProps;
 
 // @public (undocumented)
-export const FileDropZone: MemoExoticComponent<ForwardRefExoticComponent<FileDropZoneProps & RefAttributes<HTMLDivElement>>>;
+export const FileDropZone: MemoExoticComponent<ForwardRefExoticComponent<    {
+isActive?: boolean | undefined;
+isAccepting?: boolean | undefined;
+isRejecting?: boolean | undefined;
+children?: ReactNode;
+} & HTMLDivElementProps & RefAttributes<HTMLDivElement>>>;
 
 // @public (undocumented)
-export interface FileDropZoneProps extends HTMLAttributes<HTMLDivElement> {
-    // (undocumented)
-    children?: ReactNode;
-    // (undocumented)
-    isAccepting?: boolean;
-    // (undocumented)
+export type FileDropZoneProps = {
     isActive?: boolean;
-    // (undocumented)
+    isAccepting?: boolean;
     isRejecting?: boolean;
-}
+    children?: ReactNode;
+} & HTMLDivElementProps;
 
 // @public (undocumented)
 export const FilePreview: MemoExoticComponent<({ actions, children, isActive, overlay }: FilePreviewProps) => JSX.Element>;
@@ -1544,7 +1550,7 @@ export const forceReflow: (element: HTMLElement | null) => void;
 export function getPortalRoot(): HTMLElement;
 
 // @public (undocumented)
-export const Grid: MemoExoticComponent<ForwardRefExoticComponent<Omit<GridProps, "ref"> & RefAttributes<HTMLDivElement>>>;
+export const Grid: MemoExoticComponent<ForwardRefExoticComponent<GridOwnProps & HTMLDivElementProps & RefAttributes<HTMLDivElement>>>;
 
 // @public (undocumented)
 export interface GridOwnProps {
@@ -1553,10 +1559,14 @@ export interface GridOwnProps {
 }
 
 // @public (undocumented)
-export type GridProps = GridOwnProps & JSX.IntrinsicElements['div'];
+export type GridProps = GridOwnProps & HTMLDivElementProps;
 
 // @public (undocumented)
-export const Heading: MemoExoticComponent<ForwardRefExoticComponent<HeadingProps & RefAttributes<HTMLHeadingElement>>>;
+export const Heading: MemoExoticComponent<ForwardRefExoticComponent<    {
+distinction?: HeadingDistinction | undefined;
+depth?: HeadingDepth | undefined;
+size?: "small" | "default" | undefined;
+} & Omit<HTMLHeadingElementProps, "ref"> & RefAttributes<HTMLHeadingElement>>>;
 
 // @public (undocumented)
 export type HeadingDepth = 1 | 2 | 3 | 4 | 5 | 6;
@@ -1565,16 +1575,13 @@ export type HeadingDepth = 1 | 2 | 3 | 4 | 5 | 6;
 export type HeadingDistinction = Default | 'subtle';
 
 // @public (undocumented)
-export interface HeadingProps extends Omit<DetailedHTMLProps<HTMLAttributes<HTMLHeadingElement>, HTMLHeadingElement>, 'ref'> {
-    // (undocumented)
-    depth?: HeadingDepth;
-    // (undocumented)
+export type HeadingProps = {
     distinction?: HeadingDistinction;
-    // (undocumented)
+    depth?: HeadingDepth;
     size?: {
         [S in Size]: S;
     }['small' | 'default'];
-}
+} & Omit<HTMLHeadingElementProps, 'ref'>;
 
 // @public (undocumented)
 export const HiddenInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<string> & ControlValueProps<string> & {
@@ -1600,10 +1607,50 @@ export interface HoveringToolbarProps {
 export type HoveringToolbarScope = 'contextual' | Default;
 
 // @public (undocumented)
+export interface HTMLAnchorElementProps extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
+}
+
+// @public (undocumented)
+export interface HTMLButtonElementProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+}
+
+// @public (undocumented)
+export interface HTMLDivElementProps extends React.HTMLAttributes<HTMLDivElement> {
+}
+
+// @public (undocumented)
+export interface HTMLHeadingElementProps extends React.HTMLAttributes<HTMLHeadingElement> {
+}
+
+// @public (undocumented)
+export interface HTMLImageElementProps extends React.ImgHTMLAttributes<HTMLImageElement> {
+}
+
+// @public (undocumented)
+export interface HTMLInputElementProps extends React.InputHTMLAttributes<HTMLInputElement> {
+}
+
+// @public (undocumented)
+export interface HTMLParagraphElementProps extends React.HTMLAttributes<HTMLParagraphElement> {
+}
+
+// @public (undocumented)
 export type HTMLReactSelectElement<V> = SelectInstance<SelectOption<V>, false, never>;
 
 // @public (undocumented)
 export type HTMLReactSelectElementWithKey<V> = SelectInstance<SelectOptionWithKey<V>, false, never>;
+
+// @public (undocumented)
+export interface HTMLSpanElementProps extends React.HTMLAttributes<HTMLSpanElement> {
+}
+
+// @public (undocumented)
+export interface HTMLTextAreaDivTargetProps extends TextareaHTMLAttributes<HTMLDivElement> {
+}
+
+// @public (undocumented)
+export interface HTMLVideoElementProps extends React.VideoHTMLAttributes<HTMLVideoElement> {
+}
 
 // @public (undocumented)
 export const Icon: MemoExoticComponent<ForwardRefExoticComponent<IconProps & RefAttributes<HTMLElement>>>;
@@ -1671,16 +1718,14 @@ export interface LabelOwnProps {
 }
 
 // @public (undocumented)
-export type LabelProps = Omit<LabelOwnProps, 'children'> & JSX.IntrinsicElements['div'];
+export type LabelProps = LabelOwnProps & HTMLSpanElementProps;
 
-// @public (undocumented)
+// @public
 export const Layout: MemoExoticComponent<({ className, children, sidebarHeader, sidebarFooter, switchers, navigation, scheme, theme, themeContent, themeControls, pageScheme, pageTheme, pageThemeContent, pageThemeControls, titleScheme, titleTheme, titleThemeContent, titleThemeControls, }: LayoutProps) => JSX.Element>;
 
 // @public (undocumented)
 export const LayoutChrome: MemoExoticComponent<({ children, navigation, pageScheme, pageTheme, pageThemeContent, pageThemeControls, scheme, sidebarFooter, sidebarHeader, switchers, theme, themeContent, themeControls, titleScheme, titleTheme, titleThemeContent, titleThemeControls, }: LayoutChromeProps) => JSX.Element>;
 
-// Warning: (ae-forgotten-export) The symbol "ThemeScheme" needs to be exported by the entry point index.d.ts
-//
 // @public (undocumented)
 export interface LayoutChromeProps extends ThemeScheme {
     // (undocumented)
@@ -1715,16 +1760,16 @@ export interface LayoutChromeProps extends ThemeScheme {
 export const LayoutPage: MemoExoticComponent<({ actions, afterTitle, children, fit, headingProps, layout, navigation, pageContentLayout, side, title, ...props }: LayoutPageProps) => JSX.Element>;
 
 // @public (undocumented)
-export const LayoutPageAside: MemoExoticComponent<({ children }: JSX.IntrinsicElements['div']) => JSX.Element>;
+export const LayoutPageAside: MemoExoticComponent<({ children }: HTMLDivElementProps) => JSX.Element>;
 
 // @public (undocumented)
 export const LayoutPageContent: MemoExoticComponent<({ children, layout, pageContentLayout }: LayoutPageContentProps) => JSX.Element>;
 
 // @public (undocumented)
-export type LayoutPageContentProps = JSX.IntrinsicElements['div'] & {
+export type LayoutPageContentProps = {
     layout?: 'default' | 'full-width';
     pageContentLayout?: 'center' | 'start' | 'end' | 'stretch';
-};
+} & HTMLDivElementProps;
 
 // @public (undocumented)
 export interface LayoutPageProps extends Omit<TitleBarProps, 'after' | 'children'>, ThemeScheme {
@@ -1748,13 +1793,13 @@ export interface LayoutPageProps extends Omit<TitleBarProps, 'after' | 'children
 export const LayoutPageStickyContainer: MemoExoticComponent<({ bottom, className: classNameProp, children, left, right, style: styleProp, top, ...rest }: LayoutPageStickyContainerProps) => JSX.Element>;
 
 // @public (undocumented)
-export type LayoutPageStickyContainerProps = JSX.IntrinsicElements['div'] & {
+export type LayoutPageStickyContainerProps = {
     bottom?: CSSProperties['bottom'];
     children?: ReactNode;
     left?: CSSProperties['left'];
     right?: CSSProperties['right'];
     top?: CSSProperties['top'];
-};
+} & HTMLDivElementProps;
 
 // @public (undocumented)
 export interface LayoutProps extends LayoutChromeProps {
@@ -1765,10 +1810,18 @@ export interface LayoutProps extends LayoutChromeProps {
 // @public (undocumented)
 export const LinkCard: NamedExoticComponent<LinkCardProps>;
 
-// Warning: (ae-forgotten-export) The symbol "LinkCompatibleProps" needs to be exported by the entry point index.d.ts
-//
 // @public (undocumented)
-export type LinkCardProps = Omit<CommonCardProps, 'active' | 'type'> & Omit<JSX.IntrinsicElements['a'], 'href' | 'onClick'> & LinkCompatibleProps;
+export type LinkCardProps = Omit<CommonCardProps, 'active' | 'type'> & Omit<HTMLAnchorElementProps, 'href' | 'onClick'> & LinkCompatibleProps;
+
+// @public (undocumented)
+export interface LinkCompatibleProps {
+    // (undocumented)
+    active: boolean;
+    // (undocumented)
+    href: string;
+    // (undocumented)
+    onClick: (e?: MouseEvent_2<HTMLAnchorElement>) => void;
+}
 
 // @public (undocumented)
 export function Logo({ children, image, size }: LogoProps): JSX.Element;
@@ -1820,9 +1873,6 @@ export const Menu: MemoExoticComponent<(props: PropsWithChildren<MenuProps>) => 
     Item: <T>(props: MenuItemProps<T>) => JSX.Element;
 };
 
-// Warning: (ae-forgotten-export) The symbol "MenuItemPropsTitleRequired" needs to be exported by the entry point index.d.ts
-// Warning: (ae-forgotten-export) The symbol "MenuItemPropsTitleOptional" needs to be exported by the entry point index.d.ts
-//
 // @public (undocumented)
 export type MenuItemProps<T = unknown> = (MenuItemPropsTitleRequired<T> | MenuItemPropsTitleOptional) & {
     children?: ReactNode;
@@ -1830,6 +1880,22 @@ export type MenuItemProps<T = unknown> = (MenuItemPropsTitleRequired<T> | MenuIt
     external?: boolean;
     expandedByDefault?: boolean;
 };
+
+// @public (undocumented)
+export interface MenuItemPropsTitleOptional {
+    // (undocumented)
+    title?: ReactNode;
+    // (undocumented)
+    to?: never;
+}
+
+// @public (undocumented)
+export interface MenuItemPropsTitleRequired<T> {
+    // (undocumented)
+    title: ReactNode;
+    // (undocumented)
+    to: T;
+}
 
 // @public (undocumented)
 export interface MenuProps {
@@ -1841,7 +1907,7 @@ export interface MenuProps {
 }
 
 // @public (undocumented)
-export const Message: MemoExoticComponent<({ className, children, intent, size, flow, distinction, type, lifted, action }: MessageProps) => JSX.Element>;
+export const Message: MemoExoticComponent<({ className, children, intent, size, flow, distinction, type, lifted, action, ...props }: MessageProps) => JSX.Element>;
 
 // @public (undocumented)
 export type MessageDistinction = Default | 'striking';
@@ -1850,24 +1916,16 @@ export type MessageDistinction = Default | 'striking';
 export type MessageFlow = Default | 'generous' | 'block' | 'generousBlock';
 
 // @public (undocumented)
-export interface MessageProps extends HTMLAttributes<HTMLDivElement> {
-    // (undocumented)
-    action?: ReactNode;
-    // (undocumented)
-    children?: ReactNode;
-    // (undocumented)
-    distinction?: MessageDistinction;
-    // (undocumented)
-    flow?: MessageFlow;
-    // (undocumented)
+export type MessageProps = {
     intent?: Intent;
-    // (undocumented)
-    lifted?: boolean;
-    // (undocumented)
-    size?: Size;
-    // (undocumented)
     type?: 'prop is deprecated, use intent';
-}
+    size?: Size;
+    flow?: MessageFlow;
+    distinction?: MessageDistinction;
+    lifted?: boolean;
+    children?: ReactNode;
+    action?: ReactNode;
+} & HTMLDivElementProps;
 
 // @public (undocumented)
 export const MonthInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<string> & ControlValueProps<string> & {
@@ -1889,13 +1947,21 @@ export function MouseMoveProvider<E extends HTMLElement = HTMLElement>({ element
     children?: ReactNode;
 }): JSX.Element;
 
-// Warning: (ae-forgotten-export) The symbol "NavigationLinkProps" needs to be exported by the entry point index.d.ts
-//
 // @public (undocumented)
 export type NavigationContext = <T>(to: T) => NavigationLinkProps;
 
 // @public (undocumented)
 export const NavigationContext: Context<NavigationContext>;
+
+// @public (undocumented)
+export interface NavigationLinkProps {
+    // (undocumented)
+    href: string;
+    // (undocumented)
+    isActive: boolean;
+    // (undocumented)
+    navigate: (e?: SyntheticEvent) => void;
+}
 
 // @public (undocumented)
 export function noop(): void;
@@ -1981,6 +2047,24 @@ export type PublicCommonReactSelectStylesProps = {
 export const Radio: MemoExoticComponent<(props: RadioProps) => JSX.Element>;
 
 // @public (undocumented)
+export interface RadioButtonProps {
+    // (undocumented)
+    checked?: boolean;
+    // (undocumented)
+    disabled?: boolean;
+    // (undocumented)
+    focused?: boolean;
+    // (undocumented)
+    hovered?: boolean;
+    // (undocumented)
+    indeterminate?: boolean;
+    // (undocumented)
+    invalid?: boolean;
+    // (undocumented)
+    readonly?: boolean;
+}
+
+// @public (undocumented)
 export interface RadioOption {
     // (undocumented)
     label: ReactNode;
@@ -2002,10 +2086,8 @@ export interface RadioProps {
     options: RadioOption[];
     // (undocumented)
     orientation?: 'horizontal' | 'vertical';
-    // Warning: (ae-forgotten-export) The symbol "RadioButton" needs to be exported by the entry point index.d.ts
-    //
     // (undocumented)
-    RadioButtonComponent?: typeof RadioButton;
+    RadioButtonComponent?: ComponentType<RadioButtonProps>;
     // (undocumented)
     readOnly?: boolean;
     // (undocumented)
@@ -2069,19 +2151,20 @@ export interface RestHTMLTextInputProps extends Omit<AllHTMLAttributes<HTMLInput
 }
 
 // @public (undocumented)
-export const SaveButton: MemoExoticComponent<ForwardRefExoticComponent<SaveButtonProps & RefAttributes<HTMLButtonElement>>>;
+export const SaveButton: MemoExoticComponent<ForwardRefExoticComponent<    {
+isPrimary?: boolean | undefined;
+labelSave?: string | undefined;
+labelSaved?: string | undefined;
+isDirty: boolean;
+} & ButtonOwnProps & Omit<ButtonBasedProps, "Component"> & RefAttributes<HTMLButtonElement>>>;
 
 // @public (undocumented)
-export interface SaveButtonProps extends ButtonProps {
-    // (undocumented)
-    isDirty: boolean;
-    // (undocumented)
+export type SaveButtonProps = {
     isPrimary?: boolean;
-    // (undocumented)
     labelSave?: string;
-    // (undocumented)
     labelSaved?: string;
-}
+    isDirty: boolean;
+} & ButtonProps;
 
 // @public (undocumented)
 export type Scheme = 'system' | 'light' | 'light-above' | 'light-below' | 'dark' | 'dark-above' | 'dark-below';
@@ -2096,15 +2179,16 @@ export namespace SeamlessDropdown {
 }
 
 // @public (undocumented)
+export type SeamlessDropdownDirection = Default | 'down' | 'up';
+
+// @public (undocumented)
 export interface SeamlessDropdownProps {
     // (undocumented)
     caret?: boolean;
     // (undocumented)
     children?: ReactNode;
-    // Warning: (ae-forgotten-export) The symbol "Direction" needs to be exported by the entry point index.d.ts
-    //
     // (undocumented)
-    direction?: Direction;
+    direction?: SeamlessDropdownDirection;
     // (undocumented)
     hoverable?: boolean;
     // (undocumented)
@@ -2121,8 +2205,8 @@ withTopToolbar?: boolean | undefined;
 // @public (undocumented)
 export type SearchInputProps = TextInputProps;
 
-// @public (undocumented)
-export const Section: MemoExoticComponent<ForwardRefExoticComponent<Omit<SectionProps, "ref"> & RefAttributes<HTMLElement>>>;
+// @public
+export const Section: MemoExoticComponent<ForwardRefExoticComponent<SectionOwnProps & HTMLDivElementProps & RefAttributes<HTMLElement>>>;
 
 // @public (undocumented)
 export interface SectionOwnProps {
@@ -2139,16 +2223,41 @@ export interface SectionOwnProps {
 }
 
 // @public (undocumented)
-export interface SectionProps extends SectionOwnProps, Omit<DetailedHTMLProps<HTMLAttributes<HTMLElement>, HTMLElement>, 'children'> {
+export type SectionProps = SectionOwnProps & HTMLDivElementProps;
+
+// @public (undocumented)
+export interface SectionTabProps {
+    // (undocumented)
+    id: string;
+    // (undocumented)
+    isMeta?: boolean;
+    // (undocumented)
+    label: ReactNode;
 }
 
 // @public (undocumented)
 export const SectionTabs: MemoExoticComponent<() => JSX.Element | null>;
 
-// Warning: (ae-forgotten-export) The symbol "SectionTabsProps" needs to be exported by the entry point index.d.ts
-//
+// @public (undocumented)
+export interface SectionTabsMap {
+    // (undocumented)
+    [id: string]: SectionTabProps;
+}
+
+// @public (undocumented)
+export interface SectionTabsProps {
+    // (undocumented)
+    children: ReactNode;
+}
+
 // @public (undocumented)
 export const SectionTabsProvider: MemoExoticComponent<({ children }: SectionTabsProps) => JSX.Element>;
+
+// @public (undocumented)
+export type SectionTabsRegistrationContextType = [
+(tab: SectionTabProps) => void,
+(tab: SectionTabProps) => void
+];
 
 // @public (undocumented)
 export const Select: <V = unknown>(props: Omit<ControlProps<V>, "type" | keyof ControlConstraintProps<any>> & {
@@ -2158,10 +2267,16 @@ export const Select: <V = unknown>(props: Omit<ControlProps<V>, "type" | keyof C
     styles?: StylesConfig<any, boolean, never> | undefined;
 } & RefAttributes<HTMLReactSelectElement<V>>) => ReactElement | null;
 
-// Warning: (ae-forgotten-export) The symbol "SelectCreateNewWrapperProps" needs to be exported by the entry point index.d.ts
-//
 // @public (undocumented)
 export const SelectCreateNewWrapper: ({ onClick, children }: SelectCreateNewWrapperProps) => JSX.Element;
+
+// @public (undocumented)
+export interface SelectCreateNewWrapperProps {
+    // (undocumented)
+    children: ReactChild;
+    // (undocumented)
+    onClick?: () => void;
+}
 
 // @public (undocumented)
 export interface SelectOption<V = string> {
@@ -2210,13 +2325,12 @@ export type SlugInputProps = TextInputProps & {
 };
 
 // @public (undocumented)
-export const Spacer: NamedExoticComponent<SpacerProps>;
+export const Spacer: MemoExoticComponent<({ className, gap, ...rest }: SpacerProps) => JSX.Element>;
 
 // @public (undocumented)
-export interface SpacerProps extends Omit<JSX.IntrinsicElements['div'], 'children'> {
-    // (undocumented)
+export type SpacerProps = {
     gap?: Size | 'xlarge' | 'none';
-}
+} & Omit<HTMLDivElementProps, 'ref'>;
 
 // @public (undocumented)
 export const Spinner: MemoExoticComponent<() => JSX.Element>;
@@ -2224,8 +2338,8 @@ export const Spinner: MemoExoticComponent<() => JSX.Element>;
 // @public (undocumented)
 export function splitDatetime(datetime: string | null | undefined): string[];
 
-// @public (undocumented)
-export const Stack: MemoExoticComponent<ForwardRefExoticComponent<Omit<StackProps, "ref"> & RefAttributes<HTMLDivElement>>>;
+// @public
+export const Stack: MemoExoticComponent<ForwardRefExoticComponent<StackOwnProps & HTMLDivElementProps & RefAttributes<HTMLDivElement>>>;
 
 // @public (undocumented)
 export interface StackOwnProps {
@@ -2248,14 +2362,13 @@ export interface StackOwnProps {
     // (undocumented)
     shrink?: boolean | CSSProperties['flexShrink'];
     // (undocumented)
-    style?: JSX.IntrinsicElements['div']['style'];
+    style?: CSSProperties;
     // (undocumented)
     wrap?: boolean | 'reverse';
 }
 
 // @public (undocumented)
-export interface StackProps extends StackOwnProps, Omit<JSX.IntrinsicElements['div'], 'children'> {
-}
+export type StackProps = StackOwnProps & HTMLDivElementProps;
 
 // @public (undocumented)
 export const StyleProvider: ({ children }: {
@@ -2272,17 +2385,18 @@ export const TAB_INDEX_NEVER_FOCUSABLE = -2;
 export const TAB_INDEX_TEMPORARY_UNFOCUSABLE = -1;
 
 // @public (undocumented)
-export const TabButton: MemoExoticComponent<ForwardRefExoticComponent<TabButtonProps & RefAttributes<HTMLButtonElement>>>;
+export const TabButton: MemoExoticComponent<ForwardRefExoticComponent<    {
+isSelected?: boolean | undefined;
+isDisabled?: boolean | undefined;
+children: ReactNode;
+} & Omit<HTMLButtonElementProps, "ref"> & RefAttributes<HTMLButtonElement>>>;
 
 // @public (undocumented)
-export interface TabButtonProps extends HTMLAttributes<HTMLElement> {
-    // (undocumented)
-    children: ReactNode;
-    // (undocumented)
-    isDisabled?: boolean;
-    // (undocumented)
+export type TabButtonProps = {
     isSelected?: boolean;
-}
+    isDisabled?: boolean;
+    children: ReactNode;
+} & Omit<HTMLButtonElementProps, 'ref'>;
 
 // @public (undocumented)
 export interface TabItem {
@@ -2419,6 +2533,23 @@ export type TextInputOwnProps<V extends string | number = string> = ControlProps
 export type TextInputProps<V extends string | number = string> = TextInputOwnProps<V> & RestHTMLTextInputProps;
 
 // @public (undocumented)
+export type TextInputPropsWithDeprecated = Omit<TextInputProps, 'type'> & {
+    type?: 'color' | 'date' | 'datetime' | 'datetime-local' | 'email' | 'month' | 'password' | 'range' | 'search' | 'tel' | 'time' | 'url' | 'week';
+};
+
+// @public (undocumented)
+export interface ThemeScheme {
+    // (undocumented)
+    scheme?: Scheme;
+    // (undocumented)
+    theme?: Intent;
+    // (undocumented)
+    themeContent?: Intent;
+    // (undocumented)
+    themeControls?: Intent;
+}
+
+// @public (undocumented)
 export const TimeInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<string> & ControlValueProps<string> & {
 withTopToolbar?: boolean | undefined;
 } & RestHTMLTextInputProps & {
@@ -2458,6 +2589,11 @@ export interface Toast extends ToastDefinition {
     // (undocumented)
     id: ToastId;
 }
+
+// @public (undocumented)
+export type ToastData = ToastDefinition & {
+    dismiss?: number | boolean;
+};
 
 // @public (undocumented)
 export interface ToastDefinition {
@@ -2534,9 +2670,13 @@ export interface ToolbarButton extends IconSourceSpecification {
 export type ToolbarButtonLayout = 'grid' | 'list';
 
 // @public (undocumented)
+export interface ToolbarButtonOrDropdown extends ToolbarButton {
+    // (undocumented)
+    groups?: ToolbarGroup[];
+}
+
+// @public (undocumented)
 export interface ToolbarGroup {
-    // Warning: (ae-forgotten-export) The symbol "ToolbarButtonOrDropdown" needs to be exported by the entry point index.d.ts
-    //
     // (undocumented)
     buttons: ToolbarButtonOrDropdown[];
 }
@@ -2595,8 +2735,6 @@ withTopToolbar?: boolean | undefined;
 // @public (undocumented)
 export type UrlInputProps = TextInputProps;
 
-// Warning: (ae-forgotten-export) The symbol "ActiveSectionTabsMap" needs to be exported by the entry point index.d.ts
-//
 // @public (undocumented)
 export function useActiveSectionsTabs(): ActiveSectionTabsMap;
 
@@ -2656,13 +2794,7 @@ export function useNativeInput<E extends HTMLInputElement | HTMLTextAreaElement 
 export function usePreventCloseContext(): () => void;
 
 // @public (undocumented)
-export function UserMiniControl({ name, note, avatarUrl }: UserMiniControlProps): JSX.Element;
-
-// @public (undocumented)
-export namespace UserMiniControl {
-    var // (undocumented)
-    displayName: string;
-}
+export const UserMiniControl: FunctionComponent<UserMiniControlProps>;
 
 // @public (undocumented)
 export interface UserMiniControlProps {
@@ -2674,18 +2806,12 @@ export interface UserMiniControlProps {
     note?: ReactNode;
 }
 
-// Warning: (ae-forgotten-export) The symbol "SectionTabsMap" needs to be exported by the entry point index.d.ts
-//
 // @public (undocumented)
 export function useSectionTabs(): SectionTabsMap;
 
-// Warning: (ae-forgotten-export) The symbol "SectionTabsRegistrationContextType" needs to be exported by the entry point index.d.ts
-//
 // @public (undocumented)
 export function useSectionTabsRegistration(): SectionTabsRegistrationContextType;
 
-// Warning: (ae-forgotten-export) The symbol "ToastData" needs to be exported by the entry point index.d.ts
-//
 // @public (undocumented)
 export const useShowToast: () => (toast: ToastData) => void;
 

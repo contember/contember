@@ -1,43 +1,48 @@
 import classNames from 'classnames'
 import { memo, ReactNode } from 'react'
 import { useComponentClassName } from '../../auxiliary'
+import { HTMLDivElementProps } from '../../types'
 import { toEnumViewClass, toFeatureClass } from '../../utils'
 import { Button } from '../Forms'
 import { Icon } from '../Icon'
 import { Stack, StackProps } from '../Stack'
 
-export type DialogModalProps = JSX.IntrinsicElements['div'] & {
-	bodyClassName?: string
-	dividers?: boolean
-	footer?: ReactNode
-	footerProps?: Partial<Omit<StackProps, 'ref'>>
-	bodyProps?: Partial<Omit<StackProps, 'ref'>>
-	header?: ReactNode
-	headerProps?: Partial<Omit<StackProps, 'ref'>>
-	headerClassName?: string
-	footerClassName?: string
-	layout?: 'fit-content' | 'wide' | 'expanded'
-	onClose: () => void
-}
+export type DialogModalProps =
+	& {
+		bodyClassName?: string
+		dividers?: boolean
+		footer?: ReactNode
+		footerProps?: Partial<Omit<StackProps, 'ref'>>
+		bodyProps?: Partial<Omit<StackProps, 'ref'>>
+		header?: ReactNode
+		headerProps?: Partial<Omit<StackProps, 'ref'>>
+		headerClassName?: string
+		footerClassName?: string
+		layout?: 'fit-content' | 'wide' | 'expanded'
+		onClose: () => void
+	}
+	& HTMLDivElementProps
 
+/**
+ * @group UI
+ */
 export const DialogModal = memo(({
-	bodyClassName,
-	bodyProps,
-	children,
-	className,
-	dividers = false,
-	footer,
-	footerClassName,
-	footerProps,
-	header,
-	headerClassName,
-	headerProps,
-	layout = 'fit-content',
-	onClose,
-	...rest
+ 	bodyClassName,
+ 	bodyProps,
+ 	children,
+ 	className,
+ 	dividers = false,
+ 	footer,
+ 	footerClassName,
+ 	footerProps,
+ 	header,
+ 	headerClassName,
+ 	headerProps,
+ 	layout = 'fit-content',
+ 	onClose,
+ 	...rest
 }: DialogModalProps) => {
 	const componentClassName = useComponentClassName('dialog-modal')
-
 	return (
 		<div
 			{...rest}
@@ -59,7 +64,8 @@ export const DialogModal = memo(({
 				)}
 			>
 				{header}
-				<Button onClick={onClose} flow="circular" distinction="seamless" className={`${componentClassName}-close-button`}><Icon blueprintIcon="cross" /></Button>
+				<Button onClick={onClose} flow="circular" distinction="seamless"
+						className={`${componentClassName}-close-button`}><Icon blueprintIcon="cross" /></Button>
 			</Stack>
 
 			{children && <div className={`${componentClassName}-body-wrapper`}>

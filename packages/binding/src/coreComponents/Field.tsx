@@ -16,6 +16,9 @@ export interface FieldProps<Persisted extends FieldValue = FieldValue>
 	extends FieldBasicProps,
 		FieldRuntimeProps<Persisted> {}
 
+/**
+ * @group Data binding
+ */
 export const Field = Component(
 	<Persisted extends FieldValue = FieldValue>(props: FieldProps<Persisted>) => {
 		const field = useField<Persisted>(props)

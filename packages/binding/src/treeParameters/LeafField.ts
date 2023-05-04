@@ -12,7 +12,9 @@ export interface LeafField extends FieldEventListeners {
 	defaultValue: FieldValue | undefined
 }
 
-export interface UnsugarableLeafField extends UnsugarableFieldEventListeners {
-	isNonbearing?: boolean
-	defaultValue?: OptionallyVariableFieldValue
-}
+export type UnsugarableLeafField =
+	& UnsugarableFieldEventListeners
+	& {
+		isNonbearing?: boolean
+		defaultValue?: OptionallyVariableFieldValue
+	}

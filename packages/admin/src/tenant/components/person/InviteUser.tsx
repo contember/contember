@@ -13,6 +13,9 @@ export interface InviteUserProps {
 	mailVariant?: string
 }
 
+/**
+ * @group Tenant
+ */
 export const InviteUser: FC<InviteUserProps> = ({ project, rolesConfig, userListLink, method, mailVariant }) => {
 	const [email, setEmailInner] = useState('')
 	const redirect = useRedirect()

@@ -13,6 +13,9 @@ export interface ContemberClientProps {
 
 const sessionTokenKey = 'contember_session_token'
 
+/**
+ * @group Entrypoints
+ */
 export const ContemberClient = memo<ContemberClientProps & { children: React.ReactNode }>(function ContemberClient({
 	apiBaseUrl,
 	children,

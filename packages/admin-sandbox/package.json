@@ -12,6 +12,7 @@
 	},
 	"devDependencies": {
 		"@contember/admin": "workspace:*",
+		"@contember/brand": "workspace:*",
 		"@contember/cms-layout": "workspace:*",
 		"@contember/interface-tester": "workspace:*",
 		"@contember/ui": "workspace:*"

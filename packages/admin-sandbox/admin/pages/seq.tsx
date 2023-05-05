@@ -12,8 +12,8 @@ import {
 	TextCell,
 	TextField,
 } from '@contember/admin'
-import { Actions, Content, ContentStack, Title } from '../components/Layout'
-
+import { Title } from '../components/Directives'
+import { Actions, Content, ContentStack } from '../components/Slots'
 
 export const list = (
 	<>

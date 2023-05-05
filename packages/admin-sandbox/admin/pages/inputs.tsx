@@ -23,7 +23,8 @@ import {
 	UrlField,
 	useFieldControl,
 } from '@contember/admin'
-import { Actions, ContentStack, Title } from '../components/Layout'
+import { Title } from '../components/Directives'
+import { Actions, ContentStack } from '../components/Slots'
 
 export const JsonField = SimpleRelativeSingleField<TextFieldProps, string>(
 	(fieldMetadata, {

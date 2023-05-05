@@ -8,6 +8,7 @@ testInterface({
 		'categories.tsx/CategoryForm',
 		'article.tsx/EditOrCreateForm',
 		'auto.tsx',
+		'brand.tsx',
 		'lorem.tsx',
 		'nested/**',
 		'random.tsx',

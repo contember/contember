@@ -16,6 +16,7 @@ import {
 	ImageUploadField,
 	LinkButton,
 	MultiSelectField,
+	NavigateBackLink,
 	NumberCell,
 	PersistButton,
 	RichTextField,
@@ -24,9 +25,10 @@ import {
 	TextCell,
 	TextField,
 } from '@contember/admin'
-import { NavigateBackLink } from '@contember/cms-layout'
 import { DataGridTile } from '../components/DataGridTile'
-import { Actions, BREAKPOINT, Back, Content, ContentStack, SidebarStack, Title } from '../components/Layout'
+import { Title } from '../components/Directives'
+import { BREAKPOINT } from '../components/Layout'
+import { Actions, Back, Content, ContentStack, SidebarStack } from '../components/Slots'
 import { CategoryForm } from './categories'
 
 
@@ -161,7 +163,7 @@ export const EditOrCreateForm = Component(() => (
 export const create = (
 	<>
 		<Back>
-			<NavigateBackLink to="article/list" breakpoint={BREAKPOINT}>Back to articles</NavigateBackLink>
+			<NavigateBackLink to="article/list">Back to articles</NavigateBackLink>
 		</Back>
 		<Title>New Article</Title>
 		<CreateScope entity="Article" redirectOnSuccess="article/edit(id: $entity.id)">

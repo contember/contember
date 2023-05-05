@@ -1,14 +1,15 @@
-import { DimensionsSwitcher, Link, Logo } from '@contember/admin'
-import { CMSLayout, ContemberEditLogo2023 } from '@contember/cms-layout'
+import { DimensionsSwitcher, DropdownContentContainerProvider, Link, Logo, toThemeClass } from '@contember/admin'
+import { Identity2023 } from '@contember/brand'
+import '@contember/brand/index.css'
+import { CMSLayout } from '@contember/cms-layout'
+import '@contember/cms-layout/index.css'
+import { useMemo } from 'react'
+import { useDirectives } from '../Directives'
+import { BREAKPOINT } from '../Layout'
 import { Navigation } from '../Navigation'
 
-import { useMemo } from 'react'
-import '../../../../../ee/cms-layout/src/index.css'
-import { BREAKPOINT } from '../Layout'
-import { useMetaDirectives } from '../MetaDirectives'
-
 export const Layout = () => {
-	const directives = useMetaDirectives()
+	const directives = useDirectives()
 
 	return (
 		<CMSLayout.Root
@@ -16,6 +17,7 @@ export const Layout = () => {
 			contentProps={useMemo(() => ({
 				maxWidth: directives['layouts.cms.contentProps.maxWidth'],
 			}), [directives])}
+			className={toThemeClass(directives['layout.theme'], directives['layout.theme'])}
 		>
 			<CMSLayout.Slots.SidebarLeftHeader>
 				<DimensionsSwitcher
@@ -32,8 +34,11 @@ export const Layout = () => {
 			</CMSLayout.Slots.Navigation>
 
 			<CMSLayout.Slots.Logo>
-				<Link to="index"><Logo image={<ContemberEditLogo2023 size={56} />} /></Link>
+				<Link to="index"><Identity2023.Edit /></Link>
 			</CMSLayout.Slots.Logo>
+
+			<DropdownContentContainerProvider />
+			<div id="portal-root" />
 		</CMSLayout.Root>
 	)
 }

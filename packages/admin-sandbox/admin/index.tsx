@@ -1,7 +1,8 @@
 import { ApplicationEntrypoint, DataBindingProvider, FeedbackRenderer, PageModule, Pages, runReactApp } from '@contember/admin'
+import { LayoutSlotsProvider } from '@contember/layout'
 import { createRoot } from 'react-dom/client'
+import { DirectivesProvider } from './components/Directives'
 import { Layout } from './components/Layout'
-import { MetaDirectivesProvider } from './components/MetaDirectives'
 import './index.sass'
 
 runReactApp(
@@ -13,11 +14,13 @@ runReactApp(
 		basePath={import.meta.env.BASE_URL}
 		children={
 			<DataBindingProvider stateComponent={FeedbackRenderer}>
-				<MetaDirectivesProvider>
-					<Layout>
-						<Pages children={import.meta.glob<PageModule>('./pages/**/*.tsx')} />
-					</Layout>
-				</MetaDirectivesProvider>
+				<DirectivesProvider>
+					<LayoutSlotsProvider>
+						<Layout>
+							<Pages children={import.meta.glob<PageModule>('./pages/**/*.tsx')} />
+						</Layout>
+					</LayoutSlotsProvider>
+				</DirectivesProvider>
 			</DataBindingProvider>
 		}
 	/>,

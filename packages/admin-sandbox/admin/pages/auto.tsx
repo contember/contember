@@ -6,15 +6,15 @@ import {
 	FeedbackRenderer,
 	Link,
 	LinkButton,
+	NavigateBackLink,
 	PersistButton,
 	RoutingParameter,
 	useCurrentRequest,
 	useEnvironment,
 	useOnPersistSuccess,
 } from '@contember/admin'
-import { NavigateBackLink } from '@contember/cms-layout'
-import { Actions, Back, ContentStack, Title } from '../components/Layout'
-import { MetaDirective } from '../components/MetaDirectives'
+import { Directive, Title } from '../components/Directives'
+import { Actions, Back, ContentStack } from '../components/Slots'
 
 const AutoGridList = () => {
 	const env = useEnvironment()
@@ -58,7 +58,7 @@ export function Grid() {
 
 	return (
 		<DataBindingProvider stateComponent={FeedbackRenderer}>
-			<MetaDirective name="layout" content="legacy" />
+			<Directive name="layout" content="legacy" />
 
 			<Back>
 				<NavigateBackLink to={{ pageName: 'auto' }}>Back to Auto</NavigateBackLink>

@@ -1,7 +1,8 @@
 import { EditScope, PersistButton } from '@contember/admin'
 import { AddContent } from '../components/AddContent'
 import { ContentField } from '../components/ContentField'
-import { Actions, ContentStack, Title } from '../components/Layout'
+import { Title } from '../components/Directives'
+import { Actions, ContentStack } from '../components/Slots'
 
 export default (
 	<EditScope entity="Homepage(unique = One)" setOnCreate="(unique = One)">

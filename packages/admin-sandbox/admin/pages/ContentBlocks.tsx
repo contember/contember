@@ -1,5 +1,5 @@
 import { Block, BlockRepeater, EditScope } from '@contember/admin'
-import { Title } from '../components/Layout'
+import { Title } from '../components/Directives'
 
 export const ContentBlockPage = (
 	<EditScope entity="ContentBlockPage(unique = One)" setOnCreate="(unique = One)">

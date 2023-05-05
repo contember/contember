@@ -1,10 +1,10 @@
 import classNames from 'classnames'
 import { memo } from 'react'
 import { useClassNamePrefix } from '../../auxiliary'
-import { NativeProps, Size } from '../../types'
+import type { Size } from '../../types'
 import { toEnumViewClass } from '../../utils'
 
-export interface SpacerProps extends Omit<NativeProps<HTMLDivElement>, 'children'> {
+export interface SpacerProps extends Omit<JSX.IntrinsicElements['div'], 'children'> {
 	gap?: Size | 'xlarge' | 'none'
 }
 

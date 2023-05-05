@@ -1,10 +1,9 @@
 import classNames from 'classnames'
 import { memo } from 'react'
 import { useComponentClassName } from '../../auxiliary'
-import { NativeProps } from '../../types'
 import { toEnumClass } from '../../utils'
 
-export interface LayoutPageContentProps extends NativeProps<HTMLDivElement> {
+export type LayoutPageContentProps = JSX.IntrinsicElements['div'] & {
 	/** @deprecated Use `pageContentLayout` instead */
 	layout?: 'default' | 'full-width'
 	pageContentLayout?: 'center' | 'start' | 'end' | 'stretch'

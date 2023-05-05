@@ -1,6 +1,5 @@
 import classNames from 'classnames'
 import { memo, MouseEvent as ReactMouseEvent } from 'react'
-import { } from '../../../src/'
 import { useClassNamePrefix } from '../../auxiliary'
 import { toEnumViewClass } from '../../utils'
 import { Icon } from '../Icon'

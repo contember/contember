@@ -11,10 +11,10 @@
   gap: var(--cui-padding)
   margin-left: calc(-1 * var(--cui-section-padding-left))
   margin-right: calc(-1 * var(--cui-section-padding-right))
-  padding-bottom: var(--cui-section-padding-bottom)
+  padding-bottom: var(--cui-section-padding-bottom, calc(6 * var(--cui-gap)))
   padding-left: var(--cui-section-padding-left)
   padding-right: var(--cui-section-padding-right)
-  padding-top: var(--cui-section-padding-top)
+  padding-top: var(--cui-section-padding-top, calc(6 * var(--cui-gap)))
   scroll-margin-top: calc(var(--cui-content-offset-top, 0px) - var(--cui-section-border-width))
   &:first-child
     margin-top: calc(-1 * var(--cui-layout-page-padding-top, 0em))

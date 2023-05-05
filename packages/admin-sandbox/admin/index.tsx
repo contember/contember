@@ -1,7 +1,3 @@
-// Uncomment to see what caused re-renders
-// Note: Does not work with pages containing content editor
-// import './wdyr' // THIS MUST BE THE FIRST IMPORT!
-
 import { ApplicationEntrypoint, DataBindingProvider, FeedbackRenderer, PageModule, Pages, runReactApp } from '@contember/admin'
 import { createRoot } from 'react-dom/client'
 import { Layout } from './components/Layout'

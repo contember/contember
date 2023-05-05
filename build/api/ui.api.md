@@ -156,7 +156,7 @@ export interface BoxOwnProps {
 }
 
 // @public (undocumented)
-export interface BoxProps extends BoxOwnProps, Omit<NativeProps<HTMLDivElement>, 'children'> {
+export interface BoxProps extends BoxOwnProps, Omit<JSX.IntrinsicElements['div'], 'children'> {
 }
 
 // @public (undocumented)
@@ -262,7 +262,7 @@ export type ButtonProps = ButtonOwnProps & Omit<ButtonBasedProps, 'Component'>;
 export const Card: NamedExoticComponent<CardProps>;
 
 // @public (undocumented)
-export type CardProps = Omit<CommonCardProps, 'type'> & Omit<NativeProps<HTMLDivElement>, 'onClick'> & {
+export type CardProps = Omit<CommonCardProps, 'type'> & Omit<JSX.IntrinsicElements['div'], 'onClick'> & {
     href?: never;
     onClick?: () => void;
 };
@@ -555,30 +555,19 @@ export interface DevErrorProps extends DevErrorInnerProps {
 export const DialogModal: MemoExoticComponent<({ bodyClassName, bodyProps, children, className, dividers, footer, footerClassName, footerProps, header, headerClassName, headerProps, layout, onClose, ...rest }: DialogModalProps) => JSX.Element>;
 
 // @public (undocumented)
-export interface DialogModalProps extends NativeProps<HTMLDivElement> {
-    // (undocumented)
+export type DialogModalProps = JSX.IntrinsicElements['div'] & {
     bodyClassName?: string;
-    // (undocumented)
-    bodyProps?: Partial<Omit<StackProps, 'ref'>>;
-    // (undocumented)
     dividers?: boolean;
-    // (undocumented)
     footer?: ReactNode;
-    // (undocumented)
-    footerClassName?: string;
-    // (undocumented)
     footerProps?: Partial<Omit<StackProps, 'ref'>>;
-    // (undocumented)
+    bodyProps?: Partial<Omit<StackProps, 'ref'>>;
     header?: ReactNode;
-    // (undocumented)
-    headerClassName?: string;
-    // (undocumented)
     headerProps?: Partial<Omit<StackProps, 'ref'>>;
-    // (undocumented)
+    headerClassName?: string;
+    footerClassName?: string;
     layout?: 'fit-content' | 'wide' | 'expanded';
-    // (undocumented)
     onClose: () => void;
-}
+};
 
 // @public (undocumented)
 export interface DialogOptions<Result> {
@@ -644,7 +633,7 @@ export interface DimensionSwitcherValue {
 export const Divider: MemoExoticComponent<({ className, gap, ...rest }: DividerProps) => JSX.Element>;
 
 // @public (undocumented)
-export interface DividerProps extends Omit<NativeProps<HTMLDivElement>, 'children'> {
+export interface DividerProps extends Omit<JSX.IntrinsicElements['div'], 'children'> {
     // (undocumented)
     gap?: Size | 'xlarge' | 'none';
 }
@@ -1444,7 +1433,7 @@ export const FieldContainer: MemoExoticComponent<({ children, className, descrip
 export type FieldContainerLabelPosition = Default | 'labelLeft' | 'labelRight' | 'labelInlineLeft' | 'labelInlineRight';
 
 // @public (undocumented)
-export interface FieldContainerProps extends ErrorListProps, Pick<NativeProps<HTMLDivElement>, 'className' | 'style'> {
+export interface FieldContainerProps extends ErrorListProps, Pick<JSX.IntrinsicElements['div'], 'className' | 'style'> {
     // (undocumented)
     children: ReactNode;
     // (undocumented)
@@ -1492,7 +1481,7 @@ export interface FieldSetOwnProps {
 }
 
 // @public (undocumented)
-export interface FieldSetProps extends FieldSetOwnProps, Omit<NativeProps<HTMLDivElement>, 'children'> {
+export interface FieldSetProps extends FieldSetOwnProps, Omit<JSX.IntrinsicElements['div'], 'children'> {
 }
 
 // @public (undocumented)
@@ -1552,8 +1541,7 @@ export interface GridOwnProps {
 }
 
 // @public (undocumented)
-export interface GridProps extends GridOwnProps, NativeProps<HTMLDivElement> {
-}
+export type GridProps = GridOwnProps & JSX.IntrinsicElements['div'];
 
 // @public (undocumented)
 export const Heading: MemoExoticComponent<ForwardRefExoticComponent<HeadingProps & RefAttributes<HTMLHeadingElement>>>;
@@ -1671,8 +1659,7 @@ export interface LabelOwnProps {
 }
 
 // @public (undocumented)
-export interface LabelProps extends Omit<LabelOwnProps, 'children'>, NativeProps<HTMLSpanElement> {
-}
+export type LabelProps = Omit<LabelOwnProps, 'children'> & JSX.IntrinsicElements['div'];
 
 // @public (undocumented)
 export const Layout: MemoExoticComponent<({ className, children, sidebarHeader, sidebarFooter, switchers, navigation, scheme, theme, themeContent, themeControls, pageScheme, pageTheme, pageThemeContent, pageThemeControls, titleScheme, titleTheme, titleThemeContent, titleThemeControls, }: LayoutProps) => JSX.Element>;
@@ -1716,18 +1703,16 @@ export interface LayoutChromeProps extends ThemeScheme {
 export const LayoutPage: MemoExoticComponent<({ actions, afterTitle, children, fit, headingProps, layout, navigation, pageContentLayout, side, title, ...props }: LayoutPageProps) => JSX.Element>;
 
 // @public (undocumented)
-export const LayoutPageAside: MemoExoticComponent<({ children }: NativeProps<HTMLDivElement>) => JSX.Element>;
+export const LayoutPageAside: MemoExoticComponent<({ children }: JSX.IntrinsicElements['div']) => JSX.Element>;
 
 // @public (undocumented)
 export const LayoutPageContent: MemoExoticComponent<({ children, layout, pageContentLayout }: LayoutPageContentProps) => JSX.Element>;
 
 // @public (undocumented)
-export interface LayoutPageContentProps extends NativeProps<HTMLDivElement> {
-    // @deprecated (undocumented)
+export type LayoutPageContentProps = JSX.IntrinsicElements['div'] & {
     layout?: 'default' | 'full-width';
-    // (undocumented)
     pageContentLayout?: 'center' | 'start' | 'end' | 'stretch';
-}
+};
 
 // @public (undocumented)
 export interface LayoutPageProps extends Omit<TitleBarProps, 'after' | 'children'>, ThemeScheme {
@@ -1747,10 +1732,17 @@ export interface LayoutPageProps extends Omit<TitleBarProps, 'after' | 'children
     title?: ReactNode;
 }
 
-// Warning: (ae-forgotten-export) The symbol "LayoutPageStickyContainerProps" needs to be exported by the entry point index.d.ts
-//
 // @public (undocumented)
 export const LayoutPageStickyContainer: MemoExoticComponent<({ bottom, className: classNameProp, children, left, right, style: styleProp, top, ...rest }: LayoutPageStickyContainerProps) => JSX.Element>;
+
+// @public (undocumented)
+export type LayoutPageStickyContainerProps = JSX.IntrinsicElements['div'] & {
+    bottom?: CSSProperties['bottom'];
+    children?: ReactNode;
+    left?: CSSProperties['left'];
+    right?: CSSProperties['right'];
+    top?: CSSProperties['top'];
+};
 
 // @public (undocumented)
 export interface LayoutProps extends LayoutChromeProps {
@@ -1764,7 +1756,7 @@ export const LinkCard: NamedExoticComponent<LinkCardProps>;
 // Warning: (ae-forgotten-export) The symbol "LinkCompatibleProps" needs to be exported by the entry point index.d.ts
 //
 // @public (undocumented)
-export type LinkCardProps = Omit<CommonCardProps, 'active' | 'type'> & Omit<NativeProps<HTMLAnchorElement>, 'href' | 'onClick'> & LinkCompatibleProps;
+export type LinkCardProps = Omit<CommonCardProps, 'active' | 'type'> & Omit<JSX.IntrinsicElements['a'], 'href' | 'onClick'> & LinkCompatibleProps;
 
 // @public (undocumented)
 export function Logo({ children, image, size }: LogoProps): JSX.Element;
@@ -1884,9 +1876,6 @@ export function MouseMoveProvider<E extends HTMLElement = HTMLElement>({ element
     elementRef: RefObject<E>;
     children?: ReactNode;
 }): JSX.Element;
-
-// @public (undocumented)
-export type NativeProps<El extends Element> = DetailedHTMLProps<HTMLAttributes<El>, El>;
 
 // Warning: (ae-forgotten-export) The symbol "NavigationLinkProps" needs to be exported by the entry point index.d.ts
 //
@@ -2130,7 +2119,7 @@ export interface SectionOwnProps {
 }
 
 // @public (undocumented)
-export interface SectionProps extends SectionOwnProps, Omit<NativeProps<HTMLElement>, 'children'> {
+export interface SectionProps extends SectionOwnProps, Omit<DetailedHTMLProps<HTMLAttributes<HTMLElement>, HTMLElement>, 'children'> {
 }
 
 // @public (undocumented)
@@ -2204,7 +2193,7 @@ export type SlugInputProps = TextInputProps & {
 export const Spacer: NamedExoticComponent<SpacerProps>;
 
 // @public (undocumented)
-export interface SpacerProps extends Omit<NativeProps<HTMLDivElement>, 'children'> {
+export interface SpacerProps extends Omit<JSX.IntrinsicElements['div'], 'children'> {
     // (undocumented)
     gap?: Size | 'xlarge' | 'none';
 }
@@ -2239,13 +2228,13 @@ export interface StackOwnProps {
     // (undocumented)
     shrink?: boolean | CSSProperties['flexShrink'];
     // (undocumented)
-    style?: NativeProps<HTMLDivElement>['style'];
+    style?: JSX.IntrinsicElements['div']['style'];
     // (undocumented)
     wrap?: boolean | 'reverse';
 }
 
 // @public (undocumented)
-export interface StackProps extends StackOwnProps, Omit<NativeProps<HTMLDivElement>, 'children'> {
+export interface StackProps extends StackOwnProps, Omit<JSX.IntrinsicElements['div'], 'children'> {
 }
 
 // @public (undocumented)
@@ -2696,6 +2685,14 @@ export interface ValidationStateProps {
 
 // @public (undocumented)
 export type VisuallyDependentControlProps = ControlStateProps & ControlDisplayProps & Pick<ValidationStateProps, 'validationState'>;
+
+// @public (undocumented)
+export const VisuallyHidden: NamedExoticComponent<    {
+children?: ReactNode;
+}>;
+
+// @public (undocumented)
+export const visuallyHiddenStyle: CSSProperties;
 
 // @public (undocumented)
 export const WeekInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<string> & ControlValueProps<string> & {

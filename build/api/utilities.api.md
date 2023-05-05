@@ -20,12 +20,6 @@ export class AssertionError extends Error {
 // @public (undocumented)
 export function capitalize(str: string): string;
 
-// Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-// Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-// Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-// Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-// Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-//
 // @public
 export function classNameForFactory(componentClassName: NestedClassName, className?: NestedClassName, state?: ClassNameStateMap, glue?: string, stateGlue?: string): (suffix?: string | null | undefined, additionalClassName?: NestedClassName) => string;
 
@@ -105,8 +99,6 @@ export function isOneOfFactory<U, T = any>(options: T extends Array<U> | Readonl
 // @public (undocumented)
 export function isPlainObject<T extends Record<string, unknown>>(value: unknown): value is T;
 
-// Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-//
 // @public
 export function isScrollable(element: HTMLElement | null): boolean;
 
@@ -119,8 +111,6 @@ export function isTrue(value: unknown): value is true;
 // @public (undocumented)
 export function isUndefined(value: unknown): value is undefined;
 
-// Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-//
 // @public
 export function listClassName(list: (string | false | null | undefined)[]): string;
 
@@ -137,8 +127,6 @@ export type ObjectKeyValue<T, K extends keyof T> = T extends {
     [P in K]: T[P];
 } ? T[K] : never;
 
-// Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-//
 // @public
 export function parseTransformMatrix(transform?: string): {
     scaleX: number;
@@ -187,8 +175,6 @@ export function setHasOneOf<T>(set: Set<T>, values: T[]): boolean;
 // Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
 // Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
 // Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
-// Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-// Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
 //
 // @public
 export function stateClassName(state?: ClassNameStateMap | null, glue?: string): string[];
@@ -206,9 +192,6 @@ export interface SvgSizeProps {
 // @public (undocumented)
 export function svgSizeProps(width: number, height?: number, crop?: number): SvgSizeProps;
 
-// Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-// Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-//
 // @public
 export function trimString(value: string, characters: string): string;
 

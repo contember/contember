@@ -6,58 +6,46 @@
 
 /// <reference types="react" />
 
-import { Consumer } from 'react';
-import { Context } from 'react';
-import type { DetailedHTMLProps } from 'react';
 import { ElementType } from 'react';
-import { FunctionComponent } from 'react';
-import type { HTMLAttributes } from 'react';
-import { LinkProps } from '@contember/admin';
+import { LayoutSlotProps } from '@contember/layout';
+import { LayoutSlotTargetProps } from '@contember/layout';
 import { MemoExoticComponent } from 'react';
 import { NamedExoticComponent } from 'react';
-import { PropsWithChildren } from 'react';
-import { default as React_2 } from 'react';
+import { OwnContainerProps } from '@contember/layout';
+import { PolymorphicComponentPropsWithRef } from '@contember/utilities';
 import { ReactElement } from 'react';
-import { ReactNode } from 'react';
-import { ReactPortal } from 'react';
-import { RefObject } from 'react';
-
-// @public (undocumented)
-export type AsProp<C extends React.ElementType> = {
-    as?: C;
-};
-
-// @public (undocumented)
-export interface BasicLayoutPanelProps extends OwnContainerProps {
-    // (undocumented)
-    trapFocusInModal?: boolean;
-}
-
-// Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-// Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-// Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-// Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-// Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-//
-// @public
-export function classNameForFactory(componentClassName: NestedClassName, className?: NestedClassName, state?: ClassNameStateMap, glue?: string, stateGlue?: string): (suffix?: string | null | undefined, additionalClassName?: NestedClassName) => string;
-
-// @public (undocumented)
-export type ClassNameStateMap = {
-    [key: string]: string | number | boolean | null | undefined;
-};
 
 // @public (undocumented)
 export const CMSLayout: {
-    Content: NamedExoticComponent<CMSLayoutContentProps>;
-    Root: MemoExoticComponent<({ breakpoint, children, className, componentClassName, contentProps: contentPropsProp, sidebarLeftProps: sidebarLeftPropsProp, sidebarRightProps: sidebarRightPropsProp, }: CMSLayoutRootProps) => JSX.Element>;
-    Sidebar: CMSLayoutSidebarComponentType;
+    slotTargets: Readonly<{
+        ContentFooter: "cms-content-footer";
+        ContentHeader: "cms-content-header";
+        HeaderCenter: "cms-header-center";
+        HeaderLeft: "cms-header-left";
+        HeaderRight: "cms-header-right";
+        SidebarLeftBody: "cms-sidebar-left-body";
+        SidebarLeftFooter: "cms-sidebar-left-footer";
+        SidebarLeftHeader: "cms-sidebar-left-header";
+        SidebarRightBody: "cms-sidebar-right-body";
+        SidebarRightFooter: "cms-sidebar-right-footer";
+        SidebarRightHeader: "cms-sidebar-right-header";
+        Actions: "actions";
+        Back: "back";
+        Content: "content";
+        Logo: "logo";
+        Navigation: "navigation";
+        Sidebar: "sidebar";
+        Title: "title";
+    }>;
+    slotTargetAliases: Readonly<{
+        ModalLogo: "cms-modal-header-logo";
+    }>;
     Slots: {
-        Back: {
+        Actions: {
             ({ children }: Omit<LayoutSlotProps, "target">): JSX.Element;
             displayName: string;
         };
-        Actions: {
+        Back: {
             ({ children }: Omit<LayoutSlotProps, "target">): JSX.Element;
             displayName: string;
         };
@@ -126,6 +114,87 @@ export const CMSLayout: {
             displayName: string;
         };
     };
+    SlotTargets: {
+        Actions: {
+            ({ className, ...props }: Omit<LayoutSlotTargetProps, "name">): JSX.Element;
+            displayName: string;
+        };
+        Back: {
+            ({ className, ...props }: Omit<LayoutSlotTargetProps, "name">): JSX.Element;
+            displayName: string;
+        };
+        Content: {
+            ({ className, ...props }: Omit<LayoutSlotTargetProps, "name">): JSX.Element;
+            displayName: string;
+        };
+        Logo: {
+            ({ className, ...props }: Omit<LayoutSlotTargetProps, "name">): JSX.Element;
+            displayName: string;
+        };
+        Navigation: {
+            ({ className, ...props }: Omit<LayoutSlotTargetProps, "name">): JSX.Element;
+            displayName: string;
+        };
+        Sidebar: {
+            ({ className, ...props }: Omit<LayoutSlotTargetProps, "name">): JSX.Element;
+            displayName: string;
+        };
+        Title: {
+            ({ className, ...props }: Omit<LayoutSlotTargetProps, "name">): JSX.Element;
+            displayName: string;
+        };
+        ContentFooter: {
+            ({ className, ...props }: Omit<LayoutSlotTargetProps, "name">): JSX.Element;
+            displayName: string;
+        };
+        ContentHeader: {
+            ({ className, ...props }: Omit<LayoutSlotTargetProps, "name">): JSX.Element;
+            displayName: string;
+        };
+        HeaderCenter: {
+            ({ className, ...props }: Omit<LayoutSlotTargetProps, "name">): JSX.Element;
+            displayName: string;
+        };
+        HeaderLeft: {
+            ({ className, ...props }: Omit<LayoutSlotTargetProps, "name">): JSX.Element;
+            displayName: string;
+        };
+        HeaderRight: {
+            ({ className, ...props }: Omit<LayoutSlotTargetProps, "name">): JSX.Element;
+            displayName: string;
+        };
+        SidebarLeftBody: {
+            ({ className, ...props }: Omit<LayoutSlotTargetProps, "name">): JSX.Element;
+            displayName: string;
+        };
+        SidebarLeftFooter: {
+            ({ className, ...props }: Omit<LayoutSlotTargetProps, "name">): JSX.Element;
+            displayName: string;
+        };
+        SidebarLeftHeader: {
+            ({ className, ...props }: Omit<LayoutSlotTargetProps, "name">): JSX.Element;
+            displayName: string;
+        };
+        SidebarRightBody: {
+            ({ className, ...props }: Omit<LayoutSlotTargetProps, "name">): JSX.Element;
+            displayName: string;
+        };
+        SidebarRightFooter: {
+            ({ className, ...props }: Omit<LayoutSlotTargetProps, "name">): JSX.Element;
+            displayName: string;
+        };
+        SidebarRightHeader: {
+            ({ className, ...props }: Omit<LayoutSlotTargetProps, "name">): JSX.Element;
+            displayName: string;
+        };
+        ModalLogo: {
+            ({ className, ...props }: Omit<LayoutSlotTargetProps, "name">): JSX.Element;
+            displayName: string;
+        };
+    };
+    Content: NamedExoticComponent<CMSLayoutContentProps>;
+    Root: MemoExoticComponent<({ breakpoint, children, className, componentClassName, contentProps: contentPropsProp, sidebarLeftProps: sidebarLeftPropsProp, sidebarRightProps: sidebarRightPropsProp, }: CMSLayoutRootProps) => JSX.Element>;
+    Sidebar: CMSLayoutSidebarComponentType;
 };
 
 // @public (undocumented)
@@ -161,428 +230,12 @@ export type CMSLayoutSidebarComponentType = (<C extends ElementType = 'section'>
 export type CMSLayoutSidebarProps<C extends ElementType> = PolymorphicComponentPropsWithRef<C, OwnCMSLayoutSidebarProps>;
 
 // @public (undocumented)
-export type CommonLayoutPanelConfigProps = {
-    basis: number | null | undefined;
-    maxWidth?: number | null | undefined;
-    minWidth?: number | null | undefined;
-    name: string;
-    priority?: number | null | undefined;
-};
-
-// @public (undocumented)
-export const CommonSlots: CommonSlotsType;
-
-// @public (undocumented)
-export type CommonSlotsType = Record<keyof typeof commonSlotTargets, ReturnType<typeof createLayoutSlotComponent>>;
-
-// @public (undocumented)
-export const CommonSlotTargets: SlotTargetsType;
-
-// @public (undocumented)
-export const commonSlotTargets: Readonly<{
-    Actions: "actions";
-    Back: "back";
-    Content: "content";
-    Logo: "logo";
-    Navigation: "navigation";
-    Sidebar: "sidebar";
-    Title: "title";
-}>;
-
-// @public (undocumented)
-export type ContainerComponentType = (<C extends ElementType = 'div'>(props: ContainerProps<C>) => React.ReactElement | null) & {
-    displayName?: string | undefined;
-};
-
-// @public (undocumented)
-export type ContainerProps<C extends ElementType> = PolymorphicComponentPropsWithRef<C, OwnContainerProps>;
-
-// @public (undocumented)
-export function ContemberEditLogo2023({ className, size }: IconProps): JSX.Element;
-
-// @public (undocumented)
-export interface ControlledLayoutPanelProps {
-    // (undocumented)
-    behavior: LayoutPanelBehavior | null | undefined;
-    // (undocumented)
-    defaultBehavior?: never;
-    // (undocumented)
-    defaultVisibility?: never;
-    // (undocumented)
-    onBehaviorChange: (state: LayoutPanelState) => void;
-    // (undocumented)
-    onKeyPress?: (event: KeyboardEvent, state: LayoutPanelState) => void;
-    // (undocumented)
-    onVisibilityChange: (state: LayoutPanelState) => void;
-    // (undocumented)
-    visibility: LayoutPanelVisibility | null | undefined;
-}
-
-// @public (undocumented)
-export function createDirectiveContext<T extends RequiredDeepPlainObject<T>, K extends keyof T & string = keyof T & string>(displayName: string, initialValue: T): readonly [{
-    ({ value, children }: {
-        value?: Partial<T> | undefined;
-        children: ReactNode;
-    }): JSX.Element;
-    displayName: string;
-}, NamedExoticComponent<DirectiveProps<T, K>>, Consumer<T>, () => T];
-
-// @public (undocumented)
-export function createLayoutSlotComponent(target: string | string[], displayName?: string, defaultContent?: React.ReactNode): {
-    ({ children }: Omit<LayoutSlotProps, 'target'>): JSX.Element;
-    displayName: string;
-};
-
-// @public (undocumented)
-export type CreateLayoutSlotPortal = (target: string, children: ReactNode) => ReactPortal | null;
-
-// @public (undocumented)
-export function createLayoutSlotTargetComponent(name: string, displayName?: string): {
-    ({ className, ...props }: Omit<LayoutSlotTargetProps, 'name'>): JSX.Element;
-    displayName: string;
-};
-
-// @public (undocumented)
-export type DeepPartial<T> = T extends Function ? T : T extends Array<infer InferredArrayMember> ? Array<DeepPartial<InferredArrayMember>> : T extends object ? {
-    [Key in keyof T]?: DeepPartial<T[Key]>;
-} : T | undefined;
-
-// @public (undocumented)
-export type DirectiveComponentType<V> = FunctionComponent<DirectiveComponentTypeProps<V>>;
-
-// @public (undocumented)
-export type DirectiveComponentTypeProps<V> = V extends Literal ? {
-    children: V;
-} : PropsWithChildren<DeepPartial<V>>;
-
-// @public (undocumented)
-export type DirectiveProps<T extends Record<string, unknown>, K extends keyof T & string = keyof T & string> = {
-    name: K;
-    content: T[K];
-};
-
-// @public
-export type ExtendableProps<ExtendedProps = {}, OverrideProps = {}> = OverrideProps & Omit<ExtendedProps, keyof OverrideProps>;
-
-// @public (undocumented)
-export function FocusScope({ active, children, pressToSkipToLastLabel, pressToSkipToFirstLabel, }: FocusScopeProps): JSX.Element;
-
-// @public (undocumented)
-export const focusScopeDictionary: {
-    focusScope: {
-        pressToSkipToLastLabel: string;
-        pressToSkipToFirstLabel: string;
-    };
-};
-
-// @public (undocumented)
-export type FocusScopeProps = {
-    active?: boolean;
-    pressToSkipToLastLabel?: string;
-    pressToSkipToFirstLabel?: string;
-    children: ReactNode;
-};
-
-// @public (undocumented)
-export const GetLayoutPanelsStateContext: Context<GetLayoutPanelsStateContextType>;
-
-// @public (undocumented)
-export type GetLayoutPanelsStateContextType = {
-    allPanelsCanBeVisible?: boolean;
-    panels: Map<string, LayoutPanelConfig>;
-    currentlyActivePanel: string | undefined;
-};
-
-// @public (undocumented)
-export type IconProps = {
-    size?: number;
-    className?: string | undefined;
-};
-
-// @public
-export type InheritableElementProps<C extends React.ElementType, Props = {}> = ExtendableProps<PropsOf<C>, Props>;
-
-// @public (undocumented)
-export const isOneOfLayoutPanelBehaviors: (value: unknown) => value is "static" | "overlay" | "collapsible" | "modal";
-
-// @public (undocumented)
-export const isOneOfLayoutPanelVisibilities: (value: unknown) => value is "hidden" | "visible";
-
-// @public (undocumented)
-export type KeyValuePair<T, K extends keyof T = keyof T> = {
-    key: K;
-    value: T[K];
-};
-
-// @public (undocumented)
-export type LabeledProps = {
-    ariaLabel: string;
-    children: Exclude<ReactNode, string | null | undefined>;
-} | {
-    ariaLabel?: string;
-    children?: string | null | undefined;
-};
-
-// @public (undocumented)
-export const Layout: {
-    Root: ContainerComponentType;
-    ResponsiveContainer: ContainerComponentType;
-    Panel: LayoutPanelComponentType & {
-        displayName?: string | undefined;
-    };
-    PanelBody: LayoutPanelBodyComponentType;
-    PanelHeader: LayoutPanelHeaderComponentType;
-    PanelFooter: LayoutPanelFooterComponentType;
-    PanelsStateProvider: NamedExoticComponent<    {
-    children: ReactNode;
-    }>;
-};
-
-// @public (undocumented)
-export const LayoutContainerWidthContext: Context<number | null>;
-
-// @public (undocumented)
-export type LayoutContainerWidthContextType = number;
-
-// @public (undocumented)
-export type LayoutPanelBehavior = typeof layoutPanelBehaviorsList[number];
-
-// @public (undocumented)
-export const layoutPanelBehaviorsList: readonly ["static", "collapsible", "overlay", "modal"];
-
-// @public (undocumented)
-export const LayoutPanelBody: LayoutPanelBodyComponentType;
-
-// @public (undocumented)
-export type LayoutPanelBodyComponentType = (<C extends ElementType = 'div'>(props: LayoutPanelBodyProps<C>) => React_2.ReactElement | null) & {
-    displayName?: string | undefined;
-};
-
-// @public (undocumented)
-export type LayoutPanelBodyProps<C extends ElementType> = PolymorphicComponentPropsWithRef<C, OwnLayoutPanelBodyProps>;
-
-// @public (undocumented)
-export type LayoutPanelCallback = (name: string) => void;
-
-// @public (undocumented)
-export type LayoutPanelComponentType = <C extends ElementType = 'section'>(props: LayoutPanelProps<C>) => React.ReactElement | null;
-
-// @public (undocumented)
-export type LayoutPanelConfig = {
-    [P in keyof Omit<LayoutPanelConfigProps, `on${string}`>]-?: P extends 'basis' | 'minWidth' ? Exclude<OwnLayoutPanelProps[P], null | undefined> : Exclude<OwnLayoutPanelProps[P], undefined>;
-} & {
-    ref: RefObject<HTMLElement>;
-};
-
-// @public (undocumented)
-export type LayoutPanelConfigProps = CommonLayoutPanelConfigProps & (ControlledLayoutPanelProps | UncontrolledLayoutPanelProps);
-
-// @public (undocumented)
-export const LayoutPanelContext: Context<LayoutPanelState>;
-
-// @public (undocumented)
-export const LayoutPanelFooter: LayoutPanelFooterComponentType;
-
-// @public (undocumented)
-export type LayoutPanelFooterComponentType = (<C extends ElementType = 'footer'>(props: LayoutPanelFooterProps<C>) => React_2.ReactElement | null) & {
-    displayName?: string | undefined;
-};
-
-// @public (undocumented)
-export type LayoutPanelFooterProps<C extends ElementType> = PolymorphicComponentPropsWithRef<C, OwnLayoutPanelFooterProps>;
-
-// @public (undocumented)
-export const LayoutPanelHeader: LayoutPanelHeaderComponentType;
-
-// @public (undocumented)
-export type LayoutPanelHeaderComponentType = (<C extends ElementType = 'header'>(props: LayoutPanelHeaderProps<C>) => React_2.ReactElement | null) & {
-    displayName?: string | undefined;
-};
-
-// @public (undocumented)
-export type LayoutPanelHeaderProps<C extends ElementType> = PolymorphicComponentPropsWithRef<C, OwnLayoutPanelHeaderProps>;
-
-// @public (undocumented)
-export type LayoutPanelOptionalComponentType = <C extends ElementType = 'section'>(props: Partial<LayoutPanelProps<C>>) => React.ReactElement | null;
-
-// @public (undocumented)
-export type LayoutPanelPart = typeof layoutPanelPartsList[number];
-
-// @public (undocumented)
-export const layoutPanelPartsList: readonly ["header", "body", "footer"];
-
-// @public (undocumented)
-export type LayoutPanelProps<C extends ElementType> = PolymorphicComponentPropsWithRef<C, OwnLayoutPanelProps>;
-
-// @public (undocumented)
-export type LayoutPanelState = {
-    behavior: LayoutPanelBehavior;
-    panel: string;
-    visibility: LayoutPanelVisibility;
-};
-
-// @public (undocumented)
-export type LayoutPanelVisibility = typeof layoutPanelVisibilityList[number];
-
-// @public (undocumented)
-export const layoutPanelVisibilityList: readonly ["visible", "hidden"];
-
-// @public (undocumented)
-export type LayoutPart = typeof layoutParts[number];
-
-// @public (undocumented)
-export const layoutParts: readonly ["header", "panel", "footer"];
-
-// @public (undocumented)
-export const LayoutSlot: {
-    Portal: NamedExoticComponent<LayoutSlotProps>;
-    Target: NamedExoticComponent<LayoutSlotTargetProps>;
-};
-
-// @public (undocumented)
-export type LayoutSlotProps = {
-    children: ReactNode;
-    target: string;
-};
-
-// @public (undocumented)
-export const LayoutSlotRegistryContext: Context<LayoutSlotRegistryContextType>;
-
-// @public (undocumented)
-export type LayoutSlotRegistryContextType = {
-    activeSlots: Set<string>;
-    registerLayoutSlot: RegisterLayoutSlot;
-    unregisterLayoutSlot: UnregisterLayoutSlot;
-};
-
-// @public (undocumented)
-export const LayoutSlotsProvider: NamedExoticComponent<    {
-children: ReactNode;
-}>;
-
-// @public (undocumented)
-export type LayoutSlotsRegistry = Map<string, RefObject<HTMLElement>>;
-
-// @public (undocumented)
-export type LayoutSlotTargetProps = {
-    as?: ElementType;
-    children?: never;
-    className?: NestedClassName;
-    componentClassName?: string;
-    name: string;
-};
-
-// Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-//
-// @public
-export function listClassName(list: (string | false | null | undefined)[]): string;
-
-// @public (undocumented)
-export type Literal = string | number | boolean | null | undefined;
-
-// @public (undocumented)
-export type MaybeLayoutPanelBehavior = LayoutPanelBehavior | null;
-
-// @public (undocumented)
-export type MaybeLayoutPanelVisibility = LayoutPanelVisibility | null;
-
-// @public (undocumented)
-export type NativeProps<El extends Element> = DetailedHTMLProps<HTMLAttributes<El>, El>;
-
-// @public (undocumented)
-export const NavigateBackLink: NamedExoticComponent<NavigateBackLinkProps>;
-
-// @public (undocumented)
-export type NavigateBackLinkProps = Omit<LinkProps, 'children'> & LabeledProps & {
-    icon?: ReactNode;
-    breakpoint?: number | null | undefined;
-};
-
-// @public (undocumented)
-export const navigationBackLinkDictionary: {
-    navigationBackLink: {
-        back: string;
-    };
-};
-
-// @public (undocumented)
-export type NestedClassName = string | false | null | undefined | (string | false | null | undefined)[] | NestedClassName[];
-
-// @public (undocumented)
-export type NonNullableRequired<T> = {
-    [P in keyof T]-?: NonNullable<T[P]>;
-};
-
-// @public (undocumented)
-export type ObjectKeyValue<T, K extends keyof T> = T extends {
-    [P in K]: T[P];
-} ? T[K] : never;
-
-// @public (undocumented)
 export type OwnCMSLayoutSidebarProps = OwnContainerProps & {
     keepVisible?: boolean | null | undefined;
     panelName: string;
     priority?: number | null | undefined;
     trapFocusInModal?: boolean | null | undefined;
     width: number;
-};
-
-// @public (undocumented)
-export type OwnContainerProps = PropsWithChildren<{
-    className?: NestedClassName;
-    componentClassName?: string;
-}>;
-
-// @public (undocumented)
-export type OwnLayoutPanelBodyProps = {
-    children?: ReactNode;
-    className?: NestedClassName;
-    componentClassName?: string;
-};
-
-// @public (undocumented)
-export type OwnLayoutPanelFooterProps = {
-    children?: ReactNode;
-    className?: NestedClassName;
-    componentClassName?: string;
-};
-
-// @public (undocumented)
-export type OwnLayoutPanelHeaderProps = {
-    children?: ReactNode;
-    className?: NestedClassName;
-    componentClassName?: string;
-};
-
-// @public (undocumented)
-export type OwnLayoutPanelProps = BasicLayoutPanelProps & LayoutPanelConfigProps;
-
-// @public (undocumented)
-export const PanelWidthContext: Context<PanelWidthContextType>;
-
-// @public (undocumented)
-export type PanelWidthContextType = {
-    height: number;
-    width: number;
-};
-
-// @public
-export type PolymorphicComponentProps<C extends React.ElementType, Props = {}> = InheritableElementProps<C, Props & AsProp<C>>;
-
-// @public
-export type PolymorphicComponentPropsWithRef<C extends React.ElementType, Props = {}> = PolymorphicComponentProps<C, Props> & {
-    ref?: PolymorphicRef<C>;
-};
-
-// @public
-export type PolymorphicRef<C extends React.ElementType> = React.ComponentPropsWithRef<C>['ref'];
-
-// @public (undocumented)
-export type PropsOf<C extends keyof JSX.IntrinsicElements | React.JSXElementConstructor<any>> = JSX.LibraryManagedAttributes<C, React.ComponentPropsWithoutRef<C>>;
-
-// @public (undocumented)
-export type PropsWithRequiredChildren<P = unknown> = P & {
-    children: ReactNode | undefined;
 };
 
 // @public (undocumented)
@@ -602,135 +255,6 @@ export interface PublicSidebarProps {
     // (undocumented)
     width?: number | null | undefined;
 }
-
-// @public (undocumented)
-export type RegisterLayoutPanel = (name: string, config: LayoutPanelConfig) => void;
-
-// @public (undocumented)
-export type RegisterLayoutSlot = (name: string, ref: RefObject<HTMLElement>) => void;
-
-// @public (undocumented)
-export type RegisterLayoutSlotPortal = (id: string, target: string) => void;
-
-// @public (undocumented)
-export const RenderToSlotPortalContext: Context<RenderToSlotPortalContextType>;
-
-// @public (undocumented)
-export type RenderToSlotPortalContextType = {
-    createLayoutSlotPortal: CreateLayoutSlotPortal;
-    registerLayoutSlotPortal: RegisterLayoutSlotPortal;
-    unregisterLayoutSlotPortal: UnregisterLayoutSlotPortal;
-};
-
-// @public (undocumented)
-export type RequiredDeepPlainObject<T extends Record<string, unknown>, K extends keyof T & string = keyof T & string> = {
-    [P in K]-?: T[P] extends Record<string, unknown> ? RequiredDeepPlainObject<T[P]> : T[P];
-};
-
-// @public (undocumented)
-export type SetDirectiveContextType<T extends Record<string, unknown>> = {
-    registerDirective: <K extends keyof T>(componentId: string, key: K, value: T[K]) => void;
-    updateDirective: <K extends keyof T>(componentId: string, key: K, value: T[K]) => void;
-    unregisterDirective: (componentId: string) => void;
-};
-
-// @public (undocumented)
-export const SetLayoutPanelsStateContext: Context<SetLayoutPanelsStateContextType>;
-
-// @public (undocumented)
-export type SetLayoutPanelsStateContextType = {
-    registerLayoutPanel: RegisterLayoutPanel;
-    unregisterLayoutPanel: UnregisterLayoutPanel;
-    show: SetLayoutPanelVisibility;
-    hide: SetLayoutPanelVisibility;
-    update: UpdateLayoutPanel;
-    reset: SetLayoutPanelVisibility;
-    activate: LayoutPanelCallback;
-    deactivate: LayoutPanelCallback;
-};
-
-// @public (undocumented)
-export type SetLayoutPanelVisibility = LayoutPanelCallback;
-
-// @public (undocumented)
-export type SetLayoutSlotChildrenCount = (name: string, count: number) => void;
-
-// @public (undocumented)
-export type SlotTargetsType = Record<keyof typeof commonSlotTargets, ReturnType<typeof createLayoutSlotTargetComponent>>;
-
-// Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
-// Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
-// Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
-// Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-// Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-//
-// @public
-export function stateClassName(state?: ClassNameStateMap | null, glue?: string): string[];
-
-// @public (undocumented)
-export type Try<A1, A2, Catch = never> = A1 extends A2 ? A1 : Catch;
-
-// @public (undocumented)
-export interface UncontrolledLayoutPanelProps {
-    // (undocumented)
-    behavior?: never;
-    // (undocumented)
-    defaultBehavior: LayoutPanelBehavior | null | undefined;
-    // (undocumented)
-    defaultVisibility: LayoutPanelVisibility | null | undefined;
-    // (undocumented)
-    onBehaviorChange?: (state: LayoutPanelState) => Partial<LayoutPanelState> | null | undefined | void;
-    // (undocumented)
-    onKeyPress?: (event: KeyboardEvent, state: LayoutPanelState) => Partial<LayoutPanelState> | null | undefined | void;
-    // (undocumented)
-    onVisibilityChange?: (state: LayoutPanelState) => Partial<LayoutPanelState> | null | undefined | void;
-    // (undocumented)
-    visibility?: never;
-}
-
-// @public (undocumented)
-export type UnregisterLayoutPanel = LayoutPanelCallback;
-
-// @public (undocumented)
-export type UnregisterLayoutSlot = (name: string) => void;
-
-// @public (undocumented)
-export type UnregisterLayoutSlotPortal = (id: string, target: string) => void;
-
-// @public (undocumented)
-export type UpdateLayoutPanel = (name: string, config: Partial<Omit<LayoutPanelConfig, 'name'>> | null | undefined | void) => void;
-
-// @public (undocumented)
-export function useClosePanelOnEscape(behaviors?: Array<LayoutPanelState['behavior']>): (event: KeyboardEvent, state: LayoutPanelState) => {
-    readonly visibility: "hidden";
-} | undefined;
-
-// @public (undocumented)
-export function useDirectiveLifeCycle<T>(key: string, value: T, registry: SetDirectiveContextType<Record<string, unknown>>): void;
-
-// @public (undocumented)
-export function useDirectiveProviderRegistry<T extends Record<string, unknown>>(value: T): [SetDirectiveContextType<T>, T];
-
-// @public (undocumented)
-export const useGetLayoutPanelsStateContext: () => GetLayoutPanelsStateContextType;
-
-// @public (undocumented)
-export function useLayoutContainerWidth<T>(): number;
-
-// @public (undocumented)
-export const useLayoutPanelContext: () => LayoutPanelState;
-
-// @public (undocumented)
-export const useLayoutSlotRegistryContext: () => LayoutSlotRegistryContextType;
-
-// @public (undocumented)
-export const usePanelWidthContext: () => PanelWidthContextType;
-
-// @public (undocumented)
-export const useRenderToSlotPortalContext: () => RenderToSlotPortalContextType;
-
-// @public (undocumented)
-export const useSetLayoutPanelsStateContext: () => SetLayoutPanelsStateContextType;
 
 // (No @packageDocumentation comment for this package)
 

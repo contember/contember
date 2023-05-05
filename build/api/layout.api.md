@@ -206,8 +206,6 @@ export type InsetsConsumerComponentType = (<C extends ElementType = 'div'>(props
     displayName?: string | undefined;
 };
 
-// Warning: (ae-forgotten-export) The symbol "OwnInsetsConsumerProps" needs to be exported by the entry point index.d.ts
-//
 // @public (undocumented)
 export type InsetsConsumerProps<C extends ElementType> = PolymorphicComponentPropsWithRef<C, OwnInsetsConsumerProps>;
 
@@ -219,8 +217,6 @@ export type InsetsProviderComponentType = (<C extends ElementType = 'div'>(props
     displayName?: string | undefined;
 };
 
-// Warning: (ae-forgotten-export) The symbol "OwnInsetsProviderProps" needs to be exported by the entry point index.d.ts
-//
 // @public (undocumented)
 export type InsetsProviderProps<C extends ElementType> = PolymorphicComponentPropsWithRef<C, OwnInsetsProviderProps>;
 
@@ -410,6 +406,24 @@ export type OwnContainerProps = PropsWithChildren<{
 }>;
 
 // @public (undocumented)
+export type OwnInsetsConsumerProps = {
+    children?: ReactNode;
+    className?: NestedClassName;
+    componentClassName?: string;
+};
+
+// @public (undocumented)
+export type OwnInsetsProviderProps = {
+    children?: ReactNode;
+    className?: NestedClassName;
+    componentClassName?: string;
+    bottom: number;
+    left: number;
+    right: number;
+    top: number;
+};
+
+// @public (undocumented)
 export type OwnLayoutPanelBodyProps = {
     children?: ReactNode;
     className?: NestedClassName;
@@ -445,8 +459,6 @@ export interface OwnResponsiveAppLayoutProps extends OwnContainerProps {
     minimumHeaderHeight?: number;
 }
 
-// Warning: (ae-forgotten-export) The symbol "ResponsiveProps" needs to be exported by the entry point index.d.ts
-//
 // @public (undocumented)
 export type OwnResponsiveStackProps = ResponsiveProps<StackOwnProps>;
 
@@ -483,13 +495,21 @@ export type RequiredDeepPlainObject<T extends Record<string, unknown>, K extends
     [P in K]-?: T[P] extends Record<string, unknown> ? RequiredDeepPlainObject<T[P]> : T[P];
 };
 
-// Warning: (ae-forgotten-export) The symbol "ResponsiveAppLayoutComponentType" needs to be exported by the entry point index.d.ts
-//
 // @public (undocumented)
 export const ResponsiveAppLayout: ResponsiveAppLayoutComponentType;
 
 // @public (undocumented)
+export type ResponsiveAppLayoutComponentType = (<C extends ElementType = 'div'>(props: ResponsiveAppLayoutProps<C>) => React.ReactElement | null) & {
+    displayName?: string | undefined;
+};
+
+// @public (undocumented)
 export type ResponsiveAppLayoutProps<C extends ElementType> = PolymorphicComponentPropsWithRef<C, OwnResponsiveAppLayoutProps>;
+
+// @public (undocumented)
+export type ResponsiveProps<P> = {
+    [K in keyof P]: P[K] | ((layoutContainerWidth: number) => P[K]);
+};
 
 // @public (undocumented)
 export const ResponsiveStack: MemoExoticComponent<ForwardRefExoticComponent<Omit<ResponsiveStackProps, "ref"> & RefAttributes<HTMLDivElement>>>;
@@ -501,10 +521,14 @@ export interface ResponsiveStackProps extends OwnResponsiveStackProps, Omit<JSX.
 // @public (undocumented)
 export const SafeAreaInsetsContext: Context<ContainerInsets>;
 
-// Warning: (ae-forgotten-export) The symbol "SafeAreaInsetsProviderProps" needs to be exported by the entry point index.d.ts
-//
 // @public (undocumented)
 export const SafeAreaInsetsProvider: MemoExoticComponent<({ children, insets: insetsProp }: SafeAreaInsetsProviderProps) => JSX.Element>;
+
+// @public (undocumented)
+export type SafeAreaInsetsProviderProps = {
+    children: ReactNode;
+    insets?: Partial<ContainerInsets>;
+};
 
 // @public (undocumented)
 export function screenInsetsToCSSCustomProperties<P extends string, T extends Readonly<Record<string, number | null>>>(value: T, prefix: P): {
@@ -542,15 +566,33 @@ export type SetLayoutSlotChildrenCount = (name: string, count: number) => void;
 // @public (undocumented)
 export type SlotTargetsType = Record<keyof typeof commonSlotTargets, ReturnType<typeof createLayoutSlotTargetComponent>>;
 
-// Warning: (ae-forgotten-export) The symbol "ToggleMenuButtonProps" needs to be exported by the entry point index.d.ts
-//
 // @public (undocumented)
 export const ToggleMenuButton: NamedExoticComponent<ToggleMenuButtonProps>;
 
-// Warning: (ae-forgotten-export) The symbol "ToggleSidebarButtonProps" needs to be exported by the entry point index.d.ts
-//
+// @public (undocumented)
+export interface ToggleMenuButtonProps {
+    // (undocumented)
+    className?: NestedClassName;
+    // (undocumented)
+    componentClassName?: string;
+    // (undocumented)
+    panel: string;
+}
+
 // @public (undocumented)
 export const ToggleSidebarButton: NamedExoticComponent<ToggleSidebarButtonProps>;
+
+// @public (undocumented)
+export interface ToggleSidebarButtonProps {
+    // (undocumented)
+    className?: NestedClassName;
+    // (undocumented)
+    componentClassName?: string;
+    // (undocumented)
+    panel: string;
+    // (undocumented)
+    position: 'left' | 'right';
+}
 
 // @public (undocumented)
 export interface UncontrolledLayoutPanelProps {

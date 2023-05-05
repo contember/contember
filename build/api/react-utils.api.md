@@ -15,12 +15,26 @@ import { RefObject } from 'react';
 import { SyntheticEvent } from 'react';
 
 // @public (undocumented)
+export type ComposedRefCallback<T> = RefCallback<T> & {
+    current: T | null;
+};
+
+// @public (undocumented)
 export function createNonNullableContextFactory<T>(displayName: string, initialValue?: T): [Context<T>, () => NonNullable<T>];
 
-// Warning: (ae-forgotten-export) The symbol "DebugChildrenProps" needs to be exported by the entry point index.d.ts
-//
 // @public (undocumented)
 export const DebugChildren: NamedExoticComponent<DebugChildrenProps>;
+
+// @public (undocumented)
+export type DebugChildrenProps = {
+    active: true;
+    children: ReactNode;
+    id: string;
+} | {
+    active?: false;
+    children: ReactNode;
+    id?: string;
+};
 
 // @public (undocumented)
 export type DebugMethod = (...parameters: any[]) => void;
@@ -36,6 +50,9 @@ export const identityFunction: <Value>(value: Value) => Value;
 
 // @public (undocumented)
 export function isNoopScopedConsole(value: unknown): boolean;
+
+// @public (undocumented)
+export type MaybeRef<T> = ((instance: T | null) => void) | MutableRefObject<T | null> | null | undefined;
 
 // @public (undocumented)
 export const noop: () => undefined;
@@ -103,20 +120,12 @@ export function unwrapRefValue<T>(value: RefObjectOrElement<T>): T | null;
 // @public (undocumented)
 export const useAbortController: () => () => AbortSignal;
 
-// Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-// Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-// Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-//
 // @public
 export function useAddClassNameDuringResize(className: string, timeoutToRestore?: number, element?: HTMLElement): void;
 
 // @public
 export const useArrayMapMemo: <Item, OutputItem>(items: Item[], map: (value: Item, index: number, array: Item[]) => OutputItem) => OutputItem[];
 
-// Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-// Warning: (ae-forgotten-export) The symbol "MaybeRef" needs to be exported by the entry point index.d.ts
-// Warning: (ae-forgotten-export) The symbol "ComposedRefCallback" needs to be exported by the entry point index.d.ts
-//
 // @public
 export function useComposeRef<T>(...refs: MaybeRef<T>[]): ComposedRefCallback<T>;
 
@@ -135,17 +144,12 @@ export const useDebounce: <T>(value: T, debounceMs: number) => T;
 // @public (undocumented)
 export const useDebounceCallback: (cb: () => any, debounceMs: number) => () => void;
 
-// Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-//
 // @public
 export function useElementSize(refOrElement: RefObjectOrElement<HTMLElement>, options?: ResizeObserverOptions, timeout?: number): {
     height: number | undefined;
     width: number | undefined;
 };
 
-// Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-// Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-//
 // @public
 export function useEventHandler<E extends SyntheticEvent<any>>(type: E['type'], callback: EventHandler<E>): EventHandler<E>;
 
@@ -193,8 +197,6 @@ export function useScrollOffsets(refOrElement: RefObjectOrElement<HTMLElement | 
 // @public (undocumented)
 export const useSessionStorageState: <V extends Serializable>(key: string, initializeValue: ValueInitializer<V>) => [V, SetState<V>];
 
-// Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-//
 // @public
 export function useUpdatedRef<T>(value: T): MutableRefObject<T>;
 

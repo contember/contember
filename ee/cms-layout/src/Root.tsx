@@ -1,15 +1,9 @@
 import { Spacer, Stack } from '@contember/admin'
+import { GetLayoutPanelsStateContext, InsetsConsumer, Layout, LayoutPanelContext, ResponsiveAppLayout, ResponsiveStack, ToggleMenuButton, ToggleSidebarButton, useLayoutSlotRegistryContext } from '@contember/layout'
+import { useExpectSameValueReference } from '@contember/react-utils'
+import { classNameForFactory, setHasOneOf, stateClassName } from '@contember/utilities'
 import { mergeProps } from '@react-aria/utils'
 import { memo, useCallback, useMemo } from 'react'
-import { classNameForFactory, stateClassName } from '../packages/class-name'
-import { setHasOneOf } from '../packages/functional'
-import { useExpectSameValueReference } from '../packages/react-hooks'
-import { InsetsConsumer } from '../packages/ui-insets'
-import { GetLayoutPanelsStateContext, Layout, LayoutPanelContext } from '../packages/ui-layout'
-import { useLayoutSlotRegistryContext } from '../packages/ui-layout-slots'
-import { ResponsiveAppLayout } from '../packages/ui-responsive-app-layout'
-import { ResponsiveStack } from '../packages/ui-responsive-stack'
-import { ToggleMenuButton, ToggleSidebarButton } from '../packages/ui-toggle-buttons'
 import { PANEL_CONTENT_NAME, PANEL_LEFT_NAME, PANEL_RIGHT_NAME, defaultContentProps, defaultPublicSidebarLeftProps, defaultPublicSidebarRightProps, sidebarLeftSlots, sidebarRightSlots } from './Constants'
 import { Content } from './Content'
 import { Sidebar } from './Sidebar'
@@ -116,9 +110,9 @@ export const Root = memo(({
 					<InsetsConsumer className={classNameFor('header-main')}>
 						<div className={classNameFor('header-main-content', classNameFor('content-container'))}>
 							<ResponsiveStack
-								align={useCallback((containerWidth: number) => containerWidth > breakpoint ? undefined : 'center', [breakpoint])}
+								align="center"
+								direction="horizontal"
 								gap={useCallback((containerWidth: number) => containerWidth > breakpoint ? 'small' : 'default', [breakpoint])}
-								direction={useCallback((containerWidth: number) => containerWidth > breakpoint ? 'vertical' : 'horizontal', [breakpoint])}
 							>
 								<Back className="cms-header-back" />
 								<Title className="cms-header-title" />

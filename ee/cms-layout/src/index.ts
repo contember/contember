@@ -1,9 +1,12 @@
-export * from './lib'
-export * from './packages/class-name'
-export * from './packages/typescript-utilities'
-export * from './packages/ui-contember-logos'
-export * from './packages/ui-directives'
-export * from './packages/ui-focus-scope'
-export * from './packages/ui-layout'
-export * from './packages/ui-layout-common-slots'
-export * from './packages/ui-layout-slots'
+import { Content } from './Content'
+import { Root } from './Root'
+import { Sidebar } from './Sidebar'
+import * as Slots from './Slots'
+export * from './Types'
+
+export const CMSLayout = {
+	Content,
+	Root,
+	Sidebar,
+	...Slots,
+}

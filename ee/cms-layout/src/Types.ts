@@ -1,6 +1,6 @@
+import { OwnContainerProps } from '@contember/layout'
+import { PolymorphicComponentPropsWithRef } from '@contember/utilities'
 import { ElementType, ReactElement } from 'react'
-import { PolymorphicComponentPropsWithRef } from '../packages/typescript-utilities'
-import { OwnContainerProps } from '../packages/ui-layout'
 
 export interface PublicSidebarProps {
 	keepVisible?: boolean | null | undefined;

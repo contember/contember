@@ -1,10 +1,7 @@
-import { useReferentiallyStableCallback } from '@contember/react-utils'
+import { Layout, LayoutPanelState, MenuAutoCloseProvider, useClosePanelOnEscape, useGetLayoutPanelsStateContext, useSetLayoutPanelsStateContext } from '@contember/layout'
+import { useComposeRef, useReferentiallyStableCallback } from '@contember/react-utils'
+import { PolymorphicRef, classNameForFactory } from '@contember/utilities'
 import { ElementType, forwardRef, memo, useRef } from 'react'
-import { classNameForFactory } from '../packages/class-name'
-import { useComposeRef } from '../packages/react-hooks'
-import { PolymorphicRef } from '../packages/typescript-utilities'
-import { Layout, LayoutPanelState, useClosePanelOnEscape, useGetLayoutPanelsStateContext, useSetLayoutPanelsStateContext } from '../packages/ui-layout'
-import { MenuAutoCloseProvider } from '../packages/ui-menu-auto-close-provider'
 import { CMSLayoutSidebarComponentType, CMSLayoutSidebarProps } from './Types'
 
 export const Sidebar: CMSLayoutSidebarComponentType = memo(forwardRef(

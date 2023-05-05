@@ -31,15 +31,18 @@ html, body {
 	--cui-gutter: calc(3 * var(--cui-gap));
 }
 
-.lucide,
-.svg-icon {
-	--size: 1.5em;
-	display: inline-block;
-	height: var(--size);
-	line-height: 1em;
-	margin: calc((1em - var(--size)) / 2) -0.125em;
-	vertical-align: text-bottom;
-	width: var(--size);
+.lucide {
+	--scale: 1;
+  --square-to-circle-ratio: 1.1284;
+  --square-to-circle-margin: calc((var(--square-to-circle-ratio) - 1) / 2);
+  stroke: currentColor;
+  display: inline-block;
+  flex-grow: 0;
+  flex-shrink: 0;
+  height: calc(1em * var(--scale));
+  margin: calc(-1em * var(--square-to-circle-margin));
+  vertical-align: middle;
+  width: calc(1em * var(--scale));
 }
 
 /* HOTFIX: Firefox */

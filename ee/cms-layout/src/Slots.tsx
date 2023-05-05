@@ -1,6 +1,5 @@
-import { ContemberEditLogo2023 } from '../packages/ui-contember-logos'
-import { CommonSlotTargets, CommonSlots, commonSlotTargets } from '../packages/ui-layout-common-slots'
-import { createLayoutSlotComponent, createLayoutSlotTargetComponent } from '../packages/ui-layout-slots'
+import { Identity2023 } from '@contember/brand'
+import { CommonSlotTargets, CommonSlots, commonSlotTargets, createLayoutSlotComponent, createLayoutSlotTargetComponent } from '@contember/layout'
 
 export const slotTargets = Object.freeze({
 	...commonSlotTargets,
@@ -36,7 +35,7 @@ export const Slots: SlotsMapType = {
 		slotTargets.Logo,
 		slotTargetAliases.ModalLogo,
 	], 'Logo', (<a href="/">
-		<ContemberEditLogo2023 className="cms-logo" size={56} />
+		<Identity2023.Edit scale={1.5} className="cms-logo" />
 	</a>
 	)),
 	HeaderCenter: createLayoutSlotComponent(slotTargets.HeaderCenter, 'HeaderCenter'),

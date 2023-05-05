@@ -1,4 +1,4 @@
-import { NonNullableRequired } from '../packages/typescript-utilities'
+import { NonNullableRequired } from '@contember/utilities'
 import { slotTargets } from './Slots'
 import { PublicContentProps, PublicSidebarProps } from './Types'
 

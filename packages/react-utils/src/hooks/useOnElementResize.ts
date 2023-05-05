@@ -1,5 +1,5 @@
 import { useLayoutEffect, useRef } from 'react'
-import { useScopedConsoleRef } from '../ui-debug-context'
+import { useScopedConsoleRef } from '../debug-context'
 import { RefObjectOrElement, unwrapRefValue } from './unwrapRefValue'
 
 export function useOnElementResize(

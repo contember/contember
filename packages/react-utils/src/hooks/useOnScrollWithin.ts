@@ -1,13 +1,13 @@
 import { useLayoutEffect, useRef } from 'react'
-import { useScopedConsoleRef } from '../ui-debug-context'
+import { useScopedConsoleRef } from '../debug-context'
 import { RefObjectOrElement, unwrapRefValue } from './unwrapRefValue'
 
 /**
  * Invokes callback on scroll event within the scroll container
  *
- * @param refOrElement Scroll container
- * @param callback Callback that is invoked on scroll event
- * @param interval Specifies how often should scroll event invoke callback
+ * @param refOrElement - Scroll container
+ * @param callback - Callback that is invoked on scroll event
+ * @param interval - Specifies how often should scroll event invoke callback
  */
 export function useOnScrollWithin(
 	refOrElement: RefObjectOrElement<HTMLElement | null> | null,

@@ -1,6 +1,6 @@
+import { getSizeFromResizeObserverEntryFactory } from '@contember/utilities'
 import { useLayoutEffect, useMemo, useRef, useState } from 'react'
-import { getSizeFromResizeObserverEntryFactory } from '../dom'
-import { useScopedConsoleRef } from '../ui-debug-context'
+import { useScopedConsoleRef } from '../debug-context'
 import { RefObjectOrElement, unwrapRefValue } from './unwrapRefValue'
 import { useOnElementResize } from './useOnElementResize'
 
@@ -15,7 +15,7 @@ function getElementHeight(element: HTMLElement) {
 /**
  * Measure HTMLElement
  *
- * @param refOrElement HTMLElement passed directly or indirectly as RefObject
+ * @param refOrElement - HTMLElement passed directly or indirectly as RefObject
  * @returns Size vector consisting of width and height properties
  */
 export function useElementSize(

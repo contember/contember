@@ -1,6 +1,6 @@
 import deepEqual from 'deep-equal'
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
-import { useScopedConsoleRef } from '../ui-debug-context'
+import { useScopedConsoleRef } from '../debug-context'
 import { RefObjectOrElement, unwrapRefValue } from './unwrapRefValue'
 
 export function useOnElementMutation(

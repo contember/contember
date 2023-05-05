@@ -1,5 +1,5 @@
-import { useReferentiallyStableCallback } from '@contember/react-utils'
 import { useLayoutEffect, useRef } from 'react'
+import { useReferentiallyStableCallback } from '../referentiallyStable'
 import { useOnWindowResize } from './useOnWindowResize'
 
 function intendedFlushOfCSSChangesToCauseImmediateReflow(element: HTMLElement) {
@@ -33,9 +33,9 @@ function removeClassName(
  * - Adds CSS class to element also on the initial load
  * - Uses element.classList directly
  *
- * @param className CSS class to apply during the resize event
- * @param timeoutToRestore Timeout in milliseconds to wait before finally removing the CSS class
- * @param element Optional HTML element to apply CSS class to
+ * @param className - CSS class to apply during the resize event
+ * @param timeoutToRestore - Timeout in milliseconds to wait before finally removing the CSS class
+ * @param element - Optional HTML element to apply CSS class to
  */
 export function useAddClassNameDuringResize(
 	className: string,

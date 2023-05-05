@@ -4,8 +4,26 @@
 
 ```ts
 
+import { Context } from 'react';
 import { DispatchWithoutAction } from 'react';
+import { EventHandler } from 'react';
 import { MutableRefObject } from 'react';
+import { NamedExoticComponent } from 'react';
+import { ReactNode } from 'react';
+import { RefCallback } from 'react';
+import { RefObject } from 'react';
+import { SyntheticEvent } from 'react';
+
+// @public (undocumented)
+export function createNonNullableContextFactory<T>(displayName: string, initialValue?: T): [Context<T>, () => NonNullable<T>];
+
+// Warning: (ae-forgotten-export) The symbol "DebugChildrenProps" needs to be exported by the entry point index.d.ts
+//
+// @public (undocumented)
+export const DebugChildren: NamedExoticComponent<DebugChildrenProps>;
+
+// @public (undocumented)
+export type DebugMethod = (...parameters: any[]) => void;
 
 // @public (undocumented)
 export const emptyArray: any[];
@@ -17,7 +35,38 @@ export const emptyObject: Readonly<{}>;
 export const identityFunction: <Value>(value: Value) => Value;
 
 // @public (undocumented)
+export function isNoopScopedConsole(value: unknown): boolean;
+
+// @public (undocumented)
 export const noop: () => undefined;
+
+// @public (undocumented)
+export function noopLog(...parameters: any[]): void;
+
+// @public (undocumented)
+export function noopLogged<T>(message: string, value: T): T;
+
+// @public (undocumented)
+export const noopScopedConsole: ScopedConsoleContextType;
+
+// @public (undocumented)
+export type Offsets = {
+    bottom: number;
+    left: number;
+    right: number;
+    top: number;
+};
+
+// @public (undocumented)
+export type PropsWithRequiredChildren<P = unknown> = P & {
+    children: ReactNode | undefined;
+};
+
+// @public (undocumented)
+export type RefObjectOrElement<T> = T | RefObject<T>;
+
+// @public (undocumented)
+export type ResultDebuggedMethod = <T>(message: string, value: T) => T;
 
 // @public (undocumented)
 export const returnFalse: () => boolean;
@@ -26,15 +75,49 @@ export const returnFalse: () => boolean;
 export const returnTrue: () => boolean;
 
 // @public (undocumented)
+export const ScopedConsoleContext: Context<ScopedConsoleContextType>;
+
+// @public (undocumented)
+export type ScopedConsoleContextType = {
+    log: DebugMethod;
+    logged: ResultDebuggedMethod;
+    warn: DebugMethod;
+    warned: ResultDebuggedMethod;
+    error: DebugMethod;
+    errored: ResultDebuggedMethod;
+    trace: DebugMethod;
+    traced: ResultDebuggedMethod;
+};
+
+// @public (undocumented)
 export type Serializable = string | number | boolean | null | readonly Serializable[] | {
     readonly [K in string]?: Serializable;
 };
 
+// Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+//
+// @public
+export function unwrapRefValue<T>(value: RefObjectOrElement<T>): T | null;
+
 // @public (undocumented)
 export const useAbortController: () => () => AbortSignal;
 
+// Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+//
+// @public
+export function useAddClassNameDuringResize(className: string, timeoutToRestore?: number, element?: HTMLElement): void;
+
 // @public
 export const useArrayMapMemo: <Item, OutputItem>(items: Item[], map: (value: Item, index: number, array: Item[]) => OutputItem) => OutputItem[];
+
+// Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// Warning: (ae-forgotten-export) The symbol "MaybeRef" needs to be exported by the entry point index.d.ts
+// Warning: (ae-forgotten-export) The symbol "ComposedRefCallback" needs to be exported by the entry point index.d.ts
+//
+// @public
+export function useComposeRef<T>(...refs: MaybeRef<T>[]): ComposedRefCallback<T>;
 
 // @public (undocumented)
 export const useConstantLengthInvariant: <Item>(items: Item[], message?: string) => void;
@@ -42,14 +125,37 @@ export const useConstantLengthInvariant: <Item>(items: Item[], message?: string)
 // @public (undocumented)
 export const useConstantValueInvariant: <Value>(value: Value, message?: string) => void;
 
+// @public @deprecated (undocumented)
+export function useCountLayoutSlotChildren(refOrElement: RefObjectOrElement<HTMLElement | undefined>, selector?: string): number;
+
 // @public (undocumented)
 export const useDebounce: <T>(value: T, debounceMs: number) => T;
 
 // @public (undocumented)
 export const useDebounceCallback: (cb: () => any, debounceMs: number) => () => void;
 
+// Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+//
+// @public
+export function useElementSize(refOrElement: RefObjectOrElement<HTMLElement>, options?: ResizeObserverOptions, timeout?: number): {
+    height: number | undefined;
+    width: number | undefined;
+};
+
+// Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+// Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+//
+// @public
+export function useEventHandler<E extends SyntheticEvent<any>>(type: E['type'], callback: EventHandler<E>): EventHandler<E>;
+
+// @public (undocumented)
+export function useExpectSameValueReference<T>(next: T, shouldThrow?: boolean): void;
+
 // @public (undocumented)
 export const useForceRender: () => DispatchWithoutAction;
+
+// @public (undocumented)
+export function useHasEmptySlotsClassName(refOrElement: RefObjectOrElement<HTMLElement | undefined>): "has-empty-slots" | "has-non-empty-slots";
 
 // @public (undocumented)
 export const useIsMounted: () => MutableRefObject<boolean>;
@@ -58,16 +164,47 @@ export const useIsMounted: () => MutableRefObject<boolean>;
 export const useObjectMemo: <A extends object>(value: A) => A;
 
 // @public (undocumented)
+export function useOnElementMutation(refOrElement: RefObjectOrElement<HTMLElement | undefined>, callback: MutationCallback, options?: MutationObserverInit): void;
+
+// @public (undocumented)
+export function useOnElementResize(refOrElement: RefObjectOrElement<HTMLElement | null> | null, callback: (entries: ResizeObserverEntry) => void, options?: ResizeObserverOptions, timeout?: number): void;
+
+// @public (undocumented)
+export function useOnWindowResize(callback: (event: Event) => void, interval?: number): void;
+
+// @public (undocumented)
 export const usePreviousValue: <Value>(value: Value) => Value;
 
 // @public (undocumented)
 export const useReferentiallyStableCallback: <T extends (...args: any[]) => any>(callback: T) => T;
+
+// @public (undocumented)
+export const useScopedConsoleRef: (prefix: string) => MutableRefObject<ScopedConsoleContextType>;
+
+// @public (undocumented)
+export function useScrollOffsets(refOrElement: RefObjectOrElement<HTMLElement | null> | null, interval?: number): {
+    bottom: number;
+    left: number;
+    right: number;
+    top: number;
+};
 
 // Warning: (ae-forgotten-export) The symbol "ValueInitializer" needs to be exported by the entry point index.d.ts
 // Warning: (ae-forgotten-export) The symbol "SetState" needs to be exported by the entry point index.d.ts
 //
 // @public (undocumented)
 export const useSessionStorageState: <V extends Serializable>(key: string, initializeValue: ValueInitializer<V>) => [V, SetState<V>];
+
+// Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
+//
+// @public
+export function useUpdatedRef<T>(value: T): MutableRefObject<T>;
+
+// @public (undocumented)
+export function useWindowSize(): {
+    height: number;
+    width: number;
+};
 
 // (No @packageDocumentation comment for this package)
 

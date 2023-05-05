@@ -1,7 +1,5 @@
 export * from './DeepPartial'
-export * from './NativeProps'
 export * from './NonNullableRequired'
 export * from './ObjectKeyValue'
 export * from './PolymorphicRefs'
-export * from './PropsWithRequiredChildren'
 export * from './Try'

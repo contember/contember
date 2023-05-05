@@ -12,8 +12,8 @@ function toKebabCase(value: string) {
  * @example
  * stateClassName({ foo: true, bar: false, baz: 1 }) // => 'foo baz-1'
  *
- * @param state State map object with class names as keys and literals as values.
- * @param glue Glue to use between the class name and the value, default is '-'. Set to '' to disable.
+ * @param state - State map object with class names as keys and literals as values.
+ * @param glue - Glue to use between the class name and the value, default is '-'. Set to '' to disable.
  * @returns Combined class names as string
  */
 export function stateClassName(state: ClassNameStateMap | null = null, glue = '-'): string[] {

@@ -13,7 +13,7 @@ function isTransformMatrixTuple(value: unknown): value is [number, number, numbe
 /**
  * Parses a CSS transform matrix string into an object.
  *
- * @param transform CSS transform matrix string.
+ * @param transform - CSS transform matrix string.
  * @returns Object with the transform matrix values or undefined.
  */
 export function parseTransformMatrix(transform = '') {

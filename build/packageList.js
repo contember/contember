@@ -20,6 +20,7 @@ export const list = {
 		'admin-i18n',
 		'admin-sandbox',
 		'binding',
+		'brand',
 		'client',
 		'interface-tester',
 		'layout',

@@ -9,6 +9,7 @@
 		{ "path": "./packages/admin-i18n" },
 		{ "path": "./packages/admin-sandbox" },
 		{ "path": "./packages/binding"  },
+		{ "path": "./packages/brand" },
 		{ "path": "./packages/client" },
 		{ "path": "./packages/interface-tester" },
 		{ "path": "./packages/layout" },

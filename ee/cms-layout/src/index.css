@@ -1,5 +1,5 @@
 @import "./lib/root.css";
-@import "./packages/ui-layout/index.css";
 @import "./packages/ui-layout-slots/index.css";
 @import "./packages/ui-responsive-app-layout/index.css";
 @import "./lib/index.css";
+@import "@contember/layout/index.css";

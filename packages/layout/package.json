@@ -1,0 +1,61 @@
+{
+	"name": "@contember/layout",
+	"license": "Apache-2.0",
+	"version": "0.0.0",
+	"type": "module",
+	"sideEffects": false,
+	"main": "./dist/production/index.js",
+	"exports": {
+		".": {
+			"import": {
+				"development": "./dist/development/index.js",
+				"production": "./dist/production/index.js",
+				"default": "./dist/production/index.js"
+			}
+		},
+		"./index.css": {
+			"development": "./src/index.css",
+			"production": "./dist/assets/index.css",
+			"default": "./dist/assets/index.css"
+		}
+	},
+	"files": [
+		"dist/",
+		"src/"
+	],
+	"typings": "./dist/types/index.d.ts",
+	"scripts": {
+		"build": "yarn build:js:dev && yarn build:js:prod && yarn build:css",
+		"build:js:dev": "vite build --mode development",
+		"build:js:prod": "vite build --mode production",
+		"build:css": "vite build --config vite.config.css.js",
+		"ae:build": "api-extractor run --local",
+		"ae:test": "api-extractor run",
+		"test": "vitest"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/contember/interface.git",
+		"directory": "packages/layout"
+	},
+	"dependencies": {
+		"@contember/admin": "workspace:*",
+		"@contember/react-utils": "workspace:*",
+		"@contember/ui": "workspace:*",
+		"@contember/utilities": "workspace:*",
+		"deep-equal": "^2.2.0",
+		"lucide-react": "^0.108.0",
+		"wait-for-element-transition": "^3.3.1"
+	},
+	"peerDependencies": {
+		"react": "^17 || ^18",
+		"react-dom": "^17 || ^18"
+	},
+	"devDependencies": {
+		"@types/deep-equal": "^1.0.1",
+		"react": "^18",
+		"react-dom": "^18",
+		"vite": "^4",
+		"vitest": "^0"
+	}
+}

@@ -1,5 +1,5 @@
-import { memo, useCallback, useEffect, useState } from 'react'
-import { SessionTokenContext, SetSessionTokenContext } from './auth'
+import { memo, useCallback, useMemo, useState } from 'react'
+import { SessionTokenContext, SessionTokenContextValue, SetSessionTokenContext } from './auth'
 import { ApiBaseUrlContext, LoginTokenContext } from './config'
 import { ProjectSlugContext, StageSlugContext } from './project'
 
@@ -21,7 +21,31 @@ export const ContemberClient = memo<ContemberClientProps & { children: React.Rea
 	sessionToken,
 	stage,
 }) {
-	const [sessionTokenInner, setSessionTokenInner] = useState(() => localStorage.getItem(sessionTokenKey) ?? sessionToken  ?? undefined)
+	const [localStorageSessionToken, setLocalStorageSessionToken] = useLocalStorageSessionToken()
+
+	const sessionTokenContextValue = useMemo((): SessionTokenContextValue => ({
+		propsToken: sessionToken,
+		token: localStorageSessionToken ?? sessionToken,
+		source: localStorageSessionToken ? 'localstorage' : (sessionToken ? 'props' : undefined),
+	}), [localStorageSessionToken, sessionToken])
+
+	return (
+		<ApiBaseUrlContext.Provider value={apiBaseUrl}>
+			<LoginTokenContext.Provider value={loginToken}>
+				<SetSessionTokenContext.Provider value={setLocalStorageSessionToken}>
+					<SessionTokenContext.Provider value={sessionTokenContextValue}>
+						<ProjectSlugContext.Provider value={project}>
+							<StageSlugContext.Provider value={stage}>{children}</StageSlugContext.Provider>
+						</ProjectSlugContext.Provider>
+					</SessionTokenContext.Provider>
+				</SetSessionTokenContext.Provider>
+			</LoginTokenContext.Provider>
+		</ApiBaseUrlContext.Provider>
+	)
+})
+
+const useLocalStorageSessionToken = (): [value: string | undefined, set: (token: string | undefined) => void] => {
+	const [sessionTokenInner, setSessionTokenInner] = useState(() => localStorage.getItem(sessionTokenKey) ?? undefined)
 
 	const setSessionToken = useCallback((token: string | undefined) => {
 		if (token !== undefined) {
@@ -32,17 +56,5 @@ export const ContemberClient = memo<ContemberClientProps & { children: React.Rea
 		setSessionTokenInner(token)
 	}, [])
 
-	return (
-		<ApiBaseUrlContext.Provider value={apiBaseUrl}>
-			<LoginTokenContext.Provider value={loginToken}>
-				<SetSessionTokenContext.Provider value={setSessionToken}>
-					<SessionTokenContext.Provider value={sessionTokenInner}>
-						<ProjectSlugContext.Provider value={project}>
-							<StageSlugContext.Provider value={stage}>{children}</StageSlugContext.Provider>
-						</ProjectSlugContext.Provider>
-					</SessionTokenContext.Provider>
-				</SetSessionTokenContext.Provider>
-			</LoginTokenContext.Provider>
-		</ApiBaseUrlContext.Provider>
-	)
-})
+	return [sessionTokenInner, setSessionToken]
+}

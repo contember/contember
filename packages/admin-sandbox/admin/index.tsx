@@ -1,8 +1,15 @@
-import { ApplicationEntrypoint, DataBindingProvider, FeedbackRenderer, PageModule, Pages, runReactApp } from '@contember/admin'
+import {
+	ApplicationEntrypoint,
+	DataBindingProvider,
+	FeedbackRenderer,
+	PageModule,
+	Pages,
+	runReactApp,
+} from '@contember/admin'
 import { LayoutSlotsProvider } from '@contember/layout'
 import { createRoot } from 'react-dom/client'
 import { DirectivesProvider } from './components/Directives'
-import { Layout } from './components/Layout'
+import { Layout, LayoutDevPanel } from './components/Layout'
 import './index.sass'
 
 runReactApp(
@@ -12,6 +19,9 @@ runReactApp(
 		project={'admin-sandbox'}
 		stage={'live'}
 		basePath={import.meta.env.BASE_URL}
+		devBarPanels={<>
+			<LayoutDevPanel />
+		</>}
 		children={
 			<DataBindingProvider stateComponent={FeedbackRenderer}>
 				<DirectivesProvider>

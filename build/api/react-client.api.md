@@ -404,7 +404,17 @@ export interface RootEditorNode<CustomElements extends RichTextElement = never, 
 }
 
 // @public (undocumented)
-export const SessionTokenContext: Context<string | undefined>;
+export const SessionTokenContext: Context<SessionTokenContextValue>;
+
+// @public (undocumented)
+export interface SessionTokenContextValue {
+    // (undocumented)
+    propsToken: string | undefined;
+    // (undocumented)
+    source: 'props' | 'localstorage' | undefined;
+    // (undocumented)
+    token: string | undefined;
+}
 
 // @public (undocumented)
 export const SetSessionTokenContext: Context<(token: string | undefined) => void>;
@@ -492,6 +502,9 @@ export const useProjectSlug: () => string | undefined;
 
 // @public (undocumented)
 export const useSessionToken: () => string | undefined;
+
+// @public (undocumented)
+export const useSessionTokenWithMeta: () => SessionTokenContextValue;
 
 // @public (undocumented)
 export const useSetSessionToken: () => (token: string | undefined) => void;

@@ -338,6 +338,8 @@ export interface ApplicationEntrypointProps extends ContemberClientProps {
     // (undocumented)
     defaultLocale?: string;
     // (undocumented)
+    devBarPanels?: ReactNode;
+    // (undocumented)
     dictionaries?: MessageDictionaryByLocaleCode;
     // (undocumented)
     envVariables?: Record<string, string>;
@@ -4291,9 +4293,12 @@ export interface TenantMutationErrorResponse<Code extends string> {
 }
 
 // @public (undocumented)
-export type TenantMutationExecutor<VariableValues, Res extends TenantMutationResponse<any, string>> = (variables: VariableValues, option?: {
+export type TenantMutationExecutor<VariableValues, Res extends TenantMutationResponse<any, string>> = (variables: VariableValues, option?: TenantMutationExecutorOptions) => Promise<Res>;
+
+// @public (undocumented)
+export type TenantMutationExecutorOptions = {
     onResponse?: (response: any) => void;
-}) => Promise<Res>;
+} & Omit<GraphQlClientRequestOptions, 'variables'>;
 
 // @public (undocumented)
 export interface TenantMutationOkResponse<Result> {

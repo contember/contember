@@ -12,8 +12,8 @@
 	&-header
 		align-items: center
 		display: flex
-		justify-content: space-between
 		gap: calc(2 * var(--cui-gap))
+
 	&-content
 		//
 
@@ -33,7 +33,9 @@
 
 	&-label
 		font-weight: 800
+
 	&-actions
+		margin-left: auto
 		align-items: center
 		display: flex
 		gap: inherit
@@ -54,3 +56,7 @@
 	&.view-circular
 		&:last-child
 			margin-right: calc(-1 * (var(--cui-button-height) - var(--cui-button-line-height)) / 2)
+
+:where(.cui-repeater-item-container-index)
+	&::before
+		content: '#'

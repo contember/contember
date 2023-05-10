@@ -109,7 +109,7 @@ export const RepeaterInner = Component<RepeaterInnerProps<any, any>, NonStaticPr
 						<Entity accessor={entity} key={entity.key}>
 							<Item
 								{...props.itemComponentExtraProps!}
-								label={label ? `${label} #${i + 1}` : `#${i + 1}`}
+								label={label}
 								index={i}
 								createNewEntity={createNewEntity}
 								removalType={removalType}
@@ -152,7 +152,7 @@ export const RepeaterInner = Component<RepeaterInnerProps<any, any>, NonStaticPr
 							<Entity accessor={entity}>
 								<Item
 									{...props.itemComponentExtraProps!}
-									label={label ? `${label} #${i + 1}` : `#${i + 1}`}
+									label={label}
 									index={i}
 									createNewEntity={createNewEntity}
 									removalType={removalType}

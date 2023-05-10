@@ -1,6 +1,6 @@
-import { EditScope, Link } from '@contember/admin'
-import { NavigateBackLink } from '@contember/cms-layout'
-import { Back, Content, Title } from '../components/Layout'
+import { EditScope, NavigateBackLink } from '@contember/admin'
+import { Title } from '../components/Directives'
+import { Back, Content } from '../components/Slots'
 
 export default () => (
 	<EditScope entity="UploadShowcase(unique = One)" setOnCreate="(unique = One)">

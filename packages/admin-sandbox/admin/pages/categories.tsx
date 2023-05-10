@@ -1,5 +1,6 @@
 import { Component, MultiEditScope, PersistButton, Repeater, SelectField, TextField } from '@contember/admin'
-import { Actions, Content, Title } from '../components/Layout'
+import { Title } from '../components/Directives'
+import { Actions, Content } from '../components/Slots'
 
 export const CategoryForm = Component(() => <>
 	<TextField field={'name'} label={'Name'} />
@@ -10,7 +11,6 @@ export const CategoryForm = Component(() => <>
 </>)
 
 export default () => (
-	// TODO: Implement `rendererProps={{  }}` for MultiEditScope
 	<>
 		<Title>Categories</Title>
 		<Content>

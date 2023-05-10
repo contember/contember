@@ -1,7 +1,6 @@
 import classnames from 'classnames'
-import { forwardRef, memo, ReactNode, useLayoutEffect, useRef } from 'react'
+import { DetailedHTMLProps, forwardRef, HTMLAttributes, memo, ReactNode, useLayoutEffect, useRef } from 'react'
 import { useClassNamePrefix } from '../../auxiliary'
-import type { NativeProps } from '../../types'
 import { Message } from '../Message'
 import { useSectionTabsRegistration } from '../SectionTabs'
 import { Stack } from '../Stack'
@@ -15,7 +14,7 @@ export interface SectionOwnProps {
 	children?: ReactNode
 }
 
-export interface SectionProps extends SectionOwnProps, Omit<NativeProps<HTMLElement>, 'children'> { }
+export interface SectionProps extends SectionOwnProps, Omit<DetailedHTMLProps<HTMLAttributes<HTMLElement>, HTMLElement>, 'children'> { }
 
 const randomId = () => (Math.random() + 1).toString(36).substring(7)
 

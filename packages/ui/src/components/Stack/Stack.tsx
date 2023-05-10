@@ -1,7 +1,7 @@
 import classnames from 'classnames'
 import { CSSProperties, forwardRef, memo, ReactNode, useMemo } from 'react'
 import { useClassNamePrefix } from '../../auxiliary'
-import type { NativeProps, Size } from '../../types'
+import type { Size } from '../../types'
 import { toEnumClass, toEnumViewClass, toStateClass, toViewClass } from '../../utils'
 
 export interface StackOwnProps {
@@ -13,22 +13,22 @@ export interface StackOwnProps {
 	gap?: Size | 'xlarge' | 'none',
 	grow?: boolean | CSSProperties['flexGrow'],
 	justify?:
-		| 'center'
-		| 'start'
-		| 'end'
-		| 'space-between'
-		| 'space-around'
-		| 'space-evenly'
-		| 'stretch'
-		| 'inherit'
-		| 'initial'
-		| 'revert'
+	| 'center'
+	| 'start'
+	| 'end'
+	| 'space-between'
+	| 'space-around'
+	| 'space-evenly'
+	| 'stretch'
+	| 'inherit'
+	| 'initial'
+	| 'revert'
 	shrink?: boolean | CSSProperties['flexShrink'],
-	style?: NativeProps<HTMLDivElement>['style'],
+	style?: JSX.IntrinsicElements['div']['style'],
 	wrap?: boolean | 'reverse',
 }
 
-export interface StackProps extends StackOwnProps, Omit<NativeProps<HTMLDivElement>, 'children'> {}
+export interface StackProps extends StackOwnProps, Omit<JSX.IntrinsicElements['div'], 'children'> { }
 
 export const Stack = memo(
 	forwardRef<HTMLDivElement, StackProps>(

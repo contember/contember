@@ -2641,6 +2641,15 @@ export const isUnorderedListElement: (element: Node_2, suchThat?: Partial<Unorde
 export const italicToolbarButton: ToolbarButtonSpec;
 
 // @public (undocumented)
+export type LabeledProps = {
+    ariaLabel: string;
+    children: Exclude<ReactNode, string | null | undefined>;
+} | {
+    ariaLabel?: string;
+    children?: string | null | undefined;
+};
+
+// @public (undocumented)
 export const LayoutRenderer: FunctionComponent<LayoutRendererProps>;
 
 // @public (undocumented)
@@ -3019,6 +3028,21 @@ export type MutationRequestState<T> = QueryRequestState<T> | RequestStateUniniti
 
 // @public (undocumented)
 export const NavigateBackButton: React.NamedExoticComponent<LinkButtonProps>;
+
+// @public (undocumented)
+export const NavigateBackLink: React.NamedExoticComponent<NavigateBackLinkProps>;
+
+// @public (undocumented)
+export type NavigateBackLinkProps = Omit<LinkProps, 'children'> & LabeledProps & {
+    icon?: ReactNode;
+};
+
+// @public (undocumented)
+export const navigationBackLinkDictionary: {
+    navigationBackLink: {
+        back: string;
+    };
+};
 
 // @public (undocumented)
 export const NavigationProvider: (props: NavigationProviderProps) => JSX.Element;
@@ -4198,6 +4222,12 @@ export const tableCellElementPlugin: CustomElementPlugin<TableCellElement>;
 export const tableCellElementType: "tableCell";
 
 // @public (undocumented)
+export type TableContainerRendererProps = TableProps & EmptyMessageOuterProps & {
+    accessor: EntityListAccessor;
+    children: ReactNode;
+};
+
+// @public (undocumented)
 export interface TableElement extends Element_2 {
     // (undocumented)
     children: Editor_2['children'];
@@ -4220,6 +4250,12 @@ export type TablePageProps<ContainerExtraProps, ItemExtraProps> = SugaredQualifi
     children?: ReactNode;
     rendererProps?: Omit<ImmutableEntityListTablePageRendererProps<ContainerExtraProps, ItemExtraProps>, 'accessor' | 'children'>;
 };
+
+// @public (undocumented)
+export const TableRenderer: React.NamedExoticComponent<TableProps & EmptyMessageOuterProps & {
+    accessor: EntityListAccessor;
+    children: ReactNode;
+}>;
 
 // @public (undocumented)
 export interface TableRowElement extends Element_2 {

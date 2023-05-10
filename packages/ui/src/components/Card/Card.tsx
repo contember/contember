@@ -1,7 +1,6 @@
 import classNames from 'classnames'
 import { memo, MouseEvent, ReactNode } from 'react'
 import { useComponentClassName } from '../../auxiliary'
-import { NativeProps } from '../../types'
 import { toEnumViewClass, toFeatureClass, toStateClass } from '../../utils'
 import { VisuallyDependentControlProps } from '../Forms'
 import { useInputClassName } from '../Forms/hooks/useInputClassName'
@@ -46,7 +45,7 @@ export type CommonCardProps =
 
 export type CardProps =
 	& Omit<CommonCardProps, 'type'>
-	& Omit<NativeProps<HTMLDivElement>, 'onClick'>
+	& Omit<JSX.IntrinsicElements['div'], 'onClick'>
 	& {
 		href?: never
 		onClick?: () => void
@@ -54,7 +53,7 @@ export type CardProps =
 
 export type LinkCardProps =
 	& Omit<CommonCardProps, 'active' | 'type'>
-	& Omit<NativeProps<HTMLAnchorElement>, 'href' | 'onClick'>
+	& Omit<JSX.IntrinsicElements['a'], 'href' | 'onClick'>
 	& LinkCompatibleProps
 
 export const LinkCard = memo<LinkCardProps>(

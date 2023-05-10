@@ -1,40 +1,8 @@
-import { Stack, StackOwnProps } from '@contember/admin'
-import { CommonSlots, LayoutSlotsProvider, PropsWithRequiredChildren } from '@contember/cms-layout'
 import { useReferentiallyStableCallback } from '@contember/react-utils'
-import { ChangeEvent, ComponentType, ReactNode, createElement, memo, useEffect, useRef, useState } from 'react'
+import { ChangeEvent, ReactNode, useEffect, useRef, useState } from 'react'
+import { DirectivesConsumer } from './Directives'
 import * as Layouts from './Layouts'
-import { MetaDirective, MetaDirectivesConsumer } from './MetaDirectives'
-
-export const { Actions, Back, Title: TitleSlot, Content, Logo, Navigation, Sidebar, ...restOfCommonSlots } = CommonSlots
-
-if (import.meta.env.DEV) {
-	const exhaustiveCheck: Record<string, never> = restOfCommonSlots
-}
-
-export const Title = memo<{ children: string | null | undefined }>(({ children }) => (
-	<MetaDirective name="title" content={children} />
-))
-
-function SlotWithStack<C extends ComponentType<PropsWithRequiredChildren>>(Component: C) {
-	const WrappedComponent = memo<Partial<StackOwnProps>>(({
-		direction = 'vertical',
-		gap = 'large',
-		...rest
-	}) => {
-		return createElement(
-			Component,
-			{
-				children: <Stack direction={direction} gap={gap} {...rest} />,
-			},
-		)
-	})
-	WrappedComponent.displayName = Component.displayName
-
-	return WrappedComponent
-}
-
-export const SidebarStack = SlotWithStack(Sidebar)
-export const ContentStack = SlotWithStack(Content)
+import { TitleSlot } from './Slots'
 
 const types = Object.keys(Layouts) as ReadonlyArray<keyof typeof Layouts>
 type LayoutTypes = typeof types[number]
@@ -53,8 +21,8 @@ export const Layout = (props: {
 	}, [])
 
 	return (
-		<LayoutSlotsProvider>
-			<MetaDirectivesConsumer>{({ layout, title }) => {
+		<>
+			<DirectivesConsumer>{({ layout, title }) => {
 				const LayoutComponent = Layouts[typeState ?? layout] ?? Layouts.default
 
 				if (title) {
@@ -71,7 +39,7 @@ export const Layout = (props: {
 						<LayoutComponent />
 					</>
 				)
-			}}</MetaDirectivesConsumer>
+			}}</DirectivesConsumer>
 			{props.children}
 			<div style={{ position: 'fixed', bottom: 0, right: 0, zIndex: 1000 }}>
 				<select value={typeState} onChange={useReferentiallyStableCallback((e: ChangeEvent<HTMLSelectElement>) => setTypeState(e.target.value as keyof typeof Layouts))}>
@@ -81,7 +49,7 @@ export const Layout = (props: {
 					))}
 				</select>
 			</div>
-		</LayoutSlotsProvider>
+		</>
 	)
 }
 

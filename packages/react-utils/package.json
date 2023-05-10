@@ -28,5 +28,9 @@
 	},
 	"peerDependencies": {
 		"react": "^17 || ^18"
+	},
+	"dependencies": {
+		"@contember/utilities": "workspace:*",
+		"deep-equal": "^2.2.0"
 	}
 }

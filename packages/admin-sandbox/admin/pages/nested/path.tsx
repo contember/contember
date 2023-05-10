@@ -1,6 +1,6 @@
 import { Section, SectionTabs, SectionTabsProvider, SelectFieldInner } from '@contember/admin'
-import { Actions, ContentStack, Sidebar, Title, TitleSlot } from '../../components/Layout'
-import { MetaDirective } from '../../components/MetaDirectives'
+import { Directive, Title } from '../../components/Directives'
+import { Actions, ContentStack, Sidebar, TitleSlot } from '../../components/Slots'
 
 export default function InnerFooPage() {
 	return (
@@ -8,7 +8,7 @@ export default function InnerFooPage() {
 			<Title>Nested Path</Title>
 			<TitleSlot><SectionTabs /></TitleSlot>
 
-			<MetaDirective name="layouts.cms.contentProps.maxWidth" content={720} />
+			<Directive name="layouts.cms.contentProps.maxWidth" content={720} />
 
 			<Actions>
 				<SelectFieldInner

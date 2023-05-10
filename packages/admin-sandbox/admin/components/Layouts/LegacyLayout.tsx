@@ -1,5 +1,5 @@
 import { ContemberLogoImage, DimensionsSwitcher, LayoutPage, Layout as LegacyLayout, Link, Logo } from '@contember/admin'
-import { CommonSlotTargets, commonSlotTargets, useLayoutSlotRegistryContext } from '@contember/cms-layout'
+import { CommonSlotTargets, commonSlotTargets, useLayoutSlotRegistryContext } from '@contember/layout'
 import { PropsWithChildren } from 'react'
 import { Navigation } from '../Navigation'
 

@@ -1,5 +1,6 @@
 import { MultiEditScope, PersistButton, TextField } from '@contember/admin'
-import { Actions, Content, Title } from '../components/Layout'
+import { Title } from '../components/Directives'
+import { Actions, Content } from '../components/Slots'
 
 export default () => (
 	<>

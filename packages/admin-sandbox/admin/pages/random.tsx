@@ -1,4 +1,4 @@
-import { Title } from '../components/Layout'
+import { Title } from '../components/Directives'
 
 export const foo = <Title>Hello from Foo</Title>
 export const fooBar = <Title>Hello from Foo Bar</Title>

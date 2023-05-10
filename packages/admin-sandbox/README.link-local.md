@@ -38,7 +38,7 @@ To debug with local version of Contember Admin:
 3. In your `index.sass`
   ```scss
   // Replace:
-  // @import '../node_modules/@contember/admin/dist/style.css'
+  // @import '../node_modules/@contember/admin/dist/index.css'
   // with:
   @import '/absolute/path/to/contember-admin/packages/admin/src/index.sass'
   ```

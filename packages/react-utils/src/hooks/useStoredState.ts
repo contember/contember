@@ -1,8 +1,8 @@
 import { useCallback, useState } from 'react'
 import { Serializable } from '../types'
 
-type SetState<V extends Serializable> = (value: V | ((current: V) => V)) => void;
-type ValueInitializer<V extends Serializable> = (storedValue: V | undefined) => V;
+export type SetState<V extends Serializable> = (value: V | ((current: V) => V)) => void;
+export type ValueInitializer<V extends Serializable> = (storedValue: V | undefined) => V;
 
 const createStoredStateHook = (getStorage: () => Storage) => {
 	return <V extends Serializable>(key: string, initializeValue: ValueInitializer<V>): [V, SetState<V>] => {

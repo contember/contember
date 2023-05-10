@@ -46,6 +46,9 @@ export function createViteConfig(packageName) {
 			},
 			plugins: [react()],
 			resolve: resolveConfig,
+			test: {
+				environment: 'jsdom',
+			},
 		}
 	})
 }

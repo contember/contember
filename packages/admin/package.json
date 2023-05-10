@@ -13,7 +13,8 @@
 				"default": "./dist/production/index.js"
 			}
 		},
-		"./style.css": "./dist/assets/style.css"
+		"./index.css": "./dist/assets/index.css",
+		"./style.css": "./dist/assets/index.css"
 	},
 	"files": [
 		"dist/",
@@ -29,7 +30,7 @@
 		"build": "yarn build:js:dev && yarn build:js:prod && yarn build:css",
 		"build:js:dev": "vite build --mode development",
 		"build:js:prod": "vite build --mode production",
-		"build:css": "sass --no-charset src/index.sass:dist/assets/style.css && yarn build:css:copy-fonts",
+		"build:css": "sass --no-charset src/index.sass:dist/assets/index.css && yarn build:css:copy-fonts",
 		"build:css:copy-fonts": "rm -rf \"dist/assets/Inter\" && cp -R \"../ui/src/assets/Inter\" \"dist/assets/Inter\"",
 		"pw:build": "vite build tests/playwright/admin",
 		"pw:preview": "vite preview tests/playwright/admin",
@@ -49,6 +50,7 @@
 		"@contember/react-multipass-rendering": "workspace:*",
 		"@contember/react-utils": "workspace:*",
 		"@contember/ui": "workspace:*",
+		"@contember/utilities": "workspace:*",
 		"@formatjs/icu-messageformat-parser": "2.0.11",
 		"@sindresorhus/slugify": "0.11.0",
 		"blueimp-md5": "2.18.0",
@@ -58,6 +60,7 @@
 		"intl-messageformat": "9.9.1",
 		"is-hotkey": "0.1.8",
 		"leaflet": "^1.9.2",
+		"lucide-react": "^0.108.0",
 		"path-to-regexp": "6.2.0",
 		"qrcode-generator": "^1.4.4",
 		"react-dropzone": "10.2.2",

@@ -1,6 +1,6 @@
 import { Component, Entity, EntityAccessor, EntityListAccessor } from '@contember/binding'
 import { Table, TableCell, TableProps, TableRow, TableRowProps } from '@contember/ui'
-import { memo, ReactElement, ReactNode } from 'react'
+import { ReactElement, ReactNode, memo } from 'react'
 import { DeleteEntityButton, EmptyMessage, EmptyMessageOuterProps } from '../../collections'
 import { LayoutRenderer, LayoutRendererProps } from '../LayoutRenderer'
 
@@ -42,14 +42,14 @@ export const ImmutableEntityListTablePageRenderer = Component(
 ) => ReactElement
 
 
-type TableContainerRendererProps =
+export type TableContainerRendererProps =
 	& TableProps
 	& EmptyMessageOuterProps
 	& {
 		accessor: EntityListAccessor
 		children: ReactNode
 	}
-const TableRenderer = Component(
+export const TableRenderer = Component(
 	({ accessor, children, ...props }: TableContainerRendererProps) => {
 		// TODO solve this via preferences
 		const isEmpty = !Array.from(accessor).some(entity => entity instanceof EntityAccessor && entity.existsOnServer)

@@ -1,7 +1,7 @@
 import classnames from 'classnames'
 import { forwardRef, memo, ReactNode } from 'react'
 import { useClassNamePrefix } from '../../auxiliary'
-import type { BoxDistinction, Default, Intent, NativeProps, Size } from '../../types'
+import type { BoxDistinction, Default, Intent, Size } from '../../types'
 import { toEnumViewClass, toStateClass, toThemeClass } from '../../utils'
 import { Stack, StackProps } from '../Stack'
 import { Label } from '../Typography/Label'
@@ -18,7 +18,7 @@ export interface BoxOwnProps {
 	padding?: Default | 'no-padding' | 'with-padding'
 }
 
-export interface BoxProps extends BoxOwnProps, Omit<NativeProps<HTMLDivElement>, 'children'> {}
+export interface BoxProps extends BoxOwnProps, Omit<JSX.IntrinsicElements['div'], 'children'> { }
 
 export const Box = memo(
 	forwardRef<HTMLDivElement, BoxProps>(

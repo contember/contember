@@ -5,7 +5,7 @@ import { defineConfig } from 'vite'
 /**
  * @returns {import('vite').UserConfigExport}
  */
-export function createViteCSSConfig({ input, output } = { input: 'src/index.css', output: 'dist/assets/style.css' }) {
+export function createViteCSSConfig({ input, output } = { input: 'src/index.css', output: 'dist/assets/index.css' }) {
 	const { dir, base: assetFileNames } = parse(output)
 
 	return defineConfig({

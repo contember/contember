@@ -1,5 +1,6 @@
 import { Button, MultiEditScope, PersistButton, Repeater, RepeaterItem, RepeaterItemProps, SelectField, TextField } from '@contember/admin'
-import { Actions, ContentStack, Title } from '../components/Layout'
+import { Title } from '../components/Directives'
+import { Actions, ContentStack } from '../components/Slots'
 
 const CustomRepeaterItem = (props: RepeaterItemProps) => {
 	return <>

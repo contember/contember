@@ -1,7 +1,7 @@
 import classNames from 'classnames'
 import { memo, ReactNode } from 'react'
 import { useClassNamePrefix } from '../../../auxiliary'
-import type { NativeProps, Size } from '../../../types'
+import type { Size } from '../../../types'
 import { toEnumClass, toEnumViewClass, toThemeClass } from '../../../utils'
 import { Stack, StackProps } from '../../Stack'
 import { Description } from '../../Typography/Description'
@@ -9,7 +9,7 @@ import { Label } from '../../Typography/Label'
 import { ErrorList, ErrorListProps } from '../ErrorList'
 import type { FieldContainerLabelPosition } from './Types'
 
-export interface FieldContainerProps extends ErrorListProps, Pick<NativeProps<HTMLDivElement>, 'className' | 'style'> {
+export interface FieldContainerProps extends ErrorListProps, Pick<JSX.IntrinsicElements['div'], 'className' | 'style'> {
 	children: ReactNode // The actual field
 	description?: ReactNode // Can explain e.g. the kinds of values to be filled
 	direction?: StackProps['direction']
@@ -59,12 +59,12 @@ export const FieldContainer = memo(
 			>
 				<LabelElement className={`${componentClassName}-label`}>
 					{(label || labelDescription) && <span className={`${componentClassName}-header`}>
-							{label && <Label>
-								{label}
-								<span className={`${componentClassName}-required-asterix ${toThemeClass('danger', 'danger')}`}>{required && '*'}</span>
-							</Label>}
-							{labelDescription && <Description>{labelDescription}</Description>}
-						</span>
+						{label && <Label>
+							{label}
+							<span className={`${componentClassName}-required-asterix ${toThemeClass('danger', 'danger')}`}>{required && '*'}</span>
+						</Label>}
+						{labelDescription && <Description>{labelDescription}</Description>}
+					</span>
 					}
 					{(children || (!isLabelInline && description)) && <div className={`${componentClassName}-body`}>
 						{children && <Stack

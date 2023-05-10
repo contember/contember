@@ -1,7 +1,6 @@
 import cn from 'classnames'
 import { memo, ReactNode } from 'react'
 import { useClassNamePrefix } from '../../../auxiliary'
-import type { NativeProps } from '../../../types'
 import { toStateClass } from '../../../utils'
 import { Stack } from '../../Stack'
 import { Heading } from '../../Typography/Heading'
@@ -12,7 +11,7 @@ export interface FieldSetOwnProps {
 	isActive?: boolean
 }
 
-export interface FieldSetProps extends FieldSetOwnProps, Omit<NativeProps<HTMLDivElement>, 'children'> {}
+export interface FieldSetProps extends FieldSetOwnProps, Omit<JSX.IntrinsicElements['div'], 'children'> { }
 
 export const FieldSet = memo(function FieldSet({
 	children,

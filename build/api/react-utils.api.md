@@ -94,8 +94,9 @@ export type Serializable = string | number | boolean | null | readonly Serializa
     readonly [K in string]?: Serializable;
 };
 
-// Warning: (tsdoc-param-tag-missing-hyphen) The @param block should be followed by a parameter name and then a hyphen
-//
+// @public (undocumented)
+export type SetState<V extends Serializable> = (value: V | ((current: V) => V)) => void;
+
 // @public
 export function unwrapRefValue<T>(value: RefObjectOrElement<T>): T | null;
 
@@ -189,9 +190,6 @@ export function useScrollOffsets(refOrElement: RefObjectOrElement<HTMLElement | 
     top: number;
 };
 
-// Warning: (ae-forgotten-export) The symbol "ValueInitializer" needs to be exported by the entry point index.d.ts
-// Warning: (ae-forgotten-export) The symbol "SetState" needs to be exported by the entry point index.d.ts
-//
 // @public (undocumented)
 export const useSessionStorageState: <V extends Serializable>(key: string, initializeValue: ValueInitializer<V>) => [V, SetState<V>];
 
@@ -205,6 +203,9 @@ export function useWindowSize(): {
     height: number;
     width: number;
 };
+
+// @public (undocumented)
+export type ValueInitializer<V extends Serializable> = (storedValue: V | undefined) => V;
 
 // (No @packageDocumentation comment for this package)
 

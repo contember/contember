@@ -52,7 +52,7 @@ export interface PoolStatus {
 	stats: PoolStats
 }
 
-export const poolStatsDescription =  {
+export const poolStatsDescription = {
 	connection_started_count: 'Total number of connection attempts when started.',
 	connection_established_count: 'Total number of established connections.',
 	connection_recoverable_error_count: 'Number of connections that failed on recoverable error (e.g. 53300) and retry was tried.',
@@ -305,6 +305,7 @@ class Pool {
 		this.log('Creating a new connection')
 		const client = this.clientFactory()
 		const poolConnection = new PoolConnection(client)
+
 		client.on('error', e => {
 			this.log('Client error on idle connection has occurred: ' + e.message)
 			this.poolConfig.logError(new ClientError(e, 'runtime error'))
@@ -315,6 +316,7 @@ class Pool {
 				this.disposeConnection(poolConnection)
 			}
 		})
+
 		try {
 			this.connectingCount++
 			this.remainingRateLimit--
@@ -323,19 +325,21 @@ class Pool {
 			await client.connect()
 
 			this.poolStats.connection_established_count++
-			this.log('Connection established')
 			this.connectingCount--
+
+			this.log('Connection established')
+
 			if (this.ended) {
-				await this.disposeConnection(poolConnection)
-				return
+				return this.disposeConnection(poolConnection)
 			}
+
+			this.handleAvailableConnection(poolConnection)
+			this.maybeCreateNew()
+
 		} catch (e: any) {
 			this.log('Connection error occurred: ' + e.message)
-			try {
-				await client.end()
-			} catch (e2: unknown) {
-				this.poolConfig.logError(new ClientError(e2, 'disposal error'))
-			}
+			this.disposeConnection(poolConnection)
+
 			if (
 				e.code === ClientErrorCodes.TOO_MANY_CONNECTIONS
 				|| e.code === ClientErrorCodes.CANNOT_CONNECT_NOW // server starting
@@ -350,6 +354,7 @@ class Pool {
 					this.log('Retrying')
 					this.maybeCreateNew()
 				}, this.poolConfig.reconnectIntervalMs)
+
 			} else {
 				this.poolStats.connection_error_count++
 				this.connectingCount--
@@ -365,7 +370,7 @@ class Pool {
 					this.poolConfig.logError(clientError)
 				}
 			}
-			return
+
 		} finally {
 			setTimeout(() => {
 				if (this.remainingRateLimit === 0) {
@@ -375,8 +380,6 @@ class Pool {
 				this.maybeCreateNew()
 			}, this.poolConfig.rateLimitPeriodMs)
 		}
-		this.handleAvailableConnection(poolConnection)
-		this.maybeCreateNew()
 	}
 
 	private createPendingItem(): Promise<PoolConnection> {
@@ -469,15 +472,21 @@ class Pool {
 	}
 
 	private async disposeConnection(connection: PoolConnection) {
-		try {
-			if (connection.disposed) {
-				throw new PoolError('Connection is already disposed')
-			}
-			connection.disposed = true
-			await connection.client.end()
-		} catch (e: any) {
-			this.poolConfig.logError(new ClientError(e, 'disposal error'))
+		if (connection.disposed) {
+			throw new PoolError('Connection is already disposed')
 		}
+		connection.disposed = true
+		const doEnd = async () => {
+			try {
+				await connection.client.end()
+			} catch (e: any) {
+				this.poolConfig.logError(new ClientError(e, 'disposal error'))
+			}
+		}
+		await Promise.race([
+			doEnd(),
+			new Promise(resolve => setTimeout(resolve, 5_000)),
+		])
 	}
 
 	private log(message: string) {

@@ -1,3 +1,13 @@
 import { createContext } from 'react'
 
-export const SessionTokenContext = createContext<string | undefined>(undefined)
+export interface SessionTokenContextValue {
+	propsToken: string | undefined
+	source: 'props' | 'localstorage' | undefined
+	token: string | undefined
+}
+
+export const SessionTokenContext = createContext<SessionTokenContextValue>({
+	propsToken: undefined,
+	source: undefined,
+	token: undefined,
+})

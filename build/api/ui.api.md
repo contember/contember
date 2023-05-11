@@ -509,6 +509,11 @@ export interface DescriptionProps {
 }
 
 // @public (undocumented)
+export const DevBar: ({ children }: {
+    children: ReactNode;
+}) => JSX.Element | null;
+
+// @public (undocumented)
 export function DevError(props: DevErrorProps): JSX.Element;
 
 // @public (undocumented)
@@ -550,6 +555,13 @@ export interface DevErrorProps extends DevErrorInnerProps {
     // (undocumented)
     source: string;
 }
+
+// @public (undocumented)
+export const DevPanel: ({ heading, children, preview }: {
+    heading: ReactNode;
+    children: ReactNode;
+    preview?: ReactNode;
+}) => JSX.Element;
 
 // @public (undocumented)
 export const DialogModal: MemoExoticComponent<({ bodyClassName, bodyProps, children, className, dividers, footer, footerClassName, footerProps, header, headerClassName, headerProps, layout, onClose, ...rest }: DialogModalProps) => JSX.Element>;

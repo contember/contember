@@ -8,6 +8,7 @@ import { IdentityProvider } from './Identity'
 import { NavigationProvider } from './NavigationProvider'
 import { projectEnvironmentExtension } from './Project'
 import { OutdatedApplicationChecker } from './Application/OutdatedApplicationChecker'
+import { ApplicationDevBar } from './Dev/DevBar'
 
 export interface ApplicationEntrypointProps extends ContemberClientProps {
 	basePath?: string
@@ -19,6 +20,7 @@ export interface ApplicationEntrypointProps extends ContemberClientProps {
 	envVariables?: Record<string, string>
 	children: ReactNode
 	onInvalidIdentity?: () => void
+	devBarPanels?: ReactNode
 }
 
 const validateProps = (props: Partial<ApplicationEntrypointProps>) => {
@@ -68,6 +70,7 @@ export const ApplicationEntrypoint = (props: ApplicationEntrypointProps) => {
 													<SectionTabsProvider>
 														{props.children}
 													</SectionTabsProvider>
+													<ApplicationDevBar panels={props.devBarPanels} />
 												</IdentityProvider>
 											</NavigationProvider>
 											<Toaster />

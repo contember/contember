@@ -1,54 +1,54 @@
-import { useReferentiallyStableCallback } from '@contember/react-utils'
-import { ChangeEvent, ReactNode, useEffect, useRef, useState } from 'react'
-import { DirectivesConsumer } from './Directives'
+import { ReactNode, useEffect, useMemo, useState } from 'react'
+import { Directive, useDirectives } from './Directives'
 import * as Layouts from './Layouts'
 import { TitleSlot } from './Slots'
+import { Button, DevPanel } from '@contember/admin'
 
 const types = Object.keys(Layouts) as ReadonlyArray<keyof typeof Layouts>
-type LayoutTypes = typeof types[number]
+export type LayoutTypes = typeof types[number]
 
 export const BREAKPOINT = 768
 
+
 export const Layout = (props: {
-	type?: LayoutTypes,
 	children?: ReactNode;
 }) => {
-	const [typeState, setTypeState] = useState(props.type)
-	const documentTitle = useRef(document.title)
+	const initialTitle = useMemo(() => document.title, [])
 
-	useEffect(() => () => {
-		document.title = documentTitle.current
-	}, [])
+	const { layout, title } = useDirectives()
+	const LayoutComponent = Layouts[layout ?? 'default']
+	useEffect(() => {
+		if (title) {
+			document.title = `${title} / ${initialTitle}`
+		} else {
+			document.title = initialTitle
+		}
+	}, [initialTitle, title])
 
 	return (
 		<>
-			<DirectivesConsumer>{({ layout, title }) => {
-				const LayoutComponent = Layouts[typeState ?? layout] ?? Layouts.default
-
-				if (title) {
-					if (document.title !== title) {
-						document.title = `${title} / ${documentTitle.current}`
-					}
-				} else {
-					document.title = documentTitle.current
-				}
-
-				return (
-					<>
-						<TitleSlot><h1>{title}</h1></TitleSlot>
-						<LayoutComponent />
-					</>
-				)
-			}}</DirectivesConsumer>
+			<TitleSlot><h1>{title}</h1></TitleSlot>
+			<LayoutComponent />
 			{props.children}
-			<div style={{ position: 'fixed', bottom: 0, right: 0, zIndex: 1000 }}>
-				<select value={typeState} onChange={useReferentiallyStableCallback((e: ChangeEvent<HTMLSelectElement>) => setTypeState(e.target.value as keyof typeof Layouts))}>
-					<option key="undefined" value="">Select layout...</option>
-					{Object.keys(Layouts).map(key => (
-						<option key={key} value={key}>{key}</option>
-					))}
-				</select>
-			</div>
+		</>
+	)
+}
+
+export const LayoutDevPanel = () => {
+	const [typeState, setTypeState] = useState<LayoutTypes>()
+	const [counter, setCounter] = useState(1)
+	const { layout } = useDirectives()
+	return (
+		<>
+			{typeState && <Directive name={'layout'} content={typeState} key={counter} />}
+			<DevPanel heading={`Layout: ${layout}`}>
+				{Object.keys(Layouts).map(key => (
+					<Button key={key} onClick={() => {
+						setTypeState(key as keyof typeof Layouts)
+						setCounter(it => it + 1)
+					}}>{key}</Button>
+				))}
+			</DevPanel>
 		</>
 	)
 }

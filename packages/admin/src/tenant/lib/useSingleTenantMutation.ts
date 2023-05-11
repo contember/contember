@@ -3,8 +3,19 @@ import { useCallback } from 'react'
 import { GQLVariableType, GQLVariableValues } from './variables'
 
 
-export type TenantMutationExecutor<VariableValues, Res extends TenantMutationResponse<any, string>> =
-	(variables: VariableValues, option?: { onResponse?: (response: any) => void }) => Promise<Res>
+export type TenantMutationExecutorOptions =
+	& {
+		onResponse?: (response: any) => void
+	}
+	& Omit<GraphQlClientRequestOptions, 'variables'>
+
+export type TenantMutationExecutor<
+	VariableValues,
+	Res extends TenantMutationResponse<any, string>
+> = (
+	variables: VariableValues,
+	option?: TenantMutationExecutorOptions
+) => Promise<Res>
 
 export const useSingleTenantMutation = <
 	Result,
@@ -25,7 +36,7 @@ export const useSingleTenantMutation = <
 				result: ${mutation}
 			}
 		`
-		const response = await client.sendRequest<{ data: { result: TenantMutationResponse<Result, ErrorCode> }, errors?: any }>(gql, { variables, ...options })
+		const response = await client.sendRequest<{ data: { result: TenantMutationResponse<Result, ErrorCode> }, errors?: any }>(gql, { variables, ...options, ...queryOptions })
 		queryOptions?.onResponse?.(response)
 		if (response.errors) {
 			throw response.errors

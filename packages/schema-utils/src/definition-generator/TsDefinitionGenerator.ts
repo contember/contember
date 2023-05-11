@@ -8,9 +8,8 @@ import {
 	resolveDefaultColumnType,
 } from '../model'
 import { PredicateDefinitionProcessor } from '../acl'
+import { Literal, printJsValue } from '../utils/printJsValue'
 
-type FormatterPath = ({ type: 'array' } | { type: 'object'; key: string })[]
-type IndentDecider = (value: any, path: FormatterPath) => boolean
 
 export class TsDefinitionGenerator {
 	private static reservedWords = new Set(['do', 'if', 'in', 'for', 'let', 'new', 'try', 'var', 'case', 'else', 'enum', 'eval', 'null', 'this', 'true', 'void', 'with', 'await', 'break', 'catch', 'class', 'const', 'false', 'super', 'throw', 'while', 'yield', 'delete', 'export', 'import', 'public', 'return', 'static', 'switch', 'typeof', 'default', 'extends', 'finally', 'package', 'private', 'continue', 'debugger', 'function', 'arguments', 'interface', 'protected', 'implements', 'instanceof'])
@@ -35,7 +34,7 @@ ${roles}${aclVariables}${enums}${entities}`
 
 	private generateRole({ name, values }: { name: string; values: Acl.RolePermissions }): string {
 		const { variables, entities, inherits, ...other } = values
-		return `\nexport const ${this.roleVarName(name)} = acl.createRole(${this.formatLiteral(name)}, ${this.formatLiteral(other)})\n`
+		return `\nexport const ${this.roleVarName(name)} = acl.createRole(${printJsValue(name)}, ${printJsValue(other)})\n`
 	}
 
 	private generateAclVariables(): string[] {
@@ -45,9 +44,9 @@ ${roles}${aclVariables}${enums}${entities}`
 			Object.entries(roleValues.variables).map(([variableName, variableValues]) => {
 				let variableDefinition = `\nexport const ${this.variableVarName(roleName, variableName)} = acl.`
 				if (variableValues.type === Acl.VariableType.predefined) {
-					variableDefinition += `createPredefinedVariable(${this.formatLiteral(variableName)}, ${this.formatLiteral(variableValues.value)}, ${this.roleVarName(roleName)})\n`
+					variableDefinition += `createPredefinedVariable(${printJsValue(variableName)}, ${printJsValue(variableValues.value)}, ${this.roleVarName(roleName)})\n`
 				} else if (variableValues.type === Acl.VariableType.entity) {
-					variableDefinition += `createEntityVariable(${this.formatLiteral(variableName)}, ${this.formatLiteral(variableValues.entityName)}, ${this.roleVarName(roleName)})\n`
+					variableDefinition += `createEntityVariable(${printJsValue(variableName)}, ${printJsValue(variableValues.entityName)}, ${this.roleVarName(roleName)})\n`
 				} else {
 					throw new Error(`Variable type ${variableValues.type} not yet supported`)
 				}
@@ -59,7 +58,7 @@ ${roles}${aclVariables}${enums}${entities}`
 	}
 
 	private generateEnum({ name, values }: { name: string; values: readonly string[] }): string {
-		return `\nexport const ${this.formatIdentifier(name)} = def.createEnum(${values.map(it => this.formatLiteral(it)).join(', ')})\n`
+		return `\nexport const ${this.formatIdentifier(name)} = def.createEnum(${values.map(it => printJsValue(it)).join(', ')})\n`
 	}
 
 	public generateEntity({ entity }: { entity: Model.Entity }): string {
@@ -78,19 +77,19 @@ ${Object.values(entity.fields).map(field => this.generateField({ field, entity }
 	private generateUniqueConstraint({ entity, constraint }: { entity: Model.Entity; constraint: Model.UniqueConstraint }): string {
 		const defaultName = NamingHelper.createUniqueConstraintName(entity.name, constraint.fields)
 		if (defaultName === constraint.name) {
-			const fieldsList = `${constraint.fields.map(it => this.formatLiteral(it)).join(', ')}`
+			const fieldsList = `${constraint.fields.map(it => printJsValue(it)).join(', ')}`
 			return `@def.Unique(${fieldsList})`
 		}
-		return `@def.Unique(${this.formatLiteral(constraint)})`
+		return `@def.Unique(${printJsValue(constraint)})`
 	}
 
 	private generateIndex({ entity, index }: { entity: Model.Entity; index: Model.Index }): string {
 		const defaultName = NamingHelper.createIndexName(entity.name, index.fields)
 		if (defaultName === index.name) {
-			const fieldsList = `${index.fields.map(it => this.formatLiteral(it)).join(', ')}`
+			const fieldsList = `${index.fields.map(it => printJsValue(it)).join(', ')}`
 			return `@def.Index(${fieldsList})`
 		}
-		return `@def.Index(${this.formatLiteral(index)})`
+		return `@def.Index(${printJsValue(index)})`
 	}
 
 	private generateEntityAcl({ entity }: { entity: Model.Entity }): string {
@@ -120,7 +119,7 @@ ${Object.values(entity.fields).map(field => this.generateField({ field, entity }
 							return ctx.value
 						},
 					})
-					aclOutput.push(`@acl.allow(${this.roleVarName(roleName)}, ${this.formatLiteral({ when, ...operations }, (val, path) => path.length === 0)})\n`)
+					aclOutput.push(`@acl.allow(${this.roleVarName(roleName)}, ${printJsValue({ when, ...operations }, (val, path) => path.length === 0)})\n`)
 				}
 			}
 			const trueOperations = this.getMatchingOperations({
@@ -129,7 +128,7 @@ ${Object.values(entity.fields).map(field => this.generateField({ field, entity }
 				numberOfEntityFieldsWithoutId,
 			})
 			if (Object.keys(trueOperations).length > 0) {
-				aclOutput.push(`@acl.allow(${this.roleVarName(roleName)}, ${this.formatLiteral({ ...trueOperations }, (val, path) => path.length === 0)})\n`)
+				aclOutput.push(`@acl.allow(${this.roleVarName(roleName)}, ${printJsValue({ ...trueOperations }, (val, path) => path.length === 0)})\n`)
 			}
 		}
 
@@ -177,7 +176,7 @@ ${Object.values(entity.fields).map(field => this.generateField({ field, entity }
 	public generateField({ entity, field }: { entity: Model.Entity; field: Model.AnyField }): string | undefined {
 		const formatRelationFactory = (method: string, relation: Model.AnyRelation) => {
 			const otherSide = isInverseRelation(relation) ? relation.ownedBy : relation.inversedBy
-			const otherSideFormatted = otherSide ? `, ${this.formatLiteral(otherSide)}` : ''
+			const otherSideFormatted = otherSide ? `, ${printJsValue(otherSide)}` : ''
 			return `${method}(${this.formatIdentifier(relation.target)}${otherSideFormatted})`
 		}
 		const formatEnumRef = (enumName: string, enumValues: Record<string, string>, providedValue?: string, defaultValue?: string): string | undefined => {
@@ -194,7 +193,7 @@ ${Object.values(entity.fields).map(field => this.generateField({ field, entity }
 		const formatOrderBy = (orderBy?: readonly Model.OrderBy[]) => {
 			return orderBy?.map(it => {
 				const enumExpr = formatEnumRef(`Model.OrderDirection`, Model.OrderDirection, it.direction, Model.OrderDirection.asc)
-				return `orderBy(${this.formatLiteral(it.path)}${enumExpr ? `, ${enumExpr}` : ''})`
+				return `orderBy(${printJsValue(it.path)}${enumExpr ? `, ${enumExpr}` : ''})`
 			}) ?? []
 		}
 		const formatOnDelete = (onDelete?: Model.OnDelete): string | undefined => {
@@ -211,7 +210,7 @@ ${Object.values(entity.fields).map(field => this.generateField({ field, entity }
 			if (defaultJoiningColumn === joiningColumnName) {
 				return undefined
 			}
-			return `joiningColumn(${this.formatLiteral(joiningColumnName)})`
+			return `joiningColumn(${printJsValue(joiningColumnName)})`
 		}
 		const definition = acceptFieldVisitor<(string | undefined)[]>(this.schema.model, entity, field, {
 			visitColumn: ctx => {
@@ -277,7 +276,7 @@ ${Object.values(entity.fields).map(field => this.generateField({ field, entity }
 				return [
 					formatRelationFactory('manyHasMany', relation),
 					...formatOrderBy(relation.orderBy),
-					Object.keys(joiningTable).length > 0 ? `joiningTable(${this.formatLiteral(joiningTable)})` : undefined,
+					Object.keys(joiningTable).length > 0 ? `joiningTable(${printJsValue(joiningTable)})` : undefined,
 				]
 			},
 			visitManyHasManyInverse: ({ relation }) => {
@@ -302,21 +301,21 @@ ${Object.values(entity.fields).map(field => this.generateField({ field, entity }
 			parts.push(`${ColumnToMethodMapping[column.type]}()`)
 			const defaultColumnType = resolveDefaultColumnType(column.type)
 			if (defaultColumnType !== column.columnType) {
-				parts.push(`columnType(${this.formatLiteral(column.columnType)})`)
+				parts.push(`columnType(${printJsValue(column.columnType)})`)
 			}
 		}
 		const defaultColumnName = this.conventions.getColumnName(column.name)
 		if (defaultColumnName !== column.columnName) {
-			parts.push(`columnName(${this.formatLiteral(column.columnName)})`)
+			parts.push(`columnName(${printJsValue(column.columnName)})`)
 		}
 		if (!column.nullable) {
 			parts.push('notNull()')
 		}
 		if (column.default !== undefined) {
-			parts.push(`default(${this.formatLiteral(column.default)})`)
+			parts.push(`default(${printJsValue(column.default)})`)
 		}
 		if (column.typeAlias) {
-			parts.push(`typeAlias(${this.formatLiteral(column.typeAlias)})`)
+			parts.push(`typeAlias(${printJsValue(column.typeAlias)})`)
 		}
 
 
@@ -331,66 +330,6 @@ ${Object.values(entity.fields).map(field => this.generateField({ field, entity }
 		return id
 	}
 
-	private formatLiteral(value: any, shouldIndentCb: IndentDecider = () => false, path: FormatterPath = []): string {
-		if (value instanceof Literal) {
-			return value.value
-		}
-		if (value === undefined || value === null || typeof value === 'boolean' || typeof value === 'number' || typeof value === 'function') {
-			return String(value)
-		}
-		if (typeof value === 'bigint') {
-			return value.toString(10) + 'n'
-		}
-		if (typeof value === 'string') {
-			return `'${value.replaceAll(/'/g, '\\\'')}'`
-		}
-		const shouldIndent = shouldIndentCb(value, path)
-		if (!shouldIndent) {
-			shouldIndentCb = () => false
-		}
-		const formatIndent = (inc: number) => '\t'.repeat(path.length + inc)
-
-		const elementPreIndent = shouldIndent ? `\n${formatIndent(1)}` : ''
-
-		if (Array.isArray(value)) {
-			return  ''
-				+ '['
-				+ value.map((it, index, arr) =>
-					elementPreIndent
-					+ this.formatLiteral(it, shouldIndentCb, [...path, { type: 'array' }])
-					+ (shouldIndent ? ',' : ((index + 1) < arr.length ? ', ' : '')),
-				).join('')
-				+ (shouldIndent ? `\n${formatIndent(0)}` : ' ')
-				+ ']'
-		}
-
-		return ''
-			+ '{'
-			+ (shouldIndent ? '' : ' ')
-			+ Object.entries(value).map(([key, value], index, arr) => {
-				const formattedKey = this.isSimpleIdentifier(key) ? key : `[${this.formatLiteral(key)}]`
-				return ''
-					+ elementPreIndent
-					+ formattedKey
-					+ ': '
-					+ this.formatLiteral(value)
-					+ (shouldIndent ? ',' : ((index + 1) < arr.length ? ', ' : ''))
-			}).join('')
-			+ (shouldIndent ? `\n${formatIndent(0)}` : ' ')
-			+ '}'
-
-	}
-
-	private isValidIdentifier(identifier: string): boolean {
-		if (!this.isSimpleIdentifier(identifier)) {
-			return false
-		}
-		return !TsDefinitionGenerator.reservedWords.has(identifier)
-	}
-
-	private isSimpleIdentifier(identifier: string): boolean {
-		return !!identifier.match(/^[_$a-zA-Z\xA0-\uFFFF][_$a-zA-Z0-9\xA0-\uFFFF]*$/)
-	}
 
 	private roleVarName(id: string): string {
 		return this.formatIdentifier(`${id}Role`)
@@ -401,10 +340,6 @@ ${Object.values(entity.fields).map(field => this.generateField({ field, entity }
 	}
 }
 
-class Literal {
-	constructor(public readonly value: string) {
-	}
-}
 
 const ColumnToMethodMapping: {
 	[K in Exclude<Model.ColumnType, Model.ColumnType.Enum>]: string

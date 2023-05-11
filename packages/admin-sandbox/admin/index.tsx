@@ -13,27 +13,25 @@ import { Layout, LayoutDevPanel } from './components/Layout'
 import './index.sass'
 
 runReactApp(
-	<ApplicationEntrypoint
-		apiBaseUrl={import.meta.env.VITE_CONTEMBER_ADMIN_API_BASE_URL as string}
-		sessionToken={import.meta.env.VITE_CONTEMBER_ADMIN_SESSION_TOKEN as string}
-		project={'admin-sandbox'}
-		stage={'live'}
-		basePath={import.meta.env.BASE_URL}
-		devBarPanels={<>
-			<LayoutDevPanel />
-		</>}
-		children={
-			<DataBindingProvider stateComponent={FeedbackRenderer}>
-				<DirectivesProvider>
+	<DirectivesProvider>
+		<ApplicationEntrypoint
+			apiBaseUrl={import.meta.env.VITE_CONTEMBER_ADMIN_API_BASE_URL as string}
+			sessionToken={import.meta.env.VITE_CONTEMBER_ADMIN_SESSION_TOKEN as string}
+			project={'admin-sandbox'}
+			stage={'live'}
+			basePath={import.meta.env.BASE_URL}
+			devBarPanels={<>
+				<LayoutDevPanel />
+			</>}
+			children={
+				<DataBindingProvider stateComponent={FeedbackRenderer}>
 					<LayoutSlotsProvider>
-						<Layout>
-							<Pages children={import.meta.glob<PageModule>('./pages/**/*.tsx')} />
-						</Layout>
+						<Pages children={import.meta.glob<PageModule>('./pages/**/*.tsx')} layout={Layout} />
 					</LayoutSlotsProvider>
-				</DirectivesProvider>
-			</DataBindingProvider>
-		}
-	/>,
+				</DataBindingProvider>
+			}
+		/>
+	</DirectivesProvider>,
 	null,
 	(dom, react, onRecoverableError) => createRoot(dom, { onRecoverableError }).render(react),
 )

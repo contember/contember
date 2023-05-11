@@ -11,13 +11,16 @@ import { Label } from '../Typography/Label'
 export interface RepeaterItemContainerProps {
 	gap?: Size
 	label?: ReactNode
+	index?: number
 	actions?: ReactNode
 	children: ReactNode
 	dragHandleComponent?: ComponentType<{ children: ReactNode }>
 }
 
-export const RepeaterItemContainer = memo(({ actions, children, gap, label, dragHandleComponent: Handle }: RepeaterItemContainerProps) => {
-	const componentClassName = `${useClassNamePrefix()}repeater-item-container`
+const repeaterItemContainerCls = `repeater-item-container`
+
+export const RepeaterItemContainer = memo(({ actions, children, gap, label, dragHandleComponent: Handle, index }: RepeaterItemContainerProps) => {
+	const componentClassName = `${useClassNamePrefix()}${repeaterItemContainerCls}`
 
 	return (
 		<Box
@@ -34,16 +37,7 @@ export const RepeaterItemContainer = memo(({ actions, children, gap, label, drag
 					</Handle>
 				</div>
 			)}
-			{(label || actions) && <div className={`${componentClassName}-header`}>
-				{label && (
-					<div className={`${componentClassName}-label`}>
-						<Label>
-							{label}
-						</Label>
-					</div>
-				)}
-				{actions && <div className={`${componentClassName}-actions`}>{actions}</div>}
-			</div>}
+			<RepeaterItemContainerHeader index={index} label={label} actions={actions} />
 			<Stack
 				className={`${componentClassName}-content`}
 				direction="vertical"
@@ -55,3 +49,32 @@ export const RepeaterItemContainer = memo(({ actions, children, gap, label, drag
 	)
 })
 RepeaterItemContainer.displayName = 'RepeaterItemContainer'
+
+
+export type RepeaterItemContainerHeaderProps = Pick<RepeaterItemContainerProps, 'index' | 'label' | 'actions'>
+
+export const RepeaterItemContainerHeader = memo(({ label, actions, index }: RepeaterItemContainerHeaderProps) => {
+	const componentClassName = `${useClassNamePrefix()}${repeaterItemContainerCls}`
+
+	if (!label && !actions && index === undefined) {
+		return null
+	}
+
+	return (
+		<div className={`${componentClassName}-header`}>
+			{(label || index !== undefined) && (
+				<div className={`${componentClassName}-label`}>
+					<Label>
+						{label}{label ? ' ' : ''}
+						{index !== undefined && (
+							<span className={`${componentClassName}-index`}>{index + 1}</span>
+						)}
+					</Label>
+				</div>
+			)}
+			{actions && (
+				<div className={`${componentClassName}-actions`}>{actions}</div>
+			)}
+		</div>
+	)
+})

@@ -2022,7 +2022,13 @@ export interface RenderDialogContentProps<Result> {
 }
 
 // @public (undocumented)
-export const RepeaterItemContainer: MemoExoticComponent<({ actions, children, gap, label, dragHandleComponent: Handle }: RepeaterItemContainerProps) => JSX.Element>;
+export const RepeaterItemContainer: MemoExoticComponent<({ actions, children, gap, label, dragHandleComponent: Handle, index }: RepeaterItemContainerProps) => JSX.Element>;
+
+// @public (undocumented)
+export const RepeaterItemContainerHeader: MemoExoticComponent<({ label, actions, index }: RepeaterItemContainerHeaderProps) => JSX.Element | null>;
+
+// @public (undocumented)
+export type RepeaterItemContainerHeaderProps = Pick<RepeaterItemContainerProps, 'index' | 'label' | 'actions'>;
 
 // @public (undocumented)
 export interface RepeaterItemContainerProps {
@@ -2036,6 +2042,8 @@ export interface RepeaterItemContainerProps {
     }>;
     // (undocumented)
     gap?: Size;
+    // (undocumented)
+    index?: number;
     // (undocumented)
     label?: ReactNode;
 }

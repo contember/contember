@@ -5,7 +5,7 @@ import { RoutingLinkTarget, useRedirect } from '../../../routing'
 import { useForm } from '../../lib'
 import { useDisableOtp } from '../../mutations'
 
-interface DisableOtpFormProps {
+export interface DisableOtpFormProps {
 	onSuccess?: () => void
 	redirectOnSuccess?: RoutingLinkTarget
 }

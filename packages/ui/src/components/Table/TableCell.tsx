@@ -14,6 +14,9 @@ export interface TableCellProps {
 	colSpan?: number
 }
 
+/**
+ * @group UI
+ */
 export const TableCell = memo(({ shrunk = false, numeric = false, ...props }: TableCellProps) => {
 	const useTableElement = useContext(UseTableElementContext)
 	const className = cn(

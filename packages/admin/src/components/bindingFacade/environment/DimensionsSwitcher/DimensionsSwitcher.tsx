@@ -30,6 +30,9 @@ const DimensionsStateRenderer = (props: DataBindingStateComponentProps) => {
 	return <Spinner />
 }
 
+/**
+ * @group Dimensions
+ */
 export const DimensionsSwitcher = memo((props: DimensionsSwitcherProps) => {
 	const minItems = props.minItems === undefined ? 1 : props.minItems
 	const maxItems = props.maxItems === undefined ? 2 : props.maxItems

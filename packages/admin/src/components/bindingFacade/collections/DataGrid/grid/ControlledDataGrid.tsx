@@ -25,7 +25,26 @@ export type ControlledDataGridProps<ComponentExtraProps extends {}> =
 		}
 	)
 
-
+/**
+ * Supplementary DataGrid component for advanced use. Using this component, you can access and modify internal state such as filters or pagination. Use this component together with a {@link useDataGrid} hook.
+ *
+ * @example
+ * ```
+ * const dataGrid = useDataGrid({
+ *   entities: "Article",
+ * })
+ * const applyFilter = () => {
+ *     dataGrid.stateMethods.setFilter('title', myFilter)
+ * }
+ * <ControlledDataGrid {...dataGrid}>
+ *   <TextCell header="Title" field="title" />
+ *   <TextCell header="Author" field="author.name" />
+ * </ControlledDataGrid>
+ * ```
+ *
+ *
+ * @group Data grid
+ */
 export const ControlledDataGrid = Component(
 	<ComponentProps extends {}>({ state, stateMethods, ...props }: ControlledDataGridProps<ComponentProps>) => {
 		const containerProps: DataGridContainerPublicProps = useMemo(

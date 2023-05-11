@@ -14,6 +14,9 @@ export type AutoFieldProps = {
 	excludedEntities?: string[]
 }
 
+/**
+ * @group Auto Admin
+ */
 export const AutoField = Component<AutoFieldProps>(
 	({ schema, entityName, fieldName, createEditLink, excludedEntities }) => {
 		const field = schema.getEntityField(entityName, fieldName)

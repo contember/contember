@@ -10,6 +10,9 @@ export interface AddNewBlockButtonInnerProps extends DropdownRenderProps, Create
 	isMutating: boolean
 }
 
+/**
+ * @internal
+ */
 export const AddNewBlockButtonInner = memo<AddNewBlockButtonInnerProps>(props => {
 	const desugaredDiscriminationField = useDesugaredRelativeSingleField(props.discriminationField)
 	return (

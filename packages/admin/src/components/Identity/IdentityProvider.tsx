@@ -36,17 +36,17 @@ export interface IdentityProject {
 	roles: string[]
 }
 
-interface IdentityContext {
+export interface IdentityContextValue {
 	clearIdentity: () => void
 	identity: Identity
 }
 
-export const IdentityContext = createContext<IdentityContext | undefined>(undefined)
+export const IdentityContext = createContext<IdentityContextValue | undefined>(undefined)
 export const IdentityRefreshContext = createContext<(() => void)>(() => {
 	throw new Error('IdentityRefreshContext is not initialized')
 })
 
-interface IdentityProviderProps {
+export interface IdentityProviderProps {
 	children: ReactNode
 	onInvalidIdentity?: () => void
 	allowUnauthenticated?: boolean

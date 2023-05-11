@@ -10,6 +10,9 @@ export type EditUserPageProps = {
 	userListLink?: RoutingLinkTarget
 }
 
+/**
+ * @group Tenant
+ */
 export const EditUserPage: FC<EditUserPageProps> = memo(
 	({ rolesConfig, identityId, userListLink = 'tenantUsers' }) => {
 		const project = useProjectSlug()

@@ -1,13 +1,26 @@
 import { Component } from '@contember/binding'
 import type { ReactElement } from 'react'
-import type { StockImageFileKindProps } from '../../fileKinds'
 import { getStockImageFileKind } from '../../fileKinds'
 import { PublicSingleKindFileRepeaterProps, SingleKindFileRepeater } from '../../internalComponents'
+import { ImageFileDataExtractorProps } from '../../fileDataExtractors'
 
 export type ImageFileRepeaterProps<AcceptArtifacts = unknown, SFExtraProps extends {} = {}> =
 	& PublicSingleKindFileRepeaterProps<AcceptArtifacts, SFExtraProps>
-	& StockImageFileKindProps<AcceptArtifacts>
+	& ImageFileDataExtractorProps
 
+/**
+ * @example
+ * ```
+ * <ImageFileRepeater
+ *   field="images"
+ *   urlField="image.url"
+ *   label="Gallery"
+ *   sortableBy="order"
+ * />
+ * ```
+ *
+ * @group Uploads
+ */
 export const ImageFileRepeater = Component<ImageFileRepeaterProps>(
 	props => (
 		<SingleKindFileRepeater {...props} kindFactory={getStockImageFileKind} />

@@ -10,6 +10,9 @@ export interface UsersListProps {
 	editUserLink: RoutingLinkTarget
 }
 
+/**
+ * @group Tenant
+ */
 export const UsersList = memo<UsersListProps>(({ editUserLink, ...props }) => (
 	<MemberList
 		{...props}

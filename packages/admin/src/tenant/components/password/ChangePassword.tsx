@@ -9,6 +9,9 @@ const initialValues = {
 	newPasswordAgain: '',
 }
 
+/**
+ * @group Tenant
+ */
 export const ChangePassword: FC<{}> = ({ }) => {
 	const changePassword = useChangePassword()
 	const addToast = useShowToast()

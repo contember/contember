@@ -39,6 +39,9 @@ export type RichTextRendererProps<
 	renderBlock?: ComponentType<{ block: unknown, children?: ReactNode }>
 } & (RichTextRendererFieldProps | RichTextRendererBlockProps<CustomElements, CustomLeaves>)
 
+/**
+ * @group Content rendering
+ */
 export const RichTextRenderer = memo(function RichTextRenderer<
 	CustomElements extends RichTextElement = never,
 	CustomLeaves extends RichTextLeaf = never,

@@ -20,6 +20,9 @@ export type HasManyProps<ListProps = never, EntityProps = never> = SugaredRelati
 		  }
 	)
 
+/**
+ * @group Data binding
+ */
 export const HasMany = Component(
 	<ListProps, EntityProps>(props: HasManyProps<ListProps, EntityProps>) => {
 		const entityList = useEntityList(props)

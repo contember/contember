@@ -7,6 +7,9 @@ export type AutoLabelProps = {
 	createLink?: (entity: string) => RoutingLinkTarget
 }
 
+/**
+ * @group Auto Admin
+ */
 export const AutoLabel = Component<AutoLabelProps>(
 	({ field, createLink }, env) => {
 		const entity = env.getSubTreeNode().entity

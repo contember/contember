@@ -21,6 +21,10 @@
 			"ae-missing-release-tag": {
 				"logLevel": "none",
 				"addToApiReportFile": false
+			},
+			"ae-internal-missing-underscore": {
+				"logLevel": "none",
+				"addToApiReportFile": false
 			}
 		}
 	},

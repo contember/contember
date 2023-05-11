@@ -11,6 +11,9 @@ export type AutoFormProps = {
 	createEditLink?: (entity: string) => RoutingLinkTarget
 }
 
+/**
+ * @group Auto Admin
+ */
 export const AutoForm = Component<AutoFormProps>(
 	({ entity, id, onCreateSuccess, createEditLink }) => {
 		if (id === undefined) {

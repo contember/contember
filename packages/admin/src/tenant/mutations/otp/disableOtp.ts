@@ -12,11 +12,11 @@ disableOtp {
 
 const disableOtpVariables = {}
 
-type ConfirmOtpErrors =
+export type DisableOtpErrors =
 	| 'OTP_NOT_ACTIVE'
 
 export const useDisableOtp = () => {
-	return useSingleTenantMutation<never, ConfirmOtpErrors, typeof disableOtpVariables>(
+	return useSingleTenantMutation<never, DisableOtpErrors, typeof disableOtpVariables>(
 		DisableOtpMutation,
 		disableOtpVariables,
 	)

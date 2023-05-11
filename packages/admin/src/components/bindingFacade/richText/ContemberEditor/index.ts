@@ -20,6 +20,8 @@ import {
 	topLevelNodes,
 } from './methods'
 
+export type { ElementDataAttributes } from './methods'
+
 // TODO use export * as ContemberEditor from './methods' once the tooling is ready.
 export const ContemberEditor = {
 	addMarks,

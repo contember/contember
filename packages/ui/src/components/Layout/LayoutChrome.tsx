@@ -30,6 +30,9 @@ export interface LayoutChromeProps extends ThemeScheme {
 
 const PREVENT_HAPPENED_RECENTLY = 100
 
+/**
+ * @group Layout UI
+ */
 export const LayoutChrome = memo(({
 	children,
 	navigation,

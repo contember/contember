@@ -4525,25 +4525,25 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@microsoft/api-extractor-model@npm:7.26.4":
-  version: 7.26.4
-  resolution: "@microsoft/api-extractor-model@npm:7.26.4"
+"@microsoft/api-extractor-model@npm:7.26.8":
+  version: 7.26.8
+  resolution: "@microsoft/api-extractor-model@npm:7.26.8"
   dependencies:
     "@microsoft/tsdoc": 0.14.2
     "@microsoft/tsdoc-config": ~0.16.1
-    "@rushstack/node-core-library": 3.55.2
-  checksum: 0b27f9b248396422f3044f2472d86c111a6a4d34b4fd2c67d9995e96e5b144ec41ac35dbf2a005f144766814b824518bc42b424d93e3075d3dc1b17c2f8791d6
+    "@rushstack/node-core-library": 3.58.0
+  checksum: ce1bafefbfad59d16a7d4bbc24702cae42910f286c45d50a60758f4318db594c3e6c8cf5fd2145668cd14f1364f84927781788d1fd45840e443156dde15d0553
   languageName: node
   linkType: hard
 
-"@microsoft/api-extractor@npm:^7.34.4":
-  version: 7.34.4
-  resolution: "@microsoft/api-extractor@npm:7.34.4"
+"@microsoft/api-extractor@npm:^7.34.8":
+  version: 7.34.8
+  resolution: "@microsoft/api-extractor@npm:7.34.8"
   dependencies:
-    "@microsoft/api-extractor-model": 7.26.4
+    "@microsoft/api-extractor-model": 7.26.8
     "@microsoft/tsdoc": 0.14.2
     "@microsoft/tsdoc-config": ~0.16.1
-    "@rushstack/node-core-library": 3.55.2
+    "@rushstack/node-core-library": 3.58.0
     "@rushstack/rig-package": 0.3.18
     "@rushstack/ts-command-line": 4.13.2
     colors: ~1.2.1
@@ -4554,7 +4554,7 @@ __metadata:
     typescript: ~4.8.4
   bin:
     api-extractor: bin/api-extractor
-  checksum: 855a04237e30f425553aab661b77bc0cbeb493510d769691d713e5bfdf02439fa7bc2076750271d154237f8c9d4451b209f30724c9ee2a2c4ea307c5db093d42
+  checksum: 2757a080032788642c9659e7fffc0d0dda7fd29d023ce548760a08fc0569f025f22b84e38061cf61e3570c5ab5298d4178e9d36b78cd8fc75ffd2893485b32f7
   languageName: node
   linkType: hard
 
@@ -6090,9 +6090,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@rushstack/node-core-library@npm:3.55.2":
-  version: 3.55.2
-  resolution: "@rushstack/node-core-library@npm:3.55.2"
+"@rushstack/node-core-library@npm:3.58.0":
+  version: 3.58.0
+  resolution: "@rushstack/node-core-library@npm:3.58.0"
   dependencies:
     colors: ~1.2.1
     fs-extra: ~7.0.1
@@ -6106,7 +6106,7 @@ __metadata:
   peerDependenciesMeta:
     "@types/node":
       optional: true
-  checksum: b6b289315cd6a3544471f534405479b7c80f3906b7506590d5eb83a605a0a5b65861bf678f3e6c2277c8db116b8e05f8e7b6864fdc75e0f1514c9ff224b83fe6
+  checksum: b116ae3830e93c7391a65eea88d2b323dbf4ddb9d88363b8a77e85bf8baf67c26fa4bcd9608d07b858910af2cce95b10b68468e5c6d7b1b5fef70474c92de3e5
   languageName: node
   linkType: hard
 
@@ -8350,6 +8350,13 @@ __metadata:
   version: 5.0.1
   resolution: "ansi-regex@npm:5.0.1"
   checksum: 2aa4bb54caf2d622f1afdad09441695af2a83aa3fe8b8afa581d205e57ed4261c183c4d3877cee25794443fde5876417d859c108078ab788d6af7e4fe52eb66b
+  languageName: node
+  linkType: hard
+
+"ansi-sequence-parser@npm:^1.1.0":
+  version: 1.1.0
+  resolution: "ansi-sequence-parser@npm:1.1.0"
+  checksum: 75f4d3a4c555655a698aec05b5763cbddcd16ccccdbfd178fb0aa471ab74fdf98e031b875ef26e64be6a95cf970c89238744b26de6e34af97f316d5186b1df53
   languageName: node
   linkType: hard
 
@@ -13583,6 +13590,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"lunr@npm:^2.3.9":
+  version: 2.3.9
+  resolution: "lunr@npm:2.3.9"
+  checksum: 176719e24fcce7d3cf1baccce9dd5633cd8bdc1f41ebe6a180112e5ee99d80373fe2454f5d4624d437e5a8319698ca6837b9950566e15d2cae5f2a543a3db4b8
+  languageName: node
+  linkType: hard
+
 "lz-string@npm:^1.4.4":
   version: 1.5.0
   resolution: "lz-string@npm:1.5.0"
@@ -13675,6 +13689,15 @@ __metadata:
   peerDependencies:
     react: ">= 0.14.0"
   checksum: ea417e684d7eec9f1beebc9423aba377116ef77c3cd83a2d622df1b9030ffef99aa9b3f431192b94f3237943a33560e6dda9be8a4c1d25187518d09986dad22f
+  languageName: node
+  linkType: hard
+
+"marked@npm:^4.3.0":
+  version: 4.3.0
+  resolution: "marked@npm:4.3.0"
+  bin:
+    marked: bin/marked.js
+  checksum: 0db6817893952c3ec710eb9ceafb8468bf5ae38cb0f92b7b083baa13d70b19774674be04db5b817681fa7c5c6a088f61300815e4dd75a59696f4716ad69f6260
   languageName: node
   linkType: hard
 
@@ -13836,6 +13859,15 @@ __metadata:
   dependencies:
     brace-expansion: ^2.0.1
   checksum: 7564208ef81d7065a370f788d337cd80a689e981042cb9a1d0e6580b6c6a8c9279eba80010516e258835a988363f99f54a6f711a315089b8b42694f5da9d0d77
+  languageName: node
+  linkType: hard
+
+"minimatch@npm:^9.0.0":
+  version: 9.0.0
+  resolution: "minimatch@npm:9.0.0"
+  dependencies:
+    brace-expansion: ^2.0.1
+  checksum: 7bd57899edd1d1b0560f50b5b2d1ea4ad2a366c5a2c8e0a943372cf2f200b64c256bae45a87a80915adbce27fa36526264296ace0da57b600481fe5ea3e372e5
   languageName: node
   linkType: hard
 
@@ -16145,7 +16177,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "root-workspace-0b6124@workspace:."
   dependencies:
-    "@microsoft/api-extractor": ^7.34.4
+    "@microsoft/api-extractor": ^7.34.8
     "@types/classnames": 2.2.10
     "@types/react": ^18
     "@types/react-dom": ^18
@@ -16167,6 +16199,7 @@ __metadata:
     sass: 1.49.11
     tsm: 2.2.1
     tsx: 3.2.1
+    typedoc: ^0.24.4
     typescript: ^5.0.4
     vite: ^4.3.2
     vitest: ^0.30.1
@@ -16468,6 +16501,18 @@ __metadata:
   bin:
     shjs: bin/shjs
   checksum: 7babc46f732a98f4c054ec1f048b55b9149b98aa2da32f6cf9844c434b43c6251efebd6eec120937bd0999e13811ebd45efe17410edb3ca938f82f9381302748
+  languageName: node
+  linkType: hard
+
+"shiki@npm:^0.14.1":
+  version: 0.14.2
+  resolution: "shiki@npm:0.14.2"
+  dependencies:
+    ansi-sequence-parser: ^1.1.0
+    jsonc-parser: ^3.2.0
+    vscode-oniguruma: ^1.7.0
+    vscode-textmate: ^8.0.0
+  checksum: f2a14302b1803617e3ff1b751a5c87b4af4ad15214dc00e9215402e42940a84a0b956cf55d628f25dbf1296b18e277b8529571cd9359b971ac599a0ab11303e7
   languageName: node
   linkType: hard
 
@@ -17472,6 +17517,22 @@ __metadata:
   languageName: node
   linkType: hard
 
+"typedoc@npm:^0.24.4":
+  version: 0.24.7
+  resolution: "typedoc@npm:0.24.7"
+  dependencies:
+    lunr: ^2.3.9
+    marked: ^4.3.0
+    minimatch: ^9.0.0
+    shiki: ^0.14.1
+  peerDependencies:
+    typescript: 4.6.x || 4.7.x || 4.8.x || 4.9.x || 5.0.x
+  bin:
+    typedoc: bin/typedoc
+  checksum: 9ae433566cb02b96deb9eb2a9f5b23d1b199f5aeb61ca8c7e2653ff5d339fbfb4d526e024febab4f3278332978814aaa0885f1d5925ba21a441d93a611510ac3
+  languageName: node
+  linkType: hard
+
 "typescript@npm:^5.0.4":
   version: 5.0.4
   resolution: "typescript@npm:5.0.4"
@@ -18088,6 +18149,20 @@ __metadata:
   bin:
     vitest: vitest.mjs
   checksum: 68e33226dde914600270df9834bdc1f45fd225250051c046c9bc53ca51b8e0bf76dee29a5cf1a51a4c1524f00c414f81764bb463734bdcc9c3f483f2140ec516
+  languageName: node
+  linkType: hard
+
+"vscode-oniguruma@npm:^1.7.0":
+  version: 1.7.0
+  resolution: "vscode-oniguruma@npm:1.7.0"
+  checksum: 53519d91d90593e6fb080260892e87d447e9b200c4964d766772b5053f5699066539d92100f77f1302c91e8fc5d9c772fbe40fe4c90f3d411a96d5a9b1e63f42
+  languageName: node
+  linkType: hard
+
+"vscode-textmate@npm:^8.0.0":
+  version: 8.0.0
+  resolution: "vscode-textmate@npm:8.0.0"
+  checksum: 127780dfea89559d70b8326df6ec344cfd701312dd7f3f591a718693812b7852c30b6715e3cfc8b3200a4e2515b4c96f0843c0eacc0a3020969b5de262c2a4bb
   languageName: node
   linkType: hard
 

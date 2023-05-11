@@ -15,6 +15,9 @@ import { useActiveMenuItemContext } from './useActiveMenuItem'
 import { useKeyNavigation } from './useKeyNavigation'
 import { useMenuId } from './useMenuId'
 
+/**
+ * @group UI
+ */
 export function MenuItem<T = unknown>({ children, ...props }: MenuItemProps<T>) {
 	const depth = useContext(DepthContext)
 

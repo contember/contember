@@ -1,7 +1,7 @@
 import classnames from 'classnames'
 import { forwardRef, memo, ReactNode } from 'react'
 import { useClassNamePrefix } from '../../auxiliary'
-import type { BoxDistinction, Default, Intent, Size } from '../../types'
+import type { BoxDistinction, Default, HTMLDivElementProps, Intent, Size } from '../../types'
 import { toEnumViewClass, toStateClass, toThemeClass } from '../../utils'
 import { Stack, StackProps } from '../Stack'
 import { Label } from '../Typography/Label'
@@ -18,54 +18,62 @@ export interface BoxOwnProps {
 	padding?: Default | 'no-padding' | 'with-padding'
 }
 
-export interface BoxProps extends BoxOwnProps, Omit<JSX.IntrinsicElements['div'], 'children'> { }
+export type BoxProps =
+	& BoxOwnProps
+	& HTMLDivElementProps
 
-export const Box = memo(
-	forwardRef<HTMLDivElement, BoxProps>(
-		({
-			actions,
-			children,
-			className,
-			direction = 'vertical',
-			distinction,
-			gap = 'small',
-			heading,
-			intent,
-			isActive,
-			padding,
-			...divProps
-		}: BoxProps, ref) => {
-			const componentClassName = `${useClassNamePrefix()}box`
+/**
+ * The `Box` component is a container that can be used to wrap other components.
+ *
+ * @example
+ * ```
+ * <Box />
+ * ```
+ *
+ * @group UI
+ */
+export const Box = memo(forwardRef<HTMLDivElement, BoxProps>(({
+	actions,
+	children,
+	className,
+	direction = 'vertical',
+	distinction,
+	gap = 'small',
+	heading,
+	intent,
+	isActive,
+	padding,
+	...divProps
+}: BoxProps, ref) => {
+	const componentClassName = `${useClassNamePrefix()}box`
 
-			return (
-				<div
-					{...divProps}
-					className={classnames(
-						componentClassName,
-						toStateClass('active', isActive),
-						toEnumViewClass(distinction),
-						toThemeClass(intent, intent),
-						toEnumViewClass(padding),
-						className,
-					)}
-					ref={ref}
-				>
-					<Stack gap={gap} direction={direction}>
-						{(heading || actions) && (
-							<div className={`${componentClassName}-header`}>
-								{heading && <Label>{heading}</Label>}
-								{actions && (
-									<div className={`${componentClassName}-actions`} contentEditable={false}>
-										{actions}
-									</div>
-								)}
+	return (
+		<div
+			{...divProps}
+			className={classnames(
+				componentClassName,
+				toStateClass('active', isActive),
+				toEnumViewClass(distinction),
+				toThemeClass(intent, intent),
+				toEnumViewClass(padding),
+				className,
+			)}
+			ref={ref}
+		>
+			<Stack gap={gap} direction={direction}>
+				{(heading || actions) && (
+					<div className={`${componentClassName}-header`}>
+						{heading && <Label>{heading}</Label>}
+						{actions && (
+							<div className={`${componentClassName}-actions`} contentEditable={false}>
+								{actions}
 							</div>
 						)}
-						{children}
-					</Stack>
-				</div>
-			)
-		},
-	),
-)
+					</div>
+				)}
+				{children}
+			</Stack>
+		</div>
+	)
+}))
 Box.displayName = 'Box'

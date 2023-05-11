@@ -1,7 +1,7 @@
 import classNames from 'classnames'
 import { memo, ReactNode } from 'react'
 import { useClassNamePrefix } from '../../auxiliary'
-import { Default, Size } from '../../types'
+import { Default, HTMLSpanElementProps, Size } from '../../types'
 import { toEnumViewClass, toStateClass } from '../../utils'
 
 export interface LabelOwnProps {
@@ -14,8 +14,13 @@ export interface LabelOwnProps {
 	children?: ReactNode
 }
 
-export type LabelProps = Omit<LabelOwnProps, 'children'> & JSX.IntrinsicElements['div']
+export type LabelProps =
+	& LabelOwnProps
+	& HTMLSpanElementProps
 
+/**
+ * @group UI
+ */
 export const Label = memo(({
 	className,
 	isDisabled,

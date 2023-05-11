@@ -1,13 +1,21 @@
 import { Component } from '@contember/binding'
 import type { ReactElement } from 'react'
-import type { StockAudioFileKindProps } from '../../fileKinds'
 import { getStockAudioFileKind } from '../../fileKinds'
 import { PublicSingleKindUploadFieldProps, SingleKindUploadField } from '../../internalComponents'
+import { AudioFileDataExtractorProps } from '../../fileDataExtractors'
 
 export type AudioUploadFieldProps<AcceptArtifacts = unknown, SFExtraProps extends {} = {}> =
 	& PublicSingleKindUploadFieldProps<AcceptArtifacts, SFExtraProps>
-	& StockAudioFileKindProps<AcceptArtifacts>
+	& AudioFileDataExtractorProps
 
+/**
+ * @example
+ * ```
+ * <AudioUploadField urlField="file.url" label="Audio upload" />
+ * ```
+ *
+ * @group Uploads
+ */
 export const AudioUploadField = Component<AudioUploadFieldProps>(
 	props => (
 		<SingleKindUploadField {...props} kindFactory={getStockAudioFileKind} />

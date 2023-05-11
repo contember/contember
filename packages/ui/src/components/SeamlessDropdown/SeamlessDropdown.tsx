@@ -1,22 +1,18 @@
 import cn from 'classnames'
-import { ReactNode, useCallback, useMemo, useRef, useState } from 'react'
-import {
-	useClassNamePrefix,
-	useCloseOnClickOutside,
-	useCloseOnEscape,
-} from '../../auxiliary'
+import { ReactNode, useCallback, useMemo, useState } from 'react'
+import { useClassNamePrefix, useCloseOnClickOutside, useCloseOnEscape } from '../../auxiliary'
 import { Default } from '../../types'
 import { toEnumViewClass, toViewClass } from '../../utils'
 import { Stack } from '../Stack'
 
-type Direction = Default | 'down' | 'up'
+export type SeamlessDropdownDirection = Default | 'down' | 'up'
 export interface SeamlessDropdownProps {
 	label: ReactNode
 	children?: ReactNode
 	hoverable?: boolean
 	inline?: boolean
 	caret?: boolean
-	direction?: Direction
+	direction?: SeamlessDropdownDirection
 }
 
 export function SeamlessDropdown({ direction = 'down', label, children, hoverable, caret, inline }: SeamlessDropdownProps) {

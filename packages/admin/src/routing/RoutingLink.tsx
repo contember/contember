@@ -17,6 +17,11 @@ const defaultComponent: FunctionComponent<InnerRoutingLinkProps> = ({ active, ..
 	<a {...props} />
 )
 
+/**
+ * Low level link. Usually, you should use {@link Link}
+ *
+ * @group Routing
+ */
 export const RoutingLink = memo<RoutingLinkProps & PublicAnchorProps>(({ onClick, to, parametersResolver, parameters, Component, componentProps, target, ...props }) => {
 	const { navigate, isActive: active, href } = useRoutingLink(to, parametersResolver, parameters)
 

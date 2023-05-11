@@ -10,6 +10,9 @@ export interface SortableBlockOwnProps {
 
 export interface SortableBlockProps extends RepeaterItemProps, SortableBlockOwnProps {}
 
+/**
+ * @internal
+ */
 export const SortableBlock = memo<SortableBlockProps>(props => {
 	const field = useField(props.discriminationField)
 	const selectedBlock = getDiscriminatedBlock(props.normalizedBlocks, field)

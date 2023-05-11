@@ -1,11 +1,12 @@
 import cn from 'classnames'
-import { createElement, HTMLAttributes, ReactNode } from 'react'
+import { createElement, ReactNode } from 'react'
 import { useClassNamePrefix } from '../../auxiliary'
 import { toViewClass } from '../../utils'
+import { HTMLParagraphElementProps } from '../../types'
 
 export interface EditorParagraphProps {
 	isNumbered?: boolean
-	attributes: HTMLAttributes<HTMLParagraphElement>
+	attributes: HTMLParagraphElementProps
 	align?: 'start' | 'end' | 'center' | 'justify'
 	children: ReactNode
 }

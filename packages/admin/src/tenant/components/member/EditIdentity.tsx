@@ -13,6 +13,9 @@ export interface EditIdentityProps {
 	userListLink: RoutingLinkTarget
 }
 
+/**
+ * @group Tenant
+ */
 export const EditIdentity: FC<EditIdentityProps> = ({ project, rolesConfig, identityId, userListLink }) => {
 	const { state: previousMembershipsState } = useProjectMembershipsQuery(project, identityId)
 	const [memberships, setMemberships] = useState<(Membership | undefined)[]>([undefined])

@@ -2,7 +2,7 @@ import { useCallback, useContext } from 'react'
 import { ToastDefinition, ToastType } from './Toaster'
 import { ToasterContext } from './ToasterContext'
 
-type ToastData = ToastDefinition & { dismiss?: number | boolean}
+export type ToastData = ToastDefinition & { dismiss?: number | boolean}
 
 const TIMEOUT_BY_TYPE: {
 	[K in ToastType]: number

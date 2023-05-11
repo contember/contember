@@ -5,6 +5,9 @@ export interface ProgressBarProps {
 	progress: number
 }
 
+/**
+ * @group UI
+ */
 export const ProgressBar = memo(({ progress }: ProgressBarProps) => {
 	const clampedProgress = Math.max(0, Math.min(progress, 1))
 	const prefix = useClassNamePrefix()

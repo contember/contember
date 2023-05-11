@@ -12,6 +12,9 @@ export type VideoFilesProps<AcceptArtifacts = unknown, SFExtraProps extends {} =
 		discriminateBy: SugaredDiscriminateBy
 	}
 
+/**
+ * @group Uploads
+ */
 export const VideoFiles = Component<VideoFilesProps>(
 	({
 		 discriminateBy,

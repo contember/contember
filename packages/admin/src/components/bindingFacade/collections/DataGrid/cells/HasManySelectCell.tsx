@@ -26,7 +26,16 @@ export type HasManySelectProps =
 		renderElements?: (elements: ReactNode[]) => ReactElement
 	}
 
-
+/**
+ * DataGrid cell which allows displaying and filtering by has-many relations.
+ *
+ * @example
+ * ```
+ * <HasManySelectCell header="Tags" field="tags" options="Tag.name" />
+ * ```
+ *
+ * @group Data grid
+ */
 export const HasManySelectCell: FunctionComponent<HasManySelectProps> = Component(props => {
 	return (
 		<DataGridColumn<SelectCellArtifacts>

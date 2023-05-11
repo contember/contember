@@ -6,19 +6,26 @@ import { toEnumViewClass } from '../../utils'
 
 export interface LogoLabelProps {
 	className?: string
-  children: ReactNode
+	children: ReactNode
 	size?: Size | number
 }
 
+/**
+ * @group UI
+ */
 export const LogoLabel = memo(({ className, children, size }: LogoLabelProps) => {
 	const prefix = useClassNamePrefix()
 
-  return <div className={
-    classNames(
-      `${prefix}logo-label`,
-			typeof size === 'string' ? toEnumViewClass(size) : undefined,
-				className,
-			)}
-			style={typeof size === 'number' ? { fontSize: `${size >= 0 ? size : 1}em` } : undefined}
-		>{children}</div>
+	const cls = classNames(
+		`${prefix}logo-label`,
+		typeof size === 'string' ? toEnumViewClass(size) : undefined,
+		className,
+	)
+	const style = typeof size === 'number' ? { fontSize: `${size >= 0 ? size : 1}em` } : undefined
+
+	return (
+		<div className={cls} style={style}>
+			{children}
+		</div>
+	)
 })

@@ -76,6 +76,16 @@ const MenuInternal = memo((props: PropsWithChildren<MenuProps>) => {
 	</DepthContext.Provider>
 })
 
+/**
+ * @example
+ * ```
+ * <Menu>
+ *   <Menu.Item title="Articles" to="articleList"/>
+ * </Menu>
+ * ```
+ *
+ * @group UI
+ */
 export const Menu: MemoExoticComponent<(props: PropsWithChildren<MenuProps>) => JSX.Element> & {
 	Item: <T>(props: MenuItemProps<T>) => JSX.Element
 } = MenuInternal as any

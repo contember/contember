@@ -14,6 +14,9 @@ export interface CoalesceFieldViewProps<Persisted extends FieldValue = FieldValu
 	format?: (value: Persisted) => ReactNode
 }
 
+/**
+ * @group Field Views
+ */
 export const CoalesceFieldView = Component(
 	<Persisted extends FieldValue = FieldValue>(props: CoalesceFieldViewProps<Persisted>) => {
 		const entity = useEntity()

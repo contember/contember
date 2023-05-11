@@ -19,6 +19,9 @@ export type SelectFieldProps =
 		| DynamicSingleChoiceFieldProps
 	)
 
+/**
+ * @group Form Fields
+ */
 export const SelectField: FunctionComponent<SelectFieldProps> = Component(
 	props => (
 		<ChoiceField {...props} >
@@ -42,6 +45,9 @@ export type SelectFieldInnerProps =
 	& PublicCommonReactSelectStylesProps
 	& { errors: FieldErrors | undefined }
 
+/**
+ * @internal
+ */
 export const SelectFieldInner = memo(
 	({
 		placeholder,

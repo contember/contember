@@ -11,11 +11,16 @@ export interface HoveringToolbarProps {
 	scheme?: Scheme
 }
 
-export const HoveringToolbar = memo(
-	forwardRef<HTMLDivElement, HoveringToolbarProps>(({ isActive, scope, scheme, children }: HoveringToolbarProps, ref) => {
-		const componentClassName = useComponentClassName('hoveringToolbar')
+export const HoveringToolbar = memo(forwardRef<HTMLDivElement, HoveringToolbarProps>(({
+	isActive,
+	scope,
+	scheme,
+	children,
+}, ref) => {
+	const componentClassName = useComponentClassName('hoveringToolbar')
 
-		return <div
+	return (
+		<div
 			className={classNames(
 				componentClassName,
 				toStateClass('active', isActive),
@@ -28,6 +33,6 @@ export const HoveringToolbar = memo(
 				{children}
 			</div>
 		</div>
-	}),
-)
+	)
+}))
 HoveringToolbar.displayName = 'HoveringToolbar'

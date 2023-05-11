@@ -20,6 +20,9 @@ export interface LayoutPageProps extends Omit<TitleBarProps, 'after' | 'children
 	title?: ReactNode
 }
 
+/**
+ * @group Layout UI
+ */
 export const LayoutPage = memo(({
 	actions,
 	afterTitle,

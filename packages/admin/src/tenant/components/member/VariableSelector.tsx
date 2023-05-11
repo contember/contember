@@ -4,7 +4,7 @@ import { RoleVariableDefinition } from '../../queries'
 import { Membership } from '../../types'
 import { RolesConfig } from './EditMembership'
 
-interface VariableSelectorProps {
+export interface VariableSelectorProps {
 	rolesConfig?: RolesConfig
 	membership: Membership
 	variable: RoleVariableDefinition
@@ -67,6 +67,9 @@ const GenericVariableEdit = ({ label, value, onChange }: { label?: React.ReactNo
 	)
 }
 
+/**
+ * @group Tenant
+ */
 export const VariableSelector: FC<VariableSelectorProps> = ({ rolesConfig, membership, variable, onChange }) => {
 	const innerOnChange = useCallback(
 		(newValues: string[]) => {

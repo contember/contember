@@ -4,7 +4,9 @@ import { useClassNamePrefix } from '../../auxiliary'
 import type { EditorCanvasDistinction, EditorCanvasSize } from '../../types'
 import { toEnumStateClass, toEnumViewClass } from '../../utils'
 
-export interface EditorCanvasProps<P extends TextareaHTMLAttributes<HTMLDivElement>> {
+export interface HTMLTextAreaDivTargetProps extends TextareaHTMLAttributes<HTMLDivElement> {}
+
+export interface EditorCanvasProps<P extends HTMLTextAreaDivTargetProps> {
 	underlyingComponent: (props: P) => ReactElement
 	componentProps: P
 	children?: ReactNode
@@ -16,7 +18,7 @@ export interface EditorCanvasProps<P extends TextareaHTMLAttributes<HTMLDivEleme
 // Approximation: Toolbar height + vertical margin
 const toolbarVisibilityTreshold = 56 + 2 * 16
 
-export const EditorCanvas = memo(<P extends TextareaHTMLAttributes<HTMLDivElement>>({
+export const EditorCanvas = memo(<P extends HTMLTextAreaDivTargetProps>({
 	children,
 	inset,
 	size,
@@ -63,7 +65,7 @@ export const EditorCanvas = memo(<P extends TextareaHTMLAttributes<HTMLDivElemen
 		</div>
 	)
 }) as {
-	<P extends TextareaHTMLAttributes<HTMLDivElement>>(props: EditorCanvasProps<P>): ReactElement
+	<P extends HTMLTextAreaDivTargetProps>(props: EditorCanvasProps<P>): ReactElement
 	displayName?: string
 }
 EditorCanvas.displayName = 'EditorCanvas'

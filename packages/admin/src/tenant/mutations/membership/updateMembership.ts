@@ -22,7 +22,7 @@ const updateMembershipVariables = {
 	memberships: GQLVariable.Required(GQLVariable.List(MembershipInput)),
 }
 
-type UpdateMembershipErrorCodes =
+export type UpdateMembershipErrorCodes =
 	| 'PROJECT_NOT_FOUND'
 	| 'NOT_MEMBER'
 	| 'INVALID_MEMBERSHIP'

@@ -5,11 +5,16 @@ import { useAccessorErrors } from '../../errors'
 import type { SimpleRelativeSingleFieldMetadata } from './SimpleRelativeSingleField'
 import { useLabelMiddleware } from '../../environment/LabelMiddleware'
 
-export type SimpleRelativeSingleFieldProxyProps = Omit<FieldContainerProps, 'children'> &
-	SugaredRelativeSingleField & {
+export type SimpleRelativeSingleFieldProxyProps =
+	& {
 		render: (fieldMetadata: SimpleRelativeSingleFieldMetadata<any>, props: any) => ReactNode
 	}
+	& Omit<FieldContainerProps, 'children'>
+	& SugaredRelativeSingleField
 
+/**
+ * @internal
+ */
 export const SimpleRelativeSingleFieldProxy = memo(
 	({ render, label, labelDescription, labelPosition, description, ...props }: SimpleRelativeSingleFieldProxyProps) => {
 		const environment = useEnvironment()

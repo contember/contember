@@ -10,6 +10,11 @@ export type HiddenFieldProps =
 		label?: ReactNode
 	}
 
+/**
+ * The `HiddenField` components is used to include data into the form but hide them from user.
+ *
+ * @group Form Fields
+ */
 export const HiddenField = Component<HiddenFieldProps>(
 	() => null,
 	props => (

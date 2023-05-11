@@ -1,5 +1,5 @@
 import { DataBindingProvider } from '@contember/binding'
-import { ComponentType, memo, ReactNode } from 'react'
+import { ReactNode } from 'react'
 import {
 	DataGrid,
 	DataGridPageRenderer,
@@ -7,8 +7,7 @@ import {
 	FeedbackRenderer,
 	LayoutRendererProps,
 } from '../../bindingFacade'
-import type { PageProvider } from '../Pages'
-import { getPageName } from './getPageName'
+import { pageComponent } from './pageComponent'
 
 export type DataGridPageProps =
 	& DataGridProps<{}>
@@ -18,7 +17,10 @@ export type DataGridPageProps =
 		rendererProps?: Omit<LayoutRendererProps, 'children'>
 	}
 
-const DataGridPage: Partial<PageProvider<DataGridPageProps>> & ComponentType<DataGridPageProps> = memo(({
+/**
+ * @group Pages
+ */
+export const DataGridPage = pageComponent(({
 		children,
 		rendererProps,
 		pageName,
@@ -30,8 +32,5 @@ const DataGridPage: Partial<PageProvider<DataGridPageProps>> & ComponentType<Dat
 			</DataGrid>
 		</DataBindingProvider>
 	),
+	'DataGridPage',
 )
-DataGridPage.displayName = 'DataGridPage'
-DataGridPage.getPageName = getPageName
-
-export { DataGridPage }

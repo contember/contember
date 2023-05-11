@@ -8,9 +8,12 @@ import type { EditorWithBlocks } from './editor'
 import { ReferenceElement, referenceElementType } from './elements'
 import type { EditorReferenceBlocks } from './templating'
 
-export type BlockHoveringToolbarConfig = IconSourceSpecification & {
-	title?: string
-} & (
+export type BlockHoveringToolbarConfig =
+	& IconSourceSpecification
+	& {
+		title?: string
+	}
+	& (
 		| {
 				discriminateBy: SugaredDiscriminateBy
 		  }

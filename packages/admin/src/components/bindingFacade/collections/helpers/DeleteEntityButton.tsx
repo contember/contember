@@ -4,11 +4,23 @@ import classNames from 'classnames'
 import { memo, ReactNode, useCallback } from 'react'
 import { usePersistWithFeedback } from '../../../ui'
 
-export type DeleteEntityButtonProps = ButtonProps & {
-	immediatePersist?: true
-	children?: ReactNode
-}
+export type DeleteEntityButtonProps =
+	& {
+		immediatePersist?: true
+		children?: ReactNode
+	}
+	& ButtonProps
 
+/**
+ * Renders a button which deletes an entity in current binding context.
+ *
+ * @example
+ * ```
+ * <DeleteEntityButton />
+ * ```
+ *
+ * @group Action buttons
+ */
 export const DeleteEntityButton = memo((props: DeleteEntityButtonProps) => {
 	const { children, immediatePersist, className, ...rest } = props
 	const parentEntity = useEntity()

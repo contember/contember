@@ -12,6 +12,9 @@ export type ColorFieldProps = SimpleRelativeSingleFieldProps &
 const parse: ControlValueParser<string, string> = value => value ??  null
 const format: FieldValueFormatter<string, string> = value => value ?? null
 
+/**
+ * @group Form Fields
+ */
 export const ColorField = SimpleRelativeSingleField<ColorFieldProps, string>(
 	(fieldMetadata, {
 		defaultValue,

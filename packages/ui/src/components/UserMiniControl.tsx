@@ -1,5 +1,5 @@
 import cn from 'classnames'
-import type { ReactNode } from 'react'
+import type { FunctionComponent, ReactNode } from 'react'
 import { useClassNamePrefix } from '../auxiliary'
 
 export interface UserMiniControlProps {
@@ -8,7 +8,10 @@ export interface UserMiniControlProps {
 	note?: ReactNode
 }
 
-export function UserMiniControl({ name, note, avatarUrl }: UserMiniControlProps) {
+/**
+ * @group UI
+ */
+export const UserMiniControl: FunctionComponent<UserMiniControlProps> = ({ name, note, avatarUrl }) => {
 	const prefix = useClassNamePrefix()
 	return (
 		<div className={cn(`${prefix}userMiniControl`)}>

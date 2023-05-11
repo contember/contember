@@ -6,6 +6,9 @@ import { blockRepeaterDictionary } from './Dictionary'
 
 export interface AddNewBlockButtonProps extends Omit<AddNewBlockButtonInnerProps, 'requestClose'> {}
 
+/**
+ * @internal
+ */
 export const AddNewBlockButton = memo<AddNewBlockButtonProps>(props => {
 	const formatter = useMessageFormatter(blockRepeaterDictionary)
 

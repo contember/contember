@@ -8,6 +8,9 @@ export interface AvatarProps {
 	email?: string
 }
 
+/**
+ * @group UI
+ */
 export const Avatar: FunctionComponent<AvatarProps> = props => {
 	const { size = 1, shape = 'Circle' } = props
 	const email = props.email || ''

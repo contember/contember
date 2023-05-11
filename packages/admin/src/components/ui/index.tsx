@@ -6,4 +6,4 @@ export * from './Tile'
 export * from './TileList'
 export * from './usePersistWithFeedback'
 
-export type { PersistFeedbackDictionary } from './persistFeedbackDictionary'
+export * from './persistFeedbackDictionary'

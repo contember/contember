@@ -8,11 +8,14 @@ import { getFileHandler, useFileHandler } from '../../fileHandler'
 
 export type UploadFieldProps<SFExtraProps extends {} = {}> =
 	& FileInputPublicProps
-	&	HybridFileKindProps
+	& HybridFileKindProps
 	& {
 		children?: ReactNode
 	}
 
+/**
+ * @group Uploads
+ */
 export const UploadField = Component<UploadFieldProps>(
 	props => {
 		const fileHandler = useFileHandler(props, 'UploadField')

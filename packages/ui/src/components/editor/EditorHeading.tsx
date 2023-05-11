@@ -1,12 +1,13 @@
 import cn from 'classnames'
-import { createElement, HTMLAttributes, ReactNode } from 'react'
+import { createElement, ReactNode } from 'react'
 import { useClassNamePrefix } from '../../auxiliary'
 import { toViewClass } from '../../utils'
+import { HTMLHeadingElementProps } from '../../types'
 
 export interface EditorHeadingProps {
 	level: 1 | 2 | 3 | 4 | 5 | 6
 	isNumbered?: boolean
-	attributes: HTMLAttributes<HTMLHeadingElement>
+	attributes: HTMLHeadingElementProps
 	align?: 'start' | 'end' | 'center' | 'justify'
 	children: ReactNode
 }

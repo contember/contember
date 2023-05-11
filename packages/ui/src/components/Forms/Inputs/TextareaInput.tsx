@@ -17,29 +17,30 @@ export type TextareaInputProps = ControlProps<string> & TextareaInputOwnProps & 
 	style?: TextareaAutosizeProps['style'],
 }
 
-export const TextareaInput = memo(
-	forwardRef(({
-		className,
-		minRows,
-		style,
-		withTopToolbar,
-		...outerProps
-	}: TextareaInputProps, forwardedRed: ForwardedRef<HTMLTextAreaElement>) => {
-		const props = useTextBasedInput<HTMLTextAreaElement>({
-			...outerProps,
-			className: classNames(
-				useComponentClassName('textarea-input'),
-				toViewClass('withTopToolbar', withTopToolbar),
-				className,
-			),
-		}, forwardedRed)
+/**
+ * @group Forms UI
+ */
+export const TextareaInput = memo(forwardRef(({
+	className,
+	minRows,
+	style,
+	withTopToolbar,
+	...outerProps
+}: TextareaInputProps, forwardedRed: ForwardedRef<HTMLTextAreaElement>) => {
+	const props = useTextBasedInput<HTMLTextAreaElement>({
+		...outerProps,
+		className: classNames(
+			useComponentClassName('textarea-input'),
+			toViewClass('withTopToolbar', withTopToolbar),
+			className,
+		),
+	}, forwardedRed)
 
-		return <TextareaAutosize
-			{...props}
-			cacheMeasurements={true}
-			minRows={minRows}
-			style={style}
-		/>
-	}),
-)
+	return <TextareaAutosize
+		{...props}
+		cacheMeasurements={true}
+		minRows={minRows}
+		style={style}
+	/>
+}))
 TextareaInput.displayName = 'TextareaInput'

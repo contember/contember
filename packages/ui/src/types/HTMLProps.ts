@@ -1,0 +1,9 @@
+export interface HTMLAnchorElementProps extends React.AnchorHTMLAttributes<HTMLAnchorElement> {}
+export interface HTMLButtonElementProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {}
+export interface HTMLDivElementProps extends React.HTMLAttributes<HTMLDivElement> {}
+export interface HTMLHeadingElementProps extends React.HTMLAttributes<HTMLHeadingElement> {}
+export interface HTMLImageElementProps extends React.ImgHTMLAttributes<HTMLImageElement> {}
+export interface HTMLInputElementProps extends React.InputHTMLAttributes<HTMLInputElement> {}
+export interface HTMLParagraphElementProps extends React.HTMLAttributes<HTMLParagraphElement> {}
+export interface HTMLSpanElementProps extends React.HTMLAttributes<HTMLSpanElement> {}
+export interface HTMLVideoElementProps extends React.VideoHTMLAttributes<HTMLVideoElement> {}

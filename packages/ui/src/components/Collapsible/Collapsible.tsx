@@ -13,6 +13,9 @@ export interface CollapsibleProps {
 	onTransitionEnd?: () => void
 }
 
+/**
+ * @group UI
+ */
 export const Collapsible = memo((props: CollapsibleProps) => {
 	const contentRef = useRef<HTMLDivElement>(null)
 	const [isTransitioning, setIsTransitioning] = useState(false)

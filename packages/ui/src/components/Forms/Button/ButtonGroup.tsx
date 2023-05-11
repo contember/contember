@@ -13,6 +13,9 @@ export interface ButtonGroupProps {
 	isTopToolbar?: boolean
 }
 
+/**
+ * @group UI
+ */
 export const ButtonGroup = memo(({ size, flow, orientation, isTopToolbar, children }: ButtonGroupProps) => (
 	<div
 		className={cn(

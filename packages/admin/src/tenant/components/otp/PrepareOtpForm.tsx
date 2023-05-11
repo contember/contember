@@ -3,7 +3,7 @@ import { FC, useCallback } from 'react'
 import { useForm } from '../../lib'
 import { PrepareOtpResult, usePrepareOtp } from '../../mutations'
 
-interface PrepareOtpFormProps {
+export interface PrepareOtpFormProps {
 	onPrepared: (data: PrepareOtpResult) => void
 	onCancel?: () => void
 	isReSetup?: boolean

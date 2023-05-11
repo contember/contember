@@ -5,14 +5,20 @@ import { Repeater, RepeaterProps } from '../Repeater'
 import { AddNewBlockButton } from './AddNewBlockButton'
 import { SortableBlock } from './SortableBlock'
 
-export interface BlockRepeaterProps
-	extends Omit<
+export type BlockRepeaterProps =
+	& {
+		discriminationField: SugaredFieldProps['field']
+	}
+	& Omit<
 		RepeaterProps<unknown, unknown>,
 		'containerComponent' | 'containerComponentExtraProps' | 'itemComponent' | 'itemComponentExtraProps'
-	> {
-	discriminationField: SugaredFieldProps['field']
-}
+	>
 
+/**
+ * The `BlockRepeater` component is a simple way to repeat blocks of content. Use {@link Block} for wrapping fields.
+ *
+ * @group Blocks and repeaters
+ */
 export const BlockRepeater: FunctionComponent<BlockRepeaterProps> = Component(
 	({ discriminationField, ...props }) => {
 		const normalizedBlocks = useNormalizedBlocks(props.children)

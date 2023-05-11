@@ -9,11 +9,10 @@ import { NormalizedEmbedHandlers } from '../embed'
 import { NormalizedBlocks } from '../../../blocks'
 import { ReactEditor } from 'slate-react'
 
-type ReferenceElementType = 'reference'
-export const referenceElementType: ReferenceElementType = 'reference'
+export const referenceElementType = 'reference' as const
 
 export interface ReferenceElement extends ElementWithReference {
-	type: ReferenceElementType
+	type: typeof referenceElementType
 }
 
 export const isReferenceElement = (node: Node): node is ReferenceElement =>

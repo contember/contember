@@ -4,10 +4,9 @@ import {
 	EntitySubTreeAdditionalProps,
 	SugaredQualifiedSingleEntity,
 } from '@contember/binding'
-import { ComponentType, memo, ReactNode } from 'react'
+import { ReactNode } from 'react'
 import { FeedbackRenderer, LayoutRenderer, LayoutRendererProps } from '../../bindingFacade'
-import type { PageProvider } from '../Pages'
-import { getPageName } from './getPageName'
+import { pageComponent } from './pageComponent'
 
 export type DetailPageProps =
 	& SugaredQualifiedSingleEntity
@@ -18,7 +17,10 @@ export type DetailPageProps =
 		rendererProps?: LayoutRendererProps
 	}
 
-const DetailPage: Partial<PageProvider<DetailPageProps>> & ComponentType<DetailPageProps> = memo(
+/**
+ * @group Pages
+ */
+export const DetailPage = pageComponent(
 	({ pageName, children, rendererProps, ...entityProps }: DetailPageProps) => (
 		<DataBindingProvider stateComponent={FeedbackRenderer}>
 			<EntitySubTree {...entityProps}>
@@ -28,9 +30,5 @@ const DetailPage: Partial<PageProvider<DetailPageProps>> & ComponentType<DetailP
 			</EntitySubTree>
 		</DataBindingProvider>
 	),
+	'DetailPage',
 )
-
-DetailPage.displayName = 'DetailPage'
-DetailPage.getPageName = getPageName
-
-export { DetailPage }

@@ -14,6 +14,11 @@ export type TextareaFieldProps =
 const parse: ControlValueParser<string, string> = value => value ??  null
 const format: FieldValueFormatter<string, string> = value => value ?? null
 
+/**
+ * Renders a multiline text area field. It is used for basic string editing and has no rich text editing capabilities.
+ *
+ * @group Form Fields
+ */
 export const TextareaField = SimpleRelativeSingleField<TextareaFieldProps, string>(
 	(fieldMetadata, {
 		label,

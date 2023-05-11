@@ -4,7 +4,7 @@ import { useAuthedTenantQuery } from '../../lib'
 import { LinkButton, RoutingLinkTarget } from '../../../routing'
 import { QueryLoader } from '../QueryLoader'
 
-interface ProjectGridProps {
+export interface ProjectGridProps {
 	projectDetailLink: RoutingLinkTarget
 }
 

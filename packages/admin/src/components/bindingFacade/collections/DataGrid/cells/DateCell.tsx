@@ -21,6 +21,16 @@ type DateRange = {
 	end: string | null
 }
 
+/**
+ * DataGrid cell for displaying a date field value.
+ *
+ * @example
+ * ```
+ * <DateCell header="Created at" field="createdAt" />
+ * ```
+ *
+ * @group Data grid
+ */
 export const DateCell: FunctionComponent<DateCellProps> = Component(props => {
 	return (
 		<DataGridColumn<DateRange>

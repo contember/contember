@@ -5,6 +5,9 @@ export interface BreadcrumbsProps {
 	items: ReactNode[]
 }
 
+/**
+ * @group UI
+ */
 export const Breadcrumbs = memo<BreadcrumbsProps>(({ items }) => {
 	const prefix = useClassNamePrefix()
 	return (

@@ -1,13 +1,16 @@
 import { useIsMounted } from '@contember/react-utils'
 import { Button, Heading, Stack, useDialog } from '@contember/ui'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { ComponentType, useCallback, useEffect, useRef, useState } from 'react'
 import { useMessageFormatter } from '../../i18n'
 import { outdatedApplicationDictionary } from './outdatedApplicationDictionary'
 
 const postponeTimeoutMs = 60_000 * 5
 const checkIntervalMs = 30_000
 
-export const OutdatedApplicationChecker = () => {
+/**
+ * @internal
+ */
+export const OutdatedApplicationChecker: ComponentType = () => {
 	const modal = useDialog<boolean>()
 	const isOutdated = useIsOutdated()
 	const isOpen = useRef(false)

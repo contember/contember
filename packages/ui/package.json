@@ -30,7 +30,7 @@
 		"build:css": "sass --no-charset src/index.sass:dist/assets/index.css && yarn build:css:copy-fonts",
 		"build:css:copy-fonts": "rm -rf \"dist/assets/Inter\" && cp -R \"src/assets/Inter\" \"dist/assets/Inter\"",
 		"ae:build": "api-extractor run --local",
-		"ae:test": "api-extractor run",
+		"ae:test": "api-extractor run -v",
 		"storybook": "storybook dev -p 6006",
 		"build-storybook": "storybook build",
 		"test": "vitest"

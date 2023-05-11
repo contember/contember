@@ -14,7 +14,7 @@ const LIST_MEMBERSHIPS_QUERY = `
 `
 
 
-interface ListUserQueryResult {
+export interface ListUserQueryResult {
 	memberships: Membership[]
 }
 

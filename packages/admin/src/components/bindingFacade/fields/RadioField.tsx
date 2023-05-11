@@ -18,6 +18,9 @@ export type RadioFieldProps =
 		| SimpleDynamicSingleChoiceFieldProps
 	)
 
+/**
+ * @group Form Fields
+ */
 export const RadioField: FunctionComponent<RadioFieldProps> = Component(props => {
 	return (
 		<ChoiceField {...props} renderedOptionsLimit={0}>

@@ -8,6 +8,7 @@ import { memo, ReactElement, ReactNode } from 'react'
 import { FeedbackRenderer, MutableEntityListPageRenderer, MutableEntityListPageRendererProps } from '../../bindingFacade'
 import type { PageProvider } from '../Pages'
 import { getPageName } from './getPageName'
+import { pageComponent } from './pageComponent'
 
 export type MultiEditPageProps<ContainerExtraProps, ItemExtraProps> =
 	& SugaredQualifiedEntityList
@@ -18,7 +19,20 @@ export type MultiEditPageProps<ContainerExtraProps, ItemExtraProps> =
 		rendererProps?: Omit<MutableEntityListPageRendererProps<ContainerExtraProps, ItemExtraProps>, 'accessor' | 'children'>
 	}
 
-const MultiEditPage = memo(
+/**
+ * @example
+ * ```
+ * <MultiEditPage
+ *   entities="BottleVolume"
+ *   rendererProps={{ title: 'Bottle volumes', sortableBy: 'order' }}
+ * >
+ * 	<TextField field="volume" label="Volume" />
+ * </MultiEditPage>
+ * ```
+ *
+ * @group Pages
+ */
+export const MultiEditPage = pageComponent(
 	<ContainerExtraProps, ItemExtraProps>({
 		children,
 		rendererProps,
@@ -31,11 +45,5 @@ const MultiEditPage = memo(
 			</EntityListSubTree>
 		</DataBindingProvider>
 	),
-) as (<ContainerExtraProps, ItemExtraProps>(
-	props: MultiEditPageProps<ContainerExtraProps, ItemExtraProps>,
-) => ReactElement) &
-	Partial<PageProvider<MultiEditPageProps<never, never>>>
-
-MultiEditPage.getPageName = getPageName
-
-export { MultiEditPage }
+	'MultiEditPage',
+)

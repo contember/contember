@@ -36,14 +36,18 @@ export type ChoiceFieldSearchByFields =
 	| SugaredRelativeSingleField['field']
 	| SugaredRelativeSingleField['field'][]
 
+export type DynamicChoiceFieldWithCustomLabelProps = {
+	options: ChoiceFieldOptionsAsEntityList
+	optionLabel: ReactNode
+}
+
+export type DynamicChoiceFieldOptionProps = {
+	options: ChoiceFieldOptionsAsFieldList
+}
+
 export type BaseDynamicChoiceFieldOptions =
-	| {
-		options: ChoiceFieldOptionsAsEntityList
-		optionLabel: ReactNode
-	}
-	| {
-		options: ChoiceFieldOptionsAsFieldList
-	}
+	| DynamicChoiceFieldOptionProps
+	| DynamicChoiceFieldWithCustomLabelProps
 	| LegacyChoiceFieldWithOptionRenderer
 
 export type BaseDynamicChoiceField =

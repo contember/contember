@@ -17,7 +17,7 @@ const resetPasswordVariables = {
 	password: GQLVariable.Required(GQLVariable.String),
 }
 
-type PasswordResetErrors =
+export type PasswordResetErrors =
 	| 'TOKEN_NOT_FOUND'
 	| 'TOKEN_USED'
 	| 'TOKEN_EXPIRED'

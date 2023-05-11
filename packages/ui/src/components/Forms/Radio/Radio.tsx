@@ -1,17 +1,17 @@
 import classNames from 'classnames'
-import { memo } from 'react'
+import { ComponentType, memo } from 'react'
 import { useRadioGroup } from 'react-aria'
 import { useRadioGroupState } from 'react-stately'
 import { useClassNamePrefix } from '../../../auxiliary'
 import type { Size, ValidationState } from '../../../types'
 import { toEnumStateClass, toEnumViewClass } from '../../../utils'
-import { RadioButton } from './RadioButton'
+import { RadioButtonProps } from './RadioButton'
 import { RadioContext } from './RadioContext'
 import { RadioControl } from './RadioControl'
 import type { RadioOption } from './types'
 
 export interface RadioProps {
-	RadioButtonComponent?: typeof RadioButton
+	RadioButtonComponent?: ComponentType<RadioButtonProps>
 	disabled?: boolean
 	name?: string
 	onChange: (newValue: string) => void
@@ -35,6 +35,9 @@ function deriveAriaValidationState(validationState?: ValidationState): 'valid' |
 	return undefined
 }
 
+/**
+ * @group Forms UI
+ */
 export const Radio = memo((props: RadioProps) => {
 	const { name, options, orientation, size, validationState, RadioButtonComponent } = props
 

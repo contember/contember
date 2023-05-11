@@ -12,6 +12,9 @@ export interface ButtonListProps {
 	orientation?: ButtonGroupOrientation
 }
 
+/**
+ * @group UI
+ */
 export const ButtonList = memo(({ children, flow, orientation, size }: ButtonListProps) => (
 	<div className={cn(
 		useComponentClassName('button-list'),

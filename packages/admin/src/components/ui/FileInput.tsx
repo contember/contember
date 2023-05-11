@@ -6,6 +6,9 @@ export interface FileInputProps {
 	children?: ReactNode
 }
 
+/**
+ * @group Forms UI
+ */
 export const FileInput: FunctionComponent<FileInputProps> = props => (
 	<label className="fileInput">
 		<input className="fileInput-input" type="file" onChange={props.onChange} />

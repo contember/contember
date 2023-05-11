@@ -10,7 +10,7 @@ export type FileInputPublicProps =
 	& Pick<FieldContainerProps, 'label' | 'description' | 'labelDescription'>
 	& AddEntityButtonProps
 	& SelectFileInputPublicProps
-	&	{
+	& {
 		enableAddingNew?: boolean
 		addButtonSubText?: ReactNode
 	}
@@ -18,7 +18,7 @@ export type FileInputPublicProps =
 export type FileInputProps =
 	& FileInputPublicProps
 	& SelectFileInputProps<{}>
-	&	{
+	& {
 		children: ReactNode
 		dropzoneState: DropzoneState
 		errors: FieldErrors | undefined

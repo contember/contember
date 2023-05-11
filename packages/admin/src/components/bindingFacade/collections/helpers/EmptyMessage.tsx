@@ -17,6 +17,9 @@ export interface EmptyMessageComponentProps {
 	distinction?: BoxProps['distinction']
 }
 
+/**
+ * @group UI
+ */
 export const EmptyMessage = memo(({ children, component, distinction }: EmptyMessageProps) => {
 	const MessageComponent = component ?? EmptyMessageDefault
 	return <MessageComponent distinction={distinction}>{children}</MessageComponent>
@@ -25,9 +28,8 @@ EmptyMessage.displayName = 'EmptyMessage'
 
 const EmptyMessageDefault = memo(({ children, distinction }: EmptyMessageComponentProps) => (
 	<Box distinction={distinction} intent="default" padding="with-padding">
-		<Stack
-			direction="horizontal"
-			justify="space-around"
-		>{children}</Stack>
+		<Stack direction="horizontal" justify="space-around">
+			{children}
+		</Stack>
 	</Box>
 ))

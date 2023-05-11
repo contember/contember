@@ -14,6 +14,9 @@ export type HasOneProps<EntityProps = never> = SugaredRelativeSingleEntity & {
 	variables?: Environment.ValuesMapWithFactory
 }
 
+/**
+ * @group Data binding
+ */
 export const HasOne = Component(
 	<EntityProps extends {}>(props: HasOneProps<EntityProps>) => {
 		const entity = useEntity(props)

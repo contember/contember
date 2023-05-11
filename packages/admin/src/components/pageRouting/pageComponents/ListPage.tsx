@@ -4,10 +4,13 @@ import {
 	EntityListSubTreeAdditionalProps,
 	SugaredQualifiedEntityList,
 } from '@contember/binding'
-import { memo, ReactElement, ReactNode } from 'react'
-import { FeedbackRenderer, ImmutableEntityListPageRenderer, ImmutableEntityListPageRendererProps } from '../../bindingFacade'
-import type { PageProvider } from '../Pages'
-import { getPageName } from './getPageName'
+import { memo, ReactNode } from 'react'
+import {
+	FeedbackRenderer,
+	ImmutableEntityListPageRenderer,
+	ImmutableEntityListPageRendererProps,
+} from '../../bindingFacade'
+import { pageComponent } from './pageComponent'
 
 export type ListPageProps<ContainerExtraProps, ItemExtraProps> =
 	& SugaredQualifiedEntityList
@@ -18,7 +21,10 @@ export type ListPageProps<ContainerExtraProps, ItemExtraProps> =
 		rendererProps?: Omit<ImmutableEntityListPageRendererProps<ContainerExtraProps, ItemExtraProps>, 'accessor' | 'children'>
 	}
 
-const ListPage = memo(
+/**
+ * @group Pages
+ */
+export const ListPage = pageComponent(
 	<ContainerExtraProps, ItemExtraProps>({
 		children,
 		rendererProps,
@@ -31,11 +37,5 @@ const ListPage = memo(
 			</EntityListSubTree>
 		</DataBindingProvider>
 	),
-) as (<ContainerExtraProps, ItemExtraProps>(
-	props: ListPageProps<ContainerExtraProps, ItemExtraProps>,
-) => ReactElement) &
-	Partial<PageProvider<ListPageProps<never, never>>>
-
-ListPage.getPageName = getPageName
-
-export { ListPage }
+	'ListPage',
+)

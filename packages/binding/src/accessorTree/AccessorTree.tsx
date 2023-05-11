@@ -10,7 +10,10 @@ export interface AccessorTreeProps {
 	children: ReactNode
 }
 
-export function AccessorTree({ state, children }: AccessorTreeProps) {
+/**
+ * @group Data binding
+ */
+export const AccessorTree = ({ state, children }: AccessorTreeProps) => {
 	const stateData = state.name === 'initialized' ? state.data : {
 		hasUnpersistedChanges: false,
 		isMutating: false,

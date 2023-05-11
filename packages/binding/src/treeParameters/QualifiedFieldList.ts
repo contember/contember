@@ -12,25 +12,32 @@ import type {
 	UnsugarableQualifiedEntityParameters,
 } from './QualifiedEntityParameters'
 
-export interface QualifiedFieldList extends EntityListParameters, QualifiedEntityParameters, AnyField, LeafField {
-	hasOneRelationPath: HasOneRelation[]
-}
+export type QualifiedFieldList =
+	& EntityListParameters
+	& QualifiedEntityParameters
+	& AnyField
+	& LeafField
+	& {
+		hasOneRelationPath: HasOneRelation[]
+	}
 
-export interface SugarableQualifiedFieldList
-	extends SugarableEntityListParameters,
-		SugarableQualifiedEntityParameters,
-		SugarableAnyField {
-	hasOneRelationPath?: SugarableHasOneRelation[] | SugarableHasOneRelation
-}
+export type SugarableQualifiedFieldList =
+	& SugarableEntityListParameters
+	& SugarableQualifiedEntityParameters
+	& SugarableAnyField
+	& {
+		hasOneRelationPath?: SugarableHasOneRelation[] | SugarableHasOneRelation
+	}
 
-export interface UnsugarableQualifiedFieldList
-	extends UnsugarableEntityListParameters,
-		UnsugarableQualifiedEntityParameters,
-		UnsugarableLeafField {
+export type UnsugarableQualifiedFieldList =
+	& UnsugarableEntityListParameters
+	& UnsugarableQualifiedEntityParameters
+	& UnsugarableLeafField
 	// Deliberately leaving out UnsugarableHasOneRelation
-}
 
 // E.g. Author[age < 123].son.sister.name
-export interface SugaredQualifiedFieldList extends UnsugarableQualifiedFieldList {
-	fields: string | SugarableQualifiedFieldList
-}
+export type SugaredQualifiedFieldList =
+	& UnsugarableQualifiedFieldList
+	& {
+		fields: string | SugarableQualifiedFieldList
+	}

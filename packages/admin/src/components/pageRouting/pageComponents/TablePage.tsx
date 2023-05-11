@@ -4,10 +4,13 @@ import {
 	EntityListSubTreeAdditionalProps,
 	SugaredQualifiedEntityList,
 } from '@contember/binding'
-import { memo, ReactElement, ReactNode } from 'react'
-import { FeedbackRenderer, ImmutableEntityListTablePageRenderer, ImmutableEntityListTablePageRendererProps } from '../../bindingFacade'
-import type { PageProvider } from '../Pages'
-import { getPageName } from './getPageName'
+import { ReactNode } from 'react'
+import {
+	FeedbackRenderer,
+	ImmutableEntityListTablePageRenderer,
+	ImmutableEntityListTablePageRendererProps,
+} from '../../bindingFacade'
+import { pageComponent } from './pageComponent'
 
 export type TablePageProps<ContainerExtraProps, ItemExtraProps> =
 	& SugaredQualifiedEntityList
@@ -18,7 +21,10 @@ export type TablePageProps<ContainerExtraProps, ItemExtraProps> =
 		rendererProps?: Omit<ImmutableEntityListTablePageRendererProps<ContainerExtraProps, ItemExtraProps>, 'accessor' | 'children'>
 	}
 
-const TablePage = memo(
+/**
+ * @group Pages
+ */
+export const TablePage = pageComponent(
 	<ContainerExtraProps, ItemExtraProps>({
 		rendererProps,
 		children,
@@ -31,11 +37,5 @@ const TablePage = memo(
 			</EntityListSubTree>
 		</DataBindingProvider>
 	),
-) as (<ContainerExtraProps, ItemExtraProps>(
-	props: TablePageProps<ContainerExtraProps, ItemExtraProps>,
-) => ReactElement) &
-	Partial<PageProvider<TablePageProps<never, never>>>
-
-TablePage.getPageName = getPageName
-
-export { TablePage }
+	'TablePage',
+)

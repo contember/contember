@@ -13,6 +13,9 @@ export interface TableRowProps {
 	onClick?: (id: number | string) => void
 }
 
+/**
+ * @group UI
+ */
 export const TableRow = memo(({ active, children, id, justification, onClick: onClickProp }: TableRowProps) => {
 	const useTableElement = useContext(UseTableElementContext)
 	const className = classNames(

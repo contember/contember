@@ -4,12 +4,16 @@ import { identityEnvironmentExtension } from './IdentityEnvironmentExtension'
 import { useProjectUserRoles } from '../../acl'
 import { projectEnvironmentExtension } from '../Project'
 
-type RoleCondition = string | ((roles: Set<string>) => boolean);
+export type RoleCondition = string | ((roles: Set<string>) => boolean)
 
 export interface HasRoleProps {
 	children?: ReactNode
 	role: RoleCondition
 }
+
+/**
+ * @group Logic Components
+ */
 export const HasRole = Component<HasRoleProps>(({ children, role }) => {
 	const projectRoles = useProjectUserRoles()
 

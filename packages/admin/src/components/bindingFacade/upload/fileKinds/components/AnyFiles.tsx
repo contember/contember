@@ -11,7 +11,9 @@ export type AnyFilesProps<AcceptArtifacts = unknown, SFExtraProps extends {} = {
 	& {
 		discriminateBy: SugaredDiscriminateBy
 	}
-
+/**
+ * @group Uploads
+ */
 export const AnyFiles = Component<AnyFilesProps>(
 	({
 		 discriminateBy,

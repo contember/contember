@@ -1,13 +1,16 @@
 import classNames from 'classnames'
 import { memo } from 'react'
 import { useComponentClassName } from '../../auxiliary'
+import { HTMLDivElementProps } from '../../types'
 import { toEnumClass } from '../../utils'
 
-export type LayoutPageContentProps = JSX.IntrinsicElements['div'] & {
-	/** @deprecated Use `pageContentLayout` instead */
-	layout?: 'default' | 'full-width'
-	pageContentLayout?: 'center' | 'start' | 'end' | 'stretch'
-}
+export type LayoutPageContentProps =
+	& {
+		/** @deprecated Use `pageContentLayout` instead */
+		layout?: 'default' | 'full-width'
+		pageContentLayout?: 'center' | 'start' | 'end' | 'stretch'
+	}
+	& HTMLDivElementProps
 
 export const LayoutPageContent = memo(({ children, layout, pageContentLayout = 'center' }: LayoutPageContentProps) => {
 	const componentClassName = useComponentClassName('layout-page-content')

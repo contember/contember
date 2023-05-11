@@ -1,7 +1,6 @@
 import { LayoutPage, LayoutPageProps } from '@contember/ui'
-import { ComponentType, memo, ReactNode } from 'react'
-import type { PageProvider } from '../Pages'
-import { getPageName } from './getPageName'
+import { ReactNode } from 'react'
+import { pageComponent } from './pageComponent'
 
 export type GenericPageProps =
 	& Omit<LayoutPageProps, 'children'>
@@ -10,11 +9,19 @@ export type GenericPageProps =
 		children: ReactNode
 	}
 
-const GenericPage: Partial<PageProvider<GenericPageProps>> & ComponentType<GenericPageProps> = memo(
+/**
+ * Page for generic content. To use data binding, you must provide {@link @contember/binding#DataBindingProvider}
+ *
+ * @example
+ * ```
+ * <GenericPage>
+ *   <p>Welcome to Contember.</p>
+ * </GenericPage>
+ * ```
+ *
+ * @group Pages
+ */
+export const GenericPage = pageComponent(
 	({ children, ...props }: GenericPageProps) => <LayoutPage {...props}>{children}</LayoutPage>,
+	'GenericPage',
 )
-
-GenericPage.displayName = 'GenericPage'
-GenericPage.getPageName = getPageName
-
-export { GenericPage }

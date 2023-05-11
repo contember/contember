@@ -6,6 +6,11 @@ import { Component } from '@contember/binding'
 export type LinkButtonProps = LinkProps & AnchorButtonProps
 
 // TODO forward ref
+/**
+ * Link rendered as a button.
+ *
+ * @group Routing
+ */
 export const LinkButton = Component<LinkButtonProps>(({ to, ...buttonProps }) => {
 	return (
 		<Link

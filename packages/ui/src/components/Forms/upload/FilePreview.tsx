@@ -10,6 +10,9 @@ export interface FilePreviewProps {
 	overlay?: ReactNode
 }
 
+/**
+ * @group Forms UI
+ */
 export const FilePreview = memo(({ actions, children, isActive, overlay }: FilePreviewProps) => {
 	const prefix = useClassNamePrefix()
 	// TODO actions

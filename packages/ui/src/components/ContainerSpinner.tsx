@@ -1,6 +1,5 @@
+import { useClassName } from '@contember/utilities'
 import { memo } from 'react'
-import cn from 'classnames'
-import { useComponentClassName } from '../auxiliary'
 import type { Size } from '../types'
 import { toEnumViewClass } from '../utils'
 import { Aether } from './Aether'
@@ -14,7 +13,7 @@ export interface ContainerSpinnerProps {
  * @group UI
  */
 export const ContainerSpinner = memo(({ size }: ContainerSpinnerProps) => (
-	<Aether className={cn(useComponentClassName('containerSpinner'), toEnumViewClass(size))}>
+	<Aether className={useClassName('containerSpinner', toEnumViewClass(size))}>
 		<Spinner />
 	</Aether>
 ))

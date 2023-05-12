@@ -4,6 +4,7 @@
 		"outDir": "../dist/types"
 	},
 	"references": [
-		{ "path": "../../react-utils/src" }
+		{ "path": "../../react-utils/src" },
+		{ "path": "../../utilities/src" },
 	]
 }

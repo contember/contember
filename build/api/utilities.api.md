@@ -4,6 +4,8 @@
 
 ```ts
 
+import { Context } from 'react';
+
 // @public (undocumented)
 export type AsProp<C extends React.ElementType> = {
     as?: C;
@@ -44,6 +46,9 @@ export function getSizeFromResizeObserverEntryFactory(box: ResizeObserverOptions
     height: number;
     width: number;
 };
+
+// @public (undocumented)
+export const GlobalClassNamePrefixContext: Context<string>;
 
 // @public
 export type InheritableElementProps<C extends React.ElementType, Props = {}> = ExtendableProps<PropsOf<C>, Props>;
@@ -197,6 +202,12 @@ export function trimString(value: string, characters: string): string;
 
 // @public (undocumented)
 export type Try<A1, A2, Catch = never> = A1 extends A2 ? A1 : Catch;
+
+// @public
+export const useClassName: (componentClassName: NestedClassName, additionalClassName?: NestedClassName, prefixOverride?: string | null | undefined) => string;
+
+// @public (undocumented)
+export function useClassNameFactory(componentClassName: NestedClassName, glue?: string | null, prefixOverride?: string | null | undefined): (suffix?: string | null | undefined, additionalClassName?: NestedClassName) => string;
 
 // (No @packageDocumentation comment for this package)
 

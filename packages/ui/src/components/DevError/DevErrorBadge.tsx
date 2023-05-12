@@ -1,4 +1,4 @@
-import { useClassNamePrefix } from '../../auxiliary'
+import { useClassNameFactory } from '@contember/utilities'
 
 export interface DevErrorBadgeProps {
 	onOpen: () => void
@@ -6,10 +6,11 @@ export interface DevErrorBadgeProps {
 }
 
 export function DevErrorBadge({ errorCount, onOpen }: DevErrorBadgeProps) {
-	const prefix = useClassNamePrefix()
+	const componentClassName = useClassNameFactory('devErrorBadge')
+
 	return (
-		<div className={`${prefix}devErrorBadge`}>
-			<a className={`${prefix}devErrorBadge-button`} onClick={onOpen}>
+		<div className={componentClassName()}>
+			<a className={componentClassName('button')} onClick={onOpen}>
 				{errorCount} {errorCount > 1 ? 'errors' : 'error'}
 			</a>
 		</div>

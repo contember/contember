@@ -1,6 +1,5 @@
-import classnames from 'classnames'
-import { CSSProperties, forwardRef, memo, ReactNode, useMemo } from 'react'
-import { useClassNamePrefix } from '../../auxiliary'
+import { useClassName, useClassNameFactory } from '@contember/utilities'
+import { CSSProperties, ReactNode, forwardRef, memo, useMemo } from 'react'
 import type { HTMLDivElementProps, Size } from '../../types'
 import { toEnumClass, toEnumViewClass, toStateClass, toViewClass } from '../../utils'
 
@@ -57,8 +56,7 @@ export const Stack = memo(forwardRef<HTMLDivElement, StackProps>(({
 	wrap,
 	...rest
 }: StackProps, ref) => {
-	const prefix = useClassNamePrefix()
-
+	const componentClassName = useClassNameFactory('stack')
 	const style: CSSProperties = useMemo(() => ({
 		...{ flexBasis: basis },
 		...(typeof grow !== 'boolean' ? { flexGrow: grow } : {}),
@@ -70,8 +68,7 @@ export const Stack = memo(forwardRef<HTMLDivElement, StackProps>(({
 		{children && (
 			<div
 				{...rest}
-				className={classnames(
-					`${prefix}stack`,
+				className={componentClassName(null, [
 					toViewClass(`${direction}`, true),
 					toStateClass('evenly-distributed', evenly),
 					toEnumClass('gap-', gap),
@@ -79,9 +76,9 @@ export const Stack = memo(forwardRef<HTMLDivElement, StackProps>(({
 					grow === true && toEnumViewClass('grow'),
 					justify && toEnumViewClass(`justify-${justify}`),
 					shrink === true && toEnumViewClass('shrink'),
-					wrap && toEnumViewClass(wrap === true ? `wrap` : `wrap-${wrap}`),
+					wrap && toEnumViewClass(wrap === true ? 'wrap' : `wrap-${wrap}`),
 					className,
-				)}
+				])}
 				style={style}
 				ref={ref}
 			>

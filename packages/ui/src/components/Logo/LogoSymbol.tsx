@@ -1,6 +1,5 @@
-import classNames from 'classnames'
-import { memo, ReactNode } from 'react'
-import { useClassNamePrefix } from '../../auxiliary'
+import { useClassName } from '@contember/utilities'
+import { ReactNode, memo } from 'react'
 import type { Size } from '../../types'
 import { toEnumViewClass } from '../../utils'
 
@@ -16,14 +15,12 @@ export interface LogoSymbolProps {
  * @group UI
  */
 export const LogoSymbol = memo(({ className, children, size }: LogoSymbolProps) => {
-	const prefix = useClassNamePrefix()
 	return (
 		<div
-			className={classNames(
-				`${prefix}logo-symbol`,
+			className={useClassName('logo-symbol', [
 				typeof size === 'string' ? toEnumViewClass(size) : undefined,
 				className,
-			)}
+			])}
 			style={typeof size === 'number' ? { fontSize: `${size >= 0 ? size : 1}em` } : undefined}
 		>
 			{children}

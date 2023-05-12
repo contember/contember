@@ -1,7 +1,6 @@
-import cn from 'classnames'
+import { useClassName } from '@contember/utilities'
 import { createElement, forwardRef, memo } from 'react'
-import { useClassNamePrefix } from '../../auxiliary'
-import type { HeadingDepth, HeadingDistinction, HTMLHeadingElementProps, Size } from '../../types'
+import type { HTMLHeadingElementProps, HeadingDepth, HeadingDistinction, Size } from '../../types'
 import { toEnumViewClass } from '../../utils'
 
 export type HeadingProps =
@@ -23,7 +22,6 @@ export const Heading = memo(forwardRef<HTMLHeadingElement, HeadingProps>(({
 	size,
 	...headingProps
 }, ref) => {
-	const prefix = useClassNamePrefix()
 	const normalizedDepth = depth ?? 6
 	const headingElement = `h${normalizedDepth}` as 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'
 
@@ -31,7 +29,7 @@ export const Heading = memo(forwardRef<HTMLHeadingElement, HeadingProps>(({
 		headingElement,
 		{
 			ref,
-			className: cn(`${prefix}heading`, className, toEnumViewClass(size), toEnumViewClass(distinction)),
+			className: useClassName('heading', [className, toEnumViewClass(size), toEnumViewClass(distinction)]),
 			...headingProps,
 		},
 		children,

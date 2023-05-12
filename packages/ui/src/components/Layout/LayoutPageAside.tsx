@@ -1,5 +1,5 @@
+import { useClassNameFactory } from '@contember/utilities'
 import { memo, useLayoutEffect, useRef } from 'react'
-import { useClassNamePrefix } from '../../auxiliary'
 import { HTMLDivElementProps } from '../../types'
 import { useSectionTabsRegistration } from '../SectionTabs'
 import { Stack } from '../Stack'
@@ -14,7 +14,7 @@ const metaTab = {
  * @group Layout UI
  */
 export const LayoutPageAside = memo(({ children }: HTMLDivElementProps) => {
-	const componentClassName = `${useClassNamePrefix()}layout-page-aside`
+	const componentClassName = useClassNameFactory('layout-page-aside')
 	const [registerTab, unregisterTab] = useSectionTabsRegistration()
 	const element = useRef<HTMLDivElement>(null)
 
@@ -43,10 +43,12 @@ export const LayoutPageAside = memo(({ children }: HTMLDivElementProps) => {
 		}
 	})
 
-	return <div ref={element} id={metaTab.id} className={componentClassName}>
-		<Stack gap="large" direction="vertical" className={`${componentClassName}-content`}>
-			{children}
-		</Stack>
-	</div>
+	return (
+		<div ref={element} id={metaTab.id} className={componentClassName()}>
+			<Stack gap="large" direction="vertical" className={componentClassName('content')}>
+				{children}
+			</Stack>
+		</div>
+	)
 })
 LayoutPageAside.displayName = 'LayoutPageAside'

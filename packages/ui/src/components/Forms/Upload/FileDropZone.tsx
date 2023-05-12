@@ -1,9 +1,8 @@
-import cn from 'classnames'
+import { useClassNameFactory } from '@contember/utilities'
 import { forwardRef, memo, ReactNode } from 'react'
-import { useClassNamePrefix } from '../../../auxiliary'
+import { HTMLDivElementProps } from '../../../types'
 import { toStateClass } from '../../../utils'
 import { Box } from '../../Box'
-import { HTMLDivElementProps } from '../../../types'
 
 export type FileDropZoneProps =
 	& {
@@ -24,17 +23,17 @@ export const FileDropZone = memo(forwardRef<HTMLDivElement, FileDropZoneProps>((
 	className,
 	...props
 }, ref) => {
-	const prefix = useClassNamePrefix()
+	const componentClassName = useClassNameFactory('fileDropZone')
+
 	return (
 		<Box
 			{...props}
-			className={cn(
-				`${prefix}fileDropZone`,
+			className={componentClassName(null, [
 				toStateClass('active', isActive),
 				toStateClass('accepting', isAccepting),
 				toStateClass('rejecting', isRejecting),
 				className,
-			)}
+			])}
 			ref={ref}
 		/>
 	)

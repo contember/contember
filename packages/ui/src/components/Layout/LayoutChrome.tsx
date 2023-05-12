@@ -1,7 +1,6 @@
-import { default as classNames, default as classnames } from 'classnames'
-import { CSSProperties, memo, ReactNode, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
+import { useClassNameFactory } from '@contember/utilities'
+import { CSSProperties, ReactNode, memo, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { NavigationContext } from '../..'
-import { useClassNamePrefix } from '../../auxiliary'
 import { Intent, Scheme } from '../../types'
 import { toSchemeClass, toStateClass, toThemeClass, toViewClass } from '../../utils'
 import { DropdownContentContainerProvider } from '../Dropdown'
@@ -52,8 +51,6 @@ export const LayoutChrome = memo(({
 	titleThemeContent,
 	titleThemeControls,
 }: LayoutChromeProps) => {
-	const prefix = useClassNamePrefix()
-
 	const [collapsed, setCollapsed] = useState(true)
 	const [isScrolled, setIsScrolled] = useState(false)
 	const navigationContext = useContext(NavigationContext)
@@ -157,67 +154,67 @@ export const LayoutChrome = memo(({
 		}
 	})
 
-	const barClassName = `${prefix}layout-chrome-bar`
+	const componentClassName = useClassNameFactory('layout-chrome')
+	const componentBarClassName = useClassNameFactory('layout-chrome-bar')
 	const hasBar: boolean = !!(sidebarHeader || switchers || navigation || sidebarFooter)
 
-	return <div
-		ref={layoutRef}
-		className={classnames(
-			`${prefix}layout-chrome`,
-			toViewClass('no-bar', !hasBar),
-			toThemeClass(themeContent ?? theme, themeControls ?? theme),
-			toSchemeClass(scheme),
-			toViewClass('collapsed', collapsed),
-		)}
-		style={useMemo(() => (barContentOffsetTop
-			? ({ '--cui-bar-content-offset-top': `${barContentOffsetTop}px` } as CSSProperties)
-			: undefined
-		), [barContentOffsetTop])}
-	>
-		{hasBar && (
-			<DropdownContentContainerProvider>
-				<PreventCloseContext.Provider value={preventMenuClose}>
-					<div className={barClassName}>
-						<div className={`${barClassName}-header`}>
-							{sidebarHeader && <div className={`${barClassName}-header-inner`}>{sidebarHeader}</div>}
-							<Button id="cui-menu-button" distinction="seamless" className={`${prefix}layout-chrome-navigation-button`} onClick={toggleCollapsed}>
-								<span className={`${prefix}chrome-menu-button-label`}>Menu</span>
-								<Icon blueprintIcon={collapsed ? 'menu' : 'cross'} />
-							</Button>
+	return (
+		<div
+			ref={layoutRef}
+			className={componentClassName(null, [
+				toViewClass('no-bar', !hasBar),
+				toThemeClass(themeContent ?? theme, themeControls ?? theme),
+				toSchemeClass(scheme),
+				toViewClass('collapsed', collapsed),
+			])}
+			style={useMemo(() => (barContentOffsetTop
+				? ({ '--cui-bar-content-offset-top': `${barContentOffsetTop}px` } as CSSProperties)
+				: undefined
+			), [barContentOffsetTop])}
+		>
+			{hasBar && (
+				<DropdownContentContainerProvider>
+					<PreventCloseContext.Provider value={preventMenuClose}>
+						<div className={componentBarClassName()}>
+							<div className={componentBarClassName('header')}>
+								{sidebarHeader && <div className={componentBarClassName('header-inner')}>{sidebarHeader}</div>}
+								<Button id="cui-menu-button" distinction="seamless" className={componentClassName('navigation-button')} onClick={toggleCollapsed}>
+									<span className={componentClassName('menu-button-label')}>Menu</span>
+									<Icon blueprintIcon={collapsed ? 'menu' : 'cross'} />
+								</Button>
+							</div>
+							{switchers && <div className={componentBarClassName('switchers')}>{switchers}</div>}
+							{navigation && <div ref={contentRef} className={componentBarClassName('body')}>
+								<span className={componentBarClassName('body-scrolled-indicator', [
+									toStateClass('scrolled', isScrolled),
+								])} />
+								<Stack direction="vertical">
+									{navigation}
+								</Stack>
+							</div>}
+							{sidebarFooter && <div className={componentBarClassName('footer')}>
+								{sidebarFooter}
+							</div>}
 						</div>
-						{switchers && <div className={`${barClassName}-switchers`}>{switchers}</div>}
-						{navigation && <div ref={contentRef} className={`${barClassName}-body`}>
-							<span className={classNames(
-								`${barClassName}-body-scrolled-indicator`,
-								toStateClass('scrolled', isScrolled),
-							)} />
-							<Stack direction="vertical">
-								{navigation}
-							</Stack>
-						</div>}
-						{sidebarFooter && <div className={`${barClassName}-footer`}>
-							{sidebarFooter}
-						</div>}
-					</div>
-				</PreventCloseContext.Provider>
-			</DropdownContentContainerProvider>
-		)}
+					</PreventCloseContext.Provider>
+				</DropdownContentContainerProvider>
+			)}
 
-		<DropdownContentContainerProvider>
-			<div className={classNames(
-				`${prefix}layout-chrome-body`,
-				toSchemeClass(pageScheme ?? scheme),
-				toThemeClass(pageThemeContent ?? pageTheme, pageThemeControls ?? pageTheme),
-			)}>
-				<ThemeSchemeContext.Provider value={themeScheme}>
-					<TitleThemeSchemeContext.Provider value={titleThemeScheme}>
-						{children}
-					</TitleThemeSchemeContext.Provider>
-				</ThemeSchemeContext.Provider>
-			</div>
-		</DropdownContentContainerProvider>
-		<div id="portal-root" />
-	</div>
+			<DropdownContentContainerProvider>
+				<div className={componentClassName('body', [
+					toSchemeClass(pageScheme ?? scheme),
+					toThemeClass(pageThemeContent ?? pageTheme, pageThemeControls ?? pageTheme),
+				])}>
+					<ThemeSchemeContext.Provider value={themeScheme}>
+						<TitleThemeSchemeContext.Provider value={titleThemeScheme}>
+							{children}
+						</TitleThemeSchemeContext.Provider>
+					</ThemeSchemeContext.Provider>
+				</div>
+			</DropdownContentContainerProvider>
+			<div id="portal-root" />
+		</div>
+	)
 })
 
 LayoutChrome.displayName = 'LayoutChrome'

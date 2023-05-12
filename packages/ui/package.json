@@ -38,8 +38,8 @@
 	"dependencies": {
 		"@blueprintjs/icons": "3.29.0",
 		"@contember/react-utils": "workspace:*",
+		"@contember/utilities": "workspace:*",
 		"@popperjs/core": "2.10.2",
-		"classnames": "2.3.1",
 		"react-aria": "^3.20.0",
 		"react-popper": "^2.3.0",
 		"react-select": "5.3.2",

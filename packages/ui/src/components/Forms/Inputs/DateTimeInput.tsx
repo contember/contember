@@ -1,6 +1,5 @@
-import classNames from 'classnames'
+import { useClassName } from '@contember/utilities'
 import { forwardRef, memo, Ref } from 'react'
-import { useComponentClassName } from '../../../auxiliary'
 import { HTMLInputElementProps } from '../../../types'
 import { toViewClass } from '../../../utils'
 import { useTextBasedInput } from '../Hooks'
@@ -53,12 +52,10 @@ export const DateTimeInput = memo(
 	}: DateTimeInputProps, forwardedRef: Ref<HTMLInputElement>) => {
 		const props = useTextBasedInput<HTMLInputElement>({
 			...outerProps,
-			className: classNames(
-				useComponentClassName('text-input'),
-				useComponentClassName('datetime-input'),
+			className: useClassName(['text-input', 'datetime-input'], [
 				toViewClass('withTopToolbar', withTopToolbar),
 				className,
-			),
+			]),
 		}, forwardedRef)
 
 		return isInputDateTimeLocalSupported()

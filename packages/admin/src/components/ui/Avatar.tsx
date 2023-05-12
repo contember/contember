@@ -1,5 +1,5 @@
+import { listClassName } from '@contember/utilities'
 import md5 from 'blueimp-md5'
-import cn from 'classnames'
 import type { FunctionComponent } from 'react'
 
 export interface AvatarProps {
@@ -16,7 +16,7 @@ export const Avatar: FunctionComponent<AvatarProps> = props => {
 	const email = props.email || ''
 
 	return (
-		<div className={cn('avatar', `avatar-size${size}`, `avatar-shape${shape}`)}>
+		<div className={listClassName(['avatar', `avatar-size${size}`, `avatar-shape${shape}`])}>
 			{
 				<img
 					className="avatar-image"

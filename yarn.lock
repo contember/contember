@@ -2983,7 +2983,6 @@ __metadata:
     "@types/react-test-renderer": ^18
     blueimp-md5: 2.18.0
     buffer: 6.0.3
-    classnames: 2.3.1
     csstype: 3.0.8
     fuse.js: 6.4.6
     intl-messageformat: 9.9.1
@@ -3239,6 +3238,7 @@ __metadata:
     "@babel/core": 7.15.5
     "@blueprintjs/icons": 3.29.0
     "@contember/react-utils": "workspace:*"
+    "@contember/utilities": "workspace:*"
     "@mangoweb/sass-base": 0.0.8
     "@popperjs/core": 2.10.2
     "@storybook/addon-actions": 7.0.7
@@ -3257,7 +3257,6 @@ __metadata:
     "@types/react-dom": ^18
     babel-loader: 8.2.2
     babel-plugin-transform-vite-meta-env: 1.0.3
-    classnames: 2.3.1
     css-loader: 5.2.4
     csstype: 3.0.8
     prop-types: ^15.8.1
@@ -7277,13 +7276,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/classnames@npm:2.2.10":
-  version: 2.2.10
-  resolution: "@types/classnames@npm:2.2.10"
-  checksum: 6d1b647fe03bb4f0f09756a704ae2e8c6976e2fe012800c013c75cd87752197e5e502417710a78ce994809c2f6a56b5d4b819c3ca49086581c4ef98e3f2e2844
-  languageName: node
-  linkType: hard
-
 "@types/connect@npm:*":
   version: 3.4.35
   resolution: "@types/connect@npm:3.4.35"
@@ -9257,13 +9249,6 @@ __metadata:
   version: 3.8.0
   resolution: "ci-info@npm:3.8.0"
   checksum: d0a4d3160497cae54294974a7246202244fff031b0a6ea20dd57b10ec510aa17399c41a1b0982142c105f3255aff2173e5c0dd7302ee1b2f28ba3debda375098
-  languageName: node
-  linkType: hard
-
-"classnames@npm:2.3.1":
-  version: 2.3.1
-  resolution: "classnames@npm:2.3.1"
-  checksum: 14db8889d56c267a591f08b0834989fe542d47fac659af5a539e110cc4266694e8de86e4e3bbd271157dbd831361310a8293e0167141e80b0f03a0f175c80960
   languageName: node
   linkType: hard
 
@@ -16178,7 +16163,6 @@ __metadata:
   resolution: "root-workspace-0b6124@workspace:."
   dependencies:
     "@microsoft/api-extractor": ^7.34.8
-    "@types/classnames": 2.2.10
     "@types/react": ^18
     "@types/react-dom": ^18
     "@typescript-eslint/eslint-plugin": ^5.58.0

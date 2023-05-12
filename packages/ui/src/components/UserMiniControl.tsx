@@ -1,6 +1,5 @@
-import cn from 'classnames'
+import { useClassNameFactory } from '@contember/utilities'
 import type { FunctionComponent, ReactNode } from 'react'
-import { useClassNamePrefix } from '../auxiliary'
 
 export interface UserMiniControlProps {
 	avatarUrl?: string
@@ -12,17 +11,18 @@ export interface UserMiniControlProps {
  * @group UI
  */
 export const UserMiniControl: FunctionComponent<UserMiniControlProps> = ({ name, note, avatarUrl }) => {
-	const prefix = useClassNamePrefix()
+	const componentClassName = useClassNameFactory('userMiniControl')
+
 	return (
-		<div className={cn(`${prefix}userMiniControl`)}>
+		<div className={componentClassName()}>
 			{avatarUrl && (
-				<div className={`${prefix}userMiniControl-avatar`}>
-					<img src={avatarUrl} className={`${prefix}userMiniControl-avatar-img`} alt="" />
+				<div className={componentClassName('avatar')}>
+					<img src={avatarUrl} className={componentClassName('avatar-img')} alt="" />
 				</div>
 			)}
-			<div className={`${prefix}userMiniControl-info`}>
-				<span className={`${prefix}userMiniControl-name`}>{name}</span>
-				{note && <span className={`${prefix}userMiniControl-note`}>{note}</span>}
+			<div className={componentClassName('info')}>
+				<span className={componentClassName('name')}>{name}</span>
+				{note && <span className={componentClassName('note')}>{note}</span>}
 			</div>
 		</div>
 	)

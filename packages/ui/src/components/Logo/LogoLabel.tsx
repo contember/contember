@@ -1,6 +1,5 @@
-import classNames from 'classnames'
-import { memo, ReactNode } from 'react'
-import { useClassNamePrefix } from '../../auxiliary'
+import { useClassName } from '@contember/utilities'
+import { ReactNode, memo } from 'react'
 import { Size } from '../../types'
 import { toEnumViewClass } from '../../utils'
 
@@ -14,18 +13,13 @@ export interface LogoLabelProps {
  * @group UI
  */
 export const LogoLabel = memo(({ className, children, size }: LogoLabelProps) => {
-	const prefix = useClassNamePrefix()
-
-	const cls = classNames(
-		`${prefix}logo-label`,
-		typeof size === 'string' ? toEnumViewClass(size) : undefined,
-		className,
-	)
-	const style = typeof size === 'number' ? { fontSize: `${size >= 0 ? size : 1}em` } : undefined
-
 	return (
-		<div className={cls} style={style}>
-			{children}
-		</div>
+		<div
+			className={useClassName('logo-label', [
+				typeof size === 'string' ? toEnumViewClass(size) : undefined,
+				className,
+			])}
+			style={typeof size === 'number' ? { fontSize: `${size >= 0 ? size : 1}em` } : undefined}
+		>{children}</div>
 	)
 })

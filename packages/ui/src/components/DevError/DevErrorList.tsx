@@ -1,4 +1,4 @@
-import { useClassNamePrefix } from '../../auxiliary'
+import { useClassNameFactory } from '@contember/utilities'
 import { Button, ButtonGroup } from '../Forms'
 import { Icon } from '../Icon'
 import { DevErrorInner } from './DevErrorInner'
@@ -24,31 +24,32 @@ export function DevErrorList({
 	onNext,
 	onPrevious,
 }: DevErrorListProps) {
-	const prefix = useClassNamePrefix()
+	const componentClassName = useClassNameFactory('devError')
+
 	return (
-		<div className={`${prefix}devError`}>
-			<div className={`${prefix}devError-in`}>
-				<div className={`${prefix}devError-bar`}>
-					<div className={`${prefix}devError-errorSource`}>{currentErrorSource}</div>
-					<div className={`${prefix}devError-actions`}>
+		<div className={componentClassName()}>
+			<div className={componentClassName('in')}>
+				<div className={componentClassName('bar')}>
+					<div className={componentClassName('errorSource')}>{currentErrorSource}</div>
+					<div className={componentClassName('actions')}>
 						{errorCount > 1 ? (
-							<div className={`${prefix}devError-switcher`}>
-								<p className={`${prefix}devError-errorCount`}>
+							<div className={componentClassName('switcher')}>
+								<p className={componentClassName('errorCount')}>
 									Error {currentErrorIndex + 1} of {errorCount}
 								</p>
-								<ButtonGroup size={'small'}>
-									<Button distinction={'outlined'} size={'small'} onClick={onPrevious}>
-										<Icon blueprintIcon={'arrow-left'} />{' '}
+								<ButtonGroup size="small">
+									<Button distinction="outlined" size="small" onClick={onPrevious}>
+										<Icon blueprintIcon="arrow-left" />{' '}
 									</Button>
-									<Button distinction={'outlined'} size={'small'} onClick={onNext}>
-										<Icon blueprintIcon={'arrow-right'} />{' '}
+									<Button distinction="outlined" size="small" onClick={onNext}>
+										<Icon blueprintIcon="arrow-right" />{' '}
 									</Button>
 								</ButtonGroup>
 							</div>
 						) : null}
-						<div className={`${prefix}devError-close`}>
-							<Button distinction={'outlined'} size={'small'} onClick={onClose}>
-								<Icon blueprintIcon={'cross'} />{' '}
+						<div className={componentClassName('close')}>
+							<Button distinction="outlined" size="small" onClick={onClose}>
+								<Icon blueprintIcon="cross" />{' '}
 							</Button>
 						</div>
 					</div>

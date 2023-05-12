@@ -1,10 +1,9 @@
-import classNames from 'classnames'
+import { useClassNameFactory } from '@contember/utilities'
 import { memo, ReactElement, ReactNode, TextareaHTMLAttributes, useEffect, useRef, useState } from 'react'
-import { useClassNamePrefix } from '../../auxiliary'
 import type { EditorCanvasDistinction, EditorCanvasSize } from '../../types'
 import { toEnumStateClass, toEnumViewClass } from '../../utils'
 
-export interface HTMLTextAreaDivTargetProps extends TextareaHTMLAttributes<HTMLDivElement> {}
+export interface HTMLTextAreaDivTargetProps extends TextareaHTMLAttributes<HTMLDivElement> { }
 
 export interface EditorCanvasProps<P extends HTMLTextAreaDivTargetProps> {
 	underlyingComponent: (props: P) => ReactElement
@@ -27,7 +26,7 @@ export const EditorCanvas = memo(<P extends HTMLTextAreaDivTargetProps>({
 	componentProps: props,
 }: EditorCanvasProps<P>) => {
 	const className = props.className
-	const prefix = useClassNamePrefix()
+	const componentClassName = useClassNameFactory('editorCanvas')
 
 	const [isInView, setIsInView] = useState(false)
 
@@ -53,14 +52,13 @@ export const EditorCanvas = memo(<P extends HTMLTextAreaDivTargetProps>({
 	}, [])
 
 	return (
-		<div ref={intersectionRef} className={classNames(
-			`${prefix}editorCanvas`,
+		<div ref={intersectionRef} className={componentClassName(null, [
 			toEnumViewClass(size),
 			toEnumViewClass(inset),
 			toEnumViewClass(distinction),
 			toEnumStateClass(isInView ? 'in-view' : 'not-in-view'),
-		)}>
-			<Component {...props} className={classNames(`${prefix}editorCanvas-canvas`, className)} />
+		])}>
+			<Component {...props} className={componentClassName('canvas', className)} />
 			{children}
 		</div>
 	)

@@ -1,5 +1,5 @@
+import { useClassNameFactory } from '@contember/utilities'
 import { memo, useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react'
-import { useClassNamePrefix } from '../../auxiliary'
 import { TabButton } from '../Tabs'
 import { ActiveSectionsTabsContext, SectionTabsContext, SectionTabsRegistrationContext, useActiveSectionsTabs, useSectionTabs } from './Context'
 import { activeSectionTabsMapReducer, sectionTabsMapReducer } from './State'
@@ -77,7 +77,7 @@ export const SectionTabsProvider = memo(({ children }: SectionTabsProps) => {
 })
 
 export const SectionTabs = memo(() => {
-	const prefix = useClassNamePrefix()
+	const componentClassName = useClassNameFactory('section-tabs')
 	const tabs = useSectionTabs()
 	const activeTabs = useActiveSectionsTabs()
 	const entries = Object.entries(tabs)
@@ -106,8 +106,8 @@ export const SectionTabs = memo(() => {
 	}, [selectedOrActiveTab, selectedTab, activeTab, activeTabs])
 
 	return entries.length > 1
-		? <div className={`${prefix}section-tabs`}>
-			<div className={`${prefix}section-tabs-content`}>
+		? <div className={componentClassName()}>
+			<div className={componentClassName('content')}>
 				{entries.map(([, { id, label, isMeta = false }]) => (
 					<TabButton
 						key={id}

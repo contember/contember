@@ -1,6 +1,7 @@
 import { EntityAccessor, useMutationState } from '@contember/binding'
-import { Button, ButtonProps, Icon, IconProps, useClassNamePrefix } from '@contember/ui'
-import { ComponentType, memo, ReactNode } from 'react'
+import { Button, ButtonProps, Icon, IconProps } from '@contember/ui'
+import { useClassName } from '@contember/utilities'
+import { ComponentType, ReactNode, memo } from 'react'
 
 export type CreateNewEntityButtonProps = ButtonProps & {
 	createNewEntity: (initialize?: EntityAccessor.BatchUpdatesHandler) => void
@@ -33,7 +34,6 @@ const defaultIconProps: IconProps = {
 export const CreateNewEntityButton = memo(
 	({ createNewEntity, iconProps, children = 'Add', ...buttonProps }: CreateNewEntityButtonProps) => {
 		const isMutating = useMutationState()
-		const prefix = useClassNamePrefix()
 
 		return (
 			<Button
@@ -41,7 +41,7 @@ export const CreateNewEntityButton = memo(
 				onClick={() => createNewEntity()}
 				disabled={isMutating}
 				loading={isMutating}
-				className={`${prefix}new-entity-button`}
+				className={useClassName('new-entity-button')}
 				distinction="seamless"
 				justification="justifyStart"
 				{...buttonProps}

@@ -1,6 +1,5 @@
-import cn from 'classnames'
+import { useClassNameFactory } from '@contember/utilities'
 import { memo, ReactNode } from 'react'
-import { useClassNamePrefix } from '../../../auxiliary'
 import { toStateClass } from '../../../utils'
 
 export interface FilePreviewProps {
@@ -14,13 +13,14 @@ export interface FilePreviewProps {
  * @group Forms UI
  */
 export const FilePreview = memo(({ actions, children, isActive, overlay }: FilePreviewProps) => {
-	const prefix = useClassNamePrefix()
+	const componentClassName = useClassNameFactory('filePreview')
+
 	// TODO actions
 	return (
-		<div className={cn(`${prefix}filePreview`, toStateClass('active', isActive))}>
-			<div className={`${prefix}filePreview-in`}>
-				{overlay && <div className={`${prefix}filePreview-overlay`}>{overlay}</div>}
-				<div className={`${prefix}filePreview-preview`}>{children}</div>
+		<div className={componentClassName(null, toStateClass('active', isActive))}>
+			<div className={componentClassName('in')}>
+				{overlay && <div className={componentClassName('overlay')}>{overlay}</div>}
+				<div className={componentClassName('preview')}>{children}</div>
 			</div>
 		</div>
 	)

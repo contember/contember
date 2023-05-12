@@ -1,9 +1,8 @@
-import classNames from 'classnames'
-import { memo, MouseEvent, ReactNode } from 'react'
-import { useComponentClassName } from '../../auxiliary'
+import { useClassName, useClassNameFactory } from '@contember/utilities'
+import { MouseEvent, ReactNode, memo } from 'react'
 import { HTMLAnchorElementProps, HTMLDivElementProps } from '../../types'
 import { toEnumViewClass, toFeatureClass, toStateClass } from '../../utils'
-import { useInputClassName, VisuallyDependentControlProps } from '../Forms'
+import { VisuallyDependentControlProps, useInputClassName } from '../Forms'
 import { Label } from '../Typography'
 
 const CardInner = ({
@@ -59,66 +58,50 @@ export type LinkCardProps =
 /**
  * @group UI
  */
-export const LinkCard = memo<LinkCardProps>(
-	({
-		active,
-		children,
-		className: _className,
-		layout = 'label-below',
-		src,
-		...props
-	}) => {
-		const componentClassName = useComponentClassName('card')
-		const className = classNames(
-			componentClassName,
-			toEnumViewClass(layout),
-			toFeatureClass('focus', true),
-			toFeatureClass('hover', true),
-			toFeatureClass('press', true),
-			toStateClass('active', active),
-			useInputClassName(props as VisuallyDependentControlProps),
-			_className,
-		)
-
-		return (
-			<a {...props} className={className}>
-				<CardInner src={src} className={componentClassName}>{children}</CardInner>
-			</a>
-		)
-	},
-)
+export const LinkCard = memo<LinkCardProps>(({
+	active,
+	children,
+	className,
+	layout = 'label-below',
+	src,
+	...props
+}) => (
+	<a {...props} className={useClassName('card', [
+		toEnumViewClass(layout),
+		toFeatureClass('focus', true),
+		toFeatureClass('hover', true),
+		toFeatureClass('press', true),
+		toStateClass('active', active),
+		useInputClassName(props as VisuallyDependentControlProps),
+		className,
+	])}>
+		<CardInner src={src} className={useClassName('card')}>{children}</CardInner>
+	</a>
+))
 LinkCard.displayName = 'LinkCard'
 
 /**
  * @group UI
  */
-export const Card = memo<CardProps>(
-	({
-		children,
-		className: _className,
-		layout = 'label-below',
-		onClick,
-		active,
-		src,
-		...props
-	}) => {
-		const componentClassName = useComponentClassName('card')
-		const className = classNames(
-			componentClassName,
-			toEnumViewClass(layout),
-			toFeatureClass('focus', !!onClick),
-			toFeatureClass('hover', !!onClick),
-			toFeatureClass('press', !!onClick),
-			toStateClass('active', active),
-			useInputClassName(props as VisuallyDependentControlProps),
-			_className,
-		)
-
-		return (
-			<div {...props} onClick={onClick} className={className}>
-				<CardInner src={src} className={componentClassName}>{children}</CardInner>
-			</div>
-		)
-	},
-)
+export const Card = memo<CardProps>(({
+	children,
+	className,
+	layout = 'label-below',
+	onClick,
+	active,
+	src,
+	...props
+}) => (
+	<div {...props} onClick={onClick} className={useClassName('card', [
+		toEnumViewClass(layout),
+		toFeatureClass('focus', !!onClick),
+		toFeatureClass('hover', !!onClick),
+		toFeatureClass('press', !!onClick),
+		toStateClass('active', active),
+		useInputClassName(props as VisuallyDependentControlProps),
+		className,
+	])}>
+		<CardInner src={src} className={useClassName('card')}>{children}</CardInner>
+	</div>
+))
 Card.displayName = 'Card'

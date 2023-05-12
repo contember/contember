@@ -1,4 +1,4 @@
-import classNames from 'classnames'
+import { listClassName } from '@contember/utilities'
 import { toEnumClass, toEnumStateClass, toEnumViewClass, toStateClass, toThemeClass } from '../../../utils'
 import { NonOptionalVisuallyDependentControlProps } from '../Types'
 import { VisuallyDependentControlProps } from '../Types/ControlProps'
@@ -50,7 +50,7 @@ export function useInputClassName<P extends NonOptionalUseInputClassNameProps | 
 		finalIntent = 'danger'
 	}
 
-	return classNames(
+	return listClassName([
 		toStateClass('active', active),
 		toStateClass('disabled', disabled),
 		toStateClass('focused', focused),
@@ -66,5 +66,5 @@ export function useInputClassName<P extends NonOptionalUseInputClassNameProps | 
 		toEnumStateClass(validationState),
 
 		outerClassName,
-	)
+	])
 }

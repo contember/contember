@@ -1,6 +1,5 @@
-import classNames from 'classnames'
+import { useClassNameFactory } from '@contember/utilities'
 import { memo, MouseEvent as ReactMouseEvent } from 'react'
-import { useClassNamePrefix } from '../../auxiliary'
 import { toEnumViewClass } from '../../utils'
 import { Icon } from '../Icon'
 import { Label } from '../Typography/Label'
@@ -12,18 +11,18 @@ export interface EditorBlockBoundaryProps {
 }
 
 export const EditorBlockBoundary = memo(function EditorBlockBoundary({ blockEdge, newParagraphText, onClick }: EditorBlockBoundaryProps) {
-	const prefix = useClassNamePrefix()
+	const componentClassName = useClassNameFactory('editorBlockBoundary')
+
 	return (
 		<div
-			className={classNames(
-				`${prefix}editorBlockBoundary`,
+			className={componentClassName(null, [
 				toEnumViewClass(`${blockEdge}Block`),
-			)}
+			])}
 			contentEditable={false}
 			data-slate-editor={false}
 			onClick={onClick}
 		>
-			<span className={`${prefix}editorBlockBoundary-inner`}>
+			<span className={componentClassName('inner')}>
 				<Icon blueprintIcon="add" />
 				<Label>{newParagraphText}</Label>
 			</span>

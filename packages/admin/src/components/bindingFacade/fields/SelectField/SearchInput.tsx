@@ -1,5 +1,5 @@
-import type { CommonProps, GroupBase, InputProps } from 'react-select'
-import cn from 'classnames'
+import { listClassName } from '@contember/utilities'
+import type { CommonProps, InputProps } from 'react-select'
 
 // This function is copied from react-select.
 export const cleanCommonProps = (props: CommonProps<any, boolean, never> & { className?: any }): any => {
@@ -27,7 +27,7 @@ export const SearchInput = (props: InputProps<any, boolean, never>) => {
 	const { innerRef, isDisabled, isHidden, ...innerProps } = cleanCommonProps(props as any)
 
 	return (
-		<div className={cn('selectField-search', isHidden && 'is-hidden')} data-value={innerProps.value}>
+		<div className={listClassName(['selectField-search', isHidden && 'is-hidden'])} data-value={innerProps.value}>
 			<input
 				type="text"
 				className="selectField-search-input"

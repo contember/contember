@@ -1,6 +1,5 @@
-import classNames from 'classnames'
+import { useClassName } from '@contember/utilities'
 import { ChangeEvent, forwardRef, memo, Ref, useCallback, useEffect, useRef, useState } from 'react'
-import { useComponentClassName } from '../../../auxiliary'
 import { toViewClass } from '../../../utils'
 import { Divider } from '../../Divider'
 import { Stack } from '../../Stack'
@@ -65,10 +64,7 @@ export const DateTimeInputFallback = memo(forwardRef(({
 	const dateInputProps = useTextBasedInput<HTMLInputElement>({
 		...outerProps,
 		distinction: 'seamless',
-		className: classNames(
-			useComponentClassName('input'),
-			className,
-		),
+		className: useClassName('input', className),
 		onValidationStateChange: useCallback((error: string | undefined) => {
 			dateError.current = error
 			changeValidationState()
@@ -80,10 +76,7 @@ export const DateTimeInputFallback = memo(forwardRef(({
 	const timeInputProps = useTextBasedInput<HTMLInputElement>({
 		...outerProps,
 		distinction: 'seamless',
-		className: classNames(
-			useComponentClassName('input'),
-			className,
-		),
+		className: useClassName('input', className),
 		onValidationStateChange: useCallback((error: string | undefined) => {
 			timeError.current = error
 			changeValidationState()
@@ -94,32 +87,32 @@ export const DateTimeInputFallback = memo(forwardRef(({
 	const [maxDate, maxTime] = splitDatetime(max)
 	const [minDate, minTime] = splitDatetime(min)
 
-	return <Stack gap="large" direction="horizontal" className={useInputClassName<VisuallyDependentControlProps>({
-		...outerProps,
-		className: classNames(
-			useComponentClassName('text-input'),
-			useComponentClassName('datetime-input'),
-			toViewClass('withTopToolbar', withTopToolbar),
-			className,
-		),
-	})}>
-		<input
-			{...dateInputProps}
-			max={maxDate}
-			min={minDate}
-			onChange={onDateChange}
-			placeholder={outerProps.placeholder ?? undefined}
-			type="date"
-		/>
-		<Divider gap="none" />
-		<input
-			{...timeInputProps}
-			max={date && date === maxDate ? maxTime : ''}
-			min={date && date === minDate ? minTime : ''}
-			onChange={onTimeChange}
-			placeholder={undefined}
-			type="time"
-		/>
-	</Stack>
+	return (
+		<Stack gap="large" direction="horizontal" className={useInputClassName<VisuallyDependentControlProps>({
+			...outerProps,
+			className: useClassName(['text-input', 'datetime-input'], [
+				toViewClass('withTopToolbar', withTopToolbar),
+				className,
+			]),
+		})}>
+			<input
+				{...dateInputProps}
+				max={maxDate}
+				min={minDate}
+				onChange={onDateChange}
+				placeholder={outerProps.placeholder ?? undefined}
+				type="date"
+			/>
+			<Divider gap="none" />
+			<input
+				{...timeInputProps}
+				max={date && date === maxDate ? maxTime : ''}
+				min={date && date === minDate ? minTime : ''}
+				onChange={onTimeChange}
+				placeholder={undefined}
+				type="time"
+			/>
+		</Stack>
+	)
 }))
 DateTimeInputFallback.displayName = 'DateTimeInputFallback'

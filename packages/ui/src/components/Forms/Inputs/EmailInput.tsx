@@ -1,6 +1,5 @@
-import classNames from 'classnames'
+import { useClassName } from '@contember/utilities'
 import { forwardRef, memo } from 'react'
-import { useComponentClassName } from '../../../auxiliary'
 import { toViewClass } from '../../../utils'
 import { useTextBasedInput } from '../Hooks'
 import type { EmailInputProps } from './Types'
@@ -15,12 +14,10 @@ export const EmailInput = memo(forwardRef<HTMLInputElement, EmailInputProps>(({
 }, forwardedRed) => {
 	const props = useTextBasedInput<HTMLInputElement>({
 		...outerProps,
-		className: classNames(
-			useComponentClassName('text-input'),
-			useComponentClassName('email-input'),
+		className: useClassName(['text-input', 'email-input'], [
 			toViewClass('withTopToolbar', withTopToolbar),
 			className,
-		),
+		]),
 	}, forwardedRed)
 
 	return <input {...props} type="email" />

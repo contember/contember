@@ -1,8 +1,7 @@
-import cn from 'classnames'
+import { useClassName } from '@contember/utilities'
 import { createElement, ReactNode } from 'react'
-import { useClassNamePrefix } from '../../auxiliary'
-import { toViewClass } from '../../utils'
 import { HTMLParagraphElementProps } from '../../types'
+import { toViewClass } from '../../utils'
 
 export interface EditorParagraphProps {
 	isNumbered?: boolean
@@ -12,13 +11,12 @@ export interface EditorParagraphProps {
 }
 
 export function EditorParagraph({ isNumbered, attributes, children, align }: EditorParagraphProps) {
-	const prefix = useClassNamePrefix()
 	return createElement('p', {
 		...attributes,
 		style: {
 			textAlign: align,
 		},
 		children,
-		className: cn(`${prefix}editorParagraph`, toViewClass('numbered', isNumbered)),
+		className: useClassName('editorParagraph', toViewClass('numbered', isNumbered)),
 	})
 }

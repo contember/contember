@@ -41,7 +41,6 @@
 	},
 	"devDependencies": {
 		"@microsoft/api-extractor": "^7.34.8",
-		"@types/classnames": "2.2.10",
 		"@types/react": "^18",
 		"@types/react-dom": "^18",
 		"@typescript-eslint/eslint-plugin": "^5.58.0",

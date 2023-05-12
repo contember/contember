@@ -1,6 +1,5 @@
-import classNames from 'classnames'
+import { useClassName, useClassNameFactory } from '@contember/utilities'
 import { memo } from 'react'
-import { useClassNamePrefix } from '../../auxiliary'
 import { HTMLDivElementProps, Size } from '../../types'
 import { toEnumViewClass } from '../../utils'
 
@@ -13,15 +12,12 @@ export type DividerProps =
 /**
  * @group UI
  */
-export const Divider = memo(({ className, gap, ...rest }: DividerProps) => {
-	const componentClassName = `${useClassNamePrefix()}divider`
-
-	return <div
-		className={classNames(
-			componentClassName,
+export const Divider = memo(({ className, gap, ...rest }: DividerProps) => (
+	<div
+		className={useClassName('divider', [
 			toEnumViewClass(gap),
 			className,
-		)}
+		])}
 		{...rest}
 	/>
-})
+))

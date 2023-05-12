@@ -1,5 +1,5 @@
+import { listClassName } from '@contember/utilities'
 import type { ComponentMeta, ComponentStory } from '@storybook/react'
-import classNames from 'classnames'
 import * as React from 'react'
 import { Button, Stack } from '../../src'
 import { Intent, Scheme } from '../../src/types'
@@ -100,20 +100,17 @@ const PropertyBackgroundColor = ({ children }: { children: string }) => <>
 const ThemePreview = ({ background, belowAbove, children }: ThemePreviewProps) => <>
 	<Stack
 		direction="horizontal"
-		className={classNames(
-			`schema-${background}`,
-		)}
+		className={`schema-${background}`}
 		style={{
 			alignItems: 'stretch',
 			display: 'flex',
 		}}
 	>
 		{colorThemes.map(theme => (
-			<div key={theme} className={classNames([
+			<div key={theme} className={listClassName([
 				`theme-${theme}`,
 				background !== 'inherit' ? `scheme-${background + (belowAbove ? `-${belowAbove}` : '')}` : undefined,
-			])
-			} style={{
+			])} style={{
 				borderRadius: '1em',
 				backgroundColor: 'var(--cui-background-color)',
 				color: 'var(--cui-color)',

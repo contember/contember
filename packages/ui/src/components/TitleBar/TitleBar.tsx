@@ -1,6 +1,5 @@
-import classNames from 'classnames'
+import { useClassNameFactory } from '@contember/utilities'
 import { memo, ReactNode } from 'react'
-import { useClassNamePrefix } from '../../auxiliary'
 import { toSchemeClass, toThemeClass } from '../../utils'
 import { ButtonList } from '../Forms'
 import { LayoutPageStickyContainer } from '../Layout/LayoutPageStickyContainer'
@@ -20,7 +19,7 @@ export interface TitleBarProps extends ThemeScheme {
  * @group UI
  */
 export const TitleBar = memo(({ after, navigation, children, headingProps, actions, ...props }: TitleBarProps) => {
-	const prefix = useClassNamePrefix()
+	const componentClassName = useClassNameFactory('titleBar')
 	const {
 		scheme,
 		theme,
@@ -33,29 +32,28 @@ export const TitleBar = memo(({ after, navigation, children, headingProps, actio
 	return (
 		<LayoutPageStickyContainer
 			top={0}
-			className={classNames(
-				`${prefix}titleBar`,
+			className={componentClassName(null, [
 				toThemeClass(themeContent ?? theme, themeControls ?? theme),
 				toSchemeClass(scheme),
 				scheme !== layoutScheme ? 'is-global-theme' : undefined,
-			)}
+			])}
 		>
 			{navigation && (
-				<nav className={`${prefix}titleBar-navigation`}>
+				<nav className={componentClassName('navigation')}>
 					<ButtonList>{navigation}</ButtonList>
 				</nav>
 			)}
-			<div className={`${prefix}titleBar-in`}>
-				<div className={`${prefix}titleBar-heading`}>
+			<div className={componentClassName('in')}>
+				<div className={componentClassName('heading')}>
 					<Heading {...{ depth: 2, ...headingProps }}>{children}</Heading>
 				</div>
 				{actions && (
-					<div className={`${prefix}titleBar-actions`}>
+					<div className={componentClassName('actions')}>
 						<ButtonList>{actions}</ButtonList>
 					</div>
 				)}
 			</div>
-			{after && <div className={`${prefix}titleBar-after`}>
+			{after && <div className={componentClassName('after')}>
 				{after}
 			</div>}
 		</LayoutPageStickyContainer>

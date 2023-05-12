@@ -1,5 +1,4 @@
-import classNames from 'classnames'
-import { useClassNamePrefix } from '../../../auxiliary'
+import { useClassNameFactory } from '@contember/utilities'
 import { toStateClass } from '../../../utils'
 
 export interface RadioButtonProps {
@@ -24,11 +23,10 @@ export const RadioButton = ({
 	readonly,
 	invalid,
 }: RadioButtonProps) => {
-	const componentClassName = `${useClassNamePrefix()}radio-button`
+	const componentClassName = useClassNameFactory('radio-button')
 
 	return <span
-		className={classNames(
-			`${componentClassName}`,
+		className={componentClassName(null, [
 			toStateClass('checked', checked),
 			toStateClass('disabled', disabled),
 			toStateClass('focused', focused),
@@ -36,9 +34,9 @@ export const RadioButton = ({
 			toStateClass('invalid', invalid),
 			toStateClass('indeterminate', indeterminate),
 			toStateClass('readonly', readonly),
-		)}
+		])}
 		children={indeterminate
-			? <span aria-hidden="true" className={`${componentClassName}-questionmark`}>?</span>
+			? <span aria-hidden="true" className={componentClassName('questionmark')}>?</span>
 			: undefined}
 	/>
 }

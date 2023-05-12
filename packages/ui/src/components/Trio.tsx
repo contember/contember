@@ -1,6 +1,5 @@
-import cn from 'classnames'
+import { useClassNameFactory } from '@contember/utilities'
 import type { ReactNode } from 'react'
-import { useClassNamePrefix } from '../auxiliary'
 import { toViewClass } from '../utils'
 
 export function Trio({
@@ -18,22 +17,22 @@ export function Trio({
 	end?: ReactNode
 	clickThroughSpace?: boolean
 }) {
-	const prefix = useClassNamePrefix()
+	const componentClassName = useClassNameFactory('trio')
+
 	if (!start && !center && !end) {
 		return null
 	}
 	return (
 		<div
-			className={cn(
-				`${prefix}trio`,
+			className={componentClassName(null, [
 				className,
 				toViewClass('column', column),
 				toViewClass('clickThroughSpace', clickThroughSpace),
-			)}
+			])}
 		>
-			<div className={`${prefix}trio-start`}>{start}</div>
-			<div className={`${prefix}trio-center`}>{center}</div>
-			<div className={`${prefix}trio-end`}>{end}</div>
+			<div className={componentClassName('start')}>{start}</div>
+			<div className={componentClassName('center')}>{center}</div>
+			<div className={componentClassName('end')}>{end}</div>
 		</div>
 	)
 }

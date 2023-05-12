@@ -1,11 +1,10 @@
-import classNames from 'classnames'
+import { useClassNameFactory } from '@contember/utilities'
 import { memo, MouseEvent as ReactMouseEvent, ReactNode, useMemo } from 'react'
-import { useClassNamePrefix } from '../../auxiliary'
+import { HTMLDivElementProps } from '../../types'
 import { Box } from '../Box'
 import { Dropdown, DropdownProps } from '../Dropdown'
 import { Button, ButtonOwnProps } from '../Forms'
 import { Icon, IconProps } from '../Icon'
-import { HTMLDivElementProps } from '../../types'
 
 export type ActionableBoxProps =
 	& {
@@ -33,12 +32,12 @@ export const ActionableBox = memo<ActionableBoxProps>(({
 	onRemove,
 	...divProps
 }) => {
-	const prefix = useClassNamePrefix()
-
 	const buttonProps: DropdownProps['buttonProps'] = useMemo(() => ({
 		...commonButtonProps,
 		children: <Icon {...commonIconProps} contemberIcon="pencil" />,
 	}), [])
+
+	const componentClassName = useClassNameFactory('actionableBox')
 
 	if (editContents === undefined && onRemove === undefined) {
 		return <>{children}</>
@@ -47,21 +46,19 @@ export const ActionableBox = memo<ActionableBoxProps>(({
 	return (
 		<Box
 			{...divProps}
-			className={classNames(`${prefix}actionableBox`, className)}
+			className={componentClassName(null, className)}
 		>
-			<div className={`${prefix}actionableBox-contents`}>{children}</div>
-			<ul className={`${prefix}actionableBox-actions`} contentEditable={false}>
+			<div className={componentClassName('contents')}>{children}</div>
+			<ul className={componentClassName('actions')} contentEditable={false}>
 				{editContents && (
-					<li className={`${prefix}actionableBox-action`}>
-						<Dropdown
-							buttonProps={buttonProps}
-						>
+					<li className={componentClassName('action')}>
+						<Dropdown buttonProps={buttonProps}>
 							<>{editContents}</>
 						</Dropdown>
 					</li>
 				)}
 				{onRemove && (
-					<li className={`${prefix}actionableBox-action`}>
+					<li className={componentClassName('action')}>
 						<Button intent="danger" {...commonButtonProps} onClick={onRemove}>
 							<Icon {...commonIconProps} blueprintIcon="trash" />
 						</Button>

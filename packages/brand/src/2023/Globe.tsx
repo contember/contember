@@ -1,5 +1,5 @@
 import { useExpectSameValueReference } from '@contember/react-utils'
-import { listClassName, svgSizeProps } from '@contember/utilities'
+import { svgSizeProps, useClassName } from '@contember/utilities'
 import { CSSProperties, memo, useMemo } from 'react'
 import type { ContemberIdentitySvgProps } from '../Types'
 
@@ -20,9 +20,10 @@ export const Globe = memo<ContemberIdentitySvgProps>(({
 		const exhaustiveCheck: Record<PropertyKey, never> = rest
 	}
 
+
 	return (
 		<svg
-			className={listClassName(['cui-brand-icon', 'cui-brand-globe', className])}
+			className={useClassName(['brand-icon', 'brand-globe'], className)}
 			fill="none"
 			style={useMemo(() => ({ ...style, '--scale': scale } as CSSProperties), [scale, style])}
 			xmlns="http://www.w3.org/2000/svg"

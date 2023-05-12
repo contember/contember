@@ -1,25 +1,27 @@
-import { ReactChild } from 'react'
-import { useClassNamePrefix } from '../../../auxiliary'
+import { useClassNameFactory } from '@contember/utilities'
+import { ReactNode } from 'react'
 import { Icon } from '../../Icon'
 import { Button } from '../Button'
 
 export interface SelectCreateNewWrapperProps {
 	onClick?: () => void
-	children: ReactChild
+	children: ReactNode
 }
 
 export const SelectCreateNewWrapper = ({ onClick, children }: SelectCreateNewWrapperProps) => {
-	const prefix = useClassNamePrefix()
+	const componentClassName = useClassNameFactory('selectCreateNewWrapper')
+
 	if (!onClick) {
 		return <>{children}</>
 	}
+
 	return (
-		<div className={`${prefix}selectCreateNewWrapper`}>
-			<div className={`${prefix}selectCreateNewWrapper-control`}>
+		<div className={componentClassName()}>
+			<div className={componentClassName('control')}>
 				{children}
 			</div>
-			<div className={`${prefix}selectCreateNewWrapper-button`}>
-				<Button onClick={onClick} elevation="none" intent="default"><Icon blueprintIcon={'plus'}/></Button>
+			<div className={componentClassName('button')}>
+				<Button onClick={onClick} elevation="none" intent="default"><Icon blueprintIcon="plus" /></Button>
 			</div>
 		</div>
 	)

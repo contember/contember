@@ -1,6 +1,5 @@
-import classNames from 'classnames'
+import { useClassName } from '@contember/utilities'
 import { forwardRef, memo } from 'react'
-import { useComponentClassName } from '../../../auxiliary'
 import { toViewClass } from '../../../utils'
 import { useTextBasedInput } from '../Hooks'
 import { ColorInput } from './ColorInput'
@@ -26,11 +25,10 @@ export const InternalTextInput = memo(
 	}, forwardedRed) => {
 		const props = useTextBasedInput<HTMLInputElement>({
 			...outerProps,
-			className: classNames(
-				useComponentClassName('text-input'),
+			className: useClassName('text-input', [
 				toViewClass('withTopToolbar', withTopToolbar),
 				className,
-			),
+			]),
 		}, forwardedRed)
 
 		return <input {...props} type="text" />

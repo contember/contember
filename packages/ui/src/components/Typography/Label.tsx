@@ -1,6 +1,5 @@
-import classNames from 'classnames'
-import { memo, ReactNode } from 'react'
-import { useClassNamePrefix } from '../../auxiliary'
+import { useClassName } from '@contember/utilities'
+import { ReactNode, memo } from 'react'
 import { Default, HTMLSpanElementProps, Size } from '../../types'
 import { toEnumViewClass, toStateClass } from '../../utils'
 
@@ -31,9 +30,7 @@ export const Label = memo(({
 	size,
 	weight,
 }: LabelProps) => {
-	const componentClassName = `${useClassNamePrefix()}label`
-	const classList = classNames(
-		componentClassName,
+	return <span className={useClassName('label', [
 		toStateClass('active', !isDisabled && isActive),
 		toStateClass('focused', !isDisabled && isFocused),
 		toStateClass('disabled', isDisabled),
@@ -41,9 +38,7 @@ export const Label = memo(({
 		toEnumViewClass(size),
 		toEnumViewClass(weight),
 		className,
-	)
-
-	return <span className={classList}>{children}</span>
+	])}>{children}</span>
 })
 
 Label.displayName = 'Label'

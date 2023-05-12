@@ -1,17 +1,17 @@
-import './DevBar.sass'
-import React, { ReactNode, useState } from 'react'
-import { useComponentClassName } from '../../auxiliary'
+import { useClassNameFactory } from '@contember/utilities'
+import { ReactNode, useState } from 'react'
 import { Icon } from '../Icon'
+import './DevBar.sass'
 
 export const DevBar = ({ children }: { children: ReactNode }) => {
-	const componentClassName = useComponentClassName('devBar')
+	const componentClassName = useClassNameFactory('devBar')
 	const [closed, setClosed] = useState(false)
 	if (closed) {
 		return null
 	}
 	return (
-		<div className={componentClassName}>
-			<a className={`${componentClassName}-brand`} href={'https://docs.contember.com/'} target={'_blank'} rel="noreferrer">
+		<div className={componentClassName()}>
+			<a className={componentClassName('brand')} href="https://docs.contember.com/" target="_blank" rel="noreferrer">
 				<svg viewBox="35 35 370 60" xmlns="http://www.w3.org/2000/svg" stroke="none">
 					<g fill="currentColor">
 						<path d="m36.9851 62.4293c0-14.5746 11.5202-25.5713 27.0862-25.5713 4.679 0 10.0515 1.5397 14.2392 4.345v10.8597c-3.7673-3.7149-8.9377-5.8134-13.8898-5.8134-10.1225 0-16.9637 6.8654-16.9637 16.18 0 9.3145 6.8412 16.0429 16.9637 16.0429 4.9575 0 10.1225-2.104 13.8898-5.8134v10.8597c-4.1877 2.7999-9.5656 4.345-14.2392 4.345-15.566-.0055-27.0862-10.9364-27.0862-25.4342z"></path>
@@ -26,33 +26,33 @@ export const DevBar = ({ children }: { children: ReactNode }) => {
 					</g>
 				</svg>
 			</a>
-			<div className={`${componentClassName}-panels`}>
+			<div className={componentClassName('panels')}>
 				{children}
 			</div>
-			<div className={`${componentClassName}-close`} onClick={() => setClosed(true)}>
-				<Icon blueprintIcon={'cross'} />
+			<div className={componentClassName('close')} onClick={() => setClosed(true)}>
+				<Icon blueprintIcon="cross" />
 			</div>
 		</div>
 	)
 }
-
 
 export const DevPanel = ({ heading, children, preview }: {
 	heading: ReactNode,
 	children: ReactNode,
 	preview?: ReactNode
 }) => {
-	const componentClassName = useComponentClassName('devBar')
+	const componentClassName = useClassNameFactory('devBar')
+
 	return (
-		<div className={`${componentClassName}-trigger`}>
-			<div className={`${componentClassName}-trigger-label`}>
+		<div className={componentClassName('trigger')}>
+			<div className={componentClassName('trigger-label')}>
 				{preview ?? heading}
 			</div>
-			<div className={`${componentClassName}-panel`}>
-				<h1 className={`${componentClassName}-panel-heading`}>
+			<div className={componentClassName('panel')}>
+				<h1 className={componentClassName('panel-heading')}>
 					{heading}
 				</h1>
-				<div className={`${componentClassName}-panel-content`}>
+				<div className={componentClassName('panel-content')}>
 					{children}
 				</div>
 			</div>

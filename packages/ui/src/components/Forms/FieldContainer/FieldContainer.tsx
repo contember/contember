@@ -1,11 +1,9 @@
-import classNames from 'classnames'
+import { useClassNameFactory } from '@contember/utilities'
 import { CSSProperties, memo, ReactNode } from 'react'
-import { useClassNamePrefix } from '../../../auxiliary'
 import type { Size } from '../../../types'
 import { toEnumClass, toEnumViewClass, toThemeClass } from '../../../utils'
 import { Stack, StackProps } from '../../Stack'
-import { Description } from '../../Typography'
-import { Label } from '../../Typography'
+import { Description, Label } from '../../Typography'
 import { ErrorList, ErrorListProps } from '../ErrorList'
 import type { FieldContainerLabelPosition } from './Types'
 
@@ -48,7 +46,7 @@ export const FieldContainer = memo(
 		width = 'column',
 	}: FieldContainerProps) => {
 		const LabelElement = useLabelElement ? 'label' : 'div'
-		const componentClassName = `${useClassNamePrefix()}field-container`
+		const componentClassName = useClassNameFactory('field-container')
 
 		const isLabelInline = labelPosition === 'labelInlineLeft' || labelPosition === 'labelInlineRight'
 		const invalid = !!errors?.length
@@ -57,39 +55,38 @@ export const FieldContainer = memo(
 			<div
 				data-invalid={invalid ? true : undefined}
 				style={style}
-				className={classNames(
-					`${componentClassName}`,
+				className={componentClassName(null, [
 					toEnumViewClass(size),
 					toEnumViewClass(labelPosition),
 					toEnumClass('width-', width === 'none' ? undefined : width),
 					invalid ? toThemeClass(null, 'danger') : null,
 					className,
-				)}
+				])}
 			>
-				<LabelElement className={`${componentClassName}-label`}>
-					{(label || labelDescription) && <span className={`${componentClassName}-header`}>
+				<LabelElement className={componentClassName('label')}>
+					{(label || labelDescription) && <span className={componentClassName('header')}>
 						{label && <Label>
 							{label}
-							<span className={`${componentClassName}-required-asterix ${toThemeClass('danger', 'danger')}`}>{required && '*'}</span>
+							<span className={componentClassName('required-asterisk', toThemeClass('danger', 'danger'))}>{required && '*'}</span>
 						</Label>}
 						{labelDescription && <Description>{labelDescription}</Description>}
 					</span>
 					}
-					{(children || (!isLabelInline && description)) && <div className={`${componentClassName}-body`}>
+					{(children || (!isLabelInline && description)) && <div className={componentClassName('body')}>
 						{children && <Stack
-							className={`${componentClassName}-body-content`}
+							className={componentClassName('body-content')}
 							direction={direction}
 							gap={gap}
 						>
 							{children}
 						</Stack>}
-						{!isLabelInline && description && <span className={`${componentClassName}-body-content-description`}>{description}</span>}
+						{!isLabelInline && description && <span className={componentClassName('body-content-description')}>{description}</span>}
 					</div>}
 				</LabelElement>
-				{isLabelInline && description && <span className={`${componentClassName}-body-content-description`}>{description}</span>}
+				{isLabelInline && description && <span className={componentClassName('body-content-description')}>{description}</span>}
 
 				{!!errors && errors.length > 0 && (
-					<div className={`${componentClassName}-errors`}>
+					<div className={componentClassName('errors')}>
 						<ErrorList errors={errors} />
 					</div>
 				)}

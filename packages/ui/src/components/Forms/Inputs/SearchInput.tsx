@@ -1,6 +1,5 @@
-import classNames from 'classnames'
+import { useClassName } from '@contember/utilities'
 import { forwardRef, memo } from 'react'
-import { useComponentClassName } from '../../../auxiliary'
 import { toViewClass } from '../../../utils'
 import { useTextBasedInput } from '../Hooks'
 import type { SearchInputProps } from './Types'
@@ -15,12 +14,10 @@ export const SearchInput = memo(forwardRef<HTMLInputElement, SearchInputProps>((
 }, forwardedRed) => {
 	const props = useTextBasedInput<HTMLInputElement>({
 		...outerProps,
-		className: classNames(
-			useComponentClassName('text-input'),
-			useComponentClassName('search-input'),
+		className: useClassName(['text-input', 'search-input'], [
 			toViewClass('withTopToolbar', withTopToolbar),
 			className,
-		),
+		]),
 	}, forwardedRed)
 
 	return <input

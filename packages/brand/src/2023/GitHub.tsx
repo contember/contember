@@ -1,5 +1,5 @@
 import { useExpectSameValueReference } from '@contember/react-utils'
-import { listClassName, svgSizeProps } from '@contember/utilities'
+import { svgSizeProps, useClassName } from '@contember/utilities'
 import { CSSProperties, memo, useMemo } from 'react'
 import type { ContemberIdentitySvgProps } from '../Types'
 
@@ -21,7 +21,7 @@ export const GitHub = memo<Omit<ContemberIdentitySvgProps, 'strokeWidth'>>(({
 
 	return (
 		<svg
-			className={listClassName(['cui-brand-icon', 'cui-brand-github', className])}
+			className={useClassName(['brand-icon', 'brand-github'], className)}
 			style={useMemo(() => ({ ...style, '--scale': scale } as CSSProperties), [scale, style])}
 			xmlns="http://www.w3.org/2000/svg"
 			{...svgSizeProps(width, height, crop)}

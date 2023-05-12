@@ -1,12 +1,12 @@
-import cn from 'classnames'
+import { useClassName, useClassNameFactory } from '@contember/utilities'
 import {
-	createContext,
-	memo,
-	MouseEvent as ReactMouseEvent,
 	MouseEventHandler,
 	ReactElement,
+	MouseEvent as ReactMouseEvent,
 	ReactNode,
 	Ref,
+	createContext,
+	memo,
 	useCallback,
 	useContext,
 	useEffect,
@@ -15,7 +15,7 @@ import {
 	useState,
 } from 'react'
 import { usePopper } from 'react-popper'
-import { useClassNamePrefix, useCloseOnClickOutside, useCloseOnEscape } from '../auxiliary'
+import { useCloseOnClickOutside, useCloseOnEscape } from '../auxiliary'
 import type { DropdownAlignment } from '../types'
 import { assertNever, toViewClass } from '../utils'
 import { Collapsible } from './Collapsible'
@@ -59,7 +59,7 @@ const alignmentToPlacement = (alignment: DropdownAlignment | undefined) => {
 	}
 }
 
-const noop = () => {}
+const noop = () => { }
 
 export const DropdownContentContainerContext = createContext<HTMLElement | undefined>(undefined)
 DropdownContentContainerContext.displayName = 'DropdownContentContainerContext'
@@ -110,7 +110,7 @@ export const Dropdown = memo((props: DropdownProps) => {
 	const contentContainerFromContent = useContext(DropdownContentContainerContext)
 	const contentContainer = props.contentContainer || contentContainerFromContent || document.body
 
-	const prefix = useClassNamePrefix()
+	const componentClassName = useClassNameFactory('dropdown')
 
 	const { children, renderContent, renderToggle, styledContent = true } = props
 
@@ -133,7 +133,7 @@ export const Dropdown = memo((props: DropdownProps) => {
 						ref={setPopperElement}
 						style={styles.popper}
 						{...attributes.popper}
-						className={`${prefix}dropdown-content`}
+						className={componentClassName('content')}
 						data-placement={placement}
 					>
 						<Collapsible
@@ -149,7 +149,7 @@ export const Dropdown = memo((props: DropdownProps) => {
 							{renderContent ? (
 								renderContent(renderProps)
 							) : (
-								<div className={cn(`${prefix}dropdown-content-in`, toViewClass('unstyled', !styledContent))}>
+								<div className={componentClassName('content-in', toViewClass('unstyled', !styledContent))}>
 									{typeof children === 'function' ? children(renderProps) : children}
 								</div>
 							)}
@@ -173,10 +173,8 @@ export const DropdownContentContainerProvider = memo((props: DropdownContainerPr
 		// Run once ref is set
 		setContentContainer(contentContainerRef.current || undefined)
 	}, [])
-	const prefix = useClassNamePrefix()
-
 	return (
-		<div className={`${prefix}dropdown-contentContainer`} ref={contentContainerRef}>
+		<div className={useClassName('dropdown-contentContainer')} ref={contentContainerRef}>
 			<DropdownContentContainerContext.Provider value={contentContainer}>
 				{props.children}
 			</DropdownContentContainerContext.Provider>

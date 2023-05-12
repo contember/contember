@@ -1,7 +1,6 @@
-import classnames from 'classnames'
-import { ComponentType, memo, ReactNode, useContext, useRef } from 'react'
-import { useFocusRing, useHover, useRadio, VisuallyHidden } from 'react-aria'
-import { useClassNamePrefix } from '../../../auxiliary'
+import { useClassName, useClassNameFactory } from '@contember/utilities'
+import { ComponentType, ReactNode, memo, useContext, useRef } from 'react'
+import { VisuallyHidden, useFocusRing, useHover, useRadio } from 'react-aria'
 import { Size, ValidationState } from '../../../types'
 import { toEnumStateClass, toStateClass } from '../../../utils'
 import { FieldContainer } from '../FieldContainer'
@@ -25,7 +24,6 @@ export interface RadioControlProps {
 export const RadioControl = memo(({ RadioButtonComponent, description, size, validationState, ...props }: RadioControlProps) => {
 	const { children, value } = props
 
-	const componentClassName = `${useClassNamePrefix()}radio-control`
 	const ref = useRef<HTMLInputElement>(null)
 
 	const state = useContext(RadioContext)
@@ -36,21 +34,18 @@ export const RadioControl = memo(({ RadioButtonComponent, description, size, val
 
 	const isSelected = state.selectedValue === value
 
-	const classList = classnames(
-		componentClassName,
-		toEnumStateClass(validationState),
-		toStateClass('focused', isFocusVisible),
-		toStateClass('checked', isSelected),
-		toStateClass('indeterminate', state.selectedValue === null),
-		toStateClass('disabled', isDisabled),
-		toStateClass('readonly', isReadOnly),
-		toStateClass('hovered', isHovered),
-	)
-
 	const RadioButton = RadioButtonComponent ?? DefaultRadioButton
 
 	return (
-		<label className={classList}>
+		<label className={useClassName('radio-control', [
+			toEnumStateClass(validationState),
+			toStateClass('focused', isFocusVisible),
+			toStateClass('checked', isSelected),
+			toStateClass('indeterminate', state.selectedValue === null),
+			toStateClass('disabled', isDisabled),
+			toStateClass('readonly', isReadOnly),
+			toStateClass('hovered', isHovered),
+		])}>
 			<FieldContainer
 				useLabelElement={false}
 				size={size}

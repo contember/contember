@@ -1,7 +1,6 @@
-import classNames from 'classnames'
+import { useClassName } from '@contember/utilities'
 import { AllHTMLAttributes, ForwardedRef, forwardRef, memo } from 'react'
 import TextareaAutosize, { TextareaAutosizeProps } from 'react-textarea-autosize'
-import { useComponentClassName } from '../../../auxiliary'
 import { toViewClass } from '../../../utils'
 import { useTextBasedInput } from '../Hooks'
 import type { ControlProps, ControlPropsKeys } from '../Types'
@@ -29,11 +28,10 @@ export const TextareaInput = memo(forwardRef(({
 }: TextareaInputProps & UnderlyingElementProps, forwardedRed: ForwardedRef<HTMLTextAreaElement>) => {
 	const props = useTextBasedInput<HTMLTextAreaElement>({
 		...outerProps,
-		className: classNames(
-			useComponentClassName('textarea-input'),
+		className: useClassName('textarea-input', [
 			toViewClass('withTopToolbar', withTopToolbar),
 			className,
-		),
+		]),
 	}, forwardedRed)
 
 	return <TextareaAutosize

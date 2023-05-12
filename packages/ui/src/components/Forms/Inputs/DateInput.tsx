@@ -1,6 +1,5 @@
-import classNames from 'classnames'
+import { useClassName } from '@contember/utilities'
 import { forwardRef, memo } from 'react'
-import { useComponentClassName } from '../../../auxiliary'
 import { toViewClass } from '../../../utils'
 import { useTextBasedInput } from '../Hooks'
 import { assertDateString } from '../Types'
@@ -20,12 +19,10 @@ export const DateInput = memo(forwardRef<HTMLInputElement, DateInputProps>(({
 
 	const props = useTextBasedInput<HTMLInputElement>({
 		...outerProps,
-		className: classNames(
-			useComponentClassName('text-input'),
-			useComponentClassName('date-input'),
+		className: useClassName(['text-input', 'date-input'], [
 			toViewClass('withTopToolbar', withTopToolbar),
 			className,
-		),
+		]),
 	}, forwardedRed)
 
 	return <input {...props} type="date" />

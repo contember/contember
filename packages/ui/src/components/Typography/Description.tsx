@@ -1,6 +1,5 @@
-import classNames from 'classnames'
-import { memo, ReactNode } from 'react'
-import { useClassNamePrefix } from '../../auxiliary'
+import { useClassName } from '@contember/utilities'
+import { ReactNode, memo } from 'react'
 
 export interface DescriptionProps {
 	className?: string
@@ -11,9 +10,7 @@ export interface DescriptionProps {
  * @group UI
  */
 export const Description = memo(({ className, children }: DescriptionProps) => {
-	const prefix = useClassNamePrefix()
-
-	return <span className={classNames(`${prefix}description`, className)}>{children}</span>
+	return <span className={useClassName('description', className)}>{children}</span>
 })
 
 Description.displayName = 'Description'

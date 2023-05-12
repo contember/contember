@@ -1,5 +1,5 @@
-import { getPortalRoot, useComponentClassName } from '@contember/ui'
-import classNames from 'classnames'
+import { getPortalRoot } from '@contember/ui'
+import { useClassName } from '@contember/utilities'
 import { ReactNode } from 'react'
 import { SortableContainer, SortableContainerProps } from 'react-sortable-hoc'
 export interface SortableRepeaterContainerProps extends SortableContainerProps {
@@ -11,10 +11,7 @@ const SortableRepeaterContainerInner = SortableContainer(({ children }: Sortable
 export const SortableRepeaterContainer = ({ helperClass, ...props }: SortableRepeaterContainerProps) => <SortableRepeaterContainerInner
 	helperContainer={getPortalRoot}
 	{...props}
-	helperClass={classNames(
-		helperClass,
-		useComponentClassName('root-no-display'),
-	)}
+	helperClass={useClassName('root-no-display', helperClass)}
 />
 
 SortableRepeaterContainer.displayName = 'SortableRepeaterContainer'

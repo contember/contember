@@ -1,5 +1,5 @@
 import { useComposeRef, useElementSize } from '@contember/react-utils'
-import { PolymorphicComponentPropsWithRef, PolymorphicRef, classNameForFactory, px } from '@contember/utilities'
+import { PolymorphicComponentPropsWithRef, PolymorphicRef, dataAttribute, px, useClassNameFactory } from '@contember/utilities'
 import { CSSProperties, ElementType, ReactNode, forwardRef, memo, useMemo, useRef } from 'react'
 import { InsetsProvider, combineElementInsets, useContainerInsetsContext, useSafeAreaInsetsContext } from '../insets'
 import { Layout, OwnContainerProps } from '../layout'
@@ -38,10 +38,7 @@ export const ResponsiveAppLayout: ResponsiveAppLayoutComponentType = memo(forwar
 		const headerHeight = !headerSize.height || !headerSize.width ? undefined : headerSize.height
 		const footerHeight = !footerSize.height || !footerSize.width ? undefined : footerSize.height
 
-		const classNameFor = classNameForFactory(componentClassName, className, {
-			'responsive-app-layout-header-has-height': (headerHeight ?? 0) > 0,
-			'responsive-app-layout-footer-has-height': (footerHeight ?? 0) > 0,
-		})
+		const classNameFor = useClassNameFactory(componentClassName)
 
 		const elementRef = useRef<HTMLElement>(null)
 		const composeRef = useComposeRef(elementRef, forwardedRef)
@@ -71,7 +68,14 @@ export const ResponsiveAppLayout: ResponsiveAppLayoutComponentType = memo(forwar
 		return (
 			// Too complicated to type properly internally, so we just cast it to `any`
 			// because the outer PolymorphicRef types ensure proper typing of `as` prop.
-			<Layout.Root<any> as={as} ref={composeRef} className={classNameFor()} {...rest}>
+			<Layout.Root<any>
+				as={as}
+				ref={composeRef}
+				className={classNameFor(null, className)}
+				data-header-has-height={dataAttribute((headerHeight ?? 0) > 0)}
+				data-footer-has-height={dataAttribute((footerHeight ?? 0) > 0)}
+				{...rest}
+			>
 				<Layout.ResponsiveContainer
 					style={{
 						'--header-height': `${px(headerHeight)}`,

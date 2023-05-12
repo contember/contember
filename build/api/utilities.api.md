@@ -22,13 +22,13 @@ export class AssertionError extends Error {
 // @public (undocumented)
 export function capitalize(str: string): string;
 
-// @public
-export function classNameForFactory(componentClassName: NestedClassName, className?: NestedClassName, state?: ClassNameStateMap, glue?: string, stateGlue?: string): (suffix?: string | null | undefined, additionalClassName?: NestedClassName) => string;
-
 // @public (undocumented)
 export type ClassNameStateMap = {
     [key: string]: string | number | boolean | null | undefined;
 };
+
+// @public (undocumented)
+export function dataAttribute(value: unknown): string | true | undefined;
 
 // @public (undocumented)
 export type DeepPartial<T> = T extends Function ? T : T extends Array<infer InferredArrayMember> ? Array<DeepPartial<InferredArrayMember>> : T extends object ? {

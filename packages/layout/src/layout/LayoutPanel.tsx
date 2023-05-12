@@ -1,6 +1,6 @@
 import { useComposeRef, useElementSize, useExpectSameValueReference, useReferentiallyStableCallback, useUpdatedRef } from '@contember/react-utils'
-import { PolymorphicRef, assert, classNameForFactory, isNotNullish, px } from '@contember/utilities'
-import { CSSProperties, ElementType, Fragment, forwardRef, memo, useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { PolymorphicRef, assert, dataAttribute, isNotNullish, px, useClassName } from '@contember/utilities'
+import { CSSProperties, ElementType, Fragment, forwardRef, memo, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import waitForTransition from 'wait-for-element-transition'
 import { FocusScope } from '../focus-scope'
 import { ContainerInsetsContext, useElementInsets, useSafeAreaInsetsContext } from '../insets'
@@ -36,8 +36,6 @@ export const LayoutPanel: LayoutPanelComponentType & {
 			style,
 			...rest
 		} = parseLayoutPanelProps(props)
-		const id = `LayoutPanel#${useId()}`
-
 		const elementRef = useRef<HTMLElement>(null)
 		const composedRef = useComposeRef(forwardedRef, elementRef)
 		const { height, width } = useElementSize(elementRef)
@@ -124,11 +122,6 @@ export const LayoutPanel: LayoutPanelComponentType & {
 			}
 		}, [contextVisibility, contextBehavior, isPanelStateReady, name, onBehaviorChange, onVisibilityChange, update, currentBehaviorRef, currentVisibilityRef])
 
-		const classNameFor = classNameForFactory(componentClassName, [className, `${componentClassName}-name-${name}`], {
-			[`${componentClassName}-behavior`]: currentBehavior,
-			[`${componentClassName}-visibility`]: currentVisibility ?? 'hidden',
-		})
-
 		const handleKeyPress = useReferentiallyStableCallback((event: KeyboardEvent) => {
 			if (currentBehavior && currentVisibility === 'visible' || currentVisibility === 'hidden') {
 				update(name, onKeyPress?.(event, { panel: name, behavior: currentBehavior, visibility: currentVisibility }))
@@ -164,7 +157,10 @@ export const LayoutPanel: LayoutPanelComponentType & {
 				<Container
 					as={typeof Container === 'string' ? undefined : 'section'}
 					ref={composedRef}
-					className={classNameFor()}
+					className={useClassName(componentClassName, className)}
+					data-name={dataAttribute(name)}
+					data-behavior={dataAttribute(currentBehavior)}
+					data-visibility={dataAttribute(currentVisibility ?? 'hidden')}
 					id={`layout-panel-${name}`}
 					key={`layout-panel-${name}`}
 					tabIndex={tabIndex ?? 0}

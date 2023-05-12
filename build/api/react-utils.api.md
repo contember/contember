@@ -135,9 +135,6 @@ export const useConstantLengthInvariant: <Item>(items: Item[], message?: string)
 // @public (undocumented)
 export const useConstantValueInvariant: <Value>(value: Value, message?: string) => void;
 
-// @public @deprecated (undocumented)
-export function useCountLayoutSlotChildren(refOrElement: RefObjectOrElement<HTMLElement | undefined>, selector?: string): number;
-
 // @public (undocumented)
 export const useDebounce: <T>(value: T, debounceMs: number) => T;
 
@@ -158,9 +155,6 @@ export function useExpectSameValueReference<T>(next: T, shouldThrow?: boolean): 
 
 // @public (undocumented)
 export const useForceRender: () => DispatchWithoutAction;
-
-// @public (undocumented)
-export function useHasEmptySlotsClassName(refOrElement: RefObjectOrElement<HTMLElement | undefined>): "has-empty-slots" | "has-non-empty-slots";
 
 // @public (undocumented)
 export const useIsMounted: () => MutableRefObject<boolean>;

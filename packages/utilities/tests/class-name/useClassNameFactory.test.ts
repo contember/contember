@@ -33,6 +33,15 @@ describe('@contember/utilities', () => {
 		expect(componentClassName('--suffix')).toBe('bar-foo--suffix')
 	})
 
+	test('useClassNameFactory without prefix override', () => {
+		const componentClassName = renderHook(() => useClassNameFactory('foo', undefined, null)).result.current
+
+		expect(componentClassName()).toBe('foo')
+		expect(componentClassName('suffix')).toBe('foo-suffix')
+		expect(componentClassName('__suffix')).toBe('foo__suffix')
+		expect(componentClassName('--suffix')).toBe('foo--suffix')
+	})
+
 	test('useClassNameFactory with multiple input class names', () => {
 		const componentClassName = renderHook(() => useClassNameFactory(['foo', 'bar'])).result.current
 

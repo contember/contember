@@ -1,6 +1,6 @@
 import { useReferentiallyStableCallback } from '@contember/react-utils'
 import { Button } from '@contember/ui'
-import { NestedClassName, classNameForFactory } from '@contember/utilities'
+import { NestedClassName, useClassName } from '@contember/utilities'
 import { SidebarCloseIcon, SidebarOpenIcon } from 'lucide-react'
 import { memo } from 'react'
 import { useGetLayoutPanelsStateContext, useSetLayoutPanelsStateContext } from '../layout'
@@ -26,7 +26,7 @@ export const ToggleSidebarButton = memo<ToggleSidebarButtonProps>(({
 		<Button
 			intent="default"
 			flow="squarish"
-			className={classNameForFactory(componentClassName, [className, 'layout-slot', 'synthetic-layout-slot'])()}
+			className={useClassName(componentClassName, [className, 'layout-slot', 'synthetic-layout-slot'])}
 			onClick={useReferentiallyStableCallback(() => {
 				panelState?.visibility === 'visible' ? hide(panel) : show(panel)
 			})}

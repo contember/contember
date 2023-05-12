@@ -1,5 +1,5 @@
-import { useComposeRef, useHasEmptySlotsClassName } from '@contember/react-utils'
-import { NestedClassName, PolymorphicComponentPropsWithRef, PolymorphicRef, classNameForFactory } from '@contember/utilities'
+import { useComposeRef } from '@contember/react-utils'
+import { NestedClassName, PolymorphicComponentPropsWithRef, PolymorphicRef, useClassName } from '@contember/utilities'
 import React, { ElementType, ReactNode, forwardRef, memo, useRef } from 'react'
 import { useElementInsetCustomProperties } from './useElementInsetCustomProperties'
 
@@ -23,7 +23,7 @@ export const InsetsConsumer: InsetsConsumerComponentType = memo(forwardRef(
 		as,
 		children,
 		className,
-		componentClassName = 'has-insets',
+		componentClassName = 'insets-consumer',
 		style,
 		...rest
 	}: InsetsConsumerProps<C>, forwardedRef: PolymorphicRef<C>) => {
@@ -33,13 +33,11 @@ export const InsetsConsumer: InsetsConsumerComponentType = memo(forwardRef(
 
 		const insetsStyle = useElementInsetCustomProperties(elementRef, '--container-inset-')
 
-		const classNameFor = classNameForFactory(componentClassName, className)
-
 		return (
 			<Container
 				as={typeof Container === 'string' ? undefined : 'div'}
 				ref={composeRef}
-				className={classNameFor(null, useHasEmptySlotsClassName(elementRef))}
+				className={useClassName(componentClassName, className)}
 				style={{
 					...insetsStyle,
 					...style,

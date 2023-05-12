@@ -1,6 +1,6 @@
 import { useComposeRef } from '@contember/react-utils'
-import { classNameForFactory, NestedClassName, PolymorphicComponentPropsWithRef, PolymorphicRef } from '@contember/utilities'
-import React, { ElementType, forwardRef, memo, ReactNode, useMemo, useRef } from 'react'
+import { NestedClassName, PolymorphicComponentPropsWithRef, PolymorphicRef, useClassName } from '@contember/utilities'
+import React, { ElementType, ReactNode, forwardRef, memo, useMemo, useRef } from 'react'
 import { ContainerInsetsContext } from './Contexts'
 
 export type OwnInsetsProviderProps = {
@@ -39,13 +39,11 @@ export const InsetsProvider: InsetsProviderComponentType = memo(forwardRef(
 		const elementRef = useRef<HTMLElement>(null)
 		const composeRef = useComposeRef(elementRef, forwardedRef)
 
-		const classNameFor = classNameForFactory(componentClassName, className)
-
 		return (
 			<Container
 				as={typeof Container === 'string' ? undefined : 'div'}
 				ref={composeRef}
-				className={classNameFor()}
+				className={useClassName(componentClassName, className)}
 				{...rest}
 			>
 				<ContainerInsetsContext.Provider value={useMemo(() => (

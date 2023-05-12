@@ -1,4 +1,4 @@
-import { PolymorphicRef, assert, classNameForFactory, isNotNullish } from '@contember/utilities'
+import { PolymorphicRef, assert, dataAttribute, isNotNullish, useClassName } from '@contember/utilities'
 import { ElementType, forwardRef, memo, useEffect, useMemo, useRef } from 'react'
 import { GetLayoutPanelsStateContext, GetLayoutPanelsStateContextType, useGetLayoutPanelsStateContext, useLayoutContainerWidth, useSetLayoutPanelsStateContext } from './Contexts'
 import { ContainerComponentType, ContainerProps, LayoutPanelConfig } from './Types'
@@ -124,12 +124,6 @@ export const LayoutResponsiveContainer: ContainerComponentType = memo(forwardRef
 			([, { behavior, visibility }]) => behavior === 'modal' && visibility === 'visible',
 		), [responsiveState.panels])
 
-		const classNameFor = classNameForFactory(componentClassName, className, {
-			'all-panels-can-be-visible': responsiveState.allPanelsCanBeVisible,
-			'has-modals': modals.length > 0,
-			'has-visible-modal': visibleModals.length > 0,
-		})
-
 		useEffect(() => {
 			if (currentlyActivePanel) {
 				panels.get(currentlyActivePanel)?.ref.current?.focus()
@@ -144,12 +138,20 @@ export const LayoutResponsiveContainer: ContainerComponentType = memo(forwardRef
 
 		return (
 			<GetLayoutPanelsStateContext.Provider value={responsiveState}>
-				<Container ref={forwardedRef} className={classNameFor(null, [...responsiveState.panels.entries()].map(
-					([name, panel]) => [
-						panel.visibility ? `panel-${name}-visibility-${panel.visibility}` : undefined,
-						panel.behavior ? `panel-${name}-behavior-${panel.behavior}` : undefined,
-					],
-				))} {...rest}>
+				<Container
+					ref={forwardedRef}
+					className={useClassName(componentClassName, className)}
+					data-all-panels-can-be-visible={dataAttribute(responsiveState.allPanelsCanBeVisible)}
+					data-has-modals={dataAttribute(modals.length > 0)}
+					data-has-visible-modal={dataAttribute(visibleModals.length > 0)}
+					{...Object.fromEntries([...responsiveState.panels.entries()].map(
+						([name, panel]) => [
+							[`data-panel-${name}-visibility`, dataAttribute(panel.visibility ? panel.visibility : undefined)],
+							[`data-panel-${name}-behavior`, dataAttribute(panel.behavior ? panel.behavior : undefined)],
+						],
+					).flat(1))}
+					{...rest}
+				>
 					{children}
 				</Container>
 			</GetLayoutPanelsStateContext.Provider>

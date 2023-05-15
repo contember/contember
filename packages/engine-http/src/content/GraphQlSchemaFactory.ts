@@ -13,12 +13,9 @@ import { makeExecutableSchema, mergeSchemas } from '@graphql-tools/schema'
 import { GraphQLSchemaContributor } from './GraphQLSchemaContributor'
 import { JSONType } from '@contember/graphql-utils'
 
-type Context = { schema: Schema; identity: Identity }
-
 type CacheEntry = {
 	graphQlSchema: GraphQLSchema
 	permissions: Acl.Permissions
-	contributorsCacheKey: string
 	verifier: (identity: Identity) => boolean
 }
 
@@ -33,9 +30,8 @@ export class GraphQlSchemaFactory {
 
 	public create(schema: Schema, identity: Identity): [GraphQLSchema, Acl.Permissions] {
 		let cacheEntries = this.cache.get(schema)
-		const contributorsCacheKey = this.getContributorsCacheKey({ schema, identity })
 		if (cacheEntries !== undefined) {
-			const entry = cacheEntries.find(it => it.contributorsCacheKey === contributorsCacheKey && it.verifier(identity))
+			const entry = cacheEntries.find(it => it.verifier(identity))
 			if (entry !== undefined) {
 				return [entry.graphQlSchema, entry.permissions]
 			}
@@ -71,12 +67,8 @@ export class GraphQlSchemaFactory {
 				Json: JSONType,
 			},
 		})
-		cacheEntries.push({ graphQlSchema, verifier, permissions, contributorsCacheKey })
+		cacheEntries.push({ graphQlSchema, verifier, permissions })
 
 		return [graphQlSchema, permissions]
-	}
-
-	private getContributorsCacheKey(ctx: Context): string {
-		return JSON.stringify(this.schemaContributors.map(it => it.getCacheKey(ctx)))
 	}
 }

@@ -9,6 +9,4 @@ export type GraphQLSchemaContributorContext = { schema: Schema; identity: Identi
 
 export interface GraphQLSchemaContributor {
 	createSchema(context: GraphQLSchemaContributorContext): undefined | GraphQLSchema
-
-	getCacheKey(context: GraphQLSchemaContributorContext): string
 }

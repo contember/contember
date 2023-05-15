@@ -39,12 +39,6 @@ export class S3SchemaContributor implements GraphQLSchemaContributor {
 		private readonly providers: Providers,
 	) {}
 
-	getCacheKey(context: GraphQLSchemaContributorContext): string {
-		const roles = context.identity.projectRoles
-		roles.sort()
-		return roles.join('||')
-	}
-
 	createSchema(context: GraphQLSchemaContributorContext): GraphQLSchema | undefined {
 		if (!this.s3Config) {
 			return undefined

@@ -1,12 +1,13 @@
 import { createSchema } from '@contember/schema-definition'
-import { test, expect } from 'vitest'
+import { expect, test } from 'vitest'
 import * as basic from './schemas/basic'
 import * as relations from './schemas/relations'
 import * as unique from './schemas/unique'
 import * as enum_ from './schemas/enum'
+import * as acl from './schemas/acl'
 import { readFile, writeFile } from 'fs/promises'
 import { join } from 'path'
-import { TsDefinitionGenerator } from '../../../src'
+import { DefinitionCodeGenerator } from '../../../src/definition-generator/DefinitionCodeGenerator'
 
 
 const tests = [
@@ -14,13 +15,14 @@ const tests = [
 	['relations', relations],
 	['unique', unique],
 	['enum', enum_],
+	['acl', acl],
 ] as const
 for (const [name, def] of tests) {
 	test(`generate schema: ${name}`, async () => {
 		const schema = createSchema(def)
-		const generator = new TsDefinitionGenerator(schema)
+		const generator = new DefinitionCodeGenerator()
 		const content = await readFile(join(__dirname, `schemas/${name}.ts`), 'utf-8')
-		const generated = generator.generate()
+		const generated = generator.generate(schema)
 		try {
 			expect(generated).toBe(content)
 		} catch (e) {

@@ -272,18 +272,23 @@ export class Application {
 	private createTimer() {
 		const times: EventTime[] = []
 		const globalStart = new Date().getTime()
-		const timer: Timer = async (name: string, cb) => {
-			if (!cb) {
-				times.push({ label: name, start: new Date().getTime() - globalStart })
-				return
-			}
-
+		const timer: Timer = (name: string, cb) => {
 			const start = new Date().getTime()
 			const time: EventTime = { label: name, start: start - globalStart }
 			times.push(time)
-			const res = await cb()
-			time.duration = new Date().getTime() - start
-			return res as any
+			const res = cb()
+
+			if (res instanceof Promise) {
+				(async () => {
+					try {
+						await res
+					} catch {
+					} finally {
+						time.duration = new Date().getTime() - start
+					}
+				})()
+			}
+			return res
 		}
 
 		const send = (ctx: { response?: ServerResponse; body?: unknown; requestDebugMode: boolean; logger: Logger }) => {
@@ -336,7 +341,7 @@ export class Application {
 
 type EventTime = { label: string; start: number; duration?: number }
 
-export type Timer = <T>(event: string, cb?: () => T) => Promise<T>
+export type Timer = <T>(event: string, cb: () => T) => T
 
 export interface ApplicationContext {
 	logger: Logger

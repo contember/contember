@@ -48,9 +48,9 @@ export class ProjectPrintSchemaCommand extends Command<Args, Options> {
 		if (!validateSchemaAndPrintErrors(schema, 'Defined schema is invalid:')) {
 			return 1
 		}
-		const permissionFactory = new PermissionFactory(schema.model)
+		const permissionFactory = new PermissionFactory()
 		const inputRoles = input.getOption('role')
-		const permissions = permissionFactory.create(schema.acl, inputRoles || ['admin'])
+		const permissions = permissionFactory.create(schema, inputRoles || ['admin'])
 		const schemaBuilderFactory = new GraphQlSchemaBuilderFactory()
 		const authorizator = new Authorizator(permissions, schema.acl.customPrimary ?? false)
 		const introspection = new IntrospectionSchemaFactory(

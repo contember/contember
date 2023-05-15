@@ -160,7 +160,7 @@ namespace DeepFilterModel {
 
 describe('predicates injector elimination', () => {
 	const schema = createSchema(DeepFilterModel)
-	const permissions = new PermissionFactory(schema.model).create(schema.acl, ['reader'])
+	const permissions = new PermissionFactory().create(schema, ['reader'])
 
 	const injector = new PredicatesInjector(
 		schema.model,

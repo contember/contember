@@ -41,7 +41,7 @@ namespace RowPredicateSubset {
 test('owner predicate with isNull', async () => {
 	const schema = createSchema(RowPredicateSubset)
 
-	const permissions = new PermissionFactory(schema.model).create(schema.acl, ['owner'])
+	const permissions = new PermissionFactory().create(schema, ['owner'])
 
 	await execute({
 		schema: schema.model,

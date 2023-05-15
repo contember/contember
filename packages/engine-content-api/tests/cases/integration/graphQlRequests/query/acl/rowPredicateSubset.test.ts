@@ -37,7 +37,7 @@ namespace RowPredicateSubset {
 test('row level predicate includes main predicate', async () => {
 	const schema = createSchema(RowPredicateSubset)
 
-	const permissions = new PermissionFactory(schema.model).create(schema.acl, ['reader'])
+	const permissions = new PermissionFactory().create(schema, ['reader'])
 
 	await execute({
 		schema: schema.model,

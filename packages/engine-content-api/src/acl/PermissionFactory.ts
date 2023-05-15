@@ -1,33 +1,31 @@
-import { Acl, Model, Writable } from '@contember/schema'
+import { Acl, Model, Schema, Writable } from '@contember/schema'
 import { getEntity, PredicateDefinitionProcessor } from '@contember/schema-utils'
 import { mapObject } from '../utils'
 import { prefixVariable } from './VariableUtils'
 
 export class PermissionFactory {
-	constructor(private readonly schema: Model.Schema) {}
-
-	public create(acl: Acl.Schema, roles: readonly string[], prefix?: string): Acl.Permissions {
+	public create(schema: Schema, roles: readonly string[], prefix?: string): Acl.Permissions {
 		let result: Acl.Permissions = {}
 		for (let role of roles) {
-			const roleDefinition = acl.roles[role] || { entities: {} }
-			let rolePermissions: Acl.Permissions = this.prefixPredicatesWithRole(roleDefinition.entities, prefix || role)
+			const roleDefinition = schema.acl.roles[role] || { entities: {} }
+			let rolePermissions: Acl.Permissions = this.prefixPredicatesWithRole(schema.model, roleDefinition.entities, prefix || role)
 			if (roleDefinition.inherits) {
-				const inheritedPermissions = this.create(acl, roleDefinition.inherits, prefix || role)
+				const inheritedPermissions = this.create(schema, roleDefinition.inherits, prefix || role)
 				rolePermissions = this.mergePermissions(inheritedPermissions, rolePermissions)
 			}
 			result = this.mergePermissions(result, rolePermissions)
 		}
-		result = this.makePrimaryPredicatesUnionOfAllFields(result)
+		result = this.makePrimaryPredicatesUnionOfAllFields(schema.model, result)
 
 		return result
 	}
 
-	private prefixPredicatesWithRole(permissions: Acl.Permissions, role: string): Acl.Permissions {
+	private prefixPredicatesWithRole(model: Model.Schema, permissions: Acl.Permissions, role: string): Acl.Permissions {
 		return mapObject(permissions, ({ operations, predicates }, entityName) => ({
 			operations,
 			predicates: mapObject(predicates, predicate => {
-				const predicateDefinitionProcessor = new PredicateDefinitionProcessor(this.schema)
-				return predicateDefinitionProcessor.process(getEntity(this.schema, entityName), predicate, {
+				const predicateDefinitionProcessor = new PredicateDefinitionProcessor(model)
+				return predicateDefinitionProcessor.process(getEntity(model, entityName), predicate, {
 					handleColumn: ({ value }) => {
 						if (typeof value === 'string') {
 							return prefixVariable(role, value)
@@ -45,9 +43,9 @@ export class PermissionFactory {
 		}))
 	}
 
-	private makePrimaryPredicatesUnionOfAllFields(permissions: Acl.Permissions): Acl.Permissions {
+	private makePrimaryPredicatesUnionOfAllFields(model: Model.Schema, permissions: Acl.Permissions): Acl.Permissions {
 		return mapObject(permissions, (permission, entityName): Acl.EntityPermissions => {
-			const entity = getEntity(this.schema, entityName)
+			const entity = getEntity(model, entityName)
 			const entityPredicates: Writable<Acl.PredicateMap> = { ...permission.predicates }
 			const entityOperations: Writable<Acl.EntityOperations> = { ...permission.operations }
 

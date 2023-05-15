@@ -1,9 +1,6 @@
 import { Schema } from '@contember/schema'
 import { GraphQLSchema } from 'graphql'
-
-export interface Identity {
-	projectRoles: string[]
-}
+import { Identity } from './Identity'
 
 export type GraphQLSchemaContributorContext = { schema: Schema; identity: Identity }
 

@@ -73,6 +73,9 @@ export const configTemplate: any = {
 		http: {
 			requestBodySize: '%?env.CONTEMBER_HTTP_REQUEST_BODY_SIZE::string%',
 		},
+		contentApi: {
+			schemaCacheTtlSeconds: '%?env.CONTEMBER_CONTENT_API_SCHEMA_CACHE_TTL_SECONDS::number%',
+		},
 		projectGroup: {
 			domainMapping: '%?env.CONTEMBER_PROJECT_GROUP_DOMAIN_MAPPING%',
 			configHeader: '%?env.CONTEMBER_PROJECT_GROUP_CONFIG_HEADER%',

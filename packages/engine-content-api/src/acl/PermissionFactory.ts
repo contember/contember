@@ -3,6 +3,10 @@ import { getEntity, PredicateDefinitionProcessor } from '@contember/schema-utils
 import { mapObject } from '../utils'
 import { prefixVariable } from './VariableUtils'
 
+export interface Identity {
+	projectRoles: readonly string[]
+}
+
 export class PermissionFactory {
 	public create(schema: Schema, roles: readonly string[], prefix?: string): Acl.Permissions {
 		let result: Acl.Permissions = {}

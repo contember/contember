@@ -1,6 +1,5 @@
 export * from './Authorizator'
 export * from './PermissionFactory'
-export * from './PermissionsByIdentityFactory'
 export * from './PredicateFactory'
 export * from './PredicatesInjector'
 export * from './VariableInjector'

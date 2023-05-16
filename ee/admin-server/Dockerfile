@@ -18,6 +18,7 @@ COPY packages/react-client/package.json								./packages/react-client/package.j
 COPY packages/react-multipass-rendering/package.json	./packages/react-multipass-rendering/package.json
 COPY packages/react-utils/package.json								./packages/react-utils/package.json
 COPY packages/ui/package.json													./packages/ui/package.json
+COPY packages/utilities/package.json									./packages/utilities/package.json
 COPY packages/vimeo-file-uploader/package.json				./packages/vimeo-file-uploader/package.json
 
 RUN yarn install

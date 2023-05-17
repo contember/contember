@@ -9,9 +9,9 @@ const entity: Model.Entity = {
 	primaryColumn: 'id',
 	tableName: 'foo',
 	fields: {},
-	unique: {},
+	unique: [],
 	eventLog: { enabled: true },
-	indexes: {},
+	indexes: [],
 }
 
 describe('order by helper', () => {

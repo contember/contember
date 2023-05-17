@@ -4,44 +4,44 @@ import { patchAclSchemaModification, updateAclSchemaModification } from './acl'
 import { createColumnModification, updateColumnDefinitionModification, updateColumnNameModification } from './columns'
 import { createUniqueConstraintModification, removeUniqueConstraintModification } from './constraints'
 import {
-	createEntityModification, createViewModification,
-	removeEntityModification, toggleEventLogModification,
+	createEntityModification,
+	createViewModification,
+	removeEntityModification,
+	toggleEventLogModification,
 	updateEntityNameModification,
 	updateEntityTableNameModification,
 } from './entities'
 import { updateViewModification } from './entities/UpdateViewModification'
-import {
-	createEnumModification,
-	removeEnumModification,
-	updateEnumModification,
-} from './enums'
+import { createEnumModification, removeEnumModification, updateEnumModification } from './enums'
 import { removeFieldModification, updateFieldNameModification } from './fields'
 import {
 	convertOneHasManyToManyHasManyRelationModification,
 	convertOneToManyRelationModification,
 	createRelationInverseSideModification,
-	createRelationModification, disableOrphanRemovalModification,
+	createRelationModification,
+	disableOrphanRemovalModification,
 	enableOrphanRemovalModification,
 	makeRelationNotNullModification,
-	makeRelationNullableModification, toggleJunctionEventLogModification,
+	makeRelationNullableModification,
+	toggleJunctionEventLogModification,
 	updateRelationOnDeleteModification,
 	updateRelationOrderByModification,
 } from './relations'
 import { patchValidationSchemaModification, updateValidationSchemaModification } from './validation'
 import { createIndexModification, removeIndexModification } from './indexes'
-import { SchemaWithMeta } from './utils/schemaMeta'
 import { updateSettingsModification } from './settings'
 import { createTriggerModification, removeTriggerModification, updateTriggerModification } from './actions'
 import { createTargetModification } from './actions/CreateTargetModification'
 import { removeTargetModification } from './actions/RemoveTargetModification'
 import { updateTargetModification } from './actions/UpdateTargetModification'
 import { updateEntityOrderByModification } from './entities/UpdateEntityOrderByModification'
+import { removeIndexNamesModification } from './upgrade/RemoveIndexNamesModification'
 
 
 class ModificationHandlerFactory {
 	constructor(private readonly map: Record<string, ModificationType<string, any>>) {}
 
-	public create<D>(name: string, data: D, schema: SchemaWithMeta, options: ModificationHandlerOptions): ModificationHandler<D> {
+	public create<D>(name: string, data: D, schema: Schema, options: ModificationHandlerOptions): ModificationHandler<D> {
 		if (!this.map[name]) {
 			throw new Error(`Undefined modification handler for ${name}`)
 		}
@@ -53,6 +53,7 @@ namespace ModificationHandlerFactory {
 	type HandlerMap<D> = { [modificationName: string]: ModificationType<string, D> }
 
 	const handlers = [
+		removeIndexNamesModification,
 		updateSettingsModification,
 		updateAclSchemaModification,
 		patchAclSchemaModification,

@@ -92,7 +92,7 @@ export class MigrationAmendCommand extends Command<Args, Options> {
 						emptySchema,
 						version => version < amendMigration.version,
 					)
-					const { meta, ...newSchema } = await schemaMigrator.applyModifications(
+					const newSchema = await schemaMigrator.applyModifications(
 						prevSchema,
 						[...amendMigration.modifications, ...intermediateResult.migration.modifications],
 						amendMigration.formatVersion,

@@ -79,6 +79,9 @@ export class ContentApiControllerFactory {
 				}),
 			)
 
+
+			const schemaDatabaseMetadata = await projectContainer.projectDatabaseMetadataResolver.resolveDatabaseMetadata(systemDatabase, schema, stage.schema)
+
 			const handler = await (async () => {
 				const existingHandler = handlerCache.get(graphQlSchema)
 				if (existingHandler) {
@@ -104,6 +107,7 @@ export class ContentApiControllerFactory {
 							authResult,
 							memberships,
 							permissions,
+							schemaDatabaseMetadata,
 							schema,
 							timer,
 							koaContext: koa,

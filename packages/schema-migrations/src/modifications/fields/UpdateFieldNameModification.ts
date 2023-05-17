@@ -13,25 +13,28 @@ import {
 	updateModel,
 	updateSchema,
 } from '../utils/schemaUpdateUtils'
-import { createModificationType, ModificationHandler, ModificationHandlerOptions } from '../ModificationHandler'
-import { acceptFieldVisitor, NamingHelper, PredicateDefinitionProcessor } from '@contember/schema-utils'
+import {
+	createModificationType,
+	ModificationHandler,
+	ModificationHandlerCreateSqlOptions,
+	ModificationHandlerOptions,
+} from '../ModificationHandler'
+import { acceptFieldVisitor, PredicateDefinitionProcessor } from '@contember/schema-utils'
 import {
 	VERSION_ACL_PATCH,
-	VERSION_UPDATE_CONSTRAINT_NAME,
-	VERSION_UPDATE_CONSTRAINT_NAME_ONE_HAS_ONE,
+	VERSION_UPDATE_CONSTRAINT_FIELDS,
+	VERSION_UPDATE_INDEX_FIELDS,
 } from '../ModificationVersions'
-import { renameConstraintSchemaUpdater, renameConstraintsSqlBuilder } from '../utils/renameConstraintsHelper'
 import { changeValue } from '../utils/valueUtils'
 import { updateColumnNameModification } from '../columns'
 import { NoopModification } from '../NoopModification'
-import { SchemaWithMeta } from '../utils/schemaMeta'
 
 export class UpdateFieldNameModificationHandler implements ModificationHandler<UpdateFieldNameModificationData> {
 	private renameColumnSubModification: ModificationHandler<any> = new NoopModification()
 
 	constructor(
 		private readonly data: UpdateFieldNameModificationData,
-		private readonly schema: SchemaWithMeta,
+		private readonly schema: Schema,
 		private readonly options: ModificationHandlerOptions,
 	) {
 		if (this.data.columnName) {
@@ -43,57 +46,39 @@ export class UpdateFieldNameModificationHandler implements ModificationHandler<U
 		}
 	}
 
-	public createSql(builder: MigrationBuilder): void {
+	public createSql(builder: MigrationBuilder, options: ModificationHandlerCreateSqlOptions): void {
 		const entity = this.schema.model.entities[this.data.entityName]
 		if (entity.view) {
 			return
 		}
-		if (this.options.formatVersion >= VERSION_UPDATE_CONSTRAINT_NAME) {
-			renameConstraintsSqlBuilder(builder, entity, this.getNewConstraintName.bind(this))
-		}
-
-		if (this.options.formatVersion >= VERSION_UPDATE_CONSTRAINT_NAME_ONE_HAS_ONE) {
-			acceptFieldVisitor(this.schema.model, this.data.entityName,  this.data.fieldName, {
-				visitColumn: () => {},
-				visitManyHasManyOwning: () => {},
-				visitManyHasManyInverse: () => {},
-				visitOneHasOneInverse: () => {},
-				visitManyHasOne: () => {},
-				visitOneHasMany: () => {},
-				visitOneHasOneOwning: ({ relation }) => {
-					const uniqueConstraintName = NamingHelper.createUniqueConstraintName(entity.name, [relation.name])
-					const newUniqueConstraintName = NamingHelper.createUniqueConstraintName(entity.name, [this.data.newFieldName])
-					builder.renameConstraint(entity.tableName, uniqueConstraintName, newUniqueConstraintName)
-				},
-			})
-		}
-
-		this.renameColumnSubModification.createSql(builder)
+		this.renameColumnSubModification.createSql(builder, options)
 	}
 
 	public getSchemaUpdater(): SchemaUpdater {
-		const updateConstraintName =
-			this.options.formatVersion >= VERSION_UPDATE_CONSTRAINT_NAME
-				? updateEntity(this.data.entityName, renameConstraintSchemaUpdater(this.getNewConstraintName.bind(this)))
-				: undefined
 		const updateConstraintFields =
-			this.options.formatVersion >= VERSION_UPDATE_CONSTRAINT_NAME
+			this.options.formatVersion >= VERSION_UPDATE_CONSTRAINT_FIELDS
 				? updateEntity(this.data.entityName, ({ entity }) => {
 					return {
 						...entity,
-						unique: Object.fromEntries(
-							Object.entries(entity.unique).map(([name, unique]) => [
-								name,
-								{
-									...unique,
-									fields: unique.fields.map(changeValue(this.data.fieldName, this.data.newFieldName)),
-								},
-							]),
-						),
+						unique: entity.unique.map(unique => ({
+							...unique,
+							fields: unique.fields.map(changeValue(this.data.fieldName, this.data.newFieldName)),
+						})),
 					}
 				  })
 				: undefined
-
+		const updateIndexFields =
+			this.options.formatVersion >= VERSION_UPDATE_INDEX_FIELDS
+				? updateEntity(this.data.entityName, ({ entity }) => {
+					return {
+						...entity,
+						indexes: entity.indexes.map(unique => ({
+							...unique,
+							fields: unique.fields.map(changeValue(this.data.fieldName, this.data.newFieldName)),
+						})),
+					}
+				})
+				: undefined
 		const updateRelationReferences = updateEveryEntity(
 			updateEveryField(({ field, entity }) => {
 				const isUpdatedRelation = (entity: Model.Entity, relation: Model.AnyRelation | null) => {
@@ -189,24 +174,12 @@ export class UpdateFieldNameModificationHandler implements ModificationHandler<U
 			updateAclOp,
 			this.renameColumnSubModification.getSchemaUpdater(),
 			updateModel(
-				updateConstraintName,
 				updateConstraintFields,
+				updateIndexFields,
 				updateRelationReferences,
 				updateFieldName,
 			),
 		)
-	}
-
-
-	private getNewConstraintName(constraint: Model.UniqueConstraint): string | null {
-		const generatedName = NamingHelper.createUniqueConstraintName(this.data.entityName, constraint.fields)
-		const isGenerated = constraint.name === generatedName
-		if (!isGenerated) {
-			null
-		}
-		const newFieldNames = constraint.fields.map(changeValue(this.data.fieldName, this.data.newFieldName))
-		const newName = NamingHelper.createUniqueConstraintName(this.data.entityName, newFieldNames)
-		return newName === constraint.name ? null : newName
 	}
 
 	describe() {

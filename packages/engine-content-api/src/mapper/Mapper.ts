@@ -1,5 +1,5 @@
 import { Input, Model } from '@contember/schema'
-import { acceptFieldVisitor, getColumnName } from '@contember/schema-utils'
+import { acceptFieldVisitor, getColumnName, SchemaDatabaseMetadata } from '@contember/schema-utils'
 import {
 	OrderByHelper,
 	PathFactory,
@@ -38,6 +38,7 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 		public readonly identityId: string,
 		public readonly transactionId: string,
 		private readonly schema: Model.Schema,
+		private readonly schemaDatabaseMetadata: SchemaDatabaseMetadata,
 		private readonly predicatesInjector: PredicatesInjector,
 		private readonly selectBuilderFactory: SelectBuilderFactory,
 		private readonly uniqueWhereExpander: UniqueWhereExpander,
@@ -181,7 +182,7 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 			throw new ImplementationException()
 		}
 		await this.setupSystemVariables()
-		return tryMutation(this.schema, () =>
+		return tryMutation(this.schema, this.schemaDatabaseMetadata, () =>
 			this.insertInternal(entity, data, builderCb),
 		)
 	}
@@ -196,7 +197,7 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 			throw new ImplementationException()
 		}
 		await this.setupSystemVariables()
-		return tryMutation(this.schema, async () => {
+		return tryMutation(this.schema, this.schemaDatabaseMetadata, async () => {
 			const primaryValue = await this.getPrimaryValue(entity, by)
 			if (primaryValue === undefined) {
 				return [new MutationEntryNotFoundError([], by)]
@@ -214,7 +215,7 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 			throw new ImplementationException()
 		}
 		await this.setupSystemVariables()
-		return tryMutation(this.schema, async () => {
+		return tryMutation(this.schema, this.schemaDatabaseMetadata, async () => {
 			const primaryValue = await this.getPrimaryValue(entity, by)
 			if (primaryValue === undefined) {
 				return [new MutationEntryNotFoundError([], by as Input.UniqueWhere)]
@@ -233,7 +234,7 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 			throw new ImplementationException()
 		}
 		await this.setupSystemVariables()
-		return tryMutation(this.schema, async () => {
+		return tryMutation(this.schema, this.schemaDatabaseMetadata, async () => {
 			const primaryValue = await this.getPrimaryValue(entity, by)
 			if (primaryValue === undefined) {
 				return await this.insertInternal(entity, create)
@@ -258,7 +259,9 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 			throw new ImplementationException()
 		}
 		await this.setupSystemVariables()
-		return tryMutation(this.schema, () => this.deleteExecutor.execute(this, entity, by, filter))
+		return tryMutation(this.schema, this.schemaDatabaseMetadata, () => {
+			return this.deleteExecutor.execute(this, entity, by, filter)
+		})
 	}
 
 	public async connectJunction(

@@ -4,9 +4,8 @@ import { SchemaUpdater, updateEntity, updateField, updateModel } from '../utils/
 import { createModificationType, Differ, ModificationHandler } from '../ModificationHandler'
 import deepEqual from 'fast-deep-equal'
 import { updateColumns } from '../utils/diffUtils'
-import { wrapIdentifier } from '@contember/database'
+import { wrapIdentifier } from '../../utils/dbHelpers'
 import { getColumnSqlType } from '../utils/columnUtils'
-import { getEntityDependantViews } from '../utils/viewDependencies'
 
 export class UpdateColumnDefinitionModificationHandler implements ModificationHandler<UpdateColumnDefinitionModificationData>  {
 	constructor(private readonly data: UpdateColumnDefinitionModificationData, private readonly schema: Schema) {}

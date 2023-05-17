@@ -5,6 +5,7 @@ import {
 	createModificationType,
 	Differ,
 	ModificationHandler,
+	ModificationHandlerCreateSqlOptions,
 	ModificationHandlerOptions,
 } from '../ModificationHandler'
 import {
@@ -23,14 +24,14 @@ export class ToggleEventLogModificationHandler implements ModificationHandler<To
 	) {
 	}
 
-	public createSql(builder: MigrationBuilder): void {
+	public createSql(builder: MigrationBuilder, { systemSchema }: ModificationHandlerCreateSqlOptions): void {
 		const entity = this.schema.model.entities[this.data.entityName]
 		if (entity.view) {
 			return
 		}
 		if (this.data.enabled) {
-			createEventTrigger(builder, this.options.systemSchema, entity.tableName, [entity.primaryColumn])
-			createEventTrxTrigger(builder, this.options.systemSchema, entity.tableName)
+			createEventTrigger(builder, systemSchema, entity.tableName, [entity.primaryColumn])
+			createEventTrxTrigger(builder, systemSchema, entity.tableName)
 		} else {
 			dropEventTrigger(builder, entity.tableName)
 			dropEventTrxTrigger(builder, entity.tableName)

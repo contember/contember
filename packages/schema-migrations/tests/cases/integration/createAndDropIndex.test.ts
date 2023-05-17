@@ -23,10 +23,10 @@ testMigrations('create index', {
 		{
 			modification: 'createIndex',
 			entityName: 'Article',
-			index: { name: 'idx_Article_title_2dc66a', fields: ['title'] },
+			index: { fields: ['title'] },
 		},
 	],
-	sql: SQL`CREATE INDEX "idx_Article_title_2dc66a" ON "article" ("title");`,
+	sql: SQL`CREATE INDEX ON "article" ("title");`,
 })
 
 
@@ -37,8 +37,8 @@ testMigrations('drop index', {
 		{
 			modification: 'removeIndex',
 			entityName: 'Article',
-			indexName: 'idx_Article_title_2dc66a',
+			fields: ['title'],
 		},
 	],
-	sql: SQL`DROP INDEX "idx_Article_title_2dc66a";`,
+	sql: SQL`DROP INDEX "idx_article_title";`,
 })

@@ -2,6 +2,7 @@ import migration from '../../../src/migrations/2020-06-01-103000-event-trigger-p
 import { createMigrationBuilder } from '@contember/database-migrations'
 import { sampleProject } from '@contember/engine-api-tester'
 import { test, assert } from 'vitest'
+import { dummySchemaDatabaseMetadata } from '@contember/schema-utils'
 
 
 test('event-trigger-performance sql', async () => {
@@ -9,6 +10,7 @@ test('event-trigger-performance sql', async () => {
 	await migration(builder, {
 		connection: undefined as any,
 		schemaResolver: () => Promise.resolve(sampleProject),
+		databaseMetadataResolver: () => Promise.resolve(dummySchemaDatabaseMetadata),
 		project: {
 			slug: 'test',
 			stages: [

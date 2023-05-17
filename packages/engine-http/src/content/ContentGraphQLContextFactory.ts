@@ -6,7 +6,7 @@ import { AuthResult } from '../common'
 import { KoaContext, Timer } from '../application'
 import { Providers } from '../providers'
 import { GraphQLKoaState } from '../graphql'
-import { ParsedMembership } from '@contember/schema-utils'
+import { ParsedMembership, SchemaDatabaseMetadata } from '@contember/schema-utils'
 import { Stage } from '@contember/engine-system-api'
 import { ProjectConfig } from '../project/config'
 
@@ -23,9 +23,10 @@ export class ContentGraphQLContextFactory {
 	) {
 	}
 
-	create({ db, schema, authResult, memberships, permissions, timer, koaContext, requestDebug, systemSchema, stage, project }: {
+	create({ db, schema, schemaDatabaseMetadata, authResult, memberships, permissions, timer, koaContext, requestDebug, systemSchema, stage, project }: {
 		db: Client
 		schema: Schema & { id: number }
+		schemaDatabaseMetadata: SchemaDatabaseMetadata
 		permissions: Acl.Permissions
 		authResult: AuthResult
 		memberships: readonly ParsedMembership[]
@@ -50,6 +51,7 @@ export class ContentGraphQLContextFactory {
 			identityVariables,
 			identityId,
 			schema,
+			schemaDatabaseMetadata,
 			permissions,
 			systemSchema,
 			stage,

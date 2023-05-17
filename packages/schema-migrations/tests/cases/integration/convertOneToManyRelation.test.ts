@@ -24,8 +24,8 @@ testMigrations('convert one has one to many has one relation without inverse sid
 		},
 	],
 	sql: SQL`
-		CREATE INDEX "post_image_id_index" ON "post" ("image_id");
-		ALTER TABLE "post" DROP CONSTRAINT "unique_Post_image_a85d6d";
+		CREATE INDEX ON "post" ("image_id");
+		ALTER TABLE "post" DROP CONSTRAINT "uniq_post_image_id";
 	`,
 })
 
@@ -52,8 +52,8 @@ testMigrations('convert one has one to many has one relation with inverse side',
 		},
 	],
 	sql: SQL`
-		CREATE INDEX "post_image_id_index" ON "post" ("image_id");
-		ALTER TABLE "post" DROP CONSTRAINT "unique_Post_image_a85d6d";
-	`,
+	CREATE INDEX ON "post" ("image_id"); 
+	ALTER TABLE "post" DROP CONSTRAINT "uniq_post_image_id";
+`,
 })
 

@@ -1,13 +1,13 @@
 import { createEventTrigger, createEventTrxTrigger } from './sqlUpdateUtils'
 import { MigrationBuilder } from '@contember/database-migrations'
-import { Model } from '@contember/schema'
+import { Model, Schema } from '@contember/schema'
 import { getPrimaryColumnType } from './getPrimaryColumnType'
-import { resolveIndexName, SchemaWithMeta } from './schemaMeta'
+import { wrapIdentifier } from '../../utils/dbHelpers'
 
 export const createJunctionTableSql = (
 	builder: MigrationBuilder,
 	systemSchema: string,
-	schema: SchemaWithMeta,
+	schema: Schema,
 	entity: Model.Entity,
 	targetEntity: Model.Entity,
 	relation: Model.ManyHasManyOwningRelation,
@@ -33,11 +33,11 @@ export const createJunctionTableSql = (
 			},
 		},
 	)
-	const proposedIndexName = `${relation.joiningTable.tableName}_pkey`
-	const indexName = resolveIndexName(schema, proposedIndexName)
-	builder.addConstraint(relation.joiningTable.tableName, indexName, {
-		primaryKey: primaryColumns,
-	})
+
+	const tableNameId = wrapIdentifier(relation.joiningTable.tableName)
+	const columnNameId = primaryColumns.map(wrapIdentifier)
+	builder.sql(`ALTER TABLE ${tableNameId} ADD PRIMARY KEY (${columnNameId.join(', ')})`)
+
 	if (relation.joiningTable.eventLog.enabled) {
 		createEventTrigger(builder, systemSchema, relation.joiningTable.tableName, primaryColumns)
 		createEventTrxTrigger(builder, systemSchema, relation.joiningTable.tableName)

@@ -5,7 +5,7 @@ import {
 	createModificationType,
 	Differ,
 	ModificationHandler,
-	ModificationHandlerOptions,
+	ModificationHandlerCreateSqlOptions,
 } from '../ModificationHandler'
 import {
 	createEventTrigger,
@@ -22,11 +22,10 @@ export class ToggleJunctionEventLogModificationHandler implements ModificationHa
 	constructor(
 		private readonly data: ToggleJunctionEventLogModificationData,
 		private readonly schema: Schema,
-		private readonly options: ModificationHandlerOptions,
 	) {
 	}
 
-	public createSql(builder: MigrationBuilder): void {
+	public createSql(builder: MigrationBuilder, { systemSchema }: ModificationHandlerCreateSqlOptions): void {
 		const entity = this.schema.model.entities[this.data.entityName]
 		const relation = entity.fields[this.data.fieldName]
 		if (!isRelation(relation) || relation.type !== Model.RelationType.ManyHasMany || !isOwningRelation(relation)) {
@@ -38,8 +37,8 @@ export class ToggleJunctionEventLogModificationHandler implements ModificationHa
 				relation.joiningTable.joiningColumn.columnName,
 				relation.joiningTable.inverseJoiningColumn.columnName,
 			]
-			createEventTrigger(builder, this.options.systemSchema, tableName, primaryColumns)
-			createEventTrxTrigger(builder, this.options.systemSchema, tableName)
+			createEventTrigger(builder, systemSchema, tableName, primaryColumns)
+			createEventTrxTrigger(builder, systemSchema, tableName)
 		} else {
 			dropEventTrigger(builder, tableName)
 			dropEventTrxTrigger(builder, tableName)

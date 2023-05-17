@@ -1,5 +1,5 @@
-import { Model, Writable } from '@contember/schema'
-import { NamingHelper } from '@contember/schema-utils'
+import { Model } from '@contember/schema'
+import { NamingConventions } from '@contember/schema-utils'
 import EntityBuilder from './EntityBuilder'
 import { SchemaBuilderError } from './SchemaBuilderError'
 import FieldProcessor from './internal/FieldProcessor'
@@ -8,7 +8,6 @@ import ManyHasManyProcessor from './internal/ManyHasManyProcessor'
 import OneHasOneProcessor from './internal/OneHasOneProcessor'
 import OneHasManyProcessor from './internal/OneHasManyProcessor'
 import ManyHasOneProcessor from './internal/ManyHasOneProcessor'
-import { NamingConventions } from '@contember/schema-utils'
 import FieldBuilder from './FieldBuilder'
 
 export default class SchemaBuilderInternal {
@@ -39,7 +38,7 @@ export default class SchemaBuilderInternal {
 			primaryColumn: primaryField.options.columnName || this.conventions.getColumnName(primaryName),
 			unique: this.createUnique(name, options, fieldOptions),
 			fields: {},
-			indexes: {},
+			indexes: [],
 			tableName: options.tableName || this.conventions.getTableName(name),
 			eventLog: {
 				enabled: true,
@@ -160,17 +159,16 @@ export default class SchemaBuilderInternal {
 		options: EntityBuilder.EntityOptions,
 		fieldOptions: FieldBuilder.Map,
 	): Model.UniqueConstraints {
-		const unique: Writable<Model.UniqueConstraints> = {}
+		const unique: Model.UniqueConstraint[] = []
+
 		for (const singleUnique of options.unique || []) {
-			const name = singleUnique.name || NamingHelper.createUniqueConstraintName(entityName, singleUnique.fields)
-			unique[name] = { fields: singleUnique.fields, name: name }
+			unique.push(singleUnique)
 		}
 		for (let fieldName in fieldOptions) {
 			const options = fieldOptions[fieldName]
 
 			if (options.type === FieldBuilder.Type.Column && options.options.unique) {
-				const uniqueName = NamingHelper.createUniqueConstraintName(entityName, [fieldName])
-				unique[uniqueName] = { fields: [fieldName], name: uniqueName }
+				unique.push({ fields: [fieldName] })
 			}
 		}
 		return unique

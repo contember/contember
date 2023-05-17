@@ -2,7 +2,7 @@ import { MigrationBuilder } from '@contember/database-migrations'
 import { SchemaUpdater } from './utils/schemaUpdateUtils'
 import { Schema } from '@contember/schema'
 import { Migration } from '../Migration'
-import { SchemaWithMeta } from './utils/schemaMeta'
+import { SchemaDatabaseMetadata } from '@contember/schema-utils'
 
 export interface ModificationDescription {
 	message: string
@@ -14,20 +14,25 @@ export const emptyModificationDescriptionContext: ModificationDescriptionContext
 export type ModificationDescriptionContext = { createdEntities: string[] }
 
 export interface ModificationHandler<Data> {
-	createSql(builder: MigrationBuilder): void | Promise<void>
+	createSql(builder: MigrationBuilder, options: ModificationHandlerCreateSqlOptions): void
 
 	getSchemaUpdater(): SchemaUpdater
 
 	describe(context: ModificationDescriptionContext): ModificationDescription
 }
 
+export interface ModificationHandlerCreateSqlOptions {
+	systemSchema: string
+	databaseMetadata: SchemaDatabaseMetadata
+	invalidateDatabaseMetadata: () => void
+}
+
 export interface ModificationHandlerOptions {
 	formatVersion: number
-	systemSchema: string
 }
 
 export interface ModificationHandlerConstructor<Data> {
-	new(data: Data, schema: SchemaWithMeta, options: ModificationHandlerOptions): ModificationHandler<Data>
+	new(data: Data, schema: Schema, options: ModificationHandlerOptions): ModificationHandler<Data>
 }
 
 export interface Differ<Data = { [field: string]: any }> {
@@ -38,7 +43,7 @@ export interface Differ<Data = { [field: string]: any }> {
 export interface ModificationType<Id extends String, Data> {
 	id: Id
 	createModification: (data: Data) => Migration.Modification<Data>
-	createHandler: (data: Data, schema: SchemaWithMeta, options: ModificationHandlerOptions) => ModificationHandler<Data>
+	createHandler: (data: Data, schema: Schema, options: ModificationHandlerOptions) => ModificationHandler<Data>
 }
 
 export const createModificationType = <Data, Id extends string>({ handler, id }: {

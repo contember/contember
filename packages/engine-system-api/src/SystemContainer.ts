@@ -11,9 +11,10 @@ import {
 	ExecutedMigrationsResolver,
 	IdentityFetcher,
 	MigrationAlterer,
+	MigrationsDatabaseMetadataResolverStoreFactory,
 	PermissionsFactory,
 	ProjectMigrator,
-	ProjectTruncateExecutor,
+	ProjectTruncateExecutor, SchemaDatabaseMetadataResolver,
 	SchemaVersionBuilder,
 } from './model'
 import { UuidProvider } from './utils'
@@ -79,8 +80,12 @@ export class SystemContainerFactory {
 				new SchemaDiffer(schemaMigrator))
 			.addService('migrationDescriber', ({ modificationHandlerFactory }) =>
 				new MigrationDescriber(modificationHandlerFactory))
-			.addService('projectMigrator', ({ migrationDescriber, schemaVersionBuilder, executedMigrationsResolver }) =>
-				new ProjectMigrator(migrationDescriber, schemaVersionBuilder, executedMigrationsResolver))
+			.addService('databaseMetadataResolver', () =>
+				new SchemaDatabaseMetadataResolver())
+			.addService('migrationsDatabaseMetadataResolverStoreFactory', ({ databaseMetadataResolver }) =>
+				new MigrationsDatabaseMetadataResolverStoreFactory(databaseMetadataResolver))
+			.addService('projectMigrator', ({ migrationDescriber, schemaVersionBuilder, executedMigrationsResolver, migrationsDatabaseMetadataResolverStoreFactory }) =>
+				new ProjectMigrator(migrationDescriber, schemaVersionBuilder, executedMigrationsResolver, migrationsDatabaseMetadataResolverStoreFactory))
 			.addService('projectTruncateExecutor', () =>
 				new ProjectTruncateExecutor())
 			.addService('migrationAlterer', () =>

@@ -33,11 +33,11 @@ testMigrations('create one has many relation (post with locales)', {
 				primary: 'id',
 				primaryColumn: 'id',
 				tableName: 'post_locale',
-				unique: {},
+				unique: [],
 				eventLog: {
 					enabled: true,
 				},
-				indexes: {},
+				indexes: [],
 			},
 		},
 		{
@@ -92,10 +92,7 @@ testMigrations('create one has many relation (post with locales)', {
 		{
 			modification: 'createUniqueConstraint',
 			entityName: 'PostLocale',
-			unique: {
-				name: 'unique_PostLocale_post_locale_5759e8',
-				fields: ['post', 'locale'],
-			},
+			unique: { fields: ['post', 'locale'] },
 		},
 	],
 	sql: SQL`CREATE TABLE "post_locale" (
@@ -119,8 +116,8 @@ testMigrations('create one has many relation (post with locales)', {
 	ALTER TABLE "post_locale"
 		ADD "post_id" uuid NOT NULL;
 	ALTER TABLE "post_locale"
-		ADD CONSTRAINT "fk_post_locale_post_id_f3d2e5" FOREIGN KEY ("post_id") REFERENCES "post"("id") ON DELETE NO ACTION DEFERRABLE INITIALLY IMMEDIATE;
-	CREATE INDEX "post_locale_post_id_index" ON "post_locale" ("post_id");
+		ADD FOREIGN KEY ("post_id") REFERENCES "post"("id") ON DELETE NO ACTION DEFERRABLE INITIALLY IMMEDIATE;
+	CREATE INDEX ON "post_locale" ("post_id");
 	ALTER TABLE "post_locale"
-		ADD CONSTRAINT "unique_PostLocale_post_locale_5759e8" UNIQUE ("post_id", "locale");`,
+		ADD UNIQUE ("post_id", "locale");`,
 })

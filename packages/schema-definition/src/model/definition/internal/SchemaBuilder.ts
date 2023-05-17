@@ -1,5 +1,5 @@
-import { Model, Writable } from '@contember/schema'
-import { NamingConventions, NamingHelper } from '@contember/schema-utils'
+import { Model } from '@contember/schema'
+import { NamingConventions } from '@contember/schema-utils'
 import 'reflect-metadata'
 import { tuple } from '../../../utils'
 import { EntityConstructor, FieldsDefinition } from '../types'
@@ -35,7 +35,7 @@ export class SchemaBuilder {
 				primary: primaryName,
 				primaryColumn: this.conventions.getColumnName(primaryName),
 				unique: this.createUnique(entityName, definitionInstance),
-				indexes: {},
+				indexes: [],
 				fields: [
 					...definitionInstance[primaryName] ? [] : [tuple(primaryName, this.createPrimaryColumn())],
 					...Object.entries(definitionInstance),
@@ -84,11 +84,10 @@ export class SchemaBuilder {
 	}
 
 	private createUnique(entityName: string, fieldDefinitions: FieldsDefinition): Model.UniqueConstraints {
-		const unique: Writable<Model.UniqueConstraints> = {}
+		const unique: Model.UniqueConstraint[] = []
 		for (const [fieldName, definition] of Object.entries(fieldDefinitions)) {
 			if (definition.options.unique) {
-				const uniqueName = NamingHelper.createUniqueConstraintName(entityName, [fieldName])
-				unique[uniqueName] = { fields: [fieldName], name: uniqueName }
+				unique.push({ fields: [fieldName] })
 			}
 		}
 		return unique

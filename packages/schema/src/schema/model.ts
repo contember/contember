@@ -200,22 +200,18 @@ export namespace Model {
 		readonly entities: { readonly [name: string]: Entity }
 	}
 
-	export type UniqueConstraints = {
-		readonly [name: string]: UniqueConstraint
-	}
+	export type UniqueConstraints = readonly UniqueConstraint[]
 
 	export type UniqueConstraint = {
 		readonly fields: readonly string[]
-		readonly name: string
+		readonly name?: string
 	}
 
-	export type Indexes = {
-		readonly [name: string]: Index
-	}
+	export type Indexes = readonly Index[]
 
 	export type Index = {
 		readonly fields: readonly string[]
-		readonly name: string
+		readonly name?: string
 	}
 
 

@@ -3,6 +3,7 @@ import { Connection } from '@contember/database'
 import {
 	DatabaseContextFactory,
 	ProjectInitializer,
+	SchemaDatabaseMetadataResolver,
 	SchemaVersionBuilder,
 	StageCreator,
 	SystemMigrationsRunner,
@@ -21,6 +22,7 @@ import { Plugin } from '../plugin/Plugin'
 import { ServerConfig } from '../config/config'
 import { ContentApiSpecificCache } from '../content/ContentApiSpecificCache'
 import { Schema } from '@contember/schema'
+import { ProjectDatabaseMetadataResolver } from './ProjectDatabaseMetadataResolver'
 
 export interface ProjectContainer {
 	systemDatabaseContextFactory: DatabaseContextFactory
@@ -31,6 +33,7 @@ export interface ProjectContainer {
 	graphQlSchemaFactory: GraphQlSchemaFactory
 	contentSchemaResolver: ContentSchemaResolver
 	projectInitializer: ProjectInitializer
+	projectDatabaseMetadataResolver: ProjectDatabaseMetadataResolver
 }
 
 export class ProjectContainerFactoryFactory {
@@ -80,6 +83,7 @@ export class ProjectContainerFactory {
 				'graphQlSchemaFactory',
 				'projectInitializer',
 				'logger',
+				'projectDatabaseMetadataResolver',
 			)
 	}
 
@@ -135,9 +139,13 @@ export class ProjectContainerFactory {
 				new DatabaseContextFactory(systemSchemaName, connection, providers))
 			.addService('systemMigrationGroups', () =>
 				Object.fromEntries(this.plugins.flatMap(it => it.getSystemMigrations ? [[it.name, it.getSystemMigrations()]] : [])))
-			.addService('systemMigrationsRunner', ({ systemDatabaseContextFactory, project, systemSchemaName, systemMigrationGroups }) =>
-				new SystemMigrationsRunner(systemDatabaseContextFactory, project, systemSchemaName, this.schemaVersionBuilder, systemMigrationGroups))
+			.addService('databaseMetadataResolver', () =>
+				new SchemaDatabaseMetadataResolver())
+			.addService('systemMigrationsRunner', ({ systemDatabaseContextFactory, project, systemSchemaName, systemMigrationGroups, databaseMetadataResolver }) =>
+				new SystemMigrationsRunner(systemDatabaseContextFactory, project, systemSchemaName, this.schemaVersionBuilder, systemMigrationGroups, databaseMetadataResolver))
 			.addService('projectInitializer', ({ systemMigrationsRunner, systemDatabaseContextFactory, project }) =>
 				new ProjectInitializer(new StageCreator(), systemMigrationsRunner, systemDatabaseContextFactory, project))
+			.addService('projectDatabaseMetadataResolver', ({ databaseMetadataResolver }) =>
+				new ProjectDatabaseMetadataResolver(databaseMetadataResolver))
 	}
 }

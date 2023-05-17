@@ -67,7 +67,7 @@ testMigrations('convert one has many to many has many', {
 		"category_id" uuid NOT NULL REFERENCES "category"("id") ON DELETE CASCADE
 	);
 	ALTER TABLE "article_categories"
-		ADD CONSTRAINT "article_categories_pkey" PRIMARY KEY ("article_id", "category_id");
+		ADD PRIMARY KEY ("article_id", "category_id");
 
 	CREATE TRIGGER "log_event" AFTER INSERT OR UPDATE OR DELETE
 	    ON "article_categories" FOR EACH ROW

@@ -44,12 +44,12 @@ import {
 } from './modifications'
 import { ChangeViewNonViewDiffer, RemoveChangedFieldDiffer, RemoveChangedViewDiffer } from './modifications/differs'
 import { CreateIndexDiffer, RemoveIndexDiffer } from './modifications/indexes'
-import { SchemaWithMeta } from './modifications/utils/schemaMeta'
 import { CreateTriggerDiffer, RemoveTriggerDiffer, UpdateTriggerDiffer } from './modifications/actions'
 import { UpdateTargetDiffer } from './modifications/actions/UpdateTargetModification'
 import { CreateTargetDiffer } from './modifications/actions/CreateTargetModification'
 import { RemoveTargetDiffer } from './modifications/actions/RemoveTargetModification'
 import { UpdateSettingsDiffer } from './modifications/settings'
+import { RemoveIndexNamesDiffer } from './modifications/upgrade/RemoveIndexNamesModification'
 
 type DiffOptions = { skipRecreateValidation?: boolean; skipInitialSchemaValidation?: boolean }
 
@@ -72,6 +72,7 @@ export class SchemaDiffer {
 		}
 
 		const differs: Differ[] = [
+			new RemoveIndexNamesDiffer(),
 			new UpdateSettingsDiffer(),
 			new ConvertOneToManyRelationDiffer(),
 			new ConvertOneHasManyToManyHasManyRelationDiffer(),
@@ -125,8 +126,7 @@ export class SchemaDiffer {
 
 
 		if (!skipRecreateValidation) {
-			const { meta, ...appliedDiffsSchema2 } = appliedDiffsSchema as SchemaWithMeta
-			const errors = deepCompare(updatedSchema, appliedDiffsSchema2, [])
+			const errors = deepCompare(updatedSchema, appliedDiffsSchema, [])
 			if (errors.length === 0) {
 				return diffs
 			}

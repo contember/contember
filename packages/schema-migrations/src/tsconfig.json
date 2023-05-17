@@ -6,7 +6,6 @@
 		"downlevelIteration": true
 	},
 	"references": [
-		{ "path": "../../database/src" },
 		{ "path": "../../database-migrations/src" },
 		{ "path": "../../engine-common/src" },
 		{ "path": "../../schema/src" },

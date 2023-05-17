@@ -4,11 +4,11 @@ import { SchemaUpdater, updateModel } from '../utils/schemaUpdateUtils'
 import {
 	createModificationType,
 	Differ,
-	ModificationHandler,
+	ModificationHandler, ModificationHandlerCreateSqlOptions,
 	ModificationHandlerOptions,
 } from '../ModificationHandler'
 import { createEventTrigger, createEventTrxTrigger } from '../utils/sqlUpdateUtils'
-import { PartialEntity } from '../../utils/PartialEntity.js'
+import { PossibleEntityShapeInMigrations } from '../../utils/PartialEntity.js'
 import { getColumnSqlType } from '../utils/columnUtils'
 
 export class CreateEntityModificationHandler implements ModificationHandler<CreateEntityModificationData> {
@@ -18,7 +18,7 @@ export class CreateEntityModificationHandler implements ModificationHandler<Crea
 		private readonly options: ModificationHandlerOptions,
 	) {}
 
-	public createSql(builder: MigrationBuilder): void {
+	public createSql(builder: MigrationBuilder, { systemSchema }: ModificationHandlerCreateSqlOptions): void {
 		const entity = this.data.entity
 		if (entity.view) {
 			// BC
@@ -37,8 +37,8 @@ export class CreateEntityModificationHandler implements ModificationHandler<Crea
 		})
 
 		if  (entity.eventLog?.enabled !== false) {
-			createEventTrigger(builder, this.options.systemSchema, entity.tableName, [entity.primaryColumn])
-			createEventTrxTrigger(builder, this.options.systemSchema, entity.tableName)
+			createEventTrigger(builder, systemSchema, entity.tableName, [entity.primaryColumn])
+			createEventTrxTrigger(builder, systemSchema, entity.tableName)
 		}
 	}
 
@@ -49,8 +49,9 @@ export class CreateEntityModificationHandler implements ModificationHandler<Crea
 				...model.entities,
 				[this.data.entity.name]: {
 					eventLog: { enabled: true },
-					indexes: {},
 					...this.data.entity,
+					unique: Object.values(this.data.entity.unique),
+					indexes: Object.values(this.data.entity.indexes ?? []),
 				},
 			},
 		}))
@@ -80,7 +81,7 @@ export class CreateEntityDiffer implements Differ {
 						fields: {
 							[entity.primary]: entity.fields[entity.primary],
 						},
-						unique: {},
+						unique: [],
 					},
 				}),
 			)
@@ -88,5 +89,5 @@ export class CreateEntityDiffer implements Differ {
 }
 
 export interface CreateEntityModificationData {
-	entity: PartialEntity
+	entity: PossibleEntityShapeInMigrations
 }

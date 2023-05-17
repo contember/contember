@@ -23,6 +23,7 @@ import { InputPreValidator } from '../input-validation'
 import { ObjectNode } from '../inputProcessing'
 import { executeReadOperations } from './ReadHelpers'
 import { logger } from '@contember/logger'
+import { SchemaDatabaseMetadata } from '@contember/schema-utils'
 
 type WithoutNode<T extends { node: any }> = Pick<T, Exclude<keyof T, 'node'>>
 
@@ -34,6 +35,7 @@ export class MutationResolver {
 		private readonly mapperFactory: MapperFactory,
 		private readonly inputValidator: InputPreValidator,
 		private readonly graphqlQueryAstFactory: GraphQlQueryAstFactory,
+		private readonly schemaDatabaseMetadata: SchemaDatabaseMetadata,
 	) {}
 
 	public async resolveTransaction(info: GraphQLResolveInfo, options: TransactionOptions): Promise<Result.TransactionResult> {
@@ -196,7 +198,7 @@ export class MutationResolver {
 			}
 			if (options?.deferForeignKeyConstraints) {
 				logger.debug('MutationResolver: validating fk constraints')
-				const constraintsResult = await tryMutation(this.schema, async () => {
+				const constraintsResult = await tryMutation(this.schema, this.schemaDatabaseMetadata, async () => {
 					await mapper.constraintHelper.setFkConstraintsImmediate()
 					return []
 				})

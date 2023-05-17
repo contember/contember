@@ -1,56 +1,47 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Model, Schema } from '@contember/schema'
 import { SchemaUpdater, updateEntity, updateModel } from '../utils/schemaUpdateUtils'
-import { createModificationType, Differ, ModificationHandler } from '../ModificationHandler'
-import { acceptFieldVisitor } from '@contember/schema-utils'
+import {
+	createModificationType,
+	Differ,
+	ModificationHandler,
+	ModificationHandlerCreateSqlOptions,
+} from '../ModificationHandler'
+import { wrapIdentifier } from '../../utils/dbHelpers'
+import { getIndexColumns } from './utils'
+import deepEqual from 'fast-deep-equal'
 
 export class CreateIndexModificationHandler implements ModificationHandler<CreateIndexModificationData> {
 	constructor(private readonly data: CreateIndexModificationData, private readonly schema: Schema) {}
 
-	public createSql(builder: MigrationBuilder): void {
+	public createSql(builder: MigrationBuilder, { databaseMetadata, invalidateDatabaseMetadata }: ModificationHandlerCreateSqlOptions): void {
 		const entity = this.schema.model.entities[this.data.entityName]
 		if (entity.view) {
 			return
 		}
 		const fields = this.data.index.fields
-		const columns = fields.map(fieldName => {
-			return acceptFieldVisitor(this.schema.model, entity, fieldName, {
-				visitColumn: ({ column }) => {
-					return column.columnName
-				},
-				visitManyHasOne: ({ relation }) => {
-					return relation.joiningColumn.columnName
-				},
-				visitOneHasOneOwning: ({ relation }) => {
-					return relation.joiningColumn.columnName
-				},
-				visitOneHasMany: () => {
-					throw new Error(`Cannot create index on 1:m relation in ${entity.name}.${fieldName}`)
-				},
-				visitOneHasOneInverse: () => {
-					throw new Error(`Cannot create index on 1:1 inverse relation in ${entity.name}.${fieldName}`)
-				},
-				visitManyHasManyOwning: () => {
-					throw new Error(`Cannot create index on m:m relation in ${entity.name}.${fieldName}`)
-				},
-				visitManyHasManyInverse: () => {
-					throw new Error(`Cannot create index on m:m inverse relation in ${entity.name}.${fieldName}`)
-				},
-			})
+		const columns = getIndexColumns({
+			fields,
+			entity,
+			model: this.schema.model,
 		})
-		builder.addIndex(entity.tableName, [...columns], {
-			name: this.data.index.name,
-		})
+
+		const tableNameId = wrapIdentifier(entity.tableName)
+		const columnNameIds = columns.map(wrapIdentifier)
+
+		builder.sql(`CREATE INDEX ON ${tableNameId} (${columnNameIds.join(', ')})`)
+
+		invalidateDatabaseMetadata()
 	}
 
 	public getSchemaUpdater(): SchemaUpdater {
 		return updateModel(
 			updateEntity(this.data.entityName, ({ entity }) => ({
 				...entity,
-				indexes: {
+				indexes: [
 					...entity.indexes,
-					[this.data.index.name]: this.data.index,
-				},
+					this.data.index,
+				],
 			})),
 		)
 	}
@@ -67,17 +58,20 @@ export const createIndexModification = createModificationType({
 	handler: CreateIndexModificationHandler,
 })
 
-export class CreateIndexDiffer implements Differ {
-	createDiff(originalSchema: Schema, updatedSchema: Schema) {
-		return Object.values(updatedSchema.model.entities).flatMap(entity =>
-			Object.values(entity.indexes)
-				.filter(it => !originalSchema.model.entities[entity.name].indexes[it.name])
-				.map(index => createIndexModification.createModification({ entityName: entity.name, index })),
-		)
-	}
-}
-
 export interface CreateIndexModificationData {
 	entityName: string
 	index: Model.Index
+}
+
+export class CreateIndexDiffer implements Differ {
+	createDiff(originalSchema: Schema, updatedSchema: Schema) {
+		return Object.values(updatedSchema.model.entities).flatMap(entity =>
+			entity.indexes
+				.filter(it => !originalSchema.model.entities[entity.name].indexes.find(idx => deepEqual(idx.fields, it.fields)))
+				.map(index => createIndexModification.createModification({
+					entityName: entity.name,
+					index,
+				})),
+		)
+	}
 }

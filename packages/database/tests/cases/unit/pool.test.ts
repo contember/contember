@@ -34,7 +34,7 @@ it('acquires and releases new connection from pool', async () => {
 		CAI P
 		000 1: Item added to a queue.
 		000 1: Creating a new connection
-		100 1: Connection established
+		000 1: Connection established
 		010 0: Queued item fulfilled with new connection.
 		010 0: Not connecting, queue is empty.
 		010 0: Releasing a connection.
@@ -57,7 +57,7 @@ it('disposes connection when maxIdle is reached', async () => {
 		CAI P
 		000 1: Item added to a queue.
 		000 1: Creating a new connection
-		100 1: Connection established
+		000 1: Connection established
 		010 0: Queued item fulfilled with new connection.
 		010 0: Not connecting, queue is empty.
 		010 0: Releasing a connection.
@@ -79,7 +79,7 @@ it('disposes connection after max uses', async () => {
 		CAI P
 		000 1: Item added to a queue.
 		000 1: Creating a new connection
-		100 1: Connection established
+		000 1: Connection established
 		010 0: Queued item fulfilled with new connection.
 		010 0: Not connecting, queue is empty.
 		010 0: Releasing a connection.
@@ -102,7 +102,7 @@ it('disposes errored connection', async () => {
 		CAI P
 		000 1: Item added to a queue.
 		000 1: Creating a new connection
-		100 1: Connection established
+		000 1: Connection established
 		010 0: Queued item fulfilled with new connection.
 		010 0: Not connecting, queue is empty.
 		010 0: Releasing and disposing a connection.
@@ -129,7 +129,7 @@ it('time outs when waiting for a connection', async () => {
 		000 1: Item added to a queue.
 		000 1: Creating a new connection
 		100 0: Queued item timed out
-		100 0: Connection established
+		000 0: Connection established
 		001 0: Connection is idle and available.
 		001 0: Not connecting, queue is empty.
 	`)
@@ -171,12 +171,12 @@ it('acquires multiple new connections from pool', async () => {
 		CAI P
 		000 1: Item added to a queue.
 		000 1: Creating a new connection
-		100 1: Connection established
+		000 1: Connection established
 		010 0: Queued item fulfilled with new connection.
 		010 0: Not connecting, queue is empty.
 		010 1: Item added to a queue.
 		010 1: Creating a new connection
-		110 1: Connection established
+		010 1: Connection established
 		020 0: Queued item fulfilled with new connection.
 		020 0: Not connecting, queue is empty.
 		020 0: Releasing a connection.
@@ -201,7 +201,7 @@ it('releases idle connection', async () => {
 		CAI P
 		000 1: Item added to a queue.
 		000 1: Creating a new connection
-		100 1: Connection established
+		000 1: Connection established
 		010 0: Queued item fulfilled with new connection.
 		010 0: Not connecting, queue is empty.
 		010 0: Releasing a connection.
@@ -229,7 +229,7 @@ it('waits for idle connection when pool is full', async () => {
 		CAI P
 		000 1: Item added to a queue.
 		000 1: Creating a new connection
-		100 1: Connection established
+		000 1: Connection established
 		010 0: Queued item fulfilled with new connection.
 		010 0: Not connecting, queue is empty.
 		010 1: Item added to a queue.
@@ -267,7 +267,7 @@ it('tries to reconnect on recoverable error', async () => {
 		100 1: Recoverable error, retrying in a moment.
 		000 1: Retrying
 		000 1: Creating a new connection
-		100 1: Connection established
+		000 1: Connection established
 		010 0: Queued item fulfilled with new connection.
 		010 0: Not connecting, queue is empty.
 	`)
@@ -378,7 +378,7 @@ it('rate limit', async () => {
 		CAI P
 		000 1: Item added to a queue.
 		000 1: Creating a new connection
-		100 1: Connection established
+		000 1: Connection established
 		010 0: Queued item fulfilled with new connection.
 		010 0: Not connecting, queue is empty.
 		010 1: Item added to a queue.
@@ -392,7 +392,7 @@ it('rate limit', async () => {
 		000 1: Not connecting, rate limit reached.
 		000 1: Rate limit renewed.
 		000 1: Creating a new connection
-		100 1: Connection established
+		000 1: Connection established
 		010 0: Queued item fulfilled with new connection.
 		010 0: Not connecting, queue is empty.
 	`)

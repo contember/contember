@@ -7,13 +7,20 @@ import {
 	StageCreator,
 	SystemMigrationsRunner,
 } from '@contember/engine-system-api'
-import { GraphQlSchemaBuilderFactory, PermissionsByIdentityFactory } from '@contember/engine-content-api'
+import { GraphQlSchemaBuilderFactory, PermissionFactory } from '@contember/engine-content-api'
 import { Logger } from '@contember/logger'
 import { ProjectConfig } from './config'
-import { ContentSchemaResolver, GraphQlSchemaFactory } from '../content'
+import {
+	ContentSchemaResolver,
+	GraphQLSchemaContributor,
+	GraphQlSchemaFactory,
+	GraphQLSchemaFactoryResult,
+} from '../content'
 import { Providers } from '../providers'
 import { Plugin } from '../plugin/Plugin'
-import { GraphQLSchemaContributor } from '../content/GraphQLSchemaContributor'
+import { ServerConfig } from '../config/config'
+import { ContentApiSpecificCache } from '../content/ContentApiSpecificCache'
+import { Schema } from '@contember/schema'
 
 export interface ProjectContainer {
 	systemDatabaseContextFactory: DatabaseContextFactory
@@ -31,11 +38,19 @@ export class ProjectContainerFactoryFactory {
 		private readonly debug: boolean,
 		private readonly plugins: Plugin[],
 		private readonly providers: Providers,
+		private readonly serverConfig: ServerConfig,
 	) {
 	}
 
 	create(schemaVersionBuilder: SchemaVersionBuilder, logger: Logger): ProjectContainerFactory {
-		return new ProjectContainerFactory(this.debug, this.plugins, schemaVersionBuilder, this.providers, logger)
+		return new ProjectContainerFactory(
+			this.debug,
+			this.plugins,
+			schemaVersionBuilder,
+			this.providers,
+			logger,
+			this.serverConfig,
+		)
 	}
 }
 
@@ -50,6 +65,7 @@ export class ProjectContainerFactory {
 		private readonly schemaVersionBuilder: SchemaVersionBuilder,
 		private readonly providers: Providers,
 		private readonly logger: Logger,
+		private readonly serverConfig: ServerConfig,
 	) {}
 
 	public createContainer(args: ProjectContainerFactoryArgs): ProjectContainer {
@@ -94,13 +110,22 @@ export class ProjectContainerFactory {
 			})
 			.addService('graphQlSchemaBuilderFactory', () =>
 				new GraphQlSchemaBuilderFactory())
-			.addService('permissionsByIdentityFactory', ({}) =>
-				new PermissionsByIdentityFactory())
-			.addService('graphQlSchemaFactory', ({ project, permissionsByIdentityFactory, graphQlSchemaBuilderFactory, providers }) => {
+			.addService('permissionFactory', ({}) =>
+				new PermissionFactory())
+			.addService('graphqlSchemaCache', () =>
+				new ContentApiSpecificCache<Schema, GraphQLSchemaFactoryResult>({
+					ttlSeconds: this.serverConfig.contentApi.schemaCacheTtlSeconds,
+				}))
+			.addService('graphQlSchemaFactory', ({ project, permissionFactory, graphQlSchemaBuilderFactory, providers, graphqlSchemaCache }) => {
 				const contributors = this.plugins
 					.map(it => (it.getSchemaContributor ? it.getSchemaContributor({ project, providers }) : null))
 					.filter((it): it is GraphQLSchemaContributor => !!it)
-				return new GraphQlSchemaFactory(graphQlSchemaBuilderFactory, permissionsByIdentityFactory, contributors)
+				return new GraphQlSchemaFactory(
+					graphqlSchemaCache,
+					graphQlSchemaBuilderFactory,
+					permissionFactory,
+					contributors,
+				)
 			})
 			.addService('contentSchemaResolver', ({ schemaVersionBuilder }) =>
 				new ContentSchemaResolver(schemaVersionBuilder))

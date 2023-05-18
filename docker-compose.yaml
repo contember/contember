@@ -80,7 +80,7 @@ services:
       - yarn
       - tsx
       - watch
-      - "--conditions=tsx"
+      - "--conditions=typescript"
       - ./ee/engine-server-ee/src/start.ts
   mailhog:
     image: mailhog/mailhog

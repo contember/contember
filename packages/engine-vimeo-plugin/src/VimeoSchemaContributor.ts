@@ -22,12 +22,6 @@ export class VimeoSchemaContributor implements GraphQLSchemaContributor {
 		private readonly vimeoServiceFactory: VimeoServiceFactory,
 	) {}
 
-	getCacheKey(context: GraphQLSchemaContributorContext): string {
-		const roles = context.identity.projectRoles
-		roles.sort()
-		return roles.join('||')
-	}
-
 	createSchema(context: GraphQLSchemaContributorContext): GraphQLSchema | undefined {
 		if (!this.vimeoConfig) {
 			return undefined

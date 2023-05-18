@@ -1,7 +1,8 @@
 import { Acl, Model } from '@contember/schema'
 import { PermissionFactory } from '../../../src/acl'
 import { SchemaBuilder } from '@contember/schema-definition'
-import { describe, it, assert } from 'vitest'
+import { assert, describe, it } from 'vitest'
+import { emptySchema } from '@contember/schema-utils'
 
 interface Test {
 	acl: Acl.Schema
@@ -10,13 +11,17 @@ interface Test {
 }
 
 const execute = (test: Test) => {
-	const schema: Model.Schema = new SchemaBuilder()
+	const model: Model.Schema = new SchemaBuilder()
 		.entity('Entity1', e => e.column('lorem').column('bar'))
 		.entity('Entity2', e => e.oneHasOne('xyz', r => r.target('Entity1')))
 		.buildSchema()
-	const merger = new PermissionFactory(schema)
+	const merger = new PermissionFactory()
 	const initialAcl = JSON.parse(JSON.stringify(test.acl))
-	const result = merger.create(test.acl, test.roles)
+	const result = merger.create({
+		...emptySchema,
+		 model,
+		acl: test.acl,
+	}, test.roles)
 	assert.deepStrictEqual(result, test.result)
 	assert.deepStrictEqual(test.acl, initialAcl)
 }

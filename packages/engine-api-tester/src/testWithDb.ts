@@ -129,7 +129,7 @@ export const executeDbTest = async (test: Test) => {
 				db: projectDb,
 				identityVariables: {},
 				executionContainer,
-				timer: async (label, cb) => (cb ? await cb() : (undefined as any)),
+				timer: (label, cb) => cb(),
 			}
 			const result = JSON.parse(JSON.stringify(await graphql({
 				schema: gqlSchema,

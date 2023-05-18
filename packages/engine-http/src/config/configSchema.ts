@@ -88,6 +88,9 @@ export const serverConfigSchema = Typesafe.object({
 	http: Typesafe.partial({
 		requestBodySize: Typesafe.string,
 	}),
+	contentApi: Typesafe.partial({
+		schemaCacheTtlSeconds: Typesafe.integer,
+	}),
 	logging: Typesafe.union(
 		(val): { sentry?: { dsn: string } } => Typesafe.valueAt(val, ['sentry', 'dsn']) === undefined ? {} : Typesafe.fail([]),
 		Typesafe.partial({

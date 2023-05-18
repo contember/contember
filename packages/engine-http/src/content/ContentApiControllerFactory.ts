@@ -58,6 +58,7 @@ export class ContentApiControllerFactory {
 					},
 				}),
 			)
+
 			logger.debug('Memberships fetched', { memberships })
 
 			const debugHeaderValue = request.headers[debugHeader]
@@ -71,9 +72,12 @@ export class ContentApiControllerFactory {
 
 			const projectRoles = memberships.map(it => it.role)
 
-			const [graphQlSchema, permissions] = await timer('GraphQLSchemaCreate', () => projectContainer.graphQlSchemaFactory.create(schema, {
-				projectRoles: projectRoles,
-			}))
+			const { schema: graphQlSchema, permissions } = await timer(
+				'GraphQLSchemaCreate',
+				() => projectContainer.graphQlSchemaFactory.create(schema, {
+					projectRoles: projectRoles,
+				}),
+			)
 
 			const handler = await (async () => {
 				const existingHandler = handlerCache.get(graphQlSchema)

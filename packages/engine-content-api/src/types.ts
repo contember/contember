@@ -6,5 +6,5 @@ export interface Context {
 	db: Client
 	identityVariables: Acl.VariablesMap
 	executionContainer: ExecutionContainer
-	timer: <T>(event: string, cb?: () => T) => Promise<T>
+	timer: <T>(event: string, cb: () => T) => T
 }

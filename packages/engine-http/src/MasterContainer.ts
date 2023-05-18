@@ -95,8 +95,8 @@ export class MasterContainerFactory {
 				new ModificationHandlerFactory(ModificationHandlerFactory.defaultFactoryMap))
 			.addService('systemContainerFactory', ({ providers, modificationHandlerFactory }) =>
 				new SystemContainerFactory(providers, modificationHandlerFactory))
-			.addService('projectContainerFactoryFactory', ({ debugMode, plugins, providers }) =>
-				new ProjectContainerFactoryFactory(debugMode, plugins, providers))
+			.addService('projectContainerFactoryFactory', ({ debugMode, plugins, providers, serverConfig }) =>
+				new ProjectContainerFactoryFactory(debugMode, plugins, providers, serverConfig))
 			.addService('tenantGraphQLHandlerFactory', () =>
 				new TenantGraphQLHandlerFactory())
 			.addService('systemGraphQLHandlerFactory', ({ debugMode }) =>

@@ -3,5 +3,9 @@
 	"compilerOptions": {
 		"experimentalDecorators": true,
 		"noEmit": true
-	}
+	},
+	"references": [
+		{ "path": "../../packages/schema/src" },
+		{ "path": "../../packages/schema-definition/src" }
+	]
 }

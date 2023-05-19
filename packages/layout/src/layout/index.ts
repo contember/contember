@@ -11,6 +11,7 @@ export type { LayoutPanelFooter, LayoutPanelFooterComponentType, LayoutPanelFoot
 export type { LayoutPanelHeader, LayoutPanelHeaderComponentType, LayoutPanelHeaderProps, OwnLayoutPanelHeaderProps } from './LayoutPanelHeader'
 export * from './Types'
 export * from './useClosePanelOnEscape'
+export * from './useDocumentTitle'
 
 
 export const Layout = {

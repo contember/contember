@@ -2,7 +2,7 @@ import { ContemberIdentitySvgProps, Identity2023 } from '@contember/brand'
 import { Stack } from '@contember/ui'
 import { FunctionComponent } from 'react'
 import { Title } from '../components/Directives'
-import { Actions, Content } from '../components/Slots'
+import { Slots } from '../components/Slots'
 import { ThemeSwitcher } from '../components/ThemeSwitcher'
 
 const list = Identity2023 as Record<string, FunctionComponent<ContemberIdentitySvgProps>>
@@ -10,10 +10,10 @@ const list = Identity2023 as Record<string, FunctionComponent<ContemberIdentityS
 export default (
 	<>
 		<Title>Brand</Title>
-		<Actions>
+		<Slots.Actions>
 			<ThemeSwitcher />
-		</Actions>
-		<Content>
+		</Slots.Actions>
+		<Slots.Content>
 			<Stack direction="vertical" gap="small" style={{ fontSize: '3em' }}>
 				{Object.keys(list).map(key => {
 					const Component = list[key]
@@ -25,6 +25,6 @@ export default (
 					)
 				})}
 			</Stack>
-		</Content>
+		</Slots.Content>
 	</>
 )

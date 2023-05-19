@@ -26,9 +26,8 @@ import {
 	TextField,
 } from '@contember/admin'
 import { DataGridTile } from '../components/DataGridTile'
-import { Title } from '../components/Directives'
-import { BREAKPOINT } from '../components/Layout'
-import { Actions, Back, Content, ContentStack, SidebarStack } from '../components/Slots'
+import { Directive, Title } from '../components/Directives'
+import { Slots } from '../components/Slots'
 import { CategoryForm } from './categories'
 
 
@@ -41,16 +40,19 @@ const stateOptions = {
 export const List = () => (
 	<>
 		<Title>Articles</Title>
-		<Actions><LinkButton to="article/create">Add article</LinkButton></Actions>
-		<Content>
+		<Directive name="cms-layout.content.maxWidth" content={null} />
+		<Slots.Actions><LinkButton to="article/create">Add article</LinkButton></Slots.Actions>
+		<Slots.Content>
 			<DataGrid
 				entities="Article"
 				itemsPerPage={20}
-				tile={<DataGridTile
-					to={`article/edit(id: $entity.id)`}
-					thumbnailField="image.url"
-					titleField="title"
-				/>}
+				tile={(
+					<DataGridTile
+						to="article/edit(id: $entity.id)"
+						thumbnailField="image.url"
+						titleField="title"
+					/>
+				)}
 				tileSize={100}
 			>
 				<TextCell field="title" header="Title" />
@@ -64,7 +66,7 @@ export const List = () => (
 					<DeleteEntityButton title="Delete" immediatePersist={true} />
 				</GenericCell>
 			</DataGrid>
-		</Content>
+		</Slots.Content>
 	</>
 )
 
@@ -148,23 +150,23 @@ const ArticleSidebarForm = Component(() => <>
 
 export const EditOrCreateForm = Component(() => (
 	<>
-		<Actions><PersistButton /></Actions>
+		<Slots.Actions><PersistButton /></Slots.Actions>
 
-		<ContentStack>
+		<Slots.ContentStack>
 			<ArticleForm />
-		</ContentStack>
+		</Slots.ContentStack>
 
-		<SidebarStack>
+		<Slots.SidebarStack>
 			<ArticleSidebarForm />
-		</SidebarStack>
+		</Slots.SidebarStack>
 	</>
 ), 'EditOrCreateForm')
 
 export const create = (
 	<>
-		<Back>
+		<Slots.Back>
 			<NavigateBackLink to="article/list">Back to articles</NavigateBackLink>
-		</Back>
+		</Slots.Back>
 		<Title>New Article</Title>
 		<CreateScope entity="Article" redirectOnSuccess="article/edit(id: $entity.id)">
 			<EditOrCreateForm />

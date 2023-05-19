@@ -1,6 +1,6 @@
 import { Component, MultiEditScope, PersistButton, Repeater, SelectField, TextField } from '@contember/admin'
 import { Title } from '../components/Directives'
-import { Actions, Content } from '../components/Slots'
+import { Slots } from '../components/Slots'
 
 export const CategoryForm = Component(() => <>
 	<TextField field={'name'} label={'Name'} />
@@ -13,13 +13,13 @@ export const CategoryForm = Component(() => <>
 export default () => (
 	<>
 		<Title>Categories</Title>
-		<Content>
+		<Slots.Content>
 			<MultiEditScope entities="Category" listProps={{
 				sortableBy: 'order',
-				beforeContent: <Actions><PersistButton /></Actions>,
+				beforeContent: <Slots.Actions><PersistButton /></Slots.Actions>,
 			}}>
 				<CategoryForm />
 			</MultiEditScope>
-		</Content>
+		</Slots.Content>
 	</>
 )

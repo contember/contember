@@ -1,16 +1,16 @@
 import { Section, SectionTabs, SectionTabsProvider, SelectFieldInner } from '@contember/admin'
 import { Directive, Title } from '../../components/Directives'
-import { Actions, ContentStack, Sidebar, TitleSlot } from '../../components/Slots'
+import { Slots } from '../../components/Slots'
 
 export default function InnerFooPage() {
 	return (
 		<SectionTabsProvider>
 			<Title>Nested Path</Title>
-			<TitleSlot><SectionTabs /></TitleSlot>
+			<Slots.Title><SectionTabs /></Slots.Title>
 
-			<Directive name="layouts.cms.contentProps.maxWidth" content={720} />
+			<Directive name="cms-layout.content.maxWidth" content={720} />
 
-			<Actions>
+			<Slots.Actions>
 				<SelectFieldInner
 					menuZIndex={2}
 					errors={undefined}
@@ -27,9 +27,9 @@ export default function InnerFooPage() {
 					label="Select:"
 					labelPosition="labelInlineLeft"
 				/>
-			</Actions>
+			</Slots.Actions>
 
-			<ContentStack>
+			<Slots.ContentStack>
 				<h1>Hello from Inner Foo</h1>
 				<Section heading="Lorem" showTab={false}>
 					<p>
@@ -60,10 +60,10 @@ export default function InnerFooPage() {
 						Duis eget nisi laoreet, hendrerit eros vel, molestie justo. Donec mollis orci et cursus dictum. Integer commodo posuere imperdiet. Duis eget vulputate neque, at porta tellus. Etiam vehicula euismod sem a sagittis. Fusce quis sem mattis, scelerisque est eget, posuere nunc. Aliquam erat volutpat. Quisque eget diam leo. Ut dapibus odio mi, vitae volutpat elit faucibus sed. Praesent eu faucibus dui. Quisque quis libero a sapien interdum egestas ut egestas enim. Etiam non ante orci. Etiam et condimentum sapien. Aenean fringilla urna imperdiet diam ornare dictum. Nullam at diam et est tincidunt placerat. Phasellus in magna vulputate, cursus tortor ac, laoreet massa.
 					</p>
 				</Section>
-			</ContentStack>
-			<Sidebar>
+			</Slots.ContentStack>
+			<Slots.Sidebar>
 				<p><small>Hello Contember world from the sidebar!</small></p>
-			</Sidebar>
+			</Slots.Sidebar>
 		</SectionTabsProvider>
 	)
 }

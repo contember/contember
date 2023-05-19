@@ -14,7 +14,7 @@ import {
 	useOnPersistSuccess,
 } from '@contember/admin'
 import { Directive, Title } from '../components/Directives'
-import { Actions, Back, ContentStack } from '../components/Slots'
+import { Slots } from '../components/Slots'
 
 const AutoGridList = () => {
 	const env = useEnvironment()
@@ -33,11 +33,11 @@ const AutoGridList = () => {
 export default (
 	<>
 		<Title>Auto Admin</Title>
-		<ContentStack>
+		<Slots.ContentStack>
 			<DataBindingProvider stateComponent={FeedbackRenderer}>
 				<AutoGridList />
 			</DataBindingProvider>
-		</ContentStack>
+		</Slots.ContentStack>
 	</>
 )
 
@@ -58,18 +58,18 @@ export function Grid() {
 
 	return (
 		<DataBindingProvider stateComponent={FeedbackRenderer}>
-			<Directive name="layout" content="legacy" />
+			<Directive name="layout" content="default" />
 
-			<Back>
+			<Slots.Back>
 				<NavigateBackLink to={{ pageName: 'auto' }}>Back to Auto</NavigateBackLink>
-			</Back>
+			</Slots.Back>
 
 			<Title>{`List ${entity}`}</Title>
 
-			<Actions>{actions}</Actions>
-			<ContentStack>
+			<Slots.Actions>{actions}</Slots.Actions>
+			<Slots.ContentStack>
 				<AutoGrid entities={entity + filter} createViewLinkTarget={createViewLinkTarget} createEditLinkTarget={createEditLinkTarget} />
-			</ContentStack>
+			</Slots.ContentStack>
 		</DataBindingProvider>
 	)
 }
@@ -87,19 +87,18 @@ export function Form() {
 	return (
 		<>
 			<Title>{title}</Title>
-			<Back>
+			<Slots.Back>
 				<NavigateBackLink to={{ pageName: 'auto/grid', parameters: { entity } }}>Back to Grid</NavigateBackLink>
-			</Back>
+			</Slots.Back>
 
-
-			<ContentStack>
+			<Slots.ContentStack>
 				<DataBindingProvider stateComponent={FeedbackRenderer} >
-					<Actions>
+					<Slots.Actions>
 						<PersistButton />
-					</Actions>
+					</Slots.Actions>
 					<AutoForm entity={entity} id={id} onCreateSuccess={onCreateSuccess} createEditLink={createEditLink} />
 				</DataBindingProvider>
-			</ContentStack>
+			</Slots.ContentStack>
 		</>
 	)
 }

@@ -1,15 +1,15 @@
 import { EditScope, NavigateBackLink } from '@contember/admin'
 import { Title } from '../components/Directives'
-import { Back, Content } from '../components/Slots'
+import { Slots } from '../components/Slots'
 
 export default () => (
 	<EditScope entity="UploadShowcase(unique = One)" setOnCreate="(unique = One)">
-		<Back>
+		<Slots.Back>
 			<NavigateBackLink to="index" />
-		</Back>
+		</Slots.Back>
 		<Title>Second screen</Title>
-		<Content>
+		<Slots.Content>
 			There is nothing here yet.
-		</Content>
+		</Slots.Content>
 	</EditScope>
 )

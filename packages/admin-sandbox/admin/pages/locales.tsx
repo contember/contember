@@ -1,15 +1,15 @@
 import { MultiEditScope, PersistButton, TextField } from '@contember/admin'
 import { Title } from '../components/Directives'
-import { Actions, Content } from '../components/Slots'
+import { Slots } from '../components/Slots'
 
 export default () => (
 	<>
 		<Title>Languages</Title>
-		<Content>
-			<MultiEditScope entities="Locale" listProps={{ beforeContent: <Actions><PersistButton /></Actions> }}>
+		<Slots.Content>
+			<MultiEditScope entities="Locale" listProps={{ beforeContent: <Slots.Actions><PersistButton /></Slots.Actions> }}>
 				<TextField label="Code" field="code" />
 				<TextField label="Label" field="label" />
 			</MultiEditScope>
-		</Content>
+		</Slots.Content>
 	</>
 )

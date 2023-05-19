@@ -22,7 +22,6 @@ export type CreateScopeProps =
 export const CreateScope: Partial<CreateScopeProps> & ComponentType<CreateScopeProps> = memo(
 	({ children, redirectOnSuccess, onPersistSuccess, ...entityProps }: CreateScopeProps) => {
 		return (
-			// TODO: Remove this DataBindingProvider and use only the one from parent Pages.tsx
 			<DataBindingProvider stateComponent={FeedbackRenderer}>
 				<EntitySubTree {...entityProps} onPersistSuccess={useOnPersistSuccess({ redirectOnSuccess, onPersistSuccess })} isCreating>
 					{children}

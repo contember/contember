@@ -18,7 +18,6 @@ export type DetailScopeProps =
 
 export const DetailScope: Partial<DetailScopeProps> & ComponentType<DetailScopeProps> = memo(
 	({ children, ...entityProps }: DetailScopeProps) => (
-		// TODO: Remove this DataBindingProvider and use only the one from parent Pages.tsx
 		<DataBindingProvider stateComponent={FeedbackRenderer}>
 			<EntitySubTree {...entityProps}>
 				<NotFoundBoundary>

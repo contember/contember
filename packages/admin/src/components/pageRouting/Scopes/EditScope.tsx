@@ -22,7 +22,6 @@ export type EditScopeProps =
 
 export const EditScope: Partial<EditScopeProps> & ComponentType<EditScopeProps> = memo(
 	({ children, redirectOnSuccess, onPersistSuccess, refreshDataBindingOnPersist, skipBindingStateUpdateAfterPersist, ...entityProps }: EditScopeProps) => (
-		// TODO: Remove this DataBindingProvider and use only the one from parent Pages.tsx
 		<DataBindingProvider
 			stateComponent={FeedbackRenderer}
 			refreshOnPersist={refreshDataBindingOnPersist ?? true}

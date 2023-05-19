@@ -25,7 +25,7 @@
 	],
 	"scripts": {
 		"build": "yarn build:js:dev && yarn build:js:prod && yarn build:css",
-		"build:js:dev": "vite build --mode development",
+		"build:js:dev": "NODE_ENV=development vite build --mode development",
 		"build:js:prod": "vite build --mode production",
 		"build:css": "sass --no-charset src/index.sass:dist/assets/index.css && yarn build:css:copy-fonts",
 		"build:css:copy-fonts": "rm -rf \"dist/assets/Inter\" && cp -R \"src/assets/Inter\" \"dist/assets/Inter\"",

@@ -20,7 +20,6 @@ export const ListScope = memo(
 		children,
 		...entityListProps
 	}: ListScopeProps<ContainerExtraProps, ItemExtraProps>) => (
-		// TODO: Remove this DataBindingProvider and use only the one from parent Pages.tsx
 		<DataBindingProvider stateComponent={FeedbackRenderer}>
 			<EntityListSubTree {...entityListProps} listComponent={ImmutableEntityListRenderer}>
 				{children}

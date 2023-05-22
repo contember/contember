@@ -33,7 +33,7 @@
 	},
 	"scripts": {
 		"build": "yarn run build:js:dev && yarn run build:js:prod && yarn run build:css && yarn build:license",
-		"build:js:dev": "vite build --mode development",
+		"build:js:dev": "NODE_ENV=development vite build --mode development",
 		"build:js:prod": "vite build --mode production",
 		"build:css": "vite build --config vite.config.css.js",
 		"build:license": "cp ../LICENSE ./LICENSE",

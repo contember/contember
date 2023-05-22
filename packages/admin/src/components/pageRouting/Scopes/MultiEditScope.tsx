@@ -24,7 +24,6 @@ export const MultiEditScope = Component(
 		refreshDataBindingOnPersist, skipBindingStateUpdateAfterPersist,
 		...entityListProps
 	}: MultiEditScopeProps<ContainerExtraProps, ItemExtraProps>) => (
-		// TODO: Remove this DataBindingProvider and use only the one from parent Pages.tsx
 		<DataBindingProvider
 			stateComponent={FeedbackRenderer}
 			refreshOnPersist={refreshDataBindingOnPersist ?? true}

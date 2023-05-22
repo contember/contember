@@ -204,9 +204,7 @@ export const Pages = ({ children, layout, bindingFeedbackRenderer }: PagesProps)
 		<EnvironmentContext.Provider value={requestEnv}>
 			<Layout>
 				<PageErrorBoundary key={requestId.current++}>
-					<DataBindingProvider stateComponent={bindingFeedbackRenderer ?? FeedbackRenderer}>
-						<Page action={pageAction} />
-					</DataBindingProvider>
+					<Page action={pageAction} />
 				</PageErrorBoundary>
 			</Layout>
 		</EnvironmentContext.Provider>

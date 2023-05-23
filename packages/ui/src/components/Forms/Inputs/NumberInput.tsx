@@ -3,8 +3,8 @@ import { forwardRef, memo, useCallback } from 'react'
 import { mergeProps } from 'react-aria'
 import { useComponentClassName } from '../../../auxiliary'
 import { toViewClass } from '../../../utils'
+import { useTextBasedInput } from '../Hooks'
 import type { NumberInputProps } from './Types'
-import { useTextBasedInput } from '../hooks/useTextBasedInput'
 
 /**
  * @group Forms UI
@@ -32,10 +32,10 @@ export const NumberInput = memo(forwardRef<HTMLInputElement, NumberInputProps>((
 		min: min?.toString(10),
 		onChange: useCallback((value?: string | null) => {
 			value = typeof value === 'string' && value.trim() !== ''
-			? (value)
-				.replace(/[^\d]/g, '')
-				.replace(/^0*(?=\d)/, '')
-			: null
+				? (value)
+					.replace(/[^\d]/g, '')
+					.replace(/^0*(?=\d)/, '')
+				: null
 
 			onChange?.(value ? parseInt(value) : null)
 		}, [onChange]),

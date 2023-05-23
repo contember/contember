@@ -7,7 +7,6 @@
 /// <reference types="react" />
 
 import type { AccessorTreeState } from '@contember/binding';
-import type { AllControlProps } from '@contember/ui';
 import { Ancestor } from 'slate';
 import { AnchorButtonProps } from '@contember/ui';
 import { AnchorHTMLAttributes } from 'react';
@@ -22,6 +21,7 @@ import { ColorInputProps } from '@contember/ui';
 import { ComponentType } from 'react';
 import { ContemberClientProps } from '@contember/react-client';
 import { ControlProps } from '@contember/ui';
+import { CSSProperties } from 'react';
 import { DataBindingStateComponentProps } from '@contember/binding';
 import { DateInputProps } from '@contember/ui';
 import { DateTimeInputProps } from '@contember/ui';
@@ -83,6 +83,7 @@ import { MouseEvent as MouseEvent_2 } from 'react';
 import type { NamedExoticComponent } from 'react';
 import { Node as Node_2 } from 'slate';
 import { NodeEntry } from 'slate';
+import type { NonOptionalControlProps } from '@contember/ui';
 import { OptionallyVariableFieldValue } from '@contember/binding';
 import { OrderBy } from '@contember/binding';
 import { Path } from 'slate';
@@ -137,11 +138,12 @@ import { SyntheticEvent } from 'react';
 import { TableProps } from '@contember/ui';
 import { TableRowProps } from '@contember/ui';
 import { Text as Text_2 } from 'slate';
-import { TextareaInputOwnProps } from '@contember/ui';
+import { TextareaInputProps } from '@contember/ui';
 import { TileLayerProps } from 'react-leaflet';
 import { TimeInputProps } from '@contember/ui';
 import { UnsugarableSingleEntityEventListeners } from '@contember/binding';
 import { UrlInputProps } from '@contember/ui';
+import { VisuallyDependentControlProps } from '@contember/ui';
 
 // @public (undocumented)
 export const acceptAnyFile: () => boolean;
@@ -1565,6 +1567,14 @@ export type DiscriminatedFileKindsProps<SFExtraProps extends {} = {}> = SelectFi
 export type DispatchChangePage = (action: GridPagingAction) => void;
 
 // @public (undocumented)
+export const DisplayTextField: React.NamedExoticComponent<DisplayTextFieldProps>;
+
+// @public (undocumented)
+export type DisplayTextFieldProps = Omit<SimpleRelativeSingleFieldProps, 'defaultValue'> & VisuallyDependentControlProps & {
+    format?: FieldValueFormatter<string, string>;
+};
+
+// @public (undocumented)
 export const DragHandle: () => JSX.Element;
 
 // @public (undocumented)
@@ -1922,6 +1932,9 @@ export type FieldFallbackViewStyle = 'n/a' | 'nothing' | 'unknown';
 
 // @public (undocumented)
 export type FieldValueFormatter<FieldVal extends FieldValue, ControlVal extends FieldValue> = (value: FieldVal | null | undefined, field: FieldAccessor<FieldVal>) => ControlVal | null;
+
+// @public (undocumented)
+export type FieldValueRenderer<FV extends FieldValue = string> = (value: FV | null | undefined, fieldAccessor: FieldAccessor<FV>) => ReactElement;
 
 // @public (undocumented)
 export type FieldViewDictionary = typeof fieldViewDictionary;
@@ -3911,6 +3924,15 @@ export const renderAudioFilePreview: ({ objectUrl }: RenderFilePreviewOptions) =
 export const renderByJoining: SelectedDimensionRenderer;
 
 // @public (undocumented)
+export type RenderedSimpleRelativeSingleFieldProxyExtraPropsKeys = 'className' | 'style';
+
+// @public (undocumented)
+export type RenderedSimpleRelativeSingleFieldProxyFieldContainerPropsKeys = 'required' | 'size' | 'errors';
+
+// @public (undocumented)
+export type RenderedSugaredRelativeSingleFieldKeys = 'field';
+
+// @public (undocumented)
 export interface RenderFilePreviewOptions<AcceptArtifacts = unknown> {
     // (undocumented)
     acceptArtifacts: AcceptArtifacts;
@@ -4572,7 +4594,7 @@ export interface SignOutResponseOk {
 export type SimpleDynamicSingleChoiceFieldProps = SugaredRelativeSingleEntity & BaseDynamicChoiceFieldOptions & Pick<DynamicSingleChoiceFieldProps, 'transformOptions'>;
 
 // @public (undocumented)
-export const SimpleRelativeSingleField: <P extends FieldBasicProps & Omit<FieldContainerProps, "children">, Value extends FieldValue = FieldValue>(render: (fieldMetadata: SimpleRelativeSingleFieldMetadata<Value>, props: P) => ReactNode, displayName: string, defaultProps?: Partial<P> | undefined) => NamedExoticComponent<P>;
+export const SimpleRelativeSingleField: <P extends SimpleRelativeSingleFieldProxyProps, Value extends FieldValue = FieldValue>(render: (fieldMetadata: SimpleRelativeSingleFieldMetadata<Value>, props: SimpleRelativeSingleFieldProxyExcludeHandledProps<P>) => ReactNode, displayName: string, defaultProps?: Partial<P> | undefined) => NamedExoticComponent<P>;
 
 // @public (undocumented)
 export interface SimpleRelativeSingleFieldMetadata<Value extends FieldValue = FieldValue> {
@@ -4585,15 +4607,33 @@ export interface SimpleRelativeSingleFieldMetadata<Value extends FieldValue = Fi
 }
 
 // @public (undocumented)
-export type SimpleRelativeSingleFieldProps = FieldBasicProps & Omit<FieldContainerProps, 'children'>;
+export type SimpleRelativeSingleFieldProps = SimpleRelativeSingleFieldProxyProps;
 
 // @internal (undocumented)
-export const SimpleRelativeSingleFieldProxy: React.MemoExoticComponent<({ render, label, labelDescription, labelPosition, description, ...props }: SimpleRelativeSingleFieldProxyProps) => JSX.Element>;
+export const SimpleRelativeSingleFieldProxy: React.MemoExoticComponent<({ render, defaultValue, isNonbearing, onBeforeUpdate, onInitialize, onUpdate, description, direction, gap, label, labelDescription, labelPosition, useLabelElement, width, className, style, errors, field: fieldName, required, size, containerClassName, containerStyle, suppressErrors, ...rest }: SimpleRelativeSingleFieldProxyProps & SimpleRelativeSingleFieldProxyRendererProps) => JSX.Element>;
 
 // @public (undocumented)
-export type SimpleRelativeSingleFieldProxyProps = {
-    render: (fieldMetadata: SimpleRelativeSingleFieldMetadata<any>, props: any) => ReactNode;
-} & Omit<FieldContainerProps, 'children'> & SugaredRelativeSingleField;
+export type SimpleRelativeSingleFieldProxyExcludeHandledProps<P extends SimpleRelativeSingleFieldProxyProps> = Omit<P, Exclude<keyof SugaredRelativeSingleField, RenderedSugaredRelativeSingleFieldKeys> | Exclude<keyof SimpleRelativeSingleFieldProxyExtraProps, RenderedSimpleRelativeSingleFieldProxyExtraPropsKeys> | Exclude<keyof SimpleRelativeSingleFieldProxyFieldContainerProps, RenderedSimpleRelativeSingleFieldProxyFieldContainerPropsKeys>>;
+
+// @public (undocumented)
+export type SimpleRelativeSingleFieldProxyExtraProps = {
+    className?: string | undefined;
+    containerClassName?: string | undefined;
+    containerStyle?: CSSProperties | undefined;
+    style?: CSSProperties | undefined;
+    suppressErrors?: boolean | undefined;
+};
+
+// @public (undocumented)
+export type SimpleRelativeSingleFieldProxyFieldContainerProps = Omit<FieldContainerProps, 'children' | 'className' | 'style'>;
+
+// @public (undocumented)
+export type SimpleRelativeSingleFieldProxyProps = SimpleRelativeSingleFieldProxyFieldContainerProps & SugaredRelativeSingleField & SimpleRelativeSingleFieldProxyExtraProps;
+
+// @public (undocumented)
+export type SimpleRelativeSingleFieldProxyRendererProps = {
+    render: (fieldMetadata: SimpleRelativeSingleFieldMetadata<any>, props: SimpleRelativeSingleFieldProxyExcludeHandledProps<any>) => ReactNode;
+};
 
 // @public (undocumented)
 export type SingleKindFileProps = FullFileKind & SelectFileInputSelectionComponentProps<any> & {
@@ -4816,7 +4856,7 @@ export const TextAreaField: React.NamedExoticComponent<TextareaFieldProps>;
 export const TextareaField: React.NamedExoticComponent<TextareaFieldProps>;
 
 // @public (undocumented)
-export type TextareaFieldProps = SimpleRelativeSingleFieldProps & ControlProps<string> & TextareaInputOwnProps;
+export type TextareaFieldProps = Omit<SimpleRelativeSingleFieldProps, 'style'> & ControlProps<string> & TextareaInputProps;
 
 // @public (undocumented)
 export interface TextAttrs {
@@ -4838,10 +4878,7 @@ export type TextCellProps = DataGridColumnPublicProps & FieldFallbackViewPublicP
 export const TextField: React.NamedExoticComponent<TextFieldProps>;
 
 // @public (undocumented)
-export type TextFieldProps = SimpleRelativeSingleFieldProps & ControlProps<string> & {
-    allowNewlines?: boolean;
-    wrapLines?: boolean;
-};
+export type TextFieldProps = SimpleRelativeSingleFieldProps & ControlProps<string>;
 
 // @public (undocumented)
 export type TextFilterArtifacts = {
@@ -5093,7 +5130,7 @@ export const useFetchMe: () => () => Promise<{
 }>;
 
 // @public (undocumented)
-export const useFieldControl: <FieldVal extends FieldValue, ControlVal extends FieldValue, Type extends string | undefined = string | undefined>({ fieldMetadata, parse, format, ...props }: UseControlProps<FieldVal, ControlVal>) => AllControlProps<ControlVal> & {
+export const useFieldControl: <FieldVal extends FieldValue, ControlVal extends FieldValue, Type extends string | undefined = string | undefined>({ fieldMetadata, parse, format, ...props }: UseControlProps<FieldVal, ControlVal>) => NonOptionalControlProps<ControlVal> & {
     ref: Ref<any>;
 };
 

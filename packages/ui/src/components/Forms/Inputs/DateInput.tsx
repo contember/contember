@@ -2,9 +2,9 @@ import classNames from 'classnames'
 import { forwardRef, memo } from 'react'
 import { useComponentClassName } from '../../../auxiliary'
 import { toViewClass } from '../../../utils'
+import { useTextBasedInput } from '../Hooks'
 import { assertDateString } from '../Types'
 import type { DateInputProps } from './Types'
-import { useTextBasedInput } from '../hooks/useTextBasedInput'
 
 /**
  * @group Forms UI

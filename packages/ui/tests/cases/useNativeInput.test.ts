@@ -27,6 +27,8 @@ describe('useNativeInput hook', () => {
 			    "current": null,
 			  },
 			  "required": undefined,
+			  "step": undefined,
+			  "style": undefined,
 			}
 		`)
 	})
@@ -46,18 +48,21 @@ describe('useNativeInput hook', () => {
 			readOnly: true,
 			required: true,
 			validationState: 'invalid',
-			name: 'test,',
+			name: 'test',
+			style: { height: '20px' },
+			step: 2,
+			className: 'extra-class',
 		}, createRef<HTMLInputElement>()))
 		expect(result.current).toMatchInlineSnapshot(`
 			{
-			  "className": "is-active is-focused is-hovered is-loading is-read-only is-required scheme-light cui-theme theme-danger view-seamless is-invalid",
+			  "className": "is-active is-focused is-hovered is-loading is-read-only is-required scheme-light cui-theme theme-danger view-seamless is-invalid extra-class",
 			  "disabled": true,
 			  "id": undefined,
 			  "max": 100,
 			  "maxLength": undefined,
 			  "min": 10,
 			  "minLength": undefined,
-			  "name": "test,",
+			  "name": "test",
 			  "onBlur": [Function],
 			  "onFocus": [Function],
 			  "pattern": undefined,
@@ -67,6 +72,10 @@ describe('useNativeInput hook', () => {
 			    "current": null,
 			  },
 			  "required": true,
+			  "step": 2,
+			  "style": {
+			    "height": "20px",
+			  },
 			}
 		`)
 	})

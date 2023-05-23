@@ -1,8 +1,8 @@
 import classNames from 'classnames'
 import { forwardRef, memo } from 'react'
 import { useComponentClassName } from '../../../auxiliary'
+import { useTextBasedInput } from '../Hooks'
 import type { TextInputProps } from './Types'
-import { useTextBasedInput } from '../hooks/useTextBasedInput'
 
 /**
  * @group Forms UI

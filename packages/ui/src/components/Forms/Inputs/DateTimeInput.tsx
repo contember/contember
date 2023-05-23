@@ -1,12 +1,12 @@
 import classNames from 'classnames'
 import { forwardRef, memo, Ref } from 'react'
 import { useComponentClassName } from '../../../auxiliary'
+import { HTMLInputElementProps } from '../../../types'
 import { toViewClass } from '../../../utils'
+import { useTextBasedInput } from '../Hooks'
 import { assertDatetimeString } from '../Types'
 import { DateTimeInputFallback } from './DateTimeInputFallback'
 import { DateTimeInputProps } from './Types'
-import { useTextBasedInput } from '../hooks/useTextBasedInput'
-import { HTMLInputElementProps } from '../../../types'
 
 let _isInputDateTimeLocalSupported: boolean | null = null
 

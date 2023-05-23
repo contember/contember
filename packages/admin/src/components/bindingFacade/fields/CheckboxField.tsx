@@ -6,7 +6,7 @@ import {
 	useFieldControl,
 } from './useFieldControl'
 
-const parse: ControlValueParser<boolean, boolean> = value => value ??  null
+const parse: ControlValueParser<boolean, boolean> = value => value ?? null
 const format: FieldValueFormatter<boolean, boolean> = value => value ?? null
 
 export type CheckboxFieldProps =
@@ -17,10 +17,7 @@ export type CheckboxFieldProps =
  * @group Form Fields
  */
 export const CheckboxField = SimpleRelativeSingleField<CheckboxFieldProps, boolean>(
-	(fieldMetadata, {
-		label,
-		...props
-	}) => {
+	(fieldMetadata, props) => {
 		const inputProps = useFieldControl<boolean, boolean>({
 			...props,
 			fieldMetadata,

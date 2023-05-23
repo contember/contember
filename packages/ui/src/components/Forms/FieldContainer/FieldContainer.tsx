@@ -41,26 +41,28 @@ export const FieldContainer = memo(
 		label,
 		labelDescription,
 		labelPosition,
-		width = 'column',
 		required,
 		size,
-		useLabelElement = true,
 		style,
+		useLabelElement = true,
+		width = 'column',
 	}: FieldContainerProps) => {
 		const LabelElement = useLabelElement ? 'label' : 'div'
 		const componentClassName = `${useClassNamePrefix()}field-container`
 
 		const isLabelInline = labelPosition === 'labelInlineLeft' || labelPosition === 'labelInlineRight'
+		const invalid = !!errors?.length
 
 		return (
 			<div
+				data-invalid={invalid ? true : undefined}
 				style={style}
 				className={classNames(
 					`${componentClassName}`,
 					toEnumViewClass(size),
 					toEnumViewClass(labelPosition),
 					toEnumClass('width-', width === 'none' ? undefined : width),
-					errors?.length ? toThemeClass(null, 'danger') : null,
+					invalid ? toThemeClass(null, 'danger') : null,
 					className,
 				)}
 			>

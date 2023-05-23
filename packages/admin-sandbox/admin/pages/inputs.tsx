@@ -4,6 +4,7 @@ import {
 	CheckboxField,
 	DateField,
 	DateTimeField,
+	DisplayTextField,
 	EditScope,
 	EmailField,
 	FloatField,
@@ -16,9 +17,9 @@ import {
 	SimpleRelativeSingleField,
 	SlugField,
 	TextareaField,
+	TextareaFieldProps,
 	TextareaInput,
 	TextField,
-	TextFieldProps,
 	TimeField,
 	UrlField,
 	useFieldControl,
@@ -26,11 +27,9 @@ import {
 import { Title } from '../components/Directives'
 import { Actions, ContentStack } from '../components/Slots'
 
-export const JsonField = SimpleRelativeSingleField<TextFieldProps, string>(
+export const JsonField = SimpleRelativeSingleField<TextareaFieldProps, string>(
 	(fieldMetadata, {
-		allowNewlines,
-		label,
-		wrapLines,
+		style,
 		...props
 	}) => {
 		const inputProps = useFieldControl<string, string>({
@@ -40,11 +39,19 @@ export const JsonField = SimpleRelativeSingleField<TextFieldProps, string>(
 			format: val => val ? JSON.stringify(val) : null,
 		})
 
-		return <TextareaInput {...inputProps} />
+		return <TextareaInput {...inputProps} style={style} />
 	},
 	'JsonField',
 )
 
+const SHOW_OVERRIDES = false
+
+const extraDebugProps = SHOW_OVERRIDES ? {
+	containerStyle: { outline: '1px solid red' },
+	containerClassName: 'background-container',
+	style: { outline: '1px solid blue' },
+	className: 'background-input',
+} : {}
 
 export default () => (
 	<EditScope entity="InputShowcase(unique = One)" setOnCreate="(unique = One)">
@@ -52,26 +59,31 @@ export default () => (
 		<Actions>
 			<PersistButton />
 		</Actions>
+		<style>{`
+		.background-container { background-color: pink !important; }
+		.background-input { background-color: lightblue !important; }
+		`}</style>
 		<ContentStack>
-			<TextField required field={'textValue'} label={'Text'} />
-			<TextField field={'notNullTextValue'} label={'Not null text'} />
-			<EmailField field={'emailValue'} label={'Your email'} />
-			<SearchField field={'searchValue'} label={'Search page'} />
-			<UrlField field={'urlValue'} label={'URL'} />
-			<SlugField required derivedFrom={'textValue'} field={'slugValue'} label={'Slug with prefix'} unpersistedHardPrefix="https://www.contember.com/" linkToExternalUrl />
-			<SlugField derivedFrom={'textValue'} field={'slugValue'} label={'Slug without prefix'} />
-			<TextareaField field={'multilineValue'} label={'Multiline text'} />
-			<CheckboxField field={'boolValue'} label={'Bool'} />
-			<CheckboxField field={'boolValue'} label={'Bool'} description="Same checkbox with description" labelDescription="This could be true or false or null" />
-			<NumberField field={'intValue'} label={'Int'} />
-			<FloatField field={'floatValue'} label={'Float value'} />
-			<TimeField field={'timeValue'} label={'Time'} />
-			<TimeField field={'timeValue'} label={'Time'} seconds />
-			<DateField field={'dateValue'} label={'Date'} />
-			<DateTimeField field={'dateTimeValue'} label={'Date time'} />
-			<DateTimeField field={'dateTimeValue'} label={'Date time'} min="2020-12-02T01:20" max="2022-01-20T23:13" />
-			<LocationField latitudeField={'gpsLatValue'} longitudeField={'gpsLonValue'} label={'Map'} />
-			<RadioField field={'enumValue'} label={'Value'} options={[
+			<TextField {...extraDebugProps} required labelPosition="labelLeft" field={'textValue'} label={'Text'} placeholder="Enter text..." />
+			<DisplayTextField {...extraDebugProps} labelPosition="labelLeft" field={'textValue'} label={'Text'} placeholder="N/A" direction="horizontal-reverse" />
+			<TextField {...extraDebugProps} field={'notNullTextValue'} label={'Not null text'} />
+			<EmailField {...extraDebugProps} field={'emailValue'} label={'Your email'} />
+			<SearchField {...extraDebugProps} field={'searchValue'} label={'Search page'} />
+			<UrlField {...extraDebugProps} field={'urlValue'} label={'URL'} />
+			<SlugField {...extraDebugProps} required derivedFrom={'textValue'} field={'slugValue'} label={'Slug with prefix'} unpersistedHardPrefix="https://www.contember.com/" linkToExternalUrl />
+			<SlugField {...extraDebugProps} derivedFrom={'textValue'} field={'slugValue'} label={'Slug without prefix'} />
+			<TextareaField {...extraDebugProps} field={'multilineValue'} label={'Multiline text'} />
+			<CheckboxField {...extraDebugProps} field={'boolValue'} label={'Bool'} />
+			<CheckboxField {...extraDebugProps} field={'boolValue'} label={'Bool'} description="Same checkbox with description" labelDescription="This could be true or false or null" />
+			<NumberField {...extraDebugProps} field={'intValue'} label={'Int'} step={2} />
+			<FloatField {...extraDebugProps} field={'floatValue'} label={'Float value'} />
+			<TimeField {...extraDebugProps} field={'timeValue'} label={'Time'} />
+			<TimeField {...extraDebugProps} field={'timeValue'} label={'Time'} seconds />
+			<DateField {...extraDebugProps} field={'dateValue'} label={'Date'} />
+			<DateTimeField {...extraDebugProps} field={'dateTimeValue'} label={'Date time'} />
+			<DateTimeField {...extraDebugProps} field={'dateTimeValue'} label={'Date time'} min="2020-12-02T01:20" max="2022-01-20T23:13" />
+			<LocationField {...extraDebugProps} latitudeField={'gpsLatValue'} longitudeField={'gpsLonValue'} label={'Map'} />
+			<RadioField {...extraDebugProps} field={'enumValue'} label={'Value'} options={[
 				{ value: 'a', label: 'A option' },
 				{ value: 'b', label: 'B option' },
 				{ value: 'c', label: 'C option' },
@@ -87,15 +99,15 @@ export default () => (
 					discriminateBy="heroSection"
 					label="Hero section"
 				>
-					<TextField field="primaryText" label="Headline" />
+					<TextField {...extraDebugProps} field="primaryText" label="Headline" />
 				</Block>
 			</BlockRepeater>
-			<SelectField field={'selectValue'} label={'Value'} options={[
+			<SelectField {...extraDebugProps} field={'selectValue'} label={'Value'} options={[
 				{ value: 'a', label: 'A option' },
 				{ value: 'b', label: 'B option' },
 				{ value: 'c', label: 'C option' },
 			]} />
-			<JsonField field={'jsonValue'} label={'JSON'} />
+			<JsonField {...extraDebugProps} field={'jsonValue'} label={'JSON'} />
 		</ContentStack>
 	</EditScope>
 )

@@ -2,9 +2,9 @@ import classNames from 'classnames'
 import { forwardRef, memo } from 'react'
 import { useComponentClassName } from '../../../auxiliary'
 import { toViewClass } from '../../../utils'
+import { useTextBasedInput } from '../Hooks'
 import { assertTimeString } from '../Types'
 import type { TimeInputProps } from './Types'
-import { useTextBasedInput } from '../hooks/useTextBasedInput'
 
 /**
  * @group Forms UI

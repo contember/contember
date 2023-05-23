@@ -10,14 +10,14 @@ export type NumberFieldProps =
 	& SimpleRelativeSingleFieldProps
 	& ControlProps<number>
 
-const parse: ControlValueParser<number, number> = value => value ??  null
+const parse: ControlValueParser<number, number> = value => value ?? null
 const format: FieldValueFormatter<number, number> = value => value ?? null
 
 /**
  * @group Form Fields
  */
 export const NumberField = SimpleRelativeSingleField<NumberFieldProps, number>(
-	(fieldMetadata, { defaultValue, ...props }) => {
+	(fieldMetadata, props) => {
 		const inputProps = useFieldControl<number, number>({
 			...props,
 			fieldMetadata,

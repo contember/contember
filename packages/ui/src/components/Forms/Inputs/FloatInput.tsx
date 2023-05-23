@@ -2,8 +2,8 @@ import classNames from 'classnames'
 import { forwardRef, memo, useCallback, useRef } from 'react'
 import { useComponentClassName } from '../../../auxiliary'
 import { toViewClass } from '../../../utils'
+import { useTextBasedInput } from '../Hooks'
 import type { FloatInputProps } from './Types'
-import { useTextBasedInput } from '../hooks/useTextBasedInput'
 
 /**
  * @group Forms UI
@@ -33,12 +33,12 @@ export const FloatInput = memo(forwardRef<HTMLInputElement, FloatInputProps>(({
 		min: min?.toString(10),
 		onChange: useCallback((value?: string | null) => {
 			value = typeof value === 'string' && value.trim() !== ''
-			? (value)
-				.replaceAll(',', '.')
-				.replace(/[^\d.-]/g, '')
-				.replace(/^(\d+\.\d+|\d+).*/, '$1')
-				.replace(/^0*(?=\d)/, '')
-			: ''
+				? (value)
+					.replaceAll(',', '.')
+					.replace(/[^\d.-]/g, '')
+					.replace(/^(\d+\.\d+|\d+).*/, '$1')
+					.replace(/^0*(?=\d)/, '')
+				: ''
 
 			if (number.current !== value) {
 				number.current = value

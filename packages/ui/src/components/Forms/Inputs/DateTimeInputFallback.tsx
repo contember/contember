@@ -4,10 +4,9 @@ import { useComponentClassName } from '../../../auxiliary'
 import { toViewClass } from '../../../utils'
 import { Divider } from '../../Divider'
 import { Stack } from '../../Stack'
+import { useInputClassName, useTextBasedInput } from '../Hooks'
 import { assertDatetimeString, splitDatetime, VisuallyDependentControlProps } from '../Types'
-import { useInputClassName } from '../hooks/useInputClassName'
 import { DateTimeInputProps } from './Types'
-import { useTextBasedInput } from '../hooks/useTextBasedInput'
 
 function joinDatetime(date?: string | null, time?: string | null) {
 	return `${date}T${time}`
@@ -90,8 +89,7 @@ export const DateTimeInputFallback = memo(forwardRef(({
 			changeValidationState()
 		}, [changeValidationState]),
 		value: time,
-	},
-	timeInputRef)
+	}, timeInputRef)
 
 	const [maxDate, maxTime] = splitDatetime(max)
 	const [minDate, minTime] = splitDatetime(min)

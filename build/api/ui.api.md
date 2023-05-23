@@ -7,6 +7,7 @@
 import { AllHTMLAttributes } from 'react';
 import { AnimationEventHandler } from 'react';
 import { AriaRole } from 'react';
+import { ChangeEventHandler } from 'react';
 import { ClipboardEventHandler } from 'react';
 import { ComponentProps } from 'react';
 import { ComponentType } from 'react';
@@ -87,17 +88,6 @@ export type AetherProps = HTMLDivElementProps;
 
 // @public (undocumented)
 export type Alignment = Default | 'alignStart' | 'alignCenter' | 'alignEnd';
-
-// @public
-export type All<T> = {
-    [P in keyof Required<T>]: Pick<T, P> extends Required<Pick<T, P>> ? T[P] : (T[P] | undefined);
-};
-
-// @public (undocumented)
-export type AllControlProps<V> = Omit<All<ControlProps<V>>, 'type'>;
-
-// @public (undocumented)
-export type AllVisuallyDependentControlProps = Omit<All<VisuallyDependentControlProps>, 'type'>;
 
 // @public (undocumented)
 export interface AnchorBasedProps extends Omit<HTMLAnchorElementProps, 'ref' | 'size'> {
@@ -285,15 +275,15 @@ export type CardProps = Omit<CommonCardProps, 'type'> & Omit<HTMLDivElementProps
 
 // @public (undocumented)
 export const Checkbox: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<boolean> & ControlValueProps<boolean> & {
-CheckboxButtonComponent?: (({ id, name, placeholder, checked, indeterminate, ...props }: CheckboxButtonProps) => JSX.Element) | undefined;
+CheckboxButtonComponent?: (({ id, name, placeholder, checked, indeterminate, style, ...props }: CheckboxButtonProps) => JSX.Element) | undefined;
 children?: undefined;
 } & RestHTMLCheckboxProps & RefAttributes<HTMLInputElement>>>;
 
 // @public (undocumented)
-export const CheckboxButton: ({ id, name, placeholder, checked, indeterminate, ...props }: CheckboxButtonProps) => JSX.Element;
+export const CheckboxButton: ({ id, name, placeholder, checked, indeterminate, style, ...props }: CheckboxButtonProps) => JSX.Element;
 
 // @public (undocumented)
-export interface CheckboxButtonProps extends AllVisuallyDependentControlProps {
+export interface CheckboxButtonProps extends NonOptionalVisuallyDependentControlProps {
     // (undocumented)
     checked?: boolean | null;
     // (undocumented)
@@ -404,6 +394,8 @@ export interface ControlConstraintProps<V> {
     minLength?: number;
     // (undocumented)
     pattern?: string;
+    // (undocumented)
+    step?: number;
 }
 
 // @public (undocumented)
@@ -424,6 +416,8 @@ export interface ControlDisplayProps {
     scheme?: Scheme;
     // (undocumented)
     size?: Size;
+    // (undocumented)
+    style?: CSSProperties;
     // (undocumented)
     type?: never;
 }
@@ -1454,7 +1448,7 @@ export interface ErrorListProps {
 export type ErrorType = Error | unknown;
 
 // @public (undocumented)
-export const FieldContainer: MemoExoticComponent<({ children, className, description, direction, errors, gap, label, labelDescription, labelPosition, width, required, size, useLabelElement, style, }: FieldContainerProps) => JSX.Element>;
+export const FieldContainer: MemoExoticComponent<({ children, className, description, direction, errors, gap, label, labelDescription, labelPosition, required, size, style, useLabelElement, width, }: FieldContainerProps) => JSX.Element>;
 
 // @public (undocumented)
 export type FieldContainerLabelPosition = Default | 'labelLeft' | 'labelRight' | 'labelInlineLeft' | 'labelInlineRight';
@@ -1681,6 +1675,13 @@ export interface IconSourceSpecification {
     // (undocumented)
     customIcon?: ReactElement | string[];
 }
+
+// @public (undocumented)
+export type InputValueProps<T, E extends HTMLElement> = ControlValueProps<T> & {
+    required?: boolean;
+    emptyValue: T;
+    extractValue: (input: E) => T | null;
+};
 
 // @public (undocumented)
 export type Intent = Default | 'primary' | 'secondary' | 'tertiary' | 'positive' | 'success' | 'warn' | 'danger';
@@ -1962,6 +1963,20 @@ export interface NavigationLinkProps {
     // (undocumented)
     navigate: (e?: SyntheticEvent) => void;
 }
+
+// @public
+export type NonOptional<T> = {
+    [P in keyof Required<T>]: Pick<T, P> extends Required<Pick<T, P>> ? T[P] : (T[P] | undefined);
+};
+
+// @public (undocumented)
+export type NonOptionalControlProps<V> = Omit<NonOptional<ControlProps<V>>, 'type'>;
+
+// @public (undocumented)
+export type NonOptionalUseInputClassNameProps = Omit<NonOptionalVisuallyDependentControlProps, 'id' | 'name' | 'placeholder' | 'style'>;
+
+// @public (undocumented)
+export type NonOptionalVisuallyDependentControlProps = Omit<NonOptional<VisuallyDependentControlProps>, 'type'>;
 
 // @public (undocumented)
 export function noop(): void;
@@ -2260,7 +2275,7 @@ export type SectionTabsRegistrationContextType = [
 ];
 
 // @public (undocumented)
-export const Select: <V = unknown>(props: Omit<ControlProps<V>, "type" | keyof ControlConstraintProps<any>> & {
+export const Select: <V = unknown>(props: Omit<ControlProps<V>, "style" | "type" | keyof ControlConstraintProps<any>> & {
     options: SelectOption<V>[];
     rows?: undefined;
     isSearchable?: ComponentProps<ReactSelect>['isSearchable'];
@@ -2296,7 +2311,7 @@ export type SelectOptionWithKey<V = string> = Omit<SelectOption<V>, 'key'> & {
 };
 
 // @public (undocumented)
-export type SelectProps<V> = Omit<ControlProps<V>, 'type' | keyof ControlConstraintProps<any>> & {
+export type SelectProps<V> = Omit<ControlProps<V>, 'type' | 'style' | keyof ControlConstraintProps<any>> & {
     options: SelectOption<V>[];
     rows?: never;
     isSearchable?: ComponentProps<ReactSelect>['isSearchable'];
@@ -2502,9 +2517,9 @@ withTopToolbar?: boolean | undefined;
 export type TelInputProps = TextInputProps;
 
 // @public (undocumented)
-export const TextareaInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<string> & ControlValueProps<string> & TextareaInputOwnProps & UnderlyingElementProps & {
+export const TextareaInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<string> & ControlValueProps<string> & TextareaInputOwnProps & {
 style?: TextareaAutosizeProps['style'];
-} & RefAttributes<HTMLTextAreaElement>>>;
+} & UnderlyingElementProps & RefAttributes<HTMLTextAreaElement>>>;
 
 // @public (undocumented)
 export interface TextareaInputOwnProps {
@@ -2515,7 +2530,7 @@ export interface TextareaInputOwnProps {
 }
 
 // @public (undocumented)
-export type TextareaInputProps = ControlProps<string> & TextareaInputOwnProps & UnderlyingElementProps & {
+export type TextareaInputProps = ControlProps<string> & TextareaInputOwnProps & {
     style?: TextareaAutosizeProps['style'];
 };
 
@@ -2745,6 +2760,12 @@ export const useChangeValidationState: ({ ref, onValidationStateChange }: {
 }) => void;
 
 // @public (undocumented)
+export const useCheckboxInput: <E extends HTMLInputElement>(props: ControlProps<boolean>, forwardedRef: ForwardedRef<E>) => AllHTMLAttributes<E> & {
+    ref: RefObject<E>;
+    indeterminate?: boolean | undefined;
+};
+
+// @public (undocumented)
 export function useChildrenAsLabel(children: ReactNode): string | undefined;
 
 // @public (undocumented)
@@ -2779,6 +2800,18 @@ export function useElementTopOffset(ref?: RefObject<HTMLElement>): number | unde
 // @public (undocumented)
 export function useFallbackRef<E extends HTMLDivElement>(forwardedRef?: ForwardedRef<E>): ((instance: E | null) => void) | RefObject<E>;
 
+// @public
+export function useInputClassName<P extends NonOptionalUseInputClassNameProps | UseInputClassNameProps = NonOptionalUseInputClassNameProps>({ active, disabled, loading, readOnly, required, focused, hovered, className: outerClassName, distinction, intent, scheme, size, validationState, ...restNotImplemented }: P): string;
+
+// @public (undocumented)
+export type UseInputClassNameProps = Omit<VisuallyDependentControlProps, 'id' | 'name' | 'placeholder' | 'style'>;
+
+// @public (undocumented)
+export const useInputValue: <T, E extends HTMLElement>({ defaultValue, value, onChange, notNull: notNull_, required, emptyValue, extractValue, }: InputValueProps<T, E>) => {
+    onChange: ChangeEventHandler<E>;
+    state: T | null;
+};
+
 // @public (undocumented)
 export function useMouseMove<E extends HTMLElement = HTMLElement>(observedElementRef: RefObject<E>): RefObject<boolean>;
 
@@ -2786,7 +2819,7 @@ export function useMouseMove<E extends HTMLElement = HTMLElement>(observedElemen
 export function useMouseMoveContext(): RefObject<boolean>;
 
 // @public (undocumented)
-export function useNativeInput<E extends HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement, T>({ active, disabled, loading, readOnly, required, focused, hovered, onBlur, onFocus, onFocusChange, defaultValue, id, name, onChange, notNull, placeholder, type, value, max, maxLength, min, minLength, pattern, onValidationStateChange, validationState, className: outerClassName, distinction, intent, scheme, size, ...rest }: ControlProps<T>, forwardedRef: ForwardedRef<E>): AllHTMLAttributes<E> & {
+export function useNativeInput<E extends HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement, T>({ active, disabled, loading, readOnly, required, focused, hovered, onBlur, onFocus, onFocusChange, defaultValue, id, name, onChange, notNull, placeholder, type, value, max, maxLength, min, minLength, pattern, step, onValidationStateChange, validationState, className: outerClassName, distinction, intent, scheme, size, style, ...rest }: ControlProps<T>, forwardedRef: ForwardedRef<E>): AllHTMLAttributes<E> & {
     ref: RefObject<E>;
 };
 
@@ -2817,6 +2850,11 @@ export const useShowToast: () => (toast: ToastData) => void;
 
 // @public (undocumented)
 export const UseTableElementContext: Context<boolean>;
+
+// @public (undocumented)
+export const useTextBasedInput: <E extends HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>(props: ControlProps<string>, forwardedRef: ForwardedRef<E>) => AllHTMLAttributes<E> & {
+    ref: RefObject<E>;
+};
 
 // @public (undocumented)
 export type ValidationState = Default | 'valid' | 'invalid';

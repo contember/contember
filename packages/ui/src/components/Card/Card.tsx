@@ -3,8 +3,7 @@ import { memo, MouseEvent, ReactNode } from 'react'
 import { useComponentClassName } from '../../auxiliary'
 import { HTMLAnchorElementProps, HTMLDivElementProps } from '../../types'
 import { toEnumViewClass, toFeatureClass, toStateClass } from '../../utils'
-import { VisuallyDependentControlProps } from '../Forms'
-import { useInputClassName } from '../Forms/hooks/useInputClassName'
+import { useInputClassName, VisuallyDependentControlProps } from '../Forms'
 import { Label } from '../Typography'
 
 const CardInner = ({

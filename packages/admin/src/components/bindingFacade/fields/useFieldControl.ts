@@ -1,6 +1,6 @@
 import type { FieldAccessor, FieldValue } from '@contember/binding'
 import { useEntityBeforePersist } from '@contember/binding'
-import type { AllControlProps, ControlProps } from '@contember/ui'
+import type { ControlProps, NonOptionalControlProps } from '@contember/ui'
 import { Ref, useCallback, useEffect, useRef, useState } from 'react'
 import type { SimpleRelativeSingleFieldMetadata } from '../auxiliary'
 
@@ -28,7 +28,7 @@ export const useFieldControl = <FieldVal extends FieldValue, ControlVal extends 
 	parse,
 	format,
 	...props
-}: UseControlProps<FieldVal, ControlVal>): AllControlProps<ControlVal> & {
+}: UseControlProps<FieldVal, ControlVal>): NonOptionalControlProps<ControlVal> & {
 	ref: Ref<any>,
 } => {
 	// TODO: fix unknow
@@ -85,6 +85,7 @@ export const useFieldControl = <FieldVal extends FieldValue, ControlVal extends 
 		min: format(props.min, field.current),
 		minLength: props.minLength,
 		pattern: props.pattern,
+		step: props.step,
 
 		// ValidationStateProps
 		validationState: field.current.errors ? ('invalid' as const) : undefined,
@@ -110,8 +111,8 @@ export const useFieldControl = <FieldVal extends FieldValue, ControlVal extends 
 		onBlur: useCallback(() => {
 			setWasTouched(true)
 		}, [setWasTouched]),
-		onFocus: useCallback(() => {}, []),
-		onFocusChange: useCallback(() => {}, []),
+		onFocus: useCallback(() => { }, []),
+		onFocusChange: useCallback(() => { }, []),
 
 		// ControlDisplayProps
 		id: props.id,
@@ -120,5 +121,6 @@ export const useFieldControl = <FieldVal extends FieldValue, ControlVal extends 
 		intent: props.intent,
 		scheme: props.scheme,
 		size: props.size,
+		style: props.style,
 	}
 }

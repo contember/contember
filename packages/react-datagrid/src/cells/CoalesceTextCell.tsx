@@ -27,7 +27,7 @@ export type CoalesceTextFilterArtifacts = {
 	query: string
 }
 
-export const createCoalesceCell = <ColumnProps extends {}, ValueRendererProps extends {}>({ FilterRenderer, ValueRenderer }: {
+export const createCoalesceTextCell = <ColumnProps extends {}, ValueRendererProps extends {}>({ FilterRenderer, ValueRenderer }: {
 	FilterRenderer: ComponentType<FilterRendererProps<CoalesceTextFilterArtifacts>>,
 	ValueRenderer: ComponentType<CoalesceCellRendererProps & ValueRendererProps>
 }): FunctionComponent<CoalesceTextCellProps & ColumnProps & ValueRendererProps> => Component(props => {

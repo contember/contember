@@ -1,5 +1,5 @@
 export * from './BooleanCell'
-export * from './CoalesceCell'
+export * from './CoalesceTextCell'
 export * from './DateCell'
 export * from './EnumCell'
 export * from './GenericCell'

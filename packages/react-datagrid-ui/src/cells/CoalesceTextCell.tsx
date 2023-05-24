@@ -1,4 +1,4 @@
-import { createCoalesceCell } from '@contember/react-datagrid'
+import { createCoalesceTextCell } from '@contember/react-datagrid'
 import { GenericTextCellFilter } from '../filters'
 import { CoalesceFieldView, CoalesceFieldViewProps } from '@contember/react-binding-ui'
 import { Stack } from '@contember/ui'
@@ -14,7 +14,7 @@ import { DataGridColumnPublicProps } from '../types'
  *
  * @group Data grid
  */
-export const CoalesceCell = createCoalesceCell<DataGridColumnPublicProps, CoalesceFieldViewProps>({
+export const CoalesceTextCell = createCoalesceTextCell<DataGridColumnPublicProps, CoalesceFieldViewProps>({
 	FilterRenderer: props => {
 		return (
 			<Stack horizontal align="center">

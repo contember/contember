@@ -19,11 +19,28 @@ export const createControlledDataGrid = <P extends {}>(Renderer: ComponentType<P
 		filter: state.filter,
 		itemsPerPage: state.paging.itemsPerPage,
 	})
+	const rendererProps: DataGridRendererProps<any> = {
+		environment,
+		stateMethods,
+		pagingInfo,
+		desiredState: state,
+		displayedState: gridState,
+		treeRootId,
+	}
 
-	return <Renderer environment={environment} stateMethods={stateMethods} pagingInfo={pagingInfo} desiredState={state} displayedState={gridState} treeRootId={treeRootId} {...(props as unknown as P)} />
+	return <Renderer {...rendererProps} {...(props as unknown as P)} />
 }, ({ state, stateMethods, ...props }, environment) => {
-	return <Renderer environment={environment} stateMethods={stateMethods} desiredState={state} displayedState={state} pagingInfo={{
-		pagesCount: undefined,
-		totalCount: undefined,
-	}} treeRootId={undefined} {...(props as unknown as P)} />
+	const rendererProps: DataGridRendererProps<any> = {
+		environment,
+		stateMethods,
+		pagingInfo: {
+			pagesCount: undefined,
+			totalCount: undefined,
+		},
+		desiredState: state,
+		displayedState: state,
+		treeRootId: undefined,
+	}
+
+	return <Renderer {...rendererProps} {...(props as unknown as P)} />
 })

@@ -11,6 +11,7 @@ import {
 	StaticSingleChoiceFieldProps,
 } from '@contember/react-choice-field'
 import { useAccessorErrors } from '@contember/react-binding-ui'
+import { useOpenCreateNewDialog } from './useOpenCreateNewDialog'
 
 export type RadioFieldProps =
 	& RadioFieldInnerPublicProps
@@ -22,15 +23,15 @@ export type RadioFieldProps =
 /**
  * @group Form Fields
  */
-export const RadioField: FunctionComponent<RadioFieldProps> = Component(props => {
-	return (
-		<ChoiceField {...props} renderedOptionsLimit={0}>
-			{(choiceProps: ChoiceFieldData.SingleChoiceFieldMetadata<any>) => (
-				<RadioFieldInner{...props} {...choiceProps} />
-			)}
+export const RadioField: FunctionComponent<RadioFieldProps> = Component(
+	props => (
+		<ChoiceField openCreateNewFormDialog={useOpenCreateNewDialog()} {...props} renderedOptionsLimit={0}>
+			{(choiceProps: ChoiceFieldData.SingleChoiceFieldMetadata<any>) => <RadioFieldInner{...props} {...choiceProps} />}
 		</ChoiceField>
-	)
-}, 'RadioField')
+	),
+	props => <ChoiceField {...props} renderedOptionsLimit={0} children={() => null} />,
+	'RadioField',
+)
 
 export type RadioFieldInnerPublicProps =
 	& Omit<FieldContainerProps, 'children' | 'errors' | 'direction'>

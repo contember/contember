@@ -1,12 +1,20 @@
 import { Component, useLabelMiddleware } from '@contember/react-binding'
-import { FieldContainer, FieldContainerProps, FieldErrors, PublicCommonReactSelectStylesProps, SelectCreateNewWrapper, usePortalProvider } from '@contember/ui'
+import {
+	FieldContainer,
+	FieldContainerProps,
+	getPortalRoot,
+	PublicCommonReactSelectStylesProps,
+	SelectCreateNewWrapper,
+	usePortalProvider,
+} from '@contember/ui'
 import { FunctionComponent, memo } from 'react'
 import type { Props as SelectProps } from 'react-select'
 import Select from 'react-select'
 import { useAccessorErrors } from '@contember/react-binding-ui'
-import { StaticSingleChoiceFieldProps, DynamicSingleChoiceFieldProps, ChoiceField, ChoiceFieldData } from '@contember/react-choice-field'
+import { ChoiceField, ChoiceFieldData, DynamicSingleChoiceFieldProps, StaticSingleChoiceFieldProps } from '@contember/react-choice-field'
 
 import { useCommonReactSelectProps } from './useCommonReactSelectProps'
+import { useOpenCreateNewDialog } from './useOpenCreateNewDialog'
 
 export type SelectFieldProps =
 	& SelectFieldInnerPublicProps
@@ -20,12 +28,13 @@ export type SelectFieldProps =
  */
 export const SelectField: FunctionComponent<SelectFieldProps> = Component(
 	props => (
-		<ChoiceField {...props} >
+		<ChoiceField openCreateNewFormDialog={useOpenCreateNewDialog()} {...props}>
 			{(choiceProps: ChoiceFieldData.SingleChoiceFieldMetadata<any>) => (
 				<SelectFieldInner {...props} {...choiceProps} />
 			)}
 		</ChoiceField>
 	),
+	props => <ChoiceField {...props} children={() => null} />,
 	'SelectField',
 )
 

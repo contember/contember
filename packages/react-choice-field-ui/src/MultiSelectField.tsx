@@ -12,7 +12,9 @@ import Select, { ActionMeta, components } from 'react-select'
 import { SortableContainer, SortableContainerProps, SortableElement, SortableHandle, SortEndHandler } from 'react-sortable-hoc'
 import { ChoiceFieldData, DynamicMultiChoiceField, DynamicMultipleChoiceFieldProps } from '@contember/react-choice-field'
 import { useCommonReactSelectProps } from './useCommonReactSelectProps'
-import { shouldCancelStart, useAccessorErrors } from '@contember/react-binding-ui'
+import { useAccessorErrors } from '@contember/react-binding-ui'
+import { shouldCancelStart } from '@contember/utilities'
+import { useOpenCreateNewDialog } from './useOpenCreateNewDialog'
 
 export type MultiSelectFieldProps =
 	& MultiSelectFieldInnerPublicProps
@@ -23,12 +25,13 @@ export type MultiSelectFieldProps =
  */
 export const MultiSelectField: FunctionComponent<MultiSelectFieldProps> = Component(
 	props => (
-		<DynamicMultiChoiceField {...props} >
+		<DynamicMultiChoiceField openCreateNewFormDialog={useOpenCreateNewDialog()} {...props} >
 			{(choiceProps: ChoiceFieldData.MultipleChoiceFieldMetadata<EntityAccessor>) => (
 				<MultiSelectFieldInner {...props} {...choiceProps} />
 			)}
 		</DynamicMultiChoiceField>
 	),
+	props => <DynamicMultiChoiceField {...props} children={() => null} />,
 	'MultiSelectField',
 )
 

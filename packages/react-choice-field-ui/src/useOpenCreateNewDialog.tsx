@@ -3,8 +3,9 @@ import { Button, Stack, useDialog } from '@contember/ui'
 import { useMessageFormatter } from '@contember/react-i18n'
 import { ReactNode, useCallback } from 'react'
 import { choiceFieldDictionary } from './choiceFieldDictionary'
+import { OpenCreateNewFormDialog } from '@contember/react-choice-field'
 
-export const useOpenCreateNewDialog = () => {
+export const useOpenCreateNewDialog = (): OpenCreateNewFormDialog => {
 	const dialog = useDialog<true>()
 	const localization = useMessageFormatter(choiceFieldDictionary)
 	const accessorTreeState = useAccessorTreeState()
@@ -28,6 +29,6 @@ export const useOpenCreateNewDialog = () => {
 					</Stack>
 				</Stack>
 			),
-		})
+		}) ?? false
 	}, [accessorTreeState, dialog, localization])
 }

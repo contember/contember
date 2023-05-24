@@ -1,3 +1,4 @@
+import { assertNever } from '../../assert-types'
 import { NestedClassName } from '../Types'
 
 export function flatClassNameList(className: NestedClassName): string[] {
@@ -12,6 +13,6 @@ export function flatClassNameList(className: NestedClassName): string[] {
 			console.error(`Unexpected className: ${JSON.stringify(className)}`)
 		}
 
-		throw new Error(`Unexpected className: ${JSON.stringify(className)}`)
+		assertNever(className)
 	}
 }

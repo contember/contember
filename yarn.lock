@@ -3156,6 +3156,7 @@ __metadata:
   resolution: "@contember/react-client@workspace:packages/react-client"
   dependencies:
     "@contember/client": "workspace:*"
+    "@contember/utilities": "workspace:*"
   peerDependencies:
     react: ^17 || ^18
   languageName: unknown
@@ -3164,6 +3165,8 @@ __metadata:
 "@contember/react-multipass-rendering@workspace:*, @contember/react-multipass-rendering@workspace:packages/react-multipass-rendering":
   version: 0.0.0-use.local
   resolution: "@contember/react-multipass-rendering@workspace:packages/react-multipass-rendering"
+  dependencies:
+    "@contember/utilities": "workspace:*"
   peerDependencies:
     react: ^17 || ^18
   languageName: unknown

@@ -1,4 +1,3 @@
-export * from './assertNever'
 export * from './flipValue'
 export * from './forceReflow'
 export * from './isSpecialLinkClick'

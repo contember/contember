@@ -113,9 +113,6 @@ export function assertDatetimeString(value: unknown): asserts value is DateTimeI
 export function assertMonthInputString(value: unknown): asserts value is MonthInputString;
 
 // @public (undocumented)
-export const assertNever: (_: never) => never;
-
-// @public (undocumented)
 export function assertTimeString(value: unknown): asserts value is TimeInputString;
 
 // @public (undocumented)

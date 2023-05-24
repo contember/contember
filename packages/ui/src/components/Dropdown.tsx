@@ -1,4 +1,4 @@
-import { useClassName, useClassNameFactory } from '@contember/utilities'
+import { assertNever, useClassName, useClassNameFactory } from '@contember/utilities'
 import {
 	MouseEventHandler,
 	ReactElement,
@@ -17,7 +17,7 @@ import {
 import { usePopper } from 'react-popper'
 import { useCloseOnClickOutside, useCloseOnEscape } from '../auxiliary'
 import type { DropdownAlignment } from '../types'
-import { assertNever, toViewClass } from '../utils'
+import { toViewClass } from '../utils'
 import { Collapsible } from './Collapsible'
 import { Button, ButtonProps } from './Forms'
 import { Portal } from './Portal'

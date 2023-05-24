@@ -20,6 +20,9 @@ export class AssertionError extends Error {
 }
 
 // @public (undocumented)
+export function assertNever(_: never): never;
+
+// @public (undocumented)
 export function capitalize(str: string): string;
 
 // @public (undocumented)

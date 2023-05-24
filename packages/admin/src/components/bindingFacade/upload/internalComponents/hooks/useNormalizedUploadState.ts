@@ -1,7 +1,5 @@
-import { AcceptFileKindError, AcceptedFile, FileHandler } from '../../fileHandler'
-import * as dropzone from 'react-dropzone'
-import type { DropzoneState } from 'react-dropzone'
 import { EntityAccessor, useBindingOperations, useMutationState } from '@contember/binding'
+import { FileUploadError } from '@contember/client'
 import type {
 	FileId,
 	FileUpload,
@@ -9,11 +7,12 @@ import type {
 	FileWithMetadata,
 	StartUploadFileOptions,
 } from '@contember/react-client'
-
-import { FileUploadError } from '@contember/client'
-import { assertNever } from '../../../../../utils'
-import { unstable_batchedUpdates } from 'react-dom'
+import { assertNever } from '@contember/utilities'
 import { useCallback } from 'react'
+import { unstable_batchedUpdates } from 'react-dom'
+import type { DropzoneState } from 'react-dropzone'
+import * as dropzone from 'react-dropzone'
+import { AcceptFileKindError, AcceptedFile, FileHandler } from '../../fileHandler'
 
 export interface NormalizedUploadStateOptions {
 	isMultiple: boolean

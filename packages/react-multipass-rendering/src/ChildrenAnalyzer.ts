@@ -1,10 +1,11 @@
+import { assertNever } from '@contember/utilities'
 import type { ElementType, ReactElement, ReactNode } from 'react'
-import { assertNever } from './assertNever'
 import type { BranchNodeList } from './BranchNodeList'
 import { ChildrenAnalyzerError } from './ChildrenAnalyzerError'
 import type { ChildrenAnalyzerOptions } from './ChildrenAnalyzerOptions'
-import { getErrorMessage } from './helpers'
 import type { LeafList } from './LeafList'
+import { getErrorMessage } from './helpers'
+import { wrapError } from './helpers/wrapError'
 import type {
 	DeclarationSiteNodeRepresentationFactory,
 	RawNodeRepresentation,
@@ -13,7 +14,6 @@ import type {
 	UnconstrainedLeafRepresentationFactory,
 	ValidFactoryName,
 } from './nodeSpecs'
-import { wrapError } from './helpers/wrapError'
 
 export class ChildrenAnalyzer<
 	AllLeavesRepresentation = any,
@@ -153,10 +153,10 @@ export class ChildrenAnalyzer<
 		const treeNode = node.type as ElementType &
 			{
 				[staticMethod in ValidFactoryName]:
-					| StaticContextFactory<any, StaticContext>
-					| SyntheticChildrenFactory<any, StaticContext>
-					| UnconstrainedLeafRepresentationFactory<any, AllLeavesRepresentation, StaticContext>
-					| DeclarationSiteNodeRepresentationFactory<any, unknown, AllBranchNodesRepresentation, StaticContext>
+				| StaticContextFactory<any, StaticContext>
+				| SyntheticChildrenFactory<any, StaticContext>
+				| UnconstrainedLeafRepresentationFactory<any, AllLeavesRepresentation, StaticContext>
+				| DeclarationSiteNodeRepresentationFactory<any, unknown, AllBranchNodesRepresentation, StaticContext>
 			}
 
 		componentPath = [...componentPath, node]

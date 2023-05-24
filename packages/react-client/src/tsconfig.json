@@ -4,6 +4,7 @@
 		"outDir": "../dist/types"
 	},
 	"references": [
-		{ "path": "../../client/src" }
+		{ "path": "../../client/src" },
+		{ "path": "../../utilities/src" }
 	]
 }

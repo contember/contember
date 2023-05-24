@@ -1,5 +1,5 @@
 import { FileUploadError } from '@contember/client'
-import { assertNever } from '../utils'
+import { assertNever } from '@contember/utilities'
 import type { FileId } from './FileId'
 import type { FileUploadAction } from './FileUploadAction'
 import type { FileUploadMultiTemporalState } from './FileUploadMultiTemporalState'
@@ -104,15 +104,15 @@ export const fileUploadReducer = <Result = unknown, Metadata = undefined>(
 				}
 				const uploader = previousFileState.readyState === 'uploading' ? previousFileState.uploader : undefined
 				const metadata = previousFileState.readyState === 'uploading' ? previousFileState.metadata : undefined
-				;(newState ??= new Map(previousState.state)).set(fileId, {
-					readyState: 'error',
-					errors: errors.length ? errors : undefined,
-					rawError,
-					file: previousFileState.file,
-					metadata,
-					previewUrl: previousFileState.previewUrl,
-					uploader,
-				})
+					; (newState ??= new Map(previousState.state)).set(fileId, {
+						readyState: 'error',
+						errors: errors.length ? errors : undefined,
+						rawError,
+						file: previousFileState.file,
+						metadata,
+						previewUrl: previousFileState.previewUrl,
+						uploader,
+					})
 			}
 			break
 		}

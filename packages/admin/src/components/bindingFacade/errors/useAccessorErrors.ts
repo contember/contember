@@ -1,8 +1,8 @@
 import type { ErrorAccessor } from '@contember/binding'
+import { assertNever } from '@contember/utilities'
+import { useCallback, useMemo } from 'react'
 import { useMessageFormatter } from '../../../i18n'
 import { errorCodeDictionary } from './errorCodeDictionary'
-import { useCallback, useMemo } from 'react'
-import { assertNever } from '../../../utils'
 
 export interface AccessorErrorsHolder {
 	readonly errors: ErrorAccessor | undefined

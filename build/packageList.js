@@ -34,6 +34,6 @@ export const list = {
 	],
 }
 
-export const entries = Object.entries(list).map(([directory, packages]) => {
+export const entries = Object.entries(list).flatMap(([directory, packages]) => {
 	return directoryPackageEntry(directory, packages)
-}).flat()
+})

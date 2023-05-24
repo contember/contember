@@ -34,6 +34,9 @@ export const list = {
 	],
 }
 
+/**
+ * @type {[string, string][]}
+ **/
 export const entries = Object.entries(list).flatMap(([directory, packages]) => {
 	return directoryPackageEntry(directory, packages)
 })

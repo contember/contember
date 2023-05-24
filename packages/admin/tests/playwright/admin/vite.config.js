@@ -1,3 +1,4 @@
+// @ts-check
 import react from '@vitejs/plugin-react'
 import { Readable } from 'stream'
 import { defineConfig } from 'vite'
@@ -40,7 +41,11 @@ export default defineConfig({
 	plugins: [react(), {
 		name: 'initContemberProject',
 		configureServer(server) {
-			async function toJson(stream: Readable) {
+			/**
+			 * @param {Readable} stream
+			 * @returns {Promise<import('@contember/schema').Schema>}
+			 **/
+			async function toJson(stream) {
 				const chunks = []
 				for await (const chunk of stream) chunks.push(chunk)
 				return JSON.parse(Buffer.concat(chunks).toString())

@@ -11,7 +11,7 @@ export const Layout = (props: PropsWithChildren) => {
 	const directives = useDirectives()
 	useDocumentTitle(directives.title)
 
-	const LayoutComponent = Layouts[directives.layout ?? 'default']
+	const LayoutComponent = Layouts[directives.layout] ?? Layouts.default
 
 	return (
 		<>

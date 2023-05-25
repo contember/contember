@@ -1,0 +1,154 @@
+:where(.cui-editorCanvas) {
+  --cui-editor-canvas-element-padding-bottom: calc(2 * var(--cui-gap));
+  --cui-editor-canvas-element-padding-left: calc(3 * var(--cui-gap));
+  --cui-editor-canvas-element-padding-right: calc(3 * var(--cui-gap));
+  --cui-editor-canvas-element-padding-top: calc(2 * var(--cui-gap));
+  --cui-editor-blocks-gap: calc(2 * var(--cui-editor-canvas-element-padding-top));
+  border: var(--cui-control-border-width, 1px) solid var(--cui-color--lower);
+  border-radius: var(--cui-control-border-radius);
+  position: relative;
+  width: 100%;
+}
+
+:where(.cui-editorCanvas *[contenteditable=true]) {
+  margin-bottom: calc(-1 * var(--cui-control-border-width));
+  margin-top: calc(-1 * var(--cui-control-border-width));
+  padding-bottom: calc(2 * var(--cui-gap) - var(--cui-control-border-width));
+  padding-top: calc(2 * var(--cui-gap) - var(--cui-control-border-width));
+  border-radius: var(--cui-control-border-radius);
+  flex-grow: 1;
+}
+
+:where(.cui-editorCanvas:hover) {
+  border-color: var(--cui-color--low);
+}
+
+:where(.cui-editorCanvas:focus-within) {
+  border-color: var(--cui-control-border-color);
+  box-shadow: var(--cui-control-focus-ring-box-shadow);
+}
+
+:where(.cui-editorCanvas.view-hovering-toolbar *[contenteditable=true]) {
+  padding-bottom: calc(56px + 10 * var(--cui-gap));
+}
+
+:where(.cui-editorCanvas-canvas > [class^=cui-editor]) {
+  padding-bottom: 0;
+  padding-left: var(--cui-editor-canvas-element-padding-left);
+  padding-right: var(--cui-editor-canvas-element-padding-right);
+  padding-top: 0;
+  position: relative;
+}
+
+:where(.cui-editorCanvas-canvas > .cui-editorBlock) {
+  padding: 0;
+}
+
+:where(.cui-editorCanvas-canvas > *[contenteditable=true]) {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cui-editor-blocks-gap);
+  padding-bottom: var(--cui-editor-canvas-element-padding-bottom);
+  padding-top: var(--cui-editor-canvas-element-padding-top);
+}
+
+:where(.cui-editorCanvas-canvas) {
+  cursor: text;
+  display: flex;
+  min-height: var(--cui-control-height);
+  flex-direction: column;
+  gap: var(--cui-editor-blocks-gap);
+  counter-reset: cui-editorParagraph-counter;
+}
+
+:where(.cui-editorCanvas-canvas h1),
+:where(.cui-editorCanvas-canvas h2),
+:where(.cui-editorCanvas-canvas h3),
+:where(.cui-editorCanvas-canvas h4),
+:where(.cui-editorCanvas-canvas h5),
+:where(.cui-editorCanvas-canvas h6) {
+  margin: 0;
+}
+
+:where(.cui-editorCanvas-canvas > :first-child) {
+  margin-top: 0;
+}
+
+:where(.cui-editorCanvas-canvas > :last-child) {
+  margin-bottom: 0;
+}
+
+:where(.cui-editorCanvas-canvas a) {
+  color: #3DA9EB;
+}
+
+:where(.cui-editorCanvas-canvas ol + ul),
+:where(.cui-editorCanvas-canvas ol + ol),
+:where(.cui-editorCanvas-canvas ul + ul),
+:where(.cui-editorCanvas-canvas ul + ol) {
+  margin-top: 0.5em;
+}
+
+:where(.cui-editorCanvas-canvas li > p) {
+  margin: 0;
+}
+
+:where(.cui-editorCanvas-canvas code),
+:where(.cui-editorCanvas-canvas em) {
+  padding: 0.125em 0.0625em;
+}
+
+:where(.cui-editorCanvas-canvas code) {
+  background-color: var(--cui-color--lower);
+  border-radius: 0.25em;
+  font-family: monospace;
+  padding-left: 0.25em;
+  padding-right: 0.25em;
+}
+
+:where(.cui-editorCanvas-canvas em) {
+  --cui-highlight-color: 255, 249, 51;
+  color: var(--cui-color--strong);
+  background-color: rgb(var(--cui-highlight-color), var(--cui-opacity--medium, 0.5));
+  font-style: normal;
+}
+
+@media (prefers-color-scheme: dark) {
+  :where(.cui-editorCanvas-canvas em) {
+    background-color: rgb(var(--cui-highlight-color), var(--cui-opacity--low, 0.3));
+  }
+}
+
+:where(.cui-editorCanvas-canvas hr) {
+  background-color: var(--cui-color--lower);
+  height: 0.0625em;
+  margin: 0;
+  border: none;
+}
+
+:where(.cui-editorCanvas-canvas ::selection) {
+  color: var(--cui-color--strong);
+  background-color: rgba(75, 150, 255, 0.5);
+  background-color: rgb(var(--cui-theme-positive-500), var(--cui-opacity--medium, 0.5));
+}
+
+:where(.cui-editorCanvas.view-large .cui-editorCanvas-canvas) {
+  min-height: 32em;
+}
+
+:where(.cui-editorCanvas > .cui-editorCanvas-canvas .cui-editorCanvas-canvas) {
+  min-height: 1em;
+  padding: 0;
+}
+
+:where(.cui-editorCanvas.view-seamless) {
+  --cui-editor-canvas-element-padding-left: 0;
+  --cui-editor-canvas-element-padding-right: 0;
+}
+
+:where(.cui-editorCanvas.view-seamless),
+:where(.cui-editorCanvas.view-seamless-with-padding) {
+  background-color: transparent;
+  border: 0;
+  box-shadow: none;
+}

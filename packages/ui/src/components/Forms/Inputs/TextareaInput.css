@@ -1,0 +1,6 @@
+:where(.cui-textarea-input) {
+  --cui-text-area-padding-vertical: calc((var(--cui-min-height) - 2 * var(--cui-control-border-width, 1px) - var(--cui-font-size-body) * var(--cui-control-line-height)) / 2);
+  padding-bottom: var(--cui-text-area-padding-vertical);
+  padding-top: var(--cui-text-area-padding-vertical);
+  flex-basis: auto;
+}

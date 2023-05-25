@@ -1,0 +1,49 @@
+:where(.cui-hoveringToolbar) {
+  bottom: 0;
+  opacity: 0;
+  overflow: visible;
+  pointer-events: none;
+  position: sticky;
+  top: 0;
+  transition-duration: var(--cui-transition-duration--fast);
+  transition-property: opacity, visibility;
+  visibility: hidden;
+  z-index: 1;
+}
+
+:where(.cui-hoveringToolbar:not(.view-contextual) .cui-hoveringToolbar-content) {
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  left: var(--cui-editor-canvas-element-padding-left);
+  margin: var(--cui-editor-canvas-element-padding-top) auto var(--cui-editor-canvas-element-padding-bottom) auto;
+  overflow-x: auto;
+  position: absolute;
+  right: var(--cui-editor-canvas-element-padding-right);
+  top: auto;
+}
+
+:where(:not(.is-not-in-view) > .cui-hoveringToolbar.is-active) {
+  opacity: 1;
+  visibility: visible;
+}
+
+:where(:not(.is-not-in-view) > .cui-hoveringToolbar.is-active .cui-hoveringToolbar-content) {
+  pointer-events: all;
+}
+
+:where(.cui-hoveringToolbar.view-contextual) {
+  bottom: unset;
+  left: -1000vw;
+  margin: -0.5em 0 0 0;
+  position: absolute;
+  right: unset;
+  top: -1000vh;
+  top: unset;
+  overflow: hidden;
+}
+
+:where(.cui-hoveringToolbar.view-contextual .cui-hoveringToolbar-content),
+:where(.cui-hoveringToolbar.view-contextual .view-contextual.view-layout-bar) {
+  max-width: inherit;
+}

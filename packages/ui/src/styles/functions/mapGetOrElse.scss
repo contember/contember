@@ -1,9 +1,0 @@
-@function mapGetFallback($map, $key, $fallbackMap) {
-	@if map_has_key($map, $key) {
-		@return map_get($map, $key)
-	}
-	@if map_has_key($fallbackMap, $key) {
-		@return map_get($fallbackMap, $key)
-	}
-	@error 'Undefined key "' + $key + '"'
-}

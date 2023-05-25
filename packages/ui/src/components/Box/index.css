@@ -1,0 +1,76 @@
+:where(.cui-box) {
+  --cui-box-content-padding: var(--cui-padding);
+  --cui-box-content-padding-left: var(--cui-box-content-padding);
+  --cui-box-content-padding-right: var(--cui-box-content-padding);
+  --cui-box-content-padding-top: var(--cui-box-content-padding);
+  --cui-box-content-padding-bottom: var(--cui-box-content-padding);
+  --cui-box-content-border: var(--cui-control-border-width, 1px) solid var(--cui-color--lower);
+  --cui-box-content-background-color: var(--cui-background-color--above);
+  --cui-box-background-focused-overlay: linear-gradient(rgba(var(--cui-controls-1000), 0.01), rgba(var(--cui-controls-1000), 0.01));
+  background-color: var(--cui-box-content-background-color);
+  border: var(--cui-box-content-border);
+  border-radius: var(--cui-control-border-radius);
+  display: flex;
+  align-items: stretch;
+  flex-direction: column;
+  position: relative;
+  width: 100%;
+}
+
+:where(.cui-box),
+:where(.cui-box.view-with-padding) {
+  padding-left: var(--cui-box-content-padding-left);
+  padding-right: var(--cui-box-content-padding-right);
+  padding-top: var(--cui-box-content-padding-top);
+  padding-bottom: var(--cui-box-content-padding-bottom);
+}
+
+:where(.cui-box.view-seamless:not(.view-with-padding)) {
+  --cui-box-content-padding: 0;
+}
+
+:where(.cui-box.view-seamless) {
+  box-shadow: none;
+  background: inherit;
+  border: 0;
+  border-radius: unset;
+}
+
+:where(.cui-box.view-no-padding) {
+  --cui-box-content-padding: 0;
+}
+
+:where(.cui-box-header),
+:where(.cui-box-body) {
+  display: flex;
+  gap: var(--cui-gap);
+}
+
+:where(.cui-box-header) {
+  align-items: center;
+  flex-direction: row;
+  font-weight: 600;
+  justify-content: space-between;
+}
+
+:where(.cui-box:not(.is-active):not(:focus-within) > .cui-stack > .cui-box-header) {
+  color: var(--cui-color--high);
+}
+
+:where(.cui-box-actions) {
+  display: flex;
+  gap: var(--cui-gap);
+  grid-column: 2;
+}
+
+:where(.cui-box.is-active),
+:where(.cui-box:focus-within) {
+  color: var(--cui-control-color);
+  background-image: var(--cui-box-background-focused-overlay);
+  transition: box-shadow 0.15s;
+}
+
+:where(.cui-box.is-active .cui-box-content),
+:where(.cui-box:focus-within .cui-box-content) {
+  background-image: var(--cui-box-background-focused-overlay);
+}

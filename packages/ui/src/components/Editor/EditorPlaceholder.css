@@ -1,0 +1,5 @@
+:where(.cui-editorPlaceholder) {
+  color: var(--cui-color--low);
+  width: 0;
+  white-space: nowrap;
+}

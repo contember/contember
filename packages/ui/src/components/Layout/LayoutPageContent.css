@@ -1,0 +1,75 @@
+:where(.cui-layout-page-content-wrap) {
+  --cui-page-width: calc(100vw - var(--layout-chrome-bar-width, 0px));
+  --cui-page-height: calc(100vh - var(--cui-content-offset-top, 0px));
+  background-color: var(--cui-background-color);
+  display: flex;
+  flex: 1 1 100%;
+  flex-direction: column;
+  position: relative;
+}
+
+:where(.cui-layout-page-content-wrap.fit-none) {
+  max-width: var(--cui-page-width, 100vw);
+}
+
+:where(.cui-layout-page-content-wrap.fit-content) {
+  max-width: initial;
+}
+
+@media (min-width: 1280px) {
+  :where(.cui-layout-page-content-wrap) {
+    flex-direction: row;
+  }
+}
+
+:where(.cui-layout-page-content) {
+  --cui-page-content-width: calc(var(--cui-page-width, 100vw) - var(--cui-layout-page-padding-left, 0px) - var(--cui-layout-page-padding-right, 0px));
+  --cui-page-content-height: calc(var(--cui-page-height, 100vh) - var(--cui-layout-page-padding-bottom, 0px) - var(--cui-layout-page-padding-top, 0px));
+  display: flex;
+  flex-direction: row;
+  flex: 1;
+  padding-top: var(--cui-layout-page-padding-top);
+  padding-left: var(--cui-layout-page-padding-left);
+  padding-right: var(--cui-layout-page-padding-right);
+  padding-bottom: var(--cui-layout-page-padding-bottom);
+  transition: border-color var(--cui-transition-duration);
+  max-width: 100%;
+}
+
+:where(.cui-layout-page-content-container) {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  gap: var(--cui-layout-section-gap);
+  max-width: 100%;
+}
+
+@media (min-width: 1024px) {
+  :where(.cui-layout-page-content-container) {
+    flex-basis: 768px;
+    flex-grow: unset;
+  }
+
+  :where(.cui-layout-page-content-container.layout-start) {
+    margin-right: auto;
+  }
+
+  :where(.cui-layout-page-content-container.layout-end) {
+    margin-left: auto;
+  }
+
+  :where(.cui-layout-page-content-container.layout-center) {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  :where(.cui-layout-page-content-container.layout-stretch) {
+    flex-basis: 100%;
+  }
+}
+
+@media (min-width: 1280px) {
+  :where(.cui-layout-page-content:not(:last-child)) {
+    padding-right: var(--cui-layout-section-padding-right);
+  }
+}

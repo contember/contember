@@ -1,0 +1,16 @@
+:where(.cui-devErrorBadge) {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+}
+
+:where(.cui-devErrorBadge-button) {
+  display: block;
+  background: #CD1818;
+  color: #fff;
+  font-weight: 600;
+  box-shadow: 3px 3px 7px rgba(50, 50, 50, 0.5);
+  border-radius: 10px;
+  padding: 1em 2em;
+  cursor: pointer;
+}

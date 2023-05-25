@@ -1,0 +1,32 @@
+:where(.cui-divider) {
+  --divider-margin: var(--cui-padding);
+  align-self: stretch;
+  background-color: var(--cui-color--lower);
+  margin-bottom: calc(var(--divider-margin) - 0.5px);
+  margin-top: calc(var(--divider-margin) - 0.5px);
+  min-height: 1px;
+  min-width: 1px;
+}
+
+:where(.view-horizontal .cui-divider) {
+  margin-bottom: unset;
+  margin-left: calc(var(--divider-margin) - 0.5px);
+  margin-right: calc(var(--divider-margin) - 0.5px);
+  margin-top: unset;
+}
+
+:where(.cui-divider.view-none) {
+  --divider-margin: 0;
+}
+
+:where(.cui-divider.view-small) {
+  --divider-margin: var(--cui-gap);
+}
+
+:where(.cui-divider.view-large) {
+  --divider-margin: calc(1.5 * var(--cui-padding));
+}
+
+:where(.cui-divider.view-xlarge) {
+  --divider-margin: calc(3 * var(--cui-padding));
+}

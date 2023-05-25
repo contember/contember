@@ -1,0 +1,12 @@
+:where(.centerCard) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+:where(.centerCard-in) {
+  max-width: 30em;
+  width: 100%;
+  margin: 10vh 5vw;
+}

@@ -1,0 +1,17 @@
+@keyframes rotate {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+:where(.is-loading.cui-button > *) {
+  visibility: hidden;
+}
+
+:where(.is-loading.cui-button .cui-button-spinner) {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  visibility: visible;
+  transform: translate(-50%, -50%);
+}

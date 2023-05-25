@@ -1,0 +1,63 @@
+:where(.cui-root) {
+  display: contents;
+}
+
+:where(.cui-root),
+:where(.cui-root-no-display) {
+  -webkit-font-smoothing: antialiased;
+  background-color: var(--cui-background-color);
+  color: var(--cui-color);
+  font-family: var(--cui-font-family);
+  font-size: var(--cui-font-size-body);
+  font-smoothing: antialiased;
+  line-height: var(--cui-line-height);
+}
+
+:where(.cui-root h1),
+:where(.cui-root h2),
+:where(.cui-root h3),
+:where(.cui-root h4),
+:where(.cui-root h5),
+:where(.cui-root h6) {
+  font-weight: 500;
+}
+
+:where(.cui-root textarea) {
+  resize: vertical;
+}
+
+:where(.cui-root a),
+:where(.cui-root button) {
+  font-weight: 600;
+}
+
+:where(.cui-root a:not([class])),
+:where(.cui-root button:not([class])) {
+  color: var(--cui-control-color);
+}
+
+:where(.cui-root a) {
+  text-decoration: none;
+}
+
+:where(.cui-root a:not([class]):hover) {
+  color: var(--cui-control-color--highlighted);
+}
+
+:where(.cui-root a:not([class]):focus:focus-visible) {
+  color: var(--cui-control-color--highlighted);
+}
+
+:where(.cui-root a:not([class]):active) {
+  color: var(--cui-control-color--pressed);
+}
+
+:where(.cui-root button) {
+  cursor: pointer;
+}
+
+:where(.cui-root button[disabled]) {
+  opacity: 0.5;
+  border-style: solid;
+  cursor: not-allowed;
+}

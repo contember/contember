@@ -1,0 +1,36 @@
+@import "@contember/ui/index.css";
+@import "./styles/parts/avatar";
+@import "./styles/parts/centerCard";
+@import "./styles/parts/concealableField";
+@import "./styles/parts/diffView";
+@import "./styles/parts/dimensionsSwitcher";
+@import "./styles/parts/editor";
+@import "./styles/parts/fileInput";
+@import "./styles/parts/hoverMenu";
+@import "./styles/parts/input";
+@import "./styles/parts/inputGroup";
+@import "./styles/parts/link";
+@import "./styles/parts/locationField";
+@import "./styles/parts/navbar";
+@import "./styles/parts/projectsList";
+@import "./styles/parts/repeaterItem";
+@import "./styles/parts/selectField";
+@import "./styles/parts/shape";
+@import "./styles/parts/sideDimensions";
+@import "./styles/parts/sortable";
+@import "./styles/parts/tile";
+@import "./styles/parts/tileList";
+@import "./styles/parts/toolbar";
+@import "./styles/libs/leaflet";
+
+/* Global overrides: */
+:where(.bp3-icon) {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* HOTFIX */
+:where(.react-datepicker-popper) {
+  z-index: 2;
+}

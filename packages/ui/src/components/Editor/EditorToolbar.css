@@ -1,0 +1,104 @@
+:where(.cui-editorToolbar) {
+  display: inline-flex;
+  background: var(--cui-filled-control-background-color);
+  color: var(--cui-filled-control-color);
+  border-radius: 5em;
+  padding: 0.875em 1.25em;
+  box-shadow: 0 0 3em -1.5em var(--cui-control-border-color);
+}
+
+:where(.cui-editorToolbar-groups),
+:where(.cui-editorToolbar-group) {
+  display: flex;
+}
+
+:where(.cui-editorToolbar-groups) {
+  min-height: 1.875em;
+  align-items: stretch;
+}
+
+:where(.cui-editorToolbar-group) {
+  align-items: flex-start;
+}
+
+:where(.cui-editorToolbar-button) {
+  line-height: 1;
+}
+
+:where(.cui-editorToolbar.view-layout-list) {
+  background: #000000;
+  border-radius: 1.875em;
+}
+
+:where(.cui-editorToolbar.view-layout-bar) {
+  overflow-x: auto;
+}
+
+:where(.cui-editorToolbar.view-layout-bar .cui-editorToolbar-group:before) {
+  content: "";
+  display: inline-block;
+  height: 100%;
+  opacity: 0.25;
+  border-left: solid 1px;
+  margin: 0 0.5em;
+}
+
+:where(.cui-editorToolbar.view-layout-bar .cui-editorToolbar-group:first-child:before) {
+  display: none;
+}
+
+:where(.cui-editorToolbar.view-layout-grid),
+:where(.cui-editorToolbar.view-layout-list) {
+  background: #000000;
+  border-radius: 1.875em;
+  max-width: 22.5em;
+}
+
+:where(.cui-editorToolbar.view-layout-list .cui-editorToolbar-groups),
+:where(.cui-editorToolbar.view-layout-grid .cui-editorToolbar-groups) {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+:where(.cui-editorToolbar.view-layout-list .cui-editorToolbar-group),
+:where(.cui-editorToolbar.view-layout-grid .cui-editorToolbar-group) {
+  flex-wrap: wrap;
+  align-items: flex-start;
+}
+
+:where(.cui-editorToolbar.view-layout-list .cui-editorToolbar-group:before),
+:where(.cui-editorToolbar.view-layout-grid .cui-editorToolbar-group:before) {
+  content: "";
+  display: block;
+  width: 100%;
+  opacity: 0.25;
+  border-top: solid 1px;
+  margin: 0.5em 0;
+}
+
+:where(.cui-editorToolbar.view-layout-list .cui-editorToolbar-group:first-child:before),
+:where(.cui-editorToolbar.view-layout-grid .cui-editorToolbar-group:first-child:before) {
+  display: none;
+}
+
+:where(.cui-editorToolbar.view-layout-grid .cui-editorToolbar-button) {
+  width: 25%;
+  flex-basis: 25%;
+  max-width: none;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 0.25em;
+}
+
+:where(.cui-editorToolbar.view-layout-list .cui-editorToolbar-group) {
+  flex-direction: column;
+}
+
+:where(.cui-editorToolbar.view-layout-list .cui-editorToolbar-button) {
+  width: 100%;
+  margin: 0.125em 0;
+}
+
+:where(.cui-editorToolbar.view-contextual) {
+  font-size: 0.625em;
+}

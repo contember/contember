@@ -1,0 +1,15 @@
+:where(.cui-contentStatus) {
+  color: #838383;
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+:where(.cui-contentStatus-label) {
+  margin-right: 1em;
+}
+
+:where(.cui-contentStatus-icon) {
+  font-size: 1.3125em;
+  display: inline-flex;
+}

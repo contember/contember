@@ -1,0 +1,6 @@
+:where(.cui-editorParagraph.view-numbered)::before {
+  display: inline-block;
+  margin-right: 0.25em;
+  content: var(--cui-editorParagraph-counter-prefix, "(") counter(cui-editorParagraph-counter) var(--cui-editorParagraph-counter-suffix, ")");
+  counter-increment: cui-editorParagraph-counter;
+}

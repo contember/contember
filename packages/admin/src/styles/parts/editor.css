@@ -1,0 +1,40 @@
+:where(.editor-toolbar) {
+  position: relative;
+  padding: 0 0 0.5em;
+  border-bottom: 0.125rem solid #eee;
+  margin-bottom: 1.25rem;
+}
+
+:where(.editor-button) {
+  cursor: pointer;
+  color: #ccc;
+  background: none;
+  border: none;
+}
+
+:where(.editor-button.is-active) {
+  color: #000;
+}
+
+:where(.editor-button.is-reversed) {
+  color: #aaa;
+}
+
+:where(.editor-button.is-reversed.is-active) {
+  color: #fff;
+}
+
+:where(.editor-icon) {
+  font-size: 1.125rem;
+  vertical-align: text-bottom;
+}
+
+:where(.editor-image) {
+  display: block;
+  max-width: 100%;
+  max-height: 20em;
+}
+
+:where(.editor-image.is-selected) {
+  box-shadow: 0 0 0 0.125rem blue;
+}

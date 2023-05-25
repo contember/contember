@@ -1,7 +1,7 @@
 import { ApplicationEntrypoint, Pages, runReactApp } from '@contember/admin'
-import { PanelLayout } from './components/PanelLayout'
-import './index.sass'
 import { panelConfig } from '../../src/config'
+import { PanelLayout } from './components/PanelLayout'
+import './index.css'
 
 const Entry = () => {
 	const configElement = document.getElementById('contember-config')

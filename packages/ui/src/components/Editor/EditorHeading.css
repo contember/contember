@@ -1,0 +1,57 @@
+:where(.cui-editorHeading.view-numbered)::before {
+  display: inline-block;
+  margin-right: 0.25em;
+}
+
+:where(h1.cui-editorHeading.view-numbered) {
+  counter-increment: cui-editorHeading-1;
+  counter-reset: cui-editorHeading-2 cui-editorHeading-3 cui-editorHeading-4 cui-editorHeading-5 cui-editorHeading-6;
+}
+
+:where(h1.cui-editorHeading.view-numbered)::before {
+  content: "" counter(cui-editorHeading-1, var(--cui-editorHeading-style-1, decimal)) var(--cui-editorHeading-glue-1, ".");
+}
+
+:where(h2.cui-editorHeading.view-numbered) {
+  counter-increment: cui-editorHeading-2;
+  counter-reset: cui-editorHeading-3 cui-editorHeading-4 cui-editorHeading-5 cui-editorHeading-6;
+}
+
+:where(h2.cui-editorHeading.view-numbered)::before {
+  content: "" counter(cui-editorHeading-1, var(--cui-editorHeading-style-1, decimal)) var(--cui-editorHeading-glue-1, ".") counter(cui-editorHeading-2, var(--cui-editorHeading-style-2, decimal)) var(--cui-editorHeading-glue-2, ".");
+}
+
+:where(h3.cui-editorHeading.view-numbered) {
+  counter-increment: cui-editorHeading-3;
+  counter-reset: cui-editorHeading-4 cui-editorHeading-5 cui-editorHeading-6;
+}
+
+:where(h3.cui-editorHeading.view-numbered)::before {
+  content: "" counter(cui-editorHeading-1, var(--cui-editorHeading-style-1, decimal)) var(--cui-editorHeading-glue-1, ".") counter(cui-editorHeading-2, var(--cui-editorHeading-style-2, decimal)) var(--cui-editorHeading-glue-2, ".") counter(cui-editorHeading-3, var(--cui-editorHeading-style-3, decimal)) var(--cui-editorHeading-glue-3, ".");
+}
+
+:where(h4.cui-editorHeading.view-numbered) {
+  counter-increment: cui-editorHeading-4;
+  counter-reset: cui-editorHeading-5 cui-editorHeading-6;
+}
+
+:where(h4.cui-editorHeading.view-numbered)::before {
+  content: "" counter(cui-editorHeading-1, var(--cui-editorHeading-style-1, decimal)) var(--cui-editorHeading-glue-1, ".") counter(cui-editorHeading-2, var(--cui-editorHeading-style-2, decimal)) var(--cui-editorHeading-glue-2, ".") counter(cui-editorHeading-3, var(--cui-editorHeading-style-3, decimal)) var(--cui-editorHeading-glue-3, ".") counter(cui-editorHeading-4, var(--cui-editorHeading-style-4, decimal)) var(--cui-editorHeading-glue-4, ".");
+}
+
+:where(h5.cui-editorHeading.view-numbered) {
+  counter-increment: cui-editorHeading-5;
+  counter-reset: cui-editorHeading-6;
+}
+
+:where(h5.cui-editorHeading.view-numbered)::before {
+  content: "" counter(cui-editorHeading-1, var(--cui-editorHeading-style-1, decimal)) var(--cui-editorHeading-glue-1, ".") counter(cui-editorHeading-2, var(--cui-editorHeading-style-2, decimal)) var(--cui-editorHeading-glue-2, ".") counter(cui-editorHeading-3, var(--cui-editorHeading-style-3, decimal)) var(--cui-editorHeading-glue-3, ".") counter(cui-editorHeading-4, var(--cui-editorHeading-style-4, decimal)) var(--cui-editorHeading-glue-4, ".") counter(cui-editorHeading-5, var(--cui-editorHeading-style-5, decimal)) var(--cui-editorHeading-glue-5, ".");
+}
+
+:where(h6.cui-editorHeading.view-numbered) {
+  counter-increment: cui-editorHeading-6;
+}
+
+:where(h6.cui-editorHeading.view-numbered)::before {
+  content: "" counter(cui-editorHeading-1, var(--cui-editorHeading-style-1, decimal)) var(--cui-editorHeading-glue-1, ".") counter(cui-editorHeading-2, var(--cui-editorHeading-style-2, decimal)) var(--cui-editorHeading-glue-2, ".") counter(cui-editorHeading-3, var(--cui-editorHeading-style-3, decimal)) var(--cui-editorHeading-glue-3, ".") counter(cui-editorHeading-4, var(--cui-editorHeading-style-4, decimal)) var(--cui-editorHeading-glue-4, ".") counter(cui-editorHeading-5, var(--cui-editorHeading-style-5, decimal)) var(--cui-editorHeading-glue-5, ".") counter(cui-editorHeading-6, var(--cui-editorHeading-style-6, decimal)) var(--cui-editorHeading-glue-6, ".");
+}

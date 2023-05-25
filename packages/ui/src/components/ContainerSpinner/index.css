@@ -1,0 +1,44 @@
+:where(.cui-containerSpinner) {
+  --cui-container-spinner-delay: 1000ms;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  z-index: 10;
+}
+
+:where(.cui-containerSpinner.cui-aether) {
+  animation-delay: var(--cui-container-spinner-delay);
+  animation-duration: var(--cui-transition-duration);
+  animation-fill-mode: forwards;
+  animation-name: dim-background;
+  background: transparent;
+}
+
+:where(.cui-containerSpinner) {
+  font-size: 2.5em;
+}
+
+:where(.cui-containerSpinner.view-small) {
+  font-size: 1.5em;
+}
+
+:where(.cui-containerSpinner.view-large) {
+  font-size: 4em;
+}
+
+@keyframes dim-background {
+  from {
+    background-color: transparent;
+  }
+
+  to {
+    background-color: var(--cui-background-color--highlighted);
+  }
+}

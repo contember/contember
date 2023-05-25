@@ -1,0 +1,27 @@
+:where(.cui-tag) {
+  border-radius: 1em;
+  display: inline-flex;
+  padding: 0.1em 0.5em;
+  margin: 0.1em;
+  background: #6F6F6F;
+  color: #FFFFFF;
+}
+
+:where(.cui-tag-text) {
+  font-size: 0.8em;
+  line-height: 1.2;
+}
+
+:where(.cui-tag-remove) {
+  background: none;
+  border: none;
+  appearance: none;
+  padding: 0 0 0 0.5em;
+  color: #C6C6C6;
+  cursor: pointer;
+  font-size: 0.8em;
+}
+
+:where(.cui-tag-remove:focus) {
+  color: #FFFFFF;
+}

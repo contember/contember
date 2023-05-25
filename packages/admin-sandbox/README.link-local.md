@@ -35,10 +35,10 @@ To debug with local version of Contember Admin:
     // [...]
   })
   ```
-3. In your `index.sass`
-  ```scss
+3. In your `index.css`
+  ```css
   // Replace:
   // @import '../node_modules/@contember/admin/dist/index.css'
   // with:
-  @import '/absolute/path/to/contember-admin/packages/admin/src/index.sass'
+  @import "/absolute/path/to/contember-admin/packages/admin/src/index.css";
   ```

@@ -1,0 +1,100 @@
+:where(.cui-field-container) {
+  align-self: stretch;
+  gap: calc(3 * var(--cui-gap));
+  display: flex;
+  flex-direction: column;
+}
+
+:where(.cui-field-container.width-fluid) {
+  max-width: 100%;
+}
+
+:where(.cui-layout-page-content-wrap .cui-field-container.width-column) {
+  min-width: var(--cui-field-container-min-width);
+}
+
+:where(.cui-layout-page-content-wrap .cui-field-container .cui-field-container) {
+  min-width: unset;
+}
+
+:where(.cui-field-container.view-small) {
+  font-size: var(--cui-control-font-size--small);
+}
+
+:where(.cui-field-container.view-large) {
+  font-size: var(--cui-control-font-size--large);
+}
+
+:where(.cui-field-container:focus-within) {
+  color: var(--cui-control-color);
+}
+
+:where(.cui-field-container-label) {
+  display: flex;
+  flex-direction: column;
+  gap: calc(2 * var(--cui-gap));
+}
+
+:where(.cui-field-container:not(.is-active):not(:focus-within) > .cui-field-container-label) {
+  color: var(--cui-color--high);
+}
+
+:where(.cui-field-container-required-asterisk),
+:where(.cui-field-container-required-asterix) {
+  color: var(--cui-control-color);
+}
+
+:where(.cui-field-container-header),
+:where(.cui-field-container-body) {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cui-gap);
+}
+
+:where(.cui-field-container-header) {
+  font-weight: 700;
+  flex: 1 1 calc(100% / 7 * 2);
+  user-select: none;
+}
+
+:where(.cui-field-container-body) {
+  flex: 1 1 calc(100% / 7 * 5);
+}
+
+:where(.cui-field-container-body-content > [contenteditable=false]) {
+  display: contents;
+}
+
+:where(.cui-field-container-body-content-description) {
+  font-weight: 500;
+  color: var(--cui-color--medium);
+  display: block;
+  font-size: 0.9em;
+  line-height: 1.2;
+}
+
+:where(.cui-field-container.view-labelLeft .cui-field-container-label),
+:where(.cui-field-container.view-labelInlineLeft .cui-field-container-label) {
+  flex-direction: row;
+}
+
+:where(.cui-field-container.view-labelRight .cui-field-container-label),
+:where(.cui-field-container.view-labelInlineRight .cui-field-container-label) {
+  flex-direction: row-reverse;
+}
+
+:where(.cui-field-container.view-labelLeft .cui-field-container-header),
+:where(.cui-field-container.view-labelInlineLeft .cui-field-container-header),
+:where(.cui-field-container.view-labelRight .cui-field-container-header),
+:where(.cui-field-container.view-labelInlineRight .cui-field-container-header) {
+  justify-content: center;
+  align-self: stretch;
+}
+
+:where(.cui-field-container.view-labelInlineLeft .cui-field-container-header) {
+  flex: unset;
+}
+
+:where(.cui-field-container.view-labelInlineRight .cui-field-container-body) {
+  flex: unset;
+}

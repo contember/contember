@@ -1,0 +1,57 @@
+:where(.cui-contember-logo-image-symbol) {
+  display: block;
+  height: 1em;
+}
+
+:where(.cui-contember-logo-image-symbol .view-with-label) {
+  height: 1em;
+}
+
+:where(.cui-logo) {
+  align-items: stretch;
+  display: inline-flex;
+  line-height: 1;
+  vertical-align: middle;
+  gap: var(--cui-gap);
+}
+
+:where(a .cui-logo) {
+  color: var(--cui-control-color);
+}
+
+:where(a:hover .cui-logo) {
+  color: var(--cui-control-color--highlighted);
+}
+
+:where(.cui-logo-label) {
+  align-items: center;
+  color: inherit;
+  display: inline-flex;
+  font-weight: bold;
+  font-size: var(--cui-logo-size);
+  line-height: 1;
+}
+
+:where(.cui-logo-label.view-small) {
+  font-size: var(--cui-logo-size--small);
+}
+
+:where(.cui-logo-label.view-large) {
+  font-size: var(--cui-logo-size--large);
+}
+
+:where(.cui-logo-symbol) {
+  color: inherit;
+  font-size: var(--cui-logo-size);
+  display: inline-block;
+  height: 1em;
+  vertical-align: middle;
+}
+
+:where(.cui-logo-symbol.view-small) {
+  font-size: var(--cui-logo-size--small);
+}
+
+:where(.cui-logo-symbol.view-large) {
+  font-size: var(--cui-logo-size--large);
+}

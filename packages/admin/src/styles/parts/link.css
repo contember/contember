@@ -1,0 +1,8 @@
+:where(.link) {
+  text-decoration: none;
+}
+
+:where(.link:hover) {
+  text-decoration: underline;
+  color: currentColor;
+}

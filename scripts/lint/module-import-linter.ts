@@ -8,7 +8,6 @@ const globalModules = new Set(['vitest'])
 const allowedUnused = new Set([
 	'stacktracey',
 	'@popperjs/core',
-	'@mangoweb/sass-base',
 	'@aws-sdk/signature-v4-crt',
 ])
 

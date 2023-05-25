@@ -1,0 +1,178 @@
+:where(.cui-devError) {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 99;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  background: rgba(212, 212, 212, 0.66);
+  font-family: Poppins, Roboto, sans-serif;
+}
+
+:where(.cui-devError-in) {
+  z-index: 100;
+  width: 100%;
+  height: 100%;
+  color: #333;
+  background: #222;
+  box-shadow: 3px 3px 10px rgba(50, 50, 50, 0.5);
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+}
+
+:where(.cui-devError-header) {
+  background: #CD1818;
+  color: #FFF;
+  padding: 0.5em 1em;
+}
+
+:where(.cui-devError-errorMessage),
+:where(.cui-devError-errorName),
+:where(.cui-devError-errorDetails) {
+  margin: 0;
+  flex: 0 0 auto;
+  font-weight: 300;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  line-height: 130%;
+}
+
+:where(.cui-devError-errorMessage) {
+  font-family: monospace;
+  margin-top: 0.5em;
+  font-size: 1.7em;
+}
+
+:where(.cui-devError-errorDetails) {
+  font-family: monospace;
+  margin-top: 0.5em;
+  font-size: 1em;
+  white-space: pre;
+  overflow-x: scroll;
+}
+
+:where(.cui-devError-causeLink) {
+  color: #FFCC00;
+  text-decoration: underline;
+}
+
+:where(.cui-devError-stack) {
+  flex: 1 1 auto;
+}
+
+:where(.cui-devError-stack-dump) {
+  color: #fff;
+  margin-top: 1em;
+  padding: 1em;
+  white-space: pre-wrap;
+}
+
+:where(.cui-devError-bar) {
+  padding: 0.2em 0.2em 0.2em 1em;
+  background: #ac1616;
+  color: #eee;
+  display: flex;
+}
+
+:where(.cui-devError-causedBy) {
+  padding: 0.2em 0.2em 0.2em 1em;
+  background: #FFCC00;
+  color: #000;
+  display: flex;
+}
+
+:where(.cui-devError-actions) {
+  margin-left: auto;
+  display: flex;
+}
+
+:where(.cui-devError-actions .cui-button) {
+  color: #fff;
+  border-color: #cbcbcb;
+}
+
+:where(.cui-devError-actions .cui-button:hover) {
+  color: #fff;
+}
+
+:where(.cui-devError-close) {
+  margin-left: 1em;
+}
+
+:where(.cui-devError-close .cui-button) {
+  border-color: transparent;
+}
+
+:where(.cui-devError-switcher) {
+  display: flex;
+  align-items: center;
+  margin-left: 2em;
+}
+
+:where(.cui-devError-errorCount) {
+  margin: 0;
+  margin-right: 0.5em;
+}
+
+:where(.cui-devError-stackFrame) {
+  font-family: monospace;
+}
+
+:where(.cui-devError-stackFrame:last-child) {
+  border-bottom: 1px solid #666;
+}
+
+:where(.cui-devError-stackFrameHeader) {
+  display: flex;
+  padding: 0.5em 1em;
+  background: #333;
+  color: #fff;
+  border-bottom: 1px solid #666;
+  border-top: 1px solid #666;
+}
+
+:where(.cui-devError-stackFrameSource) {
+  margin-left: 0.2em;
+}
+
+:where(.cui-devError-stackFrameCallee) {
+  margin-left: 1em;
+  color: #a4ffa4;
+}
+
+:where(.cui-devError-stackFrameCode) {
+  background: #222;
+  color: #D5D5D5;
+}
+
+:where(.cui-devError-stackFrameLine) {
+  display: flex;
+}
+
+:where(.cui-devError-stackFrameLine.is-active) {
+  color: #fff;
+  background: #CD1818;
+}
+
+:where(.cui-devError-stackFrameLine.is-active .cui-devError-stackFrameLineNumber) {
+  color: #fff;
+}
+
+:where(.cui-devError-stackFrameLineNumber) {
+  color: #888;
+  flex: 0 0 50px;
+  text-align: right;
+  padding: 0.2em;
+}
+
+:where(.cui-devError-stackFrameLineCode) {
+  padding: 0.2em 1em;
+  white-space: pre-wrap;
+  tab-size: 4;
+}

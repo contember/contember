@@ -1,0 +1,139 @@
+:where(.cui-dialog-modal) {
+  --cui-dialog-modal-border: var(--cui-control-border-width, 1px) solid var(--cui-color--lower);
+  --cui-dialog-modal-background-color: var(--cui-background-color--above);
+  --cui-dialog-modal-padding-left: calc(0.5 * var(--cui-padding));
+  --cui-dialog-modal-padding-right: calc(0.5 * var(--cui-padding));
+  --cui-dialog-modal-padding-top: calc(0.5 * var(--cui-padding));
+  --cui-dialog-modal-padding-bottom: calc(0.5 * var(--cui-padding));
+  --cui-dialog-modal-header-padding-left: var(--cui-dialog-modal-padding-left);
+  --cui-dialog-modal-header-padding-right: var(--cui-dialog-modal-padding-right);
+  --cui-dialog-modal-header-padding-top: var(--cui-dialog-modal-padding-top);
+  --cui-dialog-modal-header-padding-bottom: var(--cui-dialog-modal-padding-bottom);
+  --cui-dialog-modal-body-padding-left: var(--cui-dialog-modal-padding-left);
+  --cui-dialog-modal-body-padding-right: var(--cui-dialog-modal-padding-right);
+  --cui-dialog-modal-body-padding-top: var(--cui-dialog-modal-padding-top);
+  --cui-dialog-modal-body-padding-bottom: var(--cui-dialog-modal-padding-bottom);
+  --cui-dialog-modal-footer-padding-left: var(--cui-dialog-modal-padding-left);
+  --cui-dialog-modal-footer-padding-right: var(--cui-dialog-modal-padding-right);
+  --cui-dialog-modal-footer-padding-top: var(--cui-dialog-modal-padding-top);
+  --cui-dialog-modal-footer-padding-bottom: var(--cui-dialog-modal-padding-bottom);
+  --cui-layout-page-padding-left: 0px;
+  --cui-layout-page-padding-right: 0px;
+  background-color: var(--cui-dialog-modal-background-color);
+  border: var(--cui-dialog-modal-border);
+  border-radius: calc(2 * var(--cui-control-border-radius));
+  display: flex;
+  align-items: stretch;
+  flex-direction: column;
+}
+
+@media (max-width: 767.98px) {
+  :where(.cui-dialog-modal) {
+    max-width: calc(100vw - var(--cui-padding));
+  }
+}
+
+:where(.cui-dialog-modal .cui-table-container-box) {
+  flex-grow: 1;
+}
+
+:where(.cui-dialog-modal .cui-table-container) {
+  flex-grow: 1;
+}
+
+:where(.cui-dialog-modal .cui-table-container > .cui-field-container-label) {
+  flex-grow: 1;
+}
+
+:where(.cui-dialog-modal .cui-table-container > .cui-field-container-label > .cui-field-container-body) {
+  flex-grow: 1;
+}
+
+:where(.cui-dialog-modal .cui-table-container > .cui-field-container-label > .cui-field-container-body > .cui-field-container-body-content) {
+  flex-grow: 1;
+}
+
+:where(.cui-dialog-modal .cui-data-grid-body) {
+  flex-grow: 1;
+  overflow: hidden;
+}
+
+:where(.cui-dialog-modal .cui-field-container-body-content .cui-table-wrapper) {
+  overflow: auto;
+}
+
+:where(.cui-dialog-modal .cui-data-grid-body-content-grid) {
+  flex: 1 1 0%;
+  overflow: auto;
+}
+
+:where(.cui-dialog-modal.view-wide),
+:where(.cui-dialog-modal.view-fit-content) {
+  max-height: calc(100vh - 2 * var(--cui-padding));
+}
+
+:where(.cui-dialog-modal.view-fit-content) {
+  max-width: calc(767.98px - 2 * var(--cui-padding));
+}
+
+:where(.cui-dialog-modal.view-wide) {
+  max-width: calc(100vw - 2 * var(--cui-padding));
+  width: calc(1023.98px - var(--cui-padding));
+}
+
+:where(.cui-dialog-modal.view-expanded) {
+  height: calc(100vh - var(--cui-padding));
+  width: calc(100vw - var(--cui-padding));
+}
+
+:where(.cui-dialog-modal-close-button.cui-button.view-seamless) {
+  margin-bottom: calc(-1 * (var(--cui-button-height) - var(--cui-button-line-height)) / 2);
+  margin-top: calc(-1 * (var(--cui-button-height) - var(--cui-button-line-height)) / 2);
+}
+
+:where(.cui-dialog-modal-close-button.cui-button.view-seamless:last-child) {
+  margin-right: calc(-1 * var(--cui-button-padding-horizontal));
+}
+
+:where(.cui-dialog-modal-close-button.cui-button.view-seamless.view-squarish:last-child),
+:where(.cui-dialog-modal-close-button.cui-button.view-seamless.view-circular:last-child) {
+  margin-right: calc(-1 * (var(--cui-button-height) - var(--cui-button-line-height)) / 2);
+}
+
+:where(.cui-dialog-modal-header) {
+  padding-left: var(--cui-dialog-modal-header-padding-left);
+  padding-right: var(--cui-dialog-modal-header-padding-right);
+  padding-bottom: var(--cui-dialog-modal-header-padding-bottom);
+  padding-top: var(--cui-dialog-modal-header-padding-top);
+  min-height: calc(var(--cui-button-height) + var(--cui-dialog-modal-header-padding-top) + var(--cui-dialog-modal-header-padding-bottom));
+}
+
+:where(.cui-dialog-modal-body-wrapper) {
+  display: flex;
+  flex: 1 1 0%;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+:where(.cui-dialog-modal-body) {
+  flex-grow: 1;
+  max-width: 100%;
+  padding-left: var(--cui-dialog-modal-body-padding-left);
+  padding-right: var(--cui-dialog-modal-body-padding-right);
+  padding-bottom: var(--cui-dialog-modal-body-padding-bottom);
+  padding-top: var(--cui-dialog-modal-body-padding-top);
+  min-height: calc(var(--cui-button-height) + var(--cui-dialog-modal-body-padding-top) + var(--cui-dialog-modal-body-padding-bottom));
+}
+
+:where(.cui-dialog-modal-footer) {
+  padding-left: var(--cui-dialog-modal-footer-padding-left);
+  padding-right: var(--cui-dialog-modal-footer-padding-right);
+  padding-bottom: var(--cui-dialog-modal-footer-padding-bottom);
+  padding-top: var(--cui-dialog-modal-footer-padding-top);
+  min-height: calc(var(--cui-button-height) + var(--cui-dialog-modal-footer-padding-top) + var(--cui-dialog-modal-footer-padding-bottom));
+}
+
+:where(.cui-dialog-modal.with-dividers-body),
+:where(.cui-dialog-modal.with-dividers-footer) {
+  border-top: 1px solid var(--cui-color--lower);
+}

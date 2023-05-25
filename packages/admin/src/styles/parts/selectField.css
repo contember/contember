@@ -1,0 +1,35 @@
+:where(.selectField-search) {
+  display: inline-grid;
+  flex-basis: 0px;
+  flex-grow: 1;
+  flex-shrink: 1;
+  min-width: 0px;
+}
+
+:where(.selectField-search)::before {
+  content: attr(data-value) " ";
+  visibility: hidden;
+  white-space: pre-wrap;
+}
+
+:where(.selectField-search)::before,
+:where(.selectField-search-input) {
+  background: transparent;
+  border: none;
+  color: inherit;
+  font-size: inherit;
+  -moz-appearance: none;
+  -webkit-appearance: none;
+  appearance: none;
+  grid-area: 1/1;
+  margin: 0;
+  outline: 0;
+  padding: 0 2px;
+  resize: none;
+  min-width: 0px;
+  width: auto;
+}
+
+:where(.selectField-search.is-hidden .selectField-search-input) {
+  opacity: 0;
+}

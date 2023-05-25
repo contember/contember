@@ -1,7 +1,7 @@
 import { useClassNameFactory } from '@contember/utilities'
 import type { FunctionComponent, ReactNode } from 'react'
-import { ProgressBar } from '../../ProgressBar'
-import { Spinner } from '../../Spinner'
+import { ProgressBar } from '../../ProgressBar/ProgressBar'
+import { Spinner } from '../../Spinner/Spinner'
 
 export interface UploadProgressProps {
 	progress?: string | number // 0 to 1

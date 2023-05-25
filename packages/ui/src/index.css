@@ -1,0 +1,7 @@
+@import "./assets/Inter/index.css";
+@import "./styles/is-loading.css";
+@import "./styles/root.css";
+@import "./styles/globals.css";
+@import "./styles/themes.css";
+@import "./styles/schemes.css";
+@import "./components/index.css";

@@ -1,0 +1,58 @@
+:where(.fileInput) {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(8.125em, 1fr));
+  grid-gap: 0.625em;
+}
+
+:where(.fileInput-preview) {
+  background: var(--cui-background-color--above);
+  border-radius: 10px;
+}
+
+:where(.fileInput-preview.view-sortable) {
+  cursor: move;
+}
+
+:where(.fileInput-dropZone) {
+  min-height: 8.125em;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+:where(.fileInput-dropZone:last-child:nth-child(1)) {
+  grid-column: 1/-1;
+}
+
+:where(.fileInput-dropZone:last-child:nth-child(2)) {
+  grid-column: 2/-1;
+}
+
+:where(.fileInput-dropZone:last-child:nth-child(3)) {
+  grid-column: 3/-1;
+}
+
+:where(.fileInput-dropZone:last-child:nth-child(4)) {
+  grid-column: 4/-1;
+}
+
+:where(.fileInput-dropZone:last-child:nth-child(5)) {
+  grid-column: 5/-1;
+}
+
+:where(.fileInput-cta) {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cui-gap);
+  text-align: center;
+  padding: 0 0.5em;
+}
+
+:where(.fileInput-cta-label) {
+  display: block;
+  color: var(--cui-color--medium);
+  font-size: 0.875rem;
+  margin-bottom: calc(-4 * var(--cui-gap));
+}

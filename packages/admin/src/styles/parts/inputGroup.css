@@ -1,0 +1,36 @@
+:where(.inputGroup-text) {
+  border-radius: 0.25rem;
+  border: 0.0625rem solid #E2E5ED;
+  padding: 0.625rem 0.9375rem;
+  font-size: 0.875rem;
+  width: 100%;
+  background: white;
+}
+
+:where(.inputGroup-text::placeholder) {
+  color: #9EA0A5;
+}
+
+:where(.inputGroup-text:focus) {
+  outline: none;
+  border: 0.0625rem solid #1665d8;
+}
+
+:where(.inputGroup-text[readonly]) {
+  border-color: #f2f3f7;
+  color: #abadb1;
+  background: #fcfcfc;
+}
+
+:where(.inputGroup-text[readonly]:focus) {
+  border-color: #eaecf2;
+}
+
+:where(.inputGroup.view-large .inputGroup-text) {
+  font-size: 1.375rem;
+}
+
+:where(.inputGroup.view-topFluent .inputGroup-text) {
+  border-top-right-radius: 0;
+  border-top-left-radius: 0;
+}

@@ -1,0 +1,23 @@
+:where(.cui-section-tabs) {
+  --cui-tabs-padding-vertical: calc(3* var(--cui-gap, 0em));
+  --cui-tabs-padding-horizontal: calc(3* var(--cui-gap, 0em));
+  margin-bottom: calc(-1 * var(--cui-padding));
+  margin-left: calc(-1 * var(--cui-tabs-padding-horizontal));
+  margin-right: calc(-1 * var(--cui-tabs-padding-horizontal));
+  padding-left: var(--cui-tabs-padding-horizontal);
+  padding-right: var(--cui-tabs-padding-horizontal);
+}
+
+@media (min-width: 1280px) {
+  :where(.cui-section-tabs .is-meta) {
+    display: none;
+  }
+}
+
+:where(.cui-section-tabs-content) {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  margin-left: calc(-3 * var(--cui-gap));
+  margin-right: calc(-3 * var(--cui-gap));
+}

@@ -1,0 +1,14 @@
+:where(.cui-progressBar) {
+  height: 1em;
+  background: #444444;
+  border: 0.25em solid #444444;
+  border-radius: 0.5em;
+  overflow: hidden;
+}
+
+:where(.cui-progressBar-bar) {
+  background: #85FF00;
+  height: 0.5em;
+  transform-origin: left center;
+  transition: transform ease-out 0.1s;
+}

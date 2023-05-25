@@ -1,0 +1,21 @@
+@import "../../../src/index.css";
+
+@font-face {
+	font-family: 'Ahem';
+	src: url('./ahem.ttf') format('truetype');
+}
+
+:where(:root) {
+	--cui-font-family: 'Ahem'
+}
+
+:where(*, ::before, ::after) {
+	font-family: var(--cui-font-family) !important;
+	font-kerning: none !important;
+	font-smooth: never !important;
+	-webkit-font-smoothing: none !important;
+}
+
+:where(.cui-devError) {
+	--cui-font-family: Inter var, sans-serif;
+}

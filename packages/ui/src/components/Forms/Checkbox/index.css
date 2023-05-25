@@ -1,0 +1,170 @@
+:where(.cui-checkbox) {
+  --checkbox-button-border-radius: .3em;
+  --checkbox-button-background-color: transparent;
+  --checkbox-button-size: calc(1em * var(--cui-line-height));
+  --tick-color: transparent;
+  --tick-border-color: var(--cui-color--high);
+  --control-font-size: var(--cui-control-font-size);
+  position: relative;
+}
+
+:where(.cui-checkbox .cui-label) {
+  font-weight: 700;
+}
+
+:where(.cui-checkbox-visually-hidden) {
+  position: absolute;
+  z-index: 1;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+}
+
+:where(.cui-checkbox.view-small) {
+  --control-font-size: var(--cui-control-font-size--small);
+}
+
+:where(.cui-checkbox.view-large) {
+  --control-font-size: var(--cui-control-font-size--large);
+}
+
+:where(.cui-checkbox.is-hovered),
+:where(.cui-checkbox:hover) {
+  --tick-border-color: var(--cui-control-border-color--highlighted);
+}
+
+:where(.cui-checkbox.is-readonly) {
+  --checkbox-button-background-color: var(--radio-color--readonly);
+  color: var(--radio-color--readonly);
+}
+
+:where(.cui-checkbox.is-invalid) {
+  --checkbox-button-background-color: rgb(var(--cui-theme-danger-500));
+  --tick-border-color: rgb(var(--cui-theme-danger-500));
+}
+
+:where(.cui-checkbox.is-checked:not(.is-invalid)) {
+  --checkbox-button-background-color: var(--cui-control-border-color);
+  --tick-border-color: var(--cui-control-border-color);
+}
+
+:where(.cui-checkbox.is-disabled) {
+  --checkbox-button-background-color: var(--cui-color--medium);
+  --tick-border-color: var(--cui-color--medium);
+}
+
+:where(.cui-checkbox-button) {
+  background: var(--checkbox-button-background-color);
+  border-radius: var(--checkbox-button-border-radius);
+  border: var(--cui-control-border-width, 1px) solid var(--tick-border-color);
+  color: var(--tick-color);
+  display: block;
+  max-height: var(--checkbox-button-size);
+  max-width: var(--checkbox-button-size);
+  min-height: var(--checkbox-button-size);
+  min-width: var(--checkbox-button-size);
+  pointer-events: none;
+  position: relative;
+  transition: background-color var(--cui-transition-duration--immediate), border-color var(--cui-transition-duration--immediate), box-shadow 0.2s;
+  user-select: none;
+}
+
+:where(.cui-checkbox-button)::before,
+:where(.cui-checkbox-button)::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  background-color: currentColor;
+  border-radius: 0.075em;
+  transform-origin: 0.075em center;
+}
+
+:where(.cui-checkbox-button)::before {
+  width: 0.4em;
+  height: 0.15em;
+  transform: translate(-0.1874878317em, 0.1553362829em) rotate(50deg) translate(-0.25em);
+}
+
+:where(.cui-checkbox-button)::after {
+  width: 0.75em;
+  height: 0.15em;
+  transform: translate(-0.1874878317em, 0.1553362829em) rotate(-50deg);
+}
+
+:where(.cui-checkbox-button.is-indeterminate) {
+  background-color: transparent;
+}
+
+:where(.cui-checkbox-button.is-indeterminate .cui-checkbox-button-questionmark) {
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  color: var(--tick-border-color);
+  position: absolute;
+  line-height: 1em;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 0;
+}
+
+:where(.cui-checkbox-button.is-disabled) {
+  cursor: not-allowed;
+  opacity: 0.33;
+}
+
+:where(.cui-checkbox-button.is-read-only) {
+  cursor: not-allowed;
+  opacity: 0.75;
+}
+
+:where(.cui-checkbox-button.is-focused) {
+  box-shadow: 0 0 0 0.2em var(--cui-control-border-color--highlighted);
+}
+
+:where(.cui-checkbox-button.is-focused:not(.is-checked)) {
+  --tick-border-color: var(--cui-control-border-color--highlighted);
+}
+
+:where(.cui-checkbox-button.is-indeterminate) {
+  border-width: var(--cui-control-border-width, 1px);
+  border-style: dashed;
+}
+
+@keyframes checkbox-tick-short {
+  0% {
+    color: white;
+    width: 0.15em;
+  }
+
+  100% {
+    color: white;
+    width: 0.4em;
+  }
+}
+
+@keyframes checkbox-tick-long {
+  0% {
+    color: white;
+    width: 0.15em;
+  }
+
+  100% {
+    color: white;
+    width: 0.75em;
+  }
+}
+
+:where(.cui-checkbox-button.is-checked)::before {
+  animation: var(--cui-transition-duration--immediate) checkbox-tick-short var(--cui-transition-duration--immediate) ease-in forwards;
+}
+
+:where(.cui-checkbox-button.is-checked)::after {
+  animation: var(--cui-transition-duration--immediate) checkbox-tick-long var(--cui-transition-duration--immediate) ease-in forwards;
+}

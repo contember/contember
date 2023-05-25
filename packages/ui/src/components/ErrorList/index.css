@@ -1,0 +1,13 @@
+:where(.cui-errorList) {
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+}
+
+:where(.cui-errorList-item) {
+  line-height: 1.2;
+}
+
+:where(.cui-errorList-item + .cui-errorList-item) {
+  margin-top: 0.5em;
+}

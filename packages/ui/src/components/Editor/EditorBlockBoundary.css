@@ -1,0 +1,93 @@
+:where(.cui-editorBlockBoundary) {
+  --cui-editor-block-boundary-height: var(--cui-editor-blocks-gap);
+  align-items: center;
+  color: var(--cui-color--low);
+  cursor: pointer;
+  display: flex;
+  flex-direction: row;
+  font-weight: 600;
+  height: var(--cui-editor-block-boundary-height);
+  justify-content: flex-start;
+  margin: 0 auto 0 calc(-1 * var(--cui-editor-canvas-element-handle-width, 0));
+  padding-left: var(--cui-editor-canvas-element-handle-width, 0);
+  position: relative;
+}
+
+:where(.cui-editorBlockBoundary)::after,
+:where(.cui-editorBlockBoundary)::before {
+  border-radius: 2px;
+  border: 1px solid;
+  content: "";
+  display: block;
+  flex-grow: 1;
+  height: 2px;
+  visibility: hidden;
+}
+
+:where(.is-dragged .cui-editorBlockBoundary) {
+  display: none;
+}
+
+:where(.cui-editorBlockBoundary.view-afterBlock) {
+  margin-bottom: calc(-1 * var(--cui-editor-block-boundary-height));
+}
+
+:where(.cui-editorBlockBoundary.view-beforeBlock) {
+  margin-top: calc(-1 * var(--cui-editor-block-boundary-height));
+}
+
+:where(.cui-editorBlockBoundary.view-beforeBlock + *:not(.cui-editorTable)) {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: var(--cui-editor-canvas-element-handle-height);
+}
+
+:where(.cui-editorBlockBoundary .cui-icon) {
+  align-items: center;
+  color: inherit;
+  justify-content: center;
+}
+
+:where(.cui-editorBlockBoundary-inner) {
+  align-items: center;
+  background-color: var(--cui-background-color--above);
+  border-radius: 1em;
+  color: var(--cui-color--lower);
+  display: flex;
+  flex-direction: row;
+  line-height: 1em;
+  padding: calc(var(--cui-gap) / 2);
+}
+
+:where(.cui-editorBlockBoundary .cui-label) {
+  display: none;
+  margin-left: 0;
+  margin-right: 0;
+}
+
+:where(.cui-editorBlockBoundary .cui-editorCanvas-canvas > div[data-contember-type=reference] + div[data-contember-type=reference] .cui-editorBlockBoundary.view-beforeBlock) {
+  display: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  :where(.cui-editorBlockBoundary-inner) {
+    background-color: var(--cui-control-border-color);
+    color: var(--cui-background-color--above);
+    visibility: hidden;
+  }
+
+  :where(.cui-editorBlockBoundary:hover) {
+    color: var(--cui-control-color);
+  }
+
+  :where(.cui-editorBlockBoundary:hover .cui-editorBlockBoundary-inner),
+  :where(.cui-editorBlockBoundary:hover)::after,
+  :where(.cui-editorBlockBoundary:hover)::before {
+    visibility: visible;
+  }
+
+  :where(.cui-editorBlockBoundary:hover .cui-label) {
+    display: flex;
+  }
+}

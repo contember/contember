@@ -3,7 +3,7 @@ import { LayoutSlotsProvider } from '@contember/layout'
 import { createRoot } from 'react-dom/client'
 import { DirectivesProvider } from './components/Directives'
 import { Layout, LayoutDevPanel } from './components/Layout'
-import './index.sass'
+import './index.css'
 
 runReactApp(
 	<DirectivesProvider>

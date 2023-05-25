@@ -1,0 +1,35 @@
+:where(.cui-uploadProgress) {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #444444;
+}
+
+:where(.cui-uploadProgress-indeterminate) {
+  display: flex;
+  justify-content: center;
+  font-size: 0.5em;
+}
+
+:where(.cui-uploadProgress-progress) {
+  width: 40%;
+  min-width: 4rem;
+  font-size: 0.25em;
+}
+
+:where(.cui-uploadProgress-message) {
+  margin-top: 0.5em;
+  font-size: 0.75em;
+  position: relative;
+}
+
+:where(.cui-uploadProgress-message-stabilizer) {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+:where(.cui-uploadProgress-message-real) {
+  position: absolute;
+  top: 0;
+  left: 0;
+}

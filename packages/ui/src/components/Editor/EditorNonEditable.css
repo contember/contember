@@ -1,0 +1,8 @@
+:where(.cui-editorNonEditable) {
+  pointer-events: none;
+  user-select: none;
+}
+
+:where(.cui-editorNonEditable.view-inline) {
+  display: inline-block;
+}

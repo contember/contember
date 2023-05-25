@@ -1,0 +1,47 @@
+:where(.cui-section) {
+  --cui-section-padding-bottom: var(--cui-layout-section-padding-bottom);
+  --cui-section-padding-left: var(--cui-layout-section-padding-left);
+  --cui-section-padding-right: var(--cui-layout-section-padding-right);
+  --cui-section-padding-top: var(--cui-layout-section-padding-top);
+  --cui-section-border-width: 1px;
+  border-top: var(--cui-section-border-width) solid var(--cui-color--lower);
+  display: flex;
+  flex-direction: column;
+  gap: var(--cui-padding);
+  margin-left: calc(-1 * var(--cui-section-padding-left));
+  margin-right: calc(-1 * var(--cui-section-padding-right));
+  padding-bottom: var(--cui-section-padding-bottom, calc(6 * var(--cui-gap)));
+  padding-left: var(--cui-section-padding-left);
+  padding-right: var(--cui-section-padding-right);
+  padding-top: var(--cui-section-padding-top, calc(6 * var(--cui-gap)));
+  scroll-margin-top: calc(var(--cui-content-offset-top, 0px) - var(--cui-section-border-width));
+}
+
+:where(.cui-section:first-child) {
+  margin-top: calc(-1 * var(--cui-layout-page-padding-top, 0em));
+  border-color: transparent;
+}
+
+:where(.cui-section + .cui-section) {
+  margin-bottom: 0;
+  margin-top: calc(-1 * (var(--cui-layout-section-gap, 0em) + var(--cui-section-border-width)));
+}
+
+:where(.cui-section:last-child) {
+  margin-bottom: calc(-1 * var(--cui-layout-page-padding-bottom, 0em));
+}
+
+:where(.cui-section-heading) {
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+:where(.cui-section .message--nesting-warning) {
+  display: none;
+}
+
+:where(.sideDimensions-dimensions-dimension .cui-section .message--nesting-warning) {
+  display: unset;
+}

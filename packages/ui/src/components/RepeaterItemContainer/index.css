@@ -1,0 +1,67 @@
+:where(.cui-repeater-item-container) {
+  --cui-box-background-focused-overlay: linear-gradient(rgba(var(--cui-controls-1000), 0.01), rgba(var(--cui-controls-1000), 0.01));
+  --line-height-negative-vertical-space: calc(0.5em * calc(var(--cui-line-height) - 1));
+  transition: background-image 0.15s;
+}
+
+:where(.cui-repeater-item-container.view-sortable) {
+  --cui-box-content-padding-left: calc(2 * var(--cui-box-content-padding));
+}
+
+:where(.cui-repeater-item-container-header) {
+  align-items: center;
+  display: flex;
+  gap: calc(2 * var(--cui-gap));
+}
+
+:where(.cui-repeater-item-container-handle) {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  cursor: grab;
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  padding: var(--cui-box-content-padding) 0;
+  width: calc(2 * var(--cui-box-content-padding));
+}
+
+:where(.cui-repeater-item-container-handle .cui-icon) {
+  padding: var(--line-height-negative-vertical-space) 0;
+}
+
+:where(.cui-repeater-item-container-label) {
+  font-weight: 800;
+}
+
+:where(.cui-repeater-item-container-actions) {
+  margin-left: auto;
+  align-items: center;
+  display: flex;
+  gap: inherit;
+}
+
+:where(.cui-repeater-item-container.is-active),
+:where(.cui-repeater-item-container:focus-within) {
+  color: var(--cui-control-color);
+  background-image: var(--cui-box-background-focused-overlay);
+}
+
+:where(:where(.cui-repeater-item-container-actions) .cui-button.view-seamless) {
+  margin-bottom: calc(-1 * (var(--cui-button-height) - var(--cui-button-line-height)) / 2);
+  margin-top: calc(-1 * (var(--cui-button-height) - var(--cui-button-line-height)) / 2);
+}
+
+:where(:where(.cui-repeater-item-container-actions) .cui-button.view-seamless:last-child) {
+  margin-right: calc(-1 * var(--cui-button-padding-horizontal));
+}
+
+:where(:where(.cui-repeater-item-container-actions) .cui-button.view-seamless.view-squarish:last-child),
+:where(:where(.cui-repeater-item-container-actions) .cui-button.view-seamless.view-circular:last-child) {
+  margin-right: calc(-1 * (var(--cui-button-height) - var(--cui-button-line-height)) / 2);
+}
+
+:where(:where(.cui-repeater-item-container-index))::before {
+  content: "#";
+}

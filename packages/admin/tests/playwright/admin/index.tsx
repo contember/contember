@@ -13,7 +13,7 @@ import {
 	runReactApp,
 	useCurrentRequest,
 } from '../../../src'
-import './index.sass'
+import './index.css'
 
 const projectSlug = window.location.pathname.split('/')[1]
 const pages = import.meta.glob<PageModule>('../cases/**/*.tsx')

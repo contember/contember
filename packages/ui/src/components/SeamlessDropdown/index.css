@@ -1,0 +1,81 @@
+:where(.cui-seamlessDropdown) {
+  position: relative;
+  z-index: 10;
+  display: inline-block;
+}
+
+:where(.cui-seamlessDropdown.view-inline) {
+  margin: -0.75em;
+}
+
+:where(.cui-seamlessDropdown-button-in),
+:where(.cui-seamlessDropdown-content-in) {
+  padding: 0.75em;
+}
+
+:where(.cui-seamlessDropdown.view-caret.view-up .cui-seamlessDropdown-button-in:after) {
+  transform: rotateZ(180deg);
+}
+
+:where(.cui-seamlessDropdown.view-caret .cui-seamlessDropdown-button-in) {
+  position: relative;
+  padding-right: 2em;
+}
+
+:where(.cui-seamlessDropdown.view-caret .cui-seamlessDropdown-button-in:after) {
+  content: "";
+  display: block;
+  position: absolute;
+  right: 0.75em;
+  top: 50%;
+  width: 0.6875em;
+  height: 0.6875em;
+  margin-top: -0.34375em;
+  background: url("data:image/svg+xml,%3Csvg width='10' height='8' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M9.68 1.65L5.4 7a.5.5 0 0 1-.78 0L.31 1.65a.5.5 0 0 1 .4-.82h8.58a.5.5 0 0 1 .4.82z' fill='%2392929D' fill-rule='evenodd'/%3E%3C/svg%3E") no-repeat;
+  background-size: contain;
+}
+
+:where(.cui-seamlessDropdown-content) {
+  position: absolute;
+  left: 0;
+  min-height: 100%;
+  min-width: 100%;
+  background: var(--cui-background-color--above);
+  border-radius: 1em;
+  display: none;
+  box-shadow: 0 0.0625em 0.1875em rgba(0, 0, 0, 0.2), 0 0.125em 0.5em rgba(0, 0, 0, 0.2);
+}
+
+:where(.cui-layout-chrome-bar-footer .cui-seamlessDropdown-content) {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+:where(.cui-seamlessDropdown.view-down .cui-seamlessDropdown-content) {
+  top: 0;
+}
+
+:where(.cui-seamlessDropdown.view-up .cui-seamlessDropdown-content) {
+  bottom: 0;
+}
+
+:where(.cui-seamlessDropdown-content-sep) {
+  border-bottom: solid 0.0625em;
+  margin: 0 0.75em;
+  opacity: 0.1;
+}
+
+:where(.cui-seamlessDropdown.view-hoverable:hover .cui-seamlessDropdown-content),
+:where(.cui-seamlessDropdown.view-open .cui-seamlessDropdown-content) {
+  display: block;
+}
+
+:where(.cui-seamlessDropdown.view-down.view-hoverable:hover .cui-seamlessDropdown-button-in:after),
+:where(.cui-seamlessDropdown.view-down.view-open .cui-seamlessDropdown-button-in:after) {
+  transform: rotateZ(180deg);
+}
+
+:where(.cui-seamlessDropdown.view-up.view-hoverable:hover .cui-seamlessDropdown-button-in:after),
+:where(.cui-seamlessDropdown.view-up.view-open .cui-seamlessDropdown-button-in:after) {
+  transform: rotateZ(0deg);
+}

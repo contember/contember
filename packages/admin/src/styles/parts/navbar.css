@@ -1,0 +1,39 @@
+:where(.navbar-left),
+:where(.navbar-center),
+:where(.navbar-right) {
+  flex-basis: 0;
+  flex-grow: 1;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+:where(.navbar-center) {
+  text-align: center;
+  justify-content: center;
+}
+
+:where(.navbar-right) {
+  text-align: right;
+  display: flex;
+  justify-content: flex-end;
+}
+
+:where(.navbar-title) {
+  font-size: 1rem;
+  font-weight: 500;
+  text-decoration: none;
+  margin-right: 1.125rem;
+  color: inherit;
+}
+
+@media (max-width: 767.98px) {
+  :where(.navbar-title) {
+    display: none;
+  }
+}
+
+:where(.navbar-link) {
+  display: inline-block;
+}

@@ -1,0 +1,17 @@
+:where(.cui-fileDropZone) {
+  transition: border-color 0.2s;
+}
+
+:where(.cui-fileDropZone.is-active) {
+  background-color: var(--cui-toned-control-background-color);
+  border-color: var(--cui-control-border-color--highlighted);
+  border-style: dashed;
+}
+
+:where(.cui-fileDropZone.is-accepting) {
+  background-color: var(--cui-background-color--below);
+}
+
+:where(.cui-fileDropZone.is-rejecting) {
+  border-color: rgb(var(--cui-theme-danger-500));
+}

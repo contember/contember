@@ -1,0 +1,9 @@
+:where(.cui-fieldSet) {
+  display: flex;
+  flex-direction: column;
+  gap: calc(2 * var(--cui-gap));
+}
+
+:where(.cui-fieldSet-content > [contenteditable=false]) {
+  display: contents;
+}

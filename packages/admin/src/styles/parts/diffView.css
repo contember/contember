@@ -1,0 +1,9 @@
+:where(.diffView.is-explicit) {
+  color: #34aa44;
+  font-weight: 700;
+}
+
+:where(.diffView.is-dependency) {
+  color: #66be72;
+  color: #34aa44;
+}

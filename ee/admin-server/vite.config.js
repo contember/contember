@@ -23,13 +23,6 @@ export default defineConfig({
 			},
 		},
 	},
-	css: {
-		preprocessorOptions: {
-			sass: {
-				charset: false,
-			},
-		},
-	},
 	esbuild: {
 		target: 'esnext',
 	},

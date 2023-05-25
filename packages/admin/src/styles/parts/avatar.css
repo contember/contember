@@ -1,0 +1,65 @@
+:where(.avatar) {
+  position: relative;
+  color: #FFFFFF;
+  text-align: center;
+}
+
+:where(.avatar:empty) {
+  background-color: #C5C5C5;
+}
+
+:where(.avatar-image) {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background-color: #C5C5C5;
+  border-radius: inherit;
+}
+
+:where(.avatar-size1) {
+  width: 1.75rem;
+  height: 1.75rem;
+  font-size: 0.75rem;
+  line-height: 1.75rem;
+}
+
+:where(.avatar-size2) {
+  width: 2.375rem;
+  height: 2.375rem;
+  font-size: 1rem;
+  line-height: 2.375rem;
+}
+
+:where(.avatar-size3) {
+  width: 3.75rem;
+  height: 3.75rem;
+  font-size: 1.125rem;
+  line-height: 3.75rem;
+}
+
+:where(.avatar-size4) {
+  width: 5rem;
+  height: 5rem;
+  font-size: 1.625rem;
+  line-height: 5rem;
+}
+
+:where(.avatar-size5) {
+  width: 6.25rem;
+  height: 6.25rem;
+  font-size: 2.25rem;
+  line-height: 6.25rem;
+}
+
+:where(.avatar-shapeCircle) {
+  border-radius: 50%;
+}
+
+:where(.avatar-shapeSquare) {
+  border-radius: 0.25rem;
+}

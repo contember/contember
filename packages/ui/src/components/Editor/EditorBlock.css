@@ -1,0 +1,68 @@
+:where(.cui-editorBlock) {
+  --cui-editor-canvas-element-handle-width: calc(6 * var(--cui-gap));
+  --cui-editor-canvas-element-handle-height: calc(1em * var(--cui-line-height, 1.5));
+}
+
+:where(.cui-editorBlock-inner) {
+  display: flex;
+  padding-bottom: 0;
+  padding-left: var(--cui-editor-canvas-element-handle-width);
+  padding-right: var(--cui-editor-canvas-element-padding-right);
+  padding-top: 0;
+  position: relative;
+}
+
+:where(.cui-editorBlock-content) {
+  flex: 1 1 auto;
+  position: relative;
+}
+
+:where(.cui-editorBlock-content > *) {
+  margin-bottom: 0;
+  margin-top: 0;
+}
+
+:where(.cui-editorBlock-dragHandle) {
+  align-self: center;
+  cursor: move;
+  flex: 0;
+  left: 0;
+  opacity: 0.1;
+  position: absolute;
+  text-align: center;
+  top: 0;
+  bottom: 0;
+  width: var(--cui-editor-canvas-element-handle-width);
+}
+
+:where(.cui-editorBlock-dragHandle .cui-icon) {
+  align-items: center;
+  height: var(--cui-editor-canvas-element-handle-height);
+}
+
+:where(.cui-editorBlock.is-dragged .cui-editorBlock-dragHandle),
+:where(.cui-editorBlock-dragHandle:hover) {
+  opacity: 1;
+}
+
+:where(*:hover > .cui-editorBlock .cui-editorBlock-dragHandle) {
+  opacity: 1;
+}
+
+:where(*:focus:focus-within > .cui-editorBlock .cui-editorBlock-dragHandle) {
+  opacity: 1;
+}
+
+@media (hover: none) and (pointer: coarse) {
+  :where(.cui-editorBlock .cui-editorBlock-dragHandle) {
+    opacity: 1;
+  }
+}
+
+:where(.cui-editorBlock.is-dragged) {
+  z-index: 3;
+}
+
+:where(.cui-editorBlock.is-dragged .cui-editorBlock-content) {
+  opacity: 0.5;
+}

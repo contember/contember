@@ -1,0 +1,52 @@
+:where(.cui-label) {
+  --cui-inset-vertical: var(--cui-gap);
+  --cui-inset-horizontal: var(--cui-gap);
+  background-color: transparent;
+  border: none;
+  border-radius: var(--cui-gap);
+  color: inherit;
+  font-family: inherit;
+  font-size: var(--cui-font-size-label);
+  font-weight: inherit;
+  line-height: 1.125em;
+  margin: calc(-1 * var(--cui-inset-vertical)) calc(-1 * var(--cui-inset-horizontal));
+  padding: var(--cui-inset-vertical) var(--cui-inset-horizontal);
+  position: relative;
+  text-align: inherit;
+  text-decoration: none;
+  text-transform: inherit;
+}
+
+:where(.cui-label.view-bold) {
+  font-weight: bolder;
+}
+
+:where(.cui-label.view-small) {
+  font-size: var(--cui-font-size-note);
+}
+
+:where(.cui-label.view-large) {
+  font-weight: lighter;
+  font-size: var(--cui-font-size-heading);
+}
+
+:where(a .cui-label),
+:where(button .cui-label) {
+  color: var(--cui-control-color);
+}
+
+:where(.cui-label.is-active) {
+  color: var(--cui-control-color--highlighted);
+}
+
+:where(a:focus .cui-label),
+:where(button:focus .cui-label),
+:where(.cui-label.is-focused) {
+  color: var(--cui-control-color--highlighted);
+}
+
+:where(a:hover .cui-label),
+:where(button:hover .cui-label),
+:where(.cui-label.is-hover) {
+  color: var(--cui-control-color--highlighted);
+}

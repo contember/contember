@@ -3,7 +3,7 @@ import { CSSProperties, ReactNode, memo, useCallback, useContext, useEffect, use
 import { NavigationContext } from '../..'
 import { Intent, Scheme } from '../../types'
 import { toSchemeClass, toStateClass, toThemeClass, toViewClass } from '../../utils'
-import { DropdownContentContainerProvider } from '../Dropdown'
+import { DropdownContentContainerProvider } from '../Dropdown/Dropdown'
 import { Button } from '../Forms'
 import { Icon } from '../Icon'
 import { useElementTopOffset } from '../Layout/useElementTopOffset'

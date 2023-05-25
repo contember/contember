@@ -1,0 +1,23 @@
+:where(.cui-trio) {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  justify-content: space-between;
+  align-items: center;
+}
+
+:where(.cui-trio > .cui-trio-start),
+:where(.cui-trio > .cui-trio-center),
+:where(.cui-trio > .cui-trio-end) {
+  padding: 0;
+  pointer-events: auto;
+}
+
+:where(.cui-trio.view-column) {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+:where(.cui-trio.view-clickThroughSpace) {
+  pointer-events: none;
+}

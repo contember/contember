@@ -1,0 +1,80 @@
+:where(.cui-collapsible) {
+  --cui-collapsible-transition-duration: var(--cui-transition-duration--fast);
+  --cui-collapsible-transition-timing-function: ease;
+  --cui-collapsible-content-height: auto;
+  display: flex;
+  transition-property: height, width, opacity, visibility;
+  transition-timing-function: var(--cui-collapsible-transition-timing-function);
+  transition-duration: var(--cui-collapsible-transition-duration);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :where(.cui-collapsible) {
+    --cui-collapsible-transition-duration: 0.0166666667s;
+    --cui-collapsible-transition-timing-function: step-end;
+  }
+}
+
+:where(.cui-collapsible.is-expanded) {
+  opacity: 1;
+  visibility: visible;
+}
+
+:where(.cui-collapsible.is-collapsed) {
+  height: 0;
+  opacity: 0;
+  overflow: hidden;
+  visibility: hidden;
+}
+
+:where(.cui-collapsible.is-transitioning) {
+  overflow: hidden;
+}
+
+:where(.cui-collapsible-content) {
+  width: 100%;
+}
+
+:where(.cui-collapsible.view-topInsert.is-expanded),
+:where(.cui-collapsible.view-bottomInsert.is-expanded) {
+  height: var(--cui-collapsible-content-height);
+}
+
+:where(.cui-collapsible.view-topInsert) {
+  align-items: flex-end;
+}
+
+:where(.cui-collapsible.view-bottomInsert) {
+  align-items: flex-start;
+}
+
+:where(.cui-collapsible.view-fade),
+:where(.cui-collapsible.view-leftInsert),
+:where(.cui-collapsible.view-rightInsert) {
+  align-items: flex-start;
+  transition-timing-function: step-end, var(--cui-collapsible-transition-timing-function), var(--cui-collapsible-transition-timing-function), var(--cui-collapsible-transition-timing-function);
+}
+
+:where(.cui-collapsible.view-fade.is-expanded),
+:where(.cui-collapsible.view-leftInsert.is-expanded),
+:where(.cui-collapsible.view-rightInsert.is-expanded) {
+  height: var(--cui-collapsible-content-height);
+  transition-timing-function: step-start, var(--cui-collapsible-transition-timing-function), var(--cui-collapsible-transition-timing-function), var(--cui-collapsible-transition-timing-function);
+}
+
+:where(.cui-collapsible.view-leftInsert .cui-collapsible-content),
+:where(.cui-collapsible.view-rightInsert .cui-collapsible-content) {
+  transition-property: transform;
+  transition-timing-function: var(--cui-collapsible-transition-timing-function);
+  transition-duration: var(--cui-collapsible-transition-duration);
+  transform: translateX(-100%);
+}
+
+:where(.cui-collapsible.view-rightInsert .cui-collapsible-content) {
+  transform: translateX(100%);
+}
+
+:where(.cui-collapsible.view-leftInsert.is-expanded .cui-collapsible-content),
+:where(.cui-collapsible.view-rightInsert.is-expanded .cui-collapsible-content) {
+  transform: none;
+}

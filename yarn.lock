@@ -2971,7 +2971,6 @@ __metadata:
     "@contember/ui": "workspace:*"
     "@contember/utilities": "workspace:*"
     "@formatjs/icu-messageformat-parser": 2.0.11
-    "@mangoweb/sass-base": 0.0.8
     "@playwright/test": 1.32.3
     "@sindresorhus/slugify": 0.11.0
     "@types/blueimp-md5": 2.18.0
@@ -3240,7 +3239,6 @@ __metadata:
     "@contember/brand": "workspace:*"
     "@contember/react-utils": "workspace:*"
     "@contember/utilities": "workspace:*"
-    "@mangoweb/sass-base": 0.0.8
     "@popperjs/core": 2.10.2
     "@storybook/addon-actions": 7.0.7
     "@storybook/addon-essentials": 7.0.7
@@ -3248,7 +3246,6 @@ __metadata:
     "@storybook/addon-links": 7.0.7
     "@storybook/addons": 7.0.7
     "@storybook/blocks": ^7.0.7
-    "@storybook/preset-scss": 1.0.3
     "@storybook/react": 7.0.7
     "@storybook/react-vite": ^7.0.7
     "@storybook/testing-library": ^0.0.14-next.2
@@ -3269,8 +3266,6 @@ __metadata:
     react-stately: ^3.18.0
     react-textarea-autosize: ^8.3.4
     resolve-url-loader: 4.0.0
-    sass: 1.36.0
-    sass-loader: 10.1.1
     source-map-loader: 2.0.1
     storybook: ^7.0.7
     style-loader: 2.0.0
@@ -4481,13 +4476,6 @@ __metadata:
   version: 3.4.0
   resolution: "@juggle/resize-observer@npm:3.4.0"
   checksum: 2505028c05cc2e17639fcad06218b1c4b60f932a4ebb4b41ab546ef8c157031ae377e3f560903801f6d01706dbefd4943b6c4704bf19ed86dfa1c62f1473a570
-  languageName: node
-  linkType: hard
-
-"@mangoweb/sass-base@npm:0.0.8":
-  version: 0.0.8
-  resolution: "@mangoweb/sass-base@npm:0.0.8"
-  checksum: abd1efa275e48b55122a718f681af4402426255c7159b45fdc19155f98404009edf6fe75847553fd646670532352959de8c8bd2938f7c942aef56b72e4cd424b
   languageName: node
   linkType: hard
 
@@ -6911,17 +6899,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@storybook/preset-scss@npm:1.0.3":
-  version: 1.0.3
-  resolution: "@storybook/preset-scss@npm:1.0.3"
-  peerDependencies:
-    css-loader: "*"
-    sass-loader: "*"
-    style-loader: "*"
-  checksum: 4f1cf1f57a4cd277d76afad5fc4f677436dc3ae3753ce549a6395c0aa9f3d9cf58e9d04c7f8b2cccd2e01929ae563764cca03c016c7e3fed4044a6409e8ca8cd
-  languageName: node
-  linkType: hard
-
 "@storybook/preview-api@npm:7.0.7":
   version: 7.0.7
   resolution: "@storybook/preview-api@npm:7.0.7"
@@ -9184,7 +9161,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"chokidar@npm:>=3.0.0 <4.0.0, chokidar@npm:^3.5.3":
+"chokidar@npm:^3.5.3":
   version: 3.5.3
   resolution: "chokidar@npm:3.5.3"
   dependencies:
@@ -12015,13 +11992,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"immutable@npm:^4.0.0":
-  version: 4.2.4
-  resolution: "immutable@npm:4.2.4"
-  checksum: 3be84eded37b05e65cad57bfba630bc1bf170c498b7472144bc02d2650cc9baef79daf03574a9c2e41d195ebb55a1c12c9b312f41ee324b653927b24ad8bcaa7
-  languageName: node
-  linkType: hard
-
 "import-fresh@npm:^3.0.0, import-fresh@npm:^3.2.1":
   version: 3.3.0
   resolution: "import-fresh@npm:3.3.0"
@@ -13008,13 +12978,6 @@ __metadata:
   version: 3.0.3
   resolution: "kleur@npm:3.0.3"
   checksum: df82cd1e172f957bae9c536286265a5cdbd5eeca487cb0a3b2a7b41ef959fc61f8e7c0e9aeea9c114ccf2c166b6a8dd45a46fd619c1c569d210ecd2765ad5169
-  languageName: node
-  linkType: hard
-
-"klona@npm:^2.0.4":
-  version: 2.0.6
-  resolution: "klona@npm:2.0.6"
-  checksum: ac9ee3732e42b96feb67faae4d27cf49494e8a3bf3fa7115ce242fe04786788e0aff4741a07a45a2462e2079aa983d73d38519c85d65b70ef11447bbc3c58ce7
   languageName: node
   linkType: hard
 
@@ -15934,7 +15897,6 @@ __metadata:
     prettier: 2.3.2
     react: ^18.2.0
     react-dom: ^18.2.0
-    sass: 1.49.11
     tsx: ^3.12.7
     typedoc: ^0.24.4
     typescript: ^5.0.4
@@ -15988,55 +15950,6 @@ __metadata:
   version: 2.1.2
   resolution: "safer-buffer@npm:2.1.2"
   checksum: cab8f25ae6f1434abee8d80023d7e72b598cf1327164ddab31003c51215526801e40b66c5e65d658a0af1e9d6478cadcb4c745f4bd6751f97d8644786c0978b0
-  languageName: node
-  linkType: hard
-
-"sass-loader@npm:10.1.1":
-  version: 10.1.1
-  resolution: "sass-loader@npm:10.1.1"
-  dependencies:
-    klona: ^2.0.4
-    loader-utils: ^2.0.0
-    neo-async: ^2.6.2
-    schema-utils: ^3.0.0
-    semver: ^7.3.2
-  peerDependencies:
-    fibers: ">= 3.1.0"
-    node-sass: ^4.0.0 || ^5.0.0
-    sass: ^1.3.0
-    webpack: ^4.36.0 || ^5.0.0
-  peerDependenciesMeta:
-    fibers:
-      optional: true
-    node-sass:
-      optional: true
-    sass:
-      optional: true
-  checksum: dbd4ba06e2a7de50db4588c9e84e38fb458ca4a44e1fccdf6eded728662b6fe0bd556249970876f13b47424e4285f5c6a8953933f83d47fd1448cad5884f84a5
-  languageName: node
-  linkType: hard
-
-"sass@npm:1.36.0":
-  version: 1.36.0
-  resolution: "sass@npm:1.36.0"
-  dependencies:
-    chokidar: ">=3.0.0 <4.0.0"
-  bin:
-    sass: sass.js
-  checksum: fdb03deed1769f182900c1b5505bc22e50cf1d3ce4d5253fc907865f784c430236937bd391d91ef714e59995584f13ff31d3776d5283e730f5172ac227585754
-  languageName: node
-  linkType: hard
-
-"sass@npm:1.49.11":
-  version: 1.49.11
-  resolution: "sass@npm:1.49.11"
-  dependencies:
-    chokidar: ">=3.0.0 <4.0.0"
-    immutable: ^4.0.0
-    source-map-js: ">=0.6.2 <2.0.0"
-  bin:
-    sass: sass.js
-  checksum: f81cabfc43d6baf710979d647e24019f7cfb68242f8421d20dfc8c864cf83512b0b74a89098331696f758756829cb736f7b8aca70a11cff365928393ae351bcc
   languageName: node
   linkType: hard
 
@@ -16371,17 +16284,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"source-map-js@npm:>=0.6.2 <2.0.0, source-map-js@npm:^1.0.2":
-  version: 1.0.2
-  resolution: "source-map-js@npm:1.0.2"
-  checksum: c049a7fc4deb9a7e9b481ae3d424cc793cb4845daa690bc5a05d428bf41bf231ced49b4cf0c9e77f9d42fdb3d20d6187619fc586605f5eabe995a316da8d377c
-  languageName: node
-  linkType: hard
-
 "source-map-js@npm:^0.6.2":
   version: 0.6.2
   resolution: "source-map-js@npm:0.6.2"
   checksum: 9c8151a29e00fd8d3ba87709fdf9a9ce48313d653f4a29a39b4ae53d346ac79e005de624796ff42eff55cbaf26d2e87f4466001ca87831d400d818c5cf146a0e
+  languageName: node
+  linkType: hard
+
+"source-map-js@npm:^1.0.2":
+  version: 1.0.2
+  resolution: "source-map-js@npm:1.0.2"
+  checksum: c049a7fc4deb9a7e9b481ae3d424cc793cb4845daa690bc5a05d428bf41bf231ced49b4cf0c9e77f9d42fdb3d20d6187619fc586605f5eabe995a316da8d377c
   languageName: node
   linkType: hard
 

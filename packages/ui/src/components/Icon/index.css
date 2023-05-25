@@ -1,0 +1,31 @@
+:where(.cui-icon) {
+  display: inline-flex;
+  vertical-align: middle;
+}
+
+:where(.cui-icon-blueprintSvg),
+:where(.cui-icon-contemberSvg) {
+  width: 1em;
+  height: 1em;
+  fill: currentColor;
+}
+
+:where(.cui-icon) {
+  font-size: 1em;
+}
+
+:where(.cui-icon.view-small) {
+  font-size: 0.75em;
+}
+
+:where(.cui-icon.view-large) {
+  font-size: 1.5em;
+}
+
+:where(.cui-icon.view-lowercase) {
+  font-size: 1ex;
+}
+
+:where(.cui-icon.view-alignWithLowercase) {
+  vertical-align: middle;
+}

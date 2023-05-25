@@ -1,0 +1,21 @@
+:where(.cui-spacer) {
+  --spacer-margin: var(--cui-padding);
+  min-height: var(--spacer-margin);
+  min-width: var(--spacer-margin);
+}
+
+:where(.cui-spacer.view-none) {
+  --spacer-margin: 0;
+}
+
+:where(.cui-spacer.view-small) {
+  --spacer-margin: var(--cui-gap);
+}
+
+:where(.cui-spacer.view-large) {
+  --spacer-margin: calc(1.5 * var(--cui-padding));
+}
+
+:where(.cui-spacer.view-xlarge) {
+  --spacer-margin: calc(3 * var(--cui-padding));
+}

@@ -1,0 +1,10 @@
+:where(.cui-layout-page-sticky-container) {
+  --cui-sticky-container-offset-left: 0px;
+  --cui-sticky-container-offset-right: 0px;
+  --cui-left: calc(var(--layout-chrome-bar-width, 0px) + var(--cui-sticky-container-offset-left));
+  --cui-right: var(--cui-sticky-container-offset-right);
+  left: var(--cui-left);
+  max-width: calc(var(--cui-layout-page-visible-width) - var(--cui-sticky-container-offset-left) - var(--cui-sticky-container-offset-right));
+  right: var(--cui-right);
+  position: sticky;
+}

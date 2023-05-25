@@ -1,0 +1,83 @@
+:where(.cui-devBar) {
+  height: 1.6rem;
+  position: fixed;
+  bottom: 0.25rem;
+  right: 0.25rem;
+  z-index: 1000;
+  display: flex;
+  border: 1px solid #ccc;
+  box-shadow: 0 0 5px rgba(100, 100, 100, 0.5);
+  background: #eee;
+  border-radius: 0.5rem;
+  color: #000;
+  align-items: center;
+}
+
+:where(.cui-devBar-close) {
+  padding: 0 1rem;
+  cursor: pointer;
+}
+
+:where(.cui-devBar-close:hover) {
+  background: #ddd;
+}
+
+:where(.cui-devBar-brand) {
+  height: 100%;
+  padding: 0 1rem;
+  margin-right: auto;
+  display: flex;
+  align-items: center;
+  text-align: right;
+  background: #00182f;
+  border-radius: 0.5rem;
+  color: #fff;
+}
+
+:where(.cui-devBar-brand svg) {
+  width: 90px;
+}
+
+:where(.cui-devBar-panels) {
+  display: flex;
+  height: 100%;
+}
+
+:where(.cui-devBar-trigger) {
+  display: flex;
+  align-items: center;
+  color: #111;
+  padding: 0.25rem 1rem;
+  border-right: 1px solid #ccc;
+  position: relative;
+}
+
+:where(.cui-devBar-trigger-label) {
+  font-size: 0.9rem;
+  color: #444;
+}
+
+:where(.cui-devBar-trigger:hover) {
+  background: #ddd;
+}
+
+:where(.cui-devBar-trigger:hover .cui-devBar-trigger-label) {
+  cursor: pointer;
+}
+
+:where(.cui-devBar-panel) {
+  display: none;
+  position: absolute;
+  min-width: 320px;
+  top: 0;
+  right: 0;
+  background: #f8f8f8;
+  padding: 0.5rem;
+  box-shadow: 0 0 3px 0 rgba(155, 155, 155, 0.5);
+  transform: translate(0, -100%);
+}
+
+:where(.cui-devBar-trigger:hover .cui-devBar-panel) {
+  cursor: unset;
+  display: block;
+}

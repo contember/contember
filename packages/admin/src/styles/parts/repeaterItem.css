@@ -1,0 +1,19 @@
+:where(.repeaterItem-in) {
+  display: flex;
+  align-items: flex-start;
+}
+
+:where(.repeaterItem-content) {
+  flex: 1 1 auto;
+  flex-wrap: wrap;
+  max-width: 100%;
+}
+
+:where(.repeaterItem-button) {
+  flex: 0 0 auto;
+  margin-left: 0.375rem;
+}
+
+:where(.repeaterItem + .repeaterItem) {
+  margin-top: 1.25rem;
+}

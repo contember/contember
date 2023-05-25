@@ -3,7 +3,9 @@
 	"license": "Apache-2.0",
 	"version": "0.0.0",
 	"type": "module",
-	"sideEffects": false,
+	"sideEffects": [
+		"*.css"
+	],
 	"main": "./dist/production/index.js",
 	"exports": {
 		".": {
@@ -13,7 +15,11 @@
 				"default": "./dist/production/index.js"
 			}
 		},
-		"./index.css": "./dist/assets/index.css",
+		"./index.css": {
+			"development": "./src/index.css",
+			"production": "./dist/assets/index.css",
+			"default": "./dist/assets/index.css"
+		},
 		"./style.css": "./dist/assets/index.css"
 	},
 	"files": [
@@ -30,8 +36,7 @@
 		"build": "yarn build:js:dev && yarn build:js:prod && yarn build:css",
 		"build:js:dev": "NODE_ENV=development vite build --mode development",
 		"build:js:prod": "vite build --mode production",
-		"build:css": "sass --no-charset src/index.sass:dist/assets/index.css && yarn build:css:copy-fonts",
-		"build:css:copy-fonts": "rm -rf \"dist/assets/Inter\" && cp -R \"../ui/src/assets/Inter\" \"dist/assets/Inter\"",
+		"build:css": "vite build --config vite.config.css.js",
 		"pw:build": "vite build tests/playwright/admin",
 		"pw:dev": "vite dev tests/playwright/admin",
 		"pw:preview": "vite preview tests/playwright/admin",
@@ -82,7 +87,6 @@
 		"@contember/schema-definition": "^1.2.0",
 		"@contember/schema-migrations": "^1.2.0",
 		"@contember/schema-utils": "^1.2.0",
-		"@mangoweb/sass-base": "0.0.8",
 		"@playwright/test": "1.32.3",
 		"@types/blueimp-md5": "2.18.0",
 		"@types/is-hotkey": "0.1.5",

@@ -1,0 +1,27 @@
+:where(.hoverMenu) {
+  position: fixed;
+  top: 0;
+  left: 0;
+  display: flex;
+  background: black;
+  color: white;
+  border-radius: 5px;
+  transform-origin: bottom center;
+  z-index: 1;
+  padding: 0.2em;
+}
+
+:where(.hoverMenu-item) {
+  padding: 0.2em 0.5em;
+  cursor: pointer;
+  opacity: 0.7;
+}
+
+:where(.hoverMenu-item:hover) {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 5px;
+}
+
+:where(.hoverMenu-isActive) {
+  opacity: 1;
+}

@@ -1,0 +1,8 @@
+:where(.cui-description) {
+  font-size: calc(var(--cui-font-size-label) * 0.95);
+  font-weight: 400;
+  line-height: 1.2;
+  color: var(--cui-color--medium);
+  display: inline-block;
+  margin: 0.125em 0;
+}

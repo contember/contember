@@ -1,0 +1,121 @@
+:where(:root) {
+  --cui-transition-duration--immediate: 100ms;
+  --cui-transition-duration--fast: 200ms;
+  --cui-transition-duration: 300ms;
+  --cui-transition-duration--slow: 600ms;
+  --cui-transition-duration--slowest: 800ms;
+  --cui-font-family: Inter, "system-ui";
+  --cui-line-height: 1.5;
+  --cui-font-size-body: 15px;
+  --cui-font-size-heading: 1.125em;
+  --cui-font-size-text: 1em;
+  --cui-font-size-label: 0.875em;
+  --cui-font-size-note: 0.8125em;
+  --cui-logo-size: 1.125em;
+  --cui-logo-size--small: 0.84375em;
+  --cui-logo-size--large: 2.25em;
+  --cui-gap: 0.25em;
+  --cui-gutter: 0.75em;
+  --cui-padding: calc(var(--cui-gap) * 4);
+  --cui-screen-gap-horizontal: 0.25em;
+  --cui-screen-gap-vertical: 0.25em;
+  --cui-screen-gap: var(--cui-screen-gap-horizontal);
+  --cui-screen-padding-horizontal: calc(var(--cui-screen-gap-horizontal) * 3);
+  --cui-edge-offset-horizontal: 0em;
+  --cui-edge-offset-left: var(--cui-edge-offset-horizontal);
+  --cui-edge-offset-right: var(--cui-edge-offset-horizontal);
+  --cui-field-container-min-width: 100%;
+  --cui-edge-offset-vertical: 0px;
+  --cui-edge-offset-bottom: var(--cui-edge-offset-vertical);
+  --cui-edge-offset-top: var(--cui-edge-offset-vertical);
+  --cui-control-font-size: 1em;
+  --cui-control-font-size--small: 0.9em;
+  --cui-control-font-size--large: 1.5em;
+  --cui-message-font-size-small: 0.8em;
+  --cui-message-font-size-large: 1.2em;
+  --cui-control-border-radius: var(--cui-gap);
+  --cui-control-border-width: 1px;
+  --cui-tap-target-size: 1.375em;
+  --cui-control-height--small: calc(var(--cui-tap-target-size) * 1.25);
+  --cui-control-height: calc(var(--cui-tap-target-size) * 1.75);
+  --cui-control-height--large: calc(var(--cui-tap-target-size) * 2);
+  box-sizing: border-box;
+}
+
+@supports (font-variation-settings: normal) {
+  :where(:root) {
+    --cui-font-family: "Inter var", "system-ui";
+  }
+}
+
+@media (min-width: 480px) {
+  :where(:root) {
+    --cui-screen-gap-horizontal: 0.3125em;
+    --cui-screen-padding-horizontal: calc(var(--cui-screen-gap-horizontal) * 4);
+    --cui-edge-offset-horizontal: calc(var(--cui-screen-gap-horizontal) * 1);
+  }
+}
+
+@media (min-width: 768px) {
+  :where(:root) {
+    --cui-screen-padding-horizontal: calc(var(--cui-screen-gap-horizontal) * 5);
+    --cui-edge-offset-horizontal: calc(var(--cui-screen-gap-horizontal) * 2);
+    --cui-field-container-min-width: 20em;
+  }
+}
+
+@media (min-width: 1024px) {
+  :where(:root) {
+    --cui-screen-gap-horizontal: 0.375em;
+    --cui-edge-offset-horizontal: calc(var(--cui-screen-gap-horizontal) * 3);
+    --cui-field-container-min-width: 25em;
+  }
+}
+
+@media (min-width: 1280px) {
+  :where(:root) {
+    --cui-screen-padding-horizontal: calc(var(--cui-screen-gap-horizontal) * 6);
+    --cui-edge-offset-horizontal: calc(var(--cui-screen-gap-horizontal) * 4);
+  }
+}
+
+@media (min-height: 768px) {
+  :where(:root) {
+    --cui-screen-gap-vertical: 0.3125em;
+  }
+}
+
+@media (min-height: 1024px) {
+  :where(:root) {
+    --cui-screen-gap-vertical: 0.375em;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :where(:root) {
+    --cui-transition-duration--immediate: 0s;
+    --cui-transition-duration--fast: 0s;
+    --cui-transition-duration: 0s;
+    --cui-transition-duration--slow: 0s;
+    --cui-transition-duration--slowest: 0s;
+  }
+}
+
+@media (min-width: 1024px) {
+  :where(:root) {
+    --cui-logo-size: 1.5625em;
+    --cui-logo-size--small: 1.171875em;
+    --cui-logo-size--large: 3.125em;
+  }
+}
+
+:where(:root *),
+:where(:root *)::before,
+:where(:root *)::after {
+  box-sizing: inherit;
+}
+
+:where(*) {
+  --cui-control-focus-ring-box-shadow: 0 0 0 .2em var(--cui-control-border-color);
+  --cui-control-focus-ring-box-shadow-error: 0 0 0 .2em rgb(var(--cui-theme-danger-500));
+}

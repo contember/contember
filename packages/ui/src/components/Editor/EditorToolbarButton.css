@@ -1,0 +1,74 @@
+:where(.cui-editorToolbarButton) {
+  border: none;
+  margin: 0;
+  padding: 0;
+  width: auto;
+  overflow: visible;
+  background: transparent;
+  /* inherit font & color from ancestor */
+  color: inherit;
+  font: inherit;
+  /* Normalize `line-height`. Cannot be changed from `normal` in Firefox 4+. */
+  line-height: normal;
+  /* Corrects font smoothing for webkit */
+  -webkit-font-smoothing: inherit;
+  -moz-osx-font-smoothing: inherit;
+  /* Corrects inability to style clickable `input` types in iOS */
+  -webkit-appearance: none;
+  display: flex;
+  align-items: center;
+  text-align: center;
+  border-radius: 0.25em;
+  background: rgba(255, 255, 255, 0);
+  border: solid 0.125em rgba(255, 255, 255, 0);
+  cursor: pointer;
+}
+
+:where(.cui-editorToolbarButton:hover) {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+:where(.cui-editorToolbarButton:focus) {
+  border-color: rgba(61, 169, 235, 0.5);
+  outline: none;
+}
+
+:where(.cui-editorToolbarButton.view-active) {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+:where(.cui-editorToolbarButton-icon) {
+  line-height: 1;
+  width: 1.5em;
+  height: 1.5em;
+}
+
+:where(.cui-editorToolbarButton-label) {
+  display: none;
+  line-height: 1.2;
+}
+
+:where(.cui-editorToolbarButton.view-layout-grid) {
+  display: inline-flex;
+  flex-direction: column;
+  max-width: 5.625em;
+  min-width: 2.5em;
+  padding: 0.25em;
+}
+
+:where(.cui-editorToolbarButton.view-layout-grid .cui-editorToolbarButton-label) {
+  font-size: 0.75em;
+  margin-top: 0.3333333333em;
+  overflow-x: hidden;
+  max-width: 100%;
+  text-overflow: ellipsis;
+  margin-bottom: -0.25em;
+}
+
+:where(.cui-editorToolbarButton.view-layout-list .cui-editorToolbarButton-icon) {
+  margin-right: 0.5em;
+}
+
+:where(.cui-editorToolbarButton.view-showLabel .cui-editorToolbarButton-label) {
+  display: block;
+}

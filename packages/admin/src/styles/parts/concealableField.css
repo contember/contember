@@ -1,0 +1,62 @@
+:where(.concealableField) {
+  cursor: pointer;
+  position: relative;
+}
+
+:where(.concealableField-field) {
+  visibility: hidden;
+  opacity: 0;
+  transition-delay: 0s;
+}
+
+:where(.concealableField-cover) {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  transition-delay: 0.2s;
+}
+
+:where(.concealableField-field),
+:where(.concealableField-cover) {
+  transition-property: opacity, visibility;
+  transition-duration: 0.2s;
+}
+
+:where(.concealableField-value) {
+  color: #9EA0A5;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+:where(.concealableField-value a) {
+  color: inherit;
+}
+
+:where(.concealableField-button) {
+  margin-left: 1em;
+}
+
+:where(.concealableField.is-editing .concealableField-cover) {
+  visibility: hidden;
+  opacity: 0;
+  transition-delay: 0s;
+}
+
+:where(.concealableField.is-editing .concealableField-field) {
+  visibility: visible;
+  opacity: 1;
+  transition-delay: 0.2s;
+}
+
+:where(.concealableField.view-extended) {
+  margin-top: 0;
+}
+
+:where(.concealableField.view-extended .concealableField-value) {
+  flex: 1 0 auto;
+}

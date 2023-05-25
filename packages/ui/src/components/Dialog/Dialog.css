@@ -1,0 +1,63 @@
+@keyframes cui-dialogIntro {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes cui-dialogIntroIn {
+  0% {
+    opacity: 0;
+    transform: translateY(-20%) scale(1.1);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+:where(.cui-dialog) {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 50;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  animation: cui-dialogIntro 0.1s forwards;
+}
+
+:where(.cui-dialog)::before {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  content: "";
+  background: #000000;
+  opacity: 0.1;
+}
+
+:where(.cui-dialog-in) {
+  z-index: 51;
+  margin: 1em;
+  opacity: 0;
+  animation: cui-dialogIntroIn 0.2s 0.1s forwards;
+}
+
+:where(.cui-dialog.view-immersive)::before {
+  background: transparent;
+  opacity: 1;
+}
+
+:where(.cui-dialog.view-captivating)::before {
+  opacity: 0.3;
+}

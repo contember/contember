@@ -1,22 +1,26 @@
 /* Globals */
-.cui-cms,
-.cui-cms .cui-theme:not([class*=scheme-]),
-.cui-cms .scheme-light,
-.cui-cms .scheme-light .cui-theme:not([class*=scheme-]),
-.cui-cms .scheme-system,
-.cui-cms .scheme-system .cui-theme:not([class*=scheme-]) {
+:where(
+	.cui-cms,
+	.cui-cms .cui-theme:not([class*=scheme-]),
+	.cui-cms .scheme-light,
+	.cui-cms .scheme-light .cui-theme:not([class*=scheme-]),
+	.cui-cms .scheme-system,
+	.cui-cms .scheme-system .cui-theme:not([class*=scheme-]),
+) {
 	--cui-background-color--above: rgb(var(--cui-content-1000));
 	--cui-background-color: rgb(var(--cui-content-975));
 	--cui-background-color--below: rgb(var(--cui-content-950));
 }
 
 @media (prefers-color-scheme: light) {
-	.cui-cms,
-	.cui-cms .cui-theme:not([class*=scheme-]),
-	.cui-cms .scheme-light,
-	.cui-cms .scheme-light .cui-theme:not([class*=scheme-]),
-	.cui-cms .scheme-system,
-	.cui-cms .scheme-system .cui-theme:not([class*=scheme-]) {
+	:where(
+		.cui-cms,
+		.cui-cms .cui-theme:not([class*=scheme-]),
+		.cui-cms .scheme-light,
+		.cui-cms .scheme-light .cui-theme:not([class*=scheme-]),
+		.cui-cms .scheme-system,
+		.cui-cms .scheme-system .cui-theme:not([class*=scheme-]),
+	) {
 		--cui-background-color--above: rgb(var(--cui-content-1000));
 		--cui-background-color: rgb(var(--cui-content-975));
 		--cui-background-color--below: rgb(var(--cui-content-950));
@@ -24,12 +28,14 @@
 }
 
 @media (prefers-color-scheme: dark) {
-	.cui-cms,
-	.cui-cms .cui-theme:not([class*=scheme-]),
-	.cui-cms .scheme-dark,
-	.cui-cms .scheme-dark .cui-theme:not([class*=scheme-]),
-	.cui-cms .scheme-system,
-	.cui-cms .scheme-system .cui-theme:not([class*=scheme-]) {
+	:where(
+		.cui-cms,
+		.cui-cms .cui-theme:not([class*=scheme-]),
+		.cui-cms .scheme-dark,
+		.cui-cms .scheme-dark .cui-theme:not([class*=scheme-]),
+		.cui-cms .scheme-system,
+		.cui-cms .scheme-system .cui-theme:not([class*=scheme-]),
+	) {
 		--cui-background-color--above: rgb(var(--cui-content-150));
 		--cui-background-color: rgb(var(--cui-content-100));
 		--cui-background-color--below: rgb(var(--cui-content-50));
@@ -37,38 +43,35 @@
 }
 
 @media (prefers-color-scheme: light) {
-	.cui-cms {
+	:where(.cui-cms) {
 		--cms-content-background-color: var(--cui-background-color--above);
 		--cms-sidebar-background-color: var(--cui-background-color);
 	}
 }
 @media (prefers-color-scheme: dark) {
-	.cui-cms {
+	:where(.cui-cms) {
 		--cms-content-background-color: var(--cui-background-color);
 		--cms-sidebar-background-color: var(--cui-background-color--above);
 	}
 }
 
-/* Apply color for all links in CMS layout */
-.cui-cms a {
-	color: inherit
-}
-
 /* Flip Icons (hack for missing icons) */
-.right-sidebar-close-icon,
-.right-sidebar-open-icon {
+:where(
+	.right-sidebar-close-icon,
+	.right-sidebar-open-icon,
+) {
 	transform: rotate(180deg);
 }
 
-.cui-cms-header-title .cui-layout-slot-title {
+:where(.cui-cms-header-title .cui-layout-slot-title) {
 	font-size: min(1em, 1.5vw);
 }
-.cui-root .cui-cms-header-title h1 {
+:where(.cui-root .cui-cms-header-title h1) {
 	font-weight: bold;
 }
 
 /* Make left sidebar sticky (1) */
-.cui-cms .cui-cms-sidebar-left[data-behavior="static"] {
+:where(.cui-cms .cui-cms-sidebar-left[data-behavior="static"]) {
 	position: sticky;
 	max-height: 100vh;
 	max-height: 100dvh;
@@ -76,7 +79,7 @@
 }
 
 /* Make left sidebar sticky (2) */
-.cui-cms-sidebar-left-body {
+:where(.cui-cms-sidebar-left-body) {
 	overflow: auto;
 }
 
@@ -94,57 +97,59 @@
 }
 
 /* Inherit colors in menu (1) */
-.cui-cms :where(
-	.cui-menu-group-title-content,
-	.cui-menu-section-title-content,
+:where(
+	.cui-cms .cui-menu-group-title-content,
+	.cui-cms .cui-menu-section-title-content,
 ) {
 	color: inherit;
 	text-decoration: none;
 }
 /* Inherit colors in menu (2) */
-.cui-menu-section-title-content .cui-menu-section-title-label {
+:where(.cui-menu-section-title-content .cui-menu-section-title-label) {
 	color: inherit;
 }
 
 /* Remove menu left margins now handled by insets (1) */
-.cui-cms :where(
-	.cui-menu-section-title,
-	.cui-menu-section-list,
+:where(
+	.cui-cms .cui-menu-section-title,
+	.cui-cms .cui-menu-section-list,
 ) {
 	margin-left: 0;
 }
 
 /* Remove menu left margins now handled by insets (2) */
-.cui-cms .cui-menu-section::after { display: none }
+:where(.cui-cms .cui-menu-section)::after { display: none }
 
 /* Remove menu left margins now handled by insets (3) */
-.cui-cms .cui-menu-section {
+:where(.cui-cms .cui-menu-section) {
 	margin-left: 0px;
 }
-.cui-cms .cui-menu-section > .cui-menu-section-list,
-.cui-cms .cui-menu-section > .cui-menu-section-title {
+:where(
+	.cui-cms .cui-menu-section > .cui-menu-section-list,
+	.cui-cms .cui-menu-section > .cui-menu-section-title,
+) {
 	margin-left: var(--cui-gutter);
 }
 
 /* Modify Menu right margin */
-.cui-cms .cui-menu {
+:where(.cui-cms .cui-menu) {
 	margin-right: calc(-1 * var(--cms-box-padding-horizontal));
 }
 
 /* Modify Menu bottom margin */
-.cui-cms .cui-menu:last-child {
+:where(.cui-cms .cui-menu:last-child) {
 	margin-bottom: calc(-1 *  var(--cms-box-padding-vertical));
 }
 
 /* CMS Layout */
-.cui-cms {
+:where(.cui-cms) {
 	--cms-box-padding-vertical: 1rem;
 	--cms-box-padding-horizontal: 1rem;
 	--cms-logo-whitespace-margin: calc((1em - var(--size) * 0.5) / 2);
 }
 
 @media screen and (min-width: 1024px) {
-	.cui-cms {
+	:where(.cui-cms) {
 		--cms-box-padding-horizontal: 2rem;
 	}
 }
@@ -154,7 +159,7 @@
 	--scale: 2.5;
 }
 
-.cui-cms .cui-responsive-app-layout-header-container {
+:where(.cui-cms .cui-responsive-app-layout-header-container) {
 	max-width: 100%;
 }
 
@@ -222,9 +227,11 @@
 
 
 /* Make toggle buttons transparent (1) */
-.cui-cms .cui-cms-toggle-right-sidebar,
-.cui-cms .cui-cms-toggle-left-sidebar,
-.cui-cms .cui-cms-toggle-menu.view-seamless {
+:where(
+	.cui-cms .cui-cms-toggle-right-sidebar,
+	.cui-cms .cui-cms-toggle-left-sidebar,
+	.cui-cms .cui-cms-toggle-menu.view-seamless,
+) {
 	--cui-button-box-shadow-shadow-below: ;
 	--cui-button-background-color: transparent;
 	--cui-button-color: inherit;
@@ -235,7 +242,7 @@
 }
 
 /* Make toggle buttons transparent (2) */
-.cui-cms-toggle-left-sidebar {
+:where(.cui-cms-toggle-left-sidebar) {
 	margin-right: calc(var(--cms-box-padding-horizontal) / -4);
 }
 
@@ -296,18 +303,30 @@
 	inset: 0;
 }
 /* Blur (2) */
-:where(.cui-cms-header-start-content, .cui-cms-header-main-content, .cui-cms-header-end-content) {
+:where(
+	.cui-cms-header-start-content,
+	.cui-cms-header-main-content,
+	.cui-cms-header-end-content,
+) {
 	align-items: center;
 	display: flex;
 	gap: var(--cui-gutter);
 	z-index: 1;
 }
 /* Blur (3) */
-:where(.cui-cms-header-start, .cui-cms-header-main, .cui-cms-header-end)::before {
+:where(
+	.cui-cms-header-start,
+	.cui-cms-header-main,
+	.cui-cms-header-end,
+)::before {
 	opacity: 0.85;
 }
 /* Blur (4) */
-:where(.cui-cms-header-start, .cui-cms-header-main, .cui-cms-header-end)::after {
+:where(
+	.cui-cms-header-start,
+	.cui-cms-header-main,
+	.cui-cms-header-end,
+)::after {
 	-webkit-backdrop-filter: blur(5px);
 	backdrop-filter: blur(5px);
 }
@@ -387,7 +406,9 @@
 }
 
 /* Left sidebar is open in modal (2) */
-:where(.cui-cms-sidebar-left-header[data-behavior="modal"])
+:where(
+	.cui-cms-sidebar-left-header[data-behavior="modal"]
+)
 :where(
 	.cui-cms-sidebar-left-header-content
 ) {

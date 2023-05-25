@@ -1,0 +1,10 @@
+:where(.cui-text-input:is([type=date], [type=time], [type=datetime-local], [type=month], [type=week])) {
+  -webkit-appearance: textfield;
+  display: inline-flex;
+}
+
+:where(.cui-text-input::-webkit-date-and-time-value) {
+  text-align: left;
+  margin-top: unset;
+  line-height: var(--cui-min-height);
+}

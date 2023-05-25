@@ -1,0 +1,17 @@
+:where(.cui-spinner) {
+  width: 1em;
+  height: 1em;
+  position: relative;
+  --cui-spinner-period: var(--cui-transition-duration--slow);
+  background: transparent;
+  border-radius: 50%;
+  border: 0.125em solid currentColor;
+  border-right-color: transparent;
+  animation: rotate var(--cui-spinner-period) linear 0s infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :where(.cui-spinner) {
+    --cui-spinner-period: calc(var(--cui-transition-duration--slow) / 3);
+  }
+}

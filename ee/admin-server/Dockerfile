@@ -23,7 +23,9 @@ COPY packages/react-choice-field/package.json ./packages/react-choice-field/pack
 COPY packages/react-choice-field-ui/package.json ./packages/react-choice-field-ui/package.json
 COPY packages/react-datagrid/package.json ./packages/react-datagrid/package.json
 COPY packages/react-datagrid-ui/package.json ./packages/react-datagrid-ui/package.json
+COPY packages/react-form-fields-ui/package.json ./packages/react-form-fields-ui/package.json
 COPY packages/react-i18n/package.json ./packages/react-i18n/package.json
+COPY packages/react-leaflet-fields-ui/package.json ./packages/react-leaflet-fields-ui/package.json
 COPY packages/react-multipass-rendering/package.json ./packages/react-multipass-rendering/package.json
 COPY packages/react-utils/package.json ./packages/react-utils/package.json
 COPY packages/ui/package.json ./packages/ui/package.json

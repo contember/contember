@@ -1,22 +1,28 @@
-import { ColorInput, ColorInputProps } from '@contember/ui'
+import { ControlProps, TextInput } from '@contember/ui'
 import { SimpleRelativeSingleField, SimpleRelativeSingleFieldProps } from '../auxiliary'
 import {
 	ControlValueParser,
 	FieldValueFormatter,
 	useFieldControl,
-} from './useFieldControl'
+} from '../hooks/useFieldControl'
 
-export type ColorFieldProps = SimpleRelativeSingleFieldProps &
-	Omit<ColorInputProps, 'value' | 'validationState' | 'allowNewlines' | 'wrapLines'>
+export type TextFieldProps =
+	& SimpleRelativeSingleFieldProps
+	& ControlProps<string>
+
 
 const parse: ControlValueParser<string, string> = value => value ?? null
 const format: FieldValueFormatter<string, string> = value => value ?? null
 
 /**
+ * Renders a text field used for basic string editing and has no rich text editing capabilities.
+ *
  * @group Form Fields
  */
-export const ColorField = SimpleRelativeSingleField<ColorFieldProps, string>(
-	(fieldMetadata, props) => {
+export const TextField = SimpleRelativeSingleField<TextFieldProps, string>(
+	(fieldMetadata, {
+		...props
+	}) => {
 		const inputProps = useFieldControl<string, string>({
 			...props,
 			fieldMetadata,
@@ -24,7 +30,9 @@ export const ColorField = SimpleRelativeSingleField<ColorFieldProps, string>(
 			format,
 		})
 
-		return <ColorInput {...inputProps} />
+		return (
+			<TextInput {...inputProps} />
+		)
 	},
-	'ColorField',
+	'TextField',
 )

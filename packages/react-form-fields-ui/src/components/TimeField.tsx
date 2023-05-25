@@ -1,6 +1,6 @@
 import { TimeInput, TimeInputProps, toTimeString } from '@contember/ui'
 import { SimpleRelativeSingleField, SimpleRelativeSingleFieldProps } from '../auxiliary'
-import { ControlValueParser, useFieldControl } from './useFieldControl'
+import { ControlValueParser, useFieldControl } from '../hooks/useFieldControl'
 
 export type TimeFieldProps = SimpleRelativeSingleFieldProps & TimeInputProps
 

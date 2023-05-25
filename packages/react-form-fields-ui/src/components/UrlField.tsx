@@ -4,7 +4,7 @@ import {
 	ControlValueParser,
 	FieldValueFormatter,
 	useFieldControl,
-} from './useFieldControl'
+} from '../hooks/useFieldControl'
 
 export type UrlFieldProps = SimpleRelativeSingleFieldProps &
 	Omit<UrlInputProps, 'value' | 'validationState' | 'allowNewlines' | 'wrapLines'>

@@ -1,0 +1,11 @@
+{
+	"extends": "../../../tsconfig.settings.json",
+	"compilerOptions": {
+		"outDir": "../dist/types"
+	},
+	"references": [
+		{ "path": "../../react-binding/src" },
+		{ "path": "../../react-binding-ui/src" },
+		{ "path": "../../ui/src" },
+	]
+}

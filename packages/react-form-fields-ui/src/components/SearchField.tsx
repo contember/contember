@@ -1,13 +1,13 @@
-import { EmailInput, EmailInputProps } from '@contember/ui'
+import { SearchInput, SearchInputProps } from '@contember/ui'
 import { SimpleRelativeSingleField, SimpleRelativeSingleFieldProps } from '../auxiliary'
 import {
 	ControlValueParser,
 	FieldValueFormatter,
 	useFieldControl,
-} from './useFieldControl'
+} from '../hooks/useFieldControl'
 
-export type EmailFieldProps = SimpleRelativeSingleFieldProps &
-	Omit<EmailInputProps, 'value' | 'validationState' | 'allowNewlines' | 'wrapLines'>
+export type SearchFieldProps = SimpleRelativeSingleFieldProps &
+	Omit<SearchInputProps, 'value' | 'validationState' | 'allowNewlines' | 'wrapLines'>
 
 const parse: ControlValueParser<string, string> = value => value ?? null
 const format: FieldValueFormatter<string, string> = value => value ?? null
@@ -15,7 +15,7 @@ const format: FieldValueFormatter<string, string> = value => value ?? null
 /**
  * @group Form Fields
  */
-export const EmailField = SimpleRelativeSingleField<EmailFieldProps, string>(
+export const SearchField = SimpleRelativeSingleField<SearchFieldProps, string>(
 	(fieldMetadata, props) => {
 		const inputProps = useFieldControl<string, string>({
 			...props,
@@ -24,7 +24,7 @@ export const EmailField = SimpleRelativeSingleField<EmailFieldProps, string>(
 			format,
 		})
 
-		return <EmailInput {...inputProps} />
+		return <SearchInput {...inputProps} />
 	},
-	'EmailField',
+	'SearchField',
 )

@@ -8,7 +8,7 @@ import {
 	SimpleRelativeSingleField,
 	SimpleRelativeSingleFieldProps,
 } from '../auxiliary'
-import { useFieldControl } from './useFieldControl'
+import { useFieldControl } from '../hooks/useFieldControl'
 
 export type DateTimeFieldProps = SimpleRelativeSingleFieldProps & DateTimeInputProps
 

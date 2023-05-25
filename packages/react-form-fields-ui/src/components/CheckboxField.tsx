@@ -4,7 +4,7 @@ import {
 	ControlValueParser,
 	FieldValueFormatter,
 	useFieldControl,
-} from './useFieldControl'
+} from '../hooks/useFieldControl'
 
 const parse: ControlValueParser<boolean, boolean> = value => value ?? null
 const format: FieldValueFormatter<boolean, boolean> = value => value ?? null

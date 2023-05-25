@@ -11,7 +11,7 @@ import slugify from '@sindresorhus/slugify'
 import { useCallback, useMemo } from 'react'
 import type { SimpleRelativeSingleFieldProps } from '../auxiliary'
 import { SimpleRelativeSingleField } from '../auxiliary'
-import { useFieldControl } from './useFieldControl'
+import { useFieldControl } from '../hooks/useFieldControl'
 
 export type SlugPrefix = string | ((environment: Environment) => string)
 

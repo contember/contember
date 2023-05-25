@@ -80,6 +80,19 @@
 	overflow: auto;
 }
 
+/* Make right sidebar sticky (1) */
+.cui-cms .cui-cms-sidebar-right[data-behavior="static"] {
+	position: sticky;
+	max-height: 100vh;
+	max-height: 100dvh;
+	top: 0;
+}
+
+/* Make right sidebar sticky (2) */
+.cui-cms-sidebar-right-body {
+	overflow: auto;
+}
+
 /* Inherit colors in menu (1) */
 .cui-cms :where(
 	.cui-menu-group-title-content,

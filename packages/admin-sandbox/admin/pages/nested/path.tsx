@@ -1,6 +1,7 @@
 import { Section, SectionTabs, SectionTabsProvider, SelectFieldInner } from '@contember/admin'
 import { Directive, Title } from '../../components/Directives'
 import { Slots } from '../../components/Slots'
+import Lorem from '../lorem'
 
 export default function InnerFooPage() {
 	return (
@@ -63,6 +64,10 @@ export default function InnerFooPage() {
 			</Slots.ContentStack>
 			<Slots.Sidebar>
 				<p><small>Hello Contember world from the sidebar!</small></p>
+
+				<p>
+					Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce arcu est, dignissim at varius vitae, egestas at enim. Cras at malesuada lacus. Sed pellentesque odio in sem malesuada, et feugiat tortor rutrum. Duis vel consectetur mi, sed vulputate quam. Suspendisse elementum sapien nec erat finibus rhoncus. Phasellus et enim et ante hendrerit tempor. In id venenatis felis. Nunc sed orci eu lectus euismod efficitur ornare at nisi. Sed egestas, eros eu dictum porta, enim nunc elementum nisl, et mollis dolor orci a tellus. Suspendisse potenti. Nunc sollicitudin id leo vitae aliquam. Nam efficitur nulla id tristique pulvinar. Nulla a efficitur ipsum, sit amet varius mi. Proin pulvinar dapibus tristique.
+				</p>
 			</Slots.Sidebar>
 		</SectionTabsProvider>
 	)

@@ -1,4 +1,4 @@
-:where(.layout-panel) {
+:where(.cui-layout-panel) {
 	content-visibility: visible;
 	display: flex;
 	flex-basis: var(--panel-basis);
@@ -9,25 +9,25 @@
 	opacity: 1;
 }
 
-:where(.layout-panel) {
+:where(.cui-layout-panel) {
 	transition-property: transform, opacity;
 	transition-timing-function: ease-in;
 	transition-duration: var(--cui-transition-duration);
 }
 
-:where(.layout-panel):where(
-	.layout-panel-behavior-overlay,
-	.layout-panel-behavior-modal,
+:where(.cui-layout-panel):where(
+	[data-behavior="overlay"],
+	[data-behavior="modal"],
 ) {
 	overflow: hidden;
 	overscroll-behavior: contain;
 }
 
 :where(
-	.layout-panel,
+	.cui-layout-panel,
 ):where(
-	.layout-panel-behavior-overlay,
-	.layout-panel-behavior-modal,
+	[data-behavior="overlay"],
+	[data-behavior="modal"],
 ) {
 	align-items: center;
 	background: rgba(0, 0, 0, 0.2);
@@ -38,32 +38,32 @@
 	bottom: 0;
 }
 
-:where(.layout-panel.layout-panel-behavior-overlay) {
+:where(.cui-layout-panel[data-behavior="overlay"]) {
 	background-color: var(--cui-background-color--above);
 	color: var(--cui-color);
 	z-index: 3;
 }
 
-:where(.layout-panel.layout-panel-behavior-modal) {
+:where(.cui-layout-panel[data-behavior="modal"]) {
 	background: rgba(0, 0, 0, 0.2);
 	z-index: 4;
 }
 
 :where(
-	.layout-panel.layout-panel-behavior-modal.layout-panel-visibility-visible
+	.cui-layout-panel[data-behavior="modal"][data-visibility="visible"]
 ) {
 	pointer-events: all;
 }
 
 :where(
-	.layout-panel:not(.layout-panel-behavior-modal),
+	.cui-layout-panel:not([data-behavior="modal"]),
 ) {
 	max-width: var(--panel-max-width, 100vw);
 	max-width: var(--panel-max-width, 100dvw);
 }
 
 :where(
-	.layout-panel:not(.layout-panel-visibility-visible),
+	.cui-layout-panel:not([data-visibility="visible"]),
 ) {
 	clip-path: inset(0 0 0 0);
 	overflow: hidden;
@@ -71,31 +71,31 @@
 }
 
 :where(
-	.layout-panel,
+	.cui-layout-panel,
 ):where(
-	.layout-panel-visibility-hidden,
-	.layout-panel-visibility-will-become-hidden,
+	[data-visibility="hidden"],
+	[data-visibility="will-become-hidden"],
 ) {
 	pointer-events: none;
 	opacity: 0;
 }
 
 :where(
-	.layout-panel,
+	.cui-layout-panel,
 ):where(
-	.layout-panel-visibility-hidden
+	[data-visibility="hidden"]
 ) {
 	content-visibility: hidden;
 }
 
 :where(
-	.layout-panel,
+	.cui-layout-panel,
 ):where(
-	.layout-panel-behavior-collapsible,
-	.layout-panel-behavior-static,
+	[data-behavior="collapsible"],
+	[data-behavior="static"],
 ):where(
-	.layout-panel-visibility-hidden,
-	.layout-panel-visibility-will-become-hidden,
+	[data-visibility="hidden"],
+	[data-visibility="will-become-hidden"],
 ) {
 	flex-basis: 0px;
 	max-width: 0px;

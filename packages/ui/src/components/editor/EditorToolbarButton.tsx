@@ -1,6 +1,5 @@
-import cn from 'classnames'
-import { forwardRef, memo, MouseEventHandler, ReactNode } from 'react'
-import { useComponentClassName } from '../../auxiliary'
+import { useClassName, useClassNameFactory } from '@contember/utilities'
+import { MouseEventHandler, ReactNode, forwardRef, memo } from 'react'
 import { toViewClass } from '../../utils'
 import { Icon, IconSourceSpecification } from '../Icon'
 
@@ -28,6 +27,8 @@ export const EditorToolbarButton = memo(forwardRef<any, ToolbarButton>(({
 	onClick,
 	onMouseDown,
 }, ref) => {
+	const componentClassName = useClassNameFactory('editorToolbarButton')
+
 	return (
 		<button
 			ref={ref}
@@ -37,17 +38,16 @@ export const EditorToolbarButton = memo(forwardRef<any, ToolbarButton>(({
 			onMouseDown={onMouseDown}
 			onClick={onClick}
 			title={title || String(label)}
-			className={cn(
-				useComponentClassName('editorToolbarButton'),
+			className={componentClassName(null, [
 				toViewClass('showLabel', showLabel),
 				toViewClass('active', isActive),
 				toViewClass(`layout-${layout}`, true),
-			)}
+			])}
 		>
-			<span className={cn(useComponentClassName('editorToolbarButton-icon'))}>
+			<span className={componentClassName('icon')}>
 				<Icon size="large" {...{ contemberIcon, customIcon, blueprintIcon }} />
 			</span>
-			<span className={cn(useComponentClassName('editorToolbarButton-label'))}>{label}</span>
+			<span className={componentClassName('label')}>{label}</span>
 		</button>
 	)
 }))

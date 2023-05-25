@@ -1,5 +1,5 @@
+import { useClassNameFactory } from '@contember/utilities'
 import { memo, ReactNode } from 'react'
-import { useClassNamePrefix } from '../../auxiliary'
 
 export interface BreadcrumbsProps {
 	items: ReactNode[]
@@ -9,12 +9,13 @@ export interface BreadcrumbsProps {
  * @group UI
  */
 export const Breadcrumbs = memo<BreadcrumbsProps>(({ items }) => {
-	const prefix = useClassNamePrefix()
+	const componentClassName = useClassNameFactory('breadcrumbs')
+
 	return (
-		<div className={`${prefix}breadcrumbs`}>
-			<div className={`${prefix}breadcrumbs-items`}>
+		<div className={componentClassName()}>
+			<div className={componentClassName('items')}>
 				{items.map((item, i) => (
-					<span className={`${prefix}breadcrumbs-item`} key={i}>
+					<span className={componentClassName('item')} key={i}>
 						{item}
 					</span>
 				))}

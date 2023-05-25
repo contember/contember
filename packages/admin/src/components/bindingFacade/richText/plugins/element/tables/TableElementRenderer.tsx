@@ -1,14 +1,14 @@
 import { EditorTableElement } from '@contember/ui'
+import { assertNever } from '@contember/utilities'
 import { memo, useCallback } from 'react'
 import { Transforms } from 'slate'
 import { ReactEditor, RenderElementProps, useSelected, useSlateStatic } from 'slate-react'
-import { assertNever } from '../../../../../../utils'
 import { BlockElement } from '../../../baseEditor'
 import type { TableCellElement } from './TableCellElement'
 import type { TableElement } from './TableElement'
-import type { TableRowElement } from './TableRowElement'
-import { TableModifications } from './TableModifications'
 import { isTableElement } from './TableElement'
+import { TableModifications } from './TableModifications'
+import type { TableRowElement } from './TableRowElement'
 
 export interface TableElementRendererProps extends Omit<RenderElementProps, 'element'> {
 	element: TableElement

@@ -1,8 +1,8 @@
+import { useClassName } from '@contember/utilities'
 import { memo } from 'react'
-import { useComponentClassName } from '../auxiliary'
 
 /**
  * @group UI
  */
-export const Spinner = memo(() => <div className={useComponentClassName('spinner')} />)
+export const Spinner = memo(() => <div className={useClassName('spinner')} />)
 Spinner.displayName = 'Spinner'

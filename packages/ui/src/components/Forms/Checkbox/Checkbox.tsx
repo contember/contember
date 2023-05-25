@@ -1,7 +1,6 @@
-import classNames from 'classnames'
+import { useClassNameFactory } from '@contember/utilities'
 import { AllHTMLAttributes, DetailedHTMLProps, forwardRef, InputHTMLAttributes, memo, useCallback } from 'react'
 import { mergeProps, useFocusRing, useHover } from 'react-aria'
-import { useComponentClassName } from '../../../auxiliary'
 import { toStateClass } from '../../../utils'
 import { useCheckboxInput } from '../Hooks'
 import { ControlProps, ControlPropsKeys } from '../Types'
@@ -9,7 +8,7 @@ import { CheckboxButton as DefaultCheckboxButton } from './CheckboxButton'
 
 export interface RestHTMLCheckboxProps extends Omit<AllHTMLAttributes<HTMLInputElement>, ControlPropsKeys<boolean> | 'checked' | 'children'> { }
 
-export type CheckoboxOwnProps = ControlProps<boolean> & {
+export type CheckboxOwnProps = ControlProps<boolean> & {
 	CheckboxButtonComponent?: typeof DefaultCheckboxButton
 	/**
 	 * @deprecated Add `<Label>` next to it or wrap with `<FieldContainer label={label} labelPosition="labelInlineRight"><Checkbox {...} /></FieldContainer>`
@@ -18,7 +17,7 @@ export type CheckoboxOwnProps = ControlProps<boolean> & {
 	children?: never
 }
 
-export type CheckboxProps = CheckoboxOwnProps & RestHTMLCheckboxProps
+export type CheckboxProps = CheckboxOwnProps & RestHTMLCheckboxProps
 
 /**
  * @group UI
@@ -33,7 +32,7 @@ export const Checkbox = memo(forwardRef<HTMLInputElement, CheckboxProps>(({
 	value,
 	...outerProps
 }, forwardedRef) => {
-	const componentClassName = useComponentClassName('checkbox')
+	const componentClassName = useClassNameFactory('checkbox')
 	const notNull = outerProps.notNull
 
 	const onChangeRotateState = useCallback((next?: boolean | null) => {
@@ -76,12 +75,11 @@ export const Checkbox = memo(forwardRef<HTMLInputElement, CheckboxProps>(({
 	}
 
 	return (
-		<div {...hoverProps} className={classNames(
-			componentClassName,
+		<div {...hoverProps} className={componentClassName(null, [
 			toStateClass('indeterminate', props.indeterminate),
 			toStateClass('checked', props.checked),
 			className,
-		)}>
+		])}>
 			<input
 				type="checkbox"
 				{...mergeProps(
@@ -89,7 +87,7 @@ export const Checkbox = memo(forwardRef<HTMLInputElement, CheckboxProps>(({
 					ariaProps,
 					focusProps,
 				)}
-				className={`${componentClassName}-visually-hidden`}
+				className={componentClassName('visually-hidden')}
 			/>
 
 			<CheckboxButton

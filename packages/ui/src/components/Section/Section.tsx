@@ -1,6 +1,5 @@
-import classnames from 'classnames'
-import { DetailedHTMLProps, forwardRef, HTMLAttributes, memo, ReactNode, useLayoutEffect, useRef } from 'react'
-import { useClassNamePrefix } from '../../auxiliary'
+import { useClassNameFactory } from '@contember/utilities'
+import { forwardRef, memo, ReactNode, useLayoutEffect, useRef } from 'react'
 import type { HTMLDivElementProps } from '../../types'
 import { Message } from '../Message'
 import { useSectionTabsRegistration } from '../SectionTabs'
@@ -40,7 +39,7 @@ export const Section = memo(forwardRef<HTMLElement, SectionProps>(({
 	showTab = true,
 	...divProps
 }: SectionProps, ref) => {
-	const prefix = useClassNamePrefix()
+	const componentClassName = useClassNameFactory('section')
 
 	const [registerTab, unregisterTab] = useSectionTabsRegistration()
 	const sectionId = useRef<string>(id ? `section-${id}` : 'section-' + randomId())
@@ -63,19 +62,16 @@ export const Section = memo(forwardRef<HTMLElement, SectionProps>(({
 		<section
 			{...divProps}
 			id={sectionId.current}
-			className={classnames(
-				`${prefix}section`,
-				className,
-			)}
+			className={componentClassName(null, className)}
 			ref={ref}
 		>
 			{import.meta.env.DEV && <Message distinction="striking" intent="warn" className="message--nesting-warning">Please use <code><strong>Section</strong></code> as parent element of the <code><strong>LocaleSideDimension</strong></code>.</Message>}
 			{(heading || actions) && (
-				<div className={`${prefix}section-heading`} contentEditable={false}>
+				<div className={componentClassName('heading')} contentEditable={false}>
 					<Heading depth={3}>
 						{heading}
 					</Heading>
-					<Stack direction="horizontal" className={`${prefix}section-actions`} contentEditable={false}>
+					<Stack direction="horizontal" className={componentClassName('actions')} contentEditable={false}>
 						{actions}
 					</Stack>
 				</div>

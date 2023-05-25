@@ -32,7 +32,6 @@ import { MouseEventHandler } from 'react';
 import { NamedExoticComponent } from 'react';
 import { PointerEventHandler } from 'react';
 import { PropsWithChildren } from 'react';
-import { ReactChild } from 'react';
 import { ReactElement } from 'react';
 import { ReactEventHandler } from 'react';
 import { ReactNode } from 'react';
@@ -112,9 +111,6 @@ export function assertDatetimeString(value: unknown): asserts value is DateTimeI
 
 // @public (undocumented)
 export function assertMonthInputString(value: unknown): asserts value is MonthInputString;
-
-// @public (undocumented)
-export const assertNever: (_: never) => never;
 
 // @public (undocumented)
 export function assertTimeString(value: unknown): asserts value is TimeInputString;
@@ -291,13 +287,13 @@ export interface CheckboxButtonProps extends NonOptionalVisuallyDependentControl
 }
 
 // @public (undocumented)
-export type CheckboxProps = CheckoboxOwnProps & RestHTMLCheckboxProps;
-
-// @public (undocumented)
-export type CheckoboxOwnProps = ControlProps<boolean> & {
+export type CheckboxOwnProps = ControlProps<boolean> & {
     CheckboxButtonComponent?: typeof CheckboxButton;
     children?: never;
 };
+
+// @public (undocumented)
+export type CheckboxProps = CheckboxOwnProps & RestHTMLCheckboxProps;
 
 // @public (undocumented)
 export const Collapsible: MemoExoticComponent<(props: CollapsibleProps) => JSX.Element>;
@@ -2288,7 +2284,7 @@ export const SelectCreateNewWrapper: ({ onClick, children }: SelectCreateNewWrap
 // @public (undocumented)
 export interface SelectCreateNewWrapperProps {
     // (undocumented)
-    children: ReactChild;
+    children: ReactNode;
     // (undocumented)
     onClick?: () => void;
 }
@@ -2769,9 +2765,6 @@ export const useCheckboxInput: <E extends HTMLInputElement>(props: ControlProps<
 export function useChildrenAsLabel(children: ReactNode): string | undefined;
 
 // @public (undocumented)
-export const useClassNamePrefix: () => string;
-
-// @public (undocumented)
 export const useCloseOnClickOutside: ({ isOpen, close, contents, outside }: {
     isOpen: boolean;
     close: () => void;
@@ -2787,9 +2780,6 @@ export const useCloseOnEscape: ({ isOpen, close }: {
 
 // @public (undocumented)
 export const useCommonReactSelectStyles: <Option = unknown, IsMulti extends boolean = boolean, Group extends GroupBase<Option> = GroupBase<Option>>({ isInvalid, menuZIndex }: CommonReactSelectStylesProps) => StylesConfig<Option, IsMulti, Group>;
-
-// @public (undocumented)
-export const useComponentClassName: (className: string) => string;
 
 // @public (undocumented)
 export const useDialog: <Result>() => DialogOptions<Result>;

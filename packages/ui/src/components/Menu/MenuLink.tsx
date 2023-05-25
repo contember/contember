@@ -1,4 +1,4 @@
-import classNames from 'classnames'
+import { listClassName } from '@contember/utilities'
 import { ReactNode, SyntheticEvent, useCallback } from 'react'
 import { isSpecialLinkClick, toStateClass } from '../../utils'
 
@@ -23,10 +23,9 @@ export function MenuLink({ className, children, external, href, isActive, onClic
 		}
 	}, [onNavigate, suppressTo])
 
-	// eslint-disable-next-line react/jsx-no-target-blank
 	return <a
 		tabIndex={-1}
-		className={classNames(className, toStateClass('active', isActive))}
+		className={listClassName([className, toStateClass('active', isActive)])}
 		href={href}
 		onClick={onClick}
 		target={external ? '_blank' : undefined}

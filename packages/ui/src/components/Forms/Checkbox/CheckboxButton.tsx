@@ -1,5 +1,4 @@
-import classNames from 'classnames'
-import { useComponentClassName } from '../../../auxiliary'
+import { useClassNameFactory } from '@contember/utilities'
 import { toStateClass } from '../../../utils'
 import { useInputClassName } from '../Hooks'
 import { NonOptionalVisuallyDependentControlProps } from '../Types'
@@ -21,21 +20,17 @@ export const CheckboxButton = ({
 	style,
 	...props
 }: CheckboxButtonProps) => {
-	const componentClassName = useComponentClassName('checkbox-button')
+	const componentClassName = useClassNameFactory('checkbox-button')
 
-	return (
-		<span
-			id={id}
-			className={classNames(
-				componentClassName,
-				toStateClass('checked', checked === true),
-				toStateClass('indeterminate', indeterminate),
-				useInputClassName(props),
-			)}
-			children={indeterminate
-				? <span aria-hidden="true" className={`${componentClassName}-questionmark`}>?</span>
-				: undefined}
-			style={style}
-		/>
-	)
+	return <span
+		id={id}
+		className={componentClassName(null, [
+			toStateClass('checked', checked === true),
+			toStateClass('indeterminate', indeterminate),
+			useInputClassName(props),
+		])}
+		children={indeterminate
+			? <span aria-hidden="true" className={componentClassName('questionmark')}>?</span>
+			: undefined}
+	/>
 }

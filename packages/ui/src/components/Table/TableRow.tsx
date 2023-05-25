@@ -1,6 +1,5 @@
-import classNames from 'classnames'
+import { useClassName } from '@contember/utilities'
 import { memo, ReactNode, useCallback, useContext } from 'react'
-import { useComponentClassName } from '../../auxiliary'
 import type { Justification } from '../../types'
 import { toEnumViewClass, toFeatureClass, toStateClass } from '../../utils'
 import { UseTableElementContext } from './Table'
@@ -18,18 +17,17 @@ export interface TableRowProps {
  */
 export const TableRow = memo(({ active, children, id, justification, onClick: onClickProp }: TableRowProps) => {
 	const useTableElement = useContext(UseTableElementContext)
-	const className = classNames(
-		useComponentClassName('table-row'),
+	const className = useClassName('table-row', [
 		toEnumViewClass(justification),
 		toFeatureClass('hover', !!onClickProp),
 		toFeatureClass('press', !!onClickProp),
 		toStateClass('active', active),
-	)
+	])
 
 	const onClick = useCallback(() => {
-			if (id !== undefined) {
-				onClickProp?.(id)
-			}
+		if (id !== undefined) {
+			onClickProp?.(id)
+		}
 	}, [id, onClickProp])
 
 	if (useTableElement) {

@@ -1,6 +1,5 @@
-import classNames from 'classnames'
+import { useClassName } from '@contember/utilities'
 import { memo } from 'react'
-import { useClassNamePrefix } from '../../auxiliary'
 import { HTMLDivElementProps, Size } from '../../types'
 import { toEnumViewClass } from '../../utils'
 
@@ -15,14 +14,11 @@ export type SpacerProps =
  * @group UI
  */
 export const Spacer = memo(({ className, gap, ...rest }: SpacerProps) => {
-	const componentClassName = `${useClassNamePrefix()}spacer`
-
 	return <div
-		className={classNames(
-			componentClassName,
+		className={useClassName('spacer', [
 			toEnumViewClass(gap),
 			className,
-		)}
+		])}
 		{...rest}
 	/>
 })

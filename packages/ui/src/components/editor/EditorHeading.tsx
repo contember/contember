@@ -1,8 +1,7 @@
-import cn from 'classnames'
+import { useClassName } from '@contember/utilities'
 import { createElement, ReactNode } from 'react'
-import { useClassNamePrefix } from '../../auxiliary'
-import { toViewClass } from '../../utils'
 import { HTMLHeadingElementProps } from '../../types'
+import { toViewClass } from '../../utils'
 
 export interface EditorHeadingProps {
 	level: 1 | 2 | 3 | 4 | 5 | 6
@@ -13,7 +12,6 @@ export interface EditorHeadingProps {
 }
 
 export function EditorHeading({ level, isNumbered, attributes, align, children }: EditorHeadingProps) {
-	const prefix = useClassNamePrefix()
 	return createElement(
 		`h${level}` as 'h1', // Casting just to type-check the rest better.
 		{
@@ -21,7 +19,7 @@ export function EditorHeading({ level, isNumbered, attributes, align, children }
 			style: {
 				textAlign: align,
 			},
-			className: cn(`${prefix}editorHeading`, toViewClass('numbered', isNumbered)),
+			className: useClassName('editorHeading', toViewClass('numbered', isNumbered)),
 		},
 		children,
 	)

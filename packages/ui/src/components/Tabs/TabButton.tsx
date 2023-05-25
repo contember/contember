@@ -1,10 +1,9 @@
-import classNames from 'classnames'
+import { useClassNameFactory } from '@contember/utilities'
 import { forwardRef, memo, ReactNode, useState } from 'react'
 import { useFocus, useFocusVisible } from 'react-aria'
-import { useClassNamePrefix } from '../../auxiliary'
+import { HTMLButtonElementProps } from '../../types'
 import { toStateClass } from '../../utils'
 import { Label } from '../Typography'
-import { HTMLButtonElementProps } from '../../types'
 
 export type TabButtonProps =
 	& {
@@ -23,16 +22,9 @@ export const TabButton = memo(forwardRef<HTMLButtonElement, TabButtonProps>(({
 	children,
 	...rest
 }, ref) => {
-	const prefix = `${useClassNamePrefix()}tab-button`
+	const componentClassName = useClassNameFactory('tab-button')
 	const [isFocused, setIsFocused] = useState(false)
 	const { isFocusVisible } = useFocusVisible()
-
-	const classList = classNames(
-		`${prefix}`,
-		toStateClass('selected', !isDisabled && isSelected),
-		toStateClass('focused', !isDisabled && isFocused && isFocusVisible),
-		toStateClass('disabled', isDisabled),
-	)
 
 	const { focusProps } = useFocus({
 		isDisabled,
@@ -43,14 +35,18 @@ export const TabButton = memo(forwardRef<HTMLButtonElement, TabButtonProps>(({
 		<button
 			{...focusProps}
 			{...rest}
-			className={classList}
+			className={componentClassName(null, [
+				toStateClass('selected', !isDisabled && isSelected),
+				toStateClass('focused', !isDisabled && isFocused && isFocusVisible),
+				toStateClass('disabled', isDisabled),
+			])}
 			ref={ref}
 			disabled={isDisabled}
 		>
-  			<span className={`${prefix}-label`}>
+			<span className={componentClassName('label')}>
 				{typeof children === 'string'
-	  			? <Label isActive={isSelected} isDisabled={isDisabled} isFocused={isFocused && isFocusVisible}>{children}</Label>
-	  			: children}
+					? <Label isActive={isSelected} isDisabled={isDisabled} isFocused={isFocused && isFocusVisible}>{children}</Label>
+					: children}
 			</span>
 		</button>
 	)

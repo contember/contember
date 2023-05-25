@@ -1,6 +1,8 @@
+// @ts-check
 import react from '@vitejs/plugin-react'
 import { Readable } from 'stream'
 import { defineConfig } from 'vite'
+import { entries } from '../../../../../build/packageList'
 import { initContemberProjectDev } from '../utils'
 
 const packagesDir = __dirname + '/../../../..'
@@ -23,18 +25,10 @@ export default defineConfig({
 		},
 	},
 	resolve: {
-		alias: [
-			{ find: '@contember/admin', replacement: `${packagesDir}/admin/src` },
-			{ find: '@contember/admin-i18n', replacement: `${packagesDir}/admin-i18n/src` },
-			{ find: '@contember/admin-sandbox', replacement: `${packagesDir}/admin-sandbox/src` },
-			{ find: '@contember/binding', replacement: `${packagesDir}/binding/src` },
-			{ find: '@contember/client', replacement: `${packagesDir}/client/src` },
-			{ find: '@contember/react-client', replacement: `${packagesDir}/react-client/src` },
-			{ find: '@contember/react-multipass-rendering', replacement: `${packagesDir}/react-multipass-rendering/src` },
-			{ find: '@contember/react-utils', replacement: `${packagesDir}/react-utils/src` },
-			{ find: '@contember/ui', replacement: `${packagesDir}/ui/src` },
-			{ find: '@contember/vimeo-file-uploader', replacement: `${packagesDir}/vimeo-file-uploader/src` },
-		],
+		alias: entries.map(([packageName, packagePath]) => ({
+			find: `@contember/${packageName}`,
+			replacement: `${packagesDir}/${packageName}/src`,
+		})),
 	},
 	preview: {
 		port: 3333,
@@ -47,7 +41,11 @@ export default defineConfig({
 	plugins: [react(), {
 		name: 'initContemberProject',
 		configureServer(server) {
-			async function toJson(stream: Readable) {
+			/**
+			 * @param {Readable} stream
+			 * @returns {Promise<import('@contember/schema').Schema>}
+			 **/
+			async function toJson(stream) {
 				const chunks = []
 				for await (const chunk of stream) chunks.push(chunk)
 				return JSON.parse(Buffer.concat(chunks).toString())

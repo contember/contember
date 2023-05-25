@@ -1,7 +1,6 @@
-import classNames from 'classnames'
+import { useClassName } from '@contember/utilities'
 import { forwardRef, memo, useCallback } from 'react'
 import { mergeProps } from 'react-aria'
-import { useComponentClassName } from '../../../auxiliary'
 import { toViewClass } from '../../../utils'
 import { useTextBasedInput } from '../Hooks'
 import type { NumberInputProps } from './Types'
@@ -21,12 +20,10 @@ export const NumberInput = memo(forwardRef<HTMLInputElement, NumberInputProps>((
 }, forwardedRed) => {
 	const props = useTextBasedInput<HTMLInputElement>({
 		...outerProps,
-		className: classNames(
-			useComponentClassName('text-input'),
-			useComponentClassName('number-input'),
+		className: useClassName(['text-input', 'number-input'], [
 			toViewClass('withTopToolbar', withTopToolbar),
 			className,
-		),
+		]),
 		defaultValue: defaultValue?.toString(10),
 		max: max?.toString(10),
 		min: min?.toString(10),

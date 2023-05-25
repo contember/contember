@@ -5581,7 +5581,7 @@ export * from "@contember/ui";
 // src/components/bindingFacade/richText/blockEditor/embed/index.ts:5:27 - (ae-forgotten-export) The symbol "VimeoEmbedHandler" needs to be exported by the entry point index.d.ts
 // src/components/bindingFacade/richText/blockEditor/embed/index.ts:5:27 - (ae-forgotten-export) The symbol "SoundCloudEmbedHandler" needs to be exported by the entry point index.d.ts
 // src/components/bindingFacade/richText/blockEditor/embed/index.ts:5:27 - (ae-forgotten-export) The symbol "SpotifyEmbedHandler" needs to be exported by the entry point index.d.ts
-// src/components/bindingFacade/richText/blockEditor/templating/getEditorTemplate.tsx:16:4 - (ae-forgotten-export) The symbol "EditorTemplateAtom" needs to be exported by the entry point index.d.ts
+// src/components/bindingFacade/richText/blockEditor/templating/getEditorTemplate.tsx:16:3 - (ae-forgotten-export) The symbol "EditorTemplateAtom" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

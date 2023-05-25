@@ -1,6 +1,5 @@
-import cn from 'classnames'
-import { useCallback, memo, forwardRef } from 'react'
-import { useComponentClassName } from '../../auxiliary'
+import { useClassName, useClassNameFactory } from '@contember/utilities'
+import { forwardRef, memo, useCallback } from 'react'
 import type { HoveringToolbarScope } from '../../types'
 import { toEnumViewClass, toStateClass, toViewClass } from '../../utils'
 import { Dropdown, DropdownProps } from '../Dropdown'
@@ -34,7 +33,7 @@ export interface EditorToolbarProps {
 }
 
 function ButtonOrDropdown(props: ToolbarButtonOrDropdown & WithPopupProps) {
-	const className = useComponentClassName('editorToolbar-button')
+	const className = useClassName('editorToolbar-button')
 	const renderToggle = useCallback<Exclude<DropdownProps['renderToggle'], undefined>>(
 		({ ref, onClick }) => {
 			return (
@@ -66,7 +65,7 @@ function ButtonOrDropdown(props: ToolbarButtonOrDropdown & WithPopupProps) {
 		)
 	}
 	return (
-		<div className={cn(className)}>
+		<div className={className}>
 			<EditorToolbarButton {...props} />
 		</div>
 	)
@@ -81,6 +80,8 @@ export const EditorToolbar = memo(forwardRef<HTMLDivElement, EditorToolbarProps>
 }, ref) => {
 	layout = layout ?? 'bar'
 	const buttonLayout = layout === 'list' ? 'list' : 'grid'
+	const componentClassName = useClassNameFactory('editorToolbar')
+
 	if (restGroups) {
 		switch (layout) {
 			case 'grid':
@@ -89,20 +90,19 @@ export const EditorToolbar = memo(forwardRef<HTMLDivElement, EditorToolbarProps>
 				restGroups = undefined
 		}
 	}
-	const groupClassName = useComponentClassName('editorToolbar-group')
+
 	return (
 		<div
-			className={cn(
-				useComponentClassName('editorToolbar'),
+			className={componentClassName(null, [
 				toStateClass('active', isActive),
 				toEnumViewClass(scope),
 				toViewClass(`layout-${layout}`, true),
-			)}
+			])}
 			ref={ref}
 		>
-			<div className={cn(useComponentClassName('editorToolbar-groups'))}>
+			<div className={componentClassName('groups')}>
 				{groups.map((g, i) => (
-					<div key={i} className={cn(groupClassName)}>
+					<div key={i} className={componentClassName('group')}>
 						{g.buttons.map((b, i) => (
 							<ButtonOrDropdown
 								key={i}
@@ -119,7 +119,7 @@ export const EditorToolbar = memo(forwardRef<HTMLDivElement, EditorToolbarProps>
 					</div>
 				))}
 				{restGroups && !!restGroups.length && (
-					<div className={cn(groupClassName, 'view-rest')}>
+					<div className={componentClassName('group', 'view-rest')}>
 						<ButtonOrDropdown
 							label="More…"
 							contemberIcon="ellipsis"

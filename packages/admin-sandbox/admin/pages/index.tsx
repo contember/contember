@@ -26,7 +26,7 @@ import {
 } from '@contember/admin'
 import { DataGridTile } from '../components/DataGridTile'
 import { Title } from '../components/Directives'
-import { Actions, ContentStack } from '../components/Slots'
+import { Slots } from '../components/Slots'
 
 const GalleryItemTile = Component(({ onClick, selectedEntityIds }: {
 	onClick?: (entity: EntityAccessor) => void
@@ -159,9 +159,9 @@ export default () => (
 	<EditScope entity="UploadShowcase(unique = One)" setOnCreate="(unique = One)">
 		<Title>Welcome to Contember!</Title>
 
-		<Actions><PersistButton /></Actions>
+		<Slots.Actions><PersistButton /></Slots.Actions>
 
-		<ContentStack>
+		<Slots.ContentStack>
 			<Link to="second">GO TO SECOND &rarr;</Link>
 			<ImageUploadField urlField="singleTrivialImage.url" label="Trivial image" />
 
@@ -360,6 +360,6 @@ export default () => (
 				>
 				</VideoFiles>
 			</FileRepeater>
-		</ContentStack>
+		</Slots.ContentStack>
 	</EditScope>
 )

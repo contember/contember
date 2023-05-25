@@ -1,5 +1,5 @@
+import { useClassNameFactory } from '@contember/utilities'
 import type { FunctionComponent, ReactNode } from 'react'
-import { useClassNamePrefix } from '../../../auxiliary'
 import { ProgressBar } from '../../ProgressBar'
 import { Spinner } from '../../Spinner'
 
@@ -19,29 +19,29 @@ export const UploadProgress: FunctionComponent<UploadProgressProps> = ({
 	progress,
 	formatProgressMessage = defaultFormatProgressMessage,
 }: UploadProgressProps) => {
-	const prefix = useClassNamePrefix()
+	const componentClassName = useClassNameFactory('uploadProgress')
 
 	const renderNumericProgress = (progress: number) => {
 		const clampedProgress = Math.max(0, Math.min(progress ?? 0, 1))
 
 		return (
 			<>
-				<div className={`${prefix}uploadProgress-progress`}>
+				<div className={componentClassName('progress')}>
 					<ProgressBar progress={clampedProgress} />
 				</div>
-				<div className={`${prefix}uploadProgress-message`}>
-					<div className={`${prefix}uploadProgress-message-stabilizer`}>{formatProgressMessage(1)}</div>
-					<div className={`${prefix}uploadProgress-message-real`}>{formatProgressMessage(clampedProgress)}</div>
+				<div className={componentClassName('message')}>
+					<div className={componentClassName('message-stabilizer')}>{formatProgressMessage(1)}</div>
+					<div className={componentClassName('message-real')}>{formatProgressMessage(clampedProgress)}</div>
 				</div>
 			</>
 		)
 	}
-	const renderStringProgress = (progress: string) => <div className={`${prefix}uploadProgress-message`}>{progress}</div>
+	const renderStringProgress = (progress: string) => <div className={componentClassName('message')}>{progress}</div>
 
 	return (
-		<div className={`${prefix}uploadProgress`}>
+		<div className={componentClassName()}>
 			{(progress === undefined || typeof progress === 'string') && (
-				<div className={`${prefix}uploadProgress-indeterminate`}>
+				<div className={componentClassName('indeterminate')}>
 					<Spinner />
 				</div>
 			)}

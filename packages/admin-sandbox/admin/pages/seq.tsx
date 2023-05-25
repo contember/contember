@@ -13,16 +13,16 @@ import {
 	TextField,
 } from '@contember/admin'
 import { Title } from '../components/Directives'
-import { Actions, Content, ContentStack } from '../components/Slots'
+import { Slots } from '../components/Slots'
 
 export const list = (
 	<>
 		<Title>List of Seqs</Title>
-		<Actions>
+		<Slots.Actions>
 			<LinkButton to={'seq/create'}>New entity</LinkButton>
-		</Actions>
+		</Slots.Actions>
 
-		<Content>
+		<Slots.Content>
 			<DataGrid entities={'SeqEntity'}>
 				<TextCell field={'value'} />
 				<GenericCell canBeHidden={false} justification="justifyEnd">
@@ -30,7 +30,7 @@ export const list = (
 					<DeleteEntityButton title="Delete" immediatePersist={true} />
 				</GenericCell>
 			</DataGrid>
-		</Content>
+		</Slots.Content>
 	</>
 )
 
@@ -38,11 +38,11 @@ export const create = (
 	<>
 		<Title>Create a new Seq</Title>
 		<CreateScope entity="SeqEntity" redirectOnSuccess="seq/edit(id: $entity.id)">
-			<Actions><PersistButton /></Actions>
+			<Slots.Actions><PersistButton /></Slots.Actions>
 
-			<ContentStack>
+			<Slots.ContentStack>
 				<TextField field={'value'} label={'Value'} />
-			</ContentStack>
+			</Slots.ContentStack>
 		</CreateScope>
 	</>
 )
@@ -54,14 +54,14 @@ export const edit = (
 				<Title>{`Edit ${title.getAccessor().value ? title.getAccessor().value : 'Article'}`}</Title>
 			)} />
 
-			<Actions><PersistButton /></Actions>
+			<Slots.Actions><PersistButton /></Slots.Actions>
 
-			<ContentStack>
+			<Slots.ContentStack>
 				<TextField field={'value'} label={'Value'} />
 				<Repeater field={'sub'} label={'Sub'} orderBy={undefined}>
 					<TextField field={'value'} label={'Value sub'} />
 				</Repeater>
-			</ContentStack>
+			</Slots.ContentStack>
 		</EditScope>
 	</>
 )

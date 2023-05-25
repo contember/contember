@@ -1,15 +1,14 @@
 import { IconName as BPIconName, IconSvgPaths16 } from '@blueprintjs/icons'
-import cn from 'classnames'
+import { useClassNameFactory } from '@contember/utilities'
 import {
 	CSSProperties,
+	ReactElement,
+	MouseEvent as ReactMouseEvent,
+	RefCallback,
 	forwardRef,
 	memo,
-	MouseEvent as ReactMouseEvent,
-	ReactElement,
-	RefCallback,
 	useMemo,
 } from 'react'
-import { useClassNamePrefix } from '../../auxiliary'
 import type { IconSize } from '../../types'
 import { toEnumViewClass, toViewClass } from '../../utils'
 import * as ContemberIcons from './contemberIcons'
@@ -43,40 +42,46 @@ const renderSvgPaths = (pathStrings: string[] | undefined): JSX.Element[] | null
  * @group UI
  */
 export const Icon = memo(forwardRef<HTMLElement, IconProps>(function Icon(props, ref) {
-	const prefix = useClassNamePrefix()
+	const componentClassName = useClassNameFactory('icon')
+	const svgClassName: string = props.blueprintIcon
+		? componentClassName('blueprintSvg')
+		: componentClassName('contemberSvg')
+
 	const icon: ReactElement | null = useMemo(() => {
 		if (props.customIcon && !Array.isArray(props.customIcon)) {
 			return props.customIcon
 		}
+
 		let pathStrings: string[] | undefined
-		let svgClassName: string
+
 		if (props.blueprintIcon) {
 			pathStrings = IconSvgPaths16[props.blueprintIcon]
-			svgClassName = `${prefix}icon-blueprintSvg`
 		} else if (props.contemberIcon) {
 			pathStrings = ContemberIcons[props.contemberIcon]
-			svgClassName = `${prefix}icon-contemberSvg`
 		} else {
-			// TODO if __DEV__
-			console.warn('Icon: trying to render without an icon source.')
+			if (import.meta.env.DEV) {
+				console.warn('Icon: trying to render without an icon source.')
+			}
+
 			return null
 		}
+
 		const svgPaths = renderSvgPaths(pathStrings)
+
 		return (
 			<svg viewBox="0 0 16 16" className={svgClassName}>
 				{props.title && <desc>{props.title}</desc>}
 				{svgPaths}
 			</svg>
 		)
-	}, [prefix, props])
+	}, [props.blueprintIcon, props.contemberIcon, props.customIcon, props.title, svgClassName])
 
 	return (
 		<div
-			className={cn(
-				`${prefix}icon`,
+			className={componentClassName(null, [
 				toEnumViewClass(props.size),
 				toViewClass('alignWithLowercase', props.alignWithLowercase),
-			)}
+			])}
 			style={props.style}
 			ref={ref as RefCallback<HTMLDivElement>}
 			onClick={props.onClick}

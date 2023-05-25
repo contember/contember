@@ -1,6 +1,3 @@
-import { MutableRefObject, useCallback } from 'react'
-import { assertNever } from '../../../../../utils'
-import { Editor, Element, Operation } from 'slate'
 import {
 	EntityAccessor,
 	EntityId,
@@ -10,6 +7,9 @@ import {
 	useDesugaredRelativeEntityList,
 	useDesugaredRelativeSingleField,
 } from '@contember/binding'
+import { assertNever } from '@contember/utilities'
+import { MutableRefObject, useCallback } from 'react'
+import { Editor, Element, Operation } from 'slate'
 import { useGetParentEntityRef } from '../useGetParentEntityRef'
 import { BlockElementCache } from './useBlockElementCache'
 

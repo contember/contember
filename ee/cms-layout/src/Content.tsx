@@ -1,5 +1,5 @@
 import { Layout } from '@contember/layout'
-import { classNameForFactory, isNonNegativeNumber } from '@contember/utilities'
+import { isNonNegativeNumber, useClassName } from '@contember/utilities'
 import { memo } from 'react'
 import { PANEL_CONTENT_BASIS, PANEL_CONTENT_MAX_WIDTH, PANEL_CONTENT_MIN_WIDTH } from './Constants'
 import { CMSLayoutContentProps } from './Types'
@@ -13,14 +13,12 @@ export const Content = memo<CMSLayoutContentProps>(({
 	minWidth,
 	panelName,
 }) => {
-	const classNameFor = classNameForFactory(componentClassName, className)
-
 	return (
 		<Layout.Panel
 			basis={basis ?? PANEL_CONTENT_BASIS}
 			minWidth={minWidth ?? PANEL_CONTENT_MIN_WIDTH}
 			maxWidth={isNonNegativeNumber(maxWidth) ? maxWidth : null}
-			className={classNameFor()}
+			className={useClassName(componentClassName, className)}
 			defaultBehavior="static"
 			defaultVisibility="visible"
 			name={panelName}

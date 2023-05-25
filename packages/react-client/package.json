@@ -27,7 +27,8 @@
 		"ae:test": "api-extractor run"
 	},
 	"dependencies": {
-		"@contember/client": "workspace:*"
+		"@contember/client": "workspace:*",
+		"@contember/utilities": "workspace:*"
 	},
 	"peerDependencies": {
 		"react": "^17 || ^18"

@@ -1,41 +1,45 @@
-import { ReactNode, useEffect, useMemo, useState } from 'react'
+import { Button, DevPanel, Link, Stack } from '@contember/admin'
+import { Identity2023 } from '@contember/brand'
+import { useDocumentTitle } from '@contember/layout'
+import { PropsWithChildren, useState } from 'react'
 import { Directive, useDirectives } from './Directives'
-import * as Layouts from './Layouts'
-import { TitleSlot } from './Slots'
-import { Button, DevPanel } from '@contember/admin'
+import { LayoutType, Layouts } from './Layouts'
+import { Navigation } from './Navigation'
+import { Slots } from './Slots'
 
-const types = Object.keys(Layouts) as ReadonlyArray<keyof typeof Layouts>
-export type LayoutTypes = typeof types[number]
+export const Layout = (props: PropsWithChildren) => {
+	const directives = useDirectives()
+	useDocumentTitle(directives.title)
 
-export const BREAKPOINT = 768
-
-
-export const Layout = (props: {
-	children?: ReactNode;
-}) => {
-	const initialTitle = useMemo(() => document.title, [])
-
-	const { layout, title } = useDirectives()
-	const LayoutComponent = Layouts[layout ?? 'default']
-	useEffect(() => {
-		if (title) {
-			document.title = `${title} / ${initialTitle}`
-		} else {
-			document.title = initialTitle
-		}
-	}, [initialTitle, title])
+	const LayoutComponent = Layouts[directives.layout ?? 'default']
 
 	return (
 		<>
-			<TitleSlot><h1>{title}</h1></TitleSlot>
+			<Slots.Title>
+				<h1>{directives.title}</h1>
+			</Slots.Title>
+
+			<Slots.Logo>
+				<Link to="index">
+					<Stack align="center" direction="horizontal" gap="small">
+						<Identity2023.Edit scale={2} /> Contember
+					</Stack>
+				</Link>
+			</Slots.Logo>
+
+			<Slots.Navigation>
+				<Navigation />
+			</Slots.Navigation>
+
 			<LayoutComponent />
+
 			{props.children}
 		</>
 	)
 }
 
 export const LayoutDevPanel = () => {
-	const [typeState, setTypeState] = useState<LayoutTypes>()
+	const [typeState, setTypeState] = useState<LayoutType>()
 	const [counter, setCounter] = useState(1)
 	const { layout } = useDirectives()
 	return (
@@ -52,6 +56,3 @@ export const LayoutDevPanel = () => {
 		</>
 	)
 }
-
-Layout.types = types
-Layout.breakpoint = BREAKPOINT

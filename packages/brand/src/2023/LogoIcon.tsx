@@ -1,5 +1,5 @@
 import { useExpectSameValueReference } from '@contember/react-utils'
-import { listClassName, svgSizeProps } from '@contember/utilities'
+import { svgSizeProps, useClassName } from '@contember/utilities'
 import { CSSProperties, memo, useMemo } from 'react'
 import type { ContemberIdentitySvgProps } from '../Types'
 
@@ -24,7 +24,7 @@ export const LogoIcon = memo<Omit<ContemberIdentitySvgProps, 'strokeWidth'>>(({
 
 	return (
 		<svg
-			className={listClassName(['cui-brand-icon', 'cui-brand-logo-icon', className])}
+			className={useClassName(['brand-icon', 'brand-logo-icon'], className)}
 			style={useMemo(() => ({
 				'--scale': scale,
 				'--aspect-ratio': aspectRatio === 1 ? undefined : aspectRatio,

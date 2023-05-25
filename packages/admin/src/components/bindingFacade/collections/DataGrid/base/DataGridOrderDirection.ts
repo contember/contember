@@ -1,4 +1,4 @@
-import { assertNever } from '../../../../../utils'
+import { assertNever } from '@contember/utilities'
 
 export type DataGridOrderDirection = 'asc' | 'desc' | null
 

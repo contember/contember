@@ -1,4 +1,4 @@
-import cn from 'classnames'
+import { listClassName } from '@contember/utilities'
 import { InputHTMLAttributes, PureComponent } from 'react'
 
 export interface InputGroupProps {
@@ -10,7 +10,7 @@ export class InputGroup extends PureComponent<InputGroupProps & InputHTMLAttribu
 		const { large, children, ...rest } = this.props
 
 		return (
-			<div className={cn('inputGroup', large && 'view-large')}>
+			<div className={listClassName(['inputGroup', large && 'view-large'])}>
 				<input className="inputGroup-text" {...rest} />
 			</div>
 		)

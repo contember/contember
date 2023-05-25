@@ -639,6 +639,9 @@ export function useDirectiveLifeCycle<T>(key: string, value: T, registry: SetDir
 export function useDirectiveProviderRegistry<T extends Record<string, unknown>>(value: T): [SetDirectiveContextType<T>, T];
 
 // @public (undocumented)
+export function useDocumentTitle(title: string | null | undefined, formatter?: (title: string, initialTitle: string) => string): void;
+
+// @public (undocumented)
 export function useElementInsetCustomProperties(elementRef: RefObject<HTMLElement>, prefix?: string): CSSProperties | undefined;
 
 // @public (undocumented)

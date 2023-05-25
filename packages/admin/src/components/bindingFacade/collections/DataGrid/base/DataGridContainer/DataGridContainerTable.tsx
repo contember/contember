@@ -1,14 +1,15 @@
 import { Entity, EntityId } from '@contember/binding'
-import { Table, TableCell, TableRow, useComponentClassName } from '@contember/ui'
+import { Table, TableCell, TableRow } from '@contember/ui'
+import { useClassName } from '@contember/utilities'
 import { memo, useMemo } from 'react'
 import { useMessageFormatter } from '../../../../../../i18n'
 import { EmptyMessage } from '../../../helpers'
-import { dataGridDictionary } from '../dataGridDictionary'
 import { DataGridHeaderCell } from '../DataGridHeaderCell'
+import { dataGridDictionary } from '../dataGridDictionary'
 import { getColumnFilter } from '../getColumnFilter'
 import type { DataGridContainerProps } from './Types'
 
-type DataGridContainerTableProps=
+type DataGridContainerTableProps =
 	Pick<DataGridContainerProps,
 		| 'accessor'
 		| 'desiredState'
@@ -55,7 +56,7 @@ export const DataGridContainerTable = memo<DataGridContainerTableProps>(({
 
 	return (
 		<Table
-			className={useComponentClassName('data-grid-body-content--table')}
+			className={useClassName('data-grid-body-content--table')}
 			tableHead={
 				<TableRow>
 					{Array.from(columns)

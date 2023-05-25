@@ -1,6 +1,5 @@
-import classNames from 'classnames'
+import { useClassName } from '@contember/utilities'
 import { memo } from 'react'
-import { useClassNamePrefix } from '../../auxiliary'
 import { LayoutChrome, LayoutChromeProps } from './LayoutChrome'
 
 export interface LayoutProps extends LayoutChromeProps {
@@ -44,14 +43,8 @@ export const Layout = memo(({
 	titleThemeContent,
 	titleThemeControls,
 }: LayoutProps) => {
-	const prefix = useClassNamePrefix()
-	const classList = classNames(
-		`${prefix}layout`,
-		className,
-	)
-
 	return (
-		<div className={classList}>
+		<div className={useClassName('layout', className)}>
 			<LayoutChrome
 				sidebarHeader={sidebarHeader}
 				sidebarFooter={sidebarFooter}

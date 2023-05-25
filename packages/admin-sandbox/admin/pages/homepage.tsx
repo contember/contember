@@ -2,19 +2,19 @@ import { EditScope, PersistButton } from '@contember/admin'
 import { AddContent } from '../components/AddContent'
 import { ContentField } from '../components/ContentField'
 import { Title } from '../components/Directives'
-import { Actions, ContentStack } from '../components/Slots'
+import { Slots } from '../components/Slots'
 
 export default (
 	<EditScope entity="Homepage(unique = One)" setOnCreate="(unique = One)">
 		<Title>Home Page</Title>
 
-		<Actions>
+		<Slots.Actions>
 			<PersistButton />
-		</Actions>
+		</Slots.Actions>
 
-		<ContentStack>
+		<Slots.ContentStack>
 			<ContentField field="content" />
 			<AddContent field="content" />
-		</ContentStack>
+		</Slots.ContentStack>
 	</EditScope>
 )

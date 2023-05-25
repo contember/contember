@@ -1,6 +1,5 @@
-import cn from 'classnames'
+import { useClassName } from '@contember/utilities'
 import { HTMLAttributes, memo, ReactNode } from 'react'
-import { useClassNamePrefix } from '../../../auxiliary'
 import { toEnumViewClass } from '../../../utils'
 
 export interface EditorTableCellElementProps {
@@ -20,16 +19,14 @@ export const EditorTableCellElement = memo(function EditorTableCellElement({
 	justify,
 	headerScope,
 }: EditorTableCellElementProps) {
-	const prefix = useClassNamePrefix()
 	return (
 		<div
 			{...attributes}
-			className={cn(
+			className={useClassName('editorTable-cell', [
 				attributes.className,
-				`${prefix}editorTable-cell`,
 				toEnumViewClass(justify ? `justify-${justify}` : undefined),
 				toEnumViewClass(headerScope ? `headerScope-${headerScope}` : undefined),
-			)}
+			])}
 		>
 			{children}
 		</div>

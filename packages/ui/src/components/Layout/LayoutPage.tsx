@@ -1,6 +1,5 @@
-import classNames from 'classnames'
+import { useClassNameFactory } from '@contember/utilities'
 import { CSSProperties, memo, ReactNode, useEffect, useMemo, useRef, useState } from 'react'
-import { useClassNamePrefix } from '../../auxiliary'
 import { toEnumClass, toSchemeClass, toThemeClass } from '../../utils'
 import { SectionTabs, useSectionTabs } from '../SectionTabs'
 import { TitleBar, TitleBarProps } from '../TitleBar'
@@ -36,7 +35,7 @@ export const LayoutPage = memo(({
 	title,
 	...props
 }: LayoutPageProps) => {
-	const prefix = useClassNamePrefix()
+	const componentClassName = useClassNameFactory('layout-page')
 	const {
 		scheme,
 		theme,
@@ -74,29 +73,29 @@ export const LayoutPage = memo(({
 		}
 	}, [])
 
-	return <div className={classNames(
-		`${prefix}layout-page`,
-		toThemeClass(themeContent ?? theme, themeControls ?? theme),
-		toSchemeClass(scheme),
-	)}>
-		{(title || actions) && <TitleBar after={afterTitle === undefined ? hasTabs ? <SectionTabs /> : undefined : afterTitle} navigation={navigation} actions={actions} headingProps={headingProps}>
-			{title}
-		</TitleBar>}
-		<div
-			ref={contentRef}
-			className={classNames(
-				`${prefix}layout-page-content-wrap`,
-				toEnumClass('fit-', fit),
-				showDivider ? 'view-aside-divider' : undefined,
-			)}
-			style={useMemo(() => ({ '--cui-content-offset-top': `${contentOffsetTop}px` } as CSSProperties), [contentOffsetTop])}
-		>
-			<LayoutPageContent pageContentLayout={pageContentLayout ?? layout}>
-				{children}
-			</LayoutPageContent>
-			{side && <LayoutPageAside>{side}</LayoutPageAside>}
+	return (
+		<div className={componentClassName(null, [
+			toThemeClass(themeContent ?? theme, themeControls ?? theme),
+			toSchemeClass(scheme),
+		])}>
+			{(title || actions) && <TitleBar after={afterTitle === undefined ? hasTabs ? <SectionTabs /> : undefined : afterTitle} navigation={navigation} actions={actions} headingProps={headingProps}>
+				{title}
+			</TitleBar>}
+			<div
+				ref={contentRef}
+				className={componentClassName('content-wrap', [
+					toEnumClass('fit-', fit),
+					showDivider ? 'view-aside-divider' : undefined,
+				])}
+				style={useMemo(() => ({ '--cui-content-offset-top': `${contentOffsetTop}px` } as CSSProperties), [contentOffsetTop])}
+			>
+				<LayoutPageContent pageContentLayout={pageContentLayout ?? layout}>
+					{children}
+				</LayoutPageContent>
+				{side && <LayoutPageAside>{side}</LayoutPageAside>}
+			</div>
 		</div>
-	</div>
+	)
 })
 
 LayoutPage.displayName = 'LayoutPage'

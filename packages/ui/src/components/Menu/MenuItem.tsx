@@ -1,8 +1,8 @@
 import { useSessionStorageState } from '@contember/react-utils'
-import classNames from 'classnames'
+import { useClassNameFactory } from '@contember/utilities'
 import { SyntheticEvent, useCallback, useContext, useEffect, useMemo, useRef } from 'react'
 import { useNavigationLink } from '../../Navigation'
-import { randomId, useComponentClassName } from '../../auxiliary'
+import { randomId } from '../../auxiliary'
 import { toStateClass, useChildrenAsLabel } from '../../utils'
 import { Collapsible } from '../Collapsible'
 import { usePreventCloseContext } from '../PreventCloseContext'
@@ -27,7 +27,7 @@ export function MenuItem<T = unknown>({ children, ...props }: MenuItemProps<T>) 
 	const label = useChildrenAsLabel(props.title)
 
 	const menuItemId = `cui-menu-item-${depth}-${href ?? label}`
-	const componentClassName = useComponentClassName(depth === 0 ? 'menu-section' : 'menu-group')
+	const componentClassName = useClassNameFactory(depth === 0 ? 'menu-section' : 'menu-group')
 
 	const listItemRef = useRef<HTMLLIElement>(null)
 	const listItemTitleRef = useRef<HTMLDivElement>(null)
@@ -102,28 +102,29 @@ export function MenuItem<T = unknown>({ children, ...props }: MenuItemProps<T>) 
 
 	const onKeyPress = useKeyNavigation({ changeExpand, expanded, depth, isInteractive, listItemRef, onClick: onLabelClick })
 
+	const submenuClassName = componentClassName('list', [
+		hasSubItems && (expanded ? 'is-expanded' : 'is-collapsed'),
+	])
+
 	const submenu = useMemo(
 		() => {
 			const ul = (
 				<ul
 					aria-labelledby={isInteractive ? id.current : undefined}
-					className={classNames(
-						`${componentClassName}-list`,
-						hasSubItems && (expanded ? 'is-expanded' : 'is-collapsed'),
-					)}
+					className={submenuClassName}
 				>
 					{children}
 				</ul>
 			)
 			return isInteractive ? <Collapsible expanded={expanded}>{ul}</Collapsible> : ul
 		},
-		[children, componentClassName, expanded, hasSubItems, isInteractive],
+		[children, expanded, isInteractive, submenuClassName],
 	)
 
 	const warnAboutA11YIssues = import.meta.env.DEV && depth !== 0
 
 	if (warnAboutA11YIssues && !label) {
-		console.warn('Accesibility issue: All submenu items should provide a title.')
+		console.warn('Accessibility issue: All submenu items should provide a title.')
 	}
 
 	const interactiveProps = isInteractive ? {
@@ -147,17 +148,16 @@ export function MenuItem<T = unknown>({ children, ...props }: MenuItemProps<T>) 
 					{...interactiveProps}
 					aria-label={label}
 					role={href ? 'link' : undefined}
-					className={classNames(
-						componentClassName,
+					className={componentClassName(null, [
 						hasSubItems && (expanded ? 'is-expanded' : 'is-collapsed'),
 						toStateClass('interactive', isInteractive),
 						toStateClass('active', isActive),
-					)}
+					])}
 					onKeyDown={onKeyPress}
 					tabIndex={tabIndex}
 					aria-disabled={tabIndex === TAB_INDEX_NEVER_FOCUSABLE}
 				>
-					<div ref={listItemTitleRef} className={`${componentClassName}-title`}>
+					<div ref={listItemTitleRef} className={componentClassName('title')}>
 						{isInteractive && <MenuExpandToggle
 							checked={expanded}
 							controls={id.current}
@@ -166,20 +166,20 @@ export function MenuItem<T = unknown>({ children, ...props }: MenuItemProps<T>) 
 						/>}
 						{href
 							? <MenuLink
-								className={`${componentClassName}-title-content`}
+								className={componentClassName('title-content')}
 								external={props.external}
 								href={href}
 								isActive={isActive}
 								onClick={onLabelClick}
 								suppressTo={expanded}
 							>
-								<Label className={`${componentClassName}-title-label`}>{props.title}</Label>
+								<Label className={componentClassName('title-label')}>{props.title}</Label>
 							</MenuLink>
 							: <span
-								className={`${componentClassName}-title-content`}
+								className={componentClassName('title-content')}
 								onClick={onLabelClick}
 							>
-								<Label className={`${componentClassName}-label`}>{props.title}</Label>
+								<Label className={componentClassName('label')}>{props.title}</Label>
 							</span>
 						}
 					</div>

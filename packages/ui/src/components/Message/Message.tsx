@@ -1,6 +1,5 @@
-import cn from 'classnames'
+import { useClassNameFactory } from '@contember/utilities'
 import { memo, ReactNode } from 'react'
-import { useClassNamePrefix } from '../../auxiliary'
 import type { HTMLDivElementProps, Intent, MessageDistinction, MessageFlow, Size } from '../../types'
 import { toEnumViewClass, toThemeClass, toViewClass } from '../../utils'
 
@@ -21,22 +20,21 @@ export type MessageProps =
  * @group UI
  */
 export const Message = memo(({ className, children, intent, size, flow, distinction, type, lifted, action, ...props }: MessageProps) => {
-	const prefix = useClassNamePrefix()
+	const componentClassName = useClassNameFactory('message')
 	return (
 		<div
 			{...props}
-			className={cn(
-				`${prefix}message`,
+			className={componentClassName(null, [
 				toThemeClass(intent, intent),
 				toEnumViewClass(size),
 				toEnumViewClass(distinction),
 				toViewClass('lifted', lifted),
 				toEnumViewClass(flow),
 				className,
-			)}
+			])}
 		>
-			<div className={`${prefix}message-content`}>{children}</div>
-			{action && <div className={`${prefix}message-action`}>{action}</div>}
+			<div className={componentClassName('content')}>{children}</div>
+			{action && <div className={componentClassName('action')}>{action}</div>}
 		</div>
 	)
 })

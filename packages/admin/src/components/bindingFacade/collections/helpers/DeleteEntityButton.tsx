@@ -1,7 +1,7 @@
 import { EntityAccessor, useEntity, useMutationState } from '@contember/binding'
 import { Button, ButtonOwnProps, ButtonProps, Icon, toThemeClass } from '@contember/ui'
-import classNames from 'classnames'
-import { memo, ReactNode, useCallback } from 'react'
+import { listClassName } from '@contember/utilities'
+import { ReactNode, memo, useCallback } from 'react'
 import { usePersistWithFeedback } from '../../../ui'
 
 export type DeleteEntityButtonProps =
@@ -33,7 +33,7 @@ export const DeleteEntityButton = memo((props: DeleteEntityButtonProps) => {
 		parentEntity.deleteEntity()
 
 		if (props.immediatePersist && triggerPersist) {
-			triggerPersist().catch(() => {})
+			triggerPersist().catch(() => { })
 		}
 	}, [triggerPersist, props.immediatePersist, parentEntity])
 
@@ -53,10 +53,10 @@ export const DeleteEntityButton = memo((props: DeleteEntityButtonProps) => {
 			distinction="primary"
 			{...defaultProps}
 			{...rest}
-			className={classNames(
+			className={listClassName([
 				className,
 				toThemeClass(null, 'danger', ':hover'),
-			)}
+			])}
 			disabled={isMutating || rest.disabled}
 			onClick={onClick}
 		>

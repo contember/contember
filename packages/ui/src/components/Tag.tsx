@@ -1,5 +1,5 @@
+import { useClassNameFactory } from '@contember/utilities'
 import { memo, ReactNode } from 'react'
-import { useClassNamePrefix } from '../auxiliary'
 
 export interface TagProps {
 	onRemove?: () => void
@@ -10,12 +10,13 @@ export interface TagProps {
  * @group UI
  */
 export const Tag = memo<TagProps>(({ children, onRemove }) => {
-	const prefix = useClassNamePrefix()
+	const componentClassName = useClassNameFactory('tag')
+
 	return (
-		<span className={`${prefix}tag`}>
-			<span className={`${prefix}tag-text`}>{children}</span>
+		<span className={componentClassName()}>
+			<span className={componentClassName('text')}>{children}</span>
 			{onRemove && (
-				<button type="button" className={`${prefix}tag-remove`} onClick={onRemove}>
+				<button type="button" className={componentClassName('remove')} onClick={onRemove}>
 					×
 				</button>
 			)}

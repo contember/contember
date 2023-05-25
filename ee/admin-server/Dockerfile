@@ -6,6 +6,7 @@ COPY .yarn																						./.yarn
 
 # Enterprise Edition
 COPY ee/admin-server/package.json											./ee/admin-server/package.json
+COPY ee/cms-layout/package.json												./ee/cms-layout/package.json
 
 # Community Edition
 COPY packages/admin/package.json											./packages/admin/package.json

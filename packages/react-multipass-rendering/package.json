@@ -27,6 +27,9 @@
 		"ae:test": "api-extractor run",
 		"test": "vitest"
 	},
+	"dependencies": {
+		"@contember/utilities": "workspace:*"
+	},
 	"peerDependencies": {
 		"react": "^17 || ^18"
 	}

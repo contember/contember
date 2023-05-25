@@ -1,5 +1,5 @@
 import { useExpectSameValueReference } from '@contember/react-utils'
-import { listClassName, svgSizeProps } from '@contember/utilities'
+import { svgSizeProps, useClassName } from '@contember/utilities'
 import { CSSProperties, memo, useMemo } from 'react'
 import type { ContemberIdentitySvgProps } from '../Types'
 
@@ -22,7 +22,7 @@ export const Ember = memo<ContemberIdentitySvgProps>(({
 
 	return (
 		<svg
-			className={listClassName(['cui-brand-icon', 'cui-brand-ember', className])}
+			className={useClassName(['brand-icon', 'brand-ember'], className)}
 			style={useMemo(() => ({ ...style, '--scale': scale } as CSSProperties), [scale, style])}
 			xmlns="http://www.w3.org/2000/svg"
 			{...svgSizeProps(width, height, crop)}

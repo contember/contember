@@ -1,6 +1,5 @@
-import classnames from 'classnames'
+import { useClassNameFactory } from '@contember/utilities'
 import { forwardRef, memo, ReactNode } from 'react'
-import { useClassNamePrefix } from '../../auxiliary'
 import type { BoxDistinction, Default, HTMLDivElementProps, Intent, Size } from '../../types'
 import { toEnumViewClass, toStateClass, toThemeClass } from '../../utils'
 import { Stack, StackProps } from '../Stack'
@@ -45,27 +44,26 @@ export const Box = memo(forwardRef<HTMLDivElement, BoxProps>(({
 	padding,
 	...divProps
 }: BoxProps, ref) => {
-	const componentClassName = `${useClassNamePrefix()}box`
+	const componentClassName = useClassNameFactory('box')
 
 	return (
 		<div
 			{...divProps}
-			className={classnames(
-				componentClassName,
+			className={componentClassName(null, [
 				toStateClass('active', isActive),
 				toEnumViewClass(distinction),
 				toThemeClass(intent, intent),
 				toEnumViewClass(padding),
 				className,
-			)}
+			])}
 			ref={ref}
 		>
 			<Stack gap={gap} direction={direction}>
 				{(heading || actions) && (
-					<div className={`${componentClassName}-header`}>
+					<div className={componentClassName('header')}>
 						{heading && <Label>{heading}</Label>}
 						{actions && (
-							<div className={`${componentClassName}-actions`} contentEditable={false}>
+							<div className={componentClassName('actions')} contentEditable={false}>
 								{actions}
 							</div>
 						)}

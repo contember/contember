@@ -1,6 +1,5 @@
-import cn from 'classnames'
-import { HTMLAttributes, memo, ReactNode } from 'react'
-import { useClassNamePrefix } from '../../../auxiliary'
+import { useClassName } from '@contember/utilities'
+import { HTMLAttributes, ReactNode, memo } from 'react'
 import { toEnumViewClass } from '../../../utils'
 
 export interface EditorTableRowElementProps {
@@ -18,14 +17,12 @@ export const EditorTableRowElement = memo(function EditorTableRowElement({
 	children,
 	headerScope,
 }: EditorTableRowElementProps) {
-	const prefix = useClassNamePrefix()
 	return (
 		<div
 			{...attributes}
-			className={cn(
-				`${prefix}editorTable-row`,
+			className={useClassName('editorTable-row', [
 				toEnumViewClass(headerScope ? `headerScope-${headerScope}` : undefined),
-			)}
+			])}
 		>
 			{children}
 		</div>

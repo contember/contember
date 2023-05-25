@@ -1,6 +1,6 @@
 import { Layout, LayoutPanelState, MenuAutoCloseProvider, useClosePanelOnEscape, useGetLayoutPanelsStateContext, useSetLayoutPanelsStateContext } from '@contember/layout'
 import { useComposeRef, useReferentiallyStableCallback } from '@contember/react-utils'
-import { PolymorphicRef, classNameForFactory } from '@contember/utilities'
+import { PolymorphicRef, useClassName } from '@contember/utilities'
 import { ElementType, forwardRef, memo, useRef } from 'react'
 import { CMSLayoutSidebarComponentType, CMSLayoutSidebarProps } from './Types'
 
@@ -15,8 +15,6 @@ export const Sidebar: CMSLayoutSidebarComponentType = memo(forwardRef(
 		width,
 		priority,
 	}: CMSLayoutSidebarProps<C>, forwardedRef: PolymorphicRef<C>) => {
-		const classNameFor = classNameForFactory(componentClassName, className)
-
 		const keepVisibleBehavior = useReferentiallyStableCallback(({ behavior }: LayoutPanelState) => {
 			if (behavior !== 'modal') {
 				return { visibility: 'visible' } as const
@@ -49,7 +47,7 @@ export const Sidebar: CMSLayoutSidebarComponentType = memo(forwardRef(
 				basis={width}
 				minWidth={width}
 				maxWidth={width}
-				className={classNameFor()}
+				className={useClassName(componentClassName, className)}
 				defaultBehavior="collapsible"
 				defaultVisibility="visible"
 				name={panelName}

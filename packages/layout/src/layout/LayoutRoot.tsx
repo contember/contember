@@ -1,5 +1,5 @@
 import { useAddClassNameDuringResize } from '@contember/react-utils'
-import { PolymorphicRef, classNameForFactory, isNonNegativeNumber, px } from '@contember/utilities'
+import { PolymorphicRef, dataAttribute, isNonNegativeNumber, px, useClassName } from '@contember/utilities'
 import { CSSProperties, ElementType, forwardRef, memo, useMemo } from 'react'
 import { LayoutContainerWidthContext, useGetLayoutPanelsStateContext, useLayoutContainerWidth } from './Contexts'
 import { LayoutPanelsStateProvider } from './LayoutPanelsStateProvider'
@@ -31,19 +31,19 @@ const LayoutRootInnerPanelsContainer = memo(forwardRef(
 	}: ContainerProps<C>, forwardedRef: PolymorphicRef<C>) => {
 		const width = useLayoutContainerWidth()
 		const Container = as ?? 'div'
-		const classNameFor = classNameForFactory(componentClassName, className)
 		const { panels } = useGetLayoutPanelsStateContext()
 		const style = useMemo(() => getPanelsCSSCustomProperties(panels, width, rest.style), [panels, rest.style, width])
 
 		return (
 			<Container
 				ref={forwardedRef}
-				className={classNameFor(null, [...panels.entries()].map(
+				className={useClassName(componentClassName, className)}
+				{...Object.fromEntries([...panels.entries()].map(
 					([name, panel]) => [
-						panel.visibility ? `panel-${name}-visibility-${panel.visibility}` : undefined,
-						panel.behavior ? `panel-${name}-behavior-${panel.behavior}` : undefined,
+						[`data-panel-${name}-visibility`, dataAttribute(panel.visibility ? panel.visibility : undefined)],
+						[`data-panel-${name}-behavior`, dataAttribute(panel.behavior ? panel.behavior : undefined)],
 					],
-				))}
+				).flat(1))}
 				{...rest}
 				style={style}
 			>

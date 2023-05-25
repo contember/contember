@@ -1,6 +1,5 @@
-import cn from 'classnames'
+import { useClassName } from '@contember/utilities'
 import { memo, ReactNode, useContext } from 'react'
-import { useComponentClassName } from '../../auxiliary'
 import type { Alignment, Justification } from '../../types'
 import { toEnumViewClass, toViewClass } from '../../utils'
 import { UseTableElementContext } from './Table'
@@ -19,13 +18,13 @@ export interface TableCellProps {
  */
 export const TableCell = memo(({ shrunk = false, numeric = false, ...props }: TableCellProps) => {
 	const useTableElement = useContext(UseTableElementContext)
-	const className = cn(
-		useComponentClassName('table-cell'),
+
+	const className = useClassName('table-cell', [
 		toEnumViewClass(props.alignment),
 		toEnumViewClass(props.justification),
 		toViewClass('numeric', numeric),
 		toViewClass('shrunk', shrunk),
-	)
+	])
 
 	if (useTableElement) {
 		return (

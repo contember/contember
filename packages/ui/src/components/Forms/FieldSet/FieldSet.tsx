@@ -1,6 +1,5 @@
-import cn from 'classnames'
+import { useClassNameFactory } from '@contember/utilities'
 import { memo, ReactNode } from 'react'
-import { useClassNamePrefix } from '../../../auxiliary'
 import type { HTMLDivElementProps } from '../../../types'
 import { toStateClass } from '../../../utils'
 import { Stack } from '../../Stack'
@@ -26,19 +25,19 @@ export const FieldSet = memo(function FieldSet({
 	className,
 	...divProps
 }: FieldSetProps) {
-	const prefix = useClassNamePrefix()
+	const componentClassName = useClassNameFactory('fieldSet')
 
 	return (
-		<div className={cn(`${prefix}fieldSet`, toStateClass('active', isActive), className)} {...divProps}>
+		<div className={componentClassName('', [toStateClass('active', isActive), className])} {...divProps}>
 			{heading !== undefined && (
-				<div className={`${prefix}fieldSet-heading`} contentEditable={false}>
+				<div className={componentClassName('heading')} contentEditable={false}>
 					<Heading size="small">
 						{heading}
 					</Heading>
 				</div>
 			)}
 			{children !== undefined && (
-				<Stack direction="vertical" className={`${prefix}fieldSet-content`}>
+				<Stack direction="vertical" className={componentClassName('content')}>
 					{children}
 				</Stack>
 			)}

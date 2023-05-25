@@ -1,5 +1,6 @@
 import { Component } from '@contember/binding'
-import { Stack, useComponentClassName } from '@contember/ui'
+import { Stack } from '@contember/ui'
+import { useClassName } from '@contember/utilities'
 import { FunctionComponent } from 'react'
 import { useMessageFormatter } from '../../../../../../i18n'
 import { dataGridDictionary } from '../dataGridDictionary'
@@ -31,7 +32,6 @@ export const DataGridContainer: FunctionComponent<DataGridContainerProps> = Comp
 		tileSize,
 		updatePaging,
 	}) => {
-		const componentClassName = useComponentClassName('data-grid')
 		const {
 			paging: { pageIndex, itemsPerPage },
 			layout,
@@ -47,16 +47,16 @@ export const DataGridContainer: FunctionComponent<DataGridContainerProps> = Comp
 				{pagesCount === undefined
 					? formatMessage('dataGrid.paging.status.unknownPageTotal', { pageNumber: pageIndex + 1 })
 					: formatMessage('dataGrid.paging.status.knownPageTotal', {
-							pageNumber: pageIndex + 1,
-							totalPageCount: pagesCount,
-					  })}
+						pageNumber: pageIndex + 1,
+						totalPageCount: pagesCount,
+					})}
 				{normalizedItemCount !== undefined &&
 					` ${formatMessage('dataGrid.paging.status.itemCount', { itemCount: normalizedItemCount })}`}
 			</>
 		)
 
 		return (
-			<Stack direction="vertical" className={`${componentClassName}-body`}>
+			<Stack direction="vertical" className={useClassName('data-grid-body')}>
 				<DataGridContainerHeader
 					allowAggregateFilterControls={allowAggregateFilterControls}
 					allowColumnVisibilityControls={allowColumnVisibilityControls}
@@ -70,21 +70,21 @@ export const DataGridContainer: FunctionComponent<DataGridContainerProps> = Comp
 				/>
 				{tile && layout === 'tiles'
 					? <DataGridContainerGrid
-							accessor={accessor}
-							tile={tile}
-							tileSize={tileSize}
-						/>
+						accessor={accessor}
+						tile={tile}
+						tileSize={tileSize}
+					/>
 					: <DataGridContainerTable
-							accessor={accessor}
-							desiredState={desiredState}
-							displayedState={displayedState}
-							emptyMessage={emptyMessage}
-							emptyMessageComponent={emptyMessageComponent}
-							onEntityClick={onEntityClick}
-							selectedEntityIds={selectedEntityIds}
-							setFilter={setFilter}
-							setOrderBy={setOrderBy}
-						/>
+						accessor={accessor}
+						desiredState={desiredState}
+						displayedState={displayedState}
+						emptyMessage={emptyMessage}
+						emptyMessageComponent={emptyMessageComponent}
+						onEntityClick={onEntityClick}
+						selectedEntityIds={selectedEntityIds}
+						setFilter={setFilter}
+						setOrderBy={setOrderBy}
+					/>
 				}
 				{!!normalizedItemCount && (
 					<DataGridContainerFooter

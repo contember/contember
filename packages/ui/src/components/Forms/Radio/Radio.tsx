@@ -1,8 +1,7 @@
-import classNames from 'classnames'
+import { useClassName } from '@contember/utilities'
 import { ComponentType, memo } from 'react'
 import { useRadioGroup } from 'react-aria'
 import { useRadioGroupState } from 'react-stately'
-import { useClassNamePrefix } from '../../../auxiliary'
 import type { Size, ValidationState } from '../../../types'
 import { toEnumStateClass, toEnumViewClass } from '../../../utils'
 import { RadioButtonProps } from './RadioButton'
@@ -41,8 +40,6 @@ function deriveAriaValidationState(validationState?: ValidationState): 'valid' |
 export const Radio = memo((props: RadioProps) => {
 	const { name, options, orientation, size, validationState, RadioButtonComponent } = props
 
-	const prefix = useClassNamePrefix()
-
 	const ariaRadioGroupProps = {
 		...props,
 		validationState: deriveAriaValidationState(validationState),
@@ -51,14 +48,13 @@ export const Radio = memo((props: RadioProps) => {
 	const state = useRadioGroupState(ariaRadioGroupProps)
 	const { radioGroupProps } = useRadioGroup(ariaRadioGroupProps, state)
 
-	const classList = classNames(
-		`${prefix}radio`,
-		toEnumStateClass(validationState),
-		toEnumViewClass(orientation ?? 'vertical'),
-	)
-
 	return (
-		<div className={classList} {...radioGroupProps}>
+		<div
+			className={useClassName('radio', [
+				toEnumStateClass(validationState),
+				toEnumViewClass(orientation ?? 'vertical'),
+			])}
+			{...radioGroupProps}>
 			<RadioContext.Provider value={state}>
 				{options.map(({ value, label, labelDescription }: RadioOption) => (
 					<RadioControl

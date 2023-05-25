@@ -1,6 +1,6 @@
 import { Button, MultiEditScope, PersistButton, Repeater, RepeaterItem, RepeaterItemProps, SelectField, TextField } from '@contember/admin'
 import { Title } from '../components/Directives'
-import { Actions, ContentStack } from '../components/Slots'
+import { Slots } from '../components/Slots'
 
 const CustomRepeaterItem = (props: RepeaterItemProps) => {
 	return <>
@@ -13,8 +13,8 @@ export default () => (
 	<>
 		<Title>Tags</Title>
 
-		<ContentStack>
-			<MultiEditScope entities="Tag" listProps={{ beforeContent: <Actions><PersistButton /></Actions> }}>
+		<Slots.ContentStack>
+			<MultiEditScope entities="Tag" listProps={{ beforeContent: <Slots.Actions><PersistButton /></Slots.Actions> }}>
 				<TextField field={'name'} label={'Name'} />
 				<Repeater field={'locales'} label={'Locales'} sortableBy={'order'} itemComponent={CustomRepeaterItem}>
 					<SelectField label={'Locale'} options={'Locale.code'} field={'locale'}
@@ -22,6 +22,6 @@ export default () => (
 					<TextField field={'name'} label={'Name'} />
 				</Repeater>
 			</MultiEditScope>
-		</ContentStack>
+		</Slots.ContentStack>
 	</>
 )

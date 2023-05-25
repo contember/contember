@@ -1,6 +1,5 @@
-import cn from 'classnames'
+import { useClassNameFactory } from '@contember/utilities'
 import { forwardRef, memo, ReactNode } from 'react'
-import { useClassNamePrefix } from '../../auxiliary'
 
 export interface EditorBlockProps {
 	children?: ReactNode
@@ -10,17 +9,18 @@ export interface EditorBlockProps {
 }
 
 export const EditorBlock = memo(forwardRef<HTMLDivElement, EditorBlockProps>(({
-  children,
-  dragHandle,
-  dragLine,
-  isDragged,
+	children,
+	dragHandle,
+	dragLine,
+	isDragged,
 }, ref) => {
-	const prefix = useClassNamePrefix()
+	const componentClassName = useClassNameFactory('editorBlock')
+
 	return (
-		<div className={cn(`${prefix}editorBlock`, isDragged && 'is-dragged')} ref={ref}>
-			<div className={cn(`${prefix}editorBlock-inner`)}>
-				{dragHandle && <div className={cn(`${prefix}editorBlock-dragHandle`)} contentEditable={false}>{dragHandle}</div>}
-				<div className={cn(`${prefix}editorBlock-content`)}>
+		<div className={componentClassName('', isDragged && 'is-dragged')} ref={ref}>
+			<div className={componentClassName('inner')}>
+				{dragHandle && <div className={componentClassName('dragHandle')} contentEditable={false}>{dragHandle}</div>}
+				<div className={componentClassName('content')}>
 					{children}
 				</div>
 			</div>

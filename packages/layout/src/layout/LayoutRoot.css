@@ -1,9 +1,9 @@
-:where(.layout) {
+:where(.cui-layout) {
 	display: flex;
 	flex-direction: row;
 	flex: 1;
 }
-:where(.layout):where(
+:where(.cui-layout):where(
 	.cui-theme,
 	.scheme-light,
 	.scheme-dark,

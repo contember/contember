@@ -1,5 +1,5 @@
+import { useClassNameFactory } from '@contember/utilities'
 import { ReactNode, useContext } from 'react'
-import { useComponentClassName } from '../../auxiliary'
 import { Intent } from '../../types'
 import { Button } from '../Forms'
 import { Icon } from '../Icon'
@@ -18,7 +18,6 @@ export interface Toast extends ToastDefinition {
 	id: ToastId
 }
 
-
 const toastTypeToIntent: { [K in ToastType]: Intent } = {
 	success: 'success',
 	warning: 'warn',
@@ -32,13 +31,13 @@ export const Toaster: React.FC = () => {
 		throw new Error('Toaster context is not initialized')
 	}
 
-	const componentClassName = useComponentClassName('toaster')
+	const componentClassName = useClassNameFactory('toaster')
 
 	return (
-		<div className={componentClassName}>
-			<div className={`${componentClassName}-inner`}>
+		<div className={componentClassName()}>
+			<div className={componentClassName('inner')}>
 				{toasterContext.toasts.map(toast => (
-					<div key={toast.id} className={`${componentClassName}-item`}>
+					<div key={toast.id} className={componentClassName('item')}>
 						<Message
 							intent={toastTypeToIntent[toast.type]}
 							flow="block"

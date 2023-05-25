@@ -1,6 +1,6 @@
-import { useComposeRef, useHasEmptySlotsClassName } from '@contember/react-utils'
-import { classNameForFactory, NestedClassName, PolymorphicComponentPropsWithRef, PolymorphicRef } from '@contember/utilities'
-import React, { ElementType, forwardRef, memo, ReactNode, useId, useRef } from 'react'
+import { useComposeRef } from '@contember/react-utils'
+import { NestedClassName, PolymorphicComponentPropsWithRef, PolymorphicRef, dataAttribute, useClassName } from '@contember/utilities'
+import React, { ElementType, ReactNode, forwardRef, memo, useRef } from 'react'
 import { useElementInsetCustomProperties } from '../insets'
 import { useLayoutPanelContext } from './Contexts'
 
@@ -28,7 +28,6 @@ export const LayoutPanelFooter: LayoutPanelFooterComponentType = memo(forwardRef
 		style,
 		...rest
 	}: LayoutPanelFooterProps<C>, forwardedRef: PolymorphicRef<C>) => {
-		const id = `LayoutPanelFooter#${useId()}`
 		const Container = as ?? 'footer'
 		const { behavior, visibility } = useLayoutPanelContext()
 
@@ -37,17 +36,14 @@ export const LayoutPanelFooter: LayoutPanelFooterComponentType = memo(forwardRef
 
 		const insetsStyle = useElementInsetCustomProperties(elementRef, '--container-inset-')
 
-		const classNameFor = classNameForFactory(componentClassName, className, {
-			[`${componentClassName}-behavior`]: behavior,
-			[`${componentClassName}-visibility`]: visibility ?? 'hidden',
-			'has-insets': true,
-		})
-
 		return (
 			<Container
 				as={typeof Container === 'string' ? undefined : 'footer'}
 				ref={composeRef}
-				className={classNameFor(null, useHasEmptySlotsClassName(elementRef))}
+				className={useClassName(componentClassName, className)}
+				data-behavior={dataAttribute(behavior)}
+				data-has-insets={dataAttribute(true)}
+				data-visibility={dataAttribute(visibility ?? 'hidden')}
 				style={{
 					...insetsStyle,
 					...style,

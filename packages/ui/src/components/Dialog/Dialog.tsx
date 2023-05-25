@@ -1,6 +1,6 @@
-import cn from 'classnames'
+import { useClassNameFactory } from '@contember/utilities'
 import { useLayoutEffect, useMemo, useState } from 'react'
-import { useClassNamePrefix, useCloseOnClickOutside, useCloseOnEscape } from '../../auxiliary'
+import { useCloseOnClickOutside, useCloseOnEscape } from '../../auxiliary'
 import { toEnumViewClass } from '../../utils'
 import { Box } from '../Box'
 import type { DialogSettingsWithMetadata } from './dialogReducer'
@@ -11,7 +11,7 @@ export interface DialogProps {
 }
 
 export const Dialog = (props: DialogProps) => {
-	const prefix = useClassNamePrefix()
+	const componentClassName = useClassNameFactory('dialog')
 	const [contentElement, setContentElement] = useState<HTMLDivElement | null>(null)
 	const [overlayElement, setOverlayElement] = useState<HTMLDivElement | null>(null)
 	const {
@@ -28,12 +28,11 @@ export const Dialog = (props: DialogProps) => {
 		contentElement.focus()
 	}, [contentElement])
 
-
 	const renderedContent = <RenderContent resolve={resolve} />
 
 	return (
-		<div className={cn(`${prefix}dialog`, toEnumViewClass(type))} ref={setOverlayElement}>
-			<div className={`${prefix}dialog-in`} ref={setContentElement}>
+		<div className={componentClassName('', toEnumViewClass(type))} ref={setOverlayElement}>
+			<div className={componentClassName('in')} ref={setContentElement}>
 				{bare ? renderedContent : <Box gap={gap} heading={heading}>{renderedContent}</Box>}
 			</div>
 		</div>

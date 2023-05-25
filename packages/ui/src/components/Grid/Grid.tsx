@@ -1,6 +1,5 @@
-import classNames from 'classnames'
+import { useClassName } from '@contember/utilities'
 import { CSSProperties, forwardRef, memo, useMemo } from 'react'
-import { useComponentClassName } from '../../auxiliary'
 import { HTMLDivElementProps } from '../../types'
 import { useFallbackRef } from '../../utils'
 
@@ -27,7 +26,6 @@ export const Grid = memo(forwardRef<HTMLDivElement, GridProps>(({
 	}
 
 	const ref = useFallbackRef(forwardedRef)
-	const componentClassName = useComponentClassName('grid')
 	const style: CSSProperties | undefined = useMemo(() => columnWidth ? ({
 		['--cui-grid-column-width' as any]: `${columnWidth}px`,
 		...styleProp,
@@ -36,10 +34,7 @@ export const Grid = memo(forwardRef<HTMLDivElement, GridProps>(({
 	return (
 		<div
 			ref={ref}
-			className={classNames(
-				componentClassName,
-				className,
-			)}
+			className={useClassName('grid', className)}
 			style={style}
 		>
 			{children}

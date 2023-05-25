@@ -1,6 +1,6 @@
-import cn from 'classnames'
+import { useClassNameFactory } from '@contember/utilities'
 import { ReactNode, useCallback, useMemo, useState } from 'react'
-import { useClassNamePrefix, useCloseOnClickOutside, useCloseOnEscape } from '../../auxiliary'
+import { useCloseOnClickOutside, useCloseOnEscape } from '../../auxiliary'
 import { Default } from '../../types'
 import { toEnumViewClass, toViewClass } from '../../utils'
 import { Stack } from '../Stack'
@@ -16,7 +16,7 @@ export interface SeamlessDropdownProps {
 }
 
 export function SeamlessDropdown({ direction = 'down', label, children, hoverable, caret, inline }: SeamlessDropdownProps) {
-	const prefix = useClassNamePrefix()
+	const componentClassName = useClassNameFactory('seamlessDropdown')
 	const [open, setOpen] = useState(false)
 
 	const toggleOpen = useCallback(() => {
@@ -35,28 +35,27 @@ export function SeamlessDropdown({ direction = 'down', label, children, hoverabl
 	useCloseOnClickOutside({ isOpen: open, close, contents: contents })
 
 	const buttonIn = (
-		<div className={cn(`${prefix}seamlessDropdown-button-in`)} onClick={hoverable ? undefined : toggleOpen}>
+		<div className={componentClassName('button-in')} onClick={hoverable ? undefined : toggleOpen}>
 			{label}
 		</div>
 	)
 	return (
 		<div
-			className={cn(
-				`${prefix}seamlessDropdown`,
+			className={componentClassName(null, [
 				toEnumViewClass(direction),
 				toViewClass('open', open),
 				toViewClass('hoverable', hoverable),
 				toViewClass('caret', caret),
 				toViewClass('inline', inline),
-			)}
+			])}
 		>
-			<div className={cn(`${prefix}seamlessDropdown-button`)} ref={setButtonRef}>
+			<div className={componentClassName('button')} ref={setButtonRef}>
 				{buttonIn}
 			</div>
-			<div className={cn(`${prefix}seamlessDropdown-content`)} ref={setContentRef}>
+			<div className={componentClassName('content')} ref={setContentRef}>
 				{buttonIn}
-				<div className={cn(`${prefix}seamlessDropdown-content-sep`)}></div>
-				<Stack direction="vertical" gap="small" className={cn(`${prefix}seamlessDropdown-content-in`)}>{children}</Stack>
+				<div className={componentClassName('content-sep')}></div>
+				<Stack direction="vertical" gap="small" className={componentClassName('content-in')}>{children}</Stack>
 			</div>
 		</div>
 	)

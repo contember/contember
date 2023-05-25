@@ -1,7 +1,6 @@
-import classNames from 'classnames'
+import { useClassName } from '@contember/utilities'
 import { ComponentProps, CSSProperties, ForwardedRef, forwardRef, memo, ReactElement, RefAttributes, useCallback, useMemo, useRef } from 'react'
 import ReactSelect, { SelectInstance, StylesConfig, useStateManager } from 'react-select'
-import { useComponentClassName } from '../../../auxiliary'
 import { noop } from '../../../utils'
 import { getPortalRoot } from '../../Portal'
 import { useChangeValidationState, useInputClassName } from '../Hooks'
@@ -77,7 +76,6 @@ const SelectComponent = <V = unknown>({
 		const _exhaust: { [key: string]: never } = { ...outerProps }
 	}
 
-	const selectClassName = useComponentClassName('select')
 	const className = useInputClassName({
 		// ControlStateProps
 		active,
@@ -148,7 +146,7 @@ const SelectComponent = <V = unknown>({
 	return <>
 		<ReactSelect
 			isSearchable={isSearchable}
-			className={classNames(selectClassName, className)}
+			className={useClassName('select', className)}
 			defaultValue={defaultValue}
 			getOptionLabel={getOptionLabel}
 			getOptionValue={getOptionValue}

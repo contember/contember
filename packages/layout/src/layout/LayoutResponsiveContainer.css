@@ -1,11 +1,11 @@
-:where(.layout-responsive-container) {
+:where(.cui-layout-responsive-container) {
 	display: flex;
 	flex-direction: column;
 	flex: 1;
 }
 
 :where(
-	body:has(.layout-responsive-container.has-visible-modal),
+	body:has(.cui-layout-responsive-container[data-has-visible-modal]),
 ) {
 	pointer-events: none;
 	overflow: hidden;

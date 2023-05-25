@@ -1,6 +1,5 @@
-import classNames from 'classnames'
+import { useClassName } from '@contember/utilities'
 import { forwardRef, memo } from 'react'
-import { useComponentClassName } from '../../../auxiliary'
 import { useTextBasedInput } from '../Hooks'
 import type { TextInputProps } from './Types'
 
@@ -15,10 +14,7 @@ export const HiddenInput = memo(forwardRef<HTMLInputElement, TextInputProps>(({
 }, forwardedRed) => {
 	const props = useTextBasedInput<HTMLInputElement>({
 		...outerProps,
-		className: classNames(
-			useComponentClassName('hidden-input'),
-			className,
-		),
+		className: useClassName('hidden-input', className),
 	}, forwardedRed)
 
 	return <input {...props} type="hidden" />

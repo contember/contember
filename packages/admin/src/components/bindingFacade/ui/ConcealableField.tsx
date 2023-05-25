@@ -1,6 +1,6 @@
 import { Button, ButtonProps, toStateClass, toViewClass } from '@contember/ui'
-import cn from 'classnames'
-import { memo, ReactNode, Ref, useCallback, useRef, useState } from 'react'
+import { listClassName } from '@contember/utilities'
+import { ReactNode, Ref, memo, useCallback, useRef, useState } from 'react'
 
 export interface ConcealableFieldRendererProps {
 	onFocus: () => void
@@ -35,8 +35,8 @@ export const ConcealableField = memo(
 		}, [concealTimeout])
 
 		return (
-			<div className={cn('concealableField', toViewClass('extended', isExtended), toStateClass('editing', isEditing))}>
-				<div className={cn('concealableField-field')}>
+			<div className={listClassName(['concealableField', toViewClass('extended', isExtended), toStateClass('editing', isEditing)])}>
+				<div className="concealableField-field">
 					{children({
 						onBlur,
 						onFocus,

@@ -1,5 +1,5 @@
+import { useClassName } from '@contember/utilities'
 import type { ComponentType, ReactNode } from 'react'
-import { useClassNamePrefix } from '../../auxiliary'
 import { EditorNonEditable } from './EditorNonEditable'
 
 export interface EditorPlaceholderProps {
@@ -8,7 +8,7 @@ export interface EditorPlaceholderProps {
 
 // TODO add this to storybook
 export const EditorPlaceholder: ComponentType<EditorPlaceholderProps> = props => (
-	<EditorNonEditable className={`${useClassNamePrefix()}editorPlaceholder`} inline>
+	<EditorNonEditable className={useClassName('editorPlaceholder')} inline>
 		{props.children}
 	</EditorNonEditable>
 )

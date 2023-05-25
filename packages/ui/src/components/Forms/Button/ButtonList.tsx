@@ -1,6 +1,5 @@
-import cn from 'classnames'
+import { useClassName } from '@contember/utilities'
 import { memo, ReactNode } from 'react'
-import { useComponentClassName } from '../../../auxiliary'
 import { Size } from '../../../types'
 import { toEnumViewClass } from '../../../utils'
 import type { ButtonGroupOrientation, ButtonListFlow } from './Types'
@@ -16,12 +15,14 @@ export interface ButtonListProps {
  * @group UI
  */
 export const ButtonList = memo(({ children, flow, orientation, size }: ButtonListProps) => (
-	<div className={cn(
-		useComponentClassName('button-list'),
-		toEnumViewClass(size),
-		toEnumViewClass(orientation, 'horizontal'),
-		toEnumViewClass(flow, 'inline'),
-	)} role="group">
+	<div
+		className={useClassName('button-list', [
+			toEnumViewClass(size),
+			toEnumViewClass(orientation, 'horizontal'),
+			toEnumViewClass(flow, 'inline'),
+		])}
+		role="group"
+	>
 		{children}
 	</div>
 ))

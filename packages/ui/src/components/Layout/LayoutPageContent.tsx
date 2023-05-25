@@ -1,6 +1,5 @@
-import classNames from 'classnames'
+import { useClassNameFactory } from '@contember/utilities'
 import { memo } from 'react'
-import { useComponentClassName } from '../../auxiliary'
 import { HTMLDivElementProps } from '../../types'
 import { toEnumClass } from '../../utils'
 
@@ -13,7 +12,7 @@ export type LayoutPageContentProps =
 	& HTMLDivElementProps
 
 export const LayoutPageContent = memo(({ children, layout, pageContentLayout = 'center' }: LayoutPageContentProps) => {
-	const componentClassName = useComponentClassName('layout-page-content')
+	const componentClassName = useClassNameFactory('layout-page-content')
 
 	if (import.meta.env.DEV && layout) {
 		console.warn('The `layout` prop is deprecated, use `pageContentLayout` prop instead')
@@ -23,14 +22,15 @@ export const LayoutPageContent = memo(({ children, layout, pageContentLayout = '
 		pageContentLayout = 'stretch'
 	}
 
-	return <div className={componentClassName}>
-		<div className={classNames(
-			`${componentClassName}-container`,
-			toEnumClass('layout-', pageContentLayout ?? layout),
-		)}>
-			{children}
+	return (
+		<div className={componentClassName()}>
+			<div className={componentClassName('container', [
+				toEnumClass('layout-', pageContentLayout ?? layout),
+			])}>
+				{children}
+			</div>
 		</div>
-	</div>
+	)
 })
 LayoutPageContent.displayName = 'LayoutPageContent'
 

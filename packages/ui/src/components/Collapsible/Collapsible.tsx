@@ -1,6 +1,5 @@
-import cn from 'classnames'
+import { useClassNameFactory } from '@contember/utilities'
 import { CSSProperties, memo, ReactNode, useEffect, useRef, useState } from 'react'
-import { useClassNamePrefix } from '../../auxiliary'
 import type { CollapsibleTransition } from '../../types'
 import { forceReflow, toEnumStateClass, toEnumViewClass, toStateClass } from '../../utils'
 
@@ -56,16 +55,15 @@ export const Collapsible = memo((props: CollapsibleProps) => {
 		}
 	}, [delayedExpanded, props.expanded])
 
-	const prefix = useClassNamePrefix()
+	const componentClassName = useClassNameFactory('collapsible')
 
 	return (
 		<div
-			className={cn(
-				`${prefix}collapsible`,
+			className={componentClassName(null, [
 				toEnumViewClass(props.transition, 'topInsert'),
 				toEnumStateClass(delayedExpanded ? 'expanded' : 'collapsed'),
 				toStateClass('transitioning', isTransitioning),
-			)}
+			])}
 			style={
 				{
 					'--cui-collapsible-content-height': contentHeight,
@@ -74,7 +72,7 @@ export const Collapsible = memo((props: CollapsibleProps) => {
 			aria-hidden={!props.expanded}
 			onTransitionEnd={onTransitionEnd}
 		>
-			<div className={`${prefix}collapsible-content`} ref={contentRef}>
+			<div className={componentClassName('content')} ref={contentRef}>
 				{props.children}
 			</div>
 		</div>

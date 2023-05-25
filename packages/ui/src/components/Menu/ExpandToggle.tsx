@@ -1,7 +1,5 @@
-import classNames from 'classnames'
-import { KeyboardEventHandler, MouseEventHandler } from 'react'
-import { forwardRef, memo, useCallback } from 'react'
-import { useComponentClassName } from '../../auxiliary'
+import { useClassNameFactory } from '@contember/utilities'
+import { KeyboardEventHandler, forwardRef, memo, useCallback } from 'react'
 import { toStateClass } from '../../utils'
 
 interface MenuExpandToggleProps {
@@ -17,17 +15,16 @@ export const MenuExpandToggle = memo(forwardRef<HTMLButtonElement, MenuExpandTog
 	disabled,
 	onChange,
 }, ref) => {
-	const componentClassName = useComponentClassName('menu-expand-toggle')
+	const componentClassName = useClassNameFactory('menu-expand-toggle')
 
 	return <button
 		tabIndex={-1}
 		ref={ref}
 		type="button"
 		disabled={disabled}
-		className={classNames(
-			componentClassName,
+		className={componentClassName(null, [
 			toStateClass('collapsed', !checked),
-		)}
+		])}
 		aria-haspopup="true"
 		aria-controls={controls}
 		aria-expanded={checked}
@@ -43,6 +40,6 @@ export const MenuExpandToggle = memo(forwardRef<HTMLButtonElement, MenuExpandTog
 			}
 		}, [onChange])}
 	>
-		<span className={`${componentClassName}-label`}>{checked ? '-' : '+'}</span>
+		<span className={componentClassName('label')}>{checked ? '-' : '+'}</span>
 	</button>
 }))

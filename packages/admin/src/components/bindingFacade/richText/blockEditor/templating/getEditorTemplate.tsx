@@ -1,6 +1,6 @@
 import { BindingError, Environment } from '@contember/binding'
+import { assertNever } from '@contember/utilities'
 import type { ReactNode } from 'react'
-import { assertNever } from '../../../../../utils'
 import type { ContentOutletProps } from './ContentOutlet'
 import { BoxedCatchAllJSX, BoxedContentOutletProps, editorTemplateAnalyzer } from './editorTemplateAnalyzer'
 
@@ -13,8 +13,8 @@ export interface EditorTemplateAtom<Value> {
 export type EditorTemplate =
 	| undefined
 	| {
-			blockContent: EditorTemplateAtom<ContentOutletProps> | undefined
-	  }
+		blockContent: EditorTemplateAtom<ContentOutletProps> | undefined
+	}
 
 export const getEditorTemplate = (blockContents: ReactNode, env: Environment): EditorTemplate => {
 	let contentOutlet: ContentOutletProps | undefined = undefined

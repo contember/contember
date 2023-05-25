@@ -1,6 +1,6 @@
-import classNames from 'classnames'
+import { useClassNameFactory } from '@contember/utilities'
 import { memo, MemoExoticComponent, PropsWithChildren, useCallback, useMemo, useRef } from 'react'
-import { MouseMoveProvider, useComponentClassName } from '../../auxiliary'
+import { MouseMoveProvider } from '../../auxiliary'
 import { toViewClass } from '../../utils'
 import { DepthContext, FocusableContext } from './Contexts'
 import { MenuItem } from './MenuItem'
@@ -30,7 +30,7 @@ function getClosestFocusable<E extends HTMLElement = HTMLElement>(parent: E, off
 
 const MenuInternal = memo((props: PropsWithChildren<MenuProps>) => {
 	const menuRef = useRef<HTMLUListElement>(null)
-	const componentClassName = useComponentClassName('menu')
+	const componentClassName = useClassNameFactory('menu')
 
 	const nextFocusable = useCallback((): HTMLLIElement | null => {
 		if (!menuRef.current) {
@@ -54,14 +54,10 @@ const MenuInternal = memo((props: PropsWithChildren<MenuProps>) => {
 		<MenuIdProvider menuId={menuId}>
 			<MouseMoveProvider elementRef={menuRef}>
 				<ActiveMenuItemProvider menuRef={menuRef}>
-					<section className={classNames(
-						componentClassName,
+					<section className={componentClassName(null, [
 						toViewClass('showCaret', props.showCaret ?? true),
-					)}>
-						<ul ref={menuRef} className={classNames(
-							`${componentClassName}-list`,
-							'is-expanded',
-						)}>
+					])}>
+						<ul ref={menuRef} className={componentClassName('list', 'is-expanded')}>
 							<FocusableContext.Provider value={useMemo(() => ({
 								nextFocusable,
 								previousFocusable,

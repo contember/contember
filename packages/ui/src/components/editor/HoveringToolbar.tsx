@@ -1,6 +1,5 @@
-import classNames from 'classnames'
+import { useClassNameFactory } from '@contember/utilities'
 import { forwardRef, memo, ReactNode } from 'react'
-import { useComponentClassName } from '../../auxiliary'
 import type { HoveringToolbarScope, Scheme } from '../../types'
 import { toEnumViewClass, toSchemeClass, toStateClass } from '../../utils'
 
@@ -17,19 +16,18 @@ export const HoveringToolbar = memo(forwardRef<HTMLDivElement, HoveringToolbarPr
 	scheme,
 	children,
 }, ref) => {
-	const componentClassName = useComponentClassName('hoveringToolbar')
+	const componentClassName = useClassNameFactory('hoveringToolbar')
 
 	return (
 		<div
-			className={classNames(
-				componentClassName,
+			className={componentClassName(null, [
 				toStateClass('active', isActive),
 				toEnumViewClass(scope),
 				toSchemeClass(scheme ?? 'dark'),
-			)}
+			])}
 			ref={ref}
 		>
-			<div className={`${componentClassName}-content`}>
+			<div className={componentClassName('content')}>
 				{children}
 			</div>
 		</div>

@@ -1,6 +1,5 @@
-import cn from 'classnames'
+import { useClassNameFactory } from '@contember/utilities'
 import type { ReactNode } from 'react'
-import { useClassNamePrefix } from '../auxiliary'
 
 export interface DimensionSwitcherValue {
 	key: string
@@ -13,24 +12,25 @@ export interface DimensionSwitcherProps {
 }
 
 export function DimensionSwitcher({ dimensions }: DimensionSwitcherProps) {
-	const prefix = useClassNamePrefix()
+	const componentClassName = useClassNameFactory('dimensionSwitcher')
+
 	return (
-		<div className={`${prefix}dimensionSwitcher`}>
-			<div className={`${prefix}dimensionSwitcher-items`}>
+		<div className={componentClassName()}>
+			<div className={componentClassName('items')}>
 				{dimensions.map(dimension => (
-					<div className={`${prefix}dimensionSwitcher-item`} key={dimension.key}>
-						<span className={`${prefix}dimensionSwitcher-item-label`}>{dimension.label}:</span>
-						<span className={`${prefix}dimensionSwitcher-item-options`}>
+					<div className={componentClassName('item')} key={dimension.key}>
+						<span className={componentClassName('item-label')}>{dimension.label}:</span>
+						<span className={componentClassName('item-options')}>
 							{dimension.options.map(option => (
 								<span
 									key={option.value}
-									className={cn(`${prefix}dimensionSwitcher-item-option`, option.active && 'view-active')}
+									className={componentClassName('item-option', option.active && 'view-active')}
 								>
 									{option.label}
 								</span>
 							))}
 						</span>
-						<span className={`${prefix}dimensionSwitcher-item-icon`} />
+						<span className={componentClassName('item-icon')} />
 					</div>
 				))}
 			</div>

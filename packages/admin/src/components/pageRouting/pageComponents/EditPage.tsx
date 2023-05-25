@@ -8,7 +8,7 @@ import { ReactNode } from 'react'
 import { FeedbackRenderer, LayoutRenderer, LayoutRendererProps, PersistButton } from '../../bindingFacade'
 import { RedirectOnSuccessTarget } from '../useEntityRedirectOnPersistSuccess'
 import { useOnPersistSuccess } from '../useOnPersistSuccess'
-import { NotFoundWrapper } from './NotFoundWrapper'
+import { NotFoundWrapper } from '@contember/react-binding-ui'
 import { pageComponent } from './pageComponent'
 
 export type EditPageProps =

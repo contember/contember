@@ -1,6 +1,5 @@
 export * from './Application/outdatedApplicationDictionary'
 export * from './ApplicationEntrypoint'
-export * from './Auto'
 export * from './bindingFacade'
 export * from './Identity'
 export * from './Login'

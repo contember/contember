@@ -12,6 +12,7 @@
 		{ "path": "./packages/client" },
 		{ "path": "./packages/interface-tester" },
 		{ "path": "./packages/layout" },
+		{ "path": "./packages/react-auto" },
 		{ "path": "./packages/react-binding" },
 		{ "path": "./packages/react-binding-ui" },
 		{ "path": "./packages/react-choice-field" },

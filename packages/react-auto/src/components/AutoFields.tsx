@@ -1,9 +1,9 @@
 import { Component } from '@contember/react-binding'
 import { AutoField } from './AutoField'
-import { RoutingLinkTarget } from '../../routing'
+import { LinkComponent } from './types'
 
 export type AutoFieldsProps = {
-	createEditLink?: (entity: string) => RoutingLinkTarget
+	LinkComponent?: LinkComponent
 	excludedFields?: string[]
 	excludedEntities?: string[]
 }
@@ -23,7 +23,7 @@ export const AutoFields = Component<AutoFieldsProps>(
 				schema={schema}
 				entityName={entity.name}
 				fieldName={field.name}
-				createEditLink={props.createEditLink}
+				LinkComponent={props.LinkComponent}
 				excludedEntities={[entity.name, ...(props.excludedEntities ?? [])]}
 			/>
 		))

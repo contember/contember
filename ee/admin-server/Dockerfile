@@ -16,6 +16,7 @@ COPY packages/brand/package.json ./packages/brand/package.json
 COPY packages/client/package.json ./packages/client/package.json
 COPY packages/interface-tester/package.json ./packages/interface-tester/package.json
 COPY packages/layout/package.json ./packages/layout/package.json
+COPY packages/react-auto/package.json ./packages/react-auto/package.json
 COPY packages/react-binding/package.json ./packages/react-binding/package.json
 COPY packages/react-binding-ui/package.json ./packages/react-binding-ui/package.json
 COPY packages/react-client/package.json ./packages/react-client/package.json

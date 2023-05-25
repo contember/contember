@@ -51,6 +51,7 @@
 	},
 	"dependencies": {
 		"@contember/client": "workspace:*",
+		"@contember/react-auto": "workspace:*",
 		"@contember/react-binding": "workspace:*",
 		"@contember/react-binding-ui": "workspace:*",
 		"@contember/react-choice-field-ui": "workspace:*",

@@ -1,17 +1,19 @@
 import { Component, Field, Schema } from '@contember/react-binding'
-import { SelectField, MultiSelectField } from '@contember/react-choice-field-ui'
-import { CheckboxField, DateField, DateTimeField, FloatField, NumberField, TextareaField, TextField } from '../bindingFacade'
-import { getHumanFriendlyField, resolveConnectingEntity, resolveSortableBy } from './utils'
+import { MultiSelectField, SelectField } from '@contember/react-choice-field-ui'
+import { CheckboxField, DateField, DateTimeField, FloatField, NumberField, TextareaField, TextField } from '@contember/react-form-fields-ui'
 import { AutoFields } from './AutoFields'
-import { RoutingLinkTarget } from '../../routing'
 import { AutoLabel } from './AutoLabel'
 import { FieldContainer } from '@contember/ui'
+import { getHumanFriendlyField } from '../utils/getHumanFriendlyField'
+import { resolveSortableBy } from '../utils/resolveSortableBy'
+import { resolveConnectingEntity } from '../utils/resolveConnectingEntity'
+import { LinkComponent } from './types'
 
 export type AutoFieldProps = {
 	schema: Schema
 	entityName: string
 	fieldName: string
-	createEditLink?: (entity: string) => RoutingLinkTarget
+	LinkComponent?: LinkComponent
 	excludedEntities?: string[]
 }
 
@@ -19,7 +21,7 @@ export type AutoFieldProps = {
  * @group Auto Admin
  */
 export const AutoField = Component<AutoFieldProps>(
-	({ schema, entityName, fieldName, createEditLink, excludedEntities }) => {
+	({ schema, entityName, fieldName, LinkComponent, excludedEntities }) => {
 		const field = schema.getEntityField(entityName, fieldName)
 
 		if (field.__typename === '_Column') {
@@ -73,12 +75,12 @@ export const AutoField = Component<AutoFieldProps>(
 			const targetField = connectingEntity ? connectingEntity.field : field
 			const targetEntity = schema.getEntity(targetField.targetEntity)
 			const humanFieldName = getHumanFriendlyField(targetEntity)
-			const optionLabel = <AutoLabel field={humanFieldName} createLink={createEditLink} />
+			const optionLabel = <AutoLabel field={humanFieldName} LinkComponent={LinkComponent} />
 			const otherSide = targetField.side === 'owning' ? targetField.inversedBy : targetField.ownedBy
 			const excludedFields = [otherSide, sortableBy].filter(it => it) as string[]
 
 			const createNewForm = excludedEntities === undefined || !excludedEntities.includes(targetEntity.name)
-				? <AutoFields excludedFields={excludedFields} excludedEntities={excludedEntities} createEditLink={createEditLink} />
+				? <AutoFields excludedFields={excludedFields} excludedEntities={excludedEntities} LinkComponent={LinkComponent} />
 				: undefined
 
 			if (field.type === 'OneHasOne' || field.type === 'ManyHasOne') {

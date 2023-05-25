@@ -23,6 +23,7 @@ export const list = {
 		'client',
 		'interface-tester',
 		'layout',
+		'react-auto',
 		'react-binding',
 		'react-binding-ui',
 		'react-choice-field',

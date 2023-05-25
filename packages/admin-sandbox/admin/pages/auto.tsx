@@ -11,6 +11,7 @@ import {
 	RoutingParameter,
 	useCurrentRequest,
 	useEnvironment,
+	LinkComponent,
 	useOnPersistSuccess,
 } from '@contember/admin'
 import { Directive } from '../components/Directives'
@@ -40,13 +41,19 @@ export default (
 	</>
 )
 
+const AutoLink: LinkComponent = ({ action, Component, children, entityId, entityName }) => (
+	<Link
+		to={`${action === 'edit' ? 'auto/form' : 'auto/grid'}(entity: $entityName, id: $entityId)`}
+		parameters={{ entityId, entityName }} Component={Component}>
+		{children}
+	</Link>
+)
+
+
 export function Grid() {
 	const request = useCurrentRequest()!
 	const entity = request.parameters.entity as string
 	const filter = request.parameters.id ? `[id = '${request.parameters.id}']` : ''
-
-	const createViewLinkTarget = (entity: string) => ({ pageName: 'auto/grid', parameters: { entity, id: new RoutingParameter('entity.id') } })
-	const createEditLinkTarget = (entity: string) => ({ pageName: 'auto/form', parameters: { entity, id: new RoutingParameter('entity.id') } })
 
 	const actions = (
 		<>
@@ -66,7 +73,7 @@ export function Grid() {
 				<SlotSources.Title>{`List ${entity}`}</SlotSources.Title>
 				<SlotSources.Actions>{actions}</SlotSources.Actions>
 
-				<AutoGrid entities={entity + filter} createViewLinkTarget={createViewLinkTarget} createEditLinkTarget={createEditLinkTarget} />
+				<AutoGrid entities={entity + filter} LinkComponent={AutoLink} />
 			</DataBindingProvider>
 		</>
 	)
@@ -93,7 +100,7 @@ export function Form() {
 				<SlotSources.Actions>
 					<PersistButton />
 				</SlotSources.Actions>
-				<AutoForm entity={entity} id={id} onCreateSuccess={onCreateSuccess} createEditLink={createEditLink} />
+				<AutoForm entity={entity} id={id} onCreateSuccess={onCreateSuccess} LinkComponent={AutoLink} />
 			</DataBindingProvider>
 		</>
 	)

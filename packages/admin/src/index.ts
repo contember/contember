@@ -7,6 +7,7 @@ export * from './tenant'
 
 export type { AdminDictionary } from './adminDictionary'
 
+export * from '@contember/react-auto'
 export * from '@contember/react-binding'
 export * from '@contember/react-binding-ui'
 export * from '@contember/react-choice-field-ui'

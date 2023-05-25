@@ -1,42 +1,29 @@
 import { Component, HasOne, PRIMARY_KEY_NAME, Schema, useEntityPersistSuccess } from '@contember/react-binding'
-import {
-	CheckboxField,
-	DateField,
-	DateTimeField,
-	NumberField,
-	TextareaField,
-	TextField,
-} from '../bindingFacade'
-import {
-	BooleanCell,
-	DateCell,
-	EnumCell,
-	HasManySelectCell,
-	HasOneSelectCell,
-	NumberCell,
-	TextCell,
-} from '@contember/react-datagrid-ui'
-import {
-	SelectField,
-} from '@contember/react-choice-field-ui'
-import { formatString, getHumanFriendlyField, resolveConnectingEntity, resolveSortableBy } from './utils'
-import { MouseEvent, ReactNode, useCallback, useRef, useState } from 'react'
-import { RoutingLinkTarget } from '../../routing'
+import { CheckboxField, DateField, DateTimeField, NumberField, TextareaField, TextField } from '@contember/react-form-fields-ui'
+import { BooleanCell, DateCell, EnumCell, HasManySelectCell, HasOneSelectCell, NumberCell, TextCell } from '@contember/react-datagrid-ui'
+import { SelectField } from '@contember/react-choice-field-ui'
+import { MouseEvent, ReactNode, useCallback, useState } from 'react'
 import { AutoLabel } from './AutoLabel'
 import { dateToStringWithoutTimezone } from '@contember/utilities'
+import { getHumanFriendlyField } from '../utils/getHumanFriendlyField'
+import { formatString } from '../utils/formatString'
+import { resolveSortableBy } from '../utils/resolveSortableBy'
+import { resolveConnectingEntity } from '../utils/resolveConnectingEntity'
+import { LinkComponent, LinkComponentProps } from './types'
 
 export type AutoCellProps = {
 	schema: Schema
 	entityName: string
 	fieldName: string
-	createEntityLink?: (entity: string) => RoutingLinkTarget
+	LinkComponent?: LinkComponent
+	linkAction?: LinkComponentProps['action']
 }
 
 /**
  * @group Auto Admin
  */
 export const AutoCell = Component<AutoCellProps>(
-	({ schema, entityName, fieldName, createEntityLink }) => {
+	({ schema, entityName, fieldName, LinkComponent, linkAction }) => {
 		const field = schema.getEntityField(entityName, fieldName)
 
 		if (field.__typename === '_Column') {
@@ -162,7 +149,7 @@ export const AutoCell = Component<AutoCellProps>(
 			const targetField = connectingEntity ? connectingEntity.field : field
 			const targetEntity = schema.getEntity(targetField.targetEntity)
 			const humanFieldName = getHumanFriendlyField(targetEntity)
-			let optionLabel = <AutoLabel field={humanFieldName} createLink={createEntityLink} />
+			let optionLabel = <AutoLabel field={humanFieldName} LinkComponent={LinkComponent} linkAction={linkAction} />
 			optionLabel = connectingEntity ? <HasOne field={connectingEntity.field.name}>{optionLabel}</HasOne> : optionLabel
 
 			if (field.type === 'OneHasOne' || field.type === 'ManyHasOne') {

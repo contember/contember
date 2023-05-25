@@ -64,7 +64,7 @@ jobs:
         run: ${{ matrix.run_script }}
 
   playwright:
-    needs: [test]
+    needs: [ test ]
     runs-on: ubuntu-latest
     container: mcr.microsoft.com/playwright:v1.32.3-focal
 
@@ -141,7 +141,6 @@ jobs:
 
       - name: Prepare for playwright tests
         run: |
-          yarn run build:js:prod
           yarn run admin:pw:build
 
       - name: Run playwright tests

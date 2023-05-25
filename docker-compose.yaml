@@ -53,12 +53,11 @@ services:
       - .:/src:cached
 
   playwright:
-    image: mcr.microsoft.com/playwright:v1.32.3-focal
+    image: node:16-alpine
     command: [ 'npm', 'run', 'pw:dev' ]
     user: '1000:1000'
 
     environment:
-      DISPLAY: ${DISPLAY}
       CONTEMBER_API_URL: 'http://contember-engine:4000'
       VITE_CONTEMBER_ADMIN_SESSION_TOKEN: '0000000000000000000000000000000000000000'
       VITE_CONTEMBER_ADMIN_API_BASE_URL: 'http://localhost:3001'
@@ -69,7 +68,8 @@ services:
 
   playwright-tests:
     image: mcr.microsoft.com/playwright:v1.32.3-focal
-    command: [ 'npm', 'run', 'pw:dev' ]
+    scale: 0
+    command: [ 'sh' ]
     user: '1000:1000'
 
     environment:
@@ -77,7 +77,7 @@ services:
       VITE_CONTEMBER_ADMIN_API_BASE_URL: 'http://playwright-contember-engine:4000'
       VITE_CONTEMBER_ADMIN_SESSION_TOKEN: '0000000000000000000000000000000000000000'
 
-    working_dir: /src/packages/admin
+    working_dir: /src
     volumes:
       - .:/src:cached
 

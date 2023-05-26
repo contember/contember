@@ -5,7 +5,7 @@
 	"license": "proprietary",
 	"type": "module",
 	"scripts": {
-		"start": "tsx watch src/run-admin.ts",
+		"start": "yarn run -T tsx watch src/run-admin.ts",
 		"build": "yarn build:public && yarn build:server",
 		"watch": "yarn watch:public && yarn watch:server",
 		"build:public": "vite build public --config vite.config.js",

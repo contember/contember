@@ -14,9 +14,9 @@
   "dependencies": {
     "@contember/database": "^1.3.0-alpha.6",
     "@contember/database-migrations": "^1.3.0-alpha.6",
-    "@contember/logger": "^1.3.0-alpha.6",
     "@contember/engine-content-api": "^1.3.0-alpha.6",
     "@contember/engine-system-api": "^1.3.0-alpha.6",
+    "@contember/logger": "^1.3.0-alpha.6",
     "@contember/schema": "^1.3.0-alpha.6",
     "@contember/schema-definition": "^1.3.0-alpha.6",
     "@contember/schema-migrations": "^1.3.0-alpha.6",

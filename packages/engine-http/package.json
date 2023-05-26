@@ -31,7 +31,7 @@
     "@graphql-tools/schema": "^8.3.5",
     "@koa/cors": "^3.1.0",
     "@sentry/node": "^7.1.1",
-    "bcrypt": "^5.0.1",
+    "bcryptjs": "^2.4.3",
     "koa": "^2.11.0",
     "koa-bodyparser": "^4.3.0",
     "koa-compress": "^5.1.0",
@@ -41,7 +41,7 @@
     "ws": "^8.10.0"
   },
   "devDependencies": {
-    "@types/bcrypt": "^5.0.0",
+    "@types/bcryptjs": "^2.4.2",
     "@types/koa": "^2.11.3",
     "@types/koa-bodyparser": "^4.2.2",
     "@types/koa__cors": "^3.0.2",

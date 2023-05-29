@@ -60,6 +60,9 @@ export namespace Model {
 				readonly precedence: 'ALWAYS' | 'BY DEFAULT'
 				readonly start?: number
 			}
+			readonly computed?: {
+				readonly sql: string
+			}
 		}
 
 

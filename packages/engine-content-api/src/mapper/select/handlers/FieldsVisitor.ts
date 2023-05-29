@@ -18,13 +18,18 @@ export class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.C
 
 	visitColumn({ entity, column }: Model.ColumnContext): void {
 		const columnPath = this.executionContext.path
-		const tableAlias = columnPath.back().alias
-		const columnAlias = columnPath.alias
 
-		this.executionContext.addColumn({
-			query: qb => qb.select([tableAlias, column.columnName], columnAlias),
-			predicate: this.getRequiredPredicate(entity, column),
-		})
+		if (column.computed) {
+
+		} else {
+			const tableAlias = columnPath.back().alias
+			const columnAlias = columnPath.alias
+			this.executionContext.addColumn({
+				query: qb => qb.select([tableAlias, column.columnName], columnAlias),
+				predicate: this.getRequiredPredicate(entity, column),
+			})
+		}
+
 	}
 
 	public visitManyHasManyInverse(relationContext: Model.ManyHasManyInverseContext): void {

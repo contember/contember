@@ -149,17 +149,21 @@ class Compiler {
 			const conditionArg = condition || new Literal('true')
 			switch (type) {
 				case 'inner':
-					return query //
+					return query
 						.appendString(' inner join ')
 						.append(tableArg)
 						.appendString(' on ')
 						.append(conditionArg)
 				case 'left':
-					return query //
+					return query
 						.appendString(' left join ')
 						.append(tableArg)
 						.appendString(' on ')
 						.append(conditionArg)
+				case 'lateral':
+					return query
+						.appendString(' cross join lateral ')
+						.append(tableArg)
 				default:
 					return assertNever(type)
 			}

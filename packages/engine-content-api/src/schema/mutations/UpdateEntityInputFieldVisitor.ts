@@ -21,6 +21,9 @@ export class UpdateEntityInputFieldVisitor implements
 		if (this.authorizator.getFieldPermissions(Acl.Operation.update, entity.name, column.name) === 'no') {
 			return undefined
 		}
+		if (column.computed) {
+			return undefined
+		}
 		const type = this.columnTypeResolver.getType(column)
 		return { type }
 	}

@@ -6,7 +6,6 @@ import deepEqual from 'fast-deep-equal'
 import { updateColumns } from '../utils/diffUtils'
 import { wrapIdentifier } from '@contember/database'
 import { getColumnSqlType } from '../utils/columnUtils'
-import { getEntityDependantViews } from '../utils/viewDependencies'
 
 export class UpdateColumnDefinitionModificationHandler implements ModificationHandler<UpdateColumnDefinitionModificationData>  {
 	constructor(private readonly data: UpdateColumnDefinitionModificationData, private readonly schema: Schema) {}
@@ -18,6 +17,12 @@ export class UpdateColumnDefinitionModificationHandler implements ModificationHa
 		}
 		const oldColumn = entity.fields[this.data.fieldName] as Model.AnyColumn
 		const newColumn = this.data.definition
+		if (!!newColumn.computed !== !!oldColumn.computed) {
+			throw new Error('Invalid migrations. Cannot convert between computed and non-computed columns.')
+		}
+		if (newColumn.computed) {
+			return
+		}
 
 		const hasNewSequence = !oldColumn.sequence && newColumn.sequence
 		const hasNewType = newColumn.columnType !== oldColumn.columnType

@@ -109,6 +109,16 @@ class SelectBuilder<Result = SelectBuilder.Result> implements With.Aware, Where.
 		])
 	}
 
+	public lateralJoin(
+		expression: Literal,
+		alias?: string,
+	) {
+		return this.withOption('join', [
+			...this.options.join,
+			{ type: 'lateral', table: expression, alias, condition: undefined },
+		])
+	}
+
 	private joinConditionToLiteral(joinCondition?: SelectBuilder.JoinCondition): Literal | undefined {
 		if (joinCondition === undefined) {
 			return undefined
@@ -192,7 +202,7 @@ namespace SelectBuilder {
 			from: undefined | [Literal | string, string | undefined][]
 			orderBy: [Literal, OrderByDirection][]
 			join: {
-				type: 'inner' | 'left'
+				type: 'inner' | 'left' | 'lateral'
 				table: string | Literal
 				alias: string | undefined
 				condition: Literal | undefined

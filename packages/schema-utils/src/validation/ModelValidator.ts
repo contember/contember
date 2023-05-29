@@ -76,6 +76,14 @@ export class ModelValidator {
 			if (field.sequence && field.nullable) {
 				errors.add('MODEL_INVALID_COLUMN_DEFINITION', 'Column with sequence cannot be nullable.')
 			}
+			if (field.computed) {
+				if (field.sequence) {
+					errors.add('MODEL_INVALID_COLUMN_DEFINITION', 'Computed column cannot have sequence.')
+				}
+				if (field.default) {
+					errors.add('MODEL_INVALID_COLUMN_DEFINITION', 'Computed column cannot have default value.')
+				}
+			}
 		}
 	}
 

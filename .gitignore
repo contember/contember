@@ -1,6 +1,3 @@
-# JetBrains idea
-.idea/*
-
 # Yarn
 .yarn/*
 !.yarn/patches

@@ -3,14 +3,12 @@
   "packageManager": "yarn@3.5.1",
   "private": true,
   "scripts": {
-    "oao": "oao",
-    "bootstrap": "oao bootstrap",
     "ts:build": "tsc --build",
     "ts:watch": "tsc --build --watch --pretty",
     "ts:clean": "tsc --build --clean",
-    "build": "tsc --build && oao run-script build",
-    "test": "oao run-script --relative-time test",
-    "test-e2e": "oao run-script --relative-time test-e2e",
+    "build": "tsc --build && yarn workspaces foreach run build",
+    "test": "yarn workspaces foreach run test",
+    "test-e2e": "yarn workspaces foreach run test-e2e",
     "eslint:lint": "eslint \"**/*.{ts,tsx}\" ",
     "eslint:fix": "eslint --fix \"**/*.{ts,tsx}\" ",
     "tag-version": "oao publish --no-npm-publish --no-changelog --no-check-uncommitted --no-master"

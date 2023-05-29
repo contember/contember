@@ -9,7 +9,6 @@
     "default": "./dist/src/index.js"
   },
   "scripts": {
-    "build-copy": "mkdir -p dist && find ./tests/ -name '*.gql' -type f -exec cp --parents \\{\\} ./dist \\;",
     "generate": "gql-gen --config graphql.codegen.yml",
     "test": "vitest --no-threads"
   },

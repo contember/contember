@@ -8,7 +8,7 @@
     "ts:build": "tsc --build",
     "ts:watch": "tsc --build --watch --pretty",
     "ts:clean": "tsc --build --clean",
-    "build": "oao run-script build-copy && tsc --build && oao run-script build",
+    "build": "tsc --build && oao run-script build",
     "test": "oao run-script --relative-time test",
     "test-e2e": "oao run-script --relative-time test-e2e",
     "eslint:lint": "eslint \"**/*.{ts,tsx}\" ",

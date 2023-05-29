@@ -6,4 +6,4 @@ yarn install
 node ee/engine-server-ee/esbuild.js
 cd server
 echo "{}" > package.json
-yarn add bcryptjs heapdump
+yarn add heapdump

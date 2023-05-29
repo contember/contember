@@ -328,7 +328,7 @@ export namespace EntityAccessor {
     // (undocumented)
     export type GetEntityAccessor = () => EntityAccessor;
     // (undocumented)
-    export type NestedAccessor = EntityAccessor | EntityListAccessor | FieldAccessor;
+    export type NestedAccessor = EntityAccessor | EntityListAccessor | FieldAccessor<any>;
     // (undocumented)
     export type PersistErrorHandler = (getAccessor: GetEntityAccessor, options: PersistErrorOptions) => void | Promise<void>;
     // (undocumented)

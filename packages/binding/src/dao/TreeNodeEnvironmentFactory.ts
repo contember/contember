@@ -10,10 +10,8 @@ import {
 	SugaredUnconstrainedQualifiedSingleEntity,
 } from '../treeParameters'
 import { QueryLanguage } from '../queryLanguage'
-import { BindingError } from '../BindingError'
 import { whereToFilter } from '@contember/client'
-import { BaseRelation, Schema, SchemaColumn, SchemaEntity, SchemaField, SchemaRelation } from '../core/schema'
-import levenshtein from 'js-levenshtein'
+import { TreeNodeUtils } from '../utils/TreeNodeUtils'
 
 export class TreeNodeEnvironmentFactory {
 
@@ -36,7 +34,7 @@ export class TreeNodeEnvironmentFactory {
 			expectedCardinality = 'zero-to-many'
 		}
 
-		const entitySchema = this.resolveEntity(environment.getSchema(), entityList.entityName, 'entity list')
+		const entitySchema = TreeNodeUtils.resolveEntity(environment.getSchema(), entityList.entityName, 'entity list')
 
 		return environment.withSubTree({
 			type: 'subtree-entity-list',
@@ -65,7 +63,7 @@ export class TreeNodeEnvironmentFactory {
 			expectedCardinality = entity.setOnCreate ? 'zero-or-one' : 'one'
 		}
 
-		const entitySchema = this.resolveEntity(environment.getSchema(), entity.entityName, 'entity')
+		const entitySchema = TreeNodeUtils.resolveEntity(environment.getSchema(), entity.entityName, 'entity')
 
 		return environment.withSubTree({
 			type: 'subtree-entity',
@@ -83,7 +81,7 @@ export class TreeNodeEnvironmentFactory {
 		const hasOneEnvironment = this.traverseHasOnePath(environment, relativeEntityList.hasOneRelationPath)
 		const hasManyField = relativeEntityList.hasManyRelation.field
 
-		const field = this.assertHasManyRelation(hasOneEnvironment, hasManyField)
+		const field = TreeNodeUtils.resolveHasManyRelation(hasOneEnvironment, hasManyField)
 
 		const targetEntity = environment.getSchema().getEntity(field.targetEntity)
 
@@ -110,7 +108,7 @@ export class TreeNodeEnvironmentFactory {
 		const relativeSingleField = QueryLanguage.desugarRelativeSingleField(sugaredRelativeSingleField, environment)
 		const hasOneEnvironment = this.traverseHasOnePath(environment, relativeSingleField.hasOneRelationPath)
 
-		const field = this.resolveColumn(hasOneEnvironment, relativeSingleField.field)
+		const field = TreeNodeUtils.resolveColumn(hasOneEnvironment, relativeSingleField.field)
 
 		return hasOneEnvironment.withSubTreeChild({
 			type: 'column',
@@ -124,7 +122,7 @@ export class TreeNodeEnvironmentFactory {
 		hasOneRelationPath: HasOneRelation[],
 	): Environment {
 		for (const pathItem of hasOneRelationPath) {
-			const field = this.resolveHasOneRelation(environment, pathItem.field, !!pathItem.reducedBy)
+			const field = TreeNodeUtils.resolveHasOneRelation(environment, pathItem.field, !!pathItem.reducedBy)
 			const targetEntity = environment.getSchema().getEntity(field.targetEntity)
 
 			environment = environment.withSubTreeChild({
@@ -136,88 +134,4 @@ export class TreeNodeEnvironmentFactory {
 		return environment
 	}
 
-	private static resolveHasOneRelation(environment: Environment, field: string, isReduced: boolean): SchemaRelation {
-		if (isReduced) {
-			return this.resolveRelation(environment, field, 'reduced has-one relation', ['ManyHasMany', 'OneHasMany'])
-		}
-		return this.resolveRelation(environment, field, 'a has-one relation', ['ManyHasOne', 'OneHasOne'])
-	}
-
-	private static assertHasManyRelation(environment: Environment, field: string): SchemaRelation {
-		return this.resolveRelation(environment, field, 'a has-many relation', ['ManyHasMany', 'OneHasMany'])
-	}
-
-
-	private static resolveRelation(environment: Environment, field: string, relationDescription: string, expectedRelationType: BaseRelation['type'][]): SchemaRelation {
-		return this.resolveField(environment, field, (field): field is SchemaRelation => {
-			return field.__typename === '_Relation' && expectedRelationType.includes(field.type)
-		}, relationDescription)
-	}
-
-	private static resolveEntity(schema: Schema, entityName: string, type: 'entity' | 'entity list'): SchemaEntity {
-		const entity = schema.getEntityOrUndefined(entityName)
-		if (!entity) {
-			const alternative = this.recommendAlternative(entityName, schema.getEntityNames())
-			const didYouMean = alternative ? `Did you mean '${alternative}'?` : ''
-			throw new BindingError(`Invalid ${type} sub tree: Entity '${entityName}' doesn't exist. ${didYouMean}`)
-		}
-		return entity
-	}
-
-	private static resolveColumn(environment: Environment, fieldName: string): SchemaColumn {
-		return this.resolveField(environment, fieldName, (field): field is SchemaColumn => field.__typename === '_Column', 'an ordinary field')
-		// TODO check that defaultValue matches the type
-		// TODO run custom validators
-	}
-
-	private static resolveField<T extends SchemaField>(environment: Environment, fieldName: string, matcher: (field: SchemaField) => field is T, expectedDescription: string): T {
-		const treeLocation = environment.getSubTreeNode()
-		const entity = treeLocation.entity
-		const field = entity.fields.get(fieldName)
-		if (!field) {
-			const alternative = this.recommendAlternative(
-				fieldName,
-				Array.from(entity.fields)
-					.filter(([, field]) => matcher(field))
-					.map(([fieldName]) => fieldName),
-			)
-			const didYouMean = alternative ? `Did you mean '${alternative}'?` : ''
-			throw new BindingError(`Field '${fieldName}' doesn't exist on ${this.describeLocation(environment)}. ${didYouMean}`)
-		}
-		if (!matcher(field)) {
-			const actual = field.__typename === '_Column' ? 'an ordinary field' : `a ${field.type} relation`
-			throw new BindingError(
-				`Invalid field: the name '${field.name}' on ${this.describeLocation(environment)} ` +
-				`refers to ${actual} but is being used as a ${expectedDescription}.`,
-			)
-		}
-		return field
-	}
-
-	private static describeLocation(environment: Environment): string {
-		const path = []
-		const loc = environment.getSubTreeNode()
-		for (let env = environment;; env = env.getParent()) {
-			const node = env.getSubTreeNode()
-			if (node.type === 'subtree-entity' || node.type === 'subtree-entity-list') {
-				return `entity '${loc.entity.name}' in path '${[node.entity.name, ...path.reverse()].join('.')}'`
-			}
-			path.push(node.field.name)
-		}
-	}
-
-	public static recommendAlternative(original: string, possibleAlternatives: Iterable<string>): string | undefined {
-		let bestAlternative: string | undefined = undefined
-		let bestAlternativeDistance = Number.MAX_SAFE_INTEGER
-
-		for (const alternative of possibleAlternatives) {
-			const distance = levenshtein(original, alternative)
-
-			if (distance < bestAlternativeDistance) {
-				bestAlternative = alternative
-				bestAlternativeDistance = distance
-			}
-		}
-		return bestAlternative
-	}
 }

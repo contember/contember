@@ -2,7 +2,7 @@ import { RuntimeId, SingleEntityPersistedData } from '../accessorTree'
 import { BindingError } from '../BindingError'
 import type { EntityOperations } from '../core/operations'
 import type { Environment } from '../dao'
-import { PlaceholderGenerator } from '../markers'
+import { EntityFieldMarkers, HasManyRelationMarker, HasOneRelationMarker, PlaceholderGenerator } from '../markers'
 import { QueryLanguage } from '../queryLanguage'
 import type {
 	EntityId,
@@ -10,6 +10,8 @@ import type {
 	EntityRealmKey,
 	FieldName,
 	FieldValue,
+	HasManyRelation,
+	HasOneRelation,
 	RelativeEntityList,
 	RelativeSingleEntity,
 	RelativeSingleField,
@@ -19,7 +21,7 @@ import type {
 } from '../treeParameters'
 import type { AsyncBatchUpdatesOptions } from './AsyncBatchUpdatesOptions'
 import type { BatchUpdatesOptions } from './BatchUpdatesOptions'
-import type { EntityListAccessor } from './EntityListAccessor'
+import { EntityListAccessor } from './EntityListAccessor'
 import type { Errorable } from './Errorable'
 import { ErrorAccessor } from './ErrorAccessor'
 import type { FieldAccessor } from './FieldAccessor'
@@ -27,6 +29,8 @@ import type { PersistErrorOptions } from './PersistErrorOptions'
 import type { PersistSuccessOptions } from './PersistSuccessOptions'
 import type { EntityRealmState } from '../core/state'
 import { getEntityMarker } from '../core/state'
+import { TreeNodeUtils } from '../utils/TreeNodeUtils'
+import { PlaceholderParametersGenerator } from '../markers/PlaceholderParametersGenerator'
 
 class EntityAccessor implements Errorable {
 	public constructor(
@@ -41,7 +45,8 @@ class EntityAccessor implements Errorable {
 		public readonly errors: ErrorAccessor | undefined,
 		public readonly environment: Environment,
 		public readonly getAccessor: EntityAccessor.GetEntityAccessor,
-	) {}
+	) {
+	}
 
 	public get idOnServer(): EntityId | undefined {
 		return this.runtimeId.existsOnServer ? this.runtimeId.value : undefined
@@ -123,26 +128,104 @@ class EntityAccessor implements Errorable {
 	 * @see EntityAccessor.getField
 	 */
 	public getRelativeSingleField<Value extends FieldValue = FieldValue>(field: RelativeSingleField): FieldAccessor<Value> {
-		return this.getRelativeSingleEntity(field).getAccessorByPlaceholder(
-			PlaceholderGenerator.getFieldPlaceholder(field.field),
-		) as unknown as FieldAccessor<Value>
+		const entity = this.getRelativeSingleEntity(field)
+		const fieldPlaceholder = PlaceholderGenerator.getFieldPlaceholder(field.field)
+		const accessor = entity.fieldData.get(fieldPlaceholder)
+		if (accessor) {
+			return accessor.getAccessor() as FieldAccessor<Value>
+		}
+
+		TreeNodeUtils.resolveColumn(entity.environment, field.field)
+
+		throw new BindingError(''
+			+ 'EntityAccessor: cannot access field '
+			+ `'${field.field}' on ${TreeNodeUtils.describeLocation(entity.environment)}.\n`
+			+ 'The cause of the error is that this relation has not been registered during the static rendering process. As a result, it lacks a required marker and accessor.',
+		)
 	}
 
 	public getRelativeSingleEntity(relativeSingleEntity: RelativeSingleEntity): EntityAccessor {
 		let relativeTo: EntityAccessor = this
 
 		for (const hasOneRelation of relativeSingleEntity.hasOneRelationPath) {
-			relativeTo = relativeTo.getAccessorByPlaceholder(
-				PlaceholderGenerator.getHasOneRelationPlaceholder(hasOneRelation),
-			) as EntityAccessor
+			const fieldPlaceholder = PlaceholderGenerator.getHasOneRelationPlaceholder(hasOneRelation)
+			const accessor = relativeTo.fieldData.get(fieldPlaceholder)
+			if (!accessor) {
+				return this.raiseInvalidHasOneRelationError(relativeTo, hasOneRelation)
+			}
+
+			relativeTo = accessor.getAccessor() as EntityAccessor
 		}
 		return relativeTo
 	}
 
 	public getRelativeEntityList(entityList: RelativeEntityList): EntityListAccessor {
-		return this.getRelativeSingleEntity(entityList).getAccessorByPlaceholder(
-			PlaceholderGenerator.getHasManyRelationPlaceholder(entityList.hasManyRelation),
-		) as EntityListAccessor
+		const entity = this.getRelativeSingleEntity(entityList)
+		const fieldPlaceholder = PlaceholderGenerator.getHasManyRelationPlaceholder(entityList.hasManyRelation)
+		const accessor = entity.fieldData.get(fieldPlaceholder)
+		if (!accessor) {
+			return this.raiseInvalidHasManyRelationError(entity, entityList.hasManyRelation)
+		}
+
+		return accessor.getAccessor() as EntityListAccessor
+	}
+
+	private raiseInvalidHasOneRelationError(relativeTo: EntityAccessor, hasOneRelation: HasOneRelation): never {
+		TreeNodeUtils.resolveHasOneRelation(relativeTo.environment, hasOneRelation.field, !!hasOneRelation.reducedBy)
+
+		const entityMarker = relativeTo.getMarker()
+		const possibleMarkers = this.getMarkersOfType(entityMarker.fields.markers, HasOneRelationMarker, hasOneRelation.field)
+		const markerParams = possibleMarkers.map(it => PlaceholderParametersGenerator.createHasOneRelationParameters(it.parameters))
+
+		const relationParams = PlaceholderParametersGenerator.createHasOneRelationParameters(hasOneRelation)
+
+		this.raiseUndefinedRelationError(hasOneRelation.field, relativeTo.environment, relationParams, markerParams)
+	}
+
+	private raiseInvalidHasManyRelationError(entity: EntityAccessor, hasManyRelation: HasManyRelation): never {
+		TreeNodeUtils.resolveHasManyRelation(entity.environment, hasManyRelation.field)
+
+		const entityMarker = entity.getMarker()
+		const possibleMarkers = this.getMarkersOfType(entityMarker.fields.markers, HasManyRelationMarker, hasManyRelation.field)
+		const markerParams = possibleMarkers.map(it => PlaceholderParametersGenerator.createHasManyRelationParameters(it.parameters))
+
+		const relationParams = PlaceholderParametersGenerator.createHasManyRelationParameters(hasManyRelation)
+
+		this.raiseUndefinedRelationError(hasManyRelation.field, entity.environment, relationParams, markerParams)
+	}
+
+	private raiseUndefinedRelationError(field: string, environment: Environment, relationParams: any, otherMarkersParams: any[]): never {
+		const hint = this.createHintMessage(otherMarkersParams)
+		throw new BindingError(''
+			+ `EntityAccessor: cannot access relation `
+			+ `'${field}' on ${TreeNodeUtils.describeLocation(environment)}.\n`
+			+ 'The cause of the error is that this relation has not been registered during the static rendering process. As a result, it lacks a required marker and accessor.\n\n'
+			+ 'Provided parameters:\n'
+			+ JSON.stringify(relationParams)
+			+ hint,
+		)
+	}
+
+	private createHintMessage(params: any[]): string {
+		if (params.length === 0) {
+			return ''
+		}
+
+		const serializedParams = params.map(it => JSON.stringify(it)).join('\n')
+		const message = params.length === 1
+			? 'However, there is existing marker for the same field, but it have different parameters:'
+			: 'However, there are existing markers for the same field, but they have different parameters:'
+
+		return `\n\n${message}\n${serializedParams}`
+	}
+
+	private getMarkersOfType<T extends { new(...args: any[]): HasManyRelationMarker | HasOneRelationMarker }>(
+		markers: EntityFieldMarkers,
+		markerConstructor: T,
+		fieldName: string,
+	): InstanceType<T>[] {
+		return Array.from(markers.values())
+			.filter((it): it is InstanceType<T> => (it instanceof markerConstructor) && it.parameters.field === fieldName)
 	}
 
 	public getParent(): EntityAccessor | EntityListAccessor | undefined {
@@ -156,28 +239,13 @@ class EntityAccessor implements Errorable {
 	public getMarker() {
 		return getEntityMarker(this.state)
 	}
-
-	private getAccessorByPlaceholder(placeholderName: FieldName): EntityAccessor.NestedAccessor {
-		const record = this.fieldData.get(placeholderName)
-		if (record === undefined) {
-			throw new BindingError(
-				`EntityAccessor: unknown field placeholder '${placeholderName} on ${this.name}'. Unless this is just a typo, this is ` +
-					`typically caused by one of the following:\n` +
-					`\t• Trying to access a field that has not been registered during static render, and thus lacks a marker and an accessor.\n` +
-					`\t• Misusing an EntityAccessor getter. If you used one of the getRelative[…] family, please make sure all ` +
-					`parameters match the marker tree exactly.` +
-					`\n\nFor more information, please consult the documentation.\n\n`,
-			)
-		}
-		return record.getAccessor()
-	}
 }
 
 namespace EntityAccessor {
 	export interface FieldDatum {
 		getAccessor(): NestedAccessor
 	}
-	export type NestedAccessor = EntityAccessor | EntityListAccessor | FieldAccessor
+	export type NestedAccessor = EntityAccessor | EntityListAccessor | FieldAccessor<any>
 
 	export type FieldValuePairs =
 		| {

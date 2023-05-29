@@ -12,10 +12,10 @@
     "test": "vitest"
   },
   "dependencies": {
-    "@contember/queryable": "^1.3.0-alpha.6"
+    "@contember/queryable": "workspace:*"
   },
   "devDependencies": {
-    "@contember/database-tester": "^1.3.0-alpha.6",
+    "@contember/database-tester": "workspace:*",
     "@types/node": "^18",
     "pg": "^8.9.0"
   },

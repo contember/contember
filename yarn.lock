@@ -779,7 +779,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@contember/cli@^1.3.0-alpha.6, @contember/cli@workspace:packages/cli":
+"@contember/cli@workspace:*, @contember/cli@workspace:packages/cli":
   version: 0.0.0-use.local
   resolution: "@contember/cli@workspace:packages/cli"
   dependencies:
@@ -837,7 +837,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@contember/database-migrations@^1.3.0-alpha.6, @contember/database-migrations@workspace:*, @contember/database-migrations@workspace:packages/database-migrations":
+"@contember/database-migrations@workspace:*, @contember/database-migrations@workspace:packages/database-migrations":
   version: 0.0.0-use.local
   resolution: "@contember/database-migrations@workspace:packages/database-migrations"
   dependencies:
@@ -859,7 +859,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@contember/database@^1.3.0-alpha.6, @contember/database@workspace:*, @contember/database@workspace:packages/database":
+"@contember/database@workspace:*, @contember/database@workspace:packages/database":
   version: 0.0.0-use.local
   resolution: "@contember/database@workspace:packages/database"
   dependencies:
@@ -878,24 +878,24 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@contember/engine-actions@^1.3.0-alpha.6, @contember/engine-actions@workspace:ee/engine-actions":
+"@contember/engine-actions@workspace:*, @contember/engine-actions@workspace:ee/engine-actions":
   version: 0.0.0-use.local
   resolution: "@contember/engine-actions@workspace:ee/engine-actions"
   dependencies:
-    "@contember/database": ^1.3.0-alpha.6
-    "@contember/database-migrations": ^1.3.0-alpha.6
-    "@contember/engine-api-tester": ^1.3.0-alpha.6
-    "@contember/engine-common": ^1.3.0-alpha.6
-    "@contember/engine-content-api": ^1.3.0-alpha.6
-    "@contember/engine-http": ^1.3.0-alpha.6
-    "@contember/engine-plugins": ^1.3.0-alpha.6
-    "@contember/engine-system-api": ^1.3.0-alpha.6
-    "@contember/engine-tenant-api": ^1.3.0-alpha.6
-    "@contember/graphql-utils": ^1.3.0-alpha.6
-    "@contember/logger": ^1.3.0-alpha.6
-    "@contember/schema": ^1.3.0-alpha.6
-    "@contember/schema-utils": ^1.3.0-alpha.6
-    "@contember/typesafe": ^1.3.0-alpha.6
+    "@contember/database": "workspace:*"
+    "@contember/database-migrations": "workspace:*"
+    "@contember/engine-api-tester": "workspace:*"
+    "@contember/engine-common": "workspace:*"
+    "@contember/engine-content-api": "workspace:*"
+    "@contember/engine-http": "workspace:*"
+    "@contember/engine-plugins": "workspace:*"
+    "@contember/engine-system-api": "workspace:*"
+    "@contember/engine-tenant-api": "workspace:*"
+    "@contember/graphql-utils": "workspace:*"
+    "@contember/logger": "workspace:*"
+    "@contember/schema": "workspace:*"
+    "@contember/schema-utils": "workspace:*"
+    "@contember/typesafe": "workspace:*"
     "@graphql-codegen/cli": ^2.6.2
     "@graphql-codegen/typescript": ^2.5.1
     "@graphql-codegen/typescript-operations": ^2.4.2
@@ -910,7 +910,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@contember/engine-api-tester@^1.3.0-alpha.6, @contember/engine-api-tester@workspace:*, @contember/engine-api-tester@workspace:packages/engine-api-tester":
+"@contember/engine-api-tester@workspace:*, @contember/engine-api-tester@workspace:packages/engine-api-tester":
   version: 0.0.0-use.local
   resolution: "@contember/engine-api-tester@workspace:packages/engine-api-tester"
   dependencies:
@@ -931,7 +931,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@contember/engine-common@^1.3.0-alpha.6, @contember/engine-common@workspace:*, @contember/engine-common@workspace:packages/engine-common":
+"@contember/engine-common@workspace:*, @contember/engine-common@workspace:packages/engine-common":
   version: 0.0.0-use.local
   resolution: "@contember/engine-common@workspace:packages/engine-common"
   dependencies:
@@ -940,7 +940,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@contember/engine-content-api@^1.3.0-alpha.6, @contember/engine-content-api@workspace:*, @contember/engine-content-api@workspace:packages/engine-content-api":
+"@contember/engine-content-api@workspace:*, @contember/engine-content-api@workspace:packages/engine-content-api":
   version: 0.0.0-use.local
   resolution: "@contember/engine-content-api@workspace:packages/engine-content-api"
   dependencies:
@@ -969,7 +969,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@contember/engine-http@^1.3.0-alpha.6, @contember/engine-http@workspace:*, @contember/engine-http@workspace:packages/engine-http":
+"@contember/engine-http@workspace:*, @contember/engine-http@workspace:packages/engine-http":
   version: 0.0.0-use.local
   resolution: "@contember/engine-http@workspace:packages/engine-http"
   dependencies:
@@ -1015,7 +1015,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@contember/engine-plugins@^1.3.0-alpha.6, @contember/engine-plugins@workspace:*, @contember/engine-plugins@workspace:packages/engine-plugins":
+"@contember/engine-plugins@workspace:*, @contember/engine-plugins@workspace:packages/engine-plugins":
   version: 0.0.0-use.local
   resolution: "@contember/engine-plugins@workspace:packages/engine-plugins"
   dependencies:
@@ -1027,7 +1027,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@contember/engine-s3-plugin@^1.3.0-alpha.6, @contember/engine-s3-plugin@workspace:*, @contember/engine-s3-plugin@workspace:packages/engine-s3-plugin":
+"@contember/engine-s3-plugin@workspace:*, @contember/engine-s3-plugin@workspace:packages/engine-s3-plugin":
   version: 0.0.0-use.local
   resolution: "@contember/engine-s3-plugin@workspace:packages/engine-s3-plugin"
   dependencies:
@@ -1051,9 +1051,9 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@contember/engine-sandbox@workspace:sandbox"
   dependencies:
-    "@contember/cli": ^1.3.0-alpha.6
-    "@contember/schema": ^1.3.0-alpha.6
-    "@contember/schema-definition": ^1.3.0-alpha.6
+    "@contember/cli": "workspace:*"
+    "@contember/schema": "workspace:*"
+    "@contember/schema-definition": "workspace:*"
   languageName: unknown
   linkType: soft
 
@@ -1061,15 +1061,15 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@contember/engine-server-ee@workspace:ee/engine-server-ee"
   dependencies:
-    "@contember/database": ^1.3.0-alpha.6
-    "@contember/engine-actions": ^1.3.0-alpha.6
-    "@contember/engine-api-tester": ^1.3.0-alpha.6
-    "@contember/engine-common": ^1.3.0-alpha.6
-    "@contember/engine-http": ^1.3.0-alpha.6
-    "@contember/engine-plugins": ^1.3.0-alpha.6
-    "@contember/engine-s3-plugin": ^1.3.0-alpha.6
-    "@contember/engine-vimeo-plugin": ^1.3.0-alpha.6
-    "@contember/typesafe": ^1.3.0-alpha.6
+    "@contember/database": "workspace:*"
+    "@contember/engine-actions": "workspace:*"
+    "@contember/engine-api-tester": "workspace:*"
+    "@contember/engine-common": "workspace:*"
+    "@contember/engine-http": "workspace:*"
+    "@contember/engine-plugins": "workspace:*"
+    "@contember/engine-s3-plugin": "workspace:*"
+    "@contember/engine-vimeo-plugin": "workspace:*"
+    "@contember/typesafe": "workspace:*"
     "@types/koa": ^2.11.3
     "@types/node": ^18
     graphql: ^16.5.0
@@ -1100,7 +1100,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@contember/engine-system-api@^1.3.0-alpha.6, @contember/engine-system-api@workspace:*, @contember/engine-system-api@workspace:packages/engine-system-api":
+"@contember/engine-system-api@workspace:*, @contember/engine-system-api@workspace:packages/engine-system-api":
   version: 0.0.0-use.local
   resolution: "@contember/engine-system-api@workspace:packages/engine-system-api"
   dependencies:
@@ -1131,7 +1131,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@contember/engine-tenant-api@^1.3.0-alpha.6, @contember/engine-tenant-api@workspace:*, @contember/engine-tenant-api@workspace:packages/engine-tenant-api":
+"@contember/engine-tenant-api@workspace:*, @contember/engine-tenant-api@workspace:packages/engine-tenant-api":
   version: 0.0.0-use.local
   resolution: "@contember/engine-tenant-api@workspace:packages/engine-tenant-api"
   dependencies:
@@ -1168,7 +1168,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@contember/engine-vimeo-plugin@^1.3.0-alpha.6, @contember/engine-vimeo-plugin@workspace:*, @contember/engine-vimeo-plugin@workspace:packages/engine-vimeo-plugin":
+"@contember/engine-vimeo-plugin@workspace:*, @contember/engine-vimeo-plugin@workspace:packages/engine-vimeo-plugin":
   version: 0.0.0-use.local
   resolution: "@contember/engine-vimeo-plugin@workspace:packages/engine-vimeo-plugin"
   dependencies:
@@ -1209,7 +1209,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@contember/graphql-utils@^1.3.0-alpha.6, @contember/graphql-utils@workspace:*, @contember/graphql-utils@workspace:packages/graphql-utils":
+"@contember/graphql-utils@workspace:*, @contember/graphql-utils@workspace:packages/graphql-utils":
   version: 0.0.0-use.local
   resolution: "@contember/graphql-utils@workspace:packages/graphql-utils"
   dependencies:
@@ -1220,7 +1220,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@contember/logger@^1.3.0-alpha.6, @contember/logger@workspace:*, @contember/logger@workspace:packages/logger":
+"@contember/logger@workspace:*, @contember/logger@workspace:packages/logger":
   version: 0.0.0-use.local
   resolution: "@contember/logger@workspace:packages/logger"
   dependencies:
@@ -1235,7 +1235,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@contember/schema-definition@^1.3.0-alpha.6, @contember/schema-definition@workspace:*, @contember/schema-definition@workspace:packages/schema-definition":
+"@contember/schema-definition@workspace:*, @contember/schema-definition@workspace:packages/schema-definition":
   version: 0.0.0-use.local
   resolution: "@contember/schema-definition@workspace:packages/schema-definition"
   dependencies:
@@ -1265,7 +1265,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@contember/schema-utils@^1.3.0-alpha.6, @contember/schema-utils@workspace:*, @contember/schema-utils@workspace:packages/schema-utils":
+"@contember/schema-utils@workspace:*, @contember/schema-utils@workspace:packages/schema-utils":
   version: 0.0.0-use.local
   resolution: "@contember/schema-utils@workspace:packages/schema-utils"
   dependencies:
@@ -1278,13 +1278,13 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@contember/schema@^1.3.0-alpha.6, @contember/schema@workspace:*, @contember/schema@workspace:packages/schema":
+"@contember/schema@workspace:*, @contember/schema@workspace:packages/schema":
   version: 0.0.0-use.local
   resolution: "@contember/schema@workspace:packages/schema"
   languageName: unknown
   linkType: soft
 
-"@contember/typesafe@^1.3.0-alpha.6, @contember/typesafe@workspace:*, @contember/typesafe@workspace:packages/typesafe":
+"@contember/typesafe@workspace:*, @contember/typesafe@workspace:packages/typesafe":
   version: 0.0.0-use.local
   resolution: "@contember/typesafe@workspace:packages/typesafe"
   dependencies:

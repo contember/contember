@@ -9,26 +9,25 @@
     "default": "./dist/src/index.js"
   },
   "scripts": {
-    "build-copy": "mkdir -p dist && find ./tests/ -name '*.gql' -type f -exec cp --parents {} ./dist \\;",
     "generate": "gql-gen --config graphql.codegen.yml",
     "test": "vitest --no-threads"
   },
   "dependencies": {
-    "@contember/database": "^1.3.0-alpha.8",
-    "@contember/dic": "^1.3.0-alpha.8",
-    "@contember/logger": "^1.3.0-alpha.8",
-    "@contember/graphql-utils": "^1.3.0-alpha.8",
-    "@contember/schema": "^1.3.0-alpha.8",
-    "@contember/schema-definition": "^1.3.0-alpha.8",
-    "@contember/schema-utils": "^1.3.0-alpha.8",
+    "@contember/database": "workspace:*",
+    "@contember/dic": "workspace:*",
+    "@contember/graphql-utils": "workspace:*",
+    "@contember/logger": "workspace:*",
+    "@contember/schema": "workspace:*",
+    "@contember/schema-definition": "workspace:*",
+    "@contember/schema-utils": "workspace:*",
     "@graphql-tools/schema": "^8.3.5",
     "fast-deep-equal": "^3.1.3",
     "graphql-tag": "^2.12.5"
   },
   "devDependencies": {
-    "@contember/database-tester": "^1.3.0-alpha.8",
-    "@contember/engine-api-tester": "^1.3.0-alpha.8",
-    "@contember/schema-definition": "^1.3.0-alpha.8",
+    "@contember/database-tester": "workspace:*",
+    "@contember/engine-api-tester": "workspace:*",
+    "@contember/schema-definition": "workspace:*",
     "@graphql-codegen/cli": "^2.6.2",
     "@graphql-codegen/typescript": "^2.5.1",
     "@graphql-codegen/typescript-operations": "^2.4.2",

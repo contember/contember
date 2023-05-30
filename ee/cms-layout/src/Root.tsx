@@ -153,37 +153,47 @@ export const Root = memo(({
 		>
 			{sidebarLeftPropsProp && isSidebarLeftActive && (
 				<Sidebar {...sidebarLeftProps}>
-					{setHasOneOf(activeSlots, [slotTargets.SidebarLeftHeader]) && (
-						<Layout.PanelHeader className={classNameFor('sidebar-left-header')}>
-							<Stack className={classNameFor('sidebar-left-header-content')} align="center" justify="space-between" direction="horizontal">
-								<LayoutPanelContext.Consumer>{({ behavior }) => (
-									behavior === 'modal' ? <ModalLogo className="synthetic-layout-slot" /> : null
-								)}</LayoutPanelContext.Consumer>
+					<GetLayoutPanelsStateContext.Consumer>{({ panels }) => {
+						const sidebarLeftPanel = panels.get(PANEL_LEFT_NAME)
 
-								<SidebarLeftHeader />
+						if (sidebarLeftPanel) {
+							const { behavior } = sidebarLeftPanel
 
-								<LayoutPanelContext.Consumer>{({ behavior }) => (
-									behavior === 'modal'
-										? <ToggleMenuButton
-											className={classNameFor('sidebar-left-header-menu-button')}
-											panel={PANEL_LEFT_NAME}
-										/>
-										: null
-								)}</LayoutPanelContext.Consumer>
-							</Stack>
-						</Layout.PanelHeader>
-					)}
+							return (
+								<>
+									{(setHasOneOf(activeSlots, [slotTargets.SidebarLeftHeader]) || behavior === 'modal') && (
+										<Layout.PanelHeader className={classNameFor('sidebar-left-header')}>
+											<Stack className={classNameFor('sidebar-left-header-content')} align="center" justify="space-between" direction="horizontal">
+												{behavior === 'modal' && <ModalLogo className="synthetic-layout-slot" />}
 
-					<Layout.PanelBody className={classNameFor('sidebar-left-body')}>
-						<Navigation />
-						<SidebarLeftBody />
-					</Layout.PanelBody>
+												<SidebarLeftHeader />
 
-					{setHasOneOf(activeSlots, [slotTargets.SidebarLeftFooter]) && (
-						<Layout.PanelFooter className={classNameFor('sidebar-left-footer')}>
-							<SidebarLeftFooter />
-						</Layout.PanelFooter>
-					)}
+												{behavior === 'modal' && (
+													<ToggleMenuButton
+														className={classNameFor('sidebar-left-header-menu-button')}
+														panel={PANEL_LEFT_NAME}
+													/>
+												)}
+											</Stack>
+										</Layout.PanelHeader>
+									)}
+
+									<Layout.PanelBody className={classNameFor('sidebar-left-body')}>
+										<Navigation />
+										<SidebarLeftBody />
+									</Layout.PanelBody>
+
+									{setHasOneOf(activeSlots, [slotTargets.SidebarLeftFooter]) && (
+										<Layout.PanelFooter className={classNameFor('sidebar-left-footer')}>
+											<SidebarLeftFooter />
+										</Layout.PanelFooter>
+									)}
+								</>
+							)
+						} else {
+							return null
+						}
+					}}</GetLayoutPanelsStateContext.Consumer>
 				</Sidebar>
 			)}
 
@@ -209,35 +219,47 @@ export const Root = memo(({
 
 			{sidebarRightPropsProp && isSidebarRightActive && (
 				<Sidebar {...sidebarRightProps}>
-					{setHasOneOf(activeSlots, [slotTargets.SidebarRightHeader]) && (
-						<Layout.PanelHeader className={classNameFor('sidebar-right-header')}>
-							<Stack className={classNameFor('sidebar-left-header-content')} align="center" justify="space-between" direction="horizontal">
-								<SidebarRightHeader />
-								<Spacer />
-								<LayoutPanelContext.Consumer>{({ behavior }) => (
-									behavior === 'modal'
-										? <ToggleMenuButton
-											className={classNameFor('sidebar-right-header-menu-button')}
-											panel={PANEL_RIGHT_NAME}
-										/>
-										: null
-								)}</LayoutPanelContext.Consumer>
-							</Stack>
-						</Layout.PanelHeader>
-					)}
+					<GetLayoutPanelsStateContext.Consumer>{({ panels }) => {
+						const sidebarRightPanel = panels.get(PANEL_RIGHT_NAME)
 
-					{setHasOneOf(activeSlots, [slotTargets.Sidebar, slotTargets.SidebarRightBody]) && (
-						<Layout.PanelBody className={classNameFor('sidebar-right-body')}>
-							<SidebarBody />
-							<SidebarRightBody />
-						</Layout.PanelBody>
-					)}
+						if (sidebarRightPanel) {
+							const { behavior } = sidebarRightPanel
 
-					{setHasOneOf(activeSlots, [slotTargets.SidebarRightFooter]) && (
-						<Layout.PanelFooter className={classNameFor('sidebar-right-footer')}>
-							<SidebarRightFooter />
-						</Layout.PanelFooter>
-					)}
+							return (
+								<>
+									{(setHasOneOf(activeSlots, [slotTargets.SidebarRightHeader]) || behavior === 'modal') && (
+										<Layout.PanelHeader className={classNameFor('sidebar-right-header')}>
+											<Stack className={classNameFor('sidebar-left-header-content')} align="center" justify="space-between" direction="horizontal">
+												<SidebarRightHeader />
+												<Spacer />
+												{behavior === 'modal' && (
+													<ToggleMenuButton
+														className={classNameFor('sidebar-right-header-menu-button')}
+														panel={PANEL_RIGHT_NAME}
+													/>
+												)}
+											</Stack>
+										</Layout.PanelHeader>
+									)}
+
+									{setHasOneOf(activeSlots, [slotTargets.Sidebar, slotTargets.SidebarRightBody]) && (
+										<Layout.PanelBody className={classNameFor('sidebar-right-body')}>
+											<SidebarBody />
+											<SidebarRightBody />
+										</Layout.PanelBody>
+									)}
+
+									{setHasOneOf(activeSlots, [slotTargets.SidebarRightFooter]) && (
+										<Layout.PanelFooter className={classNameFor('sidebar-right-footer')}>
+											<SidebarRightFooter />
+										</Layout.PanelFooter>
+									)}
+								</>
+							)
+						} else {
+							return null
+						}
+					}}</GetLayoutPanelsStateContext.Consumer>
 				</Sidebar>
 			)}
 

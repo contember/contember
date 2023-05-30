@@ -12,8 +12,8 @@
     "test": "echo 'No tests'"
   },
   "dependencies": {
-    "@contember/engine-plugins": "^1.3.0-alpha.8",
-    "@contember/typesafe": "^1.3.0-alpha.8",
+    "@contember/engine-plugins": "workspace:*",
+    "@contember/typesafe": "workspace:*",
     "node-fetch": "^2.0"
   },
   "devDependencies": {

@@ -9,7 +9,7 @@
     "default": "./dist/src/index.js"
   },
   "dependencies": {
-    "@contember/database": "^1.3.0-alpha.8"
+    "@contember/database": "workspace:*"
   },
   "scripts": {
     "test": "echo 'No tests'"

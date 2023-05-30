@@ -12,9 +12,9 @@
     "test": "vitest"
   },
   "dependencies": {
-    "@contember/engine-plugins": "^1.3.0-alpha.8",
-    "@contember/graphql-utils": "^1.3.0-alpha.8",
-    "@contember/typesafe": "^1.3.0-alpha.8",
+    "@contember/engine-plugins": "workspace:*",
+    "@contember/graphql-utils": "workspace:*",
+    "@contember/typesafe": "workspace:*",
     "mime-types": "^2.1.24",
     "picomatch": "^2.2.1",
     "qs": "^6.10.1",

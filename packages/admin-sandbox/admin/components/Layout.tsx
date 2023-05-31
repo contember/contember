@@ -1,9 +1,10 @@
-import { Button, DevPanel, Link, LogoutLink, Stack } from '@contember/admin'
+import { Button, DevPanel, Link, LogoutLink, Stack, VisuallyHidden, visuallyHiddenStyle } from '@contember/admin'
 import { Identity2023 } from '@contember/brand'
-import { useDocumentTitle } from '@contember/layout'
+import { useDocumentTitle, useLayoutContainerWidth } from '@contember/layout'
 import { LogOutIcon } from 'lucide-react'
 import { PropsWithChildren, useState } from 'react'
 import { AlertLogoutLink } from './AlertLogoutLink'
+import { LAYOUT_BREAKPOINT } from './Constants'
 import { Directive, useDirectives } from './Directives'
 import { LayoutType, Layouts } from './Layouts'
 import { Navigation } from './Navigation'
@@ -14,6 +15,7 @@ export const Layout = (props: PropsWithChildren) => {
 	useDocumentTitle(directives.title)
 
 	const LayoutComponent = Layouts[directives.layout] ?? Layouts.default
+	const width = useLayoutContainerWidth()
 
 	return (
 		<>
@@ -24,7 +26,8 @@ export const Layout = (props: PropsWithChildren) => {
 			<Slots.Logo>
 				<Link to="index">
 					<Stack align="center" direction="horizontal" gap="small">
-						<Identity2023.Edit scale={2} /> Contember
+						<Identity2023.Edit scale={2} />
+						<VisuallyHidden hidden={width < LAYOUT_BREAKPOINT}>Contember</VisuallyHidden>
 					</Stack>
 				</Link>
 			</Slots.Logo>

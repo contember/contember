@@ -28,7 +28,7 @@ import {
 import { Builder } from '@contember/dic'
 import { Acl, Model, Schema } from '@contember/schema'
 import { Client, SelectBuilder as DbSelectBuilder } from '@contember/database'
-import { Providers } from '@contember/schema-utils'
+import { Providers, SchemaDatabaseMetadata } from '@contember/schema-utils'
 import { PaginatedHasManyExecutionHandler } from './extensions/paginatedHasMany/PaginatedHasManyExecutionHandler'
 import { PaginatedHasManyFieldProvider } from './extensions/paginatedHasMany/PaginatedHasManyFieldProvider'
 import { WhereOptimizer } from './mapper/select/optimizer/WhereOptimizer'
@@ -44,6 +44,7 @@ import {
 
 export type ExecutionContainerArgs = {
 	schema: Schema & { id: number }
+	schemaDatabaseMetadata: SchemaDatabaseMetadata
 	db: Client
 	identityId: string
 	identityVariables: Acl.VariablesMap
@@ -75,7 +76,7 @@ export class ExecutionContainerFactory {
 		return this.hooks.reduce((acc, cb) => cb(acc), builder)
 	}
 
-	createBuilderInternal({ permissions, identityVariables, identityId, db, schema, systemSchema, stage, project }: ExecutionContainerArgs) {
+	createBuilderInternal({ permissions, identityVariables, identityId, db, schema, systemSchema, stage, project, schemaDatabaseMetadata }: ExecutionContainerArgs) {
 		return new Builder({})
 			.addService('systemSchema', () =>
 				systemSchema)
@@ -87,6 +88,8 @@ export class ExecutionContainerFactory {
 				stage)
 			.addService('schema', () =>
 				schema)
+			.addService('schemaDatabaseMetadata', () =>
+				schemaDatabaseMetadata)
 			.addService('providers', () =>
 				this.providers)
 			.addService('variableInjector', ({ schema }) =>
@@ -153,15 +156,16 @@ export class ExecutionContainerFactory {
 				new JunctionTableManager(schema.model, predicateFactory, whereBuilder, connectJunctionHandler, disconnectJunctionHandler, pathFactory))
 			.addService('deleteExecutor', ({ predicateFactory, updateBuilderFactory, whereBuilder, pathFactory, schema }) =>
 				new DeleteExecutor(schema.model, predicateFactory, whereBuilder, updateBuilderFactory, pathFactory))
-			.addService('updater', ({ predicateFactory, updateBuilderFactory, schema }) =>
-				new Updater(schema.model, predicateFactory, updateBuilderFactory))
-			.addService('inserter', ({  insertBuilderFactory, providers, schema }) =>
-				new Inserter(schema.model,  insertBuilderFactory, providers))
-			.addService('mapperFactory', ({ predicatesInjector, selectBuilderFactory, uniqueWhereExpander, whereBuilder, junctionTableManager, deleteExecutor, updater, inserter, pathFactory, providers, schema }) => {
+			.addService('updater', ({ predicateFactory, updateBuilderFactory, schema, schemaDatabaseMetadata }) =>
+				new Updater(schema.model, schemaDatabaseMetadata, predicateFactory, updateBuilderFactory))
+			.addService('inserter', ({  insertBuilderFactory, providers, schema, schemaDatabaseMetadata }) =>
+				new Inserter(schema.model, schemaDatabaseMetadata, insertBuilderFactory, providers))
+			.addService('mapperFactory', ({ predicatesInjector, selectBuilderFactory, uniqueWhereExpander, whereBuilder, junctionTableManager, deleteExecutor, updater, inserter, pathFactory, providers, schema, schemaDatabaseMetadata }) => {
 				return new MapperFactory(
 					db,
 					identityId,
 					schema.model,
+					schemaDatabaseMetadata,
 					predicatesInjector,
 					selectBuilderFactory,
 					uniqueWhereExpander,
@@ -191,8 +195,8 @@ export class ExecutionContainerFactory {
 				new EntityRulesResolver(schema.validation, schema.model))
 			.addService('inputPreValidator', ({ entityRulesResolver, columnValueResolver, dataSelector, schema }) =>
 				new InputPreValidator(schema.model, entityRulesResolver, columnValueResolver, dataSelector))
-			.addService('mutationResolver', ({ mapperFactory, inputPreValidator, queryAstFactory, schema }) =>
-				new MutationResolver(schema.model, mapperFactory, inputPreValidator, queryAstFactory))
+			.addService('mutationResolver', ({ mapperFactory, inputPreValidator, queryAstFactory, schema, schemaDatabaseMetadata }) =>
+				new MutationResolver(schema.model, mapperFactory, inputPreValidator, queryAstFactory, schemaDatabaseMetadata))
 			.addService('validationResolver', ({ inputPreValidator, mapperFactory }) =>
 				new ValidationResolver(mapperFactory, inputPreValidator))
 	}

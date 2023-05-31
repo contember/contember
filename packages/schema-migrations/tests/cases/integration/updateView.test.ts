@@ -59,7 +59,7 @@ testMigrations('update a view 1', {
 				name: 'Author',
 				primary: 'id',
 				primaryColumn: 'id',
-				unique: {},
+				unique: [],
 				fields: {
 					id: {
 						name: 'id',
@@ -83,7 +83,7 @@ testMigrations('update a view 1', {
 				eventLog: {
 					enabled: true,
 				},
-				indexes: {},
+				indexes: [],
 			},
 		},
 		{
@@ -92,7 +92,7 @@ testMigrations('update a view 1', {
 				name: 'Author2',
 				primary: 'id',
 				primaryColumn: 'id',
-				unique: {},
+				unique: [],
 				fields: {
 					id: {
 						name: 'id',
@@ -119,7 +119,7 @@ testMigrations('update a view 1', {
 				eventLog: {
 					enabled: true,
 				},
-				indexes: {},
+				indexes: [],
 			},
 		},
 		{
@@ -128,7 +128,7 @@ testMigrations('update a view 1', {
 				name: 'Author3',
 				primary: 'id',
 				primaryColumn: 'id',
-				unique: {},
+				unique: [],
 				fields: {
 					id: {
 						name: 'id',
@@ -155,7 +155,7 @@ testMigrations('update a view 1', {
 				eventLog: {
 					enabled: true,
 				},
-				indexes: {},
+				indexes: [],
 			},
 		},
 	],
@@ -203,7 +203,7 @@ testMigrations('update a view 2', {
 				name: 'Author2',
 				primary: 'id',
 				primaryColumn: 'id',
-				unique: {},
+				unique: [],
 				fields: {
 					id: {
 						name: 'id',
@@ -230,7 +230,7 @@ testMigrations('update a view 2', {
 				eventLog: {
 					enabled: true,
 				},
-				indexes: {},
+				indexes: [],
 			},
 		},
 		{
@@ -239,7 +239,7 @@ testMigrations('update a view 2', {
 				name: 'Author3',
 				primary: 'id',
 				primaryColumn: 'id',
-				unique: {},
+				unique: [],
 				fields: {
 					id: {
 						name: 'id',
@@ -266,7 +266,7 @@ testMigrations('update a view 2', {
 				eventLog: {
 					enabled: true,
 				},
-				indexes: {},
+				indexes: [],
 			},
 		},
 	],
@@ -309,7 +309,7 @@ testMigrations('update a view 3', {
 				name: 'Author3',
 				primary: 'id',
 				primaryColumn: 'id',
-				unique: {},
+				unique: [],
 				fields: {
 					id: {
 						name: 'id',
@@ -336,7 +336,7 @@ testMigrations('update a view 3', {
 				eventLog: {
 					enabled: true,
 				},
-				indexes: {},
+				indexes: [],
 			},
 		},
 	],
@@ -384,7 +384,7 @@ testMigrations('update a view 4', {
 				name: 'Author',
 				primary: 'id',
 				primaryColumn: 'id',
-				unique: {},
+				unique: [],
 				fields: {
 					id: {
 						name: 'id',
@@ -408,7 +408,7 @@ testMigrations('update a view 4', {
 				eventLog: {
 					enabled: true,
 				},
-				indexes: {},
+				indexes: [],
 			},
 		},
 		{
@@ -417,7 +417,7 @@ testMigrations('update a view 4', {
 				name: 'Author2',
 				primary: 'id',
 				primaryColumn: 'id',
-				unique: {},
+				unique: [],
 				fields: {
 					id: {
 						name: 'id',
@@ -444,7 +444,7 @@ testMigrations('update a view 4', {
 				eventLog: {
 					enabled: true,
 				},
-				indexes: {},
+				indexes: [],
 			},
 		},
 		{
@@ -453,7 +453,7 @@ testMigrations('update a view 4', {
 				name: 'Author3',
 				primary: 'id',
 				primaryColumn: 'id',
-				unique: {},
+				unique: [],
 				fields: {
 					id: {
 						name: 'id',
@@ -480,7 +480,7 @@ testMigrations('update a view 4', {
 				eventLog: {
 					enabled: true,
 				},
-				indexes: {},
+				indexes: [],
 			},
 		},
 	],

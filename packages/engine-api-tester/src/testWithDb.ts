@@ -1,6 +1,6 @@
 import { Schema } from '@contember/schema'
 import { ModificationHandlerFactory, SchemaDiffer, SchemaMigrator, VERSION_LATEST } from '@contember/schema-migrations'
-import { AllowAllPermissionFactory, emptySchema, Providers } from '@contember/schema-utils'
+import { AllowAllPermissionFactory, dummySchemaDatabaseMetadata, emptySchema, Providers } from '@contember/schema-utils'
 import { Client, SelectBuilder } from '@contember/database'
 import { assert } from 'vitest'
 import { createLogger, NullLoggerHandler, withLogger } from '@contember/logger'
@@ -14,6 +14,7 @@ import { MigrationGroup } from '@contember/database-migrations'
 import { createUuidGenerator } from './testUuid'
 import {
 	DatabaseContextFactory,
+	SchemaDatabaseMetadataResolver,
 	formatSchemaName,
 	ProjectInitializer,
 	StageBySlugQuery,
@@ -79,7 +80,16 @@ export const executeDbTest = async (test: Test) => {
 		db: projectDbCredentials,
 		stages: [{ slug: 'live', name: 'live' }],
 	}
-	const systemMigrationsRunner = new SystemMigrationsRunner(databaseContextFactory, projectConfigWithDb, 'system', systemContainer.schemaVersionBuilder, test.migrationGroups ?? {})
+	const systemMigrationsRunner = new SystemMigrationsRunner(
+		databaseContextFactory,
+		projectConfigWithDb,
+		'system',
+		systemContainer.schemaVersionBuilder,
+		test.migrationGroups ?? {},
+		{
+			resolveMetadata: () => Promise.resolve(dummySchemaDatabaseMetadata),
+		} as unknown as SchemaDatabaseMetadataResolver,
+	)
 	const stageCreator = new StageCreator()
 	const projectInitializer = new ProjectInitializer(stageCreator, systemMigrationsRunner, databaseContextFactory, projectConfigWithDb)
 
@@ -106,12 +116,16 @@ export const executeDbTest = async (test: Test) => {
 		const gqlSchemaBuilder = gqlSchemaBuilderFactory.create(model, authorizator)
 		const gqlSchema = gqlSchemaBuilder.build()
 
-		const projectDb = db.client.forSchema(formatSchemaName(stage))
+		const schemaName = stage.schema
+		const projectDb = db.client.forSchema(schemaName)
 
 		const providers = {
 			uuid: uuidGenerator,
 			now: () => new Date('2019-09-04 12:00'),
 		}
+
+		const databaseMetadataResolver = new SchemaDatabaseMetadataResolver()
+		const metadata = await databaseMetadataResolver.resolveMetadata(db, schemaName)
 
 		const queryContent = async (stageSlug: string, gql: string, variables?: { [key: string]: any }): Promise<any> => {
 			const executionContainer = (test.executionContainerFactoryFactory?.(providers) ?? new ExecutionContainerFactory(providers))
@@ -124,6 +138,7 @@ export const executeDbTest = async (test: Test) => {
 					systemSchema: 'system',
 					stage: stage,
 					project: { slug: 'test' },
+					schemaDatabaseMetadata: metadata,
 				})
 			const context: ContentContext = {
 				db: projectDb,

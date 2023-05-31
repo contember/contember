@@ -11,31 +11,37 @@ import {
 import * as Database from '@contember/database'
 import { UniqueWhereError } from '../inputProcessing'
 import { Model } from '@contember/schema'
-import { isOwningRelation, isRelation, NamingHelper } from '@contember/schema-utils'
+import { acceptFieldVisitor, SchemaDatabaseMetadata, tryGetColumnName } from '@contember/schema-utils'
 import { logger } from '@contember/logger'
-import RelationType = Model.RelationType
 
 
-const findUniqueConstraint = (schema: Model.Schema, constraintName: string): [Model.Entity, Model.UniqueConstraint] | [null, null] => {
-	for (const entity of Object.values(schema.entities)) {
-		for (const constraint of Object.values(entity.unique)) {
-			if (constraint.name === constraintName) {
-				return [entity, constraint]
-			}
+type UniqueConstraintResult = {
+	entity: Model.Entity
+	fields: string[]
+}
+
+const getEntityByTableName = (model: Model.Schema, tableName: string) => Object.values(model.entities).find(it => it.tableName === tableName)
+
+const findUniqueConstraint = (model: Model.Schema, databaseMetadata: SchemaDatabaseMetadata, tableName: string, constraintName: string): UniqueConstraintResult | null => {
+	const constraint = databaseMetadata.getUniqueConstraint(tableName, constraintName)
+	if (!constraint) {
+		return null
+	}
+	const entity = getEntityByTableName(model, constraint.tableName)
+	if (!entity) {
+		return null
+	}
+	const fieldsInConstraint: string[] = []
+	for (const field of Object.values(entity.fields)) {
+		const columnName = tryGetColumnName(model, entity, field.name)
+		if (columnName && constraint.columnNames.includes(columnName)) {
+			fieldsInConstraint.push(field.name)
 		}
 	}
-	for (const entity of Object.values(schema.entities)) {
-		for (const field of Object.values(entity.fields)) {
-			if (
-				field.type === RelationType.OneHasOne &&
-				isOwningRelation(field) &&
-				NamingHelper.createUniqueConstraintName(entity.name, [field.name]) === constraintName
-			) {
-				return [entity, { name: constraintName, fields: [field.name] }]
-			}
-		}
+	if (fieldsInConstraint.length === constraint.columnNames.length) {
+		return { entity, fields: fieldsInConstraint }
 	}
-	return [null, null]
+	return null
 }
 
 type RelationInfo = {
@@ -44,28 +50,47 @@ type RelationInfo = {
 	targetEntity: Model.Entity
 }
 
-const findForeignConstraint = (schema: Model.Schema, constraintName: string): RelationInfo | null => {
-	for (const owningEntity of Object.values(schema.entities)) {
-		for (const field of Object.values(owningEntity.fields)) {
-			if (!isRelation(field) || !isOwningRelation(field) || !('joiningColumn' in field)) {
-				continue
-			}
-			const targetEntity = schema.entities[field.target]
-			const fkName = NamingHelper.createForeignKeyName(
-				owningEntity.tableName,
-				field.joiningColumn.columnName,
-				targetEntity.tableName,
-				targetEntity.primaryColumn,
-			)
-			if (fkName === constraintName) {
-				return { owningEntity, targetEntity, owningRelation: field }
+const findForeignConstraint = (model: Model.Schema, databaseMetadata: SchemaDatabaseMetadata, tableName: string, constraintName: string): RelationInfo | null => {
+	const constraint = databaseMetadata.getForeignKeyConstraint(tableName, constraintName)
+	if (!constraint) {
+		return null
+	}
+	const owningEntity = getEntityByTableName(model, constraint.fromTable)
+	if (!owningEntity) {
+		// todo m:n
+		return null
+	}
+
+	const targetEntity = getEntityByTableName(model, constraint.toTable)
+	if (!targetEntity) {
+		return null
+	}
+	for (const field of Object.values(owningEntity.fields)) {
+		const relation = acceptFieldVisitor<(Model.Relation & Model.JoiningColumnRelation) | null>(model, owningEntity, field, {
+			visitColumn: () => null,
+			visitOneHasOneInverse: () => null,
+			visitManyHasManyInverse: () => null,
+			visitManyHasManyOwning: () => null,
+			visitOneHasMany: () => null,
+			visitOneHasOneOwning: ({ relation }) => relation,
+			visitManyHasOne: ({ relation }) => relation,
+		})
+		if (relation && relation.joiningColumn.columnName === constraint.fromColumn) {
+			return {
+				owningEntity,
+				owningRelation: relation,
+				targetEntity,
 			}
 		}
 	}
 	return null
 }
 
-export const convertError = (schema: Model.Schema, e: any): MutationResult => {
+export const convertError = (
+	schema: Model.Schema,
+	databaseMetadata: SchemaDatabaseMetadata,
+	e: any,
+): MutationResult => {
 
 	if (e instanceof Database.NotNullViolationError) {
 		return new MutationConstraintViolationError([], ConstraintType.notNull, e.originalMessage, [
@@ -73,7 +98,7 @@ export const convertError = (schema: Model.Schema, e: any): MutationResult => {
 		])
 	}
 	if (e instanceof Database.ForeignKeyViolationError) {
-		const relationInfo = e.constraint ? findForeignConstraint(schema, e.constraint) : null
+		const relationInfo = e.constraint && e.table ? findForeignConstraint(schema, databaseMetadata, e.table, e.constraint) : null
 		const violationDetail: string = 'detail' in e.previous ? e.previous.detail : ''
 		const matchResult = violationDetail.match(/^Key \(.+\)=\((.+)\) is still referenced from table/)
 		const message = relationInfo
@@ -85,13 +110,13 @@ export const convertError = (schema: Model.Schema, e: any): MutationResult => {
 		return new MutationConstraintViolationError([], ConstraintType.foreignKey, message, [MutationResultHint.sqlError])
 	}
 	if (e instanceof Database.UniqueViolationError) {
-		const [entity, constraint] = e.constraint ? findUniqueConstraint(schema, e.constraint) : [null, null]
+		const constraint = e.constraint && e.table ? findUniqueConstraint(schema, databaseMetadata, e.table, e.constraint) : null
 		const violationDetail: string = 'detail' in e.previous ? e.previous.detail : ''
 		const matchResult = violationDetail.match(/^Key \(.+\)=\((.+)\) already exists\.$/)
 		const values = matchResult?.[1]
-		const message = constraint && entity
+		const message = constraint
 			? `${values ? `Value (${values})` : 'Unknown value'}` +
-			  ` already exists in unique columns (${constraint.fields.join(', ')}) on entity ${entity.name}`
+			  ` already exists in unique columns (${constraint.fields.join(', ')}) on entity ${constraint.entity.name}`
 			: e.originalMessage
 		const paths = constraint ? constraint.fields.map(it => [{ field: it }]) : []
 		return new MutationConstraintViolationError(paths, ConstraintType.uniqueKey, message, [MutationResultHint.sqlError])
@@ -115,10 +140,10 @@ export const convertError = (schema: Model.Schema, e: any): MutationResult => {
 	throw e
 }
 
-export const tryMutation = async (schema: Model.Schema, cb: () => Promise<MutationResultList>): Promise<MutationResultList> => {
+export const tryMutation = async (schema: Model.Schema, databaseMetadata: SchemaDatabaseMetadata, cb: () => Promise<MutationResultList>): Promise<MutationResultList> => {
 	try {
 		return await cb()
 	} catch (e) {
-		return [convertError(schema, e)]
+		return [convertError(schema, databaseMetadata, e)]
 	}
 }

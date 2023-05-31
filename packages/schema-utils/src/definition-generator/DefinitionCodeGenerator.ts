@@ -1,10 +1,9 @@
-import { Acl, Model, Schema, Writable } from '@contember/schema'
+import { Model, Schema, Writable } from '@contember/schema'
 import {
 	acceptFieldVisitor,
 	DefaultNamingConventions,
 	isInverseRelation,
 	NamingConventions,
-	NamingHelper,
 	resolveDefaultColumnType,
 } from '../model'
 import { printJsValue } from '../utils/printJsValue'
@@ -57,21 +56,13 @@ ${Object.values(entity.fields).map(field => this.generateField({ field, entity, 
 		entity: Model.Entity
 		constraint: Model.UniqueConstraint
 	}): string {
-		const defaultName = NamingHelper.createUniqueConstraintName(entity.name, constraint.fields)
-		if (defaultName === constraint.name) {
-			const fieldsList = `${constraint.fields.map(it => printJsValue(it)).join(', ')}`
-			return `@def.Unique(${fieldsList})`
-		}
-		return `@def.Unique(${printJsValue(constraint)})`
+		const fieldsList = `${constraint.fields.map(it => printJsValue(it)).join(', ')}`
+		return `@def.Unique(${fieldsList})`
 	}
 
 	private generateIndex({ entity, index }: { entity: Model.Entity; index: Model.Index }): string {
-		const defaultName = NamingHelper.createIndexName(entity.name, index.fields)
-		if (defaultName === index.name) {
-			const fieldsList = `${index.fields.map(it => printJsValue(it)).join(', ')}`
-			return `@def.Index(${fieldsList})`
-		}
-		return `@def.Index(${printJsValue(index)})`
+		const fieldsList = `${index.fields.map(it => printJsValue(it)).join(', ')}`
+		return `@def.Index(${fieldsList})`
 	}
 
 

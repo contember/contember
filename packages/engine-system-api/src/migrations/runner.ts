@@ -25,6 +25,7 @@ import { ProjectConfig } from '../types'
 import { Logger } from '@contember/logger'
 import { GroupMigrationsResolver } from '@contember/database-migrations'
 import { SnapshotMigrationResolver } from '@contember/database-migrations'
+import { SchemaDatabaseMetadataResolver } from '../model/metadata/SchemaDatabaseMetadataResolver'
 
 const migrations = {
 	'2018-08-04-102200-init': _20180804102200init,
@@ -55,6 +56,7 @@ export class SystemMigrationsRunner {
 		private readonly schema: string,
 		private readonly schemaVersionBuilder: SchemaVersionBuilder,
 		private readonly migrationGroups: Record<string, MigrationGroup<unknown>>,
+		private readonly databaseMetadataResolver: SchemaDatabaseMetadataResolver,
 	) {
 	}
 	async run(logger: Logger) {
@@ -70,10 +72,14 @@ export class SystemMigrationsRunner {
 				Object.fromEntries(Object.entries(this.migrationGroups).map(([group, it]) => [group, new SnapshotMigrationResolver(it.snapshot, it.migrations, group.replace(/[^-_\w]+/g, '-'))])),
 			)
 			const migrationsRunner = new DbMigrationsRunner(connection, this.schema, migrationResolver)
-
 			await migrationsRunner.migrate(message => logger.warn(message), {
 				project: this.project,
 				schemaResolver,
+				databaseMetadataResolver: (connection: Connection.ConnectionLike, schema: string) => {
+					const dbContextMigrations = this.databaseContextFactory.create(connection)
+					return this.databaseMetadataResolver.resolveMetadata(dbContextMigrations, schema)
+				},
+
 			})
 		})
 		await singleConnection.end()

@@ -377,6 +377,10 @@ export const nullable = <T extends Json>(inner: Type<T>): Type<T | null> => {
 	return type
 }
 
+export const preprocess = <Input extends Json>(inner: Type<Input>, transform: (input: unknown) => unknown) => (input: unknown, path: PropertyKey[] = []): Input => {
+	return inner(transform(input), path)
+}
+
 export const transform = <Input extends Json, Result extends Json>(inner: Type<Input>, transform: (value: Input, input: unknown) => Result) => (input: unknown, path: PropertyKey[] = []): Result => {
 	return transform(inner(input, path), input)
 }

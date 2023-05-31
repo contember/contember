@@ -1,26 +1,34 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Model, Schema } from '@contember/schema'
 import { SchemaUpdater, updateEntity, updateField, updateModel } from '../utils/schemaUpdateUtils'
-import { createModificationType, Differ, ModificationHandler } from '../ModificationHandler'
+import {
+	createModificationType,
+	Differ,
+	ModificationHandler,
+	ModificationHandlerCreateSqlOptions,
+} from '../ModificationHandler'
 import { isIt } from '../../utils/isIt'
 import { updateRelations } from '../utils/diffUtils'
 import { acceptRelationTypeVisitor } from '@contember/schema-utils'
 import { addForeignKeyConstraint } from './helpers'
 
 export class UpdateRelationOnDeleteModificationHandler implements ModificationHandler<UpdateRelationOnDeleteModificationData> {
-	constructor(private readonly data: UpdateRelationOnDeleteModificationData, private readonly schema: Schema) {}
+	constructor(
+		private readonly data: UpdateRelationOnDeleteModificationData,
+		private readonly schema: Schema,
+	) {}
 
-	public createSql(builder: MigrationBuilder): void {
+	public createSql(builder: MigrationBuilder, { databaseMetadata, invalidateDatabaseMetadata }: ModificationHandlerCreateSqlOptions): void {
 		const entity = this.schema.model.entities[this.data.entityName]
 		if (entity.view) {
 			return
 		}
 		acceptRelationTypeVisitor(this.schema.model, entity, this.data.fieldName, {
 			visitManyHasOne: ({ entity, relation, targetEntity }) => {
-				addForeignKeyConstraint({ builder, entity, targetEntity, relation, recreate: true })
+				addForeignKeyConstraint({ builder, entity, targetEntity, relation, recreate: true, databaseMetadata, invalidateDatabaseMetadata })
 			},
 			visitOneHasOneOwning: ({ entity, relation, targetEntity }) => {
-				addForeignKeyConstraint({ builder, entity, targetEntity, relation, recreate: true })
+				addForeignKeyConstraint({ builder, entity, targetEntity, relation, recreate: true, databaseMetadata, invalidateDatabaseMetadata })
 			},
 			visitOneHasMany: () => {},
 			visitOneHasOneInverse: () => {},

@@ -1,57 +1,48 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Model, Schema } from '@contember/schema'
 import { SchemaUpdater, updateEntity, updateModel } from '../utils/schemaUpdateUtils'
-import { createModificationType, Differ, ModificationHandler } from '../ModificationHandler'
-import { acceptFieldVisitor } from '@contember/schema-utils'
+import {
+	createModificationType,
+	Differ,
+	ModificationHandler,
+	ModificationHandlerCreateSqlOptions,
+} from '../ModificationHandler'
+import { wrapIdentifier } from '../../utils/dbHelpers'
+import { getUniqueConstraintColumns } from './utils'
+import deepEqual from 'fast-deep-equal'
 
 export class CreateUniqueConstraintModificationHandler implements ModificationHandler<CreateUniqueConstraintModificationData> {
 	constructor(private readonly data: CreateUniqueConstraintModificationData, private readonly schema: Schema) {
 	}
 
-	public createSql(builder: MigrationBuilder): void {
+	public createSql(builder: MigrationBuilder, { databaseMetadata, invalidateDatabaseMetadata }: ModificationHandlerCreateSqlOptions): void {
 		const entity = this.schema.model.entities[this.data.entityName]
 		if (entity.view) {
 			return
 		}
 		const fields = this.data.unique.fields
-		const columns = fields.map(fieldName => {
-			return acceptFieldVisitor(this.schema.model, entity, fieldName, {
-				visitColumn: ({ column }) => {
-					return column.columnName
-				},
-				visitManyHasOne: ({ relation }) => {
-					return relation.joiningColumn.columnName
-				},
-				visitOneHasMany: () => {
-					throw new Error(`Cannot create unique key on 1:m relation in ${entity.name}.${fieldName}`)
-				},
-				visitOneHasOneOwning: () => {
-					throw new Error(
-						`Cannot create unique key on 1:1 relation, this relation has unique key by default in ${entity.name}.${fieldName}`,
-					)
-				},
-				visitOneHasOneInverse: () => {
-					throw new Error(`Cannot create unique key on 1:1 inverse relation in ${entity.name}.${fieldName}`)
-				},
-				visitManyHasManyOwning: () => {
-					throw new Error(`Cannot create unique key on m:m relation in ${entity.name}.${fieldName}`)
-				},
-				visitManyHasManyInverse: () => {
-					throw new Error(`Cannot create unique key on m:m inverse relation in ${entity.name}.${fieldName}`)
-				},
-			})
+		const columns = getUniqueConstraintColumns({
+			entity,
+			model: this.schema.model,
+			fields,
 		})
-		builder.addConstraint(entity.tableName, this.data.unique.name, { unique: columns })
+
+		const tableNameId = wrapIdentifier(entity.tableName)
+		const columnNameIds = columns.map(wrapIdentifier)
+
+		builder.sql(`ALTER TABLE ${tableNameId} ADD UNIQUE (${columnNameIds.join(', ')})`)
+
+		invalidateDatabaseMetadata()
 	}
 
 	public getSchemaUpdater(): SchemaUpdater {
 		return updateModel(
 			updateEntity(this.data.entityName, ({ entity }) => ({
 				...entity,
-				unique: {
+				unique: [
 					...entity.unique,
-					[this.data.unique.name]: this.data.unique,
-				},
+					this.data.unique,
+				],
 			})),
 		)
 	}
@@ -67,21 +58,21 @@ export class CreateUniqueConstraintModificationHandler implements ModificationHa
 
 }
 
-export interface CreateUniqueConstraintModificationData {
-	entityName: string
-	unique: Model.UniqueConstraint
-}
-
 export const createUniqueConstraintModification = createModificationType({
 	id: 'createUniqueConstraint',
 	handler: CreateUniqueConstraintModificationHandler,
 })
 
+export interface CreateUniqueConstraintModificationData {
+	entityName: string
+	unique: Model.UniqueConstraint
+}
+
 export class CreateUniqueConstraintDiffer implements Differ {
 	createDiff(originalSchema: Schema, updatedSchema: Schema) {
 		return Object.values(updatedSchema.model.entities).flatMap(entity =>
-			Object.values(entity.unique)
-				.filter(it => !originalSchema.model.entities[entity.name].unique[it.name])
+			entity.unique
+				.filter(it => !originalSchema.model.entities[entity.name].unique.find(uniq => deepEqual(uniq.fields, it.fields)))
 				.map(unique => createUniqueConstraintModification.createModification({
 					entityName: entity.name,
 					unique,

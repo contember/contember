@@ -33,7 +33,7 @@ testMigrations('create view', {
 				name: 'AuthorStats',
 				primary: 'id',
 				primaryColumn: 'id',
-				unique: {},
+				unique: [],
 				fields: {
 					id: {
 						name: 'id',
@@ -68,7 +68,7 @@ testMigrations('create view', {
 				eventLog: {
 					enabled: true,
 				},
-				indexes: {},
+				indexes: [],
 			},
 		},
 		{
@@ -129,8 +129,8 @@ testMigrations('create a relation and a view', {
 			entity: { name: 'ArticleStats',
 				primary: 'id',
 				primaryColumn: 'id',
-				unique: {},
-				indexes: {},
+				unique: [],
+				indexes: [],
 				fields: { id: { name: 'id', columnName: 'id', nullable: false, type: 'Uuid', columnType: 'uuid' },
 					article: { name: 'article', inversedBy: 'stats', nullable: true, type: 'OneHasOne', target: 'Article', joiningColumn: { columnName: 'article_id', onDelete: 'restrict' } },
 					visitCount: { name: 'visitCount', columnName: 'visit_count', nullable: true, type: 'Integer', columnType: 'integer' } },
@@ -151,8 +151,8 @@ testMigrations('create a relation and a view', {
 		},
 	],
 	sql: SQL`ALTER TABLE "article" ADD "category_id" uuid; 
-ALTER TABLE "article" ADD CONSTRAINT "fk_article_category_id_703b8b" FOREIGN KEY ("category_id") REFERENCES "category"("id") ON DELETE NO ACTION DEFERRABLE INITIALLY IMMEDIATE; 
-CREATE INDEX "article_category_id_index" ON "article" ("category_id"); 
+ALTER TABLE "article" ADD FOREIGN KEY ("category_id") REFERENCES "category"("id") ON DELETE NO ACTION DEFERRABLE INITIALLY IMMEDIATE; 
+CREATE INDEX ON "article" ("category_id"); 
 CREATE VIEW "article_stats" AS SELECT 1;`,
 })
 

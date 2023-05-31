@@ -4,73 +4,6 @@ import { ModelValidator } from '../../../src'
 
 
 
-test('index name collision', () => {
-	const model: Model.Schema = {
-		enums: {},
-		entities: {
-			Foo: {
-				fields: {
-					id: {
-						columnName: 'id',
-						name: 'id',
-						nullable: false,
-						type: Model.ColumnType.Uuid,
-						columnType: 'uuid',
-					},
-				},
-				name: 'Foo',
-				primary: 'id',
-				primaryColumn: 'id',
-				tableName: 'foo',
-				unique: {},
-				eventLog: {
-					enabled: true,
-				},
-				indexes: {
-					test: { fields: ['id'], name: 'test' },
-				},
-			},
-			Bar: {
-				fields: {
-					id: {
-						columnName: 'id',
-						name: 'id',
-						nullable: false,
-						type: Model.ColumnType.Uuid,
-						columnType: 'uuid',
-					},
-				},
-				name: 'Bar',
-				primary: 'id',
-				primaryColumn: 'id',
-				tableName: 'bar',
-				unique: {
-					test: { fields: ['id'], name: 'test' },
-				},
-				eventLog: {
-					enabled: true,
-				},
-				indexes: {
-					foo: { fields: ['id'], name: 'foo' },
-				},
-			},
-		},
-	}
-	const validator = new ModelValidator(model)
-	assert.deepStrictEqual(validator.validate(), [
-		{
-			code: 'MODEL_NAME_COLLISION',
-			message: 'index name foo of entity Bar collides with table name foo of entity Foo',
-			path: ['entities', 'Bar'],
-		},
-		{
-			code: 'MODEL_NAME_COLLISION',
-			message: 'unique index name test of entity Bar collides with index name test of entity Foo',
-			path: ['entities', 'Bar'],
-		},
-	])
-})
-
 
 test('"meta" collision', () => {
 	const model: Model.Schema = {
@@ -90,9 +23,9 @@ test('"meta" collision', () => {
 				primary: 'id',
 				primaryColumn: 'id',
 				tableName: 'foo',
-				unique: {},
+				unique: [],
 				eventLog: { enabled: true },
-				indexes: {},
+				indexes: [],
 			},
 			FooMeta: {
 				fields: {
@@ -108,9 +41,9 @@ test('"meta" collision', () => {
 				primary: 'id',
 				primaryColumn: 'id',
 				tableName: 'foo_meta',
-				unique: {},
+				unique: [],
 				eventLog: { enabled: true },
-				indexes: {},
+				indexes: [],
 			},
 			BarMeta: {
 				fields: {
@@ -126,9 +59,9 @@ test('"meta" collision', () => {
 				primary: 'id',
 				primaryColumn: 'id',
 				tableName: 'bar',
-				unique: {},
+				unique: [],
 				eventLog: { enabled: true },
-				indexes: {},
+				indexes: [],
 			},
 		},
 	}

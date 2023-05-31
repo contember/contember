@@ -18,7 +18,7 @@ import { emptySchema, schemaType } from '@contember/schema-utils'
 	for (const migration of await migrationsResolver.getMigrations()) {
 		const nextSchema = migrator.applyModifications(schema, migration.modifications, migration.formatVersion)
 		schemaType(nextSchema)
-		const { meta, ...nextSchemaWithoutMeta } = nextSchema
+		const nextSchemaWithoutMeta = nextSchema
 		differ.diffSchemas(schema, nextSchemaWithoutMeta)
 
 		schema = nextSchema

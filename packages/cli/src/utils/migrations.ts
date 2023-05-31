@@ -10,6 +10,7 @@ import chalk from 'chalk'
 import { Schema } from '@contember/schema'
 import chalkTable from 'chalk-table'
 import { assertNever } from './assertNever'
+import { dummySchemaDatabaseMetadata } from '@contember/schema-utils'
 
 export const getLatestMigration = async (migrationsResolver: MigrationsResolver): Promise<Migration | null> => {
 	const migrations = await migrationsResolver.getMigrations()
@@ -28,16 +29,23 @@ export const findMigration = <M extends { version: string }>(migrations: M[], ve
 		it => MigrationVersionHelper.extractVersion(it.version) === MigrationVersionHelper.extractVersion(version),
 	) || null
 
-export const printMigrationDescription = async function (
+export const printMigrationDescription = function (
 	migrationsDescriber: MigrationDescriber,
 	schema: Schema,
 	migration: Migration,
 	options: { sqlOnly?: boolean; noSql?: boolean },
 ) {
-	const description = await migrationsDescriber.describeModifications(schema, migration, 'system') // schema name cannot be determined
-	description.forEach(({ modification, sql, description }) => {
+	const description = migrationsDescriber.describeModifications(schema, migration)
+	description.forEach(({ modification, getSql, description }) => {
+		const sql = getSql({
+			systemSchema: 'system',
+			databaseMetadata: dummySchemaDatabaseMetadata,
+			invalidateDatabaseMetadata: () => null,
+		})
 		if (options.sqlOnly) {
-			console.log(sql)
+			if (sql.trim()) {
+				console.log(sql)
+			}
 		} else {
 			const color = description.isDestructive ? chalk.red : chalk.blue
 			console.group(color(`${description.message} [${modification.modification}]`))

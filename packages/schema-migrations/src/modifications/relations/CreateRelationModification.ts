@@ -1,24 +1,11 @@
 import { Model, Schema } from '@contember/schema'
-import {
-	acceptRelationTypeVisitor,
-	isInverseRelation,
-	isOwningRelation,
-	isRelation,
-	NamingHelper,
-} from '@contember/schema-utils'
+import { acceptRelationTypeVisitor, isInverseRelation, isOwningRelation, isRelation } from '@contember/schema-utils'
 import { MigrationBuilder } from '@contember/database-migrations'
-import {
-	addField,
-	addTakenIndexName,
-	SchemaUpdater,
-	updateEntity,
-	updateModel,
-	updateSchema,
-} from '../utils/schemaUpdateUtils'
+import { addField, SchemaUpdater, updateEntity, updateModel, updateSchema } from '../utils/schemaUpdateUtils'
 import {
 	createModificationType,
 	Differ,
-	ModificationHandler,
+	ModificationHandler, ModificationHandlerCreateSqlOptions,
 	ModificationHandlerOptions,
 } from '../ModificationHandler'
 import { isIt } from '../../utils/isIt'
@@ -26,19 +13,23 @@ import { createFields } from '../utils/diffUtils'
 import { getPrimaryColumnType } from '../utils/getPrimaryColumnType'
 import { createJunctionTableSql } from '../utils/createJunctionTable'
 import { normalizeManyHasManyRelation, PartialManyHasManyRelation } from './normalization'
-import { resolveIndexName, SchemaWithMeta } from '../utils/schemaMeta'
 import { addForeignKeyConstraint } from './helpers'
+import { wrapIdentifier } from '../../utils/dbHelpers'
 
 
 export class CreateRelationModificationHandler implements ModificationHandler<CreateRelationModificationData> {
 
 	constructor(
 		private readonly data: CreateRelationModificationData,
-		private readonly schema: SchemaWithMeta,
+		private readonly schema: Schema,
 		private readonly options: ModificationHandlerOptions,
 	) {}
 
-	public createSql(builder: MigrationBuilder): void {
+	public createSql(builder: MigrationBuilder, {
+		databaseMetadata,
+		systemSchema,
+		invalidateDatabaseMetadata,
+	}: ModificationHandlerCreateSqlOptions): void {
 		const entity = this.schema.model.entities[this.data.entityName]
 		if (entity.view) {
 			return
@@ -51,34 +42,34 @@ export class CreateRelationModificationHandler implements ModificationHandler<Cr
 					notNull: !relation.nullable,
 				},
 			})
-			addForeignKeyConstraint({ builder, entity, targetEntity, relation })
+			addForeignKeyConstraint({ builder, entity, targetEntity, relation, databaseMetadata, invalidateDatabaseMetadata })
 		}
 		acceptRelationTypeVisitor(this.schema.model, entity, this.getNormalizedOwningSide(), {
 			visitManyHasOne: ({ relation }) => {
 				createOwningSide(relation)
 				const columnName = relation.joiningColumn.columnName
-				const proposedIndexName = NamingHelper.createForeignKeyIndexName(entity.tableName, columnName)
-				const indexName = resolveIndexName(this.schema, proposedIndexName)
-				builder.addIndex(entity.tableName, columnName, {
-					name: indexName,
-				})
+				const tableNameId = wrapIdentifier(entity.tableName)
+				const columnNameId = wrapIdentifier(columnName)
+				builder.sql(`CREATE INDEX ON ${tableNameId} (${columnNameId})`)
+				invalidateDatabaseMetadata()
 			},
 			visitOneHasMany: () => {},
 			visitOneHasOneOwning: ({ relation }) => {
 				createOwningSide(relation)
-				const uniqueConstraintName = NamingHelper.createUniqueConstraintName(entity.name, [relation.name])
-				builder.addConstraint(entity.tableName, uniqueConstraintName, { unique: [relation.joiningColumn.columnName] })
+				const tableNameId = wrapIdentifier(entity.tableName)
+				const columnNameId = wrapIdentifier(relation.joiningColumn.columnName)
+				builder.sql(`ALTER TABLE ${tableNameId} ADD UNIQUE (${columnNameId})`)
+				invalidateDatabaseMetadata()
 			},
 			visitOneHasOneInverse: () => {},
 			visitManyHasManyOwning: ({ relation }) => {
-				createJunctionTableSql(builder, this.options.systemSchema, this.schema, entity, targetEntity, relation)
+				createJunctionTableSql(builder, systemSchema, this.schema, entity, targetEntity, relation)
 			},
 			visitManyHasManyInverse: () => {},
 		})
 	}
 
 	public getSchemaUpdater(): SchemaUpdater {
-		const entity = this.schema.model.entities[this.data.entityName]
 		return updateSchema(
 			updateModel(
 				updateEntity(this.data.entityName, addField(this.getNormalizedOwningSide())),
@@ -86,12 +77,6 @@ export class CreateRelationModificationHandler implements ModificationHandler<Cr
 					? updateEntity(this.data.owningSide.target, addField(this.data.inverseSide))
 					: undefined,
 			),
-			this.data.owningSide.type === Model.RelationType.ManyHasOne
-				? addTakenIndexName(NamingHelper.createForeignKeyIndexName(entity.tableName, this.data.owningSide.joiningColumn.columnName))
-				: undefined,
-			this.data.owningSide.type === Model.RelationType.ManyHasMany && isOwningRelation(this.data.owningSide)
-				? addTakenIndexName(NamingHelper.createJunctionTablePrimaryConstraintName(this.data.owningSide.joiningTable.tableName))
-				: undefined,
 		)
 	}
 

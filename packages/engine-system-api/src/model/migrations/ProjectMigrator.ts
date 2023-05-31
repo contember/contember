@@ -9,12 +9,17 @@ import { MigrateErrorCode } from '../../schema'
 import { SchemaVersionBuilder } from './SchemaVersionBuilder'
 import { SchemaValidator } from '@contember/schema-utils'
 import { logger } from '@contember/logger'
+import {
+	SchemaDatabaseMetadataResolverStore,
+	MigrationsDatabaseMetadataResolverStoreFactory,
+} from '../metadata/SchemaDatabaseMetadataResolverStore'
 
 export class ProjectMigrator {
 	constructor(
 		private readonly migrationDescriber: MigrationDescriber,
 		private readonly schemaVersionBuilder: SchemaVersionBuilder,
 		private readonly executedMigrationsResolver: ExecutedMigrationsResolver,
+		private readonly migrationsDatabaseMetadataResolverStoreFactory: MigrationsDatabaseMetadataResolverStoreFactory,
 	) {}
 
 	public async migrate(
@@ -34,6 +39,8 @@ export class ProjectMigrator {
 
 		const sorted = [...validated].sort((a, b) => a.version.localeCompare(b.version))
 
+		const metadataStore = this.migrationsDatabaseMetadataResolverStoreFactory.create(db)
+
 		for (const migration of sorted) {
 			const formatVersion = migration.formatVersion
 
@@ -46,6 +53,7 @@ export class ProjectMigrator {
 					formatVersion,
 					migration.version,
 					db.client.schema,
+					metadataStore,
 				)
 			}
 			await db.commandBus.execute(new SaveMigrationCommand(migration))
@@ -76,7 +84,7 @@ export class ProjectMigrator {
 			if (migration.version < version && !ignoreOrder) {
 				throw new MustFollowLatestMigrationError(migration.version, `Must follow latest executed migration ${version}`)
 			}
-			const described = await this.migrationDescriber.describeModifications(schema, migration, 'system') // system schema name not important here
+			const described = this.migrationDescriber.describeModifications(schema, migration)
 			if (described.length === 0) {
 				continue
 			}
@@ -112,13 +120,19 @@ export class ProjectMigrator {
 		formatVersion: number,
 		migrationVersion: string,
 		systemSchema: string,
+		metadataStore: SchemaDatabaseMetadataResolverStore,
 	): Promise<[Schema]> {
 		const {
-			sql,
+			getSql,
 			schema: newSchema,
-			handler,
-		} = await this.migrationDescriber.describeModification(schema, modification, { systemSchema, formatVersion })
+		} = this.migrationDescriber.describeModification(schema, modification, { formatVersion })
 		for (const stage of stages) {
+			const databaseMetadata = await metadataStore.getMetadata(stage.schema)
+			const sql = getSql({
+				systemSchema,
+				databaseMetadata,
+				invalidateDatabaseMetadata: () => metadataStore.invalidate(stage.schema),
+			})
 			await this.executeOnStage(db, stage, sql, migrationVersion)
 		}
 		return [newSchema]

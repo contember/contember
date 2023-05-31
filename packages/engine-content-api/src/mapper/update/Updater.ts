@@ -4,7 +4,7 @@ import { Input, Model } from '@contember/schema'
 import { PredicateFactory } from '../../acl'
 import { UpdateBuilderFactory } from './UpdateBuilderFactory'
 import { Mapper } from '../Mapper'
-import { acceptEveryFieldVisitor } from '@contember/schema-utils'
+import { acceptEveryFieldVisitor, SchemaDatabaseMetadata } from '@contember/schema-utils'
 import {
 	collectResults,
 	MutationNoResultError,
@@ -21,6 +21,7 @@ import { rowDataToFieldValues } from '../ColumnValue'
 export class Updater {
 	constructor(
 		private readonly schema: Model.Schema,
+		private readonly schemaDatabaseMetadata: SchemaDatabaseMetadata,
 		private readonly predicateFactory: PredicateFactory,
 		private readonly updateBuilderFactory: UpdateBuilderFactory,
 	) {}
@@ -50,7 +51,7 @@ export class Updater {
 		if (otherPromises.length === 0) {
 			return await mutationResultPromise
 		} else {
-			return await collectResults(this.schema, mutationResultPromise, otherPromises)
+			return await collectResults(this.schema, this.schemaDatabaseMetadata, mutationResultPromise, otherPromises)
 		}
 	}
 

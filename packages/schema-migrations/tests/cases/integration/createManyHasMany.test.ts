@@ -30,11 +30,11 @@ testMigrations('create many has many relation (post with categories)', {
 				primary: 'id',
 				primaryColumn: 'id',
 				tableName: 'category',
-				unique: {},
+				unique: [],
 				eventLog: {
 					enabled: true,
 				},
-				indexes: {},
+				indexes: [],
 			},
 		},
 		{
@@ -93,7 +93,7 @@ testMigrations('create many has many relation (post with categories)', {
 		"category_id" uuid NOT NULL REFERENCES "category"("id") ON DELETE CASCADE
 	);
 	ALTER TABLE "post_categories"
-		ADD CONSTRAINT "post_categories_pkey" PRIMARY KEY ("post_id", "category_id");
+		ADD PRIMARY KEY ("post_id", "category_id");
 	CREATE TRIGGER "log_event"
 		AFTER INSERT OR UPDATE OR DELETE
 		ON "post_categories"

@@ -192,8 +192,8 @@ class LaxSchemaBuilder {
 	private getEntity(entityName: string): Model.Entity {
 		return this.entities[entityName] ??= {
 			name: entityName,
-			unique: {},
-			indexes: {},
+			unique: [],
+			indexes: [],
 			primary: 'id',
 			primaryColumn: 'id',
 			tableName: this.conventions.getTableName(entityName),

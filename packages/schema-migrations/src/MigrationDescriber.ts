@@ -4,6 +4,7 @@ import {
 	ModificationDescription,
 	ModificationDescriptionContext,
 	ModificationHandler,
+	ModificationHandlerCreateSqlOptions,
 	ModificationHandlerFactory,
 	ModificationHandlerOptions,
 	SchemaUpdateError,
@@ -14,23 +15,22 @@ import { Schema } from '@contember/schema'
 
 export interface ModificationDescriptionResult {
 	modification: Migration.Modification
-	sql: string
 	schema: Schema
 	description: ModificationDescription
 	handler: ModificationHandler<any>
+	getSql: (options: ModificationHandlerCreateSqlOptions) => string
 }
 
 export class MigrationDescriber {
 	constructor(private readonly modificationHandlerFactory: ModificationHandlerFactory) {
 	}
 
-	public async describeModification(
+	public describeModification(
 		schema: Schema,
 		modification: Migration.Modification,
 		options: ModificationHandlerOptions,
 		modificationDescriptionContext: ModificationDescriptionContext = emptyModificationDescriptionContext,
-	): Promise<ModificationDescriptionResult> {
-		const builder = createMigrationBuilder()
+	): ModificationDescriptionResult {
 		const modificationHandler = this.modificationHandlerFactory.create(
 			modification.modification,
 			modification,
@@ -45,29 +45,31 @@ export class MigrationDescriber {
 			}
 			throw new SchemaUpdateError(e.message + '\n for modification: \n' + JSON.stringify(modification))
 		}
-		await modificationHandler.createSql(builder)
 		return {
 			modification,
 			schema,
-			sql: builder.getSql(),
+			getSql: options => {
+				const builder = createMigrationBuilder()
+				modificationHandler.createSql(builder, options)
+				return builder.getSql()
+			},
 			description: modificationHandler.describe(modificationDescriptionContext),
 			handler: modificationHandler,
 		}
 	}
 
-	public async describeModifications(schema: Schema, migration: Migration, systemSchema: string): Promise<ModificationDescriptionResult[]> {
+	public describeModifications(schema: Schema, migration: Migration): ModificationDescriptionResult[] {
 		const result = []
 		const createdEntities = []
 		for (const modification of migration.modifications) {
 			if (modification.modification === createEntityModification.id) {
 				createdEntities.push(modification.entity.name)
 			}
-			const description = await this.describeModification(
+			const description = this.describeModification(
 				schema,
 				modification,
 				{
 					formatVersion: migration.formatVersion,
-					systemSchema,
 				},
 				{
 					createdEntities,

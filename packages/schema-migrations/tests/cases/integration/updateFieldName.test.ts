@@ -43,25 +43,6 @@ testMigrations('rename a field with column', {
 })
 
 
-testMigrations('rename a field with a constraint', {
-	originalSchema: new SchemaBuilder()
-		.entity('Author', e => e.column('slug', c => c.type(Model.ColumnType.String).unique()))
-		.buildSchema(),
-	updatedSchema: new SchemaBuilder()
-		.entity('Author', e => e.column('identifier', c => c.type(Model.ColumnType.String).columnName('slug').unique()))
-		.buildSchema(),
-	diff: [
-		{
-			modification: 'updateFieldName',
-			entityName: 'Author',
-			fieldName: 'slug',
-			newFieldName: 'identifier',
-		},
-	],
-	sql: SQL`ALTER TABLE "author"
-			RENAME CONSTRAINT "unique_Author_slug_a645b0" TO "unique_Author_identifier_4eb9f2";`,
-	noDiff: true,
-})
 
 testMigrations('rename a field with one-has-one', {
 	originalSchema: new SchemaBuilder()
@@ -80,8 +61,7 @@ testMigrations('rename a field with one-has-one', {
 			newFieldName: 'description',
 		},
 	],
-	sql: SQL`ALTER TABLE "author"
-        RENAME CONSTRAINT "unique_Author_content_b64856" TO "unique_Author_description_00f1ef";`,
+	sql: SQL``,
 	noDiff: true,
 })
 

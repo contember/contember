@@ -15,5 +15,5 @@ export const getFieldsForUniqueWhere = (schema: Model.Schema, entity: Model.Enti
 		}),
 	).filter((it): it is [string] => !!it)
 
-	return [[entity.primary], ...Object.values(entity.unique).map(it => it.fields), ...relations]
+	return [[entity.primary], ...entity.unique.map(it => it.fields), ...relations]
 }

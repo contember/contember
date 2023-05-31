@@ -54,15 +54,10 @@ export class ModelValidator {
 	}
 
 	private validateUniqueConstraints(uniqueConstraints: Model.Entity['unique'], fields: Set<string>, errors: ErrorBuilder): void {
-		for (const [constraintName, constraint] of Object.entries(uniqueConstraints)) {
-			const uniqueErrors = errors.for(constraintName)
-			if (constraint.name !== constraintName) {
-				uniqueErrors.add('MODEL_NAME_MISMATCH', `Constraint name ${constraint.name} does not match the name in a map "${constraintName}"`)
-				continue
-			}
+		for (const constraint of uniqueConstraints) {
 			for (const field of constraint.fields) {
 				if (!fields.has(field)) {
-					uniqueErrors.add('MODEL_UNDEFINED_FIELD', `Referenced field ${field} in a constraint does not exists`)
+					errors.add('MODEL_UNDEFINED_FIELD', `Referenced field ${field} in a constraint does not exists`)
 				}
 			}
 		}
@@ -265,25 +260,6 @@ export class ModelValidator {
 				visitOneHasOneOwning: () => { },
 				visitManyHasOne: () => { },
 			})
-		}
-		for (const entity of entities) {
-			const entityErrorBuilder = errorBuilder.for(entity.name)
-			for (const index of Object.values(entity.indexes)) {
-				const description = `index name ${index.name} of entity ${entity.name}`
-				if (relationNames[index.name]) {
-					entityErrorBuilder.add('MODEL_NAME_COLLISION', `${description} collides with ${relationNames[index.name]}`)
-				} else {
-					relationNames[index.name] = description
-				}
-			}
-			for (const unique of Object.values(entity.unique)) {
-				const description = `unique index name ${unique.name} of entity ${entity.name}`
-				if (relationNames[unique.name]) {
-					entityErrorBuilder.add('MODEL_NAME_COLLISION', `${description} collides with ${relationNames[unique.name]}`)
-				} else {
-					relationNames[unique.name] = description
-				}
-			}
 		}
 	}
 }

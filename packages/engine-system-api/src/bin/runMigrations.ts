@@ -3,7 +3,11 @@ import { DatabaseContextFactory, emptyVersionedSchema, SchemaVersionBuilder } fr
 import { Connection } from '@contember/database'
 import { createLogger, PrettyPrintLoggerHandler } from '@contember/logger'
 
-;(async () => {
+
+import { SchemaDatabaseMetadataResolver } from '../model/metadata/SchemaDatabaseMetadataResolver'
+import { dummySchemaDatabaseMetadata } from '@contember/schema-utils';
+
+(async () => {
 	const dbConfig = {
 		database: process.env.PGDATABASE as string,
 		host: process.env.PGHOST as string,
@@ -25,6 +29,9 @@ import { createLogger, PrettyPrintLoggerHandler } from '@contember/logger'
 			buildSchema: () => Promise.resolve(emptyVersionedSchema),
 		} as unknown as SchemaVersionBuilder,
 		{},
+		{
+			resolveMetadata: () => Promise.resolve(dummySchemaDatabaseMetadata),
+		} as unknown as SchemaDatabaseMetadataResolver,
 	)
 	// eslint-disable-next-line no-console
 	await migrationsRunner.run(createLogger(new PrettyPrintLoggerHandler(process.stderr)))

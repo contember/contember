@@ -14,22 +14,21 @@ import {
 import {
 	createModificationType,
 	Differ,
-	ModificationHandler,
+	ModificationHandler, ModificationHandlerCreateSqlOptions,
 	ModificationHandlerOptions,
 } from '../ModificationHandler'
 import { VERSION_ACL_PATCH, VERSION_REMOVE_REFERENCING_RELATIONS } from '../ModificationVersions'
 import { isRelation, PredicateDefinitionProcessor } from '@contember/schema-utils'
 import { removeFieldModification } from '../fields'
-import { SchemaWithMeta } from '../utils/schemaMeta'
 
 export class RemoveEntityModificationHandler implements ModificationHandler<RemoveEntityModificationData> {
 	constructor(
 		private readonly data: RemoveEntityModificationData,
-		private readonly schema: SchemaWithMeta,
+		private readonly schema: Schema,
 		private readonly options: ModificationHandlerOptions,
 	) {}
 
-	public createSql(builder: MigrationBuilder): void {
+	public createSql(builder: MigrationBuilder, options: ModificationHandlerCreateSqlOptions): void {
 		const entity = this.schema.model.entities[this.data.entityName]
 		if (entity.view) {
 			builder.dropView(entity.tableName)
@@ -37,7 +36,8 @@ export class RemoveEntityModificationHandler implements ModificationHandler<Remo
 		}
 		if (this.options.formatVersion >= VERSION_REMOVE_REFERENCING_RELATIONS) {
 			this.getFieldsToRemove(this.schema).forEach(([entityName, fieldName]) => {
-				removeFieldModification.createHandler({ entityName, fieldName }, this.schema, this.options).createSql(builder)
+				const removeFieldHandler = removeFieldModification.createHandler({ entityName, fieldName }, this.schema, this.options)
+				removeFieldHandler.createSql(builder, options)
 			})
 		}
 		builder.dropTable(entity.tableName)

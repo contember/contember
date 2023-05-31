@@ -31,11 +31,11 @@ testMigrations('create a table (no relations, unique on column)', {
 				primary: 'id',
 				primaryColumn: 'id',
 				tableName: 'author',
-				unique: {},
+				unique: [],
 				eventLog: {
 					enabled: true,
 				},
-				indexes: {},
+				indexes: [],
 			},
 		},
 		{
@@ -74,10 +74,7 @@ testMigrations('create a table (no relations, unique on column)', {
 		{
 			modification: 'createUniqueConstraint',
 			entityName: 'Author',
-			unique: {
-				name: 'unique_Author_email_a3e587',
-				fields: ['email'],
-			},
+			unique: { fields: ['email'] },
 		},
 	],
 	sql: SQL`CREATE TABLE "author" (
@@ -101,7 +98,7 @@ testMigrations('create a table (no relations, unique on column)', {
 	ALTER TABLE "author"
 		ADD "registered_at" date;
 	ALTER TABLE "author"
-		ADD CONSTRAINT "unique_Author_email_a3e587" UNIQUE ("email");`,
+		ADD UNIQUE ("email");`,
 })
 
 namespace ViewEntityUpdatedSchema {
@@ -137,12 +134,12 @@ testMigrations('create a view', {
 				primary: 'id',
 				primaryColumn: 'id',
 				tableName: 'author',
-				unique: {},
+				unique: [],
 				view: { sql: "SELECT null as id, 'John' AS name" },
 				eventLog: {
 					enabled: true,
 				},
-				indexes: {},
+				indexes: [],
 			},
 		},
 	],

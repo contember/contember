@@ -11,9 +11,8 @@ import { CreateInputVisitor } from '../../inputProcessing'
 import { SqlCreateInputProcessor } from './SqlCreateInputProcessor'
 import { Mapper } from '../Mapper'
 import { Input, Model, Value } from '@contember/schema'
-import { acceptEveryFieldVisitor, Providers } from '@contember/schema-utils'
+import { acceptEveryFieldVisitor, Providers, SchemaDatabaseMetadata } from '@contember/schema-utils'
 import { InsertBuilderFactory } from './InsertBuilderFactory'
-import { Client } from '@contember/database'
 import { InsertBuilder } from './InsertBuilder'
 import { tryMutation } from '../ErrorUtils'
 import { rowDataToFieldValues } from '../ColumnValue'
@@ -21,6 +20,7 @@ import { rowDataToFieldValues } from '../ColumnValue'
 export class Inserter {
 	constructor(
 		private readonly schema: Model.Schema,
+		private readonly schemaDatabaseMetadata: SchemaDatabaseMetadata,
 		private readonly insertBuilderFactory: InsertBuilderFactory,
 		private readonly providers: Providers,
 	) {}
@@ -53,7 +53,7 @@ export class Inserter {
 			new MutationCreateOk([], entity, primary, data, values)
 		const insertPromise = this.executeInsert(insertBuilder, mapper, okResultFactory)
 
-		return await collectResults(this.schema, insertPromise, Object.values(promises))
+		return await collectResults(this.schema, this.schemaDatabaseMetadata, insertPromise, Object.values(promises))
 	}
 
 	private async executeInsert(
@@ -61,7 +61,7 @@ export class Inserter {
 		mapper: Mapper,
 		okResultFactory: (primary: Value.PrimaryValue, values: RowValues) => MutationCreateOk,
 	): Promise<MutationResultList> {
-		return tryMutation(this.schema, async () => {
+		return tryMutation(this.schema, this.schemaDatabaseMetadata, async () => {
 			const result = await insertBuilder.execute(mapper)
 			if (result.aborted) {
 				return [new MutationNothingToDo([], NothingToDoReason.aborted)]

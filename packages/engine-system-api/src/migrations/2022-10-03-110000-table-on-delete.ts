@@ -1,12 +1,14 @@
 import { MigrationArgs, MigrationBuilder } from '@contember/database-migrations'
 import { wrapIdentifier } from '@contember/database'
 import { SystemMigrationArgs } from './types'
-import { acceptFieldVisitor, NamingHelper } from '@contember/schema-utils'
+import { acceptFieldVisitor, SchemaDatabaseMetadata } from '@contember/schema-utils'
 import { Model } from '@contember/schema'
 
 export default async function (builder: MigrationBuilder, args: MigrationArgs<SystemMigrationArgs>) {
 	const schema = await args.schemaResolver(args.connection)
-	const stages = (await args.connection.query('SELECT schema FROM stage')).rows
+	const stages = (await args.connection.query<{schema: string}>('SELECT schema FROM stage')).rows
+	const metadataByStage: Record<string, SchemaDatabaseMetadata> = {}
+
 	for (const entity of Object.values(schema.model.entities)) {
 		for (const field of Object.values(entity.fields)) {
 			const result = acceptFieldVisitor<null | {
@@ -36,30 +38,27 @@ export default async function (builder: MigrationBuilder, args: MigrationArgs<Sy
 				continue
 			}
 			for (const stage of stages) {
-				const fkName = NamingHelper.createForeignKeyName(
-					entity.tableName,
-					relation.joiningColumn.columnName,
-					targetEntity.tableName,
-					targetEntity.primaryColumn,
-				)
-				const tableName = { name: entity.tableName, schema: stage.schema }
+				const databaseMetadata = metadataByStage[stage.schema] ??= await args.databaseMetadataResolver(args.connection, stage.schema)
 
-				builder.dropConstraint(tableName, fkName)
+				const fkNames = databaseMetadata.getForeignKeyConstraintNames({
+					fromTable: entity.tableName,
+					fromColumn: relation.joiningColumn.columnName,
+					toTable: targetEntity.tableName,
+					toColumn: targetEntity.primaryColumn,
+				})
+				for (const name of fkNames) {
+					builder.sql(`ALTER TABLE ${wrapIdentifier(stage.schema)}.${wrapIdentifier(entity.tableName)} DROP CONSTRAINT ${wrapIdentifier(name)}`)
+				}
 
 				const onDelete = ({
 					[Model.OnDelete.setNull]: 'SET NULL',
 					[Model.OnDelete.cascade]: 'CASCADE',
 				} as const)[relation.joiningColumn.onDelete]
 
-				builder.addConstraint(tableName, fkName, {
-					foreignKeys: {
-						columns: relation.joiningColumn.columnName,
-						references: `${wrapIdentifier(stage.schema)}.${wrapIdentifier(targetEntity.tableName)}(${wrapIdentifier(targetEntity.primaryColumn)})`,
-						onDelete: onDelete,
-					},
-					deferrable: true,
-					deferred: false,
-				})
+				builder.sql(`ALTER TABLE ${wrapIdentifier(stage.schema)}.${wrapIdentifier(entity.tableName)}
+					ADD FOREIGN KEY (${wrapIdentifier(relation.joiningColumn.columnName)}) 
+					REFERENCES ${wrapIdentifier(stage.schema)}.${wrapIdentifier(targetEntity.tableName)} (${wrapIdentifier(targetEntity.primaryColumn)}) ON DELETE ${onDelete} DEFERRABLE INITIALLY IMMEDIATE
+				`)
 			}
 		}
 	}

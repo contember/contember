@@ -3,7 +3,7 @@ import { Model, Schema } from '@contember/schema'
 import { SchemaUpdater, updateModel } from '../utils/schemaUpdateUtils'
 import { createModificationType, Differ, ModificationHandler } from '../ModificationHandler'
 import { Migration } from '../../Migration'
-import { PartialEntity } from '../../utils/PartialEntity.js'
+import { PossibleEntityShapeInMigrations } from '../../utils/PartialEntity.js'
 
 export class CreateViewModificationHandler implements ModificationHandler<CreateViewModificationData> {
 	constructor(private readonly data: CreateViewModificationData, private readonly schema: Schema) {}
@@ -22,9 +22,10 @@ export class CreateViewModificationHandler implements ModificationHandler<Create
 			entities: {
 				...model.entities,
 				[this.data.entity.name]: {
-					indexes: {},
 					eventLog: { enabled: true }, // not relevant here...
 					...this.data.entity,
+					unique: Object.values(this.data.entity.unique),
+					indexes: Object.values(this.data.entity.indexes ?? []),
 				},
 			},
 		}))
@@ -68,5 +69,5 @@ export class CreateViewDiffer implements Differ {
 }
 
 export interface CreateViewModificationData {
-	entity: PartialEntity
+	entity: PossibleEntityShapeInMigrations
 }

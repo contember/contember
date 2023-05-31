@@ -47,8 +47,8 @@ testMigrations('remove relation (one has many)', {
 		.buildSchema(),
 	diff: [
 		{
-			constraintName: 'unique_PostLocale_post_locale_5759e8',
 			entityName: 'PostLocale',
+			fields: ['post', 'locale'],
 			modification: 'removeUniqueConstraint',
 		},
 		{
@@ -57,7 +57,7 @@ testMigrations('remove relation (one has many)', {
 			fieldName: 'post',
 		},
 	],
-	sql: SQL`ALTER TABLE "post_locale" DROP CONSTRAINT "unique_PostLocale_post_locale_5759e8";
+	sql: SQL`ALTER TABLE "post_locale" DROP CONSTRAINT "uniq_post_locale_post_id_locale";
 						ALTER TABLE "post_locale" DROP "post_id";`,
 })
 
@@ -173,15 +173,15 @@ testMigrations('test drop index / unique when removing a field', {
 	}, {
 		modification: 'createUniqueConstraint',
 		entityName: 'Article',
-		unique: { name: 'unique_Article_title_author_7157ea', fields: ['title', 'author'] },
+		unique: { fields: ['title', 'author'] },
 	}, {
 		modification: 'createIndex',
 		entityName: 'Article',
-		index: { name: 'idx_Article_title_author_7157ea', fields: ['title', 'author'] },
+		index: { fields: ['title', 'author'] },
 	}],
 	sql: SQL`ALTER TABLE "article" DROP "author_id";
 ALTER TABLE "article" ADD "author" text;
-ALTER TABLE "article" ADD CONSTRAINT "unique_Article_title_author_7157ea" UNIQUE ("title", "author");
-CREATE INDEX "idx_Article_title_author_7157ea" ON "article" ("title", "author");`,
+ALTER TABLE "article" ADD UNIQUE ("title", "author");
+CREATE INDEX ON "article" ("title", "author");`,
 })
 

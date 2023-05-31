@@ -148,10 +148,22 @@ const viewSchemaCheck: Typesafe.Equals<Model.View, ReturnType<typeof viewSchemaI
 const viewSchema: Typesafe.Type<Model.View> = viewSchemaInner
 
 
-const indexesSchema = Typesafe.coalesce<Model.Indexes, Model.Indexes>(Typesafe.record(Typesafe.string, Typesafe.object({
-	fields: Typesafe.array(Typesafe.string),
-	name: Typesafe.string,
-})), { })
+const indexLike: Typesafe.Type<{readonly fields: readonly string[]; readonly name?: string | undefined}> = Typesafe.intersection(
+	Typesafe.object({
+		fields: Typesafe.array(Typesafe.string),
+	}),
+	Typesafe.partial({
+		name: Typesafe.string,
+	}),
+)
+
+const indexesSchema = Typesafe.coalesce<Model.Indexes, Model.Indexes>(
+	Typesafe.preprocess(
+		Typesafe.array(indexLike),
+		it => it?.constructor === Object ? Object.values(it) : it,
+	),
+	[],
+)
 
 const entitySchema = Typesafe.intersection(
 	Typesafe.object({
@@ -160,10 +172,10 @@ const entitySchema = Typesafe.intersection(
 		primaryColumn: Typesafe.string,
 		tableName: Typesafe.string,
 		fields: Typesafe.record(Typesafe.string, fieldSchema),
-		unique: Typesafe.record(Typesafe.string, Typesafe.object({
-			fields: Typesafe.array(Typesafe.string),
-			name: Typesafe.string,
-		})),
+		unique: Typesafe.preprocess(
+			Typesafe.array(indexLike),
+			it => it?.constructor === Object ? Object.values(it) : it,
+		),
 		indexes: indexesSchema,
 		eventLog: eventLogSchema,
 	}),

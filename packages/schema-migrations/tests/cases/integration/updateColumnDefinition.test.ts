@@ -124,8 +124,8 @@ testMigrations('recreate view dependent on entity after changing column type', {
 			name: 'AuthorMetaX',
 			primary: 'id',
 			primaryColumn: 'id',
-			unique: {},
-			indexes: {},
+			unique: [],
+			indexes: [],
 			fields: {
 				id: {
 					name: 'id',
@@ -145,8 +145,8 @@ testMigrations('recreate view dependent on entity after changing column type', {
 			name: 'AuthorMetaY',
 			primary: 'id',
 			primaryColumn: 'id',
-			unique: {},
-			indexes: {},
+			unique: [],
+			indexes: [],
 			fields: {
 				id: {
 					name: 'id',

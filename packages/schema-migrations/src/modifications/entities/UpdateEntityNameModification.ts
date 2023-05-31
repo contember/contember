@@ -5,32 +5,29 @@ import {
 	updateAcl,
 	updateAclEntities,
 	updateAclEveryRole,
-	updateEntity,
 	updateEveryEntity,
 	updateEveryField,
 	updateModel,
 	updateSchema,
 } from '../utils/schemaUpdateUtils'
-import { createModificationType, ModificationHandler, ModificationHandlerOptions } from '../ModificationHandler'
-import { isIt } from '../../utils/isIt'
 import {
-	VERSION_ACL_PATCH,
-	VERSION_UPDATE_CONSTRAINT_NAME,
-	VERSION_UPDATE_CONSTRAINT_NAME_ONE_HAS_ONE,
-} from '../ModificationVersions'
-import { acceptEveryFieldVisitor, NamingHelper } from '@contember/schema-utils'
+	createModificationType,
+	ModificationHandler,
+	ModificationHandlerCreateSqlOptions,
+	ModificationHandlerOptions,
+} from '../ModificationHandler'
+import { isIt } from '../../utils/isIt'
+import { VERSION_ACL_PATCH } from '../ModificationVersions'
 import { NoopModification } from '../NoopModification'
-import { renameConstraintSchemaUpdater, renameConstraintsSqlBuilder } from '../utils/renameConstraintsHelper'
 import { changeValue } from '../utils/valueUtils'
 import { updateEntityTableNameModification } from './UpdateEntityTableNameModification'
-import { SchemaWithMeta } from '../utils/schemaMeta'
 
 export class UpdateEntityNameModificationHandler implements ModificationHandler<UpdateEntityNameModificationData> {
 	private subModification: ModificationHandler<any>
 
 	constructor(
 		private readonly data: UpdateEntityNameModificationData,
-		private readonly schema: SchemaWithMeta,
+		private readonly schema: Schema,
 		private readonly options: ModificationHandlerOptions,
 	) {
 		this.subModification = data.tableName
@@ -42,29 +39,8 @@ export class UpdateEntityNameModificationHandler implements ModificationHandler<
 			: new NoopModification()
 	}
 
-	public createSql(builder: MigrationBuilder): void {
-		const entity = this.schema.model.entities[this.data.entityName]
-		if (!entity.view && this.options.formatVersion >= VERSION_UPDATE_CONSTRAINT_NAME) {
-			renameConstraintsSqlBuilder(builder, entity, this.getNewConstraintName.bind(this))
-		}
-
-		if (this.options.formatVersion >= VERSION_UPDATE_CONSTRAINT_NAME_ONE_HAS_ONE) {
-			acceptEveryFieldVisitor(this.schema.model, this.data.entityName, {
-				visitColumn: () => {},
-				visitManyHasManyOwning: () => {},
-				visitManyHasManyInverse: () => {},
-				visitOneHasOneInverse: () => {},
-				visitManyHasOne: () => {},
-				visitOneHasMany: () => {},
-				visitOneHasOneOwning: ({ relation }) => {
-					const uniqueConstraintName = NamingHelper.createUniqueConstraintName(entity.name, [relation.name])
-					const newUniqueConstraintName = NamingHelper.createUniqueConstraintName(this.data.newEntityName, [relation.name])
-					builder.renameConstraint(entity.tableName, uniqueConstraintName, newUniqueConstraintName)
-				},
-			})
-		}
-
-		this.subModification.createSql(builder)
+	public createSql(builder: MigrationBuilder, options: ModificationHandlerCreateSqlOptions): void {
+		this.subModification.createSql(builder, options)
 	}
 
 	public getSchemaUpdater(): SchemaUpdater {
@@ -79,9 +55,6 @@ export class UpdateEntityNameModificationHandler implements ModificationHandler<
 						return field
 					}),
 				),
-				this.options.formatVersion >= VERSION_UPDATE_CONSTRAINT_NAME
-					? updateEntity(this.data.entityName, renameConstraintSchemaUpdater(this.getNewConstraintName.bind(this)))
-					: undefined,
 				({ model }) => {
 					const { [this.data.entityName]: renamed, ...entities } = model.entities
 					const newEntities = {
@@ -131,15 +104,6 @@ export class UpdateEntityNameModificationHandler implements ModificationHandler<
 				  )
 				: undefined,
 		)
-	}
-
-	private getNewConstraintName(constraint: Model.UniqueConstraint): string | null {
-		const generatedName = NamingHelper.createUniqueConstraintName(this.data.entityName, constraint.fields)
-		const isGenerated = constraint.name === generatedName
-		if (!isGenerated) {
-			null
-		}
-		return NamingHelper.createUniqueConstraintName(this.data.newEntityName, constraint.fields)
 	}
 
 	describe() {

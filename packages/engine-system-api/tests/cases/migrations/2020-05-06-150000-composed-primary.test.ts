@@ -2,12 +2,14 @@ import migration from '../../../src/migrations/2020-05-06-150000-composed-primar
 import { createMigrationBuilder } from '@contember/database-migrations'
 import { sampleProject } from '@contember/engine-api-tester'
 import { test, assert } from 'vitest'
+import { dummySchemaDatabaseMetadata } from '@contember/schema-utils'
 
 test('many-has-many-primary migration sql', async () => {
 	const builder = createMigrationBuilder()
 	await migration(builder, {
 		connection: undefined as any,
 		schemaResolver: () => Promise.resolve(sampleProject),
+		databaseMetadataResolver: () => Promise.resolve(dummySchemaDatabaseMetadata),
 		project: {
 			slug: 'test',
 			stages: [

@@ -2,8 +2,7 @@ import { Migration, ModificationHandlerFactory, SchemaDiffer, SchemaMigrator, VE
 import { Acl, Model } from '@contember/schema'
 import { createMigrationBuilder } from '@contember/database-migrations'
 import { assert, describe, it } from 'vitest'
-import { SchemaWithMeta } from '../../src/modifications/utils/schemaMeta'
-import { emptySchema } from '@contember/schema-utils'
+import { dummySchemaDatabaseMetadata, emptySchema } from '@contember/schema-utils'
 
 const modificationFactory = new ModificationHandlerFactory(ModificationHandlerFactory.defaultFactoryMap)
 const schemaMigrator = new SchemaMigrator(modificationFactory)
@@ -40,11 +39,11 @@ export function testDiffSchemas(
 		console.log(JSON.stringify(actualDiff))
 		throw e
 	}
-	const { meta, ...schema } = schemaMigrator.applyModifications(
+	const schema = schemaMigrator.applyModifications(
 		{ ...emptySchema, model: originalModel, acl: originalAcl },
 		actualDiff,
 		VERSION_LATEST,
-	) as SchemaWithMeta
+	)
 	assert.deepStrictEqual(schema, {
 		...emptySchema,
 		model: updatedModel,
@@ -59,11 +58,11 @@ export function testApplyDiff(
 	originalAcl: Acl.Schema = emptyAcl,
 	expectedAcl: Acl.Schema = emptyAcl,
 ) {
-	const { meta, ...actualSchema } = schemaMigrator.applyModifications(
+	const actualSchema = schemaMigrator.applyModifications(
 		{ ...emptySchema, model: originalModel, acl: originalAcl },
 		diff,
 		VERSION_LATEST,
-	) as SchemaWithMeta
+	)
 
 	assert.deepStrictEqual(actualSchema, {
 		...emptySchema,
@@ -76,8 +75,14 @@ export function testGenerateSql(originalSchema: Model.Schema, diff: Migration.Mo
 	let schema = { ...emptySchema, model: originalSchema, acl: emptyAcl }
 	const builder = createMigrationBuilder()
 	for (let { modification, ...data } of diff) {
-		const modificationHandler = modificationFactory.create(modification, data, schema, { formatVersion: VERSION_LATEST, systemSchema: 'system' })
-		modificationHandler.createSql(builder)
+		const modificationHandler = modificationFactory.create(modification, data, schema, {
+			formatVersion: VERSION_LATEST,
+		})
+		modificationHandler.createSql(builder, {
+			systemSchema: 'system',
+			databaseMetadata: dummySchemaDatabaseMetadata,
+			invalidateDatabaseMetadata: () => null,
+		})
 		schema = modificationHandler.getSchemaUpdater()({ schema })
 	}
 	const actual = builder.getSql().replace(/\s+/g, ' ').trim()

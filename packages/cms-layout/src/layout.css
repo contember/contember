@@ -67,7 +67,8 @@
 	font-size: min(1em, 1.5vw);
 }
 :where(.cui-root .cui-cms-header-title h1) {
-	font-weight: bold;
+	font-size: max(1rem, min(2vw, 1.75rem));
+	font-weight: 800;
 }
 
 /* Make left sidebar sticky (1) */
@@ -413,6 +414,10 @@
 	.cui-cms-sidebar-left-header-content
 ) {
 	flex: 1
+}
+
+:where(.cui-layout-panel[data-behavior="modal"] .cui-layout-panel-body) {
+	max-width: unset;
 }
 
 /* Make content and title with max-width (1) */

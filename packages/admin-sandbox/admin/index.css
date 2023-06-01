@@ -1,10 +1,2 @@
 @import "@contember/admin/index.css";
 @import "@contember/cms-layout/index.css";
-
-body > div {
-	display: contents
-}
-
-.cui-layout-chrome {
-	flex: 1
-}

@@ -18,6 +18,10 @@ html, body {
 	overscroll-behavior: none;
 }
 
+:where(body > div) {
+	display: contents
+}
+
 :where(h1, h2, h3, h4, h5, h6, p, pre):last-child {
 	margin-bottom: 0;
 }

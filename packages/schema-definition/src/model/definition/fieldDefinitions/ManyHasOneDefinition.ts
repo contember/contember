@@ -14,8 +14,8 @@ export class ManyHasOneDefinitionImpl extends FieldDefinition<ManyHasOneDefiniti
 		return this.withOption('joiningColumn', { ...this.options.joiningColumn, columnName })
 	}
 
-	onDelete(onDelete: Model.OnDelete): Interface<ManyHasOneDefinition> {
-		return this.withOption('joiningColumn', { ...this.options.joiningColumn, onDelete })
+	onDelete(onDelete: Model.OnDelete | `${Model.OnDelete}`): Interface<ManyHasOneDefinition> {
+		return this.withOption('joiningColumn', { ...this.options.joiningColumn, onDelete: onDelete as Model.OnDelete })
 	}
 
 	cascadeOnDelete(): Interface<ManyHasOneDefinition> {

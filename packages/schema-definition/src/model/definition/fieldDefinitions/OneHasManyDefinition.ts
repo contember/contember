@@ -7,10 +7,10 @@ export class OneHasManyDefinitionImpl extends FieldDefinition<OneHasManyDefiniti
 
 	orderBy(
 		field: string | string[],
-		direction: Model.OrderDirection = Model.OrderDirection.asc,
+		direction: Model.OrderDirection | `${Model.OrderDirection}` = Model.OrderDirection.asc,
 	): Interface<OneHasManyDefinition> {
 		const path = typeof field === 'string' ? [field] : field
-		return this.withOption('orderBy', [...(this.options.orderBy || []), { path, direction }])
+		return this.withOption('orderBy', [...(this.options.orderBy || []), { path, direction: direction as Model.OrderDirection }])
 	}
 	createField({ name, entityRegistry }: CreateFieldContext): Model.AnyField {
 		const options = this.options

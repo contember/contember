@@ -1,7 +1,7 @@
 import {
 	AnchorButton,
 	CreateScope,
-	DataGrid,
+	DataGrid, DataGridScope,
 	DeleteEntityButton,
 	EditScope,
 	FieldView,
@@ -23,13 +23,13 @@ export const list = (
 		</Slots.Actions>
 
 		<Slots.Content>
-			<DataGrid entities={'SeqEntity'}>
+			<DataGridScope entities={'SeqEntity'}>
 				<TextCell field={'value'} />
 				<GenericCell canBeHidden={false} justification="justifyEnd">
 					<LinkButton to={`seq/edit(id: $entity.id)`} Component={AnchorButton}>Edit</LinkButton>
 					<DeleteEntityButton title="Delete" immediatePersist={true} />
 				</GenericCell>
-			</DataGrid>
+			</DataGridScope>
 		</Slots.Content>
 	</>
 )

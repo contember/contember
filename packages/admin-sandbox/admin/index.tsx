@@ -1,11 +1,4 @@
-import {
-	ApplicationEntrypoint,
-	DataBindingProvider,
-	FeedbackRenderer,
-	PageModule,
-	Pages,
-	runReactApp,
-} from '@contember/admin'
+import { ApplicationEntrypoint, PageModule, Pages, runReactApp } from '@contember/admin'
 import { LayoutSlotsProvider } from '@contember/layout'
 import { createRoot } from 'react-dom/client'
 import { DirectivesProvider } from './components/Directives'

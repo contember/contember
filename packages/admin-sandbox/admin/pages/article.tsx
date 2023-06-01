@@ -2,7 +2,7 @@ import {
 	AnchorButton,
 	Component,
 	CreateScope,
-	DataGrid,
+	DataGridScope,
 	DeleteEntityButton,
 	EditScope,
 	EnumCell,
@@ -43,7 +43,7 @@ export const List = () => (
 		<Directive name="cms-layout.content.maxWidth" content={null} />
 		<Slots.Actions><LinkButton to="article/create">Add article</LinkButton></Slots.Actions>
 		<Slots.Content>
-			<DataGrid
+			<DataGridScope
 				entities="Article"
 				itemsPerPage={20}
 				tile={(
@@ -65,7 +65,7 @@ export const List = () => (
 					<LinkButton to={`article/edit(id: $entity.id)`} Component={AnchorButton}>Edit</LinkButton>
 					<DeleteEntityButton title="Delete" immediatePersist={true} />
 				</GenericCell>
-			</DataGrid>
+			</DataGridScope>
 		</Slots.Content>
 	</>
 )

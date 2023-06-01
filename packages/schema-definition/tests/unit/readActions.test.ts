@@ -1,11 +1,10 @@
-import { SchemaDefinition as def, ActionsDefinition as actions } from '../../src'
-import { Model } from '@contember/schema'
+import { c } from '../../src'
 import { expect, test } from 'vitest'
 import { createActions } from '../../src/actions/definition'
 
 namespace SimpleActions {
 
-	@actions.watch({
+	@c.watch({
 		name: 'book_watch',
 		watch: `
 			title
@@ -16,36 +15,36 @@ namespace SimpleActions {
 		webhook: '%webhookUrl%/book/updated',
 	})
 	export class Book {
-		title = def.stringColumn()
-		tags = def.manyHasMany(Tag)
-		category = def.manyHasOne(Category)
+		title = c.stringColumn()
+		tags = c.manyHasMany(Tag)
+		category = c.manyHasOne(Category)
 	}
 
 	export class Tag {
-		locales = def.oneHasMany(TagLocale, 'tag')
+		locales = c.oneHasMany(TagLocale, 'tag')
 	}
 
-	@def.Unique('tag', 'locale')
+	@c.unique('tag', 'locale')
 	export class TagLocale {
-		tag = def.manyHasOne(Tag, 'locales')
-		name = def.stringColumn()
-		locale = def.manyHasOne(Locale)
+		tag = c.manyHasOne(Tag, 'locales')
+		name = c.stringColumn()
+		locale = c.manyHasOne(Locale)
 	}
 
 
 	export class Category {
-		locales = def.oneHasMany(CategoryLocale, 'category')
+		locales = c.oneHasMany(CategoryLocale, 'category')
 	}
 
-	@def.Unique('category', 'locale')
+	@c.unique('category', 'locale')
 	export class CategoryLocale {
-		category = def.manyHasOne(Category, 'locales')
-		name = def.stringColumn()
-		locale = def.manyHasOne(Locale)
+		category = c.manyHasOne(Category, 'locales')
+		name = c.stringColumn()
+		locale = c.manyHasOne(Locale)
 	}
 
 	export class Locale {
-		code = def.stringColumn().notNull().unique()
+		code = c.stringColumn().notNull().unique()
 	}
 }
 

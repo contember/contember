@@ -24,6 +24,7 @@ import {
 	SlugField,
 	TextCell,
 	TextField,
+	useRedirect,
 } from '@contember/admin'
 import { DataGridTile } from '../components/DataGridTile'
 import { Directive, Title } from '../components/Directives'
@@ -174,12 +175,18 @@ export const create = (
 	</>
 )
 
-export const edit = (
+export const edit = () => (
 	<>
 		<Slots.Back>
 			<NavigateBackLink to="article/list">Back to articles</NavigateBackLink>
 		</Slots.Back>
-		<EditScope entity="Article(id = $id)">
+		<EditScope
+			entity="Article(id = $id)"
+			redirectOnSuccess={(current, ids, entity) => !entity.existsOnServer ? 'article/list' : undefined}
+		>
+			<Slots.SidebarRightHeader>
+				<DeleteEntityButton immediatePersist={true} />
+			</Slots.SidebarRightHeader>
 			<FieldView field="title" render={title => (
 				<Title>{`Edit ${title.getAccessor().value ? title.getAccessor().value : 'Article'}`}</Title>
 			)} />

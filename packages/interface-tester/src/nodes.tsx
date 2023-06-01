@@ -6,6 +6,7 @@ import {
 	DataBindingProvider,
 	DataGrid,
 	DataGridPage,
+	DataGridScope,
 	DetailPage,
 	DetailScope,
 	EditPage,
@@ -46,7 +47,7 @@ export const createNode = (value: any): ReactNode | undefined => {
 		return <EntitySubTree {...props as any} />
 	} else if (value.type === CreatePage || value.type === CreateScope) {
 		return <EntitySubTree {...props as any} isCreating />
-	} else if (value.type === DataGridPage || value.type === DataGrid) {
+	} else if (value.type === DataGridPage || value.type === DataGrid || value.type === DataGridScope) {
 		return <DataGrid {...props as any} />
 	} else if (value.type === ListPage || value.type === ListScope || value.type === TablePage || value.type === MultiEditPage || value.type === MultiEditScope) {
 		return <EntityListSubTree {...props as any} />

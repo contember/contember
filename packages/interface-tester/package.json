@@ -35,7 +35,7 @@
 	},
 	"peerDependencies": {
 		"react": "^17 || ^18",
-		"vitest": "^0.29.3"
+		"vitest": "^0"
 	},
 	"devDependencies": {
 		"@types/micromatch": "^4.0.2",

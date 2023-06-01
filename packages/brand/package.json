@@ -43,9 +43,5 @@
 	},
 	"peerDependencies": {
 		"react": "^18"
-	},
-	"devDependencies": {
-		"vite": "^4",
-		"vitest": "^0"
 	}
 }

@@ -33,9 +33,5 @@
 		"type": "git",
 		"url": "https://github.com/contember/interface.git",
 		"directory": "packages/.template"
-	},
-	"devDependencies": {
-		"vite": "^4",
-		"vitest": "^0"
 	}
 }

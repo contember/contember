@@ -996,7 +996,7 @@ export interface CreateResetPasswordRequestFormProps {
 }
 
 // @public (undocumented)
-export const CreateScope: Partial<CreateScopeProps> & ComponentType<CreateScopeProps>;
+export const CreateScope: ({ children, redirectOnSuccess, onPersistSuccess, ...entityProps }: CreateScopeProps) => JSX.Element;
 
 // @public (undocumented)
 export type CreateScopeProps = Omit<SugaredUnconstrainedQualifiedSingleEntity, 'isCreating'> & EntitySubTreeAdditionalProps & EntitySubTreeAdditionalCreationProps & {
@@ -1345,6 +1345,16 @@ export type DataGridProps<ComponentExtraProps extends {}> = DataGridContainerPub
 });
 
 // @public (undocumented)
+export const DataGridScope: ({ children, rendererProps, pageName, ...dataGridProps }: DataGridPageProps) => JSX.Element;
+
+// @public (undocumented)
+export type DataGridScopeProps = DataGridProps<{}> & {
+    pageName?: string;
+    children?: ReactNode;
+    rendererProps?: Omit<LayoutRendererProps, 'children'>;
+};
+
+// @public (undocumented)
 export type DataGridSetColumnFilter<FA extends DataGridFilterArtifact = DataGridFilterArtifact> = (columnKey: DataGridColumnKey, columnFilter: FA | undefined) => void;
 
 // @public (undocumented)
@@ -1468,7 +1478,7 @@ export type DetailPageProps = SugaredQualifiedSingleEntity & EntitySubTreeAdditi
 };
 
 // @public (undocumented)
-export const DetailScope: Partial<DetailScopeProps> & ComponentType<DetailScopeProps>;
+export const DetailScope: ({ children, ...entityProps }: DetailScopeProps) => JSX.Element;
 
 // @public (undocumented)
 export type DetailScopeProps = SugaredQualifiedSingleEntity & EntitySubTreeAdditionalProps & {
@@ -1762,7 +1772,7 @@ export type EditPageProps = SugaredQualifiedSingleEntity & EntitySubTreeAddition
 };
 
 // @public (undocumented)
-export const EditScope: Partial<EditScopeProps> & ComponentType<EditScopeProps>;
+export const EditScope: ({ children, redirectOnSuccess, onPersistSuccess, refreshDataBindingOnPersist, skipBindingStateUpdateAfterPersist, ...entityProps }: EditScopeProps) => JSX.Element;
 
 // @public (undocumented)
 export type EditScopeProps = SugaredQualifiedSingleEntity & EntitySubTreeAdditionalProps & {
@@ -3055,9 +3065,7 @@ export interface ListRolesQueryVariables {
 }
 
 // @public (undocumented)
-export const ListScope: (<ContainerExtraProps, ItemExtraProps>(props: ListScopeProps<ContainerExtraProps, ItemExtraProps>) => ReactElement) & Partial<ListScopeProps<never, never>> & {
-    displayName?: string | undefined;
-};
+export const ListScope: <ContainerExtraProps, ItemExtraProps>({ children, ...entityListProps }: ListScopeProps<ContainerExtraProps, ItemExtraProps>) => JSX.Element;
 
 // @public (undocumented)
 export type ListScopeProps<ContainerExtraProps, ItemExtraProps> = SugaredQualifiedEntityList & EntityListSubTreeAdditionalProps & {
@@ -3324,9 +3332,7 @@ export type MultiEditPageProps<ContainerExtraProps, ItemExtraProps> = SugaredQua
 };
 
 // @public (undocumented)
-export const MultiEditScope: (<ContainerExtraProps, ItemExtraProps>(props: MultiEditScopeProps<ContainerExtraProps, ItemExtraProps>) => ReactElement) & Partial<MultiEditScopeProps<never, never>> & {
-    displayName?: string | undefined;
-};
+export const MultiEditScope: <ContainerExtraProps, ItemExtraProps>({ children, refreshDataBindingOnPersist, skipBindingStateUpdateAfterPersist, ...entityListProps }: MultiEditScopeProps<ContainerExtraProps, ItemExtraProps>) => JSX.Element;
 
 // @public (undocumented)
 export type MultiEditScopeProps<ContainerExtraProps, ItemExtraProps> = SugaredQualifiedEntityList & EntityListSubTreeAdditionalProps & {

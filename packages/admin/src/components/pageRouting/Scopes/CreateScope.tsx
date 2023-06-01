@@ -5,10 +5,11 @@ import {
 	EntitySubTreeAdditionalProps,
 	SugaredUnconstrainedQualifiedSingleEntity,
 } from '@contember/binding'
-import { ComponentType, ReactNode, memo } from 'react'
+import { ReactNode } from 'react'
 import { FeedbackRenderer } from '../../bindingFacade'
 import { RedirectOnSuccessTarget } from '../useEntityRedirectOnPersistSuccess'
 import { useOnPersistSuccess } from '../useOnPersistSuccess'
+import { scopeComponent } from './scopeComponent'
 
 export type CreateScopeProps =
 	& Omit<SugaredUnconstrainedQualifiedSingleEntity, 'isCreating'>
@@ -19,7 +20,10 @@ export type CreateScopeProps =
 		redirectOnSuccess?: RedirectOnSuccessTarget
 	}
 
-export const CreateScope: Partial<CreateScopeProps> & ComponentType<CreateScopeProps> = memo(
+/**
+ * @group Scopes
+ */
+export const CreateScope = scopeComponent(
 	({ children, redirectOnSuccess, onPersistSuccess, ...entityProps }: CreateScopeProps) => {
 		return (
 			<DataBindingProvider stateComponent={FeedbackRenderer}>
@@ -29,6 +33,5 @@ export const CreateScope: Partial<CreateScopeProps> & ComponentType<CreateScopeP
 			</DataBindingProvider>
 		)
 	},
+	'CreateScope',
 )
-
-CreateScope.displayName = 'CreateScope'

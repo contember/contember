@@ -1,11 +1,7 @@
-import {
-	DataBindingProvider,
-	EntityListSubTree,
-	EntityListSubTreeAdditionalProps,
-	SugaredQualifiedEntityList,
-} from '@contember/binding'
-import { ReactElement, ReactNode, memo } from 'react'
+import { DataBindingProvider, EntityListSubTree, EntityListSubTreeAdditionalProps, SugaredQualifiedEntityList } from '@contember/binding'
+import { ReactNode } from 'react'
 import { FeedbackRenderer, ImmutableEntityListRenderer, ImmutableEntityListRendererProps } from '../../bindingFacade'
+import { scopeComponent } from './scopeComponent'
 
 export type ListScopeProps<ContainerExtraProps, ItemExtraProps> =
 	& SugaredQualifiedEntityList
@@ -15,7 +11,10 @@ export type ListScopeProps<ContainerExtraProps, ItemExtraProps> =
 		listProps?: Omit<ImmutableEntityListRendererProps<ContainerExtraProps, ItemExtraProps>, 'accessor' | 'children'>
 	}
 
-export const ListScope = memo(
+/**
+ * @group Scopes
+ */
+export const ListScope = scopeComponent(
 	<ContainerExtraProps, ItemExtraProps>({
 		children,
 		...entityListProps
@@ -26,11 +25,5 @@ export const ListScope = memo(
 			</EntityListSubTree>
 		</DataBindingProvider>
 	),
-) as (<ContainerExtraProps, ItemExtraProps>(
-	props: ListScopeProps<ContainerExtraProps, ItemExtraProps>,
-) => ReactElement) &
-	Partial<ListScopeProps<never, never>> & {
-		displayName?: string;
-	}
-
-ListScope.displayName = 'ListScope'
+	'ListScope',
+)

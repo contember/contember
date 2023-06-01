@@ -26,10 +26,11 @@ export const LogoType = memo<ContemberIdentitySvgProps>(({
 	return (
 		<svg
 			className={useClassName(['brand-icon', 'brand-logo-type'], className)}
+			// style={useMemo(() => ({ ...style, '--scale': scale } as CSSProperties), [scale, style])}
 			style={useMemo(() => ({
+				...style,
 				'--scale': scale,
 				'--aspect-ratio': aspectRatio,
-				...style,
 			} as CSSProperties), [aspectRatio, scale, style])}
 			xmlns="http://www.w3.org/2000/svg"
 			{...sizeProps}

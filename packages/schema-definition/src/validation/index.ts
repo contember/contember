@@ -52,7 +52,7 @@ export function fluent() {
 	return new RuleBranch([], [])
 }
 
-class RuleBranch {
+export class RuleBranch {
 	constructor(private conditions: Validation.Validator[], private branchRules: Validation.ValidationRule[]) {}
 
 	public buildRules = (): Validation.ValidationRule[] => {

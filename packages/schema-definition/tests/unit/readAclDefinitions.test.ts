@@ -1,12 +1,12 @@
 import { expect, test } from 'vitest'
-import { createSchema, SchemaDefinition as def, AclDefinition as acl } from '../../src'
+import { c, createSchema } from '../../src'
 
 namespace SimpleModel {
-	export const publicRole = acl.createRole('public')
+	export const publicRole = c.createRole('public')
 
-	@acl.allow(publicRole, { read: true })
+	@c.allow(publicRole, { read: true })
 	export class Book {
-		title = def.stringColumn()
+		title = c.stringColumn()
 	}
 }
 
@@ -26,7 +26,7 @@ test('simple definitions', () => {
 
 
 namespace RoleOptions {
-	export const publicRole = acl.createRole('public', {
+	export const publicRole = c.createRole('public', {
 		debug: true,
 		s3: {
 			foo: 'bar',
@@ -51,15 +51,15 @@ test('role options', () => {
 
 
 namespace ModelWithPredicate {
-	export const publicRole = acl.createRole('public')
+	export const publicRole = c.createRole('public')
 
-	@acl.allow(publicRole, {
+	@c.allow(publicRole, {
 		when: { isPublished: { eq: true } },
 		read: true,
 	})
 	export class Book {
-		title = def.stringColumn()
-		isPublished = def.boolColumn()
+		title = c.stringColumn()
+		isPublished = c.boolColumn()
 	}
 }
 
@@ -85,15 +85,15 @@ test('definition with a predicate', () => {
 })
 
 namespace ModelWithPredicateOnField {
-	export const publicRole = acl.createRole('public')
+	export const publicRole = c.createRole('public')
 
-	@acl.allow(publicRole, {
+	@c.allow(publicRole, {
 		when: { isPublished: { eq: true } },
 		read: ['title'],
 	})
 	export class Book {
-		title = def.stringColumn()
-		isPublished = def.boolColumn()
+		title = c.stringColumn()
+		isPublished = c.boolColumn()
 	}
 }
 
@@ -119,17 +119,17 @@ test('definition with a predicate on field', () => {
 
 
 namespace ModelWithModificationAcl {
-	export const publicRole = acl.createRole('public')
+	export const publicRole = c.createRole('public')
 
-	@acl.allow(publicRole, {
+	@c.allow(publicRole, {
 		when: { isPublished: { eq: true } },
 		create: true,
 		update: true,
 		delete: true,
 	})
 	export class Book {
-		title = def.stringColumn()
-		isPublished = def.boolColumn()
+		title = c.stringColumn()
+		isPublished = c.boolColumn()
 	}
 }
 
@@ -161,19 +161,19 @@ test('definition with update, create, delete predicates', () => {
 
 
 namespace ModelWithMultiplePredicates {
-	export const publicRole = acl.createRole('public')
+	export const publicRole = c.createRole('public')
 
-	@acl.allow(publicRole, {
+	@c.allow(publicRole, {
 		when: { isPublished: { eq: true } },
 		read: ['title'],
 	})
-	@acl.allow(publicRole, {
+	@c.allow(publicRole, {
 		when: { isPublished: { eq: false } },
 		read: ['title'],
 	})
 	export class Book {
-		title = def.stringColumn()
-		isPublished = def.boolColumn()
+		title = c.stringColumn()
+		isPublished = c.boolColumn()
 	}
 }
 
@@ -208,23 +208,23 @@ test('definition with multiple predicates on a single field', () => {
 
 
 namespace ModelWithJoinedPredicateCollision {
-	export const publicRole = acl.createRole('public')
+	export const publicRole = c.createRole('public')
 
-	@acl.allow(publicRole, {
+	@c.allow(publicRole, {
 		when: { isPublishedLoremIpsumDolorSitAmet: { eq: true } },
 		read: ['title'],
 	})
-	@acl.allow(publicRole, {
+	@c.allow(publicRole, {
 		when: { isPublishedLoremIpsumDolorSitAmet: { eq: false } },
 		read: ['title', 'isPublishedLoremIpsumDolorSitAmet'],
 	})
-	@acl.allow(publicRole, {
+	@c.allow(publicRole, {
 		when: { isPublishedLoremIpsumDolorSitAmet: { eq: false } },
 		read: ['isPublishedLoremIpsumDolorSitAmet'],
 	})
 	export class Book {
-		title = def.stringColumn()
-		isPublishedLoremIpsumDolorSitAmet = def.boolColumn()
+		title = c.stringColumn()
+		isPublishedLoremIpsumDolorSitAmet = c.boolColumn()
 	}
 }
 
@@ -274,15 +274,15 @@ test('definition with collision', () => {
 
 
 namespace ModelWithMultipleRolesForSinglePredicate {
-	export const publicRole = acl.createRole('public')
-	export const adminRole = acl.createRole('admin')
+	export const publicRole = c.createRole('public')
+	export const adminRole = c.createRole('admin')
 
-	@acl.allow([publicRole, adminRole], {
+	@c.allow([publicRole, adminRole], {
 		read: ['title'],
 	})
 	export class Book {
-		title = def.stringColumn()
-		isPublished = def.boolColumn()
+		title = c.stringColumn()
+		isPublished = c.boolColumn()
 	}
 }
 
@@ -323,23 +323,23 @@ test('definition with multiple roles in single predicate', () => {
 })
 
 namespace ModelWithAclPredicateReferences {
-	export const publicRole = acl.createRole('public')
+	export const publicRole = c.createRole('public')
 
-	@acl.allow(publicRole, {
+	@c.allow(publicRole, {
 		when: { isPublished: { eq: true } },
 		read: ['title'],
 	})
 	export class Book {
-		title = def.stringColumn()
-		isPublished = def.boolColumn()
+		title = c.stringColumn()
+		isPublished = c.boolColumn()
 	}
-	@acl.allow(publicRole, {
-		when: { book: acl.canRead('title') },
+	@c.allow(publicRole, {
+		when: { book: c.canRead('title') },
 		read: ['content'],
 	})
 	export class BookReview {
-		book = def.manyHasOne(Book)
-		content = def.stringColumn()
+		book = c.manyHasOne(Book)
+		content = c.stringColumn()
 	}
 }
 
@@ -383,15 +383,15 @@ test('definition with predicate references', () => {
 
 
 namespace ModelWithVariables {
-	export const managerRole = acl.createRole('manager')
-	export const bookIdVariable = acl.createEntityVariable('bookId', 'Book', managerRole)
+	export const managerRole = c.createRole('manager')
+	export const bookIdVariable = c.createEntityVariable('bookId', 'Book', managerRole)
 
-	@acl.allow(managerRole, {
+	@c.allow(managerRole, {
 		when: { id: bookIdVariable },
 		read: ['title'],
 	})
 	export class Book {
-		title = def.stringColumn()
+		title = c.stringColumn()
 	}
 }
 
@@ -425,11 +425,11 @@ test('definition with variables', () => {
 })
 
 namespace ModelWithAllowCustomPrimary {
-	export const publicRole = acl.createRole('public')
+	export const publicRole = c.createRole('public')
 
-	@acl.allowCustomPrimary(publicRole)
+	@c.allowCustomPrimary(publicRole)
 	export class Book {
-		title = def.stringColumn()
+		title = c.stringColumn()
 	}
 }
 
@@ -446,11 +446,11 @@ test('allow custom primary', () => {
 })
 
 namespace ModelWithAllowCustomPrimaryAllRoles {
-	export const publicRole = acl.createRole('public')
+	export const publicRole = c.createRole('public')
 
-	@acl.allowCustomPrimary()
+	@c.allowCustomPrimary()
 	export class Book {
-		title = def.stringColumn()
+		title = c.stringColumn()
 	}
 }
 
@@ -468,24 +468,24 @@ test('allow custom primary', () => {
 
 
 namespace ModelWithInvalidAclPredicateReferences {
-	export const publicRole = acl.createRole('public')
+	export const publicRole = c.createRole('public')
 
-	@acl.allow(publicRole, {
+	@c.allow(publicRole, {
 		when: { isPublished: { eq: true } },
 		read: ['title'],
 	})
 	export class Book {
-		title = def.stringColumn()
-		isPublished = def.boolColumn()
+		title = c.stringColumn()
+		isPublished = c.boolColumn()
 	}
 
-	@acl.allow(publicRole, {
-		when: { content: acl.canRead('title') },
+	@c.allow(publicRole, {
+		when: { content: c.canRead('title') },
 		read: ['content'],
 	})
 	export class BookReview {
-		book = def.manyHasOne(Book)
-		content = def.stringColumn()
+		book = c.manyHasOne(Book)
+		content = c.stringColumn()
 	}
 }
 
@@ -498,16 +498,16 @@ test('definition with invalid predicate references', () => {
 
 
 namespace ModelWithPredefinedVariables {
-	export const customerRole = acl.createRole('customer')
-	export const personId = acl.createPredefinedVariable('person', 'personID', customerRole)
+	export const customerRole = c.createRole('customer')
+	export const personId = c.createPredefinedVariable('person', 'personID', customerRole)
 
-	@acl.allow(customerRole, {
+	@c.allow(customerRole, {
 		when: { personId: personId },
 		read: true,
 	})
 	export class Order {
-		personId = def.uuidColumn().notNull()
-		valueCents = def.intColumn().notNull()
+		personId = c.uuidColumn().notNull()
+		valueCents = c.intColumn().notNull()
 	}
 }
 
@@ -542,11 +542,11 @@ test('definition with predefined variables', () => {
 })
 
 namespace InvalidModel {
-	export const publicRole = acl.createRole('public')
+	export const publicRole = c.createRole('public')
 
-	@acl.allow(publicRole, { read: ['bar'] as any })
+	@c.allow(publicRole, { read: ['bar'] as any })
 	export class Book {
-		title = def.stringColumn()
+		title = c.stringColumn()
 	}
 }
 

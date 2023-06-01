@@ -24,11 +24,9 @@ runReactApp(
 				<LayoutDevPanel />
 			</>}
 			children={
-				<DataBindingProvider stateComponent={FeedbackRenderer}>
-					<LayoutSlotsProvider>
-						<Pages children={import.meta.glob<PageModule>('./pages/**/*.tsx')} layout={Layout} />
-					</LayoutSlotsProvider>
-				</DataBindingProvider>
+				<LayoutSlotsProvider>
+					<Pages children={import.meta.glob<PageModule>('./pages/**/*.tsx')} layout={Layout} />
+				</LayoutSlotsProvider>
 			}
 		/>
 	</DirectivesProvider>,

@@ -18,7 +18,7 @@ export interface PageRequest<P extends RequestParameters<RoutingParameter> = Req
 
 export type RequestState<Parameters extends RequestParameters<RoutingParameter> = RequestParameters> = PageRequest<Parameters> | null
 
-export type RequestChange = (currentState: RequestState) => IncompleteRequestState
+export type RequestChange = (currentState: RequestState) => IncompleteRequestState | string
 export type DynamicRequestParameters = RequestParameters<RoutingParameter>;
 export type IncompleteRequestState = Partial<RequestState<DynamicRequestParameters>> & { pageName: string } | null
 

@@ -1,7 +1,7 @@
 import { extendEntity } from './extensions'
 import { EntityConstructor } from './types'
 
-export const View = (sql: string, { dependencies }: { dependencies?: (() => EntityConstructor[]) | EntityConstructor[] } = {}) =>
+export const view = (sql: string, { dependencies }: { dependencies?: (() => EntityConstructor[]) | EntityConstructor[] } = {}) =>
 	extendEntity(({ entity, entityRegistry }) => {
 		const dependenciesResolved = typeof dependencies === 'function' ? dependencies() : dependencies
 		if (dependenciesResolved?.some(it => it === undefined)) {
@@ -22,3 +22,9 @@ dependencies: () => [MyEntity]
 			},
 		})
 	})
+
+
+/**
+ * @deprecated use "view"
+ */
+export const View = view

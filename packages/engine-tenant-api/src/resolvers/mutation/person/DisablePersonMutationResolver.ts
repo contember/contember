@@ -26,16 +26,6 @@ export class DisablePersonMutationResolver implements MutationResolvers {
 			return { ok: true }
 		}
 
-
-		return {
-			ok: false,
-			error: {
-				code: DisablePersonErrorCode.PersonAlreadyDisabled,
-				developerMessage: `Person <${args.personId}> already disabled`,
-			},
-		}
-
-		/*
 		switch (resultError) {
 			case PersonDisableAccessErrorCode.PERSON_ALREADY_DISABLED:
 				return {
@@ -54,6 +44,6 @@ export class DisablePersonMutationResolver implements MutationResolvers {
 						developerMessage: `Person <${args.personId}> was not found`,
 					},
 				}
-		}*/
+		}
 	}
 }

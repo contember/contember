@@ -344,6 +344,22 @@ export type DisableOtpResponse = {
 	readonly ok: Scalars['Boolean']
 }
 
+export type DisablePersonError = {
+	readonly __typename?: 'DisablePersonError'
+	readonly code: DisablePersonErrorCode
+	readonly developerMessage: Scalars['String']
+}
+
+export enum DisablePersonErrorCode {
+	PersonAlreadyDisabled = 'PERSON_ALREADY_DISABLED'
+}
+
+export type DisablePersonResponse = {
+	readonly __typename?: 'DisablePersonResponse'
+	readonly error?: Maybe<DisablePersonError>
+	readonly ok: Scalars['Boolean']
+}
+
 export type EnableIdpError = {
 	readonly __typename?: 'EnableIDPError'
 	readonly code: EnableIdpErrorCode
@@ -541,6 +557,7 @@ export type Mutation = {
 	readonly disableApiKey?: Maybe<DisableApiKeyResponse>
 	readonly disableIDP?: Maybe<DisableIdpResponse>
 	readonly disableOtp?: Maybe<DisableOtpResponse>
+	readonly disablePerson?: Maybe<DisablePersonResponse>
 	readonly enableIDP?: Maybe<EnableIdpResponse>
 	readonly initSignInIDP?: Maybe<InitSignInIdpResponse>
 	readonly invite?: Maybe<InviteResponse>
@@ -656,6 +673,11 @@ export type MutationDisableApiKeyArgs = {
 
 export type MutationDisableIdpArgs = {
 	identityProvider: Scalars['String']
+}
+
+
+export type MutationDisablePersonArgs = {
+	personId?: InputMaybe<Scalars['String']>
 }
 
 
@@ -1295,6 +1317,9 @@ export type ResolversTypes = {
 	DisableOtpError: ResolverTypeWrapper<DisableOtpError>
 	DisableOtpErrorCode: DisableOtpErrorCode
 	DisableOtpResponse: ResolverTypeWrapper<DisableOtpResponse>
+	DisablePersonError: ResolverTypeWrapper<DisablePersonError>
+	DisablePersonErrorCode: DisablePersonErrorCode
+	DisablePersonResponse: ResolverTypeWrapper<DisablePersonResponse>
 	EnableIDPError: ResolverTypeWrapper<EnableIdpError>
 	EnableIDPErrorCode: EnableIdpErrorCode
 	EnableIDPResponse: ResolverTypeWrapper<EnableIdpResponse>
@@ -1428,6 +1453,8 @@ export type ResolversParentTypes = {
 	DisableIDPResponse: DisableIdpResponse
 	DisableOtpError: DisableOtpError
 	DisableOtpResponse: DisableOtpResponse
+	DisablePersonError: DisablePersonError
+	DisablePersonResponse: DisablePersonResponse
 	EnableIDPError: EnableIdpError
 	EnableIDPResponse: EnableIdpResponse
 	IDPOptions: IdpOptions
@@ -1739,6 +1766,18 @@ export type DisableOtpResponseResolvers<ContextType = any, ParentType extends Re
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
+export type DisablePersonErrorResolvers<ContextType = any, ParentType extends ResolversParentTypes['DisablePersonError'] = ResolversParentTypes['DisablePersonError']> = {
+	code?: Resolver<ResolversTypes['DisablePersonErrorCode'], ParentType, ContextType>
+	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
+export type DisablePersonResponseResolvers<ContextType = any, ParentType extends ResolversParentTypes['DisablePersonResponse'] = ResolversParentTypes['DisablePersonResponse']> = {
+	error?: Resolver<Maybe<ResolversTypes['DisablePersonError']>, ParentType, ContextType>
+	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
 export type EnableIdpErrorResolvers<ContextType = any, ParentType extends ResolversParentTypes['EnableIDPError'] = ResolversParentTypes['EnableIDPError']> = {
 	code?: Resolver<ResolversTypes['EnableIDPErrorCode'], ParentType, ContextType>
 	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
@@ -1865,6 +1904,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
 	disableApiKey?: Resolver<Maybe<ResolversTypes['DisableApiKeyResponse']>, ParentType, ContextType, RequireFields<MutationDisableApiKeyArgs, 'id'>>
 	disableIDP?: Resolver<Maybe<ResolversTypes['DisableIDPResponse']>, ParentType, ContextType, RequireFields<MutationDisableIdpArgs, 'identityProvider'>>
 	disableOtp?: Resolver<Maybe<ResolversTypes['DisableOtpResponse']>, ParentType, ContextType>
+	disablePerson?: Resolver<Maybe<ResolversTypes['DisablePersonResponse']>, ParentType, ContextType, Partial<MutationDisablePersonArgs>>
 	enableIDP?: Resolver<Maybe<ResolversTypes['EnableIDPResponse']>, ParentType, ContextType, RequireFields<MutationEnableIdpArgs, 'identityProvider'>>
 	initSignInIDP?: Resolver<Maybe<ResolversTypes['InitSignInIDPResponse']>, ParentType, ContextType, RequireFields<MutationInitSignInIdpArgs, 'identityProvider'>>
 	invite?: Resolver<Maybe<ResolversTypes['InviteResponse']>, ParentType, ContextType, RequireFields<MutationInviteArgs, 'email' | 'memberships' | 'projectSlug'>>
@@ -2190,6 +2230,8 @@ export type Resolvers<ContextType = any> = {
 	DisableIDPResponse?: DisableIdpResponseResolvers<ContextType>
 	DisableOtpError?: DisableOtpErrorResolvers<ContextType>
 	DisableOtpResponse?: DisableOtpResponseResolvers<ContextType>
+	DisablePersonError?: DisablePersonErrorResolvers<ContextType>
+	DisablePersonResponse?: DisablePersonResponseResolvers<ContextType>
 	EnableIDPError?: EnableIdpErrorResolvers<ContextType>
 	EnableIDPResponse?: EnableIdpResponseResolvers<ContextType>
 	IDPOptionsOutput?: IdpOptionsOutputResolvers<ContextType>

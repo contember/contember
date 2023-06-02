@@ -52,6 +52,8 @@ const schema: DocumentNode = gql`
 		confirmOtp(otpToken: String!): ConfirmOtpResponse
 		disableOtp: DisableOtpResponse
 
+		disablePerson(personId: String): DisablePersonResponse
+
 		createResetPasswordRequest(email: String!, options: CreateResetPasswordRequestOptions): CreatePasswordResetRequestResponse
 		resetPassword(token: String!, password: String!): ResetPasswordResponse
 
@@ -541,7 +543,7 @@ const schema: DocumentNode = gql`
 	type AddGlobalIdentityRolesResult {
 		identity: Identity!
 	}
-	
+
 	type AddGlobalIdentityRolesError {
 		code: AddGlobalIdentityRolesErrorCode!
 		developerMessage: String!
@@ -758,6 +760,20 @@ const schema: DocumentNode = gql`
 
 	enum DisableOtpErrorCode {
 		OTP_NOT_ACTIVE
+	}
+
+	type DisablePersonResponse {
+		ok: Boolean!
+		error: DisablePersonError
+	}
+
+	type DisablePersonError {
+		code: DisablePersonErrorCode!
+		developerMessage: String!
+	}
+
+	enum DisablePersonErrorCode {
+		PERSON_ALREADY_DISABLED
 	}
 
 	# === mails ===

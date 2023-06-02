@@ -13,12 +13,10 @@
   },
   "dependencies": {
     "@contember/schema": "workspace:*",
-    "@contember/typesafe": "workspace:*",
-    "crypto-js": "^4.1.1"
+    "@contember/typesafe": "workspace:*"
   },
   "devDependencies": {
     "@contember/schema-definition": "workspace:*",
-    "@types/crypto-js": "^4.1.1",
     "@types/node": "^18"
   }
 }

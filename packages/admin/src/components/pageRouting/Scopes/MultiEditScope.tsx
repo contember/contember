@@ -1,12 +1,7 @@
-import {
-	Component,
-	DataBindingProvider,
-	EntityListSubTree,
-	EntityListSubTreeAdditionalProps,
-	SugaredQualifiedEntityList,
-} from '@contember/binding'
-import { ReactElement, ReactNode } from 'react'
+import { DataBindingProvider, EntityListSubTree, EntityListSubTreeAdditionalProps, SugaredQualifiedEntityList } from '@contember/binding'
+import { ReactNode } from 'react'
 import { FeedbackRenderer, MutableEntityListRenderer, MutableEntityListRendererProps } from '../../bindingFacade'
+import { scopeComponent } from './scopeComponent'
 
 export type MultiEditScopeProps<ContainerExtraProps, ItemExtraProps> =
 	& SugaredQualifiedEntityList
@@ -17,8 +12,10 @@ export type MultiEditScopeProps<ContainerExtraProps, ItemExtraProps> =
 		skipBindingStateUpdateAfterPersist?: boolean
 		listProps?: Omit<MutableEntityListRendererProps<ContainerExtraProps, ItemExtraProps>, 'accessor' | 'children'>
 	}
-
-export const MultiEditScope = Component(
+/**
+ * @group Scopes
+ */
+export const MultiEditScope = scopeComponent(
 	<ContainerExtraProps, ItemExtraProps>({
 		children,
 		refreshDataBindingOnPersist, skipBindingStateUpdateAfterPersist,
@@ -34,11 +31,5 @@ export const MultiEditScope = Component(
 			</EntityListSubTree>
 		</DataBindingProvider>
 	),
-) as (<ContainerExtraProps, ItemExtraProps>(
-	props: MultiEditScopeProps<ContainerExtraProps, ItemExtraProps>
-) => ReactElement) &
-	Partial<MultiEditScopeProps<never, never>> & {
-		displayName?: string;
-	}
-
-MultiEditScope.displayName = 'MultiEditScope'
+	'MultiEditScope',
+)

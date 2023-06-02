@@ -52,7 +52,7 @@ const schema: DocumentNode = gql`
 		confirmOtp(otpToken: String!): ConfirmOtpResponse
 		disableOtp: DisableOtpResponse
 
-		disablePerson(personId: String): DisablePersonResponse
+		disablePerson(personId: String!): DisablePersonResponse
 
 		createResetPasswordRequest(email: String!, options: CreateResetPasswordRequestOptions): CreatePasswordResetRequestResponse
 		resetPassword(token: String!, password: String!): ResetPasswordResponse
@@ -728,6 +728,7 @@ const schema: DocumentNode = gql`
 
 	enum DisablePersonErrorCode {
 		PERSON_ALREADY_DISABLED
+		PERSON_NOT_FOUND
 	}
 
 	# === mails ===

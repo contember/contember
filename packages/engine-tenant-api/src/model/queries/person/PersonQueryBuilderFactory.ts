@@ -11,6 +11,7 @@ export class PersonQueryBuilderFactory {
 			.select(['person', 'identity_id'])
 			.select(['person', 'email'])
 			.select(['person', 'name'])
+			.select(['person', 'disable'])
 			.select(['identity', 'roles'])
 			.from('person')
 			.join('identity', 'identity', expr => expr.columnsEq(['identity', 'id'], ['person', 'identity_id']))

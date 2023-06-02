@@ -1,8 +1,11 @@
 import { PersonQuery } from '../queries'
 import { DatabaseContext } from '../utils'
 import { DisablePersonCommand } from '../commands/person/DisablePersonCommand'
+import { ApiKeyManager } from './apiKey'
 
 class PersonAccessManager {
+
+	constructor(private readonly apiKeyManager: ApiKeyManager) {}
 
 	async disablePerson(dbContext: DatabaseContext, personId: string): Promise<PersonDisableAccessErrorCode | null> {
 		return await dbContext.transaction(async trx => {
@@ -18,24 +21,21 @@ class PersonAccessManager {
 				return PersonDisableAccessErrorCode.PERSON_ALREADY_DISABLED
 			}
 
-			await trx.commandBus.execute(new DisablePersonCommand(personId))
-
-			// TODO: Disable auth tokens
-			// TODO: Disable person
+			// Deactivate person & invalidate all api keys associated with person identity
+			await this.disablePersonAccount(trx, personRow.id)
+			await this.disableIdentityApiKeys(trx, personRow.identity_id)
 
 			return null
 		})
 	}
 
-
-	// FIXME
-	async validateAbilityToDisablePerson(): Promise<boolean> {
-		return true
+	async disablePersonAccount(dbContext: DatabaseContext, personId: string) {
+		await dbContext.commandBus.execute(new DisablePersonCommand(personId))
 	}
 
-
-
-
+	async disableIdentityApiKeys(dbContext: DatabaseContext, personIdentityId: string) {
+		await this.apiKeyManager.disableIdentityApiKeys(dbContext, personIdentityId)
+	}
 }
 
 export enum PersonDisableAccessErrorCode {

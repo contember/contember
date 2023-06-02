@@ -34,6 +34,7 @@ export class SignInMutationResolver implements MutationResolvers {
 		if (!response.ok) {
 			return createErrorResponse(response.error, response.errorMessage)
 		}
+
 		return {
 			ok: true,
 			errors: [],

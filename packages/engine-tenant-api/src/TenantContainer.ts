@@ -159,8 +159,8 @@ export class TenantContainerFactory {
 				new SecretsManager(providers))
 			.addService('projectManager', ({ secretManager, apiKeyService }) =>
 				new ProjectManager(secretManager, args.projectInitializer, apiKeyService))
-			.addService('personAccessManager', () =>
-				new PersonAccessManager())
+			.addService('personAccessManager', ({ apiKeyManager }) =>
+				new PersonAccessManager(apiKeyManager))
 			.addService('passwordResetManager', ({ userMailer, projectManager }) =>
 				new PasswordResetManager(userMailer, projectManager))
 			.addService('idpRegistry', () => {

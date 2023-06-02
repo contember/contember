@@ -1031,6 +1031,7 @@ export type SignInErrorCode =
   | 'NO_PASSWORD_SET'
   | 'OTP_REQUIRED'
   | 'UNKNOWN_EMAIL'
+  | 'PERSON_DISABLED'
 
 export type SignInIdpError = {
 	readonly __typename?: 'SignInIDPError'

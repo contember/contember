@@ -351,7 +351,8 @@ export type DisablePersonError = {
 }
 
 export enum DisablePersonErrorCode {
-	PersonAlreadyDisabled = 'PERSON_ALREADY_DISABLED'
+	PersonAlreadyDisabled = 'PERSON_ALREADY_DISABLED',
+	PersonNotFound = 'PERSON_NOT_FOUND'
 }
 
 export type DisablePersonResponse = {
@@ -677,7 +678,7 @@ export type MutationDisableIdpArgs = {
 
 
 export type MutationDisablePersonArgs = {
-	personId?: InputMaybe<Scalars['String']>
+	personId: Scalars['String']
 }
 
 
@@ -1904,7 +1905,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
 	disableApiKey?: Resolver<Maybe<ResolversTypes['DisableApiKeyResponse']>, ParentType, ContextType, RequireFields<MutationDisableApiKeyArgs, 'id'>>
 	disableIDP?: Resolver<Maybe<ResolversTypes['DisableIDPResponse']>, ParentType, ContextType, RequireFields<MutationDisableIdpArgs, 'identityProvider'>>
 	disableOtp?: Resolver<Maybe<ResolversTypes['DisableOtpResponse']>, ParentType, ContextType>
-	disablePerson?: Resolver<Maybe<ResolversTypes['DisablePersonResponse']>, ParentType, ContextType, Partial<MutationDisablePersonArgs>>
+	disablePerson?: Resolver<Maybe<ResolversTypes['DisablePersonResponse']>, ParentType, ContextType, RequireFields<MutationDisablePersonArgs, 'personId'>>
 	enableIDP?: Resolver<Maybe<ResolversTypes['EnableIDPResponse']>, ParentType, ContextType, RequireFields<MutationEnableIdpArgs, 'identityProvider'>>
 	initSignInIDP?: Resolver<Maybe<ResolversTypes['InitSignInIDPResponse']>, ParentType, ContextType, RequireFields<MutationInitSignInIdpArgs, 'identityProvider'>>
 	invite?: Resolver<Maybe<ResolversTypes['InviteResponse']>, ParentType, ContextType, RequireFields<MutationInviteArgs, 'email' | 'memberships' | 'projectSlug'>>

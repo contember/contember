@@ -34,12 +34,12 @@ const schema: DocumentNode = gql`
 			redirectUrl: String @deprecated(reason: "use data.redirectUrl")
 		): InitSignInIDPResponse
 		signInIDP(
-			identityProvider: String!, 
+			identityProvider: String!,
 			data: Json,
 			expiration: Int
             idpResponse: IDPResponseInput, @deprecated(reason: "pass idpResponse.url as data.url")
-			redirectUrl: String @deprecated(reason: "use data.redirectUrl"), 
-			sessionData: Json @deprecated(reason: "use data.sessionData"), 
+			redirectUrl: String @deprecated(reason: "use data.redirectUrl"),
+			sessionData: Json @deprecated(reason: "use data.sessionData"),
 		): SignInIDPResponse
 
 		# IDP management
@@ -51,6 +51,8 @@ const schema: DocumentNode = gql`
 		prepareOtp(label: String): PrepareOtpResponse
 		confirmOtp(otpToken: String!): ConfirmOtpResponse
 		disableOtp: DisableOtpResponse
+
+		disablePerson(personId: String): DisablePersonResponse
 
 		createResetPasswordRequest(email: String!, options: CreateResetPasswordRequestOptions): CreatePasswordResetRequestResponse
 		resetPassword(token: String!, password: String!): ResetPasswordResponse
@@ -712,6 +714,20 @@ const schema: DocumentNode = gql`
 
 	enum DisableOtpErrorCode {
 		OTP_NOT_ACTIVE
+	}
+
+	type DisablePersonResponse {
+		ok: Boolean!
+		error: DisablePersonError
+	}
+
+	type DisablePersonError {
+		code: DisablePersonErrorCode!
+		developerMessage: String!
+	}
+
+	enum DisablePersonErrorCode {
+		PERSON_ALREADY_DISABLED
 	}
 
 	# === mails ===

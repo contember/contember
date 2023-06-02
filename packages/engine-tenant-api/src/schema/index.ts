@@ -995,6 +995,7 @@ export enum SignInErrorCode {
 	InvalidPassword = 'INVALID_PASSWORD',
 	NoPasswordSet = 'NO_PASSWORD_SET',
 	OtpRequired = 'OTP_REQUIRED',
+	PersonDisabled = 'PERSON_DISABLED',
 	UnknownEmail = 'UNKNOWN_EMAIL'
 }
 

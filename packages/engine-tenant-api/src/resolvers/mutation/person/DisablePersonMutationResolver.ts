@@ -5,7 +5,7 @@ import {
 	MutationResolvers,
 } from '../../../schema'
 import { TenantResolverContext } from '../../TenantResolverContext'
-import { PersonAccessManager, PersonDisableAccessErrorCode } from '../../../model'
+import { PermissionActions, PersonAccessManager, PersonDisableAccessErrorCode } from '../../../model'
 
 export class DisablePersonMutationResolver implements MutationResolvers {
 	constructor(private readonly personAccessManager: PersonAccessManager) {}
@@ -13,7 +13,12 @@ export class DisablePersonMutationResolver implements MutationResolvers {
 	async disablePerson(
 		parent: any, args: MutationDisablePersonArgs, context: TenantResolverContext,
 	): Promise<DisablePersonResponse> {
-		// TODO: Add permission resolver
+
+		await context.requireAccess({
+			action: PermissionActions.PERSON_DISABLE,
+			message: 'You are not allowed to disable person account',
+		})
+
 		const resultError = await this.personAccessManager.disablePerson(context.db, args.personId)
 
 		// Person disabled without any issues

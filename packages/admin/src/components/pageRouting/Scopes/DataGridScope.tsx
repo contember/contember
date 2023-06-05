@@ -1,31 +1,19 @@
 import { DataBindingProvider } from '@contember/binding'
-import { memo, ReactNode } from 'react'
-import { DataGrid, DataGridPageRenderer, DataGridProps, FeedbackRenderer, LayoutRendererProps } from '../../bindingFacade'
+import { PropsWithChildren, ReactNode } from 'react'
+import { DataGrid, DataGridProps, FeedbackRenderer } from '../../bindingFacade'
 import { DataGridPageProps } from '../pageComponents'
 import { scopeComponent } from './scopeComponent'
 
-export type DataGridScopeProps =
-	& DataGridProps<{}>
-	& {
-		pageName?: string
-		children?: ReactNode
-		rendererProps?: Omit<LayoutRendererProps, 'children'>
-	}
+export type DataGridScopeProps = PropsWithChildren<DataGridProps<{}>>
 
 /**
  * @group Scopes
  */
-export const DataGridScope = scopeComponent(({
-		children,
-		rendererProps,
-		pageName,
-		...dataGridProps
-	}: DataGridPageProps) => (
+export const DataGridScope = scopeComponent(
+	(props: DataGridPageProps) => (
 		<DataBindingProvider stateComponent={FeedbackRenderer}>
-			<DataGrid {...dataGridProps} component={DataGridPageRenderer} componentProps={rendererProps}>
-				{children}
-			</DataGrid>
+			<DataGrid {...props} />
 		</DataBindingProvider>
 	),
-	'DataGridPage',
+	'DataGridScope',
 )

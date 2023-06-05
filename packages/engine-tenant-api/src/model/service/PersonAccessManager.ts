@@ -17,7 +17,7 @@ class PersonAccessManager {
 				return PersonDisableAccessErrorCode.PERSON_NOT_FOUND
 			}
 
-			if (personRow.disable) {
+			if (personRow.disabled_at !== null) {
 				return PersonDisableAccessErrorCode.PERSON_ALREADY_DISABLED
 			}
 

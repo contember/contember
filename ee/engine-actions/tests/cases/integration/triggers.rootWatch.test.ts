@@ -150,3 +150,67 @@ test('triggers: root watch - noop', async () => {
 })
 
 
+test('triggers: root delete', async () => {
+	const schema = createSchema(ActionsModel)
+	await executeDbTest({
+		executionContainerFactoryFactory,
+		migrationGroups: { 'contember/actions': migrationsGroup },
+		schema: schema,
+		seed: [
+			{
+				query: gql`
+                    mutation {
+                        createArticle(data: {title: "Hello world"}) {
+                            ok
+                        }
+                    }
+				`,
+			},
+		],
+		query: gql`
+            mutation {
+                deleteArticle(by: {title: "Hello world"}) {
+                    ok
+                }
+            }
+		`,
+		return: {
+			deleteArticle: {
+				ok: true,
+			},
+		},
+		expectSystemDatabase: {
+			actions_event: [{
+				payload: {
+					id: '123e4567-e89b-12d3-a456-000000000003',
+					entity: 'Article',
+					events: [{
+						id: '123e4567-e89b-12d3-a456-000000000003',
+						entity: 'Article',
+						values: { id: '123e4567-e89b-12d3-a456-000000000003', title: 'Hello world' },
+						operation: 'create',
+					}],
+					trigger: 'article_watch',
+					operation: 'watch',
+					selection: { id: '123e4567-e89b-12d3-a456-000000000003', title: 'Hello world' },
+				},
+				log: [],
+			}, {
+				payload: {
+					id: '123e4567-e89b-12d3-a456-000000000003',
+					entity: 'Article',
+					events: [{
+						id: '123e4567-e89b-12d3-a456-000000000003',
+						entity: 'Article',
+						operation: 'delete',
+					}],
+					trigger: 'article_watch',
+					operation: 'watch',
+					selection: { id: '123e4567-e89b-12d3-a456-000000000003', title: 'Hello world' },
+				},
+				log: [],
+			}],
+		},
+	})
+})
+

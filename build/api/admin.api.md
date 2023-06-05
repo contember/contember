@@ -5133,7 +5133,7 @@ export const useFetchMe: () => () => Promise<{
 }>;
 
 // @public (undocumented)
-export const useFieldControl: <FieldVal extends FieldValue, ControlVal extends FieldValue, Type extends string | undefined = string | undefined>({ fieldMetadata, parse, format, ...props }: UseControlProps<FieldVal, ControlVal>) => NonOptionalControlProps<ControlVal> & {
+export const useFieldControl: <FieldVal extends FieldValue, ControlVal extends FieldValue, Type extends string | undefined = string | undefined>({ fieldMetadata, parse, format, onBlur, ...props }: UseControlProps<FieldVal, ControlVal>) => NonOptionalControlProps<ControlVal> & {
     ref: Ref<any>;
 };
 

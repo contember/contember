@@ -21,6 +21,7 @@ export const getPersonByEmailSql = (args: {
 					email: args.email,
 					otp_uri: args.response.otpUri,
 					otp_activated_at: args.response.otpUri ? new Date() : null,
+					disabled_at: null,
 				},
 			  ]
 			: [],

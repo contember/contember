@@ -172,6 +172,7 @@ const schema: DocumentNode = gql`
 	enum CreateSessionTokenErrorCode {
 		UNKNOWN_EMAIL
 		UNKNOWN_PERSON_ID
+		PERSON_DISABLED
 	}
 
 	type CreateSessionTokenResult implements CommonSignInResult{
@@ -281,6 +282,7 @@ const schema: DocumentNode = gql`
 		IDP_VALIDATION_FAILED
 
 		PERSON_NOT_FOUND
+		PERSON_DISABLED
 		PERSON_ALREADY_EXISTS
 	}
 

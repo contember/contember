@@ -35,19 +35,24 @@ class PermissionsFactory {
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.API_KEY_CREATE)
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.API_KEY_DISABLE)
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.API_KEY_CREATE_GLOBAL(), projectAdminAllowedInputRoles)
+
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.PERSON_SIGN_UP(), projectAdminAllowedInputRoles)
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.IDENTITY_ADD_GLOBAL_ROLES(), projectAdminAllowedInputRoles)
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.IDENTITY_REMOVE_GLOBAL_ROLES(), projectAdminAllowedInputRoles)
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.PERSON_CREATE_SESSION_KEY(), projectAdminUseRolesVerifier)
-		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.PERSON_DISABLE)
+		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.PERSON_DISABLE(), projectAdminUseRolesVerifier)
+
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.PROJECT_VIEW_MEMBER([]))
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.PROJECT_ADD_MEMBER([]))
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.PROJECT_UPDATE_MEMBER([]))
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.PROJECT_REMOVE_MEMBER([]))
+
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.PERSON_INVITE([]))
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.PERSON_INVITE_UNMANAGED([]))
+
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.MAIL_TEMPLATE_ADD)
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.MAIL_TEMPLATE_REMOVE)
+
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.IDP_ADD)
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.IDP_UPDATE)
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.IDP_DISABLE)

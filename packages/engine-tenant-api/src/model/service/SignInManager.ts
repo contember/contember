@@ -56,6 +56,7 @@ class SignInManager {
 		verifier?: (person: PersonRow) => Promise<void>,
 	): Promise<CreateSessionTokenResponse> {
 		const personRow = await dbContext.queryHandler.fetch(PersonQuery.byUniqueIdentifier(personIdentifier))
+
 		if (personRow === null) {
 			if (personIdentifier.type === 'email') {
 				return new ResponseError('UNKNOWN_EMAIL', `Person with email ${personIdentifier.email} not found`)
@@ -63,8 +64,14 @@ class SignInManager {
 			} else if (personIdentifier.type === 'id') {
 				return new ResponseError('UNKNOWN_PERSON_ID', `Person with id ${personIdentifier.id} not found`)
 			}
+
 			throw new ImplementationException()
 		}
+
+		if (personRow.disabled_at !== null) {
+			return new ResponseError(CreateSessionTokenErrorCode.PersonDisabled, `Person with id ${personRow.id} is disabled`)
+		}
+
 		await verifier?.(personRow)
 
 		const sessionToken = await this.apiKeyManager.createSessionApiKey(dbContext, personRow.identity_id, expiration)

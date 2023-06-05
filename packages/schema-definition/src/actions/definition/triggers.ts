@@ -6,7 +6,7 @@ import { ActionsTarget } from './targets'
 export type TriggerWebhookDefinition = {
 	webhook:
 		| string
-		| Omit<Actions.WebhookTarget, 'type'>
+		| Omit<Actions.WebhookTarget, 'type' | 'name'> & { name?: string }
 }
 
 export type TriggerTargetDefinition = {

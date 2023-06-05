@@ -79,7 +79,6 @@ export class ActionsFactory {
 		} else if ('webhook' in targetDefinition) {
 			if (typeof targetDefinition.webhook === 'string') {
 				targetRegistry.register(generatedName, {
-					name: generatedName,
 					type: 'webhook',
 					url: targetDefinition.webhook,
 				})

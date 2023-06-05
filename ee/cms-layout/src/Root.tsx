@@ -93,7 +93,7 @@ export const Root = memo(({
 				<GetLayoutPanelsStateContext.Consumer>
 					{({ panels }) => {
 						const toggleSidebarLeftButtonIsVisible: boolean = sidebarLeftPropsProp && isSidebarLeftActive && !sidebarLeftPropsProp.keepVisible && panels.get(PANEL_LEFT_NAME)?.behavior !== 'modal'
-						const toggleSidebarRightButtonIsVisible: boolean = sidebarRightPropsProp && isSidebarRightActive && !sidebarRightPropsProp.keepVisible
+						const toggleSidebarRightButtonIsVisible: boolean = sidebarRightPropsProp && isSidebarRightActive && (!sidebarRightPropsProp.keepVisible || panels.get(PANEL_RIGHT_NAME)?.behavior === 'modal')
 						const toggleMenuButtonIsVisible: boolean = panels.get(PANEL_LEFT_NAME)?.behavior === 'modal'
 
 						return (

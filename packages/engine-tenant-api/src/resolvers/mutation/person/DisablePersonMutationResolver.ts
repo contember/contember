@@ -6,16 +6,32 @@ import {
 } from '../../../schema'
 import { TenantResolverContext } from '../../TenantResolverContext'
 import { PermissionActions, PersonAccessManager, PersonDisableAccessErrorCode } from '../../../model'
+import { PersonManager } from '../../../model/service/PersonManager'
 
 export class DisablePersonMutationResolver implements MutationResolvers {
-	constructor(private readonly personAccessManager: PersonAccessManager) {}
+
+	constructor(
+		private readonly personAccessManager: PersonAccessManager,
+		private readonly personManager: PersonManager,
+	) {}
 
 	async disablePerson(
 		parent: any, args: MutationDisablePersonArgs, context: TenantResolverContext,
 	): Promise<DisablePersonResponse> {
+		const targetPerson = await this.personManager.findPersonById(context.db, args.personId)
+
+		if (targetPerson === null) {
+			return {
+				ok: false,
+				error: {
+					code: DisablePersonErrorCode.PersonNotFound,
+					developerMessage: `Person <${args.personId}> was not found`,
+				},
+			}
+		}
 
 		await context.requireAccess({
-			action: PermissionActions.PERSON_DISABLE,
+			action: PermissionActions.PERSON_DISABLE(targetPerson.roles),
 			message: 'You are not allowed to disable person account',
 		})
 
@@ -26,24 +42,12 @@ export class DisablePersonMutationResolver implements MutationResolvers {
 			return { ok: true }
 		}
 
-		switch (resultError) {
-			case PersonDisableAccessErrorCode.PERSON_ALREADY_DISABLED:
-				return {
-					ok: false,
-					error: {
-						code: DisablePersonErrorCode.PersonAlreadyDisabled,
-						developerMessage: `Person <${args.personId}> already disabled`,
-					},
-				}
-
-			case PersonDisableAccessErrorCode.PERSON_NOT_FOUND:
-				return {
-					ok: false,
-					error: {
-						code: DisablePersonErrorCode.PersonNotFound,
-						developerMessage: `Person <${args.personId}> was not found`,
-					},
-				}
+		return {
+			ok: false,
+			error: {
+				code: DisablePersonErrorCode.PersonAlreadyDisabled,
+				developerMessage: `Person <${args.personId}> already disabled.`,
+			},
 		}
 	}
 }

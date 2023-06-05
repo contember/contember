@@ -12,8 +12,6 @@ export interface LayoutPageProps extends Omit<TitleBarProps, 'after' | 'children
 	afterTitle?: TitleBarProps['after']
 	children?: ReactNode
 	fit?: 'content' | 'none'
-	/** @deprecated Use `pageContentLayout` prop */
-	layout?: LayoutPageContentProps['pageContentLayout']
 	pageContentLayout?: LayoutPageContentProps['pageContentLayout']
 	side?: ReactNode
 	title?: ReactNode
@@ -27,8 +25,6 @@ export const LayoutPage = memo(({
 	afterTitle,
 	children,
 	fit = 'content',
-	headingProps,
-	layout,
 	navigation,
 	pageContentLayout,
 	side,
@@ -78,7 +74,7 @@ export const LayoutPage = memo(({
 			toThemeClass(themeContent ?? theme, themeControls ?? theme),
 			toSchemeClass(scheme),
 		])}>
-			{(title || actions) && <TitleBar after={afterTitle === undefined ? hasTabs ? <SectionTabs /> : undefined : afterTitle} navigation={navigation} actions={actions} headingProps={headingProps}>
+			{(title || actions) && <TitleBar after={afterTitle === undefined ? hasTabs ? <SectionTabs /> : undefined : afterTitle} navigation={navigation} actions={actions}>
 				{title}
 			</TitleBar>}
 			<div
@@ -89,7 +85,7 @@ export const LayoutPage = memo(({
 				])}
 				style={useMemo(() => ({ '--cui-content-offset-top': `${contentOffsetTop}px` } as CSSProperties), [contentOffsetTop])}
 			>
-				<LayoutPageContent pageContentLayout={pageContentLayout ?? layout}>
+				<LayoutPageContent pageContentLayout={pageContentLayout}>
 					{children}
 				</LayoutPageContent>
 				{side && <LayoutPageAside>{side}</LayoutPageAside>}

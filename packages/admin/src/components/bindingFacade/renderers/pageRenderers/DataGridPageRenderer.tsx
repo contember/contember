@@ -6,15 +6,14 @@ export type DataGridPageRendererProps =
 	& LayoutRendererProps
 	& DataGridContainerProps
 
-export const DataGridPageRenderer = Component(({
+export const DataGridPageRenderer = Component(
+	({
 		children,
 
 		side,
 		title,
 		navigation,
-		headingProps,
 		actions,
-		layout,
 		pageContentLayout,
 		afterTitle,
 
@@ -26,8 +25,6 @@ export const DataGridPageRenderer = Component(({
 			afterTitle={afterTitle}
 			navigation={navigation}
 			actions={actions}
-			headingProps={headingProps}
-			layout={layout}
 			pageContentLayout={pageContentLayout}
 		>
 			<DataGridContainer {...entityListProps}>{children}</DataGridContainer>

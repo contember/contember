@@ -92,6 +92,7 @@ import { PersistOptions } from '@contember/binding';
 import type { PersistSuccessOptions } from '@contember/binding';
 import { Point } from 'slate';
 import type { Props } from 'react-select';
+import { PropsWithChildren } from 'react';
 import { PublicCommonReactSelectStylesProps } from '@contember/ui';
 import { PureComponent } from 'react';
 import { QualifiedEntityList } from '@contember/binding';
@@ -1345,14 +1346,10 @@ export type DataGridProps<ComponentExtraProps extends {}> = DataGridContainerPub
 });
 
 // @public (undocumented)
-export const DataGridScope: ({ children, rendererProps, pageName, ...dataGridProps }: DataGridPageProps) => JSX.Element;
+export const DataGridScope: (props: DataGridPageProps) => JSX.Element;
 
 // @public (undocumented)
-export type DataGridScopeProps = DataGridProps<{}> & {
-    pageName?: string;
-    children?: ReactNode;
-    rendererProps?: Omit<LayoutRendererProps, 'children'>;
-};
+export type DataGridScopeProps = PropsWithChildren<DataGridProps<{}>>;
 
 // @public (undocumented)
 export type DataGridSetColumnFilter<FA extends DataGridFilterArtifact = DataGridFilterArtifact> = (columnKey: DataGridColumnKey, columnFilter: FA | undefined) => void;

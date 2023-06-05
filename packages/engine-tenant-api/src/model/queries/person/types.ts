@@ -7,7 +7,7 @@ export interface PersonRow {
 	readonly email?: string
 	readonly name?: string
 	readonly roles: string[]
-	readonly disable: boolean
+	readonly disabled_at: Date | null
 }
 
 export type MaybePersonRow = PersonRow | null

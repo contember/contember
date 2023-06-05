@@ -10,6 +10,7 @@ export type EventRow = {
 	stage_id: number
 	schema_id: string
 	target: string
+	trigger: string
 	payload: any
 	log: any[]
 }

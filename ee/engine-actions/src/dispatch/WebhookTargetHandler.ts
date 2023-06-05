@@ -27,7 +27,19 @@ export class WebhookTargetHandler implements InvokeHandler<Actions.WebhookTarget
 					},
 					signal: abortController.signal,
 					body: JSON.stringify({
-						events: events.map(it => it.payload),
+						events: events.map(it => ({
+							meta: {
+								eventId: it.id,
+								transactionId: it.transaction_id,
+								createdAt: it.created_at.toISOString(),
+								lastStateChange: it.last_state_change.toISOString(),
+								numRetries: it.num_retries,
+								trigger: it.trigger,
+								target: it.target,
+								// todo: add stage and schema version
+							},
+							...it.payload,
+						})),
 					}),
 				})
 			})

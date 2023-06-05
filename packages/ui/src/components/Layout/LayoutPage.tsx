@@ -1,5 +1,5 @@
-import { useClassNameFactory } from '@contember/utilities'
-import { CSSProperties, memo, ReactNode, useEffect, useMemo, useRef, useState } from 'react'
+import { px, useClassNameFactory } from '@contember/utilities'
+import { CSSProperties, ReactNode, memo, useEffect, useMemo, useRef, useState } from 'react'
 import { toEnumClass, toSchemeClass, toThemeClass } from '../../utils'
 import { SectionTabs, useSectionTabs } from '../SectionTabs'
 import { TitleBar, TitleBarProps } from '../TitleBar'
@@ -74,6 +74,7 @@ export const LayoutPage = memo(({
 			toThemeClass(themeContent ?? theme, themeControls ?? theme),
 			toSchemeClass(scheme),
 		])}>
+			<style>{`.cui-layout-chrome { --cui-content-offset-top: ${px(contentOffsetTop)};}`}</style>
 			{(title || actions) && <TitleBar after={afterTitle === undefined ? hasTabs ? <SectionTabs /> : undefined : afterTitle} navigation={navigation} actions={actions}>
 				{title}
 			</TitleBar>}
@@ -83,7 +84,6 @@ export const LayoutPage = memo(({
 					toEnumClass('fit-', fit),
 					showDivider ? 'view-aside-divider' : undefined,
 				])}
-				style={useMemo(() => ({ '--cui-content-offset-top': `${contentOffsetTop}px` } as CSSProperties), [contentOffsetTop])}
 			>
 				<LayoutPageContent pageContentLayout={pageContentLayout}>
 					{children}

@@ -56,7 +56,6 @@
 
 @media (min-width: 768px) {
 	:where(.cui-titleBar) {
-		flex-basis: calc(var(--cui-bar-content-offset-top) + var(--cui-control-border-width, 1px));
 		flex-shrink: 0;
 	}
 }

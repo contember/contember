@@ -156,6 +156,10 @@
 		max-width: var(--layout-chrome-bar-width);
 	}
 
+	:where(.cui-layout-chrome-bar-header) {
+		min-height: var(--cui-content-offset-top, 0px);
+	}
+
 	:where(.cui-layout-chrome-bar-body) {
 		padding-left: env(safe-area-inset-left, 0em);
 	}

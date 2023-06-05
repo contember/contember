@@ -23,7 +23,7 @@ class SignInManager {
 			return new ResponseError('NO_PASSWORD_SET', `No password set`)
 		}
 
-		if (personRow.disable) {
+		if (personRow.disabled_at !== null) {
 			return new ResponseError(SignInErrorCode.PersonDisabled, `Person is disabled`)
 		}
 

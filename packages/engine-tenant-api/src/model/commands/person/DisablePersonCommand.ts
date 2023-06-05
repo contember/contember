@@ -8,7 +8,7 @@ export class DisablePersonCommand implements Command<void> {
 		await UpdateBuilder.create()
 			.table('person')
 			.values({
-				disable: true,
+				disabled_at: new Date(),
 			})
 			.where({
 				id: this.personId,

@@ -74,6 +74,7 @@ CREATE TABLE "person" (
     "otp_activated_at" timestamp with time zone,
     "name" "text",
     "idp_only" boolean DEFAULT false NOT NULL,
+    "disabled_at" timestamp with time zone,
     CONSTRAINT "idp_only_no_email" CHECK ((("idp_only" = false) OR (("idp_only" = true) AND ("email" IS NULL))))
 );
 CREATE TABLE "person_identity_provider" (

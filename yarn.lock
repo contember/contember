@@ -3236,6 +3236,7 @@ __metadata:
   dependencies:
     "@babel/core": 7.15.5
     "@blueprintjs/icons": 3.29.0
+    "@contember/brand": "workspace:*"
     "@contember/react-utils": "workspace:*"
     "@contember/utilities": "workspace:*"
     "@mangoweb/sass-base": 0.0.8

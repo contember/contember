@@ -13,13 +13,13 @@
 	width: calc(1em * var(--scale) * var(--aspect-ratio));
 }
 :where(.cui-brand-logo-type) {
-	--scale: attr(data-scale, 1);
+	--scale: 1;
 	--aspect-ratio: calc(440 / 130);
 	stroke: currentColor;
 	display: inline-block;
 	flex-grow: 0;
 	flex-shrink: 0;
-	height: calc(1em * var(--scale));
+	height: calc(1em * var(--scale, 1));
 	vertical-align: middle;
-  width: calc(1em * var(--scale) * var(--aspect-ratio));
+  width: calc(1em * var(--scale, 1) * var(--aspect-ratio));
 }

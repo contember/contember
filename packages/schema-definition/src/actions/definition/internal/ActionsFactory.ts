@@ -100,6 +100,7 @@ export class ActionsFactory {
 			name,
 			watch: this.parseSelection(trigger.watch),
 			selection: trigger.selection ? this.parseSelection(trigger.selection) : undefined,
+			priority: trigger.priority,
 		}
 	}
 
@@ -112,6 +113,7 @@ export class ActionsFactory {
 			delete: trigger.delete ?? false,
 			update: trigger.update ?? false,
 			selection: trigger.selection ? this.parseSelection(trigger.selection) : undefined,
+			priority: trigger.priority,
 		}
 	}
 

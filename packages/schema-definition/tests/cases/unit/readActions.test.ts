@@ -12,6 +12,7 @@ namespace SimpleActions {
 				name
 			}
 		`,
+		priority: 100,
 		webhook: '%webhookUrl%/book/updated',
 	})
 	export class Book {
@@ -62,6 +63,7 @@ test('read actions schema', () => {
 		    "book_watch": {
 		      "entity": "Book",
 		      "name": "book_watch",
+		      "priority": 100,
 		      "selection": undefined,
 		      "target": "book_watch_target",
 		      "type": "watch",

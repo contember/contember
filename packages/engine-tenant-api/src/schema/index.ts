@@ -269,6 +269,7 @@ export type CreateSessionTokenError = {
 }
 
 export enum CreateSessionTokenErrorCode {
+	PersonDisabled = 'PERSON_DISABLED',
 	UnknownEmail = 'UNKNOWN_EMAIL',
 	UnknownPersonId = 'UNKNOWN_PERSON_ID'
 }
@@ -1011,6 +1012,7 @@ export enum SignInIdpErrorCode {
 	IdpValidationFailed = 'IDP_VALIDATION_FAILED',
 	InvalidIdpResponse = 'INVALID_IDP_RESPONSE',
 	PersonAlreadyExists = 'PERSON_ALREADY_EXISTS',
+	PersonDisabled = 'PERSON_DISABLED',
 	PersonNotFound = 'PERSON_NOT_FOUND'
 }
 

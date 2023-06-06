@@ -1,6 +1,6 @@
 {
   "name": "@contember/engine-server-ee",
-  "version": "1.3.0-alpha.8",
+  "version": "1.3.0-alpha.9",
   "license": "proprietary",
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",

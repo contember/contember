@@ -27,6 +27,7 @@ export const useFieldControl = <FieldVal extends FieldValue, ControlVal extends 
 	fieldMetadata,
 	parse,
 	format,
+	onBlur,
 	...props
 }: UseControlProps<FieldVal, ControlVal>): NonOptionalControlProps<ControlVal> & {
 	ref: Ref<any>,
@@ -110,9 +111,10 @@ export const useFieldControl = <FieldVal extends FieldValue, ControlVal extends 
 		// ControlFocusProps
 		onBlur: useCallback(() => {
 			setWasTouched(true)
-		}, [setWasTouched]),
-		onFocus: useCallback(() => { }, []),
-		onFocusChange: useCallback(() => { }, []),
+			onBlur?.()
+		}, [setWasTouched, onBlur]),
+		onFocus: props.onFocus,
+		onFocusChange: props.onFocusChange,
 
 		// ControlDisplayProps
 		id: props.id,

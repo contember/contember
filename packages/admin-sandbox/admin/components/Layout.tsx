@@ -1,7 +1,9 @@
-import { Button, DevPanel, Link, Stack } from '@contember/admin'
+import { Button, DevPanel, Link, LogoutLink, Stack } from '@contember/admin'
 import { Identity2023 } from '@contember/brand'
 import { useDocumentTitle } from '@contember/layout'
+import { LogOutIcon } from 'lucide-react'
 import { PropsWithChildren, useState } from 'react'
+import { AlertLogoutLink } from './AlertLogoutLink'
 import { Directive, useDirectives } from './Directives'
 import { LayoutType, Layouts } from './Layouts'
 import { Navigation } from './Navigation'
@@ -30,6 +32,14 @@ export const Layout = (props: PropsWithChildren) => {
 			<Slots.Navigation>
 				<Navigation />
 			</Slots.Navigation>
+
+			<Slots.Profile>
+				<LogoutLink Component={AlertLogoutLink}>
+					<Stack align="center" direction="horizontal" gap="small">
+						<LogOutIcon /> Logout
+					</Stack>
+				</LogoutLink>
+			</Slots.Profile>
 
 			<LayoutComponent />
 

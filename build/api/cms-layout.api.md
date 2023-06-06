@@ -36,6 +36,8 @@ export const CMSLayout: {
         Navigation: "navigation";
         Sidebar: "sidebar";
         Title: "title";
+        Profile: "profile";
+        Switchers: "switchers";
     }>;
     slotTargetAliases: Readonly<{
         ModalLogo: "cms-modal-header-logo";
@@ -66,6 +68,14 @@ export const CMSLayout: {
             displayName: string;
         };
         Title: {
+            ({ children }: Omit<LayoutSlotProps, "target">): JSX.Element;
+            displayName: string;
+        };
+        Profile: {
+            ({ children }: Omit<LayoutSlotProps, "target">): JSX.Element;
+            displayName: string;
+        };
+        Switchers: {
             ({ children }: Omit<LayoutSlotProps, "target">): JSX.Element;
             displayName: string;
         };
@@ -140,6 +150,14 @@ export const CMSLayout: {
             displayName: string;
         };
         Title: {
+            ({ className, ...props }: Omit<LayoutSlotTargetProps, "name">): JSX.Element;
+            displayName: string;
+        };
+        Profile: {
+            ({ className, ...props }: Omit<LayoutSlotTargetProps, "name">): JSX.Element;
+            displayName: string;
+        };
+        Switchers: {
             ({ className, ...props }: Omit<LayoutSlotTargetProps, "name">): JSX.Element;
             displayName: string;
         };

@@ -63,6 +63,8 @@ export const commonSlotTargets: Readonly<{
     Navigation: "navigation";
     Sidebar: "sidebar";
     Title: "title";
+    Profile: "profile";
+    Switchers: "switchers";
 }>;
 
 // @public (undocumented)

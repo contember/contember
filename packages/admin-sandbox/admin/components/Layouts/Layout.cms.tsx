@@ -1,6 +1,6 @@
 // CMS Layout requires Contember Enterprise Edition (EE) license
 // See https://github.com/contember/interface/blob/main/ee/LICENSE for more information.
-import { DimensionsSwitcher, DropdownContentContainerProvider, toThemeClass } from '@contember/admin'
+import { DimensionsRenderer, DimensionsSwitcher, DropdownContentContainerProvider, toThemeClass } from '@contember/admin'
 import '@contember/brand/index.css'
 import { CMSLayout } from '@contember/cms-layout'
 import '@contember/cms-layout/index.css'
@@ -13,7 +13,7 @@ export const Layout = () => {
 
 	return (
 		<>
-			<Slots.SidebarLeftHeader>
+			<Slots.Switchers>
 				<DimensionsSwitcher
 					optionEntities="Locale"
 					orderBy="code asc"
@@ -22,7 +22,7 @@ export const Layout = () => {
 					slugField="code"
 					maxItems={1}
 				/>
-			</Slots.SidebarLeftHeader>
+			</Slots.Switchers>
 
 			<CMSLayout.Root
 				breakpoint={directives['cms-layout.breakpoint']}

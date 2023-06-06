@@ -23,6 +23,7 @@ const {
 	ModalLogo,
 	Navigation,
 	Title,
+	Profile,
 	Sidebar: SidebarBody,
 	SidebarLeftBody,
 	SidebarLeftFooter,
@@ -30,6 +31,7 @@ const {
 	SidebarRightBody,
 	SidebarRightFooter,
 	SidebarRightHeader,
+	Switchers,
 	...notYetImplementedSlots
 } = SlotTargets
 
@@ -161,12 +163,13 @@ export const Root = memo(({
 
 							return (
 								<>
-									{(setHasOneOf(activeSlots, [slotTargets.SidebarLeftHeader]) || behavior === 'modal') && (
+									{(setHasOneOf(activeSlots, [slotTargets.SidebarLeftHeader, slotTargets.Switchers]) || behavior === 'modal') && (
 										<Layout.PanelHeader className={classNameFor('sidebar-left-header')}>
 											<Stack className={classNameFor('sidebar-left-header-content')} align="center" justify="space-between" direction="horizontal">
 												{behavior === 'modal' && <ModalLogo className="synthetic-layout-slot" />}
 
-												<SidebarLeftHeader />
+												{setHasOneOf(activeSlots, [slotTargets.SidebarLeftHeader]) && <SidebarLeftHeader />}
+												{setHasOneOf(activeSlots, [slotTargets.Switchers]) && <Switchers />}
 
 												{behavior === 'modal' && (
 													<ToggleMenuButton
@@ -179,13 +182,14 @@ export const Root = memo(({
 									)}
 
 									<Layout.PanelBody className={classNameFor('sidebar-left-body')}>
-										<Navigation />
-										<SidebarLeftBody />
+										{setHasOneOf(activeSlots, [slotTargets.Navigation]) && <Navigation />}
+										{setHasOneOf(activeSlots, [slotTargets.SidebarLeftBody]) && <SidebarLeftBody />}
 									</Layout.PanelBody>
 
-									{setHasOneOf(activeSlots, [slotTargets.SidebarLeftFooter]) && (
+									{setHasOneOf(activeSlots, [slotTargets.SidebarLeftFooter, slotTargets.Profile]) && (
 										<Layout.PanelFooter className={classNameFor('sidebar-left-footer')}>
-											<SidebarLeftFooter />
+											{setHasOneOf(activeSlots, [slotTargets.SidebarLeftFooter]) && <SidebarLeftFooter />}
+											{setHasOneOf(activeSlots, [slotTargets.Profile]) && <Profile />}
 										</Layout.PanelFooter>
 									)}
 								</>

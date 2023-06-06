@@ -31,6 +31,7 @@ const {
 	SidebarRightBody,
 	SidebarRightFooter,
 	SidebarRightHeader,
+	Switchers,
 	...notYetImplementedSlots
 } = SlotTargets
 
@@ -162,12 +163,13 @@ export const Root = memo(({
 
 							return (
 								<>
-									{(setHasOneOf(activeSlots, [slotTargets.SidebarLeftHeader]) || behavior === 'modal') && (
+									{(setHasOneOf(activeSlots, [slotTargets.SidebarLeftHeader, slotTargets.Switchers]) || behavior === 'modal') && (
 										<Layout.PanelHeader className={classNameFor('sidebar-left-header')}>
 											<Stack className={classNameFor('sidebar-left-header-content')} align="center" justify="space-between" direction="horizontal">
 												{behavior === 'modal' && <ModalLogo className="synthetic-layout-slot" />}
 
 												<SidebarLeftHeader />
+												{setHasOneOf(activeSlots, [slotTargets.Switchers]) && <Switchers />}
 
 												{behavior === 'modal' && (
 													<ToggleMenuButton

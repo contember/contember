@@ -1,45 +1,42 @@
-import { escapeValue, MigrationBuilder } from '@contember/database-migrations'
+import { MigrationBuilder } from '@contember/database-migrations'
 import { JSONValue, Model, Schema } from '@contember/schema'
 import { addField, SchemaUpdater, updateEntity, updateModel } from '../utils/schemaUpdateUtils'
 import { createModificationType, Differ, ModificationHandler } from '../ModificationHandler'
-import { wrapIdentifier } from '../../utils/dbHelpers'
-import { getColumnName, isColumn } from '@contember/schema-utils'
-import { ImplementationException } from '../../exceptions'
+import { isColumn } from '@contember/schema-utils'
 import { createFields } from '../utils/diffUtils'
 import { getColumnSqlType } from '../utils/columnUtils'
+import { formatSeedExpression } from './helpers'
 
 export class CreateColumnModificationHandler implements ModificationHandler<CreateColumnModificationData> {
 	constructor(private readonly data: CreateColumnModificationData, private readonly schema: Schema) {}
 
 	public createSql(builder: MigrationBuilder): void {
-		const entity = this.schema.model.entities[this.data.entityName]
+		const model = this.schema.model
+		const entity = model.entities[this.data.entityName]
 		if (entity.view) {
 			return
 		}
 		const column = this.data.field
-		const hasSeed = this.data.fillValue !== undefined || this.data.copyValue !== undefined
-		const columnSqlType = getColumnSqlType(column)
+		const columnType = getColumnSqlType(column)
+		const seedExpression = formatSeedExpression({
+			columnType,
+			entity,
+			model,
+			copyValue: this.data.copyValue,
+			fillValue: this.data.fillValue,
+		})
+		const hasSeed = seedExpression !== null
 		builder.addColumn(entity.tableName, {
 			[column.columnName]: {
-				type: columnSqlType,
+				type: columnType,
 				notNull: !column.nullable && !hasSeed,
 				sequenceGenerated: column.sequence,
 			},
 		})
-		if (hasSeed) {
-			let using: string
-
-			if (this.data.fillValue !== undefined) {
-				using = escapeValue(this.data.fillValue)
-			} else if (this.data.copyValue !== undefined) {
-				const copyFrom = getColumnName(this.schema.model, entity, this.data.copyValue)
-				using = `${wrapIdentifier(copyFrom)}::${columnSqlType}`
-			} else {
-				throw new ImplementationException()
-			}
+		if (seedExpression !== null) {
 			builder.alterColumn(entity.tableName, column.columnName, {
-				type: columnSqlType,
-				using,
+				type: columnType,
+				using: seedExpression,
 			})
 
 			// event applier defers constraint check, we need to fire them before ALTER

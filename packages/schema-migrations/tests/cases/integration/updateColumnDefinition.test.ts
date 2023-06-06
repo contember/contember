@@ -33,6 +33,40 @@ testMigrations('update column definition', {
 		ALTER "registered_at" SET DATA TYPE timestamptz USING "registered_at"::timestamptz;`,
 })
 
+
+namespace NotNullOrig {
+	export class Author {
+		name = def.stringColumn()
+	}
+}
+namespace NotNullUpdated {
+	export class Author {
+		name = def.stringColumn().notNull()
+	}
+}
+testMigrations('set not null and fill', {
+	originalSchema: createSchema(NotNullOrig).model,
+	updatedSchema: createSchema(NotNullUpdated).model,
+	noDiff: true,
+	diff: [
+		updateColumnDefinitionModification.createModification({
+			entityName: 'Author',
+			fieldName: 'name',
+			definition: {
+				type: Model.ColumnType.String,
+				columnType: 'text',
+				nullable: false,
+			},
+			fillValue: 'unnamed',
+		}),
+	],
+	sql: SQL`
+ALTER TABLE "author"
+		ALTER "name" SET DATA TYPE text USING COALESCE("name"::text, $pga$unnamed$pga$),
+		ALTER "name" SET NOT NULL;`,
+})
+
+
 namespace SeqOrig {
 	export class Author {
 		idSeq = def.intColumn()

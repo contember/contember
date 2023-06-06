@@ -1,17 +1,19 @@
 import { escapeValue, MigrationBuilder } from '@contember/database-migrations'
-import { Model, Schema } from '@contember/schema'
+import { JSONValue, Model, Schema } from '@contember/schema'
 import { SchemaUpdater, updateEntity, updateField, updateModel } from '../utils/schemaUpdateUtils'
 import { createModificationType, Differ, ModificationHandler } from '../ModificationHandler'
 import deepEqual from 'fast-deep-equal'
 import { updateColumns } from '../utils/diffUtils'
 import { wrapIdentifier } from '../../utils/dbHelpers'
 import { getColumnSqlType } from '../utils/columnUtils'
+import { formatSeedExpression } from './helpers'
 
 export class UpdateColumnDefinitionModificationHandler implements ModificationHandler<UpdateColumnDefinitionModificationData>  {
 	constructor(private readonly data: UpdateColumnDefinitionModificationData, private readonly schema: Schema) {}
 
 	public createSql(builder: MigrationBuilder): void {
-		const entity = this.schema.model.entities[this.data.entityName]
+		const model = this.schema.model
+		const entity = model.entities[this.data.entityName]
 		if (entity.view) {
 			return
 		}
@@ -20,18 +22,33 @@ export class UpdateColumnDefinitionModificationHandler implements ModificationHa
 
 		const hasNewSequence = !oldColumn.sequence && newColumn.sequence
 		const hasNewType = newColumn.columnType !== oldColumn.columnType
+
 		const columnType = getColumnSqlType(newColumn)
+		const seedExpression = formatSeedExpression({
+			columnType,
+			entity,
+			model,
+			copyValue: this.data.copyValue,
+			fillValue: this.data.fillValue,
+		})
 
 		const usingCast = `${wrapIdentifier(oldColumn.columnName)}::${columnType}`
 
 		builder.alterColumn(entity.tableName, oldColumn.columnName, {
-			type: hasNewSequence || hasNewType ? columnType : undefined,
+			type: hasNewSequence || hasNewType || seedExpression !== null ? columnType : undefined,
 			notNull: oldColumn.nullable !== newColumn.nullable ? !newColumn.nullable : undefined,
-			using: hasNewSequence
-				? `COALESCE(${usingCast}, nextval(PG_GET_SERIAL_SEQUENCE(${escapeValue(entity.tableName)}, ${escapeValue(oldColumn.columnName)})))`
-				: hasNewType
-					? usingCast
-					: undefined,
+			using: (() => {
+				if (hasNewSequence) {
+					return `COALESCE(${usingCast}, nextval(PG_GET_SERIAL_SEQUENCE(${escapeValue(entity.tableName)}, ${escapeValue(oldColumn.columnName)})))`
+				}
+				if (seedExpression !== null) {
+					return `COALESCE(${usingCast}, ${seedExpression})`
+				}
+				if (hasNewType) {
+					return usingCast
+				}
+				return undefined
+			})(),
 			sequenceGenerated: oldColumn.sequence && !newColumn.sequence ? false : (!oldColumn.sequence ? newColumn.sequence : undefined),
 		})
 
@@ -95,6 +112,8 @@ export interface UpdateColumnDefinitionModificationData {
 	entityName: string
 	fieldName: string
 	definition: ColumnDefinitionAlter
+	fillValue?: JSONValue
+	copyValue?: string
 }
 
 export const updateColumnDefinitionModification = createModificationType({

@@ -3055,9 +3055,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@contember/cms-layout@workspace:*, @contember/cms-layout@workspace:ee/cms-layout":
+"@contember/cms-layout@workspace:*, @contember/cms-layout@workspace:packages/cms-layout":
   version: 0.0.0-use.local
-  resolution: "@contember/cms-layout@workspace:ee/cms-layout"
+  resolution: "@contember/cms-layout@workspace:packages/cms-layout"
   dependencies:
     "@contember/admin": "workspace:*"
     "@contember/brand": "workspace:*"

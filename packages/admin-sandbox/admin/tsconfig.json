@@ -5,7 +5,7 @@
 		"emitDeclarationOnly": false
 	},
 	"references": [
-		{ "path": "../../../ee/cms-layout/src" },
+		{ "path": "../../cms-layout/src" },
 		{ "path": "../../admin/src" },
 		{ "path": "../../brand/src" },
 	]

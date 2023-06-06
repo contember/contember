@@ -3,7 +3,6 @@
 	"include": [ ],
 	"references": [
 		{ "path": "./ee/admin-server" },
-		{ "path": "./ee/cms-layout" },
 		{ "path": "./packages/.template" },
 		{ "path": "./packages/admin" },
 		{ "path": "./packages/admin-i18n" },
@@ -11,6 +10,7 @@
 		{ "path": "./packages/binding"  },
 		{ "path": "./packages/brand" },
 		{ "path": "./packages/client" },
+		{ "path": "./packages/cms-layout" },
 		{ "path": "./packages/interface-tester" },
 		{ "path": "./packages/layout" },
 		{ "path": "./packages/react-client" },

@@ -19,6 +19,13 @@ if git rev-parse -q --verify "refs/tags/v$version" >/dev/null; then
     exit 1
 fi
 
+
+# Check for modified or untracked files
+if [[ -n $(git status --porcelain) ]]; then
+  echo "There are modified or untracked files in the repository."
+  exit 1
+fi
+
 current_branch=$(git symbolic-ref --short HEAD)
 if [[ "$current_branch" != "master" && ! "$current_branch" =~ ^v[0-9]+\.[0-9]+$ ]]; then
     echo "Error: You must be on either the master branch or a version branch (e.g., v1.2)."
@@ -47,6 +54,7 @@ yarn tsx ./scripts/npm/bump-version.ts "$@"
 
 yarn install
 
+git add .
 git commit -m "v$1"
 git tag "v$1"
 git push origin "$current_branch"

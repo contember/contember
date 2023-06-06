@@ -13,6 +13,7 @@
     "test": "vitest --no-threads"
   },
   "dependencies": {
+    "@contember/authorization": "workspace:*",
     "@contember/database": "workspace:*",
     "@contember/database-migrations": "workspace:*",
     "@contember/engine-common": "workspace:*",

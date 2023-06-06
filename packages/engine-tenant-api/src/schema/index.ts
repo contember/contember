@@ -1029,7 +1029,8 @@ export type SignOutError = {
 }
 
 export enum SignOutErrorCode {
-	NotAPerson = 'NOT_A_PERSON'
+	NotAPerson = 'NOT_A_PERSON',
+	NotPossibleSignOutWithPermanentApiKey = 'NOT_POSSIBLE_SIGN_OUT_WITH_PERMANENT_API_KEY'
 }
 
 export type SignOutResponse = {

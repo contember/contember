@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
-tar czf yarn.tar.gz -C "$(yarn cache dir)" .
+tar czf yarn.tar.gz -C "./.yarn/cache" .
 
 ALL_VERSIONS=($DOCKER_TAGS)
 

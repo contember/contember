@@ -4,7 +4,7 @@ ARG SERVER_DIR
 WORKDIR /src
 COPY ./ ./
 
-RUN test ! -f yarn.tar.gz || tar xf yarn.tar.gz -C "$(yarn cache dir)" .
+RUN test ! -f yarn.tar.gz || tar xf yarn.tar.gz -C "./.yarn/cache" .
 RUN /src/scripts/server/server-build.sh
 
 FROM node:18

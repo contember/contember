@@ -6,7 +6,7 @@ RUN apk --no-cache add bash
 RUN apk --no-cache add build-base python3
 COPY ./ ./
 
-RUN test ! -f yarn.tar.gz || tar xf yarn.tar.gz -C "$(yarn cache dir)" .
+RUN test ! -f yarn.tar.gz || tar xf yarn.tar.gz -C "./.yarn/cache" .
 RUN /src/scripts/server/server-build.sh
 
 FROM node:18-alpine

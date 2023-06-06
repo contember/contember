@@ -1,12 +1,5 @@
 import { Schema } from '@contember/schema'
-import {
-	deepCompare,
-	isInverseRelation,
-	isOwningRelation,
-	isRelation,
-	SchemaValidator,
-	ValidationError,
-} from '@contember/schema-utils'
+import { compareArraysIgnoreOrder, deepCompare, isInverseRelation, isOwningRelation, isRelation, SchemaValidator, ValidationError } from '@contember/schema-utils'
 import { SchemaMigrator } from './SchemaMigrator'
 import { Migration } from './Migration'
 import { ImplementationException } from './exceptions'
@@ -34,11 +27,11 @@ import {
 	UpdateAclSchemaDiffer,
 	UpdateColumnDefinitionDiffer,
 	UpdateColumnNameDiffer,
+	UpdateEntityOrderByDiffer,
 	UpdateEntityTableNameDiffer,
 	UpdateEnumDiffer,
 	UpdateRelationOnDeleteDiffer,
 	UpdateRelationOrderByDiffer,
-	UpdateEntityOrderByDiffer,
 	UpdateValidationSchemaDiffer,
 	VERSION_LATEST,
 } from './modifications'
@@ -124,9 +117,15 @@ export class SchemaDiffer {
 			diffs.push(...differDiffs)
 		}
 
-
 		if (!skipRecreateValidation) {
-			const errors = deepCompare(updatedSchema, appliedDiffsSchema, [])
+			const errors = deepCompare(updatedSchema, appliedDiffsSchema, [], path => {
+				if (path[0] === 'model' && path[1] === 'entities' && (path[3] === 'unique' || path[3] === 'index')) {
+					return (a, b) => {
+						return compareArraysIgnoreOrder(a, b, path)
+					}
+				}
+				return null
+			})
 			if (errors.length === 0) {
 				return diffs
 			}

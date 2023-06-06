@@ -1,5 +1,7 @@
+type Path = (string | number)[]
+
 type CompareError = {
-	path: (string | number)[]
+	path: Path
 	message: string
 }
 
@@ -26,10 +28,41 @@ const getType = (val: any): ExtendedType => {
 	return 'object'
 }
 
-export function deepCompare(a: any, b: any, path: (string | number)[]): CompareError[] {
+type Comparator = (a: unknown, b: unknown) => CompareError[]
+
+export const compareArraysIgnoreOrder = (a: unknown, b: unknown, path: Path) => {
+	if (!Array.isArray(a) || !Array.isArray(b)) {
+		return [{ path, message: 'Invalid type, expected array' }]
+	}
+	if (a.length !== b.length) {
+		return [{ path, message: `Array length: ${a.length} != ${b.length}` }]
+	}
+	const haystack = [...b]
+	for (const needle of a) {
+		const index = haystack.findIndex(it => {
+			const errors = deepCompare(needle, it, path)
+			return errors.length === 0
+		})
+		if (index < 0) {
+			return [{ path, message: `Array item: ${JSON.stringify(needle)} not found in ${JSON.stringify(haystack)}` }]
+		}
+		haystack.splice(index, 1)
+	}
+	if (haystack.length > 0) {
+		return [{ path, message: `Array items: ${JSON.stringify(haystack)} not found in ${JSON.stringify(a)}` }]
+	}
+	return []
+}
+
+export function deepCompare(a: any, b: any, path: Path = [], getCustomComparator?: (path: Path) => Comparator | null): CompareError[] {
 	if (a === b) {
 		return []
 	}
+	const comparator = getCustomComparator?.(path)
+	if (comparator) {
+		return comparator(a, b)
+	}
+
 	const aType = getType(a)
 	const bType = getType(b)
 	if (aType !== bType) {
@@ -53,7 +86,7 @@ export function deepCompare(a: any, b: any, path: (string | number)[]): CompareE
 		}
 		const errors: CompareError[] = []
 		for (let i = 0; i < aLength; i++) {
-			errors.push(...deepCompare(a[i], b[i], [...path, i]))
+			errors.push(...deepCompare(a[i], b[i], [...path, i], getCustomComparator))
 		}
 		return errors
 	}
@@ -91,7 +124,7 @@ export function deepCompare(a: any, b: any, path: (string | number)[]): CompareE
 					message: `Missing property: ${key} not in right`,
 				})
 			} else {
-				errors.push(...deepCompare(a[key], b[key], [...path, key]))
+				errors.push(...deepCompare(a[key], b[key], [...path, key], getCustomComparator))
 			}
 		}
 		for (const key of bKeys) {

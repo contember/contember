@@ -1,5 +1,5 @@
 import { escapeValue, MigrationBuilder } from '@contember/database-migrations'
-import { Model, Schema } from '@contember/schema'
+import { JSONValue, Model, Schema } from '@contember/schema'
 import { addField, SchemaUpdater, updateEntity, updateModel } from '../utils/schemaUpdateUtils'
 import { createModificationType, Differ, ModificationHandler } from '../ModificationHandler'
 import { wrapIdentifier } from '../../utils/dbHelpers'
@@ -67,7 +67,7 @@ export class CreateColumnModificationHandler implements ModificationHandler<Crea
 export interface CreateColumnModificationData {
 	entityName: string
 	field: Model.AnyColumn
-	fillValue?: any
+	fillValue?: JSONValue
 	copyValue?: string
 }
 

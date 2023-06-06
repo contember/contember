@@ -18,24 +18,29 @@ export class CreateColumnModificationHandler implements ModificationHandler<Crea
 		}
 		const column = this.data.field
 		const hasSeed = this.data.fillValue !== undefined || this.data.copyValue !== undefined
+		const columnSqlType = getColumnSqlType(column)
 		builder.addColumn(entity.tableName, {
 			[column.columnName]: {
-				type: getColumnSqlType(column),
+				type: columnSqlType,
 				notNull: !column.nullable && !hasSeed,
 				sequenceGenerated: column.sequence,
 			},
 		})
 		if (hasSeed) {
+			let using: string
+
 			if (this.data.fillValue !== undefined) {
-				builder.sql(`UPDATE ${wrapIdentifier(entity.tableName)}
-	  SET ${wrapIdentifier(column.columnName)} = ${escapeValue(this.data.fillValue)}`)
+				using = escapeValue(this.data.fillValue)
 			} else if (this.data.copyValue !== undefined) {
 				const copyFrom = getColumnName(this.schema.model, entity, this.data.copyValue)
-				builder.sql(`UPDATE ${wrapIdentifier(entity.tableName)}
-	  SET ${wrapIdentifier(column.columnName)} = ${wrapIdentifier(copyFrom)}::${getColumnSqlType(column)}`)
+				using = `${wrapIdentifier(copyFrom)}::${columnSqlType}`
 			} else {
 				throw new ImplementationException()
 			}
+			builder.alterColumn(entity.tableName, column.columnName, {
+				type: columnSqlType,
+				using,
+			})
 
 			// event applier defers constraint check, we need to fire them before ALTER
 			builder.sql(`SET CONSTRAINTS ALL IMMEDIATE`)

@@ -22,6 +22,7 @@ import {
 	TextField,
 	TimeField,
 	UrlField,
+	UseControlProps,
 	useFieldControl,
 } from '@contember/admin'
 import { Title } from '../components/Directives'
@@ -51,6 +52,9 @@ const extraDebugProps = SHOW_OVERRIDES ? {
 	containerClassName: 'background-container',
 	style: { outline: '1px solid blue' },
 	className: 'background-input',
+	onFocus: () => console.log('focus'),
+	onBlur: () => console.log('blur'),
+	onFocusChange: (state: boolean) => console.log(`focus change: ${state}`),
 } : {}
 
 export default () => (

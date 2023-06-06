@@ -1,6 +1,6 @@
 import { MutationResolvers, MutationSignOutArgs, SignOutErrorCode, SignOutResponse } from '../../../schema'
 import { TenantResolverContext } from '../../TenantResolverContext'
-import { ApiKeyManager, DatabaseContext, PermissionActions, PersonQuery } from '../../../model'
+import { ApiKey, ApiKeyManager, PermissionActions, PersonQuery } from '../../../model'
 import { createErrorResponse } from '../../errorUtils'
 
 export class SignOutMutationResolver implements MutationResolvers {
@@ -8,8 +8,17 @@ export class SignOutMutationResolver implements MutationResolvers {
 
 	async signOut(parent: any, args: MutationSignOutArgs, context: TenantResolverContext): Promise<SignOutResponse> {
 		const person = await context.db.queryHandler.fetch(PersonQuery.byIdentity(context.identity.id))
+
 		if (!person) {
 			return createErrorResponse('NOT_A_PERSON', 'Only a person can sign out')
+		}
+
+		const personApiKeyId = await this.apiKeyManager.findApiKey(context.db, context.apiKeyId)
+
+		if (personApiKeyId?.type === ApiKey.Type.PERMANENT) {
+			return createErrorResponse(
+				SignOutErrorCode.NotPossibleSignOutWithPermanentApiKey, 'Only session API keys can be used for person sign out.',
+			)
 		}
 
 		await context.requireAccess({
@@ -22,6 +31,7 @@ export class SignOutMutationResolver implements MutationResolvers {
 		} else {
 			await this.apiKeyManager.disableApiKey(context.db, context.apiKeyId)
 		}
+
 		return { ok: true, errors: [] }
 	}
 }

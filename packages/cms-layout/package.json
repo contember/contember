@@ -1,6 +1,6 @@
 {
 	"name": "@contember/cms-layout",
-	"license": "proprietary",
+	"license": "Apache-2.0",
 	"version": "0.0.0",
 	"type": "module",
 	"sideEffects": [
@@ -29,14 +29,13 @@
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/contember/admin.git",
-		"directory": "ee/cms-layout"
+		"directory": "packages/cms-layout"
 	},
 	"scripts": {
-		"build": "yarn run build:js:dev && yarn run build:js:prod && yarn run build:css && yarn build:license",
+		"build": "yarn run build:js:dev && yarn run build:js:prod && yarn run build:css",
 		"build:js:dev": "NODE_ENV=development vite build --mode development",
 		"build:js:prod": "vite build --mode production",
 		"build:css": "vite build --config vite.config.css.js",
-		"build:license": "cp ../LICENSE ./LICENSE",
 		"ae:build": "api-extractor run --local",
 		"ae:test": "api-extractor run"
 	},

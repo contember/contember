@@ -13,7 +13,6 @@ function directoryPackageEntry(directory, packages) {
 export const list = {
 	ee: [
 		'admin-server',
-		'cms-layout',
 	],
 	packages: [
 		'admin',
@@ -22,6 +21,7 @@ export const list = {
 		'binding',
 		'brand',
 		'client',
+		'cms-layout',
 		'interface-tester',
 		'layout',
 		'react-client',

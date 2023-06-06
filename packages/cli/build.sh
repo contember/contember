@@ -7,4 +7,5 @@ yarn workspace @contember/cli build
 node packages/cli/esbuild.js
 cd dist
 echo "{}" > package.json
+echo "" > yarn.lock
 yarn add esbuild@^0.14.14 vm2@^3.9.9

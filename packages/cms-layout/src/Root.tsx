@@ -23,6 +23,7 @@ const {
 	ModalLogo,
 	Navigation,
 	Title,
+	Profile,
 	Sidebar: SidebarBody,
 	SidebarLeftBody,
 	SidebarLeftFooter,
@@ -183,9 +184,10 @@ export const Root = memo(({
 										<SidebarLeftBody />
 									</Layout.PanelBody>
 
-									{setHasOneOf(activeSlots, [slotTargets.SidebarLeftFooter]) && (
+									{setHasOneOf(activeSlots, [slotTargets.SidebarLeftFooter, slotTargets.Profile]) && (
 										<Layout.PanelFooter className={classNameFor('sidebar-left-footer')}>
 											<SidebarLeftFooter />
+											{setHasOneOf(activeSlots, [slotTargets.Profile]) && <Profile />}
 										</Layout.PanelFooter>
 									)}
 								</>

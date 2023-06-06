@@ -30,6 +30,7 @@ export const Layout = () => {
 					<SlotTargets.Content />
 				</LayoutPage>
 			)}
+			sidebarFooter={activeSlots.has(slotTargets.Profile) ? <SlotTargets.Profile /> : null}
 		/>
 	)
 }

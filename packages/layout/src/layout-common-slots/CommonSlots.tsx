@@ -8,6 +8,7 @@ export const commonSlotTargets = Object.freeze({
 	Navigation: 'navigation',
 	Sidebar: 'sidebar',
 	Title: 'title',
+	Profile: 'profile',
 })
 
 export type CommonSlotsType = Record<keyof typeof commonSlotTargets, ReturnType<typeof createLayoutSlotComponent>>
@@ -20,6 +21,7 @@ export const CommonSlots: CommonSlotsType = {
 	Navigation: createLayoutSlotComponent(commonSlotTargets.Navigation, 'Navigation'),
 	Sidebar: createLayoutSlotComponent(commonSlotTargets.Sidebar, 'Sidebar'),
 	Title: createLayoutSlotComponent(commonSlotTargets.Title, 'Title'),
+	Profile: createLayoutSlotComponent(commonSlotTargets.Profile, 'Profile'),
 }
 
 export type SlotTargetsType = Record<keyof typeof commonSlotTargets, ReturnType<typeof createLayoutSlotTargetComponent>>
@@ -32,4 +34,5 @@ export const CommonSlotTargets: SlotTargetsType = {
 	Navigation: createLayoutSlotTargetComponent(commonSlotTargets.Navigation, 'Navigation'),
 	Sidebar: createLayoutSlotTargetComponent(commonSlotTargets.Sidebar, 'Sidebar'),
 	Title: createLayoutSlotTargetComponent(commonSlotTargets.Title, 'Title'),
+	Profile: createLayoutSlotTargetComponent(commonSlotTargets.Profile, 'Profile'),
 }

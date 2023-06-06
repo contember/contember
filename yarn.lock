@@ -2924,6 +2924,7 @@ __metadata:
     "@contember/schema": ^1.2.0
     "@contember/schema-definition": ^1.2.0
     "@contember/ui": "workspace:*"
+    lucide-react: ^0.108.0
     react: ^17 || ^18
     react-dom: ^17 || ^18
   languageName: unknown

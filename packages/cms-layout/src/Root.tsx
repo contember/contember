@@ -168,7 +168,7 @@ export const Root = memo(({
 											<Stack className={classNameFor('sidebar-left-header-content')} align="center" justify="space-between" direction="horizontal">
 												{behavior === 'modal' && <ModalLogo className="synthetic-layout-slot" />}
 
-												<SidebarLeftHeader />
+												{setHasOneOf(activeSlots, [slotTargets.SidebarLeftHeader]) && <SidebarLeftHeader />}
 												{setHasOneOf(activeSlots, [slotTargets.Switchers]) && <Switchers />}
 
 												{behavior === 'modal' && (
@@ -182,13 +182,13 @@ export const Root = memo(({
 									)}
 
 									<Layout.PanelBody className={classNameFor('sidebar-left-body')}>
-										<Navigation />
-										<SidebarLeftBody />
+										{setHasOneOf(activeSlots, [slotTargets.Navigation]) && <Navigation />}
+										{setHasOneOf(activeSlots, [slotTargets.SidebarLeftBody]) && <SidebarLeftBody />}
 									</Layout.PanelBody>
 
 									{setHasOneOf(activeSlots, [slotTargets.SidebarLeftFooter, slotTargets.Profile]) && (
 										<Layout.PanelFooter className={classNameFor('sidebar-left-footer')}>
-											<SidebarLeftFooter />
+											{setHasOneOf(activeSlots, [slotTargets.SidebarLeftFooter]) && <SidebarLeftFooter />}
 											{setHasOneOf(activeSlots, [slotTargets.Profile]) && <Profile />}
 										</Layout.PanelFooter>
 									)}

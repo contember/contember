@@ -1,3 +1,5 @@
+import { AnyEventPayload } from '../triggers/Payload'
+
 export type EventRow = {
 	id: string
 	transaction_id: string
@@ -11,6 +13,6 @@ export type EventRow = {
 	schema_id: string
 	target: string
 	trigger: string
-	payload: any
+	payload: AnyEventPayload
 	log: any[]
 }

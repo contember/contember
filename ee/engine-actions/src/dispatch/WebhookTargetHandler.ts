@@ -16,9 +16,8 @@ export class WebhookTargetHandler implements InvokeHandler<Actions.WebhookTarget
 			const resolvedHeaders = Object.fromEntries(Object.entries(target.headers ?? {})
 				.map(([key, value]) => [key, this.resolveVariables(value, variables)]))
 
-			const response = await withTimeout({ abortController, timeoutMs }, async () => {
-
-				return await fetch(resolvedUrl, {
+			const [response, text] = await withTimeout({ abortController, timeoutMs }, async () => {
+				const response = await fetch(resolvedUrl, {
 					method: 'POST',
 					headers: {
 						['User-Agent']: 'Contember Actions',
@@ -42,19 +41,15 @@ export class WebhookTargetHandler implements InvokeHandler<Actions.WebhookTarget
 						})),
 					}),
 				})
+				const responseText = await response.text()
+				return [response, responseText]
 			})
-			let responseText
-			try {
-				responseText = await withTimeout({ abortController, timeoutMs }, async () => {
-					return await response.text()
-				})
-			} catch {
-			}
+
 			const result = {
 				ok: response.ok,
 				code: response.status,
 				durationMs: getDuration(),
-				response: responseText,
+				response: text,
 				errorMessage: !response.ok ? response.statusText : undefined,
 			}
 

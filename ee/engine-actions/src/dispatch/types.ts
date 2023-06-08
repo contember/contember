@@ -49,3 +49,10 @@ export type WebhookEvent =
 export type WebhookRequestPayload = {
 	events: WebhookEvent[]
 }
+
+export type WebhookResponsePayload = {
+	failures: {
+		eventId: string
+		error?: string
+	}
+}

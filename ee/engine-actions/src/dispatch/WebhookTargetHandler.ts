@@ -1,30 +1,48 @@
 import { Actions } from '@contember/schema'
 import { EventRow, HandledEvent, InvokeHandler, InvokeHandlerArgs, WebhookEvent, WebhookRequestPayload } from './types'
 import { VariablesMap } from '../model/VariablesManager'
+import * as Typesafe from '@contember/typesafe'
+import { FetcherResponse, WebhookFetcher } from './WebhookFetcher'
 
 const DEFAULT_TIMEOUT_MS = 30_000 // 30 seconds
 
+const ResponseType = Typesafe.noExtraProps(Typesafe.object({
+	failures: Typesafe.array(
+		Typesafe.intersection(
+			Typesafe.object({
+				eventId: Typesafe.string,
+			}),
+			Typesafe.partial({
+				error: Typesafe.string,
+			}),
+		),
+	),
+}))
+
+type EventResponseFactory = (eventRow: EventRow) => ({ ok: boolean; code?: number; response?: string; errorMessage?: string; durationMs?: number })
+
 export class WebhookTargetHandler implements InvokeHandler<Actions.WebhookTarget> {
+	constructor(
+		private readonly fetcher: WebhookFetcher,
+	) {
+	}
+
 	public async handle({ target, events, logger, variables }: InvokeHandlerArgs<Actions.WebhookTarget>): Promise<HandledEvent[]> {
 		const timeoutMs = target.timeoutMs
 
 		const start = process.hrtime.bigint()
 		const getDuration = () => Math.floor(Number((process.hrtime.bigint() - start) / BigInt(1_000_000)))
+
+		let eventResponseFactory: EventResponseFactory
 		try {
 
-			const { response, text } = await this.fetch(timeoutMs ?? DEFAULT_TIMEOUT_MS, target, variables, events)
+			const response = await this.fetch(timeoutMs ?? DEFAULT_TIMEOUT_MS, target, variables, events)
 
-			const result = {
-				ok: response.ok,
-				code: response.status,
-				durationMs: getDuration(),
-				response: text,
-				errorMessage: !response.ok ? response.statusText : undefined,
-			}
+			eventResponseFactory = this.createResponseFactory({
+				response: response,
+				events,
+			})
 
-			// todo: per-event response format
-
-			return events.map(it => ({ target, row: it, result }))
 		} catch (e) {
 			logger.warn(e)
 			const errorMessages = this.extractErrorMessages(e)
@@ -33,7 +51,67 @@ export class WebhookTargetHandler implements InvokeHandler<Actions.WebhookTarget
 				errorMessage: errorMessages.length ? errorMessages.join('; ') : undefined,
 				durationMs: getDuration(),
 			}
+			eventResponseFactory = () => ({ ok: false, errorMessage: errorMessages.length ? errorMessages.join('; ') : undefined })
+
 			return events.map(it => ({ target, row: it, result }))
+		}
+		const durationMs = getDuration()
+
+		return events.map(it => ({ target, row: it, result: { durationMs, ...eventResponseFactory(it) } }))
+	}
+
+	private createResponseFactory({ response, events }: {
+		response: FetcherResponse
+		events: EventRow[]
+	}): EventResponseFactory {
+		if (!response.ok) {
+			return () => ({
+				ok: false,
+				code: response.status,
+				response: response.responseText,
+				errorMessage: response.statusText,
+			})
+		}
+
+		if (response.responseText.trim() === '') {
+			return () => ({
+				ok: true,
+				code: response.status,
+			})
+		}
+
+		try {
+			const responseData = ResponseType(JSON.parse(response.responseText))
+			const eventsInBatch = new Set(events.map(it => it.id))
+			const failedEvents = Object.fromEntries(responseData.failures?.map(it => [it.eventId, it]) ?? [])
+			const missingEvents =  Object.keys(failedEvents).filter(it => !eventsInBatch.has(it))
+
+			if (missingEvents.length) {
+				return () => ({
+					ok: false,
+					code: response.status,
+					response: response.responseText,
+					errorMessage: 'Invalid response: undefined events IDs: ' + missingEvents.join('; '),
+				})
+			}
+
+			return it => {
+				if (!failedEvents[it.id]) {
+					return { ok: true, code: response.status }
+				}
+				return {
+					ok: false,
+					code: response.status,
+					errorMessage: failedEvents[it.id].error,
+				}
+			}
+		} catch (e: any) {
+			return () => ({
+				ok: false,
+				code: response.status,
+				response: response.responseText,
+				errorMessage: 'Invalid response: ' + e.message,
+			})
 		}
 	}
 
@@ -47,15 +125,13 @@ export class WebhookTargetHandler implements InvokeHandler<Actions.WebhookTarget
 		return errorMessages
 	}
 
-	private async fetch(timeoutMs: number, target: Actions.WebhookTarget, variables: VariablesMap, events: EventRow[]): Promise<{ response: Response; text: string }> {
+	private async fetch(timeoutMs: number, target: Actions.WebhookTarget, variables: VariablesMap, events: EventRow[]): Promise<FetcherResponse> {
 		return await withTimeout(timeoutMs, async abortController => {
-			const response = await this.doFetch(target, variables, abortController, events)
-			const text = await response.text()
-			return { response, text }
+			return await this.doFetch(target, variables, abortController, events)
 		})
 	}
 
-	private async doFetch(target: Actions.WebhookTarget, variables: VariablesMap, abortController: AbortController, events: EventRow[]): Promise<Response> {
+	private async doFetch(target: Actions.WebhookTarget, variables: VariablesMap, abortController: AbortController, events: EventRow[]): Promise<FetcherResponse> {
 		const resolvedUrl = this.resolveVariables(target.url, variables)
 		const resolvedHeaders = Object.fromEntries(Object.entries(target.headers ?? {})
 			.map(([key, value]) => [key, this.resolveVariables(value, variables)]))
@@ -64,7 +140,7 @@ export class WebhookTargetHandler implements InvokeHandler<Actions.WebhookTarget
 			events: events.map(this.formatEventPayload),
 		}
 
-		return await fetch(resolvedUrl, {
+		return await this.fetcher.fetch(resolvedUrl, {
 			method: 'POST',
 			headers: {
 				['User-Agent']: 'Contember Actions',

@@ -20,6 +20,7 @@ import { VariablesQueryResolver } from './graphql/resolvers/query/VariablesQuery
 import { VariablesManager } from './model/VariablesManager'
 import { AccessEvaluator, Authorizator } from '@contember/authorization'
 import { ActionsPermissionsFactory } from './authorization'
+import { WebhookFetcherNative } from './dispatch/WebhookFetcher'
 
 export {
 	TriggerListenersFactory,
@@ -51,7 +52,7 @@ export default class ActionsPlugin implements Plugin {
 				})
 				.addService('actions_eventDispatcher', ({ actions_variableManager }) => {
 					const eventsRepository = new EventsRepository()
-					const webhookTargetHandler = new WebhookTargetHandler()
+					const webhookTargetHandler = new WebhookTargetHandler(new WebhookFetcherNative())
 					const targetHandlerResolver = new TargetHandlerResolver(webhookTargetHandler)
 					return new EventDispatcher(eventsRepository, actions_variableManager, targetHandlerResolver)
 				})

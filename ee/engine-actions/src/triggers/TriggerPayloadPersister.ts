@@ -2,8 +2,15 @@ import { Client, InsertBuilder } from '@contember/database'
 import { AnyEventPayload } from './Payload'
 import { Mapper } from '@contember/engine-content-api'
 import { Actions } from '@contember/schema'
+import { EventRow } from '../model/types'
 
 export const NOTIFY_CHANNEL_NAME = 'actions_event'
+type EventRowToInsert = Omit<EventRow, 'created_at' | 'visible_at' | 'last_state_change' | 'log'> & {
+	created_at: string | Date
+	visible_at: string | Date
+	last_state_change: string | Date
+}
+
 export class TriggerPayloadPersister {
 	constructor(
 		private readonly mapper: Mapper,
@@ -21,7 +28,7 @@ export class TriggerPayloadPersister {
 			const chunk = payloads.slice(i, i + chunkSize)
 			await InsertBuilder.create()
 				.into('actions_event')
-				.values(chunk.map(it => ({
+				.values(chunk.map((it): EventRowToInsert => ({
 					id: this.providers.uuid(),
 					transaction_id: this.mapper.transactionId,
 					created_at: 'now',
@@ -34,6 +41,8 @@ export class TriggerPayloadPersister {
 					trigger: trigger.name,
 					priority: trigger.priority ?? 0,
 					payload: it,
+					resolved_at: null,
+					last_state_change: 'now',
 				})))
 				.execute(this.client)
 		}

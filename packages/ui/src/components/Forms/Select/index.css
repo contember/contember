@@ -1,8 +1,8 @@
 :where(.cui-selectCreateNewWrapper) {
-  display: flex;
-  gap: var(--cui-gap);
+	display: flex;
+	gap: var(--cui-gap);
 }
 
 :where(.cui-selectCreateNewWrapper-control) {
-  flex-grow: 1;
+	flex-grow: 1;
 }

@@ -25,12 +25,12 @@
 
 /* Global overrides: */
 :where(.bp3-icon) {
-  display: inline-flex;
-  justify-content: center;
-  align-items: center;
+	display: inline-flex;
+	justify-content: center;
+	align-items: center;
 }
 
 /* HOTFIX */
 :where(.react-datepicker-popper) {
-  z-index: 2;
+	z-index: 2;
 }

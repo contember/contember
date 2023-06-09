@@ -1,13 +1,13 @@
 :where(html),
 :where(body) {
-  margin: 0;
-  padding: 0;
+	margin: 0;
+	padding: 0;
 }
 
 :where(html) {
-  display: flex;
+	display: flex;
 }
 
 :where(body) {
-  flex: 1 1 100%;
+	flex: 1 1 100%;
 }

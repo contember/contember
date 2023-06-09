@@ -1,7 +1,11 @@
 export type { PublicCommonReactSelectStylesProps } from '@contember/ui'
-// export * from './VirtualizedMenuList' // Deliberately not exporting it
-export * from './MultiSelectField'
-export * from './SelectField'
-export * from './RadioField'
-export * from './choiceFieldDictionary'
+
+export * from './components/MultiSelectField'
+export * from './components/rendering/MultiSelectFieldRenderer'
+export * from './components/SelectField'
+export * from './components/rendering/SelectFieldRenderer'
+export * from './components/RadioField'
+export * from './components/rendering/RadioFieldRenderer'
+export * from './dict/choiceFieldDictionary'
+
 export * from '@contember/react-choice-field'

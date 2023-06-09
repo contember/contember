@@ -1,8 +1,7 @@
-import { Component, SugaredRelativeSingleField } from '@contember/react-binding'
+import { Component, Field, SugaredRelativeSingleField } from '@contember/react-binding'
 import type { FieldContainerProps } from '@contember/ui'
 import { FunctionComponent, ReactNode, useMemo } from 'react'
-import { ChoiceFieldData, NormalizedStaticOption, SelectFieldInner, StaticSingleChoiceField } from '@contember/react-choice-field-ui'
-import { useStaticSingleChoiceField } from '../../../../../react-choice-field/src/hooks/useStaticSingleChoiceField'
+import { useStaticSingleChoiceField, SingleChoiceFieldRendererProps, NormalizedStaticOption, SelectFieldInner } from '@contember/react-choice-field-ui'
 import { useNormalizedBlocks } from './useNormalizedBlocks'
 
 export type DiscriminatedBlocksProps =
@@ -44,7 +43,7 @@ export const DiscriminatedBlocks: FunctionComponent<DiscriminatedBlocksProps> = 
 				})),
 			[blocksArray],
 		)
-		const metadata: ChoiceFieldData.SingleChoiceFieldMetadata<any> = useStaticSingleChoiceField({
+		const metadata: SingleChoiceFieldRendererProps<any> = useStaticSingleChoiceField({
 			...props,
 			options: transformedBlockList,
 		})
@@ -63,7 +62,7 @@ export const DiscriminatedBlocks: FunctionComponent<DiscriminatedBlocksProps> = 
 	},
 	props => (
 		<>
-			<StaticSingleChoiceField {...(props as any)} options={[]} arity="single" isNonbearing={true} />
+			<Field {...(props)} isNonbearing={true} />
 			{props.children}
 		</>
 	),

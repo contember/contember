@@ -1,21 +1,21 @@
-import { ChoiceFieldData } from '../ChoiceFieldData'
 import { useMemo } from 'react'
 import { BaseDynamicChoiceField } from '../BaseDynamicChoiceField'
 import { Entity, EntityAccessor } from '@contember/react-binding'
 import { DesugaredOptionPath } from './useDesugaredOptionPath'
 import { useSearchFields } from './useSearchFields'
+import { ChoiceFieldOptions, ChoiceFieldSingleOption } from '../ChoiceFieldOptions'
 
 export const useNormalizedOptions = (
 	optionEntities: EntityAccessor[],
 	desugaredOptionPath: DesugaredOptionPath,
 	{ searchByFields, ...props }: BaseDynamicChoiceField,
-): ChoiceFieldData.Options<EntityAccessor> => {
+): ChoiceFieldOptions<EntityAccessor> => {
 	const desugaredSearchFields = useSearchFields(searchByFields)
 	const renderOption = 'renderOption' in props && props.renderOption ? props.renderOption : undefined
 	const optionLabel = 'optionLabel' in props && props.optionLabel ? props.optionLabel : undefined
 	return useMemo(
 		() =>
-			optionEntities.map((item, i): ChoiceFieldData.SingleOption<EntityAccessor> => {
+			optionEntities.map((item, i): ChoiceFieldSingleOption<EntityAccessor> => {
 				let label
 				if (renderOption) {
 					label = renderOption(item)

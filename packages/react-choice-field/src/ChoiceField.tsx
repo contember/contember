@@ -1,25 +1,30 @@
-import { Component, EntityAccessor, FieldValue } from '@contember/react-binding'
-import type { FunctionComponent } from 'react'
-import type { ChoiceFieldData } from './ChoiceFieldData'
-import { StaticSingleChoiceField, StaticSingleChoiceFieldProps } from './StaticSingleChoiceField'
-import { DynamicSingleChoiceField } from './DynamicSingleChoiceField'
+import { Component } from '@contember/react-binding'
+import type { ComponentType, FunctionComponent } from 'react'
+import {
+	AllStaticSingleChoiceFieldRendererProps,
+	createStaticSingleChoiceField,
+	StaticSingleChoiceFieldProps,
+} from './StaticSingleChoiceField'
+import { AllDynamicSingleChoiceFieldRenderer, createDynamicSingleChoiceField } from './DynamicSingleChoiceField'
 import { DynamicSingleChoiceFieldProps } from './hooks/useDynamicSingleChoiceField'
 
 export type ChoiceFieldProps =
-	| (
-		& ChoiceFieldData.SingleChoiceFieldProps<FieldValue>
-		& StaticSingleChoiceFieldProps
-	)
-	| (
-		& ChoiceFieldData.SingleChoiceFieldProps<EntityAccessor>
-		& DynamicSingleChoiceFieldProps
-	)
+	| StaticSingleChoiceFieldProps
+	| DynamicSingleChoiceFieldProps
 
-const isStatic = (props: ChoiceFieldProps): props is StaticSingleChoiceFieldProps & ChoiceFieldData.SingleChoiceFieldProps<FieldValue>	=>
-	Array.isArray(props.options)
+export const createChoiceField = <RendererProps extends {}>({ FieldRenderer }:{
+	FieldRenderer: ComponentType<AllDynamicSingleChoiceFieldRenderer<RendererProps> | AllStaticSingleChoiceFieldRendererProps<RendererProps>>
+}): FunctionComponent<ChoiceFieldProps & RendererProps> => {
+	const StaticSingleChoiceField = createStaticSingleChoiceField<RendererProps>({
+		FieldRenderer: FieldRenderer as ComponentType<AllStaticSingleChoiceFieldRendererProps<RendererProps>>,
+	})
+	const DynamicSingleChoiceField = createDynamicSingleChoiceField<RendererProps>({
+		FieldRenderer: FieldRenderer as ComponentType<AllDynamicSingleChoiceFieldRenderer<RendererProps>>,
+	})
 
-export const ChoiceField: FunctionComponent<ChoiceFieldProps> = Component(props => {
-	return isStatic(props)
-		? <StaticSingleChoiceField {...props} />
-		: <DynamicSingleChoiceField {...props} />
-}, 'ChoiceField')
+	return Component(props => {
+		return Array.isArray(props.options)
+			? <StaticSingleChoiceField {...props as StaticSingleChoiceFieldProps & RendererProps} />
+			: <DynamicSingleChoiceField {...props as DynamicSingleChoiceFieldProps & RendererProps} />
+	}, 'ChoiceField')
+}

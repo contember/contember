@@ -1,6 +1,5 @@
 import { BaseDynamicChoiceField } from '../BaseDynamicChoiceField'
 import { EntityAccessor, Filter, TreeRootId, useEnvironment, useExtendTree, useTreeRootId } from '@contember/react-binding'
-import { ChoiceFieldData } from '../ChoiceFieldData'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useDesugaredOptionPath } from './useDesugaredOptionPath'
 import { useTopLevelOptionAccessors } from './useTopLevelOptionAccessor'
@@ -10,9 +9,11 @@ import { renderDynamicChoiceFieldStatic } from '../renderDynamicChoiceFieldStati
 import { useCreateOptionsFilter } from './useCreateOptionsFilter'
 import Fuse from 'fuse.js'
 
+import { ChoiceFieldOptions } from '../ChoiceFieldOptions'
+
 export interface SelectOptions {
-	options: ChoiceFieldData.Options<EntityAccessor>,
-	allOptions: ChoiceFieldData.Options<EntityAccessor>,
+	options: ChoiceFieldOptions<EntityAccessor>,
+	allOptions: ChoiceFieldOptions<EntityAccessor>,
 	onSearch: (input: string) => void,
 	isLoading: boolean
 }
@@ -56,7 +57,7 @@ const useMergedEntities = (
 
 const useFuseFilteredOptions = (
 	optionProps: BaseDynamicChoiceField,
-	options: ChoiceFieldData.Options<EntityAccessor>,
+	options: ChoiceFieldOptions<EntityAccessor>,
 	input: string | undefined,
 ) => {
 	const fuseOpts = optionProps.fuseOptions ?? true
@@ -82,7 +83,7 @@ const useFuseFilteredOptions = (
 
 const useCustomTransformedOptions = (
 	optionProps: BaseDynamicChoiceField,
-	options: ChoiceFieldData.Options<EntityAccessor>,
+	options: ChoiceFieldOptions<EntityAccessor>,
 	input: string | undefined,
 ) => {
 	const transformFn = optionProps.transformOptions
@@ -95,7 +96,7 @@ const RENDERED_OPTIONS_LIMIT = 100
 
 const useSlicedOptions = (
 	optionProps: BaseDynamicChoiceField,
-	options: ChoiceFieldData.Options<EntityAccessor>,
+	options: ChoiceFieldOptions<EntityAccessor>,
 ) => {
 	const renderedLimit = optionProps.renderedOptionsLimit ?? RENDERED_OPTIONS_LIMIT
 	return useMemo(() => {
@@ -166,10 +167,7 @@ const useOptionsLoader = (
 
 		(async () => {
 			const filter = createFilter(debouncedInput)
-			const { subTree } = renderDynamicChoiceFieldStatic({
-				...optionProps,
-				createNewForm: undefined,
-			}, environment, filter)
+			const { subTree } = renderDynamicChoiceFieldStatic(optionProps, environment, filter)
 			const treeRootId = await extendTree(subTree)
 
 			if (treeRootId && inputRef.current === debouncedInput) {

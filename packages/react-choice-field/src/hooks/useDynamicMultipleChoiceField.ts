@@ -1,11 +1,10 @@
-import { EntityAccessor, SugaredRelativeEntityList, useEntityList, useSortedEntities } from '@contember/react-binding'
+import { SugaredRelativeEntityList, useEntityList, useSortedEntities } from '@contember/react-binding'
 import { useCallback } from 'react'
 import { BaseDynamicChoiceField } from '../BaseDynamicChoiceField'
-import type { ChoiceFieldData } from '../ChoiceFieldData'
 import { useSelectOptions } from './useSelectOptions'
-import { useOnAddNew } from './useOnAddNew'
 import { DynamicMultipleChoiceWithConnectingEntityFieldProps } from './useDynamicMultipleChoiceWithConnectingEntityField'
 import { useCurrentValues } from './useCurrentValues'
+import { DynamicMultiChoiceFieldRendererProps } from '../Renderers'
 
 export type DynamicMultipleChoiceFieldProps =
 	& SugaredRelativeEntityList
@@ -17,7 +16,7 @@ export type DynamicMultipleChoiceFieldProps =
 
 export const useDynamicMultipleChoiceField = (
 	props: DynamicMultipleChoiceFieldProps,
-): ChoiceFieldData.MultipleChoiceFieldMetadata<EntityAccessor> => {
+): DynamicMultiChoiceFieldRendererProps => {
 	const currentValueListAccessor = useEntityList(props)
 	const currentlyChosenEntities = useSortedEntities(currentValueListAccessor, props.sortableBy)
 
@@ -41,17 +40,11 @@ export const useDynamicMultipleChoiceField = (
 		errors: currentValueListAccessor.errors?.errors,
 		onClear: clear,
 		onAdd: useCallback(value => {
-			getCurrentValues().connectEntity(value.value)
+			getCurrentValues().connectEntity(value)
 		}, [getCurrentValues]),
 		onRemove: useCallback(value => {
-			getCurrentValues().disconnectEntity(value.value)
+			getCurrentValues().disconnectEntity(value)
 		}, [getCurrentValues]),
-		onAddNew: useOnAddNew({
-			...props,
-			connect: useCallback(entity => {
-				getCurrentValues().connectEntity(entity)
-			}, [getCurrentValues]),
-		}),
 		onMove: props.sortableBy ? currentlyChosenEntities.moveEntity : undefined,
 		onSearch,
 		isLoading,

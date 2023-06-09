@@ -8,8 +8,8 @@ import {
 	SugaredRelativeSingleField,
 } from '@contember/react-binding'
 import { ReactElement, ReactNode } from 'react'
-import { ChoiceFieldData } from './ChoiceFieldData'
 import { SelectFuseOptionsProps } from './hooks/useFuseFilteredOptions'
+import { ChoiceFieldOptions } from './ChoiceFieldOptions'
 
 /** @deprecated use optionLabel */
 export interface LegacyChoiceFieldWithOptionRenderer {
@@ -50,18 +50,15 @@ export type BaseDynamicChoiceFieldOptions =
 	| DynamicChoiceFieldWithCustomLabelProps
 	| LegacyChoiceFieldWithOptionRenderer
 
-export type OpenCreateNewFormDialog = (options: { entity: EntityAccessor, createNewForm?: ReactElement }) => Promise<boolean>
 
 export type BaseDynamicChoiceField =
 	& BaseDynamicChoiceFieldOptions
 	& SelectFuseOptionsProps<EntityAccessor>
 	& {
 		searchByFields?: ChoiceFieldSearchByFields
-		createNewForm?: ReactElement
-		openCreateNewFormDialog?: OpenCreateNewFormDialog
 		lazy?: LazyChoiceFieldSettings
 		renderedOptionsLimit?: number
-		transformOptions?: (data: ChoiceFieldData.Options<EntityAccessor>, input: string | undefined) => ChoiceFieldData.Options<EntityAccessor>
+		transformOptions?: (data: ChoiceFieldOptions<EntityAccessor>, input: string | undefined) => ChoiceFieldOptions<EntityAccessor>
 		sortableBy?: SugaredFieldProps['field']
 	}
 

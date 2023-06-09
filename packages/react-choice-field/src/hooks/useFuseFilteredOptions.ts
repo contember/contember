@@ -1,18 +1,18 @@
-import { ChoiceFieldData } from '../ChoiceFieldData'
 import { useMemo } from 'react'
 import Fuse from 'fuse.js'
+import { ChoiceFieldOptions, ChoiceFieldSingleOption } from '../ChoiceFieldOptions'
 
 export interface SelectFuseOptionsProps<T> {
 	fuseOptions?:
-		| Fuse.IFuseOptions<ChoiceFieldData.SingleOption<T>>
+		| Fuse.IFuseOptions<ChoiceFieldSingleOption<T>>
 		| boolean
 }
 
 export const useFuseFilteredOptions = <T>(
 	optionProps: SelectFuseOptionsProps<T>,
-	options: ChoiceFieldData.Options<T>,
+	options: ChoiceFieldOptions<T>,
 	input: string,
-): ChoiceFieldData.Options<T> => {
+): ChoiceFieldOptions<T> => {
 	const fuseOpts = optionProps.fuseOptions ?? true
 	const fuse = useMemo(
 		() => {

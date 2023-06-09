@@ -1,14 +1,8 @@
-import {
-	Component,
-	Field,
-	FieldValue,
-	OptionallyVariableFieldValue,
-	SugaredRelativeSingleField,
-} from '@contember/react-binding'
-import { FunctionComponent, ReactNode } from 'react'
-import type { ChoiceFieldData } from './ChoiceFieldData'
+import { Component, Field, FieldValue, OptionallyVariableFieldValue, SugaredRelativeSingleField } from '@contember/react-binding'
+import { ComponentType, ReactNode } from 'react'
 import { useStaticSingleChoiceField } from './hooks/useStaticSingleChoiceField'
 import { SelectFuseOptionsProps } from './hooks/useFuseFilteredOptions'
+import { SingleChoiceFieldRendererProps } from './Renderers'
 
 export interface StaticOption {
 	label: ReactNode
@@ -33,9 +27,19 @@ export type StaticSingleChoiceFieldProps =
 	}
 
 
-export const StaticSingleChoiceField: FunctionComponent<StaticSingleChoiceFieldProps & ChoiceFieldData.SingleChoiceFieldProps<FieldValue>> =
-	Component(
-		props => props.children(useStaticSingleChoiceField(props)),
-		props => <Field {...props} />,
-		'StaticSingleChoiceField',
-	)
+export type AllStaticSingleChoiceFieldRendererProps<OwnRendererProps extends {}> =
+	& StaticSingleChoiceFieldProps
+	& SingleChoiceFieldRendererProps<FieldValue>
+	& OwnRendererProps
+
+export const createStaticSingleChoiceField = <RendererProps extends {}>({ FieldRenderer }: {
+	FieldRenderer: ComponentType<AllStaticSingleChoiceFieldRendererProps<RendererProps>>
+}) => Component<StaticSingleChoiceFieldProps & Omit<RendererProps, keyof AllStaticSingleChoiceFieldRendererProps<{}>>>(
+	props => {
+		const rendererProps = useStaticSingleChoiceField(props)
+
+		return <FieldRenderer {...props as StaticSingleChoiceFieldProps & RendererProps} {...rendererProps} />
+	},
+	props => <Field {...props} />,
+	'StaticSingleChoiceField',
+)

@@ -9,10 +9,9 @@ import {
 } from '@contember/react-binding'
 import { useCallback, useMemo } from 'react'
 import { BaseDynamicChoiceField, BaseDynamicChoiceFieldOptions } from '../BaseDynamicChoiceField'
-import type { ChoiceFieldData } from '../ChoiceFieldData'
 import { useSelectOptions } from './useSelectOptions'
-import { useOnAddNew } from './useOnAddNew'
 import { useCurrentValues } from './useCurrentValues'
+import { SingleChoiceFieldRendererProps } from '../Renderers'
 
 export type DynamicSingleChoiceFieldProps =
 	& SugaredRelativeSingleEntity
@@ -25,7 +24,7 @@ export type SimpleDynamicSingleChoiceFieldProps =
 
 export const useDynamicSingleChoiceField = (
 	props: DynamicSingleChoiceFieldProps,
-): ChoiceFieldData.SingleChoiceFieldMetadata<EntityAccessor> => {
+): SingleChoiceFieldRendererProps<EntityAccessor> => {
 	const [currentValueEntity, currentValueParent, currentValueFieldName] = useCurrentAccessors(props)
 	const currentlyChosenEntities = useMemo(
 		() => currentValueEntity.existsOnServer || currentValueEntity.hasUnpersistedChanges ? [currentValueEntity] : [],
@@ -41,17 +40,11 @@ export const useDynamicSingleChoiceField = (
 		errors: currentValueEntity.errors?.errors,
 		currentValue: currentValues.length ? currentValues[0] : null,
 		onSelect: value => {
-				currentValueParent.connectEntityAtField(currentValueFieldName, value.value)
+				currentValueParent.connectEntityAtField(currentValueFieldName, value)
 		},
 		onClear: () => {
 			currentValueParent.disconnectEntityAtField(currentValueFieldName)
 		},
-		onAddNew: useOnAddNew({
-			...props,
-			connect: useCallback(entity => {
-				currentValueParent.connectEntityAtField(currentValueFieldName, entity)
-			}, [currentValueFieldName, currentValueParent]),
-		}),
 		onSearch,
 		isLoading,
 	}

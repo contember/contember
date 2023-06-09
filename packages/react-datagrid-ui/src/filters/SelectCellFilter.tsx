@@ -1,6 +1,6 @@
 import { Checkbox, FieldContainer, Stack } from '@contember/ui'
 import { useMemo } from 'react'
-import { ChoiceFieldData } from '@contember/react-choice-field'
+import { ChoiceFieldOptions } from '@contember/react-choice-field'
 import { MultiSelectFieldInner } from '@contember/react-choice-field-ui'
 import { dataGridCellsDictionary } from '../dict/dataGridCellsDictionary'
 import { EntityAccessor } from '@contember/react-binding'
@@ -18,7 +18,7 @@ export type SelectCellFilterProps =
  * @group Data grid
  */
 export const SelectCellFilter = ({ filter, setFilter, options, allOptions, onSearch, isLoading }: SelectCellFilterProps) => {
-	const currentValues = useMemo<ChoiceFieldData.Options<EntityAccessor>>(() => {
+	const currentValues = useMemo<ChoiceFieldOptions<EntityAccessor>>(() => {
 		return allOptions.filter(it => filter.id.includes(it.value.id))
 	}, [filter.id, allOptions])
 	const formatMessage = useMessageFormatter(dataGridCellsDictionary)
@@ -28,8 +28,8 @@ export const SelectCellFilter = ({ filter, setFilter, options, allOptions, onSea
 			<MultiSelectFieldInner
 				label={undefined}
 				data={options}
-				onAdd={(val: ChoiceFieldData.SingleOption<EntityAccessor>) => setFilter({ ...filter, id: [...filter.id, val.value.id] })}
-				onRemove={val => setFilter({ ...filter, id: filter.id.filter(it => it !== val.value.id) })}
+				onAdd={(val: EntityAccessor) => setFilter({ ...filter, id: [...filter.id, val.id] })}
+				onRemove={val => setFilter({ ...filter, id: filter.id.filter(it => it !== val.id) })}
 				errors={undefined}
 				currentValues={currentValues}
 				onClear={() => {

@@ -40,14 +40,6 @@ export const renderDynamicChoiceFieldStatic = (props: BaseDynamicChoiceField, en
 				<EntityListSubTree entities={entityList} {...entityList} expectedMutation="none">
 					{renderedOption}
 				</EntityListSubTree>
-				{props.createNewForm && (
-					<EntityListSubTree entities={{
-						entityName: entityList.entityName,
-					}} limit={0} expectedMutation={'none'}>
-						{props.createNewForm}
-						{renderedOption}
-					</EntityListSubTree>
-				)}
 			</>
 		)
 
@@ -76,15 +68,6 @@ export const renderDynamicChoiceFieldStatic = (props: BaseDynamicChoiceField, en
 				>
 					{renderedOption}
 				</EntityListSubTree>
-				{props.createNewForm && (
-					<EntityListSubTree entities={{
-						entityName: fieldList.entityName,
-					}} limit={0} expectedMutation={'none'}>
-						{props.createNewForm}
-						{searchByFields}
-						{renderedOptionBase}
-					</EntityListSubTree>
-				)}
 			</>
 		)
 

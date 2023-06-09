@@ -24,10 +24,7 @@ export const useCurrentlyChosenEntities = (
 			return
 		}
 		(async () => {
-			const { subTree } = renderDynamicChoiceFieldStatic({
-				...optionProps,
-				createNewForm: undefined,
-			}, environment, filter)
+			const { subTree } = renderDynamicChoiceFieldStatic(optionProps, environment, filter)
 			const treeRootId = await extendTree(subTree)
 			if (treeRootId) {
 				setRenderedState({

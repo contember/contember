@@ -15,6 +15,7 @@ export interface UnconstrainedQualifiedSingleEntity
 		EntityCreationParameters,
 		SingleEntityEventListeners {
 	isCreating: true
+	isUnpersisted: boolean
 	hasOneRelationPath: HasOneRelation[]
 }
 
@@ -28,6 +29,7 @@ export interface UnsugarableUnconstrainedQualifiedSingleEntity
 		UnsugarableEntityCreationParameters,
 		UnsugarableSingleEntityEventListeners {
 	isCreating: true
+	isUnpersisted?: boolean
 	// Deliberately leaving out UnsugarableHasOneRelation
 }
 

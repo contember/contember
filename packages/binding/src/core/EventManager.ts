@@ -226,7 +226,10 @@ export class EventManager {
 
 				if (parent === undefined) {
 					this.rootsWithPendingUpdates.add(justUpdated)
-					this.dirtinessTracker.increaseBy(changesDelta)
+
+					if (!(justUpdated.blueprint.type === 'subTree' && justUpdated.blueprint.marker.parameters.isCreating && justUpdated.blueprint.marker.parameters.isUnpersisted)) {
+						this.dirtinessTracker.increaseBy(changesDelta)
+					}
 				} else {
 					if (!parent.childrenWithPendingUpdates) {
 						parent.childrenWithPendingUpdates = new Set()

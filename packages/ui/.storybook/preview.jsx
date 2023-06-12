@@ -1,7 +1,7 @@
 // @ts-check
 import React, { useState } from 'react'
 import { Select } from '../stories/ui/Select'
-import './index.sass'
+import './index.css'
 
 /** @type { import('@storybook/react').Preview } */
 export default {

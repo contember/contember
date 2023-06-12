@@ -17,13 +17,6 @@ export default defineConfig({
 			treeshake: { moduleSideEffects: true },
 		},
 	},
-	css: {
-		preprocessorOptions: {
-			sass: {
-				charset: false,
-			},
-		},
-	},
 	resolve: {
 		alias: entries.map(([packageName, packagePath]) => ({
 			find: `@contember/${packageName}`,

@@ -26,7 +26,7 @@ export const ToggleSidebarButton = memo<ToggleSidebarButtonProps>(({
 		<Button
 			intent="default"
 			flow="squarish"
-			className={useClassName(componentClassName, [className, 'layout-slot', 'synthetic-layout-slot'])}
+			className={useClassName(componentClassName, [className, 'layout-slot'])}
 			onClick={useReferentiallyStableCallback(() => {
 				panelState?.visibility === 'visible' ? hide(panel) : show(panel)
 			})}

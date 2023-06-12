@@ -1,5 +1,7 @@
 {
 	"name": "playwright-tests",
 	"private": "true",
-	"sideEffects": true
+	"sideEffects": [
+		"*.css"
+	]
 }

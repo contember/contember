@@ -9,7 +9,7 @@ import type {
 	Size,
 } from '../../../types'
 import { toEnumClass, toEnumViewClass, toSchemeClass, toStateClass, toThemeClass, toViewClass } from '../../../utils'
-import { Spinner } from '../../Spinner'
+import { Spinner } from '../../Spinner/Spinner'
 import type { ButtonDistinction, ButtonElevation, ButtonFlow } from './Types'
 
 export interface ButtonBasedProps extends Omit<HTMLButtonElementProps, 'ref' | 'size'> {

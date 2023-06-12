@@ -1,6 +1,6 @@
 import { AnchorButton, Icon, LoginEntrypoint, Project, runReactApp } from '@contember/admin'
 import { customLoginConfig } from '../src/config'
-import './index.sass'
+import './index.css'
 
 const Entry = () => {
 	const configElement = document.getElementById('contember-config')

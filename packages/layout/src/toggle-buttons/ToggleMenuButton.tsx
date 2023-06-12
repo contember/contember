@@ -23,7 +23,7 @@ export const ToggleMenuButton = memo<ToggleMenuButtonProps>(({
 	return (
 		<Button
 			distinction="seamless"
-			className={useClassName(componentClassName, [className, 'layout-slot', 'synthetic-layout-slot'])}
+			className={useClassName(componentClassName, [className, 'layout-slot'])}
 			flow="squarish"
 			onClick={useReferentiallyStableCallback(() => {
 				panelState?.visibility === 'visible' ? hide(panel) : show(panel)

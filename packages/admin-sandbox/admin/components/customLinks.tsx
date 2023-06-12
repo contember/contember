@@ -14,8 +14,7 @@ import {
 	TextField,
 	useEditor,
 } from '@contember/admin'
-import * as React from 'react'
-import './editorButton.sass'
+import './editorButton.css'
 
 export const LinkTarget = Component(() => (
 		<DiscriminatedBlocks field={'link.type'} label={undefined}>

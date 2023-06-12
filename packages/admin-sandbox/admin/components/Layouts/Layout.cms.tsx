@@ -3,7 +3,6 @@
 import { DimensionsRenderer, DimensionsSwitcher, DropdownContentContainerProvider, toThemeClass } from '@contember/admin'
 import '@contember/brand/index.css'
 import { CMSLayout } from '@contember/cms-layout'
-import '@contember/cms-layout/index.css'
 import { useMemo } from 'react'
 import { useDirectives } from '../Directives'
 import { Slots } from '../Slots'

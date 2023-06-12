@@ -4,7 +4,7 @@
 	"version": "0.0.0",
 	"type": "module",
 	"sideEffects": [
-		"*.sass"
+		"*.css"
 	],
 	"main": "./dist/production/index.js",
 	"exports": {
@@ -15,7 +15,11 @@
 				"default": "./dist/production/index.js"
 			}
 		},
-		"./index.css": "./dist/assets/index.css",
+		"./index.css": {
+			"development": "./src/index.css",
+			"production": "./dist/assets/index.css",
+			"default": "./dist/assets/index.css"
+		},
 		"./style.css": "./dist/assets/index.css"
 	},
 	"typings": "./dist/types/index.d.ts",
@@ -27,8 +31,7 @@
 		"build": "yarn build:js:dev && yarn build:js:prod && yarn build:css",
 		"build:js:dev": "NODE_ENV=development vite build --mode development",
 		"build:js:prod": "vite build --mode production",
-		"build:css": "sass --no-charset src/index.sass:dist/assets/index.css && yarn build:css:copy-fonts",
-		"build:css:copy-fonts": "rm -rf \"dist/assets/Inter\" && cp -R \"src/assets/Inter\" \"dist/assets/Inter\"",
+		"build:css": "vite build --config vite.config.css.js",
 		"ae:build": "api-extractor run --local",
 		"ae:test": "api-extractor run -v",
 		"storybook": "storybook dev -p 6006",
@@ -53,14 +56,12 @@
 	},
 	"devDependencies": {
 		"@babel/core": "7.15.5",
-		"@mangoweb/sass-base": "0.0.8",
 		"@storybook/addon-actions": "7.0.7",
 		"@storybook/addon-essentials": "7.0.7",
 		"@storybook/addon-interactions": "^7.0.7",
 		"@storybook/addon-links": "7.0.7",
 		"@storybook/addons": "7.0.7",
 		"@storybook/blocks": "^7.0.7",
-		"@storybook/preset-scss": "1.0.3",
 		"@storybook/react": "7.0.7",
 		"@storybook/react-vite": "^7.0.7",
 		"@storybook/testing-library": "^0.0.14-next.2",
@@ -76,8 +77,6 @@
 		"react": "^18",
 		"react-dom": "^18",
 		"resolve-url-loader": "4.0.0",
-		"sass": "1.36.0",
-		"sass-loader": "10.1.1",
 		"source-map-loader": "2.0.1",
 		"storybook": "^7.0.7",
 		"style-loader": "2.0.0",

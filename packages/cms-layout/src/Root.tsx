@@ -124,8 +124,8 @@ export const Root = memo(({
 											direction="horizontal"
 											gap={gapAtContainerWidth}
 										>
-											<Back className="cms-header-back" />
-											<Title className="cms-header-title" />
+											<Back className={classNameFor('header-back')} />
+											<Title className={classNameFor('header-title')} />
 										</ResponsiveStack>
 										<HeaderCenter />
 									</div>
@@ -166,7 +166,7 @@ export const Root = memo(({
 									{(setHasOneOf(activeSlots, [slotTargets.SidebarLeftHeader, slotTargets.Switchers]) || behavior === 'modal') && (
 										<Layout.PanelHeader className={classNameFor('sidebar-left-header')}>
 											<Stack className={classNameFor('sidebar-left-header-content')} align="center" justify="space-between" direction="horizontal">
-												{behavior === 'modal' && <ModalLogo className="synthetic-layout-slot" />}
+												{behavior === 'modal' && <ModalLogo />}
 
 												{setHasOneOf(activeSlots, [slotTargets.SidebarLeftHeader]) && <SidebarLeftHeader />}
 												{setHasOneOf(activeSlots, [slotTargets.Switchers]) && <Switchers />}

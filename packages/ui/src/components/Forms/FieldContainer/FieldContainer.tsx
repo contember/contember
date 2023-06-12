@@ -2,9 +2,9 @@ import { useClassNameFactory } from '@contember/utilities'
 import { CSSProperties, memo, ReactNode } from 'react'
 import type { Size } from '../../../types'
 import { toEnumClass, toEnumViewClass, toThemeClass } from '../../../utils'
+import { ErrorList, ErrorListProps } from '../../ErrorList/ErrorList'
 import { Stack, StackProps } from '../../Stack'
 import { Description, Label } from '../../Typography'
-import { ErrorList, ErrorListProps } from '../ErrorList'
 import type { FieldContainerLabelPosition } from './Types'
 
 export type FieldContainerProps =

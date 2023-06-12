@@ -1,6 +1,5 @@
 export * from './Button'
 export * from './Checkbox'
-export * from './ErrorList'
 export * from './FieldContainer'
 export * from './FieldSet'
 export * from './Hooks'

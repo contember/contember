@@ -2,7 +2,6 @@ import { Identity2023 } from '@contember/brand'
 import { useClassNameFactory } from '@contember/utilities'
 import { ReactNode, useState } from 'react'
 import { Icon } from '../Icon'
-import './DevBar.sass'
 
 export const DevBar = ({ children }: { children: ReactNode }) => {
 	const componentClassName = useClassNameFactory('devBar')

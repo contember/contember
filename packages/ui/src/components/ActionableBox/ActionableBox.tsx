@@ -2,7 +2,7 @@ import { useClassNameFactory } from '@contember/utilities'
 import { memo, MouseEvent as ReactMouseEvent, ReactNode, useMemo } from 'react'
 import { HTMLDivElementProps } from '../../types'
 import { Box } from '../Box'
-import { Dropdown, DropdownProps } from '../Dropdown'
+import { Dropdown, DropdownProps } from '../Dropdown/Dropdown'
 import { Button, ButtonOwnProps } from '../Forms'
 import { Icon, IconProps } from '../Icon'
 

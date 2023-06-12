@@ -16,6 +16,7 @@ import { Context } from 'react';
 import { CSSProperties } from 'react';
 import { DetailedReactHTMLElement } from 'react';
 import { DragEventHandler } from 'react';
+import { ElementType } from 'react';
 import { FocusEventHandler } from 'react';
 import { FormEventHandler } from 'react';
 import { ForwardedRef } from 'react';
@@ -30,7 +31,9 @@ import { MemoExoticComponent } from 'react';
 import { MouseEvent as MouseEvent_2 } from 'react';
 import { MouseEventHandler } from 'react';
 import { NamedExoticComponent } from 'react';
+import { NestedClassName } from '@contember/utilities';
 import { PointerEventHandler } from 'react';
+import { PolymorphicComponentPropsWithRef } from '@contember/utilities';
 import { PropsWithChildren } from 'react';
 import { ReactElement } from 'react';
 import { ReactEventHandler } from 'react';
@@ -1621,6 +1624,10 @@ export interface HTMLInputElementProps extends React.InputHTMLAttributes<HTMLInp
 }
 
 // @public (undocumented)
+export interface HTMLLabelElementProps extends React.LabelHTMLAttributes<HTMLLabelElement> {
+}
+
+// @public (undocumented)
 export interface HTMLParagraphElementProps extends React.HTMLAttributes<HTMLParagraphElement> {
 }
 
@@ -1987,6 +1994,13 @@ export type NumberInputProps = TextInputProps<number>;
 
 // @public (undocumented)
 export type OpenDialog<Result> = (options: DialogSettings<Result>) => Promise<Result | undefined>;
+
+// @public (undocumented)
+export type OwnVisuallyHiddenProps = PropsWithChildren<{
+    hidden?: boolean;
+    className?: NestedClassName;
+    componentClassName?: string;
+}>;
 
 // @public @deprecated (undocumented)
 export const PageLayoutContent: MemoExoticComponent<({ children, layout, pageContentLayout }: LayoutPageContentProps) => JSX.Element>;
@@ -2861,9 +2875,15 @@ export interface ValidationStateProps {
 export type VisuallyDependentControlProps = ControlStateProps & ControlDisplayProps & Pick<ValidationStateProps, 'validationState'>;
 
 // @public (undocumented)
-export const VisuallyHidden: NamedExoticComponent<    {
-children?: ReactNode;
-}>;
+export const VisuallyHidden: VisuallyHiddenComponentType;
+
+// @public (undocumented)
+export type VisuallyHiddenComponentType = (<C extends ElementType = 'span'>(props: VisuallyHiddenProps<C>) => React.ReactElement | null) & {
+    displayName?: string | undefined;
+};
+
+// @public (undocumented)
+export type VisuallyHiddenProps<C extends ElementType> = PolymorphicComponentPropsWithRef<C, OwnVisuallyHiddenProps>;
 
 // @public (undocumented)
 export const visuallyHiddenStyle: CSSProperties;

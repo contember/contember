@@ -1,15 +1,15 @@
 :where(.cui-brand-icon) {
-  --scale: 1;
+	--scale: 1;
 	--aspect-ratio: 1;
-  --square-to-circle-ratio: 1.1284;
-  --square-to-circle-margin: calc((var(--square-to-circle-ratio) - 1) / 2);
-  stroke: currentColor;
-  display: inline-block;
-  flex-grow: 0;
-  flex-shrink: 0;
-  height: calc(1em * var(--scale));
-  margin: calc(-1em * var(--square-to-circle-margin));
-  vertical-align: middle;
+	--square-to-circle-ratio: 1.1284;
+	--square-to-circle-margin: calc((var(--square-to-circle-ratio) - 1) / 2);
+	stroke: currentColor;
+	display: inline-block;
+	flex-grow: 0;
+	flex-shrink: 0;
+	height: calc(1em * var(--scale));
+	margin: calc(-1em * var(--square-to-circle-margin));
+	vertical-align: middle;
 	width: calc(1em * var(--scale) * var(--aspect-ratio));
 }
 :where(.cui-brand-logo-type) {
@@ -21,5 +21,5 @@
 	flex-shrink: 0;
 	height: calc(1em * var(--scale, 1));
 	vertical-align: middle;
-  width: calc(1em * var(--scale, 1) * var(--aspect-ratio));
+	width: calc(1em * var(--scale, 1) * var(--aspect-ratio));
 }

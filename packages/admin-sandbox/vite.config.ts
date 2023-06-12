@@ -6,11 +6,4 @@ export default defineConfig({
 	root: 'admin',
 	plugins: [react()],
 	resolve: resolveConfig,
-	css: {
-		preprocessorOptions: {
-			sass: {
-				charset: false,
-			},
-		},
-	},
 })

@@ -38,6 +38,7 @@
 		"@contember/react-binding-ui": "workspace:*",
 		"@contember/react-choice-field-ui": "workspace:*",
 		"@contember/react-datagrid-ui": "workspace:*",
+		"@contember/react-form-fields-ui": "workspace:*",
 		"@contember/ui": "workspace:*",
 		"@contember/utilities": "workspace:*"
 	},

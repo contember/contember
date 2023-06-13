@@ -1,5 +1,5 @@
-import { useClassNameFactory } from '@contember/utilities'
-import { CSSProperties, memo, ReactNode, useEffect, useMemo, useRef, useState } from 'react'
+import { px, useClassNameFactory } from '@contember/utilities'
+import { CSSProperties, ReactNode, memo, useEffect, useMemo, useRef, useState } from 'react'
 import { toEnumClass, toSchemeClass, toThemeClass } from '../../utils'
 import { SectionTabs, useSectionTabs } from '../SectionTabs'
 import { TitleBar, TitleBarProps } from '../TitleBar'
@@ -12,8 +12,6 @@ export interface LayoutPageProps extends Omit<TitleBarProps, 'after' | 'children
 	afterTitle?: TitleBarProps['after']
 	children?: ReactNode
 	fit?: 'content' | 'none'
-	/** @deprecated Use `pageContentLayout` prop */
-	layout?: LayoutPageContentProps['pageContentLayout']
 	pageContentLayout?: LayoutPageContentProps['pageContentLayout']
 	side?: ReactNode
 	title?: ReactNode
@@ -27,8 +25,6 @@ export const LayoutPage = memo(({
 	afterTitle,
 	children,
 	fit = 'content',
-	headingProps,
-	layout,
 	navigation,
 	pageContentLayout,
 	side,
@@ -78,7 +74,8 @@ export const LayoutPage = memo(({
 			toThemeClass(themeContent ?? theme, themeControls ?? theme),
 			toSchemeClass(scheme),
 		])}>
-			{(title || actions) && <TitleBar after={afterTitle === undefined ? hasTabs ? <SectionTabs /> : undefined : afterTitle} navigation={navigation} actions={actions} headingProps={headingProps}>
+			<style>{`.cui-layout-chrome { --cui-content-offset-top: ${px(contentOffsetTop)};}`}</style>
+			{(title || actions) && <TitleBar after={afterTitle === undefined ? hasTabs ? <SectionTabs /> : undefined : afterTitle} navigation={navigation} actions={actions}>
 				{title}
 			</TitleBar>}
 			<div
@@ -87,9 +84,8 @@ export const LayoutPage = memo(({
 					toEnumClass('fit-', fit),
 					showDivider ? 'view-aside-divider' : undefined,
 				])}
-				style={useMemo(() => ({ '--cui-content-offset-top': `${contentOffsetTop}px` } as CSSProperties), [contentOffsetTop])}
 			>
-				<LayoutPageContent pageContentLayout={pageContentLayout ?? layout}>
+				<LayoutPageContent pageContentLayout={pageContentLayout}>
 					{children}
 				</LayoutPageContent>
 				{side && <LayoutPageAside>{side}</LayoutPageAside>}

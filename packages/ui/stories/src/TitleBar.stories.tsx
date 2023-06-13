@@ -7,7 +7,7 @@ export default {
 	title: 'Layout/TitleBar',
 	component: TitleBar,
 	argTypes: {
-		...disabledControlsForAttributes<typeof TitleBar>('actions', 'headingProps', 'navigation'),
+		...disabledControlsForAttributes<typeof TitleBar>('actions', 'navigation'),
 		children: stringControl(),
 	},
 } as ComponentMeta<typeof TitleBar>

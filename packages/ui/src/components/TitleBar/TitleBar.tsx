@@ -11,14 +11,13 @@ export interface TitleBarProps extends ThemeScheme {
 	after?: ReactNode
 	navigation?: ReactNode // This can contain any number of buttons but only buttons
 	children: ReactNode
-	headingProps?: HeadingProps
 	actions?: ReactNode // This can contain any number of buttons but only buttons
 }
 
 /**
  * @group UI
  */
-export const TitleBar = memo(({ after, navigation, children, headingProps, actions, ...props }: TitleBarProps) => {
+export const TitleBar = memo(({ after, navigation, children, actions, ...props }: TitleBarProps) => {
 	const componentClassName = useClassNameFactory('titleBar')
 	const {
 		scheme,
@@ -45,7 +44,7 @@ export const TitleBar = memo(({ after, navigation, children, headingProps, actio
 			)}
 			<div className={componentClassName('in')}>
 				<div className={componentClassName('heading')}>
-					<Heading {...{ depth: 2, ...headingProps }}>{children}</Heading>
+					{children}
 				</div>
 				{actions && (
 					<div className={componentClassName('actions')}>

@@ -1,5 +1,5 @@
 import { useComposeRef, useElementSize } from '@contember/react-utils'
-import { PolymorphicComponentPropsWithRef, PolymorphicRef, dataAttribute, px, useClassNameFactory } from '@contember/utilities'
+import { NestedClassName, PolymorphicComponentPropsWithRef, PolymorphicRef, dataAttribute, px, useClassNameFactory } from '@contember/utilities'
 import { CSSProperties, ElementType, ReactNode, forwardRef, memo, useMemo, useRef } from 'react'
 import { InsetsProvider, combineElementInsets, useContainerInsetsContext, useSafeAreaInsetsContext } from '../insets'
 import { Layout, OwnContainerProps } from '../layout'
@@ -8,7 +8,9 @@ export interface OwnResponsiveAppLayoutProps extends OwnContainerProps {
 	minimumFooterHeight?: number;
 	minimumHeaderHeight?: number;
 	header?: ReactNode;
+	headerClassName?: NestedClassName;
 	footer?: ReactNode;
+	footerClassName?: NestedClassName;
 }
 
 export type ResponsiveAppLayoutProps<C extends ElementType> =
@@ -25,9 +27,11 @@ export const ResponsiveAppLayout: ResponsiveAppLayoutComponentType = memo(forwar
 		as,
 		children,
 		className,
-		header,
-		footer,
 		componentClassName = 'responsive-app-layout',
+		footer,
+		footerClassName,
+		header,
+		headerClassName,
 		...rest
 	}: ResponsiveAppLayoutProps<C>, forwardedRef: PolymorphicRef<C>) => {
 		const layoutHeaderRef = useRef<HTMLDivElement>(null)
@@ -86,7 +90,7 @@ export const ResponsiveAppLayout: ResponsiveAppLayoutComponentType = memo(forwar
 					<InsetsProvider
 						ref={layoutHeaderRef}
 						as="header"
-						className={classNameFor('header')}
+						className={classNameFor('header', headerClassName)}
 						bottom={headerInsets.bottom}
 						left={headerInsets.left}
 						right={headerInsets.right}
@@ -112,7 +116,7 @@ export const ResponsiveAppLayout: ResponsiveAppLayoutComponentType = memo(forwar
 					<InsetsProvider
 						as="footer"
 						ref={layoutFooterRef}
-						className={classNameFor('footer')}
+						className={classNameFor('footer', footerClassName)}
 						bottom={footerInsets.bottom}
 						left={footerInsets.left}
 						right={footerInsets.right}

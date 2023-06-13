@@ -57,8 +57,9 @@ export const useRefreshBlocks = ({ editor, sortedBlocksRef, sortableBy, contentF
 
 			for (const [blockId, pathRef] of blockElementPathRefs) {
 				const current = pathRef.current
-				const block = getBlockList().getChildEntityById(blockId)
-				if (!monolithicReferencesMode && referencesField) {
+				const blockList = getBlockList()
+				const block = blockList.hasEntityId(blockId) ? blockList.getChildEntityById(blockId) : null
+				if (block && !monolithicReferencesMode && referencesField) {
 					for (const reference of block.getEntityList(referencesField)) {
 						knownReferences.set(reference.id, [reference, block])
 					}
@@ -67,13 +68,13 @@ export const useRefreshBlocks = ({ editor, sortedBlocksRef, sortableBy, contentF
 					const prev = cleanupStack
 					cleanupStack = () => {
 						prev()
-						block.deleteEntity()
+						block?.deleteEntity()
 						pathRef.unref()
 						blockElementPathRefs.delete(blockId)
 					}
 				}
 
-				if (current === null || current.length > 1) {
+				if (current === null || current.length > 1 || block === null) {
 					cleanUp()
 				} else {
 					const newBlockOrder = current[0]

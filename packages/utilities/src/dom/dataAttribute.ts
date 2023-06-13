@@ -1,5 +1,5 @@
 export function dataAttribute(value: unknown): string | true | undefined {
-	if (value === false) {
+	if (value === false || value === undefined || value === null) {
 		return undefined
 	} else if (value === true) {
 		// Closest to HTML: https://html.spec.whatwg.org/multipage/common-microsyntaxes.html#boolean-attributes

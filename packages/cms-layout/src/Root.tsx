@@ -94,13 +94,13 @@ export const Root = memo(({
 			header={(
 				<GetLayoutPanelsStateContext.Consumer>
 					{({ panels }) => {
-						const toggleSidebarLeftButtonIsVisible: boolean = sidebarLeftPropsProp && isSidebarLeftActive && !sidebarLeftPropsProp.keepVisible && panels.get(PANEL_LEFT_NAME)?.behavior !== 'modal'
-						const toggleSidebarRightButtonIsVisible: boolean = sidebarRightPropsProp && isSidebarRightActive && (!sidebarRightPropsProp.keepVisible || panels.get(PANEL_RIGHT_NAME)?.behavior === 'modal' || panels.get(PANEL_RIGHT_NAME)?.visibility === 'hidden')
+						const toggleSidebarLeftButtonIsVisible: boolean = isSidebarLeftActive && sidebarLeftPropsProp && !sidebarLeftPropsProp.keepVisible && panels.get(PANEL_LEFT_NAME)?.behavior !== 'modal'
+						const toggleSidebarRightButtonIsVisible: boolean = isSidebarRightActive && sidebarRightPropsProp && (!sidebarRightPropsProp.keepVisible || panels.get(PANEL_RIGHT_NAME)?.behavior === 'modal' || panels.get(PANEL_RIGHT_NAME)?.visibility === 'hidden')
 						const toggleMenuButtonIsVisible: boolean = panels.get(PANEL_LEFT_NAME)?.behavior === 'modal'
 
 						return (
 							<>
-								{(setHasOneOf(activeSlots, [slotTargets.HeaderLeft, slotTargets.Logo]) || toggleSidebarLeftButtonIsVisible) && (
+								{((isSidebarLeftActive && sidebarLeftPropsProp && sidebarLeftPropsProp.keepVisible) || setHasOneOf(activeSlots, [slotTargets.HeaderLeft, slotTargets.Logo]) || toggleSidebarLeftButtonIsVisible) && (
 									<InsetsConsumer className={classNameFor('header-start')}>
 										<Stack className={classNameFor('header-start-content')} align="center" justify="space-between" direction="horizontal">
 											<Logo />
@@ -131,7 +131,7 @@ export const Root = memo(({
 									</div>
 								</InsetsConsumer>
 
-								{(setHasOneOf(activeSlots, [slotTargets.Actions, slotTargets.HeaderRight]) || toggleMenuButtonIsVisible || toggleSidebarRightButtonIsVisible) && (
+								{((isSidebarRightActive && sidebarRightPropsProp && sidebarRightPropsProp.keepVisible) || setHasOneOf(activeSlots, [slotTargets.Actions, slotTargets.HeaderRight]) || toggleMenuButtonIsVisible || toggleSidebarRightButtonIsVisible) && (
 									<InsetsConsumer className={classNameFor('header-end')}>
 										<Stack className={classNameFor('header-end-content')} align="center" justify="space-between" direction="horizontal">
 											{toggleSidebarRightButtonIsVisible && (

@@ -423,7 +423,7 @@
 /* Make content and title with max-width (1) */
 :where([data-content-has-max-width] .cui-cms-content-container) {
 	margin-right: auto;
-	max-width: min(100%, 720px);
+	max-width: min(100%, var(--panel-cms-content-max-width, 720px));
 	width: 100%;
 }
 

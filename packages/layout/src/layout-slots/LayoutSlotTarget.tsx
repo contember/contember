@@ -1,6 +1,6 @@
 
 import { useScopedConsoleRef } from '@contember/react-utils'
-import { NestedClassName, assert, isNonEmptyTrimmedString, useClassName } from '@contember/utilities'
+import { NestedClassName, assert, dataAttribute, isNonEmptyTrimmedString, useClassName } from '@contember/utilities'
 import { ElementType, memo, useLayoutEffect, useRef } from 'react'
 import { useLayoutSlotRegistryContext } from './Contexts'
 
@@ -39,8 +39,8 @@ export const LayoutSlotTarget = memo<LayoutSlotTargetProps>(
 		return (
 			<Container
 				ref={ref}
-				id={`layout-slot-${name}`}
-				className={useClassName([componentClassName, `layout-slot-${name}`], className)}
+				data-name={dataAttribute(name)}
+				className={useClassName([componentClassName], className)}
 				{...rest}
 			/>
 		)

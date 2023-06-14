@@ -11,6 +11,7 @@
 }
 
 :where(.cui-breadcrumbs-item) {
+	display: inline-flex; /* HOTFIX: Firefox */
 	color: var(--cui-color);
 }
 

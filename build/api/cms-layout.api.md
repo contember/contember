@@ -210,6 +210,14 @@ export const CMSLayout: {
             displayName: string;
         };
     };
+    PANEL_LEFT_NAME: "cms-sidebar-left";
+    PANEL_LEFT_WIDTH: 256;
+    PANEL_RIGHT_NAME: "cms-sidebar-right";
+    PANEL_RIGHT_WIDTH: 256;
+    PANEL_CONTENT_NAME: "cms-content";
+    PANEL_CONTENT_BASIS: 640;
+    PANEL_CONTENT_MIN_WIDTH: 480;
+    PANEL_CONTENT_MAX_WIDTH: 720;
     Content: NamedExoticComponent<CMSLayoutContentProps>;
     Root: MemoExoticComponent<({ breakpoint, children, className, componentClassName, contentProps: contentPropsProp, sidebarLeftProps: sidebarLeftPropsProp, sidebarRightProps: sidebarRightPropsProp, }: CMSLayoutRootProps) => JSX.Element>;
     Sidebar: CMSLayoutSidebarComponentType;

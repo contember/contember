@@ -119,3 +119,8 @@
 	--cui-control-focus-ring-box-shadow: 0 0 0 .2em var(--cui-control-border-color);
 	--cui-control-focus-ring-box-shadow-error: 0 0 0 .2em rgb(var(--cui-theme-danger-500));
 }
+
+:where(:root) {
+	--cui-rounding-grow: 0.05642;
+	--cui-gutter: calc(3 * var(--cui-gap));
+}

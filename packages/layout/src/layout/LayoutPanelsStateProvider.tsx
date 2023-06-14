@@ -25,7 +25,8 @@ export const LayoutPanelsStateProvider = memo<{ children: ReactNode }>(({ childr
 					return panels
 				}
 			} else {
-				throw new Error(`Record with ${panel} key does not exist`)
+				console.warn(`Record with ${panel} key does not exist`, { panels, updater })
+				return panels
 			}
 		})
 	}, [])

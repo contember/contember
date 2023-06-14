@@ -454,7 +454,11 @@ export interface OwnResponsiveAppLayoutProps extends OwnContainerProps {
     // (undocumented)
     footer?: ReactNode;
     // (undocumented)
+    footerClassName?: NestedClassName;
+    // (undocumented)
     header?: ReactNode;
+    // (undocumented)
+    headerClassName?: NestedClassName;
     // (undocumented)
     minimumFooterHeight?: number;
     // (undocumented)

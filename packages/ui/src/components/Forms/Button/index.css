@@ -118,6 +118,8 @@
 
 :where(.cui-button.view-squarish) {
 	height: var(--cui-button-height);
+	min-height: var(--cui-button-height);
+	min-width: var(--cui-button-height);
 	width: var(--cui-button-height);
 }
 
@@ -125,6 +127,8 @@
 	--cui-circular-button-extra-optical-size: calc(var(--cui-button-height) * 0.5641895835477563 - var(--cui-button-height) / 2);
 	height: calc(var(--cui-button-height) + 2 * var(--cui-circular-button-extra-optical-size));
 	margin: calc(-1 * var(--cui-circular-button-extra-optical-size));
+	min-height: calc(var(--cui-button-height) + 2 * var(--cui-circular-button-extra-optical-size));
+	min-width: calc(var(--cui-button-height) + 2 * var(--cui-circular-button-extra-optical-size));
 	width: calc(var(--cui-button-height) + 2 * var(--cui-circular-button-extra-optical-size));
 }
 

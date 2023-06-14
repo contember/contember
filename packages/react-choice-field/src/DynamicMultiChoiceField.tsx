@@ -21,7 +21,7 @@ export const createDynamicMultiChoiceField = <RendererProps extends {}>({ FieldR
 		return <FieldRenderer {...(props as DynamicMultipleChoiceFieldProps & RendererProps)} {...rendererProps} />
 	},
 	(props, environment) => {
-		let { subTree, renderedOption } = renderDynamicChoiceFieldStatic(props, environment)
+		let { listSubTree, renderedOption } = renderDynamicChoiceFieldStatic(props, environment)
 
 		let expectedMutation: HasManyProps['expectedMutation'] = 'connectOrDisconnect'
 
@@ -41,7 +41,7 @@ export const createDynamicMultiChoiceField = <RendererProps extends {}>({ FieldR
 
 		return (
 			<>
-				{subTree}
+				{listSubTree}
 				<HasMany field={props.field} expectedMutation={expectedMutation} initialEntityCount={0}>
 					{props.sortableBy && <SugaredField field={props.sortableBy} />}
 					{renderedOption}

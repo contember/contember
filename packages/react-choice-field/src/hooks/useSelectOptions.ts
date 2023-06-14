@@ -5,7 +5,7 @@ import { useDesugaredOptionPath } from './useDesugaredOptionPath'
 import { useTopLevelOptionAccessors } from './useTopLevelOptionAccessor'
 import { useNormalizedOptions } from './useNormalizedOptions'
 import { useDebounce } from '@contember/react-utils'
-import { renderDynamicChoiceFieldStatic } from '../renderDynamicChoiceFieldStatic'
+import { renderDynamicChoiceFieldListStatic } from '../renderDynamicChoiceFieldStatic'
 import { useCreateOptionsFilter } from './useCreateOptionsFilter'
 import Fuse from 'fuse.js'
 
@@ -167,8 +167,8 @@ const useOptionsLoader = (
 
 		(async () => {
 			const filter = createFilter(debouncedInput)
-			const { subTree } = renderDynamicChoiceFieldStatic(optionProps, environment, filter)
-			const treeRootId = await extendTree(subTree)
+			const listSubTree = renderDynamicChoiceFieldListStatic(optionProps, environment, filter)
+			const treeRootId = await extendTree(listSubTree)
 
 			if (treeRootId && inputRef.current === debouncedInput) {
 				setRenderedState({

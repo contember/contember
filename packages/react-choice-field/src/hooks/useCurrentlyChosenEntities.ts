@@ -3,7 +3,7 @@ import { EntityAccessor, EntityId, Filter, TreeRootId, useEnvironment, useExtend
 import { useDesugaredOptionPath } from './useDesugaredOptionPath'
 import { useEffect, useMemo, useState } from 'react'
 import { useTopLevelOptionAccessors } from './useTopLevelOptionAccessor'
-import { renderDynamicChoiceFieldStatic } from '../renderDynamicChoiceFieldStatic'
+import { renderDynamicChoiceFieldListStatic } from '../renderDynamicChoiceFieldStatic'
 
 export const useCurrentlyChosenEntities = (
 	optionProps: BaseDynamicChoiceField,
@@ -24,8 +24,8 @@ export const useCurrentlyChosenEntities = (
 			return
 		}
 		(async () => {
-			const { subTree } = renderDynamicChoiceFieldStatic(optionProps, environment, filter)
-			const treeRootId = await extendTree(subTree)
+			const listSubTree = renderDynamicChoiceFieldListStatic(optionProps, environment, filter)
+			const treeRootId = await extendTree(listSubTree)
 			if (treeRootId) {
 				setRenderedState({
 					treeRootId,

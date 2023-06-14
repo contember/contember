@@ -18,11 +18,11 @@ export const createDynamicSingleChoiceField = <RendererProps extends {}>({ Field
 		return <FieldRenderer {...props as DynamicSingleChoiceFieldProps & RendererProps} {...rendererProps} />
 	},
 	(props, environment) => {
-		const { subTree, renderedOption } = renderDynamicChoiceFieldStatic(props, environment)
+		const { listSubTree, renderedOption } = renderDynamicChoiceFieldStatic(props, environment)
 
 		return (
 			<>
-				{subTree}
+				{listSubTree}
 				<HasOne field={props.field} expectedMutation="connectOrDisconnect">
 					{renderedOption}
 				</HasOne>

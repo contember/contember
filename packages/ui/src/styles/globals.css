@@ -1,13 +1,56 @@
 :where(html),
 :where(body) {
+	display: flex;
+	min-height: 100vh;
+	min-height: 100dvh;
+	min-width: 100vw;
+	min-width: 100dvw;
 	margin: 0;
+	overscroll-behavior: none;
 	padding: 0;
 }
 
 :where(html) {
 	display: flex;
+	min-height: 100vh;
+	min-height: 100dvh;
+	-webkit-text-size-adjust: 100%;
 }
 
 :where(body) {
 	flex: 1 1 100%;
+}
+
+:where(*),
+:where(*)::before,
+:where(*)::after {
+  border-width: 0;
+  border-style: solid;
+  border-color: currentColor;
+}
+
+:where(body > div) {
+	display: contents
+}
+
+:where(h1, h2, h3, h4, h5, h6, p, pre):last-child {
+	margin-bottom: 0;
+}
+
+:where(h1, h2, h3, h4, h5, h6, p, pre):first-child {
+	margin-top: 0;
+}
+
+:where(.lucide) {
+	--scale: 1;
+	--square-to-circle-ratio: 1.1284;
+	--square-to-circle-margin: calc((var(--square-to-circle-ratio) - 1) / 2);
+	stroke: currentColor;
+	display: inline-block;
+	flex-grow: 0;
+	flex-shrink: 0;
+	height: calc(1em * var(--scale));
+	margin: calc(-1em * var(--square-to-circle-margin));
+	vertical-align: middle;
+	width: calc(1em * var(--scale));
 }

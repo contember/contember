@@ -7,11 +7,11 @@ import {
 	DataGridRendererProps,
 } from '../types'
 
-export const createDataGridRenderer = <ColumnProps extends {}, ContainerProps extends {}>({ Fallback, Container, StaticRender, ColumnStaticRender }: {
+export const createDataGridRenderer = <ColumnProps extends {}, ContainerProps extends {}>({ Fallback, Container, staticRender, columnStaticRender }: {
 	Fallback: ComponentType<{ children: ReactNode }>
 	Container: ComponentType<DataGridRendererInnerProps<ColumnProps> & ContainerProps>
-	StaticRender?: ComponentType<DataGridRendererInnerProps<ColumnProps> & ContainerProps>
-	ColumnStaticRender?: ComponentType<{ column: DataGridColumnProps<DataGridFilterArtifact, ColumnProps> }>
+	staticRender?: (props: DataGridRendererInnerProps<ColumnProps> & ContainerProps) => ReactNode
+	columnStaticRender?: (props: { column: DataGridColumnProps<DataGridFilterArtifact, ColumnProps> }) => ReactNode
 }) => Component<DataGridRendererProps<ColumnProps> & ContainerProps>(({ treeRootId, ...props }) => {
 	const displayedState = props.displayedState
 	return (
@@ -28,12 +28,12 @@ export const createDataGridRenderer = <ColumnProps extends {}, ContainerProps ex
 				listComponent={Container as any}
 				listProps={props}
 			>
-				{StaticRender && <StaticRender {...props as any} />}
+				{staticRender && staticRender(props as any)}
 				{Array.from(displayedState.columns)
 					.filter(([key]) => !displayedState.hiddenColumns[key])
 					.map(([key, props]) => (
 						<Fragment key={key}>
-							{ColumnStaticRender && <ColumnStaticRender column={props} />}
+							{columnStaticRender && columnStaticRender({ column: props })}
 							{props.children}
 						</Fragment>
 					))}

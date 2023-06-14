@@ -6,8 +6,8 @@ import { SpinnerContainer } from '@contember/ui'
 const DataGridRenderer = createDataGridRenderer<DataGridColumnPublicProps, DataGridContainerPublicProps>({
 	Fallback: SpinnerContainer,
 	Container: DataGridContainer,
-	StaticRender: props => <>{props.tile}</>,
-	ColumnStaticRender: props => <>{props.column.header}</>,
+	staticRender: props => <>{props.tile}</>,
+	columnStaticRender: props => <>{props.column.header}</>,
 })
 
 /**

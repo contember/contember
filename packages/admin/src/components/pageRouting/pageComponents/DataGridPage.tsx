@@ -19,8 +19,8 @@ export type DataGridPageProps =
 const DataGridForPage = createDataGrid(createDataGridRenderer<DataGridColumnPublicProps, DataGridContainerPublicProps>({
 		Fallback: ContainerSpinner,
 		Container: DataGridPageRenderer,
-		StaticRender: props => <>{props.tile}</>,
-		ColumnStaticRender: props => <>{props.column.header}</>,
+		staticRender: props => <>{props.tile}</>,
+		columnStaticRender: props => <>{props.column.header}</>,
 	}),
 )
 

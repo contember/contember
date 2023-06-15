@@ -24,12 +24,14 @@ export type NavigateBackLinkProps =
 	& LabeledProps
 	& {
 		icon?: ReactNode;
+		visuallyHidden?: boolean;
 	}
 
 export const NavigateBackLink = memo<NavigateBackLinkProps>(({
 	icon,
 	ariaLabel,
 	children,
+	visuallyHidden = true,
 	...props
 }) => {
 	const formatMessage = useMessageFormatter(navigationBackLinkDictionary)
@@ -41,7 +43,7 @@ export const NavigateBackLink = memo<NavigateBackLinkProps>(({
 		<Link {...props} aria-label={finalAriaLabel}>
 			<Stack direction="horizontal" align="center">
 				{icon ?? <ArrowLeftIcon />}
-				{<VisuallyHidden>{children ?? formatMessage('navigationBackLink.back')}</VisuallyHidden>}
+				<VisuallyHidden hidden={visuallyHidden}>{children ?? formatMessage('navigationBackLink.back')}</VisuallyHidden>
 			</Stack>
 		</Link>
 	)

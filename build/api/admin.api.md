@@ -3388,6 +3388,7 @@ export const NavigateBackLink: React.NamedExoticComponent<NavigateBackLinkProps>
 // @public (undocumented)
 export type NavigateBackLinkProps = Omit<LinkProps, 'children'> & LabeledProps & {
     icon?: ReactNode;
+    visuallyHidden?: boolean;
 };
 
 // @public (undocumented)

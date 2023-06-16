@@ -12,6 +12,7 @@ import {
 import { DocumentNode, printSchema } from 'graphql'
 import { mergeSchemas } from '@graphql-tools/schema'
 import { loadSchema } from '../../utils/project/loadSchema'
+import { normalizeSchema } from '@contember/schema-utils'
 
 type Args = {
 	project?: string
@@ -19,6 +20,7 @@ type Args = {
 
 type Options = {
 	role?: string[]
+	normalize?: boolean
 	format?: 'graphql' | 'introspection' | 'schema'
 }
 
@@ -36,6 +38,7 @@ export class ProjectPrintSchemaCommand extends Command<Args, Options> {
 		}
 		configuration.option('format').valueRequired().description('graphql|introspection|schema')
 		configuration.option('role').valueArray()
+		configuration.option('normalize').valueNone()
 	}
 
 	protected async execute(input: Input<Args, Options>): Promise<number> {
@@ -50,23 +53,24 @@ export class ProjectPrintSchemaCommand extends Command<Args, Options> {
 		}
 		const permissionFactory = new PermissionFactory()
 		const inputRoles = input.getOption('role')
-		const permissions = permissionFactory.create(schema, inputRoles || ['admin'])
+		const schemaNormalized = input.getOption('normalize') ? normalizeSchema(schema) : schema
+		const permissions = permissionFactory.create(schemaNormalized, inputRoles || ['admin'])
 		const schemaBuilderFactory = new GraphQlSchemaBuilderFactory()
-		const authorizator = new Authorizator(permissions, schema.acl.customPrimary ?? false)
+		const authorizator = new Authorizator(permissions, schemaNormalized.acl.customPrimary ?? false)
 		const introspection = new IntrospectionSchemaFactory(
-			schema.model,
-			new EntityRulesResolver(schema.validation, schema.model),
+			schemaNormalized.model,
+			new EntityRulesResolver(schemaNormalized.validation, schemaNormalized.model),
 			authorizator,
 		)
 		if (format === 'schema') {
 			if (inputRoles) {
 				throw `--roles option is not supported for "schema" format`
 			}
-			console.log(JSON.stringify(schema, null, '\t'))
+			console.log(JSON.stringify(schemaNormalized, null, '\t'))
 		} else if (format === 'introspection') {
 			console.log(JSON.stringify(introspection.create(), null, '\t'))
 		} else if (format === 'graphql') {
-			const contentSchema = schemaBuilderFactory.create(schema.model, authorizator).build()
+			const contentSchema = schemaBuilderFactory.create(schemaNormalized.model, authorizator).build()
 			const introspectionSchemaFactory = new IntrospectionSchemaDefinitionFactory(introspection)
 			const introspectionSchema = introspectionSchemaFactory.create()
 			const gqlSchema = mergeSchemas({

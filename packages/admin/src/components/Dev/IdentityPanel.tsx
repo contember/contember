@@ -1,8 +1,11 @@
 import React, { FC, SyntheticEvent, useCallback, useState } from 'react'
 import {
+	Box,
 	Button,
 	ButtonGroup,
 	DevPanel,
+	EmailInput,
+	FieldContainer,
 	Icon,
 	Stack,
 	Table,
@@ -15,17 +18,23 @@ import {
 import { useOptionalIdentity } from '../Identity'
 import { useProjectSlug, useSessionTokenWithMeta, useSetSessionToken } from '@contember/react-client'
 import { LogoutLink } from '../LogoutLink'
-import { EditMembership, Membership, useCreateApiKey } from '../../tenant'
+import { EditMembership, GQLVariable, Membership, useCreateApiKey, useSingleTenantMutation } from '../../tenant'
 
 export const IdentityPanel = () => {
 	const identity = useOptionalIdentity()
 	const sessionToken = useSessionTokenWithMeta()
 
 	const dialog = useDialog()
-	const open = useCallback(() => {
+	const openSwitchRole = useCallback(() => {
 		dialog.openDialog({
 			heading: 'Login as...',
 			content: () => <LoginAsRole />,
+		})
+	}, [dialog])
+	const openLoginEmail = useCallback(() => {
+		dialog.openDialog({
+			heading: 'Login by email',
+			content: () => <LoginWithEmail />,
 		})
 	}, [dialog])
 
@@ -34,7 +43,8 @@ export const IdentityPanel = () => {
 			{identity ? <>
 				<Stack direction={'vertical'}>
 					<ButtonGroup>
-						<Button onClick={open}>Switch role</Button>
+						<Button onClick={openSwitchRole}>Switch role</Button>
+						<Button onClick={openLoginEmail}>Login with email</Button>
 						{sessionToken.source === 'localstorage' && <LogoutLink Component={Button}>Logout</LogoutLink>}
 					</ButtonGroup>
 					<Table>
@@ -129,4 +139,69 @@ const LoginAsRole: FC = ({}) => {
 			</Stack>
 		</form>
 	)
+}
+
+
+const createSessionKeyVariables = {
+	email: GQLVariable.Required(GQLVariable.String),
+}
+
+const useCreateSessionToken = () => {
+	return useSingleTenantMutation<
+		{ token: string },
+		'UNKNOWN_EMAIL',
+		typeof createSessionKeyVariables
+	>(`createSessionToken(email: $email) {
+		ok
+		error {
+			code
+		}
+		result {
+			token
+		}
+	}`, createSessionKeyVariables)
+
+}
+
+const LoginWithEmail = () => {
+	const [email, setEmail] = useState('')
+	const sessionToken = useSessionTokenWithMeta()
+	const addToast = useShowToast()
+	const [isSubmitting, setSubmitting] = useState(false)
+	const setSessionToken = useSetSessionToken()
+	const createSessionToken = useCreateSessionToken()
+
+	const submit = useCallback(async (e: SyntheticEvent) => {
+		e.preventDefault()
+
+		setSubmitting(true)
+		const response = await createSessionToken({
+			email,
+		}, {
+			apiTokenOverride: sessionToken.propsToken,
+		})
+		setSubmitting(false)
+
+		if (!response.ok) {
+			switch (response.error.code) {
+				case 'UNKNOWN_EMAIL':
+					return addToast({ message: 'Person with given email not found.', type: 'error' })
+			}
+		} else {
+			setSessionToken(response.result.token)
+		}
+	}, [addToast, createSessionToken, email, sessionToken.propsToken, setSessionToken])
+
+	return <>
+		<form onSubmit={submit}>
+			<Stack direction={'vertical'}>
+				<FieldContainer label={'E-mail'}>
+					<EmailInput value={email} onChange={e => setEmail(e as string)} notNull />
+				</FieldContainer>
+				<Button size="large" type="submit" disabled={isSubmitting}>
+					Login
+				</Button>
+			</Stack>
+		</form>
+	</>
 }

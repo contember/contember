@@ -19,11 +19,11 @@ export const isRoutingLinkTarget = (value: unknown): value is RoutingLinkTarget 
 }
 
 export const targetToRequest = (target: RoutingLinkTarget, currentRequest: RequestState): IncompleteRequestState | null => {
+	if (typeof target === 'function') {
+		target = target(currentRequest)
+	}
 	if (typeof target === 'string') {
 		return requestChangeFactory(target, {})(currentRequest)
-	}
-	if (typeof target === 'function') {
-		return target(currentRequest)
 	}
 	if (target === null) {
 		return null

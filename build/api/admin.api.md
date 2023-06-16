@@ -3875,7 +3875,7 @@ export function readEventStream(lines: AsyncIterable<string>): AsyncIterable<{
 export function readLines(reader: ReadableStreamDefaultReader): AsyncIterable<string>;
 
 // @public (undocumented)
-export type RedirectOnSuccessHandler = (currentState: PageRequest<any>, persistedId: EntityId, entity: EntityAccessor, options: PersistSuccessOptions) => IncompleteRequestState;
+export type RedirectOnSuccessHandler = (currentState: PageRequest<any>, persistedId: EntityId, entity: EntityAccessor, options: PersistSuccessOptions) => IncompleteRequestState | string | undefined;
 
 // @public (undocumented)
 export type RedirectOnSuccessTarget = string | IncompleteRequestState | RedirectOnSuccessHandler;
@@ -4068,10 +4068,10 @@ export interface RepeaterProps<ContainerExtraProps, ItemExtraProps> extends Suga
 }
 
 // @public (undocumented)
-export type RequestChange = (currentState: RequestState) => IncompleteRequestState;
+export type RequestChange = (currentState: RequestState) => IncompleteRequestState | string;
 
 // @public (undocumented)
-export const requestChangeFactory: <P extends RequestParameters>(pageName: string, parameters?: P | undefined) => RequestChange;
+export const requestChangeFactory: <P extends RequestParameters>(pageName: string, parameters?: P | undefined) => (currentState: RequestState) => PageRequest<P>;
 
 // @public (undocumented)
 export type RequestParameters<Extra extends RoutingParameter = never> = {

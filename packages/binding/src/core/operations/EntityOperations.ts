@@ -232,7 +232,7 @@ export class EntityOperations {
 			const entityId = outerState.id
 
 			for (const realmToDelete of outerState.realms.values()) {
-				let parent: EntityRealmState | EntityRealmStateStub | EntityListState
+				let parent: EntityRealmState | EntityRealmStateStub | EntityListState | undefined
 				let changesDelta = 0
 
 				if (realmToDelete.blueprint.type === 'listEntity') {
@@ -265,22 +265,27 @@ export class EntityOperations {
 
 					this.eventManager.registerUpdatedConnection(parent, placeholderName)
 				} else if (realmToDelete.blueprint.type === 'subTree') {
-					throw new BindingError('Deleting top-level entities is not yet implemented.')
+					parent = undefined
+					if (realmToDelete.type === 'entityRealm') {
+						this.eventManager.registerJustUpdated(realmToDelete, 1)
+					}
 				} else {
 					return assertNever(realmToDelete.blueprint)
 				}
 
-				if (realmToDelete.type === 'entityRealm') {
-					// Undoing whatever this had caused
-					changesDelta -= realmToDelete.unpersistedChangesCount
-				}
-				this.eventManager.registerJustUpdated(parent, changesDelta)
+				if (parent) {
+					if (realmToDelete.type === 'entityRealm') {
+						// Undoing whatever this had caused
+						changesDelta -= realmToDelete.unpersistedChangesCount
+					}
 
-				if (realmToDelete.type === 'entityRealm') {
-					parent.childrenWithPendingUpdates?.delete(realmToDelete)
-				}
+					this.eventManager.registerJustUpdated(parent, changesDelta)
 
-				this.treeStore.disposeOfRealm(realmToDelete)
+					if (realmToDelete.type === 'entityRealm') {
+						parent.childrenWithPendingUpdates?.delete(realmToDelete)
+					}
+					this.treeStore.disposeOfRealm(realmToDelete)
+				}
 			}
 		})
 	}

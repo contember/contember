@@ -1,6 +1,6 @@
 import { test } from 'vitest'
 import { execute, failedTransaction, sqlTransaction } from '../../../../src/test'
-import { SchemaBuilder } from '@contember/schema-definition'
+import { createSchema, SchemaBuilder, SchemaDefinition as def } from '@contember/schema-definition'
 import { Model } from '@contember/schema'
 import { GQL, SQL } from '../../../../src/tags'
 import { testUuid } from '../../../../src/testUuid'
@@ -94,6 +94,59 @@ test('delete author with restrict on posts - declined', async () => {
 					ok: false,
 					errorMessage: 'Execution has failed:\n' +
 						'unknown field: ForeignKeyConstraintViolation (Cannot delete 123e4567-e89b-12d3-a456-000000000001 row(s) of entity Author, because it is still referenced from 123e4567-e89b-12d3-a456-000000000002 row(s) of entity Post in relation author. OnDelete behaviour of this relation is set to "restrict". You might consider changing it to "setNull" or "cascade".)',
+				},
+			},
+		},
+	})
+})
+
+
+namespace DeleteModelView {
+	export class Author {
+		name = def.stringColumn()
+		stats = def.oneHasOneInverse(AuthorStats, 'author')
+	}
+
+	@def.View('SELECT 1') // not important here
+	export class AuthorStats {
+		author = def.oneHasOne(Author, 'stats')
+		postCount = def.intColumn().notNull()
+	}
+}
+
+test('delete author with restrict on a view - should be ignored', async () => {
+	const schema = createSchema(DeleteModelView)
+	await execute({
+		schema: schema.model,
+		query: GQL`
+        mutation {
+          deleteAuthor(by: {id: "${testUuid(1)}"}) {
+            ok
+          }
+        }`,
+		executes: [
+			...sqlTransaction([
+				{
+					sql: SQL`select "root_"."id" from "public"."author" as "root_" where "root_"."id" = ?`,
+					parameters: [testUuid(1)],
+					response: { rows: [{ id: testUuid(1) }] },
+				},
+				{
+					sql: SQL`select "root_"."id" as "id", true as "allowed" from "public"."author" as "root_" where "root_"."id" = ?`,
+					parameters: [testUuid(1)],
+					response: { rows: [{ id: testUuid(1), allowed: true }] },
+				},
+				{
+					sql: SQL`delete from "public"."author" where "id" in (?)`,
+					parameters: [testUuid(1)],
+					response: { },
+				},
+			]),
+		],
+		return: {
+			data: {
+				deleteAuthor: {
+					ok: true,
 				},
 			},
 		},

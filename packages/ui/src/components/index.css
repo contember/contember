@@ -1,3 +1,4 @@
+@import "./Typography";
 @import "./ContainerSpinner";
 @import "./ContentStatus";
 @import "./DevBar";
@@ -37,6 +38,5 @@
 @import "./Tabs";
 @import "./TitleBar";
 @import "./Toaster";
-@import "./Typography";
 @import "./Dialog";
 @import "./VisuallyHidden";

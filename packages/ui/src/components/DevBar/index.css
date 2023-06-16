@@ -77,6 +77,10 @@
 	transform: translate(0, -100%);
 }
 
+:where(.cui-devBar-panel .cui-devBar-panel-heading) {
+	margin-bottom: 1rem
+}
+
 :where(.cui-devBar-trigger:hover .cui-devBar-panel) {
 	cursor: unset;
 	display: block;

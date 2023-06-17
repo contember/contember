@@ -16,7 +16,7 @@
 :where(.cui-containerSpinner.cui-aether) {
 	animation-delay: var(--cui-container-spinner-delay);
 	animation-duration: var(--cui-transition-duration);
-	animation-fill-mode: forwards;
+	animation-fill-mode: both;
 	animation-name: dim-background;
 	background: transparent;
 }

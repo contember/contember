@@ -1,4 +1,4 @@
-import { Command, CommandConfiguration, Input, validateProjectName, Workspace } from '@contember/cli-common'
+import { Command, CommandConfiguration, Input, Workspace } from '@contember/cli-common'
 import { MigrationsContainerFactory } from '../../MigrationsContainer'
 import {
 	configureExecuteMigrationCommand,
@@ -6,15 +6,13 @@ import {
 	executeMigrations,
 	resolveMigrationStatus,
 } from './MigrationExecuteHelper'
-import { createMigrationStatusTable, findMigration, MigrationState } from '../../utils/migrations'
-import { assertNever } from '../../utils/assertNever'
+import { createMigrationStatusTable } from '../../utils/migrations'
 import { interactiveResolveInstanceEnvironmentFromInput } from '../../utils/instance'
 import { interactiveResolveApiToken, TenantClient } from '../../utils/tenant'
 import { SystemClient } from '../../utils/system'
 
 type Args = {
 	project?: string
-	migration?: string
 }
 
 type Options = ExecuteMigrationOptions & {
@@ -33,7 +31,6 @@ export class MigrationExecuteCommand extends Command<Args, Options> {
 		if (!this.workspace.isSingleProjectMode()) {
 			configuration.argument('project')
 		}
-		configuration.argument('migration').optional()
 		configuration.option('force').description('Ignore migrations order and missing migrations (dev only)')
 		configureExecuteMigrationCommand(configuration)
 	}
@@ -56,7 +53,6 @@ export class MigrationExecuteCommand extends Command<Args, Options> {
 		for (const project of projects) {
 			const migrationsDir = project.migrationsDir
 			const container = new MigrationsContainerFactory(migrationsDir).create()
-			const migrationArg = input.getArgument('migration')
 
 			const instance = await interactiveResolveInstanceEnvironmentFromInput(workspace, input?.getOption('instance'))
 			const apiToken = await interactiveResolveApiToken({ workspace, instance })
@@ -74,28 +70,8 @@ export class MigrationExecuteCommand extends Command<Args, Options> {
 				}
 			}
 
-			const migrations = (() => {
-				if (migrationArg) {
-					const migration = findMigration(status.allMigrations, migrationArg)
-					if (!migration) {
-						throw `Undefined migration ${migrationArg}`
-					}
-					switch (migration.state) {
-						case MigrationState.EXECUTED_OK:
-							throw `Migration ${migrationArg} is already executed`
-						case MigrationState.TO_EXECUTE_ERROR:
-						case MigrationState.EXECUTED_ERROR:
-						case MigrationState.EXECUTED_MISSING:
-							throw `Cannot execute migration ${migrationArg}: ${migration.errorMessage} (${migration.state})`
-						case MigrationState.TO_EXECUTE_OK:
-							return [migration]
-						default:
-							assertNever(migration)
-					}
-				} else {
-					return status.migrationsToExecute
-				}
-			})()
+			const migrations = status.migrationsToExecute
+
 			if (migrations.length === 0) {
 				console.log('No migrations to execute')
 				continue

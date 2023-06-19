@@ -2,6 +2,9 @@ import { Acl, ProjectRole, Schema } from '@contember/schema'
 import { AllowAllPermissionFactory } from './acl'
 
 export const normalizeSchema = <S extends Schema>(schema: S): S => {
+	const adminRoleDefinition: Partial<Acl.RolePermissions> = schema.acl.roles?.[ProjectRole.ADMIN] ?? {}
+	const contentAdminRoleDefinition: Partial<Acl.RolePermissions> = schema.acl.roles?.[ProjectRole.CONTENT_ADMIN] ?? {}
+
 	return {
 		...schema,
 		acl: {
@@ -21,13 +24,15 @@ export const normalizeSchema = <S extends Schema>(schema: S): S => {
 					content: {
 						export: true,
 						import: true,
+						...adminRoleDefinition.content,
 					},
 					system: {
 						export: true,
 						import: true,
+						...adminRoleDefinition.system,
 					},
 					debug: true,
-					...((schema.acl.roles?.[ProjectRole.ADMIN] as Acl.RolePermissions | undefined) || {}),
+					...adminRoleDefinition,
 				},
 				[ProjectRole.CONTENT_ADMIN]: {
 					stages: '*',
@@ -42,13 +47,15 @@ export const normalizeSchema = <S extends Schema>(schema: S): S => {
 					content: {
 						export: true,
 						import: true,
+						...contentAdminRoleDefinition.content,
 					},
 					system: {
 						history: true,
 						export: true,
 						import: true,
+						...contentAdminRoleDefinition.system,
 					},
-					...((schema.acl.roles?.[ProjectRole.CONTENT_ADMIN] as Acl.RolePermissions | undefined) || {}),
+					...contentAdminRoleDefinition,
 				},
 				[ProjectRole.DEPLOYER]: {
 					stages: '*',

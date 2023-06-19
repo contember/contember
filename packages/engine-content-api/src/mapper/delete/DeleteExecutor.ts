@@ -169,6 +169,10 @@ export class DeleteExecutor {
 		}
 		const owningRelations = findOwningRelations(this.schema, entity)
 		for (const [owningEntity, relation] of owningRelations) {
+			if (owningEntity.view) {
+				continue
+			}
+
 			if (relation.joiningColumn.onDelete === Model.OnDelete.restrict) {
 				await this.collectRestrictResult(state, mapper, owningEntity, relation, values)
 			} else if (relation.joiningColumn.onDelete === Model.OnDelete.cascade) {

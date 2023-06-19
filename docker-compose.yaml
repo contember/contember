@@ -21,6 +21,7 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
+
   cli-sandbox:
     image: node:18
     working_dir: /src/sandbox
@@ -34,9 +35,15 @@ services:
       CONTEMBER_API_TOKEN: '0000000000000000000000000000000000000000'
       CONTEMBER_INSTANCE: 'http://api:4000'
       CONTEMBER_PROJECT_NAME: 'sandbox'
+      CONTEMBER_CLI_PACKAGE_ROOT: '/src/packages/cli'
     entrypoint:
-      - node
-      - /src/packages/cli/dist/src/run.js
+      - yarn
+      - run
+      - "-T"
+      - tsx
+      - "--conditions=typescript"
+      - /src/packages/cli/src/run.ts
+
   api:
     image: node:18
     working_dir: /src

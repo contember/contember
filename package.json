@@ -11,7 +11,8 @@
     "test-e2e": "yarn workspaces foreach run test-e2e",
     "eslint:lint": "eslint \"**/*.{ts,tsx}\" ",
     "eslint:fix": "eslint --fix \"**/*.{ts,tsx}\" ",
-    "tag-version": "./scripts/npm/tag-version.sh $@"
+    "tag-version": "./scripts/npm/tag-version.sh $@",
+    "contember": "docker-compose run --rm cli-sandbox"
   },
   "husky": {
     "hooks": {

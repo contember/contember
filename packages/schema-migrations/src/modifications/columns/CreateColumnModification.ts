@@ -37,10 +37,6 @@ export class CreateColumnModificationHandler implements ModificationHandler<Crea
 				throw new ImplementationException()
 			}
 
-			// event applier defers constraint check, we need to fire them before ALTER
-			builder.sql(`SET CONSTRAINTS ALL IMMEDIATE`)
-			builder.sql(`SET CONSTRAINTS ALL DEFERRED`)
-
 			if (!column.nullable) {
 				builder.alterColumn(entity.tableName, column.columnName, {
 					notNull: true,

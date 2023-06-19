@@ -10,12 +10,14 @@ import { createMigrationStatusTable } from '../../utils/migrations'
 import { interactiveResolveInstanceEnvironmentFromInput } from '../../utils/instance'
 import { interactiveResolveApiToken, TenantClient } from '../../utils/tenant'
 import { SystemClient } from '../../utils/system'
+import { MigrationVersionHelper } from '@contember/schema-migrations'
 
 type Args = {
 	project?: string
 }
 
 type Options = ExecuteMigrationOptions & {
+	until?: string
 	force: boolean
 }
 
@@ -32,6 +34,7 @@ export class MigrationExecuteCommand extends Command<Args, Options> {
 			configuration.argument('project')
 		}
 		configuration.option('force').description('Ignore migrations order and missing migrations (dev only)')
+		configuration.option('until').valueRequired().description('Execute all migrations leading up to, and inclusive of, a specified migration')
 		configureExecuteMigrationCommand(configuration)
 	}
 
@@ -48,7 +51,6 @@ export class MigrationExecuteCommand extends Command<Args, Options> {
 		const projects = allProjects
 			? await workspace.projects.listProjects()
 			: [await workspace.projects.getProject(projectName, { fuzzy: true })]
-
 		let code = 0
 		for (const project of projects) {
 			const migrationsDir = project.migrationsDir
@@ -69,8 +71,12 @@ export class MigrationExecuteCommand extends Command<Args, Options> {
 					throw `Cannot execute migrations`
 				}
 			}
+			const until = input.getOption('until')
+			const untilNormalized = until ? MigrationVersionHelper.extractVersion(until) : null
 
-			const migrations = status.migrationsToExecute
+			const migrations = untilNormalized
+				? status.migrationsToExecute.filter(it => it.version <= MigrationVersionHelper.extractVersion(untilNormalized))
+				: status.migrationsToExecute
 
 			if (migrations.length === 0) {
 				console.log('No migrations to execute')

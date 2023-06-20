@@ -10,4 +10,5 @@ export const IDP_BACKLINK = 'idp_backlink'
 export interface IDP {
 	provider: string
 	name?: string
+	hidden?: boolean
 }

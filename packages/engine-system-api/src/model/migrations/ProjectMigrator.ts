@@ -1,4 +1,4 @@
-import { calculateMigrationChecksum, Migration, MigrationDescriber } from '@contember/schema-migrations'
+import { calculateMigrationChecksum, Migration, MigrationDescriber, MigrationVersionHelper } from '@contember/schema-migrations'
 import { Client, QueryError, wrapIdentifier } from '@contember/database'
 import { Schema } from '@contember/schema'
 import { SaveMigrationCommand } from '../commands'
@@ -7,7 +7,7 @@ import { DatabaseContext } from '../database'
 import { ExecutedMigrationsResolver } from './ExecutedMigrationsResolver'
 import { MigrateErrorCode } from '../../schema'
 import { SchemaVersionBuilder } from './SchemaVersionBuilder'
-import { SchemaValidator } from '@contember/schema-utils'
+import { SchemaValidator, SchemaValidatorSkippedErrors } from '@contember/schema-utils'
 import { logger } from '@contember/logger'
 import {
 	SchemaDatabaseMetadataResolverStore,
@@ -72,6 +72,7 @@ export class ProjectMigrator {
 	): Promise<readonly Migration[]> {
 		const executedMigrations = await this.executedMigrationsResolver.getMigrations(db)
 		const toExecute = []
+		let skippedErrors: SchemaValidatorSkippedErrors[] = []
 		for (const migration of migrationsToExecute) {
 			const executedMigration = executedMigrations.find(it => it.version === migration.version)
 			if (executedMigration) {
@@ -90,7 +91,11 @@ export class ProjectMigrator {
 			}
 			const latestModification = described[described.length - 1]
 			schema = latestModification.schema
-			const errors = SchemaValidator.validate(schema, migration.skippedErrors)
+			skippedErrors = [
+				...skippedErrors.filter(it => it.skipUntil && MigrationVersionHelper.extractVersion(it.skipUntil) >= migration.version),
+				...migration.skippedErrors ?? [],
+			]
+			const errors = SchemaValidator.validate(schema, skippedErrors)
 			if (errors.length > 0) {
 				throw new InvalidSchemaError(
 					migration.version,

@@ -168,3 +168,35 @@ ALTER TABLE "author"
 CREATE VIEW "author_meta_x" AS SELECT * FROM author;
 CREATE VIEW "author_meta_y" AS SELECT * FROM author_meta_x;`,
 })
+
+
+namespace NotNullOrig {
+	export class Author {
+		name = def.stringColumn()
+	}
+}
+namespace NotNullUpdated {
+	export class Author {
+		name = def.stringColumn().notNull()
+	}
+}
+testMigrations('set not null and fill', {
+	originalSchema: createSchema(NotNullOrig).model,
+	updatedSchema: createSchema(NotNullUpdated).model,
+	noDiff: true,
+	diff: [
+		updateColumnDefinitionModification.createModification({
+			entityName: 'Author',
+			fieldName: 'name',
+			definition: {
+				type: Model.ColumnType.String,
+				columnType: 'text',
+				nullable: false,
+			},
+			fillValue: 'unnamed',
+		}),
+	],
+	sql: SQL`
+UPDATE "author" SET "name" = $pga$unnamed$pga$ WHERE "name" IS NULL; 
+ALTER TABLE "author" ALTER "name" SET NOT NULL;`,
+})

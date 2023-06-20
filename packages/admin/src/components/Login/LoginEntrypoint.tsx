@@ -186,14 +186,16 @@ const LoginContainer = ({ identityProviders = [], collapsedEmailLogin: initialCo
 		return idpHandlerFeedback
 	}
 
-	const showAlternativeLoginButtons = identityProviders.length > 0 || collapsedEmailLogin
+	const visibleIdentityProviders = identityProviders.filter(it => !it.hidden)
+
+	const showAlternativeLoginButtons = visibleIdentityProviders.length > 0 || collapsedEmailLogin
 
 	return <>
 		<ErrorList errors={error ? [{ message: error }] : []} />
 		{!collapsedEmailLogin && <Login resetLink={resetRequestPageName} onLogin={redirectToBacklink} />}
 		{showAlternativeLoginButtons && (
 			<Stack direction="vertical">
-				{identityProviders.map((it, i) => <IDPInitButton key={i} provider={it} onError={setError}/>)}
+				{visibleIdentityProviders.map((it, i) => <IDPInitButton key={i} provider={it} onError={setError}/>)}
 				{collapsedEmailLogin && <Button onClick={() => setCollapsedEmailLogin(false)}>Login with email</Button>}
 			</Stack>
 		)}

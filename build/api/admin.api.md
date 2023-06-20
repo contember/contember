@@ -2619,6 +2619,8 @@ export const IdentityRefreshContext: React.Context<() => void>;
 // @public (undocumented)
 export interface IDP {
     // (undocumented)
+    hidden?: boolean;
+    // (undocumented)
     name?: string;
     // (undocumented)
     provider: string;

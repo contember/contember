@@ -58,7 +58,7 @@ export default new Builder({})
 			: { credentials: { accessKeyId: env.CONTEMBER_S3_KEY, secretAccessKey: env.CONTEMBER_S3_SECRET } }
 
 		return new S3Client({
-			endpoint: env.CONTEMBER_S3_ENDPOINT,
+			endpoint: env.CONTEMBER_S3_ENDPOINT || undefined,
 			region: env.CONTEMBER_S3_REGION,
 			forcePathStyle: true,
 			...credentialsOptions,

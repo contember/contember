@@ -11,6 +11,7 @@ export const customLoginConfig = schema.partial({
 			}),
 			schema.partial({
 				name: schema.string,
+				hidden: schema.boolean,
 			}),
 		),
 	),

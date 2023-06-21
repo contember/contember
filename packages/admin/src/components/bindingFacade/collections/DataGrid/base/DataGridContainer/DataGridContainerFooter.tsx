@@ -37,7 +37,7 @@ export const DataGridContainerFooter = memo<DataGridContainerFooterProps>(({
 		pagesCount !== undefined && updatePaging({ type: 'goToPage', newPageIndex: pagesCount - 1 })
 	}, [pagesCount, updatePaging])
 
-	return (
+	return pagesCount !== undefined && pagesCount > 1 ? (
 		<LayoutPageStickyContainer
 			left="var(--cui-layout-page-padding-left)"
 			right="var(--cui-layout-page-padding-right)"
@@ -78,6 +78,6 @@ export const DataGridContainerFooter = memo<DataGridContainerFooterProps>(({
 				<div>{pagingSummary}</div>
 			</Stack>
 		</LayoutPageStickyContainer>
-	)
+	) : null
 })
 DataGridContainerFooter.displayName = 'DataGridContainerFooter'

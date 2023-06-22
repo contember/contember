@@ -16,21 +16,21 @@ class SignInManager {
 	async signIn(dbContext: DatabaseContext, email: string, password: string, expiration?: number, otpCode?: string): Promise<SignInResponse> {
 		const personRow = await dbContext.queryHandler.fetch(PersonQuery.byEmail(email))
 		if (personRow === null) {
-			return new ResponseError(SignInErrorCode.UnknownEmail, `Person with email ${email} not found`)
+			return new ResponseError('UNKNOWN_EMAIL', `Person with email ${email} not found`)
 		}
 		if (!personRow.password_hash) {
-			return new ResponseError(SignInErrorCode.NoPasswordSet, `No password set`)
+			return new ResponseError('NO_PASSWORD_SET', `No password set`)
 		}
 		const passwordValid = await this.providers.bcryptCompare(password, personRow.password_hash)
 		if (!passwordValid) {
-			return new ResponseError(SignInErrorCode.InvalidPassword, `Password does not match`)
+			return new ResponseError('INVALID_PASSWORD', `Password does not match`)
 		}
 		if (personRow.otp_uri && personRow.otp_activated_at) {
 			if (!otpCode) {
-				return new ResponseError(SignInErrorCode.OtpRequired, `2FA is enabled. OTP token is required`)
+				return new ResponseError('OTP_REQUIRED', `2FA is enabled. OTP token is required`)
 			}
 			if (!this.otpAuthenticator.validate({ uri: personRow.otp_uri }, otpCode)) {
-				return new ResponseError(SignInErrorCode.InvalidOtpToken, 'OTP token validation has failed')
+				return new ResponseError('INVALID_OTP_TOKEN', 'OTP token validation has failed')
 			}
 		}
 
@@ -47,10 +47,10 @@ class SignInManager {
 		const personRow = await dbContext.queryHandler.fetch(PersonQuery.byUniqueIdentifier(personIdentifier))
 		if (personRow === null) {
 			if (personIdentifier.type === 'email') {
-				return new ResponseError(CreateSessionTokenErrorCode.UnknownEmail, `Person with email ${personIdentifier.email} not found`)
+				return new ResponseError('UNKNOWN_EMAIL', `Person with email ${personIdentifier.email} not found`)
 
 			} else if (personIdentifier.type === 'id') {
-				return new ResponseError(CreateSessionTokenErrorCode.UnknownPersonId, `Person with id ${personIdentifier.id} not found`)
+				return new ResponseError('UNKNOWN_PERSON_ID', `Person with id ${personIdentifier.id} not found`)
 			}
 			throw new ImplementationException()
 		}

@@ -1,9 +1,4 @@
-import {
-	CreateProjectResponse,
-	CreateProjectResponseErrorCode,
-	MutationCreateProjectArgs,
-	MutationResolvers,
-} from '../../../schema'
+import { CreateProjectResponse, MutationCreateProjectArgs, MutationResolvers } from '../../../schema'
 import { TenantResolverContext } from '../../TenantResolverContext'
 import { isTokenHash, PermissionActions, ProjectManager, TenantRole } from '../../../model'
 import { createErrorResponse } from '../../errorUtils'
@@ -20,7 +15,7 @@ export class CreateProjectMutationResolver implements MutationResolvers {
 		const project = await this.projectManager.getProjectBySlug(context.db, projectSlug)
 
 		if (project) {
-			return createErrorResponse(CreateProjectResponseErrorCode.AlreadyExists, `Project ${projectSlug} already exists`)
+			return createErrorResponse('ALREADY_EXISTS', `Project ${projectSlug} already exists`)
 		}
 
 		await context.requireAccess({

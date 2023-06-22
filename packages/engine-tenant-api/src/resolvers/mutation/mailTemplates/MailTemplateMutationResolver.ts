@@ -30,7 +30,7 @@ export class MailTemplateMutationResolver implements MutationResolvers {
 			message: 'You are not allowed to add a mail template',
 		})
 		if (projectSlug && !project) {
-			return createProjectNotFoundResponse(AddMailTemplateErrorCode.ProjectNotFound, projectSlug)
+			return createProjectNotFoundResponse('PROJECT_NOT_FOUND', projectSlug)
 		}
 
 		await this.mailTemplateManager.addMailTemplate(context.db, {
@@ -60,7 +60,7 @@ export class MailTemplateMutationResolver implements MutationResolvers {
 			message: 'You are not allowed to remove a mail template',
 		})
 		if (projectSlug && !project) {
-			return createProjectNotFoundResponse(RemoveMailTemplateErrorCode.ProjectNotFound, projectSlug)
+			return createProjectNotFoundResponse('PROJECT_NOT_FOUND', projectSlug)
 		}
 
 		const removed = await this.mailTemplateManager.removeMailTemplate(context.db, {
@@ -69,7 +69,7 @@ export class MailTemplateMutationResolver implements MutationResolvers {
 			type: this.mapMailType(type),
 		})
 		if (!removed) {
-			return createErrorResponse(RemoveMailTemplateErrorCode.TemplateNotFound, 'Mail template not found')
+			return createErrorResponse('PROJECT_NOT_FOUND', 'Mail template not found')
 		}
 
 		return {
@@ -80,9 +80,9 @@ export class MailTemplateMutationResolver implements MutationResolvers {
 
 	private mapMailType(type: SchemaMailType): MailType {
 		return {
-			[SchemaMailType.ExistingUserInvited]: MailType.existingUserInvited,
-			[SchemaMailType.NewUserInvited]: MailType.newUserInvited,
-			[SchemaMailType.ResetPasswordRequest]: MailType.passwordReset,
+			EXISTING_USER_INVITED: MailType.existingUserInvited,
+			NEW_USER_INVITED: MailType.newUserInvited,
+			RESET_PASSWORD_REQUEST: MailType.passwordReset,
 		}[type]
 	}
 }

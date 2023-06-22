@@ -93,7 +93,7 @@ test('sign in - invalid password', async () => {
 			data: {
 				signIn: {
 					ok: false,
-					errors: [{ code: SignInErrorCode.InvalidPassword }],
+					errors: [{ code: 'INVALID_PASSWORD' }],
 					result: null,
 				},
 			},
@@ -115,7 +115,7 @@ test('otp token not provided', async () => {
 			data: {
 				signIn: {
 					ok: false,
-					errors: [{ code: SignInErrorCode.OtpRequired }],
+					errors: [{ code: 'OTP_REQUIRED' }],
 					result: null,
 				},
 			},
@@ -144,7 +144,7 @@ test('sign in - invalid otp token', async () => {
 			data: {
 				signIn: {
 					ok: false,
-					errors: [{ code: SignInErrorCode.InvalidOtpToken }],
+					errors: [{ code: 'INVALID_OTP_TOKEN' }],
 					result: null,
 				},
 			},

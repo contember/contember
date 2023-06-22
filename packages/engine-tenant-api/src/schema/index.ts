@@ -22,11 +22,10 @@ export type AddIdpError = {
 	readonly developerMessage: Scalars['String']
 }
 
-export enum AddIdpErrorCode {
-	AlreadyExists = 'ALREADY_EXISTS',
-	InvalidConfiguration = 'INVALID_CONFIGURATION',
-	UnknownType = 'UNKNOWN_TYPE'
-}
+export type AddIdpErrorCode =
+  | 'ALREADY_EXISTS'
+  | 'INVALID_CONFIGURATION'
+  | 'UNKNOWN_TYPE'
 
 export type AddIdpResponse = {
 	readonly __typename?: 'AddIDPResponse'
@@ -42,10 +41,9 @@ export type AddMailTemplateError = {
 	readonly endUserMessage?: Maybe<Scalars['String']>
 }
 
-export enum AddMailTemplateErrorCode {
-	MissingVariable = 'MISSING_VARIABLE',
-	ProjectNotFound = 'PROJECT_NOT_FOUND'
-}
+export type AddMailTemplateErrorCode =
+  | 'MISSING_VARIABLE'
+  | 'PROJECT_NOT_FOUND'
 
 export type AddMailTemplateResponse = {
 	readonly __typename?: 'AddMailTemplateResponse'
@@ -64,18 +62,14 @@ export type AddProjectMemberError = {
 	readonly membershipValidation?: Maybe<ReadonlyArray<MembershipValidationError>>
 }
 
-export enum AddProjectMemberErrorCode {
-	AlreadyMember = 'ALREADY_MEMBER',
-	IdentityNotFound = 'IDENTITY_NOT_FOUND',
-	InvalidMembership = 'INVALID_MEMBERSHIP',
-	ProjectNotFound = 'PROJECT_NOT_FOUND',
-	/** @deprecated Field no longer supported */
-	RoleNotFound = 'ROLE_NOT_FOUND',
-	/** @deprecated Field no longer supported */
-	VariableEmpty = 'VARIABLE_EMPTY',
-	/** @deprecated Field no longer supported */
-	VariableNotFound = 'VARIABLE_NOT_FOUND'
-}
+export type AddProjectMemberErrorCode =
+  | 'ALREADY_MEMBER'
+  | 'IDENTITY_NOT_FOUND'
+  | 'INVALID_MEMBERSHIP'
+  | 'PROJECT_NOT_FOUND'
+  | 'ROLE_NOT_FOUND'
+  | 'VARIABLE_EMPTY'
+  | 'VARIABLE_NOT_FOUND'
 
 export type AddProjectMemberResponse = {
 	readonly __typename?: 'AddProjectMemberResponse'
@@ -103,12 +97,11 @@ export type ChangeMyPasswordError = {
 	readonly developerMessage: Scalars['String']
 }
 
-export enum ChangeMyPasswordErrorCode {
-	InvalidPassword = 'INVALID_PASSWORD',
-	NotAPerson = 'NOT_A_PERSON',
-	NoPasswordSet = 'NO_PASSWORD_SET',
-	TooWeak = 'TOO_WEAK'
-}
+export type ChangeMyPasswordErrorCode =
+  | 'INVALID_PASSWORD'
+  | 'NOT_A_PERSON'
+  | 'NO_PASSWORD_SET'
+  | 'TOO_WEAK'
 
 export type ChangeMyPasswordResponse = {
 	readonly __typename?: 'ChangeMyPasswordResponse'
@@ -124,10 +117,9 @@ export type ChangePasswordError = {
 	readonly endUserMessage?: Maybe<Scalars['String']>
 }
 
-export enum ChangePasswordErrorCode {
-	PersonNotFound = 'PERSON_NOT_FOUND',
-	TooWeak = 'TOO_WEAK'
-}
+export type ChangePasswordErrorCode =
+  | 'PERSON_NOT_FOUND'
+  | 'TOO_WEAK'
 
 export type ChangePasswordResponse = {
 	readonly __typename?: 'ChangePasswordResponse'
@@ -137,12 +129,11 @@ export type ChangePasswordResponse = {
 	readonly ok: Scalars['Boolean']
 }
 
-export enum CheckResetPasswordTokenCode {
-	RequestNotFound = 'REQUEST_NOT_FOUND',
-	TokenExpired = 'TOKEN_EXPIRED',
-	TokenNotFound = 'TOKEN_NOT_FOUND',
-	TokenUsed = 'TOKEN_USED'
-}
+export type CheckResetPasswordTokenCode =
+  | 'REQUEST_NOT_FOUND'
+  | 'TOKEN_EXPIRED'
+  | 'TOKEN_NOT_FOUND'
+  | 'TOKEN_USED'
 
 export type CheckResetPasswordTokenResult = {
 	readonly __typename?: 'CheckResetPasswordTokenResult'
@@ -162,10 +153,9 @@ export type ConfirmOtpError = {
 	readonly endUserMessage?: Maybe<Scalars['String']>
 }
 
-export enum ConfirmOtpErrorCode {
-	InvalidOtpToken = 'INVALID_OTP_TOKEN',
-	NotPrepared = 'NOT_PREPARED'
-}
+export type ConfirmOtpErrorCode =
+  | 'INVALID_OTP_TOKEN'
+  | 'NOT_PREPARED'
 
 export type ConfirmOtpResponse = {
 	readonly __typename?: 'ConfirmOtpResponse'
@@ -184,16 +174,12 @@ export type CreateApiKeyError = {
 	readonly membershipValidation?: Maybe<ReadonlyArray<MembershipValidationError>>
 }
 
-export enum CreateApiKeyErrorCode {
-	InvalidMembership = 'INVALID_MEMBERSHIP',
-	ProjectNotFound = 'PROJECT_NOT_FOUND',
-	/** @deprecated Field no longer supported */
-	RoleNotFound = 'ROLE_NOT_FOUND',
-	/** @deprecated Field no longer supported */
-	VariableEmpty = 'VARIABLE_EMPTY',
-	/** @deprecated Field no longer supported */
-	VariableNotFound = 'VARIABLE_NOT_FOUND'
-}
+export type CreateApiKeyErrorCode =
+  | 'INVALID_MEMBERSHIP'
+  | 'PROJECT_NOT_FOUND'
+  | 'ROLE_NOT_FOUND'
+  | 'VARIABLE_EMPTY'
+  | 'VARIABLE_NOT_FOUND'
 
 export type CreateApiKeyResponse = {
 	readonly __typename?: 'CreateApiKeyResponse'
@@ -217,9 +203,8 @@ export type CreatePasswordResetRequestError = {
 	readonly endUserMessage?: Maybe<Scalars['String']>
 }
 
-export enum CreatePasswordResetRequestErrorCode {
-	PersonNotFound = 'PERSON_NOT_FOUND'
-}
+export type CreatePasswordResetRequestErrorCode =
+  | 'PERSON_NOT_FOUND'
 
 export type CreatePasswordResetRequestResponse = {
 	readonly __typename?: 'CreatePasswordResetRequestResponse'
@@ -247,10 +232,9 @@ export type CreateProjectResponseError = {
 	readonly developerMessage: Scalars['String']
 }
 
-export enum CreateProjectResponseErrorCode {
-	AlreadyExists = 'ALREADY_EXISTS',
-	InitError = 'INIT_ERROR'
-}
+export type CreateProjectResponseErrorCode =
+  | 'ALREADY_EXISTS'
+  | 'INIT_ERROR'
 
 export type CreateProjectResult = {
 	readonly __typename?: 'CreateProjectResult'
@@ -268,10 +252,9 @@ export type CreateSessionTokenError = {
 	readonly developerMessage: Scalars['String']
 }
 
-export enum CreateSessionTokenErrorCode {
-	UnknownEmail = 'UNKNOWN_EMAIL',
-	UnknownPersonId = 'UNKNOWN_PERSON_ID'
-}
+export type CreateSessionTokenErrorCode =
+  | 'UNKNOWN_EMAIL'
+  | 'UNKNOWN_PERSON_ID'
 
 export type CreateSessionTokenResponse = {
 	readonly __typename?: 'CreateSessionTokenResponse'
@@ -294,9 +277,8 @@ export type DisableApiKeyError = {
 	readonly endUserMessage?: Maybe<Scalars['String']>
 }
 
-export enum DisableApiKeyErrorCode {
-	KeyNotFound = 'KEY_NOT_FOUND'
-}
+export type DisableApiKeyErrorCode =
+  | 'KEY_NOT_FOUND'
 
 export type DisableApiKeyResponse = {
 	readonly __typename?: 'DisableApiKeyResponse'
@@ -312,9 +294,8 @@ export type DisableIdpError = {
 	readonly developerMessage: Scalars['String']
 }
 
-export enum DisableIdpErrorCode {
-	NotFound = 'NOT_FOUND'
-}
+export type DisableIdpErrorCode =
+  | 'NOT_FOUND'
 
 export type DisableIdpResponse = {
 	readonly __typename?: 'DisableIDPResponse'
@@ -330,9 +311,8 @@ export type DisableOtpError = {
 	readonly endUserMessage?: Maybe<Scalars['String']>
 }
 
-export enum DisableOtpErrorCode {
-	OtpNotActive = 'OTP_NOT_ACTIVE'
-}
+export type DisableOtpErrorCode =
+  | 'OTP_NOT_ACTIVE'
 
 export type DisableOtpResponse = {
 	readonly __typename?: 'DisableOtpResponse'
@@ -348,9 +328,8 @@ export type EnableIdpError = {
 	readonly developerMessage: Scalars['String']
 }
 
-export enum EnableIdpErrorCode {
-	NotFound = 'NOT_FOUND'
-}
+export type EnableIdpErrorCode =
+  | 'NOT_FOUND'
 
 export type EnableIdpResponse = {
 	readonly __typename?: 'EnableIDPResponse'
@@ -412,10 +391,9 @@ export type InitSignInIdpError = {
 	readonly endUserMessage?: Maybe<Scalars['String']>
 }
 
-export enum InitSignInIdpErrorCode {
-	IdpValidationFailed = 'IDP_VALIDATION_FAILED',
-	ProviderNotFound = 'PROVIDER_NOT_FOUND'
-}
+export type InitSignInIdpErrorCode =
+  | 'IDP_VALIDATION_FAILED'
+  | 'PROVIDER_NOT_FOUND'
 
 export type InitSignInIdpResponse = {
 	readonly __typename?: 'InitSignInIDPResponse'
@@ -441,22 +419,17 @@ export type InviteError = {
 	readonly membershipValidation?: Maybe<ReadonlyArray<MembershipValidationError>>
 }
 
-export enum InviteErrorCode {
-	AlreadyMember = 'ALREADY_MEMBER',
-	InvalidMembership = 'INVALID_MEMBERSHIP',
-	ProjectNotFound = 'PROJECT_NOT_FOUND',
-	/** @deprecated Field no longer supported */
-	RoleNotFound = 'ROLE_NOT_FOUND',
-	/** @deprecated Field no longer supported */
-	VariableEmpty = 'VARIABLE_EMPTY',
-	/** @deprecated Field no longer supported */
-	VariableNotFound = 'VARIABLE_NOT_FOUND'
-}
+export type InviteErrorCode =
+  | 'ALREADY_MEMBER'
+  | 'INVALID_MEMBERSHIP'
+  | 'PROJECT_NOT_FOUND'
+  | 'ROLE_NOT_FOUND'
+  | 'VARIABLE_EMPTY'
+  | 'VARIABLE_NOT_FOUND'
 
-export enum InviteMethod {
-	CreatePassword = 'CREATE_PASSWORD',
-	ResetPassword = 'RESET_PASSWORD'
-}
+export type InviteMethod =
+  | 'CREATE_PASSWORD'
+  | 'RESET_PASSWORD'
 
 export type InviteOptions = {
 	readonly mailVariant?: InputMaybe<Scalars['String']>
@@ -494,16 +467,14 @@ export type MailTemplateIdentifier = {
 	readonly variant?: InputMaybe<Scalars['String']>
 }
 
-export enum MailType {
-	ExistingUserInvited = 'EXISTING_USER_INVITED',
-	NewUserInvited = 'NEW_USER_INVITED',
-	ResetPasswordRequest = 'RESET_PASSWORD_REQUEST'
-}
+export type MailType =
+  | 'EXISTING_USER_INVITED'
+  | 'NEW_USER_INVITED'
+  | 'RESET_PASSWORD_REQUEST'
 
-export enum MemberType {
-	ApiKey = 'API_KEY',
-	Person = 'PERSON'
-}
+export type MemberType =
+  | 'API_KEY'
+  | 'PERSON'
 
 export type Membership = {
 	readonly __typename?: 'Membership'
@@ -523,12 +494,11 @@ export type MembershipValidationError = {
 	readonly variable?: Maybe<Scalars['String']>
 }
 
-export enum MembershipValidationErrorCode {
-	RoleNotFound = 'ROLE_NOT_FOUND',
-	VariableEmpty = 'VARIABLE_EMPTY',
-	VariableInvalid = 'VARIABLE_INVALID',
-	VariableNotFound = 'VARIABLE_NOT_FOUND'
-}
+export type MembershipValidationErrorCode =
+  | 'ROLE_NOT_FOUND'
+  | 'VARIABLE_EMPTY'
+  | 'VARIABLE_INVALID'
+  | 'VARIABLE_NOT_FOUND'
 
 export type Mutation = {
 	readonly __typename?: 'Mutation'
@@ -872,10 +842,9 @@ export type RemoveMailTemplateError = {
 	readonly endUserMessage?: Maybe<Scalars['String']>
 }
 
-export enum RemoveMailTemplateErrorCode {
-	ProjectNotFound = 'PROJECT_NOT_FOUND',
-	TemplateNotFound = 'TEMPLATE_NOT_FOUND'
-}
+export type RemoveMailTemplateErrorCode =
+  | 'PROJECT_NOT_FOUND'
+  | 'TEMPLATE_NOT_FOUND'
 
 export type RemoveMailTemplateResponse = {
 	readonly __typename?: 'RemoveMailTemplateResponse'
@@ -892,10 +861,9 @@ export type RemoveProjectMemberError = {
 	readonly endUserMessage?: Maybe<Scalars['String']>
 }
 
-export enum RemoveProjectMemberErrorCode {
-	NotMember = 'NOT_MEMBER',
-	ProjectNotFound = 'PROJECT_NOT_FOUND'
-}
+export type RemoveProjectMemberErrorCode =
+  | 'NOT_MEMBER'
+  | 'PROJECT_NOT_FOUND'
 
 export type RemoveProjectMemberResponse = {
 	readonly __typename?: 'RemoveProjectMemberResponse'
@@ -912,12 +880,11 @@ export type ResetPasswordError = {
 	readonly endUserMessage?: Maybe<Scalars['String']>
 }
 
-export enum ResetPasswordErrorCode {
-	PasswordTooWeak = 'PASSWORD_TOO_WEAK',
-	TokenExpired = 'TOKEN_EXPIRED',
-	TokenNotFound = 'TOKEN_NOT_FOUND',
-	TokenUsed = 'TOKEN_USED'
-}
+export type ResetPasswordErrorCode =
+  | 'PASSWORD_TOO_WEAK'
+  | 'TOKEN_EXPIRED'
+  | 'TOKEN_NOT_FOUND'
+  | 'TOKEN_USED'
 
 export type ResetPasswordResponse = {
 	readonly __typename?: 'ResetPasswordResponse'
@@ -954,8 +921,18 @@ export type RoleVariableDefinition = {
 	readonly name: Scalars['String']
 }
 
+export type SetProjectSecretError = {
+	readonly __typename?: 'SetProjectSecretError'
+	readonly code: SetProjectSecretErrorCode
+	readonly developerMessage: Scalars['String']
+}
+
+export type SetProjectSecretErrorCode =
+  | 'PROJECT_NOT_FOUND'
+
 export type SetProjectSecretResponse = {
 	readonly __typename?: 'SetProjectSecretResponse'
+	readonly error?: Maybe<SetProjectSecretError>
 	readonly ok: Scalars['Boolean']
 }
 
@@ -967,13 +944,12 @@ export type SignInError = {
 	readonly endUserMessage?: Maybe<Scalars['String']>
 }
 
-export enum SignInErrorCode {
-	InvalidOtpToken = 'INVALID_OTP_TOKEN',
-	InvalidPassword = 'INVALID_PASSWORD',
-	NoPasswordSet = 'NO_PASSWORD_SET',
-	OtpRequired = 'OTP_REQUIRED',
-	UnknownEmail = 'UNKNOWN_EMAIL'
-}
+export type SignInErrorCode =
+  | 'INVALID_OTP_TOKEN'
+  | 'INVALID_PASSWORD'
+  | 'NO_PASSWORD_SET'
+  | 'OTP_REQUIRED'
+  | 'UNKNOWN_EMAIL'
 
 export type SignInIdpError = {
 	readonly __typename?: 'SignInIDPError'
@@ -983,12 +959,11 @@ export type SignInIdpError = {
 	readonly endUserMessage?: Maybe<Scalars['String']>
 }
 
-export enum SignInIdpErrorCode {
-	IdpValidationFailed = 'IDP_VALIDATION_FAILED',
-	InvalidIdpResponse = 'INVALID_IDP_RESPONSE',
-	PersonAlreadyExists = 'PERSON_ALREADY_EXISTS',
-	PersonNotFound = 'PERSON_NOT_FOUND'
-}
+export type SignInIdpErrorCode =
+  | 'IDP_VALIDATION_FAILED'
+  | 'INVALID_IDP_RESPONSE'
+  | 'PERSON_ALREADY_EXISTS'
+  | 'PERSON_NOT_FOUND'
 
 export type SignInIdpResponse = {
 	readonly __typename?: 'SignInIDPResponse'
@@ -1028,9 +1003,8 @@ export type SignOutError = {
 	readonly endUserMessage?: Maybe<Scalars['String']>
 }
 
-export enum SignOutErrorCode {
-	NotAPerson = 'NOT_A_PERSON'
-}
+export type SignOutErrorCode =
+  | 'NOT_A_PERSON'
 
 export type SignOutResponse = {
 	readonly __typename?: 'SignOutResponse'
@@ -1048,10 +1022,9 @@ export type SignUpError = {
 	readonly endPersonMessage?: Maybe<Scalars['String']>
 }
 
-export enum SignUpErrorCode {
-	EmailAlreadyExists = 'EMAIL_ALREADY_EXISTS',
-	TooWeak = 'TOO_WEAK'
-}
+export type SignUpErrorCode =
+  | 'EMAIL_ALREADY_EXISTS'
+  | 'TOO_WEAK'
 
 export type SignUpResponse = {
 	readonly __typename?: 'SignUpResponse'
@@ -1078,16 +1051,24 @@ export type UpdateIdpError = {
 	readonly developerMessage: Scalars['String']
 }
 
-export enum UpdateIdpErrorCode {
-	InvalidConfiguration = 'INVALID_CONFIGURATION',
-	NotFound = 'NOT_FOUND'
-}
+export type UpdateIdpErrorCode =
+  | 'INVALID_CONFIGURATION'
+  | 'NOT_FOUND'
 
 export type UpdateIdpResponse = {
 	readonly __typename?: 'UpdateIDPResponse'
 	readonly error?: Maybe<UpdateIdpError>
 	readonly ok: Scalars['Boolean']
 }
+
+export type UpdateProjectError = {
+	readonly __typename?: 'UpdateProjectError'
+	readonly code: UpdateProjectErrorCode
+	readonly developerMessage: Scalars['String']
+}
+
+export type UpdateProjectErrorCode =
+  | 'PROJECT_NOT_FOUND'
 
 export type UpdateProjectMemberError = {
 	readonly __typename?: 'UpdateProjectMemberError'
@@ -1098,17 +1079,13 @@ export type UpdateProjectMemberError = {
 	readonly membershipValidation?: Maybe<ReadonlyArray<MembershipValidationError>>
 }
 
-export enum UpdateProjectMemberErrorCode {
-	InvalidMembership = 'INVALID_MEMBERSHIP',
-	NotMember = 'NOT_MEMBER',
-	ProjectNotFound = 'PROJECT_NOT_FOUND',
-	/** @deprecated Field no longer supported */
-	RoleNotFound = 'ROLE_NOT_FOUND',
-	/** @deprecated Field no longer supported */
-	VariableEmpty = 'VARIABLE_EMPTY',
-	/** @deprecated Field no longer supported */
-	VariableNotFound = 'VARIABLE_NOT_FOUND'
-}
+export type UpdateProjectMemberErrorCode =
+  | 'INVALID_MEMBERSHIP'
+  | 'NOT_MEMBER'
+  | 'PROJECT_NOT_FOUND'
+  | 'ROLE_NOT_FOUND'
+  | 'VARIABLE_EMPTY'
+  | 'VARIABLE_NOT_FOUND'
 
 export type UpdateProjectMemberResponse = {
 	readonly __typename?: 'UpdateProjectMemberResponse'
@@ -1120,6 +1097,7 @@ export type UpdateProjectMemberResponse = {
 
 export type UpdateProjectResponse = {
 	readonly __typename?: 'UpdateProjectResponse'
+	readonly error?: Maybe<UpdateProjectError>
 	readonly ok: Scalars['Boolean']
 }
 
@@ -1308,6 +1286,8 @@ export type ResolversTypes = {
 	RoleEntityVariableDefinition: ResolverTypeWrapper<RoleEntityVariableDefinition>
 	RolePredefinedVariableDefinition: ResolverTypeWrapper<RolePredefinedVariableDefinition>
 	RoleVariableDefinition: ResolversTypes['RoleConditionVariableDefinition'] | ResolversTypes['RoleEntityVariableDefinition'] | ResolversTypes['RolePredefinedVariableDefinition']
+	SetProjectSecretError: ResolverTypeWrapper<SetProjectSecretError>
+	SetProjectSecretErrorCode: SetProjectSecretErrorCode
 	SetProjectSecretResponse: ResolverTypeWrapper<SetProjectSecretResponse>
 	SignInError: ResolverTypeWrapper<SignInError>
 	SignInErrorCode: SignInErrorCode
@@ -1329,6 +1309,8 @@ export type ResolversTypes = {
 	UpdateIDPError: ResolverTypeWrapper<UpdateIdpError>
 	UpdateIDPErrorCode: UpdateIdpErrorCode
 	UpdateIDPResponse: ResolverTypeWrapper<UpdateIdpResponse>
+	UpdateProjectError: ResolverTypeWrapper<UpdateProjectError>
+	UpdateProjectErrorCode: UpdateProjectErrorCode
 	UpdateProjectMemberError: ResolverTypeWrapper<UpdateProjectMemberError>
 	UpdateProjectMemberErrorCode: UpdateProjectMemberErrorCode
 	UpdateProjectMemberResponse: ResolverTypeWrapper<UpdateProjectMemberResponse>
@@ -1420,6 +1402,7 @@ export type ResolversParentTypes = {
 	RoleEntityVariableDefinition: RoleEntityVariableDefinition
 	RolePredefinedVariableDefinition: RolePredefinedVariableDefinition
 	RoleVariableDefinition: ResolversParentTypes['RoleConditionVariableDefinition'] | ResolversParentTypes['RoleEntityVariableDefinition'] | ResolversParentTypes['RolePredefinedVariableDefinition']
+	SetProjectSecretError: SetProjectSecretError
 	SetProjectSecretResponse: SetProjectSecretResponse
 	SignInError: SignInError
 	SignInIDPError: SignInIdpError
@@ -1436,6 +1419,7 @@ export type ResolversParentTypes = {
 	UnmanagedInviteOptions: UnmanagedInviteOptions
 	UpdateIDPError: UpdateIdpError
 	UpdateIDPResponse: UpdateIdpResponse
+	UpdateProjectError: UpdateProjectError
 	UpdateProjectMemberError: UpdateProjectMemberError
 	UpdateProjectMemberResponse: UpdateProjectMemberResponse
 	UpdateProjectResponse: UpdateProjectResponse
@@ -1924,7 +1908,14 @@ export type RoleVariableDefinitionResolvers<ContextType = any, ParentType extend
 	name?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 }
 
+export type SetProjectSecretErrorResolvers<ContextType = any, ParentType extends ResolversParentTypes['SetProjectSecretError'] = ResolversParentTypes['SetProjectSecretError']> = {
+	code?: Resolver<ResolversTypes['SetProjectSecretErrorCode'], ParentType, ContextType>
+	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
 export type SetProjectSecretResponseResolvers<ContextType = any, ParentType extends ResolversParentTypes['SetProjectSecretResponse'] = ResolversParentTypes['SetProjectSecretResponse']> = {
+	error?: Resolver<Maybe<ResolversTypes['SetProjectSecretError']>, ParentType, ContextType>
 	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
@@ -2017,6 +2008,12 @@ export type UpdateIdpResponseResolvers<ContextType = any, ParentType extends Res
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
+export type UpdateProjectErrorResolvers<ContextType = any, ParentType extends ResolversParentTypes['UpdateProjectError'] = ResolversParentTypes['UpdateProjectError']> = {
+	code?: Resolver<ResolversTypes['UpdateProjectErrorCode'], ParentType, ContextType>
+	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
 export type UpdateProjectMemberErrorResolvers<ContextType = any, ParentType extends ResolversParentTypes['UpdateProjectMemberError'] = ResolversParentTypes['UpdateProjectMemberError']> = {
 	code?: Resolver<ResolversTypes['UpdateProjectMemberErrorCode'], ParentType, ContextType>
 	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
@@ -2033,6 +2030,7 @@ export type UpdateProjectMemberResponseResolvers<ContextType = any, ParentType e
 }
 
 export type UpdateProjectResponseResolvers<ContextType = any, ParentType extends ResolversParentTypes['UpdateProjectResponse'] = ResolversParentTypes['UpdateProjectResponse']> = {
+	error?: Resolver<Maybe<ResolversTypes['UpdateProjectError']>, ParentType, ContextType>
 	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
@@ -2112,6 +2110,7 @@ export type Resolvers<ContextType = any> = {
 	RoleEntityVariableDefinition?: RoleEntityVariableDefinitionResolvers<ContextType>
 	RolePredefinedVariableDefinition?: RolePredefinedVariableDefinitionResolvers<ContextType>
 	RoleVariableDefinition?: RoleVariableDefinitionResolvers<ContextType>
+	SetProjectSecretError?: SetProjectSecretErrorResolvers<ContextType>
 	SetProjectSecretResponse?: SetProjectSecretResponseResolvers<ContextType>
 	SignInError?: SignInErrorResolvers<ContextType>
 	SignInIDPError?: SignInIdpErrorResolvers<ContextType>
@@ -2126,6 +2125,7 @@ export type Resolvers<ContextType = any> = {
 	SignUpResult?: SignUpResultResolvers<ContextType>
 	UpdateIDPError?: UpdateIdpErrorResolvers<ContextType>
 	UpdateIDPResponse?: UpdateIdpResponseResolvers<ContextType>
+	UpdateProjectError?: UpdateProjectErrorResolvers<ContextType>
 	UpdateProjectMemberError?: UpdateProjectMemberErrorResolvers<ContextType>
 	UpdateProjectMemberResponse?: UpdateProjectMemberResponseResolvers<ContextType>
 	UpdateProjectResponse?: UpdateProjectResponseResolvers<ContextType>

@@ -14,7 +14,7 @@ class PasswordChangeManager {
 	async changePassword(dbContext: DatabaseContext, personId: string, password: string): Promise<PasswordChangeManager.PasswordChangeResponse<ChangePasswordErrorCode>> {
 		const weakPassword = getPasswordWeaknessMessage(password)
 		if (weakPassword) {
-			return new ResponseError(ChangePasswordErrorCode.TooWeak, weakPassword)
+			return new ResponseError('TOO_WEAK', weakPassword)
 		}
 		await dbContext.commandBus.execute(new ChangePasswordCommand(personId, password))
 		return new ResponseOk(null)
@@ -23,13 +23,13 @@ class PasswordChangeManager {
 	async changeMyPassword(dbContext: DatabaseContext, person: PersonRow, currentPassword: string, password: string): Promise<PasswordChangeManager.PasswordChangeResponse<ChangeMyPasswordErrorCode>> {
 		const weakPassword = getPasswordWeaknessMessage(password)
 		if (weakPassword) {
-			return new ResponseError(ChangeMyPasswordErrorCode.TooWeak, weakPassword)
+			return new ResponseError('TOO_WEAK', weakPassword)
 		}
 		if (!person.password_hash) {
-			return new ResponseError(ChangeMyPasswordErrorCode.NoPasswordSet, 'No password set')
+			return new ResponseError('NO_PASSWORD_SET', 'No password set')
 		}
 		if (!(await this.providers.bcryptCompare(currentPassword, person.password_hash))) {
-			return new ResponseError(ChangeMyPasswordErrorCode.InvalidPassword, 'Password does not match')
+			return new ResponseError('INVALID_PASSWORD', 'Password does not match')
 		}
 
 		await dbContext.commandBus.execute(new ChangePasswordCommand(person.id, password))

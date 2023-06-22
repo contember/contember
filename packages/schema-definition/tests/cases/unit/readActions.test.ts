@@ -1,7 +1,7 @@
-import { SchemaDefinition as def, ActionsDefinition as actions } from '../../src'
+import { SchemaDefinition as def, ActionsDefinition as actions } from '../../../src'
 import { Model } from '@contember/schema'
 import { expect, test } from 'vitest'
-import { createActions } from '../../src/actions/definition'
+import { createActions } from '../../../src/actions/definition'
 
 namespace SimpleActions {
 

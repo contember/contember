@@ -27,7 +27,7 @@ export class RemoveProjectMemberMutationResolver implements MutationResolvers {
 			message: 'You are not allowed to remove a project member',
 		})
 		if (!project) {
-			return createProjectNotFoundResponse(RemoveProjectMemberErrorCode.ProjectNotFound, projectSlug)
+			return createProjectNotFoundResponse('PROJECT_NOT_FOUND', projectSlug)
 		}
 		const memberships = await this.projectMemberManager.getStoredProjectsMemberships(
 			context.db,

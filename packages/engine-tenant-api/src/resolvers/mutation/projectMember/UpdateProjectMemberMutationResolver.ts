@@ -37,7 +37,7 @@ export class UpdateProjectMemberMutationResolver implements MutationResolvers {
 			message: 'You are not allowed to update project member variables',
 		})
 		if (!project) {
-			return createProjectNotFoundResponse(UpdateProjectMemberErrorCode.ProjectNotFound, projectSlug)
+			return createProjectNotFoundResponse('PROJECT_NOT_FOUND', projectSlug)
 		}
 		const visibleMemberships = await this.projectMemberManager.getStoredProjectsMemberships(
 			context.db,
@@ -65,7 +65,7 @@ export class UpdateProjectMemberMutationResolver implements MutationResolvers {
 			it => it.error !== MembershipValidationErrorType.VARIABLE_EMPTY,
 		)
 		if (validationResult.length > 0) {
-			const errors = createMembershipValidationErrorResult<UpdateProjectMemberErrorCode>(validationResult)
+			const errors = createMembershipValidationErrorResult(validationResult)
 			return {
 				ok: false,
 				errors: errors,

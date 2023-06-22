@@ -28,11 +28,11 @@ export class AddProjectMemberMutationResolver implements MutationResolvers {
 			message: 'You are not allowed to add a project member',
 		})
 		if (!project) {
-			return createProjectNotFoundResponse(AddProjectMemberErrorCode.ProjectNotFound, projectSlug)
+			return createProjectNotFoundResponse('PROJECT_NOT_FOUND', projectSlug)
 		}
 		const validationResult = await this.membershipValidator.validate(project.slug, memberships)
 		if (validationResult.length > 0) {
-			const errors = createMembershipValidationErrorResult<AddProjectMemberErrorCode>(validationResult)
+			const errors = createMembershipValidationErrorResult(validationResult)
 			return {
 				ok: false,
 				errors: errors,

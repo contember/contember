@@ -9,7 +9,7 @@ export class SignOutMutationResolver implements MutationResolvers {
 	async signOut(parent: any, args: MutationSignOutArgs, context: TenantResolverContext): Promise<SignOutResponse> {
 		const person = await context.db.queryHandler.fetch(PersonQuery.byIdentity(context.identity.id))
 		if (!person) {
-			return createErrorResponse(SignOutErrorCode.NotAPerson, 'Only a person can sign out')
+			return createErrorResponse('NOT_A_PERSON', 'Only a person can sign out')
 		}
 
 		await context.requireAccess({

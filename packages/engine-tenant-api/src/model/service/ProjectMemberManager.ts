@@ -1,6 +1,5 @@
 import {
 	AddProjectMemberCommand,
-	AddProjectMemberCommandError,
 	MembershipUpdateInput,
 	RemoveProjectMemberCommand,
 	RemoveProjectMemberResponse,
@@ -8,12 +7,12 @@ import {
 	UpdateProjectMemberResponse,
 } from '../commands'
 import { ProjectMembershipByIdentityQuery, ProjectMembersQuery } from '../queries'
-import { AddProjectMemberErrorCode, MemberType, ProjectMembersInput } from '../../schema'
+import { AddProjectMemberErrorCode, ProjectMembersInput } from '../../schema'
 import { AccessVerifier, PermissionActions, TenantRole } from '../authorization'
 import { indexListBy, notEmpty } from '../../utils/array'
 import { createSetMembershipVariables } from './membershipUtils'
 import { Acl, ProjectRole } from '@contember/schema'
-import { Response, ResponseError, ResponseOk } from '../utils/Response'
+import { Response } from '../utils/Response'
 import { DatabaseContext } from '../utils'
 
 export class ProjectMemberManager {
@@ -24,20 +23,9 @@ export class ProjectMemberManager {
 		memberships: readonly Acl.Membership[],
 	): Promise<AddProjectMemberResponse> {
 		return await dbContext.transaction(async db => {
-			const result = await db.commandBus.execute(
+			return await db.commandBus.execute(
 				new AddProjectMemberCommand(projectId, identityId, createSetMembershipVariables(memberships)),
 			)
-			if (result.ok) {
-				return new ResponseOk(null)
-			}
-			switch (result.error) {
-				case AddProjectMemberCommandError.alreadyMember:
-					return new ResponseError(AddProjectMemberErrorCode.AlreadyMember, result.errorMessage)
-				case AddProjectMemberCommandError.projectNotFound:
-					return new ResponseError(AddProjectMemberErrorCode.ProjectNotFound, result.errorMessage)
-				case AddProjectMemberCommandError.identityNotfound:
-					return new ResponseError(AddProjectMemberErrorCode.IdentityNotFound, result.errorMessage)
-			}
 		})
 	}
 

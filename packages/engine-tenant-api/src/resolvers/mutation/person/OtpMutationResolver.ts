@@ -1,7 +1,5 @@
 import {
-	ConfirmOtpErrorCode,
 	ConfirmOtpResponse,
-	DisableOtpErrorCode,
 	DisableOtpResponse,
 	MutationConfirmOtpArgs,
 	MutationPrepareOtpArgs,
@@ -9,7 +7,7 @@ import {
 	PrepareOtpResponse,
 } from '../../../schema'
 import { TenantResolverContext } from '../../TenantResolverContext'
-import { DatabaseContext, OtpManager, PermissionActions, PersonQuery, PersonRow } from '../../../model'
+import { OtpManager, PermissionActions, PersonQuery, PersonRow } from '../../../model'
 import { ImplementationException } from '../../../exceptions'
 import { createErrorResponse } from '../../errorUtils'
 
@@ -32,12 +30,12 @@ export class OtpMutationResolver implements MutationResolvers {
 		const person = await this.getPersonFromContext(context)
 		if (!person.otp_uri) {
 			return createErrorResponse(
-				ConfirmOtpErrorCode.NotPrepared,
+				'NOT_PREPARED',
 				`OTP setup was not initialized. Call prepareOtp first.`,
 			)
 		}
 		if (!this.otpManager.verifyOtp(person, args.otpToken)) {
-			return createErrorResponse(ConfirmOtpErrorCode.InvalidOtpToken, 'Provided token is not correct.')
+			return createErrorResponse('INVALID_OTP_TOKEN', 'Provided token is not correct.')
 		}
 		await this.otpManager.confirmOtp(context.db, person)
 		return {
@@ -49,7 +47,7 @@ export class OtpMutationResolver implements MutationResolvers {
 	async disableOtp(parent: any, args: {}, context: TenantResolverContext): Promise<DisableOtpResponse> {
 		const person = await this.getPersonFromContext(context)
 		if (!person.otp_uri) {
-			return createErrorResponse(DisableOtpErrorCode.OtpNotActive, 'OTP is not active, you cannot disable it.')
+			return createErrorResponse('OTP_NOT_ACTIVE', 'OTP is not active, you cannot disable it.')
 		}
 		await this.otpManager.disableOtp(context.db, person)
 		return {

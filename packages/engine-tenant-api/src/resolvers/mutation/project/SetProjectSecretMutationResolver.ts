@@ -24,7 +24,7 @@ export class SetProjectSecretMutationResolver implements MutationResolvers {
 			message: 'You are not allowed to set project secrets',
 		})
 		if (!project) {
-			return createProjectNotFoundResponse(AddProjectMemberErrorCode.ProjectNotFound, args.projectSlug)
+			return createProjectNotFoundResponse('PROJECT_NOT_FOUND', args.projectSlug)
 		}
 		await this.secretManager.setSecret(context.db, project.id, args.key, args.value)
 		return { ok: true }

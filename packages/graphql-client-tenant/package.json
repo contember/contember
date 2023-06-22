@@ -4,7 +4,7 @@
   "license": "Apache-2.0",
   "main": "dist/src/index.js",
   "exports": {
-    "tsx": "./src/index.ts",
+    "typescript": "./src/index.ts",
     "default": "./dist/src/index.js"
   },
   "scripts": {
@@ -19,7 +19,6 @@
     "@contember/engine-tenant-api": "workspace:*",
     "@graphql-tools/schema": "^8.3.5",
     "@types/node": "^18",
-    "graphql-ts-client-codegen": "^3.1.14",
-    "tsx": "^3.12.6"
+    "graphql-ts-client-codegen": "^3.1.14"
   }
 }

@@ -37,9 +37,8 @@ export class ResetPasswordMutationResolver implements MutationResolvers {
 		})
 		const person = await context.db.queryHandler.fetch(PersonQuery.byEmail(args.email))
 		if (!person) {
-			return createErrorResponse(CreatePasswordResetRequestErrorCode.PersonNotFound, 'Person was not found.')
+			return createErrorResponse('PERSON_NOT_FOUND', 'Person was not found.')
 		}
-
 
 		const permissionContext = await this.permissionContextFactory.create(context.db, {
 			id: person.identity_id,
@@ -67,13 +66,6 @@ export class ResetPasswordMutationResolver implements MutationResolvers {
 		if (result.ok) {
 			return { ok: true, errors: [] }
 		}
-		const err = result.error
-		const code = {
-			[ResetPasswordErrorCode.PASSWORD_TOO_WEAK]: SchemaResetPasswordErrorCode.PasswordTooWeak,
-			[ResetPasswordCommandErrorCode.TOKEN_EXPIRED]: SchemaResetPasswordErrorCode.TokenExpired,
-			[ResetPasswordCommandErrorCode.TOKEN_NOT_FOUND]: SchemaResetPasswordErrorCode.TokenNotFound,
-			[ResetPasswordCommandErrorCode.TOKEN_USED]: SchemaResetPasswordErrorCode.TokenUsed,
-		}[err]
-		return createErrorResponse(code, result.errorMessage)
+		return createErrorResponse(result.error, result.errorMessage)
 	}
 }

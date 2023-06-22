@@ -10,7 +10,7 @@
   },
   "scripts": {
     "generate": "gql-gen --config graphql.codegen.yml",
-    "test": "vitest"
+    "test": "vitest --dir ./tests/cases"
   },
   "dependencies": {
     "@contember/authorization": "workspace:*",

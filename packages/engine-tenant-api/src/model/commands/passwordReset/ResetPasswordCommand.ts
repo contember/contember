@@ -23,20 +23,14 @@ export class ResetPasswordCommand implements Command<ResetPasswordCommandRespons
 					.getResult(db)
 			)[0] || null
 		if (!result) {
-			return new ResponseError(ResetPasswordCommandErrorCode.TOKEN_NOT_FOUND, 'Token was not found')
+			return new ResponseError('TOKEN_NOT_FOUND', 'Token was not found')
 		}
 		if (result.used_at) {
-			return new ResponseError(
-				ResetPasswordCommandErrorCode.TOKEN_USED,
-				`Token was used at ${result.used_at.toISOString()}`,
-			)
+			return new ResponseError('TOKEN_USED', `Token was used at ${result.used_at.toISOString()}`)
 		}
 		const now = providers.now()
 		if (result.expires_at < now) {
-			return new ResponseError(
-				ResetPasswordCommandErrorCode.TOKEN_EXPIRED,
-				`Token expired at ${result.expires_at.toISOString()}`,
-			)
+			return new ResponseError('TOKEN_EXPIRED', `Token expired at ${result.expires_at.toISOString()}`)
 		}
 		const count = await UpdateBuilder.create()
 			.table('person_password_reset')
@@ -52,13 +46,12 @@ export class ResetPasswordCommand implements Command<ResetPasswordCommandRespons
 
 		await bus.execute(new ChangePasswordCommand(result.person_id, this.password))
 
-		return new ResponseOk(undefined)
+		return new ResponseOk(null)
 	}
 }
-export enum ResetPasswordCommandErrorCode {
-	TOKEN_NOT_FOUND = 'TOKEN_NOT_FOUND',
-	TOKEN_USED = 'TOKEN_USED',
-	TOKEN_EXPIRED = 'TOKEN_EXPIRED',
-}
+export type ResetPasswordCommandErrorCode =
+	|  'TOKEN_NOT_FOUND'
+	|  'TOKEN_USED'
+	|  'TOKEN_EXPIRED'
 
-export type ResetPasswordCommandResponse = Response<undefined, ResetPasswordCommandErrorCode>
+export type ResetPasswordCommandResponse = Response<null, ResetPasswordCommandErrorCode>

@@ -1,4 +1,4 @@
-import { MemberType, ProjectIdentityRelation, ProjectMembersArgs, ProjectResolvers } from '../../schema'
+import { ProjectIdentityRelation, ProjectMembersArgs, ProjectResolvers } from '../../schema'
 import { TenantResolverContext } from '../TenantResolverContext'
 import { PermissionActions, Project, ProjectMemberManager, ProjectSchemaResolver } from '../../model'
 import { getRoleVariables } from '@contember/schema-utils'
@@ -21,7 +21,7 @@ export class ProjectTypeResolver implements ProjectResolvers {
 		if (!(await verifier(PermissionActions.PROJECT_VIEW_MEMBER([])))) {
 			return []
 		}
-		if (args.input?.filter?.email && args.input.filter.memberType === MemberType.ApiKey) {
+		if (args.input?.filter?.email && args.input.filter.memberType === 'API_KEY') {
 			throw new UserInputError(`Cannot use email filter for ApiKey member type.`)
 		}
 		if (args.memberType && args.input) {

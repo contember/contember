@@ -4,7 +4,7 @@
   "license": "Apache-2.0",
   "main": "dist/src/index.js",
   "exports": {
-    "tsx": "./src/index.ts",
+    "typescript": "./src/index.ts",
     "default": "./dist/src/index.js"
   },
   "scripts": {

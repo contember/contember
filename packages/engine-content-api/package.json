@@ -10,7 +10,7 @@
   },
   "scripts": {
     "generate": "gql-gen --config graphql.codegen.yml",
-    "test": "vitest --no-threads"
+    "test": "vitest --dir ./tests/cases --no-threads"
   },
   "dependencies": {
     "@contember/database": "workspace:*",

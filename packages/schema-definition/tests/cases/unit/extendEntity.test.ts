@@ -1,8 +1,8 @@
 import { Model } from '@contember/schema'
 import { assert, test } from 'vitest'
-import { createSchema, SchemaDefinition as def } from '../../src'
-import { extendEntity, FieldDefinition } from '../../src/model/definition'
-import { DecoratorFunction } from '../../src/utils'
+import { createSchema, SchemaDefinition as def } from '../../../src'
+import { extendEntity, FieldDefinition } from '../../../src/model/definition'
+import { DecoratorFunction } from '../../../src/utils'
 
 namespace ExtendedModel {
 	export class Article {

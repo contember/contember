@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest'
-import { createSchema, SchemaDefinition as def, AclDefinition as acl } from '../../src'
+import { createSchema, SchemaDefinition as def, AclDefinition as acl } from '../../../src'
 
 namespace SimpleModel {
 	export const publicRole = acl.createRole('public')

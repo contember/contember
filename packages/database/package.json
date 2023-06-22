@@ -9,7 +9,7 @@
     "default": "./dist/src/index.js"
   },
   "scripts": {
-    "test": "vitest"
+    "test": "vitest --dir ./tests/cases"
   },
   "dependencies": {
     "@contember/queryable": "workspace:*"

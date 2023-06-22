@@ -15,7 +15,7 @@ import {
 	SignOutMutationResolver,
 	SignUpMutationResolver,
 	UpdateProjectMemberMutationResolver,
-	UpdateProjectMutationResolver,
+	UpdateProjectMutationResolver, IdentityGlobalRolesMutationResolver,
 } from './mutation'
 
 import { Resolvers } from '../schema'
@@ -62,6 +62,8 @@ class ResolverFactory {
 
 			identityTypeResolver: IdentityTypeResolver
 			projectTypeResolver: ProjectTypeResolver
+
+			identityGlobalRolesMutationResolver: IdentityGlobalRolesMutationResolver
 
 		},
 	) {}
@@ -132,6 +134,9 @@ class ResolverFactory {
 				createProject: this.resolvers.createProjectMutationResolver.createProject.bind(this.resolvers.createProjectMutationResolver),
 				updateProject: this.resolvers.updateProjectMutationResolver.updateProject.bind(this.resolvers.updateProjectMutationResolver),
 				setProjectSecret: this.resolvers.setProjectSecretMutationResolver.setProjectSecret.bind(this.resolvers.setProjectSecretMutationResolver),
+
+				addGlobalIdentityRoles: this.resolvers.identityGlobalRolesMutationResolver.addGlobalIdentityRoles.bind(this.resolvers.identityGlobalRolesMutationResolver),
+				removeGlobalIdentityRoles: this.resolvers.identityGlobalRolesMutationResolver.removeGlobalIdentityRoles.bind(this.resolvers.identityGlobalRolesMutationResolver),
 			},
 		}
 	}

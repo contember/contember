@@ -16,6 +16,28 @@ export type Scalars = {
 	Json: any
 }
 
+export type AddGlobalIdentityRolesError = {
+	readonly __typename?: 'AddGlobalIdentityRolesError'
+	readonly code: AddGlobalIdentityRolesErrorCode
+	readonly developerMessage: Scalars['String']
+}
+
+export type AddGlobalIdentityRolesErrorCode =
+  | 'IDENTITY_NOT_FOUND'
+  | 'INVALID_ROLE'
+
+export type AddGlobalIdentityRolesResponse = {
+	readonly __typename?: 'AddGlobalIdentityRolesResponse'
+	readonly error?: Maybe<AddGlobalIdentityRolesError>
+	readonly ok: Scalars['Boolean']
+	readonly result?: Maybe<AddGlobalIdentityRolesResult>
+}
+
+export type AddGlobalIdentityRolesResult = {
+	readonly __typename?: 'AddGlobalIdentityRolesResult'
+	readonly identity: Identity
+}
+
 export type AddIdpError = {
 	readonly __typename?: 'AddIDPError'
 	readonly code: AddIdpErrorCode
@@ -502,6 +524,7 @@ export type MembershipValidationErrorCode =
 
 export type Mutation = {
 	readonly __typename?: 'Mutation'
+	readonly addGlobalIdentityRoles?: Maybe<AddGlobalIdentityRolesResponse>
 	readonly addIDP?: Maybe<AddIdpResponse>
 	readonly addMailTemplate?: Maybe<AddMailTemplateResponse>
 	/** @deprecated use addMailTemplate */
@@ -522,6 +545,7 @@ export type Mutation = {
 	readonly initSignInIDP?: Maybe<InitSignInIdpResponse>
 	readonly invite?: Maybe<InviteResponse>
 	readonly prepareOtp?: Maybe<PrepareOtpResponse>
+	readonly removeGlobalIdentityRoles?: Maybe<RemoveGlobalIdentityRolesResponse>
 	readonly removeMailTemplate?: Maybe<RemoveMailTemplateResponse>
 	/** @deprecated use removeMailTemplate */
 	readonly removeProjectMailTemplate?: Maybe<RemoveMailTemplateResponse>
@@ -536,6 +560,12 @@ export type Mutation = {
 	readonly updateIDP?: Maybe<UpdateIdpResponse>
 	readonly updateProject?: Maybe<UpdateProjectResponse>
 	readonly updateProjectMember?: Maybe<UpdateProjectMemberResponse>
+}
+
+
+export type MutationAddGlobalIdentityRolesArgs = {
+	identityId: Scalars['String']
+	roles: ReadonlyArray<Scalars['String']>
 }
 
 
@@ -652,6 +682,12 @@ export type MutationInviteArgs = {
 
 export type MutationPrepareOtpArgs = {
 	label?: InputMaybe<Scalars['String']>
+}
+
+
+export type MutationRemoveGlobalIdentityRolesArgs = {
+	identityId: Scalars['String']
+	roles: ReadonlyArray<Scalars['String']>
 }
 
 
@@ -832,6 +868,28 @@ export type QueryProjectBySlugArgs = {
 export type QueryProjectMembershipsArgs = {
 	identityId: Scalars['String']
 	projectSlug: Scalars['String']
+}
+
+export type RemoveGlobalIdentityRolesError = {
+	readonly __typename?: 'RemoveGlobalIdentityRolesError'
+	readonly code: RemoveGlobalIdentityRolesErrorCode
+	readonly developerMessage: Scalars['String']
+}
+
+export type RemoveGlobalIdentityRolesErrorCode =
+  | 'IDENTITY_NOT_FOUND'
+  | 'INVALID_ROLE'
+
+export type RemoveGlobalIdentityRolesResponse = {
+	readonly __typename?: 'RemoveGlobalIdentityRolesResponse'
+	readonly error?: Maybe<RemoveGlobalIdentityRolesError>
+	readonly ok: Scalars['Boolean']
+	readonly result?: Maybe<RemoveGlobalIdentityRolesResult>
+}
+
+export type RemoveGlobalIdentityRolesResult = {
+	readonly __typename?: 'RemoveGlobalIdentityRolesResult'
+	readonly identity: Identity
 }
 
 export type RemoveMailTemplateError = {
@@ -1181,6 +1239,10 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = {
+	AddGlobalIdentityRolesError: ResolverTypeWrapper<AddGlobalIdentityRolesError>
+	AddGlobalIdentityRolesErrorCode: AddGlobalIdentityRolesErrorCode
+	AddGlobalIdentityRolesResponse: ResolverTypeWrapper<AddGlobalIdentityRolesResponse>
+	AddGlobalIdentityRolesResult: ResolverTypeWrapper<AddGlobalIdentityRolesResult>
 	AddIDPError: ResolverTypeWrapper<AddIdpError>
 	AddIDPErrorCode: AddIdpErrorCode
 	AddIDPResponse: ResolverTypeWrapper<AddIdpResponse>
@@ -1272,6 +1334,10 @@ export type ResolversTypes = {
 	ProjectMembersInput: ProjectMembersInput
 	ProjectSecret: ProjectSecret
 	Query: ResolverTypeWrapper<{}>
+	RemoveGlobalIdentityRolesError: ResolverTypeWrapper<RemoveGlobalIdentityRolesError>
+	RemoveGlobalIdentityRolesErrorCode: RemoveGlobalIdentityRolesErrorCode
+	RemoveGlobalIdentityRolesResponse: ResolverTypeWrapper<RemoveGlobalIdentityRolesResponse>
+	RemoveGlobalIdentityRolesResult: ResolverTypeWrapper<RemoveGlobalIdentityRolesResult>
 	RemoveMailTemplateError: ResolverTypeWrapper<RemoveMailTemplateError>
 	RemoveMailTemplateErrorCode: RemoveMailTemplateErrorCode
 	RemoveMailTemplateResponse: ResolverTypeWrapper<RemoveMailTemplateResponse>
@@ -1321,6 +1387,9 @@ export type ResolversTypes = {
 
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = {
+	AddGlobalIdentityRolesError: AddGlobalIdentityRolesError
+	AddGlobalIdentityRolesResponse: AddGlobalIdentityRolesResponse
+	AddGlobalIdentityRolesResult: AddGlobalIdentityRolesResult
 	AddIDPError: AddIdpError
 	AddIDPResponse: AddIdpResponse
 	AddMailTemplateError: AddMailTemplateError
@@ -1391,6 +1460,9 @@ export type ResolversParentTypes = {
 	ProjectMembersInput: ProjectMembersInput
 	ProjectSecret: ProjectSecret
 	Query: {}
+	RemoveGlobalIdentityRolesError: RemoveGlobalIdentityRolesError
+	RemoveGlobalIdentityRolesResponse: RemoveGlobalIdentityRolesResponse
+	RemoveGlobalIdentityRolesResult: RemoveGlobalIdentityRolesResult
 	RemoveMailTemplateError: RemoveMailTemplateError
 	RemoveMailTemplateResponse: RemoveMailTemplateResponse
 	RemoveProjectMemberError: RemoveProjectMemberError
@@ -1425,6 +1497,24 @@ export type ResolversParentTypes = {
 	UpdateProjectResponse: UpdateProjectResponse
 	VariableEntry: VariableEntry
 	VariableEntryInput: VariableEntryInput
+}
+
+export type AddGlobalIdentityRolesErrorResolvers<ContextType = any, ParentType extends ResolversParentTypes['AddGlobalIdentityRolesError'] = ResolversParentTypes['AddGlobalIdentityRolesError']> = {
+	code?: Resolver<ResolversTypes['AddGlobalIdentityRolesErrorCode'], ParentType, ContextType>
+	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
+export type AddGlobalIdentityRolesResponseResolvers<ContextType = any, ParentType extends ResolversParentTypes['AddGlobalIdentityRolesResponse'] = ResolversParentTypes['AddGlobalIdentityRolesResponse']> = {
+	error?: Resolver<Maybe<ResolversTypes['AddGlobalIdentityRolesError']>, ParentType, ContextType>
+	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	result?: Resolver<Maybe<ResolversTypes['AddGlobalIdentityRolesResult']>, ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
+export type AddGlobalIdentityRolesResultResolvers<ContextType = any, ParentType extends ResolversParentTypes['AddGlobalIdentityRolesResult'] = ResolversParentTypes['AddGlobalIdentityRolesResult']> = {
+	identity?: Resolver<ResolversTypes['Identity'], ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type AddIdpErrorResolvers<ContextType = any, ParentType extends ResolversParentTypes['AddIDPError'] = ResolversParentTypes['AddIDPError']> = {
@@ -1758,6 +1848,7 @@ export type MembershipValidationErrorResolvers<ContextType = any, ParentType ext
 }
 
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
+	addGlobalIdentityRoles?: Resolver<Maybe<ResolversTypes['AddGlobalIdentityRolesResponse']>, ParentType, ContextType, RequireFields<MutationAddGlobalIdentityRolesArgs, 'identityId' | 'roles'>>
 	addIDP?: Resolver<Maybe<ResolversTypes['AddIDPResponse']>, ParentType, ContextType, RequireFields<MutationAddIdpArgs, 'configuration' | 'identityProvider' | 'type'>>
 	addMailTemplate?: Resolver<Maybe<ResolversTypes['AddMailTemplateResponse']>, ParentType, ContextType, RequireFields<MutationAddMailTemplateArgs, 'template'>>
 	addProjectMailTemplate?: Resolver<Maybe<ResolversTypes['AddMailTemplateResponse']>, ParentType, ContextType, RequireFields<MutationAddProjectMailTemplateArgs, 'template'>>
@@ -1777,6 +1868,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
 	initSignInIDP?: Resolver<Maybe<ResolversTypes['InitSignInIDPResponse']>, ParentType, ContextType, RequireFields<MutationInitSignInIdpArgs, 'identityProvider'>>
 	invite?: Resolver<Maybe<ResolversTypes['InviteResponse']>, ParentType, ContextType, RequireFields<MutationInviteArgs, 'email' | 'memberships' | 'projectSlug'>>
 	prepareOtp?: Resolver<Maybe<ResolversTypes['PrepareOtpResponse']>, ParentType, ContextType, Partial<MutationPrepareOtpArgs>>
+	removeGlobalIdentityRoles?: Resolver<Maybe<ResolversTypes['RemoveGlobalIdentityRolesResponse']>, ParentType, ContextType, RequireFields<MutationRemoveGlobalIdentityRolesArgs, 'identityId' | 'roles'>>
 	removeMailTemplate?: Resolver<Maybe<ResolversTypes['RemoveMailTemplateResponse']>, ParentType, ContextType, RequireFields<MutationRemoveMailTemplateArgs, 'templateIdentifier'>>
 	removeProjectMailTemplate?: Resolver<Maybe<ResolversTypes['RemoveMailTemplateResponse']>, ParentType, ContextType, RequireFields<MutationRemoveProjectMailTemplateArgs, 'templateIdentifier'>>
 	removeProjectMember?: Resolver<Maybe<ResolversTypes['RemoveProjectMemberResponse']>, ParentType, ContextType, RequireFields<MutationRemoveProjectMemberArgs, 'identityId' | 'projectSlug'>>
@@ -1836,6 +1928,24 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
 	projectBySlug?: Resolver<Maybe<ResolversTypes['Project']>, ParentType, ContextType, RequireFields<QueryProjectBySlugArgs, 'slug'>>
 	projectMemberships?: Resolver<ReadonlyArray<ResolversTypes['Membership']>, ParentType, ContextType, RequireFields<QueryProjectMembershipsArgs, 'identityId' | 'projectSlug'>>
 	projects?: Resolver<ReadonlyArray<ResolversTypes['Project']>, ParentType, ContextType>
+}
+
+export type RemoveGlobalIdentityRolesErrorResolvers<ContextType = any, ParentType extends ResolversParentTypes['RemoveGlobalIdentityRolesError'] = ResolversParentTypes['RemoveGlobalIdentityRolesError']> = {
+	code?: Resolver<ResolversTypes['RemoveGlobalIdentityRolesErrorCode'], ParentType, ContextType>
+	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
+export type RemoveGlobalIdentityRolesResponseResolvers<ContextType = any, ParentType extends ResolversParentTypes['RemoveGlobalIdentityRolesResponse'] = ResolversParentTypes['RemoveGlobalIdentityRolesResponse']> = {
+	error?: Resolver<Maybe<ResolversTypes['RemoveGlobalIdentityRolesError']>, ParentType, ContextType>
+	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	result?: Resolver<Maybe<ResolversTypes['RemoveGlobalIdentityRolesResult']>, ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
+export type RemoveGlobalIdentityRolesResultResolvers<ContextType = any, ParentType extends ResolversParentTypes['RemoveGlobalIdentityRolesResult'] = ResolversParentTypes['RemoveGlobalIdentityRolesResult']> = {
+	identity?: Resolver<ResolversTypes['Identity'], ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type RemoveMailTemplateErrorResolvers<ContextType = any, ParentType extends ResolversParentTypes['RemoveMailTemplateError'] = ResolversParentTypes['RemoveMailTemplateError']> = {
@@ -2042,6 +2152,9 @@ export type VariableEntryResolvers<ContextType = any, ParentType extends Resolve
 }
 
 export type Resolvers<ContextType = any> = {
+	AddGlobalIdentityRolesError?: AddGlobalIdentityRolesErrorResolvers<ContextType>
+	AddGlobalIdentityRolesResponse?: AddGlobalIdentityRolesResponseResolvers<ContextType>
+	AddGlobalIdentityRolesResult?: AddGlobalIdentityRolesResultResolvers<ContextType>
 	AddIDPError?: AddIdpErrorResolvers<ContextType>
 	AddIDPResponse?: AddIdpResponseResolvers<ContextType>
 	AddMailTemplateError?: AddMailTemplateErrorResolvers<ContextType>
@@ -2099,6 +2212,9 @@ export type Resolvers<ContextType = any> = {
 	Project?: ProjectResolvers<ContextType>
 	ProjectIdentityRelation?: ProjectIdentityRelationResolvers<ContextType>
 	Query?: QueryResolvers<ContextType>
+	RemoveGlobalIdentityRolesError?: RemoveGlobalIdentityRolesErrorResolvers<ContextType>
+	RemoveGlobalIdentityRolesResponse?: RemoveGlobalIdentityRolesResponseResolvers<ContextType>
+	RemoveGlobalIdentityRolesResult?: RemoveGlobalIdentityRolesResultResolvers<ContextType>
 	RemoveMailTemplateError?: RemoveMailTemplateErrorResolvers<ContextType>
 	RemoveMailTemplateResponse?: RemoveMailTemplateResponseResolvers<ContextType>
 	RemoveProjectMemberError?: RemoveProjectMemberErrorResolvers<ContextType>

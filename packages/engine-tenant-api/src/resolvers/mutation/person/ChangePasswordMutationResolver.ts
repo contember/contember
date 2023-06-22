@@ -25,7 +25,7 @@ export class ChangePasswordMutationResolver implements MutationResolvers {
 	): Promise<ChangePasswordResponse> {
 		const person = await context.db.queryHandler.fetch(PersonQuery.byId(args.personId))
 		if (!person) {
-			return createErrorResponse(ChangePasswordErrorCode.PersonNotFound, 'Person not found')
+			return createErrorResponse('PERSON_NOT_FOUND', 'Person not found')
 		}
 
 		await context.requireAccess({
@@ -50,7 +50,7 @@ export class ChangePasswordMutationResolver implements MutationResolvers {
 	): Promise<ChangeMyPasswordResponse> {
 		const person = await context.db.queryHandler.fetch(PersonQuery.byIdentity(context.identity.id))
 		if (!person) {
-			return createErrorResponse(ChangeMyPasswordErrorCode.NotAPerson, 'Only a person can change a password')
+			return createErrorResponse('NOT_A_PERSON', 'Only a person can change a password')
 		}
 		await context.requireAccess({
 			action: PermissionActions.PERSON_CHANGE_MY_PASSWORD,

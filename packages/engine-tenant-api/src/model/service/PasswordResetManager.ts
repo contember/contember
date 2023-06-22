@@ -56,14 +56,12 @@ export class PasswordResetManager {
 	public async resetPassword(dbContext: DatabaseContext, token: string, password: string): Promise<ResetPasswordResponse> {
 		const weakPassword = getPasswordWeaknessMessage(password)
 		if (weakPassword) {
-			return new ResponseError(ResetPasswordErrorCode.PASSWORD_TOO_WEAK, weakPassword)
+			return new ResponseError('PASSWORD_TOO_WEAK', weakPassword)
 		}
 		return await dbContext.commandBus.execute(new ResetPasswordCommand(token, password))
 	}
 }
 
-export enum ResetPasswordErrorCode {
-	PASSWORD_TOO_WEAK = 'PASSWORD_TOO_WEAK',
-}
+export type ResetPasswordErrorCode = 'PASSWORD_TOO_WEAK'
 
-export type ResetPasswordResponse = Response<undefined, ResetPasswordErrorCode | ResetPasswordCommandErrorCode>
+export type ResetPasswordResponse = Response<null, ResetPasswordErrorCode | ResetPasswordCommandErrorCode>

@@ -4,5 +4,5 @@ export const createErrorResponse = <T>(code: T, developerMessage: string): Error
 	const error = { code, developerMessage }
 	return { ok: false, error, errors: [error] }
 }
-export const createProjectNotFoundResponse = <T>(code: T, projectSlug: string): ErrorResponse<T> =>
+export const createProjectNotFoundResponse = <const T>(code: T, projectSlug: string): ErrorResponse<T> =>
 	createErrorResponse(code, `Project ${projectSlug} was not found or you are not allowed to access it.`)

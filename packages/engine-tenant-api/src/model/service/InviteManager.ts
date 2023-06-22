@@ -60,7 +60,7 @@ export class InviteManager {
 				const identityId = await trx.commandBus.execute(new CreateIdentityCommand([TenantRole.PERSON]))
 
 				generatedPassword = password ??
-					(method === InviteMethod.CreatePassword ? (await this.providers.randomBytes(9)).toString('base64') : null)
+					(method === 'CREATE_PASSWORD' ? (await this.providers.randomBytes(9)).toString('base64') : null)
 				const passwordWrapper = generatedPassword !== null ? new PasswordPlain(generatedPassword) : NoPassword
 
 				person = await trx.commandBus.execute(new CreatePersonCommand({
@@ -69,7 +69,7 @@ export class InviteManager {
 					name,
 					password: passwordWrapper,
 				}))
-				if (method === InviteMethod.ResetPassword) {
+				if (method === 'RESET_PASSWORD') {
 					const result = await trx.commandBus.execute(new CreatePasswordResetRequestCommand(person.id, INVITATION_RESET_TOKEN_EXPIRATION_MINUTES))
 					resetToken = result.token
 				}

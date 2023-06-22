@@ -17,12 +17,12 @@ type SignUpUser = {
 export class SignUpManager {
 	async signUp(dbContext: DatabaseContext, { email, password, roles = [] }: SignUpUser): Promise<SignUpResponse> {
 		if (await this.isEmailAlreadyUsed(dbContext, email)) {
-			return new ResponseError(SignUpErrorCode.EmailAlreadyExists, `User with email ${email} already exists`)
+			return new ResponseError('EMAIL_ALREADY_EXISTS', `User with email ${email} already exists`)
 		}
 		const plainPassword = password.getPlain()
 		const weakPassword = plainPassword ? getPasswordWeaknessMessage(plainPassword) : null
 		if (weakPassword) {
-			return new ResponseError(SignUpErrorCode.TooWeak, weakPassword)
+			return new ResponseError('TOO_WEAK', weakPassword)
 		}
 		const person = await dbContext.transaction(async db => {
 			const identityId = await db.commandBus.execute(new CreateIdentityCommand([...roles, TenantRole.PERSON]))

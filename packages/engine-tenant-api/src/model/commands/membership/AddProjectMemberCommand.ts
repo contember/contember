@@ -4,7 +4,7 @@ import { Response, ResponseError, ResponseOk } from '../../utils/Response'
 import { SelectBuilder } from '@contember/database'
 import { MembershipInput } from './types'
 
-type CommandResponse = Response<undefined, AddProjectMemberCommandError>
+type CommandResponse = Response<null, AddProjectMemberCommandError>
 
 export class AddProjectMemberCommand implements Command<CommandResponse> {
 	constructor(
@@ -24,7 +24,7 @@ export class AddProjectMemberCommand implements Command<CommandResponse> {
 			.getResult(db)
 		if (result.length > 0) {
 			return new ResponseError(
-				AddProjectMemberCommandError.alreadyMember,
+				'ALREADY_MEMBER',
 				`This identity is already a project member. Use updateProjectMember mutation to change memberships.`,
 			)
 		}
@@ -33,16 +33,16 @@ export class AddProjectMemberCommand implements Command<CommandResponse> {
 			for (const membership of this.memberships) {
 				await bus.execute(new CreateOrUpdateProjectMembershipCommand(this.projectId, this.identityId, membership))
 			}
-			return new ResponseOk(undefined)
+			return new ResponseOk(null)
 		} catch (e) {
 			if (!(e instanceof Error)) {
 				throw e
 			}
 			switch ((e as any).constraint) {
 				case 'project_membership_project':
-					return new ResponseError(AddProjectMemberCommandError.projectNotFound, 'Project not found')
+					return new ResponseError('PROJECT_NOT_FOUND', 'Project not found')
 				case 'project_membership_identity':
-					return new ResponseError(AddProjectMemberCommandError.identityNotfound, 'Identity not found')
+					return new ResponseError('IDENTITY_NOT_FOUND', 'Identity not found')
 				default:
 					throw e
 			}
@@ -50,8 +50,7 @@ export class AddProjectMemberCommand implements Command<CommandResponse> {
 	}
 }
 
-export enum AddProjectMemberCommandError {
-	alreadyMember,
-	projectNotFound,
-	identityNotfound,
-}
+export type AddProjectMemberCommandError =
+	| 'ALREADY_MEMBER'
+	| 'PROJECT_NOT_FOUND'
+	| 'IDENTITY_NOT_FOUND'

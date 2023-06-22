@@ -23,7 +23,7 @@ export class UpdateProjectMemberCommand implements Command<UpdateProjectMemberRe
 			})
 			.getResult(db)
 		if (result.length === 0) {
-			return new ResponseError(UpdateProjectMemberErrorCode.NotMember, 'Not a project member')
+			return new ResponseError('NOT_MEMBER', 'Not a project member')
 		}
 
 		try {
@@ -44,7 +44,7 @@ export class UpdateProjectMemberCommand implements Command<UpdateProjectMemberRe
 			}
 			switch ((e as any).constraint) {
 				case 'project_membership_project':
-					return new ResponseError(UpdateProjectMemberErrorCode.ProjectNotFound, 'Project not found')
+					return new ResponseError('PROJECT_NOT_FOUND', 'Project not found')
 				default:
 					throw e
 			}

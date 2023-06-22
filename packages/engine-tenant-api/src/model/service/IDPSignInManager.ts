@@ -21,7 +21,7 @@ class IDPSignInManager {
 		responseData: unknown,
 		expiration?: number,
 	): Promise<IDPSignInManager.SignInIDPResponse> {
-		return dbContext.transaction(async db => {
+		return dbContext.transaction(async (db): Promise<IDPSignInManager.SignInIDPResponse> => {
 			const provider = await db.queryHandler.fetch(new IdentityProviderBySlugQuery(idpSlug))
 			if (!provider || provider.disabledAt) {
 				throw new Error('provider not found')
@@ -36,16 +36,16 @@ class IDPSignInManager {
 				)
 			} catch (e) {
 				if (e instanceof IDPResponseError) {
-					return new ResponseError(SignInIdpErrorCode.InvalidIdpResponse, e.message)
+					return new ResponseError('INVALID_IDP_RESPONSE', e.message)
 				}
 				if (e instanceof IDPValidationError) {
-					return new ResponseError(SignInIdpErrorCode.IdpValidationFailed, e.message)
+					return new ResponseError('IDP_VALIDATION_FAILED', e.message)
 				}
 				throw e
 			}
 			const personRow = await this.resolvePerson(db, claim, provider)
 			if (!personRow) {
-				return new ResponseError(SignInIdpErrorCode.PersonNotFound, `Person ${claim.email} not found`)
+				return new ResponseError('PERSON_NOT_FOUND', `Person ${claim.email} not found`)
 			}
 
 			const sessionToken = await this.apiKeyManager.createSessionApiKey(db, personRow.identity_id, expiration)
@@ -56,7 +56,7 @@ class IDPSignInManager {
 	async initSignInIDP(dbContext: DatabaseContext, idpSlug: string, data: unknown): Promise<IDPSignInManager.InitSignInIDPResponse> {
 		const provider = await dbContext.queryHandler.fetch(new IdentityProviderBySlugQuery(idpSlug))
 		if (!provider || provider.disabledAt) {
-			return new ResponseError(InitSignInIdpErrorCode.ProviderNotFound, `Identity provider ${idpSlug} not found`)
+			return new ResponseError('PROVIDER_NOT_FOUND', `Identity provider ${idpSlug} not found`)
 		}
 		const providerService = this.idpRegistry.getHandler(provider.type)
 		const validatedConfig = providerService.validateConfiguration(provider.configuration)
@@ -65,7 +65,7 @@ class IDPSignInManager {
 			return new ResponseOk(initResponse)
 		} catch (e) {
 			if (e instanceof IDPValidationError) {
-				return new ResponseError(InitSignInIdpErrorCode.IdpValidationFailed, e.message)
+				return new ResponseError('IDP_VALIDATION_FAILED', e.message)
 			}
 			throw e
 		}

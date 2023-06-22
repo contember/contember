@@ -6,7 +6,8 @@ config:
 generates:
   ./src/schema/index.ts:
     config:
-      immutableTypes: "1"
+      immutableTypes: true
+      enumsAsTypes: true
     plugins:
       - "typescript"
       - "typescript-operations"

@@ -1,9 +1,4 @@
-import {
-	AddProjectMemberErrorCode,
-	MutationResolvers,
-	MutationUpdateProjectArgs,
-	UpdateProjectResponse,
-} from '../../../schema'
+import { MutationResolvers, MutationUpdateProjectArgs, UpdateProjectResponse } from '../../../schema'
 import { TenantResolverContext } from '../../TenantResolverContext'
 import { PermissionActions, ProjectManager } from '../../../model'
 import { createProjectNotFoundResponse } from '../../errorUtils'
@@ -24,7 +19,7 @@ export class UpdateProjectMutationResolver implements MutationResolvers {
 			message: 'You are not allowed to update a project',
 		})
 		if (!project) {
-			return createProjectNotFoundResponse(AddProjectMemberErrorCode.ProjectNotFound, args.projectSlug)
+			return createProjectNotFoundResponse('PROJECT_NOT_FOUND', args.projectSlug)
 		}
 		await this.projectManager.updateProject(context.db, project.id, {
 			name: args.name || undefined,

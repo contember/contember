@@ -31,14 +31,14 @@ export class CreateApiKeyMutationResolver implements MutationResolvers {
 			message: 'You are not allowed to create an API key for this project',
 		})
 		if (!project) {
-			return createProjectNotFoundResponse(CreateApiKeyErrorCode.ProjectNotFound, projectSlug)
+			return createProjectNotFoundResponse('PROJECT_NOT_FOUND', projectSlug)
 		}
 		if (typeof tokenHash === 'string' && !isTokenHash(tokenHash)) {
 			throw new UserInputError('Invalid format of tokenHash. Must be hex-encoded sha256.')
 		}
 		const validationResult = await this.membershipValidator.validate(project.slug, memberships)
 		if (validationResult.length > 0) {
-			const errors = createMembershipValidationErrorResult<CreateApiKeyErrorCode>(validationResult)
+			const errors = createMembershipValidationErrorResult(validationResult)
 			return {
 				ok: false,
 				errors: errors,

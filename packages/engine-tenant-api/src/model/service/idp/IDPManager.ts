@@ -18,23 +18,23 @@ export class IDPManager {
 	}
 
 	public async addIDP(db: DatabaseContext, idp: IdentityProviderData): Promise<RegisterIDPResponse> {
-		return await db.transaction(async db => {
+		return await db.transaction(async (db): Promise<RegisterIDPResponse> => {
 			try {
 				const providerService = this.idpRegistry.getHandler(idp.type)
 				providerService.validateConfiguration(idp.configuration)
 			} catch (e) {
 				if (e instanceof IdentityProviderNotFoundError) {
-					return new ResponseError(AddIdpErrorCode.UnknownType, `IDP type ${idp.type} not found`)
+					return new ResponseError('UNKNOWN_TYPE', `IDP type ${idp.type} not found`)
 				}
 				if (e instanceof InvalidIDPConfigurationError) {
-					return new ResponseError(AddIdpErrorCode.InvalidConfiguration, `Invalid IDP configuration: ${e.message}`)
+					return new ResponseError('INVALID_CONFIGURATION', `Invalid IDP configuration: ${e.message}`)
 				}
 				throw e
 			}
 
 			const existing = await db.queryHandler.fetch(new IdentityProviderBySlugQuery(idp.slug))
 			if (existing) {
-				return new ResponseError(AddIdpErrorCode.AlreadyExists, `IDP with slug ${idp.slug} already exists`)
+				return new ResponseError('ALREADY_EXISTS', `IDP with slug ${idp.slug} already exists`)
 			}
 			await db.commandBus.execute(new CreateIdpCommand(idp))
 			return new ResponseOk(null)
@@ -45,7 +45,7 @@ export class IDPManager {
 		return await db.transaction(async db => {
 			const existing = await db.queryHandler.fetch(new IdentityProviderBySlugQuery(slug))
 			if (!existing) {
-				return new ResponseError(DisableIdpErrorCode.NotFound, `IDP ${slug} not found`)
+				return new ResponseError('NOT_FOUND', `IDP ${slug} not found`)
 			}
 			if (!existing.disabledAt) {
 				await db.commandBus.execute(new DisableIdpCommand(existing.id))
@@ -59,7 +59,7 @@ export class IDPManager {
 		return await db.transaction(async db => {
 			const existing = await db.queryHandler.fetch(new IdentityProviderBySlugQuery(slug))
 			if (!existing) {
-				return new ResponseError(EnableIdpErrorCode.NotFound, `IDP ${slug} not found`)
+				return new ResponseError('NOT_FOUND', `IDP ${slug} not found`)
 			}
 			if (existing.disabledAt) {
 				await db.commandBus.execute(new EnableIdpCommand(existing.id))
@@ -72,7 +72,7 @@ export class IDPManager {
 		return await db.transaction(async db => {
 			const existing = await db.queryHandler.fetch(new IdentityProviderBySlugQuery(slug))
 			if (!existing) {
-				return new ResponseError(UpdateIdpErrorCode.NotFound, `IDP ${slug} not found`)
+				return new ResponseError('NOT_FOUND', `IDP ${slug} not found`)
 			}
 			try {
 				const type = data.type ?? existing.type
@@ -83,7 +83,7 @@ export class IDPManager {
 				}
 			} catch (e) {
 				if (e instanceof InvalidIDPConfigurationError) {
-					return new ResponseError(UpdateIdpErrorCode.InvalidConfiguration, `Invalid IDP configuration: ${e.message}`)
+					return new ResponseError('INVALID_CONFIGURATION', `Invalid IDP configuration: ${e.message}`)
 				}
 				throw e
 			}

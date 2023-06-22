@@ -34,13 +34,13 @@ export class ProjectManager {
 			noDeployToken?: boolean
 		},
 	): Promise<CreateProjectResponse> {
-		return await dbContext.transaction(async db => {
+		return await dbContext.transaction(async (db): Promise<CreateProjectResponse> => {
 			const bus = db.commandBus
 
 			const now = db.providers.now()
 			const projectId = await bus.execute(new CreateProjectCommand(project, now))
 			if (!projectId) {
-				return new ResponseError(CreateProjectResponseErrorCode.AlreadyExists, `Project ${project.slug} already exists`)
+				return new ResponseError('ALREADY_EXISTS', `Project ${project.slug} already exists`)
 			}
 			for (const [key, value] of Object.entries(project.secrets)) {
 				await bus.execute(new SetProjectSecretCommand(projectId, key, Buffer.from(value)))
@@ -70,7 +70,7 @@ export class ProjectManager {
 				logger.error(e, { message: 'Project initialization failed' })
 				await db.client.connection.rollback()
 				return new ResponseError(
-					CreateProjectResponseErrorCode.InitError,
+					'INIT_ERROR',
 					`Project initialization error: ${e instanceof Error && 'message' in e ? e.message : 'unknown'}`,
 				)
 			}

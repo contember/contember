@@ -17,7 +17,7 @@ export class RemoveProjectMemberCommand implements Command<RemoveProjectMemberRe
 			.execute(db)
 
 		if (result === 0) {
-			return new ResponseError(RemoveProjectMemberErrorCode.NotMember, 'Not a project member')
+			return new ResponseError('NOT_MEMBER', 'Not a project member')
 		}
 		return new ResponseOk(null)
 	}

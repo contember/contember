@@ -26,7 +26,7 @@ export class DisableApiKeyMutationResolver implements MutationResolvers {
 		const result = await this.apiKeyManager.disableApiKey(context.db, id)
 
 		if (!result) {
-			return createErrorResponse(DisableApiKeyErrorCode.KeyNotFound, 'API key not found')
+			return createErrorResponse('KEY_NOT_FOUND', 'API key not found')
 		}
 
 		return {

@@ -24,7 +24,7 @@ export class ProjectMembersQuery extends DatabaseQuery<ProjectMembersQueryResult
 			))
 			.match(qb => {
 				const { email, memberType } = this.projectMemberInput.filter ?? {}
-				if (email && memberType === MemberType.ApiKey) {
+				if (email && memberType === 'API_KEY') {
 					throw new ImplementationException()
 				}
 				const personQuery = SelectBuilder.create()
@@ -34,9 +34,9 @@ export class ProjectMembersQuery extends DatabaseQuery<ProjectMembersQueryResult
 					return qb.where(it => it.exists(personQuery.where({ email })))
 				}
 				switch (memberType) {
-					case MemberType.ApiKey:
+					case 'API_KEY':
 						return qb.where(it => it.not(it => it.exists(personQuery)))
-					case MemberType.Person:
+					case 'PERSON':
 						return qb.where(it => it.exists(personQuery))
 				}
 				return qb

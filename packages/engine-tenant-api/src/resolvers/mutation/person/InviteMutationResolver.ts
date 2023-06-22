@@ -1,11 +1,4 @@
-import {
-	InviteErrorCode,
-	InviteMethod,
-	InviteResponse,
-	MutationInviteArgs,
-	MutationResolvers,
-	MutationUnmanagedInviteArgs,
-} from '../../../schema'
+import { InviteErrorCode, InviteResponse, MutationInviteArgs, MutationResolvers, MutationUnmanagedInviteArgs } from '../../../schema'
 import { TenantResolverContext } from '../../TenantResolverContext'
 import {
 	DatabaseContext,
@@ -40,7 +33,7 @@ export class InviteMutationResolver implements MutationResolvers {
 			message: 'You are not allowed to invite a person',
 		})
 		if (!project) {
-			return createProjectNotFoundResponse(InviteErrorCode.ProjectNotFound, projectSlug)
+			return createProjectNotFoundResponse('PROJECT_NOT_FOUND', projectSlug)
 		}
 		return this.doInvite(context.db, {
 			email,
@@ -48,7 +41,7 @@ export class InviteMutationResolver implements MutationResolvers {
 			memberships,
 			name: name ?? undefined,
 			emailVariant: options?.mailVariant || '',
-			method: options?.method ?? InviteMethod.CreatePassword,
+			method: options?.method ?? 'CREATE_PASSWORD',
 		})
 	}
 
@@ -64,7 +57,7 @@ export class InviteMutationResolver implements MutationResolvers {
 			message: 'You are not allowed to unmanaged person invite',
 		})
 		if (!project) {
-			return createProjectNotFoundResponse(InviteErrorCode.ProjectNotFound, projectSlug)
+			return createProjectNotFoundResponse('PROJECT_NOT_FOUND', projectSlug)
 		}
 		if (typeof options?.resetTokenHash === 'string' && !isTokenHash(options?.resetTokenHash)) {
 			throw new UserInputError('Invalid format of resetTokenHash. Must be hex-encoded sha256.')
@@ -85,7 +78,7 @@ export class InviteMutationResolver implements MutationResolvers {
 	): Promise<InviteResponse> {
 		const validationResult = await this.membershipValidator.validate(invite.project.slug, invite.memberships)
 		if (validationResult.length > 0) {
-			const errors = createMembershipValidationErrorResult<InviteErrorCode>(validationResult)
+			const errors = createMembershipValidationErrorResult(validationResult)
 			return {
 				ok: false,
 				errors: errors,

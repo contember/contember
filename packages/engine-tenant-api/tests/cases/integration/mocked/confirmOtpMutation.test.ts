@@ -73,7 +73,7 @@ test('confirm otp mutation with invalid code', async () => {
 			data: {
 				confirmOtp: {
 					ok: false,
-					errors: [{ code: ConfirmOtpErrorCode.InvalidOtpToken }],
+					errors: [{ code: 'INVALID_OTP_TOKEN' }],
 				},
 			},
 		},

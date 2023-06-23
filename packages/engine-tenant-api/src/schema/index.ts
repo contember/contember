@@ -377,7 +377,7 @@ export type IdentityProjectRelation = {
 export type IdentityProvider = {
 	readonly __typename?: 'IdentityProvider'
 	readonly configuration: Scalars['Json']
-	readonly disabledAt: Scalars['DateTime']
+	readonly disabledAt?: Maybe<Scalars['DateTime']>
 	readonly options: IdpOptionsOutput
 	readonly slug: Scalars['String']
 	readonly type: Scalars['String']
@@ -1690,7 +1690,7 @@ export type IdentityProjectRelationResolvers<ContextType = any, ParentType exten
 
 export type IdentityProviderResolvers<ContextType = any, ParentType extends ResolversParentTypes['IdentityProvider'] = ResolversParentTypes['IdentityProvider']> = {
 	configuration?: Resolver<ResolversTypes['Json'], ParentType, ContextType>
-	disabledAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>
+	disabledAt?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>
 	options?: Resolver<ResolversTypes['IDPOptionsOutput'], ParentType, ContextType>
 	slug?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	type?: Resolver<ResolversTypes['String'], ParentType, ContextType>

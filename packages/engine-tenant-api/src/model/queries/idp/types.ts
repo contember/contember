@@ -4,7 +4,7 @@ export type IdentityProviderRow = {
 	id: string
 	slug: string
 	type: string
-	disabledAt: Date | unknown
+	disabledAt: Date | null
 	configuration: Record<string, unknown>
 	autoSignUp: boolean
 	exclusive: boolean
@@ -13,6 +13,6 @@ export type IdentityProviderRow = {
 export type IdentityProviderDto =
 	& {
 		id: string
-		disabledAt: Date | unknown
+		disabledAt: Date | null
 	}
 	& IdentityProviderData

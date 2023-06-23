@@ -350,7 +350,7 @@ const schema: DocumentNode = gql`
         slug: String!
         type: String!
         configuration: Json!
-        disabledAt: DateTime!
+        disabledAt: DateTime
         options: IDPOptionsOutput!
     }
 

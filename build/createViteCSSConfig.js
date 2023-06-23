@@ -1,23 +1,25 @@
 //@ts-check
-import { parse } from 'node:path'
 import { defineConfig } from 'vite'
 
 /**
- * @param {{ assetFileNames: string; minify: boolean; dir: string; input: string }} param0
+ * @param {{ assetFileNames: string; base?: string | undefined; minify: boolean; dir: string; input: string }} param0
  * @returns {import('vite').UserConfigExport}
  */
 export function createViteCSSConfig({
 	assetFileNames,
+	base,
 	minify: cssMinify,
 	input,
 	dir,
 } = {
-	assetFileNames: '[name][extname]',
-	minify: false,
-	dir: 'dist/assets',
-	input: 'src/index.css',
-}) {
+		assetFileNames: '[name][extname]',
+		base: './',
+		minify: false,
+		dir: 'dist/assets',
+		input: 'src/index.css',
+	}) {
 	return defineConfig({
+		base,
 		build: {
 			cssMinify,
 			emptyOutDir: false,

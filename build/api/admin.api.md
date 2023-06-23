@@ -1346,7 +1346,7 @@ export type DataGridProps<ComponentExtraProps extends {}> = DataGridContainerPub
 });
 
 // @public (undocumented)
-export const DataGridScope: (props: DataGridPageProps) => JSX.Element;
+export const DataGridScope: (props: DataGridScopeProps) => JSX.Element;
 
 // @public (undocumented)
 export type DataGridScopeProps = PropsWithChildren<DataGridProps<{}>>;

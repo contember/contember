@@ -1,0 +1,4 @@
+.cui-persist-button {
+	margin-bottom: calc(-1 / 2 * (var(--cui-control-height--large) - var(--cui-control-height)));
+	margin-top: calc(-1 / 2 * (var(--cui-control-height--large) - var(--cui-control-height)));
+}

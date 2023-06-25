@@ -19,6 +19,7 @@
 @import "./parts/sortable";
 @import "./parts/tile";
 @import "./parts/tileList";
+@import "./parts/persistButton.css";
 @import "./parts/toolbar";
 @import "./libs/leaflet";
 

@@ -2,6 +2,7 @@ import { useDirtinessState, useMutationState } from '@contember/binding'
 import { SaveButton, SaveButtonProps } from '@contember/ui'
 import { forwardRef, memo, useCallback } from 'react'
 import { usePersistWithFeedback } from '../../ui'
+import { useClassName } from '@contember/utilities'
 
 export type PersistButtonProps = Omit<SaveButtonProps, 'children' | 'isDirty'>
 
@@ -25,6 +26,7 @@ export const PersistButton = memo(
 	}, [triggerPersist])
 
 	const isDisabled = isMutating || !isDirty
+	const className = useClassName('persist-button', props.className)
 
 	if (!triggerPersist) {
 		return null
@@ -37,6 +39,7 @@ export const PersistButton = memo(
 			isDirty={isDirty}
 			loading={isMutating}
 			onClick={onClick}
+			className={className}
 			size="large"
 			{...props}
 		/>

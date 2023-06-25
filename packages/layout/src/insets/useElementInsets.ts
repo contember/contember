@@ -1,6 +1,6 @@
 import { useOnElementResize, useReferentiallyStableCallback, useScopedConsoleRef } from '@contember/react-utils'
 import { assert, getSizeFromResizeObserverEntryFactory, isHTMLElement, pick } from '@contember/utilities'
-import { CSSProperties, RefObject, useMemo, useState } from 'react'
+import { CSSProperties, RefObject, useEffect, useMemo, useState } from 'react'
 import { useContainerInsetsContext } from './Contexts'
 import { getElementInsets } from './Helpers'
 import { ContainerInsets, ContainerOffsets } from './Types'
@@ -9,21 +9,27 @@ const box = 'content-box'
 const dimensionsFromEntry = getSizeFromResizeObserverEntryFactory(box)
 
 export function useElementInsets(elementRef: RefObject<HTMLElement>) {
-	const { logged } = useScopedConsoleRef('useElementInsets').current
+	const { log, logged } = useScopedConsoleRef('useElementInsets').current
 
 	const containerInsets = useContainerInsetsContext()
 	const [containerOffsets, setContainerOffsets] = useState<ContainerOffsets>()
 
-	const updateContainerOffsets = useReferentiallyStableCallback((dimensions: ReturnType<typeof dimensionsFromEntry>) => {
-		const { width, height } = dimensions
-
+	const updateContainerOffsets = useReferentiallyStableCallback((dimensions?: ReturnType<typeof dimensionsFromEntry>) => {
 		if (elementRef.current) {
+			const { width, height } = dimensions ?? {
+				width: elementRef.current?.offsetWidth,
+				height: elementRef.current?.offsetHeight,
+			}
+
 			if (height && width) {
 				const element = logged('element', elementRef.current)
 				const parentElement = logged('parentElement', element.parentElement)
 
 				if (parentElement) {
-					logged('window', pick(window, ['innerWidth', 'innerHeight', 'scrollX', 'scrollY']))
+					log('window', pick(window, ['innerWidth', 'innerHeight', 'scrollX', 'scrollY']))
+					log('parentElement', parentElement, pick(parentElement, ['offsetWidth', 'offsetHeight', 'offsetLeft', 'offsetTop']))
+					log('element', element, pick(element, ['offsetWidth', 'offsetHeight', 'offsetLeft', 'offsetTop']))
+
 					const parentProps = logged('Parent props:', pickLayoutProperties(parentElement))
 					const elementProps = logged('elementProps', pickLayoutProperties(element, parentProps.position as CSSProperties['position']))
 
@@ -39,7 +45,7 @@ export function useElementInsets(elementRef: RefObject<HTMLElement>) {
 						} : {
 							offsetBottom: Math.max(0, parentProps.scrollHeight - elementProps.offsetTop - elementProps.offsetHeight),
 							offsetLeft: Math.max(0, elementProps.offsetLeft),
-							offsetRight: Math.max(0, parentProps.scrollWidth - elementProps.offsetLeft - elementProps.offsetWidth),
+							offsetRight: Math.max(0, parentProps.offsetWidth - elementProps.offsetLeft - elementProps.offsetWidth),
 							offsetTop: Math.max(0, elementProps.offsetTop),
 						})
 
@@ -47,8 +53,8 @@ export function useElementInsets(elementRef: RefObject<HTMLElement>) {
 							case 'row':
 								setContainerOffsets(logged('setContainerOffsets: flexDirection:row', {
 									offsetLeft: previous ? offsets.offsetLeft : 0,
-									offsetBottom: 0,
-									offsetTop: 0,
+									offsetBottom: offsets.offsetBottom,
+									offsetTop: offsets.offsetTop,
 									offsetRight: next ? offsets.offsetRight : 0,
 								}))
 								break
@@ -56,8 +62,8 @@ export function useElementInsets(elementRef: RefObject<HTMLElement>) {
 							case 'column':
 								setContainerOffsets(logged('setContainerOffsets: flexDirection:column', {
 									offsetTop: previous ? offsets.offsetTop : 0,
-									offsetLeft: 0,
-									offsetRight: 0,
+									offsetLeft: offsets.offsetLeft,
+									offsetRight: offsets.offsetRight,
 									offsetBottom: next ? offsets.offsetBottom : 0,
 								}))
 								break
@@ -78,8 +84,6 @@ export function useElementInsets(elementRef: RefObject<HTMLElement>) {
 				} else {
 					setContainerOffsets(undefined)
 				}
-			} else {
-				setContainerOffsets(undefined)
 			}
 		}
 	})
@@ -87,6 +91,10 @@ export function useElementInsets(elementRef: RefObject<HTMLElement>) {
 	useOnElementResize(elementRef, entry => {
 		updateContainerOffsets(dimensionsFromEntry(entry))
 	}, { box })
+
+	useEffect(() => {
+		updateContainerOffsets()
+	}, [updateContainerOffsets])
 
 	const elementInsets: ContainerInsets = useMemo(() => {
 		if (containerOffsets) {
@@ -99,7 +107,10 @@ export function useElementInsets(elementRef: RefObject<HTMLElement>) {
 		}
 	}, [containerInsets, containerOffsets])
 
-	return elementInsets
+	log('before return', elementRef.current, 'containerOffsets', containerOffsets)
+	log('before return', elementRef.current, 'containerInsets', containerInsets)
+
+	return logged('elementInsets', elementInsets)
 }
 
 function getPreviousElementSiblingWithLayout(element: HTMLElement): HTMLElement | null {

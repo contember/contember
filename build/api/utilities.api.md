@@ -135,6 +135,9 @@ export type ObjectKeyValue<T, K extends keyof T> = T extends {
     [P in K]: T[P];
 } ? T[K] : never;
 
+// @public (undocumented)
+export function omit<T extends Object, K extends keyof T>(object: T, properties: ReadonlyArray<K>, strict?: boolean): Omit<T, K>;
+
 // @public
 export function parseTransformMatrix(transform?: string): {
     scaleX: number;
@@ -146,7 +149,7 @@ export function parseTransformMatrix(transform?: string): {
 } | undefined;
 
 // @public (undocumented)
-export function pick<T extends Object, K extends keyof T>(object: T, properties: K[]): Pick<T, K>;
+export function pick<T extends Object, K extends keyof T>(object: T, properties: ReadonlyArray<K>): Pick<T, K>;
 
 // @public
 export type PolymorphicComponentProps<C extends React.ElementType, Props = {}> = InheritableElementProps<C, Props & AsProp<C>>;

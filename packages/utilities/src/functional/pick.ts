@@ -1,4 +1,4 @@
-export function pick<T extends Object, K extends keyof T>(object: T, properties: K[]): Pick<T, K> {
+export function pick<T extends Object, K extends keyof T>(object: T, properties: ReadonlyArray<K>): Pick<T, K> {
 	const next: Partial<Pick<T, K>> = {}
 
 	for (let key of properties) {

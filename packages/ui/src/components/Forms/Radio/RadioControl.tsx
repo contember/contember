@@ -1,4 +1,4 @@
-import { useClassName, useClassNameFactory } from '@contember/utilities'
+import { useClassName } from '@contember/utilities'
 import { ComponentType, ReactNode, memo, useContext, useRef } from 'react'
 import { VisuallyHidden, useFocusRing, useHover, useRadio } from 'react-aria'
 import { Size, ValidationState } from '../../../types'

@@ -1,4 +1,4 @@
-import { CSSProperties, HTMLAttributes } from 'react'
+import { CSSProperties } from 'react'
 import { ControlDistinction, Intent, Scheme, Size, ValidationState } from '../../../types'
 
 /**

@@ -1,5 +1,6 @@
 import {
 	DataBindingProvider,
+	DataBindingProviderStateComponent,
 	EntitySubTree,
 	EntitySubTreeAdditionalCreationProps,
 	EntitySubTreeAdditionalProps,
@@ -11,10 +12,11 @@ import { RedirectOnSuccessTarget } from '../useEntityRedirectOnPersistSuccess'
 import { useOnPersistSuccess } from '../useOnPersistSuccess'
 import { scopeComponent } from './scopeComponent'
 
-export type CreateScopeProps =
+export type CreateScopeProps<StateProps> =
 	& Omit<SugaredUnconstrainedQualifiedSingleEntity, 'isCreating'>
 	& EntitySubTreeAdditionalProps
 	& EntitySubTreeAdditionalCreationProps
+	& DataBindingProviderStateComponent<StateProps>
 	& {
 		children: ReactNode
 		redirectOnSuccess?: RedirectOnSuccessTarget
@@ -24,9 +26,16 @@ export type CreateScopeProps =
  * @group Scopes
  */
 export const CreateScope = scopeComponent(
-	({ children, redirectOnSuccess, onPersistSuccess, ...entityProps }: CreateScopeProps) => {
+	<StateProps, /*JSX FIX*/>({
+		children,
+		redirectOnSuccess,
+		onPersistSuccess,
+		stateComponent,
+		stateProps,
+		...entityProps
+	}: CreateScopeProps<StateProps>) => {
 		return (
-			<DataBindingProvider stateComponent={FeedbackRenderer}>
+			<DataBindingProvider stateComponent={stateComponent ?? FeedbackRenderer} stateProps={stateProps}>
 				<EntitySubTree {...entityProps} onPersistSuccess={useOnPersistSuccess({ redirectOnSuccess, onPersistSuccess })} isCreating>
 					{children}
 				</EntitySubTree>

@@ -1,11 +1,12 @@
-import { DataBindingProvider, EntityListSubTree, EntityListSubTreeAdditionalProps, SugaredQualifiedEntityList } from '@contember/binding'
+import { DataBindingProvider, DataBindingProviderStateComponent, EntityListSubTree, EntityListSubTreeAdditionalProps, SugaredQualifiedEntityList } from '@contember/binding'
 import { ReactNode } from 'react'
 import { FeedbackRenderer, MutableEntityListRenderer, MutableEntityListRendererProps } from '../../bindingFacade'
 import { scopeComponent } from './scopeComponent'
 
-export type MultiEditScopeProps<ContainerExtraProps, ItemExtraProps> =
+export type MultiEditScopeProps<ContainerExtraProps, ItemExtraProps, StateManagerProps> =
 	& SugaredQualifiedEntityList
 	& EntityListSubTreeAdditionalProps
+	& DataBindingProviderStateComponent<StateManagerProps>
 	& {
 		children?: ReactNode
 		refreshDataBindingOnPersist?: boolean
@@ -16,13 +17,17 @@ export type MultiEditScopeProps<ContainerExtraProps, ItemExtraProps> =
  * @group Scopes
  */
 export const MultiEditScope = scopeComponent(
-	<ContainerExtraProps, ItemExtraProps>({
+	<ContainerExtraProps, ItemExtraProps, StateManagerProps>({
 		children,
-		refreshDataBindingOnPersist, skipBindingStateUpdateAfterPersist,
+		refreshDataBindingOnPersist,
+		skipBindingStateUpdateAfterPersist,
+		stateComponent,
+		stateProps,
 		...entityListProps
-	}: MultiEditScopeProps<ContainerExtraProps, ItemExtraProps>) => (
+	}: MultiEditScopeProps<ContainerExtraProps, ItemExtraProps, StateManagerProps>) => (
 		<DataBindingProvider
-			stateComponent={FeedbackRenderer}
+			stateComponent={stateComponent ?? FeedbackRenderer}
+			stateProps={stateProps}
 			refreshOnPersist={refreshDataBindingOnPersist ?? true}
 			skipStateUpdateAfterPersist={skipBindingStateUpdateAfterPersist}
 		>

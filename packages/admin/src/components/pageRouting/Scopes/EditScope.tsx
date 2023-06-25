@@ -1,4 +1,4 @@
-import { DataBindingProvider, EntitySubTree, EntitySubTreeAdditionalProps, SugaredQualifiedSingleEntity } from '@contember/binding'
+import { DataBindingProvider, DataBindingProviderStateComponent, EntitySubTree, EntitySubTreeAdditionalProps, SugaredQualifiedSingleEntity } from '@contember/binding'
 import { ReactNode } from 'react'
 import { FeedbackRenderer } from '../../bindingFacade'
 import { RedirectOnSuccessTarget } from '../useEntityRedirectOnPersistSuccess'
@@ -6,9 +6,10 @@ import { useOnPersistSuccess } from '../useOnPersistSuccess'
 import { NotFoundBoundary } from './NotFoundBoundary'
 import { scopeComponent } from './scopeComponent'
 
-export type EditScopeProps =
+export type EditScopeProps<StateProps> =
 	& SugaredQualifiedSingleEntity
 	& EntitySubTreeAdditionalProps
+	& DataBindingProviderStateComponent<StateProps>
 	& {
 		children: ReactNode
 		redirectOnSuccess?: RedirectOnSuccessTarget
@@ -20,10 +21,20 @@ export type EditScopeProps =
  * @group Scopes
  */
 export const EditScope = scopeComponent(
-	({ children, redirectOnSuccess, onPersistSuccess, refreshDataBindingOnPersist, skipBindingStateUpdateAfterPersist, ...entityProps }: EditScopeProps) => (
+	<StateProps, /*JSX FIX*/>({
+		children,
+		onPersistSuccess,
+		redirectOnSuccess,
+		refreshDataBindingOnPersist,
+		skipBindingStateUpdateAfterPersist,
+		stateComponent,
+		stateProps,
+		...entityProps
+	}: EditScopeProps<StateProps>) => (
 		<DataBindingProvider
-			stateComponent={FeedbackRenderer}
 			refreshOnPersist={refreshDataBindingOnPersist ?? true}
+			stateComponent={stateComponent ?? FeedbackRenderer}
+			stateProps={stateProps}
 			skipStateUpdateAfterPersist={skipBindingStateUpdateAfterPersist}
 		>
 			<EntitySubTree {...entityProps} onPersistSuccess={useOnPersistSuccess({ redirectOnSuccess, onPersistSuccess })}>

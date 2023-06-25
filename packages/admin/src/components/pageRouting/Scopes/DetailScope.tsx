@@ -1,12 +1,13 @@
-import { DataBindingProvider, EntitySubTree, EntitySubTreeAdditionalProps, SugaredQualifiedSingleEntity } from '@contember/binding'
+import { DataBindingProvider, DataBindingProviderStateComponent, EntitySubTree, EntitySubTreeAdditionalProps, SugaredQualifiedSingleEntity } from '@contember/binding'
 import { ReactNode } from 'react'
 import { FeedbackRenderer } from '../../bindingFacade'
 import { NotFoundBoundary } from './NotFoundBoundary'
 import { scopeComponent } from './scopeComponent'
 
-export type DetailScopeProps =
+export type DetailScopeProps<StateProps> =
 	& SugaredQualifiedSingleEntity
 	& EntitySubTreeAdditionalProps
+	& DataBindingProviderStateComponent<StateProps>
 	& {
 		children: ReactNode
 	}
@@ -14,8 +15,8 @@ export type DetailScopeProps =
  * @group Scopes
  */
 export const DetailScope = scopeComponent(
-	({ children, ...entityProps }: DetailScopeProps) => (
-		<DataBindingProvider stateComponent={FeedbackRenderer}>
+	<StateProps, /*JSX FIX*/>({ children, stateComponent, stateProps, ...entityProps }: DetailScopeProps<StateProps>) => (
+		<DataBindingProvider stateComponent={stateComponent ?? FeedbackRenderer} stateProps={stateProps}>
 			<EntitySubTree {...entityProps}>
 				<NotFoundBoundary>
 					{children}
@@ -25,4 +26,3 @@ export const DetailScope = scopeComponent(
 	),
 	'DetailScope',
 )
-

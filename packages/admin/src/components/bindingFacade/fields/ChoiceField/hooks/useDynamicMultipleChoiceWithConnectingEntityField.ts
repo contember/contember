@@ -1,6 +1,5 @@
 import {
 	EntityAccessor, EntityId,
-	SugaredFieldProps,
 	SugaredRelativeSingleEntity,
 	useDesugaredRelativeSingleEntity,
 	useEntityList,

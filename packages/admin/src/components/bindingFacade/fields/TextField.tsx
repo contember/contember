@@ -1,4 +1,4 @@
-import { ControlProps, TextareaInput, TextInput } from '@contember/ui'
+import { ControlProps, TextInput } from '@contember/ui'
 import { SimpleRelativeSingleField, SimpleRelativeSingleFieldProps } from '../auxiliary'
 import {
 	ControlValueParser,
@@ -21,7 +21,6 @@ const format: FieldValueFormatter<string, string> = value => value ?? null
  */
 export const TextField = SimpleRelativeSingleField<TextFieldProps, string>(
 	(fieldMetadata, {
-
 		...props
 	}) => {
 		const inputProps = useFieldControl<string, string>({

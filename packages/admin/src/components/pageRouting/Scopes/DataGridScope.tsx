@@ -1,5 +1,5 @@
 import { DataBindingProvider } from '@contember/binding'
-import { PropsWithChildren, ReactNode } from 'react'
+import { PropsWithChildren } from 'react'
 import { DataGrid, DataGridProps, FeedbackRenderer } from '../../bindingFacade'
 import { scopeComponent } from './scopeComponent'
 

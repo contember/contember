@@ -1,5 +1,5 @@
 import { Component, EntityAccessor, useEntity } from '@contember/binding'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo } from 'react'
 import { useMessageFormatter } from '../../../../i18n'
 import { uploadDictionary } from '../uploadDictionary'
 import type { FileInputPublicProps } from './FileInput'

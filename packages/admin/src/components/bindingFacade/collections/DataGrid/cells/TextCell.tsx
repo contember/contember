@@ -1,13 +1,12 @@
 import {
 	Component,
 	Field,
-	FieldValue,
 	QueryLanguage,
 	SugaredRelativeSingleField,
 	wrapFilterInHasOnes,
 } from '@contember/binding'
 import { Checkbox, FieldContainer, Stack } from '@contember/ui'
-import type { FunctionComponent, ReactElement, ReactNode } from 'react'
+import type { FunctionComponent, ReactNode } from 'react'
 import { useMessageFormatter } from '../../../../../i18n'
 import { FieldFallbackView, FieldFallbackViewPublicProps } from '../../../fieldViews'
 import { DataGridColumn, DataGridColumnPublicProps, DataGridOrderDirection } from '../base'

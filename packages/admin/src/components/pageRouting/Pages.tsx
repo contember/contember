@@ -1,5 +1,4 @@
 import {
-	DataBindingProvider,
 	DataBindingStateComponentProps,
 	EnvironmentContext,
 	useEnvironment,
@@ -18,7 +17,6 @@ import {
 } from 'react'
 import { useCurrentRequest } from '../../routing'
 import { MiscPageLayout } from '../MiscPageLayout'
-import { FeedbackRenderer } from '../bindingFacade'
 import { PageErrorBoundary } from './PageErrorBoundary'
 
 export interface PageProvider<P> {

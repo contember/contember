@@ -1,7 +1,7 @@
 import { SugaredFieldProps, useGetEntityByKey, useMutationState } from '@contember/binding'
 import type { FileId } from '@contember/react-client'
 import { useFileUpload } from '@contember/react-client'
-import { FunctionComponent, ReactNode, useCallback, useMemo, useState } from 'react'
+import { FunctionComponent, ReactNode, useCallback, useMemo } from 'react'
 import { useMessageFormatter } from '../../../../i18n'
 import { RepeaterFieldContainerPrivateProps, SortableRepeaterItem } from '../../collections'
 import { useAccessorErrorFormatter } from '../../errors'

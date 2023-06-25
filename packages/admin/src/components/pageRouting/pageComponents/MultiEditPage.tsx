@@ -4,10 +4,8 @@ import {
 	EntityListSubTreeAdditionalProps,
 	SugaredQualifiedEntityList,
 } from '@contember/binding'
-import { memo, ReactElement, ReactNode } from 'react'
+import { ReactNode } from 'react'
 import { FeedbackRenderer, MutableEntityListPageRenderer, MutableEntityListPageRendererProps } from '../../bindingFacade'
-import type { PageProvider } from '../Pages'
-import { getPageName } from './getPageName'
 import { pageComponent } from './pageComponent'
 
 export type MultiEditPageProps<ContainerExtraProps, ItemExtraProps> =

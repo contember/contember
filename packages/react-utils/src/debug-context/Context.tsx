@@ -43,18 +43,18 @@ function parentScopedConsoleOrNone(parentConsole: ScopedConsoleContextType): Sco
 	return isNoopScopedConsole(parentConsole) ? undefined : parentConsole
 }
 
-export const useScopedConsoleRef = (prefix: string) => {
+export const useScopedConsoleRef = (prefix: string, override?: boolean) => {
 	assert('prefix is non-empty string', prefix, isNonEmptyString)
 
 	const parentConsole = parentScopedConsoleOrNone(useContext(ScopedConsoleContext))
 
 	const scopedConsole = useMemo(() => {
-		if (parentConsole) {
+		if (override !== false && (parentConsole || override)) {
 			return createPrefixedConsole(prefix, parentConsole)
 		} else {
 			return noopScopedConsole
 		}
-	}, [parentConsole, prefix])
+	}, [override, parentConsole, prefix])
 
 	const ref = useRef(scopedConsole)
 	ref.current = scopedConsole
@@ -63,8 +63,8 @@ export const useScopedConsoleRef = (prefix: string) => {
 }
 
 export type DebugChildrenProps =
-	| { active: true; children: ReactNode; id: string; }
-	| { active?: false; children: ReactNode; id?: string; }
+	| { active?: true; children: ReactNode; id: string }
+	| { active?: false; children: ReactNode; id?: string }
 
 export const DebugChildren = memo<DebugChildrenProps>(({ active = true, children, id }) => {
 	const parentScopedConsole = parentScopedConsoleOrNone(useContext(ScopedConsoleContext))

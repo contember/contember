@@ -39,7 +39,6 @@
 		"directory": "packages/layout"
 	},
 	"dependencies": {
-		"@contember/admin": "workspace:*",
 		"@contember/react-utils": "workspace:*",
 		"@contember/ui": "workspace:*",
 		"@contember/utilities": "workspace:*",

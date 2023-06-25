@@ -60,8 +60,9 @@ export function useNativeInput<E extends HTMLInputElement | HTMLTextAreaElement 
 }: ControlProps<T>,
 	forwardedRef: ForwardedRef<E>,
 ): AllHTMLAttributes<E> & { ref: RefObject<E> } {
-	// Intentionally unused
-	const emptyRestTypeGuard: { [Property in keyof Partial<ControlProps<T>>]: never } = rest
+	if (import.meta.env.DEV) {
+		const exhaustiveCheck: { [Property in keyof Partial<ControlProps<T>>]: never } = rest
+	}
 
 	const ref = useRef<E>(null)
 	useImperativeHandle(forwardedRef, () => ref.current as unknown as E)

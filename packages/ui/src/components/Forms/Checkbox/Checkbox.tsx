@@ -20,7 +20,9 @@ export type CheckboxOwnProps = ControlProps<boolean> & {
 export type CheckboxProps = CheckboxOwnProps & RestHTMLCheckboxProps
 
 /**
- * @group UI
+ * @group Forms UI
+ *
+ * To add label to checkbox, use `<Label>` component next to it or wrap with `<FieldContainer label={label} labelPosition="labelInlineRight"><Checkbox {...} /></FieldContainer>` or other way to display label next to Checkbox.
  */
 export const Checkbox = memo(forwardRef<HTMLInputElement, CheckboxProps>(({
 	CheckboxButtonComponent,

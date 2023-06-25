@@ -1,5 +1,3 @@
-import { SVGProps } from 'react'
-
 export interface SvgSizeProps {
 	width: number;
 	height: number;

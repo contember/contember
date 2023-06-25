@@ -1,5 +1,4 @@
-import { createNonNullableContextFactory, useWindowSize } from '@contember/react-utils'
-import { createContext, useContext } from 'react'
+import { createNonNullableContextFactory } from '@contember/react-utils'
 import type { LayoutPanelConfig, LayoutPanelState } from './Types'
 
 export type PanelWidthContextType = {
@@ -8,16 +7,6 @@ export type PanelWidthContextType = {
 }
 export const [PanelWidthContext, usePanelWidthContext] = createNonNullableContextFactory<PanelWidthContextType>('PanelWidthContext')
 PanelWidthContext.displayName = 'PanelWidthContext'
-
-export type LayoutContainerWidthContextType = number
-export const LayoutContainerWidthContext = createContext<LayoutContainerWidthContextType | null>(null)
-LayoutContainerWidthContext.displayName = 'LayoutContainerWidthContext'
-export function useLayoutContainerWidth<T>(): number {
-	const maybeContainerWidth = useContext(LayoutContainerWidthContext)
-	const { width: windowWidth } = useWindowSize()
-
-	return maybeContainerWidth ?? windowWidth
-}
 
 export type LayoutPanelCallback = (name: string) => void
 export type SetLayoutPanelVisibility = LayoutPanelCallback

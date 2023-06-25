@@ -1,6 +1,7 @@
+import { useContainerWidth } from '@contember/react-utils'
 import { PolymorphicRef, assert, dataAttribute, isNotNullish, useClassName } from '@contember/utilities'
 import { ElementType, forwardRef, memo, useEffect, useMemo, useRef } from 'react'
-import { GetLayoutPanelsStateContext, GetLayoutPanelsStateContextType, useGetLayoutPanelsStateContext, useLayoutContainerWidth, useSetLayoutPanelsStateContext } from './Contexts'
+import { GetLayoutPanelsStateContext, GetLayoutPanelsStateContextType, useGetLayoutPanelsStateContext, useSetLayoutPanelsStateContext } from './Contexts'
 import { ContainerComponentType, ContainerProps, LayoutPanelConfig } from './Types'
 import { parsePanelsState } from './parsePanelsState'
 
@@ -13,7 +14,7 @@ export const LayoutResponsiveContainer: ContainerComponentType = memo(forwardRef
 		...rest
 	}: ContainerProps<C>, forwardedRef: PolymorphicRef<C>) => {
 		const Container = as ?? 'div'
-		const layoutWidth = useLayoutContainerWidth()
+		const layoutWidth = useContainerWidth()
 		const { update } = useSetLayoutPanelsStateContext()
 		const { currentlyActivePanel, panels } = useGetLayoutPanelsStateContext()
 

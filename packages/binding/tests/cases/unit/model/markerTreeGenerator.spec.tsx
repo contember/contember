@@ -20,7 +20,7 @@ import {
 	PRIMARY_KEY_NAME,
 	SubTreeMarkers,
 } from '../../../../src'
-import { Schema, SchemaRelation } from '../../../../src/core/schema'
+import { Schema } from '../../../../src/core/schema'
 import { SchemaPreprocessor } from '../../../../src/core/schema/SchemaPreprocessor'
 
 describe('Marker tree generator', () => {

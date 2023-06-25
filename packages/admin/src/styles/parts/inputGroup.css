@@ -7,7 +7,7 @@
 	background: white;
 }
 
-:where(.inputGroup-text::placeholder) {
+:where(.inputGroup-text)::placeholder {
 	color: #9EA0A5;
 }
 

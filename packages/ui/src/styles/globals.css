@@ -21,14 +21,6 @@
 	flex: 1 1 100%;
 }
 
-:where(*),
-:where(*)::before,
-:where(*)::after {
-  border-width: 0;
-  border-style: solid;
-  border-color: currentColor;
-}
-
 :where(body > div) {
 	display: contents
 }

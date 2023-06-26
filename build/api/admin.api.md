@@ -5305,12 +5305,9 @@ export const useRoleRenderer: (roleRendererFactory: RoleRendererFactory | undefi
 export const useRoleRendererFactory: <T extends {}>({ rolesDataQuery, roleRenderers }: UseRoleRendererFactoryProps<T>) => RoleRendererFactory;
 
 // @public (undocumented)
-export type UseRoleRendererFactoryProps<T> = {
-    rolesDataQuery: string;
-    roleRenderers?: never;
-} | {
-    rolesDataQuery?: never;
-    roleRenderers?: RoleRenderers<T | undefined>;
+export type UseRoleRendererFactoryProps<T = undefined> = {
+    rolesDataQuery?: string;
+    roleRenderers?: RoleRenderers<T>;
 };
 
 // @public (undocumented)

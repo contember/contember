@@ -1,11 +1,11 @@
 import { DataBindingProvider, DataBindingProviderStateComponent } from '@contember/react-binding'
 import { PropsWithChildren } from 'react'
 import { FeedbackRenderer } from '../../bindingFacade'
-import { DataGrid, DataGridProps } from '@contember/react-datagrid-ui'
+import { DataGrid, DataGridContainerPublicProps, DataGridProps } from '@contember/react-datagrid-ui'
 import { scopeComponent } from './scopeComponent'
 
 export type DataGridScopeProps<StateProps> =
-	& PropsWithChildren<DataGridProps<{}>>
+	& PropsWithChildren<DataGridProps<DataGridContainerPublicProps>>
 	& DataBindingProviderStateComponent<StateProps>
 
 /**

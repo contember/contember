@@ -36,6 +36,7 @@ export const Grid = memo(forwardRef<HTMLDivElement, GridProps>(({
 			ref={ref}
 			className={useClassName('grid', className)}
 			style={style}
+			{...rest}
 		>
 			{children}
 		</div>

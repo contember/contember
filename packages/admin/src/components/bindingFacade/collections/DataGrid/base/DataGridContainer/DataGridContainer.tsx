@@ -71,6 +71,8 @@ export const DataGridContainer: FunctionComponent<DataGridContainerProps> = Comp
 				{tile && layout === 'tiles'
 					? <DataGridContainerGrid
 						accessor={accessor}
+						emptyMessage={emptyMessage}
+						emptyMessageComponent={emptyMessageComponent}
 						tile={tile}
 						tileSize={tileSize}
 					/>

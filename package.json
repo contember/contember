@@ -19,7 +19,7 @@
 		"ts:build": "tsc --build",
 		"ts:watch": "tsc --build --watch",
 		"ae:build": "yarn workspaces foreach -pt run ae:build",
-		"ae:update": "yarn run clean:generated && yarn run ts:build --clean && yarn run ts:build && yarn run ae:build",
+		"ae:update": "yarn run ts:build --clean && yarn run ts:build && yarn run ae:build",
 		"ae:test": "yarn workspaces foreach -pt run ae:test",
 		"build:js:prod": "yarn workspaces foreach -p run build:js:prod",
 		"build:css": "yarn workspaces foreach -p run yarn build:css",

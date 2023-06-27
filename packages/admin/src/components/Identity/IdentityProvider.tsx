@@ -54,10 +54,10 @@ export interface IdentityProviderProps {
 
 type IdentityState =
 	| { state: 'none' }
-	| { state: 'loading'}
-	| { state: 'failed'}
+	| { state: 'loading' }
+	| { state: 'failed' }
 	| { state: 'success', identity: Identity }
-	| { state: 'cleared'}
+	| { state: 'cleared' }
 
 export const IdentityProvider: React.FC<IdentityProviderProps> = ({ children, onInvalidIdentity, allowUnauthenticated }) => {
 	const sessionToken = useSessionToken()

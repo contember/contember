@@ -6,3 +6,4 @@
 @import "./styles/themes.css";
 @import "./styles/schemes.css";
 @import "./components/index.css";
+@import "./deprecated/index.css";

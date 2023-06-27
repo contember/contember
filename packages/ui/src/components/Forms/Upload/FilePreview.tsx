@@ -3,7 +3,8 @@ import { memo, ReactNode } from 'react'
 import { toStateClass } from '../../../utils'
 
 export interface FilePreviewProps {
-	actions?: ReactNode
+	/** @deprecated not implemented */
+	actions?: ReactNode;
 	children?: ReactNode
 	isActive?: boolean
 	overlay?: ReactNode
@@ -12,10 +13,9 @@ export interface FilePreviewProps {
 /**
  * @group Forms UI
  */
-export const FilePreview = memo(({ actions, children, isActive, overlay }: FilePreviewProps) => {
+export const FilePreview = memo(({ children, isActive, overlay }: FilePreviewProps) => {
 	const componentClassName = useClassNameFactory('filePreview')
 
-	// TODO actions
 	return (
 		<div className={componentClassName(null, toStateClass('active', isActive))}>
 			<div className={componentClassName('in')}>

@@ -1,3 +1,7 @@
+/* Global */
+@import "./StyleProvider";
+
+/* Leaf components */
 @import "./Typography";
 @import "./ContainerSpinner";
 @import "./ContentStatus";

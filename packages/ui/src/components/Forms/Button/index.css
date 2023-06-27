@@ -36,6 +36,7 @@
 	font-family: inherit;
 	font-size: unset;
 	font-weight: 600;
+	gap: calc(var(--cui-gap) * 1.5);
 	height: var(--cui-button-height);
 	overflow: hidden;
 	padding-left: var(--cui-button-padding-horizontal);
@@ -232,17 +233,17 @@
 }
 
 :where(.cui-button-content) {
-	font-size: var(--cui-button-label-font-size);
+	align-items: inherit;
+	justify-content: inherit;
+	display: flex;
 	flex: 1;
+	gap: inherit;
+	font-size: var(--cui-button-label-font-size);
 	line-height: var(--cui-button-line-height);
 	padding-bottom: calc(var(--cui-gap) - var(--cui-control-border-width, 1px));
 	padding-top: calc(var(--cui-gap) - var(--cui-control-border-width, 1px));
-	overflow: hidden;
 	text-overflow: ellipsis;
 	vertical-align: middle;
-	display: -webkit-box;
-	-webkit-line-clamp: 2;
-	-webkit-box-orient: vertical;
 	white-space: nowrap;
 }
 

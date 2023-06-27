@@ -33,6 +33,214 @@
 	margin-top: 0;
 }
 
+:where(.cui-slug-input-input .cui-text-input::-moz-focus-inner),
+:where(.cui-slug-input-prefix-link::-moz-focus-inner),
+:where(.cui-button::-moz-focus-inner),
+:where(.cui-tag-remove::-moz-focus-inner),
+:where(.cui-editorTable-appendRow::-moz-focus-inner),
+:where(.cui-editorTable-appendColumn::-moz-focus-inner),
+:where(.cui-editorTable-rowControls-item::-moz-focus-inner),
+:where(.cui-editorTable-columnControls-item::-moz-focus-inner),
+:where(.cui-editorCanvas [contenteditable=true]::-moz-focus-inner),
+:where(.cui-editorCanvas:focus-within::-moz-focus-inner),
+:where(.cui-textarea-input::-moz-focus-inner),
+:where(.cui-text-input::-moz-focus-inner),
+:where(.cui-editorCanvas::-moz-focus-inner) {
+	border: 0;
+}
+
+:where(.cui-slug-input-input .cui-text-input),
+:where(.cui-slug-input-prefix-link),
+:where(.cui-tag-remove),
+:where(.cui-editorTable-appendRow),
+:where(.cui-editorTable-appendColumn),
+:where(.cui-editorTable-rowControls-item),
+:where(.cui-editorTable-columnControls-item),
+:where(.cui-editorCanvas *[contenteditable=true]),
+:where(.cui-editorCanvas:focus-within),
+:where(.cui-textarea-input),
+:where(.cui-text-input),
+:where(.cui-editorCanvas) {
+	outline: none;
+}
+
+:where(.cui-textarea-input),
+:where(.cui-text-input) {
+	--cui-control-line-height: var(--cui-line-height);
+	display: block;
+	font-family: inherit;
+	transition-duration: var(--cui-transition-duration--fast);
+	transition-property: box-shadow, color, background, opacity;
+	font-weight: 400;
+	font-size: inherit;
+	text-decoration: none;
+	position: relative;
+	margin: 0;
+	border-style: solid;
+	border-width: var(--cui-control-border-width, 1px);
+	border-radius: var(--cui-control-border-radius);
+	resize: none;
+	flex-basis: 2em;
+	flex-grow: 1;
+	overflow: hidden;
+	line-height: var(--cui-control-line-height);
+}
+
+:where(:root .cui-textarea-input),
+:where(:root .cui-text-input) {
+	box-sizing: border-box;
+}
+
+:where(.cui-textarea-input:-webkit-autofill),
+:where(.cui-text-input:-webkit-autofill) {
+	-webkit-box-shadow: 0 0 0 1000px #FFFFFF inset !important;
+}
+
+:where(.view-withTopToolbar.cui-textarea-input),
+:where(.view-withTopToolbar.cui-text-input) {
+	border-top-left-radius: 0;
+	border-top-right-radius: 0;
+}
+
+:where(.cui-textarea-input),
+:where(.cui-text-input) {
+	--cui-min-height: var(--cui-control-height);
+	--cui-font-size: var(--cui-font-size-label);
+	--cui-padding-horizontal: calc(3 * var(--cui-gap));
+	min-height: var(--cui-min-height);
+	padding-left: var(--cui-padding-horizontal);
+	padding-right: var(--cui-padding-horizontal);
+	padding-top: 0;
+	padding-bottom: 0;
+}
+
+:where(.view-small.cui-textarea-input),
+:where(.view-small.cui-text-input) {
+	--cui-min-height: var(--cui-control-height--small);
+	--cui-font-size: var(--cui-font-size-note);
+	--cui-padding-horizontal: calc(2 * var(--cui-gap));
+}
+
+:where(.view-large.cui-textarea-input),
+:where(.view-large.cui-text-input) {
+	--cui-font-size: var(--cui-font-size-body);
+	--cui-min-height: var(--cui-control-height--large);
+	--cui-padding-horizontal: calc(4 * var(--cui-gap));
+}
+
+:where(.is-invalid.cui-select),
+:where(.is-invalid.cui-textarea-input),
+:where(.is-invalid.cui-text-input) {
+	border-color: var(--cui-control-border-color);
+}
+
+:where(.cui-textarea-input),
+:where(.cui-text-input),
+:where(.cui-editorCanvas) {
+	--input-control-focus-ring: var(--cui-control-focus-ring-box-shadow);
+	--input-control-color: var(--cui-color--high);
+	--input-control-background: var(--cui-background-color--above);
+	--input-control-border-color: var(--cui-color--lower);
+	color: var(--input-control-color);
+	background: var(--input-control-background);
+	border-color: var(--input-control-border-color);
+}
+
+:where(.cui-textarea-input:-webkit-autofill),
+:where(.cui-text-input:-webkit-autofill),
+:where(.cui-editorCanvas:-webkit-autofill) {
+	-webkit-box-shadow: 0 0 0 1000px var(--cui-control-background-color) inset !important;
+}
+
+:where(.cui-textarea-input:-webkit-autofill),
+:where(.cui-text-input:-webkit-autofill),
+:where(.cui-editorCanvas:-webkit-autofill) {
+	transition-delay: 9999s;
+	transition-property: background-color, color;
+}
+
+:where(.cui-textarea-input:hover),
+:where(.cui-text-input:hover),
+:where(.cui-editorCanvas:hover) {
+	--input-control-border-color: var(--cui-color--low);
+}
+
+:where(.cui-textarea-input:focus),
+:where(.cui-text-input:focus),
+:where(.cui-editorCanvas:focus) {
+	--input-control-border-color: var(--cui-control-border-color);
+}
+
+:where(.cui-textarea-input:focus:focus-visible),
+:where(.cui-text-input:focus:focus-visible),
+:where(.cui-editorCanvas:focus:focus-visible) {
+	box-shadow: var(--input-control-focus-ring);
+}
+
+:where(.cui-textarea-input)::placeholder,
+:where(.cui-text-input)::placeholder,
+:where(.cui-editorCanvas)::placeholder {
+	color: var(--cui-color--low);
+}
+
+:where([readonly].cui-textarea-input),
+:where([readonly].cui-text-input),
+:where([readonly].cui-editorCanvas) {
+	color: var(--cui-color--medium);
+}
+
+:where([disabled].cui-textarea-input),
+:where([disabled].cui-text-input),
+:where([disabled].cui-editorCanvas) {
+	cursor: not-allowed;
+	opacity: var(--cui-opacity--medium);
+}
+
+:where(.view-seamless.cui-textarea-input),
+:where(.view-seamless.cui-text-input),
+:where(.view-seamless.cui-editorCanvas) {
+	padding-left: 0;
+	padding-right: 0;
+}
+
+:where(.view-seamless.cui-textarea-input),
+:where(.view-seamless.cui-text-input),
+:where(.view-seamless.cui-editorCanvas),
+:where(.view-seamless-with-padding.cui-textarea-input),
+:where(.view-seamless-with-padding.cui-text-input),
+:where(.view-seamless-with-padding.cui-editorCanvas) {
+	--input-control-background: transparent;
+	--input-control-border-color: transparent;
+}
+
+:where(.view-seamless.cui-textarea-input:focus),
+:where(.view-seamless.cui-text-input:focus),
+:where(.view-seamless.cui-editorCanvas:focus),
+:where(.view-seamless-with-padding.cui-textarea-input:focus),
+:where(.view-seamless-with-padding.cui-text-input:focus),
+:where(.view-seamless-with-padding.cui-editorCanvas:focus) {
+	--input-control-background: var(--cui-background-color--above);
+	box-shadow: none;
+}
+
+:where(.view-seamless.cui-textarea-input:focus-within),
+:where(.view-seamless.cui-text-input:focus-within),
+:where(.view-seamless.cui-editorCanvas:focus-within),
+:where(.view-seamless-with-padding.cui-textarea-input:focus-within),
+:where(.view-seamless-with-padding.cui-text-input:focus-within),
+:where(.view-seamless-with-padding.cui-editorCanvas:focus-within) {
+	--input-control-background: var(--cui-background-color--above);
+	box-shadow: none;
+}
+
+:where(.view-seamless.cui-textarea-input:hover),
+:where(.view-seamless.cui-text-input:hover),
+:where(.view-seamless.cui-editorCanvas:hover),
+:where(.view-seamless-with-padding.cui-textarea-input:hover),
+:where(.view-seamless-with-padding.cui-text-input:hover),
+:where(.view-seamless-with-padding.cui-editorCanvas:hover) {
+	--input-control-background: var(--cui-background-color--above);
+}
 :where(.lucide) {
 	--scale: 1;
 	--square-to-circle-ratio: 1.1284;

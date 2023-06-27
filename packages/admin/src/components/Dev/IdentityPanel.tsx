@@ -1,12 +1,10 @@
-import React, { FC, SyntheticEvent, useCallback, useState } from 'react'
+import { useProjectSlug, useSessionTokenWithMeta, useSetSessionToken } from '@contember/react-client'
 import {
-	Box,
 	Button,
 	ButtonGroup,
 	DevPanel,
 	EmailInput,
 	FieldContainer,
-	Icon,
 	Stack,
 	Table,
 	TableCell,
@@ -15,10 +13,11 @@ import {
 	useDialog,
 	useShowToast,
 } from '@contember/ui'
-import { useOptionalIdentity } from '../Identity'
-import { useProjectSlug, useSessionTokenWithMeta, useSetSessionToken } from '@contember/react-client'
-import { LogoutLink } from '../LogoutLink'
+import { UserCircleIcon } from 'lucide-react'
+import { FC, SyntheticEvent, useCallback, useState } from 'react'
 import { EditMembership, GQLVariable, Membership, useCreateApiKey, useSingleTenantMutation } from '../../tenant'
+import { useOptionalIdentity } from '../Identity'
+import { LogoutLink } from '../LogoutLink'
 
 export const IdentityPanel = () => {
 	const identity = useOptionalIdentity()
@@ -39,7 +38,7 @@ export const IdentityPanel = () => {
 	}, [dialog])
 
 	return (
-		<DevPanel heading={<><Icon blueprintIcon={'user'} /> Identity</>}>
+		<DevPanel icon={<UserCircleIcon />} heading="Identity">
 			{identity ? <>
 				<Stack direction={'vertical'}>
 					<ButtonGroup>

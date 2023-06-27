@@ -12,7 +12,6 @@ export type CommonReactSelectStylesProps =
 	& PublicCommonReactSelectStylesProps
 	& { isInvalid?: boolean }
 
-// TODO: Not yet finished with all styles
 export const useCommonReactSelectStyles = <Option = unknown, IsMulti extends boolean = boolean, Group extends GroupBase<Option> = GroupBase<Option>>({ isInvalid = false, menuZIndex }: CommonReactSelectStylesProps): StylesConfig<Option, IsMulti, Group> => useMemo(() => ({
 	indicatorSeparator: (provided, { isFocused, isDisabled }) => {
 		const backgroundColor = isDisabled
@@ -48,7 +47,7 @@ export const useCommonReactSelectStyles = <Option = unknown, IsMulti extends boo
 			color,
 		}
 	},
-	multiValue: (provided, { isDisabled, isFocused }) => {
+	multiValue: (provided, { isDisabled }) => {
 		const color = isDisabled ? 'var(--cui-color--low)' : 'var(--cui-filled-control-color)'
 		const borderColor = isDisabled ? 'var(--cui-color--low)' : 'var(--cui-filled-control-border-color)'
 		const backgroundColor = isDisabled ? 'var(--cui-color--lower)' : 'var(--cui-toned-control-background-color)'
@@ -60,7 +59,7 @@ export const useCommonReactSelectStyles = <Option = unknown, IsMulti extends boo
 			backgroundColor,
 		}
 	},
-	multiValueLabel: (provided, { isDisabled, isFocused }) => {
+	multiValueLabel: (provided, { isDisabled }) => {
 		const color = isDisabled ? 'var(--cui-color--high)' : 'var(--cui-filled-control-color)'
 
 		return {
@@ -146,7 +145,7 @@ export const useCommonReactSelectStyles = <Option = unknown, IsMulti extends boo
 			},
 		}
 	},
-	menu: (provided, props) => {
+	menu: provided => {
 		const backgroundColor = 'var(--cui-background-color--above)'
 		const border = 'var(--cui-control-border-width, 1px) solid var(--cui-color--lower)'
 
@@ -156,13 +155,13 @@ export const useCommonReactSelectStyles = <Option = unknown, IsMulti extends boo
 			border,
 		}
 	},
-	menuList: (provided, props) => {
+	menuList: provided => {
 		return {
 			...provided,
 			zIndex: menuZIndex ?? 'unset',
 		}
 	},
-	menuPortal: (provided, props) => {
+	menuPortal: provided => {
 		return {
 			...provided,
 			zIndex: 150,

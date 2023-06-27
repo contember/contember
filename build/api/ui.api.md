@@ -348,10 +348,10 @@ export type CommonReactSelectStylesProps = PublicCommonReactSelectStylesProps & 
 };
 
 // @public (undocumented)
-export const ContainerSpinner: MemoExoticComponent<({ size }: ContainerSpinnerProps) => JSX.Element>;
+export const SpinnerContainer: MemoExoticComponent<({ size }: SpinnerContainerProps) => JSX.Element>;
 
 // @public (undocumented)
-export interface ContainerSpinnerProps {
+export interface SpinnerContainerProps {
     // (undocumented)
     size?: Size;
 }

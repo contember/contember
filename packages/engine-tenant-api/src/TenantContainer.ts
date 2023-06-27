@@ -4,9 +4,11 @@ import { Builder } from '@contember/dic'
 import {
 	AclSchemaAccessNodeFactory,
 	ApiKeyManager,
-	ApiKeyService, AppleProvider,
+	ApiKeyService,
+	AppleProvider,
 	DatabaseContext,
-	DatabaseContextFactory, FacebookProvider,
+	DatabaseContextFactory,
+	FacebookProvider,
 	Identity,
 	IdentityFactory,
 	IDPHandlerRegistry,
@@ -27,6 +29,7 @@ import {
 	ProjectSchemaResolver,
 	ProjectScopeFactory,
 	Providers,
+	RolesManager,
 	SecretsManager,
 	SignInManager,
 	SignUpManager,
@@ -41,6 +44,7 @@ import {
 	DisableApiKeyMutationResolver,
 	DisableIDPMutationResolver,
 	EnableIDPMutationResolver,
+	IdentityGlobalRolesMutationResolver,
 	IdentityTypeResolver,
 	IDPMutationResolver,
 	InviteMutationResolver,
@@ -178,6 +182,8 @@ export class TenantContainerFactory {
 				new OtpManager(otpAuthenticator))
 			.addService('mailTemplateManager', () =>
 				new MailTemplateManager())
+			.addService('rolesManager', () =>
+				new RolesManager())
 
 			.addService('identityTypeResolver', ({ projectMemberManager, projectManager, permissionContextFactory }) =>
 				new IdentityTypeResolver(projectMemberManager, projectManager, permissionContextFactory))
@@ -235,6 +241,8 @@ export class TenantContainerFactory {
 				new UpdateProjectMutationResolver(projectManager))
 			.addService('setProjectSecretMutationResolver', ({ projectManager, secretManager }) =>
 				new SetProjectSecretMutationResolver(projectManager, secretManager))
+			.addService('identityGlobalRolesMutationResolver', ({ rolesManager }) =>
+				new IdentityGlobalRolesMutationResolver(rolesManager))
 			.addService('resolverContextFactory', ({ permissionContextFactory }) =>
 				new TenantResolverContextFactory(permissionContextFactory))
 			.addService('resolvers', container =>

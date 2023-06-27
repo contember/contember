@@ -25,6 +25,11 @@ test('signs up a new user', async () => {
 			),
 			disableOneOffKeySql({ id: testUuid(998) }),
 			{
+				sql: SQL`select "id", "description", "roles"  from "tenant"."identity"  where "id" in (?)`,
+				parameters: [testUuid(1)],
+				response: { rows: [{ id: testUuid(1), description: '', roles: ['person'] }] },
+			},
+			{
 				sql: SQL`select
                        "project"."id",
                        "project"."name",
@@ -44,6 +49,10 @@ test('signs up a new user', async () => {
 					result: {
 						person: {
 							id: personId,
+							identity: {
+								id: identityId,
+								roles: ['person'],
+							},
 						},
 					},
 				},

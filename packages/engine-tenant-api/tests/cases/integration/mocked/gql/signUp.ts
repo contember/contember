@@ -11,6 +11,10 @@ export const signUpMutation = (variables: { email: string; password: string }): 
 			result {
 				person {
 					id
+					identity {
+						id
+						roles
+					}
 				}
 			}
 		}

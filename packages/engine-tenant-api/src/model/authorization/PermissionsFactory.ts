@@ -4,7 +4,7 @@ import { TenantRole } from './Roles'
 
 const allowedRoles = new Set<string>([TenantRole.LOGIN, TenantRole.PROJECT_ADMIN])
 
-const projectAdminCreateRolesVerifier = ({ roles }: {roles?: readonly string[]}) => {
+const projectAdminAllowedInputRoles = ({ roles }: {roles?: readonly string[]}) => {
 	return roles === undefined || roles.every(it => allowedRoles.has(it))
 }
 
@@ -34,8 +34,10 @@ class PermissionsFactory {
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.PROJECT_VIEW)
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.API_KEY_CREATE)
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.API_KEY_DISABLE)
-		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.API_KEY_CREATE_GLOBAL(), projectAdminCreateRolesVerifier)
-		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.PERSON_SIGN_UP(), projectAdminCreateRolesVerifier)
+		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.API_KEY_CREATE_GLOBAL(), projectAdminAllowedInputRoles)
+		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.PERSON_SIGN_UP(), projectAdminAllowedInputRoles)
+		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.IDENTITY_ADD_GLOBAL_ROLES(), projectAdminAllowedInputRoles)
+		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.IDENTITY_REMOVE_GLOBAL_ROLES(), projectAdminAllowedInputRoles)
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.PERSON_CREATE_SESSION_KEY(), projectAdminUseRolesVerifier)
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.PROJECT_VIEW_MEMBER([]))
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.PROJECT_ADD_MEMBER([]))

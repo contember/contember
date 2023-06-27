@@ -73,6 +73,9 @@ const schema: DocumentNode = gql`
         createApiKey(projectSlug: String!, memberships: [MembershipInput!]!, description: String!, tokenHash: String): CreateApiKeyResponse
         createGlobalApiKey(description: String!, roles: [String!], tokenHash: String): CreateApiKeyResponse
         disableApiKey(id: String!): DisableApiKeyResponse
+		
+		addGlobalIdentityRoles(identityId: String!, roles: [String!]!): AddGlobalIdentityRolesResponse
+		removeGlobalIdentityRoles(identityId: String!, roles: [String!]!): RemoveGlobalIdentityRolesResponse
 
         addMailTemplate(template: MailTemplate!): AddMailTemplateResponse
         removeMailTemplate(templateIdentifier: MailTemplateIdentifier!): RemoveMailTemplateResponse
@@ -527,8 +530,53 @@ const schema: DocumentNode = gql`
     enum DisableApiKeyErrorCode {
         KEY_NOT_FOUND
     }
+	
+	# === addGlobalIdentityRoles ===
+	
+	type AddGlobalIdentityRolesResponse {
+		ok: Boolean!
+		error: AddGlobalIdentityRolesError
+        result: AddGlobalIdentityRolesResult 
+	}
+    
+    type AddGlobalIdentityRolesResult {
+        identity: Identity!
+    }
+	
+	type AddGlobalIdentityRolesError {
+		code: AddGlobalIdentityRolesErrorCode!
+		developerMessage: String!
+	}
+	
+	enum AddGlobalIdentityRolesErrorCode {
+        IDENTITY_NOT_FOUND
+		INVALID_ROLE
+	}
 
-    # === common ===
+
+    # === removeGlobalIdentityRoles ===
+
+    type RemoveGlobalIdentityRolesResponse {
+        ok: Boolean!
+        error: RemoveGlobalIdentityRolesError
+        result: RemoveGlobalIdentityRolesResult
+    }
+
+    type RemoveGlobalIdentityRolesError {
+        code: RemoveGlobalIdentityRolesErrorCode!
+        developerMessage: String!
+    }
+
+    type RemoveGlobalIdentityRolesResult {
+        identity: Identity!
+    }
+
+    enum RemoveGlobalIdentityRolesErrorCode {
+        IDENTITY_NOT_FOUND
+        INVALID_ROLE
+    }
+	
+	# === common ===
 
     # === variables ===
 

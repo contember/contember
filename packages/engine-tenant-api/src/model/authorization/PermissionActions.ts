@@ -13,6 +13,8 @@ namespace PermissionActions {
 	}
 
 	export const IDENTITY_VIEW_PERMISSIONS = Authorizator.createAction(Resources.identity, 'viewPermissions')
+	export const IDENTITY_ADD_GLOBAL_ROLES = (roles?: readonly string[]) => Authorizator.createAction(Resources.identity, 'addGlobalRoles', { roles })
+	export const IDENTITY_REMOVE_GLOBAL_ROLES = (roles?: readonly string[]) => Authorizator.createAction(Resources.identity, 'removeGlobalRoles', { roles })
 
 	export const PERSON_SIGN_IN = Authorizator.createAction(Resources.person, 'signIn')
 	export const PERSON_SIGN_UP = (roles?: readonly string[]) => Authorizator.createAction(Resources.person, 'signUp', { roles })
@@ -38,6 +40,7 @@ namespace PermissionActions {
 	export const PROJECT_ADD_MEMBER = (memberships: readonly Acl.Membership[]) => Authorizator.createAction(Resources.project, 'addMember', { memberships })
 	export const PROJECT_REMOVE_MEMBER = (memberships: readonly Acl.Membership[]) => Authorizator.createAction(Resources.project, 'removeMember', { memberships })
 	export const PROJECT_UPDATE_MEMBER = (memberships: readonly Acl.Membership[]) => Authorizator.createAction(Resources.project, 'updateMember', { memberships })
+
 
 	export const API_KEY_CREATE = Authorizator.createAction(Resources.apiKey, 'create')
 	export const API_KEY_CREATE_GLOBAL = (roles?: readonly string[]) => Authorizator.createAction(Resources.apiKey, 'createGlobal', { roles })

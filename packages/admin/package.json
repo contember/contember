@@ -64,7 +64,7 @@
 		"intl-messageformat": "9.9.1",
 		"is-hotkey": "0.1.8",
 		"leaflet": "^1.9.2",
-		"lucide-react": "^0.108.0",
+		"lucide-react": "^0.244.0",
 		"path-to-regexp": "6.2.0",
 		"qrcode-generator": "^1.4.4",
 		"react-dropzone": "10.2.2",

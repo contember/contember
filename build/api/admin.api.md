@@ -18,6 +18,7 @@ import { BoxProps } from '@contember/ui';
 import { ButtonProps } from '@contember/ui';
 import { ChildrenAnalyzer } from '@contember/react-multipass-rendering';
 import { ColorInputProps } from '@contember/ui';
+import { ComponentProps } from 'react';
 import { ComponentType } from 'react';
 import { ContemberClientProps } from '@contember/react-client';
 import { ControlProps } from '@contember/ui';
@@ -36,6 +37,7 @@ import { EditorCanvasSize } from '@contember/ui';
 import { EditorInterface } from 'slate';
 import { Transforms as EditorTransforms } from 'slate';
 import { Element as Element_2 } from 'slate';
+import { ElementType } from 'react';
 import { EmailInputProps } from '@contember/ui';
 import { EntityAccessor } from '@contember/binding';
 import { EntityId } from '@contember/binding';
@@ -1850,14 +1852,12 @@ export const EmbedHandlers: {
 };
 
 // @public (undocumented)
-export const EmptyMessage: React.MemoExoticComponent<({ children, component, distinction }: EmptyMessageProps) => JSX.Element>;
+export const EmptyMessage: React.MemoExoticComponent<({ children, component, distinction, ...rest }: EmptyMessageProps) => JSX.Element>;
 
 // @public (undocumented)
-export interface EmptyMessageComponentProps {
+export interface EmptyMessageComponentProps extends BoxProps {
     // (undocumented)
     children: ReactNode;
-    // (undocumented)
-    distinction?: BoxProps['distinction'];
 }
 
 // @public (undocumented)
@@ -1869,14 +1869,10 @@ export interface EmptyMessageOuterProps {
 }
 
 // @public (undocumented)
-export interface EmptyMessageProps {
-    // (undocumented)
+export type EmptyMessageProps<C extends ElementType = ComponentType<EmptyMessageComponentProps>> = ComponentProps<C> & ComponentProps<C> & {
     children: ReactNode;
-    // (undocumented)
-    component?: ComponentType<EmptyMessageComponentProps>;
-    // (undocumented)
-    distinction?: BoxProps['distinction'];
-}
+    component?: C;
+};
 
 // @public
 export const EnumCell: React.NamedExoticComponent<EnumCellProps>;

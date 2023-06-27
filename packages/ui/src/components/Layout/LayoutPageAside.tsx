@@ -7,7 +7,6 @@ import { Stack } from '../Stack'
 const metaTab = {
 	id: 'meta-section-aside',
 	label: 'Meta',
-	isMeta: true,
 }
 
 /**

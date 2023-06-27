@@ -1,26 +1,27 @@
 import { ReactNode } from 'react'
 
 export interface SectionTabsProps {
-  children: ReactNode
+	children: ReactNode
 }
 
 export interface SectionTabProps {
-  id: string
-  isMeta?: boolean
-  label: ReactNode
+	id: string
+	/** @deprecated unused */
+	isMeta?: never
+	label: ReactNode
 }
 
 export interface SectionTabsMap { [id: string]: SectionTabProps }
 
 export type SectionTabsRegistrationContextType = [
-  (tab: SectionTabProps) => void,
-  (tab: SectionTabProps) => void,
+	(tab: SectionTabProps) => void,
+	(tab: SectionTabProps) => void,
 ]
 
 export interface ActiveSectionTabProps {
-  id: string
-  time: number
-  intersectionRatio: number
+	id: string
+	time: number
+	intersectionRatio: number
 }
 
 export interface ActiveSectionTabsMap { [id: string]: ActiveSectionTabProps }

@@ -1,6 +1,7 @@
 export * from './acl'
 export * from './bootstrap'
 export * from './components'
+export * from './deprecated'
 export * from './i18n'
 export * from './routing'
 export * from './tenant'

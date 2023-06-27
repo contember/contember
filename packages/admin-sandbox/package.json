@@ -20,7 +20,7 @@
 	"dependencies": {
 		"@contember/schema": "^1.2.0",
 		"@contember/schema-definition": "^1.2.0",
-		"lucide-react": "^0.108.0",
+		"lucide-react": "^0.244.0",
 		"react": "^17 || ^18",
 		"react-dom": "^17 || ^18"
 	}

@@ -106,7 +106,7 @@ describe('Pages', () => {
 
 		expectRequest(pages, { pageName: 'foo', parameters: {}, dimensions: {} }).toMatchInlineSnapshot(`
 			<div
-			  className="cui-aether cui-containerSpinner"
+			  className="cui-aether cui-spinner-overlay"
 			>
 			  <div
 			    className="cui-spinner"
@@ -115,7 +115,7 @@ describe('Pages', () => {
 		`)
 		expectRequest(pages, { pageName: 'bar', parameters: {}, dimensions: {} }).toMatchInlineSnapshot(`
 			<div
-			  className="cui-aether cui-containerSpinner"
+			  className="cui-aether cui-spinner-overlay"
 			>
 			  <div
 			    className="cui-spinner"

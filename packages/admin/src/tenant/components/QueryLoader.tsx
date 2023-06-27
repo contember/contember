@@ -1,4 +1,4 @@
-import { Box, ContainerSpinner } from '@contember/ui'
+import { Box, SpinnerOverlay } from '@contember/ui'
 import { FC, ReactElement } from 'react'
 import { QueryRequestState, RequestStateOk } from '../lib'
 
@@ -7,7 +7,7 @@ export function QueryLoader<Result>({ query, children }: { query: QueryRequestSt
 		return <Box intent="danger">Error loading data</Box>
 	}
 	if (query.state === 'loading') {
-		return <ContainerSpinner />
+		return <SpinnerOverlay />
 	}
 	return children({ query })
 }

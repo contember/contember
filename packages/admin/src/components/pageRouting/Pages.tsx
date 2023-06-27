@@ -3,7 +3,7 @@ import {
 	EnvironmentContext,
 	useEnvironment,
 } from '@contember/binding'
-import { ContainerSpinner, Message } from '@contember/ui'
+import { Message, SpinnerOverlay } from '@contember/ui'
 import {
 	ComponentType,
 	Fragment,
@@ -129,7 +129,7 @@ export const Pages = ({ children, layout, bindingFeedbackRenderer }: PagesProps)
 								return { default: isValidElement<any>(page) ? () => page : page }
 							})
 
-							return <Suspense fallback={<ContainerSpinner />}><Lazy /></Suspense>
+							return <Suspense fallback={<SpinnerOverlay />}><Lazy /></Suspense>
 						}
 
 						return [[pageName, PageActionHandler]]

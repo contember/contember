@@ -1,4 +1,4 @@
-:where(.cui-containerSpinner) {
+:where(.cui-spinner-overlay) {
 	--cui-container-spinner-delay: 1000ms;
 	position: absolute;
 	top: 0;
@@ -13,7 +13,7 @@
 	z-index: 10;
 }
 
-:where(.cui-containerSpinner.cui-aether) {
+:where(.cui-spinner-overlay.cui-aether) {
 	animation-delay: var(--cui-container-spinner-delay);
 	animation-duration: var(--cui-transition-duration);
 	animation-fill-mode: both;
@@ -21,15 +21,15 @@
 	background: transparent;
 }
 
-:where(.cui-containerSpinner) {
+:where(.cui-spinner-overlay) {
 	font-size: 2.5em;
 }
 
-:where(.cui-containerSpinner.view-small) {
+:where(.cui-spinner-overlay.view-small) {
 	font-size: 1.5em;
 }
 
-:where(.cui-containerSpinner.view-large) {
+:where(.cui-spinner-overlay.view-large) {
 	font-size: 4em;
 }
 

@@ -1,6 +1,7 @@
 import { Schema } from '@contember/schema'
-import { Migration, MigrationDescriber, SchemaMigrator, SchemaUpdateError } from '@contember/schema-migrations'
+import { Migration, MigrationDescriber, MigrationVersionHelper, SchemaMigrator, SchemaUpdateError } from '@contember/schema-migrations'
 import { validateSchemaAndPrintErrors } from '../../utils/schema'
+import { SchemaValidatorSkippedErrors } from '@contember/schema-utils'
 
 export const validateMigrations = async (
 	initialSchema: Schema,
@@ -10,6 +11,7 @@ export const validateMigrations = async (
 ): Promise<boolean> => {
 	let migratedSchema = initialSchema
 	let projectValid = true
+	let skippedErrors: SchemaValidatorSkippedErrors[] = []
 	for (const migration of await migrations) {
 		try {
 			// just a check that it does not fail
@@ -23,7 +25,11 @@ export const validateMigrations = async (
 			throw e
 		}
 		const errorMessage = `Migration ${migration.name} produces invalid schema:`
-		projectValid = validateSchemaAndPrintErrors(migratedSchema, errorMessage, migration.skippedErrors)
+		skippedErrors = [
+			...skippedErrors.filter(it => it.skipUntil && MigrationVersionHelper.extractVersion(it.skipUntil) >= migration.version),
+			...migration.skippedErrors ?? [],
+		]
+		projectValid = validateSchemaAndPrintErrors(migratedSchema, errorMessage, skippedErrors)
 			&& projectValid
 	}
 	return projectValid

@@ -81,6 +81,40 @@ test('signs in', async () => {
 	})
 })
 
+test('signs in - normalize email', async () => {
+	const email = 'John@doe.com '
+	const password = '123'
+	const identityId = testUuid(2)
+	const personId = testUuid(7)
+	const projectId = testUuid(10)
+	const apiKeyId = testUuid(1)
+	await executeTenantTest({
+		query: signInMutation({ email, password }),
+		executes: [
+			getPersonByEmailSql({ email, response: null }),
+			getPersonByEmailSql({ email: 'john@doe.com', response: { personId, identityId, password, roles: [] } }),
+			createSessionKeySql({ apiKeyId: apiKeyId, identityId: identityId }),
+			getIdentityProjectsSql({ identityId: identityId, projectId: projectId }),
+			selectMembershipsSql({
+				identityId: identityId,
+				projectId,
+				membershipsResponse: [{ role: 'editor', variables: [{ name: 'locale', values: ['cs'] }] }],
+			}),
+		],
+		return: {
+			data: {
+				signIn: {
+					ok: true,
+					errors: [],
+					result: {
+						token: '0000000000000000000000000000000000000000',
+					},
+				},
+			},
+		},
+	})
+})
+
 test('sign in - invalid password', async () => {
 	const email = 'john@doe.com'
 	const password = '123'

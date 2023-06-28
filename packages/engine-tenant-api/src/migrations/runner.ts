@@ -33,6 +33,7 @@ import _20220707135000personemailoptuniq from './2022-07-07-135000-person-email-
 import _20220707141000persondisplayname from './2022-07-07-141000-person-display-name'
 import _20220714145000personloginoptions from './2022-07-14-145000-person-login-options'
 import _20221108projectupdatenotification from './2022-11-08-project-update-notification'
+import _20230120135500personemailnormalize from './2023-01-20-135500-person-email-normalize'
 import snapshot from './snapshot'
 import { computeTokenHash, Providers } from '../model'
 import { Logger } from '@contember/logger'
@@ -78,6 +79,7 @@ const migrations = {
 	'2022-07-07-141000-person-display-name': _20220707141000persondisplayname,
 	'2022-07-14-145000-person-login-options': _20220714145000personloginoptions,
 	'2022-11-08-project-update-notification': _20221108projectupdatenotification,
+	'2023-01-20-135500-person-email-normalize': _20230120135500personemailnormalize,
 }
 
 export class TenantMigrationsRunner {

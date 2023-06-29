@@ -8,6 +8,7 @@
 
 import { ComponentType } from 'react';
 import { Consumer } from 'react';
+import { ContainerWidthContextType } from '@contember/react-utils';
 import { Context } from 'react';
 import { CSSProperties } from 'react';
 import { DeepPartial } from '@contember/utilities';
@@ -26,6 +27,8 @@ import { ReactPortal } from 'react';
 import { RefAttributes } from 'react';
 import { RefObject } from 'react';
 import { StackOwnProps } from '@contember/ui';
+import { useContainerWidth } from '@contember/react-utils';
+import { useDocumentTitle as useDocumentTitle_2 } from '@contember/react-utils';
 
 // @public (undocumented)
 export interface BasicLayoutPanelProps extends OwnContainerProps {
@@ -249,11 +252,11 @@ export const Layout: {
     }>;
 };
 
-// @public (undocumented)
+// @public @deprecated (undocumented)
 export const LayoutContainerWidthContext: Context<number | null>;
 
-// @public (undocumented)
-export type LayoutContainerWidthContextType = number;
+// @public @deprecated (undocumented)
+export type LayoutContainerWidthContextType = ContainerWidthContextType;
 
 // @public (undocumented)
 export type LayoutPanelBehavior = typeof layoutPanelBehaviorsList[number];
@@ -644,8 +647,8 @@ export function useDirectiveLifeCycle<T>(key: string, value: T, registry: SetDir
 // @public (undocumented)
 export function useDirectiveProviderRegistry<T extends Record<string, unknown>>(value: T): [SetDirectiveContextType<T>, T];
 
-// @public (undocumented)
-export function useDocumentTitle(title: string | null | undefined, formatter?: (title: string, initialTitle: string) => string): void;
+// @public @deprecated (undocumented)
+export const useDocumentTitle: typeof useDocumentTitle_2;
 
 // @public (undocumented)
 export function useElementInsetCustomProperties(elementRef: RefObject<HTMLElement>, prefix?: string): CSSProperties | undefined;
@@ -656,8 +659,8 @@ export function useElementInsets(elementRef: RefObject<HTMLElement>): ContainerI
 // @public (undocumented)
 export const useGetLayoutPanelsStateContext: () => GetLayoutPanelsStateContextType;
 
-// @public (undocumented)
-export function useLayoutContainerWidth<T>(): number;
+// @public @deprecated (undocumented)
+export const useLayoutContainerWidth: typeof useContainerWidth;
 
 // @public (undocumented)
 export const useLayoutPanelContext: () => LayoutPanelState;

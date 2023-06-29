@@ -20,6 +20,12 @@ export type ComposedRefCallback<T> = RefCallback<T> & {
 };
 
 // @public (undocumented)
+export const ContainerWidthContext: Context<number | null>;
+
+// @public (undocumented)
+export type ContainerWidthContextType = number;
+
+// @public (undocumented)
 export function createNonNullableContextFactory<T>(displayName: string, initialValue?: T): [Context<T>, () => NonNullable<T>];
 
 // @public (undocumented)
@@ -27,7 +33,7 @@ export const DebugChildren: NamedExoticComponent<DebugChildrenProps>;
 
 // @public (undocumented)
 export type DebugChildrenProps = {
-    active: true;
+    active?: true;
     children: ReactNode;
     id: string;
 } | {
@@ -136,10 +142,16 @@ export const useConstantLengthInvariant: <Item>(items: Item[], message?: string)
 export const useConstantValueInvariant: <Value>(value: Value, message?: string) => void;
 
 // @public (undocumented)
+export function useContainerWidth(): number;
+
+// @public (undocumented)
 export const useDebounce: <T>(value: T, debounceMs: number) => T;
 
 // @public (undocumented)
 export const useDebounceCallback: (cb: () => any, debounceMs: number) => () => void;
+
+// @public (undocumented)
+export function useDocumentTitle(title: string | null | undefined, formatter?: (title: string, initialTitle: string) => string): void;
 
 // @public
 export function useElementSize(refOrElement: RefObjectOrElement<HTMLElement>, options?: ResizeObserverOptions, timeout?: number): {
@@ -150,7 +162,7 @@ export function useElementSize(refOrElement: RefObjectOrElement<HTMLElement>, op
 // @public
 export function useEventHandler<E extends SyntheticEvent<any>>(type: E['type'], callback: EventHandler<E>): EventHandler<E>;
 
-// @public (undocumented)
+// @public
 export function useExpectSameValueReference<T>(next: T, shouldThrow?: boolean): void;
 
 // @public (undocumented)
@@ -178,7 +190,7 @@ export const usePreviousValue: <Value>(value: Value) => Value;
 export const useReferentiallyStableCallback: <T extends (...args: any[]) => any>(callback: T) => T;
 
 // @public (undocumented)
-export const useScopedConsoleRef: (prefix: string) => MutableRefObject<ScopedConsoleContextType>;
+export const useScopedConsoleRef: (prefix: string, override?: boolean) => MutableRefObject<ScopedConsoleContextType>;
 
 // @public (undocumented)
 export function useScrollOffsets(refOrElement: RefObjectOrElement<HTMLElement | null> | null, interval?: number): {

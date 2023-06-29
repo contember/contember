@@ -23,6 +23,7 @@ import { ComponentType } from 'react';
 import { ContemberClientProps } from '@contember/react-client';
 import { ControlProps } from '@contember/ui';
 import { CSSProperties } from 'react';
+import { DataBindingProviderStateComponent } from '@contember/binding';
 import { DataBindingStateComponentProps } from '@contember/binding';
 import { DateInputProps } from '@contember/ui';
 import { DateTimeInputProps } from '@contember/ui';
@@ -999,10 +1000,10 @@ export interface CreateResetPasswordRequestFormProps {
 }
 
 // @public (undocumented)
-export const CreateScope: ({ children, redirectOnSuccess, onPersistSuccess, ...entityProps }: CreateScopeProps) => JSX.Element;
+export const CreateScope: <StateProps>({ children, redirectOnSuccess, onPersistSuccess, stateComponent, stateProps, ...entityProps }: CreateScopeProps<StateProps>) => JSX.Element;
 
 // @public (undocumented)
-export type CreateScopeProps = Omit<SugaredUnconstrainedQualifiedSingleEntity, 'isCreating'> & EntitySubTreeAdditionalProps & EntitySubTreeAdditionalCreationProps & {
+export type CreateScopeProps<StateProps> = Omit<SugaredUnconstrainedQualifiedSingleEntity, 'isCreating'> & EntitySubTreeAdditionalProps & EntitySubTreeAdditionalCreationProps & DataBindingProviderStateComponent<StateProps> & {
     children: ReactNode;
     redirectOnSuccess?: RedirectOnSuccessTarget;
 };
@@ -1348,10 +1349,10 @@ export type DataGridProps<ComponentExtraProps extends {}> = DataGridContainerPub
 });
 
 // @public (undocumented)
-export const DataGridScope: (props: DataGridScopeProps) => JSX.Element;
+export const DataGridScope: <StateProps>({ stateComponent, stateProps, ...props }: DataGridScopeProps<StateProps>) => JSX.Element;
 
 // @public (undocumented)
-export type DataGridScopeProps = PropsWithChildren<DataGridProps<{}>>;
+export type DataGridScopeProps<StateProps> = PropsWithChildren<DataGridProps<{}>> & DataBindingProviderStateComponent<StateProps>;
 
 // @public (undocumented)
 export type DataGridSetColumnFilter<FA extends DataGridFilterArtifact = DataGridFilterArtifact> = (columnKey: DataGridColumnKey, columnFilter: FA | undefined) => void;
@@ -1477,10 +1478,10 @@ export type DetailPageProps = SugaredQualifiedSingleEntity & EntitySubTreeAdditi
 };
 
 // @public (undocumented)
-export const DetailScope: ({ children, ...entityProps }: DetailScopeProps) => JSX.Element;
+export const DetailScope: <StateProps>({ children, stateComponent, stateProps, ...entityProps }: DetailScopeProps<StateProps>) => JSX.Element;
 
 // @public (undocumented)
-export type DetailScopeProps = SugaredQualifiedSingleEntity & EntitySubTreeAdditionalProps & {
+export type DetailScopeProps<StateProps> = SugaredQualifiedSingleEntity & EntitySubTreeAdditionalProps & DataBindingProviderStateComponent<StateProps> & {
     children: ReactNode;
 };
 
@@ -1771,10 +1772,10 @@ export type EditPageProps = SugaredQualifiedSingleEntity & EntitySubTreeAddition
 };
 
 // @public (undocumented)
-export const EditScope: ({ children, redirectOnSuccess, onPersistSuccess, refreshDataBindingOnPersist, skipBindingStateUpdateAfterPersist, ...entityProps }: EditScopeProps) => JSX.Element;
+export const EditScope: <StateProps>({ children, onPersistSuccess, redirectOnSuccess, refreshDataBindingOnPersist, skipBindingStateUpdateAfterPersist, stateComponent, stateProps, ...entityProps }: EditScopeProps<StateProps>) => JSX.Element;
 
 // @public (undocumented)
-export type EditScopeProps = SugaredQualifiedSingleEntity & EntitySubTreeAdditionalProps & {
+export type EditScopeProps<StateProps> = SugaredQualifiedSingleEntity & EntitySubTreeAdditionalProps & DataBindingProviderStateComponent<StateProps> & {
     children: ReactNode;
     redirectOnSuccess?: RedirectOnSuccessTarget;
     refreshDataBindingOnPersist?: boolean;
@@ -3060,10 +3061,10 @@ export interface ListRolesQueryVariables {
 }
 
 // @public (undocumented)
-export const ListScope: <ContainerExtraProps, ItemExtraProps>({ children, ...entityListProps }: ListScopeProps<ContainerExtraProps, ItemExtraProps>) => JSX.Element;
+export const ListScope: <ContainerExtraProps, ItemExtraProps, StateProps>({ children, stateComponent, stateProps, ...entityListProps }: ListScopeProps<ContainerExtraProps, ItemExtraProps, StateProps>) => JSX.Element;
 
 // @public (undocumented)
-export type ListScopeProps<ContainerExtraProps, ItemExtraProps> = SugaredQualifiedEntityList & EntityListSubTreeAdditionalProps & {
+export type ListScopeProps<ContainerExtraProps, ItemExtraProps, StateProps> = SugaredQualifiedEntityList & EntityListSubTreeAdditionalProps & DataBindingProviderStateComponent<StateProps> & {
     children?: ReactNode;
     listProps?: Omit<ImmutableEntityListRendererProps<ContainerExtraProps, ItemExtraProps>, 'accessor' | 'children'>;
 };
@@ -3327,10 +3328,10 @@ export type MultiEditPageProps<ContainerExtraProps, ItemExtraProps> = SugaredQua
 };
 
 // @public (undocumented)
-export const MultiEditScope: <ContainerExtraProps, ItemExtraProps>({ children, refreshDataBindingOnPersist, skipBindingStateUpdateAfterPersist, ...entityListProps }: MultiEditScopeProps<ContainerExtraProps, ItemExtraProps>) => JSX.Element;
+export const MultiEditScope: <ContainerExtraProps, ItemExtraProps, StateManagerProps>({ children, refreshDataBindingOnPersist, skipBindingStateUpdateAfterPersist, stateComponent, stateProps, ...entityListProps }: MultiEditScopeProps<ContainerExtraProps, ItemExtraProps, StateManagerProps>) => JSX.Element;
 
 // @public (undocumented)
-export type MultiEditScopeProps<ContainerExtraProps, ItemExtraProps> = SugaredQualifiedEntityList & EntityListSubTreeAdditionalProps & {
+export type MultiEditScopeProps<ContainerExtraProps, ItemExtraProps, StateManagerProps> = SugaredQualifiedEntityList & EntityListSubTreeAdditionalProps & DataBindingProviderStateComponent<StateManagerProps> & {
     children?: ReactNode;
     refreshDataBindingOnPersist?: boolean;
     skipBindingStateUpdateAfterPersist?: boolean;

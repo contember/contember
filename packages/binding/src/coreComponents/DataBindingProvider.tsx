@@ -1,7 +1,18 @@
 import { ComponentType, createElement, memo, ReactElement, ReactNode } from 'react'
 import { AccessorTree, AccessorTreeState, AccessorTreeStateOptions, useDataBinding } from '../accessorTree'
 
-export type DataBindingProviderBaseProps  =
+export type DataBindingProviderStateComponent<StateProps> = (
+	| {
+		stateComponent?: never;
+		stateProps?: never;
+	}
+	| {
+		stateComponent: ComponentType<StateProps & DataBindingStateComponentProps>
+		stateProps?: StateProps
+	}
+)
+
+export type DataBindingProviderBaseProps =
 	& AccessorTreeStateOptions
 
 export interface DataBindingStateComponentProps {
@@ -9,14 +20,9 @@ export interface DataBindingStateComponentProps {
 	children?: ReactNode
 }
 
-export type DataBindingProviderProps<StateProps> = DataBindingProviderBaseProps &
-	(
-		| {}
-		| {
-				stateComponent: ComponentType<StateProps & DataBindingStateComponentProps>
-				stateProps?: StateProps
-		  }
-	)
+export type DataBindingProviderProps<StateProps> =
+	& DataBindingProviderBaseProps
+	& DataBindingProviderStateComponent<StateProps>
 
 /**
  * The `DataBindingProvider` is a root component for all other data binding related components.

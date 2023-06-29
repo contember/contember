@@ -41,7 +41,7 @@ const stateOptions = {
 export const List = () => (
 	<>
 		<Title>Articles</Title>
-		<Directive name="cms-layout.content.maxWidth" content={null} />
+		<Directive name="content-max-width" content={null} />
 		<Slots.Actions><LinkButton to="article/create">Add article</LinkButton></Slots.Actions>
 		<Slots.Content>
 			<DataGridScope

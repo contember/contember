@@ -7,7 +7,7 @@ export const ThemeSwitcher = () => {
 
 	return (
 		<div style={{ minWidth: '12rem' }}>
-			<Directive name="layout.theme" content={theme} />
+			<Directive name="layout.theme-controls" content={theme} />
 			<Select<Intent>
 				placeholder="Change theme..."
 				value={theme}

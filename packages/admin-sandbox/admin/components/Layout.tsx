@@ -1,6 +1,6 @@
 import { Button, DevPanel, Link, LogoutLink, Stack, VisuallyHidden } from '@contember/admin'
 import { Identity2023 } from '@contember/brand'
-import { useDocumentTitle, useLayoutContainerWidth } from '@contember/react-utils'
+import { useContainerWidth, useDocumentTitle } from '@contember/react-utils'
 import { Intent, Radio, Spacer } from '@contember/ui'
 import { LayoutIcon, LogOutIcon, PaintBucketIcon } from 'lucide-react'
 import { PropsWithChildren, useState } from 'react'
@@ -15,8 +15,8 @@ export const Layout = (props: PropsWithChildren) => {
 	const directives = useDirectives()
 	useDocumentTitle(directives.title)
 
-	const LayoutComponent = Layouts[directives.layout] ?? Layouts.default
-	const width = useLayoutContainerWidth()
+	const LayoutComponent = Layouts[directives.layout ?? 'default'] ?? Layouts.default
+	const width = useContainerWidth()
 
 	return (
 		<>

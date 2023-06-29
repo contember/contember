@@ -9,7 +9,7 @@ export default function InnerFooPage() {
 			<Title>Nested Path</Title>
 			<Slots.Title><SectionTabs /></Slots.Title>
 
-			<Directive name="cms-layout.content.maxWidth" content={720} />
+			<Directive name="content-max-width" content={720} />
 
 			<Slots.Actions>
 				<SelectFieldInner

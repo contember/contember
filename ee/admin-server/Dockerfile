@@ -14,7 +14,6 @@ COPY packages/admin-sandbox/package.json							./packages/admin-sandbox/package.
 COPY packages/binding/package.json										./packages/binding/package.json
 COPY packages/brand/package.json											./packages/brand/package.json
 COPY packages/client/package.json											./packages/client/package.json
-COPY packages/cms-layout/package.json									./packages/cms-layout/package.json
 COPY packages/interface-tester/package.json						./packages/interface-tester/package.json
 COPY packages/layout/package.json											./packages/layout/package.json
 COPY packages/react-client/package.json								./packages/react-client/package.json

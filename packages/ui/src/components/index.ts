@@ -1,5 +1,6 @@
 export * from './ActionableBox'
 export * from './Aether'
+export * from './Anchor'
 export * from './Box'
 export * from './Breadcrumbs'
 export * from './Card'

@@ -1,6 +1,6 @@
+import { useContainerWidth } from '@contember/react-utils'
 import { Stack, StackOwnProps, StackProps } from '@contember/ui'
 import { forwardRef, memo } from 'react'
-import { useLayoutContainerWidth } from '../layout'
 
 export type ResponsiveProps<P> = {
 	[K in keyof P]: P[K] | ((layoutContainerWidth: number) => P[K])
@@ -12,7 +12,7 @@ export interface ResponsiveStackProps extends OwnResponsiveStackProps, Omit<JSX.
 
 export const ResponsiveStack = memo(
 	forwardRef<HTMLDivElement, ResponsiveStackProps>((props, ref) => {
-		const layoutWidth = useLayoutContainerWidth()
+		const layoutWidth = useContainerWidth()
 
 		const stackProps = Object.fromEntries(
 			Object.entries(props).map(([key, value]) => {
@@ -26,7 +26,7 @@ export const ResponsiveStack = memo(
 
 		return (
 			<Stack
-				ref={ref as any}
+				ref={ref}
 				{...stackProps}
 			/>
 		)

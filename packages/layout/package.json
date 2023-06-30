@@ -42,8 +42,11 @@
 		"@contember/react-utils": "workspace:*",
 		"@contember/ui": "workspace:*",
 		"@contember/utilities": "workspace:*",
+		"change-case": "^4.1.2",
 		"deep-equal": "^2.2.0",
+		"fast-deep-equal": "^3.1.3",
 		"lucide-react": "^0.256.0",
+		"slugify": "^1.6.6",
 		"wait-for-element-transition": "^3.3.1"
 	},
 	"peerDependencies": {

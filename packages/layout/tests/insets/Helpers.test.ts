@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest'
-import { screenInsetsToCSSCustomProperties } from '../../src'
+import { getElementInsets, screenInsetsToCSSCustomProperties } from '../../src'
 
 describe('@contember/layout', function () {
 	test('@contember/layout.screenInsetsToCSSCustomProperties', function () {
@@ -63,6 +63,29 @@ describe('@contember/layout', function () {
 			'--inset-top': '10px',
 			'--inset-bottom': '20px',
 			'--inset-right': '40px',
+		})
+	})
+
+	test('@contember/layout.getElementInsets', function () {
+		const containerInsets = {
+			'top': 113,
+			'left': 0,
+			'right': 60,
+			'bottom': 76,
+		}
+
+		const containerOffsets = {
+			'offsetTop': 129,
+			'offsetLeft': 0,
+			'offsetRight': 0,
+			'offsetBottom': 447,
+		}
+
+		expect(getElementInsets(containerInsets, containerOffsets)).toEqual({
+			'top': 0,
+			'left': 0,
+			'right': 60,
+			'bottom': 0,
 		})
 	})
 })

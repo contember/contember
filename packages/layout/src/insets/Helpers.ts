@@ -26,7 +26,7 @@ export function combineElementInsets(...insets: Array<Partial<ContainerInsets> |
 
 function clampSingleElementInset(containerInset: number | undefined, elementInset: number): number {
 	if (isNonNegativeNumber(containerInset)) {
-		return elementInset > containerInset ? containerInset : elementInset
+		return elementInset >= containerInset ? containerInset : 0
 	} else {
 		return 0
 	}
@@ -77,17 +77,30 @@ function isCSSPrefix(value: unknown): value is `--${string}` {
 	return typeof value === 'string' && value.startsWith('--') ? true : false
 }
 
+type ScreenInsetsToCSSCustomProperties<
+	P extends string,
+	T extends Readonly<Record<string, number | null>>,
+> = {
+	[K in keyof T as `${P}-${string & K}`]: `${T[K]}px`;
+} & {
+		[K in keyof T as `${P}-on-${string & K}`]: '0' | '1';
+	}
+
 export function screenInsetsToCSSCustomProperties<
 	P extends string,
 	T extends Readonly<Record<string, number | null>>,
->(value: T, prefix: P): { [K in keyof T as `${P}${string & K}`]: `${T[K]}px` } {
+	>(value: T, prefix: P): ScreenInsetsToCSSCustomProperties<P, T> {
 	assert('prefix is CSS custom property prefix', prefix, isCSSPrefix)
+	const onPrefix = `--${prefix.slice(1)}-on`
 
-	const entries = Object.entries(value).filter(([key, value]) => {
+	const entries = [] as Array<[string, string]>
+
+	Object.entries(value).filter(([_key_, value]) => {
 		return value !== null && value !== undefined
-	}).map(
-		([key, value]) => [prefix + key, px(value)],
-	)
+	}).forEach(([key, value]) => {
+		entries.push([`${prefix}-${key}`, px(value)])
+		entries.push([`${onPrefix}-${key}`, value && value > 0 ? '1' : '0'])
+	})
 
-	return Object.fromEntries(entries)
+	return Object.fromEntries(entries) as ScreenInsetsToCSSCustomProperties<P, T>
 }

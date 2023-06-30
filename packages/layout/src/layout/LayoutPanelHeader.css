@@ -1,8 +1,0 @@
-:where(.cui-layout-panel-header) {
-	position: sticky;
-	top: 0;
-	z-index: 1;
-}
-:where(.cui-layout-panel-header):empty {
-	display: none;
-}

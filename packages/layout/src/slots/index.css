@@ -1,0 +1,3 @@
+:where(div, span):where(.cui-slot) {
+	display: contents;
+}

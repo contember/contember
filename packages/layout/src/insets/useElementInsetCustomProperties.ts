@@ -5,12 +5,12 @@ import { useElementInsets } from './useElementInsets'
 
 export function useElementInsetCustomProperties(
 	elementRef: RefObject<HTMLElement>,
-	prefix: string = 'container-inset',
+	prefix: string = 'inset',
 ): CSSProperties | undefined {
 	const elementInsets = useElementInsets(elementRef)
 
 	return useMemo(() => screenInsetsToCSSCustomProperties(
 		elementInsets,
-		`--${trimString(prefix, '-')}-`,
+		`--${trimString(prefix, '-')}`,
 	), [prefix, elementInsets])
 }

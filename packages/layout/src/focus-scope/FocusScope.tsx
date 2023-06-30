@@ -34,7 +34,6 @@ function TEMPORARY_fallbackFormatter(key:
 	}[key]
 }
 
-
 const siblingMatch: Record<TabbingDirection, 'nextElementSibling' | 'previousElementSibling'> = {
 	[tabbingDirection.FORWARDS]: 'nextElementSibling',
 	[tabbingDirection.BACKWARDS]: 'previousElementSibling',

@@ -1,0 +1,122 @@
+:where(.cui-layout-panel) {
+	--cui-background-color-rgb: var(--cui-content-background-color-rgb);
+	--cui-content-background-color--focused-rgb: var(--cui-content-background-color--highlighted-rgb);
+	--cui-content-background-color-alpha: 1;
+	--cui-header-background-color-rgb: var(--cui-background-color-rgb);
+	--cui-header-background-color-alpha: var(--cui-backdrop-blur-opacity);
+	--cui-body-background-color-rgb: transparent;
+	--cui-body-background-color-alpha: 1;
+	--cui-footer-background-color-rgb: var(--cui-background-color-rgb);
+	--cui-footer-background-color-alpha: var(--cui-backdrop-blur-opacity);
+
+	content-visibility: visible;
+	display: flex;
+	flex-basis: var(--panel-basis);
+	flex-direction: column;
+	flex-grow: 1;
+	flex-shrink: 1;
+	height: 100%;
+	min-width: var(--panel-min-width, 0px);
+	opacity: 1;
+	overflow-y: auto;
+	overflow-x: hidden;
+	transition-duration: var(--cui-transition-duration);
+	transition-property: transform, opacity;
+	transition-timing-function: ease-in;
+}
+
+:where(.cui-layout-panel > .cui-layout-panel-content) {
+	scroll-padding-bottom: var(--panel-footer-height);
+	scroll-padding-top: var(--panel-header-height);
+}
+
+:where(.cui-layout-panel > .cui-layout-panel-content) {
+	display: flex;
+	flex-direction: column;
+	flex-grow: 1;
+	flex-shrink: 1;
+}
+
+:where(.cui-layout-panel):where(
+	[data-behavior="overlay"],
+	[data-behavior="modal"],
+) {
+	bottom: 0;
+	left: 0;
+	overflow: hidden;
+	overscroll-behavior: contain;
+	position: absolute;
+	right: 0;
+	top: 0;
+}
+:where(
+	.cui-layout-panel[data-behavior="overlay"] > .cui-layout-panel-content,
+	.cui-layout-panel[data-behavior="modal"] > .cui-layout-panel-content,
+) {
+	overflow: hidden;
+}
+
+:where(.cui-layout-panel[data-behavior="overlay"]) {
+	background-color: var(--cui-background-color--above);
+	color: var(--cui-color);
+	z-index: 3;
+}
+
+:where(.cui-layout-panel[data-behavior="modal"]) {
+	background: rgba(0, 0, 0, 0.2);
+	z-index: 4;
+}
+
+:where(
+	.cui-layout-panel[data-behavior="modal"][data-visibility="visible"]
+) {
+	pointer-events: all;
+}
+
+:where(
+	.cui-layout-panel:not([data-behavior="modal"]),
+) {
+	max-width: var(--panel-max-width, 100vw);
+	max-width: var(--panel-max-width, 100dvw);
+}
+
+:where(
+	.cui-layout-panel:not([data-visibility="visible"]),
+) {
+	clip-path: inset(0 0 0 0);
+	overflow: hidden;
+	pointer-events: none;
+}
+
+:where(
+	.cui-layout-panel,
+):where(
+	[data-visibility="hidden"],
+	[data-visibility="will-become-hidden"],
+) {
+	pointer-events: none;
+	opacity: 0;
+}
+
+:where(
+	.cui-layout-panel,
+):where(
+	[data-visibility="hidden"]
+) {
+	content-visibility: hidden;
+}
+
+:where(
+	.cui-layout-panel,
+):where(
+	[data-behavior="collapsible"],
+	[data-behavior="static"],
+):where(
+	[data-visibility="hidden"],
+	[data-visibility="will-become-hidden"],
+) {
+	flex-basis: 0px;
+	max-width: 0px;
+	min-width: 0px;
+	width: 0px;
+}

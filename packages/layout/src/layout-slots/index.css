@@ -1,3 +1,0 @@
-:where(.cui-layout-slot:empty) {
-	display: contents;
-}

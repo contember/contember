@@ -10,6 +10,10 @@ export interface RestHTMLCheckboxProps extends Omit<AllHTMLAttributes<HTMLInputE
 
 export type CheckboxOwnProps = ControlProps<boolean> & {
 	CheckboxButtonComponent?: typeof DefaultCheckboxButton
+	/**
+	 * @deprecated Add `<Label>` next to it or wrap with `<FieldContainer>`
+	 *
+	 */
 	children?: never
 }
 
@@ -78,9 +82,16 @@ export const Checkbox = memo(forwardRef<HTMLInputElement, CheckboxProps>(({
 
 	const CheckboxButton = CheckboxButtonComponent ?? DefaultCheckboxButton
 
+
+	if (import.meta.env.DEV && INTENTIONALLY_UNUSED_CHILDREN) {
+		console.warn('UNUSED CHILDREN. Add `<Label>` next to it or '
+			+ 'wrap with `<FieldContainer label={label} labelPosition="labelInlineRight"><Checkbox {...} /></FieldContainer>` '
+			+ 'or other way to display label next to Checkbox.')
+	}
+
 	return (
 		<div {...hoverProps} className={componentClassName(null, [
-			toStateClass('indeterminate', indeterminate),
+			toStateClass('indeterminate', props.indeterminate),
 			toStateClass('checked', props.checked),
 			className,
 		])}>

@@ -1,6 +1,7 @@
 :where(html),
 :where(body) {
 	display: flex;
+	flex-direction: column;
 	min-height: 100vh;
 	min-height: 100dvh;
 	min-width: 100vw;
@@ -241,7 +242,7 @@
 :where(.view-seamless-with-padding.cui-editorCanvas:hover) {
 	--input-control-background: var(--cui-background-color--above);
 }
-:where(.lucide) {
+:where([data-overrides-lucide-icons] .lucide) {
 	--scale: 1;
 	--square-to-circle-ratio: 1.1284;
 	--square-to-circle-margin: calc((var(--square-to-circle-ratio) - 1) / 2);

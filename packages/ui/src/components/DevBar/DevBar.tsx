@@ -52,8 +52,6 @@ export const DevBar = ({
 	useEffect(() => {
 		if (devBarRef.current) {
 			function handleClickOutside(event: MouseEvent) {
-				console.log(event.target, devBarRef.current?.contains(event.target as Node))
-
 				if (expanded && !devBarRef.current?.contains(event.target as Node)) {
 					setExpanded(false)
 				}

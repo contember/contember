@@ -1,7 +1,3 @@
-:where(.cui-root) {
-	display: contents;
-}
-
 :where(.cui-root),
 :where(.cui-root-no-display) {
 	-webkit-font-smoothing: antialiased;
@@ -12,6 +8,10 @@
 	font-smoothing: antialiased;
 	line-height: var(--cui-line-height);
 }
+
+:where(.cui-root[data-display-contents]) { display: contents; }
+:where(.cui-root[data-transparent]) { background-color: transparent; }
+
 
 :where(.cui-root h1),
 :where(.cui-root h2),

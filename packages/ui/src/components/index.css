@@ -3,47 +3,57 @@
 
 /* Leaf components */
 @import "./Typography";
+
+/* Leaf components */
+@import "./Typography";
 @import "./Anchor";
-@import "./ContentStatus";
-@import "./DevBar";
-@import "./DevError";
-@import "./DimensionSwitcher";
-@import "./Dropdown";
-@import "./Editor";
-@import "./ErrorList";
-@import "./HoveringToolbar";
+@import "./Logo";
 @import "./Icon";
-@import "./ProgressBar";
+@import "./Forms";
+@import "./Dropdown";
+
 @import "./Spinner";
-@import "./Tag";
-@import "./Trio";
-@import "./UserMiniControl";
 @import "./Aether";
 @import "./Box";
 @import "./ActionableBox";
-@import "./Breadcrumbs";
+
+@import "./Trio";
+@import "./ProgressBar";
+@import "./Tag";
 @import "./Card";
 @import "./Collapsible";
 @import "./Divider";
-@import "./Forms";
+@import "./Spacer";
 @import "./Grid";
-@import "./Layout";
 @import "./Link";
-@import "./Logo";
-@import "./Menu";
+@import "./Stack";
 @import "./Message";
+@import "./EmptyStateContainer";
 @import "./RepeaterItemContainer";
 @import "./SeamlessDropdown";
 @import "./Section";
 @import "./SectionTabs";
-@import "./SpinnerContainer";
-@import "./Spacer";
-@import "./Stack";
-@import "./Table";
 @import "./Tabs";
-@import "./TitleBar";
-@import "./Toaster";
-@import "./Dialog";
 @import "./VisuallyHidden";
-@import "./EmptyStateContainer";
+
+/* Composite components */
+@import "./Dialog";
+@import "./Toaster";
+@import "./TitleBar";
+@import "./Table";
+@import "./SpinnerContainer";
+@import "./ContentStatus";
+@import "./Breadcrumbs";
+@import "./DevBar";
+@import "./DevError";
+@import "./DimensionSwitcher";
+@import "./ErrorList";
+@import "./HoveringToolbar";
+@import "./UserMiniControl";
+@import "./Menu";
+
+/* Complex components */
+@import "./Editor";
+@import "./Layout";
+
 

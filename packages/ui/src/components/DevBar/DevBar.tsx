@@ -15,7 +15,7 @@ export const DevBar = ({
 }: PropsWithChildren<{
 	breakpoint?: number;
 }>) => {
-	const className = useClassNameFactory('devBar')
+	const className = useClassNameFactory(['devBar', 'root'])
 	const [expanded, setExpanded] = useState(true)
 	const isSmallScreen = useWindowSize().width < breakpoint
 
@@ -82,7 +82,6 @@ export const DevBar = ({
 				}
 			}}
 		>
-			{/* Important for Handling Click Outside: */}
 			<style>{`svg { pointer-events: none }`}</style>
 			<div className={className('content')}>
 				<FocusScope contain={expanded} restoreFocus>
@@ -139,12 +138,17 @@ export const DevPanel = ({ heading, icon, children, preview }: {
 	const isSmallScreen = useSmallScreenContext()
 	const [expanded, setExpanded] = useState(false)
 	const id = `cui-devBar-panel-${useId()}`
+	// const mouseIsOver = useRef(false)
 
 	const handleOpen = useReferentiallyStableCallback(() => {
 		setExpanded(true)
 	})
 
 	const handleToggle = useReferentiallyStableCallback(() => {
+		// if (mouseIsOver.current && expanded) {
+		// 	return
+		// }
+
 		setExpanded(expanded => !expanded)
 	})
 
@@ -152,14 +156,17 @@ export const DevPanel = ({ heading, icon, children, preview }: {
 		setExpanded(false)
 	})
 
+
 	return (
 		<div
 			data-expanded={dataAttribute(expanded)}
 			className={className('trigger')}
 			onMouseEnter={useReferentiallyStableCallback(event => {
+				// mouseIsOver.current = true
 				handleOpen()
 			})}
 			onMouseLeave={useReferentiallyStableCallback(event => {
+				// mouseIsOver.current = false
 				handleClose()
 			})}
 			onKeyDown={useReferentiallyStableCallback(event => {

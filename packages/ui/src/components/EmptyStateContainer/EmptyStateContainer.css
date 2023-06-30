@@ -1,0 +1,16 @@
+:where(.cui-empty-state-container) {
+	display: flex;
+	flex: 1;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	text-align: center;
+}
+:where(.cui-empty-state-container-header > .lucide) {
+	--scale: 5;
+	stroke-width: 1px;
+	color: var(--cui-filled-control-color);
+}
+:where(.cui-empty-state-container-header .cui-message-content) {
+	font-weight: bold;
+}

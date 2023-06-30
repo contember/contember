@@ -1,4 +1,5 @@
 import { AssertionError } from './AssertionError'
+import { Predicate } from './types'
 
 export function assert<
 	In,
@@ -6,7 +7,7 @@ export function assert<
 >(
 	that: string | undefined = undefined,
 	value: In,
-	predicate: (value: In) => value is Out,
+	predicate: Predicate<In, Out>, // (value: In) => value is Out,
 ): asserts value is Out {
 	if (!predicate(value)) {
 		throw new AssertionError(value, that)

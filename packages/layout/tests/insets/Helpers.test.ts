@@ -9,10 +9,14 @@ describe('@contember/layout', function () {
 			'left': 30,
 			'right': 40,
 		}, '--inset-')).toEqual({
-			'--inset-top': '10px',
-			'--inset-bottom': '20px',
-			'--inset-left': '30px',
-			'--inset-right': '40px',
+			'---inset--on-bottom': '1',
+			'---inset--on-left': '1',
+			'---inset--on-right': '1',
+			'---inset--on-top': '1',
+			'--inset--bottom': '20px',
+			'--inset--left': '30px',
+			'--inset--right': '40px',
+			'--inset--top': '10px',
 		})
 
 		expect(screenInsetsToCSSCustomProperties({
@@ -21,7 +25,8 @@ describe('@contember/layout', function () {
 			'left': null,
 			'right': null,
 		}, '--inset-')).toEqual({
-			'--inset-top': '10px',
+			'---inset--on-top': '1',
+			'--inset--top': '10px',
 		})
 
 		expect(screenInsetsToCSSCustomProperties({
@@ -30,7 +35,8 @@ describe('@contember/layout', function () {
 			'left': null,
 			'right': null,
 		}, '--inset-')).toEqual({
-			'--inset-top': '10px',
+			'---inset--on-top': '1',
+			'--inset--top': '10px',
 		})
 
 		expect(screenInsetsToCSSCustomProperties({
@@ -39,8 +45,10 @@ describe('@contember/layout', function () {
 			'left': null,
 			'right': null,
 		}, '--inset-')).toEqual({
-			'--inset-top': '10px',
-			'--inset-bottom': '20px',
+			'---inset--on-bottom': '1',
+			'---inset--on-top': '1',
+			'--inset--bottom': '20px',
+			'--inset--top': '10px',
 		})
 
 		expect(screenInsetsToCSSCustomProperties({
@@ -49,9 +57,12 @@ describe('@contember/layout', function () {
 			'left': 30,
 			'right': null,
 		}, '--inset-')).toEqual({
-			'--inset-top': '10px',
-			'--inset-bottom': '20px',
-			'--inset-left': '30px',
+			'---inset--on-bottom': '1',
+			'---inset--on-left': '1',
+			'---inset--on-top': '1',
+			'--inset--bottom': '20px',
+			'--inset--left': '30px',
+			'--inset--top': '10px',
 		})
 
 		expect(screenInsetsToCSSCustomProperties({
@@ -60,9 +71,12 @@ describe('@contember/layout', function () {
 			'left': null,
 			'right': 40,
 		}, '--inset-')).toEqual({
-			'--inset-top': '10px',
-			'--inset-bottom': '20px',
-			'--inset-right': '40px',
+			'---inset--on-bottom': '1',
+			'---inset--on-right': '1',
+			'---inset--on-top': '1',
+			'--inset--bottom': '20px',
+			'--inset--right': '40px',
+			'--inset--top': '10px',
 		})
 	})
 

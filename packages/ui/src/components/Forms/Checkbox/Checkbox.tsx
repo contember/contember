@@ -1,5 +1,5 @@
 import { useClassNameFactory } from '@contember/utilities'
-import { AllHTMLAttributes, DetailedHTMLProps, forwardRef, InputHTMLAttributes, memo, useCallback } from 'react'
+import { AllHTMLAttributes, DetailedHTMLProps, InputHTMLAttributes, forwardRef, memo, useCallback } from 'react'
 import { mergeProps, useFocusRing, useHover } from 'react-aria'
 import { toStateClass } from '../../../utils'
 import { useCheckboxInput } from '../Hooks'
@@ -10,21 +10,26 @@ export interface RestHTMLCheckboxProps extends Omit<AllHTMLAttributes<HTMLInputE
 
 export type CheckboxOwnProps = ControlProps<boolean> & {
 	CheckboxButtonComponent?: typeof DefaultCheckboxButton
-	/**
-	 * @deprecated Add `<Label>` next to it or wrap with `<FieldContainer label={label} labelPosition="labelInlineRight"><Checkbox {...} /></FieldContainer>`
-	 *
-	 */
 	children?: never
 }
 
 export type CheckboxProps = CheckboxOwnProps & RestHTMLCheckboxProps
 
 /**
- * @group UI
+ * @group Forms UI
+ *
+ * To add label to checkbox, use `Label` component next to it or wrap with `FieldContainer` or other way to display label next to Checkbox.
+ *
+ * @example
+ * ```
+ * <FieldContainer label={label} labelPosition="labelInlineRight">
+ * 	<Checkbox {...} />
+ * </FieldContainer>
+ * ```
  */
 export const Checkbox = memo(forwardRef<HTMLInputElement, CheckboxProps>(({
 	CheckboxButtonComponent,
-	// TODO: Remove after depreciation time
+	// NOTE: Children are not allowed on Checkbox
 	children: INTENTIONALLY_UNUSED_CHILDREN,
 	max,
 	min,
@@ -32,6 +37,12 @@ export const Checkbox = memo(forwardRef<HTMLInputElement, CheckboxProps>(({
 	value,
 	...outerProps
 }, forwardedRef) => {
+	if (import.meta.env.DEV && INTENTIONALLY_UNUSED_CHILDREN) {
+		console.warn('[UNUSED CHILDREN] Add `<Label>` next to it or wrap with '
+			+ '`<FieldContainer label={label} labelPosition="labelInlineRight"><Checkbox {...} /></FieldContainer>` '
+			+ 'or other way to display label next to Checkbox.')
+	}
+
 	const componentClassName = useClassNameFactory('checkbox')
 	const notNull = outerProps.notNull
 
@@ -62,21 +73,14 @@ export const Checkbox = memo(forwardRef<HTMLInputElement, CheckboxProps>(({
 	const ariaProps: {
 		'aria-checked': DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>['aria-checked']
 	} = {
-		'aria-checked': props.indeterminate ? 'mixed' : props.checked ? 'true' : 'false',
+		'aria-checked': indeterminate ? 'mixed' : nativeInputProps.checked ? 'true' : 'false',
 	}
 
 	const CheckboxButton = CheckboxButtonComponent ?? DefaultCheckboxButton
 
-
-	if (import.meta.env.DEV && INTENTIONALLY_UNUSED_CHILDREN) {
-		console.warn('UNUSED CHILDREN. Add `<Label>` next to it or '
-			+ 'wrap with `<FieldContainer label={label} labelPosition="labelInlineRight"><Checkbox {...} /></FieldContainer>` '
-			+ 'or other way to display label next to Checkbox.')
-	}
-
 	return (
 		<div {...hoverProps} className={componentClassName(null, [
-			toStateClass('indeterminate', props.indeterminate),
+			toStateClass('indeterminate', indeterminate),
 			toStateClass('checked', props.checked),
 			className,
 		])}>

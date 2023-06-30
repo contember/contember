@@ -6,9 +6,11 @@ import { CMSLayout } from '@contember/cms-layout'
 import { useMemo } from 'react'
 import { useDirectives } from '../Directives'
 import { Slots } from '../Slots'
+import { LAYOUT_BREAKPOINT } from '../Constants'
 
 export const Layout = () => {
 	const directives = useDirectives()
+	const maxWidth = directives['content-max-width']
 
 	return (
 		<>
@@ -24,21 +26,9 @@ export const Layout = () => {
 			</Slots.Switchers>
 
 			<CMSLayout.Root
-				breakpoint={directives['cms-layout.breakpoint']}
-				contentProps={useMemo(() => ({
-					basis: directives['cms-layout.content.basis'],
-					maxWidth: directives['cms-layout.content.maxWidth'],
-					minWidth: directives['cms-layout.content.minWidth'],
-				}), [directives])}
-				sidebarLeftProps={useMemo(() => ({
-					keepVisible: directives['cms-layout.sidebarLeft.keepVisible'],
-					width: directives['cms-layout.sidebarLeft.width'],
-				}), [directives])}
-				sidebarRightProps={useMemo(() => ({
-					keepVisible: directives['cms-layout.sidebarRight.keepVisible'],
-					width: directives['cms-layout.sidebarRight.width'],
-				}), [directives])}
-				className={toThemeClass(directives['layout.theme'], directives['layout.theme'])}
+				breakpoint={LAYOUT_BREAKPOINT}
+				contentProps={useMemo(() => ({ maxWidth }), [maxWidth])}
+				className={toThemeClass(directives['layout.theme-content'], directives['layout.theme-controls'])}
 			>
 				<DropdownContentContainerProvider />
 				<div id="portal-root" />

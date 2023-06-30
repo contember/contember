@@ -4,11 +4,14 @@
 
 ```ts
 
+/// <reference types="react" />
+
 import { AllHTMLAttributes } from 'react';
 import { AnimationEventHandler } from 'react';
 import { AriaRole } from 'react';
 import { ChangeEventHandler } from 'react';
 import { ClipboardEventHandler } from 'react';
+import { ComponentClassNameProps } from '@contember/utilities';
 import { ComponentProps } from 'react';
 import { ComponentType } from 'react';
 import { CompositionEventHandler } from 'react';
@@ -92,6 +95,12 @@ export type AetherProps = HTMLDivElementProps;
 export type Alignment = Default | 'alignStart' | 'alignCenter' | 'alignEnd';
 
 // @public (undocumented)
+export const Anchor: MemoExoticComponent<ForwardRefExoticComponent<HTMLAnchorElementProps & {
+active?: boolean | undefined;
+componentClassName?: string | undefined;
+} & RefAttributes<HTMLAnchorElement>>>;
+
+// @public (undocumented)
 export interface AnchorBasedProps extends Omit<HTMLAnchorElementProps, 'ref' | 'size'> {
     // (undocumented)
     Component: 'a';
@@ -102,6 +111,12 @@ export const AnchorButton: MemoExoticComponent<ForwardRefExoticComponent<ButtonO
 
 // @public (undocumented)
 export type AnchorButtonProps = ButtonOwnProps & Omit<AnchorBasedProps, 'Component'>;
+
+// @public (undocumented)
+export type AnchorProps = HTMLAnchorElementProps & {
+    active?: boolean;
+    componentClassName?: string;
+};
 
 // @public (undocumented)
 export function assertColorString(value: unknown): asserts value is ColorString;
@@ -347,14 +362,11 @@ export type CommonReactSelectStylesProps = PublicCommonReactSelectStylesProps & 
     isInvalid?: boolean;
 };
 
-// @public (undocumented)
-export const ContainerSpinner: MemoExoticComponent<({ size }: ContainerSpinnerProps) => JSX.Element>;
+// @public @deprecated (undocumented)
+export const ContainerSpinner: MemoExoticComponent<(props: ContainerSpinnerProps) => JSX.Element>;
 
-// @public (undocumented)
-export interface ContainerSpinnerProps {
-    // (undocumented)
-    size?: Size;
-}
+// @public @deprecated (undocumented)
+export type ContainerSpinnerProps = SpinnerContainerProps;
 
 // Warning: (ae-forgotten-export) The symbol "ContemberIcons" needs to be exported by the entry point index.d.ts
 //
@@ -518,9 +530,9 @@ export interface DescriptionProps {
 }
 
 // @public (undocumented)
-export const DevBar: ({ children }: {
-    children: ReactNode;
-}) => JSX.Element | null;
+export const DevBar: ({ breakpoint, children, }: PropsWithChildren<{
+    breakpoint?: number | undefined;
+}>) => JSX.Element;
 
 // @public (undocumented)
 export function DevError(props: DevErrorProps): JSX.Element;
@@ -566,7 +578,8 @@ export interface DevErrorProps extends DevErrorInnerProps {
 }
 
 // @public (undocumented)
-export const DevPanel: ({ heading, children, preview }: {
+export const DevPanel: ({ heading, icon, children, preview }: {
+    icon: ReactNode;
     heading: ReactNode;
     children: ReactNode;
     preview?: ReactNode;
@@ -1519,11 +1532,11 @@ export type FileDropZoneProps = {
 } & HTMLDivElementProps;
 
 // @public (undocumented)
-export const FilePreview: MemoExoticComponent<({ actions, children, isActive, overlay }: FilePreviewProps) => JSX.Element>;
+export const FilePreview: MemoExoticComponent<({ children, isActive, overlay }: FilePreviewProps) => JSX.Element>;
 
 // @public (undocumented)
 export interface FilePreviewProps {
-    // (undocumented)
+    // @deprecated (undocumented)
     actions?: ReactNode;
     // (undocumented)
     children?: ReactNode;
@@ -2198,7 +2211,7 @@ export type SaveButtonProps = {
 } & ButtonProps;
 
 // @public (undocumented)
-export type Scheme = 'system' | 'light' | 'light-above' | 'light-below' | 'dark' | 'dark-above' | 'dark-below';
+export type Scheme = 'system' | 'light' | 'dark';
 
 // @public (undocumented)
 export function SeamlessDropdown({ direction, label, children, hoverable, caret, inline }: SeamlessDropdownProps): JSX.Element;
@@ -2260,8 +2273,8 @@ export type SectionProps = SectionOwnProps & HTMLDivElementProps;
 export interface SectionTabProps {
     // (undocumented)
     id: string;
-    // (undocumented)
-    isMeta?: boolean;
+    // @deprecated (undocumented)
+    isMeta?: never;
     // (undocumented)
     label: ReactNode;
 }
@@ -2367,6 +2380,25 @@ export type SpacerProps = {
 export const Spinner: MemoExoticComponent<() => JSX.Element>;
 
 // @public (undocumented)
+export const SpinnerContainer: MemoExoticComponent<({ enabled, children, size }: SpinnerContainerProps) => JSX.Element>;
+
+// @public (undocumented)
+export interface SpinnerContainerProps extends SpinnerOverlayProps {
+    // (undocumented)
+    children: ReactNode;
+    // (undocumented)
+    enabled?: boolean;
+}
+
+// @public (undocumented)
+export const SpinnerOverlay: MemoExoticComponent<({ size }: SpinnerOverlayProps) => JSX.Element>;
+
+// @public (undocumented)
+export type SpinnerOverlayProps = ComponentClassNameProps & {
+    size?: Size;
+};
+
+// @public (undocumented)
 export function splitDatetime(datetime: string | null | undefined): string[];
 
 // @public
@@ -2402,9 +2434,10 @@ export interface StackOwnProps {
 export type StackProps = StackOwnProps & HTMLDivElementProps;
 
 // @public (undocumented)
-export const StyleProvider: ({ children }: {
-    children: ReactNode;
-}) => JSX.Element;
+export const StyleProvider: {
+    ({ children }: PropsWithChildren): JSX.Element;
+    displayName: string;
+};
 
 // @public (undocumented)
 export const TAB_INDEX_FOCUSABLE = 0;

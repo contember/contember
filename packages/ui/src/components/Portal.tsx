@@ -1,6 +1,6 @@
 import { memo, ReactNode } from 'react'
 import { createPortal } from 'react-dom'
-import { StyleProvider } from './Layout/StyleProvider'
+import { StyleProvider } from './StyleProvider'
 
 export interface PortalProps {
 	to?: HTMLElement

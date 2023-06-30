@@ -5,11 +5,11 @@ import { CSSProperties, ReactNode, createContext, useContext, useEffect, useStat
 import { createRoot } from 'react-dom/client'
 import {
 	ApplicationEntrypoint,
-	ContainerSpinner,
 	Link,
 	MiscPageLayout,
 	PageModule,
 	Pages,
+	SpinnerContainer,
 	runReactApp,
 	useCurrentRequest,
 } from '../../../src'
@@ -81,12 +81,11 @@ const ProjectInitializingLayout = ({ children }: { children?: ReactNode }) => {
 		[pageName, setProjectSlug],
 	)
 
-	if (projectSlug === undefined) {
-		return <ContainerSpinner />
-
-	} else {
-		return <>{children}</>
-	}
+	return (
+		<SpinnerContainer enabled={projectSlug === undefined}>
+			{children}
+		</SpinnerContainer>
+	)
 }
 
 const IndexPage = () => {

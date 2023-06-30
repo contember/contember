@@ -1,5 +1,5 @@
 import { useCallback } from 'react'
-import { ContainerSpinner, ErrorList } from '@contember/ui'
+import { ErrorList, SpinnerOverlay } from '@contember/ui'
 import { useHandleIDPResponse } from './useHandleIDPResponse'
 
 export interface IDPResponseHandlerProps {
@@ -29,7 +29,7 @@ export const useResponseHandlerFeedback = ({ onLogin }: IDPResponseHandlerProps)
 			return <ErrorList errors={[{ message: error }]} />
 
 		default:
-			return <ContainerSpinner />
+			return <SpinnerOverlay />
 	}
 }
 

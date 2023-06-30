@@ -5,6 +5,7 @@
 ```ts
 
 import { Context } from 'react';
+import { PropsWithChildren } from 'react';
 
 // @public (undocumented)
 export type AsProp<C extends React.ElementType> = {
@@ -29,6 +30,12 @@ export function capitalize(str: string): string;
 export type ClassNameStateMap = {
     [key: string]: string | number | boolean | null | undefined;
 };
+
+// @public (undocumented)
+export type ComponentClassNameProps = PropsWithChildren<{
+    className?: NestedClassName;
+    componentClassName?: string | string[];
+}>;
 
 // @public (undocumented)
 export function dataAttribute(value: unknown): string | true | undefined;
@@ -102,7 +109,7 @@ export function isNumericString(value: string): value is string;
 export function isObject(value: unknown): value is Object;
 
 // @public (undocumented)
-export function isOneOfFactory<U, T = any>(options: T extends Array<U> | ReadonlyArray<U> ? T : never): (value: unknown) => value is U;
+export function isOneOfFactory<U, T = any>(members: T extends Array<U> | ReadonlyArray<U> ? T : never): (value: unknown) => value is U;
 
 // @public (undocumented)
 export function isPlainObject<T extends Record<string, unknown>>(value: unknown): value is T;
@@ -135,6 +142,9 @@ export type ObjectKeyValue<T, K extends keyof T> = T extends {
     [P in K]: T[P];
 } ? T[K] : never;
 
+// @public (undocumented)
+export function omit<T extends Object, K extends keyof T>(object: T, properties: ReadonlyArray<K>, strict?: boolean): Omit<T, K>;
+
 // @public
 export function parseTransformMatrix(transform?: string): {
     scaleX: number;
@@ -146,7 +156,7 @@ export function parseTransformMatrix(transform?: string): {
 } | undefined;
 
 // @public (undocumented)
-export function pick<T extends Object, K extends keyof T>(object: T, properties: K[]): Pick<T, K>;
+export function pick<T extends Object, K extends keyof T>(object: T, properties: ReadonlyArray<K>): Pick<T, K>;
 
 // @public
 export type PolymorphicComponentProps<C extends React.ElementType, Props = {}> = InheritableElementProps<C, Props & AsProp<C>>;
@@ -183,9 +193,19 @@ export function setHasOneOf<T>(set: Set<T>, values: T[]): boolean;
 // Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
 // Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
 // Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
+// Warning: (tsdoc-param-tag-with-invalid-name) The @param block should be followed by a valid parameter name: The identifier cannot non-word characters
+// Warning: (tsdoc-param-tag-with-invalid-name) The @param block should be followed by a valid parameter name: The identifier cannot non-word characters
 //
 // @public
-export function stateClassName(state?: ClassNameStateMap | null, glue?: string): string[];
+export function stateClassName(state?: ClassNameStateMap | null, { glue, removeFalsy }?: StateClassNameOptions): string[];
+
+// @public (undocumented)
+export interface StateClassNameOptions {
+    // (undocumented)
+    glue?: string;
+    // (undocumented)
+    removeFalsy?: boolean;
+}
 
 // @public (undocumented)
 export interface SvgSizeProps {

@@ -31,10 +31,6 @@ export type SelectProps<V> = Omit<ControlProps<V>, 'type' | 'style' | keyof Cont
 	styles?: StylesConfig<any, boolean, never>
 }
 
-function optionValueIsEmpty(value: unknown) {
-	return value === '' || value === null || typeof value === undefined
-}
-
 function deriveSelectIndexValue(index: number) {
 	return index === -1 ? '' : index.toString()
 }

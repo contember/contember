@@ -1,5 +1,5 @@
 import { useClassNameFactory } from '@contember/utilities'
-import { ForwardedRef, forwardRef, memo, ReactNode } from 'react'
+import { forwardRef, memo, ReactNode } from 'react'
 import { TextInput, TextInputProps } from '../Inputs'
 
 export type SlugInputProps =

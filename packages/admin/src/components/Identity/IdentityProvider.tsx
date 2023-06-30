@@ -1,8 +1,8 @@
-import { createContext, ReactNode, useCallback, useEffect, useMemo, useState } from 'react'
+import { ReactNode, createContext, useCallback, useEffect, useMemo, useState } from 'react'
 import { useSessionToken } from '@contember/react-client'
 import { useFetchMe } from '../../tenant'
-import { ContainerSpinner, Message } from '@contember/ui'
 import { MiscPageLayout } from '../MiscPageLayout'
+import { SpinnerContainer, Message } from '@contember/ui'
 import { InvalidIdentityFallback } from './InvalidIdentityFallback'
 import { useLogout } from './useLogout'
 import { EnvironmentExtensionProvider } from '@contember/binding'
@@ -54,10 +54,10 @@ export interface IdentityProviderProps {
 
 type IdentityState =
 	| { state: 'none' }
-	| { state: 'loading'}
-	| { state: 'failed'}
+	| { state: 'loading' }
+	| { state: 'failed' }
 	| { state: 'success', identity: Identity }
-	| { state: 'cleared'}
+	| { state: 'cleared' }
 
 export const IdentityProvider: React.FC<IdentityProviderProps> = ({ children, onInvalidIdentity, allowUnauthenticated }) => {
 	const sessionToken = useSessionToken()
@@ -155,17 +155,19 @@ export const IdentityProvider: React.FC<IdentityProviderProps> = ({ children, on
 		return <InvalidIdentityFallback />
 	}
 
-	if (identityState.state === 'loading' || (!allowUnauthenticated && identityState.state === 'none')) {
-		return <ContainerSpinner />
-	}
+	const pending = identityState.state === 'loading' || (!allowUnauthenticated && identityState.state === 'none')
 
 	return (
-		<EnvironmentExtensionProvider extension={identityEnvironmentExtension} state={identityContextValue?.identity ?? null}>
-			<IdentityContext.Provider value={identityContextValue}>
-				<IdentityRefreshContext.Provider value={refetch}>
-					{children}
-				</IdentityRefreshContext.Provider>
-			</IdentityContext.Provider>
-		</EnvironmentExtensionProvider>
+		<SpinnerContainer enabled={pending}>
+			{pending ? null : (
+				<EnvironmentExtensionProvider extension={identityEnvironmentExtension} state={identityContextValue?.identity ?? null}>
+					<IdentityContext.Provider value={identityContextValue}>
+						<IdentityRefreshContext.Provider value={refetch}>
+							{children}
+						</IdentityRefreshContext.Provider>
+					</IdentityContext.Provider>
+				</EnvironmentExtensionProvider>
+			)}
+		</SpinnerContainer>
 	)
 }

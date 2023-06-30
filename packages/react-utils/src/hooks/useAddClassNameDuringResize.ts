@@ -51,6 +51,10 @@ export function useAddClassNameDuringResize(
 		timeoutID.current = setTimeout(() => {
 			addClassName(className, element ?? document.body)
 		}, timeoutToRestore)
+
+		return () => {
+			clearTimeout(timeoutID.current)
+		}
 	})
 
 	useLayoutEffect(addTemporaryClassName, [addTemporaryClassName])

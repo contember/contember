@@ -1,4 +1,4 @@
-import { useClassName, useClassNameFactory } from '@contember/utilities'
+import { useClassName } from '@contember/utilities'
 import { memo } from 'react'
 import { HTMLDivElementProps, Size } from '../../types'
 import { toEnumViewClass } from '../../utils'

@@ -1,7 +1,7 @@
 import { useReferentiallyStableCallback } from '@contember/react-utils'
 import { Button } from '@contember/ui'
 import { NestedClassName, useClassName } from '@contember/utilities'
-import { SidebarCloseIcon, SidebarOpenIcon } from 'lucide-react'
+import { PanelLeftCloseIcon, PanelLeftOpenIcon, PanelRightCloseIcon, PanelRightOpenIcon } from 'lucide-react'
 import { memo } from 'react'
 import { useGetLayoutPanelsStateContext, useSetLayoutPanelsStateContext } from '../layout'
 
@@ -22,6 +22,9 @@ export const ToggleSidebarButton = memo<ToggleSidebarButtonProps>(({
 	const { panels } = useGetLayoutPanelsStateContext()
 	const panelState = panels.get(panel)
 
+	const OpenIcon = position === 'left' ? PanelLeftOpenIcon : PanelRightOpenIcon
+	const CloseIcon = position === 'left' ? PanelLeftCloseIcon : PanelRightCloseIcon
+
 	return (
 		<Button
 			intent="default"
@@ -32,8 +35,8 @@ export const ToggleSidebarButton = memo<ToggleSidebarButtonProps>(({
 			})}
 		>
 			{panelState?.visibility === 'visible'
-				? { left: <SidebarCloseIcon className="left-sidebar-close-icon" />, right: <SidebarCloseIcon className="right-sidebar-close-icon" /> }[position]
-				: { left: <SidebarOpenIcon className="left-sidebar-open-icon" />, right: <SidebarOpenIcon className="right-sidebar-open-icon" /> }[position]
+				? <CloseIcon />
+				: <OpenIcon />
 			}
 		</Button>
 	)

@@ -4,7 +4,7 @@ import {
 	EntityListSubTreeAdditionalProps,
 	SugaredQualifiedEntityList,
 } from '@contember/binding'
-import { memo, ReactNode } from 'react'
+import { ReactNode } from 'react'
 import {
 	FeedbackRenderer,
 	ImmutableEntityListPageRenderer,

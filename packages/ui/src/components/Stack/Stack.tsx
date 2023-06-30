@@ -1,4 +1,4 @@
-import { useClassName, useClassNameFactory } from '@contember/utilities'
+import { useClassNameFactory } from '@contember/utilities'
 import { CSSProperties, ReactNode, forwardRef, memo, useMemo } from 'react'
 import type { HTMLDivElementProps, Size } from '../../types'
 import { toEnumClass, toEnumViewClass, toStateClass, toViewClass } from '../../utils'

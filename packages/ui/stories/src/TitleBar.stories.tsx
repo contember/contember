@@ -28,7 +28,7 @@ const Template: ComponentStory<typeof TitleBar> = (args: TitleBarProps) => (
 export const Default = Template.bind({})
 
 Default.args = {
-	actions: <Button scheme="dark-below">Save</Button>,
+	actions: <Button scheme="dark">Save</Button>,
 	navigation: <AnchorButton distinction="seamless">&larr; Back</AnchorButton>,
 	children: 'Lorem ipsum',
 	after: 'This is added after...',

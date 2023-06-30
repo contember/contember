@@ -1,5 +1,5 @@
 import { memo, ReactNode } from 'react'
-import { SortableElement, SortableElementProps } from 'react-sortable-hoc'
+import { SortableElement } from 'react-sortable-hoc'
 
 export interface SortableRepeaterItemProps {
 	children: ReactNode

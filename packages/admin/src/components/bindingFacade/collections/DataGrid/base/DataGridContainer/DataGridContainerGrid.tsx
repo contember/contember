@@ -1,29 +1,46 @@
 import { Entity } from '@contember/binding'
-import { Grid } from '@contember/ui'
+import { Card, Grid } from '@contember/ui'
 import { useClassName } from '@contember/utilities'
 import { memo } from 'react'
+import { useMessageFormatter } from '../../../../../../i18n'
+import { EmptyMessage } from '../../../helpers'
+import { dataGridDictionary } from '../dataGridDictionary'
 import { DataGridContainerProps } from './Types'
 
 export type DataGridContainerGridProps =
 	Pick<DataGridContainerProps,
 		| 'accessor'
+		| 'emptyMessage'
+		| 'emptyMessageComponent'
 		| 'tile'
 		| 'tileSize'
 	>
 
 export const DataGridContainerGrid = memo(({
 	accessor,
-	tileSize = 160,
+	emptyMessage,
+	emptyMessageComponent,
 	tile,
-}: DataGridContainerGridProps) => (
-	<div className={useClassName('data-grid-body-content-grid')}>
-		<Grid columnWidth={tileSize}>
-			{!!accessor.length && Array.from(accessor, entity => (
-				<Entity key={entity.id} accessor={entity}>
-					{tile}
-				</Entity>
-			))}
-		</Grid>
-	</div>
-))
+	tileSize = 160,
+}: DataGridContainerGridProps) => {
+	const formatMessage = useMessageFormatter(dataGridDictionary)
+
+	return (
+		<div className={useClassName('data-grid-body-content-grid')}>
+			<Grid columnWidth={tileSize}>
+				{!!accessor.length
+					? Array.from(accessor, entity => (
+						<Entity key={entity.id} accessor={entity}>
+							{tile}
+						</Entity>
+					))
+					: (
+						<EmptyMessage component={emptyMessageComponent} className="cui-grid-row-full-width">
+							{formatMessage(emptyMessage, 'dataGrid.emptyMessage.text')}
+						</EmptyMessage>
+					)}
+			</Grid>
+		</div>
+	)
+})
 DataGridContainerGrid.displayName = 'DataGridContainerGrid'

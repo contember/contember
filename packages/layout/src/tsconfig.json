@@ -4,7 +4,6 @@
 		"outDir": "../dist/types"
 	},
 	"references": [
-		{ "path": "../../admin/src" },
 		{ "path": "../../react-utils/src" },
 		{ "path": "../../ui/src" },
 		{ "path": "../../utilities/src" },

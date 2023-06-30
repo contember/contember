@@ -1,4 +1,4 @@
-import { GQLVariable, useSingleTenantMutation } from '../../lib'
+import { useSingleTenantMutation } from '../../lib'
 
 const DisableOtpMutation = `
 disableOtp {

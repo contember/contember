@@ -45,10 +45,12 @@ export function isNonNegativeNumber(value: unknown): value is number {
 export function isNumericString(value: string): value is string {
   return isString(value) && !isNaN(parseFloat(value))
 }
-export function isOneOfFactory<U, T = any>(options: T extends Array<U> | ReadonlyArray<U> ? T : never): (value: unknown) => value is U {
-  return function isOneOfProduct(value: unknown): value is U {
-    return options.includes(value as U)
-  }
+export function isOneOfFactory<U, T = any>(
+	members: T extends Array<U> | ReadonlyArray<U> ? T : never,
+): (value: unknown) => value is U {
+	return function isOneOfFactoryProduct(value: unknown): value is U {
+		return members.includes(value as U)
+	}
 }
 export function isHTMLElement(value: unknown): value is HTMLElement {
   return value instanceof HTMLElement

@@ -5,7 +5,7 @@ import {
 	BatchUpdatesOptions,
 	BindingOperations,
 	ExtendTreeOptions,
-	PersistErrorOptions, PersistOptions,
+	PersistOptions,
 	PersistSuccessOptions,
 	TreeRootAccessor,
 } from '../accessors'

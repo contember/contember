@@ -27,8 +27,6 @@ import type {
 } from '../treeParameters'
 import { assertNever } from '../utils'
 import { QueryLanguage } from './QueryLanguage'
-import { GraphQlLiteral } from '@contember/client'
-import { BindingError } from '../BindingError'
 
 export class MarkerFactory {
 	private static createSubTreeMarker<

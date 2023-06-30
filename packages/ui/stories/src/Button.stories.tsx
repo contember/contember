@@ -3,7 +3,7 @@ import { AnchorButton, Button, ButtonDistinction, ButtonElevation, ButtonFlow, I
 import { booleanControl, enumControl } from './Helpers'
 
 const intents: Intent[] = ['default', 'primary', 'secondary', 'tertiary', 'positive', 'success', 'warn', 'danger']
-const schemes: Scheme[] = ['system', 'light', 'light-above', 'light-below', 'dark', 'dark-above', 'dark-below']
+const schemes: Scheme[] = ['system', 'light', 'dark']
 const sizes: Size[] = ['default', 'small', 'large']
 const flows: ButtonFlow[] = ['default', 'circular', 'squarish', 'generous', 'block', 'generousBlock']
 const distinctions: ButtonDistinction[] = ['default', 'primary', 'toned', 'outlined', 'seamless']

@@ -108,7 +108,7 @@ export const SectionTabs = memo(() => {
 	return entries.length > 1
 		? <div className={componentClassName()}>
 			<div className={componentClassName('content')}>
-				{entries.map(([, { id, label, isMeta = false }]) => (
+				{entries.map(([, { id, label }]) => (
 					<TabButton
 						key={id}
 						isSelected={selectedOrActiveTab === id}

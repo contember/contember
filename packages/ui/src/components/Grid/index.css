@@ -27,3 +27,7 @@
 	--grid-row-gap: calc(3 * var(--cui-padding));
 	--grid-column-gap: calc(3 * var(--cui-padding));
 }
+
+:where(.cui-grid-row-full-width) {
+	grid-column: 1 / -1;
+}

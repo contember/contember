@@ -1,4 +1,4 @@
-import React, { ReactNode } from 'react'
+import { ReactNode } from 'react'
 import { DevBar } from '@contember/ui'
 import { IdentityPanel } from './IdentityPanel'
 import { ApiPanel } from './ApiPanel'

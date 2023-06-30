@@ -1,5 +1,5 @@
 import { Component, SugaredQualifiedEntityList, useEnvironment } from '@contember/binding'
-import { ContainerSpinner } from '@contember/ui'
+import { SpinnerContainer } from '@contember/ui'
 import { ComponentType, ReactElement, ReactNode, useMemo } from 'react'
 import type { DataGridContainerProps, DataGridContainerPublicProps } from '../base'
 import { DataGridState, DataGridStateMethods } from '../base'
@@ -70,19 +70,19 @@ export const ControlledDataGrid = Component(
 		const displayedState = useDataGridDisplayedState(stateMethods, state, props.tile)
 		const environment = useEnvironment()
 
-		if (!displayedState.gridState) {
-			return <ContainerSpinner />
-		}
-
-		return renderGrid(
-			stateMethods,
-			displayedState.treeRootId,
-			displayedState.gridState,
-			state,
-			environment,
-			containerProps,
-			'component' in props ? props.component : undefined,
-			'componentProps' in props ? props.componentProps : undefined,
+		return (
+			<SpinnerContainer enabled={!displayedState.gridState}>
+				{displayedState.gridState && renderGrid(
+					stateMethods,
+					displayedState.treeRootId,
+					displayedState.gridState,
+					state,
+					environment,
+					containerProps,
+					'component' in props ? props.component : undefined,
+					'componentProps' in props ? props.componentProps : undefined,
+				)}
+			</SpinnerContainer>
 		)
 	},
 	({ state, stateMethods, ...props }, environment) => {

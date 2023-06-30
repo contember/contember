@@ -1,13 +1,3 @@
-import type {
-	HasManyRelation,
-	HasOneRelation,
-	QualifiedEntityList,
-	QualifiedSingleEntity,
-	UnconstrainedQualifiedEntityList,
-	UnconstrainedQualifiedSingleEntity,
-} from '../treeParameters'
-import { Environment } from '../dao'
-
 // TODO update hashing so that for offset, 0 == undefined
 export class Hashing {
 	public static hashAny(array: any[]): number {

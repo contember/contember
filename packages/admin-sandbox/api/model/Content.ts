@@ -1,7 +1,7 @@
 import { SchemaDefinition as d } from '@contember/schema-definition'
 import { BasicImage } from './Files'
 import { Link } from './Link'
-import { Article, ArticleTag, Tag } from './Article'
+import { Tag } from './Article'
 
 export class Content {
 	blocks = d.oneHasMany(ContentBlock, 'content').orderBy('order')

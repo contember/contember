@@ -1,4 +1,3 @@
-import { useMessageFormatter } from '@contember/admin'
 import { useUpdatedRef } from '@contember/react-utils'
 import { visuallyHiddenStyle } from '@contember/ui'
 import { Fragment, ReactNode, useCallback, useEffect, useRef } from 'react'
@@ -23,6 +22,18 @@ export const focusScopeDictionary = {
 		pressToSkipToFirstLabel: 'Skip to first focusable element',
 	},
 }
+
+// TODO: Remove when Formatter is moved out of Admin
+function TEMPORARY_fallbackFormatter(key:
+	| 'focusScope.pressToSkipToLastLabel'
+	| 'focusScope.pressToSkipToFirstLabel',
+): string {
+	return {
+		'focusScope.pressToSkipToLastLabel': focusScopeDictionary.focusScope.pressToSkipToLastLabel,
+		'focusScope.pressToSkipToFirstLabel': focusScopeDictionary.focusScope.pressToSkipToFirstLabel,
+	}[key]
+}
+
 
 const siblingMatch: Record<TabbingDirection, 'nextElementSibling' | 'previousElementSibling'> = {
 	[tabbingDirection.FORWARDS]: 'nextElementSibling',
@@ -75,7 +86,9 @@ export function FocusScope({
 	pressToSkipToLastLabel,
 	pressToSkipToFirstLabel,
 }: FocusScopeProps) {
-	const formatter = useMessageFormatter(focusScopeDictionary)
+	// TODO: Restore when Formatter is moved out of Admin and formatting works
+	// const formatter = useMessageFormatter(focusScopeDictionary)
+	const formatter = TEMPORARY_fallbackFormatter
 
 	const activeRef = useUpdatedRef(active)
 	const lastRef = useRef<HTMLButtonElement>(null)

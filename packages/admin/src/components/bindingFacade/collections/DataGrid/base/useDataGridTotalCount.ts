@@ -3,7 +3,6 @@ import { GraphQlBuilder } from '@contember/client'
 import { useContentApiRequest } from '@contember/react-client'
 import { useEffect } from 'react'
 import { useAbortController } from '@contember/react-utils'
-import { DataBindingExtendAborted } from '@contember/binding'
 
 export const useDataGridTotalCount = (entityName: EntityName, filter: Filter | undefined): number | undefined => {
 	const [queryState, sendQuery] = useContentApiRequest<{

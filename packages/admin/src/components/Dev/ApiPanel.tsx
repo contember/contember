@@ -1,4 +1,3 @@
-import React from 'react'
 import {
 	formatContentApiRelativeUrl,
 	tenantApiRelativeUrl,
@@ -7,7 +6,8 @@ import {
 	useSessionTokenWithMeta,
 	useStageSlug,
 } from '@contember/react-client'
-import { DevPanel, Icon, Table, TableCell, TableHeaderCell, TableRow } from '@contember/ui'
+import { DevPanel, Table, TableCell, TableHeaderCell, TableRow } from '@contember/ui'
+import { GlobeIcon } from 'lucide-react'
 
 export const ApiPanel = () => {
 	const apiBaseUrl = useApiBaseUrl()
@@ -18,7 +18,7 @@ export const ApiPanel = () => {
 		return null
 	}
 	return (
-		<DevPanel heading={<><Icon blueprintIcon={'globe'} /> API URLs</>}>
+		<DevPanel icon={<GlobeIcon />} heading="API URLs">
 			<Table>
 				<TableRow>
 					<TableHeaderCell>Project</TableHeaderCell>

@@ -214,7 +214,13 @@ export const DataBindingProvider: <StateProps>(props: DataBindingProviderProps<S
 export type DataBindingProviderBaseProps = AccessorTreeStateOptions;
 
 // @public (undocumented)
-export type DataBindingProviderProps<StateProps> = DataBindingProviderBaseProps & ({} | {
+export type DataBindingProviderProps<StateProps> = DataBindingProviderBaseProps & DataBindingProviderStateComponent<StateProps>;
+
+// @public (undocumented)
+export type DataBindingProviderStateComponent<StateProps> = ({
+    stateComponent?: never;
+    stateProps?: never;
+} | {
     stateComponent: ComponentType<StateProps & DataBindingStateComponentProps>;
     stateProps?: StateProps;
 });

@@ -9,7 +9,7 @@ export interface CheckboxButtonProps extends NonOptionalVisuallyDependentControl
 }
 
 /**
- * @group Forms UI
+ * @group UI
  */
 export const CheckboxButton = ({
 	id,

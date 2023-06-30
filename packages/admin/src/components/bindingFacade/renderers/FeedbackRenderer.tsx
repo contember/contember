@@ -1,5 +1,5 @@
 import type { AccessorTreeState } from '@contember/binding'
-import { ContainerSpinner, Message } from '@contember/ui'
+import { Message, SpinnerOverlay } from '@contember/ui'
 import { ReactNode, useEffect } from 'react'
 
 export interface FeedbackRendererProps {
@@ -15,7 +15,7 @@ export function FeedbackRenderer({ accessorTreeState, children }: FeedbackRender
 	}, [accessorTreeState])
 
 	if (accessorTreeState.name === 'initializing') {
-		return <ContainerSpinner />
+		return <SpinnerOverlay />
 	}
 
 	if (accessorTreeState.name === 'error') {

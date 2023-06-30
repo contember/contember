@@ -1,0 +1,36 @@
+:where(.cui-anchor) {
+	border-radius: var(--cui-control-border-radius);
+	display: inline-flex;
+	color: var(--cui-control-color);
+	cursor: pointer;
+	text-decoration: none;
+}
+
+:where(
+	.cui-anchor:active,
+	.cui-anchor[data-active],
+) {
+	color: var(--cui-filled-control-color--highlighted);
+}
+
+:where(
+	.cui-anchor:hover,
+	.cui-anchor:focus,
+):not(
+	.cui-anchor:active,
+	.cui-anchor[data-active],
+) {
+	color: var(--cui-control-color--highlighted);
+}
+
+:where(.cui-anchor[disabled]) {
+	cursor: not-allowed;
+	color: var(--cui-color--low);
+}
+
+:where(.cui-anchor) > .cui-label {
+	align-items: center;
+	color: inherit;
+	display: inline-flex;
+	margin: unset;
+}

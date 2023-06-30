@@ -39,12 +39,11 @@
 		"directory": "packages/layout"
 	},
 	"dependencies": {
-		"@contember/admin": "workspace:*",
 		"@contember/react-utils": "workspace:*",
 		"@contember/ui": "workspace:*",
 		"@contember/utilities": "workspace:*",
 		"deep-equal": "^2.2.0",
-		"lucide-react": "^0.108.0",
+		"lucide-react": "^0.256.0",
 		"wait-for-element-transition": "^3.3.1"
 	},
 	"peerDependencies": {

@@ -1,4 +1,4 @@
-import { createElement, ReactElement } from 'react'
+import { createElement } from 'react'
 import {
 	createEditor,
 	Descendant,

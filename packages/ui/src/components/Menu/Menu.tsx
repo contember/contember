@@ -28,9 +28,14 @@ function getClosestFocusable<E extends HTMLElement = HTMLElement>(parent: E, off
 	return list[currentlyFocusedIndex + offset] ?? null
 }
 
-const MenuInternal = memo((props: PropsWithChildren<MenuProps>) => {
+const MenuInternal = memo(({
+	label,
+	className: classNameProp,
+	componentClassName = 'menu',
+	...props
+}: PropsWithChildren<MenuProps>) => {
 	const menuRef = useRef<HTMLUListElement>(null)
-	const componentClassName = useClassNameFactory('menu')
+	const className = useClassNameFactory(componentClassName)
 
 	const nextFocusable = useCallback((): HTMLLIElement | null => {
 		if (!menuRef.current) {
@@ -50,26 +55,29 @@ const MenuInternal = memo((props: PropsWithChildren<MenuProps>) => {
 
 	const menuId = props.id ?? 'unknown'
 
-	return <DepthContext.Provider value={0}>
-		<MenuIdProvider menuId={menuId}>
-			<MouseMoveProvider elementRef={menuRef}>
-				<ActiveMenuItemProvider menuRef={menuRef}>
-					<section className={componentClassName(null, [
-						toViewClass('showCaret', props.showCaret ?? true),
-					])}>
-						<ul ref={menuRef} className={componentClassName('list', 'is-expanded')}>
-							<FocusableContext.Provider value={useMemo(() => ({
-								nextFocusable,
-								previousFocusable,
-							}), [nextFocusable, previousFocusable])}>
-								{props.children}
-							</FocusableContext.Provider>
-						</ul>
-					</section>
-				</ActiveMenuItemProvider>
-			</MouseMoveProvider>
-		</MenuIdProvider>
-	</DepthContext.Provider>
+	return (
+		<DepthContext.Provider value={0}>
+			<MenuIdProvider menuId={menuId}>
+				<MouseMoveProvider elementRef={menuRef}>
+					<ActiveMenuItemProvider menuRef={menuRef}>
+						<nav aria-label={label} className={className(null, [
+							toViewClass('showCaret', props.showCaret ?? true),
+							classNameProp,
+						])}>
+							<ul ref={menuRef} className={className('list', 'is-expanded')}>
+								<FocusableContext.Provider value={useMemo(() => ({
+									nextFocusable,
+									previousFocusable,
+								}), [nextFocusable, previousFocusable])}>
+									{props.children}
+								</FocusableContext.Provider>
+							</ul>
+						</nav>
+					</ActiveMenuItemProvider>
+				</MouseMoveProvider>
+			</MenuIdProvider>
+		</DepthContext.Provider>
+	)
 })
 
 /**

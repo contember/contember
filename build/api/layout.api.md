@@ -6,41 +6,53 @@
 
 /// <reference types="react" />
 
+import { ComponentClassNameProps } from '@contember/utilities';
 import { ComponentType } from 'react';
-import { Consumer } from 'react';
 import { ContainerWidthContextType } from '@contember/react-utils';
 import { Context } from 'react';
+import { ContextType } from 'react';
 import { CSSProperties } from 'react';
-import { DeepPartial } from '@contember/utilities';
 import { ElementType } from 'react';
 import { ForwardRefExoticComponent } from 'react';
-import { FunctionComponent } from 'react';
+import { FunctionComponentElement } from 'react';
+import { JSXElementConstructor } from 'react';
 import { MemoExoticComponent } from 'react';
 import { NamedExoticComponent } from 'react';
 import { NestedClassName } from '@contember/utilities';
+import { PascalCase } from '@contember/utilities';
 import { PolymorphicComponentPropsWithRef } from '@contember/utilities';
-import { PropsWithChildren } from 'react';
+import { Predicate } from '@contember/utilities';
 import { PropsWithRequiredChildren } from '@contember/react-utils';
 import { default as React_2 } from 'react';
+import { ReactElement } from 'react';
+import { ReactFragment } from 'react';
 import { ReactNode } from 'react';
-import { ReactPortal } from 'react';
 import { RefAttributes } from 'react';
 import { RefObject } from 'react';
+import { RequiredDeepPlainObject } from '@contember/utilities';
 import { StackOwnProps } from '@contember/ui';
 import { useContainerWidth } from '@contember/react-utils';
 import { useDocumentTitle as useDocumentTitle_2 } from '@contember/react-utils';
 
 // @public (undocumented)
-export interface BasicLayoutPanelProps extends OwnContainerProps {
-    // (undocumented)
-    trapFocusInModal?: boolean;
-}
+const ActiveSlotPortalsContext: Context<ActiveSlotPortalsContextType>;
+
+// @public (undocumented)
+type ActiveSlotPortalsContextType = Set<string>;
+
+// @public (undocumented)
+export type BarComponentType = (<C extends ElementType = 'div'>(props: BarProps<C>) => ReturnType<React.FC<BarProps<C>>>) & {
+    displayName?: string | undefined;
+};
+
+// @public (undocumented)
+export type BarProps<C extends ElementType> = PolymorphicComponentPropsWithRef<C, OwnBarProps>;
 
 // @public (undocumented)
 export function combineElementInsets(...insets: Array<Partial<ContainerInsets> | null | undefined>): ContainerInsets;
 
 // @public (undocumented)
-export type CommonLayoutPanelConfigProps = {
+type CommonPanelConfigProps = {
     basis: number | null | undefined;
     maxWidth?: number | null | undefined;
     minWidth?: number | null | undefined;
@@ -49,29 +61,114 @@ export type CommonLayoutPanelConfigProps = {
 };
 
 // @public (undocumented)
-export const CommonSlots: CommonSlotsType;
+export const commonSlots: readonly ("Actions" | "Back" | "Logo" | "Navigation" | "Sidebar" | "Title" | "Profile" | "Switchers")[];
 
 // @public (undocumented)
-export type CommonSlotsType = Record<keyof typeof commonSlotTargets, ReturnType<typeof createLayoutSlotComponent>>;
+export const CommonSlotSources: Readonly<Readonly<{
+    readonly Actions: {
+        ({ name, children }: Omit<SourcePortalProps, "name"> & {
+            name?: Capitalize<string> | undefined;
+        }): JSX.Element;
+        displayName: string;
+        slot: "Actions";
+    };
+    readonly Back: {
+        ({ name, children }: Omit<SourcePortalProps, "name"> & {
+            name?: Capitalize<string> | undefined;
+        }): JSX.Element;
+        displayName: string;
+        slot: "Back";
+    };
+    readonly Logo: {
+        ({ name, children }: Omit<SourcePortalProps, "name"> & {
+            name?: Capitalize<string> | undefined;
+        }): JSX.Element;
+        displayName: string;
+        slot: "Logo";
+    };
+    readonly Navigation: {
+        ({ name, children }: Omit<SourcePortalProps, "name"> & {
+            name?: Capitalize<string> | undefined;
+        }): JSX.Element;
+        displayName: string;
+        slot: "Navigation";
+    };
+    readonly Sidebar: {
+        ({ name, children }: Omit<SourcePortalProps, "name"> & {
+            name?: Capitalize<string> | undefined;
+        }): JSX.Element;
+        displayName: string;
+        slot: "Sidebar";
+    };
+    readonly Title: {
+        ({ name, children }: Omit<SourcePortalProps, "name"> & {
+            name?: Capitalize<string> | undefined;
+        }): JSX.Element;
+        displayName: string;
+        slot: "Title";
+    };
+    readonly Profile: {
+        ({ name, children }: Omit<SourcePortalProps, "name"> & {
+            name?: Capitalize<string> | undefined;
+        }): JSX.Element;
+        displayName: string;
+        slot: "Profile";
+    };
+    readonly Switchers: {
+        ({ name, children }: Omit<SourcePortalProps, "name"> & {
+            name?: Capitalize<string> | undefined;
+        }): JSX.Element;
+        displayName: string;
+        slot: "Switchers";
+    };
+}>>;
 
 // @public (undocumented)
-export const CommonSlotTargets: SlotTargetsType;
+export const CommonSlotTargets: Readonly<Readonly<{
+    readonly Actions: {
+        ({ className, ...props }: Omit<TargetProps, "name">): JSX.Element;
+        displayName: string;
+        slot: "Actions";
+    };
+    readonly Back: {
+        ({ className, ...props }: Omit<TargetProps, "name">): JSX.Element;
+        displayName: string;
+        slot: "Back";
+    };
+    readonly Logo: {
+        ({ className, ...props }: Omit<TargetProps, "name">): JSX.Element;
+        displayName: string;
+        slot: "Logo";
+    };
+    readonly Navigation: {
+        ({ className, ...props }: Omit<TargetProps, "name">): JSX.Element;
+        displayName: string;
+        slot: "Navigation";
+    };
+    readonly Sidebar: {
+        ({ className, ...props }: Omit<TargetProps, "name">): JSX.Element;
+        displayName: string;
+        slot: "Sidebar";
+    };
+    readonly Title: {
+        ({ className, ...props }: Omit<TargetProps, "name">): JSX.Element;
+        displayName: string;
+        slot: "Title";
+    };
+    readonly Profile: {
+        ({ className, ...props }: Omit<TargetProps, "name">): JSX.Element;
+        displayName: string;
+        slot: "Profile";
+    };
+    readonly Switchers: {
+        ({ className, ...props }: Omit<TargetProps, "name">): JSX.Element;
+        displayName: string;
+        slot: "Switchers";
+    };
+}>>;
 
 // @public (undocumented)
-export const commonSlotTargets: Readonly<{
-    Actions: "actions";
-    Back: "back";
-    Content: "content";
-    Logo: "logo";
-    Navigation: "navigation";
-    Sidebar: "sidebar";
-    Title: "title";
-    Profile: "profile";
-    Switchers: "switchers";
-}>;
-
-// @public (undocumented)
-export type ContainerComponentType = (<C extends ElementType = 'div'>(props: ContainerProps<C>) => React.ReactElement | null) & {
+type ContainerComponentType = (<C extends ElementType = 'div'>(props: ContainerProps<C>) => React.ReactElement | null) & {
     displayName?: string | undefined;
 };
 
@@ -95,66 +192,179 @@ export type ContainerOffsets = {
 };
 
 // @public (undocumented)
-export type ContainerProps<C extends ElementType> = PolymorphicComponentPropsWithRef<C, OwnContainerProps>;
+type ContainerProps<C extends ElementType> = PolymorphicComponentPropsWithRef<C, OwnContainerProps>;
 
 // @public (undocumented)
-export interface ControlledLayoutPanelProps {
+export type ContentPanelComponentType = (<C extends ElementType = 'section'>(props: ContentPanelProps<C>) => ReturnType<React.FC<ContentPanelProps<C>>>) & {
+    BASIS: number;
+    MAX_WIDTH: number;
+    MIN_WIDTH: number;
+    NAME: string;
+    displayName?: string | undefined;
+};
+
+// @public (undocumented)
+export type ContentPanelProps<C extends ElementType> = PolymorphicComponentPropsWithRef<C, OwnContentPanelProps>;
+
+// @public (undocumented)
+export const contentSlots: readonly ("ContentBody" | "ContentFooter" | "ContentHeader")[];
+
+// @public (undocumented)
+export const ContentSlotSources: Readonly<Readonly<{
+    readonly ContentBody: {
+        ({ name, children }: Omit<SourcePortalProps, "name"> & {
+            name?: Capitalize<string> | undefined;
+        }): JSX.Element;
+        displayName: string;
+        slot: "ContentBody";
+    };
+    readonly ContentFooter: {
+        ({ name, children }: Omit<SourcePortalProps, "name"> & {
+            name?: Capitalize<string> | undefined;
+        }): JSX.Element;
+        displayName: string;
+        slot: "ContentFooter";
+    };
+    readonly ContentHeader: {
+        ({ name, children }: Omit<SourcePortalProps, "name"> & {
+            name?: Capitalize<string> | undefined;
+        }): JSX.Element;
+        displayName: string;
+        slot: "ContentHeader";
+    };
+}>>;
+
+// @public (undocumented)
+export const ContentSlotTargets: Readonly<Readonly<{
+    readonly ContentBody: {
+        ({ className, ...props }: Omit<TargetProps, "name">): JSX.Element;
+        displayName: string;
+        slot: "ContentBody";
+    };
+    readonly ContentFooter: {
+        ({ className, ...props }: Omit<TargetProps, "name">): JSX.Element;
+        displayName: string;
+        slot: "ContentFooter";
+    };
+    readonly ContentHeader: {
+        ({ className, ...props }: Omit<TargetProps, "name">): JSX.Element;
+        displayName: string;
+        slot: "ContentHeader";
+    };
+}>>;
+
+// @public (undocumented)
+interface ControlledPanelProps {
     // (undocumented)
-    behavior: LayoutPanelBehavior | null | undefined;
+    behavior: PanelBehavior | null | undefined;
     // (undocumented)
     defaultBehavior?: never;
     // (undocumented)
     defaultVisibility?: never;
     // (undocumented)
-    onBehaviorChange: (state: LayoutPanelState) => void;
+    onBehaviorChange: (state: PanelState) => void;
     // (undocumented)
-    onKeyPress?: (event: KeyboardEvent, state: LayoutPanelState) => void;
+    onKeyPress?: (event: KeyboardEvent, state: PanelState) => void;
     // (undocumented)
-    onVisibilityChange: (state: LayoutPanelState) => void;
+    onVisibilityChange: (state: PanelState) => void;
     // (undocumented)
-    visibility: LayoutPanelVisibility | null | undefined;
+    visibility: PanelVisibility | null | undefined;
 }
 
 // @public (undocumented)
-export function createDirectiveContext<T extends RequiredDeepPlainObject<T>, K extends keyof T & string = keyof T & string>(displayName: string, initialValue: T): readonly [{
-    ({ value, children }: {
-        value?: Partial<T> | undefined;
-        children: ReactNode;
+export function createLayoutBarComponent({ name, defaultAs, defaultComponentClassName, displayName, }: {
+    name: string;
+    defaultAs: ElementType;
+    defaultComponentClassName?: string | string[];
+    displayName: string;
+}): BarComponentType;
+
+// @public (undocumented)
+export function createLayoutContentPanelComponent({ defaultAs, defaultComponentClassName, displayName, name, }: {
+    defaultAs?: ElementType;
+    defaultComponentClassName: string | string[];
+    displayName: string;
+    name: string;
+}): ContentPanelComponentType;
+
+// @public (undocumented)
+export function createLayoutSidebarComponent({ defaultAs, defaultBehavior, defaultComponentClassName, defaultVisibility, displayName, name, }: {
+    defaultAs: ElementType;
+    defaultBehavior?: PanelBehavior;
+    defaultComponentClassName?: string | string[];
+    defaultVisibility?: PanelVisibility;
+    displayName: string;
+    name: string;
+}): SidebarComponentType;
+
+// @public (undocumented)
+function createSlotComponents<K extends PascalCase<string>>(slots: ReadonlyArray<PascalCase<K>>): readonly [readonly PascalCase<K>[], Readonly<Readonly<{ readonly [P in PascalCase<K>]: {
+        ({ name, children }: Omit<SourcePortalProps, "name"> & {
+            name?: Capitalize<string> | undefined;
+        }): JSX.Element;
+        displayName: string;
+        slot: P;
+    }; }>>, Readonly<Readonly<{ readonly [P_1 in PascalCase<K>]: {
+        ({ className, ...props }: Omit<TargetProps, "name">): JSX.Element;
+        displayName: string;
+        slot: P_1;
+    }; }>>];
+
+// @public (undocumented)
+function createSlotSourceComponent<T extends string>(slot: T, displayName?: string, defaultContent?: React.ReactNode): {
+    ({ name, children }: Omit<SourcePortalProps, "name"> & {
+        name?: Capitalize<string> | undefined;
     }): JSX.Element;
     displayName: string;
-}, NamedExoticComponent<DirectiveProps<T, K>>, Consumer<T>, () => T];
-
-// @public (undocumented)
-export function createLayoutSlotComponent(target: string | string[], displayName?: string, defaultContent?: React.ReactNode): {
-    ({ children }: Omit<LayoutSlotProps, 'target'>): JSX.Element;
-    displayName: string;
+    slot: T;
 };
 
 // @public (undocumented)
-export type CreateLayoutSlotPortal = (target: string, children: ReactNode) => ReactPortal | null;
+function createSlotTargetComponent<T extends string>(name: T, displayName?: string): {
+    ({ className, ...props }: Omit<TargetProps, 'name'>): JSX.Element;
+    displayName: string;
+    slot: T;
+};
 
 // @public (undocumented)
-export function createLayoutSlotTargetComponent(name: string, displayName?: string): {
-    ({ className, ...props }: Omit<LayoutSlotTargetProps, 'name'>): JSX.Element;
-    displayName: string;
-};
+function createTargetsIfActiveComponent<K extends PascalCase<string>>(slotsMap: Record<K, ReturnType<typeof createSlotTargetComponent>>): NamedExoticComponent<IfActiveProps<K>>;
 
 // @public (undocumented)
 export function diffContainerInsetsFromElementRects(outerRect: ElementRect, innerRect: ElementRect): ContainerInsets;
 
 // @public (undocumented)
-export type DirectiveComponentType<V> = FunctionComponent<DirectiveComponentTypeProps<V>>;
+const Directive: DirectiveComponentType<RequiredDeepPlainObject>;
 
 // @public (undocumented)
-export type DirectiveComponentTypeProps<V> = V extends Literal ? {
-    children: V;
-} : PropsWithChildren<DeepPartial<V>>;
+interface DirectiveComponentType<T extends Record<string, unknown> = Record<string, unknown>> extends React.ExoticComponent<DirectiveProps<RequiredDeepPlainObject<T>>> {
+    // (undocumented)
+    displayName?: string | undefined;
+}
 
 // @public (undocumented)
-export type DirectiveProps<T extends Record<string, unknown>, K extends keyof T & string = keyof T & string> = {
-    name: K;
-    content: T[K];
-};
+type DirectiveProps<T> = {
+    [K in keyof T]: {
+        name: K;
+        content: T[K];
+    };
+}[keyof T];
+
+declare namespace Directives {
+    export {
+        useDirectiveLifecycle,
+        DirectiveProps,
+        DirectiveComponentType,
+        Directive,
+        ProviderProps,
+        Provider,
+        useDirectives,
+        StateContext,
+        RegistryContext,
+        useRegistryContext,
+        RegistryContextType
+    }
+}
+export { Directives }
 
 // @public (undocumented)
 export type ElementRect = {
@@ -188,15 +398,70 @@ export type FocusScopeProps = {
 };
 
 // @public (undocumented)
+export const footerSlots: readonly ("FooterCenter" | "FooterEnd" | "FooterStart")[];
+
+// @public (undocumented)
+export const FooterSlotSources: Readonly<Readonly<{
+    readonly FooterCenter: {
+        ({ name, children }: Omit<SourcePortalProps, "name"> & {
+            name?: Capitalize<string> | undefined;
+        }): JSX.Element;
+        displayName: string;
+        slot: "FooterCenter";
+    };
+    readonly FooterEnd: {
+        ({ name, children }: Omit<SourcePortalProps, "name"> & {
+            name?: Capitalize<string> | undefined;
+        }): JSX.Element;
+        displayName: string;
+        slot: "FooterEnd";
+    };
+    readonly FooterStart: {
+        ({ name, children }: Omit<SourcePortalProps, "name"> & {
+            name?: Capitalize<string> | undefined;
+        }): JSX.Element;
+        displayName: string;
+        slot: "FooterStart";
+    };
+}>>;
+
+// @public (undocumented)
+export const FooterSlotTargets: Readonly<Readonly<{
+    readonly FooterCenter: {
+        ({ className, ...props }: Omit<TargetProps, "name">): JSX.Element;
+        displayName: string;
+        slot: "FooterCenter";
+    };
+    readonly FooterEnd: {
+        ({ className, ...props }: Omit<TargetProps, "name">): JSX.Element;
+        displayName: string;
+        slot: "FooterEnd";
+    };
+    readonly FooterStart: {
+        ({ className, ...props }: Omit<TargetProps, "name">): JSX.Element;
+        displayName: string;
+        slot: "FooterStart";
+    };
+}>>;
+
+// @public (undocumented)
+export type FrameComponentType = (<C extends ElementType = 'div'>(props: FrameProps<C>) => React.ReactElement | null) & {
+    displayName?: string | undefined;
+};
+
+// @public (undocumented)
+export type FrameProps<C extends ElementType> = PolymorphicComponentPropsWithRef<C, OwnFrameProps>;
+
+// @public (undocumented)
 export function getElementInsets(containerInsets: ContainerInsets | null | undefined, elementOffsets: ContainerOffsets | null | undefined): ContainerInsets;
 
 // @public (undocumented)
-export const GetLayoutPanelsStateContext: Context<GetLayoutPanelsStateContextType>;
+const GetLayoutPanelsStateContext: Context<GetLayoutPanelsStateContextType>;
 
 // @public (undocumented)
-export type GetLayoutPanelsStateContextType = {
+type GetLayoutPanelsStateContextType = {
     allPanelsCanBeVisible?: boolean;
-    panels: Map<string, LayoutPanelConfig>;
+    panels: Map<string, PanelConfig>;
     currentlyActivePanel: string | undefined;
 };
 
@@ -204,10 +469,69 @@ export type GetLayoutPanelsStateContextType = {
 export function getScreenInnerBoundingRect(): ElementRect;
 
 // @public (undocumented)
+export const headerSlots: readonly ("HeaderCenter" | "HeaderEnd" | "HeaderStart")[];
+
+// @public (undocumented)
+export const HeaderSlotSources: Readonly<Readonly<{
+    readonly HeaderCenter: {
+        ({ name, children }: Omit<SourcePortalProps, "name"> & {
+            name?: Capitalize<string> | undefined;
+        }): JSX.Element;
+        displayName: string;
+        slot: "HeaderCenter";
+    };
+    readonly HeaderEnd: {
+        ({ name, children }: Omit<SourcePortalProps, "name"> & {
+            name?: Capitalize<string> | undefined;
+        }): JSX.Element;
+        displayName: string;
+        slot: "HeaderEnd";
+    };
+    readonly HeaderStart: {
+        ({ name, children }: Omit<SourcePortalProps, "name"> & {
+            name?: Capitalize<string> | undefined;
+        }): JSX.Element;
+        displayName: string;
+        slot: "HeaderStart";
+    };
+}>>;
+
+// @public (undocumented)
+export const HeaderSlotTargets: Readonly<Readonly<{
+    readonly HeaderCenter: {
+        ({ className, ...props }: Omit<TargetProps, "name">): JSX.Element;
+        displayName: string;
+        slot: "HeaderCenter";
+    };
+    readonly HeaderEnd: {
+        ({ className, ...props }: Omit<TargetProps, "name">): JSX.Element;
+        displayName: string;
+        slot: "HeaderEnd";
+    };
+    readonly HeaderStart: {
+        ({ className, ...props }: Omit<TargetProps, "name">): JSX.Element;
+        displayName: string;
+        slot: "HeaderStart";
+    };
+}>>;
+
+// @public (undocumented)
+const IfActive: NamedExoticComponent<IfActiveProps<string>>;
+
+// @public (undocumented)
+type IfActiveProps<K extends string = string> = {
+    children: ReactNode;
+    slots: K[];
+} | {
+    children?: never;
+    slots: K[];
+};
+
+// @public (undocumented)
 export const InsetsConsumer: InsetsConsumerComponentType;
 
 // @public (undocumented)
-export type InsetsConsumerComponentType = (<C extends ElementType = 'div'>(props: InsetsConsumerProps<C>) => React_2.ReactElement | null) & {
+export type InsetsConsumerComponentType = (<C extends ElementType = 'div'>(props: InsetsConsumerProps<C>) => React.ReactElement | null) & {
     displayName?: string | undefined;
 };
 
@@ -226,174 +550,109 @@ export type InsetsProviderComponentType = (<C extends ElementType = 'div'>(props
 export type InsetsProviderProps<C extends ElementType> = PolymorphicComponentPropsWithRef<C, OwnInsetsProviderProps>;
 
 // @public (undocumented)
-export const isOneOfLayoutPanelBehaviors: (value: unknown) => value is "static" | "overlay" | "collapsible" | "modal";
+const isComponentClassName: Predicate<unknown, string | string[]>;
 
 // @public (undocumented)
-export const isOneOfLayoutPanelVisibilities: (value: unknown) => value is "hidden" | "visible";
+const isOneOfPanelBehaviors: (value: unknown) => value is "static" | "collapsible" | "overlay" | "modal";
 
 // @public (undocumented)
-export type KeyValuePair<T, K extends keyof T = keyof T> = {
-    key: K;
-    value: T[K];
-};
-
-// @public (undocumented)
-export const Layout: {
-    Root: ContainerComponentType;
-    ResponsiveContainer: ContainerComponentType;
-    Panel: LayoutPanelComponentType & {
-        displayName?: string | undefined;
-    };
-    PanelBody: LayoutPanelBodyComponentType;
-    PanelHeader: LayoutPanelHeaderComponentType;
-    PanelFooter: LayoutPanelFooterComponentType;
-    PanelsStateProvider: NamedExoticComponent<    {
-    children: ReactNode;
-    }>;
-};
+const isOneOfPanelVisibilities: (value: unknown) => value is "visible" | "hidden";
 
 // @public @deprecated (undocumented)
-export const LayoutContainerWidthContext: Context<number | null>;
+const LayoutContainerWidthContext: Context<number | null>;
 
 // @public @deprecated (undocumented)
-export type LayoutContainerWidthContextType = ContainerWidthContextType;
+type LayoutContainerWidthContextType = ContainerWidthContextType;
 
 // @public (undocumented)
-export type LayoutPanelBehavior = typeof layoutPanelBehaviorsList[number];
-
-// @public (undocumented)
-export const layoutPanelBehaviorsList: readonly ["static", "collapsible", "overlay", "modal"];
-
-// @public (undocumented)
-export const LayoutPanelBody: LayoutPanelBodyComponentType;
-
-// @public (undocumented)
-export type LayoutPanelBodyComponentType = (<C extends ElementType = 'div'>(props: LayoutPanelBodyProps<C>) => React_2.ReactElement | null) & {
-    displayName?: string | undefined;
+export const LayoutKit: {
+    ContentPanelMain: ContentPanelComponentType;
+    Footer: BarComponentType;
+    Frame: FrameComponentType;
+    Header: BarComponentType;
+    SidebarLeft: SidebarComponentType;
+    SidebarRight: SidebarComponentType;
+    SidebarResponsive: SidebarComponentType;
+    ToggleMenuButton: NamedExoticComponent<ToggleMenuButtonProps>;
+    ToggleSidebarButton: NamedExoticComponent<ToggleSidebarButtonProps>;
 };
 
 // @public (undocumented)
-export type LayoutPanelBodyProps<C extends ElementType> = PolymorphicComponentPropsWithRef<C, OwnLayoutPanelBodyProps>;
+type LayoutPanelCallback = (name: string) => void;
 
 // @public (undocumented)
-export type LayoutPanelCallback = (name: string) => void;
+const LayoutPanelContext: Context<PanelState>;
+
+declare namespace LayoutPrimitives {
+    export {
+        LayoutContainerWidthContextType,
+        LayoutContainerWidthContext,
+        useLayoutContainerWidth,
+        useDocumentTitle,
+        PanelWidthContextType,
+        PanelWidthContext,
+        usePanelWidthContext,
+        LayoutPanelCallback,
+        SetLayoutPanelVisibility,
+        RegisterLayoutPanel,
+        UnregisterLayoutPanel,
+        UpdateLayoutPanel,
+        SetLayoutPanelsStateContextType,
+        SetLayoutPanelsStateContext,
+        useSetLayoutPanelsStateContext,
+        GetLayoutPanelsStateContextType,
+        GetLayoutPanelsStateContext,
+        useGetLayoutPanelsStateContext,
+        LayoutPanelContext,
+        useLayoutPanelContext,
+        Panel,
+        PanelBody,
+        PanelFooter,
+        PanelHeader,
+        PanelsStateProvider,
+        ResponsiveContainer,
+        Root,
+        panelBehaviorsList,
+        PanelBehavior,
+        isOneOfPanelBehaviors,
+        MaybePanelBehavior,
+        panelVisibilityList,
+        PanelVisibility,
+        isOneOfPanelVisibilities,
+        MaybePanelVisibility,
+        isComponentClassName,
+        OwnContainerProps,
+        ContainerProps,
+        ContainerComponentType,
+        PanelState,
+        PanelBasicProps,
+        CommonPanelConfigProps,
+        ControlledPanelProps,
+        UncontrolledPanelProps,
+        PanelConfigProps,
+        OwnPanelProps,
+        PanelProps,
+        PanelConfig,
+        PanelComponentType,
+        OwnPanelBodyProps,
+        PanelBodyProps,
+        PanelBodyComponentType,
+        OwnPanelFooterProps,
+        PanelFooterProps,
+        PanelFooterComponentType,
+        OwnPanelHeaderProps,
+        PanelHeaderProps,
+        PanelHeaderComponentType,
+        useClosePanelOnEscape
+    }
+}
+export { LayoutPrimitives }
 
 // @public (undocumented)
-export type LayoutPanelComponentType = <C extends ElementType = 'section'>(props: LayoutPanelProps<C>) => React.ReactElement | null;
+type MaybePanelBehavior = PanelBehavior | null;
 
 // @public (undocumented)
-export type LayoutPanelConfig = {
-    [P in keyof Omit<LayoutPanelConfigProps, `on${string}`>]-?: P extends 'basis' | 'minWidth' ? Exclude<OwnLayoutPanelProps[P], null | undefined> : Exclude<OwnLayoutPanelProps[P], undefined>;
-} & {
-    ref: RefObject<HTMLElement>;
-};
-
-// @public (undocumented)
-export type LayoutPanelConfigProps = CommonLayoutPanelConfigProps & (ControlledLayoutPanelProps | UncontrolledLayoutPanelProps);
-
-// @public (undocumented)
-export const LayoutPanelContext: Context<LayoutPanelState>;
-
-// @public (undocumented)
-export const LayoutPanelFooter: LayoutPanelFooterComponentType;
-
-// @public (undocumented)
-export type LayoutPanelFooterComponentType = (<C extends ElementType = 'footer'>(props: LayoutPanelFooterProps<C>) => React_2.ReactElement | null) & {
-    displayName?: string | undefined;
-};
-
-// @public (undocumented)
-export type LayoutPanelFooterProps<C extends ElementType> = PolymorphicComponentPropsWithRef<C, OwnLayoutPanelFooterProps>;
-
-// @public (undocumented)
-export const LayoutPanelHeader: LayoutPanelHeaderComponentType;
-
-// @public (undocumented)
-export type LayoutPanelHeaderComponentType = (<C extends ElementType = 'header'>(props: LayoutPanelHeaderProps<C>) => React_2.ReactElement | null) & {
-    displayName?: string | undefined;
-};
-
-// @public (undocumented)
-export type LayoutPanelHeaderProps<C extends ElementType> = PolymorphicComponentPropsWithRef<C, OwnLayoutPanelHeaderProps>;
-
-// @public (undocumented)
-export type LayoutPanelOptionalComponentType = <C extends ElementType = 'section'>(props: Partial<LayoutPanelProps<C>>) => React.ReactElement | null;
-
-// @public (undocumented)
-export type LayoutPanelPart = typeof layoutPanelPartsList[number];
-
-// @public (undocumented)
-export const layoutPanelPartsList: readonly ["header", "body", "footer"];
-
-// @public (undocumented)
-export type LayoutPanelProps<C extends ElementType> = PolymorphicComponentPropsWithRef<C, OwnLayoutPanelProps>;
-
-// @public (undocumented)
-export type LayoutPanelState = {
-    behavior: LayoutPanelBehavior;
-    panel: string;
-    visibility: LayoutPanelVisibility;
-};
-
-// @public (undocumented)
-export type LayoutPanelVisibility = typeof layoutPanelVisibilityList[number];
-
-// @public (undocumented)
-export const layoutPanelVisibilityList: readonly ["visible", "hidden"];
-
-// @public (undocumented)
-export type LayoutPart = typeof layoutParts[number];
-
-// @public (undocumented)
-export const layoutParts: readonly ["header", "panel", "footer"];
-
-// @public (undocumented)
-export const LayoutSlot: {
-    Portal: NamedExoticComponent<LayoutSlotProps>;
-    Target: NamedExoticComponent<LayoutSlotTargetProps>;
-};
-
-// @public (undocumented)
-export type LayoutSlotProps = {
-    children: ReactNode;
-    target: string;
-};
-
-// @public (undocumented)
-export const LayoutSlotRegistryContext: Context<LayoutSlotRegistryContextType>;
-
-// @public (undocumented)
-export type LayoutSlotRegistryContextType = {
-    activeSlots: Set<string>;
-    registerLayoutSlot: RegisterLayoutSlot;
-    unregisterLayoutSlot: UnregisterLayoutSlot;
-};
-
-// @public (undocumented)
-export const LayoutSlotsProvider: NamedExoticComponent<    {
-children: ReactNode;
-}>;
-
-// @public (undocumented)
-export type LayoutSlotsRegistry = Map<string, RefObject<HTMLElement>>;
-
-// @public (undocumented)
-export type LayoutSlotTargetProps = {
-    as?: ElementType;
-    children?: never;
-    className?: NestedClassName;
-    componentClassName?: string;
-    name: string;
-};
-
-// @public (undocumented)
-export type Literal = string | number | boolean | null | undefined;
-
-// @public (undocumented)
-export type MaybeLayoutPanelBehavior = LayoutPanelBehavior | null;
-
-// @public (undocumented)
-export type MaybeLayoutPanelVisibility = LayoutPanelVisibility | null;
+type MaybePanelVisibility = PanelVisibility | null;
 
 // @public (undocumented)
 export function MenuAutoCloseProvider({ children, onAutoClose }: MenuAutoCloseProviderProps): JSX.Element;
@@ -405,10 +664,70 @@ export type MenuAutoCloseProviderProps = {
 };
 
 // @public (undocumented)
-export type OwnContainerProps = PropsWithChildren<{
-    className?: NestedClassName;
-    componentClassName?: string;
-}>;
+export type OwnBarCenterProps = {
+    center: ReactNode | ((state: GetLayoutPanelsStateContextType) => ReactNode);
+    centerAfter?: ReactNode | ((state: GetLayoutPanelsStateContextType) => ReactNode);
+    centerBefore?: ReactNode | ((state: GetLayoutPanelsStateContextType) => ReactNode);
+} | {
+    center?: never;
+    centerAfter?: never;
+    centerBefore?: never;
+};
+
+// @public (undocumented)
+export type OwnBarEndProps = {
+    end: ReactNode | ((state: GetLayoutPanelsStateContextType) => ReactNode);
+    endAfter?: ReactNode | ((state: GetLayoutPanelsStateContextType) => ReactNode);
+    endBefore?: ReactNode | ((state: GetLayoutPanelsStateContextType) => ReactNode);
+} | {
+    end?: never;
+    endAfter?: never;
+    endBefore?: never;
+};
+
+// @public (undocumented)
+export type OwnBarProps = Omit<ComponentClassNameProps, 'children'> & {
+    children?: never;
+} & OwnBarStartProps & OwnBarCenterProps & OwnBarEndProps;
+
+// @public (undocumented)
+export type OwnBarStartProps = {
+    start: ReactNode | ((state: GetLayoutPanelsStateContextType) => ReactNode);
+    startAfter?: ReactNode | ((state: GetLayoutPanelsStateContextType) => ReactNode);
+    startBefore?: ReactNode | ((state: GetLayoutPanelsStateContextType) => ReactNode);
+} | {
+    start?: never;
+    startAfter?: never;
+    startBefore?: never;
+};
+
+// @public (undocumented)
+type OwnContainerProps = ComponentClassNameProps & {
+    showDataState?: boolean;
+};
+
+// @public (undocumented)
+export type OwnContentPanelProps = Omit<ComponentClassNameProps, 'children'> & {
+    basis?: number;
+    body?: ReactNode | ((state: PanelState) => ReactNode);
+    children?: never;
+    footer?: ReactNode | ((state: PanelState) => ReactNode);
+    header?: ReactNode | ((state: PanelState) => ReactNode);
+    maxWidth?: number | false | null | undefined;
+    minWidth?: number | null | undefined;
+};
+
+// @public (undocumented)
+export type OwnFrameProps = ComponentClassNameProps & {
+    footer?: ReactNode;
+    footerIsFixed?: boolean;
+    footerClassName?: NestedClassName;
+    header?: ReactNode;
+    headerIsFixed?: boolean;
+    headerClassName?: NestedClassName;
+    minimumFooterHeight?: number;
+    minimumHeaderHeight?: number;
+};
 
 // @public (undocumented)
 export type OwnInsetsConsumerProps = {
@@ -429,91 +748,191 @@ export type OwnInsetsProviderProps = {
 };
 
 // @public (undocumented)
-export type OwnLayoutPanelBodyProps = {
+type OwnPanelBodyProps = {
     children?: ReactNode;
     className?: NestedClassName;
     componentClassName?: string;
 };
 
 // @public (undocumented)
-export type OwnLayoutPanelFooterProps = {
+type OwnPanelFooterProps = {
     children?: ReactNode;
     className?: NestedClassName;
     componentClassName?: string;
 };
 
 // @public (undocumented)
-export type OwnLayoutPanelHeaderProps = {
+type OwnPanelHeaderProps = {
     children?: ReactNode;
     className?: NestedClassName;
     componentClassName?: string;
 };
 
 // @public (undocumented)
-export type OwnLayoutPanelProps = BasicLayoutPanelProps & LayoutPanelConfigProps;
-
-// @public (undocumented)
-export interface OwnResponsiveAppLayoutProps extends OwnContainerProps {
-    // (undocumented)
-    footer?: ReactNode;
-    // (undocumented)
-    footerClassName?: NestedClassName;
-    // (undocumented)
-    header?: ReactNode;
-    // (undocumented)
-    headerClassName?: NestedClassName;
-    // (undocumented)
-    minimumFooterHeight?: number;
-    // (undocumented)
-    minimumHeaderHeight?: number;
-}
+type OwnPanelProps = PanelBasicProps & PanelConfigProps;
 
 // @public (undocumented)
 export type OwnResponsiveStackProps = ResponsiveProps<StackOwnProps>;
 
 // @public (undocumented)
-export const PanelWidthContext: Context<PanelWidthContextType>;
+export type OwnSidebarProps = Omit<ComponentClassNameProps, 'children'> & {
+    basis?: number;
+    body?: ReactNode | ((state: PanelState) => ReactNode);
+    children?: never;
+    footer?: ReactNode | ((state: PanelState) => ReactNode);
+    header?: ReactNode | ((state: PanelState) => ReactNode);
+    keepVisible?: boolean | null | undefined;
+    maxWidth?: number | false | null | undefined;
+    minWidth?: number | null | undefined;
+    priority?: number | null | undefined;
+    trapFocusInModal?: boolean | null | undefined;
+};
 
 // @public (undocumented)
-export type PanelWidthContextType = {
+type OwnTargetContainerProps = {
+    'data-has-own-children': boolean;
+    'data-name': string;
+    className: string;
+};
+
+// @public (undocumented)
+const Panel: PanelComponentType;
+
+// @public (undocumented)
+interface PanelBasicProps extends ComponentClassNameProps {
+    // (undocumented)
+    tabIndex?: never;
+    // (undocumented)
+    trapFocusInModal?: boolean;
+}
+
+// @public (undocumented)
+type PanelBehavior = typeof panelBehaviorsList[number];
+
+// @public (undocumented)
+const panelBehaviorsList: readonly ["static", "collapsible", "overlay", "modal"];
+
+// @public (undocumented)
+const PanelBody: PanelBodyComponentType;
+
+// @public (undocumented)
+type PanelBodyComponentType = (<C extends ElementType = 'div'>(props: PanelBodyProps<C>) => React.ReactElement | null) & {
+    displayName?: string | undefined;
+};
+
+// @public (undocumented)
+type PanelBodyProps<C extends ElementType> = PolymorphicComponentPropsWithRef<C, OwnPanelBodyProps>;
+
+// @public (undocumented)
+type PanelComponentType = (<C extends ElementType = 'section'>(props: PanelProps<C>) => ReactElement | null) & {
+    displayName?: string | undefined;
+};
+
+// @public (undocumented)
+type PanelConfig = {
+    [P in keyof Omit<PanelConfigProps, `on${string}`>]-?: P extends 'basis' | 'minWidth' ? Exclude<OwnPanelProps[P], null | undefined> : Exclude<OwnPanelProps[P], undefined>;
+} & {
+    ref: RefObject<HTMLElement>;
+};
+
+// @public (undocumented)
+type PanelConfigProps = CommonPanelConfigProps & (ControlledPanelProps | UncontrolledPanelProps);
+
+// @public (undocumented)
+const PanelFooter: PanelFooterComponentType;
+
+// @public (undocumented)
+type PanelFooterComponentType = (<C extends ElementType = 'footer'>(props: PanelFooterProps<C>) => React.ReactElement | null) & {
+    displayName?: string | undefined;
+};
+
+// @public (undocumented)
+type PanelFooterProps<C extends ElementType> = PolymorphicComponentPropsWithRef<C, OwnPanelFooterProps>;
+
+// @public (undocumented)
+const PanelHeader: PanelHeaderComponentType;
+
+// @public (undocumented)
+type PanelHeaderComponentType = (<C extends ElementType = 'header'>(props: PanelHeaderProps<C>) => React.ReactElement | null) & {
+    displayName?: string | undefined;
+};
+
+// @public (undocumented)
+type PanelHeaderProps<C extends ElementType> = PolymorphicComponentPropsWithRef<C, OwnPanelHeaderProps>;
+
+// @public (undocumented)
+type PanelProps<C extends ElementType> = PolymorphicComponentPropsWithRef<C, OwnPanelProps>;
+
+// @public (undocumented)
+const PanelsStateProvider: NamedExoticComponent<    {
+children: ReactNode;
+}>;
+
+// @public (undocumented)
+type PanelState = {
+    behavior: PanelBehavior;
+    panel: string;
+    visibility: PanelVisibility;
+};
+
+// @public (undocumented)
+type PanelVisibility = typeof panelVisibilityList[number];
+
+// @public (undocumented)
+const panelVisibilityList: readonly ["visible", "hidden"];
+
+// @public (undocumented)
+const PanelWidthContext: Context<PanelWidthContextType>;
+
+// @public (undocumented)
+type PanelWidthContextType = {
     height: number;
     width: number;
 };
 
 // @public (undocumented)
-export type RegisterLayoutPanel = (name: string, config: LayoutPanelConfig) => void;
+const PortalsRegistryContext: Context<RenderToSlotPortalContextType>;
 
 // @public (undocumented)
-export type RegisterLayoutSlot = (name: string, ref: RefObject<HTMLElement>) => void;
+const Provider: NamedExoticComponent<ProviderProps>;
 
 // @public (undocumented)
-export type RegisterLayoutSlotPortal = (id: string, target: string) => void;
+const Provider_2: NamedExoticComponent<    {
+children: ReactNode;
+}>;
 
 // @public (undocumented)
-export const RenderToSlotPortalContext: Context<RenderToSlotPortalContextType>;
-
-// @public (undocumented)
-export type RenderToSlotPortalContextType = {
-    createLayoutSlotPortal: CreateLayoutSlotPortal;
-    registerLayoutSlotPortal: RegisterLayoutSlotPortal;
-    unregisterLayoutSlotPortal: UnregisterLayoutSlotPortal;
+type ProviderProps = {
+    value?: Record<string, unknown>;
+    children: ReactNode | ((directives: ContextType<typeof StateContext>) => ReactNode);
 };
 
 // @public (undocumented)
-export type RequiredDeepPlainObject<T extends Record<string, unknown>, K extends keyof T & string = keyof T & string> = {
-    [P in K]-?: T[P] extends Record<string, unknown> ? RequiredDeepPlainObject<T[P]> : T[P];
+type RegisterLayoutPanel = (name: string, config: PanelConfig) => void;
+
+// @public (undocumented)
+type RegisterSlot = (name: string, ref: RefObject<HTMLElement>) => void;
+
+// @public (undocumented)
+const RegistryContext: Context<RegistryContextType<Record<string, unknown>>>;
+
+// @public (undocumented)
+type RegistryContextType<T extends Record<string, unknown>> = {
+    register: (<K extends keyof T>(key: K, componentId: string, value: T[K]) => void) | undefined;
+    update: (<K extends keyof T>(key: K, componentId: string, value: T[K]) => void) | undefined;
+    unregister: (<K extends keyof T>(key: K, componentId: string) => void) | undefined;
 };
 
 // @public (undocumented)
-export const ResponsiveAppLayout: ResponsiveAppLayoutComponentType;
-
-// @public (undocumented)
-export type ResponsiveAppLayoutComponentType = (<C extends ElementType = 'div'>(props: ResponsiveAppLayoutProps<C>) => React.ReactElement | null) & {
-    displayName?: string | undefined;
+type RenderToSlotPortalContextType = {
+    getTarget: undefined | ((slot: string) => HTMLElement | null | undefined);
+    createSlotPortal?: never;
+    registerSlotSource: undefined | ((id: string, slot: string) => void);
+    unregisterSlotSource: undefined | ((id: string, slot: string) => void);
 };
 
 // @public (undocumented)
-export type ResponsiveAppLayoutProps<C extends ElementType> = PolymorphicComponentPropsWithRef<C, OwnResponsiveAppLayoutProps>;
+const ResponsiveContainer: ContainerComponentType;
 
 // @public (undocumented)
 export type ResponsiveProps<P> = {
@@ -528,6 +947,9 @@ export interface ResponsiveStackProps extends OwnResponsiveStackProps, Omit<JSX.
 }
 
 // @public (undocumented)
+const Root: ContainerComponentType;
+
+// @public (undocumented)
 export const SafeAreaInsetsContext: Context<ContainerInsets>;
 
 // @public (undocumented)
@@ -540,22 +962,20 @@ export type SafeAreaInsetsProviderProps = {
 };
 
 // @public (undocumented)
-export function screenInsetsToCSSCustomProperties<P extends string, T extends Readonly<Record<string, number | null>>>(value: T, prefix: P): {
-    [K in keyof T as `${P}${string & K}`]: `${T[K]}px`;
+export type ScreenInsetsToCSSCustomProperties<P extends string, T extends Readonly<Record<string, number | null>>> = {
+    [K in keyof T as `${P}-${string & K}`]: `${T[K]}px`;
+} & {
+    [K in keyof T as `${P}-on-${string & K}`]: '0' | '1';
 };
 
 // @public (undocumented)
-export type SetDirectiveContextType<T extends Record<string, unknown>> = {
-    registerDirective: <K extends keyof T>(componentId: string, key: K, value: T[K]) => void;
-    updateDirective: <K extends keyof T>(componentId: string, key: K, value: T[K]) => void;
-    unregisterDirective: (componentId: string) => void;
-};
+export function screenInsetsToCSSCustomProperties<P extends string, T extends Readonly<Record<string, number | null>>>(value: T, prefix: P): ScreenInsetsToCSSCustomProperties<P, T>;
 
 // @public (undocumented)
-export const SetLayoutPanelsStateContext: Context<SetLayoutPanelsStateContextType>;
+const SetLayoutPanelsStateContext: Context<SetLayoutPanelsStateContextType>;
 
 // @public (undocumented)
-export type SetLayoutPanelsStateContextType = {
+type SetLayoutPanelsStateContextType = {
     registerLayoutPanel: RegisterLayoutPanel;
     unregisterLayoutPanel: UnregisterLayoutPanel;
     show: SetLayoutPanelVisibility;
@@ -567,74 +987,253 @@ export type SetLayoutPanelsStateContextType = {
 };
 
 // @public (undocumented)
-export type SetLayoutPanelVisibility = LayoutPanelCallback;
+type SetLayoutPanelVisibility = LayoutPanelCallback;
 
 // @public (undocumented)
-export type SetLayoutSlotChildrenCount = (name: string, count: number) => void;
+export type SidebarComponentType = (<C extends ElementType = 'aside'>(props: SidebarProps<C>) => ReactElement | null) & {
+    BASIS: number;
+    MAX_WIDTH: number;
+    MIN_WIDTH: number;
+    NAME: string;
+    displayName?: string | undefined;
+};
 
 // @public (undocumented)
-export type SlotTargetsType = Record<keyof typeof commonSlotTargets, ReturnType<typeof createLayoutSlotTargetComponent>>;
+export const sidebarLeftSlots: readonly ("SidebarLeftBody" | "SidebarLeftFooter" | "SidebarLeftHeader")[];
 
 // @public (undocumented)
-export const ToggleMenuButton: NamedExoticComponent<ToggleMenuButtonProps>;
+export const SidebarLeftSlotSources: Readonly<Readonly<{
+    readonly SidebarLeftBody: {
+        ({ name, children }: Omit<SourcePortalProps, "name"> & {
+            name?: Capitalize<string> | undefined;
+        }): JSX.Element;
+        displayName: string;
+        slot: "SidebarLeftBody";
+    };
+    readonly SidebarLeftFooter: {
+        ({ name, children }: Omit<SourcePortalProps, "name"> & {
+            name?: Capitalize<string> | undefined;
+        }): JSX.Element;
+        displayName: string;
+        slot: "SidebarLeftFooter";
+    };
+    readonly SidebarLeftHeader: {
+        ({ name, children }: Omit<SourcePortalProps, "name"> & {
+            name?: Capitalize<string> | undefined;
+        }): JSX.Element;
+        displayName: string;
+        slot: "SidebarLeftHeader";
+    };
+}>>;
 
 // @public (undocumented)
-export interface ToggleMenuButtonProps {
-    // (undocumented)
-    className?: NestedClassName;
-    // (undocumented)
-    componentClassName?: string;
-    // (undocumented)
-    panel: string;
+export const SidebarLeftSlotTargets: Readonly<Readonly<{
+    readonly SidebarLeftBody: {
+        ({ className, ...props }: Omit<TargetProps, "name">): JSX.Element;
+        displayName: string;
+        slot: "SidebarLeftBody";
+    };
+    readonly SidebarLeftFooter: {
+        ({ className, ...props }: Omit<TargetProps, "name">): JSX.Element;
+        displayName: string;
+        slot: "SidebarLeftFooter";
+    };
+    readonly SidebarLeftHeader: {
+        ({ className, ...props }: Omit<TargetProps, "name">): JSX.Element;
+        displayName: string;
+        slot: "SidebarLeftHeader";
+    };
+}>>;
+
+// @public (undocumented)
+export type SidebarProps<C extends ElementType> = PolymorphicComponentPropsWithRef<C, OwnSidebarProps>;
+
+// @public (undocumented)
+export const sidebarRightSlots: readonly ("SidebarRightBody" | "SidebarRightFooter" | "SidebarRightHeader")[];
+
+// @public (undocumented)
+export const SidebarRightSlotSources: Readonly<Readonly<{
+    readonly SidebarRightBody: {
+        ({ name, children }: Omit<SourcePortalProps, "name"> & {
+            name?: Capitalize<string> | undefined;
+        }): JSX.Element;
+        displayName: string;
+        slot: "SidebarRightBody";
+    };
+    readonly SidebarRightFooter: {
+        ({ name, children }: Omit<SourcePortalProps, "name"> & {
+            name?: Capitalize<string> | undefined;
+        }): JSX.Element;
+        displayName: string;
+        slot: "SidebarRightFooter";
+    };
+    readonly SidebarRightHeader: {
+        ({ name, children }: Omit<SourcePortalProps, "name"> & {
+            name?: Capitalize<string> | undefined;
+        }): JSX.Element;
+        displayName: string;
+        slot: "SidebarRightHeader";
+    };
+}>>;
+
+// @public (undocumented)
+export const SidebarRightSlotTargets: Readonly<Readonly<{
+    readonly SidebarRightBody: {
+        ({ className, ...props }: Omit<TargetProps, "name">): JSX.Element;
+        displayName: string;
+        slot: "SidebarRightBody";
+    };
+    readonly SidebarRightFooter: {
+        ({ className, ...props }: Omit<TargetProps, "name">): JSX.Element;
+        displayName: string;
+        slot: "SidebarRightFooter";
+    };
+    readonly SidebarRightHeader: {
+        ({ className, ...props }: Omit<TargetProps, "name">): JSX.Element;
+        displayName: string;
+        slot: "SidebarRightHeader";
+    };
+}>>;
+
+// @public (undocumented)
+type SlotComponentsRecords<K extends string> = Readonly<{
+    readonly [P in PascalCase<K>]: ComponentType;
+}>;
+
+declare namespace Slots {
+    export {
+        createTargetsIfActiveComponent,
+        IfActiveProps,
+        IfActive,
+        Provider_2 as Provider,
+        Source,
+        OwnTargetContainerProps,
+        Target,
+        wrapSlotWithStack,
+        useRenderToSlotPortalContext,
+        useHasActiveSlotsFactory,
+        useTargetsIfActiveFactory,
+        SlotsRefMap,
+        RegisterSlot,
+        UpdateSlotTarget,
+        UnregisterSlot,
+        ActiveSlotPortalsContextType,
+        ActiveSlotPortalsContext,
+        useActiveSlotPortalsContext,
+        SlotTargetsRegistryContextType,
+        TargetsRegistryContext,
+        useTargetsRegistryContext,
+        RenderToSlotPortalContextType,
+        PortalsRegistryContext,
+        usePortalsRegistryContext,
+        createSlotComponents,
+        createSlotSourceComponent,
+        createSlotTargetComponent,
+        SlotComponentsRecords,
+        SlotSourceComponentsRecord,
+        SlotTargetComponentsRecord,
+        SourcePortalProps,
+        TargetProps
+    }
 }
+export { Slots }
 
 // @public (undocumented)
-export const ToggleSidebarButton: NamedExoticComponent<ToggleSidebarButtonProps>;
+type SlotSourceComponentsRecord<K extends string> = Readonly<{
+    readonly [P in PascalCase<K>]: ReturnType<typeof createSlotSourceComponent<P>>;
+}>;
 
 // @public (undocumented)
-export interface ToggleSidebarButtonProps {
-    // (undocumented)
-    className?: NestedClassName;
-    // (undocumented)
-    componentClassName?: string;
-    // (undocumented)
-    panel: string;
-    // (undocumented)
+type SlotsRefMap = Map<string, RefObject<HTMLElement>>;
+
+// @public (undocumented)
+type SlotTargetComponentsRecord<K extends string> = Readonly<{
+    readonly [P in PascalCase<K>]: ReturnType<typeof createSlotTargetComponent<P>>;
+}>;
+
+// @public (undocumented)
+type SlotTargetsRegistryContextType = {
+    registerSlotTarget: UpdateSlotTarget;
+    unregisterSlotTarget: UnregisterSlot;
+};
+
+// @public (undocumented)
+const Source: NamedExoticComponent<SourcePortalProps>;
+
+// @public (undocumented)
+type SourcePortalProps<K extends string = string> = {
+    children: ReactNode;
+    name: K;
+};
+
+// @public (undocumented)
+const StateContext: Context<RequiredDeepPlainObject>;
+
+// @public (undocumented)
+const Target: NamedExoticComponent<TargetProps>;
+
+// @public (undocumented)
+type TargetProps<Name extends string = string> = ComponentClassNameProps & {
+    as?: ElementType;
+    children?: ReactNode;
+    name: Name;
+};
+
+// @public (undocumented)
+const TargetsRegistryContext: Context<SlotTargetsRegistryContextType>;
+
+// @public (undocumented)
+export type ToggleMenuButtonProps = Omit<ComponentClassNameProps, 'children'> & {
+    children?: never;
+    labelWhenClosed?: string;
+    labelWhenOpen?: string;
+    panelName: string;
+};
+
+// @public (undocumented)
+export type ToggleSidebarButtonProps = Omit<ComponentClassNameProps, 'children'> & {
+    children?: never;
+    labelWhenClosed?: string;
+    labelWhenOpen?: string;
+    panelName: string;
     position: 'left' | 'right';
-}
+};
 
 // @public (undocumented)
-export interface UncontrolledLayoutPanelProps {
+interface UncontrolledPanelProps {
     // (undocumented)
     behavior?: never;
     // (undocumented)
-    defaultBehavior: LayoutPanelBehavior | null | undefined;
+    defaultBehavior: PanelBehavior | null | undefined;
     // (undocumented)
-    defaultVisibility: LayoutPanelVisibility | null | undefined;
+    defaultVisibility: PanelVisibility | null | undefined;
     // (undocumented)
-    onBehaviorChange?: (state: LayoutPanelState) => Partial<LayoutPanelState> | null | undefined | void;
+    onBehaviorChange?: (state: PanelState) => Partial<PanelState> | null | undefined | void;
     // (undocumented)
-    onKeyPress?: (event: KeyboardEvent, state: LayoutPanelState) => Partial<LayoutPanelState> | null | undefined | void;
+    onKeyPress?: (event: KeyboardEvent, state: PanelState) => Partial<PanelState> | null | undefined | void;
     // (undocumented)
-    onVisibilityChange?: (state: LayoutPanelState) => Partial<LayoutPanelState> | null | undefined | void;
+    onVisibilityChange?: (state: PanelState) => Partial<PanelState> | null | undefined | void;
     // (undocumented)
     visibility?: never;
 }
 
 // @public (undocumented)
-export type UnregisterLayoutPanel = LayoutPanelCallback;
+type UnregisterLayoutPanel = LayoutPanelCallback;
 
 // @public (undocumented)
-export type UnregisterLayoutSlot = (name: string) => void;
+type UnregisterSlot = (name: string) => void;
 
 // @public (undocumented)
-export type UnregisterLayoutSlotPortal = (id: string, target: string) => void;
+type UpdateLayoutPanel = (name: string, config: Partial<Omit<PanelConfig, 'name'>> | null | undefined | void) => void;
 
 // @public (undocumented)
-export type UpdateLayoutPanel = (name: string, config: Partial<Omit<LayoutPanelConfig, 'name'>> | null | undefined | void) => void;
+type UpdateSlotTarget = (name: string, ref: RefObject<HTMLElement>) => void;
 
 // @public (undocumented)
-export function useClosePanelOnEscape(behaviors?: Array<LayoutPanelState['behavior']>): (event: KeyboardEvent, state: LayoutPanelState) => {
+const useActiveSlotPortalsContext: () => ActiveSlotPortalsContextType;
+
+// @public (undocumented)
+function useClosePanelOnEscape(behaviors?: Array<PanelState['behavior']>): (event: KeyboardEvent, state: PanelState) => {
     readonly visibility: "hidden";
 } | undefined;
 
@@ -642,13 +1241,13 @@ export function useClosePanelOnEscape(behaviors?: Array<LayoutPanelState['behavi
 export const useContainerInsetsContext: () => ContainerInsets;
 
 // @public (undocumented)
-export function useDirectiveLifeCycle<T>(key: string, value: T, registry: SetDirectiveContextType<Record<string, unknown>>): void;
+function useDirectiveLifecycle<T extends RequiredDeepPlainObject, K extends keyof T, V extends T[K]>(name: K, content: V): boolean;
 
 // @public (undocumented)
-export function useDirectiveProviderRegistry<T extends Record<string, unknown>>(value: T): [SetDirectiveContextType<T>, T];
+function useDirectives<T extends RequiredDeepPlainObject>(): T;
 
 // @public @deprecated (undocumented)
-export const useDocumentTitle: typeof useDocumentTitle_2;
+const useDocumentTitle: typeof useDocumentTitle_2;
 
 // @public (undocumented)
 export function useElementInsetCustomProperties(elementRef: RefObject<HTMLElement>, prefix?: string): CSSProperties | undefined;
@@ -657,31 +1256,45 @@ export function useElementInsetCustomProperties(elementRef: RefObject<HTMLElemen
 export function useElementInsets(elementRef: RefObject<HTMLElement>): ContainerInsets;
 
 // @public (undocumented)
-export const useGetLayoutPanelsStateContext: () => GetLayoutPanelsStateContextType;
+const useGetLayoutPanelsStateContext: () => GetLayoutPanelsStateContextType;
+
+// @public (undocumented)
+function useHasActiveSlotsFactory<T extends SlotSourceComponentsRecord<string>>(SlotTargets: T): (...slots: ReadonlyArray<keyof T & string>) => boolean;
 
 // @public @deprecated (undocumented)
-export const useLayoutContainerWidth: typeof useContainerWidth;
+const useLayoutContainerWidth: typeof useContainerWidth;
 
 // @public (undocumented)
-export const useLayoutPanelContext: () => LayoutPanelState;
+const useLayoutPanelContext: () => PanelState;
 
 // @public (undocumented)
-export const useLayoutSlotRegistryContext: () => LayoutSlotRegistryContextType;
+const usePanelWidthContext: () => PanelWidthContextType;
 
 // @public (undocumented)
-export const usePanelWidthContext: () => PanelWidthContextType;
+const usePortalsRegistryContext: () => RenderToSlotPortalContextType;
 
 // @public (undocumented)
-export const useRenderToSlotPortalContext: () => RenderToSlotPortalContextType;
+const useRegistryContext: () => RegistryContextType<Record<string, unknown>>;
+
+// @public @deprecated (undocumented)
+const useRenderToSlotPortalContext: () => RenderToSlotPortalContextType;
 
 // @public (undocumented)
 export const useSafeAreaInsetsContext: () => ContainerInsets;
 
 // @public (undocumented)
-export const useSetLayoutPanelsStateContext: () => SetLayoutPanelsStateContextType;
+const useSetLayoutPanelsStateContext: () => SetLayoutPanelsStateContextType;
 
 // @public (undocumented)
-export function wrapSlotWithStack<C extends ComponentType<PropsWithRequiredChildren>>(Component: C): NamedExoticComponent<Partial<StackOwnProps>>;
+function useTargetsIfActiveFactory<T extends SlotSourceComponentsRecord<string>>(SlotTargets: T): (slots: ReadonlyArray<keyof T & string>, children?: ReactNode | ((...args: any[]) => ReactNode)) => string | number | true | ReactElement<any, string | JSXElementConstructor<any>> | ReactFragment | ((...args: any[]) => ReactNode) | FunctionComponentElement<    {
+children?: ReactNode;
+}> | null;
+
+// @public (undocumented)
+const useTargetsRegistryContext: () => SlotTargetsRegistryContextType;
+
+// @public @deprecated (undocumented)
+function wrapSlotWithStack<C extends ComponentType<PropsWithRequiredChildren>>(Component: C): NamedExoticComponent<Partial<StackOwnProps>>;
 
 // @public (undocumented)
 export const zeroInsets: ContainerInsets;

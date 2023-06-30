@@ -4,8 +4,16 @@
 
 ```ts
 
+import { CamelCase } from 'type-fest';
 import { Context } from 'react';
+import { DelimiterCase } from 'type-fest';
+import { KebabCase } from 'type-fest';
+import { LiteralToPrimitiveDeep } from 'type-fest';
+import { Opaque } from 'type-fest';
+import { PascalCase } from 'type-fest';
 import { PropsWithChildren } from 'react';
+import { Replace } from 'type-fest';
+import { UnionToIntersection } from 'type-fest';
 
 // @public (undocumented)
 export type AsProp<C extends React.ElementType> = {
@@ -13,7 +21,7 @@ export type AsProp<C extends React.ElementType> = {
 };
 
 // @public (undocumented)
-export function assert<In, Out extends In>(that: string | undefined, value: In, predicate: (value: In) => value is Out): asserts value is Out;
+export function assert<In, Out extends In>(that: string | undefined, value: In, predicate: Predicate<In, Out>): asserts value is Out;
 
 // @public (undocumented)
 export class AssertionError extends Error {
@@ -22,6 +30,8 @@ export class AssertionError extends Error {
 
 // @public (undocumented)
 export function assertNever(_: never): never;
+
+export { CamelCase }
 
 // @public (undocumented)
 export function capitalize(str: string): string;
@@ -45,6 +55,8 @@ export type DeepPartial<T> = T extends Function ? T : T extends Array<infer Infe
     [Key in keyof T]?: DeepPartial<T[Key]>;
 } : T | undefined;
 
+export { DelimiterCase }
+
 // @public
 export type ExtendableProps<ExtendedProps = {}, OverrideProps = {}> = OverrideProps & Omit<ExtendedProps, keyof OverrideProps>;
 
@@ -62,6 +74,9 @@ export const GlobalClassNamePrefixContext: Context<string>;
 
 // @public
 export type InheritableElementProps<C extends React.ElementType, Props = {}> = ExtendableProps<PropsOf<C>, Props>;
+
+// @public (undocumented)
+export function isArrayOfMembersSatisfyingFactory<T>(predicate: (value: unknown) => value is T): (value: unknown) => value is Array<T>;
 
 // @public (undocumented)
 export function isBoolean(value: unknown): value is boolean;
@@ -118,6 +133,9 @@ export function isPlainObject<T extends Record<string, unknown>>(value: unknown)
 export function isScrollable(element: HTMLElement | null): boolean;
 
 // @public (undocumented)
+export function isSlugString(value: unknown): value is SlugString;
+
+// @public (undocumented)
 export function isString(value: unknown): value is string;
 
 // @public (undocumented)
@@ -126,8 +144,12 @@ export function isTrue(value: unknown): value is true;
 // @public (undocumented)
 export function isUndefined(value: unknown): value is undefined;
 
+export { KebabCase }
+
 // @public
 export function listClassName(list: (string | false | null | undefined)[]): string;
+
+export { LiteralToPrimitiveDeep }
 
 // @public (undocumented)
 export type NestedClassName = string | false | null | undefined | (string | false | null | undefined)[] | NestedClassName[];
@@ -135,6 +157,11 @@ export type NestedClassName = string | false | null | undefined | (string | fals
 // @public (undocumented)
 export type NonNullableRequired<T> = {
     [P in keyof T]-?: NonNullable<T[P]>;
+};
+
+// @public
+export type NonOptional<T> = {
+    [P in keyof Required<T>]: Pick<T, P> extends Required<Pick<T, P>> ? T[P] : (T[P] | undefined);
 };
 
 // @public (undocumented)
@@ -155,6 +182,8 @@ export function parseTransformMatrix(transform?: string): {
     translateY: number;
 } | undefined;
 
+export { PascalCase }
+
 // @public (undocumented)
 export function pick<T extends Object, K extends keyof T>(object: T, properties: ReadonlyArray<K>): Pick<T, K>;
 
@@ -168,6 +197,12 @@ export type PolymorphicComponentPropsWithRef<C extends React.ElementType, Props 
 
 // @public
 export type PolymorphicRef<C extends React.ElementType> = React.ComponentPropsWithRef<C>['ref'];
+
+// @public (undocumented)
+export type Predicate<T, U extends T> = (value: T) => value is U;
+
+// @public (undocumented)
+export type Primitive = string | number | boolean | null | undefined;
 
 // @public (undocumented)
 export type PropsOf<C extends keyof JSX.IntrinsicElements | React.JSXElementConstructor<any>> = JSX.LibraryManagedAttributes<C, React.ComponentPropsWithoutRef<C>>;
@@ -187,8 +222,21 @@ export function px<V extends undefined>(value: V): '';
 // @public (undocumented)
 export function px<V extends number | false | null | undefined>(value?: V): string;
 
+export { Replace }
+
+// @public (undocumented)
+export type RequiredDeepPlainObject<T extends RequiredDeepPlainObject<Record<string, unknown>> = RequiredDeepPlainObject<Record<string, unknown>>, K extends keyof T & string = keyof T & string> = {
+    [P in K]-?: T[P] extends Record<string, unknown> ? RequiredDeepPlainObject<T[P]> : T[P];
+};
+
+// @public (undocumented)
+export function satisfiesOneOfFactory<T extends Array<Predicate<any, any>>>(...predicates: T): Predicate<unknown, UnionOfPredicateTypes<T>>;
+
 // @public (undocumented)
 export function setHasOneOf<T>(set: Set<T>, values: T[]): boolean;
+
+// @public (undocumented)
+export type SlugString = Opaque<string, 'SlugString'>;
 
 // Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
 // Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
@@ -208,6 +256,11 @@ export interface StateClassNameOptions {
 }
 
 // @public (undocumented)
+export function stateDataAttributes(state: Record<string, unknown>): {
+    [k: string]: string | true | undefined;
+};
+
+// @public (undocumented)
 export interface SvgSizeProps {
     // (undocumented)
     height: number;
@@ -220,11 +273,22 @@ export interface SvgSizeProps {
 // @public (undocumented)
 export function svgSizeProps(width: number, height?: number, crop?: number): SvgSizeProps;
 
+// @public (undocumented)
+export function toKebabCase(value: string): string;
+
 // @public
 export function trimString(value: string, characters: string): string;
 
 // @public (undocumented)
 export type Try<A1, A2, Catch = never> = A1 extends A2 ? A1 : Catch;
+
+// @public (undocumented)
+export type TypeofStringLiteral<T> = string extends T ? never : T;
+
+// @public (undocumented)
+export type UnionOfPredicateTypes<T> = T extends Array<(value: any) => value is infer U> ? U : never;
+
+export { UnionToIntersection }
 
 // @public
 export const useClassName: (componentClassName: NestedClassName, additionalClassName?: NestedClassName, prefixOverride?: string | null | undefined) => string;

@@ -1,10 +1,12 @@
 import { Layout as bare } from './Layout.bare'
 import { Layout as cms } from './Layout.cms'
 import { Layout as _default } from './Layout.default'
+import { Layout as legacy } from './Layout.legacy'
 
 export const Layouts = {
-	cms,
 	default: _default,
+	cms,
+	legacy,
 	bare,
 } as const
 

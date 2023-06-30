@@ -1,36 +1,53 @@
-import { CMSLayout } from '@contember/cms-layout'
 import {
-	CommonSlots,
-	createLayoutSlotComponent,
-	createLayoutSlotTargetComponent,
-	wrapSlotWithStack,
+	CommonSlotSources,
+	CommonSlotTargets,
+	ContentSlotSources,
+	ContentSlotTargets,
+	FooterSlotSources,
+	FooterSlotTargets,
+	HeaderSlotSources,
+	HeaderSlotTargets,
+	SidebarLeftSlotSources,
+	SidebarLeftSlotTargets,
+	SidebarRightSlotSources,
+	SidebarRightSlotTargets,
+	commonSlots,
+	contentSlots,
+	footerSlots,
+	headerSlots,
+	sidebarLeftSlots,
+	sidebarRightSlots,
 } from '@contember/layout'
 
-type SlotsMapType = Record<keyof typeof slotTargets, ReturnType<typeof createLayoutSlotComponent>>
-type SlotTargetsMapType = Record<keyof typeof slotTargets, ReturnType<typeof createLayoutSlotTargetComponent>>
-
-export const slotTargets = Object.freeze({
-	...CMSLayout.slotTargets,
+export const slots = [
+	...commonSlots,
+	...contentSlots,
+	...sidebarLeftSlots,
+	...sidebarRightSlots,
+	...headerSlots,
+	...footerSlots,
 	// Your custom slot names will come here, e.g:
-	// MySlot: 'my-slot',
-})
+	// MySLot: 'my-slot',
+]
 
-const SidebarStack = wrapSlotWithStack(CommonSlots.Sidebar)
-const ContentStack = wrapSlotWithStack(CommonSlots.Content)
-
-export const Slots: SlotsMapType & {
-	SidebarStack: typeof SidebarStack;
-	ContentStack: typeof ContentStack;
-} = {
-	SidebarStack,
-	ContentStack,
-	...CMSLayout.Slots,
+export const SlotSources = {
+	...CommonSlotSources,
+	...ContentSlotSources,
+	...HeaderSlotSources,
+	...FooterSlotSources,
+	...SidebarLeftSlotSources,
+	...SidebarRightSlotSources,
 	// Your custom slots will come here, e.g:
-	// MySlot: createLayoutSlotComponent(slotTargets.MySlot, 'MySlot'),
+	// MySLot: Slots.createPortalComponent(slotTargets.MySLot),
 }
 
-export const SlotTargets: SlotTargetsMapType = {
-	...CMSLayout.SlotTargets,
+export const SlotTargets = {
+	...CommonSlotTargets,
+	...ContentSlotTargets,
+	...HeaderSlotTargets,
+	...FooterSlotTargets,
+	...SidebarLeftSlotTargets,
+	...SidebarRightSlotTargets,
 	// Your custom slot targets will come here, e.g:
-	// MySlot: createLayoutSlotTargetComponent(slotTargets.MySlot, 'MySlot'),
+	// MySLot: Slots.createTargetComponent(slotTargets.MySLot),
 }

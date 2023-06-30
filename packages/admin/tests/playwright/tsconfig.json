@@ -1,8 +1,12 @@
 {
 	"compilerOptions": {
+		"jsx": "react-jsx",
 		"composite": true,
 		"allowImportingTsExtensions": true,
 		"noEmit": true,
 		"emitDeclarationOnly": false,
+		"types": [
+			"vite/client"
+		],
 	}
 }

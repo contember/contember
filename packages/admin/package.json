@@ -41,7 +41,7 @@
 		"pw:dev": "vite dev tests/playwright/admin",
 		"pw:preview": "vite preview tests/playwright/admin",
 		"pw:debug": "playwright test --debug --project='Desktop Chrome'",
-		"pw:report": "playwright show-report tests/playwright/admin",
+		"pw:report": "playwright show-report tests/playwright/report",
 		"pw:test": "playwright test",
 		"pw:update": "playwright test --update-snapshots",
 		"ae:build": "api-extractor run --local",

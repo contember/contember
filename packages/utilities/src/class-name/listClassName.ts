@@ -1,5 +1,5 @@
-import { deduplicateClassName } from './Internal/deduplicateClassName'
-import { flatClassNameList } from './Internal/flatClassNameList'
+import { deduplicateClassName } from './deduplicateClassName'
+import { flatClassNameList } from './flatClassNameList'
 
 /**
  * Combines a list of class names into a single string, even nested

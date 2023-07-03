@@ -1,8 +1,8 @@
 import { useContext } from 'react'
 import { GlobalClassNamePrefixContext } from './GlobalClassNamePrefixContext'
-import { deduplicateClassName } from './Internal/deduplicateClassName'
-import { flatClassNameList } from './Internal/flatClassNameList'
 import { NestedClassName } from './Types'
+import { deduplicateClassName } from './deduplicateClassName'
+import { flatClassNameList } from './flatClassNameList'
 
 /**
  * Prefixes leaf component class name

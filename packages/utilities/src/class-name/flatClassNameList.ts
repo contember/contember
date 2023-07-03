@@ -1,5 +1,5 @@
-import { assertNever } from '../../assert-types'
-import { NestedClassName } from '../Types'
+import { assertNever } from '../assert-types'
+import { NestedClassName } from './Types'
 
 export function flatClassNameList(className: NestedClassName): string[] {
 	if (!className) {

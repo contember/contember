@@ -1,5 +1,7 @@
 export * from './GlobalClassNamePrefixContext'
 export * from './Types'
+export * from './deduplicateClassName'
+export * from './flatClassNameList'
 export * from './listClassName'
 export * from './stateClassName'
 export * from './useClassName'

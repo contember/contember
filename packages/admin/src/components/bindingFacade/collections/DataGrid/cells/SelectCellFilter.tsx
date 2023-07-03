@@ -13,6 +13,7 @@ export type SelectCellArtifacts = {
 	id: EntityId[]
 	nullCondition: boolean
 }
+
 type SelectCellFilterProps =
 	& FilterRendererProps<SelectCellArtifacts>
 	& {

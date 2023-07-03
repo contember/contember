@@ -21,6 +21,7 @@ export type TextCellProps =
 		disableOrder?: boolean
 		initialOrder?: DataGridOrderDirection
 		format?: (value: string | null) => ReactNode
+		initialFilter?: TextFilterArtifacts
 	}
 
 export type TextFilterArtifacts = {

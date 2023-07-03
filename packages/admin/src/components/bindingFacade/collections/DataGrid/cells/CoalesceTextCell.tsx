@@ -9,8 +9,11 @@ export type CoalesceTextCellProps<Persisted extends FieldValue = FieldValue> =
 	& DataGridColumnPublicProps
 	& FieldFallbackViewPublicProps
 	& CoalesceFieldViewProps<Persisted>
+	& {
+		initialFilter?: CoalesceTextFilterArtifacts
+	}
 
-type CoalesceTextFilterArtifacts = {
+export type CoalesceTextFilterArtifacts = {
 	mode: 'matches' | 'matchesExactly' | 'startsWith' | 'endsWith' | 'doesNotMatch'
 	query: string
 }

@@ -13,9 +13,10 @@ export type BooleanCellProps =
 	& {
 		disableOrder?: boolean
 		initialOrder?: DataGridOrderDirection
+		initialFilter?: BooleanFilterArtifacts
 	}
 
-type BooleanFilterArtifacts = {
+export type BooleanFilterArtifacts = {
 	includeTrue: boolean
 	includeFalse: boolean
 	includeNull: boolean

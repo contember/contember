@@ -24,6 +24,7 @@ export type HasManySelectProps =
 	& SugaredRelativeSingleEntity
 	& {
 		renderElements?: (elements: ReactNode[]) => ReactElement
+		initialFilter?: SelectCellArtifacts
 	}
 
 /**

@@ -596,6 +596,7 @@ export const BooleanCell: FunctionComponent<BooleanCellProps>;
 export type BooleanCellProps = DataGridColumnPublicProps & BooleanFieldViewProps & {
     disableOrder?: boolean;
     initialOrder?: DataGridOrderDirection;
+    initialFilter?: BooleanFilterArtifacts;
 };
 
 // @public (undocumented)
@@ -607,6 +608,13 @@ export type BooleanFieldViewProps = {
     booleanStyle?: 'yesNo' | 'checkCross' | 'oneZero';
     format?: (date: boolean) => ReactNode;
 } & FieldFallbackViewPublicProps;
+
+// @public (undocumented)
+export type BooleanFilterArtifacts = {
+    includeTrue: boolean;
+    includeFalse: boolean;
+    includeNull: boolean;
+};
 
 // @public (undocumented)
 export type BuiltinEditorPlugins = BuiltinElementBased | BuiltinTextBased;
@@ -760,7 +768,15 @@ export interface CoalesceFieldViewProps<Persisted extends FieldValue = FieldValu
 export const CoalesceTextCell: FC<CoalesceTextCellProps>;
 
 // @public (undocumented)
-export type CoalesceTextCellProps<Persisted extends FieldValue = FieldValue> = DataGridColumnPublicProps & FieldFallbackViewPublicProps & CoalesceFieldViewProps<Persisted>;
+export type CoalesceTextCellProps<Persisted extends FieldValue = FieldValue> = DataGridColumnPublicProps & FieldFallbackViewPublicProps & CoalesceFieldViewProps<Persisted> & {
+    initialFilter?: CoalesceTextFilterArtifacts;
+};
+
+// @public (undocumented)
+export type CoalesceTextFilterArtifacts = {
+    mode: 'matches' | 'matchesExactly' | 'startsWith' | 'endsWith' | 'doesNotMatch';
+    query: string;
+};
 
 // @public (undocumented)
 export const codeToolbarButton: ToolbarButtonSpec;
@@ -1408,6 +1424,7 @@ export const DateCell: FunctionComponent<DateCellProps>;
 export type DateCellProps = DataGridColumnPublicProps & DateFieldViewProps & {
     disableOrder?: boolean;
     initialOrder?: DataGridOrderDirection;
+    initialFilter?: DateRange;
 };
 
 // @public (undocumented)
@@ -1429,6 +1446,12 @@ export type DateFieldViewProps = {
     format?: Intl.DateTimeFormatOptions;
     locale: string | string[];
 }) & FieldFallbackViewPublicProps;
+
+// @public (undocumented)
+export type DateRange = {
+    start: string | null;
+    end: string | null;
+};
 
 // @public (undocumented)
 export const DateTimeField: React.NamedExoticComponent<DateTimeFieldProps>;
@@ -1889,6 +1912,7 @@ export type EnumCellProps = DataGridColumnPublicProps & FieldFallbackViewPublicP
     field: SugaredFieldProps['field'];
     options: Record<string, string>;
     format?: (value: string | null) => ReactNode;
+    initialFilter?: EnumCellArtifacts;
 };
 
 // @public (undocumented)
@@ -2321,13 +2345,16 @@ export const HasManySelectCell: FunctionComponent<HasManySelectProps>;
 // @public (undocumented)
 export type HasManySelectProps = DataGridColumnPublicProps & SugaredRelativeEntityList & BaseDynamicChoiceField & FieldFallbackViewPublicProps & SugaredRelativeSingleEntity & {
     renderElements?: (elements: ReactNode[]) => ReactElement;
+    initialFilter?: SelectCellArtifacts;
 };
 
 // @public
 export const HasOneSelectCell: FunctionComponent<HasOneSelectProps>;
 
 // @public (undocumented)
-export type HasOneSelectProps = DataGridColumnPublicProps & BaseDynamicChoiceField & FieldFallbackViewPublicProps & SugaredRelativeSingleEntity;
+export type HasOneSelectProps = DataGridColumnPublicProps & BaseDynamicChoiceField & FieldFallbackViewPublicProps & SugaredRelativeSingleEntity & {
+    initialFilter?: SelectCellArtifacts;
+};
 
 // @public (undocumented)
 export const HasRole: React.NamedExoticComponent<HasRoleProps>;
@@ -3467,6 +3494,7 @@ export type NumberCellProps = DataGridHeaderCellPublicProps & DataGridCellPublic
     disableOrder?: boolean;
     initialOrder?: DataGridOrderDirection;
     format?: (value: number) => ReactNode;
+    initialFilter?: NumberFilterArtifacts;
 };
 
 // @public (undocumented)
@@ -4414,6 +4442,12 @@ export const SearchField: React.NamedExoticComponent<SearchFieldProps>;
 export type SearchFieldProps = SimpleRelativeSingleFieldProps & Omit<SearchInputProps, 'value' | 'validationState' | 'allowNewlines' | 'wrapLines'>;
 
 // @public (undocumented)
+export type SelectCellArtifacts = {
+    id: EntityId[];
+    nullCondition: boolean;
+};
+
+// @public (undocumented)
 export interface SelectedDimension {
     // (undocumented)
     [key: string]: string[];
@@ -4875,6 +4909,7 @@ export type TextCellProps = DataGridColumnPublicProps & FieldFallbackViewPublicP
     disableOrder?: boolean;
     initialOrder?: DataGridOrderDirection;
     format?: (value: string | null) => ReactNode;
+    initialFilter?: TextFilterArtifacts;
 };
 
 // @public

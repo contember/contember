@@ -14,9 +14,10 @@ export type DateCellProps =
 	& {
 		disableOrder?: boolean
 		initialOrder?: DataGridOrderDirection
+		initialFilter?: DateRange
 	}
 
-type DateRange = {
+export type DateRange = {
 	start: string | null
 	end: string | null
 }

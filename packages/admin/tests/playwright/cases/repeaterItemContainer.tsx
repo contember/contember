@@ -8,21 +8,19 @@ const Handle = () => <>=</>
 
 export default function () {
 	return (
-		<StyleProvider>
-			<Layout scheme="system">
-				<LayoutPage>
-					<RepeaterItemContainer dragHandleComponent={Handle}>
-						{dummyInput}
-						{dummyInput}
-						{dummyInput}
-					</RepeaterItemContainer>
-					<RepeaterItemContainer>
-						{dummyInput}
-						{dummyInput}
-						{dummyInput}
-					</RepeaterItemContainer>
-				</LayoutPage>
-			</Layout>
-		</StyleProvider>
+		<Layout>
+			<LayoutPage>
+				<RepeaterItemContainer dragHandleComponent={Handle}>
+					{dummyInput}
+					{dummyInput}
+					{dummyInput}
+				</RepeaterItemContainer>
+				<RepeaterItemContainer>
+					{dummyInput}
+					{dummyInput}
+					{dummyInput}
+				</RepeaterItemContainer>
+			</LayoutPage>
+		</Layout>
 	)
 }

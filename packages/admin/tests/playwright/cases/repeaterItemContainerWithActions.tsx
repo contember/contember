@@ -14,40 +14,38 @@ const intent: Intent = 'danger'
 
 export default function () {
 	return (
-		<StyleProvider>
-			<Layout scheme="system">
-				<LayoutPage>
-					<style>{`
+		<Layout>
+			<LayoutPage>
+				<style>{`
 					.cui-repeater-item-container-header:hover { background-color: #00CCFF33; }
 					`}</style>
-					<div style={horizontalStack}>
-						{buttonFlows.map(flow => (
-							<div key={flow} style={verticalStack}>
-								<strong>flow: {flow}</strong>
-								{buttonDistinctions.map(distinction => {
-									const buttonProps = {
-										flow,
-										intent,
-										distinction,
-									}
+				<div style={horizontalStack}>
+					{buttonFlows.map(flow => (
+						<div key={flow} style={verticalStack}>
+							<strong>flow: {flow}</strong>
+							{buttonDistinctions.map(distinction => {
+								const buttonProps = {
+									flow,
+									intent,
+									distinction,
+								}
 
-									return (
-										<RepeaterItemContainer
-											key={distinction}
-											label={distinction}
-											actions={<>
-												<Button {...buttonProps} size="small"><Icon blueprintIcon="trash" /></Button>
-												<Button {...buttonProps}><Icon blueprintIcon="trash" /></Button>
-												<Button {...buttonProps} size="large"><Icon blueprintIcon="trash" /></Button>
-											</>}
-										>{dummyInput}</RepeaterItemContainer>
-									)
-								})}
-							</div>
-						))}
-					</div>
-				</LayoutPage>
-			</Layout>
-		</StyleProvider>
+								return (
+									<RepeaterItemContainer
+										key={distinction}
+										label={distinction}
+										actions={<>
+											<Button {...buttonProps} size="small"><Icon blueprintIcon="trash" /></Button>
+											<Button {...buttonProps}><Icon blueprintIcon="trash" /></Button>
+											<Button {...buttonProps} size="large"><Icon blueprintIcon="trash" /></Button>
+										</>}
+									>{dummyInput}</RepeaterItemContainer>
+								)
+							})}
+						</div>
+					))}
+				</div>
+			</LayoutPage>
+		</Layout>
 	)
 }

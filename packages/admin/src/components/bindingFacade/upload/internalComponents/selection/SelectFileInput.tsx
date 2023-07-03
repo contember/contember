@@ -1,5 +1,5 @@
 import { AccessorTree, Component, EntityAccessor, EntityId, useAccessorTreeState } from '@contember/binding'
-import { Button, DropdownContentContainerProvider, useDialog } from '@contember/ui'
+import { Button, useDialog } from '@contember/ui'
 import { ComponentType, MouseEventHandler, ReactNode, useCallback } from 'react'
 import { MessageFormatter } from '../../../../../i18n'
 import { SelectEntityButtonProps } from '../../../collections'
@@ -57,19 +57,17 @@ export const SelectFileInput = Component(
 				type: 'captivating',
 				bare: true,
 				content: props => (
-					<DropdownContentContainerProvider>
-						<AccessorTree state={accessorTree}>
-							<SelectFileDialog
-								formatMessage={formatMessage}
-								onCancel={() => props.resolve()}
-								onSelect={props.resolve}
-								insertSelectedText={insertSelectedText}
-								selectButtonText={selectButtonText}
-								isMultiple={isMultiple}
-								{...fileSelection!}
-							/>
-						</AccessorTree>
-					</DropdownContentContainerProvider>
+					<AccessorTree state={accessorTree}>
+						<SelectFileDialog
+							formatMessage={formatMessage}
+							onCancel={() => props.resolve()}
+							onSelect={props.resolve}
+							insertSelectedText={insertSelectedText}
+							selectButtonText={selectButtonText}
+							isMultiple={isMultiple}
+							{...fileSelection!}
+						/>
+					</AccessorTree>
 				),
 			})
 			if (selectedEntities !== undefined) {
@@ -92,4 +90,3 @@ export const SelectFileInput = Component(
 	},
 	'SelectFileInput',
 )
-

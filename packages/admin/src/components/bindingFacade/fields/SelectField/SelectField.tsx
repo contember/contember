@@ -1,5 +1,5 @@
 import { Component } from '@contember/binding'
-import { FieldContainer, FieldContainerProps, FieldErrors, getPortalRoot, PublicCommonReactSelectStylesProps, SelectCreateNewWrapper } from '@contember/ui'
+import { FieldContainer, FieldContainerProps, FieldErrors, PublicCommonReactSelectStylesProps, SelectCreateNewWrapper, usePortalProvider } from '@contember/ui'
 import { FunctionComponent, memo } from 'react'
 import type { Props as SelectProps } from 'react-select'
 import Select from 'react-select'
@@ -86,7 +86,7 @@ export const SelectFieldInner = memo(
 					<Select
 						{...selectProps}
 						menuPlacement="auto"
-						menuPortalTarget={getPortalRoot()}
+						menuPortalTarget={usePortalProvider()}
 						isClearable={allowNull === true}
 						value={currentValue}
 						isLoading={isLoading}

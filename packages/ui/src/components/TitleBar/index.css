@@ -24,8 +24,8 @@
 	content: "";
 	display: block;
 	position: absolute;
-	left: var(--cui-edge-offset-left);
-	right: var(--cui-edge-offset-right);
+	left: 0;
+	right: 0;
 	bottom: 0;
 	border-bottom: var(--cui-control-border-width, 1px) solid var(--cui-color--lower);
 }

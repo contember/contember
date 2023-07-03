@@ -1,4 +1,4 @@
-import { Command, CommandConfiguration, Input, pathExists, Project, Workspace } from '@contember/cli-common'
+import { Command, CommandConfiguration, Input, pathExists, Workspace } from '@contember/cli-common'
 import {
 	configureExecuteMigrationCommand,
 	ExecuteMigrationOptions,
@@ -10,7 +10,6 @@ import { interactiveResolveInstanceEnvironmentFromInput } from '../../utils/inst
 import { SystemClient } from '../../utils/system'
 import { MigrationsContainerFactory } from '../../MigrationsContainer'
 import { AdminClient, readAdminFiles } from '../../utils/admin'
-import { URL } from 'node:url'
 import prompts from 'prompts'
 import { createMigrationStatusTable } from '../../utils/migrations'
 import { maskToken } from '../../utils/token'
@@ -23,6 +22,8 @@ type Args = {
 
 type Options = ExecuteMigrationOptions & {
 	admin?: string
+	['no-admin']?: boolean
+	root?: boolean
 }
 
 export class DeployCommand extends Command<Args, Options> {
@@ -35,10 +36,15 @@ export class DeployCommand extends Command<Args, Options> {
 	protected configure(configuration: CommandConfiguration<Args, Options>): void {
 		configuration.description('Deploy Contember project')
 		configuration.argument('dsn')
+
 		if (!this.workspace.isSingleProjectMode()) {
 			configuration.argument('project').optional()
 		}
+
 		configuration.option('admin').valueRequired()
+		configuration.option('no-admin').valueOptional()
+		configuration.option('root').valueOptional()
+
 		configureExecuteMigrationCommand(configuration)
 	}
 
@@ -120,13 +126,20 @@ export class DeployCommand extends Command<Args, Options> {
 			return migrationExitCode
 		}
 
-		if (adminEndpoint) {
+		if (adminEndpoint && input.getOption('no-admin') != true) {
 			console.log('Deploying admin...')
 			const client = AdminClient.create(adminEndpoint, apiToken)
 			const files = await readAdminFiles(projectAdminDistDir)
-			await client.deploy(remoteProject, files)
+
+			// in some cases you need deploy whole folder with custom build etc.
+			// with root option you can build app on your own and simply deploy it with subprojects
+			await client.deploy(
+				input.getOption('root') ? null : remoteProject, files,
+			)
+
 			console.log(`Admin deployed (${files.length} files)`)
 		}
+
 		console.log('')
 		console.log('Deployment successful')
 		console.log(`API URL: ${instance.baseUrl}`)

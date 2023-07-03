@@ -4,6 +4,7 @@ import { Acl } from '@contember/schema'
 namespace PermissionActions {
 	export enum Resources {
 		system = 'system',
+		entrypoint = 'entrypoint',
 		person = 'person',
 		identity = 'identity',
 		project = 'project',
@@ -33,6 +34,7 @@ namespace PermissionActions {
 	export const PROJECT_UPDATE = Authorizator.createAction(Resources.project, 'update')
 
 	export const PROJECT_CREATE = Authorizator.createAction(Resources.project, 'create')
+	export const ENTRYPOINT_DEPLOY = Authorizator.createAction(Resources.entrypoint, 'deployEntrypoint')
 
 	export const PROJECT_VIEW_MEMBER = (memberships: readonly Acl.Membership[]) => Authorizator.createAction(Resources.project, 'viewMembers', { memberships })
 	export const PROJECT_ADD_MEMBER = (memberships: readonly Acl.Membership[]) => Authorizator.createAction(Resources.project, 'addMember', { memberships })

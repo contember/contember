@@ -9,7 +9,7 @@ export class AdminClient {
 		return new AdminClient(url, apiToken)
 	}
 
-	public async deploy(project: string, files: AdminFiles): Promise<void> {
+	public async deploy(project: string | null, files: AdminFiles): Promise<void> {
 		const response = await this.execute('_deploy', 'POST', { project, files })
 
 		if (!response.ok) {

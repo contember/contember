@@ -387,6 +387,7 @@ export type Identity = {
 export type IdentityGlobalPermissions = {
 	readonly __typename?: 'IdentityGlobalPermissions'
 	readonly canCreateProject: Scalars['Boolean']
+	readonly canDeployEntrypoint: Scalars['Boolean']
 }
 
 export type IdentityProjectRelation = {
@@ -1695,6 +1696,7 @@ export type IdentityResolvers<ContextType = any, ParentType extends ResolversPar
 
 export type IdentityGlobalPermissionsResolvers<ContextType = any, ParentType extends ResolversParentTypes['IdentityGlobalPermissions'] = ResolversParentTypes['IdentityGlobalPermissions']> = {
 	canCreateProject?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	canDeployEntrypoint?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 

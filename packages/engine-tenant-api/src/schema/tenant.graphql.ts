@@ -34,12 +34,12 @@ const schema: DocumentNode = gql`
 			redirectUrl: String @deprecated(reason: "use data.redirectUrl")
 		): InitSignInIDPResponse
 		signInIDP(
-			identityProvider: String!, 
+			identityProvider: String!,
 			data: Json,
 			expiration: Int
             idpResponse: IDPResponseInput, @deprecated(reason: "pass idpResponse.url as data.url")
-			redirectUrl: String @deprecated(reason: "use data.redirectUrl"), 
-			sessionData: Json @deprecated(reason: "use data.sessionData"), 
+			redirectUrl: String @deprecated(reason: "use data.redirectUrl"),
+			sessionData: Json @deprecated(reason: "use data.sessionData"),
 		): SignInIDPResponse
 
 		# IDP management
@@ -604,6 +604,7 @@ const schema: DocumentNode = gql`
 
 	type IdentityGlobalPermissions {
 		canCreateProject: Boolean!
+		canDeployEntrypoint: Boolean!
 	}
 
 	type IdentityProjectRelation {

@@ -13,8 +13,8 @@ export class OneHasOneDefinitionImpl extends FieldDefinition<OneHasOneDefinition
 		return this.withOption('joiningColumn', { ...this.joiningColumn, columnName })
 	}
 
-	onDelete(onDelete: Model.OnDelete): Interface<OneHasOneDefinition> {
-		return this.withOption('joiningColumn', { ...this.joiningColumn, onDelete })
+	onDelete(onDelete: Model.OnDelete | `${Model.OnDelete}`): Interface<OneHasOneDefinition> {
+		return this.withOption('joiningColumn', { ...this.joiningColumn, onDelete: onDelete as Model.OnDelete })
 	}
 
 	cascadeOnDelete(): Interface<OneHasOneDefinition> {

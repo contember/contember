@@ -1,12 +1,12 @@
 import { Model } from '@contember/schema'
 import { assert, test } from 'vitest'
-import { createSchema, SchemaDefinition as def } from '../../../src'
+import { createSchema, c } from '../../../src'
 import { extendEntity, FieldDefinition } from '../../../src/model/definition'
 import { DecoratorFunction } from '../../../src/utils'
 
 namespace ExtendedModel {
 	export class Article {
-		title = def.stringColumn()
+		title = c.stringColumn()
 	}
 
 	const addField = (name: string, field: FieldDefinition<any>): DecoratorFunction<any> => {
@@ -25,7 +25,7 @@ namespace ExtendedModel {
 		}))
 	}
 
-	addField('lead', def.stringColumn())(Article)
+	addField('lead', c.stringColumn())(Article)
 }
 
 

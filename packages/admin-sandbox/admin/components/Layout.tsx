@@ -1,8 +1,7 @@
 import { Button, DevPanel, DimensionsSwitcher, Link, LogoutLink, Scheme, Spacer, Stack, VisuallyHidden, toSchemeClass, toThemeClass } from '@contember/admin'
 import { Identity2023 } from '@contember/brand'
 import { SafeAreaInsetsProvider } from '@contember/layout'
-import { useContainerWidth, useDocumentTitle, useReferentiallyStableCallback, useSessionStorageState } from '@contember/react-utils'
-import { Intent, Radio } from '@contember/ui'
+import { ColorSchemeProvider, getThemeClassName, useContainerWidth, useDocumentTitle, useReferentiallyStableCallback, useSessionStorageState, useThemedClassName } from '@contember/react-utils'
 import { CircleDashedIcon, LayoutIcon, LogOutIcon, MoonIcon, PaintBucketIcon, SmartphoneIcon, SunIcon } from 'lucide-react'
 import { PropsWithChildren, memo, useMemo, useRef, useState } from 'react'
 import { AlertLogoutLink } from './AlertLogoutLink'
@@ -43,47 +42,50 @@ export const Layout = memo(({ children }: PropsWithChildren) => {
 					</Link>
 				</SlotSources.Logo>
 
-				<SlotSources.Switchers>
-					<Button
-						size="small"
-						elevation="none"
-						distinction="seamless"
-						active={!scheme.match(/system/)}
-						flow="circular"
-						onClick={useReferentiallyStableCallback(() => {
-							setScheme(scheme => (scheme.match(/light/) ? 'dark' : scheme.match(/dark/) ? 'system' : 'light'))
-						})}
-						aria-label={scheme.match(/light/) ? 'Light mode, switch to dark mode' : scheme.match(/dark/) ? 'Dark mode, switch to light mode' : 'System mode, switch to system mode'}
-					>
-						{scheme.match(/light/) ? <SunIcon /> : scheme.match(/dark/) ? <MoonIcon /> : <CircleDashedIcon />}
-					</Button>
+							<SlotSources.Switchers>
+								<Button
+									size="small"
+									elevation="none"
+									distinction="seamless"
+									active={!scheme.match(/system/)}
+									flow="circular"
+									onClick={useReferentiallyStableCallback(() => {
+										setScheme(scheme => (scheme.match(/light/) ? 'dark' : scheme.match(/dark/) ? 'system' : 'light'))
+									})}
+									aria-label={scheme.match(/light/) ? 'Light mode, switch to dark mode' : scheme.match(/dark/) ? 'Dark mode, switch to light mode' : 'System mode, switch to system mode'}
+								>
+									{scheme.match(/light/) ? <SunIcon /> : scheme.match(/dark/) ? <MoonIcon /> : <CircleDashedIcon />}
+								</Button>
 
-					<DimensionsSwitcher
-						optionEntities="Locale"
-						orderBy="code asc"
-						dimension="locale"
-						labelField="code"
-						slugField="code"
-						maxItems={1}
-					/>
-				</SlotSources.Switchers>
+								<DimensionsSwitcher
+									optionEntities="Locale"
+									orderBy="code asc"
+									dimension="locale"
+									labelField="code"
+									slugField="code"
+									maxItems={1}
+								/>
+							</SlotSources.Switchers>
 
-				{Navigation && (
-					<SlotSources.Navigation>
-						<Navigation />
-					</SlotSources.Navigation>
-				)}
+							{Navigation && (
+								<SlotSources.Navigation>
+									<Navigation />
+								</SlotSources.Navigation>
+							)}
 
-				<SlotSources.Profile>
-					<LogoutLink Component={AlertLogoutLink}>
-						<Stack align="center" direction="horizontal" gap="small">
-							<LogOutIcon /> Logout
-						</Stack>
-					</LogoutLink>
-				</SlotSources.Profile>
+							<SlotSources.Profile>
+								<LogoutLink Component={AlertLogoutLink}>
+									<Stack align="center" direction="horizontal" gap="small">
+										<LogOutIcon /> Logout
+									</Stack>
+								</LogoutLink>
+							</SlotSources.Profile>
 
-				{children}
-			</LayoutComponent>
+							{children}
+						</DialogProvider>
+					</PortalProvider>
+				</LayoutComponent>
+			</ColorSchemeProvider>
 		</SafeAreaInsetsProvider>
 	)
 })

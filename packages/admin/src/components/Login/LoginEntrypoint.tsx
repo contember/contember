@@ -1,5 +1,5 @@
 import { ContemberClient } from '@contember/react-client'
-import { Button, ErrorList, Icon, Stack, StyleProvider, Toaster, ToasterProvider } from '@contember/ui'
+import { Button, ErrorList, Icon, Providers, Stack } from '@contember/ui'
 import { FC, ReactNode, useEffect, useMemo, useState } from 'react'
 import { Link, RequestProvider, RoutingContext, RoutingContextValue } from '../../routing'
 import {
@@ -15,8 +15,8 @@ import {
 } from '../../tenant'
 import { IdentityProvider, useLogout, useOptionalIdentity } from '../Identity'
 import { MiscPageLayout } from '../MiscPageLayout'
-import { Page, Pages } from '../pageRouting'
 import { Project, ProjectListButtons } from '../Project'
+import { Page, Pages } from '../pageRouting'
 
 
 export interface LoginEntrypointProps {
@@ -55,58 +55,55 @@ export const LoginEntrypoint = (props: LoginEntrypointProps) => {
 			sessionToken={props.sessionToken}
 			loginToken={props.loginToken}
 		>
-			<StyleProvider>
-				<ToasterProvider>
-					<RoutingContext.Provider value={routing}>
-						<RequestProvider>
-							<Pages>
-								<Page name={indexPageName}>
-									<IdentityProvider allowUnauthenticated={true}>
-										<LoginEntrypointIndex
-											projects={props.projects}
-											formatProjectUrl={props.formatProjectUrl}
-											identityProviders={props.identityProviders}
-											heading={props.heading}
-											projectsPageActions={props.projectsPageActions}
-											collapsedEmailLogin={props.collapsedEmailLogin}
-										/>
-									</IdentityProvider>
-								</Page>
-								<Page name={resetRequestPageName}>
-									<MiscPageLayout heading="Password reset" actions={<>
+			<RoutingContext.Provider value={routing}>
+				<RequestProvider>
+					<Providers>
+						<Pages>
+							<Page name={indexPageName}>
+								<IdentityProvider allowUnauthenticated={true}>
+									<LoginEntrypointIndex
+										projects={props.projects}
+										formatProjectUrl={props.formatProjectUrl}
+										identityProviders={props.identityProviders}
+										heading={props.heading}
+										projectsPageActions={props.projectsPageActions}
+										collapsedEmailLogin={props.collapsedEmailLogin}
+									/>
+								</IdentityProvider>
+							</Page>
+							<Page name={resetRequestPageName}>
+								<MiscPageLayout heading="Password reset" actions={<>
+									<Link to={indexPageName}>&larr; Back to login</Link>
+								</>}>
+									<CreateResetPasswordRequestForm redirectOnSuccess={redirectOnSuccessPageName} />
+								</MiscPageLayout>
+							</Page>
+							<Page name={redirectOnSuccessPageName}>
+								<MiscPageLayout heading="Password reset" actions={<>
+									<Link to={indexPageName}>&larr; Back to login</Link>
+								</>}>
+									<p>
+										Password reset request has been successfully created. Please check your inbox for the instructions.
+									</p>
+									<p>
+										Please follow the link in e-mail or copy the reset token here:
+									</p>
+									<FillResetPasswordTokenForm resetLink={`${passwordResetPageName}(token: $token)`} />
+								</MiscPageLayout>
+							</Page>
+							<Page name={passwordResetPageName}>
+								{({ token }: { token: string }) => (
+									<MiscPageLayout heading="Set a new password" actions={<>
 										<Link to={indexPageName}>&larr; Back to login</Link>
 									</>}>
-										<CreateResetPasswordRequestForm redirectOnSuccess={redirectOnSuccessPageName} />
+										<ResetPasswordForm token={token} redirectOnSuccess={indexPageName} />
 									</MiscPageLayout>
-								</Page>
-								<Page name={redirectOnSuccessPageName}>
-									<MiscPageLayout heading="Password reset" actions={<>
-										<Link to={indexPageName}>&larr; Back to login</Link>
-									</>}>
-										<p>
-											Password reset request has been successfully created. Please check your inbox for the instructions.
-										</p>
-										<p>
-											Please follow the link in e-mail or copy the reset token here:
-										</p>
-										<FillResetPasswordTokenForm resetLink={`${passwordResetPageName}(token: $token)`} />
-									</MiscPageLayout>
-								</Page>
-								<Page name={passwordResetPageName}>
-									{({ token }: { token: string }) => (
-										<MiscPageLayout heading="Set a new password" actions={<>
-											<Link to={indexPageName}>&larr; Back to login</Link>
-										</>}>
-											<ResetPasswordForm token={token} redirectOnSuccess={indexPageName} />
-										</MiscPageLayout>
-									)}
-								</Page>
-							</Pages>
-						</RequestProvider>
-					</RoutingContext.Provider>
-					<Toaster />
-				</ToasterProvider>
-			</StyleProvider>
+								)}
+							</Page>
+						</Pages>
+					</Providers>
+				</RequestProvider>
+			</RoutingContext.Provider>
 		</ContemberClient>
 	)
 }

@@ -6,4 +6,5 @@ export enum TenantRole {
 	PROJECT_CREATOR = 'project_creator',
 	PROJECT_MEMBER = 'project_member',
 	PROJECT_ADMIN = 'project_admin',
+	ENTRYPOINT_DEPLOYER = 'entrypoint_deployer',
 }

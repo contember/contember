@@ -72,9 +72,9 @@ const schema: DocumentNode = gql`
 
 		updateProjectMember(projectSlug: String!, identityId: String!, memberships: [MembershipInput!]!): UpdateProjectMemberResponse
 
-		createApiKey(projectSlug: String!, memberships: [MembershipInput!]!, description: String!, tokenHash: String): CreateApiKeyResponse
-		createGlobalApiKey(description: String!, roles: [String!], tokenHash: String): CreateApiKeyResponse
-		disableApiKey(id: String!): DisableApiKeyResponse
+        createApiKey(projectSlug: String!, memberships: [MembershipInput!]!, description: String!, tokenHash: String): CreateApiKeyResponse
+        createGlobalApiKey(description: String!, roles: [String!], tokenHash: String): CreateApiKeyResponse
+        disableApiKey(id: String!): DisableApiKeyResponse
 		addGlobalIdentityRoles(identityId: String!, roles: [String!]!): AddGlobalIdentityRolesResponse
 		removeGlobalIdentityRoles(identityId: String!, roles: [String!]!): RemoveGlobalIdentityRolesResponse
 
@@ -532,9 +532,9 @@ const schema: DocumentNode = gql`
 		endUserMessage: String @deprecated
 	}
 
-	enum DisableApiKeyErrorCode {
-		KEY_NOT_FOUND
-	}
+    enum DisableApiKeyErrorCode {
+        KEY_NOT_FOUND
+    }
 	# === addGlobalIdentityRoles ===
 
 	type AddGlobalIdentityRolesResponse {
@@ -546,7 +546,6 @@ const schema: DocumentNode = gql`
 	type AddGlobalIdentityRolesResult {
 		identity: Identity!
 	}
-
 	type AddGlobalIdentityRolesError {
 		code: AddGlobalIdentityRolesErrorCode!
 		developerMessage: String!
@@ -575,10 +574,10 @@ const schema: DocumentNode = gql`
 		identity: Identity!
 	}
 
-	enum RemoveGlobalIdentityRolesErrorCode {
-		IDENTITY_NOT_FOUND
-		INVALID_ROLE
-	}
+    enum RemoveGlobalIdentityRolesErrorCode {
+        IDENTITY_NOT_FOUND
+        INVALID_ROLE
+    }
 	# === common ===
 
 	# === variables ===
@@ -655,6 +654,7 @@ const schema: DocumentNode = gql`
 
 	type IdentityGlobalPermissions {
 		canCreateProject: Boolean!
+		canDeployEntrypoint: Boolean!
 	}
 
 	type IdentityProjectRelation {

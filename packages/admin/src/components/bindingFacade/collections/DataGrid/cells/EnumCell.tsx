@@ -14,7 +14,8 @@ export type EnumCellProps =
 		field: SugaredFieldProps['field']
 		options: Record<string, string>
 		format?: (value: string | null) => ReactNode
-}
+		initialFilter?: EnumCellArtifacts
+	}
 
 export type EnumCellArtifacts = {
 	values: string[]

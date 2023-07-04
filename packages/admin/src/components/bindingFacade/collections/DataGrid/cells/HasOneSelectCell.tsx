@@ -19,6 +19,9 @@ export type HasOneSelectProps =
 	& BaseDynamicChoiceField
 	& FieldFallbackViewPublicProps
 	& SugaredRelativeSingleEntity
+	& {
+		initialFilter?: SelectCellArtifacts
+	}
 
 /**
  * DataGrid cell which allows displaying and filtering by has-one relations.

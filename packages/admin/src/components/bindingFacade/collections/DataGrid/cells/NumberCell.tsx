@@ -18,6 +18,7 @@ export type NumberCellProps =
 		disableOrder?: boolean
 		initialOrder?: DataGridOrderDirection
 		format?: (value: number) => ReactNode
+		initialFilter?: NumberFilterArtifacts
 	}
 
 export type NumberFilterArtifacts = {

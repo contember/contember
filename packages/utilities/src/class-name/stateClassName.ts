@@ -1,10 +1,5 @@
+import { toKebabCase } from '../string-utilities'
 import { ClassNameStateMap } from './Types'
-
-const UPPER_CASE_REG_EXP = /([A-Z])/g
-
-function toKebabCase(value: string) {
-	return value.replace(UPPER_CASE_REG_EXP, '-$1').toLowerCase()
-}
 
 export interface StateClassNameOptions {
 	glue?: string;

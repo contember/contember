@@ -193,6 +193,8 @@
 :where(.cui-devBar:not([data-expanded])) {
 	transform: translateY(var(--cui-control-height));
 	opacity: 0;
+	max-width: 5rem;
+	margin: auto;
 }
 
 :where(

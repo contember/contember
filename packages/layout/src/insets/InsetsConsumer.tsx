@@ -1,7 +1,9 @@
 import { useComposeRef } from '@contember/react-utils'
 import { NestedClassName, PolymorphicComponentPropsWithRef, PolymorphicRef, useClassName } from '@contember/utilities'
-import React, { ElementType, ReactNode, forwardRef, memo, useRef } from 'react'
-import { useElementInsetCustomProperties } from './useElementInsetCustomProperties'
+import { ElementType, ReactNode, forwardRef, memo, useRef } from 'react'
+import { ContainerInsetsContext } from './Contexts'
+import { screenInsetsToCSSCustomProperties } from './Helpers'
+import { useElementInsets } from './useElementInsets'
 
 export type OwnInsetsConsumerProps = {
 	children?: ReactNode;
@@ -9,44 +11,43 @@ export type OwnInsetsConsumerProps = {
 	componentClassName?: string;
 }
 
-export type InsetsConsumerProps<C extends ElementType> =
-	PolymorphicComponentPropsWithRef<C, OwnInsetsConsumerProps>
+export type InsetsConsumerProps<C extends ElementType> = PolymorphicComponentPropsWithRef<C, OwnInsetsConsumerProps>
 
-export type InsetsConsumerComponentType = (<C extends ElementType = 'div'>(
-	props: InsetsConsumerProps<C>,
-) => React.ReactElement | null) & {
-	displayName?: string | undefined;
-}
+export type InsetsConsumerComponentType =
+	& (<C extends ElementType = 'div'>(props: InsetsConsumerProps<C>) => React.ReactElement | null)
+	& {
+		displayName?: string | undefined;
+	}
 
-export const InsetsConsumer: InsetsConsumerComponentType = memo(forwardRef(
-	<C extends ElementType = 'div'>({
-		as,
-		children,
-		className,
-		componentClassName = 'insets-consumer',
-		style,
-		...rest
-	}: InsetsConsumerProps<C>, forwardedRef: PolymorphicRef<C>) => {
-		const Container = as ?? 'div'
-		const elementRef = useRef<HTMLElement>(null)
-		const composeRef = useComposeRef(elementRef, forwardedRef)
+export const InsetsConsumer: InsetsConsumerComponentType = memo(forwardRef(<C extends ElementType = 'div'>({
+	as,
+	children,
+	className,
+	componentClassName = 'insets-consumer',
+	style,
+	...rest
+}: InsetsConsumerProps<C>, forwardedRef: PolymorphicRef<C>) => {
+	const Container = as ?? 'div'
+	const elementRef = useRef<HTMLElement>(null)
+	const composeRef = useComposeRef(elementRef, forwardedRef)
+	const elementInsets = useElementInsets(elementRef)
+	const insetsStyle = screenInsetsToCSSCustomProperties(elementInsets, '--inset')
 
-		const insetsStyle = useElementInsetCustomProperties(elementRef, '--container-inset-')
-
-		return (
-			<Container
-				as={typeof Container === 'string' ? undefined : 'div'}
-				ref={composeRef}
-				className={useClassName(componentClassName, className)}
-				style={{
-					...insetsStyle,
-					...style,
-				}}
-				{...rest}
-			>
+	return (
+		<Container
+			as={typeof Container === 'string' ? undefined : 'div'}
+			ref={composeRef}
+			className={useClassName(componentClassName, className)}
+			style={{
+				...insetsStyle,
+				...style,
+			}}
+			{...rest}
+		>
+			<ContainerInsetsContext.Provider value={elementInsets}>
 				{children}
-			</Container>
-		)
-	},
-))
+			</ContainerInsetsContext.Provider>
+		</Container>
+	)
+}))
 InsetsConsumer.displayName = 'InsetsConsumer'

@@ -80,34 +80,18 @@
 	display: flex;
 	flex-direction: column;
 	flex: 1;
-	margin: 0 calc(-2 * var(--cui-screen-gap));
-	padding: calc(2 * var(--cui-screen-gap));
+	padding: calc(2 * var(--cui-gap));
 }
 
 :where(.cui-menu-section) {
-	margin-left: var(--cui-edge-offset-left);
 	padding-bottom: calc(var(--cui-padding) / 2);
 	padding-right: 0;
 	padding-top: calc(var(--cui-padding) / 2);
 	position: relative;
 }
 
-:where(.cui-menu-section)::after {
-	border-bottom: 1px solid var(--cui-color--lower);
-	content: "";
-	display: block;
-	left: var(--cui-screen-padding-horizontal);
-	position: absolute;
-	right: 0;
-	top: 0;
-}
-
 :where(.cui-menu-section-title) {
 	letter-spacing: 0.125em;
-	margin-bottom: var(--cui-screen-gap);
-	margin-left: var(--cui-screen-padding-horizontal);
-	margin-right: var(--cui-screen-padding-horizontal);
-	margin-top: var(--cui-screen-gap);
 	padding-bottom: var(--cui-gap);
 	padding-top: var(--cui-gap);
 	text-transform: uppercase;
@@ -123,10 +107,6 @@
 
 :where(.cui-menu-section-list) {
 	list-style: none;
-	margin-bottom: 0;
-	margin-left: var(--cui-screen-padding-horizontal);
-	margin-right: var(--cui-screen-padding-horizontal);
-	margin-top: 0;
 	padding: 0;
 }
 
@@ -136,7 +116,7 @@
 
 :where(.cui-menu-group-list) {
 	list-style: none;
-	padding-left: calc(4 * var(--cui-screen-gap-horizontal));
+	padding-left: calc(4 * var(--cui-gap));
 	position: relative;
 }
 

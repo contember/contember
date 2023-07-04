@@ -1,5 +1,6 @@
 import { Component, useEntity } from '@contember/binding'
-import { Message } from '@contember/ui'
+import { EmptyStateContainer, Message } from '@contember/ui'
+import { SearchX } from 'lucide-react'
 import { ReactNode } from 'react'
 
 export const NotFoundBoundary = Component<{ children: ReactNode }>(
@@ -9,7 +10,9 @@ export const NotFoundBoundary = Component<{ children: ReactNode }>(
 
 		if (node.expectedCardinality === 'one' && !accessor.existsOnServer) {
 			return (
-				<Message intent="danger">Requested entity of type {accessor.name} was not found</Message>
+				<EmptyStateContainer intent="danger" header={<SearchX /> }>
+					<Message intent="danger">Requested entity of type {accessor.name} was not found</Message>
+				</EmptyStateContainer>
 			)
 		} else {
 			return <>{children}</>

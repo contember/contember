@@ -1,3 +1,20 @@
-@import "./layout/index.css";
-@import "./layout-slots/index.css";
-@import "./responsive-app-layout/index.css";
+@import "primitives/index.css";
+@import "slots/index.css";
+@import "kit/index.css";
+
+:where(:root) {
+	--cui-backdrop-blur-opacity: 0.5;
+	--cui-backdrop-blur: 20px;
+
+	--cui-box-padding-vertical: 1rem;
+	--cui-box-padding-horizontal: 1rem;
+	--cui-box-inner-padding-vertical: 0.5rem;
+	--cui-box-inner-padding-horizontal: 0.5rem;
+}
+
+@media screen and (min-width: 1024px) {
+	:where(:root) {
+		--cui-box-padding-horizontal: 2rem;
+		--cui-box-inner-padding-horizontal: 0.75rem;
+	}
+}

@@ -1,14 +1,14 @@
 import { Environment, EnvironmentContext, EnvironmentExtensionProvider } from '@contember/binding'
 import { ContemberClient, ContemberClientProps } from '@contember/react-client'
-import { DialogProvider, SectionTabsProvider, StyleProvider, Toaster, ToasterProvider } from '@contember/ui'
-import { ReactNode } from 'react'
+import { Providers as InterfaceProviders } from '@contember/ui'
+import { ComponentType, PropsWithChildren, ReactNode } from 'react'
 import { I18nProvider, MessageDictionaryByLocaleCode } from '../i18n'
 import { RequestProvider, RouteMap, RoutingContext, RoutingContextValue, SelectedDimension } from '../routing'
+import { OutdatedApplicationChecker } from './Application/OutdatedApplicationChecker'
+import { ApplicationDevBar } from './Dev/DevBar'
 import { IdentityProvider } from './Identity'
 import { NavigationProvider } from './NavigationProvider'
 import { projectEnvironmentExtension } from './Project'
-import { OutdatedApplicationChecker } from './Application/OutdatedApplicationChecker'
-import { ApplicationDevBar } from './Dev/DevBar'
 
 export interface ApplicationEntrypointProps extends ContemberClientProps {
 	basePath?: string
@@ -21,6 +21,7 @@ export interface ApplicationEntrypointProps extends ContemberClientProps {
 	children: ReactNode
 	onInvalidIdentity?: () => void
 	devBarPanels?: ReactNode
+	providers?: ComponentType<PropsWithChildren>
 }
 
 const validateProps = (props: Partial<ApplicationEntrypointProps>) => {
@@ -51,40 +52,35 @@ export const ApplicationEntrypoint = (props: ApplicationEntrypointProps) => {
 		.withVariables(props.envVariables)
 		.withDimensions(props.defaultDimensions ?? {})
 
+	const Providers = props.providers ?? InterfaceProviders
+
 	return (
-		<StyleProvider>
-			<EnvironmentContext.Provider value={rootEnv}>
-				<I18nProvider localeCode={props.defaultLocale} dictionaries={props.dictionaries}>
-					<RoutingContext.Provider value={routing}>
-						<RequestProvider>
-							<ToasterProvider>
-								<ContemberClient
-									apiBaseUrl={props.apiBaseUrl}
-									sessionToken={props.sessionToken}
-									loginToken={props.loginToken}
-									project={projectSlug}
-									stage={props.stage}
-								>
-									<EnvironmentExtensionProvider extension={projectEnvironmentExtension} state={projectSlug ?? null}>
-										<DialogProvider>
-											<NavigationProvider>
-												<IdentityProvider onInvalidIdentity={props.onInvalidIdentity}>
-													<OutdatedApplicationChecker />
-													<SectionTabsProvider>
-														{props.children}
-													</SectionTabsProvider>
-													<ApplicationDevBar panels={props.devBarPanels} />
-												</IdentityProvider>
-											</NavigationProvider>
-											<Toaster />
-										</DialogProvider>
-									</EnvironmentExtensionProvider>
-								</ContemberClient>
-							</ToasterProvider>
-						</RequestProvider>
-					</RoutingContext.Provider>
-				</I18nProvider>
-			</EnvironmentContext.Provider>
-		</StyleProvider>
+		<EnvironmentContext.Provider value={rootEnv}>
+			<I18nProvider localeCode={props.defaultLocale} dictionaries={props.dictionaries}>
+				<RoutingContext.Provider value={routing}>
+					<RequestProvider>
+						<ContemberClient
+							apiBaseUrl={props.apiBaseUrl}
+							sessionToken={props.sessionToken}
+							loginToken={props.loginToken}
+							project={projectSlug}
+							stage={props.stage}
+						>
+							<EnvironmentExtensionProvider extension={projectEnvironmentExtension} state={projectSlug ?? null}>
+								<NavigationProvider>
+									<IdentityProvider onInvalidIdentity={props.onInvalidIdentity}>
+										<Providers>
+											<OutdatedApplicationChecker />
+											{props.children}
+											<ApplicationDevBar panels={props.devBarPanels} />
+										</Providers>
+									</IdentityProvider>
+								</NavigationProvider>
+							</EnvironmentExtensionProvider>
+						</ContemberClient>
+					</RequestProvider>
+				</RoutingContext.Provider>
+			</I18nProvider>
+		</EnvironmentContext.Provider>
 	)
 }

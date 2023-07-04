@@ -34,5 +34,8 @@
 	},
 	"peerDependencies": {
 		"react": "^17 || ^18"
+	},
+	"dependencies": {
+		"type-fest": "^3.12.0"
 	}
 }

@@ -1,4 +1,5 @@
 :where(.cui-anchor) {
+	align-items: center;
 	border-radius: var(--cui-control-border-radius);
 	display: inline-flex;
 	color: var(--cui-control-color);

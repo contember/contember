@@ -1,3 +1,4 @@
+import { useExpectSameValueReference } from '@contember/react-utils'
 import { NavigationContext, PreventCloseContext } from '@contember/ui'
 import { ReactNode, useCallback, useContext, useEffect, useRef } from 'react'
 
@@ -11,9 +12,8 @@ const PREVENT_HAPPENED_RECENTLY = 100
 export function MenuAutoCloseProvider({ children, onAutoClose }: MenuAutoCloseProviderProps): JSX.Element {
 	const onAutoCloseRef = useRef(onAutoClose)
 
-	if (onAutoCloseRef.current !== onAutoClose) {
-		throw new Error('Callback reference is not stable. Try memoizing the callback with useCallback, useReferentiallyStableCallback, useEvent or useRef')
-	}
+	useExpectSameValueReference(onAutoCloseRef.current)
+
 
 	const navigationContext = useContext(NavigationContext)
 	const preventedAt = useRef<Date | null>(null)

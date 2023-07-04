@@ -14,7 +14,7 @@ import {
 	useOnPersistSuccess,
 } from '@contember/admin'
 import { Directive, Title } from '../components/Directives'
-import { Slots } from '../components/Slots'
+import { SlotSources } from '../components/Slots'
 
 const AutoGridList = () => {
 	const env = useEnvironment()
@@ -33,11 +33,10 @@ const AutoGridList = () => {
 export default (
 	<>
 		<Title>Auto Admin</Title>
-		<Slots.ContentStack>
-			<DataBindingProvider stateComponent={FeedbackRenderer}>
-				<AutoGridList />
-			</DataBindingProvider>
-		</Slots.ContentStack>
+
+		<DataBindingProvider stateComponent={FeedbackRenderer}>
+			<AutoGridList />
+		</DataBindingProvider>
 	</>
 )
 
@@ -57,20 +56,19 @@ export function Grid() {
 	)
 
 	return (
-		<DataBindingProvider stateComponent={FeedbackRenderer}>
-			<Directive name="layout" content="default" />
+		<>
+			<Directive name="content-max-width" content={null} />
+			<DataBindingProvider stateComponent={FeedbackRenderer}>
+				<SlotSources.Back>
+					<NavigateBackLink to={{ pageName: 'auto' }}>Back to Auto</NavigateBackLink>
+				</SlotSources.Back>
 
-			<Slots.Back>
-				<NavigateBackLink to={{ pageName: 'auto' }}>Back to Auto</NavigateBackLink>
-			</Slots.Back>
+				<Title>{`List ${entity}`}</Title>
+				<SlotSources.Actions>{actions}</SlotSources.Actions>
 
-			<Title>{`List ${entity}`}</Title>
-
-			<Slots.Actions>{actions}</Slots.Actions>
-			<Slots.ContentStack>
 				<AutoGrid entities={entity + filter} createViewLinkTarget={createViewLinkTarget} createEditLinkTarget={createEditLinkTarget} />
-			</Slots.ContentStack>
-		</DataBindingProvider>
+			</DataBindingProvider>
+		</>
 	)
 }
 
@@ -87,18 +85,16 @@ export function Form() {
 	return (
 		<>
 			<Title>{title}</Title>
-			<Slots.Back>
+			<SlotSources.Back>
 				<NavigateBackLink to={{ pageName: 'auto/grid', parameters: { entity } }}>Back to Grid</NavigateBackLink>
-			</Slots.Back>
+			</SlotSources.Back>
 
-			<Slots.ContentStack>
-				<DataBindingProvider stateComponent={FeedbackRenderer} >
-					<Slots.Actions>
-						<PersistButton />
-					</Slots.Actions>
-					<AutoForm entity={entity} id={id} onCreateSuccess={onCreateSuccess} createEditLink={createEditLink} />
-				</DataBindingProvider>
-			</Slots.ContentStack>
+			<DataBindingProvider stateComponent={FeedbackRenderer} >
+				<SlotSources.Actions>
+					<PersistButton />
+				</SlotSources.Actions>
+				<AutoForm entity={entity} id={id} onCreateSuccess={onCreateSuccess} createEditLink={createEditLink} />
+			</DataBindingProvider>
 		</>
 	)
 }

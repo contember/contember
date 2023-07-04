@@ -1,0 +1,28 @@
+:where(.cui-layout-panel-header) {
+	-webkit-backdrop-filter: blur(var(--cui-backdrop-blur));
+	backdrop-filter: blur(var(--cui-backdrop-blur));
+	background-color: rgba(var(--cui-header-background-color-rgb), var(--cui-header-background-color-alpha));
+	background-image: linear-gradient(rgb(var(--cui-background-color-rgb)), transparent);
+	left: 0;
+	padding-bottom: var(--cui-box-padding-vertical);
+	padding-left: max(var(--inset-left, 0px), var(--cui-box-padding-horizontal));
+	padding-right: max(var(--inset-right, 0px), var(--cui-box-padding-horizontal));
+	padding-top: max(var(--inset-top, 0px), var(--cui-box-padding-vertical));
+	position: sticky;
+	top: 0;
+	width: 100%;
+	z-index: 1;
+}
+
+:where(.cui-layout-panel-header-content) {
+	display: flex;
+	flex-direction: row;
+	gap: var(--cui-gutter);
+	justify-content: space-between;
+}
+
+:where(.cui-layout-panel-header):empty {
+	--cui-box-padding-vertical: 0px;
+	--cui-box-padding-horizontal: 0px;
+	padding-bottom: 0;
+}

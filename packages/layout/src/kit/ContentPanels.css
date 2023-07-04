@@ -1,0 +1,23 @@
+:where(.cui-layout-content-panel) {
+	--cui-header-background-color-rgb: var(--cui-background-color-rgb);
+	--cui-footer-background-color-rgb: var(--cui-background-color-rgb);
+	max-width: unset;
+}
+
+:where(.cui-layout-content-panel > .cui-layout-panel-content) {
+	overflow: unset;
+}
+
+:where(
+	.cui-layout-panel-header > .cui-layout-panel-header-content,
+	.cui-layout-panel-body > .cui-layout-panel-body-content,
+	.cui-layout-panel-footer > .cui-layout-panel-footer-content,
+) {
+	margin: auto;
+	max-width: var(--panel-max-width);
+	min-width: min(
+		calc(100% - 2 * var(--cui-box-padding-horizontal)),
+		var(--panel-min-width),
+	);
+	width: 100%;
+}

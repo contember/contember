@@ -44,7 +44,7 @@ export const Layout = memo(({
 	titleThemeControls,
 }: LayoutProps) => {
 	return (
-		<div className={useClassName('layout', className)}>
+		<div className={useClassName(['layout', 'legacy-layout'], className)}>
 			<LayoutChrome
 				sidebarHeader={sidebarHeader}
 				sidebarFooter={sidebarFooter}

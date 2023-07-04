@@ -1,4 +1,5 @@
-import { createDirectiveContext } from '@contember/layout'
+import { CommonSlotSources, Directives } from '@contember/layout'
+import { useDocumentTitle } from '@contember/react-utils'
 import { Intent } from '@contember/ui'
 import { memo } from 'react'
 import { LAYOUT_BREAKPOINT } from './Constants'
@@ -13,6 +14,7 @@ export type DirectivesType = {
 	'layout': LayoutType | undefined;
 	'layout.theme-content': Intent | null | undefined;
 	'layout.theme-controls': Intent | null | undefined;
+	'safe-area-insets': number | undefined;
 	'title': string | null | undefined,
 }
 
@@ -25,12 +27,19 @@ export const initialDirectives: DirectivesType = Object.freeze({
 	'layout': 'default',
 	'layout.theme-content': 'default',
 	'layout.theme-controls': 'primary',
+	'safe-area-insets': 20,
 	'title': undefined,
 })
 
-export const directivesList = Object.keys(initialDirectives) as (keyof DirectivesType)[]
-export const [DirectivesProvider, Directive, DirectivesConsumer, useDirectives] = createDirectiveContext<DirectivesType>('Directives', initialDirectives)
+export const Directive = Directives.Directive as unknown as Directives.DirectiveComponentType<DirectivesType> // <DirectivesType>
+export const useDirectives = Directives.useDirectives<DirectivesType>
 
-export const Title = memo<{ children: string | null | undefined }>(({ children }) => (
-	<Directive name="title" content={children} />
-))
+export const Title = memo<{ children: string | null | undefined }>(({ children }) => {
+	useDocumentTitle(children)
+
+	return (
+		<CommonSlotSources.Title>{children}</CommonSlotSources.Title>
+	)
+})
+
+// export const Title = CommonSlotSources.Title

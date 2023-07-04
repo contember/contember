@@ -10,6 +10,8 @@ testInterface({
 		'auto.tsx',
 		'brand.tsx',
 		'lorem.tsx',
+		'examples.tsx',
+		'settings.tsx',
 		'nested/**',
 		'random.tsx',
 		'tenant**',

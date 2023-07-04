@@ -1,4 +1,5 @@
 @import "../../../../packages/admin/src/index";
+@import "../../../../packages/brand/src/index";
 
 .cui-layout-main {
 	background: #f3f3f3;

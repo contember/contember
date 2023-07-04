@@ -6,6 +6,7 @@ interface MenuExpandToggleProps {
 	controls: string
 	disabled: boolean
 	checked: boolean
+	label?: string
 	onChange: (checked: boolean) => void
 }
 
@@ -13,6 +14,7 @@ export const MenuExpandToggle = memo(forwardRef<HTMLButtonElement, MenuExpandTog
 	controls,
 	checked,
 	disabled,
+	label,
 	onChange,
 }, ref) => {
 	const componentClassName = useClassNameFactory('menu-expand-toggle')
@@ -25,6 +27,7 @@ export const MenuExpandToggle = memo(forwardRef<HTMLButtonElement, MenuExpandTog
 		className={componentClassName(null, [
 			toStateClass('collapsed', !checked),
 		])}
+		aria-label={label}
 		aria-haspopup="true"
 		aria-controls={controls}
 		aria-expanded={checked}

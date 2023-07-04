@@ -3,13 +3,13 @@ import { ReactNode, SyntheticEvent, useCallback } from 'react'
 import { isSpecialLinkClick, toStateClass } from '../../utils'
 
 interface MenuLinkProps {
-	href: string
-	onClick?: (e: SyntheticEvent<HTMLElement>) => void
-	suppressTo: boolean
-	isActive?: boolean
-	className?: string
-	external?: boolean | undefined
-	children?: ReactNode
+	children?: ReactNode;
+	className?: string;
+	external?: boolean | undefined;
+	href: string;
+	isActive?: boolean;
+	onClick?: (e: SyntheticEvent<HTMLElement>) => void;
+	suppressTo: boolean;
 }
 
 export function MenuLink({ className, children, external, href, isActive, onClick: onNavigate, suppressTo }: MenuLinkProps) {

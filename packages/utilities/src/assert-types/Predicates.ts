@@ -1,3 +1,5 @@
+import { Predicate, SlugString, UnionOfPredicateTypes } from './types'
+
 export function isNull(value: unknown): value is null {
   return value === null
 }
@@ -25,6 +27,9 @@ export function isFalse(value: unknown): value is false {
 export function isString(value: unknown): value is string {
   return typeof value === 'string'
 }
+export function isSlugString(value: unknown): value is SlugString {
+	return isNonEmptyString(value) && /^[a-z0-9_-]+$/.test(value)
+}
 export function isNonEmptyString(value: unknown): value is string {
   return isString(value) && value.length > 0
 }
@@ -50,6 +55,20 @@ export function isOneOfFactory<U, T = any>(
 ): (value: unknown) => value is U {
 	return function isOneOfFactoryProduct(value: unknown): value is U {
 		return members.includes(value as U)
+	}
+}
+export function satisfiesOneOfFactory<T extends Array<Predicate<any, any>>>(
+	...predicates: T
+): Predicate<unknown, UnionOfPredicateTypes<T>> {
+	return (value: any): value is UnionOfPredicateTypes<T> => {
+		return predicates.some(predicate => predicate(value))
+	}
+}
+export function isArrayOfMembersSatisfyingFactory<T>(
+	predicate: (value: unknown) => value is T,
+): (value: unknown) => value is Array<T> {
+	return function isArrayOfMembersSatisfyingProduct(value: unknown): value is Array<T> {
+		return Array.isArray(value) && value.every(predicate)
 	}
 }
 export function isHTMLElement(value: unknown): value is HTMLElement {

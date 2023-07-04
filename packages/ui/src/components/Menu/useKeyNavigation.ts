@@ -1,6 +1,6 @@
 import {
-	KeyboardEvent as ReactKeyboardEvent,
 	KeyboardEventHandler,
+	KeyboardEvent as ReactKeyboardEvent,
 	RefObject,
 	SyntheticEvent,
 	useCallback,
@@ -33,19 +33,11 @@ export const useKeyNavigation = ({ changeExpand, expanded, depth, isInteractive,
 		}
 
 		switch (event.code) {
-			case 'ArrowLeft':
-				if (expanded) {
-					changeExpand(false)
-				} else {
-					previousFocusable()?.focus()
-				}
-				event.preventDefault()
-				break
-			case 'ArrowRight':
+			case 'Enter':
 				if (!expanded && isInteractive) {
 					changeExpand(true)
 				} else {
-					nextFocusable()?.focus()
+					onClick(event)
 				}
 				event.preventDefault()
 				break
@@ -53,14 +45,12 @@ export const useKeyNavigation = ({ changeExpand, expanded, depth, isInteractive,
 				changeExpand(!expanded)
 				event.preventDefault()
 				break
-			case 'Enter':
-				onClick(event)
-				event.preventDefault()
-				break
+			case 'ArrowLeft':
 			case 'ArrowUp':
 				previousFocusable()?.focus()
 				event.preventDefault()
 				break
+			case 'ArrowRight':
 			case 'ArrowDown':
 				nextFocusable()?.focus()
 				event.preventDefault()

@@ -354,6 +354,8 @@ export interface ApplicationEntrypointProps extends ContemberClientProps {
     // (undocumented)
     onInvalidIdentity?: () => void;
     // (undocumented)
+    providers?: ComponentType<PropsWithChildren>;
+    // (undocumented)
     routes?: RouteMap;
     // (undocumented)
     sessionToken?: string;

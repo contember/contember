@@ -22,11 +22,10 @@ import {
 	TextField,
 	TimeField,
 	UrlField,
-	UseControlProps,
 	useFieldControl,
 } from '@contember/admin'
 import { Title } from '../components/Directives'
-import { Slots } from '../components/Slots'
+import { SlotSources } from '../components/Slots'
 
 export const JsonField = SimpleRelativeSingleField<TextareaFieldProps, string>(
 	(fieldMetadata, {
@@ -60,58 +59,57 @@ const extraDebugProps = SHOW_OVERRIDES ? {
 export default () => (
 	<EditScope entity="InputShowcase(unique = One)" setOnCreate="(unique = One)">
 		<Title>Inputs Showcase</Title>
-		<Slots.Actions>
+		<SlotSources.Actions>
 			<PersistButton />
-		</Slots.Actions>
+		</SlotSources.Actions>
 		<style>{`
 		.background-container { background-color: pink !important; }
 		.background-input { background-color: lightblue !important; }
 		`}</style>
-		<Slots.ContentStack>
-			<TextField {...extraDebugProps} required labelPosition="labelLeft" field={'textValue'} label={'Text'} placeholder="Enter text..." />
-			<DisplayTextField {...extraDebugProps} labelPosition="labelLeft" field={'textValue'} label={'Text'} placeholder="N/A" direction="horizontal-reverse" />
-			<TextField {...extraDebugProps} field={'notNullTextValue'} label={'Not null text'} />
-			<EmailField {...extraDebugProps} field={'emailValue'} label={'Your email'} />
-			<SearchField {...extraDebugProps} field={'searchValue'} label={'Search page'} />
-			<UrlField {...extraDebugProps} field={'urlValue'} label={'URL'} />
-			<SlugField {...extraDebugProps} required derivedFrom={'textValue'} field={'slugValue'} label={'Slug with prefix'} unpersistedHardPrefix="https://www.contember.com/" linkToExternalUrl />
-			<SlugField {...extraDebugProps} derivedFrom={'textValue'} field={'slugValue'} label={'Slug without prefix'} />
-			<TextareaField {...extraDebugProps} field={'multilineValue'} label={'Multiline text'} />
-			<CheckboxField {...extraDebugProps} field={'boolValue'} label={'Bool'} />
-			<CheckboxField {...extraDebugProps} field={'boolValue'} label={'Bool'} description="Same checkbox with description" labelDescription="This could be true or false or null" />
-			<NumberField {...extraDebugProps} field={'intValue'} label={'Int'} step={2} />
-			<FloatField {...extraDebugProps} field={'floatValue'} label={'Float value'} />
-			<TimeField {...extraDebugProps} field={'timeValue'} label={'Time'} />
-			<TimeField {...extraDebugProps} field={'timeValue'} label={'Time'} seconds />
-			<DateField {...extraDebugProps} field={'dateValue'} label={'Date'} />
-			<DateTimeField {...extraDebugProps} field={'dateTimeValue'} label={'Date time'} />
-			<DateTimeField {...extraDebugProps} field={'dateTimeValue'} label={'Date time'} min="2020-12-02T01:20" max="2022-01-20T23:13" />
-			<LocationField {...extraDebugProps} latitudeField={'gpsLatValue'} longitudeField={'gpsLonValue'} label={'Map'} />
-			<RadioField {...extraDebugProps} field={'enumValue'} label={'Value'} options={[
-				{ value: 'a', label: 'A option' },
-				{ value: 'b', label: 'B option' },
-				{ value: 'c', label: 'C option' },
-			]} orientation={'horizontal'} />
-			<BlockRepeater
-				field="blocks"
-				label={undefined}
-				discriminationField="type"
-				sortableBy="order"
-				addButtonText="Add content block"
+
+		<TextField {...extraDebugProps} required labelPosition="labelLeft" field={'textValue'} label={'Text'} placeholder="Enter text..." />
+		<DisplayTextField {...extraDebugProps} labelPosition="labelLeft" field={'textValue'} label={'Text'} placeholder="N/A" direction="horizontal-reverse" />
+		<TextField {...extraDebugProps} field={'notNullTextValue'} label={'Not null text'} />
+		<EmailField {...extraDebugProps} field={'emailValue'} label={'Your email'} />
+		<SearchField {...extraDebugProps} field={'searchValue'} label={'Search page'} />
+		<UrlField {...extraDebugProps} field={'urlValue'} label={'URL'} />
+		<SlugField {...extraDebugProps} required derivedFrom={'textValue'} field={'slugValue'} label={'Slug with prefix'} unpersistedHardPrefix="https://www.contember.com/" linkToExternalUrl />
+		<SlugField {...extraDebugProps} derivedFrom={'textValue'} field={'slugValue'} label={'Slug without prefix'} />
+		<TextareaField {...extraDebugProps} field={'multilineValue'} label={'Multiline text'} />
+		<CheckboxField {...extraDebugProps} field={'boolValue'} label={'Bool'} />
+		<CheckboxField {...extraDebugProps} field={'boolValue'} label={'Bool'} description="Same checkbox with description" labelDescription="This could be true or false or null" />
+		<NumberField {...extraDebugProps} field={'intValue'} label={'Int'} step={2} />
+		<FloatField {...extraDebugProps} field={'floatValue'} label={'Float value'} />
+		<TimeField {...extraDebugProps} field={'timeValue'} label={'Time'} />
+		<TimeField {...extraDebugProps} field={'timeValue'} label={'Time'} seconds />
+		<DateField {...extraDebugProps} field={'dateValue'} label={'Date'} />
+		<DateTimeField {...extraDebugProps} field={'dateTimeValue'} label={'Date time'} />
+		<DateTimeField {...extraDebugProps} field={'dateTimeValue'} label={'Date time'} min="2020-12-02T01:20" max="2022-01-20T23:13" />
+		<LocationField {...extraDebugProps} latitudeField={'gpsLatValue'} longitudeField={'gpsLonValue'} label={'Map'} />
+		<RadioField {...extraDebugProps} field={'enumValue'} label={'Value'} options={[
+			{ value: 'a', label: 'A option' },
+			{ value: 'b', label: 'B option' },
+			{ value: 'c', label: 'C option' },
+		]} orientation={'horizontal'} />
+		<BlockRepeater
+			field="blocks"
+			label={undefined}
+			discriminationField="type"
+			sortableBy="order"
+			addButtonText="Add content block"
+		>
+			<Block
+				discriminateBy="heroSection"
+				label="Hero section"
 			>
-				<Block
-					discriminateBy="heroSection"
-					label="Hero section"
-				>
-					<TextField {...extraDebugProps} field="primaryText" label="Headline" />
-				</Block>
-			</BlockRepeater>
-			<SelectField {...extraDebugProps} field={'selectValue'} label={'Value'} options={[
-				{ value: 'a', label: 'A option' },
-				{ value: 'b', label: 'B option' },
-				{ value: 'c', label: 'C option' },
-			]} />
-			<JsonField {...extraDebugProps} field={'jsonValue'} label={'JSON'} />
-		</Slots.ContentStack>
+				<TextField {...extraDebugProps} field="primaryText" label="Headline" />
+			</Block>
+		</BlockRepeater>
+		<SelectField {...extraDebugProps} field={'selectValue'} label={'Value'} options={[
+			{ value: 'a', label: 'A option' },
+			{ value: 'b', label: 'B option' },
+			{ value: 'c', label: 'C option' },
+		]} />
+		<JsonField {...extraDebugProps} field={'jsonValue'} label={'JSON'} />
 	</EditScope>
 )

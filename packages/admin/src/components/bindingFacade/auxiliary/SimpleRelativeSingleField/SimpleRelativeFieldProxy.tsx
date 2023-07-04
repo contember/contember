@@ -1,9 +1,10 @@
 import { SugaredRelativeSingleField, useEnvironment, useField, useMutationState } from '@contember/binding'
-import { FieldContainer, FieldContainerProps, NonOptional } from '@contember/ui'
+import { FieldContainer, FieldContainerProps } from '@contember/ui'
 import { CSSProperties, ReactNode, memo, useMemo } from 'react'
 import { useLabelMiddleware } from '../../environment/LabelMiddleware'
 import { useAccessorErrors } from '../../errors'
 import type { SimpleRelativeSingleFieldMetadata } from './SimpleRelativeSingleField'
+import { NonOptional } from '@contember/utilities'
 
 // Props that are handled by the FieldContainer:
 export type SimpleRelativeSingleFieldProxyFieldContainerProps = Omit<FieldContainerProps, 'children' | 'className' | 'style'>

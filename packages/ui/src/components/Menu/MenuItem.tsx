@@ -18,7 +18,7 @@ import { useMenuId } from './useMenuId'
 /**
  * @group UI
  */
-export function MenuItem<T = unknown>({ children, ...props }: MenuItemProps<T>) {
+export function MenuItem<T = unknown>({ children, componentClassName = 'menu', ...props }: MenuItemProps<T>) {
 	const depth = useContext(DepthContext)
 
 	const { isActive, href, navigate } = useNavigationLink(props.to, props.href)
@@ -27,7 +27,7 @@ export function MenuItem<T = unknown>({ children, ...props }: MenuItemProps<T>) 
 	const label = useChildrenAsLabel(props.title)
 
 	const menuItemId = `cui-menu-item-${depth}-${href ?? label}`
-	const componentClassName = useClassNameFactory(depth === 0 ? 'menu-section' : 'menu-group')
+	const className = useClassNameFactory(depth === 0 ? `${componentClassName}-section` : `${componentClassName}-group`)
 
 	const listItemRef = useRef<HTMLLIElement>(null)
 	const listItemTitleRef = useRef<HTMLDivElement>(null)
@@ -49,11 +49,11 @@ export function MenuItem<T = unknown>({ children, ...props }: MenuItemProps<T>) 
 	}, [isActive, href, expandParent])
 
 	const hasSubItems = !!children
-	const isInteractive = hasSubItems && depth > 0
+	const isInteractive = hasSubItems //&& depth > 0
 
 	const activeMenuItem = useActiveMenuItemContext()
 
-	const tabIndex = (depth > 0 && hasSubItems) || href
+	const tabIndex = (depth >= 0 && hasSubItems) || href
 		? parentIsExpanded
 			? !activeMenuItem || activeMenuItem === listItemRef.current ? TAB_INDEX_FOCUSABLE : TAB_INDEX_TEMPORARY_UNFOCUSABLE
 			: TAB_INDEX_NEVER_FOCUSABLE
@@ -102,15 +102,15 @@ export function MenuItem<T = unknown>({ children, ...props }: MenuItemProps<T>) 
 
 	const onKeyPress = useKeyNavigation({ changeExpand, expanded, depth, isInteractive, listItemRef, onClick: onLabelClick })
 
-	const submenuClassName = componentClassName('list', [
+	const submenuClassName = className('list', [
 		hasSubItems && (expanded ? 'is-expanded' : 'is-collapsed'),
 	])
 
 	const submenu = useMemo(
 		() => {
-			const ul = (
+			const ul = children && (
 				<ul
-					aria-labelledby={isInteractive ? id.current : undefined}
+					id={isInteractive ? id.current : undefined}
 					className={submenuClassName}
 				>
 					{children}
@@ -147,8 +147,7 @@ export function MenuItem<T = unknown>({ children, ...props }: MenuItemProps<T>) 
 					ref={listItemRef}
 					{...interactiveProps}
 					aria-label={label}
-					role={href ? 'link' : undefined}
-					className={componentClassName(null, [
+					className={className(null, [
 						hasSubItems && (expanded ? 'is-expanded' : 'is-collapsed'),
 						toStateClass('interactive', isInteractive),
 						toStateClass('active', isActive),
@@ -157,31 +156,36 @@ export function MenuItem<T = unknown>({ children, ...props }: MenuItemProps<T>) 
 					tabIndex={tabIndex}
 					aria-disabled={tabIndex === TAB_INDEX_NEVER_FOCUSABLE}
 				>
-					<div ref={listItemTitleRef} className={componentClassName('title')}>
-						{isInteractive && <MenuExpandToggle
-							checked={expanded}
-							controls={id.current}
-							disabled={!isInteractive}
-							onChange={changeExpand}
-						/>}
+					<div ref={listItemTitleRef} className={className('title')}>
 						{href
 							? <MenuLink
-								className={componentClassName('title-content')}
+								className={className('title-content')}
 								external={props.external}
 								href={href}
 								isActive={isActive}
 								onClick={onLabelClick}
 								suppressTo={expanded}
 							>
-								<Label className={componentClassName('title-label')}>{props.title}</Label>
+								<Label className={className('title-label')}>{props.title}</Label>
 							</MenuLink>
 							: <span
-								className={componentClassName('title-content')}
+								className={className('title-content')}
 								onClick={onLabelClick}
 							>
-								<Label className={componentClassName('label')}>{props.title}</Label>
+								<Label className={className('label')}>{props.title}</Label>
 							</span>
 						}
+
+						{isInteractive && (
+							<MenuExpandToggle
+								checked={expanded}
+								controls={id.current}
+								// TODO: Needs translation
+								label={`More ${label}`}
+								disabled={!isInteractive}
+								onChange={changeExpand}
+							/>
+						)}
 					</div>
 					{submenu}
 				</li>

@@ -1,68 +1,100 @@
-import { Button, DevPanel, Link, LogoutLink, Stack, VisuallyHidden } from '@contember/admin'
+import { Button, DevPanel, DimensionsSwitcher, Link, LogoutLink, Scheme, Spacer, Stack, VisuallyHidden, toSchemeClass, toThemeClass } from '@contember/admin'
 import { Identity2023 } from '@contember/brand'
-import { useContainerWidth, useDocumentTitle } from '@contember/react-utils'
-import { Intent, Radio, Spacer } from '@contember/ui'
-import { LayoutIcon, LogOutIcon, PaintBucketIcon } from 'lucide-react'
-import { PropsWithChildren, useState } from 'react'
+import { SafeAreaInsetsProvider } from '@contember/layout'
+import { useContainerWidth, useDocumentTitle, useReferentiallyStableCallback, useSessionStorageState } from '@contember/react-utils'
+import { Intent, Radio } from '@contember/ui'
+import { CircleDashedIcon, LayoutIcon, LogOutIcon, MoonIcon, PaintBucketIcon, SmartphoneIcon, SunIcon } from 'lucide-react'
+import { PropsWithChildren, memo, useMemo, useRef, useState } from 'react'
 import { AlertLogoutLink } from './AlertLogoutLink'
 import { LAYOUT_BREAKPOINT } from './Constants'
-import { Directive, DirectivesType, useDirectives } from './Directives'
+import { Directive, DirectivesType, initialDirectives, useDirectives } from './Directives'
 import { LayoutType, Layouts } from './Layouts'
 import { Navigation } from './Navigation'
-import { Slots } from './Slots'
+import { SlotSources } from './Slots'
 
-export const Layout = (props: PropsWithChildren) => {
+export const Layout = memo(({ children }: PropsWithChildren) => {
 	const directives = useDirectives()
 	useDocumentTitle(directives.title)
 
-	const LayoutComponent = Layouts[directives.layout ?? 'default'] ?? Layouts.default
+	const LayoutComponent = Layouts[directives?.layout ?? 'default'] ?? Layouts.default
 	const width = useContainerWidth()
 
-	return (
-		<>
-			<Slots.Title>
-				<h1>{directives.title}</h1>
-			</Slots.Title>
-
-			<Slots.Logo>
-				<Link to="index">
-					<Stack align="center" direction="horizontal" gap="small">
-						<Identity2023.Edit scale={2} />
-						<VisuallyHidden hidden={width < LAYOUT_BREAKPOINT}>Contember</VisuallyHidden>
-					</Stack>
-				</Link>
-			</Slots.Logo>
-
-			<Slots.Navigation>
-				<Navigation />
-			</Slots.Navigation>
-
-			<Slots.Profile>
-				<LogoutLink Component={AlertLogoutLink}>
-					<Stack align="center" direction="horizontal" gap="small">
-						<LogOutIcon /> Logout
-					</Stack>
-				</LogoutLink>
-			</Slots.Profile>
-
-			<LayoutComponent />
-
-			{props.children}
-		</>
+	const [scheme, setScheme] = useSessionStorageState<Scheme>(
+		'contember-admin-sandbox-scheme',
+		scheme => scheme ?? 'system',
 	)
-}
+
+	const safeAreaInsets = directives['safe-area-insets'] ?? 0
+
+	return (
+		<SafeAreaInsetsProvider insets={useMemo(() => ({ top: safeAreaInsets, right: safeAreaInsets, left: safeAreaInsets, bottom: safeAreaInsets }), [safeAreaInsets])}>
+			<LayoutComponent
+				className={[
+					toThemeClass(directives['layout.theme-content'], directives['layout.theme-controls']),
+					toSchemeClass(scheme),
+				]}
+			>
+				<SlotSources.Logo>
+					<Link to="index">
+						<Stack align="center" direction="horizontal" gap="small">
+							<Identity2023.Edit scale={2} />
+							<VisuallyHidden hidden={width < LAYOUT_BREAKPOINT}>Contember</VisuallyHidden>
+						</Stack>
+					</Link>
+				</SlotSources.Logo>
+
+				<SlotSources.Switchers>
+					<Button
+						size="small"
+						elevation="none"
+						distinction="seamless"
+						active={!scheme.match(/system/)}
+						flow="circular"
+						onClick={useReferentiallyStableCallback(() => {
+							setScheme(scheme => (scheme.match(/light/) ? 'dark' : scheme.match(/dark/) ? 'system' : 'light'))
+						})}
+						aria-label={scheme.match(/light/) ? 'Light mode, switch to dark mode' : scheme.match(/dark/) ? 'Dark mode, switch to light mode' : 'System mode, switch to system mode'}
+					>
+						{scheme.match(/light/) ? <SunIcon /> : scheme.match(/dark/) ? <MoonIcon /> : <CircleDashedIcon />}
+					</Button>
+
+					<DimensionsSwitcher
+						optionEntities="Locale"
+						orderBy="code asc"
+						dimension="locale"
+						labelField="code"
+						slugField="code"
+						maxItems={1}
+					/>
+				</SlotSources.Switchers>
+
+				{Navigation && (
+					<SlotSources.Navigation>
+						<Navigation />
+					</SlotSources.Navigation>
+				)}
+
+				<SlotSources.Profile>
+					<LogoutLink Component={AlertLogoutLink}>
+						<Stack align="center" direction="horizontal" gap="small">
+							<LogOutIcon /> Logout
+						</Stack>
+					</LogoutLink>
+				</SlotSources.Profile>
+
+				{children}
+			</LayoutComponent>
+		</SafeAreaInsetsProvider>
+	)
+})
+Layout.displayName = 'Layout'
 
 export const LayoutDevPanel = () => {
 	const [typeState, setTypeState] = useState<LayoutType>()
 	const { layout } = useDirectives()
-/*
-	const registered = Directives.useDirectiveLifecycle('layout', typeState)
 
-	return !registered
-		? null
-		: (
-*/
-	return (
+	return layout
+		? (
 			<>
 				<Directive key={typeState ?? '(unset)'} name="layout" content={typeState} />
 				<DevPanel icon={<LayoutIcon />} heading={`Layout: ${layout}`}>
@@ -80,6 +112,66 @@ export const LayoutDevPanel = () => {
 				</DevPanel>
 			</>
 		)
+		: null
+}
+Layout.displayName = 'SandBox.Layout'
+
+const MAX_INSET = 90
+const MIN_INSET = 0
+
+export const SafeAreasDevPanel = () => {
+	const [inset, setInset] = useState<number>(initialDirectives['safe-area-insets'] ?? 0)
+	const shiftPressed = useRef(false)
+
+	const handleSetInset = useReferentiallyStableCallback((inset: number) => {
+		setInset(Math.max(MIN_INSET, Math.min(MAX_INSET, inset)))
+	})
+
+	const handleKeyUp = useReferentiallyStableCallback((event: React.KeyboardEvent<HTMLInputElement>) => {
+		if (event.key === 'Shift') {
+			shiftPressed.current = false
+		}
+
+		if (shiftPressed.current) {
+			if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+				event.preventDefault()
+				event.stopPropagation()
+
+				const direction = event.key === 'ArrowDown' ? -1 : 1
+
+				handleSetInset(inset + 10 * direction)
+			}
+		}
+
+	})
+
+	const handleKeyDown = useReferentiallyStableCallback((event: React.KeyboardEvent<HTMLInputElement>) => {
+		if (event.key === 'Shift') {
+			shiftPressed.current = true
+		}
+	})
+
+	const onChange = useReferentiallyStableCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+		if (shiftPressed.current) {
+			event.preventDefault()
+			event.stopPropagation()
+		} else {
+			handleSetInset(parseInt(event.target.value))
+		}
+	})
+
+	return (
+		typeof inset === 'number'
+			? (
+				<>
+					<Directive name="safe-area-insets" content={inset} />
+					<DevPanel icon={<SmartphoneIcon />} heading="Safe Area Insets">
+						<input type="number" className="cui-text-input cui-number-input" value={inset} onKeyUp={handleKeyUp} onKeyDown={handleKeyDown} min={0} max={MAX_INSET} onChange={onChange} />
+					</DevPanel>
+				</>
+			)
+			: null
+	)
 }
 
 export const ThemeDevPanel = () => {

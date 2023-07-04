@@ -3,7 +3,7 @@ import {
 	EnvironmentContext,
 	useEnvironment,
 } from '@contember/binding'
-import { Message, SpinnerOverlay } from '@contember/ui'
+import { EmptyStateContainer, Message, SpinnerOverlay } from '@contember/ui'
 import {
 	ComponentType,
 	Fragment,
@@ -16,7 +16,6 @@ import {
 	useRef,
 } from 'react'
 import { useCurrentRequest } from '../../routing'
-import { MiscPageLayout } from '../MiscPageLayout'
 import { PageErrorBoundary } from './PageErrorBoundary'
 
 export interface PageProvider<P> {
@@ -171,9 +170,11 @@ export const Pages = ({ children, layout, bindingFeedbackRenderer }: PagesProps)
 
 	if (request === null) {
 		return (
-			<MiscPageLayout>
-				<Message intent="danger" size="large">Page not found</Message>
-			</MiscPageLayout>
+			<Layout>
+				<EmptyStateContainer>
+					<Message intent="danger" size="large">Page not found</Message>
+				</EmptyStateContainer>
+			</Layout>
 		)
 	}
 

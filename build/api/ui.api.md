@@ -35,6 +35,7 @@ import { MouseEvent as MouseEvent_2 } from 'react';
 import { MouseEventHandler } from 'react';
 import { NamedExoticComponent } from 'react';
 import { NestedClassName } from '@contember/utilities';
+import { NonOptional } from '@contember/utilities';
 import { PointerEventHandler } from 'react';
 import { PolymorphicComponentPropsWithRef } from '@contember/utilities';
 import { PropsWithChildren } from 'react';
@@ -1456,6 +1457,15 @@ withTopToolbar?: boolean | undefined;
 export type EmailInputProps = TextInputProps;
 
 // @public (undocumented)
+export const EmptyStateContainer: NamedExoticComponent<EmptyStateContainerProps>;
+
+// @public (undocumented)
+export type EmptyStateContainerProps = ComponentClassNameProps & PropsWithChildren<{
+    header?: React.ReactNode;
+    intent?: Intent;
+}>;
+
+// @public (undocumented)
 export const ErrorList: MemoExoticComponent<({ errors }: ErrorListProps) => JSX.Element | null>;
 
 // @public (undocumented)
@@ -1899,6 +1909,7 @@ export const Menu: MemoExoticComponent<(props: PropsWithChildren<MenuProps>) => 
 // @public (undocumented)
 export type MenuItemProps<T = unknown> = (MenuItemPropsTitleRequired<T> | MenuItemPropsTitleOptional) & {
     children?: ReactNode;
+    componentClassName?: string;
     href?: string;
     external?: boolean;
     expandedByDefault?: boolean;
@@ -1923,8 +1934,14 @@ export interface MenuItemPropsTitleRequired<T> {
 // @public (undocumented)
 export interface MenuProps {
     // (undocumented)
+    className?: NestedClassName;
+    // (undocumented)
+    componentClassName?: string;
+    // (undocumented)
     focusMenuItemLabel?: string;
     id?: string;
+    // (undocumented)
+    label?: string;
     // (undocumented)
     showCaret?: boolean;
 }
@@ -1985,11 +2002,6 @@ export interface NavigationLinkProps {
     // (undocumented)
     navigate: (e?: SyntheticEvent) => void;
 }
-
-// @public
-export type NonOptional<T> = {
-    [P in keyof Required<T>]: Pick<T, P> extends Required<Pick<T, P>> ? T[P] : (T[P] | undefined);
-};
 
 // @public (undocumented)
 export type NonOptionalControlProps<V> = Omit<NonOptional<ControlProps<V>>, 'type'>;
@@ -2081,6 +2093,9 @@ export interface ProgressBarProps {
     // (undocumented)
     progress: number;
 }
+
+// @public (undocumented)
+export const Providers: (props: PropsWithChildren) => JSX.Element;
 
 // @public (undocumented)
 export type PublicCommonReactSelectStylesProps = {
@@ -2435,8 +2450,18 @@ export type StackProps = StackOwnProps & HTMLDivElementProps;
 
 // @public (undocumented)
 export const StyleProvider: {
-    ({ children }: PropsWithChildren): JSX.Element;
+    ({ children, ...props }: PropsWithChildren<StyleProviderProps>): JSX.Element;
     displayName: string;
+};
+
+// @public (undocumented)
+export type StyleProviderProps = {
+    transparent?: boolean;
+    displayContents?: boolean;
+    scheme?: Scheme;
+    themeContent?: Intent;
+    themeControls?: Intent;
+    overridesLucideIcons?: boolean;
 };
 
 // @public (undocumented)

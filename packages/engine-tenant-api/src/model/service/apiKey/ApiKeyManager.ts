@@ -12,7 +12,7 @@ import { DatabaseContext, TokenHash } from '../../utils'
 import { ApiKeyService, CreateApiKeyResponse } from './ApiKeyService'
 import assert from 'node:assert'
 import { Acl } from '@contember/schema'
-import { ApiKeyByIdQuery, ApiKeyByTokenQuery, ApiKeyFetchQuery } from '../../queries/apiKey/ApiKeyByFetchQuery'
+import { ApiKeyByIdQuery, ApiKeyByTokenQuery, ApiKeyFetchQuery } from '../../queries'
 
 export class ApiKeyManager {
 	constructor(

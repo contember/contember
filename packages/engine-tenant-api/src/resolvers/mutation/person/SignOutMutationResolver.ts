@@ -1,4 +1,4 @@
-import { MutationResolvers, MutationSignOutArgs, SignOutErrorCode, SignOutResponse } from '../../../schema'
+import { MutationResolvers, MutationSignOutArgs, SignOutResponse } from '../../../schema'
 import { TenantResolverContext } from '../../TenantResolverContext'
 import { ApiKey, ApiKeyManager, PermissionActions, PersonQuery } from '../../../model'
 import { createErrorResponse } from '../../errorUtils'
@@ -17,7 +17,7 @@ export class SignOutMutationResolver implements MutationResolvers {
 
 		if (personApiKeyId?.type === ApiKey.Type.PERMANENT) {
 			return createErrorResponse(
-				SignOutErrorCode.NotPossibleSignOutWithPermanentApiKey, 'Only session API keys can be used for person sign out.',
+				'NOT_POSSIBLE_SIGN_OUT_WITH_PERMANENT_API_KEY', 'Only session API keys can be used for person sign out.',
 			)
 		}
 

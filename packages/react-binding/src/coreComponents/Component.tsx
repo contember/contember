@@ -2,7 +2,7 @@ import { memo, NamedExoticComponent, PropsWithChildren, ReactElement } from 'rea
 import { useEnvironment } from '../accessorPropagation'
 import type { Environment } from '@contember/binding'
 import type { MarkerProvider, StaticRenderProvider, StaticRenderProviderProps } from './MarkerProvider'
-import { assertNever } from '../utils/assertNever'
+import { assertNever } from '@contember/utilities'
 
 interface EnvironmentAwareFunctionComponent<P> {
 	(props: PropsWithChildren<P>, environment: Environment): ReactElement<any, any> | null;

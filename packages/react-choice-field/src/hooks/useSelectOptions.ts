@@ -10,12 +10,10 @@ import { renderDynamicChoiceFieldStatic } from '../renderDynamicChoiceFieldStati
 import { useCreateOptionsFilter } from './useCreateOptionsFilter'
 import Fuse from 'fuse.js'
 
-type OnSearch = (input: string) => void
-
 export interface SelectOptions {
 	options: ChoiceFieldData.Options<EntityAccessor>,
 	allOptions: ChoiceFieldData.Options<EntityAccessor>,
-	onSearch: OnSearch,
+	onSearch: (input: string) => void,
 	isLoading: boolean
 }
 

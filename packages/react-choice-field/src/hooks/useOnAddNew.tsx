@@ -3,12 +3,12 @@ import { useMemo } from 'react'
 import { BaseDynamicChoiceField } from '../BaseDynamicChoiceField'
 import { useDesugaredOptionPath } from './useDesugaredOptionPath'
 
-export const useOnAddNew = ({ openDialog, connect, ...props }: BaseDynamicChoiceField & { connect: (entity: EntityAccessor) => void, openDialog?: (entity: EntityAccessor) => Promise<boolean>}) => {
+export const useOnAddNew = ({ createNewForm, openCreateNewFormDialog, connect, ...props }: BaseDynamicChoiceField & { connect: (entity: EntityAccessor) => void}) => {
 	const desugaredOptionPath = useDesugaredOptionPath(props, undefined)
 	const getSubTree = useGetEntityListSubTree()
 
 	return useMemo(() => {
-			if (!openDialog) {
+			if (!createNewForm || !openCreateNewFormDialog) {
 				return undefined
 			}
 			return async () => {
@@ -21,14 +21,14 @@ export const useOnAddNew = ({ openDialog, connect, ...props }: BaseDynamicChoice
 				const newEntityId = subTree.createNewEntity()
 				const entity = subTree.getChildEntityById(newEntityId.value)
 
-				const result = await openDialog(entity)
-				if (result === true) {
+				const result = await openCreateNewFormDialog({ entity, createNewForm })
+				if (result) {
 					const entityToConnect = entity.getAccessor()
 					connect(entityToConnect)
 				} else {
 					entity.deleteEntity()
 				}
 			}
-		}, [openDialog, getSubTree, desugaredOptionPath.entityName, connect],
+		}, [createNewForm, openCreateNewFormDialog, getSubTree, desugaredOptionPath.entityName, connect],
 	)
 }

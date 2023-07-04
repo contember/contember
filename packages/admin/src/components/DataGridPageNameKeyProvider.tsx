@@ -1,5 +1,5 @@
 import { useCurrentRequest } from '../routing'
-import { DataGridKeyProvider } from '@contember/react-datagrid'
+import { DataGridKeyProvider } from '@contember/react-datagrid-ui'
 import { ReactNode } from 'react'
 
 export const DataGridPageNameKeyProvider = ({ children }: { children: ReactNode }) => {

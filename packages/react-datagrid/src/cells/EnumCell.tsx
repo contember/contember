@@ -22,15 +22,12 @@ export type EnumCellFilterArtifacts = {
 	nullCondition: boolean
 }
 
-/** @deprecated */
-export type LegacyEnumCellArtifacts = string[]
-
 export const createEnumCell = <ColumnProps extends {}, ValueRendererProps extends {}, FilterProps extends {}>({ FilterRenderer, ValueRenderer }: {
-	FilterRenderer: ComponentType<FilterRendererProps<EnumCellFilterArtifacts | LegacyEnumCellArtifacts, FilterProps>>,
+	FilterRenderer: ComponentType<FilterRendererProps<EnumCellFilterArtifacts, FilterProps>>,
 	ValueRenderer: ComponentType<EnumCellRendererProps & ValueRendererProps>
 }): FunctionComponent<EnumCellProps & ColumnProps & ValueRendererProps & FilterProps> => Component(props => {
 	return (
-		<DataGridColumn<EnumCellFilterArtifacts | LegacyEnumCellArtifacts>
+		<DataGridColumn<EnumCellFilterArtifacts>
 			{...props}
 			enableOrdering={true}
 			getNewOrderBy={(newDirection, { environment }) =>
@@ -38,9 +35,7 @@ export const createEnumCell = <ColumnProps extends {}, ValueRendererProps extend
 			}
 			enableFiltering={true}
 			getNewFilter={(filter, { environment }) => {
-				const { values, nullCondition = false } = Array.isArray(filter) ? {
-					values: filter,
-				} : filter
+				const { values, nullCondition = false } = filter
 
 				if (values.length === 0 && !nullCondition) {
 					return undefined

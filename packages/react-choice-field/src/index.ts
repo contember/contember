@@ -11,4 +11,5 @@ export type { DynamicMultipleChoiceWithConnectingEntityFieldProps } from './hook
 export { useSelectOptions } from './hooks/useSelectOptions'
 export { useCurrentlyChosenEntities } from './hooks/useCurrentlyChosenEntities'
 export { useDesugaredOptionPath } from './hooks/useDesugaredOptionPath'
+export type { DesugaredOptionPath } from './hooks/useDesugaredOptionPath'
 export { renderDynamicChoiceFieldStatic } from './renderDynamicChoiceFieldStatic'

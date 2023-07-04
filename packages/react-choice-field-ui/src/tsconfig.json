@@ -8,6 +8,7 @@
 		{ "path": "../../react-binding-ui/src" },
 		{ "path": "../../react-choice-field/src" },
 		{ "path": "../../react-i18n/src" },
+		{ "path": "../../utilities/src" },
 		{ "path": "../../ui/src" },
 	]
 }

@@ -23,7 +23,7 @@ import { formatString, getHumanFriendlyField, resolveConnectingEntity, resolveSo
 import { MouseEvent, ReactNode, useCallback, useRef, useState } from 'react'
 import { RoutingLinkTarget } from '../../routing'
 import { AutoLabel } from './AutoLabel'
-import { dateToStringWithoutTimezone } from '@contember/react-binding-ui'
+import { dateToStringWithoutTimezone } from '@contember/utilities'
 
 export type AutoCellProps = {
 	schema: Schema

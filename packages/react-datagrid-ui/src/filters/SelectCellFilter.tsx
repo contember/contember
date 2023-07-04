@@ -8,7 +8,7 @@ import { EntityAccessor } from '@contember/react-binding'
 import { FilterRendererProps, SelectCellArtifacts, SelectCellFilterExtraProps } from '@contember/react-datagrid'
 import { useMessageFormatter } from '@contember/react-i18n'
 
-type SelectCellFilterProps =
+export type SelectCellFilterProps =
 	& FilterRendererProps<SelectCellArtifacts>
 	& SelectCellFilterExtraProps
 

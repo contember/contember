@@ -16,7 +16,7 @@ export type DataGridTablePublicProps =
 	}
 	& DataGridTableRowPublicProps
 
-type DataGridTableProps =
+export type DataGridTableProps =
 	& DataGridRenderingCommonProps
 	& DataGridTablePublicProps
 	& EntityListBaseProps

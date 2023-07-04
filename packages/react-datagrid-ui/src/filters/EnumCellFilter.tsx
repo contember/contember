@@ -1,7 +1,5 @@
-import { EnumCellFilterArtifacts, EnumCellRendererProps, LegacyEnumCellArtifacts } from '@contember/react-datagrid'
-import { useMemo } from 'react'
+import { EnumCellFilterArtifacts, EnumCellRendererProps, FilterRendererProps } from '@contember/react-datagrid'
 import { Checkbox, FieldContainer, Stack } from '@contember/ui'
-import { FilterRendererProps } from '@contember/react-datagrid'
 import { NullConditionFilter, NullConditionFilterPublicProps } from './NullConditionFilter'
 
 export type EnumCellFilterExtraProps =
@@ -11,11 +9,7 @@ export type EnumCellFilterExtraProps =
 		options: Record<string, string>
 	}
 
-export const EnumCellFilter = ({ filter: inFilter, setFilter, environment, field, options, showNullConditionFilter }: FilterRendererProps<EnumCellFilterArtifacts | LegacyEnumCellArtifacts, EnumCellFilterExtraProps>) => {
-	const filter = useMemo(() => Array.isArray(inFilter) ? {
-		nullCondition: false,
-		values: inFilter,
-	} : inFilter, [inFilter])
+export const EnumCellFilter = ({ filter, setFilter, environment, field, options, showNullConditionFilter }: FilterRendererProps<EnumCellFilterArtifacts, EnumCellFilterExtraProps>) => {
 	const values = filter.values
 
 	const checkboxList = Object.entries(options).map(([value, label]) => (

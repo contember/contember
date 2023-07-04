@@ -29,7 +29,7 @@ const DataGridRenderer = createDataGridRenderer<DataGridColumnPublicProps, DataG
 export const DataGrid = createDataGrid(DataGridRenderer)
 
 /**
- * Supplementary DataGrid component for advanced use. Using this component, you can access and modify internal state such as filters or pagination. Use this component together with a {@link useDataGrid} hook.
+ * Supplementary DataGrid component for advanced use. Using this component, you can access and modify internal state such as filters or pagination. Use this component together with a {@link @contember/react-datagrid#useDataGrid} hook.
  *
  * @example
  * ```

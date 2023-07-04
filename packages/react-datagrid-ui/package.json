@@ -41,7 +41,8 @@
 		"@contember/react-datagrid": "workspace:*",
 		"@contember/react-i18n": "workspace:*",
 		"@contember/react-utils": "workspace:*",
-		"@contember/ui": "workspace:*"
+		"@contember/ui": "workspace:*",
+		"@contember/utilities": "workspace:*"
 	},
 	"peerDependencies": {
 		"react": "^17 || ^18",

@@ -8,14 +8,16 @@ import {
 	wrapFilterInHasOnes,
 } from '@contember/react-binding'
 import { ComponentType, Fragment, FunctionComponent, ReactElement, ReactNode, useMemo } from 'react'
-import { BaseDynamicChoiceField } from '@contember/react-choice-field'
-import { renderDynamicChoiceFieldStatic } from '@contember/react-choice-field'
-import { useDesugaredOptionPath } from '@contember/react-choice-field'
+import {
+	BaseDynamicChoiceField,
+	renderDynamicChoiceFieldStatic,
+	useCurrentlyChosenEntities,
+	useDesugaredOptionPath,
+	useSelectOptions,
+} from '@contember/react-choice-field'
 import { DataGridColumnCommonProps, FilterRendererProps } from '../types'
 import { DataGridColumn } from '../grid'
 import { SelectCellArtifacts, SelectCellFilterExtraProps } from './common'
-import { useCurrentlyChosenEntities } from '@contember/react-choice-field'
-import { useSelectOptions } from '@contember/react-choice-field'
 
 export type HasManySelectRendererProps =
 	& SugaredRelativeEntityList

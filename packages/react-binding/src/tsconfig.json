@@ -8,6 +8,7 @@
 		{ "path": "../../client/src" },
 		{ "path": "../../react-client/src" },
 		{ "path": "../../react-multipass-rendering/src" },
-		{ "path": "../../react-utils/src" }
+		{ "path": "../../react-utils/src" },
+		{ "path": "../../utilities/src" }
 	]
 }

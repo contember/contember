@@ -1,6 +1,7 @@
 import { createDateCell, DateCellRendererProps } from '@contember/react-datagrid'
 import { useMessageFormatter } from '@contember/react-i18n'
-import { DateFieldView, DateFieldViewFormattingProps, FieldFallbackViewPublicProps, dateToStringWithoutTimezone } from '@contember/react-binding-ui'
+import { DateFieldView, DateFieldViewFormattingProps, FieldFallbackViewPublicProps } from '@contember/react-binding-ui'
+import { dateToStringWithoutTimezone } from '@contember/utilities'
 import { dataGridCellsDictionary } from '../dict/dataGridCellsDictionary'
 import { DateInput, FieldContainer, Stack, toDateString } from '@contember/ui'
 import { forwardRef, memo, ReactNode, useCallback } from 'react'

@@ -36,7 +36,8 @@
 	"dependencies": {
 		"@contember/react-binding": "workspace:*",
 		"@contember/react-i18n": "workspace:*",
-		"@contember/ui": "workspace:*"
+		"@contember/ui": "workspace:*",
+		"@contember/utilities": "workspace:*"
 	},
 	"peerDependencies": {
 		"react": "^17 || ^18",

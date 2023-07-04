@@ -32,7 +32,8 @@
 		"@contember/client": "workspace:*",
 		"@contember/react-client": "workspace:*",
 		"@contember/react-multipass-rendering": "workspace:*",
-		"@contember/react-utils": "workspace:*"
+		"@contember/react-utils": "workspace:*",
+		"@contember/utilities": "workspace:*"
 	},
 	"peerDependencies": {
 		"react": "^17 || ^18",

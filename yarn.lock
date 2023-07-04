@@ -3017,6 +3017,7 @@ __metadata:
     "@contember/react-binding": "workspace:*"
     "@contember/react-binding-ui": "workspace:*"
     "@contember/ui": "workspace:*"
+    "@contember/utilities": "workspace:*"
     "@sindresorhus/slugify": 0.11.0
     react: ^18
     react-dom: ^18

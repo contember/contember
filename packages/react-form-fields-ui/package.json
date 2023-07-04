@@ -37,6 +37,7 @@
 		"@contember/react-binding": "workspace:*",
 		"@contember/react-binding-ui": "workspace:*",
 		"@contember/ui": "workspace:*",
+		"@contember/utilities": "workspace:*",
 		"@sindresorhus/slugify": "0.11.0"
 	},
 	"peerDependencies": {

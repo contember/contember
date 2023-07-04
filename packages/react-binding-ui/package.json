@@ -36,8 +36,10 @@
 	"dependencies": {
 		"@contember/react-binding": "workspace:*",
 		"@contember/react-i18n": "workspace:*",
+		"@contember/react-utils": "workspace:*",
 		"@contember/ui": "workspace:*",
-		"@contember/utilities": "workspace:*"
+		"@contember/utilities": "workspace:*",
+		"lucide-react": "^0.256.0"
 	},
 	"peerDependencies": {
 		"react": "^17 || ^18",

@@ -7,5 +7,6 @@
 		{ "path": "../../react-binding/src" },
 		{ "path": "../../react-binding-ui/src" },
 		{ "path": "../../ui/src" },
+		{ "path": "../../utilities/src" },
 	]
 }

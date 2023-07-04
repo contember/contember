@@ -2,7 +2,7 @@ import { Permissions } from '@contember/authorization'
 import { PermissionActions } from './PermissionActions'
 import { TenantRole } from './Roles'
 
-const allowedRoles = new Set<string>([TenantRole.LOGIN, TenantRole.PROJECT_ADMIN])
+const allowedRoles = new Set<string>([TenantRole.LOGIN, TenantRole.PROJECT_ADMIN, TenantRole.ENTRYPOINT_DEPLOYER])
 
 const projectAdminAllowedInputRoles = ({ roles }: {roles?: readonly string[]}) => {
 	return roles === undefined || roles.every(it => allowedRoles.has(it))
@@ -53,6 +53,7 @@ class PermissionsFactory {
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.IDP_ENABLE)
 
 		permissions.allow(TenantRole.PROJECT_CREATOR, PermissionActions.PROJECT_CREATE)
+		permissions.allow(TenantRole.ENTRYPOINT_DEPLOYER, PermissionActions.ENTRYPOINT_DEPLOY)
 
 		return permissions
 	}

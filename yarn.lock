@@ -2708,9 +2708,16 @@ __metadata:
   resolution: "@contember/admin@workspace:packages/admin"
   dependencies:
     "@babel/core": 7.17.10
-    "@contember/binding": "workspace:*"
     "@contember/client": "workspace:*"
+    "@contember/react-auto": "workspace:*"
+    "@contember/react-binding": "workspace:*"
+    "@contember/react-binding-ui": "workspace:*"
+    "@contember/react-choice-field-ui": "workspace:*"
     "@contember/react-client": "workspace:*"
+    "@contember/react-datagrid-ui": "workspace:*"
+    "@contember/react-form-fields-ui": "workspace:*"
+    "@contember/react-i18n": "workspace:*"
+    "@contember/react-leaflet-fields-ui": "workspace:*"
     "@contember/react-multipass-rendering": "workspace:*"
     "@contember/react-utils": "workspace:*"
     "@contember/schema": ^1.2.0
@@ -2719,9 +2726,7 @@ __metadata:
     "@contember/schema-utils": ^1.2.0
     "@contember/ui": "workspace:*"
     "@contember/utilities": "workspace:*"
-    "@formatjs/icu-messageformat-parser": 2.0.11
     "@playwright/test": 1.32.3
-    "@sindresorhus/slugify": 0.11.0
     "@types/blueimp-md5": 2.18.0
     "@types/is-hotkey": 0.1.5
     "@types/leaflet": ^1.9.0
@@ -2733,10 +2738,7 @@ __metadata:
     blueimp-md5: 2.18.0
     buffer: 6.0.3
     csstype: 3.0.8
-    fuse.js: 6.4.6
-    intl-messageformat: 9.9.1
     is-hotkey: 0.1.8
-    leaflet: ^1.9.2
     lucide-react: ^0.268.0
     node-fetch: ^2.6.5
     path-to-regexp: 6.2.0
@@ -2747,8 +2749,6 @@ __metadata:
     react-dom: ^18
     react-dropzone: 10.2.2
     react-error-boundary: 3.1.3
-    react-leaflet: ^4.1.0
-    react-select: 5.3.2
     react-sortable-hoc: 2.0.0
     react-test-renderer: ^18
     slate: 0.73.1
@@ -2766,20 +2766,12 @@ __metadata:
   resolution: "@contember/binding@workspace:packages/binding"
   dependencies:
     "@contember/client": "workspace:*"
-    "@contember/react-client": "workspace:*"
-    "@contember/react-multipass-rendering": "workspace:*"
-    "@contember/react-utils": "workspace:*"
     "@types/js-levenshtein": 1.1.0
     "@types/uuid": 8.3.1
     chevrotain: 6.5.0
     fast-deep-equal: ^3.1.3
     js-levenshtein: 1.1.6
-    react: ^18
-    react-dom: ^18
     uuid: 8.3.2
-  peerDependencies:
-    react: ^17 || ^18
-    react-dom: ^17 || ^18
   languageName: unknown
   linkType: soft
 
@@ -2854,6 +2846,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@contember/layout@workspace:packages/layout"
   dependencies:
+    "@contember/react-i18n": "workspace:*"
     "@contember/react-utils": "workspace:*"
     "@contember/ui": "workspace:*"
     "@contember/utilities": "workspace:*"
@@ -2876,6 +2869,96 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@contember/react-auto@workspace:*, @contember/react-auto@workspace:packages/react-auto":
+  version: 0.0.0-use.local
+  resolution: "@contember/react-auto@workspace:packages/react-auto"
+  dependencies:
+    "@contember/react-binding": "workspace:*"
+    "@contember/react-binding-ui": "workspace:*"
+    "@contember/react-choice-field-ui": "workspace:*"
+    "@contember/react-datagrid-ui": "workspace:*"
+    "@contember/react-form-fields-ui": "workspace:*"
+    "@contember/ui": "workspace:*"
+    "@contember/utilities": "workspace:*"
+    react: ^18
+    react-dom: ^18
+  peerDependencies:
+    react: ^17 || ^18
+    react-dom: ^17 || ^18
+  languageName: unknown
+  linkType: soft
+
+"@contember/react-binding-ui@workspace:*, @contember/react-binding-ui@workspace:packages/react-binding-ui":
+  version: 0.0.0-use.local
+  resolution: "@contember/react-binding-ui@workspace:packages/react-binding-ui"
+  dependencies:
+    "@contember/react-binding": "workspace:*"
+    "@contember/react-i18n": "workspace:*"
+    "@contember/ui": "workspace:*"
+    "@contember/utilities": "workspace:*"
+    react: ^18
+    react-dom: ^18
+  peerDependencies:
+    react: ^17 || ^18
+    react-dom: ^17 || ^18
+  languageName: unknown
+  linkType: soft
+
+"@contember/react-binding@workspace:*, @contember/react-binding@workspace:packages/react-binding":
+  version: 0.0.0-use.local
+  resolution: "@contember/react-binding@workspace:packages/react-binding"
+  dependencies:
+    "@contember/binding": "workspace:*"
+    "@contember/client": "workspace:*"
+    "@contember/react-client": "workspace:*"
+    "@contember/react-multipass-rendering": "workspace:*"
+    "@contember/react-utils": "workspace:*"
+    "@contember/utilities": "workspace:*"
+    "@types/js-levenshtein": 1.1.0
+    "@types/uuid": 8.3.1
+    react: ^18
+    react-dom: ^18
+  peerDependencies:
+    react: ^17 || ^18
+    react-dom: ^17 || ^18
+  languageName: unknown
+  linkType: soft
+
+"@contember/react-choice-field-ui@workspace:*, @contember/react-choice-field-ui@workspace:packages/react-choice-field-ui":
+  version: 0.0.0-use.local
+  resolution: "@contember/react-choice-field-ui@workspace:packages/react-choice-field-ui"
+  dependencies:
+    "@contember/react-binding": "workspace:*"
+    "@contember/react-binding-ui": "workspace:*"
+    "@contember/react-choice-field": "workspace:*"
+    "@contember/react-i18n": "workspace:*"
+    "@contember/ui": "workspace:*"
+    "@contember/utilities": "workspace:*"
+    react: ^18
+    react-dom: ^18
+    react-select: 5.3.2
+    react-sortable-hoc: 2.0.0
+  peerDependencies:
+    react: ^17 || ^18
+    react-dom: ^17 || ^18
+  languageName: unknown
+  linkType: soft
+
+"@contember/react-choice-field@workspace:*, @contember/react-choice-field@workspace:packages/react-choice-field":
+  version: 0.0.0-use.local
+  resolution: "@contember/react-choice-field@workspace:packages/react-choice-field"
+  dependencies:
+    "@contember/react-binding": "workspace:*"
+    "@contember/react-utils": "workspace:*"
+    fuse.js: 6.4.6
+    react: ^18
+    react-dom: ^18
+  peerDependencies:
+    react: ^17 || ^18
+    react-dom: ^17 || ^18
+  languageName: unknown
+  linkType: soft
+
 "@contember/react-client@workspace:*, @contember/react-client@workspace:packages/react-client":
   version: 0.0.0-use.local
   resolution: "@contember/react-client@workspace:packages/react-client"
@@ -2884,6 +2967,93 @@ __metadata:
     "@contember/utilities": "workspace:*"
   peerDependencies:
     react: ^17 || ^18
+  languageName: unknown
+  linkType: soft
+
+"@contember/react-datagrid-ui@workspace:*, @contember/react-datagrid-ui@workspace:packages/react-datagrid-ui":
+  version: 0.0.0-use.local
+  resolution: "@contember/react-datagrid-ui@workspace:packages/react-datagrid-ui"
+  dependencies:
+    "@contember/react-binding": "workspace:*"
+    "@contember/react-binding-ui": "workspace:*"
+    "@contember/react-choice-field": "workspace:*"
+    "@contember/react-choice-field-ui": "workspace:*"
+    "@contember/react-datagrid": "workspace:*"
+    "@contember/react-i18n": "workspace:*"
+    "@contember/react-utils": "workspace:*"
+    "@contember/ui": "workspace:*"
+    "@contember/utilities": "workspace:*"
+    react: ^18
+    react-dom: ^18
+  peerDependencies:
+    react: ^17 || ^18
+    react-dom: ^17 || ^18
+  languageName: unknown
+  linkType: soft
+
+"@contember/react-datagrid@workspace:*, @contember/react-datagrid@workspace:packages/react-datagrid":
+  version: 0.0.0-use.local
+  resolution: "@contember/react-datagrid@workspace:packages/react-datagrid"
+  dependencies:
+    "@contember/client": "workspace:*"
+    "@contember/react-binding": "workspace:*"
+    "@contember/react-choice-field": "workspace:*"
+    "@contember/react-client": "workspace:*"
+    "@contember/react-multipass-rendering": "workspace:*"
+    "@contember/react-utils": "workspace:*"
+    "@contember/utilities": "workspace:*"
+    react: ^18
+    react-dom: ^18
+  peerDependencies:
+    react: ^17 || ^18
+    react-dom: ^17 || ^18
+  languageName: unknown
+  linkType: soft
+
+"@contember/react-form-fields-ui@workspace:*, @contember/react-form-fields-ui@workspace:packages/react-form-fields-ui":
+  version: 0.0.0-use.local
+  resolution: "@contember/react-form-fields-ui@workspace:packages/react-form-fields-ui"
+  dependencies:
+    "@contember/react-binding": "workspace:*"
+    "@contember/react-binding-ui": "workspace:*"
+    "@contember/ui": "workspace:*"
+    "@sindresorhus/slugify": 0.11.0
+    react: ^18
+    react-dom: ^18
+  peerDependencies:
+    react: ^17 || ^18
+    react-dom: ^17 || ^18
+  languageName: unknown
+  linkType: soft
+
+"@contember/react-i18n@workspace:*, @contember/react-i18n@workspace:packages/react-i18n":
+  version: 0.0.0-use.local
+  resolution: "@contember/react-i18n@workspace:packages/react-i18n"
+  dependencies:
+    "@contember/react-utils": "workspace:*"
+    "@formatjs/icu-messageformat-parser": 2.0.11
+    intl-messageformat: 9.9.1
+    react: ^18
+    react-dom: ^18
+  peerDependencies:
+    react: ^17 || ^18
+    react-dom: ^17 || ^18
+  languageName: unknown
+  linkType: soft
+
+"@contember/react-leaflet-fields-ui@workspace:*, @contember/react-leaflet-fields-ui@workspace:packages/react-leaflet-fields-ui":
+  version: 0.0.0-use.local
+  resolution: "@contember/react-leaflet-fields-ui@workspace:packages/react-leaflet-fields-ui"
+  dependencies:
+    "@contember/react-binding": "workspace:*"
+    "@contember/ui": "workspace:*"
+    leaflet: ^1.9.2
+    react: ^18
+    react-dom: ^18
+    react-leaflet: ^4.1.0
+  peerDependencies:
+    react: ^17 || ^18
+    react-dom: ^17 || ^18
   languageName: unknown
   linkType: soft
 

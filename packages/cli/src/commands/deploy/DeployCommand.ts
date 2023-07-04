@@ -42,8 +42,8 @@ export class DeployCommand extends Command<Args, Options> {
 		}
 
 		configuration.option('admin').valueRequired()
-		configuration.option('no-admin').valueOptional()
-		configuration.option('root').valueOptional()
+		configuration.option('no-admin').valueNone()
+		configuration.option('root').valueNone()
 
 		configureExecuteMigrationCommand(configuration)
 	}
@@ -126,7 +126,7 @@ export class DeployCommand extends Command<Args, Options> {
 			return migrationExitCode
 		}
 
-		if (adminEndpoint && input.getOption('no-admin') != true) {
+		if (adminEndpoint && input.getOption('no-admin') !== true) {
 			console.log('Deploying admin...')
 			const client = AdminClient.create(adminEndpoint, apiToken)
 			const files = await readAdminFiles(projectAdminDistDir)

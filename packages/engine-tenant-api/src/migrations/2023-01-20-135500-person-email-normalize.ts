@@ -3,7 +3,7 @@ import { MigrationBuilder } from '@contember/database-migrations'
 const sql = `
 WITH
 	normalized AS (
-		SELECT id, email, REGEXP_REPLACE(LOWER(email), '\s', '', 'g') AS normalized
+		SELECT id, email, REGEXP_REPLACE(LOWER(email), '\\s', '', 'g') AS normalized
 		FROM person
 	),
 	not_exist AS (

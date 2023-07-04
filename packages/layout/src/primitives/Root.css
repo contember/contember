@@ -1,13 +1,8 @@
 /* RGB tokens */
 @media (prefers-color-scheme: light) {
-	:where(
-		.cui-layout,
-		.cui-layout.cui-theme:not([class*=scheme-]),
-		.cui-layout.scheme-light,
-		.cui-layout.scheme-light .cui-theme:not([class*=scheme-]),
-		.cui-layout.scheme-system,
-		.cui-layout.scheme-system .cui-theme:not([class*=scheme-]),
-	) {
+	:where(.cui-layout, .cui-layout.cui-theme:not([class*='scheme-']), .cui-layout.scheme-light, .cui-layout.scheme-light
+			.cui-theme:not([class*='scheme-']), .cui-layout.scheme-system, .cui-layout.scheme-system
+			.cui-theme:not([class*='scheme-']), ) {
 		--cui-background-color-rgb--above: var(--cui-content-1000);
 		--cui-background-color-rgb: var(--cui-content-1000);
 		--cui-background-color-rgb--below: var(--cui-content-975);
@@ -19,10 +14,7 @@
 		--cui-frame-background-color--highlighted-rgb: var(--cui-content-1000);
 	}
 
-	:where(
-		.cui-layout.scheme-dark,
-		.cui-layout.scheme-dark .cui-theme:not([class*=scheme-]),
-	) {
+	:where(.cui-layout.scheme-dark, .cui-layout.scheme-dark .cui-theme:not([class*='scheme-']), ) {
 		--cui-background-color-rgb--above: var(--cui-content-150);
 		--cui-background-color-rgb: var(--cui-content-100);
 		--cui-background-color-rgb--below: var(--cui-content-50);
@@ -35,14 +27,9 @@
 	}
 }
 @media (prefers-color-scheme: dark) {
-	:where(
-		.cui-layout,
-		.cui-layout.cui-theme:not([class*=scheme-]),
-		.cui-layout.scheme-dark,
-		.cui-layout.scheme-dark .cui-theme:not([class*=scheme-]),
-		.cui-layout.scheme-system,
-		.cui-layout.scheme-system .cui-theme:not([class*=scheme-]),
-	) {
+	:where(.cui-layout, .cui-layout.cui-theme:not([class*='scheme-']), .cui-layout.scheme-dark, .cui-layout.scheme-dark
+			.cui-theme:not([class*='scheme-']), .cui-layout.scheme-system, .cui-layout.scheme-system
+			.cui-theme:not([class*='scheme-']), ) {
 		--cui-background-color-rgb--above: var(--cui-content-175);
 		--cui-background-color-rgb: var(--cui-content-100);
 		--cui-background-color-rgb--below: var(--cui-content-250);
@@ -54,10 +41,7 @@
 		--cui-frame-background-color--highlighted-rgb: var(--cui-content-50);
 	}
 
-	:where(
-		.cui-layout.scheme-light,
-		.cui-layout.scheme-light .cui-theme:not([class*=scheme-]),
-	) {
+	:where(.cui-layout.scheme-light, .cui-layout.scheme-light .cui-theme:not([class*='scheme-']), ) {
 		--cui-background-color-rgb--above: var(--cui-content-1000);
 		--cui-background-color-rgb: var(--cui-content-1000);
 		--cui-background-color-rgb--below: var(--cui-content-975);
@@ -80,17 +64,13 @@
 	flex-direction: row;
 	flex: 1;
 }
-:where(.cui-layout):where(
-	.cui-theme,
-	.scheme-light,
-	.scheme-dark,
-	.scheme-system,
-) {
+:where(.cui-layout):where(.cui-theme, .scheme-light, .scheme-dark, .scheme-system, ) {
 	background-color: var(--cui-background-color);
 	color: var(--cui-color);
 }
 
-.disable-transitions-on-resize, .disable-transitions-on-resize * {
+.disable-transitions-on-resize,
+.disable-transitions-on-resize * {
 	transition-duration: 0ms !important;
 }
 

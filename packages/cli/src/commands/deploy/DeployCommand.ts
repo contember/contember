@@ -23,6 +23,7 @@ type Args = {
 type Options = ExecuteMigrationOptions & {
 	admin?: string
 	['no-admin']?: boolean
+	['no-migrations']?: boolean
 	root?: boolean
 }
 
@@ -42,8 +43,9 @@ export class DeployCommand extends Command<Args, Options> {
 		}
 
 		configuration.option('admin').valueRequired()
-		configuration.option('no-admin').valueNone()
 		configuration.option('root').valueNone()
+		configuration.option('no-admin').valueNone()
+		configuration.option('no-migrations').valueNone()
 
 		configureExecuteMigrationCommand(configuration)
 	}
@@ -58,11 +60,14 @@ export class DeployCommand extends Command<Args, Options> {
 		let apiTokenFromDsn: string | undefined = undefined
 
 		let remoteProject = input.getOption('remote-project') || project.name
+
 		if (dsn) {
 			({ project: remoteProject, endpoint: adminEndpoint, token: apiTokenFromDsn  } = parseDsn(dsn))
 		}
+
 		const instance = await interactiveResolveInstanceEnvironmentFromInput(this.workspace, apiUrl ?? (adminEndpoint ? adminEndpoint + '/_api' : undefined))
 		const apiToken = await interactiveResolveApiToken({ workspace: this.workspace, instance, apiToken: apiTokenFromDsn })
+
 		console.log('')
 		console.log('Contember project deployment configuration:')
 		console.log(`Local project name: ${project.name}`)
@@ -72,62 +77,66 @@ export class DeployCommand extends Command<Args, Options> {
 		console.log(`Deploy token: ${maskToken(apiToken)}`)
 		console.log('')
 
-		const migrationsDir = project.migrationsDir
-		const container = new MigrationsContainerFactory(migrationsDir).create()
-
-		const tenantClient = TenantClient.create(instance.baseUrl, apiToken)
-		await tenantClient.createProject(remoteProject, true)
-		const systemClient = SystemClient.create(instance.baseUrl, remoteProject, apiToken)
-
 		const projectAdminDistDir = `${project.adminDir}/dist`
-		if (adminEndpoint && !(await pathExists(`${projectAdminDistDir}/index.html`))) {
+
+		if (adminEndpoint && input.getOption('no-admin') !== true && !(await pathExists(`${projectAdminDistDir}/index.html`))) {
 			throw `Missing ${projectAdminDistDir}/index.html. Please build admin before deploying.`
 		}
 
-		const status = await resolveMigrationStatus(systemClient, container.migrationsResolver, false)
+		if (input.getOption('no-migrations') !== true) {
+			const migrationsDir = project.migrationsDir
+			const container = new MigrationsContainerFactory(migrationsDir).create()
 
-		if (status.errorMigrations.length > 0) {
-			console.error(createMigrationStatusTable(status.errorMigrations))
-			throw `Cannot execute migrations`
-		}
+			const tenantClient = TenantClient.create(instance.baseUrl, apiToken)
+			await tenantClient.createProject(remoteProject, true)
+			const systemClient = SystemClient.create(instance.baseUrl, remoteProject, apiToken)
 
-		if (status.migrationsToExecute.length === 0 && !adminEndpoint) {
-			console.log('Nothing to do.')
-			return 0
-		}
-		if (!input.getOption('yes')) {
-			if (!process.stdin.isTTY) {
-				throw 'TTY not available. Pass --yes option to confirm execution.'
+			const status = await resolveMigrationStatus(systemClient, container.migrationsResolver, false)
+
+			if (status.errorMigrations.length > 0) {
+				console.error(createMigrationStatusTable(status.errorMigrations))
+				throw `Cannot execute migrations`
 			}
-			console.log('Following migrations will be executed:')
-			console.log(status.migrationsToExecute.length ? status.migrationsToExecute.map(it => it.name).join(' ') : 'none')
-			console.log(adminEndpoint ? 'Admin will be deployed.' : 'Admin will NOT be deployed.')
-			console.log('(to skip this dialog, you can pass --yes option)')
-			console.log('')
-			const { ok } = await prompts({
-				type: 'confirm',
-				name: 'ok',
-				message: `Do you want to continue?`,
+
+			if (status.migrationsToExecute.length === 0 && !adminEndpoint) {
+				console.log('Nothing to do.')
+				return 0
+			}
+			if (!input.getOption('yes')) {
+				if (!process.stdin.isTTY) {
+					throw 'TTY not available. Pass --yes option to confirm execution.'
+				}
+				console.log('Following migrations will be executed:')
+				console.log(status.migrationsToExecute.length ? status.migrationsToExecute.map(it => it.name).join(' ') : 'none')
+				console.log(adminEndpoint ? 'Admin will be deployed.' : 'Admin will NOT be deployed.')
+				console.log('(to skip this dialog, you can pass --yes option)')
+				console.log('')
+				const { ok } = await prompts({
+					type: 'confirm',
+					name: 'ok',
+					message: `Do you want to continue?`,
+				})
+				if (!ok) {
+					return 1
+				}
+			}
+			const migrationExitCode = await executeMigrations({
+				migrationDescriber: container.migrationDescriber,
+				schemaVersionBuilder: container.schemaVersionBuilder,
+				client: systemClient,
+				migrations: status.migrationsToExecute,
+				requireConfirmation: false,
+				force: false,
 			})
-			 if (!ok) {
-				return 1
-			}
-		}
-		const migrationExitCode = await executeMigrations({
-			migrationDescriber: container.migrationDescriber,
-			schemaVersionBuilder: container.schemaVersionBuilder,
-			client: systemClient,
-			migrations: status.migrationsToExecute,
-			requireConfirmation: false,
-			force: false,
-		})
 
-		if (migrationExitCode !== 0) {
-			return migrationExitCode
+			if (migrationExitCode !== 0) {
+				return migrationExitCode
+			}
 		}
 
 		if (adminEndpoint && input.getOption('no-admin') !== true) {
 			console.log('Deploying admin...')
+
 			const client = AdminClient.create(adminEndpoint, apiToken)
 			const files = await readAdminFiles(projectAdminDistDir)
 

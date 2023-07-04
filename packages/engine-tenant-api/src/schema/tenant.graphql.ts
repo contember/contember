@@ -2,546 +2,546 @@ import { gql } from 'graphql-tag'
 import { DocumentNode } from 'graphql'
 
 const schema: DocumentNode = gql`
-    scalar Json
-    scalar DateTime
+	scalar Json
+	scalar DateTime
 
-    schema {
-        query: Query
-        mutation: Mutation
-    }
+	schema {
+		query: Query
+		mutation: Mutation
+	}
 
-    type Query {
-        me: Identity!
-        projects: [Project!]!
-        projectBySlug(slug: String!): Project
-        projectMemberships(projectSlug: String!, identityId: String!): [Membership!]!
-        checkResetPasswordToken(requestId: String!, token: String!): CheckResetPasswordTokenCode!
+	type Query {
+		me: Identity!
+		projects: [Project!]!
+		projectBySlug(slug: String!): Project
+		projectMemberships(projectSlug: String!, identityId: String!): [Membership!]!
+		checkResetPasswordToken(requestId: String!, token: String!): CheckResetPasswordTokenCode!
 
-        identityProviders: [IdentityProvider!]!
-    }
+		identityProviders: [IdentityProvider!]!
+	}
 
-    type Mutation {
-        signUp(email: String!, password: String, passwordHash: String, roles: [String!], name: String): SignUpResponse
-        signIn(email: String!, password: String!, expiration: Int, otpToken: String): SignInResponse
-        createSessionToken(email: String, personId: String, expiration: Int): CreateSessionTokenResponse
-        signOut(all: Boolean): SignOutResponse
-        changePassword(personId: String!, password: String!): ChangePasswordResponse
-        changeMyPassword(currentPassword: String!, newPassword: String!): ChangeMyPasswordResponse
+	type Mutation {
+		signUp(email: String!, password: String, passwordHash: String, roles: [String!], name: String): SignUpResponse
+		signIn(email: String!, password: String!, expiration: Int, otpToken: String): SignInResponse
+		createSessionToken(email: String, personId: String, expiration: Int): CreateSessionTokenResponse
+		signOut(all: Boolean): SignOutResponse
+		changePassword(personId: String!, password: String!): ChangePasswordResponse
+		changeMyPassword(currentPassword: String!, newPassword: String!): ChangeMyPasswordResponse
 
-        initSignInIDP(
-            identityProvider: String!,
-            data: Json
-            redirectUrl: String @deprecated(reason: "use data.redirectUrl")
-        ): InitSignInIDPResponse
-        signInIDP(
-            identityProvider: String!,
-            data: Json,
-            expiration: Int
-            idpResponse: IDPResponseInput, @deprecated(reason: "pass idpResponse.url as data.url")
-            redirectUrl: String @deprecated(reason: "use data.redirectUrl"),
-            sessionData: Json @deprecated(reason: "use data.sessionData"),
-        ): SignInIDPResponse
+		initSignInIDP(
+			identityProvider: String!,
+			data: Json
+			redirectUrl: String @deprecated(reason: "use data.redirectUrl")
+		): InitSignInIDPResponse
+		signInIDP(
+			identityProvider: String!,
+			data: Json,
+			expiration: Int
+			idpResponse: IDPResponseInput, @deprecated(reason: "pass idpResponse.url as data.url")
+			redirectUrl: String @deprecated(reason: "use data.redirectUrl"),
+			sessionData: Json @deprecated(reason: "use data.sessionData"),
+		): SignInIDPResponse
 
-        # IDP management
-        addIDP(identityProvider: String!, type: String!, configuration: Json!, options: IDPOptions): AddIDPResponse
-        updateIDP(identityProvider: String!, type: String, configuration: Json, options: IDPOptions): UpdateIDPResponse
-        disableIDP(identityProvider: String!): DisableIDPResponse
-        enableIDP(identityProvider: String!): EnableIDPResponse
+		# IDP management
+		addIDP(identityProvider: String!, type: String!, configuration: Json!, options: IDPOptions): AddIDPResponse
+		updateIDP(identityProvider: String!, type: String, configuration: Json, options: IDPOptions): UpdateIDPResponse
+		disableIDP(identityProvider: String!): DisableIDPResponse
+		enableIDP(identityProvider: String!): EnableIDPResponse
 
-        prepareOtp(label: String): PrepareOtpResponse
-        confirmOtp(otpToken: String!): ConfirmOtpResponse
-        disableOtp: DisableOtpResponse
+		prepareOtp(label: String): PrepareOtpResponse
+		confirmOtp(otpToken: String!): ConfirmOtpResponse
+		disableOtp: DisableOtpResponse
 
-        createResetPasswordRequest(email: String!, options: CreateResetPasswordRequestOptions): CreatePasswordResetRequestResponse
-        resetPassword(token: String!, password: String!): ResetPasswordResponse
+		createResetPasswordRequest(email: String!, options: CreateResetPasswordRequestOptions): CreatePasswordResetRequestResponse
+		resetPassword(token: String!, password: String!): ResetPasswordResponse
 
-        invite(email: String!, name: String, projectSlug: String!, memberships: [MembershipInput!]!, options: InviteOptions): InviteResponse
-        unmanagedInvite(
-            email: String!,
-            name: String,
-            projectSlug: String!,
-            memberships: [MembershipInput!]!,
-            options: UnmanagedInviteOptions,
-            password: String @deprecated(reason: "Use options")
-        ): InviteResponse
+		invite(email: String!, name: String, projectSlug: String!, memberships: [MembershipInput!]!, options: InviteOptions): InviteResponse
+		unmanagedInvite(
+			email: String!,
+			name: String,
+			projectSlug: String!,
+			memberships: [MembershipInput!]!,
+			options: UnmanagedInviteOptions,
+			password: String @deprecated(reason: "Use options")
+		): InviteResponse
 
-        addProjectMember(projectSlug: String!, identityId: String!, memberships: [MembershipInput!]!): AddProjectMemberResponse
-        removeProjectMember(projectSlug: String!, identityId: String!): RemoveProjectMemberResponse
+		addProjectMember(projectSlug: String!, identityId: String!, memberships: [MembershipInput!]!): AddProjectMemberResponse
+		removeProjectMember(projectSlug: String!, identityId: String!): RemoveProjectMemberResponse
 
-        updateProjectMember(projectSlug: String!, identityId: String!, memberships: [MembershipInput!]!): UpdateProjectMemberResponse
+		updateProjectMember(projectSlug: String!, identityId: String!, memberships: [MembershipInput!]!): UpdateProjectMemberResponse
 
-        createApiKey(projectSlug: String!, memberships: [MembershipInput!]!, description: String!, tokenHash: String): CreateApiKeyResponse
-        createGlobalApiKey(description: String!, roles: [String!], tokenHash: String): CreateApiKeyResponse
-        disableApiKey(id: String!): DisableApiKeyResponse
+		createApiKey(projectSlug: String!, memberships: [MembershipInput!]!, description: String!, tokenHash: String): CreateApiKeyResponse
+		createGlobalApiKey(description: String!, roles: [String!], tokenHash: String): CreateApiKeyResponse
+		disableApiKey(id: String!): DisableApiKeyResponse
 
 		addGlobalIdentityRoles(identityId: String!, roles: [String!]!): AddGlobalIdentityRolesResponse
 		removeGlobalIdentityRoles(identityId: String!, roles: [String!]!): RemoveGlobalIdentityRolesResponse
 
-        addMailTemplate(template: MailTemplate!): AddMailTemplateResponse
-        removeMailTemplate(templateIdentifier: MailTemplateIdentifier!): RemoveMailTemplateResponse
-
-        createProject(
-            projectSlug: String!,
-            name: String,
-            config: Json,
-            secrets: [ProjectSecret!],
-            options: CreateProjectOptions,
-            deployTokenHash: String @deprecated(reason: "Use options")
-        ): CreateProjectResponse
-        setProjectSecret(projectSlug: String!, key: String!, value: String!): SetProjectSecretResponse
-        updateProject(projectSlug: String!, name: String, config: Json, mergeConfig: Boolean): UpdateProjectResponse
-
-        addProjectMailTemplate(template: MailTemplate!): AddMailTemplateResponse
-        @deprecated(reason: "use addMailTemplate")
-
-        removeProjectMailTemplate(templateIdentifier: MailTemplateIdentifier!): RemoveMailTemplateResponse
-        @deprecated(reason: "use removeMailTemplate")
-
-    }
-
-    # === signUp ===
-    type SignUpResponse {
-        ok: Boolean!
-        errors: [SignUpError!]! @deprecated
-        error: SignUpError
-        result: SignUpResult
-    }
-
-    type SignUpError {
-        code: SignUpErrorCode!
-        developerMessage: String!
-        endPersonMessage: String @deprecated
-    }
-
-    enum SignUpErrorCode {
-        EMAIL_ALREADY_EXISTS
-        TOO_WEAK
-    }
-
-    type SignUpResult {
-        person: Person!
-    }
-
-    # === signInCommon ==
-
-    interface CommonSignInResult {
-        token: String!
-        person: Person!
-    }
-
-    # === signIn ===
-    type SignInResponse {
-        ok: Boolean!
-        errors: [SignInError!]! @deprecated
-        error: SignInError
-        result: SignInResult
-    }
-
-    type SignInError {
-        code: SignInErrorCode!
-        developerMessage: String!
-        endUserMessage: String @deprecated
-    }
-
-    enum SignInErrorCode {
-        UNKNOWN_EMAIL
-        INVALID_PASSWORD
-        NO_PASSWORD_SET
-        OTP_REQUIRED
-        INVALID_OTP_TOKEN
-    }
-
-    type SignInResult implements CommonSignInResult {
-        token: String!
-        person: Person!
-    }
-
-    # == createSessionToken ==
-
-    type CreateSessionTokenResponse {
-        ok: Boolean!
-        error: CreateSessionTokenError
-        result: CreateSessionTokenResult
-    }
-
-    type CreateSessionTokenError {
-        code: CreateSessionTokenErrorCode!
-        developerMessage: String!
-    }
-
-    enum CreateSessionTokenErrorCode {
-        UNKNOWN_EMAIL
-        UNKNOWN_PERSON_ID
-    }
-
-    type CreateSessionTokenResult implements CommonSignInResult{
-        token: String!
-        person: Person!
-    }
-
-    # === signOut ===
-
-    type SignOutResponse {
-        ok: Boolean!
-        errors: [SignOutError!]! @deprecated
-        error: SignOutError
-    }
-
-    type SignOutError {
-        code: SignOutErrorCode!
-        developerMessage: String!
-        endUserMessage: String @deprecated
-    }
-
-    enum SignOutErrorCode {
-        NOT_A_PERSON
-    }
-
-    # === changePassword ===
-
-    type ChangePasswordResponse {
-        ok: Boolean!
-        errors: [ChangePasswordError!]! @deprecated
-        error: ChangePasswordError
-    }
-
-    type ChangePasswordError {
-        code: ChangePasswordErrorCode!
-        developerMessage: String!
-        endUserMessage: String @deprecated
-    }
-
-    enum ChangePasswordErrorCode {
-        PERSON_NOT_FOUND
-        TOO_WEAK
-    }
-
-
-    type ChangeMyPasswordResponse {
-        ok: Boolean!
-        error: ChangeMyPasswordError
-    }
-
-    type ChangeMyPasswordError {
-        code: ChangeMyPasswordErrorCode!
-        developerMessage: String!
-    }
-
-    enum ChangeMyPasswordErrorCode {
-        TOO_WEAK
-        NOT_A_PERSON
-        INVALID_PASSWORD
-        NO_PASSWORD_SET
-    }
-
-    # === IDP ===
-
-    type InitSignInIDPResponse {
-        ok: Boolean!
-        errors: [InitSignInIDPError!]! @deprecated
-        error: InitSignInIDPError
-        result: InitSignInIDPResult
-    }
-
-    type InitSignInIDPResult {
-        authUrl: String!
-        sessionData: Json!
-    }
-
-    type InitSignInIDPError {
-        code: InitSignInIDPErrorCode!
-        developerMessage: String!
-        endUserMessage: String @deprecated
-    }
-
-    enum InitSignInIDPErrorCode {
-        PROVIDER_NOT_FOUND
-        IDP_VALIDATION_FAILED
-    }
-
-    input IDPResponseInput {
-        url: String!
-    }
-
-    type SignInIDPResponse {
-        ok: Boolean!
-        errors: [SignInIDPError!]! @deprecated
-        error: SignInIDPError
-        result: SignInIDPResult
-    }
-
-    type SignInIDPError {
-        code: SignInIDPErrorCode!
-        developerMessage: String!
-        endUserMessage: String @deprecated
-    }
-
-    enum SignInIDPErrorCode {
-        INVALID_IDP_RESPONSE
-        IDP_VALIDATION_FAILED
-
-        PERSON_NOT_FOUND
-        PERSON_ALREADY_EXISTS
-    }
-
-    type SignInIDPResult implements CommonSignInResult {
-        token: String!
-        person: Person!
-    }
-
-    type AddIDPResponse {
-        error: AddIDPError
-        ok: Boolean!
-    }
-
-    type AddIDPError {
-        code: AddIDPErrorCode!
-        developerMessage: String!
-    }
-
-    enum AddIDPErrorCode {
-        ALREADY_EXISTS
-        UNKNOWN_TYPE
-        INVALID_CONFIGURATION
-    }
-
-    type UpdateIDPResponse {
-        error: UpdateIDPError
-        ok: Boolean!
-    }
-
-    type UpdateIDPError {
-        code: UpdateIDPErrorCode!
-        developerMessage: String!
-    }
-
-    enum UpdateIDPErrorCode {
-        NOT_FOUND
-        INVALID_CONFIGURATION
-    }
-
-
-    type DisableIDPResponse {
-        error: DisableIDPError
-        ok: Boolean!
-    }
-
-    type DisableIDPError {
-        code: DisableIDPErrorCode!
-        developerMessage: String!
-    }
-
-    enum DisableIDPErrorCode {
-        NOT_FOUND
-    }
-
-    type EnableIDPResponse {
-        error: EnableIDPError
-        ok: Boolean!
-    }
-
-    type EnableIDPError {
-        code: EnableIDPErrorCode!
-        developerMessage: String!
-    }
-
-    enum EnableIDPErrorCode {
-        NOT_FOUND
-    }
-
-    type IdentityProvider {
-        slug: String!
-        type: String!
-        configuration: Json!
-        disabledAt: DateTime
-        options: IDPOptionsOutput!
-    }
-
-    type IDPOptionsOutput {
-        autoSignUp: Boolean!
-        exclusive: Boolean!
-    }
-
-    input IDPOptions {
-        autoSignUp: Boolean
-        exclusive: Boolean
-    }
-
-
-    # === invite ===
-
-    type InviteResponse {
-        ok: Boolean!
-        errors: [InviteError!]! @deprecated
-        error: InviteError
-        result: InviteResult
-    }
-
-    type InviteError {
-        code: InviteErrorCode!
-        developerMessage: String!
-        membershipValidation: [MembershipValidationError!]
-        endUserMessage: String @deprecated
-    }
-
-    enum InviteErrorCode {
-        PROJECT_NOT_FOUND
-        ALREADY_MEMBER
-        INVALID_MEMBERSHIP
-
-        ROLE_NOT_FOUND @deprecated
-        VARIABLE_NOT_FOUND @deprecated
-        VARIABLE_EMPTY @deprecated
-    }
-
-    type InviteResult {
-        person: Person!
-        isNew: Boolean!
-    }
-
-    enum InviteMethod {
-        CREATE_PASSWORD
-        RESET_PASSWORD
-    }
-
-    input InviteOptions {
-        method: InviteMethod
-        mailVariant: String
-    }
-
-    input UnmanagedInviteOptions {
-        password: String
-        resetTokenHash: String
-    }
-
-    # === addProjectMember ===
-
-    type AddProjectMemberResponse {
-        ok: Boolean!
-        errors: [AddProjectMemberError!]!
-        error: AddProjectMemberError
-    }
-
-    type AddProjectMemberError {
-        code: AddProjectMemberErrorCode!
-        membershipValidation: [MembershipValidationError!]
-        developerMessage: String!
-        endUserMessage: String @deprecated
-    }
-
-    enum AddProjectMemberErrorCode {
-        PROJECT_NOT_FOUND
-        IDENTITY_NOT_FOUND
-        ALREADY_MEMBER
-        INVALID_MEMBERSHIP
-
-        ROLE_NOT_FOUND @deprecated
-        VARIABLE_EMPTY @deprecated
-        VARIABLE_NOT_FOUND @deprecated
-    }
-
-    # === updateProjectMember ===
-
-    type UpdateProjectMemberResponse {
-        ok: Boolean!
-        errors: [UpdateProjectMemberError!]! @deprecated
-        error: UpdateProjectMemberError
-    }
-
-    type UpdateProjectMemberError {
-        code: UpdateProjectMemberErrorCode!
-        developerMessage: String!
-        membershipValidation: [MembershipValidationError!]
-        endUserMessage: String @deprecated
-    }
-
-    enum UpdateProjectMemberErrorCode {
-        PROJECT_NOT_FOUND
-        NOT_MEMBER
-        INVALID_MEMBERSHIP
-
-        ROLE_NOT_FOUND @deprecated
-        VARIABLE_EMPTY @deprecated
-        VARIABLE_NOT_FOUND @deprecated
-    }
-
-    # === removeProjectMember ===
-
-    type RemoveProjectMemberResponse {
-        ok: Boolean!
-        errors: [RemoveProjectMemberError!]!
-        error: RemoveProjectMemberError
-    }
-
-    type RemoveProjectMemberError {
-        code: RemoveProjectMemberErrorCode!
-        developerMessage: String!
-        endUserMessage: String @deprecated
-    }
-
-    enum RemoveProjectMemberErrorCode {
-        NOT_MEMBER
-        PROJECT_NOT_FOUND
-    }
-
-    # === createApiKey ===
-
-    type CreateApiKeyResponse {
-        ok: Boolean!
-        errors: [CreateApiKeyError!]! @deprecated
-        error: CreateApiKeyError
-        result: CreateApiKeyResult
-    }
-
-    type CreateApiKeyError {
-        code: CreateApiKeyErrorCode!
-        developerMessage: String!
-        membershipValidation: [MembershipValidationError!]
-        endUserMessage: String @deprecated
-    }
-
-    enum CreateApiKeyErrorCode {
-        PROJECT_NOT_FOUND
-        INVALID_MEMBERSHIP
-
-        VARIABLE_NOT_FOUND @deprecated
-        ROLE_NOT_FOUND @deprecated
-        VARIABLE_EMPTY @deprecated
-    }
-
-    type CreateApiKeyResult {
-        apiKey: ApiKeyWithToken!
-    }
-
-    # === disableApiKey ===
-
-    type DisableApiKeyResponse {
-        ok: Boolean!
-        errors: [DisableApiKeyError!]! @deprecated
-        error: DisableApiKeyError
-    }
-
-    type DisableApiKeyError {
-        code: DisableApiKeyErrorCode!
-        developerMessage: String!
-        endUserMessage: String @deprecated
-    }
-
-    enum DisableApiKeyErrorCode {
-        KEY_NOT_FOUND
-    }
+		addMailTemplate(template: MailTemplate!): AddMailTemplateResponse
+		removeMailTemplate(templateIdentifier: MailTemplateIdentifier!): RemoveMailTemplateResponse
+
+		createProject(
+			projectSlug: String!,
+			name: String,
+			config: Json,
+			secrets: [ProjectSecret!],
+			options: CreateProjectOptions,
+			deployTokenHash: String @deprecated(reason: "Use options")
+		): CreateProjectResponse
+		setProjectSecret(projectSlug: String!, key: String!, value: String!): SetProjectSecretResponse
+		updateProject(projectSlug: String!, name: String, config: Json, mergeConfig: Boolean): UpdateProjectResponse
+
+		addProjectMailTemplate(template: MailTemplate!): AddMailTemplateResponse
+		@deprecated(reason: "use addMailTemplate")
+
+		removeProjectMailTemplate(templateIdentifier: MailTemplateIdentifier!): RemoveMailTemplateResponse
+		@deprecated(reason: "use removeMailTemplate")
+
+	}
+
+	# === signUp ===
+	type SignUpResponse {
+		ok: Boolean!
+		errors: [SignUpError!]! @deprecated
+		error: SignUpError
+		result: SignUpResult
+	}
+
+	type SignUpError {
+		code: SignUpErrorCode!
+		developerMessage: String!
+		endPersonMessage: String @deprecated
+	}
+
+	enum SignUpErrorCode {
+		EMAIL_ALREADY_EXISTS
+		TOO_WEAK
+	}
+
+	type SignUpResult {
+		person: Person!
+	}
+
+	# === signInCommon ==
+
+	interface CommonSignInResult {
+		token: String!
+		person: Person!
+	}
+
+	# === signIn ===
+	type SignInResponse {
+		ok: Boolean!
+		errors: [SignInError!]! @deprecated
+		error: SignInError
+		result: SignInResult
+	}
+
+	type SignInError {
+		code: SignInErrorCode!
+		developerMessage: String!
+		endUserMessage: String @deprecated
+	}
+
+	enum SignInErrorCode {
+		UNKNOWN_EMAIL
+		INVALID_PASSWORD
+		NO_PASSWORD_SET
+		OTP_REQUIRED
+		INVALID_OTP_TOKEN
+	}
+
+	type SignInResult implements CommonSignInResult {
+		token: String!
+		person: Person!
+	}
+
+	# == createSessionToken ==
+
+	type CreateSessionTokenResponse {
+		ok: Boolean!
+		error: CreateSessionTokenError
+		result: CreateSessionTokenResult
+	}
+
+	type CreateSessionTokenError {
+		code: CreateSessionTokenErrorCode!
+		developerMessage: String!
+	}
+
+	enum CreateSessionTokenErrorCode {
+		UNKNOWN_EMAIL
+		UNKNOWN_PERSON_ID
+	}
+
+	type CreateSessionTokenResult implements CommonSignInResult{
+		token: String!
+		person: Person!
+	}
+
+	# === signOut ===
+
+	type SignOutResponse {
+		ok: Boolean!
+		errors: [SignOutError!]! @deprecated
+		error: SignOutError
+	}
+
+	type SignOutError {
+		code: SignOutErrorCode!
+		developerMessage: String!
+		endUserMessage: String @deprecated
+	}
+
+	enum SignOutErrorCode {
+		NOT_A_PERSON
+	}
+
+	# === changePassword ===
+
+	type ChangePasswordResponse {
+		ok: Boolean!
+		errors: [ChangePasswordError!]! @deprecated
+		error: ChangePasswordError
+	}
+
+	type ChangePasswordError {
+		code: ChangePasswordErrorCode!
+		developerMessage: String!
+		endUserMessage: String @deprecated
+	}
+
+	enum ChangePasswordErrorCode {
+		PERSON_NOT_FOUND
+		TOO_WEAK
+	}
+
+
+	type ChangeMyPasswordResponse {
+		ok: Boolean!
+		error: ChangeMyPasswordError
+	}
+
+	type ChangeMyPasswordError {
+		code: ChangeMyPasswordErrorCode!
+		developerMessage: String!
+	}
+
+	enum ChangeMyPasswordErrorCode {
+		TOO_WEAK
+		NOT_A_PERSON
+		INVALID_PASSWORD
+		NO_PASSWORD_SET
+	}
+
+	# === IDP ===
+
+	type InitSignInIDPResponse {
+		ok: Boolean!
+		errors: [InitSignInIDPError!]! @deprecated
+		error: InitSignInIDPError
+		result: InitSignInIDPResult
+	}
+
+	type InitSignInIDPResult {
+		authUrl: String!
+		sessionData: Json!
+	}
+
+	type InitSignInIDPError {
+		code: InitSignInIDPErrorCode!
+		developerMessage: String!
+		endUserMessage: String @deprecated
+	}
+
+	enum InitSignInIDPErrorCode {
+		PROVIDER_NOT_FOUND
+		IDP_VALIDATION_FAILED
+	}
+
+	input IDPResponseInput {
+		url: String!
+	}
+
+	type SignInIDPResponse {
+		ok: Boolean!
+		errors: [SignInIDPError!]! @deprecated
+		error: SignInIDPError
+		result: SignInIDPResult
+	}
+
+	type SignInIDPError {
+		code: SignInIDPErrorCode!
+		developerMessage: String!
+		endUserMessage: String @deprecated
+	}
+
+	enum SignInIDPErrorCode {
+		INVALID_IDP_RESPONSE
+		IDP_VALIDATION_FAILED
+
+		PERSON_NOT_FOUND
+		PERSON_ALREADY_EXISTS
+	}
+
+	type SignInIDPResult implements CommonSignInResult {
+		token: String!
+		person: Person!
+	}
+
+	type AddIDPResponse {
+		error: AddIDPError
+		ok: Boolean!
+	}
+
+	type AddIDPError {
+		code: AddIDPErrorCode!
+		developerMessage: String!
+	}
+
+	enum AddIDPErrorCode {
+		ALREADY_EXISTS
+		UNKNOWN_TYPE
+		INVALID_CONFIGURATION
+	}
+
+	type UpdateIDPResponse {
+		error: UpdateIDPError
+		ok: Boolean!
+	}
+
+	type UpdateIDPError {
+		code: UpdateIDPErrorCode!
+		developerMessage: String!
+	}
+
+	enum UpdateIDPErrorCode {
+		NOT_FOUND
+		INVALID_CONFIGURATION
+	}
+
+
+	type DisableIDPResponse {
+		error: DisableIDPError
+		ok: Boolean!
+	}
+
+	type DisableIDPError {
+		code: DisableIDPErrorCode!
+		developerMessage: String!
+	}
+
+	enum DisableIDPErrorCode {
+		NOT_FOUND
+	}
+
+	type EnableIDPResponse {
+		error: EnableIDPError
+		ok: Boolean!
+	}
+
+	type EnableIDPError {
+		code: EnableIDPErrorCode!
+		developerMessage: String!
+	}
+
+	enum EnableIDPErrorCode {
+		NOT_FOUND
+	}
+
+	type IdentityProvider {
+		slug: String!
+		type: String!
+		configuration: Json!
+		disabledAt: DateTime
+		options: IDPOptionsOutput!
+	}
+
+	type IDPOptionsOutput {
+		autoSignUp: Boolean!
+		exclusive: Boolean!
+	}
+
+	input IDPOptions {
+		autoSignUp: Boolean
+		exclusive: Boolean
+	}
+
+
+	# === invite ===
+
+	type InviteResponse {
+		ok: Boolean!
+		errors: [InviteError!]! @deprecated
+		error: InviteError
+		result: InviteResult
+	}
+
+	type InviteError {
+		code: InviteErrorCode!
+		developerMessage: String!
+		membershipValidation: [MembershipValidationError!]
+		endUserMessage: String @deprecated
+	}
+
+	enum InviteErrorCode {
+		PROJECT_NOT_FOUND
+		ALREADY_MEMBER
+		INVALID_MEMBERSHIP
+
+		ROLE_NOT_FOUND @deprecated
+		VARIABLE_NOT_FOUND @deprecated
+		VARIABLE_EMPTY @deprecated
+	}
+
+	type InviteResult {
+		person: Person!
+		isNew: Boolean!
+	}
+
+	enum InviteMethod {
+		CREATE_PASSWORD
+		RESET_PASSWORD
+	}
+
+	input InviteOptions {
+		method: InviteMethod
+		mailVariant: String
+	}
+
+	input UnmanagedInviteOptions {
+		password: String
+		resetTokenHash: String
+	}
+
+	# === addProjectMember ===
+
+	type AddProjectMemberResponse {
+		ok: Boolean!
+		errors: [AddProjectMemberError!]!
+		error: AddProjectMemberError
+	}
+
+	type AddProjectMemberError {
+		code: AddProjectMemberErrorCode!
+		membershipValidation: [MembershipValidationError!]
+		developerMessage: String!
+		endUserMessage: String @deprecated
+	}
+
+	enum AddProjectMemberErrorCode {
+		PROJECT_NOT_FOUND
+		IDENTITY_NOT_FOUND
+		ALREADY_MEMBER
+		INVALID_MEMBERSHIP
+
+		ROLE_NOT_FOUND @deprecated
+		VARIABLE_EMPTY @deprecated
+		VARIABLE_NOT_FOUND @deprecated
+	}
+
+	# === updateProjectMember ===
+
+	type UpdateProjectMemberResponse {
+		ok: Boolean!
+		errors: [UpdateProjectMemberError!]! @deprecated
+		error: UpdateProjectMemberError
+	}
+
+	type UpdateProjectMemberError {
+		code: UpdateProjectMemberErrorCode!
+		developerMessage: String!
+		membershipValidation: [MembershipValidationError!]
+		endUserMessage: String @deprecated
+	}
+
+	enum UpdateProjectMemberErrorCode {
+		PROJECT_NOT_FOUND
+		NOT_MEMBER
+		INVALID_MEMBERSHIP
+
+		ROLE_NOT_FOUND @deprecated
+		VARIABLE_EMPTY @deprecated
+		VARIABLE_NOT_FOUND @deprecated
+	}
+
+	# === removeProjectMember ===
+
+	type RemoveProjectMemberResponse {
+		ok: Boolean!
+		errors: [RemoveProjectMemberError!]!
+		error: RemoveProjectMemberError
+	}
+
+	type RemoveProjectMemberError {
+		code: RemoveProjectMemberErrorCode!
+		developerMessage: String!
+		endUserMessage: String @deprecated
+	}
+
+	enum RemoveProjectMemberErrorCode {
+		NOT_MEMBER
+		PROJECT_NOT_FOUND
+	}
+
+	# === createApiKey ===
+
+	type CreateApiKeyResponse {
+		ok: Boolean!
+		errors: [CreateApiKeyError!]! @deprecated
+		error: CreateApiKeyError
+		result: CreateApiKeyResult
+	}
+
+	type CreateApiKeyError {
+		code: CreateApiKeyErrorCode!
+		developerMessage: String!
+		membershipValidation: [MembershipValidationError!]
+		endUserMessage: String @deprecated
+	}
+
+	enum CreateApiKeyErrorCode {
+		PROJECT_NOT_FOUND
+		INVALID_MEMBERSHIP
+
+		VARIABLE_NOT_FOUND @deprecated
+		ROLE_NOT_FOUND @deprecated
+		VARIABLE_EMPTY @deprecated
+	}
+
+	type CreateApiKeyResult {
+		apiKey: ApiKeyWithToken!
+	}
+
+	# === disableApiKey ===
+
+	type DisableApiKeyResponse {
+		ok: Boolean!
+		errors: [DisableApiKeyError!]! @deprecated
+		error: DisableApiKeyError
+	}
+
+	type DisableApiKeyError {
+		code: DisableApiKeyErrorCode!
+		developerMessage: String!
+		endUserMessage: String @deprecated
+	}
+
+	enum DisableApiKeyErrorCode {
+		KEY_NOT_FOUND
+	}
 
 	# === addGlobalIdentityRoles ===
 
 	type AddGlobalIdentityRolesResponse {
 		ok: Boolean!
 		error: AddGlobalIdentityRolesError
-        result: AddGlobalIdentityRolesResult
+		result: AddGlobalIdentityRolesResult
 	}
 
-    type AddGlobalIdentityRolesResult {
-        identity: Identity!
-    }
+	type AddGlobalIdentityRolesResult {
+		identity: Identity!
+	}
 
 	type AddGlobalIdentityRolesError {
 		code: AddGlobalIdentityRolesErrorCode!
@@ -549,390 +549,390 @@ const schema: DocumentNode = gql`
 	}
 
 	enum AddGlobalIdentityRolesErrorCode {
-        IDENTITY_NOT_FOUND
+		IDENTITY_NOT_FOUND
 		INVALID_ROLE
 	}
 
 
-    # === removeGlobalIdentityRoles ===
+	# === removeGlobalIdentityRoles ===
 
-    type RemoveGlobalIdentityRolesResponse {
-        ok: Boolean!
-        error: RemoveGlobalIdentityRolesError
-        result: RemoveGlobalIdentityRolesResult
-    }
+	type RemoveGlobalIdentityRolesResponse {
+		ok: Boolean!
+		error: RemoveGlobalIdentityRolesError
+		result: RemoveGlobalIdentityRolesResult
+	}
 
-    type RemoveGlobalIdentityRolesError {
-        code: RemoveGlobalIdentityRolesErrorCode!
-        developerMessage: String!
-    }
+	type RemoveGlobalIdentityRolesError {
+		code: RemoveGlobalIdentityRolesErrorCode!
+		developerMessage: String!
+	}
 
-    type RemoveGlobalIdentityRolesResult {
-        identity: Identity!
-    }
+	type RemoveGlobalIdentityRolesResult {
+		identity: Identity!
+	}
 
-    enum RemoveGlobalIdentityRolesErrorCode {
-        IDENTITY_NOT_FOUND
-        INVALID_ROLE
-    }
+	enum RemoveGlobalIdentityRolesErrorCode {
+		IDENTITY_NOT_FOUND
+		INVALID_ROLE
+	}
 
 	# === common ===
 
-    # === variables ===
+	# === variables ===
 
-    input VariableEntryInput {
-        name: String!
-        values: [String!]!
-    }
+	input VariableEntryInput {
+		name: String!
+		values: [String!]!
+	}
 
-    type VariableEntry {
-        name: String!
-        values: [String!]!
-    }
+	type VariableEntry {
+		name: String!
+		values: [String!]!
+	}
 
-    # === membership ===
+	# === membership ===
 
-    input MembershipInput {
-        role: String!
-        variables: [VariableEntryInput!]!
-    }
+	input MembershipInput {
+		role: String!
+		variables: [VariableEntryInput!]!
+	}
 
-    type Membership {
-        role: String!
-        variables: [VariableEntry!]!
-    }
+	type Membership {
+		role: String!
+		variables: [VariableEntry!]!
+	}
 
-    type MembershipValidationError {
-        code: MembershipValidationErrorCode!
-        role: String!
-        variable: String
-    }
+	type MembershipValidationError {
+		code: MembershipValidationErrorCode!
+		role: String!
+		variable: String
+	}
 
-    enum MembershipValidationErrorCode {
-        ROLE_NOT_FOUND
-        VARIABLE_NOT_FOUND
-        VARIABLE_EMPTY
-        VARIABLE_INVALID
-    }
+	enum MembershipValidationErrorCode {
+		ROLE_NOT_FOUND
+		VARIABLE_NOT_FOUND
+		VARIABLE_EMPTY
+		VARIABLE_INVALID
+	}
 
-    # === person ====
+	# === person ====
 
-    type Person {
-        id: String!
-        email: String
-        name: String
-        otpEnabled: Boolean!
-        identity: Identity!
-    }
+	type Person {
+		id: String!
+		email: String
+		name: String
+		otpEnabled: Boolean!
+		identity: Identity!
+	}
 
-    # === api key ===
+	# === api key ===
 
-    type ApiKey {
-        id: String!
-        identity: Identity!
-    }
+	type ApiKey {
+		id: String!
+		identity: Identity!
+	}
 
-    type ApiKeyWithToken {
-        id: String!
-        token: String
-        identity: Identity!
-    }
+	type ApiKeyWithToken {
+		id: String!
+		token: String
+		identity: Identity!
+	}
 
-    # === identity ===
+	# === identity ===
 
-    type Identity {
-        id: String!
-        description: String
-        person: Person
-        apiKey: ApiKey
-        projects: [IdentityProjectRelation!]!
-        permissions: IdentityGlobalPermissions
-        roles: [String!]
-    }
+	type Identity {
+		id: String!
+		description: String
+		person: Person
+		apiKey: ApiKey
+		projects: [IdentityProjectRelation!]!
+		permissions: IdentityGlobalPermissions
+		roles: [String!]
+	}
 
 	type IdentityGlobalPermissions {
 		canCreateProject: Boolean!
 		canDeployEntrypoint: Boolean!
 	}
 
-    type IdentityProjectRelation {
-        project: Project!
-        memberships: [Membership!]!
-    }
+	type IdentityProjectRelation {
+		project: Project!
+		memberships: [Membership!]!
+	}
 
-    # === project ===
+	# === project ===
 
-    type Project {
-        id: String!
-        name: String!
-        slug: String!
-        config: Json!
-        roles: [RoleDefinition!]!
-        members(
-            input: ProjectMembersInput,
-            memberType: MemberType @deprecated(reason: "Use args")
-        ): [ProjectIdentityRelation!]!
-    }
+	type Project {
+		id: String!
+		name: String!
+		slug: String!
+		config: Json!
+		roles: [RoleDefinition!]!
+		members(
+			input: ProjectMembersInput,
+			memberType: MemberType @deprecated(reason: "Use args")
+		): [ProjectIdentityRelation!]!
+	}
 
-    input ProjectMembersInput {
-        limit: Int
-        offset: Int
-        filter: ProjectMembersFilter
-    }
+	input ProjectMembersInput {
+		limit: Int
+		offset: Int
+		filter: ProjectMembersFilter
+	}
 
-    input ProjectMembersFilter {
-        memberType: MemberType
-        email: String
-    }
+	input ProjectMembersFilter {
+		memberType: MemberType
+		email: String
+	}
 
-    enum MemberType {
-        API_KEY
-        PERSON
-    }
+	enum MemberType {
+		API_KEY
+		PERSON
+	}
 
-    type ProjectIdentityRelation {
-        identity: Identity!
-        memberships: [Membership!]!
-    }
+	type ProjectIdentityRelation {
+		identity: Identity!
+		memberships: [Membership!]!
+	}
 
-    type RoleDefinition {
-        name: String!
-        variables: [RoleVariableDefinition!]!
-    }
+	type RoleDefinition {
+		name: String!
+		variables: [RoleVariableDefinition!]!
+	}
 
-    interface RoleVariableDefinition {
-        name: String!
-    }
+	interface RoleVariableDefinition {
+		name: String!
+	}
 
-    type RoleEntityVariableDefinition implements RoleVariableDefinition {
-        name: String!
-        entityName: String!
-    }
+	type RoleEntityVariableDefinition implements RoleVariableDefinition {
+		name: String!
+		entityName: String!
+	}
 
-    type RolePredefinedVariableDefinition implements RoleVariableDefinition {
-        name: String!
-        value: String!
-    }
+	type RolePredefinedVariableDefinition implements RoleVariableDefinition {
+		name: String!
+		value: String!
+	}
 
-    type RoleConditionVariableDefinition implements RoleVariableDefinition {
-        name: String!
-    }
+	type RoleConditionVariableDefinition implements RoleVariableDefinition {
+		name: String!
+	}
 
-    # ==== 2fa ====
+	# ==== 2fa ====
 
-    type PrepareOtpResponse {
-        ok: Boolean!
-        result: PrepareOtpResult
-    }
+	type PrepareOtpResponse {
+		ok: Boolean!
+		result: PrepareOtpResult
+	}
 
-    type PrepareOtpResult {
-        otpUri: String!
-        otpSecret: String!
-    }
+	type PrepareOtpResult {
+		otpUri: String!
+		otpSecret: String!
+	}
 
-    type ConfirmOtpResponse {
-        ok: Boolean!
-        errors: [ConfirmOtpError!]! @deprecated
-        error: ConfirmOtpError
-    }
+	type ConfirmOtpResponse {
+		ok: Boolean!
+		errors: [ConfirmOtpError!]! @deprecated
+		error: ConfirmOtpError
+	}
 
-    type ConfirmOtpError {
-        code: ConfirmOtpErrorCode!
-        developerMessage: String!
-        endUserMessage: String @deprecated
-    }
+	type ConfirmOtpError {
+		code: ConfirmOtpErrorCode!
+		developerMessage: String!
+		endUserMessage: String @deprecated
+	}
 
-    enum ConfirmOtpErrorCode {
-        INVALID_OTP_TOKEN
-        NOT_PREPARED
-    }
+	enum ConfirmOtpErrorCode {
+		INVALID_OTP_TOKEN
+		NOT_PREPARED
+	}
 
-    type DisableOtpResponse {
-        ok: Boolean!
-        errors: [DisableOtpError!]! @deprecated
-        error: DisableOtpError
-    }
+	type DisableOtpResponse {
+		ok: Boolean!
+		errors: [DisableOtpError!]! @deprecated
+		error: DisableOtpError
+	}
 
-    type DisableOtpError {
-        code: DisableOtpErrorCode!
-        developerMessage: String!
-        endUserMessage: String @deprecated
-    }
+	type DisableOtpError {
+		code: DisableOtpErrorCode!
+		developerMessage: String!
+		endUserMessage: String @deprecated
+	}
 
-    enum DisableOtpErrorCode {
-        OTP_NOT_ACTIVE
-    }
+	enum DisableOtpErrorCode {
+		OTP_NOT_ACTIVE
+	}
 
-    # === mails ===
+	# === mails ===
 
-    input MailTemplate {
-        projectSlug: String
-        type: MailType!
-        "Custom mail variant identifier, e.g. a locale."
-        variant: String
-        subject: String!
-        content: String!
-        useLayout: Boolean
-    }
+	input MailTemplate {
+		projectSlug: String
+		type: MailType!
+		"Custom mail variant identifier, e.g. a locale."
+		variant: String
+		subject: String!
+		content: String!
+		useLayout: Boolean
+	}
 
-    enum MailType {
-        EXISTING_USER_INVITED
-        NEW_USER_INVITED
-        RESET_PASSWORD_REQUEST
-    }
+	enum MailType {
+		EXISTING_USER_INVITED
+		NEW_USER_INVITED
+		RESET_PASSWORD_REQUEST
+	}
 
-    input MailTemplateIdentifier {
-        projectSlug: String
-        type: MailType!
-        variant: String
-    }
+	input MailTemplateIdentifier {
+		projectSlug: String
+		type: MailType!
+		variant: String
+	}
 
-    type AddMailTemplateResponse {
-        ok: Boolean!
-        errors: [AddMailTemplateError!]! @deprecated
-        error: AddMailTemplateError
-    }
+	type AddMailTemplateResponse {
+		ok: Boolean!
+		errors: [AddMailTemplateError!]! @deprecated
+		error: AddMailTemplateError
+	}
 
-    type AddMailTemplateError {
-        code: AddMailTemplateErrorCode!
-        developerMessage: String!
-        endUserMessage: String @deprecated
-    }
+	type AddMailTemplateError {
+		code: AddMailTemplateErrorCode!
+		developerMessage: String!
+		endUserMessage: String @deprecated
+	}
 
-    enum AddMailTemplateErrorCode {
-        MISSING_VARIABLE
-        PROJECT_NOT_FOUND
-    }
-
-    type RemoveMailTemplateResponse {
-        ok: Boolean!
-        errors: [RemoveMailTemplateError!]!
-        error: RemoveMailTemplateError
-    }
-
-    type RemoveMailTemplateError {
-        code: RemoveMailTemplateErrorCode!
-        developerMessage: String!
-        endUserMessage: String @deprecated
-    }
-
-    enum RemoveMailTemplateErrorCode {
-        PROJECT_NOT_FOUND
-        TEMPLATE_NOT_FOUND
-    }
-
-    # === password reset ===
-
-    type CheckResetPasswordTokenResult {
-        code: CheckResetPasswordTokenCode!
-    }
-
-    enum CheckResetPasswordTokenCode {
-        REQUEST_NOT_FOUND
-        TOKEN_NOT_FOUND
-        TOKEN_USED
-        TOKEN_EXPIRED
-    }
-
-    type CreatePasswordResetRequestResponse {
-        ok: Boolean!
-        errors: [CreatePasswordResetRequestError!]! @deprecated
-        error: CreatePasswordResetRequestError
-    }
-
-    type CreatePasswordResetRequestError {
-        code: CreatePasswordResetRequestErrorCode!
-        developerMessage: String!
-        endUserMessage: String @deprecated
-    }
-
-    enum CreatePasswordResetRequestErrorCode {
-        PERSON_NOT_FOUND
-    }
-
-    type ResetPasswordResponse {
-        ok: Boolean!
-        errors: [ResetPasswordError!]! @deprecated
-        error: ResetPasswordError
-    }
-    type ResetPasswordError {
-        code: ResetPasswordErrorCode!
-        developerMessage: String!
-        endUserMessage: String @deprecated
-    }
-
-    enum ResetPasswordErrorCode {
-        TOKEN_NOT_FOUND
-        TOKEN_USED
-        TOKEN_EXPIRED
-
-        PASSWORD_TOO_WEAK
-    }
-
-    input CreateResetPasswordRequestOptions {
-        mailProject: String
-        mailVariant: String
-    }
-
-    # === project ===
-
-    input ProjectSecret {
-        key: String!
-        value: String!
-    }
-
-    input CreateProjectOptions {
-        deployTokenHash: String
-        noDeployToken: Boolean
-    }
-
-    type CreateProjectResponse {
-        ok: Boolean!
-        error: CreateProjectResponseError
-        result: CreateProjectResult
-    }
-
-    type CreateProjectResponseError {
-        code: CreateProjectResponseErrorCode!
-        developerMessage: String!
-    }
-
-    type CreateProjectResult {
-        deployerApiKey: ApiKeyWithToken
-    }
-
-    enum CreateProjectResponseErrorCode {
-        ALREADY_EXISTS
-        INIT_ERROR
-    }
-
-    type SetProjectSecretResponse {
-        ok: Boolean!
-        error: SetProjectSecretError
-    }
-
-    type SetProjectSecretError {
-        code: SetProjectSecretErrorCode!
-        developerMessage: String!
-    }
-
-    enum SetProjectSecretErrorCode {
+	enum AddMailTemplateErrorCode {
+		MISSING_VARIABLE
 		PROJECT_NOT_FOUND
-    }
+	}
 
-    type UpdateProjectResponse {
-        ok: Boolean!
-        error: UpdateProjectError
-    }
+	type RemoveMailTemplateResponse {
+		ok: Boolean!
+		errors: [RemoveMailTemplateError!]!
+		error: RemoveMailTemplateError
+	}
 
-    type UpdateProjectError {
-        code: UpdateProjectErrorCode!
-        developerMessage: String!
-    }
+	type RemoveMailTemplateError {
+		code: RemoveMailTemplateErrorCode!
+		developerMessage: String!
+		endUserMessage: String @deprecated
+	}
 
-    enum UpdateProjectErrorCode {
-        PROJECT_NOT_FOUND
-    }
+	enum RemoveMailTemplateErrorCode {
+		PROJECT_NOT_FOUND
+		TEMPLATE_NOT_FOUND
+	}
+
+	# === password reset ===
+
+	type CheckResetPasswordTokenResult {
+		code: CheckResetPasswordTokenCode!
+	}
+
+	enum CheckResetPasswordTokenCode {
+		REQUEST_NOT_FOUND
+		TOKEN_NOT_FOUND
+		TOKEN_USED
+		TOKEN_EXPIRED
+	}
+
+	type CreatePasswordResetRequestResponse {
+		ok: Boolean!
+		errors: [CreatePasswordResetRequestError!]! @deprecated
+		error: CreatePasswordResetRequestError
+	}
+
+	type CreatePasswordResetRequestError {
+		code: CreatePasswordResetRequestErrorCode!
+		developerMessage: String!
+		endUserMessage: String @deprecated
+	}
+
+	enum CreatePasswordResetRequestErrorCode {
+		PERSON_NOT_FOUND
+	}
+
+	type ResetPasswordResponse {
+		ok: Boolean!
+		errors: [ResetPasswordError!]! @deprecated
+		error: ResetPasswordError
+	}
+	type ResetPasswordError {
+		code: ResetPasswordErrorCode!
+		developerMessage: String!
+		endUserMessage: String @deprecated
+	}
+
+	enum ResetPasswordErrorCode {
+		TOKEN_NOT_FOUND
+		TOKEN_USED
+		TOKEN_EXPIRED
+
+		PASSWORD_TOO_WEAK
+	}
+
+	input CreateResetPasswordRequestOptions {
+		mailProject: String
+		mailVariant: String
+	}
+
+	# === project ===
+
+	input ProjectSecret {
+		key: String!
+		value: String!
+	}
+
+	input CreateProjectOptions {
+		deployTokenHash: String
+		noDeployToken: Boolean
+	}
+
+	type CreateProjectResponse {
+		ok: Boolean!
+		error: CreateProjectResponseError
+		result: CreateProjectResult
+	}
+
+	type CreateProjectResponseError {
+		code: CreateProjectResponseErrorCode!
+		developerMessage: String!
+	}
+
+	type CreateProjectResult {
+		deployerApiKey: ApiKeyWithToken
+	}
+
+	enum CreateProjectResponseErrorCode {
+		ALREADY_EXISTS
+		INIT_ERROR
+	}
+
+	type SetProjectSecretResponse {
+		ok: Boolean!
+		error: SetProjectSecretError
+	}
+
+	type SetProjectSecretError {
+		code: SetProjectSecretErrorCode!
+		developerMessage: String!
+	}
+
+	enum SetProjectSecretErrorCode {
+		PROJECT_NOT_FOUND
+	}
+
+	type UpdateProjectResponse {
+		ok: Boolean!
+		error: UpdateProjectError
+	}
+
+	type UpdateProjectError {
+		code: UpdateProjectErrorCode!
+		developerMessage: String!
+	}
+
+	enum UpdateProjectErrorCode {
+		PROJECT_NOT_FOUND
+	}
 `
 
 export default schema

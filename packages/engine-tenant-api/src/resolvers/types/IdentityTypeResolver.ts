@@ -117,6 +117,7 @@ export class IdentityTypeResolver implements IdentityResolvers {
 		if (parent.permissions) {
 			return parent.permissions
 		}
+
 		const permissionsContext = await (async () => {
 			const isSelf = parent.id === context.identity.id
 			if (isSelf) {
@@ -128,13 +129,14 @@ export class IdentityTypeResolver implements IdentityResolvers {
 			}
 			return this.permissionContextFactory.create(context.db, { id: parent.id, roles })
 		})()
+
 		if (!permissionsContext) {
 			return null
 		}
+
 		return {
 			canCreateProject: await permissionsContext.isAllowed({ action: PermissionActions.PROJECT_CREATE }),
+			canDeployEntrypoint: await permissionsContext.isAllowed({ action: PermissionActions.ENTRYPOINT_DEPLOY }),
 		}
 	}
-
-
 }

@@ -77,7 +77,7 @@ function isCSSPrefix(value: unknown): value is `--${string}` {
 	return typeof value === 'string' && value.startsWith('--') ? true : false
 }
 
-type ScreenInsetsToCSSCustomProperties<
+export type ScreenInsetsToCSSCustomProperties<
 	P extends string,
 	T extends Readonly<Record<string, number | null>>,
 > = {

@@ -1,1 +1,1 @@
-export * from './ApiKeyByTokenQuery'
+export * from './ApiKeyQuery'

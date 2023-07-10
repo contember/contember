@@ -6,12 +6,13 @@ import {
 	ProlongApiKeyCommand,
 } from '../../commands'
 import { ApiKey } from '../../type'
-import { ApiKeyByTokenQuery } from '../../queries'
+
 import { Response, ResponseError, ResponseOk } from '../../utils/Response'
 import { DatabaseContext, TokenHash } from '../../utils'
 import { ApiKeyService, CreateApiKeyResponse } from './ApiKeyService'
 import assert from 'node:assert'
 import { Acl } from '@contember/schema'
+import { ApiKeyByIdQuery, ApiKeyByTokenQuery, ApiKeyRow } from '../../queries'
 
 export class ApiKeyManager {
 	constructor(
@@ -55,6 +56,12 @@ export class ApiKeyManager {
 		return token
 	}
 
+
+	async findApiKey(dbContext: DatabaseContext, apiKeyId: string): Promise<ApiKeyRow | null> {
+		return await dbContext.queryHandler.fetch(
+			new ApiKeyByIdQuery(apiKeyId),
+		)
+	}
 
 	async disableOneOffApiKey(dbContext: DatabaseContext, apiKeyId: string): Promise<void> {
 		await dbContext.commandBus.execute(new DisableOneOffApiKeyCommand(apiKeyId))

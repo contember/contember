@@ -1063,6 +1063,7 @@ export type SignOutError = {
 
 export type SignOutErrorCode =
   | 'NOT_A_PERSON'
+  | 'NOT_POSSIBLE_SIGN_OUT_WITH_PERMANENT_API_KEY'
 
 export type SignOutResponse = {
 	readonly __typename?: 'SignOutResponse'

@@ -274,17 +274,10 @@ export type CreateSessionTokenError = {
 	readonly developerMessage: Scalars['String']
 }
 
-<<<<<<< HEAD
 export type CreateSessionTokenErrorCode =
   | 'UNKNOWN_EMAIL'
   | 'UNKNOWN_PERSON_ID'
-=======
-export enum CreateSessionTokenErrorCode {
-	PersonDisabled = 'PERSON_DISABLED',
-	UnknownEmail = 'UNKNOWN_EMAIL',
-	UnknownPersonId = 'UNKNOWN_PERSON_ID'
-}
->>>>>>> 035b71030 (chore(tenant): restrict sign in for disabled accounts in IDPS provider)
+  | 'PERSON_DISABLED'
 
 export type CreateSessionTokenResponse = {
 	readonly __typename?: 'CreateSessionTokenResponse'
@@ -1049,21 +1042,12 @@ export type SignInIdpError = {
 	readonly endUserMessage?: Maybe<Scalars['String']>
 }
 
-<<<<<<< HEAD
 export type SignInIdpErrorCode =
   | 'IDP_VALIDATION_FAILED'
   | 'INVALID_IDP_RESPONSE'
   | 'PERSON_ALREADY_EXISTS'
   | 'PERSON_NOT_FOUND'
-=======
-export enum SignInIdpErrorCode {
-	IdpValidationFailed = 'IDP_VALIDATION_FAILED',
-	InvalidIdpResponse = 'INVALID_IDP_RESPONSE',
-	PersonAlreadyExists = 'PERSON_ALREADY_EXISTS',
-	PersonDisabled = 'PERSON_DISABLED',
-	PersonNotFound = 'PERSON_NOT_FOUND'
-}
->>>>>>> 035b71030 (chore(tenant): restrict sign in for disabled accounts in IDPS provider)
+  | 'PERSON_DISABLED'
 
 export type SignInIdpResponse = {
 	readonly __typename?: 'SignInIDPResponse'

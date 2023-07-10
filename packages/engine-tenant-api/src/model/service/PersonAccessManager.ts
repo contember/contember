@@ -2,23 +2,25 @@ import { PersonQuery } from '../queries'
 import { DatabaseContext } from '../utils'
 import { DisablePersonCommand } from '../commands/person/DisablePersonCommand'
 import { ApiKeyManager } from './apiKey'
+import { Response, ResponseError, ResponseOk } from '../utils/Response'
+import { DisablePersonErrorCode } from '../../schema'
 
 class PersonAccessManager {
 
 	constructor(private readonly apiKeyManager: ApiKeyManager) {}
 
-	async disablePerson(dbContext: DatabaseContext, personId: string): Promise<PersonDisableAccessErrorCode | null> {
-		return await dbContext.transaction(async trx => {
+	async disablePerson(dbContext: DatabaseContext, personId: string): Promise<PersonDisableAccessResponse> {
+		const result = await dbContext.transaction(async trx => {
 			const personRow = await trx.queryHandler.fetch(
 				PersonQuery.byId(personId),
 			)
 
 			if (personRow === null) {
-				return PersonDisableAccessErrorCode.PERSON_NOT_FOUND
+				return 'PERSON_NOT_FOUND'
 			}
 
 			if (personRow.disabled_at !== null) {
-				return PersonDisableAccessErrorCode.PERSON_ALREADY_DISABLED
+				return 'PERSON_ALREADY_DISABLED'
 			}
 
 			// Deactivate person & invalidate all api keys associated with person identity
@@ -27,20 +29,28 @@ class PersonAccessManager {
 
 			return null
 		})
+
+		switch (result) {
+			case null:
+				return new ResponseOk(null)
+
+			case 'PERSON_ALREADY_DISABLED':
+				return new ResponseError(result, 'Person is already disable')
+
+			case 'PERSON_NOT_FOUND':
+				return new ResponseError(result, 'Person not found')
+		}
 	}
 
-	async disablePersonAccount(dbContext: DatabaseContext, personId: string) {
+	private async disablePersonAccount(dbContext: DatabaseContext, personId: string) {
 		await dbContext.commandBus.execute(new DisablePersonCommand(personId))
 	}
 
-	async disableIdentityApiKeys(dbContext: DatabaseContext, personIdentityId: string) {
+	private async disableIdentityApiKeys(dbContext: DatabaseContext, personIdentityId: string) {
 		await this.apiKeyManager.disableIdentityApiKeys(dbContext, personIdentityId)
 	}
 }
 
-export enum PersonDisableAccessErrorCode {
-	PERSON_NOT_FOUND = 'PERSON_NOT_FOUND',
-	PERSON_ALREADY_DISABLED = 'PERSON_ALREADY_DISABLED',
-}
+export type PersonDisableAccessResponse = Response<null, DisablePersonErrorCode>
 
 export { PersonAccessManager }

@@ -1,12 +1,12 @@
 import {
-	DisablePersonErrorCode,
 	DisablePersonResponse,
 	MutationDisablePersonArgs,
 	MutationResolvers,
 } from '../../../schema'
 import { TenantResolverContext } from '../../TenantResolverContext'
-import { PermissionActions, PersonAccessManager, PersonDisableAccessErrorCode } from '../../../model'
+import { PermissionActions, PersonAccessManager } from '../../../model'
 import { PersonManager } from '../../../model/service/PersonManager'
+import { createErrorResponse } from '../../errorUtils'
 
 export class DisablePersonMutationResolver implements MutationResolvers {
 
@@ -24,7 +24,7 @@ export class DisablePersonMutationResolver implements MutationResolvers {
 			return {
 				ok: false,
 				error: {
-					code: DisablePersonErrorCode.PersonNotFound,
+					code: 'PERSON_NOT_FOUND',
 					developerMessage: `Person <${args.personId}> was not found`,
 				},
 			}
@@ -35,19 +35,14 @@ export class DisablePersonMutationResolver implements MutationResolvers {
 			message: 'You are not allowed to disable person account',
 		})
 
-		const resultError = await this.personAccessManager.disablePerson(context.db, args.personId)
+		const result = await this.personAccessManager.disablePerson(context.db, args.personId)
 
-		// Person disabled without any issues
-		if (resultError === null) {
-			return { ok: true }
+		if (!result.ok) {
+			return createErrorResponse(result.error, result.errorMessage)
 		}
 
 		return {
-			ok: false,
-			error: {
-				code: DisablePersonErrorCode.PersonAlreadyDisabled,
-				developerMessage: `Person <${args.personId}> already disabled.`,
-			},
+			ok: true,
 		}
 	}
 }

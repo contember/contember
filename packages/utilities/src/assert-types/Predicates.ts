@@ -9,7 +9,7 @@ export function isNotNull<T>(value: unknown): value is T {
 export function isUndefined(value: unknown): value is undefined {
   return value === undefined
 }
-export function isDefined<T>(value: unknown): value is T {
+export function isDefined<T>(value: unknown): value is Exclude<T, undefined> {
   return value !== undefined
 }
 export function isNotNullish<T>(value: T): value is Exclude<T, null | undefined> {

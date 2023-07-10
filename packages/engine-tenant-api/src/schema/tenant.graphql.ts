@@ -52,6 +52,8 @@ const schema: DocumentNode = gql`
 		confirmOtp(otpToken: String!): ConfirmOtpResponse
 		disableOtp: DisableOtpResponse
 
+		disablePerson(personId: String!): DisablePersonResponse
+
 		createResetPasswordRequest(email: String!, options: CreateResetPasswordRequestOptions): CreatePasswordResetRequestResponse
 		resetPassword(token: String!, password: String!): ResetPasswordResponse
 
@@ -145,6 +147,7 @@ const schema: DocumentNode = gql`
 	enum SignInErrorCode {
 		UNKNOWN_EMAIL
 		INVALID_PASSWORD
+		PERSON_DISABLED
 		NO_PASSWORD_SET
 		OTP_REQUIRED
 		INVALID_OTP_TOKEN
@@ -171,6 +174,7 @@ const schema: DocumentNode = gql`
 	enum CreateSessionTokenErrorCode {
 		UNKNOWN_EMAIL
 		UNKNOWN_PERSON_ID
+		PERSON_DISABLED
 	}
 
 	type CreateSessionTokenResult implements CommonSignInResult{
@@ -281,6 +285,7 @@ const schema: DocumentNode = gql`
 		IDP_VALIDATION_FAILED
 
 		PERSON_NOT_FOUND
+		PERSON_DISABLED
 		PERSON_ALREADY_EXISTS
 	}
 
@@ -541,7 +546,7 @@ const schema: DocumentNode = gql`
 	type AddGlobalIdentityRolesResult {
 		identity: Identity!
 	}
-	
+
 	type AddGlobalIdentityRolesError {
 		code: AddGlobalIdentityRolesErrorCode!
 		developerMessage: String!
@@ -758,6 +763,21 @@ const schema: DocumentNode = gql`
 
 	enum DisableOtpErrorCode {
 		OTP_NOT_ACTIVE
+	}
+
+	type DisablePersonResponse {
+		ok: Boolean!
+		error: DisablePersonError
+	}
+
+	type DisablePersonError {
+		code: DisablePersonErrorCode!
+		developerMessage: String!
+	}
+
+	enum DisablePersonErrorCode {
+		PERSON_ALREADY_DISABLED
+		PERSON_NOT_FOUND
 	}
 
 	# === mails ===

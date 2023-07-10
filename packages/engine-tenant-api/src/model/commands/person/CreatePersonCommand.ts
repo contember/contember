@@ -39,6 +39,7 @@ export class CreatePersonCommand implements Command<Omit<PersonRow, 'roles'>> {
 			this.data.identityId,
 			otp_uri: null,
 			otp_activated_at: null,
+			disabled_at: null,
 		}
 	}
 }

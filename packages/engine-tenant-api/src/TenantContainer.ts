@@ -34,6 +34,7 @@ import {
 	SignInManager,
 	SignUpManager,
 	UserMailer,
+	PersonAccessManager,
 } from './model'
 import {
 	AddIDPMutationResolver,
@@ -73,6 +74,8 @@ import { IDPManager } from './model/service/idp/IDPManager'
 import { IDPQueryResolver } from './resolvers/query/IDPQueryResolver'
 import { UpdateIDPMutationResolver } from './resolvers/mutation/idp/UpdateIDPMutationResolver'
 import { TenantCredentials, TenantMigrationsRunner } from './migrations'
+import { DisablePersonMutationResolver } from './resolvers/mutation/person/DisablePersonMutationResolver'
+import { PersonManager } from './model/service/PersonManager'
 
 export interface TenantContainer {
 	projectMemberManager: ProjectMemberManager
@@ -157,6 +160,10 @@ export class TenantContainerFactory {
 				new SecretsManager(providers))
 			.addService('projectManager', ({ secretManager, apiKeyService }) =>
 				new ProjectManager(secretManager, args.projectInitializer, apiKeyService))
+			.addService('personAccessManager', ({ apiKeyManager }) =>
+				new PersonAccessManager(apiKeyManager))
+			.addService('personManager', () =>
+				new PersonManager())
 			.addService('passwordResetManager', ({ userMailer, projectManager }) =>
 				new PasswordResetManager(userMailer, projectManager))
 			.addService('idpRegistry', () => {
@@ -237,6 +244,8 @@ export class TenantContainerFactory {
 				new EnableIDPMutationResolver(idpManager))
 			.addService('createProjectMutationResolver', ({ projectManager }) =>
 				new CreateProjectMutationResolver(projectManager))
+			.addService('disablePersonMutationResolver', ({ personAccessManager, personManager }) =>
+				new DisablePersonMutationResolver(personAccessManager, personManager))
 			.addService('updateProjectMutationResolver', ({ projectManager }) =>
 				new UpdateProjectMutationResolver(projectManager))
 			.addService('setProjectSecretMutationResolver', ({ projectManager, secretManager }) =>

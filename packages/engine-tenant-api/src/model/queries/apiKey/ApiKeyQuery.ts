@@ -2,7 +2,7 @@ import { DatabaseQuery, DatabaseQueryable, Operator, SelectBuilder } from '@cont
 import { ApiKey } from '../../type'
 import { computeTokenHash } from '../../utils'
 
-const apiKeyBasicQuery = SelectBuilder.create<ApiKeyFetchQuery.Row>()
+const apiKeyBasicQuery = SelectBuilder.create<null | ApiKeyRow>()
 	.select(['api_key', 'id'])
 	.select(['api_key', 'type'])
 	.select(['api_key', 'identity_id'])
@@ -21,12 +21,12 @@ const apiKeyBasicQuery = SelectBuilder.create<ApiKeyFetchQuery.Row>()
 		),
 	)
 
-class ApiKeyByIdQuery extends DatabaseQuery<ApiKeyFetchQuery.Result> {
+class ApiKeyByIdQuery extends DatabaseQuery<null | ApiKeyRow> {
 	constructor(private readonly apiKeyId: string) {
 		super()
 	}
 
-	async fetch({ db }: DatabaseQueryable): Promise<ApiKeyFetchQuery.Result> {
+	async fetch({ db }: DatabaseQueryable): Promise<null | ApiKeyRow> {
 		const rows = await apiKeyBasicQuery
 			.where(
 				where => where.compare(['api_key', 'id'], Operator.eq, this.apiKeyId),
@@ -37,12 +37,12 @@ class ApiKeyByIdQuery extends DatabaseQuery<ApiKeyFetchQuery.Result> {
 	}
 }
 
-class ApiKeyByTokenQuery extends DatabaseQuery<ApiKeyFetchQuery.Result> {
+class ApiKeyByTokenQuery extends DatabaseQuery<null | ApiKeyRow> {
 	constructor(private readonly token: string) {
 		super()
 	}
 
-	async fetch({ db }: DatabaseQueryable): Promise<ApiKeyFetchQuery.Result> {
+	async fetch({ db }: DatabaseQueryable): Promise<null | ApiKeyRow> {
 		const tokenHash = computeTokenHash(this.token)
 		const rows = await apiKeyBasicQuery
 			.where({ token_hash: tokenHash })
@@ -52,19 +52,15 @@ class ApiKeyByTokenQuery extends DatabaseQuery<ApiKeyFetchQuery.Result> {
 	}
 }
 
-namespace ApiKeyFetchQuery {
-	export type Result = null | Row
-
-	export type Row = {
-		readonly id: string
-		readonly type: ApiKey.Type
-		readonly identity_id: string
-		readonly disabled_at: Date | null
-		readonly expires_at: Date | null
-		readonly expiration: number | null
-		readonly roles: string[]
-		readonly person_id: string | null
-	}
+export type ApiKeyRow = {
+	readonly id: string
+	readonly type: ApiKey.Type
+	readonly identity_id: string
+	readonly disabled_at: Date | null
+	readonly expires_at: Date | null
+	readonly expiration: number | null
+	readonly roles: string[]
+	readonly person_id: string | null
 }
 
-export { ApiKeyFetchQuery, ApiKeyByIdQuery, ApiKeyByTokenQuery }
+export { ApiKeyByIdQuery, ApiKeyByTokenQuery }

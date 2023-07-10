@@ -12,7 +12,7 @@ import { DatabaseContext, TokenHash } from '../../utils'
 import { ApiKeyService, CreateApiKeyResponse } from './ApiKeyService'
 import assert from 'node:assert'
 import { Acl } from '@contember/schema'
-import { ApiKeyByIdQuery, ApiKeyByTokenQuery, ApiKeyFetchQuery } from '../../queries'
+import { ApiKeyByIdQuery, ApiKeyByTokenQuery, ApiKeyRow } from '../../queries'
 
 export class ApiKeyManager {
 	constructor(
@@ -57,7 +57,7 @@ export class ApiKeyManager {
 	}
 
 
-	async findApiKey(dbContext: DatabaseContext, apiKeyId: string): Promise<ApiKeyFetchQuery.Result> {
+	async findApiKey(dbContext: DatabaseContext, apiKeyId: string): Promise<ApiKeyRow | null> {
 		return await dbContext.queryHandler.fetch(
 			new ApiKeyByIdQuery(apiKeyId),
 		)

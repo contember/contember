@@ -6,7 +6,6 @@ import { getPersonByIdentity } from './sql/getPersonByIdentity'
 import { test } from 'vitest'
 import { getApiKeySql } from './sql/getApiKeySql'
 import { ApiKey } from '../../../../src'
-import Type = ApiKey.Type
 
 test('sign out', async () => {
 	const personId = testUuid(1)
@@ -29,7 +28,7 @@ test('sign out', async () => {
 			}),
 			getApiKeySql({
 				apiKeyId: authenticatedApiKeyId,
-				response: { personId: personId, identityId: authenticatedIdentityId, apiKeyType: Type.SESSION },
+				response: { personId: personId, identityId: authenticatedIdentityId, apiKeyType: ApiKey.Type.SESSION },
 			}),
 			disableApiKey({ id: authenticatedApiKeyId }),
 		],
@@ -65,7 +64,7 @@ test('sign out all', async () => {
 			}),
 			getApiKeySql({
 				apiKeyId: authenticatedApiKeyId,
-				response: { personId: personId, identityId: authenticatedIdentityId, apiKeyType: Type.SESSION },
+				response: { personId: personId, identityId: authenticatedIdentityId, apiKeyType: ApiKey.Type.SESSION },
 			}),
 			{
 				sql: SQL`update "tenant"."api_key" set "disabled_at" = ? where "identity_id" = ?`,
@@ -108,7 +107,7 @@ test('sign out - permanent api key', async () => {
 			}),
 			getApiKeySql({
 				apiKeyId: authenticatedApiKeyId,
-				response: { personId: personId, identityId: authenticatedIdentityId, apiKeyType: Type.PERMANENT },
+				response: { personId: personId, identityId: authenticatedIdentityId, apiKeyType: ApiKey.Type.PERMANENT },
 			}),
 			{
 				sql: SQL`update "tenant"."api_key" set "disabled_at" = ? where "identity_id" = ?`,

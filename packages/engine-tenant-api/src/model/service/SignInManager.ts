@@ -25,7 +25,7 @@ class SignInManager {
 		}
 
 		if (personRow.disabled_at !== null) {
-			return new ResponseError(SignInErrorCode.PersonDisabled, `Person is disabled`)
+			return new ResponseError('PERSON_DISABLED', `Person is disabled`)
 		}
 
 		const passwordValid = await this.providers.bcryptCompare(password, personRow.password_hash)
@@ -69,7 +69,7 @@ class SignInManager {
 		}
 
 		if (personRow.disabled_at !== null) {
-			return new ResponseError(CreateSessionTokenErrorCode.PersonDisabled, `Person with id ${personRow.id} is disabled`)
+			return new ResponseError('PERSON_DISABLED', `Person with id ${personRow.id} is disabled`)
 		}
 
 		await verifier?.(personRow)

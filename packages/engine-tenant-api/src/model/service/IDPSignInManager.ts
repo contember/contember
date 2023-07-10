@@ -50,7 +50,7 @@ class IDPSignInManager {
 			}
 
 			if (personRow.disabled_at !== null) {
-				return new ResponseError(SignInIdpErrorCode.PersonDisabled, `Person with e-mail ${claim.email} is disabled`)
+				return new ResponseError('PERSON_DISABLED', `Person with e-mail ${claim.email} is disabled`)
 			}
 
 			const sessionToken = await this.apiKeyManager.createSessionApiKey(db, personRow.identity_id, expiration)

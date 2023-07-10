@@ -351,10 +351,9 @@ export type DisablePersonError = {
 	readonly developerMessage: Scalars['String']
 }
 
-export enum DisablePersonErrorCode {
-	PersonAlreadyDisabled = 'PERSON_ALREADY_DISABLED',
-	PersonNotFound = 'PERSON_NOT_FOUND'
-}
+export type DisablePersonErrorCode =
+  'PERSON_ALREADY_DISABLED'
+  | 'PERSON_NOT_FOUND'
 
 export type DisablePersonResponse = {
 	readonly __typename?: 'DisablePersonResponse'

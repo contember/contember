@@ -1,26 +1,22 @@
-import { assertNever, useClassName, useClassNameFactory } from '@contember/utilities'
+import { useColorScheme } from '@contember/react-utils'
+import { assertNever, useClassNameFactory } from '@contember/utilities'
 import {
 	MouseEventHandler,
 	ReactElement,
 	MouseEvent as ReactMouseEvent,
 	ReactNode,
-	Ref,
-	createContext,
-	memo,
+	Ref, memo,
 	useCallback,
-	useContext,
-	useEffect,
 	useMemo,
-	useRef,
 	useState,
 } from 'react'
 import { usePopper } from 'react-popper'
 import { useCloseOnClickOutside, useCloseOnEscape } from '../../auxiliary'
 import type { DropdownAlignment } from '../../types'
-import { toViewClass } from '../../utils'
+import { toSchemeClass, toViewClass } from '../../utils'
 import { Collapsible } from '../Collapsible'
 import { Button, ButtonProps } from '../Forms'
-import { Portal } from '../Portal'
+import { Portal, usePortalProvider } from '../Portal'
 
 export interface DropdownRenderProps {
 	requestClose: () => void
@@ -60,9 +56,6 @@ const alignmentToPlacement = (alignment: DropdownAlignment | undefined) => {
 }
 
 const noop = () => { }
-
-export const DropdownContentContainerContext = createContext<HTMLElement | undefined>(undefined)
-DropdownContentContainerContext.displayName = 'DropdownContentContainerContext'
 
 /**
  * @group UI
@@ -107,10 +100,8 @@ export const Dropdown = memo((props: DropdownProps) => {
 	useCloseOnEscape({ isOpen, close: dismiss })
 	useCloseOnClickOutside({ isOpen, close: dismiss, contents: useMemo(() => [referenceElement, popperElement], [referenceElement, popperElement]) })
 
-	const contentContainerFromContent = useContext(DropdownContentContainerContext)
-	const contentContainer = props.contentContainer || contentContainerFromContent || document.body
-
 	const componentClassName = useClassNameFactory('dropdown')
+	const colorScheme = useColorScheme()
 
 	const { children, renderContent, renderToggle, styledContent = true } = props
 
@@ -120,6 +111,8 @@ export const Dropdown = memo((props: DropdownProps) => {
 		update: update ?? noop,
 	}
 
+	const currentPortalContainer = usePortalProvider(props.contentContainer)
+
 	return (
 		<>
 			{renderToggle ? (
@@ -128,12 +121,12 @@ export const Dropdown = memo((props: DropdownProps) => {
 				<Button {...props.buttonProps} onClick={onButtonClick} ref={setReferenceElement} />
 			)}
 			{isActive && (
-				<Portal to={contentContainer}>
+				<Portal to={currentPortalContainer}>
 					<div
 						ref={setPopperElement}
 						style={styles.popper}
 						{...attributes.popper}
-						className={componentClassName('content')}
+						className={componentClassName('content', toSchemeClass(colorScheme))}
 						data-placement={placement}
 					>
 						<Collapsible
@@ -161,24 +154,3 @@ export const Dropdown = memo((props: DropdownProps) => {
 	)
 })
 Dropdown.displayName = 'Dropdown'
-
-export interface DropdownContainerProviderProps {
-	children?: ReactNode
-}
-
-export const DropdownContentContainerProvider = memo((props: DropdownContainerProviderProps) => {
-	const [contentContainer, setContentContainer] = useState<HTMLElement | undefined>(undefined)
-	const contentContainerRef = useRef<HTMLDivElement>(null)
-	useEffect(() => {
-		// Run once ref is set
-		setContentContainer(contentContainerRef.current || undefined)
-	}, [])
-	return (
-		<div className={useClassName('dropdown-contentContainer')} ref={contentContainerRef}>
-			<DropdownContentContainerContext.Provider value={contentContainer}>
-				{props.children}
-			</DropdownContentContainerContext.Provider>
-		</div>
-	)
-})
-DropdownContentContainerProvider.displayName = 'DropdownContentContainerProvider'

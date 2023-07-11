@@ -79,7 +79,6 @@ export class ActionsFactory {
 		} else if ('webhook' in targetDefinition) {
 			if (typeof targetDefinition.webhook === 'string') {
 				targetRegistry.register(generatedName, {
-					name: generatedName,
 					type: 'webhook',
 					url: targetDefinition.webhook,
 				})
@@ -101,6 +100,7 @@ export class ActionsFactory {
 			name,
 			watch: this.parseSelection(trigger.watch),
 			selection: trigger.selection ? this.parseSelection(trigger.selection) : undefined,
+			priority: trigger.priority,
 		}
 	}
 
@@ -113,6 +113,7 @@ export class ActionsFactory {
 			delete: trigger.delete ?? false,
 			update: trigger.update ?? false,
 			selection: trigger.selection ? this.parseSelection(trigger.selection) : undefined,
+			priority: trigger.priority,
 		}
 	}
 

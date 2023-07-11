@@ -1,3 +1,5 @@
+import { AnyEventPayload } from '../triggers/Payload'
+
 export type EventRow = {
 	id: string
 	transaction_id: string
@@ -7,9 +9,11 @@ export type EventRow = {
 	num_retries: number
 	state: 'created' | 'retrying' | 'processing' | 'succeed' | 'failed' | 'stopped'
 	last_state_change: Date
-	stage_id: number
-	schema_id: string
+	stage_id: string
+	schema_id: number
 	target: string
-	payload: any
+	priority: number
+	trigger: string
+	payload: AnyEventPayload
 	log: any[]
 }

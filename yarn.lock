@@ -860,6 +860,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@contember/engine-actions@workspace:ee/engine-actions"
   dependencies:
+    "@contember/authorization": "workspace:*"
     "@contember/database": "workspace:*"
     "@contember/database-migrations": "workspace:*"
     "@contember/engine-api-tester": "workspace:*"

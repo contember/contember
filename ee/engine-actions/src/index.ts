@@ -18,6 +18,9 @@ import { DispatchWorkerSupervisorFactory } from './dispatch/DispatchWorkerSuperv
 import { ProjectDispatcherFactory } from './dispatch/ProjectDispatcher'
 import { VariablesQueryResolver } from './graphql/resolvers/query/VariablesQueryResolver'
 import { VariablesManager } from './model/VariablesManager'
+import { AccessEvaluator, Authorizator } from '@contember/authorization'
+import { ActionsPermissionsFactory } from './authorization'
+import { WebhookFetcherNative } from './dispatch/WebhookFetcher'
 
 export {
 	TriggerListenersFactory,
@@ -49,7 +52,7 @@ export default class ActionsPlugin implements Plugin {
 				})
 				.addService('actions_eventDispatcher', ({ actions_variableManager }) => {
 					const eventsRepository = new EventsRepository()
-					const webhookTargetHandler = new WebhookTargetHandler()
+					const webhookTargetHandler = new WebhookTargetHandler(new WebhookFetcherNative())
 					const targetHandlerResolver = new TargetHandlerResolver(webhookTargetHandler)
 					return new EventDispatcher(eventsRepository, actions_variableManager, targetHandlerResolver)
 				})
@@ -57,7 +60,10 @@ export default class ActionsPlugin implements Plugin {
 					const projectDispatcherFactory = new ProjectDispatcherFactory(actions_eventDispatcher)
 					return new DispatchWorkerSupervisorFactory(projectDispatcherFactory)
 				})
-				.setupService('application', (it, { projectContextResolver, debugMode, actions_eventDispatcher, actions_dispatchWorkerSupervisorFactory, actions_variableManager }) => {
+				.addService('actions_authorizator', () => {
+					return new Authorizator.Default(new AccessEvaluator.PermissionEvaluator(new ActionsPermissionsFactory().create()))
+				})
+				.setupService('application', (it, { projectContextResolver, debugMode, actions_eventDispatcher, actions_dispatchWorkerSupervisorFactory, actions_variableManager, actions_authorizator }) => {
 					const handlerFactory = new ActionsGraphQLHandlerFactory()
 					const eventsQueryResolver = new EventsQueryResolver()
 					const processBatchMutationResolver = new ProcessBatchMutationResolver(actions_eventDispatcher)
@@ -71,7 +77,7 @@ export default class ActionsPlugin implements Plugin {
 					)
 
 					const actionsContextResolver = new ActionsContextResolver(debugMode, projectContextResolver)
-					const actionsMiddlewareFactory = new ActionsApiMiddlewareFactory(actionsContextResolver, handlerFactory.create(resolversFactory))
+					const actionsMiddlewareFactory = new ActionsApiMiddlewareFactory(actionsContextResolver, handlerFactory.create(resolversFactory), actions_authorizator)
 					const actionsWebsocketMiddlewareFactory = new ActionsWebsocketControllerFactory(debugMode, actionsContextResolver, actions_dispatchWorkerSupervisorFactory)
 					it.addRoute('actions', '/actions/:projectSlug', actionsMiddlewareFactory.create())
 					it.addWebsocketRoute('actions', '/actions/_worker', actionsWebsocketMiddlewareFactory.create())

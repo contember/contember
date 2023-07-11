@@ -4,6 +4,7 @@
 		"outDir": "../dist/src"
 	},
 	"references": [
+		{ "path": "../../../packages/authorization/src" },
 		{ "path": "../../../packages/database/src" },
 		{ "path": "../../../packages/database-migrations/src" },
 		{ "path": "../../../packages/engine-common/src" },

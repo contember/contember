@@ -72,11 +72,3 @@ export type BasicEventPayload =
 export type AnyEventPayload =
 	| BasicEventPayload
 	| WatchEventPayload
-
-export interface TriggerPayload {
-	// identityId: string
-	// apiKeyId: string
-	transactionId: string
-	createdAt: string
-	event: AnyEventPayload
-}

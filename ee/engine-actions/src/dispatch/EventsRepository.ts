@@ -16,7 +16,7 @@ import { eventsToProcessSpecification, eventsToProcessStateSpecification } from 
 const ACK_TIMEOUT_MS = 1_000 * 60 * 10 // 10 minutes
 const DEFAULT_REPEAT_INTERVAL_MS = 5_000 // 5 seconds
 const DEFAULT_MAX_ATTEMPTS = 10
-const DEFAULT_BATCH_SIZE = 20
+const DEFAULT_BATCH_SIZE = 1
 
 export class EventsRepository {
 

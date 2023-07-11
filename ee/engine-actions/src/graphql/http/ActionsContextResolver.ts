@@ -1,5 +1,11 @@
-import { ApplicationContext, HttpErrorResponse, ProjectContextResolver } from '@contember/engine-http'
-import { ProjectRole } from '@contember/schema'
+import { ApplicationContext, HttpErrorResponse, ProjectConfig, ProjectContainer, ProjectContextResolver } from '@contember/engine-http'
+import { Identity } from '../../authorization'
+
+export interface ActionsContext {
+	projectContainer: ProjectContainer
+	project: ProjectConfig
+	identity: Identity
+}
 
 export class ActionsContextResolver {
 	constructor(
@@ -8,7 +14,7 @@ export class ActionsContextResolver {
 	) {
 	}
 
-	async resolve(ctx: ApplicationContext) {
+	async resolve(ctx: ApplicationContext): Promise<ActionsContext> {
 		const { timer, projectGroup: { tenantContainer }, logger, authResult } = ctx
 		const projectContext = await this.projectContextResolver.resolve(ctx)
 		const { project } = projectContext
@@ -27,12 +33,15 @@ export class ActionsContextResolver {
 		)
 		logger.debug('Memberships fetched', { memberships })
 
-		const isProjectAdmin = memberships.some(it => it.role === ProjectRole.ADMIN)
-		if (!isProjectAdmin) {
+		if (memberships.length === 0) {
 			throw this.debug
 				? new HttpErrorResponse(404, `You are not allowed to access project ${project.slug}`)
 				: new HttpErrorResponse(404, `Project ${project.slug} NOT found`)
 		}
-		return projectContext
+		const roles = memberships.map(it => it.role)
+		return {
+			...projectContext,
+			identity: { id: authResult.identityId, roles },
+		}
 	}
 }

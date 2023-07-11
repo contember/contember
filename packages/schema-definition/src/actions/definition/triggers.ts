@@ -6,7 +6,7 @@ import { ActionsTarget } from './targets'
 export type TriggerWebhookDefinition = {
 	webhook:
 		| string
-		| Omit<Actions.WebhookTarget, 'type'>
+		| Omit<Actions.WebhookTarget, 'type' | 'name'> & { name?: string }
 }
 
 export type TriggerTargetDefinition = {
@@ -17,22 +17,26 @@ export type TargetDefinition =
 	| TriggerWebhookDefinition
 	| TriggerTargetDefinition
 
+export type CommonTriggerDefinition = {
+	readonly name: string
+	readonly selection?: Actions.SelectionNode | string
+	readonly priority?: number
+}
+
 export type BasicTriggerDefinition =
 	& {
-		readonly name: string
 		readonly create?: boolean
 		readonly delete?: boolean
 		readonly update?: boolean | readonly string[]
-		readonly selection?: Actions.SelectionNode | string
 	}
+	& CommonTriggerDefinition
 	& TargetDefinition
 
 export type WatchTriggerDefinition =
 	& {
-		readonly name: string
 		readonly watch: Actions.SelectionNode | string
-		readonly selection?: Actions.SelectionNode | string
 	}
+	& CommonTriggerDefinition
 	& TargetDefinition
 
 export const trigger = <T>(definition: BasicTriggerDefinition): DecoratorFunction<T> => (entity: EntityConstructor<T>) => {

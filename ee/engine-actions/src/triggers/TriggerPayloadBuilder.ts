@@ -57,7 +57,7 @@ export class TriggerPayloadBuilder {
 				trigger: events[0].listener.trigger.name,
 				entity: events[0].entity.name,
 				id: eventsByPrimary.primary,
-				selection: selections[eventsByPrimary.primary],
+				selection: events[0].selection ?? selections[eventsByPrimary.primary],
 				events: eventsByPrimary.events.map(it => this.buildBaseEventPayloads(it)),
 			})
 		}

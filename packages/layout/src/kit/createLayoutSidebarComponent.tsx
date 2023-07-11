@@ -1,5 +1,5 @@
-import { useComposeRef, useElementSize, useReferentiallyStableCallback } from '@contember/react-utils'
-import { PolymorphicRef, assert, isNonNegativeNumber, isNotNullish, isSlugString, px, useClassName, useClassNameFactory } from '@contember/utilities'
+import { useClassName, useClassNameFactory, useComposeRef, useElementSize, useReferentiallyStableCallback } from '@contember/react-utils'
+import { PolymorphicRef, assert, isNonNegativeNumber, isNotNullish, isSlugString, px } from '@contember/utilities'
 import { ElementType, forwardRef, memo, useRef } from 'react'
 import { MenuAutoCloseProvider } from '../menu-auto-close-provider'
 import { LayoutPanelContext, Panel, PanelBehavior, PanelBody, PanelFooter, PanelHeader, PanelState, PanelVisibility, isComponentClassName, useClosePanelOnEscape, useGetLayoutPanelsStateContext, useSetLayoutPanelsStateContext } from '../primitives'

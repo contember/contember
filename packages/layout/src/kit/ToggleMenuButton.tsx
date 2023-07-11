@@ -1,6 +1,5 @@
-import { useReferentiallyStableCallback } from '@contember/react-utils'
+import { useClassName, useReferentiallyStableCallback } from '@contember/react-utils'
 import { Button } from '@contember/ui'
-import { useClassName } from '@contember/utilities'
 import { MenuIcon, XIcon } from 'lucide-react'
 import { memo } from 'react'
 import { useGetLayoutPanelsStateContext, useSetLayoutPanelsStateContext } from '../primitives'

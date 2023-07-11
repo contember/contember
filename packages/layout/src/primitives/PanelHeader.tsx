@@ -1,5 +1,5 @@
-import { useComposeRef } from '@contember/react-utils'
-import { PolymorphicRef, dataAttribute, useClassNameFactory } from '@contember/utilities'
+import { useClassNameFactory, useComposeRef } from '@contember/react-utils'
+import { PolymorphicRef, dataAttribute } from '@contember/utilities'
 import { ElementType, forwardRef, memo, useRef } from 'react'
 import { useElementInsetCustomProperties } from '../insets'
 import { useLayoutPanelContext } from './Contexts'

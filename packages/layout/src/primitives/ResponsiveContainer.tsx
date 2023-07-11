@@ -1,5 +1,5 @@
-import { useContainerWidth } from '@contember/react-utils'
-import { PolymorphicRef, assert, dataAttribute, isNotNullish, useClassName } from '@contember/utilities'
+import { useClassName, useContainerWidth } from '@contember/react-utils'
+import { PolymorphicRef, assert, dataAttribute, isNotNullish } from '@contember/utilities'
 import { ElementType, forwardRef, memo, useEffect, useMemo, useRef } from 'react'
 import { GetLayoutPanelsStateContext, GetLayoutPanelsStateContextType, useGetLayoutPanelsStateContext, useSetLayoutPanelsStateContext } from './Contexts'
 import { ContainerComponentType, ContainerProps, PanelConfig } from './Types'

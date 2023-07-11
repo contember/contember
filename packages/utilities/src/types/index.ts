@@ -3,9 +3,11 @@ export type {
 	DelimiterCase,
 	KebabCase,
 	LiteralToPrimitiveDeep,
+	Opaque,
 	PascalCase,
 	Replace,
 	UnionToIntersection,
+	UnwrapOpaque,
 } from 'type-fest'
 export * from './DeepPartial'
 export * from './NonNullableRequired'

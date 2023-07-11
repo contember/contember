@@ -1,5 +1,5 @@
 import { toKebabCase } from '../string-utilities'
-import { ClassNameStateMap } from './Types'
+import { ClassNameStateMap } from './types'
 
 export interface StateClassNameOptions {
 	glue?: string;

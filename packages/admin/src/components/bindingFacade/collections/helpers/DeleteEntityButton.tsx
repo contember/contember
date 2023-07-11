@@ -4,6 +4,13 @@ import { listClassName } from '@contember/utilities'
 import { ReactNode, memo, useCallback } from 'react'
 import { usePersistWithFeedback } from '../../../ui'
 
+const defaultProps: ButtonOwnProps = {
+	size: 'small',
+	flow: 'circular',
+	distinction: 'seamless',
+	bland: true,
+}
+
 export type DeleteEntityButtonProps =
 	& {
 		immediatePersist?: true
@@ -39,13 +46,6 @@ export const DeleteEntityButton = memo((props: DeleteEntityButtonProps) => {
 
 	if (!(parentEntity instanceof EntityAccessor)) {
 		return null
-	}
-
-	let defaultProps: ButtonOwnProps = {
-		size: 'small',
-		flow: 'circular',
-		distinction: 'seamless',
-		bland: true,
 	}
 
 	return (

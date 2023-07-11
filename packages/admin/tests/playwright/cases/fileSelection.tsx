@@ -35,7 +35,6 @@ const ImageSelectForm = Component((
 			thumbnailField="url"
 			onClick={onToggleSelect}
 		/>}
-		tileSize={260}
 		selectedEntityIds={selectedEntityIds}
 		onEntityClick={onToggleSelect}
 	>

@@ -69,7 +69,7 @@ export default () => (
 
 		<TextField {...extraDebugProps} required labelPosition="labelLeft" field={'textValue'} label={'Text'} placeholder="Enter text..." />
 		<DisplayTextField {...extraDebugProps} labelPosition="labelLeft" field={'textValue'} label={'Text'} placeholder="N/A" direction="horizontal-reverse" />
-		<TextField {...extraDebugProps} field={'notNullTextValue'} label={'Not null text'} />
+		<TextField {...extraDebugProps} containerClassName="theme-success-content theme-warn-controls" field={'notNullTextValue'} label={'Not null text'} />
 		<EmailField {...extraDebugProps} field={'emailValue'} label={'Your email'} />
 		<SearchField {...extraDebugProps} field={'searchValue'} label={'Search page'} />
 		<UrlField {...extraDebugProps} field={'urlValue'} label={'URL'} />

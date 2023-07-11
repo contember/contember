@@ -44,8 +44,13 @@ class IDPSignInManager {
 				throw e
 			}
 			const personRow = await this.resolvePerson(db, claim, provider)
+
 			if (!personRow) {
 				return new ResponseError('PERSON_NOT_FOUND', `Person ${claim.email} not found`)
+			}
+
+			if (personRow.disabled_at !== null) {
+				return new ResponseError('PERSON_DISABLED', `Person with e-mail ${claim.email} is disabled`)
 			}
 
 			const sessionToken = await this.apiKeyManager.createSessionApiKey(db, personRow.identity_id, expiration)

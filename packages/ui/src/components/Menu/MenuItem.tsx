@@ -100,6 +100,10 @@ export function MenuItem<T = unknown>({ children, componentClassName = 'menu', .
 		event.preventDefault()
 	}, [expanded, changeExpand, isInteractive, navigate, preventMenuClose])
 
+	const onNeverFocusableClick = useCallback((event: SyntheticEvent) => {
+		event.preventDefault()
+	}, [])
+
 	const onKeyPress = useKeyNavigation({ changeExpand, expanded, depth, isInteractive, listItemRef, onClick: onLabelClick })
 
 	const submenuClassName = className('list', [
@@ -170,7 +174,7 @@ export function MenuItem<T = unknown>({ children, componentClassName = 'menu', .
 							</MenuLink>
 							: <span
 								className={className('title-content')}
-								onClick={onLabelClick}
+								onMouseDown={onNeverFocusableClick}
 							>
 								<Label className={className('label')}>{props.title}</Label>
 							</span>

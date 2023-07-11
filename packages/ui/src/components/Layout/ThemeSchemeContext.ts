@@ -4,6 +4,7 @@ import { ThemeScheme } from './Types'
 export const ThemeSchemeContext = createContext<ThemeScheme>({})
 export const TitleThemeSchemeContext = createContext<ThemeScheme>({})
 
+/** @deprecated no alternative to use instead */
 export const useThemeScheme = ({
    scheme,
    theme,
@@ -21,6 +22,7 @@ export const useThemeScheme = ({
 	}
 }
 
+/** @deprecated no alternative to use instead */
 export const useTitleThemeScheme = ({
 	scheme,
 	theme,

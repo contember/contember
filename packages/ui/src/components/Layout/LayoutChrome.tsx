@@ -1,12 +1,13 @@
 import { useClassNameFactory } from '@contember/utilities'
 import { CSSProperties, ReactNode, memo, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
-import { NavigationContext } from '../..'
+import { DialogProvider, NavigationContext } from '../..'
 import { Intent, Scheme } from '../../types'
 import { toSchemeClass, toStateClass, toThemeClass, toViewClass } from '../../utils'
 import { DropdownContentContainerProvider } from '../Dropdown/Dropdown'
 import { Button } from '../Forms'
 import { Icon } from '../Icon'
 import { useElementTopOffset } from '../Layout/useElementTopOffset'
+import { DEFAULT_PORTAL_ROOT_ID, PortalProvider } from '../Portal'
 import { PreventCloseContext } from '../PreventCloseContext'
 import { Stack } from '../Stack'
 import { ThemeSchemeContext, TitleThemeSchemeContext } from './ThemeSchemeContext'
@@ -173,7 +174,8 @@ export const LayoutChrome = memo(({
 			), [barContentOffsetTop])}
 		>
 			{hasBar && (
-				<DropdownContentContainerProvider>
+					<PortalProvider>
+						<DialogProvider>
 					<PreventCloseContext.Provider value={preventMenuClose}>
 						<div className={componentBarClassName()}>
 							<div className={componentBarClassName('header')}>
@@ -197,11 +199,13 @@ export const LayoutChrome = memo(({
 							</div>}
 						</div>
 					</PreventCloseContext.Provider>
-				</DropdownContentContainerProvider>
+						</DialogProvider>
+					</PortalProvider>
 			)}
 
-			<DropdownContentContainerProvider>
 				<div className={componentClassName('body', [
+				<PortalProvider>
+					<DialogProvider>
 					toSchemeClass(pageScheme ?? scheme),
 					toThemeClass(pageThemeContent ?? pageTheme, pageThemeControls ?? pageTheme),
 				])}>
@@ -211,8 +215,9 @@ export const LayoutChrome = memo(({
 						</TitleThemeSchemeContext.Provider>
 					</ThemeSchemeContext.Provider>
 				</div>
-			</DropdownContentContainerProvider>
-			<div id="portal-root" />
+					</DialogProvider>
+				</PortalProvider>
+				<div id={DEFAULT_PORTAL_ROOT_ID} />
 		</div>
 	)
 })

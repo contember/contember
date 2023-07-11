@@ -288,7 +288,7 @@ export const discriminatedUnion = <F extends string, T extends {[key: string]: J
 
 		const { [field]: _, ...inputWithoutDiscr } = input
 
-		return { [field]: key, ...discriminatedType(inputWithoutDiscr) }
+		return { [field]: key, ...discriminatedType(inputWithoutDiscr, path) }
 
 	}
 	type.inner = inner

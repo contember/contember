@@ -5,7 +5,6 @@
 ```ts
 
 import { CamelCase } from 'type-fest';
-import { Context } from 'react';
 import { DelimiterCase } from 'type-fest';
 import { KebabCase } from 'type-fest';
 import { LiteralToPrimitiveDeep } from 'type-fest';
@@ -14,6 +13,7 @@ import { PascalCase } from 'type-fest';
 import { PropsWithChildren } from 'react';
 import { Replace } from 'type-fest';
 import { UnionToIntersection } from 'type-fest';
+import { UnwrapOpaque } from 'type-fest';
 
 // @public (undocumented)
 export type AsProp<C extends React.ElementType> = {
@@ -41,14 +41,41 @@ export type ClassNameStateMap = {
     [key: string]: string | number | boolean | null | undefined;
 };
 
+// @internal
+export const COLOR_SCHEME_CLASS_NAME_REG_EXP: RegExp;
+
+// @public (undocumented)
+export type ColorSchemeClassName<T extends KebabCase<string> = KebabCase<string>> = `scheme-${T}`;
+
+// @public
+export function colorSchemeClassName<S extends KebabCase<string> = KebabCase<string>>(scheme: S): ColorSchemeClassName<S>;
+
+// @public (undocumented)
+export function colorSchemeClassName<S extends KebabCase<string> = KebabCase<string>>(scheme: null | undefined): undefined;
+
+// @public (undocumented)
+export function colorSchemeClassName<S extends KebabCase<string> = KebabCase<string>>(scheme: S | null | undefined): ColorSchemeClassName<S> | undefined;
+
 // @public (undocumented)
 export type ComponentClassNameProps = PropsWithChildren<{
     className?: NestedClassName;
     componentClassName?: string | string[];
 }>;
 
+// @public
+export function contentThemeClassName<ContentTheme extends KebabCase<string> = KebabCase<string>, State extends `:${KebabCase<string>}` | null | undefined = undefined>(theme: ContentTheme | null | undefined, state?: State | null | undefined): ThemeContentClassName<ContentTheme, State> | undefined;
+
+// @public
+export function controlsThemeClassName<ControlsTheme extends KebabCase<string> = KebabCase<string>, State extends `:${KebabCase<string>}` | null | undefined = undefined>(theme: ControlsTheme | null | undefined, state?: State | null | undefined): ThemeControlsClassName<ControlsTheme, State> | undefined;
+
+// @internal
+export function currentOrDeprecated<R, D>(current: R, deprecated: D, shouldThrow?: boolean): R | D;
+
 // @public (undocumented)
 export function dataAttribute(value: unknown): string | true | undefined;
+
+// @public (undocumented)
+export function deduplicateClassName(classNameArray: string[]): string[];
 
 // @public (undocumented)
 export type DeepPartial<T> = T extends Function ? T : T extends Array<infer InferredArrayMember> ? Array<DeepPartial<InferredArrayMember>> : T extends object ? {
@@ -57,8 +84,17 @@ export type DeepPartial<T> = T extends Function ? T : T extends Array<infer Infe
 
 export { DelimiterCase }
 
+// @internal
+export function deprecate(removal: SemverString, assertion: boolean, deprecated: string, replacement: string): void;
+
 // @public
 export type ExtendableProps<ExtendedProps = {}, OverrideProps = {}> = OverrideProps & Omit<ExtendedProps, keyof OverrideProps>;
+
+// @public (undocumented)
+export function filterThemedClassName(nestedClassName: NestedClassName, defaultColorSchemeContext: ColorSchemeClassName): string[];
+
+// @public (undocumented)
+export function flatClassNameList(className: NestedClassName): string[];
 
 // @public (undocumented)
 export function getMatchingParentElement(element: HTMLElement | null, predicate: (element: HTMLElement | null) => boolean | Promise<boolean>): HTMLElement;
@@ -69,9 +105,6 @@ export function getSizeFromResizeObserverEntryFactory(box: ResizeObserverOptions
     width: number;
 };
 
-// @public (undocumented)
-export const GlobalClassNamePrefixContext: Context<string>;
-
 // @public
 export type InheritableElementProps<C extends React.ElementType, Props = {}> = ExtendableProps<PropsOf<C>, Props>;
 
@@ -81,8 +114,11 @@ export function isArrayOfMembersSatisfyingFactory<T>(predicate: (value: unknown)
 // @public (undocumented)
 export function isBoolean(value: unknown): value is boolean;
 
+// @internal
+export function isColorSchemeClassName<T extends string>(value: string): value is ColorSchemeClassName<T>;
+
 // @public (undocumented)
-export function isDefined<T>(value: unknown): value is T;
+export function isDefined<T>(value: unknown): value is Exclude<T, undefined>;
 
 // @public (undocumented)
 export function isFalse(value: unknown): value is false;
@@ -172,6 +208,8 @@ export type ObjectKeyValue<T, K extends keyof T> = T extends {
 // @public (undocumented)
 export function omit<T extends Object, K extends keyof T>(object: T, properties: ReadonlyArray<K>, strict?: boolean): Omit<T, K>;
 
+export { Opaque }
+
 // @public
 export function parseTransformMatrix(transform?: string): {
     scaleX: number;
@@ -233,6 +271,9 @@ export type RequiredDeepPlainObject<T extends RequiredDeepPlainObject<Record<str
 export function satisfiesOneOfFactory<T extends Array<Predicate<any, any>>>(...predicates: T): Predicate<unknown, UnionOfPredicateTypes<T>>;
 
 // @public (undocumented)
+export type SemverString = `${number}.${number}.${number}` | `v${number}.${number}.${number}`;
+
+// @public (undocumented)
 export function setHasOneOf<T>(set: Set<T>, values: T[]): boolean;
 
 // @public (undocumented)
@@ -273,6 +314,24 @@ export interface SvgSizeProps {
 // @public (undocumented)
 export function svgSizeProps(width: number, height?: number, crop?: number): SvgSizeProps;
 
+// @internal
+export const THEME_CLASS_NAME_REG_EXP: RegExp;
+
+// @public
+export function themeClassName<Theme extends KebabCase<string> = KebabCase<string>, State extends `:${KebabCase<string>}` | null | undefined = undefined>(theme: Theme | null | undefined, state?: State | null | undefined): readonly [ThemeContentClassName<Theme, State> | undefined, ThemeControlsClassName<Theme, State> | undefined];
+
+// @public (undocumented)
+export type ThemeConfig = {
+    content: string | undefined;
+    controls: string | undefined;
+};
+
+// @public (undocumented)
+export type ThemeContentClassName<T extends KebabCase<string> = KebabCase<string>, S extends `:${KebabCase<string>}` | null | undefined = undefined> = S extends string ? `theme-${T}-content${S}` : `theme-${T}-content`;
+
+// @public (undocumented)
+export type ThemeControlsClassName<T extends KebabCase<string> = KebabCase<string>, S extends `:${KebabCase<string>}` | null | undefined = undefined> = S extends string ? `theme-${T}-controls${S}` : `theme-${T}-controls`;
+
 // @public (undocumented)
 export function toKebabCase(value: string): string;
 
@@ -290,11 +349,7 @@ export type UnionOfPredicateTypes<T> = T extends Array<(value: any) => value is 
 
 export { UnionToIntersection }
 
-// @public
-export const useClassName: (componentClassName: NestedClassName, additionalClassName?: NestedClassName, prefixOverride?: string | null | undefined) => string;
-
-// @public (undocumented)
-export function useClassNameFactory(componentClassName: NestedClassName, glue?: string | null, prefixOverride?: string | null | undefined): (suffix?: string | null | undefined, additionalClassName?: NestedClassName) => string;
+export { UnwrapOpaque }
 
 // (No @packageDocumentation comment for this package)
 

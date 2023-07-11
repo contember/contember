@@ -7,12 +7,27 @@
 import { Context } from 'react';
 import { DispatchWithoutAction } from 'react';
 import { EventHandler } from 'react';
+import { KebabCase } from '@contember/utilities';
+import { MemoExoticComponent } from 'react';
 import { MutableRefObject } from 'react';
 import { NamedExoticComponent } from 'react';
+import { NestedClassName } from '@contember/utilities';
 import { ReactNode } from 'react';
 import { RefCallback } from 'react';
 import { RefObject } from 'react';
 import { SyntheticEvent } from 'react';
+
+// @public (undocumented)
+export const ColorSchemeContext: Context<string>;
+
+// @public (undocumented)
+export const ColorSchemeProvider: MemoExoticComponent<(<T extends string>({ children, scheme }: ColorSchemeProviderProps<T>) => JSX.Element)>;
+
+// @public (undocumented)
+export type ColorSchemeProviderProps<T extends KebabCase<string>> = {
+    children: React.ReactNode;
+    scheme?: T;
+};
 
 // @public (undocumented)
 export type ComposedRefCallback<T> = RefCallback<T> & {
@@ -27,6 +42,9 @@ export type ContainerWidthContextType = number;
 
 // @public (undocumented)
 export function createNonNullableContextFactory<T>(displayName: string, initialValue?: T): [Context<T>, () => NonNullable<T>];
+
+// @public (undocumented)
+export function createOptionalContextFactory<T>(name: string, initialValue: T): [Context<T>, () => T];
 
 // @public (undocumented)
 export const DebugChildren: NamedExoticComponent<DebugChildrenProps>;
@@ -46,10 +64,16 @@ export type DebugChildrenProps = {
 export type DebugMethod = (...parameters: any[]) => void;
 
 // @public (undocumented)
+export const DEFAULT_COLOR_SCHEME = "system";
+
+// @public (undocumented)
 export const emptyArray: any[];
 
 // @public (undocumented)
 export const emptyObject: Readonly<{}>;
+
+// @public (undocumented)
+export const GlobalClassNamePrefixContext: Context<string>;
 
 // @public (undocumented)
 export const identityFunction: <Value>(value: Value) => Value;
@@ -133,6 +157,15 @@ export function useAddClassNameDuringResize(className: string, timeoutToRestore?
 export const useArrayMapMemo: <Item, OutputItem>(items: Item[], map: (value: Item, index: number, array: Item[]) => OutputItem) => OutputItem[];
 
 // @public
+export function useClassName(componentClassName: NestedClassName, additionalClassName?: NestedClassName, prefixOverride?: string | null | undefined): string;
+
+// @public
+export function useClassNameFactory(componentClassName: NestedClassName, glue?: string | null, prefixOverride?: string | null | undefined): (suffix?: string | null | undefined, additionalClassName?: NestedClassName) => string;
+
+// @public (undocumented)
+export const useColorScheme: () => string;
+
+// @public
 export function useComposeRef<T>(...refs: MaybeRef<T>[]): ComposedRefCallback<T>;
 
 // @public (undocumented)
@@ -202,6 +235,12 @@ export function useScrollOffsets(refOrElement: RefObjectOrElement<HTMLElement | 
 
 // @public (undocumented)
 export const useSessionStorageState: <V extends Serializable>(key: string, initializeValue: ValueInitializer<V>) => [V, SetState<V>];
+
+// @internal
+export function useThemedClassName(componentClassName: NestedClassName, additionalClassName: NestedClassName, prefixOverride?: string | null | undefined): string;
+
+// @public (undocumented)
+export function useThemedClassNameFactory(componentClassName: NestedClassName, glue?: string | null, prefixOverride?: string | null | undefined): (suffix?: string | null | undefined, additionalClassName?: NestedClassName) => string;
 
 // @public
 export function useUpdatedRef<T>(value: T): MutableRefObject<T>;

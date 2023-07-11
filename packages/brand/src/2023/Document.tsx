@@ -1,5 +1,5 @@
-import { useExpectSameValueReference } from '@contember/react-utils'
-import { svgSizeProps, useClassName } from '@contember/utilities'
+import { useClassName, useExpectSameValueReference } from '@contember/react-utils'
+import { svgSizeProps } from '@contember/utilities'
 import { CSSProperties, memo, useMemo } from 'react'
 import type { ContemberIdentitySvgProps } from '../Types'
 

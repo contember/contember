@@ -131,12 +131,12 @@ export function MenuItem<T = unknown>({ children, componentClassName = 'menu', .
 		console.warn('Accessibility issue: All submenu items should provide a title.')
 	}
 
-	const interactiveProps = isInteractive ? {
+	const interactiveProps = useMemo(() => isInteractive ? {
 		'id': menuItemId,
 		'aria-haspopup': true,
 		'aria-controls': id.current,
 		'aria-expanded': expanded,
-	} : undefined
+	} : undefined, [expanded, isInteractive, menuItemId])
 
 	return (
 		<DepthContext.Provider value={depth + 1}>

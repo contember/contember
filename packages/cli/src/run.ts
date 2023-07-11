@@ -21,10 +21,16 @@ import {
 } from './commands'
 import { ExportCommand } from './commands/transfer/ExportCommand'
 import { ImportCommand } from './commands/transfer/ImportCommand'
-import { TransferCommand } from './commands/transfer/TransferCommand';
+import { TransferCommand } from './commands/transfer/TransferCommand'
+import { checkVersions } from './utils/checkVersions';
 
 (async () => {
 	const workspace = await Workspace.get(process.cwd())
+
+	if (!process.env.CONTEMBER_SKIP_VERSION_CHECK) {
+		await checkVersions(workspace)
+	}
+
 	const commands: CommandFactoryList = {
 		['deploy']: () => new DeployCommand(workspace),
 		['version']: () => new VersionCommand(),

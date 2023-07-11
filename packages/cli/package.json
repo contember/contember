@@ -14,6 +14,7 @@
     "@types/js-yaml": "^4.0.1",
     "@types/node": "^18",
     "@types/prompts": "^2.0.1",
+    "@types/semver": "^7.5.0",
     "autoprefixer": "^10.4.5",
     "postcss": "^8.4.12",
     "tailwindcss": "^3.0.24"
@@ -38,6 +39,7 @@
     "preact": "^10.7.1",
     "preact-render-to-string": "^5.2.0",
     "prompts": "^2.2.1",
+    "semver": "^7.5.1",
     "vm2": "^3.9.9",
     "yawn-yaml": "^1.5.0"
   }

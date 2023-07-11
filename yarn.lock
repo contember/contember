@@ -746,6 +746,7 @@ __metadata:
     "@types/npm-package-arg": ^6.1.0
     chalk: ^4.1.2
     download-tarball: ^2.0.0
+    fast-glob: ^3.2.12
     fs-extra: ^10.0.0
     get-package-json-from-registry: ^2.2.2
     js-yaml: ^4.1.0
@@ -770,6 +771,7 @@ __metadata:
     "@types/js-yaml": ^4.0.1
     "@types/node": ^18
     "@types/prompts": ^2.0.1
+    "@types/semver": ^7.5.0
     autoprefixer: ^10.4.5
     chalk: ^4.1.2
     chalk-table: ^1.0.2
@@ -783,6 +785,7 @@ __metadata:
     preact: ^10.7.1
     preact-render-to-string: ^5.2.0
     prompts: ^2.2.1
+    semver: ^7.5.1
     tailwindcss: ^3.0.24
     vm2: ^3.9.9
     yawn-yaml: ^1.5.0
@@ -2633,6 +2636,13 @@ __metadata:
   dependencies:
     "@types/node": "*"
   checksum: e99fc7cc6265407987b30deda54c1c24bb1478803faf6037557a774b2f034c5b097ffd65847daa87e82a61a250d919f35c3588654b0fdaa816906650f596d1b0
+  languageName: node
+  linkType: hard
+
+"@types/semver@npm:^7.5.0":
+  version: 7.5.0
+  resolution: "@types/semver@npm:7.5.0"
+  checksum: 0a64b9b9c7424d9a467658b18dd70d1d781c2d6f033096a6e05762d20ebbad23c1b69b0083b0484722aabf35640b78ccc3de26368bcae1129c87e9df028a22e2
   languageName: node
   linkType: hard
 
@@ -8724,6 +8734,17 @@ __metadata:
   bin:
     semver: bin/semver.js
   checksum: 2fa3e877568cd6ce769c75c211beaed1f9fce80b28338cadd9d0b6c40f2e2862bafd62c19a6cff42f3d54292b7c623277bcab8816a2b5521cf15210d43e75232
+  languageName: node
+  linkType: hard
+
+"semver@npm:^7.5.1":
+  version: 7.5.1
+  resolution: "semver@npm:7.5.1"
+  dependencies:
+    lru-cache: ^6.0.0
+  bin:
+    semver: bin/semver.js
+  checksum: d16dbedad53c65b086f79524b9ef766bf38670b2395bdad5c957f824dcc566b624988013564f4812bcace3f9d405355c3635e2007396a39d1bffc71cfec4a2fc
   languageName: node
   linkType: hard
 

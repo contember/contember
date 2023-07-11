@@ -19,6 +19,7 @@
   "dependencies": {
     "chalk": "^4.1.2",
     "download-tarball": "^2.0.0",
+    "fast-glob": "^3.2.12",
     "fs-extra": "^10.0.0",
     "get-package-json-from-registry": "^2.2.2",
     "js-yaml": "^4.1.0",

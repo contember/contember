@@ -1,7 +1,6 @@
 import { Command, CommandConfiguration, Input, Workspace } from '@contember/cli-common'
-import { updateNpmPackages } from '../../utils/npm'
 import { updateWorkspaceApiVersion } from '../../utils/workspace'
-import { updateMainDockerComposeConfig } from '../../utils/dockerCompose'
+import { contemberDockerImages, updateMainDockerComposeConfig } from '../../utils/dockerCompose'
 
 type Args = {
 	version: string
@@ -24,11 +23,14 @@ export class WorkspaceUpdateApiCommand extends Command<Args, Options> {
 	protected async execute(input: Input<Args, Options>): Promise<void> {
 		const version = input.getArgument('version')
 		const workspace = this.workspace
-		const upgradablePackages = ['@contember/schema', '@contember/schema-definition', '@contember/cli']
+		const packageWorkspace = await workspace.resolvePackageWorkspace()
 
-		await updateNpmPackages(upgradablePackages.map(it => ({ name: it, version })), workspace.directory)
+		await packageWorkspace.updateEverywhere({
+			'@contember/schema': version,
+			'@contember/schema-definition': version,
+			'@contember/cli': version,
+		})
 
-		const prevVersion = workspace.apiVersion
 		const updatedYaml = await updateWorkspaceApiVersion(workspace, version)
 
 		if (updatedYaml) {
@@ -39,8 +41,8 @@ export class WorkspaceUpdateApiCommand extends Command<Args, Options> {
 
 		console.log('Updating docker-compose')
 		const getNewImage = (currentImage: string): string | null => {
-			for (const candidate of ['contember/engine', 'contember/contember', 'contember/cli']) {
-				if (prevVersion && currentImage === `${candidate}:${prevVersion}` || !prevVersion && currentImage.startsWith(`${candidate}:`)) {
+			for (const candidate of contemberDockerImages) {
+				if (currentImage.startsWith(`${candidate}:`)) {
 					return `${candidate}:${version}`
 				}
 			}
@@ -51,7 +53,7 @@ export class WorkspaceUpdateApiCommand extends Command<Args, Options> {
 			services: Object.fromEntries(Object.entries(data?.services ?? {}).map(([name, service]: [string, any]) => {
 				const newImage = getNewImage(service.image)
 				if (newImage) {
-					console.log(`docker-compose service ${service} updated`)
+					console.log(`docker-compose service ${name} updated`)
 					return [
 						name,
 						{

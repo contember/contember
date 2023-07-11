@@ -29,7 +29,7 @@ const parseVersion = (version) => {
 		const latestMajor = sameIsStable.length > 0 ? Math.max(...sameIsStable.map(it => it.major)) : -1
 		const sameMajor = sameIsStable.filter(it => it.major === version.major)
 		const latestMinor = sameMajor.length > 0 ? Math.max(...sameMajor.map(it => it.minor)) : -1
-		const sameMinor = sameIsStable.filter(it => it.minor === version.minor)
+		const sameMinor = sameMajor.filter(it => it.minor === version.minor)
 		const latestPatch = sameMinor.length > 0 ? Math.max(...sameMinor.map(it => it.patch)) : -1
 		const samePatchAndStability = sameMinor.filter(it => it.patch === version.patch && it.prerelease === version.prerelease)
 		const latestPrereleaseVersion = version.prerelease && samePatchAndStability.length > 0 ? Math.max(...samePatchAndStability.map(it => it.prereleaseVersion)) : -1

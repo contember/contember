@@ -1,7 +1,7 @@
 {
   "name": "@contember/engine-plugins",
   "license": "Apache-2.0",
-  "version": "1.3.0-alpha.13",
+  "version": "1.3.0-beta.1",
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
   "exports": {

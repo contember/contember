@@ -1,5 +1,6 @@
 import { useClassNameFactory } from '@contember/utilities'
 import { forwardRef, memo, ReactNode } from 'react'
+import { toThemeClass } from '../../../utils/toThemeClass'
 import { TextInput, TextInputProps } from '../Inputs'
 
 export type SlugInputProps =
@@ -22,9 +23,10 @@ export const SlugInput = memo(forwardRef<HTMLInputElement, SlugInputProps>(({
 	...textInputProps
 }, ref) => {
 	const componentClassName = useClassNameFactory('slug-input')
+	const intent = textInputProps.validationState === 'invalid' ? 'danger' : undefined
 
 	return (
-		<div className={componentClassName()}>
+		<div className={componentClassName(null, toThemeClass(intent, intent))}>
 			{prefix && (
 				<div className={componentClassName('prefix')}>
 					{link ?
@@ -42,3 +44,4 @@ export const SlugInput = memo(forwardRef<HTMLInputElement, SlugInputProps>(({
 		</div>
 	)
 }))
+SlugInput.displayName = 'Interface.SlugInput'

@@ -1,6 +1,6 @@
-import { useClassNameFactory } from '@contember/utilities'
-import { forwardRef, memo, ReactNode } from 'react'
-import { toThemeClass } from '../../../utils/toThemeClass'
+import { useClassNameFactory, useColorScheme } from '@contember/react-utils'
+import { colorSchemeClassName, themeClassName } from '@contember/utilities'
+import { ReactNode, forwardRef, memo } from 'react'
 import { TextInput, TextInputProps } from '../Inputs'
 
 export type SlugInputProps =
@@ -26,7 +26,7 @@ export const SlugInput = memo(forwardRef<HTMLInputElement, SlugInputProps>(({
 	const intent = textInputProps.validationState === 'invalid' ? 'danger' : undefined
 
 	return (
-		<div className={componentClassName(null, toThemeClass(intent, intent))}>
+		<div className={componentClassName(null, [...themeClassName(intent), colorSchemeClassName(useColorScheme())])}>
 			{prefix && (
 				<div className={componentClassName('prefix')}>
 					{link ?

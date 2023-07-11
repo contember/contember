@@ -1,7 +1,8 @@
-import { useClassNameFactory } from '@contember/utilities'
-import { memo, ReactNode } from 'react'
+import { useClassNameFactory, useColorScheme } from '@contember/react-utils'
+import { colorSchemeClassName, themeClassName } from '@contember/utilities'
+import { ReactNode, memo } from 'react'
 import type { HTMLDivElementProps, Intent, MessageDistinction, MessageFlow, Size } from '../../types'
-import { toEnumViewClass, toThemeClass, toViewClass } from '../../utils'
+import { toEnumViewClass, toViewClass } from '../../utils'
 
 export type MessageProps =
 	& {
@@ -25,7 +26,8 @@ export const Message = memo(({ className, children, intent, size, flow, distinct
 		<div
 			{...props}
 			className={componentClassName(null, [
-				toThemeClass(intent, intent),
+				...themeClassName(intent),
+				colorSchemeClassName(useColorScheme()),
 				toEnumViewClass(size),
 				toEnumViewClass(distinction),
 				toViewClass('lifted', lifted),

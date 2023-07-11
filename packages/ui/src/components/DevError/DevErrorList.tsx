@@ -1,4 +1,4 @@
-import { useClassNameFactory } from '@contember/utilities'
+import { useClassNameFactory } from '@contember/react-utils'
 import { Button, ButtonGroup } from '../Forms'
 import { Icon } from '../Icon'
 import { DevErrorInner } from './DevErrorInner'

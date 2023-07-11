@@ -1,4 +1,4 @@
-import { useClassNameFactory } from '@contember/utilities'
+import { useClassNameFactory } from '@contember/react-utils'
 import { memo, useMemo } from 'react'
 import type { FieldErrors } from '../../types'
 import { Message } from '../Message'

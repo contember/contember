@@ -1,4 +1,4 @@
-import { useClassNameFactory } from '@contember/utilities'
+import { useClassNameFactory } from '@contember/react-utils'
 import { useLayoutEffect, useMemo, useState } from 'react'
 import { useCloseOnClickOutside, useCloseOnEscape } from '../../auxiliary'
 import { toEnumViewClass } from '../../utils'

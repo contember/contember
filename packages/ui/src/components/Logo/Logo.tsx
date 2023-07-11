@@ -1,4 +1,4 @@
-import { useClassName } from '@contember/utilities'
+import { useClassName } from '@contember/react-utils'
 import type { ReactNode } from 'react'
 import type { Size } from '../../types'
 import { LogoLabel } from './LogoLabel'

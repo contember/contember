@@ -1,4 +1,4 @@
-import { useClassNameFactory } from '@contember/utilities'
+import { useClassNameFactory } from '@contember/react-utils'
 import { MouseEventHandler, ReactNode, forwardRef, memo } from 'react'
 import { toViewClass } from '../../utils'
 import { Icon, IconSourceSpecification } from '../Icon'

@@ -1,4 +1,4 @@
-import { useClassNameFactory } from '@contember/utilities'
+import { useClassNameFactory } from '@contember/react-utils'
 import { memo, ReactElement, ReactNode, TextareaHTMLAttributes, useEffect, useRef, useState } from 'react'
 import type { EditorCanvasDistinction, EditorCanvasSize } from '../../types'
 import { toEnumStateClass, toEnumViewClass } from '../../utils'

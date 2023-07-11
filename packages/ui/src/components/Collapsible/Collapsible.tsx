@@ -1,4 +1,4 @@
-import { useClassNameFactory } from '@contember/utilities'
+import { useClassNameFactory } from '@contember/react-utils'
 import { CSSProperties, memo, ReactNode, useEffect, useRef, useState } from 'react'
 import type { CollapsibleTransition } from '../../types'
 import { forceReflow, toEnumStateClass, toEnumViewClass, toStateClass } from '../../utils'

@@ -1,4 +1,4 @@
-import { useClassName } from '@contember/utilities'
+import { useClassName } from '@contember/react-utils'
 import { CSSProperties, forwardRef, memo, useMemo } from 'react'
 import { HTMLDivElementProps } from '../../types'
 import { useFallbackRef } from '../../utils'

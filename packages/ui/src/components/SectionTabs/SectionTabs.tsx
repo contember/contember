@@ -1,4 +1,4 @@
-import { useClassNameFactory } from '@contember/utilities'
+import { useClassNameFactory } from '@contember/react-utils'
 import { memo, useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react'
 import { TabButton } from '../Tabs'
 import { ActiveSectionsTabsContext, SectionTabsContext, SectionTabsRegistrationContext, useActiveSectionsTabs, useSectionTabs } from './Context'

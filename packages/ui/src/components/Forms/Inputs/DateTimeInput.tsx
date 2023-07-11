@@ -1,4 +1,4 @@
-import { useClassName } from '@contember/utilities'
+import { useClassName } from '@contember/react-utils'
 import { forwardRef, memo, Ref } from 'react'
 import { HTMLInputElementProps } from '../../../types'
 import { toViewClass } from '../../../utils'

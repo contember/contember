@@ -1,4 +1,4 @@
-import { useClassName } from '@contember/utilities'
+import { useClassName } from '@contember/react-utils'
 import { forwardRef, memo, useCallback } from 'react'
 import { mergeProps } from 'react-aria'
 import { toViewClass } from '../../../utils'

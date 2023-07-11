@@ -1,7 +1,8 @@
-import { useClassNameFactory } from '@contember/utilities'
-import { forwardRef, memo, ReactNode } from 'react'
+import { useClassNameFactory, useColorScheme } from '@contember/react-utils'
+import { colorSchemeClassName, themeClassName } from '@contember/utilities'
+import { ReactNode, forwardRef, memo } from 'react'
 import type { BoxDistinction, Default, HTMLDivElementProps, Intent, Size } from '../../types'
-import { toEnumViewClass, toStateClass, toThemeClass } from '../../utils'
+import { toEnumViewClass, toStateClass } from '../../utils'
 import { Stack, StackProps } from '../Stack'
 import { Label } from '../Typography/Label'
 
@@ -52,8 +53,9 @@ export const Box = memo(forwardRef<HTMLDivElement, BoxProps>(({
 			className={componentClassName(null, [
 				toStateClass('active', isActive),
 				toEnumViewClass(distinction),
-				toThemeClass(intent, intent),
 				toEnumViewClass(padding),
+				...themeClassName(intent),
+				colorSchemeClassName(useColorScheme()),
 				className,
 			])}
 			ref={ref}

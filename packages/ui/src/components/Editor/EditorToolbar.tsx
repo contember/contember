@@ -1,4 +1,4 @@
-import { useClassName, useClassNameFactory } from '@contember/utilities'
+import { useClassName, useClassNameFactory } from '@contember/react-utils'
 import { forwardRef, memo, useCallback } from 'react'
 import type { HoveringToolbarScope } from '../../types'
 import { toEnumViewClass, toStateClass, toViewClass } from '../../utils'

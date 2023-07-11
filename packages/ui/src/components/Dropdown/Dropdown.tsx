@@ -1,5 +1,5 @@
-import { useColorScheme } from '@contember/react-utils'
-import { assertNever, useClassNameFactory } from '@contember/utilities'
+import { useClassNameFactory, useColorScheme } from '@contember/react-utils'
+import { assertNever, colorSchemeClassName } from '@contember/utilities'
 import {
 	MouseEventHandler,
 	ReactElement,
@@ -13,7 +13,7 @@ import {
 import { usePopper } from 'react-popper'
 import { useCloseOnClickOutside, useCloseOnEscape } from '../../auxiliary'
 import type { DropdownAlignment } from '../../types'
-import { toSchemeClass, toViewClass } from '../../utils'
+import { toViewClass } from '../../utils'
 import { Collapsible } from '../Collapsible'
 import { Button, ButtonProps } from '../Forms'
 import { Portal, usePortalProvider } from '../Portal'
@@ -126,7 +126,7 @@ export const Dropdown = memo((props: DropdownProps) => {
 						ref={setPopperElement}
 						style={styles.popper}
 						{...attributes.popper}
-						className={componentClassName('content', toSchemeClass(colorScheme))}
+						className={componentClassName('content')}
 						data-placement={placement}
 					>
 						<Collapsible

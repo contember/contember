@@ -1,4 +1,4 @@
-import { useClassName } from '@contember/utilities'
+import { useClassName } from '@contember/react-utils'
 import { memo, ReactNode } from 'react'
 import { Size } from '../../../types'
 import { toEnumViewClass } from '../../../utils'

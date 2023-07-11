@@ -1,4 +1,4 @@
-import { useClassNameFactory } from '@contember/utilities'
+import { useClassNameFactory } from '@contember/react-utils'
 import { memo, MouseEvent as ReactMouseEvent } from 'react'
 import { toEnumViewClass } from '../../utils'
 import { Icon } from '../Icon'

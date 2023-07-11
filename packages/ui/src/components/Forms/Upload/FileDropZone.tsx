@@ -1,4 +1,4 @@
-import { useClassNameFactory } from '@contember/utilities'
+import { useClassNameFactory } from '@contember/react-utils'
 import { forwardRef, memo, ReactNode } from 'react'
 import { HTMLDivElementProps } from '../../../types'
 import { toStateClass } from '../../../utils'

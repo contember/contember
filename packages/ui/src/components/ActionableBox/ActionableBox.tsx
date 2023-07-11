@@ -1,4 +1,4 @@
-import { useClassNameFactory } from '@contember/utilities'
+import { useClassNameFactory } from '@contember/react-utils'
 import { memo, MouseEvent as ReactMouseEvent, ReactNode, useMemo } from 'react'
 import { HTMLDivElementProps } from '../../types'
 import { Box } from '../Box'

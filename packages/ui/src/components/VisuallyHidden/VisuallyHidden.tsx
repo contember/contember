@@ -1,4 +1,5 @@
-import { NestedClassName, PolymorphicComponentPropsWithRef, PolymorphicRef, dataAttribute, useClassName } from '@contember/utilities'
+import { useClassName } from '@contember/react-utils'
+import { NestedClassName, PolymorphicComponentPropsWithRef, PolymorphicRef, dataAttribute } from '@contember/utilities'
 import { ElementType, PropsWithChildren, forwardRef, memo } from 'react'
 
 export type OwnVisuallyHiddenProps = PropsWithChildren<{

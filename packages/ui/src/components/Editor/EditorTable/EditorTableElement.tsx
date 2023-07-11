@@ -1,4 +1,4 @@
-import { useClassNameFactory } from '@contember/utilities'
+import { useClassNameFactory } from '@contember/react-utils'
 import { CSSProperties, Fragment, memo, ReactNode } from 'react'
 import { toStateClass } from '../../../utils'
 import { Dropdown } from '../../Dropdown/Dropdown'

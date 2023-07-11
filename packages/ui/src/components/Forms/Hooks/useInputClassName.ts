@@ -1,5 +1,6 @@
-import { listClassName } from '@contember/utilities'
-import { toEnumClass, toEnumStateClass, toEnumViewClass, toStateClass, toThemeClass } from '../../../utils'
+import { useColorScheme } from '@contember/react-utils'
+import { colorSchemeClassName, contentThemeClassName, controlsThemeClassName, listClassName, themeClassName } from '@contember/utilities'
+import { toEnumStateClass, toEnumViewClass, toStateClass } from '../../../utils'
 import { NonOptionalVisuallyDependentControlProps } from '../Types'
 import { VisuallyDependentControlProps } from '../Types/ControlProps'
 
@@ -50,6 +51,8 @@ export function useInputClassName<P extends NonOptionalUseInputClassNameProps | 
 		finalIntent = 'danger'
 	}
 
+	const colorScheme = useColorScheme()
+
 	return listClassName([
 		toStateClass('active', active),
 		toStateClass('disabled', disabled),
@@ -59,8 +62,9 @@ export function useInputClassName<P extends NonOptionalUseInputClassNameProps | 
 		toStateClass('read-only', readOnly),
 		toStateClass('required', required),
 
-		toEnumClass('scheme-', !disabled ? scheme : undefined),
-		toThemeClass(finalIntent, finalIntent),
+		colorSchemeClassName(!disabled ? scheme ?? colorScheme : colorScheme),
+		contentThemeClassName(finalIntent),
+		controlsThemeClassName(finalIntent),
 		toEnumViewClass(size),
 		toEnumViewClass(distinction),
 		toEnumStateClass(validationState),

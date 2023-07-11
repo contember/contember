@@ -1,5 +1,4 @@
-import { useSessionStorageState } from '@contember/react-utils'
-import { useClassNameFactory } from '@contember/utilities'
+import { useClassNameFactory, useSessionStorageState } from '@contember/react-utils'
 import { SyntheticEvent, useCallback, useContext, useEffect, useMemo, useRef } from 'react'
 import { useNavigationLink } from '../../Navigation'
 import { randomId } from '../../auxiliary'

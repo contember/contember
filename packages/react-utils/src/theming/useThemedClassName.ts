@@ -1,19 +1,17 @@
-import { flatClassNameList, KebabCase, NestedClassName } from '@contember/utilities'
-import { THEME_CLASS_NAME_REG_EXP } from './constants'
+import { NestedClassName, colorSchemeClassName, filterThemedClassName } from '@contember/utilities'
 import { useColorScheme } from './contexts'
-import { themeClassName } from './themeClassName'
-
-export type ThemeConfig = { content: string | undefined, controls: string | undefined }
+import { useClassName } from './useClassName'
 
 /**
- * Looks for theme CSS classes in the given class name, deduplicates them and returns final theme class name with scheme CSS class set
+ * Hook for component class name accepting outer class name with theme-* and scheme-* class manes
+ *
+ * It looks for theme CSS classes in the given class name, deduplicates them and returns final theme class name with scheme CSS class set
  * @internal
  *
- * @param className - class name string or array of class names, even nested
- * @returns array of theme class names
- *
- * @see getThemeClassName
- * @see THEME_CLASS_NAME_REG_EXP
+ * @param componentClassName - Component class name
+ * @param additionalClassName - Additional class name
+ * @param prefixOverride - Context component prefix override
+ * @returns string
  * @see useColorScheme
  *
  * @example
@@ -40,73 +38,17 @@ export type ThemeConfig = { content: string | undefined, controls: string | unde
  * // </div>
  * ```
  */
-export function useThemedClassName(className: NestedClassName): (string | undefined)[] {
-	const theme: ThemeConfig = { content: undefined, controls: undefined }
-	const stateThemes: Record<string, ThemeConfig> = {}
-	const colorScheme = `scheme-${useColorScheme()}`
-	let schemeClassName: string | undefined = undefined
-
-	const flatClassName = flatClassNameList(className).map(className => {
-		if (className.startsWith('scheme-')) {
-			schemeClassName = className
-
-			return undefined
-		}
-
-		const match = className.match(THEME_CLASS_NAME_REG_EXP)
-
-		if (match) {
-			const name = match.groups!.name as KebabCase<string>
-			const scope = match.groups!.scope as KebabCase<string>
-			const state = match.groups!.state as `:${KebabCase<string>}`
-
-			if (state) {
-				stateThemes[state] = stateThemes[state] ?? { content: undefined, controls: undefined }
-
-				if (!scope) {
-					stateThemes[state].content = name
-					stateThemes[state].controls = name
-				} else if (scope === 'content') {
-					stateThemes[state].content = name
-				} else if (scope === 'controls') {
-					stateThemes[state].controls = name
-				} else {
-					throw new Error(`Unknown theme scope: ${scope}`)
-				}
-			} else {
-				if (!scope) {
-					theme.content = name
-					theme.controls = name
-				} else if (scope === 'content') {
-					theme.content = name
-				} else if (scope === 'controls') {
-					theme.controls = name
-				} else {
-					throw new Error(`Unknown theme scope: ${scope}`)
-				}
-			}
-
-			return undefined
-		} else {
-			return className
-		}
-	}).filter(Boolean) as string[]
-
-	const themeClassNames: (string | undefined)[] = []
-
-	if (theme.content || theme.controls) {
-		const [content, controls] = getThemeClassName(theme.content, theme.controls)
-		themeClassNames.push(content, controls)
-	}
-
-	for (const state in stateThemes) {
-		const { content, controls } = stateThemes[state]
-		const [contentClassName, controlsClassName] = getThemeClassName(content, controls, state as `:${KebabCase<string>}`)
-
-		themeClassNames.push(contentClassName, controlsClassName)
-	}
-
-	const flatThemeClassNames = flatClassNameList(themeClassNames)
-
-	return [schemeClassName ?? colorScheme, ...flatThemeClassNames, ...flatClassName]
+export function useThemedClassName(
+	componentClassName: NestedClassName,
+	additionalClassName: NestedClassName,
+	prefixOverride?: string | null | undefined,
+): string {
+	return useClassName(
+		componentClassName,
+		filterThemedClassName(
+			additionalClassName,
+			colorSchemeClassName(useColorScheme()),
+		),
+		prefixOverride,
+	)
 }

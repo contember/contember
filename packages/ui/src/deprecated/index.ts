@@ -5,3 +5,5 @@ export default {}
 export * from './ContainerSpinner'
 export * from './DropdownContentContainerContext'
 export * from './Portal'
+export * from './toSchemeClass'
+export * from './toThemeClass'

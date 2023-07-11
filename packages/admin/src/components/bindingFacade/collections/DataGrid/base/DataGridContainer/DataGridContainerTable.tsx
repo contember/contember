@@ -1,6 +1,6 @@
 import { Entity, EntityId } from '@contember/binding'
+import { useClassName } from '@contember/react-utils'
 import { Table, TableCell, TableRow } from '@contember/ui'
-import { useClassName } from '@contember/utilities'
 import { memo, useMemo } from 'react'
 import { useMessageFormatter } from '../../../../../../i18n'
 import { EmptyMessage } from '../../../helpers'

@@ -1,5 +1,5 @@
+import { useClassName } from '@contember/react-utils'
 import { usePortalProvider } from '@contember/ui'
-import { useClassName } from '@contember/utilities'
 import { ReactNode } from 'react'
 import { SortableContainer, SortableContainerProps } from 'react-sortable-hoc'
 export interface SortableRepeaterContainerProps extends SortableContainerProps {

@@ -1,6 +1,6 @@
 import { EntityAccessor, useMutationState } from '@contember/binding'
+import { useClassName } from '@contember/react-utils'
 import { Button, ButtonProps, Icon, IconProps } from '@contember/ui'
-import { useClassName } from '@contember/utilities'
 import { ComponentType, ReactNode, memo } from 'react'
 
 export type CreateNewEntityButtonProps = ButtonProps & {

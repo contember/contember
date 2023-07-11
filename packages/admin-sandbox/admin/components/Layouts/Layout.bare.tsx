@@ -1,4 +1,5 @@
-import { ComponentClassNameProps, pick, useClassNameFactory } from '@contember/utilities'
+import { useClassNameFactory } from '@contember/react-utils'
+import { ComponentClassNameProps, pick } from '@contember/utilities'
 import { PropsWithChildren } from 'react'
 import { SlotTargets } from '../Slots'
 

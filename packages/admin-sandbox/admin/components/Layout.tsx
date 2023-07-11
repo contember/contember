@@ -1,7 +1,8 @@
-import { Button, DevPanel, DimensionsSwitcher, Link, LogoutLink, Scheme, Spacer, Stack, VisuallyHidden, toSchemeClass, toThemeClass } from '@contember/admin'
+import { Button, DevPanel, DialogProvider, DimensionsSwitcher, Intent, Link, LogoutLink, PortalProvider, Radio, Scheme, Spacer, Stack, VisuallyHidden } from '@contember/admin'
 import { Identity2023 } from '@contember/brand'
 import { SafeAreaInsetsProvider } from '@contember/layout'
-import { ColorSchemeProvider, getThemeClassName, useContainerWidth, useDocumentTitle, useReferentiallyStableCallback, useSessionStorageState, useThemedClassName } from '@contember/react-utils'
+import { ColorSchemeProvider, useContainerWidth, useDocumentTitle, useReferentiallyStableCallback, useSessionStorageState } from '@contember/react-utils'
+import { colorSchemeClassName, contentThemeClassName, controlsThemeClassName } from '@contember/utilities'
 import { CircleDashedIcon, LayoutIcon, LogOutIcon, MoonIcon, PaintBucketIcon, SmartphoneIcon, SunIcon } from 'lucide-react'
 import { PropsWithChildren, memo, useMemo, useRef, useState } from 'react'
 import { AlertLogoutLink } from './AlertLogoutLink'
@@ -27,20 +28,25 @@ export const Layout = memo(({ children }: PropsWithChildren) => {
 
 	return (
 		<SafeAreaInsetsProvider insets={useMemo(() => ({ top: safeAreaInsets, right: safeAreaInsets, left: safeAreaInsets, bottom: safeAreaInsets }), [safeAreaInsets])}>
-			<LayoutComponent
-				className={[
-					toThemeClass(directives['layout.theme-content'], directives['layout.theme-controls']),
-					toSchemeClass(scheme),
-				]}
-			>
-				<SlotSources.Logo>
-					<Link to="index">
-						<Stack align="center" direction="horizontal" gap="small">
-							<Identity2023.Edit scale={2} />
-							<VisuallyHidden hidden={width < LAYOUT_BREAKPOINT}>Contember</VisuallyHidden>
-						</Stack>
-					</Link>
-				</SlotSources.Logo>
+			<ColorSchemeProvider scheme={scheme}>
+				<LayoutComponent
+					key="changeable-layout"
+					className={[
+						colorSchemeClassName(scheme),
+						contentThemeClassName(directives['layout.theme-content']),
+						controlsThemeClassName(directives['layout.theme-controls']),
+					]}
+				>
+					<PortalProvider>
+						<DialogProvider>
+							<SlotSources.Logo>
+								<Link to="index">
+									<Stack align="center" direction="horizontal" gap="small">
+										<Identity2023.Edit scale={2} />
+										<VisuallyHidden hidden={width < LAYOUT_BREAKPOINT}>Contember</VisuallyHidden>
+									</Stack>
+								</Link>
+							</SlotSources.Logo>
 
 							<SlotSources.Switchers>
 								<Button

@@ -1,4 +1,4 @@
-import { useClassNameFactory } from '@contember/utilities'
+import { useClassNameFactory } from '@contember/react-utils'
 import { memo, MemoExoticComponent, PropsWithChildren, useCallback, useMemo, useRef } from 'react'
 import { MouseMoveProvider } from '../../auxiliary'
 import { toViewClass } from '../../utils'

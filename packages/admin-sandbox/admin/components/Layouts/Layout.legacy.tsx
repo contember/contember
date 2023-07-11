@@ -1,6 +1,7 @@
 import { CommonSlotTargets, ContentSlotTargets } from '@contember/layout'
+import { useClassName } from '@contember/react-utils'
 import { Layout as DefaultLayout, LayoutPage } from '@contember/ui'
-import { NestedClassName, useClassName } from '@contember/utilities'
+import { NestedClassName } from '@contember/utilities'
 import { PropsWithChildren } from 'react'
 
 const {

@@ -1,19 +1,24 @@
-:where(:root),
-:where(.scheme-system) {
+:where(
+	:root,
+	.scheme-system,
+) {
 	color-scheme: light dark;
 }
 
 :where(.scheme-light) {
-	color-scheme: light;
+	color-scheme: only light;
 }
 
 :where(.scheme-dark) {
-	color-scheme: dark;
+	color-scheme: only dark;
 }
 
-:where(:root),
-:where(.scheme-light),
-:where(.scheme-system) {
+:where(
+	:root,
+	.scheme-system,
+	.scheme-light,
+	.scheme-dark,
+){
 	/* Opacities */
 	--cui-opacity--strong: 1;
 	--cui-opacity--high: 0.750;
@@ -23,275 +28,232 @@
 	--cui-opacity--control-background-color: 0.250;
 	--cui-opacity--control-background-color--highlighted: 0.750;
 	--cui-opacity--filled-control-background-color--pressed: 0.500;
-	--cui-opacity--toned-control-background-color: 0.250;
+	--cui-opacity--toned-control-background-color: ; /* schema dependent */
+}
+:where(.scheme-light) { --cui-opacity--toned-control-background-color: 0.250; }
+:where(.scheme-dark) { --cui-opacity--toned-control-background-color: 0.500; }
+
+@media (prefers-color-scheme: light) {
+  :where(.scheme-system),
+	:where(.scheme-light)
+	{
+		/* Content */
+		--cui-background-color: rgb(var(--cui-content-950));
+		--cui-background-color--above: rgb(var(--cui-content-975));
+		--cui-background-color--below: rgb(var(--cui-content-925));
+		--cui-color: rgba(var(--cui-content-75), 0.750);
+		--cui-color--strong: rgb(var(--cui-content-75));
+		--cui-color--high: rgba(var(--cui-content-75), 0.750);
+		--cui-color--medium: rgba(var(--cui-content-75), 0.500);
+		--cui-color--low: rgba(var(--cui-content-75), 0.300);
+		--cui-color--lower: rgba(var(--cui-content-75), 0.125);
+		/* Control – 950 : 375*/
+		--cui-control-color: rgb(var(--cui-controls-375));
+		--cui-control-background-color: rgba(var(--cui-controls-950), 0.250);
+		--cui-control-border-color: rgb(var(--cui-controls-450));
+		/* Content:highlighted – 950 : 375 */
+		--cui-color--highlighted: rgb(var(--cui-content-375));
+		--cui-background-color--highlighted: rgba(var(--cui-content-1000), 0.750);
+		--cui-border-color--highlighted: rgb(var(--cui-content-375));
+		/* Control:highlighted – 950 : 375 */
+		--cui-control-color--highlighted: rgb(var(--cui-controls-375));
+		--cui-control-background-color--highlighted: rgba(var(--cui-controls-1000), 0.750);
+		--cui-control-border-color--highlighted: rgb(var(--cui-controls-375));
+		/* Content:pressed — 950 : 300 */
+		--cui-color--pressed: rgb(var(--cui-content-175));
+		--cui-background-color--pressed: rgba(var(--cui-content-350), 0.500);
+		--cui-border-color--pressed: rgb(var(--cui-content-175));
+		/* Control:pressed — 950 : 300 */
+		--cui-control-color--pressed: rgb(var(--cui-controls-175));
+		--cui-control-background-color--pressed: rgba(var(--cui-controls-350), 0.500);
+		--cui-control-border-color--pressed: rgb(var(--cui-controls-175));
+		/* FilledContent — 1000 : rgb(var(--cui-content-375)) */
+		--cui-filled-color: rgb(var(--cui-content-375));
+		--cui-filled-background-color: rgb(var(--cui-content-1000));
+		--cui-filled-border-color: rgb(var(--cui-content-375));
+		/* FilledControl — 1000 : rgb(var(--cui-controls-375)) */
+		--cui-filled-control-color: rgb(var(--cui-controls-375));
+		--cui-filled-control-background-color: rgb(var(--cui-controls-1000));
+		--cui-filled-control-border-color: rgb(var(--cui-controls-375));
+		/* FilledContent:highlighted – 1025 : 425 */
+		--cui-filled-color--highlighted: rgb(var(--cui-content-425));
+		--cui-filled-background-color--highlighted: rgb(var(--cui-content-1000));
+		--cui-filled-border-color--highlighted: rgb(var(--cui-content-425));
+		/* FilledControl:highlighted – 1025 : 425 */
+		--cui-filled-control-color--highlighted: rgb(var(--cui-controls-425));
+		--cui-filled-control-background-color--highlighted: rgb(var(--cui-controls-1000));
+		--cui-filled-control-border-color--highlighted: rgb(var(--cui-controls-425));
+		/* FilledContent:pressed – 350 alpha : 175 */
+		--cui-filled-color--pressed: rgb(var(--cui-content-175));
+		--cui-filled-background-color--pressed: rgba(var(--cui-content-350), 0.500);
+		--cui-filled-border-color--pressed: rgb(var(--cui-content-175));
+		/* FilledControl:pressed – 350 alpha : 175 */
+		--cui-filled-control-color--pressed: rgb(var(--cui-controls-175));
+		--cui-filled-control-background-color--pressed: rgba(var(--cui-controls-350), 0.500);
+		--cui-filled-control-border-color--pressed: rgb(var(--cui-controls-175));
+		/* FilledPrimaryContent — 350 : rgb(var(--cui-content-375)) */
+		--cui-filled-primary-color: rgb(var(--cui-content-1000));
+		--cui-filled-primary-background-color: rgb(var(--cui-content-350));
+		--cui-filled-primary-border-color: rgb(var(--cui-content-1000));
+		/* FilledPrimaryControl — 350 : rgb(var(--cui-controls-375)) */
+		--cui-filled-primary-control-color: rgb(var(--cui-controls-1000));
+		--cui-filled-primary-control-background-color: rgb(var(--cui-controls-350));
+		--cui-filled-primary-control-border-color: rgb(var(--cui-controls-1000));
+		/* FilledPrimaryContent:highlighted – 400 : 1350 */
+		--cui-filled-primary-color--highlighted: rgb(var(--cui-content-1000));
+		--cui-filled-primary-background-color--highlighted: rgb(var(--cui-content-400));
+		--cui-filled-primary-border-color--highlighted: rgb(var(--cui-content-1000));
+		/* FilledPrimaryControl:highlighted – 400 : 1350 */
+		--cui-filled-primary-control-color--highlighted: rgb(var(--cui-controls-1000));
+		--cui-filled-primary-control-background-color--highlighted: rgb(var(--cui-controls-400));
+		--cui-filled-primary-control-border-color--highlighted: rgb(var(--cui-controls-1000));
+		/* FilledPrimaryContent:pressed – 350 alpha : 750 */
+		--cui-filled-primary-color--pressed: rgb(var(--cui-content-750));
+		--cui-filled-primary-background-color--pressed: rgb(var(--cui-content-350));
+		--cui-filled-primary-border-color--pressed: rgb(var(--cui-content-750));
+		/* FilledPrimaryControl:pressed – 350 alpha : 750 */
+		--cui-filled-primary-control-color--pressed: rgb(var(--cui-controls-750));
+		--cui-filled-primary-control-background-color--pressed: rgb(var(--cui-controls-350));
+		--cui-filled-primary-control-border-color--pressed: rgb(var(--cui-controls-750));
+		/* TonedContent — 825 alpha : 250 */
+		--cui-toned-color: rgb(var(--cui-content-250));
+		--cui-toned-background-color: rgba(var(--cui-content-825), 0.250);
+		--cui-toned-border-color: rgb(var(--cui-content-250));
+		/* TonedControl — 825 alpha : 250 */
+		--cui-toned-control-color: rgb(var(--cui-controls-250));
+		--cui-toned-control-background-color: rgba(var(--cui-controls-825), 0.250);
+		--cui-toned-control-border-color: rgb(var(--cui-controls-250));
+		/* TonedContent:highlighted = FilledControl:highlighted */
+		--cui-toned-color--highlighted: rgb(var(--cui-content-1000));
+		--cui-toned-background-color--highlighted: rgb(var(--cui-content-400));
+		--cui-toned-border-color--highlighted: rgb(var(--cui-content-425));
+		/* TonedControl:highlighted = FilledControl:highlighted */
+		--cui-toned-control-color--highlighted: rgb(var(--cui-controls-650));
+		--cui-toned-control-background-color--highlighted: rgba(var(--cui-controls-1000), 0.750);
+		--cui-toned-control-border-color--highlighted: rgb(var(--cui-controls-425));
+		/* TonedContent:pressed = FilledControl:pressed */
+		--cui-toned-color--pressed: rgb(var(--cui-content-175));
+		--cui-toned-background-color--pressed: rgba(var(--cui-content-350), 0.500);
+		--cui-toned-border-color--pressed: rgb(var(--cui-content-175));
+		/* TonedControl:pressed = FilledControl:pressed */
+		--cui-toned-control-color--pressed: rgb(var(--cui-controls-175));
+		--cui-toned-control-background-color--pressed: rgba(var(--cui-controls-350), 0.500);
+		--cui-toned-control-border-color--pressed: rgb(var(--cui-controls-175));
+	}
+
+	:where(.scheme-dark) {
+		/* Content */
+		--cui-background-color: rgb(var(--cui-content-50));
+		--cui-background-color--above: rgb(var(--cui-content-75));
+		--cui-background-color--below: rgb(var(--cui-content-25));
+		--cui-color: rgba(var(--cui-content-1000), 0.750);
+		--cui-color--strong: rgb(var(--cui-content-1000));
+		--cui-color--high: rgba(var(--cui-content-1000), 0.750);
+		--cui-color--medium: rgba(var(--cui-content-1000), 0.500);
+		--cui-color--low: rgba(var(--cui-content-1000), 0.300);
+		--cui-color--lower: rgba(var(--cui-content-1000), 0.125);
+		/* Control – 50 : 625*/
+		--cui-control-color: rgb(var(--cui-controls-625));
+		--cui-control-background-color: rgba(var(--cui-controls-0), 0.250);
+		--cui-control-border-color: rgb(var(--cui-controls-600));
+		/* Content:highlighted – 50 : 950 */
+		--cui-color--highlighted: rgb(var(--cui-content-950));
+		--cui-background-color--highlighted: rgba(var(--cui-content-300), 0.750);
+		--cui-border-color--highlighted: rgb(var(--cui-content-950));
+		/* Control:highlighted – 50 : 950 */
+		--cui-control-color--highlighted: rgb(var(--cui-controls-950));
+		--cui-control-background-color--highlighted: rgba(var(--cui-controls-300), 0.750);
+		--cui-control-border-color--highlighted: rgb(var(--cui-controls-950));
+		/* Content:pressed — 50 : 600 */
+		--cui-color--pressed: rgb(var(--cui-content-700));
+		--cui-background-color--pressed: rgba(var(--cui-content-175), 0.500);
+		--cui-border-color--pressed: rgb(var(--cui-content-700));
+		/* Control:pressed — 50 : 600 */
+		--cui-control-color--pressed: rgb(var(--cui-controls-700));
+		--cui-control-background-color--pressed: rgba(var(--cui-controls-175), 0.500);
+		--cui-control-border-color--pressed: rgb(var(--cui-controls-700));
+		/* FilledContent — 175 : rgb(var(--cui-content-700)) */
+		--cui-filled-color: rgb(var(--cui-content-700));
+		--cui-filled-background-color: rgb(var(--cui-content-175));
+		--cui-filled-border-color: rgb(var(--cui-content-700));
+		/* FilledControl — 175 : rgb(var(--cui-controls-700)) */
+		--cui-filled-control-color: rgb(var(--cui-controls-700));
+		--cui-filled-control-background-color: rgb(var(--cui-controls-175));
+		--cui-filled-control-border-color: rgb(var(--cui-controls-700));
+		/* FilledContent:highlighted – 300 : 1050 */
+		--cui-filled-color--highlighted: rgb(var(--cui-content-1000));
+		--cui-filled-background-color--highlighted: rgb(var(--cui-content-300));
+		--cui-filled-border-color--highlighted: rgb(var(--cui-content-1000));
+		/* FilledControl:highlighted – 300 : 1050 */
+		--cui-filled-control-color--highlighted: rgb(var(--cui-controls-1000));
+		--cui-filled-control-background-color--highlighted: rgb(var(--cui-controls-300));
+		--cui-filled-control-border-color--highlighted: rgb(var(--cui-controls-1000));
+		/* FilledContent:pressed – 175 alpha : 700 */
+		--cui-filled-color--pressed: rgb(var(--cui-content-700));
+		--cui-filled-background-color--pressed: rgba(var(--cui-content-175), 0.500);
+		--cui-filled-border-color--pressed: rgb(var(--cui-content-700));
+		/* FilledControl:pressed – 175 alpha : 700 */
+		--cui-filled-control-color--pressed: rgb(var(--cui-controls-700));
+		--cui-filled-control-background-color--pressed: rgba(var(--cui-controls-175), 0.500);
+		--cui-filled-control-border-color--pressed: rgb(var(--cui-controls-700));
+		/* FilledPrimaryContent — 325 : rgb(var(--cui-content-700)) */
+		--cui-filled-primary-color: rgb(var(--cui-content-1000));
+		--cui-filled-primary-background-color: rgb(var(--cui-content-325));
+		--cui-filled-primary-border-color: rgb(var(--cui-content-1000));
+		/* FilledPrimaryControl — 325 : rgb(var(--cui-controls-700)) */
+		--cui-filled-primary-control-color: rgb(var(--cui-controls-1000));
+		--cui-filled-primary-control-background-color: rgb(var(--cui-controls-325));
+		--cui-filled-primary-control-border-color: rgb(var(--cui-controls-1000));
+		/* FilledPrimaryContent:highlighted – 400 : 1050 */
+		--cui-filled-primary-color--highlighted: rgb(var(--cui-content-1000));
+		--cui-filled-primary-background-color--highlighted: rgb(var(--cui-content-400));
+		--cui-filled-primary-border-color--highlighted: rgb(var(--cui-content-1000));
+		/* FilledPrimaryControl:highlighted – 400 : 1050 */
+		--cui-filled-primary-control-color--highlighted: rgb(var(--cui-controls-1000));
+		--cui-filled-primary-control-background-color--highlighted: rgb(var(--cui-controls-400));
+		--cui-filled-primary-control-border-color--highlighted: rgb(var(--cui-controls-1000));
+		/* FilledPrimaryContent:pressed – 175 alpha : 650 */
+		--cui-filled-primary-color--pressed: rgb(var(--cui-content-650));
+		--cui-filled-primary-background-color--pressed: rgb(var(--cui-content-175));
+		--cui-filled-primary-border-color--pressed: rgb(var(--cui-content-700));
+		/* FilledPrimaryControl:pressed – 175 alpha : 650 */
+		--cui-filled-primary-control-color--pressed: rgb(var(--cui-controls-650));
+		--cui-filled-primary-control-background-color--pressed: rgb(var(--cui-controls-175));
+		--cui-filled-primary-control-border-color--pressed: rgb(var(--cui-controls-700));
+		/* TonedContent — 300 alpha : 900 */
+		--cui-toned-color: rgb(var(--cui-content-900));
+		--cui-toned-background-color: rgba(var(--cui-content-300), 0.500);
+		--cui-toned-border-color: rgb(var(--cui-content-900));
+		/* TonedControl — 300 alpha : 900 */
+		--cui-toned-control-color: rgb(var(--cui-controls-900));
+		--cui-toned-control-background-color: rgba(var(--cui-controls-300), 0.500);
+		--cui-toned-control-border-color: rgb(var(--cui-controls-900));
+		/* TonedContent:highlighted = FilledControl:highlighted */
+		--cui-toned-color--highlighted: rgb(var(--cui-content-1000));
+		--cui-toned-background-color--highlighted: rgb(var(--cui-content-400));
+		--cui-toned-border-color--highlighted: rgb(var(--cui-content-1000));
+		/* TonedControl:highlighted = FilledControl:highlighted */
+		--cui-toned-control-color--highlighted: rgb(var(--cui-controls-1000));
+		--cui-toned-control-background-color--highlighted: rgba(var(--cui-controls-375), 0.875);
+		--cui-toned-control-border-color--highlighted: rgb(var(--cui-controls-1000));
+		/* TonedContent:pressed = FilledControl:pressed */
+		--cui-toned-color--pressed: rgb(var(--cui-content-700));
+		--cui-toned-background-color--pressed: rgba(var(--cui-content-175), 0.500);
+		--cui-toned-border-color--pressed: rgb(var(--cui-content-700));
+		/* TonedControl:pressed = FilledControl:pressed */
+		--cui-toned-control-color--pressed: rgb(var(--cui-controls-700));
+		--cui-toned-control-background-color--pressed: rgba(var(--cui-controls-175), 0.500);
+		--cui-toned-control-border-color--pressed: rgb(var(--cui-controls-700));
+	}
 }
 
-:where(.scheme-dark) {
-	/* Opacities */
-	--cui-opacity--strong: 1;
-	--cui-opacity--high: 0.750;
-	--cui-opacity--medium: 0.500;
-	--cui-opacity--low: 0.300;
-	--cui-opacity--lower: 0.125;
-	--cui-opacity--control-background-color: 0.250;
-	--cui-opacity--control-background-color--highlighted: 0.750;
-	--cui-opacity--filled-control-background-color--pressed: 0.500;
-	--cui-opacity--toned-control-background-color: 0.500;
-}
-
-:where(:root),
-:where(:root .cui-theme:not([class*=scheme-])),
-:where(.scheme-light),
-:where(.scheme-light .cui-theme:not([class*=scheme-])),
-:where(.scheme-system),
-:where(.scheme-system .cui-theme:not([class*=scheme-])) {
-	/* Content */
-	--cui-background-color: rgb(var(--cui-content-950));
-	--cui-background-color--above: rgb(var(--cui-content-975));
-	--cui-background-color--below: rgb(var(--cui-content-925));
-	--cui-color: rgba(var(--cui-content-75), 0.750);
-	--cui-color--strong: rgb(var(--cui-content-75));
-	--cui-color--high: rgba(var(--cui-content-75), 0.750);
-	--cui-color--medium: rgba(var(--cui-content-75), 0.500);
-	--cui-color--low: rgba(var(--cui-content-75), 0.300);
-	--cui-color--lower: rgba(var(--cui-content-75), 0.125);
-	/* Control – 950 : 375*/
-	--cui-control-color: rgb(var(--cui-controls-375));
-	--cui-control-background-color: rgba(var(--cui-controls-950), 0.250);
-	--cui-control-border-color: rgb(var(--cui-controls-450));
-	/* Content:highlighted – 950 : 375 */
-	--cui-color--highlighted: rgb(var(--cui-content-375));
-	--cui-background-color--highlighted: rgba(var(--cui-content-1000), 0.750);
-	--cui-border-color--highlighted: rgb(var(--cui-content-375));
-	/* Control:highlighted – 950 : 375 */
-	--cui-control-color--highlighted: rgb(var(--cui-controls-375));
-	--cui-control-background-color--highlighted: rgba(var(--cui-controls-1000), 0.750);
-	--cui-control-border-color--highlighted: rgb(var(--cui-controls-375));
-	/* Content:pressed — 950 : 300 */
-	--cui-color--pressed: rgb(var(--cui-content-175));
-	--cui-background-color--pressed: rgba(var(--cui-content-350), 0.500);
-	--cui-border-color--pressed: rgb(var(--cui-content-175));
-	/* Control:pressed — 950 : 300 */
-	--cui-control-color--pressed: rgb(var(--cui-controls-175));
-	--cui-control-background-color--pressed: rgba(var(--cui-controls-350), 0.500);
-	--cui-control-border-color--pressed: rgb(var(--cui-controls-175));
-	/* FilledContent — 1000 : rgb(var(--cui-content-375)) */
-	--cui-filled-color: rgb(var(--cui-content-375));
-	--cui-filled-background-color: rgb(var(--cui-content-1000));
-	--cui-filled-border-color: rgb(var(--cui-content-375));
-	/* FilledControl — 1000 : rgb(var(--cui-controls-375)) */
-	--cui-filled-control-color: rgb(var(--cui-controls-375));
-	--cui-filled-control-background-color: rgb(var(--cui-controls-1000));
-	--cui-filled-control-border-color: rgb(var(--cui-controls-375));
-	/* FilledContent:highlighted – 1025 : 425 */
-	--cui-filled-color--highlighted: rgb(var(--cui-content-425));
-	--cui-filled-background-color--highlighted: rgb(var(--cui-content-1000));
-	--cui-filled-border-color--highlighted: rgb(var(--cui-content-425));
-	/* FilledControl:highlighted – 1025 : 425 */
-	--cui-filled-control-color--highlighted: rgb(var(--cui-controls-425));
-	--cui-filled-control-background-color--highlighted: rgb(var(--cui-controls-1000));
-	--cui-filled-control-border-color--highlighted: rgb(var(--cui-controls-425));
-	/* FilledContent:pressed – 350 alpha : 175 */
-	--cui-filled-color--pressed: rgb(var(--cui-content-175));
-	--cui-filled-background-color--pressed: rgba(var(--cui-content-350), 0.500);
-	--cui-filled-border-color--pressed: rgb(var(--cui-content-175));
-	/* FilledControl:pressed – 350 alpha : 175 */
-	--cui-filled-control-color--pressed: rgb(var(--cui-controls-175));
-	--cui-filled-control-background-color--pressed: rgba(var(--cui-controls-350), 0.500);
-	--cui-filled-control-border-color--pressed: rgb(var(--cui-controls-175));
-	/* FilledPrimaryContent — 350 : rgb(var(--cui-content-375)) */
-	--cui-filled-primary-color: rgb(var(--cui-content-1000));
-	--cui-filled-primary-background-color: rgb(var(--cui-content-350));
-	--cui-filled-primary-border-color: rgb(var(--cui-content-1000));
-	/* FilledPrimaryControl — 350 : rgb(var(--cui-controls-375)) */
-	--cui-filled-primary-control-color: rgb(var(--cui-controls-1000));
-	--cui-filled-primary-control-background-color: rgb(var(--cui-controls-350));
-	--cui-filled-primary-control-border-color: rgb(var(--cui-controls-1000));
-	/* FilledPrimaryContent:highlighted – 400 : 1350 */
-	--cui-filled-primary-color--highlighted: rgb(var(--cui-content-1000));
-	--cui-filled-primary-background-color--highlighted: rgb(var(--cui-content-400));
-	--cui-filled-primary-border-color--highlighted: rgb(var(--cui-content-1000));
-	/* FilledPrimaryControl:highlighted – 400 : 1350 */
-	--cui-filled-primary-control-color--highlighted: rgb(var(--cui-controls-1000));
-	--cui-filled-primary-control-background-color--highlighted: rgb(var(--cui-controls-400));
-	--cui-filled-primary-control-border-color--highlighted: rgb(var(--cui-controls-1000));
-	/* FilledPrimaryContent:pressed – 350 alpha : 750 */
-	--cui-filled-primary-color--pressed: rgb(var(--cui-content-750));
-	--cui-filled-primary-background-color--pressed: rgb(var(--cui-content-350));
-	--cui-filled-primary-border-color--pressed: rgb(var(--cui-content-750));
-	/* FilledPrimaryControl:pressed – 350 alpha : 750 */
-	--cui-filled-primary-control-color--pressed: rgb(var(--cui-controls-750));
-	--cui-filled-primary-control-background-color--pressed: rgb(var(--cui-controls-350));
-	--cui-filled-primary-control-border-color--pressed: rgb(var(--cui-controls-750));
-	/* TonedContent — 825 alpha : 250 */
-	--cui-toned-color: rgb(var(--cui-content-250));
-	--cui-toned-background-color: rgba(var(--cui-content-825), 0.250);
-	--cui-toned-border-color: rgb(var(--cui-content-250));
-	/* TonedControl — 825 alpha : 250 */
-	--cui-toned-control-color: rgb(var(--cui-controls-250));
-	--cui-toned-control-background-color: rgba(var(--cui-controls-825), 0.250);
-	--cui-toned-control-border-color: rgb(var(--cui-controls-250));
-	/* TonedContent:highlighted = FilledControl:highlighted */
-	--cui-toned-color--highlighted: rgb(var(--cui-content-1000));
-	--cui-toned-background-color--highlighted: rgb(var(--cui-content-400));
-	--cui-toned-border-color--highlighted: rgb(var(--cui-content-425));
-	/* TonedControl:highlighted = FilledControl:highlighted */
-	--cui-toned-control-color--highlighted: rgb(var(--cui-controls-650));
-	--cui-toned-control-background-color--highlighted: rgba(var(--cui-controls-1000), 0.750);
-	--cui-toned-control-border-color--highlighted: rgb(var(--cui-controls-425));
-	/* TonedContent:pressed = FilledControl:pressed */
-	--cui-toned-color--pressed: rgb(var(--cui-content-175));
-	--cui-toned-background-color--pressed: rgba(var(--cui-content-350), 0.500);
-	--cui-toned-border-color--pressed: rgb(var(--cui-content-175));
-	/* TonedControl:pressed = FilledControl:pressed */
-	--cui-toned-control-color--pressed: rgb(var(--cui-controls-175));
-	--cui-toned-control-background-color--pressed: rgba(var(--cui-controls-350), 0.500);
-	--cui-toned-control-border-color--pressed: rgb(var(--cui-controls-175));
-}
-
-:where(.scheme-dark),
-:where(.scheme-dark .cui-theme:not([class*=scheme-])) {
-	/* Content */
-	--cui-background-color: rgb(var(--cui-content-50));
-	--cui-background-color--above: rgb(var(--cui-content-75));
-	--cui-background-color--below: rgb(var(--cui-content-25));
-	--cui-color: rgba(var(--cui-content-1000), 0.750);
-	--cui-color--strong: rgb(var(--cui-content-1000));
-	--cui-color--high: rgba(var(--cui-content-1000), 0.750);
-	--cui-color--medium: rgba(var(--cui-content-1000), 0.500);
-	--cui-color--low: rgba(var(--cui-content-1000), 0.300);
-	--cui-color--lower: rgba(var(--cui-content-1000), 0.125);
-	/* Control – 50 : 625*/
-	--cui-control-color: rgb(var(--cui-controls-625));
-	--cui-control-background-color: rgba(var(--cui-controls-0), 0.250);
-	--cui-control-border-color: rgb(var(--cui-controls-600));
-	/* Content:highlighted – 50 : 950 */
-	--cui-color--highlighted: rgb(var(--cui-content-950));
-	--cui-background-color--highlighted: rgba(var(--cui-content-300), 0.750);
-	--cui-border-color--highlighted: rgb(var(--cui-content-950));
-	/* Control:highlighted – 50 : 950 */
-	--cui-control-color--highlighted: rgb(var(--cui-controls-950));
-	--cui-control-background-color--highlighted: rgba(var(--cui-controls-300), 0.750);
-	--cui-control-border-color--highlighted: rgb(var(--cui-controls-950));
-	/* Content:pressed — 50 : 600 */
-	--cui-color--pressed: rgb(var(--cui-content-700));
-	--cui-background-color--pressed: rgba(var(--cui-content-175), 0.500);
-	--cui-border-color--pressed: rgb(var(--cui-content-700));
-	/* Control:pressed — 50 : 600 */
-	--cui-control-color--pressed: rgb(var(--cui-controls-700));
-	--cui-control-background-color--pressed: rgba(var(--cui-controls-175), 0.500);
-	--cui-control-border-color--pressed: rgb(var(--cui-controls-700));
-	/* FilledContent — 175 : rgb(var(--cui-content-700)) */
-	--cui-filled-color: rgb(var(--cui-content-700));
-	--cui-filled-background-color: rgb(var(--cui-content-175));
-	--cui-filled-border-color: rgb(var(--cui-content-700));
-	/* FilledControl — 175 : rgb(var(--cui-controls-700)) */
-	--cui-filled-control-color: rgb(var(--cui-controls-700));
-	--cui-filled-control-background-color: rgb(var(--cui-controls-175));
-	--cui-filled-control-border-color: rgb(var(--cui-controls-700));
-	/* FilledContent:highlighted – 300 : 1050 */
-	--cui-filled-color--highlighted: rgb(var(--cui-content-1000));
-	--cui-filled-background-color--highlighted: rgb(var(--cui-content-300));
-	--cui-filled-border-color--highlighted: rgb(var(--cui-content-1000));
-	/* FilledControl:highlighted – 300 : 1050 */
-	--cui-filled-control-color--highlighted: rgb(var(--cui-controls-1000));
-	--cui-filled-control-background-color--highlighted: rgb(var(--cui-controls-300));
-	--cui-filled-control-border-color--highlighted: rgb(var(--cui-controls-1000));
-	/* FilledContent:pressed – 175 alpha : 700 */
-	--cui-filled-color--pressed: rgb(var(--cui-content-700));
-	--cui-filled-background-color--pressed: rgba(var(--cui-content-175), 0.500);
-	--cui-filled-border-color--pressed: rgb(var(--cui-content-700));
-	/* FilledControl:pressed – 175 alpha : 700 */
-	--cui-filled-control-color--pressed: rgb(var(--cui-controls-700));
-	--cui-filled-control-background-color--pressed: rgba(var(--cui-controls-175), 0.500);
-	--cui-filled-control-border-color--pressed: rgb(var(--cui-controls-700));
-	/* FilledPrimaryContent — 325 : rgb(var(--cui-content-700)) */
-	--cui-filled-primary-color: rgb(var(--cui-content-1000));
-	--cui-filled-primary-background-color: rgb(var(--cui-content-325));
-	--cui-filled-primary-border-color: rgb(var(--cui-content-1000));
-	/* FilledPrimaryControl — 325 : rgb(var(--cui-controls-700)) */
-	--cui-filled-primary-control-color: rgb(var(--cui-controls-1000));
-	--cui-filled-primary-control-background-color: rgb(var(--cui-controls-325));
-	--cui-filled-primary-control-border-color: rgb(var(--cui-controls-1000));
-	/* FilledPrimaryContent:highlighted – 400 : 1050 */
-	--cui-filled-primary-color--highlighted: rgb(var(--cui-content-1000));
-	--cui-filled-primary-background-color--highlighted: rgb(var(--cui-content-400));
-	--cui-filled-primary-border-color--highlighted: rgb(var(--cui-content-1000));
-	/* FilledPrimaryControl:highlighted – 400 : 1050 */
-	--cui-filled-primary-control-color--highlighted: rgb(var(--cui-controls-1000));
-	--cui-filled-primary-control-background-color--highlighted: rgb(var(--cui-controls-400));
-	--cui-filled-primary-control-border-color--highlighted: rgb(var(--cui-controls-1000));
-	/* FilledPrimaryContent:pressed – 175 alpha : 650 */
-	--cui-filled-primary-color--pressed: rgb(var(--cui-content-650));
-	--cui-filled-primary-background-color--pressed: rgb(var(--cui-content-175));
-	--cui-filled-primary-border-color--pressed: rgb(var(--cui-content-700));
-	/* FilledPrimaryControl:pressed – 175 alpha : 650 */
-	--cui-filled-primary-control-color--pressed: rgb(var(--cui-controls-650));
-	--cui-filled-primary-control-background-color--pressed: rgb(var(--cui-controls-175));
-	--cui-filled-primary-control-border-color--pressed: rgb(var(--cui-controls-700));
-	/* TonedContent — 300 alpha : 900 */
-	--cui-toned-color: rgb(var(--cui-content-900));
-	--cui-toned-background-color: rgba(var(--cui-content-300), 0.500);
-	--cui-toned-border-color: rgb(var(--cui-content-900));
-	/* TonedControl — 300 alpha : 900 */
-	--cui-toned-control-color: rgb(var(--cui-controls-900));
-	--cui-toned-control-background-color: rgba(var(--cui-controls-300), 0.500);
-	--cui-toned-control-border-color: rgb(var(--cui-controls-900));
-	/* TonedContent:highlighted = FilledControl:highlighted */
-	--cui-toned-color--highlighted: rgb(var(--cui-content-1000));
-	--cui-toned-background-color--highlighted: rgb(var(--cui-content-400));
-	--cui-toned-border-color--highlighted: rgb(var(--cui-content-1000));
-	/* TonedControl:highlighted = FilledControl:highlighted */
-	--cui-toned-control-color--highlighted: rgb(var(--cui-controls-1000));
-	--cui-toned-control-background-color--highlighted: rgba(var(--cui-controls-375), 0.875);
-	--cui-toned-control-border-color--highlighted: rgb(var(--cui-controls-1000));
-	/* TonedContent:pressed = FilledControl:pressed */
-	--cui-toned-color--pressed: rgb(var(--cui-content-700));
-	--cui-toned-background-color--pressed: rgba(var(--cui-content-175), 0.500);
-	--cui-toned-border-color--pressed: rgb(var(--cui-content-700));
-	/* TonedControl:pressed = FilledControl:pressed */
-	--cui-toned-control-color--pressed: rgb(var(--cui-controls-700));
-	--cui-toned-control-background-color--pressed: rgba(var(--cui-controls-175), 0.500);
-	--cui-toned-control-border-color--pressed: rgb(var(--cui-controls-700));
-}
 
 /*** Prefers dark scheme defaults: ***/
 
 @media (prefers-color-scheme: dark) {
-	:where(:root),
-	:where(.scheme-dark),
-	:where(.scheme-system) {
-		/* Opacities */
-		--cui-opacity--strong: 1;
-		--cui-opacity--high: 0.750;
-		--cui-opacity--medium: 0.500;
-		--cui-opacity--low: 0.300;
-		--cui-opacity--lower: 0.125;
-		--cui-opacity--control-background-color: 0.250;
-		--cui-opacity--control-background-color--highlighted: 0.750;
-		--cui-opacity--filled-control-background-color--pressed: 0.500;
-		--cui-opacity--toned-control-background-color: 0.500;
-	}
-
-	:where(.scheme-light) {
-		/* Opacities */
-		--cui-opacity--strong: 1;
-		--cui-opacity--high: 0.750;
-		--cui-opacity--medium: 0.500;
-		--cui-opacity--low: 0.300;
-		--cui-opacity--lower: 0.125;
-		--cui-opacity--control-background-color: 0.250;
-		--cui-opacity--control-background-color--highlighted: 0.750;
-		--cui-opacity--filled-control-background-color--pressed: 0.500;
-		--cui-opacity--toned-control-background-color: 0.250;
-	}
-
-	:where(:root),
-	:where(:root .cui-theme:not([class*=scheme-])),
-	:where(.scheme-dark),
-	:where(.scheme-dark .cui-theme:not([class*=scheme-])),
 	:where(.scheme-system),
-	:where(.scheme-system .cui-theme:not([class*=scheme-])) {
+	:where(.scheme-dark)
+	{
 		/* Content */
 		--cui-background-color: rgb(var(--cui-content-50));
 		--cui-background-color--above: rgb(var(--cui-content-75));
@@ -396,8 +358,7 @@
 		--cui-toned-control-border-color--pressed: rgb(var(--cui-controls-700));
 	}
 
-	:where(.scheme-light),
-	:where(.scheme-light .cui-theme:not([class*=scheme-])) {
+	:where(.scheme-light) {
 		/* Content */
 		--cui-background-color: rgb(var(--cui-content-950));
 		--cui-background-color--above: rgb(var(--cui-content-975));

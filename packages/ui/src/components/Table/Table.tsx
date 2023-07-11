@@ -1,4 +1,4 @@
-import { useClassNameFactory } from '@contember/utilities'
+import { useClassNameFactory } from '@contember/react-utils'
 import { ReactNode, createContext, memo } from 'react'
 import type { Justification, Size } from '../../types'
 import { toEnumViewClass } from '../../utils'

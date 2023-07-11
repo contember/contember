@@ -1,5 +1,5 @@
 import { Slots } from '@contember/layout'
-import { useClassName } from '@contember/utilities'
+import { useClassName } from '@contember/react-utils'
 import { forwardRef } from 'react'
 
 export const AppHeaderTitle = forwardRef<HTMLHeadingElement, Slots.OwnTargetContainerProps>((props, forwardRef) => (

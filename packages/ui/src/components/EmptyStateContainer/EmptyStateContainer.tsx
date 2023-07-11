@@ -1,7 +1,7 @@
+import { useClassNameFactory, useColorScheme } from '@contember/react-utils'
+import { ComponentClassNameProps, colorSchemeClassName, themeClassName } from '@contember/utilities'
 import { PropsWithChildren, memo } from 'react'
 import { Intent } from '../../types'
-import { ComponentClassNameProps, useClassName, useClassNameFactory } from '@contember/utilities'
-import { toThemeClass } from '../../utils'
 import { Stack } from '../Stack'
 
 export type EmptyStateContainerProps =
@@ -22,7 +22,8 @@ export const EmptyStateContainer = memo<EmptyStateContainerProps>(({
 
 	return (
 		<div className={className(null, [
-			toThemeClass(intent, intent),
+			...themeClassName(intent),
+			colorSchemeClassName(useColorScheme()),
 			classNameProp,
 		])}>
 			<Stack direction="vertical" gap="large">

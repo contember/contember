@@ -1,4 +1,4 @@
-import { useClassNameFactory } from '@contember/utilities'
+import { useClassNameFactory } from '@contember/react-utils'
 import { forwardRef, memo, ReactNode, useState } from 'react'
 import { useFocus, useFocusVisible } from 'react-aria'
 import { HTMLButtonElementProps } from '../../types'

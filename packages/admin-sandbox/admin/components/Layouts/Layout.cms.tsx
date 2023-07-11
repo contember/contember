@@ -1,6 +1,7 @@
 import { Divider, Spacer, Stack } from '@contember/admin'
 import { LayoutKit, LayoutPrimitives, Slots, commonSlots, contentSlots, footerSlots, headerSlots } from '@contember/layout'
-import { pick, useClassName } from '@contember/utilities'
+import { useClassName } from '@contember/react-utils'
+import { pick } from '@contember/utilities'
 import { PropsWithChildren } from 'react'
 import { useDirectives } from '../Directives'
 import { SlotTargets } from '../Slots'

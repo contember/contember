@@ -1,21 +1,20 @@
+import { NestedClassName, deduplicateClassName, flatClassNameList } from '@contember/utilities'
 import { useContext } from 'react'
 import { GlobalClassNamePrefixContext } from './GlobalClassNamePrefixContext'
-import { deduplicateClassName } from './Internal/deduplicateClassName'
-import { flatClassNameList } from './Internal/flatClassNameList'
-import { NestedClassName } from './Types'
 
 /**
- * Prefixes leaf component class name
+ * Hook for component class name accepting outer class name
  *
- * @param componentClassName - Component class name.
- * @param additionalClassName - Additional class name.
+ * @param componentClassName - Component class name
+ * @param additionalClassName - Additional class name
+ * @param prefixOverride - Context component prefix override
  * @returns Prefixed component class name.
  */
-export const useClassName = (
+export function useClassName (
 	componentClassName: NestedClassName,
 	additionalClassName: NestedClassName = null,
 	prefixOverride?: string | null | undefined,
-) => {
+) {
 	const contextPrefix = useContext(GlobalClassNamePrefixContext)
 	const classNamePrefix: string = prefixOverride === null || prefixOverride === '' ? '' : prefixOverride || contextPrefix
 

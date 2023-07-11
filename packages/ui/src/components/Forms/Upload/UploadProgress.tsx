@@ -1,4 +1,4 @@
-import { useClassNameFactory } from '@contember/utilities'
+import { useClassNameFactory } from '@contember/react-utils'
 import type { FunctionComponent, ReactNode } from 'react'
 import { ProgressBar } from '../../ProgressBar/ProgressBar'
 import { Spinner } from '../../Spinner/Spinner'

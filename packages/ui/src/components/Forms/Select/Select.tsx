@@ -1,8 +1,8 @@
-import { useClassName } from '@contember/utilities'
+import { useClassName } from '@contember/react-utils'
 import { ComponentProps, CSSProperties, ForwardedRef, forwardRef, memo, ReactElement, RefAttributes, useCallback, useMemo, useRef } from 'react'
 import ReactSelect, { SelectInstance, StylesConfig, useStateManager } from 'react-select'
 import { noop } from '../../../utils'
-import { getPortalRoot } from '../../Portal'
+import { usePortalProvider } from '../../Portal'
 import { useChangeValidationState, useInputClassName } from '../Hooks'
 import type { ControlConstraintProps, ControlProps } from '../Types'
 import { useCommonReactSelectStyles } from './useCommonReactSelectStyles'
@@ -151,7 +151,7 @@ const SelectComponent = <V = unknown>({
 			isDisabled={disabled || readOnly || loading}
 			isLoading={loading}
 			isOptionDisabled={isOptionDisabled}
-			menuPortalTarget={getPortalRoot()}
+			menuPortalTarget={usePortalProvider()}
 			name={name}
 			options={optionsWithKeys}
 			placeholder={placeholder}

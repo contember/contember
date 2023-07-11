@@ -1,4 +1,5 @@
-import { dataAttribute, useClassName } from '@contember/utilities'
+import { useClassName } from '@contember/react-utils'
+import { dataAttribute } from '@contember/utilities'
 import { forwardRef, memo } from 'react'
 import { HTMLAnchorElementProps } from '../../types'
 import { Label } from '../Typography'

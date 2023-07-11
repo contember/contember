@@ -1,5 +1,5 @@
-import { useElementSize } from '@contember/react-utils'
-import { PolymorphicRef, assert, isNonNegativeNumber, isNotNullish, isSlugString, px, useClassNameFactory } from '@contember/utilities'
+import { useClassNameFactory, useElementSize } from '@contember/react-utils'
+import { PolymorphicRef, assert, isNonNegativeNumber, isNotNullish, isSlugString, px } from '@contember/utilities'
 import { ElementType, forwardRef, memo, useRef } from 'react'
 import { LayoutPanelContext, Panel, PanelBody, PanelFooter, PanelHeader, isComponentClassName } from '../primitives'
 import { ContentPanelComponentType, ContentPanelProps } from './Types'

@@ -20,6 +20,8 @@ export const Navigation = () => (
 			<Menu.Item title="Tenant" to="tenant/users" />
 			<Menu.Item title="Nested Path" to="nested/path" />
 
+			<Menu.Item title="Inactive" />
+
 			<Menu.Item title="Nesting">
 				<Menu.Item title="Foo Bar">
 					<Menu.Item title="Skip this1" />

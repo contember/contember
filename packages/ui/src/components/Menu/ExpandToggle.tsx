@@ -1,4 +1,4 @@
-import { useClassNameFactory } from '@contember/utilities'
+import { useClassNameFactory } from '@contember/react-utils'
 import { KeyboardEventHandler, forwardRef, memo, useCallback } from 'react'
 import { toStateClass } from '../../utils'
 

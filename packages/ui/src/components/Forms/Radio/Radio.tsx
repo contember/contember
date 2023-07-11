@@ -1,4 +1,4 @@
-import { useClassName } from '@contember/utilities'
+import { useClassName } from '@contember/react-utils'
 import { ComponentType, memo } from 'react'
 import { useRadioGroup } from 'react-aria'
 import { useRadioGroupState } from 'react-stately'

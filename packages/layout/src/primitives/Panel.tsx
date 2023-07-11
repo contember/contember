@@ -1,5 +1,5 @@
-import { useComposeRef, useElementSize, useExpectSameValueReference, useReferentiallyStableCallback, useUpdatedRef } from '@contember/react-utils'
-import { PolymorphicRef, assert, dataAttribute, isNotNullish, px, useClassNameFactory } from '@contember/utilities'
+import { useClassNameFactory, useComposeRef, useElementSize, useExpectSameValueReference, useReferentiallyStableCallback, useUpdatedRef } from '@contember/react-utils'
+import { PolymorphicRef, assert, dataAttribute, isNotNullish, px } from '@contember/utilities'
 import { CSSProperties, ElementType, forwardRef, memo, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import waitForTransition from 'wait-for-element-transition'
 import { FocusScope } from '../focus-scope'

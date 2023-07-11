@@ -1,4 +1,5 @@
-import { PolymorphicRef, assert, isNotNullish, isSlugString, useClassNameFactory } from '@contember/utilities'
+import { useClassNameFactory } from '@contember/react-utils'
+import { PolymorphicRef, assert, isNotNullish, isSlugString } from '@contember/utilities'
 import { ElementType, forwardRef, memo } from 'react'
 import { InsetsConsumer } from '../insets'
 import { GetLayoutPanelsStateContext, isComponentClassName } from '../primitives'

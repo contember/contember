@@ -1,4 +1,4 @@
-import { useClassName } from '@contember/utilities'
+import { useClassName } from '@contember/react-utils'
 import { forwardRef, memo } from 'react'
 import { useTextBasedInput } from '../Hooks'
 import type { TextInputProps } from './Types'

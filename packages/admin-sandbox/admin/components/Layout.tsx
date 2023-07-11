@@ -1,8 +1,8 @@
-import { Button, DevPanel, DimensionsSwitcher, Link, LogoutLink, Scheme, Spacer, Stack, VisuallyHidden, toSchemeClass, toThemeClass } from '@contember/admin'
+import { Button, DevPanel, DialogProvider, DimensionsSwitcher, Intent, Link, LogoutLink, PortalProvider, Radio, Scheme, Spacer, Stack, VisuallyHidden } from '@contember/admin'
 import { Identity2023 } from '@contember/brand'
 import { SafeAreaInsetsProvider } from '@contember/layout'
-import { useContainerWidth, useDocumentTitle, useReferentiallyStableCallback, useSessionStorageState } from '@contember/react-utils'
-import { Intent, Radio } from '@contember/ui'
+import { ColorSchemeProvider, useContainerWidth, useDocumentTitle, useReferentiallyStableCallback, useSessionStorageState } from '@contember/react-utils'
+import { colorSchemeClassName, contentThemeClassName, controlsThemeClassName } from '@contember/utilities'
 import { CircleDashedIcon, LayoutIcon, LogOutIcon, MoonIcon, PaintBucketIcon, SmartphoneIcon, SunIcon } from 'lucide-react'
 import { PropsWithChildren, memo, useMemo, useRef, useState } from 'react'
 import { AlertLogoutLink } from './AlertLogoutLink'
@@ -28,62 +28,70 @@ export const Layout = memo(({ children }: PropsWithChildren) => {
 
 	return (
 		<SafeAreaInsetsProvider insets={useMemo(() => ({ top: safeAreaInsets, right: safeAreaInsets, left: safeAreaInsets, bottom: safeAreaInsets }), [safeAreaInsets])}>
-			<LayoutComponent
-				className={[
-					toThemeClass(directives['layout.theme-content'], directives['layout.theme-controls']),
-					toSchemeClass(scheme),
-				]}
-			>
-				<SlotSources.Logo>
-					<Link to="index">
-						<Stack align="center" direction="horizontal" gap="small">
-							<Identity2023.Edit scale={2} />
-							<VisuallyHidden hidden={width < LAYOUT_BREAKPOINT}>Contember</VisuallyHidden>
-						</Stack>
-					</Link>
-				</SlotSources.Logo>
+			<ColorSchemeProvider scheme={scheme}>
+				<LayoutComponent
+					key="changeable-layout"
+					className={[
+						colorSchemeClassName(scheme),
+						contentThemeClassName(directives['layout.theme-content']),
+						controlsThemeClassName(directives['layout.theme-controls']),
+					]}
+				>
+					<PortalProvider>
+						<DialogProvider>
+							<SlotSources.Logo>
+								<Link to="index">
+									<Stack align="center" direction="horizontal" gap="small">
+										<Identity2023.Edit scale={2} />
+										<VisuallyHidden hidden={width < LAYOUT_BREAKPOINT}>Contember</VisuallyHidden>
+									</Stack>
+								</Link>
+							</SlotSources.Logo>
 
-				<SlotSources.Switchers>
-					<Button
-						size="small"
-						elevation="none"
-						distinction="seamless"
-						active={!scheme.match(/system/)}
-						flow="circular"
-						onClick={useReferentiallyStableCallback(() => {
-							setScheme(scheme => (scheme.match(/light/) ? 'dark' : scheme.match(/dark/) ? 'system' : 'light'))
-						})}
-						aria-label={scheme.match(/light/) ? 'Light mode, switch to dark mode' : scheme.match(/dark/) ? 'Dark mode, switch to light mode' : 'System mode, switch to system mode'}
-					>
-						{scheme.match(/light/) ? <SunIcon /> : scheme.match(/dark/) ? <MoonIcon /> : <CircleDashedIcon />}
-					</Button>
+							<SlotSources.Switchers>
+								<Button
+									size="small"
+									elevation="none"
+									distinction="seamless"
+									active={!scheme.match(/system/)}
+									flow="circular"
+									onClick={useReferentiallyStableCallback(() => {
+										setScheme(scheme => (scheme.match(/light/) ? 'dark' : scheme.match(/dark/) ? 'system' : 'light'))
+									})}
+									aria-label={scheme.match(/light/) ? 'Light mode, switch to dark mode' : scheme.match(/dark/) ? 'Dark mode, switch to light mode' : 'System mode, switch to system mode'}
+								>
+									{scheme.match(/light/) ? <SunIcon /> : scheme.match(/dark/) ? <MoonIcon /> : <CircleDashedIcon />}
+								</Button>
 
-					<DimensionsSwitcher
-						optionEntities="Locale"
-						orderBy="code asc"
-						dimension="locale"
-						labelField="code"
-						slugField="code"
-						maxItems={1}
-					/>
-				</SlotSources.Switchers>
+								<DimensionsSwitcher
+									optionEntities="Locale"
+									orderBy="code asc"
+									dimension="locale"
+									labelField="code"
+									slugField="code"
+									maxItems={1}
+								/>
+							</SlotSources.Switchers>
 
-				{Navigation && (
-					<SlotSources.Navigation>
-						<Navigation />
-					</SlotSources.Navigation>
-				)}
+							{Navigation && (
+								<SlotSources.Navigation>
+									<Navigation />
+								</SlotSources.Navigation>
+							)}
 
-				<SlotSources.Profile>
-					<LogoutLink Component={AlertLogoutLink}>
-						<Stack align="center" direction="horizontal" gap="small">
-							<LogOutIcon /> Logout
-						</Stack>
-					</LogoutLink>
-				</SlotSources.Profile>
+							<SlotSources.Profile>
+								<LogoutLink Component={AlertLogoutLink}>
+									<Stack align="center" direction="horizontal" gap="small">
+										<LogOutIcon /> Logout
+									</Stack>
+								</LogoutLink>
+							</SlotSources.Profile>
 
-				{children}
-			</LayoutComponent>
+							{children}
+						</DialogProvider>
+					</PortalProvider>
+				</LayoutComponent>
+			</ColorSchemeProvider>
 		</SafeAreaInsetsProvider>
 	)
 })

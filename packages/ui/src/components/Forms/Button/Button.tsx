@@ -1,5 +1,6 @@
-import { useClassNameFactory } from '@contember/utilities'
-import { createElement, forwardRef, memo, ReactNode } from 'react'
+import { ColorSchemeContext, useClassNameFactory, useColorScheme } from '@contember/react-utils'
+import { colorSchemeClassName, contentThemeClassName, controlsThemeClassName } from '@contember/utilities'
+import { ReactNode, createElement, forwardRef, memo } from 'react'
 import type {
 	HTMLAnchorElementProps,
 	HTMLButtonElementProps,
@@ -8,7 +9,7 @@ import type {
 	Scheme,
 	Size,
 } from '../../../types'
-import { toEnumClass, toEnumViewClass, toSchemeClass, toStateClass, toThemeClass, toViewClass } from '../../../utils'
+import { toEnumClass, toEnumViewClass, toStateClass, toViewClass } from '../../../utils'
 import { Spinner } from '../../Spinner/Spinner'
 import type { ButtonDistinction, ButtonElevation, ButtonFlow } from './Types'
 
@@ -62,7 +63,7 @@ export const Button = memo(forwardRef<HTMLButtonElement, ButtonProps>((props, re
 Button.displayName = 'Button'
 
 export const BaseButton = memo(forwardRef<any, BaseButtonProps>((props, ref) => {
-	const { Component, intent, size, flow, distinction, elevation, justification, loading, active, bland, children, scheme, ...rest } =
+	const { Component, intent, size, flow, distinction, elevation, justification, loading, active, bland, children, scheme: schemeProp, ...rest } =
 		props
 
 	if (props.disabled === true) {
@@ -76,12 +77,15 @@ export const BaseButton = memo(forwardRef<any, BaseButtonProps>((props, ref) => 
 
 	const themeIntent = !props.disabled ? intent : 'default'
 	const componentClassName = useClassNameFactory('button')
+	const colorScheme = useColorScheme()
+	const scheme = schemeProp ?? colorScheme
 
 	const attrs = {
 		className: componentClassName(null, [
+			contentThemeClassName(props.distinction === 'default' ? null : themeIntent),
+			controlsThemeClassName(themeIntent),
+			colorSchemeClassName(scheme),
 			rest.className,
-			toThemeClass(props.distinction === 'default' ? null : themeIntent, themeIntent),
-			toSchemeClass(!props.disabled ? scheme : undefined),
 			toEnumViewClass(size),
 			toEnumViewClass(props.disabled ? 'default' : distinction),
 			toEnumViewClass(flow),
@@ -98,14 +102,14 @@ export const BaseButton = memo(forwardRef<any, BaseButtonProps>((props, ref) => 
 		} : undefined),
 	}
 	const content = (
-		<>
+		<ColorSchemeContext.Provider value={scheme}>
 			<div className={componentClassName('content')}>{children}</div>
 			{loading && (
 				<span className={componentClassName('spinner')}>
 					<Spinner />
 				</span>
 			)}
-		</>
+		</ColorSchemeContext.Provider>
 	)
 
 	return createElement(Component, { ...rest, ...attrs }, content)

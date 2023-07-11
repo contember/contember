@@ -1,4 +1,4 @@
-import { useClassName } from '@contember/utilities'
+import { useClassName } from '@contember/react-utils'
 import { createElement, forwardRef, memo } from 'react'
 import type { HTMLHeadingElementProps, HeadingDepth, HeadingDistinction, Size } from '../../types'
 import { toEnumViewClass } from '../../utils'

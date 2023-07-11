@@ -1,4 +1,4 @@
-import { useClassName } from '@contember/utilities'
+import { useClassName } from '@contember/react-utils'
 import { memo } from 'react'
 import { toEnumViewClass } from '../../utils'
 import { Aether } from '../Aether'

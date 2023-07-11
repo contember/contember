@@ -1,7 +1,7 @@
 :where(.cui-slug-input) {
 	--slug-input-control-focus-ring: var(--cui-control-focus-ring-box-shadow);
 	align-items: stretch;
-	background: var(--cui-background-color--above);
+	background-color: var(--cui-background-color--above);
 	border-color: var(--cui-color--lower);
 	border-radius: var(--cui-control-border-radius);
 	border-style: solid;
@@ -52,6 +52,15 @@
 
 :where(.cui-slug-input-input .cui-text-input) {
 	border: none;
+}
+
+:where(
+	.cui-slug-input-input > .cui-text-input:active,
+	.cui-slug-input-input > .cui-text-input:hover,
+	.cui-slug-input-input > .cui-text-input:focus,
+	.cui-slug-input-input > .cui-text-input:focus-within,
+) {
+	--input-control-background: transparent;
 }
 
 :where(.cui-slug-input-prefix + .cui-slug-input-input) {

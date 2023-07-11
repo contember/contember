@@ -1,4 +1,4 @@
-import { useClassName } from '@contember/utilities'
+import { useClassName } from '@contember/react-utils'
 import { ReactNode, memo } from 'react'
 
 export interface DescriptionProps {

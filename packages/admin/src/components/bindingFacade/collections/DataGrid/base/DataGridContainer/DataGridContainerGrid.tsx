@@ -1,6 +1,6 @@
 import { Entity } from '@contember/binding'
-import { Card, Grid } from '@contember/ui'
-import { useClassName } from '@contember/utilities'
+import { useClassName } from '@contember/react-utils'
+import { Grid } from '@contember/ui'
 import { memo } from 'react'
 import { useMessageFormatter } from '../../../../../../i18n'
 import { EmptyMessage } from '../../../helpers'

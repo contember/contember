@@ -1,4 +1,4 @@
-import { useClassName } from '@contember/utilities'
+import { useClassName } from '@contember/react-utils'
 import type { ComponentType, ReactNode } from 'react'
 import { EditorNonEditable } from './EditorNonEditable'
 

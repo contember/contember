@@ -1,4 +1,4 @@
-import { useClassName } from '@contember/utilities'
+import { useClassName } from '@contember/react-utils'
 import { AllHTMLAttributes, ForwardedRef, forwardRef, memo } from 'react'
 import TextareaAutosize, { TextareaAutosizeProps } from 'react-textarea-autosize'
 import { toViewClass } from '../../../utils'

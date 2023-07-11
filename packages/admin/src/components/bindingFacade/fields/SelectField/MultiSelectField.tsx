@@ -1,5 +1,5 @@
 import { Component, EntityAccessor } from '@contember/binding'
-import { FieldContainer, FieldContainerProps, FieldErrors, PublicCommonReactSelectStylesProps, SelectCreateNewWrapper, getPortalRoot } from '@contember/ui'
+import { FieldContainer, FieldContainerProps, FieldErrors, PublicCommonReactSelectStylesProps, SelectCreateNewWrapper, usePortalProvider } from '@contember/ui'
 import { FunctionComponent, MouseEventHandler, memo, useCallback } from 'react'
 import type { MultiValueGenericProps, MultiValueProps, Props as SelectProps } from 'react-select'
 import Select, { ActionMeta, components } from 'react-select'
@@ -115,7 +115,7 @@ export const MultiSelectFieldInner = typedMemo(
 							axis="xy"
 							onSortEnd={onSortEnd}
 							distance={4}
-							helperContainer={getPortalRoot}
+							helperContainer={usePortalProvider()}
 							helperClass={'sortable-dragged'}
 							shouldCancelStart={shouldCancelStart}
 							components={{
@@ -124,7 +124,7 @@ export const MultiSelectFieldInner = typedMemo(
 								MultiValueLabel: SortableMultiValueLabel,
 							} as any}
 						/>
-						: <Select menuPortalTarget={getPortalRoot()} {...allSelectProps} />
+						: <Select menuPortalTarget={usePortalProvider()} {...allSelectProps} />
 					}
 				</SelectCreateNewWrapper>
 			</FieldContainer>

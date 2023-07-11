@@ -18,42 +18,40 @@ const dummyInput = (
 
 export default function () {
 	return (
-		<StyleProvider>
-			<Layout scheme="system">
-				<LayoutPage>
-					<div style={verticalStack}>
-						{positions.map(position => <Fragment key={position}>
-							<div style={horizontalStack}>
-								<FieldContainer
-									label="Lorem ipsum"
-									labelPosition={position}
-								>{dummyInput}</FieldContainer>
-
-								<Divider />
-
-								<FieldContainer
-									label="Lorem ipsum"
-									description="Lorem ipsum dolor sit amet"
-									labelPosition={position}
-								>{dummyInput}</FieldContainer>
-
-								<Divider />
-
-								<FieldContainer
-									label="Lorem ipsum"
-									labelDescription="Lorem ipsum dolor"
-									description="Lorem ipsum dolor sit amet"
-									labelPosition={position}
-								>{dummyInput}</FieldContainer>
-
-								<Divider />
-							</div>
+		<Layout>
+			<LayoutPage>
+				<div style={verticalStack}>
+					{positions.map(position => <Fragment key={position}>
+						<div style={horizontalStack}>
+							<FieldContainer
+								label="Lorem ipsum"
+								labelPosition={position}
+							>{dummyInput}</FieldContainer>
 
 							<Divider />
-						</Fragment>)}
-					</div>
-				</LayoutPage>
-			</Layout>
-		</StyleProvider>
+
+							<FieldContainer
+								label="Lorem ipsum"
+								description="Lorem ipsum dolor sit amet"
+								labelPosition={position}
+							>{dummyInput}</FieldContainer>
+
+							<Divider />
+
+							<FieldContainer
+								label="Lorem ipsum"
+								labelDescription="Lorem ipsum dolor"
+								description="Lorem ipsum dolor sit amet"
+								labelPosition={position}
+							>{dummyInput}</FieldContainer>
+
+							<Divider />
+						</div>
+
+						<Divider />
+					</Fragment>)}
+				</div>
+			</LayoutPage>
+		</Layout>
 	)
 }

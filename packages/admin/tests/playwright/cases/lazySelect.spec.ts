@@ -35,7 +35,7 @@ test('lazy select', async ({ page }) => {
 	await page.waitForLoadState('networkidle')
 	expect(await page.screenshot({ animations: 'disabled' })).toMatchSnapshot('03-loaded.png')
 	//
-	// await page.locator('#portal-root button:has-text("OK")').click()
+	// await page.locator('#cui-portal-root button:has-text("OK")').click()
 	// await page.waitForSelector('input#pw-locale-code', { state: 'detached' })
 	// await page.waitForTimeout(200)
 	// expect(await page.screenshot()).toMatchSnapshot('03-item-added.png')

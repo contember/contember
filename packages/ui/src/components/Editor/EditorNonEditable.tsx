@@ -1,4 +1,4 @@
-import { useClassName } from '@contember/utilities'
+import { useClassName } from '@contember/react-utils'
 import { ComponentType, createElement, ReactNode } from 'react'
 import { HTMLDivElementProps, HTMLSpanElementProps } from '../../types'
 import { toViewClass } from '../../utils'

@@ -1,4 +1,4 @@
-import { useClassNameFactory } from '@contember/utilities'
+import { useClassNameFactory } from '@contember/react-utils'
 import { ComponentType, memo, ReactNode } from 'react'
 import { Size } from '../../types'
 import { toViewClass } from '../../utils'

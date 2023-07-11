@@ -1,4 +1,4 @@
-import { useClassNameFactory } from '@contember/utilities'
+import { useClassNameFactory } from '@contember/react-utils'
 import { AllHTMLAttributes, DetailedHTMLProps, InputHTMLAttributes, forwardRef, memo, useCallback } from 'react'
 import { mergeProps, useFocusRing, useHover } from 'react-aria'
 import { toStateClass } from '../../../utils'

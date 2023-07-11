@@ -10,7 +10,7 @@ describe('useNativeInput hook', () => {
 		const { result } = renderHook(() => useNativeInput({}, createRef<HTMLInputElement>()))
 		expect(result.current).toMatchInlineSnapshot(`
 			{
-			  "className": "",
+			  "className": "scheme-system",
 			  "disabled": undefined,
 			  "id": undefined,
 			  "max": undefined,
@@ -55,7 +55,7 @@ describe('useNativeInput hook', () => {
 		}, createRef<HTMLInputElement>()))
 		expect(result.current).toMatchInlineSnapshot(`
 			{
-			  "className": "is-active is-focused is-hovered is-loading is-read-only is-required scheme-light cui-theme theme-danger view-seamless is-invalid extra-class",
+			  "className": "is-active is-focused is-hovered is-loading is-read-only is-required scheme-light theme-danger-content theme-danger-controls view-seamless is-invalid extra-class",
 			  "disabled": true,
 			  "id": undefined,
 			  "max": 100,

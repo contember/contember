@@ -1,4 +1,4 @@
-import { useClassName } from '@contember/utilities'
+import { useClassName } from '@contember/react-utils'
 import { MouseEvent, ReactNode, memo } from 'react'
 import { HTMLAnchorElementProps, HTMLDivElementProps } from '../../types'
 import { toEnumViewClass, toFeatureClass, toStateClass } from '../../utils'

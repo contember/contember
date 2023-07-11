@@ -33,6 +33,7 @@ import { KeyboardEventHandler } from 'react';
 import { MemoExoticComponent } from 'react';
 import { MouseEvent as MouseEvent_2 } from 'react';
 import { MouseEventHandler } from 'react';
+import { MutableRefObject } from 'react';
 import { NamedExoticComponent } from 'react';
 import { NestedClassName } from '@contember/utilities';
 import { NonOptional } from '@contember/utilities';
@@ -520,6 +521,9 @@ export const DateTimeInputStringRegExp: RegExp;
 export type Default = 'default';
 
 // @public (undocumented)
+export const DEFAULT_PORTAL_ROOT_ID = "cui-portal-root";
+
+// @public (undocumented)
 export const Description: MemoExoticComponent<({ className, children }: DescriptionProps) => JSX.Element>;
 
 // @public (undocumented)
@@ -678,16 +682,16 @@ export const Dropdown: MemoExoticComponent<(props: DropdownProps) => JSX.Element
 // @public (undocumented)
 export type DropdownAlignment = Default | 'center' | 'start' | 'end' | 'top' | 'right';
 
-// @public (undocumented)
+// @public @deprecated (undocumented)
 export interface DropdownContainerProviderProps {
     // (undocumented)
     children?: ReactNode;
 }
 
-// @public (undocumented)
+// @public @deprecated (undocumented)
 export const DropdownContentContainerContext: Context<HTMLElement | undefined>;
 
-// @public (undocumented)
+// @public @deprecated (undocumented)
 export const DropdownContentContainerProvider: MemoExoticComponent<(props: DropdownContainerProviderProps) => JSX.Element>;
 
 // @public (undocumented)
@@ -1570,7 +1574,7 @@ export type FloatInputProps = TextInputProps<number>;
 // @public (undocumented)
 export const forceReflow: (element: HTMLElement | null) => void;
 
-// @public (undocumented)
+// @public @deprecated (undocumented)
 export function getPortalRoot(): HTMLElement;
 
 // @public (undocumented)
@@ -2062,7 +2066,7 @@ withTopToolbar?: boolean | undefined;
 export type PasswordInputProps = TextInputProps;
 
 // @public (undocumented)
-export const Portal: MemoExoticComponent<(props: PortalProps) => ReactPortal>;
+export const Portal: MemoExoticComponent<({ children, to }: PortalProps) => ReactPortal>;
 
 // @public (undocumented)
 export interface PortalProps {
@@ -2071,6 +2075,29 @@ export interface PortalProps {
     // (undocumented)
     to?: HTMLElement;
 }
+
+// @public (undocumented)
+export const PortalProvider: MemoExoticComponent<(props: PortalProviderProps) => JSX.Element>;
+
+// @public (undocumented)
+export const PortalProviderContext: Context<MutableRefObject<HTMLDivElement>>;
+
+// @public (undocumented)
+export interface PortalProviderProps {
+    // (undocumented)
+    children: ReactNode;
+}
+
+// @public (undocumented)
+export type PortalRootProps = {
+    id?: string;
+    displayContents?: boolean;
+};
+
+// @public (undocumented)
+export type PortalRootProviderProps = PropsWithChildren<{
+    id: string;
+}>;
 
 // @public (undocumented)
 export const PreventCloseContext: Context<() => void>;
@@ -2456,12 +2483,12 @@ export const StyleProvider: {
 
 // @public (undocumented)
 export type StyleProviderProps = {
-    transparent?: boolean;
     displayContents?: boolean;
+    overridesLucideIcons?: boolean;
     scheme?: Scheme;
     themeContent?: Intent;
     themeControls?: Intent;
-    overridesLucideIcons?: boolean;
+    transparent?: boolean;
 };
 
 // @public (undocumented)
@@ -2768,13 +2795,13 @@ export interface ToolbarGroup {
     buttons: ToolbarButtonOrDropdown[];
 }
 
-// @public (undocumented)
-export const toSchemeClass: <T extends Scheme>(scheme?: T | undefined) => string | undefined;
+// @public @deprecated (undocumented)
+export const toSchemeClass: <T extends string = Scheme>(scheme?: T | undefined) => string | undefined;
 
 // @public (undocumented)
 export const toStateClass: (name: string, state?: boolean) => string | undefined;
 
-// @public (undocumented)
+// @public @deprecated (undocumented)
 export const toThemeClass: <T extends string = Intent>(contentTheme: T | null | undefined, controlsTheme: T | null | undefined, suffix?: string) => string | undefined;
 
 // @public (undocumented)
@@ -2888,6 +2915,9 @@ export function useMouseMoveContext(): RefObject<boolean>;
 export function useNativeInput<E extends HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement, T>({ active, disabled, loading, readOnly, required, focused, hovered, onBlur, onFocus, onFocusChange, defaultValue, id, name, onChange, notNull, placeholder, type, value, max, maxLength, min, minLength, pattern, step, onValidationStateChange, validationState, className: outerClassName, distinction, intent, scheme, size, style, ...rest }: ControlProps<T>, forwardedRef: ForwardedRef<E>): AllHTMLAttributes<E> & {
     ref: RefObject<E>;
 };
+
+// @public (undocumented)
+export function usePortalProvider(override?: HTMLElement): HTMLElement;
 
 // @public (undocumented)
 export function usePreventCloseContext(): () => void;

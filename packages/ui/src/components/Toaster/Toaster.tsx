@@ -1,4 +1,4 @@
-import { useClassNameFactory } from '@contember/utilities'
+import { useClassNameFactory } from '@contember/react-utils'
 import { ReactNode, useContext } from 'react'
 import { Intent } from '../../types'
 import { Button } from '../Forms'

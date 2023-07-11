@@ -1,8 +1,8 @@
 import { useDirtinessState, useMutationState } from '@contember/binding'
+import { useClassName } from '@contember/react-utils'
 import { SaveButton, SaveButtonProps } from '@contember/ui'
 import { forwardRef, memo, useCallback } from 'react'
 import { usePersistWithFeedback } from '../../ui'
-import { useClassName } from '@contember/utilities'
 
 export type PersistButtonProps = Omit<SaveButtonProps, 'children' | 'isDirty'>
 

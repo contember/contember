@@ -1,5 +1,5 @@
-import { ContainerWidthContext, useAddClassNameDuringResize, useContainerWidth } from '@contember/react-utils'
-import { PolymorphicRef, isNonNegativeNumber, px, useClassName } from '@contember/utilities'
+import { ContainerWidthContext, useAddClassNameDuringResize, useClassName, useContainerWidth } from '@contember/react-utils'
+import { PolymorphicRef, isNonNegativeNumber, px } from '@contember/utilities'
 import { CSSProperties, ElementType, forwardRef, memo, useMemo } from 'react'
 import { useGetLayoutPanelsStateContext } from './Contexts'
 import { PanelsStateProvider } from './PanelsStateProvider'

@@ -1,11 +1,8 @@
-import { useClassNameFactory } from '@contember/utilities'
-import { memo, ReactNode } from 'react'
-import { toSchemeClass, toThemeClass } from '../../utils'
+import { useClassNameFactory } from '@contember/react-utils'
+import { ReactNode, memo } from 'react'
 import { ButtonList } from '../Forms'
 import { LayoutPageStickyContainer } from '../Layout/LayoutPageStickyContainer'
-import { useThemeScheme, useTitleThemeScheme } from '../Layout/ThemeSchemeContext'
 import type { ThemeScheme } from '../Layout/Types'
-import { Heading, HeadingProps } from '../Typography/Heading'
 
 export interface TitleBarProps extends ThemeScheme {
 	after?: ReactNode
@@ -19,24 +16,9 @@ export interface TitleBarProps extends ThemeScheme {
  */
 export const TitleBar = memo(({ after, navigation, children, actions, ...props }: TitleBarProps) => {
 	const componentClassName = useClassNameFactory('titleBar')
-	const {
-		scheme,
-		theme,
-		themeContent,
-		themeControls,
-	} = useTitleThemeScheme(props)
-
-	const { scheme: layoutScheme } = useThemeScheme({})
 
 	return (
-		<LayoutPageStickyContainer
-			top={0}
-			className={componentClassName(null, [
-				toThemeClass(themeContent ?? theme, themeControls ?? theme),
-				toSchemeClass(scheme),
-				scheme !== layoutScheme ? 'is-global-theme' : undefined,
-			])}
-		>
+		<LayoutPageStickyContainer top={0} className={componentClassName()}>
 			{navigation && (
 				<nav className={componentClassName('navigation')}>
 					<ButtonList>{navigation}</ButtonList>

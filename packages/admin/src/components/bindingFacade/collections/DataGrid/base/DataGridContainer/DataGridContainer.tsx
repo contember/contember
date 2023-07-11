@@ -1,6 +1,6 @@
 import { Component } from '@contember/binding'
+import { useClassName } from '@contember/react-utils'
 import { Stack } from '@contember/ui'
-import { useClassName } from '@contember/utilities'
 import { FunctionComponent } from 'react'
 import { useMessageFormatter } from '../../../../../../i18n'
 import { dataGridDictionary } from '../dataGridDictionary'

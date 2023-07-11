@@ -1,12 +1,13 @@
-import { useClassNameFactory } from '@contember/utilities'
+import { ColorSchemeProvider, useClassNameFactory } from '@contember/react-utils'
+import { colorSchemeClassName, contentThemeClassName, controlsThemeClassName } from '@contember/utilities'
 import { CSSProperties, ReactNode, memo, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
-import { NavigationContext } from '../..'
+import { DialogProvider, NavigationContext } from '../..'
 import { Intent, Scheme } from '../../types'
-import { toSchemeClass, toStateClass, toThemeClass, toViewClass } from '../../utils'
-import { DropdownContentContainerProvider } from '../Dropdown/Dropdown'
+import { toStateClass, toViewClass } from '../../utils'
 import { Button } from '../Forms'
 import { Icon } from '../Icon'
 import { useElementTopOffset } from '../Layout/useElementTopOffset'
+import { DEFAULT_PORTAL_ROOT_ID, PortalProvider } from '../Portal'
 import { PreventCloseContext } from '../PreventCloseContext'
 import { Stack } from '../Stack'
 import { ThemeSchemeContext, TitleThemeSchemeContext } from './ThemeSchemeContext'
@@ -39,7 +40,7 @@ export const LayoutChrome = memo(({
 	pageTheme,
 	pageThemeContent,
 	pageThemeControls,
-	scheme = 'light',
+	scheme,
 	sidebarFooter,
 	sidebarHeader,
 	switchers,
@@ -159,61 +160,69 @@ export const LayoutChrome = memo(({
 	const hasBar: boolean = !!(sidebarHeader || switchers || navigation || sidebarFooter)
 
 	return (
-		<div
-			ref={layoutRef}
-			className={componentClassName(null, [
-				toViewClass('no-bar', !hasBar),
-				toThemeClass(themeContent ?? theme, themeControls ?? theme),
-				toSchemeClass(scheme),
-				toViewClass('collapsed', collapsed),
-			])}
-			style={useMemo(() => (barContentOffsetTop
-				? ({ '--cui-bar-content-offset-top': `${barContentOffsetTop}px` } as CSSProperties)
-				: undefined
-			), [barContentOffsetTop])}
-		>
-			{hasBar && (
-				<DropdownContentContainerProvider>
-					<PreventCloseContext.Provider value={preventMenuClose}>
-						<div className={componentBarClassName()}>
-							<div className={componentBarClassName('header')}>
-								{sidebarHeader && <div className={componentBarClassName('header-inner')}>{sidebarHeader}</div>}
-								<Button id="cui-menu-button" distinction="seamless" className={componentClassName('navigation-button')} onClick={toggleCollapsed}>
-									<span className={componentClassName('menu-button-label')}>Menu</span>
-									<Icon blueprintIcon={collapsed ? 'menu' : 'cross'} />
-								</Button>
-							</div>
-							{switchers && <div className={componentBarClassName('switchers')}>{switchers}</div>}
-							{navigation && <div ref={contentRef} className={componentBarClassName('body')}>
-								<span className={componentBarClassName('body-scrolled-indicator', [
-									toStateClass('scrolled', isScrolled),
-								])} />
-								<Stack direction="vertical">
-									{navigation}
-								</Stack>
-							</div>}
-							{sidebarFooter && <div className={componentBarClassName('footer')}>
-								{sidebarFooter}
-							</div>}
-						</div>
-					</PreventCloseContext.Provider>
-				</DropdownContentContainerProvider>
-			)}
+		<ColorSchemeProvider scheme={scheme}>
+			<div
+				ref={layoutRef}
+				className={componentClassName(null, [
+					toViewClass('no-bar', !hasBar),
+					contentThemeClassName(themeContent ?? theme),
+					controlsThemeClassName(themeControls ?? theme),
+					colorSchemeClassName(scheme),,
+					toViewClass('collapsed', collapsed),
+				])}
+				style={useMemo(() => (barContentOffsetTop
+					? ({ '--cui-bar-content-offset-top': `${barContentOffsetTop}px` } as CSSProperties)
+					: undefined
+				), [barContentOffsetTop])}
+			>
+				{hasBar && (
+					<PortalProvider>
+						<DialogProvider>
+							<PreventCloseContext.Provider value={preventMenuClose}>
+								<div className={componentBarClassName()}>
+									<div className={componentBarClassName('header')}>
+										{sidebarHeader && <div className={componentBarClassName('header-inner')}>{sidebarHeader}</div>}
+										<Button id="cui-menu-button" distinction="seamless" className={componentClassName('navigation-button')} onClick={toggleCollapsed}>
+											<span className={componentClassName('menu-button-label')}>Menu</span>
+											<Icon blueprintIcon={collapsed ? 'menu' : 'cross'} />
+										</Button>
+									</div>
+									{switchers && <div className={componentBarClassName('switchers')}>{switchers}</div>}
+									{navigation && <div ref={contentRef} className={componentBarClassName('body')}>
+										<span className={componentBarClassName('body-scrolled-indicator', [
+											toStateClass('scrolled', isScrolled),
+										])} />
+										<Stack direction="vertical">
+											{navigation}
+										</Stack>
+									</div>}
+									{sidebarFooter && <div className={componentBarClassName('footer')}>
+										{sidebarFooter}
+									</div>}
+								</div>
+							</PreventCloseContext.Provider>
+						</DialogProvider>
+					</PortalProvider>
+				)}
 
-			<DropdownContentContainerProvider>
-				<div className={componentClassName('body', [
-					toSchemeClass(pageScheme ?? scheme),
-					toThemeClass(pageThemeContent ?? pageTheme, pageThemeControls ?? pageTheme),
-				])}>
-					<ThemeSchemeContext.Provider value={themeScheme}>
-						<TitleThemeSchemeContext.Provider value={titleThemeScheme}>
-							{children}
-						</TitleThemeSchemeContext.Provider>
-					</ThemeSchemeContext.Provider>
-				</div>
-			</DropdownContentContainerProvider>
-			<div id="portal-root" />
-		</div>
+				<PortalProvider>
+					<DialogProvider>
+						<div className={componentClassName('body', [
+							contentThemeClassName(pageThemeContent ?? pageTheme),
+							controlsThemeClassName(pageThemeControls ?? pageTheme),
+							colorSchemeClassName(pageScheme ?? scheme),
+						])}>
+							<ThemeSchemeContext.Provider value={themeScheme}>
+								<TitleThemeSchemeContext.Provider value={titleThemeScheme}>
+									{children}
+								</TitleThemeSchemeContext.Provider>
+							</ThemeSchemeContext.Provider>
+						</div>
+					</DialogProvider>
+				</PortalProvider>
+				<div id={DEFAULT_PORTAL_ROOT_ID} />
+			</div>
+		</ColorSchemeProvider>
 	)
 })
 

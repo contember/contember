@@ -1,4 +1,4 @@
-import { useClassNameFactory } from '@contember/utilities'
+import { useClassNameFactory } from '@contember/react-utils'
 import type { ReactNode } from 'react'
 import { Icon } from '../Icon'
 

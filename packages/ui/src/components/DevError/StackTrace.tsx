@@ -1,4 +1,4 @@
-import { useClassNameFactory } from '@contember/utilities'
+import { useClassNameFactory } from '@contember/react-utils'
 import { ParsedStackFrame, ParsedStackTrace } from './types'
 
 export const StackTrace = ({ stackTrace }: { stackTrace: ParsedStackTrace }) => {

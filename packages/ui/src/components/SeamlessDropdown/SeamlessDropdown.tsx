@@ -1,4 +1,4 @@
-import { useClassNameFactory } from '@contember/utilities'
+import { useClassNameFactory } from '@contember/react-utils'
 import { ReactNode, useCallback, useMemo, useState } from 'react'
 import { useCloseOnClickOutside, useCloseOnEscape } from '../../auxiliary'
 import { Default } from '../../types'

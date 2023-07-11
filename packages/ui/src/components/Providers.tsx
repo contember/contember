@@ -1,22 +1,21 @@
 import { PropsWithChildren } from 'react'
-import { Toaster, ToasterProvider } from './Toaster'
 import { DialogProvider } from './Dialog'
-import { StyleProvider } from './StyleProvider'
-import { DropdownContentContainerProvider } from './Dropdown'
+import { PortalProvider } from './Portal'
 import { SectionTabsProvider } from './SectionTabs'
+import { StyleProvider } from './StyleProvider'
+import { Toaster, ToasterProvider } from './Toaster'
 
 export const Providers = (props: PropsWithChildren) => (
 	<StyleProvider>
 		<ToasterProvider>
-			<DialogProvider>
-				<SectionTabsProvider>
-					<DropdownContentContainerProvider>
+			<PortalProvider>
+				<DialogProvider>
+					<SectionTabsProvider>
 						{props.children}
-						<Toaster />
-						<div id="portal-root" style={{ display: 'contents' }} />
-					</DropdownContentContainerProvider>
-				</SectionTabsProvider>
-			</DialogProvider>
+					</SectionTabsProvider>
+					<Toaster />
+				</DialogProvider>
+			</PortalProvider>
 		</ToasterProvider>
 	</StyleProvider>
 )

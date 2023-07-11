@@ -1,4 +1,4 @@
-import { useClassName } from '@contember/utilities'
+import { useClassName } from '@contember/react-utils'
 import { memo, MouseEventHandler, ReactNode, useContext } from 'react'
 import type { Justification } from '../../types'
 import { toEnumViewClass, toViewClass } from '../../utils'

@@ -1,5 +1,4 @@
-import { useSessionStorageState } from '@contember/react-utils'
-import { useClassNameFactory } from '@contember/utilities'
+import { useClassNameFactory, useSessionStorageState } from '@contember/react-utils'
 import { SyntheticEvent, useCallback, useContext, useEffect, useMemo, useRef } from 'react'
 import { useNavigationLink } from '../../Navigation'
 import { randomId } from '../../auxiliary'
@@ -100,6 +99,10 @@ export function MenuItem<T = unknown>({ children, componentClassName = 'menu', .
 		event.preventDefault()
 	}, [expanded, changeExpand, isInteractive, navigate, preventMenuClose])
 
+	const onNeverFocusableClick = useCallback((event: SyntheticEvent) => {
+		event.preventDefault()
+	}, [])
+
 	const onKeyPress = useKeyNavigation({ changeExpand, expanded, depth, isInteractive, listItemRef, onClick: onLabelClick })
 
 	const submenuClassName = className('list', [
@@ -127,12 +130,12 @@ export function MenuItem<T = unknown>({ children, componentClassName = 'menu', .
 		console.warn('Accessibility issue: All submenu items should provide a title.')
 	}
 
-	const interactiveProps = isInteractive ? {
+	const interactiveProps = useMemo(() => isInteractive ? {
 		'id': menuItemId,
 		'aria-haspopup': true,
 		'aria-controls': id.current,
 		'aria-expanded': expanded,
-	} : undefined
+	} : undefined, [expanded, isInteractive, menuItemId])
 
 	return (
 		<DepthContext.Provider value={depth + 1}>
@@ -170,7 +173,7 @@ export function MenuItem<T = unknown>({ children, componentClassName = 'menu', .
 							</MenuLink>
 							: <span
 								className={className('title-content')}
-								onClick={onLabelClick}
+								onMouseDown={onNeverFocusableClick}
 							>
 								<Label className={className('label')}>{props.title}</Label>
 							</span>

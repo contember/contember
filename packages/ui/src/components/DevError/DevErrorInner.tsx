@@ -1,4 +1,4 @@
-import { useClassNameFactory } from '@contember/utilities'
+import { useClassNameFactory } from '@contember/react-utils'
 import { StackTrace } from './StackTrace'
 import type { ProcessedError } from './types'
 

@@ -61,7 +61,7 @@ export const SlugFieldInner = SimpleRelativeSingleField<SlugFieldProps, string>(
 			fieldMetadata,
 			parse: (val, field) => {
 				const parsedValue = val ?? null
-				return parsedValue !== null ? `${normalizedPersistedHardPrefix}${parsedValue}` : null
+				return parsedValue !== null ? `${normalizedPersistedHardPrefix}${slugify(parsedValue)}` : null
 			},
 			format: value => typeof value === 'string' ? value.substring(normalizedPersistedHardPrefix.length) : '',
 		})

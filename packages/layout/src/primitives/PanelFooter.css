@@ -2,7 +2,7 @@
 	-webkit-backdrop-filter: blur(var(--cui-backdrop-blur));
 	backdrop-filter: blur(var(--cui-backdrop-blur));bottom: 0;
 	background-color: rgba(var(--cui-footer-background-color-rgb), var(--cui-footer-background-color-alpha));
-	background-image: linear-gradient(transparent, rgb(var(--cui-frame-background-color-rgb)));
+	background-image: linear-gradient(transparent, rgb(var(--cui-background-color-rgb)));
 	bottom: 0;
 	left: 0;
 	padding-bottom: max(var(--inset-bottom, 0px), var(--cui-box-padding-vertical));

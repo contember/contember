@@ -1,12 +1,10 @@
-import { LayoutKit, Slots, createLayoutBarComponent, createLayoutSidebarComponent } from '@contember/layout'
+import { LayoutKit, Slots, createLayoutBarComponent } from '@contember/layout'
 import { Divider, Spacer, Stack } from '@contember/ui'
-import { pick } from '@contember/utilities'
+import { ComponentClassNameProps, pick } from '@contember/utilities'
 import { PropsWithChildren } from 'react'
-import { AppHeaderTitle } from '../AppHeaderTitle'
-import { useDirectives } from '../Directives'
-import { SlotTargets } from '../Slots'
-
-const NAVIGATION_PANEL_NAME = 'navigation-panel'
+import { AppHeaderTitle } from './AppHeaderTitle'
+import { useDirectives } from './Directives'
+import { SlotTargets } from './Slots'
 
 const LayoutSlots = pick(SlotTargets, [
 	'Back',
@@ -15,6 +13,10 @@ const LayoutSlots = pick(SlotTargets, [
 	'Actions',
 	'HeaderCenter',
 	'HeaderStart',
+	'HeaderEnd',
+	'FooterStart',
+	'FooterCenter',
+	'FooterEnd',
 	'Logo',
 	'Navigation',
 	'Profile',
@@ -23,21 +25,13 @@ const LayoutSlots = pick(SlotTargets, [
 	'Title',
 ])
 
-const NavigationPanel = createLayoutSidebarComponent({
-	defaultAs: 'aside',
-	defaultBehavior: 'modal',
-	defaultVisibility: 'hidden',
-	displayName: 'NavigationPanel',
-	name: NAVIGATION_PANEL_NAME,
-})
-
 const SubHeader = createLayoutBarComponent({
 	defaultAs: 'div',
 	displayName: 'SubHeader',
 	name: 'sub-header',
 })
 
-export const Layout = ({ children, ...rest }: PropsWithChildren) => {
+export const LayoutComponent = ({ children, ...rest }: PropsWithChildren<ComponentClassNameProps>) => {
 	const directives = useDirectives()
 	const targetsIfActive = Slots.useTargetsIfActiveFactory(LayoutSlots)
 
@@ -55,25 +49,35 @@ export const Layout = ({ children, ...rest }: PropsWithChildren) => {
 								<Spacer />
 								<SlotTargets.HeaderCenter />
 							</>
-						))}
-						end={state => (
-							<>
-								<SlotTargets.Profile />
-								{state.panels.get(LayoutKit.SidebarLeft.NAME)?.behavior === 'modal' && <LayoutKit.ToggleMenuButton panelName={LayoutKit.SidebarLeft.NAME} />}
-							</>
-						)}
+						)) || false}
+						end={state => {
+							const targets = targetsIfActive(['HeaderEnd', 'Profile'])
+							const menuButton = state.panels.get(LayoutKit.SidebarLeft.NAME)?.behavior === 'modal'
+								? < LayoutKit.ToggleMenuButton panelName={LayoutKit.SidebarLeft.NAME} />
+								: null
+
+							return (targets || menuButton)
+								? (
+									<>
+										{targets}
+										{menuButton}
+									</>
+								)
+								: false
+						}}
 					/>
 					<SubHeader
 						start={targetsIfActive(['Back']) || false}
 						center={<SlotTargets.Title as={AppHeaderTitle} />}
-						end={targetsIfActive(['Actions'])}
+						end={targetsIfActive(['Actions']) || false}
 					/>
 				</>
 			}
 			footer={(
 				<LayoutKit.Footer
-					center={<p><small>Made by Contember &copy; {(new Date).getFullYear()}</small></p>}
-					end={targetsIfActive(['Switchers'])}
+					start={targetsIfActive(['FooterStart']) || false}
+					center={targetsIfActive(['FooterCenter', 'Switchers']) || false}
+					end={targetsIfActive(['FooterEnd']) || false}
 				/>
 			)}
 			{...rest}
@@ -86,7 +90,7 @@ export const Layout = ({ children, ...rest }: PropsWithChildren) => {
 						<LayoutKit.ToggleMenuButton panelName={LayoutKit.SidebarLeft.NAME} />
 					</>
 				)) || false}
-				body={targetsIfActive(['Navigation'])}
+				body={targetsIfActive(['Navigation']) || false}
 				footer={false}
 			/>
 			<Divider />
@@ -103,4 +107,4 @@ export const Layout = ({ children, ...rest }: PropsWithChildren) => {
 		</LayoutKit.Frame>
 	)
 }
-Layout.displayName = 'Layout(default-layout)'
+LayoutComponent.displayName = 'Layout(default)'

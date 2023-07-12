@@ -13,8 +13,8 @@ import {
 	useEnvironment,
 	useOnPersistSuccess,
 } from '@contember/admin'
-import { Directive, Title } from '../components/Directives'
-import { SlotSources } from '../components/Slots'
+import { Directive } from '../components/Directives'
+import { SlotSources, Title } from '../components/Slots'
 
 const AutoGridList = () => {
 	const env = useEnvironment()

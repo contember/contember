@@ -1,8 +1,7 @@
 import { Button, EditScope, PersistButton, useEntity } from '@contember/admin'
 import { AddContent } from '../components/AddContent'
 import { ContentField } from '../components/ContentField'
-import { Title } from '../components/Directives'
-import { SlotSources } from '../components/Slots'
+import { SlotSources, Title } from '../components/Slots'
 
 const DeleteBlocks = () => {
 	const entity = useEntity()

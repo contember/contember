@@ -1,7 +1,7 @@
 import { Section, SectionTabs, SectionTabsProvider, SelectFieldInner } from '@contember/admin'
 import { ContentSlotSources, HeaderSlotSources } from '@contember/layout'
-import { Directive, Title } from '../../components/Directives'
-import { SlotSources } from '../../components/Slots'
+import { Directive } from '../../components/Directives'
+import { SlotSources, Title } from '../../components/Slots'
 
 export default function InnerFooPage() {
 	return (

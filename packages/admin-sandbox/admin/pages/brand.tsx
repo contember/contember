@@ -1,7 +1,7 @@
 import { ContemberIdentitySvgProps, Identity2023 } from '@contember/brand'
 import { Stack } from '@contember/ui'
 import { FunctionComponent } from 'react'
-import { Title } from '../components/Directives'
+import { Title } from '../components/Slots'
 
 const list = Identity2023 as Record<string, FunctionComponent<ContemberIdentitySvgProps>>
 

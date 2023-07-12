@@ -4,6 +4,8 @@ import {
 	CreateScope,
 	DataGridScope,
 	DeleteEntityButton,
+	Dropdown,
+	DropdownProps,
 	EditScope,
 	EnumCell,
 	FieldView,
@@ -22,11 +24,12 @@ import {
 	TextCell,
 	TextField,
 } from '@contember/admin'
+import { MoreVerticalIcon, TrashIcon } from 'lucide-react'
 import { CategoryForm } from '../components/CategoryForm'
 import { DataGridTile } from '../components/DataGridTile'
-import { Directive, Title } from '../components/Directives'
+import { Directive } from '../components/Directives'
 import { EditOrCreateForm } from '../components/EditOrCreateForm'
-import { SlotSources as Slots } from '../components/Slots'
+import { SlotSources, Title } from '../components/Slots'
 
 
 const stateOptions = {
@@ -39,7 +42,7 @@ export const list = () => (
 	<>
 		<Title>Articles</Title>
 		<Directive name="content-max-width" content={null} />
-		<Slots.Actions><LinkButton to="articles/create">Add article</LinkButton></Slots.Actions>
+		<SlotSources.Actions><LinkButton to="articles/create">Add article</LinkButton></SlotSources.Actions>
 
 		<DataGridScope
 			entities="Article"
@@ -69,9 +72,9 @@ export const list = () => (
 
 export const create = (
 	<>
-		<Slots.Back>
+		<SlotSources.Back>
 			<NavigateBackLink to="articles/list">Back to articles</NavigateBackLink>
-		</Slots.Back>
+		</SlotSources.Back>
 		<Title>New Article</Title>
 		<CreateScope entity="Article" redirectOnSuccess="articles/edit(id: $entity.id)">
 			<EditOrCreateForm />
@@ -79,23 +82,28 @@ export const create = (
 	</>
 )
 
+const buttonProps: DropdownProps['buttonProps'] = { distinction: 'seamless', children: <MoreVerticalIcon /> }
+
 export const edit = () => (
 	<>
-		<Slots.Back>
+		<SlotSources.Back>
 			<NavigateBackLink to="articles/list">Back to articles</NavigateBackLink>
-		</Slots.Back>
+		</SlotSources.Back>
 		<EditScope
 			entity="Article(id = $id)"
 			redirectOnSuccess={(current, ids, entity) => !entity.existsOnServer ? 'articles/list' : undefined}
 		>
-			<Slots.SidebarRightHeader>
-				<DeleteEntityButton immediatePersist={true} />
-			</Slots.SidebarRightHeader>
 			<FieldView field="title" render={title => (
 				<Title>{`Edit ${title.getAccessor().value ? title.getAccessor().value : 'Article'}`}</Title>
 			)} />
 
 			<EditOrCreateForm />
+
+			<SlotSources.Actions>
+				<Dropdown buttonProps={buttonProps}>
+					<DeleteEntityButton immediatePersist={true} />
+				</Dropdown>
+			</SlotSources.Actions>
 		</EditScope>
 	</>
 )
@@ -106,7 +114,7 @@ export const categories = () => (
 
 		<MultiEditScope entities="Category" listProps={{
 			sortableBy: 'order',
-			beforeContent: <Slots.Actions><PersistButton /></Slots.Actions>,
+			beforeContent: <SlotSources.Actions><PersistButton /></SlotSources.Actions>,
 		}}>
 			<CategoryForm />
 		</MultiEditScope>
@@ -124,7 +132,7 @@ export const tags = () => (
 	<>
 		<Title>Tags</Title>
 
-		<MultiEditScope entities="Tag" listProps={{ beforeContent: <Slots.Actions><PersistButton /></Slots.Actions> }}>
+		<MultiEditScope entities="Tag" listProps={{ beforeContent: <SlotSources.Actions><PersistButton /></SlotSources.Actions> }}>
 			<TextField field={'name'} label={'Name'} />
 			<Repeater field={'locales'} label={'Locales'} sortableBy={'order'} itemComponent={CustomRepeaterItem}>
 				<SelectField label={'Locale'} options={'Locale.code'} field={'locale'}

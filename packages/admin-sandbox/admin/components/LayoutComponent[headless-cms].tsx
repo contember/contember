@@ -3,17 +3,17 @@ import { LayoutKit, LayoutPrimitives, Slots, commonSlots, contentSlots, footerSl
 import { useClassName } from '@contember/react-utils'
 import { pick } from '@contember/utilities'
 import { PropsWithChildren } from 'react'
-import { useDirectives } from '../Directives'
-import { SlotTargets } from '../Slots'
+import { useDirectives } from './Directives'
+import { SlotTargets } from './Slots'
 
-const slotsInSidebarLeft = ['Navigation', 'Profile', 'SidebarLeftBody', 'SidebarLeftFooter', 'SidebarLeftHeader', 'Switchers'] as const
-const slotsInSidebarRight = ['SidebarRightHeader', 'Sidebar', 'SidebarRightFooter'] as const
+const slotsInSidebarLeft = ['Navigation', 'Profile', 'Switchers'] as const
+const slotsInSidebarRight = ['Sidebar'] as const
 
 export const SidebarLeftSlots = pick(SlotTargets, slotsInSidebarLeft)
 export const SidebarRightSlots = pick(SlotTargets, slotsInSidebarRight)
 export const LayoutSlots = pick(SlotTargets, [...commonSlots, ...headerSlots, ...footerSlots, ...contentSlots, ...slotsInSidebarLeft, ...slotsInSidebarRight] as const)
 
-export const Layout = ({ children, ...rest }: PropsWithChildren) => {
+export const LayoutComponent = ({ children, ...rest }: PropsWithChildren) => {
 	const directives = useDirectives()
 	const hasActiveSlots = Slots.useHasActiveSlotsFactory(LayoutSlots)
 	const targetsIfActive = Slots.useTargetsIfActiveFactory(LayoutSlots)
@@ -57,9 +57,9 @@ export const Layout = ({ children, ...rest }: PropsWithChildren) => {
 			}
 			footer={(
 				<LayoutKit.Footer
-					start={targetsIfActive(['FooterStart'])}
-					center={targetsIfActive(['FooterCenter'])}
-					end={targetsIfActive(['FooterEnd'])}
+					start={targetsIfActive(['FooterStart']) || false}
+					center={targetsIfActive(['FooterCenter', 'Switchers']) || false}
+					end={targetsIfActive(['FooterEnd']) || false}
 				/>
 			)}
 			{...rest}
@@ -67,18 +67,17 @@ export const Layout = ({ children, ...rest }: PropsWithChildren) => {
 			{isSidebarLeftActive && (
 				<>
 					<LayoutKit.SidebarLeft
-						header={({ behavior }) => (
-							<>
-								<LayoutSlots.SidebarLeftHeader />
-								<LayoutSlots.Switchers />
-								<Spacer />
-								{behavior === 'modal' && (
+						header={({ behavior }) => behavior === 'modal'
+							? (
+								<>
+									<Spacer />
 									<LayoutKit.ToggleMenuButton panelName={LayoutKit.SidebarLeft.NAME} />
-								)}
-							</>
-						)}
-						body={targetsIfActive(['Navigation', 'SidebarLeftBody'])}
-						footer={targetsIfActive(['SidebarLeftFooter', 'Profile'])}
+								</>
+							)
+							: null
+						}
+						body={targetsIfActive(['Navigation'])}
+						footer={targetsIfActive(['Profile'])}
 					/>
 					<LayoutPrimitives.GetLayoutPanelsStateContext.Consumer>{({ panels }) => {
 						const panel = panels.get(LayoutKit.SidebarLeft.NAME)
@@ -105,23 +104,12 @@ export const Layout = ({ children, ...rest }: PropsWithChildren) => {
 						)
 					}}</LayoutPrimitives.GetLayoutPanelsStateContext.Consumer>
 					<LayoutKit.SidebarRight
-						header={({ behavior }) => (
-							<>
-								{targetsIfActive(['SidebarRightHeader'], (
-									<>
-										<LayoutSlots.SidebarRightHeader />
-										<Spacer />
-									</>
-								))}
-								{(behavior === 'modal' && <LayoutKit.ToggleMenuButton panelName={LayoutKit.SidebarRight.NAME} />)}
-							</>
-						)}
+						header={({ behavior }) => behavior === 'modal' && <LayoutKit.ToggleMenuButton panelName={LayoutKit.SidebarRight.NAME} />}
 						body={targetsIfActive(['Sidebar'])}
-						footer={targetsIfActive(['SidebarRightFooter'])}
 					/>
 				</>
 			)}
 		</LayoutKit.Frame>
 	)
 }
-Layout.displayName = 'Layout(cms-layout)'
+LayoutComponent.displayName = 'Layout(headless-cms)'

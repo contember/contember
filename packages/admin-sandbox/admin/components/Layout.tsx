@@ -8,7 +8,7 @@ import { PropsWithChildren, memo, useMemo, useRef, useState } from 'react'
 import { AlertLogoutLink } from './AlertLogoutLink'
 import { LAYOUT_BREAKPOINT } from './Constants'
 import { Directive, DirectivesType, initialDirectives, useDirectives } from './Directives'
-import { LayoutType, Layouts } from './Layouts'
+import { LayoutComponents, LayoutType } from './LayoutComponent'
 import { Navigation } from './Navigation'
 import { SlotSources } from './Slots'
 
@@ -16,7 +16,7 @@ export const Layout = memo(({ children }: PropsWithChildren) => {
 	const directives = useDirectives()
 	useDocumentTitle(directives.title)
 
-	const LayoutComponent = Layouts[directives?.layout ?? 'default'] ?? Layouts.default
+	const LayoutComponent = LayoutComponents[directives?.layout ?? 'default'] ?? LayoutComponents.default
 	const width = useContainerWidth()
 
 	const [scheme, setScheme] = useSessionStorageState<Scheme>(
@@ -30,7 +30,6 @@ export const Layout = memo(({ children }: PropsWithChildren) => {
 		<SafeAreaInsetsProvider insets={useMemo(() => ({ top: safeAreaInsets, right: safeAreaInsets, left: safeAreaInsets, bottom: safeAreaInsets }), [safeAreaInsets])}>
 			<ColorSchemeProvider scheme={scheme}>
 				<LayoutComponent
-					key="changeable-layout"
 					className={[
 						colorSchemeClassName(scheme),
 						contentThemeClassName(directives['layout.theme-content']),
@@ -49,6 +48,15 @@ export const Layout = memo(({ children }: PropsWithChildren) => {
 							</SlotSources.Logo>
 
 							<SlotSources.Switchers>
+								<DimensionsSwitcher
+									optionEntities="Locale"
+									orderBy="code asc"
+									dimension="locale"
+									labelField="code"
+									slugField="code"
+									maxItems={1}
+								/>
+
 								<Button
 									size="small"
 									elevation="none"
@@ -62,15 +70,6 @@ export const Layout = memo(({ children }: PropsWithChildren) => {
 								>
 									{scheme.match(/light/) ? <SunIcon /> : scheme.match(/dark/) ? <MoonIcon /> : <CircleDashedIcon />}
 								</Button>
-
-								<DimensionsSwitcher
-									optionEntities="Locale"
-									orderBy="code asc"
-									dimension="locale"
-									labelField="code"
-									slugField="code"
-									maxItems={1}
-								/>
 							</SlotSources.Switchers>
 
 							{Navigation && (
@@ -86,6 +85,10 @@ export const Layout = memo(({ children }: PropsWithChildren) => {
 									</Stack>
 								</LogoutLink>
 							</SlotSources.Profile>
+
+							<SlotSources.FooterCenter>
+								<p><small>Made by Contember &copy; {(new Date).getFullYear()}</small></p>
+							</SlotSources.FooterCenter>
 
 							{children}
 						</DialogProvider>
@@ -106,7 +109,7 @@ export const LayoutDevPanel = () => {
 			<>
 				<Directive key={typeState ?? '(unset)'} name="layout" content={typeState} />
 				<DevPanel icon={<LayoutIcon />} heading={`Layout: ${layout}`}>
-					{Object.keys(Layouts).map(key => (
+					{Object.keys(LayoutComponents).map(key => (
 						<Button active={typeState === key} flow="block" key={key} onClick={() => {
 							setTypeState(previous => previous === key ? undefined : key as unknown as LayoutType)
 						}}>{key}</Button>

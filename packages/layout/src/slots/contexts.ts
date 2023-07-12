@@ -1,5 +1,5 @@
 import { createNonNullableContextFactory, noop } from '@contember/react-utils'
-import { ElementType, Fragment, ReactNode, RefObject, createContext, createElement, useCallback, useContext } from 'react'
+import { ElementType, Fragment, ReactNode, RefObject, createElement, useCallback } from 'react'
 import { SlotSourceComponentsRecord } from './types'
 
 export type SlotsRefMap = Map<string, RefObject<HTMLElement>>
@@ -21,7 +21,7 @@ export function useHasActiveSlotsFactory<T extends SlotSourceComponentsRecord<st
 export function useTargetsIfActiveFactory<T extends SlotSourceComponentsRecord<string>>(SlotTargets: T) {
 	const activeSlotPortals = useActiveSlotPortalsContext()
 
-	return useCallback(function targetsIfActive(slots: ReadonlyArray<keyof T & string>, children?: ReactNode | ((...args: any[]) => ReactNode)) {
+	return useCallback(function targetsIfActive<Children extends ReactNode | ((...args: any[]) => ReactNode)>(slots: ReadonlyArray<keyof T & string>, children?: Children) {
 		if (slots.some(slot => activeSlotPortals.has(slot))) {
 			if (children) {
 				return children

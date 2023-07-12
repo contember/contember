@@ -15,7 +15,6 @@ import { CSSProperties } from 'react';
 import { ElementType } from 'react';
 import { ForwardRefExoticComponent } from 'react';
 import { FunctionComponentElement } from 'react';
-import { JSXElementConstructor } from 'react';
 import { MemoExoticComponent } from 'react';
 import { NamedExoticComponent } from 'react';
 import { NestedClassName } from '@contember/utilities';
@@ -25,7 +24,6 @@ import { Predicate } from '@contember/utilities';
 import { PropsWithRequiredChildren } from '@contember/react-utils';
 import { default as React_2 } from 'react';
 import { ReactElement } from 'react';
-import { ReactFragment } from 'react';
 import { ReactNode } from 'react';
 import { RefAttributes } from 'react';
 import { RefObject } from 'react';
@@ -207,17 +205,10 @@ export type ContentPanelComponentType = (<C extends ElementType = 'section'>(pro
 export type ContentPanelProps<C extends ElementType> = PolymorphicComponentPropsWithRef<C, OwnContentPanelProps>;
 
 // @public (undocumented)
-export const contentSlots: readonly ("ContentBody" | "ContentFooter" | "ContentHeader")[];
+export const contentSlots: readonly ("ContentFooter" | "ContentHeader")[];
 
 // @public (undocumented)
 export const ContentSlotSources: Readonly<Readonly<{
-    readonly ContentBody: {
-        ({ name, children }: Omit<SourcePortalProps, "name"> & {
-            name?: Capitalize<string> | undefined;
-        }): JSX.Element;
-        displayName: string;
-        slot: "ContentBody";
-    };
     readonly ContentFooter: {
         ({ name, children }: Omit<SourcePortalProps, "name"> & {
             name?: Capitalize<string> | undefined;
@@ -236,11 +227,6 @@ export const ContentSlotSources: Readonly<Readonly<{
 
 // @public (undocumented)
 export const ContentSlotTargets: Readonly<Readonly<{
-    readonly ContentBody: {
-        ({ className, ...props }: Omit<TargetProps, "name">): JSX.Element;
-        displayName: string;
-        slot: "ContentBody";
-    };
     readonly ContentFooter: {
         ({ className, ...props }: Omit<TargetProps, "name">): JSX.Element;
         displayName: string;
@@ -709,16 +695,18 @@ type OwnContainerProps = ComponentClassNameProps & {
 // @public (undocumented)
 export type OwnContentPanelProps = Omit<ComponentClassNameProps, 'children'> & {
     basis?: number;
-    body?: ReactNode | ((state: PanelState) => ReactNode);
+    body?: ReactNode | ((state: PanelState, panelsState: GetLayoutPanelsStateContextType) => ReactNode);
     children?: never;
-    footer?: ReactNode | ((state: PanelState) => ReactNode);
-    header?: ReactNode | ((state: PanelState) => ReactNode);
+    footer?: ReactNode | ((state: PanelState, panelsState: GetLayoutPanelsStateContextType) => ReactNode);
+    header?: ReactNode | ((state: PanelState, panelsState: GetLayoutPanelsStateContextType) => ReactNode);
     maxWidth?: number | false | null | undefined;
     minWidth?: number | null | undefined;
 };
 
 // @public (undocumented)
 export type OwnFrameProps = ComponentClassNameProps & {
+    bodyFooter?: ReactNode;
+    bodyHeader?: ReactNode;
     footer?: ReactNode;
     footerIsFixed?: boolean;
     footerClassName?: NestedClassName;
@@ -777,10 +765,10 @@ export type OwnResponsiveStackProps = ResponsiveProps<StackOwnProps>;
 // @public (undocumented)
 export type OwnSidebarProps = Omit<ComponentClassNameProps, 'children'> & {
     basis?: number;
-    body?: ReactNode | ((state: PanelState) => ReactNode);
+    body?: ReactNode | ((state: PanelState, panelsState: GetLayoutPanelsStateContextType) => ReactNode);
     children?: never;
-    footer?: ReactNode | ((state: PanelState) => ReactNode);
-    header?: ReactNode | ((state: PanelState) => ReactNode);
+    footer?: ReactNode | ((state: PanelState, panelsState: GetLayoutPanelsStateContextType) => ReactNode);
+    header?: ReactNode | ((state: PanelState, panelsState: GetLayoutPanelsStateContextType) => ReactNode);
     keepVisible?: boolean | null | undefined;
     maxWidth?: number | false | null | undefined;
     minWidth?: number | null | undefined;
@@ -911,7 +899,7 @@ type ProviderProps = {
 type RegisterLayoutPanel = (name: string, config: PanelConfig) => void;
 
 // @public (undocumented)
-type RegisterSlot = (name: string, ref: RefObject<HTMLElement>) => void;
+type RegisterSlotTarget = (id: string, name: string, ref: RefObject<HTMLElement>) => void;
 
 // @public (undocumented)
 const RegistryContext: Context<RegistryContextType<Record<string, unknown>>>;
@@ -1114,9 +1102,8 @@ declare namespace Slots {
         useHasActiveSlotsFactory,
         useTargetsIfActiveFactory,
         SlotsRefMap,
-        RegisterSlot,
-        UpdateSlotTarget,
-        UnregisterSlot,
+        RegisterSlotTarget,
+        UnregisterSlotTarget,
         ActiveSlotPortalsContextType,
         ActiveSlotPortalsContext,
         useActiveSlotPortalsContext,
@@ -1153,8 +1140,8 @@ type SlotTargetComponentsRecord<K extends string> = Readonly<{
 
 // @public (undocumented)
 type SlotTargetsRegistryContextType = {
-    registerSlotTarget: UpdateSlotTarget;
-    unregisterSlotTarget: UnregisterSlot;
+    registerSlotTarget: RegisterSlotTarget;
+    unregisterSlotTarget: UnregisterSlotTarget;
 };
 
 // @public (undocumented)
@@ -1221,13 +1208,10 @@ interface UncontrolledPanelProps {
 type UnregisterLayoutPanel = LayoutPanelCallback;
 
 // @public (undocumented)
-type UnregisterSlot = (name: string) => void;
+type UnregisterSlotTarget = (id: string, name: string) => void;
 
 // @public (undocumented)
 type UpdateLayoutPanel = (name: string, config: Partial<Omit<PanelConfig, 'name'>> | null | undefined | void) => void;
-
-// @public (undocumented)
-type UpdateSlotTarget = (name: string, ref: RefObject<HTMLElement>) => void;
 
 // @public (undocumented)
 const useActiveSlotPortalsContext: () => ActiveSlotPortalsContextType;
@@ -1286,7 +1270,7 @@ export const useSafeAreaInsetsContext: () => ContainerInsets;
 const useSetLayoutPanelsStateContext: () => SetLayoutPanelsStateContextType;
 
 // @public (undocumented)
-function useTargetsIfActiveFactory<T extends SlotSourceComponentsRecord<string>>(SlotTargets: T): (slots: ReadonlyArray<keyof T & string>, children?: ReactNode | ((...args: any[]) => ReactNode)) => string | number | true | ReactElement<any, string | JSXElementConstructor<any>> | ReactFragment | ((...args: any[]) => ReactNode) | FunctionComponentElement<    {
+function useTargetsIfActiveFactory<T extends SlotSourceComponentsRecord<string>>(SlotTargets: T): <Children extends ReactNode | ((...args: any[]) => ReactNode)>(slots: ReadonlyArray<keyof T & string>, children?: Children | undefined) => NonNullable<Children> | FunctionComponentElement<    {
 children?: ReactNode;
 }> | null;
 

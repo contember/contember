@@ -101,7 +101,8 @@ export function MenuItem<T = unknown>({ children, componentClassName = 'menu', .
 
 	const onNeverFocusableClick = useCallback((event: SyntheticEvent) => {
 		event.preventDefault()
-	}, [])
+		changeExpand(!expanded)
+	}, [changeExpand, expanded])
 
 	const onKeyPress = useKeyNavigation({ changeExpand, expanded, depth, isInteractive, listItemRef, onClick: onLabelClick })
 

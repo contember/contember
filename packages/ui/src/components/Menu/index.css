@@ -93,6 +93,13 @@
 	position: relative;
 }
 
+:where(
+	.cui-menu-section-title:not([aria-disabled="true"]),
+	.cui-menu-group-title:not([aria-disabled="true"]),
+) {
+	cursor: pointer;
+}
+
 :where(.cui-menu-section-title-content),
 :where(.cui-menu-group-title-content) {
 	display: flex;

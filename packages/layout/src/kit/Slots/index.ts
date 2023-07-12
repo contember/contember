@@ -12,7 +12,6 @@ export const [commonSlots, CommonSlotSources, CommonSlotTargets] = createSlotCom
 ])
 
 export const [contentSlots, ContentSlotSources, ContentSlotTargets] = createSlotComponents([
-	'ContentBody',
 	'ContentFooter',
 	'ContentHeader',
 ])

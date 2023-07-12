@@ -102,21 +102,13 @@
 }
 
 :where(.cui-menu-section) {
-	padding-bottom: calc(var(--cui-padding) / 2);
 	padding-right: 0;
-	padding-top: calc(var(--cui-padding) / 2);
 	position: relative;
 }
 
 :where(.cui-menu-section-title) {
-	letter-spacing: 0.125em;
 	padding-bottom: var(--cui-gap);
 	padding-top: var(--cui-gap);
-	text-transform: uppercase;
-}
-
-:where(.cui-menu-section-title-content) {
-	font-size: var(--cui-font-size-note);
 }
 
 :where(.cui-menu-section-title.is-active:after) {

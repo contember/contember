@@ -80,7 +80,7 @@ export const TextCell: FunctionComponent<TextCellProps> = Component(props => {
 			filterRenderer={({ filter, setFilter, ...props }) => {
 				const formatMessage = useMessageFormatter(dataGridCellsDictionary)
 				return (
-					<Stack direction="horizontal">
+					<Stack direction="horizontal" align="center">
 						<GenericTextCellFilter {...props} filter={filter} setFilter={setFilter} />
 							<FieldContainer
 								label={<span style={{ whiteSpace: 'nowrap' }}>

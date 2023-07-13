@@ -83,7 +83,7 @@ export const DateCell: FunctionComponent<DateCellProps> = Component(props => {
 				}, [filter, setFilter])
 
 				return (
-					<Stack direction="horizontal">
+					<Stack direction="horizontal" align="center">
 						<DateBoundInput label={formatMessage('dataGridCells.dateCell.fromLabel')}>
 							<DateInput
 								value={start}

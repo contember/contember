@@ -1,7 +1,7 @@
-import { Button, DevPanel, DialogProvider, DimensionsSwitcher, Intent, Link, LogoutLink, PortalProvider, Radio, Scheme, Spacer, Stack, VisuallyHidden } from '@contember/admin'
+import { Button, DevPanel, DimensionsSwitcher, Intent, Link, LogoutLink, Radio, Scheme, Spacer, Stack, VisuallyHidden } from '@contember/admin'
 import { Identity2023 } from '@contember/brand'
 import { SafeAreaInsetsProvider } from '@contember/layout'
-import { ColorSchemeProvider, useContainerWidth, useDocumentTitle, useReferentiallyStableCallback, useSessionStorageState } from '@contember/react-utils'
+import { ColorSchemeProvider, useContainerWidth, useReferentiallyStableCallback, useSessionStorageState } from '@contember/react-utils'
 import { colorSchemeClassName, contentThemeClassName, controlsThemeClassName } from '@contember/utilities'
 import { CircleDashedIcon, LayoutIcon, LogOutIcon, MoonIcon, PaintBucketIcon, SmartphoneIcon, SunIcon } from 'lucide-react'
 import { PropsWithChildren, memo, useMemo, useRef, useState } from 'react'
@@ -14,7 +14,6 @@ import { SlotSources } from './Slots'
 
 export const Layout = memo(({ children }: PropsWithChildren) => {
 	const directives = useDirectives()
-	useDocumentTitle(directives.title)
 
 	const LayoutComponent = LayoutComponents[directives?.layout ?? 'default'] ?? LayoutComponents.default
 	const width = useContainerWidth()
@@ -36,63 +35,59 @@ export const Layout = memo(({ children }: PropsWithChildren) => {
 						controlsThemeClassName(directives['layout.theme-controls']),
 					]}
 				>
-					<PortalProvider>
-						<DialogProvider>
-							<SlotSources.Logo>
-								<Link to="index">
-									<Stack align="center" direction="horizontal" gap="small">
-										<Identity2023.Edit scale={2} />
-										<VisuallyHidden hidden={width < LAYOUT_BREAKPOINT}>Contember</VisuallyHidden>
-									</Stack>
-								</Link>
-							</SlotSources.Logo>
+					<SlotSources.Logo>
+						<Link to="index">
+							<Stack align="center" direction="horizontal" gap="small">
+								<Identity2023.Edit scale={2} />
+								<VisuallyHidden hidden={width < LAYOUT_BREAKPOINT}>Contember</VisuallyHidden>
+							</Stack>
+						</Link>
+					</SlotSources.Logo>
 
-							<SlotSources.Switchers>
-								<DimensionsSwitcher
-									optionEntities="Locale"
-									orderBy="code asc"
-									dimension="locale"
-									labelField="code"
-									slugField="code"
-									maxItems={1}
-								/>
+					<SlotSources.Switchers>
+						<DimensionsSwitcher
+							optionEntities="Locale"
+							orderBy="code asc"
+							dimension="locale"
+							labelField="code"
+							slugField="code"
+							maxItems={1}
+						/>
 
-								<Button
-									size="small"
-									elevation="none"
-									distinction="seamless"
-									active={!scheme.match(/system/)}
-									flow="circular"
-									onClick={useReferentiallyStableCallback(() => {
-										setScheme(scheme => (scheme.match(/light/) ? 'dark' : scheme.match(/dark/) ? 'system' : 'light'))
-									})}
-									aria-label={scheme.match(/light/) ? 'Light mode, switch to dark mode' : scheme.match(/dark/) ? 'Dark mode, switch to light mode' : 'System mode, switch to system mode'}
-								>
-									{scheme.match(/light/) ? <SunIcon /> : scheme.match(/dark/) ? <MoonIcon /> : <CircleDashedIcon />}
-								</Button>
-							</SlotSources.Switchers>
+						<Button
+							size="small"
+							elevation="none"
+							distinction="seamless"
+							active={!scheme.match(/system/)}
+							flow="circular"
+							onClick={useReferentiallyStableCallback(() => {
+								setScheme(scheme => (scheme.match(/light/) ? 'dark' : scheme.match(/dark/) ? 'system' : 'light'))
+							})}
+							aria-label={scheme.match(/light/) ? 'Light mode, switch to dark mode' : scheme.match(/dark/) ? 'Dark mode, switch to light mode' : 'System mode, switch to system mode'}
+						>
+							{scheme.match(/light/) ? <SunIcon /> : scheme.match(/dark/) ? <MoonIcon /> : <CircleDashedIcon />}
+						</Button>
+					</SlotSources.Switchers>
 
-							{Navigation && (
-								<SlotSources.Navigation>
-									<Navigation />
-								</SlotSources.Navigation>
-							)}
+					{Navigation && (
+						<SlotSources.Navigation>
+							<Navigation />
+						</SlotSources.Navigation>
+					)}
 
-							<SlotSources.Profile>
-								<LogoutLink Component={AlertLogoutLink}>
-									<Stack align="center" direction="horizontal" gap="small">
-										<LogOutIcon /> Logout
-									</Stack>
-								</LogoutLink>
-							</SlotSources.Profile>
+					<SlotSources.Profile>
+						<LogoutLink Component={AlertLogoutLink}>
+							<Stack align="center" direction="horizontal" gap="small">
+								<LogOutIcon /> Logout
+							</Stack>
+						</LogoutLink>
+					</SlotSources.Profile>
 
-							<SlotSources.FooterCenter>
-								<p><small>Made by Contember &copy; {(new Date).getFullYear()}</small></p>
-							</SlotSources.FooterCenter>
+					<SlotSources.FooterCenter>
+						<p><small>Created with <a className="content-link" href="https://www.contember.com/">AI-assisted Contember Studio</a></small></p>
+					</SlotSources.FooterCenter>
 
-							{children}
-						</DialogProvider>
-					</PortalProvider>
+					{children}
 				</LayoutComponent>
 			</ColorSchemeProvider>
 		</SafeAreaInsetsProvider>

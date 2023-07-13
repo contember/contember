@@ -8,18 +8,19 @@ export const Provider = memo<{ children: ReactNode }>(({ children }) => {
 
 	const activeSlotsMapRef = useRef(activeSlotsMap); activeSlotsMapRef.current = activeSlotsMap
 
-	const registerSlotTarget = useCallback((name: string, ref: RefObject<HTMLElement>) => {
+	// TODO: refactor to use ID
+	const registerSlotTarget = useCallback((id: string, name: string, ref: RefObject<HTMLElement>) => {
 		setSlotsRefMap(previous => new Map([...previous, [name, ref]]))
 	}, [])
 
-	const unregisterSlotTarget = useCallback((name: string) => {
+	const unregisterSlotTarget = useCallback((id: string, name: string) => {
 		setSlotsRefMap(previous => {
 			previous.delete(name)
 			return new Map([...previous])
 		})
 	}, [])
 
-	const slotRegistry: SlotTargetsRegistryContextType = useMemo(() => {
+	const slotTargetsRegistry: SlotTargetsRegistryContextType = useMemo(() => {
 		return {
 			activeSlotPortals,
 			registerSlotTarget,
@@ -39,9 +40,9 @@ export const Provider = memo<{ children: ReactNode }>(({ children }) => {
 		setActiveSlotsMap(previous => new Map([...previous, [id, name]]))
 	}, [])
 
-	const unregisterSlotSource = useCallback((name: string) => {
+	const unregisterSlotSource = useCallback((id: string, name: string) => {
 		setActiveSlotsMap(previous => {
-			previous.delete(name)
+			previous.delete(id)
 			return new Map([...previous])
 		})
 	}, [])
@@ -54,7 +55,7 @@ export const Provider = memo<{ children: ReactNode }>(({ children }) => {
 
 	return (
 		<PortalsRegistryContext.Provider value={renderToSlotPortal}>
-			<TargetsRegistryContext.Provider value={slotRegistry}>
+			<TargetsRegistryContext.Provider value={slotTargetsRegistry}>
 				<ActiveSlotPortalsContext.Provider value={activeSlotPortals}>
 					{children}
 				</ActiveSlotPortalsContext.Provider>

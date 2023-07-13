@@ -23,13 +23,14 @@ export const Target = memo<TargetProps>(
 		assert('name is non-empty string', name, isNonEmptyTrimmedString)
 
 		const ref = useRef<HTMLElement>(null)
+		const instanceId = useRef(Math.random().toString(36).substring(2, 9)).current
 		const { unregisterSlotTarget, registerSlotTarget } = useTargetsRegistryContext()
 		const activeSlotPortals = useActiveSlotPortalsContext()
 
 		useLayoutEffect(() => {
-			registerSlotTarget(name, ref)
-			return () => unregisterSlotTarget(name)
-		})
+			registerSlotTarget(instanceId, name, ref)
+			return () => unregisterSlotTarget(instanceId, name)
+		}, [instanceId, name, registerSlotTarget, unregisterSlotTarget])
 
 		const Container = as ?? 'div'
 		const className = useClassName(componentClassName, classNameProp)
@@ -40,6 +41,8 @@ export const Target = memo<TargetProps>(
 				<Container
 					ref={ref}
 					key={key}
+					data-key={key}
+					data-id={instanceId}
 					data-has-own-children={!!children}
 					data-name={dataAttribute(slugify(name, { lower: true }))}
 					className={className}

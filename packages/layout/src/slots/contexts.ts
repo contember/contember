@@ -3,9 +3,8 @@ import { ElementType, Fragment, ReactNode, RefObject, createElement, useCallback
 import { SlotSourceComponentsRecord } from './types'
 
 export type SlotsRefMap = Map<string, RefObject<HTMLElement>>
-export type RegisterSlot = (name: string, ref: RefObject<HTMLElement>) => void;
-export type UpdateSlotTarget = (name: string, ref: RefObject<HTMLElement>) => void;
-export type UnregisterSlot = (name: string) => void;
+export type RegisterSlotTarget = (id: string, name: string, ref: RefObject<HTMLElement>) => void;
+export type UnregisterSlotTarget = (id: string, name: string) => void;
 
 export type ActiveSlotPortalsContextType = Set<string>;
 export const [ActiveSlotPortalsContext, useActiveSlotPortalsContext] = createNonNullableContextFactory<ActiveSlotPortalsContextType>('ActiveSlotPortalsContext', new Set())
@@ -45,8 +44,8 @@ export function useTargetsIfActiveFactory<T extends SlotSourceComponentsRecord<s
 }
 
 export type SlotTargetsRegistryContextType = {
-	registerSlotTarget: UpdateSlotTarget;
-	unregisterSlotTarget: UnregisterSlot;
+	registerSlotTarget: RegisterSlotTarget;
+	unregisterSlotTarget: UnregisterSlotTarget;
 }
 export const [TargetsRegistryContext, useTargetsRegistryContext] = createNonNullableContextFactory<SlotTargetsRegistryContextType>('Interface.Slots.TargetsRegistryContext', {
 	registerSlotTarget: noop,

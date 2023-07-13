@@ -62,7 +62,7 @@ export function DataGridFullFilters({
 
 	return (
 		<Dropdown
-			alignment="end"
+			alignment="center"
 			buttonProps={columnFilteringButtonProps}
 			renderContent={({ update: updateOuterDropdown }) => (
 				<Box heading={formatMessage('dataGrid.columnFiltering.heading')}>
@@ -125,7 +125,8 @@ export function DataGridFullFilters({
 							buttonProps={filterButtonBrops}
 						>
 							{({ requestClose }) => (
-								<ButtonGroup orientation="vertical">
+								<Box padding="no-padding">
+									<ButtonGroup orientation="vertical">
 									{remainingColumns.map(([key, column]) => (
 										<Button
 											key={key}
@@ -147,6 +148,7 @@ export function DataGridFullFilters({
 										</Button>
 									))}
 								</ButtonGroup>
+								</Box>
 							)}
 						</Dropdown>
 					)}

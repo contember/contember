@@ -28,7 +28,19 @@
 
 :where(.cui-root a),
 :where(.cui-root button) {
+	color: var(--cui-color--strong);
 	font-weight: 600;
+}
+
+:where(.cui-root a.content-link) {
+	color: var(--cui-color--strong);
+}
+:where(
+	.cui-root a.content-link:hover,
+	.cui-root a.content-link:focus,
+	.cui-root a.content-link:active,
+) {
+	color: var(--cui-control-color--highlighted);
 }
 
 :where(.cui-root a:not([class])),

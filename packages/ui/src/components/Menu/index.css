@@ -70,7 +70,6 @@
 	transform: rotate(45deg);
 	transition: transform var(--cui-transition-duration--fast);
 	width: 0.4em;
-	z-index: 1;
 }
 
 :where(.cui-menu-expand-toggle.is-collapsed)::before {

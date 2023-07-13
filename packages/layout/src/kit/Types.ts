@@ -5,6 +5,8 @@ import { GetLayoutPanelsStateContextType, PanelState } from '../primitives'
 export type OwnFrameProps =
 	& ComponentClassNameProps
 	& {
+		bodyFooter?: ReactNode;
+		bodyHeader?: ReactNode;
 		footer?: ReactNode;
 		footerIsFixed?: boolean;
 		footerClassName?: NestedClassName;
@@ -25,10 +27,10 @@ export type OwnContentPanelProps =
 	& Omit<ComponentClassNameProps, 'children'>
 	& {
 		basis?: number;
-		body?: ReactNode | ((state: PanelState) => ReactNode);
+		body?: ReactNode | ((state: PanelState, panelsState: GetLayoutPanelsStateContextType) => ReactNode);
 		children?: never;
-		footer?: ReactNode | ((state: PanelState) => ReactNode);
-		header?: ReactNode | ((state: PanelState) => ReactNode);
+		footer?: ReactNode | ((state: PanelState, panelsState: GetLayoutPanelsStateContextType) => ReactNode);
+		header?: ReactNode | ((state: PanelState, panelsState: GetLayoutPanelsStateContextType) => ReactNode);
 		maxWidth?: number | false | null | undefined;
 		minWidth?: number | null | undefined;
 	}
@@ -99,10 +101,10 @@ export type OwnSidebarProps =
 	& Omit<ComponentClassNameProps, 'children'>
 	& {
 		basis?: number;
-		body?: ReactNode | ((state: PanelState) => ReactNode);
+		body?: ReactNode | ((state: PanelState, panelsState: GetLayoutPanelsStateContextType) => ReactNode);
 		children?: never;
-		footer?: ReactNode | ((state: PanelState) => ReactNode);
-		header?: ReactNode | ((state: PanelState) => ReactNode);
+		footer?: ReactNode | ((state: PanelState, panelsState: GetLayoutPanelsStateContextType) => ReactNode);
+		header?: ReactNode | ((state: PanelState, panelsState: GetLayoutPanelsStateContextType) => ReactNode);
 		keepVisible?: boolean | null | undefined;
 		maxWidth?: number | false | null | undefined;
 		minWidth?: number | null | undefined;

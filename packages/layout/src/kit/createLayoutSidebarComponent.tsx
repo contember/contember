@@ -2,7 +2,7 @@ import { useClassName, useClassNameFactory, useComposeRef, useElementSize, useRe
 import { PolymorphicRef, assert, isNonNegativeNumber, isNotNullish, isSlugString, px } from '@contember/utilities'
 import { ElementType, forwardRef, memo, useRef } from 'react'
 import { MenuAutoCloseProvider } from '../menu-auto-close-provider'
-import { LayoutPanelContext, Panel, PanelBehavior, PanelBody, PanelFooter, PanelHeader, PanelState, PanelVisibility, isComponentClassName, useClosePanelOnEscape, useGetLayoutPanelsStateContext, useSetLayoutPanelsStateContext } from '../primitives'
+import { GetLayoutPanelsStateContext, LayoutPanelContext, Panel, PanelBehavior, PanelBody, PanelFooter, PanelHeader, PanelState, PanelVisibility, isComponentClassName, useClosePanelOnEscape, useGetLayoutPanelsStateContext, useSetLayoutPanelsStateContext } from '../primitives'
 import { SidebarComponentType, SidebarProps } from './Types'
 
 const BASIS = 256
@@ -100,35 +100,39 @@ export function createLayoutSidebarComponent({
 				}}
 			>
 				<MenuAutoCloseProvider onAutoClose={hideModal}>
-					<LayoutPanelContext.Consumer>
-						{state => {
-							const headerContent = typeof header === 'function' ? header(state) : header
-							const bodyContent = typeof body === 'function' ? body(state) : body
-							const footerContent = typeof footer === 'function' ? footer(state) : footer
+					<GetLayoutPanelsStateContext.Consumer>
+						{panelsState => (
+							<LayoutPanelContext.Consumer>
+								{state => {
+									const headerContent = typeof header === 'function' ? header(state, panelsState) : header
+									const bodyContent = typeof body === 'function' ? body(state, panelsState) : body
+									const footerContent = typeof footer === 'function' ? footer(state, panelsState) : footer
 
-							return (
-								<>
-									{headerContent !== false && (
-										<PanelHeader ref={headerRef} className={className('header')}>
-											{headerContent}
-										</PanelHeader>
-									)}
+									return (
+										<>
+											{headerContent !== false && (
+												<PanelHeader ref={headerRef} className={className('header')}>
+													{headerContent}
+												</PanelHeader>
+											)}
 
-									{bodyContent !== false && (
-										<PanelBody className={className('body')}>
-											{typeof body === 'function' ? body(state) : body}
-										</PanelBody>
-									)}
+											{bodyContent !== false && (
+												<PanelBody className={className('body')}>
+													{bodyContent}
+												</PanelBody>
+											)}
 
-									{footerContent !== false && (
-										<PanelFooter ref={footerRef} className={className('footer')}>
-											{footerContent}
-										</PanelFooter>
-									)}
-								</>
-							)
-						}}
-					</LayoutPanelContext.Consumer>
+											{footerContent !== false && (
+												<PanelFooter ref={footerRef} className={className('footer')}>
+													{footerContent}
+												</PanelFooter>
+											)}
+										</>
+									)
+								}}
+							</LayoutPanelContext.Consumer>
+						)}
+					</GetLayoutPanelsStateContext.Consumer>
 				</MenuAutoCloseProvider>
 			</Panel>
 		)

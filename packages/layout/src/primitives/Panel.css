@@ -45,9 +45,14 @@
 	left: 0;
 	overflow: hidden;
 	overscroll-behavior: contain;
-	position: absolute;
 	right: 0;
 	top: 0;
+}
+:where(.cui-layout-panel):where([data-behavior="overlay"]) {
+	position: absolute;
+}
+:where(.cui-layout-panel):where([data-behavior="modal"]) {
+	position: fixed;
 }
 :where(
 	.cui-layout-panel[data-behavior="overlay"] > .cui-layout-panel-content,

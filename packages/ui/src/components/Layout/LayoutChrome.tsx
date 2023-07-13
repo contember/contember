@@ -7,7 +7,7 @@ import { toStateClass, toViewClass } from '../../utils'
 import { Button } from '../Forms'
 import { Icon } from '../Icon'
 import { useElementTopOffset } from '../Layout/useElementTopOffset'
-import { DEFAULT_PORTAL_ROOT_ID, PortalProvider } from '../Portal'
+import { PortalProvider } from '../Portal'
 import { PreventCloseContext } from '../PreventCloseContext'
 import { Stack } from '../Stack'
 import { ThemeSchemeContext, TitleThemeSchemeContext } from './ThemeSchemeContext'
@@ -220,7 +220,6 @@ export const LayoutChrome = memo(({
 						</div>
 					</DialogProvider>
 				</PortalProvider>
-				<div id={DEFAULT_PORTAL_ROOT_ID} />
 			</div>
 		</ColorSchemeProvider>
 	)

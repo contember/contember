@@ -9,10 +9,10 @@ describe('@contember/layout', function () {
 			'left': 30,
 			'right': 40,
 		}, '--inset-')).toEqual({
-			'---inset--on-bottom': '1',
-			'---inset--on-left': '1',
-			'---inset--on-right': '1',
-			'---inset--on-top': '1',
+			'--inset--on-bottom': '1',
+			'--inset--on-left': '1',
+			'--inset--on-right': '1',
+			'--inset--on-top': '1',
 			'--inset--bottom': '20px',
 			'--inset--left': '30px',
 			'--inset--right': '40px',
@@ -25,7 +25,7 @@ describe('@contember/layout', function () {
 			'left': null,
 			'right': null,
 		}, '--inset-')).toEqual({
-			'---inset--on-top': '1',
+			'--inset--on-top': '1',
 			'--inset--top': '10px',
 		})
 
@@ -35,7 +35,7 @@ describe('@contember/layout', function () {
 			'left': null,
 			'right': null,
 		}, '--inset-')).toEqual({
-			'---inset--on-top': '1',
+			'--inset--on-top': '1',
 			'--inset--top': '10px',
 		})
 
@@ -45,8 +45,8 @@ describe('@contember/layout', function () {
 			'left': null,
 			'right': null,
 		}, '--inset-')).toEqual({
-			'---inset--on-bottom': '1',
-			'---inset--on-top': '1',
+			'--inset--on-bottom': '1',
+			'--inset--on-top': '1',
 			'--inset--bottom': '20px',
 			'--inset--top': '10px',
 		})
@@ -57,9 +57,9 @@ describe('@contember/layout', function () {
 			'left': 30,
 			'right': null,
 		}, '--inset-')).toEqual({
-			'---inset--on-bottom': '1',
-			'---inset--on-left': '1',
-			'---inset--on-top': '1',
+			'--inset--on-bottom': '1',
+			'--inset--on-left': '1',
+			'--inset--on-top': '1',
 			'--inset--bottom': '20px',
 			'--inset--left': '30px',
 			'--inset--top': '10px',
@@ -71,9 +71,9 @@ describe('@contember/layout', function () {
 			'left': null,
 			'right': 40,
 		}, '--inset-')).toEqual({
-			'---inset--on-bottom': '1',
-			'---inset--on-right': '1',
-			'---inset--on-top': '1',
+			'--inset--on-bottom': '1',
+			'--inset--on-right': '1',
+			'--inset--on-top': '1',
 			'--inset--bottom': '20px',
 			'--inset--right': '40px',
 			'--inset--top': '10px',

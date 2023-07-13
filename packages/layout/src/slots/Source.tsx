@@ -1,4 +1,4 @@
-import { memo, useLayoutEffect, useMemo, useRef } from 'react'
+import { memo, useLayoutEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { usePortalsRegistryContext } from './contexts'
 import { SourcePortalProps } from './types'
@@ -6,7 +6,7 @@ import { SourcePortalProps } from './types'
 export const Source = memo<SourcePortalProps>(({ name, children }) => {
 	const { getTarget, registerSlotSource, unregisterSlotSource } = usePortalsRegistryContext()
 
-	const instanceId = useMemo(() => Math.random().toString(36).substring(2, 9), [])
+	const instanceId = useRef(Math.random().toString(36).substring(2, 9)).current
 	const instanceIdRef = useRef(instanceId)
 	instanceIdRef.current = instanceId
 

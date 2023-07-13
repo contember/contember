@@ -1,11 +1,10 @@
 import { createNonNullableContextFactory, noop } from '@contember/react-utils'
-import { ElementType, Fragment, ReactNode, RefObject, createContext, createElement, useCallback, useContext } from 'react'
+import { ElementType, Fragment, ReactNode, RefObject, createElement, useCallback } from 'react'
 import { SlotSourceComponentsRecord } from './types'
 
 export type SlotsRefMap = Map<string, RefObject<HTMLElement>>
-export type RegisterSlot = (name: string, ref: RefObject<HTMLElement>) => void;
-export type UpdateSlotTarget = (name: string, ref: RefObject<HTMLElement>) => void;
-export type UnregisterSlot = (name: string) => void;
+export type RegisterSlotTarget = (id: string, name: string, ref: RefObject<HTMLElement>) => void;
+export type UnregisterSlotTarget = (id: string, name: string) => void;
 
 export type ActiveSlotPortalsContextType = Set<string>;
 export const [ActiveSlotPortalsContext, useActiveSlotPortalsContext] = createNonNullableContextFactory<ActiveSlotPortalsContextType>('ActiveSlotPortalsContext', new Set())
@@ -21,7 +20,7 @@ export function useHasActiveSlotsFactory<T extends SlotSourceComponentsRecord<st
 export function useTargetsIfActiveFactory<T extends SlotSourceComponentsRecord<string>>(SlotTargets: T) {
 	const activeSlotPortals = useActiveSlotPortalsContext()
 
-	return useCallback(function targetsIfActive(slots: ReadonlyArray<keyof T & string>, children?: ReactNode | ((...args: any[]) => ReactNode)) {
+	return useCallback(function targetsIfActive<Children extends ReactNode | ((...args: any[]) => ReactNode)>(slots: ReadonlyArray<keyof T & string>, children?: Children) {
 		if (slots.some(slot => activeSlotPortals.has(slot))) {
 			if (children) {
 				return children
@@ -45,8 +44,8 @@ export function useTargetsIfActiveFactory<T extends SlotSourceComponentsRecord<s
 }
 
 export type SlotTargetsRegistryContextType = {
-	registerSlotTarget: UpdateSlotTarget;
-	unregisterSlotTarget: UnregisterSlot;
+	registerSlotTarget: RegisterSlotTarget;
+	unregisterSlotTarget: UnregisterSlotTarget;
 }
 export const [TargetsRegistryContext, useTargetsRegistryContext] = createNonNullableContextFactory<SlotTargetsRegistryContextType>('Interface.Slots.TargetsRegistryContext', {
 	registerSlotTarget: noop,

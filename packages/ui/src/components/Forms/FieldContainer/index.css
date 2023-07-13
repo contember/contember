@@ -1,5 +1,4 @@
 :where(.cui-field-container) {
-	align-self: stretch;
 	gap: calc(3 * var(--cui-gap));
 	display: flex;
 	flex-direction: column;

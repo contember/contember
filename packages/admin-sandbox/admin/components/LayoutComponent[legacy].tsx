@@ -22,7 +22,7 @@ if (import.meta.env.DEV) {
 	const __exhaustiveCheck: Record<PropertyKey, never> = rest
 }
 
-export const Layout = ({
+export const LayoutComponent = ({
 	children,
 	className,
 	...rest

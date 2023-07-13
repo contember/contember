@@ -11,8 +11,7 @@ import {
 	TextCell,
 	TextField,
 } from '@contember/admin'
-import { Title } from '../components/Directives'
-import { SlotSources } from '../components/Slots'
+import { SlotSources, Title } from '../components/Slots'
 
 export const list = (
 	<>

@@ -8,6 +8,8 @@ import { FrameComponentType, FrameProps } from './Types'
 export const Frame: FrameComponentType = memo(forwardRef(<C extends ElementType = 'div'>({
 	as,
 	children,
+	bodyHeader,
+	bodyFooter,
 	className,
 	componentClassName = 'layout-frame',
 	footer,
@@ -18,13 +20,19 @@ export const Frame: FrameComponentType = memo(forwardRef(<C extends ElementType 
 	headerIsFixed = false,
 	...rest
 }: FrameProps<C>, forwardedRef: PolymorphicRef<C>) => {
-	const layoutHeaderRef = useRef<HTMLDivElement>(null)
-	const headerSize = useElementSize(layoutHeaderRef)
-	const layoutFooterRef = useRef<HTMLDivElement>(null)
-	const footerSize = useElementSize(layoutFooterRef)
+	const frameHeaderRef = useRef<HTMLDivElement>(null)
+	const frameFooterRef = useRef<HTMLDivElement>(null)
+	const bodyHeaderRef = useRef<HTMLDivElement>(null)
+	const bodyFooterRef = useRef<HTMLDivElement>(null)
+	const frameHeaderSize = useElementSize(frameHeaderRef)
+	const frameFooterSize = useElementSize(frameFooterRef)
+	const bodyHeaderSize = useElementSize(bodyHeaderRef)
+	const bodyFooterSize = useElementSize(bodyFooterRef)
 
-	const headerHeight = !headerSize.height || !headerSize.width ? undefined : headerSize.height
-	const footerHeight = !footerSize.height || !footerSize.width ? undefined : footerSize.height
+	const frameHeaderHeight = !frameHeaderSize.height || !frameHeaderSize.width ? 0 : frameHeaderSize.height
+	const frameFooterHeight = !frameFooterSize.height || !frameFooterSize.width ? 0 : frameFooterSize.height
+	const bodyHeaderHeight = !bodyHeaderSize.height || !bodyHeaderSize.width ? 0 : bodyHeaderSize.height
+	const bodyFooterHeight = !bodyFooterSize.height || !bodyFooterSize.width ? 0 : bodyFooterSize.height
 
 	const classNameFor = useClassNameFactory(componentClassName)
 
@@ -52,11 +60,16 @@ export const Frame: FrameComponentType = memo(forwardRef(<C extends ElementType 
 
 	const bodyInsets = useMemo(
 		() =>
-			combineElementInsets(safeAreaInsets, containerInsets, {
-				top: headerIsFixed ? headerHeight : 0,
-				bottom: footerIsFixed ? footerHeight : 0,
+			combineElementInsets({
+				...safeAreaInsets,
+				// TODO: containerInsets are measured against the whole viewport, not just the frame body
+				top: headerIsFixed ? safeAreaInsets.top : 0,
+				bottom: footerIsFixed ? safeAreaInsets.bottom : 0,
+			}, containerInsets, {
+				top: headerIsFixed ? frameHeaderHeight + bodyHeaderHeight : bodyHeaderHeight,
+				bottom: footerIsFixed ? frameFooterHeight + bodyFooterHeight : bodyFooterHeight,
 			}),
-		[safeAreaInsets, containerInsets, headerIsFixed, headerHeight, footerIsFixed, footerHeight],
+		[safeAreaInsets, containerInsets, headerIsFixed, frameHeaderHeight, bodyHeaderHeight, footerIsFixed, frameFooterHeight, bodyFooterHeight],
 	)
 
 	return (
@@ -64,9 +77,9 @@ export const Frame: FrameComponentType = memo(forwardRef(<C extends ElementType 
 			as={as}
 			ref={composeRef}
 			className={classNameFor(null, className)}
-			data-header-has-height={dataAttribute((headerHeight ?? 0) > 0)}
+			data-header-has-height={dataAttribute((frameHeaderHeight ?? 0) > 0)}
 			data-header-is-fixed={dataAttribute(headerIsFixed)}
-			data-footer-has-height={dataAttribute((footerHeight ?? 0) > 0)}
+			data-footer-has-height={dataAttribute((frameFooterHeight ?? 0) > 0)}
 			data-footer-is-fixed={dataAttribute(footerIsFixed)}
 			showDataState={false}
 			{...rest}
@@ -74,15 +87,15 @@ export const Frame: FrameComponentType = memo(forwardRef(<C extends ElementType 
 			<LayoutPrimitives.ResponsiveContainer
 				style={
 					{
-						'--header-height': `${px(headerHeight)}`,
-						'--footer-height': `${px(footerHeight)}`,
+						'--header-height': `${px(frameHeaderHeight)}`,
+						'--footer-height': `${px(frameFooterHeight)}`,
 					} as CSSProperties
 				}
 				className={classNameFor('container')}
 			>
 				{header && (
 					<InsetsProvider
-						ref={layoutHeaderRef}
+						ref={frameHeaderRef}
 						className={classNameFor('header', headerClassName)}
 						bottom={0}
 						left={headerInsets.left}
@@ -93,19 +106,25 @@ export const Frame: FrameComponentType = memo(forwardRef(<C extends ElementType 
 					</InsetsProvider>
 				)}
 
-				<InsetsProvider
-					className={classNameFor('body')}
-					bottom={bodyInsets.bottom}
-					left={bodyInsets.left}
-					right={bodyInsets.right}
-					top={bodyInsets.top}
-				>
-					{children}
-				</InsetsProvider>
+				<div className={classNameFor('body')}>
+					{bodyHeader && <div ref={bodyHeaderRef} className={classNameFor('body-header')}>{bodyHeader}</div>}
+					{children && (
+						<InsetsProvider
+							className={classNameFor('body-content')}
+							bottom={bodyInsets.bottom}
+							left={bodyInsets.left}
+							right={bodyInsets.right}
+							top={bodyInsets.top}
+						>
+							{children}
+						</InsetsProvider>
+					)}
+					{bodyFooter && <div ref={bodyFooterRef} className={classNameFor('body-footer')}>{bodyFooter}</div>}
+				</div>
 
 				{footer && (
 					<InsetsProvider
-						ref={layoutFooterRef}
+						ref={frameFooterRef}
 						className={classNameFor('footer', footerClassName)}
 						bottom={footerInsets.bottom}
 						left={footerInsets.left}

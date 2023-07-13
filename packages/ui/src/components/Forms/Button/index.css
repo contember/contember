@@ -1,13 +1,12 @@
 :where(.cui-button) {
-	--cui-button-box-shadow-light-edge: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
 	--cui-button-box-shadow-dark-edge-bottom: inset 0 -2px 0 -1px rgba(0, 0, 0, 0.1);
 	--cui-button-box-shadow-dark-edge-top: inset 0 1px 0 1px rgba(0, 0, 0, 0.025);
 	--cui-button-box-shadow-shadow-below: 0 0 1px rgba(0, 0, 0, 0.1), 0 1px 0.5em rgba(0, 0, 0, 0.1);
 	--cui-button-box-shadow-highlighted: inset 0 -0.5em 2em -1em rgba(0, 0, 0, 0.1);
 	--cui-button-box-shadow-pressed: inset 0 0 1px rgba(0, 0, 0, 0.1);
-	--cui-button-box-shadow: var(--cui-button-box-shadow-shadow-below), var(--cui-button-box-shadow-light-edge), var(--cui-button-box-shadow-dark-edge-bottom);
-	--cui-button-box-shadow--highlighted: var(--cui-button-box-shadow-shadow-below), var(--cui-button-box-shadow-highlighted), var(--cui-button-box-shadow-light-edge), var(--cui-button-box-shadow-dark-edge-bottom);
-	--cui-button-box-shadow--pressed: var(--cui-button-box-shadow-dark-edge-top), var(--cui-button-box-shadow-pressed), var(--cui-button-box-shadow-light-edge);
+	--cui-button-box-shadow: var(--cui-button-box-shadow-shadow-below), var(--cui-button-box-shadow-dark-edge-bottom);
+	--cui-button-box-shadow--highlighted: var(--cui-button-box-shadow-shadow-below), var(--cui-button-box-shadow-highlighted), var(--cui-button-box-shadow-dark-edge-bottom);
+	--cui-button-box-shadow--pressed: var(--cui-button-box-shadow-dark-edge-top), var(--cui-button-box-shadow-pressed);
 	--cui-button-color: var(--cui-filled-control-color);
 	--cui-button-color--highlighted: var(--cui-filled-control-color--highlighted);
 	--cui-button-color--disabled: var(--cui-color--medium);

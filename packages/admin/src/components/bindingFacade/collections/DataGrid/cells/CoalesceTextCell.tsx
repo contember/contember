@@ -54,7 +54,7 @@ export const CoalesceTextCell: FC<CoalesceTextCellProps> = Component(props => {
 			}}
 			filterRenderer={props => {
 				return (
-					<Stack direction="horizontal">
+					<Stack direction="horizontal" align="center">
 						<GenericTextCellFilter {...props} />
 					</Stack>
 				)

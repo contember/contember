@@ -6,7 +6,8 @@
 	--cui-transition-duration--slowest: 800ms;
 	--cui-font-family: Inter, "system-ui";
 	--cui-line-height: 1.5;
-	--cui-font-size-body: 15px;
+	--cui-font-size-body--px: 15;
+	--cui-font-size-body: calc(var(--cui-font-size-body--px) * 1px);
 	--cui-font-size-heading: 1.125em;
 	--cui-font-size-text: 1em;
 	--cui-font-size-label: 0.875em;

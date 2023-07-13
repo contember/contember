@@ -1,6 +1,5 @@
 import { MultiEditScope, NavigateBackLink, PersistButton, TextField } from '@contember/admin'
-import { Title } from '../../components/Directives'
-import { SlotSources } from '../../components/Slots'
+import { SlotSources, Title } from '../../components/Slots'
 
 export default () => (
 	<>

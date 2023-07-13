@@ -2086,6 +2086,8 @@ export const PortalProviderContext: Context<MutableRefObject<HTMLDivElement>>;
 export interface PortalProviderProps {
     // (undocumented)
     children: ReactNode;
+    // (undocumented)
+    id?: string;
 }
 
 // @public (undocumented)
@@ -2411,10 +2413,12 @@ export type SlugInputProps = TextInputProps & {
 };
 
 // @public (undocumented)
-export const Spacer: MemoExoticComponent<({ className, gap, ...rest }: SpacerProps) => JSX.Element>;
+export const Spacer: MemoExoticComponent<({ className, gap, grow, shrink, ...rest }: SpacerProps) => JSX.Element>;
 
 // @public (undocumented)
 export type SpacerProps = {
+    shrink?: boolean;
+    grow?: boolean;
     gap?: Size | 'xlarge' | 'none';
 } & Omit<HTMLDivElementProps, 'ref'>;
 

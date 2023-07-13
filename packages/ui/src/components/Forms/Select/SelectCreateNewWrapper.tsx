@@ -1,6 +1,6 @@
 import { useClassNameFactory } from '@contember/react-utils'
+import { PlusIcon } from 'lucide-react'
 import { ReactNode } from 'react'
-import { Icon } from '../../Icon'
 import { Button } from '../Button'
 
 export interface SelectCreateNewWrapperProps {
@@ -21,7 +21,7 @@ export const SelectCreateNewWrapper = ({ onClick, children }: SelectCreateNewWra
 				{children}
 			</div>
 			<div className={componentClassName('button')}>
-				<Button onClick={onClick} elevation="none" intent="default"><Icon blueprintIcon="plus" /></Button>
+				<Button flow="squarish" onClick={onClick} elevation="none" intent="default"><PlusIcon /></Button>
 			</div>
 		</div>
 	)

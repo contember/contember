@@ -91,7 +91,7 @@ export function screenInsetsToCSSCustomProperties<
 	T extends Readonly<Record<string, number | null>>,
 	>(value: T, prefix: P): ScreenInsetsToCSSCustomProperties<P, T> {
 	assert('prefix is CSS custom property prefix', prefix, isCSSPrefix)
-	const onPrefix = `--${prefix.slice(1)}-on`
+	const onPrefix = `${prefix}-on`
 
 	const entries = [] as Array<[string, string]>
 

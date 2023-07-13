@@ -1,6 +1,5 @@
 import { EditScope, NavigateBackLink } from '@contember/admin'
-import { Title } from '../components/Directives'
-import { SlotSources } from '../components/Slots'
+import { SlotSources, Title } from '../components/Slots'
 
 export default () => (
 	<EditScope entity="UploadShowcase(unique = One)" setOnCreate="(unique = One)">

@@ -29,7 +29,7 @@ export function DataGridColumnHiding({
 
 	return (
 		<Dropdown
-			alignment="end"
+			alignment="center"
 			buttonProps={buttonProps}
 		>
 			<Box heading={formatMessage('dataGrid.columnHiding.heading')}>

@@ -1,4 +1,4 @@
-import { Title } from '../components/Directives'
+import { Title } from '../components/Slots'
 
 export default (
 	<>

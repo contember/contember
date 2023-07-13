@@ -88,7 +88,7 @@ export const NumberCell: FunctionComponent<NumberCellProps> = Component(props =>
 					]
 				return (
 					<>
-						<Stack direction="horizontal">
+						<Stack direction="horizontal" align="center">
 							<Select
 								notNull
 								value={filter.mode}

@@ -11,6 +11,13 @@
 	appearance: none;
 }
 
+:where(.cui-toggle-sidebar-button) {
+	opacity: var(--cui-opacity--medium);
+}
+:where(.cui-toggle-sidebar-button:hover) {
+	opacity: var(--cui-opacity--strong);
+}
+
 :where(
 	.cui-toggle-sidebar-button,
 	.cui-toggle-menu.view-seamless,

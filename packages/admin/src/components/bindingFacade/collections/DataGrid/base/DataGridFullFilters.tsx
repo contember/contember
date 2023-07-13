@@ -109,7 +109,6 @@ export function DataGridFullFilters({
 												}}
 												distinction="seamless"
 												size="small"
-												bland
 											>
 												<Icon blueprintIcon="trash" size="small" />
 											</Button>

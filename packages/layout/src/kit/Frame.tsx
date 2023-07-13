@@ -60,7 +60,12 @@ export const Frame: FrameComponentType = memo(forwardRef(<C extends ElementType 
 
 	const bodyInsets = useMemo(
 		() =>
-			combineElementInsets(safeAreaInsets, containerInsets, {
+			combineElementInsets({
+				...safeAreaInsets,
+				// TODO: containerInsets are measured against the whole viewport, not just the frame body
+				top: headerIsFixed ? safeAreaInsets.top : 0,
+				bottom: footerIsFixed ? safeAreaInsets.bottom : 0,
+			}, containerInsets, {
 				top: headerIsFixed ? frameHeaderHeight + bodyHeaderHeight : bodyHeaderHeight,
 				bottom: footerIsFixed ? frameFooterHeight + bodyFooterHeight : bodyFooterHeight,
 			}),

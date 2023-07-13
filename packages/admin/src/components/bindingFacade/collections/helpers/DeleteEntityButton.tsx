@@ -9,7 +9,7 @@ const defaultProps: ButtonOwnProps = {
 	size: 'small',
 	flow: 'circular',
 	distinction: 'seamless',
-	bland: true,
+	bland: false,
 }
 
 export type DeleteEntityButtonProps =

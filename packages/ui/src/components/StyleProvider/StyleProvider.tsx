@@ -11,6 +11,7 @@ export type StyleProviderProps = {
 	themeContent?: Intent;
 	themeControls?: Intent;
 	transparent?: boolean;
+	suppressFocusRing?: boolean;
 }
 
 const initialValues: NonOptional<StyleProviderProps> = {
@@ -20,6 +21,7 @@ const initialValues: NonOptional<StyleProviderProps> = {
 	themeContent: 'default',
 	themeControls: 'primary',
 	transparent: true,
+	suppressFocusRing: true,
 }
 
 export const StyleProvider = ({ children, ...props }: PropsWithChildren<StyleProviderProps>) => {

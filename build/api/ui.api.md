@@ -2493,6 +2493,7 @@ export type StyleProviderProps = {
     themeContent?: Intent;
     themeControls?: Intent;
     transparent?: boolean;
+    suppressFocusRing?: boolean;
 };
 
 // @public (undocumented)

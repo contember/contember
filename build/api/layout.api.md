@@ -21,7 +21,6 @@ import { NestedClassName } from '@contember/utilities';
 import { PascalCase } from '@contember/utilities';
 import { PolymorphicComponentPropsWithRef } from '@contember/utilities';
 import { Predicate } from '@contember/utilities';
-import { PropsWithRequiredChildren } from '@contember/react-utils';
 import { default as React_2 } from 'react';
 import { ReactElement } from 'react';
 import { ReactNode } from 'react';
@@ -313,9 +312,6 @@ function createSlotTargetComponent<T extends string>(name: T, displayName?: stri
 };
 
 // @public (undocumented)
-function createTargetsIfActiveComponent<K extends PascalCase<string>>(slotsMap: Record<K, ReturnType<typeof createSlotTargetComponent>>): NamedExoticComponent<IfActiveProps<K>>;
-
-// @public (undocumented)
 export function diffContainerInsetsFromElementRects(outerRect: ElementRect, innerRect: ElementRect): ContainerInsets;
 
 // @public (undocumented)
@@ -502,18 +498,6 @@ export const HeaderSlotTargets: Readonly<Readonly<{
 }>>;
 
 // @public (undocumented)
-const IfActive: NamedExoticComponent<IfActiveProps<string>>;
-
-// @public (undocumented)
-type IfActiveProps<K extends string = string> = {
-    children: ReactNode;
-    slots: K[];
-} | {
-    children?: never;
-    slots: K[];
-};
-
-// @public (undocumented)
 export const InsetsConsumer: InsetsConsumerComponentType;
 
 // @public (undocumented)
@@ -558,7 +542,6 @@ export const LayoutKit: {
     Header: BarComponentType;
     SidebarLeft: SidebarComponentType;
     SidebarRight: SidebarComponentType;
-    SidebarResponsive: SidebarComponentType;
     ToggleMenuButton: NamedExoticComponent<ToggleMenuButtonProps>;
     ToggleSidebarButton: NamedExoticComponent<ToggleSidebarButtonProps>;
 };
@@ -1090,15 +1073,10 @@ type SlotComponentsRecords<K extends string> = Readonly<{
 
 declare namespace Slots {
     export {
-        createTargetsIfActiveComponent,
-        IfActiveProps,
-        IfActive,
         Provider_2 as Provider,
         Source,
         OwnTargetContainerProps,
         Target,
-        wrapSlotWithStack,
-        useRenderToSlotPortalContext,
         useHasActiveSlotsFactory,
         useTargetsIfActiveFactory,
         SlotsRefMap,
@@ -1260,9 +1238,6 @@ const usePortalsRegistryContext: () => RenderToSlotPortalContextType;
 // @public (undocumented)
 const useRegistryContext: () => RegistryContextType<Record<string, unknown>>;
 
-// @public @deprecated (undocumented)
-const useRenderToSlotPortalContext: () => RenderToSlotPortalContextType;
-
 // @public (undocumented)
 export const useSafeAreaInsetsContext: () => ContainerInsets;
 
@@ -1276,9 +1251,6 @@ children?: ReactNode;
 
 // @public (undocumented)
 const useTargetsRegistryContext: () => SlotTargetsRegistryContextType;
-
-// @public @deprecated (undocumented)
-function wrapSlotWithStack<C extends ComponentType<PropsWithRequiredChildren>>(Component: C): NamedExoticComponent<Partial<StackOwnProps>>;
 
 // @public (undocumented)
 export const zeroInsets: ContainerInsets;

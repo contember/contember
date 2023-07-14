@@ -37,11 +37,6 @@ export const LayoutKit = {
 		defaultAs: 'aside',
 		displayName: 'SidebarRight',
 	}),
-	SidebarResponsive: createLayoutSidebarComponent({
-		name: 'sidebar-responsive',
-		defaultAs: 'aside',
-		displayName: 'SidebarResponsive',
-	}),
 	ToggleMenuButton,
 	ToggleSidebarButton,
 }

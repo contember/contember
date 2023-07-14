@@ -24,5 +24,8 @@ export const initialDirectives: DirectivesType = Object.freeze({
 	'safe-area-insets': 20,
 })
 
-export const Directive = Directives.Directive as unknown as Directives.DirectiveComponentType<DirectivesType> // <DirectivesType>
+// Local export with current DirectivesType specific to the project
+export const Directive = Directives.Directive as unknown as Directives.DirectiveComponentType<DirectivesType>
+
+// Local export with current DirectivesType specific to the project
 export const useDirectives = Directives.useDirectives<DirectivesType>

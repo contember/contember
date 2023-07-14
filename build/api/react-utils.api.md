@@ -201,6 +201,11 @@ export function useExpectSameValueReference<T>(next: T, shouldThrow?: boolean): 
 // @public (undocumented)
 export const useForceRender: () => DispatchWithoutAction;
 
+// Warning: (tsdoc-malformed-html-name) Invalid HTML element: A space is not allowed here
+//
+// @internal
+export function useId(): string;
+
 // @public (undocumented)
 export const useIsMounted: () => MutableRefObject<boolean>;
 

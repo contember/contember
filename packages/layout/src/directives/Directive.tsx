@@ -1,5 +1,6 @@
+import { useId } from '@contember/react-utils'
 import { RequiredDeepPlainObject, assert, isNonEmptyTrimmedString } from '@contember/utilities'
-import { memo, useContext, useId, useLayoutEffect, useRef } from 'react'
+import { memo, useContext, useLayoutEffect, useRef } from 'react'
 import { RegistryContext } from './contexts'
 
 export type DirectiveProps<T> = { [K in keyof T]: { name: K, content: T[K] } }[keyof T]

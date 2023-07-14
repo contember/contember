@@ -1,6 +1,6 @@
-import { useClassName } from '@contember/react-utils'
+import { useClassName, useId } from '@contember/react-utils'
 import { assert, dataAttribute, isNonEmptyTrimmedString } from '@contember/utilities'
-import { memo, useId, useLayoutEffect, useRef } from 'react'
+import { memo, useLayoutEffect, useRef } from 'react'
 import slugify from 'slugify'
 import { useActiveSlotPortalsContext, useTargetsRegistryContext } from './contexts'
 import { TargetProps } from './types'

@@ -1,4 +1,4 @@
-import { ReactNode, memo, useContext, useId, useRef } from 'react'
+import { ReactNode, memo, useContext, useRef } from 'react'
 import { Portal } from './Portal'
 import { DEFAULT_PORTAL_ROOT_ID } from './constants'
 import { PortalProviderContext, usePortalProvider } from './contexts'

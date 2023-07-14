@@ -7,6 +7,8 @@ import {
 	FooterSlotTargets,
 	HeaderSlotSources,
 	HeaderSlotTargets,
+	// When you define new slots, you need import:
+	// Slots,
 	commonSlots,
 	contentSlots,
 	footerSlots,
@@ -21,7 +23,7 @@ export const slots = [
 	...headerSlots,
 	...footerSlots,
 	// Your custom slot names will come here, e.g:
-	// MySLot: 'my-slot',
+	// 'MySlot',
 ]
 
 export const SlotSources = {
@@ -30,7 +32,7 @@ export const SlotSources = {
 	...HeaderSlotSources,
 	...FooterSlotSources,
 	// Your custom slots will come here, e.g:
-	// MySLot: Slots.createPortalComponent(slotTargets.MySLot),
+	// MySLot: Slots.createSlotSourceComponent('MySlot'),
 }
 
 export const SlotTargets = {
@@ -39,7 +41,7 @@ export const SlotTargets = {
 	...HeaderSlotTargets,
 	...FooterSlotTargets,
 	// Your custom slot targets will come here, e.g:
-	// MySLot: Slots.createTargetComponent(slotTargets.MySLot),
+	// MySLot: Slots.createSlotTargetComponent('MySlot'),
 }
 
 export const Title = memo<{ children: string | null | undefined }>(({ children }) => {

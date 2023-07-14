@@ -1,4 +1,5 @@
 import { useClassNameFactory, useSessionStorageState } from '@contember/react-utils'
+import { stateDataAttributes } from '@contember/utilities'
 import { SyntheticEvent, useCallback, useContext, useEffect, useMemo, useRef } from 'react'
 import { useNavigationLink } from '../../Navigation'
 import { randomId } from '../../auxiliary'
@@ -20,7 +21,7 @@ import { useMenuId } from './useMenuId'
 export function MenuItem<T = unknown>({ children, componentClassName = 'menu', ...props }: MenuItemProps<T>) {
 	const depth = useContext(DepthContext)
 
-	const { isActive, href, navigate } = useNavigationLink(props.to, props.href)
+	const { isActive: active, href, navigate } = useNavigationLink(props.to, props.href)
 
 	const id = useRef(`cui-menu-id-${randomId()}`)
 	const label = useChildrenAsLabel(props.title)
@@ -40,19 +41,17 @@ export function MenuItem<T = unknown>({ children, componentClassName = 'menu', .
 			return
 		}
 
-		if (isActive) {
+		if (active) {
 			expandParent()
 		}
 
 		parentExpandedOnce.current = true
-	}, [isActive, href, expandParent])
+	}, [active, href, expandParent])
 
-	const hasSubItems = !!children
-	const isInteractive = hasSubItems //&& depth > 0
-
+	const expandable = !!children
 	const activeMenuItem = useActiveMenuItemContext()
 
-	const tabIndex = (depth >= 0 && hasSubItems) || href
+	const tabIndex = (depth >= 0 && expandable) || href
 		? parentIsExpanded
 			? !activeMenuItem || activeMenuItem === listItemRef.current ? TAB_INDEX_FOCUSABLE : TAB_INDEX_TEMPORARY_UNFOCUSABLE
 			: TAB_INDEX_NEVER_FOCUSABLE
@@ -67,7 +66,7 @@ export function MenuItem<T = unknown>({ children, componentClassName = 'menu', .
 	const preventMenuClose = usePreventCloseContext()
 
 	const changeExpand = useCallback((nextExpanded: boolean) => {
-		if (!isInteractive) {
+		if (!expandable) {
 			return
 		}
 
@@ -76,14 +75,14 @@ export function MenuItem<T = unknown>({ children, componentClassName = 'menu', .
 		}
 
 		setExpanded(nextExpanded)
-	}, [isInteractive, setExpanded])
+	}, [expandable, setExpanded])
 
 	const onLabelClick = useCallback((event: SyntheticEvent) => {
 		if (event.defaultPrevented) {
 			return
 		}
 
-		if (isInteractive && !expanded) {
+		if (expandable && !expanded) {
 			preventMenuClose()
 		}
 
@@ -97,32 +96,32 @@ export function MenuItem<T = unknown>({ children, componentClassName = 'menu', .
 		listItemRef.current?.focus()
 
 		event.preventDefault()
-	}, [expanded, changeExpand, isInteractive, navigate, preventMenuClose])
+	}, [expanded, changeExpand, expandable, navigate, preventMenuClose])
 
 	const onNeverFocusableClick = useCallback((event: SyntheticEvent) => {
 		event.preventDefault()
 		changeExpand(!expanded)
 	}, [changeExpand, expanded])
 
-	const onKeyPress = useKeyNavigation({ changeExpand, expanded, depth, isInteractive, listItemRef, onClick: onLabelClick })
+	const onKeyPress = useKeyNavigation({ changeExpand, expanded, depth, isInteractive: expandable, listItemRef, onClick: onLabelClick })
 
 	const submenuClassName = className('list', [
-		hasSubItems && (expanded ? 'is-expanded' : 'is-collapsed'),
+		expandable && (expanded ? 'is-expanded' : 'is-collapsed'),
 	])
 
 	const submenu = useMemo(
 		() => {
 			const ul = children && (
 				<ul
-					id={isInteractive ? id.current : undefined}
+					id={expandable ? id.current : undefined}
 					className={submenuClassName}
 				>
 					{children}
 				</ul>
 			)
-			return isInteractive ? <Collapsible expanded={expanded}>{ul}</Collapsible> : ul
+			return expandable ? <Collapsible expanded={expanded}>{ul}</Collapsible> : ul
 		},
-		[children, expanded, isInteractive, submenuClassName],
+		[children, expanded, expandable, submenuClassName],
 	)
 
 	const warnAboutA11YIssues = import.meta.env.DEV && depth !== 0
@@ -131,12 +130,12 @@ export function MenuItem<T = unknown>({ children, componentClassName = 'menu', .
 		console.warn('Accessibility issue: All submenu items should provide a title.')
 	}
 
-	const interactiveProps = useMemo(() => isInteractive ? {
+	const interactiveProps = useMemo(() => expandable ? {
 		'id': menuItemId,
 		'aria-haspopup': true,
 		'aria-controls': id.current,
 		'aria-expanded': expanded,
-	} : undefined, [expanded, isInteractive, menuItemId])
+	} : undefined, [expanded, expandable, menuItemId])
 
 	return (
 		<DepthContext.Provider value={depth + 1}>
@@ -150,12 +149,13 @@ export function MenuItem<T = unknown>({ children, componentClassName = 'menu', .
 				<li
 					ref={listItemRef}
 					{...interactiveProps}
+					{...stateDataAttributes({
+						active,
+						expandable,
+						focusable: tabIndex !== TAB_INDEX_NEVER_FOCUSABLE,
+					})}
 					aria-label={label}
-					className={className(null, [
-						hasSubItems && (expanded ? 'is-expanded' : 'is-collapsed'),
-						toStateClass('interactive', isInteractive),
-						toStateClass('active', isActive),
-					])}
+					className={className()}
 					onKeyDown={onKeyPress}
 					tabIndex={tabIndex}
 					aria-disabled={tabIndex === TAB_INDEX_NEVER_FOCUSABLE}
@@ -166,7 +166,7 @@ export function MenuItem<T = unknown>({ children, componentClassName = 'menu', .
 								className={className('title-content')}
 								external={props.external}
 								href={href}
-								isActive={isActive}
+								isActive={active}
 								onClick={onLabelClick}
 								suppressTo={expanded}
 							>
@@ -180,13 +180,13 @@ export function MenuItem<T = unknown>({ children, componentClassName = 'menu', .
 							</span>
 						}
 
-						{isInteractive && (
+						{expandable && (
 							<MenuExpandToggle
 								checked={expanded}
 								controls={id.current}
 								// TODO: Needs translation
 								label={`More ${label}`}
-								disabled={!isInteractive}
+								disabled={!expandable}
 								onChange={changeExpand}
 							/>
 						)}

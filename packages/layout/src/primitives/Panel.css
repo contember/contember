@@ -24,6 +24,10 @@
 	transition-timing-function: ease-in;
 }
 
+:where([data-suppress-focus-ring] .cui-layout-panel) {
+	outline: none;
+}
+
 :where(.cui-layout-panel > .cui-layout-panel-content) {
 	scroll-padding-bottom: var(--panel-footer-height);
 	scroll-padding-top: var(--panel-header-height);

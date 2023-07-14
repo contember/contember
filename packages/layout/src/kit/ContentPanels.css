@@ -16,7 +16,7 @@
 	margin: auto;
 	max-width: var(--panel-max-width);
 	min-width: min(
-		calc(100% - 2 * var(--cui-box-padding-horizontal)),
+		calc(100% - 2 * var(--cui-panel-padding-horizontal)),
 		var(--panel-min-width),
 	);
 	width: 100%;

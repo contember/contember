@@ -2,10 +2,10 @@
 	display: flex;
 	flex-direction: column;
 	flex: 1;
-	padding-bottom: max(var(--inset-bottom, 0px), var(--cui-box-padding-vertical));
-	padding-left: max(var(--inset-left, 0px), var(--cui-box-padding-horizontal));
-	padding-right: max(var(--inset-right, 0px), var(--cui-box-padding-horizontal));
-	padding-top: max(var(--inset-top, 0px), var(--cui-box-padding-vertical));
+	padding-bottom: max(var(--inset-bottom, 0px), var(--cui-panel-padding-vertical));
+	padding-left: max(var(--inset-left, 0px), var(--cui-panel-padding-horizontal));
+	padding-right: max(var(--inset-right, 0px), var(--cui-panel-padding-horizontal));
+	padding-top: max(var(--inset-top, 0px), var(--cui-panel-padding-vertical));
 	transition-property: transform, opacity;
 	transition-timing-function: ease-in;
 	transition-duration: var(--cui-transition-duration);

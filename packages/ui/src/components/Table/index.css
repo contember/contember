@@ -31,6 +31,16 @@
 	font-size: 1.3em;
 }
 
+:where(.cui-table-container) {
+	margin-left: calc(-1 * max(var(--inset-left, 0px), var(--cui-padding)));
+	margin-right: calc(-1 * max(var(--inset-right, 0px), var(--cui-padding)));
+	overflow-x: auto;
+}
+:where(.cui-table-container > *) {
+	padding-left: max(var(--inset-left, 0px), var(--cui-padding));
+	padding-right: max(var(--inset-right, 0px), var(--cui-padding));
+}
+
 :where(.cui-table-wrapper) {
 	padding-bottom: 1px;
 	border-radius: var(--cui-control-border-radius, 0);

@@ -46,11 +46,11 @@
 	display: flex;
 	flex-direction: column;
 	flex-grow: 1;
-	margin: 0 var(--cui-box-padding-horizontal) 0 var(--cui-box-padding-horizontal);
+	margin: 0 var(--cui-panel-padding-horizontal) 0 var(--cui-panel-padding-horizontal);
 	max-height: 100%;
 	overflow: hidden;
 	position: relative;
-	width: min(calc(100vw - 2 * var(--cui-box-padding-horizontal)), 80rem);
+	width: min(calc(100vw - 2 * var(--cui-panel-padding-horizontal)), 80rem);
 }
 :where([data-has-modals] .cui-layout-frame-body > .cui-divider) {
 	display: none;

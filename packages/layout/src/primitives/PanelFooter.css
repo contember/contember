@@ -5,10 +5,10 @@
 	background-image: linear-gradient(transparent, rgb(var(--cui-background-color-rgb)));
 	bottom: 0;
 	left: 0;
-	padding-bottom: max(var(--inset-bottom, 0px), var(--cui-box-padding-vertical));
-	padding-left: max(var(--inset-left, 0px), var(--cui-box-padding-horizontal));
-	padding-right: max(var(--inset-right, 0px), var(--cui-box-padding-horizontal));
-	padding-top: max(var(--inset-top, 0px), var(--cui-box-padding-vertical));
+	padding-bottom: max(var(--inset-bottom, 0px), var(--cui-panel-padding-vertical));
+	padding-left: max(var(--inset-left, 0px), var(--cui-panel-padding-horizontal));
+	padding-right: max(var(--inset-right, 0px), var(--cui-panel-padding-horizontal));
+	padding-top: max(var(--inset-top, 0px), var(--cui-panel-padding-vertical));
 	position: sticky;
 	width: 100%;
 	z-index: 1;
@@ -22,7 +22,7 @@
 }
 
 :where(.cui-layout-panel-footer):empty {
-	--cui-box-padding-vertical: 0px;
-	--cui-box-padding-horizontal: 0px;
+	--cui-panel-padding-vertical: 0px;
+	--cui-panel-padding-horizontal: 0px;
 	padding-top: 0;
 }

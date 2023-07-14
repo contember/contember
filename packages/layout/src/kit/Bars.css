@@ -24,10 +24,10 @@
 ) {
 	display: flex;
 	gap: var(--cui-gutter);
-	padding-bottom: max(var(--inset-bottom, 0px), var(--cui-box-padding-vertical));
-	padding-left: max(var(--inset-left, 0px), var(--cui-box-padding-horizontal));
-	padding-right: max(var(--inset-right, 0px), var(--cui-box-padding-horizontal));
-	padding-top: max(var(--inset-top, 0px), var(--cui-box-padding-vertical));
+	padding-bottom: max(var(--inset-bottom, 0px), var(--cui-panel-padding-vertical));
+	padding-left: max(var(--inset-left, 0px), var(--cui-panel-padding-horizontal));
+	padding-right: max(var(--inset-right, 0px), var(--cui-panel-padding-horizontal));
+	padding-top: max(var(--inset-top, 0px), var(--cui-panel-padding-vertical));
 }
 
 :where(

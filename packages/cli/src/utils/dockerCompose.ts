@@ -1,4 +1,4 @@
-import { join } from 'node:path'
+import { join, dirname } from 'node:path'
 import { pathExists } from '@contember/cli-common'
 import { JsonUpdateCallback, updateYaml } from './yaml'
 import jsyaml from 'js-yaml'
@@ -38,7 +38,10 @@ export const resolveMainDockerComposeConfig = async (dir: string): Promise<strin
 export const tryReadMainDockerComposeConfig = async (dir: string): Promise<DockerComposeConfig | null> => {
 	const path = await resolveMainDockerComposeConfig(dir)
 	if (!path) {
-		return null
+		if (dir === '/') {
+			return null
+		}
+		return await tryReadMainDockerComposeConfig(dirname(dir))
 	}
 	return jsyaml.load(await fs.readFile(path, 'utf8')) as DockerComposeConfig
 }

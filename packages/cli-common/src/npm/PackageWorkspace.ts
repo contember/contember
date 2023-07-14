@@ -103,24 +103,39 @@ export class PackageWorkspaceResolver {
 	) {
 	}
 
-	public async resolve(dir: string): Promise<PackageWorkspace> {
+	public async resolve(dir: string, packageJsonFound: boolean = false): Promise<PackageWorkspace> {
 		const packageJson = await this.fsManager.tryReadJson<PackageJson>(join(dir, 'package.json'))
 		if (!packageJson) {
-			throw `package.json not found.`
+			if (dir === '/') {
+				if (packageJsonFound) {
+					throw `No lockfile found. Please install dependencies using package manager of your choice.`
+				} else {
+					throw `package.json not found.`
+				}
+			}
+			return await this.resolve(dirname(dir), packageJsonFound)
 		}
+
 		const pm = await this.resolvePackageManager({ dir, packageJson })
+		if (!pm) {
+			if (dir === '/') {
+				throw `No lockfile found. Please install dependencies using package manager of your choice.`
+			}
+			return await this.resolve(dirname(dir), true)
+		}
+
 		const rootPackage = new Package(dir, true, packageJson)
 		const workspacePackages = await pm.readWorkspacePackages({ dir, packageJson })
 
 		return new PackageWorkspace(pm, this.fsManager, rootPackage, workspacePackages)
 	}
 
-	private async resolvePackageManager(args: { dir: string; packageJson: PackageJson }): Promise<PackageManager> {
+	private async resolvePackageManager(args: { dir: string; packageJson: PackageJson }): Promise<PackageManager | null> {
 		for (const pm of this.packageManagers) {
 			if (await pm.isActive(args)) {
 				return pm
 			}
 		}
-		throw `No lockfile found. Please install dependencies using package manager of your choice.`
+		return null
 	}
 }

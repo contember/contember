@@ -166,7 +166,7 @@ describe('webhook handler', () => {
 				return Promise.resolve({
 					ok: true,
 					headers: new Headers([['content-type', 'application/json']]),
-					responseText: `{"events": []}`,
+					responseText: `{"failures": [{}]}`,
 					status: 200,
 					statusText: 'OK',
 				})
@@ -196,8 +196,8 @@ describe('webhook handler', () => {
 					ok: false,
 					code: 200,
 					durationMs: -1,
-					errorMessage: 'Invalid response: value at path /failures: must be array, undefined given',
-					response: '{"events": []}',
+					errorMessage: 'Invalid response: value at path /failures/0/eventId: must be string, undefined given',
+					response: '{"failures": [{}]}',
 				},
 			},
 			{
@@ -207,13 +207,70 @@ describe('webhook handler', () => {
 					ok: false,
 					code: 200,
 					durationMs: -1,
-					errorMessage: 'Invalid response: value at path /failures: must be array, undefined given',
-					response: '{"events": []}',
+					errorMessage: 'Invalid response: value at path /failures/0/eventId: must be string, undefined given',
+					response: '{"failures": [{}]}',
 				},
 			},
 		])
 	})
 
+
+	test('ignored invalid response', async () => {
+		const testLoggerHandler = new TestLoggerHandler()
+		const logger = createLogger(testLoggerHandler)
+
+		let fetchCalled = false
+		const webhookHandler = new WebhookTargetHandler({
+			fetch(url: string, init: RequestInit): Promise<FetcherResponse> {
+				fetchCalled = true
+				assert.equal(url, 'http://localhost')
+
+				return Promise.resolve({
+					ok: true,
+					headers: new Headers([['content-type', 'application/json']]),
+					responseText: `{"success": true}`,
+					status: 200,
+					statusText: 'OK',
+				})
+			},
+		})
+
+		const target: Actions.AnyTarget = {
+			name: 'test_target',
+			type: 'webhook',
+			url: 'http://localhost',
+		}
+
+		const event1 = createTestEvent(0)
+		const event2 = createTestEvent(1)
+		const result = await webhookHandler.handle({
+			logger,
+			target: target,
+			events: [event1, event2],
+			variables: {},
+		})
+		assert.equal(fetchCalled, true)
+		assert.deepStrictEqual(dropDuration(result), [
+			{
+				row: event1,
+				target,
+				result: {
+					ok: true,
+					code: 200,
+					durationMs: -1,
+				},
+			},
+			{
+				row: event2,
+				target,
+				result: {
+					ok: true,
+					code: 200,
+					durationMs: -1,
+				},
+			},
+		])
+	})
 
 	test('partially successful response', async () => {
 		const testLoggerHandler = new TestLoggerHandler()

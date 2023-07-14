@@ -83,7 +83,14 @@ export class WebhookTargetHandler implements InvokeHandler<Actions.WebhookTarget
 		}
 
 		try {
-			const responseData = ResponseType(JSON.parse(response.responseText))
+			const parsedJson = JSON.parse(response.responseText)
+			if (parsedJson === null || typeof parsedJson !== 'object' || !('failures' in parsedJson)) {
+				return () => ({
+					ok: true,
+					code: response.status,
+				})
+			}
+			const responseData = ResponseType(parsedJson)
 			const eventsInBatch = new Set(events.map(it => it.id))
 			const failedEvents = Object.fromEntries(responseData.failures?.map(it => [it.eventId, it]) ?? [])
 			const missingEvents =  Object.keys(failedEvents).filter(it => !eventsInBatch.has(it))

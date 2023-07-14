@@ -73,7 +73,9 @@ export class WebhookTargetHandler implements InvokeHandler<Actions.WebhookTarget
 			})
 		}
 
-		if (response.responseText.trim() === '') {
+		if (response.responseText.trim() === ''
+			|| !response.headers.get('content-type')?.toLowerCase().includes('json')
+		) {
 			return () => ({
 				ok: true,
 				code: response.status,

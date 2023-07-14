@@ -165,7 +165,7 @@ describe('webhook handler', () => {
 
 				return Promise.resolve({
 					ok: true,
-					headers: new Headers(),
+					headers: new Headers([['content-type', 'application/json']]),
 					responseText: `{"events": []}`,
 					status: 200,
 					statusText: 'OK',
@@ -227,7 +227,7 @@ describe('webhook handler', () => {
 
 				return Promise.resolve({
 					ok: true,
-					headers: new Headers(),
+					headers: new Headers([['content-type', 'application/json']]),
 					responseText: `{"failures": [{"eventId": "${testUuid(1)}", "error": "foo failure"}]}`,
 					status: 200,
 					statusText: 'OK',

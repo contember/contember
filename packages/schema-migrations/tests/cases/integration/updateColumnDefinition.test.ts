@@ -197,6 +197,7 @@ testMigrations('set not null and fill', {
 		}),
 	],
 	sql: SQL`
-UPDATE "author" SET "name" = $pga$unnamed$pga$ WHERE "name" IS NULL; 
+UPDATE "author" SET "name" = $pga$unnamed$pga$ WHERE "name" IS NULL;
+SET CONSTRAINTS ALL IMMEDIATE; SET CONSTRAINTS ALL DEFERRED;
 ALTER TABLE "author" ALTER "name" SET NOT NULL;`,
 })

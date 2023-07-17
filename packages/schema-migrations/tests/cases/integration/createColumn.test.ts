@@ -32,6 +32,7 @@ testMigrations('create a column with default value', {
 	],
 	sql: SQL`ALTER TABLE "author" ADD "name" text;
 UPDATE "author" SET "name" = $pga$unnamed author$pga$;
+SET CONSTRAINTS ALL IMMEDIATE; SET CONSTRAINTS ALL DEFERRED;
 ALTER TABLE "author" ALTER "name" SET NOT NULL;`,
 })
 
@@ -64,5 +65,6 @@ testMigrations('create a column with copy value', {
 	noDiff: true,
 	sql: SQL`ALTER TABLE "author" ADD "name" text;
 UPDATE "author" SET "name" = "email"::text;
+SET CONSTRAINTS ALL IMMEDIATE; SET CONSTRAINTS ALL DEFERRED;
 ALTER TABLE "author" ALTER "name" SET NOT NULL;`,
 })

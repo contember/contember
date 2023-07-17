@@ -27,6 +27,10 @@ export const fillSeed = ({ builder, fillValue, copyValue, entity, columnName, nu
 		throw new ImplementationException()
 	}
 
+	// event log uses deferred constraint triggers, we need to fire them before ALTER
+	builder.sql(`SET CONSTRAINTS ALL IMMEDIATE`)
+	builder.sql(`SET CONSTRAINTS ALL DEFERRED`)
+
 	if (!nullable) {
 		builder.alterColumn(entity.tableName, columnName, {
 			notNull: true,

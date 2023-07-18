@@ -28,7 +28,7 @@ export const UserListPage = <T extends {}>(props: UserListPageProps<T>) => {
 			<UsersList
 				project={project}
 				createRoleRenderer={roleRendererFactory}
-				editUserLink={props.editUserLink ?? `tenantEditUser(id: $id)`}
+				editUserLink={props.editUserLink ?? `tenantEditUser(id: $identityId)`}
 			/>
 		</LayoutPage>
 	)

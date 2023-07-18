@@ -1,9 +1,9 @@
 import { MultiEditScope, NavigateBackLink, PersistButton, TextField } from '@contember/admin'
-import { SlotSources, Title } from '../../components/Slots'
+import { SlotSources } from '../../components/Slots'
 
 export default () => (
 	<>
-		<Title>Languages</Title>
+		<SlotSources.Title>Languages</SlotSources.Title>
 		<SlotSources.Back><NavigateBackLink to="settings">Back</NavigateBackLink></SlotSources.Back>
 
 		<MultiEditScope entities="Locale" listProps={{ beforeContent: <SlotSources.Actions><PersistButton /></SlotSources.Actions> }}>

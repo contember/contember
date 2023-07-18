@@ -24,7 +24,7 @@ import {
 	UrlField,
 	useFieldControl,
 } from '@contember/admin'
-import { SlotSources, Title } from '../components/Slots'
+import { SlotSources } from '../components/Slots'
 
 export const JsonField = SimpleRelativeSingleField<TextareaFieldProps, string>(
 	(fieldMetadata, {
@@ -57,7 +57,7 @@ const extraDebugProps = SHOW_OVERRIDES ? {
 
 export default () => (
 	<EditScope entity="InputShowcase(unique = One)" setOnCreate="(unique = One)">
-		<Title>Inputs Showcase</Title>
+		<SlotSources.Title>Inputs Showcase</SlotSources.Title>
 		<SlotSources.Actions>
 			<PersistButton />
 		</SlotSources.Actions>

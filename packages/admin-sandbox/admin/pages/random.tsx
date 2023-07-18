@@ -1,4 +1,6 @@
-import { Title } from '../components/Slots'
+import { SlotSources } from '../components/Slots'
+
+const { Title } = SlotSources
 
 export const foo = <Title>Hello from Foo</Title>
 export const fooBar = <Title>Hello from Foo Bar</Title>

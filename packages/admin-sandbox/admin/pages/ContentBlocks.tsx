@@ -1,9 +1,9 @@
 import { Block, BlockRepeater, EditScope } from '@contember/admin'
-import { Title } from '../components/Slots'
+import { SlotSources } from '../components/Slots'
 
 export const ContentBlockPage = (
 	<EditScope entity="ContentBlockPage(unique = One)" setOnCreate="(unique = One)">
-		<Title>Edit Content Block</Title>
+		<SlotSources.Title>Edit Content Block</SlotSources.Title>
 		<BlockRepeater
 			field="blocks"
 			label="Block repeater"

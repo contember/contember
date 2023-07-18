@@ -1,13 +1,13 @@
 import { ContemberIdentitySvgProps, Identity2023 } from '@contember/brand'
 import { Stack } from '@contember/ui'
 import { FunctionComponent } from 'react'
-import { Title } from '../components/Slots'
+import { SlotSources } from '../components/Slots'
 
 const list = Identity2023 as Record<string, FunctionComponent<ContemberIdentitySvgProps>>
 
 export default (
 	<>
-		<Title>Brand</Title>
+		<SlotSources.Title>Brand</SlotSources.Title>
 
 		<Stack direction="vertical" gap="small" style={{ fontSize: '3em' }}>
 			{Object.keys(list).map(key => {

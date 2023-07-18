@@ -1,8 +1,8 @@
-import { Title } from '../components/Slots'
+import { SlotSources } from '../components/Slots'
 
 export default (
 	<>
-		<Title>Settings</Title>
+		<SlotSources.Title>Settings</SlotSources.Title>
 
 		<p>Say hi to settings</p>
 	</>

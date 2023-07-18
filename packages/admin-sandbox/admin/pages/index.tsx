@@ -25,7 +25,7 @@ import {
 	VideoFiles,
 } from '@contember/admin'
 import { DataGridTile } from '../components/DataGridTile'
-import { SlotSources, Title } from '../components/Slots'
+import { SlotSources } from '../components/Slots'
 
 const GalleryItemTile = Component(({ onClick, selectedEntityIds }: {
 	onClick?: (entity: EntityAccessor) => void
@@ -156,9 +156,12 @@ const s3FileUploader = new S3FileUploader({
 
 export default () => (
 	<EditScope entity="UploadShowcase(unique = One)" setOnCreate="(unique = One)">
-		<Title>Welcome to Contember!</Title>
+		<SlotSources.Title>Welcome to Contember!</SlotSources.Title>
 
-		<Link to="second">GO TO SECOND &rarr;</Link>
+		<SlotSources.ContentHeader>
+			<Link to="second">GO TO SECOND &rarr;</Link>
+		</SlotSources.ContentHeader>
+
 		<ImageUploadField urlField="singleTrivialImage.url" label="Trivial image" />
 
 		<ImageFileRepeater

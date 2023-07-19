@@ -14,12 +14,15 @@ export class SystemApiMiddlewareFactory {
 
 	create(): HttpController {
 		return async context => {
-			const { timer, projectGroup, authResult, logger, koa } = context
+			const { timer, projectGroup, authResult, koa } = context
 			if (!authResult) {
 				return new HttpErrorResponse(401, 'Authentication required')
 			}
 			const { projectContainer, project } = await this.projectContextResolver.resolve(context)
 
+			const logger = context.logger.child({
+				project: project.slug,
+			})
 
 			const tenantContainer = projectGroup.tenantContainer
 			const memberships = await timer('MembershipFetch', () =>

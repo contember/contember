@@ -1,6 +1,14 @@
 import * as Sentry from '@sentry/node'
-import { LogEntry, LoggerHandler, LogLevel, LogLevels } from '@contember/logger'
+import { LogEntry, LoggerHandler, LogLevel, LogLevels, LogLevelName } from '@contember/logger'
 import { LoggerRequestBody } from '../application'
+
+const logLevelMapping: Record<LogLevelName, Sentry.SeverityLevel> = {
+	crit: 'fatal',
+	error: 'error',
+	warn: 'warning',
+	debug: 'debug',
+	info: 'info',
+}
 
 export class SentryLoggerHandler implements LoggerHandler {
 	constructor(
@@ -19,7 +27,7 @@ export class SentryLoggerHandler implements LoggerHandler {
 		Sentry.captureException(entry.error, scope => {
 			scope.setTag('project', entry.loggerAttributes.project ?? entry.ownAttributes.project)
 			scope.setTag('module', entry.loggerAttributes.module ?? entry.ownAttributes.module)
-			scope.setLevel('error')
+			scope.setLevel(logLevelMapping[entry.level.name])
 			scope.setUser({
 				id: entry.loggerAttributes.user ?? entry.ownAttributes.user,
 			})

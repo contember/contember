@@ -133,7 +133,7 @@ export const createGraphQLQueryHandler = <Context>({
 			})
 			if (response.errors && response.errors.length > 0) {
 				const [code, errors] = processErrors(response.errors)
-				respond(code && response.data === null ? code : 200, { ...response, errors })
+				respond(code && !response.data ? code : 200, { ...response, errors })
 			} else {
 				respond(200, response)
 			}

@@ -21,11 +21,15 @@ export class ContentApiControllerFactory {
 	create(): HttpController {
 		const handlerCache = new WeakMap<GraphQLSchema, ContentQueryHandler>()
 		return async context => {
-			const { params, timer, projectGroup, authResult, request, logger, koa } = context
+			const { params, timer, projectGroup, authResult, request, koa } = context
 			if (!authResult) {
 				return new HttpErrorResponse(401, 'Authentication required')
 			}
 			const { projectContainer, project } = await this.projectContextResolver.resolve(context)
+
+			const logger = context.logger.child({
+				project: project.slug,
+			})
 
 			const systemDatabase = projectContainer.systemDatabaseContextFactory.create()
 			const stage = await systemDatabase.queryHandler.fetch(new StageBySlugQuery(params.stageSlug))

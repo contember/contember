@@ -31,7 +31,9 @@ export type LoggerAttributes = {
 	[key: string | symbol]: any
 }
 
-export type LogLevel = { name: string; value: number }
+export type LogLevelName = 'debug' | 'info' | 'warn' | 'error' | 'crit'
+
+export type LogLevel = { name: LogLevelName; value: number }
 
 export type LogEntry = {
 	level: LogLevel

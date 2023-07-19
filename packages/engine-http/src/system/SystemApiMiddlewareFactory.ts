@@ -40,25 +40,27 @@ export class SystemApiMiddlewareFactory {
 					: new HttpErrorResponse(404, `Project ${project.slug} NOT found`)
 			}
 
-			logger.debug('System query processing started')
-			const graphqlContext = await this.systemGraphqlContextFactory.create({
-				authResult,
-				memberships,
-				koaContext: koa,
-				projectContainer,
-				systemContainer: projectGroup.systemContainer,
-				onClearCache: () => {
-					projectContainer.contentSchemaResolver.clearCache()
-				},
-			})
-			const handler = projectGroup.systemGraphQLHandler
+			await logger.scope(async logger => {
+				logger.debug('System query processing started')
+				const graphqlContext = await this.systemGraphqlContextFactory.create({
+					authResult,
+					memberships,
+					koaContext: koa,
+					projectContainer,
+					systemContainer: projectGroup.systemContainer,
+					onClearCache: () => {
+						projectContainer.contentSchemaResolver.clearCache()
+					},
+				})
+				const handler = projectGroup.systemGraphQLHandler
 
-			await timer('GraphQL', () => handler({
-				request: koa.request,
-				response: koa.response,
-				createContext: () => graphqlContext,
-			}))
-			logger.debug('System query finished')
+				await timer('GraphQL', () => handler({
+					request: koa.request,
+					response: koa.response,
+					createContext: () => graphqlContext,
+				}))
+				logger.debug('System query finished')
+			})
 		}
 	}
 }

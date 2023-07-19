@@ -111,6 +111,11 @@ export class Application {
 			requestLogger = this.createRequestLogger(req, undefined, matchedRequest.module)
 
 			const groupContainer = await this.projectGroupResolver.resolveContainer({ request: req })
+
+			requestLogger = requestLogger.child({
+				projectGroup: groupContainer.slug,
+			})
+
 			const authResult = await groupContainer.authenticator.authenticate({ request: req, timer })
 			requestLogger.debug('User authenticated', { authResult })
 			requestLogger = requestLogger.child({
@@ -184,6 +189,10 @@ export class Application {
 			ctx.state.module = matchedRequest.module
 
 			const groupContainer = await this.projectGroupResolver.resolveContainer({ request: ctx.req })
+			requestLogger = requestLogger.child({
+				projectGroup: groupContainer.slug,
+			})
+
 			const authResult = await groupContainer.authenticator.authenticate({ request: ctx.req, timer })
 			requestLogger.debug('User authenticated', { authResult })
 			requestLogger = requestLogger.child({

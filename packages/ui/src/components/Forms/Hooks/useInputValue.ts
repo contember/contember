@@ -1,7 +1,8 @@
 import { ChangeEventHandler, useCallback, useEffect, useRef, useState } from 'react'
-import { ControlValueProps } from '../Types'
+import { ControlStateProps, ControlValueProps } from '../Types'
 
 export type InputValueProps<T, E extends HTMLElement> =
+	& ControlStateProps
 	& ControlValueProps<T>
 	& {
 		required?: boolean
@@ -17,6 +18,8 @@ export const useInputValue = <T, E extends HTMLElement>(
 		required,
 		emptyValue,
 		extractValue,
+		readOnly,
+		disabled,
 	}: InputValueProps<T, E>,
 ) => {
 	const notNull = notNull_ || required
@@ -40,9 +43,12 @@ export const useInputValue = <T, E extends HTMLElement>(
 	const onChangeListener = useCallback<ChangeEventHandler<E>>(event => {
 		const inputValue = extractValue(event.target)
 		const normalizedValue = inputValue ?? emptyOrNull
-		onChangeRef.current?.(normalizedValue)
-		setInternalState(inputValue)
-	}, [emptyOrNull, extractValue])
+
+		if (!readOnly && !disabled) {
+			onChangeRef.current?.(normalizedValue)
+			setInternalState(inputValue)
+		}
+	}, [disabled, emptyOrNull, extractValue, readOnly])
 
 	return {
 		onChange: onChangeListener,

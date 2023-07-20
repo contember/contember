@@ -1715,7 +1715,7 @@ export interface IconSourceSpecification {
 }
 
 // @public (undocumented)
-export type InputValueProps<T, E extends HTMLElement> = ControlValueProps<T> & {
+export type InputValueProps<T, E extends HTMLElement> = ControlStateProps & ControlValueProps<T> & {
     required?: boolean;
     emptyValue: T;
     extractValue: (input: E) => T | null;
@@ -2905,7 +2905,7 @@ export function useInputClassName<P extends NonOptionalUseInputClassNameProps | 
 export type UseInputClassNameProps = Omit<VisuallyDependentControlProps, 'id' | 'name' | 'placeholder' | 'style'>;
 
 // @public (undocumented)
-export const useInputValue: <T, E extends HTMLElement>({ defaultValue, value, onChange, notNull: notNull_, required, emptyValue, extractValue, }: InputValueProps<T, E>) => {
+export const useInputValue: <T, E extends HTMLElement>({ defaultValue, value, onChange, notNull: notNull_, required, emptyValue, extractValue, readOnly, disabled, }: InputValueProps<T, E>) => {
     onChange: ChangeEventHandler<E>;
     state: T | null;
 };

@@ -9,7 +9,7 @@
 
 # Contember Engine
 
-Contember is an open-source, headless CMS without limits. It gives you full control over the administration interface and data structure. Enjoy GraphQL API, role-based access control, authentication and a well-structured PostgreSQL database. Built by developers for developers.
+Contember is an open-source platform that empowers developers to quickly build and manage data-driven web applications. It gives you full control over the administration interface and data structure. Enjoy GraphQL API, role-based access control, authentication and a well-structured PostgreSQL database. Built by developers for developers.
 
 Contember Engine is a standalone server providing GraphQL API for your PostgreSQL database.
 

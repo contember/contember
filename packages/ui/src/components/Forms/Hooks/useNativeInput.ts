@@ -130,6 +130,7 @@ export function useNativeInput<E extends HTMLInputElement | HTMLTextAreaElement 
 		pattern,
 		step,
 		style,
+		...rest,
 	}
 }
 

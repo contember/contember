@@ -1,12 +1,12 @@
-import { Checkbox, FieldContainer } from '@contember/ui'
+import { EntityAccessor, EntityId } from '@contember/binding'
+import { Checkbox, FieldContainer, Stack } from '@contember/ui'
 import { useMemo } from 'react'
 import { useMessageFormatter } from '../../../../../i18n'
 import { BaseDynamicChoiceField, ChoiceFieldData, MultiSelectFieldInner } from '../../../fields'
+import { useCurrentlyChosenEntities } from '../../../fields/ChoiceField/hooks/useCurrentlyChosenEntities'
 import { useSelectOptions } from '../../../fields/ChoiceField/hooks/useSelectOptions'
 import { FilterRendererProps } from '../base'
 import { dataGridCellsDictionary } from './dataGridCellsDictionary'
-import { EntityAccessor, EntityId } from '@contember/binding'
-import { useCurrentlyChosenEntities } from '../../../fields/ChoiceField/hooks/useCurrentlyChosenEntities'
 
 
 export type SelectCellArtifacts = {
@@ -33,7 +33,7 @@ export const SelectCellFilter = ({ filter, setFilter, optionProps }: SelectCellF
 	}, [filter.id, allOptions])
 	const formatMessage = useMessageFormatter(dataGridCellsDictionary)
 
-	return <>
+	return <Stack align="center" direction="horizontal">
 		<MultiSelectFieldInner
 			label={undefined}
 			data={options}
@@ -67,5 +67,5 @@ export const SelectCellFilter = ({ filter, setFilter, optionProps }: SelectCellF
 				}}
 			/>
 		</FieldContainer>
-	</>
+	</Stack>
 }

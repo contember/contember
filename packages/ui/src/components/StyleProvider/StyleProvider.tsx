@@ -19,7 +19,7 @@ const initialValues: NonOptional<StyleProviderProps> = {
 	overridesLucideIcons: true,
 	scheme: 'system',
 	themeContent: 'default',
-	themeControls: 'primary',
+	themeControls: 'positive',
 	transparent: true,
 	suppressFocusRing: true,
 }

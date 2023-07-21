@@ -1,7 +1,7 @@
 :where(.cui-layout-chrome) {
 	--layout-chrome-bar-width: 33.3vw;
 	align-items: stretch;
-	color: var(--cui-color--medium);
+	color: rgba(var(--cui-color-rgb-50), var(--cui-opacity--medium));
 	display: flex;
 	flex: 1;
 	flex-direction: column;
@@ -34,7 +34,7 @@
 }
 
 :where(.cui-layout-chrome-bar) {
-	background: var(--cui-background-color);
+	background: rgb(var(--cui-background-color-rgb-25));
 	display: flex;
 	flex-direction: column;
 	height: 100vh;
@@ -68,7 +68,7 @@
 :where(.cui-layout-chrome-bar-body-scrolled-indicator) {
 	content: "";
 	display: block;
-	border-top: var(--cui-control-border-width, 1px) solid transparent;
+	border-top: var(--cui-border-width, 1px) solid transparent;
 	position: sticky;
 	left: 0;
 	right: 0;
@@ -76,12 +76,12 @@
 }
 
 :where(.cui-layout-chrome-bar-body-scrolled-indicator.is-scrolled) {
-	border-top-color: var(--cui-color--lower);
+	border-top-color: rgba(var(--cui-color-rgb-50), var(--cui-opacity--lower));
 }
 
 :where(.cui-layout-chrome-bar-footer) {
 	align-items: stretch;
-	border-top: var(--cui-control-border-width, 1px) solid var(--cui-color--lower);
+	border-top: var(--cui-border-width, 1px) solid rgba(var(--cui-color-rgb-50), var(--cui-opacity--lower));
 	display: flex;
 	flex-direction: column;
 	padding-bottom: var(--cui-layout-chrome-padding-bottom);
@@ -98,7 +98,7 @@
 }
 
 :where(.cui-layout-chrome-body) {
-	background-color: var(--cui-background-color);
+	background-color: rgb(var(--cui-background-color-rgb-25));
 	display: flex;
 	flex-direction: column;
 	flex-grow: 1;
@@ -107,7 +107,7 @@
 }
 
 :where(.cui-layout-chrome-navigation-button) {
-	height: var(--cui-control-height);
+	height: var(--cui-size--controls);
 	margin-top: -0.5em;
 	margin-bottom: -0.5em;
 }
@@ -151,7 +151,7 @@
 
 	:where(.cui-layout-chrome-bar) {
 		--cui-edge-offset-right: 0em;
-		background: linear-gradient(to right, var(--cui-background-color) 25%, var(--cui-background-color--below));
+		background: linear-gradient(to right, rgb(var(--cui-background-color-rgb-50)) 25%, rgb(var(--cui-background-color-rgb-25)));
 		min-width: var(--layout-chrome-bar-width);
 		max-width: var(--layout-chrome-bar-width);
 	}

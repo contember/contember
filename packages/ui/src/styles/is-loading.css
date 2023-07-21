@@ -4,10 +4,12 @@
 	}
 }
 
+:where(cui-button[data-loading] > *),
 :where(.is-loading.cui-button > *) {
 	visibility: hidden;
 }
 
+:where(cui-button[data-loading] .cui-button-spinner),
 :where(.is-loading.cui-button .cui-button-spinner) {
 	position: absolute;
 	top: 50%;

@@ -1,7 +1,6 @@
 :where(.cui-editorBlockBoundary) {
 	--cui-editor-block-boundary-height: var(--cui-editor-blocks-gap);
 	align-items: center;
-	color: var(--cui-color--low);
 	cursor: pointer;
 	display: flex;
 	flex-direction: row;
@@ -15,13 +14,14 @@
 
 :where(.cui-editorBlockBoundary)::after,
 :where(.cui-editorBlockBoundary)::before {
+	background-color: rgb(var(--cui-background-color-controls-rgb-50));
 	border-radius: 2px;
-	border: 1px solid;
 	content: "";
 	display: block;
 	flex-grow: 1;
 	height: 2px;
 	visibility: hidden;
+	padding: 0;
 }
 
 :where(.is-dragged .cui-editorBlockBoundary) {
@@ -51,9 +51,9 @@
 
 :where(.cui-editorBlockBoundary-inner) {
 	align-items: center;
-	background-color: var(--cui-background-color--above);
+	background-color: rgb(var(--cui-background-color-rgb-50));
 	border-radius: 1em;
-	color: var(--cui-color--lower);
+	color: rgba(var(--cui-color-rgb-50), var(--cui-opacity--lower));
 	display: flex;
 	flex-direction: row;
 	line-height: 1em;
@@ -72,13 +72,13 @@
 
 @media (hover: hover) and (pointer: fine) {
 	:where(.cui-editorBlockBoundary-inner) {
-		background-color: var(--cui-control-border-color);
-		color: var(--cui-background-color--above);
+		background-color: rgb(var(--cui-background-color-controls-rgb-50));
+		color: rgb(var(--cui-background-color-rgb-50));
 		visibility: hidden;
 	}
 
 	:where(.cui-editorBlockBoundary:hover) {
-		color: var(--cui-control-color);
+		color: rgb(var(--cui-color-accent-rgb-50));
 	}
 
 	:where(.cui-editorBlockBoundary:hover .cui-editorBlockBoundary-inner),

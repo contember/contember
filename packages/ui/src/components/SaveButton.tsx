@@ -31,7 +31,7 @@ export const SaveButton = memo(forwardRef<HTMLButtonElement, SaveButtonProps>(({
 		size={size ?? 'large'}
 		flow={flow}
 		scheme={scheme}
-		distinction={rest.disabled ? 'seamless' : isPrimary ? 'primary' : distinction}
+		distinction={isPrimary ? 'primary' : distinction}
 		{...rest}
 	>
 		{isDirty

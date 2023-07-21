@@ -1,5 +1,5 @@
 import { ColorSchemeContext, useClassName, useColorScheme } from '@contember/react-utils'
-import { NonOptional, colorSchemeClassName, contentThemeClassName, controlsThemeClassName, stateDataAttributes, themeClassName } from '@contember/utilities'
+import { NonOptional, colorSchemeClassName, contentThemeClassName, controlsThemeClassName, stateDataAttributes } from '@contember/utilities'
 import { PropsWithChildren } from 'react'
 import { mergeProps } from 'react-aria'
 import { Intent, Scheme } from '../../types'

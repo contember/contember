@@ -21,7 +21,7 @@ import { InsertLink, LinkElement } from './customLinks'
 
 const RB = RichEditor.buttons
 export const fullEditorInlineButtons: BlockEditorProps['inlineButtons'] = [
-	[RB.bold, RB.italic, RB.underline, RB.anchor],
+	[RB.bold, RB.italic, RB.highlight, RB.underline, RB.anchor],
 	[RB.headingOne, RB.headingTwo, RB.headingThree, RB.headingFour, RB.unorderedList, RB.orderedList],
 	[RB.alignStart, RB.alignCenter, RB.alignEnd, RB.alignJustify],
 	[RB.strikeThrough, RB.code],

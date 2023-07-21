@@ -1,16 +1,16 @@
 :where(.cui-menu) {
-	--cui-menu-background-color-focused: var(--cui-toned-control-background-color);
-	color: var(--cui-color--strong);
+	--cui-menu-background-color-focused: rgba(var(--cui-background-color-toned-rgb-50), var(--cui-opacity--low));
+	color: rgb(var(--cui-color-strong-rgb-75));
 	user-select: none;
 }
 
-:where(.cui-menu a) {
+:where(.cui-menu *) {
 	color: inherit;
 }
 
 :where(.cui-menu .cui-label) {
-	--cui-inset-vertical: calc(1.5 * var(--cui-gap));
-	--cui-inset-horizontal: calc(1.5 * var(--cui-gap));
+	--cui-label-inset-vertical: calc(1.5 * var(--cui-gap));
+	--cui-label-inset-horizontal: calc(1.5 * var(--cui-gap));
 	color: inherit;
 }
 
@@ -21,14 +21,14 @@
 }
 
 :where(.cui-menu-group[aria-disabled="true"]) {
-	color: var(--cui-color--low);
+	color: rgba(var(--cui-color-rgb-50), var(--cui-opacity--low));
 }
 
 :where(
 	.cui-menu-group[data-active] > .cui-menu-group-title,
 	.cui-menu-section[data-active] > .cui-menu-section-title,
 ) {
-	color: var(--cui-control-color);
+	color: rgb(var(--cui-color-accent-rgb-50));
 }
 
 :where(
@@ -37,30 +37,30 @@
 	li:focus > .cui-menu-section-title > .cui-menu-section-title-content > .cui-label,
 	li:focus > .cui-menu-group-title > .cui-menu-group-title-content > .cui-label,
 ) {
-	color: var(--cui-control-color--highlighted);
+	color: rgb(var(--cui-color-accent-rgb-75));
 	background-color: var(--cui-menu-background-color-focused);
 }
 
 :where(.cui-menu-expand-toggle) {
-	--cui-expand-toggle-size: calc(5 * var(--cui-gap));
+	--cui-menu-expand-toggle-size: calc(5 * var(--cui-gap));
 	background: transparent;
 	border: 0;
 	color: inherit;
-	height: var(--cui-expand-toggle-size);
+	height: var(--cui-menu-expand-toggle-size);
 	padding: 0;
 	position: absolute;
 	right: calc(100% + 1.5 * var(--cui-gap));
-	width: var(--cui-expand-toggle-size);
+	width: var(--cui-menu-expand-toggle-size);
 }
 
 :where(.cui-menu-expand-toggle)::before {
-	border-bottom: 0.109375rem solid var(--cui-color--high);
-	border-right: 0.109375rem solid var(--cui-color--high);
+	border-bottom: 0.109375rem solid rgb(var(--cui-color-rgb-50));
+	border-right: 0.109375rem solid rgb(var(--cui-color-rgb-50));
 	bottom: 0;
 	content: "";
 	display: inline-block;
 	height: 0.4em;
-	left: calc(var(--cui-expand-toggle-size) / 2 - 0.2em);
+	left: calc(var(--cui-menu-expand-toggle-size) / 2 - 0.2em);
 	margin: auto;
 	position: absolute;
 	top: -0.15em;
@@ -117,7 +117,7 @@
 	outline: none;
 }
 
-:where(.cui-menu-section-title[data-active]:after) {
+:where(.cui-menu-section-title[data-active])::after {
 	visibility: unset;
 }
 

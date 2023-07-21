@@ -1,11 +1,11 @@
 :where(.cui-repeater-item-container) {
-	--cui-box-background-focused-overlay: linear-gradient(rgba(var(--cui-controls-1000), 0.01), rgba(var(--cui-controls-1000), 0.01));
+	--cui-box-background-focused-overlay: linear-gradient(rgba(var(--cui-theme-controls-rgb-1000), 0.01), rgba(var(--cui-theme-controls-rgb-1000), 0.01));
 	--line-height-negative-vertical-space: calc(0.5em * calc(var(--cui-line-height) - 1));
 	transition: background-image 0.15s;
 }
 
 :where(.cui-repeater-item-container.view-sortable) {
-	--cui-box-content-padding-left: calc(2 * var(--cui-box-content-padding));
+	--cui-box-padding-left: calc(2 * var(--cui-box-padding));
 }
 
 :where(.cui-repeater-item-container-header) {
@@ -23,8 +23,8 @@
 	left: 0;
 	top: 0;
 	bottom: 0;
-	padding: var(--cui-box-content-padding) 0;
-	width: calc(2 * var(--cui-box-content-padding));
+	padding: var(--cui-box-padding) 0;
+	width: calc(2 * var(--cui-box-padding));
 }
 
 :where(.cui-repeater-item-container-handle .cui-icon) {
@@ -42,9 +42,8 @@
 	gap: inherit;
 }
 
-:where(.cui-repeater-item-container.is-active),
-:where(.cui-repeater-item-container:focus-within) {
-	color: var(--cui-control-color);
+:where(.cui-repeater-item-container.is-active) {
+	color: rgb(var(--cui-color-accent-rgb-50));
 	background-image: var(--cui-box-background-focused-overlay);
 }
 

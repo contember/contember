@@ -1,14 +1,12 @@
 :where(.cui-slug-input) {
 	--slug-input-control-focus-ring: var(--cui-control-focus-ring-box-shadow);
 	align-items: stretch;
-	background-color: var(--cui-background-color--above);
-	border-color: var(--cui-color--lower);
-	border-radius: var(--cui-control-border-radius);
-	border-style: solid;
-	border-width: var(--cui-control-border-width, 1px);
+	background-color: rgb(var(--cui-background-color-rgb-25));
+	border-radius: var(--cui-border-radius--controls);
+	border-width: var(--cui-border-width, 1px);
 	display: flex;
-	margin-bottom: calc(-1 * var(--cui-control-border-width));
-	margin-top: calc(-1 * var(--cui-control-border-width));
+	margin-bottom: calc(-1 * var(--cui-border-width));
+	margin-top: calc(-1 * var(--cui-border-width));
 }
 
 :where(.cui-slug-input:focus-within) {
@@ -20,15 +18,15 @@
 	align-items: center;
 	line-height: normal;
 	padding-left: calc(3 * var(--cui-gap));
-	color: var(--cui-color--medium);
+	color: rgba(var(--cui-color-rgb-50), var(--cui-opacity--medium));
 }
 
 :where(.cui-field-container:hover .cui-slug-input-prefix) {
-	border-color: var(--cui-color--low);
+	border-color: rgba(var(--cui-color-rgb-50), var(--cui-opacity--low));
 }
 
 :where(.cui-slug-input:focus-within > .cui-slug-input-prefix:not(:focus-within)) {
-	border-color: var(--cui-control-border-color);
+	border-color: rgb(var(--cui-background-color-controls-rgb-50));
 }
 
 :where(.cui-slug-input-prefix-link) {
@@ -41,7 +39,7 @@
 :where(.cui-slug-input-prefix-link:focus),
 :where(.cui-slug-input-prefix-link:hover) {
 	text-decoration: underline;
-	color: var(--cui-control-color);
+	color: rgb(var(--cui-color-accent-rgb-50));
 }
 
 :where(.cui-slug-input-input) {
@@ -52,6 +50,8 @@
 
 :where(.cui-slug-input-input .cui-text-input) {
 	border: none;
+	box-shadow: none;
+	flex-grow: 1;
 }
 
 :where(
@@ -60,7 +60,7 @@
 	.cui-slug-input-input > .cui-text-input:focus,
 	.cui-slug-input-input > .cui-text-input:focus-within,
 ) {
-	--input-control-background: transparent;
+	background-color: transparent;
 }
 
 :where(.cui-slug-input-prefix + .cui-slug-input-input) {
@@ -68,7 +68,7 @@
 	position: relative;
 }
 
-:where(.cui-slug-input-prefix + .cui-slug-input-input .cui-input) {
+:where(.cui-slug-input-prefix + .cui-slug-input-input .cui-text-input) {
 	--input-control-focus-ring: none;
 	border-left: 0;
 	border-top-left-radius: 0;

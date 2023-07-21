@@ -37,8 +37,8 @@ export const decorators = [
 				flexDirection: 'column',
 				flexGrow: 1,
 				padding: '2em',
-				backgroundColor: 'var(--cui-background-color)',
-				color: 'var(--cui-color)',
+				backgroundColor: 'rgb(var(--cui-background-color-rgb-25))',
+				color: 'rgb(var(--cui-color-rgb-50))',
 				gap: '2em',
 			}}
 		>

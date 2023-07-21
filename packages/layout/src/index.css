@@ -2,7 +2,7 @@
 @import "slots/index.css";
 @import "kit/index.css";
 
-:where(:root) {
+:where(.cui-root) {
 	--cui-panel-padding-vertical: 1rem;
 	--cui-panel-padding-horizontal: 1rem;
 	--cui-box-inner-padding-vertical: 0.5rem;
@@ -10,7 +10,7 @@
 }
 
 @media screen and (min-width: 1024px) {
-	:where(:root) {
+	:where(.cui-root) {
 		--cui-panel-padding-horizontal: 2rem;
 		--cui-box-inner-padding-horizontal: 0.75rem;
 	}

@@ -1,5 +1,5 @@
 :where(.cui-spinner-overlay) {
-	--cui-container-spinner-delay: 1000ms;
+	--cui-spinner-overlay-delay: 1000ms;
 	position: absolute;
 	top: 0;
 	right: 0;
@@ -14,7 +14,7 @@
 }
 
 :where(.cui-spinner-overlay.cui-aether) {
-	animation-delay: var(--cui-container-spinner-delay);
+	animation-delay: var(--cui-spinner-overlay-delay);
 	animation-duration: var(--cui-transition-duration);
 	animation-fill-mode: both;
 	animation-name: dim-background;
@@ -39,6 +39,6 @@
 	}
 
 	to {
-		background-color: var(--cui-background-color--highlighted);
+		background-color: rgba(var(--cui-background-color-rgb-0), var(--cui-opacity--medium));
 	}
 }

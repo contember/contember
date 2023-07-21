@@ -2,7 +2,6 @@
 	.cui-toggle-sidebar-button,
 	.cui-toggle-menu.view-seamless,
 ) {
-	--cui-button-box-shadow-shadow-below: ;
 	--cui-button-background-color: transparent;
 	--cui-button-color: inherit;
 	--cui-button-color--highlighted: inherit;

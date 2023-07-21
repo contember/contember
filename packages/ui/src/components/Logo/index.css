@@ -8,6 +8,9 @@
 }
 
 :where(.cui-logo) {
+	--cui-logo-size: 1.125em;
+	--cui-logo-size--small: 0.84375em;
+	--cui-logo-size--large: 2.25em;
 	align-items: stretch;
 	display: inline-flex;
 	line-height: 1;
@@ -16,11 +19,11 @@
 }
 
 :where(a .cui-logo) {
-	color: var(--cui-control-color);
+	color: rgb(var(--cui-color-accent-rgb-50));
 }
 
 :where(a:hover .cui-logo) {
-	color: var(--cui-control-color--highlighted);
+	color: rgb(var(--cui-color-accent-rgb-75));
 }
 
 :where(.cui-logo-label) {

@@ -52,7 +52,7 @@ export const FieldContainer = memo(
 		const isLabelInline = labelPosition === 'labelInlineLeft' || labelPosition === 'labelInlineRight'
 		const invalid = !!errors?.length
 
-		const asteriskClassName = [...themeClassName('danger')]
+		const asteriskClassName = [...themeClassName('danger'), colorSchemeClassName(useColorScheme())]
 
 		return (
 			<div

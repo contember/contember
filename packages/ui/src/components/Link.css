@@ -1,5 +1,5 @@
 :where(.cui-link) {
-	--cui-link-color: var(--cui-control-color);
+	--cui-link-color: rgb(var(--cui-color-accent-rgb-50));
 	color: var(--cui-link-color);
 }
 
@@ -7,10 +7,10 @@
 :where(.cui-link.is-hovered),
 :where(.cui-link:focus),
 :where(.cui-link.is-focused) {
-	--cui-link-color: var(--cui-control-color--highlighted);
+	--cui-link-color: rgb(var(--cui-color-accent-rgb-75));
 }
 
 :where(.cui-link:active),
 :where(.cui-link.is-active) {
-	--cui-link-color: var(--cui-control-color--pressed);
+	--cui-link-color: rgb(var(--cui-color-accent-rgb-25));
 }

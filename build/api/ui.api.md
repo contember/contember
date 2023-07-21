@@ -209,7 +209,7 @@ export type ButtonElevation = Default | 'none';
 export type ButtonFlow = Default | 'circular' | 'squarish' | 'generous' | 'block' | 'generousBlock';
 
 // @public (undocumented)
-export const ButtonGroup: MemoExoticComponent<({ size, flow, orientation, isTopToolbar, children }: ButtonGroupProps) => JSX.Element>;
+export const ButtonGroup: MemoExoticComponent<({ size, componentClassName, className, flow, orientation, isTopToolbar, children }: ButtonGroupProps) => JSX.Element>;
 
 // @public (undocumented)
 export type ButtonGroupFlow = Default | 'block';
@@ -218,7 +218,7 @@ export type ButtonGroupFlow = Default | 'block';
 export type ButtonGroupOrientation = Default | 'horizontal' | 'vertical';
 
 // @public (undocumented)
-export interface ButtonGroupProps {
+export interface ButtonGroupProps extends ComponentClassNameProps {
     // (undocumented)
     children?: ReactNode;
     // (undocumented)
@@ -232,13 +232,13 @@ export interface ButtonGroupProps {
 }
 
 // @public (undocumented)
-export const ButtonList: MemoExoticComponent<({ children, flow, orientation, size }: ButtonListProps) => JSX.Element>;
+export const ButtonList: MemoExoticComponent<({ children, className, componentClassName, flow, orientation, size }: ButtonListProps) => JSX.Element>;
 
 // @public (undocumented)
 export type ButtonListFlow = Default | 'inline' | 'block';
 
 // @public (undocumented)
-export interface ButtonListProps {
+export interface ButtonListProps extends ComponentClassNameProps {
     // (undocumented)
     children?: ReactNode;
     // (undocumented)

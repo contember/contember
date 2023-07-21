@@ -1,13 +1,8 @@
 :where(.cui-layout-panel) {
-	--cui-background-color-rgb: var(--cui-content-background-color-rgb);
-	--cui-content-background-color--focused-rgb: var(--cui-content-background-color--highlighted-rgb);
-	--cui-content-background-color-alpha: 1;
-	--cui-header-background-color-rgb: var(--cui-background-color-rgb);
-	--cui-header-background-color-alpha: var(--cui-backdrop-blur-opacity);
-	--cui-body-background-color-rgb: transparent;
-	--cui-body-background-color-alpha: 1;
-	--cui-footer-background-color-rgb: var(--cui-background-color-rgb);
-	--cui-footer-background-color-alpha: var(--cui-backdrop-blur-opacity);
+	--cui-layout-panel-footer-background-alpha: var(--cui-backdrop-blur-opacity);
+	--cui-layout-panel-footer-background-rgb: rgb(var(--cui-background-color-rgb-50));
+	--cui-layout-panel-header-background-alpha: var(--cui-backdrop-blur-opacity);
+	--cui-layout-panel-header-background-rgb: rgb(var(--cui-background-color-rgb-50));
 
 	content-visibility: visible;
 	display: flex;
@@ -65,8 +60,8 @@
 }
 
 :where(.cui-layout-panel[data-behavior="overlay"]) {
-	background-color: var(--cui-background-color--above);
-	color: var(--cui-color);
+	background-color: rgb(var(--cui-background-color-rgb-50));
+	color: rgb(var(--cui-color-rgb-50));
 	z-index: 3;
 }
 

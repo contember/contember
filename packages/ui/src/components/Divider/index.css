@@ -1,7 +1,7 @@
 :where(.cui-divider) {
 	--divider-margin: var(--cui-padding);
 	align-self: stretch;
-	background-color: rgba(var(--cui-rgb-text-100), var(--cui-opacity--low));
+	background-color: rgba(var(--cui-color-rgb-100), var(--cui-opacity--low));
 	margin-bottom: calc(var(--divider-margin) - 0.5px);
 	margin-top: calc(var(--divider-margin) - 0.5px);
 	min-height: 1px;

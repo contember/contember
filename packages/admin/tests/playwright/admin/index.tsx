@@ -106,7 +106,7 @@ const IndexPage = () => {
 
 if (import.meta.env.DEV) {
 	runReactApp(
-		<div style={{ '--cui-font-family': 'Inter var' } as CSSProperties}>
+		<div data-localhost>
 			<ProjectSlugProvider>
 				{slug => (
 					<ApplicationEntrypoint

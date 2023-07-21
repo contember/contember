@@ -1,7 +1,7 @@
 :where(.cui-devBar) {
-	--soft-shadow-color: rgba(var(--cui-controls-800), 0.5);
-	--brand-background-color--highlighted: var(--cui-filled-primary-control-background-color);
-	--control-background-color--highlighted: var(--cui-toned-control-background-color);
+	--devBar-soft-shadow-color: rgba(var(--cui-background-color-toned-rgb-50), var(--cui-opacity--low));
+	--devBar-control-background-color--highlighted: rgba(var(--cui-background-color-toned-rgb-50), var(--cui-opacity--low));
+	--brand-background-color--highlighted: rgb(var(--cui-background-color-controls-rgb-50));
 	--screen-offset-vertical: var(--cui-padding, 1rem);
 	--screen-offset-horizontal: var(--cui-padding, 1rem);
 
@@ -20,14 +20,13 @@
 	transition-timing-function: ease-in-out;
 }
 
-
 :where(
 	.cui-devBar-content,
 	.cui-devBar-panel-content,
 ) {
-	background: var(--cui-background-color--above);
-	box-shadow: inset 0 0 0 1px var(--cui-color--lower), 0 1rem 4rem var(--cui-color--low);
-	color: var(--cui-color);
+	background: rgb(var(--cui-background-color-rgb-50));
+	box-shadow: inset 0 0 0 1px rgba(var(--cui-color-rgb-50), var(--cui-opacity--lower)), 0 1rem 4rem rgba(var(--cui-color-rgb-50), var(--cui-opacity--low));;
+	color: rgb(var(--cui-color-rgb-50));
 }
 
 :where(.cui-devBar-content) {
@@ -46,21 +45,21 @@
 	.cui-devBar-content:hover,
 	.cui-devBar-content:focus-within,
 ) {
-	box-shadow: inset 0 0 0 1px var(--cui-color--low), 0 1rem 4rem var(--soft-shadow-color);
-}
+	box-shadow: inset 0 0 0 1px rgba(var(--cui-color-rgb-50), var(--cui-opacity--lower)), 0 1rem 4rem var(--devBar-soft-shadow-color);
 
+}
 :where(
 	.cui-devBar-close,
 	.cui-devBar-trigger-label,
 	.cui-devBar-brand,
 ) {
 	align-items: center;
-	height: var(--cui-control-height);
+	height: var(--cui-size--controls);
 	border-radius: 2rem;
 	justify-content: center;
-	max-height: var(--cui-control-height);
-	min-height: var(--cui-control-height);
-	min-width: var(--cui-control-height);
+	max-height: var(--cui-size--controls);
+	min-height: var(--cui-size--controls);
+	min-width: var(--cui-size--controls);
 	padding: 0.625rem;
 }
 
@@ -68,8 +67,8 @@
 	background: transparent;
 	cursor: pointer;
 	display: flex;
-	max-width: var(--cui-control-height);
-	width: var(--cui-control-height);
+	max-width: var(--cui-size--controls);
+	width: var(--cui-size--controls);
 	order: 999;
 }
 
@@ -77,12 +76,13 @@
 	.cui-devBar-close:hover,
 	.cui-devBar-close:focus-visible,
 ) {
-	background: var(--control-background-color--highlighted);
+	color: rgb(var(--cui-color-toned-rgb-50));
+	background-color: var(--devBar-control-background-color--highlighted);
 }
 
 :where(.cui-devBar-brand) {
 	align-items: center;
-	color: var(--cui-color--strong);
+	color: rgb(var(--cui-color-rgb-0));
 	display: flex;
 	gap: var(--cui-gutter);
 	text-align: right;
@@ -93,7 +93,7 @@
 	.cui-devBar-brand:focus-visible,
 ) {
 	background-color: var(--brand-background-color--highlighted);
-	color: var(--cui-filled-primary-control-color);
+	color: rgb(var(--cui-color-controls-rgb-50));
 }
 
 :where(.cui-devBar-brand .cui-brand-logo-type) {
@@ -106,8 +106,8 @@
 }
 
 :where(.cui-devBar-trigger) {
-	--y-offset: calc(-1 * var(--screen-offset-vertical) - var(--cui-control-height));
-	color: var(--cui-color);
+	--y-offset: calc(-1 * var(--screen-offset-vertical) - var(--cui-size--controls));
+	color: rgb(var(--cui-color-rgb-50));
 	display: flex;
 }
 
@@ -125,12 +125,13 @@
 	.cui-devBar-trigger-label:focus-visible,
 	.cui-devBar-trigger[data-expanded] > .cui-devBar-trigger-label,
 ) {
-	background-color: var(--control-background-color--highlighted);
+	color: rgb(var(--cui-color-toned-rgb-50));
+	background-color: var(--devBar-control-background-color--highlighted);
 }
 :where(
 	.cui-devBar-trigger[data-expanded] > .cui-devBar-trigger-label,
 ) {
-	box-shadow: inset 0 1px 0 0px var(--cui-color--lower);
+	box-shadow: inset 0 1px 0 0px rgba(var(--cui-color-rgb-50), var(--cui-opacity--lower));
 }
 
 :where(.cui-devBar-panel) {
@@ -152,8 +153,8 @@
 
 :where(.cui-devBar-panel-content) {
 	gap: inherit;
-	background: var(--cui-background-color--above);
-	box-shadow: inset 0 0 0 1px var(--cui-color--low);
+	background: rgb(var(--cui-background-color-rgb-50));
+	box-shadow: inset 0 0 0 1px rgba(var(--cui-color-rgb-50), var(--cui-opacity--low));
 	border-radius: 1rem;
 	display: flex;
 	min-width: min(20rem, 100%);
@@ -165,7 +166,7 @@
 
 @media screen and (min-width: 768px) {
 	:where(.cui-devBar-trigger) {
-		--y-offset: calc(-1 * var(--cui-control-height) + 2 * var(--cui-gap));
+		--y-offset: calc(-1 * var(--cui-size--controls) + 2 * var(--cui-gap));
 		position: relative;
 	}
 	:where(.cui-devBar-panel-content) {
@@ -187,11 +188,11 @@
 	.cui-devBar-trigger:hover,
 	.cui-devBar-trigger[data-expanded],
 ) {
-	color: var(--cui-color--strong);
+	color: rgb(var(--cui-color-rgb-0));
 }
 
 :where(.cui-devBar:not([data-expanded])) {
-	transform: translateY(var(--cui-control-height));
+	transform: translateY(var(--cui-size--controls));
 	opacity: 0;
 	max-width: 5rem;
 	margin: auto;

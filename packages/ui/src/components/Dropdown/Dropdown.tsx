@@ -10,6 +10,7 @@ import {
 	useMemo,
 	useState,
 } from 'react'
+import { FocusScope } from 'react-aria'
 import { usePopper } from 'react-popper'
 import { useCloseOnClickOutside, useCloseOnEscape } from '../../auxiliary'
 import type { DropdownAlignment } from '../../types'
@@ -118,7 +119,7 @@ export const Dropdown = memo((props: DropdownProps) => {
 			{renderToggle ? (
 				renderToggle({ ref: setReferenceElement, onClick: onButtonClick })
 			) : (
-				<Button {...props.buttonProps} onClick={onButtonClick} ref={setReferenceElement} />
+					<Button active={isActive} {...props.buttonProps} onClick={onButtonClick} ref={setReferenceElement} />
 			)}
 			{isActive && (
 				<Portal to={currentPortalContainer}>
@@ -126,7 +127,7 @@ export const Dropdown = memo((props: DropdownProps) => {
 						ref={setPopperElement}
 						style={styles.popper}
 						{...attributes.popper}
-						className={componentClassName('content')}
+						className={componentClassName('content', [colorSchemeClassName(colorScheme)])}
 						data-placement={placement}
 					>
 						<Collapsible
@@ -139,13 +140,15 @@ export const Dropdown = memo((props: DropdownProps) => {
 								setIsTransitioning(false)
 							}}
 						>
-							{renderContent ? (
-								renderContent(renderProps)
-							) : (
-								<div className={componentClassName('content-in', toViewClass('unstyled', !styledContent))}>
-									{typeof children === 'function' ? children(renderProps) : children}
-								</div>
-							)}
+							<FocusScope autoFocus contain={isOpen} restoreFocus>
+								{renderContent ? (
+									renderContent(renderProps)
+								) : (
+									<div className={componentClassName('content-in', toViewClass('unstyled', !styledContent))}>
+										{typeof children === 'function' ? children(renderProps) : children}
+									</div>
+								)}
+							</FocusScope>
 						</Collapsible>
 					</div>
 				</Portal>

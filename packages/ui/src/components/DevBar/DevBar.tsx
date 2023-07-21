@@ -15,7 +15,7 @@ export const DevBar = ({
 }: PropsWithChildren<{
 	breakpoint?: number;
 }>) => {
-	const className = useClassNameFactory(['devBar', 'root'])
+	const className = useClassNameFactory('devBar')
 	const [expanded, setExpanded] = useState(true)
 	const isSmallScreen = useWindowSize().width < breakpoint
 
@@ -100,13 +100,13 @@ export const DevBar = ({
 							)}
 						</a>
 
-						<Divider />
+						<Divider gap="medium" />
 
 						<div className={className('panels')}>
 							<SmallScreenContext.Provider value={isSmallScreen}>{children}</SmallScreenContext.Provider>
 						</div>
 
-						<Divider />
+						<Divider gap="medium" />
 					</div>
 
 					<button

@@ -9,7 +9,7 @@ export const Button = ({
     onClick={() => {
       onClick()
     }}
-    style={{ backgroundColor: 'var(--cui-control-background-color)', border: '1px solid', borderRadius: '0.25em', color: 'var(--cui-color--strong)', padding: '0.25em 0.33em' }}
+    style={{ backgroundColor: 'var(--cui-control-background-color)', border: '1px solid', borderRadius: '0.25em', color: 'rgb(var(--cui-rgb-text-0))', padding: '0.25em 0.33em' }}
   >
     {children}
   </button>

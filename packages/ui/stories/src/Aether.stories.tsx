@@ -15,8 +15,8 @@ export const Simple = Template.bind({})
 Simple.args = {
   style: { overflow: 'auto' },
 	children: <div className="theme-warn scheme-light-above" style={{
-    background: 'var(--cui-background-color)',
-    color: 'var(--cui-color)',
+    background: 'varrgb(var(--cui-rgb-background-25))',
+    color: 'rgb(var(--cui-rgb-text-50))',
     margin: '2em',
     padding: '1em',
     textAlign: 'center',

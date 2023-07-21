@@ -1,10 +1,10 @@
 import { DetailedHTMLProps, HTMLAttributes } from 'react'
 
 export const Block = ({ children, style }: DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement>) => <div style={{
-	background: 'var(--cui-toned-control-background-color)',
+	background: 'rgba(var(--cui-rgb-toned-background-50), var(--cui-opacity--low));',
 	borderRadius: '0.25em',
 	display: 'flex',
-	color: 'var(--cui-toned-color)',
+	color: 'rgb(var(--cui-rgb-toned-color-50))',
 	fontSize: '0.8125em',
 	lineHeight: '1em',
 	justifyContent: 'space-between',

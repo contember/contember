@@ -1,30 +1,28 @@
 import { useClassName } from '@contember/react-utils'
-import { dataAttribute } from '@contember/utilities'
+import { ComponentClassNameProps, dataAttribute } from '@contember/utilities'
 import { memo } from 'react'
 import { HTMLDivElementProps, Size } from '../../types'
 import { toEnumViewClass } from '../../utils'
 
 export type SpacerProps =
+	& ComponentClassNameProps
+	& Omit<HTMLDivElementProps, 'ref' | 'children'>
 	& {
 		shrink?: boolean
 		grow?: boolean
-		gap?: Size | 'xlarge' | 'none'
+		gap?: Size | 'medium' | 'xlarge' | 'none'
 	}
-	& Omit<HTMLDivElementProps, 'ref'>
 
 
 /**
  * @group UI
  */
-export const Spacer = memo(({ className, gap, grow, shrink, ...rest }: SpacerProps) => {
+export const Spacer = memo(({ className, componentClassName = 'spacer', gap, grow, shrink, ...rest }: SpacerProps) => {
 	return <div
 		data-gap={dataAttribute(gap)}
 		data-grow={dataAttribute(grow)}
 		data-shrink={dataAttribute(shrink)}
-		className={useClassName('spacer', [
-			toEnumViewClass(gap),
-			className,
-		])}
+		className={useClassName(componentClassName, className)}
 		{...rest}
 	/>
 })

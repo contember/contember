@@ -669,12 +669,12 @@ export interface DimensionSwitcherValue {
 }
 
 // @public (undocumented)
-export const Divider: MemoExoticComponent<({ className, gap, ...rest }: DividerProps) => JSX.Element>;
+export const Divider: MemoExoticComponent<({ className, componentClassName, gap, ...rest }: DividerProps) => JSX.Element>;
 
 // @public (undocumented)
-export type DividerProps = {
-    gap?: Size | 'xlarge' | 'none';
-} & Omit<HTMLDivElementProps, 'children'>;
+export type DividerProps = Omit<HTMLDivElementProps, 'children'> & ComponentClassNameProps & {
+    gap?: Size | 'medium' | 'xlarge' | 'none';
+};
 
 // @public (undocumented)
 export const Dropdown: MemoExoticComponent<(props: DropdownProps) => JSX.Element>;
@@ -2413,14 +2413,14 @@ export type SlugInputProps = TextInputProps & {
 };
 
 // @public (undocumented)
-export const Spacer: MemoExoticComponent<({ className, gap, grow, shrink, ...rest }: SpacerProps) => JSX.Element>;
+export const Spacer: MemoExoticComponent<({ className, componentClassName, gap, grow, shrink, ...rest }: SpacerProps) => JSX.Element>;
 
 // @public (undocumented)
-export type SpacerProps = {
+export type SpacerProps = ComponentClassNameProps & Omit<HTMLDivElementProps, 'ref' | 'children'> & {
     shrink?: boolean;
     grow?: boolean;
-    gap?: Size | 'xlarge' | 'none';
-} & Omit<HTMLDivElementProps, 'ref'>;
+    gap?: Size | 'medium' | 'xlarge' | 'none';
+};
 
 // @public (undocumented)
 export const Spinner: MemoExoticComponent<() => JSX.Element>;

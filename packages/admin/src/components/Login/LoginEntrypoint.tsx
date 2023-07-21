@@ -1,5 +1,5 @@
 import { ContemberClient } from '@contember/react-client'
-import { Button, ErrorList, Icon, Providers, Stack } from '@contember/ui'
+import { Button, ErrorList, Icon, Providers, SpinnerOverlay, Stack } from '@contember/ui'
 import { FC, ReactNode, useEffect, useMemo, useState } from 'react'
 import { Link, RequestProvider, RoutingContext, RoutingContextValue } from '../../routing'
 import {
@@ -176,19 +176,28 @@ const LoginContainer = ({ identityProviders = [], collapsedEmailLogin: initialCo
 
 	const redirectToBacklink = useRedirectToBacklinkCallback()
 
-	useIDPAutoInit({ onError: setError, providers: identityProviders })
-
+	const idpAutoInit = useIDPAutoInit({ providers: identityProviders })
 	const idpHandlerFeedback = useResponseHandlerFeedback({ onLogin: redirectToBacklink })
+
+	const errors = useMemo(() => [
+		...(error ? [{ message: error }] : []),
+		...(idpAutoInit.type === 'failed' ? [{ message: idpAutoInit.error }] : []),
+	], [error, idpAutoInit])
+
 	if (idpHandlerFeedback !== null) {
 		return idpHandlerFeedback
+	}
+	if (idpAutoInit.type === 'processing') {
+		return <SpinnerOverlay />
 	}
 
 	const visibleIdentityProviders = identityProviders.filter(it => !it.hidden)
 
 	const showAlternativeLoginButtons = visibleIdentityProviders.length > 0 || collapsedEmailLogin
 
+
 	return <>
-		<ErrorList errors={error ? [{ message: error }] : []} />
+		<ErrorList errors={errors} />
 		{!collapsedEmailLogin && <Login resetLink={resetRequestPageName} onLogin={redirectToBacklink} />}
 		{showAlternativeLoginButtons && (
 			<Stack direction="vertical">

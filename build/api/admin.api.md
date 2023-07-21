@@ -2653,6 +2653,16 @@ export interface IDP {
 }
 
 // @public (undocumented)
+export type IDPAutoInitState = {
+    type: 'nothing';
+} | {
+    type: 'processing';
+} | {
+    type: 'failed';
+    error: string;
+};
+
+// @public (undocumented)
 export const IDPInitButton: ({ provider, onError }: IDPInitButtonProps) => JSX.Element;
 
 // @public (undocumented)
@@ -5195,23 +5205,28 @@ export interface UseHandleIDPResponseProps {
 export const useIdentity: () => Identity;
 
 // @public (undocumented)
-export const useIDPAutoInit: ({ onError, providers }: UseIDPAutoInitProps) => void;
+export const useIDPAutoInit: ({ onError, providers }: UseIDPAutoInitProps) => IDPAutoInitState;
 
 // @public (undocumented)
 export interface UseIDPAutoInitProps {
     // (undocumented)
-    onError: UseInitIDPRedirectProps['onError'];
+    onError?: UseInitIDPRedirectProps['onError'];
     // (undocumented)
     providers: readonly IDP[];
 }
 
 // @public (undocumented)
-export const useInitIDPRedirect: ({ onError }: UseInitIDPRedirectProps) => ({ provider }: IDP) => Promise<void>;
+export const useInitIDPRedirect: ({ onError }: UseInitIDPRedirectProps) => ({ provider }: IDP) => Promise<{
+    ok: true;
+} | {
+    ok: false;
+    error: string;
+}>;
 
 // @public (undocumented)
 export interface UseInitIDPRedirectProps {
     // (undocumented)
-    onError: (message: string) => void;
+    onError?: (message: string) => void;
 }
 
 // @public (undocumented)

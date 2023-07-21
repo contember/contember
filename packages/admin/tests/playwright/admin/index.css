@@ -1,4 +1,5 @@
 @import "../../../src/index.css";
+@import "../../../../brand/src/index.css";
 
 @font-face {
 	font-family: 'Ahem';

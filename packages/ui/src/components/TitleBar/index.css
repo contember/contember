@@ -4,7 +4,7 @@
 	--cui-title-bar-padding-right: var(--cui-layout-page-padding-right);
 	--cui-title-bar-gap: calc(var(--cui-layout-section-gap) / 2);
 	align-items: stretch;
-	background-color: var(--cui-background-color);
+	background-color: rgb(var(--cui-background-color-rgb-25));
 	display: flex;
 	flex-direction: column;
 	gap: var(--cui-title-bar-gap);
@@ -17,7 +17,7 @@
 }
 
 :where(.cui-titleBar.is-global-theme) {
-	background-color: var(--cui-background-color--below);
+	background-color: rgb(var(--cui-background-color-rgb-25));
 }
 
 :where(.cui-titleBar)::after {
@@ -27,7 +27,7 @@
 	left: 0;
 	right: 0;
 	bottom: 0;
-	border-bottom: var(--cui-control-border-width, 1px) solid var(--cui-color--lower);
+	border-bottom: var(--cui-border-width, 1px) solid rgba(var(--cui-color-rgb-50), var(--cui-opacity--lower));
 }
 
 :where(.cui-titleBar-in) {
@@ -49,7 +49,7 @@
 
 @media (max-width: 767.98px) {
 	:where(.cui-titleBar) {
-		background: linear-gradient(to bottom, var(--cui-background-color), var(--cui-background-color--below));
+		background: linear-gradient(to bottom, var(--cui-background-color-rgb-25), rgb(var(--cui-background-color-rgb-25)));
 		border-bottom-color: transparent;
 	}
 }

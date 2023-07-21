@@ -1,6 +1,6 @@
 import { Entity, EntityAccessor, EntityListAccessor, useEnvironment } from '@contember/binding'
 import { emptyArray } from '@contember/react-utils'
-import { AnchorButton, ButtonGroup, ButtonProps, Checkbox, Dropdown, DropdownProps, FieldContainer } from '@contember/ui'
+import { AnchorButton, ButtonGroup, ButtonProps, Checkbox, Dropdown, DropdownProps, FieldContainer, Stack } from '@contember/ui'
 import { ReactNode, useCallback, useEffect, useMemo } from 'react'
 import type { RequestChange } from '../../../../routing'
 import { RoutingLink, useRedirect } from '../../../../routing'
@@ -111,12 +111,13 @@ export function DimensionsRenderer(props: DimensionsRendererProps) {
 		}
 
 		return (
-			<div
-				style={{ display: 'flex', flexDirection: 'column', gap: '0.25em', padding: '0.75em' }}
+			<Stack
+				direction="vertical"
+				gap="large"
 				key="multipleDimensions"
 			>
 				{renderedDimensions}
-			</div>
+			</Stack>
 		)
 	}
 

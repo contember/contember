@@ -38,8 +38,8 @@ export const LayoutComponent = ({ children, ...rest }: PropsWithChildren) => {
 			footer={(
 				<LayoutKit.Footer
 					start={targetsIfActive(['FooterStart']) || false}
-					center={targetsIfActive(['FooterCenter', 'Switchers']) || false}
-					end={targetsIfActive(['FooterEnd']) || false}
+					center={targetsIfActive(['FooterCenter']) || false}
+					end={targetsIfActive(['FooterEnd', 'Switchers']) || false}
 				/>
 			)}
 			{...rest}

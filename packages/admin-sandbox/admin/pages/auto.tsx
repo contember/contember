@@ -14,7 +14,7 @@ import {
 	useOnPersistSuccess,
 } from '@contember/admin'
 import { Directive } from '../components/Directives'
-import { SlotSources, Title } from '../components/Slots'
+import { SlotSources } from '../components/Slots'
 
 const AutoGridList = () => {
 	const env = useEnvironment()
@@ -32,7 +32,7 @@ const AutoGridList = () => {
 
 export default (
 	<>
-		<Title>Auto Admin</Title>
+		<SlotSources.Title>Auto Admin</SlotSources.Title>
 
 		<DataBindingProvider stateComponent={FeedbackRenderer}>
 			<AutoGridList />
@@ -63,7 +63,7 @@ export function Grid() {
 					<NavigateBackLink to={{ pageName: 'auto' }}>Back to Auto</NavigateBackLink>
 				</SlotSources.Back>
 
-				<Title>{`List ${entity}`}</Title>
+				<SlotSources.Title>{`List ${entity}`}</SlotSources.Title>
 				<SlotSources.Actions>{actions}</SlotSources.Actions>
 
 				<AutoGrid entities={entity + filter} createViewLinkTarget={createViewLinkTarget} createEditLinkTarget={createEditLinkTarget} />
@@ -84,7 +84,7 @@ export function Form() {
 
 	return (
 		<>
-			<Title>{title}</Title>
+			<SlotSources.Title>{title}</SlotSources.Title>
 			<SlotSources.Back>
 				<NavigateBackLink to={{ pageName: 'auto/grid', parameters: { entity } }}>Back to Grid</NavigateBackLink>
 			</SlotSources.Back>

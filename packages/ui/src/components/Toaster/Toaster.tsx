@@ -45,7 +45,7 @@ export const Toaster: React.FC = () => {
 							distinction="striking"
 							action={
 								<Button
-									distinction="seamless"
+									distinction="toned"
 									flow="squarish"
 									onClick={() => {
 										toasterContext.dismissToast(toast.id)

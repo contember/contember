@@ -11,11 +11,11 @@ import {
 	TextCell,
 	TextField,
 } from '@contember/admin'
-import { SlotSources, Title } from '../components/Slots'
+import { SlotSources } from '../components/Slots'
 
 export const list = (
 	<>
-		<Title>List of Seqs</Title>
+		<SlotSources.Title>List of Seqs</SlotSources.Title>
 		<SlotSources.Actions>
 			<LinkButton to={'seq/create'}>New entity</LinkButton>
 		</SlotSources.Actions>
@@ -32,7 +32,7 @@ export const list = (
 
 export const create = (
 	<>
-		<Title>Create a new Seq</Title>
+		<SlotSources.Title>Create a new Seq</SlotSources.Title>
 		<CreateScope entity="SeqEntity" redirectOnSuccess="seq/edit(id: $entity.id)">
 			<SlotSources.Actions><PersistButton /></SlotSources.Actions>
 			<TextField field={'value'} label={'Value'} />
@@ -44,7 +44,7 @@ export const edit = (
 	<>
 		<EditScope entity="SeqEntity(id = $id)">
 			<FieldView field="value" render={title => (
-				<Title>{`Edit ${title.getAccessor().value ? title.getAccessor().value : 'Article'}`}</Title>
+				<SlotSources.Title>{`Edit ${title.getAccessor().value ? title.getAccessor().value : 'Article'}`}</SlotSources.Title>
 			)} />
 
 			<SlotSources.Actions><PersistButton /></SlotSources.Actions>

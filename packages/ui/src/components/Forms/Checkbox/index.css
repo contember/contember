@@ -1,10 +1,8 @@
 :where(.cui-checkbox) {
-	--checkbox-button-border-radius: .3em;
-	--checkbox-button-background-color: transparent;
-	--checkbox-button-size: calc(1em * var(--cui-line-height));
-	--tick-color: transparent;
-	--tick-border-color: var(--cui-color--high);
-	--control-font-size: var(--cui-control-font-size);
+	--cui-checkbox-background-color: transparent;
+	--cui-checkbox-tick-border-color: rgb(var(--cui-color-rgb-50));
+	--cui-checkbox-font-size: var(--cui-font-size--controls);
+	--cui-checkbox-color--readonly: rgba(var(--cui-color-rgb-50), var(--cui-opacity--medium));
 	position: relative;
 }
 
@@ -26,48 +24,46 @@
 }
 
 :where(.cui-checkbox.view-small) {
-	--control-font-size: var(--cui-control-font-size--small);
+	--cui-checkbox-font-size: var(--cui-font-size--controls--small);
 }
 
 :where(.cui-checkbox.view-large) {
-	--control-font-size: var(--cui-control-font-size--large);
+	--cui-checkbox-font-size: var(--cui-font-size--controls--large);
 }
 
 :where(.cui-checkbox.is-hovered),
 :where(.cui-checkbox:hover) {
-	--tick-border-color: var(--cui-control-border-color--highlighted);
+	--cui-checkbox-tick-border-color: rgb(var(--cui-color-accent-rgb-50));
 }
 
 :where(.cui-checkbox.is-readonly) {
-	--checkbox-button-background-color: var(--radio-color--readonly);
-	color: var(--radio-color--readonly);
+	--cui-checkbox-background-color: rgba(var(--cui-color-rgb-50), var(--cui-opacity--medium));
 }
 
 :where(.cui-checkbox.is-invalid) {
-	--checkbox-button-background-color: rgb(var(--cui-theme-danger-500));
-	--tick-border-color: rgb(var(--cui-theme-danger-500));
+	--cui-checkbox-background-color: rgb(var(--cui-theme-danger-rgb-500));
+	--cui-checkbox-tick-border-color: rgb(var(--cui-theme-danger-rgb-500));
 }
 
 :where(.cui-checkbox.is-checked:not(.is-invalid)) {
-	--checkbox-button-background-color: var(--cui-control-border-color);
-	--tick-border-color: var(--cui-control-border-color);
+	--cui-checkbox-background-color: rgb(var(--cui-background-color-controls-rgb-50));
+	--cui-checkbox-tick-border-color: rgb(var(--cui-background-color-controls-rgb-50));
 }
 
 :where(.cui-checkbox.is-disabled) {
-	--checkbox-button-background-color: var(--cui-color--medium);
-	--tick-border-color: var(--cui-color--medium);
+	--cui-checkbox-tick-border-color: rgba(var(--cui-color-rgb-50), var(--cui-opacity--medium));
 }
 
 :where(.cui-checkbox-button) {
-	background: var(--checkbox-button-background-color);
-	border-radius: var(--checkbox-button-border-radius);
-	border: var(--cui-control-border-width, 1px) solid var(--tick-border-color);
-	color: var(--tick-color);
+	background: var(--cui-checkbox-background-color);
+	border-radius: var(--cui-border-radius--controls);
+	border: var(--cui-border-width--controls, 1px) solid var(--cui-checkbox-tick-border-color);
+	color: transparent;
 	display: block;
-	max-height: var(--checkbox-button-size);
-	max-width: var(--checkbox-button-size);
-	min-height: var(--checkbox-button-size);
-	min-width: var(--checkbox-button-size);
+	max-height: var(--cui-size--checkbox);
+	max-width: var(--cui-size--checkbox);
+	min-height: var(--cui-size--checkbox);
+	min-width: var(--cui-size--checkbox);
 	pointer-events: none;
 	position: relative;
 	transition: background-color var(--cui-transition-duration--immediate), border-color var(--cui-transition-duration--immediate), box-shadow 0.2s;
@@ -105,7 +101,7 @@
 	align-items: center;
 	justify-content: center;
 	display: flex;
-	color: var(--tick-border-color);
+	color: var(--cui-checkbox-tick-border-color);
 	position: absolute;
 	line-height: 1em;
 	left: 0;
@@ -116,7 +112,7 @@
 
 :where(.cui-checkbox-button.is-disabled) {
 	cursor: not-allowed;
-	opacity: 0.33;
+	opacity: var(--cui-opacity--medium);
 }
 
 :where(.cui-checkbox-button.is-read-only) {
@@ -125,15 +121,15 @@
 }
 
 :where(.cui-checkbox-button.is-focused) {
-	box-shadow: 0 0 0 0.2em var(--cui-control-border-color--highlighted);
+	box-shadow: 0 0 0 0.2em rgb(var(--cui-color-accent-rgb-50));
 }
 
 :where(.cui-checkbox-button.is-focused:not(.is-checked)) {
-	--tick-border-color: var(--cui-control-border-color--highlighted);
+	--cui-checkbox-tick-border-color: rgb(var(--cui-color-accent-rgb-50));
 }
 
 :where(.cui-checkbox-button.is-indeterminate) {
-	border-width: var(--cui-control-border-width, 1px);
+	border-width: var(--cui-border-width--controls, 2px);
 	border-style: dashed;
 }
 

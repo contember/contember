@@ -19,6 +19,9 @@
 :where(.cui-spacer[data-gap="small"]) {
 	--spacer-margin: var(--cui-gap);
 }
+:where(.cui-spacer[data-gap="medium"]) {
+	--spacer-margin: var(--cui-gutter);
+}
 
 :where(.cui-spacer[data-gap="large"]) {
 	--spacer-margin: calc(1.5 * var(--cui-padding));

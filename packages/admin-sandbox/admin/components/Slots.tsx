@@ -17,6 +17,14 @@ import {
 import { useDocumentTitle } from '@contember/react-utils'
 import { memo } from 'react'
 
+const Title = memo<{ children: string | null | undefined }>(({ children }) => {
+	useDocumentTitle(children)
+
+	return (
+		<CommonSlotSources.Title>{children}</CommonSlotSources.Title>
+	)
+})
+
 export const slots = [
 	...commonSlots,
 	...contentSlots,
@@ -31,6 +39,7 @@ export const SlotSources = {
 	...ContentSlotSources,
 	...HeaderSlotSources,
 	...FooterSlotSources,
+	Title,
 	// Your custom slots will come here, e.g:
 	// MySLot: Slots.createSlotSourceComponent('MySlot'),
 }
@@ -43,11 +52,3 @@ export const SlotTargets = {
 	// Your custom slot targets will come here, e.g:
 	// MySLot: Slots.createSlotTargetComponent('MySlot'),
 }
-
-export const Title = memo<{ children: string | null | undefined }>(({ children }) => {
-	useDocumentTitle(children)
-
-	return (
-		<CommonSlotSources.Title>{children}</CommonSlotSources.Title>
-	)
-})

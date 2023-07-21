@@ -209,7 +209,7 @@ export type ButtonElevation = Default | 'none';
 export type ButtonFlow = Default | 'circular' | 'squarish' | 'generous' | 'block' | 'generousBlock';
 
 // @public (undocumented)
-export const ButtonGroup: MemoExoticComponent<({ size, flow, orientation, isTopToolbar, children }: ButtonGroupProps) => JSX.Element>;
+export const ButtonGroup: MemoExoticComponent<({ size, componentClassName, className, flow, orientation, isTopToolbar, children }: ButtonGroupProps) => JSX.Element>;
 
 // @public (undocumented)
 export type ButtonGroupFlow = Default | 'block';
@@ -218,7 +218,7 @@ export type ButtonGroupFlow = Default | 'block';
 export type ButtonGroupOrientation = Default | 'horizontal' | 'vertical';
 
 // @public (undocumented)
-export interface ButtonGroupProps {
+export interface ButtonGroupProps extends ComponentClassNameProps {
     // (undocumented)
     children?: ReactNode;
     // (undocumented)
@@ -232,13 +232,13 @@ export interface ButtonGroupProps {
 }
 
 // @public (undocumented)
-export const ButtonList: MemoExoticComponent<({ children, flow, orientation, size }: ButtonListProps) => JSX.Element>;
+export const ButtonList: MemoExoticComponent<({ children, className, componentClassName, flow, orientation, size }: ButtonListProps) => JSX.Element>;
 
 // @public (undocumented)
 export type ButtonListFlow = Default | 'inline' | 'block';
 
 // @public (undocumented)
-export interface ButtonListProps {
+export interface ButtonListProps extends ComponentClassNameProps {
     // (undocumented)
     children?: ReactNode;
     // (undocumented)
@@ -669,12 +669,12 @@ export interface DimensionSwitcherValue {
 }
 
 // @public (undocumented)
-export const Divider: MemoExoticComponent<({ className, gap, ...rest }: DividerProps) => JSX.Element>;
+export const Divider: MemoExoticComponent<({ className, componentClassName, gap, ...rest }: DividerProps) => JSX.Element>;
 
 // @public (undocumented)
-export type DividerProps = {
-    gap?: Size | 'xlarge' | 'none';
-} & Omit<HTMLDivElementProps, 'children'>;
+export type DividerProps = Omit<HTMLDivElementProps, 'children'> & ComponentClassNameProps & {
+    gap?: Size | 'medium' | 'xlarge' | 'none';
+};
 
 // @public (undocumented)
 export const Dropdown: MemoExoticComponent<(props: DropdownProps) => JSX.Element>;
@@ -1715,7 +1715,7 @@ export interface IconSourceSpecification {
 }
 
 // @public (undocumented)
-export type InputValueProps<T, E extends HTMLElement> = ControlValueProps<T> & {
+export type InputValueProps<T, E extends HTMLElement> = ControlStateProps & ControlValueProps<T> & {
     required?: boolean;
     emptyValue: T;
     extractValue: (input: E) => T | null;
@@ -2413,14 +2413,14 @@ export type SlugInputProps = TextInputProps & {
 };
 
 // @public (undocumented)
-export const Spacer: MemoExoticComponent<({ className, gap, grow, shrink, ...rest }: SpacerProps) => JSX.Element>;
+export const Spacer: MemoExoticComponent<({ className, componentClassName, gap, grow, shrink, ...rest }: SpacerProps) => JSX.Element>;
 
 // @public (undocumented)
-export type SpacerProps = {
+export type SpacerProps = ComponentClassNameProps & Omit<HTMLDivElementProps, 'ref' | 'children'> & {
     shrink?: boolean;
     grow?: boolean;
-    gap?: Size | 'xlarge' | 'none';
-} & Omit<HTMLDivElementProps, 'ref'>;
+    gap?: Size | 'medium' | 'xlarge' | 'none';
+};
 
 // @public (undocumented)
 export const Spinner: MemoExoticComponent<() => JSX.Element>;
@@ -2905,7 +2905,7 @@ export function useInputClassName<P extends NonOptionalUseInputClassNameProps | 
 export type UseInputClassNameProps = Omit<VisuallyDependentControlProps, 'id' | 'name' | 'placeholder' | 'style'>;
 
 // @public (undocumented)
-export const useInputValue: <T, E extends HTMLElement>({ defaultValue, value, onChange, notNull: notNull_, required, emptyValue, extractValue, }: InputValueProps<T, E>) => {
+export const useInputValue: <T, E extends HTMLElement>({ defaultValue, value, onChange, notNull: notNull_, required, emptyValue, extractValue, readOnly, disabled, }: InputValueProps<T, E>) => {
     onChange: ChangeEventHandler<E>;
     state: T | null;
 };

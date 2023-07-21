@@ -10,6 +10,7 @@ export const Navigation = () => (
 		<Menu.Item title="Examples">
 			<Menu.Item title="Auto" to="auto" />
 			<Menu.Item title="Inputs" to="inputs" />
+			<Menu.Item title="Buttons" to="buttons" />
 
 			<Menu.Item title="Homepage" to="homepage" />
 			<Menu.Item title="Brand" to="brand" />

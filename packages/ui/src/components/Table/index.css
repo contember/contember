@@ -1,22 +1,12 @@
 :where(.cui-table) {
-	color: var(--cui-color);
-	display: table;
-	border-collapse: collapse;
-	width: 100%;
-	color: var(--cui-color);
-	display: table;
-	border-collapse: collapse;
-	width: 100%;
-	color: var(--cui-color);
-	display: table;
-	border-collapse: collapse;
-	width: 100%;
-}
-
-:where(.cui-table) {
 	--cui-table-spacingX: 0.75em;
 	--cui-table-spacingY: 0.75em;
+	border-collapse: collapse;
+	border-width: 0;
+	color: rgb(var(--cui-color-rgb-50));
+	display: table;
 	font-size: 1em;
+	width: 100%;
 }
 
 :where(.cui-table.view-small) {
@@ -34,48 +24,61 @@
 :where(.cui-table-container) {
 	margin-left: calc(-1 * max(var(--inset-left, 0px), var(--cui-padding)));
 	margin-right: calc(-1 * max(var(--inset-right, 0px), var(--cui-padding)));
-	overflow-x: auto;
 }
+
 :where(.cui-table-container > *) {
 	padding-left: max(var(--inset-left, 0px), var(--cui-padding));
 	padding-right: max(var(--inset-right, 0px), var(--cui-padding));
 }
+:where(
+	.cui-table-container > .cui-field-container-label,
+	.cui-table-container > .cui-field-container-label > .cui-field-container-body,
+	.cui-table-container > .cui-field-container-label > .cui-field-container-body > .cui-field-container-body-content,
+) {
+	display: flex;
+	flex: 1;
+	flex-direction: row;
+}
+
+:where(.cui-table-container > .cui-field-container-label) { overflow-x: auto }
 
 :where(.cui-table-wrapper) {
-	padding-bottom: 1px;
-	border-radius: var(--cui-control-border-radius, 0);
+	border-radius: var(--cui-border-radius--controls, 0);
+	display: flex;
 	margin: calc(-1 * var(--cui-boxNesting-paddingY, 0)) calc(-1 * var(--cui-boxNesting-paddingX, 0));
 	width: calc(100% + 2 * var(--cui-boxNesting-paddingX, 0));
 }
 
 :where(.cui-table-row) {
+	border-color: rgba(var(--cui-color-rgb-50), var(--cui-opacity--lower));
 	display: table-row;
+	border-top-width: 1px;
 }
-
-:where(.cui-table-row:nth-child(even)) {
-	background-color: rgba(0, 0, 0, 0.02);
+:where(.cui-table-row:first-child) {
+	border-top-width: 0;
 }
 
 :where(.cui-table-row.with-hover:hover),
 :where(.cui-table-row.with-hover:hover > .cui-table-cell) {
-	color: var(--cui-control-color);
-	background-color: var(--cui-toned-control-background-color--highlighted);
+	background-color: rgba(var(--cui-background-color-toned-rgb-50), var(--cui-opacity--lower));
+	color: rgb(var(--cui-color-accent-rgb-50));
 	cursor: pointer;
 }
 
 :where(.cui-table-row.with-press:active),
 :where(.cui-table-row.with-press:active > .cui-table-cell) {
-	color: var(--cui-control-color--pressed);
-	background-color: var(--cui-toned-control-background-color--pressed);
+	background-color: rgba(var(--cui-background-color-controls-rgb-50), var(--cui-opacity--lower));
+	color: rgb(var(--cui-color-accent-rgb-25));
 }
 
 :where(.cui-table-row.is-active) {
-	background-color: var(--cui-toned-control-background-color);
-	color: var(--cui-control-color--highlighted);
+	background-color: rgba(var(--cui-background-color-toned-rgb-50), var(--cui-opacity--low));
+	color: rgb(var(--cui-color-accent-rgb-75));
 }
 
 :where(.cui-table thead .cui-table-row) {
-	background-color: rgba(0, 0, 0, 0.05);
+	background-color: rgba(var(--cui-background-color-rgb-0), var(--cui-opacity--lower));
+	border-bottom-width: 1px;
 }
 
 :where(.cui-table-cell) {

@@ -112,8 +112,8 @@ const ThemePreview = ({ background, belowAbove, children }: ThemePreviewProps) =
 				background !== 'inherit' ? `scheme-${background + (belowAbove ? `-${belowAbove}` : '')}` : undefined,
 			])} style={{
 				borderRadius: '1em',
-				backgroundColor: 'var(--cui-background-color)',
-				color: 'var(--cui-color)',
+				backgroundColor: 'rgb(var(--cui-background-color-rgb-25))',
+				color: 'rgb(var(--cui-color-rgb-50))',
 				padding: '1em',
 			}}>
 				{children}

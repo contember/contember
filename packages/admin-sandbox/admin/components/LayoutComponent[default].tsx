@@ -4,6 +4,7 @@ import { ComponentClassNameProps, pick } from '@contember/utilities'
 import { PropsWithChildren } from 'react'
 import { AppHeaderTitle } from './AppHeaderTitle'
 import { useDirectives } from './Directives'
+import { PanelDivider } from './PanelDivider'
 import { SlotTargets } from './Slots'
 
 const LayoutSlots = pick(SlotTargets, [
@@ -76,8 +77,8 @@ export const LayoutComponent = ({ children, ...rest }: PropsWithChildren<Compone
 			footer={(
 				<LayoutKit.Footer
 					start={targetsIfActive(['FooterStart']) || false}
-					center={targetsIfActive(['FooterCenter', 'Switchers']) || false}
-					end={targetsIfActive(['FooterEnd']) || false}
+					center={targetsIfActive(['FooterCenter']) || false}
+					end={targetsIfActive(['FooterEnd', 'Switchers']) || false}
 				/>
 			)}
 			{...rest}
@@ -93,7 +94,7 @@ export const LayoutComponent = ({ children, ...rest }: PropsWithChildren<Compone
 				body={targetsIfActive(['Navigation']) || false}
 				footer={false}
 			/>
-			<Divider />
+			<PanelDivider name={LayoutKit.SidebarLeft.NAME} />
 			<LayoutKit.ContentPanelMain
 				header={targetsIfActive(['ContentHeader'])}
 				body={(

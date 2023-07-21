@@ -1,15 +1,14 @@
 import { Section, SectionTabs, SectionTabsProvider, SelectFieldInner } from '@contember/admin'
-import { ContentSlotSources, HeaderSlotSources } from '@contember/layout'
 import { Directive } from '../../components/Directives'
-import { SlotSources, Title } from '../../components/Slots'
+import { SlotSources } from '../../components/Slots'
 
 export default function InnerFooPage() {
 	return (
 		<SectionTabsProvider>
-			<Title>Nested Path</Title>
-			<ContentSlotSources.ContentHeader>
+			<SlotSources.Title>Nested Path</SlotSources.Title>
+			<SlotSources.ContentHeader>
 				<SectionTabs />
-			</ContentSlotSources.ContentHeader>
+			</SlotSources.ContentHeader>
 
 			<Directive name="content-max-width" content={720} />
 

@@ -29,7 +29,7 @@ import { CategoryForm } from '../components/CategoryForm'
 import { DataGridTile } from '../components/DataGridTile'
 import { Directive } from '../components/Directives'
 import { EditOrCreateForm } from '../components/EditOrCreateForm'
-import { SlotSources, Title } from '../components/Slots'
+import { SlotSources } from '../components/Slots'
 
 
 const stateOptions = {
@@ -40,7 +40,7 @@ const stateOptions = {
 
 export const list = () => (
 	<>
-		<Title>Articles</Title>
+		<SlotSources.Title>Articles</SlotSources.Title>
 		<Directive name="content-max-width" content={null} />
 		<SlotSources.Actions><LinkButton to="articles/create">Add article</LinkButton></SlotSources.Actions>
 
@@ -75,7 +75,7 @@ export const create = (
 		<SlotSources.Back>
 			<NavigateBackLink to="articles/list">Back to articles</NavigateBackLink>
 		</SlotSources.Back>
-		<Title>New Article</Title>
+		<SlotSources.Title>New Article</SlotSources.Title>
 		<CreateScope entity="Article" redirectOnSuccess="articles/edit(id: $entity.id)">
 			<EditOrCreateForm />
 		</CreateScope>
@@ -94,7 +94,7 @@ export const edit = () => (
 			redirectOnSuccess={(current, ids, entity) => !entity.existsOnServer ? 'articles/list' : undefined}
 		>
 			<FieldView field="title" render={title => (
-				<Title>{`Edit ${title.getAccessor().value ? title.getAccessor().value : 'Article'}`}</Title>
+				<SlotSources.Title>{`Edit ${title.getAccessor().value ? title.getAccessor().value : 'Article'}`}</SlotSources.Title>
 			)} />
 
 			<EditOrCreateForm />
@@ -110,7 +110,7 @@ export const edit = () => (
 
 export const categories = () => (
 	<>
-		<Title>Categories</Title>
+		<SlotSources.Title>Categories</SlotSources.Title>
 
 		<MultiEditScope entities="Category" listProps={{
 			sortableBy: 'order',
@@ -130,7 +130,7 @@ const CustomRepeaterItem = (props: RepeaterItemProps) => {
 
 export const tags = () => (
 	<>
-		<Title>Tags</Title>
+		<SlotSources.Title>Tags</SlotSources.Title>
 
 		<MultiEditScope entities="Tag" listProps={{ beforeContent: <SlotSources.Actions><PersistButton /></SlotSources.Actions> }}>
 			<TextField field={'name'} label={'Name'} />

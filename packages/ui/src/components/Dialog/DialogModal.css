@@ -1,27 +1,24 @@
 :where(.cui-dialog-modal) {
-	--cui-dialog-modal-border: var(--cui-control-border-width, 1px) solid var(--cui-color--lower);
-	--cui-dialog-modal-background-color: var(--cui-background-color--above);
-	--cui-dialog-modal-padding-left: calc(0.5 * var(--cui-padding));
-	--cui-dialog-modal-padding-right: calc(0.5 * var(--cui-padding));
-	--cui-dialog-modal-padding-top: calc(0.5 * var(--cui-padding));
-	--cui-dialog-modal-padding-bottom: calc(0.5 * var(--cui-padding));
-	--cui-dialog-modal-header-padding-left: var(--cui-dialog-modal-padding-left);
-	--cui-dialog-modal-header-padding-right: var(--cui-dialog-modal-padding-right);
-	--cui-dialog-modal-header-padding-top: var(--cui-dialog-modal-padding-top);
-	--cui-dialog-modal-header-padding-bottom: var(--cui-dialog-modal-padding-bottom);
-	--cui-dialog-modal-body-padding-left: var(--cui-dialog-modal-padding-left);
-	--cui-dialog-modal-body-padding-right: var(--cui-dialog-modal-padding-right);
-	--cui-dialog-modal-body-padding-top: var(--cui-dialog-modal-padding-top);
-	--cui-dialog-modal-body-padding-bottom: var(--cui-dialog-modal-padding-bottom);
-	--cui-dialog-modal-footer-padding-left: var(--cui-dialog-modal-padding-left);
-	--cui-dialog-modal-footer-padding-right: var(--cui-dialog-modal-padding-right);
-	--cui-dialog-modal-footer-padding-top: var(--cui-dialog-modal-padding-top);
-	--cui-dialog-modal-footer-padding-bottom: var(--cui-dialog-modal-padding-bottom);
+	--cui-dialog-modal-background-color: rgb(var(--cui-background-color-rgb-50));
+	--cui-dialog-modal-header-padding-left: var(--cui-inner-padding);
+	--cui-dialog-modal-header-padding-right: var(--cui-inner-padding);
+	--cui-dialog-modal-header-padding-top: var(--cui-inner-padding);
+	--cui-dialog-modal-header-padding-bottom: 0px;
+	--cui-dialog-modal-body-padding-left: var(--cui-inner-padding);
+	--cui-dialog-modal-body-padding-right: var(--cui-inner-padding);
+	--cui-dialog-modal-body-padding-top: var(--cui-inner-padding);
+	--cui-dialog-modal-body-padding-bottom: var(--cui-inner-padding);
+	--cui-dialog-modal-footer-padding-left: var(--cui-inner-padding);
+	--cui-dialog-modal-footer-padding-right: var(--cui-inner-padding);
+	--cui-dialog-modal-footer-padding-top: 0px;
+	--cui-dialog-modal-footer-padding-bottom: var(--cui-inner-padding);
 	--cui-layout-page-padding-left: 0px;
 	--cui-layout-page-padding-right: 0px;
 	background-color: var(--cui-dialog-modal-background-color);
-	border: var(--cui-dialog-modal-border);
-	border-radius: calc(2 * var(--cui-control-border-radius));
+	border-width: var(--cui-border-width, 1px);
+	border-style: solid;
+	border-color: rgba(var(--cui-color-rgb-50), var(--cui-opacity--low));
+	border-radius: calc(2 * var(--cui-border-radius--controls));
 	display: flex;
 	align-items: stretch;
 	flex-direction: column;
@@ -55,7 +52,6 @@
 
 :where(.cui-dialog-modal .cui-data-grid-body) {
 	flex-grow: 1;
-	overflow: hidden;
 }
 
 :where(.cui-dialog-modal .cui-field-container-body-content .cui-table-wrapper) {
@@ -135,5 +131,5 @@
 
 :where(.cui-dialog-modal.with-dividers-body),
 :where(.cui-dialog-modal.with-dividers-footer) {
-	border-top: 1px solid var(--cui-color--lower);
+	border-top: 1px solid rgba(var(--cui-color-rgb-50), var(--cui-opacity--lower));
 }

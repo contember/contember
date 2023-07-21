@@ -1,3 +1,3 @@
-import { Title } from '../components/Slots'
+import { SlotSources } from '../components/Slots'
 
-export default () => <Title>Hello from Lorem</Title>
+export default () => <SlotSources.Title>Hello from Lorem</SlotSources.Title>

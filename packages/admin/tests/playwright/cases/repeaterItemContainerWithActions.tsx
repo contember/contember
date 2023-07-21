@@ -1,5 +1,5 @@
 import { CSSProperties } from 'react'
-import { Button, ButtonDistinction, ButtonFlow, Icon, Intent, Layout, LayoutPage, RepeaterItemContainer, StyleProvider } from '../../../src'
+import { Button, ButtonDistinction, ButtonFlow, Icon, Intent, Layout, LayoutPage, RepeaterItemContainer } from '../../../src'
 
 const verticalStack: CSSProperties = { display: 'flex', flexDirection: 'column', gap: '1em', flex: 1 }
 const horizontalStack: CSSProperties = { display: 'flex', flexDirection: 'row', gap: '1em', flex: 1 }
@@ -8,7 +8,7 @@ const dummyInput = (
 	<div style={{ backgroundColor: 'lightBlue', border: '1px solid blue', borderRadius: '0.25em', height: '2.25em', minWidth: '2.25em' }}></div>
 )
 
-const buttonFlows: ButtonFlow[] = ['default', 'circular', 'squarish']
+const buttonFlows: ButtonFlow[] = ['circular']
 const buttonDistinctions: ButtonDistinction[] = ['seamless', 'default', 'outlined', 'primary', 'toned']
 const intent: Intent = 'danger'
 

@@ -1,4 +1,4 @@
-import { useClassNameFactory, useColorScheme } from '@contember/react-utils'
+import { useClassNameFactory, useColorScheme, useId } from '@contember/react-utils'
 import { assertNever, colorSchemeClassName } from '@contember/utilities'
 import {
 	MouseEventHandler,
@@ -10,6 +10,7 @@ import {
 	useMemo,
 	useState,
 } from 'react'
+import { FocusScope } from 'react-aria'
 import { usePopper } from 'react-popper'
 import { useCloseOnClickOutside, useCloseOnEscape } from '../../auxiliary'
 import type { DropdownAlignment } from '../../types'
@@ -112,21 +113,29 @@ export const Dropdown = memo((props: DropdownProps) => {
 	}
 
 	const currentPortalContainer = usePortalProvider(props.contentContainer)
+	const id = `dropdown${useId()}`
 
 	return (
 		<>
 			{renderToggle ? (
 				renderToggle({ ref: setReferenceElement, onClick: onButtonClick })
 			) : (
-				<Button {...props.buttonProps} onClick={onButtonClick} ref={setReferenceElement} />
+					<Button
+						active={isActive}
+						{...props.buttonProps}
+						onClick={onButtonClick}
+						ref={setReferenceElement}
+						aria-controls={id}
+					/>
 			)}
 			{isActive && (
 				<Portal to={currentPortalContainer}>
 					<div
+						id={id}
 						ref={setPopperElement}
 						style={styles.popper}
 						{...attributes.popper}
-						className={componentClassName('content')}
+						className={componentClassName('content', [colorSchemeClassName(colorScheme)])}
 						data-placement={placement}
 					>
 						<Collapsible
@@ -139,13 +148,15 @@ export const Dropdown = memo((props: DropdownProps) => {
 								setIsTransitioning(false)
 							}}
 						>
-							{renderContent ? (
-								renderContent(renderProps)
-							) : (
-								<div className={componentClassName('content-in', toViewClass('unstyled', !styledContent))}>
-									{typeof children === 'function' ? children(renderProps) : children}
-								</div>
-							)}
+							<FocusScope autoFocus contain={isOpen} restoreFocus>
+								{renderContent ? (
+									renderContent(renderProps)
+								) : (
+									<div className={componentClassName('content-in', toViewClass('unstyled', !styledContent))}>
+										{typeof children === 'function' ? children(renderProps) : children}
+									</div>
+								)}
+							</FocusScope>
 						</Collapsible>
 					</div>
 				</Portal>

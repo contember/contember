@@ -1,5 +1,5 @@
 import { ColorSchemeContext, useClassNameFactory, useColorScheme } from '@contember/react-utils'
-import { colorSchemeClassName, contentThemeClassName, controlsThemeClassName } from '@contember/utilities'
+import { colorSchemeClassName, contentThemeClassName, controlsThemeClassName, dataAttribute } from '@contember/utilities'
 import { ReactNode, createElement, forwardRef, memo } from 'react'
 import type {
 	HTMLAnchorElementProps,
@@ -63,7 +63,7 @@ export const Button = memo(forwardRef<HTMLButtonElement, ButtonProps>((props, re
 Button.displayName = 'Button'
 
 export const BaseButton = memo(forwardRef<any, BaseButtonProps>((props, ref) => {
-	const { Component, intent, size, flow, distinction, elevation, justification, loading, active, bland, children, scheme: schemeProp, ...rest } =
+	const { Component, intent, size, flow, distinction = 'default', elevation = 'none', justification = 'justifyCenter', loading, active, bland, children, scheme: schemeProp, ...rest } =
 		props
 
 	if (props.disabled === true) {
@@ -81,21 +81,23 @@ export const BaseButton = memo(forwardRef<any, BaseButtonProps>((props, ref) => 
 	const scheme = schemeProp ?? colorScheme
 
 	const attrs = {
-		className: componentClassName(null, [
+		'data-active': dataAttribute(active),
+		'data-bland': dataAttribute(bland),
+		'data-disabled': dataAttribute(props.disabled),
+		'data-distinction': dataAttribute(distinction),
+		'data-elevation': dataAttribute(elevation),
+		'data-flow': dataAttribute(flow),
+		'data-intent': dataAttribute(intent),
+		'data-justification': dataAttribute(justification),
+		'data-loading': dataAttribute(loading),
+		'data-size': dataAttribute(size),
+		'className': componentClassName(null, [
 			contentThemeClassName(props.distinction === 'default' ? null : themeIntent),
 			controlsThemeClassName(themeIntent),
 			colorSchemeClassName(scheme),
 			rest.className,
-			toEnumViewClass(size),
-			toEnumViewClass(props.disabled ? 'default' : distinction),
-			toEnumViewClass(flow),
-			toEnumViewClass(justification, 'justifyCenter'),
-			toStateClass('loading', loading),
-			toStateClass('active', active),
-			toViewClass('bland', bland),
-			toEnumClass('elevation-', elevation),
 		]),
-		ref: ref,
+		'ref': ref,
 		...(props.disabled ? {
 			href: null,
 			onClick: null,
@@ -114,4 +116,4 @@ export const BaseButton = memo(forwardRef<any, BaseButtonProps>((props, ref) => 
 
 	return createElement(Component, { ...rest, ...attrs }, content)
 }))
-BaseButton.displayName = 'BaseButton'
+BaseButton.displayName = 'Interface.BaseButton'

@@ -5,6 +5,7 @@
 @import "./Typography";
 
 /* Leaf components */
+@import "./Box";
 @import "./Typography";
 @import "./Anchor";
 @import "./Logo";
@@ -14,7 +15,6 @@
 
 @import "./Spinner";
 @import "./Aether";
-@import "./Box";
 @import "./ActionableBox";
 
 @import "./Trio";
@@ -55,5 +55,3 @@
 /* Complex components */
 @import "./Editor";
 @import "./Layout";
-
-

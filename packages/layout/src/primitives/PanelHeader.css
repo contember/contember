@@ -1,8 +1,8 @@
 :where(.cui-layout-panel-header) {
 	-webkit-backdrop-filter: blur(var(--cui-backdrop-blur));
 	backdrop-filter: blur(var(--cui-backdrop-blur));
-	background-color: rgba(var(--cui-header-background-color-rgb), var(--cui-header-background-color-alpha));
-	background-image: linear-gradient(rgb(var(--cui-background-color-rgb)), transparent);
+	background-color: rgba(var(--cui-layout-panel-header-background-rgb), var(--cui-layout-panel-header-background-alpha));
+	background-image: linear-gradient(rgb(var(--cui-background-color-rgb-50)), transparent);
 	left: 0;
 	padding-bottom: var(--cui-panel-padding-vertical);
 	padding-left: max(var(--inset-left, 0px), var(--cui-panel-padding-horizontal));

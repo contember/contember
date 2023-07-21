@@ -1,11 +1,12 @@
 @import "../../../src/index.css";
+@import "../../../../brand/src/index.css";
 
 @font-face {
 	font-family: 'Ahem';
 	src: url('./ahem.ttf') format('truetype');
 }
 
-:where(:root) {
+:where(*:not([data-localhost]) > .cui-root) {
 	--cui-font-family: 'Ahem'
 }
 
@@ -16,6 +17,6 @@
 	-webkit-font-smoothing: none !important;
 }
 
-:where(.cui-devError) {
+.cui-devError {
 	--cui-font-family: Inter var, sans-serif;
 }

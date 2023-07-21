@@ -1,22 +1,29 @@
-import { CommonSlotTargets, ContentSlotTargets } from '@contember/layout'
+import { CommonSlotTargets, Slots } from '@contember/layout'
 import { useClassName } from '@contember/react-utils'
 import { Layout as DefaultLayout, LayoutPage } from '@contember/ui'
 import { NestedClassName } from '@contember/utilities'
 import { PropsWithChildren } from 'react'
+import { SlotSources, SlotTargets } from './Slots'
 
 const {
 	Actions,
+	Back,
+	ContentFooter,
+	ContentHeader,
+	FooterCenter,
+	FooterEnd,
+	FooterStart,
+	HeaderCenter,
+	HeaderEnd,
+	HeaderStart,
 	Logo,
 	Navigation,
-	Sidebar,
-	Title,
-	Switchers,
-	Back,
 	Profile,
+	Sidebar,
+	Switchers,
+	Title,
 	...rest
-} = CommonSlotTargets
-
-const AfterTitle = ContentSlotTargets.ContentHeader
+} = SlotTargets
 
 if (import.meta.env.DEV) {
 	const __exhaustiveCheck: Record<PropertyKey, never> = rest
@@ -28,24 +35,48 @@ export const LayoutComponent = ({
 	...rest
 }: PropsWithChildren<{
 	className?: NestedClassName;
-}>) => (
-	<DefaultLayout
-		className={useClassName(undefined, className)}
-		sidebarHeader={<Logo />}
-		switchers={<Switchers />}
-		navigation={<Navigation />}
-		children={(
-			<LayoutPage
-				navigation={<Back />}
-				actions={<Actions />}
-				side={<Sidebar />}
-				title={<Title as="h1" />}
-				afterTitle={<AfterTitle />}
-			>
-				{children}
-			</LayoutPage>
-		)}
-		sidebarFooter={<Profile />}
-		{...rest}
-	/>
-)
+}>) => {
+	const targetsIfActive = Slots.useTargetsIfActiveFactory(SlotTargets)
+
+	return (
+		<DefaultLayout
+			className={useClassName(undefined, className)}
+			sidebarHeader={targetsIfActive(['Logo'])}
+			switchers={targetsIfActive(['Switchers'])}
+			navigation={targetsIfActive(['Navigation'])}
+			children={(
+				<>
+					{targetsIfActive(['HeaderStart', 'HeaderCenter', 'HeaderEnd'], (
+						<header>
+							<HeaderStart />
+							<HeaderCenter />
+							<HeaderEnd />
+						</header>
+					))}
+					<LayoutPage
+						navigation={targetsIfActive(['Back'])}
+						actions={targetsIfActive(['Actions'])}
+						side={targetsIfActive(['Sidebar'])}
+						title={targetsIfActive(['Title'], (
+							<Title as="h1" />
+						))}
+						afterTitle={targetsIfActive(['ContentHeader'])}
+					>
+						{children}
+						{targetsIfActive(['ContentFooter'])}
+					</LayoutPage>
+					{targetsIfActive(['FooterStart', 'FooterCenter', 'FooterEnd'], (
+						<footer>
+							<FooterStart />
+							<FooterCenter />
+							<FooterEnd />
+						</footer>
+					))}
+				</>
+			)}
+			sidebarFooter={targetsIfActive(['Profile'])}
+			{...rest}
+		/>
+	)
+}
+LayoutComponent.displayName = 'LayoutComponent'

@@ -1,11 +1,11 @@
 :where(.cui-message) {
-	--message-color: var(--cui-control-color);
+	--message-color: rgb(var(--cui-color-accent-rgb-50));
 	--message-background-color: transparent;
 	--message-striking-padding-horizontal: 0;
 	--message-striking-padding-vertical: 0;
 	align-items: center;
 	background-color: var(--message-background-color);
-	border-radius: var(--cui-control-border-radius);
+	border-radius: var(--cui-border-radius--controls);
 	color: var(--message-color);
 	display: inline-flex;
 	font-weight: 300;
@@ -15,8 +15,8 @@
 }
 
 :where(.cui-message.view-striking) {
-	--message-color: var(--cui-color--strong);
-	--message-background-color: rgba(var(--cui-controls-500), 0.9);
+	--message-color: rgb(var(--cui-color-controls-rgb-0));
+	--message-background-color: rgba(var(--cui-background-color-controls-rgb-50), 0.9);
 }
 
 :where(.cui-message.view-lifted) {
@@ -34,7 +34,7 @@
 	gap: var(--cui-gap);
 }
 
-:where(.cui-message-action .cui-button:not(:hover)) {
+:where(.cui-message-action .cui-button) {
 	color: inherit;
 }
 

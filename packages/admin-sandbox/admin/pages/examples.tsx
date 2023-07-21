@@ -1,9 +1,9 @@
-import { Title } from '../components/Slots'
+import { SlotSources } from '../components/Slots'
 
 export default () => {
 	return (
 		<>
-			<Title>Examples</Title>
+			<SlotSources.Title>Examples</SlotSources.Title>
 
 			<p>Say hi to examples</p>
 		</>

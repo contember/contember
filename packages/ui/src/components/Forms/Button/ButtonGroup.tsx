@@ -1,10 +1,11 @@
 import { useClassName } from '@contember/react-utils'
-import { memo, ReactNode } from 'react'
+import { ComponentClassNameProps, dataAttribute } from '@contember/utilities'
+import { ReactNode, memo } from 'react'
 import type { Size } from '../../../types'
 import { toEnumViewClass, toViewClass } from '../../../utils'
 import type { ButtonGroupFlow, ButtonGroupOrientation } from './Types'
 
-export interface ButtonGroupProps {
+export interface ButtonGroupProps extends ComponentClassNameProps {
 	children?: ReactNode
 	size?: Size
 	orientation?: ButtonGroupOrientation
@@ -15,17 +16,18 @@ export interface ButtonGroupProps {
 /**
  * @group UI
  */
-export const ButtonGroup = memo(({ size, flow, orientation, isTopToolbar, children }: ButtonGroupProps) => (
+export const ButtonGroup = memo(({ size, componentClassName = 'button-group', className, flow, orientation = 'horizontal', isTopToolbar, children }: ButtonGroupProps) => (
 	<div
-		className={useClassName('button-group', [
-			toEnumViewClass(size),
-			toEnumViewClass(flow),
-			toEnumViewClass(orientation, 'horizontal'),
+		data-orientation={dataAttribute(orientation)}
+		data-flow={dataAttribute(flow)}
+		data-size={dataAttribute(size)}
+		className={useClassName(componentClassName, [
 			toViewClass('isTopToolbar', isTopToolbar),
+			className,
 		])}
 		role="group"
 	>
 		{children}
 	</div>
 ))
-ButtonGroup.displayName = 'ButtonGroup'
+ButtonGroup.displayName = 'Interface.ButtonGroup'

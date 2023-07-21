@@ -15,7 +15,7 @@ export const DevBar = ({
 }: PropsWithChildren<{
 	breakpoint?: number;
 }>) => {
-	const className = useClassNameFactory(['devBar', 'root'])
+	const className = useClassNameFactory('devBar')
 	const [expanded, setExpanded] = useState(true)
 	const isSmallScreen = useWindowSize().width < breakpoint
 
@@ -61,6 +61,8 @@ export const DevBar = ({
 		}
 	}, [expanded])
 
+	const id = `dev-bar-panel${useId()}`
+
 	return (
 		<section
 			ref={devBarRef}
@@ -85,7 +87,7 @@ export const DevBar = ({
 				<FocusScope contain={expanded} restoreFocus>
 					<div
 						data-expanded={dataAttribute(expanded)}
-						id="dev-bar-toggle-button-target"
+						id={id}
 						role="dialog"
 						style={{ display: 'contents' }}
 					>
@@ -100,19 +102,19 @@ export const DevBar = ({
 							)}
 						</a>
 
-						<Divider />
+						<Divider gap="medium" />
 
 						<div className={className('panels')}>
 							<SmallScreenContext.Provider value={isSmallScreen}>{children}</SmallScreenContext.Provider>
 						</div>
 
-						<Divider />
+						<Divider gap="medium" />
 					</div>
 
 					<button
 						id="dev-bar-toggle-button"
 						aria-label="Toggle Contember Developer Toolbar"
-						aria-controls="dev-bar-toggle-button-target"
+						aria-controls={id}
 						aria-expanded={expanded}
 						className={className('close')}
 						onClick={handleToggle}

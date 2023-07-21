@@ -1,6 +1,6 @@
 :where(.cui-layout-content-panel) {
-	--cui-header-background-color-rgb: var(--cui-background-color-rgb);
-	--cui-footer-background-color-rgb: var(--cui-background-color-rgb);
+	--cui-layout-panel-header-background-rgb: rgb(var(--cui-background-color-rgb-50));
+	--cui-layout-panel-footer-background-rgb: rgb(var(--cui-background-color-rgb-50));
 	max-width: unset;
 }
 

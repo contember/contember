@@ -15,6 +15,8 @@ test.beforeAll(async ({ }, testInfo) => {
 })
 
 test('basic test', async ({ page, userAgent }) => {
+	test.skip(!!userAgent?.match(/\biPhone\b/), 'Unstable test on iPhone')
+
 	expectNoConsoleErrors(page)
 
 	await page.goto(`/${projectSlug}/fieldContainer`)

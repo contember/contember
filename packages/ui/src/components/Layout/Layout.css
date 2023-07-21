@@ -68,7 +68,7 @@
 }
 
 :where(.cui-legacy-layout .cui-menu-section)after {
-	border-bottom: 1px solid var(--cui-color--lower);
+	border-bottom: 1px solid rgba(var(--cui-color-rgb-50), var(--cui-opacity--lower));
 	content: "";
 	display: block;
 	left: var(--cui-screen-padding-horizontal);
@@ -100,4 +100,3 @@
 	left: var(--cui-edge-offset-left);
 	right: var(--cui-edge-offset-right);
 }
-

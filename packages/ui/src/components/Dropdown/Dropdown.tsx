@@ -1,4 +1,4 @@
-import { useClassNameFactory, useColorScheme } from '@contember/react-utils'
+import { useClassNameFactory, useColorScheme, useId } from '@contember/react-utils'
 import { assertNever, colorSchemeClassName } from '@contember/utilities'
 import {
 	MouseEventHandler,
@@ -113,17 +113,25 @@ export const Dropdown = memo((props: DropdownProps) => {
 	}
 
 	const currentPortalContainer = usePortalProvider(props.contentContainer)
+	const id = `dropdown${useId()}`
 
 	return (
 		<>
 			{renderToggle ? (
 				renderToggle({ ref: setReferenceElement, onClick: onButtonClick })
 			) : (
-					<Button active={isActive} {...props.buttonProps} onClick={onButtonClick} ref={setReferenceElement} />
+					<Button
+						active={isActive}
+						{...props.buttonProps}
+						onClick={onButtonClick}
+						ref={setReferenceElement}
+						aria-controls={id}
+					/>
 			)}
 			{isActive && (
 				<Portal to={currentPortalContainer}>
 					<div
+						id={id}
 						ref={setPopperElement}
 						style={styles.popper}
 						{...attributes.popper}

@@ -9,6 +9,7 @@ testInterface({
 		'article.tsx/EditOrCreateForm',
 		'auto.tsx',
 		'brand.tsx',
+		'buttons.tsx',
 		'lorem.tsx',
 		'examples.tsx',
 		'settings.tsx',

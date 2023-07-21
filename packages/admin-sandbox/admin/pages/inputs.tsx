@@ -16,6 +16,7 @@ import {
 	SelectField,
 	SimpleRelativeSingleField,
 	SlugField,
+	Stack,
 	TextareaField,
 	TextareaFieldProps,
 	TextareaInput,
@@ -68,14 +69,20 @@ export default () => (
 
 		<TextField {...extraDebugProps} required labelPosition="labelLeft" field={'textValue'} label={'Text'} placeholder="Enter text..." />
 		<DisplayTextField {...extraDebugProps} labelPosition="labelLeft" field={'textValue'} label={'Text'} placeholder="N/A" direction="horizontal-reverse" />
-		<TextField {...extraDebugProps} containerClassName="theme-success-content theme-warn-controls" field={'notNullTextValue'} label={'Not null text'} />
+		<Stack justify="stretch" direction="horizontal" gap="default">
+			<TextField {...extraDebugProps} containerClassName="theme-success-content theme-warn-controls" field={'notNullTextValue'} label={'Not null text'} />
+			<TextField {...extraDebugProps} field={'notNullTextValue'} label={'Not null text'} disabled />
+		</Stack>
 		<EmailField {...extraDebugProps} field={'emailValue'} label={'Your email'} />
 		<SearchField {...extraDebugProps} field={'searchValue'} label={'Search page'} />
 		<UrlField {...extraDebugProps} field={'urlValue'} label={'URL'} />
 		<SlugField {...extraDebugProps} required derivedFrom={'textValue'} field={'slugValue'} label={'Slug with prefix'} unpersistedHardPrefix="https://www.contember.com/" linkToExternalUrl />
 		<SlugField {...extraDebugProps} derivedFrom={'textValue'} field={'slugValue'} label={'Slug without prefix'} />
+		<SlugField {...extraDebugProps} derivedFrom={'textValue'} field={'slugValue'} label={'Slug without prefix'} disabled />
 		<TextareaField {...extraDebugProps} field={'multilineValue'} label={'Multiline text'} />
 		<CheckboxField {...extraDebugProps} field={'boolValue'} label={'Bool'} />
+		<CheckboxField {...extraDebugProps} field={'boolValue'} label={'Bool'} readOnly />
+		<CheckboxField {...extraDebugProps} field={'boolValue'} label={'Bool'} disabled />
 		<CheckboxField {...extraDebugProps} field={'boolValue'} label={'Bool'} description="Same checkbox with description" labelDescription="This could be true or false or null" />
 		<NumberField {...extraDebugProps} field={'intValue'} label={'Int'} step={2} />
 		<FloatField {...extraDebugProps} field={'floatValue'} label={'Float value'} />

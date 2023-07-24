@@ -24,14 +24,13 @@
 
 :where(.cui-layout-panel-body[data-behavior='modal']) {
 	background-color: rgb(var(--cui-background-color-rgb-50));
-	overflow: auto;
 	max-width: unset;
 }
 
 :where(.cui-layout-panel-body):where(
 	[data-behavior='overlay'],
 	[data-behavior='modal'],
-	) {
-	overscroll-behavior: contain;
+) {
+	overscroll-behavior: none;
 	overflow: auto;
 }

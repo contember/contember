@@ -125,7 +125,7 @@ export const useCommonReactSelectStyles = <Option = unknown, IsMulti extends boo
 			? 'rgb(var(--cui-theme-danger-rgb-500))'
 			: isDisabled
 				? 'rgba(var(--cui-color-rgb-50), var(--cui-opacity--lower))'
-				: 'rgba(var(--cui-color-rgb-50), var(--cui-opacity--medium))'
+				: 'rgba(var(--cui-color-rgb-50), var(--cui-opacity--low))'
 
 		return {
 			...provided,
@@ -188,6 +188,7 @@ export const useCommonReactSelectStyles = <Option = unknown, IsMulti extends boo
 	placeholder: provided => {
 		return {
 			...provided,
+			color: 'rgba(var(--cui-color-rgb-50), var(--cui-opacity--low))',
 			position: 'absolute',
 		}
 	},

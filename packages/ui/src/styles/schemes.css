@@ -149,16 +149,16 @@
 		--cui-color-rgb-0: var(--cui-theme-content-rgb-600);
 
 		--cui-color-strong-rgb-100: var(--cui-theme-content-rgb-1000);
-		--cui-color-strong-rgb-75: var(--cui-theme-content-rgb-950);
-		--cui-color-strong-rgb-50: var(--cui-theme-content-rgb-900);
-		--cui-color-strong-rgb-25: var(--cui-theme-content-rgb-850);
+		--cui-color-strong-rgb-75: var(--cui-theme-content-rgb-1000);
+		--cui-color-strong-rgb-50: var(--cui-theme-content-rgb-1000);
+		--cui-color-strong-rgb-25: var(--cui-theme-content-rgb-900);
 		--cui-color-strong-rgb-0: var(--cui-theme-content-rgb-800);
 
-		--cui-color-accent-rgb-100: var(--cui-theme-controls-rgb-800);
-		--cui-color-accent-rgb-75: var(--cui-theme-controls-rgb-700);
-		--cui-color-accent-rgb-50: var(--cui-theme-controls-rgb-600);
-		--cui-color-accent-rgb-25: var(--cui-theme-controls-rgb-500);
-		--cui-color-accent-rgb-0: var(--cui-theme-controls-rgb-400);
+		--cui-color-accent-rgb-100: var(--cui-theme-controls-rgb-700);
+		--cui-color-accent-rgb-75: var(--cui-theme-controls-rgb-600);
+		--cui-color-accent-rgb-50: var(--cui-theme-controls-rgb-500);
+		--cui-color-accent-rgb-25: var(--cui-theme-controls-rgb-400);
+		--cui-color-accent-rgb-0: var(--cui-theme-controls-rgb-300);
 
 		--cui-background-color-toned-rgb-100: var(--cui-theme-controls-rgb-200);
 		--cui-background-color-toned-rgb-75: var(--cui-theme-controls-rgb-300);
@@ -192,11 +192,11 @@
 		--cui-background-color-rgb-25: var(--cui-theme-content-rgb-950);
 		--cui-background-color-rgb-0: var(--cui-theme-content-rgb-900);
 
-		--cui-color-rgb-100: var(--cui-theme-content-rgb-400);
-		--cui-color-rgb-75: var(--cui-theme-content-rgb-350);
-		--cui-color-rgb-50: var(--cui-theme-content-rgb-300);
-		--cui-color-rgb-25: var(--cui-theme-content-rgb-250);
-		--cui-color-rgb-0: var(--cui-theme-content-rgb-200);
+		--cui-color-rgb-100: var(--cui-theme-content-rgb-500);
+		--cui-color-rgb-75: var(--cui-theme-content-rgb-450);
+		--cui-color-rgb-50: var(--cui-theme-content-rgb-400);
+		--cui-color-rgb-25: var(--cui-theme-content-rgb-350);
+		--cui-color-rgb-0: var(--cui-theme-content-rgb-300);
 
 		--cui-color-strong-rgb-100: var(--cui-theme-content-rgb-200);
 		--cui-color-strong-rgb-75: var(--cui-theme-content-rgb-100);

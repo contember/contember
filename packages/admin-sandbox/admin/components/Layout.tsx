@@ -39,7 +39,7 @@ export const Layout = memo(({ children }: PropsWithChildren) => {
 						<Link to="index">
 							<Stack align="center" direction="horizontal" gap="small">
 								<Identity2023.Edit scale={2} />
-								<VisuallyHidden hidden={width < LAYOUT_BREAKPOINT}>Contember</VisuallyHidden>
+								<VisuallyHidden className="whitespace-nowrap" hidden={width < LAYOUT_BREAKPOINT}>Contember Sandbox</VisuallyHidden>
 							</Stack>
 						</Link>
 					</SlotSources.Logo>

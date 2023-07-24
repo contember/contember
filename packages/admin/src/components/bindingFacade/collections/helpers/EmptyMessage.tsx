@@ -21,14 +21,14 @@ export interface EmptyMessageComponentProps extends BoxProps {
 /**
  * @group UI
  */
-export const EmptyMessage = memo(({ children, component, distinction, ...rest }: EmptyMessageProps) => {
+export const EmptyMessage = memo(({ children, component, padding = true, ...rest }: EmptyMessageProps) => {
 	const MessageComponent = component ?? EmptyMessageDefault
-	return <MessageComponent distinction={distinction} {...rest}>{children}</MessageComponent>
+	return <MessageComponent padding={padding} {...rest}>{children}</MessageComponent>
 })
 EmptyMessage.displayName = 'EmptyMessage'
 
-const EmptyMessageDefault = memo(({ children, distinction, ...rest }: EmptyMessageComponentProps) => (
-	<Box {...rest} distinction={distinction} intent="default" padding="with-padding">
+const EmptyMessageDefault = memo(({ children, intent = 'default', padding = true, ...rest }: EmptyMessageComponentProps) => (
+	<Box intent={intent} padding={padding} {...rest}>
 		<Stack direction="horizontal" justify="space-around">
 			{children}
 		</Stack>

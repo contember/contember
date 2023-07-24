@@ -1,9 +1,9 @@
-import { ReactNode, useMemo } from 'react'
-import { DataGridColumn, DataGridColumnPublicProps } from '../base'
 import { Component, QueryLanguage, SugaredField, SugaredFieldProps, wrapFilterInHasOnes } from '@contember/binding'
 import { GraphQlLiteral, Input } from '@contember/client'
+import { Checkbox, FieldContainer, Stack } from '@contember/ui'
+import { ReactNode, useMemo } from 'react'
 import { FieldFallbackView, FieldFallbackViewPublicProps } from '../../../fieldViews'
-import { Checkbox, FieldContainer } from '@contember/ui'
+import { DataGridColumn, DataGridColumnPublicProps } from '../base'
 import { NullConditionFilter, NullConditionFilterPublicProps } from './NullConditionFilter'
 
 export type EnumCellProps =
@@ -97,10 +97,12 @@ export const EnumCell = Component<EnumCellProps>(props => {
 					</FieldContainer>
 				))
 
-				return <>
-					{checkboxList}
-					<NullConditionFilter filter={filter} setFilter={setFilter} environment={environment} field={props.field} showNullConditionFilter={props.showNullConditionFilter} />
-				</>
+				return (
+					<Stack direction="vertical" gap="small">
+						{checkboxList}
+						<NullConditionFilter filter={filter} setFilter={setFilter} environment={environment} field={props.field} showNullConditionFilter={props.showNullConditionFilter} />
+					</Stack>
+				)
 			}}
 		>
 			<SugaredField<string> field={props.field} format={value => {

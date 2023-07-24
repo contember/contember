@@ -22,6 +22,7 @@
 	.cui-layout-bar-center,
 	.cui-layout-bar-end,
 ) {
+	align-items: center;
 	display: flex;
 	gap: var(--cui-gutter);
 	padding-bottom: max(var(--inset-bottom, 0px), var(--cui-panel-padding-vertical));

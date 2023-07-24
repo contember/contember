@@ -1,7 +1,6 @@
 import { useClassNameFactory } from '@contember/react-utils'
 import { ComponentType, memo, ReactNode } from 'react'
 import { Size } from '../../types'
-import { toViewClass } from '../../utils'
 import { Box } from '../Box'
 import { Icon } from '../Icon'
 import { Stack } from '../Stack'
@@ -23,8 +22,9 @@ export const RepeaterItemContainer = memo(({ actions, children, gap, label, drag
 
 	return (
 		<Box
+			className={componentClassName()}
+			data-sortable={!!Handle}
 			gap={gap}
-			className={componentClassName(null, toViewClass('sortable', !!Handle))}
 		>
 			{Handle && (
 				<div className={componentClassName('handle')}>

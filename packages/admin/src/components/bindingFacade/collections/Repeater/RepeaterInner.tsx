@@ -11,10 +11,11 @@ import {
 	useMutationState,
 	useSortedEntities,
 } from '@contember/binding'
+import { RepeaterItemContainerProps } from '@contember/ui'
 import { ComponentType, Fragment, ReactElement, ReactNode, useCallback } from 'react'
 import type { SortEndHandler } from 'react-sortable-hoc'
 import { useMessageFormatter } from '../../../../i18n'
-import { repeaterDictionary } from './repeaterDictionary'
+import { shouldCancelStart } from '../../helpers/shouldCancelStart'
 import {
 	RepeaterCreateNewEntity,
 	RepeaterFieldContainer,
@@ -22,11 +23,10 @@ import {
 	RepeaterFieldContainerPublicProps,
 } from './RepeaterFieldContainer'
 import { RepeaterItem, RepeaterItemProps } from './RepeaterItem'
-import { shouldCancelStart } from '../../helpers/shouldCancelStart'
 import { SortableRepeaterContainer } from './SortableRepeaterContainer'
 import { SortableRepeaterItem } from './SortableRepeaterItem'
 import { SortableRepeaterItemHandle } from './SortableRepeaterItemHandle'
-import { RepeaterItemContainerProps } from '@contember/ui'
+import { repeaterDictionary } from './repeaterDictionary'
 
 // TODO alt content for collapsing
 export interface RepeaterInnerProps<ContainerExtraProps, ItemExtraProps>
@@ -131,7 +131,7 @@ export const RepeaterInner = Component<RepeaterInnerProps<any, any>, NonStaticPr
 			<SortableRepeaterContainer
 				axis={axis}
 				lockAxis={axis}
-				helperClass="is-active"
+				helperClass="is-dragged"
 				lockToContainerEdges={true}
 				useWindowAsScrollContainer={true}
 				useDragHandle={useDragHandle}

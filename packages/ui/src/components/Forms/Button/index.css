@@ -240,10 +240,6 @@
 	border-bottom-right-radius: 0;
 }
 
-:where(.cui-button-group .cui-button:focus) {
-	z-index: 1;
-}
-
 :where(.cui-button-group:not([data-orientation="vertical"]) .cui-button:not(:first-child):not(:last-child)) {
 	border-left: none;
 	border-right: none;
@@ -289,11 +285,6 @@
 	outline: 2px solid;
 }
 
-:where(.cui-button:focus) {
-	color: var(--cui-button-color--highlighted);
-	box-shadow: var(--cui-button-box-shadow--highlighted), var(--cui-control-focus-ring-box-shadow);
-}
-
 :where(.cui-button:focus:not(:focus-visible)) {
 	box-shadow: var(--cui-button-box-shadow--highlighted);
 }
@@ -311,6 +302,12 @@
 	background: var(--cui-button-background-color--pressed);
 	border-color: var(--cui-button-border-color--pressed);
 	box-shadow: var(--cui-button-box-shadow--pressed);
+}
+
+:where(.cui-button:focus) {
+	color: var(--cui-button-color--highlighted);
+	box-shadow: var(--cui-button-box-shadow--highlighted), var(--cui-control-focus-ring-box-shadow);
+	z-index: 1;
 }
 
 :where(.cui-button:active:focus:focus-visible),

@@ -1878,7 +1878,7 @@ export const EmbedHandlers: {
 };
 
 // @public (undocumented)
-export const EmptyMessage: React.MemoExoticComponent<({ children, component, distinction, ...rest }: EmptyMessageProps) => JSX.Element>;
+export const EmptyMessage: React.MemoExoticComponent<({ children, component, padding, ...rest }: EmptyMessageProps) => JSX.Element>;
 
 // @public (undocumented)
 export interface EmptyMessageComponentProps extends BoxProps {

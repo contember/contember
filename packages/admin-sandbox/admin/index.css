@@ -2,6 +2,6 @@
 @import "@contember/brand/index.css";
 @import "@contember/layout/index.css";
 
-:where(.cui-slot[data-name="logo"]) {
+.whitespace-nowrap {
 	white-space: nowrap;
 }

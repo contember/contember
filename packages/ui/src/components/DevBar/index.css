@@ -206,7 +206,7 @@
 	opacity: unset;
 }
 
-:where(#dev-bar-toggle-button-target:not([data-expanded]) > *) {
+:where([id^="dev-bar-panel"]:not([data-expanded]) > *) {
 	display: none;
 }
 

@@ -4,7 +4,7 @@
 	transition: background-image 0.15s;
 }
 
-:where(.cui-repeater-item-container.view-sortable) {
+:where(.cui-repeater-item-container[data-sortable]) {
 	--cui-box-padding-left: calc(2 * var(--cui-box-padding));
 }
 

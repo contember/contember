@@ -48,23 +48,36 @@
 	justify-content: space-between;
 }
 
-:where(.cui-box:not(.is-active) > .cui-stack > .cui-box-header) {
-	color: rgb(var(--cui-color-rgb-50));
-}
-
 :where(.cui-box-actions) {
 	display: flex;
 	gap: var(--cui-gap);
 	grid-column: 2;
 }
 
-:where(.cui-box.is-active) {
+:where(
+	.cui-box[data-active],
+	.cui-box.is-dragged,
+) {
 	color: rgb(var(--cui-color-accent-rgb-50));
+	border-color: rgb(var(--cui-color-accent-rgb-50));
 	background-image: var(--cui-box-background-focused-overlay);
+	box-shadow: inset 0 0 0 2px rgb(var(--cui-color-accent-rgb-50));
 	transition: box-shadow 0.15s;
 }
 
-:where(.cui-box.is-active .cui-box-content),
+:where(
+	.cui-box:not([data-active]) > .cui-stack > .cui-box-header,
+	.cui-box.is-dragged > .cui-stack > .cui-box-header,
+) {
+	color: rgb(var(--cui-color-rgb-50));
+}
+
+:where(.cui-box.is-dragged .cui-box-content),
+:where(.cui-box[data-active] .cui-box-content),
 :where(.cui-box:focus-within .cui-box-content) {
 	background-image: var(--cui-box-background-focused-overlay);
+}
+
+:where(.cui-box.is-dragged) {
+	z-index: 9999;
 }

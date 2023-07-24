@@ -5,12 +5,12 @@ import { FunctionComponent, ReactNode, useCallback, useMemo } from 'react'
 import { useMessageFormatter } from '../../../../i18n'
 import { RepeaterFieldContainerPrivateProps, SortableRepeaterItem } from '../../collections'
 import { useAccessorErrorFormatter } from '../../errors'
+import { FileHandler } from '../fileHandler'
 import { uploadDictionary } from '../uploadDictionary'
 import { FileInput, FileInputPublicProps } from './FileInput'
 import { SingleFilePreview } from './SingleFilePreview'
-import { useNormalizedUploadState } from './hooks/useNormalizedUploadState'
 import { useConnectSelectedEntities } from './hooks/useConnectSelectedEntities'
-import { FileHandler } from '../fileHandler'
+import { useNormalizedUploadState } from './hooks/useNormalizedUploadState'
 import { SelectFileInputSelectionComponentProps } from './selection'
 
 export interface BareFileRepeaterContainerPrivateProps {
@@ -102,7 +102,7 @@ export const BareFileRepeaterContainer: FunctionComponent<BareFileRepeaterContai
 		} else {
 			previews.push(
 				<SortableRepeaterItem index={i} key={entity.parentEntity.key} disabled={isMutating}>
-					<div className="fileInput-preview view-sortable">{preview}</div>
+					<div data-sortable className="fileInput-preview">{preview}</div>
 				</SortableRepeaterItem>,
 			)
 		}

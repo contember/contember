@@ -10,8 +10,8 @@
 	border-radius: 10px;
 }
 
-:where(.fileInput-preview.view-sortable) {
-	cursor: move;
+:where(.fileInput-preview[data-sortable]) {
+	cursor: grab;
 }
 
 :where(.fileInput-dropZone) {

@@ -2,11 +2,10 @@ import { useClassNameFactory, useColorScheme } from '@contember/react-utils'
 import { colorSchemeClassName, currentOrDeprecated, dataAttribute, deprecate, isDefined, themeClassName } from '@contember/utilities'
 import { ReactNode, forwardRef, memo } from 'react'
 import type { BoxDistinction, Default, HTMLDivElementProps, Intent, Size } from '../../types'
-import { toEnumViewClass, toStateClass } from '../../utils'
 import { Stack, StackProps } from '../Stack'
 import { Label } from '../Typography/Label'
 
-export type BoxOwnProps = {
+export interface BoxOwnProps {
 	actions?: ReactNode
 	background?: boolean
 	border?: boolean
@@ -88,11 +87,11 @@ export const Box = memo(forwardRef<HTMLDivElement, BoxProps>(({
 	return (
 		<div
 			{...divProps}
+			data-active={dataAttribute(isActive)}
 			data-background={dataAttribute(background)}
 			data-border={dataAttribute(border)}
 			data-padding={dataAttribute(padding)}
 			className={componentClassName(null, [
-				toStateClass('active', isActive),
 				...themeClassName(intent),
 				colorSchemeClassName(useColorScheme()),
 				className,

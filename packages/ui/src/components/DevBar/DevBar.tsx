@@ -138,17 +138,12 @@ export const DevPanel = ({ heading, icon, children, preview }: {
 	const isSmallScreen = useSmallScreenContext()
 	const [expanded, setExpanded] = useState(false)
 	const id = `cui-devBar-panel-${useId()}`
-	// const mouseIsOver = useRef(false)
 
 	const handleOpen = useReferentiallyStableCallback(() => {
 		setExpanded(true)
 	})
 
 	const handleToggle = useReferentiallyStableCallback(() => {
-		// if (mouseIsOver.current && expanded) {
-		// 	return
-		// }
-
 		setExpanded(expanded => !expanded)
 	})
 
@@ -162,11 +157,9 @@ export const DevPanel = ({ heading, icon, children, preview }: {
 			data-expanded={dataAttribute(expanded)}
 			className={className('trigger')}
 			onMouseEnter={useReferentiallyStableCallback(event => {
-				// mouseIsOver.current = true
 				handleOpen()
 			})}
 			onMouseLeave={useReferentiallyStableCallback(event => {
-				// mouseIsOver.current = false
 				handleClose()
 			})}
 			onKeyDown={useReferentiallyStableCallback(event => {

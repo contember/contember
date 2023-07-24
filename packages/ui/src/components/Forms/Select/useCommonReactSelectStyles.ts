@@ -188,7 +188,7 @@ export const useCommonReactSelectStyles = <Option = unknown, IsMulti extends boo
 	placeholder: provided => {
 		return {
 			...provided,
-			color: 'rgba(var(--cui-color-rgb-50), var(--cui-opacity--low))',
+			color: 'rgba(var(--cui-color-rgb-50), var(--cui-opacity--medium))',
 			position: 'absolute',
 		}
 	},

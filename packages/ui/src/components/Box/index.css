@@ -8,7 +8,7 @@
 	background-color: rgb(var(--cui-background-color-rgb-50));
 	border-width: var(--cui-border-width, 1px);
 	border-style: solid;
-	border-color: rgba(var(--cui-color-rgb-100), var(--cui-opacity--low));
+	border-color: rgba(var(--cui-color-rgb-50), var(--cui-opacity--low));
 	border-radius: var(--cui-border-radius--controls);
 	display: flex;
 	align-items: stretch;

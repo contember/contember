@@ -187,7 +187,7 @@
 :where(.cui-textarea-input)::placeholder,
 :where(.cui-text-input)::placeholder,
 :where(.cui-editorCanvas)::placeholder {
-	color: rgba(var(--cui-color-rgb-50), var(--cui-opacity--low));
+	color: rgba(var(--cui-color-rgb-50), var(--cui-opacity--medium));
 }
 
 :where([readonly].cui-textarea-input),

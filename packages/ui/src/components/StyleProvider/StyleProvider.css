@@ -110,7 +110,7 @@
 }
 
 :where(.cui-root a.content-link) {
-	color: rgb(var(--cui-color-rgb-0));
+	color: rgb(var(--cui-color-strong-rgb-50));
 }
 :where(
 	.cui-root a.content-link:hover,

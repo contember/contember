@@ -22,13 +22,16 @@
 }
 
 :where(.cui-table-container) {
-	margin-left: calc(-1 * max(var(--inset-left, 0px), var(--cui-padding)));
-	margin-right: calc(-1 * max(var(--inset-right, 0px), var(--cui-padding)));
+	--cui-table-container-overflow-padding-left: var(--cui-padding);
+	--cui-table-container-overflow-padding-right: var(--cui-padding);
+
+	margin-left: calc(-1 * max(var(--cui-table-container-overflow-padding-left, 0px), var(--cui-padding)));
+	margin-right: calc(-1 * max(var(--cui-table-container-overflow-padding-right, 0px), var(--cui-padding)));
 }
 
 :where(.cui-table-container > *) {
-	padding-left: max(var(--inset-left, 0px), var(--cui-padding));
-	padding-right: max(var(--inset-right, 0px), var(--cui-padding));
+	padding-left: max(var(--cui-table-container-overflow-padding-left, 0px), var(--cui-padding));
+	padding-right: max(var(--cui-table-container-overflow-padding-right, 0px), var(--cui-padding));
 }
 :where(
 	.cui-table-container > .cui-field-container-label,

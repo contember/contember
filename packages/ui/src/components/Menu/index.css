@@ -1,5 +1,4 @@
 :where(.cui-menu) {
-	--cui-menu-background-color-focused: rgba(var(--cui-background-color-toned-rgb-50), var(--cui-opacity--low));
 	color: rgb(var(--cui-color-strong-rgb-75));
 	user-select: none;
 }
@@ -34,11 +33,17 @@
 :where(
 	li[data-focusable] > .cui-menu-section-title:hover > .cui-menu-section-title-content > .cui-label,
 	li[data-focusable] > .cui-menu-group-title:hover > .cui-menu-group-title-content > .cui-label,
+) {
+	color: rgb(var(--cui-color-accent-rgb-75));
+	background-color: rgba(var(--cui-background-color-toned-rgb-50), var(--cui-opacity--lower));;
+}
+
+:where(
 	li:focus > .cui-menu-section-title > .cui-menu-section-title-content > .cui-label,
 	li:focus > .cui-menu-group-title > .cui-menu-group-title-content > .cui-label,
 ) {
 	color: rgb(var(--cui-color-accent-rgb-75));
-	background-color: var(--cui-menu-background-color-focused);
+	background-color: rgba(var(--cui-background-color-toned-rgb-50), var(--cui-opacity--low));;
 }
 
 :where(.cui-menu-expand-toggle) {

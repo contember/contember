@@ -42,7 +42,7 @@
 	border-radius: var(--cui-gutter);
 	border-width: 1px;
 	border-style: solid;
-	border-color: rgba(var(--cui-color-rgb-50), var(--cui-opacity--low));
+	border-color: rgba(var(--cui-color-rgb-50), var(--cui-opacity--lower));
 	display: flex;
 	flex-direction: column;
 	flex-grow: 1;

@@ -21,6 +21,7 @@ import {
 	SugaredQualifiedEntityList,
 	TextCell,
 	TextField,
+	TextInput,
 	UploadField,
 	VideoFiles,
 } from '@contember/admin'
@@ -161,6 +162,8 @@ export default () => (
 		<SlotSources.ContentHeader>
 			<Link to="second">GO TO SECOND &rarr;</Link>
 		</SlotSources.ContentHeader>
+
+		<TextInput placeholder="I am here for comparison only..." />
 
 		<ImageUploadField urlField="singleTrivialImage.url" label="Trivial image" />
 

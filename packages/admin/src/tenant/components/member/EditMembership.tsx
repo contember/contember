@@ -67,7 +67,7 @@ export const EditMembership: FC<EditMembershipProps> = ({ project, memberships, 
 								}
 
 								return (
-									<Box key={membershipIndex} padding="no-padding">
+									<Box key={membershipIndex} padding={false}>
 										<Stack align="center" direction="horizontal" gap="none">
 											<Select
 												required
@@ -104,7 +104,7 @@ export const EditMembership: FC<EditMembershipProps> = ({ project, memberships, 
 
 										{variablesToShow.length > 0 && membership && <>
 											<Divider gap="none" />
-											<Box distinction="seamless">
+											<Box background={false} border={false} padding={false}>
 												<Stack direction="vertical">
 													{variablesToShow.map(variable => (
 															<VariableSelector

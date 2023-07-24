@@ -46,7 +46,7 @@ export const Table = memo(({ /*useTableElement = true, */ bare, className: class
 	return (
 		<UseTableElementContext.Provider value={/*useTableElement*/ true}>
 			<FieldContainer className={componentClassName('container')} label={!bare && props.heading} useLabelElement={false}>
-				<Box padding="no-padding" className={componentClassName('container-box')}>
+				<Box padding={false} className={componentClassName('container-box')}>
 					{table}
 				</Box>
 			</FieldContainer>

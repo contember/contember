@@ -79,7 +79,6 @@ export function DimensionsRenderer(props: DimensionsRendererProps) {
 							<AnchorButton
 								href={href}
 								flow="block"
-								distinction="seamless"
 								active={dimension.isSelected}
 								onClick={onClick}
 							>

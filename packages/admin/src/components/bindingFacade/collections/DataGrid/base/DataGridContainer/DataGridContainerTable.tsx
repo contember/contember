@@ -121,10 +121,7 @@ export const DataGridContainerTable = memo<DataGridContainerTableProps>(({
 			{!accessor.length && (
 				<TableRow>
 					<TableCell colSpan={columns.size}>
-						<EmptyMessage
-							distinction="seamless"
-							component={emptyMessageComponent}
-						>
+						<EmptyMessage border={false} component={emptyMessageComponent}>
 							{formatMessage(emptyMessage, 'dataGrid.emptyMessage.text')}
 						</EmptyMessage>
 					</TableCell>

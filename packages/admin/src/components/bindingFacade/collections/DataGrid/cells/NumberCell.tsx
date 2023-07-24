@@ -5,8 +5,8 @@ import type { FunctionComponent, ReactNode } from 'react'
 import { useMessageFormatter } from '../../../../../i18n'
 import { FieldFallbackView, FieldFallbackViewPublicProps } from '../../../fieldViews'
 import { DataGridCellPublicProps, DataGridColumn, DataGridHeaderCellPublicProps, DataGridOrderDirection } from '../base'
-import { dataGridCellsDictionary } from './dataGridCellsDictionary'
 import { NullConditionFilter, NullConditionFilterPublicProps } from './NullConditionFilter'
+import { dataGridCellsDictionary } from './dataGridCellsDictionary'
 
 export type NumberCellProps =
 	& DataGridHeaderCellPublicProps
@@ -87,8 +87,8 @@ export const NumberCell: FunctionComponent<NumberCellProps> = Component(props =>
 						{ value: 'lte', label: formatMessage('dataGridCells.numberCell.lessThan') },
 					]
 				return (
-					<>
-						<Stack direction="horizontal" align="center">
+					<Stack direction="vertical" gap="small">
+						<Stack direction="horizontal" align="center" gap="small">
 							<Select
 								notNull
 								value={filter.mode}
@@ -116,7 +116,7 @@ export const NumberCell: FunctionComponent<NumberCellProps> = Component(props =>
 							/>
 						</Stack>
 						<NullConditionFilter filter={filter} setFilter={setFilter} environment={environment} field={props.field} showNullConditionFilter={props.showNullConditionFilter} />
-					</>
+					</Stack>
 				)
 			}}
 		>

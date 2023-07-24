@@ -1,13 +1,13 @@
 import type { Environment } from '@contember/binding'
 import { Box, Button, ButtonGroup, Dropdown, DropdownProps, Icon, Table, TableCell, TableHeaderCell, TableRow } from '@contember/ui'
-import { createElement, Fragment, ReactElement, useMemo } from 'react'
+import { Fragment, ReactElement, createElement, useMemo } from 'react'
 import type { MessageFormatter } from '../../../../../i18n'
 import { EmptyMessage } from '../../helpers'
-import type { DataGridDictionary } from './dataGridDictionary'
 import type { DataGridSetColumnFilter } from './DataGridSetFilter'
 import type { DataGridState } from './DataGridState'
+import type { DataGridDictionary } from './dataGridDictionary'
 
-export interface DataGridFullFiltersPublicProps {}
+export interface DataGridFullFiltersPublicProps { }
 
 export interface DataGridFullFiltersInternalProps {
 	desiredState: DataGridState
@@ -16,7 +16,7 @@ export interface DataGridFullFiltersInternalProps {
 	setFilter: DataGridSetColumnFilter
 }
 
-export interface DataGridFullFiltersProps extends DataGridFullFiltersInternalProps, DataGridFullFiltersPublicProps {}
+export interface DataGridFullFiltersProps extends DataGridFullFiltersInternalProps, DataGridFullFiltersPublicProps { }
 
 export function DataGridFullFilters({
 	desiredState,
@@ -48,7 +48,7 @@ export function DataGridFullFilters({
 		),
 	}), [formatMessage, hasAnyFilters])
 
-	const filterButtonBrops: DropdownProps['buttonProps'] = useMemo(() => ({
+	const filterButtonProps: DropdownProps['buttonProps'] = useMemo(() => ({
 		distinction: 'seamless',
 		flow: 'block',
 		style: { marginTop: hasAnyFilters ? '1em' : 0 },
@@ -119,18 +119,12 @@ export function DataGridFullFilters({
 						</Table>
 					)}
 					{!!remainingColumns.length && (
-						<Dropdown
-							alignment="center"
-							buttonProps={filterButtonBrops}
-						>
+						<Dropdown buttonProps={filterButtonProps}>
 							{({ requestClose }) => (
-								<Box padding="no-padding">
-									<ButtonGroup orientation="vertical">
+								<ButtonGroup orientation="vertical">
 									{remainingColumns.map(([key, column]) => (
 										<Button
 											key={key}
-											distinction="seamless"
-											flow="generousBlock"
 											justification="justifyStart"
 											onClick={() => {
 												requestClose()
@@ -147,7 +141,6 @@ export function DataGridFullFilters({
 										</Button>
 									))}
 								</ButtonGroup>
-								</Box>
 							)}
 						</Dropdown>
 					)}

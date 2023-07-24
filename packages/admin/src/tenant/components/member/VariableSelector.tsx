@@ -26,7 +26,7 @@ const GenericVariableEdit = ({ label, value, onChange }: { label?: React.ReactNo
 	return (
 		<FieldContainer label={label} direction="vertical" gap="small" style={{ margin: '1em' }}>
 			{localValues.map((v, i) => (
-				<Box key={i} padding="no-padding" direction="horizontal" gap="none">
+				<Box key={i} padding={false} direction="horizontal" gap="none">
 					<TextInput
 						notNull
 						value={v}

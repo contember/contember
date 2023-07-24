@@ -143,7 +143,7 @@
 :where(.cui-editorCanvas) {
 	--input-control-focus-ring: var(--cui-control-focus-ring-box-shadow);
 	background-color: rgb(var(--cui-background-color-rgb-25));
-	border-color: rgba(var(--cui-color-rgb-50), var(--cui-opacity--medium));
+	border-color: rgba(var(--cui-color-rgb-50), var(--cui-opacity--low));
 	border-width: var(--cui-border-width, 1px);
 	border-style: solid;
 	color: rgb(var(--cui-color-strong-rgb-50));

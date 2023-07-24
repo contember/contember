@@ -161,10 +161,14 @@ export interface BoxOwnProps {
     // (undocumented)
     actions?: ReactNode;
     // (undocumented)
+    background?: boolean;
+    // (undocumented)
+    border?: boolean;
+    // (undocumented)
     children?: ReactNode;
     // (undocumented)
     direction?: StackProps['direction'];
-    // (undocumented)
+    // @deprecated (undocumented)
     distinction?: BoxDistinction;
     // (undocumented)
     gap?: Size | 'none';
@@ -175,7 +179,7 @@ export interface BoxOwnProps {
     // (undocumented)
     isActive?: boolean;
     // (undocumented)
-    padding?: Default | 'no-padding' | 'with-padding';
+    padding?: boolean | DeprecatedPaddingPropLiteral;
 }
 
 // @public (undocumented)
@@ -522,6 +526,9 @@ export type Default = 'default';
 
 // @public (undocumented)
 export const DEFAULT_PORTAL_ROOT_ID = "cui-portal-root";
+
+// @public @deprecated (undocumented)
+export type DeprecatedPaddingPropLiteral = Default | 'no-padding' | 'with-padding';
 
 // @public (undocumented)
 export const Description: MemoExoticComponent<({ className, children }: DescriptionProps) => JSX.Element>;

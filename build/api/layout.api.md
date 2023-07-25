@@ -10,7 +10,6 @@ import { ComponentClassNameProps } from '@contember/utilities';
 import { ComponentType } from 'react';
 import { ContainerWidthContextType } from '@contember/react-utils';
 import { Context } from 'react';
-import { ContextType } from 'react';
 import { CSSProperties } from 'react';
 import { ElementType } from 'react';
 import { ForwardRefExoticComponent } from 'react';
@@ -38,7 +37,7 @@ const ActiveSlotPortalsContext: Context<ActiveSlotPortalsContextType>;
 type ActiveSlotPortalsContextType = Set<string>;
 
 // @public (undocumented)
-export type BarComponentType = (<C extends ElementType = 'div'>(props: BarProps<C>) => ReturnType<React.FC<BarProps<C>>>) & {
+export type BarComponentType = (<C extends ElementType = 'div'>(props: BarProps<C>) => ReactElement | null) & {
     displayName?: string | undefined;
 };
 
@@ -192,7 +191,7 @@ export type ContainerOffsets = {
 type ContainerProps<C extends ElementType> = PolymorphicComponentPropsWithRef<C, OwnContainerProps>;
 
 // @public (undocumented)
-export type ContentPanelComponentType = (<C extends ElementType = 'section'>(props: ContentPanelProps<C>) => ReturnType<React.FC<ContentPanelProps<C>>>) & {
+export type ContentPanelComponentType = (<C extends ElementType = 'section'>(props: ContentPanelProps<C>) => ReactElement | null) & {
     BASIS: number;
     MAX_WIDTH: number;
     MIN_WIDTH: number;
@@ -624,7 +623,7 @@ type MaybePanelBehavior = PanelBehavior | null;
 type MaybePanelVisibility = PanelVisibility | null;
 
 // @public (undocumented)
-export function MenuAutoCloseProvider({ children, onAutoClose }: MenuAutoCloseProviderProps): JSX.Element;
+export function MenuAutoCloseProvider({ children, onAutoClose }: MenuAutoCloseProviderProps): ReactElement;
 
 // @public (undocumented)
 export type MenuAutoCloseProviderProps = {
@@ -875,7 +874,7 @@ children: ReactNode;
 // @public (undocumented)
 type ProviderProps = {
     value?: Record<string, unknown>;
-    children: ReactNode | ((directives: ContextType<typeof StateContext>) => ReactNode);
+    children: ReactNode | ((directives: Record<string, unknown>) => ReactNode);
 };
 
 // @public (undocumented)

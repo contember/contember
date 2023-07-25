@@ -1,6 +1,9 @@
 import { ReactNode, RefObject, memo, useCallback, useMemo, useRef, useState } from 'react'
 import { ActiveSlotPortalsContext, PortalsRegistryContext, SlotTargetsRegistryContextType, SlotsRefMap, TargetsRegistryContext } from './contexts'
 
+/**
+ * @group Layout
+ */
 export const Provider = memo<{ children: ReactNode }>(({ children }) => {
 	const [slotsRefMap, setSlotsRefMap] = useState<SlotsRefMap>(new Map)
 	const [activeSlotsMap, setActiveSlotsMap] = useState<Map<string, string>>(new Map)

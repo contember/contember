@@ -6,6 +6,9 @@ import { useGetLayoutPanelsStateContext, useSetLayoutPanelsStateContext } from '
 import { getLayoutPanelId } from '../primitives/getPanelId'
 import { ToggleMenuButtonProps } from './Types'
 
+/**
+ * @group Layout
+ */
 export const ToggleMenuButton = memo<ToggleMenuButtonProps>(({
 	className: classNameProp,
 	componentClassName = 'toggle-menu-button',

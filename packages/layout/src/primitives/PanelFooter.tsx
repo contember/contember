@@ -5,6 +5,9 @@ import { useElementInsetCustomProperties } from '../insets'
 import { useLayoutPanelContext } from './Contexts'
 import { PanelFooterComponentType, PanelFooterProps } from './Types'
 
+/**
+ * @group Layout
+ */
 export const PanelFooter: PanelFooterComponentType = memo(forwardRef(<C extends ElementType = 'footer'>({
 	as,
 	children,

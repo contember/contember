@@ -11,6 +11,9 @@ import { parseLayoutPanelProps } from './parseLayoutPanelProps'
 
 const DEFAULT_PANEL_BASIS = 320
 
+/**
+ * @group Layout
+ */
 export const Panel: LayoutPrimitivesPanelComponentType = memo(forwardRef(
 	<C extends ElementType = 'section'>(props: PanelProps<C>, forwardedRef: PolymorphicRef<C>) => {
 		const {

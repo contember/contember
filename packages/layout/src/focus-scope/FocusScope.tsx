@@ -79,6 +79,9 @@ function findFocusableElement(start: Element | null, direction: TabbingDirection
 	}
 }
 
+/**
+ * @group Layout
+ */
 export function FocusScope({
 	active = true,
 	children,

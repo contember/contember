@@ -4,6 +4,9 @@ import { ReactNode, memo, useCallback, useMemo, useState } from 'react'
 import { GetLayoutPanelsStateContext, SetLayoutPanelsStateContext, SetLayoutPanelsStateContextType } from './Contexts'
 import { PanelConfig } from './Types'
 
+/**
+ * @group Layout
+ */
 export const PanelsStateProvider = memo<{ children: ReactNode }>(({ children }) => {
 	const [currentlyActivePanel, setCurrentlyActivePanel] = useState<string>()
 	const [panels, setPanels] = useState<Map<string, PanelConfig>>(new Map)

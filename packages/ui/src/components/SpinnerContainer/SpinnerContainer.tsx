@@ -3,9 +3,9 @@ import { SpinnerOverlay } from './SpinnerOverlay'
 import { SpinnerContainerProps } from './types'
 
 /**
- * @group UI
- *
  * Displays a spinner above the children when enabled.
+ *
+ * @group UI
  *
  * @example
  * ```tsx

@@ -6,6 +6,9 @@ import { PanelsStateProvider } from './PanelsStateProvider'
 import { ContainerComponentType, ContainerProps, PanelConfig } from './Types'
 import { panelsStateAsDataAttributes } from './panelsStateAsDataAttributes'
 
+/**
+ * @group Layout
+ */
 export const Root: ContainerComponentType = memo(forwardRef(
 	<C extends ElementType = 'div'>(props: ContainerProps<C>, forwardedRef: PolymorphicRef<C>) => {
 		useAddClassNameDuringResize('disable-transitions-on-resize')

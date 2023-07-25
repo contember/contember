@@ -10,6 +10,9 @@ import { createLayoutBarComponent } from './createLayoutBarComponent'
 import { createLayoutContentPanelComponent } from './createLayoutContentPanelComponent'
 import { createLayoutSidebarComponent } from './createLayoutSidebarComponent'
 
+/**
+ * @group Layout
+ */
 export const LayoutKit = {
 	ContentPanelMain: createLayoutContentPanelComponent({
 		name: 'main-content',

@@ -5,6 +5,9 @@ import { InsetsProvider, combineElementInsets, useContainerInsetsContext, useSaf
 import * as LayoutPrimitives from '../primitives'
 import { FrameComponentType, FrameProps } from './Types'
 
+/**
+ * @group Layout
+ */
 export const Frame: FrameComponentType = memo(forwardRef(<C extends ElementType = 'div'>({
 	as,
 	children,

@@ -10,6 +10,9 @@ export type OwnResponsiveStackProps = ResponsiveProps<StackOwnProps>
 
 export interface ResponsiveStackProps extends OwnResponsiveStackProps, Omit<JSX.IntrinsicElements['div'], keyof StackOwnProps> { }
 
+/**
+ * @group Layout
+ */
 export const ResponsiveStack = memo(
 	forwardRef<HTMLDivElement, ResponsiveStackProps>((props, ref) => {
 		const layoutWidth = useContainerWidth()

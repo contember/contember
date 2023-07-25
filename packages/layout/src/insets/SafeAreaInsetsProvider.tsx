@@ -19,6 +19,9 @@ function getInitialScreenRectsState() {
 	}
 }
 
+/**
+ * @group Layout
+ */
 export const SafeAreaInsetsProvider = memo(({ children, insets: insetsProp }: SafeAreaInsetsProviderProps) => {
 	useExpectSameValueReference(insetsProp)
 

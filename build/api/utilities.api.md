@@ -69,7 +69,7 @@ export function contentThemeClassName<ContentTheme extends KebabCase<string> = K
 export function controlsThemeClassName<ControlsTheme extends KebabCase<string> = KebabCase<string>, State extends `:${KebabCase<string>}` | null | undefined = undefined>(theme: ControlsTheme | null | undefined, state?: State | null | undefined): ThemeControlsClassName<ControlsTheme, State> | undefined;
 
 // @internal
-export function currentOrDeprecated<R, D>(current: R, deprecated: D, shouldThrow?: boolean): R | D;
+export function currentOrDeprecated<R, D>(current: R, deprecated: D, mapped: R, shouldThrow?: boolean): R;
 
 // @public (undocumented)
 export function dataAttribute(value: unknown): string | true | undefined;

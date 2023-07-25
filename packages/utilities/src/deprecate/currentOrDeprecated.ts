@@ -31,20 +31,23 @@
  * console.log(value) // 'current'
  * ```
  */
-export function currentOrDeprecated<R, D>(current: R, deprecated: D, shouldThrow: boolean = false): R | D {
-	if (deprecated !== undefined) {
-		if (current !== undefined && import.meta.env.DEV) {
-			console.error('Current value:', current)
-			console.error('Deprecated value:', deprecated)
+export function currentOrDeprecated<R, D>(current: R, deprecated: D, mapped: R, shouldThrow: boolean = false): R {
+	if (current === undefined) {
+		if (deprecated === undefined) {
+			return undefined as R
+		} else {
+			if (import.meta.env.DEV) {
+				console.error('Current value:', current, 'Deprecated value:', deprecated)
 
-			if (shouldThrow) {
-				throw new Error(`You are using deprecated together with current value which is mutually exclusive. Use only one of them.`)
-			} else {
-				console.error(`You are using deprecated together with current value which is mutually exclusive. Use only one of them.`)
+				if (shouldThrow) {
+					throw new Error(`You are using deprecated together with current value which is mutually exclusive. Use only one of them.`)
+				} else {
+					console.error(`You are using deprecated together with current value which is mutually exclusive. Use only one of them.`)
+				}
 			}
-		}
 
-		return deprecated
+			return mapped
+		}
 	} else {
 		return current
 	}

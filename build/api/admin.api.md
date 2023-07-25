@@ -3895,7 +3895,7 @@ export interface RadioFieldInnerProps extends ChoiceFieldData.SingleChoiceFieldM
 }
 
 // @public (undocumented)
-export interface RadioFieldInnerPublicProps extends Omit<FieldContainerProps, 'children'>, Pick<RadioProps, 'orientation'> {
+export interface RadioFieldInnerPublicProps extends Omit<FieldContainerProps, 'children' | 'direction'>, Pick<RadioProps, 'orientation'> {
 }
 
 // @public (undocumented)

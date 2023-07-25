@@ -59,6 +59,9 @@ export type LinkCardProps =
  * @group UI
  */
 export const LinkCard = memo<LinkCardProps>(({
+	href,
+	target,
+	onClick,
 	active,
 	children,
 	className,
@@ -66,15 +69,21 @@ export const LinkCard = memo<LinkCardProps>(({
 	src,
 	...props
 }) => (
-	<a {...props} className={useClassName('card', [
-		toEnumViewClass(layout),
-		toFeatureClass('focus', true),
-		toFeatureClass('hover', true),
-		toFeatureClass('press', true),
-		toStateClass('active', active),
-		useInputClassName(props as VisuallyDependentControlProps),
-		className,
-	])}>
+	<a
+		href={href}
+		target={target}
+		onClick={onClick}
+		{...props}
+		className={useClassName('card', [
+			toEnumViewClass(layout),
+			toFeatureClass('focus', true),
+			toFeatureClass('hover', true),
+			toFeatureClass('press', true),
+			toStateClass('active', active),
+			useInputClassName(props as VisuallyDependentControlProps),
+			className,
+		])}
+	>
 		<CardInner src={src} className={useClassName('card')}>{children}</CardInner>
 	</a>
 ))

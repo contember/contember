@@ -121,20 +121,13 @@ export const categories = () => (
 	</>
 )
 
-const CustomRepeaterItem = (props: RepeaterItemProps) => {
-	return <>
-		<Button onClick={() => props.createNewEntity(undefined, props.index)}>Add item</Button>
-		<RepeaterItem {...props} />
-	</>
-}
-
 export const tags = () => (
 	<>
 		<SlotSources.Title>Tags</SlotSources.Title>
 
 		<MultiEditScope entities="Tag" listProps={{ beforeContent: <SlotSources.Actions><PersistButton /></SlotSources.Actions> }}>
 			<TextField field={'name'} label={'Name'} />
-			<Repeater field={'locales'} label={'Locales'} sortableBy={'order'} itemComponent={CustomRepeaterItem}>
+			<Repeater field={'locales'} label={'Locales'} sortableBy={'order'}>
 				<SelectField label={'Locale'} options={'Locale.code'} field={'locale'}
 					createNewForm={<TextField field={'code'} label={'Locale code'} />} />
 				<TextField field={'name'} label={'Name'} />

@@ -4064,6 +4064,8 @@ export interface RepeaterInnerProps<ContainerExtraProps, ItemExtraProps> extends
     // (undocumented)
     dragHandleComponent?: RepeaterItemContainerProps['dragHandleComponent'];
     // (undocumented)
+    enableAdding?: boolean;
+    // (undocumented)
     enableRemoving?: boolean;
     // (undocumented)
     itemComponent?: ComponentType<RepeaterItemProps & ItemExtraProps>;
@@ -4090,8 +4092,6 @@ export interface RepeaterItemProps {
     canBeRemoved: boolean;
     // (undocumented)
     children: ReactNode;
-    // (undocumented)
-    createNewEntity: RepeaterCreateNewEntity;
     // (undocumented)
     dragHandleComponent?: RepeaterItemContainerProps['dragHandleComponent'];
     // (undocumented)

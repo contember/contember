@@ -56,6 +56,14 @@ export const Stack = memo(forwardRef<HTMLDivElement, StackProps>(({
 	wrap,
 	...rest
 }: StackProps, ref) => {
+	deprecate('1.3.0', gap !== 'none', '`size="none"`', '`gap="gap"`')
+	gap = currentOrDeprecated(gap, gap === 'none' ? gap : undefined, false)
+	deprecate('1.3.0', gap !== 'small', '`size="small"`', '`gap="gap"`')
+	gap = currentOrDeprecated(gap, gap === 'small' ? gap : undefined, 'gap')
+	deprecate('1.3.0', gap !== 'xlarge', '`size="xlarge"`', '`gap="larger"`')
+	gap = currentOrDeprecated(gap, gap === 'xlarge' ? gap : undefined, 'large')
+	deprecate('1.3.0', gap !== 'default', '`size="default"`', 'omit the `gap` prop')
+	gap = currentOrDeprecated(gap, gap === 'default' ? gap : undefined, true)
 	const componentClassName = useClassNameFactory('stack')
 	const style: CSSProperties = useMemo(() => ({
 		...{ flexBasis: basis },

@@ -82,29 +82,30 @@ export const TextCell: FunctionComponent<TextCellProps> = Component(props => {
 				return (
 					<Stack horizontal align="center">
 						<GenericTextCellFilter {...props} filter={filter} setFilter={setFilter} />
-							<FieldContainer
-								label={<span style={{ whiteSpace: 'nowrap' }}>
-									{filter.mode === 'doesNotMatch'
-										? formatMessage('dataGridCells.textCell.excludeNull', {
-												strong: chunks => <strong>{chunks}</strong>,
-											})
-										: formatMessage('dataGridCells.textCell.includeNull', {
-												strong: chunks => <strong>{chunks}</strong>,
-											})}
-									</span>}
-								labelPosition="labelInlineRight"
-							>
-								<Checkbox
-									notNull
-									value={filter.nullCondition}
-									onChange={checked => {
-										setFilter({
-											...filter,
-											nullCondition: !!checked,
-										})
-									}}
-								/>
-							</FieldContainer>
+						<FieldContainer
+							display="inline"
+							label={<span style={{ whiteSpace: 'nowrap' }}>
+								{filter.mode === 'doesNotMatch'
+									? formatMessage('dataGridCells.textCell.excludeNull', {
+										strong: chunks => <strong>{chunks}</strong>,
+									})
+									: formatMessage('dataGridCells.textCell.includeNull', {
+										strong: chunks => <strong>{chunks}</strong>,
+									})}
+							</span>}
+							labelPosition="right"
+						>
+							<Checkbox
+								notNull
+								value={filter.nullCondition}
+								onChange={checked => {
+									setFilter({
+										...filter,
+										nullCondition: !!checked,
+									})
+								}}
+							/>
+						</FieldContainer>
 					</Stack>
 				)
 			}}

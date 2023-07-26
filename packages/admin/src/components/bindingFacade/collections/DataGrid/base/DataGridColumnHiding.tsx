@@ -39,8 +39,9 @@ export function DataGridColumnHiding({
 						return (
 							<FieldContainer
 								key={key}
+								display="inline"
 								label={column.header}
-								labelPosition="labelInlineRight"
+								labelPosition="right"
 							>
 								<Checkbox
 									notNull

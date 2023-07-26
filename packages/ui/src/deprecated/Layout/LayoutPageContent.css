@@ -73,3 +73,11 @@
 		padding-right: var(--cui-layout-section-padding-right);
 	}
 }
+
+:where(.cui-layout-page-content-wrap .cui-field-container .cui-field-container) {
+	min-width: unset;
+}
+
+:where(.cui-field-container.width-fluid) {
+	max-width: 100%;
+}

@@ -47,8 +47,9 @@ export const HasManyAbsentCell: FunctionComponent<HasManyAbsentCellProps> = Comp
 			emptyFilter={false}
 			filterRenderer={({ filter, setFilter }) => {
 				return <FieldContainer
+					display="inline"
 					label="Has any"
-					labelPosition="labelInlineRight"
+					labelPosition="right"
 				>
 					<Checkbox notNull value={filter} onChange={checked => setFilter(!!checked)} />
 				</FieldContainer>

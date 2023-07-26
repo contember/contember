@@ -109,7 +109,7 @@ export const DateCell: FunctionComponent<DateCellProps> = Component(props => {
 
 const DateBoundInput = memo(
 	forwardRef(({ label, children }: { label: string, children: ReactNode }, ref: any) => (
-		<FieldContainer label={label} labelPosition="labelInlineLeft">
+		<FieldContainer label={label} display="inline" labelPosition="left">
 			{children}
 		</FieldContainer>
 	)),

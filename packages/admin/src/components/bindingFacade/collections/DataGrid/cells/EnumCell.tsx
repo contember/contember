@@ -83,9 +83,10 @@ export const EnumCell = Component<EnumCellProps>(props => {
 
 				const checkboxList = Object.entries(props.options).map(([value, label]) => (
 					<FieldContainer
+						display="inline"
 						key={value}
 						label={label}
-						labelPosition="labelInlineRight"
+						labelPosition="right"
 					>
 						<Checkbox
 							notNull

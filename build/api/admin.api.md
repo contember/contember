@@ -4657,7 +4657,7 @@ export interface SimpleRelativeSingleFieldMetadata<Value extends FieldValue = Fi
 export type SimpleRelativeSingleFieldProps = SimpleRelativeSingleFieldProxyProps;
 
 // @internal (undocumented)
-export const SimpleRelativeSingleFieldProxy: React.MemoExoticComponent<({ render, defaultValue, isNonbearing, onBeforeUpdate, onInitialize, onUpdate, description, direction, evenly, horizontal, gap, label, labelDescription, labelPosition, reverse, useLabelElement, width, className, style, errors, field: fieldName, required, size, containerClassName, containerStyle, suppressErrors, ...rest }: SimpleRelativeSingleFieldProxyProps & SimpleRelativeSingleFieldProxyRendererProps) => JSX.Element>;
+export const SimpleRelativeSingleFieldProxy: React.MemoExoticComponent<({ render, defaultValue, isNonbearing, onBeforeUpdate, onInitialize, onUpdate, description, display, direction, evenly, horizontal, gap, label, labelDescription, labelPosition, reverse, useLabelElement, width, className, style, errors, field: fieldName, required, size, containerClassName, containerStyle, suppressErrors, ...rest }: SimpleRelativeSingleFieldProxyProps & SimpleRelativeSingleFieldProxyRendererProps) => JSX.Element>;
 
 // @public (undocumented)
 export type SimpleRelativeSingleFieldProxyExcludeHandledProps<P extends SimpleRelativeSingleFieldProxyProps> = Omit<P, Exclude<keyof SugaredRelativeSingleField, RenderedSugaredRelativeSingleFieldKeys> | Exclude<keyof SimpleRelativeSingleFieldProxyExtraProps, RenderedSimpleRelativeSingleFieldProxyExtraPropsKeys> | Exclude<keyof SimpleRelativeSingleFieldProxyFieldContainerProps, RenderedSimpleRelativeSingleFieldProxyFieldContainerPropsKeys>>;

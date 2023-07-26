@@ -69,7 +69,17 @@ export class SystemMigrationsRunner {
 			}
 			const migrationResolver = new GroupMigrationsResolver(
 				new SnapshotMigrationResolver(snapshot, migrations),
-				Object.fromEntries(Object.entries(this.migrationGroups).map(([group, it]) => [group, new SnapshotMigrationResolver(it.snapshot, it.migrations, group.replace(/[^-_\w]+/g, '-'))])),
+				Object.fromEntries(Object.entries(this.migrationGroups).map(
+					([group, it]) => [
+						group,
+						new SnapshotMigrationResolver(
+							it.snapshot,
+							it.migrations,
+							group.replace(/[^-_\w]+/g, '-'),
+							migrations,
+						),
+					]),
+				),
 			)
 			const migrationsRunner = new DbMigrationsRunner(connection, this.schema, migrationResolver)
 			await migrationsRunner.migrate(message => logger.warn(message), {

@@ -28,7 +28,6 @@ SOFTWARE.
 
 import {
 	createMigrationBuilder,
-	createMigrationVersionPrefixGenerator,
 } from './helpers'
 import { Connection, withDatabaseAdvisoryLock, wrapIdentifier } from '@contember/database'
 import { Migration, RunMigration } from './Migration'
@@ -92,7 +91,6 @@ export default async <Args>(
 			const runMigrations = await getRunMigrations(db, options)
 			const migrations = await migrationsResolver.resolveMigrations({
 				runMigrations,
-				createTimeVersionPrefix: createMigrationVersionPrefixGenerator(),
 			})
 
 			const runNames = runMigrations.map(it => it.name)

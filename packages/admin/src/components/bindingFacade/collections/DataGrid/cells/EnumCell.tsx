@@ -98,7 +98,7 @@ export const EnumCell = Component<EnumCellProps>(props => {
 				))
 
 				return (
-					<Stack direction="vertical" gap="small">
+					<Stack gap="gap">
 						{checkboxList}
 						<NullConditionFilter filter={filter} setFilter={setFilter} environment={environment} field={props.field} showNullConditionFilter={props.showNullConditionFilter} />
 					</Stack>

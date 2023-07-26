@@ -46,7 +46,7 @@
 :where(.cui-table-container > .cui-field-container-label) { overflow-x: auto }
 
 :where(.cui-table-wrapper) {
-	border-radius: var(--cui-border-radius--controls, 0);
+	border-radius: var(--cui-border-radius-controls, 0);
 	display: flex;
 	margin: calc(-1 * var(--cui-boxNesting-paddingY, 0)) calc(-1 * var(--cui-boxNesting-paddingX, 0));
 	width: calc(100% + 2 * var(--cui-boxNesting-paddingX, 0));

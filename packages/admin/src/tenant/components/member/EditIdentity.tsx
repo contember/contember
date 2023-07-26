@@ -69,7 +69,7 @@ export const EditIdentity: FC<EditIdentityProps> = ({ project, rolesConfig, iden
 	const editUserMembershipProps = { project, rolesConfig, memberships, setMemberships }
 	return (
 		<form onSubmit={submit}>
-			<Stack direction="vertical" gap="large">
+			<Stack gap="large">
 				<EditMembership {...editUserMembershipProps} />
 
 				<Button distinction="primary" size="large" type="submit" disabled={isSubmitting}>

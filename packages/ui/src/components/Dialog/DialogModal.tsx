@@ -1,9 +1,9 @@
 import { useClassNameFactory } from '@contember/react-utils'
+import { XIcon } from 'lucide-react'
 import { memo, ReactNode } from 'react'
 import { HTMLDivElementProps } from '../../types'
 import { toEnumViewClass, toFeatureClass } from '../../utils'
 import { Button } from '../Forms'
-import { Icon } from '../Icon'
 import { Stack, StackProps } from '../Stack'
 
 export type DialogModalProps =
@@ -55,20 +55,18 @@ export const DialogModal = memo(({
 			<Stack
 				{...headerProps}
 				align={headerProps?.align ?? 'center'}
-				direction={headerProps?.direction ?? 'horizontal'}
+				horizontal={headerProps?.horizontal ?? true}
 				justify={headerProps?.justify ?? 'space-between'}
 				className={componentClassName('header', headerClassName)}
 			>
 				{header}
-				<Button onClick={onClose} flow="circular" distinction="seamless"
-					className={componentClassName('close-button')}><Icon blueprintIcon="cross" /></Button>
+				<Button square borderRadius="full" inset="gutter" onClick={onClose} distinction="seamless" className={componentClassName('close-button')}><XIcon /></Button>
 			</Stack>
 
 			{children && <div className={componentClassName('body-wrapper')}>
 				<Stack
 					{...bodyProps}
 					className={componentClassName('body', bodyClassName)}
-					direction={bodyProps?.direction ?? 'vertical'}
 				>
 					{children}
 				</Stack>
@@ -77,7 +75,7 @@ export const DialogModal = memo(({
 			{footer && <Stack
 				{...footerProps}
 				className={componentClassName('footer', footerClassName)}
-				direction={footerProps?.direction ?? 'horizontal'}
+				horizontal={footerProps?.horizontal ?? true}
 				justify={footerProps?.justify ?? 'end'}
 			>
 				{footer}

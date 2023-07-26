@@ -4,9 +4,9 @@ import { memo, MouseEvent as ReactMouseEvent } from 'react'
 import { Transforms } from 'slate'
 import { useSlate } from 'slate-react'
 import type { EditorWithBlocks } from '../blockEditor'
-import type { ToolbarButtonSpec } from './ToolbarButtonSpec'
-import { EditorTransforms } from '../slate-reexport'
 import { referenceElementType } from '../blockEditor'
+import { EditorTransforms } from '../slate-reexport'
+import type { ToolbarButtonSpec } from './ToolbarButtonSpec'
 
 export interface HoveringToolbarContentsProps {
 	buttons: ToolbarButtonSpec[] | ToolbarButtonSpec[][]

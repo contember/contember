@@ -12,7 +12,7 @@ export const toThemeClass = <T extends string = Intent>(
 	controlsTheme: T | null | undefined,
 	suffix: string = '',
 ): string | undefined => {
-	deprecate('1.3.0', false, 'toThemeClass function', 'import { themeClassName } from \'@contember/react-utils\'')
+	deprecate('1.3.0', true, 'toThemeClass function', 'import { themeClassName } from \'@contember/react-utils\'')
 
 	if (contentTheme === controlsTheme) {
 		const both = contentTheme

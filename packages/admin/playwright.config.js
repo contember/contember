@@ -29,6 +29,14 @@ const config = {
 
 	projects: [
 		{
+			name: 'iPhone 11',
+			use: { ...devices['iPhone 11'] },
+		},
+		{
+			name: 'iPad landscape',
+			use: { ...devices['iPad (gen 7) landscape'] },
+		},
+		{
 			name: 'Desktop Chrome',
 			use: { ...devices['Desktop Chrome'], viewport: { width: 1903, height: 1009 } },
 		},
@@ -43,14 +51,6 @@ const config = {
 		{
 			name: 'Desktop Chrome Dark',
 			use: { ...devices['Desktop Chrome'], viewport: { width: 1903, height: 1009 }, colorScheme: 'dark' },
-		},
-		{
-			name: 'iPhone 11',
-			use: { ...devices['iPhone 11'] },
-		},
-		{
-			name: 'iPad landscape',
-			use: { ...devices['iPad (gen 7) landscape'] },
 		},
 	],
 

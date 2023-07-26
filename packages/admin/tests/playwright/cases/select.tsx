@@ -4,7 +4,7 @@ export default function () {
 	return (
 		<Layout scheme="system">
 			<CreatePage entity="Article">
-				<Stack direction="vertical">
+				<Stack>
 					<div tabIndex={1} id="deselected">Deselect by clicking here</div>
 					<TitleSelectField
 						required

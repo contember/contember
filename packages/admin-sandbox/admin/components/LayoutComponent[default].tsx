@@ -44,7 +44,7 @@ export const LayoutComponent = ({ children, ...rest }: PropsWithChildren<Compone
 						start={targetsIfActive(['HeaderStart']) || false}
 						center={targetsIfActive(['Logo', 'HeaderCenter'], (
 							<>
-								<Stack direction="horizontal">
+								<Stack horizontal>
 									<SlotTargets.Logo />
 								</Stack>
 								<Spacer />

@@ -56,7 +56,7 @@ export const DataGridContainer: FunctionComponent<DataGridContainerProps> = Comp
 		)
 
 		return (
-			<Stack direction="vertical" className={useClassName('data-grid-body')}>
+			<Stack className={useClassName('data-grid-body')}>
 				<DataGridContainerHeader
 					allowAggregateFilterControls={allowAggregateFilterControls}
 					allowColumnVisibilityControls={allowColumnVisibilityControls}

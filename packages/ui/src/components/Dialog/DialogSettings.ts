@@ -7,10 +7,11 @@ export interface RenderDialogContentProps<Result> {
 }
 
 export interface DialogSettings<Result> {
-	content: (props: RenderDialogContentProps<Result>) => ReactElement
-	container?: HTMLElement
-	type?: Default | 'immersive' | 'captivating'
 	bare?: boolean
-	heading?: ReactNode
+	container?: HTMLElement
+	content: (props: RenderDialogContentProps<Result>) => ReactElement
+	footer?: (props: RenderDialogContentProps<Result>) => ReactElement
 	gap?: BoxProps['gap']
+	heading?: ReactNode
+	type?: Default | 'immersive' | 'captivating'
 }

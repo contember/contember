@@ -1,9 +1,9 @@
-import { CoalesceFieldView, CoalesceFieldViewProps, FieldFallbackViewPublicProps } from '../../../fieldViews'
 import { Component, FieldValue, Filter, QueryLanguage, wrapFilterInHasOnes } from '@contember/binding'
-import { DataGridColumn, DataGridColumnPublicProps } from '../base'
-import { FC, ReactElement } from 'react'
-import { createGenericTextCellFilterCondition, GenericTextCellFilter } from './GenericTextCellFilter'
 import { Stack } from '@contember/ui'
+import { FC, ReactElement } from 'react'
+import { CoalesceFieldView, CoalesceFieldViewProps, FieldFallbackViewPublicProps } from '../../../fieldViews'
+import { DataGridColumn, DataGridColumnPublicProps } from '../base'
+import { GenericTextCellFilter, createGenericTextCellFilterCondition } from './GenericTextCellFilter'
 
 export type CoalesceTextCellProps<Persisted extends FieldValue = FieldValue> =
 	& DataGridColumnPublicProps
@@ -54,7 +54,7 @@ export const CoalesceTextCell: FC<CoalesceTextCellProps> = Component(props => {
 			}}
 			filterRenderer={props => {
 				return (
-					<Stack direction="horizontal" align="center">
+					<Stack horizontal align="center">
 						<GenericTextCellFilter {...props} />
 					</Stack>
 				)

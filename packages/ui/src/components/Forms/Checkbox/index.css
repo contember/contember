@@ -1,7 +1,7 @@
 :where(.cui-checkbox) {
 	--cui-checkbox-background-color: transparent;
 	--cui-checkbox-tick-border-color: rgb(var(--cui-color-rgb-50));
-	--cui-checkbox-font-size: var(--cui-font-size--controls);
+	--cui-checkbox-font-size: var(--cui-font-size-controls);
 	--cui-checkbox-color--readonly: rgba(var(--cui-color-rgb-50), var(--cui-opacity--medium));
 	position: relative;
 }
@@ -24,11 +24,11 @@
 }
 
 :where(.cui-checkbox.view-small) {
-	--cui-checkbox-font-size: var(--cui-font-size--controls--small);
+	--cui-checkbox-font-size: var(--cui-font-size-controls-small);
 }
 
 :where(.cui-checkbox.view-large) {
-	--cui-checkbox-font-size: var(--cui-font-size--controls--large);
+	--cui-checkbox-font-size: var(--cui-font-size-controls-large);
 }
 
 :where(.cui-checkbox.is-hovered),
@@ -56,17 +56,17 @@
 
 :where(.cui-checkbox-button) {
 	background: var(--cui-checkbox-background-color);
-	border-radius: var(--cui-border-radius--controls);
-	border: var(--cui-border-width--controls, 1px) solid var(--cui-checkbox-tick-border-color);
+	border-radius: var(--cui-border-radius-controls);
+	border: var(--cui-border-width-controls, 1px) solid var(--cui-checkbox-tick-border-color);
 	color: transparent;
 	display: block;
-	max-height: var(--cui-size--checkbox);
-	max-width: var(--cui-size--checkbox);
-	min-height: var(--cui-size--checkbox);
-	min-width: var(--cui-size--checkbox);
+	max-height: var(--cui-size-controls-checkbox);
+	max-width: var(--cui-size-controls-checkbox);
+	min-height: var(--cui-size-controls-checkbox);
+	min-width: var(--cui-size-controls-checkbox);
 	pointer-events: none;
 	position: relative;
-	transition: background-color var(--cui-transition-duration--immediate), border-color var(--cui-transition-duration--immediate), box-shadow 0.2s;
+	transition: background-color var(--cui-transition-duration-immediate), border-color var(--cui-transition-duration-immediate), box-shadow 0.2s;
 	user-select: none;
 }
 
@@ -129,7 +129,7 @@
 }
 
 :where(.cui-checkbox-button.is-indeterminate) {
-	border-width: var(--cui-border-width--controls, 2px);
+	border-width: var(--cui-border-width-controls, 2px);
 	border-style: dashed;
 }
 
@@ -158,9 +158,9 @@
 }
 
 :where(.cui-checkbox-button.is-checked)::before {
-	animation: var(--cui-transition-duration--immediate) checkbox-tick-short var(--cui-transition-duration--immediate) ease-in forwards;
+	animation: var(--cui-transition-duration-immediate) checkbox-tick-short var(--cui-transition-duration-immediate) ease-in forwards;
 }
 
 :where(.cui-checkbox-button.is-checked)::after {
-	animation: var(--cui-transition-duration--immediate) checkbox-tick-long var(--cui-transition-duration--immediate) ease-in forwards;
+	animation: var(--cui-transition-duration-immediate) checkbox-tick-long var(--cui-transition-duration-immediate) ease-in forwards;
 }

@@ -29,8 +29,8 @@ export const AddNewBlockButton = memo<AddNewBlockButtonProps>(props => {
 			),
 			disabled: props.isMutating,
 			distinction: 'seamless',
-			flow: 'block',
-			justification: 'justifyStart',
+			display: 'block',
+			justify: 'start',
 		}),
 		[formatter, props.isMutating, props.children],
 	)

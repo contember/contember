@@ -28,9 +28,10 @@ Default.args = {
 		<Block />
 	</>,
 	actions: <Button
-		distinction="seamless"
-		flow="circular"
+		square
+		borderRadius="full"
 		className="theme-grey-controls theme-danger-controls:hover"
+		distinction="seamless"
 	><Icon blueprintIcon="trash" /></Button>,
 	dragHandleComponent: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
 }

@@ -3,13 +3,13 @@ import type { FieldErrors, RadioProps } from '@contember/ui'
 import { FieldContainer, FieldContainerProps, Radio } from '@contember/ui'
 import type { FunctionComponent } from 'react'
 import { memo, useMemo } from 'react'
+import { useLabelMiddleware } from '../environment/LabelMiddleware'
 import {
 	ChoiceField,
 	ChoiceFieldData,
 	SimpleDynamicSingleChoiceFieldProps,
 	StaticSingleChoiceFieldProps,
 } from './ChoiceField'
-import { useLabelMiddleware } from '../environment/LabelMiddleware'
 
 export type RadioFieldProps =
 	& RadioFieldInnerPublicProps
@@ -31,7 +31,7 @@ export const RadioField: FunctionComponent<RadioFieldProps> = Component(props =>
 	)
 }, 'RadioField')
 
-export interface RadioFieldInnerPublicProps extends Omit<FieldContainerProps, 'children'>, Pick<RadioProps, 'orientation'> {
+export interface RadioFieldInnerPublicProps extends Omit<FieldContainerProps, 'children' | 'direction'>, Pick<RadioProps, 'orientation'> {
 }
 
 export interface RadioFieldInnerProps extends ChoiceFieldData.SingleChoiceFieldMetadata, RadioFieldInnerPublicProps {

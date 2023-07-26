@@ -37,7 +37,7 @@ export const FieldSet = memo(function FieldSet({
 				</div>
 			)}
 			{children !== undefined && (
-				<Stack direction="vertical" className={componentClassName('content')}>
+				<Stack className={componentClassName('content')}>
 					{children}
 				</Stack>
 			)}

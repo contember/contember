@@ -71,7 +71,7 @@
 	top: -0.15em;
 	transform-origin: 70% 70%;
 	transform: rotate(45deg);
-	transition: transform var(--cui-transition-duration--fast);
+	transition: transform var(--cui-transition-duration-fast);
 	width: 0.4em;
 }
 

@@ -1,7 +1,7 @@
 import { Component, QueryLanguage, wrapFilterInHasOnes } from '@contember/binding'
 import type { Input } from '@contember/client'
 import { DateInput, FieldContainer, Stack, toDateString } from '@contember/ui'
-import { forwardRef, FunctionComponent, memo, ReactNode, useCallback } from 'react'
+import { FunctionComponent, ReactNode, forwardRef, memo, useCallback } from 'react'
 import { useMessageFormatter } from '../../../../../i18n'
 import { dateToStringWithoutTimezone } from '../../../../../utils'
 import { DateFieldView, DateFieldViewProps } from '../../../fieldViews'
@@ -83,7 +83,7 @@ export const DateCell: FunctionComponent<DateCellProps> = Component(props => {
 				}, [filter, setFilter])
 
 				return (
-					<Stack direction="horizontal" align="center">
+					<Stack horizontal align="center">
 						<DateBoundInput label={formatMessage('dataGridCells.dateCell.fromLabel')}>
 							<DateInput
 								value={start}

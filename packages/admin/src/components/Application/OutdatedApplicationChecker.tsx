@@ -52,14 +52,14 @@ export const OutdatedApplicationChecker: ComponentType = () => {
 const OutdatedApplicationDialog = ({ onReload, onPostpone }: { onReload: () => void, onPostpone: () => void }) => {
 	const formatMessage = useMessageFormatter(outdatedApplicationDictionary)
 	return (
-		<Stack direction={'vertical'}>
+		<Stack>
 			<Heading>{formatMessage('outdatedApplication.heading')}</Heading>
 			<p>{formatMessage('outdatedApplication.text')}</p>
-			<Stack direction={'horizontal'} gap={'small'} justify={'end'}>
-				<Button onClick={onReload} intent={'success'}>
+			<Stack horizontal gap="gap" justify="end">
+				<Button onClick={onReload} intent="success">
 					{formatMessage('outdatedApplication.reloadButton')}
 				</Button>
-				<Button onClick={onPostpone} intent={'warn'}>
+				<Button onClick={onPostpone} intent="warn">
 					{formatMessage('outdatedApplication.postponeButton')}
 				</Button>
 			</Stack>

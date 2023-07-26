@@ -6,7 +6,7 @@
 	border-radius: var(--cui-gap);
 	color: inherit;
 	font-family: inherit;
-	font-size: var(--cui-font-size--label);
+	font-size: var(--cui-font-size-label);
 	font-weight: inherit;
 	line-height: 1.125em;
 	margin: calc(-1 * var(--cui-label-inset-vertical)) calc(-1 * var(--cui-label-inset-horizontal));
@@ -22,12 +22,12 @@
 }
 
 :where(.cui-label.view-small) {
-	font-size: var(--cui-font-size--note);
+	font-size: var(--cui-font-size-note);
 }
 
 :where(.cui-label.view-large) {
 	font-weight: lighter;
-	font-size: var(--cui-font-size--heading);
+	font-size: var(--cui-font-size-heading);
 }
 
 :where(a .cui-label),

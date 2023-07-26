@@ -1,6 +1,6 @@
 import { AnchorButton, ButtonList } from '@contember/ui'
-import { EmptyMessage } from '../bindingFacade'
 import { MiscPageLayout } from '../MiscPageLayout'
+import { EmptyMessage } from '../bindingFacade'
 
 export interface Project {
 	slug: string
@@ -25,14 +25,14 @@ export const ProjectListButtons = (props: ProjectListProps) => {
 		return <EmptyMessage>No projects found</EmptyMessage>
 	}
 
-	return <ButtonList flow="block">
+	return <ButtonList display="block">
 		{props.projects.map(project => (
 			<AnchorButton
 				key={project.slug}
 				href={props.formatProjectUrl(project)}
 				distinction="seamless"
-				flow="block"
-				justification="justifyStart"
+				display="block"
+				justify="start"
 			>
 				{project.name}
 			</AnchorButton>

@@ -9,11 +9,11 @@ export default (
 	<>
 		<SlotSources.Title>Brand</SlotSources.Title>
 
-		<Stack direction="vertical" gap="small" style={{ fontSize: '3em' }}>
+		<Stack gap="gap" style={{ fontSize: '3em' }}>
 			{Object.keys(list).map(key => {
 				const Component = list[key]
 				return (
-					<Stack align="center" direction="horizontal" gap="small" key={key}>
+					<Stack align="center" horizontal gap="gap" key={key}>
 						<Component />
 						{key}
 					</Stack>

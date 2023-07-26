@@ -78,7 +78,7 @@ export function DimensionsRenderer(props: DimensionsRendererProps) {
 						Component={({ href, onClick }) => (
 							<AnchorButton
 								href={href}
-								flow="block"
+								display="block"
 								active={dimension.isSelected}
 								onClick={onClick}
 							>
@@ -110,11 +110,7 @@ export function DimensionsRenderer(props: DimensionsRendererProps) {
 		}
 
 		return (
-			<Stack
-				direction="vertical"
-				gap="large"
-				key="multipleDimensions"
-			>
+			<Stack gap="large" key="multipleDimensions">
 				{renderedDimensions}
 			</Stack>
 		)
@@ -173,6 +169,7 @@ export function DimensionsRenderer(props: DimensionsRendererProps) {
 	}, [normalizedData, props.dimension, props.maxItems, redirect, selectedDimensions])
 
 	const buttonProps: DropdownProps['buttonProps'] = useMemo(() => ({
+		distinction: 'seamless',
 		size: 'small',
 		...props.buttonProps,
 		children: renderSelected(selectedDimensions),

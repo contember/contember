@@ -44,7 +44,7 @@ export const LayoutPageAside = memo(({ children }: HTMLDivElementProps) => {
 
 	return (
 		<div ref={element} id={metaTab.id} className={componentClassName()}>
-			<Stack gap="large" direction="vertical" className={componentClassName('content')}>
+			<Stack gap="large" className={componentClassName('content')}>
 				{children}
 			</Stack>
 		</div>

@@ -14,7 +14,9 @@ export type EmptyMessageProps<C extends ElementType =
 		component?: C
 	}
 
-export interface EmptyMessageComponentProps extends BoxProps {
+export type EmptyMessageComponentProps =
+	& BoxProps
+	& {
 	children: ReactNode
 }
 
@@ -28,9 +30,7 @@ export const EmptyMessage = memo(({ children, component, padding = true, ...rest
 EmptyMessage.displayName = 'EmptyMessage'
 
 const EmptyMessageDefault = memo(({ children, intent = 'default', padding = true, ...rest }: EmptyMessageComponentProps) => (
-	<Box intent={intent} padding={padding} {...rest}>
-		<Stack direction="horizontal" justify="space-around">
-			{children}
-		</Stack>
+	<Box intent={intent} padding={padding} {...rest} horizontal justify="space-around">
+		{children}
 	</Box>
 ))

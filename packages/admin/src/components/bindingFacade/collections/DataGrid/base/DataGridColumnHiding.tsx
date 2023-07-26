@@ -25,14 +25,12 @@ export function DataGridColumnHiding({
 				{formatMessage('dataGrid.columnHiding.showMenuButton.text')}
 			</>
 		),
+		size: 'small',
 	}), [formatMessage])
 
 	return (
-		<Dropdown
-			alignment="center"
-			buttonProps={buttonProps}
-		>
-			<Box border={false} heading={formatMessage('dataGrid.columnHiding.heading')}>
+		<Dropdown buttonProps={buttonProps}>
+			<Box border={false} label={formatMessage('dataGrid.columnHiding.heading')}>
 				<div style={{ display: 'flex', flexDirection: 'column', gap: '0.25em' }}>
 					{Array.from(desiredState.columns, ([key, column]) => {
 						if (column.canBeHidden === false) {

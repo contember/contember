@@ -65,13 +65,13 @@ export const Section = memo(forwardRef<HTMLElement, SectionProps>(({
 			className={componentClassName(null, className)}
 			ref={ref}
 		>
-			{import.meta.env.DEV && <Message distinction="striking" intent="warn" className="message--nesting-warning">Please use <code><strong>Section</strong></code> as parent element of the <code><strong>LocaleSideDimension</strong></code>.</Message>}
+			{import.meta.env.DEV && <Message important padding intent="warn" className="message--nesting-warning">Please use <code><strong>Section</strong></code> as parent element of the <code><strong>LocaleSideDimension</strong></code>.</Message>}
 			{(heading || actions) && (
 				<div className={componentClassName('heading')} contentEditable={false}>
 					<Heading depth={3}>
 						{heading}
 					</Heading>
-					<Stack direction="horizontal" className={componentClassName('actions')} contentEditable={false}>
+					<Stack horizontal className={componentClassName('actions')} contentEditable={false}>
 						{actions}
 					</Stack>
 				</div>

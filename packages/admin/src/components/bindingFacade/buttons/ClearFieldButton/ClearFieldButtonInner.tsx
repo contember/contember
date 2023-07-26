@@ -22,10 +22,10 @@ export const ClearFieldButtonInner = (props: ClearFieldButtonInnerProps) => {
 
 	return (
 		<Button
+			square
 			onClick={onClick}
 			disabled={isMutating}
 			size="small"
-			flow="squarish"
 			distinction="seamless"
 			{...buttonProps}
 		>

@@ -1,5 +1,5 @@
 import { Button, LayoutPageStickyContainer, Stack } from '@contember/ui'
-import { memo, ReactNode, useCallback } from 'react'
+import { ReactNode, memo, useCallback } from 'react'
 import { useMessageFormatter } from '../../../../../../i18n'
 import { dataGridDictionary } from '../dataGridDictionary'
 import type { DataGridContainerProps } from './Types'
@@ -42,8 +42,8 @@ export const DataGridContainerFooter = memo<DataGridContainerFooterProps>(({
 			left="var(--cui-layout-page-padding-left)"
 			right="var(--cui-layout-page-padding-right)"
 		>
-			<Stack wrap align="center" direction="horizontal" justify="space-between">
-				<Stack direction="horizontal" justify="space-between" gap="small">
+			<Stack wrap align="center" horizontal justify="space-between">
+				<Stack horizontal justify="space-between" gap="gap">
 					<Button
 						distinction="seamless"
 						disabled={pageIndex === 0}

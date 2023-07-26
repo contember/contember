@@ -67,7 +67,7 @@
 	padding: calc(2 * var(--cui-screen-gap));
 }
 
-:where(.cui-legacy-layout .cui-menu-section)after {
+:where(.cui-legacy-layout .cui-menu-section)::after {
 	border-bottom: 1px solid rgba(var(--cui-color-rgb-50), var(--cui-opacity--lower));
 	content: "";
 	display: block;

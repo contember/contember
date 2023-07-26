@@ -13,11 +13,11 @@
 }
 
 :where(.cui-field-container.view-small) {
-	font-size: var(--cui-font-size--controls--small);
+	font-size: var(--cui-font-size-controls-small);
 }
 
 :where(.cui-field-container.view-large) {
-	font-size: var(--cui-font-size--controls--large);
+	font-size: var(--cui-font-size-controls-large);
 }
 
 :where(.cui-field-container:focus-within) {
@@ -27,7 +27,7 @@
 :where(.cui-field-container-label) {
 	display: flex;
 	flex-direction: column;
-	gap: calc(2 * var(--cui-gap));
+	gap: calc(3 * var(--cui-gap));
 }
 
 :where(.cui-field-container:not(.is-active) > .cui-field-container-label) {

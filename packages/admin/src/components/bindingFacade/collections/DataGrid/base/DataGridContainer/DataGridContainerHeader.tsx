@@ -1,9 +1,9 @@
 import { Button, ButtonList, Divider, Icon, LayoutPageStickyContainer, Stack } from '@contember/ui'
-import { memo, ReactNode, useCallback } from 'react'
+import { ReactNode, memo, useCallback } from 'react'
 import { useMessageFormatter } from '../../../../../../i18n'
 import { DataGridColumnHiding } from '../DataGridColumnHiding'
-import { dataGridDictionary } from '../dataGridDictionary'
 import { DataGridFullFilters } from '../DataGridFullFilters'
+import { dataGridDictionary } from '../dataGridDictionary'
 import { DataGridContainerProps } from './Types'
 
 interface DataGridContainerHeaderProps
@@ -43,14 +43,14 @@ export const DataGridContainerHeader = memo<DataGridContainerHeaderProps>(({
 			left="var(--cui-layout-page-padding-left)"
 			right="var(--cui-layout-page-padding-right)"
 		>
-			<Stack wrap align="center" direction="horizontal" justify="space-between">
-				<Stack gap="small" direction="horizontal">
+			<Stack wrap align="center" horizontal justify="space-between">
+				<Stack gap="gap" horizontal>
 					{hasTile && <>
-						<ButtonList>
-							<Button onClick={setTileView} size="small" distinction="seamless" intent={layout === 'tiles' ? 'primary' : 'default'}>
+						<ButtonList gap="gutter">
+							<Button inset="gap" onClick={setTileView} size="small" distinction="seamless" intent={layout === 'tiles' ? 'primary' : 'default'}>
 								<Icon blueprintIcon="grid-view" />
 							</Button>
-							<Button onClick={setDefaultView} size="small" distinction="seamless" intent={layout === 'default' ? 'primary' : 'default'}>
+							<Button inset="gap" onClick={setDefaultView} size="small" distinction="seamless" intent={layout === 'default' ? 'primary' : 'default'}>
 								<Icon blueprintIcon="list" />
 							</Button>
 						</ButtonList>

@@ -1,5 +1,5 @@
 :where(.cui-collapsible) {
-	--cui-collapsible-transition-duration: var(--cui-transition-duration--fast);
+	--cui-collapsible-transition-duration: var(--cui-transition-duration-fast);
 	--cui-collapsible-transition-timing-function: ease;
 	--cui-collapsible-content-height: auto;
 	display: flex;

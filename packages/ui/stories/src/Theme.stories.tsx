@@ -43,7 +43,7 @@ const TextPreview = ({ children }: { children: string }) => <div style={{
 	width: swatchSize,
 }}><em><strong>A</strong></em>a</div>
 
-const PropertyText = ({ children }: { children: string }) => <Stack direction="horizontal" gap="small" align="center">
+const PropertyText = ({ children }: { children: string }) => <Stack horizontal gap="gap" align="center">
 	<TextPreview>{children}</TextPreview>
 	<span style={{ fontSize: '0.8125em', fontWeight: 600, whiteSpace: 'nowrap' }}>{children}</span>
 </Stack>
@@ -59,7 +59,7 @@ const PropertyBorderPreview = ({ children }: { children: string | string[] }) =>
 		width: swatchSize,
 		minWidth: swatchSize,
 	}}>
-		<Stack direction="vertical" gap="small">
+		<Stack gap="gap">
 			<div style={{ borderTop: `1px solid var(--${children})`, height: '3px', width: '1.5em' }}></div>
 			<div style={{ borderTop: `2px solid var(--${children})`, height: '3px', width: '1.5em' }}></div>
 			<div style={{ borderTop: `3px solid var(--${children})`, height: '3px', width: '1.5em' }}></div>
@@ -68,7 +68,7 @@ const PropertyBorderPreview = ({ children }: { children: string | string[] }) =>
 )
 
 const PropertyBorder = ({ children }: { children: string }) => (
-	<Stack direction="horizontal" gap="small" align="center">
+	<Stack horizontal gap="gap" align="center">
 		<PropertyBorderPreview>{children}</PropertyBorderPreview>
 		<span style={{ fontSize: '0.8125em', fontWeight: 600, whiteSpace: 'nowrap' }}>{children}</span>
 	</Stack>
@@ -79,7 +79,7 @@ const PropertyBackgroundColor = ({ children }: { children: string }) => <>
 		children,
 		`${children}--highlighted`,
 		`${children}--pressed`,
-	].map((children, i) => <Stack key={i} direction="horizontal" gap="small" align="center">
+	].map((children, i) => <Stack key={i} horizontal gap="gap" align="center">
 		<div style={{
 			height: swatchSize,
 			minHeight: swatchSize,
@@ -90,7 +90,7 @@ const PropertyBackgroundColor = ({ children }: { children: string }) => <>
 		}}>
 			<TextPreview>{children.replace(/-background-/, '-')}</TextPreview>
 		</div>
-		<Stack direction="vertical" gap="small" justify="center">
+		<Stack gap="gap" justify="center">
 			<span style={{ fontSize: '0.8125em', fontWeight: 600, whiteSpace: 'nowrap' }}>{children.replace(/-background-/, '-')}</span>
 			<span style={{ fontSize: '0.8125em', fontWeight: 600, whiteSpace: 'nowrap' }}>{children}</span>
 		</Stack>
@@ -99,7 +99,7 @@ const PropertyBackgroundColor = ({ children }: { children: string }) => <>
 
 const ThemePreview = ({ background, belowAbove, children }: ThemePreviewProps) => <>
 	<Stack
-		direction="horizontal"
+		horizontal
 		className={`schema-${background}`}
 		style={{
 			alignItems: 'stretch',
@@ -136,8 +136,8 @@ export default {
 const Template: ComponentStory<typeof ThemePreview> = (args: ThemePreviewProps) => {
 	return (
 		<ThemePreview {...args}>
-			<Stack direction="vertical" gap="large">
-				<Stack direction="vertical" gap="small" align="stretch">
+			<Stack gap="large">
+				<Stack gap="gap" align="stretch">
 					<PropertyText>cui-color</PropertyText>
 
 					<PropertyText>cui-color--low</PropertyText>
@@ -154,11 +154,11 @@ const Template: ComponentStory<typeof ThemePreview> = (args: ThemePreviewProps) 
 					<PropertyBackgroundColor>cui-filled-control-background-color</PropertyBackgroundColor>
 				</Stack>
 
-				<Stack direction="vertical" align="start">
+				<Stack align="start">
 					<Button scheme={args.buttonScheme} intent={args.intent} size="small">Button</Button>
 					<Button scheme={args.buttonScheme} intent={args.intent}>Button</Button>
 					<Button scheme={args.buttonScheme} intent={args.intent} size="large">Button</Button>
-					<Button scheme={args.buttonScheme} intent={args.intent} distinction="default" size="small">Button</Button>
+					<Button scheme={args.buttonScheme} intent={args.intent} size="small">Button</Button>
 					<Button scheme={args.buttonScheme} intent={args.intent} distinction="outlined">Button</Button>
 					<Button scheme={args.buttonScheme} intent={args.intent} distinction="seamless" size="large">Button</Button>
 				</Stack>

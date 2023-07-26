@@ -5,7 +5,7 @@
 :where(.cui-breadcrumbs-items) {
 	display: flex;
 	flex-wrap: wrap;
-	font-size: var(--cui-font-size--label);
+	font-size: var(--cui-font-size-label);
 	letter-spacing: 0.025em;
 	user-select: none;
 }

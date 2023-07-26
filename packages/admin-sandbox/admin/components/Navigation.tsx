@@ -7,10 +7,16 @@ export const Navigation = () => (
 			<Menu.Item title="Tags" to="articles/tags" />
 			<Menu.Item title="Categories" to="articles/categories" />
 		</Menu.Item>
+		<Menu.Item title="Components">
+			<Menu.Item title="Boxes" to="boxes" />
+			<Menu.Item title="Buttons" to="buttons" />
+			<Menu.Item title="FieldContainer" to="fieldContainers" />
+			<Menu.Item title="Inputs" to="inputs" />
+			<Menu.Item title="Messages" to="messages" />
+		</Menu.Item>
+
 		<Menu.Item title="Examples">
 			<Menu.Item title="Auto" to="auto" />
-			<Menu.Item title="Inputs" to="inputs" />
-			<Menu.Item title="Buttons" to="buttons" />
 
 			<Menu.Item title="Homepage" to="homepage" />
 			<Menu.Item title="Brand" to="brand" />

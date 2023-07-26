@@ -87,8 +87,8 @@ export const NumberCell: FunctionComponent<NumberCellProps> = Component(props =>
 						{ value: 'lte', label: formatMessage('dataGridCells.numberCell.lessThan') },
 					]
 				return (
-					<Stack direction="vertical" gap="small">
-						<Stack direction="horizontal" align="center" gap="small">
+					<Stack gap="gap">
+						<Stack horizontal align="center" gap="gap">
 							<Select
 								notNull
 								value={filter.mode}

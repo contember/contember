@@ -1,9 +1,11 @@
 import { Box, BoxOwnProps, Heading, Layout, Spacer, Stack } from '@contember/ui'
-import { memo, ReactNode } from 'react'
+import { ReactNode, memo } from 'react'
 
-export interface MiscPageLayoutProps extends BoxOwnProps {
-	footerActions?: ReactNode
-}
+export type MiscPageLayoutProps =
+	& Omit<BoxOwnProps, 'header' | 'footer'>
+	& {
+		footerActions?: ReactNode
+	}
 
 export const MiscPageLayout = memo<MiscPageLayoutProps>(({ footerActions, heading, children, ...props }) => (
 	<Layout>
@@ -17,13 +19,13 @@ export const MiscPageLayout = memo<MiscPageLayoutProps>(({ footerActions, headin
 					)}
 					{...props}
 				>
-					<Stack direction="vertical" gap="large">
+					<Stack gap="large">
 						{children}
 					</Stack>
 				</Box>
 				{footerActions && <div style={{ position: 'sticky', bottom: 0 }}>
 					<Spacer gap="large" />
-					<Stack direction="horizontal">
+					<Stack horizontal>
 						{footerActions}
 					</Stack>
 				</div>}

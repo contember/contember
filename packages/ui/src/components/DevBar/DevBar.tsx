@@ -102,13 +102,13 @@ export const DevBar = ({
 							)}
 						</a>
 
-						<Divider gap="medium" />
+						<Divider gap="gutter" />
 
 						<div className={className('panels')}>
 							<SmallScreenContext.Provider value={isSmallScreen}>{children}</SmallScreenContext.Provider>
 						</div>
 
-						<Divider gap="medium" />
+						<Divider gap="gutter" />
 					</div>
 
 					<button

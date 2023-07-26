@@ -52,7 +52,7 @@ export const ResetPasswordForm: FC<ResetPasswordFormProps> = ({ redirectOnSucces
 
 	return (
 		<form onSubmit={onSubmit}>
-			<Stack direction="vertical" gap="large">
+			<Stack gap="large">
 				<FieldContainer label="Password">
 					<TextInput {...register('password')} required={true} type={'password'} />
 				</FieldContainer>

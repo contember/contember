@@ -33,7 +33,7 @@ export const SelectCellFilter = ({ filter, setFilter, optionProps }: SelectCellF
 	}, [filter.id, allOptions])
 	const formatMessage = useMessageFormatter(dataGridCellsDictionary)
 
-	return <Stack align="center" direction="horizontal">
+	return <Stack align="center" horizontal>
 		<MultiSelectFieldInner
 			label={undefined}
 			data={options}

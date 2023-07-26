@@ -46,26 +46,27 @@ export function DataGridFullFilters({
 				{formatMessage('dataGrid.columnFiltering.showMenuButton.text')}
 			</>
 		),
+		size: 'small',
 	}), [formatMessage, hasAnyFilters])
 
 	const filterButtonProps: DropdownProps['buttonProps'] = useMemo(() => ({
 		distinction: 'seamless',
-		flow: 'block',
-		style: { marginTop: hasAnyFilters ? '1em' : 0 },
+		display: 'block',
+		inset: true,
 		children: (
 			<>
 				<Icon alignWithLowercase blueprintIcon="add" style={{ marginRight: '0.2em' }} />
 				{formatMessage('dataGrid.columnFiltering.addFilterButton.text')}
 			</>
 		),
-	}), [formatMessage, hasAnyFilters])
+	}), [formatMessage])
 
 	return (
 		<Dropdown
 			alignment="center"
 			buttonProps={columnFilteringButtonProps}
 			renderContent={({ update: updateOuterDropdown }) => (
-				<Box heading={formatMessage('dataGrid.columnFiltering.heading')}>
+				<Box label={formatMessage('dataGrid.columnFiltering.heading')}>
 					{hasAnyFilters || <EmptyMessage>{formatMessage('dataGrid.columnFiltering.emptyMessage.text')}</EmptyMessage>}
 					{hasAnyFilters && (
 						<Table
@@ -125,7 +126,7 @@ export function DataGridFullFilters({
 									{remainingColumns.map(([key, column]) => (
 										<Button
 											key={key}
-											justification="justifyStart"
+											justify="start"
 											onClick={() => {
 												requestClose()
 												updateOuterDropdown()

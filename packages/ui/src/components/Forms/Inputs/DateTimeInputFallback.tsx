@@ -88,7 +88,7 @@ export const DateTimeInputFallback = memo(forwardRef(({
 	const [minDate, minTime] = splitDatetime(min)
 
 	return (
-		<Stack gap="large" direction="horizontal" className={useInputClassName<VisuallyDependentControlProps>({
+		<Stack gap="large" horizontal className={useInputClassName<VisuallyDependentControlProps>({
 			...outerProps,
 			className: useClassName(['text-input', 'datetime-input'], [
 				toViewClass('withTopToolbar', withTopToolbar),

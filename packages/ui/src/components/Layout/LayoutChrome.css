@@ -107,7 +107,7 @@
 }
 
 :where(.cui-layout-chrome-navigation-button) {
-	height: var(--cui-size--controls);
+	height: var(--cui-size-controls);
 	margin-top: -0.5em;
 	margin-bottom: -0.5em;
 }

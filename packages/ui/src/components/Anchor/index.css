@@ -1,6 +1,6 @@
 :where(.cui-anchor) {
 	align-items: center;
-	border-radius: var(--cui-border-radius--controls);
+	border-radius: var(--cui-border-radius-controls);
 	display: inline-flex;
 	color: rgb(var(--cui-color-accent-rgb-50));
 	cursor: pointer;

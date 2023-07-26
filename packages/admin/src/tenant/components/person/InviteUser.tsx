@@ -68,7 +68,7 @@ export const InviteUser: FC<InviteUserProps> = ({ project, rolesConfig, userList
 
 	return (
 		<form onSubmit={submit}>
-			<Stack direction="vertical" gap="large">
+			<Stack gap="large">
 				<FieldContainer label="E-mail" errors={emailNotValidError ? [{ message: 'Email is not valid.' }] : undefined}>
 					<TextInput
 						ref={emailInput}

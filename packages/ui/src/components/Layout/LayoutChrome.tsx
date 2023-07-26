@@ -192,9 +192,7 @@ export const LayoutChrome = memo(({
 										<span className={componentBarClassName('body-scrolled-indicator', [
 											toStateClass('scrolled', isScrolled),
 										])} />
-										<Stack direction="vertical">
-											{navigation}
-										</Stack>
+										<Stack>{navigation}</Stack>
 									</div>}
 									{sidebarFooter && <div className={componentBarClassName('footer')}>
 										{sidebarFooter}

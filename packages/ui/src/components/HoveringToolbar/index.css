@@ -5,7 +5,7 @@
 	pointer-events: none;
 	position: sticky;
 	top: 0;
-	transition-duration: var(--cui-transition-duration--fast);
+	transition-duration: var(--cui-transition-duration-fast);
 	transition-property: opacity, visibility;
 	visibility: hidden;
 	z-index: 1;

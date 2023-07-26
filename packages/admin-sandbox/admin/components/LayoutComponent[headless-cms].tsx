@@ -67,7 +67,7 @@ export const LayoutComponent = ({ children, ...rest }: PropsWithChildren) => {
 					panels.get(LayoutKit.SidebarLeft.NAME)?.behavior === 'modal'
 						? targetsIfActive(['ContentHeader', 'Back', 'Title', 'Actions'], (
 							<>
-								<Stack align="center" direction="horizontal">
+								<Stack align="center" horizontal>
 									<LayoutSlots.Back />
 									<LayoutSlots.Title as="h1" />
 								</Stack>
@@ -78,7 +78,7 @@ export const LayoutComponent = ({ children, ...rest }: PropsWithChildren) => {
 						))
 						: targetsIfActive(['ContentHeader', 'Back', 'Title'], (
 							<>
-								<Stack align="center" direction="horizontal">
+								<Stack align="center" horizontal>
 									<LayoutSlots.Back />
 									<LayoutSlots.Title as="h1" />
 								</Stack>

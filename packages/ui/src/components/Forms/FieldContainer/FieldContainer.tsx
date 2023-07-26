@@ -12,21 +12,82 @@ export type FieldContainerProps =
 	& {
 		children: ReactNode // The actual field
 		description?: ReactNode // Can explain e.g. the kinds of values to be filled
+		/** @deprecated Use `horizontal` instead */
 		direction?: StackProps['direction']
-		gap?: Size | 'none'
+		evenly?: StackProps['evenly']
+		gap?: StackProps['gap']
+		horizontal?: StackProps['horizontal']
 		label: ReactNode
 		labelDescription?: ReactNode // Expands on the label e.g. to provide the additional explanation
 		labelPosition?: FieldContainerLabelPosition
+		/** @deprecated No alternative */
 		width?: 'column' | 'fluid' | 'none'
 		required?: boolean
 		size?: Size
 		useLabelElement?: boolean
+		reverse?: StackProps['reverse']
 		style?: CSSProperties
 		className?: string
 	}
 	& ErrorListProps
 
 /**
+ * The `FieldContainer` component is a container that can be used to wrap inputs to form a labeled field.
+ *
+ * @example
+ * A basic FieldContainer:
+ * ```tsx
+ * <FieldContainer label="Lorem ipsum">
+ * 	<TextInput name="name" placeholder="Enter name..." />
+ * </FieldContainer>
+ * ```
+ *
+ * @example
+ * FieldContainer with various label positions:
+ * ```tsx
+ * <FieldContainer
+ * 	label="Lorem ipsum"
+ * 	labelDescription="Lorem ipsum dolor"
+ * 	description="Lorem ipsum dolor sit amet"
+ * >
+ * 	<TextInput name="name" placeholder="Enter name..." />
+ * </FieldContainer>
+ *
+ * <FieldContainer
+ * 	labelPosition="labelInlineLeft"
+ * 	label="Lorem ipsum"
+ * 	labelDescription="Lorem ipsum dolor"
+ * 	description="Lorem ipsum dolor sit amet"
+ * >
+ * 	<TextInput name="name" placeholder="Enter name..." />
+ * </FieldContainer>
+ *
+ * <FieldContainer
+ * 	labelPosition="labelInlineRight"
+ * 	label="Lorem ipsum"
+ * 	labelDescription="Lorem ipsum dolor"
+ * 	description="Lorem ipsum dolor sit amet"
+ * >
+ * 	<TextInput name="name" placeholder="Enter name..." />
+ * </FieldContainer>
+ *
+ * <FieldContainer
+ * 	labelPosition="labelLeft"
+ * 	label="Lorem ipsum"
+ * 	labelDescription="Lorem ipsum dolor"
+ * 	description="Lorem ipsum dolor sit amet"
+ * >
+ * 	<TextInput name="name" placeholder="Enter name..." />
+ * </FieldContainer>
+ *
+ * <FieldContainer
+ * 	labelPosition="labelRight"
+ * 	label="Lorem ipsum"
+ * 	labelDescription="Lorem ipsum dolor"
+ * 	description="Lorem ipsum dolor sit amet"
+ * >
+ * 	<TextInput name="name" placeholder="Enter name..." />
+ * </FieldContainer>
  * @group Forms UI
  */
 export const FieldContainer = memo(
@@ -34,13 +95,16 @@ export const FieldContainer = memo(
 		children,
 		className,
 		description,
-		direction = 'vertical',
 		errors,
-		gap = 'small',
+		direction,
+		evenly,
+		gap = 'gap',
+		horizontal = false,
 		label,
 		labelDescription,
 		labelPosition,
 		required,
+		reverse,
 		size,
 		style,
 		useLabelElement = true,
@@ -61,7 +125,6 @@ export const FieldContainer = memo(
 				className={componentClassName(null, [
 					toEnumViewClass(size),
 					toEnumViewClass(labelPosition),
-					toEnumClass('width-', width === 'none' ? undefined : width),
 					invalid ? controlsThemeClassName('danger') : null,
 					colorSchemeClassName(useColorScheme()),
 					className,
@@ -77,13 +140,18 @@ export const FieldContainer = memo(
 					</span>
 					}
 					{(children || (!isLabelInline && description)) && <div className={componentClassName('body')}>
-						{children && <Stack
-							className={componentClassName('body-content')}
-							direction={direction}
-							gap={gap}
-						>
-							{children}
-						</Stack>}
+						{children && (
+							<Stack
+								className={componentClassName('body-content')}
+								direction={direction}
+								horizontal={horizontal}
+								evenly={evenly}
+								reverse={reverse}
+								gap={gap}
+							>
+								{children}
+							</Stack>
+						)}
 						{!isLabelInline && description && <span className={componentClassName('body-content-description')}>{description}</span>}
 					</div>}
 				</LabelElement>

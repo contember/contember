@@ -70,7 +70,7 @@ export const BooleanCell: FunctionComponent<BooleanCellProps> = Component(props 
 			filterRenderer={({ filter, setFilter }) => {
 				const formatMessage = useMessageFormatter(dataGridCellsDictionary)
 				return (
-					<Stack direction="horizontal" align="center">
+					<Stack horizontal align="center">
 						{(
 							[
 								['includeTrue', formatMessage('dataGridCells.booleanCell.includeTrue')],

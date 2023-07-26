@@ -32,11 +32,12 @@ export const ToggleSidebarButton = memo<ToggleSidebarButtonProps>(({
 	return panelState
 		? (
 			<Button
+				square
+				distinction="seamless"
 				aria-haspopup="dialog"
 				aria-controls={id}
 				aria-expanded={panelState?.visibility === 'visible'}
 				intent="default"
-				flow="squarish"
 				className={className}
 				onClick={onClick}
 				aria-label={panelState?.visibility === 'visible' ? labelWhenOpen : labelWhenClosed}

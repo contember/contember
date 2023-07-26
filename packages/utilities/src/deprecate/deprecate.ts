@@ -19,7 +19,7 @@ import { SemverString } from './types'
 export function deprecate(removal: SemverString, condition: boolean, deprecated: string, replacement: string): void {
 	if (condition === true) {
 		if (import.meta.env.DEV) {
-			const shouldThrow = Boolean(import.meta.env.VITE_CONTEMBER_ADMIN_STRICT_DEPRECATIONS || true)
+			const shouldThrow = Boolean(import.meta.env.VITE_CONTEMBER_ADMIN_STRICT_DEPRECATIONS)
 
 			if (shouldThrow) {
 				throw new Error(`Support for ${deprecated} was planned to be removed in the ${removal} release. Replace it with ${replacement} instead.`)

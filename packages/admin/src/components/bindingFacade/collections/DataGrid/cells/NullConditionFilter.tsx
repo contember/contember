@@ -1,7 +1,7 @@
-import { FilterRendererProps } from '../base'
 import { QueryLanguage, SugaredFieldProps } from '@contember/binding'
 import { Checkbox, FieldContainer } from '@contember/ui'
 import { useMessageFormatter } from '../../../../../i18n'
+import { FilterRendererProps } from '../base'
 import { dataGridCellsDictionary } from './dataGridCellsDictionary'
 
 export type NullConditionArtifacts = { nullCondition: boolean }
@@ -33,7 +33,8 @@ export const NullConditionFilter = <FA extends NullConditionArtifacts>({ filter,
 			label={<i style={{ opacity: 0.8, fontWeight: 'normal' }}>
 				{formatMessage('dataGridCells.includeNull')}
 			</i>}
-			labelPosition="labelInlineRight"
+			display="inline"
+			labelPosition="right"
 		>
 			<Checkbox
 				notNull

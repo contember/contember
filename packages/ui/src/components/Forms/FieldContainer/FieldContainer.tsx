@@ -1,8 +1,7 @@
-import { useClassNameFactory, useColorScheme } from '@contember/react-utils'
-import { colorSchemeClassName, controlsThemeClassName, themeClassName } from '@contember/utilities'
-import { CSSProperties, ReactNode, memo } from 'react'
+import { useClassNameFactory, useColorScheme, useElementSize } from '@contember/react-utils'
+import { colorSchemeClassName, controlsThemeClassName, dataAttribute, deprecate, fallback, px, themeClassName } from '@contember/utilities'
+import { CSSProperties, ReactNode, memo, useMemo, useRef } from 'react'
 import type { Size } from '../../../types'
-import { toEnumClass, toEnumViewClass } from '../../../utils'
 import { ErrorList, ErrorListProps } from '../../ErrorList/ErrorList'
 import { Stack, StackProps } from '../../Stack'
 import { Description, Label } from '../../Typography'
@@ -16,6 +15,7 @@ export type FieldContainerProps =
 		direction?: StackProps['direction']
 		evenly?: StackProps['evenly']
 		gap?: StackProps['gap']
+		display?: 'inline' | 'block'
 		horizontal?: StackProps['horizontal']
 		label: ReactNode
 		labelDescription?: ReactNode // Expands on the label e.g. to provide the additional explanation
@@ -54,7 +54,18 @@ export type FieldContainerProps =
  * </FieldContainer>
  *
  * <FieldContainer
- * 	labelPosition="labelInlineLeft"
+ * 	display="inline"
+ * 	label="Lorem ipsum"
+ * 	labelPosition="left"
+ * 	labelDescription="Lorem ipsum dolor"
+ * 	description="Lorem ipsum dolor sit amet"
+ * >
+ * 	<TextInput name="name" placeholder="Enter name..." />
+ * </FieldContainer>
+ *
+ * <FieldContainer
+ * 	display="inline"
+ * 	labelPosition="right"
  * 	label="Lorem ipsum"
  * 	labelDescription="Lorem ipsum dolor"
  * 	description="Lorem ipsum dolor sit amet"
@@ -63,7 +74,7 @@ export type FieldContainerProps =
  * </FieldContainer>
  *
  * <FieldContainer
- * 	labelPosition="labelInlineRight"
+ * 	labelPosition="left"
  * 	label="Lorem ipsum"
  * 	labelDescription="Lorem ipsum dolor"
  * 	description="Lorem ipsum dolor sit amet"
@@ -72,7 +83,7 @@ export type FieldContainerProps =
  * </FieldContainer>
  *
  * <FieldContainer
- * 	labelPosition="labelLeft"
+ * 	labelPosition="right"
  * 	label="Lorem ipsum"
  * 	labelDescription="Lorem ipsum dolor"
  * 	description="Lorem ipsum dolor sit amet"
@@ -81,13 +92,15 @@ export type FieldContainerProps =
  * </FieldContainer>
  *
  * <FieldContainer
- * 	labelPosition="labelRight"
+ * 	labelPosition="bottom"
  * 	label="Lorem ipsum"
  * 	labelDescription="Lorem ipsum dolor"
  * 	description="Lorem ipsum dolor sit amet"
  * >
  * 	<TextInput name="name" placeholder="Enter name..." />
  * </FieldContainer>
+ * ```
+ *
  * @group Forms UI
  */
 export const FieldContainer = memo(
@@ -97,12 +110,13 @@ export const FieldContainer = memo(
 		description,
 		errors,
 		direction,
+		display = 'block',
 		evenly,
 		gap = 'gap',
 		horizontal = false,
 		label,
 		labelDescription,
-		labelPosition,
+		labelPosition = 'top',
 		required,
 		reverse,
 		size,
@@ -110,25 +124,39 @@ export const FieldContainer = memo(
 		useLabelElement = true,
 		width = 'column',
 	}: FieldContainerProps) => {
+		deprecate('1.3.0', labelPosition === 'labelInlineLeft', '`labelPosition="labelInlineLeft"`', '`labelPosition="left" display="inline"`')
+		deprecate('1.3.0', labelPosition === 'labelInlineRight', '`labelPosition="labelInlineRight"`', '`labelPosition="right" display="inline"`')
+		deprecate('1.3.0', labelPosition === 'labelLeft', '`labelPosition="labelLeft"`', '`labelPosition="left"`')
+		deprecate('1.3.0', labelPosition === 'labelRight', '`labelPosition="labelRight"`', '`labelPosition="right"`')
+
+		display = fallback(display, labelPosition === 'labelInlineLeft' || labelPosition === 'labelInlineRight', 'inline')
+		labelPosition = fallback(labelPosition, labelPosition === 'labelInlineLeft' || labelPosition === 'labelLeft', 'left')
+		labelPosition = fallback(labelPosition, labelPosition === 'labelInlineRight' || labelPosition === 'labelRight', 'right')
+
 		const LabelElement = useLabelElement ? 'label' : 'div'
 		const componentClassName = useClassNameFactory('field-container')
 
-		const isLabelInline = labelPosition === 'labelInlineLeft' || labelPosition === 'labelInlineRight'
 		const invalid = !!errors?.length
 
 		const asteriskClassName = [...themeClassName('danger'), colorSchemeClassName(useColorScheme())]
+		const bodyContentRef = useRef<HTMLDivElement>(null)
+		const { height } = useElementSize(bodyContentRef)
 
 		return (
 			<div
-				data-invalid={invalid ? true : undefined}
-				style={style}
+				data-invalid={dataAttribute(invalid)}
+				data-size={dataAttribute(size)}
+				data-label-position={dataAttribute(labelPosition)}
+				data-display={dataAttribute(display)}
 				className={componentClassName(null, [
-					toEnumViewClass(size),
-					toEnumViewClass(labelPosition),
 					invalid ? controlsThemeClassName('danger') : null,
 					colorSchemeClassName(useColorScheme()),
 					className,
 				])}
+				style={useMemo(() => ({
+					'--cui-field-container-body-content-height': px(height),
+					...style,
+				}), [height, style])}
 			>
 				<LabelElement className={componentClassName('label')}>
 					{(label || labelDescription) && <span className={componentClassName('header')}>
@@ -139,9 +167,10 @@ export const FieldContainer = memo(
 						{labelDescription && <Description>{labelDescription}</Description>}
 					</span>
 					}
-					{(children || (!isLabelInline && description)) && <div className={componentClassName('body')}>
+					{(children || description) && <div className={componentClassName('body')}>
 						{children && (
 							<Stack
+								ref={bodyContentRef}
 								className={componentClassName('body-content')}
 								direction={direction}
 								horizontal={horizontal}
@@ -152,16 +181,14 @@ export const FieldContainer = memo(
 								{children}
 							</Stack>
 						)}
-						{!isLabelInline && description && <span className={componentClassName('body-content-description')}>{description}</span>}
+						{description && <span className={componentClassName('body-content-description')}>{description}</span>}
+						{!!errors && errors.length > 0 && (
+							<div className={componentClassName('errors')}>
+								<ErrorList errors={errors} />
+							</div>
+						)}
 					</div>}
 				</LabelElement>
-				{isLabelInline && description && <span className={componentClassName('body-content-description')}>{description}</span>}
-
-				{!!errors && errors.length > 0 && (
-					<div className={componentClassName('errors')}>
-						<ErrorList errors={errors} />
-					</div>
-				)}
 			</div>
 		)
 	},

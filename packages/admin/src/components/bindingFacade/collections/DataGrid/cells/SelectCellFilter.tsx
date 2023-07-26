@@ -49,12 +49,13 @@ export const SelectCellFilter = ({ filter, setFilter, optionProps }: SelectCellF
 		/>
 
 		<FieldContainer
+			display="inline"
 			label={<span style={{ whiteSpace: 'nowrap' }}>
 				{formatMessage('dataGridCells.textCell.includeNull', {
 					strong: chunks => <strong>{chunks}</strong>,
 				})}
 			</span>}
-			labelPosition="labelInlineRight"
+			labelPosition="right"
 		>
 			<Checkbox
 				notNull

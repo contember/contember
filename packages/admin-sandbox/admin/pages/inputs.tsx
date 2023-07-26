@@ -67,8 +67,8 @@ export default () => (
 		.background-input { background-color: lightblue !important; }
 		`}</style>
 
-		<TextField {...extraDebugProps} required labelPosition="labelLeft" field={'textValue'} label={'Text'} placeholder="Enter text..." />
-		<DisplayTextField {...extraDebugProps} labelPosition="labelLeft" field={'textValue'} label={'Text'} placeholder="N/A" horizontal reverse />
+		<TextField {...extraDebugProps} required labelPosition="left" field={'textValue'} label={'Text'} placeholder="Enter text..." />
+		<DisplayTextField {...extraDebugProps} labelPosition="left" field={'textValue'} label={'Text'} placeholder="N/A" horizontal reverse />
 		<Stack justify="stretch" horizontal>
 			<TextField {...extraDebugProps} containerClassName="theme-success-content theme-warn-controls" field={'notNullTextValue'} label={'Not null text'} />
 			<TextField {...extraDebugProps} field={'notNullTextValue'} label={'Not null text'} disabled />

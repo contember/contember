@@ -26,8 +26,9 @@ export default function InnerFooPage() {
 						{ label: 'Option 4', value: '4', key: '4', searchKeywords: '4' },
 						{ label: 'Option 5', value: '5', key: '5', searchKeywords: '5' },
 					]}
+					display="inline"
 					label="Select:"
-					labelPosition="labelInlineLeft"
+					labelPosition="left"
 				/>
 			</SlotSources.Actions>
 

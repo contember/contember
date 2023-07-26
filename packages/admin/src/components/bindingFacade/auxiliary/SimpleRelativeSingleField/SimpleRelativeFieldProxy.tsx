@@ -1,10 +1,10 @@
 import { SugaredRelativeSingleField, useEnvironment, useField, useMutationState } from '@contember/binding'
 import { FieldContainer, FieldContainerProps } from '@contember/ui'
+import { NonOptional } from '@contember/utilities'
 import { CSSProperties, ReactNode, memo, useMemo } from 'react'
 import { useLabelMiddleware } from '../../environment/LabelMiddleware'
 import { useAccessorErrors } from '../../errors'
 import type { SimpleRelativeSingleFieldMetadata } from './SimpleRelativeSingleField'
-import { NonOptional } from '@contember/utilities'
 
 // Props that are handled by the FieldContainer:
 export type SimpleRelativeSingleFieldProxyFieldContainerProps = Omit<FieldContainerProps, 'children' | 'className' | 'style'>
@@ -63,7 +63,7 @@ export const SimpleRelativeSingleFieldProxy = memo(
 		// Used by useField():
 		defaultValue, isNonbearing, onBeforeUpdate, onInitialize, onUpdate,
 		// Used only by FieldContainer:
-		description, direction, evenly, horizontal, gap, label, labelDescription, labelPosition, reverse, useLabelElement, width,
+		description, display, direction, evenly, horizontal, gap, label, labelDescription, labelPosition, reverse, useLabelElement, width,
 		// Used only by render():
 		className, style,
 		// Used by both render() and FieldContainer:
@@ -90,7 +90,7 @@ export const SimpleRelativeSingleFieldProxy = memo(
 		const combinedErrors = !suppressErrors ? combineErrorMessages(errors, fieldErrors) : undefined
 
 		const fieldContainerProps: NonOptional<Omit<FieldContainerProps, 'children'>> = {
-			description, direction, errors: combinedErrors, evenly, horizontal, gap, label: normalizedLabel, labelDescription, labelPosition, required, reverse, size, useLabelElement, width,
+			description, display, direction, errors: combinedErrors, evenly, horizontal, gap, label: normalizedLabel, labelDescription, labelPosition, required, reverse, size, useLabelElement, width,
 			className: containerClassName, style: containerStyle,
 		}
 		const renderProps: PropsPassedToRendererCheck = { field: fieldName, className, style, required, size, errors, ...rest }

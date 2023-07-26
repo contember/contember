@@ -91,8 +91,9 @@ export function DimensionsRenderer(props: DimensionsRendererProps) {
 				return (
 					<FieldContainer
 						key={dimension.slug}
+						display="inline"
 						label={dimension.label}
-						labelPosition="labelInlineRight"
+						labelPosition="right"
 					>
 						<Checkbox
 							key={dimension.slug}

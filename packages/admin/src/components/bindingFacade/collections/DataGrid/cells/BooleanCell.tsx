@@ -80,8 +80,9 @@ export const BooleanCell: FunctionComponent<BooleanCellProps> = Component(props 
 						).map(([item, label], index) => (
 							<FieldContainer
 								key={`${index}-${label}`}
+								display="inline"
 								label={label}
-								labelPosition="labelInlineRight"
+								labelPosition="right"
 							>
 								<Checkbox
 									key={item}

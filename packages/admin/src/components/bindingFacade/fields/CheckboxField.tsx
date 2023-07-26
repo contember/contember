@@ -28,5 +28,5 @@ export const CheckboxField = SimpleRelativeSingleField<CheckboxFieldProps, boole
 		return <Checkbox {...inputProps} />
 	},
 	'CheckboxField',
-	{ labelPosition: 'labelInlineRight' },
+	{ display: 'inline', labelPosition: 'right' },
 )

@@ -1,4 +1,4 @@
-import { useClassName } from '@contember/react-utils'
+import { useClassName, useClassNameFactory } from '@contember/react-utils'
 import { ComponentType, ReactNode, memo, useContext, useRef } from 'react'
 import { VisuallyHidden, useFocusRing, useHover, useRadio } from 'react-aria'
 import { Size, ValidationState } from '../../../types'
@@ -49,23 +49,26 @@ export const RadioControl = memo(({ RadioButtonComponent, description, size, val
 			<FieldContainer
 				useLabelElement={false}
 				size={size}
+				display="inline"
 				label={children}
 				labelDescription={description}
-				labelPosition="labelInlineRight"
+				labelPosition="right"
 			>
-				<VisuallyHidden>
-					<input {...inputProps} {...focusProps} ref={ref} />
-				</VisuallyHidden>
+				<span className={useClassName('radio-control-button-wrapper')}>
+					<VisuallyHidden>
+						<input {...inputProps} {...focusProps} ref={ref} />
+					</VisuallyHidden>
 
-				<RadioButton
-					focused={isFocusVisible}
-					checked={isSelected}
-					indeterminate={value === null}
-					disabled={isDisabled}
-					readonly={inputProps.readOnly}
-					hovered={isHovered}
-					invalid={validationState === 'invalid'}
-				/>
+					<RadioButton
+						focused={isFocusVisible}
+						checked={isSelected}
+						indeterminate={value === null}
+						disabled={isDisabled}
+						readonly={inputProps.readOnly}
+						hovered={isHovered}
+						invalid={validationState === 'invalid'}
+					/>
+				</span>
 			</FieldContainer>
 		</label>
 	)

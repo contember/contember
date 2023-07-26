@@ -36,14 +36,18 @@ export const useOnAddNew = ({ createNewForm, connect, ...props }: BaseDynamicCho
 				const result = await dialog.openDialog({
 					heading: localization('choiceField.createNew.dialogTitle'),
 					content: contentProps => (
-						<Stack direction="vertical">
+						<Stack>
 							<AccessorTree state={accessorTreeState}>
 								<Entity accessor={entity}>{createNewForm}</Entity>
 							</AccessorTree>
-							<Stack direction="horizontal" evenly>
-								<Button onClick={() => contentProps.resolve()} distinction="default" elevation="none">{localization('choiceField.createNew.cancelButtonText')}</Button>
-								<Button onClick={() => contentProps.resolve(true)} distinction="primary" elevation="none">{localization('choiceField.createNew.confirmButtonText')}</Button>
+							<Stack horizontal evenly>
 							</Stack>
+						</Stack>
+					),
+					footer: contentProps => (
+						<Stack grow evenly horizontal>
+							<Button onClick={() => contentProps.resolve()}>{localization('choiceField.createNew.cancelButtonText')}</Button>
+							<Button onClick={() => contentProps.resolve(true)} distinction="primary">{localization('choiceField.createNew.confirmButtonText')}</Button>
 						</Stack>
 					),
 				})

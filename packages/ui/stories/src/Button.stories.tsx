@@ -1,12 +1,12 @@
 import type { ComponentMeta, ComponentStory } from '@storybook/react'
-import { AnchorButton, Button, ButtonDistinction, ButtonElevation, ButtonFlow, Intent, Justification, Scheme, Size } from '../../src'
+import { AnchorButton, Button, ButtonElevation, ButtonFlow, ButtonProps, Intent, Justification, Scheme, Size } from '../../src'
 import { booleanControl, enumControl } from './Helpers'
 
 const intents: Intent[] = ['default', 'primary', 'secondary', 'tertiary', 'positive', 'success', 'warn', 'danger']
 const schemes: Scheme[] = ['system', 'light', 'dark']
 const sizes: Size[] = ['default', 'small', 'large']
 const flows: ButtonFlow[] = ['default', 'circular', 'squarish', 'generous', 'block', 'generousBlock']
-const distinctions: ButtonDistinction[] = ['default', 'primary', 'toned', 'outlined', 'seamless']
+const distinctions: ButtonProps['distinction'][] = ['default', 'primary', 'toned', 'outlined', 'seamless']
 const justifications: Justification[] = ['default', 'justifyStart', 'justifyCenter', 'justifyEnd']
 const buttonElevations: ButtonElevation[] = ['default', 'none']
 
@@ -34,7 +34,6 @@ export default {
 	 */
 	argTypes: {
 		active: booleanControl(false),
-		bland: booleanControl(false),
 		disabled: booleanControl(false),
 		distinction: enumControl(distinctions, 'inline-radio', 'default'),
 		flow: enumControl(flows, 'select', 'default'),
@@ -55,8 +54,7 @@ const Template: ComponentStory<typeof Button> = args => <>
     flow={args.flow}
     intent={args.intent}
     distinction={args.distinction}
-    disabled={args.disabled}
-    bland={args.bland}
+		disabled={args.disabled}
     active={args.active}
     loading={args.loading}
     scheme={args.scheme}

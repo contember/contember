@@ -26,7 +26,7 @@ export const EmptyStateContainer = memo<EmptyStateContainerProps>(({
 			colorSchemeClassName(useColorScheme()),
 			classNameProp,
 		])}>
-			<Stack direction="vertical" gap="large">
+			<Stack gap="large">
 				{header && <div className={className('header')}>{header}</div>}
 				{children}
 			</Stack>

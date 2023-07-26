@@ -47,7 +47,7 @@ export const EditMembership: FC<EditMembershipProps> = ({ project, memberships, 
 
 				return (
 					<FieldContainer label={'Roles'} useLabelElement={false}>
-						<Stack direction="vertical" gap="small">
+						<Stack gap="gap">
 							{memberships.map((membership, membershipIndex) => {
 								const roleDefinition = membership && roleDefinitions.find(def => def.name === membership.role)
 								const variablesToShow = (roleDefinition && roleDefinition.variables.filter(it => 'entityName' in it)) ?? []
@@ -68,7 +68,7 @@ export const EditMembership: FC<EditMembershipProps> = ({ project, memberships, 
 
 								return (
 									<Box key={membershipIndex} padding={false}>
-										<Stack align="center" direction="horizontal" gap="none">
+										<Stack align="center" horizontal gap="none">
 											<Select
 												required
 												distinction="seamless-with-padding"
@@ -94,8 +94,8 @@ export const EditMembership: FC<EditMembershipProps> = ({ project, memberships, 
 											/>
 											<Divider gap="none" />
 											<Button
+												square
 												distinction="seamless"
-												flow="squarish"
 												onClick={removeMembership}
 											>
 												<Icon blueprintIcon="trash" />
@@ -105,7 +105,7 @@ export const EditMembership: FC<EditMembershipProps> = ({ project, memberships, 
 										{variablesToShow.length > 0 && membership && <>
 											<Divider gap="none" />
 											<Box background={false} border={false} padding={false}>
-												<Stack direction="vertical">
+												<Stack>
 													{variablesToShow.map(variable => (
 															<VariableSelector
 																key={variable.name}
@@ -127,8 +127,8 @@ export const EditMembership: FC<EditMembershipProps> = ({ project, memberships, 
 
 							<Button
 								distinction="seamless"
-								flow="block"
-								justification="justifyStart"
+								display="block"
+								justify="start"
 								onClick={addMembership}
 							>
 								<Icon blueprintIcon={'add'} style={{ marginRight: '0.2em' }} />

@@ -11,7 +11,7 @@ export default {
 	},
 } as ComponentMeta<typeof Box>
 
-const Template: ComponentStory<typeof Box> = args => <Box {...args} />
+const Template: ComponentStory<typeof Box> = (args: any) => <Box {...args} />
 
 export const Simple = Template.bind({})
 Simple.args = {

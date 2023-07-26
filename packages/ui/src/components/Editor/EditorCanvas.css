@@ -4,7 +4,7 @@
 	--cui-editor-canvas-element-padding-right: calc(3 * var(--cui-gap));
 	--cui-editor-canvas-element-padding-top: calc(2 * var(--cui-gap));
 	--cui-editor-blocks-gap: calc(2 * var(--cui-editor-canvas-element-padding-top));
-	border-radius: var(--cui-border-radius--controls);
+	border-radius: var(--cui-border-radius-controls);
 	position: relative;
 	width: 100%;
 }
@@ -14,7 +14,7 @@
 	margin-top: calc(-1 * var(--cui-border-width));
 	padding-bottom: calc(2 * var(--cui-gap) - var(--cui-border-width));
 	padding-top: calc(2 * var(--cui-gap) - var(--cui-border-width));
-	border-radius: var(--cui-border-radius--controls);
+	border-radius: var(--cui-border-radius-controls);
 	flex-grow: 1;
 }
 
@@ -50,7 +50,7 @@
 :where(.cui-editorCanvas-canvas) {
 	cursor: text;
 	display: flex;
-	min-height: var(--cui-size--controls);
+	min-height: var(--cui-size-controls);
 	flex-direction: column;
 	gap: var(--cui-editor-blocks-gap);
 	counter-reset: cui-editorParagraph-counter;

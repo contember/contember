@@ -61,7 +61,7 @@ export const CreateApiKeyForm: FC<CreateApiKeyFormProps> = ({ project, rolesConf
 
 	return (
 		<form onSubmit={submit}>
-			<Stack direction="vertical" gap="large">
+			<Stack>
 				<FieldContainer label="Description">
 					<TextInput {...register('description')} />
 				</FieldContainer>

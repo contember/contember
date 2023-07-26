@@ -133,9 +133,9 @@ export const useCommonReactSelectStyles = <Option = unknown, IsMulti extends boo
 			borderColor,
 			'borderWidth': 'var(--cui-border-width, 1px)',
 			color,
-			'borderRadius': 'var(--cui-border-radius--controls)',
+			'borderRadius': 'var(--cui-border-radius-controls)',
 			'boxShadow': isFocused ? 'var(--cui-control-focus-ring-box-shadow)' : undefined,
-			'minHeight': 'var(--cui-size--controls)',
+			'minHeight': 'var(--cui-size-controls)',
 			'&:hover': {
 				color: 'rgb(var(--cui-color-rgb-0))',
 				borderColor: isDisabled
@@ -170,15 +170,15 @@ export const useCommonReactSelectStyles = <Option = unknown, IsMulti extends boo
 		return {
 			...provided,
 			'backgroundColor': isFocused
-				? 'rgb(var(--cui-background-color-controls-rgb-75))'
+				? 'rgb(var(--cui-background-color-controls-rgb-50))'
 				: isSelected
-					? 'rgb(var(--cui-background-color-controls-rgb-50))'
+					? 'rgb(var(--cui-background-color-controls-rgb-75))'
 					: 'transparent',
 			'color': isFocused
-				? 'rgb(var(--cui-color-controls-rgb-50))'
+				? 'rgb(var(--cui-color-controls-rgb-75))'
 				: isSelected
-					? 'rgb(var(--cui-color-controls-rgb-50))'
-					: 'rgb(var(--cui-color-rgb-50))',
+					? 'rgb(var(--cui-color-controls-rgb-75));'
+					: 'var(--cui-color-controls-rgb-50)',
 			'&:hover': {
 				backgroundColor: 'rgb(var(--cui-background-color-controls-rgb-75))',
 				color: 'rgb(var(--cui-color-controls-rgb-50))',

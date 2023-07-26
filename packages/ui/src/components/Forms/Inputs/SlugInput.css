@@ -2,7 +2,7 @@
 	--slug-input-control-focus-ring: var(--cui-control-focus-ring-box-shadow);
 	align-items: stretch;
 	background-color: rgb(var(--cui-background-color-rgb-25));
-	border-radius: var(--cui-border-radius--controls);
+	border-radius: var(--cui-border-radius-controls);
 	border-width: var(--cui-border-width, 1px);
 	display: flex;
 	margin-bottom: calc(-1 * var(--cui-border-width));

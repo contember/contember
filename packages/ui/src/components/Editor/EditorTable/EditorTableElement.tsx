@@ -47,12 +47,12 @@ export const EditorTableElement = memo(function EditorTableElement({
 			}
 		>
 			<div className={componentClassName('handle')} contentEditable={false}>
-				{/*<Button onClick={selectTable} flow="circular" size="small" distinction="seamless">*/}
+				{/*<Button onClick={selectTable} square borderRadius="full" size="small" distinction="seamless">*/}
 				{/*	<Icon blueprintIcon="selection" />*/}
 				{/*</Button>*/}
 			</div>
 			<div className={componentClassName('remove')} contentEditable={false}>
-				<Button onClick={deleteTable} flow="circular" size="small" distinction="seamless">
+				<Button onClick={deleteTable} square borderRadius="full" size="small" distinction="seamless">
 					<Icon blueprintIcon="trash" />
 				</Button>
 			</div>
@@ -64,28 +64,29 @@ export const EditorTableElement = memo(function EditorTableElement({
 							{columnNumber < columnCount ? (
 								<Dropdown
 									buttonProps={{
-										className: componentClassName('columnControls-more'),
-										flow: 'circular',
-										size: 'small',
-										distinction: 'seamless',
-										style: columnStyle,
+										borderRadius: 'full',
 										children: <Icon blueprintIcon="more" />,
+										className: componentClassName('columnControls-more'),
+										distinction: 'seamless',
+										size: 'small',
+										square: true,
+										style: columnStyle,
 									}}
 									styledContent={false}
 								>
 									<ButtonGroup>
 										{columnNumber === 0 && (
-											<Button flow="circular" size="small" onClick={() => toggleColumnHeaderScope(columnNumber, 'row')}>
+											<Button square borderRadius="full" size="small" onClick={() => toggleColumnHeaderScope(columnNumber, 'row')}>
 												<Icon blueprintIcon="header" size="small" />
 											</Button>
 										)}
-										<Button flow="circular" size="small" onClick={() => justifyColumn(columnNumber, 'start')}>
+										<Button square borderRadius="full" size="small" onClick={() => justifyColumn(columnNumber, 'start')}>
 											<Icon blueprintIcon="align-left" size="small" />
 										</Button>
-										<Button flow="circular" size="small" onClick={() => justifyColumn(columnNumber, 'center')}>
+										<Button square borderRadius="full" size="small" onClick={() => justifyColumn(columnNumber, 'center')}>
 											<Icon blueprintIcon="align-center" size="small" />
 										</Button>
-										<Button flow="circular" size="small" onClick={() => justifyColumn(columnNumber, 'end')}>
+										<Button square borderRadius="full" size="small" onClick={() => justifyColumn(columnNumber, 'end')}>
 											<Icon blueprintIcon="align-right" size="small" />
 										</Button>
 									</ButtonGroup>
@@ -111,7 +112,8 @@ export const EditorTableElement = memo(function EditorTableElement({
 							<Button
 								onClick={() => extendTable('column', columnNumber)}
 								className={componentClassName('columnControls-add')}
-								flow="circular"
+								square
+								borderRadius="full"
 								size="small"
 								distinction="seamless"
 								style={columnStyle}
@@ -131,17 +133,18 @@ export const EditorTableElement = memo(function EditorTableElement({
 							{rowNumber < rowCount && rowNumber === 0 ? (
 								<Dropdown
 									buttonProps={{
-										className: componentClassName('rowControls-more'),
-										flow: 'circular',
-										size: 'small',
-										distinction: 'seamless',
-										style: rowStyle,
+										borderRadius: 'full',
 										children: <Icon blueprintIcon="more" />,
+										className: componentClassName('rowControls-more'),
+										distinction: 'seamless',
+										size: 'small',
+										square: true,
+										style: rowStyle,
 									}}
 									styledContent={false}
 									alignment="right"
 								>
-									<Button flow="circular" size="small" onClick={() => toggleRowHeaderScope(rowNumber, 'table')}>
+									<Button square borderRadius="full" size="small" onClick={() => toggleRowHeaderScope(rowNumber, 'table')}>
 										<Icon blueprintIcon="header" size="small" />
 									</Button>
 								</Dropdown>
@@ -166,7 +169,8 @@ export const EditorTableElement = memo(function EditorTableElement({
 							<Button
 								onClick={() => extendTable('row', rowNumber)}
 								className={componentClassName('rowControls-add')}
-								flow="circular"
+								square
+								borderRadius="full"
 								size="small"
 								distinction="seamless"
 								style={rowStyle}

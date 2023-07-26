@@ -1,6 +1,6 @@
 :where(
 	.cui-toggle-sidebar-button,
-	.cui-toggle-menu.view-seamless,
+	.cui-toggle-menu[data-distinction="seamless"],
 ) {
 	--cui-button-background-color: transparent;
 	--cui-button-color: inherit;
@@ -19,7 +19,7 @@
 
 :where(
 	.cui-toggle-sidebar-button,
-	.cui-toggle-menu.view-seamless,
+	.cui-toggle-menu[data-distinction="seamless"],
 )
 :where(
 	.lucide,

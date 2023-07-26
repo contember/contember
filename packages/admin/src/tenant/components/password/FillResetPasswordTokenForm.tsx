@@ -24,7 +24,7 @@ export const FillResetPasswordTokenForm: FC<FillResetPasswordTokenFormProps> = (
 
 	return (
 		<form onSubmit={onSubmit}>
-			<Stack direction="vertical" gap="large">
+			<Stack gap="large">
 				<FieldContainer label="Token">
 					<TextInput {...register('token')} required={true} />
 				</FieldContainer>

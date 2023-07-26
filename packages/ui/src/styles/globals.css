@@ -70,7 +70,7 @@
 	--cui-control-line-height: var(--cui-line-height);
 	display: block;
 	font-family: inherit;
-	transition-duration: var(--cui-transition-duration--fast);
+	transition-duration: var(--cui-transition-duration-fast);
 	transition-property: box-shadow, color, background, opacity;
 	font-weight: 400;
 	font-size: inherit;
@@ -79,7 +79,7 @@
 	margin: 0;
 	border-style: solid;
 	border-width: var(--cui-border-width, 1px);
-	border-radius: var(--cui-border-radius--controls);
+	border-radius: var(--cui-border-radius-controls);
 	resize: none;
 	flex-basis: 2em;
 	flex-grow: 1;
@@ -105,7 +105,7 @@
 
 :where(.cui-textarea-input),
 :where(.cui-text-input) {
-	--cui-min-height: var(--cui-size--controls);
+	--cui-min-height: var(--cui-size-controls);
 	--cui-padding-horizontal: calc(3 * var(--cui-gap));
 	min-height: var(--cui-min-height);
 	padding-left: var(--cui-padding-horizontal);
@@ -120,13 +120,13 @@
 
 :where(.view-small.cui-textarea-input),
 :where(.view-small.cui-text-input) {
-	--cui-min-height: var(--cui-size--controls--small);
+	--cui-min-height: var(--cui-size-controls-small);
 	--cui-padding-horizontal: calc(2 * var(--cui-gap));
 }
 
 :where(.view-large.cui-textarea-input),
 :where(.view-large.cui-text-input) {
-	--cui-min-height: var(--cui-size--controls--large);
+	--cui-min-height: var(--cui-size-controls-large);
 	--cui-padding-horizontal: calc(4 * var(--cui-gap));
 }
 

@@ -9,7 +9,7 @@
 	--card-overlay-opacity-inactive: 0.0;
 	--card-overlay-opacity-active: 0.25;
 	--card-overlay-opacity-pressed: 0.125;
-	--card-border-radius: var(--cui-border-radius--controls);
+	--card-border-radius: var(--cui-border-radius-controls);
 	--card-inset: var(--cui-gap);
 	--card-row-gap: var(--cui-gap);
 	--card-column-gap: var(--cui-gap);
@@ -98,7 +98,7 @@
 	display: block;
 	left: 0;
 	position: absolute;
-	transition: opacity var(--cui-transition-duration--fast) ease-in, background-color var(--cui-transition-duration--fast) ease-in;
+	transition: opacity var(--cui-transition-duration-fast) ease-in, background-color var(--cui-transition-duration-fast) ease-in;
 	right: 0;
 	top: 0;
 }

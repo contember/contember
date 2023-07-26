@@ -6,10 +6,9 @@ import { ReactNode, memo, useCallback } from 'react'
 import { usePersistWithFeedback } from '../../../ui'
 
 const defaultProps: ButtonOwnProps = {
-	size: 'small',
-	flow: 'circular',
+	borderRadius: 'full',
 	distinction: 'seamless',
-	bland: false,
+	square: true,
 }
 
 export type DeleteEntityButtonProps =

@@ -63,7 +63,7 @@ export const FileInput = ({
 					>
 						<input {...getInputProps()} />
 						<div className="fileInput-cta">
-							<Stack wrap justify="center" direction="horizontal">
+							<Stack wrap justify="center" horizontal>
 								{selectProps.fileSelection && (
 									<SelectFileInput {...selectProps} formatMessage={formatMessage} />
 								)}

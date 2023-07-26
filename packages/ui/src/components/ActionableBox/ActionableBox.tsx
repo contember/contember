@@ -15,8 +15,9 @@ export type ActionableBoxProps =
 	& HTMLDivElementProps
 
 const commonButtonProps: ButtonOwnProps = {
+	borderRadius: 'full',
+	square: true,
 	size: 'small',
-	flow: 'circular',
 }
 const commonIconProps: IconProps = {
 	size: 'small',

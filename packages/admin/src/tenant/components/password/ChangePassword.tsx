@@ -46,7 +46,7 @@ export const ChangePassword: FC<{}> = ({ }) => {
 	return <>
 		<Heading depth={3}>Change password</Heading>
 		<form onSubmit={onSubmit}>
-			<Stack direction="vertical" gap="large">
+			<Stack gap="large">
 				<FieldContainer
 					label="Current password"
 					errors={errors.currentPassword === undefined ? undefined : [{ message: errors.currentPassword }]}

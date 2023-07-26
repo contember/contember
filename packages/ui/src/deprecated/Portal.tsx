@@ -8,7 +8,7 @@ import { DEFAULT_PORTAL_ROOT_ID, PortalProvider, usePortalProvider } from '../co
  * @see DEFAULT_PORTAL_ROOT_ID
  */
 export function getPortalRoot(): HTMLElement {
-	deprecate('1.3.0', false, 'getPortalRoot()', 'usePortalProvider()')
+	deprecate('1.3.0', true, 'getPortalRoot()', 'usePortalProvider()')
 
 	return document.getElementById(DEFAULT_PORTAL_ROOT_ID) ?? document.body
 }

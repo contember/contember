@@ -10,7 +10,6 @@ import {
 	SimpleDynamicSingleChoiceFieldProps,
 	StaticSingleChoiceFieldProps,
 } from './ChoiceField'
-import { useLabelMiddleware } from '../environment/LabelMiddleware'
 
 export type RadioFieldProps =
 	& RadioFieldInnerPublicProps

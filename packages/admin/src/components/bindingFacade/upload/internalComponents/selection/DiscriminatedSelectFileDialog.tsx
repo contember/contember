@@ -22,7 +22,7 @@ export const DiscriminatedSelectFileDialog = (
 	const [component, setComponent] = useState(components[0])
 
 	return <>
-		{components.length > 1 && <Stack direction={'horizontal'}>
+		{components.length > 1 && <Stack horizontal>
 			{components.map((it, index) => (
 				<TabButton
 					key={index}

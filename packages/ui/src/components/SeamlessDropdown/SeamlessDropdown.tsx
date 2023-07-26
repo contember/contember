@@ -55,7 +55,7 @@ export function SeamlessDropdown({ direction = 'down', label, children, hoverabl
 			<div className={componentClassName('content')} ref={setContentRef}>
 				{buttonIn}
 				<div className={componentClassName('content-sep')}></div>
-				<Stack direction="vertical" gap="small" className={componentClassName('content-in')}>{children}</Stack>
+				<Stack gap="gap" className={componentClassName('content-in')}>{children}</Stack>
 			</div>
 		</div>
 	)

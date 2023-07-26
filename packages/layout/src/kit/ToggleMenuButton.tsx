@@ -33,7 +33,7 @@ export const ToggleMenuButton = memo<ToggleMenuButtonProps>(({
 				aria-expanded={panelState?.visibility === 'visible'}
 				distinction="seamless"
 				className={className}
-				flow="squarish"
+				square
 				onClick={onClick}
 				aria-label={panelState?.visibility === 'visible' ? labelWhenOpen : labelWhenClosed}
 			>

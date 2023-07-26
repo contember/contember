@@ -25,13 +25,11 @@ const Template: ComponentStory<typeof Stack> = (args: StackOwnProps) => <Stack {
 export const Default = Template.bind({})
 
 Default.args = {
-	direction: 'vertical',
 }
 
 export const Many_children = Template.bind({})
 
 Many_children.args = {
-	direction: 'vertical',
 	children: <>
 		<Block />
 		<Block />

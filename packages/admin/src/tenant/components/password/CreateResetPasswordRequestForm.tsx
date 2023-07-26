@@ -43,7 +43,7 @@ export const CreateResetPasswordRequestForm: FC<CreateResetPasswordRequestFormPr
 
 	return (
 		<form onSubmit={onSubmit}>
-			<Stack direction="vertical" gap="large">
+			<Stack gap="large">
 				<FieldContainer label="E-mail">
 					<TextInput {...register('email')} required={true} type={'email'} />
 				</FieldContainer>

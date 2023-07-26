@@ -20,9 +20,9 @@ export const AddNewBlockButtonInner = memo<AddNewBlockButtonInnerProps>(props =>
 			{Array.from(props.normalizedBlocks.values(), ({ discriminateBy, datum: blockProps }, i) => (
 				<Button
 					key={i}
-					distinction="seamless"
-					flow="generousBlock"
 					disabled={props.isMutating}
+					display="block"
+					distinction="seamless"
 					onClick={() => {
 						props.requestClose()
 						const targetValue = discriminateBy
@@ -32,6 +32,7 @@ export const AddNewBlockButtonInner = memo<AddNewBlockButtonInnerProps>(props =>
 							discriminationField.updateValue(targetValue)
 						})
 					}}
+					padding="padding"
 				>
 					{!!blockProps.description && (
 						<span>

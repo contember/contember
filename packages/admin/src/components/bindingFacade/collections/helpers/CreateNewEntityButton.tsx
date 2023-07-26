@@ -1,6 +1,7 @@
 import { EntityAccessor, useMutationState } from '@contember/binding'
 import { useClassName } from '@contember/react-utils'
 import { Button, ButtonProps, Icon, IconProps } from '@contember/ui'
+import { PlusCircleIcon } from 'lucide-react'
 import { ComponentType, ReactNode, memo } from 'react'
 
 export type CreateNewEntityButtonProps = ButtonProps & {
@@ -43,10 +44,11 @@ export const CreateNewEntityButton = memo(
 				loading={isMutating}
 				className={useClassName('new-entity-button')}
 				distinction="seamless"
-				justification="justifyStart"
+				justify="start"
+				size="small"
 				{...buttonProps}
 			>
-				<Icon {...defaultIconProps} {...iconProps} />
+				<PlusCircleIcon />
 				{children}
 			</Button>
 		)

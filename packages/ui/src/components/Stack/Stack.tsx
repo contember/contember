@@ -1,16 +1,22 @@
 import { useClassNameFactory } from '@contember/react-utils'
+import { dataAttribute, deprecate, fallback, isDefined } from '@contember/utilities'
 import { CSSProperties, ReactNode, forwardRef, memo, useMemo } from 'react'
 import type { HTMLDivElementProps, Size } from '../../types'
 import { toEnumClass, toEnumViewClass, toStateClass, toViewClass } from '../../utils'
+
+/** @deprecated Use other prop values */
+export type DeprecatedStackSize = Size | 'xlarge' | 'none'
 
 export interface StackOwnProps {
 	align?: 'center' | 'stretch' | 'start' | 'end',
 	basis?: CSSProperties['flexBasis'],
 	children?: ReactNode,
-	direction: 'vertical' | 'horizontal' | 'vertical-reverse' | 'horizontal-reverse',
+	/** @deprecated Use `horizontal` and `reverse` props instead */
+	direction?: 'vertical' | 'horizontal' | 'vertical-reverse' | 'horizontal-reverse',
 	evenly?: boolean,
-	gap?: Size | 'xlarge' | 'none',
+	gap?: boolean | 'gap' | 'gutter' | 'padding' | 'large' | 'larger' | DeprecatedStackSize,
 	grow?: boolean | CSSProperties['flexGrow'],
+	horizontal?: boolean,
 	justify?:
 	| 'center'
 	| 'start'
@@ -22,6 +28,7 @@ export interface StackOwnProps {
 	| 'inherit'
 	| 'initial'
 	| 'revert'
+	reverse?: boolean,
 	shrink?: boolean | CSSProperties['flexShrink'],
 	style?: CSSProperties,
 	wrap?: boolean | 'reverse',
@@ -36,7 +43,7 @@ export type StackProps =
  *
  * @example
  * ```
- * <Stack direction="horizontal" />
+ * <Stack  horizontal />
  * ```
  *
  * @group UI
@@ -48,22 +55,33 @@ export const Stack = memo(forwardRef<HTMLDivElement, StackProps>(({
 	children,
 	className,
 	direction,
-	gap,
+	gap = 'gutter',
 	grow,
+	horizontal,
 	justify,
+	reverse,
 	shrink,
 	style: styleProp,
 	wrap,
 	...rest
 }: StackProps, ref) => {
-	deprecate('1.3.0', gap !== 'none', '`size="none"`', '`gap="gap"`')
-	gap = currentOrDeprecated(gap, gap === 'none' ? gap : undefined, false)
-	deprecate('1.3.0', gap !== 'small', '`size="small"`', '`gap="gap"`')
-	gap = currentOrDeprecated(gap, gap === 'small' ? gap : undefined, 'gap')
-	deprecate('1.3.0', gap !== 'xlarge', '`size="xlarge"`', '`gap="larger"`')
-	gap = currentOrDeprecated(gap, gap === 'xlarge' ? gap : undefined, 'large')
-	deprecate('1.3.0', gap !== 'default', '`size="default"`', 'omit the `gap` prop')
-	gap = currentOrDeprecated(gap, gap === 'default' ? gap : undefined, true)
+	deprecate('1.3.0', gap === 'none', '`gap="none"`', '`gap={false}`')
+	gap = fallback(gap, gap === 'none', false)
+
+	deprecate('1.3.0', gap === 'small', '`gap="small"`', '`gap="gap"`')
+	gap = fallback(gap, gap === 'small', 'gap')
+
+	deprecate('1.3.0', gap === 'xlarge', '`gap="xlarge"`', '`gap="larger"`')
+	gap = fallback(gap, gap === 'xlarge', 'larger')
+
+	deprecate('1.3.0', gap === 'default', '`gap="default"`', 'omit the `gap` prop')
+	gap = fallback(gap, gap === 'default', true)
+
+	deprecate('1.3.0', isDefined(direction), '`direction` prop', '`horizontal` and `reverse` props')
+	horizontal = fallback(horizontal, direction === 'horizontal' || direction === 'horizontal-reverse', true)
+	horizontal = fallback(horizontal, direction === 'vertical' || direction === 'vertical-reverse', false)
+	reverse = fallback(reverse, direction === 'horizontal-reverse' || direction === 'vertical-reverse', true)
+
 	const componentClassName = useClassNameFactory('stack')
 	const style: CSSProperties = useMemo(() => ({
 		...{ flexBasis: basis },
@@ -76,17 +94,16 @@ export const Stack = memo(forwardRef<HTMLDivElement, StackProps>(({
 		{children && (
 			<div
 				{...rest}
-				className={componentClassName(null, [
-					toViewClass(`${direction}`, true),
-					toStateClass('evenly-distributed', evenly),
-					toEnumClass('gap-', gap),
-					align && toEnumViewClass(`align-${align}`),
-					grow === true && toEnumViewClass('grow'),
-					justify && toEnumViewClass(`justify-${justify}`),
-					shrink === true && toEnumViewClass('shrink'),
-					wrap && toEnumViewClass(wrap === true ? 'wrap' : `wrap-${wrap}`),
-					className,
-				])}
+				data-align={dataAttribute(align)}
+				data-evenly={dataAttribute(evenly)}
+				data-gap={dataAttribute(gap)}
+				data-grow={dataAttribute(grow)}
+				data-horizontal={dataAttribute(horizontal)}
+				data-justify={dataAttribute(justify)}
+				data-reverse={dataAttribute(reverse)}
+				data-shrink={dataAttribute(shrink)}
+				data-wrap={dataAttribute(wrap)}
+				className={componentClassName(null, className)}
 				style={style}
 				ref={ref}
 			>

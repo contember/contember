@@ -40,7 +40,7 @@ export const IdentityPanel = () => {
 	return (
 		<DevPanel icon={<UserCircleIcon />} heading="Identity">
 			{identity ? <>
-				<Stack direction={'vertical'}>
+				<Stack>
 					<ButtonGroup>
 						<Button onClick={openSwitchRole}>Switch role</Button>
 						<Button onClick={openLoginEmail}>Login with email</Button>
@@ -129,7 +129,7 @@ const LoginAsRole: FC = ({}) => {
 
 	return (
 		<form onSubmit={submit}>
-			<Stack direction="vertical" gap="large">
+			<Stack gap="large">
 				<EditMembership {...editUserMembershipProps} />
 
 				<Button distinction="primary" size="large" type="submit" disabled={isSubmitting}>
@@ -193,7 +193,7 @@ const LoginWithEmail = () => {
 
 	return <>
 		<form onSubmit={submit}>
-			<Stack direction={'vertical'}>
+			<Stack>
 				<FieldContainer label={'E-mail'}>
 					<EmailInput value={email} onChange={e => setEmail(e as string)} notNull />
 				</FieldContainer>

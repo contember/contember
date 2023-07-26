@@ -10,8 +10,8 @@ import type { FunctionComponent, ReactNode } from 'react'
 import { useMessageFormatter } from '../../../../../i18n'
 import { FieldFallbackView, FieldFallbackViewPublicProps } from '../../../fieldViews'
 import { DataGridColumn, DataGridColumnPublicProps, DataGridOrderDirection } from '../base'
+import { GenericTextCellFilter, createGenericTextCellFilterCondition } from './GenericTextCellFilter'
 import { dataGridCellsDictionary } from './dataGridCellsDictionary'
-import { createGenericTextCellFilterCondition, GenericTextCellFilter } from './GenericTextCellFilter'
 
 export type TextCellProps =
 	& DataGridColumnPublicProps
@@ -80,7 +80,7 @@ export const TextCell: FunctionComponent<TextCellProps> = Component(props => {
 			filterRenderer={({ filter, setFilter, ...props }) => {
 				const formatMessage = useMessageFormatter(dataGridCellsDictionary)
 				return (
-					<Stack direction="horizontal" align="center">
+					<Stack horizontal align="center">
 						<GenericTextCellFilter {...props} filter={filter} setFilter={setFilter} />
 							<FieldContainer
 								label={<span style={{ whiteSpace: 'nowrap' }}>

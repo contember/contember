@@ -1,6 +1,6 @@
 import type { EntityAccessor, EntityListAccessor } from '@contember/binding'
 import { FieldContainer, Stack } from '@contember/ui'
-import { memo, ReactNode } from 'react'
+import { ReactNode, memo } from 'react'
 import type { MessageFormatter } from '../../../../i18n'
 import { AccessorErrors } from '../../errors'
 import { AddEntityButtonProps, CreateNewEntityButton, EmptyMessage, EmptyMessageOuterProps } from '../helpers'
@@ -50,10 +50,7 @@ export const RepeaterFieldContainer = memo(
 		label,
 	}: RepeaterFieldContainerProps) => {
 		return <FieldContainer label={label} useLabelElement={false}>
-			<Stack
-				direction="vertical"
-				gap="small"
-			>
+			<Stack gap="gap">
 				<AccessorErrors accessor={accessor} />
 				{isEmpty && (
 					<EmptyMessage component={emptyMessageComponent}>{formatMessage(emptyMessage, 'repeater.emptyMessage.text')}</EmptyMessage>

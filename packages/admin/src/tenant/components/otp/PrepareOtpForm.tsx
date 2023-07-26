@@ -35,18 +35,18 @@ export const PrepareOtpForm: FC<PrepareOtpFormProps> = ({ onPrepared, isReSetup,
 
 	return (
 		<form onSubmit={onSubmit}>
-			<Stack direction="vertical" gap="large">
+			<Stack gap="large">
 				<FieldContainer label="Label for an identification in two-factor app">
 					<TextInput {...register('label')} />
 				</FieldContainer>
 
 				{isReSetup && <>
-					<Message distinction="striking" intent="warn">
+					<Message important padding intent="warn">
 						You already have two-factor authentication active. By clicking &quot;Continue&quot;, the old one will no longer work.
 					</Message>
 				</>}
 
-				<Stack direction="horizontal" style={{ alignSelf: 'flex-end' }}>
+				<Stack horizontal style={{ alignSelf: 'flex-end' }}>
 					<Button type="submit" distinction="seamless" onClick={onCancel}>
 						Cancel
 					</Button>

@@ -45,7 +45,7 @@ export const PanelLayout = (props: PanelLayoutProps) => {
 					}
 					sidebarFooter={
 						project === undefined && (
-							<AnchorButton distinction="seamless" href="/" justification="justifyStart">
+							<AnchorButton distinction="seamless" href="/" justify="start">
 								&larr; Close Admin Panel
 							</AnchorButton>
 						)

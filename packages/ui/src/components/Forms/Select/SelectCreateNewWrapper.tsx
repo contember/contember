@@ -21,7 +21,7 @@ export const SelectCreateNewWrapper = ({ onClick, children }: SelectCreateNewWra
 				{children}
 			</div>
 			<div className={componentClassName('button')}>
-				<Button flow="squarish" onClick={onClick} elevation="none" intent="default"><PlusIcon /></Button>
+				<Button square onClick={onClick} intent="default"><PlusIcon /></Button>
 			</div>
 		</div>
 	)

@@ -2,7 +2,7 @@ import { Box, ChangePassword, Divider, Heading, LayoutPage, OtpManagement, Stack
 
 export default () => (
 	<LayoutPage title="Profile security">
-		<Stack direction="vertical" gap="xlarge">
+		<Stack gap="xlarge">
 			<ChangePassword />
 
 			<Divider />

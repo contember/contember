@@ -141,7 +141,7 @@ const LoginEntrypointIndex: FC<Pick<LoginEntrypointProps, 'projects' | 'formatPr
 				heading="Projects"
 				actions={<>
 					{props.projectsPageActions}
-					<Button onClick={() => logout()} size={'small'} distinction={'seamless'}><Icon blueprintIcon={'log-out'} /></Button>
+					<Button onClick={() => logout()} size="small" distinction="seamless"><Icon blueprintIcon={'log-out'} /></Button>
 				</>}
 			>
 				Loading projects...
@@ -157,7 +157,7 @@ const LoginEntrypointIndex: FC<Pick<LoginEntrypointProps, 'projects' | 'formatPr
 			<MiscPageLayout
 				heading="Projects"
 				actions={props.projectsPageActions}
-				footerActions={<Button onClick={() => logout()} distinction="seamless" flow="block">Sign out <Icon blueprintIcon="log-out" /></Button>}
+				footerActions={<Button onClick={() => logout()} distinction="seamless" display="block">Sign out <Icon blueprintIcon="log-out" /></Button>}
 			>
 				<ProjectListButtons projects={projects} formatProjectUrl={props.formatProjectUrl} />
 			</MiscPageLayout>
@@ -200,7 +200,7 @@ const LoginContainer = ({ identityProviders = [], collapsedEmailLogin: initialCo
 		<ErrorList errors={errors} />
 		{!collapsedEmailLogin && <Login resetLink={resetRequestPageName} onLogin={redirectToBacklink} />}
 		{showAlternativeLoginButtons && (
-			<Stack direction="vertical">
+			<Stack>
 				{visibleIdentityProviders.map((it, i) => <IDPInitButton key={i} provider={it} onError={setError}/>)}
 				{collapsedEmailLogin && <Button onClick={() => setCollapsedEmailLogin(false)}>Login with email</Button>}
 			</Stack>

@@ -58,7 +58,7 @@ const extraDebugProps = SHOW_OVERRIDES ? {
 
 export default () => (
 	<EditScope entity="InputShowcase(unique = One)" setOnCreate="(unique = One)">
-		<SlotSources.Title>Inputs Showcase</SlotSources.Title>
+		<SlotSources.Title>Inputs</SlotSources.Title>
 		<SlotSources.Actions>
 			<PersistButton />
 		</SlotSources.Actions>
@@ -68,8 +68,8 @@ export default () => (
 		`}</style>
 
 		<TextField {...extraDebugProps} required labelPosition="labelLeft" field={'textValue'} label={'Text'} placeholder="Enter text..." />
-		<DisplayTextField {...extraDebugProps} labelPosition="labelLeft" field={'textValue'} label={'Text'} placeholder="N/A" direction="horizontal-reverse" />
-		<Stack justify="stretch" direction="horizontal" gap="default">
+		<DisplayTextField {...extraDebugProps} labelPosition="labelLeft" field={'textValue'} label={'Text'} placeholder="N/A" horizontal reverse />
+		<Stack justify="stretch" horizontal>
 			<TextField {...extraDebugProps} containerClassName="theme-success-content theme-warn-controls" field={'notNullTextValue'} label={'Not null text'} />
 			<TextField {...extraDebugProps} field={'notNullTextValue'} label={'Not null text'} disabled />
 		</Stack>

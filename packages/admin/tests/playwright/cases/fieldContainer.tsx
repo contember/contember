@@ -1,5 +1,5 @@
 import { CSSProperties, Fragment } from 'react'
-import { Divider, FieldContainer, FieldContainerProps, Layout, LayoutPage, StyleProvider } from '../../../src'
+import { Divider, FieldContainer, FieldContainerProps, Layout, LayoutPage } from '../../../src'
 
 const verticalStack: CSSProperties = { display: 'flex', flexDirection: 'column', gap: '1em' }
 const horizontalStack: CSSProperties = { display: 'flex', flexDirection: 'row', gap: '1em' }

@@ -1881,10 +1881,9 @@ export const EmbedHandlers: {
 export const EmptyMessage: React.MemoExoticComponent<({ children, component, padding, ...rest }: EmptyMessageProps) => JSX.Element>;
 
 // @public (undocumented)
-export interface EmptyMessageComponentProps extends BoxProps {
-    // (undocumented)
+export type EmptyMessageComponentProps = BoxProps & {
     children: ReactNode;
-}
+};
 
 // @public (undocumented)
 export interface EmptyMessageOuterProps {
@@ -3351,10 +3350,9 @@ export type MessageFormatterPrimitiveType = string | number | boolean | null | u
 export const MiscPageLayout: React.NamedExoticComponent<MiscPageLayoutProps>;
 
 // @public (undocumented)
-export interface MiscPageLayoutProps extends BoxOwnProps {
-    // (undocumented)
+export type MiscPageLayoutProps = Omit<BoxOwnProps, 'header' | 'footer'> & {
     footerActions?: ReactNode;
-}
+};
 
 // @public (undocumented)
 export const MultiEditPage: PageComponent<(<ContainerExtraProps, ItemExtraProps>({ children, rendererProps, pageName, ...entityListProps }: MultiEditPageProps<ContainerExtraProps, ItemExtraProps>) => JSX.Element)>;
@@ -4084,10 +4082,10 @@ export interface RepeaterInnerProps<ContainerExtraProps, ItemExtraProps> extends
 }
 
 // @public (undocumented)
-export const RepeaterItem: React.MemoExoticComponent<({ children, canBeRemoved, label, removalType, dragHandleComponent, index }: RepeaterItemProps) => JSX.Element>;
+export const RepeaterItem: React.MemoExoticComponent<({ children, canBeRemoved, label, removalType, dragHandleComponent, index, ...rest }: RepeaterItemProps) => JSX.Element>;
 
 // @public (undocumented)
-export interface RepeaterItemProps {
+export interface RepeaterItemProps extends Omit<RepeaterItemContainerProps, 'children' | 'index' | 'label'> {
     // (undocumented)
     canBeRemoved: boolean;
     // (undocumented)
@@ -4659,7 +4657,7 @@ export interface SimpleRelativeSingleFieldMetadata<Value extends FieldValue = Fi
 export type SimpleRelativeSingleFieldProps = SimpleRelativeSingleFieldProxyProps;
 
 // @internal (undocumented)
-export const SimpleRelativeSingleFieldProxy: React.MemoExoticComponent<({ render, defaultValue, isNonbearing, onBeforeUpdate, onInitialize, onUpdate, description, direction, gap, label, labelDescription, labelPosition, useLabelElement, width, className, style, errors, field: fieldName, required, size, containerClassName, containerStyle, suppressErrors, ...rest }: SimpleRelativeSingleFieldProxyProps & SimpleRelativeSingleFieldProxyRendererProps) => JSX.Element>;
+export const SimpleRelativeSingleFieldProxy: React.MemoExoticComponent<({ render, defaultValue, isNonbearing, onBeforeUpdate, onInitialize, onUpdate, description, direction, evenly, horizontal, gap, label, labelDescription, labelPosition, reverse, useLabelElement, width, className, style, errors, field: fieldName, required, size, containerClassName, containerStyle, suppressErrors, ...rest }: SimpleRelativeSingleFieldProxyProps & SimpleRelativeSingleFieldProxyRendererProps) => JSX.Element>;
 
 // @public (undocumented)
 export type SimpleRelativeSingleFieldProxyExcludeHandledProps<P extends SimpleRelativeSingleFieldProxyProps> = Omit<P, Exclude<keyof SugaredRelativeSingleField, RenderedSugaredRelativeSingleFieldKeys> | Exclude<keyof SimpleRelativeSingleFieldProxyExtraProps, RenderedSimpleRelativeSingleFieldProxyExtraPropsKeys> | Exclude<keyof SimpleRelativeSingleFieldProxyFieldContainerProps, RenderedSimpleRelativeSingleFieldProxyFieldContainerPropsKeys>>;
@@ -4941,7 +4939,7 @@ export type TextFilterArtifacts = {
 export type TextSpecifics<Text extends Text_2> = Omit<Text, 'text'>;
 
 // @public (undocumented)
-export const Tile: React.NamedExoticComponent<TileProps>;
+export const Tile: React.NamedExoticComponent<BoxOwnProps>;
 
 // @public (undocumented)
 export const TileList: ({ children }: {
@@ -4949,8 +4947,7 @@ export const TileList: ({ children }: {
 }) => JSX.Element;
 
 // @public (undocumented)
-export interface TileProps extends BoxOwnProps {
-}
+export type TileProps = BoxOwnProps;
 
 // @public (undocumented)
 export const TimeField: React.NamedExoticComponent<TimeFieldProps>;

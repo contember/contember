@@ -46,7 +46,7 @@ export const Login = ({ onLogin, resetLink }: LoginProps) => {
 
 	return (
 		<form onSubmit={onSubmit}>
-			<Stack direction="vertical" gap="large">
+			<Stack gap="large">
 				<ErrorList errors={errors} />
 				<FieldContainer label="Email">
 					<TextInput
@@ -72,7 +72,7 @@ export const Login = ({ onLogin, resetLink }: LoginProps) => {
 						{...register('otpToken')}
 					/>
 				</FieldContainer>}
-				<Stack direction="horizontal" align="center" justify="space-between">
+				<Stack horizontal align="center" justify="space-between">
 					<Button type="submit" distinction="primary" disabled={isSubmitting}>
 						Submit
 					</Button>

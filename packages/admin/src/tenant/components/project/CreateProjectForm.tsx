@@ -77,7 +77,7 @@ export const CreateProjectForm: FC<CreateProjectFormProps> = ({ projectListLink 
 	}
 	return (
 		<form onSubmit={onSubmit}>
-			<Stack direction="vertical" gap="xlarge">
+			<Stack gap="xlarge">
 				<Heading depth={3}>New project</Heading>
 
 				<FieldContainer label={'Project slug'}>

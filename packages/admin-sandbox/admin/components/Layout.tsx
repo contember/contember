@@ -37,7 +37,7 @@ export const Layout = memo(({ children }: PropsWithChildren) => {
 				>
 					<SlotSources.Logo>
 						<Link to="index">
-							<Stack align="center" direction="horizontal" gap="small">
+							<Stack align="center" horizontal gap="gap">
 								<Identity2023.Edit scale={2} />
 								<VisuallyHidden className="whitespace-nowrap" hidden={width < LAYOUT_BREAKPOINT}>Contember Sandbox</VisuallyHidden>
 							</Stack>
@@ -55,15 +55,15 @@ export const Layout = memo(({ children }: PropsWithChildren) => {
 						/>
 
 						<Button
-							size="small"
-							elevation="none"
-							distinction="seamless"
+							square
 							active={!scheme.match(/system/)}
-							flow="circular"
+							aria-label={scheme.match(/light/) ? 'Light mode, switch to dark mode' : scheme.match(/dark/) ? 'Dark mode, switch to light mode' : 'System mode, switch to system mode'}
+							borderRadius="full"
+							distinction="seamless"
 							onClick={useReferentiallyStableCallback(() => {
 								setScheme(scheme => (scheme.match(/light/) ? 'dark' : scheme.match(/dark/) ? 'system' : 'light'))
 							})}
-							aria-label={scheme.match(/light/) ? 'Light mode, switch to dark mode' : scheme.match(/dark/) ? 'Dark mode, switch to light mode' : 'System mode, switch to system mode'}
+							size="small"
 						>
 							{scheme.match(/light/) ? <SunIcon /> : scheme.match(/dark/) ? <MoonIcon /> : <CircleDashedIcon />}
 						</Button>
@@ -77,7 +77,7 @@ export const Layout = memo(({ children }: PropsWithChildren) => {
 
 					<SlotSources.Profile>
 						<LogoutLink Component={AlertLogoutLink}>
-							<Stack align="center" direction="horizontal" gap="small">
+							<Stack align="center" horizontal gap="gap">
 								<LogOutIcon /> Logout
 							</Stack>
 						</LogoutLink>
@@ -105,14 +105,14 @@ export const LayoutDevPanel = () => {
 				<Directive key={typeState ?? '(unset)'} name="layout" content={typeState} />
 				<DevPanel icon={<LayoutIcon />} heading={`Layout: ${layout}`}>
 					{Object.keys(LayoutComponents).map(key => (
-						<Button active={typeState === key} flow="block" key={key} onClick={() => {
+						<Button active={typeState === key} display="block" key={key} onClick={() => {
 							setTypeState(previous => previous === key ? undefined : key as unknown as LayoutType)
 						}}>{key}</Button>
 					))}
 
 					<Spacer />
 
-					<Button flow="block" distinction="seamless" onClick={() => {
+					<Button padding={false} display="block" distinction="seamless" onClick={() => {
 						setTypeState(undefined)
 					}}>Reset</Button>
 				</DevPanel>
@@ -190,8 +190,8 @@ export const ThemeDevPanel = () => {
 			<Directive name="layout.theme-controls" content={controlsTheme} />
 
 			<DevPanel icon={<PaintBucketIcon />} heading="Theme">
-				<Stack direction="horizontal" gap="large">
-					<Stack direction="vertical" gap="default">
+				<Stack horizontal gap="large">
+					<Stack>
 						<h3>Content</h3>
 						<Radio
 							value={contentTheme ?? ''}
@@ -210,7 +210,7 @@ export const ThemeDevPanel = () => {
 						/>
 					</Stack>
 
-					<Stack direction="vertical" gap="default">
+					<Stack>
 						<h3>Controls</h3>
 						<Radio
 							value={controlsTheme ?? ''}

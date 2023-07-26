@@ -6,7 +6,7 @@
 	--radio-color--disabled: rgba(var(--cui-color-rgb-50), var(--cui-opacity--low));
 	--radio-color--disabled-checked: rgba(var(--cui-color-rgb-50), var(--cui-opacity--medium));
 	--radio-color--invalid: rgb(var(--cui-theme-danger-rgb-500));
-	--control-font-size: var(--cui-font-size--controls);
+	--control-font-size: var(--cui-font-size-controls);
 	display: flex;
 	flex-direction: column;
 	gap: calc(3 * var(--cui-gap));
@@ -14,11 +14,11 @@
 }
 
 :where(.cui-radio.view-small) {
-	--control-font-size: var(--cui-font-size--controls--small);
+	--control-font-size: var(--cui-font-size-controls-small);
 }
 
 :where(.cui-radio.view-large) {
-	--control-font-size: var(--cui-font-size--controls--large);
+	--control-font-size: var(--cui-font-size-controls-large);
 }
 
 :where(.cui-radio.view-horizontal) {
@@ -62,14 +62,14 @@
 
 :where(.cui-radio-button) {
 	border-radius: 50%;
-	border: var(--cui-border-width--controls, 1px) solid var(--button-color);
+	border: var(--cui-border-width-controls, 1px) solid var(--button-color);
 	display: flex;
-	max-height: var(--cui-size--radio);
-	max-width: var(--cui-size--radio);
-	min-height: var(--cui-size--radio);
-	min-width: var(--cui-size--radio);
+	max-height: var(--cui-size-controls-radio);
+	max-width: var(--cui-size-controls-radio);
+	min-height: var(--cui-size-controls-radio);
+	min-width: var(--cui-size-controls-radio);
 	position: relative;
-	transition-duration: var(--cui-transition-duration--fast), var(--cui-transition-duration--immediate), var(--cui-transition-duration--fast);
+	transition-duration: var(--cui-transition-duration-fast), var(--cui-transition-duration-immediate), var(--cui-transition-duration-fast);
 	transition-property: box-shadow, border-color, box-shadow;
 }
 
@@ -88,7 +88,7 @@
 	bottom: 0;
 	top: 0;
 	transform: scale(0);
-	transition-duration: var(--cui-transition-duration--immediate), var(--cui-transition-duration--fast);
+	transition-duration: var(--cui-transition-duration-immediate), var(--cui-transition-duration-fast);
 	transition-property: background-color, transform;
 }
 

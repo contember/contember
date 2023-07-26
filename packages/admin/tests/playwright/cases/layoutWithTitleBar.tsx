@@ -9,7 +9,7 @@ const side = (
 )
 
 const afterTitle = (
-	<Stack direction="horizontal">
+	<Stack horizontal>
 		<span>Lorem</span>
 		<span>ipsum</span>
 		<span>dolor</span>

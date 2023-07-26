@@ -39,14 +39,16 @@ export const Toaster: React.FC = () => {
 				{toasterContext.toasts.map(toast => (
 					<div key={toast.id} className={componentClassName('item')}>
 						<Message
+							elevated
+							important
+							padding
 							intent={toastTypeToIntent[toast.type]}
-							flow="block"
-							lifted
-							distinction="striking"
+							display="block"
 							action={
 								<Button
+									square
+									borderRadius
 									distinction="toned"
-									flow="squarish"
 									onClick={() => {
 										toasterContext.dismissToast(toast.id)
 									}}

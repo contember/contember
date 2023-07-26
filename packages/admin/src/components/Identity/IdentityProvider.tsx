@@ -1,12 +1,12 @@
-import { ReactNode, createContext, useCallback, useEffect, useMemo, useState } from 'react'
+import { EnvironmentExtensionProvider } from '@contember/binding'
 import { useSessionToken } from '@contember/react-client'
+import { Message, SpinnerContainer } from '@contember/ui'
+import { ReactNode, createContext, useCallback, useEffect, useMemo, useState } from 'react'
 import { useFetchMe } from '../../tenant'
 import { MiscPageLayout } from '../MiscPageLayout'
-import { SpinnerContainer, Message } from '@contember/ui'
+import { identityEnvironmentExtension } from './IdentityEnvironmentExtension'
 import { InvalidIdentityFallback } from './InvalidIdentityFallback'
 import { useLogout } from './useLogout'
-import { EnvironmentExtensionProvider } from '@contember/binding'
-import { identityEnvironmentExtension } from './IdentityEnvironmentExtension'
 
 export interface Identity {
 	id: string
@@ -146,7 +146,7 @@ export const IdentityProvider: React.FC<IdentityProviderProps> = ({ children, on
 	if (identityState.state === 'cleared') {
 		return (
 			<MiscPageLayout>
-				<Message size="large" flow="generousBlock">Logging out&hellip;</Message>
+				<Message size="large" padding="large" display="block">Logging out&hellip;</Message>
 			</MiscPageLayout>
 		)
 	}

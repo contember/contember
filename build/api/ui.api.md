@@ -148,7 +148,7 @@ export type BaseButtonProps = ButtonOwnProps & (ButtonBasedProps | AnchorBasedPr
 export type BlueprintIconName = IconName;
 
 // @public
-export const Box: MemoExoticComponent<ForwardRefExoticComponent<BoxOwnProps & HTMLDivElementProps & RefAttributes<HTMLDivElement>>>;
+export const Box: MemoExoticComponent<ForwardRefExoticComponent<BoxProps & RefAttributes<HTMLDivElement>>>;
 
 // @public (undocumented)
 export type BoxDepth = 1 | 2 | 3 | 4 | 5 | 6;
@@ -157,30 +157,29 @@ export type BoxDepth = 1 | 2 | 3 | 4 | 5 | 6;
 export type BoxDistinction = Default | 'seamless';
 
 // @public (undocumented)
-export interface BoxOwnProps {
-    // (undocumented)
+export type BoxHeaderProps = {
     actions?: ReactNode;
-    // (undocumented)
+    header?: never;
+    label?: ReactNode;
+} | {
+    actions?: never;
+    header?: ReactNode;
+    label?: never;
+};
+
+// @public (undocumented)
+export type BoxOwnProps = BoxHeaderProps & Pick<StackProps, 'align' | 'direction' | 'evenly' | 'gap' | 'horizontal' | 'justify' | 'reverse' | 'wrap'> & {
     background?: boolean;
-    // (undocumented)
     border?: boolean;
-    // (undocumented)
+    borderRadius?: boolean | 'gap' | 'gutter' | 'padding' | 'large' | 'larger';
     children?: ReactNode;
-    // (undocumented)
-    direction?: StackProps['direction'];
-    // @deprecated (undocumented)
     distinction?: BoxDistinction;
-    // (undocumented)
-    gap?: Size | 'none';
-    // (undocumented)
+    footer?: ReactNode;
     heading?: ReactNode;
-    // (undocumented)
-    intent?: Intent;
-    // (undocumented)
     isActive?: boolean;
-    // (undocumented)
-    padding?: boolean | DeprecatedPaddingPropLiteral;
-}
+    intent?: Intent;
+    padding?: boolean | 'gap' | 'gutter' | 'padding' | 'large' | 'larger' | DeprecatedPaddingPropLiteral;
+};
 
 // @public (undocumented)
 export type BoxProps = BoxOwnProps & HTMLDivElementProps;
@@ -203,82 +202,90 @@ export interface ButtonBasedProps extends Omit<HTMLButtonElementProps, 'ref' | '
     Component: 'button';
 }
 
-// @public (undocumented)
+// @public @deprecated (undocumented)
 export type ButtonDistinction = Default | 'primary' | 'toned' | 'outlined' | 'seamless';
 
-// @public (undocumented)
+// @public @deprecated (undocumented)
 export type ButtonElevation = Default | 'none';
 
-// @public (undocumented)
+// @public @deprecated (undocumented)
 export type ButtonFlow = Default | 'circular' | 'squarish' | 'generous' | 'block' | 'generousBlock';
 
 // @public (undocumented)
-export const ButtonGroup: MemoExoticComponent<({ size, componentClassName, className, flow, orientation, isTopToolbar, children }: ButtonGroupProps) => JSX.Element>;
+export const ButtonGroup: MemoExoticComponent<({ children, className, componentClassName, display, flow, isTopToolbar, orientation, size, }: ButtonGroupProps) => JSX.Element>;
 
-// @public (undocumented)
+// @public @deprecated (undocumented)
 export type ButtonGroupFlow = Default | 'block';
 
-// @public (undocumented)
+// @public @deprecated (undocumented)
 export type ButtonGroupOrientation = Default | 'horizontal' | 'vertical';
 
 // @public (undocumented)
-export interface ButtonGroupProps extends ComponentClassNameProps {
+export interface ButtonGroupProps extends ComponentClassNameProps, DeprecatedButtonGroupProps {
     // (undocumented)
     children?: ReactNode;
     // (undocumented)
-    flow?: ButtonGroupFlow;
+    display?: 'block' | 'inline';
     // (undocumented)
-    isTopToolbar?: boolean;
+    orientation?: 'horizontal' | 'vertical' | DeprecatedButtonDefault;
     // (undocumented)
-    orientation?: ButtonGroupOrientation;
-    // (undocumented)
-    size?: Size;
+    size?: 'small' | 'medium' | 'large' | DeprecatedButtonDefault;
 }
 
 // @public (undocumented)
-export const ButtonList: MemoExoticComponent<({ children, className, componentClassName, flow, orientation, size }: ButtonListProps) => JSX.Element>;
+export const ButtonList: MemoExoticComponent<({ children, className, componentClassName, display, flow, gap, orientation, size, }: ButtonListProps) => JSX.Element>;
 
-// @public (undocumented)
+// @public @deprecated (undocumented)
 export type ButtonListFlow = Default | 'inline' | 'block';
 
 // @public (undocumented)
-export interface ButtonListProps extends ComponentClassNameProps {
+export interface ButtonListProps extends ComponentClassNameProps, DeprecatedButtonListProps {
     // (undocumented)
     children?: ReactNode;
     // (undocumented)
-    flow?: ButtonListFlow;
+    display?: 'block' | 'inline';
     // (undocumented)
-    orientation?: ButtonGroupOrientation;
+    gap?: boolean | 'gap' | 'gutter' | 'padding' | 'large' | 'larger';
     // (undocumented)
-    size?: Size;
+    orientation?: 'horizontal' | 'vertical' | DeprecatedButtonDefault;
+    // (undocumented)
+    size?: 'small' | 'medium' | 'large' | DeprecatedButtonDefault;
 }
 
 // @public (undocumented)
-export interface ButtonOwnProps {
+export interface ButtonOwnProps extends DeprecatedButtonOwnProps {
     // (undocumented)
     active?: boolean;
     // (undocumented)
-    bland?: boolean;
+    align?: 'start' | 'center' | 'end' | 'stretch';
+    // (undocumented)
+    borderRadius?: boolean | 'gap' | 'gutter' | 'padding' | 'full';
     // (undocumented)
     children?: ReactNode;
     // (undocumented)
     disabled?: boolean;
     // (undocumented)
-    distinction?: ButtonDistinction;
+    display?: 'inline' | 'block';
     // (undocumented)
-    elevation?: ButtonElevation;
+    distinction?: 'primary' | 'toned' | 'outlined' | 'seamless' | 'inverse' | DeprecatedButtonDefault;
     // (undocumented)
-    flow?: ButtonFlow;
+    elevated?: boolean;
+    // (undocumented)
+    inset?: boolean | 'gap' | 'gutter' | 'padding' | 'large';
     // (undocumented)
     intent?: Intent;
     // (undocumented)
-    justification?: Justification;
+    justify?: 'start' | 'center' | 'end' | 'space-around' | 'space-between' | 'space-evenly';
     // (undocumented)
     loading?: boolean;
     // (undocumented)
+    padding?: boolean | 'gap' | 'gutter' | 'padding' | DeprecatedButtonPadding;
+    // (undocumented)
     scheme?: Scheme;
     // (undocumented)
-    size?: Size;
+    size?: 'small' | 'medium' | 'large' | DeprecatedButtonDefault;
+    // (undocumented)
+    square?: boolean;
 }
 
 // @public (undocumented)
@@ -528,7 +535,58 @@ export type Default = 'default';
 export const DEFAULT_PORTAL_ROOT_ID = "cui-portal-root";
 
 // @public @deprecated (undocumented)
+export type DeprecatedButtonDefault = Default;
+
+// @public @deprecated (undocumented)
+export interface DeprecatedButtonGroupProps {
+    // @deprecated (undocumented)
+    flow?: ButtonGroupFlow;
+    // @deprecated (undocumented)
+    isTopToolbar?: boolean;
+}
+
+// @public @deprecated (undocumented)
+export interface DeprecatedButtonListProps {
+    // @deprecated (undocumented)
+    flow?: ButtonListFlow;
+}
+
+// @public @deprecated (undocumented)
+export interface DeprecatedButtonOwnProps {
+    // @deprecated (undocumented)
+    bland?: boolean;
+    // @deprecated (undocumented)
+    elevation?: ButtonElevation;
+    // @deprecated (undocumented)
+    flow?: ButtonFlow;
+    // @deprecated (undocumented)
+    justification?: Justification;
+}
+
+// @public @deprecated (undocumented)
+export type DeprecatedButtonPadding = Default | 'small';
+
+// @public @deprecated (undocumented)
+export type DeprecatedDividerSize = Size | 'xlarge' | 'none';
+
+// @internal (undocumented)
+export type DeprecatedMessageProps = {
+    lifted?: boolean;
+    distinction?: MessageDistinction;
+    flow?: MessageFlow;
+};
+
+// @public @deprecated (undocumented)
+export type DeprecatedMessageSize = Default;
+
+// @public @deprecated (undocumented)
 export type DeprecatedPaddingPropLiteral = Default | 'no-padding' | 'with-padding';
+
+// @public @deprecated (undocumented)
+export type DeprecatedSpacerSize = Size | 'xlarge' | 'none';
+
+// @public @deprecated (undocumented)
+export type DeprecatedStackSize = Size | 'xlarge' | 'none';
 
 // @public (undocumented)
 export const Description: MemoExoticComponent<({ className, children }: DescriptionProps) => JSX.Element>;
@@ -639,6 +697,8 @@ export interface DialogSettings<Result> {
     // (undocumented)
     content: (props: RenderDialogContentProps<Result>) => ReactElement;
     // (undocumented)
+    footer?: (props: RenderDialogContentProps<Result>) => ReactElement;
+    // (undocumented)
     gap?: BoxProps['gap'];
     // (undocumented)
     heading?: ReactNode;
@@ -680,7 +740,7 @@ export const Divider: MemoExoticComponent<({ className, componentClassName, gap,
 
 // @public (undocumented)
 export type DividerProps = Omit<HTMLDivElementProps, 'children'> & ComponentClassNameProps & {
-    gap?: Size | 'medium' | 'xlarge' | 'none';
+    gap?: boolean | 'gap' | 'gutter' | 'padding' | 'large' | 'larger' | DeprecatedDividerSize;
 };
 
 // @public (undocumented)
@@ -1488,8 +1548,10 @@ export interface ErrorListProps {
 // @public (undocumented)
 export type ErrorType = Error | unknown;
 
-// @public (undocumented)
-export const FieldContainer: MemoExoticComponent<({ children, className, description, direction, errors, gap, label, labelDescription, labelPosition, required, size, style, useLabelElement, width, }: FieldContainerProps) => JSX.Element>;
+// Warning: (tsdoc-code-fence-missing-delimiter) Error parsing code fence: Missing closing delimiter
+//
+// @public
+export const FieldContainer: MemoExoticComponent<({ children, className, description, errors, direction, evenly, gap, horizontal, label, labelDescription, labelPosition, required, reverse, size, style, useLabelElement, width, }: FieldContainerProps) => JSX.Element>;
 
 // @public (undocumented)
 export type FieldContainerLabelPosition = Default | 'labelLeft' | 'labelRight' | 'labelInlineLeft' | 'labelInlineRight';
@@ -1499,7 +1561,9 @@ export type FieldContainerProps = {
     children: ReactNode;
     description?: ReactNode;
     direction?: StackProps['direction'];
-    gap?: Size | 'none';
+    evenly?: StackProps['evenly'];
+    gap?: StackProps['gap'];
+    horizontal?: StackProps['horizontal'];
     label: ReactNode;
     labelDescription?: ReactNode;
     labelPosition?: FieldContainerLabelPosition;
@@ -1507,6 +1571,7 @@ export type FieldContainerProps = {
     required?: boolean;
     size?: Size;
     useLabelElement?: boolean;
+    reverse?: StackProps['reverse'];
     style?: CSSProperties;
     className?: string;
 } & ErrorListProps;
@@ -1957,26 +2022,32 @@ export interface MenuProps {
     showCaret?: boolean;
 }
 
-// @public (undocumented)
-export const Message: MemoExoticComponent<({ className, children, intent, size, flow, distinction, type, lifted, action, ...props }: MessageProps) => JSX.Element>;
+// @public
+export const Message: MemoExoticComponent<({ action, background, borderRadius, children, className, display, distinction, elevated, flow, icon, important, intent, lifted, padding, size, textAlign, ...props }: MessageProps) => JSX.Element>;
 
 // @public (undocumented)
 export type MessageDistinction = Default | 'striking';
 
-// @public (undocumented)
+// @public @deprecated (undocumented)
 export type MessageFlow = Default | 'generous' | 'block' | 'generousBlock';
 
+// Warning: (ae-incompatible-release-tags) The symbol "MessageProps" is marked as @public, but its signature references "DeprecatedMessageProps" which is marked as @internal
+//
 // @public (undocumented)
 export type MessageProps = {
-    intent?: Intent;
-    type?: 'prop is deprecated, use intent';
-    size?: Size;
-    flow?: MessageFlow;
-    distinction?: MessageDistinction;
-    lifted?: boolean;
-    children?: ReactNode;
     action?: ReactNode;
-} & HTMLDivElementProps;
+    borderRadius?: boolean | 'gap' | 'gutter' | 'padding' | 'large' | 'larger';
+    background?: boolean;
+    display?: 'inline' | 'block';
+    elevated?: boolean;
+    children?: ReactNode;
+    icon?: ReactNode;
+    important?: boolean;
+    intent?: Intent;
+    padding?: boolean | 'gap' | 'gutter' | 'padding' | 'large' | 'larger';
+    textAlign?: 'start' | 'center' | 'end';
+    size?: 'small' | 'medium' | 'large' | DeprecatedMessageSize;
+} & HTMLDivElementProps & DeprecatedMessageProps;
 
 // @public (undocumented)
 export const MonthInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<string> & ControlValueProps<string> & {
@@ -2211,31 +2282,26 @@ export interface RenderDialogContentProps<Result> {
 }
 
 // @public (undocumented)
-export const RepeaterItemContainer: MemoExoticComponent<({ actions, children, gap, label, dragHandleComponent: Handle, index }: RepeaterItemContainerProps) => JSX.Element>;
+export const RepeaterItemContainer: MemoExoticComponent<({ actions, gap, children, label, dragHandleComponent: Handle, index, ...rest }: RepeaterItemContainerProps) => JSX.Element>;
 
 // @public (undocumented)
-export const RepeaterItemContainerHeader: MemoExoticComponent<({ label, actions, index }: RepeaterItemContainerHeaderProps) => JSX.Element | null>;
+export const RepeaterItemContainerHeader: MemoExoticComponent<({ label, actions, index }: RepeaterItemContainerHeaderProps) => JSX.Element>;
 
 // @public (undocumented)
-export type RepeaterItemContainerHeaderProps = Pick<RepeaterItemContainerProps, 'index' | 'label' | 'actions'>;
-
-// @public (undocumented)
-export interface RepeaterItemContainerProps {
-    // (undocumented)
+export type RepeaterItemContainerHeaderProps = {
+    index?: number;
+    label?: ReactNode;
     actions?: ReactNode;
-    // (undocumented)
+};
+
+// @public (undocumented)
+export type RepeaterItemContainerProps = Omit<BoxProps, 'header' | 'footer' | 'heading'> & {
+    index?: number;
     children: ReactNode;
-    // (undocumented)
     dragHandleComponent?: ComponentType<{
         children: ReactNode;
     }>;
-    // (undocumented)
-    gap?: Size;
-    // (undocumented)
-    index?: number;
-    // (undocumented)
-    label?: ReactNode;
-}
+};
 
 // @public (undocumented)
 export interface RestHTMLCheckboxProps extends Omit<AllHTMLAttributes<HTMLInputElement>, ControlPropsKeys<boolean> | 'checked' | 'children'> {
@@ -2426,7 +2492,7 @@ export const Spacer: MemoExoticComponent<({ className, componentClassName, gap, 
 export type SpacerProps = ComponentClassNameProps & Omit<HTMLDivElementProps, 'ref' | 'children'> & {
     shrink?: boolean;
     grow?: boolean;
-    gap?: Size | 'medium' | 'xlarge' | 'none';
+    gap?: boolean | 'gap' | 'gutter' | 'padding' | 'large' | 'larger' | DeprecatedSpacerSize;
 };
 
 // @public (undocumented)
@@ -2465,16 +2531,20 @@ export interface StackOwnProps {
     basis?: CSSProperties['flexBasis'];
     // (undocumented)
     children?: ReactNode;
-    // (undocumented)
-    direction: 'vertical' | 'horizontal' | 'vertical-reverse' | 'horizontal-reverse';
+    // @deprecated (undocumented)
+    direction?: 'vertical' | 'horizontal' | 'vertical-reverse' | 'horizontal-reverse';
     // (undocumented)
     evenly?: boolean;
     // (undocumented)
-    gap?: Size | 'xlarge' | 'none';
+    gap?: boolean | 'gap' | 'gutter' | 'padding' | 'large' | 'larger' | DeprecatedStackSize;
     // (undocumented)
     grow?: boolean | CSSProperties['flexGrow'];
     // (undocumented)
+    horizontal?: boolean;
+    // (undocumented)
     justify?: 'center' | 'start' | 'end' | 'space-between' | 'space-around' | 'space-evenly' | 'stretch' | 'inherit' | 'initial' | 'revert';
+    // (undocumented)
+    reverse?: boolean;
     // (undocumented)
     shrink?: boolean | CSSProperties['flexShrink'];
     // (undocumented)

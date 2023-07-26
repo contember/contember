@@ -1,7 +1,7 @@
 import { Box, BoxOwnProps } from '@contember/ui'
 import { memo } from 'react'
 
-export interface TileProps extends BoxOwnProps {}
+export type TileProps = BoxOwnProps
 
 /**
  * @group UI

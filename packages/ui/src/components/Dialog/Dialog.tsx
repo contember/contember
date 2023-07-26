@@ -16,7 +16,7 @@ export const Dialog = (props: DialogProps) => {
 	const [overlayElement, setOverlayElement] = useState<HTMLDivElement | null>(null)
 	const {
 		resolve,
-		settings: { content: RenderContent, bare, gap = 'default', heading, type },
+		settings: { bare, content: Content, footer: Footer, gap = true, heading, type },
 	} = props.settings
 
 	useCloseOnEscape({ isOpen: true, close: resolve })
@@ -28,12 +28,18 @@ export const Dialog = (props: DialogProps) => {
 		contentElement.focus()
 	}, [contentElement])
 
-	const renderedContent = <RenderContent resolve={resolve} />
-
 	return (
 		<div className={componentClassName('', toEnumViewClass(type))} ref={setOverlayElement}>
 			<div className={componentClassName('in')} ref={setContentElement}>
-				{bare ? renderedContent : <Box gap={gap} heading={heading}>{renderedContent}</Box>}
+				<Box
+					border={!bare}
+					padding={!bare}
+					gap={gap}
+					label={heading}
+					footer={Footer ? <Footer resolve={resolve} /> : null}
+				>
+					<Content resolve={resolve} />
+				</Box>
 			</div>
 		</div>
 	)

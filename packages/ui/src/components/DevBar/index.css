@@ -16,7 +16,7 @@
 	opacity: 1;
 	padding: var(--screen-offset-vertical) var(--screen-offset-horizontal);
 	transition-property: opacity, transform;
-	transition-duration: var(--cui-transition-duration--fast);
+	transition-duration: var(--cui-transition-duration-fast);
 	transition-timing-function: ease-in-out;
 }
 
@@ -30,7 +30,7 @@
 }
 
 :where(.cui-devBar-content) {
-	transition: box-shadow var(--cui-transition-duration--slow) ease-in-out;
+	transition: box-shadow var(--cui-transition-duration-slow) ease-in-out;
 	align-self: center;
 	align-items: center;
 	border-radius: 2rem;
@@ -54,12 +54,12 @@
 	.cui-devBar-brand,
 ) {
 	align-items: center;
-	height: var(--cui-size--controls);
+	height: var(--cui-size-controls);
 	border-radius: 2rem;
 	justify-content: center;
-	max-height: var(--cui-size--controls);
-	min-height: var(--cui-size--controls);
-	min-width: var(--cui-size--controls);
+	max-height: var(--cui-size-controls);
+	min-height: var(--cui-size-controls);
+	min-width: var(--cui-size-controls);
 	padding: 0.625rem;
 }
 
@@ -67,8 +67,8 @@
 	background: transparent;
 	cursor: pointer;
 	display: flex;
-	max-width: var(--cui-size--controls);
-	width: var(--cui-size--controls);
+	max-width: var(--cui-size-controls);
+	width: var(--cui-size-controls);
 	order: 999;
 }
 
@@ -106,7 +106,7 @@
 }
 
 :where(.cui-devBar-trigger) {
-	--y-offset: calc(-1 * var(--screen-offset-vertical) - var(--cui-size--controls));
+	--y-offset: calc(-1 * var(--screen-offset-vertical) - var(--cui-size-controls));
 	color: rgb(var(--cui-color-rgb-50));
 	display: flex;
 }
@@ -166,7 +166,7 @@
 
 @media screen and (min-width: 768px) {
 	:where(.cui-devBar-trigger) {
-		--y-offset: calc(-1 * var(--cui-size--controls) + 2 * var(--cui-gap));
+		--y-offset: calc(-1 * var(--cui-size-controls) + 2 * var(--cui-gap));
 		position: relative;
 	}
 	:where(.cui-devBar-panel-content) {
@@ -192,7 +192,7 @@
 }
 
 :where(.cui-devBar:not([data-expanded])) {
-	transform: translateY(var(--cui-size--controls));
+	transform: translateY(var(--cui-size-controls));
 	opacity: 0;
 	max-width: 5rem;
 	margin: auto;

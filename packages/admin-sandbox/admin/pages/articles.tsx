@@ -1,6 +1,7 @@
 import {
 	AnchorButton,
 	Button,
+	CreateNewEntityButtonProps,
 	CreateScope,
 	DataGridScope,
 	DeleteEntityButton,
@@ -113,6 +114,7 @@ export const categories = () => (
 		<SlotSources.Title>Categories</SlotSources.Title>
 
 		<MultiEditScope entities="Category" listProps={{
+			enableAdding: true,
 			sortableBy: 'order',
 			beforeContent: <SlotSources.Actions><PersistButton /></SlotSources.Actions>,
 		}}>

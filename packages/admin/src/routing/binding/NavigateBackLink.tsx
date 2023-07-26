@@ -41,7 +41,7 @@ export const NavigateBackLink = memo<NavigateBackLinkProps>(({
 
 	return (
 		<Link {...props} aria-label={finalAriaLabel}>
-			<Stack direction="horizontal" align="center">
+			<Stack horizontal align="center">
 				{icon ?? <ArrowLeftIcon />}
 				<VisuallyHidden hidden={visuallyHidden}>{children ?? formatMessage('navigationBackLink.back')}</VisuallyHidden>
 			</Stack>

@@ -1,5 +1,5 @@
 import { LayoutKit, Slots, createLayoutBarComponent } from '@contember/layout'
-import { Divider, Spacer, Stack } from '@contember/ui'
+import { Spacer, Stack } from '@contember/ui'
 import { ComponentClassNameProps, pick } from '@contember/utilities'
 import { PropsWithChildren } from 'react'
 import { AppHeaderTitle } from './AppHeaderTitle'

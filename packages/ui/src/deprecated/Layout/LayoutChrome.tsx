@@ -1,15 +1,14 @@
-import { ColorSchemeProvider, useClassNameFactory } from '@contember/react-utils'
+import { ColorSchemeProvider, useClassNameFactory, useElementTopOffset } from '@contember/react-utils'
 import { colorSchemeClassName, contentThemeClassName, controlsThemeClassName } from '@contember/utilities'
 import { CSSProperties, ReactNode, memo, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { DialogProvider, NavigationContext } from '../..'
+import { Button } from '../../components/Forms'
+import { Icon } from '../../components/Icon'
+import { PortalProvider } from '../../components/Portal'
+import { PreventCloseContext } from '../../components/PreventCloseContext'
+import { Stack } from '../../components/Stack'
 import { Intent, Scheme } from '../../types'
 import { toStateClass, toViewClass } from '../../utils'
-import { Button } from '../Forms'
-import { Icon } from '../Icon'
-import { useElementTopOffset } from '../Layout/useElementTopOffset'
-import { PortalProvider } from '../Portal'
-import { PreventCloseContext } from '../PreventCloseContext'
-import { Stack } from '../Stack'
 import { ThemeSchemeContext, TitleThemeSchemeContext } from './ThemeSchemeContext'
 import { ThemeScheme } from './Types'
 export interface LayoutChromeProps extends ThemeScheme {
@@ -31,6 +30,7 @@ export interface LayoutChromeProps extends ThemeScheme {
 const PREVENT_HAPPENED_RECENTLY = 100
 
 /**
+ * @deprecated Use `LayoutKit` from `@contember/layout` instead.
  * @group Layout UI
  */
 export const LayoutChrome = memo(({
@@ -167,7 +167,7 @@ export const LayoutChrome = memo(({
 					toViewClass('no-bar', !hasBar),
 					contentThemeClassName(themeContent ?? theme),
 					controlsThemeClassName(themeControls ?? theme),
-					colorSchemeClassName(scheme),,
+					colorSchemeClassName(scheme), ,
 					toViewClass('collapsed', collapsed),
 				])}
 				style={useMemo(() => (barContentOffsetTop

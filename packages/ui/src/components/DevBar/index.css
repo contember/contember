@@ -1,9 +1,9 @@
 :where(.cui-devBar) {
 	--devBar-soft-shadow-color: rgba(var(--cui-background-color-toned-rgb-50), var(--cui-opacity--low));
 	--devBar-control-background-color--highlighted: rgba(var(--cui-background-color-toned-rgb-50), var(--cui-opacity--low));
-	--brand-background-color--highlighted: rgb(var(--cui-background-color-controls-rgb-50));
-	--screen-offset-vertical: var(--cui-padding, 1rem);
-	--screen-offset-horizontal: var(--cui-padding, 1rem);
+	--devBar-brand-background-color--highlighted: rgb(var(--cui-background-color-controls-rgb-50));
+	--devBar-padding-vertical: var(--cui-padding, 1rem);
+	--devBar-padding-horizontal: var(--cui-padding, 1rem);
 
 	align-items: center;
 	bottom: 0;
@@ -14,10 +14,15 @@
 	left: 0;
 	right: 0;
 	opacity: 1;
-	padding: var(--screen-offset-vertical) var(--screen-offset-horizontal);
+	padding: var(--devBar-padding-vertical) var(--devBar-padding-horizontal);
 	transition-property: opacity, transform;
 	transition-duration: var(--cui-transition-duration-fast);
 	transition-timing-function: ease-in-out;
+}
+
+:where(.cui-devBar) .cui-table-container {
+	--cui-table-container-overflow-padding-left: var(--devBar-padding-horizontal);
+	--cui-table-container-overflow-padding-right: var(--devBar-padding-horizontal);
 }
 
 :where(
@@ -92,7 +97,7 @@
 	.cui-devBar-brand:hover,
 	.cui-devBar-brand:focus-visible,
 ) {
-	background-color: var(--brand-background-color--highlighted);
+	background-color: var(--devBar-brand-background-color--highlighted);
 	color: rgb(var(--cui-color-controls-rgb-50));
 }
 
@@ -106,7 +111,7 @@
 }
 
 :where(.cui-devBar-trigger) {
-	--y-offset: calc(-1 * var(--screen-offset-vertical) - var(--cui-size-controls));
+	--y-offset: calc(-1 * var(--devBar-padding-vertical) - var(--cui-size-controls));
 	color: rgb(var(--cui-color-rgb-50));
 	display: flex;
 }

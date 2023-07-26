@@ -192,6 +192,9 @@ export function useElementSize(refOrElement: RefObjectOrElement<HTMLElement>, op
     width: number | undefined;
 };
 
+// @public (undocumented)
+export function useElementTopOffset(ref?: RefObject<HTMLElement>): number | undefined;
+
 // @public
 export function useEventHandler<E extends SyntheticEvent<any>>(type: E['type'], callback: EventHandler<E>): EventHandler<E>;
 

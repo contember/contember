@@ -11,6 +11,9 @@ export type LayoutPageContentProps =
 	}
 	& HTMLDivElementProps
 
+/**
+ * @deprecated Use `LayoutKit` from `@contember/layout` instead.
+ */
 export const LayoutPageContent = memo(({ children, layout, pageContentLayout = 'center' }: LayoutPageContentProps) => {
 	const componentClassName = useClassNameFactory('layout-page-content')
 

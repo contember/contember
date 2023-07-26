@@ -56,6 +56,7 @@ import { TextareaHTMLAttributes } from 'react';
 import { TouchEventHandler } from 'react';
 import { TransitionEventHandler } from 'react';
 import { UIEventHandler } from 'react';
+import { useElementTopOffset } from '@contember/react-utils';
 import { WheelEventHandler } from 'react';
 
 // @public (undocumented)
@@ -1831,10 +1832,10 @@ export interface LabelOwnProps {
 // @public (undocumented)
 export type LabelProps = LabelOwnProps & HTMLSpanElementProps;
 
-// @public
+// @public @deprecated
 export const Layout: MemoExoticComponent<({ className, children, sidebarHeader, sidebarFooter, switchers, navigation, scheme, theme, themeContent, themeControls, pageScheme, pageTheme, pageThemeContent, pageThemeControls, titleScheme, titleTheme, titleThemeContent, titleThemeControls, }: LayoutProps) => JSX.Element>;
 
-// @public (undocumented)
+// @public @deprecated (undocumented)
 export const LayoutChrome: MemoExoticComponent<({ children, navigation, pageScheme, pageTheme, pageThemeContent, pageThemeControls, scheme, sidebarFooter, sidebarHeader, switchers, theme, themeContent, themeControls, titleScheme, titleTheme, titleThemeContent, titleThemeControls, }: LayoutChromeProps) => JSX.Element>;
 
 // @public (undocumented)
@@ -1867,13 +1868,13 @@ export interface LayoutChromeProps extends ThemeScheme {
     titleThemeControls?: Intent;
 }
 
-// @public (undocumented)
+// @public @deprecated (undocumented)
 export const LayoutPage: MemoExoticComponent<({ actions, afterTitle, children, fit, navigation, pageContentLayout, side, title, ...props }: LayoutPageProps) => JSX.Element>;
 
-// @public (undocumented)
+// @public @deprecated (undocumented)
 export const LayoutPageAside: MemoExoticComponent<({ children }: HTMLDivElementProps) => JSX.Element>;
 
-// @public (undocumented)
+// @public @deprecated (undocumented)
 export const LayoutPageContent: MemoExoticComponent<({ children, layout, pageContentLayout }: LayoutPageContentProps) => JSX.Element>;
 
 // @public (undocumented)
@@ -1898,7 +1899,7 @@ export interface LayoutPageProps extends Omit<TitleBarProps, 'after' | 'children
     title?: ReactNode;
 }
 
-// @public (undocumented)
+// @public @deprecated (undocumented)
 export const LayoutPageStickyContainer: MemoExoticComponent<({ bottom, className: classNameProp, children, left, right, style: styleProp, top, ...rest }: LayoutPageStickyContainerProps) => JSX.Element>;
 
 // @public (undocumented)
@@ -2969,8 +2970,7 @@ export const useCommonReactSelectStyles: <Option = unknown, IsMulti extends bool
 // @public (undocumented)
 export const useDialog: <Result>() => DialogOptions<Result>;
 
-// @public (undocumented)
-export function useElementTopOffset(ref?: RefObject<HTMLElement>): number | undefined;
+export { useElementTopOffset }
 
 // @public (undocumented)
 export function useFallbackRef<E extends HTMLDivElement>(forwardedRef?: ForwardedRef<E>): ((instance: E | null) => void) | RefObject<E>;

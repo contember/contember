@@ -68,9 +68,6 @@ export function contentThemeClassName<ContentTheme extends KebabCase<string> = K
 // @public
 export function controlsThemeClassName<ControlsTheme extends KebabCase<string> = KebabCase<string>, State extends `:${KebabCase<string>}` | null | undefined = undefined>(theme: ControlsTheme | null | undefined, state?: State | null | undefined): ThemeControlsClassName<ControlsTheme, State> | undefined;
 
-// @internal
-export function currentOrDeprecated<R, D>(current: R, deprecated: D, mapped: R, shouldThrow?: boolean): R;
-
 // @public (undocumented)
 export function dataAttribute(value: unknown): string | true | undefined;
 
@@ -85,10 +82,13 @@ export type DeepPartial<T> = T extends Function ? T : T extends Array<infer Infe
 export { DelimiterCase }
 
 // @internal
-export function deprecate(removal: SemverString, assertion: boolean, deprecated: string, replacement: string): void;
+export function deprecate(removal: SemverString, condition: boolean, deprecated: string, replacement: string): void;
 
 // @public
 export type ExtendableProps<ExtendedProps = {}, OverrideProps = {}> = OverrideProps & Omit<ExtendedProps, keyof OverrideProps>;
+
+// @public (undocumented)
+export function fallback<R>(current: R, condition: boolean, mapped: R): R;
 
 // @public (undocumented)
 export function filterThemedClassName(nestedClassName: NestedClassName, defaultColorSchemeContext: ColorSchemeClassName): string[];

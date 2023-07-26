@@ -5,7 +5,7 @@ import { SemverString } from './types'
  * @internal
  *
  * @param removal - Version when the deprecated feature will be removed
- * @param assertion - Condition that must be true to avoid the deprecation warning
+ * @param condition - Condition under which the deprecation warning will be logged
  * @param deprecated - Name of the deprecated feature
  * @param replacement - Name of the feature that replaces the deprecated feature
  *
@@ -16,10 +16,10 @@ import { SemverString } from './types'
  * // Logs: Use of "default" is deprecated and might be removed in the next release. Use "hidden" instead.
  * ```
  */
-export function deprecate(removal: SemverString, assertion: boolean, deprecated: string, replacement: string): void {
-	if (assertion === false) {
+export function deprecate(removal: SemverString, condition: boolean, deprecated: string, replacement: string): void {
+	if (condition === true) {
 		if (import.meta.env.DEV) {
-			const shouldThrow = Boolean(import.meta.env.VITE_CONTEMBER_ADMIN_STRICT_DEPRECATIONS)
+			const shouldThrow = Boolean(import.meta.env.VITE_CONTEMBER_ADMIN_STRICT_DEPRECATIONS || true)
 
 			if (shouldThrow) {
 				throw new Error(`Support for ${deprecated} was planned to be removed in the ${removal} release. Replace it with ${replacement} instead.`)

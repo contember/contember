@@ -12,6 +12,9 @@ export type LayoutPageStickyContainerProps =
 	}
 	& HTMLDivElementProps
 
+/**
+ * @deprecated Use `LayoutKit` from `@contember/layout` instead.
+ */
 export const LayoutPageStickyContainer = memo(({
 	bottom,
 	className: classNameProp,

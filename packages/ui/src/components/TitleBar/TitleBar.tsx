@@ -1,8 +1,8 @@
 import { useClassNameFactory } from '@contember/react-utils'
 import { ReactNode, memo } from 'react'
+import { LayoutPageStickyContainer } from '../../deprecated/Layout/LayoutPageStickyContainer'
+import type { ThemeScheme } from '../../deprecated/Layout/Types'
 import { ButtonList } from '../Forms'
-import { LayoutPageStickyContainer } from '../Layout/LayoutPageStickyContainer'
-import type { ThemeScheme } from '../Layout/Types'
 
 export interface TitleBarProps extends ThemeScheme {
 	after?: ReactNode

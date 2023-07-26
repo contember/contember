@@ -1,14 +1,13 @@
-import { ColorSchemeContext, useClassNameFactory, useColorScheme } from '@contember/react-utils'
+import { ColorSchemeContext, useClassNameFactory, useColorScheme, useElementTopOffset } from '@contember/react-utils'
 import { colorSchemeClassName, contentThemeClassName, controlsThemeClassName, px } from '@contember/utilities'
 import { ReactNode, memo, useEffect, useRef, useState } from 'react'
+import { SectionTabs, useSectionTabs } from '../../components/SectionTabs'
+import { TitleBar, TitleBarProps } from '../../components/TitleBar'
 import { toEnumClass } from '../../utils'
-import { SectionTabs, useSectionTabs } from '../SectionTabs'
-import { TitleBar, TitleBarProps } from '../TitleBar'
 import { LayoutPageAside } from './LayoutPageAside'
 import { LayoutPageContent, LayoutPageContentProps } from './LayoutPageContent'
 import { useThemeScheme } from './ThemeSchemeContext'
 import { ThemeScheme } from './Types'
-import { useElementTopOffset } from './useElementTopOffset'
 export interface LayoutPageProps extends Omit<TitleBarProps, 'after' | 'children'>, ThemeScheme {
 	afterTitle?: TitleBarProps['after']
 	children?: ReactNode
@@ -19,6 +18,7 @@ export interface LayoutPageProps extends Omit<TitleBarProps, 'after' | 'children
 }
 
 /**
+ * @deprecated Use `LayoutKit` from `@contember/layout` instead.
  * @group Layout UI
  */
 export const LayoutPage = memo(({

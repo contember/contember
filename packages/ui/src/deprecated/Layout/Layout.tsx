@@ -9,6 +9,8 @@ export interface LayoutProps extends LayoutChromeProps {
 /**
  * The `Layout` component is a component that builds main layout of the admin.
  *
+ * @deprecated Use `LayoutKit` from `@contember/layout` instead.
+ *
  * @example
  * ```
  * <Layout

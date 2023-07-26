@@ -84,7 +84,7 @@ export const RepeaterInner = Component<RepeaterInnerProps<any, any>, NonStaticPr
 
 		const isEmpty = entities.length === 0
 		const itemRemovingEnabled = props.enableRemoving !== false
-		const itemAddingEnabled = props.enableAdding !== false && !!props.sortableBy
+		const itemAddingEnabled = props.enableAdding === true && !!props.sortableBy
 
 		const sortableHandle = useCallback<ComponentType<{ children: ReactNode }>>(
 			({ children }) => (

@@ -1,7 +1,5 @@
 import {
 	AnchorButton,
-	Button,
-	CreateNewEntityButtonProps,
 	CreateScope,
 	DataGridScope,
 	DeleteEntityButton,
@@ -19,13 +17,11 @@ import {
 	NumberCell,
 	PersistButton,
 	Repeater,
-	RepeaterItem,
-	RepeaterItemProps,
 	SelectField,
 	TextCell,
 	TextField,
 } from '@contember/admin'
-import { MoreVerticalIcon, TrashIcon } from 'lucide-react'
+import { MoreVerticalIcon } from 'lucide-react'
 import { CategoryForm } from '../components/CategoryForm'
 import { DataGridTile } from '../components/DataGridTile'
 import { Directive } from '../components/Directives'

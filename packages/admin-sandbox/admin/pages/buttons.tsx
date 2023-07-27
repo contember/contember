@@ -1,5 +1,5 @@
 import { Button, ButtonGroup, ButtonList, Select, TextInput } from '@contember/admin'
-import { ArrowRightIcon } from 'lucide-react'
+import { ArrowLeftIcon, ArrowRightIcon } from 'lucide-react'
 import { Fragment } from 'react'
 import { SlotSources } from '../components/Slots'
 
@@ -19,9 +19,10 @@ export default () => (
 						<Button active>Default</Button>
 						<Button>Go <ArrowRightIcon /></Button>
 						<Button disabled>Default</Button>
+						<Button><ArrowLeftIcon /></Button>
 						<Button square><ArrowRightIcon /></Button>
-						<Button square borderRadius="full"><ArrowRightIcon /></Button>
 						<Button square borderRadius="gutter"><ArrowRightIcon /></Button>
+						<Button square borderRadius="full"><ArrowRightIcon /></Button>
 					</Wrapper>
 					Lorem ipsum
 				</div>
@@ -33,9 +34,10 @@ export default () => (
 						<Button distinction="inverse" active>Inverse</Button>
 						<Button distinction="inverse">Go <ArrowRightIcon /></Button>
 						<Button distinction="inverse" disabled>Inverse</Button>
+						<Button distinction="inverse"><ArrowLeftIcon /></Button>
 						<Button distinction="inverse" square><ArrowRightIcon /></Button>
-						<Button distinction="inverse" square borderRadius="full"><ArrowRightIcon /></Button>
 						<Button distinction="inverse" square borderRadius="gutter"><ArrowRightIcon /></Button>
+						<Button distinction="inverse" square borderRadius="full"><ArrowRightIcon /></Button>
 					</Wrapper>
 					Lorem ipsum
 				</div>
@@ -47,9 +49,10 @@ export default () => (
 						<Button distinction="primary" active>Primary</Button>
 						<Button distinction="primary">Go <ArrowRightIcon /></Button>
 						<Button distinction="primary" disabled>Primary</Button>
+						<Button distinction="primary"><ArrowLeftIcon /></Button>
 						<Button distinction="primary" square><ArrowRightIcon /></Button>
-						<Button distinction="primary" square borderRadius="full"><ArrowRightIcon /></Button>
 						<Button distinction="primary" square borderRadius="gutter"><ArrowRightIcon /></Button>
+						<Button distinction="primary" square borderRadius="full"><ArrowRightIcon /></Button>
 					</Wrapper>
 					Lorem ipsum
 				</div>
@@ -61,9 +64,10 @@ export default () => (
 						<Button distinction="seamless" active>Seamless</Button>
 						<Button distinction="seamless">Go <ArrowRightIcon /></Button>
 						<Button distinction="seamless" disabled>Seamless</Button>
+						<Button distinction="seamless"><ArrowLeftIcon /></Button>
 						<Button distinction="seamless" square><ArrowRightIcon /></Button>
-						<Button distinction="seamless" square borderRadius="full"><ArrowRightIcon /></Button>
 						<Button distinction="seamless" square borderRadius="gutter"><ArrowRightIcon /></Button>
+						<Button distinction="seamless" square borderRadius="full"><ArrowRightIcon /></Button>
 					</Wrapper>
 					Lorem ipsum
 				</div>
@@ -75,9 +79,10 @@ export default () => (
 						<Button distinction="outlined" active>Outlined</Button>
 						<Button distinction="outlined">Go <ArrowRightIcon /></Button>
 						<Button distinction="outlined" disabled>Outlined</Button>
+						<Button distinction="outlined"><ArrowLeftIcon /></Button>
 						<Button distinction="outlined" square><ArrowRightIcon /></Button>
-						<Button distinction="outlined" square borderRadius="full"><ArrowRightIcon /></Button>
 						<Button distinction="outlined" square borderRadius="gutter"><ArrowRightIcon /></Button>
+						<Button distinction="outlined" square borderRadius="full"><ArrowRightIcon /></Button>
 					</Wrapper>
 					Lorem ipsum
 				</div>
@@ -89,9 +94,10 @@ export default () => (
 						<Button distinction="toned" active>Toned</Button>
 						<Button distinction="toned">Go <ArrowRightIcon /></Button>
 						<Button distinction="toned" disabled>Toned</Button>
+						<Button distinction="toned"><ArrowLeftIcon /></Button>
 						<Button distinction="toned" square><ArrowRightIcon /></Button>
-						<Button distinction="toned" square borderRadius="full"><ArrowRightIcon /></Button>
 						<Button distinction="toned" square borderRadius="gutter"><ArrowRightIcon /></Button>
+						<Button distinction="toned" square borderRadius="full"><ArrowRightIcon /></Button>
 					</Wrapper>
 					Lorem ipsum
 				</div>

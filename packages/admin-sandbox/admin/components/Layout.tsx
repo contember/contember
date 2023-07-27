@@ -1,8 +1,8 @@
-import { Button, DevPanel, DimensionsSwitcher, Intent, Link, LogoutLink, Radio, Scheme, Spacer, Stack, VisuallyHidden } from '@contember/admin'
+import { Button, DevPanel, DimensionsSwitcher, Intent, Link, LogoutLink, PortalProvider, Radio, Scheme, Spacer, Stack, VisuallyHidden } from '@contember/admin'
 import { Identity2023 } from '@contember/brand'
 import { SafeAreaInsetsProvider } from '@contember/layout'
 import { ColorSchemeProvider, useContainerWidth, useReferentiallyStableCallback, useSessionStorageState } from '@contember/react-utils'
-import { colorSchemeClassName, contentThemeClassName, controlsThemeClassName } from '@contember/utilities'
+import { colorSchemeClassName, contentThemeClassName, controlsThemeClassName, listClassName } from '@contember/utilities'
 import { CircleDashedIcon, LayoutIcon, LogOutIcon, MoonIcon, PaintBucketIcon, SmartphoneIcon, SunIcon } from 'lucide-react'
 import { PropsWithChildren, memo, useMemo, useRef, useState } from 'react'
 import { AlertLogoutLink } from './AlertLogoutLink'
@@ -25,16 +25,17 @@ export const Layout = memo(({ children }: PropsWithChildren) => {
 
 	const safeAreaInsets = directives['safe-area-insets'] ?? 0
 
+	const colorSchemeTheme = listClassName([
+		colorSchemeClassName(scheme),
+		contentThemeClassName(directives['layout.theme-content']),
+		controlsThemeClassName(directives['layout.theme-controls']),
+	])
+
 	return (
 		<SafeAreaInsetsProvider insets={useMemo(() => ({ top: safeAreaInsets, right: safeAreaInsets, left: safeAreaInsets, bottom: safeAreaInsets }), [safeAreaInsets])}>
 			<ColorSchemeProvider scheme={scheme}>
-				<LayoutComponent
-					className={[
-						colorSchemeClassName(scheme),
-						contentThemeClassName(directives['layout.theme-content']),
-						controlsThemeClassName(directives['layout.theme-controls']),
-					]}
-				>
+				<PortalProvider className={colorSchemeTheme}>
+					<LayoutComponent className={colorSchemeTheme}>
 					<SlotSources.Logo>
 						<Link to="index">
 							<Stack align="center" horizontal gap="gap">
@@ -89,6 +90,7 @@ export const Layout = memo(({ children }: PropsWithChildren) => {
 
 					{children}
 				</LayoutComponent>
+				</PortalProvider>
 			</ColorSchemeProvider>
 		</SafeAreaInsetsProvider>
 	)

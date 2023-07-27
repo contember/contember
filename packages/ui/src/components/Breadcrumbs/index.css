@@ -42,6 +42,6 @@
 :where(.cui-breadcrumbs-item a:hover),
 :where(.cui-breadcrumbs-item a:focus) {
 	--cui-breadcrumbs-color: rgb(var(--cui-color-accent-rgb-75));
-	background-color: rgba(var(--cui-background-color-toned-rgb-50), var(--cui-opacity--low));
+	background-color: rgba(var(--cui-background-color-toned-controls-rgb-50), var(--cui-opacity--low));
 	outline: none;
 }

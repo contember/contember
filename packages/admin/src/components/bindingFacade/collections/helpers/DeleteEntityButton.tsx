@@ -1,15 +1,10 @@
 import { EntityAccessor, useEntity, useMutationState } from '@contember/binding'
 import { useColorScheme } from '@contember/react-utils'
-import { Button, ButtonOwnProps, ButtonProps, Icon } from '@contember/ui'
+import { Button, ButtonProps } from '@contember/ui'
 import { colorSchemeClassName, controlsThemeClassName, listClassName } from '@contember/utilities'
+import { Trash2Icon } from 'lucide-react'
 import { ReactNode, memo, useCallback } from 'react'
 import { usePersistWithFeedback } from '../../../ui'
-
-const defaultProps: ButtonOwnProps = {
-	borderRadius: 'full',
-	distinction: 'seamless',
-	square: true,
-}
 
 export type DeleteEntityButtonProps =
 	& {
@@ -52,8 +47,11 @@ export const DeleteEntityButton = memo((props: DeleteEntityButtonProps) => {
 
 	return (
 		<Button
-			distinction="primary"
-			{...defaultProps}
+			square
+			borderRadius="full"
+			distinction="seamless"
+			padding={false}
+			size="small"
 			{...rest}
 			className={listClassName([
 				controlsThemeClassName('danger', ':hover'),
@@ -63,7 +61,7 @@ export const DeleteEntityButton = memo((props: DeleteEntityButtonProps) => {
 			disabled={isMutating || rest.disabled}
 			onClick={onClick}
 		>
-			{children || <Icon blueprintIcon="trash" />}
+			{children || <Trash2Icon />}
 		</Button>
 	)
 })

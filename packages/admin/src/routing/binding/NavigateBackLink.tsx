@@ -1,7 +1,7 @@
-import { Stack, VisuallyHidden } from '@contember/ui'
+import { AnchorButton, Button, Stack, VisuallyHidden } from '@contember/ui'
 import { assert, isNonEmptyTrimmedString } from '@contember/utilities'
 import { ArrowLeftIcon } from 'lucide-react'
-import { ReactNode, memo } from 'react'
+import { ReactNode, memo, useMemo } from 'react'
 import { useMessageFormatter } from '../../i18n'
 import { Link, LinkProps } from './Link'
 
@@ -40,7 +40,7 @@ export const NavigateBackLink = memo<NavigateBackLinkProps>(({
 	assert('ariaLabel to be present when children is empty', finalAriaLabel, isNonEmptyTrimmedString)
 
 	return (
-		<Link {...props} aria-label={finalAriaLabel}>
+		<Link Component={AnchorButton} componentProps={useMemo(() => ({ inset: true, borderRadius: 'full', distinction: 'seamless' }), [])} {...props} aria-label={finalAriaLabel}>
 			<Stack horizontal align="center">
 				{icon ?? <ArrowLeftIcon />}
 				<VisuallyHidden hidden={visuallyHidden}>{children ?? formatMessage('navigationBackLink.back')}</VisuallyHidden>

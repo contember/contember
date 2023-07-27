@@ -6,6 +6,7 @@ import { PortalProviderContext, usePortalProvider } from './contexts'
 export interface PortalProviderProps {
 	id?: string
 	children: ReactNode
+	className?: string
 }
 
 /**
@@ -46,7 +47,7 @@ export const PortalProvider = memo((props: PortalProviderProps) => {
 			<PortalProviderContext.Provider value={portalRootRef}>
 				{props.children}
 			</PortalProviderContext.Provider>
-			<div ref={portalRootRef} id={id} style={{ display: 'contents' }} />
+			<div ref={portalRootRef} className={props.className} id={id} style={{ display: 'contents' }} />
 		</>
 	)
 })

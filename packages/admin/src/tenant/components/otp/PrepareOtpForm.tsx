@@ -51,7 +51,7 @@ export const PrepareOtpForm: FC<PrepareOtpFormProps> = ({ onPrepared, isReSetup,
 						Cancel
 					</Button>
 
-					<Button intent={isReSetup ? 'danger' : 'primary'} distinction="primary" type="submit" disabled={isSubmitting}>
+					<Button intent={isReSetup ? 'danger' : undefined} distinction="primary" type="submit" disabled={isSubmitting}>
 						Continue
 					</Button>
 

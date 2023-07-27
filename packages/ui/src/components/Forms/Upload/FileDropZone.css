@@ -3,7 +3,7 @@
 }
 
 :where(.cui-fileDropZone.is-active) {
-	background-color: rgba(var(--cui-background-color-toned-rgb-25), var(--cui-opacity--low));
+	background-color: rgba(var(--cui-background-color-toned-controls-rgb-25), var(--cui-opacity--low));
 	border-color: rgb(var(--cui-color-accent-rgb-50));
 	border-style: dashed;
 }

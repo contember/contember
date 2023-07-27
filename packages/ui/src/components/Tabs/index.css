@@ -44,7 +44,7 @@
 }
 
 :where(.cui-tab-button:hover .cui-tab-button-label) {
-	background-color: rgba(var(--cui-background-color-toned-rgb-50), var(--cui-opacity--low));
+	background-color: rgba(var(--cui-background-color-toned-controls-rgb-50), var(--cui-opacity--low));
 }
 
 :where(.cui-tab-button:focus) {
@@ -53,7 +53,7 @@
 
 :where(.cui-tab-button.is-focused .cui-tab-button-label),
 :where(.cui-tab-button:focus .cui-tab-button-label) {
-	background-color: rgba(var(--cui-background-color-toned-rgb-50), var(--cui-opacity--low));
+	background-color: rgba(var(--cui-background-color-toned-controls-rgb-50), var(--cui-opacity--low));
 	box-shadow: var(--cui-control-focus-ring-box-shadow);
 }
 

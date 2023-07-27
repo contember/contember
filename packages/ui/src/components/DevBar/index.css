@@ -1,6 +1,6 @@
 :where(.cui-devBar) {
-	--devBar-soft-shadow-color: rgba(var(--cui-background-color-toned-rgb-50), var(--cui-opacity--low));
-	--devBar-control-background-color--highlighted: rgba(var(--cui-background-color-toned-rgb-50), var(--cui-opacity--low));
+	--devBar-soft-shadow-color: rgba(var(--cui-color-accent-rgb-75), var(--cui-opacity--low));
+	--devBar-control-background-color--highlighted: rgba(var(--cui-background-color-toned-controls-rgb-50), var(--cui-opacity--low));
 	--devBar-brand-background-color--highlighted: rgb(var(--cui-background-color-controls-rgb-50));
 	--devBar-padding-vertical: var(--cui-padding, 1rem);
 	--devBar-padding-horizontal: var(--cui-padding, 1rem);
@@ -30,7 +30,7 @@
 	.cui-devBar-panel-content,
 ) {
 	background: rgb(var(--cui-background-color-rgb-50));
-	box-shadow: inset 0 0 0 1px rgba(var(--cui-color-rgb-50), var(--cui-opacity--lower)), 0 1rem 4rem rgba(var(--cui-color-rgb-50), var(--cui-opacity--low));;
+	box-shadow: inset 0 0 0 1px rgba(var(--cui-color-rgb-50), var(--cui-opacity--low)), 0 1rem 4rem rgba(var(--cui-color-rgb-50), var(--cui-opacity--low));;
 	color: rgb(var(--cui-color-rgb-50));
 }
 
@@ -50,7 +50,7 @@
 	.cui-devBar-content:hover,
 	.cui-devBar-content:focus-within,
 ) {
-	box-shadow: inset 0 0 0 1px rgba(var(--cui-color-rgb-50), var(--cui-opacity--lower)), 0 1rem 4rem var(--devBar-soft-shadow-color);
+	box-shadow: inset 0 0 0 1px rgba(var(--cui-color-rgb-50), var(--cui-opacity--low)), 0 1rem 4rem var(--devBar-soft-shadow-color);
 
 }
 :where(
@@ -81,7 +81,7 @@
 	.cui-devBar-close:hover,
 	.cui-devBar-close:focus-visible,
 ) {
-	color: rgb(var(--cui-color-toned-rgb-50));
+	color: rgb(var(--cui-color-toned-controls-rgb-50));
 	background-color: var(--devBar-control-background-color--highlighted);
 }
 
@@ -130,13 +130,13 @@
 	.cui-devBar-trigger-label:focus-visible,
 	.cui-devBar-trigger[data-expanded] > .cui-devBar-trigger-label,
 ) {
-	color: rgb(var(--cui-color-toned-rgb-50));
+	color: rgb(var(--cui-color-toned-controls-rgb-50));
 	background-color: var(--devBar-control-background-color--highlighted);
 }
 :where(
 	.cui-devBar-trigger[data-expanded] > .cui-devBar-trigger-label,
 ) {
-	box-shadow: inset 0 1px 0 0px rgba(var(--cui-color-rgb-50), var(--cui-opacity--lower));
+	box-shadow: inset 0 1px 0 0px rgba(var(--cui-color-rgb-50), var(--cui-opacity--low));
 }
 
 :where(.cui-devBar-panel) {

@@ -2168,6 +2168,8 @@ export interface PortalProviderProps {
     // (undocumented)
     children: ReactNode;
     // (undocumented)
+    className?: string;
+    // (undocumented)
     id?: string;
 }
 

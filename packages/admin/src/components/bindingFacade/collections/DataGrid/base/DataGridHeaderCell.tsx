@@ -1,9 +1,9 @@
 import type { Environment } from '@contember/binding'
 import { ActionableBox, Box, Dropdown, DropdownProps, Icon, Justification, TableHeaderCell } from '@contember/ui'
-import { ComponentType, createElement, ReactElement, ReactNode, useMemo } from 'react'
+import { ComponentType, ReactElement, ReactNode, createElement, useMemo } from 'react'
 import type { FilterRendererProps } from './DataGridColumn'
 import type { DataGridFilterArtifact } from './DataGridFilterArtifact'
-import { cycleOrderDirection, DataGridOrderDirection } from './DataGridOrderDirection'
+import { DataGridOrderDirection, cycleOrderDirection } from './DataGridOrderDirection'
 import type { DataGridSetFilter } from './DataGridSetFilter'
 import type { DataGridSetOrderBy } from './DataGridSetOrderBy'
 
@@ -44,7 +44,7 @@ export function DataGridHeaderCell({
 	shrunk,
 }: DataGridHeaderCellProps): ReactElement {
 	const buttonProps: DropdownProps['buttonProps'] = useMemo(() => ({
-		intent: hasFilter ? 'primary' : 'default',
+		intent: hasFilter ? undefined : 'default',
 		distinction: 'seamless',
 		size: 'small',
 		children: (

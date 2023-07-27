@@ -31,7 +31,7 @@ export function DataGridFullFilters({
 	const hasAnyFilters = Object.keys(desiredState.filterArtifacts).length > 0
 
 	const columnFilteringButtonProps: DropdownProps['buttonProps'] = useMemo(() => ({
-		intent: hasAnyFilters ? 'primary' : 'default',
+		intent: hasAnyFilters ? undefined : 'default',
 		distinction: 'seamless',
 		children: (
 			<>

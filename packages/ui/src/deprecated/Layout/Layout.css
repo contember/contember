@@ -60,15 +60,20 @@
 
 :where(.cui-legacy-layout .cui-menu-section) {
 	margin-left: var(--cui-edge-offset-left);
+	margin-bottom: var(--cui-screen-gap);
+	padding-top: var(--cui-gap);
 }
 
 :where(.cui-legacy-layout .cui-menu-group-title-content) {
-	margin: 0 calc(-2 * var(--cui-screen-gap));
-	padding: calc(2 * var(--cui-screen-gap));
+	padding: calc(2 * var(--cui-gap));
+}
+
+:where(.cui-legacy-layout .cui-menu-section-title-content) {
+	padding: calc(2 * var(--cui-gap));
 }
 
 :where(.cui-legacy-layout .cui-menu-section)::after {
-	border-bottom: 1px solid rgba(var(--cui-color-rgb-50), var(--cui-opacity--lower));
+	border-bottom: 1px solid rgba(var(--cui-color-rgb-50), var(--cui-opacity--low));
 	content: "";
 	display: block;
 	left: var(--cui-screen-padding-horizontal);
@@ -78,17 +83,13 @@
 }
 
 :where(.cui-legacy-layout .cui-menu-section-title) {
-	margin-bottom: var(--cui-screen-gap);
-	margin-left: var(--cui-screen-padding-horizontal);
+	margin-left: calc(var(--cui-screen-padding-horizontal) - 2 * var(--cui-gap));
 	margin-right: var(--cui-screen-padding-horizontal);
-	margin-top: var(--cui-screen-gap);
-	padding-bottom: var(--cui-gap);
-	padding-top: var(--cui-gap);
 }
 
 :where(.cui-legacy-layout .cui-menu-section-list) {
 	margin-bottom: 0;
-	margin-left: var(--cui-screen-padding-horizontal);
+	margin-left: calc(var(--cui-screen-padding-horizontal) - 2 * var(--cui-gap));
 	margin-right: var(--cui-screen-padding-horizontal);
 }
 

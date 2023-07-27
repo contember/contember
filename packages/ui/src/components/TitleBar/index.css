@@ -4,7 +4,7 @@
 	--cui-title-bar-padding-right: var(--cui-layout-page-padding-right);
 	--cui-title-bar-gap: calc(var(--cui-layout-section-gap) / 2);
 	align-items: stretch;
-	background-color: rgb(var(--cui-background-color-rgb-25));
+	background-color: rgb(var(--cui-background-color-rgb-50));
 	display: flex;
 	flex-direction: column;
 	gap: var(--cui-title-bar-gap);
@@ -27,7 +27,7 @@
 	left: 0;
 	right: 0;
 	bottom: 0;
-	border-bottom: var(--cui-border-width, 1px) solid rgba(var(--cui-color-rgb-50), var(--cui-opacity--lower));
+	border-bottom: var(--cui-border-width, 1px) solid rgba(var(--cui-color-rgb-50), var(--cui-opacity--low));
 }
 
 :where(.cui-titleBar-in) {

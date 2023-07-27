@@ -54,7 +54,7 @@
 	height: var(--cui-menu-expand-toggle-size);
 	padding: 0;
 	position: absolute;
-	right: calc(100% + 1.5 * var(--cui-gap));
+	right: 100%;
 	width: var(--cui-menu-expand-toggle-size);
 }
 

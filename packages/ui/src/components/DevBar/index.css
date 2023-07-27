@@ -1,6 +1,6 @@
 :where(.cui-devBar) {
-	--devBar-soft-shadow-color: rgba(var(--cui-background-color-toned-rgb-50), var(--cui-opacity--low));
-	--devBar-control-background-color--highlighted: rgba(var(--cui-background-color-toned-rgb-50), var(--cui-opacity--low));
+	--devBar-soft-shadow-color: rgba(var(--cui-background-color-toned-controls-rgb-50), var(--cui-opacity--low));
+	--devBar-control-background-color--highlighted: rgba(var(--cui-background-color-toned-controls-rgb-50), var(--cui-opacity--low));
 	--devBar-brand-background-color--highlighted: rgb(var(--cui-background-color-controls-rgb-50));
 	--devBar-padding-vertical: var(--cui-padding, 1rem);
 	--devBar-padding-horizontal: var(--cui-padding, 1rem);
@@ -81,7 +81,7 @@
 	.cui-devBar-close:hover,
 	.cui-devBar-close:focus-visible,
 ) {
-	color: rgb(var(--cui-color-toned-rgb-50));
+	color: rgb(var(--cui-color-toned-controls-rgb-50));
 	background-color: var(--devBar-control-background-color--highlighted);
 }
 
@@ -130,7 +130,7 @@
 	.cui-devBar-trigger-label:focus-visible,
 	.cui-devBar-trigger[data-expanded] > .cui-devBar-trigger-label,
 ) {
-	color: rgb(var(--cui-color-toned-rgb-50));
+	color: rgb(var(--cui-color-toned-controls-rgb-50));
 	background-color: var(--devBar-control-background-color--highlighted);
 }
 :where(

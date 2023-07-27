@@ -1,7 +1,7 @@
 :where(.cui-button) {
-	--cui-button-background-color--disabled: rgba(var(--cui-background-color-toned-rgb-75), var(--cui-opacity--lower));
-	--cui-button-background-color--highlighted: rgba(var(--cui-background-color-toned-rgb-75), var(--cui-opacity--low));
-	--cui-button-background-color--pressed: rgba(var(--cui-background-color-toned-rgb-75), var(--cui-opacity--medium));
+	--cui-button-background-color--disabled: rgba(var(--cui-background-color-toned-controls-rgb-75), var(--cui-opacity--lower));
+	--cui-button-background-color--highlighted: rgba(var(--cui-background-color-toned-controls-rgb-75), var(--cui-opacity--low));
+	--cui-button-background-color--pressed: rgba(var(--cui-background-color-toned-controls-rgb-75), var(--cui-opacity--medium));
 	--cui-button-background-color: rgb(var(--cui-background-color-rgb-75));
 	--cui-button-border-color--disabled: rgba(var(--cui-color-rgb-50), var(--cui-opacity--lower));
 	--cui-button-border-color--highlighted: rgba(var(--cui-color-accent-rgb-50), var(--cui-opacity--medium));
@@ -18,7 +18,7 @@
 	--cui-button-box-shadow: var(--cui-button-box-shadow-shadow-below), var(--cui-button-box-shadow-dark-edge-bottom);
 	--cui-button-color--disabled: rgba(var(--cui-color-accent-rgb-50), var(--cui-opacity--low));
 	--cui-button-color--highlighted: rgb(var(--cui-color-accent-rgb-75));
-	--cui-button-color--pressed: rgb(var(--cui-color-toned-rgb-100));
+	--cui-button-color--pressed: rgb(var(--cui-color-toned-controls-rgb-100));
 	--cui-button-color-rgb: var(--cui-color-accent-rgb-50);
 	--cui-button-color: rgb(var(--cui-button-color-rgb));
 	--cui-button-gap: var(--cui-gap);
@@ -28,7 +28,7 @@
 	--cui-button-inset-vertical: var(--cui-button-inset);
 	--cui-button-optical-size: 0px;
 	--cui-button-label-font-size: var(--cui-font-size-label);
-	--cui-button-line-height: 1.125;
+	--cui-button-line-height: var(--cui-line-height-controls);
 	--cui-button-padding: 0px;
 	--cui-button-padding-horizontal: var(--cui-button-padding);
 	--cui-button-padding-vertical: var(--cui-button-padding);
@@ -46,8 +46,7 @@
 	font-family: inherit;
 	font-size: unset;
 	font-weight: 600;
-	gap: var(--cui-gap);
-	height: var(--cui-button-height);
+	min-height: var(--cui-button-height);
 	margin:
 		calc(-1 * var(--cui-button-inset-vertical) - 1 * var(--cui-button-optical-size))
 		calc(-1 * var(--cui-button-inset-horizontal) - 1 * var(--cui-button-optical-size));
@@ -112,7 +111,7 @@
 	position: relative;
 }
 
-:where(.cui-button[data-padding]) { --cui-button-padding: calc(3 * var(--cui-button-gap) - var(--cui-border-width, 1px)) }
+:where(.cui-button[data-padding]) { --cui-button-padding: calc(2.25 * var(--cui-button-gap) - var(--cui-border-width, 1px)) }
 :where(.cui-button[data-padding="gap"]) { --cui-button-padding: calc(var(--cui-button-gap) - var(--cui-border-width, 1px)) }
 :where(.cui-button[data-padding="gutter"]) { --cui-button-padding: calc(var(--cui-gutter) - var(--cui-border-width, 1px)) }
 :where(.cui-button[data-padding="padding"]) { --cui-button-padding: calc(var(--cui-padding) - var(--cui-border-width, 1px)) }
@@ -139,13 +138,13 @@
 }
 
 :where(.cui-button[data-distinction="inverse"]) {
-	--cui-button-background-color--highlighted: rgb(var(--cui-background-color-inverse-rgb-75));
-	--cui-button-background-color--pressed: rgb(var(--cui-background-color-inverse-rgb-100));
-	--cui-button-background-color: rgb(var(--cui-background-color-inverse-rgb-50));
-	--cui-button-border-color--pressed: rgb(var(--cui-background-color-inverse-rgb-75));
-	--cui-button-color--highlighted: rgb(var(--cui-color-inverse-rgb-75));
-	--cui-button-color--pressed: rgb(var(--cui-color-inverse-rgb-75));
-	--cui-button-color-rgb: var(--cui-color-inverse-rgb-50);
+	--cui-button-background-color--highlighted: rgb(var(--cui-background-color-controls-inverse-rgb-75));
+	--cui-button-background-color--pressed: rgb(var(--cui-background-color-controls-inverse-rgb-100));
+	--cui-button-background-color: rgb(var(--cui-background-color-controls-inverse-rgb-50));
+	--cui-button-border-color--pressed: rgb(var(--cui-background-color-controls-inverse-rgb-75));
+	--cui-button-color--highlighted: rgb(var(--cui-color-controls-inverse-rgb-75));
+	--cui-button-color--pressed: rgb(var(--cui-color-controls-inverse-rgb-75));
+	--cui-button-color-rgb: var(--cui-color-controls-inverse-rgb-50);
 }
 
 :where(.cui-button[data-distinction="primary"]) {
@@ -154,20 +153,20 @@
 	--cui-button-background-color: rgb(var(--cui-background-color-controls-rgb-50));
 	--cui-button-border-color--pressed: rgb(var(--cui-background-color-controls-rgb-0));
 	--cui-button-color--highlighted: rgb(var(--cui-color-controls-rgb-75));
-	--cui-button-color--pressed: rgb(var(--cui-color-controls-rgb-75));
+	--cui-button-color--pressed: rgb(var(--cui-color-controls-rgb-100));
 	--cui-button-color-rgb: var(--cui-color-controls-rgb-50);
 }
 
 :where(.cui-button[data-distinction="toned"]) {
-	--cui-button-background-color--highlighted: rgba(var(--cui-background-color-toned-rgb-50), var(--cui-opacity--low));
-	--cui-button-background-color--pressed: rgba(var(--cui-background-color-toned-rgb-50), var(--cui-opacity--medium));
-	--cui-button-background-color: rgba(var(--cui-background-color-toned-rgb-50), var(--cui-opacity--lower));
-	--cui-button-border-color--pressed: rgb(var(--cui-color-toned-rgb-100));
+	--cui-button-background-color--highlighted: rgba(var(--cui-background-color-toned-controls-rgb-50), var(--cui-opacity--low));
+	--cui-button-background-color--pressed: rgba(var(--cui-background-color-toned-controls-rgb-50), var(--cui-opacity--medium));
+	--cui-button-background-color: rgba(var(--cui-background-color-toned-controls-rgb-50), var(--cui-opacity--lower));
+	--cui-button-border-color--pressed: rgb(var(--cui-color-toned-controls-rgb-100));
 	--cui-button-border-width: 0px;
 	--cui-button-box-shadow--highlighted: 0 0 transparent;
 	--cui-button-box-shadow: var(--cui-button-box-shadow-shadow-below);
-	--cui-button-color--highlighted: rgb(var(--cui-color-toned-rgb-75));
-	--cui-button-color-rgb: var(--cui-color-toned-rgb-50);
+	--cui-button-color--highlighted: rgb(var(--cui-color-toned-controls-rgb-75));
+	--cui-button-color-rgb: var(--cui-color-toned-controls-rgb-50);
 }
 
 :where(.cui-button[data-distinction="outlined"]) {

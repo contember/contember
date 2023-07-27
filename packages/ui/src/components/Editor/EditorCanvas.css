@@ -102,7 +102,7 @@
 }
 
 :where(.cui-editorCanvas-canvas em) {
-	--cui-editorCanvas-canvas-em-highlight-color: var(--cui-background-color-toned-rgb-75);
+	--cui-editorCanvas-canvas-em-highlight-color: var(--cui-background-color-toned-controls-rgb-75);
 	color: rgb(var(--cui-color-rgb-0));
 	background-color: rgb(var(--cui-editorCanvas-canvas-em-highlight-color), var(--cui-opacity--medium, 0.5));
 	font-style: normal;

@@ -63,7 +63,7 @@
 
 :where(.cui-table-row.with-hover:hover),
 :where(.cui-table-row.with-hover:hover > .cui-table-cell) {
-	background-color: rgba(var(--cui-background-color-toned-rgb-50), var(--cui-opacity--lower));
+	background-color: rgba(var(--cui-background-color-toned-controls-rgb-50), var(--cui-opacity--lower));
 	color: rgb(var(--cui-color-accent-rgb-50));
 	cursor: pointer;
 }
@@ -75,7 +75,7 @@
 }
 
 :where(.cui-table-row.is-active) {
-	background-color: rgba(var(--cui-background-color-toned-rgb-50), var(--cui-opacity--low));
+	background-color: rgba(var(--cui-background-color-toned-controls-rgb-50), var(--cui-opacity--low));
 	color: rgb(var(--cui-color-accent-rgb-75));
 }
 

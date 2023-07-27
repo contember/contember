@@ -58,7 +58,11 @@ const ArticleSidebarForm = Component(() => <>
 	<MultiSelectField
 		label={'tags'}
 		field={'tags'}
-		options={`Tag.locales(locale.code = 'cs').name`}
+		// options={`Tag.locales(locale.code = 'cs').name`}
+		options={{
+			fields: 'Tag.name',
+			orderBy: 'name desc',
+		}}
 		lazy
 	/>
 	<MultiSelectField

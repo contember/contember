@@ -51,3 +51,7 @@
 :where(:where(.cui-repeater-item-container-index))::before {
 	content: "#";
 }
+
+:where(.cui-field-container-body-content > .cui-stack > .cui-new-entity-button[data-distinction="seamless"]:last-child) {
+	margin-bottom: calc(-3 * var(--cui-gap));
+}

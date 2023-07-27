@@ -44,18 +44,18 @@ export const DataGridContainerHeader = memo<DataGridContainerHeaderProps>(({
 			right="var(--cui-layout-page-padding-right)"
 		>
 			<Stack wrap align="center" horizontal justify="space-between">
-				<Stack gap="gap" horizontal>
+				<Stack gap="gutter" horizontal>
 					{hasTile && <>
 						<ButtonList gap="gutter">
-							<Button inset="gap" onClick={setTileView} size="small" distinction="seamless" intent={layout === 'tiles' ? 'primary' : 'default'}>
+							<Button inset="gap" onClick={setTileView} size="small" distinction="seamless" intent={layout === 'tiles' ? undefined : 'default'}>
 								<Icon blueprintIcon="grid-view" />
 							</Button>
-							<Button inset="gap" onClick={setDefaultView} size="small" distinction="seamless" intent={layout === 'default' ? 'primary' : 'default'}>
+							<Button inset="gap" onClick={setDefaultView} size="small" distinction="seamless" intent={layout === 'default' ? undefined : 'default'}>
 								<Icon blueprintIcon="list" />
 							</Button>
 						</ButtonList>
 
-						<Divider />
+						<Divider gap="gap" />
 					</>}
 					{layout !== 'tiles' && allowColumnVisibilityControls !== false && (
 							<DataGridColumnHiding

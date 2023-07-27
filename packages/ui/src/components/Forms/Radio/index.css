@@ -9,7 +9,7 @@
 	--control-font-size: var(--cui-font-size-controls);
 	display: inline-flex;
 	flex-direction: column;
-	gap: calc(3 * var(--cui-gap));
+	gap: var(--cui-padding);
 	position: relative;
 }
 
@@ -94,4 +94,8 @@
 
 :where(.cui-radio-button.is-checked)::after {
 	transform: scale(var(--button-knob-scale));
+}
+
+:where(.cui-radio-control .cui-field-container-header) {
+	font-weight: unset;
 }

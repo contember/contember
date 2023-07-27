@@ -16,7 +16,7 @@ export type DividerProps =
 /**
  * @group UI
  */
-export const Divider = memo(({ className, componentClassName = 'divider', gap, ...rest }: DividerProps) => {
+export const Divider = memo(({ className, componentClassName = 'divider', gap = true, ...rest }: DividerProps) => {
 	deprecate('1.3.0', gap === 'none', '`gap="none"`', '`gap={false}`')
 	gap = fallback(gap, gap === 'none', false)
 

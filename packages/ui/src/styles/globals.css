@@ -175,7 +175,7 @@
 :where(.cui-textarea-input:focus),
 :where(.cui-text-input:focus),
 :where(.cui-editorCanvas:focus) {
-	border-color: rgb(var(--cui-color-controls-rgb-50));
+	border-color: rgb(var(--cui-color-accent-rgb-50));
 }
 
 :where(.cui-textarea-input:focus:focus-visible),

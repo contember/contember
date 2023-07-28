@@ -12,6 +12,7 @@ export const loadSchema = async (project: Project): Promise<Schema> => {
 		bundle: true,
 		treeShaking: true,
 		write: false,
+		loader: { '.sql': 'text' },
 		external: ['@contember/admin', 'react', 'react/jsx-runtime'],
 	})
 	const bundledJs = response.outputFiles[0].text

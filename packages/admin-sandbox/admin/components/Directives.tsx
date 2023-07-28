@@ -20,7 +20,7 @@ export const initialDirectives: DirectivesType = Object.freeze({
 	'content-max-width': LAYOUT_BREAKPOINT,
 	'layout': 'default',
 	'layout.theme-content': 'default',
-	'layout.theme-controls': 'primary',
+	'layout.theme-controls': 'accent',
 	'safe-area-insets': 20,
 })
 

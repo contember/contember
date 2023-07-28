@@ -199,7 +199,7 @@ export const ThemeDevPanel = () => {
 							value={contentTheme ?? ''}
 							options={[
 								{ label: 'None', value: '' },
-								{ label: 'Default', value: 'default' },
+								{ label: 'Accent', value: 'accent' },
 								{ label: 'Primary', value: 'primary' },
 								{ label: 'Secondary', value: 'secondary' },
 								{ label: 'Tertiary', value: 'tertiary' },
@@ -207,6 +207,7 @@ export const ThemeDevPanel = () => {
 								{ label: 'Success', value: 'success' },
 								{ label: 'Warning', value: 'warn' },
 								{ label: 'Danger', value: 'danger' },
+								{ label: 'Default', value: 'default' },
 							] satisfies { label: string; value: Intent | '' }[]}
 							onChange={value => value ? setContentTheme(value as Intent) : setContentTheme(undefined)}
 						/>
@@ -218,7 +219,7 @@ export const ThemeDevPanel = () => {
 							value={controlsTheme ?? ''}
 							options={[
 								{ label: 'None', value: '' },
-								{ label: 'Default', value: 'default' },
+								{ label: 'Accent', value: 'accent' },
 								{ label: 'Primary', value: 'primary' },
 								{ label: 'Secondary', value: 'secondary' },
 								{ label: 'Tertiary', value: 'tertiary' },
@@ -226,6 +227,7 @@ export const ThemeDevPanel = () => {
 								{ label: 'Success', value: 'success' },
 								{ label: 'Warning', value: 'warn' },
 								{ label: 'Danger', value: 'danger' },
+								{ label: 'Default', value: 'default' },
 							] satisfies { label: string; value: Intent | '' }[]}
 							onChange={value => value ? setControlsTheme(value as Intent) : setControlsTheme(undefined)}
 						/>

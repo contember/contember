@@ -1797,7 +1797,7 @@ export type InputValueProps<T, E extends HTMLElement> = ControlStateProps & Cont
 };
 
 // @public (undocumented)
-export type Intent = Default | 'primary' | 'secondary' | 'tertiary' | 'positive' | 'success' | 'warn' | 'danger';
+export type Intent = Default | 'accent' | 'primary' | 'secondary' | 'tertiary' | 'positive' | 'success' | 'warn' | 'danger';
 
 // @public (undocumented)
 export const InternalTextInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<string> & ControlValueProps<string> & {

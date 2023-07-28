@@ -19,6 +19,11 @@
 	margin: 0;
 }
 
+:where(.cui-menu-section .cui-collapsible .cui-collapsible-content) {
+	padding-left: calc(1 * var(--cui-gap));
+	padding-bottom: calc(3 * var(--cui-gap));
+}
+
 :where(.cui-menu-group[aria-disabled="true"]) {
 	color: rgba(var(--cui-color-rgb-50), var(--cui-opacity--low));
 }
@@ -128,7 +133,7 @@
 
 :where(.cui-menu-section-list) {
 	list-style: none;
-	padding: 0;
+	padding: 0 0 0 calc(4 * var(--cui-gap));
 }
 
 :where(.cui-menu-group-list) {

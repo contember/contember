@@ -3,14 +3,16 @@ import { RepeaterItemContainer, RepeaterItemContainerProps } from '@contember/ui
 import { memo, ReactNode } from 'react'
 import { DeleteEntityButton } from '../helpers'
 
-export interface RepeaterItemProps extends Omit<RepeaterItemContainerProps, 'children' | 'index' | 'label'> {
+export type RepeaterItemOwnProps = {
 	label: ReactNode
 	children: ReactNode
-	canBeRemoved: boolean
+	canBeRemoved?: boolean
 	index: number
 	dragHandleComponent?: RepeaterItemContainerProps['dragHandleComponent']
 	removalType: RemovalType
 }
+
+export interface RepeaterItemProps extends Omit<RepeaterItemContainerProps, keyof RepeaterItemOwnProps>, RepeaterItemOwnProps { }
 
 export const RepeaterItem = memo(
 	({ children, canBeRemoved, label, removalType, dragHandleComponent, index, ...rest }: RepeaterItemProps) => {

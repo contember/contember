@@ -115,9 +115,7 @@ export const RepeaterInner = Component<RepeaterInnerProps<any, any>, NonStaticPr
 								{...props.itemComponentExtraProps!}
 								label={label}
 								index={i}
-								createNewEntity={createNewEntity}
 								removalType={removalType}
-								canBeAdded={itemAddingEnabled}
 								canBeRemoved={itemRemovingEnabled}
 								dragHandleComponent={undefined}
 							>
@@ -163,7 +161,6 @@ export const RepeaterInner = Component<RepeaterInnerProps<any, any>, NonStaticPr
 										index={i}
 										createNewEntity={createNewEntity}
 										removalType={removalType}
-										canBeAdded={itemAddingEnabled}
 										canBeRemoved={itemRemovingEnabled}
 										dragHandleComponent={useDragHandle ? sortableHandle : undefined}
 									>

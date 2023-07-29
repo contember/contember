@@ -1,5 +1,6 @@
 import { NestedClassName, colorSchemeClassName, deduplicateClassName, filterThemedClassName, flatClassNameList } from '@contember/utilities'
 import { useContext } from 'react'
+import { useReferentiallyStableCallback } from '../referentiallyStable'
 import { GlobalClassNamePrefixContext } from './GlobalClassNamePrefixContext'
 import { useColorScheme } from './contexts'
 
@@ -17,7 +18,7 @@ export function useThemedClassNameFactory(
 
 	const colorScheme = colorSchemeClassName(useColorScheme())
 
-	return function componentClassNameFor(
+	function componentClassNameFor(
 		suffix: string | null | undefined = null,
 		additionalClassName: NestedClassName = null,
 	): string {
@@ -38,4 +39,6 @@ export function useThemedClassNameFactory(
 			),
 		)).join(' ')
 	}
+
+	return useReferentiallyStableCallback(componentClassNameFor)
 }

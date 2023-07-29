@@ -1,5 +1,6 @@
 import { NestedClassName, deduplicateClassName, flatClassNameList } from '@contember/utilities'
 import { useContext } from 'react'
+import { useReferentiallyStableCallback } from '../referentiallyStable'
 import { GlobalClassNamePrefixContext } from './GlobalClassNamePrefixContext'
 
 /**
@@ -28,7 +29,7 @@ export function useClassNameFactory(
 		componentClassName => `${classNamePrefix}${componentClassName}`,
 	)
 
-	return function componentClassNameFor(
+	function componentClassNameFor(
 		suffix: string | null | undefined = null,
 		additionalClassName: NestedClassName = null,
 	): string {
@@ -44,4 +45,6 @@ export function useClassNameFactory(
 			flatClassNameList(additionalClassName),
 		)).join(' ')
 	}
+
+	return useReferentiallyStableCallback(componentClassNameFor)
 }

@@ -63,12 +63,12 @@
 
 :where(.cui-button[data-square]) {
 	--cui-button-optical-grow: 0;
-	--cui-button-size-square: calc(var(--cui-button-height) * (1 + 2 * var(--cui-button-optical-grow)));
-	--cui-button-optical-size: calc(var(--cui-button-height) * var(--cui-button-optical-grow));
-	height: var(--cui-button-size-square);
-	min-height: var(--cui-button-size-square);
-	min-width: var(--cui-button-size-square);
-	width: var(--cui-button-size-square);
+	--cui-button-size-square: calc(1em + var(--cui-button-border-width) + 2 * var(--cui-button-padding));
+	--cui-button-optical-size: calc(var(--cui-button-size-square) * var(--cui-button-optical-grow));
+	height: calc(var(--cui-button-size-square) + 2 * var(--cui-button-optical-size));
+	min-height: calc(var(--cui-button-size-square) + 2 * var(--cui-button-optical-size));
+	min-width: calc(var(--cui-button-size-square) + 2 * var(--cui-button-optical-size));
+	width: calc(var(--cui-button-size-square) + 2 * var(--cui-button-optical-size));
 }
 
 :where(.cui-button[data-border-radius]) { --cui-button-border-radius: var(--cui-border-radius-controls) }
@@ -111,7 +111,7 @@
 	position: relative;
 }
 
-:where(.cui-button[data-padding]) { --cui-button-padding: calc(2.25 * var(--cui-button-gap) - var(--cui-border-width, 1px)) }
+:where(.cui-button[data-padding]) { --cui-button-padding: calc(2.75 * var(--cui-button-gap) - var(--cui-border-width, 1px)) }
 :where(.cui-button[data-padding="gap"]) { --cui-button-padding: calc(var(--cui-button-gap) - var(--cui-border-width, 1px)) }
 :where(.cui-button[data-padding="gutter"]) { --cui-button-padding: calc(var(--cui-gutter) - var(--cui-border-width, 1px)) }
 :where(.cui-button[data-padding="padding"]) { --cui-button-padding: calc(var(--cui-padding) - var(--cui-border-width, 1px)) }
@@ -124,7 +124,6 @@
 :where(.cui-button[data-size="small"]),
 :where(.cui-button-list[data-size="small"] .cui-button),
 :where(.cui-button-group[data-size="small"] .cui-button) {
-	--cui-button-height: var(--cui-size-controls-small);
 	--cui-button-size-horizontal: 0.5;
 	--cui-button-size-vertical: 0.5;
 }
@@ -133,7 +132,6 @@
 :where(.cui-button-list[data-size="large"] .cui-button),
 :where(.cui-button-group[data-size="large"] .cui-button) {
 	--cui-button-label-font-size: var(--cui-font-size-body);
-	--cui-button-height: var(--cui-size-controls-large);
 	--cui-button-size-horizontal: 2;
 }
 

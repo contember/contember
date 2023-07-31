@@ -3,6 +3,9 @@ import { createPortal } from 'react-dom'
 import { usePortalsRegistryContext } from './contexts'
 import { SourcePortalProps } from './types'
 
+/**
+ * @group Layout
+ */
 export const Source = memo<SourcePortalProps>(({ name, children }) => {
 	const { getTarget, registerSlotSource, unregisterSlotSource } = usePortalsRegistryContext()
 

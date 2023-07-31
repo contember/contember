@@ -301,7 +301,7 @@ export type CardProps = Omit<CommonCardProps, 'type'> & Omit<HTMLDivElementProps
     onClick?: () => void;
 };
 
-// @public (undocumented)
+// @public
 export const Checkbox: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<boolean> & ControlValueProps<boolean> & {
 CheckboxButtonComponent?: (({ id, name, placeholder, checked, indeterminate, style, ...props }: CheckboxButtonProps) => JSX.Element) | undefined;
 children?: undefined;
@@ -2146,7 +2146,7 @@ withTopToolbar?: boolean | undefined;
 // @public (undocumented)
 export type PasswordInputProps = TextInputProps;
 
-// @public (undocumented)
+// @public
 export const Portal: MemoExoticComponent<({ children, to }: PortalProps) => ReactPortal>;
 
 // @public (undocumented)
@@ -2157,7 +2157,7 @@ export interface PortalProps {
     to?: HTMLElement;
 }
 
-// @public (undocumented)
+// @public
 export const PortalProvider: MemoExoticComponent<(props: PortalProviderProps) => JSX.Element>;
 
 // @public (undocumented)
@@ -2503,7 +2503,7 @@ export type SpacerProps = ComponentClassNameProps & Omit<HTMLDivElementProps, 'r
 // @public (undocumented)
 export const Spinner: MemoExoticComponent<() => JSX.Element>;
 
-// @public (undocumented)
+// @public
 export const SpinnerContainer: MemoExoticComponent<({ enabled, children, size }: SpinnerContainerProps) => JSX.Element>;
 
 // @public (undocumented)
@@ -2514,7 +2514,7 @@ export interface SpinnerContainerProps extends SpinnerOverlayProps {
     enabled?: boolean;
 }
 
-// @public (undocumented)
+// @public
 export const SpinnerOverlay: MemoExoticComponent<({ size }: SpinnerOverlayProps) => JSX.Element>;
 
 // @public (undocumented)

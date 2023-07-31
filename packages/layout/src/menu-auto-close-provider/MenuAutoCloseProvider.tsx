@@ -1,6 +1,6 @@
 import { useExpectSameValueReference } from '@contember/react-utils'
 import { NavigationContext, PreventCloseContext } from '@contember/ui'
-import { ReactNode, useCallback, useContext, useEffect, useRef } from 'react'
+import { ReactElement, ReactNode, useCallback, useContext, useEffect, useRef } from 'react'
 
 export type MenuAutoCloseProviderProps = {
 	children: ReactNode;
@@ -9,7 +9,10 @@ export type MenuAutoCloseProviderProps = {
 
 const PREVENT_HAPPENED_RECENTLY = 100
 
-export function MenuAutoCloseProvider({ children, onAutoClose }: MenuAutoCloseProviderProps): JSX.Element {
+/**
+ * @group Layout
+ */
+export function MenuAutoCloseProvider({ children, onAutoClose }: MenuAutoCloseProviderProps): ReactElement {
 	const onAutoCloseRef = useRef(onAutoClose)
 
 	useExpectSameValueReference(onAutoCloseRef.current)

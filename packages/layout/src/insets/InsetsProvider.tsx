@@ -21,6 +21,9 @@ export type InsetsProviderComponentType = (<C extends ElementType = 'div'>(
 	displayName?: string | undefined;
 }
 
+/**
+ * @group Layout
+ */
 export const InsetsProvider: InsetsProviderComponentType = memo(forwardRef(<C extends ElementType = 'div'>({
 	as,
 	bottom,

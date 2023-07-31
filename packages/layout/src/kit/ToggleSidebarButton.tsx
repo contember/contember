@@ -6,6 +6,9 @@ import { useGetLayoutPanelsStateContext, useSetLayoutPanelsStateContext } from '
 import { getLayoutPanelId } from '../primitives/getPanelId'
 import { ToggleSidebarButtonProps } from './Types'
 
+/**
+ * @group Layout
+ */
 export const ToggleSidebarButton = memo<ToggleSidebarButtonProps>(({
 	className: classNameProp,
 	componentClassName = 'toggle-sidebar-button',

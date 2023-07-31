@@ -6,9 +6,9 @@ import { Spinner } from '../Spinner/Spinner'
 import { SpinnerOverlayProps } from './types'
 
 /**
- * @group UI
- *
  * An overlay with a spinner.
+ *
+ * @group UI
  */
 export const SpinnerOverlay = memo(({ size }: SpinnerOverlayProps) => (
 	<Aether className={useClassName('spinner-overlay', toEnumViewClass(size))}>

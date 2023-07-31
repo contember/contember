@@ -20,9 +20,9 @@ export type CheckboxOwnProps = ControlProps<boolean> & {
 export type CheckboxProps = CheckboxOwnProps & RestHTMLCheckboxProps
 
 /**
- * @group Forms UI
- *
  * To add label to checkbox, use `Label` component next to it or wrap with `FieldContainer` or other way to display label next to Checkbox.
+ *
+ * @group Forms UI
  *
  * @example
  * ```

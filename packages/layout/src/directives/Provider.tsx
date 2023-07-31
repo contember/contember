@@ -1,6 +1,6 @@
 import { useScopedConsoleRef } from '@contember/react-utils'
 import equal from 'fast-deep-equal/es6/index.js'
-import { ContextType, ReactNode, memo, useCallback, useEffect, useMemo, useState } from 'react'
+import { memo, ReactNode, useCallback, useEffect, useMemo, useState } from 'react'
 import { RegistryContext, StateContext } from './contexts'
 import { RegistryContextType } from './types'
 
@@ -10,9 +10,12 @@ type State<T extends Record<PropertyKey, unknown>> = Map<keyof T, StateRecord<T[
 
 export type ProviderProps = {
 	value?: Record<string, unknown>;
-	children: ReactNode | ((directives: ContextType<typeof StateContext>) => ReactNode);
+	children: ReactNode | ((directives: Record<string, unknown>) => ReactNode);
 }
 
+/**
+ * @group Layout
+ */
 export const Provider = memo<ProviderProps>(({ value, children }) => {
 	const [combinedState, registry] = useProviderRegistry<Record<string, unknown>>(value)
 	return (

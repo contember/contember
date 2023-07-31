@@ -45,6 +45,9 @@ export function useDirectiveLifecycle<
 	return isRegistered.current
 }
 
+/**
+ * @group Layout
+ */
 export const Directive: DirectiveComponentType<RequiredDeepPlainObject> = memo<DirectiveProps<Record<string, unknown>>>(({ name, content }) => {
 	useDirectiveLifecycle(name, content)
 

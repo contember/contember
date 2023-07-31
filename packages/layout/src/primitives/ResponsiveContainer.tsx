@@ -6,6 +6,9 @@ import { ContainerComponentType, ContainerProps, PanelConfig } from './Types'
 import { panelsStateAsDataAttributes } from './panelsStateAsDataAttributes'
 import { parsePanelsState } from './parsePanelsState'
 
+/**
+ * @group Layout
+ */
 export const ResponsiveContainer: ContainerComponentType = memo(forwardRef(<C extends ElementType = 'div'>({
 	as,
 	children,

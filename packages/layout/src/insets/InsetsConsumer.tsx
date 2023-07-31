@@ -19,6 +19,9 @@ export type InsetsConsumerComponentType =
 		displayName?: string | undefined;
 	}
 
+/**
+ * @group Layout
+ */
 export const InsetsConsumer: InsetsConsumerComponentType = memo(forwardRef(<C extends ElementType = 'div'>({
 	as,
 	children,

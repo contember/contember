@@ -38,7 +38,7 @@ export type OwnContentPanelProps =
 export type ContentPanelProps<C extends ElementType> = PolymorphicComponentPropsWithRef<C, OwnContentPanelProps>
 
 export type ContentPanelComponentType =
-	& (<C extends ElementType = 'section'>(props: ContentPanelProps<C>) => ReturnType<React.FC<ContentPanelProps<C>>>)
+	& (<C extends ElementType = 'section'>(props: ContentPanelProps<C>) => ReactElement | null)
 	& {
 		BASIS: number;
 		MAX_WIDTH: number;
@@ -92,7 +92,7 @@ export type OwnBarProps = Omit<ComponentClassNameProps, 'children'>
 export type BarProps<C extends ElementType> = PolymorphicComponentPropsWithRef<C, OwnBarProps>
 
 export type BarComponentType =
-	& (<C extends ElementType = 'div'>(props: BarProps<C>) => ReturnType<React.FC<BarProps<C>>>)
+	& (<C extends ElementType = 'div'>(props: BarProps<C>) => ReactElement | null)
 	& {
 		displayName?: string | undefined;
 	}

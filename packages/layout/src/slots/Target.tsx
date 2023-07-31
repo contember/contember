@@ -11,6 +11,9 @@ export type OwnTargetContainerProps = {
 	className: string;
 }
 
+/**
+ * @group Layout
+ */
 export const Target = memo<TargetProps>(
 	({
 		as,

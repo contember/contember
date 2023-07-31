@@ -5,6 +5,9 @@ import { useElementInsetCustomProperties } from '../insets'
 import { useLayoutPanelContext } from './Contexts'
 import { PanelBodyComponentType, PanelBodyProps } from './Types'
 
+/**
+ * @group Layout
+ */
 export const PanelBody: PanelBodyComponentType = memo(forwardRef(<C extends ElementType = 'div'>({
 	as,
 	children,

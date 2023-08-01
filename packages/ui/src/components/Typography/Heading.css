@@ -9,12 +9,12 @@
 ) {
 	font-weight: 500;
 	line-height: 1.2em;
-	color: rgb(var(--cui-color-strong-rgb-50));
+	color: rgb(var(--cui-color--strong-rgb-50));
 	margin: -0.1em 0;
 }
 
 :where(.cui-heading.view-subtle) {
-	color: rgba(var(--cui-color-rgb-50), var(--cui-opacity--medium));
+	color: rgba(var(--cui-color--rgb-50), var(--cui-opacity--medium));
 	text-transform: uppercase;
 }
 

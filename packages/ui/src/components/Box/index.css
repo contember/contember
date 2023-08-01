@@ -1,50 +1,50 @@
 :where(.cui-box) {
-	--cui-box-background-focused-overlay: linear-gradient(rgba(var(--cui-theme-controls-rgb-1000), 0.01), rgba(var(--cui-theme-controls-rgb-1000), 0.01));
-	--cui-box-background-color: transparent;
-	--cui-box-border-radius: 0px;
-	--cui-box-border-width: 0px;
-	--cui-box-padding: 0px;
-	--cui-box-padding-left: var(--cui-box-padding);
-	--cui-box-padding-right: var(--cui-box-padding);
-	--cui-box-padding-top: var(--cui-box-padding);
-	--cui-box-padding-bottom: var(--cui-box-padding);
-	background-color: var(--cui-box-background-color);
-	border-width: var(--cui-box-border-width);
+	--cui-box--background-focused-overlay: linear-gradient(rgba(var(--cui-theme-controls--rgb-1000), 0.01), rgba(var(--cui-theme-controls--rgb-1000), 0.01));
+	--cui-box--background-color: transparent;
+	--cui-box--border-radius: 0px;
+	--cui-box--border-width: 0px;
+	--cui-box--padding: 0px;
+	--cui-box--padding-left: var(--cui-box--padding);
+	--cui-box--padding-right: var(--cui-box--padding);
+	--cui-box--padding-top: var(--cui-box--padding);
+	--cui-box--padding-bottom: var(--cui-box--padding);
+	background-color: var(--cui-box--background-color);
+	border-width: var(--cui-box--border-width);
 	border-style: solid;
-	border-color: rgba(var(--cui-color-rgb-50), var(--cui-opacity--low));
-	border-radius: var(--cui-box-border-radius);
+	border-color: rgba(var(--cui-color--rgb-50), var(--cui-opacity--low));
+	border-radius: var(--cui-box--border-radius);
 	display: flex;
 	align-items: stretch;
 	flex-direction: column;
-	padding-left: var(--cui-box-padding-left);
-	padding-right: var(--cui-box-padding-right);
-	padding-top: var(--cui-box-padding-top);
-	padding-bottom: var(--cui-box-padding-bottom);
+	padding-left: var(--cui-box--padding-left);
+	padding-right: var(--cui-box--padding-right);
+	padding-top: var(--cui-box--padding-top);
+	padding-bottom: var(--cui-box--padding-bottom);
 	position: relative;
 	width: 100%;
 }
 
-:where(.cui-box[data-border-radius]) { --cui-box-border-radius: var(--cui-border-radius) }
-:where(.cui-box[data-border-radius="gap"]) { --cui-box-border-radius: var(--cui-gap) }
-:where(.cui-box[data-border-radius="gutter"]) { --cui-box-border-radius: var(--cui-gutter) }
-:where(.cui-box[data-border-radius="padding"]) { --cui-box-border-radius: var(--cui-padding) }
-:where(.cui-box[data-border-radius="large"]) { --cui-box-border-radius: calc(1.5 * var(--cui-padding)) }
-:where(.cui-box[data-border-radius="larger"]) { --cui-box-border-radius: calc(3 * var(--cui-padding)) }
+:where(.cui-box[data-border-radius]) { --cui-box--border-radius: var(--cui-border-radius) }
+:where(.cui-box[data-border-radius="gap"]) { --cui-box--border-radius: var(--cui-gap) }
+:where(.cui-box[data-border-radius="gutter"]) { --cui-box--border-radius: var(--cui-gutter) }
+:where(.cui-box[data-border-radius="padding"]) { --cui-box--border-radius: var(--cui-padding) }
+:where(.cui-box[data-border-radius="large"]) { --cui-box--border-radius: calc(1.5 * var(--cui-padding)) }
+:where(.cui-box[data-border-radius="larger"]) { --cui-box--border-radius: calc(3 * var(--cui-padding)) }
 
 :where(.cui-box[data-background]) {
-	--cui-box-background-color: rgb(var(--cui-background-color-rgb-50));
+	--cui-box--background-color: rgb(var(--cui-background-color--rgb-50));
 }
 
 :where(.cui-box[data-border]) {
-	--cui-box-border-width:	var(--cui-border-width, 1px)
+	--cui-box--border-width:	var(--cui-border-width, 1px)
 }
 
-:where(.cui-box[data-padding]) { --cui-box-padding: var(--cui-padding) }
-:where(.cui-box[data-padding="gap"]) { --cui-box-padding: var(--cui-gap) }
-:where(.cui-box[data-padding="gutter"]) { --cui-box-padding: var(--cui-gutter) }
-:where(.cui-box[data-padding="padding"]) { --cui-box-padding: var(--cui-padding) }
-:where(.cui-box[data-padding="large"]) { --cui-box-padding: calc(1.5 * var(--cui-padding)) }
-:where(.cui-box[data-padding="larger"]) { --cui-box-padding: calc(3 * var(--cui-padding)) }
+:where(.cui-box[data-padding]) { --cui-box--padding: var(--cui-padding) }
+:where(.cui-box[data-padding="gap"]) { --cui-box--padding: var(--cui-gap) }
+:where(.cui-box[data-padding="gutter"]) { --cui-box--padding: var(--cui-gutter) }
+:where(.cui-box[data-padding="padding"]) { --cui-box--padding: var(--cui-padding) }
+:where(.cui-box[data-padding="large"]) { --cui-box--padding: calc(1.5 * var(--cui-padding)) }
+:where(.cui-box[data-padding="larger"]) { --cui-box--padding: calc(3 * var(--cui-padding)) }
 
 :where(.cui-box-header),
 :where(.cui-box-body),
@@ -71,17 +71,17 @@
 	.cui-box[data-active],
 	.cui-box.is-dragged,
 ) {
-	color: rgb(var(--cui-color-accent-rgb-50));
-	border-color: rgb(var(--cui-color-accent-rgb-50));
-	background-image: var(--cui-box-background-focused-overlay);
-	box-shadow: inset 0 0 0 2px rgb(var(--cui-color-accent-rgb-50));
+	color: rgb(var(--cui-color--accent-rgb-50));
+	border-color: rgb(var(--cui-color--accent-rgb-50));
+	background-image: var(--cui-box--background-focused-overlay);
+	box-shadow: inset 0 0 0 2px rgb(var(--cui-color--accent-rgb-50));
 	transition: box-shadow 0.15s;
 }
 
 :where(.cui-box.is-dragged .cui-box-content),
 :where(.cui-box[data-active] .cui-box-content),
 :where(.cui-box:focus-within .cui-box-content) {
-	background-image: var(--cui-box-background-focused-overlay);
+	background-image: var(--cui-box--background-focused-overlay);
 }
 
 :where(.cui-box.is-dragged) {

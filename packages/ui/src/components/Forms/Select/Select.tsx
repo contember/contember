@@ -1,5 +1,6 @@
 import { useClassName } from '@contember/react-utils'
-import { ComponentProps, CSSProperties, ForwardedRef, forwardRef, memo, ReactElement, RefAttributes, useCallback, useMemo, useRef } from 'react'
+import { Narrow } from '@contember/utilities'
+import { CSSProperties, ComponentProps, ForwardedRef, ReactElement, RefAttributes, forwardRef, memo, useCallback, useMemo, useRef } from 'react'
 import ReactSelect, { SelectInstance, StylesConfig, useStateManager } from 'react-select'
 import { noop } from '../../../utils'
 import { usePortalProvider } from '../../Portal'
@@ -21,8 +22,8 @@ export type SelectOptionWithKey<V = string> =
 export type HTMLReactSelectElement<V> = SelectInstance<SelectOption<V>, false, never>
 export type HTMLReactSelectElementWithKey<V> = SelectInstance<SelectOptionWithKey<V>, false, never>
 
-export type SelectProps<V> = Omit<ControlProps<V>, 'type' | 'style' | keyof ControlConstraintProps<any>> & {
-	options: SelectOption<V>[]
+export type SelectProps<V, NN extends boolean> = Omit<ControlProps<V, NN>, 'type' | 'style' | keyof ControlConstraintProps<any>> & {
+	options: SelectOption<Narrow<V>>[]
 	/**
 	 * @deprecated No need for React Select component.
 	 */
@@ -35,7 +36,7 @@ function deriveSelectIndexValue(index: number) {
 	return index === -1 ? '' : index.toString()
 }
 
-const SelectComponent = <V = unknown>({
+export const SelectComponent = <V, NN extends boolean>({
 	active,
 	className: outerClassName,
 	defaultValue: defaultValueProp,
@@ -66,7 +67,7 @@ const SelectComponent = <V = unknown>({
 	value: valueProp,
 
 	...outerProps
-}: SelectProps<V>, forwardedRef: ForwardedRef<HTMLReactSelectElement<V>>) => {
+}: SelectProps<V, NN>, forwardedRef: ForwardedRef<HTMLReactSelectElement<V>>) => {
 	if (import.meta.env.DEV) {
 		// Spread fixes TS error "Index signature for type 'string' is missing in type '{ }'."
 		const _exhaust: { [key: string]: never } = { ...outerProps }
@@ -98,7 +99,7 @@ const SelectComponent = <V = unknown>({
 	const getOptionValue = useCallback((option: SelectOptionWithKey<V>) => option.key, [])
 	const isOptionDisabled = useCallback((option: SelectOption<V>) => !!option.disabled, [])
 
-	const optionsWithKeys: SelectOptionWithKey<V>[] = useMemo(() => options.map(
+	const optionsWithKeys: SelectOptionWithKey<V>[] = useMemo(() => (options as SelectOption<V>[]).map(
 		(option, key) => ({ key: deriveSelectIndexValue(key), ...option }),
 	), [options])
 
@@ -121,11 +122,12 @@ const SelectComponent = <V = unknown>({
 		onChange: newValue => {
 			const next = newValue?.value
 
-			if (valueProp !== next) {
+			if (next !== undefined && valueProp !== next) {
 				if (nativeValidationInput.current) {
 					nativeValidationInput.current.value = optionsWithKeys.find(option => option.value === next)?.key ?? ''
 				}
-				onChange?.(next)
+
+				onChange?.(next as any)
 			}
 		},
 		onBlur: () => {
@@ -182,11 +184,14 @@ const nativeValidationInputStyle: CSSProperties = {
 	width: 0,
 }
 
-// memo(forwardRef()) causes `V` generic to cast as `unknown`
-type MemoForwardRefComponentWithGenericProps = <A, B, R>(Component: (props: A, ref: ForwardedRef<R>) => B) => (props: A & RefAttributes<R>) => ReactElement | null
-const memoizedForwardedComponentWithGenericProps: MemoForwardRefComponentWithGenericProps = <A, B, R>(Component: (props: A, ref: ForwardedRef<R>) => B) => ((memo(forwardRef(Component as any)) as any) as (props: A & RefAttributes<R>) => ReactElement | null)
-
 /**
  * @group Forms UI
  */
-export const Select = memoizedForwardedComponentWithGenericProps(SelectComponent) // as typeof SelectComponent
+export const Select = memo(forwardRef(SelectComponent)) as (
+	<V, NN extends boolean>(
+		props: SelectProps<V, NN> & RefAttributes<HTMLReactSelectElement<V>>,
+	) => ReactElement<any, any> | null
+) & {
+	displayName?: string | undefined
+}
+Select.displayName = 'Interface.Select'

@@ -47,12 +47,12 @@ export const DevBar = ({
 		return () => document.removeEventListener('keydown', handleKeyDown)
 	}, [expanded, handleToggle])
 
-	const devBarRef = useRef<HTMLDivElement>(null)
+	const devBarContentRef = useRef<HTMLDivElement>(null)
 
 	useEffect(() => {
-		if (devBarRef.current) {
+		if (devBarContentRef.current) {
 			function handleClickOutside(event: MouseEvent) {
-				if (expanded && !devBarRef.current?.contains(event.target as Node)) {
+				if (expanded && !devBarContentRef.current?.contains(event.target as Node)) {
 					setExpanded(false)
 				}
 			}
@@ -65,7 +65,6 @@ export const DevBar = ({
 
 	return (
 		<section
-			ref={devBarRef}
 			data-transparent
 			data-overrides-lucide-icons
 			data-expanded={dataAttribute(expanded)}
@@ -83,7 +82,7 @@ export const DevBar = ({
 			}}
 		>
 			<style>{`svg { pointer-events: none }`}</style>
-			<div className={className('content')}>
+			<div ref={devBarContentRef} className={className('content')}>
 				<FocusScope contain={expanded} restoreFocus>
 					<div
 						data-expanded={dataAttribute(expanded)}

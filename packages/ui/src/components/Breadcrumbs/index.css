@@ -1,25 +1,25 @@
 :where(.cui-breadcrumbs a) {
-	--cui-breadcrumbs-color: rgb(var(--cui-color-accent-rgb-50));
+	--cui-breadcrumbs-color: rgb(var(--cui-color--accent-rgb-50));
 }
 
 :where(.cui-breadcrumbs-items) {
 	display: flex;
 	flex-wrap: wrap;
-	font-size: var(--cui-font-size-label);
+	font-size: var(--cui-font-size--label);
 	letter-spacing: 0.025em;
 	user-select: none;
 }
 
 :where(.cui-breadcrumbs-item) {
 	display: inline-flex; /* HOTFIX: Firefox */
-	color: rgb(var(--cui-color-rgb-50));
+	color: rgb(var(--cui-color--rgb-50));
 }
 
 :where(.cui-breadcrumbs-item)::before {
 	content: "›";
 	display: inline-block;
 	margin: 0 0.5em;
-	color: rgba(var(--cui-color-rgb-50), var(--cui-opacity--low));
+	color: rgba(var(--cui-color--rgb-50), var(--cui-opacity--low));
 }
 
 :where(.cui-breadcrumbs-item:first-child)::before {
@@ -36,12 +36,12 @@
 }
 
 :where(.cui-breadcrumbs-item a:active) {
-	--cui-breadcrumbs-color: rgb(var(--cui-color-accent-rgb-25));
+	--cui-breadcrumbs-color: rgb(var(--cui-color--accent-rgb-25));
 }
 
 :where(.cui-breadcrumbs-item a:hover),
 :where(.cui-breadcrumbs-item a:focus) {
-	--cui-breadcrumbs-color: rgb(var(--cui-color-accent-rgb-75));
-	background-color: rgba(var(--cui-background-color-toned-controls-rgb-50), var(--cui-opacity--low));
+	--cui-breadcrumbs-color: rgb(var(--cui-color--accent-rgb-75));
+	background-color: rgba(var(--cui-background-color--toned-controls-rgb-50), var(--cui-opacity--low));
 	outline: none;
 }

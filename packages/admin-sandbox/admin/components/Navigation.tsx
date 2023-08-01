@@ -1,13 +1,14 @@
 import { Menu } from '@contember/admin'
+import { CircleIcon, ComponentIcon, FileTextIcon, LayoutDashboardIcon, ListTreeIcon, NewspaperIcon } from 'lucide-react'
 
 export const Navigation = () => (
 	<Menu id="sandbox-menu" label="Sandbox project">
-		<Menu.Item title="Dashboard" to="index" />
-		<Menu.Item title="Articles" to="articles">
+		<Menu.Item icon={<LayoutDashboardIcon />} title="Dashboard" to="index" />
+		<Menu.Item icon={<NewspaperIcon />} title="Articles" to="articles">
 			<Menu.Item title="Tags" to="articles/tags" />
 			<Menu.Item title="Categories" to="articles/categories" />
 		</Menu.Item>
-		<Menu.Item title="Components">
+		<Menu.Item icon={<ComponentIcon />} title="Components">
 			<Menu.Item title="Boxes" to="boxes" />
 			<Menu.Item title="Buttons" to="buttons" />
 			<Menu.Item title="FieldContainer" to="fieldContainers" />
@@ -15,7 +16,7 @@ export const Navigation = () => (
 			<Menu.Item title="Messages" to="messages" />
 		</Menu.Item>
 
-		<Menu.Item title="Examples">
+		<Menu.Item icon={<FileTextIcon />} title="Examples">
 			<Menu.Item title="Auto" to="auto" />
 
 			<Menu.Item title="Homepage" to="homepage" />
@@ -29,7 +30,7 @@ export const Navigation = () => (
 
 			<Menu.Item title="Inactive" />
 
-			<Menu.Item title="Nesting">
+			<Menu.Item icon={<ListTreeIcon />} title="Nesting">
 				<Menu.Item title="Foo Bar">
 					<Menu.Item title="Skip this1" />
 					<Menu.Item title="Foo Bar 1" to="random/fooBar1" />

@@ -1,10 +1,10 @@
 :where(.cui-editorCanvas) {
-	--cui-editor-canvas-element-padding-bottom: calc(2 * var(--cui-gap));
-	--cui-editor-canvas-element-padding-left: calc(3 * var(--cui-gap));
-	--cui-editor-canvas-element-padding-right: calc(3 * var(--cui-gap));
-	--cui-editor-canvas-element-padding-top: calc(2 * var(--cui-gap));
-	--cui-editor-blocks-gap: calc(2 * var(--cui-editor-canvas-element-padding-top));
-	border-radius: var(--cui-border-radius-controls);
+	--cui-editor-canvas--padding-element-bottom: calc(2 * var(--cui-gap));
+	--cui-editor-canvas--padding-element-left: calc(3 * var(--cui-gap));
+	--cui-editor-canvas--padding-element-right: calc(3 * var(--cui-gap));
+	--cui-editor-canvas--padding-element-top: calc(2 * var(--cui-gap));
+	--cui-editor-blocks-gap: calc(2 * var(--cui-editor-canvas--padding-element-top));
+	border-radius: var(--cui-border-radius--controls);
 	position: relative;
 	width: 100%;
 }
@@ -14,13 +14,13 @@
 	margin-top: calc(-1 * var(--cui-border-width));
 	padding-bottom: calc(2 * var(--cui-gap) - var(--cui-border-width));
 	padding-top: calc(2 * var(--cui-gap) - var(--cui-border-width));
-	border-radius: var(--cui-border-radius-controls);
+	border-radius: var(--cui-border-radius--controls);
 	flex-grow: 1;
 }
 
 :where(.cui-editorCanvas:focus-within) {
-	border-color: rgb(var(--cui-background-color-controls-rgb-50));
-	box-shadow: var(--cui-control-focus-ring-box-shadow);
+	border-color: rgb(var(--cui-background-color--controls-rgb-50));
+	box-shadow: var(--cui-box-shadow--controls-focus-ring);
 }
 
 :where(.cui-editorCanvas.view-hovering-toolbar *[contenteditable=true]) {
@@ -29,8 +29,8 @@
 
 :where(.cui-editorCanvas-canvas > [class^=cui-editor]) {
 	padding-bottom: 0;
-	padding-left: var(--cui-editor-canvas-element-padding-left);
-	padding-right: var(--cui-editor-canvas-element-padding-right);
+	padding-left: var(--cui-editor-canvas--padding-element-left);
+	padding-right: var(--cui-editor-canvas--padding-element-right);
 	padding-top: 0;
 	position: relative;
 }
@@ -43,14 +43,14 @@
 	display: flex;
 	flex-direction: column;
 	gap: var(--cui-editor-blocks-gap);
-	padding-bottom: var(--cui-editor-canvas-element-padding-bottom);
-	padding-top: var(--cui-editor-canvas-element-padding-top);
+	padding-bottom: var(--cui-editor-canvas--padding-element-bottom);
+	padding-top: var(--cui-editor-canvas--padding-element-top);
 }
 
 :where(.cui-editorCanvas-canvas) {
 	cursor: text;
 	display: flex;
-	min-height: var(--cui-size-controls);
+	min-height: var(--cui-size--controls);
 	flex-direction: column;
 	gap: var(--cui-editor-blocks-gap);
 	counter-reset: cui-editorParagraph-counter;
@@ -94,7 +94,7 @@
 }
 
 :where(.cui-editorCanvas-canvas code) {
-	background-color: rgba(var(--cui-color-rgb-50), var(--cui-opacity--lower));
+	background-color: rgba(var(--cui-color--rgb-50), var(--cui-opacity--lower));
 	border-radius: 0.25em;
 	font-family: monospace;
 	padding-left: 0.25em;
@@ -102,29 +102,29 @@
 }
 
 :where(.cui-editorCanvas-canvas em) {
-	--cui-editorCanvas-canvas-em-highlight-color: var(--cui-background-color-toned-controls-rgb-75);
-	color: rgb(var(--cui-color-rgb-0));
-	background-color: rgb(var(--cui-editorCanvas-canvas-em-highlight-color), var(--cui-opacity--medium, 0.5));
+	--cui-editorCanvas-canvas--em--highlight-color: var(--cui-background-color--toned-controls-rgb-75);
+	color: rgb(var(--cui-color--rgb-0));
+	background-color: rgb(var(--cui-editorCanvas-canvas--em--highlight-color), var(--cui-opacity--medium, 0.5));
 	font-style: normal;
 }
 
 @media (prefers-color-scheme: dark) {
 	:where(.cui-editorCanvas-canvas em) {
-		background-color: rgb(var(--cui-editorCanvas-canvas-em-highlight-color), var(--cui-opacity--low, 0.3));
+		background-color: rgb(var(--cui-editorCanvas-canvas--em--highlight-color), var(--cui-opacity--low, 0.3));
 	}
 }
 
 :where(.cui-editorCanvas-canvas hr) {
-	background-color: rgba(var(--cui-color-rgb-50), var(--cui-opacity--lower));
+	background-color: rgba(var(--cui-color--rgb-50), var(--cui-opacity--lower));
 	height: 0.0625em;
 	margin: 0;
 	border: none;
 }
 
 :where(.cui-editorCanvas-canvas ::selection) {
-	color: rgb(var(--cui-color-rgb-0));
+	color: rgb(var(--cui-color--rgb-0));
 	background-color: rgba(75, 150, 255, 0.5);
-	background-color: rgb(var(--cui-theme-positive-rgb-500), var(--cui-opacity--medium, 0.5));
+	background-color: rgb(var(--cui-theme-positive--rgb-500), var(--cui-opacity--medium, 0.5));
 }
 
 :where(.cui-editorCanvas.view-large .cui-editorCanvas-canvas) {
@@ -137,8 +137,8 @@
 }
 
 :where(.cui-editorCanvas.view-seamless) {
-	--cui-editor-canvas-element-padding-left: 0;
-	--cui-editor-canvas-element-padding-right: 0;
+	--cui-editor-canvas--padding-element-left: 0;
+	--cui-editor-canvas--padding-element-right: 0;
 }
 
 :where(.cui-editorCanvas .view-seamless),

@@ -20,7 +20,7 @@ export type BoxHeaderProps =
 
 export type BoxOwnProps =
 	& BoxHeaderProps
-	& Pick<StackProps, 'align' | 'direction' | 'evenly' | 'gap' | 'horizontal' | 'justify' | 'reverse' | 'wrap'>
+	& Pick<StackProps, 'align' | 'className' | 'direction' | 'evenly' | 'gap' | 'horizontal' | 'justify' | 'reverse' | 'wrap'>
 	& {
 		background?: boolean
 		border?: boolean
@@ -45,8 +45,8 @@ export type DeprecatedPaddingPropLiteral =
 	| 'with-padding'
 
 export type BoxProps =
+	& Omit<HTMLDivElementProps, keyof BoxOwnProps>
 	& BoxOwnProps
-	& HTMLDivElementProps
 
 /**
  * The `Box` component is a container that can be used to wrap other components.
@@ -72,7 +72,7 @@ export type BoxProps =
  * @example
  * Box with label and delete action:
  * ```tsx
- * <Box label="Label" actions={<Button inset square borderRadius="full" distinction="seamless" intent="danger"><TrashIcon /></Button>}>A box content</Box>* ```
+ * <Box label="Label" actions={<Button square borderRadius="full" distinction="seamless" intent="danger"><TrashIcon /></Button>}>A box content</Box>* ```
  * ```
  *
  * @example
@@ -113,20 +113,20 @@ export const Box = memo(forwardRef<HTMLDivElement, BoxProps>(({
 	const componentClassName = useClassNameFactory('box')
 
 	// TODO: Remove in v1.3.0
-	deprecate('v1.3.0', padding === 'default', '`padding="default"`', 'omitted `padding` prop')
+	deprecate('1.3.0', padding === 'default', '`padding="default"`', 'omitted `padding` prop')
 	padding = fallback(padding, padding === 'default', true)
 
-	deprecate('v1.3.0', padding === 'no-padding', '`padding="no-padding"`', '`padding={false}`')
+	deprecate('1.3.0', padding === 'no-padding', '`padding="no-padding"`', '`padding={false}`')
 	padding = fallback(padding, padding === 'no-padding', false)
 
-	deprecate('v1.3.0', padding === 'with-padding', '`padding="with-padding"`', '`padding={true}`')
+	deprecate('1.3.0', padding === 'with-padding', '`padding="with-padding"`', '`padding={true}`')
 	padding = fallback(padding, padding === 'with-padding', true)
 
-	deprecate('v1.3.0', isDefined(distinction), 'the `distinction` prop', '`background={false} border={false} padding={false}`')
+	deprecate('1.3.0', isDefined(distinction), 'the `distinction` prop', '`background={false} border={false} padding={false}`')
 	border = fallback(border, distinction === 'seamless', false)
 	padding = fallback(padding, distinction === 'seamless', false)
 
-	deprecate('v1.3.0', heading !== undefined, '`heading` prop', '`label` prop')
+	deprecate('1.3.0', heading !== undefined, '`heading` prop', '`label` prop')
 	label = fallback(label, heading !== undefined, heading)
 
 	return (
@@ -136,6 +136,7 @@ export const Box = memo(forwardRef<HTMLDivElement, BoxProps>(({
 			data-background={dataAttribute(background)}
 			data-border={dataAttribute(border)}
 			data-border-radius={dataAttribute(borderRadius)}
+			data-gap={dataAttribute(gap)}
 			data-padding={dataAttribute(padding)}
 			className={componentClassName(null, [
 				...themeClassName(intent),

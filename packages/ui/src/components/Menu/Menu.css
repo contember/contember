@@ -1,0 +1,10 @@
+:where(.cui-menu) {
+	color: rgba(var(--cui-color--rgb-50), var(--cui-opacity--medium));
+	user-select: none;
+}
+
+:where(.cui-menu-list) {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+}

@@ -1,8 +1,8 @@
 :where(.cui-anchor) {
 	align-items: center;
-	border-radius: var(--cui-border-radius-controls);
+	border-radius: var(--cui-border-radius--controls);
 	display: inline-flex;
-	color: rgb(var(--cui-color-accent-rgb-50));
+	color: rgb(var(--cui-color--accent-rgb-50));
 	cursor: pointer;
 	text-decoration: none;
 }
@@ -11,7 +11,7 @@
 	.cui-anchor:active,
 	.cui-anchor[data-active],
 ) {
-	color: rgb(var(--cui-color-accent-rgb-75));
+	color: rgb(var(--cui-color--accent-rgb-75));
 }
 
 :where(
@@ -21,12 +21,12 @@
 	.cui-anchor:active,
 	.cui-anchor[data-active],
 ) {
-	color: rgb(var(--cui-color-accent-rgb-75));
+	color: rgb(var(--cui-color--accent-rgb-75));
 }
 
 :where(.cui-anchor[disabled]) {
 	cursor: not-allowed;
-	color: rgba(var(--cui-color-rgb-50), var(--cui-opacity--low));
+	color: rgba(var(--cui-color--rgb-50), var(--cui-opacity--low));
 }
 
 :where(.cui-anchor) > .cui-label {

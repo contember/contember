@@ -1,24 +1,26 @@
 :where(.cui-brand-icon) {
-	--scale: 1;
-	--aspect-ratio: 1;
-	--cui-circle-optical-grow: 0.05641895835477563;
-	stroke: currentColor;
+	--cui-border-radius-optical-grow: 0.05641895835477563;
+
+	--cui-brand-icon: 1;
+	--cui-brand-icon--aspect-ratio: 1;
+	--cui-brand-icon--inset: calc(1em / 2 * var(--cui-border-radius-optical-grow));
+	--cui-brand-icon--padding: calc((var(--cui-line-height--units) - 1em) / 2);
+
 	display: inline-block;
+	flex-basis: content;
 	flex-grow: 0;
 	flex-shrink: 0;
-	height: calc(1em * var(--scale));
-	margin: calc(-1em * var(--cui-circle-optical-grow));
+	font-size: calc(1em * var(--cui-brand-icon));
+	height: var(--cui-line-height--units);
+	margin: calc(-1 * var(--cui-brand-icon--inset));
+	padding: var(--cui-brand-icon--padding);
+	stroke: currentColor;
 	vertical-align: middle;
-	width: calc(1em * var(--scale) * var(--aspect-ratio));
+	width: calc(var(--cui-brand-icon--aspect-ratio) * var(--cui-line-height--units));
 }
 :where(.cui-brand-logo-type) {
-	--scale: 1;
-	--aspect-ratio: calc(440 / 130);
-	stroke: currentColor;
-	display: inline-block;
-	flex-grow: 0;
-	flex-shrink: 0;
-	height: calc(1em * var(--scale, 1));
-	vertical-align: middle;
-	width: calc(1em * var(--scale, 1) * var(--aspect-ratio));
+	--cui-brand-icon: 1;
+	margin: calc(-1 * (var(--cui-brand-icon--inset) + var(--cui-brand-icon--padding)));
+
+	width: auto;
 }

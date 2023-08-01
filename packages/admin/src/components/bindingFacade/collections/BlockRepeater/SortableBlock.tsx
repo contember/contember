@@ -13,9 +13,13 @@ export interface SortableBlockProps extends RepeaterItemProps, SortableBlockOwnP
 /**
  * @internal
  */
-export const SortableBlock = memo<SortableBlockProps>(props => {
-	const field = useField(props.discriminationField)
-	const selectedBlock = getDiscriminatedBlock(props.normalizedBlocks, field)
+export const SortableBlock = memo<SortableBlockProps>(({
+	discriminationField,
+	normalizedBlocks,
+	...props
+}) => {
+	const field = useField(discriminationField)
+	const selectedBlock = getDiscriminatedBlock(normalizedBlocks, field)
 
 	if (!selectedBlock) {
 		return null

@@ -1,6 +1,4 @@
 :where(.cui-layout-content-panel) {
-	--cui-layout-panel-header-background-rgb: rgb(var(--cui-background-color-rgb-50));
-	--cui-layout-panel-footer-background-rgb: rgb(var(--cui-background-color-rgb-50));
 	max-width: unset;
 }
 
@@ -16,7 +14,7 @@
 	margin: auto;
 	max-width: var(--panel-max-width);
 	min-width: min(
-		calc(100% - 2 * var(--cui-panel-padding-horizontal)),
+		calc(100% - 2 * var(--cui-padding--panel-horizontal)),
 		var(--panel-min-width),
 	);
 	width: 100%;

@@ -1,14 +1,11 @@
-import { CSSProperties } from 'react'
-import { Button, ButtonFlow, ButtonProps, Icon, Intent, Layout, LayoutPage, RepeaterItemContainer } from '../../../src'
-
-const verticalStack: CSSProperties = { display: 'flex', flexDirection: 'column', gap: '1em', flex: 1 }
-const horizontalStack: CSSProperties = { display: 'flex', flexDirection: 'row', gap: '1em', flex: 1 }
+import { Trash2Icon } from 'lucide-react'
+import { Button, ButtonProps, Intent, Layout, LayoutPage, RepeaterItemContainer, Stack } from '../../../src'
 
 const dummyInput = (
-	<div style={{ backgroundColor: 'lightBlue', border: '1px solid blue', borderRadius: '0.25em', height: '2.25em', minWidth: '2.25em' }}></div>
+	<div style={{ backgroundColor: 'lightBlue', border: '1px solid blue', padding: '0.25em', height: '2.25em', minWidth: '2.25em' }}></div>
 )
 
-const buttonFlows: ButtonFlow[] = ['circular']
+const paddings = ['gap', 'gutter', 'padding'] satisfies ButtonProps['padding'][]
 const buttonDistinctions: ButtonProps['distinction'][] = ['seamless', 'default', 'outlined', 'primary', 'toned']
 const intent: Intent = 'danger'
 
@@ -16,16 +13,13 @@ export default function () {
 	return (
 		<Layout>
 			<LayoutPage>
-				<style>{`
-					.cui-repeater-item-container-header:hover { background-color: #00CCFF33; }
-					`}</style>
-				<div style={horizontalStack}>
-					{buttonFlows.map(flow => (
-						<div key={flow} style={verticalStack}>
-							<strong>flow: {flow}</strong>
+				<Stack horizontal>
+					{paddings.map(padding => (
+						<Stack key={padding}>
+							<strong>padding: {padding}</strong>
 							{buttonDistinctions.map(distinction => {
 								const buttonProps = {
-									flow,
+									padding,
 									intent,
 									distinction,
 								}
@@ -35,16 +29,24 @@ export default function () {
 										key={distinction}
 										label={distinction}
 										actions={<>
-											<Button {...buttonProps} size="small"><Icon blueprintIcon="trash" /></Button>
-											<Button {...buttonProps}><Icon blueprintIcon="trash" /></Button>
-											<Button {...buttonProps} size="large"><Icon blueprintIcon="trash" /></Button>
+											<Button square borderRadius={false} {...buttonProps}><Trash2Icon /></Button>
+											<Button square borderRadius {...buttonProps}><Trash2Icon /></Button>
+											<Button square borderRadius="gap" {...buttonProps}><Trash2Icon /></Button>
+											<Button square borderRadius="gutter" {...buttonProps}><Trash2Icon /></Button>
+											<Button square borderRadius="full" {...buttonProps}><Trash2Icon /></Button>
 										</>}
 									>{dummyInput}</RepeaterItemContainer>
 								)
 							})}
-						</div>
+						</Stack>
 					))}
-				</div>
+				</Stack>
+				<style>{`@media (max-width: 1023.98px) {
+					.cui-stack[data-horizontal] {
+						flex-direction: column;
+					}
+				}`}
+				</style>
 			</LayoutPage>
 		</Layout>
 	)

@@ -27,7 +27,7 @@ export const LogoIcon = memo<Omit<ContemberIdentitySvgProps, 'strokeWidth'>>(({
 			className={useClassName(['brand-icon', 'brand-logo-icon'], className)}
 			style={useMemo(() => ({
 				...style,
-				'--scale': scale,
+				'--cui-icon--scale': scale,
 				'--aspect-ratio': aspectRatio === 1 ? undefined : aspectRatio,
 			} as CSSProperties), [aspectRatio, scale, style])}
 			xmlns="http://www.w3.org/2000/svg"

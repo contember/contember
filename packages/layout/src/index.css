@@ -1,24 +1,3 @@
 @import "primitives/index.css";
 @import "slots/index.css";
 @import "kit/index.css";
-
-:where(.cui-root) {
-	--cui-box-inner-padding-horizontal: 0.5rem;
-	--cui-box-inner-padding-vertical: 0.5rem;
-	--cui-panel-padding-horizontal: 1rem;
-	--cui-panel-padding-vertical: 1rem;
-	--cui-table-container-overflow-padding-left: 1rem;
-	--cui-table-container-overflow-padding-right: 1rem;
-}
-
-@media screen and (min-width: 1024px) {
-	:where(.cui-root) {
-		--cui-panel-padding-horizontal: 2rem;
-		--cui-box-inner-padding-horizontal: 0.75rem;
-	}
-
-	:where(.cui-table-container) {
-		--cui-table-container-overflow-padding-left: 2rem;
-		--cui-table-container-overflow-padding-right: 2rem;
-	}
-}

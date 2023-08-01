@@ -16,15 +16,15 @@ import { SemverString } from './types'
  * // Logs: Use of "default" is deprecated and might be removed in the next release. Use "hidden" instead.
  * ```
  */
-export function deprecate(removal: SemverString, condition: boolean, deprecated: string, replacement: string): void {
+export function deprecate(removal: SemverString, condition: boolean, deprecated: string, replacement: string | null): void {
 	if (condition === true) {
 		if (import.meta.env.DEV) {
 			const shouldThrow = Boolean(import.meta.env.VITE_CONTEMBER_ADMIN_STRICT_DEPRECATIONS)
 
 			if (shouldThrow) {
-				throw new Error(`Support for ${deprecated} was planned to be removed in the ${removal} release. Replace it with ${replacement} instead.`)
+				throw new Error(`Support for ${deprecated} was planned to be removed in the ${removal} release.${replacement ? ` Replace it with ${replacement} instead.` : 'Remove it.'}`)
 			} else {
-				console.warn(`Use of ${deprecated} is deprecated and might be removed in the next release. Use ${replacement} instead.`)
+				console.warn(`Use of ${deprecated} is deprecated and might be removed in the next release.${replacement ? ` Use ${replacement} instead.` : 'There is no replacement.'}`)
 			}
 		}
 	}

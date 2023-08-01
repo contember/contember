@@ -1,13 +1,13 @@
 :where(.cui-editorBlock) {
-	--cui-editor-canvas-element-handle-width: calc(6 * var(--cui-gap));
-	--cui-editor-canvas-element-handle-height: calc(1em * var(--cui-line-height, 1.5));
+	--cui-editor-block--element-handle-width: calc(6 * var(--cui-gap));
+	--cui-editor-block--element-handle-height: calc(1em * var(--cui-line-height, 1.5));
 }
 
 :where(.cui-editorBlock-inner) {
 	display: flex;
 	padding-bottom: 0;
-	padding-left: var(--cui-editor-canvas-element-handle-width);
-	padding-right: var(--cui-editor-canvas-element-padding-right);
+	padding-left: var(--cui-editor-block--element-handle-width);
+	padding-right: var(--cui-editor-canvas--padding-element-right);
 	padding-top: 0;
 	position: relative;
 }
@@ -32,12 +32,12 @@
 	text-align: center;
 	top: 0;
 	bottom: 0;
-	width: var(--cui-editor-canvas-element-handle-width);
+	width: var(--cui-editor-block--element-handle-width);
 }
 
 :where(.cui-editorBlock-dragHandle .cui-icon) {
 	align-items: center;
-	height: var(--cui-editor-canvas-element-handle-height);
+	height: var(--cui-editor-block--element-handle-height);
 }
 
 :where(.cui-editorBlock.is-dragged .cui-editorBlock-dragHandle),

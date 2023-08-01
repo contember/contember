@@ -1,23 +1,23 @@
 :where(.cui-dialog-modal) {
-	--cui-dialog-modal-background-color: rgb(var(--cui-background-color-rgb-50));
-	--cui-dialog-modal-header-padding-left: var(--cui-padding);
-	--cui-dialog-modal-header-padding-right: var(--cui-padding);
-	--cui-dialog-modal-header-padding-top: var(--cui-padding);
-	--cui-dialog-modal-header-padding-bottom: 0px;
-	--cui-dialog-modal-body-padding-left: var(--cui-padding);
-	--cui-dialog-modal-body-padding-right: var(--cui-padding);
-	--cui-dialog-modal-body-padding-top: var(--cui-padding);
-	--cui-dialog-modal-body-padding-bottom: var(--cui-padding);
-	--cui-dialog-modal-footer-padding-left: var(--cui-padding);
-	--cui-dialog-modal-footer-padding-right: var(--cui-padding);
-	--cui-dialog-modal-footer-padding-top: 0px;
-	--cui-dialog-modal-footer-padding-bottom: var(--cui-padding);
-	--cui-layout-page-padding-left: 0px;
-	--cui-layout-page-padding-right: 0px;
-	background-color: var(--cui-dialog-modal-background-color);
+	--cui-dialog-modal--background-color: rgb(var(--cui-background-color--rgb-50));
+	--cui-dialog-modal--header-padding-left: var(--cui-padding);
+	--cui-dialog-modal--header-padding-right: var(--cui-padding);
+	--cui-dialog-modal--header-padding-top: var(--cui-padding);
+	--cui-dialog-modal--header-padding-bottom: 0px;
+	--cui-dialog-modal--body-padding-left: var(--cui-padding);
+	--cui-dialog-modal--body-padding-right: var(--cui-padding);
+	--cui-dialog-modal--body-padding-top: var(--cui-padding);
+	--cui-dialog-modal--body-padding-bottom: var(--cui-padding);
+	--cui-dialog-modal--footer-padding-left: var(--cui-padding);
+	--cui-dialog-modal--footer-padding-right: var(--cui-padding);
+	--cui-dialog-modal--footer-padding-top: 0px;
+	--cui-dialog-modal--footer-padding-bottom: var(--cui-padding);
+	--cui-layout-page--padding-left: 0px;
+	--cui-layout-page--padding-right: 0px;
+	background-color: var(--cui-dialog-modal--background-color);
 	border-width: var(--cui-border-width, 1px);
 	border-style: solid;
-	border-color: rgba(var(--cui-color-rgb-50), var(--cui-opacity--low));
+	border-color: rgba(var(--cui-color--rgb-50), var(--cui-opacity--low));
 	border-radius: calc(2 * var(--cui-border-radius));
 	display: flex;
 	align-items: stretch;
@@ -83,11 +83,11 @@
 }
 
 :where(.cui-dialog-modal-header) {
-	padding-left: var(--cui-dialog-modal-header-padding-left);
-	padding-right: var(--cui-dialog-modal-header-padding-right);
-	padding-bottom: var(--cui-dialog-modal-header-padding-bottom);
-	padding-top: var(--cui-dialog-modal-header-padding-top);
-	min-height: calc(var(--cui-button-height) + var(--cui-dialog-modal-header-padding-top) + var(--cui-dialog-modal-header-padding-bottom));
+	padding-left: var(--cui-dialog-modal--header-padding-left);
+	padding-right: var(--cui-dialog-modal--header-padding-right);
+	padding-bottom: var(--cui-dialog-modal--header-padding-bottom);
+	padding-top: var(--cui-dialog-modal--header-padding-top);
+	min-height: calc(var(--cui-button--height) + var(--cui-dialog-modal--header-padding-top) + var(--cui-dialog-modal--header-padding-bottom));
 }
 
 :where(.cui-dialog-modal-body-wrapper) {
@@ -100,22 +100,22 @@
 :where(.cui-dialog-modal-body) {
 	flex-grow: 1;
 	max-width: 100%;
-	padding-left: var(--cui-dialog-modal-body-padding-left);
-	padding-right: var(--cui-dialog-modal-body-padding-right);
-	padding-bottom: var(--cui-dialog-modal-body-padding-bottom);
-	padding-top: var(--cui-dialog-modal-body-padding-top);
-	min-height: calc(var(--cui-button-height) + var(--cui-dialog-modal-body-padding-top) + var(--cui-dialog-modal-body-padding-bottom));
+	padding-left: var(--cui-dialog-modal--body-padding-left);
+	padding-right: var(--cui-dialog-modal--body-padding-right);
+	padding-bottom: var(--cui-dialog-modal--body-padding-bottom);
+	padding-top: var(--cui-dialog-modal--body-padding-top);
+	min-height: calc(var(--cui-button--height) + var(--cui-dialog-modal--body-padding-top) + var(--cui-dialog-modal--body-padding-bottom));
 }
 
 :where(.cui-dialog-modal-footer) {
-	padding-left: var(--cui-dialog-modal-footer-padding-left);
-	padding-right: var(--cui-dialog-modal-footer-padding-right);
-	padding-bottom: var(--cui-dialog-modal-footer-padding-bottom);
-	padding-top: var(--cui-dialog-modal-footer-padding-top);
-	min-height: calc(var(--cui-button-height) + var(--cui-dialog-modal-footer-padding-top) + var(--cui-dialog-modal-footer-padding-bottom));
+	padding-left: var(--cui-dialog-modal--footer-padding-left);
+	padding-right: var(--cui-dialog-modal--footer-padding-right);
+	padding-bottom: var(--cui-dialog-modal--footer-padding-bottom);
+	padding-top: var(--cui-dialog-modal--footer-padding-top);
+	min-height: calc(var(--cui-button--height) + var(--cui-dialog-modal--footer-padding-top) + var(--cui-dialog-modal--footer-padding-bottom));
 }
 
 :where(.cui-dialog-modal.with-dividers-body),
 :where(.cui-dialog-modal.with-dividers-footer) {
-	border-top: 1px solid rgba(var(--cui-color-rgb-50), var(--cui-opacity--lower));
+	border-top: 1px solid rgba(var(--cui-color--rgb-50), var(--cui-opacity--lower));
 }

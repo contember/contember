@@ -39,6 +39,6 @@
 	}
 
 	to {
-		background-color: rgba(var(--cui-background-color-rgb-0), var(--cui-opacity--medium));
+		background-color: rgba(var(--cui-background-color--rgb-0), var(--cui-opacity--medium));
 	}
 }

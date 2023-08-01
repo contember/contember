@@ -19,7 +19,7 @@ export default {
 } as ComponentMeta<typeof Collapsible>
 
 const Template: ComponentStory<typeof Collapsible> = args => <Collapsible {...args}>
-	<div style={{ background: 'rgb(var(--cui-background-color-rgb-50))', borderRadius: '.5em', boxShadow: '0 .5em 5em rgba(0, 31, 91, .1)', overflow: 'auto', padding: '0 1em' }}>
+	<div style={{ background: 'rgb(var(--cui-background-color--rgb-50))', borderRadius: '.5em', boxShadow: '0 .5em 5em rgba(0, 31, 91, .1)', overflow: 'auto', padding: '0 1em' }}>
 		<h4>Collapsible content</h4>
 		<p>
 			Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer vel tincidunt lacus. Duis vestibulum, justo

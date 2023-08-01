@@ -1,0 +1,25 @@
+:where(.cui-menu-expand-toggle) {
+	align-items: center;
+	background: transparent;
+	border: 0;
+	color: inherit;
+	display: none;
+	justify-content: center;
+	min-height: 1.5em;
+	min-width: 1.5em;
+	padding: 0;
+	position: absolute;
+	right: 100%;
+	transform-origin: center center;
+	transform: rotate(90deg);
+	transition: transform var(--cui-transition-duration--fast);
+	user-select: none;
+	vertical-align: middle;
+}
+:where(.cui-menu-expand-toggle[aria-expanded="false"]) {
+	transform: rotate(0deg);
+}
+
+:where(.cui-menu[data-caret] .cui-menu-expand-toggle) {
+	display: flex;
+}

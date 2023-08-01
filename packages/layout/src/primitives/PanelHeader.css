@@ -1,13 +1,13 @@
 :where(.cui-layout-panel-header) {
 	-webkit-backdrop-filter: blur(var(--cui-backdrop-blur));
 	backdrop-filter: blur(var(--cui-backdrop-blur));
-	background-color: rgba(var(--cui-layout-panel-header-background-rgb), var(--cui-layout-panel-header-background-alpha));
-	background-image: linear-gradient(rgb(var(--cui-background-color-rgb-50)), transparent);
+	background-color: rgba(var(--cui-layout-panel--header-background-rgb), var(--cui-layout-panel--header-background-alpha));
+	background-image: linear-gradient(rgb(var(--cui-layout-panel--header-background-rgb)), rgba(var(--cui-layout-panel--header-background-rgb), 0));
 	left: 0;
-	padding-bottom: var(--cui-panel-padding-vertical);
-	padding-left: max(var(--inset-left, 0px), var(--cui-panel-padding-horizontal));
-	padding-right: max(var(--inset-right, 0px), var(--cui-panel-padding-horizontal));
-	padding-top: max(var(--inset-top, 0px), var(--cui-panel-padding-vertical));
+	padding-bottom: var(--cui-padding--panel-vertical);
+	padding-left: max(var(--inset-left, 0px), var(--cui-padding--panel-horizontal));
+	padding-right: max(var(--inset-right, 0px), var(--cui-padding--panel-horizontal));
+	padding-top: max(var(--inset-top, 0px), var(--cui-padding--panel-vertical));
 	position: sticky;
 	top: 0;
 	width: 100%;
@@ -23,7 +23,7 @@
 }
 
 :where(.cui-layout-panel-header):empty {
-	--cui-panel-padding-vertical: 0px;
-	--cui-panel-padding-horizontal: 0px;
+	--cui-padding--panel-vertical: 0px;
+	--cui-padding--panel-horizontal: 0px;
 	padding-bottom: 0;
 }

@@ -20,7 +20,7 @@ export default () => (
 
 
 		Box with label and delete action:
-		<Box label="Label" actions={<Button inset square borderRadius="full" distinction="seamless" intent="danger"><TrashIcon /></Button>}>A box content</Box>
+		<Box label="Label" actions={<Button square borderRadius="full" distinction="seamless" intent="danger"><TrashIcon /></Button>}>A box content</Box>
 
 		Box with a custom header, content and footer:
 		<Box header={<h3>Header</h3>} footer={<Button display="block" distinction="primary">Continue</Button>}>

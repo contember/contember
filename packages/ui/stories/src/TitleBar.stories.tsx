@@ -15,9 +15,9 @@ export default {
 
 const Template: ComponentStory<typeof TitleBar> = (args: TitleBarProps) => (
 	<div style={{
-		'--cui-layout-page-padding-top': '1em',
-		'--cui-layout-page-padding-left': '1em',
-		'--cui-layout-page-padding-right': '1em',
+		'--cui-layout-page--padding-top': '1em',
+		'--cui-layout-page--padding-left': '1em',
+		'--cui-layout-page--padding-right': '1em',
 		'--cui-layout-section-gap': '0.5em',
 		'flex': 1,
 	} as React.HTMLAttributes<HTMLDivElement['style']>}>

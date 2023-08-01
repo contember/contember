@@ -36,11 +36,11 @@ export interface ControlDisplayProps {
 	style?: CSSProperties;
 }
 
-export interface ControlValueProps<V> {
-	defaultValue?: V | null | undefined
-	onChange?: (value?: V | null) => void
-	notNull?: boolean
-	value?: V | null
+export type ControlValueProps<V, NN extends boolean = boolean> = {
+	defaultValue?: NN extends true ? Exclude<V, null> : V | null
+	onChange?: (value: NN extends true ? Exclude<V, null> : V | V | null) => void
+	value?: NN extends true ? Exclude<V, null> : V | null
+	notNull?: NN
 }
 
 export interface ControlConstraintProps<V> {
@@ -52,15 +52,15 @@ export interface ControlConstraintProps<V> {
 	step?: number
 }
 
-export type ControlProps<V> =
+export type ControlProps<V, NN extends boolean = boolean> =
 	& ControlDisplayProps
 	& ValidationStateProps
 	& ControlStateProps
 	& ControlFocusProps
 	& ControlConstraintProps<V>
-	& ControlValueProps<V>
+	& ControlValueProps<V, NN>
 
-export type NonOptionalControlProps<V> = Omit<NonOptional<ControlProps<V>>, 'type'>
+export type NonOptionalControlProps<V, NN extends boolean = boolean> = Omit<NonOptional<ControlProps<V, NN>>, 'type'>
 export type ControlPropsKeys<V> = keyof ControlProps<V>
 
 export type VisuallyDependentControlProps =

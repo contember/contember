@@ -5,8 +5,10 @@
 	border: none;
 	border-radius: var(--cui-gap);
 	color: inherit;
+	display: inline-flex;
+	gap: var(--cui-gap);
 	font-family: inherit;
-	font-size: var(--cui-font-size-label);
+	font-size: var(--cui-font-size--label);
 	font-weight: inherit;
 	line-height: 1.125em;
 	margin: calc(-1 * var(--cui-label-inset-vertical)) calc(-1 * var(--cui-label-inset-horizontal));
@@ -22,31 +24,10 @@
 }
 
 :where(.cui-label.view-small) {
-	font-size: var(--cui-font-size-note);
+	font-size: var(--cui-font-size--note);
 }
 
 :where(.cui-label.view-large) {
 	font-weight: lighter;
-	font-size: var(--cui-font-size-heading);
-}
-
-:where(a .cui-label),
-:where(button .cui-label) {
-	color: rgb(var(--cui-color-accent-rgb-50));
-}
-
-:where(.cui-label.is-active) {
-	color: rgb(var(--cui-color-accent-rgb-75));
-}
-
-:where(a:focus .cui-label),
-:where(button:focus .cui-label),
-:where(.cui-label.is-focused) {
-	color: rgb(var(--cui-color-accent-rgb-75));
-}
-
-:where(a:hover .cui-label),
-:where(button:hover .cui-label),
-:where(.cui-label.is-hover) {
-	color: rgb(var(--cui-color-accent-rgb-75));
+	font-size: var(--cui-font-size--heading);
 }

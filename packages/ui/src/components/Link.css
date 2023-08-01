@@ -1,16 +1,27 @@
-:where(.cui-link) {
-	--cui-link-color: rgb(var(--cui-color-accent-rgb-50));
-	color: var(--cui-link-color);
+:where(.cui-link),
+:where(.cui-root a) {
+	text-decoration: none;
+	color: rgb(var(--cui-color--strong-rgb-50));
+	font-weight: 600;
 }
 
-:where(.cui-link:hover),
-:where(.cui-link.is-hovered),
-:where(.cui-link:focus),
-:where(.cui-link.is-focused) {
-	--cui-link-color: rgb(var(--cui-color-accent-rgb-75));
+:where(.cui-root .cui-link),
+:where(.cui-root .cui-link.is-hovered),
+:where(.cui-root a:hover) {
+	color: rgb(var(--cui-color--accent-rgb-75));
 }
+:where(.cui-root .cui-link),
+:where(.cui-root .cui-link.is-focused),
+:where(.cui-root a:focus) {
+	color: rgb(var(--cui-color--accent-rgb-75));
+}
+:where(.cui-root .cui-link),
+:where(.cui-root a:active) {
+	color: rgb(var(--cui-color--accent-rgb-25));
+}
+
 
 :where(.cui-link:active),
 :where(.cui-link.is-active) {
-	--cui-link-color: rgb(var(--cui-color-accent-rgb-25));
+	--cui-link-color: rgb(var(--cui-color--accent-rgb-25));
 }

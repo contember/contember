@@ -1,20 +1,20 @@
 :where(.cui-editorBlockBoundary) {
-	--cui-editor-block-boundary-height: var(--cui-editor-blocks-gap);
+	--cui-editor-block-boundary--height: var(--cui-editor-blocks-gap);
 	align-items: center;
 	cursor: pointer;
 	display: flex;
 	flex-direction: row;
 	font-weight: 600;
-	height: var(--cui-editor-block-boundary-height);
+	height: var(--cui-editor-block-boundary--height);
 	justify-content: flex-start;
-	margin: 0 auto 0 calc(-1 * var(--cui-editor-canvas-element-handle-width, 0));
-	padding-left: var(--cui-editor-canvas-element-handle-width, 0);
+	margin: 0 auto 0 calc(-1 * var(--cui-editor-block--element-handle-width, 0));
+	padding-left: var(--cui-editor-block--element-handle-width, 0);
 	position: relative;
 }
 
 :where(.cui-editorBlockBoundary)::after,
 :where(.cui-editorBlockBoundary)::before {
-	background-color: rgb(var(--cui-background-color-controls-rgb-50));
+	background-color: rgb(var(--cui-background-color--controls-rgb-50));
 	border-radius: 2px;
 	content: "";
 	display: block;
@@ -29,18 +29,18 @@
 }
 
 :where(.cui-editorBlockBoundary.view-afterBlock) {
-	margin-bottom: calc(-1 * var(--cui-editor-block-boundary-height));
+	margin-bottom: calc(-1 * var(--cui-editor-block-boundary--height));
 }
 
 :where(.cui-editorBlockBoundary.view-beforeBlock) {
-	margin-top: calc(-1 * var(--cui-editor-block-boundary-height));
+	margin-top: calc(-1 * var(--cui-editor-block-boundary--height));
 }
 
 :where(.cui-editorBlockBoundary.view-beforeBlock + *:not(.cui-editorTable)) {
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
-	min-height: var(--cui-editor-canvas-element-handle-height);
+	min-height: var(--cui-editor-block--element-handle-height);
 }
 
 :where(.cui-editorBlockBoundary .cui-icon) {
@@ -51,9 +51,9 @@
 
 :where(.cui-editorBlockBoundary-inner) {
 	align-items: center;
-	background-color: rgb(var(--cui-background-color-rgb-50));
+	background-color: rgb(var(--cui-background-color--rgb-50));
 	border-radius: 1em;
-	color: rgba(var(--cui-color-rgb-50), var(--cui-opacity--lower));
+	color: rgba(var(--cui-color--rgb-50), var(--cui-opacity--lower));
 	display: flex;
 	flex-direction: row;
 	line-height: 1em;
@@ -72,13 +72,13 @@
 
 @media (hover: hover) and (pointer: fine) {
 	:where(.cui-editorBlockBoundary-inner) {
-		background-color: rgb(var(--cui-background-color-controls-rgb-50));
-		color: rgb(var(--cui-background-color-rgb-50));
+		background-color: rgb(var(--cui-background-color--controls-rgb-50));
+		color: rgb(var(--cui-background-color--rgb-50));
 		visibility: hidden;
 	}
 
 	:where(.cui-editorBlockBoundary:hover) {
-		color: rgb(var(--cui-color-accent-rgb-50));
+		color: rgb(var(--cui-color--accent-rgb-50));
 	}
 
 	:where(.cui-editorBlockBoundary:hover .cui-editorBlockBoundary-inner),

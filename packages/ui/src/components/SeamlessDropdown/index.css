@@ -40,7 +40,7 @@
 	left: 0;
 	min-height: 100%;
 	min-width: 100%;
-	background: rgb(var(--cui-background-color-rgb-50));
+	background: rgb(var(--cui-background-color--rgb-50));
 	border-radius: 1em;
 	display: none;
 	box-shadow: 0 0.0625em 0.1875em rgba(0, 0, 0, 0.2), 0 0.125em 0.5em rgba(0, 0, 0, 0.2);

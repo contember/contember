@@ -1,4 +1,4 @@
-import { Layout, LayoutPage, RepeaterItemContainer, StyleProvider } from '@contember/ui'
+import { Layout, LayoutPage, RepeaterItemContainer } from '@contember/ui'
 
 const dummyInput = (
 	<div style={{ backgroundColor: 'lightBlue', border: '1px solid blue', borderRadius: '0.25em', height: '2.25em', minWidth: '2.25em' }}></div>

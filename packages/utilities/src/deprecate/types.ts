@@ -1,2 +1,2 @@
 
-export type SemverString = `${number}.${number}.${number}` | `v${number}.${number}.${number}`
+export type SemverString = `${number}.${number}.${number}`

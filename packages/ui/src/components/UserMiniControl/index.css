@@ -25,7 +25,7 @@
 }
 
 :where(.cui-userMiniControl-name) {
-	color: rgb(var(--cui-color-rgb-50));
+	color: rgb(var(--cui-color--rgb-50));
 	font-weight: bold;
 	font-size: 0.875em;
 }

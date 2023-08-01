@@ -1,17 +1,17 @@
 :where(.cui-collapsible) {
-	--cui-collapsible-transition-duration: var(--cui-transition-duration-fast);
-	--cui-collapsible-transition-timing-function: ease;
-	--cui-collapsible-content-height: auto;
+	--cui-collapsible--transition-duration: var(--cui-transition-duration--fast);
+	--cui-collapsible--transition-timing-function: ease;
+	--cui-collapsible--content-height: auto;
 	display: flex;
 	transition-property: height, width, opacity, visibility;
-	transition-timing-function: var(--cui-collapsible-transition-timing-function);
-	transition-duration: var(--cui-collapsible-transition-duration);
+	transition-timing-function: var(--cui-collapsible--transition-timing-function);
+	transition-duration: var(--cui-collapsible--transition-duration);
 }
 
 @media (prefers-reduced-motion: reduce) {
 	:where(.cui-collapsible) {
-		--cui-collapsible-transition-duration: 0.0166666667s;
-		--cui-collapsible-transition-timing-function: step-end;
+		--cui-collapsible--transition-duration: 0.0166666667s;
+		--cui-collapsible--transition-timing-function: step-end;
 	}
 }
 
@@ -37,7 +37,7 @@
 
 :where(.cui-collapsible.view-topInsert.is-expanded),
 :where(.cui-collapsible.view-bottomInsert.is-expanded) {
-	height: var(--cui-collapsible-content-height);
+	height: var(--cui-collapsible--content-height);
 }
 
 :where(.cui-collapsible.view-topInsert) {
@@ -52,21 +52,21 @@
 :where(.cui-collapsible.view-leftInsert),
 :where(.cui-collapsible.view-rightInsert) {
 	align-items: flex-start;
-	transition-timing-function: step-end, var(--cui-collapsible-transition-timing-function), var(--cui-collapsible-transition-timing-function), var(--cui-collapsible-transition-timing-function);
+	transition-timing-function: step-end, var(--cui-collapsible--transition-timing-function), var(--cui-collapsible--transition-timing-function), var(--cui-collapsible--transition-timing-function);
 }
 
 :where(.cui-collapsible.view-fade.is-expanded),
 :where(.cui-collapsible.view-leftInsert.is-expanded),
 :where(.cui-collapsible.view-rightInsert.is-expanded) {
-	height: var(--cui-collapsible-content-height);
-	transition-timing-function: step-start, var(--cui-collapsible-transition-timing-function), var(--cui-collapsible-transition-timing-function), var(--cui-collapsible-transition-timing-function);
+	height: var(--cui-collapsible--content-height);
+	transition-timing-function: step-start, var(--cui-collapsible--transition-timing-function), var(--cui-collapsible--transition-timing-function), var(--cui-collapsible--transition-timing-function);
 }
 
 :where(.cui-collapsible.view-leftInsert .cui-collapsible-content),
 :where(.cui-collapsible.view-rightInsert .cui-collapsible-content) {
 	transition-property: transform;
-	transition-timing-function: var(--cui-collapsible-transition-timing-function);
-	transition-duration: var(--cui-collapsible-transition-duration);
+	transition-timing-function: var(--cui-collapsible--transition-timing-function);
+	transition-duration: var(--cui-collapsible--transition-duration);
 	transform: translateX(-100%);
 }
 

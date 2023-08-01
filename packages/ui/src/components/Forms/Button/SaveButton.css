@@ -1,0 +1,7 @@
+:where(.cui-save-button) {
+	--cui-button--size-horizontal: 2;
+	--cui-button--label-font-size: var(--cui-font-size--body);
+}
+:where(.cui-save-button > .cui-button-content) {
+	--cui-button--inset-vertical: calc(var(--cui-font-size--body) - var(--cui-font-size--label));
+}

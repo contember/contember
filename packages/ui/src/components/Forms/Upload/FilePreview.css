@@ -13,8 +13,8 @@
 	left: 0;
 	width: 100%;
 	height: 100%;
-	border-radius: var(--cui-border-radius-controls);
-	border: var(--cui-border-width, 1px) solid rgba(var(--cui-color-rgb-50), var(--cui-opacity--lower));
+	border-radius: var(--cui-border-radius--controls);
+	border: var(--cui-border-width, 1px) solid rgba(var(--cui-color--rgb-50), var(--cui-opacity--lower));
 	background-color: rgba(0, 0, 0, 0.05);
 	display: flex;
 	transition: border-color 0.2s;
@@ -55,5 +55,5 @@
 }
 
 :where(.cui-filePreview.is-active .cui-filePreview-in) {
-	border-color: rgb(var(--cui-background-color-controls-rgb-50));
+	border-color: rgb(var(--cui-background-color--controls-rgb-50));
 }

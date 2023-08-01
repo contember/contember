@@ -76,7 +76,6 @@ export const LayoutChrome = memo(({
 	}, [collapsed, setCollapsed])
 
 	const contentRef = useRef<HTMLDivElement>(null)
-	const barContentOffsetTop = useElementTopOffset(contentRef)
 
 	useEffect(() => {
 		const contentRefCopy = contentRef.current
@@ -170,10 +169,6 @@ export const LayoutChrome = memo(({
 					colorSchemeClassName(scheme), ,
 					toViewClass('collapsed', collapsed),
 				])}
-				style={useMemo(() => (barContentOffsetTop
-					? ({ '--cui-bar-content-offset-top': `${barContentOffsetTop}px` } as CSSProperties)
-					: undefined
-				), [barContentOffsetTop])}
 			>
 				{hasBar && (
 					<PortalProvider>

@@ -1,8 +1,8 @@
 :where(.cui-slug-input) {
-	--slug-input-control-focus-ring: var(--cui-control-focus-ring-box-shadow);
+	--slug-input-control-focus-ring: var(--cui-box-shadow--controls-focus-ring);
 	align-items: stretch;
-	background-color: rgb(var(--cui-background-color-rgb-25));
-	border-radius: var(--cui-border-radius-controls);
+	background-color: rgb(var(--cui-background-color--rgb-25));
+	border-radius: var(--cui-border-radius--controls);
 	border-width: var(--cui-border-width, 1px);
 	display: flex;
 	margin-bottom: calc(-1 * var(--cui-border-width));
@@ -18,15 +18,15 @@
 	align-items: center;
 	line-height: normal;
 	padding-left: calc(3 * var(--cui-gap));
-	color: rgba(var(--cui-color-rgb-50), var(--cui-opacity--medium));
+	color: rgba(var(--cui-color--rgb-50), var(--cui-opacity--medium));
 }
 
 :where(.cui-field-container:hover .cui-slug-input-prefix) {
-	border-color: rgba(var(--cui-color-rgb-50), var(--cui-opacity--low));
+	border-color: rgba(var(--cui-color--rgb-50), var(--cui-opacity--low));
 }
 
 :where(.cui-slug-input:focus-within > .cui-slug-input-prefix:not(:focus-within)) {
-	border-color: rgb(var(--cui-background-color-controls-rgb-50));
+	border-color: rgb(var(--cui-background-color--controls-rgb-50));
 }
 
 :where(.cui-slug-input-prefix-link) {
@@ -39,7 +39,7 @@
 :where(.cui-slug-input-prefix-link:focus),
 :where(.cui-slug-input-prefix-link:hover) {
 	text-decoration: underline;
-	color: rgb(var(--cui-color-accent-rgb-50));
+	color: rgb(var(--cui-color--accent-rgb-50));
 }
 
 :where(.cui-slug-input-input) {

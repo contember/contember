@@ -8,12 +8,20 @@ import { CamelCase } from 'type-fest';
 import { DelimiterCase } from 'type-fest';
 import { KebabCase } from 'type-fest';
 import { LiteralToPrimitiveDeep } from 'type-fest';
+import { MergeExclusive } from 'type-fest';
 import { Opaque } from 'type-fest';
 import { PascalCase } from 'type-fest';
 import { PropsWithChildren } from 'react';
 import { Replace } from 'type-fest';
+import { Simplify } from 'type-fest';
 import { UnionToIntersection } from 'type-fest';
 import { UnwrapOpaque } from 'type-fest';
+
+// @public (undocumented)
+export type AnyArray<Type = any> = Array<Type> | ReadonlyArray<Type>;
+
+// @public (undocumented)
+export type AnyRecord<T = any> = Record<KeyofBase, T>;
 
 // @public (undocumented)
 export type AsProp<C extends React.ElementType> = {
@@ -82,7 +90,12 @@ export type DeepPartial<T> = T extends Function ? T : T extends Array<infer Infe
 export { DelimiterCase }
 
 // @internal
-export function deprecate(removal: SemverString, condition: boolean, deprecated: string, replacement: string): void;
+export function deprecate(removal: SemverString, condition: boolean, deprecated: string, replacement: string | null): void;
+
+// @internal (undocumented)
+export function extend<B, E>(base: B, extension: E): B | E | readonly (B & object & any[])[number][] | Readonly<{
+    [k: string]: unknown;
+}>;
 
 // @public
 export type ExtendableProps<ExtendedProps = {}, OverrideProps = {}> = OverrideProps & Omit<ExtendedProps, keyof OverrideProps>;
@@ -182,10 +195,23 @@ export function isUndefined(value: unknown): value is undefined;
 
 export { KebabCase }
 
+// @public (undocumented)
+export type KeyofBase = keyof any;
+
 // @public
-export function listClassName(list: (string | false | null | undefined)[]): string;
+export function listClassName(list: NestedClassName): string;
 
 export { LiteralToPrimitiveDeep }
+
+export { MergeExclusive }
+
+// Warning: (ae-forgotten-export) The symbol "NarrowRaw" needs to be exported by the entry point index.d.ts
+//
+// @public (undocumented)
+export type Narrow<A extends any> = Try<A, [], NarrowRaw<A>>;
+
+// @public
+export type Narrowable = string | number | bigint | boolean;
 
 // @public (undocumented)
 export type NestedClassName = string | false | null | undefined | (string | false | null | undefined)[] | NestedClassName[];
@@ -271,10 +297,12 @@ export type RequiredDeepPlainObject<T extends RequiredDeepPlainObject<Record<str
 export function satisfiesOneOfFactory<T extends Array<Predicate<any, any>>>(...predicates: T): Predicate<unknown, UnionOfPredicateTypes<T>>;
 
 // @public (undocumented)
-export type SemverString = `${number}.${number}.${number}` | `v${number}.${number}.${number}`;
+export type SemverString = `${number}.${number}.${number}`;
 
 // @public (undocumented)
 export function setHasOneOf<T>(set: Set<T>, values: T[]): boolean;
+
+export { Simplify }
 
 // @public (undocumented)
 export type SlugString = Opaque<string, 'SlugString'>;

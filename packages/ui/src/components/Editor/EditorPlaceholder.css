@@ -1,5 +1,5 @@
 :where(.cui-editorPlaceholder) {
-	color: rgba(var(--cui-color-rgb-50), var(--cui-opacity--low));
+	color: rgba(var(--cui-color--rgb-50), var(--cui-opacity--low));
 	width: 0;
 	white-space: nowrap;
 }

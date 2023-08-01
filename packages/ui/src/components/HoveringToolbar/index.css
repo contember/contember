@@ -5,7 +5,7 @@
 	pointer-events: none;
 	position: sticky;
 	top: 0;
-	transition-duration: var(--cui-transition-duration-fast);
+	transition-duration: var(--cui-transition-duration--fast);
 	transition-property: opacity, visibility;
 	visibility: hidden;
 	z-index: 1;
@@ -15,11 +15,11 @@
 	bottom: 0;
 	display: flex;
 	justify-content: center;
-	left: var(--cui-editor-canvas-element-padding-left);
-	margin: var(--cui-editor-canvas-element-padding-top) auto var(--cui-editor-canvas-element-padding-bottom) auto;
+	left: var(--cui-editor-canvas--padding-element-left);
+	margin: var(--cui-editor-canvas--padding-element-top) auto var(--cui-editor-canvas--padding-element-bottom) auto;
 	overflow-x: auto;
 	position: absolute;
-	right: var(--cui-editor-canvas-element-padding-right);
+	right: var(--cui-editor-canvas--padding-element-right);
 	top: auto;
 }
 

@@ -42,13 +42,21 @@ export const useInputValue = <T, E extends HTMLElement>(
 
 	const onChangeListener = useCallback<ChangeEventHandler<E>>(event => {
 		const inputValue = extractValue(event.target)
-		const normalizedValue = inputValue ?? emptyOrNull
+		const normalizedValue = inputValue ?? (notNull ? emptyValue : null)
+
+		if (inputValue === undefined || emptyOrNull) {
+			if (notNull && import.meta.env.DEV) {
+				console.error('Input value is null, but notNull is true')
+			}
+
+			return
+		}
 
 		if (!readOnly && !disabled) {
 			onChangeRef.current?.(normalizedValue)
 			setInternalState(inputValue)
 		}
-	}, [disabled, emptyOrNull, extractValue, readOnly])
+	}, [extractValue, notNull, emptyValue, emptyOrNull, readOnly, disabled])
 
 	return {
 		onChange: onChangeListener,

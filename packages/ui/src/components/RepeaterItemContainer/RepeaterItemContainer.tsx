@@ -5,13 +5,15 @@ import { Box, BoxProps } from '../Box'
 import { Icon } from '../Icon'
 import { Label } from '../Typography/Label'
 
+export type RepeaterItemContainerOwnProps = {
+	index?: number
+	children: ReactNode
+	dragHandleComponent?: ComponentType<{ children: ReactNode }>
+}
+
 export type RepeaterItemContainerProps =
-	& Omit<BoxProps, 'header' | 'footer' | 'heading'>
-	& {
-		index?: number
-		children: ReactNode
-		dragHandleComponent?: ComponentType<{ children: ReactNode }>
-	}
+	& Omit<BoxProps, 'header' | 'footer' | 'heading' | keyof RepeaterItemContainerOwnProps>
+	& RepeaterItemContainerOwnProps
 
 const repeaterItemContainerClassNameBase = 'repeater-item-container'
 

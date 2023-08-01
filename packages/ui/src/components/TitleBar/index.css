@@ -1,23 +1,23 @@
 :where(.cui-titleBar) {
-	--cui-title-bar-padding-top: var(--cui-layout-page-padding-top);
-	--cui-title-bar-padding-left: var(--cui-layout-page-padding-left);
-	--cui-title-bar-padding-right: var(--cui-layout-page-padding-right);
-	--cui-title-bar-gap: calc(var(--cui-layout-section-gap) / 2);
+	--cui-title-bar--padding-top: var(--cui-layout-page--padding-top);
+	--cui-title-bar--padding-left: var(--cui-layout-page--padding-left);
+	--cui-title-bar--padding-right: var(--cui-layout-page--padding-right);
+	--cui-title-bar--gap: calc(var(--cui-layout-section-gap) / 2);
 	align-items: stretch;
-	background-color: rgb(var(--cui-background-color-rgb-50));
+	background-color: rgb(var(--cui-background-color--rgb-50));
 	display: flex;
 	flex-direction: column;
-	gap: var(--cui-title-bar-gap);
+	gap: var(--cui-title-bar--gap);
 	justify-content: space-between;
 	padding-bottom: var(--cui-padding);
-	padding-left: var(--cui-title-bar-padding-left);
-	padding-right: var(--cui-title-bar-padding-right);
-	padding-top: var(--cui-title-bar-padding-top);
+	padding-left: var(--cui-title-bar--padding-left);
+	padding-right: var(--cui-title-bar--padding-right);
+	padding-top: var(--cui-title-bar--padding-top);
 	z-index: 1;
 }
 
 :where(.cui-titleBar.is-global-theme) {
-	background-color: rgb(var(--cui-background-color-rgb-25));
+	background-color: rgb(var(--cui-background-color--rgb-25));
 }
 
 :where(.cui-titleBar)::after {
@@ -27,7 +27,7 @@
 	left: 0;
 	right: 0;
 	bottom: 0;
-	border-bottom: var(--cui-border-width, 1px) solid rgba(var(--cui-color-rgb-50), var(--cui-opacity--low));
+	border-bottom: var(--cui-border-width, 1px) solid rgba(var(--cui-color--rgb-50), var(--cui-opacity--low));
 }
 
 :where(.cui-titleBar-in) {
@@ -49,7 +49,7 @@
 
 @media (max-width: 767.98px) {
 	:where(.cui-titleBar) {
-		background: linear-gradient(to bottom, var(--cui-background-color-rgb-25), rgb(var(--cui-background-color-rgb-25)));
+		background: linear-gradient(to bottom, var(--cui-background-color--rgb-25), rgb(var(--cui-background-color--rgb-25)));
 		border-bottom-color: transparent;
 	}
 }

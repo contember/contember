@@ -60,7 +60,7 @@ export const DialogModal = memo(({
 				className={componentClassName('header', headerClassName)}
 			>
 				{header}
-				<Button square borderRadius="full" inset="gutter" onClick={onClose} distinction="seamless" className={componentClassName('close-button')}><XIcon /></Button>
+				<Button square borderRadius="full" onClick={onClose} distinction="seamless" className={componentClassName('close-button')}><XIcon /></Button>
 			</Stack>
 
 			{children && <div className={componentClassName('body-wrapper')}>

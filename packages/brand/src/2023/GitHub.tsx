@@ -22,7 +22,7 @@ export const GitHub = memo<Omit<ContemberIdentitySvgProps, 'strokeWidth'>>(({
 	return (
 		<svg
 			className={useClassName(['brand-icon', 'brand-github'], className)}
-			style={useMemo(() => ({ ...style, '--scale': scale } as CSSProperties), [scale, style])}
+			style={useMemo(() => ({ ...style, '--cui-icon--scale': scale } as CSSProperties), [scale, style])}
 			xmlns="http://www.w3.org/2000/svg"
 			{...svgSizeProps(width, height, crop)}
 		>

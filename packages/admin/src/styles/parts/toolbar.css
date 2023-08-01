@@ -2,7 +2,7 @@
 	color: #3E3F42;
 	background: linear-gradient(to top, #F6F7F9 0%, white 100%);
 	border: 0.0625rem solid #d7dce5;
-	border-top-left-radius: calc(var(--cui-border-radius-controls) + var(--cui-border-width, 1px));
-	border-top-right-radius: calc(var(--cui-border-radius-controls) + var(--cui-border-width, 1px));
+	border-top-left-radius: calc(var(--cui-border-radius--controls) + var(--cui-border-width, 1px));
+	border-top-right-radius: calc(var(--cui-border-radius--controls) + var(--cui-border-width, 1px));
 	border-bottom: none;
 }

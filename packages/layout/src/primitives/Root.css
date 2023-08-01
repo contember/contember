@@ -1,6 +1,6 @@
 :where(.cui-layout) {
-	background-color: rgb(var(--cui-background-color-rgb-25));
-	color: rgb(var(--cui-color-rgb-50));
+	background-color: rgb(var(--cui-background-color--rgb-25));
+	color: rgb(var(--cui-color--rgb-50));
 	display: flex;
 	flex-direction: row;
 	flex: 1;

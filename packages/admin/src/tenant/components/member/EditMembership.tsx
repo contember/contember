@@ -78,7 +78,7 @@ export const EditMembership: FC<EditMembershipProps> = ({ project, memberships, 
 													}
 												}}
 												options={[
-													{ value: -1, label: 'Select role', disabled: true },
+													{ value: null, label: 'Select role', disabled: true },
 													...rolesToShow.map(({ name: roleName }): SelectOption => {
 														const otherIndex = memberships.findIndex(mem => mem && mem.role === roleName)
 														const enabled = otherIndex === -1 || otherIndex === membershipIndex
@@ -90,7 +90,7 @@ export const EditMembership: FC<EditMembershipProps> = ({ project, memberships, 
 													}),
 												]}
 												placeholder="Select role"
-												value={membership === undefined ? -1 : membership.role}
+												value={membership === undefined ? null : membership.role}
 											/>
 											<Divider gap="none" />
 											<Button

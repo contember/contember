@@ -19,11 +19,11 @@
 }
 
 :where(a .cui-logo) {
-	color: rgb(var(--cui-color-accent-rgb-50));
+	color: rgb(var(--cui-color--accent-rgb-50));
 }
 
 :where(a:hover .cui-logo) {
-	color: rgb(var(--cui-color-accent-rgb-75));
+	color: rgb(var(--cui-color--accent-rgb-75));
 }
 
 :where(.cui-logo-label) {

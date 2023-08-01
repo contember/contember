@@ -3,6 +3,7 @@ import { colorSchemeClassName, contentThemeClassName, controlsThemeClassName, da
 import { createElement, forwardRef, memo } from 'react'
 import type { HTMLButtonElementProps } from '../../../types'
 import { Spinner } from '../../Spinner/Spinner'
+import { Text } from '../../Typography'
 import { AnchorButtonProps, BaseButtonProps, ButtonProps } from './Types'
 
 /**
@@ -92,6 +93,8 @@ export const BaseButton = memo(forwardRef<any, BaseButtonProps>(({
 	align,
 	bland,
 	borderRadius = true,
+	className: classNameProp,
+	componentClassName = 'button',
 	display = 'inline',
 	children,
 	disabled,
@@ -111,7 +114,6 @@ export const BaseButton = memo(forwardRef<any, BaseButtonProps>(({
 	square = false,
 	...rest
 }, ref) => {
-
 	// TODO: deprecated since v1.3.0
 	deprecate('1.3.0', bland !== undefined, '`bland` prop', '`distinction` prop')
 
@@ -148,7 +150,7 @@ export const BaseButton = memo(forwardRef<any, BaseButtonProps>(({
 	}
 
 	const themeIntent = !disabled ? intent : 'default'
-	const componentClassName = useClassNameFactory('button')
+	const className = useClassNameFactory(componentClassName)
 	const colorScheme = useColorScheme()
 	const scheme = schemeProp ?? colorScheme
 
@@ -163,7 +165,7 @@ export const BaseButton = memo(forwardRef<any, BaseButtonProps>(({
 		'data-display': dataAttribute(display),
 		'data-distinction': dataAttribute(distinction),
 		'data-elevated': dataAttribute(elevated),
-		'data-inset': dataAttribute(inset),
+		'data-inset': dataAttribute(inset ?? (distinction === 'seamless' ? true : undefined)),
 		'data-intent': dataAttribute(intent),
 		'data-justify': dataAttribute(justify),
 		'data-loading': dataAttribute(loading),
@@ -171,26 +173,30 @@ export const BaseButton = memo(forwardRef<any, BaseButtonProps>(({
 		'data-size': dataAttribute(size),
 		'data-square': dataAttribute(square),
 		disabled,
-		'className': componentClassName(null, [
+		'className': className(null, [
 			contentThemeClassName(distinction === 'default' ? null : themeIntent),
 			controlsThemeClassName(themeIntent),
 			colorSchemeClassName(scheme),
-			rest.className,
+			classNameProp,
 		]),
 		type,
-		'ref': ref,
+		ref,
 		...(disabled ? {
 			href: null,
 			onClick: null,
 		} : undefined),
 	}, (<ColorSchemeContext.Provider value={scheme}>
-			<div className={componentClassName('content')}>{children}</div>
-			{loading && (
-				<span className={componentClassName('spinner')}>
-					<Spinner />
-				</span>
-			)}
-		</ColorSchemeContext.Provider>
-	))
+		<div className={className('content')}>
+			{(typeof children === 'string' || typeof children === 'number')
+				? <Text>{`${children}`}</Text>
+				: children
+			}
+		</div>
+		{loading && (
+			<span className={className('spinner')}>
+				<Spinner />
+			</span>
+		)}
+	</ColorSchemeContext.Provider>))
 }))
 BaseButton.displayName = 'Interface.BaseButton'

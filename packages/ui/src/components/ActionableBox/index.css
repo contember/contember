@@ -4,8 +4,8 @@
 
 :where(.cui-actionableBox.view-image),
 :where(.cui-actionableBox.view-video) {
-	--cui-box-padding: 0;
-	--cui-box-border: none;
+	--cui-box--padding: 0;
+	--cui-box--border: none;
 }
 
 :where(.cui-actionableBox-actions) {

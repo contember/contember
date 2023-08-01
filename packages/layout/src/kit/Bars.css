@@ -25,10 +25,10 @@
 	align-items: center;
 	display: flex;
 	gap: var(--cui-gutter);
-	padding-bottom: max(var(--inset-bottom, 0px), var(--cui-panel-padding-vertical));
-	padding-left: max(var(--inset-left, 0px), var(--cui-panel-padding-horizontal));
-	padding-right: max(var(--inset-right, 0px), var(--cui-panel-padding-horizontal));
-	padding-top: max(var(--inset-top, 0px), var(--cui-panel-padding-vertical));
+	padding-bottom: max(var(--inset-bottom, 0px), var(--cui-padding--panel-vertical));
+	padding-left: max(var(--inset-left, 0px), var(--cui-padding--panel-horizontal));
+	padding-right: max(var(--inset-right, 0px), var(--cui-padding--panel-horizontal));
+	padding-top: max(var(--inset-top, 0px), var(--cui-padding--panel-vertical));
 }
 
 :where(
@@ -39,7 +39,7 @@
 	:first-child:not(:last-child),
 	:not(:first-child):not(:last-child),
 ) {
-	padding-right: max(var(--inset-right, 0px), var(--cui-box-inner-padding-horizontal));
+	padding-right: max(var(--inset-right, 0px), var(--cui-padding--inner-horizontal));
 }
 
 :where(
@@ -50,7 +50,7 @@
 	:last-child:not(:first-child),
 	:not(:first-child):not(:last-child),
 ) {
-	padding-left: max(var(--inset-left, 0px), var(--cui-box-inner-padding-horizontal));
+	padding-left: max(var(--inset-left, 0px), var(--cui-padding--inner-horizontal));
 }
 
 :where(
@@ -76,7 +76,7 @@
 	display: flex;
 	flex-direction: row;
 	flex-grow: 1;
-	gap: var(--cui-gap);
+	gap: inherit;
 }
 
 :where(.cui-layout-bar-center-content) {
@@ -135,23 +135,4 @@
 )
 :where(.cui-layout-bar-end) {
 	border-color: transparent;
-}
-
-
-/* MENU */
-:where(.cui-layout-bar .cui-menu-next > .cui-menu-next-list) {
-	display: flex;
-	flex-direction: row;
-}
-:where(.cui-layout-bar .cui-menu-next > .cui-menu-next-list > li > .cui-menu-next-section-title .cui-menu-next-expand-toggle.is-collapsed)::before {
-	transform: rotate(135deg);
-}
-
-:where(.cui-layout-bar .cui-menu-next > .cui-menu-next-list li > .cui-menu-next-section-title .cui-menu-next-expand-toggle),
-:where(.cui-layout-bar .cui-menu-next > .cui-menu-next-list li > .cui-menu-next-section-title .cui-menu-next-expand-toggle)::before {
-	position: unset;
-}
-
-:where(.cui-layout-bar .cui-menu-next > .cui-menu-next-list li > .cui-collapsible) {
-	position: absolute;
 }

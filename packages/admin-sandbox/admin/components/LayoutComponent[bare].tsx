@@ -12,8 +12,8 @@ export const LayoutComponent = ({ children, className: classNameProp, ...rest }:
 
 	return (
 		<div {...rest} className={className(null, classNameProp)} style={{
-			backgroundColor: 'rgb(var(--cui-background-color-rgb-25))',
-			color: 'rgb(var(--cui-color-rgb-50))',
+			backgroundColor: 'rgb(var(--cui-background-color--rgb-25))',
+			color: 'rgb(var(--cui-color--rgb-50))',
 			flexGrow: 1,
 		}}>
 			{targetsIfActive(allSlotKeys)}

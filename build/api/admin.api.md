@@ -4085,19 +4085,17 @@ export interface RepeaterInnerProps<ContainerExtraProps, ItemExtraProps> extends
 export const RepeaterItem: React.MemoExoticComponent<({ children, canBeRemoved, label, removalType, dragHandleComponent, index, ...rest }: RepeaterItemProps) => JSX.Element>;
 
 // @public (undocumented)
-export interface RepeaterItemProps extends Omit<RepeaterItemContainerProps, 'children' | 'index' | 'label'> {
-    // (undocumented)
-    canBeRemoved: boolean;
-    // (undocumented)
-    children: ReactNode;
-    // (undocumented)
-    dragHandleComponent?: RepeaterItemContainerProps['dragHandleComponent'];
-    // (undocumented)
-    index: number;
-    // (undocumented)
+export type RepeaterItemOwnProps = {
     label: ReactNode;
-    // (undocumented)
+    children: ReactNode;
+    canBeRemoved?: boolean;
+    index: number;
+    dragHandleComponent?: RepeaterItemContainerProps['dragHandleComponent'];
     removalType: RemovalType;
+};
+
+// @public (undocumented)
+export interface RepeaterItemProps extends Omit<RepeaterItemContainerProps, keyof RepeaterItemOwnProps>, RepeaterItemOwnProps {
 }
 
 // @public (undocumented)

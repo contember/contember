@@ -5,6 +5,8 @@
 	border: none;
 	border-radius: var(--cui-gap);
 	color: inherit;
+	display: inline-flex;
+	gap: var(--cui-gap);
 	font-family: inherit;
 	font-size: var(--cui-font-size-label);
 	font-weight: inherit;
@@ -28,25 +30,4 @@
 :where(.cui-label.view-large) {
 	font-weight: lighter;
 	font-size: var(--cui-font-size-heading);
-}
-
-:where(a .cui-label),
-:where(button .cui-label) {
-	color: rgb(var(--cui-color-accent-rgb-50));
-}
-
-:where(.cui-label.is-active) {
-	color: rgb(var(--cui-color-accent-rgb-75));
-}
-
-:where(a:focus .cui-label),
-:where(button:focus .cui-label),
-:where(.cui-label.is-focused) {
-	color: rgb(var(--cui-color-accent-rgb-75));
-}
-
-:where(a:hover .cui-label),
-:where(button:hover .cui-label),
-:where(.cui-label.is-hover) {
-	color: rgb(var(--cui-color-accent-rgb-75));
 }

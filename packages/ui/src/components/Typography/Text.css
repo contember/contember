@@ -1,0 +1,19 @@
+:where(.cui-text) {
+	--cui-text--leading-trim: calc((var(--cui-line-height-units) - 1em) / 2);
+	display: var(--cui-view--display, inline);
+	padding-inline-end: calc(var(--cui-view--padding-right, var(--cui-view--padding-horizontal, var(--cui-view--padding, 0px))) + var(--cui-text--leading-trim));
+	padding-inline-start: calc(var(--cui-view--padding-left, var(--cui-view--padding-horizontal, var(--cui-view--padding, 0px))) + var(--cui-text--leading-trim));
+
+	--cui-text--inset: 0px;
+	--cui-text--inset-horizontal: calc(var(--cui-text--inset));
+	--cui-text--inset-vertical: var(--cui-text--inset);
+
+	--cui-text--padding: 0px;
+	--cui-text--padding-horizontal: calc(var(--cui-text--padding));
+	--cui-text--padding-vertical: var(--cui-text--padding);
+
+	margin-inline-start: calc(-1 * var(--cui-text--inset-horizontal));
+	margin-inline-end: calc(-1 * var(--cui-text--inset-horizontal));
+	margin-block-start: calc(-1 * var(--cui-text--inset-vertical));
+	margin-block-end: calc(-1 * var(--cui-text--inset-vertical));
+}

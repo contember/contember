@@ -42,6 +42,7 @@ export class ModelValidator {
 
 	private validateEntity(entity: Model.Entity, errors: ErrorBuilder): void {
 		this.validateIdentifier(entity.name, errors)
+		this.validateEntityName(entity.name, errors)
 
 		for (const [fieldName, field] of Object.entries(entity.fields)) {
 			const fieldErrors = errors.for(fieldName)
@@ -234,6 +235,12 @@ export class ModelValidator {
 		}
 		if (RESERVED_WORDS.includes(value)) {
 			errorBuilder.add('MODEL_INVALID_IDENTIFIER', `${value} is reserved word`)
+		}
+	}
+
+	private validateEntityName(value: string, errorBuilder: ErrorBuilder) {
+		if (['Query', 'Mutation'].includes(value)) {
+			errorBuilder.add('MODEL_INVALID_ENTITY_NAME', `${value} is reserved word`)
 		}
 	}
 

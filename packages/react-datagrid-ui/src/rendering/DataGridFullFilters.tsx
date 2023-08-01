@@ -63,10 +63,9 @@ export function DataGridFullFilters({
 		),
 	}), [formatMessage])
 
-	if (!allowAggregateFilterControls) {
+	if (allowAggregateFilterControls === false) {
 		return null
 	}
-
 
 	return (
 		<Dropdown

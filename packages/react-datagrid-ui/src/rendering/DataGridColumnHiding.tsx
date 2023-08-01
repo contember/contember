@@ -31,7 +31,7 @@ export const DataGridColumnHiding = ({
 		size: 'small',
 	}), [formatMessage])
 
-	if (!allowColumnVisibilityControls || displayedState.layout === 'tiles') {
+	if (allowColumnVisibilityControls === false || displayedState.layout === 'tiles') {
 		return null
 	}
 

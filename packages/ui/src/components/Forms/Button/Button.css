@@ -304,7 +304,6 @@
 	--cui-button--inset-optical: 0px;
 }
 
-:where(.cui-button-list > .cui-button[data-inset]),
 :where(.cui-button-group > .cui-button[data-inset]) {
 	--cui-button--inset: 0px;
 }

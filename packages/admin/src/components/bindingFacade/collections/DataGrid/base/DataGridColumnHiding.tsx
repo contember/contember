@@ -1,4 +1,4 @@
-import { Box, Checkbox, Dropdown, DropdownProps, FieldContainer, TableColumnsIcon } from '@contember/ui'
+import { Box, Checkbox, Dropdown, DropdownProps, FieldContainer, TableColumnsIcon, Text } from '@contember/ui'
 import { Fragment, ReactElement, useMemo } from 'react'
 import type { MessageFormatter } from '../../../../../i18n'
 import type { DataGridSetIsColumnHidden } from './DataGridSetIsColumnHidden'
@@ -22,7 +22,7 @@ export function DataGridColumnHiding({
 		children: (
 			<>
 				<TableColumnsIcon />
-				{formatMessage('dataGrid.columnHiding.showMenuButton.text')}
+				<Text translate={formatMessage}>dataGrid.columnHiding.showMenuButton.text</Text>
 			</>
 		),
 		size: 'small',
@@ -30,7 +30,7 @@ export function DataGridColumnHiding({
 
 	return (
 		<Dropdown buttonProps={buttonProps}>
-			<Box border={false} label={formatMessage('dataGrid.columnHiding.heading')}>
+			<Box border={false} label={<Text translate={formatMessage}>dataGrid.columnHiding.heading</Text>}>
 				<div style={{ display: 'flex', flexDirection: 'column', gap: '0.25em' }}>
 					{Array.from(desiredState.columns, ([key, column]) => {
 						if (column.canBeHidden === false) {

@@ -1,5 +1,5 @@
 import type { Environment } from '@contember/binding'
-import { Box, Button, ButtonGroup, Dropdown, DropdownProps, Table, TableCell, TableHeaderCell, TableRow } from '@contember/ui'
+import { Box, Button, ButtonGroup, Dropdown, DropdownProps, Table, TableCell, TableHeaderCell, TableRow, Text } from '@contember/ui'
 import { FilterIcon, PlusCircleIcon, Trash2Icon } from 'lucide-react'
 import { Fragment, ReactElement, createElement, useMemo } from 'react'
 import type { MessageFormatter } from '../../../../../i18n'
@@ -37,7 +37,7 @@ export function DataGridFullFilters({
 		children: (
 			<>
 				<FilterIcon />
-				{formatMessage('dataGrid.columnFiltering.showMenuButton.text')}
+				<Text translate={formatMessage}>dataGrid.columnFiltering.showMenuButton.text</Text>
 			</>
 		),
 		size: 'small',
@@ -60,7 +60,7 @@ export function DataGridFullFilters({
 			alignment="center"
 			buttonProps={columnFilteringButtonProps}
 			renderContent={({ update: updateOuterDropdown }) => (
-				<Box label={formatMessage('dataGrid.columnFiltering.heading')}>
+				<Box label={<Text translate={formatMessage}>dataGrid.columnFiltering.heading</Text>}>
 					{hasAnyFilters || <EmptyMessage>{formatMessage('dataGrid.columnFiltering.emptyMessage.text')}</EmptyMessage>}
 					{hasAnyFilters && (
 						<Table

@@ -2894,8 +2894,10 @@ __metadata:
   dependencies:
     "@contember/react-binding": "workspace:*"
     "@contember/react-i18n": "workspace:*"
+    "@contember/react-utils": "workspace:*"
     "@contember/ui": "workspace:*"
     "@contember/utilities": "workspace:*"
+    lucide-react: ^0.256.0
     react: ^18
     react-dom: ^18
   peerDependencies:
@@ -2983,6 +2985,7 @@ __metadata:
     "@contember/react-utils": "workspace:*"
     "@contember/ui": "workspace:*"
     "@contember/utilities": "workspace:*"
+    lucide-react: ^0.256.0
     react: ^18
     react-dom: ^18
   peerDependencies:

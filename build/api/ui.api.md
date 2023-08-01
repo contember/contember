@@ -17,6 +17,7 @@ import { ComponentType } from 'react';
 import { CompositionEventHandler } from 'react';
 import { Context } from 'react';
 import { CSSProperties } from 'react';
+import { DeepPartial } from '@contember/utilities';
 import { DetailedReactHTMLElement } from 'react';
 import { DragEventHandler } from 'react';
 import { ElementType } from 'react';
@@ -30,11 +31,14 @@ import { HTMLAttributes } from 'react';
 import { IconName } from '@blueprintjs/icons';
 import { Key } from 'react';
 import { KeyboardEventHandler } from 'react';
+import { LucideIcon } from 'lucide-react';
 import { MemoExoticComponent } from 'react';
 import { MouseEvent as MouseEvent_2 } from 'react';
 import { MouseEventHandler } from 'react';
 import { MutableRefObject } from 'react';
 import { NamedExoticComponent } from 'react';
+import { Narrow } from '@contember/utilities';
+import { Narrowable } from '@contember/utilities';
 import { NestedClassName } from '@contember/utilities';
 import { NonOptional } from '@contember/utilities';
 import { PointerEventHandler } from 'react';
@@ -55,6 +59,7 @@ import { TextareaAutosizeProps } from 'react-textarea-autosize';
 import { TextareaHTMLAttributes } from 'react';
 import { TouchEventHandler } from 'react';
 import { TransitionEventHandler } from 'react';
+import { Try } from '@contember/utilities';
 import { UIEventHandler } from 'react';
 import { useElementTopOffset } from '@contember/react-utils';
 import { WheelEventHandler } from 'react';
@@ -104,7 +109,7 @@ componentClassName?: string | undefined;
 } & RefAttributes<HTMLAnchorElement>>>;
 
 // @public (undocumented)
-export interface AnchorBasedProps extends Omit<HTMLAnchorElementProps, 'ref' | 'size'> {
+export interface AnchorBasedProps extends Omit<HTMLAnchorElementProps, 'ref' | 'size' | 'className'> {
     // (undocumented)
     Component: 'a';
 }
@@ -169,7 +174,7 @@ export type BoxHeaderProps = {
 };
 
 // @public (undocumented)
-export type BoxOwnProps = BoxHeaderProps & Pick<StackProps, 'align' | 'direction' | 'evenly' | 'gap' | 'horizontal' | 'justify' | 'reverse' | 'wrap'> & {
+export type BoxOwnProps = BoxHeaderProps & Pick<StackProps, 'align' | 'className' | 'direction' | 'evenly' | 'gap' | 'horizontal' | 'justify' | 'reverse' | 'wrap'> & {
     background?: boolean;
     border?: boolean;
     borderRadius?: boolean | 'gap' | 'gutter' | 'padding' | 'large' | 'larger';
@@ -183,7 +188,7 @@ export type BoxOwnProps = BoxHeaderProps & Pick<StackProps, 'align' | 'direction
 };
 
 // @public (undocumented)
-export type BoxProps = BoxOwnProps & HTMLDivElementProps;
+export type BoxProps = Omit<HTMLDivElementProps, keyof BoxOwnProps> & BoxOwnProps;
 
 // @public (undocumented)
 export const Breadcrumbs: NamedExoticComponent<BreadcrumbsProps>;
@@ -198,7 +203,7 @@ export interface BreadcrumbsProps {
 export const Button: MemoExoticComponent<ForwardRefExoticComponent<ButtonOwnProps & Omit<ButtonBasedProps, "Component"> & RefAttributes<HTMLButtonElement>>>;
 
 // @public (undocumented)
-export interface ButtonBasedProps extends Omit<HTMLButtonElementProps, 'ref' | 'size'> {
+export interface ButtonBasedProps extends Omit<HTMLButtonElementProps, 'ref' | 'size' | 'className'> {
     // (undocumented)
     Component: 'button';
 }
@@ -254,7 +259,7 @@ export interface ButtonListProps extends ComponentClassNameProps, DeprecatedButt
 }
 
 // @public (undocumented)
-export interface ButtonOwnProps extends DeprecatedButtonOwnProps {
+export interface ButtonOwnProps extends DeprecatedButtonOwnProps, ComponentClassNameProps {
     // (undocumented)
     active?: boolean;
     // (undocumented)
@@ -302,7 +307,7 @@ export type CardProps = Omit<CommonCardProps, 'type'> & Omit<HTMLDivElementProps
 };
 
 // @public
-export const Checkbox: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<boolean> & ControlValueProps<boolean> & {
+export const Checkbox: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<boolean> & ControlValueProps<boolean, boolean> & {
 CheckboxButtonComponent?: (({ id, name, placeholder, checked, indeterminate, style, ...props }: CheckboxButtonProps) => JSX.Element) | undefined;
 children?: undefined;
 } & RestHTMLCheckboxProps & RefAttributes<HTMLInputElement>>>;
@@ -350,7 +355,7 @@ export interface CollapsibleProps {
 export type CollapsibleTransition = Default | 'topInsert' | 'leftInsert' | 'rightInsert' | 'bottomInsert' | 'fade';
 
 // @public (undocumented)
-export const ColorInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<string> & ControlValueProps<string> & {
+export const ColorInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<string> & ControlValueProps<string, boolean> & {
 withTopToolbar?: boolean | undefined;
 } & RestHTMLTextInputProps & RefAttributes<HTMLInputElement>>>;
 
@@ -461,7 +466,7 @@ export interface ControlFocusProps {
 }
 
 // @public (undocumented)
-export type ControlProps<V> = ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<V> & ControlValueProps<V>;
+export type ControlProps<V, NN extends boolean = boolean> = ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<V> & ControlValueProps<V, NN>;
 
 // @public (undocumented)
 export type ControlPropsKeys<V> = keyof ControlProps<V>;
@@ -485,19 +490,15 @@ export interface ControlStateProps {
 }
 
 // @public (undocumented)
-export interface ControlValueProps<V> {
-    // (undocumented)
-    defaultValue?: V | null | undefined;
-    // (undocumented)
-    notNull?: boolean;
-    // (undocumented)
-    onChange?: (value?: V | null) => void;
-    // (undocumented)
-    value?: V | null;
-}
+export type ControlValueProps<V, NN extends boolean = boolean> = {
+    defaultValue?: NN extends true ? Exclude<V, null> : V | null;
+    onChange?: (value: NN extends true ? Exclude<V, null> : V | V | null) => void;
+    value?: NN extends true ? Exclude<V, null> : V | null;
+    notNull?: NN;
+};
 
 // @public (undocumented)
-export const DateInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<string> & ControlValueProps<string> & {
+export const DateInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<string> & ControlValueProps<string, boolean> & {
 withTopToolbar?: boolean | undefined;
 } & RestHTMLTextInputProps & RefAttributes<HTMLInputElement>>>;
 
@@ -511,12 +512,12 @@ export type DateInputString = string;
 export const DateInputStringRegExp: RegExp;
 
 // @public (undocumented)
-export const DateTimeInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<string> & ControlValueProps<string> & {
+export const DateTimeInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<string> & ControlValueProps<string, boolean> & {
 withTopToolbar?: boolean | undefined;
 } & RestHTMLTextInputProps & RefAttributes<HTMLInputElement>>>;
 
 // @public (undocumented)
-export const DateTimeInputFallback: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<string> & ControlValueProps<string> & {
+export const DateTimeInputFallback: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<string> & ControlValueProps<string, boolean> & {
 withTopToolbar?: boolean | undefined;
 } & RestHTMLTextInputProps & RefAttributes<HTMLInputElement>>>;
 
@@ -907,7 +908,7 @@ itemRef?: string | undefined;
 results?: number | undefined;
 security?: string | undefined;
 unselectable?: "on" | "off" | undefined;
-inputMode?: "search" | "text" | "none" | "tel" | "url" | "email" | "numeric" | "decimal" | undefined;
+inputMode?: "none" | "text" | "search" | "tel" | "url" | "email" | "numeric" | "decimal" | undefined;
 is?: string | undefined;
 'aria-activedescendant'?: string | undefined;
 'aria-atomic'?: (boolean | "false" | "true") | undefined;
@@ -918,16 +919,16 @@ is?: string | undefined;
 'aria-colindex'?: number | undefined;
 'aria-colspan'?: number | undefined;
 'aria-controls'?: string | undefined;
-'aria-current'?: boolean | "time" | "page" | "false" | "true" | "date" | "step" | "location" | undefined;
+'aria-current'?: boolean | "page" | "false" | "true" | "time" | "step" | "location" | "date" | undefined;
 'aria-describedby'?: string | undefined;
 'aria-details'?: string | undefined;
 'aria-disabled'?: (boolean | "false" | "true") | undefined;
-'aria-dropeffect'?: "copy" | "link" | "none" | "move" | "execute" | "popup" | undefined;
+'aria-dropeffect'?: "none" | "copy" | "move" | "link" | "execute" | "popup" | undefined;
 'aria-errormessage'?: string | undefined;
 'aria-expanded'?: (boolean | "false" | "true") | undefined;
 'aria-flowto'?: string | undefined;
 'aria-grabbed'?: (boolean | "false" | "true") | undefined;
-'aria-haspopup'?: boolean | "dialog" | "menu" | "listbox" | "grid" | "false" | "true" | "tree" | undefined;
+'aria-haspopup'?: boolean | "listbox" | "grid" | "menu" | "false" | "true" | "dialog" | "tree" | undefined;
 'aria-hidden'?: (boolean | "false" | "true") | undefined;
 'aria-invalid'?: boolean | "false" | "true" | "grammar" | "spelling" | undefined;
 'aria-keyshortcuts'?: string | undefined;
@@ -944,7 +945,7 @@ is?: string | undefined;
 'aria-posinset'?: number | undefined;
 'aria-pressed'?: boolean | "mixed" | "false" | "true" | undefined;
 'aria-readonly'?: (boolean | "false" | "true") | undefined;
-'aria-relevant'?: "text" | "all" | "additions" | "additions removals" | "additions text" | "removals" | "removals additions" | "removals text" | "text additions" | "text removals" | undefined;
+'aria-relevant'?: "all" | "text" | "additions" | "additions removals" | "additions text" | "removals" | "removals additions" | "removals text" | "text additions" | "text removals" | undefined;
 'aria-required'?: (boolean | "false" | "true") | undefined;
 'aria-roledescription'?: string | undefined;
 'aria-rowcount'?: number | undefined;
@@ -1203,7 +1204,7 @@ itemRef?: string | undefined;
 results?: number | undefined;
 security?: string | undefined;
 unselectable?: "on" | "off" | undefined;
-inputMode?: "search" | "text" | "none" | "tel" | "url" | "email" | "numeric" | "decimal" | undefined;
+inputMode?: "none" | "text" | "search" | "tel" | "url" | "email" | "numeric" | "decimal" | undefined;
 is?: string | undefined;
 'aria-activedescendant'?: string | undefined;
 'aria-atomic'?: (boolean | "false" | "true") | undefined;
@@ -1214,16 +1215,16 @@ is?: string | undefined;
 'aria-colindex'?: number | undefined;
 'aria-colspan'?: number | undefined;
 'aria-controls'?: string | undefined;
-'aria-current'?: boolean | "time" | "page" | "false" | "true" | "date" | "step" | "location" | undefined;
+'aria-current'?: boolean | "page" | "false" | "true" | "time" | "step" | "location" | "date" | undefined;
 'aria-describedby'?: string | undefined;
 'aria-details'?: string | undefined;
 'aria-disabled'?: (boolean | "false" | "true") | undefined;
-'aria-dropeffect'?: "copy" | "link" | "none" | "move" | "execute" | "popup" | undefined;
+'aria-dropeffect'?: "none" | "copy" | "move" | "link" | "execute" | "popup" | undefined;
 'aria-errormessage'?: string | undefined;
 'aria-expanded'?: (boolean | "false" | "true") | undefined;
 'aria-flowto'?: string | undefined;
 'aria-grabbed'?: (boolean | "false" | "true") | undefined;
-'aria-haspopup'?: boolean | "dialog" | "menu" | "listbox" | "grid" | "false" | "true" | "tree" | undefined;
+'aria-haspopup'?: boolean | "listbox" | "grid" | "menu" | "false" | "true" | "dialog" | "tree" | undefined;
 'aria-hidden'?: (boolean | "false" | "true") | undefined;
 'aria-invalid'?: boolean | "false" | "true" | "grammar" | "spelling" | undefined;
 'aria-keyshortcuts'?: string | undefined;
@@ -1240,7 +1241,7 @@ is?: string | undefined;
 'aria-posinset'?: number | undefined;
 'aria-pressed'?: boolean | "mixed" | "false" | "true" | undefined;
 'aria-readonly'?: (boolean | "false" | "true") | undefined;
-'aria-relevant'?: "text" | "all" | "additions" | "additions removals" | "additions text" | "removals" | "removals additions" | "removals text" | "text additions" | "text removals" | undefined;
+'aria-relevant'?: "all" | "text" | "additions" | "additions removals" | "additions text" | "removals" | "removals additions" | "removals text" | "text additions" | "text removals" | undefined;
 'aria-required'?: (boolean | "false" | "true") | undefined;
 'aria-roledescription'?: string | undefined;
 'aria-rowcount'?: number | undefined;
@@ -1524,7 +1525,7 @@ export interface EditorToolbarProps {
 }
 
 // @public (undocumented)
-export const EmailInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<string> & ControlValueProps<string> & {
+export const EmailInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<string> & ControlValueProps<string, boolean> & {
 withTopToolbar?: boolean | undefined;
 } & RestHTMLTextInputProps & RefAttributes<HTMLInputElement>>>;
 
@@ -1639,7 +1640,7 @@ export interface FilePreviewProps {
 export function flipValue<V = any, T = boolean, F = boolean>(value: V, truthy?: T, falsy?: F): boolean | NonNullable<T> | NonNullable<F> | undefined;
 
 // @public (undocumented)
-export const FloatInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<number> & ControlValueProps<number> & {
+export const FloatInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<number> & ControlValueProps<number, boolean> & {
 withTopToolbar?: boolean | undefined;
 } & RestHTMLTextInputProps & RefAttributes<HTMLInputElement>>>;
 
@@ -1668,7 +1669,7 @@ export type GridProps = GridOwnProps & HTMLDivElementProps;
 export const Heading: MemoExoticComponent<ForwardRefExoticComponent<    {
 distinction?: HeadingDistinction | undefined;
 depth?: HeadingDepth | undefined;
-size?: "small" | "default" | undefined;
+size?: "default" | "small" | undefined;
 } & Omit<HTMLHeadingElementProps, "ref"> & RefAttributes<HTMLHeadingElement>>>;
 
 // @public (undocumented)
@@ -1687,7 +1688,7 @@ export type HeadingProps = {
 } & Omit<HTMLHeadingElementProps, 'ref'>;
 
 // @public (undocumented)
-export const HiddenInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<string> & ControlValueProps<string> & {
+export const HiddenInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<string> & ControlValueProps<string, boolean> & {
 withTopToolbar?: boolean | undefined;
 } & RestHTMLTextInputProps & RefAttributes<HTMLInputElement>>>;
 
@@ -1800,7 +1801,7 @@ export type InputValueProps<T, E extends HTMLElement> = ControlStateProps & Cont
 export type Intent = Default | 'accent' | 'primary' | 'secondary' | 'tertiary' | 'positive' | 'success' | 'warn' | 'danger';
 
 // @public (undocumented)
-export const InternalTextInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<string> & ControlValueProps<string> & {
+export const InternalTextInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<string> & ControlValueProps<string, boolean> & {
 withTopToolbar?: boolean | undefined;
 } & RestHTMLTextInputProps & RefAttributes<HTMLInputElement>>>;
 
@@ -1989,9 +1990,10 @@ export const Menu: MemoExoticComponent<(props: PropsWithChildren<MenuProps>) => 
 export type MenuItemProps<T = unknown> = (MenuItemPropsTitleRequired<T> | MenuItemPropsTitleOptional) & {
     children?: ReactNode;
     componentClassName?: string;
-    href?: string;
-    external?: boolean;
     expandedByDefault?: boolean;
+    external?: boolean;
+    href?: string;
+    icon?: ReactNode;
 };
 
 // @public (undocumented)
@@ -2011,19 +2013,15 @@ export interface MenuItemPropsTitleRequired<T> {
 }
 
 // @public (undocumented)
-export interface MenuProps {
-    // (undocumented)
+export type MenuProps = HTMLDivElementProps & {
     className?: NestedClassName;
-    // (undocumented)
+    caret?: ReactNode;
     componentClassName?: string;
-    // (undocumented)
     focusMenuItemLabel?: string;
     id?: string;
-    // (undocumented)
     label?: string;
-    // (undocumented)
     showCaret?: boolean;
-}
+};
 
 // @public
 export const Message: MemoExoticComponent<({ action, background, borderRadius, children, className, display, distinction, elevated, flow, icon, important, intent, lifted, padding, size, textAlign, ...props }: MessageProps) => JSX.Element>;
@@ -2053,7 +2051,7 @@ export type MessageProps = {
 } & HTMLDivElementProps & DeprecatedMessageProps;
 
 // @public (undocumented)
-export const MonthInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<string> & ControlValueProps<string> & {
+export const MonthInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<string> & ControlValueProps<string, boolean> & {
 withTopToolbar?: boolean | undefined;
 } & RestHTMLTextInputProps & RefAttributes<HTMLInputElement>>>;
 
@@ -2089,7 +2087,7 @@ export interface NavigationLinkProps {
 }
 
 // @public (undocumented)
-export type NonOptionalControlProps<V> = Omit<NonOptional<ControlProps<V>>, 'type'>;
+export type NonOptionalControlProps<V, NN extends boolean = boolean> = Omit<NonOptional<ControlProps<V, NN>>, 'type'>;
 
 // @public (undocumented)
 export type NonOptionalUseInputClassNameProps = Omit<NonOptionalVisuallyDependentControlProps, 'id' | 'name' | 'placeholder' | 'style'>;
@@ -2101,7 +2099,7 @@ export type NonOptionalVisuallyDependentControlProps = Omit<NonOptional<Visually
 export function noop(): void;
 
 // @public (undocumented)
-export const NumberInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<number> & ControlValueProps<number> & {
+export const NumberInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<number> & ControlValueProps<number, boolean> & {
 withTopToolbar?: boolean | undefined;
 } & RestHTMLTextInputProps & RefAttributes<HTMLInputElement>>>;
 
@@ -2139,7 +2137,7 @@ export interface ParsedStackFrame {
 export type ParsedStackTrace = ParsedStackFrame[];
 
 // @public (undocumented)
-export const PasswordInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<string> & ControlValueProps<string> & {
+export const PasswordInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<string> & ControlValueProps<string, boolean> & {
 withTopToolbar?: boolean | undefined;
 } & RestHTMLTextInputProps & RefAttributes<HTMLInputElement>>>;
 
@@ -2273,7 +2271,7 @@ export interface RadioProps {
 export const randomId: () => string;
 
 // @public (undocumented)
-export const RangeInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<string> & ControlValueProps<string> & {
+export const RangeInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<string> & ControlValueProps<string, boolean> & {
 withTopToolbar?: boolean | undefined;
 } & RestHTMLTextInputProps & RefAttributes<HTMLInputElement>>>;
 
@@ -2300,13 +2298,16 @@ export type RepeaterItemContainerHeaderProps = {
 };
 
 // @public (undocumented)
-export type RepeaterItemContainerProps = Omit<BoxProps, 'header' | 'footer' | 'heading'> & {
+export type RepeaterItemContainerOwnProps = {
     index?: number;
     children: ReactNode;
     dragHandleComponent?: ComponentType<{
         children: ReactNode;
     }>;
 };
+
+// @public (undocumented)
+export type RepeaterItemContainerProps = Omit<BoxProps, 'header' | 'footer' | 'heading' | keyof RepeaterItemContainerOwnProps> & RepeaterItemContainerOwnProps;
 
 // @public (undocumented)
 export interface RestHTMLCheckboxProps extends Omit<AllHTMLAttributes<HTMLInputElement>, ControlPropsKeys<boolean> | 'checked' | 'children'> {
@@ -2364,7 +2365,7 @@ export interface SeamlessDropdownProps {
 }
 
 // @public (undocumented)
-export const SearchInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<string> & ControlValueProps<string> & {
+export const SearchInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<string> & ControlValueProps<string, boolean> & {
 withTopToolbar?: boolean | undefined;
 } & RestHTMLTextInputProps & RefAttributes<HTMLInputElement>>>;
 
@@ -2426,12 +2427,17 @@ export type SectionTabsRegistrationContextType = [
 ];
 
 // @public (undocumented)
-export const Select: <V = unknown>(props: Omit<ControlProps<V>, "style" | "type" | keyof ControlConstraintProps<any>> & {
-    options: SelectOption<V>[];
+export const Select: (<V, NN extends boolean>(props: Omit<ControlProps<V, NN>, "style" | "type" | keyof ControlConstraintProps<any>> & {
+    options: SelectOption<Try<V, [], (V extends [] ? [] : never) | (V extends Narrowable ? V : never) | { [K in keyof V]: V[K] extends Function ? V[K] : (V[K] extends infer T ? T extends V[K] ? T extends [] ? [] : never : never : never) | (V[K] extends infer T_1 ? T_1 extends V[K] ? T_1 extends Narrowable ? T_1 : never : never : never) | (V[K] extends infer T_2 ? { [K_1 in keyof T_2]: V[K][K_1] extends Function ? V[K][K_1] : (V[K][K_1] extends infer T_3 ? T_3 extends V[K][K_1] ? T_3 extends [] ? [] : never : never : never) | (V[K][K_1] extends infer T_4 ? T_4 extends V[K][K_1] ? T_4 extends Narrowable ? T_4 : never : never : never) | (V[K][K_1] extends infer T_5 ? { [K_2 in keyof T_5]: V[K][K_1][K_2] extends Function ? V[K][K_1][K_2] : (V[K][K_1][K_2] extends infer T_6 ? T_6 extends V[K][K_1][K_2] ? T_6 extends [] ? [] : never : never : never) | (V[K][K_1][K_2] extends infer T_7 ? T_7 extends V[K][K_1][K_2] ? T_7 extends Narrowable ? T_7 : never : never : never) | (V[K][K_1][K_2] extends infer T_8 ? { [K_3 in keyof T_8]: V[K][K_1][K_2][K_3] extends Function ? V[K][K_1][K_2][K_3] : (V[K][K_1][K_2][K_3] extends infer T_9 ? T_9 extends V[K][K_1][K_2][K_3] ? T_9 extends [] ? [] : never : never : never) | (V[K][K_1][K_2][K_3] extends infer T_10 ? T_10 extends V[K][K_1][K_2][K_3] ? T_10 extends Narrowable ? T_10 : never : never : never) | (V[K][K_1][K_2][K_3] extends infer T_11 ? { [K_4 in keyof T_11]: V[K][K_1][K_2][K_3][K_4] extends Function ? V[K][K_1][K_2][K_3][K_4] : (V[K][K_1][K_2][K_3][K_4] extends infer T_12 ? T_12 extends V[K][K_1][K_2][K_3][K_4] ? T_12 extends [] ? [] : never : never : never) | (V[K][K_1][K_2][K_3][K_4] extends infer T_13 ? T_13 extends V[K][K_1][K_2][K_3][K_4] ? T_13 extends Narrowable ? T_13 : never : never : never) | (V[K][K_1][K_2][K_3][K_4] extends infer T_14 ? { [K_5 in keyof T_14]: V[K][K_1][K_2][K_3][K_4][K_5] extends Function ? V[K][K_1][K_2][K_3][K_4][K_5] : (V[K][K_1][K_2][K_3][K_4][K_5] extends infer T_15 ? T_15 extends V[K][K_1][K_2][K_3][K_4][K_5] ? T_15 extends [] ? [] : never : never : never) | (V[K][K_1][K_2][K_3][K_4][K_5] extends infer T_16 ? T_16 extends V[K][K_1][K_2][K_3][K_4][K_5] ? T_16 extends Narrowable ? T_16 : never : never : never) | (V[K][K_1][K_2][K_3][K_4][K_5] extends infer T_17 ? { [K_6 in keyof T_17]: V[K][K_1][K_2][K_3][K_4][K_5][K_6] extends Function ? V[K][K_1][K_2][K_3][K_4][K_5][K_6] : (V[K][K_1][K_2][K_3][K_4][K_5][K_6] extends infer T_18 ? T_18 extends V[K][K_1][K_2][K_3][K_4][K_5][K_6] ? T_18 extends [] ? [] : never : never : never) | (V[K][K_1][K_2][K_3][K_4][K_5][K_6] extends infer T_19 ? T_19 extends V[K][K_1][K_2][K_3][K_4][K_5][K_6] ? T_19 extends Narrowable ? T_19 : never : never : never) | (V[K][K_1][K_2][K_3][K_4][K_5][K_6] extends infer T_20 ? { [K_7 in keyof T_20]: V[K][K_1][K_2][K_3][K_4][K_5][K_6][K_7] extends Function ? V[K][K_1][K_2][K_3][K_4][K_5][K_6][K_7] : (V[K][K_1][K_2][K_3][K_4][K_5][K_6][K_7] extends infer T_21 ? T_21 extends V[K][K_1][K_2][K_3][K_4][K_5][K_6][K_7] ? T_21 extends [] ? [] : never : never : never) | (V[K][K_1][K_2][K_3][K_4][K_5][K_6][K_7] extends infer T_22 ? T_22 extends V[K][K_1][K_2][K_3][K_4][K_5][K_6][K_7] ? T_22 extends Narrowable ? T_22 : never : never : never) | (V[K][K_1][K_2][K_3][K_4][K_5][K_6][K_7] extends infer T_23 ? { [K_8 in keyof T_23]: V[K][K_1][K_2][K_3][K_4][K_5][K_6][K_7][K_8] extends Function ? V[K][K_1][K_2][K_3][K_4][K_5][K_6][K_7][K_8] : (V[K][K_1][K_2][K_3][K_4][K_5][K_6][K_7][K_8] extends infer T_24 ? T_24 extends V[K][K_1][K_2][K_3][K_4][K_5][K_6][K_7][K_8] ? T_24 extends [] ? [] : never : never : never) | (V[K][K_1][K_2][K_3][K_4][K_5][K_6][K_7][K_8] extends infer T_25 ? T_25 extends V[K][K_1][K_2][K_3][K_4][K_5][K_6][K_7][K_8] ? T_25 extends Narrowable ? T_25 : never : never : never) | (V[K][K_1][K_2][K_3][K_4][K_5][K_6][K_7][K_8] extends infer T_26 ? { [K_9 in keyof T_26]: V[K][K_1][K_2][K_3][K_4][K_5][K_6][K_7][K_8][K_9] extends Function ? V[K][K_1][K_2][K_3][K_4][K_5][K_6][K_7][K_8][K_9] : (V[K][K_1][K_2][K_3][K_4][K_5][K_6][K_7][K_8][K_9] extends infer T_27 ? T_27 extends V[K][K_1][K_2][K_3][K_4][K_5][K_6][K_7][K_8][K_9] ? T_27 extends [] ? [] : never : never : never) | (V[K][K_1][K_2][K_3][K_4][K_5][K_6][K_7][K_8][K_9] extends infer T_28 ? T_28 extends V[K][K_1][K_2][K_3][K_4][K_5][K_6][K_7][K_8][K_9] ? T_28 extends Narrowable ? T_28 : never : never : never) | (V[K][K_1][K_2][K_3][K_4][K_5][K_6][K_7][K_8][K_9] extends infer T_29 ? { [K_10 in keyof T_29]: V[K][K_1][K_2][K_3][K_4][K_5][K_6][K_7][K_8][K_9][K_10] extends Function ? V[K][K_1][K_2][K_3][K_4][K_5][K_6][K_7][K_8][K_9][K_10] : (V[K][K_1][K_2][K_3][K_4][K_5][K_6][K_7][K_8][K_9][K_10] extends infer T_30 ? T_30 extends V[K][K_1][K_2][K_3][K_4][K_5][K_6][K_7][K_8][K_9][K_10] ? T_30 extends [] ? [] : never : never : never) | (V[K][K_1][K_2][K_3][K_4][K_5][K_6][K_7][K_8][K_9][K_10] extends infer T_31 ? T_31 extends V[K][K_1][K_2][K_3][K_4][K_5][K_6][K_7][K_8][K_9][K_10] ? T_31 extends Narrowable ? T_31 : never : never : never) | any; } : never); } : never); } : never); } : never); } : never); } : never); } : never); } : never); } : never); } : never); }>>[];
     rows?: undefined;
     isSearchable?: ComponentProps<ReactSelect>['isSearchable'];
     styles?: StylesConfig<any, boolean, never> | undefined;
-} & RefAttributes<HTMLReactSelectElement<V>>) => ReactElement | null;
+} & RefAttributes<HTMLReactSelectElement<V>>) => ReactElement<any, any> | null) & {
+    displayName?: string | undefined;
+};
+
+// @public (undocumented)
+export const SelectComponent: <V, NN extends boolean>({ active, className: outerClassName, defaultValue: defaultValueProp, disabled, distinction, focused, hovered, id, intent, isSearchable, loading, name, notNull, onBlur, onChange, onFocus, onFocusChange, onValidationStateChange, options, placeholder, readOnly, required, rows, scheme, size, styles, validationState, value: valueProp, ...outerProps }: SelectProps<V, NN>, forwardedRef: ForwardedRef<HTMLReactSelectElement<V>>) => JSX.Element;
 
 // @public (undocumented)
 export const SelectCreateNewWrapper: ({ onClick, children }: SelectCreateNewWrapperProps) => JSX.Element;
@@ -2462,18 +2468,23 @@ export type SelectOptionWithKey<V = string> = Omit<SelectOption<V>, 'key'> & {
 };
 
 // @public (undocumented)
-export type SelectProps<V> = Omit<ControlProps<V>, 'type' | 'style' | keyof ControlConstraintProps<any>> & {
-    options: SelectOption<V>[];
+export type SelectProps<V, NN extends boolean> = Omit<ControlProps<V, NN>, 'type' | 'style' | keyof ControlConstraintProps<any>> & {
+    options: SelectOption<Narrow<V>>[];
     rows?: never;
     isSearchable?: ComponentProps<ReactSelect>['isSearchable'];
     styles?: StylesConfig<any, boolean, never>;
 };
 
+// Warning: (ae-forgotten-export) The symbol "config" needs to be exported by the entry point index.d.ts
+//
+// @public (undocumented)
+export function setInterfaceConfig(userConfig: DeepPartial<typeof config>): void;
+
 // @public (undocumented)
 export type Size = Default | 'small' | 'large';
 
 // @public (undocumented)
-export const SlugInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<string> & ControlValueProps<string> & {
+export const SlugInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<string> & ControlValueProps<string, boolean> & {
 withTopToolbar?: boolean | undefined;
 } & RestHTMLTextInputProps & {
 link?: string | undefined;
@@ -2633,6 +2644,9 @@ export interface TableCellProps {
     shrunk?: boolean;
 }
 
+// @internal
+export const TableColumnsIcon: LucideIcon;
+
 // @public (undocumented)
 export const TableHeaderCell: MemoExoticComponent<({ shrunk, ...props }: TableHeaderCellProps) => JSX.Element>;
 
@@ -2685,6 +2699,9 @@ export interface TableRowProps {
     onClick?: (id: number | string) => void;
 }
 
+// @internal
+export const TableRowsIcon: LucideIcon;
+
 // @public (undocumented)
 export const Tag: NamedExoticComponent<TagProps>;
 
@@ -2697,7 +2714,7 @@ export interface TagProps {
 }
 
 // @public (undocumented)
-export const TelInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<string> & ControlValueProps<string> & {
+export const TelInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<string> & ControlValueProps<string, boolean> & {
 withTopToolbar?: boolean | undefined;
 } & RestHTMLTextInputProps & RefAttributes<HTMLInputElement>>>;
 
@@ -2705,7 +2722,11 @@ withTopToolbar?: boolean | undefined;
 export type TelInputProps = TextInputProps;
 
 // @public (undocumented)
-export const TextareaInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<string> & ControlValueProps<string> & TextareaInputOwnProps & {
+const Text_2: MemoExoticComponent<ForwardRefExoticComponent<TextProps<Function> & RefAttributes<HTMLSpanElement>>>;
+export { Text_2 as Text }
+
+// @public (undocumented)
+export const TextareaInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<string> & ControlValueProps<string, boolean> & TextareaInputOwnProps & {
 style?: TextareaAutosizeProps['style'];
 } & UnderlyingElementProps & RefAttributes<HTMLTextAreaElement>>>;
 
@@ -2724,7 +2745,7 @@ export type TextareaInputProps = ControlProps<string> & TextareaInputOwnProps & 
 
 // @public (undocumented)
 export const TextInput: MemoExoticComponent<ForwardRefExoticComponent<Omit<TextInputProps, "type"> & {
-type?: "search" | "time" | "color" | "range" | "tel" | "url" | "email" | "date" | "datetime-local" | "month" | "password" | "week" | "datetime" | undefined;
+type?: "color" | "range" | "search" | "time" | "tel" | "url" | "email" | "date" | "datetime-local" | "month" | "password" | "week" | "datetime" | undefined;
 } & RefAttributes<HTMLInputElement>>>;
 
 // @public (undocumented)
@@ -2741,6 +2762,22 @@ export type TextInputPropsWithDeprecated = Omit<TextInputProps, 'type'> & {
 };
 
 // @public (undocumented)
+export type TextOwnProps<Translate extends Function = Function> = ComponentClassNameProps & ({
+    children: string;
+    fallback?: string;
+    translate: Translate;
+    values?: Record<string, any>;
+} | {
+    children: string;
+    fallback?: never;
+    translate?: never;
+    values?: never;
+});
+
+// @public (undocumented)
+export type TextProps<Translate extends Function = Function> = Omit<HTMLSpanElementProps, keyof TextOwnProps> & TextOwnProps<Translate>;
+
+// @public (undocumented)
 export interface ThemeScheme {
     // (undocumented)
     scheme?: Scheme;
@@ -2753,7 +2790,7 @@ export interface ThemeScheme {
 }
 
 // @public (undocumented)
-export const TimeInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<string> & ControlValueProps<string> & {
+export const TimeInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<string> & ControlValueProps<string, boolean> & {
 withTopToolbar?: boolean | undefined;
 } & RestHTMLTextInputProps & {
 seconds?: boolean | undefined;
@@ -2929,7 +2966,7 @@ export interface UploadProgressProps {
 }
 
 // @public (undocumented)
-export const UrlInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<string> & ControlValueProps<string> & {
+export const UrlInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<string> & ControlValueProps<string, boolean> & {
 withTopToolbar?: boolean | undefined;
 } & RestHTMLTextInputProps & RefAttributes<HTMLInputElement>>>;
 
@@ -2992,6 +3029,17 @@ export const useInputValue: <T, E extends HTMLElement>({ defaultValue, value, on
 };
 
 // @public (undocumented)
+export function useInterfaceConfig(): Readonly<{
+    StyleProvider: NonOptional<StyleProviderProps>;
+    Menu: {
+        caret: boolean;
+    };
+    MenuExpandToggle: {
+        Icon: LucideIcon;
+    };
+}>;
+
+// @public (undocumented)
 export function useMouseMove<E extends HTMLElement = HTMLElement>(observedElementRef: RefObject<E>): RefObject<boolean>;
 
 // @public (undocumented)
@@ -3034,7 +3082,7 @@ export const useShowToast: () => (toast: ToastData) => void;
 export const UseTableElementContext: Context<boolean>;
 
 // @public (undocumented)
-export const useTextBasedInput: <E extends HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>(props: ControlProps<string>, forwardedRef: ForwardedRef<E>) => AllHTMLAttributes<E> & {
+export const useTextBasedInput: <E extends HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>(props: ControlProps<string>, forwardedRef: ForwardedRef<E>) => AllHTMLAttributes<E> & {
     ref: RefObject<E>;
 };
 
@@ -3067,7 +3115,7 @@ export type VisuallyHiddenProps<C extends ElementType> = PolymorphicComponentPro
 export const visuallyHiddenStyle: CSSProperties;
 
 // @public (undocumented)
-export const WeekInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<string> & ControlValueProps<string> & {
+export const WeekInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<string> & ControlValueProps<string, boolean> & {
 withTopToolbar?: boolean | undefined;
 } & RestHTMLTextInputProps & RefAttributes<HTMLInputElement>>>;
 

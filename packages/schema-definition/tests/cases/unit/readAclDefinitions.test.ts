@@ -553,3 +553,27 @@ namespace InvalidModel {
 test('invalid column', () => {
 	expect(() => createSchema(InvalidModel)).toThrow('Field "bar" does not exist on entity "Book" in read ACL definition.')
 })
+
+
+namespace ExplicitIdPredicate {
+	export const publicRole = c.createRole('public')
+
+	@c.Allow(publicRole, { read: ['id'] })
+	export class Book {
+		title = c.stringColumn()
+	}
+}
+
+test('explicit ID predicate', () => {
+	const schema = createSchema(ExplicitIdPredicate)
+	expect(schema.acl.roles.public.entities.Book).toMatchInlineSnapshot(`
+		{
+		  "operations": {
+		    "read": {
+		      "id": true,
+		    },
+		  },
+		  "predicates": {},
+		}
+	`)
+})

@@ -62,8 +62,8 @@ export class EntityPredicatesResolver {
 		return new EntityPredicatesResolver(aclDefinitions, predicates, predicateNamesMap, generatedNames)
 	}
 
-	createFieldPredicate(op: 'create' | 'update' | 'read' | 'delete', field: string): true | undefined | string {
-		const fieldWhens = EntityPredicatesResolver.getMatchingWhens(this.aclDefinitions, op, field)
+	createFieldPredicate(op: 'create' | 'update' | 'read' | 'delete', field: string, isPrimary: boolean): true | undefined | string {
+		const fieldWhens = EntityPredicatesResolver.getMatchingWhens(this.aclDefinitions, op, field, isPrimary)
 		if (fieldWhens.length === 0) {
 			return undefined
 		}
@@ -130,7 +130,7 @@ export class EntityPredicatesResolver {
 						return { [ctx.targetEntity.primary]: { never: true } }
 					}
 					const ref = ctx.value
-					const whens = EntityPredicatesResolver.getMatchingWhens(targetPermissions.definitions, ref.operation, ref.field ?? '')
+					const whens = EntityPredicatesResolver.getMatchingWhens(targetPermissions.definitions, ref.operation, ref.field ?? '', false)
 					if (whens.length === 0) {
 						return { [ctx.targetEntity.primary]: { never: true } }
 					}
@@ -150,7 +150,12 @@ export class EntityPredicatesResolver {
 		})
 	}
 
-	private static getMatchingWhens(permissions: AllowDefinition<any>[], operation: 'delete' | 'read' | 'update' | 'create', field: string) {
+	private static getMatchingWhens(
+		permissions: AllowDefinition<any>[],
+		operation: 'delete' | 'read' | 'update' | 'create',
+		field: string,
+		isPrimary: boolean,
+	) {
 		return permissions
 			.filter(it => {
 				if (operation === 'delete') {
@@ -160,7 +165,10 @@ export class EntityPredicatesResolver {
 				if (!op) {
 					return false
 				}
-				return op === true || op.includes(field)
+				if (op === true) {
+					return !isPrimary
+				}
+				return op.includes(field)
 			})
 			.map(it => it.when ?? true)
 	}

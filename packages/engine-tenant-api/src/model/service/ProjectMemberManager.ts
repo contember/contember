@@ -114,24 +114,23 @@ export class ProjectMemberManager {
 		memberships: readonly T[],
 		verifier: AccessVerifier,
 	): Promise<T[]> {
-		const filteredMemberships = await Promise.all(
-			memberships.map(async membership => {
-				if (!(await verifier(PermissionActions.PROJECT_VIEW_MEMBER([{ role: membership.role, variables: [] }])))) {
-					return null
+		const filteredMemberships: T[] = []
+		nextMembership: for (const membership of memberships) {
+			if (!(await verifier(PermissionActions.PROJECT_VIEW_MEMBER([{ role: membership.role, variables: [] }])))) {
+				continue
+			}
+			const variables: { values: Acl.MembershipVariable['values']; name: string }[] = []
+			for (const variable of membership.variables) {
+				const values = await this.filterProjectMembershipVariableValues(membership, variable, verifier)
+				if (values.length === 0) {
+					continue nextMembership
 				}
-				const variables = await Promise.all(
-					membership.variables.map(async variable => {
-						const values = await this.filterProjectMembershipVariableValues(membership, variable, verifier)
-						return { name: variable.name, values }
-					}),
-				)
-				if (variables.find(it => it.values.length === 0)) {
-					return null
-				}
-				return { ...membership, variables }
-			}),
-		)
-		return filteredMemberships.filter(notEmpty)
+				variables.push({ name: variable.name, values })
+			}
+			filteredMemberships.push({ ...membership, variables })
+		}
+
+		return filteredMemberships
 	}
 
 	private async filterProjectMembershipVariableValues(

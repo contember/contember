@@ -162,7 +162,7 @@ export const useCommonReactSelectStyles = <Option = unknown, IsMulti extends boo
 			borderColor,
 			'borderWidth': 'var(--cui-border-width, 1px)',
 			color,
-			'borderRadius': 'var(--cui-border-radius-controls)',
+			'borderRadius': 'var(--cui-border-radius--controls)',
 			'boxShadow': isFocused ? 'var(--cui-control-focus-ring-box-shadow)' : undefined,
 			'minHeight': 'var(--cui-size-controls)',
 			'&:hover': {
@@ -202,7 +202,7 @@ export const useCommonReactSelectStyles = <Option = unknown, IsMulti extends boo
 	option: (provided, { isFocused, isSelected }) => {
 		return {
 			...provided,
-			'borderRadius': 'var(--cui-border-radius-controls)',
+			'borderRadius': 'var(--cui-border-radius--controls)',
 			'backgroundColor': isFocused
 				? 'rgb(var(--cui-background-color-controls-rgb-75))'
 				: isSelected

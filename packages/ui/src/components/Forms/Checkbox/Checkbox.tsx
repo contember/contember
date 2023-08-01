@@ -59,7 +59,9 @@ export const Checkbox = memo(forwardRef<HTMLInputElement, CheckboxProps>(({
 			}
 		}
 
-		onChange?.(next)
+		if (next !== undefined) {
+			onChange?.(next)
+		}
 	}, [value, notNull, onChange])
 
 	const props = useCheckboxInput({

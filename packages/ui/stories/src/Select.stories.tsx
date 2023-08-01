@@ -23,12 +23,12 @@ export default {
 } as ComponentMeta<typeof Select>
 
 const Template: ComponentStory<typeof Select> = (args: {
-	options: { value: unknown, label: string }[],
+	options: { value: unknown | null, label: string }[],
 	defaultValue?: unknown | null | undefined;
 	value?: unknown | null | undefined;
 }) => {
 	const ref = React.useRef<HTMLReactSelectElement<typeof args.options[number]['value']>>(null)
-	const [value, setValue] = useState<unknown | null | undefined>(args.value as unknown)
+	const [value, setValue] = useState<unknown | null | undefined>(args.value)
 	const [error, setError] = useState<string | undefined>(undefined)
 	const [touched, setTouched] = useState<boolean | undefined>(undefined)
 
@@ -47,7 +47,7 @@ const Template: ComponentStory<typeof Select> = (args: {
 			validationState={touched && error ? 'invalid' : undefined}
 			{...args}
 			defaultValue={args.defaultValue}
-			value={value}
+			value={value as any}
 			onChange={onChange}
 			onBlur={useCallback(() => {
 				setTouched(true)
@@ -82,7 +82,7 @@ export const Custom_Empty_Option = Template.bind({})
 
 Custom_Empty_Option.args = {
 	options: [{
-		value: null,
+		value: null as any,
 		label: 'Set fancy value...',
 	}, {
 		value: '1',

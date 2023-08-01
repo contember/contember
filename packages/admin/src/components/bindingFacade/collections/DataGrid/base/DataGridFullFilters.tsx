@@ -1,5 +1,6 @@
 import type { Environment } from '@contember/binding'
-import { Box, Button, ButtonGroup, Dropdown, DropdownProps, Icon, Table, TableCell, TableHeaderCell, TableRow } from '@contember/ui'
+import { Box, Button, ButtonGroup, Dropdown, DropdownProps, Table, TableCell, TableHeaderCell, TableRow } from '@contember/ui'
+import { FilterIcon, PlusCircleIcon, Trash2Icon } from 'lucide-react'
 import { Fragment, ReactElement, createElement, useMemo } from 'react'
 import type { MessageFormatter } from '../../../../../i18n'
 import { EmptyMessage } from '../../helpers'
@@ -35,14 +36,7 @@ export function DataGridFullFilters({
 		distinction: 'seamless',
 		children: (
 			<>
-				<Icon
-					blueprintIcon="filter"
-					alignWithLowercase
-					style={{
-						marginRight: '0.2em',
-						opacity: hasAnyFilters ? '1' : '0.8',
-					}}
-				/>
+				<FilterIcon />
 				{formatMessage('dataGrid.columnFiltering.showMenuButton.text')}
 			</>
 		),
@@ -55,7 +49,7 @@ export function DataGridFullFilters({
 		inset: true,
 		children: (
 			<>
-				<Icon alignWithLowercase blueprintIcon="add" style={{ marginRight: '0.2em' }} />
+				<PlusCircleIcon />
 				{formatMessage('dataGrid.columnFiltering.addFilterButton.text')}
 			</>
 		),
@@ -111,7 +105,7 @@ export function DataGridFullFilters({
 												distinction="seamless"
 												size="small"
 											>
-												<Icon blueprintIcon="trash" size="small" />
+												<Trash2Icon />
 											</Button>
 										</TableCell>
 									</TableRow>

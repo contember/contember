@@ -1,4 +1,5 @@
-import { Button, ButtonList, Divider, Icon, LayoutPageStickyContainer, Stack } from '@contember/ui'
+import { Button, ButtonList, Divider, LayoutPageStickyContainer, Stack, TableRowsIcon } from '@contember/ui'
+import { LayoutGridIcon } from 'lucide-react'
 import { ReactNode, memo, useCallback } from 'react'
 import { useMessageFormatter } from '../../../../../../i18n'
 import { DataGridColumnHiding } from '../DataGridColumnHiding'
@@ -48,10 +49,10 @@ export const DataGridContainerHeader = memo<DataGridContainerHeaderProps>(({
 					{hasTile && <>
 						<ButtonList gap="gutter">
 							<Button inset="gap" onClick={setTileView} size="small" distinction="seamless" intent={layout === 'tiles' ? undefined : 'default'}>
-								<Icon blueprintIcon="grid-view" />
+								<LayoutGridIcon />
 							</Button>
 							<Button inset="gap" onClick={setDefaultView} size="small" distinction="seamless" intent={layout === 'default' ? undefined : 'default'}>
-								<Icon blueprintIcon="list" />
+								<TableRowsIcon />
 							</Button>
 						</ButtonList>
 

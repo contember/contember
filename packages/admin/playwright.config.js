@@ -8,8 +8,8 @@ const config = {
 
 	expect: {
 		toMatchSnapshot: {
-			threshold: process.env.CI ? 0.05 : 0,
-			maxDiffPixelRatio: process.env.CI ? 0.05 : 0,
+			threshold: process.env.CI ? 0.03 : 0,
+			maxDiffPixelRatio: process.env.CI ? 0.0005 : 0,
 		},
 	},
 

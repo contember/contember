@@ -7,9 +7,11 @@ import {
 	DisplayTextField,
 	EditScope,
 	EmailField,
+	FieldContainer,
 	FloatField,
 	LocationField,
 	NumberField,
+	PasswordInput,
 	PersistButton,
 	RadioField,
 	SearchField,
@@ -68,6 +70,9 @@ export default () => (
 		`}</style>
 
 		<TextField {...extraDebugProps} required labelPosition="left" field={'textValue'} label={'Text'} placeholder="Enter text..." />
+		<FieldContainer label="Password">
+			<PasswordInput name="password" />
+		</FieldContainer>
 		<DisplayTextField {...extraDebugProps} labelPosition="left" field={'textValue'} label={'Text'} placeholder="N/A" horizontal reverse />
 		<Stack justify="stretch" horizontal>
 			<TextField {...extraDebugProps} containerClassName="theme-success-content theme-warn-controls" field={'notNullTextValue'} label={'Not null text'} />

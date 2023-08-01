@@ -22,6 +22,8 @@ export class StaticIdentity implements Identity {
 }
 
 export class ProjectAwareIdentity implements Identity {
+	private projectMembershipCache: Record<string, Promise<readonly Acl.Membership[]>> = {}
+
 	constructor(
 		public readonly id: string,
 		public readonly roles: readonly string[],
@@ -30,6 +32,7 @@ export class ProjectAwareIdentity implements Identity {
 	) {}
 
 	async getProjectMemberships(projectSlug: string): Promise<readonly Acl.Membership[]> {
-		return await this.memberManager.getEffectiveProjectMemberships(this.dbContext, { slug: projectSlug }, this)
+		this.projectMembershipCache[projectSlug] ??= this.memberManager.getEffectiveProjectMemberships(this.dbContext, { slug: projectSlug }, this)
+		return await this.projectMembershipCache[projectSlug]
 	}
 }

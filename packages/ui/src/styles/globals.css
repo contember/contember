@@ -92,11 +92,6 @@
 	box-sizing: border-box;
 }
 
-:where(.cui-textarea-input:-webkit-autofill),
-:where(.cui-text-input:-webkit-autofill) {
-	-webkit-box-shadow: 0 0 0 1000px #FFFFFF inset !important;
-}
-
 :where(.view-withTopToolbar.cui-textarea-input),
 :where(.view-withTopToolbar.cui-text-input) {
 	border-top-left-radius: 0;
@@ -147,21 +142,6 @@
 	border-width: var(--cui-border-width, 1px);
 	border-style: solid;
 	color: rgb(var(--cui-color--strong-rgb-50));
-}
-
-:where(.cui-slug-input:-webkit-autofill),
-:where(.cui-textarea-input:-webkit-autofill),
-:where(.cui-text-input:-webkit-autofill),
-:where(.cui-editorCanvas:-webkit-autofill) {
-	-webkit-box-shadow: 0 0 0 1000px rgba(var(--cui-theme-controls--rgb-500), 0.250) inset !important;
-}
-
-:where(.cui-slug-input:-webkit-autofill),
-:where(.cui-textarea-input:-webkit-autofill),
-:where(.cui-text-input:-webkit-autofill),
-:where(.cui-editorCanvas:-webkit-autofill) {
-	transition-delay: 9999s;
-	transition-property: color;
 }
 
 :where(.cui-slug-input:not([disabled]):hover),

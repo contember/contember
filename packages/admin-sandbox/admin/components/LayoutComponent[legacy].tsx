@@ -1,6 +1,6 @@
 import { CommonSlotTargets, Slots } from '@contember/layout'
 import { useClassName } from '@contember/react-utils'
-import { Layout as DefaultLayout, LayoutPage } from '@contember/ui'
+import { Layout as DefaultLayout, LayoutPage, Spacer } from '@contember/ui'
 import { NestedClassName } from '@contember/utilities'
 import { PropsWithChildren } from 'react'
 import { SlotSources, SlotTargets } from './Slots'
@@ -63,15 +63,16 @@ export const LayoutComponent = ({
 						afterTitle={targetsIfActive(['ContentHeader'])}
 					>
 						{children}
+						<Spacer grow />
+						{targetsIfActive(['FooterStart', 'FooterCenter', 'FooterEnd'], (
+							<footer>
+								<FooterStart />
+								<FooterCenter />
+								<FooterEnd />
+							</footer>
+						))}
 						{targetsIfActive(['ContentFooter'])}
 					</LayoutPage>
-					{targetsIfActive(['FooterStart', 'FooterCenter', 'FooterEnd'], (
-						<footer>
-							<FooterStart />
-							<FooterCenter />
-							<FooterEnd />
-						</footer>
-					))}
 				</>
 			)}
 			sidebarFooter={targetsIfActive(['Profile'])}

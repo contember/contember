@@ -1,5 +1,6 @@
 import { useClassNameFactory } from '@contember/react-utils'
 import { KeyboardEventHandler, forwardRef, memo, useCallback } from 'react'
+import { useInterfaceConfig } from '../../config'
 import { toStateClass } from '../../utils'
 
 interface MenuExpandToggleProps {
@@ -18,6 +19,7 @@ export const MenuExpandToggle = memo(forwardRef<HTMLButtonElement, MenuExpandTog
 	onChange,
 }, ref) => {
 	const componentClassName = useClassNameFactory('menu-expand-toggle')
+	const { MenuExpandToggle } = useInterfaceConfig()
 
 	return <button
 		tabIndex={-1}
@@ -43,6 +45,6 @@ export const MenuExpandToggle = memo(forwardRef<HTMLButtonElement, MenuExpandTog
 			}
 		}, [onChange])}
 	>
-		<span className={componentClassName('label')}>{checked ? '-' : '+'}</span>
+		<MenuExpandToggle.Icon />
 	</button>
 }))

@@ -9,15 +9,15 @@ import type {
 } from '../../../types'
 import { Default } from '../../../types'
 
-export interface ButtonBasedProps extends Omit<HTMLButtonElementProps, 'ref' | 'size'> {
+export interface ButtonBasedProps extends Omit<HTMLButtonElementProps, 'ref' | 'size' | 'className'> {
 	Component: 'button'
 }
 
-export interface AnchorBasedProps extends Omit<HTMLAnchorElementProps, 'ref' | 'size'> {
+export interface AnchorBasedProps extends Omit<HTMLAnchorElementProps, 'ref' | 'size' | 'className'> {
 	Component: 'a'
 }
 
-export interface ButtonOwnProps extends DeprecatedButtonOwnProps {
+export interface ButtonOwnProps extends DeprecatedButtonOwnProps, ComponentClassNameProps {
 	active?: boolean
 	align?: 'start' | 'center' | 'end' | 'stretch'
 	borderRadius?: boolean | 'gap' | 'gutter' | 'padding' | 'full'

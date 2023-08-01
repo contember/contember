@@ -1,5 +1,5 @@
 :where(.cui-text) {
-	--cui-text--leading-trim: calc((var(--cui-line-height-units) - 1em) / 2);
+	--cui-text--leading-trim: calc((var(--cui-line-height--units) - 1em) / 2);
 	display: var(--cui-view--display, inline);
 	padding-inline-end: calc(var(--cui-view--padding-right, var(--cui-view--padding-horizontal, var(--cui-view--padding, 0px))) + var(--cui-text--leading-trim));
 	padding-inline-start: calc(var(--cui-view--padding-left, var(--cui-view--padding-horizontal, var(--cui-view--padding, 0px))) + var(--cui-text--leading-trim));

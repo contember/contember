@@ -10,7 +10,7 @@
 :where(.cui-layout-page-content-wrap) {
 	--cui-page-width: calc(100vw - var(--layout-chrome-bar-width, 0px));
 	--cui-page-height: calc(100vh - var(--cui-content-offset-top, 0px));
-	background-color: rgb(var(--cui-background-color-rgb-25));
+	background-color: rgb(var(--cui-background-color--rgb-25));
 	display: flex;
 	flex: 1 1 100%;
 	flex-direction: column;

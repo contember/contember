@@ -12,6 +12,12 @@ let config = Object.freeze({
 		transparent: true,
 		suppressFocusRing: true,
 	} as NonOptional<StyleProviderProps>,
+	Menu: {
+		caret: true,
+	},
+	MenuExpandToggle: {
+		Icon: ChevronRightIcon,
+	},
 })
 
 export function setInterfaceConfig(userConfig: DeepPartial<typeof config>) {

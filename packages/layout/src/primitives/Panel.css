@@ -1,8 +1,12 @@
 :where(.cui-layout-panel) {
-	--cui-layout-panel-footer-background-alpha: var(--cui-backdrop-blur-opacity);
-	--cui-layout-panel-footer-background-rgb: rgb(var(--cui-background-color-rgb-50));
-	--cui-layout-panel-header-background-alpha: var(--cui-backdrop-blur-opacity);
-	--cui-layout-panel-header-background-rgb: rgb(var(--cui-background-color-rgb-50));
+	--cui-layout-panel--background-rgb: var(--cui-background-color--rgb-0);
+	--cui-layout-panel--background-alpha: 1;
+	--cui-layout-panel--header-background-alpha: var(--cui-backdrop-blur-opacity);
+	--cui-layout-panel--header-background-rgb: var(--cui-layout-panel--background-rgb);
+	--cui-layout-panel--body-background-rgb: var(--cui-layout-panel--background-rgb);
+	--cui-layout-panel--body-background-alpha: 1;
+	--cui-layout-panel--footer-background-alpha: var(--cui-backdrop-blur-opacity);
+	--cui-layout-panel--footer-background-rgb: var(--cui-layout-panel--background-rgb);
 
 	content-visibility: visible;
 	display: flex;
@@ -25,15 +29,13 @@
 }
 
 :where(.cui-layout-panel > .cui-layout-panel-content) {
-	scroll-padding-bottom: var(--panel-footer-height);
-	scroll-padding-top: var(--panel-header-height);
-}
-
-:where(.cui-layout-panel > .cui-layout-panel-content) {
+	background-color: rgba(var(--cui-layout-panel--background-rgb), var(--cui-layout-panel--background-alpha));
 	display: flex;
 	flex-direction: column;
 	flex-grow: 1;
 	flex-shrink: 1;
+	scroll-padding-bottom: var(--panel-footer-height);
+	scroll-padding-top: var(--panel-header-height);
 }
 
 :where(.cui-layout-panel):where(
@@ -46,10 +48,11 @@
 	right: 0;
 	top: 0;
 }
-:where(.cui-layout-panel):where([data-behavior="overlay"]) {
+:where(.cui-layout-panel[data-behavior="overlay"]) {
 	position: absolute;
 }
-:where(.cui-layout-panel):where([data-behavior="modal"]) {
+:where(.cui-layout-panel[data-behavior="modal"]) {
+	--cui-layout-panel--background-alpha: 0;
 	position: fixed;
 }
 :where(
@@ -60,8 +63,8 @@
 }
 
 :where(.cui-layout-panel[data-behavior="overlay"]) {
-	background-color: rgb(var(--cui-background-color-rgb-50));
-	color: rgb(var(--cui-color-rgb-50));
+	background-color: rgb(var(--cui-background-color--rgb-50));
+	color: rgb(var(--cui-color--rgb-50));
 	z-index: 3;
 }
 

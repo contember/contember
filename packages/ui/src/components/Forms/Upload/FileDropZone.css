@@ -3,16 +3,16 @@
 }
 
 :where(.cui-fileDropZone.is-active) {
-	background-color: rgba(var(--cui-background-color-toned-controls-rgb-25), var(--cui-opacity--low));
-	border-color: rgb(var(--cui-color-accent-rgb-50));
+	background-color: rgba(var(--cui-background-color--toned-controls-rgb-25), var(--cui-opacity--low));
+	border-color: rgb(var(--cui-color--accent-rgb-50));
 	border-style: dashed;
 }
 
 :where(.cui-fileDropZone.is-accepting) {
-	background-color: rgb(var(--cui-background-color-rgb-25));
+	background-color: rgb(var(--cui-background-color--rgb-25));
 }
 
 :where(.cui-fileDropZone.is-rejecting) {
-	background-color: rgba(var(--cui-theme-danger-rgb-500), var(--cui-opacity--lower));
-	border-color: rgb(var(--cui-theme-danger-rgb-500));
+	background-color: rgba(var(--cui-theme-danger--rgb-500), var(--cui-opacity--lower));
+	border-color: rgb(var(--cui-theme-danger--rgb-500));
 }

@@ -1,6 +1,6 @@
-@import "./Layout";
-@import "./LayoutChrome";
-@import "./LayoutPage";
-@import "./LayoutPageAside";
-@import "./LayoutPageContent";
-@import "./LayoutPageStickyContainer";
+@import "./Layout.css";
+@import "./LayoutChrome.css";
+@import "./LayoutPage.css";
+@import "./LayoutPageAside.css";
+@import "./LayoutPageContent.css";
+@import "./LayoutPageStickyContainer.css";

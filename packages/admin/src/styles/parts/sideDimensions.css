@@ -23,7 +23,7 @@
 }
 
 :where(.sideDimensions-dimensions-dimensionValue) {
-	background-color: rgb(var(--cui-background-color-rgb-25));
+	background-color: rgb(var(--cui-background-color--rgb-25));
 	border-radius: 0.5em;
 	font-size: 0.5em;
 	padding: 0.1em 0.75em;

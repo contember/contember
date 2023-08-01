@@ -1,30 +1,30 @@
 :where(.cui-tab-button) {
-	--cui-tab-button-padding-vertical: var(--cui-section-tabs-padding-vertical, calc(3 * var(--cui-gap)));
-	--cui-tab-button-padding-horizontal: var(--cui-section-tabs-padding-horizontal, calc(3 * var(--cui-gap)));
-	--cui-tab-button-label-padding: var(--cui-gap);
-	--cui-tab-button-margin: unset;
+	--cui-tab-button--padding-vertical: var(--cui-section-tabs--padding-vertical, calc(3 * var(--cui-gap)));
+	--cui-tab-button--padding-horizontal: var(--cui-section-tabs--padding-horizontal, calc(3 * var(--cui-gap)));
+	--cui-tab-button--label-padding: var(--cui-gap);
+	--cui-tab-button--margin: unset;
 	appearance: unset;
 	background-color: unset;
 	border: unset;
 	display: inline-flex;
 	font-family: inherit;
 	font-size: inherit;
-	margin: var(--cui-tab-button-margin);
+	margin: var(--cui-tab-button--margin);
 	overflow: visible;
-	padding: var(--cui-tab-button-padding-vertical) var(--cui-tab-button-padding-horizontal);
+	padding: var(--cui-tab-button--padding-vertical) var(--cui-tab-button--padding-horizontal);
 	position: relative;
 	text-transform: none;
 }
 
 :where(.cui-tab-button)::after {
-	background-color: rgb(var(--cui-color-accent-rgb-75));
+	background-color: rgb(var(--cui-color--accent-rgb-75));
 	bottom: 0;
 	content: "";
 	height: 2px;
-	left: var(--cui-tab-button-padding-horizontal);
+	left: var(--cui-tab-button--padding-horizontal);
 	opacity: 0;
 	position: absolute;
-	right: var(--cui-tab-button-padding-horizontal);
+	right: var(--cui-tab-button--padding-horizontal);
 	transform: scaleY(0);
 	transition: opacity var(--cui-transition-duration), transform var(--cui-transition-duration), background-color var(--cui-transition-duration);
 	z-index: 1;
@@ -39,12 +39,12 @@
 	border-radius: 0.25em;
 	display: flex;
 	flex-direction: row;
-	padding: var(--cui-tab-button-label-padding);
-	margin: calc(-1 * var(--cui-tab-button-label-padding));
+	padding: var(--cui-tab-button--label-padding);
+	margin: calc(-1 * var(--cui-tab-button--label-padding));
 }
 
 :where(.cui-tab-button:hover .cui-tab-button-label) {
-	background-color: rgba(var(--cui-background-color-toned-controls-rgb-50), var(--cui-opacity--low));
+	background-color: rgba(var(--cui-background-color--toned-controls-rgb-50), var(--cui-opacity--low));
 }
 
 :where(.cui-tab-button:focus) {
@@ -53,8 +53,8 @@
 
 :where(.cui-tab-button.is-focused .cui-tab-button-label),
 :where(.cui-tab-button:focus .cui-tab-button-label) {
-	background-color: rgba(var(--cui-background-color-toned-controls-rgb-50), var(--cui-opacity--low));
-	box-shadow: var(--cui-control-focus-ring-box-shadow);
+	background-color: rgba(var(--cui-background-color--toned-controls-rgb-50), var(--cui-opacity--low));
+	box-shadow: var(--cui-box-shadow--controls-focus-ring);
 }
 
 :where(.cui-tab-button:focus:not(:focus-visible) .cui-tab-button-label) {
@@ -64,5 +64,5 @@
 :where(.cui-tab-button.is-disabled),
 :where(.cui-tab-button:disabled) {
 	pointer-events: none;
-	color: rgba(var(--cui-color-rgb-50), var(--cui-opacity--low));
+	color: rgba(var(--cui-color--rgb-50), var(--cui-opacity--low));
 }

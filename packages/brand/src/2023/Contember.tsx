@@ -23,7 +23,7 @@ export const Contember = memo<Omit<ContemberIdentitySvgProps, 'strokeWidth'>>(({
 		<svg
 			className={useClassName(['brand-icon', 'brand-contember'], className)}
 			fill="none"
-			style={useMemo(() => ({ ...style, '--scale': scale } as CSSProperties), [scale, style])}
+			style={useMemo(() => ({ ...style, '--cui-icon--scale': scale } as CSSProperties), [scale, style])}
 			xmlns="http://www.w3.org/2000/svg"
 			{...svgSizeProps(width, height, crop)}
 		>

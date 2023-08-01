@@ -1,10 +1,10 @@
 :where(.cui-editorToolbar) {
 	display: inline-flex;
-	background: rgb(var(--cui-background-color-controls-rgb-50));
-	color: rgb(var(--cui-color-controls-rgb-0));
+	background: rgb(var(--cui-background-color--controls-rgb-50));
+	color: rgb(var(--cui-color--controls-rgb-0));
 	border-radius: 5em;
 	padding: 0.875em 1.25em;
-	box-shadow: 0 0 3em -1.5em rgb(var(--cui-background-color-controls-rgb-50));
+	box-shadow: 0 0 3em -1.5em rgb(var(--cui-background-color--controls-rgb-50));
 }
 
 :where(.cui-editorToolbar-groups),

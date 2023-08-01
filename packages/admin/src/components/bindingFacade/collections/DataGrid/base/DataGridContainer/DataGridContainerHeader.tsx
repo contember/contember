@@ -41,22 +41,22 @@ export const DataGridContainerHeader = memo<DataGridContainerHeaderProps>(({
 
 	return (
 		<LayoutPageStickyContainer
-			left="var(--cui-layout-page-padding-left)"
-			right="var(--cui-layout-page-padding-right)"
+			left="var(--cui-layout-page--padding-left)"
+			right="var(--cui-layout-page--padding-right)"
 		>
 			<Stack wrap align="center" horizontal justify="space-between">
 				<Stack gap="gutter" horizontal>
 					{hasTile && <>
 						<ButtonList gap="gutter">
-							<Button inset="gap" onClick={setTileView} size="small" distinction="seamless" intent={layout === 'tiles' ? undefined : 'default'}>
+							<Button onClick={setTileView} size="small" distinction="seamless" intent={layout === 'tiles' ? undefined : 'default'}>
 								<LayoutGridIcon />
 							</Button>
-							<Button inset="gap" onClick={setDefaultView} size="small" distinction="seamless" intent={layout === 'default' ? undefined : 'default'}>
+							<Button onClick={setDefaultView} size="small" distinction="seamless" intent={layout === 'default' ? undefined : 'default'}>
 								<TableRowsIcon />
 							</Button>
 						</ButtonList>
 
-						<Divider gap="gap" />
+						<Divider gap={false} />
 					</>}
 					{layout !== 'tiles' && allowColumnVisibilityControls !== false && (
 							<DataGridColumnHiding

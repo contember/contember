@@ -1,7 +1,7 @@
 :where(.cui-layout-page-aside) {
-	background-color: rgb(var(--cui-background-color-rgb-50));
+	background-color: rgb(var(--cui-background-color--rgb-50));
 	border-radius: unset;
-	border-top: 1px solid rgba(var(--cui-color-rgb-50), var(--cui-opacity--lower));
+	border-top: 1px solid rgba(var(--cui-color--rgb-50), var(--cui-opacity--lower));
 	display: flex;
 	flex-direction: column;
 	margin-top: calc(-1 * var(--cui-border-width, 1px));
@@ -13,15 +13,15 @@
 
 :where(.cui-layout-page-aside-content) {
 	flex-grow: 1;
-	padding-bottom: var(--cui-layout-section-padding-bottom);
-	padding-left: var(--cui-layout-page-padding-left);
-	padding-right: var(--cui-layout-page-padding-right);
-	padding-top: var(--cui-layout-section-padding-top);
+	padding-bottom: var(--cui-layout--padding-section-bottom);
+	padding-left: var(--cui-layout-page--padding-left);
+	padding-right: var(--cui-layout-page--padding-right);
+	padding-top: var(--cui-layout--padding-section-top);
 }
 
 @media (min-width: 1280px) {
 	:where(.cui-layout-page-aside) {
-		background-color: rgb(var(--cui-background-color-rgb-25));
+		background-color: rgb(var(--cui-background-color--rgb-25));
 		border-left: 1px solid transparent;
 		border-top: unset;
 		bottom: 0;
@@ -36,10 +36,10 @@
 	}
 
 	:where(.cui-layout-page-aside-content) {
-		padding-left: var(--cui-layout-section-padding-left);
+		padding-left: var(--cui-layout--padding-section-left);
 	}
 
 	:where(.view-aside-divider > .cui-layout-page-aside) {
-		border-left-color: rgba(var(--cui-color-rgb-50), var(--cui-opacity--lower));
+		border-left-color: rgba(var(--cui-color--rgb-50), var(--cui-opacity--lower));
 	}
 }

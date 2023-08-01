@@ -40,7 +40,6 @@ export const PersistButton = memo(
 			loading={isMutating}
 			onClick={onClick}
 			className={className}
-			size="large"
 			{...props}
 		/>
 	)

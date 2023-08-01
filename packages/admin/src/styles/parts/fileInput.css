@@ -6,7 +6,7 @@
 }
 
 :where(.fileInput-preview) {
-	background: rgb(var(--cui-background-color-rgb-50));
+	background: rgb(var(--cui-background-color--rgb-50));
 	border-radius: 10px;
 }
 
@@ -52,7 +52,7 @@
 
 :where(.fileInput-cta-label) {
 	display: block;
-	color: rgba(var(--cui-color-rgb-50), var(--cui-opacity--medium));
+	color: rgba(var(--cui-color--rgb-50), var(--cui-opacity--medium));
 	font-size: 0.875rem;
 	margin-bottom: calc(-4 * var(--cui-gap));
 }

@@ -7,9 +7,9 @@
 	text-align: center;
 }
 :where(.cui-empty-state-container-header > .lucide) {
-	--scale: 5;
+	--cui-scale: 5;
 	stroke-width: 1px;
-	color: rgb(var(--cui-color-accent-rgb-50));
+	color: rgb(var(--cui-color--accent-rgb-50));
 }
 :where(.cui-empty-state-container-header .cui-message-content) {
 	font-weight: bold;

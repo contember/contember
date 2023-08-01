@@ -66,7 +66,7 @@ export const Collapsible = memo((props: CollapsibleProps) => {
 			])}
 			style={
 				{
-					'--cui-collapsible-content-height': contentHeight,
+					'--cui-collapsible--content-height': contentHeight,
 				} as CSSProperties // Custom properties not supported workaround
 			}
 			aria-hidden={!props.expanded}

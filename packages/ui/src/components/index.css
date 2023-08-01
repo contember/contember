@@ -1,56 +1,56 @@
 /* Global */
-@import "./StyleProvider";
+@import "./StyleProvider/index.css";
 
 /* Leaf components */
-@import "./Typography";
+@import "./Typography/index.css";
 
 /* Leaf components */
-@import "./Box";
-@import "./Typography";
-@import "./Anchor";
-@import "./Logo";
-@import "./Icon";
-@import "./Forms";
-@import "./Dropdown";
+@import "./Box/index.css";
+@import "./Typography/index.css";
+@import "./Anchor/index.css";
+@import "./Logo/index.css";
+@import "./Icon/index.css";
+@import "./Forms/index.css";
+@import "./Dropdown/index.css";
 
-@import "./Spinner";
-@import "./Aether";
-@import "./ActionableBox";
+@import "./Spinner/index.css";
+@import "./Aether/index.css";
+@import "./ActionableBox/index.css";
 
-@import "./Trio";
-@import "./ProgressBar";
-@import "./Tag";
-@import "./Card";
-@import "./Collapsible";
-@import "./Divider";
-@import "./Spacer";
-@import "./Grid";
-@import "./Link";
-@import "./Stack";
-@import "./Message";
-@import "./EmptyStateContainer";
-@import "./RepeaterItemContainer";
-@import "./SeamlessDropdown";
-@import "./Section";
-@import "./SectionTabs";
-@import "./Tabs";
-@import "./VisuallyHidden";
+@import "./Trio/index.css";
+@import "./ProgressBar/index.css";
+@import "./Tag/index.css";
+@import "./Card/index.css";
+@import "./Collapsible/index.css";
+@import "./Divider/index.css";
+@import "./Spacer/index.css";
+@import "./Grid/index.css";
+@import "./Link.css";
+@import "./Stack/index.css";
+@import "./Message/index.css";
+@import "./EmptyStateContainer/index.css";
+@import "./RepeaterItemContainer/index.css";
+@import "./SeamlessDropdown/index.css";
+@import "./Section/index.css";
+@import "./SectionTabs/index.css";
+@import "./Tabs/index.css";
+@import "./VisuallyHidden/index.css";
 
 /* Composite components */
-@import "./Dialog";
-@import "./Toaster";
-@import "./TitleBar";
-@import "./Table";
-@import "./SpinnerContainer";
-@import "./ContentStatus";
-@import "./Breadcrumbs";
-@import "./DevBar";
-@import "./DevError";
-@import "./DimensionSwitcher";
-@import "./ErrorList";
-@import "./HoveringToolbar";
-@import "./UserMiniControl";
-@import "./Menu";
+@import "./Dialog/index.css";
+@import "./Toaster/index.css";
+@import "./TitleBar/index.css";
+@import "./Table/index.css";
+@import "./SpinnerContainer/index.css";
+@import "./ContentStatus/index.css";
+@import "./Breadcrumbs/index.css";
+@import "./DevBar/index.css";
+@import "./DevError/index.css";
+@import "./DimensionSwitcher/index.css";
+@import "./ErrorList/index.css";
+@import "./HoveringToolbar/index.css";
+@import "./UserMiniControl/index.css";
+@import "./Menu/index.css";
 
 /* Complex components */
-@import "./Editor";
+@import "./Editor/index.css";

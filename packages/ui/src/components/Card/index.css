@@ -1,15 +1,15 @@
 :where(.cui-card) {
-	--card-color-active: rgb(var(--cui-color-accent-rgb-50));
-	--card-color-inactive: rgb(var(--cui-color-rgb-0));
-	--card-color-faded: rgba(var(--cui-color-rgb-50), var(--cui-opacity--low));
+	--card-color-active: rgb(var(--cui-color--accent-rgb-50));
+	--card-color-inactive: rgb(var(--cui-color--rgb-0));
+	--card-color-faded: rgba(var(--cui-color--rgb-50), var(--cui-opacity--low));
 	--card-cursor: default;
-	--card-overlay-background-color-inactive: rgb(var(--cui-background-color-rgb-25));
-	--card-overlay-background-color-active: rgb(var(--cui-background-color-rgb-50));
-	--card-overlay-gradient: linear-gradient(transparent, rgb(var(--cui-background-color-rgb-50)));
+	--card-overlay-background-color-inactive: rgb(var(--cui-background-color--rgb-25));
+	--card-overlay-background-color-active: rgb(var(--cui-background-color--rgb-50));
+	--card-overlay-gradient: linear-gradient(transparent, rgb(var(--cui-background-color--rgb-50)));
 	--card-overlay-opacity-inactive: 0.0;
 	--card-overlay-opacity-active: 0.25;
 	--card-overlay-opacity-pressed: 0.125;
-	--card-border-radius: var(--cui-border-radius-controls);
+	--card-border-radius: var(--cui-border-radius--controls);
 	--card-inset: var(--cui-gap);
 	--card-row-gap: var(--cui-gap);
 	--card-column-gap: var(--cui-gap);
@@ -72,7 +72,7 @@
 }
 
 :where(.cui-card.is-active .cui-card-inner) {
-	border: var(--card-thumbnail-border-radius) solid rgb(var(--cui-color-accent-rgb-50));
+	border: var(--card-thumbnail-border-radius) solid rgb(var(--cui-color--accent-rgb-50));
 }
 
 :where(.cui-card.is-active .cui-card-thumbnail) {
@@ -98,7 +98,7 @@
 	display: block;
 	left: 0;
 	position: absolute;
-	transition: opacity var(--cui-transition-duration-fast) ease-in, background-color var(--cui-transition-duration-fast) ease-in;
+	transition: opacity var(--cui-transition-duration--fast) ease-in, background-color var(--cui-transition-duration--fast) ease-in;
 	right: 0;
 	top: 0;
 }

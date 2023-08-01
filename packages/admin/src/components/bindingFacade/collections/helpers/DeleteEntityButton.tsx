@@ -50,7 +50,6 @@ export const DeleteEntityButton = memo((props: DeleteEntityButtonProps) => {
 			square
 			borderRadius="full"
 			distinction="seamless"
-			padding={false}
 			size="small"
 			{...rest}
 			className={listClassName([

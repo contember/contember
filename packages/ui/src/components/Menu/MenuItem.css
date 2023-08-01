@@ -1,0 +1,38 @@
+:where(.cui-menu-item) {
+	position: relative;
+}
+
+:where([data-suppress-focus-ring] .cui-menu-item) {
+	outline: none;
+}
+
+:where(.cui-menu-item[aria-haspopup="true"] > .cui-menu-item-trigger) {
+	cursor: pointer;
+}
+
+:where(.cui-menu-item-list) {
+	list-style: none;
+	padding-left: calc(1em + var(--cui-gap));
+	position: relative;
+}
+
+:where(.cui-menu-item-trigger) {
+	align-items: center;
+	display: flex;
+	font-weight: 600;
+	position: relative;
+}
+
+:where(.cui-menu-item-trigger > .cui-menu-link) {
+	flex: 1;
+}
+
+:where(.cui-menu-item[data-focusable] > .cui-menu-item-trigger:hover > a.cui-menu-link > .cui-label) {
+	color: rgb(var(--cui-color--accent-rgb-75));
+	background-color: rgba(var(--cui-background-color--toned-controls-rgb-50), var(--cui-opacity--lower));;
+}
+
+:where(.cui-menu-item:focus > .cui-menu-item-trigger > a.cui-menu-link > .cui-label) {
+	color: rgb(var(--cui-color--accent-rgb-75));
+	background-color: rgba(var(--cui-background-color--toned-controls-rgb-50), var(--cui-opacity--low));;
+}

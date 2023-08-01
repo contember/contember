@@ -36,60 +36,60 @@ export const Layout = memo(({ children }: PropsWithChildren) => {
 			<ColorSchemeProvider scheme={scheme}>
 				<PortalProvider className={colorSchemeTheme}>
 					<LayoutComponent className={colorSchemeTheme}>
-					<SlotSources.Logo>
-						<Link to="index">
-							<Stack align="center" horizontal gap="gap">
-								<Identity2023.Edit scale={2} />
-								<VisuallyHidden className="whitespace-nowrap" hidden={width < LAYOUT_BREAKPOINT}>Contember Sandbox</VisuallyHidden>
-							</Stack>
-						</Link>
-					</SlotSources.Logo>
+						<SlotSources.Logo>
+							<Link to="index">
+								<Stack align="center" horizontal gap="gap">
+									<Identity2023.Edit scale={2} />
+									<VisuallyHidden className="whitespace-nowrap" hidden={width < LAYOUT_BREAKPOINT}>Contember Sandbox</VisuallyHidden>
+								</Stack>
+							</Link>
+						</SlotSources.Logo>
 
-					<SlotSources.Switchers>
-						<DimensionsSwitcher
-							optionEntities="Locale"
-							orderBy="code asc"
-							dimension="locale"
-							labelField="code"
-							slugField="code"
-							maxItems={1}
-						/>
+						<SlotSources.Switchers>
+							<DimensionsSwitcher
+								optionEntities="Locale"
+								orderBy="code asc"
+								dimension="locale"
+								labelField="code"
+								slugField="code"
+								maxItems={1}
+							/>
 
-						<Button
-							square
-							active={!scheme.match(/system/)}
-							aria-label={scheme.match(/light/) ? 'Light mode, switch to dark mode' : scheme.match(/dark/) ? 'Dark mode, switch to light mode' : 'System mode, switch to system mode'}
-							borderRadius="full"
-							distinction="seamless"
-							onClick={useReferentiallyStableCallback(() => {
-								setScheme(scheme => (scheme.match(/light/) ? 'dark' : scheme.match(/dark/) ? 'system' : 'light'))
-							})}
-							size="small"
-						>
-							{scheme.match(/light/) ? <SunIcon /> : scheme.match(/dark/) ? <MoonIcon /> : <CircleDashedIcon />}
-						</Button>
-					</SlotSources.Switchers>
+							<Button
+								square
+								active={!scheme.match(/system/)}
+								aria-label={scheme.match(/light/) ? 'Light mode, switch to dark mode' : scheme.match(/dark/) ? 'Dark mode, switch to light mode' : 'System mode, switch to system mode'}
+								borderRadius="full"
+								distinction="seamless"
+								onClick={useReferentiallyStableCallback(() => {
+									setScheme(scheme => (scheme.match(/light/) ? 'dark' : scheme.match(/dark/) ? 'system' : 'light'))
+								})}
+								size="small"
+							>
+								{scheme.match(/light/) ? <SunIcon /> : scheme.match(/dark/) ? <MoonIcon /> : <CircleDashedIcon />}
+							</Button>
+						</SlotSources.Switchers>
 
-					{Navigation && (
-						<SlotSources.Navigation>
-							<Navigation />
-						</SlotSources.Navigation>
-					)}
+						{Navigation && (
+							<SlotSources.Navigation>
+								<Navigation />
+							</SlotSources.Navigation>
+						)}
 
-					<SlotSources.Profile>
-						<LogoutLink Component={AlertLogoutLink}>
-							<Stack align="center" horizontal gap="gap">
-								<LogOutIcon /> Logout
-							</Stack>
-						</LogoutLink>
-					</SlotSources.Profile>
+						<SlotSources.Profile>
+							<LogoutLink Component={AlertLogoutLink}>
+								<Stack align="center" horizontal gap="gap">
+									<LogOutIcon /> Logout
+								</Stack>
+							</LogoutLink>
+						</SlotSources.Profile>
 
-					<SlotSources.FooterCenter>
-						<p><small>Created with <a className="content-link" href="https://www.contember.com/">AI-assisted Contember Studio</a></small></p>
-					</SlotSources.FooterCenter>
+						<SlotSources.FooterCenter>
+							<p><small>Created with <a className="content-link" href="https://www.contember.com/">AI-assisted Contember Studio</a></small></p>
+						</SlotSources.FooterCenter>
 
-					{children}
-				</LayoutComponent>
+						{children}
+					</LayoutComponent>
 				</PortalProvider>
 			</ColorSchemeProvider>
 		</SafeAreaInsetsProvider>

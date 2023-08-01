@@ -154,7 +154,7 @@ export const FieldContainer = memo(
 					className,
 				])}
 				style={useMemo(() => ({
-					'--cui-field-container-body-content-height': px(height),
+					'--cui-field-container--body-content-height': px(height),
 					...style,
 				}), [height, style])}
 			>

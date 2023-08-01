@@ -1,11 +1,11 @@
 :where(.cui-section-tabs) {
-	--cui-section-tabs-padding-vertical: calc(3* var(--cui-gap, 0em));
-	--cui-section-tabs-padding-horizontal: calc(3* var(--cui-gap, 0em));
+	--cui-section-tabs--padding-vertical: calc(3* var(--cui-gap, 0em));
+	--cui-section-tabs--padding-horizontal: calc(3* var(--cui-gap, 0em));
 	margin-bottom: calc(-1 * var(--cui-padding));
-	margin-left: calc(-1 * var(--cui-section-tabs-padding-horizontal));
-	margin-right: calc(-1 * var(--cui-section-tabs-padding-horizontal));
-	padding-left: var(--cui-section-tabs-padding-horizontal);
-	padding-right: var(--cui-section-tabs-padding-horizontal);
+	margin-left: calc(-1 * var(--cui-section-tabs--padding-horizontal));
+	margin-right: calc(-1 * var(--cui-section-tabs--padding-horizontal));
+	padding-left: var(--cui-section-tabs--padding-horizontal);
+	padding-right: var(--cui-section-tabs--padding-horizontal);
 }
 
 @media (min-width: 1280px) {

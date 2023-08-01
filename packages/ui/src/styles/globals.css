@@ -70,7 +70,7 @@
 	--cui-control-line-height: var(--cui-line-height);
 	display: block;
 	font-family: inherit;
-	transition-duration: var(--cui-transition-duration-fast);
+	transition-duration: var(--cui-transition-duration--fast);
 	transition-property: box-shadow, color, opacity;
 	font-weight: 400;
 	font-size: inherit;
@@ -79,7 +79,7 @@
 	margin: 0;
 	border-style: solid;
 	border-width: var(--cui-border-width, 1px);
-	border-radius: var(--cui-border-radius-controls);
+	border-radius: var(--cui-border-radius--controls);
 	resize: none;
 	flex-basis: 2em;
 	flex-grow: 1;
@@ -105,7 +105,7 @@
 
 :where(.cui-textarea-input),
 :where(.cui-text-input) {
-	--cui-min-height: var(--cui-size-controls);
+	--cui-min-height: var(--cui-size--controls);
 	--cui-padding-horizontal: var(--cui-gutter);
 	min-height: var(--cui-min-height);
 	padding-left: var(--cui-padding-horizontal);
@@ -120,13 +120,13 @@
 
 :where(.view-small.cui-textarea-input),
 :where(.view-small.cui-text-input) {
-	--cui-min-height: var(--cui-size-controls-small);
+	--cui-min-height: var(--cui-size--controls-small);
 	--cui-padding-horizontal: calc(2 * var(--cui-gap));
 }
 
 :where(.view-large.cui-textarea-input),
 :where(.view-large.cui-text-input) {
-	--cui-min-height: var(--cui-size-controls-large);
+	--cui-min-height: var(--cui-size--controls-large);
 	--cui-padding-horizontal: calc(4 * var(--cui-gap));
 }
 
@@ -134,26 +134,26 @@
 :where(.is-invalid.cui-slug-input),
 :where(.is-invalid.cui-textarea-input),
 :where(.is-invalid.cui-text-input) {
-	border-color: rgb(var(--cui-color-controls-rgb-50));
+	border-color: rgb(var(--cui-color--controls-rgb-50));
 }
 
 :where(.cui-slug-input),
 :where(.cui-textarea-input),
 :where(.cui-text-input),
 :where(.cui-editorCanvas) {
-	--input-control-focus-ring: var(--cui-control-focus-ring-box-shadow);
-	background-color: rgba(var(--cui-background-color-rgb-25), var(--cui-opacity--medium));
-	border-color: rgb(var(--cui-background-color-toned-rgb-75));
+	--input-control-focus-ring: var(--cui-box-shadow--controls-focus-ring);
+	background-color: rgba(var(--cui-background-color--rgb-25), var(--cui-opacity--medium));
+	border-color: rgb(var(--cui-background-color--toned-rgb-75));
 	border-width: var(--cui-border-width, 1px);
 	border-style: solid;
-	color: rgb(var(--cui-color-strong-rgb-50));
+	color: rgb(var(--cui-color--strong-rgb-50));
 }
 
 :where(.cui-slug-input:-webkit-autofill),
 :where(.cui-textarea-input:-webkit-autofill),
 :where(.cui-text-input:-webkit-autofill),
 :where(.cui-editorCanvas:-webkit-autofill) {
-	-webkit-box-shadow: 0 0 0 1000px rgba(var(--cui-theme-controls-rgb-500), 0.250) inset !important;
+	-webkit-box-shadow: 0 0 0 1000px rgba(var(--cui-theme-controls--rgb-500), 0.250) inset !important;
 }
 
 :where(.cui-slug-input:-webkit-autofill),
@@ -168,14 +168,14 @@
 :where(.cui-textarea-input:not([disabled]):hover),
 :where(.cui-text-input:not([disabled]):hover),
 :where(.cui-editorCanvas:not([disabled]):hover) {
-	border-color: rgba(var(--cui-color-rgb-50), var(--cui-opacity--high));
+	border-color: rgba(var(--cui-color--rgb-50), var(--cui-opacity--high));
 }
 
 :where(.cui-slug-input:focus),
 :where(.cui-textarea-input:focus),
 :where(.cui-text-input:focus),
 :where(.cui-editorCanvas:focus) {
-	border-color: rgb(var(--cui-color-accent-rgb-50));
+	border-color: rgb(var(--cui-color--accent-rgb-50));
 }
 
 :where(.cui-textarea-input:focus:focus-visible),
@@ -187,20 +187,20 @@
 :where(.cui-textarea-input)::placeholder,
 :where(.cui-text-input)::placeholder,
 :where(.cui-editorCanvas)::placeholder {
-	color: rgba(var(--cui-color-rgb-25), var(--cui-opacity--high));
+	color: rgba(var(--cui-color--rgb-25), var(--cui-opacity--high));
 }
 
 :where([readonly].cui-textarea-input),
 :where([readonly].cui-text-input),
 :where([readonly].cui-editorCanvas) {
-	color: rgba(var(--cui-color-rgb-50), var(--cui-opacity--medium));
+	color: rgba(var(--cui-color--rgb-50), var(--cui-opacity--medium));
 }
 
 :where([disabled].cui-textarea-input),
 :where([disabled].cui-text-input),
 :where([disabled].cui-editorCanvas) {
-	background-color: rgba(var(--cui-background-color-rgb-25), var(--cui-opacity--medium));
-	color: rgba(var(--cui-color-strong-rgb-50), var(--cui-opacity--medium));
+	background-color: rgba(var(--cui-background-color--rgb-25), var(--cui-opacity--medium));
+	color: rgba(var(--cui-color--strong-rgb-50), var(--cui-opacity--medium));
 	cursor: not-allowed;
 	opacity: var(--cui-opacity--medium);
 }
@@ -230,16 +230,22 @@
 	box-shadow: none;
 }
 
+:where(.cui-icon),
 :where([data-overrides-lucide-icons] .lucide) {
-	--scale: 1;
-	stroke: currentColor;
+	--cui-scale: var(--cui-scale);
+	--cui-icon--inset: calc(1em / 2 * var(--cui-border-radius-optical-grow));
+	--cui-icon--padding: calc((var(--cui-line-height--units) - 1em) / 2);
 	display: inline-block;
+	flex-basis: content;
 	flex-grow: 0;
 	flex-shrink: 0;
-	height: calc(1em * var(--scale));
-	margin: calc(-1em * var(--cui-circle-optical-grow));
+	font-size: calc(1em * var(--cui-scale));
+	height: var(--cui-line-height--units);
+	margin: calc(-1 * (var(--cui-icon--inset) + var(--cui-icon--padding)));
+	padding: var(--cui-icon--padding);
+	stroke: currentColor;
 	vertical-align: middle;
-	width: calc(1em * var(--scale));
+	width: var(--cui-line-height--units);
 }
 
 :where(.dangerously-remove-native-focus-outline) {

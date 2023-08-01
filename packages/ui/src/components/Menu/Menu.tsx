@@ -1,13 +1,13 @@
 import { useClassNameFactory } from '@contember/react-utils'
-import { memo, MemoExoticComponent, PropsWithChildren, useCallback, useMemo, useRef } from 'react'
+import { dataAttribute, deprecate, isDefined } from '@contember/utilities'
+import { MemoExoticComponent, PropsWithChildren, memo, useCallback, useMemo, useRef } from 'react'
 import { MouseMoveProvider } from '../../auxiliary'
-import { toViewClass } from '../../utils'
+import { useInterfaceConfig } from '../../config'
 import { DepthContext, FocusableContext } from './Contexts'
 import { MenuItem } from './MenuItem'
 import type { MenuItemProps, MenuProps } from './Types'
 import { ActiveMenuItemProvider } from './useActiveMenuItem'
 import { MenuIdProvider } from './useMenuId'
-
 
 function getFocusableItems<E extends HTMLElement = HTMLElement>(parent: E): HTMLLIElement[] {
 	return Array.from(parent.querySelectorAll('li')).filter(node => node.tabIndex >= -1)
@@ -29,11 +29,20 @@ function getClosestFocusable<E extends HTMLElement = HTMLElement>(parent: E, off
 }
 
 const MenuInternal = memo(({
+	id = 'unknown',
 	label,
+	caret,
 	className: classNameProp,
 	componentClassName = 'menu',
-	...props
+	focusMenuItemLabel,
+	showCaret,
+	children,
+	...rest
 }: PropsWithChildren<MenuProps>) => {
+	deprecate('1.3.0', isDefined(focusMenuItemLabel), '`focusMenuItemLabel` prop', null)
+	deprecate('1.3.0', isDefined(showCaret), '`showCaret` prop', '`caret` prop')
+
+	const { Menu } = useInterfaceConfig()
 	const menuRef = useRef<HTMLUListElement>(null)
 	const className = useClassNameFactory(componentClassName)
 
@@ -53,23 +62,18 @@ const MenuInternal = memo(({
 		return getClosestFocusable(menuRef.current, -1)
 	}, [])
 
-	const menuId = props.id ?? 'unknown'
-
 	return (
 		<DepthContext.Provider value={0}>
-			<MenuIdProvider menuId={menuId}>
+			<MenuIdProvider menuId={id}>
 				<MouseMoveProvider elementRef={menuRef}>
 					<ActiveMenuItemProvider menuRef={menuRef}>
-						<nav aria-label={label} className={className(null, [
-							toViewClass('showCaret', props.showCaret ?? true),
-							classNameProp,
-						])}>
-							<ul ref={menuRef} className={className('list', 'is-expanded')}>
+						<nav aria-label={label} data-caret={dataAttribute(caret ?? Menu.caret)} className={className(null, classNameProp)} {...rest}>
+							<ul ref={menuRef} className={className('list')}>
 								<FocusableContext.Provider value={useMemo(() => ({
 									nextFocusable,
 									previousFocusable,
 								}), [nextFocusable, previousFocusable])}>
-									{props.children}
+									{children}
 								</FocusableContext.Provider>
 							</ul>
 						</nav>

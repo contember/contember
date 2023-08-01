@@ -46,7 +46,6 @@ export function DataGridFullFilters({
 	const filterButtonProps: DropdownProps['buttonProps'] = useMemo(() => ({
 		distinction: 'seamless',
 		display: 'block',
-		inset: true,
 		children: (
 			<>
 				<PlusCircleIcon />

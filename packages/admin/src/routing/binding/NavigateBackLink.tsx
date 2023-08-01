@@ -40,7 +40,7 @@ export const NavigateBackLink = memo<NavigateBackLinkProps>(({
 	assert('ariaLabel to be present when children is empty', finalAriaLabel, isNonEmptyTrimmedString)
 
 	return (
-		<Link Component={AnchorButton} componentProps={useMemo(() => ({ inset: true, borderRadius: 'full', distinction: 'seamless' }), [])} {...props} aria-label={finalAriaLabel}>
+		<Link Component={AnchorButton} componentProps={useMemo(() => ({ borderRadius: 'full', distinction: 'seamless' }), [])} {...props} aria-label={finalAriaLabel}>
 			<Stack horizontal align="center">
 				{icon ?? <ArrowLeftIcon />}
 				<VisuallyHidden hidden={visuallyHidden}>{children ?? formatMessage('navigationBackLink.back')}</VisuallyHidden>

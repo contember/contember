@@ -15,10 +15,10 @@ export type CommonReactSelectStylesProps =
 export const useCommonReactSelectStyles = <Option = unknown, IsMulti extends boolean = boolean, Group extends GroupBase<Option> = GroupBase<Option>>({ isInvalid = false, menuZIndex }: CommonReactSelectStylesProps): StylesConfig<Option, IsMulti, Group> => useMemo(() => ({
 	indicatorSeparator: (provided, { isFocused, isDisabled }) => {
 		const backgroundColor = isDisabled
-			? 'rgba(var(--cui-color-rgb-50), var(--cui-opacity--lower))'
+			? 'rgba(var(--cui-color--rgb-50), var(--cui-opacity--lower))'
 			: isFocused
-				? 'rgba(var(--cui-color-rgb-50), var(--cui-opacity--low))'
-				: 'rgba(var(--cui-color-rgb-50), var(--cui-opacity--lower))'
+				? 'rgba(var(--cui-color--rgb-50), var(--cui-opacity--low))'
+				: 'rgba(var(--cui-color--rgb-50), var(--cui-opacity--lower))'
 
 		return {
 			...provided,
@@ -27,8 +27,8 @@ export const useCommonReactSelectStyles = <Option = unknown, IsMulti extends boo
 	},
 	indicatorsContainer: (provided, { isDisabled }) => {
 		const color = isDisabled
-			? 'rgba(var(--cui-color-rgb-50), var(--cui-opacity--low))'
-			: 'rgb(var(--cui-color-rgb-50))'
+			? 'rgba(var(--cui-color--rgb-50), var(--cui-opacity--low))'
+			: 'rgb(var(--cui-color--rgb-50))'
 
 		return {
 			...provided,
@@ -48,15 +48,15 @@ export const useCommonReactSelectStyles = <Option = unknown, IsMulti extends boo
 	placeholder: provided => {
 		return {
 			...provided,
-			color: 'rgba(var(--cui-color-rgb-25), var(--cui-opacity--high))',
+			color: 'rgba(var(--cui-color--rgb-25), var(--cui-opacity--high))',
 			margin: 0,
 			position: 'absolute',
 		}
 	},
 	singleValue: (provided, { isDisabled }) => {
 		const color = isDisabled
-			? 'rgba(var(--cui-color-rgb-50), var(--cui-opacity--low))'
-			: 'rgb(var(--cui-color-strong-rgb-50))'
+			? 'rgba(var(--cui-color--rgb-50), var(--cui-opacity--low))'
+			: 'rgb(var(--cui-color--strong-rgb-50))'
 
 		return {
 			...provided,
@@ -64,10 +64,10 @@ export const useCommonReactSelectStyles = <Option = unknown, IsMulti extends boo
 		}
 	},
 	multiValue: (provided, { isDisabled }) => {
-		const borderColor = isDisabled ? 'rgba(var(--cui-color-rgb-50), var(--cui-opacity--low))' : 'rgb(var(--cui-background-color-toned-rgb-75))'
-		const backgroundColor = isDisabled ? 'rgba(var(--cui-color-rgb-50), var(--cui-opacity--lower))' : 'rgba(var(--cui-background-color-toned-rgb-50), var(--cui-opacity--lower))'
+		const borderColor = isDisabled ? 'rgba(var(--cui-color--rgb-50), var(--cui-opacity--low))' : 'rgb(var(--cui-background-color--toned-rgb-75))'
+		const backgroundColor = isDisabled ? 'rgba(var(--cui-color--rgb-50), var(--cui-opacity--lower))' : 'rgba(var(--cui-background-color--toned-rgb-50), var(--cui-opacity--lower))'
 		const borderWidth = 'var(--cui-border-width, 1px)'
-		const lineHeight = 'var(--cui-line-height-controls)'
+		const lineHeight = 'var(--cui-line-height--controls)'
 		const margin = 0
 		const padding = '0 0 0 calc(var(--cui-gap) - var(--cui-border-width, 1px))'
 
@@ -80,7 +80,7 @@ export const useCommonReactSelectStyles = <Option = unknown, IsMulti extends boo
 			padding,
 			lineHeight,
 			'&:hover': {
-				borderColor: isDisabled ? borderColor : 'rgba(var(--cui-color-rgb-50), var(--cui-opacity--high))',
+				borderColor: isDisabled ? borderColor : 'rgba(var(--cui-color--rgb-50), var(--cui-opacity--high))',
 			},
 			'&:first-child': {
 				marginLeft: 'calc(-2 * var(--cui-gap) + 2 * var(--cui-border-width, 1px))',
@@ -88,7 +88,7 @@ export const useCommonReactSelectStyles = <Option = unknown, IsMulti extends boo
 		}
 	},
 	multiValueLabel: (provided, { isDisabled }) => {
-		const color = isDisabled ? 'rgba(var(--cui-color-rgb-50), var(--cui-opacity--low))' : 'rgb(var(--cui-color-strong-rgb-50))'
+		const color = isDisabled ? 'rgba(var(--cui-color--rgb-50), var(--cui-opacity--low))' : 'rgb(var(--cui-color--strong-rgb-50))'
 
 		return {
 			...provided,
@@ -96,9 +96,9 @@ export const useCommonReactSelectStyles = <Option = unknown, IsMulti extends boo
 		}
 	},
 	multiValueRemove: provided => {
-		const color = 'rgb(var(--cui-color-strong-rgb-50))'
-		const colorHover = 'rgb(var(--cui-color-accent-rgb-75))'
-		const backgroundColor = 'rgba(var(--cui-background-color-toned-controls-rgb-75), var(--cui-opacity--low))'
+		const color = 'rgb(var(--cui-color--strong-rgb-50))'
+		const colorHover = 'rgb(var(--cui-color--accent-rgb-75))'
+		const backgroundColor = 'rgba(var(--cui-background-color--toned-controls-rgb-75), var(--cui-opacity--low))'
 
 		// TODO: Indirect, but there seems to be no better way for now
 		const isFocusing = provided.backgroundColor
@@ -121,13 +121,13 @@ export const useCommonReactSelectStyles = <Option = unknown, IsMulti extends boo
 			'alignSelf': 'stretch',
 			'alignItems': 'center',
 			'color': isDisabled
-				? 'rgba(var(--cui-color-rgb-50), var(--cui-opacity--low))'
+				? 'rgba(var(--cui-color--rgb-50), var(--cui-opacity--low))'
 				: isFocused
-					? 'rgb(var(--cui-color-rgb-0))'
-					: 'rgb(var(--cui-color-rgb-50))',
+					? 'rgb(var(--cui-color--rgb-0))'
+					: 'rgb(var(--cui-color--rgb-50))',
 			'padding': '0 var(--cui-gap)',
 			'&:hover': {
-				color: 'rgb(var(--cui-color-rgb-0))',
+				color: 'rgb(var(--cui-color--rgb-0))',
 			},
 		}
 	},
@@ -135,26 +135,26 @@ export const useCommonReactSelectStyles = <Option = unknown, IsMulti extends boo
 		return {
 			...provided,
 			'color': isFocused
-				? 'rgb(var(--cui-color-rgb-0))'
-				: 'rgb(var(--cui-color-rgb-50))',
+				? 'rgb(var(--cui-color--rgb-0))'
+				: 'rgb(var(--cui-color--rgb-50))',
 			'&:hover': {
-				color: 'rgb(var(--cui-color-rgb-0))',
+				color: 'rgb(var(--cui-color--rgb-0))',
 			},
 		}
 	},
 	control: (provided, { isFocused, isDisabled }) => {
-		const backgroundColor = 'rgba(var(--cui-background-color-rgb-25), var(--cui-opacity--medium))'
+		const backgroundColor = 'rgba(var(--cui-background-color--rgb-25), var(--cui-opacity--medium))'
 		const color = isDisabled
-			? 'rgba(var(--cui-color-rgb-50), var(--cui-opacity--low))'
+			? 'rgba(var(--cui-color--rgb-50), var(--cui-opacity--low))'
 			: isFocused
-				? 'rgb(var(--cui-color-rgb-0))'
-				: 'rgb(var(--cui-color-rgb-50))'
+				? 'rgb(var(--cui-color--rgb-0))'
+				: 'rgb(var(--cui-color--rgb-50))'
 
 		const borderColor = isInvalid
-			? 'rgb(var(--cui-theme-danger-rgb-500))'
+			? 'rgb(var(--cui-theme-danger--rgb-500))'
 			: isDisabled
-				? 'rgba(var(--cui-color-rgb-50), var(--cui-opacity--lower))'
-				: 'rgb(var(--cui-background-color-toned-rgb-75))'
+				? 'rgba(var(--cui-color--rgb-50), var(--cui-opacity--lower))'
+				: 'rgb(var(--cui-background-color--toned-rgb-75))'
 
 		return {
 			...provided,
@@ -163,19 +163,19 @@ export const useCommonReactSelectStyles = <Option = unknown, IsMulti extends boo
 			'borderWidth': 'var(--cui-border-width, 1px)',
 			color,
 			'borderRadius': 'var(--cui-border-radius--controls)',
-			'boxShadow': isFocused ? 'var(--cui-control-focus-ring-box-shadow)' : undefined,
-			'minHeight': 'var(--cui-size-controls)',
+			'boxShadow': isFocused ? 'var(--cui-box-shadow--controls-focus-ring)' : undefined,
+			'minHeight': 'var(--cui-size--controls)',
 			'&:hover': {
-				color: 'rgb(var(--cui-color-rgb-0))',
+				color: 'rgb(var(--cui-color--rgb-0))',
 				borderColor: isDisabled
-					? 'rgba(var(--cui-color-rgb-50), var(--cui-opacity--low))'
-					: 'rgba(var(--cui-color-rgb-50), var(--cui-opacity--high))',
+					? 'rgba(var(--cui-color--rgb-50), var(--cui-opacity--low))'
+					: 'rgba(var(--cui-color--rgb-50), var(--cui-opacity--high))',
 			},
 		}
 	},
 	menu: provided => {
-		const backgroundColor = 'rgb(var(--cui-background-color-rgb-50))'
-		const border = 'var(--cui-border-width, 1px) solid rgb(var(--cui-background-color-toned-rgb-75))'
+		const backgroundColor = 'rgb(var(--cui-background-color--rgb-50))'
+		const border = 'var(--cui-border-width, 1px) solid rgb(var(--cui-background-color--toned-rgb-75))'
 
 		return {
 			...provided,
@@ -204,24 +204,24 @@ export const useCommonReactSelectStyles = <Option = unknown, IsMulti extends boo
 			...provided,
 			'borderRadius': 'var(--cui-border-radius--controls)',
 			'backgroundColor': isFocused
-				? 'rgb(var(--cui-background-color-controls-rgb-75))'
+				? 'rgb(var(--cui-background-color--controls-rgb-75))'
 				: isSelected
-					? 'rgb(var(--cui-background-color-controls-rgb-100))'
+					? 'rgb(var(--cui-background-color--controls-rgb-100))'
 					: 'transparent',
 			'color': isFocused
-				? 'rgb(var(--cui-color-controls-rgb-75))'
+				? 'rgb(var(--cui-color--controls-rgb-75))'
 				: isSelected
-					? 'rgb(var(--cui-color-controls-rgb-100))'
-					: 'var(--cui-color-controls-rgb-50)',
-			'lineHeight': 'var(--cui-line-height-controls)',
+					? 'rgb(var(--cui-color--controls-rgb-100))'
+					: 'var(--cui-color--controls-rgb-50)',
+			'lineHeight': 'var(--cui-line-height--controls)',
 			'padding': 'calc(2 * var(--cui-gap))',
 			'&:hover': {
 				backgroundColor: isSelected
-					? 'rgb(var(--cui-background-color-controls-rgb-100))'
-					: 'rgb(var(--cui-background-color-controls-rgb-75))',
+					? 'rgb(var(--cui-background-color--controls-rgb-100))'
+					: 'rgb(var(--cui-background-color--controls-rgb-75))',
 				color: isSelected
-					? 'rgb(var(--cui-color-controls-rgb-100))'
-					: 'rgb(var(--cui-color-controls-rgb-75))',
+					? 'rgb(var(--cui-color--controls-rgb-100))'
+					: 'rgb(var(--cui-color--controls-rgb-75))',
 			},
 		}
 	},

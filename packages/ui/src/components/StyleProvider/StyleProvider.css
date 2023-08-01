@@ -1,38 +1,43 @@
 :where(.cui-root) {
-	--cui-button-box-shadow-pressed: inset 0 4px 5px 2px rgba(0, 0, 0, 0.1);
-	--cui-transition-duration-immediate: 100ms;
-	--cui-transition-duration-fast: 200ms;
-	--cui-transition-duration: 300ms;
-	--cui-transition-duration-slow: 600ms;
-	--cui-transition-duration-slowest: 800ms;
-	--cui-font-family: Inter, "system-ui";
-	--cui-line-height: 1.5;
-	--cui-line-height-controls: 1.125;
-	--cui-font-size-body-px: 15;
-	--cui-font-size-body: calc(var(--cui-font-size-body-px) * 1px);
-	--cui-font-size-heading: 1.125em;
-	--cui-font-size-label: 0.875em;
-	--cui-font-size-note: 0.8125em;
-	--cui-font-size-controls-small: 0.9em;
-	--cui-font-size-controls-large: 1.5em;
-	--cui-font-size-controls: 1em;
-	--cui-gap: 0.3rem;
-	--cui-gutter: 0.75rem;
-	--cui-padding: calc(var(--cui-gap) * 4);
-	--cui-inner-padding: calc(var(--cui-gap) * 2);
-	--cui-border-radius: var(--cui-gap);
-	--cui-border-radius-controls: var(--cui-gap);
-	--cui-border-width: 1px;
-	--cui-border-width-controls: 2px;
-	--cui-tap-target-size: 1.375em;
-	--cui-size-controls-small: calc(var(--cui-tap-target-size) * 1.25);
-	--cui-size-controls: calc(var(--cui-tap-target-size) * 1.75);
-	--cui-size-controls-large: calc(var(--cui-tap-target-size) * 2);
-	--cui-size-controls-radio: 1.375em;
-	--cui-size-controls-checkbox: 1.375em;
 	--cui-backdrop-blur-opacity: 0.5;
 	--cui-backdrop-blur: 20px;
-	box-sizing: border-box;
+	--cui-border-radius--controls: var(--cui-gap);
+	--cui-border-radius-optical-grow: 0.05641895835477563;
+	--cui-border-radius: var(--cui-gap);
+	--cui-border-width--controls: 2px;
+	--cui-border-width: 1px;
+	--cui-button--box-shadow-pressed: inset 0 4px 5px 2px rgba(0, 0, 0, 0.1);
+	--cui-font-family: Inter, "system-ui";
+	--cui-font-size--body-px: 15;
+	--cui-font-size--body: calc(var(--cui-font-size--body-px) * 1px);
+	--cui-font-size--controls-large: 1.5em;
+	--cui-font-size--controls-small: 0.9em;
+	--cui-font-size--controls: 1em;
+	--cui-font-size--heading: 1.125em;
+	--cui-font-size--label: 0.875em;
+	--cui-font-size--note: 0.8125em;
+	--cui-gap: 0.3rem;
+	--cui-gutter: calc(3 * var(--cui-gap, 0.75rem));
+	--cui-line-height--controls: 1.125;
+	--cui-line-height: 1.5;
+	--cui-padding--inner: calc(var(--cui-gap) * 2);
+	--cui-padding--inner-horizontal: var(--cui-padding--inner);
+	--cui-padding--inner-vertical: var(--cui-padding--inner);
+	--cui-padding--panel-horizontal: var(--cui-padding);
+	--cui-padding--panel-vertical: var(--cui-padding);
+	--cui-padding: calc(var(--cui-gap) * 4);
+	--cui-scale: 1;
+	--cui-size--controls-checkbox: 1.375em;
+	--cui-size--controls-large: calc(var(--cui-tap-target-size) * 2);
+	--cui-size--controls-radio: 1.375em;
+	--cui-size--controls-small: calc(var(--cui-tap-target-size) * 1.25);
+	--cui-size--controls: calc(var(--cui-tap-target-size) * 1.75);
+	--cui-tap-target-size: 1.375em;
+	--cui-transition-duration--fast: 200ms;
+	--cui-transition-duration--immediate: 100ms;
+	--cui-transition-duration--slow: 600ms;
+	--cui-transition-duration-–slowest: 800ms;
+	--cui-transition-duration: 300ms;
 }
 
 @supports (font-variation-settings: normal) {
@@ -43,11 +48,11 @@
 
 @media (prefers-reduced-motion: reduce) {
 	:where(.cui-root) {
-		--cui-transition-duration-immediate: 0s;
-		--cui-transition-duration-fast: 0s;
+		--cui-transition-duration--immediate: 0s;
+		--cui-transition-duration--fast: 0s;
 		--cui-transition-duration: 0s;
-		--cui-transition-duration-slow: 0s;
-		--cui-transition-duration-slowest: 0s;
+		--cui-transition-duration--slow: 0s;
+		--cui-transition-duration-–slowest: 0s;
 	}
 }
 
@@ -56,32 +61,19 @@
 		--cui-logo-size: 1.5625em;
 		--cui-logo-size--small: 1.171875em;
 		--cui-logo-size--large: 3.125em;
+		--cui-padding--inner-horizontal: calc(var(--cui-gap) * 3);
+		--cui-padding--panel-horizontal: calc(var(--cui-gap) * 4);
 	}
-}
-
-:where(.cui-root *),
-:where(.cui-root *)::before,
-:where(.cui-root *)::after {
-	box-sizing: inherit;
-}
-
-:where(.cui-root *) {
-	--cui-control-focus-ring-box-shadow: 0 0 0 .2em rgb(var(--cui-color-accent-rgb-50));
-	--cui-control-focus-ring-box-shadow-error: 0 0 0 .2em rgb(var(--cui-theme-danger-rgb-500));
-}
-
-:where(.cui-root) {
-	--cui-circle-optical-grow: 0.05641895835477563;
-	--cui-gutter: calc(3 * var(--cui-gap));
 }
 
 :where(.cui-root),
 :where(.cui-root-no-display) {
 	-webkit-font-smoothing: antialiased;
-	background-color: rgb(var(--cui-background-color-rgb-25));
-	color: rgb(var(--cui-color-rgb-50));
+	background-color: rgb(var(--cui-background-color--rgb-25));
+	box-sizing: border-box;
+	color: rgb(var(--cui-color--rgb-50));
 	font-family: var(--cui-font-family);
-	font-size: var(--cui-font-size-body);
+	font-size: var(--cui-font-size--body);
 	font-smoothing: antialiased;
 	line-height: var(--cui-line-height);
 }
@@ -89,6 +81,13 @@
 :where(.cui-root[data-display-contents]) { display: contents; }
 :where(.cui-root[data-transparent]) { background-color: transparent; }
 
+:where(.cui-root *),
+:where(.cui-root *)::before,
+:where(.cui-root *)::after {
+	--cui-box-shadow--controls-focus-ring: 0 0 0 .2em rgb(var(--cui-color--accent-rgb-50));
+	--cui-line-height--units: calc(1em * var(--cui-line-height));
+	box-sizing: inherit;
+}
 
 :where(.cui-root h1),
 :where(.cui-root h2),
@@ -103,50 +102,15 @@
 	resize: vertical;
 }
 
-:where(.cui-root a),
 :where(.cui-root button) {
-	color: rgb(var(--cui-color-rgb-0));
-	font-weight: 600;
-}
-
-:where(.cui-root a.content-link) {
-	color: rgb(var(--cui-color-strong-rgb-50));
-}
-:where(
-	.cui-root a.content-link:hover,
-	.cui-root a.content-link:focus,
-	.cui-root a.content-link:active,
-) {
-	color: rgb(var(--cui-color-accent-rgb-75));
-}
-
-:where(.cui-root a:not([class])),
-:where(.cui-root button:not([class])) {
-	color: rgb(var(--cui-color-accent-rgb-50));
-}
-
-:where(.cui-root a) {
-	text-decoration: none;
-}
-
-:where(.cui-root a:not([class]):hover) {
-	color: rgb(var(--cui-color-accent-rgb-75));
-}
-
-:where(.cui-root a:not([class]):focus:focus-visible) {
-	color: rgb(var(--cui-color-accent-rgb-75));
-}
-
-:where(.cui-root a:not([class]):active) {
-	color: rgb(var(--cui-color-accent-rgb-25));
-}
-
-:where(.cui-root button) {
+	border-style: solid;
+	color: rgb(var(--cui-color--strong-rgb-50));
 	cursor: pointer;
+	font-weight: 600;
+	line-height: inherit;
 }
 
 :where(.cui-root button[disabled]) {
-	opacity: 0.5;
-	border-style: solid;
 	cursor: not-allowed;
+	opacity: 0.5;
 }

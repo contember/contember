@@ -2,9 +2,9 @@
 	.cui-toggle-sidebar-button,
 	.cui-toggle-menu[data-distinction="seamless"],
 ) {
-	--cui-button-background-color: transparent;
-	--cui-button-color: inherit;
-	--cui-button-color--highlighted: inherit;
+	--cui-button--background-color: transparent;
+	--cui-button--color: inherit;
+	--cui-button--color--highlighted: inherit;
 	background-color: transparent;
 	border: 0;
 	appearance: none;
@@ -24,5 +24,5 @@
 :where(
 	.lucide,
 ) {
-	--scale: 1.5;
+	--cui-scale: 1.5;
 }

@@ -1,6 +1,5 @@
 :where(.cui-layout-frame) {
-	--cui-frame-border-radius: var(--cui-gutter);
-	background-color: rgb(var(--cui-background-color-rgb-0));
+	background-color: rgb(var(--cui-background-color--rgb-0));
 	max-height: 100vh;
 	max-height: 100dvh;
 	max-width: 100vw;
@@ -9,8 +8,12 @@
 	position: relative;
 }
 
+:where(.cui-layout-frame .cui-layout-panel) {
+	--cui-layout-panel--background-rgb: var(--cui-background-color--rgb-50);
+}
+
 :where(.cui-layout-frame-container) {
-	background-color: rgb(var(--cui-background-color-rgb-0));;
+	background-color: rgb(var(--cui-background-color--rgb-0));;
 }
 
 :where(
@@ -38,19 +41,19 @@
 }
 :where(.cui-layout-frame-body) {
 	align-self: center;
-	background-color: rgb(var(--cui-background-color-rgb-50));
+	background-color: rgb(var(--cui-background-color--rgb-50));
 	border-radius: var(--cui-gutter);
 	border-width: 1px;
 	border-style: solid;
-	border-color: rgba(var(--cui-color-rgb-50), var(--cui-opacity--lower));
+	border-color: rgba(var(--cui-color--rgb-50), var(--cui-opacity--lower));
 	display: flex;
 	flex-direction: column;
 	flex-grow: 1;
-	margin: 0 var(--cui-panel-padding-horizontal) 0 var(--cui-panel-padding-horizontal);
+	margin: 0 var(--cui-padding--panel-horizontal) 0 var(--cui-padding--panel-horizontal);
 	max-height: 100%;
 	overflow: hidden;
 	position: relative;
-	width: min(calc(100vw - 2 * var(--cui-panel-padding-horizontal)), 80rem);
+	width: min(calc(100vw - 2 * var(--cui-padding--panel-horizontal)), 80rem);
 }
 :where([data-has-modals] .cui-layout-frame-body > .cui-divider) {
 	display: none;

@@ -1,7 +1,7 @@
 :where(.cui-devBar) {
-	--devBar-soft-shadow-color: rgba(var(--cui-color-accent-rgb-75), var(--cui-opacity--low));
-	--devBar-control-background-color--highlighted: rgba(var(--cui-background-color-toned-controls-rgb-50), var(--cui-opacity--low));
-	--devBar-brand-background-color--highlighted: rgb(var(--cui-background-color-controls-rgb-50));
+	--devBar-soft-shadow-color: rgba(var(--cui-color--accent-rgb-75), var(--cui-opacity--low));
+	--devBar-control-background-color--highlighted: rgba(var(--cui-background-color--toned-controls-rgb-50), var(--cui-opacity--low));
+	--devBar-brand-background-color--highlighted: rgb(var(--cui-background-color--controls-rgb-50));
 	--devBar-padding-vertical: var(--cui-padding, 1rem);
 	--devBar-padding-horizontal: var(--cui-padding, 1rem);
 
@@ -16,26 +16,26 @@
 	opacity: 1;
 	padding: var(--devBar-padding-vertical) var(--devBar-padding-horizontal);
 	transition-property: opacity, transform;
-	transition-duration: var(--cui-transition-duration-fast);
+	transition-duration: var(--cui-transition-duration--fast);
 	transition-timing-function: ease-in-out;
 }
 
 :where(.cui-devBar) .cui-table-container {
-	--cui-table-container-overflow-padding-left: var(--devBar-padding-horizontal);
-	--cui-table-container-overflow-padding-right: var(--devBar-padding-horizontal);
+	--cui-table-container--overflow-padding-left: var(--devBar-padding-horizontal);
+	--cui-table-container--overflow-padding-right: var(--devBar-padding-horizontal);
 }
 
 :where(
 	.cui-devBar-content,
 	.cui-devBar-panel-content,
 ) {
-	background: rgb(var(--cui-background-color-rgb-50));
-	box-shadow: inset 0 0 0 1px rgba(var(--cui-color-rgb-50), var(--cui-opacity--low)), 0 1rem 4rem rgba(var(--cui-color-rgb-50), var(--cui-opacity--low));;
-	color: rgb(var(--cui-color-rgb-50));
+	background: rgb(var(--cui-background-color--rgb-50));
+	box-shadow: inset 0 0 0 1px rgba(var(--cui-color--rgb-50), var(--cui-opacity--low)), 0 1rem 4rem rgba(var(--cui-color--rgb-50), var(--cui-opacity--low));;
+	color: rgb(var(--cui-color--rgb-50));
 }
 
 :where(.cui-devBar-content) {
-	transition: box-shadow var(--cui-transition-duration-slow) ease-in-out;
+	transition: box-shadow var(--cui-transition-duration--slow) ease-in-out;
 	align-self: center;
 	align-items: center;
 	border-radius: 2rem;
@@ -50,7 +50,7 @@
 	.cui-devBar-content:hover,
 	.cui-devBar-content:focus-within,
 ) {
-	box-shadow: inset 0 0 0 1px rgba(var(--cui-color-rgb-50), var(--cui-opacity--low)), 0 1rem 4rem var(--devBar-soft-shadow-color);
+	box-shadow: inset 0 0 0 1px rgba(var(--cui-color--rgb-50), var(--cui-opacity--low)), 0 1rem 4rem var(--devBar-soft-shadow-color);
 
 }
 :where(
@@ -59,12 +59,12 @@
 	.cui-devBar-brand,
 ) {
 	align-items: center;
-	height: var(--cui-size-controls);
+	height: var(--cui-size--controls);
 	border-radius: 2rem;
 	justify-content: center;
-	max-height: var(--cui-size-controls);
-	min-height: var(--cui-size-controls);
-	min-width: var(--cui-size-controls);
+	max-height: var(--cui-size--controls);
+	min-height: var(--cui-size--controls);
+	min-width: var(--cui-size--controls);
 	padding: 0.625rem;
 }
 
@@ -72,8 +72,8 @@
 	background: transparent;
 	cursor: pointer;
 	display: flex;
-	max-width: var(--cui-size-controls);
-	width: var(--cui-size-controls);
+	max-width: var(--cui-size--controls);
+	width: var(--cui-size--controls);
 	order: 999;
 }
 
@@ -81,15 +81,15 @@
 	.cui-devBar-close:hover,
 	.cui-devBar-close:focus-visible,
 ) {
-	color: rgb(var(--cui-color-toned-controls-rgb-50));
+	color: rgb(var(--cui-color--toned-controls-rgb-50));
 	background-color: var(--devBar-control-background-color--highlighted);
 }
 
 :where(.cui-devBar-brand) {
 	align-items: center;
-	color: rgb(var(--cui-color-rgb-0));
+	color: rgb(var(--cui-color--rgb-0));
 	display: flex;
-	gap: var(--cui-gutter);
+	gap: var(--cui-gap);
 	text-align: right;
 }
 
@@ -98,7 +98,7 @@
 	.cui-devBar-brand:focus-visible,
 ) {
 	background-color: var(--devBar-brand-background-color--highlighted);
-	color: rgb(var(--cui-color-controls-rgb-50));
+	color: rgb(var(--cui-color--controls-rgb-50));
 }
 
 :where(.cui-devBar-brand .cui-brand-logo-type) {
@@ -111,8 +111,8 @@
 }
 
 :where(.cui-devBar-trigger) {
-	--y-offset: calc(-1 * var(--devBar-padding-vertical) - var(--cui-size-controls));
-	color: rgb(var(--cui-color-rgb-50));
+	--y-offset: calc(-1 * var(--devBar-padding-vertical) - var(--cui-size--controls));
+	color: rgb(var(--cui-color--rgb-50));
 	display: flex;
 }
 
@@ -130,13 +130,13 @@
 	.cui-devBar-trigger-label:focus-visible,
 	.cui-devBar-trigger[data-expanded] > .cui-devBar-trigger-label,
 ) {
-	color: rgb(var(--cui-color-toned-controls-rgb-50));
+	color: rgb(var(--cui-color--toned-controls-rgb-50));
 	background-color: var(--devBar-control-background-color--highlighted);
 }
 :where(
 	.cui-devBar-trigger[data-expanded] > .cui-devBar-trigger-label,
 ) {
-	box-shadow: inset 0 1px 0 0px rgba(var(--cui-color-rgb-50), var(--cui-opacity--low));
+	box-shadow: inset 0 1px 0 0px rgba(var(--cui-color--rgb-50), var(--cui-opacity--low));
 }
 
 :where(.cui-devBar-panel) {
@@ -158,8 +158,8 @@
 
 :where(.cui-devBar-panel-content) {
 	gap: inherit;
-	background: rgb(var(--cui-background-color-rgb-50));
-	box-shadow: inset 0 0 0 1px rgba(var(--cui-color-rgb-50), var(--cui-opacity--low));
+	background: rgb(var(--cui-background-color--rgb-50));
+	box-shadow: inset 0 0 0 1px rgba(var(--cui-color--rgb-50), var(--cui-opacity--low));
 	border-radius: 1rem;
 	display: flex;
 	min-width: min(20rem, 100%);
@@ -171,7 +171,7 @@
 
 @media screen and (min-width: 768px) {
 	:where(.cui-devBar-trigger) {
-		--y-offset: calc(-1 * var(--cui-size-controls) + 2 * var(--cui-gap));
+		--y-offset: calc(-1 * var(--cui-size--controls) + 2 * var(--cui-gap));
 		position: relative;
 	}
 	:where(.cui-devBar-panel-content) {
@@ -193,11 +193,11 @@
 	.cui-devBar-trigger:hover,
 	.cui-devBar-trigger[data-expanded],
 ) {
-	color: rgb(var(--cui-color-rgb-0));
+	color: rgb(var(--cui-color--rgb-0));
 }
 
 :where(.cui-devBar:not([data-expanded])) {
-	transform: translateY(var(--cui-size-controls));
+	transform: translateY(var(--cui-size--controls));
 	opacity: 0;
 	max-width: 5rem;
 	margin: auto;

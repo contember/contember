@@ -30,151 +30,151 @@
 @media (prefers-color-scheme: light) {
   :where(.scheme-system),
 	:where(.scheme-light) {
-		--cui-background-color-rgb-100: var(--cui-theme-content-rgb-1000);
-		--cui-background-color-rgb-75: var(--cui-theme-content-rgb-1000);
-		--cui-background-color-rgb-50: var(--cui-theme-content-rgb-1000);
-		--cui-background-color-rgb-25: var(--cui-theme-content-rgb-975);
-		--cui-background-color-rgb-0: var(--cui-theme-content-rgb-950);
+		--cui-background-color--rgb-100: var(--cui-theme-content--rgb-1000);
+		--cui-background-color--rgb-75: var(--cui-theme-content--rgb-1000);
+		--cui-background-color--rgb-50: var(--cui-theme-content--rgb-1000);
+		--cui-background-color--rgb-25: var(--cui-theme-content--rgb-975);
+		--cui-background-color--rgb-0: var(--cui-theme-content--rgb-950);
 
-		--cui-color-rgb-100: var(--cui-theme-content-rgb-500);
-		--cui-color-rgb-75: var(--cui-theme-content-rgb-450);
-		--cui-color-rgb-50: var(--cui-theme-content-rgb-400);
-		--cui-color-rgb-25: var(--cui-theme-content-rgb-350);
-		--cui-color-rgb-0: var(--cui-theme-content-rgb-300);
+		--cui-color--rgb-100: var(--cui-theme-content--rgb-500);
+		--cui-color--rgb-75: var(--cui-theme-content--rgb-450);
+		--cui-color--rgb-50: var(--cui-theme-content--rgb-400);
+		--cui-color--rgb-25: var(--cui-theme-content--rgb-350);
+		--cui-color--rgb-0: var(--cui-theme-content--rgb-300);
 
-		--cui-color-strong-rgb-100: var(--cui-theme-content-rgb-200);
-		--cui-color-strong-rgb-75: var(--cui-theme-content-rgb-100);
-		--cui-color-strong-rgb-50: var(--cui-theme-content-rgb-0);
-		--cui-color-strong-rgb-25: var(--cui-theme-content-rgb-0);
-		--cui-color-strong-rgb-0: var(--cui-theme-content-rgb-0);
+		--cui-color--strong-rgb-100: var(--cui-theme-content--rgb-200);
+		--cui-color--strong-rgb-75: var(--cui-theme-content--rgb-100);
+		--cui-color--strong-rgb-50: var(--cui-theme-content--rgb-0);
+		--cui-color--strong-rgb-25: var(--cui-theme-content--rgb-0);
+		--cui-color--strong-rgb-0: var(--cui-theme-content--rgb-0);
 
-		--cui-color-accent-rgb-100: var(--cui-theme-controls-rgb-600);
-		--cui-color-accent-rgb-75: var(--cui-theme-controls-rgb-500);
-		--cui-color-accent-rgb-50: var(--cui-theme-controls-rgb-400);
-		--cui-color-accent-rgb-25: var(--cui-theme-controls-rgb-300);
-		--cui-color-accent-rgb-0: var(--cui-theme-controls-rgb-200);
+		--cui-color--accent-rgb-100: var(--cui-theme-controls--rgb-600);
+		--cui-color--accent-rgb-75: var(--cui-theme-controls--rgb-500);
+		--cui-color--accent-rgb-50: var(--cui-theme-controls--rgb-400);
+		--cui-color--accent-rgb-25: var(--cui-theme-controls--rgb-300);
+		--cui-color--accent-rgb-0: var(--cui-theme-controls--rgb-200);
 
-		--cui-background-color-toned-rgb-100: var(--cui-theme-content-rgb-800);
-		--cui-background-color-toned-rgb-75: var(--cui-theme-content-rgb-700);
-		--cui-background-color-toned-rgb-50: var(--cui-theme-content-rgb-600);
-		--cui-background-color-toned-rgb-25: var(--cui-theme-content-rgb-500);
-		--cui-background-color-toned-rgb-0: var(--cui-theme-content-rgb-400);
+		--cui-background-color--toned-rgb-100: var(--cui-theme-content--rgb-800);
+		--cui-background-color--toned-rgb-75: var(--cui-theme-content--rgb-700);
+		--cui-background-color--toned-rgb-50: var(--cui-theme-content--rgb-600);
+		--cui-background-color--toned-rgb-25: var(--cui-theme-content--rgb-500);
+		--cui-background-color--toned-rgb-0: var(--cui-theme-content--rgb-400);
 
-		--cui-color-toned-rgb-100: var(--cui-theme-content-rgb-300);
-		--cui-color-toned-rgb-75: var(--cui-theme-content-rgb-400);
-		--cui-color-toned-rgb-50: var(--cui-theme-content-rgb-500);
-		--cui-color-toned-rgb-25: var(--cui-theme-content-rgb-600);
-		--cui-color-toned-rgb-0: var(--cui-theme-content-rgb-700);
+		--cui-color--toned-rgb-100: var(--cui-theme-content--rgb-300);
+		--cui-color--toned-rgb-75: var(--cui-theme-content--rgb-400);
+		--cui-color--toned-rgb-50: var(--cui-theme-content--rgb-500);
+		--cui-color--toned-rgb-25: var(--cui-theme-content--rgb-600);
+		--cui-color--toned-rgb-0: var(--cui-theme-content--rgb-700);
 
-		--cui-background-color-toned-controls-rgb-100: var(--cui-theme-controls-rgb-800);
-		--cui-background-color-toned-controls-rgb-75: var(--cui-theme-controls-rgb-700);
-		--cui-background-color-toned-controls-rgb-50: var(--cui-theme-controls-rgb-600);
-		--cui-background-color-toned-controls-rgb-25: var(--cui-theme-controls-rgb-500);
-		--cui-background-color-toned-controls-rgb-0: var(--cui-theme-controls-rgb-400);
+		--cui-background-color--toned-controls-rgb-100: var(--cui-theme-controls--rgb-800);
+		--cui-background-color--toned-controls-rgb-75: var(--cui-theme-controls--rgb-700);
+		--cui-background-color--toned-controls-rgb-50: var(--cui-theme-controls--rgb-600);
+		--cui-background-color--toned-controls-rgb-25: var(--cui-theme-controls--rgb-500);
+		--cui-background-color--toned-controls-rgb-0: var(--cui-theme-controls--rgb-400);
 
-		--cui-color-toned-controls-rgb-100: var(--cui-theme-controls-rgb-300);
-		--cui-color-toned-controls-rgb-75: var(--cui-theme-controls-rgb-400);
-		--cui-color-toned-controls-rgb-50: var(--cui-theme-controls-rgb-500);
-		--cui-color-toned-controls-rgb-25: var(--cui-theme-controls-rgb-600);
-		--cui-color-toned-controls-rgb-0: var(--cui-theme-controls-rgb-700);
+		--cui-color--toned-controls-rgb-100: var(--cui-theme-controls--rgb-300);
+		--cui-color--toned-controls-rgb-75: var(--cui-theme-controls--rgb-400);
+		--cui-color--toned-controls-rgb-50: var(--cui-theme-controls--rgb-500);
+		--cui-color--toned-controls-rgb-25: var(--cui-theme-controls--rgb-600);
+		--cui-color--toned-controls-rgb-0: var(--cui-theme-controls--rgb-700);
 
-		--cui-background-color-controls-rgb-100: var(--cui-theme-controls-rgb-550);
-		--cui-background-color-controls-rgb-75: var(--cui-theme-controls-rgb-450);
-		--cui-background-color-controls-rgb-50: var(--cui-theme-controls-rgb-350);
-		--cui-background-color-controls-rgb-25: var(--cui-theme-controls-rgb-250);
-		--cui-background-color-controls-rgb-0: var(--cui-theme-controls-rgb-150);
+		--cui-background-color--controls-rgb-100: var(--cui-theme-controls--rgb-550);
+		--cui-background-color--controls-rgb-75: var(--cui-theme-controls--rgb-450);
+		--cui-background-color--controls-rgb-50: var(--cui-theme-controls--rgb-350);
+		--cui-background-color--controls-rgb-25: var(--cui-theme-controls--rgb-250);
+		--cui-background-color--controls-rgb-0: var(--cui-theme-controls--rgb-150);
 
-		--cui-color-controls-rgb-100: var(--cui-theme-controls-rgb-1000);
-		--cui-color-controls-rgb-75: var(--cui-theme-controls-rgb-1000);
-		--cui-color-controls-rgb-50: var(--cui-theme-controls-rgb-1000);
-		--cui-color-controls-rgb-25: var(--cui-theme-controls-rgb-950);
-		--cui-color-controls-rgb-0: var(--cui-theme-controls-rgb-900);
+		--cui-color--controls-rgb-100: var(--cui-theme-controls--rgb-1000);
+		--cui-color--controls-rgb-75: var(--cui-theme-controls--rgb-1000);
+		--cui-color--controls-rgb-50: var(--cui-theme-controls--rgb-1000);
+		--cui-color--controls-rgb-25: var(--cui-theme-controls--rgb-950);
+		--cui-color--controls-rgb-0: var(--cui-theme-controls--rgb-900);
 
-		--cui-background-color-controls-inverse-rgb-100: var(--cui-theme-controls-rgb-250);
-		--cui-background-color-controls-inverse-rgb-75: var(--cui-theme-controls-rgb-150);
-		--cui-background-color-controls-inverse-rgb-50: var(--cui-theme-controls-rgb-50);
-		--cui-background-color-controls-inverse-rgb-25: var(--cui-theme-controls-rgb-0);
-		--cui-background-color-controls-inverse-rgb-0: var(--cui-theme-controls-rgb-0);
+		--cui-background-color--controls-inverse-rgb-100: var(--cui-theme-controls--rgb-250);
+		--cui-background-color--controls-inverse-rgb-75: var(--cui-theme-controls--rgb-150);
+		--cui-background-color--controls-inverse-rgb-50: var(--cui-theme-controls--rgb-50);
+		--cui-background-color--controls-inverse-rgb-25: var(--cui-theme-controls--rgb-0);
+		--cui-background-color--controls-inverse-rgb-0: var(--cui-theme-controls--rgb-0);
 
-		--cui-color-controls-inverse-rgb-100: var(--cui-theme-controls-rgb-1000);
-		--cui-color-controls-inverse-rgb-75: var(--cui-theme-controls-rgb-1000);
-		--cui-color-controls-inverse-rgb-50: var(--cui-theme-controls-rgb-1000);
-		--cui-color-controls-inverse-rgb-25: var(--cui-theme-controls-rgb-950);
-		--cui-color-controls-inverse-rgb-0: var(--cui-theme-controls-rgb-900);
+		--cui-color--controls-inverse-rgb-100: var(--cui-theme-controls--rgb-1000);
+		--cui-color--controls-inverse-rgb-75: var(--cui-theme-controls--rgb-1000);
+		--cui-color--controls-inverse-rgb-50: var(--cui-theme-controls--rgb-1000);
+		--cui-color--controls-inverse-rgb-25: var(--cui-theme-controls--rgb-950);
+		--cui-color--controls-inverse-rgb-0: var(--cui-theme-controls--rgb-900);
 	}
 
 	:where(.scheme-dark) {
-		--cui-background-color-rgb-100: var(--cui-theme-content-rgb-200);
-		--cui-background-color-rgb-75: var(--cui-theme-content-rgb-150);
-		--cui-background-color-rgb-50: var(--cui-theme-content-rgb-100);
-		--cui-background-color-rgb-25: var(--cui-theme-content-rgb-50);
-		--cui-background-color-rgb-0: var(--cui-theme-content-rgb-0);
+		--cui-background-color--rgb-100: var(--cui-theme-content--rgb-200);
+		--cui-background-color--rgb-75: var(--cui-theme-content--rgb-150);
+		--cui-background-color--rgb-50: var(--cui-theme-content--rgb-100);
+		--cui-background-color--rgb-25: var(--cui-theme-content--rgb-50);
+		--cui-background-color--rgb-0: var(--cui-theme-content--rgb-0);
 
-		--cui-color-rgb-100: var(--cui-theme-content-rgb-800);
-		--cui-color-rgb-75: var(--cui-theme-content-rgb-750);
-		--cui-color-rgb-50: var(--cui-theme-content-rgb-700);
-		--cui-color-rgb-25: var(--cui-theme-content-rgb-650);
-		--cui-color-rgb-0: var(--cui-theme-content-rgb-600);
+		--cui-color--rgb-100: var(--cui-theme-content--rgb-800);
+		--cui-color--rgb-75: var(--cui-theme-content--rgb-750);
+		--cui-color--rgb-50: var(--cui-theme-content--rgb-700);
+		--cui-color--rgb-25: var(--cui-theme-content--rgb-650);
+		--cui-color--rgb-0: var(--cui-theme-content--rgb-600);
 
-		--cui-color-strong-rgb-100: var(--cui-theme-content-rgb-1000);
-		--cui-color-strong-rgb-75: var(--cui-theme-content-rgb-1000);
-		--cui-color-strong-rgb-50: var(--cui-theme-content-rgb-1000);
-		--cui-color-strong-rgb-25: var(--cui-theme-content-rgb-900);
-		--cui-color-strong-rgb-0: var(--cui-theme-content-rgb-800);
+		--cui-color--strong-rgb-100: var(--cui-theme-content--rgb-1000);
+		--cui-color--strong-rgb-75: var(--cui-theme-content--rgb-1000);
+		--cui-color--strong-rgb-50: var(--cui-theme-content--rgb-1000);
+		--cui-color--strong-rgb-25: var(--cui-theme-content--rgb-900);
+		--cui-color--strong-rgb-0: var(--cui-theme-content--rgb-800);
 
-		--cui-color-accent-rgb-100: var(--cui-theme-controls-rgb-700);
-		--cui-color-accent-rgb-75: var(--cui-theme-controls-rgb-600);
-		--cui-color-accent-rgb-50: var(--cui-theme-controls-rgb-500);
-		--cui-color-accent-rgb-25: var(--cui-theme-controls-rgb-400);
-		--cui-color-accent-rgb-0: var(--cui-theme-controls-rgb-300);
+		--cui-color--accent-rgb-100: var(--cui-theme-controls--rgb-700);
+		--cui-color--accent-rgb-75: var(--cui-theme-controls--rgb-600);
+		--cui-color--accent-rgb-50: var(--cui-theme-controls--rgb-500);
+		--cui-color--accent-rgb-25: var(--cui-theme-controls--rgb-400);
+		--cui-color--accent-rgb-0: var(--cui-theme-controls--rgb-300);
 
-		--cui-background-color-toned-rgb-100: var(--cui-theme-content-rgb-200);
-		--cui-background-color-toned-rgb-75: var(--cui-theme-content-rgb-300);
-		--cui-background-color-toned-rgb-50: var(--cui-theme-content-rgb-400);
-		--cui-background-color-toned-rgb-25: var(--cui-theme-content-rgb-500);
-		--cui-background-color-toned-rgb-0: var(--cui-theme-content-rgb-600);
+		--cui-background-color--toned-rgb-100: var(--cui-theme-content--rgb-200);
+		--cui-background-color--toned-rgb-75: var(--cui-theme-content--rgb-300);
+		--cui-background-color--toned-rgb-50: var(--cui-theme-content--rgb-400);
+		--cui-background-color--toned-rgb-25: var(--cui-theme-content--rgb-500);
+		--cui-background-color--toned-rgb-0: var(--cui-theme-content--rgb-600);
 
-		--cui-color-toned-rgb-100: var(--cui-theme-content-rgb-1000);
-		--cui-color-toned-rgb-75: var(--cui-theme-content-rgb-800);
-		--cui-color-toned-rgb-50: var(--cui-theme-content-rgb-600);
-		--cui-color-toned-rgb-25: var(--cui-theme-content-rgb-400);
-		--cui-color-toned-rgb-0: var(--cui-theme-content-rgb-200);
+		--cui-color--toned-rgb-100: var(--cui-theme-content--rgb-1000);
+		--cui-color--toned-rgb-75: var(--cui-theme-content--rgb-800);
+		--cui-color--toned-rgb-50: var(--cui-theme-content--rgb-600);
+		--cui-color--toned-rgb-25: var(--cui-theme-content--rgb-400);
+		--cui-color--toned-rgb-0: var(--cui-theme-content--rgb-200);
 
-		--cui-background-color-toned-controls-rgb-100: var(--cui-theme-controls-rgb-200);
-		--cui-background-color-toned-controls-rgb-75: var(--cui-theme-controls-rgb-300);
-		--cui-background-color-toned-controls-rgb-50: var(--cui-theme-controls-rgb-400);
-		--cui-background-color-toned-controls-rgb-25: var(--cui-theme-controls-rgb-500);
-		--cui-background-color-toned-controls-rgb-0: var(--cui-theme-controls-rgb-600);
+		--cui-background-color--toned-controls-rgb-100: var(--cui-theme-controls--rgb-200);
+		--cui-background-color--toned-controls-rgb-75: var(--cui-theme-controls--rgb-300);
+		--cui-background-color--toned-controls-rgb-50: var(--cui-theme-controls--rgb-400);
+		--cui-background-color--toned-controls-rgb-25: var(--cui-theme-controls--rgb-500);
+		--cui-background-color--toned-controls-rgb-0: var(--cui-theme-controls--rgb-600);
 
-		--cui-color-toned-controls-rgb-100: var(--cui-theme-controls-rgb-1000);
-		--cui-color-toned-controls-rgb-75: var(--cui-theme-controls-rgb-800);
-		--cui-color-toned-controls-rgb-50: var(--cui-theme-controls-rgb-600);
-		--cui-color-toned-controls-rgb-25: var(--cui-theme-controls-rgb-400);
-		--cui-color-toned-controls-rgb-0: var(--cui-theme-controls-rgb-200);
+		--cui-color--toned-controls-rgb-100: var(--cui-theme-controls--rgb-1000);
+		--cui-color--toned-controls-rgb-75: var(--cui-theme-controls--rgb-800);
+		--cui-color--toned-controls-rgb-50: var(--cui-theme-controls--rgb-600);
+		--cui-color--toned-controls-rgb-25: var(--cui-theme-controls--rgb-400);
+		--cui-color--toned-controls-rgb-0: var(--cui-theme-controls--rgb-200);
 
-		--cui-background-color-controls-rgb-100: var(--cui-theme-controls-rgb-450);
-		--cui-background-color-controls-rgb-75: var(--cui-theme-controls-rgb-350);
-		--cui-background-color-controls-rgb-50: var(--cui-theme-controls-rgb-250);
-		--cui-background-color-controls-rgb-25: var(--cui-theme-controls-rgb-150);
-		--cui-background-color-controls-rgb-0: var(--cui-theme-controls-rgb-50);
+		--cui-background-color--controls-rgb-100: var(--cui-theme-controls--rgb-450);
+		--cui-background-color--controls-rgb-75: var(--cui-theme-controls--rgb-350);
+		--cui-background-color--controls-rgb-50: var(--cui-theme-controls--rgb-250);
+		--cui-background-color--controls-rgb-25: var(--cui-theme-controls--rgb-150);
+		--cui-background-color--controls-rgb-0: var(--cui-theme-controls--rgb-50);
 
-		--cui-color-controls-rgb-100: var(--cui-theme-controls-rgb-1000);
-		--cui-color-controls-rgb-75: var(--cui-theme-controls-rgb-1000);
-		--cui-color-controls-rgb-50: var(--cui-theme-controls-rgb-950);
-		--cui-color-controls-rgb-25: var(--cui-theme-controls-rgb-900);
-		--cui-color-controls-rgb-0: var(--cui-theme-controls-rgb-850);
+		--cui-color--controls-rgb-100: var(--cui-theme-controls--rgb-1000);
+		--cui-color--controls-rgb-75: var(--cui-theme-controls--rgb-1000);
+		--cui-color--controls-rgb-50: var(--cui-theme-controls--rgb-950);
+		--cui-color--controls-rgb-25: var(--cui-theme-controls--rgb-900);
+		--cui-color--controls-rgb-0: var(--cui-theme-controls--rgb-850);
 
-		--cui-background-color-controls-inverse-rgb-100: var(--cui-theme-controls-rgb-800);
-		--cui-background-color-controls-inverse-rgb-75: var(--cui-theme-controls-rgb-900);
-		--cui-background-color-controls-inverse-rgb-50: var(--cui-theme-controls-rgb-1000);
-		--cui-background-color-controls-inverse-rgb-25: var(--cui-theme-controls-rgb-1000);
-		--cui-background-color-controls-inverse-rgb-0: var(--cui-theme-controls-rgb-1000);
+		--cui-background-color--controls-inverse-rgb-100: var(--cui-theme-controls--rgb-800);
+		--cui-background-color--controls-inverse-rgb-75: var(--cui-theme-controls--rgb-900);
+		--cui-background-color--controls-inverse-rgb-50: var(--cui-theme-controls--rgb-1000);
+		--cui-background-color--controls-inverse-rgb-25: var(--cui-theme-controls--rgb-1000);
+		--cui-background-color--controls-inverse-rgb-0: var(--cui-theme-controls--rgb-1000);
 
-		--cui-color-controls-inverse-rgb-100: var(--cui-theme-controls-rgb-300);
-		--cui-color-controls-inverse-rgb-75: var(--cui-theme-controls-rgb-250);
-		--cui-color-controls-inverse-rgb-50: var(--cui-theme-controls-rgb-200);
-		--cui-color-controls-inverse-rgb-25: var(--cui-theme-controls-rgb-150);
-		--cui-color-controls-inverse-rgb-0: var(--cui-theme-controls-rgb-100);
+		--cui-color--controls-inverse-rgb-100: var(--cui-theme-controls--rgb-300);
+		--cui-color--controls-inverse-rgb-75: var(--cui-theme-controls--rgb-250);
+		--cui-color--controls-inverse-rgb-50: var(--cui-theme-controls--rgb-200);
+		--cui-color--controls-inverse-rgb-25: var(--cui-theme-controls--rgb-150);
+		--cui-color--controls-inverse-rgb-0: var(--cui-theme-controls--rgb-100);
 	}
 }
 
@@ -184,150 +184,150 @@
 @media (prefers-color-scheme: dark) {
 	:where(.scheme-system),
 	:where(.scheme-dark) {
-		--cui-background-color-rgb-100: var(--cui-theme-content-rgb-200);
-		--cui-background-color-rgb-75: var(--cui-theme-content-rgb-150);
-		--cui-background-color-rgb-50: var(--cui-theme-content-rgb-100);
-		--cui-background-color-rgb-25: var(--cui-theme-content-rgb-50);
-		--cui-background-color-rgb-0: var(--cui-theme-content-rgb-0);
+		--cui-background-color--rgb-100: var(--cui-theme-content--rgb-200);
+		--cui-background-color--rgb-75: var(--cui-theme-content--rgb-150);
+		--cui-background-color--rgb-50: var(--cui-theme-content--rgb-100);
+		--cui-background-color--rgb-25: var(--cui-theme-content--rgb-50);
+		--cui-background-color--rgb-0: var(--cui-theme-content--rgb-0);
 
-		--cui-color-rgb-100: var(--cui-theme-content-rgb-800);
-		--cui-color-rgb-75: var(--cui-theme-content-rgb-750);
-		--cui-color-rgb-50: var(--cui-theme-content-rgb-700);
-		--cui-color-rgb-25: var(--cui-theme-content-rgb-650);
-		--cui-color-rgb-0: var(--cui-theme-content-rgb-600);
+		--cui-color--rgb-100: var(--cui-theme-content--rgb-800);
+		--cui-color--rgb-75: var(--cui-theme-content--rgb-750);
+		--cui-color--rgb-50: var(--cui-theme-content--rgb-700);
+		--cui-color--rgb-25: var(--cui-theme-content--rgb-650);
+		--cui-color--rgb-0: var(--cui-theme-content--rgb-600);
 
-		--cui-color-strong-rgb-100: var(--cui-theme-content-rgb-1000);
-		--cui-color-strong-rgb-75: var(--cui-theme-content-rgb-1000);
-		--cui-color-strong-rgb-50: var(--cui-theme-content-rgb-1000);
-		--cui-color-strong-rgb-25: var(--cui-theme-content-rgb-900);
-		--cui-color-strong-rgb-0: var(--cui-theme-content-rgb-800);
+		--cui-color--strong-rgb-100: var(--cui-theme-content--rgb-1000);
+		--cui-color--strong-rgb-75: var(--cui-theme-content--rgb-1000);
+		--cui-color--strong-rgb-50: var(--cui-theme-content--rgb-1000);
+		--cui-color--strong-rgb-25: var(--cui-theme-content--rgb-900);
+		--cui-color--strong-rgb-0: var(--cui-theme-content--rgb-800);
 
-		--cui-color-accent-rgb-100: var(--cui-theme-controls-rgb-700);
-		--cui-color-accent-rgb-75: var(--cui-theme-controls-rgb-600);
-		--cui-color-accent-rgb-50: var(--cui-theme-controls-rgb-500);
-		--cui-color-accent-rgb-25: var(--cui-theme-controls-rgb-400);
-		--cui-color-accent-rgb-0: var(--cui-theme-controls-rgb-300);
+		--cui-color--accent-rgb-100: var(--cui-theme-controls--rgb-700);
+		--cui-color--accent-rgb-75: var(--cui-theme-controls--rgb-600);
+		--cui-color--accent-rgb-50: var(--cui-theme-controls--rgb-500);
+		--cui-color--accent-rgb-25: var(--cui-theme-controls--rgb-400);
+		--cui-color--accent-rgb-0: var(--cui-theme-controls--rgb-300);
 
-		--cui-background-color-toned-rgb-100: var(--cui-theme-content-rgb-200);
-		--cui-background-color-toned-rgb-75: var(--cui-theme-content-rgb-300);
-		--cui-background-color-toned-rgb-50: var(--cui-theme-content-rgb-400);
-		--cui-background-color-toned-rgb-25: var(--cui-theme-content-rgb-500);
-		--cui-background-color-toned-rgb-0: var(--cui-theme-content-rgb-600);
+		--cui-background-color--toned-rgb-100: var(--cui-theme-content--rgb-200);
+		--cui-background-color--toned-rgb-75: var(--cui-theme-content--rgb-300);
+		--cui-background-color--toned-rgb-50: var(--cui-theme-content--rgb-400);
+		--cui-background-color--toned-rgb-25: var(--cui-theme-content--rgb-500);
+		--cui-background-color--toned-rgb-0: var(--cui-theme-content--rgb-600);
 
-		--cui-color-toned-rgb-100: var(--cui-theme-content-rgb-1000);
-		--cui-color-toned-rgb-75: var(--cui-theme-content-rgb-800);
-		--cui-color-toned-rgb-50: var(--cui-theme-content-rgb-600);
-		--cui-color-toned-rgb-25: var(--cui-theme-content-rgb-400);
-		--cui-color-toned-rgb-0: var(--cui-theme-content-rgb-200);
+		--cui-color--toned-rgb-100: var(--cui-theme-content--rgb-1000);
+		--cui-color--toned-rgb-75: var(--cui-theme-content--rgb-800);
+		--cui-color--toned-rgb-50: var(--cui-theme-content--rgb-600);
+		--cui-color--toned-rgb-25: var(--cui-theme-content--rgb-400);
+		--cui-color--toned-rgb-0: var(--cui-theme-content--rgb-200);
 
-		--cui-background-color-toned-controls-rgb-100: var(--cui-theme-controls-rgb-200);
-		--cui-background-color-toned-controls-rgb-75: var(--cui-theme-controls-rgb-300);
-		--cui-background-color-toned-controls-rgb-50: var(--cui-theme-controls-rgb-400);
-		--cui-background-color-toned-controls-rgb-25: var(--cui-theme-controls-rgb-500);
-		--cui-background-color-toned-controls-rgb-0: var(--cui-theme-controls-rgb-600);
+		--cui-background-color--toned-controls-rgb-100: var(--cui-theme-controls--rgb-200);
+		--cui-background-color--toned-controls-rgb-75: var(--cui-theme-controls--rgb-300);
+		--cui-background-color--toned-controls-rgb-50: var(--cui-theme-controls--rgb-400);
+		--cui-background-color--toned-controls-rgb-25: var(--cui-theme-controls--rgb-500);
+		--cui-background-color--toned-controls-rgb-0: var(--cui-theme-controls--rgb-600);
 
-		--cui-color-toned-controls-rgb-100: var(--cui-theme-controls-rgb-1000);
-		--cui-color-toned-controls-rgb-75: var(--cui-theme-controls-rgb-800);
-		--cui-color-toned-controls-rgb-50: var(--cui-theme-controls-rgb-600);
-		--cui-color-toned-controls-rgb-25: var(--cui-theme-controls-rgb-400);
-		--cui-color-toned-controls-rgb-0: var(--cui-theme-controls-rgb-200);
+		--cui-color--toned-controls-rgb-100: var(--cui-theme-controls--rgb-1000);
+		--cui-color--toned-controls-rgb-75: var(--cui-theme-controls--rgb-800);
+		--cui-color--toned-controls-rgb-50: var(--cui-theme-controls--rgb-600);
+		--cui-color--toned-controls-rgb-25: var(--cui-theme-controls--rgb-400);
+		--cui-color--toned-controls-rgb-0: var(--cui-theme-controls--rgb-200);
 
-		--cui-background-color-controls-rgb-100: var(--cui-theme-controls-rgb-450);
-		--cui-background-color-controls-rgb-75: var(--cui-theme-controls-rgb-350);
-		--cui-background-color-controls-rgb-50: var(--cui-theme-controls-rgb-250);
-		--cui-background-color-controls-rgb-25: var(--cui-theme-controls-rgb-150);
-		--cui-background-color-controls-rgb-0: var(--cui-theme-controls-rgb-50);
+		--cui-background-color--controls-rgb-100: var(--cui-theme-controls--rgb-450);
+		--cui-background-color--controls-rgb-75: var(--cui-theme-controls--rgb-350);
+		--cui-background-color--controls-rgb-50: var(--cui-theme-controls--rgb-250);
+		--cui-background-color--controls-rgb-25: var(--cui-theme-controls--rgb-150);
+		--cui-background-color--controls-rgb-0: var(--cui-theme-controls--rgb-50);
 
-		--cui-color-controls-rgb-100: var(--cui-theme-controls-rgb-1000);
-		--cui-color-controls-rgb-75: var(--cui-theme-controls-rgb-1000);
-		--cui-color-controls-rgb-50: var(--cui-theme-controls-rgb-950);
-		--cui-color-controls-rgb-25: var(--cui-theme-controls-rgb-900);
-		--cui-color-controls-rgb-0: var(--cui-theme-controls-rgb-850);
+		--cui-color--controls-rgb-100: var(--cui-theme-controls--rgb-1000);
+		--cui-color--controls-rgb-75: var(--cui-theme-controls--rgb-1000);
+		--cui-color--controls-rgb-50: var(--cui-theme-controls--rgb-950);
+		--cui-color--controls-rgb-25: var(--cui-theme-controls--rgb-900);
+		--cui-color--controls-rgb-0: var(--cui-theme-controls--rgb-850);
 
-		--cui-background-color-controls-inverse-rgb-100: var(--cui-theme-controls-rgb-800);
-		--cui-background-color-controls-inverse-rgb-75: var(--cui-theme-controls-rgb-900);
-		--cui-background-color-controls-inverse-rgb-50: var(--cui-theme-controls-rgb-1000);
-		--cui-background-color-controls-inverse-rgb-25: var(--cui-theme-controls-rgb-1000);
-		--cui-background-color-controls-inverse-rgb-0: var(--cui-theme-controls-rgb-1000);
+		--cui-background-color--controls-inverse-rgb-100: var(--cui-theme-controls--rgb-800);
+		--cui-background-color--controls-inverse-rgb-75: var(--cui-theme-controls--rgb-900);
+		--cui-background-color--controls-inverse-rgb-50: var(--cui-theme-controls--rgb-1000);
+		--cui-background-color--controls-inverse-rgb-25: var(--cui-theme-controls--rgb-1000);
+		--cui-background-color--controls-inverse-rgb-0: var(--cui-theme-controls--rgb-1000);
 
-		--cui-color-controls-inverse-rgb-100: var(--cui-theme-controls-rgb-300);
-		--cui-color-controls-inverse-rgb-75: var(--cui-theme-controls-rgb-250);
-		--cui-color-controls-inverse-rgb-50: var(--cui-theme-controls-rgb-200);
-		--cui-color-controls-inverse-rgb-25: var(--cui-theme-controls-rgb-150);
-		--cui-color-controls-inverse-rgb-0: var(--cui-theme-controls-rgb-100);
+		--cui-color--controls-inverse-rgb-100: var(--cui-theme-controls--rgb-300);
+		--cui-color--controls-inverse-rgb-75: var(--cui-theme-controls--rgb-250);
+		--cui-color--controls-inverse-rgb-50: var(--cui-theme-controls--rgb-200);
+		--cui-color--controls-inverse-rgb-25: var(--cui-theme-controls--rgb-150);
+		--cui-color--controls-inverse-rgb-0: var(--cui-theme-controls--rgb-100);
 	}
 
 	:where(.scheme-light) {
-		--cui-background-color-rgb-100: var(--cui-theme-content-rgb-1000);
-		--cui-background-color-rgb-75: var(--cui-theme-content-rgb-1000);
-		--cui-background-color-rgb-50: var(--cui-theme-content-rgb-1000);
-		--cui-background-color-rgb-25: var(--cui-theme-content-rgb-975);
-		--cui-background-color-rgb-0: var(--cui-theme-content-rgb-950);
+		--cui-background-color--rgb-100: var(--cui-theme-content--rgb-1000);
+		--cui-background-color--rgb-75: var(--cui-theme-content--rgb-1000);
+		--cui-background-color--rgb-50: var(--cui-theme-content--rgb-1000);
+		--cui-background-color--rgb-25: var(--cui-theme-content--rgb-975);
+		--cui-background-color--rgb-0: var(--cui-theme-content--rgb-950);
 
-		--cui-color-rgb-100: var(--cui-theme-content-rgb-500);
-		--cui-color-rgb-75: var(--cui-theme-content-rgb-450);
-		--cui-color-rgb-50: var(--cui-theme-content-rgb-400);
-		--cui-color-rgb-25: var(--cui-theme-content-rgb-350);
-		--cui-color-rgb-0: var(--cui-theme-content-rgb-300);
+		--cui-color--rgb-100: var(--cui-theme-content--rgb-500);
+		--cui-color--rgb-75: var(--cui-theme-content--rgb-450);
+		--cui-color--rgb-50: var(--cui-theme-content--rgb-400);
+		--cui-color--rgb-25: var(--cui-theme-content--rgb-350);
+		--cui-color--rgb-0: var(--cui-theme-content--rgb-300);
 
-		--cui-color-strong-rgb-100: var(--cui-theme-content-rgb-200);
-		--cui-color-strong-rgb-75: var(--cui-theme-content-rgb-100);
-		--cui-color-strong-rgb-50: var(--cui-theme-content-rgb-0);
-		--cui-color-strong-rgb-25: var(--cui-theme-content-rgb-0);
-		--cui-color-strong-rgb-0: var(--cui-theme-content-rgb-0);
+		--cui-color--strong-rgb-100: var(--cui-theme-content--rgb-200);
+		--cui-color--strong-rgb-75: var(--cui-theme-content--rgb-100);
+		--cui-color--strong-rgb-50: var(--cui-theme-content--rgb-0);
+		--cui-color--strong-rgb-25: var(--cui-theme-content--rgb-0);
+		--cui-color--strong-rgb-0: var(--cui-theme-content--rgb-0);
 
-		--cui-color-accent-rgb-100: var(--cui-theme-controls-rgb-600);
-		--cui-color-accent-rgb-75: var(--cui-theme-controls-rgb-500);
-		--cui-color-accent-rgb-50: var(--cui-theme-controls-rgb-400);
-		--cui-color-accent-rgb-25: var(--cui-theme-controls-rgb-300);
-		--cui-color-accent-rgb-0: var(--cui-theme-controls-rgb-200);
+		--cui-color--accent-rgb-100: var(--cui-theme-controls--rgb-600);
+		--cui-color--accent-rgb-75: var(--cui-theme-controls--rgb-500);
+		--cui-color--accent-rgb-50: var(--cui-theme-controls--rgb-400);
+		--cui-color--accent-rgb-25: var(--cui-theme-controls--rgb-300);
+		--cui-color--accent-rgb-0: var(--cui-theme-controls--rgb-200);
 
-		--cui-background-color-toned-rgb-100: var(--cui-theme-content-rgb-800);
-		--cui-background-color-toned-rgb-75: var(--cui-theme-content-rgb-700);
-		--cui-background-color-toned-rgb-50: var(--cui-theme-content-rgb-600);
-		--cui-background-color-toned-rgb-25: var(--cui-theme-content-rgb-500);
-		--cui-background-color-toned-rgb-0: var(--cui-theme-content-rgb-400);
+		--cui-background-color--toned-rgb-100: var(--cui-theme-content--rgb-800);
+		--cui-background-color--toned-rgb-75: var(--cui-theme-content--rgb-700);
+		--cui-background-color--toned-rgb-50: var(--cui-theme-content--rgb-600);
+		--cui-background-color--toned-rgb-25: var(--cui-theme-content--rgb-500);
+		--cui-background-color--toned-rgb-0: var(--cui-theme-content--rgb-400);
 
-		--cui-color-toned-rgb-100: var(--cui-theme-content-rgb-300);
-		--cui-color-toned-rgb-75: var(--cui-theme-content-rgb-400);
-		--cui-color-toned-rgb-50: var(--cui-theme-content-rgb-500);
-		--cui-color-toned-rgb-25: var(--cui-theme-content-rgb-600);
-		--cui-color-toned-rgb-0: var(--cui-theme-content-rgb-700);
+		--cui-color--toned-rgb-100: var(--cui-theme-content--rgb-300);
+		--cui-color--toned-rgb-75: var(--cui-theme-content--rgb-400);
+		--cui-color--toned-rgb-50: var(--cui-theme-content--rgb-500);
+		--cui-color--toned-rgb-25: var(--cui-theme-content--rgb-600);
+		--cui-color--toned-rgb-0: var(--cui-theme-content--rgb-700);
 
-		--cui-background-color-toned-controls-rgb-100: var(--cui-theme-controls-rgb-800);
-		--cui-background-color-toned-controls-rgb-75: var(--cui-theme-controls-rgb-700);
-		--cui-background-color-toned-controls-rgb-50: var(--cui-theme-controls-rgb-600);
-		--cui-background-color-toned-controls-rgb-25: var(--cui-theme-controls-rgb-500);
-		--cui-background-color-toned-controls-rgb-0: var(--cui-theme-controls-rgb-400);
+		--cui-background-color--toned-controls-rgb-100: var(--cui-theme-controls--rgb-800);
+		--cui-background-color--toned-controls-rgb-75: var(--cui-theme-controls--rgb-700);
+		--cui-background-color--toned-controls-rgb-50: var(--cui-theme-controls--rgb-600);
+		--cui-background-color--toned-controls-rgb-25: var(--cui-theme-controls--rgb-500);
+		--cui-background-color--toned-controls-rgb-0: var(--cui-theme-controls--rgb-400);
 
-		--cui-color-toned-controls-rgb-100: var(--cui-theme-controls-rgb-300);
-		--cui-color-toned-controls-rgb-75: var(--cui-theme-controls-rgb-400);
-		--cui-color-toned-controls-rgb-50: var(--cui-theme-controls-rgb-500);
-		--cui-color-toned-controls-rgb-25: var(--cui-theme-controls-rgb-600);
-		--cui-color-toned-controls-rgb-0: var(--cui-theme-controls-rgb-700);
+		--cui-color--toned-controls-rgb-100: var(--cui-theme-controls--rgb-300);
+		--cui-color--toned-controls-rgb-75: var(--cui-theme-controls--rgb-400);
+		--cui-color--toned-controls-rgb-50: var(--cui-theme-controls--rgb-500);
+		--cui-color--toned-controls-rgb-25: var(--cui-theme-controls--rgb-600);
+		--cui-color--toned-controls-rgb-0: var(--cui-theme-controls--rgb-700);
 
-		--cui-background-color-controls-rgb-100: var(--cui-theme-controls-rgb-550);
-		--cui-background-color-controls-rgb-75: var(--cui-theme-controls-rgb-450);
-		--cui-background-color-controls-rgb-50: var(--cui-theme-controls-rgb-350);
-		--cui-background-color-controls-rgb-25: var(--cui-theme-controls-rgb-250);
-		--cui-background-color-controls-rgb-0: var(--cui-theme-controls-rgb-150);
+		--cui-background-color--controls-rgb-100: var(--cui-theme-controls--rgb-550);
+		--cui-background-color--controls-rgb-75: var(--cui-theme-controls--rgb-450);
+		--cui-background-color--controls-rgb-50: var(--cui-theme-controls--rgb-350);
+		--cui-background-color--controls-rgb-25: var(--cui-theme-controls--rgb-250);
+		--cui-background-color--controls-rgb-0: var(--cui-theme-controls--rgb-150);
 
-		--cui-color-controls-rgb-100: var(--cui-theme-controls-rgb-1000);
-		--cui-color-controls-rgb-75: var(--cui-theme-controls-rgb-1000);
-		--cui-color-controls-rgb-50: var(--cui-theme-controls-rgb-1000);
-		--cui-color-controls-rgb-25: var(--cui-theme-controls-rgb-950);
-		--cui-color-controls-rgb-0: var(--cui-theme-controls-rgb-900);
+		--cui-color--controls-rgb-100: var(--cui-theme-controls--rgb-1000);
+		--cui-color--controls-rgb-75: var(--cui-theme-controls--rgb-1000);
+		--cui-color--controls-rgb-50: var(--cui-theme-controls--rgb-1000);
+		--cui-color--controls-rgb-25: var(--cui-theme-controls--rgb-950);
+		--cui-color--controls-rgb-0: var(--cui-theme-controls--rgb-900);
 
-		--cui-background-color-controls-inverse-rgb-100: var(--cui-theme-controls-rgb-250);
-		--cui-background-color-controls-inverse-rgb-75: var(--cui-theme-controls-rgb-150);
-		--cui-background-color-controls-inverse-rgb-50: var(--cui-theme-controls-rgb-50);
-		--cui-background-color-controls-inverse-rgb-25: var(--cui-theme-controls-rgb-0);
-		--cui-background-color-controls-inverse-rgb-0: var(--cui-theme-controls-rgb-0);
+		--cui-background-color--controls-inverse-rgb-100: var(--cui-theme-controls--rgb-250);
+		--cui-background-color--controls-inverse-rgb-75: var(--cui-theme-controls--rgb-150);
+		--cui-background-color--controls-inverse-rgb-50: var(--cui-theme-controls--rgb-50);
+		--cui-background-color--controls-inverse-rgb-25: var(--cui-theme-controls--rgb-0);
+		--cui-background-color--controls-inverse-rgb-0: var(--cui-theme-controls--rgb-0);
 
-		--cui-color-controls-inverse-rgb-100: var(--cui-theme-controls-rgb-1000);
-		--cui-color-controls-inverse-rgb-75: var(--cui-theme-controls-rgb-1000);
-		--cui-color-controls-inverse-rgb-50: var(--cui-theme-controls-rgb-1000);
-		--cui-color-controls-inverse-rgb-25: var(--cui-theme-controls-rgb-950);
-		--cui-color-controls-inverse-rgb-0: var(--cui-theme-controls-rgb-900);
+		--cui-color--controls-inverse-rgb-100: var(--cui-theme-controls--rgb-1000);
+		--cui-color--controls-inverse-rgb-75: var(--cui-theme-controls--rgb-1000);
+		--cui-color--controls-inverse-rgb-50: var(--cui-theme-controls--rgb-1000);
+		--cui-color--controls-inverse-rgb-25: var(--cui-theme-controls--rgb-950);
+		--cui-color--controls-inverse-rgb-0: var(--cui-theme-controls--rgb-900);
 	}
 }

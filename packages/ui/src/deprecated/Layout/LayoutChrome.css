@@ -13,27 +13,27 @@
 
 :where(.cui-layout-chrome-bar),
 :where(.cui-layout-chrome-body) {
-	--cui-layout-chrome-padding-bottom: calc(var(--cui-padding) + var(--cui-edge-offset-bottom) + env(safe-area-inset-bottom, 0em));
-	--cui-layout-chrome-padding-left: calc(var(--cui-screen-padding-horizontal) + var(--cui-edge-offset-left) + env(safe-area-inset-left, 0em));
-	--cui-layout-chrome-padding-right: calc(var(--cui-screen-padding-horizontal) + var(--cui-edge-offset-right) + env(safe-area-inset-right, 0em));
-	--cui-layout-chrome-padding-top: calc(var(--cui-padding) + var(--cui-edge-offset-top) + env(safe-area-inset-top, 0em));
+	--cui-layout-chrome--padding-bottom: calc(var(--cui-padding) + var(--cui-edge-offset-bottom) + env(safe-area-inset-bottom, 0em));
+	--cui-layout-chrome--padding-left: calc(var(--cui-padding--screen-horizontal) + var(--cui-edge-offset-left) + env(safe-area-inset-left, 0em));
+	--cui-layout-chrome--padding-right: calc(var(--cui-padding--screen-horizontal) + var(--cui-edge-offset-right) + env(safe-area-inset-right, 0em));
+	--cui-layout-chrome--padding-top: calc(var(--cui-padding) + var(--cui-edge-offset-top) + env(safe-area-inset-top, 0em));
 }
 
 :where(.cui-layout-chrome-body) {
-	--cui-layout-page-padding-bottom: calc(var(--cui-padding, 0em) + var(--cui-edge-offset-bottom, 0em) + env(safe-area-inset-bottom, 0em));
-	--cui-layout-page-padding-left: calc(var(--cui-screen-padding-horizontal, 0em) + var(--cui-edge-offset-left, 0em) + env(safe-area-inset-left, 0em));
-	--cui-layout-page-padding-right: calc(var(--cui-screen-padding-horizontal, 0em) + var(--cui-edge-offset-right, 0em) + env(safe-area-inset-right, 0em));
-	--cui-layout-page-padding-top: calc(var(--cui-padding, 0em) + var(--cui-edge-offset-top, 0em) + env(safe-area-inset-top, 0em));
-	--cui-layout-page-visible-width: calc(100vw - var(--layout-chrome-bar-width, 0));
-	--cui-layout-section-padding-bottom: var(--cui-layout-page-padding-bottom);
-	--cui-layout-section-padding-left: calc(var(--cui-layout-page-padding-left) - var(--cui-edge-offset-left, 0em));
-	--cui-layout-section-padding-right: calc(var(--cui-layout-page-padding-right) - var(--cui-edge-offset-right, 0em));
-	--cui-layout-section-padding-top: var(--cui-layout-page-padding-top);
+	--cui-layout-page--padding-bottom: calc(var(--cui-padding, 0em) + var(--cui-edge-offset-bottom, 0em) + env(safe-area-inset-bottom, 0em));
+	--cui-layout-page--padding-left: calc(var(--cui-padding--screen-horizontal, 0em) + var(--cui-edge-offset-left, 0em) + env(safe-area-inset-left, 0em));
+	--cui-layout-page--padding-right: calc(var(--cui-padding--screen-horizontal, 0em) + var(--cui-edge-offset-right, 0em) + env(safe-area-inset-right, 0em));
+	--cui-layout-page--padding-top: calc(var(--cui-padding, 0em) + var(--cui-edge-offset-top, 0em) + env(safe-area-inset-top, 0em));
+	--cui-layout-page--visible-width: calc(100vw - var(--layout-chrome-bar-width, 0));
+	--cui-layout--padding-section-bottom: var(--cui-layout-page--padding-bottom);
+	--cui-layout--padding-section-left: calc(var(--cui-layout-page--padding-left) - var(--cui-edge-offset-left, 0em));
+	--cui-layout--padding-section-right: calc(var(--cui-layout-page--padding-right) - var(--cui-edge-offset-right, 0em));
+	--cui-layout--padding-section-top: var(--cui-layout-page--padding-top);
 	--cui-layout-section-gap: calc(4 * var(--cui-gap));
 }
 
 :where(.cui-layout-chrome-bar) {
-	background: rgb(var(--cui-background-color-rgb-25));
+	background: rgb(var(--cui-background-color--rgb-25));
 	display: flex;
 	flex-direction: column;
 	height: 100vh;
@@ -50,10 +50,10 @@
 	flex-direction: row;
 	gap: calc(var(--cui-gap) * 2);
 	justify-content: space-between;
-	padding-bottom: var(--cui-layout-chrome-padding-bottom);
-	padding-left: var(--cui-layout-chrome-padding-left);
-	padding-right: var(--cui-layout-chrome-padding-right);
-	padding-top: var(--cui-layout-chrome-padding-top);
+	padding-bottom: var(--cui-layout-chrome--padding-bottom);
+	padding-left: var(--cui-layout-chrome--padding-left);
+	padding-right: var(--cui-layout-chrome--padding-right);
+	padding-top: var(--cui-layout-chrome--padding-top);
 	position: relative;
 }
 
@@ -62,6 +62,10 @@
 	overflow-y: auto;
 	position: relative;
 	transition: border-color var(--cui-transition-duration);
+}
+
+:where(.cui-layout-chrome-bar-body .cui-menu) {
+	padding-left: var(--cui-layout-chrome--padding-left);
 }
 
 :where(.cui-layout-chrome-bar-body-scrolled-indicator) {
@@ -75,29 +79,31 @@
 }
 
 :where(.cui-layout-chrome-bar-body-scrolled-indicator.is-scrolled) {
-	border-top-color: rgba(var(--cui-color-rgb-50), var(--cui-opacity--lower));
+	border-top-color: rgba(var(--cui-color--rgb-50), var(--cui-opacity--lower));
 }
 
 :where(.cui-layout-chrome-bar-footer) {
 	align-items: stretch;
-	border-top: var(--cui-border-width, 1px) solid rgba(var(--cui-color-rgb-50), var(--cui-opacity--lower));
+	border-top: var(--cui-border-width, 1px) solid rgba(var(--cui-color--rgb-50), var(--cui-opacity--lower));
 	display: flex;
 	flex-direction: column;
-	padding-bottom: var(--cui-layout-chrome-padding-bottom);
-	padding-left: var(--cui-layout-chrome-padding-left);
-	padding-right: var(--cui-layout-chrome-padding-right);
-	padding-top: var(--cui-layout-chrome-padding-top);
+	padding-bottom: var(--cui-layout-chrome--padding-bottom);
+	padding-left: var(--cui-layout-chrome--padding-left);
+	padding-right: var(--cui-layout-chrome--padding-right);
+	padding-top: var(--cui-layout-chrome--padding-top);
 }
 
 :where(.cui-layout-chrome-bar-switchers) {
+	display: flex;
+	gap: var(--cui-gutter);
 	margin-top: calc(-1* var(--cui-padding) / 2);
 	padding-bottom: calc(var(--cui-padding) / 2);
-	padding-left: var(--cui-layout-chrome-padding-left);
-	padding-right: var(--cui-layout-chrome-padding-right);
+	padding-left: var(--cui-layout-chrome--padding-left);
+	padding-right: var(--cui-layout-chrome--padding-right);
 }
 
 :where(.cui-layout-chrome-body) {
-	background-color: rgb(var(--cui-background-color-rgb-50));
+	background-color: rgb(var(--cui-background-color--rgb-50));
 	display: flex;
 	flex-direction: column;
 	flex-grow: 1;
@@ -106,7 +112,7 @@
 }
 
 :where(.cui-layout-chrome-navigation-button) {
-	height: var(--cui-size-controls);
+	height: var(--cui-size--controls);
 	margin-top: -0.5em;
 	margin-bottom: -0.5em;
 }
@@ -150,13 +156,13 @@
 
 	:where(.cui-layout-chrome-bar) {
 		--cui-edge-offset-right: 0em;
-		background: linear-gradient(to right, rgb(var(--cui-background-color-rgb-50)) 25%, rgb(var(--cui-background-color-rgb-25)));
+		background: linear-gradient(to right, rgb(var(--cui-background-color--rgb-50)) 25%, rgb(var(--cui-background-color--rgb-25)));
 		min-width: var(--layout-chrome-bar-width);
 		max-width: var(--layout-chrome-bar-width);
 	}
 
 	:where(.cui-layout-chrome-bar-header) {
-		min-height: var(--cui-content-offset-top, 0px);
+		min-height: calc(var(--cui-content-offset-top, 0px) - 1px);
 	}
 
 	:where(.cui-layout-chrome-bar-body) {

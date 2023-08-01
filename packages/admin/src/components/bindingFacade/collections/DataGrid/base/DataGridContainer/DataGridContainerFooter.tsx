@@ -39,8 +39,8 @@ export const DataGridContainerFooter = memo<DataGridContainerFooterProps>(({
 
 	return pagesCount !== undefined && pagesCount > 1 ? (
 		<LayoutPageStickyContainer
-			left="var(--cui-layout-page-padding-left)"
-			right="var(--cui-layout-page-padding-right)"
+			left="var(--cui-layout-page--padding-left)"
+			right="var(--cui-layout-page--padding-right)"
 		>
 			<Stack wrap align="center" horizontal justify="space-between">
 				<Stack horizontal justify="space-between" gap="gap">

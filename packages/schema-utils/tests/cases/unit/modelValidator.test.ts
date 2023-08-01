@@ -1,9 +1,7 @@
 import { assert, test } from 'vitest'
 import { Model } from '@contember/schema'
 import { ModelValidator } from '../../../src'
-
-
-
+import { c, createSchema } from '@contember/schema-definition'
 
 test('"meta" collision', () => {
 	const model: Model.Schema = {
@@ -71,6 +69,25 @@ test('"meta" collision', () => {
 			code: 'MODEL_NAME_COLLISION',
 			message: 'entity FooMeta collides with entity Foo, because a GraphQL type with "Meta" suffix is created for every entity',
 			path: ['entities', 'FooMeta'],
+		},
+	])
+})
+
+namespace ColumnNameCollision {
+	export class Bar {
+		rel = c.oneHasOne(Bar)
+		relId = c.intColumn()
+	}
+}
+
+test('column name collision', () => {
+	const schema = createSchema(ColumnNameCollision)
+	const validator = new ModelValidator(schema.model)
+	assert.deepStrictEqual(validator.validate(), [
+		{
+			code: 'MODEL_NAME_COLLISION',
+			message: 'Column name "rel_id" on field "relId" collides with a column name on field "rel".',
+			path: ['entities', 'Bar', 'relId'],
 		},
 	])
 })

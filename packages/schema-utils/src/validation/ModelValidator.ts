@@ -55,6 +55,7 @@ export class ModelValidator {
 			new Set(Object.keys(entity.fields)),
 			errors.for('unique'),
 		)
+		this.validateColumnNamesCollision(entity, errors)
 	}
 
 	private validateUniqueConstraints(uniqueConstraints: Model.Entity['unique'], fields: Set<string>, errors: ErrorBuilder): void {
@@ -65,6 +66,34 @@ export class ModelValidator {
 				}
 			}
 		}
+	}
+
+	private validateColumnNamesCollision(entity: Model.Entity, errors: ErrorBuilder): void {
+		const existingColumnNames = new Map<string, string>()
+		const addColumnName = (fieldName: string, columnName: string) => {
+			if (existingColumnNames.has(columnName)) {
+				const exitingName = existingColumnNames.get(columnName)
+				errors
+					.for(fieldName)
+					.add('MODEL_NAME_COLLISION', `Column name "${columnName}" on field "${fieldName}" collides with a column name on field "${exitingName}".`)
+			}
+			existingColumnNames.set(columnName, fieldName)
+		}
+		acceptEveryFieldVisitor(this.model, entity, {
+			visitColumn: ({ column }) => {
+				addColumnName(column.name, column.columnName)
+			},
+			visitOneHasOneOwning: ({ relation }) => {
+				addColumnName(relation.name, relation.joiningColumn.columnName)
+			},
+			visitManyHasOne: ({ relation }) => {
+				addColumnName(relation.name, relation.joiningColumn.columnName)
+			},
+			visitOneHasOneInverse: () => {},
+			visitOneHasMany: () => {},
+			visitManyHasManyInverse: () => {},
+			visitManyHasManyOwning: () => {},
+		})
 	}
 
 	private validateField(partialEntity: Model.Entity, field: Model.AnyField, errors: ErrorBuilder): void {

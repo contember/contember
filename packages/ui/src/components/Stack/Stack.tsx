@@ -2,7 +2,6 @@ import { useClassNameFactory } from '@contember/react-utils'
 import { dataAttribute, deprecate, fallback, isDefined } from '@contember/utilities'
 import { CSSProperties, ReactNode, forwardRef, memo, useMemo } from 'react'
 import type { HTMLDivElementProps, Size } from '../../types'
-import { toEnumClass, toEnumViewClass, toStateClass, toViewClass } from '../../utils'
 
 /** @deprecated Use other prop values */
 export type DeprecatedStackSize = Size | 'xlarge' | 'none'

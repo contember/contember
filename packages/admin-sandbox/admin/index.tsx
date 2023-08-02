@@ -32,7 +32,13 @@ runReactApp(
 						<SafeAreasDevPanel />
 					</>
 				}
-				children={<Pages layout={Layout} children={import.meta.glob<PageModule>('./pages/**/*.tsx', { eager: true })} />}
+				children={<Pages
+					layout={Layout}
+					children={import.meta.glob<PageModule>(
+						'./pages/**/*.tsx',
+						{ eager: true },
+					)}
+				/>}
 			/>
 		</Slots.Provider>
 	</Directives.Provider>,

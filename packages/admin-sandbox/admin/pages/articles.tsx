@@ -43,7 +43,7 @@ export const list = () => (
 
 		<DataGridScope
 			entities="Article"
-			itemsPerPage={20}
+			itemsPerPage={5}
 			tile={(
 				<DataGridTile
 					to="articles/edit(id: $entity.id)"

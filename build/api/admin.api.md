@@ -4090,6 +4090,7 @@ export type RepeaterItemOwnProps = {
     children: ReactNode;
     canBeRemoved?: boolean;
     index: number;
+    createNewEntity: RepeaterCreateNewEntity;
     dragHandleComponent?: RepeaterItemContainerProps['dragHandleComponent'];
     removalType: RemovalType;
 };

@@ -115,6 +115,7 @@ export const RepeaterInner = Component<RepeaterInnerProps<any, any>, NonStaticPr
 								{...props.itemComponentExtraProps!}
 								label={label}
 								index={i}
+								createNewEntity={createNewEntity}
 								removalType={removalType}
 								canBeRemoved={itemRemovingEnabled}
 								dragHandleComponent={undefined}

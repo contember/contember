@@ -743,9 +743,12 @@ export interface DimensionSwitcherValue {
 export const Divider: MemoExoticComponent<({ className, componentClassName, gap, ...rest }: DividerProps) => JSX.Element>;
 
 // @public (undocumented)
-export type DividerProps = Omit<HTMLDivElementProps, 'children'> & ComponentClassNameProps & {
+export type DividerOwnProps = {
     gap?: boolean | 'gap' | 'gutter' | 'padding' | 'large' | 'larger' | DeprecatedDividerSize;
 };
+
+// @public (undocumented)
+export type DividerProps = Omit<HTMLDivElementProps, keyof DividerOwnProps> & ComponentClassNameProps & DividerOwnProps;
 
 // @public (undocumented)
 export const Dropdown: MemoExoticComponent<(props: DropdownProps) => JSX.Element>;

@@ -1,15 +1,17 @@
 :where(.cui-menu-expand-toggle) {
+	--cui-menu-expand-toggle--size: 1.5em;
+	--cui-menu-expand-toggle--offset: 0px;
 	align-items: center;
 	background: transparent;
 	border: 0;
 	color: inherit;
 	display: none;
 	justify-content: center;
-	min-height: 1.5em;
-	min-width: 1.5em;
+	min-height: var(--cui-menu-expand-toggle--size);
+	min-width: var(--cui-menu-expand-toggle--size);
 	padding: 0;
 	position: absolute;
-	right: 100%;
+	right: calc(100% - var(--cui-menu-expand-toggle--size) + var(--cui-menu-expand-toggle--offset));
 	transform-origin: center center;
 	transform: rotate(90deg);
 	transition: transform var(--cui-transition-duration--fast);

@@ -15,12 +15,12 @@ type DataGridContainerFooterProps =
 	}
 
 export const DataGridContainerFooter = memo<DataGridContainerFooterProps>(({
-  desiredState,
-  pagesCount,
-  pagingSummary,
-  updatePaging,
+	desiredState,
+	pagesCount,
+	pagingSummary,
+	updatePaging,
 }) => {
-  const { paging: { pageIndex, itemsPerPage } } = desiredState
+	const { paging: { pageIndex, itemsPerPage } } = desiredState
 
 	const formatMessage = useMessageFormatter(dataGridDictionary)
 
@@ -46,12 +46,14 @@ export const DataGridContainerFooter = memo<DataGridContainerFooterProps>(({
 				<Stack horizontal justify="space-between" gap="gap">
 					<Button
 						distinction="seamless"
+						inset={false}
 						disabled={pageIndex === 0}
 						onClick={goToFirstPageClick}
 					>
 						{formatMessage('dataGrid.paging.first')}
 					</Button>
 					<Button
+						inset={false}
 						disabled={pageIndex === 0}
 						onClick={goToPreviousPageClick}
 					>
@@ -60,12 +62,14 @@ export const DataGridContainerFooter = memo<DataGridContainerFooterProps>(({
 					{itemsPerPage !== null && (
 						<>
 							<Button
+								inset={false}
 								disabled={pagesCount === undefined || pagesCount <= pageIndex + 1}
 								onClick={goToNextPageClick}
 							>
 								{formatMessage('dataGrid.paging.next')}
 							</Button>
 							<Button
+								inset={false}
 								distinction="seamless"
 								disabled={pagesCount === undefined || pagesCount <= pageIndex + 1}
 								onClick={goToLastPageClick}

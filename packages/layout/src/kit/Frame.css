@@ -11,6 +11,9 @@
 :where(.cui-layout-frame .cui-layout-panel) {
 	--cui-layout-panel--background-rgb: var(--cui-background-color--rgb-50);
 }
+:where(.cui-layout-frame .cui-layout-panel[data-behavior="modal"]) {
+	--cui-layout-panel--header-background-rgb: var(--cui-background-color--rgb-0);
+}
 
 :where(.cui-layout-frame-container) {
 	background-color: rgb(var(--cui-background-color--rgb-0));;

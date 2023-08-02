@@ -96,6 +96,7 @@ import type { PersistSuccessOptions } from '@contember/binding';
 import { Point } from 'slate';
 import type { Props } from 'react-select';
 import { PropsWithChildren } from 'react';
+import { ProvidersProps } from '@contember/ui';
 import { PublicCommonReactSelectStylesProps } from '@contember/ui';
 import { PureComponent } from 'react';
 import { QualifiedEntityList } from '@contember/binding';
@@ -336,7 +337,7 @@ export interface ApiKeyListProps {
 export const ApplicationEntrypoint: (props: ApplicationEntrypointProps) => JSX.Element;
 
 // @public (undocumented)
-export interface ApplicationEntrypointProps extends ContemberClientProps {
+export interface ApplicationEntrypointProps extends ContemberClientProps, Omit<ProvidersProps, 'children'> {
     // (undocumented)
     basePath?: string;
     // (undocumented)

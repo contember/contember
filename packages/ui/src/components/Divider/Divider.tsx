@@ -6,12 +6,14 @@ import { HTMLDivElementProps, Size } from '../../types'
 /** @deprecated Use other prop values */
 export type DeprecatedDividerSize = Size | 'xlarge' | 'none'
 
+export type DividerOwnProps = {
+	gap?: boolean | 'gap' | 'gutter' | 'padding' | 'large' | 'larger' | DeprecatedDividerSize
+}
+
 export type DividerProps =
-	& Omit<HTMLDivElementProps, 'children'>
+	& Omit<HTMLDivElementProps, keyof DividerOwnProps>
 	& ComponentClassNameProps
-	& {
-		gap?: boolean | 'gap' | 'gutter' | 'padding' | 'large' | 'larger' | DeprecatedDividerSize
-	}
+	& DividerOwnProps
 
 /**
  * @group UI

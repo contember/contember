@@ -17,7 +17,6 @@ import { ComponentType } from 'react';
 import { CompositionEventHandler } from 'react';
 import { Context } from 'react';
 import { CSSProperties } from 'react';
-import { DeepPartial } from '@contember/utilities';
 import { DetailedReactHTMLElement } from 'react';
 import { DragEventHandler } from 'react';
 import { ElementType } from 'react';
@@ -908,7 +907,7 @@ itemRef?: string | undefined;
 results?: number | undefined;
 security?: string | undefined;
 unselectable?: "on" | "off" | undefined;
-inputMode?: "none" | "text" | "search" | "tel" | "url" | "email" | "numeric" | "decimal" | undefined;
+inputMode?: "search" | "text" | "none" | "tel" | "url" | "email" | "numeric" | "decimal" | undefined;
 is?: string | undefined;
 'aria-activedescendant'?: string | undefined;
 'aria-atomic'?: (boolean | "false" | "true") | undefined;
@@ -919,16 +918,16 @@ is?: string | undefined;
 'aria-colindex'?: number | undefined;
 'aria-colspan'?: number | undefined;
 'aria-controls'?: string | undefined;
-'aria-current'?: boolean | "page" | "false" | "true" | "time" | "step" | "location" | "date" | undefined;
+'aria-current'?: boolean | "time" | "page" | "false" | "true" | "step" | "location" | "date" | undefined;
 'aria-describedby'?: string | undefined;
 'aria-details'?: string | undefined;
 'aria-disabled'?: (boolean | "false" | "true") | undefined;
-'aria-dropeffect'?: "none" | "copy" | "move" | "link" | "execute" | "popup" | undefined;
+'aria-dropeffect'?: "copy" | "link" | "none" | "move" | "execute" | "popup" | undefined;
 'aria-errormessage'?: string | undefined;
 'aria-expanded'?: (boolean | "false" | "true") | undefined;
 'aria-flowto'?: string | undefined;
 'aria-grabbed'?: (boolean | "false" | "true") | undefined;
-'aria-haspopup'?: boolean | "listbox" | "grid" | "menu" | "false" | "true" | "dialog" | "tree" | undefined;
+'aria-haspopup'?: boolean | "dialog" | "menu" | "listbox" | "grid" | "false" | "true" | "tree" | undefined;
 'aria-hidden'?: (boolean | "false" | "true") | undefined;
 'aria-invalid'?: boolean | "false" | "true" | "grammar" | "spelling" | undefined;
 'aria-keyshortcuts'?: string | undefined;
@@ -945,7 +944,7 @@ is?: string | undefined;
 'aria-posinset'?: number | undefined;
 'aria-pressed'?: boolean | "mixed" | "false" | "true" | undefined;
 'aria-readonly'?: (boolean | "false" | "true") | undefined;
-'aria-relevant'?: "all" | "text" | "additions" | "additions removals" | "additions text" | "removals" | "removals additions" | "removals text" | "text additions" | "text removals" | undefined;
+'aria-relevant'?: "text" | "all" | "additions" | "additions removals" | "additions text" | "removals" | "removals additions" | "removals text" | "text additions" | "text removals" | undefined;
 'aria-required'?: (boolean | "false" | "true") | undefined;
 'aria-roledescription'?: string | undefined;
 'aria-rowcount'?: number | undefined;
@@ -1204,7 +1203,7 @@ itemRef?: string | undefined;
 results?: number | undefined;
 security?: string | undefined;
 unselectable?: "on" | "off" | undefined;
-inputMode?: "none" | "text" | "search" | "tel" | "url" | "email" | "numeric" | "decimal" | undefined;
+inputMode?: "search" | "text" | "none" | "tel" | "url" | "email" | "numeric" | "decimal" | undefined;
 is?: string | undefined;
 'aria-activedescendant'?: string | undefined;
 'aria-atomic'?: (boolean | "false" | "true") | undefined;
@@ -1215,16 +1214,16 @@ is?: string | undefined;
 'aria-colindex'?: number | undefined;
 'aria-colspan'?: number | undefined;
 'aria-controls'?: string | undefined;
-'aria-current'?: boolean | "page" | "false" | "true" | "time" | "step" | "location" | "date" | undefined;
+'aria-current'?: boolean | "time" | "page" | "false" | "true" | "step" | "location" | "date" | undefined;
 'aria-describedby'?: string | undefined;
 'aria-details'?: string | undefined;
 'aria-disabled'?: (boolean | "false" | "true") | undefined;
-'aria-dropeffect'?: "none" | "copy" | "move" | "link" | "execute" | "popup" | undefined;
+'aria-dropeffect'?: "copy" | "link" | "none" | "move" | "execute" | "popup" | undefined;
 'aria-errormessage'?: string | undefined;
 'aria-expanded'?: (boolean | "false" | "true") | undefined;
 'aria-flowto'?: string | undefined;
 'aria-grabbed'?: (boolean | "false" | "true") | undefined;
-'aria-haspopup'?: boolean | "listbox" | "grid" | "menu" | "false" | "true" | "dialog" | "tree" | undefined;
+'aria-haspopup'?: boolean | "dialog" | "menu" | "listbox" | "grid" | "false" | "true" | "tree" | undefined;
 'aria-hidden'?: (boolean | "false" | "true") | undefined;
 'aria-invalid'?: boolean | "false" | "true" | "grammar" | "spelling" | undefined;
 'aria-keyshortcuts'?: string | undefined;
@@ -1241,7 +1240,7 @@ is?: string | undefined;
 'aria-posinset'?: number | undefined;
 'aria-pressed'?: boolean | "mixed" | "false" | "true" | undefined;
 'aria-readonly'?: (boolean | "false" | "true") | undefined;
-'aria-relevant'?: "all" | "text" | "additions" | "additions removals" | "additions text" | "removals" | "removals additions" | "removals text" | "text additions" | "text removals" | undefined;
+'aria-relevant'?: "text" | "all" | "additions" | "additions removals" | "additions text" | "removals" | "removals additions" | "removals text" | "text additions" | "text removals" | undefined;
 'aria-required'?: (boolean | "false" | "true") | undefined;
 'aria-roledescription'?: string | undefined;
 'aria-rowcount'?: number | undefined;
@@ -1669,7 +1668,7 @@ export type GridProps = GridOwnProps & HTMLDivElementProps;
 export const Heading: MemoExoticComponent<ForwardRefExoticComponent<    {
 distinction?: HeadingDistinction | undefined;
 depth?: HeadingDepth | undefined;
-size?: "default" | "small" | undefined;
+size?: "small" | "default" | undefined;
 } & Omit<HTMLHeadingElementProps, "ref"> & RefAttributes<HTMLHeadingElement>>>;
 
 // @public (undocumented)
@@ -2205,7 +2204,14 @@ export interface ProgressBarProps {
 }
 
 // @public (undocumented)
-export const Providers: (props: PropsWithChildren) => JSX.Element;
+export const Providers: ({ children, portalProviderProps, styleProviderProps, }: ProvidersProps) => JSX.Element;
+
+// @public (undocumented)
+export type ProvidersProps = {
+    children: React.ReactNode;
+    portalProviderProps?: PortalProviderProps;
+    styleProviderProps?: StyleProviderProps;
+};
 
 // @public (undocumented)
 export type PublicCommonReactSelectStylesProps = {
@@ -2475,11 +2481,6 @@ export type SelectProps<V, NN extends boolean> = Omit<ControlProps<V, NN>, 'type
     styles?: StylesConfig<any, boolean, never>;
 };
 
-// Warning: (ae-forgotten-export) The symbol "config" needs to be exported by the entry point index.d.ts
-//
-// @public (undocumented)
-export function setInterfaceConfig(userConfig: DeepPartial<typeof config>): void;
-
 // @public (undocumented)
 export type Size = Default | 'small' | 'large';
 
@@ -2745,7 +2746,7 @@ export type TextareaInputProps = ControlProps<string> & TextareaInputOwnProps & 
 
 // @public (undocumented)
 export const TextInput: MemoExoticComponent<ForwardRefExoticComponent<Omit<TextInputProps, "type"> & {
-type?: "color" | "range" | "search" | "time" | "tel" | "url" | "email" | "date" | "datetime-local" | "month" | "password" | "week" | "datetime" | undefined;
+type?: "search" | "time" | "color" | "range" | "tel" | "url" | "email" | "date" | "datetime-local" | "month" | "password" | "week" | "datetime" | undefined;
 } & RefAttributes<HTMLInputElement>>>;
 
 // @public (undocumented)
@@ -3029,17 +3030,6 @@ export const useInputValue: <T, E extends HTMLElement>({ defaultValue, value, on
 };
 
 // @public (undocumented)
-export function useInterfaceConfig(): Readonly<{
-    StyleProvider: NonOptional<StyleProviderProps>;
-    Menu: {
-        caret: boolean;
-    };
-    MenuExpandToggle: {
-        Icon: LucideIcon;
-    };
-}>;
-
-// @public (undocumented)
 export function useMouseMove<E extends HTMLElement = HTMLElement>(observedElementRef: RefObject<E>): RefObject<boolean>;
 
 // @public (undocumented)
@@ -3082,7 +3072,7 @@ export const useShowToast: () => (toast: ToastData) => void;
 export const UseTableElementContext: Context<boolean>;
 
 // @public (undocumented)
-export const useTextBasedInput: <E extends HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>(props: ControlProps<string>, forwardedRef: ForwardedRef<E>) => AllHTMLAttributes<E> & {
+export const useTextBasedInput: <E extends HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>(props: ControlProps<string>, forwardedRef: ForwardedRef<E>) => AllHTMLAttributes<E> & {
     ref: RefObject<E>;
 };
 

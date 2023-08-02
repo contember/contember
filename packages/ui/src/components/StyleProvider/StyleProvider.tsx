@@ -1,12 +1,21 @@
 import { ColorSchemeContext, useClassName, useColorScheme } from '@contember/react-utils'
-import { colorSchemeClassName, contentThemeClassName, controlsThemeClassName, stateDataAttributes } from '@contember/utilities'
+import { NonOptional, colorSchemeClassName, contentThemeClassName, controlsThemeClassName, stateDataAttributes } from '@contember/utilities'
 import { PropsWithChildren } from 'react'
 import { mergeProps } from 'react-aria'
-import { useInterfaceConfig } from '../../config'
 import { StyleProviderProps } from './types'
 
+const defaultProps = {
+	displayContents: true,
+	overridesLucideIcons: true,
+	scheme: 'system',
+	themeContent: 'default',
+	themeControls: 'accent',
+	transparent: true,
+	suppressFocusRing: true,
+} as NonOptional<StyleProviderProps>
+
 export const StyleProvider = ({ children, ...props }: PropsWithChildren<StyleProviderProps>) => {
-	const { scheme, themeContent, themeControls, ...state } = mergeProps(useInterfaceConfig().StyleProvider, props)
+	const { scheme, themeContent, themeControls, ...state } = mergeProps(defaultProps, props)
 	const colorScheme = useColorScheme()
 
 	return (

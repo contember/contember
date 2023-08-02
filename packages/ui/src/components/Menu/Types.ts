@@ -8,21 +8,21 @@ export const TAB_INDEX_NEVER_FOCUSABLE = -2
 export type MenuProps =
 	& HTMLDivElementProps
 	& {
-	className?: NestedClassName;
-		caret?: ReactNode;
-	componentClassName?: string;
+		className?: NestedClassName;
+		caret?: boolean;
+		componentClassName?: string;
 		/** @deprecated No alternative */
-	focusMenuItemLabel?: string;
-	/**
-	 * Unique identifier to identify menu. Mandatory if you have multiple menus on a single page.
-	 *
-	 * Menus are being persisted in session storage.
-	 */
-	id?: string;
-	label?: string;
+		focusMenuItemLabel?: string;
+		/**
+		 * Unique identifier to identify menu. Mandatory if you have multiple menus on a single page.
+		 *
+		 * Menus are being persisted in session storage.
+		 */
+		id?: string;
+		label?: string;
 		/** @deprecated Use `caret` instead */
-	showCaret?: boolean;
-}
+		showCaret?: boolean;
+	}
 
 export interface MenuItemPropsTitleRequired<T> {
 	title: ReactNode;

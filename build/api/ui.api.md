@@ -2015,7 +2015,7 @@ export interface MenuItemPropsTitleRequired<T> {
 // @public (undocumented)
 export type MenuProps = HTMLDivElementProps & {
     className?: NestedClassName;
-    caret?: ReactNode;
+    caret?: boolean;
     componentClassName?: string;
     focusMenuItemLabel?: string;
     id?: string;

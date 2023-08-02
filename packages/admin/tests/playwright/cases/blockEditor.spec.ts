@@ -26,7 +26,7 @@ test('basic test', async ({ page }) => {
 	expect(await page.screenshot({ animations: 'disabled' })).toMatchSnapshot('selected.png')
 })
 
-const keyboardPressOptions = { delay: 10 }
+const keyboardPressOptions = { delay: 100 }
 
 test('inline buttons: ordered list', async ({ page }) => {
 	expectNoConsoleErrors(page)

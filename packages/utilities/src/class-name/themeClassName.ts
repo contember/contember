@@ -1,5 +1,4 @@
 import { KebabCase } from 'type-fest'
-import { colorSchemeClassName } from './colorSchemeClassName'
 import { ThemeContentClassName, ThemeControlsClassName } from './types'
 
 /**

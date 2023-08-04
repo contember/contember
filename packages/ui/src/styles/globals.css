@@ -227,6 +227,11 @@
 	vertical-align: middle;
 	width: var(--cui-line-height--units);
 }
+/* TODO: Temporary fix until we remove last Blueprint icon */
+.cui-icon-blueprintSvg,
+.cui-icon-contemberSvg {
+	stroke: none;
+}
 
 :where(.dangerously-remove-native-focus-outline) {
 	outline: none;

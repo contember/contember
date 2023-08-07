@@ -66,6 +66,7 @@
 	min-height: var(--cui-size--controls);
 	min-width: var(--cui-size--controls);
 	padding: 0.625rem;
+	white-space: nowrap;
 }
 
 :where(.cui-devBar-close) {
@@ -123,7 +124,7 @@
 	cursor: pointer;
 	display: inline-flex;
 	font-weight: normal;
-	gap: var(--cui-gutter);
+	gap: var(--cui-gap);
 }
 :where(
 	.cui-devBar-trigger-label:hover,

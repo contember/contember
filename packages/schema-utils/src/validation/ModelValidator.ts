@@ -13,7 +13,7 @@ export class ModelValidator {
 		const errorBuilder = new ErrorBuilder([], [])
 		this.validateEnums(this.model.enums, errorBuilder.for('enums'))
 		this.validateEntities(this.model.entities, errorBuilder.for('entities'))
-		this.validateCollisions(Object.values(this.model.entities), errorBuilder.for('entities'))
+
 		return errorBuilder.errors
 	}
 
@@ -34,10 +34,15 @@ export class ModelValidator {
 			}
 			this.validateEntity(entity, entityErrors)
 		}
+		const entitiesArr = Object.values(this.model.entities)
+		this.validateMetaSuffixCollisions(entitiesArr, errors)
+		this.validateTableNameCollisions(entitiesArr, errors)
+		this.validateAliasedTypesCollision(entitiesArr, errors)
 	}
 
 	private validateEntity(entity: Model.Entity, errors: ErrorBuilder): void {
 		this.validateIdentifier(entity.name, errors)
+		this.validateEntityName(entity.name, errors)
 
 		for (const [fieldName, field] of Object.entries(entity.fields)) {
 			const fieldErrors = errors.for(fieldName)
@@ -51,6 +56,7 @@ export class ModelValidator {
 			new Set(Object.keys(entity.fields)),
 			errors.for('unique'),
 		)
+		this.validateColumnNamesCollision(entity, errors)
 	}
 
 	private validateUniqueConstraints(uniqueConstraints: Model.Entity['unique'], fields: Set<string>, errors: ErrorBuilder): void {
@@ -61,6 +67,34 @@ export class ModelValidator {
 				}
 			}
 		}
+	}
+
+	private validateColumnNamesCollision(entity: Model.Entity, errors: ErrorBuilder): void {
+		const existingColumnNames = new Map<string, string>()
+		const addColumnName = (fieldName: string, columnName: string) => {
+			if (existingColumnNames.has(columnName)) {
+				const exitingName = existingColumnNames.get(columnName)
+				errors
+					.for(fieldName)
+					.add('MODEL_NAME_COLLISION', `Column name "${columnName}" on field "${fieldName}" collides with a column name on field "${exitingName}".`)
+			}
+			existingColumnNames.set(columnName, fieldName)
+		}
+		acceptEveryFieldVisitor(this.model, entity, {
+			visitColumn: ({ column }) => {
+				addColumnName(column.name, column.columnName)
+			},
+			visitOneHasOneOwning: ({ relation }) => {
+				addColumnName(relation.name, relation.joiningColumn.columnName)
+			},
+			visitManyHasOne: ({ relation }) => {
+				addColumnName(relation.name, relation.joiningColumn.columnName)
+			},
+			visitOneHasOneInverse: () => {},
+			visitOneHasMany: () => {},
+			visitManyHasManyInverse: () => {},
+			visitManyHasManyOwning: () => {},
+		})
 	}
 
 	private validateField(partialEntity: Model.Entity, field: Model.AnyField, errors: ErrorBuilder): void {
@@ -204,10 +238,29 @@ export class ModelValidator {
 		}
 	}
 
-	private validateCollisions(entities: Model.Entity[], errorBuilder: ErrorBuilder) {
-		const relationNames: Record<string, string> = {}
-		const aliasedTypes = new Map<string, Model.ColumnType>()
+	private validateEntityName(value: string, errorBuilder: ErrorBuilder) {
+		if (['Query', 'Mutation'].includes(value)) {
+			errorBuilder.add('MODEL_INVALID_ENTITY_NAME', `${value} is reserved word`)
+		}
+	}
+
+
+	private validateMetaSuffixCollisions(entities: Model.Entity[], errorBuilder: ErrorBuilder) {
 		const entityNames = new Set(entities.map(it => it.name))
+		for (const entity of entities) {
+			if (entity.name.endsWith('Meta')) {
+				const baseName = entity.name.substring(0, entity.name.length - 4)
+				if (entityNames.has(baseName)) {
+					errorBuilder.for(entity.name)
+						.add('MODEL_NAME_COLLISION', `entity ${entity.name} collides with entity ${baseName}, because a GraphQL type with "Meta" suffix is created for every entity`)
+				}
+			}
+		}
+	}
+
+
+	private validateTableNameCollisions(entities: Model.Entity[], errorBuilder: ErrorBuilder) {
+		const relationNames: Record<string, string> = {}
 		for (const entity of entities) {
 			const description = `table name ${entity.tableName} of entity ${entity.name}`
 			if (relationNames[entity.tableName]) {
@@ -216,14 +269,6 @@ export class ModelValidator {
 					.add('MODEL_NAME_COLLISION', `${description} collides with a ${relationNames[entity.tableName]}`)
 			} else {
 				relationNames[entity.tableName] = description
-			}
-
-			if (entity.name.endsWith('Meta')) {
-				const baseName = entity.name.substring(0, entity.name.length - 4)
-				if (entityNames.has(baseName)) {
-					errorBuilder.for(entity.name)
-						.add('MODEL_NAME_COLLISION', `entity ${entity.name} collides with entity ${baseName}, because a GraphQL type with "Meta" suffix is created for every entity`)
-				}
 			}
 		}
 		for (const entity of entities) {
@@ -243,7 +288,22 @@ export class ModelValidator {
 						relationNames[joiningTable.tableName] = description
 					}
 				},
-				visitColumn: ({ entity, column }) => {
+				visitColumn: () => {},
+				visitManyHasManyInverse: () => { },
+				visitOneHasMany: () => { },
+				visitOneHasOneInverse: () => { },
+				visitOneHasOneOwning: () => { },
+				visitManyHasOne: () => { },
+			})
+		}
+	}
+
+
+	private validateAliasedTypesCollision(entities: Model.Entity[], errorBuilder: ErrorBuilder) {
+		const aliasedTypes = new Map<string, Model.ColumnType>()
+		for (const entity of entities) {
+			acceptEveryFieldVisitor(this.model, entity, {
+				visitColumn: ({ column }) => {
 					if (!column.typeAlias) {
 						return
 					}
@@ -254,6 +314,7 @@ export class ModelValidator {
 					}
 					aliasedTypes.set(column.typeAlias, column.type)
 				},
+				visitManyHasManyOwning: () => { },
 				visitManyHasManyInverse: () => { },
 				visitOneHasMany: () => { },
 				visitOneHasOneInverse: () => { },

@@ -57,10 +57,7 @@ export class AclFactory {
 			for (const op of ['create', 'update', 'read'] as const) {
 				const fieldPermissions: Writable<Acl.FieldPermissions> = {}
 				for (const field of Object.keys(entity.fields)) {
-					if (field === entity.primary) {
-						continue
-					}
-					const predicate = predicatesResolver.createFieldPredicate(op, field)
+					const predicate = predicatesResolver.createFieldPredicate(op, field, field === entity.primary)
 					if (predicate !== undefined) {
 						fieldPermissions[field] = predicate
 					}
@@ -69,7 +66,7 @@ export class AclFactory {
 					entityOperations[op] = fieldPermissions
 				}
 			}
-			const delPredicate = predicatesResolver.createFieldPredicate('delete', '')
+			const delPredicate = predicatesResolver.createFieldPredicate('delete', '', false)
 			if (delPredicate !== undefined) {
 				entityOperations.delete = delPredicate
 			}

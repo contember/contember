@@ -1,6 +1,6 @@
 import { ComponentClassNameProps, NestedClassName, PolymorphicComponentPropsWithRef } from '@contember/utilities'
 import { ElementType, ReactElement, ReactNode } from 'react'
-import { GetLayoutPanelsStateContextType, PanelState } from '../primitives'
+import { GetLayoutPanelsStateContextType, OwnPanelProps, PanelState } from '../primitives'
 
 export type OwnFrameProps =
 	& ComponentClassNameProps
@@ -99,6 +99,7 @@ export type BarComponentType =
 
 export type OwnSidebarProps =
 	& Omit<ComponentClassNameProps, 'children'>
+	& Pick<OwnPanelProps, 'onBehaviorChange' | 'onKeyPress' | 'onVisibilityChange'>
 	& {
 		basis?: number;
 		body?: ReactNode | ((state: PanelState, panelsState: GetLayoutPanelsStateContextType) => ReactNode);

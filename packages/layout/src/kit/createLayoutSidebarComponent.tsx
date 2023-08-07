@@ -1,6 +1,6 @@
 import { useClassName, useClassNameFactory, useComposeRef, useElementSize, useReferentiallyStableCallback } from '@contember/react-utils'
 import { PolymorphicRef, assert, isNonNegativeNumber, isNotNullish, isSlugString, px } from '@contember/utilities'
-import { ElementType, forwardRef, memo, useRef } from 'react'
+import { ElementType, forwardRef, memo, useCallback, useRef } from 'react'
 import { MenuAutoCloseProvider } from '../menu-auto-close-provider'
 import { GetLayoutPanelsStateContext, LayoutPanelContext, Panel, PanelBehavior, PanelBody, PanelFooter, PanelHeader, PanelState, PanelVisibility, isComponentClassName, useClosePanelOnEscape, useGetLayoutPanelsStateContext, useSetLayoutPanelsStateContext } from '../primitives'
 import { SidebarComponentType, SidebarProps } from './Types'
@@ -43,6 +43,9 @@ export function createLayoutSidebarComponent({
 		keepVisible = false,
 		maxWidth = MAX_WIDTH,
 		minWidth = MIN_WIDTH,
+		onBehaviorChange: onBehaviorChangeProp,
+		onKeyPress: onKeyPressProp,
+		onVisibilityChange,
 		priority,
 		style,
 		...props
@@ -50,7 +53,7 @@ export function createLayoutSidebarComponent({
 		forwardedRef: PolymorphicRef<C>,
 	) => {
 		const keepVisibleBehavior = useReferentiallyStableCallback(({ behavior }: PanelState) => {
-			if (behavior !== 'modal') {
+			if (keepVisible && behavior !== 'modal') {
 				return { visibility: 'visible' } as const
 			}
 		})
@@ -77,6 +80,16 @@ export function createLayoutSidebarComponent({
 		const { height: headerHeight } = useElementSize(headerRef)
 		const { height: footerHeight } = useElementSize(footerRef)
 
+		const onKeyPress = useCallback((event: KeyboardEvent, state: PanelState) => ({
+			...onEscapePress(event, state),
+			...onKeyPressProp?.(event, state),
+		}), [onEscapePress, onKeyPressProp])
+
+		const onBehaviorChange = useCallback((state: PanelState) => ({
+			...keepVisibleBehavior(state),
+			...onBehaviorChangeProp?.(state),
+		}), [keepVisibleBehavior, onBehaviorChangeProp])
+
 		return (
 			<Panel<ElementType>
 				ref={composeRef}
@@ -88,9 +101,9 @@ export function createLayoutSidebarComponent({
 				maxWidth={isNonNegativeNumber(maxWidth) ? maxWidth : undefined}
 				minWidth={isNonNegativeNumber(minWidth) ? minWidth : undefined}
 				name={name}
-				onBehaviorChange={keepVisible ? keepVisibleBehavior : undefined}
-				onKeyPress={onEscapePress}
-				onVisibilityChange={undefined}
+				onBehaviorChange={onBehaviorChange}
+				onKeyPress={onKeyPress}
+				onVisibilityChange={onVisibilityChange}
 				priority={priority}
 				{...props}
 				style={{

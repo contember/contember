@@ -745,7 +745,7 @@ type OwnPanelProps = PanelBasicProps & PanelConfigProps;
 export type OwnResponsiveStackProps = ResponsiveProps<StackOwnProps>;
 
 // @public (undocumented)
-export type OwnSidebarProps = Omit<ComponentClassNameProps, 'children'> & {
+export type OwnSidebarProps = Omit<ComponentClassNameProps, 'children'> & Pick<OwnPanelProps, 'onBehaviorChange' | 'onKeyPress' | 'onVisibilityChange'> & {
     basis?: number;
     body?: ReactNode | ((state: PanelState, panelsState: GetLayoutPanelsStateContextType) => ReactNode);
     children?: never;
@@ -1172,11 +1172,11 @@ interface UncontrolledPanelProps {
     // (undocumented)
     defaultVisibility: PanelVisibility | null | undefined;
     // (undocumented)
-    onBehaviorChange?: (state: PanelState) => Partial<PanelState> | null | undefined | void;
+    onBehaviorChange?: (state: PanelState) => Partial<Omit<PanelState, 'behavior'>> | null | undefined | void;
     // (undocumented)
     onKeyPress?: (event: KeyboardEvent, state: PanelState) => Partial<PanelState> | null | undefined | void;
     // (undocumented)
-    onVisibilityChange?: (state: PanelState) => Partial<PanelState> | null | undefined | void;
+    onVisibilityChange?: (state: PanelState) => Partial<Omit<PanelState, 'visibility'>> | null | undefined | void;
     // (undocumented)
     visibility?: never;
 }

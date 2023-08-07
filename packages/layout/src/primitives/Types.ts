@@ -62,9 +62,9 @@ export interface UncontrolledPanelProps {
 	behavior?: never;
 	defaultBehavior: PanelBehavior | null | undefined;
 	defaultVisibility: PanelVisibility | null | undefined;
-	onBehaviorChange?: (state: PanelState) => Partial<PanelState> | null | undefined | void;
+	onBehaviorChange?: (state: PanelState) => Partial<Omit<PanelState, 'behavior'>> | null | undefined | void;
 	onKeyPress?: (event: KeyboardEvent, state: PanelState) => Partial<PanelState> | null | undefined | void;
-	onVisibilityChange?: (state: PanelState) => Partial<PanelState> | null | undefined | void;
+	onVisibilityChange?: (state: PanelState) => Partial<Omit<PanelState, 'visibility'>> | null | undefined | void;
 	visibility?: never;
 }
 

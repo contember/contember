@@ -1,5 +1,5 @@
 import { useClassNameFactory, useComposeRef, useElementSize, useExpectSameValueReference, useReferentiallyStableCallback, useUpdatedRef } from '@contember/react-utils'
-import { PolymorphicRef, assert, dataAttribute, isNotNullish, px } from '@contember/utilities'
+import { PolymorphicRef, assert, dataAttribute, isNotNullish, omit, px } from '@contember/utilities'
 import { CSSProperties, ElementType, forwardRef, memo, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import waitForTransition from 'wait-for-element-transition'
 import { FocusScope } from '../focus-scope'
@@ -82,38 +82,33 @@ export const Panel: LayoutPrimitivesPanelComponentType = memo(forwardRef(
 
 				let isMounted = true
 
-				if (currentBehavior === contextBehavior) {
-					const layoutPanelState = {
-						behavior: contextBehavior,
-						panel: name,
-						visibility: contextVisibility,
-					}
+				const panelContextState = {
+					behavior: contextBehavior,
+					panel: name,
+					visibility: contextVisibility,
+				}
 
+				if (currentBehavior === contextBehavior) {
 					if (currentVisibility !== contextVisibility) {
-						// We wait for possible transitions set on panel to finish:
+						update(name, onVisibilityChange?.(panelContextState))
+						// When behaviors are the same, we can transition between visibilities.
 						setCurrentVisibility(`will-become-${contextVisibility}`)
 
+						// We wait for possible transitions set on panel to finish:
 						waitForTransition(element).then(() => {
 							if (isMounted) {
 								setCurrentVisibility(contextVisibility)
-								update(name, onVisibilityChange?.(layoutPanelState))
 							}
 						})
 					}
 				} else {
-					// We can apply visibility immediately
-					const layoutPanelState = {
-						behavior: contextBehavior,
-						panel: name,
-						visibility: contextVisibility,
-					}
-
+					// We can apply behavior immediately
 					setCurrentBehavior(contextBehavior)
-					update(name, onBehaviorChange?.(layoutPanelState))
+					update(name, onBehaviorChange?.(panelContextState))
 
 					if (currentVisibility !== contextVisibility) {
 						setCurrentVisibility(contextVisibility)
-						update(name, onVisibilityChange?.(layoutPanelState))
+						update(name, onVisibilityChange?.(panelContextState))
 					}
 				}
 

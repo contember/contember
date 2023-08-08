@@ -2015,6 +2015,20 @@ export interface MenuItemPropsTitleRequired<T> {
 }
 
 // @public (undocumented)
+export function MenuLink({ active, className: classNameProp, componentClassName, disabled, children, external, href, icon, onClick: onClickProp, ...rest }: MenuLinkProps): JSX.Element;
+
+// @public (undocumented)
+export type MenuLinkProps = HTMLAnchorElementProps & ComponentClassNameProps & {
+    active?: boolean;
+    children?: ReactNode;
+    disabled?: boolean;
+    external?: boolean | undefined;
+    href?: string;
+    icon?: ReactNode;
+    onClick?: (e: SyntheticEvent<HTMLElement>) => void;
+};
+
+// @public (undocumented)
 export type MenuProps = HTMLDivElementProps & {
     className?: NestedClassName;
     caret?: boolean;

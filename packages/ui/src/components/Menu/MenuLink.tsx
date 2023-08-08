@@ -1,6 +1,6 @@
 import { useClassNameFactory } from '@contember/react-utils'
-import { ComponentClassNameProps, dataAttribute, deprecate, fallback, isDefined } from '@contember/utilities'
-import { ReactNode, SyntheticEvent, useCallback } from 'react'
+import { ComponentClassNameProps, dataAttribute } from '@contember/utilities'
+import { MouseEventHandler, ReactNode, SyntheticEvent, useCallback } from 'react'
 import { HTMLAnchorElementProps } from '../../types'
 import { isSpecialLinkClick } from '../../utils'
 import { Label } from '../Typography'
@@ -15,11 +15,7 @@ export type MenuLinkProps =
 		external?: boolean | undefined;
 		href?: string;
 		icon?: ReactNode;
-		/** @deprecated Use `active` instead */
-		isActive?: boolean;
 		onClick?: (e: SyntheticEvent<HTMLElement>) => void;
-		/** @deprecated Handle event.preventDefault() in `onClick` */
-		suppressTo?: boolean;
 	}
 
 export function MenuLink({
@@ -31,28 +27,16 @@ export function MenuLink({
 	external,
 	href,
 	icon,
-	isActive,
 	onClick: onClickProp,
-	suppressTo,
 	...rest
 }: MenuLinkProps) {
-	deprecate('1.3.0', isDefined(suppressTo), '`suppressTo` prop', '`event.preventDefault()` within `onClick` handler')
-	deprecate('1.3.0', isDefined(isActive), '`isActive` prop', '`active` prop')
-
-	active = fallback(active, isDefined(isActive), isActive)
-
-	const onClick = useCallback((event: SyntheticEvent<HTMLAnchorElement>) => {
+	const onClick: MouseEventHandler<HTMLAnchorElement> = useCallback(event => {
 		console.log('MenuLink onClick', event)
 
 		if (event.nativeEvent instanceof MouseEvent && !isSpecialLinkClick(event.nativeEvent) && event.nativeEvent.button === 0) {
 			onClickProp?.(event)
-
-			// TODO: Remove in 1.3.0
-			if (suppressTo) {
-				event.preventDefault()
-			}
 		}
-	}, [onClickProp, suppressTo])
+	}, [onClickProp])
 
 	const className = useClassNameFactory(componentClassName)
 

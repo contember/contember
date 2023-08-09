@@ -1,7 +1,7 @@
 import { useClassNameFactory } from '@contember/react-utils'
 import { CSSProperties, memo, ReactNode, useEffect, useRef, useState } from 'react'
 import type { CollapsibleTransition } from '../../types'
-import { forceReflow, toEnumStateClass, toEnumViewClass, toStateClass } from '../../utils'
+import { forceReflow, toEnumViewClass, toStateClass } from '../../utils'
 
 export interface CollapsibleProps {
 	expanded: boolean
@@ -61,14 +61,12 @@ export const Collapsible = memo((props: CollapsibleProps) => {
 		<div
 			className={componentClassName(null, [
 				toEnumViewClass(props.transition, 'topInsert'),
-				toEnumStateClass(delayedExpanded ? 'expanded' : 'collapsed'),
 				toStateClass('transitioning', isTransitioning),
 			])}
-			style={
-				{
-					'--cui-collapsible--content-height': contentHeight,
-				} as CSSProperties // Custom properties not supported workaround
-			}
+			style={{
+				'--cui-collapsible--content-height': contentHeight,
+			} as CSSProperties}
+			aria-expanded={delayedExpanded}
 			aria-hidden={!props.expanded}
 			onTransitionEnd={onTransitionEnd}
 		>

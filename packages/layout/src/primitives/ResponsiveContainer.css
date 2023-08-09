@@ -3,10 +3,3 @@
 	flex-direction: column;
 	flex: 1;
 }
-
-:where(
-	body:has(.cui-layout-responsive-container[data-has-visible-modal]),
-) {
-	pointer-events: none;
-	overflow: hidden;
-}

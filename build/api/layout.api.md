@@ -20,6 +20,7 @@ import { NestedClassName } from '@contember/utilities';
 import { PascalCase } from '@contember/utilities';
 import { PolymorphicComponentPropsWithRef } from '@contember/utilities';
 import { Predicate } from '@contember/utilities';
+import { PropsWithChildren } from 'react';
 import { default as React_2 } from 'react';
 import { ReactElement } from 'react';
 import { ReactNode } from 'react';
@@ -670,9 +671,10 @@ export type OwnBarStartProps = {
 };
 
 // @public (undocumented)
-type OwnContainerProps = ComponentClassNameProps & {
+interface OwnContainerProps extends ComponentClassNameProps, PropsWithChildren<{
     showDataState?: boolean;
-};
+}> {
+}
 
 // @public (undocumented)
 export type OwnContentPanelProps = Omit<ComponentClassNameProps, 'children'> & {
@@ -769,11 +771,10 @@ type OwnTargetContainerProps = {
 const Panel: PanelComponentType;
 
 // @public (undocumented)
-interface PanelBasicProps extends ComponentClassNameProps {
-    // (undocumented)
-    tabIndex?: never;
-    // (undocumented)
+interface PanelBasicProps extends ComponentClassNameProps, PropsWithChildren<{
     trapFocusInModal?: boolean;
+    tabIndex?: never;
+}> {
 }
 
 // @public (undocumented)

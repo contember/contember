@@ -1,5 +1,5 @@
 import { ComponentClassNameProps, NestedClassName, PolymorphicComponentPropsWithRef, isArrayOfMembersSatisfyingFactory, isNonEmptyString, isOneOfFactory, satisfiesOneOfFactory } from '@contember/utilities'
-import { ElementType, ReactElement, ReactNode, RefObject } from 'react'
+import { ElementType, PropsWithChildren, ReactElement, ReactNode, RefObject } from 'react'
 
 export const panelBehaviorsList = ['static', 'collapsible', 'overlay', 'modal'] as const
 export type PanelBehavior = typeof panelBehaviorsList[number]
@@ -16,11 +16,9 @@ export const isComponentClassName = satisfiesOneOfFactory(
 	isNonEmptyString,
 )
 
-export type OwnContainerProps =
-	& ComponentClassNameProps
-	& {
-		showDataState?: boolean;
-	}
+export interface OwnContainerProps extends ComponentClassNameProps, PropsWithChildren<{
+	showDataState?: boolean;
+}> { }
 
 export type ContainerProps<C extends ElementType> = PolymorphicComponentPropsWithRef<C, OwnContainerProps>
 
@@ -36,10 +34,10 @@ export type PanelState = {
 	visibility: PanelVisibility;
 }
 
-export interface PanelBasicProps extends ComponentClassNameProps {
+export interface PanelBasicProps extends ComponentClassNameProps, PropsWithChildren<{
 	trapFocusInModal?: boolean;
 	tabIndex?: never;
-}
+}> { }
 
 export type CommonPanelConfigProps = {
 	basis: number | null | undefined;

@@ -11,7 +11,6 @@ import { LiteralToPrimitiveDeep } from 'type-fest';
 import { MergeExclusive } from 'type-fest';
 import { Opaque } from 'type-fest';
 import { PascalCase } from 'type-fest';
-import { PropsWithChildren } from 'react';
 import { Replace } from 'type-fest';
 import { Simplify } from 'type-fest';
 import { UnionToIntersection } from 'type-fest';
@@ -65,10 +64,12 @@ export function colorSchemeClassName<S extends KebabCase<string> = KebabCase<str
 export function colorSchemeClassName<S extends KebabCase<string> = KebabCase<string>>(scheme: S | null | undefined): ColorSchemeClassName<S> | undefined;
 
 // @public (undocumented)
-export type ComponentClassNameProps = PropsWithChildren<{
+export interface ComponentClassNameProps {
+    // (undocumented)
     className?: NestedClassName;
+    // (undocumented)
     componentClassName?: string | string[];
-}>;
+}
 
 // @public
 export function contentThemeClassName<ContentTheme extends KebabCase<string> = KebabCase<string>, State extends `:${KebabCase<string>}` | null | undefined = undefined>(theme: ContentTheme | null | undefined, state?: State | null | undefined): ThemeContentClassName<ContentTheme, State> | undefined;

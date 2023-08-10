@@ -1,13 +1,12 @@
-import { PropsWithChildren } from 'react'
 import { KebabCase } from 'type-fest'
 
 export type NestedClassName = string | false | null | undefined | (string | false | null | undefined)[] | NestedClassName[]
 export type ClassNameStateMap = { [key: string]: string | number | boolean | null | undefined }
 
-export type ComponentClassNameProps = PropsWithChildren<{
+export interface ComponentClassNameProps {
 	className?: NestedClassName;
 	componentClassName?: string | string[];
-}>
+}
 
 export type ColorSchemeClassName<T extends KebabCase<string> = KebabCase<string>> = `scheme-${T}`
 export type ThemeContentClassName<T extends KebabCase<string> = KebabCase<string>, S extends `:${KebabCase<string>}` | null | undefined = undefined> = S extends string

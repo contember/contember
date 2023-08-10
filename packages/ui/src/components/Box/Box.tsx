@@ -130,46 +130,41 @@ export const Box = memo(forwardRef<HTMLDivElement, BoxProps>(({
 	label = fallback(label, heading !== undefined, heading)
 
 	return (
-		<div
+		<Stack
 			{...divProps}
+			ref={ref}
+			align={align}
 			data-active={dataAttribute(isActive)}
 			data-background={dataAttribute(background)}
 			data-border={dataAttribute(border)}
 			data-border-radius={dataAttribute(borderRadius)}
-			data-gap={dataAttribute(gap)}
 			data-padding={dataAttribute(padding)}
 			className={componentClassName(null, [
 				...themeClassName(intent),
 				colorSchemeClassName(useColorScheme()),
 				className,
 			])}
-			ref={ref}
+			evenly={evenly}
+			gap={gap}
+			horizontal={horizontal}
+			justify={justify}
+			reverse={reverse}
 		>
-			<Stack
-				align={align}
-				direction={direction}
-				evenly={evenly}
-				gap={gap}
-				horizontal={horizontal}
-				justify={justify}
-				reverse={reverse}
-			>
-				{header
-					? <div className={componentClassName('header')}>{header}</div>
-					: (label || actions) && (
-						<div className={componentClassName('header')}>
-							{label && <Label>{label}</Label>}
-							{actions && (
-								<div className={componentClassName('actions')} contentEditable={false}>
-									{actions}
-								</div>
-							)}
-						</div>
+			{header
+				? <div className={componentClassName('header')}>{header}</div>
+				: (label || actions) && (
+					<div className={componentClassName('header')}>
+						{label && <Label>{label}</Label>}
+						{actions && (
+							<div className={componentClassName('actions')} contentEditable={false}>
+								{actions}
+							</div>
+						)}
+					</div>
 				)}
-				{children}
-				{footer && <div className={componentClassName('footer')}>{footer}</div>}
-			</Stack>
-		</div>
+			{children}
+			{footer && <div className={componentClassName('footer')}>{footer}</div>}
+		</Stack>
 	)
 }))
 Box.displayName = 'Box'

@@ -1,4 +1,5 @@
 import { useClassName } from '@contember/react-utils'
+import { dataAttribute } from '@contember/utilities'
 import { forwardRef, memo } from 'react'
 import { toViewClass } from '../../../utils'
 import { useTextBasedInput } from '../Hooks'
@@ -10,6 +11,7 @@ import type { WeekInputProps } from './Types'
  */
 export const WeekInput = memo(forwardRef<HTMLInputElement, WeekInputProps>(({
 	className,
+	focusRing = true,
 	withTopToolbar,
 	...outerProps
 }, forwardedRed) => {
@@ -25,6 +27,6 @@ export const WeekInput = memo(forwardRef<HTMLInputElement, WeekInputProps>(({
 		]),
 	}, forwardedRed)
 
-	return <input {...props} type="week" />
+	return <input data-focus-ring={dataAttribute(focusRing)} {...props} type="week" />
 }))
 WeekInput.displayName = 'WeekInput'

@@ -10,9 +10,10 @@ import type {
 	WeekInputString,
 } from '../Types'
 
-export interface RestHTMLTextInputProps extends Omit<AllHTMLAttributes<HTMLInputElement>, ControlPropsKeys<string>> {}
+export interface RestHTMLTextInputProps extends Omit<AllHTMLAttributes<HTMLInputElement>, ControlPropsKeys<string>> { }
 
 export type TextInputOwnProps<V extends string | number = string> = ControlProps<V> & {
+	focusRing?: boolean
 	withTopToolbar?: boolean
 }
 

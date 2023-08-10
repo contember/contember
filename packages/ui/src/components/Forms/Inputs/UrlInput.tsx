@@ -1,4 +1,5 @@
 import { useClassName } from '@contember/react-utils'
+import { dataAttribute } from '@contember/utilities'
 import { forwardRef, memo } from 'react'
 import { toViewClass } from '../../../utils'
 import { useTextBasedInput } from '../Hooks'
@@ -9,6 +10,7 @@ import type { UrlInputProps } from './Types'
  */
 export const UrlInput = memo(forwardRef<HTMLInputElement, UrlInputProps>(({
 	className,
+	focusRing = true,
 	withTopToolbar,
 	...outerProps
 }, forwardedRed) => {
@@ -20,6 +22,6 @@ export const UrlInput = memo(forwardRef<HTMLInputElement, UrlInputProps>(({
 		]),
 	}, forwardedRed)
 
-	return <input {...props} type="url" />
+	return <input data-focus-ring={dataAttribute(focusRing)} {...props} type="url" />
 }))
 UrlInput.displayName = 'UrlInput'

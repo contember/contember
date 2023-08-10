@@ -158,9 +158,9 @@
 	border-color: rgb(var(--cui-color--accent-rgb-50));
 }
 
-:where(.cui-textarea-input:focus:focus-visible),
-:where(.cui-text-input:focus:focus-visible),
-:where(.cui-editorCanvas:focus:focus-visible) {
+:where(.cui-textarea-input[data-focus-ring]:focus:focus-visible),
+:where(.cui-text-input[data-focus-ring]:focus:focus-visible),
+:where(.cui-editorCanvas[data-focus-ring]:focus:focus-visible) {
 	box-shadow: var(--input-control-focus-ring);
 }
 

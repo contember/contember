@@ -1,5 +1,5 @@
 import { useClassNameFactory, useColorScheme } from '@contember/react-utils'
-import { colorSchemeClassName, themeClassName } from '@contember/utilities'
+import { colorSchemeClassName, dataAttribute, themeClassName } from '@contember/utilities'
 import { ReactNode, forwardRef, memo } from 'react'
 import { TextInput, TextInputProps } from '../Inputs'
 
@@ -19,6 +19,7 @@ export const SlugInput = memo(forwardRef<HTMLInputElement, SlugInputProps>(({
 	prefix,
 	link,
 	overlay,
+	focusRing = true,
 	onOverlayClick,
 	...textInputProps
 }, ref) => {
@@ -26,7 +27,7 @@ export const SlugInput = memo(forwardRef<HTMLInputElement, SlugInputProps>(({
 	const intent = textInputProps.validationState === 'invalid' ? 'danger' : undefined
 
 	return (
-		<div className={componentClassName(null, [...themeClassName(intent), colorSchemeClassName(useColorScheme())])}>
+		<div data-focus-ring={dataAttribute(focusRing)} className={componentClassName(null, [...themeClassName(intent), colorSchemeClassName(useColorScheme())])}>
 			{prefix && (
 				<div className={componentClassName('prefix')}>
 					{link ?
@@ -34,7 +35,7 @@ export const SlugInput = memo(forwardRef<HTMLInputElement, SlugInputProps>(({
 				</div>
 			)}
 			<div className={componentClassName('input')}>
-				<TextInput {...textInputProps} distinction={prefix ? 'seamless' : textInputProps.distinction} ref={ref} />
+				<TextInput focusRing={false} {...textInputProps} distinction={prefix ? 'seamless' : textInputProps.distinction} ref={ref} />
 				{(overlay || onOverlayClick) ? (
 					<div className={componentClassName('overlay')} onClick={onOverlayClick}>
 						{overlay}

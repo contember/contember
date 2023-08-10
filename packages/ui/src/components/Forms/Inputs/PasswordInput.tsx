@@ -1,4 +1,5 @@
 import { useClassName } from '@contember/react-utils'
+import { dataAttribute } from '@contember/utilities'
 import { forwardRef, memo } from 'react'
 import { toViewClass } from '../../../utils'
 import { useTextBasedInput } from '../Hooks'
@@ -9,6 +10,7 @@ import type { PasswordInputProps } from './Types'
  */
 export const PasswordInput = memo(forwardRef<HTMLInputElement, PasswordInputProps>(({
 	className,
+	focusRing = true,
 	withTopToolbar,
 	...outerProps
 }, forwardedRed) => {
@@ -20,6 +22,6 @@ export const PasswordInput = memo(forwardRef<HTMLInputElement, PasswordInputProp
 		]),
 	}, forwardedRed)
 
-	return <input {...props} type="password" />
+	return <input data-focus-ring={dataAttribute(focusRing)} {...props} type="password" />
 }))
 PasswordInput.displayName = 'PasswordInput'

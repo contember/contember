@@ -1,4 +1,5 @@
 import { useClassNameFactory } from '@contember/react-utils'
+import { dataAttribute } from '@contember/utilities'
 import { memo, ReactElement, ReactNode, TextareaHTMLAttributes, useEffect, useRef, useState } from 'react'
 import type { EditorCanvasDistinction, EditorCanvasSize } from '../../types'
 import { toEnumStateClass, toEnumViewClass } from '../../utils'
@@ -8,6 +9,7 @@ export interface HTMLTextAreaDivTargetProps extends TextareaHTMLAttributes<HTMLD
 export interface EditorCanvasProps<P extends HTMLTextAreaDivTargetProps> {
 	underlyingComponent: (props: P) => ReactElement
 	componentProps: P
+	focusRing?: boolean
 	children?: ReactNode
 	size?: EditorCanvasSize
 	distinction?: EditorCanvasDistinction
@@ -19,6 +21,7 @@ const toolbarVisibilityTreshold = 56 + 2 * 16
 
 export const EditorCanvas = memo(<P extends HTMLTextAreaDivTargetProps>({
 	children,
+	focusRing = true,
 	inset,
 	size,
 	distinction,
@@ -52,7 +55,7 @@ export const EditorCanvas = memo(<P extends HTMLTextAreaDivTargetProps>({
 	}, [])
 
 	return (
-		<div ref={intersectionRef} className={componentClassName(null, [
+		<div data-focus-ring={dataAttribute(focusRing)} ref={intersectionRef} className={componentClassName(null, [
 			toEnumViewClass(size),
 			toEnumViewClass(inset),
 			toEnumViewClass(distinction),

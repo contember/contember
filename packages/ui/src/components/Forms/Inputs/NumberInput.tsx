@@ -1,4 +1,5 @@
 import { useClassName } from '@contember/react-utils'
+import { dataAttribute } from '@contember/utilities'
 import { forwardRef, memo, useCallback } from 'react'
 import { mergeProps } from 'react-aria'
 import { toViewClass } from '../../../utils'
@@ -11,6 +12,7 @@ import type { NumberInputProps } from './Types'
 export const NumberInput = memo(forwardRef<HTMLInputElement, NumberInputProps>(({
 	className,
 	defaultValue,
+	focusRing = true,
 	max,
 	min,
 	onChange,
@@ -40,6 +42,7 @@ export const NumberInput = memo(forwardRef<HTMLInputElement, NumberInputProps>((
 	}, forwardedRed)
 
 	return <input
+		data-focus-ring={dataAttribute(focusRing)}
 		{...mergeProps(props, {
 			onKeyDown: useCallback((event: KeyboardEvent) => {
 				if (event.code === 'Period' || event.code === 'Comma') {

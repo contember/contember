@@ -1,4 +1,5 @@
 import { useClassName } from '@contember/react-utils'
+import { dataAttribute } from '@contember/utilities'
 import { forwardRef, memo } from 'react'
 import { toViewClass } from '../../../utils'
 import { useTextBasedInput } from '../Hooks'
@@ -9,6 +10,7 @@ import type { EmailInputProps } from './Types'
  */
 export const EmailInput = memo(forwardRef<HTMLInputElement, EmailInputProps>(({
 	className,
+	focusRing = true,
 	withTopToolbar,
 	...outerProps
 }, forwardedRed) => {
@@ -20,6 +22,6 @@ export const EmailInput = memo(forwardRef<HTMLInputElement, EmailInputProps>(({
 		]),
 	}, forwardedRed)
 
-	return <input {...props} type="email" />
+	return <input data-focus-ring={dataAttribute(focusRing)} {...props} type="email" />
 }))
 EmailInput.displayName = 'EmailInput'

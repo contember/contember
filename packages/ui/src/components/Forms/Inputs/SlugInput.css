@@ -9,7 +9,7 @@
 	margin-top: calc(-1 * var(--cui-border-width));
 }
 
-:where(.cui-slug-input:focus-within) {
+:where(.cui-slug-input[data-focus-ring]:focus-within) {
 	box-shadow: var(--slug-input-control-focus-ring);
 }
 
@@ -69,7 +69,6 @@
 }
 
 :where(.cui-slug-input-prefix + .cui-slug-input-input .cui-text-input) {
-	--input-control-focus-ring: none;
 	border-left: 0;
 	border-top-left-radius: 0;
 	border-bottom-left-radius: 0;

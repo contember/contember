@@ -1,4 +1,5 @@
 import { useClassName } from '@contember/react-utils'
+import { dataAttribute } from '@contember/utilities'
 import { forwardRef, memo } from 'react'
 import { toViewClass } from '../../../utils'
 import { useTextBasedInput } from '../Hooks'
@@ -10,6 +11,7 @@ import type { ColorInputProps } from './Types'
  */
 export const ColorInput = memo(forwardRef<HTMLInputElement, ColorInputProps>(({
 	className,
+	focusRing = true,
 	withTopToolbar,
 	...outerProps
 }, forwardedRed) => {
@@ -23,6 +25,6 @@ export const ColorInput = memo(forwardRef<HTMLInputElement, ColorInputProps>(({
 		]),
 	}, forwardedRed)
 
-	return <input {...props} type="color" />
+	return <input data-focus-ring={dataAttribute(focusRing)} {...props} type="color" />
 }))
 ColorInput.displayName = 'ColorInput'

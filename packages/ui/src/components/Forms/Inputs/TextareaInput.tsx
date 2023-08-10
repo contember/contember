@@ -1,4 +1,5 @@
 import { useClassName } from '@contember/react-utils'
+import { dataAttribute } from '@contember/utilities'
 import { AllHTMLAttributes, ForwardedRef, forwardRef, memo } from 'react'
 import TextareaAutosize, { TextareaAutosizeProps } from 'react-textarea-autosize'
 import { toViewClass } from '../../../utils'
@@ -13,6 +14,7 @@ export interface TextareaInputOwnProps {
 }
 
 export type TextareaInputProps = ControlProps<string> & TextareaInputOwnProps & {
+	focusRing?: boolean
 	style?: TextareaAutosizeProps['style'];
 }
 
@@ -21,6 +23,7 @@ export type TextareaInputProps = ControlProps<string> & TextareaInputOwnProps & 
  */
 export const TextareaInput = memo(forwardRef(({
 	className,
+	focusRing = true,
 	minRows,
 	style,
 	withTopToolbar,
@@ -37,6 +40,7 @@ export const TextareaInput = memo(forwardRef(({
 	return <TextareaAutosize
 		{...props}
 		cacheMeasurements={true}
+		data-focus-ring={dataAttribute(focusRing)}
 		minRows={minRows}
 		style={style}
 	/>

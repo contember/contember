@@ -1,4 +1,5 @@
 import { useClassName } from '@contember/react-utils'
+import { dataAttribute } from '@contember/utilities'
 import { forwardRef, memo } from 'react'
 import { toViewClass } from '../../../utils'
 import { useTextBasedInput } from '../Hooks'
@@ -20,6 +21,7 @@ export const InternalTextInput = memo(
 	forwardRef<HTMLInputElement, TextInputProps>(({
 		className,
 		type,
+		focusRing = true,
 		withTopToolbar,
 		...outerProps
 	}, forwardedRed) => {
@@ -31,7 +33,7 @@ export const InternalTextInput = memo(
 			]),
 		}, forwardedRed)
 
-		return <input {...props} type="text" />
+		return <input data-focus-ring={dataAttribute(focusRing)} {...props} type="text" />
 	}),
 )
 InternalTextInput.displayName = 'InternalTextInput'

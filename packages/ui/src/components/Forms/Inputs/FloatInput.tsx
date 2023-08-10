@@ -1,4 +1,5 @@
 import { useClassName } from '@contember/react-utils'
+import { dataAttribute } from '@contember/utilities'
 import { forwardRef, memo, useCallback, useRef } from 'react'
 import { toViewClass } from '../../../utils'
 import { useTextBasedInput } from '../Hooks'
@@ -11,6 +12,7 @@ export const FloatInput = memo(forwardRef<HTMLInputElement, FloatInputProps>(({
 	className,
 	defaultValue,
 	onChange,
+	focusRing = true,
 	max,
 	min,
 	value,
@@ -45,6 +47,6 @@ export const FloatInput = memo(forwardRef<HTMLInputElement, FloatInputProps>(({
 		value: value?.toString(10),
 	}, forwardedRed)
 
-	return <input {...props} type="number" step={outerProps.step ?? 'any'} />
+	return <input data-focus-ring={dataAttribute(focusRing)} {...props} type="number" step={outerProps.step ?? 'any'} />
 }))
 FloatInput.displayName = 'FloatInput'

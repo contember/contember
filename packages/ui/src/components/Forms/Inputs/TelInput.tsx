@@ -1,4 +1,5 @@
 import { useClassName } from '@contember/react-utils'
+import { dataAttribute } from '@contember/utilities'
 import { forwardRef, memo } from 'react'
 import { toViewClass } from '../../../utils'
 import { useTextBasedInput } from '../Hooks'
@@ -9,6 +10,7 @@ import type { TelInputProps } from './Types'
  */
 export const TelInput = memo(forwardRef<HTMLInputElement, TelInputProps>(({
 	className,
+	focusRing = true,
 	withTopToolbar,
 	...outerProps
 }, forwardedRed) => {
@@ -20,6 +22,6 @@ export const TelInput = memo(forwardRef<HTMLInputElement, TelInputProps>(({
 		]),
 	}, forwardedRed)
 
-	return <input {...props} type="tel" />
+	return <input data-focus-ring={dataAttribute(focusRing)} {...props} type="tel" />
 }))
 TelInput.displayName = 'TelInput'

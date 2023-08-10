@@ -34,6 +34,7 @@ export default () => {
 					<div>
 						<Wrapper>
 							<Button size={size}>Default</Button>
+							<TextInput placeholder="Enter text..." name="name" />
 							<Button size={size} elevated>Elevated</Button>
 							<Button size={size} active>Default</Button>
 							<Button size={size}>Go <ArrowRightIcon /></Button>
@@ -51,6 +52,7 @@ export default () => {
 					{/* <div>
 						<Wrapper>
 							<div className="cui-view" data-pressable data-background-color data-padding>Default</div>
+							<TextInput placeholder="Enter text..." name="name" />
 							<div className="cui-view" data-pressable data-background-color data-padding data-elevated>Elevated</div>
 							<div className="cui-view" data-pressable data-background-color data-padding data-pressed>Default</div>
 							<div className="cui-view" data-pressable data-background-color data-padding>Go <ArrowRightIcon /></div>
@@ -68,6 +70,7 @@ export default () => {
 					<div>
 						<Wrapper>
 							<Button size={size} distinction="inverse">Inverse</Button>
+							<TextInput placeholder="Enter text..." name="name" />
 							<Button size={size} distinction="inverse" elevated>Elevated Inverse</Button>
 							<Button size={size} distinction="inverse" active>Inverse</Button>
 							<Button size={size} distinction="inverse">Go <ArrowRightIcon /></Button>
@@ -85,6 +88,7 @@ export default () => {
 					<div>
 						<Wrapper>
 							<Button size={size} distinction="primary">Primary</Button>
+							<TextInput placeholder="Enter text..." name="name" />
 							<Button size={size} distinction="primary" elevated>Elevated Primary</Button>
 							<Button size={size} distinction="primary" active>Primary</Button>
 							<Button size={size} distinction="primary">Go <ArrowRightIcon /></Button>
@@ -102,6 +106,7 @@ export default () => {
 					<div>
 						<Wrapper>
 							<Button size={size} distinction="seamless">Seamless</Button>
+							<TextInput placeholder="Enter text..." name="name" />
 							<Button size={size} distinction="seamless" elevated>Elevated Seamless</Button>
 							<Button size={size} distinction="seamless" active>Seamless</Button>
 							<Button size={size} distinction="seamless">Go <ArrowRightIcon /></Button>
@@ -119,6 +124,7 @@ export default () => {
 					<div>
 						<Wrapper>
 							<Button size={size} distinction="outlined">Outlined</Button>
+							<TextInput placeholder="Enter text..." name="name" />
 							<Button size={size} distinction="outlined" elevated>Elevated Outlined</Button>
 							<Button size={size} distinction="outlined" active>Outlined</Button>
 							<Button size={size} distinction="outlined">Go <ArrowRightIcon /></Button>
@@ -136,6 +142,7 @@ export default () => {
 					<div>
 						<Wrapper>
 							<Button size={size} distinction="toned">Toned</Button>
+							<TextInput placeholder="Enter text..." name="name" />
 							<Button size={size} distinction="toned" elevated>Elevated Toned</Button>
 							<Button size={size} distinction="toned" active>Toned</Button>
 							<Button size={size} distinction="toned">Go <ArrowRightIcon /></Button>

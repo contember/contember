@@ -28,6 +28,7 @@ export type BoxOwnProps =
 		children?: ReactNode
 		/** @deprecated Use `background={false} border={false} padding={false}` props combination instead */
 		distinction?: BoxDistinction
+		fit?: false | 'width' | 'height' | 'both'
 		footer?: ReactNode
 		/** @deprecated Use `label` instead */
 		heading?: ReactNode
@@ -96,6 +97,7 @@ export const Box = memo(forwardRef<HTMLDivElement, BoxProps>(({
 	direction,
 	distinction,
 	evenly,
+	fit = 'width',
 	footer,
 	gap = 'gutter',
 	header,
@@ -138,6 +140,7 @@ export const Box = memo(forwardRef<HTMLDivElement, BoxProps>(({
 			data-background={dataAttribute(background)}
 			data-border={dataAttribute(border)}
 			data-border-radius={dataAttribute(borderRadius)}
+			data-fit={dataAttribute(fit)}
 			data-padding={dataAttribute(padding)}
 			className={componentClassName(null, [
 				...themeClassName(intent),

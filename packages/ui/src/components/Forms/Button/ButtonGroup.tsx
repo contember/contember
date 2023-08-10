@@ -8,10 +8,12 @@ import type { ButtonGroupProps } from './Types'
  * @group UI
  */
 export const ButtonGroup = memo(({
+	borderRadius = true,
 	children,
 	className,
 	componentClassName = 'button-group',
 	display = 'inline',
+	focusRing = false,
 	flow,
 	isTopToolbar,
 	orientation = 'horizontal',
@@ -31,7 +33,9 @@ export const ButtonGroup = memo(({
 
 	return (
 		<div
+			data-border-radius={dataAttribute(borderRadius)}
 			data-display={dataAttribute(display)}
+			data-focus-ring={dataAttribute(focusRing)}
 			data-orientation={dataAttribute(orientation)}
 			data-size={dataAttribute(size)}
 			className={useClassName(componentClassName, [

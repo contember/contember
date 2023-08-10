@@ -218,7 +218,7 @@ export type ButtonElevation = Default | 'none';
 export type ButtonFlow = Default | 'circular' | 'squarish' | 'generous' | 'block' | 'generousBlock';
 
 // @public (undocumented)
-export const ButtonGroup: MemoExoticComponent<({ children, className, componentClassName, display, flow, isTopToolbar, orientation, size, }: ButtonGroupProps) => JSX.Element>;
+export const ButtonGroup: MemoExoticComponent<({ borderRadius, children, className, componentClassName, display, focusRing, flow, isTopToolbar, orientation, size, }: ButtonGroupProps) => JSX.Element>;
 
 // @public @deprecated (undocumented)
 export type ButtonGroupFlow = Default | 'block';
@@ -229,9 +229,13 @@ export type ButtonGroupOrientation = Default | 'horizontal' | 'vertical';
 // @public (undocumented)
 export interface ButtonGroupProps extends ComponentClassNameProps, DeprecatedButtonGroupProps {
     // (undocumented)
+    borderRadius?: boolean | 'gap' | 'gutter' | 'padding' | 'full';
+    // (undocumented)
     children?: ReactNode;
     // (undocumented)
     display?: 'block' | 'inline';
+    // (undocumented)
+    focusRing?: boolean;
     // (undocumented)
     orientation?: 'horizontal' | 'vertical' | DeprecatedButtonDefault;
     // (undocumented)
@@ -276,6 +280,8 @@ export interface ButtonOwnProps extends DeprecatedButtonOwnProps, ComponentClass
     distinction?: 'primary' | 'toned' | 'outlined' | 'seamless' | 'inverse' | DeprecatedButtonDefault;
     // (undocumented)
     elevated?: boolean;
+    // (undocumented)
+    focusRing?: boolean;
     // (undocumented)
     inset?: boolean | 'gap' | 'gutter' | 'padding' | 'large';
     // (undocumented)

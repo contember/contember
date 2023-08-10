@@ -26,6 +26,7 @@ export interface ButtonOwnProps extends DeprecatedButtonOwnProps, ComponentClass
 	disabled?: boolean
 	distinction?: 'primary' | 'toned' | 'outlined' | 'seamless' | 'inverse' | DeprecatedButtonDefault
 	elevated?: boolean
+	focusRing?: boolean
 	inset?: boolean | 'gap' | 'gutter' | 'padding' | 'large'
 	intent?: Intent
 	justify?: 'start' | 'center' | 'end' | 'space-around' | 'space-between' | 'space-evenly'
@@ -49,8 +50,10 @@ export interface ButtonListProps extends ComponentClassNameProps, DeprecatedButt
 }
 
 export interface ButtonGroupProps extends ComponentClassNameProps, DeprecatedButtonGroupProps {
+	borderRadius?: boolean | 'gap' | 'gutter' | 'padding' | 'full'
 	children?: ReactNode
 	display?: 'block' | 'inline'
+	focusRing?: boolean
 	orientation?: 'horizontal' | 'vertical' | DeprecatedButtonDefault
 	size?: 'small' | 'medium' | 'large' | DeprecatedButtonDefault
 }

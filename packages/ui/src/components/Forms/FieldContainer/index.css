@@ -72,6 +72,7 @@
 
 :where(.cui-field-container-required-asterisk) {
 	color: rgb(var(--cui-color--accent-rgb-50));
+	display: inline;
 }
 
 :where(.cui-field-container-header),
@@ -84,6 +85,9 @@
 :where(.cui-field-container-header) {
 	font-weight: 700;
 	user-select: none;
+}
+:where(.cui-field-container-header > .cui-label) {
+	display: inline;
 }
 
 :where(.cui-field-container-body-content-description) {

@@ -24,6 +24,7 @@
 
 :where(.cui-collapsible[aria-expanded="true"]) {
 	opacity: 1;
+	overflow: unset;
 	visibility: visible;
 }
 

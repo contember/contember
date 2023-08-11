@@ -1,5 +1,6 @@
 import type { Environment } from '@contember/binding'
-import { ActionableBox, Box, Dropdown, DropdownProps, Icon, Justification, TableHeaderCell } from '@contember/ui'
+import { ActionableBox, Box, Dropdown, DropdownProps, Justification, TableHeaderCell } from '@contember/ui'
+import { ChevronDownIcon, ChevronUpIcon, FilterIcon } from 'lucide-react'
 import { ComponentType, ReactElement, ReactNode, createElement, useMemo } from 'react'
 import type { FilterRendererProps } from './DataGridColumn'
 import type { DataGridFilterArtifact } from './DataGridFilterArtifact'
@@ -26,7 +27,7 @@ export interface DataGridHeaderCellInternalProps {
 	filterRenderer: ComponentType<FilterRendererProps<DataGridFilterArtifact>> | undefined
 }
 
-export interface DataGridHeaderCellProps extends DataGridHeaderCellInternalProps, DataGridHeaderCellPublicProps {}
+export interface DataGridHeaderCellProps extends DataGridHeaderCellInternalProps, DataGridHeaderCellPublicProps { }
 
 export function DataGridHeaderCell({
 	ascOrderIcon,
@@ -48,12 +49,8 @@ export function DataGridHeaderCell({
 		distinction: 'seamless',
 		size: 'small',
 		children: (
-			<Icon
-				blueprintIcon="filter"
-				alignWithLowercase
-				style={{
-					opacity: hasFilter ? '1' : '0.5',
-				}}
+			<FilterIcon
+				fill={hasFilter ? 'currentColor' : 'none'}
 			/>
 		),
 	}), [hasFilter])
@@ -83,7 +80,7 @@ export function DataGridHeaderCell({
 									requestClose()
 								}}
 							>
-								<Box heading={<>Filter: {header}</>}>
+								<Box padding={false} background={false} border={false} header={<>Filter: {header}</>}>
 									{createElement(filterRenderer, {
 										filter: filterArtifact === undefined ? emptyFilterArtifact : filterArtifact,
 										setFilter: setFilter,
@@ -99,5 +96,5 @@ export function DataGridHeaderCell({
 	)
 }
 
-const defaultAscIcon = <Icon blueprintIcon="caret-up" size="small" alignWithLowercase />
-const defaultDescIcon = <Icon blueprintIcon="caret-down" size="small" alignWithLowercase />
+const defaultAscIcon = <ChevronUpIcon />
+const defaultDescIcon = <ChevronDownIcon />

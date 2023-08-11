@@ -36,7 +36,7 @@ export function DataGridFullFilters({
 		distinction: 'seamless',
 		children: (
 			<>
-				<FilterIcon />
+				<FilterIcon fill={hasAnyFilters ? 'currentColor' : 'none'} />
 				<Text translate={formatMessage}>dataGrid.columnFiltering.showMenuButton.text</Text>
 			</>
 		),

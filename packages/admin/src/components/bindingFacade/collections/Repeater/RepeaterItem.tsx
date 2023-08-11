@@ -17,7 +17,7 @@ export type RepeaterItemOwnProps = {
 export interface RepeaterItemProps extends Omit<RepeaterItemContainerProps, keyof RepeaterItemOwnProps>, RepeaterItemOwnProps { }
 
 export const RepeaterItem = memo(
-	({ children, canBeRemoved, label, removalType, dragHandleComponent, index, ...rest }: RepeaterItemProps) => {
+	({ children, canBeRemoved, createNewEntity, label, removalType, dragHandleComponent, index, ...rest }: RepeaterItemProps) => {
 		if (removalType !== 'delete') {
 			throw new BindingError(
 				`As a temporary limitation, <Repeater /> can currently only delete its items, not disconnect them. ` +

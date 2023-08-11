@@ -339,7 +339,7 @@ export type CheckboxOwnProps = ControlProps<boolean> & {
 export type CheckboxProps = CheckboxOwnProps & RestHTMLCheckboxProps;
 
 // @public (undocumented)
-export const Collapsible: MemoExoticComponent<(props: CollapsibleProps) => JSX.Element>;
+export const Collapsible: MemoExoticComponent<ForwardRefExoticComponent<CollapsibleProps & RefAttributes<HTMLDivElement>>>;
 
 // @public (undocumented)
 export interface CollapsibleProps {

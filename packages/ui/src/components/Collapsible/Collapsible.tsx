@@ -1,5 +1,5 @@
 import { useClassNameFactory } from '@contember/react-utils'
-import { CSSProperties, memo, ReactNode, useEffect, useRef, useState } from 'react'
+import { CSSProperties, forwardRef, memo, ReactNode, useEffect, useRef, useState } from 'react'
 import type { CollapsibleTransition } from '../../types'
 import { forceReflow, toEnumViewClass, toStateClass } from '../../utils'
 
@@ -15,7 +15,7 @@ export interface CollapsibleProps {
 /**
  * @group UI
  */
-export const Collapsible = memo((props: CollapsibleProps) => {
+export const Collapsible = memo(forwardRef<HTMLDivElement, CollapsibleProps>((props, forwardedRef) => {
 	const contentRef = useRef<HTMLDivElement>(null)
 	const [isTransitioning, setIsTransitioning] = useState(false)
 	const [contentHeight, setContentHeight] = useState('auto')
@@ -59,6 +59,7 @@ export const Collapsible = memo((props: CollapsibleProps) => {
 
 	return (
 		<div
+			ref={forwardedRef}
 			className={componentClassName(null, [
 				toEnumViewClass(props.transition, 'topInsert'),
 				toStateClass('transitioning', isTransitioning),
@@ -75,5 +76,5 @@ export const Collapsible = memo((props: CollapsibleProps) => {
 			</div>
 		</div>
 	)
-})
+}))
 Collapsible.displayName = 'Collapsible'

@@ -216,6 +216,9 @@ export const useIsMounted: () => MutableRefObject<boolean>;
 export const useObjectMemo: <A extends object>(value: A) => A;
 
 // @public (undocumented)
+export function useOnElementClickOutsideCallback(refOrElement: RefObjectOrElement<HTMLElement>, callback: (event: MouseEvent) => void): void;
+
+// @public (undocumented)
 export function useOnElementMutation(refOrElement: RefObjectOrElement<HTMLElement | undefined>, callback: MutationCallback, options?: MutationObserverInit): void;
 
 // @public (undocumented)

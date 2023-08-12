@@ -4080,7 +4080,7 @@ export interface RepeaterInnerProps<ContainerExtraProps, ItemExtraProps> extends
 }
 
 // @public (undocumented)
-export const RepeaterItem: React.MemoExoticComponent<({ children, canBeRemoved, createNewEntity, label, removalType, dragHandleComponent, index, ...rest }: RepeaterItemProps) => JSX.Element>;
+export const RepeaterItem: React.MemoExoticComponent<React.ForwardRefExoticComponent<RepeaterItemProps & React.RefAttributes<HTMLDivElement>>>;
 
 // @public (undocumented)
 export type RepeaterItemOwnProps = {

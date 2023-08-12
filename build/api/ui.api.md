@@ -2340,7 +2340,7 @@ export interface RenderDialogContentProps<Result> {
 }
 
 // @public (undocumented)
-export const RepeaterItemContainer: MemoExoticComponent<({ actions, gap, children, label, dragHandleComponent: Handle, index, ...rest }: RepeaterItemContainerProps) => JSX.Element>;
+export const RepeaterItemContainer: MemoExoticComponent<ForwardRefExoticComponent<Omit<BoxProps, "footer" | "header" | "heading" | keyof RepeaterItemContainerOwnProps> & RepeaterItemContainerOwnProps & RefAttributes<HTMLDivElement>>>;
 
 // @public (undocumented)
 export const RepeaterItemContainerHeader: MemoExoticComponent<({ label, actions, index }: RepeaterItemContainerHeaderProps) => JSX.Element>;

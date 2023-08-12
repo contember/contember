@@ -1,6 +1,6 @@
 import { BindingError, RemovalType } from '@contember/binding'
 import { RepeaterItemContainer, RepeaterItemContainerProps } from '@contember/ui'
-import { ReactNode, memo } from 'react'
+import { ReactNode, forwardRef, memo } from 'react'
 import { DeleteEntityButton } from '../helpers'
 import { RepeaterCreateNewEntity } from './RepeaterFieldContainer'
 
@@ -16,26 +16,34 @@ export type RepeaterItemOwnProps = {
 
 export interface RepeaterItemProps extends Omit<RepeaterItemContainerProps, keyof RepeaterItemOwnProps>, RepeaterItemOwnProps { }
 
-export const RepeaterItem = memo(
-	({ children, canBeRemoved, createNewEntity, label, removalType, dragHandleComponent, index, ...rest }: RepeaterItemProps) => {
-		if (removalType !== 'delete') {
-			throw new BindingError(
-				`As a temporary limitation, <Repeater /> can currently only delete its items, not disconnect them. ` +
-				`This restriction is planned to be lifted sometime in future.`,
-			)
-		}
-
-		return (
-			<RepeaterItemContainer
-				dragHandleComponent={dragHandleComponent}
-				label={label}
-				index={index}
-				actions={canBeRemoved && <DeleteEntityButton />}
-				{...rest}
-			>
-				{children}
-			</RepeaterItemContainer>
+export const RepeaterItem = memo(forwardRef<HTMLDivElement, RepeaterItemProps>(({
+	canBeRemoved,
+	children,
+	createNewEntity,
+	dragHandleComponent,
+	index,
+	label,
+	removalType,
+	...rest
+}, forwardedRef) => {
+	if (removalType !== 'delete') {
+		throw new BindingError(
+			`As a temporary limitation, <Repeater /> can currently only delete its items, not disconnect them. ` +
+			`This restriction is planned to be lifted sometime in future.`,
 		)
-	},
-)
+	}
+
+	return (
+		<RepeaterItemContainer
+			ref={forwardedRef}
+			dragHandleComponent={dragHandleComponent}
+			label={label}
+			index={index}
+			actions={canBeRemoved && <DeleteEntityButton />}
+			{...rest}
+		>
+			{children}
+		</RepeaterItemContainer>
+	)
+}))
 RepeaterItem.displayName = 'RepeaterItem'

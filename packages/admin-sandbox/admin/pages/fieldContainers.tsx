@@ -41,6 +41,20 @@ export default () => {
 					label="Lorem ipsum"
 					labelDescription="Lorem ipsum dolor"
 					description="Lorem ipsum dolor sit amet"
+					footer={<Button distinction="primary">Add</Button>}
+					errors={errors}
+				>
+					<TextInput name="name" placeholder="Enter name..." />
+				</FieldContainer>
+
+				<Divider />
+
+				<FieldContainer
+					label="Lorem ipsum"
+					labelPosition="bottom"
+					labelDescription="Lorem ipsum dolor"
+					description="Lorem ipsum dolor sit amet"
+					footer={<Button distinction="primary">Add</Button>}
 					errors={errors}
 				>
 					<TextInput name="name" placeholder="Enter name..." />
@@ -53,6 +67,7 @@ export default () => {
 					label="Lorem ipsum"
 					labelPosition="left"
 					description="Lorem ipsum dolor sit amet"
+					footer={<Button distinction="primary">Add</Button>}
 				>
 					<TextInput name="name" placeholder="Enter name..." />
 				</FieldContainer>
@@ -63,6 +78,7 @@ export default () => {
 					labelPosition="left"
 					labelDescription="Lorem ipsum dolor"
 					description="Lorem ipsum dolor sit amet"
+					footer={<Button distinction="primary">Add</Button>}
 				>
 					<TextInput name="name" placeholder="Enter name..." />
 				</FieldContainer>
@@ -71,6 +87,7 @@ export default () => {
 					label="Lorem ipsum"
 					labelPosition="left"
 					description="Lorem ipsum dolor sit amet"
+					footer={<Button distinction="primary">Add</Button>}
 
 				>
 					<TextInput name="name" placeholder="Enter name..." />
@@ -81,6 +98,7 @@ export default () => {
 					labelPosition="left"
 					labelDescription="Lorem ipsum dolor"
 					description="Lorem ipsum dolor sit amet"
+					footer={<Button distinction="primary">Add</Button>}
 				>
 					<TextInput name="name" placeholder="Enter name..." />
 				</FieldContainer>
@@ -92,6 +110,7 @@ export default () => {
 					label="Lorem ipsum"
 					labelPosition="right"
 					description="Lorem ipsum dolor sit amet"
+					footer={<Button distinction="primary">Add</Button>}
 				>
 					<TextInput name="name" placeholder="Enter name..." />
 				</FieldContainer>
@@ -102,6 +121,7 @@ export default () => {
 					labelPosition="right"
 					labelDescription="Lorem ipsum dolor"
 					description="Lorem ipsum dolor sit amet"
+					footer={<Button distinction="primary">Add</Button>}
 				>
 					<TextInput name="name" placeholder="Enter name..." />
 				</FieldContainer>
@@ -110,6 +130,7 @@ export default () => {
 					label="Lorem ipsum"
 					labelPosition="right"
 					description="Lorem ipsum dolor sit amet"
+					footer={<Button distinction="primary">Add</Button>}
 				>
 					<TextInput name="name" placeholder="Enter name..." />
 				</FieldContainer>
@@ -119,6 +140,7 @@ export default () => {
 					labelPosition="right"
 					labelDescription="Lorem ipsum dolor"
 					description="Lorem ipsum dolor sit amet"
+					footer={<Button distinction="primary">Add</Button>}
 				>
 					<TextInput name="name" placeholder="Enter name..." />
 				</FieldContainer>

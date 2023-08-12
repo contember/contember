@@ -119,13 +119,15 @@ export const categories = () => (
 	</>
 )
 
+const tagLocalesContainerProps = { gap: false }
+
 export const tags = () => (
 	<>
 		<SlotSources.Title>Tags</SlotSources.Title>
 
 		<MultiEditScope entities="Tag" listProps={{ beforeContent: <SlotSources.Actions><PersistButton /></SlotSources.Actions> }}>
 			<TextField field={'name'} label={'Name'} />
-			<Repeater field={'locales'} label={'Locales'} sortableBy={'order'}>
+			<Repeater field={'locales'} label={'Locales'} sortableBy={'order'} containerComponentExtraProps={tagLocalesContainerProps}>
 				<SelectField label={'Locale'} options={'Locale.code'} field={'locale'}
 					createNewForm={<TextField field={'code'} label={'Locale code'} />} />
 				<TextField field={'name'} label={'Name'} />

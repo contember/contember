@@ -685,6 +685,7 @@ export type OwnContentPanelProps = Omit<ComponentClassNameProps, 'children'> & {
     header?: ReactNode | ((state: PanelState, panelsState: GetLayoutPanelsStateContextType) => ReactNode);
     maxWidth?: number | false | null | undefined;
     minWidth?: number | null | undefined;
+    priority?: number | null | undefined;
 };
 
 // @public (undocumented)

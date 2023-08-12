@@ -33,6 +33,7 @@ export type OwnContentPanelProps =
 		header?: ReactNode | ((state: PanelState, panelsState: GetLayoutPanelsStateContextType) => ReactNode);
 		maxWidth?: number | false | null | undefined;
 		minWidth?: number | null | undefined;
+		priority?: number | null | undefined;
 	}
 
 export type ContentPanelProps<C extends ElementType> = PolymorphicComponentPropsWithRef<C, OwnContentPanelProps>

@@ -54,6 +54,7 @@ import { ErrorListProps } from '@contember/ui';
 import { FC } from 'react';
 import { FieldAccessor } from '@contember/binding';
 import { FieldBasicProps } from '@contember/binding';
+import { FieldContainerOwnProps } from '@contember/ui';
 import { FieldContainerProps } from '@contember/ui';
 import { FieldErrors } from '@contember/ui';
 import { FieldValue } from '@contember/binding';
@@ -4012,16 +4013,14 @@ export const repeaterDictionary: {
 };
 
 // @public (undocumented)
-export const RepeaterFieldContainer: React.MemoExoticComponent<({ accessor, addButtonText, children, createNewEntity, addButtonComponent: AddButton, addButtonComponentExtraProps, addButtonProps, emptyMessage, emptyMessageComponent, enableAddingNew, formatMessage, isEmpty, label, }: RepeaterFieldContainerProps) => JSX.Element>;
+export const RepeaterFieldContainer: React.MemoExoticComponent<({ accessor, addButtonText, boxLabel, children, createNewEntity, addButtonComponent: AddButton, addButtonComponentExtraProps, addButtonProps, emptyMessage, emptyMessageComponent, enableAddingNew, formatMessage, isEmpty, label, ...rest }: RepeaterFieldContainerProps) => JSX.Element>;
 
 // @public (undocumented)
-export interface RepeaterFieldContainerPrivateProps {
+export interface RepeaterFieldContainerPrivateProps extends Omit<FieldContainerOwnProps, 'useLabelElement'> {
     // (undocumented)
     accessor: EntityListAccessor;
     // @deprecated (undocumented)
     boxLabel?: ReactNode;
-    // (undocumented)
-    children: ReactNode;
     // (undocumented)
     createNewEntity: RepeaterCreateNewEntity;
     // (undocumented)
@@ -4030,8 +4029,6 @@ export interface RepeaterFieldContainerPrivateProps {
     formatMessage: MessageFormatter<RepeaterDictionary>;
     // (undocumented)
     isEmpty: boolean;
-    // (undocumented)
-    label: ReactNode;
 }
 
 // @public (undocumented)
@@ -4083,7 +4080,7 @@ export interface RepeaterInnerProps<ContainerExtraProps, ItemExtraProps> extends
 }
 
 // @public (undocumented)
-export const RepeaterItem: React.MemoExoticComponent<({ children, canBeRemoved, label, removalType, dragHandleComponent, index, ...rest }: RepeaterItemProps) => JSX.Element>;
+export const RepeaterItem: React.MemoExoticComponent<({ children, canBeRemoved, createNewEntity, label, removalType, dragHandleComponent, index, ...rest }: RepeaterItemProps) => JSX.Element>;
 
 // @public (undocumented)
 export type RepeaterItemOwnProps = {
@@ -4657,7 +4654,7 @@ export interface SimpleRelativeSingleFieldMetadata<Value extends FieldValue = Fi
 export type SimpleRelativeSingleFieldProps = SimpleRelativeSingleFieldProxyProps;
 
 // @internal (undocumented)
-export const SimpleRelativeSingleFieldProxy: React.MemoExoticComponent<({ render, defaultValue, isNonbearing, onBeforeUpdate, onInitialize, onUpdate, description, display, direction, evenly, horizontal, gap, label, labelDescription, labelPosition, reverse, useLabelElement, width, className, style, errors, field: fieldName, required, size, containerClassName, containerStyle, suppressErrors, ...rest }: SimpleRelativeSingleFieldProxyProps & SimpleRelativeSingleFieldProxyRendererProps) => JSX.Element>;
+export const SimpleRelativeSingleFieldProxy: React.MemoExoticComponent<({ render, defaultValue, isNonbearing, onBeforeUpdate, onInitialize, onUpdate, description, display, direction, evenly, footer, horizontal, gap, label, labelDescription, labelPosition, reverse, useLabelElement, width, className, componentClassName, style, errors, field: fieldName, required, size, containerClassName, containerStyle, suppressErrors, ...rest }: SimpleRelativeSingleFieldProxyProps & SimpleRelativeSingleFieldProxyRendererProps) => JSX.Element>;
 
 // @public (undocumented)
 export type SimpleRelativeSingleFieldProxyExcludeHandledProps<P extends SimpleRelativeSingleFieldProxyProps> = Omit<P, Exclude<keyof SugaredRelativeSingleField, RenderedSugaredRelativeSingleFieldKeys> | Exclude<keyof SimpleRelativeSingleFieldProxyExtraProps, RenderedSimpleRelativeSingleFieldProxyExtraPropsKeys> | Exclude<keyof SimpleRelativeSingleFieldProxyFieldContainerProps, RenderedSimpleRelativeSingleFieldProxyFieldContainerPropsKeys>>;

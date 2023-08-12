@@ -41,16 +41,16 @@
 	padding-right: max(var(--cui-table-container--overflow-padding-right, 0px), var(--cui-padding));
 }
 :where(
-	.cui-table-container > .cui-field-container-label,
-	.cui-table-container > .cui-field-container-label > .cui-field-container-body,
-	.cui-table-container > .cui-field-container-label > .cui-field-container-body > .cui-field-container-body-content,
+	.cui-table-container,
+	.cui-table-container > .cui-field-container-body,
+	.cui-table-container > .cui-field-container-body > .cui-field-container-body-content,
 ) {
 	display: flex;
 	flex: 1;
 	flex-direction: row;
 }
 
-:where(.cui-table-container > .cui-field-container-label) { overflow-x: auto }
+:where(.cui-table-container) { overflow-x: auto }
 
 :where(.cui-table-wrapper) {
 	border-radius: var(--cui-border-radius--controls, 0);

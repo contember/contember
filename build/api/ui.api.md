@@ -584,6 +584,14 @@ export type DeprecatedDividerSize = Size | 'xlarge' | 'none';
 // @public @deprecated (undocumented)
 export type DeprecatedFieldContainerLabelPosition = Default | 'labelLeft' | 'labelRight' | 'labelInlineLeft' | 'labelInlineRight';
 
+// @public (undocumented)
+export interface DeprecatedFieldContainerProps {
+    // @deprecated (undocumented)
+    direction?: StackProps['direction'];
+    // @deprecated (undocumented)
+    width?: 'column' | 'fluid' | 'none';
+}
+
 // @internal (undocumented)
 export type DeprecatedMessageProps = {
     lifted?: boolean;
@@ -1570,31 +1578,34 @@ export interface ErrorListProps {
 export type ErrorType = Error | unknown;
 
 // @public
-export const FieldContainer: MemoExoticComponent<({ children, className, description, errors, direction, display, evenly, gap, horizontal, label, labelDescription, labelPosition, required, reverse, size, style, useLabelElement, width, }: FieldContainerProps) => JSX.Element>;
+export const FieldContainer: MemoExoticComponent<({ children, className: classNameProp, componentClassName, description, errors, direction, display, footer, evenly, gap, horizontal, label, labelDescription, labelPosition, required, reverse, size, style, useLabelElement, width, }: FieldContainerProps) => JSX.Element>;
 
 // @public (undocumented)
 export type FieldContainerLabelPosition = 'bottom' | 'left' | 'right' | 'top' | DeprecatedFieldContainerLabelPosition;
 
 // @public (undocumented)
-export type FieldContainerProps = {
+export interface FieldContainerOwnProps extends ComponentClassNameProps {
     children: ReactNode;
     description?: ReactNode;
-    direction?: StackProps['direction'];
-    evenly?: StackProps['evenly'];
-    gap?: StackProps['gap'];
     display?: 'inline' | 'block';
+    evenly?: StackProps['evenly'];
+    footer?: ReactNode;
+    gap?: StackProps['gap'];
     horizontal?: StackProps['horizontal'];
     label: ReactNode;
     labelDescription?: ReactNode;
     labelPosition?: FieldContainerLabelPosition;
-    width?: 'column' | 'fluid' | 'none';
     required?: boolean;
-    size?: Size;
-    useLabelElement?: boolean;
     reverse?: StackProps['reverse'];
+    size?: Size;
+    // (undocumented)
     style?: CSSProperties;
-    className?: string;
-} & ErrorListProps;
+    useLabelElement?: boolean;
+}
+
+// @public (undocumented)
+export interface FieldContainerProps extends ErrorListProps, DeprecatedFieldContainerProps, FieldContainerOwnProps {
+}
 
 // @public (undocumented)
 export interface FieldError {

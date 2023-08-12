@@ -33,6 +33,7 @@
 }
 
 :where(.cui-repeater-item-container-label) {
+	color: rgb(var(--cui-color--strong-rgb-50));
 	font-weight: 800;
 }
 

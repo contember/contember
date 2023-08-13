@@ -1,7 +1,7 @@
 import { useClassName, useContainerWidth } from '@contember/react-utils'
 import { PolymorphicRef, assert, dataAttribute, isNotNullish } from '@contember/utilities'
-import { ElementType, forwardRef, memo, useEffect, useMemo, useRef } from 'react'
-import { GetLayoutPanelsStateContext, GetLayoutPanelsStateContextType, useGetLayoutPanelsStateContext, useSetLayoutPanelsStateContext } from './Contexts'
+import { ElementType, forwardRef, memo, useLayoutEffect, useMemo, useRef } from 'react'
+import { GetLayoutPanelsStateContext, GetLayoutPanelsStateContextType, useGetLayoutPanelsStateContext } from './Contexts'
 import { ContainerComponentType, ContainerProps, PanelConfig } from './Types'
 import { panelsStateAsDataAttributes } from './panelsStateAsDataAttributes'
 import { parsePanelsState } from './parsePanelsState'
@@ -19,7 +19,6 @@ export const ResponsiveContainer: ContainerComponentType = memo(forwardRef(<C ex
 }: ContainerProps<C>, forwardedRef: PolymorphicRef<C>) => {
 	const Container = as ?? 'div'
 	const layoutWidth = useContainerWidth()
-	const { update } = useSetLayoutPanelsStateContext()
 	const { currentlyActivePanel, panels } = useGetLayoutPanelsStateContext()
 
 	const previousResponsiveState = useRef<GetLayoutPanelsStateContextType>()
@@ -129,17 +128,11 @@ export const ResponsiveContainer: ContainerComponentType = memo(forwardRef(<C ex
 		([, { behavior, visibility }]) => behavior === 'modal' && visibility === 'visible',
 	), [responsiveState.panels])
 
-	useEffect(() => {
+	useLayoutEffect(() => {
 		if (currentlyActivePanel) {
 			panels.get(currentlyActivePanel)?.ref.current?.focus()
 		}
 	}, [panels, currentlyActivePanel])
-
-	useEffect(() => {
-		responsiveState.panels.forEach(config => {
-			update(config.name, { visibility: config.visibility })
-		})
-	}, [responsiveState.panels, update])
 
 	return (
 		<GetLayoutPanelsStateContext.Provider value={responsiveState}>

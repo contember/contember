@@ -47,28 +47,40 @@ export type CommonPanelConfigProps = {
 	priority?: number | null | undefined;
 }
 
-export interface ControlledPanelProps {
-	behavior: PanelBehavior | null | undefined;
-	defaultBehavior?: never;
-	defaultVisibility?: never;
+export interface ControlledBehaviorPanelProps {
+	behavior: PanelBehavior;
+	defaultBehavior?: null | undefined;
 	onBehaviorChange: (state: PanelState) => void;
-	onKeyPress?: (event: KeyboardEvent, state: PanelState) => void;
-	onVisibilityChange: (state: PanelState) => void;
-	visibility: PanelVisibility | null | undefined;
 }
-export interface UncontrolledPanelProps {
-	behavior?: never;
-	defaultBehavior: PanelBehavior | null | undefined;
-	defaultVisibility: PanelVisibility | null | undefined;
+
+export interface UncontrolledBehaviorPanelProps {
+	behavior?: null | undefined;
+	defaultBehavior: PanelBehavior;
 	onBehaviorChange?: (state: PanelState) => Partial<Omit<PanelState, 'behavior'>> | null | undefined | void;
-	onKeyPress?: (event: KeyboardEvent, state: PanelState) => Partial<PanelState> | null | undefined | void;
-	onVisibilityChange?: (state: PanelState) => Partial<Omit<PanelState, 'visibility'>> | null | undefined | void;
-	visibility?: never;
 }
+
+export interface ControlledVisibilityPanelProps {
+	defaultVisibility?: null | undefined;
+	onVisibilityChange: (state: PanelState) => void;
+	visibility: PanelVisibility;
+}
+
+export interface UncontrolledVisibilityPanelProps {
+	defaultVisibility: PanelVisibility;
+	onVisibilityChange?: (state: PanelState) => Partial<Omit<PanelState, 'visibility'>> | null | undefined | void;
+	visibility?: null | undefined;
+}
+
+export type ControlPanelProps =
+	& (ControlledBehaviorPanelProps | UncontrolledBehaviorPanelProps)
+	& (ControlledVisibilityPanelProps | UncontrolledVisibilityPanelProps)
+	& {
+		onKeyPress?: (event: KeyboardEvent, state: PanelState) => Partial<PanelState> | null | undefined | void;
+	}
 
 export type PanelConfigProps =
 	& CommonPanelConfigProps
-	& (ControlledPanelProps | UncontrolledPanelProps)
+	& ControlPanelProps
 
 export type OwnPanelProps =
 	& PanelBasicProps

@@ -239,22 +239,29 @@ export const ContentSlotTargets: Readonly<Readonly<{
 }>>;
 
 // @public (undocumented)
-interface ControlledPanelProps {
+interface ControlledBehaviorPanelProps {
     // (undocumented)
-    behavior: PanelBehavior | null | undefined;
+    behavior: PanelBehavior;
     // (undocumented)
-    defaultBehavior?: never;
-    // (undocumented)
-    defaultVisibility?: never;
+    defaultBehavior?: null | undefined;
     // (undocumented)
     onBehaviorChange: (state: PanelState) => void;
+}
+
+// @public (undocumented)
+interface ControlledVisibilityPanelProps {
     // (undocumented)
-    onKeyPress?: (event: KeyboardEvent, state: PanelState) => void;
+    defaultVisibility?: null | undefined;
     // (undocumented)
     onVisibilityChange: (state: PanelState) => void;
     // (undocumented)
-    visibility: PanelVisibility | null | undefined;
+    visibility: PanelVisibility;
 }
+
+// @public (undocumented)
+type ControlPanelProps = (ControlledBehaviorPanelProps | UncontrolledBehaviorPanelProps) & (ControlledVisibilityPanelProps | UncontrolledVisibilityPanelProps) & {
+    onKeyPress?: (event: KeyboardEvent, state: PanelState) => Partial<PanelState> | null | undefined | void;
+};
 
 // @public (undocumented)
 export function createLayoutBarComponent({ name, defaultAs, defaultComponentClassName, displayName, }: {
@@ -596,8 +603,11 @@ declare namespace LayoutPrimitives {
         PanelState,
         PanelBasicProps,
         CommonPanelConfigProps,
-        ControlledPanelProps,
-        UncontrolledPanelProps,
+        ControlledBehaviorPanelProps,
+        UncontrolledBehaviorPanelProps,
+        ControlledVisibilityPanelProps,
+        UncontrolledVisibilityPanelProps,
+        ControlPanelProps,
         PanelConfigProps,
         OwnPanelProps,
         PanelProps,
@@ -808,7 +818,7 @@ type PanelConfig = {
 };
 
 // @public (undocumented)
-type PanelConfigProps = CommonPanelConfigProps & (ControlledPanelProps | UncontrolledPanelProps);
+type PanelConfigProps = CommonPanelConfigProps & ControlPanelProps;
 
 // @public (undocumented)
 const PanelFooter: PanelFooterComponentType;
@@ -1166,21 +1176,23 @@ export type ToggleSidebarButtonProps = Omit<ComponentClassNameProps, 'children'>
 };
 
 // @public (undocumented)
-interface UncontrolledPanelProps {
+interface UncontrolledBehaviorPanelProps {
     // (undocumented)
-    behavior?: never;
+    behavior?: null | undefined;
     // (undocumented)
-    defaultBehavior: PanelBehavior | null | undefined;
-    // (undocumented)
-    defaultVisibility: PanelVisibility | null | undefined;
+    defaultBehavior: PanelBehavior;
     // (undocumented)
     onBehaviorChange?: (state: PanelState) => Partial<Omit<PanelState, 'behavior'>> | null | undefined | void;
+}
+
+// @public (undocumented)
+interface UncontrolledVisibilityPanelProps {
     // (undocumented)
-    onKeyPress?: (event: KeyboardEvent, state: PanelState) => Partial<PanelState> | null | undefined | void;
+    defaultVisibility: PanelVisibility;
     // (undocumented)
     onVisibilityChange?: (state: PanelState) => Partial<Omit<PanelState, 'visibility'>> | null | undefined | void;
     // (undocumented)
-    visibility?: never;
+    visibility?: null | undefined;
 }
 
 // @public (undocumented)

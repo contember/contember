@@ -46,6 +46,7 @@ export const LayoutComponent = ({ children, ...rest }: PropsWithChildren) => {
 		>
 			{targetsIfActive(['Navigation', 'Profile'], (
 				<LayoutKit.SidebarLeft
+					keepVisible
 					header={({ behavior }) => behavior === 'modal'
 						? (
 							<>
@@ -113,6 +114,7 @@ export const LayoutComponent = ({ children, ...rest }: PropsWithChildren) => {
 					return (
 						leftPanel?.behavior !== 'modal'
 							? <LayoutKit.SidebarRight
+								keepVisible
 								header={false}
 								body={targetsIfActive(['Sidebar']) || false}
 								footer={false}

@@ -233,6 +233,126 @@
 	stroke: none;
 }
 
+:where([data-overrides-lucide-icons] .lucide[scale="1"]) { --cui-scale: 1 }
+:where([data-overrides-lucide-icons] .lucide[scale^="1.0"]) { --cui-scale: 1.0 }
+:where([data-overrides-lucide-icons] .lucide[scale^="1.1"]) { --cui-scale: 1.1 }
+:where([data-overrides-lucide-icons] .lucide[scale^="1.2"]) { --cui-scale: 1.2 }
+:where([data-overrides-lucide-icons] .lucide[scale^="1.3"]) { --cui-scale: 1.3 }
+:where([data-overrides-lucide-icons] .lucide[scale^="1.4"]) { --cui-scale: 1.4 }
+:where([data-overrides-lucide-icons] .lucide[scale^="1.5"]) { --cui-scale: 1.5 }
+:where([data-overrides-lucide-icons] .lucide[scale^="1.6"]) { --cui-scale: 1.6 }
+:where([data-overrides-lucide-icons] .lucide[scale^="1.7"]) { --cui-scale: 1.7 }
+:where([data-overrides-lucide-icons] .lucide[scale^="1.8"]) { --cui-scale: 1.8 }
+:where([data-overrides-lucide-icons] .lucide[scale^="1.9"]) { --cui-scale: 1.9 }
+
+:where([data-overrides-lucide-icons] .lucide[scale="2"]) { --cui-scale: 2 }
+:where([data-overrides-lucide-icons] .lucide[scale^="2.0"]) { --cui-scale: 2.0 }
+:where([data-overrides-lucide-icons] .lucide[scale^="2.1"]) { --cui-scale: 2.1 }
+:where([data-overrides-lucide-icons] .lucide[scale^="2.2"]) { --cui-scale: 2.2 }
+:where([data-overrides-lucide-icons] .lucide[scale^="2.3"]) { --cui-scale: 2.3 }
+:where([data-overrides-lucide-icons] .lucide[scale^="2.4"]) { --cui-scale: 2.4 }
+:where([data-overrides-lucide-icons] .lucide[scale^="2.5"]) { --cui-scale: 2.5 }
+:where([data-overrides-lucide-icons] .lucide[scale^="2.6"]) { --cui-scale: 2.6 }
+:where([data-overrides-lucide-icons] .lucide[scale^="2.7"]) { --cui-scale: 2.7 }
+:where([data-overrides-lucide-icons] .lucide[scale^="2.8"]) { --cui-scale: 2.8 }
+:where([data-overrides-lucide-icons] .lucide[scale^="2.9"]) { --cui-scale: 2.9 }
+
+:where([data-overrides-lucide-icons] .lucide[scale="3"]) { --cui-scale: 3 }
+:where([data-overrides-lucide-icons] .lucide[scale^="3.0"]) { --cui-scale: 3.0 }
+:where([data-overrides-lucide-icons] .lucide[scale^="3.1"]) { --cui-scale: 3.1 }
+:where([data-overrides-lucide-icons] .lucide[scale^="3.2"]) { --cui-scale: 3.2 }
+:where([data-overrides-lucide-icons] .lucide[scale^="3.3"]) { --cui-scale: 3.3 }
+:where([data-overrides-lucide-icons] .lucide[scale^="3.4"]) { --cui-scale: 3.4 }
+:where([data-overrides-lucide-icons] .lucide[scale^="3.5"]) { --cui-scale: 3.5 }
+:where([data-overrides-lucide-icons] .lucide[scale^="3.6"]) { --cui-scale: 3.6 }
+:where([data-overrides-lucide-icons] .lucide[scale^="3.7"]) { --cui-scale: 3.7 }
+:where([data-overrides-lucide-icons] .lucide[scale^="3.8"]) { --cui-scale: 3.8 }
+:where([data-overrides-lucide-icons] .lucide[scale^="3.9"]) { --cui-scale: 3.9 }
+
+:where([data-overrides-lucide-icons] .lucide[scale="4"]) { --cui-scale: 4 }
+:where([data-overrides-lucide-icons] .lucide[scale^="4.0"]) { --cui-scale: 4.0 }
+:where([data-overrides-lucide-icons] .lucide[scale^="4.1"]) { --cui-scale: 4.1 }
+:where([data-overrides-lucide-icons] .lucide[scale^="4.2"]) { --cui-scale: 4.2 }
+:where([data-overrides-lucide-icons] .lucide[scale^="4.3"]) { --cui-scale: 4.3 }
+:where([data-overrides-lucide-icons] .lucide[scale^="4.4"]) { --cui-scale: 4.4 }
+:where([data-overrides-lucide-icons] .lucide[scale^="4.5"]) { --cui-scale: 4.5 }
+:where([data-overrides-lucide-icons] .lucide[scale^="4.6"]) { --cui-scale: 4.6 }
+:where([data-overrides-lucide-icons] .lucide[scale^="4.7"]) { --cui-scale: 4.7 }
+:where([data-overrides-lucide-icons] .lucide[scale^="4.8"]) { --cui-scale: 4.8 }
+:where([data-overrides-lucide-icons] .lucide[scale^="4.9"]) { --cui-scale: 4.9 }
+
+:where([data-overrides-lucide-icons] .lucide[scale="5"]) { --cui-scale: 5 }
+:where([data-overrides-lucide-icons] .lucide[scale^="5.0"]) { --cui-scale: 5.0 }
+:where([data-overrides-lucide-icons] .lucide[scale^="5.1"]) { --cui-scale: 5.1 }
+:where([data-overrides-lucide-icons] .lucide[scale^="5.2"]) { --cui-scale: 5.2 }
+:where([data-overrides-lucide-icons] .lucide[scale^="5.3"]) { --cui-scale: 5.3 }
+:where([data-overrides-lucide-icons] .lucide[scale^="5.4"]) { --cui-scale: 5.4 }
+:where([data-overrides-lucide-icons] .lucide[scale^="5.5"]) { --cui-scale: 5.5 }
+:where([data-overrides-lucide-icons] .lucide[scale^="5.6"]) { --cui-scale: 5.6 }
+:where([data-overrides-lucide-icons] .lucide[scale^="5.7"]) { --cui-scale: 5.7 }
+:where([data-overrides-lucide-icons] .lucide[scale^="5.8"]) { --cui-scale: 5.8 }
+:where([data-overrides-lucide-icons] .lucide[scale^="5.9"]) { --cui-scale: 5.9 }
+
+:where([data-overrides-lucide-icons] .lucide[scale="6"]) { --cui-scale: 6 }
+:where([data-overrides-lucide-icons] .lucide[scale^="6.0"]) { --cui-scale: 6.0 }
+:where([data-overrides-lucide-icons] .lucide[scale^="6.1"]) { --cui-scale: 6.1 }
+:where([data-overrides-lucide-icons] .lucide[scale^="6.2"]) { --cui-scale: 6.2 }
+:where([data-overrides-lucide-icons] .lucide[scale^="6.3"]) { --cui-scale: 6.3 }
+:where([data-overrides-lucide-icons] .lucide[scale^="6.4"]) { --cui-scale: 6.4 }
+:where([data-overrides-lucide-icons] .lucide[scale^="6.5"]) { --cui-scale: 6.5 }
+:where([data-overrides-lucide-icons] .lucide[scale^="6.6"]) { --cui-scale: 6.6 }
+:where([data-overrides-lucide-icons] .lucide[scale^="6.7"]) { --cui-scale: 6.7 }
+:where([data-overrides-lucide-icons] .lucide[scale^="6.8"]) { --cui-scale: 6.8 }
+:where([data-overrides-lucide-icons] .lucide[scale^="6.9"]) { --cui-scale: 6.9 }
+
+:where([data-overrides-lucide-icons] .lucide[scale="7"]) { --cui-scale: 7 }
+:where([data-overrides-lucide-icons] .lucide[scale^="7.0"]) { --cui-scale: 7.0 }
+:where([data-overrides-lucide-icons] .lucide[scale^="7.1"]) { --cui-scale: 7.1 }
+:where([data-overrides-lucide-icons] .lucide[scale^="7.2"]) { --cui-scale: 7.2 }
+:where([data-overrides-lucide-icons] .lucide[scale^="7.3"]) { --cui-scale: 7.3 }
+:where([data-overrides-lucide-icons] .lucide[scale^="7.4"]) { --cui-scale: 7.4 }
+:where([data-overrides-lucide-icons] .lucide[scale^="7.5"]) { --cui-scale: 7.5 }
+:where([data-overrides-lucide-icons] .lucide[scale^="7.6"]) { --cui-scale: 7.6 }
+:where([data-overrides-lucide-icons] .lucide[scale^="7.7"]) { --cui-scale: 7.7 }
+:where([data-overrides-lucide-icons] .lucide[scale^="7.8"]) { --cui-scale: 7.8 }
+:where([data-overrides-lucide-icons] .lucide[scale^="7.9"]) { --cui-scale: 7.9 }
+
+:where([data-overrides-lucide-icons] .lucide[scale="8"]) { --cui-scale: 8 }
+:where([data-overrides-lucide-icons] .lucide[scale^="8.0"]) { --cui-scale: 8.0 }
+:where([data-overrides-lucide-icons] .lucide[scale^="8.1"]) { --cui-scale: 8.1 }
+:where([data-overrides-lucide-icons] .lucide[scale^="8.2"]) { --cui-scale: 8.2 }
+:where([data-overrides-lucide-icons] .lucide[scale^="8.3"]) { --cui-scale: 8.3 }
+:where([data-overrides-lucide-icons] .lucide[scale^="8.4"]) { --cui-scale: 8.4 }
+:where([data-overrides-lucide-icons] .lucide[scale^="8.5"]) { --cui-scale: 8.5 }
+:where([data-overrides-lucide-icons] .lucide[scale^="8.6"]) { --cui-scale: 8.6 }
+:where([data-overrides-lucide-icons] .lucide[scale^="8.7"]) { --cui-scale: 8.7 }
+:where([data-overrides-lucide-icons] .lucide[scale^="8.8"]) { --cui-scale: 8.8 }
+:where([data-overrides-lucide-icons] .lucide[scale^="8.9"]) { --cui-scale: 8.9 }
+
+:where([data-overrides-lucide-icons] .lucide[scale="9"]) { --cui-scale: 9 }
+:where([data-overrides-lucide-icons] .lucide[scale^="9.0"]) { --cui-scale: 9.0 }
+:where([data-overrides-lucide-icons] .lucide[scale^="9.1"]) { --cui-scale: 9.1 }
+:where([data-overrides-lucide-icons] .lucide[scale^="9.2"]) { --cui-scale: 9.2 }
+:where([data-overrides-lucide-icons] .lucide[scale^="9.3"]) { --cui-scale: 9.3 }
+:where([data-overrides-lucide-icons] .lucide[scale^="9.4"]) { --cui-scale: 9.4 }
+:where([data-overrides-lucide-icons] .lucide[scale^="9.5"]) { --cui-scale: 9.5 }
+:where([data-overrides-lucide-icons] .lucide[scale^="9.6"]) { --cui-scale: 9.6 }
+:where([data-overrides-lucide-icons] .lucide[scale^="9.7"]) { --cui-scale: 9.7 }
+:where([data-overrides-lucide-icons] .lucide[scale^="9.8"]) { --cui-scale: 9.8 }
+:where([data-overrides-lucide-icons] .lucide[scale^="9.9"]) { --cui-scale: 9.9 }
+
+:where([data-overrides-lucide-icons] .lucide[scale="10"]) { --cui-scale: 10 }
+:where([data-overrides-lucide-icons] .lucide[scale^="10.0"]) { --cui-scale: 10.0 }
+:where([data-overrides-lucide-icons] .lucide[scale^="10.1"]) { --cui-scale: 10.1 }
+:where([data-overrides-lucide-icons] .lucide[scale^="10.2"]) { --cui-scale: 10.2 }
+:where([data-overrides-lucide-icons] .lucide[scale^="10.3"]) { --cui-scale: 10.3 }
+:where([data-overrides-lucide-icons] .lucide[scale^="10.4"]) { --cui-scale: 10.4 }
+:where([data-overrides-lucide-icons] .lucide[scale^="10.5"]) { --cui-scale: 10.5 }
+:where([data-overrides-lucide-icons] .lucide[scale^="10.6"]) { --cui-scale: 10.6 }
+:where([data-overrides-lucide-icons] .lucide[scale^="10.7"]) { --cui-scale: 10.7 }
+:where([data-overrides-lucide-icons] .lucide[scale^="10.8"]) { --cui-scale: 10.8 }
+:where([data-overrides-lucide-icons] .lucide[scale^="10.9"]) { --cui-scale: 10.9 }
+
 :where(.dangerously-remove-native-focus-outline) {
 	outline: none;
 }

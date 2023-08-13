@@ -260,7 +260,9 @@ interface ControlledVisibilityPanelProps {
 
 // @public (undocumented)
 type ControlPanelProps = (ControlledBehaviorPanelProps | UncontrolledBehaviorPanelProps) & (ControlledVisibilityPanelProps | UncontrolledVisibilityPanelProps) & {
-    onKeyPress?: (event: KeyboardEvent, state: PanelState) => Partial<PanelState> | null | undefined | void;
+    onKeyPress?: (event: KeyboardEvent, state: PanelState) => Partial<PanelState> & {
+        passive?: boolean;
+    } | null | undefined | void;
 };
 
 // @public (undocumented)
@@ -572,6 +574,7 @@ declare namespace LayoutPrimitives {
         SetLayoutPanelVisibility,
         RegisterLayoutPanel,
         UnregisterLayoutPanel,
+        UpdateLayoutPanelConfig,
         UpdateLayoutPanel,
         SetLayoutPanelsStateContextType,
         SetLayoutPanelsStateContext,
@@ -1182,7 +1185,9 @@ interface UncontrolledBehaviorPanelProps {
     // (undocumented)
     defaultBehavior: PanelBehavior;
     // (undocumented)
-    onBehaviorChange?: (state: PanelState) => Partial<Omit<PanelState, 'behavior'>> | null | undefined | void;
+    onBehaviorChange?: (state: PanelState) => Partial<Omit<PanelState, 'behavior'>> & {
+        passive?: boolean;
+    } | null | undefined | void;
 }
 
 // @public (undocumented)
@@ -1190,7 +1195,9 @@ interface UncontrolledVisibilityPanelProps {
     // (undocumented)
     defaultVisibility: PanelVisibility;
     // (undocumented)
-    onVisibilityChange?: (state: PanelState) => Partial<Omit<PanelState, 'visibility'>> | null | undefined | void;
+    onVisibilityChange?: (state: PanelState) => Partial<Omit<PanelState, 'visibility'>> & {
+        passive?: boolean;
+    } | null | undefined | void;
     // (undocumented)
     visibility?: null | undefined;
 }
@@ -1202,7 +1209,12 @@ type UnregisterLayoutPanel = LayoutPanelCallback;
 type UnregisterSlotTarget = (id: string, name: string) => void;
 
 // @public (undocumented)
-type UpdateLayoutPanel = (name: string, config: Partial<Omit<PanelConfig, 'name'>> | null | undefined | void) => void;
+type UpdateLayoutPanel = (name: string, config: UpdateLayoutPanelConfig | null | undefined | void) => void;
+
+// @public (undocumented)
+type UpdateLayoutPanelConfig = Partial<Omit<PanelConfig, 'name'> & {
+    passive?: boolean;
+}>;
 
 // @public (undocumented)
 const useActiveSlotPortalsContext: () => ActiveSlotPortalsContextType;

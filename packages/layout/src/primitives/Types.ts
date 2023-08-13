@@ -56,7 +56,7 @@ export interface ControlledBehaviorPanelProps {
 export interface UncontrolledBehaviorPanelProps {
 	behavior?: null | undefined;
 	defaultBehavior: PanelBehavior;
-	onBehaviorChange?: (state: PanelState) => Partial<Omit<PanelState, 'behavior'>> | null | undefined | void;
+	onBehaviorChange?: (state: PanelState) => Partial<Omit<PanelState, 'behavior'>> & { passive?: boolean } | null | undefined | void;
 }
 
 export interface ControlledVisibilityPanelProps {
@@ -67,7 +67,7 @@ export interface ControlledVisibilityPanelProps {
 
 export interface UncontrolledVisibilityPanelProps {
 	defaultVisibility: PanelVisibility;
-	onVisibilityChange?: (state: PanelState) => Partial<Omit<PanelState, 'visibility'>> | null | undefined | void;
+	onVisibilityChange?: (state: PanelState) => Partial<Omit<PanelState, 'visibility'>> & { passive?: boolean } | null | undefined | void;
 	visibility?: null | undefined;
 }
 
@@ -75,7 +75,7 @@ export type ControlPanelProps =
 	& (ControlledBehaviorPanelProps | UncontrolledBehaviorPanelProps)
 	& (ControlledVisibilityPanelProps | UncontrolledVisibilityPanelProps)
 	& {
-		onKeyPress?: (event: KeyboardEvent, state: PanelState) => Partial<PanelState> | null | undefined | void;
+		onKeyPress?: (event: KeyboardEvent, state: PanelState) => Partial<PanelState> & { passive?: boolean } | null | undefined | void;
 	}
 
 export type PanelConfigProps =

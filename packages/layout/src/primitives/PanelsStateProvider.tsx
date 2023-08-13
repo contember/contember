@@ -75,7 +75,20 @@ export const PanelsStateProvider = memo<{ children: ReactNode }>(({ children }) 
 					assert('config has no property "name"', config, (value: typeof config): value is Partial<Omit<PanelConfig, 'name'>> => {
 						return !('name' in config)
 					})
-					updatePanels(panel, previous => ({ ...previous, ...config }))
+
+					const passive = config.passive ?? true
+
+					updatePanels(panel, previous => {
+						if (!passive && config.visibility && previous.visibility !== config.visibility) {
+							if (config.visibility === 'visible') {
+								setCurrentlyActivePanel(panel)
+							} else if (previous.visibility === 'visible') {
+								setCurrentlyActivePanel(deactivateIfPanelMatches(panel))
+							}
+						}
+
+						return ({ ...previous, ...config })
+					})
 				}
 			},
 		}

@@ -26,6 +26,7 @@ export const RepeaterItemContainer = memo(forwardRef<HTMLDivElement, RepeaterIte
 			{...rest}
 			className={componentClassName()}
 			gap={gap ?? 'gutter'}
+			data-index={dataAttribute(index)}
 			data-sortable={dataAttribute(!!Handle)}
 			header={isNumber(index) || label || actions
 				? (<RepeaterItemContainerHeader index={index} label={label} actions={actions} />)
@@ -57,16 +58,18 @@ export const RepeaterItemContainerHeader = memo(({ label, actions, index }: Repe
 
 	return (
 		<>
-			{(label || index !== undefined) && (
-				<div className={componentClassName('label')}>
-					<Label>
+			{(typeof label === 'string' || typeof label === 'number' || typeof label === 'boolean' || label == null)
+				? (label || index !== undefined) && (
+					<Label className={componentClassName('label')}>
 						{label}{label ? ' ' : ''}
 						{index !== undefined && (
 							<span className={componentClassName('index')}>{index + 1}</span>
 						)}
 					</Label>
-				</div>
-			)}
+				)
+				: label
+			}
+
 			{actions && (
 				<div className={componentClassName('actions')}>{actions}</div>
 			)}

@@ -5,6 +5,13 @@ import { Literal, QueryBuilder, SelectBuilder } from '@contember/database'
 import { getColumnName, getTargetEntity } from '@contember/schema-utils'
 import { UserError } from '../../exception'
 
+const orderByMapping = {
+	asc: 'asc',
+	desc: 'desc',
+	ascNullsFirst: 'asc nulls first',
+	descNullsLast: 'desc nulls last',
+} as const
+
 export class OrderByBuilder {
 	constructor(private readonly schema: Model.Schema, private readonly joinBuilder: JoinBuilder) {}
 
@@ -56,7 +63,7 @@ export class OrderByBuilder {
 		if (typeof value === 'string') {
 			const columnName = getColumnName(this.schema, entity, fieldName)
 			const applyOrder = <Orderable extends QueryBuilder.Orderable<any>>(orderable: Orderable) =>
-				orderable.orderBy([path.alias, columnName], value)
+				orderable.orderBy([path.alias, columnName], orderByMapping[value])
 
 			qb = applyOrder(qb)
 			if (orderable !== null) {

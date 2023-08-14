@@ -3,7 +3,12 @@ import { Model } from '@contember/schema'
 
 const orderBySchema = Typesafe.array(Typesafe.object({
 	path: Typesafe.array(Typesafe.string),
-	direction: Typesafe.enumeration<Model.OrderDirection>(Model.OrderDirection.asc, Model.OrderDirection.desc),
+	direction: Typesafe.enumeration<Model.OrderDirection>(
+		Model.OrderDirection.asc,
+		Model.OrderDirection.desc,
+		Model.OrderDirection.ascNullsFirst,
+		Model.OrderDirection.descNullsLast,
+	),
 }))
 const joiningColumnSchema = Typesafe.object({
 	columnName: Typesafe.string,

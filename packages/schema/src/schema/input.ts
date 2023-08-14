@@ -152,9 +152,12 @@ export namespace Input {
 
 	export enum OrderDirection {
 		asc = 'asc',
-		ascNullFirst = 'asc nulls first',
+		ascNullsFirst = 'ascNullsFirst',
 		desc = 'desc',
-		descNullsLast = 'desc nulls last'
+		descNullsLast = 'descNullsLast',
+
+		/** @deprecated use ascNullsFirst */
+		ascNullFirst = 'ascNullsFirst',
 	}
 
 	// generics required by admin

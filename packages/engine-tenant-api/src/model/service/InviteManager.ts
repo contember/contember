@@ -7,7 +7,7 @@ import {
 } from '../commands'
 import { Providers } from '../providers'
 import { PersonQuery, PersonRow } from '../queries'
-import { Project } from '../type'
+import { Project, ProjectSchemaResolver } from '../type'
 import { InviteErrorCode, InviteMethod } from '../../schema'
 import { TenantRole } from '../authorization'
 import { UserMailer } from '../mailing'
@@ -35,6 +35,7 @@ export class InviteManager {
 	constructor(
 		private readonly providers: Providers,
 		private readonly mailer: UserMailer,
+		private readonly projectSchemaResolver: ProjectSchemaResolver,
 	) {}
 
 	async invite(
@@ -70,11 +71,11 @@ export class InviteManager {
 					password: passwordWrapper,
 				}))
 				if (method === 'RESET_PASSWORD') {
-					const result = await trx.commandBus.execute(new CreatePasswordResetRequestCommand(person.id, INVITATION_RESET_TOKEN_EXPIRATION_MINUTES))
+					const result = await trx.commandBus.execute(new CreatePasswordResetRequestCommand(person.id, await this.getInviteExpiration(project.slug)))
 					resetToken = result.token
 				}
 				if (passwordResetTokenHash) {
-					await trx.commandBus.execute(new SavePasswordResetRequestCommand(person.id, passwordResetTokenHash, INVITATION_RESET_TOKEN_EXPIRATION_MINUTES))
+					await trx.commandBus.execute(new SavePasswordResetRequestCommand(person.id, passwordResetTokenHash, await this.getInviteExpiration(project.slug)))
 				}
 			}
 			for (const membershipUpdate of createAppendMembershipVariables(memberships)) {
@@ -97,6 +98,12 @@ export class InviteManager {
 			}
 			return new ResponseOk(new InviteResult(person, isNew))
 		})
+	}
+
+	private async getInviteExpiration(projectSlug: string): Promise<number> {
+		const schema = await this.projectSchemaResolver.getSchema(projectSlug)
+
+		return schema?.settings.tenant?.inviteExpirationMinutes ?? INVITATION_RESET_TOKEN_EXPIRATION_MINUTES
 	}
 }
 

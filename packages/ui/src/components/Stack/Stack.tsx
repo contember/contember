@@ -11,11 +11,11 @@ export interface StackOwnProps {
 	basis?: CSSProperties['flexBasis'],
 	children?: ReactNode,
 	/** @deprecated Use `horizontal` and `reverse` props instead */
-	direction?: 'vertical' | 'horizontal' | 'vertical-reverse' | 'horizontal-reverse',
+	direction?: 'vertical' | 'horizontal' | 'vertical-reverse' | 'horizontal-reverse'
 	evenly?: boolean,
-	gap?: boolean | 'gap' | 'gutter' | 'padding' | 'large' | 'larger' | DeprecatedStackSize,
-	grow?: boolean | CSSProperties['flexGrow'],
-	horizontal?: boolean,
+	gap?: boolean | 'gap' | 'gutter' | 'padding' | 'large' | 'larger' | DeprecatedStackSize
+	grow?: boolean | CSSProperties['flexGrow']
+	horizontal?: boolean
 	justify?:
 	| 'center'
 	| 'start'
@@ -27,10 +27,10 @@ export interface StackOwnProps {
 	| 'inherit'
 	| 'initial'
 	| 'revert'
-	reverse?: boolean,
-	shrink?: boolean | CSSProperties['flexShrink'],
+	reverse?: boolean
+	shrink?: boolean | CSSProperties['flexShrink']
 	style?: CSSProperties,
-	wrap?: boolean | 'reverse',
+	wrap?: boolean | 'reverse'
 }
 
 export type StackProps =
@@ -76,10 +76,14 @@ export const Stack = memo(forwardRef<HTMLDivElement, StackProps>(({
 	deprecate('1.3.0', gap === 'default', '`gap="default"`', 'omit the `gap` prop')
 	gap = fallback(gap, gap === 'default', true)
 
-	deprecate('1.3.0', isDefined(direction), '`direction` prop', '`horizontal` and `reverse` props')
-	horizontal = fallback(horizontal, direction === 'horizontal' || direction === 'horizontal-reverse', true)
-	horizontal = fallback(horizontal, direction === 'vertical' || direction === 'vertical-reverse', false)
+	deprecate('1.3.0', direction === 'horizontal-reverse', '`direction="horizontal-reverse"`', '`horizontal` and `reverse` props')
+	deprecate('1.3.0', direction === 'vertical-reverse', '`direction="vertical-reverse"`', 'reverse` prop')
 	reverse = fallback(reverse, direction === 'horizontal-reverse' || direction === 'vertical-reverse', true)
+
+	// NOTE: When finally removing the direction prop, keep local variable `direction` for `data-direction` attribute
+	direction = fallback(direction, isDefined(horizontal), horizontal ? 'horizontal' : 'vertical')
+	direction = fallback(direction, direction === 'horizontal-reverse', 'horizontal')
+	direction = fallback(direction, direction === 'vertical-reverse', 'vertical')
 
 	const componentClassName = useClassNameFactory('stack')
 	const style: CSSProperties = useMemo(() => ({
@@ -97,7 +101,7 @@ export const Stack = memo(forwardRef<HTMLDivElement, StackProps>(({
 				data-evenly={dataAttribute(evenly)}
 				data-gap={dataAttribute(gap)}
 				data-grow={dataAttribute(grow)}
-				data-horizontal={dataAttribute(horizontal)}
+				data-direction={dataAttribute(direction)}
 				data-justify={dataAttribute(justify)}
 				data-reverse={dataAttribute(reverse)}
 				data-shrink={dataAttribute(shrink)}

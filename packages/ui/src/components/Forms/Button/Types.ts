@@ -43,8 +43,12 @@ export type BaseButtonProps = ButtonOwnProps & (ButtonBasedProps | AnchorBasedPr
 
 export interface ButtonListProps extends ComponentClassNameProps, DeprecatedButtonListProps {
 	children?: ReactNode
+	direction?: 'horizontal' | 'vertical'
 	display?: 'block' | 'inline'
 	gap?: boolean | 'gap' | 'gutter' | 'padding' | 'large' | 'larger'
+	/**
+	 * @deprecated Use `direction` instead
+	 */
 	orientation?: 'horizontal' | 'vertical' | DeprecatedButtonDefault
 	size?: 'small' | 'medium' | 'large' | DeprecatedButtonDefault
 }
@@ -52,8 +56,12 @@ export interface ButtonListProps extends ComponentClassNameProps, DeprecatedButt
 export interface ButtonGroupProps extends ComponentClassNameProps, DeprecatedButtonGroupProps {
 	borderRadius?: boolean | 'gap' | 'gutter' | 'padding' | 'full'
 	children?: ReactNode
+	direction?: 'horizontal' | 'vertical'
 	display?: 'block' | 'inline'
 	focusRing?: boolean
+	/**
+	 * @deprecated Use `direction` instead
+	 */
 	orientation?: 'horizontal' | 'vertical' | DeprecatedButtonDefault
 	size?: 'small' | 'medium' | 'large' | DeprecatedButtonDefault
 }

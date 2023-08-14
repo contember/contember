@@ -304,8 +304,8 @@
 	flex-grow: 1;
 }
 
-:where(.cui-button-list[data-orientation="vertical"]),
-:where(.cui-button-group[data-orientation="vertical"]) {
+:where(.cui-button-list[data-direction="vertical"]),
+:where(.cui-button-group[data-direction="vertical"]) {
 	align-items: stretch;
 	flex-direction: column;
 }
@@ -335,37 +335,37 @@
 	border-bottom-right-radius: 0;
 }
 
-:where(.cui-button-group[data-orientation="horizontal"] > :not(:first-child):not(:last-child)) {
+:where(.cui-button-group[data-direction="horizontal"] > :not(:first-child):not(:last-child)) {
 	border-left: none;
 	border-right: none;
 	border-radius: 0;
 }
 
-:where(.cui-button-group[data-orientation="horizontal"] > :first-child:not(:last-child)) {
+:where(.cui-button-group[data-direction="horizontal"] > :first-child:not(:last-child)) {
 	border-top-right-radius: 0;
 	border-bottom-right-radius: 0;
 	border-right: none;
 }
 
-:where(.cui-button-group[data-orientation="horizontal"] > :last-child:not(:first-child)) {
+:where(.cui-button-group[data-direction="horizontal"] > :last-child:not(:first-child)) {
 	border-top-left-radius: 0;
 	border-bottom-left-radius: 0;
 	border-left: none;
 }
 
-:where(.cui-button-group[data-orientation="vertical"] > :not(:first-child):not(:last-child)) {
+:where(.cui-button-group[data-direction="vertical"] > :not(:first-child):not(:last-child)) {
 	border-top: none;
 	border-bottom: none;
 	border-radius: 0;
 }
 
-:where(.cui-button-group[data-orientation="vertical"] > :first-child:not(:last-child)) {
+:where(.cui-button-group[data-direction="vertical"] > :first-child:not(:last-child)) {
 	border-bottom-left-radius: 0;
 	border-bottom-right-radius: 0;
 	border-bottom: none;
 }
 
-:where(.cui-button-group[data-orientation="vertical"] > :last-child:not(:first-child)) {
+:where(.cui-button-group[data-direction="vertical"] > :last-child:not(:first-child)) {
 	border-top-left-radius: 0;
 	border-top-right-radius: 0;
 	border-top: none;

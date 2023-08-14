@@ -82,9 +82,16 @@
 	border-radius: var(--cui-border-radius--controls);
 	resize: none;
 	flex-basis: 2em;
-	flex-grow: 1;
 	overflow: hidden;
 	line-height: var(--cui-control-line-height);
+	/* [NOTE]: This keeps the input within the flex-box container bounds in Firefox & Safari, Chrome seems to be working fine */
+	width: 100%;
+}
+
+:where([data-direction="horizontal"] > .cui-textarea-input),
+:where([data-direction="horizontal"] > .cui-slug-input),
+:where([data-direction="horizontal"] > .cui-text-input) {
+	flex: 1 1 min-content;
 }
 
 :where(.cui-root .cui-textarea-input),

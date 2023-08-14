@@ -12,12 +12,10 @@
 	flex-direction: column-reverse;
 }
 
-:where(.cui-stack[data-horizontal]) {
-	flex-direction: row;
-}
-:where(.cui-stack[data-horizontal][data-reverse]) {
-	flex-direction: row-reverse;
-}
+:where(.cui-stack[data-direction="vertical"]) { flex-direction: column }
+:where(.cui-stack[data-direction="vertical"][data-reverse]) { flex-direction: column-reverse }
+:where(.cui-stack[data-direction="horizontal"]) { flex-direction: row }
+:where(.cui-stack[data-direction="horizontal"][data-reverse]) { flex-direction: row-reverse }
 
 :where(.cui-stack[data-gap]) { --cui-stack-gap: var(--cui-padding) }
 :where(.cui-stack[data-gap="gap"]) { --cui-stack-gap: var(--cui-gap) }

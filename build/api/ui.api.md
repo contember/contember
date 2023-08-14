@@ -218,7 +218,7 @@ export type ButtonElevation = Default | 'none';
 export type ButtonFlow = Default | 'circular' | 'squarish' | 'generous' | 'block' | 'generousBlock';
 
 // @public (undocumented)
-export const ButtonGroup: MemoExoticComponent<({ borderRadius, children, className, componentClassName, display, focusRing, flow, isTopToolbar, orientation, size, }: ButtonGroupProps) => JSX.Element>;
+export const ButtonGroup: MemoExoticComponent<({ borderRadius, children, className, componentClassName, display, focusRing, flow, isTopToolbar, orientation, direction, size, }: ButtonGroupProps) => JSX.Element>;
 
 // @public @deprecated (undocumented)
 export type ButtonGroupFlow = Default | 'block';
@@ -233,17 +233,19 @@ export interface ButtonGroupProps extends ComponentClassNameProps, DeprecatedBut
     // (undocumented)
     children?: ReactNode;
     // (undocumented)
+    direction?: 'horizontal' | 'vertical';
+    // (undocumented)
     display?: 'block' | 'inline';
     // (undocumented)
     focusRing?: boolean;
-    // (undocumented)
+    // @deprecated (undocumented)
     orientation?: 'horizontal' | 'vertical' | DeprecatedButtonDefault;
     // (undocumented)
     size?: 'small' | 'medium' | 'large' | DeprecatedButtonDefault;
 }
 
 // @public (undocumented)
-export const ButtonList: MemoExoticComponent<({ children, className, componentClassName, display, flow, gap, orientation, size, }: ButtonListProps) => JSX.Element>;
+export const ButtonList: MemoExoticComponent<({ children, className, componentClassName, display, flow, gap, orientation, direction, size, }: ButtonListProps) => JSX.Element>;
 
 // @public @deprecated (undocumented)
 export type ButtonListFlow = Default | 'inline' | 'block';
@@ -253,10 +255,12 @@ export interface ButtonListProps extends ComponentClassNameProps, DeprecatedButt
     // (undocumented)
     children?: ReactNode;
     // (undocumented)
+    direction?: 'horizontal' | 'vertical';
+    // (undocumented)
     display?: 'block' | 'inline';
     // (undocumented)
     gap?: boolean | 'gap' | 'gutter' | 'padding' | 'large' | 'larger';
-    // (undocumented)
+    // @deprecated (undocumented)
     orientation?: 'horizontal' | 'vertical' | DeprecatedButtonDefault;
     // (undocumented)
     size?: 'small' | 'medium' | 'large' | DeprecatedButtonDefault;

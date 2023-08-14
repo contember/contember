@@ -218,6 +218,9 @@ export const useObjectMemo: <A extends object>(value: A) => A;
 // @public (undocumented)
 export function useOnElementClickOutsideCallback(refOrElement: RefObjectOrElement<HTMLElement>, callback: (event: MouseEvent) => void): void;
 
+// @public
+export function useOnElementMouseEnterDelayedCallback(refOrElement: RefObjectOrElement<HTMLElement>, callback: (event: MouseEvent) => void, timeoutMs?: number): void;
+
 // @public (undocumented)
 export function useOnElementMutation(refOrElement: RefObjectOrElement<HTMLElement | undefined>, callback: MutationCallback, options?: MutationObserverInit): void;
 

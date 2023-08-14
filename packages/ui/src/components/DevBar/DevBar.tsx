@@ -27,6 +27,7 @@ export const DevBar = ({
 	useEffect(() => {
 		function handleKeyDown(event: KeyboardEvent) {
 			if (event.code === 'KeyJ' && (event.ctrlKey || event.metaKey)) {
+				event.preventDefault()
 				event.stopPropagation()
 
 				if (expanded) {
@@ -66,8 +67,10 @@ export const DevBar = ({
 			className={className(null)}
 			onKeyDown={event => {
 				if (event.code === 'Escape') {
-					if (expanded) {
+					event.preventDefault()
 						event.stopPropagation()
+
+					if (expanded) {
 						setExpanded(false)
 					} else if (document.activeElement && document.activeElement instanceof HTMLElement) {
 						document.activeElement.blur()
@@ -158,6 +161,7 @@ export const DevPanel = ({ heading, icon, children, preview }: {
 			})}
 			onKeyDown={useReferentiallyStableCallback(event => {
 				if (expanded && event.code === 'Escape') {
+					event.preventDefault()
 					event.stopPropagation()
 					handleClose()
 				}

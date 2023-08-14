@@ -4084,12 +4084,12 @@ export const RepeaterItem: React.MemoExoticComponent<React.ForwardRefExoticCompo
 
 // @public (undocumented)
 export type RepeaterItemOwnProps = {
-    label: ReactNode;
-    children: ReactNode;
     canBeRemoved?: boolean;
-    index: number;
+    children: ReactNode;
     createNewEntity: RepeaterCreateNewEntity;
     dragHandleComponent?: RepeaterItemContainerProps['dragHandleComponent'];
+    index: number;
+    label: ReactNode;
     removalType: RemovalType;
 };
 

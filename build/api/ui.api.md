@@ -54,7 +54,6 @@ import { RefObject } from 'react';
 import { SelectInstance } from 'react-select';
 import { StylesConfig } from 'react-select';
 import { SyntheticEvent } from 'react';
-import { TextareaAutosizeProps } from 'react-textarea-autosize';
 import { TextareaHTMLAttributes } from 'react';
 import { TouchEventHandler } from 'react';
 import { TransitionEventHandler } from 'react';
@@ -614,6 +613,14 @@ export type DeprecatedSpacerSize = Size | 'xlarge' | 'none';
 
 // @public @deprecated (undocumented)
 export type DeprecatedStackSize = Size | 'xlarge' | 'none';
+
+// @public (undocumented)
+export interface DeprecatedTextareaInputOwnProps {
+    // @deprecated (undocumented)
+    cacheMeasurements?: boolean;
+    // @deprecated (undocumented)
+    onHeightChange?: (height: number, ...args: any[]) => void;
+}
 
 // @public (undocumented)
 export const Description: MemoExoticComponent<({ className, children }: DescriptionProps) => JSX.Element>;
@@ -2783,23 +2790,24 @@ const Text_2: MemoExoticComponent<ForwardRefExoticComponent<TextProps<Function> 
 export { Text_2 as Text }
 
 // @public (undocumented)
-export const TextareaInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<string> & ControlValueProps<string, boolean> & TextareaInputOwnProps & {
-focusRing?: boolean | undefined;
-style?: TextareaAutosizeProps['style'];
-} & UnderlyingElementProps & RefAttributes<HTMLTextAreaElement>>>;
+export const TextareaInput: MemoExoticComponent<ForwardRefExoticComponent<(TextareaInputProps & UnderlyingElementProps) & RefAttributes<HTMLTextAreaElement>>>;
 
 // @public (undocumented)
-export interface TextareaInputOwnProps {
-    // (undocumented)
-    minRows?: number;
-    // (undocumented)
+export type TextareaInputOwnProps = {
     withTopToolbar?: boolean;
-}
+} & ({
+    maxRows?: number;
+    minRows?: number;
+    rows?: never;
+} | {
+    maxRows?: never;
+    minRows?: never;
+    rows?: number;
+});
 
 // @public (undocumented)
-export type TextareaInputProps = ControlProps<string> & TextareaInputOwnProps & {
+export type TextareaInputProps = ControlProps<string> & TextareaInputOwnProps & DeprecatedTextareaInputOwnProps & {
     focusRing?: boolean;
-    style?: TextareaAutosizeProps['style'];
 };
 
 // @public (undocumented)
@@ -3012,7 +3020,7 @@ export namespace Trio {
 }
 
 // @public (undocumented)
-export interface UnderlyingElementProps extends Omit<AllHTMLAttributes<HTMLTextAreaElement>, ControlPropsKeys<string>> {
+export interface UnderlyingElementProps extends Omit<AllHTMLAttributes<HTMLTextAreaElement>, ControlPropsKeys<string> | 'rows'> {
 }
 
 // @public (undocumented)

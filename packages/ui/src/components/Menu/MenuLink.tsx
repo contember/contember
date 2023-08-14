@@ -31,8 +31,6 @@ export function MenuLink({
 	...rest
 }: MenuLinkProps) {
 	const onClick: MouseEventHandler<HTMLAnchorElement> = useCallback(event => {
-		console.log('MenuLink onClick', event)
-
 		if (event.nativeEvent instanceof MouseEvent && !isSpecialLinkClick(event.nativeEvent) && event.nativeEvent.button === 0) {
 			onClickProp?.(event)
 		}

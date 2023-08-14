@@ -77,8 +77,8 @@ export default () => (
 		<Stack justify="stretch" horizontal>
 			<TextField {...extraDebugProps} containerClassName="theme-success-content theme-warn-controls" field={'notNullTextValue'} label={'Not null text'} />
 			<TextField {...extraDebugProps} field={'notNullTextValue'} label={'Not null text'} disabled />
+			<EmailField {...extraDebugProps} field={'emailValue'} label={'Your email'} />
 		</Stack>
-		<EmailField {...extraDebugProps} field={'emailValue'} label={'Your email'} />
 		<SearchField {...extraDebugProps} field={'searchValue'} label={'Search page'} />
 		<UrlField {...extraDebugProps} field={'urlValue'} label={'URL'} />
 		<SlugField {...extraDebugProps} required derivedFrom={'textValue'} field={'slugValue'} label={'Slug with prefix'} unpersistedHardPrefix="https://www.contember.com/" linkToExternalUrl />

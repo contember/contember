@@ -183,8 +183,8 @@ export class TenantContainerFactory {
 				new SignInManager(apiKeyManager, providers, otpAuthenticator))
 			.addService('membershipValidator', ({ projectSchemaResolver }) =>
 				new MembershipValidator(projectSchemaResolver))
-			.addService('inviteManager', ({ providers, userMailer }) =>
-				new InviteManager(providers, userMailer))
+			.addService('inviteManager', ({ providers, userMailer, projectSchemaResolver }) =>
+				new InviteManager(providers, userMailer, projectSchemaResolver))
 			.addService('otpManager', ({ otpAuthenticator }) =>
 				new OtpManager(otpAuthenticator))
 			.addService('mailTemplateManager', () =>

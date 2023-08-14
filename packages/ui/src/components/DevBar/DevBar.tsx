@@ -1,5 +1,5 @@
 import { Identity2023 } from '@contember/brand'
-import { createNonNullableContextFactory, useClassNameFactory, useId, useOnElementClickOutsideCallback, useReferentiallyStableCallback, useWindowSize } from '@contember/react-utils'
+import { createNonNullableContextFactory, useClassNameFactory, useId, useOnElementClickOutsideCallback, useOnElementMouseEnterDelayedCallback, useReferentiallyStableCallback, useWindowSize } from '@contember/react-utils'
 import { dataAttribute } from '@contember/utilities'
 import { ChevronLeftIcon, ExternalLinkIcon, XIcon } from 'lucide-react'
 import { PropsWithChildren, ReactNode, useEffect, useRef, useState } from 'react'
@@ -68,7 +68,7 @@ export const DevBar = ({
 			onKeyDown={event => {
 				if (event.code === 'Escape') {
 					event.preventDefault()
-						event.stopPropagation()
+					event.stopPropagation()
 
 					if (expanded) {
 						setExpanded(false)
@@ -148,14 +148,19 @@ export const DevPanel = ({ heading, icon, children, preview }: {
 		setExpanded(false)
 	})
 
+	const devPanelRef = useRef<HTMLDivElement>(null)
+
+	useOnElementMouseEnterDelayedCallback(devPanelRef, useReferentiallyStableCallback(({ type }) => {
+		if (type === 'mouseenter') {
+			handleOpen()
+		}
+	}))
 
 	return (
 		<div
+			ref={devPanelRef}
 			data-expanded={dataAttribute(expanded)}
 			className={className('trigger')}
-			onMouseEnter={useReferentiallyStableCallback(event => {
-				handleOpen()
-			})}
 			onMouseLeave={useReferentiallyStableCallback(event => {
 				handleClose()
 			})}

@@ -32,5 +32,11 @@ export default () => (
 			<TextareaInput placeholder="Send new message..." minRows={1} maxRows={10} distinction="seamless" />
 			<Button>Send <SendHorizontalIcon /></Button>
 		</Box>
+
+		<Box horizontal>
+			<TextInput placeholder="Start..." />
+			<TextInput placeholder="Center..." />
+			<TextInput placeholder="End..." />
+		</Box>
 	</>
 )

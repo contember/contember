@@ -51,11 +51,26 @@
 :where(.cui-box[data-padding="large"]) { --cui-box--padding: calc(1.5 * var(--cui-padding)) }
 :where(.cui-box[data-padding="larger"]) { --cui-box--padding: calc(3 * var(--cui-padding)) }
 
+:where(.cui-box-header:empty),
+:where(.cui-box-body:empty),
+:where(.cui-box-footer:empty) {
+	display: contents;
+}
+
 :where(.cui-box-header),
-:where(.cui-box-body),
 :where(.cui-box-footer) {
 	display: flex;
 	gap: var(--cui-gap);
+}
+
+:where(.cui-box-body) {
+	flex: 1 1 auto;
+	min-width: 0px;
+	max-width: 100%;
+}
+
+:where(.cui-box-body > .cui-text-input) {
+	flex: 1 0 min-content;
 }
 
 :where(.cui-box-header),

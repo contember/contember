@@ -64,11 +64,18 @@ import { WheelEventHandler } from 'react';
 export const ActionableBox: NamedExoticComponent<ActionableBoxProps>;
 
 // @public (undocumented)
-export type ActionableBoxProps = {
-    editContents?: ReactNode;
-    onRemove?: (e: MouseEvent_2<HTMLButtonElement>) => void;
+export interface ActionableBoxOwnProps extends ComponentClassNameProps {
+    // (undocumented)
     children: ReactNode;
-} & HTMLDivElementProps;
+    // (undocumented)
+    editContents?: ReactNode;
+    // (undocumented)
+    onRemove?: (e: MouseEvent_2<HTMLButtonElement>) => void;
+}
+
+// @public (undocumented)
+export interface ActionableBoxProps extends Omit<HTMLDivElementProps, keyof ActionableBoxOwnProps | keyof BoxOwnProps>, Omit<BoxOwnProps, keyof ActionableBoxOwnProps>, ActionableBoxOwnProps {
+}
 
 // @public (undocumented)
 export type ActiveSectionsTabsContextType = ActiveSectionTabsMap;

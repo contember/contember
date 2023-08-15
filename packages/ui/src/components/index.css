@@ -2,7 +2,10 @@
 @import "./StyleProvider/index.css";
 
 /* Leaf components */
+@import "./Divider/index.css";
 @import "./Typography/index.css";
+@import "./Stack/index.css";
+@import "./Spacer/index.css";
 
 /* Leaf components */
 @import "./Box/index.css";
@@ -22,11 +25,8 @@
 @import "./Tag/index.css";
 @import "./Card/index.css";
 @import "./Collapsible/index.css";
-@import "./Divider/index.css";
-@import "./Spacer/index.css";
 @import "./Grid/index.css";
 @import "./Link.css";
-@import "./Stack/index.css";
 @import "./Message/index.css";
 @import "./EmptyStateContainer/index.css";
 @import "./RepeaterItemContainer/index.css";

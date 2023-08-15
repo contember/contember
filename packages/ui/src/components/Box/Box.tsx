@@ -163,7 +163,6 @@ export const Box = memo(forwardRef<HTMLDivElement, BoxProps>(({
 				colorSchemeClassName(useColorScheme()),
 				classNameProp,
 			])}
-			evenly={evenly}
 			gap={gap}
 			horizontal={horizontal}
 			justify={justify}
@@ -184,7 +183,16 @@ export const Box = memo(forwardRef<HTMLDivElement, BoxProps>(({
 						)}
 					</div>
 				)}
-			{children}
+			{children && (
+				<Stack
+					className={[className('body'), className('content')]}
+					evenly={evenly}
+					gap={gap}
+					horizontal={horizontal}
+				>
+					{children}
+				</Stack>
+			)}
 			{footer && <div className={className('footer')}>{footer}</div>}
 		</Stack>
 	)

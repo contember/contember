@@ -1,8 +1,8 @@
 import { useClassNameFactory, useColorScheme } from '@contember/react-utils'
-import { colorSchemeClassName, dataAttribute, deprecate, fallback, isDefined, themeClassName } from '@contember/utilities'
+import { ComponentClassNameProps, colorSchemeClassName, dataAttribute, deprecate, fallback, isDefined, themeClassName } from '@contember/utilities'
 import { ReactNode, forwardRef, memo } from 'react'
 import type { BoxDistinction, Default, HTMLDivElementProps, Intent } from '../../types'
-import { Stack, StackProps } from '../Stack'
+import { DeprecatedStackProps, Stack, StackOwnProps } from '../Stack'
 import { Label } from '../Typography/Label'
 
 export type BoxHeaderProps =
@@ -17,37 +17,40 @@ export type BoxHeaderProps =
 		label?: never
 	}
 
+/** @deprecated Use `boolean` instead */
+export type DeprecatedPaddingPropLiteral = Default | 'no-padding' | 'with-padding'
 
 export type BoxOwnProps =
+	& ComponentClassNameProps
 	& BoxHeaderProps
-	& Pick<StackProps, 'align' | 'className' | 'direction' | 'evenly' | 'gap' | 'horizontal' | 'justify' | 'reverse' | 'wrap'>
+	& Pick<StackOwnProps, 'align' | 'evenly' | 'gap' | 'horizontal' | 'justify' | 'reverse' | 'wrap'>
 	& {
 		background?: boolean
 		border?: boolean
 		borderRadius?: boolean | 'gap' | 'gutter' | 'padding' | 'large' | 'larger'
 		children?: ReactNode
-		/** @deprecated Use `background={false} border={false} padding={false}` props combination instead */
-		distinction?: BoxDistinction
 		fit?: false | 'width' | 'height' | 'both'
 		footer?: ReactNode
-		/** @deprecated Use `label` instead */
-		heading?: ReactNode
 		isActive?: boolean
 		intent?: Intent
-		padding?:
-		| boolean | 'gap' | 'gutter' | 'padding' | 'large' | 'larger'
-		| DeprecatedPaddingPropLiteral
+		padding?: boolean | 'gap' | 'gutter' | 'padding' | 'large' | 'larger'
 	}
 
-/** @deprecated Use `boolean` instead */
-export type DeprecatedPaddingPropLiteral =
-	| Default
-	| 'no-padding'
-	| 'with-padding'
+/** @deprecated Use `BoxOwnProps` instead */
+export interface DeprecatedBoxProps extends Pick<DeprecatedStackProps, 'gap'> {
+	/** @deprecated Use combination of `horizontal` and `reverse` props instead */
+	direction?: DeprecatedStackProps['direction']
+	/** @deprecated Use `background={false} border={false} padding={false}` props combination instead */
+	distinction?: BoxDistinction
+	/** @deprecated Use `label` instead */
+	heading?: ReactNode
+	padding?: BoxOwnProps['padding'] | DeprecatedPaddingPropLiteral
+}
 
 export type BoxProps =
-	& Omit<HTMLDivElementProps, keyof BoxOwnProps>
-	& BoxOwnProps
+	& Omit<HTMLDivElementProps, keyof BoxOwnProps | keyof DeprecatedBoxProps>
+	& Omit<BoxOwnProps, keyof DeprecatedBoxProps>
+	& DeprecatedBoxProps
 
 /**
  * The `Box` component is a container that can be used to wrap other components.
@@ -93,7 +96,8 @@ export const Box = memo(forwardRef<HTMLDivElement, BoxProps>(({
 	border = true,
 	borderRadius = true,
 	children,
-	className,
+	className: classNameProp,
+	componentClassName = 'box',
 	direction,
 	distinction,
 	evenly,
@@ -112,7 +116,7 @@ export const Box = memo(forwardRef<HTMLDivElement, BoxProps>(({
 	wrap,
 	...divProps
 }: BoxProps, ref) => {
-	const componentClassName = useClassNameFactory('box')
+	const className = useClassNameFactory(componentClassName)
 
 	// TODO: Remove in v1.3.0
 	deprecate('1.3.0', padding === 'default', '`padding="default"`', 'omitted `padding` prop')
@@ -142,10 +146,10 @@ export const Box = memo(forwardRef<HTMLDivElement, BoxProps>(({
 			data-border-radius={dataAttribute(borderRadius)}
 			data-fit={dataAttribute(fit)}
 			data-padding={dataAttribute(padding)}
-			className={componentClassName(null, [
+			className={className(null, [
 				...themeClassName(intent),
 				colorSchemeClassName(useColorScheme()),
-				className,
+				classNameProp,
 			])}
 			evenly={evenly}
 			gap={gap}
@@ -154,19 +158,22 @@ export const Box = memo(forwardRef<HTMLDivElement, BoxProps>(({
 			reverse={reverse}
 		>
 			{header
-				? <div className={componentClassName('header')}>{header}</div>
+				? <div className={className('header')}>{header}</div>
 				: (label || actions) && (
-					<div className={componentClassName('header')}>
-						{label && <Label>{label}</Label>}
+					<div className={className('header')}>
+						{(typeof label === 'string' || typeof label === 'number')
+							? <Label>{label}</Label>
+							: label
+						}
 						{actions && (
-							<div className={componentClassName('actions')} contentEditable={false}>
+							<div className={className('actions')} contentEditable={false}>
 								{actions}
 							</div>
 						)}
 					</div>
 				)}
 			{children}
-			{footer && <div className={componentClassName('footer')}>{footer}</div>}
+			{footer && <div className={className('footer')}>{footer}</div>}
 		</Stack>
 	)
 }))

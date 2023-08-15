@@ -2,19 +2,26 @@ import { useClassName } from '@contember/react-utils'
 import { ComponentClassNameProps, dataAttribute, deprecate, fallback } from '@contember/utilities'
 import { memo } from 'react'
 import { HTMLDivElementProps, Size } from '../../types'
+import { StackOwnProps } from '../Stack'
 
 /** @deprecated Use other prop values */
 export type DeprecatedSpacerSize = Size | 'xlarge' | 'none'
 
-export type SpacerProps =
-	& ComponentClassNameProps
-	& Omit<HTMLDivElementProps, 'ref' | 'children'>
-	& {
-		shrink?: boolean
-		grow?: boolean
-		gap?: boolean | 'gap' | 'gutter' | 'padding' | 'large' | 'larger' | DeprecatedSpacerSize
-	}
+export interface SpacerOwnProps extends ComponentClassNameProps {
+	shrink?: boolean
+	grow?: boolean
+	gap?: StackOwnProps['gap']
+}
 
+/** @deprecated Use `SpacerOwnProps` instead */
+export interface DeprecatedSpacerProps {
+	gap?: SpacerOwnProps['gap'] | DeprecatedSpacerSize
+}
+
+export type SpacerProps =
+	& Omit<HTMLDivElementProps, 'children' | keyof SpacerOwnProps | keyof DeprecatedSpacerProps>
+	& Omit<SpacerOwnProps, keyof DeprecatedSpacerProps>
+	& DeprecatedSpacerProps
 
 /**
  * @group UI

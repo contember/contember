@@ -152,7 +152,7 @@ export type BaseButtonProps = ButtonOwnProps & (ButtonBasedProps | AnchorBasedPr
 export type BlueprintIconName = IconName;
 
 // @public
-export const Box: MemoExoticComponent<ForwardRefExoticComponent<BoxProps & RefAttributes<HTMLDivElement>>>;
+export const Box: MemoExoticComponent<ForwardRefExoticComponent<Omit<HTMLDivElementProps, "children" | "isActive" | "reverse" | "footer" | "header" | "label" | "align" | "evenly" | "horizontal" | "justify" | "wrap" | "border" | keyof ComponentClassNameProps | "actions" | "background" | "borderRadius" | "fit" | "intent" | keyof DeprecatedBoxProps> & Omit<BoxOwnProps, keyof DeprecatedBoxProps> & DeprecatedBoxProps & RefAttributes<HTMLDivElement>>>;
 
 // @public (undocumented)
 export type BoxDepth = 1 | 2 | 3 | 4 | 5 | 6;
@@ -172,22 +172,20 @@ export type BoxHeaderProps = {
 };
 
 // @public (undocumented)
-export type BoxOwnProps = BoxHeaderProps & Pick<StackProps, 'align' | 'className' | 'direction' | 'evenly' | 'gap' | 'horizontal' | 'justify' | 'reverse' | 'wrap'> & {
+export type BoxOwnProps = ComponentClassNameProps & BoxHeaderProps & Pick<StackOwnProps, 'align' | 'evenly' | 'gap' | 'horizontal' | 'justify' | 'reverse' | 'wrap'> & {
     background?: boolean;
     border?: boolean;
     borderRadius?: boolean | 'gap' | 'gutter' | 'padding' | 'large' | 'larger';
     children?: ReactNode;
-    distinction?: BoxDistinction;
     fit?: false | 'width' | 'height' | 'both';
     footer?: ReactNode;
-    heading?: ReactNode;
     isActive?: boolean;
     intent?: Intent;
-    padding?: boolean | 'gap' | 'gutter' | 'padding' | 'large' | 'larger' | DeprecatedPaddingPropLiteral;
+    padding?: boolean | 'gap' | 'gutter' | 'padding' | 'large' | 'larger';
 };
 
 // @public (undocumented)
-export type BoxProps = Omit<HTMLDivElementProps, keyof BoxOwnProps> & BoxOwnProps;
+export type BoxProps = Omit<HTMLDivElementProps, keyof BoxOwnProps | keyof DeprecatedBoxProps> & Omit<BoxOwnProps, keyof DeprecatedBoxProps> & DeprecatedBoxProps;
 
 // @public (undocumented)
 export const Breadcrumbs: NamedExoticComponent<BreadcrumbsProps>;
@@ -258,7 +256,7 @@ export interface ButtonListProps extends ComponentClassNameProps, DeprecatedButt
     // (undocumented)
     display?: 'block' | 'inline';
     // (undocumented)
-    gap?: boolean | 'gap' | 'gutter' | 'padding' | 'large' | 'larger';
+    gap?: StackOwnProps['gap'];
     // @deprecated (undocumented)
     orientation?: 'horizontal' | 'vertical' | DeprecatedButtonDefault;
     // (undocumented)
@@ -550,6 +548,18 @@ export type Default = 'default';
 export const DEFAULT_PORTAL_ROOT_ID = "cui-portal-root";
 
 // @public @deprecated (undocumented)
+export interface DeprecatedBoxProps extends Pick<DeprecatedStackProps, 'gap'> {
+    // @deprecated (undocumented)
+    direction?: DeprecatedStackProps['direction'];
+    // @deprecated (undocumented)
+    distinction?: BoxDistinction;
+    // @deprecated (undocumented)
+    heading?: ReactNode;
+    // (undocumented)
+    padding?: BoxOwnProps['padding'] | DeprecatedPaddingPropLiteral;
+}
+
+// @public @deprecated (undocumented)
 export type DeprecatedButtonDefault = Default;
 
 // @public @deprecated (undocumented)
@@ -582,12 +592,18 @@ export interface DeprecatedButtonOwnProps {
 export type DeprecatedButtonPadding = Default | 'small';
 
 // @public @deprecated (undocumented)
+export interface DeprecatedDividerProps {
+    // (undocumented)
+    gap?: DividerOwnProps['gap'] | DeprecatedDividerSize;
+}
+
+// @public @deprecated (undocumented)
 export type DeprecatedDividerSize = Size | 'xlarge' | 'none';
 
 // @public @deprecated (undocumented)
 export type DeprecatedFieldContainerLabelPosition = Default | 'labelLeft' | 'labelRight' | 'labelInlineLeft' | 'labelInlineRight';
 
-// @public (undocumented)
+// @public @deprecated (undocumented)
 export interface DeprecatedFieldContainerProps {
     // @deprecated (undocumented)
     direction?: StackProps['direction'];
@@ -595,11 +611,12 @@ export interface DeprecatedFieldContainerProps {
     width?: 'column' | 'fluid' | 'none';
 }
 
-// @internal (undocumented)
+// @public @deprecated (undocumented)
 export type DeprecatedMessageProps = {
     lifted?: boolean;
     distinction?: MessageDistinction;
     flow?: MessageFlow;
+    size?: MessageOwnProps['size'] | DeprecatedMessageSize;
 };
 
 // @public @deprecated (undocumented)
@@ -609,12 +626,24 @@ export type DeprecatedMessageSize = Default;
 export type DeprecatedPaddingPropLiteral = Default | 'no-padding' | 'with-padding';
 
 // @public @deprecated (undocumented)
+export interface DeprecatedSpacerProps {
+    // (undocumented)
+    gap?: SpacerOwnProps['gap'] | DeprecatedSpacerSize;
+}
+
+// @public @deprecated (undocumented)
 export type DeprecatedSpacerSize = Size | 'xlarge' | 'none';
+
+// @public @deprecated (undocumented)
+export type DeprecatedStackProps = {
+    direction?: 'vertical' | 'horizontal' | 'vertical-reverse' | 'horizontal-reverse';
+    gap?: StackOwnProps['gap'] | DeprecatedStackSize;
+};
 
 // @public @deprecated (undocumented)
 export type DeprecatedStackSize = Size | 'xlarge' | 'none';
 
-// @public (undocumented)
+// @public @deprecated (undocumented)
 export interface DeprecatedTextareaInputOwnProps {
     // @deprecated (undocumented)
     cacheMeasurements?: boolean;
@@ -773,12 +802,12 @@ export interface DimensionSwitcherValue {
 export const Divider: MemoExoticComponent<({ className, componentClassName, gap, ...rest }: DividerProps) => JSX.Element>;
 
 // @public (undocumented)
-export type DividerOwnProps = {
-    gap?: boolean | 'gap' | 'gutter' | 'padding' | 'large' | 'larger' | DeprecatedDividerSize;
-};
+export interface DividerOwnProps extends ComponentClassNameProps {
+    gap?: StackOwnProps['gap'];
+}
 
 // @public (undocumented)
-export type DividerProps = Omit<HTMLDivElementProps, keyof DividerOwnProps> & ComponentClassNameProps & DividerOwnProps;
+export type DividerProps = Omit<HTMLDivElementProps, keyof DividerOwnProps | keyof DeprecatedDividerProps> & Omit<DividerOwnProps, keyof DeprecatedDividerProps> & DeprecatedDividerProps;
 
 // @public (undocumented)
 export const Dropdown: MemoExoticComponent<(props: DropdownProps) => JSX.Element>;
@@ -953,7 +982,7 @@ is?: string | undefined;
 'aria-colindex'?: number | undefined;
 'aria-colspan'?: number | undefined;
 'aria-controls'?: string | undefined;
-'aria-current'?: boolean | "time" | "page" | "false" | "true" | "date" | "step" | "location" | undefined;
+'aria-current'?: boolean | "time" | "page" | "false" | "true" | "step" | "location" | "date" | undefined;
 'aria-describedby'?: string | undefined;
 'aria-details'?: string | undefined;
 'aria-disabled'?: (boolean | "false" | "true") | undefined;
@@ -973,7 +1002,7 @@ is?: string | undefined;
 'aria-modal'?: (boolean | "false" | "true") | undefined;
 'aria-multiline'?: (boolean | "false" | "true") | undefined;
 'aria-multiselectable'?: (boolean | "false" | "true") | undefined;
-'aria-orientation'?: "vertical" | "horizontal" | undefined;
+'aria-orientation'?: "horizontal" | "vertical" | undefined;
 'aria-owns'?: string | undefined;
 'aria-placeholder'?: string | undefined;
 'aria-posinset'?: number | undefined;
@@ -1249,7 +1278,7 @@ is?: string | undefined;
 'aria-colindex'?: number | undefined;
 'aria-colspan'?: number | undefined;
 'aria-controls'?: string | undefined;
-'aria-current'?: boolean | "time" | "page" | "false" | "true" | "date" | "step" | "location" | undefined;
+'aria-current'?: boolean | "time" | "page" | "false" | "true" | "step" | "location" | "date" | undefined;
 'aria-describedby'?: string | undefined;
 'aria-details'?: string | undefined;
 'aria-disabled'?: (boolean | "false" | "true") | undefined;
@@ -1269,7 +1298,7 @@ is?: string | undefined;
 'aria-modal'?: (boolean | "false" | "true") | undefined;
 'aria-multiline'?: (boolean | "false" | "true") | undefined;
 'aria-multiselectable'?: (boolean | "false" | "true") | undefined;
-'aria-orientation'?: "vertical" | "horizontal" | undefined;
+'aria-orientation'?: "horizontal" | "vertical" | undefined;
 'aria-owns'?: string | undefined;
 'aria-placeholder'?: string | undefined;
 'aria-posinset'?: number | undefined;
@@ -2087,23 +2116,36 @@ export type MessageDistinction = Default | 'striking';
 // @public @deprecated (undocumented)
 export type MessageFlow = Default | 'generous' | 'block' | 'generousBlock';
 
-// Warning: (ae-incompatible-release-tags) The symbol "MessageProps" is marked as @public, but its signature references "DeprecatedMessageProps" which is marked as @internal
-//
 // @public (undocumented)
-export type MessageProps = {
+export interface MessageOwnProps {
+    // (undocumented)
     action?: ReactNode;
-    borderRadius?: boolean | 'gap' | 'gutter' | 'padding' | 'large' | 'larger';
+    // (undocumented)
     background?: boolean;
-    display?: 'inline' | 'block';
-    elevated?: boolean;
+    // (undocumented)
+    borderRadius?: boolean | 'gap' | 'gutter' | 'padding' | 'large' | 'larger';
+    // (undocumented)
     children?: ReactNode;
+    // (undocumented)
+    display?: 'inline' | 'block';
+    // (undocumented)
+    elevated?: boolean;
+    // (undocumented)
     icon?: ReactNode;
+    // (undocumented)
     important?: boolean;
+    // (undocumented)
     intent?: Intent;
+    // (undocumented)
     padding?: boolean | 'gap' | 'gutter' | 'padding' | 'large' | 'larger';
+    // (undocumented)
+    size?: 'small' | 'medium' | 'large';
+    // (undocumented)
     textAlign?: 'start' | 'center' | 'end';
-    size?: 'small' | 'medium' | 'large' | DeprecatedMessageSize;
-} & HTMLDivElementProps & DeprecatedMessageProps;
+}
+
+// @public (undocumented)
+export type MessageProps = Omit<HTMLDivElementProps, keyof MessageOwnProps | keyof DeprecatedMessageProps> & Omit<MessageOwnProps, keyof DeprecatedMessageProps> & DeprecatedMessageProps;
 
 // @public (undocumented)
 export const MonthInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<string> & ControlValueProps<string, boolean> & {
@@ -2568,11 +2610,17 @@ export type SlugInputProps = TextInputProps & {
 export const Spacer: MemoExoticComponent<({ className, componentClassName, gap, grow, shrink, ...rest }: SpacerProps) => JSX.Element>;
 
 // @public (undocumented)
-export type SpacerProps = ComponentClassNameProps & Omit<HTMLDivElementProps, 'ref' | 'children'> & {
-    shrink?: boolean;
+export interface SpacerOwnProps extends ComponentClassNameProps {
+    // (undocumented)
+    gap?: StackOwnProps['gap'];
+    // (undocumented)
     grow?: boolean;
-    gap?: boolean | 'gap' | 'gutter' | 'padding' | 'large' | 'larger' | DeprecatedSpacerSize;
-};
+    // (undocumented)
+    shrink?: boolean;
+}
+
+// @public (undocumented)
+export type SpacerProps = Omit<HTMLDivElementProps, 'children' | keyof SpacerOwnProps | keyof DeprecatedSpacerProps> & Omit<SpacerOwnProps, keyof DeprecatedSpacerProps> & DeprecatedSpacerProps;
 
 // @public (undocumented)
 export const Spinner: MemoExoticComponent<() => JSX.Element>;
@@ -2600,22 +2648,20 @@ export type SpinnerOverlayProps = ComponentClassNameProps & {
 export function splitDatetime(datetime: string | null | undefined): string[];
 
 // @public
-export const Stack: MemoExoticComponent<ForwardRefExoticComponent<StackOwnProps & HTMLDivElementProps & RefAttributes<HTMLDivElement>>>;
+export const Stack: MemoExoticComponent<ForwardRefExoticComponent<Omit<HTMLDivElementProps, "children" | "reverse" | "style" | "align" | "basis" | "evenly" | "gap" | "grow" | "horizontal" | "justify" | "shrink" | "wrap" | "className" | "componentClassName" | "direction"> & Omit<StackOwnProps, keyof DeprecatedStackProps> & DeprecatedStackProps & RefAttributes<HTMLDivElement>>>;
 
 // @public (undocumented)
-export interface StackOwnProps {
+export interface StackOwnProps extends ComponentClassNameProps {
     // (undocumented)
     align?: 'center' | 'stretch' | 'start' | 'end';
     // (undocumented)
     basis?: CSSProperties['flexBasis'];
     // (undocumented)
     children?: ReactNode;
-    // @deprecated (undocumented)
-    direction?: 'vertical' | 'horizontal' | 'vertical-reverse' | 'horizontal-reverse';
     // (undocumented)
     evenly?: boolean;
     // (undocumented)
-    gap?: boolean | 'gap' | 'gutter' | 'padding' | 'large' | 'larger' | DeprecatedStackSize;
+    gap?: boolean | 'gap' | 'double' | 'gutter' | 'padding' | 'large' | 'larger';
     // (undocumented)
     grow?: boolean | CSSProperties['flexGrow'];
     // (undocumented)
@@ -2633,7 +2679,7 @@ export interface StackOwnProps {
 }
 
 // @public (undocumented)
-export type StackProps = StackOwnProps & HTMLDivElementProps;
+export type StackProps = Omit<HTMLDivElementProps, keyof StackOwnProps | keyof DeprecatedStackProps> & Omit<StackOwnProps, keyof DeprecatedStackProps> & DeprecatedStackProps;
 
 // @public (undocumented)
 export const StyleProvider: {

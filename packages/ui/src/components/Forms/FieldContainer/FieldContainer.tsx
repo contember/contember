@@ -76,8 +76,9 @@ export interface FieldContainerOwnProps extends ComponentClassNameProps {
 	style?: CSSProperties
 }
 
+/** @deprecated Use `FieldContainerOwnProps` instead */
 export interface DeprecatedFieldContainerProps {
-	/** @deprecated Use `horizontal` instead */
+	/** @deprecated Use combination of `horizontal` and `reverse` props instead */
 	direction?: StackProps['direction']
 	/** @deprecated No alternative */
 	width?: 'column' | 'fluid' | 'none'

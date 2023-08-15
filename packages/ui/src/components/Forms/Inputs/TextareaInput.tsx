@@ -7,6 +7,7 @@ import type { ControlProps, ControlPropsKeys } from '../Types'
 
 export interface UnderlyingElementProps extends Omit<AllHTMLAttributes<HTMLTextAreaElement>, ControlPropsKeys<string> | 'rows'> { }
 
+/** @deprecated Use `TextareaInputOwnProps` instead */
 export interface DeprecatedTextareaInputOwnProps {
 	/** @deprecated No alternative */
 	cacheMeasurements?: boolean

@@ -8,6 +8,7 @@ import type {
 	Scheme,
 } from '../../../types'
 import { Default } from '../../../types'
+import { StackOwnProps } from '../../Stack'
 
 export interface ButtonBasedProps extends Omit<HTMLButtonElementProps, 'ref' | 'size' | 'className'> {
 	Component: 'button'
@@ -45,7 +46,7 @@ export interface ButtonListProps extends ComponentClassNameProps, DeprecatedButt
 	children?: ReactNode
 	direction?: 'horizontal' | 'vertical'
 	display?: 'block' | 'inline'
-	gap?: boolean | 'gap' | 'gutter' | 'padding' | 'large' | 'larger'
+	gap?: StackOwnProps['gap']
 	/**
 	 * @deprecated Use `direction` instead
 	 */

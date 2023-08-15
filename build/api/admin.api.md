@@ -4060,8 +4060,6 @@ export interface RepeaterInnerProps<ContainerExtraProps, ItemExtraProps> extends
     // (undocumented)
     dragHandleComponent?: RepeaterItemContainerProps['dragHandleComponent'];
     // (undocumented)
-    enableAdding?: boolean;
-    // (undocumented)
     enableRemoving?: boolean;
     // (undocumented)
     itemComponent?: ComponentType<RepeaterItemProps & ItemExtraProps>;

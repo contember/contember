@@ -16,7 +16,6 @@ import { ComponentType, Fragment, ReactElement, ReactNode, useCallback } from 'r
 import type { SortEndHandler } from 'react-sortable-hoc'
 import { useMessageFormatter } from '../../../../i18n'
 import { shouldCancelStart } from '../../helpers/shouldCancelStart'
-import { CreateNewEntityButton, CreateNewEntityButtonProps } from '../helpers'
 import {
 	RepeaterCreateNewEntity,
 	RepeaterFieldContainer,
@@ -42,7 +41,6 @@ export interface RepeaterInnerProps<ContainerExtraProps, ItemExtraProps>
 
 	sortableBy?: SugaredFieldProps['field']
 
-	enableAdding?: boolean
 	enableRemoving?: boolean
 	removalType?: RemovalType
 
@@ -76,7 +74,6 @@ export const RepeaterInner = Component<RepeaterInnerProps<any, any>, NonStaticPr
 		)
 		const formatMessage = useMessageFormatter(repeaterDictionary)
 
-		const AddButton: ComponentType<CreateNewEntityButtonProps> = props.addButtonComponent || CreateNewEntityButton
 		const Handle: ComponentType<{ children: ReactNode }> = props.dragHandleComponent || Fragment
 		const Item: ComponentType<RepeaterItemProps & ItemExtraProps> = props.itemComponent || RepeaterItem
 		const Container: ComponentType<RepeaterFieldContainerProps & ContainerExtraProps> =
@@ -84,7 +81,6 @@ export const RepeaterInner = Component<RepeaterInnerProps<any, any>, NonStaticPr
 
 		const isEmpty = entities.length === 0
 		const itemRemovingEnabled = props.enableRemoving !== false
-		const itemAddingEnabled = props.enableAdding === true && !!props.sortableBy
 
 		const sortableHandle = useCallback<ComponentType<{ children: ReactNode }>>(
 			({ children }) => (
@@ -152,24 +148,21 @@ export const RepeaterInner = Component<RepeaterInnerProps<any, any>, NonStaticPr
 					formatMessage={formatMessage}
 				>
 					{entities.map((entity, i) => (
-						<Fragment key={entity.key}>
-							{itemAddingEnabled && <AddButton {...props.addButtonComponentExtraProps} createNewEntity={() => createNewEntity(undefined, i)} />}
-							<SortableRepeaterItem index={i} disabled={isMutating}>
-								<Entity accessor={entity}>
-									<Item
-										{...props.itemComponentExtraProps!}
-										label={label}
-										index={i}
-										createNewEntity={createNewEntity}
-										removalType={removalType}
-										canBeRemoved={itemRemovingEnabled}
-										dragHandleComponent={useDragHandle ? sortableHandle : undefined}
-									>
-										{props.children}
-									</Item>
-								</Entity>
-							</SortableRepeaterItem>
-						</Fragment>
+						<SortableRepeaterItem index={i} key={entity.key} disabled={isMutating}>
+							<Entity accessor={entity}>
+								<Item
+									{...props.itemComponentExtraProps!}
+									label={label}
+									index={i}
+									createNewEntity={createNewEntity}
+									removalType={removalType}
+									canBeRemoved={itemRemovingEnabled}
+									dragHandleComponent={useDragHandle ? sortableHandle : undefined}
+								>
+									{props.children}
+								</Item>
+							</Entity>
+						</SortableRepeaterItem>
 					))}
 				</Container>
 			</SortableRepeaterContainer>

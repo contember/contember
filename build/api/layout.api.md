@@ -4,8 +4,6 @@
 
 ```ts
 
-/// <reference types="react" />
-
 import { ComponentClassNameProps } from '@contember/utilities';
 import { ComponentType } from 'react';
 import { ContainerWidthContextType } from '@contember/react-utils';

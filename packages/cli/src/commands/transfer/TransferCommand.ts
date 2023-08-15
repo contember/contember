@@ -1,7 +1,7 @@
 import { Command, CommandConfiguration, Input, Workspace } from '@contember/cli-common'
 import { confirmImport, dataExport, dataImport, resolveProject } from './utils'
 import { maskToken } from '../../utils/token'
-import { rewriteStdoutLine } from '../../utils/stdio'
+import { printProgressLine } from '../../utils/stdio'
 import { readStream } from '../../utils/stream'
 
 type Args = {
@@ -56,7 +56,7 @@ export class TransferCommand extends Command<Args, Options> {
 		const includeSystem = input.getOption('include-system') === true
 		const exportResponse = (await dataExport({ project: sourceProject, includeSystem, noGzip: true }))
 		const importResponse = await dataImport({
-			stream: exportResponse, project: targetProject, printProgress: rewriteStdoutLine,
+			stream: exportResponse, project: targetProject, printProgress: printProgressLine,
 		})
 		console.log('')
 

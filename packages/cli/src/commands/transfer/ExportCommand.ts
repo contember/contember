@@ -3,7 +3,7 @@ import { createWriteStream } from 'node:fs'
 import { dataExport, resolveProject } from './utils'
 import { maskToken } from '../../utils/token'
 import { pipeline } from 'node:stream/promises'
-import { rewriteStdoutLine } from '../../utils/stdio'
+import { printProgressLine } from '../../utils/stdio'
 
 type Args = {
 	source?: string
@@ -57,7 +57,7 @@ export class ExportCommand extends Command<Args, Options> {
 			const currentMb = Math.floor(transferred / 1024 / 1024)
 			if (currentMb > lastMbReported) {
 				const durationS = Math.floor((Date.now() - start) / 1000)
-				rewriteStdoutLine(`transferred ${currentMb} MiB; ${durationS} seconds`)
+				printProgressLine(`transferred ${currentMb} MiB; ${durationS} seconds`)
 				lastMbReported = currentMb
 			}
 		})

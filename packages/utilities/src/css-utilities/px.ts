@@ -12,5 +12,5 @@ export function px<V extends number | false | null | undefined>(value?: V): stri
  * @returns Returns a string in the format '10px' or '' when value is falsy.
  */
 export function px<V extends number | false | null | undefined>(value?: V): string {
-	return typeof value === 'number' && !isNaN(value) ? value + 'px' : ''
+	return typeof value === 'number' && !(isNaN(value) || value === Infinity || value === -Infinity) ? value + 'px' : ''
 }

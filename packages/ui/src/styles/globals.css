@@ -195,8 +195,17 @@
 :where(.view-seamless.cui-textarea-input),
 :where(.view-seamless.cui-text-input),
 :where(.view-seamless.cui-editorCanvas) {
+	background-color: transparent;
+	border-width: 0px;
 	padding-left: 0;
 	padding-right: 0;
+}
+
+:where(.view-seamless-with-padding.cui-textarea-input),
+:where(.view-seamless-with-padding.cui-text-input),
+:where(.view-seamless-with-padding.cui-editorCanvas) {
+	background-color: transparent;
+	border-width: 0px;
 }
 
 :where(.view-seamless.cui-textarea-input:focus),

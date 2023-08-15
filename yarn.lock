@@ -2672,7 +2672,7 @@ __metadata:
     "@contember/schema": ^1.2.0
     "@contember/schema-definition": ^1.2.0
     "@contember/ui": "workspace:*"
-    lucide-react: ^0.256.0
+    lucide-react: ^0.268.0
     react: ^17 || ^18
     react-dom: ^17 || ^18
   languageName: unknown
@@ -2737,7 +2737,7 @@ __metadata:
     is-hotkey: 0.1.8
     jsdom: ^18.0.0
     leaflet: ^1.9.2
-    lucide-react: ^0.256.0
+    lucide-react: ^0.268.0
     node-fetch: ^2.6.5
     path-to-regexp: 6.2.0
     pg: ^8.7.3
@@ -2861,7 +2861,7 @@ __metadata:
     change-case: ^4.1.2
     deep-equal: ^2.2.0
     fast-deep-equal: ^3.1.3
-    lucide-react: ^0.256.0
+    lucide-react: ^0.268.0
     react: ^18
     react-dom: ^18
     slugify: ^1.6.6
@@ -2989,7 +2989,7 @@ __metadata:
     babel-plugin-transform-vite-meta-env: 1.0.3
     css-loader: 5.2.4
     csstype: 3.0.8
-    lucide-react: ^0.256.0
+    lucide-react: ^0.268.0
     prop-types: ^15.8.1
     react: ^18
     react-aria: ^3.20.0
@@ -12344,12 +12344,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lucide-react@npm:^0.256.0":
-  version: 0.256.0
-  resolution: "lucide-react@npm:0.256.0"
+"lucide-react@npm:^0.268.0":
+  version: 0.268.0
+  resolution: "lucide-react@npm:0.268.0"
   peerDependencies:
     react: ^16.5.1 || ^17.0.0 || ^18.0.0
-  checksum: f5b2eef5e5900b34b8fa9a48af61086213f302001a244b7d969a195b306718c9c03dba0086616a3e523812e8bc17563ffaa969363178edf3464e16dd38c62b07
+  checksum: cb40a30bb9e0156f81cc2960a4708b948330304e40efeae7043d0414679cd6ae6dfe37c7eb99d56e673863e5862aa408d89669048afaba1b6dd3677e59d0bd96
   languageName: node
   linkType: hard
 

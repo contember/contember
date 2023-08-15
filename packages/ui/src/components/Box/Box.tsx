@@ -88,6 +88,15 @@ export type BoxProps =
  * </Box>
  * ```
  *
+ * @example
+ * Box simulating a message input with a send button:
+ * ```tsx
+ * <Box horizontal focusRing padding="double" align="end">
+ * 	<TextareaInput placeholder="Send new message..." minRows={1} maxRows={10} distinction="seamless" />
+ * 	<Button>Send <SendHorizontalIcon /></Button>
+ * </Box>
+ * ```
+ *
  * @group UI
  */
 export const Box = memo(forwardRef<HTMLDivElement, BoxProps>(({

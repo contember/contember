@@ -1,5 +1,5 @@
-import { Box, Button } from '@contember/ui'
-import { TrashIcon } from 'lucide-react'
+import { Box, Button, TextInput, TextareaInput } from '@contember/ui'
+import { SendHorizontalIcon, TrashIcon } from 'lucide-react'
 import { SlotSources } from '../components/Slots'
 
 export default () => (
@@ -25,6 +25,12 @@ export default () => (
 		Box with a custom header, content and footer:
 		<Box header={<h3>Header</h3>} footer={<Button display="block" distinction="primary">Continue</Button>}>
 			Lorem ipsum dolor sit amet
+		</Box>
+
+		Box simulating a message input with a send button:
+		<Box horizontal focusRing padding="double" align="end">
+			<TextareaInput placeholder="Send new message..." minRows={1} maxRows={10} distinction="seamless" />
+			<Button>Send <SendHorizontalIcon /></Button>
 		</Box>
 	</>
 )

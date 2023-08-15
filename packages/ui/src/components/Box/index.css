@@ -29,6 +29,7 @@
 
 :where(.cui-box[data-border-radius]) { --cui-box--border-radius: var(--cui-border-radius) }
 :where(.cui-box[data-border-radius="gap"]) { --cui-box--border-radius: var(--cui-gap) }
+:where(.cui-box[data-border-radius="double"]) { --cui-box--border-radius: var(--cui-double-gap) }
 :where(.cui-box[data-border-radius="gutter"]) { --cui-box--border-radius: var(--cui-gutter) }
 :where(.cui-box[data-border-radius="padding"]) { --cui-box--border-radius: var(--cui-padding) }
 :where(.cui-box[data-border-radius="large"]) { --cui-box--border-radius: calc(1.5 * var(--cui-padding)) }
@@ -44,6 +45,7 @@
 
 :where(.cui-box[data-padding]) { --cui-box--padding: var(--cui-padding) }
 :where(.cui-box[data-padding="gap"]) { --cui-box--padding: var(--cui-gap) }
+:where(.cui-box[data-padding="double"]) { --cui-box--padding: var(--cui-double-gap) }
 :where(.cui-box[data-padding="gutter"]) { --cui-box--padding: var(--cui-gutter) }
 :where(.cui-box[data-padding="padding"]) { --cui-box--padding: var(--cui-padding) }
 :where(.cui-box[data-padding="large"]) { --cui-box--padding: calc(1.5 * var(--cui-padding)) }
@@ -79,6 +81,12 @@
 	background-image: var(--cui-box--background-focused-overlay);
 	box-shadow: inset 0 0 0 2px rgb(var(--cui-color--accent-rgb-50));
 	transition: box-shadow 0.15s;
+}
+
+:where(.cui-box[data-focus-ring]:focus-within) {
+	border-color: rgb(var(--cui-color--accent-rgb-50));
+	box-shadow: var(--cui-box-shadow--controls-focus-ring);
+	z-index: 1;
 }
 
 :where(.cui-box.is-dragged .cui-box-content),

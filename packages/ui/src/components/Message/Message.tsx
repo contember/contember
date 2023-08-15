@@ -2,13 +2,14 @@ import { useClassNameFactory, useColorScheme } from '@contember/react-utils'
 import { colorSchemeClassName, dataAttribute, deprecate, fallback, isDefined, themeClassName } from '@contember/utilities'
 import { ReactNode, memo } from 'react'
 import type { Default, HTMLDivElementProps, Intent, MessageDistinction, MessageFlow } from '../../types'
+import { StackOwnProps } from '../Stack'
 
 /** @deprecated Omit the prop instead */
 export type DeprecatedMessageSize = Default
 
 export interface MessageOwnProps {
 	action?: ReactNode
-	borderRadius?: boolean | 'gap' | 'gutter' | 'padding' | 'large' | 'larger'
+	borderRadius?: StackOwnProps['gap']
 	background?: boolean
 	display?: 'inline' | 'block'
 	elevated?: boolean
@@ -16,7 +17,7 @@ export interface MessageOwnProps {
 	icon?: ReactNode
 	important?: boolean
 	intent?: Intent
-	padding?: boolean | 'gap' | 'gutter' | 'padding' | 'large' | 'larger'
+	padding?: StackOwnProps['gap']
 	textAlign?: 'start' | 'center' | 'end'
 	size?: 'small' | 'medium' | 'large'
 }

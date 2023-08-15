@@ -21,18 +21,18 @@ export interface AnchorBasedProps extends Omit<HTMLAnchorElementProps, 'ref' | '
 export interface ButtonOwnProps extends DeprecatedButtonOwnProps, ComponentClassNameProps {
 	active?: boolean
 	align?: 'start' | 'center' | 'end' | 'stretch'
-	borderRadius?: boolean | 'gap' | 'gutter' | 'padding' | 'full'
+	borderRadius?: Exclude<StackOwnProps['gap'], 'large' | 'larger'> | 'full'
 	children?: ReactNode
 	display?: 'inline' | 'block'
 	disabled?: boolean
 	distinction?: 'primary' | 'toned' | 'outlined' | 'seamless' | 'inverse' | DeprecatedButtonDefault
 	elevated?: boolean
 	focusRing?: boolean
-	inset?: boolean | 'gap' | 'gutter' | 'padding' | 'large'
+	inset?: Exclude<StackOwnProps['gap'], 'large' | 'larger'>
 	intent?: Intent
 	justify?: 'start' | 'center' | 'end' | 'space-around' | 'space-between' | 'space-evenly'
 	loading?: boolean
-	padding?: boolean | 'gap' | 'gutter' | 'padding' | DeprecatedButtonPadding
+	padding?: Exclude<StackOwnProps['gap'], 'large' | 'larger'> | DeprecatedButtonPadding
 	scheme?: Scheme
 	square?: boolean
 	size?: 'small' | 'medium' | 'large' | DeprecatedButtonDefault
@@ -55,7 +55,7 @@ export interface ButtonListProps extends ComponentClassNameProps, DeprecatedButt
 }
 
 export interface ButtonGroupProps extends ComponentClassNameProps, DeprecatedButtonGroupProps {
-	borderRadius?: boolean | 'gap' | 'gutter' | 'padding' | 'full'
+	borderRadius?: Exclude<StackOwnProps['gap'], 'large' | 'larger'> | 'full'
 	children?: ReactNode
 	direction?: 'horizontal' | 'vertical'
 	display?: 'block' | 'inline'

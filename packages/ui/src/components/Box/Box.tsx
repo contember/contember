@@ -27,13 +27,14 @@ export type BoxOwnProps =
 	& {
 		background?: boolean
 		border?: boolean
-		borderRadius?: boolean | 'gap' | 'gutter' | 'padding' | 'large' | 'larger'
+		borderRadius?: StackOwnProps['gap']
 		children?: ReactNode
 		fit?: false | 'width' | 'height' | 'both'
+		focusRing?: boolean
 		footer?: ReactNode
 		isActive?: boolean
 		intent?: Intent
-		padding?: boolean | 'gap' | 'gutter' | 'padding' | 'large' | 'larger'
+		padding?: StackOwnProps['gap']
 	}
 
 /** @deprecated Use `BoxOwnProps` instead */
@@ -102,6 +103,7 @@ export const Box = memo(forwardRef<HTMLDivElement, BoxProps>(({
 	distinction,
 	evenly,
 	fit = 'width',
+	focusRing,
 	footer,
 	gap = 'gutter',
 	header,
@@ -144,6 +146,7 @@ export const Box = memo(forwardRef<HTMLDivElement, BoxProps>(({
 			data-background={dataAttribute(background)}
 			data-border={dataAttribute(border)}
 			data-border-radius={dataAttribute(borderRadius)}
+			data-focus-ring={dataAttribute(focusRing)}
 			data-fit={dataAttribute(fit)}
 			data-padding={dataAttribute(padding)}
 			className={className(null, [

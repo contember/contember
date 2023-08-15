@@ -72,6 +72,9 @@
 :where(.cui-button[data-border-radius="gap"]) {
 	--cui-button--border-radius: min(var(--cui-button--padding), var(--cui-gap));
 }
+:where(.cui-button[data-border-radius="double"]) {
+	--cui-button--border-radius: min(var(--cui-button--padding), var(--cui-double-gap));
+}
 :where(.cui-button[data-border-radius="gutter"]) {
 	--cui-button--border-radius: min(var(--cui-button--padding), var(--cui-gutter));
 }
@@ -114,11 +117,13 @@
 
 :where(.cui-button[data-padding]) { --cui-button--padding: calc(2.25 * var(--cui-gap)) }
 :where(.cui-button[data-padding="gap"]) { --cui-button--padding: calc(var(--cui-gap)) }
+:where(.cui-button[data-padding="double"]) { --cui-button--padding: calc(var(--cui-double-gap)) }
 :where(.cui-button[data-padding="gutter"]) { --cui-button--padding: calc(var(--cui-gutter)) }
 :where(.cui-button[data-padding="padding"]) { --cui-button--padding: calc(var(--cui-padding)) }
 
 :where(.cui-button[data-inset]) { --cui-button--inset: var(--cui-button--padding) }
 :where(.cui-button[data-inset="gap"]) { --cui-button--inset: var(--cui-gap) }
+:where(.cui-button[data-inset="double"]) { --cui-button--inset: var(--cui-double-gap) }
 :where(.cui-button[data-inset="gutter"]) { --cui-button--inset: var(--cui-gutter) }
 :where(.cui-button[data-inset="padding"]) { --cui-button--inset: var(--cui-padding) }
 
@@ -374,10 +379,11 @@
 
 :where(.cui-button-group[data-border-radius]) { border-radius: var(--cui-border-radius--controls) }
 :where(.cui-button-group[data-border-radius="gap"]) { border-radius: calc(var(--cui-gap)) }
+:where(.cui-button-group[data-border-radius="double"]) { border-radius: calc(var(--cui-double-gap)) }
 :where(.cui-button-group[data-border-radius="gutter"]) { border-radius: calc(var(--cui-gutter)) }
 :where(.cui-button-group[data-border-radius="padding"]) { border-radius: calc(var(--cui-padding)) }
 
-:where(.cui-button-group[data-focus-ring]:focus-within:has(:focus-visible)) {
+:where(.cui-button-group[data-focus-ring]:focus-within) {
 	box-shadow: var(--cui-box-shadow--controls-focus-ring);
 	z-index: 1;
 }

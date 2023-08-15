@@ -4,8 +4,6 @@
 
 ```ts
 
-/// <reference types="react" />
-
 import { AllHTMLAttributes } from 'react';
 import { AnimationEventHandler } from 'react';
 import { AriaRole } from 'react';
@@ -152,7 +150,7 @@ export type BaseButtonProps = ButtonOwnProps & (ButtonBasedProps | AnchorBasedPr
 export type BlueprintIconName = IconName;
 
 // @public
-export const Box: MemoExoticComponent<ForwardRefExoticComponent<Omit<HTMLDivElementProps, "children" | "isActive" | "reverse" | "footer" | "header" | "label" | "align" | "evenly" | "horizontal" | "justify" | "wrap" | "border" | keyof ComponentClassNameProps | "actions" | "background" | "borderRadius" | "fit" | "intent" | keyof DeprecatedBoxProps> & Omit<BoxOwnProps, keyof DeprecatedBoxProps> & DeprecatedBoxProps & RefAttributes<HTMLDivElement>>>;
+export const Box: MemoExoticComponent<ForwardRefExoticComponent<Omit<HTMLDivElementProps, "children" | "isActive" | "reverse" | "footer" | "header" | "label" | "align" | "evenly" | "horizontal" | "justify" | "wrap" | "border" | keyof ComponentClassNameProps | "actions" | "background" | "borderRadius" | "fit" | "focusRing" | "intent" | keyof DeprecatedBoxProps> & Omit<BoxOwnProps, keyof DeprecatedBoxProps> & DeprecatedBoxProps & RefAttributes<HTMLDivElement>>>;
 
 // @public (undocumented)
 export type BoxDepth = 1 | 2 | 3 | 4 | 5 | 6;
@@ -175,13 +173,14 @@ export type BoxHeaderProps = {
 export type BoxOwnProps = ComponentClassNameProps & BoxHeaderProps & Pick<StackOwnProps, 'align' | 'evenly' | 'gap' | 'horizontal' | 'justify' | 'reverse' | 'wrap'> & {
     background?: boolean;
     border?: boolean;
-    borderRadius?: boolean | 'gap' | 'gutter' | 'padding' | 'large' | 'larger';
+    borderRadius?: StackOwnProps['gap'];
     children?: ReactNode;
     fit?: false | 'width' | 'height' | 'both';
+    focusRing?: boolean;
     footer?: ReactNode;
     isActive?: boolean;
     intent?: Intent;
-    padding?: boolean | 'gap' | 'gutter' | 'padding' | 'large' | 'larger';
+    padding?: StackOwnProps['gap'];
 };
 
 // @public (undocumented)
@@ -226,7 +225,7 @@ export type ButtonGroupOrientation = Default | 'horizontal' | 'vertical';
 // @public (undocumented)
 export interface ButtonGroupProps extends ComponentClassNameProps, DeprecatedButtonGroupProps {
     // (undocumented)
-    borderRadius?: boolean | 'gap' | 'gutter' | 'padding' | 'full';
+    borderRadius?: Exclude<StackOwnProps['gap'], 'large' | 'larger'> | 'full';
     // (undocumented)
     children?: ReactNode;
     // (undocumented)
@@ -270,7 +269,7 @@ export interface ButtonOwnProps extends DeprecatedButtonOwnProps, ComponentClass
     // (undocumented)
     align?: 'start' | 'center' | 'end' | 'stretch';
     // (undocumented)
-    borderRadius?: boolean | 'gap' | 'gutter' | 'padding' | 'full';
+    borderRadius?: Exclude<StackOwnProps['gap'], 'large' | 'larger'> | 'full';
     // (undocumented)
     children?: ReactNode;
     // (undocumented)
@@ -284,7 +283,7 @@ export interface ButtonOwnProps extends DeprecatedButtonOwnProps, ComponentClass
     // (undocumented)
     focusRing?: boolean;
     // (undocumented)
-    inset?: boolean | 'gap' | 'gutter' | 'padding' | 'large';
+    inset?: Exclude<StackOwnProps['gap'], 'large' | 'larger'>;
     // (undocumented)
     intent?: Intent;
     // (undocumented)
@@ -292,7 +291,7 @@ export interface ButtonOwnProps extends DeprecatedButtonOwnProps, ComponentClass
     // (undocumented)
     loading?: boolean;
     // (undocumented)
-    padding?: boolean | 'gap' | 'gutter' | 'padding' | DeprecatedButtonPadding;
+    padding?: Exclude<StackOwnProps['gap'], 'large' | 'larger'> | DeprecatedButtonPadding;
     // (undocumented)
     scheme?: Scheme;
     // (undocumented)
@@ -2123,7 +2122,7 @@ export interface MessageOwnProps {
     // (undocumented)
     background?: boolean;
     // (undocumented)
-    borderRadius?: boolean | 'gap' | 'gutter' | 'padding' | 'large' | 'larger';
+    borderRadius?: StackOwnProps['gap'];
     // (undocumented)
     children?: ReactNode;
     // (undocumented)
@@ -2137,7 +2136,7 @@ export interface MessageOwnProps {
     // (undocumented)
     intent?: Intent;
     // (undocumented)
-    padding?: boolean | 'gap' | 'gutter' | 'padding' | 'large' | 'larger';
+    padding?: StackOwnProps['gap'];
     // (undocumented)
     size?: 'small' | 'medium' | 'large';
     // (undocumented)

@@ -156,6 +156,9 @@ export function useAddClassNameDuringResize(className: string, timeoutToRestore?
 // @public
 export const useArrayMapMemo: <Item, OutputItem>(items: Item[], map: (value: Item, index: number, array: Item[]) => OutputItem) => OutputItem[];
 
+// @public (undocumented)
+export const useAutoHeightTextArea: (textAreaRef: RefObjectOrElement<HTMLTextAreaElement>, value: string, minRows: number, maxRows: number) => void;
+
 // @public
 export function useClassName(componentClassName: NestedClassName, additionalClassName?: NestedClassName, prefixOverride?: string | null | undefined): string;
 

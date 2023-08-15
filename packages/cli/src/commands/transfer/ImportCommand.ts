@@ -3,7 +3,7 @@ import { createReadStream } from 'node:fs'
 import { createGunzip } from 'node:zlib'
 import { confirmImport, dataImport, resolveProject } from './utils'
 import { maskToken } from '../../utils/token'
-import { rewriteStdoutLine } from '../../utils/stdio'
+import { printProgressLine } from '../../utils/stdio'
 import { readStream } from '../../utils/stream'
 
 type Args = {
@@ -47,7 +47,7 @@ export class ImportCommand extends Command<Args, Options> {
 		const file = input.getArgument('file')
 		const baseInputStream = createReadStream(file)
 		const stream = (file.endsWith('.gz') ? baseInputStream.pipe(createGunzip()) : baseInputStream)
-		const response = await dataImport({ stream: stream, project, printProgress: rewriteStdoutLine })
+		const response = await dataImport({ stream: stream, project, printProgress: printProgressLine })
 		console.log('')
 		const responseData = JSON.parse((await readStream(response)).toString())
 		if (responseData.ok) {

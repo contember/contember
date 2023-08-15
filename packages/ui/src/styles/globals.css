@@ -123,7 +123,7 @@
 :where(.view-small.cui-textarea-input),
 :where(.view-small.cui-text-input) {
 	--cui-min-height: var(--cui-size--controls-small);
-	--cui-padding-horizontal: calc(2 * var(--cui-gap));
+	--cui-padding-horizontal: var(--cui-double-gap);
 }
 
 :where(.view-large.cui-textarea-input),

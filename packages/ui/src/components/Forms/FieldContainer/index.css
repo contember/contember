@@ -1,6 +1,6 @@
 :where(.cui-field-container) {
 	--cui-field-container--body-content-height: ;
-	gap: calc(2 * var(--cui-gap));
+	gap: var(--cui-double-gap);
 	flex-direction: column;
 }
 

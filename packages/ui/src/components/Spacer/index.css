@@ -12,26 +12,10 @@
 	flex-grow: 1;
 }
 
-:where(.cui-spacer[data-gap]) {
-	--cui-spacer-margin: var(--cui-padding);
-}
-
-:where(.cui-spacer[data-gap="gap"]) {
-	--cui-spacer-margin: var(--cui-gap);
-}
-
-:where(.cui-spacer[data-gap="gutter"]) {
-	--cui-spacer-margin: var(--cui-gutter);
-}
-
-:where(.cui-spacer[data-gap="padding"]) {
-	--cui-spacer-margin: var(--cui-padding);
-}
-
-:where(.cui-spacer[data-gap="large"]) {
-	--cui-spacer-margin: calc(1.5 * var(--cui-padding));
-}
-
-:where(.cui-spacer[data-gap="larger"]) {
-	--cui-spacer-margin: calc(3 * var(--cui-padding));
-}
+:where(.cui-spacer[data-gap]) { --cui-spacer-margin: var(--cui-padding) }
+:where(.cui-spacer[data-gap="gap"]) { --cui-spacer-margin: var(--cui-gap) }
+:where(.cui-spacer[data-gap="double"]) { --cui-spacer-margin: var(--cui-double-gap) }
+:where(.cui-spacer[data-gap="gutter"]) { --cui-spacer-margin: var(--cui-gutter) }
+:where(.cui-spacer[data-gap="padding"]) { --cui-spacer-margin: var(--cui-padding) }
+:where(.cui-spacer[data-gap="large"]) { --cui-spacer-margin: calc(1.5 * var(--cui-padding)) }
+:where(.cui-spacer[data-gap="larger"]) { --cui-spacer-margin: calc(3 * var(--cui-padding)) }

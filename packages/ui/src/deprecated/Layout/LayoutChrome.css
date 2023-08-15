@@ -48,7 +48,7 @@
 :where(.cui-layout-chrome-bar-header) {
 	display: flex;
 	flex-direction: row;
-	gap: calc(var(--cui-gap) * 2);
+	gap: var(--cui-double-gap);
 	justify-content: space-between;
 	padding-bottom: var(--cui-layout-chrome--padding-bottom);
 	padding-left: var(--cui-layout-chrome--padding-left);
@@ -120,7 +120,7 @@
 :where(.cui-layout-chrome-navigation-button .cui-button-content) {
 	align-items: center;
 	display: flex;
-	gap: calc(var(--cui-gap) * 2);
+	gap: var(--cui-double-gap);
 	padding-left: calc(var(--cui-gap) * 3);
 	padding-right: calc(var(--cui-gap) * 3);
 }

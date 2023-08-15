@@ -19,6 +19,7 @@
 
 :where(.cui-stack[data-gap]) { --cui-stack-gap: var(--cui-padding) }
 :where(.cui-stack[data-gap="gap"]) { --cui-stack-gap: var(--cui-gap) }
+:where(.cui-stack[data-gap="double"]) { --cui-stack-gap: var(--cui-double-gap) }
 :where(.cui-stack[data-gap="gutter"]) { --cui-stack-gap: var(--cui-gutter) }
 :where(.cui-stack[data-gap="padding"]) { --cui-stack-gap: var(--cui-padding) }
 :where(.cui-stack[data-gap="large"]) { --cui-stack-gap: calc(1.5 * var(--cui-padding)) }

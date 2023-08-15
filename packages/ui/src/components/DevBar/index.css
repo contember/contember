@@ -172,7 +172,7 @@
 
 @media screen and (min-width: 768px) {
 	:where(.cui-devBar-trigger) {
-		--y-offset: calc(-1 * var(--cui-size--controls) + 2 * var(--cui-gap));
+		--y-offset: calc(-1 * var(--cui-size--controls) + var(--cui-double-gap));
 		position: relative;
 	}
 	:where(.cui-devBar-panel-content) {

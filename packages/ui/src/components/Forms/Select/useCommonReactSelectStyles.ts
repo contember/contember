@@ -211,7 +211,7 @@ export const useCommonReactSelectStyles = <Option = unknown, IsMulti extends boo
 					? 'rgb(var(--cui-color--controls-rgb-100))'
 					: 'var(--cui-color--controls-rgb-50)',
 			'lineHeight': 'var(--cui-line-height--controls)',
-			'padding': 'calc(2 * var(--cui-gap))',
+			'padding': 'var(--cui-double-gap)',
 			'&:hover': {
 				backgroundColor: isSelected
 					? 'rgb(var(--cui-background-color--controls-rgb-100))'

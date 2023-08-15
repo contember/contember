@@ -13,7 +13,7 @@ export interface StackOwnProps {
 	/** @deprecated Use `horizontal` and `reverse` props instead */
 	direction?: 'vertical' | 'horizontal' | 'vertical-reverse' | 'horizontal-reverse'
 	evenly?: boolean,
-	gap?: boolean | 'gap' | 'gutter' | 'padding' | 'large' | 'larger' | DeprecatedStackSize
+	gap?: boolean | 'gap' | 'double' | 'gutter' | 'padding' | 'large' | 'larger' | DeprecatedStackSize
 	grow?: boolean | CSSProperties['flexGrow']
 	horizontal?: boolean
 	justify?:

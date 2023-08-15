@@ -12,7 +12,7 @@
 :where(.cui-repeater-item-container-header) {
 	align-items: center;
 	display: flex;
-	gap: calc(2 * var(--cui-gap));
+	gap: var(--cui-double-gap);
 }
 
 :where(.cui-repeater-item-container-handle) {

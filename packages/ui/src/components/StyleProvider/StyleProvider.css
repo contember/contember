@@ -17,10 +17,11 @@
 	--cui-font-size--label: 0.875em;
 	--cui-font-size--note: 0.8125em;
 	--cui-gap: 0.3rem;
+	--cui-double-gap: calc(2 * var(--cui-gap, 0.6rem));
 	--cui-gutter: calc(3 * var(--cui-gap, 0.75rem));
 	--cui-line-height--controls: 1.125;
 	--cui-line-height: 1.5;
-	--cui-padding--inner: calc(var(--cui-gap) * 2);
+	--cui-padding--inner: var(--cui-double-gap);
 	--cui-padding--inner-horizontal: var(--cui-padding--inner);
 	--cui-padding--inner-vertical: var(--cui-padding--inner);
 	--cui-padding--panel-horizontal: var(--cui-padding);

@@ -293,6 +293,7 @@
 }
 :where(.cui-button-list[data-gap]) { --cui-button-list--gap: var(--cui-gap) }
 :where(.cui-button-list[data-gap="gap"]) { --cui-button-list--gap: var(--cui-gap) }
+:where(.cui-button-list[data-gap="double"]) { --cui-button-list--gap: var(--cui-double-gap) }
 :where(.cui-button-list[data-gap="gutter"]) { --cui-button-list--gap: var(--cui-gutter) }
 :where(.cui-button-list[data-gap="padding"]) { --cui-button-list--gap: var(--cui-padding) }
 :where(.cui-button-list[data-gap="large"]) { --cui-button-list--gap: calc(1.5 * var(--cui-padding)) }

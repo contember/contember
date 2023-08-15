@@ -287,6 +287,9 @@ export function px<V extends undefined>(value: V): '';
 // @public (undocumented)
 export function px<V extends number | false | null | undefined>(value?: V): string;
 
+// @public
+export function range(start: number, end: number, step?: number): number[];
+
 export { Replace }
 
 // @public (undocumented)

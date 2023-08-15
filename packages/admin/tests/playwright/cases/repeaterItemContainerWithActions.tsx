@@ -42,7 +42,7 @@ export default function () {
 					))}
 				</Stack>
 				<style>{`@media (max-width: 1023.98px) {
-					.cui-stack[data-horizontal] {
+					.cui-stack[data-direction="horizontal"] {
 						flex-direction: column;
 					}
 				}`}

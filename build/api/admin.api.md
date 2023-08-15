@@ -3354,6 +3354,7 @@ export const MiscPageLayout: React.NamedExoticComponent<MiscPageLayoutProps>;
 // @public (undocumented)
 export type MiscPageLayoutProps = Omit<BoxOwnProps, 'header' | 'footer'> & {
     footerActions?: ReactNode;
+    heading?: ReactNode;
 };
 
 // @public (undocumented)

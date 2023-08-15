@@ -12,8 +12,8 @@ export const DirectionStack = ({ children }: { children: ReactNode }) => {
 		<label>
 			<input checked={horizontal} name="horizontal-direction" type="checkbox" onChange={onChange} /> horizontal
 		</label>
-		<Stack gap="none" horizontal={horizontal} style={{ width: '100%' }}>
-      {children}
-    </Stack>
-  </>
+		<Stack gap={false} horizontal={horizontal} style={{ width: '100%' }}>
+			{children}
+		</Stack>
+	</>
 }

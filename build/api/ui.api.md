@@ -2804,7 +2804,7 @@ export interface TableProps {
 }
 
 // @public (undocumented)
-export const TableRow: MemoExoticComponent<({ active, children, id, justification, onClick: onClickProp }: TableRowProps) => JSX.Element>;
+export const TableRow: MemoExoticComponent<({ active, children, justification, onClick: onClick }: TableRowProps) => JSX.Element>;
 
 // @public (undocumented)
 export interface TableRowProps {
@@ -2813,11 +2813,9 @@ export interface TableRowProps {
     // (undocumented)
     children?: ReactNode;
     // (undocumented)
-    id?: string | number;
-    // (undocumented)
     justification?: Justification;
     // (undocumented)
-    onClick?: (id: number | string) => void;
+    onClick?: MouseEventHandler<HTMLTableRowElement>;
 }
 
 // @internal

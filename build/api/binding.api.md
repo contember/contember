@@ -4,7 +4,6 @@
 
 ```ts
 
-import { ComponentType } from 'react';
 import type { CrudQueryBuilder } from '@contember/client';
 import { EmbeddedActionsParser } from 'chevrotain';
 import { v4 as generateUuid } from 'uuid';
@@ -14,70 +13,9 @@ import type { GraphQlClientFailedRequestMetadata } from '@contember/client';
 import type { GraphQlClientRequestOptions } from '@contember/client';
 import { GraphQlLiteral } from '@contember/client';
 import { Input } from '@contember/client';
-import { NamedExoticComponent } from 'react';
-import { PropsWithChildren } from 'react';
-import { ReactElement } from 'react';
-import { ReactNode } from 'react';
 import type { Result } from '@contember/client';
 import { TokenType } from 'chevrotain';
 import type { TreeFilter } from '@contember/client';
-
-// @public (undocumented)
-export function AccessorProvider(props: EntityProviderProps): JSX.Element;
-
-// @public (undocumented)
-export const AccessorTree: {
-    ({ state, children }: AccessorTreeProps): JSX.Element;
-    displayName: string;
-};
-
-// @public (undocumented)
-export interface AccessorTreeProps {
-    // (undocumented)
-    children: ReactNode;
-    // (undocumented)
-    state: AccessorTreeState;
-}
-
-// @public (undocumented)
-export type AccessorTreeState = InitializingAccessorTreeState | InitializedAccessorTreeState | ErrorAccessorTreeState;
-
-// @public (undocumented)
-export type AccessorTreeStateAction = {
-    type: 'setData';
-    data: TreeRootAccessor;
-    binding: DataBinding;
-} | {
-    type: 'failWithError';
-    error: RequestError;
-    binding: DataBinding;
-} | {
-    type: 'reset';
-    binding: DataBinding;
-    environment: Environment;
-};
-
-// @public (undocumented)
-export interface AccessorTreeStateMetadata {
-    // (undocumented)
-    initialize: (() => void) | undefined;
-}
-
-// @public (undocumented)
-export interface AccessorTreeStateOptions {
-    // (undocumented)
-    children?: ReactNode;
-    // (undocumented)
-    refreshOnPersist?: boolean;
-    // (undocumented)
-    skipStateUpdateAfterPersist?: boolean;
-}
-
-// @public (undocumented)
-export const accessorTreeStateReducer: (previousState: AccessorTreeState, action: AccessorTreeStateAction) => AccessorTreeState;
-
-// @public (undocumented)
-export const addEntityAtIndex: (entityList: EntityListAccessor, sortableByField: RelativeSingleField, index: number, preprocess?: EntityAccessor.BatchUpdatesHandler) => void;
 
 // @public (undocumented)
 export type Alias = string;
@@ -143,32 +81,15 @@ export class BindingError extends Error {
 }
 
 // @public (undocumented)
-export interface BindingOperations extends AsyncBatchUpdatesOptions {
+export interface BindingOperations<Node> extends AsyncBatchUpdatesOptions {
     // (undocumented)
     batchDeferredUpdates: (performUpdates: (bindingOperations: BatchUpdatesOptions) => void) => void;
     // (undocumented)
-    extendTree: ExtendTree;
+    extendTree: ExtendTree<Node>;
     // (undocumented)
     getTreeFilters: () => TreeFilter[];
     // (undocumented)
     persist: Persist;
-}
-
-// @public (undocumented)
-export function BindingOperationsProvider(props: BindingOperationsProviderProps): JSX.Element;
-
-// @public (undocumented)
-export interface BindingOperationsProviderProps {
-    // (undocumented)
-    bindingOperations: BindingOperations | undefined;
-    // (undocumented)
-    children: ReactNode;
-}
-
-// @public (undocumented)
-export interface BranchMarkerProvider<Props extends {} = any> {
-    // (undocumented)
-    generateBranchMarker: (props: Props, fields: EntityFieldsWithHoistablesMarker | EntityFieldMarkersContainer, environment: Environment) => HasOneRelationMarker | HasManyRelationMarker | EntityFieldMarkersContainer | EntityFieldsWithHoistablesMarker;
 }
 
 // @public (undocumented)
@@ -183,72 +104,37 @@ export class ClientGeneratedUuid implements RuntimeIdSpec {
 }
 
 // @public (undocumented)
-export type CompleteMarkerProvider<Props extends {} = any, NonStaticPropNames extends keyof Props = never> = EnvironmentDeltaProvider<Props> & LeafMarkerProvider<Props> & BranchMarkerProvider<Props> & StaticRenderProvider<Props, NonStaticPropNames>;
+export class Config {
+    constructor(config?: Partial<BindingConfig>);
+    // (undocumented)
+    getValue<Name extends keyof BindingConfig>(name: Name): BindingConfig[Name];
+    // (undocumented)
+    setValue<Name extends keyof BindingConfig>(name: Name, value: BindingConfig[Name]): this;
+}
 
 // @public (undocumented)
-export function Component<Props extends {}>(statelessRender: EnvironmentAwareFunctionComponent<Props>, displayName?: string): NamedExoticComponent<Props>;
-
-// @public (undocumented)
-export function Component<Props extends {}, NonStaticPropNames extends keyof Props = never>(statefulRender: EnvironmentAwareFunctionComponent<Props>, staticRender: (props: StaticRenderProviderProps<Props, NonStaticPropNames>, environment: Environment) => ReactElement | null, displayName?: string): NamedExoticComponent<Props>;
-
-// @public (undocumented)
-export function Component<Props extends {}, NonStaticPropNames extends keyof Props = never>(statefulRender: EnvironmentAwareFunctionComponent<Props>, markerProvisions: MarkerProvider<Props, NonStaticPropNames>, displayName?: string): NamedExoticComponent<Props>;
-
-// @public (undocumented)
-export class DataBinding {
-    // Warning: (ae-forgotten-export) The symbol "TreeStore" needs to be exported by the entry point index.d.ts
-    constructor(contentApiClient: GraphQlClient, systemApiClient: GraphQlClient, tenantApiClient: GraphQlClient, treeStore: TreeStore, environment: Environment, onUpdate: (newData: TreeRootAccessor, binding: DataBinding) => void, onError: (error: RequestError, binding: DataBinding) => void, onPersistSuccess: (result: SuccessfulPersistResult, binding: DataBinding) => void, options: {
+export class DataBinding<Node> {
+    constructor(contentApiClient: GraphQlClient, systemApiClient: GraphQlClient, tenantApiClient: GraphQlClient, treeStore: TreeStore, environment: Environment, createMarkerTree: (node: Node, environment: Environment) => MarkerTreeRoot, batchedUpdates: (callback: () => any) => void, onUpdate: (newData: TreeRootAccessor<Node>, binding: DataBinding<Node>) => void, onError: (error: RequestError, binding: DataBinding<Node>) => void, onPersistSuccess: (result: SuccessfulPersistResult, binding: DataBinding<Node>) => void, options: {
         skipStateUpdateAfterPersist: boolean;
     });
     // (undocumented)
-    extendTree(newFragment: ReactNode, options?: ExtendTreeOptions): Promise<TreeRootId | undefined>;
+    extendTree(newFragment: Node, options?: ExtendTreeOptions): Promise<TreeRootId | undefined>;
 }
 
 // @public (undocumented)
 export const DataBindingExtendAborted: unique symbol;
 
-// @public
-export const DataBindingProvider: <StateProps>(props: DataBindingProviderProps<StateProps>) => ReactElement;
-
 // @public (undocumented)
-export type DataBindingProviderBaseProps = AccessorTreeStateOptions;
-
-// @public (undocumented)
-export type DataBindingProviderProps<StateProps> = DataBindingProviderBaseProps & DataBindingProviderStateComponent<StateProps>;
-
-// @public (undocumented)
-export type DataBindingProviderStateComponent<StateProps> = ({
-    stateComponent?: never;
-    stateProps?: never;
-} | {
-    stateComponent: ComponentType<StateProps & DataBindingStateComponentProps>;
-    stateProps?: StateProps;
-});
-
-// @public (undocumented)
-export interface DataBindingStateComponentProps {
+export class DirtinessTracker {
     // (undocumented)
-    accessorTreeState: AccessorTreeState;
+    getTotalTouchCount(): number;
     // (undocumented)
-    children?: ReactNode;
+    hasChanges(): boolean;
+    // (undocumented)
+    increaseBy(delta: number): void;
+    // (undocumented)
+    reset(): void;
 }
-
-// @public (undocumented)
-export const DeferredSubTrees: React.NamedExoticComponent<DeferredSubTreesProps>;
-
-// @public (undocumented)
-export interface DeferredSubTreesProps {
-    // (undocumented)
-    children: ReactNode;
-    // (undocumented)
-    fallback: ReactNode;
-}
-
-// @public (undocumented)
-export const DirtinessContext: React.Context<boolean>;
-
-// @public (undocumented)
-export const Entity: React.NamedExoticComponent<EntityBaseProps>;
 
 // @public (undocumented)
 export class EntityAccessor implements Errorable {
@@ -359,14 +245,6 @@ export namespace EntityAccessor {
 }
 
 // @public (undocumented)
-export interface EntityBaseProps {
-    // (undocumented)
-    accessor: EntityAccessor;
-    // (undocumented)
-    children?: ReactNode;
-}
-
-// @public (undocumented)
 export interface EntityCreationParameters {
     // (undocumented)
     isNonbearing: boolean;
@@ -425,20 +303,6 @@ export class EntityFieldsWithHoistablesMarker {
 
 // @public (undocumented)
 export type EntityId = string | number;
-
-// @public (undocumented)
-export function EntityKeyProvider(props: EntityKeyProviderProps): JSX.Element;
-
-// @public (undocumented)
-export interface EntityKeyProviderProps {
-    // (undocumented)
-    children: ReactNode;
-    // (undocumented)
-    entityKey: string;
-}
-
-// @public (undocumented)
-export const EntityList: <ListProps>(props: EntityListProps<ListProps>) => ReactElement;
 
 // @public (undocumented)
 export class EntityListAccessor implements Errorable {
@@ -540,14 +404,6 @@ export namespace EntityListAccessor {
 }
 
 // @public (undocumented)
-export interface EntityListBaseProps {
-    // (undocumented)
-    accessor: EntityListAccessor;
-    // (undocumented)
-    children?: ReactNode;
-}
-
-// @public (undocumented)
 export interface EntityListEventListeners {
     // (undocumented)
     childEventListeners: EntityEventListenerStore | undefined;
@@ -585,21 +441,6 @@ export interface EntityListPreferences {
 export const EntityListPreferencesDefaults: EntityListPreferences;
 
 // @public (undocumented)
-export type EntityListProps<ListProps> = EntityListBaseProps & ({} | {
-    listComponent: ComponentType<ListProps & EntityListBaseProps>;
-    listProps?: ListProps;
-});
-
-// @public
-export const EntityListSubTree: <ListProps, EntityProps>(props: EntityListSubTreeProps<ListProps, EntityProps>) => ReactElement;
-
-// @public (undocumented)
-export interface EntityListSubTreeAdditionalProps {
-    // (undocumented)
-    variables?: Environment.ValuesMapWithFactory;
-}
-
-// @public (undocumented)
 export class EntityListSubTreeMarker {
     constructor(parameters: QualifiedEntityList | UnconstrainedQualifiedEntityList, fields: EntityFieldMarkersContainer, environment: Environment);
     // (undocumented)
@@ -615,42 +456,10 @@ export class EntityListSubTreeMarker {
 }
 
 // @public (undocumented)
-export type EntityListSubTreeProps<ListProps, EntityProps> = {
-    treeRootId?: TreeRootId;
-    children?: ReactNode;
-} & EntityListSubTreeAdditionalProps & (SugaredQualifiedEntityList | SugaredUnconstrainedQualifiedEntityList) & ({} | {
-    listComponent: ComponentType<ListProps & EntityListBaseProps>;
-    listProps?: ListProps;
-});
-
-// @public (undocumented)
 export type EntityName = string;
 
 // @public (undocumented)
-export type EntityProps = EntityBaseProps;
-
-// @public (undocumented)
-export interface EntityProviderProps {
-    // (undocumented)
-    accessor: EntityAccessor;
-    // (undocumented)
-    children: ReactNode;
-}
-
-// @public (undocumented)
 export type EntityRealmKey = string;
-
-// @public
-export const EntitySubTree: <EntityProps>(pros: EntitySubTreeProps<EntityProps>) => ReactElement;
-
-// @public (undocumented)
-export type EntitySubTreeAdditionalCreationProps = {} | SetOrderFieldOnCreateOwnProps;
-
-// @public (undocumented)
-export interface EntitySubTreeAdditionalProps {
-    // (undocumented)
-    variables?: Environment.ValuesMapWithFactory;
-}
 
 // @public (undocumented)
 export class EntitySubTreeMarker {
@@ -665,23 +474,6 @@ export class EntitySubTreeMarker {
     readonly parameters: QualifiedSingleEntity | UnconstrainedQualifiedSingleEntity;
     // (undocumented)
     readonly placeholderName: string;
-}
-
-// @public (undocumented)
-export type EntitySubTreeProps<EntityProps> = {
-    treeRootId?: TreeRootId;
-    children?: ReactNode;
-} & EntitySubTreeAdditionalProps & (SugaredQualifiedSingleEntity | (SugaredUnconstrainedQualifiedSingleEntity & EntitySubTreeAdditionalCreationProps));
-
-// @public (undocumented)
-export function EntityView(props: EntityViewProps): JSX.Element;
-
-// @public (undocumented)
-export interface EntityViewProps {
-    // (undocumented)
-    field?: string | SugaredRelativeSingleEntity;
-    // (undocumented)
-    render: (entity: EntityAccessor) => ReactNode;
 }
 
 // @public (undocumented)
@@ -818,6 +610,11 @@ export namespace Environment {
         [K in string]?: string | number;
     };
     // (undocumented)
+    export type ReactElementLike = {
+        type: any;
+        props: any;
+    };
+    // (undocumented)
     export type ResolvedValue = Value;
     // (undocumented)
     export interface SelectedDimensions {
@@ -849,7 +646,7 @@ export namespace Environment {
     // (undocumented)
     export type SubTreeNode = SubTreeEntityNode | SubTreeEntityListNode;
     // (undocumented)
-    export type Value = ReactNode | GraphQlLiteral | Filter;
+    export type Value = string | number | boolean | undefined | GraphQlLiteral | Filter | ReactElementLike;
     const // (undocumented)
     createExtension: <S, R>(create: (state: S | undefined, environment: Environment) => R, otherMethods?: Omit<Extension<S, R>, "create"> | undefined) => Extension<S, R>;
     // (undocumented)
@@ -857,47 +654,6 @@ export namespace Environment {
         // (undocumented)
         [key: string]: ((environment: Environment) => Value) | Value;
     }
-}
-
-// @public (undocumented)
-export interface EnvironmentAwareFunctionComponent<P> {
-    // (undocumented)
-    (props: PropsWithChildren<P>, environment: Environment): ReactElement<any, any> | null;
-    // (undocumented)
-    displayName?: string | undefined;
-}
-
-// @public (undocumented)
-export const EnvironmentContext: React.Context<Environment>;
-
-// @public (undocumented)
-export interface EnvironmentDeltaProvider<Props extends {} = any> {
-    // (undocumented)
-    generateEnvironment: (props: Props, oldEnvironment: Environment) => Environment;
-}
-
-// @public (undocumented)
-export const EnvironmentExtensionProvider: <S, R>(props: EnvironmentWithExtensionProps<S, R>) => ReactElement | null;
-
-// @public (undocumented)
-export const EnvironmentMiddleware: React.NamedExoticComponent<EnvironmentMiddlewareProps>;
-
-// @public (undocumented)
-export interface EnvironmentMiddlewareProps {
-    // (undocumented)
-    children: ReactNode;
-    // (undocumented)
-    create: (env: Environment) => Environment;
-}
-
-// @public (undocumented)
-export interface EnvironmentWithExtensionProps<S, R> {
-    // (undocumented)
-    children: ReactNode;
-    // (undocumented)
-    extension: Environment.Extension<S, R>;
-    // (undocumented)
-    state: S;
 }
 
 // @public (undocumented)
@@ -950,18 +706,6 @@ export namespace ErrorAccessor {
 }
 
 // @public (undocumented)
-export interface ErrorAccessorTreeState {
-    // (undocumented)
-    binding: DataBinding;
-    // (undocumented)
-    environment: Environment;
-    // (undocumented)
-    error: RequestError;
-    // (undocumented)
-    name: 'error';
-}
-
-// @public (undocumented)
 export type ErrorPathNodeType = FieldPathErrorFragment | IndexPathErrorFragment;
 
 // @public (undocumented)
@@ -1003,6 +747,48 @@ export class EventListenersStore<EventTypes extends string, Events extends Gener
 }
 
 // @public (undocumented)
+export class EventManager {
+    // Warning: (ae-forgotten-export) The symbol "UpdateMetadata" needs to be exported by the entry point index.d.ts
+    constructor(asyncBatchUpdatesOptions: AsyncBatchUpdatesOptions, batchUpdatesOptions: BatchUpdatesOptions, config: Config, dirtinessTracker: DirtinessTracker, onUpdate: (metadata: UpdateMetadata) => void, treeStore: TreeStore, batchedUpdates: (callback: () => any) => void);
+    // (undocumented)
+    asyncOperation<T>(operation: () => Promise<T>): Promise<T>;
+    // (undocumented)
+    asyncTransaction<T>(transaction: () => Promise<T>): Promise<T>;
+    // (undocumented)
+    getEventDispatchers<State extends StateNode, EventListenerTypes extends Exclude<State['eventListeners'], undefined> extends EventListenersStore<infer Keys, infer Map> ? [Keys, Map] : never, EventType extends EventListenerTypes[0]>(state: State, event: {
+        type: EventType;
+        key?: string;
+    }, listenerArgs: Parameters<Exclude<EventListenerTypes[1][EventType], undefined>>): Array<() => ReturnType<Exclude<EventListenerTypes[1][EventType], undefined>>> | undefined;
+    // (undocumented)
+    getEventListeners<State extends StateNode, EventListenerTypes extends Exclude<State['eventListeners'], undefined> extends EventListenersStore<infer Keys, infer Map> ? [Keys, Map] : never, EventType extends EventListenerTypes[0]>(state: State, event: {
+        type: EventType;
+        key?: string;
+    }): Set<Exclude<EventListenerTypes[1][EventType], undefined>> | undefined;
+    // (undocumented)
+    static readonly NO_CHANGES_DIFFERENCE = 0;
+    // (undocumented)
+    persistOperation(operation: () => Promise<SuccessfulPersistResult>): Promise<SuccessfulPersistResult>;
+    // (undocumented)
+    registerJustUpdated(justUpdated: StateNode, changesDelta: number): void;
+    // Warning: (ae-forgotten-export) The symbol "StateNode" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    registerNewlyInitialized(newlyInitialized: StateNode): void;
+    // (undocumented)
+    registerUpdatedConnection(parentState: EntityRealmState, placeholderName: PlaceholderName): void;
+    // (undocumented)
+    syncOperation<T>(operation: () => T): T;
+    // (undocumented)
+    syncTransaction<T>(transaction: () => T): T;
+    // (undocumented)
+    triggerOnBeforePersist(): Promise<void>;
+    // (undocumented)
+    triggerOnPersistError(options: PersistErrorOptions): Promise<void>;
+    // (undocumented)
+    triggerOnPersistSuccess(options: PersistSuccessOptions): Promise<void>;
+}
+
+// @public (undocumented)
 export interface ExecutionError {
     // (undocumented)
     message: string | null;
@@ -1022,7 +808,7 @@ export type ExpectedQualifiedEntityMutation = 'none' | 'anyMutation';
 export type ExpectedRelationMutation = 'none' | 'createOrDelete' | 'connectOrDisconnect' | 'anyMutation';
 
 // @public (undocumented)
-export type ExtendTree = (newFragment: ReactNode, options?: ExtendTreeOptions) => Promise<TreeRootId | undefined>;
+export type ExtendTree<Node> = (newFragment: Node, options?: ExtendTreeOptions) => Promise<TreeRootId | undefined>;
 
 // @public (undocumented)
 export interface ExtendTreeOptions {
@@ -1031,9 +817,6 @@ export interface ExtendTreeOptions {
     // (undocumented)
     signal?: AbortSignal;
 }
-
-// @public (undocumented)
-export const Field: <Persisted extends FieldValue = FieldValue>(props: FieldProps<Persisted>) => ReactElement;
 
 // @public (undocumented)
 export class FieldAccessor<Value extends FieldValue = FieldValue> implements Errorable {
@@ -1119,10 +902,6 @@ export namespace FieldAccessor {
 }
 
 // @public (undocumented)
-export interface FieldBasicProps extends SugaredRelativeSingleField {
-}
-
-// @public (undocumented)
 export interface FieldEventListeners {
     // (undocumented)
     eventListeners: FieldEventListenerStore | undefined;
@@ -1161,52 +940,10 @@ export interface FieldPathErrorFragment {
 }
 
 // @public (undocumented)
-export interface FieldProps<Persisted extends FieldValue = FieldValue> extends FieldBasicProps, FieldRuntimeProps<Persisted> {
-}
-
-// @public (undocumented)
-export interface FieldRuntimeProps<Persisted extends FieldValue = FieldValue> {
-    // (undocumented)
-    format?: (value: Persisted | null) => ReactNode;
-}
-
-// @public (undocumented)
 export type FieldValue = JsonValue;
-
-// @public
-export const FieldView: {
-    <FV1 extends FieldValue>(props: FieldViewCommonProps & {
-        field: SRSF;
-        render: (field1: FieldAccessor<FV1>) => RN;
-    }): REN;
-    <FV1_1 extends FieldValue>(props: FieldViewCommonProps & {
-        fields: [SRSF];
-        render: (field1: FieldAccessor<FV1_1>) => RN;
-    }): REN;
-    <FV1_2 extends FieldValue, FV2 extends FieldValue>(props: FieldViewCommonProps & {
-        fields: [SRSF, SRSF];
-        render: (field1: FieldAccessor<FV1_2>, field2: FieldAccessor<FV2>) => RN;
-    }): REN;
-    <FV1_3 extends FieldValue, FV2_1 extends FieldValue, FV3 extends FieldValue>(props: FieldViewCommonProps & {
-        fields: [SRSF, SRSF, SRSF];
-        render: (field1: FieldAccessor<FV1_3>, field2: FieldAccessor<FV2_1>, field3: FieldAccessor<FV3>) => RN;
-    }): REN;
-    <FV1_4 extends FieldValue, FV2_2 extends FieldValue, FV3_1 extends FieldValue, FV4 extends FieldValue>(props: FieldViewCommonProps & {
-        fields: [SRSF, SRSF, SRSF, SRSF];
-        render: (field1: FieldAccessor<FV1_4>, field2: FieldAccessor<FV2_2>, field3: FieldAccessor<FV3_1>, field4: FieldAccessor<FV4>) => RN;
-    }): REN;
-    <FV1_5 extends FieldValue, FV2_3 extends FieldValue, FV3_2 extends FieldValue, FV4_1 extends FieldValue, FV5 extends FieldValue>(props: FieldViewCommonProps & {
-        fields: [SRSF, SRSF, SRSF, SRSF, SRSF];
-        render: (field1: FieldAccessor<FV1_5>, field2: FieldAccessor<FV2_3>, field3: FieldAccessor<FV3_2>, field4: FieldAccessor<FV4_1>, field5: FieldAccessor<FV5>) => RN;
-    }): REN;
-    (props: FieldViewProps): REN;
-};
 
 // @public (undocumented)
 export type Filter<T = GraphQlLiteral> = Input.Where<Input.Condition<Input.ColumnValue<T>>>;
-
-// @public (undocumented)
-export type ForceAccessorUpdate = () => void;
 
 export { generateUuid }
 
@@ -1233,18 +970,6 @@ export interface GqlError {
 }
 
 // @public (undocumented)
-export const HasMany: <ListProps, EntityProps>(props: HasManyProps<ListProps, EntityProps>) => ReactElement;
-
-// @public (undocumented)
-export type HasManyProps<ListProps = never, EntityProps = never> = SugaredRelativeEntityList & {
-    children?: ReactNode;
-    variables?: Environment.ValuesMapWithFactory;
-} & ({} | {
-    listComponent: ComponentType<ListProps & EntityListBaseProps>;
-    listProps?: ListProps;
-});
-
-// @public (undocumented)
 export interface HasManyRelation extends Relation, EntityListParameters, EntityListEventListeners {
 }
 
@@ -1262,15 +987,6 @@ export class HasManyRelationMarker {
     // (undocumented)
     readonly placeholderName: string;
 }
-
-// @public (undocumented)
-export const HasOne: <EntityProps extends {}>(props: HasOneProps<EntityProps>) => ReactElement;
-
-// @public (undocumented)
-export type HasOneProps<EntityProps = never> = SugaredRelativeSingleEntity & {
-    children?: ReactNode;
-    variables?: Environment.ValuesMapWithFactory;
-};
 
 // @public (undocumented)
 export interface HasOneRelation extends Relation, SingleEntityParameters, SingleEntityEventListeners {
@@ -1294,28 +1010,6 @@ export class HasOneRelationMarker {
 }
 
 // @public (undocumented)
-export const If: React.NamedExoticComponent<IfProps>;
-
-// @public (undocumented)
-export interface IfCallbackProps {
-    // (undocumented)
-    children?: ReactNode;
-    // (undocumented)
-    condition: (accessor: EntityAccessor) => boolean;
-}
-
-// @public (undocumented)
-export interface IfFilterProps {
-    // (undocumented)
-    children?: ReactNode;
-    // (undocumented)
-    condition: string | Filter;
-}
-
-// @public (undocumented)
-export type IfProps = IfFilterProps | IfCallbackProps;
-
-// @public (undocumented)
 export interface IndexPathErrorFragment {
     // (undocumented)
     __typename: '_IndexPathFragment';
@@ -1323,28 +1017,6 @@ export interface IndexPathErrorFragment {
     alias: string | null;
     // (undocumented)
     index: number;
-}
-
-// @public (undocumented)
-export interface InitializedAccessorTreeState {
-    // (undocumented)
-    binding: DataBinding;
-    // (undocumented)
-    data: TreeRootAccessor;
-    // (undocumented)
-    environment: Environment;
-    // (undocumented)
-    name: 'initialized';
-}
-
-// @public (undocumented)
-export interface InitializingAccessorTreeState {
-    // (undocumented)
-    binding?: DataBinding;
-    // (undocumented)
-    environment: Environment;
-    // (undocumented)
-    name: 'initializing';
 }
 
 // @public (undocumented)
@@ -1410,12 +1082,6 @@ export const LeafFieldDefaults: {
 };
 
 // @public (undocumented)
-export interface LeafMarkerProvider<Props extends {} = any> {
-    // (undocumented)
-    generateLeafMarker: (props: Props, environment: Environment) => FieldMarker | HasOneRelationMarker | EntityFieldMarkersContainer;
-}
-
-// @public (undocumented)
 export type Limit = number;
 
 // @public (undocumented)
@@ -1477,16 +1143,6 @@ export class MarkerMerger {
 }
 
 // @public (undocumented)
-export type MarkerProvider<Props extends {} = any, NonStaticPropNames extends keyof Props = never> = Partial<CompleteMarkerProvider<Props, NonStaticPropNames>>;
-
-// @public (undocumented)
-export class MarkerTreeGenerator {
-    constructor(sourceTree: ReactNode, environment?: Environment);
-    // (undocumented)
-    generate(): MarkerTreeRoot;
-}
-
-// @public (undocumented)
 export class MarkerTreeRoot {
     constructor(subTrees: SubTreeMarkers, placeholdersByAliases: Map<Alias, PlaceholderName>);
     // (undocumented)
@@ -1500,12 +1156,6 @@ export type MeaningfulMarker = FieldMarker | HasOneRelationMarker | HasManyRelat
 
 // @public (undocumented)
 export const metadataToRequestError: (metadata: GraphQlClientFailedRequestMetadata) => RequestError;
-
-// @public (undocumented)
-export const moveEntity: (entityList: EntityListAccessor, sortByField: RelativeSingleField, oldIndex: number, newIndex: number) => void;
-
-// @public (undocumented)
-export const moveEntityInArray: (entities: EntityAccessor[], getAccessor: EntityListAccessor.GetEntityListAccessor, sortByField: RelativeSingleField, oldIndex: number, newIndex: number) => EntityAccessor[];
 
 // @public (undocumented)
 export interface MutationDataResponse {
@@ -1543,9 +1193,6 @@ export interface MutationResponse {
         errors: ValidationError[];
     } | undefined;
 }
-
-// @public (undocumented)
-export const MutationStateContext: React.Context<boolean>;
 
 // @public (undocumented)
 export interface MutationTransactionResponse {
@@ -1603,9 +1250,6 @@ export interface OwningRelation extends BaseRelation {
 }
 
 // @public (undocumented)
-export const ParentEntity: React.NamedExoticComponent<ParentEntityProps>;
-
-// @public (undocumented)
 export class ParentEntityMarker {
     constructor(parentEntity: ParentEntityParameters, fields: EntityFieldMarkersContainer);
     // (undocumented)
@@ -1616,12 +1260,6 @@ export class ParentEntityMarker {
 
 // @public (undocumented)
 export interface ParentEntityParameters extends SingleEntityEventListeners {
-}
-
-// @public (undocumented)
-export interface ParentEntityProps extends SugaredParentEntityParameters {
-    // (undocumented)
-    children?: ReactNode;
 }
 
 // @public
@@ -1834,6 +1472,18 @@ export interface QueryRequestResponse {
 }
 
 // @public (undocumented)
+export interface RawSchema {
+    // Warning: (ae-forgotten-export) The symbol "RawSchemaEntity" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    entities: RawSchemaEntity[];
+    // Warning: (ae-forgotten-export) The symbol "RawSchemaEnum" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    enums: RawSchemaEnum[];
+}
+
+// @public (undocumented)
 export type ReceivedData = ReceivedEntityData | ReceivedEntityData[];
 
 // @public (undocumented)
@@ -1885,9 +1535,6 @@ export type RelativeSingleField = AnyField & LeafField & {
 
 // @public (undocumented)
 export type RemovalType = 'disconnect' | 'delete';
-
-// @public (undocumented)
-export const repairEntitiesOrder: (sortableByField: RelativeSingleField, sortedEntities: EntityAccessor[]) => void;
 
 // @public (undocumented)
 export type RequestError = UnauthorizedRequestError | NetworkErrorRequestError | GqlError | UnknownErrorRequestError;
@@ -1997,6 +1644,12 @@ export class SchemaLoader {
 }
 
 // @public (undocumented)
+export class SchemaPreprocessor {
+    // (undocumented)
+    static processRawSchema(rawSchema: RawSchema): SchemaStore;
+}
+
+// @public (undocumented)
 export type SchemaRelation = OwningRelation | InverseRelation;
 
 // @public (undocumented)
@@ -2040,21 +1693,6 @@ export class ServerId implements RuntimeIdSpec {
 export type SetOnCreate = UniqueWhere | undefined;
 
 // @public (undocumented)
-export const SetOrderFieldOnCreate: React.NamedExoticComponent<SetOrderFieldOnCreateProps>;
-
-// @public (undocumented)
-export interface SetOrderFieldOnCreateOwnProps {
-    // (undocumented)
-    newOrderFieldValue?: number;
-    // (undocumented)
-    orderField: SugaredRelativeSingleField | string;
-}
-
-// @public (undocumented)
-export interface SetOrderFieldOnCreateProps extends SetOrderFieldOnCreateOwnProps, Pick<SugaredUnconstrainedQualifiedSingleEntity, 'entity'> {
-}
-
-// @public (undocumented)
 export interface SingleEntityEventListeners {
     // (undocumented)
     eventListeners: EntityEventListenerStore | undefined;
@@ -2070,41 +1708,27 @@ export interface SingleEntityParameters {
 export type SingleEntityPersistedData = Map<PlaceholderName, EntityFieldPersistedData>;
 
 // @public (undocumented)
-export interface SortedEntities {
+export class StateInitializer {
+    // Warning: (ae-forgotten-export) The symbol "AccessorErrorManager" needs to be exported by the entry point index.d.ts
+    constructor(accessorErrorManager: AccessorErrorManager, batchUpdatesOptions: BatchUpdatesOptions, eventManager: EventManager, treeStore: TreeStore);
     // (undocumented)
-    addNewAtIndex: (index: number | undefined, preprocess?: EntityAccessor.BatchUpdatesHandler) => void;
+    initializeEntityEventListenerStore(blueprint: EntityRealmBlueprint): EntityEventListenerStore | undefined;
+    // Warning: (ae-forgotten-export) The symbol "EntityRealmBlueprint" needs to be exported by the entry point index.d.ts
+    // Warning: (ae-forgotten-export) The symbol "EntityRealmStateStub" needs to be exported by the entry point index.d.ts
+    //
     // (undocumented)
-    appendNew: (initialize?: EntityAccessor.BatchUpdatesHandler) => void;
+    initializeEntityRealm(id: RuntimeId, entityName: EntityName, blueprint: EntityRealmBlueprint, copyFrom?: EntityRealmState | EntityRealmStateStub): EntityRealmState | EntityRealmStateStub;
+    // Warning: (ae-forgotten-export) The symbol "EntityState" needs to be exported by the entry point index.d.ts
+    //
     // (undocumented)
-    entities: EntityAccessor[];
+    initializeEntityState(id: RuntimeId, entityName: EntityName): EntityState;
+    // Warning: (ae-forgotten-export) The symbol "RootStateNode" needs to be exported by the entry point index.d.ts
+    //
     // (undocumented)
-    moveEntity: (oldIndex: number, newIndex: number) => void;
+    initializeSubTree(tree: EntitySubTreeMarker | EntityListSubTreeMarker): RootStateNode;
     // (undocumented)
-    prependNew: (initialize?: EntityAccessor.BatchUpdatesHandler) => void;
+    runImmediateUserInitialization(realm: EntityRealmState | EntityRealmStateStub, initialize: EntityAccessor.BatchUpdatesHandler | undefined): void;
 }
-
-// @public (undocumented)
-export const sortEntities: (entities: EntityAccessor[], sortByField: RelativeSingleField | undefined) => EntityAccessor[];
-
-// @public (undocumented)
-export const StaticRender: React.NamedExoticComponent<StaticRenderProps>;
-
-// @public (undocumented)
-export interface StaticRenderProps {
-    // (undocumented)
-    children?: ReactNode;
-}
-
-// @public (undocumented)
-export interface StaticRenderProvider<Props extends {} = any, NonStaticPropNames extends keyof Props = never> {
-    // (undocumented)
-    staticRender: (props: StaticRenderProviderProps<Props, NonStaticPropNames>, environment: Environment) => ReactElement | null;
-}
-
-// @public (undocumented)
-export type StaticRenderProviderProps<Props extends {} = any, NonStaticPropNames extends keyof Props = never> = [
-NonStaticPropNames
-] extends [never] ? Props : Omit<Props, NonStaticPropNames>;
 
 // @public (undocumented)
 export type SubTreeDataStore = Map<PlaceholderName, ServerId | EntityListPersistedData>;
@@ -2205,15 +1829,6 @@ export interface SugarableUnconstrainedQualifiedEntityList extends SugarableQual
 export interface SugarableUnconstrainedQualifiedSingleEntity extends SugarableQualifiedEntityParameters {
     // (undocumented)
     hasOneRelationPath?: SugarableHasOneRelation[] | SugarableHasOneRelation;
-}
-
-// @public (undocumented)
-export const SugaredField: <Persisted extends FieldValue = FieldValue>(props: SugaredFieldProps<Persisted>) => ReactElement;
-
-// @public (undocumented)
-export interface SugaredFieldProps<Persisted extends FieldValue = FieldValue> extends Omit<FieldProps<Persisted>, 'field'> {
-    // (undocumented)
-    field: string | SugaredRelativeSingleField;
 }
 
 // @public (undocumented)
@@ -2323,6 +1938,35 @@ export const tokens: {
 };
 
 // @public (undocumented)
+export class TreeAugmenter {
+    constructor(eventManager: EventManager, stateInitializer: StateInitializer, treeStore: TreeStore, skipStateUpdateAfterPersist?: boolean);
+    // (undocumented)
+    extendPersistedData(newPersistedData: ReceivedDataTree, markerTree: MarkerTreeRoot): void;
+    // (undocumented)
+    extendTreeStates(newTreeId: TreeRootId | undefined, newMarkerTree: MarkerTreeRoot): void;
+    // (undocumented)
+    resetCreatingSubTrees(): void;
+    // Warning: (ae-forgotten-export) The symbol "SubMutationOperation" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    updatePersistedData(response: ReceivedDataTree, operations: SubMutationOperation[]): void;
+}
+
+// @public (undocumented)
+export class TreeNodeEnvironmentFactory {
+    // (undocumented)
+    static createEnvironmentForEntity(environment: Environment, sugaredRelativeSingleEntity: SugaredRelativeSingleEntity): Environment;
+    // (undocumented)
+    static createEnvironmentForEntityList(environment: Environment, sugaredRelativeEntityList: SugaredRelativeEntityList): Environment;
+    // (undocumented)
+    static createEnvironmentForEntityListSubtree(environment: Environment, sugaredEntityList: SugaredQualifiedEntityList | SugaredUnconstrainedQualifiedEntityList): Environment;
+    // (undocumented)
+    static createEnvironmentForEntitySubtree(environment: Environment, sugaredEntityList: SugaredQualifiedSingleEntity | SugaredUnconstrainedQualifiedSingleEntity): Environment;
+    // (undocumented)
+    static createEnvironmentForField(environment: Environment, sugaredRelativeSingleField: SugaredRelativeSingleField): Environment;
+}
+
+// @public (undocumented)
 export class TreeParameterMerger {
     // (undocumented)
     static cloneEntityListEventListeners(store: EntityListEventListenerStore): EntityListEventListenerStore;
@@ -2351,10 +1995,10 @@ export class TreeParameterMerger {
 }
 
 // @public (undocumented)
-export class TreeRootAccessor {
-    constructor(hasUnpersistedChanges: boolean, isMutating: boolean, bindingOperations: BindingOperations);
+export class TreeRootAccessor<Node> {
+    constructor(hasUnpersistedChanges: boolean, isMutating: boolean, bindingOperations: BindingOperations<Node>);
     // (undocumented)
-    readonly bindingOperations: BindingOperations;
+    readonly bindingOperations: BindingOperations<Node>;
     // (undocumented)
     readonly hasUnpersistedChanges: boolean;
     // (undocumented)
@@ -2365,14 +2009,45 @@ export class TreeRootAccessor {
 export type TreeRootId = string;
 
 // @public (undocumented)
-export function TreeRootIdProvider(props: TreeRootIdProviderProps): JSX.Element;
-
-// @public (undocumented)
-export interface TreeRootIdProviderProps {
+export class TreeStore {
+    constructor(_schema: Schema);
     // (undocumented)
-    children: ReactNode;
+    disposeOfEntity(entity: EntityState): void;
     // (undocumented)
-    treeRootId: TreeRootId | undefined;
+    disposeOfRealm(realmToDisposeOf: EntityRealmState | EntityRealmStateStub): void;
+    // (undocumented)
+    effectivelyHasTreeRoot(candidateRoot: MarkerTreeRoot): boolean;
+    // (undocumented)
+    readonly entityRealmStore: Map<EntityRealmKey, EntityRealmState | EntityRealmStateStub>;
+    // (undocumented)
+    readonly entityStore: Map<UniqueEntityId, EntityState>;
+    // (undocumented)
+    getEntityListPersistedIds(state: EntityListState): ReadonlySet<EntityId>;
+    // (undocumented)
+    getPathBackToParent(entityRealm: EntityRealmState | EntityRealmStateStub): {
+        fieldBackToParent: FieldName;
+        parent: EntityRealmState;
+    } | undefined;
+    // (undocumented)
+    getSubTreeState(mode: 'entity', treeRootId: TreeRootId | undefined, aliasOrParameters: Alias | SugaredQualifiedSingleEntity | SugaredUnconstrainedQualifiedSingleEntity, environment: Environment): EntityRealmState;
+    // (undocumented)
+    getSubTreeState(mode: 'entityList', treeRootId: TreeRootId | undefined, aliasOrParameters: Alias | SugaredQualifiedEntityList | SugaredUnconstrainedQualifiedEntityList, environment: Environment): EntityListState;
+    // (undocumented)
+    readonly markerTrees: Map<TreeRootId | undefined, MarkerTreeRoot>;
+    // (undocumented)
+    mergeInMutationResponse(response: ReceivedDataTree, operations: SubMutationOperation[]): void;
+    // (undocumented)
+    mergeInQueryResponse(response: ReceivedDataTree, markerTree: MarkerTreeRoot): void;
+    // (undocumented)
+    readonly persistedData: NormalizedPersistedData;
+    // (undocumented)
+    get persistedEntityData(): PersistedEntityDataStore;
+    // (undocumented)
+    get schema(): Schema;
+    // (undocumented)
+    get subTreePersistedData(): SubTreeDataStore;
+    // (undocumented)
+    readonly subTreeStatesByRoot: Map<TreeRootId | undefined, Map<PlaceholderName, RootStateNode>>;
 }
 
 // @public (undocumented)
@@ -2390,6 +2065,8 @@ export interface UnconstrainedQualifiedEntityList extends QualifiedEntityParamet
     hasOneRelationPath: HasOneRelation[];
     // (undocumented)
     isCreating: true;
+    // (undocumented)
+    isUnpersisted: boolean;
 }
 
 // @public (undocumented)
@@ -2398,6 +2075,8 @@ export interface UnconstrainedQualifiedSingleEntity extends QualifiedEntityParam
     hasOneRelationPath: HasOneRelation[];
     // (undocumented)
     isCreating: true;
+    // (undocumented)
+    isUnpersisted: boolean;
 }
 
 // @public (undocumented)
@@ -2536,188 +2215,17 @@ export type UnsugarableSingleEntityEventListeners = {
 export interface UnsugarableUnconstrainedQualifiedEntityList extends UnsugarableQualifiedEntityParameters, UnsugarableEntityCreationParameters, UnsugarableEntityListEventListeners, UnsugarableEntityListPreferences {
     // (undocumented)
     isCreating: true;
+    // (undocumented)
+    isUnpersisted?: boolean;
 }
 
 // @public (undocumented)
 export interface UnsugarableUnconstrainedQualifiedSingleEntity extends UnsugarableQualifiedEntityParameters, UnsugarableEntityCreationParameters, UnsugarableSingleEntityEventListeners {
     // (undocumented)
     isCreating: true;
+    // (undocumented)
+    isUnpersisted?: boolean;
 }
-
-// @public (undocumented)
-export const useAccessorTreeState: () => AccessorTreeState;
-
-// @public
-export function useAccessorUpdateSubscription<Value extends FieldValue = FieldValue>(getFieldAccessor: () => FieldAccessor<Value>): FieldAccessor<Value>;
-
-// @public (undocumented)
-export function useAccessorUpdateSubscription(getEntityAccessor: () => EntityAccessor): EntityAccessor;
-
-// @public (undocumented)
-export function useAccessorUpdateSubscription(getListAccessor: () => EntityListAccessor): EntityListAccessor;
-
-// @public (undocumented)
-export function useAccessorUpdateSubscription(getAccessor: () => EntityListAccessor | EntityAccessor): EntityListAccessor | EntityAccessor;
-
-// @public (undocumented)
-export function useAccessorUpdateSubscription<Value extends FieldValue = FieldValue>(getFieldAccessor: () => FieldAccessor<Value>, withForceUpdate: true): [FieldAccessor<Value>, ForceAccessorUpdate];
-
-// @public (undocumented)
-export function useAccessorUpdateSubscription(getEntityAccessor: () => EntityAccessor, withForceUpdate: true): [EntityAccessor, ForceAccessorUpdate];
-
-// @public (undocumented)
-export function useAccessorUpdateSubscription(getListAccessor: () => EntityListAccessor, withForceUpdate: true): [EntityListAccessor, ForceAccessorUpdate];
-
-// @public (undocumented)
-export function useAccessorUpdateSubscription(getAccessor: () => EntityListAccessor | EntityAccessor, withForceUpdate: true): [EntityListAccessor | EntityAccessor, ForceAccessorUpdate];
-
-// @public (undocumented)
-export const useBindingOperations: () => BindingOperations;
-
-// @public (undocumented)
-export const useDataBinding: ({ children, refreshOnPersist, skipStateUpdateAfterPersist, }: AccessorTreeStateOptions) => AccessorTreeState;
-
-// @public @deprecated
-export const useDerivedField: <SourceValue extends FieldValue = FieldValue>(sourceField: string | SugaredRelativeSingleField, derivedField: string | SugaredRelativeSingleField, transform?: (sourceValue: SourceValue | null) => SourceValue | null, agent?: string) => void;
-
-// @public @deprecated (undocumented)
-export function useDesugaredRelativeEntityList(sugaredRelativeEntityList: string | SugaredRelativeEntityList): RelativeEntityList;
-
-// @public @deprecated (undocumented)
-export function useDesugaredRelativeEntityList(sugaredRelativeEntityList: string | SugaredRelativeEntityList | undefined): RelativeEntityList | undefined;
-
-// @public @deprecated (undocumented)
-export function useDesugaredRelativeSingleEntity(sugaredRelativeSingleEntity: string | SugaredRelativeSingleEntity): RelativeSingleEntity;
-
-// @public @deprecated (undocumented)
-export function useDesugaredRelativeSingleEntity(sugaredRelativeSingleEntity: string | SugaredRelativeSingleEntity | undefined): RelativeSingleEntity | undefined;
-
-// @public @deprecated (undocumented)
-export function useDesugaredRelativeSingleField(sugaredRelativeSingleField: string | SugaredRelativeSingleField): RelativeSingleField;
-
-// @public @deprecated (undocumented)
-export function useDesugaredRelativeSingleField(sugaredRelativeSingleField: string | SugaredRelativeSingleField | undefined): RelativeSingleField | undefined;
-
-// @public (undocumented)
-export const useDirtinessState: () => boolean;
-
-// @public (undocumented)
-export function useEntity(): EntityAccessor;
-
-// @public (undocumented)
-export function useEntity(sugaredRelativeSingleEntity: string | SugaredRelativeSingleEntity): EntityAccessor;
-
-// @public (undocumented)
-export function useEntity(sugaredRelativeSingleEntity: string | SugaredRelativeSingleEntity | undefined): EntityAccessor | undefined;
-
-// @public (undocumented)
-export const useEntityBeforePersist: (listener: EntityAccessor.EntityEventListenerMap['beforePersist']) => void;
-
-// @public (undocumented)
-export const useEntityBeforeUpdate: (listener: EntityAccessor.EntityEventListenerMap['beforeUpdate']) => void;
-
-// @public (undocumented)
-export function useEntityEvent(type: 'beforePersist', listener: EntityAccessor.EntityEventListenerMap['beforePersist']): void;
-
-// @public (undocumented)
-export function useEntityEvent(type: 'beforeUpdate', listener: EntityAccessor.EntityEventListenerMap['beforeUpdate']): void;
-
-// @public (undocumented)
-export function useEntityEvent(type: 'connectionUpdate', hasOneField: FieldName, listener: EntityAccessor.EntityEventListenerMap['connectionUpdate']): void;
-
-// @public (undocumented)
-export function useEntityEvent(type: 'persistError', listener: EntityAccessor.EntityEventListenerMap['persistError']): void;
-
-// @public (undocumented)
-export function useEntityEvent(type: 'persistSuccess', listener: EntityAccessor.EntityEventListenerMap['persistSuccess']): void;
-
-// @public (undocumented)
-export function useEntityEvent(type: 'update', listener: EntityAccessor.EntityEventListenerMap['update']): void;
-
-// @public (undocumented)
-export const useEntityKey: () => string;
-
-// @public (undocumented)
-export function useEntityList(sugaredRelativeEntityList: string | SugaredRelativeEntityList): EntityListAccessor;
-
-// @public (undocumented)
-export function useEntityList(sugaredRelativeEntityList: string | SugaredRelativeEntityList | undefined): EntityListAccessor | undefined;
-
-// @public (undocumented)
-export const useEntityListSubTree: (qualifiedEntityList: Alias | SugaredQualifiedEntityList | SugaredUnconstrainedQualifiedEntityList, ...treeId: [TreeRootId | undefined] | [
-]) => EntityListAccessor;
-
-// @public (undocumented)
-export function useEntityListSubTreeParameters(alias: Alias): Alias;
-
-// @public (undocumented)
-export function useEntityListSubTreeParameters(qualifiedEntityList: SugaredQualifiedEntityList | SugaredUnconstrainedQualifiedEntityList): SugaredQualifiedEntityList | SugaredUnconstrainedQualifiedEntityList;
-
-// @public (undocumented)
-export function useEntityListSubTreeParameters(qualifiedEntityListOrAlias: Alias | SugaredQualifiedEntityList | SugaredUnconstrainedQualifiedEntityList): Alias | SugaredQualifiedEntityList | SugaredUnconstrainedQualifiedEntityList;
-
-// @public (undocumented)
-export const useEntityPersistError: (listener: EntityAccessor.EntityEventListenerMap['persistError']) => void;
-
-// @public (undocumented)
-export const useEntityPersistSuccess: (listener: EntityAccessor.EntityEventListenerMap['persistSuccess']) => void;
-
-// @public (undocumented)
-export const useEntitySubTree: (qualifiedSingleEntity: Alias | SugaredQualifiedSingleEntity | SugaredUnconstrainedQualifiedSingleEntity, ...treeId: [TreeRootId | undefined] | [
-]) => EntityAccessor;
-
-// @public (undocumented)
-export function useEntitySubTreeParameters(alias: Alias): Alias;
-
-// @public (undocumented)
-export function useEntitySubTreeParameters(qualifiedEntity: SugaredQualifiedSingleEntity | SugaredUnconstrainedQualifiedSingleEntity): SugaredQualifiedSingleEntity | SugaredUnconstrainedQualifiedSingleEntity;
-
-// @public (undocumented)
-export function useEntitySubTreeParameters(qualifiedSingleEntityOrAlias: Alias | SugaredQualifiedSingleEntity | SugaredUnconstrainedQualifiedSingleEntity): Alias | SugaredQualifiedSingleEntity | SugaredUnconstrainedQualifiedSingleEntity;
-
-// @public (undocumented)
-export const useEnvironment: () => Environment;
-
-// @public (undocumented)
-export const useExtendTree: () => (newFragment: ReactNode, options?: Omit<ExtendTreeOptions, 'signal'>) => Promise<TreeRootId | undefined>;
-
-// @public (undocumented)
-export function useField<Value extends FieldValue = FieldValue>(sugaredRelativeSingleField: string | SugaredRelativeSingleField): FieldAccessor<Value>;
-
-// @public (undocumented)
-export function useField<Value extends FieldValue = FieldValue>(sugaredRelativeSingleField: string | SugaredRelativeSingleField | undefined): FieldAccessor<Value> | undefined;
-
-// @public (undocumented)
-export const useGetEntityByKey: () => GetEntityByKey;
-
-// @public (undocumented)
-export const useGetEntityListSubTree: () => (parametersOrAlias: Alias | SugaredQualifiedEntityList | SugaredUnconstrainedQualifiedEntityList, ...treeId: [TreeRootId | undefined] | [
-]) => EntityListAccessor;
-
-// @public (undocumented)
-export const useGetEntitySubTree: () => (parametersOrAlias: Alias | SugaredQualifiedSingleEntity | SugaredUnconstrainedQualifiedSingleEntity, ...treeId: [TreeRootId | undefined] | [
-]) => EntityAccessor;
-
-// @public (undocumented)
-export const useGetTreeFilters: () => (() => TreeFilter[]);
-
-// @public (undocumented)
-export const useHasEntity: () => boolean;
-
-// @public (undocumented)
-export const useMutationState: () => boolean;
-
-// @public (undocumented)
-export const useOnConnectionUpdate: (fieldName: FieldName, listener: EntityAccessor.EntityEventListenerMap['connectionUpdate']) => void;
-
-// @public (undocumented)
-export const usePersist: () => Persist;
-
-// @public (undocumented)
-export const useSortedEntities: (entityList: EntityListAccessor, sortableByField: SugaredFieldProps['field'] | undefined) => SortedEntities;
-
-// @public (undocumented)
-export const useTreeRootId: () => TreeRootId | undefined;
 
 // @public (undocumented)
 export interface ValidationError {
@@ -2746,14 +2254,6 @@ export class VariableInputTransformer {
 
 // @public (undocumented)
 export const wrapFilterInHasOnes: (path: HasOneRelation[], filter: Filter) => Filter;
-
-// Warnings were encountered during analysis:
-//
-// src/helperComponents/FieldView.tsx:47:23 - (ae-forgotten-export) The symbol "FieldViewCommonProps" needs to be exported by the entry point index.d.ts
-// src/helperComponents/FieldView.tsx:47:23 - (ae-forgotten-export) The symbol "REN" needs to be exported by the entry point index.d.ts
-// src/helperComponents/FieldView.tsx:49:1 - (ae-forgotten-export) The symbol "SRSF" needs to be exported by the entry point index.d.ts
-// src/helperComponents/FieldView.tsx:108:33 - (ae-forgotten-export) The symbol "RN" needs to be exported by the entry point index.d.ts
-// src/helperComponents/FieldView.tsx:141:1 - (ae-forgotten-export) The symbol "FieldViewProps" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

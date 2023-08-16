@@ -546,7 +546,6 @@ const schema: DocumentNode = gql`
 	type AddGlobalIdentityRolesResult {
 		identity: Identity!
 	}
-
 	type AddGlobalIdentityRolesError {
 		code: AddGlobalIdentityRolesErrorCode!
 		developerMessage: String!
@@ -655,6 +654,7 @@ const schema: DocumentNode = gql`
 
 	type IdentityGlobalPermissions {
 		canCreateProject: Boolean!
+		canDeployEntrypoint: Boolean!
 	}
 
 	type IdentityProjectRelation {

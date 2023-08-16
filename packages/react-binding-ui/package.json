@@ -39,7 +39,7 @@
 		"@contember/react-utils": "workspace:*",
 		"@contember/ui": "workspace:*",
 		"@contember/utilities": "workspace:*",
-		"lucide-react": "^0.256.0"
+		"lucide-react": "^0.258.0"
 	},
 	"peerDependencies": {
 		"react": "^17 || ^18",

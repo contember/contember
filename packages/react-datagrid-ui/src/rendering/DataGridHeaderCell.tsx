@@ -99,7 +99,7 @@ export const DataGridHeaderCellFilterDropdown = (props: DataGridHeaderCellFilter
 						requestClose()
 					}}
 				>
-					<Box padding={false} background={false} border={false} header={<>Filter: {header}</>}>
+					<Box padding={false} background={false} border={false} header={<>Filter: {props.column.header}</>}>
 						{createElement(filterRenderer, {
 							filter,
 							setFilter: setFilter,

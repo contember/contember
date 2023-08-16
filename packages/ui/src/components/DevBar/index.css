@@ -66,6 +66,7 @@
 	min-height: var(--cui-size--controls);
 	min-width: var(--cui-size--controls);
 	padding: 0.625rem;
+	white-space: nowrap;
 }
 
 :where(.cui-devBar-close) {
@@ -123,7 +124,7 @@
 	cursor: pointer;
 	display: inline-flex;
 	font-weight: normal;
-	gap: var(--cui-gutter);
+	gap: var(--cui-gap);
 }
 :where(
 	.cui-devBar-trigger-label:hover,
@@ -171,7 +172,7 @@
 
 @media screen and (min-width: 768px) {
 	:where(.cui-devBar-trigger) {
-		--y-offset: calc(-1 * var(--cui-size--controls) + 2 * var(--cui-gap));
+		--y-offset: calc(-1 * var(--cui-size--controls) + var(--cui-double-gap));
 		position: relative;
 	}
 	:where(.cui-devBar-panel-content) {

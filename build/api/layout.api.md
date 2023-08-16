@@ -4,8 +4,6 @@
 
 ```ts
 
-/// <reference types="react" />
-
 import { ComponentClassNameProps } from '@contember/utilities';
 import { ComponentType } from 'react';
 import { ContainerWidthContextType } from '@contember/react-utils';
@@ -20,6 +18,7 @@ import { NestedClassName } from '@contember/utilities';
 import { PascalCase } from '@contember/utilities';
 import { PolymorphicComponentPropsWithRef } from '@contember/utilities';
 import { Predicate } from '@contember/utilities';
+import { PropsWithChildren } from 'react';
 import { default as React_2 } from 'react';
 import { ReactElement } from 'react';
 import { ReactNode } from 'react';
@@ -238,22 +237,31 @@ export const ContentSlotTargets: Readonly<Readonly<{
 }>>;
 
 // @public (undocumented)
-interface ControlledPanelProps {
+interface ControlledBehaviorPanelProps {
     // (undocumented)
-    behavior: PanelBehavior | null | undefined;
+    behavior: PanelBehavior;
     // (undocumented)
-    defaultBehavior?: never;
-    // (undocumented)
-    defaultVisibility?: never;
+    defaultBehavior?: null | undefined;
     // (undocumented)
     onBehaviorChange: (state: PanelState) => void;
+}
+
+// @public (undocumented)
+interface ControlledVisibilityPanelProps {
     // (undocumented)
-    onKeyPress?: (event: KeyboardEvent, state: PanelState) => void;
+    defaultVisibility?: null | undefined;
     // (undocumented)
     onVisibilityChange: (state: PanelState) => void;
     // (undocumented)
-    visibility: PanelVisibility | null | undefined;
+    visibility: PanelVisibility;
 }
+
+// @public (undocumented)
+type ControlPanelProps = (ControlledBehaviorPanelProps | UncontrolledBehaviorPanelProps) & (ControlledVisibilityPanelProps | UncontrolledVisibilityPanelProps) & {
+    onKeyPress?: (event: KeyboardEvent, state: PanelState) => Partial<PanelState> & {
+        passive?: boolean;
+    } | null | undefined | void;
+};
 
 // @public (undocumented)
 export function createLayoutBarComponent({ name, defaultAs, defaultComponentClassName, displayName, }: {
@@ -564,6 +572,7 @@ declare namespace LayoutPrimitives {
         SetLayoutPanelVisibility,
         RegisterLayoutPanel,
         UnregisterLayoutPanel,
+        UpdateLayoutPanelConfig,
         UpdateLayoutPanel,
         SetLayoutPanelsStateContextType,
         SetLayoutPanelsStateContext,
@@ -595,8 +604,11 @@ declare namespace LayoutPrimitives {
         PanelState,
         PanelBasicProps,
         CommonPanelConfigProps,
-        ControlledPanelProps,
-        UncontrolledPanelProps,
+        ControlledBehaviorPanelProps,
+        UncontrolledBehaviorPanelProps,
+        ControlledVisibilityPanelProps,
+        UncontrolledVisibilityPanelProps,
+        ControlPanelProps,
         PanelConfigProps,
         OwnPanelProps,
         PanelProps,
@@ -670,9 +682,10 @@ export type OwnBarStartProps = {
 };
 
 // @public (undocumented)
-type OwnContainerProps = ComponentClassNameProps & {
+interface OwnContainerProps extends ComponentClassNameProps, PropsWithChildren<{
     showDataState?: boolean;
-};
+}> {
+}
 
 // @public (undocumented)
 export type OwnContentPanelProps = Omit<ComponentClassNameProps, 'children'> & {
@@ -683,6 +696,7 @@ export type OwnContentPanelProps = Omit<ComponentClassNameProps, 'children'> & {
     header?: ReactNode | ((state: PanelState, panelsState: GetLayoutPanelsStateContextType) => ReactNode);
     maxWidth?: number | false | null | undefined;
     minWidth?: number | null | undefined;
+    priority?: number | null | undefined;
 };
 
 // @public (undocumented)
@@ -745,7 +759,7 @@ type OwnPanelProps = PanelBasicProps & PanelConfigProps;
 export type OwnResponsiveStackProps = ResponsiveProps<StackOwnProps>;
 
 // @public (undocumented)
-export type OwnSidebarProps = Omit<ComponentClassNameProps, 'children'> & {
+export type OwnSidebarProps = Omit<ComponentClassNameProps, 'children'> & Pick<OwnPanelProps, 'onBehaviorChange' | 'onKeyPress' | 'onVisibilityChange'> & {
     basis?: number;
     body?: ReactNode | ((state: PanelState, panelsState: GetLayoutPanelsStateContextType) => ReactNode);
     children?: never;
@@ -769,11 +783,10 @@ type OwnTargetContainerProps = {
 const Panel: PanelComponentType;
 
 // @public (undocumented)
-interface PanelBasicProps extends ComponentClassNameProps {
-    // (undocumented)
-    tabIndex?: never;
-    // (undocumented)
+interface PanelBasicProps extends ComponentClassNameProps, PropsWithChildren<{
     trapFocusInModal?: boolean;
+    tabIndex?: never;
+}> {
 }
 
 // @public (undocumented)
@@ -806,7 +819,7 @@ type PanelConfig = {
 };
 
 // @public (undocumented)
-type PanelConfigProps = CommonPanelConfigProps & (ControlledPanelProps | UncontrolledPanelProps);
+type PanelConfigProps = CommonPanelConfigProps & ControlPanelProps;
 
 // @public (undocumented)
 const PanelFooter: PanelFooterComponentType;
@@ -1164,21 +1177,27 @@ export type ToggleSidebarButtonProps = Omit<ComponentClassNameProps, 'children'>
 };
 
 // @public (undocumented)
-interface UncontrolledPanelProps {
+interface UncontrolledBehaviorPanelProps {
     // (undocumented)
-    behavior?: never;
+    behavior?: null | undefined;
     // (undocumented)
-    defaultBehavior: PanelBehavior | null | undefined;
+    defaultBehavior: PanelBehavior;
     // (undocumented)
-    defaultVisibility: PanelVisibility | null | undefined;
+    onBehaviorChange?: (state: PanelState) => Partial<Omit<PanelState, 'behavior'>> & {
+        passive?: boolean;
+    } | null | undefined | void;
+}
+
+// @public (undocumented)
+interface UncontrolledVisibilityPanelProps {
     // (undocumented)
-    onBehaviorChange?: (state: PanelState) => Partial<PanelState> | null | undefined | void;
+    defaultVisibility: PanelVisibility;
     // (undocumented)
-    onKeyPress?: (event: KeyboardEvent, state: PanelState) => Partial<PanelState> | null | undefined | void;
+    onVisibilityChange?: (state: PanelState) => Partial<Omit<PanelState, 'visibility'>> & {
+        passive?: boolean;
+    } | null | undefined | void;
     // (undocumented)
-    onVisibilityChange?: (state: PanelState) => Partial<PanelState> | null | undefined | void;
-    // (undocumented)
-    visibility?: never;
+    visibility?: null | undefined;
 }
 
 // @public (undocumented)
@@ -1188,7 +1207,12 @@ type UnregisterLayoutPanel = LayoutPanelCallback;
 type UnregisterSlotTarget = (id: string, name: string) => void;
 
 // @public (undocumented)
-type UpdateLayoutPanel = (name: string, config: Partial<Omit<PanelConfig, 'name'>> | null | undefined | void) => void;
+type UpdateLayoutPanel = (name: string, config: UpdateLayoutPanelConfig | null | undefined | void) => void;
+
+// @public (undocumented)
+type UpdateLayoutPanelConfig = Partial<Omit<PanelConfig, 'name'> & {
+    passive?: boolean;
+}>;
 
 // @public (undocumented)
 const useActiveSlotPortalsContext: () => ActiveSlotPortalsContextType;

@@ -12,15 +12,14 @@
 	flex-direction: column-reverse;
 }
 
-:where(.cui-stack[data-horizontal]) {
-	flex-direction: row;
-}
-:where(.cui-stack[data-horizontal][data-reverse]) {
-	flex-direction: row-reverse;
-}
+:where(.cui-stack[data-direction="vertical"]) { flex-direction: column }
+:where(.cui-stack[data-direction="vertical"][data-reverse]) { flex-direction: column-reverse }
+:where(.cui-stack[data-direction="horizontal"]) { flex-direction: row }
+:where(.cui-stack[data-direction="horizontal"][data-reverse]) { flex-direction: row-reverse }
 
 :where(.cui-stack[data-gap]) { --cui-stack-gap: var(--cui-padding) }
 :where(.cui-stack[data-gap="gap"]) { --cui-stack-gap: var(--cui-gap) }
+:where(.cui-stack[data-gap="double"]) { --cui-stack-gap: var(--cui-double-gap) }
 :where(.cui-stack[data-gap="gutter"]) { --cui-stack-gap: var(--cui-gutter) }
 :where(.cui-stack[data-gap="padding"]) { --cui-stack-gap: var(--cui-padding) }
 :where(.cui-stack[data-gap="large"]) { --cui-stack-gap: calc(1.5 * var(--cui-padding)) }
@@ -29,6 +28,7 @@
 :where(.cui-stack[data-evenly] > *) {
 	flex-basis: 0%;
 	flex-grow: 1;
+	min-width: 0px;
 }
 
 :where(.cui-stack[data-align="center"]) { align-items: center }

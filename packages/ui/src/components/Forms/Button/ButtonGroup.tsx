@@ -8,13 +8,16 @@ import type { ButtonGroupProps } from './Types'
  * @group UI
  */
 export const ButtonGroup = memo(({
+	borderRadius = true,
 	children,
 	className,
 	componentClassName = 'button-group',
 	display = 'inline',
+	focusRing = false,
 	flow,
 	isTopToolbar,
-	orientation = 'horizontal',
+	orientation,
+	direction = 'horizontal',
 	size = 'medium',
 }: ButtonGroupProps) => {
 	// TODO: deprecated since v1.3.0
@@ -23,22 +26,24 @@ export const ButtonGroup = memo(({
 
 	deprecate('1.3.0', isDefined(isTopToolbar), '`isTopToolbar` prop', 'no alternative')
 
-	deprecate('1.3.0', orientation === 'default', 'orientation="default"', 'omitted `orientation` prop')
-	orientation = fallback(orientation, orientation === 'default', 'horizontal')
+	deprecate('1.3.0', isDefined(orientation), '`orientation` prop', '`direction` prop')
+	direction = fallback(direction, isDefined(orientation), orientation === 'default' || !orientation ? 'horizontal' : orientation)
 
 	deprecate('1.3.0', size === 'default', 'size="default"', 'omitted `size` prop')
 	size = fallback(size, size === 'default', 'medium')
 
 	return (
 		<div
-			data-display={dataAttribute(display)}
-			data-orientation={dataAttribute(orientation)}
-			data-size={dataAttribute(size)}
 			className={useClassName(componentClassName, [
 				// TODO: remove in 1.3.0
 				toViewClass('isTopToolbar', isTopToolbar),
 				className,
 			])}
+			data-border-radius={dataAttribute(borderRadius)}
+			data-direction={dataAttribute(direction)}
+			data-display={dataAttribute(display)}
+			data-focus-ring={dataAttribute(focusRing)}
+			data-size={dataAttribute(size)}
 			role="group"
 		>
 			{children}

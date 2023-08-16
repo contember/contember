@@ -2,6 +2,7 @@
 	display: flex;
 	flex: 1 0 auto;
 	flex-direction: column;
+	min-width: 0px;
 	max-width: 100%;
 }
 
@@ -9,6 +10,7 @@
 	display: flex;
 	flex: 1 0 auto;
 	flex-direction: row;
+	min-width: 0px;
 	max-width: 100%;
 }
 
@@ -65,6 +67,7 @@
 
 :where(.cui-layout-bar-center) {
 	flex: 1 1 100%;
+	min-width: 0px;
 }
 
 :where(

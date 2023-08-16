@@ -8,6 +8,7 @@ import type {
 	Scheme,
 } from '../../../types'
 import { Default } from '../../../types'
+import { StackOwnProps } from '../../Stack'
 
 export interface ButtonBasedProps extends Omit<HTMLButtonElementProps, 'ref' | 'size' | 'className'> {
 	Component: 'button'
@@ -20,17 +21,18 @@ export interface AnchorBasedProps extends Omit<HTMLAnchorElementProps, 'ref' | '
 export interface ButtonOwnProps extends DeprecatedButtonOwnProps, ComponentClassNameProps {
 	active?: boolean
 	align?: 'start' | 'center' | 'end' | 'stretch'
-	borderRadius?: boolean | 'gap' | 'gutter' | 'padding' | 'full'
+	borderRadius?: Exclude<StackOwnProps['gap'], 'large' | 'larger'> | 'full'
 	children?: ReactNode
 	display?: 'inline' | 'block'
 	disabled?: boolean
 	distinction?: 'primary' | 'toned' | 'outlined' | 'seamless' | 'inverse' | DeprecatedButtonDefault
 	elevated?: boolean
-	inset?: boolean | 'gap' | 'gutter' | 'padding' | 'large'
+	focusRing?: boolean
+	inset?: Exclude<StackOwnProps['gap'], 'large' | 'larger'>
 	intent?: Intent
 	justify?: 'start' | 'center' | 'end' | 'space-around' | 'space-between' | 'space-evenly'
 	loading?: boolean
-	padding?: boolean | 'gap' | 'gutter' | 'padding' | DeprecatedButtonPadding
+	padding?: Exclude<StackOwnProps['gap'], 'large' | 'larger'> | DeprecatedButtonPadding
 	scheme?: Scheme
 	square?: boolean
 	size?: 'small' | 'medium' | 'large' | DeprecatedButtonDefault
@@ -42,15 +44,25 @@ export type BaseButtonProps = ButtonOwnProps & (ButtonBasedProps | AnchorBasedPr
 
 export interface ButtonListProps extends ComponentClassNameProps, DeprecatedButtonListProps {
 	children?: ReactNode
+	direction?: 'horizontal' | 'vertical'
 	display?: 'block' | 'inline'
-	gap?: boolean | 'gap' | 'gutter' | 'padding' | 'large' | 'larger'
+	gap?: StackOwnProps['gap']
+	/**
+	 * @deprecated Use `direction` instead
+	 */
 	orientation?: 'horizontal' | 'vertical' | DeprecatedButtonDefault
 	size?: 'small' | 'medium' | 'large' | DeprecatedButtonDefault
 }
 
 export interface ButtonGroupProps extends ComponentClassNameProps, DeprecatedButtonGroupProps {
+	borderRadius?: Exclude<StackOwnProps['gap'], 'large' | 'larger'> | 'full'
 	children?: ReactNode
+	direction?: 'horizontal' | 'vertical'
 	display?: 'block' | 'inline'
+	focusRing?: boolean
+	/**
+	 * @deprecated Use `direction` instead
+	 */
 	orientation?: 'horizontal' | 'vertical' | DeprecatedButtonDefault
 	size?: 'small' | 'medium' | 'large' | DeprecatedButtonDefault
 }

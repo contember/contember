@@ -1,5 +1,5 @@
 import { Identity2023 } from '@contember/brand'
-import { createNonNullableContextFactory, useClassNameFactory, useId, useReferentiallyStableCallback, useWindowSize } from '@contember/react-utils'
+import { createNonNullableContextFactory, useClassNameFactory, useId, useOnElementClickOutsideCallback, useOnElementMouseEnterDelayedCallback, useReferentiallyStableCallback, useWindowSize } from '@contember/react-utils'
 import { dataAttribute } from '@contember/utilities'
 import { ChevronLeftIcon, ExternalLinkIcon, XIcon } from 'lucide-react'
 import { PropsWithChildren, ReactNode, useEffect, useRef, useState } from 'react'
@@ -18,6 +18,7 @@ export const DevBar = ({
 	const className = useClassNameFactory('devBar')
 	const [expanded, setExpanded] = useState(true)
 	const isSmallScreen = useWindowSize().width < breakpoint
+	const toggleButtonRef = useRef<HTMLButtonElement>(null)
 
 	const handleToggle = useReferentiallyStableCallback(() => {
 		setExpanded(expanded => !expanded)
@@ -25,19 +26,18 @@ export const DevBar = ({
 
 	useEffect(() => {
 		function handleKeyDown(event: KeyboardEvent) {
-			const toggleButton = document.getElementById('dev-bar-toggle-button')
-
 			if (event.code === 'KeyJ' && (event.ctrlKey || event.metaKey)) {
+				event.preventDefault()
 				event.stopPropagation()
 
 				if (expanded) {
 					setExpanded(false)
-					toggleButton?.blur()
+					toggleButtonRef.current?.blur()
 				} else {
-					if (toggleButton !== document.activeElement) {
-						toggleButton?.focus()
+					if (toggleButtonRef.current !== document.activeElement) {
+						toggleButtonRef.current?.focus()
 					} else {
-						toggleButton?.blur()
+						toggleButtonRef.current?.blur()
 					}
 				}
 			}
@@ -49,17 +49,12 @@ export const DevBar = ({
 
 	const devBarContentRef = useRef<HTMLDivElement>(null)
 
-	useEffect(() => {
-		if (devBarContentRef.current) {
-			function handleClickOutside(event: MouseEvent) {
-				if (expanded && !devBarContentRef.current?.contains(event.target as Node)) {
-					setExpanded(false)
-				}
-			}
-			window.addEventListener('click', handleClickOutside)
-			return () => window.removeEventListener('click', handleClickOutside)
+	useOnElementClickOutsideCallback(devBarContentRef, () => {
+		if (expanded) {
+			setExpanded(false)
+			toggleButtonRef.current?.blur()
 		}
-	}, [expanded])
+	})
 
 	const id = `dev-bar-panel${useId()}`
 
@@ -72,8 +67,10 @@ export const DevBar = ({
 			className={className(null)}
 			onKeyDown={event => {
 				if (event.code === 'Escape') {
+					event.preventDefault()
+					event.stopPropagation()
+
 					if (expanded) {
-						event.stopPropagation()
 						setExpanded(false)
 					} else if (document.activeElement && document.activeElement instanceof HTMLElement) {
 						document.activeElement.blur()
@@ -111,6 +108,7 @@ export const DevBar = ({
 					</div>
 
 					<button
+						ref={toggleButtonRef}
 						id="dev-bar-toggle-button"
 						aria-label="Toggle Contember Developer Toolbar"
 						aria-controls={id}
@@ -150,19 +148,25 @@ export const DevPanel = ({ heading, icon, children, preview }: {
 		setExpanded(false)
 	})
 
+	const devPanelRef = useRef<HTMLDivElement>(null)
+
+	useOnElementMouseEnterDelayedCallback(devPanelRef, useReferentiallyStableCallback(({ type }) => {
+		if (type === 'mouseenter') {
+			handleOpen()
+		}
+	}))
 
 	return (
 		<div
+			ref={devPanelRef}
 			data-expanded={dataAttribute(expanded)}
 			className={className('trigger')}
-			onMouseEnter={useReferentiallyStableCallback(event => {
-				handleOpen()
-			})}
 			onMouseLeave={useReferentiallyStableCallback(event => {
 				handleClose()
 			})}
 			onKeyDown={useReferentiallyStableCallback(event => {
 				if (expanded && event.code === 'Escape') {
+					event.preventDefault()
 					event.stopPropagation()
 					handleClose()
 				}

@@ -1,20 +1,9 @@
-import { ApplicationEntrypoint, PageModule, Pages, runReactApp, setInterfaceConfig } from '@contember/admin'
+import { ApplicationEntrypoint, PageModule, Pages, runReactApp } from '@contember/admin'
 import { Directives, Slots } from '@contember/layout'
-import { PlusIcon } from 'lucide-react'
 import { createRoot } from 'react-dom/client'
 import { initialDirectives } from './components/Directives'
 import { Layout, LayoutDevPanel, SafeAreasDevPanel, ThemeDevPanel } from './components/Layout'
 import './index.css'
-
-setInterfaceConfig({
-	Menu: { caret: false },
-	StyleProvider: {
-		scheme: 'light',
-	},
-	MenuExpandToggle: {
-		Icon: PlusIcon,
-	},
-})
 
 runReactApp(
 	<Directives.Provider value={initialDirectives}>
@@ -32,7 +21,13 @@ runReactApp(
 						<SafeAreasDevPanel />
 					</>
 				}
-				children={<Pages layout={Layout} children={import.meta.glob<PageModule>('./pages/**/*.tsx', { eager: true })} />}
+				children={<Pages
+					layout={Layout}
+					children={import.meta.glob<PageModule>(
+						'./pages/**/*.tsx',
+						{ eager: true },
+					)}
+				/>}
 			/>
 		</Slots.Provider>
 	</Directives.Provider>,

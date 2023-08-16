@@ -11,6 +11,7 @@ testInterface({
 		'brand.tsx',
 		'buttons.tsx',
 		'boxes.tsx',
+		'textareas.tsx',
 		'fieldContainers.tsx',
 		'messages.tsx',
 		'lorem.tsx',

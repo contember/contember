@@ -1,6 +1,6 @@
 import { EntityAccessor, useMutationState } from '@contember/binding'
 import { useClassName } from '@contember/react-utils'
-import { Button, ButtonProps, Icon, IconProps } from '@contember/ui'
+import { Button, ButtonProps, IconProps, Text } from '@contember/ui'
 import { PlusCircleIcon } from 'lucide-react'
 import { ComponentType, ReactNode, memo } from 'react'
 
@@ -23,15 +23,6 @@ export interface SelectEntityButtonProps {
 	selectButtonComponentExtraProps?: {}
 }
 
-const defaultIconProps: IconProps = {
-	blueprintIcon: 'add',
-	style: {
-		marginRight: '0.2em',
-		position: 'relative',
-		top: '0.05em',
-	},
-}
-
 export const CreateNewEntityButton = memo(
 	({ createNewEntity, iconProps, children = 'Add', ...buttonProps }: CreateNewEntityButtonProps) => {
 		const isMutating = useMutationState()
@@ -45,11 +36,13 @@ export const CreateNewEntityButton = memo(
 				className={useClassName('new-entity-button')}
 				distinction="seamless"
 				justify="start"
-				size="small"
+				padding="gap"
 				{...buttonProps}
 			>
 				<PlusCircleIcon />
-				{children}
+				{typeof children === 'string' || typeof children === 'number'
+					? <Text>{`${children}`}</Text>
+					: children}
 			</Button>
 		)
 	},

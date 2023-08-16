@@ -42,7 +42,7 @@ export const useCommonReactSelectStyles = <Option = unknown, IsMulti extends boo
 			...provided,
 			display: 'flex',
 			gap: 'var(--cui-gap)',
-			padding: '0 calc(var(--cui-gutter) - var(--cui-border-width))',
+			padding: 'var(--cui-gap) calc(var(--cui-gutter) - var(--cui-border-width))',
 		}
 	},
 	placeholder: provided => {
@@ -81,9 +81,6 @@ export const useCommonReactSelectStyles = <Option = unknown, IsMulti extends boo
 			lineHeight,
 			'&:hover': {
 				borderColor: isDisabled ? borderColor : 'rgba(var(--cui-color--rgb-50), var(--cui-opacity--high))',
-			},
-			'&:first-child': {
-				marginLeft: 'calc(-2 * var(--cui-gap) + 2 * var(--cui-border-width, 1px))',
 			},
 		}
 	},
@@ -214,7 +211,7 @@ export const useCommonReactSelectStyles = <Option = unknown, IsMulti extends boo
 					? 'rgb(var(--cui-color--controls-rgb-100))'
 					: 'var(--cui-color--controls-rgb-50)',
 			'lineHeight': 'var(--cui-line-height--controls)',
-			'padding': 'calc(2 * var(--cui-gap))',
+			'padding': 'var(--cui-double-gap)',
 			'&:hover': {
 				backgroundColor: isSelected
 					? 'rgb(var(--cui-background-color--controls-rgb-100))'

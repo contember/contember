@@ -1,4 +1,4 @@
-import { Button, ButtonGroup, ButtonList, ButtonProps, Select, TextInput } from '@contember/admin'
+import { Button, ButtonGroup, ButtonList, ButtonProps, Select, Tag, TextInput, TextareaInput } from '@contember/admin'
 import { ArrowLeftIcon, ArrowRightIcon } from 'lucide-react'
 import { Fragment, useState } from 'react'
 import { SlotSources } from '../components/Slots'
@@ -17,6 +17,7 @@ export default () => {
 		<>
 			<SlotSources.Title>Buttons</SlotSources.Title>
 			<TextInput name="name" placeholder="Enter name..." />
+			<TextareaInput minRows={4} maxRows={9} name="message" placeholder="Enter message..." defaultValue={'1\n2\n3\n4\n5\n6\n7\n8\n9\n10'} />
 
 			<Select
 				value={size}
@@ -29,11 +30,14 @@ export default () => {
 				onChange={it => setSize(it ?? 'medium')}
 			/>
 
+			<Tag>hi</Tag>
+
 			{[ButtonList, ButtonGroup].map((Wrapper, index) => (
 				<Fragment key={index}>
 					<div>
 						<Wrapper>
 							<Button size={size}>Default</Button>
+							<TextInput placeholder="Enter text..." name="name" />
 							<Button size={size} elevated>Elevated</Button>
 							<Button size={size} active>Default</Button>
 							<Button size={size}>Go <ArrowRightIcon /></Button>
@@ -51,6 +55,7 @@ export default () => {
 					{/* <div>
 						<Wrapper>
 							<div className="cui-view" data-pressable data-background-color data-padding>Default</div>
+							<TextInput placeholder="Enter text..." name="name" />
 							<div className="cui-view" data-pressable data-background-color data-padding data-elevated>Elevated</div>
 							<div className="cui-view" data-pressable data-background-color data-padding data-pressed>Default</div>
 							<div className="cui-view" data-pressable data-background-color data-padding>Go <ArrowRightIcon /></div>
@@ -68,6 +73,7 @@ export default () => {
 					<div>
 						<Wrapper>
 							<Button size={size} distinction="inverse">Inverse</Button>
+							<TextInput placeholder="Enter text..." name="name" />
 							<Button size={size} distinction="inverse" elevated>Elevated Inverse</Button>
 							<Button size={size} distinction="inverse" active>Inverse</Button>
 							<Button size={size} distinction="inverse">Go <ArrowRightIcon /></Button>
@@ -85,6 +91,7 @@ export default () => {
 					<div>
 						<Wrapper>
 							<Button size={size} distinction="primary">Primary</Button>
+							<TextInput placeholder="Enter text..." name="name" />
 							<Button size={size} distinction="primary" elevated>Elevated Primary</Button>
 							<Button size={size} distinction="primary" active>Primary</Button>
 							<Button size={size} distinction="primary">Go <ArrowRightIcon /></Button>
@@ -102,6 +109,7 @@ export default () => {
 					<div>
 						<Wrapper>
 							<Button size={size} distinction="seamless">Seamless</Button>
+							<TextInput placeholder="Enter text..." name="name" />
 							<Button size={size} distinction="seamless" elevated>Elevated Seamless</Button>
 							<Button size={size} distinction="seamless" active>Seamless</Button>
 							<Button size={size} distinction="seamless">Go <ArrowRightIcon /></Button>
@@ -119,6 +127,7 @@ export default () => {
 					<div>
 						<Wrapper>
 							<Button size={size} distinction="outlined">Outlined</Button>
+							<TextInput placeholder="Enter text..." name="name" />
 							<Button size={size} distinction="outlined" elevated>Elevated Outlined</Button>
 							<Button size={size} distinction="outlined" active>Outlined</Button>
 							<Button size={size} distinction="outlined">Go <ArrowRightIcon /></Button>
@@ -136,6 +145,7 @@ export default () => {
 					<div>
 						<Wrapper>
 							<Button size={size} distinction="toned">Toned</Button>
+							<TextInput placeholder="Enter text..." name="name" />
 							<Button size={size} distinction="toned" elevated>Elevated Toned</Button>
 							<Button size={size} distinction="toned" active>Toned</Button>
 							<Button size={size} distinction="toned">Go <ArrowRightIcon /></Button>

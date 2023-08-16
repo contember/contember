@@ -1,6 +1,6 @@
 import { Environment, EnvironmentContext, EnvironmentExtensionProvider } from '@contember/binding'
 import { ContemberClient, ContemberClientProps } from '@contember/react-client'
-import { Providers as InterfaceProviders } from '@contember/ui'
+import { Providers as InterfaceProviders, ProvidersProps } from '@contember/ui'
 import { ComponentType, PropsWithChildren, ReactNode } from 'react'
 import { I18nProvider, MessageDictionaryByLocaleCode } from '../i18n'
 import { RequestProvider, RouteMap, RoutingContext, RoutingContextValue, SelectedDimension } from '../routing'
@@ -10,7 +10,7 @@ import { IdentityProvider } from './Identity'
 import { NavigationProvider } from './NavigationProvider'
 import { projectEnvironmentExtension } from './Project'
 
-export interface ApplicationEntrypointProps extends ContemberClientProps {
+export interface ApplicationEntrypointProps extends ContemberClientProps, Omit<ProvidersProps, 'children'> {
 	basePath?: string
 	sessionToken?: string
 	routes?: RouteMap
@@ -69,7 +69,7 @@ export const ApplicationEntrypoint = (props: ApplicationEntrypointProps) => {
 							<EnvironmentExtensionProvider extension={projectEnvironmentExtension} state={projectSlug ?? null}>
 								<NavigationProvider>
 									<IdentityProvider onInvalidIdentity={props.onInvalidIdentity}>
-										<Providers>
+										<Providers portalProviderProps={props.portalProviderProps} styleProviderProps={props.styleProviderProps}>
 											<OutdatedApplicationChecker />
 											{props.children}
 											<ApplicationDevBar panels={props.devBarPanels} />

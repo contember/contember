@@ -12,7 +12,8 @@ export type LayoutPanelCallback = (name: string) => void
 export type SetLayoutPanelVisibility = LayoutPanelCallback
 export type RegisterLayoutPanel = (name: string, config: PanelConfig) => void;
 export type UnregisterLayoutPanel = LayoutPanelCallback
-export type UpdateLayoutPanel = (name: string, config: Partial<Omit<PanelConfig, 'name'>> | null | undefined | void) => void;
+export type UpdateLayoutPanelConfig = Partial<Omit<PanelConfig, 'name'> & { passive?: boolean }>
+export type UpdateLayoutPanel = (name: string, config: UpdateLayoutPanelConfig | null | undefined | void) => void;
 export type SetLayoutPanelsStateContextType = {
 	registerLayoutPanel: RegisterLayoutPanel;
 	unregisterLayoutPanel: UnregisterLayoutPanel;

@@ -19,7 +19,7 @@
 	align-items: stretch;
 	display: flex;
 	flex-direction: column;
-	gap: calc(var(--cui-gap) * 2);
+	gap: var(--cui-double-gap);
 }
 
 :where(.cui-toaster-inner) {

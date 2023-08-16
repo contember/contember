@@ -1,4 +1,5 @@
 import { useClassName } from '@contember/react-utils'
+import { dataAttribute } from '@contember/utilities'
 import { forwardRef, memo, Ref } from 'react'
 import { HTMLInputElementProps } from '../../../types'
 import { toViewClass } from '../../../utils'
@@ -47,6 +48,7 @@ InnerDatetimeInput.displayName = 'InnerDatetimeInput'
 export const DateTimeInput = memo(
 	forwardRef(({
 		className,
+		focusRing = true,
 		withTopToolbar,
 		...outerProps
 	}: DateTimeInputProps, forwardedRef: Ref<HTMLInputElement>) => {
@@ -59,8 +61,8 @@ export const DateTimeInput = memo(
 		}, forwardedRef)
 
 		return isInputDateTimeLocalSupported()
-			? <InnerDatetimeInput {...props} />
-			: <DateTimeInputFallback {...outerProps} />
+			? <InnerDatetimeInput data-focus-ring={dataAttribute(focusRing)} {...props} />
+			: <DateTimeInputFallback data-focus-ring={dataAttribute(focusRing)} {...outerProps} />
 	}),
 )
 DateTimeInput.displayName = 'DateTimeInput'

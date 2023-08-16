@@ -1,4 +1,5 @@
 import { useClassName } from '@contember/react-utils'
+import { dataAttribute } from '@contember/utilities'
 import { forwardRef, memo } from 'react'
 import { toViewClass } from '../../../utils'
 import { useTextBasedInput } from '../Hooks'
@@ -10,6 +11,7 @@ import type { MonthInputProps } from './Types'
  */
 export const MonthInput = memo(forwardRef<HTMLInputElement, MonthInputProps>(({
 	className,
+	focusRing = true,
 	withTopToolbar,
 	...outerProps
 }, forwardedRed) => {
@@ -25,6 +27,6 @@ export const MonthInput = memo(forwardRef<HTMLInputElement, MonthInputProps>(({
 		]),
 	}, forwardedRed)
 
-	return <input {...props} type="month" />
+	return <input data-focus-ring={dataAttribute(focusRing)} {...props} type="month" />
 }))
 MonthInput.displayName = 'MonthInput'

@@ -1,5 +1,5 @@
 import type { ComponentMeta, ComponentStory } from '@storybook/react'
-import { Stack, StackOwnProps } from '../../src'
+import { Stack, StackOwnProps, StackProps } from '../../src'
 import { Block, booleanControl, disabledControlsForAttributes } from './Helpers'
 
 export default {
@@ -12,7 +12,7 @@ export default {
 	},
 } as ComponentMeta<typeof Stack>
 
-const Template: ComponentStory<typeof Stack> = (args: StackOwnProps) => <Stack {...args}>
+const Template: ComponentStory<typeof Stack> = (args: StackProps) => <Stack {...args}>
 	{args.children ?? <>
 		<Block />
 		<Block />

@@ -46,6 +46,7 @@
 
 :where(.cui-message[data-border-radius]) { --cui-message--border-radius: var(--cui-border-radius) }
 :where(.cui-message[data-border-radius="gap"]) { --cui-message--border-radius: var(--cui-gap) }
+:where(.cui-message[data-border-radius="double"]) { --cui-message--border-radius: var(--cui-double-gap) }
 :where(.cui-message[data-border-radius="gutter"]) { --cui-message--border-radius: var(--cui-gutter) }
 :where(.cui-message[data-border-radius="padding"]) { --cui-message--border-radius: var(--cui-padding) }
 :where(.cui-message[data-border-radius="large"]) { --cui-message--border-radius: calc(1.5 * var(--cui-padding)) }
@@ -69,6 +70,11 @@
 :where(.cui-message[data-padding="gap"]) {
 	--cui-message--padding-horizontal: var(--cui-gap);
 	--cui-message--padding-vertical: var(--cui-gap);
+}
+
+:where(.cui-message[data-padding="double"]) {
+	--cui-message--padding-horizontal: var(--cui-double-gap);
+	--cui-message--padding-vertical: var(--cui-double-gap);
 }
 
 :where(.cui-message[data-padding="gutter"]) {

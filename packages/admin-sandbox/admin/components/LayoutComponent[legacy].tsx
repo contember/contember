@@ -1,9 +1,9 @@
-import { CommonSlotTargets, Slots } from '@contember/layout'
+import { Slots } from '@contember/layout'
 import { useClassName } from '@contember/react-utils'
 import { Layout as DefaultLayout, LayoutPage, Spacer } from '@contember/ui'
 import { NestedClassName } from '@contember/utilities'
 import { PropsWithChildren } from 'react'
-import { SlotSources, SlotTargets } from './Slots'
+import { SlotTargets } from './Slots'
 
 const {
 	Actions,

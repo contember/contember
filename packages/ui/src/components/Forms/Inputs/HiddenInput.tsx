@@ -1,4 +1,5 @@
 import { useClassName } from '@contember/react-utils'
+import { dataAttribute } from '@contember/utilities'
 import { forwardRef, memo } from 'react'
 import { useTextBasedInput } from '../Hooks'
 import type { TextInputProps } from './Types'
@@ -8,6 +9,7 @@ import type { TextInputProps } from './Types'
  */
 export const HiddenInput = memo(forwardRef<HTMLInputElement, TextInputProps>(({
 	className,
+	focusRing = true,
 	withTopToolbar,
 	type,
 	...outerProps
@@ -17,6 +19,6 @@ export const HiddenInput = memo(forwardRef<HTMLInputElement, TextInputProps>(({
 		className: useClassName('hidden-input', className),
 	}, forwardedRed)
 
-	return <input {...props} type="hidden" />
+	return <input data-focus-ring={dataAttribute(focusRing)} {...props} type="hidden" />
 }))
 HiddenInput.displayName = 'HiddenInput'

@@ -5,6 +5,7 @@ export type MiscPageLayoutProps =
 	& Omit<BoxOwnProps, 'header' | 'footer'>
 	& {
 		footerActions?: ReactNode
+		heading?: ReactNode
 	}
 
 export const MiscPageLayout = memo<MiscPageLayoutProps>(({ footerActions, heading, children, ...props }) => (
@@ -13,7 +14,7 @@ export const MiscPageLayout = memo<MiscPageLayoutProps>(({ footerActions, headin
 			<div className="centerCard-in">
 				<Box
 					gap="large"
-					heading={heading && (typeof heading === 'string'
+					label={heading && (typeof heading === 'string'
 						? <Heading depth={1} size="small">{heading}</Heading>
 						: heading
 					)}

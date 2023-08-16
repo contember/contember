@@ -68,7 +68,7 @@ export const EditMembership: FC<EditMembershipProps> = ({ project, memberships, 
 
 								return (
 									<Box key={membershipIndex} padding={false}>
-										<Stack align="center" horizontal gap="none">
+										<Stack align="center" horizontal gap={false}>
 											<Select
 												required
 												distinction="seamless-with-padding"
@@ -92,7 +92,7 @@ export const EditMembership: FC<EditMembershipProps> = ({ project, memberships, 
 												placeholder="Select role"
 												value={membership === undefined ? null : membership.role}
 											/>
-											<Divider gap="none" />
+											<Divider gap={false} />
 											<Button
 												square
 												distinction="seamless"
@@ -103,23 +103,23 @@ export const EditMembership: FC<EditMembershipProps> = ({ project, memberships, 
 										</Stack>
 
 										{variablesToShow.length > 0 && membership && <>
-											<Divider gap="none" />
+											<Divider gap={false} />
 											<Box background={false} border={false} padding={false}>
 												<Stack>
 													{variablesToShow.map(variable => (
-															<VariableSelector
-																key={variable.name}
-																rolesConfig={rolesConfig}
-																membership={membership}
-																variable={variable}
-																onChange={newMembership => {
-																	updateMembership(newMembership)
-																}}
-															/>
+														<VariableSelector
+															key={variable.name}
+															rolesConfig={rolesConfig}
+															membership={membership}
+															variable={variable}
+															onChange={newMembership => {
+																updateMembership(newMembership)
+															}}
+														/>
 													))}
-													</Stack>
-												</Box>
-											</>
+												</Stack>
+											</Box>
+										</>
 										}
 									</Box>
 								)

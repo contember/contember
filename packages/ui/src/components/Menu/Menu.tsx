@@ -2,7 +2,6 @@ import { useClassNameFactory } from '@contember/react-utils'
 import { dataAttribute, deprecate, isDefined } from '@contember/utilities'
 import { MemoExoticComponent, PropsWithChildren, memo, useCallback, useMemo, useRef } from 'react'
 import { MouseMoveProvider } from '../../auxiliary'
-import { useInterfaceConfig } from '../../config'
 import { DepthContext, FocusableContext } from './Contexts'
 import { MenuItem } from './MenuItem'
 import type { MenuItemProps, MenuProps } from './Types'
@@ -31,7 +30,7 @@ function getClosestFocusable<E extends HTMLElement = HTMLElement>(parent: E, off
 const MenuInternal = memo(({
 	id = 'unknown',
 	label,
-	caret,
+	caret = true,
 	className: classNameProp,
 	componentClassName = 'menu',
 	focusMenuItemLabel,
@@ -42,7 +41,6 @@ const MenuInternal = memo(({
 	deprecate('1.3.0', isDefined(focusMenuItemLabel), '`focusMenuItemLabel` prop', null)
 	deprecate('1.3.0', isDefined(showCaret), '`showCaret` prop', '`caret` prop')
 
-	const { Menu } = useInterfaceConfig()
 	const menuRef = useRef<HTMLUListElement>(null)
 	const className = useClassNameFactory(componentClassName)
 
@@ -67,7 +65,7 @@ const MenuInternal = memo(({
 			<MenuIdProvider menuId={id}>
 				<MouseMoveProvider elementRef={menuRef}>
 					<ActiveMenuItemProvider menuRef={menuRef}>
-						<nav aria-label={label} data-caret={dataAttribute(caret ?? Menu.caret)} className={className(null, classNameProp)} {...rest}>
+						<nav aria-label={label} data-caret={dataAttribute(caret)} className={className(null, classNameProp)} {...rest}>
 							<ul ref={menuRef} className={className('list')}>
 								<FocusableContext.Provider value={useMemo(() => ({
 									nextFocusable,

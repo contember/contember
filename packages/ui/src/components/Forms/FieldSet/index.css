@@ -1,7 +1,7 @@
 :where(.cui-fieldSet) {
 	display: flex;
 	flex-direction: column;
-	gap: calc(2 * var(--cui-gap));
+	gap: var(--cui-double-gap);
 }
 
 :where(.cui-fieldSet-content > [contenteditable=false]) {

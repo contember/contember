@@ -156,6 +156,9 @@ export function useAddClassNameDuringResize(className: string, timeoutToRestore?
 // @public
 export const useArrayMapMemo: <Item, OutputItem>(items: Item[], map: (value: Item, index: number, array: Item[]) => OutputItem) => OutputItem[];
 
+// @public (undocumented)
+export const useAutoHeightTextArea: (textAreaRef: RefObjectOrElement<HTMLTextAreaElement>, value: string, minRows: number, maxRows: number) => void;
+
 // @public
 export function useClassName(componentClassName: NestedClassName, additionalClassName?: NestedClassName, prefixOverride?: string | null | undefined): string;
 
@@ -214,6 +217,12 @@ export const useIsMounted: () => MutableRefObject<boolean>;
 
 // @public (undocumented)
 export const useObjectMemo: <A extends object>(value: A) => A;
+
+// @public (undocumented)
+export function useOnElementClickOutsideCallback(refOrElement: RefObjectOrElement<HTMLElement>, callback: (event: MouseEvent) => void): void;
+
+// @public
+export function useOnElementMouseEnterDelayedCallback(refOrElement: RefObjectOrElement<HTMLElement>, callback: (event: MouseEvent) => void, timeoutMs?: number): void;
 
 // @public (undocumented)
 export function useOnElementMutation(refOrElement: RefObjectOrElement<HTMLElement | undefined>, callback: MutationCallback, options?: MutationObserverInit): void;

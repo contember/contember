@@ -1,22 +1,16 @@
 import { useClassNameFactory } from '@contember/react-utils'
-import { dataAttribute, deprecate, fallback, isDefined } from '@contember/utilities'
+import { ComponentClassNameProps, dataAttribute, deprecate, fallback, isDefined } from '@contember/utilities'
 import { CSSProperties, ReactNode, forwardRef, memo, useMemo } from 'react'
 import type { HTMLDivElementProps, Size } from '../../types'
-import { toEnumClass, toEnumViewClass, toStateClass, toViewClass } from '../../utils'
 
-/** @deprecated Use other prop values */
-export type DeprecatedStackSize = Size | 'xlarge' | 'none'
-
-export interface StackOwnProps {
+export interface StackOwnProps extends ComponentClassNameProps {
 	align?: 'center' | 'stretch' | 'start' | 'end',
 	basis?: CSSProperties['flexBasis'],
 	children?: ReactNode,
-	/** @deprecated Use `horizontal` and `reverse` props instead */
-	direction?: 'vertical' | 'horizontal' | 'vertical-reverse' | 'horizontal-reverse',
 	evenly?: boolean,
-	gap?: boolean | 'gap' | 'gutter' | 'padding' | 'large' | 'larger' | DeprecatedStackSize,
-	grow?: boolean | CSSProperties['flexGrow'],
-	horizontal?: boolean,
+	gap?: boolean | 'gap' | 'double' | 'gutter' | 'padding' | 'large' | 'larger'
+	grow?: boolean | CSSProperties['flexGrow']
+	horizontal?: boolean
 	justify?:
 	| 'center'
 	| 'start'
@@ -28,15 +22,26 @@ export interface StackOwnProps {
 	| 'inherit'
 	| 'initial'
 	| 'revert'
-	reverse?: boolean,
-	shrink?: boolean | CSSProperties['flexShrink'],
+	reverse?: boolean
+	shrink?: boolean | CSSProperties['flexShrink']
 	style?: CSSProperties,
-	wrap?: boolean | 'reverse',
+	wrap?: boolean | 'reverse'
+}
+
+/** @deprecated Use other prop values */
+export type DeprecatedStackSize = Size | 'xlarge' | 'none'
+
+/** @deprecated Use `StackOwnProps` instead */
+export type DeprecatedStackProps = {
+	/** @deprecated Use combination of `horizontal` and `reverse` props instead */
+	direction?: 'vertical' | 'horizontal' | 'vertical-reverse' | 'horizontal-reverse'
+	gap?: StackOwnProps['gap'] | DeprecatedStackSize
 }
 
 export type StackProps =
-	& StackOwnProps
-	& HTMLDivElementProps
+	& Omit<HTMLDivElementProps, keyof StackOwnProps | keyof DeprecatedStackProps>
+	& Omit<StackOwnProps, keyof DeprecatedStackProps>
+	& DeprecatedStackProps
 
 /**
  * The `Stack` components allows you to stack any content vertically or horizontally.
@@ -53,7 +58,8 @@ export const Stack = memo(forwardRef<HTMLDivElement, StackProps>(({
 	basis,
 	evenly,
 	children,
-	className,
+	className: classNameProp,
+	componentClassName = 'stack',
 	direction,
 	gap = 'gutter',
 	grow,
@@ -77,12 +83,16 @@ export const Stack = memo(forwardRef<HTMLDivElement, StackProps>(({
 	deprecate('1.3.0', gap === 'default', '`gap="default"`', 'omit the `gap` prop')
 	gap = fallback(gap, gap === 'default', true)
 
-	deprecate('1.3.0', isDefined(direction), '`direction` prop', '`horizontal` and `reverse` props')
-	horizontal = fallback(horizontal, direction === 'horizontal' || direction === 'horizontal-reverse', true)
-	horizontal = fallback(horizontal, direction === 'vertical' || direction === 'vertical-reverse', false)
+	deprecate('1.3.0', direction === 'horizontal-reverse', '`direction="horizontal-reverse"`', '`horizontal` and `reverse` props')
+	deprecate('1.3.0', direction === 'vertical-reverse', '`direction="vertical-reverse"`', 'reverse` prop')
 	reverse = fallback(reverse, direction === 'horizontal-reverse' || direction === 'vertical-reverse', true)
 
-	const componentClassName = useClassNameFactory('stack')
+	// NOTE: When finally removing the direction prop, keep local variable `direction` for `data-direction` attribute
+	direction = fallback(direction, isDefined(horizontal), horizontal ? 'horizontal' : 'vertical')
+	direction = fallback(direction, direction === 'horizontal-reverse', 'horizontal')
+	direction = fallback(direction, direction === 'vertical-reverse', 'vertical')
+
+	const className = useClassNameFactory(componentClassName)
 	const style: CSSProperties = useMemo(() => ({
 		...{ flexBasis: basis },
 		...(typeof grow !== 'boolean' ? { flexGrow: grow } : {}),
@@ -98,12 +108,12 @@ export const Stack = memo(forwardRef<HTMLDivElement, StackProps>(({
 				data-evenly={dataAttribute(evenly)}
 				data-gap={dataAttribute(gap)}
 				data-grow={dataAttribute(grow)}
-				data-horizontal={dataAttribute(horizontal)}
+				data-direction={dataAttribute(direction)}
 				data-justify={dataAttribute(justify)}
 				data-reverse={dataAttribute(reverse)}
 				data-shrink={dataAttribute(shrink)}
 				data-wrap={dataAttribute(wrap)}
-				className={componentClassName(null, className)}
+				className={className(null, classNameProp)}
 				style={style}
 				ref={ref}
 			>

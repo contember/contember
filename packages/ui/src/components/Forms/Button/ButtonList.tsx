@@ -13,26 +13,27 @@ export const ButtonList = memo(({
 	display = 'inline',
 	flow,
 	gap = true,
-	orientation = 'horizontal',
+	orientation,
+	direction = 'horizontal',
 	size = 'medium',
 }: ButtonListProps) => {
 	// TODO: deprecated since v1.3.0
 	deprecate('1.3.0', isDefined(flow), '`flow` prop', '`display` prop')
 	display = fallback(display, flow === 'block', 'block')
 
-	deprecate('1.3.0', orientation === 'default', 'orientation="default"', 'omitted `orientation` prop')
-	orientation = fallback(orientation, orientation === 'default', 'horizontal')
+	deprecate('1.3.0', isDefined(orientation), '`orientation` prop', '`direction` prop')
+	direction = fallback(direction, isDefined(orientation), orientation === 'default' || !orientation ? 'horizontal' : orientation)
 
 	deprecate('1.3.0', size === 'default', 'size="default"', 'omitted `size` prop')
 	size = fallback(size, size === 'default', 'medium')
 
 	return (
 		<div
+			className={useClassName(componentClassName, className)}
+			data-direction={dataAttribute(direction)}
 			data-display={dataAttribute(display)}
 			data-gap={dataAttribute(gap)}
-			data-orientation={dataAttribute(orientation)}
 			data-size={dataAttribute(size)}
-			className={useClassName(componentClassName, className)}
 			role="group"
 		>
 			{children}

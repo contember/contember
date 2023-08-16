@@ -174,7 +174,7 @@ export const SafeAreasDevPanel = () => {
 				<>
 					<Directive name="safe-area-insets" content={inset} />
 					<DevPanel icon={<SmartphoneIcon />} heading="Safe Area Insets">
-						<input type="number" className="cui-text-input cui-number-input" value={inset} onKeyUp={handleKeyUp} onKeyDown={handleKeyDown} min={0} max={MAX_INSET} onChange={onChange} />
+						<input data-focus-ring type="number" className="cui-text-input cui-number-input" value={inset} onKeyUp={handleKeyUp} onKeyDown={handleKeyDown} min={0} max={MAX_INSET} onChange={onChange} />
 					</DevPanel>
 				</>
 			)

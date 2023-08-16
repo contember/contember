@@ -4,8 +4,6 @@
 
 ```ts
 
-/// <reference types="react" />
-
 import { AllHTMLAttributes } from 'react';
 import { AnimationEventHandler } from 'react';
 import { AriaRole } from 'react';
@@ -17,7 +15,6 @@ import { ComponentType } from 'react';
 import { CompositionEventHandler } from 'react';
 import { Context } from 'react';
 import { CSSProperties } from 'react';
-import { DeepPartial } from '@contember/utilities';
 import { DetailedReactHTMLElement } from 'react';
 import { DragEventHandler } from 'react';
 import { ElementType } from 'react';
@@ -55,7 +52,6 @@ import { RefObject } from 'react';
 import { SelectInstance } from 'react-select';
 import { StylesConfig } from 'react-select';
 import { SyntheticEvent } from 'react';
-import { TextareaAutosizeProps } from 'react-textarea-autosize';
 import { TextareaHTMLAttributes } from 'react';
 import { TouchEventHandler } from 'react';
 import { TransitionEventHandler } from 'react';
@@ -68,11 +64,18 @@ import { WheelEventHandler } from 'react';
 export const ActionableBox: NamedExoticComponent<ActionableBoxProps>;
 
 // @public (undocumented)
-export type ActionableBoxProps = {
-    editContents?: ReactNode;
-    onRemove?: (e: MouseEvent_2<HTMLButtonElement>) => void;
+export interface ActionableBoxOwnProps extends ComponentClassNameProps {
+    // (undocumented)
     children: ReactNode;
-} & HTMLDivElementProps;
+    // (undocumented)
+    editContents?: ReactNode;
+    // (undocumented)
+    onRemove?: (e: MouseEvent_2<HTMLButtonElement>) => void;
+}
+
+// @public (undocumented)
+export interface ActionableBoxProps extends Omit<HTMLDivElementProps, keyof ActionableBoxOwnProps | keyof BoxOwnProps>, Omit<BoxOwnProps, keyof ActionableBoxOwnProps>, ActionableBoxOwnProps {
+}
 
 // @public (undocumented)
 export type ActiveSectionsTabsContextType = ActiveSectionTabsMap;
@@ -154,7 +157,7 @@ export type BaseButtonProps = ButtonOwnProps & (ButtonBasedProps | AnchorBasedPr
 export type BlueprintIconName = IconName;
 
 // @public
-export const Box: MemoExoticComponent<ForwardRefExoticComponent<BoxProps & RefAttributes<HTMLDivElement>>>;
+export const Box: MemoExoticComponent<ForwardRefExoticComponent<Omit<HTMLDivElementProps, "children" | "isActive" | "reverse" | "footer" | "header" | "label" | "align" | "evenly" | "horizontal" | "justify" | "wrap" | "border" | keyof ComponentClassNameProps | "actions" | "background" | "borderRadius" | "fit" | "focusRing" | "intent" | keyof DeprecatedBoxProps> & Omit<BoxOwnProps, keyof DeprecatedBoxProps> & DeprecatedBoxProps & RefAttributes<HTMLDivElement>>>;
 
 // @public (undocumented)
 export type BoxDepth = 1 | 2 | 3 | 4 | 5 | 6;
@@ -174,21 +177,21 @@ export type BoxHeaderProps = {
 };
 
 // @public (undocumented)
-export type BoxOwnProps = BoxHeaderProps & Pick<StackProps, 'align' | 'className' | 'direction' | 'evenly' | 'gap' | 'horizontal' | 'justify' | 'reverse' | 'wrap'> & {
+export type BoxOwnProps = ComponentClassNameProps & BoxHeaderProps & Pick<StackOwnProps, 'align' | 'evenly' | 'gap' | 'horizontal' | 'justify' | 'reverse' | 'wrap'> & {
     background?: boolean;
     border?: boolean;
-    borderRadius?: boolean | 'gap' | 'gutter' | 'padding' | 'large' | 'larger';
+    borderRadius?: StackOwnProps['gap'];
     children?: ReactNode;
-    distinction?: BoxDistinction;
+    fit?: false | 'width' | 'height' | 'both';
+    focusRing?: boolean;
     footer?: ReactNode;
-    heading?: ReactNode;
     isActive?: boolean;
     intent?: Intent;
-    padding?: boolean | 'gap' | 'gutter' | 'padding' | 'large' | 'larger' | DeprecatedPaddingPropLiteral;
+    padding?: StackOwnProps['gap'];
 };
 
 // @public (undocumented)
-export type BoxProps = Omit<HTMLDivElementProps, keyof BoxOwnProps> & BoxOwnProps;
+export type BoxProps = Omit<HTMLDivElementProps, keyof BoxOwnProps | keyof DeprecatedBoxProps> & Omit<BoxOwnProps, keyof DeprecatedBoxProps> & DeprecatedBoxProps;
 
 // @public (undocumented)
 export const Breadcrumbs: NamedExoticComponent<BreadcrumbsProps>;
@@ -218,7 +221,7 @@ export type ButtonElevation = Default | 'none';
 export type ButtonFlow = Default | 'circular' | 'squarish' | 'generous' | 'block' | 'generousBlock';
 
 // @public (undocumented)
-export const ButtonGroup: MemoExoticComponent<({ children, className, componentClassName, display, flow, isTopToolbar, orientation, size, }: ButtonGroupProps) => JSX.Element>;
+export const ButtonGroup: MemoExoticComponent<({ borderRadius, children, className, componentClassName, display, focusRing, flow, isTopToolbar, orientation, direction, size, }: ButtonGroupProps) => JSX.Element>;
 
 // @public @deprecated (undocumented)
 export type ButtonGroupFlow = Default | 'block';
@@ -229,17 +232,23 @@ export type ButtonGroupOrientation = Default | 'horizontal' | 'vertical';
 // @public (undocumented)
 export interface ButtonGroupProps extends ComponentClassNameProps, DeprecatedButtonGroupProps {
     // (undocumented)
+    borderRadius?: Exclude<StackOwnProps['gap'], 'large' | 'larger'> | 'full';
+    // (undocumented)
     children?: ReactNode;
+    // (undocumented)
+    direction?: 'horizontal' | 'vertical';
     // (undocumented)
     display?: 'block' | 'inline';
     // (undocumented)
+    focusRing?: boolean;
+    // @deprecated (undocumented)
     orientation?: 'horizontal' | 'vertical' | DeprecatedButtonDefault;
     // (undocumented)
     size?: 'small' | 'medium' | 'large' | DeprecatedButtonDefault;
 }
 
 // @public (undocumented)
-export const ButtonList: MemoExoticComponent<({ children, className, componentClassName, display, flow, gap, orientation, size, }: ButtonListProps) => JSX.Element>;
+export const ButtonList: MemoExoticComponent<({ children, className, componentClassName, display, flow, gap, orientation, direction, size, }: ButtonListProps) => JSX.Element>;
 
 // @public @deprecated (undocumented)
 export type ButtonListFlow = Default | 'inline' | 'block';
@@ -249,10 +258,12 @@ export interface ButtonListProps extends ComponentClassNameProps, DeprecatedButt
     // (undocumented)
     children?: ReactNode;
     // (undocumented)
+    direction?: 'horizontal' | 'vertical';
+    // (undocumented)
     display?: 'block' | 'inline';
     // (undocumented)
-    gap?: boolean | 'gap' | 'gutter' | 'padding' | 'large' | 'larger';
-    // (undocumented)
+    gap?: StackOwnProps['gap'];
+    // @deprecated (undocumented)
     orientation?: 'horizontal' | 'vertical' | DeprecatedButtonDefault;
     // (undocumented)
     size?: 'small' | 'medium' | 'large' | DeprecatedButtonDefault;
@@ -265,7 +276,7 @@ export interface ButtonOwnProps extends DeprecatedButtonOwnProps, ComponentClass
     // (undocumented)
     align?: 'start' | 'center' | 'end' | 'stretch';
     // (undocumented)
-    borderRadius?: boolean | 'gap' | 'gutter' | 'padding' | 'full';
+    borderRadius?: Exclude<StackOwnProps['gap'], 'large' | 'larger'> | 'full';
     // (undocumented)
     children?: ReactNode;
     // (undocumented)
@@ -277,7 +288,9 @@ export interface ButtonOwnProps extends DeprecatedButtonOwnProps, ComponentClass
     // (undocumented)
     elevated?: boolean;
     // (undocumented)
-    inset?: boolean | 'gap' | 'gutter' | 'padding' | 'large';
+    focusRing?: boolean;
+    // (undocumented)
+    inset?: Exclude<StackOwnProps['gap'], 'large' | 'larger'>;
     // (undocumented)
     intent?: Intent;
     // (undocumented)
@@ -285,7 +298,7 @@ export interface ButtonOwnProps extends DeprecatedButtonOwnProps, ComponentClass
     // (undocumented)
     loading?: boolean;
     // (undocumented)
-    padding?: boolean | 'gap' | 'gutter' | 'padding' | DeprecatedButtonPadding;
+    padding?: Exclude<StackOwnProps['gap'], 'large' | 'larger'> | DeprecatedButtonPadding;
     // (undocumented)
     scheme?: Scheme;
     // (undocumented)
@@ -333,7 +346,7 @@ export type CheckboxOwnProps = ControlProps<boolean> & {
 export type CheckboxProps = CheckboxOwnProps & RestHTMLCheckboxProps;
 
 // @public (undocumented)
-export const Collapsible: MemoExoticComponent<(props: CollapsibleProps) => JSX.Element>;
+export const Collapsible: MemoExoticComponent<ForwardRefExoticComponent<CollapsibleProps & RefAttributes<HTMLDivElement>>>;
 
 // @public (undocumented)
 export interface CollapsibleProps {
@@ -356,6 +369,7 @@ export type CollapsibleTransition = Default | 'topInsert' | 'leftInsert' | 'righ
 
 // @public (undocumented)
 export const ColorInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<string> & ControlValueProps<string, boolean> & {
+focusRing?: boolean | undefined;
 withTopToolbar?: boolean | undefined;
 } & RestHTMLTextInputProps & RefAttributes<HTMLInputElement>>>;
 
@@ -499,6 +513,7 @@ export type ControlValueProps<V, NN extends boolean = boolean> = {
 
 // @public (undocumented)
 export const DateInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<string> & ControlValueProps<string, boolean> & {
+focusRing?: boolean | undefined;
 withTopToolbar?: boolean | undefined;
 } & RestHTMLTextInputProps & RefAttributes<HTMLInputElement>>>;
 
@@ -513,11 +528,13 @@ export const DateInputStringRegExp: RegExp;
 
 // @public (undocumented)
 export const DateTimeInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<string> & ControlValueProps<string, boolean> & {
+focusRing?: boolean | undefined;
 withTopToolbar?: boolean | undefined;
 } & RestHTMLTextInputProps & RefAttributes<HTMLInputElement>>>;
 
 // @public (undocumented)
 export const DateTimeInputFallback: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<string> & ControlValueProps<string, boolean> & {
+focusRing?: boolean | undefined;
 withTopToolbar?: boolean | undefined;
 } & RestHTMLTextInputProps & RefAttributes<HTMLInputElement>>>;
 
@@ -535,6 +552,18 @@ export type Default = 'default';
 
 // @public (undocumented)
 export const DEFAULT_PORTAL_ROOT_ID = "cui-portal-root";
+
+// @public @deprecated (undocumented)
+export interface DeprecatedBoxProps extends Pick<DeprecatedStackProps, 'gap'> {
+    // @deprecated (undocumented)
+    direction?: DeprecatedStackProps['direction'];
+    // @deprecated (undocumented)
+    distinction?: BoxDistinction;
+    // @deprecated (undocumented)
+    heading?: ReactNode;
+    // (undocumented)
+    padding?: BoxOwnProps['padding'] | DeprecatedPaddingPropLiteral;
+}
 
 // @public @deprecated (undocumented)
 export type DeprecatedButtonDefault = Default;
@@ -569,16 +598,31 @@ export interface DeprecatedButtonOwnProps {
 export type DeprecatedButtonPadding = Default | 'small';
 
 // @public @deprecated (undocumented)
+export interface DeprecatedDividerProps {
+    // (undocumented)
+    gap?: DividerOwnProps['gap'] | DeprecatedDividerSize;
+}
+
+// @public @deprecated (undocumented)
 export type DeprecatedDividerSize = Size | 'xlarge' | 'none';
 
 // @public @deprecated (undocumented)
 export type DeprecatedFieldContainerLabelPosition = Default | 'labelLeft' | 'labelRight' | 'labelInlineLeft' | 'labelInlineRight';
 
-// @internal (undocumented)
+// @public @deprecated (undocumented)
+export interface DeprecatedFieldContainerProps {
+    // @deprecated (undocumented)
+    direction?: StackProps['direction'];
+    // @deprecated (undocumented)
+    width?: 'column' | 'fluid' | 'none';
+}
+
+// @public @deprecated (undocumented)
 export type DeprecatedMessageProps = {
     lifted?: boolean;
     distinction?: MessageDistinction;
     flow?: MessageFlow;
+    size?: MessageOwnProps['size'] | DeprecatedMessageSize;
 };
 
 // @public @deprecated (undocumented)
@@ -588,10 +632,30 @@ export type DeprecatedMessageSize = Default;
 export type DeprecatedPaddingPropLiteral = Default | 'no-padding' | 'with-padding';
 
 // @public @deprecated (undocumented)
+export interface DeprecatedSpacerProps {
+    // (undocumented)
+    gap?: SpacerOwnProps['gap'] | DeprecatedSpacerSize;
+}
+
+// @public @deprecated (undocumented)
 export type DeprecatedSpacerSize = Size | 'xlarge' | 'none';
 
 // @public @deprecated (undocumented)
+export type DeprecatedStackProps = {
+    direction?: 'vertical' | 'horizontal' | 'vertical-reverse' | 'horizontal-reverse';
+    gap?: StackOwnProps['gap'] | DeprecatedStackSize;
+};
+
+// @public @deprecated (undocumented)
 export type DeprecatedStackSize = Size | 'xlarge' | 'none';
+
+// @public @deprecated (undocumented)
+export interface DeprecatedTextareaInputOwnProps {
+    // @deprecated (undocumented)
+    cacheMeasurements?: boolean;
+    // @deprecated (undocumented)
+    onHeightChange?: (height: number, ...args: any[]) => void;
+}
 
 // @public (undocumented)
 export const Description: MemoExoticComponent<({ className, children }: DescriptionProps) => JSX.Element>;
@@ -744,9 +808,12 @@ export interface DimensionSwitcherValue {
 export const Divider: MemoExoticComponent<({ className, componentClassName, gap, ...rest }: DividerProps) => JSX.Element>;
 
 // @public (undocumented)
-export type DividerProps = Omit<HTMLDivElementProps, 'children'> & ComponentClassNameProps & {
-    gap?: boolean | 'gap' | 'gutter' | 'padding' | 'large' | 'larger' | DeprecatedDividerSize;
-};
+export interface DividerOwnProps extends ComponentClassNameProps {
+    gap?: StackOwnProps['gap'];
+}
+
+// @public (undocumented)
+export type DividerProps = Omit<HTMLDivElementProps, keyof DividerOwnProps | keyof DeprecatedDividerProps> & Omit<DividerOwnProps, keyof DeprecatedDividerProps> & DeprecatedDividerProps;
 
 // @public (undocumented)
 export const Dropdown: MemoExoticComponent<(props: DropdownProps) => JSX.Element>;
@@ -847,6 +914,8 @@ export interface EditorCanvasProps<P extends HTMLTextAreaDivTargetProps> {
     // (undocumented)
     distinction?: EditorCanvasDistinction;
     // (undocumented)
+    focusRing?: boolean;
+    // (undocumented)
     inset?: 'hovering-toolbar';
     // (undocumented)
     size?: EditorCanvasSize;
@@ -908,7 +977,7 @@ itemRef?: string | undefined;
 results?: number | undefined;
 security?: string | undefined;
 unselectable?: "on" | "off" | undefined;
-inputMode?: "none" | "text" | "search" | "tel" | "url" | "email" | "numeric" | "decimal" | undefined;
+inputMode?: "search" | "text" | "none" | "tel" | "url" | "email" | "numeric" | "decimal" | undefined;
 is?: string | undefined;
 'aria-activedescendant'?: string | undefined;
 'aria-atomic'?: (boolean | "false" | "true") | undefined;
@@ -919,16 +988,16 @@ is?: string | undefined;
 'aria-colindex'?: number | undefined;
 'aria-colspan'?: number | undefined;
 'aria-controls'?: string | undefined;
-'aria-current'?: boolean | "page" | "false" | "true" | "time" | "step" | "location" | "date" | undefined;
+'aria-current'?: boolean | "time" | "page" | "false" | "true" | "step" | "location" | "date" | undefined;
 'aria-describedby'?: string | undefined;
 'aria-details'?: string | undefined;
 'aria-disabled'?: (boolean | "false" | "true") | undefined;
-'aria-dropeffect'?: "none" | "copy" | "move" | "link" | "execute" | "popup" | undefined;
+'aria-dropeffect'?: "copy" | "link" | "none" | "move" | "execute" | "popup" | undefined;
 'aria-errormessage'?: string | undefined;
 'aria-expanded'?: (boolean | "false" | "true") | undefined;
 'aria-flowto'?: string | undefined;
 'aria-grabbed'?: (boolean | "false" | "true") | undefined;
-'aria-haspopup'?: boolean | "listbox" | "grid" | "menu" | "false" | "true" | "dialog" | "tree" | undefined;
+'aria-haspopup'?: boolean | "dialog" | "menu" | "listbox" | "grid" | "false" | "true" | "tree" | undefined;
 'aria-hidden'?: (boolean | "false" | "true") | undefined;
 'aria-invalid'?: boolean | "false" | "true" | "grammar" | "spelling" | undefined;
 'aria-keyshortcuts'?: string | undefined;
@@ -939,13 +1008,13 @@ is?: string | undefined;
 'aria-modal'?: (boolean | "false" | "true") | undefined;
 'aria-multiline'?: (boolean | "false" | "true") | undefined;
 'aria-multiselectable'?: (boolean | "false" | "true") | undefined;
-'aria-orientation'?: "vertical" | "horizontal" | undefined;
+'aria-orientation'?: "horizontal" | "vertical" | undefined;
 'aria-owns'?: string | undefined;
 'aria-placeholder'?: string | undefined;
 'aria-posinset'?: number | undefined;
 'aria-pressed'?: boolean | "mixed" | "false" | "true" | undefined;
 'aria-readonly'?: (boolean | "false" | "true") | undefined;
-'aria-relevant'?: "all" | "text" | "additions" | "additions removals" | "additions text" | "removals" | "removals additions" | "removals text" | "text additions" | "text removals" | undefined;
+'aria-relevant'?: "text" | "all" | "additions" | "additions removals" | "additions text" | "removals" | "removals additions" | "removals text" | "text additions" | "text removals" | undefined;
 'aria-required'?: (boolean | "false" | "true") | undefined;
 'aria-roledescription'?: string | undefined;
 'aria-rowcount'?: number | undefined;
@@ -1204,7 +1273,7 @@ itemRef?: string | undefined;
 results?: number | undefined;
 security?: string | undefined;
 unselectable?: "on" | "off" | undefined;
-inputMode?: "none" | "text" | "search" | "tel" | "url" | "email" | "numeric" | "decimal" | undefined;
+inputMode?: "search" | "text" | "none" | "tel" | "url" | "email" | "numeric" | "decimal" | undefined;
 is?: string | undefined;
 'aria-activedescendant'?: string | undefined;
 'aria-atomic'?: (boolean | "false" | "true") | undefined;
@@ -1215,16 +1284,16 @@ is?: string | undefined;
 'aria-colindex'?: number | undefined;
 'aria-colspan'?: number | undefined;
 'aria-controls'?: string | undefined;
-'aria-current'?: boolean | "page" | "false" | "true" | "time" | "step" | "location" | "date" | undefined;
+'aria-current'?: boolean | "time" | "page" | "false" | "true" | "step" | "location" | "date" | undefined;
 'aria-describedby'?: string | undefined;
 'aria-details'?: string | undefined;
 'aria-disabled'?: (boolean | "false" | "true") | undefined;
-'aria-dropeffect'?: "none" | "copy" | "move" | "link" | "execute" | "popup" | undefined;
+'aria-dropeffect'?: "copy" | "link" | "none" | "move" | "execute" | "popup" | undefined;
 'aria-errormessage'?: string | undefined;
 'aria-expanded'?: (boolean | "false" | "true") | undefined;
 'aria-flowto'?: string | undefined;
 'aria-grabbed'?: (boolean | "false" | "true") | undefined;
-'aria-haspopup'?: boolean | "listbox" | "grid" | "menu" | "false" | "true" | "dialog" | "tree" | undefined;
+'aria-haspopup'?: boolean | "dialog" | "menu" | "listbox" | "grid" | "false" | "true" | "tree" | undefined;
 'aria-hidden'?: (boolean | "false" | "true") | undefined;
 'aria-invalid'?: boolean | "false" | "true" | "grammar" | "spelling" | undefined;
 'aria-keyshortcuts'?: string | undefined;
@@ -1235,13 +1304,13 @@ is?: string | undefined;
 'aria-modal'?: (boolean | "false" | "true") | undefined;
 'aria-multiline'?: (boolean | "false" | "true") | undefined;
 'aria-multiselectable'?: (boolean | "false" | "true") | undefined;
-'aria-orientation'?: "vertical" | "horizontal" | undefined;
+'aria-orientation'?: "horizontal" | "vertical" | undefined;
 'aria-owns'?: string | undefined;
 'aria-placeholder'?: string | undefined;
 'aria-posinset'?: number | undefined;
 'aria-pressed'?: boolean | "mixed" | "false" | "true" | undefined;
 'aria-readonly'?: (boolean | "false" | "true") | undefined;
-'aria-relevant'?: "all" | "text" | "additions" | "additions removals" | "additions text" | "removals" | "removals additions" | "removals text" | "text additions" | "text removals" | undefined;
+'aria-relevant'?: "text" | "all" | "additions" | "additions removals" | "additions text" | "removals" | "removals additions" | "removals text" | "text additions" | "text removals" | undefined;
 'aria-required'?: (boolean | "false" | "true") | undefined;
 'aria-roledescription'?: string | undefined;
 'aria-rowcount'?: number | undefined;
@@ -1526,6 +1595,7 @@ export interface EditorToolbarProps {
 
 // @public (undocumented)
 export const EmailInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<string> & ControlValueProps<string, boolean> & {
+focusRing?: boolean | undefined;
 withTopToolbar?: boolean | undefined;
 } & RestHTMLTextInputProps & RefAttributes<HTMLInputElement>>>;
 
@@ -1554,31 +1624,34 @@ export interface ErrorListProps {
 export type ErrorType = Error | unknown;
 
 // @public
-export const FieldContainer: MemoExoticComponent<({ children, className, description, errors, direction, display, evenly, gap, horizontal, label, labelDescription, labelPosition, required, reverse, size, style, useLabelElement, width, }: FieldContainerProps) => JSX.Element>;
+export const FieldContainer: MemoExoticComponent<({ children, className: classNameProp, componentClassName, description, errors, direction, display, footer, evenly, gap, horizontal, label, labelDescription, labelPosition, required, reverse, size, style, useLabelElement, width, }: FieldContainerProps) => JSX.Element>;
 
 // @public (undocumented)
 export type FieldContainerLabelPosition = 'bottom' | 'left' | 'right' | 'top' | DeprecatedFieldContainerLabelPosition;
 
 // @public (undocumented)
-export type FieldContainerProps = {
+export interface FieldContainerOwnProps extends ComponentClassNameProps {
     children: ReactNode;
     description?: ReactNode;
-    direction?: StackProps['direction'];
-    evenly?: StackProps['evenly'];
-    gap?: StackProps['gap'];
     display?: 'inline' | 'block';
+    evenly?: StackProps['evenly'];
+    footer?: ReactNode;
+    gap?: StackProps['gap'];
     horizontal?: StackProps['horizontal'];
     label: ReactNode;
     labelDescription?: ReactNode;
     labelPosition?: FieldContainerLabelPosition;
-    width?: 'column' | 'fluid' | 'none';
     required?: boolean;
-    size?: Size;
-    useLabelElement?: boolean;
     reverse?: StackProps['reverse'];
+    size?: Size;
+    // (undocumented)
     style?: CSSProperties;
-    className?: string;
-} & ErrorListProps;
+    useLabelElement?: boolean;
+}
+
+// @public (undocumented)
+export interface FieldContainerProps extends ErrorListProps, DeprecatedFieldContainerProps, FieldContainerOwnProps {
+}
 
 // @public (undocumented)
 export interface FieldError {
@@ -1641,6 +1714,7 @@ export function flipValue<V = any, T = boolean, F = boolean>(value: V, truthy?: 
 
 // @public (undocumented)
 export const FloatInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<number> & ControlValueProps<number, boolean> & {
+focusRing?: boolean | undefined;
 withTopToolbar?: boolean | undefined;
 } & RestHTMLTextInputProps & RefAttributes<HTMLInputElement>>>;
 
@@ -1669,7 +1743,7 @@ export type GridProps = GridOwnProps & HTMLDivElementProps;
 export const Heading: MemoExoticComponent<ForwardRefExoticComponent<    {
 distinction?: HeadingDistinction | undefined;
 depth?: HeadingDepth | undefined;
-size?: "default" | "small" | undefined;
+size?: "small" | "default" | undefined;
 } & Omit<HTMLHeadingElementProps, "ref"> & RefAttributes<HTMLHeadingElement>>>;
 
 // @public (undocumented)
@@ -1689,6 +1763,7 @@ export type HeadingProps = {
 
 // @public (undocumented)
 export const HiddenInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<string> & ControlValueProps<string, boolean> & {
+focusRing?: boolean | undefined;
 withTopToolbar?: boolean | undefined;
 } & RestHTMLTextInputProps & RefAttributes<HTMLInputElement>>>;
 
@@ -1802,6 +1877,7 @@ export type Intent = Default | 'accent' | 'primary' | 'secondary' | 'tertiary' |
 
 // @public (undocumented)
 export const InternalTextInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<string> & ControlValueProps<string, boolean> & {
+focusRing?: boolean | undefined;
 withTopToolbar?: boolean | undefined;
 } & RestHTMLTextInputProps & RefAttributes<HTMLInputElement>>>;
 
@@ -2013,9 +2089,23 @@ export interface MenuItemPropsTitleRequired<T> {
 }
 
 // @public (undocumented)
+export function MenuLink({ active, className: classNameProp, componentClassName, disabled, children, external, href, icon, onClick: onClickProp, ...rest }: MenuLinkProps): JSX.Element;
+
+// @public (undocumented)
+export type MenuLinkProps = HTMLAnchorElementProps & ComponentClassNameProps & {
+    active?: boolean;
+    children?: ReactNode;
+    disabled?: boolean;
+    external?: boolean | undefined;
+    href?: string;
+    icon?: ReactNode;
+    onClick?: (e: SyntheticEvent<HTMLElement>) => void;
+};
+
+// @public (undocumented)
 export type MenuProps = HTMLDivElementProps & {
     className?: NestedClassName;
-    caret?: ReactNode;
+    caret?: boolean;
     componentClassName?: string;
     focusMenuItemLabel?: string;
     id?: string;
@@ -2032,26 +2122,40 @@ export type MessageDistinction = Default | 'striking';
 // @public @deprecated (undocumented)
 export type MessageFlow = Default | 'generous' | 'block' | 'generousBlock';
 
-// Warning: (ae-incompatible-release-tags) The symbol "MessageProps" is marked as @public, but its signature references "DeprecatedMessageProps" which is marked as @internal
-//
 // @public (undocumented)
-export type MessageProps = {
+export interface MessageOwnProps {
+    // (undocumented)
     action?: ReactNode;
-    borderRadius?: boolean | 'gap' | 'gutter' | 'padding' | 'large' | 'larger';
+    // (undocumented)
     background?: boolean;
-    display?: 'inline' | 'block';
-    elevated?: boolean;
+    // (undocumented)
+    borderRadius?: StackOwnProps['gap'];
+    // (undocumented)
     children?: ReactNode;
+    // (undocumented)
+    display?: 'inline' | 'block';
+    // (undocumented)
+    elevated?: boolean;
+    // (undocumented)
     icon?: ReactNode;
+    // (undocumented)
     important?: boolean;
+    // (undocumented)
     intent?: Intent;
-    padding?: boolean | 'gap' | 'gutter' | 'padding' | 'large' | 'larger';
+    // (undocumented)
+    padding?: StackOwnProps['gap'];
+    // (undocumented)
+    size?: 'small' | 'medium' | 'large';
+    // (undocumented)
     textAlign?: 'start' | 'center' | 'end';
-    size?: 'small' | 'medium' | 'large' | DeprecatedMessageSize;
-} & HTMLDivElementProps & DeprecatedMessageProps;
+}
+
+// @public (undocumented)
+export type MessageProps = Omit<HTMLDivElementProps, keyof MessageOwnProps | keyof DeprecatedMessageProps> & Omit<MessageOwnProps, keyof DeprecatedMessageProps> & DeprecatedMessageProps;
 
 // @public (undocumented)
 export const MonthInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<string> & ControlValueProps<string, boolean> & {
+focusRing?: boolean | undefined;
 withTopToolbar?: boolean | undefined;
 } & RestHTMLTextInputProps & RefAttributes<HTMLInputElement>>>;
 
@@ -2100,6 +2204,7 @@ export function noop(): void;
 
 // @public (undocumented)
 export const NumberInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<number> & ControlValueProps<number, boolean> & {
+focusRing?: boolean | undefined;
 withTopToolbar?: boolean | undefined;
 } & RestHTMLTextInputProps & RefAttributes<HTMLInputElement>>>;
 
@@ -2138,6 +2243,7 @@ export type ParsedStackTrace = ParsedStackFrame[];
 
 // @public (undocumented)
 export const PasswordInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<string> & ControlValueProps<string, boolean> & {
+focusRing?: boolean | undefined;
 withTopToolbar?: boolean | undefined;
 } & RestHTMLTextInputProps & RefAttributes<HTMLInputElement>>>;
 
@@ -2205,7 +2311,14 @@ export interface ProgressBarProps {
 }
 
 // @public (undocumented)
-export const Providers: (props: PropsWithChildren) => JSX.Element;
+export const Providers: ({ children, portalProviderProps, styleProviderProps, }: ProvidersProps) => JSX.Element;
+
+// @public (undocumented)
+export type ProvidersProps = {
+    children: React.ReactNode;
+    portalProviderProps?: PortalProviderProps;
+    styleProviderProps?: StyleProviderProps;
+};
 
 // @public (undocumented)
 export type PublicCommonReactSelectStylesProps = {
@@ -2272,6 +2385,7 @@ export const randomId: () => string;
 
 // @public (undocumented)
 export const RangeInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<string> & ControlValueProps<string, boolean> & {
+focusRing?: boolean | undefined;
 withTopToolbar?: boolean | undefined;
 } & RestHTMLTextInputProps & RefAttributes<HTMLInputElement>>>;
 
@@ -2285,7 +2399,7 @@ export interface RenderDialogContentProps<Result> {
 }
 
 // @public (undocumented)
-export const RepeaterItemContainer: MemoExoticComponent<({ actions, gap, children, label, dragHandleComponent: Handle, index, ...rest }: RepeaterItemContainerProps) => JSX.Element>;
+export const RepeaterItemContainer: MemoExoticComponent<ForwardRefExoticComponent<Omit<BoxProps, "footer" | "header" | "heading" | keyof RepeaterItemContainerOwnProps> & RepeaterItemContainerOwnProps & RefAttributes<HTMLDivElement>>>;
 
 // @public (undocumented)
 export const RepeaterItemContainerHeader: MemoExoticComponent<({ label, actions, index }: RepeaterItemContainerHeaderProps) => JSX.Element>;
@@ -2366,6 +2480,7 @@ export interface SeamlessDropdownProps {
 
 // @public (undocumented)
 export const SearchInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<string> & ControlValueProps<string, boolean> & {
+focusRing?: boolean | undefined;
 withTopToolbar?: boolean | undefined;
 } & RestHTMLTextInputProps & RefAttributes<HTMLInputElement>>>;
 
@@ -2475,16 +2590,12 @@ export type SelectProps<V, NN extends boolean> = Omit<ControlProps<V, NN>, 'type
     styles?: StylesConfig<any, boolean, never>;
 };
 
-// Warning: (ae-forgotten-export) The symbol "config" needs to be exported by the entry point index.d.ts
-//
-// @public (undocumented)
-export function setInterfaceConfig(userConfig: DeepPartial<typeof config>): void;
-
 // @public (undocumented)
 export type Size = Default | 'small' | 'large';
 
 // @public (undocumented)
 export const SlugInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<string> & ControlValueProps<string, boolean> & {
+focusRing?: boolean | undefined;
 withTopToolbar?: boolean | undefined;
 } & RestHTMLTextInputProps & {
 link?: string | undefined;
@@ -2505,11 +2616,17 @@ export type SlugInputProps = TextInputProps & {
 export const Spacer: MemoExoticComponent<({ className, componentClassName, gap, grow, shrink, ...rest }: SpacerProps) => JSX.Element>;
 
 // @public (undocumented)
-export type SpacerProps = ComponentClassNameProps & Omit<HTMLDivElementProps, 'ref' | 'children'> & {
-    shrink?: boolean;
+export interface SpacerOwnProps extends ComponentClassNameProps {
+    // (undocumented)
+    gap?: StackOwnProps['gap'];
+    // (undocumented)
     grow?: boolean;
-    gap?: boolean | 'gap' | 'gutter' | 'padding' | 'large' | 'larger' | DeprecatedSpacerSize;
-};
+    // (undocumented)
+    shrink?: boolean;
+}
+
+// @public (undocumented)
+export type SpacerProps = Omit<HTMLDivElementProps, 'children' | keyof SpacerOwnProps | keyof DeprecatedSpacerProps> & Omit<SpacerOwnProps, keyof DeprecatedSpacerProps> & DeprecatedSpacerProps;
 
 // @public (undocumented)
 export const Spinner: MemoExoticComponent<() => JSX.Element>;
@@ -2537,22 +2654,20 @@ export type SpinnerOverlayProps = ComponentClassNameProps & {
 export function splitDatetime(datetime: string | null | undefined): string[];
 
 // @public
-export const Stack: MemoExoticComponent<ForwardRefExoticComponent<StackOwnProps & HTMLDivElementProps & RefAttributes<HTMLDivElement>>>;
+export const Stack: MemoExoticComponent<ForwardRefExoticComponent<Omit<HTMLDivElementProps, "children" | "reverse" | "style" | "align" | "basis" | "evenly" | "gap" | "grow" | "horizontal" | "justify" | "shrink" | "wrap" | "className" | "componentClassName" | "direction"> & Omit<StackOwnProps, keyof DeprecatedStackProps> & DeprecatedStackProps & RefAttributes<HTMLDivElement>>>;
 
 // @public (undocumented)
-export interface StackOwnProps {
+export interface StackOwnProps extends ComponentClassNameProps {
     // (undocumented)
     align?: 'center' | 'stretch' | 'start' | 'end';
     // (undocumented)
     basis?: CSSProperties['flexBasis'];
     // (undocumented)
     children?: ReactNode;
-    // @deprecated (undocumented)
-    direction?: 'vertical' | 'horizontal' | 'vertical-reverse' | 'horizontal-reverse';
     // (undocumented)
     evenly?: boolean;
     // (undocumented)
-    gap?: boolean | 'gap' | 'gutter' | 'padding' | 'large' | 'larger' | DeprecatedStackSize;
+    gap?: boolean | 'gap' | 'double' | 'gutter' | 'padding' | 'large' | 'larger';
     // (undocumented)
     grow?: boolean | CSSProperties['flexGrow'];
     // (undocumented)
@@ -2570,7 +2685,7 @@ export interface StackOwnProps {
 }
 
 // @public (undocumented)
-export type StackProps = StackOwnProps & HTMLDivElementProps;
+export type StackProps = Omit<HTMLDivElementProps, keyof StackOwnProps | keyof DeprecatedStackProps> & Omit<StackOwnProps, keyof DeprecatedStackProps> & DeprecatedStackProps;
 
 // @public (undocumented)
 export const StyleProvider: {
@@ -2715,6 +2830,7 @@ export interface TagProps {
 
 // @public (undocumented)
 export const TelInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<string> & ControlValueProps<string, boolean> & {
+focusRing?: boolean | undefined;
 withTopToolbar?: boolean | undefined;
 } & RestHTMLTextInputProps & RefAttributes<HTMLInputElement>>>;
 
@@ -2726,30 +2842,34 @@ const Text_2: MemoExoticComponent<ForwardRefExoticComponent<TextProps<Function> 
 export { Text_2 as Text }
 
 // @public (undocumented)
-export const TextareaInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<string> & ControlValueProps<string, boolean> & TextareaInputOwnProps & {
-style?: TextareaAutosizeProps['style'];
-} & UnderlyingElementProps & RefAttributes<HTMLTextAreaElement>>>;
+export const TextareaInput: MemoExoticComponent<ForwardRefExoticComponent<(TextareaInputProps & UnderlyingElementProps) & RefAttributes<HTMLTextAreaElement>>>;
 
 // @public (undocumented)
-export interface TextareaInputOwnProps {
-    // (undocumented)
-    minRows?: number;
-    // (undocumented)
+export type TextareaInputOwnProps = {
     withTopToolbar?: boolean;
-}
+} & ({
+    maxRows?: number;
+    minRows?: number;
+    rows?: never;
+} | {
+    maxRows?: never;
+    minRows?: never;
+    rows?: number;
+});
 
 // @public (undocumented)
-export type TextareaInputProps = ControlProps<string> & TextareaInputOwnProps & {
-    style?: TextareaAutosizeProps['style'];
+export type TextareaInputProps = ControlProps<string> & TextareaInputOwnProps & DeprecatedTextareaInputOwnProps & {
+    focusRing?: boolean;
 };
 
 // @public (undocumented)
 export const TextInput: MemoExoticComponent<ForwardRefExoticComponent<Omit<TextInputProps, "type"> & {
-type?: "color" | "range" | "search" | "time" | "tel" | "url" | "email" | "date" | "datetime-local" | "month" | "password" | "week" | "datetime" | undefined;
+type?: "search" | "time" | "color" | "range" | "tel" | "url" | "email" | "date" | "datetime-local" | "month" | "password" | "week" | "datetime" | undefined;
 } & RefAttributes<HTMLInputElement>>>;
 
 // @public (undocumented)
 export type TextInputOwnProps<V extends string | number = string> = ControlProps<V> & {
+    focusRing?: boolean;
     withTopToolbar?: boolean;
 };
 
@@ -2791,6 +2911,7 @@ export interface ThemeScheme {
 
 // @public (undocumented)
 export const TimeInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<string> & ControlValueProps<string, boolean> & {
+focusRing?: boolean | undefined;
 withTopToolbar?: boolean | undefined;
 } & RestHTMLTextInputProps & {
 seconds?: boolean | undefined;
@@ -2951,7 +3072,7 @@ export namespace Trio {
 }
 
 // @public (undocumented)
-export interface UnderlyingElementProps extends Omit<AllHTMLAttributes<HTMLTextAreaElement>, ControlPropsKeys<string>> {
+export interface UnderlyingElementProps extends Omit<AllHTMLAttributes<HTMLTextAreaElement>, ControlPropsKeys<string> | 'rows'> {
 }
 
 // @public (undocumented)
@@ -2967,6 +3088,7 @@ export interface UploadProgressProps {
 
 // @public (undocumented)
 export const UrlInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<string> & ControlValueProps<string, boolean> & {
+focusRing?: boolean | undefined;
 withTopToolbar?: boolean | undefined;
 } & RestHTMLTextInputProps & RefAttributes<HTMLInputElement>>>;
 
@@ -3029,17 +3151,6 @@ export const useInputValue: <T, E extends HTMLElement>({ defaultValue, value, on
 };
 
 // @public (undocumented)
-export function useInterfaceConfig(): Readonly<{
-    StyleProvider: NonOptional<StyleProviderProps>;
-    Menu: {
-        caret: boolean;
-    };
-    MenuExpandToggle: {
-        Icon: LucideIcon;
-    };
-}>;
-
-// @public (undocumented)
 export function useMouseMove<E extends HTMLElement = HTMLElement>(observedElementRef: RefObject<E>): RefObject<boolean>;
 
 // @public (undocumented)
@@ -3082,7 +3193,7 @@ export const useShowToast: () => (toast: ToastData) => void;
 export const UseTableElementContext: Context<boolean>;
 
 // @public (undocumented)
-export const useTextBasedInput: <E extends HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>(props: ControlProps<string>, forwardedRef: ForwardedRef<E>) => AllHTMLAttributes<E> & {
+export const useTextBasedInput: <E extends HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>(props: ControlProps<string>, forwardedRef: ForwardedRef<E>) => AllHTMLAttributes<E> & {
     ref: RefObject<E>;
 };
 
@@ -3116,6 +3227,7 @@ export const visuallyHiddenStyle: CSSProperties;
 
 // @public (undocumented)
 export const WeekInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<string> & ControlValueProps<string, boolean> & {
+focusRing?: boolean | undefined;
 withTopToolbar?: boolean | undefined;
 } & RestHTMLTextInputProps & RefAttributes<HTMLInputElement>>>;
 

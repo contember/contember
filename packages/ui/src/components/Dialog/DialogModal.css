@@ -38,15 +38,15 @@
 	flex-grow: 1;
 }
 
-:where(.cui-dialog-modal .cui-table-container > .cui-field-container-label) {
+:where(.cui-dialog-modal .cui-table-container) {
 	flex-grow: 1;
 }
 
-:where(.cui-dialog-modal .cui-table-container > .cui-field-container-label > .cui-field-container-body) {
+:where(.cui-dialog-modal .cui-table-container > .cui-field-container-body) {
 	flex-grow: 1;
 }
 
-:where(.cui-dialog-modal .cui-table-container > .cui-field-container-label > .cui-field-container-body > .cui-field-container-body-content) {
+:where(.cui-dialog-modal .cui-table-container > .cui-field-container-body > .cui-field-container-body-content) {
 	flex-grow: 1;
 }
 

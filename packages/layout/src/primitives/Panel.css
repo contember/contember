@@ -8,6 +8,7 @@
 	--cui-layout-panel--footer-background-alpha: var(--cui-backdrop-blur-opacity);
 	--cui-layout-panel--footer-background-rgb: var(--cui-layout-panel--background-rgb);
 
+	visibility: visible;
 	content-visibility: visible;
 	display: flex;
 	flex-basis: var(--panel-basis);
@@ -109,6 +110,7 @@
 ):where(
 	[data-visibility="hidden"]
 ) {
+	visibility: hidden;
 	content-visibility: hidden;
 }
 

@@ -1,5 +1,5 @@
 import { Menu } from '@contember/admin'
-import { CircleIcon, ComponentIcon, FileTextIcon, LayoutDashboardIcon, ListTreeIcon, NewspaperIcon } from 'lucide-react'
+import { ComponentIcon, FileTextIcon, LayoutDashboardIcon, ListTreeIcon, NewspaperIcon } from 'lucide-react'
 
 export const Navigation = () => (
 	<Menu id="sandbox-menu" label="Sandbox project">
@@ -14,6 +14,7 @@ export const Navigation = () => (
 			<Menu.Item title="FieldContainer" to="fieldContainers" />
 			<Menu.Item title="Inputs" to="inputs" />
 			<Menu.Item title="Messages" to="messages" />
+			<Menu.Item title="Text areas" to="textareas" />
 		</Menu.Item>
 
 		<Menu.Item icon={<FileTextIcon />} title="Examples">

@@ -103,7 +103,7 @@ export const DateTimeInputFallback = memo(forwardRef(({
 				placeholder={outerProps.placeholder ?? undefined}
 				type="date"
 			/>
-			<Divider gap="none" />
+			<Divider gap={false} />
 			<input
 				{...timeInputProps}
 				max={date && date === maxDate ? maxTime : ''}

@@ -54,6 +54,7 @@ import { ErrorListProps } from '@contember/ui';
 import { FC } from 'react';
 import { FieldAccessor } from '@contember/binding';
 import { FieldBasicProps } from '@contember/binding';
+import { FieldContainerOwnProps } from '@contember/ui';
 import { FieldContainerProps } from '@contember/ui';
 import { FieldErrors } from '@contember/ui';
 import { FieldValue } from '@contember/binding';
@@ -96,6 +97,7 @@ import type { PersistSuccessOptions } from '@contember/binding';
 import { Point } from 'slate';
 import type { Props } from 'react-select';
 import { PropsWithChildren } from 'react';
+import { ProvidersProps } from '@contember/ui';
 import { PublicCommonReactSelectStylesProps } from '@contember/ui';
 import { PureComponent } from 'react';
 import { QualifiedEntityList } from '@contember/binding';
@@ -336,7 +338,7 @@ export interface ApiKeyListProps {
 export const ApplicationEntrypoint: (props: ApplicationEntrypointProps) => JSX.Element;
 
 // @public (undocumented)
-export interface ApplicationEntrypointProps extends ContemberClientProps {
+export interface ApplicationEntrypointProps extends ContemberClientProps, Omit<ProvidersProps, 'children'> {
     // (undocumented)
     basePath?: string;
     // (undocumented)
@@ -3352,6 +3354,7 @@ export const MiscPageLayout: React.NamedExoticComponent<MiscPageLayoutProps>;
 // @public (undocumented)
 export type MiscPageLayoutProps = Omit<BoxOwnProps, 'header' | 'footer'> & {
     footerActions?: ReactNode;
+    heading?: ReactNode;
 };
 
 // @public (undocumented)
@@ -4011,16 +4014,14 @@ export const repeaterDictionary: {
 };
 
 // @public (undocumented)
-export const RepeaterFieldContainer: React.MemoExoticComponent<({ accessor, addButtonText, children, createNewEntity, addButtonComponent: AddButton, addButtonComponentExtraProps, addButtonProps, emptyMessage, emptyMessageComponent, enableAddingNew, formatMessage, isEmpty, label, }: RepeaterFieldContainerProps) => JSX.Element>;
+export const RepeaterFieldContainer: React.MemoExoticComponent<({ accessor, addButtonText, boxLabel, children, createNewEntity, addButtonComponent: AddButton, addButtonComponentExtraProps, addButtonProps, emptyMessage, emptyMessageComponent, enableAddingNew, formatMessage, isEmpty, label, ...rest }: RepeaterFieldContainerProps) => JSX.Element>;
 
 // @public (undocumented)
-export interface RepeaterFieldContainerPrivateProps {
+export interface RepeaterFieldContainerPrivateProps extends Omit<FieldContainerOwnProps, 'useLabelElement'> {
     // (undocumented)
     accessor: EntityListAccessor;
     // @deprecated (undocumented)
     boxLabel?: ReactNode;
-    // (undocumented)
-    children: ReactNode;
     // (undocumented)
     createNewEntity: RepeaterCreateNewEntity;
     // (undocumented)
@@ -4029,8 +4030,6 @@ export interface RepeaterFieldContainerPrivateProps {
     formatMessage: MessageFormatter<RepeaterDictionary>;
     // (undocumented)
     isEmpty: boolean;
-    // (undocumented)
-    label: ReactNode;
 }
 
 // @public (undocumented)
@@ -4062,8 +4061,6 @@ export interface RepeaterInnerProps<ContainerExtraProps, ItemExtraProps> extends
     // (undocumented)
     dragHandleComponent?: RepeaterItemContainerProps['dragHandleComponent'];
     // (undocumented)
-    enableAdding?: boolean;
-    // (undocumented)
     enableRemoving?: boolean;
     // (undocumented)
     itemComponent?: ComponentType<RepeaterItemProps & ItemExtraProps>;
@@ -4082,15 +4079,16 @@ export interface RepeaterInnerProps<ContainerExtraProps, ItemExtraProps> extends
 }
 
 // @public (undocumented)
-export const RepeaterItem: React.MemoExoticComponent<({ children, canBeRemoved, label, removalType, dragHandleComponent, index, ...rest }: RepeaterItemProps) => JSX.Element>;
+export const RepeaterItem: React.MemoExoticComponent<React.ForwardRefExoticComponent<RepeaterItemProps & React.RefAttributes<HTMLDivElement>>>;
 
 // @public (undocumented)
 export type RepeaterItemOwnProps = {
-    label: ReactNode;
-    children: ReactNode;
     canBeRemoved?: boolean;
-    index: number;
+    children: ReactNode;
+    createNewEntity: RepeaterCreateNewEntity;
     dragHandleComponent?: RepeaterItemContainerProps['dragHandleComponent'];
+    index: number;
+    label: ReactNode;
     removalType: RemovalType;
 };
 
@@ -4655,7 +4653,7 @@ export interface SimpleRelativeSingleFieldMetadata<Value extends FieldValue = Fi
 export type SimpleRelativeSingleFieldProps = SimpleRelativeSingleFieldProxyProps;
 
 // @internal (undocumented)
-export const SimpleRelativeSingleFieldProxy: React.MemoExoticComponent<({ render, defaultValue, isNonbearing, onBeforeUpdate, onInitialize, onUpdate, description, display, direction, evenly, horizontal, gap, label, labelDescription, labelPosition, reverse, useLabelElement, width, className, style, errors, field: fieldName, required, size, containerClassName, containerStyle, suppressErrors, ...rest }: SimpleRelativeSingleFieldProxyProps & SimpleRelativeSingleFieldProxyRendererProps) => JSX.Element>;
+export const SimpleRelativeSingleFieldProxy: React.MemoExoticComponent<({ render, defaultValue, isNonbearing, onBeforeUpdate, onInitialize, onUpdate, description, display, direction, evenly, footer, horizontal, gap, label, labelDescription, labelPosition, reverse, useLabelElement, width, className, componentClassName, style, errors, field: fieldName, required, size, containerClassName, containerStyle, suppressErrors, ...rest }: SimpleRelativeSingleFieldProxyProps & SimpleRelativeSingleFieldProxyRendererProps) => JSX.Element>;
 
 // @public (undocumented)
 export type SimpleRelativeSingleFieldProxyExcludeHandledProps<P extends SimpleRelativeSingleFieldProxyProps> = Omit<P, Exclude<keyof SugaredRelativeSingleField, RenderedSugaredRelativeSingleFieldKeys> | Exclude<keyof SimpleRelativeSingleFieldProxyExtraProps, RenderedSimpleRelativeSingleFieldProxyExtraPropsKeys> | Exclude<keyof SimpleRelativeSingleFieldProxyFieldContainerProps, RenderedSimpleRelativeSingleFieldProxyFieldContainerPropsKeys>>;

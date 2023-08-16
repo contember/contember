@@ -1,7 +1,7 @@
 :where(.cui-brand-icon) {
 	--cui-border-radius-optical-grow: 0.05641895835477563;
 
-	--cui-brand-icon: 1;
+	--cui-brand-icon--scale: 1;
 	--cui-brand-icon--aspect-ratio: 1;
 	--cui-brand-icon--inset: calc(1em / 2 * var(--cui-border-radius-optical-grow));
 	--cui-brand-icon--padding: calc((var(--cui-line-height--units) - 1em) / 2);
@@ -10,7 +10,7 @@
 	flex-basis: content;
 	flex-grow: 0;
 	flex-shrink: 0;
-	font-size: calc(1em * var(--cui-brand-icon));
+	font-size: calc(1em * var(--cui-brand-icon--scale));
 	height: var(--cui-line-height--units);
 	margin: calc(-1 * var(--cui-brand-icon--inset));
 	padding: var(--cui-brand-icon--padding);
@@ -19,8 +19,8 @@
 	width: calc(var(--cui-brand-icon--aspect-ratio) * var(--cui-line-height--units));
 }
 :where(.cui-brand-logo-type) {
-	--cui-brand-icon: 1;
-	margin: calc(-1 * (var(--cui-brand-icon--inset) + var(--cui-brand-icon--padding)));
-
+	--cui-brand-icon--scale: 0.75;
+	margin: 0;
+	padding: 0;
 	width: auto;
 }

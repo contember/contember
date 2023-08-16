@@ -41,7 +41,7 @@ export const SlotSources = {
 	...FooterSlotSources,
 	Title,
 	// Your custom slots will come here, e.g:
-	// MySLot: Slots.createSlotSourceComponent('MySlot'),
+	// MySLot: Slots.createSlotSourceComponent(slotTargets.MySLot),
 }
 
 export const SlotTargets = {
@@ -50,5 +50,5 @@ export const SlotTargets = {
 	...HeaderSlotTargets,
 	...FooterSlotTargets,
 	// Your custom slot targets will come here, e.g:
-	// MySLot: Slots.createSlotTargetComponent('MySlot'),
+	// MySLot: Slots.createSlotTargetComponent(slotTargets.MySLot),
 }

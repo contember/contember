@@ -1,17 +1,26 @@
-import { PropsWithChildren } from 'react'
 import { DialogProvider } from './Dialog'
-import { PortalProvider } from './Portal'
+import { PortalProvider, PortalProviderProps } from './Portal'
 import { SectionTabsProvider } from './SectionTabs'
-import { StyleProvider } from './StyleProvider'
+import { StyleProvider, StyleProviderProps } from './StyleProvider'
 import { Toaster, ToasterProvider } from './Toaster'
 
-export const Providers = (props: PropsWithChildren) => (
-	<StyleProvider>
+export type ProvidersProps = {
+	children: React.ReactNode
+	portalProviderProps?: PortalProviderProps
+	styleProviderProps?: StyleProviderProps
+}
+
+export const Providers = ({
+	children,
+	portalProviderProps,
+	styleProviderProps,
+}: ProvidersProps) => (
+	<StyleProvider {...styleProviderProps}>
 		<ToasterProvider>
-			<PortalProvider>
+			<PortalProvider {...portalProviderProps}>
 				<DialogProvider>
 					<SectionTabsProvider>
-						{props.children}
+						{children}
 					</SectionTabsProvider>
 					<Toaster />
 				</DialogProvider>

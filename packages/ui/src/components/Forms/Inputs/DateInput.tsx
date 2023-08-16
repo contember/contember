@@ -1,4 +1,5 @@
 import { useClassName } from '@contember/react-utils'
+import { dataAttribute } from '@contember/utilities'
 import { forwardRef, memo } from 'react'
 import { toViewClass } from '../../../utils'
 import { useTextBasedInput } from '../Hooks'
@@ -10,6 +11,7 @@ import type { DateInputProps } from './Types'
  */
 export const DateInput = memo(forwardRef<HTMLInputElement, DateInputProps>(({
 	className,
+	focusRing = true,
 	withTopToolbar,
 	...outerProps
 }, forwardedRed) => {
@@ -25,6 +27,6 @@ export const DateInput = memo(forwardRef<HTMLInputElement, DateInputProps>(({
 		]),
 	}, forwardedRed)
 
-	return <input {...props} type="date" />
+	return <input data-focus-ring={dataAttribute(focusRing)} {...props} type="date" />
 }))
 DateInput.displayName = 'DateInput'

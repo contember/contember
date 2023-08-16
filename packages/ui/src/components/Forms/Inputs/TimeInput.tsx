@@ -1,4 +1,5 @@
 import { useClassName } from '@contember/react-utils'
+import { dataAttribute } from '@contember/utilities'
 import { forwardRef, memo } from 'react'
 import { toViewClass } from '../../../utils'
 import { useTextBasedInput } from '../Hooks'
@@ -10,6 +11,7 @@ import type { TimeInputProps } from './Types'
  */
 export const TimeInput = memo(forwardRef<HTMLInputElement, TimeInputProps>(({
 	className,
+	focusRing = true,
 	seconds,
 	withTopToolbar,
 	...outerProps
@@ -26,6 +28,6 @@ export const TimeInput = memo(forwardRef<HTMLInputElement, TimeInputProps>(({
 		]),
 	}, forwardedRed)
 
-	return <input {...props} step={seconds ? 1 : props.step} type="time" />
+	return <input data-focus-ring={dataAttribute(focusRing)} {...props} step={seconds ? 1 : props.step} type="time" />
 }))
 TimeInput.displayName = 'TimeInput'

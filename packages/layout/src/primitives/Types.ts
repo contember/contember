@@ -1,5 +1,5 @@
 import { ComponentClassNameProps, NestedClassName, PolymorphicComponentPropsWithRef, isArrayOfMembersSatisfyingFactory, isNonEmptyString, isOneOfFactory, satisfiesOneOfFactory } from '@contember/utilities'
-import { ElementType, ReactElement, ReactNode, RefObject } from 'react'
+import { ElementType, PropsWithChildren, ReactElement, ReactNode, RefObject } from 'react'
 
 export const panelBehaviorsList = ['static', 'collapsible', 'overlay', 'modal'] as const
 export type PanelBehavior = typeof panelBehaviorsList[number]
@@ -16,11 +16,9 @@ export const isComponentClassName = satisfiesOneOfFactory(
 	isNonEmptyString,
 )
 
-export type OwnContainerProps =
-	& ComponentClassNameProps
-	& {
-		showDataState?: boolean;
-	}
+export interface OwnContainerProps extends ComponentClassNameProps, PropsWithChildren<{
+	showDataState?: boolean;
+}> { }
 
 export type ContainerProps<C extends ElementType> = PolymorphicComponentPropsWithRef<C, OwnContainerProps>
 
@@ -36,10 +34,10 @@ export type PanelState = {
 	visibility: PanelVisibility;
 }
 
-export interface PanelBasicProps extends ComponentClassNameProps {
+export interface PanelBasicProps extends ComponentClassNameProps, PropsWithChildren<{
 	trapFocusInModal?: boolean;
 	tabIndex?: never;
-}
+}> { }
 
 export type CommonPanelConfigProps = {
 	basis: number | null | undefined;
@@ -49,28 +47,40 @@ export type CommonPanelConfigProps = {
 	priority?: number | null | undefined;
 }
 
-export interface ControlledPanelProps {
-	behavior: PanelBehavior | null | undefined;
-	defaultBehavior?: never;
-	defaultVisibility?: never;
+export interface ControlledBehaviorPanelProps {
+	behavior: PanelBehavior;
+	defaultBehavior?: null | undefined;
 	onBehaviorChange: (state: PanelState) => void;
-	onKeyPress?: (event: KeyboardEvent, state: PanelState) => void;
+}
+
+export interface UncontrolledBehaviorPanelProps {
+	behavior?: null | undefined;
+	defaultBehavior: PanelBehavior;
+	onBehaviorChange?: (state: PanelState) => Partial<Omit<PanelState, 'behavior'>> & { passive?: boolean } | null | undefined | void;
+}
+
+export interface ControlledVisibilityPanelProps {
+	defaultVisibility?: null | undefined;
 	onVisibilityChange: (state: PanelState) => void;
-	visibility: PanelVisibility | null | undefined;
+	visibility: PanelVisibility;
 }
-export interface UncontrolledPanelProps {
-	behavior?: never;
-	defaultBehavior: PanelBehavior | null | undefined;
-	defaultVisibility: PanelVisibility | null | undefined;
-	onBehaviorChange?: (state: PanelState) => Partial<PanelState> | null | undefined | void;
-	onKeyPress?: (event: KeyboardEvent, state: PanelState) => Partial<PanelState> | null | undefined | void;
-	onVisibilityChange?: (state: PanelState) => Partial<PanelState> | null | undefined | void;
-	visibility?: never;
+
+export interface UncontrolledVisibilityPanelProps {
+	defaultVisibility: PanelVisibility;
+	onVisibilityChange?: (state: PanelState) => Partial<Omit<PanelState, 'visibility'>> & { passive?: boolean } | null | undefined | void;
+	visibility?: null | undefined;
 }
+
+export type ControlPanelProps =
+	& (ControlledBehaviorPanelProps | UncontrolledBehaviorPanelProps)
+	& (ControlledVisibilityPanelProps | UncontrolledVisibilityPanelProps)
+	& {
+		onKeyPress?: (event: KeyboardEvent, state: PanelState) => Partial<PanelState> & { passive?: boolean } | null | undefined | void;
+	}
 
 export type PanelConfigProps =
 	& CommonPanelConfigProps
-	& (ControlledPanelProps | UncontrolledPanelProps)
+	& ControlPanelProps
 
 export type OwnPanelProps =
 	& PanelBasicProps

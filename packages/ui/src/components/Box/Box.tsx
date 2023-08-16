@@ -1,8 +1,8 @@
 import { useClassNameFactory, useColorScheme } from '@contember/react-utils'
-import { colorSchemeClassName, dataAttribute, deprecate, fallback, isDefined, themeClassName } from '@contember/utilities'
+import { ComponentClassNameProps, colorSchemeClassName, dataAttribute, deprecate, fallback, isDefined, themeClassName } from '@contember/utilities'
 import { ReactNode, forwardRef, memo } from 'react'
 import type { BoxDistinction, Default, HTMLDivElementProps, Intent } from '../../types'
-import { Stack, StackProps } from '../Stack'
+import { DeprecatedStackProps, Stack, StackOwnProps } from '../Stack'
 import { Label } from '../Typography/Label'
 
 export type BoxHeaderProps =
@@ -17,36 +17,41 @@ export type BoxHeaderProps =
 		label?: never
 	}
 
+/** @deprecated Use `boolean` instead */
+export type DeprecatedPaddingPropLiteral = Default | 'no-padding' | 'with-padding'
 
 export type BoxOwnProps =
+	& ComponentClassNameProps
 	& BoxHeaderProps
-	& Pick<StackProps, 'align' | 'className' | 'direction' | 'evenly' | 'gap' | 'horizontal' | 'justify' | 'reverse' | 'wrap'>
+	& Pick<StackOwnProps, 'align' | 'evenly' | 'gap' | 'horizontal' | 'justify' | 'reverse' | 'wrap'>
 	& {
 		background?: boolean
 		border?: boolean
-		borderRadius?: boolean | 'gap' | 'gutter' | 'padding' | 'large' | 'larger'
+		borderRadius?: StackOwnProps['gap']
 		children?: ReactNode
-		/** @deprecated Use `background={false} border={false} padding={false}` props combination instead */
-		distinction?: BoxDistinction
+		fit?: false | 'width' | 'height' | 'both'
+		focusRing?: boolean
 		footer?: ReactNode
-		/** @deprecated Use `label` instead */
-		heading?: ReactNode
 		isActive?: boolean
 		intent?: Intent
-		padding?:
-		| boolean | 'gap' | 'gutter' | 'padding' | 'large' | 'larger'
-		| DeprecatedPaddingPropLiteral
+		padding?: StackOwnProps['gap']
 	}
 
-/** @deprecated Use `boolean` instead */
-export type DeprecatedPaddingPropLiteral =
-	| Default
-	| 'no-padding'
-	| 'with-padding'
+/** @deprecated Use `BoxOwnProps` instead */
+export interface DeprecatedBoxProps extends Pick<DeprecatedStackProps, 'gap'> {
+	/** @deprecated Use combination of `horizontal` and `reverse` props instead */
+	direction?: DeprecatedStackProps['direction']
+	/** @deprecated Use `background={false} border={false} padding={false}` props combination instead */
+	distinction?: BoxDistinction
+	/** @deprecated Use `label` instead */
+	heading?: ReactNode
+	padding?: BoxOwnProps['padding'] | DeprecatedPaddingPropLiteral
+}
 
 export type BoxProps =
-	& Omit<HTMLDivElementProps, keyof BoxOwnProps>
-	& BoxOwnProps
+	& Omit<HTMLDivElementProps, keyof BoxOwnProps | keyof DeprecatedBoxProps>
+	& Omit<BoxOwnProps, keyof DeprecatedBoxProps>
+	& DeprecatedBoxProps
 
 /**
  * The `Box` component is a container that can be used to wrap other components.
@@ -83,6 +88,15 @@ export type BoxProps =
  * </Box>
  * ```
  *
+ * @example
+ * Box simulating a message input with a send button:
+ * ```tsx
+ * <Box horizontal focusRing padding="double" align="end">
+ * 	<TextareaInput placeholder="Send new message..." minRows={1} maxRows={10} distinction="seamless" />
+ * 	<Button>Send <SendHorizontalIcon /></Button>
+ * </Box>
+ * ```
+ *
  * @group UI
  */
 export const Box = memo(forwardRef<HTMLDivElement, BoxProps>(({
@@ -92,10 +106,13 @@ export const Box = memo(forwardRef<HTMLDivElement, BoxProps>(({
 	border = true,
 	borderRadius = true,
 	children,
-	className,
+	className: classNameProp,
+	componentClassName = 'box',
 	direction,
 	distinction,
 	evenly,
+	fit = 'width',
+	focusRing,
 	footer,
 	gap = 'gutter',
 	header,
@@ -110,7 +127,7 @@ export const Box = memo(forwardRef<HTMLDivElement, BoxProps>(({
 	wrap,
 	...divProps
 }: BoxProps, ref) => {
-	const componentClassName = useClassNameFactory('box')
+	const className = useClassNameFactory(componentClassName)
 
 	// TODO: Remove in v1.3.0
 	deprecate('1.3.0', padding === 'default', '`padding="default"`', 'omitted `padding` prop')
@@ -130,46 +147,54 @@ export const Box = memo(forwardRef<HTMLDivElement, BoxProps>(({
 	label = fallback(label, heading !== undefined, heading)
 
 	return (
-		<div
+		<Stack
 			{...divProps}
+			ref={ref}
+			align={align}
 			data-active={dataAttribute(isActive)}
 			data-background={dataAttribute(background)}
 			data-border={dataAttribute(border)}
 			data-border-radius={dataAttribute(borderRadius)}
-			data-gap={dataAttribute(gap)}
+			data-focus-ring={dataAttribute(focusRing)}
+			data-fit={dataAttribute(fit)}
 			data-padding={dataAttribute(padding)}
-			className={componentClassName(null, [
+			className={className(null, [
 				...themeClassName(intent),
 				colorSchemeClassName(useColorScheme()),
-				className,
+				classNameProp,
 			])}
-			ref={ref}
+			gap={gap}
+			horizontal={horizontal}
+			justify={justify}
+			reverse={reverse}
 		>
-			<Stack
-				align={align}
-				direction={direction}
-				evenly={evenly}
-				gap={gap}
-				horizontal={horizontal}
-				justify={justify}
-				reverse={reverse}
-			>
-				{header
-					? <div className={componentClassName('header')}>{header}</div>
-					: (label || actions) && (
-						<div className={componentClassName('header')}>
-							{label && <Label>{label}</Label>}
-							{actions && (
-								<div className={componentClassName('actions')} contentEditable={false}>
-									{actions}
-								</div>
-							)}
-						</div>
+			{header
+				? <div className={className('header')}>{header}</div>
+				: (label || actions) && (
+					<div className={className('header')}>
+						{(typeof label === 'string' || typeof label === 'number')
+							? <Label>{label}</Label>
+							: label
+						}
+						{actions && (
+							<div className={className('actions')} contentEditable={false}>
+								{actions}
+							</div>
+						)}
+					</div>
 				)}
-				{children}
-				{footer && <div className={componentClassName('footer')}>{footer}</div>}
-			</Stack>
-		</div>
+			{children && (
+				<Stack
+					className={[className('body'), className('content')]}
+					evenly={evenly}
+					gap={gap}
+					horizontal={horizontal}
+				>
+					{children}
+				</Stack>
+			)}
+			{footer && <div className={className('footer')}>{footer}</div>}
+		</Stack>
 	)
 }))
 Box.displayName = 'Box'

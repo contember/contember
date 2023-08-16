@@ -24,7 +24,6 @@
 	--cui-button--color--pressed: rgb(var(--cui-color--toned-controls-rgb-100));
 	--cui-button--color-rgb: var(--cui-color--accent-rgb-50);
 	--cui-button--color: rgb(var(--cui-button--color-rgb));
-	--cui-button--gap: var(--cui-gap);
 	--cui-button--height: var(--cui-size--controls);
 	--cui-button--inset: 0px;
 	--cui-button--inset-horizontal: var(--cui-button--inset);
@@ -51,7 +50,7 @@
 	font-family: inherit;
 	font-size: var(--cui-button--label-font-size);
 	font-weight: 600;
-	gap: var(--cui-button--gap);
+	gap: var(--cui-gap);
 	line-height: var(--cui-button--line-height);
 	margin: 0px;
 	outline: none;
@@ -72,6 +71,9 @@
 }
 :where(.cui-button[data-border-radius="gap"]) {
 	--cui-button--border-radius: min(var(--cui-button--padding), var(--cui-gap));
+}
+:where(.cui-button[data-border-radius="double"]) {
+	--cui-button--border-radius: min(var(--cui-button--padding), var(--cui-double-gap));
 }
 :where(.cui-button[data-border-radius="gutter"]) {
 	--cui-button--border-radius: min(var(--cui-button--padding), var(--cui-gutter));
@@ -113,13 +115,15 @@
 	--cui-button--color--highlighted: rgb(var(--cui-color--accent-rgb-75));
 }
 
-:where(.cui-button[data-padding]) { --cui-button--padding: calc(2.25 * var(--cui-button--gap)) }
-:where(.cui-button[data-padding="gap"]) { --cui-button--padding: calc(var(--cui-button--gap)) }
+:where(.cui-button[data-padding]) { --cui-button--padding: calc(2.25 * var(--cui-gap)) }
+:where(.cui-button[data-padding="gap"]) { --cui-button--padding: calc(var(--cui-gap)) }
+:where(.cui-button[data-padding="double"]) { --cui-button--padding: calc(var(--cui-double-gap)) }
 :where(.cui-button[data-padding="gutter"]) { --cui-button--padding: calc(var(--cui-gutter)) }
 :where(.cui-button[data-padding="padding"]) { --cui-button--padding: calc(var(--cui-padding)) }
 
 :where(.cui-button[data-inset]) { --cui-button--inset: var(--cui-button--padding) }
 :where(.cui-button[data-inset="gap"]) { --cui-button--inset: var(--cui-gap) }
+:where(.cui-button[data-inset="double"]) { --cui-button--inset: var(--cui-double-gap) }
 :where(.cui-button[data-inset="gutter"]) { --cui-button--inset: var(--cui-gutter) }
 :where(.cui-button[data-inset="padding"]) { --cui-button--inset: var(--cui-padding) }
 
@@ -266,8 +270,18 @@
 }
 
 :where(.cui-button:focus:focus-visible:not([disabled]) > .cui-button-content) {
-	box-shadow: var(--cui-button--box-shadow--highlighted), var(--cui-box-shadow--controls-focus-ring);
+	background: var(--cui-button--background-color--highlighted);
+	box-shadow: var(--cui-button--box-shadow--highlighted);
 	color: var(--cui-button--color--highlighted);
+}
+
+:where(.cui-button[data-focus-ring]:focus:focus-visible:not([disabled]) > .cui-button-content) {
+	box-shadow: var(--cui-button--box-shadow--highlighted), var(--cui-box-shadow--controls-focus-ring);
+}
+
+:where(.cui-button[data-focus-ring]:active:focus:focus-visible > .cui-button-content),
+:where(.cui-button[data-focus-ring][data-active]:focus:focus-visible > .cui-button-content) {
+	box-shadow: var(--cui-button--box-shadow--pressed), var(--cui-box-shadow--controls-focus-ring);
 }
 
 :where(.cui-button-list),
@@ -275,6 +289,7 @@
 	align-items: center;
 	display: inline-flex;
 	flex-wrap: wrap;
+	position: relative;
 }
 
 :where(.cui-button-list) {
@@ -283,6 +298,7 @@
 }
 :where(.cui-button-list[data-gap]) { --cui-button-list--gap: var(--cui-gap) }
 :where(.cui-button-list[data-gap="gap"]) { --cui-button-list--gap: var(--cui-gap) }
+:where(.cui-button-list[data-gap="double"]) { --cui-button-list--gap: var(--cui-double-gap) }
 :where(.cui-button-list[data-gap="gutter"]) { --cui-button-list--gap: var(--cui-gutter) }
 :where(.cui-button-list[data-gap="padding"]) { --cui-button-list--gap: var(--cui-padding) }
 :where(.cui-button-list[data-gap="large"]) { --cui-button-list--gap: calc(1.5 * var(--cui-padding)) }
@@ -294,8 +310,8 @@
 	flex-grow: 1;
 }
 
-:where(.cui-button-list[data-orientation="vertical"]),
-:where(.cui-button-group[data-orientation="vertical"]) {
+:where(.cui-button-list[data-direction="vertical"]),
+:where(.cui-button-group[data-direction="vertical"]) {
 	align-items: stretch;
 	flex-direction: column;
 }
@@ -320,54 +336,56 @@
 }
 
 /* TODO: Should be removed with deprecated code */
-:where(.cui-button-group.view-isTopToolbar > .cui-button) {
+:where(.cui-button-group.view-isTopToolbar > *) {
 	border-bottom-left-radius: 0;
 	border-bottom-right-radius: 0;
 }
 
-:where(.cui-button-group:not([data-orientation="vertical"]) > .cui-button:not(:first-child):not(:last-child)) {
+:where(.cui-button-group[data-direction="horizontal"] > :not(:first-child):not(:last-child)) {
 	border-left: none;
 	border-right: none;
 	border-radius: 0;
 }
 
-:where(.cui-button-group:not([data-orientation="vertical"]) > .cui-button:first-child:not(.cui-button-group:last-child)),
-:where(.cui-button-group:not([data-orientation="vertical"]) > .cui-button-group:first-child) {
+:where(.cui-button-group[data-direction="horizontal"] > :first-child:not(:last-child)) {
 	border-top-right-radius: 0;
 	border-bottom-right-radius: 0;
 	border-right: none;
 }
 
-:where(.cui-button-group:not([data-orientation="vertical"]) > .cui-button:last-child:not(.cui-button-group:first-child)),
-:where(.cui-button-group:not([data-orientation="vertical"]) > .cui-button-group:last-child) {
+:where(.cui-button-group[data-direction="horizontal"] > :last-child:not(:first-child)) {
 	border-top-left-radius: 0;
 	border-bottom-left-radius: 0;
 	border-left: none;
 }
 
-:where(.cui-button-group[data-orientation="vertical"] > .cui-button:not(:first-child):not(:last-child)) {
+:where(.cui-button-group[data-direction="vertical"] > :not(:first-child):not(:last-child)) {
 	border-top: none;
 	border-bottom: none;
 	border-radius: 0;
 }
 
-:where(.cui-button-group[data-orientation="vertical"] > .cui-button:first-child:not(.cui-button-group:last-child)),
-:where(.cui-button-group[data-orientation="vertical"] > .cui-button-group:first-child) {
+:where(.cui-button-group[data-direction="vertical"] > :first-child:not(:last-child)) {
 	border-bottom-left-radius: 0;
 	border-bottom-right-radius: 0;
 	border-bottom: none;
 }
 
-:where(.cui-button-group[data-orientation="vertical"] > .cui-button:last-child:not(.cui-button-group:first-child)),
-:where(.cui-button-group[data-orientation="vertical"] > .cui-button-group:last-child) {
+:where(.cui-button-group[data-direction="vertical"] > :last-child:not(:first-child)) {
 	border-top-left-radius: 0;
 	border-top-right-radius: 0;
 	border-top: none;
 }
 
-:where(.cui-button:active:focus:focus-visible),
-:where(.cui-button[data-active]:focus:focus-visible) {
-	box-shadow: var(--cui-button--box-shadow--pressed), var(--cui-box-shadow--controls-focus-ring);
+:where(.cui-button-group[data-border-radius]) { border-radius: var(--cui-border-radius--controls) }
+:where(.cui-button-group[data-border-radius="gap"]) { border-radius: calc(var(--cui-gap)) }
+:where(.cui-button-group[data-border-radius="double"]) { border-radius: calc(var(--cui-double-gap)) }
+:where(.cui-button-group[data-border-radius="gutter"]) { border-radius: calc(var(--cui-gutter)) }
+:where(.cui-button-group[data-border-radius="padding"]) { border-radius: calc(var(--cui-padding)) }
+
+:where(.cui-button-group[data-focus-ring]:focus-within) {
+	box-shadow: var(--cui-box-shadow--controls-focus-ring);
+	z-index: 1;
 }
 
 :where(.cui-button[disabled]) {

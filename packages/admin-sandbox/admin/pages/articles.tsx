@@ -1,5 +1,7 @@
 import {
 	AnchorButton,
+	Button,
+	CreateNewEntityButton,
 	CreateScope,
 	DataGridScope,
 	DeleteEntityButton,
@@ -17,11 +19,16 @@ import {
 	NumberCell,
 	PersistButton,
 	Repeater,
+	RepeaterItem,
+	RepeaterItemProps,
 	SelectField,
+	Stack,
+	Text,
 	TextCell,
 	TextField,
+	noop,
 } from '@contember/admin'
-import { MoreVerticalIcon } from 'lucide-react'
+import { MoreVerticalIcon, PlusCircleIcon, PlusIcon } from 'lucide-react'
 import { CategoryForm } from '../components/CategoryForm'
 import { DataGridTile } from '../components/DataGridTile'
 import { Directive } from '../components/Directives'
@@ -43,7 +50,7 @@ export const list = () => (
 
 		<DataGridScope
 			entities="Article"
-			itemsPerPage={20}
+			itemsPerPage={5}
 			tile={(
 				<DataGridTile
 					to="articles/edit(id: $entity.id)"
@@ -110,7 +117,6 @@ export const categories = () => (
 		<SlotSources.Title>Categories</SlotSources.Title>
 
 		<MultiEditScope entities="Category" listProps={{
-			enableAdding: true,
 			sortableBy: 'order',
 			beforeContent: <SlotSources.Actions><PersistButton /></SlotSources.Actions>,
 		}}>
@@ -119,13 +125,22 @@ export const categories = () => (
 	</>
 )
 
+const CustomRepeaterItem = (props: RepeaterItemProps) => {
+	return (
+		<Stack gap="gap">
+			<CreateNewEntityButton createNewEntity={noop} onClick={() => props.createNewEntity(undefined, props.index)}>Locales</CreateNewEntityButton>
+			<RepeaterItem {...props} />
+		</Stack>
+	)
+}
+
 export const tags = () => (
 	<>
 		<SlotSources.Title>Tags</SlotSources.Title>
 
 		<MultiEditScope entities="Tag" listProps={{ beforeContent: <SlotSources.Actions><PersistButton /></SlotSources.Actions> }}>
 			<TextField field={'name'} label={'Name'} />
-			<Repeater field={'locales'} label={'Locales'} sortableBy={'order'}>
+			<Repeater field={'locales'} label={'Locales'} sortableBy={'order'} itemComponent={CustomRepeaterItem}>
 				<SelectField label={'Locale'} options={'Locale.code'} field={'locale'}
 					createNewForm={<TextField field={'code'} label={'Locale code'} />} />
 				<TextField field={'name'} label={'Name'} />

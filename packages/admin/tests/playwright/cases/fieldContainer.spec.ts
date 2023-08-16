@@ -22,7 +22,7 @@ test('basic test', async ({ page, userAgent }) => {
 	await page.goto(`/${projectSlug}/fieldContainer`)
 	await page.waitForLoadState('networkidle') // wait for fonts
 	await page.waitForTimeout(200)
-	await page.waitForSelector('div.cui-field-container')
+	await page.waitForSelector('.cui-field-container')
 	await page.waitForTimeout(200)
 	expect(await page.screenshot({ animations: 'disabled' })).toMatchSnapshot('initial.png')
 })

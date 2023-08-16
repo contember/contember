@@ -1,5 +1,6 @@
 import type { EntityAccessor, EntityListAccessor } from '@contember/binding'
-import { FieldContainer, Stack } from '@contember/ui'
+import { FieldContainer, FieldContainerOwnProps } from '@contember/ui'
+import { deprecate, fallback, isDefined } from '@contember/utilities'
 import { ReactNode, memo } from 'react'
 import type { MessageFormatter } from '../../../../i18n'
 import { AccessorErrors } from '../../errors'
@@ -15,7 +16,7 @@ export type RepeaterFieldContainerPublicProps =
 
 export type RepeaterCreateNewEntity = (initialize?: EntityAccessor.BatchUpdatesHandler, index?: number) => void
 
-export interface RepeaterFieldContainerPrivateProps {
+export interface RepeaterFieldContainerPrivateProps extends Omit<FieldContainerOwnProps, 'useLabelElement'> {
 	accessor: EntityListAccessor
 	entities: EntityAccessor[]
 	formatMessage: MessageFormatter<RepeaterDictionary>
@@ -24,9 +25,7 @@ export interface RepeaterFieldContainerPrivateProps {
 	 * @deprecated Use label instead
 	 */
 	boxLabel?: ReactNode
-	label: ReactNode
 	createNewEntity: RepeaterCreateNewEntity
-	children: ReactNode
 }
 
 export type RepeaterFieldContainerProps =
@@ -37,6 +36,7 @@ export const RepeaterFieldContainer = memo(
 	({
 		accessor,
 		addButtonText,
+		boxLabel,
 		children,
 		createNewEntity,
 		addButtonComponent: AddButton = CreateNewEntityButton,
@@ -48,15 +48,17 @@ export const RepeaterFieldContainer = memo(
 		formatMessage,
 		isEmpty,
 		label,
+		...rest
 	}: RepeaterFieldContainerProps) => {
-		return <FieldContainer label={label} useLabelElement={false}>
-			<Stack gap="gap">
-				<AccessorErrors accessor={accessor} />
-				{isEmpty && (
-					<EmptyMessage component={emptyMessageComponent}>{formatMessage(emptyMessage, 'repeater.emptyMessage.text')}</EmptyMessage>
-				)}
-				{isEmpty || children}
-				{enableAddingNew && (
+		deprecate('1.3.0', isDefined(boxLabel), '`boxLabel` prop', '`label` prop')
+		label = fallback(label, isDefined(boxLabel), boxLabel)
+
+		return (
+			<FieldContainer
+				label={label}
+				{...rest}
+				useLabelElement={false}
+				footer={enableAddingNew && (
 					<AddButton
 						{...addButtonComponentExtraProps}
 						{...addButtonProps}
@@ -65,8 +67,14 @@ export const RepeaterFieldContainer = memo(
 						{addButtonText ?? label ?? formatMessage('repeater.addButton.text')}
 					</AddButton>
 				)}
-			</Stack>
-		</FieldContainer>
+			>
+				<AccessorErrors accessor={accessor} />
+				{isEmpty && (
+					<EmptyMessage component={emptyMessageComponent}>{formatMessage(emptyMessage, 'repeater.emptyMessage.text')}</EmptyMessage>
+				)}
+				{isEmpty || children}
+			</FieldContainer>
+		)
 	},
 )
 RepeaterFieldContainer.displayName = 'RepeaterFieldContainer'

@@ -2,11 +2,27 @@ import { useClassNameFactory, useColorScheme } from '@contember/react-utils'
 import { colorSchemeClassName, dataAttribute, deprecate, fallback, isDefined, themeClassName } from '@contember/utilities'
 import { ReactNode, memo } from 'react'
 import type { Default, HTMLDivElementProps, Intent, MessageDistinction, MessageFlow } from '../../types'
+import { StackOwnProps } from '../Stack'
 
 /** @deprecated Omit the prop instead */
 export type DeprecatedMessageSize = Default
 
-/** @internal */
+export interface MessageOwnProps {
+	action?: ReactNode
+	borderRadius?: StackOwnProps['gap']
+	background?: boolean
+	display?: 'inline' | 'block'
+	elevated?: boolean
+	children?: ReactNode
+	icon?: ReactNode
+	important?: boolean
+	intent?: Intent
+	padding?: StackOwnProps['gap']
+	textAlign?: 'start' | 'center' | 'end'
+	size?: 'small' | 'medium' | 'large'
+}
+
+/** @deprecated Use `MessageOwnProps` instead */
 export type DeprecatedMessageProps = {
 	/** @deprecated Use `elevated` instead */
 	lifted?: boolean
@@ -14,24 +30,12 @@ export type DeprecatedMessageProps = {
 	distinction?: MessageDistinction
 	/** @deprecated Use `padding` and `display` props instead */
 	flow?: MessageFlow
+	size?: MessageOwnProps['size'] | DeprecatedMessageSize
 }
 
 export type MessageProps =
-	& {
-		action?: ReactNode
-		borderRadius?: boolean | 'gap' | 'gutter' | 'padding' | 'large' | 'larger'
-		background?: boolean
-		display?: 'inline' | 'block'
-		elevated?: boolean
-		children?: ReactNode
-		icon?: ReactNode
-		important?: boolean
-		intent?: Intent
-		padding?: boolean | 'gap' | 'gutter' | 'padding' | 'large' | 'larger'
-		textAlign?: 'start' | 'center' | 'end'
-		size?: 'small' | 'medium' | 'large' | DeprecatedMessageSize
-	}
-	& HTMLDivElementProps
+	& Omit<HTMLDivElementProps, keyof MessageOwnProps | keyof DeprecatedMessageProps>
+	& Omit<MessageOwnProps, keyof DeprecatedMessageProps>
 	& DeprecatedMessageProps
 
 /**

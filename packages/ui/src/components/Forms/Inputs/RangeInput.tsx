@@ -1,4 +1,5 @@
 import { useClassName } from '@contember/react-utils'
+import { dataAttribute } from '@contember/utilities'
 import { forwardRef, memo } from 'react'
 import { toViewClass } from '../../../utils'
 import { useTextBasedInput } from '../Hooks'
@@ -9,6 +10,7 @@ import type { RangeInputProps } from './Types'
  */
 export const RangeInput = memo(forwardRef<HTMLInputElement, RangeInputProps>(({
 	className,
+	focusRing = true,
 	withTopToolbar,
 	...outerProps
 }, forwardedRed) => {
@@ -20,6 +22,6 @@ export const RangeInput = memo(forwardRef<HTMLInputElement, RangeInputProps>(({
 		]),
 	}, forwardedRed)
 
-	return <input {...props} type="range" />
+	return <input data-focus-ring={dataAttribute(focusRing)} {...props} type="range" />
 }))
 RangeInput.displayName = 'RangeInput'

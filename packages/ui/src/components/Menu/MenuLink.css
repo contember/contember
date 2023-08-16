@@ -3,7 +3,7 @@
 	align-items: center;
 	color: rgb(var(--cui-color--strong-rgb-75));
 	display: inline-flex;
-	padding: calc(2 * var(--cui-gap));
+	padding: var(--cui-double-gap);
 }
 :where(a.cui-menu-link[href]) {
 	color: rgb(var(--cui-color--strong-rgb-100));

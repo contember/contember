@@ -89,7 +89,7 @@ export const IdentityPanel = () => {
 	)
 }
 
-const LoginAsRole: FC = ({}) => {
+const LoginAsRole: FC = ({ }) => {
 	const addToast = useShowToast()
 	const [isSubmitting, setSubmitting] = useState(false)
 	const [memberships, setMemberships] = useState<(Membership | undefined)[]>([undefined])
@@ -197,7 +197,7 @@ const LoginWithEmail = () => {
 				<FieldContainer label={'E-mail'}>
 					<EmailInput value={email} onChange={e => setEmail(e as string)} notNull />
 				</FieldContainer>
-				<Button size="large" type="submit" disabled={isSubmitting}>
+				<Button display="block" type="submit" disabled={isSubmitting}>
 					Login
 				</Button>
 			</Stack>

@@ -1,4 +1,4 @@
-import { AnyEventPayload } from '../triggers/Payload'
+import { ActionsPayload } from '@contember/schema'
 
 export type EventRow = {
 	id: string
@@ -14,6 +14,6 @@ export type EventRow = {
 	target: string
 	priority: number
 	trigger: string
-	payload: AnyEventPayload
+	payload: ActionsPayload.AnyEventPayload
 	log: any[]
 }

@@ -1,7 +1,7 @@
-import { useClassNameFactory } from '@contember/react-utils'
+import { useClassNameFactory, useComposeRef } from '@contember/react-utils'
 import { ComponentClassNameProps, flatClassNameList } from '@contember/utilities'
 import { PencilIcon, Trash2Icon } from 'lucide-react'
-import { MouseEvent as ReactMouseEvent, ReactNode, memo, useMemo, useRef } from 'react'
+import { MouseEvent as ReactMouseEvent, ReactNode, memo, useCallback, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { HTMLDivElementProps } from '../../types'
 import { Box, BoxOwnProps } from '../Box'
@@ -33,6 +33,8 @@ export const ActionableBox = memo<ActionableBoxProps>(({
 	const className = useClassNameFactory(componentClassName)
 	const boxComponentClassName = useMemo(() => [...flatClassNameList(componentClassName), 'box'], [componentClassName])
 	const boxRef = useRef<HTMLDivElement>(null)
+	const [boxRefElement, setBoxRefElement] = useState<HTMLDivElement | null>(null)
+	const composeRef = useComposeRef(boxRef, setBoxRefElement)
 
 	if (editContents === undefined && onRemove === undefined) {
 		return <>{children}</>
@@ -40,13 +42,13 @@ export const ActionableBox = memo<ActionableBoxProps>(({
 
 	return (
 		<Box
-			ref={boxRef}
+			ref={composeRef}
 			{...rest}
 			className={className(null, classNameProp)}
 			componentClassName={boxComponentClassName}
 		>
 			{children}
-			{boxRef.current
+			{boxRefElement
 				? createPortal((
 					<ul className={className('actions')} contentEditable={false}>
 						{editContents && (
@@ -64,7 +66,7 @@ export const ActionableBox = memo<ActionableBoxProps>(({
 							</li>
 						)}
 					</ul>
-				), boxRef.current)
+				), boxRefElement)
 				: null}
 		</Box>
 	)

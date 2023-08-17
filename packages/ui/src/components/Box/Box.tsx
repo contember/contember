@@ -125,7 +125,7 @@ export const Box = memo(forwardRef<HTMLDivElement, BoxProps>(({
 	padding = true,
 	reverse,
 	wrap,
-	...divProps
+	...rest
 }: BoxProps, ref) => {
 	const className = useClassNameFactory(componentClassName)
 
@@ -148,7 +148,7 @@ export const Box = memo(forwardRef<HTMLDivElement, BoxProps>(({
 
 	return (
 		<Stack
-			{...divProps}
+			{...rest}
 			ref={ref}
 			align={align}
 			data-active={dataAttribute(isActive)}

@@ -16,10 +16,11 @@
 
 :where(.fileInput-dropZone) {
 	min-height: 8.125em;
-	display: flex;
+}
+
+:where(.fileInput-dropZone > .cui-box-body) {
 	justify-content: center;
 	align-items: center;
-	flex-direction: column;
 }
 
 :where(.fileInput-dropZone:last-child:nth-child(1)) {

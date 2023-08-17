@@ -42,8 +42,8 @@ export const ActionableBox = memo<ActionableBoxProps>(({
 
 	return (
 		<Box
-			ref={composeRef}
 			{...rest}
+			ref={composeRef}
 			className={className(null, classNameProp)}
 			componentClassName={boxComponentClassName}
 		>

@@ -1624,7 +1624,7 @@ export interface ErrorListProps {
 export type ErrorType = Error | unknown;
 
 // @public
-export const FieldContainer: MemoExoticComponent<({ children, className: classNameProp, componentClassName, description, errors, direction, display, footer, evenly, gap, horizontal, label, labelDescription, labelPosition, required, reverse, size, style, useLabelElement, width, }: FieldContainerProps) => JSX.Element>;
+export const FieldContainer: MemoExoticComponent<({ children, className: classNameProp, componentClassName, description, errors, direction, display, footer, evenly, gap, horizontal, label, labelDescription, labelPosition, required, reverse, size, style, useLabelElement, width, ...props }: FieldContainerProps) => JSX.Element>;
 
 // @public (undocumented)
 export type FieldContainerLabelPosition = 'bottom' | 'left' | 'right' | 'top' | DeprecatedFieldContainerLabelPosition;

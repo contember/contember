@@ -10,6 +10,7 @@ testInterface({
 		'auto.tsx',
 		'brand.tsx',
 		'buttons.tsx',
+		'actionableBoxes.tsx',
 		'boxes.tsx',
 		'textareas.tsx',
 		'fieldContainers.tsx',

@@ -9,6 +9,7 @@ export const Navigation = () => (
 			<Menu.Item title="Categories" to="articles/categories" />
 		</Menu.Item>
 		<Menu.Item icon={<ComponentIcon />} title="Components">
+			<Menu.Item title="Actionable Boxes" to="actionableBoxes" />
 			<Menu.Item title="Boxes" to="boxes" />
 			<Menu.Item title="Buttons" to="buttons" />
 			<Menu.Item title="FieldContainer" to="fieldContainers" />

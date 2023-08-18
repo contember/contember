@@ -69,10 +69,6 @@
 	max-width: 100%;
 }
 
-:where(.cui-box-body > .cui-text-input) {
-	flex: 1 0 min-content;
-}
-
 :where(.cui-box-header),
 :where(.cui-box-footer) {
 	align-items: center;

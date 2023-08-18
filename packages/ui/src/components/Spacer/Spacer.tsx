@@ -26,7 +26,7 @@ export type SpacerProps =
 /**
  * @group UI
  */
-export const Spacer = memo(({ className, componentClassName = 'spacer', gap, grow, shrink, ...rest }: SpacerProps) => {
+export const Spacer = memo(({ className, componentClassName = 'spacer', gap = true, grow, shrink, ...rest }: SpacerProps) => {
 	deprecate('1.3.0', gap === 'none', '`gap="none"`', '`gap={false}`')
 	gap = fallback(gap, gap === 'none', false)
 

@@ -240,6 +240,9 @@ export const usePreviousValue: <Value>(value: Value) => Value;
 export const useReferentiallyStableCallback: <T extends (...args: any[]) => any>(callback: T) => T;
 
 // @public (undocumented)
+export function useReferentiallyStableValue<T>(value: T): T;
+
+// @public (undocumented)
 export const useScopedConsoleRef: (prefix: string, override?: boolean) => MutableRefObject<ScopedConsoleContextType>;
 
 // @public (undocumented)

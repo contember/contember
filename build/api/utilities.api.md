@@ -141,6 +141,9 @@ export function isFalse(value: unknown): value is false;
 export function isHTMLElement(value: unknown): value is HTMLElement;
 
 // @public (undocumented)
+export function isNonEmptyArray<T>(value: unknown): value is [T, ...T[]];
+
+// @public (undocumented)
 export function isNonEmptyString(value: unknown): value is string;
 
 // @public (undocumented)

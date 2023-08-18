@@ -2674,6 +2674,7 @@ __metadata:
     "@contember/ui": "workspace:*"
     lucide-react: ^0.268.0
     react: ^17 || ^18
+    react-content-loader: ^6.0.3
     react-dom: ^17 || ^18
   languageName: unknown
   linkType: soft
@@ -14128,6 +14129,15 @@ __metadata:
     react: ">=16.8.0"
     react-dom: ">=16.8.0"
   checksum: e432b7cb0df57e8f0bcdc3b012d2e93fcbcb6092c9e0f85654788d5ebfc4442536d8cc35b2418061ba3c4afb8b7788cc101c606d86a1732407921de7a9244c8d
+  languageName: node
+  linkType: hard
+
+"react-content-loader@npm:^6.0.3":
+  version: 6.2.1
+  resolution: "react-content-loader@npm:6.2.1"
+  peerDependencies:
+    react: ">=16.0.0"
+  checksum: f777d408256a4218677e47f4cf3988d9fd8e556450e9b85ee1eb3952a5d5802573cea0df5eaf4dbc936c9522f355657de6f8ab0ecdf035d7dccdef15b45c9dae
   languageName: node
   linkType: hard
 

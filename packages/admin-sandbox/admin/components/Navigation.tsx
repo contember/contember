@@ -15,6 +15,9 @@ export const Navigation = () => (
 			<Menu.Item title="FieldContainer" to="fieldContainers" />
 			<Menu.Item title="Inputs" to="inputs" />
 			<Menu.Item title="Messages" to="messages" />
+			<Menu.Item title="Slots" to="slots">
+				<Menu.Item title="Title Fallback" to="slots/fallback" />
+			</Menu.Item>
 			<Menu.Item title="Text areas" to="textareas" />
 		</Menu.Item>
 

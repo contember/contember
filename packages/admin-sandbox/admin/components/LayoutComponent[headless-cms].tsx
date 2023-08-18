@@ -1,32 +1,29 @@
 import { Spacer, Stack } from '@contember/admin'
-import { LayoutKit, LayoutPrimitives, Slots, commonSlots, contentSlots, footerSlots, headerSlots } from '@contember/layout'
-import { pick } from '@contember/utilities'
+import { LayoutKit, LayoutPrimitives, Slots } from '@contember/layout'
 import { PropsWithChildren } from 'react'
 import { useDirectives } from './Directives'
 import { PanelDivider } from './PanelDivider'
 import { SlotTargets } from './Slots'
 
-export const LayoutSlots = pick(SlotTargets, [...commonSlots, ...headerSlots, ...footerSlots, ...contentSlots] as const)
-
 export const LayoutComponent = ({ children, ...rest }: PropsWithChildren) => {
 	const directives = useDirectives()
-	const targetsIfActive = Slots.useTargetsIfActiveFactory(LayoutSlots)
+	const createSlotTargets = Slots.useCreateSlotTargetsWhenActiveFactory(SlotTargets)
 
 	return (
 		<LayoutKit.Frame
 			header={
 				<LayoutKit.Header
-					start={targetsIfActive(['Logo', 'HeaderStart'])}
+					start={createSlotTargets(['HeaderStart', 'Logo'])}
 					startBefore={({ panels }) => (
 						panels.get(LayoutKit.SidebarLeft.NAME)?.behavior === 'modal'
 							? false
 							: <LayoutKit.ToggleSidebarButton panelName={LayoutKit.SidebarLeft.NAME} position="left" />
 					)}
-					center={targetsIfActive(['HeaderCenter'])}
+					center={createSlotTargets(['HeaderCenter'])}
 					end={({ panels }) => (
 						panels.get(LayoutKit.SidebarLeft.NAME)?.behavior !== 'modal'
-							? targetsIfActive(['HeaderEnd', 'Actions']) || false
-							: targetsIfActive(['HeaderEnd']) || false
+							? createSlotTargets(['Actions', 'HeaderEnd']) || false
+							: createSlotTargets(['HeaderEnd']) || false
 					)}
 					endAfter={({ panels }) => (
 						panels.get(LayoutKit.SidebarLeft.NAME)?.behavior === 'modal'
@@ -37,27 +34,28 @@ export const LayoutComponent = ({ children, ...rest }: PropsWithChildren) => {
 			}
 			footer={(
 				<LayoutKit.Footer
-					start={targetsIfActive(['FooterStart']) || false}
-					center={targetsIfActive(['FooterCenter']) || false}
-					end={targetsIfActive(['FooterEnd', 'Switchers']) || false}
+					start={createSlotTargets(['FooterStart']) || false}
+					center={createSlotTargets(['FooterCenter']) || false}
+					end={createSlotTargets(['Switchers', 'FooterEnd']) || false}
 				/>
 			)}
 			{...rest}
 		>
-			{targetsIfActive(['Navigation', 'Profile'], (
+			{createSlotTargets(['Navigation', 'Profile'], (
 				<LayoutKit.SidebarLeft
 					keepVisible
-					header={({ behavior }) => behavior === 'modal'
+					header={(({ behavior }) => behavior === 'modal'
 						? (
 							<>
+								<SlotTargets.SidebarLeftHeader />
 								<Spacer />
 								<LayoutKit.ToggleMenuButton panelName={LayoutKit.SidebarLeft.NAME} />
 							</>
 						)
-						: false
-					}
-					body={targetsIfActive(['Navigation']) || false}
-					footer={targetsIfActive(['Profile']) || false}
+						: createSlotTargets(['SidebarLeftHeader'])
+					) || false}
+					body={createSlotTargets(['Navigation', 'SidebarLeftBody']) || false}
+					footer={createSlotTargets(['Profile', 'SidebarLeftFooter']) || false}
 				/>
 			))}
 
@@ -66,24 +64,23 @@ export const LayoutComponent = ({ children, ...rest }: PropsWithChildren) => {
 			<LayoutKit.ContentPanelMain
 				header={(_, { panels }) => (
 					panels.get(LayoutKit.SidebarLeft.NAME)?.behavior === 'modal'
-						? targetsIfActive(['ContentHeader', 'Back', 'Title', 'Actions'], (
+						? createSlotTargets(['ContentHeader', 'Back', 'Title', 'Actions'], (
 							<>
 								<Stack align="center" horizontal>
-									<LayoutSlots.Back />
-									<LayoutSlots.Title as="h1" />
+									<SlotTargets.Back />
+									<SlotTargets.Title as="h1" />
 								</Stack>
 								<Spacer grow />
-								{targetsIfActive(['ContentHeader'])}
-								{targetsIfActive(['Actions'])}
+								{createSlotTargets(['ContentHeader', 'Actions'])}
 							</>
 						))
-						: targetsIfActive(['ContentHeader', 'Back', 'Title'], (
+						: createSlotTargets(['ContentHeader', 'Back', 'Title'], (
 							<>
 								<Stack align="center" horizontal>
-									<LayoutSlots.Back />
-									<LayoutSlots.Title as="h1" />
+									<SlotTargets.Back />
+									<SlotTargets.Title as="h1" />
 								</Stack>
-								{targetsIfActive(['ContentHeader'])}
+								{createSlotTargets(['ContentHeader'])}
 							</>
 						))
 				)}
@@ -95,30 +92,34 @@ export const LayoutComponent = ({ children, ...rest }: PropsWithChildren) => {
 							<>
 								{children}
 								{leftPanel?.behavior === 'modal' && (
-									<LayoutSlots.Sidebar />
+									<SlotTargets.Sidebar />
 								)}
 							</>
 						)
 					}}</LayoutPrimitives.GetLayoutPanelsStateContext.Consumer>
 				)}
-				footer={targetsIfActive(['ContentFooter']) || false}
+				footer={createSlotTargets(['ContentFooter']) || false}
 				maxWidth={directives['content-max-width']}
 			/>
 
 			<PanelDivider name={LayoutKit.SidebarRight.NAME} />
 
-			{targetsIfActive(['Sidebar'], (
+			{createSlotTargets(['Sidebar'], (
 				<LayoutPrimitives.GetLayoutPanelsStateContext.Consumer>{({ panels }) => {
 					const leftPanel = panels.get(LayoutKit.SidebarLeft.NAME)
 
 					return (
 						leftPanel?.behavior !== 'modal'
-							? <LayoutKit.SidebarRight
-								keepVisible
-								header={false}
-								body={targetsIfActive(['Sidebar']) || false}
-								footer={false}
-							/>
+							? (
+								<LayoutKit.SidebarRight
+									keepVisible
+									header={createSlotTargets(['SidebarRightHeader']) || false}
+									body={createSlotTargets(['Sidebar', 'SidebarRightBody'], (
+										<Slots.Target name="sidebar" aliases={['Sidebar', 'SidebarRightBody']} />
+									)) || false}
+									footer={createSlotTargets(['SidebarRightFooter']) || false}
+								/>
+							)
 							: null
 					)
 				}}</LayoutPrimitives.GetLayoutPanelsStateContext.Consumer>

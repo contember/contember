@@ -12,6 +12,7 @@ testInterface({
 		'buttons.tsx',
 		'actionableBoxes.tsx',
 		'boxes.tsx',
+		'slots.tsx',
 		'textareas.tsx',
 		'fieldContainers.tsx',
 		'messages.tsx',

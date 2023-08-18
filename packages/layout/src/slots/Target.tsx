@@ -1,29 +1,43 @@
-import { useClassName, useId } from '@contember/react-utils'
-import { assert, dataAttribute, isNonEmptyTrimmedString } from '@contember/utilities'
+import { useClassName, useId, useReferentiallyStableValue } from '@contember/react-utils'
+import { assert, dataAttribute, isArrayOfMembersSatisfyingFactory, isNonEmptyArray, isNonEmptyTrimmedString, isSingleWordString, satisfiesOneOfFactory, setHasOneOf } from '@contember/utilities'
+import { snakeCase } from 'change-case'
 import { memo, useLayoutEffect, useRef } from 'react'
-import slugify from 'slugify'
 import { useActiveSlotPortalsContext, useTargetsRegistryContext } from './contexts'
-import { TargetProps } from './types'
+import { SlotTargetProps } from './types'
 
 export type OwnTargetContainerProps = {
-	'data-has-own-children': boolean;
-	'data-name': string;
 	className: string;
 }
+
+const isNameString = satisfiesOneOfFactory(
+	isNonEmptyTrimmedString,
+	isSingleWordString,
+)
+
+const nonEmptyArrayOfNonEmptyStrings = satisfiesOneOfFactory(
+	isNonEmptyArray,
+	isArrayOfMembersSatisfyingFactory(isNameString),
+)
 
 /**
  * @group Layout
  */
-export const Target = memo<TargetProps>(
+export const Target = memo<SlotTargetProps>(
 	({
 		as,
+		aliases,
 		componentClassName = 'slot',
 		className: classNameProp,
-		children,
+		fallback,
 		name,
 		...rest
 	}) => {
-		assert('name is non-empty string', name, isNonEmptyTrimmedString)
+		assert('name is non-empty string without spaces', name, isNameString)
+
+		aliases = aliases ?? [name]
+		assert('aliases is non-empty string or array of non-empty strings', aliases, nonEmptyArrayOfNonEmptyStrings)
+
+		const names = useReferentiallyStableValue(aliases)
 
 		const ref = useRef<HTMLElement>(null)
 		const instanceId = useRef(Math.random().toString(36).substring(2, 9)).current
@@ -31,29 +45,39 @@ export const Target = memo<TargetProps>(
 		const activeSlotPortals = useActiveSlotPortalsContext()
 
 		useLayoutEffect(() => {
-			registerSlotTarget(instanceId, name, ref)
-			return () => unregisterSlotTarget(instanceId, name)
-		}, [instanceId, name, registerSlotTarget, unregisterSlotTarget])
+			names.forEach(name => {
+				registerSlotTarget(instanceId, name, ref)
+			})
+
+			return () => {
+				names.forEach(name => {
+					unregisterSlotTarget(instanceId, name)
+				})
+			}
+		}, [instanceId, names, registerSlotTarget, unregisterSlotTarget])
 
 		const Container = as ?? 'div'
 		const className = useClassName(componentClassName, classNameProp)
 		const key = useId()
 
-		return (activeSlotPortals?.has(name)
+		const active = setHasOneOf(activeSlotPortals, names)
+
+		return ((active || fallback)
 			? (
 				<Container
 					ref={ref}
 					key={key}
+					{...rest}
 					data-key={key}
 					data-id={instanceId}
-					data-has-own-children={!!children}
-					data-name={dataAttribute(slugify(name, { lower: true }))}
+					data-fallback={dataAttribute(!!fallback)}
+					data-name={dataAttribute(snakeCase(name).replace(/_/g, '-'))}
 					className={className}
-					{...rest}
+					children={active ? null : fallback}
 				/>
 			)
 			: null
 		)
 	},
 )
-Target.displayName = 'Interface.Slots.Target'
+Target.displayName = 'Layout.Slots.Target'

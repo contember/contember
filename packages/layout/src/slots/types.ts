@@ -15,12 +15,12 @@ export type SlotTargetComponentsRecord<K extends string> = Readonly<{
 	readonly [P in PascalCase<K>]: ReturnType<typeof createSlotTargetComponent<P>>
 }>
 
-export type SourcePortalProps<K extends string = string> = {
+export type SlotSourceProps<K extends string = string> = {
 	children: ReactNode;
 	name: K;
 }
 
-export type TargetProps<Name extends string = string> = ComponentClassNameProps & {
+export type SlotTargetProps<Name extends string = string> = ComponentClassNameProps & {
 	/**
 	 * Type of the container element, default is `div`.
 	 *
@@ -33,7 +33,20 @@ export type TargetProps<Name extends string = string> = ComponentClassNameProps 
 	 * ```
 	 */
 	as?: ElementType;
-	children?: ReactNode;
+	/**
+	 * Fallback of the target that is rendered when no source slot renders its content.
+	 * Use `[data-fallback]` attribute to style the fallback.
+	 */
+	fallback?: ReactNode;
+	/**
+	 * Name of the slot, similar to the `name` prop of the `Source` component.
+	 */
 	name: Name;
+	/**
+	 * Optional list of aliases for the slot.
+	 *
+	 * This is useful when one target element is sufficient for multiple slots sources.
+	 * E.g. when you know that `Sidebar` and `SidebarBody` slot sources result in the same target.
+	 */
+	aliases?: [Name, ...Name[]];
 }
-

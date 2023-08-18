@@ -2863,7 +2863,6 @@ __metadata:
     lucide-react: ^0.268.0
     react: ^18
     react-dom: ^18
-    slugify: ^1.6.6
     wait-for-element-transition: ^3.3.1
   peerDependencies:
     react: ^17 || ^18
@@ -15260,13 +15259,6 @@ __metadata:
     is-plain-object: ^5.0.0
     tiny-warning: ^1.0.3
   checksum: b86580c87d16717fec52ee1e55abc5f679bfe5b3fcfa5dcedb17794afd6bc5a013f39220fee90d42e9f4ca1ce393bab4691d92fca8509ca91e4afc9db83427be
-  languageName: node
-  linkType: hard
-
-"slugify@npm:^1.6.6":
-  version: 1.6.6
-  resolution: "slugify@npm:1.6.6"
-  checksum: 04773c2d3b7aea8d2a61fa47cc7e5d29ce04e1a96cbaec409da57139df906acb3a449fac30b167d203212c806e73690abd4ff94fbad0a9a7b7ea109a2a638ae9
   languageName: node
   linkType: hard
 

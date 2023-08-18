@@ -66,4 +66,4 @@ export const Provider = memo<{ children: ReactNode }>(({ children }) => {
 		</PortalsRegistryContext.Provider>
 	)
 })
-Provider.displayName = 'Interface.Slots.Provider'
+Provider.displayName = 'Layout.Slots.Provider'

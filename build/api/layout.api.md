@@ -61,56 +61,56 @@ export const commonSlots: readonly ("Actions" | "Back" | "Logo" | "Navigation" |
 // @public (undocumented)
 export const CommonSlotSources: Readonly<Readonly<{
     readonly Actions: {
-        ({ name, children }: Omit<SourcePortalProps, "name"> & {
+        ({ name, children }: Omit<SlotSourceProps, "name"> & {
             name?: Capitalize<string> | undefined;
         }): JSX.Element;
         displayName: string;
         slot: "Actions";
     };
     readonly Back: {
-        ({ name, children }: Omit<SourcePortalProps, "name"> & {
+        ({ name, children }: Omit<SlotSourceProps, "name"> & {
             name?: Capitalize<string> | undefined;
         }): JSX.Element;
         displayName: string;
         slot: "Back";
     };
     readonly Logo: {
-        ({ name, children }: Omit<SourcePortalProps, "name"> & {
+        ({ name, children }: Omit<SlotSourceProps, "name"> & {
             name?: Capitalize<string> | undefined;
         }): JSX.Element;
         displayName: string;
         slot: "Logo";
     };
     readonly Navigation: {
-        ({ name, children }: Omit<SourcePortalProps, "name"> & {
+        ({ name, children }: Omit<SlotSourceProps, "name"> & {
             name?: Capitalize<string> | undefined;
         }): JSX.Element;
         displayName: string;
         slot: "Navigation";
     };
     readonly Sidebar: {
-        ({ name, children }: Omit<SourcePortalProps, "name"> & {
+        ({ name, children }: Omit<SlotSourceProps, "name"> & {
             name?: Capitalize<string> | undefined;
         }): JSX.Element;
         displayName: string;
         slot: "Sidebar";
     };
     readonly Title: {
-        ({ name, children }: Omit<SourcePortalProps, "name"> & {
+        ({ name, children }: Omit<SlotSourceProps, "name"> & {
             name?: Capitalize<string> | undefined;
         }): JSX.Element;
         displayName: string;
         slot: "Title";
     };
     readonly Profile: {
-        ({ name, children }: Omit<SourcePortalProps, "name"> & {
+        ({ name, children }: Omit<SlotSourceProps, "name"> & {
             name?: Capitalize<string> | undefined;
         }): JSX.Element;
         displayName: string;
         slot: "Profile";
     };
     readonly Switchers: {
-        ({ name, children }: Omit<SourcePortalProps, "name"> & {
+        ({ name, children }: Omit<SlotSourceProps, "name"> & {
             name?: Capitalize<string> | undefined;
         }): JSX.Element;
         displayName: string;
@@ -121,42 +121,42 @@ export const CommonSlotSources: Readonly<Readonly<{
 // @public (undocumented)
 export const CommonSlotTargets: Readonly<Readonly<{
     readonly Actions: {
-        ({ className, ...props }: Omit<TargetProps, "name">): JSX.Element;
+        ({ className, ...props }: Omit<SlotTargetProps, "name">): JSX.Element;
         displayName: string;
         slot: "Actions";
     };
     readonly Back: {
-        ({ className, ...props }: Omit<TargetProps, "name">): JSX.Element;
+        ({ className, ...props }: Omit<SlotTargetProps, "name">): JSX.Element;
         displayName: string;
         slot: "Back";
     };
     readonly Logo: {
-        ({ className, ...props }: Omit<TargetProps, "name">): JSX.Element;
+        ({ className, ...props }: Omit<SlotTargetProps, "name">): JSX.Element;
         displayName: string;
         slot: "Logo";
     };
     readonly Navigation: {
-        ({ className, ...props }: Omit<TargetProps, "name">): JSX.Element;
+        ({ className, ...props }: Omit<SlotTargetProps, "name">): JSX.Element;
         displayName: string;
         slot: "Navigation";
     };
     readonly Sidebar: {
-        ({ className, ...props }: Omit<TargetProps, "name">): JSX.Element;
+        ({ className, ...props }: Omit<SlotTargetProps, "name">): JSX.Element;
         displayName: string;
         slot: "Sidebar";
     };
     readonly Title: {
-        ({ className, ...props }: Omit<TargetProps, "name">): JSX.Element;
+        ({ className, ...props }: Omit<SlotTargetProps, "name">): JSX.Element;
         displayName: string;
         slot: "Title";
     };
     readonly Profile: {
-        ({ className, ...props }: Omit<TargetProps, "name">): JSX.Element;
+        ({ className, ...props }: Omit<SlotTargetProps, "name">): JSX.Element;
         displayName: string;
         slot: "Profile";
     };
     readonly Switchers: {
-        ({ className, ...props }: Omit<TargetProps, "name">): JSX.Element;
+        ({ className, ...props }: Omit<SlotTargetProps, "name">): JSX.Element;
         displayName: string;
         slot: "Switchers";
     };
@@ -207,14 +207,14 @@ export const contentSlots: readonly ("ContentFooter" | "ContentHeader")[];
 // @public (undocumented)
 export const ContentSlotSources: Readonly<Readonly<{
     readonly ContentFooter: {
-        ({ name, children }: Omit<SourcePortalProps, "name"> & {
+        ({ name, children }: Omit<SlotSourceProps, "name"> & {
             name?: Capitalize<string> | undefined;
         }): JSX.Element;
         displayName: string;
         slot: "ContentFooter";
     };
     readonly ContentHeader: {
-        ({ name, children }: Omit<SourcePortalProps, "name"> & {
+        ({ name, children }: Omit<SlotSourceProps, "name"> & {
             name?: Capitalize<string> | undefined;
         }): JSX.Element;
         displayName: string;
@@ -225,12 +225,12 @@ export const ContentSlotSources: Readonly<Readonly<{
 // @public (undocumented)
 export const ContentSlotTargets: Readonly<Readonly<{
     readonly ContentFooter: {
-        ({ className, ...props }: Omit<TargetProps, "name">): JSX.Element;
+        ({ className, ...props }: Omit<SlotTargetProps, "name">): JSX.Element;
         displayName: string;
         slot: "ContentFooter";
     };
     readonly ContentHeader: {
-        ({ className, ...props }: Omit<TargetProps, "name">): JSX.Element;
+        ({ className, ...props }: Omit<SlotTargetProps, "name">): JSX.Element;
         displayName: string;
         slot: "ContentHeader";
     };
@@ -291,20 +291,20 @@ export function createLayoutSidebarComponent({ defaultAs, defaultBehavior, defau
 
 // @public (undocumented)
 function createSlotComponents<K extends PascalCase<string>>(slots: ReadonlyArray<PascalCase<K>>): readonly [readonly PascalCase<K>[], Readonly<Readonly<{ readonly [P in PascalCase<K>]: {
-        ({ name, children }: Omit<SourcePortalProps, "name"> & {
+        ({ name, children }: Omit<SlotSourceProps, "name"> & {
             name?: Capitalize<string> | undefined;
         }): JSX.Element;
         displayName: string;
         slot: P;
     }; }>>, Readonly<Readonly<{ readonly [P_1 in PascalCase<K>]: {
-        ({ className, ...props }: Omit<TargetProps, "name">): JSX.Element;
+        ({ className, ...props }: Omit<SlotTargetProps, "name">): JSX.Element;
         displayName: string;
         slot: P_1;
     }; }>>];
 
 // @public (undocumented)
-function createSlotSourceComponent<T extends string>(slot: T, displayName?: string, defaultContent?: React.ReactNode): {
-    ({ name, children }: Omit<SourcePortalProps, "name"> & {
+function createSlotSourceComponent<T extends string>(slot: T, displayName?: string): {
+    ({ name, children }: Omit<SlotSourceProps, "name"> & {
         name?: Capitalize<string> | undefined;
     }): JSX.Element;
     displayName: string;
@@ -313,7 +313,7 @@ function createSlotSourceComponent<T extends string>(slot: T, displayName?: stri
 
 // @public (undocumented)
 function createSlotTargetComponent<T extends string>(name: T, displayName?: string): {
-    ({ className, ...props }: Omit<TargetProps, 'name'>): JSX.Element;
+    ({ className, ...props }: Omit<SlotTargetProps, 'name'>): JSX.Element;
     displayName: string;
     slot: T;
 };
@@ -392,21 +392,21 @@ export const footerSlots: readonly ("FooterCenter" | "FooterEnd" | "FooterStart"
 // @public (undocumented)
 export const FooterSlotSources: Readonly<Readonly<{
     readonly FooterCenter: {
-        ({ name, children }: Omit<SourcePortalProps, "name"> & {
+        ({ name, children }: Omit<SlotSourceProps, "name"> & {
             name?: Capitalize<string> | undefined;
         }): JSX.Element;
         displayName: string;
         slot: "FooterCenter";
     };
     readonly FooterEnd: {
-        ({ name, children }: Omit<SourcePortalProps, "name"> & {
+        ({ name, children }: Omit<SlotSourceProps, "name"> & {
             name?: Capitalize<string> | undefined;
         }): JSX.Element;
         displayName: string;
         slot: "FooterEnd";
     };
     readonly FooterStart: {
-        ({ name, children }: Omit<SourcePortalProps, "name"> & {
+        ({ name, children }: Omit<SlotSourceProps, "name"> & {
             name?: Capitalize<string> | undefined;
         }): JSX.Element;
         displayName: string;
@@ -417,17 +417,17 @@ export const FooterSlotSources: Readonly<Readonly<{
 // @public (undocumented)
 export const FooterSlotTargets: Readonly<Readonly<{
     readonly FooterCenter: {
-        ({ className, ...props }: Omit<TargetProps, "name">): JSX.Element;
+        ({ className, ...props }: Omit<SlotTargetProps, "name">): JSX.Element;
         displayName: string;
         slot: "FooterCenter";
     };
     readonly FooterEnd: {
-        ({ className, ...props }: Omit<TargetProps, "name">): JSX.Element;
+        ({ className, ...props }: Omit<SlotTargetProps, "name">): JSX.Element;
         displayName: string;
         slot: "FooterEnd";
     };
     readonly FooterStart: {
-        ({ className, ...props }: Omit<TargetProps, "name">): JSX.Element;
+        ({ className, ...props }: Omit<SlotTargetProps, "name">): JSX.Element;
         displayName: string;
         slot: "FooterStart";
     };
@@ -463,21 +463,21 @@ export const headerSlots: readonly ("HeaderCenter" | "HeaderEnd" | "HeaderStart"
 // @public (undocumented)
 export const HeaderSlotSources: Readonly<Readonly<{
     readonly HeaderCenter: {
-        ({ name, children }: Omit<SourcePortalProps, "name"> & {
+        ({ name, children }: Omit<SlotSourceProps, "name"> & {
             name?: Capitalize<string> | undefined;
         }): JSX.Element;
         displayName: string;
         slot: "HeaderCenter";
     };
     readonly HeaderEnd: {
-        ({ name, children }: Omit<SourcePortalProps, "name"> & {
+        ({ name, children }: Omit<SlotSourceProps, "name"> & {
             name?: Capitalize<string> | undefined;
         }): JSX.Element;
         displayName: string;
         slot: "HeaderEnd";
     };
     readonly HeaderStart: {
-        ({ name, children }: Omit<SourcePortalProps, "name"> & {
+        ({ name, children }: Omit<SlotSourceProps, "name"> & {
             name?: Capitalize<string> | undefined;
         }): JSX.Element;
         displayName: string;
@@ -488,17 +488,17 @@ export const HeaderSlotSources: Readonly<Readonly<{
 // @public (undocumented)
 export const HeaderSlotTargets: Readonly<Readonly<{
     readonly HeaderCenter: {
-        ({ className, ...props }: Omit<TargetProps, "name">): JSX.Element;
+        ({ className, ...props }: Omit<SlotTargetProps, "name">): JSX.Element;
         displayName: string;
         slot: "HeaderCenter";
     };
     readonly HeaderEnd: {
-        ({ className, ...props }: Omit<TargetProps, "name">): JSX.Element;
+        ({ className, ...props }: Omit<SlotTargetProps, "name">): JSX.Element;
         displayName: string;
         slot: "HeaderEnd";
     };
     readonly HeaderStart: {
-        ({ className, ...props }: Omit<TargetProps, "name">): JSX.Element;
+        ({ className, ...props }: Omit<SlotTargetProps, "name">): JSX.Element;
         displayName: string;
         slot: "HeaderStart";
     };
@@ -774,8 +774,6 @@ export type OwnSidebarProps = Omit<ComponentClassNameProps, 'children'> & Pick<O
 
 // @public (undocumented)
 type OwnTargetContainerProps = {
-    'data-has-own-children': boolean;
-    'data-name': string;
     className: string;
 };
 
@@ -987,21 +985,21 @@ export const sidebarLeftSlots: readonly ("SidebarLeftBody" | "SidebarLeftFooter"
 // @public (undocumented)
 export const SidebarLeftSlotSources: Readonly<Readonly<{
     readonly SidebarLeftBody: {
-        ({ name, children }: Omit<SourcePortalProps, "name"> & {
+        ({ name, children }: Omit<SlotSourceProps, "name"> & {
             name?: Capitalize<string> | undefined;
         }): JSX.Element;
         displayName: string;
         slot: "SidebarLeftBody";
     };
     readonly SidebarLeftFooter: {
-        ({ name, children }: Omit<SourcePortalProps, "name"> & {
+        ({ name, children }: Omit<SlotSourceProps, "name"> & {
             name?: Capitalize<string> | undefined;
         }): JSX.Element;
         displayName: string;
         slot: "SidebarLeftFooter";
     };
     readonly SidebarLeftHeader: {
-        ({ name, children }: Omit<SourcePortalProps, "name"> & {
+        ({ name, children }: Omit<SlotSourceProps, "name"> & {
             name?: Capitalize<string> | undefined;
         }): JSX.Element;
         displayName: string;
@@ -1012,17 +1010,17 @@ export const SidebarLeftSlotSources: Readonly<Readonly<{
 // @public (undocumented)
 export const SidebarLeftSlotTargets: Readonly<Readonly<{
     readonly SidebarLeftBody: {
-        ({ className, ...props }: Omit<TargetProps, "name">): JSX.Element;
+        ({ className, ...props }: Omit<SlotTargetProps, "name">): JSX.Element;
         displayName: string;
         slot: "SidebarLeftBody";
     };
     readonly SidebarLeftFooter: {
-        ({ className, ...props }: Omit<TargetProps, "name">): JSX.Element;
+        ({ className, ...props }: Omit<SlotTargetProps, "name">): JSX.Element;
         displayName: string;
         slot: "SidebarLeftFooter";
     };
     readonly SidebarLeftHeader: {
-        ({ className, ...props }: Omit<TargetProps, "name">): JSX.Element;
+        ({ className, ...props }: Omit<SlotTargetProps, "name">): JSX.Element;
         displayName: string;
         slot: "SidebarLeftHeader";
     };
@@ -1037,21 +1035,21 @@ export const sidebarRightSlots: readonly ("SidebarRightBody" | "SidebarRightFoot
 // @public (undocumented)
 export const SidebarRightSlotSources: Readonly<Readonly<{
     readonly SidebarRightBody: {
-        ({ name, children }: Omit<SourcePortalProps, "name"> & {
+        ({ name, children }: Omit<SlotSourceProps, "name"> & {
             name?: Capitalize<string> | undefined;
         }): JSX.Element;
         displayName: string;
         slot: "SidebarRightBody";
     };
     readonly SidebarRightFooter: {
-        ({ name, children }: Omit<SourcePortalProps, "name"> & {
+        ({ name, children }: Omit<SlotSourceProps, "name"> & {
             name?: Capitalize<string> | undefined;
         }): JSX.Element;
         displayName: string;
         slot: "SidebarRightFooter";
     };
     readonly SidebarRightHeader: {
-        ({ name, children }: Omit<SourcePortalProps, "name"> & {
+        ({ name, children }: Omit<SlotSourceProps, "name"> & {
             name?: Capitalize<string> | undefined;
         }): JSX.Element;
         displayName: string;
@@ -1062,17 +1060,17 @@ export const SidebarRightSlotSources: Readonly<Readonly<{
 // @public (undocumented)
 export const SidebarRightSlotTargets: Readonly<Readonly<{
     readonly SidebarRightBody: {
-        ({ className, ...props }: Omit<TargetProps, "name">): JSX.Element;
+        ({ className, ...props }: Omit<SlotTargetProps, "name">): JSX.Element;
         displayName: string;
         slot: "SidebarRightBody";
     };
     readonly SidebarRightFooter: {
-        ({ className, ...props }: Omit<TargetProps, "name">): JSX.Element;
+        ({ className, ...props }: Omit<SlotTargetProps, "name">): JSX.Element;
         displayName: string;
         slot: "SidebarRightFooter";
     };
     readonly SidebarRightHeader: {
-        ({ className, ...props }: Omit<TargetProps, "name">): JSX.Element;
+        ({ className, ...props }: Omit<SlotTargetProps, "name">): JSX.Element;
         displayName: string;
         slot: "SidebarRightHeader";
     };
@@ -1090,6 +1088,7 @@ declare namespace Slots {
         OwnTargetContainerProps,
         Target,
         useHasActiveSlotsFactory,
+        useCreateSlotTargetsWhenActiveFactory,
         useTargetsIfActiveFactory,
         SlotsRefMap,
         RegisterSlotTarget,
@@ -1109,8 +1108,8 @@ declare namespace Slots {
         SlotComponentsRecords,
         SlotSourceComponentsRecord,
         SlotTargetComponentsRecord,
-        SourcePortalProps,
-        TargetProps
+        SlotSourceProps,
+        SlotTargetProps
     }
 }
 export { Slots }
@@ -1121,6 +1120,12 @@ type SlotSourceComponentsRecord<K extends string> = Readonly<{
 }>;
 
 // @public (undocumented)
+type SlotSourceProps<K extends string = string> = {
+    children: ReactNode;
+    name: K;
+};
+
+// @public (undocumented)
 type SlotsRefMap = Map<string, RefObject<HTMLElement>>;
 
 // @public (undocumented)
@@ -1129,32 +1134,27 @@ type SlotTargetComponentsRecord<K extends string> = Readonly<{
 }>;
 
 // @public (undocumented)
+type SlotTargetProps<Name extends string = string> = ComponentClassNameProps & {
+    as?: ElementType;
+    fallback?: ReactNode;
+    name: Name;
+    aliases?: [Name, ...Name[]];
+};
+
+// @public (undocumented)
 type SlotTargetsRegistryContextType = {
     registerSlotTarget: RegisterSlotTarget;
     unregisterSlotTarget: UnregisterSlotTarget;
 };
 
 // @public (undocumented)
-const Source: NamedExoticComponent<SourcePortalProps>;
-
-// @public (undocumented)
-type SourcePortalProps<K extends string = string> = {
-    children: ReactNode;
-    name: K;
-};
+const Source: NamedExoticComponent<SlotSourceProps>;
 
 // @public (undocumented)
 const StateContext: Context<RequiredDeepPlainObject>;
 
 // @public (undocumented)
-const Target: NamedExoticComponent<TargetProps>;
-
-// @public (undocumented)
-type TargetProps<Name extends string = string> = ComponentClassNameProps & {
-    as?: ElementType;
-    children?: ReactNode;
-    name: Name;
-};
+const Target: NamedExoticComponent<SlotTargetProps>;
 
 // @public (undocumented)
 const TargetsRegistryContext: Context<SlotTargetsRegistryContextType>;
@@ -1226,6 +1226,11 @@ function useClosePanelOnEscape(behaviors?: Array<PanelState['behavior']>): (even
 export const useContainerInsetsContext: () => ContainerInsets;
 
 // @public (undocumented)
+function useCreateSlotTargetsWhenActiveFactory<R extends SlotComponentsRecords<string>>(SlotTargets: R): <T>(slots: ReadonlyArray<keyof R & string>, override?: T | undefined) => NonNullable<T> | FunctionComponentElement<    {
+children?: ReactNode;
+}> | null;
+
+// @public (undocumented)
 function useDirectiveLifecycle<T extends RequiredDeepPlainObject, K extends keyof T, V extends T[K]>(name: K, content: V): boolean;
 
 // @public (undocumented)
@@ -1244,7 +1249,7 @@ export function useElementInsets(elementRef: RefObject<HTMLElement>): ContainerI
 const useGetLayoutPanelsStateContext: () => GetLayoutPanelsStateContextType;
 
 // @public (undocumented)
-function useHasActiveSlotsFactory<T extends SlotSourceComponentsRecord<string>>(SlotTargets: T): (...slots: ReadonlyArray<keyof T & string>) => boolean;
+function useHasActiveSlotsFactory<T extends SlotComponentsRecords<string>>(SlotTargets: T): (...slots: ReadonlyArray<keyof T & string>) => boolean;
 
 // @public @deprecated (undocumented)
 const useLayoutContainerWidth: typeof useContainerWidth;
@@ -1267,10 +1272,10 @@ export const useSafeAreaInsetsContext: () => ContainerInsets;
 // @public (undocumented)
 const useSetLayoutPanelsStateContext: () => SetLayoutPanelsStateContextType;
 
-// @public (undocumented)
-function useTargetsIfActiveFactory<T extends SlotSourceComponentsRecord<string>>(SlotTargets: T): <Children extends ReactNode | ((...args: any[]) => ReactNode)>(slots: ReadonlyArray<keyof T & string>, children?: Children | undefined) => NonNullable<Children> | FunctionComponentElement<    {
+// @public @deprecated
+function useTargetsIfActiveFactory<R extends SlotComponentsRecords<string>>(SlotTargets: R): <T>(slots: readonly (keyof R & string)[], override?: T | undefined) => FunctionComponentElement<    {
 children?: ReactNode;
-}> | null;
+}> | NonNullable<T> | null;
 
 // @public (undocumented)
 const useTargetsRegistryContext: () => SlotTargetsRegistryContextType;

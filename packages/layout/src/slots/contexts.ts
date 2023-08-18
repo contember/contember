@@ -1,6 +1,7 @@
 import { createNonNullableContextFactory, noop } from '@contember/react-utils'
-import { ElementType, Fragment, ReactNode, RefObject, createElement, useCallback } from 'react'
-import { SlotSourceComponentsRecord } from './types'
+import { deprecate } from '@contember/utilities'
+import { ComponentType, ElementType, Fragment, ReactNode, RefObject, createElement, useCallback } from 'react'
+import { SlotComponentsRecords } from './types'
 
 export type SlotsRefMap = Map<string, RefObject<HTMLElement>>
 export type RegisterSlotTarget = (id: string, name: string, ref: RefObject<HTMLElement>) => void;
@@ -9,7 +10,7 @@ export type UnregisterSlotTarget = (id: string, name: string) => void;
 export type ActiveSlotPortalsContextType = Set<string>;
 export const [ActiveSlotPortalsContext, useActiveSlotPortalsContext] = createNonNullableContextFactory<ActiveSlotPortalsContextType>('ActiveSlotPortalsContext', new Set())
 
-export function useHasActiveSlotsFactory<T extends SlotSourceComponentsRecord<string>>(SlotTargets: T) {
+export function useHasActiveSlotsFactory<T extends SlotComponentsRecords<string>>(SlotTargets: T) {
 	const activeSlotPortals = useActiveSlotPortalsContext()
 
 	return useCallback((...slots: ReadonlyArray<keyof T & string>) => {
@@ -17,17 +18,17 @@ export function useHasActiveSlotsFactory<T extends SlotSourceComponentsRecord<st
 	}, [activeSlotPortals])
 }
 
-export function useTargetsIfActiveFactory<T extends SlotSourceComponentsRecord<string>>(SlotTargets: T) {
+export function useCreateSlotTargetsWhenActiveFactory<R extends SlotComponentsRecords<string>>(SlotTargets: R) {
 	const activeSlotPortals = useActiveSlotPortalsContext()
 
-	return useCallback(function targetsIfActive<Children extends ReactNode | ((...args: any[]) => ReactNode)>(slots: ReadonlyArray<keyof T & string>, children?: Children) {
+	return useCallback(function createSlotTargets<T>(slots: ReadonlyArray<keyof R & string>, override?: T) {
 		if (slots.some(slot => activeSlotPortals.has(slot))) {
-			if (children) {
-				return children
+			if (override) {
+				return override
 			} else {
 				return createElement(Fragment, {}, ...slots.map(slot => {
 					if (slot in SlotTargets) {
-						const Target = (SlotTargets as Record<keyof T, ElementType>)[slot]
+						const Target = SlotTargets[slot] as ComponentType
 
 						return createElement(Target, {
 							key: `multi-element:${slot}`,
@@ -42,12 +43,20 @@ export function useTargetsIfActiveFactory<T extends SlotSourceComponentsRecord<s
 		}
 	}, [SlotTargets, activeSlotPortals])
 }
+/**
+ * Fallback for `useCreateSlotTargetsWhenActiveFactory` for backwards compatibility.
+ * @deprecated Use `useCreateSlotTargetsWhenActiveFactory` instead
+ */
+export function useTargetsIfActiveFactory<R extends SlotComponentsRecords<string>>(SlotTargets: R) {
+	deprecate('1.3.0', true, '`useTargetsIfActiveFactory()`', '`useCreateSlotTargetsWhenActiveFactory()`')
+	return useCreateSlotTargetsWhenActiveFactory(SlotTargets)
+}
 
 export type SlotTargetsRegistryContextType = {
 	registerSlotTarget: RegisterSlotTarget;
 	unregisterSlotTarget: UnregisterSlotTarget;
 }
-export const [TargetsRegistryContext, useTargetsRegistryContext] = createNonNullableContextFactory<SlotTargetsRegistryContextType>('Interface.Slots.TargetsRegistryContext', {
+export const [TargetsRegistryContext, useTargetsRegistryContext] = createNonNullableContextFactory<SlotTargetsRegistryContextType>('Layout.Slots.TargetsRegistryContext', {
 	registerSlotTarget: noop,
 	unregisterSlotTarget: noop,
 })
@@ -60,7 +69,7 @@ export type RenderToSlotPortalContextType = {
 	unregisterSlotSource: undefined | ((id: string, slot: string) => void);
 }
 
-export const [PortalsRegistryContext, usePortalsRegistryContext] = createNonNullableContextFactory<RenderToSlotPortalContextType>('Interface.Slots.PortalsRegistryContext', {
+export const [PortalsRegistryContext, usePortalsRegistryContext] = createNonNullableContextFactory<RenderToSlotPortalContextType>('Layout.Slots.PortalsRegistryContext', {
 	getTarget: undefined,
 	registerSlotSource: undefined,
 	unregisterSlotSource: undefined,

@@ -1,12 +1,12 @@
 import { memo, useLayoutEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { usePortalsRegistryContext } from './contexts'
-import { SourcePortalProps } from './types'
+import { SlotSourceProps } from './types'
 
 /**
  * @group Layout
  */
-export const Source = memo<SourcePortalProps>(({ name, children }) => {
+export const Source = memo<SlotSourceProps>(({ name, children }) => {
 	const { getTarget, registerSlotSource, unregisterSlotSource } = usePortalsRegistryContext()
 
 	const instanceId = useRef(Math.random().toString(36).substring(2, 9)).current
@@ -69,4 +69,4 @@ export const Source = memo<SourcePortalProps>(({ name, children }) => {
 		return <>{children}</>
 	}
 })
-Source.displayName = 'Interface.Slots.Source'
+Source.displayName = 'Layout.Slots.Source'

@@ -1,5 +1,5 @@
 import { assert, isDefined } from '@contember/utilities'
-import deepEqual from 'deep-equal'
+import deepEqual from 'fast-deep-equal/es6/index.js'
 import { ReactNode, memo, useCallback, useMemo, useState } from 'react'
 import { GetLayoutPanelsStateContext, SetLayoutPanelsStateContext, SetLayoutPanelsStateContextType } from './Contexts'
 import { PanelConfig } from './Types'

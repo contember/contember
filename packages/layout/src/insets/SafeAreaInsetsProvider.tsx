@@ -1,5 +1,5 @@
 import { useExpectSameValueReference, useOnWindowResize, useReferentiallyStableCallback } from '@contember/react-utils'
-import deepEqual from 'deep-equal'
+import deepEqual from 'fast-deep-equal/es6/index.js'
 import { ReactNode, memo, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { SafeAreaInsetsContext, useContainerInsetsContext } from './Contexts'
 import { combineElementInsets, diffContainerInsetsFromElementRects, getScreenInnerBoundingRect } from './Helpers'

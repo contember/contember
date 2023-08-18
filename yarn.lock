@@ -2859,7 +2859,6 @@ __metadata:
     "@contember/utilities": "workspace:*"
     "@types/deep-equal": ^1.0.1
     change-case: ^4.1.2
-    deep-equal: ^2.2.0
     fast-deep-equal: ^3.1.3
     lucide-react: ^0.268.0
     react: ^18
@@ -2905,7 +2904,7 @@ __metadata:
   resolution: "@contember/react-utils@workspace:packages/react-utils"
   dependencies:
     "@contember/utilities": "workspace:*"
-    deep-equal: ^2.2.0
+    fast-deep-equal: ^3.1.3
   peerDependencies:
     react: ^17 || ^18
   languageName: unknown
@@ -9062,7 +9061,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"deep-equal@npm:^2.0.5, deep-equal@npm:^2.2.0":
+"deep-equal@npm:^2.0.5":
   version: 2.2.1
   resolution: "deep-equal@npm:2.2.1"
   dependencies:

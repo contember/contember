@@ -183,6 +183,9 @@ export function isPlainObject<T extends Record<string, unknown>>(value: unknown)
 export function isScrollable(element: HTMLElement | null): boolean;
 
 // @public (undocumented)
+export function isSingleWordString(value: unknown): value is string;
+
+// @public (undocumented)
 export function isSlugString(value: unknown): value is SlugString;
 
 // @public (undocumented)

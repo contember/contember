@@ -30,6 +30,9 @@ export function isString(value: unknown): value is string {
 export function isSlugString(value: unknown): value is SlugString {
 	return isNonEmptyString(value) && /^[a-z0-9_-]+$/.test(value)
 }
+export function isSingleWordString(value: unknown): value is string {
+	return isNonEmptyString(value) && value.indexOf(' ') === -1
+}
 export function isNonEmptyString(value: unknown): value is string {
   return isString(value) && value.length > 0
 }

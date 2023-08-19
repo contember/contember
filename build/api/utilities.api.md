@@ -262,6 +262,11 @@ export { PascalCase }
 export function pick<T extends Object, K extends keyof T>(object: T, properties: ReadonlyArray<K>): Pick<T, K>;
 
 // @public
+export type PolymorphicComponent<T extends React.ElementType, P = {}> = (<C extends React.ElementType = T>(props: PolymorphicComponentPropsWithRef<C, P>) => React.ReactElement | null) & {
+    displayName?: string | undefined;
+};
+
+// @public
 export type PolymorphicComponentProps<C extends React.ElementType, Props = {}> = InheritableElementProps<C, Props & AsProp<C>>;
 
 // @public

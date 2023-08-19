@@ -1,23 +1,22 @@
 import { useClassNameFactory, useComposeRef, useElementSize, useExpectSameValueReference, useReferentiallyStableCallback, useUpdatedRef } from '@contember/react-utils'
-import { PolymorphicRef, assert, dataAttribute, isNotNullish, omit, px } from '@contember/utilities'
-import { CSSProperties, ElementType, forwardRef, memo, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { assert, dataAttribute, isNotNullish, px } from '@contember/utilities'
+import { CSSProperties, forwardRef, memo, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import waitForTransition from 'wait-for-element-transition'
 import { FocusScope } from '../focus-scope'
 import { ContainerInsetsContext, InsetsConsumer, useElementInsets, useSafeAreaInsetsContext } from '../insets'
 import { LayoutPanelContext, PanelWidthContext, useGetLayoutPanelsStateContext, useSetLayoutPanelsStateContext } from './Contexts'
-import { PanelComponentType as LayoutPrimitivesPanelComponentType, PanelProps } from './Types'
+import { PanelComponentType } from './Types'
 import { getLayoutPanelId } from './getPanelId'
 import { parseLayoutPanelProps } from './parseLayoutPanelProps'
 
 const DEFAULT_PANEL_BASIS = 320
-
 /**
  * @group Layout
  */
-export const Panel: LayoutPrimitivesPanelComponentType = memo(forwardRef(
-	<C extends ElementType = 'section'>(props: PanelProps<C>, forwardedRef: PolymorphicRef<C>) => {
+export const Panel: PanelComponentType = memo(forwardRef(
+	(props, forwardedRef) => {
 		const {
-			as,
+			as: Container = 'section',
 			basis,
 			behavior,
 			children,
@@ -137,7 +136,6 @@ export const Panel: LayoutPrimitivesPanelComponentType = memo(forwardRef(
 
 		const safeAreaInsets = useSafeAreaInsetsContext()
 
-		const Container = as ?? 'section'
 		const shouldTrapFocus = trapFocusInModal && currentVisibility === 'visible' && currentBehavior === 'modal'
 
 		const containerInsets = contextBehavior === 'modal' ? safeAreaInsets : elementInsets
@@ -157,7 +155,6 @@ export const Panel: LayoutPrimitivesPanelComponentType = memo(forwardRef(
 					id={id}
 					key={id}
 					ref={composedRef}
-					as={typeof Container === 'string' ? undefined : 'section'}
 					className={className(null, classNameProp)}
 					data-name={dataAttribute(name)}
 					data-behavior={dataAttribute(currentBehavior)}
@@ -182,7 +179,7 @@ export const Panel: LayoutPrimitivesPanelComponentType = memo(forwardRef(
 				>
 					<ContainerInsetsContext.Provider value={containerInsets}>
 						<PanelWidthContext.Provider value={useMemo(() => ({ height: height ?? 0, width: width ?? 0 }), [height, width])}>
-							<FocusScope active={shouldTrapFocus}>
+							<FocusScope active={shouldTrapFocus === true}>
 								<InsetsConsumer className={className('content')} key="children">
 									{children}
 								</InsetsConsumer>
@@ -193,5 +190,5 @@ export const Panel: LayoutPrimitivesPanelComponentType = memo(forwardRef(
 			</LayoutPanelContext.Provider>
 		)
 	},
-)) as unknown as LayoutPrimitivesPanelComponentType
+))
 Panel.displayName = 'Interface.LayoutPrimitives.Panel'

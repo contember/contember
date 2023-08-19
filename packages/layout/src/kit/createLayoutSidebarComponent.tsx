@@ -1,16 +1,16 @@
 import { useClassName, useClassNameFactory, useComposeRef, useElementSize, useReferentiallyStableCallback } from '@contember/react-utils'
-import { PolymorphicRef, assert, isNonNegativeNumber, isNotNullish, isSlugString, px } from '@contember/utilities'
+import { assert, isNonNegativeNumber, isNotNullish, isSlugString, px } from '@contember/utilities'
 import { ElementType, forwardRef, memo, useCallback, useRef } from 'react'
 import { MenuAutoCloseProvider } from '../menu-auto-close-provider'
-import { GetLayoutPanelsStateContext, LayoutPanelContext, Panel, PanelBehavior, PanelBody, PanelFooter, PanelHeader, PanelState, PanelVisibility, isComponentClassName, useClosePanelOnEscape, useGetLayoutPanelsStateContext, useSetLayoutPanelsStateContext } from '../primitives'
-import { SidebarComponentType, SidebarProps } from './Types'
+import { GetLayoutPanelsStateContext, LayoutPanelContext, PanelBehavior, PanelBody, PanelFooter, PanelHeader, Panel as PanelPrimitive, PanelState, PanelVisibility, isComponentClassName, useClosePanelOnEscape, useGetLayoutPanelsStateContext, useSetLayoutPanelsStateContext } from '../primitives'
+import { SidebarComponentAttributes, SidebarComponentType } from './Types'
 
 const BASIS = 256
 const MIN_WIDTH = 256
 const MAX_WIDTH = 256
 
 export function createLayoutSidebarComponent({
-	defaultAs,
+	defaultAs = 'aside',
 	defaultBehavior = 'collapsible',
 	defaultComponentClassName = 'layout-sidebar',
 	defaultVisibility = 'visible',
@@ -23,7 +23,7 @@ export function createLayoutSidebarComponent({
 	defaultVisibility?: PanelVisibility;
 	displayName: string;
 	name: string;
-}): SidebarComponentType {
+}) {
 	assert('name is a slug string', name, isSlugString)
 	assert('defaultAs is defined', defaultAs, isNotNullish)
 	assert(
@@ -32,8 +32,8 @@ export function createLayoutSidebarComponent({
 		isComponentClassName,
 	)
 
-	const Component: SidebarComponentType = memo(forwardRef(<C extends ElementType = 'aside'>({
-		as,
+	return Object.assign<SidebarComponentType, SidebarComponentAttributes>(memo(forwardRef(({
+		as = defaultAs,
 		basis = BASIS,
 		body,
 		className: classNameProp,
@@ -48,10 +48,9 @@ export function createLayoutSidebarComponent({
 		onVisibilityChange,
 		priority,
 		style,
+		trapFocusInModal,
 		...props
-	}: SidebarProps<C>,
-		forwardedRef: PolymorphicRef<C>,
-	) => {
+	}, forwardedRef) => {
 		const keepVisibleBehavior = useReferentiallyStableCallback(({ behavior }: PanelState) => {
 			if (keepVisible && behavior !== 'modal') {
 				return { visibility: 'visible' } as const
@@ -72,7 +71,7 @@ export function createLayoutSidebarComponent({
 			}
 		})
 
-		const elementRef = useRef<HTMLElement>(null)
+		const elementRef = useRef<HTMLDivElement>(null)
 		const composeRef = useComposeRef(forwardedRef, elementRef)
 		const className = useClassNameFactory(componentClassName)
 		const headerRef = useRef<HTMLDivElement>(null)
@@ -91,9 +90,9 @@ export function createLayoutSidebarComponent({
 		}), [keepVisibleBehavior, onBehaviorChangeProp])
 
 		return (
-			<Panel<ElementType>
+			<PanelPrimitive
 				ref={composeRef}
-				as={as ?? defaultAs}
+				as={as}
 				basis={isNonNegativeNumber(basis) ? basis : undefined}
 				className={useClassName(componentClassName, classNameProp)}
 				defaultBehavior={defaultBehavior}
@@ -105,6 +104,7 @@ export function createLayoutSidebarComponent({
 				onKeyPress={onKeyPress}
 				onVisibilityChange={onVisibilityChange}
 				priority={priority}
+				trapFocusInModal={trapFocusInModal ?? undefined}
 				{...props}
 				style={{
 					...style,
@@ -147,14 +147,13 @@ export function createLayoutSidebarComponent({
 						)}
 					</GetLayoutPanelsStateContext.Consumer>
 				</MenuAutoCloseProvider>
-			</Panel>
+			</PanelPrimitive>
 		)
-	})) as unknown as SidebarComponentType
-	Component.displayName = `Layout.Kit.${displayName}`
-	Component.NAME = name
-	Component.BASIS = BASIS
-	Component.MIN_WIDTH = MIN_WIDTH
-	Component.MAX_WIDTH = MAX_WIDTH
-
-	return Component
+	})), {
+		displayName: `Layout.Kit.${displayName}`,
+		NAME: name,
+		BASIS: BASIS,
+		MIN_WIDTH: MIN_WIDTH,
+		MAX_WIDTH: MAX_WIDTH,
+	})
 }

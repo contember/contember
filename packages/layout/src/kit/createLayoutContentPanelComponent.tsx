@@ -1,8 +1,8 @@
 import { useClassNameFactory, useElementSize } from '@contember/react-utils'
-import { PolymorphicRef, assert, isNonNegativeNumber, isNotNullish, isSlugString, px } from '@contember/utilities'
+import { assert, isNonNegativeNumber, isNotNullish, isSlugString, px } from '@contember/utilities'
 import { ElementType, forwardRef, memo, useRef } from 'react'
-import { GetLayoutPanelsStateContext, LayoutPanelContext, Panel, PanelBody, PanelFooter, PanelHeader, isComponentClassName } from '../primitives'
-import { ContentPanelComponentType, ContentPanelProps } from './Types'
+import { GetLayoutPanelsStateContext, LayoutPanelContext, PanelBody, PanelFooter, PanelHeader, Panel as PanelPrimitive, isComponentClassName } from '../primitives'
+import { ContentComponentAttributes, ContentPanelComponentType } from './Types'
 
 const BASIS = 640
 const MIN_WIDTH = 480
@@ -18,7 +18,7 @@ export function createLayoutContentPanelComponent({
 	defaultComponentClassName: string | string[];
 	displayName: string;
 	name: string;
-}): ContentPanelComponentType {
+}) {
 	assert('name is a slug string', name, isSlugString)
 	assert('defaultAs is defined', defaultAs, isNotNullish)
 	assert(
@@ -27,8 +27,8 @@ export function createLayoutContentPanelComponent({
 		isComponentClassName,
 	)
 
-	const Component: ContentPanelComponentType = memo(forwardRef(<C extends ElementType = 'section'>({
-		as,
+	return Object.assign<ContentPanelComponentType, ContentComponentAttributes>(memo(forwardRef(({
+		as = defaultAs,
 		basis = BASIS,
 		body = true,
 		className: classNameProp,
@@ -39,9 +39,7 @@ export function createLayoutContentPanelComponent({
 		minWidth = MIN_WIDTH,
 		style,
 		...props
-	}: ContentPanelProps<C>,
-		forwardedRef: PolymorphicRef<C>,
-	) => {
+	}, forwardedRef) => {
 		const className = useClassNameFactory(componentClassName)
 		const headerRef = useRef<HTMLDivElement>(null)
 		const footerRef = useRef<HTMLDivElement>(null)
@@ -49,9 +47,9 @@ export function createLayoutContentPanelComponent({
 		const { height: footerHeight } = useElementSize(footerRef)
 
 		return (
-			<Panel<ElementType>
+			<PanelPrimitive
 				ref={forwardedRef}
-				as={as ?? defaultAs}
+				as={as}
 				basis={isNonNegativeNumber(basis) ? basis : BASIS}
 				className={className(null, classNameProp)}
 				defaultBehavior="static"
@@ -99,14 +97,13 @@ export function createLayoutContentPanelComponent({
 						</LayoutPanelContext.Consumer>
 					)}
 				</GetLayoutPanelsStateContext.Consumer>
-			</Panel>
+			</PanelPrimitive>
 		)
-	})) as unknown as ContentPanelComponentType
-	Component.displayName = `Layout.Kit.${displayName}`
-	Component.NAME = name
-	Component.BASIS = BASIS
-	Component.MAX_WIDTH = MAX_WIDTH
-	Component.MIN_WIDTH = MIN_WIDTH
-
-	return Component
+	})), {
+		displayName: `Layout.Kit.${displayName}`,
+		NAME: name,
+		BASIS: BASIS,
+		MAX_WIDTH: MAX_WIDTH,
+		MIN_WIDTH: MIN_WIDTH,
+	})
 }

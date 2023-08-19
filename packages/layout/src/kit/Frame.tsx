@@ -1,14 +1,14 @@
 import { useClassNameFactory, useComposeRef, useElementSize } from '@contember/react-utils'
-import { PolymorphicRef, dataAttribute, px } from '@contember/utilities'
+import { dataAttribute, px } from '@contember/utilities'
 import { CSSProperties, ElementType, forwardRef, memo, useMemo, useRef } from 'react'
 import { InsetsProvider, combineElementInsets, useContainerInsetsContext, useSafeAreaInsetsContext } from '../insets'
 import * as LayoutPrimitives from '../primitives'
-import { FrameComponentType, FrameProps } from './Types'
+import { FrameComponentType } from './Types'
 
 /**
  * @group Layout
  */
-export const Frame: FrameComponentType = memo(forwardRef(<C extends ElementType = 'div'>({
+export const Frame: FrameComponentType = memo(forwardRef(({
 	as,
 	children,
 	bodyHeader,
@@ -22,7 +22,7 @@ export const Frame: FrameComponentType = memo(forwardRef(<C extends ElementType 
 	headerClassName,
 	headerIsFixed = false,
 	...rest
-}: FrameProps<C>, forwardedRef: PolymorphicRef<C>) => {
+}, forwardedRef) => {
 	const frameHeaderRef = useRef<HTMLDivElement>(null)
 	const frameFooterRef = useRef<HTMLDivElement>(null)
 	const bodyHeaderRef = useRef<HTMLDivElement>(null)

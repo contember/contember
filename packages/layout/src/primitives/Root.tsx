@@ -1,16 +1,16 @@
 import { ContainerWidthContext, useAddClassNameDuringResize, useClassName, useContainerWidth } from '@contember/react-utils'
-import { PolymorphicRef, isNonNegativeNumber, px } from '@contember/utilities'
-import { CSSProperties, ElementType, forwardRef, memo, useMemo } from 'react'
+import { PolymorphicComponent, isNonNegativeNumber, px } from '@contember/utilities'
+import { CSSProperties, forwardRef, memo, useMemo } from 'react'
 import { useGetLayoutPanelsStateContext } from './Contexts'
 import { PanelsStateProvider } from './PanelsStateProvider'
-import { ContainerComponentType, ContainerProps, PanelConfig } from './Types'
+import { ContainerComponentType, OwnContainerProps, PanelConfig } from './Types'
 import { panelsStateAsDataAttributes } from './panelsStateAsDataAttributes'
 
 /**
  * @group Layout
  */
 export const Root: ContainerComponentType = memo(forwardRef(
-	<C extends ElementType = 'div'>(props: ContainerProps<C>, forwardedRef: PolymorphicRef<C>) => {
+	(props, forwardedRef) => {
 		useAddClassNameDuringResize('disable-transitions-on-resize')
 		const width = useContainerWidth()
 
@@ -25,14 +25,14 @@ export const Root: ContainerComponentType = memo(forwardRef(
 ))
 Root.displayName = 'Interface.LayoutPrimitives.LayoutRoot'
 
-const LayoutRootInnerPanelsContainer = memo(forwardRef(<C extends ElementType = 'div'>({
+const LayoutRootInnerPanelsContainer: ContainerComponentType = memo(forwardRef(({
 	as,
 	children,
 	className,
 	componentClassName = 'layout',
 	showDataState = true,
 	...rest
-}: ContainerProps<C>, forwardedRef: PolymorphicRef<C>) => {
+}, forwardedRef) => {
 	const width = useContainerWidth()
 	const Container = as ?? 'div'
 	const { panels } = useGetLayoutPanelsStateContext()

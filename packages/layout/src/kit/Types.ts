@@ -1,52 +1,87 @@
-import { ComponentClassNameProps, NestedClassName, PolymorphicComponentPropsWithRef } from '@contember/utilities'
-import { ElementType, ReactElement, ReactNode } from 'react'
+import { ComponentClassNameProps, NestedClassName, PolymorphicComponent } from '@contember/utilities'
+import { ComponentProps, ReactNode } from 'react'
 import { GetLayoutPanelsStateContextType, OwnPanelProps, PanelState } from '../primitives'
 
-export type OwnFrameProps =
-	& ComponentClassNameProps
-	& {
-		bodyFooter?: ReactNode;
-		bodyHeader?: ReactNode;
-		footer?: ReactNode;
-		footerIsFixed?: boolean;
-		footerClassName?: NestedClassName;
-		header?: ReactNode;
-		headerIsFixed?: boolean;
-		headerClassName?: NestedClassName;
-		minimumFooterHeight?: number;
-		minimumHeaderHeight?: number;
-	}
+export interface OwnFrameProps extends ComponentClassNameProps {
+	/**
+	 * Content of frame body footer.
+	 */
+	bodyFooter?: ReactNode;
+	/**
+	 * Content of frame body header.
+	 */
+	bodyHeader?: ReactNode;
+	/**
+	 * Content of frame footer.
+	 */
+	footer?: ReactNode;
+	/**
+	 * Sets whether the frame footer should be of fixed position.
+	 */
+	footerIsFixed?: boolean;
+	/**
+	 * Frame footer class name.
+	 */
+	footerClassName?: NestedClassName;
+	/**
+	 * Content of frame header.
+	 */
+	header?: ReactNode;
+	/**
+	 * Sets whether the frame header should be of fixed position.
+	 */
+	headerIsFixed?: boolean;
+	/**
+	 * Sets whether the frame header should be of fixed position.
+	 */
+	headerClassName?: NestedClassName;
+	/**
+	 * Sets the minimum height of the frame footer.
+	 */
+	minimumFooterHeight?: number;
+	/**
+	 * Sets the minimum height of the frame header.
+	 */
+	minimumHeaderHeight?: number;
+}
 
-export type FrameProps<C extends ElementType> = PolymorphicComponentPropsWithRef<C, OwnFrameProps>
+export type FrameProps = ComponentProps<FrameComponentType>
 
-export type FrameComponentType =
-	& (<C extends ElementType = 'div'>(props: FrameProps<C>) => React.ReactElement | null)
-	& { displayName?: string | undefined }
+export type FrameComponentType = PolymorphicComponent<'div', OwnFrameProps>
 
-export type OwnContentPanelProps =
-	& Omit<ComponentClassNameProps, 'children'>
-	& {
-		basis?: number;
-		body?: ReactNode | ((state: PanelState, panelsState: GetLayoutPanelsStateContextType) => ReactNode);
-		children?: never;
-		footer?: ReactNode | ((state: PanelState, panelsState: GetLayoutPanelsStateContextType) => ReactNode);
-		header?: ReactNode | ((state: PanelState, panelsState: GetLayoutPanelsStateContextType) => ReactNode);
-		maxWidth?: number | false | null | undefined;
-		minWidth?: number | null | undefined;
-		priority?: number | null | undefined;
-	}
+export interface CommonPanelProps {
+	/**
+	 * Content of the panel. If you need to access the state of the panel, you can pass a function instead. The function will be called with the state of the panel and the state of all panels.
+	 */
+	body?: ReactNode | ((state: PanelState, panelsState: GetLayoutPanelsStateContextType) => ReactNode);
+	/**
+	 * You can pass ReactNode to header, body and footer props.
+	 */
+	children?: never;
+	/**
+	 * Content of the panel footer. If you need to access the state of the panel, you can pass a function instead. The function will be called with the state of the panel and the state of all panels.
+	 */
+	footer?: ReactNode | ((state: PanelState, panelsState: GetLayoutPanelsStateContextType) => ReactNode);
+	/**
+	 * Content of the panel header. If you need to access the state of the panel, you can pass a function instead. The function will be called with the state of the panel and the state of all panels.
+	 */
+	header?: ReactNode | ((state: PanelState, panelsState: GetLayoutPanelsStateContextType) => ReactNode);
+}
 
-export type ContentPanelProps<C extends ElementType> = PolymorphicComponentPropsWithRef<C, OwnContentPanelProps>
+export interface OwnContentPanelProps extends ComponentClassNameProps, CommonPanelProps, Pick<OwnPanelProps, 'basis' | 'maxWidth' | 'minWidth' | 'priority'> {
+}
 
-export type ContentPanelComponentType =
-	& (<C extends ElementType = 'section'>(props: ContentPanelProps<C>) => ReactElement | null)
-	& {
-		BASIS: number;
-		MAX_WIDTH: number;
-		MIN_WIDTH: number;
-		NAME: string;
-		displayName?: string | undefined;
-	}
+export type ContentPanelProps = ComponentProps<ContentPanelComponentType>
+
+export type ContentComponentAttributes = {
+	BASIS: number;
+	MAX_WIDTH: number;
+	MIN_WIDTH: number;
+	NAME: string;
+	displayName?: string | undefined;
+}
+
+export type ContentPanelComponentType = PolymorphicComponent<'section', OwnContentPanelProps>
 
 export type OwnBarStartProps =
 	| {
@@ -84,63 +119,94 @@ export type OwnBarEndProps =
 		endBefore?: never;
 	}
 
-export type OwnBarProps = Omit<ComponentClassNameProps, 'children'>
+export type OwnBarProps =
+	& ComponentClassNameProps
 	& { children?: never }
 	& OwnBarStartProps
 	& OwnBarCenterProps
 	& OwnBarEndProps
 
-export type BarProps<C extends ElementType> = PolymorphicComponentPropsWithRef<C, OwnBarProps>
+export type BarProps = ComponentProps<BarComponentType>
 
-export type BarComponentType =
-	& (<C extends ElementType = 'div'>(props: BarProps<C>) => ReactElement | null)
-	& {
-		displayName?: string | undefined;
-	}
+export type BarComponentType = PolymorphicComponent<'div', OwnBarProps>
 
-export type OwnSidebarProps =
-	& Omit<ComponentClassNameProps, 'children'>
-	& Pick<OwnPanelProps, 'onBehaviorChange' | 'onKeyPress' | 'onVisibilityChange'>
-	& {
-		basis?: number;
-		body?: ReactNode | ((state: PanelState, panelsState: GetLayoutPanelsStateContextType) => ReactNode);
-		children?: never;
-		footer?: ReactNode | ((state: PanelState, panelsState: GetLayoutPanelsStateContextType) => ReactNode);
-		header?: ReactNode | ((state: PanelState, panelsState: GetLayoutPanelsStateContextType) => ReactNode);
-		keepVisible?: boolean | null | undefined;
-		maxWidth?: number | false | null | undefined;
-		minWidth?: number | null | undefined;
-		priority?: number | null | undefined;
-		trapFocusInModal?: boolean | null | undefined;
-	}
 
-export type SidebarProps<C extends ElementType> = PolymorphicComponentPropsWithRef<C, OwnSidebarProps>
+export interface OwnSidebarProps extends ComponentClassNameProps, CommonPanelProps, Pick<OwnPanelProps, 'basis' | 'maxWidth' | 'minWidth' | 'onBehaviorChange' | 'onKeyPress' | 'onVisibilityChange' | 'priority' | 'trapFocusInModal'> {
+	/**
+	 * Use `header`, `body` and `footer` props instead.
+	 */
+	children?: never;
+	/**
+	 * When set true, the sidebar will become visible when possible automatically.
+	 */
+	keepVisible?: boolean | null | undefined;
+}
 
-export type SidebarComponentType =
-	& (<C extends ElementType = 'aside'>(props: SidebarProps<C>) => ReactElement | null)
-	& {
-		BASIS: number;
-		MAX_WIDTH: number;
-		MIN_WIDTH: number;
-		NAME: string;
-		displayName?: string | undefined;
-	}
+export type SidebarProps = ComponentProps<SidebarComponentType>
 
-export type ToggleMenuButtonProps =
-	& Omit<ComponentClassNameProps, 'children'>
-	& {
-		children?: never;
-		labelWhenClosed?: string;
-		labelWhenOpen?: string;
-		panelName: string;
-	}
+export type SidebarComponentType = PolymorphicComponent<'aside', OwnSidebarProps>
 
-export type ToggleSidebarButtonProps =
-	& Omit<ComponentClassNameProps, 'children'>
-	& {
-		children?: never;
-		labelWhenClosed?: string;
-		labelWhenOpen?: string;
-		panelName: string;
-		position: 'left' | 'right';
-	}
+export interface SidebarComponentAttributes {
+	/**
+	 * The basis of the sidebar.
+	 */
+	BASIS: number;
+	/**
+	 * The max width of the sidebar.
+	 */
+	MAX_WIDTH: number;
+	/**
+	 * The min width of the sidebar.
+	 */
+	MIN_WIDTH: number;
+	/**
+	 * The name of the sidebar.
+	 */
+	NAME: string;
+	/**
+	 * Display name of the sidebar component displayed in React DevTools.
+	 */
+	displayName?: string | undefined;
+}
+
+export interface ToggleMenuButtonProps extends ComponentClassNameProps {
+	/**
+	 * Button has no children.
+	 */
+	children?: never;
+	/**
+	 * Label of the button when the menu is closed.
+	 */
+	labelWhenClosed?: string;
+	/**
+	 * Label of the button when the menu is open.
+	 */
+	labelWhenOpen?: string;
+	/**
+	 * Name of the panel to toggle.
+	 */
+	panelName: string;
+}
+
+export interface ToggleSidebarButtonProps extends ComponentClassNameProps {
+	/**
+	 * Button has no children.
+	 */
+	children?: never;
+	/**
+	 * Label of the button when the menu is closed.
+	 */
+	labelWhenClosed?: string;
+	/**
+	 * Label of the button when the menu is open.
+	 */
+	labelWhenOpen?: string;
+	/**
+	 * Name of the sidebar panel to toggle.
+	 */
+	panelName: string;
+	/**
+	 * Position of the sidebar panel to toggle. Depending on the position, the button will have different icon.
+	 */
+	position: 'left' | 'right';
+}

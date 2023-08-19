@@ -5,6 +5,7 @@
 ```ts
 
 import { ComponentClassNameProps } from '@contember/utilities';
+import { ComponentProps } from 'react';
 import { ComponentType } from 'react';
 import { ContainerWidthContextType } from '@contember/react-utils';
 import { Context } from 'react';
@@ -12,10 +13,12 @@ import { CSSProperties } from 'react';
 import { ElementType } from 'react';
 import { ForwardRefExoticComponent } from 'react';
 import { FunctionComponentElement } from 'react';
+import { JSXElementConstructor } from 'react';
 import { MemoExoticComponent } from 'react';
 import { NamedExoticComponent } from 'react';
 import { NestedClassName } from '@contember/utilities';
 import { PascalCase } from '@contember/utilities';
+import { PolymorphicComponent } from '@contember/utilities';
 import { PolymorphicComponentPropsWithRef } from '@contember/utilities';
 import { Predicate } from '@contember/utilities';
 import { PropsWithChildren } from 'react';
@@ -36,24 +39,30 @@ const ActiveSlotPortalsContext: Context<ActiveSlotPortalsContextType>;
 type ActiveSlotPortalsContextType = Set<string>;
 
 // @public (undocumented)
-export type BarComponentType = (<C extends ElementType = 'div'>(props: BarProps<C>) => ReactElement | null) & {
-    displayName?: string | undefined;
-};
+export type BarComponentType = PolymorphicComponent<'div', OwnBarProps>;
 
 // @public (undocumented)
-export type BarProps<C extends ElementType> = PolymorphicComponentPropsWithRef<C, OwnBarProps>;
+export type BarProps = ComponentProps<BarComponentType>;
 
 // @public (undocumented)
 export function combineElementInsets(...insets: Array<Partial<ContainerInsets> | null | undefined>): ContainerInsets;
 
 // @public (undocumented)
-type CommonPanelConfigProps = {
-    basis: number | null | undefined;
-    maxWidth?: number | null | undefined;
-    minWidth?: number | null | undefined;
+interface CommonPanelConfigProps {
+    basis?: number;
+    maxWidth?: number | false | null | undefined;
+    minWidth?: number | false | null | undefined;
     name: string;
-    priority?: number | null | undefined;
-};
+    priority?: number | false | null | undefined;
+}
+
+// @public (undocumented)
+export interface CommonPanelProps {
+    body?: ReactNode | ((state: PanelState, panelsState: GetLayoutPanelsStateContextType) => ReactNode);
+    children?: never;
+    footer?: ReactNode | ((state: PanelState, panelsState: GetLayoutPanelsStateContextType) => ReactNode);
+    header?: ReactNode | ((state: PanelState, panelsState: GetLayoutPanelsStateContextType) => ReactNode);
+}
 
 // @public (undocumented)
 export const commonSlots: readonly ("Actions" | "Back" | "Logo" | "Navigation" | "Sidebar" | "Title" | "Profile" | "Switchers")[];
@@ -163,9 +172,7 @@ export const CommonSlotTargets: Readonly<Readonly<{
 }>>;
 
 // @public (undocumented)
-type ContainerComponentType = (<C extends ElementType = 'div'>(props: ContainerProps<C>) => React.ReactElement | null) & {
-    displayName?: string | undefined;
-};
+type ContainerComponentType = PolymorphicComponent<'div', OwnContainerProps>;
 
 // @public (undocumented)
 export type ContainerInsets = {
@@ -187,10 +194,10 @@ export type ContainerOffsets = {
 };
 
 // @public (undocumented)
-type ContainerProps<C extends ElementType> = PolymorphicComponentPropsWithRef<C, OwnContainerProps>;
+type ContainerProps = ComponentProps<ContainerComponentType>;
 
 // @public (undocumented)
-export type ContentPanelComponentType = (<C extends ElementType = 'section'>(props: ContentPanelProps<C>) => ReactElement | null) & {
+export type ContentComponentAttributes = {
     BASIS: number;
     MAX_WIDTH: number;
     MIN_WIDTH: number;
@@ -199,7 +206,10 @@ export type ContentPanelComponentType = (<C extends ElementType = 'section'>(pro
 };
 
 // @public (undocumented)
-export type ContentPanelProps<C extends ElementType> = PolymorphicComponentPropsWithRef<C, OwnContentPanelProps>;
+export type ContentPanelComponentType = PolymorphicComponent<'section', OwnContentPanelProps>;
+
+// @public (undocumented)
+export type ContentPanelProps = ComponentProps<ContentPanelComponentType>;
 
 // @public (undocumented)
 export const contentSlots: readonly ("ContentFooter" | "ContentHeader")[];
@@ -277,7 +287,9 @@ export function createLayoutContentPanelComponent({ defaultAs, defaultComponentC
     defaultComponentClassName: string | string[];
     displayName: string;
     name: string;
-}): ContentPanelComponentType;
+}): (<C extends ElementType<any> = "section">(props: PolymorphicComponentPropsWithRef<C, OwnContentPanelProps>) => ReactElement<any, string | JSXElementConstructor<any>> | null) & {
+    displayName?: string | undefined;
+} & ContentComponentAttributes;
 
 // @public (undocumented)
 export function createLayoutSidebarComponent({ defaultAs, defaultBehavior, defaultComponentClassName, defaultVisibility, displayName, name, }: {
@@ -287,7 +299,9 @@ export function createLayoutSidebarComponent({ defaultAs, defaultBehavior, defau
     defaultVisibility?: PanelVisibility;
     displayName: string;
     name: string;
-}): SidebarComponentType;
+}): (<C extends ElementType<any> = "aside">(props: PolymorphicComponentPropsWithRef<C, OwnSidebarProps>) => ReactElement<any, string | JSXElementConstructor<any>> | null) & {
+    displayName?: string | undefined;
+} & SidebarComponentAttributes;
 
 // @public (undocumented)
 function createSlotComponents<K extends PascalCase<string>>(slots: ReadonlyArray<PascalCase<K>>): readonly [readonly PascalCase<K>[], Readonly<Readonly<{ readonly [P in PascalCase<K>]: {
@@ -434,12 +448,10 @@ export const FooterSlotTargets: Readonly<Readonly<{
 }>>;
 
 // @public (undocumented)
-export type FrameComponentType = (<C extends ElementType = 'div'>(props: FrameProps<C>) => React.ReactElement | null) & {
-    displayName?: string | undefined;
-};
+export type FrameComponentType = PolymorphicComponent<'div', OwnFrameProps>;
 
 // @public (undocumented)
-export type FrameProps<C extends ElementType> = PolymorphicComponentPropsWithRef<C, OwnFrameProps>;
+export type FrameProps = ComponentProps<FrameComponentType>;
 
 // @public (undocumented)
 export function getElementInsets(containerInsets: ContainerInsets | null | undefined, elementOffsets: ContainerOffsets | null | undefined): ContainerInsets;
@@ -543,12 +555,18 @@ type LayoutContainerWidthContextType = ContainerWidthContextType;
 
 // @public (undocumented)
 export const LayoutKit: {
-    ContentPanelMain: ContentPanelComponentType;
+    ContentPanelMain: (<C extends ElementType<any> = "section">(props: PolymorphicComponentPropsWithRef<C, OwnContentPanelProps>) => ReactElement<any, string | JSXElementConstructor<any>> | null) & {
+        displayName?: string | undefined;
+    } & ContentComponentAttributes;
     Footer: BarComponentType;
     Frame: FrameComponentType;
     Header: BarComponentType;
-    SidebarLeft: SidebarComponentType;
-    SidebarRight: SidebarComponentType;
+    SidebarLeft: (<C_1 extends ElementType<any> = "aside">(props: PolymorphicComponentPropsWithRef<C_1, OwnSidebarProps>) => ReactElement<any, string | JSXElementConstructor<any>> | null) & {
+        displayName?: string | undefined;
+    } & SidebarComponentAttributes;
+    SidebarRight: (<C_1 extends ElementType<any> = "aside">(props: PolymorphicComponentPropsWithRef<C_1, OwnSidebarProps>) => ReactElement<any, string | JSXElementConstructor<any>> | null) & {
+        displayName?: string | undefined;
+    } & SidebarComponentAttributes;
     ToggleMenuButton: NamedExoticComponent<ToggleMenuButtonProps>;
     ToggleSidebarButton: NamedExoticComponent<ToggleSidebarButtonProps>;
 };
@@ -666,7 +684,7 @@ export type OwnBarEndProps = {
 };
 
 // @public (undocumented)
-export type OwnBarProps = Omit<ComponentClassNameProps, 'children'> & {
+export type OwnBarProps = ComponentClassNameProps & {
     children?: never;
 } & OwnBarStartProps & OwnBarCenterProps & OwnBarEndProps;
 
@@ -688,30 +706,22 @@ interface OwnContainerProps extends ComponentClassNameProps, PropsWithChildren<{
 }
 
 // @public (undocumented)
-export type OwnContentPanelProps = Omit<ComponentClassNameProps, 'children'> & {
-    basis?: number;
-    body?: ReactNode | ((state: PanelState, panelsState: GetLayoutPanelsStateContextType) => ReactNode);
-    children?: never;
-    footer?: ReactNode | ((state: PanelState, panelsState: GetLayoutPanelsStateContextType) => ReactNode);
-    header?: ReactNode | ((state: PanelState, panelsState: GetLayoutPanelsStateContextType) => ReactNode);
-    maxWidth?: number | false | null | undefined;
-    minWidth?: number | null | undefined;
-    priority?: number | null | undefined;
-};
+export interface OwnContentPanelProps extends ComponentClassNameProps, CommonPanelProps, Pick<OwnPanelProps, 'basis' | 'maxWidth' | 'minWidth' | 'priority'> {
+}
 
 // @public (undocumented)
-export type OwnFrameProps = ComponentClassNameProps & {
+export interface OwnFrameProps extends ComponentClassNameProps {
     bodyFooter?: ReactNode;
     bodyHeader?: ReactNode;
     footer?: ReactNode;
-    footerIsFixed?: boolean;
     footerClassName?: NestedClassName;
+    footerIsFixed?: boolean;
     header?: ReactNode;
-    headerIsFixed?: boolean;
     headerClassName?: NestedClassName;
+    headerIsFixed?: boolean;
     minimumFooterHeight?: number;
     minimumHeaderHeight?: number;
-};
+}
 
 // @public (undocumented)
 export type OwnInsetsConsumerProps = {
@@ -732,25 +742,16 @@ export type OwnInsetsProviderProps = {
 };
 
 // @public (undocumented)
-type OwnPanelBodyProps = {
-    children?: ReactNode;
-    className?: NestedClassName;
-    componentClassName?: string;
-};
+interface OwnPanelBodyProps extends PropsWithChildren<ComponentClassNameProps> {
+}
 
 // @public (undocumented)
-type OwnPanelFooterProps = {
-    children?: ReactNode;
-    className?: NestedClassName;
-    componentClassName?: string;
-};
+interface OwnPanelFooterProps extends PropsWithChildren<ComponentClassNameProps> {
+}
 
 // @public (undocumented)
-type OwnPanelHeaderProps = {
-    children?: ReactNode;
-    className?: NestedClassName;
-    componentClassName?: string;
-};
+interface OwnPanelHeaderProps extends PropsWithChildren<ComponentClassNameProps> {
+}
 
 // @public (undocumented)
 type OwnPanelProps = PanelBasicProps & PanelConfigProps;
@@ -759,18 +760,10 @@ type OwnPanelProps = PanelBasicProps & PanelConfigProps;
 export type OwnResponsiveStackProps = ResponsiveProps<StackOwnProps>;
 
 // @public (undocumented)
-export type OwnSidebarProps = Omit<ComponentClassNameProps, 'children'> & Pick<OwnPanelProps, 'onBehaviorChange' | 'onKeyPress' | 'onVisibilityChange'> & {
-    basis?: number;
-    body?: ReactNode | ((state: PanelState, panelsState: GetLayoutPanelsStateContextType) => ReactNode);
+export interface OwnSidebarProps extends ComponentClassNameProps, CommonPanelProps, Pick<OwnPanelProps, 'basis' | 'maxWidth' | 'minWidth' | 'onBehaviorChange' | 'onKeyPress' | 'onVisibilityChange' | 'priority' | 'trapFocusInModal'> {
     children?: never;
-    footer?: ReactNode | ((state: PanelState, panelsState: GetLayoutPanelsStateContextType) => ReactNode);
-    header?: ReactNode | ((state: PanelState, panelsState: GetLayoutPanelsStateContextType) => ReactNode);
     keepVisible?: boolean | null | undefined;
-    maxWidth?: number | false | null | undefined;
-    minWidth?: number | null | undefined;
-    priority?: number | null | undefined;
-    trapFocusInModal?: boolean | null | undefined;
-};
+}
 
 // @public (undocumented)
 type OwnTargetContainerProps = {
@@ -782,7 +775,7 @@ const Panel: PanelComponentType;
 
 // @public (undocumented)
 interface PanelBasicProps extends ComponentClassNameProps, PropsWithChildren<{
-    trapFocusInModal?: boolean;
+    trapFocusInModal?: boolean | null | undefined;
     tabIndex?: never;
 }> {
 }
@@ -797,17 +790,13 @@ const panelBehaviorsList: readonly ["static", "collapsible", "overlay", "modal"]
 const PanelBody: PanelBodyComponentType;
 
 // @public (undocumented)
-type PanelBodyComponentType = (<C extends ElementType = 'div'>(props: PanelBodyProps<C>) => React.ReactElement | null) & {
-    displayName?: string | undefined;
-};
+type PanelBodyComponentType = PolymorphicComponent<'div', OwnPanelBodyProps>;
 
 // @public (undocumented)
-type PanelBodyProps<C extends ElementType> = PolymorphicComponentPropsWithRef<C, OwnPanelBodyProps>;
+type PanelBodyProps = ComponentProps<PanelBodyComponentType>;
 
 // @public (undocumented)
-type PanelComponentType = (<C extends ElementType = 'section'>(props: PanelProps<C>) => ReactElement | null) & {
-    displayName?: string | undefined;
-};
+type PanelComponentType = PolymorphicComponent<'section', OwnPanelProps>;
 
 // @public (undocumented)
 type PanelConfig = {
@@ -823,26 +812,22 @@ type PanelConfigProps = CommonPanelConfigProps & ControlPanelProps;
 const PanelFooter: PanelFooterComponentType;
 
 // @public (undocumented)
-type PanelFooterComponentType = (<C extends ElementType = 'footer'>(props: PanelFooterProps<C>) => React.ReactElement | null) & {
-    displayName?: string | undefined;
-};
+type PanelFooterComponentType = PolymorphicComponent<'footer', OwnPanelFooterProps>;
 
 // @public (undocumented)
-type PanelFooterProps<C extends ElementType> = PolymorphicComponentPropsWithRef<C, OwnPanelFooterProps>;
+type PanelFooterProps = ComponentProps<PanelFooterComponentType>;
 
 // @public (undocumented)
 const PanelHeader: PanelHeaderComponentType;
 
 // @public (undocumented)
-type PanelHeaderComponentType = (<C extends ElementType = 'header'>(props: PanelHeaderProps<C>) => React.ReactElement | null) & {
-    displayName?: string | undefined;
-};
+type PanelHeaderComponentType = PolymorphicComponent<'header', OwnPanelFooterProps>;
 
 // @public (undocumented)
-type PanelHeaderProps<C extends ElementType> = PolymorphicComponentPropsWithRef<C, OwnPanelHeaderProps>;
+type PanelHeaderProps = ComponentProps<PanelHeaderComponentType>;
 
 // @public (undocumented)
-type PanelProps<C extends ElementType> = PolymorphicComponentPropsWithRef<C, OwnPanelProps>;
+type PanelProps = ComponentProps<PanelComponentType>;
 
 // @public (undocumented)
 const PanelsStateProvider: NamedExoticComponent<    {
@@ -971,13 +956,16 @@ type SetLayoutPanelsStateContextType = {
 type SetLayoutPanelVisibility = LayoutPanelCallback;
 
 // @public (undocumented)
-export type SidebarComponentType = (<C extends ElementType = 'aside'>(props: SidebarProps<C>) => ReactElement | null) & {
+export interface SidebarComponentAttributes {
     BASIS: number;
+    displayName?: string | undefined;
     MAX_WIDTH: number;
     MIN_WIDTH: number;
     NAME: string;
-    displayName?: string | undefined;
-};
+}
+
+// @public (undocumented)
+export type SidebarComponentType = PolymorphicComponent<'aside', OwnSidebarProps>;
 
 // @public (undocumented)
 export const sidebarLeftSlots: readonly ("SidebarLeftBody" | "SidebarLeftFooter" | "SidebarLeftHeader")[];
@@ -1027,7 +1015,7 @@ export const SidebarLeftSlotTargets: Readonly<Readonly<{
 }>>;
 
 // @public (undocumented)
-export type SidebarProps<C extends ElementType> = PolymorphicComponentPropsWithRef<C, OwnSidebarProps>;
+export type SidebarProps = ComponentProps<SidebarComponentType>;
 
 // @public (undocumented)
 export const sidebarRightSlots: readonly ("SidebarRightBody" | "SidebarRightFooter" | "SidebarRightHeader")[];
@@ -1160,21 +1148,21 @@ const Target: NamedExoticComponent<SlotTargetProps>;
 const TargetsRegistryContext: Context<SlotTargetsRegistryContextType>;
 
 // @public (undocumented)
-export type ToggleMenuButtonProps = Omit<ComponentClassNameProps, 'children'> & {
+export interface ToggleMenuButtonProps extends ComponentClassNameProps {
     children?: never;
     labelWhenClosed?: string;
     labelWhenOpen?: string;
     panelName: string;
-};
+}
 
 // @public (undocumented)
-export type ToggleSidebarButtonProps = Omit<ComponentClassNameProps, 'children'> & {
+export interface ToggleSidebarButtonProps extends ComponentClassNameProps {
     children?: never;
     labelWhenClosed?: string;
     labelWhenOpen?: string;
     panelName: string;
     position: 'left' | 'right';
-};
+}
 
 // @public (undocumented)
 interface UncontrolledBehaviorPanelProps {

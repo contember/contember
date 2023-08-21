@@ -228,20 +228,20 @@
 
 :where(.cui-icon),
 :where([data-overrides-lucide-icons] .lucide) {
+	----leading-trim: calc((1lh - 1em) / 2);
+	----optical-inset: calc(1em * var(--cui-border-radius-optical-grow));
 	--cui-scale: var(--cui-scale);
-	--cui-icon--inset: calc(1em / 2 * var(--cui-border-radius-optical-grow));
-	--cui-icon--padding: calc((var(--cui-line-height--units) - 1em) / 2);
 	display: inline-block;
 	flex-basis: content;
 	flex-grow: 0;
 	flex-shrink: 0;
 	font-size: calc(1em * var(--cui-scale));
-	height: var(--cui-line-height--units);
-	margin: calc(-1 * (var(--cui-icon--inset) + var(--cui-icon--padding)));
-	padding: var(--cui-icon--padding);
+	height: 1lh;
+	margin: calc(-1 * var(----leading-trim));
+	padding: calc(var(----leading-trim) - var(----optical-inset));
 	stroke: currentColor;
 	vertical-align: middle;
-	width: var(--cui-line-height--units);
+	width: 1lh;
 }
 /* TODO: Temporary fix until we remove last Blueprint icon */
 .cui-icon-blueprintSvg,

@@ -101,7 +101,7 @@ class ErrorsPreprocessor {
 							}
 						}
 
-						if (!(alias in currentNode.children)) {
+						if (!currentNode.children.has(alias)) {
 							currentNode.children.set(alias, this.getRootNode(error, nextIndex))
 							if (nextIndex <= error.path.length) {
 								// This path has been handled by getRootNode
@@ -124,7 +124,7 @@ class ErrorsPreprocessor {
 
 						const entityId = MutationAlias.decodeEntityId(alias)
 
-						if (!(entityId in currentNode.children)) {
+						if (!currentNode.children.has(entityId)) {
 							currentNode.children.set(entityId, this.getRootNode(error, i + 1))
 							if (i + 1 <= error.path.length) {
 								// This path has been handled by getRootNode

@@ -10,7 +10,6 @@
 	background-color: var(--cui-message--background-color);
 	border-radius: var(--cui-message--border-radius);
 	color: var(--cui-message--color);
-	display: inline-flex;
 	font-size: var(--cui-message--font-size);
 	font-weight: 300;
 	gap: var(--cui-gutter);

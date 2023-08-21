@@ -3,6 +3,7 @@ import { colorSchemeClassName, dataAttribute, deprecate, fallback, isDefined, th
 import { ReactNode, memo } from 'react'
 import type { Default, HTMLDivElementProps, Intent, MessageDistinction, MessageFlow } from '../../types'
 import { StackOwnProps } from '../Stack'
+import { Text } from '../Typography'
 
 /** @deprecated Omit the prop instead */
 export type DeprecatedMessageSize = Default
@@ -115,7 +116,7 @@ export const Message = memo(({
 	borderRadius = true,
 	children,
 	className,
-	display = 'inline',
+	display = 'block',
 	distinction,
 	elevated = false,
 	flow,
@@ -162,7 +163,12 @@ export const Message = memo(({
 			data-text-align={dataAttribute(textAlign)}
 		>
 			{icon && <div className={componentClassName('icon')}>{icon}</div>}
-			<div className={componentClassName('content')}>{children}</div>
+			<div className={componentClassName('content')}>
+				{typeof children === 'string' || typeof children === 'number'
+					? <Text>{children}</Text>
+					: children
+				}
+			</div>
 			{action && <div className={componentClassName('action')}>{action}</div>}
 		</div>
 	)

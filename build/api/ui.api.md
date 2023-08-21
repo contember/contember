@@ -2838,7 +2838,7 @@ withTopToolbar?: boolean | undefined;
 export type TelInputProps = TextInputProps;
 
 // @public (undocumented)
-const Text_2: MemoExoticComponent<ForwardRefExoticComponent<TextProps<Function> & RefAttributes<HTMLSpanElement>>>;
+const Text_2: MemoExoticComponent<ForwardRefExoticComponent<Omit<HTMLSpanElementProps, keyof TextOwnProps<Function>> & TextOwnProps<Function> & RefAttributes<HTMLSpanElement>>>;
 export { Text_2 as Text }
 
 // @public (undocumented)
@@ -2882,17 +2882,16 @@ export type TextInputPropsWithDeprecated = Omit<TextInputProps, 'type'> & {
 };
 
 // @public (undocumented)
-export type TextOwnProps<Translate extends Function = Function> = ComponentClassNameProps & ({
-    children: string;
+export interface TextOwnProps<Translate extends Function = Function> extends ComponentClassNameProps {
+    // (undocumented)
+    children?: ReactNode;
+    // (undocumented)
     fallback?: string;
-    translate: Translate;
+    // (undocumented)
+    translate?: Translate;
+    // (undocumented)
     values?: Record<string, any>;
-} | {
-    children: string;
-    fallback?: never;
-    translate?: never;
-    values?: never;
-});
+}
 
 // @public (undocumented)
 export type TextProps<Translate extends Function = Function> = Omit<HTMLSpanElementProps, keyof TextOwnProps> & TextOwnProps<Translate>;

@@ -19,8 +19,8 @@
 }
 
 :where(.cui-menu-link > .cui-label) {
-	--cui-label-inset-vertical: calc(1.5 * var(--cui-gap));
-	--cui-label-inset-horizontal: calc(1.5 * var(--cui-gap));
+	--cui-label--inset-vertical: calc(1.5 * var(--cui-gap));
+	--cui-label--inset-horizontal: calc(1.5 * var(--cui-gap));
 	align-items: center;
 	flex-grow: 1;
 	gap: calc(1.5 * var(--cui-gap));

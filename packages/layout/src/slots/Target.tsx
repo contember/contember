@@ -1,4 +1,4 @@
-import { useClassName, useId, useReferentiallyStableValue } from '@contember/react-utils'
+import { useClassName, useId } from '@contember/react-utils'
 import { assert, dataAttribute, isArrayOfMembersSatisfyingFactory, isNonEmptyArray, isNonEmptyTrimmedString, isSingleWordString, satisfiesOneOfFactory, setHasOneOf } from '@contember/utilities'
 import { snakeCase } from 'change-case'
 import { memo, useLayoutEffect, useRef } from 'react'
@@ -34,33 +34,62 @@ export const Target = memo<SlotTargetProps>(
 	}) => {
 		assert('name is non-empty string without spaces', name, isNameString)
 
-		aliases = aliases ?? [name]
-		assert('aliases is non-empty string or array of non-empty strings', aliases, nonEmptyArrayOfNonEmptyStrings)
-
-		const names = useReferentiallyStableValue(aliases)
+		if (aliases) {
+			assert('aliases is an empty array or an array of names', aliases, nonEmptyArrayOfNonEmptyStrings)
+		}
 
 		const ref = useRef<HTMLElement>(null)
-		const instanceId = useRef(Math.random().toString(36).substring(2, 9)).current
+		const idRef = useRef(Math.random().toString(36).substring(2, 9))
 		const { unregisterSlotTarget, registerSlotTarget } = useTargetsRegistryContext()
 		const activeSlotPortals = useActiveSlotPortalsContext()
 
 		useLayoutEffect(() => {
-			names.forEach(name => {
-				registerSlotTarget(instanceId, name, ref)
-			})
+			const id = idRef.current
+			registerSlotTarget(id, name, ref)
 
 			return () => {
-				names.forEach(name => {
-					unregisterSlotTarget(instanceId, name)
+				unregisterSlotTarget(id, name)
+			}
+		}, [name, registerSlotTarget, unregisterSlotTarget])
+
+		const registeredAliasesRef = useRef<Set<string>>(new Set())
+
+		useLayoutEffect(() => {
+			const id = idRef.current
+
+			if (aliases) {
+				const aliasesSet = new Set(aliases)
+
+				aliasesSet.forEach(name => {
+					if (!registeredAliasesRef.current.has(name)) {
+						registerSlotTarget(id, name, ref)
+						registeredAliasesRef.current.add(name)
+					}
+				})
+
+				registeredAliasesRef.current.forEach(name => {
+					if (!aliasesSet.has(name)) {
+						unregisterSlotTarget(id, name)
+						registeredAliasesRef.current.delete(name)
+					}
 				})
 			}
-		}, [instanceId, names, registerSlotTarget, unregisterSlotTarget])
+
+			const _registeredAliasesRef = registeredAliasesRef
+
+			return () => {
+				_registeredAliasesRef.current.forEach(name => {
+					unregisterSlotTarget(id, name)
+					_registeredAliasesRef.current.delete(name)
+				})
+			}
+		}, [aliases, registerSlotTarget, unregisterSlotTarget])
 
 		const Container = as ?? 'div'
 		const className = useClassName(componentClassName, classNameProp)
 		const key = useId()
 
-		const active = setHasOneOf(activeSlotPortals, names)
+		const active = setHasOneOf(activeSlotPortals, [name, ...aliases ?? []])
 
 		return ((active || fallback)
 			? (
@@ -69,7 +98,7 @@ export const Target = memo<SlotTargetProps>(
 					key={key}
 					{...rest}
 					data-key={key}
-					data-id={instanceId}
+					data-id={idRef.current}
 					data-fallback={dataAttribute(!!fallback)}
 					data-name={dataAttribute(snakeCase(name).replace(/_/g, '-'))}
 					className={className}

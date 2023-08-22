@@ -115,7 +115,7 @@ export const LayoutComponent = ({ children, ...rest }: PropsWithChildren) => {
 									keepVisible
 									header={createSlotTargets(['SidebarRightHeader']) || false}
 									body={createSlotTargets(['Sidebar', 'SidebarRightBody'], (
-										<Slots.Target name="sidebar" aliases={['Sidebar', 'SidebarRightBody']} />
+										<Slots.Target name="Sidebar" aliases={['SidebarRightBody']} />
 									)) || false}
 									footer={createSlotTargets(['SidebarRightFooter']) || false}
 								/>

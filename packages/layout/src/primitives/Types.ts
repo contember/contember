@@ -16,9 +16,9 @@ export const isComponentClassName = satisfiesOneOfFactory(
 	isNonEmptyString,
 )
 
-export interface OwnContainerProps extends ComponentClassNameProps, PropsWithChildren<{
+export type OwnContainerProps = ComponentClassNameProps & PropsWithChildren<{
 	showDataState?: boolean;
-}> { }
+}>
 
 export type ContainerProps = ComponentProps<ContainerComponentType>
 
@@ -30,15 +30,15 @@ export type PanelState = {
 	visibility: PanelVisibility;
 }
 
-export interface PanelBasicProps extends ComponentClassNameProps, PropsWithChildren<{
+export type PanelBasicProps = ComponentClassNameProps & PropsWithChildren<{
 	/**
 	 * If true, when the panel behavior is modal, the focus will be trapped inside the panel.
 	 */
 	trapFocusInModal?: boolean | null | undefined;
 	tabIndex?: never;
-}> { }
+}>
 
-export interface CommonPanelConfigProps {
+export type CommonPanelConfigProps = {
 	/**
 	 * Flex basis of the panel, default is 320 (pixels).
 	 */
@@ -61,25 +61,25 @@ export interface CommonPanelConfigProps {
 	priority?: number | false | null | undefined;
 }
 
-export interface ControlledBehaviorPanelProps {
+export type ControlledBehaviorPanelProps = {
 	behavior: PanelBehavior;
 	defaultBehavior?: null | undefined;
 	onBehaviorChange: (state: PanelState) => void;
 }
 
-export interface UncontrolledBehaviorPanelProps {
+export type UncontrolledBehaviorPanelProps = {
 	behavior?: null | undefined;
 	defaultBehavior: PanelBehavior;
 	onBehaviorChange?: (state: PanelState) => Partial<Omit<PanelState, 'behavior'>> & { passive?: boolean } | null | undefined | void;
 }
 
-export interface ControlledVisibilityPanelProps {
+export type ControlledVisibilityPanelProps = {
 	defaultVisibility?: null | undefined;
 	onVisibilityChange: (state: PanelState) => void;
 	visibility: PanelVisibility;
 }
 
-export interface UncontrolledVisibilityPanelProps {
+export type UncontrolledVisibilityPanelProps = {
 	defaultVisibility: PanelVisibility;
 	onVisibilityChange?: (state: PanelState) => Partial<Omit<PanelState, 'visibility'>> & { passive?: boolean } | null | undefined | void;
 	visibility?: null | undefined;
@@ -114,19 +114,19 @@ export type PanelConfig =
 
 export type PanelComponentType = PolymorphicComponent<'section', OwnPanelProps>
 
-export interface OwnPanelBodyProps extends PropsWithChildren<ComponentClassNameProps> { }
+export type OwnPanelBodyProps = PropsWithChildren<ComponentClassNameProps>
 
 export type PanelBodyProps = ComponentProps<PanelBodyComponentType>
 
 export type PanelBodyComponentType = PolymorphicComponent<'div', OwnPanelBodyProps>
 
-export interface OwnPanelFooterProps extends PropsWithChildren<ComponentClassNameProps> { }
+export type OwnPanelFooterProps = PropsWithChildren<ComponentClassNameProps>
 
 export type PanelFooterProps = ComponentProps<PanelFooterComponentType>
 
 export type PanelFooterComponentType = PolymorphicComponent<'footer', OwnPanelFooterProps>
 
-export interface OwnPanelHeaderProps extends PropsWithChildren<ComponentClassNameProps> { }
+export type OwnPanelHeaderProps = PropsWithChildren<ComponentClassNameProps>
 
 export type PanelHeaderProps = ComponentProps<PanelHeaderComponentType>
 

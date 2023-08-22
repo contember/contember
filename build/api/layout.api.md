@@ -48,21 +48,21 @@ export type BarProps = ComponentProps<BarComponentType>;
 export function combineElementInsets(...insets: Array<Partial<ContainerInsets> | null | undefined>): ContainerInsets;
 
 // @public (undocumented)
-interface CommonPanelConfigProps {
+type CommonPanelConfigProps = {
     basis?: number;
     maxWidth?: number | false | null | undefined;
     minWidth?: number | false | null | undefined;
     name: string;
     priority?: number | false | null | undefined;
-}
+};
 
 // @public (undocumented)
-export interface CommonPanelProps {
+export type CommonPanelProps = {
     body?: ReactNode | ((state: PanelState, panelsState: GetLayoutPanelsStateContextType) => ReactNode);
     children?: never;
     footer?: ReactNode | ((state: PanelState, panelsState: GetLayoutPanelsStateContextType) => ReactNode);
     header?: ReactNode | ((state: PanelState, panelsState: GetLayoutPanelsStateContextType) => ReactNode);
-}
+};
 
 // @public (undocumented)
 export const commonSlots: readonly ("Actions" | "Back" | "Logo" | "Navigation" | "Sidebar" | "Title" | "Profile" | "Switchers")[];
@@ -247,24 +247,18 @@ export const ContentSlotTargets: Readonly<Readonly<{
 }>>;
 
 // @public (undocumented)
-interface ControlledBehaviorPanelProps {
-    // (undocumented)
+type ControlledBehaviorPanelProps = {
     behavior: PanelBehavior;
-    // (undocumented)
     defaultBehavior?: null | undefined;
-    // (undocumented)
     onBehaviorChange: (state: PanelState) => void;
-}
+};
 
 // @public (undocumented)
-interface ControlledVisibilityPanelProps {
-    // (undocumented)
+type ControlledVisibilityPanelProps = {
     defaultVisibility?: null | undefined;
-    // (undocumented)
     onVisibilityChange: (state: PanelState) => void;
-    // (undocumented)
     visibility: PanelVisibility;
-}
+};
 
 // @public (undocumented)
 type ControlPanelProps = (ControlledBehaviorPanelProps | UncontrolledBehaviorPanelProps) & (ControlledVisibilityPanelProps | UncontrolledVisibilityPanelProps) & {
@@ -700,28 +694,26 @@ export type OwnBarStartProps = {
 };
 
 // @public (undocumented)
-interface OwnContainerProps extends ComponentClassNameProps, PropsWithChildren<{
+type OwnContainerProps = ComponentClassNameProps & PropsWithChildren<{
     showDataState?: boolean;
-}> {
-}
+}>;
 
 // @public (undocumented)
-export interface OwnContentPanelProps extends ComponentClassNameProps, CommonPanelProps, Pick<OwnPanelProps, 'basis' | 'maxWidth' | 'minWidth' | 'priority'> {
-}
+export type OwnContentPanelProps = ComponentClassNameProps & CommonPanelProps & Pick<OwnPanelProps, 'basis' | 'maxWidth' | 'minWidth' | 'priority'>;
 
 // @public (undocumented)
-export interface OwnFrameProps extends ComponentClassNameProps {
+export type OwnFrameProps = ComponentClassNameProps & {
     bodyFooter?: ReactNode;
     bodyHeader?: ReactNode;
     footer?: ReactNode;
-    footerClassName?: NestedClassName;
     footerIsFixed?: boolean;
+    footerClassName?: NestedClassName;
     header?: ReactNode;
-    headerClassName?: NestedClassName;
     headerIsFixed?: boolean;
+    headerClassName?: NestedClassName;
     minimumFooterHeight?: number;
     minimumHeaderHeight?: number;
-}
+};
 
 // @public (undocumented)
 export type OwnInsetsConsumerProps = {
@@ -742,16 +734,13 @@ export type OwnInsetsProviderProps = {
 };
 
 // @public (undocumented)
-interface OwnPanelBodyProps extends PropsWithChildren<ComponentClassNameProps> {
-}
+type OwnPanelBodyProps = PropsWithChildren<ComponentClassNameProps>;
 
 // @public (undocumented)
-interface OwnPanelFooterProps extends PropsWithChildren<ComponentClassNameProps> {
-}
+type OwnPanelFooterProps = PropsWithChildren<ComponentClassNameProps>;
 
 // @public (undocumented)
-interface OwnPanelHeaderProps extends PropsWithChildren<ComponentClassNameProps> {
-}
+type OwnPanelHeaderProps = PropsWithChildren<ComponentClassNameProps>;
 
 // @public (undocumented)
 type OwnPanelProps = PanelBasicProps & PanelConfigProps;
@@ -760,10 +749,10 @@ type OwnPanelProps = PanelBasicProps & PanelConfigProps;
 export type OwnResponsiveStackProps = ResponsiveProps<StackOwnProps>;
 
 // @public (undocumented)
-export interface OwnSidebarProps extends ComponentClassNameProps, CommonPanelProps, Pick<OwnPanelProps, 'basis' | 'maxWidth' | 'minWidth' | 'onBehaviorChange' | 'onKeyPress' | 'onVisibilityChange' | 'priority' | 'trapFocusInModal'> {
+export type OwnSidebarProps = ComponentClassNameProps & CommonPanelProps & Pick<OwnPanelProps, 'basis' | 'maxWidth' | 'minWidth' | 'onBehaviorChange' | 'onKeyPress' | 'onVisibilityChange' | 'priority' | 'trapFocusInModal'> & {
     children?: never;
     keepVisible?: boolean | null | undefined;
-}
+};
 
 // @public (undocumented)
 type OwnTargetContainerProps = {
@@ -774,11 +763,10 @@ type OwnTargetContainerProps = {
 const Panel: PanelComponentType;
 
 // @public (undocumented)
-interface PanelBasicProps extends ComponentClassNameProps, PropsWithChildren<{
+type PanelBasicProps = ComponentClassNameProps & PropsWithChildren<{
     trapFocusInModal?: boolean | null | undefined;
     tabIndex?: never;
-}> {
-}
+}>;
 
 // @public (undocumented)
 type PanelBehavior = typeof panelBehaviorsList[number];
@@ -956,13 +944,13 @@ type SetLayoutPanelsStateContextType = {
 type SetLayoutPanelVisibility = LayoutPanelCallback;
 
 // @public (undocumented)
-export interface SidebarComponentAttributes {
+export type SidebarComponentAttributes = {
     BASIS: number;
-    displayName?: string | undefined;
     MAX_WIDTH: number;
     MIN_WIDTH: number;
     NAME: string;
-}
+    displayName?: string | undefined;
+};
 
 // @public (undocumented)
 export type SidebarComponentType = PolymorphicComponent<'aside', OwnSidebarProps>;
@@ -1148,45 +1136,39 @@ const Target: NamedExoticComponent<SlotTargetProps>;
 const TargetsRegistryContext: Context<SlotTargetsRegistryContextType>;
 
 // @public (undocumented)
-export interface ToggleMenuButtonProps extends ComponentClassNameProps {
+export type ToggleMenuButtonProps = ComponentClassNameProps & {
     children?: never;
     labelWhenClosed?: string;
     labelWhenOpen?: string;
     panelName: string;
-}
+};
 
 // @public (undocumented)
-export interface ToggleSidebarButtonProps extends ComponentClassNameProps {
+export type ToggleSidebarButtonProps = ComponentClassNameProps & {
     children?: never;
     labelWhenClosed?: string;
     labelWhenOpen?: string;
     panelName: string;
     position: 'left' | 'right';
-}
+};
 
 // @public (undocumented)
-interface UncontrolledBehaviorPanelProps {
-    // (undocumented)
+type UncontrolledBehaviorPanelProps = {
     behavior?: null | undefined;
-    // (undocumented)
     defaultBehavior: PanelBehavior;
-    // (undocumented)
     onBehaviorChange?: (state: PanelState) => Partial<Omit<PanelState, 'behavior'>> & {
         passive?: boolean;
     } | null | undefined | void;
-}
+};
 
 // @public (undocumented)
-interface UncontrolledVisibilityPanelProps {
-    // (undocumented)
+type UncontrolledVisibilityPanelProps = {
     defaultVisibility: PanelVisibility;
-    // (undocumented)
     onVisibilityChange?: (state: PanelState) => Partial<Omit<PanelState, 'visibility'>> & {
         passive?: boolean;
     } | null | undefined | void;
-    // (undocumented)
     visibility?: null | undefined;
-}
+};
 
 // @public (undocumented)
 type UnregisterLayoutPanel = LayoutPanelCallback;

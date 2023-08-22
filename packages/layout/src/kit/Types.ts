@@ -2,7 +2,7 @@ import { ComponentClassNameProps, NestedClassName, PolymorphicComponent } from '
 import { ComponentProps, ReactNode } from 'react'
 import { GetLayoutPanelsStateContextType, OwnPanelProps, PanelState } from '../primitives'
 
-export interface OwnFrameProps extends ComponentClassNameProps {
+export type OwnFrameProps = ComponentClassNameProps & {
 	/**
 	 * Content of frame body footer.
 	 */
@@ -49,7 +49,7 @@ export type FrameProps = ComponentProps<FrameComponentType>
 
 export type FrameComponentType = PolymorphicComponent<'div', OwnFrameProps>
 
-export interface CommonPanelProps {
+export type CommonPanelProps = {
 	/**
 	 * Content of the panel. If you need to access the state of the panel, you can pass a function instead. The function will be called with the state of the panel and the state of all panels.
 	 */
@@ -68,8 +68,7 @@ export interface CommonPanelProps {
 	header?: ReactNode | ((state: PanelState, panelsState: GetLayoutPanelsStateContextType) => ReactNode);
 }
 
-export interface OwnContentPanelProps extends ComponentClassNameProps, CommonPanelProps, Pick<OwnPanelProps, 'basis' | 'maxWidth' | 'minWidth' | 'priority'> {
-}
+export type OwnContentPanelProps = ComponentClassNameProps & CommonPanelProps & Pick<OwnPanelProps, 'basis' | 'maxWidth' | 'minWidth' | 'priority'>
 
 export type ContentPanelProps = ComponentProps<ContentPanelComponentType>
 
@@ -130,23 +129,26 @@ export type BarProps = ComponentProps<BarComponentType>
 
 export type BarComponentType = PolymorphicComponent<'div', OwnBarProps>
 
-
-export interface OwnSidebarProps extends ComponentClassNameProps, CommonPanelProps, Pick<OwnPanelProps, 'basis' | 'maxWidth' | 'minWidth' | 'onBehaviorChange' | 'onKeyPress' | 'onVisibilityChange' | 'priority' | 'trapFocusInModal'> {
-	/**
-	 * Use `header`, `body` and `footer` props instead.
-	 */
-	children?: never;
-	/**
-	 * When set true, the sidebar will become visible when possible automatically.
-	 */
-	keepVisible?: boolean | null | undefined;
-}
+export type OwnSidebarProps =
+	& ComponentClassNameProps
+	& CommonPanelProps
+	& Pick<OwnPanelProps, 'basis' | 'maxWidth' | 'minWidth' | 'onBehaviorChange' | 'onKeyPress' | 'onVisibilityChange' | 'priority' | 'trapFocusInModal'>
+	& {
+		/**
+		 * Use `header`, `body` and `footer` props instead.
+		 */
+		children?: never;
+		/**
+		 * When set true, the sidebar will become visible when possible automatically.
+		 */
+		keepVisible?: boolean | null | undefined;
+	}
 
 export type SidebarProps = ComponentProps<SidebarComponentType>
 
 export type SidebarComponentType = PolymorphicComponent<'aside', OwnSidebarProps>
 
-export interface SidebarComponentAttributes {
+export type SidebarComponentAttributes = {
 	/**
 	 * The basis of the sidebar.
 	 */
@@ -169,7 +171,7 @@ export interface SidebarComponentAttributes {
 	displayName?: string | undefined;
 }
 
-export interface ToggleMenuButtonProps extends ComponentClassNameProps {
+export type ToggleMenuButtonProps = ComponentClassNameProps & {
 	/**
 	 * Button has no children.
 	 */
@@ -188,7 +190,7 @@ export interface ToggleMenuButtonProps extends ComponentClassNameProps {
 	panelName: string;
 }
 
-export interface ToggleSidebarButtonProps extends ComponentClassNameProps {
+export type ToggleSidebarButtonProps = ComponentClassNameProps & {
 	/**
 	 * Button has no children.
 	 */

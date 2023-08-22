@@ -1,4 +1,4 @@
-import { assert, fallback, isNonEmptyTrimmedString, isNonNegativeNumber, isNotNullish, number } from '@contember/utilities'
+import { assert, fallback, isNonEmptyTrimmedString, isNonNegativeNumber, isNotNullish, numberOrFallback } from '@contember/utilities'
 import { MaybePanelBehavior, MaybePanelVisibility, PanelBehavior, PanelConfig, PanelVisibility, isOneOfPanelBehaviors, isOneOfPanelVisibilities } from './Types'
 
 export function parsePanelsState(currentlyActivePanel: string | undefined, panels: Map<string, PanelConfig>) {
@@ -51,7 +51,7 @@ export function parsePanelsState(currentlyActivePanel: string | undefined, panel
 		resultingVisibilities.set(name, behavior === 'static' ? 'visible' : visibility)
 		resultingBehaviors.set(name, behavior)
 
-		const size = Math.max(number(panel.minWidth, 0), panel.basis)
+		const size = Math.max(numberOrFallback(panel.minWidth, 0), panel.basis)
 		assert('panel size is is non negative number', size, isNonNegativeNumber)
 
 		switch (behavior) {
@@ -89,7 +89,7 @@ export function parsePanelsState(currentlyActivePanel: string | undefined, panel
 				if (difference !== 0) {
 					return difference
 				} else {
-					difference = number(b.priority, -1) - number(a.priority, -1)
+					difference = numberOrFallback(b.priority, -1) - numberOrFallback(a.priority, -1)
 
 					return difference
 				}

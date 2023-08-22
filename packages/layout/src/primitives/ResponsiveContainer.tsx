@@ -1,5 +1,5 @@
 import { useClassName, useContainerWidth } from '@contember/react-utils'
-import { assert, dataAttribute, isNotNullish, number } from '@contember/utilities'
+import { assert, dataAttribute, isNotNullish, numberOrFallback } from '@contember/utilities'
 import { forwardRef, memo, useLayoutEffect, useMemo, useRef } from 'react'
 import { GetLayoutPanelsStateContext, GetLayoutPanelsStateContextType, useGetLayoutPanelsStateContext } from './Contexts'
 import { ContainerComponentType, PanelConfig } from './Types'
@@ -34,7 +34,7 @@ export const ResponsiveContainer: ContainerComponentType = memo(forwardRef(({
 			let modalsCount = 0
 
 			groups.collapsiblePanels.forEach(({ name, basis, minWidth }) => {
-				const size = number(minWidth, basis)
+				const size = numberOrFallback(minWidth, basis)
 				const visibility = maps.requestedVisibilities.get(name)
 				const possibleBehavior = availableSpaceForAllCollapsiblePanels >= size ? 'static' : 'modal'
 

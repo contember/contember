@@ -1,5 +1,4 @@
 export * from './extend'
-export * from './number'
 export * from './omit'
 export * from './pick'
 export * from './range'

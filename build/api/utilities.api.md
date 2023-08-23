@@ -233,9 +233,6 @@ export type NonOptional<T> = {
     [P in keyof Required<T>]: Pick<T, P> extends Required<Pick<T, P>> ? T[P] : (T[P] | undefined);
 };
 
-// @public
-export function numberOrFallback(value: unknown, fallback: number): number;
-
 // @public (undocumented)
 export type ObjectKeyValue<T, K extends keyof T> = T extends {
     [P in K]: T[P];

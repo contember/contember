@@ -4,6 +4,7 @@
 	"references": [
 		{ "path": "./ee/engine-server-ee" },
 		{ "path": "./ee/engine-actions" },
+		{ "path": "./packages/actions-client"},
 		{ "path": "./packages/authorization" },
 		{ "path": "./packages/cli" },
 		{ "path": "./packages/cli-common" },

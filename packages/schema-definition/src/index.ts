@@ -7,6 +7,7 @@ import { createSchema } from './createSchema'
 export { AllowAllPermissionFactory } from '@contember/schema-utils'
 export { PermissionsBuilder } from './acl/builder/PermissionsBuilder'
 export * from './model'
+export * from './presets'
 
 export { AclDefinition, ActionsDefinition, SchemaDefinition, InputValidation, createSchema }
 

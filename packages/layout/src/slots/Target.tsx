@@ -28,6 +28,7 @@ export const Target = memo<SlotTargetProps>(
 		aliases,
 		componentClassName = 'slot',
 		className: classNameProp,
+		display,
 		fallback,
 		name,
 		...rest
@@ -98,6 +99,7 @@ export const Target = memo<SlotTargetProps>(
 					key={key}
 					{...rest}
 					data-key={key}
+					data-display={dataAttribute(display ?? (as === undefined ? true : undefined))}
 					data-id={idRef.current}
 					data-fallback={dataAttribute(!!fallback)}
 					data-name={dataAttribute(snakeCase(name).replace(/_/g, '-'))}

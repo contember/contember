@@ -1115,6 +1115,7 @@ type SlotTargetProps<Name extends string = string> = ComponentClassNameProps & {
     fallback?: ReactNode;
     name: Name;
     aliases?: [Name, ...Name[]];
+    display?: boolean | 'contents' | 'block' | 'flex' | 'grid' | 'inline' | 'inline-flex' | 'inline-grid' | 'inline-block' | 'inherit' | 'initial' | 'none' | 'unset';
 };
 
 // @public (undocumented)

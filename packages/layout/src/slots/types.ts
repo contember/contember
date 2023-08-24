@@ -1,5 +1,5 @@
 import { ComponentClassNameProps, PascalCase } from '@contember/utilities'
-import { ComponentType, ElementType, ReactNode } from 'react'
+import { CSSProperties, ComponentType, ElementType, ReactNode } from 'react'
 import { createSlotSourceComponent } from './createSlotSourceComponent'
 import { createSlotTargetComponent } from './createSlotTargetComponent'
 
@@ -49,4 +49,8 @@ export type SlotTargetProps<Name extends string = string> = ComponentClassNamePr
 	 * E.g. when you know that `Sidebar` and `SidebarBody` slot sources result in the same target.
 	 */
 	aliases?: [Name, ...Name[]];
+	/**
+	 * Controls the display of the target element, default is 'contents'.
+	 */
+	display?: boolean | 'contents' | 'block' | 'flex' | 'grid' | 'inline' | 'inline-flex' | 'inline-grid' | 'inline-block' | 'inherit' | 'initial' | 'none' | 'unset';
 }

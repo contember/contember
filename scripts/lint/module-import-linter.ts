@@ -42,7 +42,11 @@ const processPackage = async (dir: string, projectList: ProjectList) => {
 					if (moduleMatch[2] && !allowedDirectoryImports.has(module)) {
 						errors.push({ file, message: `Forbidden file/directory import found: ${module}` })
 					}
-					imports.add(moduleMatch[1])
+					const isTypeImport = node.kind === ts.SyntaxKind.ImportDeclaration
+						&& (node as ts.ImportDeclaration).importClause?.isTypeOnly;
+					if (!isTypeImport) {
+						imports.add(moduleMatch[1])
+					}
 				}
 			}
 		})

@@ -3,59 +3,59 @@ import { JSONObject } from './json'
 
 export namespace ActionsPayload {
 	export type UpdateEvent = {
-		operation: 'update'
-		entity: string
-		id: Input.PrimaryValue
-		values: JSONObject
-		old?: JSONObject
-		selection?: any
-		path?: string[]
+		readonly operation: 'update'
+		readonly entity: string
+		readonly id: Input.PrimaryValue
+		readonly values: JSONObject
+		readonly old?: JSONObject
+		readonly selection?: JSONObject
+		readonly path?: readonly string[]
 	}
 
 	export type CreateEvent = {
-		operation: 'create'
-		entity: string
-		id: Input.PrimaryValue
-		values: JSONObject
-		selection?: any
-		path?: string[]
+		readonly operation: 'create'
+		readonly entity: string
+		readonly id: Input.PrimaryValue
+		readonly values: JSONObject
+		readonly selection?: JSONObject
+		readonly path?: readonly string[]
 	}
 
 	export type DeleteEvent = {
-		operation: 'delete'
-		entity: string
-		id: Input.PrimaryValue
-		selection?: any
-		path?: string[]
+		readonly operation: 'delete'
+		readonly entity: string
+		readonly id: Input.PrimaryValue
+		readonly selection?: JSONObject
+		readonly path?: readonly string[]
 	}
 
 	export type JunctionConnectEvent = {
-		operation: 'junction_connect'
-		entity: string
-		id: Input.PrimaryValue
-		relation: string
-		inverseId: Input.PrimaryValue
-		selection?: any
-		path?: string[]
+		readonly operation: 'junction_connect'
+		readonly entity: string
+		readonly id: Input.PrimaryValue
+		readonly relation: string
+		readonly inverseId: Input.PrimaryValue
+		readonly selection?: JSONObject
+		readonly path?: readonly string[]
 	}
 
 	export type JunctionDisconnectEvent = {
-		operation: 'junction_disconnect'
-		entity: string
-		id: Input.PrimaryValue
-		relation: string
-		inverseId: Input.PrimaryValue
-		selection?: any
-		path?: string[]
+		readonly operation: 'junction_disconnect'
+		readonly entity: string
+		readonly id: Input.PrimaryValue
+		readonly relation: string
+		readonly inverseId: Input.PrimaryValue
+		readonly selection?: JSONObject
+		readonly path?: readonly string[]
 	}
 
 	export type WatchEventPayload = {
-		operation: 'watch'
-		trigger: string
-		entity: string
-		id: Input.PrimaryValue
-		events: BaseEventPayload[]
-		selection?: any
+		readonly operation: 'watch'
+		readonly trigger: string
+		readonly entity: string
+		readonly id: Input.PrimaryValue
+		readonly events: readonly BaseEventPayload[]
+		readonly selection?: JSONObject
 	}
 
 	export type BaseEventPayload =
@@ -68,7 +68,7 @@ export namespace ActionsPayload {
 	export type BasicEventPayload =
 		& BaseEventPayload
 		& {
-			trigger: string
+			readonly trigger: string
 		}
 
 	export type AnyEventPayload =
@@ -76,28 +76,32 @@ export namespace ActionsPayload {
 		| WatchEventPayload
 
 
+	export type WebhookMeta = {
+		readonly eventId: string
+		readonly transactionId: string
+		readonly createdAt: string
+		readonly lastStateChange: string
+		readonly numRetries: number
+		readonly trigger: string
+		readonly target: string
+	}
+
 	export type WebhookEvent =
 		& AnyEventPayload
 		& {
-			meta: {
-				eventId: string
-				transactionId: string
-				createdAt: string
-				lastStateChange: string
-				numRetries: number
-				trigger: string
-				target: string
-			}
+			readonly meta: WebhookMeta
 		}
 
 	export type WebhookRequestPayload = {
-		events: WebhookEvent[]
+		readonly events: readonly WebhookEvent[]
+	}
+
+	export type WebhookResponseFailure = {
+		readonly eventId: string
+		readonly error?: string
 	}
 
 	export type WebhookResponsePayload = {
-		failures: {
-			eventId: string
-			error?: string
-		}
+		readonly failures: readonly WebhookResponseFailure[]
 	}
 }

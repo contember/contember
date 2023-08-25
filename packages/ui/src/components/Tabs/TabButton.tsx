@@ -43,11 +43,9 @@ export const TabButton = memo(forwardRef<HTMLButtonElement, TabButtonProps>(({
 			ref={ref}
 			disabled={isDisabled}
 		>
-			<span className={componentClassName('label')}>
-				{typeof children === 'string'
-					? <Label isActive={isSelected} isDisabled={isDisabled} isFocused={isFocused && isFocusVisible}>{children}</Label>
-					: children}
-			</span>
+			{typeof children === 'string'
+				? <Label className={componentClassName('label')} isActive={isSelected} isDisabled={isDisabled} isFocused={isFocused && isFocusVisible}>{children}</Label>
+				: children}
 		</button>
 	)
 }))

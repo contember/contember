@@ -9,7 +9,6 @@
 	border: none;
 	border-radius: var(--cui-gap);
 	color: inherit;
-	display: inline-flex;
 	gap: var(--cui-gap);
 	font-family: inherit;
 	font-size: var(--cui-font-size--label);

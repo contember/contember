@@ -190,6 +190,8 @@ export const Box = memo(forwardRef<HTMLDivElement, BoxProps>(({
 					evenly={evenly}
 					gap={gap}
 					horizontal={horizontal}
+					align={align}
+					justify={justify}
 				>
 					{typeof children === 'string' || typeof children === 'number'
 						? <Text>{children}</Text>

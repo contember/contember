@@ -1,5 +1,5 @@
 import { useClassName } from '@contember/react-utils'
-import { ComponentClassNameProps, assert } from '@contember/utilities'
+import { ComponentClassNameProps, PolymorphicComponent, assert } from '@contember/utilities'
 import { ReactNode, forwardRef, memo } from 'react'
 import { HTMLSpanElementProps } from '../../types'
 
@@ -11,10 +11,10 @@ export interface TextOwnProps<Translate extends Function = Function> extends Com
 }
 
 export type TextProps<Translate extends Function = Function> =
-	& Omit<HTMLSpanElementProps, keyof TextOwnProps>
 	& TextOwnProps<Translate>
 
-export const Text = memo(forwardRef<HTMLSpanElement, TextProps>(({
+export const Text: PolymorphicComponent<'span', TextProps> = memo(forwardRef(({
+	as: Container = 'span',
 	children,
 	className: classNameProp,
 	componentClassName = ['view', 'text'],
@@ -36,13 +36,13 @@ export const Text = memo(forwardRef<HTMLSpanElement, TextProps>(({
 	}
 
 	return (
-		<span
+		<Container
 			ref={forwardedRef}
 			{...props}
 			className={className}
 		>
 			{children}
-		</span>
+		</Container>
 	)
 }))
 Text.displayName = 'Interface.Text'

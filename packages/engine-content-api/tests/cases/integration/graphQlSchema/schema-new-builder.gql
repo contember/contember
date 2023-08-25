@@ -402,8 +402,8 @@ input CategoryWithoutPostsCreateInput {
 }
 
 input PostConnectOrCreateCategoriesRelationInput {
-  connect: CategoryUniqueWhere
-  create: CategoryWithoutPostsCreateInput
+  connect: CategoryUniqueWhere!
+  create: CategoryWithoutPostsCreateInput!
 }
 
 input PostCreateLocalesEntityRelationInput {
@@ -420,13 +420,13 @@ input PostLocaleWithoutPostCreateInput {
 }
 
 input PostConnectOrCreateLocalesRelationInput {
-  connect: PostLocaleUniqueWhere
-  create: PostLocaleWithoutPostCreateInput
+  connect: PostLocaleUniqueWhere!
+  create: PostLocaleWithoutPostCreateInput!
 }
 
 input AuthorConnectOrCreatePostsRelationInput {
-  connect: PostUniqueWhere
-  create: PostWithoutAuthorCreateInput
+  connect: PostUniqueWhere!
+  create: PostWithoutAuthorCreateInput!
 }
 
 input AuthorUpdateInput {
@@ -446,8 +446,8 @@ input AuthorUpdatePostsEntityRelationInput {
 }
 
 input AuthorUpdatePostsRelationInput {
-  by: PostUniqueWhere
-  data: PostWithoutAuthorUpdateInput
+  by: PostUniqueWhere!
+  data: PostWithoutAuthorUpdateInput!
 }
 
 input PostWithoutAuthorUpdateInput {
@@ -469,8 +469,8 @@ input PostUpdateCategoriesEntityRelationInput {
 }
 
 input PostUpdateCategoriesRelationInput {
-  by: CategoryUniqueWhere
-  data: CategoryWithoutPostsUpdateInput
+  by: CategoryUniqueWhere!
+  data: CategoryWithoutPostsUpdateInput!
 }
 
 input CategoryWithoutPostsUpdateInput {
@@ -479,9 +479,9 @@ input CategoryWithoutPostsUpdateInput {
 }
 
 input PostUpsertCategoriesRelationInput {
-  by: CategoryUniqueWhere
-  update: CategoryWithoutPostsUpdateInput
-  create: CategoryWithoutPostsCreateInput
+  by: CategoryUniqueWhere!
+  update: CategoryWithoutPostsUpdateInput!
+  create: CategoryWithoutPostsCreateInput!
 }
 
 input PostUpdateLocalesEntityRelationInput {
@@ -495,8 +495,8 @@ input PostUpdateLocalesEntityRelationInput {
 }
 
 input PostUpdateLocalesRelationInput {
-  by: PostLocaleUniqueWhere
-  data: PostLocaleWithoutPostUpdateInput
+  by: PostLocaleUniqueWhere!
+  data: PostLocaleWithoutPostUpdateInput!
 }
 
 input PostLocaleWithoutPostUpdateInput {
@@ -506,15 +506,15 @@ input PostLocaleWithoutPostUpdateInput {
 }
 
 input PostUpsertLocalesRelationInput {
-  by: PostLocaleUniqueWhere
-  update: PostLocaleWithoutPostUpdateInput
-  create: PostLocaleWithoutPostCreateInput
+  by: PostLocaleUniqueWhere!
+  update: PostLocaleWithoutPostUpdateInput!
+  create: PostLocaleWithoutPostCreateInput!
 }
 
 input AuthorUpsertPostsRelationInput {
-  by: PostUniqueWhere
-  update: PostWithoutAuthorUpdateInput
-  create: PostWithoutAuthorCreateInput
+  by: PostUniqueWhere!
+  update: PostWithoutAuthorUpdateInput!
+  create: PostWithoutAuthorCreateInput!
 }
 
 input PostCreateInput {
@@ -538,8 +538,8 @@ input AuthorWithoutPostsCreateInput {
 }
 
 input PostConnectOrCreateAuthorRelationInput {
-  connect: AuthorUniqueWhere
-  create: AuthorWithoutPostsCreateInput
+  connect: AuthorUniqueWhere!
+  create: AuthorWithoutPostsCreateInput!
 }
 
 input PostUpdateInput {
@@ -567,8 +567,8 @@ input AuthorWithoutPostsUpdateInput {
 }
 
 input PostUpsertAuthorRelationInput {
-  update: AuthorWithoutPostsUpdateInput
-  create: AuthorWithoutPostsCreateInput
+  update: AuthorWithoutPostsUpdateInput!
+  create: AuthorWithoutPostsCreateInput!
 }
 
 input PostLocaleCreateInput {
@@ -593,8 +593,8 @@ input PostWithoutLocalesCreateInput {
 }
 
 input PostLocaleConnectOrCreatePostRelationInput {
-  connect: PostUniqueWhere
-  create: PostWithoutLocalesCreateInput
+  connect: PostUniqueWhere!
+  create: PostWithoutLocalesCreateInput!
 }
 
 input PostLocaleUpdateInput {
@@ -623,8 +623,8 @@ input PostWithoutLocalesUpdateInput {
 }
 
 input PostLocaleUpsertPostRelationInput {
-  update: PostWithoutLocalesUpdateInput
-  create: PostWithoutLocalesCreateInput
+  update: PostWithoutLocalesUpdateInput!
+  create: PostWithoutLocalesCreateInput!
 }
 
 input CategoryCreateInput {
@@ -649,8 +649,8 @@ input PostWithoutCategoriesCreateInput {
 }
 
 input CategoryConnectOrCreatePostsRelationInput {
-  connect: PostUniqueWhere
-  create: PostWithoutCategoriesCreateInput
+  connect: PostUniqueWhere!
+  create: PostWithoutCategoriesCreateInput!
 }
 
 input CategoryUpdateInput {
@@ -670,8 +670,8 @@ input CategoryUpdatePostsEntityRelationInput {
 }
 
 input CategoryUpdatePostsRelationInput {
-  by: PostUniqueWhere
-  data: PostWithoutCategoriesUpdateInput
+  by: PostUniqueWhere!
+  data: PostWithoutCategoriesUpdateInput!
 }
 
 input PostWithoutCategoriesUpdateInput {
@@ -683,9 +683,9 @@ input PostWithoutCategoriesUpdateInput {
 }
 
 input CategoryUpsertPostsRelationInput {
-  by: PostUniqueWhere
-  update: PostWithoutCategoriesUpdateInput
-  create: PostWithoutCategoriesCreateInput
+  by: PostUniqueWhere!
+  update: PostWithoutCategoriesUpdateInput!
+  create: PostWithoutCategoriesCreateInput!
 }
 
 type QueryTransaction {

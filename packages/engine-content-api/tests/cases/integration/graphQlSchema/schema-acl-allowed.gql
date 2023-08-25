@@ -190,8 +190,8 @@ input RootWithoutRCreateInput {
 }
 
 input OneHasManyEntityConnectOrCreateR2RelationInput {
-  connect: RootUniqueWhere
-  create: RootWithoutRCreateInput
+  connect: RootUniqueWhere!
+  create: RootWithoutRCreateInput!
 }
 
 input OneHasManyEntityUpdateInput {
@@ -216,8 +216,8 @@ input RootWithoutRUpdateInput {
 }
 
 input OneHasManyEntityUpsertR2RelationInput {
-  update: RootWithoutRUpdateInput
-  create: RootWithoutRCreateInput
+  update: RootWithoutRUpdateInput!
+  create: RootWithoutRCreateInput!
 }
 
 type RootConnection {
@@ -248,8 +248,8 @@ input OneHasManyEntityWithoutR2CreateInput {
 }
 
 input RootConnectOrCreateRRelationInput {
-  connect: OneHasManyEntityUniqueWhere
-  create: OneHasManyEntityWithoutR2CreateInput
+  connect: OneHasManyEntityUniqueWhere!
+  create: OneHasManyEntityWithoutR2CreateInput!
 }
 
 input RootUpdateInput {
@@ -269,8 +269,8 @@ input RootUpdateREntityRelationInput {
 }
 
 input RootUpdateRRelationInput {
-  by: OneHasManyEntityUniqueWhere
-  data: OneHasManyEntityWithoutR2UpdateInput
+  by: OneHasManyEntityUniqueWhere!
+  data: OneHasManyEntityWithoutR2UpdateInput!
 }
 
 input OneHasManyEntityWithoutR2UpdateInput {
@@ -279,9 +279,9 @@ input OneHasManyEntityWithoutR2UpdateInput {
 }
 
 input RootUpsertRRelationInput {
-  by: OneHasManyEntityUniqueWhere
-  update: OneHasManyEntityWithoutR2UpdateInput
-  create: OneHasManyEntityWithoutR2CreateInput
+  by: OneHasManyEntityUniqueWhere!
+  update: OneHasManyEntityWithoutR2UpdateInput!
+  create: OneHasManyEntityWithoutR2CreateInput!
 }
 
 type QueryTransaction {

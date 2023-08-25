@@ -1,5 +1,5 @@
 import { Accessor, Interface, singletonFactory } from '../../utils'
-import { GraphQLInputObjectType } from 'graphql'
+import { GraphQLInputObjectType, GraphQLNonNull } from 'graphql'
 import { GqlTypeName } from '../utils'
 import { WhereTypeProvider } from '../WhereTypeProvider'
 import { EntityInputProvider, EntityInputType } from './EntityInputProvider'
@@ -43,8 +43,8 @@ export class ConnectOrCreateRelationInputProvider {
 				return new GraphQLInputObjectType({
 					name: GqlTypeName`${entity.name}ConnectOrCreate${relation.name}RelationInput`,
 					fields: () => ({
-						connect: { type: uniqueWhere },
-						create: { type: createInput },
+						connect: { type: new GraphQLNonNull(uniqueWhere) },
+						create: { type: new GraphQLNonNull(createInput) },
 					}),
 				})
 			},

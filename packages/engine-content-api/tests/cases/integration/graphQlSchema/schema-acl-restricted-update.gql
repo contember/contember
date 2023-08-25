@@ -184,8 +184,8 @@ input RootWithoutRCreateInput {
 }
 
 input OneHasManyEntityConnectOrCreateR2RelationInput {
-  connect: RootUniqueWhere
-  create: RootWithoutRCreateInput
+  connect: RootUniqueWhere!
+  create: RootWithoutRCreateInput!
 }
 
 type RootConnection {
@@ -215,8 +215,8 @@ input OneHasManyEntityWithoutR2CreateInput {
 }
 
 input RootConnectOrCreateRRelationInput {
-  connect: OneHasManyEntityUniqueWhere
-  create: OneHasManyEntityWithoutR2CreateInput
+  connect: OneHasManyEntityUniqueWhere!
+  create: OneHasManyEntityWithoutR2CreateInput!
 }
 
 input RootUpdateInput {

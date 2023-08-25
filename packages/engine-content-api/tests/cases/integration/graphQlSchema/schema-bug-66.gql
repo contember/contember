@@ -241,13 +241,13 @@ input VideoWithoutFrontPageCreateInput {
 }
 
 input FrontPageConnectOrCreateInHouseVideosRelationInput {
-  connect: VideoUniqueWhere
-  create: VideoWithoutFrontPageCreateInput
+  connect: VideoUniqueWhere!
+  create: VideoWithoutFrontPageCreateInput!
 }
 
 input VideoConnectOrCreateFrontPageForIntroRelationInput {
-  connect: FrontPageUniqueWhere
-  create: FrontPageWithoutIntroVideoCreateInput
+  connect: FrontPageUniqueWhere!
+  create: FrontPageWithoutIntroVideoCreateInput!
 }
 
 input VideoCreateFrontPageEntityRelationInput {
@@ -275,13 +275,13 @@ input VideoWithoutFrontPageForIntroCreateInput {
 }
 
 input FrontPageConnectOrCreateIntroVideoRelationInput {
-  connect: VideoUniqueWhere
-  create: VideoWithoutFrontPageForIntroCreateInput
+  connect: VideoUniqueWhere!
+  create: VideoWithoutFrontPageForIntroCreateInput!
 }
 
 input VideoConnectOrCreateFrontPageRelationInput {
-  connect: FrontPageUniqueWhere
-  create: FrontPageWithoutInHouseVideosCreateInput
+  connect: FrontPageUniqueWhere!
+  create: FrontPageWithoutInHouseVideosCreateInput!
 }
 
 input VideoUpdateInput {
@@ -318,8 +318,8 @@ input FrontPageUpdateInHouseVideosEntityRelationInput {
 }
 
 input FrontPageUpdateInHouseVideosRelationInput {
-  by: VideoUniqueWhere
-  data: VideoWithoutFrontPageUpdateInput
+  by: VideoUniqueWhere!
+  data: VideoWithoutFrontPageUpdateInput!
 }
 
 input VideoWithoutFrontPageUpdateInput {
@@ -329,14 +329,14 @@ input VideoWithoutFrontPageUpdateInput {
 }
 
 input FrontPageUpsertInHouseVideosRelationInput {
-  by: VideoUniqueWhere
-  update: VideoWithoutFrontPageUpdateInput
-  create: VideoWithoutFrontPageCreateInput
+  by: VideoUniqueWhere!
+  update: VideoWithoutFrontPageUpdateInput!
+  create: VideoWithoutFrontPageCreateInput!
 }
 
 input VideoUpsertFrontPageForIntroRelationInput {
-  update: FrontPageWithoutIntroVideoUpdateInput
-  create: FrontPageWithoutIntroVideoCreateInput
+  update: FrontPageWithoutIntroVideoUpdateInput!
+  create: FrontPageWithoutIntroVideoCreateInput!
 }
 
 input VideoUpdateFrontPageEntityRelationInput {
@@ -372,13 +372,13 @@ input VideoWithoutFrontPageForIntroUpdateInput {
 }
 
 input FrontPageUpsertIntroVideoRelationInput {
-  update: VideoWithoutFrontPageForIntroUpdateInput
-  create: VideoWithoutFrontPageForIntroCreateInput
+  update: VideoWithoutFrontPageForIntroUpdateInput!
+  create: VideoWithoutFrontPageForIntroCreateInput!
 }
 
 input VideoUpsertFrontPageRelationInput {
-  update: FrontPageWithoutInHouseVideosUpdateInput
-  create: FrontPageWithoutInHouseVideosCreateInput
+  update: FrontPageWithoutInHouseVideosUpdateInput!
+  create: FrontPageWithoutInHouseVideosCreateInput!
 }
 
 type FrontPageConnection {

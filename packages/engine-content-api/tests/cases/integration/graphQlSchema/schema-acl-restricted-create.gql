@@ -206,8 +206,8 @@ input RootUpdateREntityRelationInput {
 }
 
 input RootUpdateRRelationInput {
-  by: OneHasManyEntityUniqueWhere
-  data: OneHasManyEntityWithoutR2UpdateInput
+  by: OneHasManyEntityUniqueWhere!
+  data: OneHasManyEntityWithoutR2UpdateInput!
 }
 
 input OneHasManyEntityWithoutR2UpdateInput {

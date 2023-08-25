@@ -8,15 +8,23 @@
 
 :where(.cui-layout-bar-body) {
 	display: flex;
-	flex: 1 0 auto;
 	flex-direction: row;
-	min-width: 0px;
+	flex: 1 0 auto;
+	margin: auto;
 	max-width: 100%;
+	min-width: 0px;
+	width: min(100%, 80rem);
 }
 
-:where(.cui-layout-bar-body) {
-	margin: auto;
-	width: min(100%, 80rem);
+:where(.cui-layout-frame-header, .cui-layout-frame-footer) :where(.cui-layout-bar:not(:first-child):not(:last-child)) {
+	margin-top: calc(-1 * var(--cui-padding--panel-vertical));
+	margin-bottom: calc(-1 * var(--cui-padding--panel-vertical));
+}
+:where(.cui-layout-frame-header, .cui-layout-frame-footer) :where(.cui-layout-bar:not(:first-child)) {
+	margin-top: calc(-1 * var(--cui-padding--panel-vertical));
+}
+:where(.cui-layout-frame-header, .cui-layout-frame-footer) :where(.cui-layout-bar:not(:last-child)) {
+	margin-bottom: calc(-1 * var(--cui-padding--panel-vertical));
 }
 
 :where(

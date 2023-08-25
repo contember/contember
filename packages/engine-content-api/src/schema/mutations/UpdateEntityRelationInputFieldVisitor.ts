@@ -2,7 +2,7 @@ import {
 	GraphQLBoolean,
 	GraphQLInputFieldConfig,
 	GraphQLInputFieldConfigMap,
-	GraphQLInputObjectType,
+	GraphQLInputObjectType, GraphQLNonNull,
 	GraphQLString,
 } from 'graphql'
 import { Acl, Input, Model } from '@contember/schema'
@@ -37,7 +37,8 @@ export class UpdateEntityRelationInputFieldVisitor implements Model.ColumnVisito
 	public visitHasOne({ targetRelation, targetEntity, relation, entity }: Model.AnyHasOneRelationContext) {
 		const withoutRelation = targetRelation ? targetRelation.name : undefined
 
-		const whereInput = this.createWhereInput(targetEntity)
+		const whereInputType = this.createUniqueWhereInput(targetEntity)
+		const whereInput = whereInputType ? { type: whereInputType } : undefined
 
 		const createInputType = this.createEntityInputProvider.getInput(targetEntity.name, withoutRelation)
 		const createInput = createInputType ? { type: createInputType } : undefined
@@ -45,13 +46,13 @@ export class UpdateEntityRelationInputFieldVisitor implements Model.ColumnVisito
 		const updateInputType = this.updateEntityInputProviderAccessor.get().getInput(targetEntity.name, withoutRelation)
 		const updateInput = updateInputType ? {  type: updateInputType } : undefined
 
-		const upsertInput = updateInput && createInput
+		const upsertInput = updateInputType && createInputType
 			? {
 				type: new GraphQLInputObjectType({
 					name: GqlTypeName`${entity.name}Upsert${relation.name}RelationInput`,
 					fields: () => ({
-						update: updateInput,
-						create: createInput,
+						update: { type: new GraphQLNonNull(updateInputType) },
+						create: { type: new GraphQLNonNull(createInputType) },
 					}),
 				}),
 			}
@@ -61,7 +62,7 @@ export class UpdateEntityRelationInputFieldVisitor implements Model.ColumnVisito
 			type: GraphQLBoolean,
 		}
 
-		const connectOrCreateInput = createInput && whereInput
+		const connectOrCreateInput = createInput && whereInputType
 			? { type: this.connectOrCreateRelationInputProvider.getInput(entity.name, relation.name) }
 			: undefined
 
@@ -89,34 +90,34 @@ export class UpdateEntityRelationInputFieldVisitor implements Model.ColumnVisito
 	public visitHasMany({ entity, relation, targetEntity, targetRelation }: Model.AnyHasManyRelationContext) {
 		const withoutRelation = targetRelation ? targetRelation.name : undefined
 
-		const whereInput = this.createWhereInput(targetEntity)
+		const whereInputType = this.createUniqueWhereInput(targetEntity)
+		const whereInput = whereInputType ? { type: whereInputType } : undefined
 
 		const createInputType = this.createEntityInputProvider.getInput(targetEntity.name, withoutRelation)
 		const createInput = createInputType ? { type: createInputType } : undefined
 
 		const updateInputType = this.updateEntityInputProviderAccessor.get().getInput(targetEntity.name, withoutRelation)
-		const updateInput = updateInputType ? { type: updateInputType } : undefined
 
-		const updateSpecifiedInput = updateInput && whereInput
+		const updateSpecifiedInput = updateInputType && whereInputType
 			? {
 				type: new GraphQLInputObjectType({
 					name: GqlTypeName`${entity.name}Update${relation.name}RelationInput`,
 					fields: () => ({
-						by: whereInput,
-						data: updateInput,
+						by: { type: new GraphQLNonNull(whereInputType) },
+						data: { type: new GraphQLNonNull(updateInputType) },
 					}),
 				}),
 			}
 			: undefined
 
-		const upsertInput = updateInput && createInput && whereInput
+		const upsertInput = updateInputType && createInputType && whereInputType
 			? {
 				type: new GraphQLInputObjectType({
 					name: GqlTypeName`${entity.name}Upsert${relation.name}RelationInput`,
 					fields: () => ({
-						by: whereInput,
-						update: updateInput,
-						create: createInput,
+						by: { type: new GraphQLNonNull(whereInputType) },
+						update: { type: new GraphQLNonNull(updateInputType) },
+						create: { type: new GraphQLNonNull(createInputType) },
 					}),
 				}),
 			}
@@ -163,7 +164,7 @@ export class UpdateEntityRelationInputFieldVisitor implements Model.ColumnVisito
 		)
 	}
 
-	private createWhereInput(targetEntity: Model.Entity): GraphQLInputFieldConfig | undefined {
+	private createUniqueWhereInput(targetEntity: Model.Entity): GraphQLInputObjectType | undefined {
 		if (this.authorizator.getEntityPermission(Acl.Operation.read, targetEntity.name) === 'no') {
 			return undefined
 		}
@@ -171,8 +172,6 @@ export class UpdateEntityRelationInputFieldVisitor implements Model.ColumnVisito
 		if (!uniqueWhere) {
 			throw new ImplementationException()
 		}
-		return {
-			type: uniqueWhere,
-		}
+		return uniqueWhere
 	}
 }

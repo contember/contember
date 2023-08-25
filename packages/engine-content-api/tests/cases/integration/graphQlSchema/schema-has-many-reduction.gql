@@ -220,8 +220,8 @@ input PostWithoutLocalesCreateInput {
 }
 
 input PostLocaleConnectOrCreatePostRelationInput {
-  connect: PostUniqueWhere
-  create: PostWithoutLocalesCreateInput
+  connect: PostUniqueWhere!
+  create: PostWithoutLocalesCreateInput!
 }
 
 input PostLocaleUpdateInput {
@@ -247,8 +247,8 @@ input PostWithoutLocalesUpdateInput {
 }
 
 input PostLocaleUpsertPostRelationInput {
-  update: PostWithoutLocalesUpdateInput
-  create: PostWithoutLocalesCreateInput
+  update: PostWithoutLocalesUpdateInput!
+  create: PostWithoutLocalesCreateInput!
 }
 
 type PostConnection {
@@ -280,8 +280,8 @@ input PostLocaleWithoutPostCreateInput {
 }
 
 input PostConnectOrCreateLocalesRelationInput {
-  connect: PostLocaleUniqueWhere
-  create: PostLocaleWithoutPostCreateInput
+  connect: PostLocaleUniqueWhere!
+  create: PostLocaleWithoutPostCreateInput!
 }
 
 input PostUpdateInput {
@@ -301,8 +301,8 @@ input PostUpdateLocalesEntityRelationInput {
 }
 
 input PostUpdateLocalesRelationInput {
-  by: PostLocaleUniqueWhere
-  data: PostLocaleWithoutPostUpdateInput
+  by: PostLocaleUniqueWhere!
+  data: PostLocaleWithoutPostUpdateInput!
 }
 
 input PostLocaleWithoutPostUpdateInput {
@@ -312,9 +312,9 @@ input PostLocaleWithoutPostUpdateInput {
 }
 
 input PostUpsertLocalesRelationInput {
-  by: PostLocaleUniqueWhere
-  update: PostLocaleWithoutPostUpdateInput
-  create: PostLocaleWithoutPostCreateInput
+  by: PostLocaleUniqueWhere!
+  update: PostLocaleWithoutPostUpdateInput!
+  create: PostLocaleWithoutPostCreateInput!
 }
 
 type QueryTransaction {

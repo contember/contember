@@ -35,7 +35,7 @@ import {
 	UpdateValidationSchemaDiffer,
 	VERSION_LATEST,
 } from './modifications'
-import { ChangeViewNonViewDiffer, RemoveChangedFieldDiffer, RemoveChangedViewDiffer } from './modifications/differs'
+import { RemoveChangedFieldDiffer, RemoveViewDiffer } from './modifications/differs'
 import { CreateIndexDiffer, RemoveIndexDiffer } from './modifications/indexes'
 import { CreateTriggerDiffer, RemoveTriggerDiffer, UpdateTriggerDiffer } from './modifications/actions'
 import { UpdateTargetDiffer } from './modifications/actions/UpdateTargetModification'
@@ -71,8 +71,7 @@ export class SchemaDiffer {
 			new ConvertOneHasManyToManyHasManyRelationDiffer(),
 			new RemoveUniqueConstraintDiffer(),
 			new RemoveIndexDiffer(),
-			new ChangeViewNonViewDiffer(),
-			new RemoveChangedViewDiffer(),
+			new RemoveViewDiffer(),
 			new RemoveEntityDiffer(),
 			new RemoveFieldDiffer(),
 			new CreateEnumDiffer(),

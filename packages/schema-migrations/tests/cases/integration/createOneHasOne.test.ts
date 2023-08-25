@@ -4,15 +4,17 @@ import { Model } from '@contember/schema'
 import { SQL } from '../../src/tags'
 
 testMigrations('create one has one relation (site with settings)', {
-	originalSchema: new SchemaBuilder().buildSchema(),
-	updatedSchema: new SchemaBuilder()
-		.entity('Site', entity =>
-			entity
-				.column('name', c => c.type(Model.ColumnType.String))
-				.oneHasOne('setting', r => r.target('SiteSetting').inversedBy('site')),
-		)
-		.entity('SiteSetting', e => e.column('url', c => c.type(Model.ColumnType.String)))
-		.buildSchema(),
+	original: {},
+	updated: {
+		model: new SchemaBuilder()
+			.entity('Site', entity =>
+				entity
+					.column('name', c => c.type(Model.ColumnType.String))
+					.oneHasOne('setting', r => r.target('SiteSetting').inversedBy('site')),
+			)
+			.entity('SiteSetting', e => e.column('url', c => c.type(Model.ColumnType.String)))
+			.buildSchema(),
+	},
 	diff: [
 		{
 			modification: 'createEntity',

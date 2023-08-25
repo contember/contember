@@ -4,15 +4,19 @@ import { Model } from '@contember/schema'
 import { SQL } from '../../src/tags'
 
 testMigrations('create many has many relation (post with categories)', {
-	originalSchema: new SchemaBuilder()
-		.entity('Post', e => e.column('title', c => c.type(Model.ColumnType.String)))
-		.buildSchema(),
-	updatedSchema: new SchemaBuilder()
-		.entity('Post', e =>
-			e.column('title', c => c.type(Model.ColumnType.String)).manyHasMany('categories', r => r.target('Category')),
-		)
-		.entity('Category', e => e.column('title', c => c.type(Model.ColumnType.String)))
-		.buildSchema(),
+	original: {
+		model: new SchemaBuilder()
+			.entity('Post', e => e.column('title', c => c.type(Model.ColumnType.String)))
+			.buildSchema(),
+	},
+	updated: {
+		model: new SchemaBuilder()
+			.entity('Post', e =>
+				e.column('title', c => c.type(Model.ColumnType.String)).manyHasMany('categories', r => r.target('Category')),
+			)
+			.entity('Category', e => e.column('title', c => c.type(Model.ColumnType.String)))
+			.buildSchema(),
+	},
 	diff: [
 		{
 			modification: 'createEntity',

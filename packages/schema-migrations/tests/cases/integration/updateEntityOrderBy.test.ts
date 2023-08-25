@@ -1,5 +1,5 @@
 import { testMigrations } from '../../src/tests'
-import { SchemaBuilder, SchemaDefinition as def } from '@contember/schema-definition'
+import { createSchema, SchemaBuilder, SchemaDefinition as def } from '@contember/schema-definition'
 import { Model } from '@contember/schema'
 import { SQL } from '../../src/tags'
 
@@ -18,8 +18,8 @@ namespace SchemaWithOrderBy {
 }
 
 testMigrations('update entity add order by', {
-	originalSchema: def.createModel(SchemaWithoutOrderBy),
-	updatedSchema: def.createModel(SchemaWithOrderBy),
+	original: createSchema(SchemaWithoutOrderBy),
+	updated: createSchema(SchemaWithOrderBy),
 	diff: [
 		{
 			modification: 'updateEntityOrderBy',
@@ -31,8 +31,8 @@ testMigrations('update entity add order by', {
 })
 
 testMigrations('update entity remove order by', {
-	originalSchema: def.createModel(SchemaWithOrderBy),
-	updatedSchema: def.createModel(SchemaWithoutOrderBy),
+	original: createSchema(SchemaWithOrderBy),
+	updated: createSchema(SchemaWithoutOrderBy),
 	diff: [
 		{
 			modification: 'updateEntityOrderBy',

@@ -4,18 +4,20 @@ import { Model } from '@contember/schema'
 import { SQL } from '../../src/tags'
 
 testMigrations('create one has many relation (post with locales)', {
-	originalSchema: new SchemaBuilder().entity('Post', e => e).buildSchema(),
-	updatedSchema: new SchemaBuilder()
-		.entity('Post', e =>
-			e.oneHasMany('locales', r => r.target('PostLocale').ownerNotNull().ownedBy('post').orderBy('title')),
-		)
-		.entity('PostLocale', e =>
-			e
-				.unique(['post', 'locale'])
-				.column('title', c => c.type(Model.ColumnType.String))
-				.column('locale', c => c.type(Model.ColumnType.String)),
-		)
-		.buildSchema(),
+	original: { model: new SchemaBuilder().entity('Post', e => e).buildSchema() },
+	updated: {
+		model: new SchemaBuilder()
+			.entity('Post', e =>
+				e.oneHasMany('locales', r => r.target('PostLocale').ownerNotNull().ownedBy('post').orderBy('title')),
+			)
+			.entity('PostLocale', e =>
+				e
+					.unique(['post', 'locale'])
+					.column('title', c => c.type(Model.ColumnType.String))
+					.column('locale', c => c.type(Model.ColumnType.String)),
+			)
+			.buildSchema(),
+	},
 	diff: [
 		{
 			modification: 'createEntity',

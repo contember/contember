@@ -1,6 +1,6 @@
 import { testMigrations } from '../../src/tests'
 import { SQL } from '../../src/tags'
-import { SchemaDefinition as def } from '@contember/schema-definition'
+import { createSchema, SchemaDefinition as def } from '@contember/schema-definition'
 
 namespace ViewEntityOriginalSchema {
 	@def.View("SELECT null as id, 'John' AS name")
@@ -38,8 +38,8 @@ namespace ViewEntityUpdatedSchema1 {
 
 
 testMigrations('update a view 1', {
-	originalSchema: def.createModel(ViewEntityOriginalSchema),
-	updatedSchema: def.createModel(ViewEntityUpdatedSchema1),
+	original: createSchema(ViewEntityOriginalSchema),
+	updated: createSchema(ViewEntityUpdatedSchema1),
 	diff: [
 		{
 			modification: 'removeEntity',
@@ -186,8 +186,8 @@ namespace ViewEntityUpdatedSchema2 {
 }
 
 testMigrations('update a view 2', {
-	originalSchema: def.createModel(ViewEntityOriginalSchema),
-	updatedSchema: def.createModel(ViewEntityUpdatedSchema2),
+	original: createSchema(ViewEntityOriginalSchema),
+	updated: createSchema(ViewEntityUpdatedSchema2),
 	diff: [
 		{
 			modification: 'removeEntity',
@@ -296,8 +296,8 @@ namespace ViewEntityUpdatedSchema3 {
 }
 
 testMigrations('update a view 3', {
-	originalSchema: def.createModel(ViewEntityOriginalSchema),
-	updatedSchema: def.createModel(ViewEntityUpdatedSchema3),
+	original: createSchema(ViewEntityOriginalSchema),
+	updated: createSchema(ViewEntityUpdatedSchema3),
 	diff: [
 		{
 			modification: 'removeEntity',
@@ -363,8 +363,8 @@ namespace ViewEntityUpdatedSchema4 {
 }
 
 testMigrations('update a view 4', {
-	originalSchema: def.createModel(ViewEntityOriginalSchema),
-	updatedSchema: def.createModel(ViewEntityUpdatedSchema4),
+	original: createSchema(ViewEntityOriginalSchema),
+	updated: createSchema(ViewEntityUpdatedSchema4),
 	diff: [
 		{
 			modification: 'removeEntity',

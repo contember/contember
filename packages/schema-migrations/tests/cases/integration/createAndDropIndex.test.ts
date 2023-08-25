@@ -1,6 +1,6 @@
 import { testMigrations } from '../../src/tests'
 import { SQL } from '../../src/tags'
-import { SchemaDefinition as def } from '@contember/schema-definition'
+import { createSchema, SchemaDefinition as def } from '@contember/schema-definition'
 
 namespace SchemaWithoutIndex {
 	export class Article {
@@ -17,8 +17,8 @@ namespace SchemaWithIndex {
 
 
 testMigrations('create index', {
-	originalSchema: def.createModel(SchemaWithoutIndex),
-	updatedSchema: def.createModel(SchemaWithIndex),
+	original: createSchema(SchemaWithoutIndex),
+	updated: createSchema(SchemaWithIndex),
 	diff: [
 		{
 			modification: 'createIndex',
@@ -31,8 +31,8 @@ testMigrations('create index', {
 
 
 testMigrations('drop index', {
-	originalSchema: def.createModel(SchemaWithIndex),
-	updatedSchema: def.createModel(SchemaWithoutIndex),
+	original: createSchema(SchemaWithIndex),
+	updated: createSchema(SchemaWithoutIndex),
 	diff: [
 		{
 			modification: 'removeIndex',

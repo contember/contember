@@ -4,12 +4,16 @@ import { Model } from '@contember/schema'
 import { SQL } from '../../src/tags'
 
 testMigrations('make column not null', {
-	originalSchema: new SchemaBuilder()
-		.entity('Author', e => e.column('name', c => c.type(Model.ColumnType.String)))
-		.buildSchema(),
-	updatedSchema: new SchemaBuilder()
-		.entity('Author', e => e.column('name', c => c.type(Model.ColumnType.String).notNull()))
-		.buildSchema(),
+	original: {
+		model: new SchemaBuilder()
+			.entity('Author', e => e.column('name', c => c.type(Model.ColumnType.String)))
+			.buildSchema(),
+	},
+	updated: {
+		model: new SchemaBuilder()
+			.entity('Author', e => e.column('name', c => c.type(Model.ColumnType.String).notNull()))
+			.buildSchema(),
+	},
 	diff: [
 		{
 			modification: 'updateColumnDefinition',

@@ -4,14 +4,18 @@ import { SQL } from '../../src/tags'
 import { SchemaBuilder } from '@contember/schema-definition'
 
 testMigrations('create inverse side relation (post with locales)', {
-	originalSchema: new SchemaBuilder()
-		.entity('Post', e => e)
-		.entity('PostLocale', e => e.manyHasOne('post', r => r.target('Post')))
-		.buildSchema(),
-	updatedSchema: new SchemaBuilder()
-		.entity('Post', e => e)
-		.entity('PostLocale', e => e.manyHasOne('post', r => r.target('Post').inversedBy('locales')))
-		.buildSchema(),
+	original: {
+		model: new SchemaBuilder()
+			.entity('Post', e => e)
+			.entity('PostLocale', e => e.manyHasOne('post', r => r.target('Post')))
+			.buildSchema(),
+	},
+	updated: {
+		model: new SchemaBuilder()
+			.entity('Post', e => e)
+			.entity('PostLocale', e => e.manyHasOne('post', r => r.target('Post').inversedBy('locales')))
+			.buildSchema(),
+	},
 	diff: [
 		{
 			modification: 'createRelationInverseSide',
@@ -28,16 +32,20 @@ testMigrations('create inverse side relation (post with locales)', {
 })
 
 testMigrations('create inverse side relation together with changing onDelete behaviour', {
-	originalSchema: new SchemaBuilder()
-		.entity('Post', e => e)
-		.entity('PostLocale', e => e.manyHasOne('post', r => r.target('Post')))
-		.buildSchema(),
-	updatedSchema: new SchemaBuilder()
-		.entity('Post', e => e)
-		.entity('PostLocale', e =>
-			e.manyHasOne('post', r => r.target('Post').inversedBy('locales').onDelete(Model.OnDelete.cascade)),
-		)
-		.buildSchema(),
+	original: {
+		model: new SchemaBuilder()
+			.entity('Post', e => e)
+			.entity('PostLocale', e => e.manyHasOne('post', r => r.target('Post')))
+			.buildSchema(),
+	},
+	updated: {
+		model: new SchemaBuilder()
+			.entity('Post', e => e)
+			.entity('PostLocale', e =>
+				e.manyHasOne('post', r => r.target('Post').inversedBy('locales').onDelete(Model.OnDelete.cascade)),
+			)
+			.buildSchema(),
+	},
 	diff: [
 		{
 			modification: 'updateRelationOnDelete',

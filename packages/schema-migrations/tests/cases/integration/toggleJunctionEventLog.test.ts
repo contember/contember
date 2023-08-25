@@ -1,4 +1,4 @@
-import { SchemaDefinition as def } from '@contember/schema-definition'
+import { createSchema, SchemaDefinition as def } from '@contember/schema-definition'
 import { testMigrations } from '../../src/tests'
 import { SQL } from '../../src/tags'
 
@@ -24,8 +24,8 @@ namespace EventLogDisabled {
 }
 
 testMigrations('event log junction - disable', {
-	originalSchema: def.createModel(EventLogNoConfig),
-	updatedSchema: def.createModel(EventLogDisabled),
+	original: createSchema(EventLogNoConfig),
+	updated: createSchema(EventLogDisabled),
 	diff: [
 		{
 			modification: 'toggleJunctionEventLog',
@@ -39,8 +39,8 @@ testMigrations('event log junction - disable', {
 })
 
 testMigrations('event log junction - enable', {
-	originalSchema: def.createModel(EventLogDisabled),
-	updatedSchema: def.createModel(EventLogNoConfig),
+	original: createSchema(EventLogDisabled),
+	updated: createSchema(EventLogNoConfig),
 	diff: [
 		{
 			modification: 'toggleJunctionEventLog',

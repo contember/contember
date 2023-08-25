@@ -5,18 +5,22 @@ import { SQL } from '../../src/tags'
 import { updateColumnDefinitionModification } from '../../../src'
 
 testMigrations('update column definition', {
-	originalSchema: new SchemaBuilder()
-		.entity('Author', e =>
-			e.column('name', c => c.type(Model.ColumnType.String)).column('registeredAt', c => c.type(Model.ColumnType.Date)),
-		)
-		.buildSchema(),
-	updatedSchema: new SchemaBuilder()
-		.entity('Author', e =>
-			e
-				.column('name', c => c.type(Model.ColumnType.String))
-				.column('registeredAt', c => c.type(Model.ColumnType.DateTime)),
-		)
-		.buildSchema(),
+	original: {
+		model: new SchemaBuilder()
+			.entity('Author', e =>
+				e.column('name', c => c.type(Model.ColumnType.String)).column('registeredAt', c => c.type(Model.ColumnType.Date)),
+			)
+			.buildSchema(),
+	},
+	updated: {
+		model: new SchemaBuilder()
+			.entity('Author', e =>
+				e
+					.column('name', c => c.type(Model.ColumnType.String))
+					.column('registeredAt', c => c.type(Model.ColumnType.DateTime)),
+			)
+			.buildSchema(),
+	},
 	diff: [
 		{
 			modification: 'updateColumnDefinition',
@@ -44,8 +48,8 @@ namespace SeqUpdated {
 	}
 }
 testMigrations('add sequence to existing column', {
-	originalSchema: createSchema(SeqOrig).model,
-	updatedSchema: createSchema(SeqUpdated).model,
+	original: createSchema(SeqOrig),
+	updated: createSchema(SeqUpdated),
 	diff: [
 		updateColumnDefinitionModification.createModification({
 			entityName: 'Author',
@@ -108,8 +112,8 @@ namespace ViewColDepUpdated {
 }
 
 testMigrations('recreate view dependent on entity after changing column type', {
-	originalSchema: createSchema(ViewColDepOrig).model,
-	updatedSchema: createSchema(ViewColDepUpdated).model,
+	original: createSchema(ViewColDepOrig),
+	updated: createSchema(ViewColDepUpdated),
 	diff: [{ modification: 'removeEntity', entityName: 'AuthorMetaY' }, {
 		modification: 'removeEntity',
 		entityName: 'AuthorMetaX',
@@ -181,8 +185,8 @@ namespace NotNullUpdated {
 	}
 }
 testMigrations('set not null and fill', {
-	originalSchema: createSchema(NotNullOrig).model,
-	updatedSchema: createSchema(NotNullUpdated).model,
+	original: createSchema(NotNullOrig),
+	updated: createSchema(NotNullUpdated),
 	noDiff: true,
 	diff: [
 		updateColumnDefinitionModification.createModification({

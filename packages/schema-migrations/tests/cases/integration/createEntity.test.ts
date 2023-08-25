@@ -1,19 +1,21 @@
-import { SchemaBuilder } from '@contember/schema-definition'
+import { createSchema, SchemaBuilder } from '@contember/schema-definition'
 import { Model } from '@contember/schema'
 import { SQL } from '../../src/tags'
 import { testMigrations } from '../../src/tests'
 import { SchemaDefinition as def } from '@contember/schema-definition'
 
 testMigrations('create a table (no relations, unique on column)', {
-	originalSchema: new SchemaBuilder().buildSchema(),
-	updatedSchema: new SchemaBuilder()
-		.entity('Author', e =>
-			e
-				.column('name', c => c.type(Model.ColumnType.String))
-				.column('email', c => c.type(Model.ColumnType.String).unique())
-				.column('registeredAt', c => c.type(Model.ColumnType.Date)),
-		)
-		.buildSchema(),
+	original: {  },
+	updated: {
+		model: new SchemaBuilder()
+			.entity('Author', e =>
+				e
+					.column('name', c => c.type(Model.ColumnType.String))
+					.column('email', c => c.type(Model.ColumnType.String).unique())
+					.column('registeredAt', c => c.type(Model.ColumnType.Date)),
+			)
+			.buildSchema(),
+	},
 	diff: [
 		{
 			modification: 'createEntity',
@@ -108,8 +110,8 @@ namespace ViewEntityUpdatedSchema {
 	}
 }
 testMigrations('create a view', {
-	originalSchema: new SchemaBuilder().buildSchema(),
-	updatedSchema: def.createModel(ViewEntityUpdatedSchema),
+	original: {},
+	updated: createSchema(ViewEntityUpdatedSchema),
 	diff: [
 		{
 			modification: 'createView',

@@ -1,5 +1,5 @@
 import { Migration, ModificationHandlerFactory, SchemaDiffer, SchemaMigrator, VERSION_LATEST } from '../../src'
-import { Acl, Model } from '@contember/schema'
+import { Schema } from '@contember/schema'
 import { createMigrationBuilder } from '@contember/database-migrations'
 import { assert, describe, it } from 'vitest'
 import { dummySchemaDatabaseMetadata, emptySchema } from '@contember/schema-utils'
@@ -8,28 +8,22 @@ const modificationFactory = new ModificationHandlerFactory(ModificationHandlerFa
 const schemaMigrator = new SchemaMigrator(modificationFactory)
 const schemaDiffer = new SchemaDiffer(schemaMigrator)
 
-const emptyAcl = { roles: {} }
-
 export interface TestContext {
 	diff: Migration.Modification[]
-	originalSchema: Model.Schema
-	updatedSchema: Model.Schema
-	originalAcl?: Acl.Schema
-	updatedAcl?: Acl.Schema
+	original: Partial<Schema>
+	updated: Partial<Schema>
 	sql: string
 	noDiff?: boolean
 }
 
 export function testDiffSchemas(
-	originalModel: Model.Schema,
-	updatedModel: Model.Schema,
+	original: Partial<Schema>,
+	updated: Partial<Schema>,
 	expectedDiff: Migration.Modification[],
-	originalAcl: Acl.Schema = emptyAcl,
-	updatedAcl: Acl.Schema = emptyAcl,
 ) {
 	const actualDiff = schemaDiffer.diffSchemas(
-		{ ...emptySchema, model: originalModel, acl: originalAcl },
-		{ ...emptySchema, model: updatedModel, acl: updatedAcl },
+		{ ...emptySchema, ...original },
+		{ ...emptySchema, ...updated },
 		{ skipRecreateValidation: true },
 	)
 	try {
@@ -40,39 +34,35 @@ export function testDiffSchemas(
 		throw e
 	}
 	const schema = schemaMigrator.applyModifications(
-		{ ...emptySchema, model: originalModel, acl: originalAcl },
+		{ ...emptySchema, ...original },
 		actualDiff,
 		VERSION_LATEST,
 	)
 	assert.deepStrictEqual(schema, {
 		...emptySchema,
-		model: updatedModel,
-		acl: updatedAcl,
+		...updated,
 	})
 }
 
 export function testApplyDiff(
-	originalModel: Model.Schema,
+	original: Partial<Schema>,
+	expected: Partial<Schema>,
 	diff: Migration.Modification[],
-	expectedModel: Model.Schema,
-	originalAcl: Acl.Schema = emptyAcl,
-	expectedAcl: Acl.Schema = emptyAcl,
 ) {
 	const actualSchema = schemaMigrator.applyModifications(
-		{ ...emptySchema, model: originalModel, acl: originalAcl },
+		{ ...emptySchema, ...original },
 		diff,
 		VERSION_LATEST,
 	)
 
 	assert.deepStrictEqual(actualSchema, {
 		...emptySchema,
-		model: expectedModel,
-		acl: expectedAcl,
+		...expected,
 	})
 }
 
-export function testGenerateSql(originalSchema: Model.Schema, diff: Migration.Modification[], expectedSql: string) {
-	let schema = { ...emptySchema, model: originalSchema, acl: emptyAcl }
+export function testGenerateSql(original: Partial<Schema>, diff: Migration.Modification[], expectedSql: string) {
+	let schema = { ...emptySchema, ...original }
 	const builder = createMigrationBuilder()
 	for (let { modification, ...data } of diff) {
 		const modificationHandler = modificationFactory.create(modification, data, schema, {
@@ -89,19 +79,19 @@ export function testGenerateSql(originalSchema: Model.Schema, diff: Migration.Mo
 	assert.equal(actual, expectedSql)
 }
 
-export function testMigrations(title: string, { originalSchema, updatedSchema, diff, noDiff, originalAcl, updatedAcl, sql }: TestContext) {
+export function testMigrations(title: string, { original, updated, diff, noDiff, sql }: TestContext) {
 	describe(title, () => {
 		it('diff schemas', () => {
 			if (noDiff) {
 				return
 			}
-			testDiffSchemas(originalSchema, updatedSchema, diff, originalAcl, updatedAcl)
+			testDiffSchemas(original, updated, diff)
 		})
 		it('apply diff', () => {
-			testApplyDiff(originalSchema, diff, updatedSchema, originalAcl, updatedAcl)
+			testApplyDiff(original, updated, diff)
 		})
 		it('generate sql', () => {
-			testGenerateSql(originalSchema, diff, sql)
+			testGenerateSql(original, diff, sql)
 		})
 	})
 }

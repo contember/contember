@@ -4,20 +4,24 @@ import { Model } from '@contember/schema'
 import { SQL } from '../../src/tags'
 
 testMigrations('update relation ondelete to cascade', {
-	originalSchema: new SchemaBuilder()
-		.entity('Post', entity =>
-			entity.column('name', c => c.type(Model.ColumnType.String)).manyHasOne('category', r => r.target('Category')),
-		)
-		.entity('Category', e => e.column('name', c => c.type(Model.ColumnType.String)))
-		.buildSchema(),
-	updatedSchema: new SchemaBuilder()
-		.entity('Post', entity =>
-			entity
-				.column('name', c => c.type(Model.ColumnType.String))
-				.manyHasOne('category', r => r.target('Category').onDelete(Model.OnDelete.cascade)),
-		)
-		.entity('Category', e => e.column('name', c => c.type(Model.ColumnType.String)))
-		.buildSchema(),
+	original: {
+		model: new SchemaBuilder()
+			.entity('Post', entity =>
+				entity.column('name', c => c.type(Model.ColumnType.String)).manyHasOne('category', r => r.target('Category')),
+			)
+			.entity('Category', e => e.column('name', c => c.type(Model.ColumnType.String)))
+			.buildSchema(),
+	},
+	updated: {
+		model: new SchemaBuilder()
+			.entity('Post', entity =>
+				entity
+					.column('name', c => c.type(Model.ColumnType.String))
+					.manyHasOne('category', r => r.target('Category').onDelete(Model.OnDelete.cascade)),
+			)
+			.entity('Category', e => e.column('name', c => c.type(Model.ColumnType.String)))
+			.buildSchema(),
+	},
 	diff: [
 		{
 			modification: 'updateRelationOnDelete',

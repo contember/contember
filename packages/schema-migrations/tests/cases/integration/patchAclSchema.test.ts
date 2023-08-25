@@ -4,23 +4,27 @@ import { Model } from '@contember/schema'
 import { SQL } from '../../src/tags'
 
 testMigrations('patch acl', {
-	originalSchema: new SchemaBuilder()
-		.entity('Site', entity => entity.column('name', c => c.type(Model.ColumnType.String)))
-		.buildSchema(),
-	updatedSchema: new SchemaBuilder()
-		.entity('Site', entity => entity.column('name', c => c.type(Model.ColumnType.String)))
-		.buildSchema(),
-	updatedAcl: {
-		roles: {
-			admin: {
-				variables: {},
-				stages: '*',
-				entities: {
-					Site: {
-						predicates: {},
-						operations: {
-							read: {
-								id: true,
+	original: {
+		model: new SchemaBuilder()
+			.entity('Site', entity => entity.column('name', c => c.type(Model.ColumnType.String)))
+			.buildSchema(),
+	},
+	updated: {
+		model: new SchemaBuilder()
+			.entity('Site', entity => entity.column('name', c => c.type(Model.ColumnType.String)))
+			.buildSchema(),
+		acl: {
+			roles: {
+				admin: {
+					variables: {},
+					stages: '*',
+					entities: {
+						Site: {
+							predicates: {},
+							operations: {
+								read: {
+									id: true,
+								},
 							},
 						},
 					},

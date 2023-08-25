@@ -1,6 +1,6 @@
 import { testMigrations } from '../../src/tests'
 import { SQL } from '../../src/tags'
-import { SchemaDefinition as def } from '@contember/schema-definition'
+import { createSchema, SchemaDefinition as def } from '@contember/schema-definition'
 
 namespace ConvertOHMToMHMSchemaOrig {
 	export class Article {
@@ -26,8 +26,8 @@ namespace ConvertOHMToMHMSchemaOrigUpdated {
 
 
 testMigrations('convert one has many to many has many', {
-	originalSchema: def.createModel(ConvertOHMToMHMSchemaOrig),
-	updatedSchema: def.createModel(ConvertOHMToMHMSchemaOrigUpdated),
+	original: createSchema(ConvertOHMToMHMSchemaOrig),
+	updated: createSchema(ConvertOHMToMHMSchemaOrigUpdated),
 	diff: [
 		{
 			modification: 'convertOneHasManyToManyHasManyRelation',

@@ -7,7 +7,6 @@
 	--cui-layout-panel--body-background-alpha: 1;
 	--cui-layout-panel--footer-background-alpha: var(--cui-backdrop-blur-opacity);
 	--cui-layout-panel--footer-background-rgb: var(--cui-layout-panel--background-rgb);
-
 	visibility: visible;
 	content-visibility: visible;
 	display: flex;
@@ -17,9 +16,7 @@
 	flex-shrink: 1;
 	min-width: min(100%, var(--panel-min-width, 0px));
 	opacity: 1;
-	overflow-y: auto;
-	overflow-x: hidden;
-	overscroll-behavior: none;
+	transform: translateZ(0px); /* Fixes Safari drawing scroll bar below */
 	transition-duration: var(--cui-transition-duration);
 	transition-property: transform, opacity;
 	transition-timing-function: ease-in;
@@ -32,11 +29,27 @@
 :where(.cui-layout-panel > .cui-layout-panel-content) {
 	background-color: rgba(var(--cui-layout-panel--background-rgb), var(--cui-layout-panel--background-alpha));
 	display: flex;
+	flex-basis: 0px;
 	flex-direction: column;
 	flex-grow: 1;
 	flex-shrink: 1;
+	gap: var(--cui-padding--panel-vertical);
+	overflow: auto;
+	overscroll-behavior: none;
 	scroll-padding-bottom: var(--panel-footer-height);
 	scroll-padding-top: var(--panel-header-height);
+}
+
+:where(.cui-layout-panel-content > .cui-layout-panel-content-inner) {
+	display: flex;
+	flex-direction: column;
+	flex-grow: 1;
+	flex-shrink: 1;
+	gap: var(--cui-padding--panel-vertical);
+	padding-bottom: max(var(--inset-bottom, 0px), var(--cui-padding--panel-vertical));
+	padding-left: max(var(--inset-left, 0px), var(--cui-padding--panel-horizontal));
+	padding-right: max(var(--inset-right, 0px), var(--cui-padding--panel-horizontal));
+	padding-top: max(var(--inset-top, 0px), var(--cui-padding--panel-vertical));
 }
 
 :where(.cui-layout-panel):where(
@@ -45,7 +58,6 @@
 ) {
 	bottom: 0;
 	left: 0;
-	overflow: hidden;
 	right: 0;
 	top: 0;
 }
@@ -55,12 +67,6 @@
 :where(.cui-layout-panel[data-behavior="modal"]) {
 	--cui-layout-panel--background-alpha: 0;
 	position: fixed;
-}
-:where(
-	.cui-layout-panel[data-behavior="overlay"] > .cui-layout-panel-content,
-	.cui-layout-panel[data-behavior="modal"] > .cui-layout-panel-content,
-) {
-	overflow: hidden;
 }
 
 :where(.cui-layout-panel[data-behavior="overlay"]) {
@@ -127,4 +133,99 @@
 	max-width: 0px;
 	min-width: 0px;
 	width: 0px;
+}
+
+:where(.cui-layout-panel-header),
+:where(.cui-layout-panel-body),
+:where(.cui-layout-panel-footer) {
+	background-color: var(----background-color);
+	background-image: var(----background-image);
+	margin-bottom: calc(-1 * var(----padding-bottom));
+	margin-left: calc(-1 * var(----padding-left));
+	margin-right: calc(-1 * var(----padding-right));
+	margin-top: calc(-1 * var(----padding-top));
+	padding-bottom: var(----padding-bottom);
+	padding-left: var(----padding-left);
+	padding-right: var(----padding-right);
+	padding-top: var(----padding-top);
+	left: 0;
+	position: sticky;
+	right: 0;
+}
+
+:where(.cui-layout-panel-header),
+:where(.cui-layout-panel-footer) {
+	-webkit-backdrop-filter: blur(var(--cui-backdrop-blur));
+	backdrop-filter: blur(var(--cui-backdrop-blur));
+	z-index: 1;
+}
+
+:where(.cui-layout-panel-header) {
+	----background-color: rgba(var(--cui-layout-panel--header-background-rgb), var(--cui-layout-panel--header-background-alpha));
+	----background-image: linear-gradient(rgb(var(--cui-layout-panel--header-background-rgb)), rgba(var(--cui-layout-panel--header-background-rgb), 0));
+	----padding-bottom: var(--cui-padding--panel-vertical);
+	----padding-left: max(var(--inset-left, 0px), var(--cui-padding--panel-horizontal));
+	----padding-right: max(var(--inset-right, 0px), var(--cui-padding--panel-horizontal));
+	----padding-top: max(var(--inset-top, 0px), var(--cui-padding--panel-vertical));
+	top: 0;
+}
+
+:where(.cui-layout-panel-body) {
+	----background-color: rgba(var(--cui-layout-panel--body-background-rgb), var(--cui-layout-panel--body-background-alpha));
+	----padding-bottom: max(var(--inset-bottom, 0px), var(--cui-padding--panel-vertical));
+	----padding-left: max(var(--inset-left, 0px), var(--cui-padding--panel-horizontal));
+	----padding-right: max(var(--inset-right, 0px), var(--cui-padding--panel-horizontal));
+	----padding-top: max(var(--inset-top, 0px), var(--cui-padding--panel-vertical));
+	display: flex;
+	flex-direction: column;
+	flex: 1;
+	min-height: 0px;
+	min-width: 0px;
+	transition-property: transform, opacity;
+	transition-timing-function: ease-in;
+	transition-duration: var(--cui-transition-duration);
+}
+
+:where(.cui-layout-panel-footer) {
+	----background-image: linear-gradient(rgba(var(--cui-layout-panel--footer-background-rgb), 0), rgb(var(--cui-layout-panel--footer-background-rgb)));
+	----background-color: rgba(var(--cui-layout-panel--footer-background-rgb), var(--cui-layout-panel--footer-background-alpha));
+	----padding-bottom: max(var(--inset-bottom, 0px), var(--cui-padding--panel-vertical));
+	----padding-left: max(var(--inset-left, 0px), var(--cui-padding--panel-horizontal));
+	----padding-right: max(var(--inset-right, 0px), var(--cui-padding--panel-horizontal));
+	----padding-top: max(var(--inset-top, 0px), var(--cui-padding--panel-vertical));
+	bottom: 0;
+	bottom: 0;
+}
+
+
+:where(.cui-layout-panel-header):empty,
+:where(.cui-layout-panel-footer):empty {
+	--cui-padding--panel-vertical: 0px;
+	--cui-padding--panel-horizontal: 0px;
+}
+
+:where(.cui-layout-panel-body[data-behavior='modal']) {
+	max-width: unset;
+}
+
+:where(.cui-layout-panel-header):empty,
+:where(.cui-layout-panel-body):empty,
+:where(.cui-layout-panel-footer):empty {
+	display: none;
+}
+
+:where(.cui-layout-panel-header-content),
+:where(.cui-layout-panel-footer-content) {
+	align-items: center;
+	display: flex;
+	flex-direction: row;
+	gap: var(--cui-gutter);
+	justify-content: space-between;
+}
+
+:where(.cui-layout-panel-body-content) {
+	display: flex;
+	flex-direction: column;
+	gap: var(--cui-gutter);
+	flex: 1;
 }

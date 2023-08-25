@@ -2,10 +2,6 @@
 	max-width: unset;
 }
 
-:where(.cui-layout-content-panel > .cui-layout-panel-content) {
-	overflow: unset;
-}
-
 :where(
 	.cui-layout-panel-header:not([data-behavior="modal"]) > .cui-layout-panel-header-content,
 	.cui-layout-panel-body:not([data-behavior="modal"]) > .cui-layout-panel-body-content,

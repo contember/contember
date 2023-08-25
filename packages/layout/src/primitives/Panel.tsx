@@ -181,7 +181,7 @@ export const Panel: PanelComponentType = memo(forwardRef(
 						<PanelWidthContext.Provider value={useMemo(() => ({ height: height ?? 0, width: width ?? 0 }), [height, width])}>
 							<FocusScope active={shouldTrapFocus === true}>
 								<InsetsConsumer className={className('content')} key="children">
-									{children}
+									<div className={className('content-inner')}>{children}</div>
 								</InsetsConsumer>
 							</FocusScope>
 						</PanelWidthContext.Provider>

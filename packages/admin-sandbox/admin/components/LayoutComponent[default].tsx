@@ -1,5 +1,5 @@
 import { LayoutKit, Slots, createLayoutBarComponent } from '@contember/layout'
-import { Spacer, Stack } from '@contember/ui'
+import { Divider, Spacer, Stack } from '@contember/ui'
 import { ComponentClassNameProps } from '@contember/utilities'
 import { PropsWithChildren } from 'react'
 import { AppHeaderTitle } from './AppHeaderTitle'
@@ -22,16 +22,8 @@ export const LayoutComponent = ({ children, ...rest }: PropsWithChildren<Compone
 			header={
 				<>
 					<LayoutKit.Header
-						start={createSlotTargets(['HeaderStart']) || false}
-						center={createSlotTargets(['Logo', 'HeaderCenter'], (
-							<>
-								<Stack horizontal>
-									<SlotTargets.Logo />
-								</Stack>
-								<Spacer />
-								<SlotTargets.HeaderCenter />
-							</>
-						)) || false}
+						start={createSlotTargets(['Logo', 'HeaderStart']) || false}
+						center={createSlotTargets(['HeaderCenter']) || false}
 						end={state => {
 							const targets = createSlotTargets(['HeaderEnd', 'Profile'])
 							const menuButton = state.panels.get(LayoutKit.SidebarLeft.NAME)?.behavior === 'modal'
@@ -77,7 +69,7 @@ export const LayoutComponent = ({ children, ...rest }: PropsWithChildren<Compone
 					: createSlotTargets(['SidebarLeftHeader'])
 				) || false}
 				body={createSlotTargets(['Navigation', 'SidebarLeftBody']) || false}
-				footer={createSlotTargets(['Profile', 'SidebarLeftFooter']) || false}
+				footer={createSlotTargets(['SidebarLeftFooter']) || false}
 			/>
 
 			<PanelDivider name={LayoutKit.SidebarLeft.NAME} />

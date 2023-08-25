@@ -9,7 +9,7 @@ import { AlertLogoutLink } from './AlertLogoutLink'
 import { LAYOUT_BREAKPOINT } from './Constants'
 import { Directive, DirectivesType, initialDirectives, useDirectives } from './Directives'
 import { LayoutComponents, LayoutType } from './LayoutComponent'
-import { Navigation } from './Navigation'
+import { HorizontalNavigation, Navigation } from './Navigation'
 import { SlotSources } from './Slots'
 
 export const Layout = memo(({ children }: PropsWithChildren) => {
@@ -70,11 +70,18 @@ export const Layout = memo(({ children }: PropsWithChildren) => {
 							</Button>
 						</SlotSources.Switchers>
 
-						{Navigation && (
-							<SlotSources.Navigation>
-								<Navigation />
-							</SlotSources.Navigation>
-						)}
+						{directives.layout === 'right-sidebar'
+							? (
+								<SlotSources.Navigation>
+									<HorizontalNavigation />
+								</SlotSources.Navigation>
+							)
+							: (
+								<SlotSources.Navigation>
+									<Navigation />
+								</SlotSources.Navigation>
+							)
+						}
 
 						<SlotSources.Profile>
 							<LogoutLink Component={AlertLogoutLink}>

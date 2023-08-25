@@ -13,6 +13,7 @@ testInterface({
 		'actionableBoxes.tsx',
 		'boxes.tsx',
 		'slots.tsx',
+		'chat.tsx',
 		'textareas.tsx',
 		'fieldContainers.tsx',
 		'messages.tsx',

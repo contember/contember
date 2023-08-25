@@ -41,7 +41,7 @@ export const LayoutComponent = ({ children, ...rest }: PropsWithChildren) => {
 			)}
 			{...rest}
 		>
-			{createSlotTargets(['Navigation', 'Profile'], (
+			{createSlotTargets(['Navigation', 'SidebarLeftHeader', 'SidebarLeftBody', 'SidebarLeftFooter', 'Profile'], (
 				<LayoutKit.SidebarLeft
 					keepVisible
 					header={(({ behavior }) => behavior === 'modal'
@@ -92,7 +92,11 @@ export const LayoutComponent = ({ children, ...rest }: PropsWithChildren) => {
 							<>
 								{children}
 								{leftPanel?.behavior === 'modal' && (
-									<SlotTargets.Sidebar />
+									<>
+										<SlotTargets.SidebarRightHeader />
+										<SlotTargets.Sidebar aliases={['SidebarRightBody']} />
+										<SlotTargets.SidebarRightFooter />
+									</>
 								)}
 							</>
 						)
@@ -104,7 +108,7 @@ export const LayoutComponent = ({ children, ...rest }: PropsWithChildren) => {
 
 			<PanelDivider name={LayoutKit.SidebarRight.NAME} />
 
-			{createSlotTargets(['Sidebar'], (
+			{createSlotTargets(['SidebarRightHeader', 'Sidebar', 'SidebarRightBody', 'SidebarRightFooter'], (
 				<LayoutPrimitives.GetLayoutPanelsStateContext.Consumer>{({ panels }) => {
 					const leftPanel = panels.get(LayoutKit.SidebarLeft.NAME)
 
@@ -115,7 +119,7 @@ export const LayoutComponent = ({ children, ...rest }: PropsWithChildren) => {
 									keepVisible
 									header={createSlotTargets(['SidebarRightHeader']) || false}
 									body={createSlotTargets(['Sidebar', 'SidebarRightBody'], (
-										<Slots.Target name="Sidebar" aliases={['SidebarRightBody']} />
+										<SlotTargets.Sidebar aliases={['SidebarRightBody']} />
 									)) || false}
 									footer={createSlotTargets(['SidebarRightFooter']) || false}
 								/>

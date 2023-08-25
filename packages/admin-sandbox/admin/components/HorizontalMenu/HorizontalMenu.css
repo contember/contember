@@ -1,0 +1,89 @@
+:where(.cui-horizontal-menu) {
+  --cui-horizontal-menu--icons-scale: var(--cui-scale, 1);
+  min-width: 0px;
+  max-width: 100%;
+}
+
+:where(.cui-horizontal-menu-item) {
+  align-items: stretch;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+:where(.cui-horizontal-menu .cui-button) {
+	--cui-button--color-rgb: var(--cui-color--strong-rgb-50);
+}
+:where(.cui-horizontal-menu .cui-label) {
+	white-space: nowrap;
+}
+
+:where(.cui-horizontal-menu > .cui-button > .cui-button-content) {
+  flex-direction: column;
+	overflow: hidden;
+}
+:where(.cui-horizontal-menu .cui-collapsible) {
+  align-items: start;
+  display: flex;
+	flex-direction: column;
+}
+:where(.cui-horizontal-menu .cui-collapsible .cui-collapsible),
+:where(.cui-horizontal-menu:not([data-direction="horizontal"]) .cui-collapsible) {
+	position: static;
+}
+
+:where(.cui-horizontal-menu[data-direction="horizontal"] .cui-horizontal-menu-item > .cui-collapsible) {
+	position: absolute;
+	top: 100%;
+	left: 0px;
+	right: 0px;
+	max-height: 90vh;
+	overflow-y: auto;
+	background-color: rgb(var(--cui-background-color--rgb-50));
+	border-radius: var(--cui-border-radius);
+	border-color: rgba(var(--cui-color--rgb-50), var(--cui-opacity--low));
+	border-style: solid;
+	border-width: var(--cui-border-width);
+	min-width: min-content;
+	max-width: min(100vw, 100dvw);
+}
+
+:where(.cui-horizontal-menu[data-items-size-evenly] > .cui-button) {
+  flex: 1;
+  min-width: min-content;
+}
+
+:where(.cui-horizontal-menu[data-items-content-horizontal] > .cui-button > .cui-button-content) {
+  flex-direction: row;
+}
+
+:where(.cui-horizontal-menu-item .lucide) {
+  --cui-scale: var(--cui-horizontal-menu--icons-scale);
+}
+
+:where(.cui-horizontal-menu svg.more-toggle-icon) {
+  --cui-scale: 1;
+  margin-left: auto;
+  transition-property: transform;
+  transition-duration: var(--cui-transition-duration);
+  transition-timing-function: ease-in-out;
+}
+
+:where(.cui-horizontal-menu .cui-menu-expand-toggle) {
+	right: auto;
+	left: calc(
+		100% - (1.5 * var(--cui-menu-expand-toggle--size))
+	);
+}
+
+:where(.cui-horizontal-menu:not([data-direction="horizontal"]) .cui-horizontal-menu-item > .cui-collapsible) {
+  padding-left: calc(var(--cui-horizontal-menu--icons-scale) * 1em + var(--cui-gap));
+}
+
+:where(.cui-horizontal-menu:not([data-direction="horizontal"]) .cui-collapsible-content) {
+  border-width: 0px;
+}
+
+:where(.cui-horizontal-menu:not([data-direction="horizontal"]) .cui-collapsible[aria-expanded="true"]) {
+  margin-bottom: var(--cui-gutter);
+}

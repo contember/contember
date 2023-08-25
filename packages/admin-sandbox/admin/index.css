@@ -1,6 +1,10 @@
 @import "@contember/admin/index.css";
 @import "@contember/brand/index.css";
 @import "@contember/layout/index.css";
+@import "./components/HorizontalMenu/HorizontalMenu.css";
+@import "./components/ScrollView/ScrollView.css";
+@import "./components/messages/ui/EmptyState.css";
+@import "./components/messages/ui/MessageItem.css";
 
 .whitespace-nowrap {
 	white-space: nowrap;

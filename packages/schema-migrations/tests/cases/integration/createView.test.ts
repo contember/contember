@@ -1,6 +1,6 @@
 import { testMigrations } from '../../src/tests.js'
 import { SQL } from '../../src/tags.js'
-import { SchemaDefinition as def } from '@contember/schema-definition'
+import { createSchema, SchemaDefinition as def } from '@contember/schema-definition'
 
 namespace ViewEntityOriginalSchema {
 
@@ -24,8 +24,8 @@ namespace ViewEntityUpdatedSchema {
 
 
 testMigrations('create view', {
-	originalSchema: def.createModel(ViewEntityOriginalSchema),
-	updatedSchema: def.createModel(ViewEntityUpdatedSchema),
+	original: createSchema(ViewEntityOriginalSchema),
+	updated: createSchema(ViewEntityUpdatedSchema),
 	diff: [
 		{
 			modification: 'createView',
@@ -118,7 +118,7 @@ namespace ViewAddRelationUpdateSchema {
 
 
 testMigrations('create a relation and a view', {
-	originalSchema: def.createModel(ViewAddRelationOriginalSchema), updatedSchema: def.createModel(ViewAddRelationUpdateSchema), diff: [
+	original: createSchema(ViewAddRelationOriginalSchema), updated: createSchema(ViewAddRelationUpdateSchema), diff: [
 		{
 			modification: 'createRelation',
 			entityName: 'Article',

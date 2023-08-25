@@ -1,23 +1,27 @@
 import { testMigrations } from '../../src/tests'
-import { SchemaBuilder } from '@contember/schema-definition'
+import { createSchema, SchemaBuilder } from '@contember/schema-definition'
 import { Model } from '@contember/schema'
 import { SQL } from '../../src/tags'
 import { SchemaDefinition as def } from '@contember/schema-definition'
 
 
 testMigrations('remove relation (many has one)', {
-	originalSchema: new SchemaBuilder()
-		.entity('Author', e => e.column('name', c => c.type(Model.ColumnType.String)))
-		.entity('Post', e =>
-			e
-				.column('title', c => c.type(Model.ColumnType.String))
-				.manyHasOne('author', r => r.target('Author').onDelete(Model.OnDelete.cascade)),
-		)
-		.buildSchema(),
-	updatedSchema: new SchemaBuilder()
-		.entity('Author', e => e.column('name', c => c.type(Model.ColumnType.String)))
-		.entity('Post', e => e.column('title', c => c.type(Model.ColumnType.String)))
-		.buildSchema(),
+	original: {
+		model: new SchemaBuilder()
+			.entity('Author', e => e.column('name', c => c.type(Model.ColumnType.String)))
+			.entity('Post', e =>
+				e
+					.column('title', c => c.type(Model.ColumnType.String))
+					.manyHasOne('author', r => r.target('Author').onDelete(Model.OnDelete.cascade)),
+			)
+			.buildSchema(),
+	},
+	updated: {
+		model: new SchemaBuilder()
+			.entity('Author', e => e.column('name', c => c.type(Model.ColumnType.String)))
+			.entity('Post', e => e.column('title', c => c.type(Model.ColumnType.String)))
+			.buildSchema(),
+	},
 	diff: [
 		{
 			modification: 'removeField',
@@ -30,21 +34,25 @@ testMigrations('remove relation (many has one)', {
 })
 
 testMigrations('remove relation (one has many)', {
-	originalSchema: new SchemaBuilder()
-		.entity('Post', e => e.oneHasMany('locales', r => r.target('PostLocale').ownerNotNull().ownedBy('post')))
-		.entity('PostLocale', e =>
-			e
-				.unique(['post', 'locale'])
-				.column('title', c => c.type(Model.ColumnType.String))
-				.column('locale', c => c.type(Model.ColumnType.String)),
-		)
-		.buildSchema(),
-	updatedSchema: new SchemaBuilder()
-		.entity('Post', e => e)
-		.entity('PostLocale', e =>
-			e.column('title', c => c.type(Model.ColumnType.String)).column('locale', c => c.type(Model.ColumnType.String)),
-		)
-		.buildSchema(),
+	original: {
+		model: new SchemaBuilder()
+			.entity('Post', e => e.oneHasMany('locales', r => r.target('PostLocale').ownerNotNull().ownedBy('post')))
+			.entity('PostLocale', e =>
+				e
+					.unique(['post', 'locale'])
+					.column('title', c => c.type(Model.ColumnType.String))
+					.column('locale', c => c.type(Model.ColumnType.String)),
+			)
+			.buildSchema(),
+	},
+	updated: {
+		model: new SchemaBuilder()
+			.entity('Post', e => e)
+			.entity('PostLocale', e =>
+				e.column('title', c => c.type(Model.ColumnType.String)).column('locale', c => c.type(Model.ColumnType.String)),
+			)
+			.buildSchema(),
+	},
 	diff: [
 		{
 			entityName: 'PostLocale',
@@ -62,16 +70,20 @@ testMigrations('remove relation (one has many)', {
 })
 
 testMigrations('remove relation (many has many)', {
-	originalSchema: new SchemaBuilder()
-		.entity('Post', e =>
-			e.column('title', c => c.type(Model.ColumnType.String)).manyHasMany('categories', r => r.target('Category')),
-		)
-		.entity('Category', e => e.column('title', c => c.type(Model.ColumnType.String)))
-		.buildSchema(),
-	updatedSchema: new SchemaBuilder()
-		.entity('Post', e => e.column('title', c => c.type(Model.ColumnType.String)))
-		.entity('Category', e => e.column('title', c => c.type(Model.ColumnType.String)))
-		.buildSchema(),
+	original: {
+		model: new SchemaBuilder()
+			.entity('Post', e =>
+				e.column('title', c => c.type(Model.ColumnType.String)).manyHasMany('categories', r => r.target('Category')),
+			)
+			.entity('Category', e => e.column('title', c => c.type(Model.ColumnType.String)))
+			.buildSchema(),
+	},
+	updated: {
+		model: new SchemaBuilder()
+			.entity('Post', e => e.column('title', c => c.type(Model.ColumnType.String)))
+			.entity('Category', e => e.column('title', c => c.type(Model.ColumnType.String)))
+			.buildSchema(),
+	},
 	diff: [
 		{
 			modification: 'removeField',
@@ -83,18 +95,22 @@ testMigrations('remove relation (many has many)', {
 })
 
 testMigrations('remove relation (one has one)', {
-	originalSchema: new SchemaBuilder()
-		.entity('Site', entity =>
-			entity
-				.column('name', c => c.type(Model.ColumnType.String))
-				.oneHasOne('setting', r => r.target('SiteSetting').inversedBy('site')),
-		)
-		.entity('SiteSetting', e => e.column('url', c => c.type(Model.ColumnType.String)))
-		.buildSchema(),
-	updatedSchema: new SchemaBuilder()
-		.entity('Site', entity => entity.column('name', c => c.type(Model.ColumnType.String)))
-		.entity('SiteSetting', e => e.column('url', c => c.type(Model.ColumnType.String)))
-		.buildSchema(),
+	original: {
+		model: new SchemaBuilder()
+			.entity('Site', entity =>
+				entity
+					.column('name', c => c.type(Model.ColumnType.String))
+					.oneHasOne('setting', r => r.target('SiteSetting').inversedBy('site')),
+			)
+			.entity('SiteSetting', e => e.column('url', c => c.type(Model.ColumnType.String)))
+			.buildSchema(),
+	},
+	updated: {
+		model: new SchemaBuilder()
+			.entity('Site', entity => entity.column('name', c => c.type(Model.ColumnType.String)))
+			.entity('SiteSetting', e => e.column('url', c => c.type(Model.ColumnType.String)))
+			.buildSchema(),
+	},
 	diff: [
 		{
 			modification: 'removeField',
@@ -106,20 +122,24 @@ testMigrations('remove relation (one has one)', {
 })
 
 testMigrations('remove relation inverse side', {
-	originalSchema: new SchemaBuilder()
-		.entity('Site', entity =>
-			entity
-				.column('name', c => c.type(Model.ColumnType.String))
-				.oneHasOne('setting', r => r.target('SiteSetting').inversedBy('site')),
-		)
-		.entity('SiteSetting', e => e.column('url', c => c.type(Model.ColumnType.String)))
-		.buildSchema(),
-	updatedSchema: new SchemaBuilder()
-		.entity('Site', entity =>
-			entity.column('name', c => c.type(Model.ColumnType.String)).oneHasOne('setting', r => r.target('SiteSetting')),
-		)
-		.entity('SiteSetting', e => e.column('url', c => c.type(Model.ColumnType.String)))
-		.buildSchema(),
+	original: {
+		model: new SchemaBuilder()
+			.entity('Site', entity =>
+				entity
+					.column('name', c => c.type(Model.ColumnType.String))
+					.oneHasOne('setting', r => r.target('SiteSetting').inversedBy('site')),
+			)
+			.entity('SiteSetting', e => e.column('url', c => c.type(Model.ColumnType.String)))
+			.buildSchema(),
+	},
+	updated: {
+		model: new SchemaBuilder()
+			.entity('Site', entity =>
+				entity.column('name', c => c.type(Model.ColumnType.String)).oneHasOne('setting', r => r.target('SiteSetting')),
+			)
+			.entity('SiteSetting', e => e.column('url', c => c.type(Model.ColumnType.String)))
+			.buildSchema(),
+	},
 	diff: [
 		{
 			modification: 'removeField',
@@ -160,8 +180,8 @@ namespace DropIndexUpSchema {
 
 
 testMigrations('test drop index / unique when removing a field', {
-	originalSchema: def.createModel(DropIndexOrigSchema),
-	updatedSchema: def.createModel(DropIndexUpSchema),
+	original: createSchema(DropIndexOrigSchema),
+	updated: createSchema(DropIndexUpSchema),
 	diff: [{
 		modification: 'removeField',
 		entityName: 'Article',

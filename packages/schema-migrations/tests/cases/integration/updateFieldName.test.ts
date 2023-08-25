@@ -4,12 +4,16 @@ import { Acl, Model } from '@contember/schema'
 import { SQL } from '../../src/tags'
 
 testMigrations('rename a field', {
-	originalSchema: new SchemaBuilder()
-		.entity('Author', e => e.column('firstName', c => c.type(Model.ColumnType.String).columnName('name')))
-		.buildSchema(),
-	updatedSchema: new SchemaBuilder()
-		.entity('Author', e => e.column('name', c => c.type(Model.ColumnType.String)))
-		.buildSchema(),
+	original: {
+		model: new SchemaBuilder()
+			.entity('Author', e => e.column('firstName', c => c.type(Model.ColumnType.String).columnName('name')))
+			.buildSchema(),
+	},
+	updated: {
+		model: new SchemaBuilder()
+			.entity('Author', e => e.column('name', c => c.type(Model.ColumnType.String)))
+			.buildSchema(),
+	},
 	diff: [
 		{
 			modification: 'updateFieldName',
@@ -23,12 +27,16 @@ testMigrations('rename a field', {
 })
 
 testMigrations('rename a field with column', {
-	originalSchema: new SchemaBuilder()
-		.entity('Author', e => e.column('firstName', c => c.type(Model.ColumnType.String)))
-		.buildSchema(),
-	updatedSchema: new SchemaBuilder()
-		.entity('Author', e => e.column('name', c => c.type(Model.ColumnType.String)))
-		.buildSchema(),
+	original: {
+		model: new SchemaBuilder()
+			.entity('Author', e => e.column('firstName', c => c.type(Model.ColumnType.String)))
+			.buildSchema(),
+	},
+	updated: {
+		model: new SchemaBuilder()
+			.entity('Author', e => e.column('name', c => c.type(Model.ColumnType.String)))
+			.buildSchema(),
+	},
 	diff: [
 		{
 			modification: 'updateFieldName',
@@ -45,14 +53,18 @@ testMigrations('rename a field with column', {
 
 
 testMigrations('rename a field with one-has-one', {
-	originalSchema: new SchemaBuilder()
-		.entity('Author', e => e.oneHasOne('content', r => r.target('Content')))
-		.entity('Content', e => e.column('foo'))
-		.buildSchema(),
-	updatedSchema: new SchemaBuilder()
-		.entity('Author', e => e.oneHasOne('description', r => r.target('Content').joiningColumn('content_id')))
-		.entity('Content', e => e.column('foo'))
-		.buildSchema(),
+	original: {
+		model: new SchemaBuilder()
+			.entity('Author', e => e.oneHasOne('content', r => r.target('Content')))
+			.entity('Content', e => e.column('foo'))
+			.buildSchema(),
+	},
+	updated: {
+		model: new SchemaBuilder()
+			.entity('Author', e => e.oneHasOne('description', r => r.target('Content').joiningColumn('content_id')))
+			.entity('Content', e => e.column('foo'))
+			.buildSchema(),
+	},
 	diff: [
 		{
 			modification: 'updateFieldName',
@@ -66,16 +78,20 @@ testMigrations('rename a field with one-has-one', {
 })
 
 testMigrations('rename a relation', {
-	originalSchema: new SchemaBuilder()
-		.entity('Post', e => e.column('title').manyHasOne('user', r => r.target('Author').inversedBy('posts')))
-		.entity('Author', e => e.column('name'))
-		.buildSchema(),
-	updatedSchema: new SchemaBuilder()
-		.entity('Post', e =>
-			e.column('title').manyHasOne('author', r => r.target('Author').inversedBy('posts').joiningColumn('user_id')),
-		)
-		.entity('Author', e => e.column('name'))
-		.buildSchema(),
+	original: {
+		model: new SchemaBuilder()
+			.entity('Post', e => e.column('title').manyHasOne('user', r => r.target('Author').inversedBy('posts')))
+			.entity('Author', e => e.column('name'))
+			.buildSchema(),
+	},
+	updated: {
+		model: new SchemaBuilder()
+			.entity('Post', e =>
+				e.column('title').manyHasOne('author', r => r.target('Author').inversedBy('posts').joiningColumn('user_id')),
+			)
+			.entity('Author', e => e.column('name'))
+			.buildSchema(),
+	},
 	diff: [
 		{
 			modification: 'updateFieldName',
@@ -90,16 +106,20 @@ testMigrations('rename a relation', {
 
 
 testMigrations('rename a relation with joining column', {
-	originalSchema: new SchemaBuilder()
-		.entity('Post', e => e.column('title').manyHasOne('user', r => r.target('Author').inversedBy('posts')))
-		.entity('Author', e => e.column('name'))
-		.buildSchema(),
-	updatedSchema: new SchemaBuilder()
-		.entity('Post', e =>
-			e.column('title').manyHasOne('author', r => r.target('Author').inversedBy('posts')),
-		)
-		.entity('Author', e => e.column('name'))
-		.buildSchema(),
+	original: {
+		model: new SchemaBuilder()
+			.entity('Post', e => e.column('title').manyHasOne('user', r => r.target('Author').inversedBy('posts')))
+			.entity('Author', e => e.column('name'))
+			.buildSchema(),
+	},
+	updated: {
+		model: new SchemaBuilder()
+			.entity('Post', e =>
+				e.column('title').manyHasOne('author', r => r.target('Author').inversedBy('posts')),
+			)
+			.entity('Author', e => e.column('name'))
+			.buildSchema(),
+	},
 	diff: [
 		{
 			modification: 'updateFieldName',
@@ -115,39 +135,41 @@ testMigrations('rename a relation with joining column', {
 
 
 testMigrations('rename relation with acl', {
-	originalSchema: new SchemaBuilder()
-		.entity('Post', e => e.column('title').manyHasOne('user', r => r.target('Author').inversedBy('posts')))
-		.entity('Comment', e => e.column('content').manyHasOne('post', r => r.target('Post')))
-		.entity('Author', e => e.column('name'))
-		.buildSchema(),
-	originalAcl: {
-		roles: {
-			admin: {
-				variables: {
-					authorId: {
-						type: Acl.VariableType.entity,
-						entityName: 'Author',
-					},
-				},
-				stages: '*',
-				entities: {
-					Post: {
-						predicates: {
-							author: { user: { id: 'authorId' } },
+	original: {
+		model: new SchemaBuilder()
+			.entity('Post', e => e.column('title').manyHasOne('user', r => r.target('Author').inversedBy('posts')))
+			.entity('Comment', e => e.column('content').manyHasOne('post', r => r.target('Post')))
+			.entity('Author', e => e.column('name'))
+			.buildSchema(),
+		acl: {
+			roles: {
+				admin: {
+					variables: {
+						authorId: {
+							type: Acl.VariableType.entity,
+							entityName: 'Author',
 						},
-						operations: {
-							read: {
-								title: 'author',
+					},
+					stages: '*',
+					entities: {
+						Post: {
+							predicates: {
+								author: { user: { id: 'authorId' } },
+							},
+							operations: {
+								read: {
+									title: 'author',
+								},
 							},
 						},
-					},
-					Comment: {
-						predicates: {
-							postAuthor: { post: { user: { id: 'authorId' } } },
-						},
-						operations: {
-							read: {
-								content: 'postAuthor',
+						Comment: {
+							predicates: {
+								postAuthor: { post: { user: { id: 'authorId' } } },
+							},
+							operations: {
+								read: {
+									content: 'postAuthor',
+								},
 							},
 						},
 					},
@@ -155,41 +177,43 @@ testMigrations('rename relation with acl', {
 			},
 		},
 	},
-	updatedSchema: new SchemaBuilder()
-		.entity('Post', e =>
-			e.column('title').manyHasOne('author', r => r.target('Author').inversedBy('posts').joiningColumn('user_id')),
-		)
-		.entity('Comment', e => e.column('content').manyHasOne('post', r => r.target('Post')))
-		.entity('Author', e => e.column('name'))
-		.buildSchema(),
-	updatedAcl: {
-		roles: {
-			admin: {
-				variables: {
-					authorId: {
-						type: Acl.VariableType.entity,
-						entityName: 'Author',
-					},
-				},
-				stages: '*',
-				entities: {
-					Post: {
-						predicates: {
-							author: { author: { id: 'authorId' } },
+	updated: {
+		model: new SchemaBuilder()
+			.entity('Post', e =>
+				e.column('title').manyHasOne('author', r => r.target('Author').inversedBy('posts').joiningColumn('user_id')),
+			)
+			.entity('Comment', e => e.column('content').manyHasOne('post', r => r.target('Post')))
+			.entity('Author', e => e.column('name'))
+			.buildSchema(),
+		acl: {
+			roles: {
+				admin: {
+					variables: {
+						authorId: {
+							type: Acl.VariableType.entity,
+							entityName: 'Author',
 						},
-						operations: {
-							read: {
-								title: 'author',
+					},
+					stages: '*',
+					entities: {
+						Post: {
+							predicates: {
+								author: { author: { id: 'authorId' } },
+							},
+							operations: {
+								read: {
+									title: 'author',
+								},
 							},
 						},
-					},
-					Comment: {
-						predicates: {
-							postAuthor: { post: { author: { id: 'authorId' } } },
-						},
-						operations: {
-							read: {
-								content: 'postAuthor',
+						Comment: {
+							predicates: {
+								postAuthor: { post: { author: { id: 'authorId' } } },
+							},
+							operations: {
+								read: {
+									content: 'postAuthor',
+								},
 							},
 						},
 					},

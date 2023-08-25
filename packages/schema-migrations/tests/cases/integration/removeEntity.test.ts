@@ -1,21 +1,25 @@
 import { testMigrations } from '../../src/tests'
-import { SchemaBuilder } from '@contember/schema-definition'
+import { createSchema, SchemaBuilder } from '@contember/schema-definition'
 import { Acl, Model } from '@contember/schema'
 import { SQL } from '../../src/tags'
 import { SchemaDefinition as def } from '@contember/schema-definition'
 
 testMigrations('remove an entity', {
-	originalSchema: new SchemaBuilder()
-		.entity('Author', e => e.column('name', c => c.type(Model.ColumnType.String)))
-		.entity('Post', e =>
-			e
-				.column('title', c => c.type(Model.ColumnType.String))
-				.manyHasOne('author', r => r.target('Author').onDelete(Model.OnDelete.cascade)),
-		)
-		.buildSchema(),
-	updatedSchema: new SchemaBuilder()
-		.entity('Post', e => e.column('title', c => c.type(Model.ColumnType.String)))
-		.buildSchema(),
+	original: {
+		model: new SchemaBuilder()
+			.entity('Author', e => e.column('name', c => c.type(Model.ColumnType.String)))
+			.entity('Post', e =>
+				e
+					.column('title', c => c.type(Model.ColumnType.String))
+					.manyHasOne('author', r => r.target('Author').onDelete(Model.OnDelete.cascade)),
+			)
+			.buildSchema(),
+	},
+	updated: {
+		model: new SchemaBuilder()
+			.entity('Post', e => e.column('title', c => c.type(Model.ColumnType.String)))
+			.buildSchema(),
+	},
 	diff: [
 		{
 			modification: 'removeEntity',
@@ -26,36 +30,38 @@ testMigrations('remove an entity', {
 })
 
 testMigrations('remove entity with acl', {
-	originalSchema: new SchemaBuilder()
-		.entity('Site', entity => entity.column('name', c => c.type(Model.ColumnType.String)))
-		.entity('Post', entity => entity.column('title').manyHasOne('site', r => r.target('Site')))
-		.buildSchema(),
-	originalAcl: {
-		roles: {
-			admin: {
-				variables: {
-					siteId: {
-						type: Acl.VariableType.entity,
-						entityName: 'Site',
+	original: {
+		model: new SchemaBuilder()
+			.entity('Site', entity => entity.column('name', c => c.type(Model.ColumnType.String)))
+			.entity('Post', entity => entity.column('title').manyHasOne('site', r => r.target('Site')))
+			.buildSchema(),
+		acl: {
+			roles: {
+				admin: {
+					variables: {
+						siteId: {
+							type: Acl.VariableType.entity,
+							entityName: 'Site',
+						},
 					},
-				},
-				stages: '*',
-				entities: {
-					Site: {
-						predicates: {},
-						operations: {
-							read: {
-								id: true,
+					stages: '*',
+					entities: {
+						Site: {
+							predicates: {},
+							operations: {
+								read: {
+									id: true,
+								},
 							},
 						},
-					},
-					Post: {
-						predicates: {
-							site: { site: { id: 'siteId' } },
-						},
-						operations: {
-							read: {
-								title: 'site',
+						Post: {
+							predicates: {
+								site: { site: { id: 'siteId' } },
+							},
+							operations: {
+								read: {
+									title: 'site',
+								},
 							},
 						},
 					},
@@ -63,20 +69,22 @@ testMigrations('remove entity with acl', {
 			},
 		},
 	},
-	updatedSchema: new SchemaBuilder().entity('Post', entity => entity.column('title')).buildSchema(),
-	updatedAcl: {
-		roles: {
-			admin: {
-				variables: {},
-				stages: '*',
-				entities: {
-					Post: {
-						predicates: {
-							site: {},
-						},
-						operations: {
-							read: {
-								title: 'site',
+	updated: {
+		model: new SchemaBuilder().entity('Post', entity => entity.column('title')).buildSchema(),
+		acl: {
+			roles: {
+				admin: {
+					variables: {},
+					stages: '*',
+					entities: {
+						Post: {
+							predicates: {
+								site: {},
+							},
+							operations: {
+								read: {
+									title: 'site',
+								},
 							},
 						},
 					},
@@ -100,8 +108,8 @@ namespace ViewEntityOriginalSchema {
 	}
 }
 testMigrations('remove a view', {
-	originalSchema: def.createModel(ViewEntityOriginalSchema),
-	updatedSchema: new SchemaBuilder().buildSchema(),
+	original: createSchema(ViewEntityOriginalSchema),
+	updated: {},
 	diff: [
 		{
 			modification: 'removeEntity',

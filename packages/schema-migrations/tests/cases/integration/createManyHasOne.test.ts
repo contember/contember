@@ -4,17 +4,21 @@ import { SQL } from '../../src/tags'
 import { testMigrations } from '../../src/tests'
 
 testMigrations('create many has one relation (post with author)', {
-	originalSchema: new SchemaBuilder()
-		.entity('Author', e => e.column('name', c => c.type(Model.ColumnType.String)))
-		.buildSchema(),
-	updatedSchema: new SchemaBuilder()
-		.entity('Author', e => e.column('name', c => c.type(Model.ColumnType.String)))
-		.entity('Post', e =>
-			e
-				.column('title', c => c.type(Model.ColumnType.String))
-				.manyHasOne('author', r => r.target('Author').onDelete(Model.OnDelete.cascade)),
-		)
-		.buildSchema(),
+	original: {
+		model: new SchemaBuilder()
+			.entity('Author', e => e.column('name', c => c.type(Model.ColumnType.String)))
+			.buildSchema(),
+	},
+	updated: {
+		model: new SchemaBuilder()
+			.entity('Author', e => e.column('name', c => c.type(Model.ColumnType.String)))
+			.entity('Post', e =>
+				e
+					.column('title', c => c.type(Model.ColumnType.String))
+					.manyHasOne('author', r => r.target('Author').onDelete(Model.OnDelete.cascade)),
+			)
+			.buildSchema(),
+	},
 	diff: [
 		{
 			modification: 'createEntity',

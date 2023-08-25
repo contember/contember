@@ -4,18 +4,22 @@ import { Model } from '@contember/schema'
 import { SQL } from '../../src/tags'
 
 testMigrations('convert one has one to many has one relation without inverse side', {
-	originalSchema: new SchemaBuilder()
-		.entity('Post', entity =>
-			entity.oneHasOne('image', rel => rel.target('Image')),
-		)
-		.entity('Image', e => e.column('url', c => c.type(Model.ColumnType.String)))
-		.buildSchema(),
-	updatedSchema: new SchemaBuilder()
-		.entity('Post', entity =>
-			entity.manyHasOne('image', rel => rel.target('Image')),
-		)
-		.entity('Image', e => e.column('url', c => c.type(Model.ColumnType.String)))
-		.buildSchema(),
+	original: {
+		model: new SchemaBuilder()
+			.entity('Post', entity =>
+				entity.oneHasOne('image', rel => rel.target('Image')),
+			)
+			.entity('Image', e => e.column('url', c => c.type(Model.ColumnType.String)))
+			.buildSchema(),
+	},
+	updated: {
+		model: new SchemaBuilder()
+			.entity('Post', entity =>
+				entity.manyHasOne('image', rel => rel.target('Image')),
+			)
+			.entity('Image', e => e.column('url', c => c.type(Model.ColumnType.String)))
+			.buildSchema(),
+	},
 	diff: [
 		{
 			modification: 'convertOneToManyRelation',
@@ -31,18 +35,22 @@ testMigrations('convert one has one to many has one relation without inverse sid
 
 
 testMigrations('convert one has one to many has one relation with inverse side', {
-	originalSchema: new SchemaBuilder()
-		.entity('Post', entity =>
-			entity.oneHasOne('image', rel => rel.target('Image').inversedBy('post')),
-		)
-		.entity('Image', e => e.column('url', c => c.type(Model.ColumnType.String)))
-		.buildSchema(),
-	updatedSchema: new SchemaBuilder()
-		.entity('Post', entity =>
-			entity.manyHasOne('image', rel => rel.target('Image').inversedBy('posts')),
-		)
-		.entity('Image', e => e.column('url', c => c.type(Model.ColumnType.String)))
-		.buildSchema(),
+	original: {
+		model: new SchemaBuilder()
+			.entity('Post', entity =>
+				entity.oneHasOne('image', rel => rel.target('Image').inversedBy('post')),
+			)
+			.entity('Image', e => e.column('url', c => c.type(Model.ColumnType.String)))
+			.buildSchema(),
+	},
+	updated: {
+		model: new SchemaBuilder()
+			.entity('Post', entity =>
+				entity.manyHasOne('image', rel => rel.target('Image').inversedBy('posts')),
+			)
+			.entity('Image', e => e.column('url', c => c.type(Model.ColumnType.String)))
+			.buildSchema(),
+	},
 	diff: [
 		{
 			modification: 'convertOneToManyRelation',

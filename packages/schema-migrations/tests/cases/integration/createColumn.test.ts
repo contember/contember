@@ -1,15 +1,15 @@
-import { SchemaDefinition as def } from '@contember/schema-definition'
+import { createSchema, SchemaDefinition as def } from '@contember/schema-definition'
 import { Model } from '@contember/schema'
 import { SQL } from '../../src/tags'
 import { testMigrations } from '../../src/tests'
 
 testMigrations('create a column with default value', {
-	originalSchema: def.createModel({
+	original: createSchema({
 		Author: class Author {
 			email = def.stringColumn().unique()
 		},
 	}),
-	updatedSchema: def.createModel({
+	updated: createSchema({
 		Author: class Author {
 			name = def.stringColumn().default('unnamed author').notNull()
 			email = def.stringColumn().unique()
@@ -37,12 +37,12 @@ ALTER TABLE "author" ALTER "name" SET NOT NULL;`,
 })
 
 testMigrations('create a column with copy value', {
-	originalSchema: def.createModel({
+	original: createSchema({
 		Author: class Author {
 			email = def.stringColumn().unique()
 		},
 	}),
-	updatedSchema: def.createModel({
+	updated: createSchema({
 		Author: class Author {
 			name = def.stringColumn().notNull()
 			email = def.stringColumn().unique()

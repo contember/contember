@@ -4,17 +4,21 @@ import { Model } from '@contember/schema'
 import { SQL } from '../../src/tags'
 
 testMigrations('create enum', {
-	originalSchema: new SchemaBuilder()
-		.entity('Post', e => e.column('title', c => c.type(Model.ColumnType.String)))
-		.buildSchema(),
-	updatedSchema: new SchemaBuilder()
-		.entity('Post', e =>
-			e
-				.column('title', c => c.type(Model.ColumnType.String))
-				.column('status', c => c.type(Model.ColumnType.Enum, { enumName: 'postStatus' })),
-		)
-		.enum('postStatus', ['publish', 'draft'])
-		.buildSchema(),
+	original: {
+		model: new SchemaBuilder()
+			.entity('Post', e => e.column('title', c => c.type(Model.ColumnType.String)))
+			.buildSchema(),
+	},
+	updated: {
+		model: new SchemaBuilder()
+			.entity('Post', e =>
+				e
+					.column('title', c => c.type(Model.ColumnType.String))
+					.column('status', c => c.type(Model.ColumnType.Enum, { enumName: 'postStatus' })),
+			)
+			.enum('postStatus', ['publish', 'draft'])
+			.buildSchema(),
+	},
 	diff: [
 		{
 			modification: 'createEnum',

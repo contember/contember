@@ -21,14 +21,14 @@ export const getEntityDependantViews = (model: Model.Schema): EntityDependantVie
 }
 
 export const cascadeRemoveDependantViews = (model: Model.Schema, entities: Model.Entity[]): Migration.Modification[] => {
-	const removed = new Set<string>()
+	const visited = new Set<string>()
 	const dependants = getEntityDependantViews(model)
 	const modifications: Migration.Modification[] = []
 	const removeCascade = (entity: Model.Entity) => {
-		if (removed.has(entity.name)) {
+		if (visited.has(entity.name)) {
 			return
 		}
-		removed.add(entity.name)
+		visited.add(entity.name)
 		for (const dependant of dependants.get(entity.name) ?? []) {
 			removeCascade(dependant)
 		}

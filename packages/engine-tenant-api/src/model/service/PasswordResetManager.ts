@@ -17,7 +17,7 @@ export class PasswordResetManager {
 	constructor(
 		private readonly mailer: UserMailer,
 		private readonly projectManager: ProjectManager,
-	) {}
+	) { }
 
 	public async createPasswordResetRequest(
 		dbContext: DatabaseContext,
@@ -45,6 +45,7 @@ export class PasswordResetManager {
 				email: person.email,
 				token: result.token,
 				project: project?.name,
+				projectSlug: project?.slug,
 			},
 			{
 				variant: mailOptions.mailVariant || '',

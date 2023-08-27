@@ -36,7 +36,7 @@ export class InviteManager {
 		private readonly providers: Providers,
 		private readonly mailer: UserMailer,
 		private readonly projectSchemaResolver: ProjectSchemaResolver,
-	) {}
+	) { }
 
 	async invite(
 		dbContext: DatabaseContext,
@@ -89,11 +89,11 @@ export class InviteManager {
 				if (isNew) {
 					await this.mailer.sendNewUserInvitedMail(
 						trx,
-						{ email, project: project.name, password: generatedPassword, token: resetToken },
+						{ email, project: project.name, projectSlug: project.slug, password: generatedPassword, token: resetToken },
 						customMailOptions,
 					)
 				} else {
-					await this.mailer.sendExistingUserInvitedEmail(trx, { email, project: project.name }, customMailOptions)
+					await this.mailer.sendExistingUserInvitedEmail(trx, { email, project: project.name, projectSlug: project.slug }, customMailOptions)
 				}
 			}
 			return new ResponseOk(new InviteResult(person, isNew))
@@ -110,5 +110,5 @@ export class InviteManager {
 export type InviteResponse = Response<InviteResult, InviteErrorCode>
 
 export class InviteResult {
-	constructor(public readonly person: Omit<PersonRow, 'roles'>, public readonly isNew: boolean) {}
+	constructor(public readonly person: Omit<PersonRow, 'roles'>, public readonly isNew: boolean) { }
 }

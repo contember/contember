@@ -12,11 +12,13 @@ export const Provider = memo<{ children: ReactNode }>(({ children }) => {
 	const activeSlotsMapRef = useRef(activeSlotsMap); activeSlotsMapRef.current = activeSlotsMap
 
 	// TODO: refactor to use ID
-	const registerSlotTarget = useCallback((id: string, name: string, ref: RefObject<HTMLElement>) => {
+	const registerSlotTarget = useCallback((id: string, name: string, ref: HTMLElement) => {
+		console.log('registerSlotTarget', id, name, ref)
 		setSlotsRefMap(previous => new Map([...previous, [name, ref]]))
 	}, [])
 
 	const unregisterSlotTarget = useCallback((id: string, name: string) => {
+		console.log('unregisterSlotTarget', id, name)
 		setSlotsRefMap(previous => {
 			previous.delete(name)
 			return new Map([...previous])
@@ -32,7 +34,8 @@ export const Provider = memo<{ children: ReactNode }>(({ children }) => {
 	}, [activeSlotPortals, registerSlotTarget, unregisterSlotTarget])
 
 	const getTarget = useCallback((name: string) => {
-		return slotsRefMap.get(name)?.current
+		console.log('getTarget', name, slotsRefMap, slotsRefMap.get(name), slotsRefMap.get(name))
+		return slotsRefMap.get(name)
 	}, [slotsRefMap])
 
 	const registerSlotSource = useCallback((id: string, name: string) => {

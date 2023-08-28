@@ -3,8 +3,8 @@ import { deprecate } from '@contember/utilities'
 import { ComponentType, ElementType, Fragment, ReactNode, RefObject, createElement, useCallback } from 'react'
 import { SlotComponentsRecords } from './types'
 
-export type SlotsRefMap = Map<string, RefObject<HTMLElement>>
-export type RegisterSlotTarget = (id: string, name: string, ref: RefObject<HTMLElement>) => void;
+export type SlotsRefMap = Map<string, HTMLElement>
+export type RegisterSlotTarget = (id: string, name: string, ref: HTMLElement) => void;
 export type UnregisterSlotTarget = (id: string, name: string) => void;
 
 export type ActiveSlotPortalsContextType = Set<string>;

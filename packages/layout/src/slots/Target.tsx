@@ -1,7 +1,7 @@
 import { useClassName, useId } from '@contember/react-utils'
 import { assert, dataAttribute, isArrayOfMembersSatisfyingFactory, isNonEmptyArray, isNonEmptyTrimmedString, isSingleWordString, satisfiesOneOfFactory, setHasOneOf } from '@contember/utilities'
 import { snakeCase } from 'change-case'
-import { memo, useEffect, useLayoutEffect, useRef } from 'react'
+import { memo, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { useActiveSlotPortalsContext, useTargetsRegistryContext } from './contexts'
 import { SlotTargetProps } from './types'
 
@@ -39,31 +39,34 @@ export const Target = memo<SlotTargetProps>(
 			assert('aliases is an empty array or an array of names', aliases, nonEmptyArrayOfNonEmptyStrings)
 		}
 
-		const ref = useRef<HTMLElement>(null)
+		const [element, setElement] = useState<HTMLElement | null>(null)
 		const idRef = useRef(Math.random().toString(36).substring(2, 9))
 		const { unregisterSlotTarget, registerSlotTarget } = useTargetsRegistryContext()
 		const activeSlotPortals = useActiveSlotPortalsContext()
 
 		useLayoutEffect(() => {
 			const id = idRef.current
-			registerSlotTarget(id, name, ref)
 
-			return () => {
-				unregisterSlotTarget(id, name)
+			if (element) {
+				registerSlotTarget(id, name, element)
+
+				return () => {
+					unregisterSlotTarget(id, name)
+				}
 			}
-		}, [name, registerSlotTarget, unregisterSlotTarget])
+		}, [element, name, registerSlotTarget, unregisterSlotTarget])
 
 		const registeredAliasesRef = useRef<Set<string>>(new Set())
 
 		useLayoutEffect(() => {
 			const id = idRef.current
 
-			if (aliases) {
+			if (element && aliases) {
 				const aliasesSet = new Set(aliases)
 
 				aliasesSet.forEach(name => {
 					if (!registeredAliasesRef.current.has(name)) {
-						registerSlotTarget(id, name, ref)
+						registerSlotTarget(id, name, element)
 						registeredAliasesRef.current.add(name)
 					}
 				})
@@ -75,7 +78,7 @@ export const Target = memo<SlotTargetProps>(
 					}
 				})
 			}
-		}, [aliases, registerSlotTarget, unregisterSlotTarget])
+		}, [aliases, element, registerSlotTarget, unregisterSlotTarget])
 
 		useEffect(() => {
 			const id = idRef.current
@@ -98,7 +101,7 @@ export const Target = memo<SlotTargetProps>(
 		return ((active || fallback)
 			? (
 				<Container
-					ref={ref}
+					ref={setElement}
 					key={key}
 					{...rest}
 					data-key={key}

@@ -12,11 +12,11 @@ export class PackageManagerHelpers {
 		const dirs = await fsManager.listDirectories(dir, workspaces)
 
 		const packageJson = await Promise.all(dirs.map(async it => {
-			const packageJson = await fsManager.tryReadJson<PackageJson>(join(it, 'package.json'))
+			const packageJson = await fsManager.tryReadJson<PackageJson>(join(dir, it, 'package.json'))
 			return packageJson ? [packageJson, it] as const : null
 		}))
 
-		return packageJson.filter(<T>(it: T | null): it is T => it !== null).map(([packageJson, dir]) => new Package(dir, false, packageJson))
+		return packageJson.filter(<T>(it: T | null): it is T => it !== null).map(([packageJson, subDir]) => new Package(join(dir, subDir), false, packageJson))
 	}
 
 	static getWorkspacesFromPackageJson({ packageJson }: { packageJson: PackageJson }): string[] {

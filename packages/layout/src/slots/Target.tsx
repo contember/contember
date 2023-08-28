@@ -1,7 +1,7 @@
 import { useClassName, useId } from '@contember/react-utils'
 import { assert, dataAttribute, isArrayOfMembersSatisfyingFactory, isNonEmptyArray, isNonEmptyTrimmedString, isSingleWordString, satisfiesOneOfFactory, setHasOneOf } from '@contember/utilities'
 import { snakeCase } from 'change-case'
-import { memo, useLayoutEffect, useRef } from 'react'
+import { memo, useEffect, useLayoutEffect, useRef } from 'react'
 import { useActiveSlotPortalsContext, useTargetsRegistryContext } from './contexts'
 import { SlotTargetProps } from './types'
 
@@ -75,16 +75,19 @@ export const Target = memo<SlotTargetProps>(
 					}
 				})
 			}
+		}, [aliases, registerSlotTarget, unregisterSlotTarget])
 
-			const _registeredAliasesRef = registeredAliasesRef
+		useEffect(() => {
+			const id = idRef.current
+			const registeredAliases = registeredAliasesRef.current
 
 			return () => {
-				_registeredAliasesRef.current.forEach(name => {
+				registeredAliases.forEach(name => {
 					unregisterSlotTarget(id, name)
-					_registeredAliasesRef.current.delete(name)
+					registeredAliases.delete(name)
 				})
 			}
-		}, [aliases, registerSlotTarget, unregisterSlotTarget])
+		}, [unregisterSlotTarget])
 
 		const Container = as ?? 'div'
 		const className = useClassName(componentClassName, classNameProp)

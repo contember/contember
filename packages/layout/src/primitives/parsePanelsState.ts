@@ -51,7 +51,7 @@ export function parsePanelsState(currentlyActivePanel: string | undefined, panel
 		resultingVisibilities.set(name, behavior === 'static' ? 'visible' : visibility)
 		resultingBehaviors.set(name, behavior)
 
-		const size = Math.max(panel.minWidth, panel.basis)
+		const size = Math.max(panel.minWidth || 0, panel.basis)
 		assert('panel size is is non negative number', size, isNonNegativeNumber)
 
 		switch (behavior) {
@@ -89,7 +89,7 @@ export function parsePanelsState(currentlyActivePanel: string | undefined, panel
 				if (difference !== 0) {
 					return difference
 				} else {
-					difference = (b.priority ?? -1) - (a.priority ?? -1)
+					difference = (b.priority || -1) - (a.priority || -1)
 
 					return difference
 				}

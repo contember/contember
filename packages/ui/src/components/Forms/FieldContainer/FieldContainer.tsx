@@ -1,5 +1,5 @@
 import { useClassNameFactory, useColorScheme, useElementSize } from '@contember/react-utils'
-import { ComponentClassNameProps, colorSchemeClassName, controlsThemeClassName, dataAttribute, deprecate, fallback, px, themeClassName } from '@contember/utilities'
+import { ComponentClassNameProps, colorSchemeClassName, controlsThemeClassName, dataAttribute, deprecate, fallback, omit, px, themeClassName } from '@contember/utilities'
 import { CSSProperties, ReactNode, memo, useMemo, useRef } from 'react'
 import type { Size } from '../../../types'
 import { ErrorList, ErrorListProps } from '../../ErrorList/ErrorList'
@@ -184,6 +184,7 @@ export const FieldContainer = memo(
 		style,
 		useLabelElement = true,
 		width = 'column',
+		...props
 	}: FieldContainerProps) => {
 		deprecate('1.3.0', labelPosition === 'labelInlineLeft', '`labelPosition="labelInlineLeft"`', '`labelPosition="left" display="inline"`')
 		deprecate('1.3.0', labelPosition === 'labelInlineRight', '`labelPosition="labelInlineRight"`', '`labelPosition="right" display="inline"`')
@@ -203,8 +204,11 @@ export const FieldContainer = memo(
 		const bodyContentRef = useRef<HTMLDivElement>(null)
 		const { height } = useElementSize(bodyContentRef)
 
+		const rest = omit(props as Record<PropertyKey, unknown>, unfilteredBindingRestProps)
+
 		return (
 			<LabelElement
+				{...rest}
 				data-invalid={dataAttribute(invalid)}
 				data-size={dataAttribute(size)}
 				data-label-position={dataAttribute(labelPosition)}
@@ -257,3 +261,22 @@ export const FieldContainer = memo(
 	},
 )
 FieldContainer.displayName = 'FieldContainer'
+
+const unfilteredBindingRestProps = [
+	'connectingEntityField',
+	'containerComponentExtraProps',
+	'createNewForm',
+	'currentValue',
+	'enableRemoving',
+	'initialEntityCount',
+	'itemComponent',
+	'itemComponentExtraProps',
+	'lazy',
+	'onClear',
+	'onSearch',
+	'optionLabel',
+	'orderBy',
+	'removalType',
+	'searchByFields',
+	'sortableBy',
+]

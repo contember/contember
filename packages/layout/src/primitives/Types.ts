@@ -1,5 +1,5 @@
-import { ComponentClassNameProps, NestedClassName, PolymorphicComponentPropsWithRef, isArrayOfMembersSatisfyingFactory, isNonEmptyString, isOneOfFactory, satisfiesOneOfFactory } from '@contember/utilities'
-import { ElementType, PropsWithChildren, ReactElement, ReactNode, RefObject } from 'react'
+import { ComponentClassNameProps, PolymorphicComponent, isArrayOfMembersSatisfyingFactory, isNonEmptyString, isOneOfFactory, satisfiesOneOfFactory } from '@contember/utilities'
+import { ComponentProps, PropsWithChildren, ReactNode, RefObject } from 'react'
 
 export const panelBehaviorsList = ['static', 'collapsible', 'overlay', 'modal'] as const
 export type PanelBehavior = typeof panelBehaviorsList[number]
@@ -16,17 +16,13 @@ export const isComponentClassName = satisfiesOneOfFactory(
 	isNonEmptyString,
 )
 
-export interface OwnContainerProps extends ComponentClassNameProps, PropsWithChildren<{
+export type OwnContainerProps = ComponentClassNameProps & PropsWithChildren<{
 	showDataState?: boolean;
-}> { }
+}>
 
-export type ContainerProps<C extends ElementType> = PolymorphicComponentPropsWithRef<C, OwnContainerProps>
+export type ContainerProps = ComponentProps<ContainerComponentType>
 
-export type ContainerComponentType =
-	& (<C extends ElementType = 'div'>(props: ContainerProps<C>,) => React.ReactElement | null)
-	& {
-		displayName?: string | undefined;
-	}
+export type ContainerComponentType = PolymorphicComponent<'div', OwnContainerProps>
 
 export type PanelState = {
 	behavior: PanelBehavior;
@@ -34,38 +30,56 @@ export type PanelState = {
 	visibility: PanelVisibility;
 }
 
-export interface PanelBasicProps extends ComponentClassNameProps, PropsWithChildren<{
-	trapFocusInModal?: boolean;
+export type PanelBasicProps = ComponentClassNameProps & PropsWithChildren<{
+	/**
+	 * If true, when the panel behavior is modal, the focus will be trapped inside the panel.
+	 */
+	trapFocusInModal?: boolean | null | undefined;
 	tabIndex?: never;
-}> { }
+}>
 
 export type CommonPanelConfigProps = {
-	basis: number | null | undefined;
-	maxWidth?: number | null | undefined;
-	minWidth?: number | null | undefined;
+	/**
+	 * Flex basis of the panel, default is 320 (pixels).
+	 */
+	basis?: number;
+	/**
+	 * Max width of the panel. If the value is false or null, the panel will have no max width.
+	 */
+	maxWidth?: number | false | null | undefined;
+	/**
+	 * Min width of the panel. If the value is false or null, the panel will have no min width.
+	 */
+	minWidth?: number | false | null | undefined;
+	/**
+	 * Name of the panel, only one panel with the same name can be registered at the same time.
+	 */
 	name: string;
-	priority?: number | null | undefined;
+	/**
+	 * Priority of the panel, used for determining which panel will be hidden when there is not enough space for all panels.
+	 */
+	priority?: number | false | null | undefined;
 }
 
-export interface ControlledBehaviorPanelProps {
+export type ControlledBehaviorPanelProps = {
 	behavior: PanelBehavior;
 	defaultBehavior?: null | undefined;
 	onBehaviorChange: (state: PanelState) => void;
 }
 
-export interface UncontrolledBehaviorPanelProps {
+export type UncontrolledBehaviorPanelProps = {
 	behavior?: null | undefined;
 	defaultBehavior: PanelBehavior;
 	onBehaviorChange?: (state: PanelState) => Partial<Omit<PanelState, 'behavior'>> & { passive?: boolean } | null | undefined | void;
 }
 
-export interface ControlledVisibilityPanelProps {
+export type ControlledVisibilityPanelProps = {
 	defaultVisibility?: null | undefined;
 	onVisibilityChange: (state: PanelState) => void;
 	visibility: PanelVisibility;
 }
 
-export interface UncontrolledVisibilityPanelProps {
+export type UncontrolledVisibilityPanelProps = {
 	defaultVisibility: PanelVisibility;
 	onVisibilityChange?: (state: PanelState) => Partial<Omit<PanelState, 'visibility'>> & { passive?: boolean } | null | undefined | void;
 	visibility?: null | undefined;
@@ -86,7 +100,7 @@ export type OwnPanelProps =
 	& PanelBasicProps
 	& PanelConfigProps
 
-export type PanelProps<C extends ElementType> = PolymorphicComponentPropsWithRef<C, OwnPanelProps>
+export type PanelProps = ComponentProps<PanelComponentType>
 
 export type PanelConfig =
 	& {
@@ -98,50 +112,22 @@ export type PanelConfig =
 		ref: RefObject<HTMLElement>;
 	}
 
-export type PanelComponentType =
-	& (<C extends ElementType = 'section'>(props: PanelProps<C>,) => ReactElement | null)
-	& {
-		displayName?: string | undefined;
-	}
+export type PanelComponentType = PolymorphicComponent<'section', OwnPanelProps>
 
-export type OwnPanelBodyProps = {
-	children?: ReactNode;
-	className?: NestedClassName;
-	componentClassName?: string;
-}
+export type OwnPanelBodyProps = PropsWithChildren<ComponentClassNameProps>
 
-export type PanelBodyProps<C extends ElementType> = PolymorphicComponentPropsWithRef<C, OwnPanelBodyProps>
+export type PanelBodyProps = ComponentProps<PanelBodyComponentType>
 
-export type PanelBodyComponentType = (<C extends ElementType = 'div'>(
-	props: PanelBodyProps<C>,
-) => React.ReactElement | null) & {
-	displayName?: string | undefined;
-}
+export type PanelBodyComponentType = PolymorphicComponent<'div', OwnPanelBodyProps>
 
-export type OwnPanelFooterProps = {
-	children?: ReactNode;
-	className?: NestedClassName;
-	componentClassName?: string;
-}
+export type OwnPanelFooterProps = PropsWithChildren<ComponentClassNameProps>
 
-export type PanelFooterProps<C extends ElementType> = PolymorphicComponentPropsWithRef<C, OwnPanelFooterProps>
+export type PanelFooterProps = ComponentProps<PanelFooterComponentType>
 
-export type PanelFooterComponentType =
-	& (<C extends ElementType = 'footer'>(props: PanelFooterProps<C>,) => React.ReactElement | null)
-	& {
-		displayName?: string | undefined;
-	}
+export type PanelFooterComponentType = PolymorphicComponent<'footer', OwnPanelFooterProps>
 
-export type OwnPanelHeaderProps = {
-	children?: ReactNode;
-	className?: NestedClassName;
-	componentClassName?: string;
-}
+export type OwnPanelHeaderProps = PropsWithChildren<ComponentClassNameProps>
 
-export type PanelHeaderProps<C extends ElementType> = PolymorphicComponentPropsWithRef<C, OwnPanelHeaderProps>
+export type PanelHeaderProps = ComponentProps<PanelHeaderComponentType>
 
-export type PanelHeaderComponentType =
-	& (<C extends ElementType = 'header'>(props: PanelHeaderProps<C>) => React.ReactElement | null)
-	& {
-		displayName?: string | undefined;
-	}
+export type PanelHeaderComponentType = PolymorphicComponent<'header', OwnPanelFooterProps>

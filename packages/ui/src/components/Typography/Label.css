@@ -1,18 +1,19 @@
 :where(.cui-label) {
-	--cui-label-inset-vertical: var(--cui-gap);
-	--cui-label-inset-horizontal: var(--cui-gap);
+	--cui-text--inset-horizontal: var(--cui-label--inset-horizontal);
+	--cui-text--inset-vertical: var(--cui-label--inset-vertical);
+	--cui-text--padding-horizontal: var(--cui-label--inset-horizontal);
+	--cui-text--padding-vertical: var(--cui-label--inset-vertical);
+	--cui-label--inset-vertical: var(--cui-gap);
+	--cui-label--inset-horizontal: var(--cui-gap);
 	background-color: transparent;
 	border: none;
 	border-radius: var(--cui-gap);
 	color: inherit;
-	display: inline-flex;
 	gap: var(--cui-gap);
 	font-family: inherit;
 	font-size: var(--cui-font-size--label);
 	font-weight: inherit;
 	line-height: 1.125em;
-	margin: calc(-1 * var(--cui-label-inset-vertical)) calc(-1 * var(--cui-label-inset-horizontal));
-	padding: var(--cui-label-inset-vertical) var(--cui-label-inset-horizontal);
 	position: relative;
 	text-align: inherit;
 	text-decoration: none;

@@ -21,7 +21,6 @@
 
 @media (min-width: 1280px) {
 	:where(.cui-layout-page-aside) {
-		background-color: rgb(var(--cui-background-color--rgb-25));
 		border-left: 1px solid transparent;
 		border-top: unset;
 		bottom: 0;

@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useMemo, useRef } from 'react'
 
 const count = { current: 360 }
 
@@ -17,5 +17,5 @@ function nextId() {
  * @returns a unique id
  */
 export function useId() {
-	return useRef(nextId()).current
+	return useMemo(() => nextId(), [])
 }

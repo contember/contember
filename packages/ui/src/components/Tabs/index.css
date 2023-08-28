@@ -35,14 +35,6 @@
 	transform: scaleY(1);
 }
 
-:where(.cui-tab-button-label) {
-	border-radius: 0.25em;
-	display: flex;
-	flex-direction: row;
-	padding: var(--cui-tab-button--label-padding);
-	margin: calc(-1 * var(--cui-tab-button--label-padding));
-}
-
 :where(.cui-tab-button:hover .cui-tab-button-label) {
 	background-color: rgba(var(--cui-background-color--toned-controls-rgb-50), var(--cui-opacity--low));
 }

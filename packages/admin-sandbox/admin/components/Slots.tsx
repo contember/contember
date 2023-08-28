@@ -7,12 +7,16 @@ import {
 	FooterSlotTargets,
 	HeaderSlotSources,
 	HeaderSlotTargets,
-	// When you define new slots, you need import:
-	// Slots,
+	SidebarLeftSlotSources,
+	SidebarLeftSlotTargets,
+	SidebarRightSlotSources,
+	SidebarRightSlotTargets,
 	commonSlots,
 	contentSlots,
 	footerSlots,
 	headerSlots,
+	sidebarLeftSlots,
+	sidebarRightSlots,
 } from '@contember/layout'
 import { useDocumentTitle } from '@contember/react-utils'
 import { memo } from 'react'
@@ -30,6 +34,8 @@ export const slots = [
 	...contentSlots,
 	...headerSlots,
 	...footerSlots,
+	...sidebarLeftSlots,
+	...sidebarRightSlots,
 	// Your custom slot names will come here, e.g:
 	// 'MySlot',
 ]
@@ -39,6 +45,8 @@ export const SlotSources = {
 	...ContentSlotSources,
 	...HeaderSlotSources,
 	...FooterSlotSources,
+	...SidebarLeftSlotSources,
+	...SidebarRightSlotSources,
 	Title,
 	// Your custom slots will come here, e.g:
 	// MySLot: Slots.createSlotSourceComponent(slotTargets.MySLot),
@@ -49,6 +57,8 @@ export const SlotTargets = {
 	...ContentSlotTargets,
 	...HeaderSlotTargets,
 	...FooterSlotTargets,
+	...SidebarLeftSlotTargets,
+	...SidebarRightSlotTargets,
 	// Your custom slot targets will come here, e.g:
 	// MySLot: Slots.createSlotTargetComponent(slotTargets.MySLot),
 }

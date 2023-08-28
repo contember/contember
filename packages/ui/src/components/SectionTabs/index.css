@@ -1,7 +1,8 @@
 :where(.cui-section-tabs) {
 	--cui-section-tabs--padding-vertical: calc(3* var(--cui-gap, 0em));
 	--cui-section-tabs--padding-horizontal: calc(3* var(--cui-gap, 0em));
-	margin-bottom: calc(-1 * var(--cui-padding));
+	margin-bottom: calc(-1 * max(var(--cui-padding), var(--cui-section-tabs--padding-vertical)));
+	margin-top: calc(-1 * max(var(--cui-padding), var(--cui-section-tabs--padding-vertical)));
 	margin-left: calc(-1 * var(--cui-section-tabs--padding-horizontal));
 	margin-right: calc(-1 * var(--cui-section-tabs--padding-horizontal));
 	padding-left: var(--cui-section-tabs--padding-horizontal);

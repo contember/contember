@@ -131,28 +131,19 @@ export const DevPanel = ({ heading, icon, children, preview }: {
 	children: ReactNode,
 	preview?: ReactNode
 }) => {
+	const id = `cui-devBar-panel-${useId()}`
 	const className = useClassNameFactory('devBar')
 	const isSmallScreen = useSmallScreenContext()
+
 	const [expanded, setExpanded] = useState(false)
-	const id = `cui-devBar-panel-${useId()}`
-
-	const handleOpen = useReferentiallyStableCallback(() => {
-		setExpanded(true)
-	})
-
-	const handleToggle = useReferentiallyStableCallback(() => {
-		setExpanded(expanded => !expanded)
-	})
-
-	const handleClose = useReferentiallyStableCallback(() => {
-		setExpanded(false)
-	})
+	const mouseEnterTimeStampRef = useRef<ReturnType<typeof Date.now> | undefined>(undefined)
 
 	const devPanelRef = useRef<HTMLDivElement>(null)
 
 	useOnElementMouseEnterDelayedCallback(devPanelRef, useReferentiallyStableCallback(({ type }) => {
 		if (type === 'mouseenter') {
-			handleOpen()
+			mouseEnterTimeStampRef.current = Date.now() + 300
+			setExpanded(true)
 		}
 	}))
 
@@ -161,14 +152,14 @@ export const DevPanel = ({ heading, icon, children, preview }: {
 			ref={devPanelRef}
 			data-expanded={dataAttribute(expanded)}
 			className={className('trigger')}
-			onMouseLeave={useReferentiallyStableCallback(event => {
-				handleClose()
+			onMouseLeave={useReferentiallyStableCallback(() => {
+				setExpanded(false)
 			})}
 			onKeyDown={useReferentiallyStableCallback(event => {
 				if (expanded && event.code === 'Escape') {
 					event.preventDefault()
 					event.stopPropagation()
-					handleClose()
+					setExpanded(false)
 				}
 			})}
 		>
@@ -178,7 +169,14 @@ export const DevPanel = ({ heading, icon, children, preview }: {
 				aria-controls={id}
 				aria-expanded={expanded}
 				className={className('trigger-label')}
-				onClick={handleToggle}
+				onClick={useReferentiallyStableCallback(() => {
+					if (mouseEnterTimeStampRef.current && Date.now() < mouseEnterTimeStampRef.current) {
+						return
+					} else {
+						setExpanded(expanded => !expanded)
+						mouseEnterTimeStampRef.current = undefined
+					}
+				})}
 			>
 				{icon}
 				<VisuallyHidden hidden={isSmallScreen}>{preview ?? heading}</VisuallyHidden>

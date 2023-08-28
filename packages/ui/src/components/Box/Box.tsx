@@ -3,6 +3,7 @@ import { ComponentClassNameProps, colorSchemeClassName, dataAttribute, deprecate
 import { ReactNode, forwardRef, memo } from 'react'
 import type { BoxDistinction, Default, HTMLDivElementProps, Intent } from '../../types'
 import { DeprecatedStackProps, Stack, StackOwnProps } from '../Stack'
+import { Text } from '../Typography'
 import { Label } from '../Typography/Label'
 
 export type BoxHeaderProps =
@@ -125,7 +126,7 @@ export const Box = memo(forwardRef<HTMLDivElement, BoxProps>(({
 	padding = true,
 	reverse,
 	wrap,
-	...divProps
+	...rest
 }: BoxProps, ref) => {
 	const className = useClassNameFactory(componentClassName)
 
@@ -148,7 +149,7 @@ export const Box = memo(forwardRef<HTMLDivElement, BoxProps>(({
 
 	return (
 		<Stack
-			{...divProps}
+			{...rest}
 			ref={ref}
 			align={align}
 			data-active={dataAttribute(isActive)}
@@ -189,8 +190,13 @@ export const Box = memo(forwardRef<HTMLDivElement, BoxProps>(({
 					evenly={evenly}
 					gap={gap}
 					horizontal={horizontal}
+					align={align}
+					justify={justify}
 				>
-					{children}
+					{typeof children === 'string' || typeof children === 'number'
+						? <Text>{children}</Text>
+						: children
+					}
 				</Stack>
 			)}
 			{footer && <div className={className('footer')}>{footer}</div>}

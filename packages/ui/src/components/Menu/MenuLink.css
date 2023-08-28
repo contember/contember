@@ -19,11 +19,16 @@
 }
 
 :where(.cui-menu-link > .cui-label) {
-	--cui-label-inset-vertical: calc(1.5 * var(--cui-gap));
-	--cui-label-inset-horizontal: calc(1.5 * var(--cui-gap));
+	--cui-label--inset-vertical: calc(1.5 * var(--cui-gap));
+	--cui-label--inset-horizontal: calc(1.5 * var(--cui-gap));
 	align-items: center;
+	display: inline-flex;
 	flex-grow: 1;
 	gap: calc(1.5 * var(--cui-gap));
+}
+:where(.cui-menu-link > .cui-label)::before,
+:where(.cui-menu-link > .cui-label)::after {
+	content: unset;
 }
 
 :where(.cui-menu-link[href]:hover > .cui-label) {

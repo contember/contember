@@ -1,25 +1,24 @@
 import { useClassNameFactory, useComposeRef } from '@contember/react-utils'
-import { PolymorphicRef, dataAttribute } from '@contember/utilities'
-import { ElementType, forwardRef, memo, useRef } from 'react'
+import { dataAttribute } from '@contember/utilities'
+import { forwardRef, memo, useRef } from 'react'
 import { useElementInsetCustomProperties } from '../insets'
 import { useLayoutPanelContext } from './Contexts'
-import { PanelBodyComponentType, PanelBodyProps } from './Types'
+import { PanelBodyComponentType } from './Types'
 
 /**
  * @group Layout
  */
-export const PanelBody: PanelBodyComponentType = memo(forwardRef(<C extends ElementType = 'div'>({
-	as,
+export const PanelBody: PanelBodyComponentType = memo(forwardRef(({
+	as: Container = 'div',
 	children,
 	className: classNameProp,
 	componentClassName = 'layout-panel-body',
 	style,
 	...rest
-}: PanelBodyProps<C>, forwardedRef: PolymorphicRef<C>) => {
-	const Container = as ?? 'div'
+}, forwardedRef) => {
 	const { behavior, visibility } = useLayoutPanelContext()
 
-	const elementRef = useRef<HTMLElement>(null)
+	const elementRef = useRef<HTMLDivElement>(null)
 	const composeRef = useComposeRef(elementRef, forwardedRef)
 
 	const insetsStyle = useElementInsetCustomProperties(elementRef, '--inset')
@@ -27,7 +26,6 @@ export const PanelBody: PanelBodyComponentType = memo(forwardRef(<C extends Elem
 
 	return (
 		<Container
-			as={typeof Container === 'string' ? undefined : 'div'}
 			ref={composeRef}
 			className={className(null, classNameProp)}
 			data-behavior={dataAttribute(behavior)}

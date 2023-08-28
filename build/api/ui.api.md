@@ -39,6 +39,7 @@ import { Narrowable } from '@contember/utilities';
 import { NestedClassName } from '@contember/utilities';
 import { NonOptional } from '@contember/utilities';
 import { PointerEventHandler } from 'react';
+import { PolymorphicComponent } from '@contember/utilities';
 import { PolymorphicComponentPropsWithRef } from '@contember/utilities';
 import { PropsWithChildren } from 'react';
 import { ReactElement } from 'react';
@@ -1624,7 +1625,7 @@ export interface ErrorListProps {
 export type ErrorType = Error | unknown;
 
 // @public
-export const FieldContainer: MemoExoticComponent<({ children, className: classNameProp, componentClassName, description, errors, direction, display, footer, evenly, gap, horizontal, label, labelDescription, labelPosition, required, reverse, size, style, useLabelElement, width, }: FieldContainerProps) => JSX.Element>;
+export const FieldContainer: MemoExoticComponent<({ children, className: classNameProp, componentClassName, description, errors, direction, display, footer, evenly, gap, horizontal, label, labelDescription, labelPosition, required, reverse, size, style, useLabelElement, width, ...props }: FieldContainerProps) => JSX.Element>;
 
 // @public (undocumented)
 export type FieldContainerLabelPosition = 'bottom' | 'left' | 'right' | 'top' | DeprecatedFieldContainerLabelPosition;
@@ -1740,11 +1741,7 @@ export interface GridOwnProps {
 export type GridProps = GridOwnProps & HTMLDivElementProps;
 
 // @public (undocumented)
-export const Heading: MemoExoticComponent<ForwardRefExoticComponent<    {
-distinction?: HeadingDistinction | undefined;
-depth?: HeadingDepth | undefined;
-size?: "small" | "default" | undefined;
-} & Omit<HTMLHeadingElementProps, "ref"> & RefAttributes<HTMLHeadingElement>>>;
+export const Heading: MemoExoticComponent<ForwardRefExoticComponent<Omit<TextOwnProps<Function>, keyof HeadingOwnProps> & Omit<HTMLHeadingElementProps, "ref" | keyof TextOwnProps<Function> | keyof HeadingOwnProps> & HeadingOwnProps & RefAttributes<HTMLHeadingElement>>>;
 
 // @public (undocumented)
 export type HeadingDepth = 1 | 2 | 3 | 4 | 5 | 6;
@@ -1753,13 +1750,16 @@ export type HeadingDepth = 1 | 2 | 3 | 4 | 5 | 6;
 export type HeadingDistinction = Default | 'subtle';
 
 // @public (undocumented)
-export type HeadingProps = {
+export type HeadingOwnProps = {
     distinction?: HeadingDistinction;
     depth?: HeadingDepth;
     size?: {
         [S in Size]: S;
     }['small' | 'default'];
-} & Omit<HTMLHeadingElementProps, 'ref'>;
+};
+
+// @public (undocumented)
+export type HeadingProps = Omit<TextProps, keyof HeadingOwnProps> & Omit<HTMLHeadingElementProps, 'ref' | keyof HeadingOwnProps | keyof TextProps> & HeadingOwnProps;
 
 // @public (undocumented)
 export const HiddenInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<string> & ControlValueProps<string, boolean> & {
@@ -2838,7 +2838,7 @@ withTopToolbar?: boolean | undefined;
 export type TelInputProps = TextInputProps;
 
 // @public (undocumented)
-const Text_2: MemoExoticComponent<ForwardRefExoticComponent<TextProps<Function> & RefAttributes<HTMLSpanElement>>>;
+const Text_2: PolymorphicComponent<'span', TextProps>;
 export { Text_2 as Text }
 
 // @public (undocumented)
@@ -2882,20 +2882,19 @@ export type TextInputPropsWithDeprecated = Omit<TextInputProps, 'type'> & {
 };
 
 // @public (undocumented)
-export type TextOwnProps<Translate extends Function = Function> = ComponentClassNameProps & ({
-    children: string;
+export interface TextOwnProps<Translate extends Function = Function> extends ComponentClassNameProps {
+    // (undocumented)
+    children?: ReactNode;
+    // (undocumented)
     fallback?: string;
-    translate: Translate;
+    // (undocumented)
+    translate?: Translate;
+    // (undocumented)
     values?: Record<string, any>;
-} | {
-    children: string;
-    fallback?: never;
-    translate?: never;
-    values?: never;
-});
+}
 
 // @public (undocumented)
-export type TextProps<Translate extends Function = Function> = Omit<HTMLSpanElementProps, keyof TextOwnProps> & TextOwnProps<Translate>;
+export type TextProps<Translate extends Function = Function> = TextOwnProps<Translate>;
 
 // @public (undocumented)
 export interface ThemeScheme {

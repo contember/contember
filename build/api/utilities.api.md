@@ -141,6 +141,9 @@ export function isFalse(value: unknown): value is false;
 export function isHTMLElement(value: unknown): value is HTMLElement;
 
 // @public (undocumented)
+export function isNonEmptyArray<T>(value: unknown): value is [T, ...T[]];
+
+// @public (undocumented)
 export function isNonEmptyString(value: unknown): value is string;
 
 // @public (undocumented)
@@ -181,6 +184,9 @@ export function isPlainObject<T extends Record<string, unknown>>(value: unknown)
 
 // @public
 export function isScrollable(element: HTMLElement | null): boolean;
+
+// @public (undocumented)
+export function isSingleWordString(value: unknown): value is string;
 
 // @public (undocumented)
 export function isSlugString(value: unknown): value is SlugString;
@@ -251,6 +257,11 @@ export { PascalCase }
 
 // @public (undocumented)
 export function pick<T extends Object, K extends keyof T>(object: T, properties: ReadonlyArray<K>): Pick<T, K>;
+
+// @public
+export type PolymorphicComponent<T extends React.ElementType, P = {}> = (<C extends React.ElementType = T>(props: PolymorphicComponentPropsWithRef<C, P>) => React.ReactElement | null) & {
+    displayName?: string | undefined;
+};
 
 // @public
 export type PolymorphicComponentProps<C extends React.ElementType, Props = {}> = InheritableElementProps<C, Props & AsProp<C>>;

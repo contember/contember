@@ -1,5 +1,6 @@
 import { useClassName } from '@contember/react-utils'
 import { ReactNode, memo } from 'react'
+import { Text } from './Text'
 
 export interface DescriptionProps {
 	className?: string
@@ -10,7 +11,7 @@ export interface DescriptionProps {
  * @group UI
  */
 export const Description = memo(({ className, children }: DescriptionProps) => {
-	return <span className={useClassName('description', className)}>{children}</span>
+	return <Text className={useClassName('description', className)}>{children}</Text>
 })
 
 Description.displayName = 'Description'

@@ -1,9 +1,9 @@
 import { useClassNameFactory } from '@contember/react-utils'
-import { PolymorphicRef, assert, isNotNullish, isSlugString } from '@contember/utilities'
+import { assert, isNotNullish, isSlugString } from '@contember/utilities'
 import { ElementType, forwardRef, memo } from 'react'
 import { InsetsConsumer } from '../insets'
 import { GetLayoutPanelsStateContext, isComponentClassName } from '../primitives'
-import { BarComponentType, BarProps } from './Types'
+import { BarComponentType } from './Types'
 
 export function createLayoutBarComponent({
 	name,
@@ -15,7 +15,7 @@ export function createLayoutBarComponent({
 	defaultAs: ElementType;
 	defaultComponentClassName?: string | string[];
 	displayName: string;
-}): BarComponentType {
+}) {
 	assert('name is a slug string', name, isSlugString)
 	assert('as is defined', defaultAs, isNotNullish)
 	assert(
@@ -24,8 +24,8 @@ export function createLayoutBarComponent({
 		isComponentClassName,
 	)
 
-	const Component = memo(forwardRef(<C extends ElementType = typeof defaultAs>({
-		as,
+	const Component: BarComponentType = memo(forwardRef(({
+		as = defaultAs,
 		center = true,
 		centerAfter,
 		centerBefore,
@@ -38,11 +38,11 @@ export function createLayoutBarComponent({
 		startAfter,
 		startBefore,
 		...props
-	}: BarProps<C>, forwardedRef: PolymorphicRef<C>) => {
+	}, forwardedRef) => {
 		const className = useClassNameFactory(componentClassName)
 
 		return (
-			<InsetsConsumer<ElementType> as={as ?? defaultAs} ref={forwardedRef} data-name={name} className={className(null, classNameProp)} {...props}>
+			<InsetsConsumer<ElementType> as={as} ref={forwardedRef} data-name={name} className={className(null, classNameProp)} {...props}>
 				<div className={className('body', classNameProp)}>
 					<GetLayoutPanelsStateContext.Consumer>
 						{state => (
@@ -80,7 +80,7 @@ export function createLayoutBarComponent({
 				</div>
 			</InsetsConsumer>
 		)
-	})) as unknown as BarComponentType
+	}))
 	Component.displayName = displayName
 
 	return Component

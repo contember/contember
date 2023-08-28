@@ -56,3 +56,13 @@ export type PolymorphicComponentPropsWithRef<
 	C extends React.ElementType,
 	Props = {}
 > = PolymorphicComponentProps<C, Props> & { ref?: PolymorphicRef<C> }
+
+/**
+ * A polymorphic component is a component that can be rendered as different
+ * HTML elements or other React components by specifying the `as` prop.
+ * This type allows for specifying the component (`C`) and the props (`P`)
+ * that the component accepts.
+ */
+export type PolymorphicComponent<T extends React.ElementType, P = {}> =
+	& (<C extends React.ElementType = T>(props: PolymorphicComponentPropsWithRef<C, P>) => React.ReactElement | null)
+	& { displayName?: string | undefined }

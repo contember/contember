@@ -1,19 +1,45 @@
+:where(.cui-text),
+:where(.cui-text)::after,
+:where(.cui-text)::before {
+	----leading-trim: calc((1lh - 1em) / 2);
+}
+
+:where(.cui-text)::after,
+:where(.cui-text)::before {
+  content: "";
+  display: table;
+}
+
+:where(.cui-text)::before {
+  margin-block-end: calc(-1 * var(----leading-trim));
+}
+
+:where(.cui-text)::after {
+  margin-block-start: calc(-1 * var(----leading-trim));
+}
+
 :where(.cui-text) {
-	--cui-text--leading-trim: calc((var(--cui-line-height--units) - 1em) / 2);
-	display: var(--cui-view--display, inline);
-	padding-inline-end: calc(var(--cui-view--padding-right, var(--cui-view--padding-horizontal, var(--cui-view--padding, 0px))) + var(--cui-text--leading-trim));
-	padding-inline-start: calc(var(--cui-view--padding-left, var(--cui-view--padding-horizontal, var(--cui-view--padding, 0px))) + var(--cui-text--leading-trim));
-
+	display: inline-block;
 	--cui-text--inset: 0px;
-	--cui-text--inset-horizontal: calc(var(--cui-text--inset));
-	--cui-text--inset-vertical: var(--cui-text--inset);
-
+  --cui-text--inset-vertical: var(--cui-text--inset);
+  --cui-text--inset-bottom: var(--cui-text--inset-vertical);
+  --cui-text--inset-top: var(--cui-text--inset-vertical);
+  --cui-text--inset-horizontal: var(--cui-text--inset);
+  --cui-text--inset-left: var(--cui-text--inset-horizontal);
+  --cui-text--inset-right: var(--cui-text--inset-horizontal);
 	--cui-text--padding: 0px;
-	--cui-text--padding-horizontal: calc(var(--cui-text--padding));
-	--cui-text--padding-vertical: var(--cui-text--padding);
-
-	margin-inline-start: calc(-1 * var(--cui-text--inset-horizontal));
-	margin-inline-end: calc(-1 * var(--cui-text--inset-horizontal));
-	margin-block-start: calc(-1 * var(--cui-text--inset-vertical));
-	margin-block-end: calc(-1 * var(--cui-text--inset-vertical));
+  --cui-text--padding-vertical: var(--cui-text--padding);
+  --cui-text--padding-bottom: var(--cui-text--padding-vertical);
+  --cui-text--padding-top: var(--cui-text--padding-vertical);
+  --cui-text--padding-horizontal: var(--cui-text--padding);
+  --cui-text--padding-left: var(--cui-text--padding-horizontal);
+  --cui-text--padding-right: var(--cui-text--padding-horizontal);
+	margin-inline-start: calc(-1 * var(--cui-text--inset-left));
+  margin-inline-end: calc(-1 * var(--cui-text--inset-right));
+  margin-block-start: calc(-1 * var(--cui-text--inset-top));
+  margin-block-end: calc(-1 * var(--cui-text--inset-bottom));
+  padding-inline-start: var(--cui-text--padding-left);
+  padding-inline-end: var(--cui-text--padding-right);
+  padding-block-start: max(0px, calc(var(--cui-text--padding-top) - var(----leading-trim)));
+  padding-block-end: max(0px, calc(var(--cui-text--padding-bottom) - var(----leading-trim)));
 }

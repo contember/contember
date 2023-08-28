@@ -1,22 +1,22 @@
 import { useClassName, useContainerWidth } from '@contember/react-utils'
-import { PolymorphicRef, assert, dataAttribute, isNotNullish } from '@contember/utilities'
-import { ElementType, forwardRef, memo, useLayoutEffect, useMemo, useRef } from 'react'
+import { assert, dataAttribute, isNotNullish } from '@contember/utilities'
+import { forwardRef, memo, useLayoutEffect, useMemo, useRef } from 'react'
 import { GetLayoutPanelsStateContext, GetLayoutPanelsStateContextType, useGetLayoutPanelsStateContext } from './Contexts'
-import { ContainerComponentType, ContainerProps, PanelConfig } from './Types'
+import { ContainerComponentType, PanelConfig } from './Types'
 import { panelsStateAsDataAttributes } from './panelsStateAsDataAttributes'
 import { parsePanelsState } from './parsePanelsState'
 
 /**
  * @group Layout
  */
-export const ResponsiveContainer: ContainerComponentType = memo(forwardRef(<C extends ElementType = 'div'>({
+export const ResponsiveContainer: ContainerComponentType = memo(forwardRef(({
 	as,
 	children,
 	className,
 	componentClassName = 'layout-responsive-container',
 	showDataState = true,
 	...rest
-}: ContainerProps<C>, forwardedRef: PolymorphicRef<C>) => {
+}, forwardedRef) => {
 	const Container = as ?? 'div'
 	const layoutWidth = useContainerWidth()
 	const { currentlyActivePanel, panels } = useGetLayoutPanelsStateContext()
@@ -34,7 +34,7 @@ export const ResponsiveContainer: ContainerComponentType = memo(forwardRef(<C ex
 			let modalsCount = 0
 
 			groups.collapsiblePanels.forEach(({ name, basis, minWidth }) => {
-				const size = minWidth ?? basis
+				const size = minWidth || basis
 				const visibility = maps.requestedVisibilities.get(name)
 				const possibleBehavior = availableSpaceForAllCollapsiblePanels >= size ? 'static' : 'modal'
 

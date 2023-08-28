@@ -17,14 +17,14 @@ export type RepeaterItemContainerProps =
 
 const repeaterItemContainerClassNameBase = 'repeater-item-container'
 
-export const RepeaterItemContainer = memo(forwardRef<HTMLDivElement, RepeaterItemContainerProps>(({ actions, gap, children, label, dragHandleComponent: Handle, index, ...rest }, forwardedRef) => {
-	const componentClassName = useClassNameFactory(repeaterItemContainerClassNameBase)
+export const RepeaterItemContainer = memo(forwardRef<HTMLDivElement, RepeaterItemContainerProps>(({ actions, gap, children, label, dragHandleComponent: Handle, index, className: classNameProp, componentClassName = repeaterItemContainerClassNameBase, ...rest }, forwardedRef) => {
+	const className = useClassNameFactory(componentClassName)
 
 	return (
 		<Box
 			ref={forwardedRef}
 			{...rest}
-			className={componentClassName()}
+			className={className(null, classNameProp)}
 			gap={gap ?? 'gutter'}
 			data-index={dataAttribute(index)}
 			data-sortable={dataAttribute(!!Handle)}
@@ -34,7 +34,7 @@ export const RepeaterItemContainer = memo(forwardRef<HTMLDivElement, RepeaterIte
 			}
 		>
 			{Handle && (
-				<div className={componentClassName('handle')}>
+				<div className={className('handle')}>
 					<Handle>
 						<Icon blueprintIcon="drag-handle-vertical" />
 					</Handle>
@@ -54,16 +54,16 @@ export type RepeaterItemContainerHeaderProps = {
 }
 
 export const RepeaterItemContainerHeader = memo(({ label, actions, index }: RepeaterItemContainerHeaderProps) => {
-	const componentClassName = useClassNameFactory(repeaterItemContainerClassNameBase)
+	const className = useClassNameFactory(repeaterItemContainerClassNameBase)
 
 	return (
 		<>
 			{(typeof label === 'string' || typeof label === 'number' || typeof label === 'boolean' || label == null)
 				? (label || index !== undefined) && (
-					<Label className={componentClassName('label')}>
+					<Label className={className('label')}>
 						{label}{label ? ' ' : ''}
 						{index !== undefined && (
-							<span className={componentClassName('index')}>{index + 1}</span>
+							<span className={className('index')}>{index + 1}</span>
 						)}
 					</Label>
 				)
@@ -71,7 +71,7 @@ export const RepeaterItemContainerHeader = memo(({ label, actions, index }: Repe
 			}
 
 			{actions && (
-				<div className={componentClassName('actions')}>{actions}</div>
+				<div className={className('actions')}>{actions}</div>
 			)}
 		</>
 	)

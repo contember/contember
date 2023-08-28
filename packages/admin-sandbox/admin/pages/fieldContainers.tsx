@@ -35,7 +35,7 @@ export default () => {
 				</Stack>
 			</SlotSources.ContentHeader>
 
-			<Stack align={align} horizontal={direction === 'horizontal'} gap="large" style={{ overflow: 'auto' }}>
+			<Stack align={align} horizontal={direction === 'horizontal'} gap="large">
 				FieldContainer with various label positions:
 				<FieldContainer
 					label="Lorem ipsum"

@@ -1,25 +1,24 @@
 import { useClassNameFactory, useComposeRef } from '@contember/react-utils'
-import { PolymorphicRef, dataAttribute } from '@contember/utilities'
-import { ElementType, forwardRef, memo, useRef } from 'react'
+import { dataAttribute } from '@contember/utilities'
+import { forwardRef, memo, useRef } from 'react'
 import { useElementInsetCustomProperties } from '../insets'
 import { useLayoutPanelContext } from './Contexts'
-import { PanelFooterComponentType, PanelFooterProps } from './Types'
+import { PanelFooterComponentType } from './Types'
 
 /**
  * @group Layout
  */
-export const PanelFooter: PanelFooterComponentType = memo(forwardRef(<C extends ElementType = 'footer'>({
-	as,
+export const PanelFooter: PanelFooterComponentType = memo(forwardRef(({
+	as: Container = 'footer',
 	children,
 	className: classNameProp,
 	componentClassName = 'layout-panel-footer',
 	style,
 	...rest
-}: PanelFooterProps<C>, forwardedRef: PolymorphicRef<C>) => {
-	const Container = as ?? 'footer'
+}, forwardedRef) => {
 	const { behavior, visibility } = useLayoutPanelContext()
 
-	const elementRef = useRef<HTMLElement>(null)
+	const elementRef = useRef<HTMLDivElement>(null)
 	const composeRef = useComposeRef(elementRef, forwardedRef)
 
 	const insetsStyle = useElementInsetCustomProperties(elementRef, '--inset')
@@ -27,7 +26,6 @@ export const PanelFooter: PanelFooterComponentType = memo(forwardRef(<C extends 
 
 	return (
 		<Container
-			as={typeof Container === 'string' ? undefined : 'footer'}
 			ref={composeRef}
 			className={className(null, classNameProp)}
 			data-behavior={dataAttribute(behavior)}

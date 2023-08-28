@@ -1,33 +1,9 @@
 import { Slots } from '@contember/layout'
 import { useClassName } from '@contember/react-utils'
-import { Layout as DefaultLayout, LayoutPage, Spacer } from '@contember/ui'
+import { Layout as DefaultLayout, LayoutPage, Spacer, Stack } from '@contember/ui'
 import { NestedClassName } from '@contember/utilities'
 import { PropsWithChildren } from 'react'
 import { SlotTargets } from './Slots'
-
-const {
-	Actions,
-	Back,
-	ContentFooter,
-	ContentHeader,
-	FooterCenter,
-	FooterEnd,
-	FooterStart,
-	HeaderCenter,
-	HeaderEnd,
-	HeaderStart,
-	Logo,
-	Navigation,
-	Profile,
-	Sidebar,
-	Switchers,
-	Title,
-	...rest
-} = SlotTargets
-
-if (import.meta.env.DEV) {
-	const __exhaustiveCheck: Record<PropertyKey, never> = rest
-}
 
 export const LayoutComponent = ({
 	children,
@@ -36,46 +12,47 @@ export const LayoutComponent = ({
 }: PropsWithChildren<{
 	className?: NestedClassName;
 }>) => {
-	const targetsIfActive = Slots.useTargetsIfActiveFactory(SlotTargets)
+	const createSlotTargets = Slots.useSlotTargetsFactory(SlotTargets)
 
 	return (
 		<DefaultLayout
 			className={useClassName(undefined, className)}
-			sidebarHeader={targetsIfActive(['Logo'])}
-			switchers={targetsIfActive(['Switchers'])}
-			navigation={targetsIfActive(['Navigation'])}
+			sidebarHeader={createSlotTargets(['SidebarLeftHeader', 'Logo'])}
+			switchers={createSlotTargets(['Switchers'])}
+			navigation={createSlotTargets(['Navigation'])}
 			children={(
 				<>
-					{targetsIfActive(['HeaderStart', 'HeaderCenter', 'HeaderEnd'], (
-						<header>
-							<HeaderStart />
-							<HeaderCenter />
-							<HeaderEnd />
-						</header>
-					))}
 					<LayoutPage
-						navigation={targetsIfActive(['Back'])}
-						actions={targetsIfActive(['Actions'])}
-						side={targetsIfActive(['Sidebar'])}
-						title={targetsIfActive(['Title'], (
-							<Title as="h1" />
+						navigation={createSlotTargets(['Back'])}
+						actions={createSlotTargets(['Actions', 'HeaderEnd'])}
+						side={createSlotTargets(['SidebarRightHeader', 'Sidebar', 'SidebarRightBody', 'SidebarRightFooter'])}
+						title={createSlotTargets(['HeaderStart', 'Title', 'HeaderCenter'], (
+							<>
+								{createSlotTargets(['HeaderStart'])}
+								{createSlotTargets(['Title', 'HeaderCenter'], (
+									<>
+										<SlotTargets.Title as="h1" />
+										<SlotTargets.HeaderCenter />
+									</>
+								))}
+							</>
 						))}
-						afterTitle={targetsIfActive(['ContentHeader'])}
+						afterTitle={createSlotTargets(['ContentHeader'])}
 					>
 						{children}
 						<Spacer grow />
-						{targetsIfActive(['FooterStart', 'FooterCenter', 'FooterEnd'], (
-							<footer>
-								<FooterStart />
-								<FooterCenter />
-								<FooterEnd />
-							</footer>
+						{createSlotTargets(['ContentFooter'])}
+						{createSlotTargets(['FooterStart', 'FooterCenter', 'FooterEnd'], (
+							<Stack horizontal>
+								<SlotTargets.FooterStart />
+								<SlotTargets.FooterCenter />
+								<SlotTargets.FooterEnd />
+							</Stack>
 						))}
-						{targetsIfActive(['ContentFooter'])}
 					</LayoutPage>
 				</>
 			)}
-			sidebarFooter={targetsIfActive(['Profile'])}
+			sidebarFooter={createSlotTargets(['Profile', 'SidebarLeftFooter'])}
 			{...rest}
 		/>
 	)

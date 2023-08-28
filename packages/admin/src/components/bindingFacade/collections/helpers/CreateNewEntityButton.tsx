@@ -41,7 +41,7 @@ export const CreateNewEntityButton = memo(
 			>
 				<PlusCircleIcon />
 				{typeof children === 'string' || typeof children === 'number'
-					? <Text>{`${children}`}</Text>
+					? <Text>{children}</Text>
 					: children}
 			</Button>
 		)

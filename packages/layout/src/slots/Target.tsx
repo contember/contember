@@ -1,59 +1,113 @@
 import { useClassName, useId } from '@contember/react-utils'
-import { assert, dataAttribute, isNonEmptyTrimmedString } from '@contember/utilities'
-import { memo, useLayoutEffect, useRef } from 'react'
-import slugify from 'slugify'
+import { assert, dataAttribute, isArrayOfMembersSatisfyingFactory, isNonEmptyArray, isNonEmptyTrimmedString, isSingleWordString, satisfiesOneOfFactory, setHasOneOf } from '@contember/utilities'
+import { snakeCase } from 'change-case'
+import { memo, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { useActiveSlotPortalsContext, useTargetsRegistryContext } from './contexts'
-import { TargetProps } from './types'
+import { SlotTargetProps } from './types'
 
 export type OwnTargetContainerProps = {
-	'data-has-own-children': boolean;
-	'data-name': string;
 	className: string;
 }
+
+const isNameString = satisfiesOneOfFactory(
+	isNonEmptyTrimmedString,
+	isSingleWordString,
+)
+
+const nonEmptyArrayOfNonEmptyStrings = satisfiesOneOfFactory(
+	isNonEmptyArray,
+	isArrayOfMembersSatisfyingFactory(isNameString),
+)
 
 /**
  * @group Layout
  */
-export const Target = memo<TargetProps>(
+export const Target = memo<SlotTargetProps>(
 	({
 		as,
+		aliases,
 		componentClassName = 'slot',
 		className: classNameProp,
-		children,
+		display,
+		fallback,
 		name,
 		...rest
 	}) => {
-		assert('name is non-empty string', name, isNonEmptyTrimmedString)
+		assert('name is non-empty string without spaces', name, isNameString)
 
-		const ref = useRef<HTMLElement>(null)
-		const instanceId = useRef(Math.random().toString(36).substring(2, 9)).current
+		if (aliases) {
+			assert('aliases is an empty array or an array of names', aliases, nonEmptyArrayOfNonEmptyStrings)
+		}
+
+		const [element, setElement] = useState<HTMLElement | null>(null)
+		const id = useId()
 		const { unregisterSlotTarget, registerSlotTarget } = useTargetsRegistryContext()
 		const activeSlotPortals = useActiveSlotPortalsContext()
 
 		useLayoutEffect(() => {
-			registerSlotTarget(instanceId, name, ref)
-			return () => unregisterSlotTarget(instanceId, name)
-		}, [instanceId, name, registerSlotTarget, unregisterSlotTarget])
+			if (element) {
+				registerSlotTarget(id, name, element)
+
+				return () => {
+					unregisterSlotTarget(id, name)
+				}
+			}
+		}, [element, id, name, registerSlotTarget, unregisterSlotTarget])
+
+		const registeredAliasesRef = useRef<Set<string>>(new Set())
+
+		useLayoutEffect(() => {
+			if (element && aliases) {
+				const aliasesSet = new Set(aliases)
+
+				aliasesSet.forEach(name => {
+					if (!registeredAliasesRef.current.has(name)) {
+						registerSlotTarget(id, name, element)
+						registeredAliasesRef.current.add(name)
+					}
+				})
+
+				registeredAliasesRef.current.forEach(name => {
+					if (!aliasesSet.has(name)) {
+						unregisterSlotTarget(id, name)
+						registeredAliasesRef.current.delete(name)
+					}
+				})
+			}
+		}, [aliases, element, id, registerSlotTarget, unregisterSlotTarget])
+
+		useEffect(() => {
+			const registeredAliases = registeredAliasesRef.current
+
+			return () => {
+				registeredAliases.forEach(name => {
+					unregisterSlotTarget(id, name)
+					registeredAliases.delete(name)
+				})
+			}
+		}, [id, unregisterSlotTarget])
 
 		const Container = as ?? 'div'
 		const className = useClassName(componentClassName, classNameProp)
-		const key = useId()
 
-		return (activeSlotPortals?.has(name)
+		const active = setHasOneOf(activeSlotPortals, [name, ...aliases ?? []])
+
+		return ((active || fallback)
 			? (
 				<Container
-					ref={ref}
-					key={key}
-					data-key={key}
-					data-id={instanceId}
-					data-has-own-children={!!children}
-					data-name={dataAttribute(slugify(name, { lower: true }))}
-					className={className}
+					ref={setElement}
+					key={id}
 					{...rest}
+					data-display={dataAttribute(display ?? (as === undefined ? true : undefined))}
+					data-id={id}
+					data-fallback={dataAttribute(!!fallback)}
+					data-name={dataAttribute(snakeCase(name).replace(/_/g, '-'))}
+					className={className}
+					children={active ? null : fallback}
 				/>
 			)
 			: null
 		)
 	},
 )
-Target.displayName = 'Interface.Slots.Target'
+Target.displayName = 'Layout.Slots.Target'

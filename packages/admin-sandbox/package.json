@@ -22,6 +22,7 @@
 		"@contember/schema-definition": "^1.2.0",
 		"lucide-react": "^0.268.0",
 		"react": "^17 || ^18",
+		"react-content-loader": "^6.0.3",
 		"react-dom": "^17 || ^18"
 	}
 }

@@ -1,6 +1,5 @@
 import {
 	AnchorButton,
-	Button,
 	CreateNewEntityButton,
 	CreateScope,
 	DataGridScope,
@@ -22,13 +21,13 @@ import {
 	RepeaterItem,
 	RepeaterItemProps,
 	SelectField,
+	SideDimensions,
 	Stack,
-	Text,
 	TextCell,
 	TextField,
 	noop,
 } from '@contember/admin'
-import { MoreVerticalIcon, PlusCircleIcon, PlusIcon } from 'lucide-react'
+import { MoreVerticalIcon } from 'lucide-react'
 import { CategoryForm } from '../components/CategoryForm'
 import { DataGridTile } from '../components/DataGridTile'
 import { Directive } from '../components/Directives'
@@ -139,12 +138,17 @@ export const tags = () => (
 		<SlotSources.Title>Tags</SlotSources.Title>
 
 		<MultiEditScope entities="Tag" listProps={{ beforeContent: <SlotSources.Actions><PersistButton /></SlotSources.Actions> }}>
-			<TextField field={'name'} label={'Name'} />
-			<Repeater field={'locales'} label={'Locales'} sortableBy={'order'} itemComponent={CustomRepeaterItem}>
+			<TextField field={'name'} label="Default name" />
+			<Stack horizontal evenly>
+				<SideDimensions dimension="locale" hasOneField="locales(locale.code=$currentLocale)" variableName="currentLocale">
+					<TextField field="name" label="Name" />
+				</SideDimensions>
+			</Stack>
+			{/* <Repeater field={'locales'} label={'Locales'} sortableBy={'order'} itemComponent={CustomRepeaterItem} containerComponentExtraProps={{ className: 'locales-list' }} itemComponentExtraProps={{ className: 'locale-list-item' }}>
 				<SelectField label={'Locale'} options={'Locale.code'} field={'locale'}
 					createNewForm={<TextField field={'code'} label={'Locale code'} />} />
 				<TextField field={'name'} label={'Name'} />
-			</Repeater>
+			</Repeater> */}
 		</MultiEditScope>
 	</>
 )

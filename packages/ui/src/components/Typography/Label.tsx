@@ -2,6 +2,7 @@ import { useClassName } from '@contember/react-utils'
 import { ReactNode, memo } from 'react'
 import { Default, HTMLSpanElementProps, Size } from '../../types'
 import { toEnumViewClass, toStateClass } from '../../utils'
+import { Text } from './Text'
 
 export interface LabelOwnProps {
 	isDisabled?: boolean
@@ -30,15 +31,21 @@ export const Label = memo(({
 	size,
 	weight,
 }: LabelProps) => {
-	return <span className={useClassName('label', [
-		toStateClass('active', !isDisabled && isActive),
-		toStateClass('focused', !isDisabled && isFocused),
-		toStateClass('disabled', isDisabled),
-		toStateClass('hover', !isDisabled && isHover),
-		toEnumViewClass(size),
-		toEnumViewClass(weight),
-		className,
-	])}>{children}</span>
+	return (
+		<Text
+			className={useClassName('label', [
+				toStateClass('active', !isDisabled && isActive),
+				toStateClass('focused', !isDisabled && isFocused),
+				toStateClass('disabled', isDisabled),
+				toStateClass('hover', !isDisabled && isHover),
+				toEnumViewClass(size),
+				toEnumViewClass(weight),
+				className,
+			])}
+		>
+			{children}
+		</Text>
+	)
 })
 
 Label.displayName = 'Label'

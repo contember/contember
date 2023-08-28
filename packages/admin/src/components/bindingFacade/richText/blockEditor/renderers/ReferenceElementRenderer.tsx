@@ -61,8 +61,8 @@ export const ReferenceElementRenderer = memo((props: ReferenceElementRendererPro
 		if (contentTemplate === undefined) {
 			throw new BindingError(
 				`BlockEditor: All block reference elements must at least use the BlockEditor.ContentOutlet component!\n\n` +
-					`It appears that other BlockEditor._____ components have been used but the BlockEditor.ContentOutlet is ` +
-					`missing or isn't at the very top level.`,
+				`It appears that other BlockEditor._____ components have been used but the BlockEditor.ContentOutlet is ` +
+				`missing or isn't at the very top level.`,
 			)
 		}
 		const placeholder = contentTemplate.value.placeholder
@@ -73,7 +73,7 @@ export const ReferenceElementRenderer = memo((props: ReferenceElementRendererPro
 				{showPlaceholder
 					? (
 						<div style={{ position: 'relative' }}>
-							<div style={{ position: 'absolute', pointerEvents: 'none' }}>
+							<div style={{ position: 'absolute', pointerEvents: 'none' }} contentEditable={false}>
 								<EditorPlaceholder>{placeholder}</EditorPlaceholder>
 							</div>
 							<div>{props.children}</div>
@@ -96,7 +96,7 @@ export const ReferenceElementRenderer = memo((props: ReferenceElementRendererPro
 		) {
 			throw new BindingError(
 				`BlockEditor: Trying to render an embed element without all the correct settings. ` +
-					`Check the related BlockEditor props.`,
+				`Check the related BlockEditor props.`,
 			)
 		}
 		const embedTypeDiscriminant = referencedEntity.getRelativeSingleField(props.embedContentDiscriminationField)

@@ -1,0 +1,29 @@
+@import './MessageItem.css';
+@import './EmptyState.css';
+
+:where(.cui-layout-sidebar .cui-send-message-input) {
+	flex-grow: 1;
+}
+
+:where(.cui-layout-sidebar .cui-layout-sidebar-body) {
+	background: transparent;
+}
+
+:where(.cui-layout-sidebar .cui-layout-sidebar-footer) { padding-top: 0px }
+
+:where(.cui-layout-sidebar .cui-scroll-view) {
+  ----padding-bottom: max(var(--inset-bottom, 0px), var(--cui-padding--panel-vertical));
+  ----padding-left: max(var(--inset-left, 0px), var(--cui-padding--panel-horizontal));
+  ----padding-right: max(var(--inset-right, 0px), var(--cui-padding--panel-horizontal));
+  ----padding-top: max(var(--inset-top, 0px), var(--cui-padding--panel-vertical));
+  margin-bottom: calc(-1 * var(----padding-bottom));
+  margin-left: calc(-1 * var(----padding-left));
+  margin-right: calc(-1 * var(----padding-right));
+  margin-top: calc(-1 * var(----padding-top));
+}
+:where(.cui-layout-sidebar .cui-scroll-view-content) {
+  padding-bottom: var(----padding-bottom);
+  padding-left: var(----padding-left);
+  padding-right: var(----padding-right);
+  padding-top: var(----padding-top);
+}

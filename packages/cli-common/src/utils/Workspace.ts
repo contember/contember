@@ -75,7 +75,7 @@ export class Workspace {
 	}
 
 	public isSingleProjectMode(): boolean {
-		return !!this.env.projectName
+		return !!this.env.projectName  || !this.config.projects
 	}
 
 	public async resolvePackageWorkspace(): Promise<PackageWorkspace> {

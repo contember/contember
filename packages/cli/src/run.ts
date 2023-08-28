@@ -27,10 +27,6 @@ import { checkVersions } from './utils/checkVersions';
 (async () => {
 	const workspace = await Workspace.get(process.cwd())
 
-	if (!process.env.CONTEMBER_SKIP_VERSION_CHECK) {
-		await checkVersions(workspace)
-	}
-
 	const commands: CommandFactoryList = {
 		['deploy']: () => new DeployCommand(workspace),
 		['version']: () => new VersionCommand(),
@@ -62,7 +58,17 @@ import { checkVersions } from './utils/checkVersions';
 		throw `Node >= 12 is required`
 	}
 	const cliVersion = getPackageVersion()
-	const app = new Application(commandManager, `Contember CLI version ${cliVersion}`)
+	const app = new Application(
+		commandManager,
+		`Contember CLI version ${cliVersion}`,
+		{
+			beforeRun: async ({ name }) => {
+				if (!process.env.CONTEMBER_SKIP_VERSION_CHECK && !['deploy', 'version', 'data:export', 'data:import', 'data:transfer'].includes(name)) {
+					await checkVersions(workspace)
+				}
+			},
+		},
+	)
 	await app.run(process.argv.slice(2))
 })().catch(e => {
 	console.log(e)

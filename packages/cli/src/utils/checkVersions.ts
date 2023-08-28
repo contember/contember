@@ -17,7 +17,7 @@ export const checkVersions = async (workspace: Workspace) => {
 				errors.push(`Package ${packageName} defined in ${jsonPath} is not installed.`)
 				continue
 			}
-			if (!semver.satisfies(pckg.installed.version, pckg.defined.version)) {
+			if (pckg.defined.version !== 'workspace:*' && !semver.satisfies(pckg.installed.version, pckg.defined.version)) {
 				errors.push(`Package ${packageName}@${pckg.installed.version} does not match constraint ${pckg.defined.version} defined in ${jsonPath}.`)
 				continue
 			}

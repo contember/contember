@@ -100,12 +100,6 @@
 	z-index: 1;
 }
 
-:where(.cui-box.is-dragged .cui-box-content),
-:where(.cui-box[data-active] .cui-box-content),
-:where(.cui-box:focus-within .cui-box-content) {
-	background-image: var(--cui-box--background-focused-overlay);
-}
-
 :where(.cui-box.is-dragged) {
 	z-index: 9999;
 }

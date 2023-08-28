@@ -1,9 +1,16 @@
 import { InvalidInputError } from './InputParser'
 import { CommandManager } from './CommandManager'
 import chalk from 'chalk'
+import { Command } from './Command'
 
 export class Application {
-	constructor(private readonly commandManager: CommandManager, private readonly applicationDescription: string) {}
+	constructor(
+		private readonly commandManager: CommandManager,
+		private readonly applicationDescription: string,
+		private readonly options: {
+			beforeRun?: (args: {command: Command<any, any>; name: string; args: string[]}) => void
+		} = {},
+	) {}
 
 	async run(args: string[]): Promise<void> {
 		const [name, ...rest] = args
@@ -70,6 +77,8 @@ export class Application {
 		}
 
 		try {
+			await this.options.beforeRun?.({ command, args, name: fullName })
+
 			const result = await command.run(args)
 			return process.exit(result)
 		} catch (e) {

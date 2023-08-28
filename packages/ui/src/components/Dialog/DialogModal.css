@@ -78,8 +78,8 @@
 }
 
 :where(.cui-dialog-modal.view-expanded) {
-	height: calc(100vh - var(--cui-padding));
-	width: calc(100vw - var(--cui-padding));
+	height: calc(100vh - 2 * var(--cui-padding));
+	width: calc(100vw - 2 * var(--cui-padding));
 }
 
 :where(.cui-dialog-modal-header) {

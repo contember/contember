@@ -1064,7 +1064,7 @@ declare namespace Slots {
         OwnTargetContainerProps,
         Target,
         useHasActiveSlotsFactory,
-        useCreateSlotTargetsWhenActiveFactory,
+        useSlotTargetsFactory,
         useTargetsIfActiveFactory,
         SlotsRefMap,
         RegisterSlotTarget,
@@ -1197,11 +1197,6 @@ function useClosePanelOnEscape(behaviors?: Array<PanelState['behavior']>): (even
 export const useContainerInsetsContext: () => ContainerInsets;
 
 // @public (undocumented)
-function useCreateSlotTargetsWhenActiveFactory<R extends SlotComponentsRecords<string>>(SlotTargets: R): <T>(slots: ReadonlyArray<keyof R & string>, override?: T | undefined) => NonNullable<T> | FunctionComponentElement<    {
-children?: ReactNode;
-}> | null;
-
-// @public (undocumented)
 function useDirectiveLifecycle<T extends RequiredDeepPlainObject, K extends keyof T, V extends T[K]>(name: K, content: V): boolean;
 
 // @public (undocumented)
@@ -1242,6 +1237,11 @@ export const useSafeAreaInsetsContext: () => ContainerInsets;
 
 // @public (undocumented)
 const useSetLayoutPanelsStateContext: () => SetLayoutPanelsStateContextType;
+
+// @public
+function useSlotTargetsFactory<R extends SlotComponentsRecords<string>>(SlotTargets: R): <T>(slots: ReadonlyArray<keyof R & string>, override?: T | undefined) => NonNullable<T> | FunctionComponentElement<    {
+children?: ReactNode;
+}> | null;
 
 // @public @deprecated
 function useTargetsIfActiveFactory<R extends SlotComponentsRecords<string>>(SlotTargets: R): <T>(slots: readonly (keyof R & string)[], override?: T | undefined) => FunctionComponentElement<    {

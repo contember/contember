@@ -8,7 +8,7 @@ const allSlotKeys = Object.keys(SlotTargets) as Array<keyof typeof SlotTargets>
 
 export const LayoutComponent = ({ children, className: classNameProp, ...rest }: PropsWithChildren<ComponentClassNameProps>) => {
 	const className = useClassNameFactory('test-layout')
-	const createSlotTargets = Slots.useCreateSlotTargetsWhenActiveFactory(SlotTargets)
+	const createSlotTargets = Slots.useSlotTargetsFactory(SlotTargets)
 
 	return (
 		<div {...rest} className={className(null, classNameProp)} style={{

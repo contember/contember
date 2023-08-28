@@ -18,7 +18,11 @@ export function useHasActiveSlotsFactory<T extends SlotComponentsRecords<string>
 	}, [activeSlotPortals])
 }
 
-export function useCreateSlotTargetsWhenActiveFactory<R extends SlotComponentsRecords<string>>(SlotTargets: R) {
+/**
+ * Creates a function that returns a list of slot targets if any of them are active.
+ * @param SlotTargets - List of slot targets to create
+ */
+export function useSlotTargetsFactory<R extends SlotComponentsRecords<string>>(SlotTargets: R) {
 	const activeSlotPortals = useActiveSlotPortalsContext()
 
 	return useCallback(function createSlotTargets<T>(slots: ReadonlyArray<keyof R & string>, override?: T) {
@@ -44,12 +48,12 @@ export function useCreateSlotTargetsWhenActiveFactory<R extends SlotComponentsRe
 	}, [SlotTargets, activeSlotPortals])
 }
 /**
- * Fallback for `useCreateSlotTargetsWhenActiveFactory` for backwards compatibility.
- * @deprecated Use `useCreateSlotTargetsWhenActiveFactory` instead
+ * Fallback for `useSlotTargetsFactory` for backwards compatibility.
+ * @deprecated Use `useSlotTargetsFactory` instead
  */
 export function useTargetsIfActiveFactory<R extends SlotComponentsRecords<string>>(SlotTargets: R) {
-	deprecate('1.3.0', true, '`useTargetsIfActiveFactory()`', '`useCreateSlotTargetsWhenActiveFactory()`')
-	return useCreateSlotTargetsWhenActiveFactory(SlotTargets)
+	deprecate('1.3.0', true, '`useTargetsIfActiveFactory()`', '`useSlotTargetsFactory()`')
+	return useSlotTargetsFactory(SlotTargets)
 }
 
 export type SlotTargetsRegistryContextType = {

@@ -12,7 +12,7 @@ export const LayoutComponent = ({
 }: PropsWithChildren<{
 	className?: NestedClassName;
 }>) => {
-	const createSlotTargets = Slots.useCreateSlotTargetsWhenActiveFactory(SlotTargets)
+	const createSlotTargets = Slots.useSlotTargetsFactory(SlotTargets)
 
 	return (
 		<DefaultLayout

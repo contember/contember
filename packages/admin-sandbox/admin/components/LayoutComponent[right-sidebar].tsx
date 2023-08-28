@@ -17,7 +17,7 @@ export interface LayoutComponentProps extends ComponentClassNameProps { }
 
 export const LayoutComponent = ({ children, ...rest }: PropsWithChildren<LayoutComponentProps>) => {
 	const directives = useDirectives()
-	const createSlotTargets = Slots.useCreateSlotTargetsWhenActiveFactory(SlotTargets)
+	const createSlotTargets = Slots.useSlotTargetsFactory(SlotTargets)
 
 	return (
 		<LayoutKit.Frame

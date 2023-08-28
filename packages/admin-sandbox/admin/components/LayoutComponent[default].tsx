@@ -15,7 +15,7 @@ const SubHeader = createLayoutBarComponent({
 
 export const LayoutComponent = ({ children, ...rest }: PropsWithChildren<ComponentClassNameProps>) => {
 	const directives = useDirectives()
-	const createSlotTargets = Slots.useCreateSlotTargetsWhenActiveFactory(SlotTargets)
+	const createSlotTargets = Slots.useSlotTargetsFactory(SlotTargets)
 
 	return (
 		<LayoutKit.Frame

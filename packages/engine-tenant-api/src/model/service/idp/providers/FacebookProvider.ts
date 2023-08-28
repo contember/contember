@@ -116,10 +116,16 @@ export class FacebookProvider implements IdentityProviderHandler<FacebookConfigu
 	}
 
 	private async createOIDCClient(configuration: FacebookConfiguration): Promise<Client> {
-		return new this.facebookIssuer.Client({
-			client_id: configuration.clientId,
-			client_secret: configuration.clientSecret,
-			response_types: [configuration.responseType || 'code'],
-		})
+		return new this.facebookIssuer.Client(
+			{
+				client_id: configuration.clientId,
+				client_secret: configuration.clientSecret,
+				response_types: [configuration.responseType || 'code'],
+			},
+			undefined,
+			{
+				additionalAuthorizedParties: [...(configuration.additionalAuthorizedParties ?? [])],
+			},
+		)
 	}
 }

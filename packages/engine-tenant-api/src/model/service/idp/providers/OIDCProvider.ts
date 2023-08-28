@@ -31,10 +31,16 @@ export class OIDCProvider implements IdentityProviderHandler<OIDCConfiguration> 
 	private async createOIDCClient(configuration: OIDCConfiguration): Promise<Client> {
 		this.issuerCache[configuration.url] ??= await Issuer.discover(configuration.url)
 
-		return new this.issuerCache[configuration.url].Client({
-			client_id: configuration.clientId,
-			client_secret: configuration.clientSecret,
-			response_types: [configuration.responseType || 'code'],
-		})
+		return new this.issuerCache[configuration.url].Client(
+			{
+				client_id: configuration.clientId,
+				client_secret: configuration.clientSecret,
+				response_types: [configuration.responseType || 'code'],
+			},
+			undefined,
+			{
+				additionalAuthorizedParties: [...(configuration.additionalAuthorizedParties ?? [])],
+			},
+		)
 	}
 }

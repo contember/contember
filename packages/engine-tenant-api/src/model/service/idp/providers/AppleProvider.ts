@@ -56,10 +56,16 @@ export class AppleProvider implements IdentityProviderHandler<AppleConfiguration
 			.setExpirationTime('10m')
 			.sign(privateKey)
 
-		return new this.issuer.Client({
-			client_id: configuration.clientId,
-			client_secret: jwt,
-			response_types: [configuration.responseType || 'code'],
-		})
+		return new this.issuer.Client(
+			{
+				client_id: configuration.clientId,
+				client_secret: jwt,
+				response_types: [configuration.responseType || 'code'],
+			},
+			undefined,
+			{
+				additionalAuthorizedParties: [...(configuration.additionalAuthorizedParties ?? [])],
+			},
+		)
 	}
 }

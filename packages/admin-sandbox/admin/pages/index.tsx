@@ -16,29 +16,18 @@ import {
 	ImageUploadField,
 	Link,
 	PersistButton,
-	Radio,
 	S3FileUploader,
-	Stack,
 	StaticRender,
-	SugarableRelativeSingleField,
 	SugaredQualifiedEntityList,
 	TextCell,
 	TextField,
 	TextInput,
 	UploadField,
-	useDialog,
-	useEntity,
-	useField,
 	VideoFiles,
-	AccessorTree,
-	Entity,
-	useAccessorTreeState,
 } from '@contember/admin'
 import { DataGridTile } from '../components/DataGridTile'
-import { SlotSources } from '../components/Slots'
-import { Button } from '@contember/ui'
-import { CSSProperties, Fragment, useCallback, useMemo, useState } from 'react'
 import { FocalPointDialogOpener } from '../components/FocalPoint'
+import { SlotSources } from '../components/Slots'
 
 const GalleryItemTile = Component(({ onClick, selectedEntityIds }: {
 	onClick?: (entity: EntityAccessor) => void
@@ -152,7 +141,6 @@ const ImageSelectForm = Component((
 					<Field field={'type'} />
 					<Field field={'fileName'} />
 					<Field field={'alt'} />
-
 				</>}
 			</StaticRender>
 		</GenericCell>
@@ -216,6 +204,8 @@ export default () => (
 		>
 			<FocalPointDialogOpener
 				urlField={'url'}
+				widthField={'width'}
+				heightField={'height'}
 				previews={[
 					{
 						label: 'test point 1',
@@ -243,17 +233,17 @@ export default () => (
 					},
 				]}
 				points={[
-				{
-					xField: 'focalPointX',
-					yField: 'focalPointY',
-					label: 'Primary',
-				},
-				{
-					xField: 'secondaryFocalPointX',
-					yField: 'secondaryFocalPointY',
-					label: 'Secondary',
-				},
-			]}/>
+					{
+						xField: 'focalPointX',
+						yField: 'focalPointY',
+						label: 'Primary',
+					},
+					{
+						xField: 'secondaryFocalPointX',
+						yField: 'secondaryFocalPointY',
+						label: 'Secondary',
+					},
+				]} />
 		</ImageUploadField>
 		<UploadField label="Discriminated has one" baseEntity="discriminatedAttachment" discriminationField="type">
 			<ImageFiles
@@ -299,7 +289,7 @@ export default () => (
 			</VideoFiles>
 		</UploadField>
 		<FileRepeater field="fileList.items" boxLabel="Complex file list" label="Complex file list item" sortableBy="order"
-					  discriminationField="type">
+			discriminationField="type">
 			<ImageFiles
 				discriminateBy="image"
 				baseEntity="image"

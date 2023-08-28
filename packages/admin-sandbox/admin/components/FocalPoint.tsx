@@ -1,19 +1,27 @@
 import {
 	AccessorTree,
+	Box,
 	Button,
 	Component,
+	Description,
 	Entity,
 	Field,
+	Heading,
 	Radio,
+	Spacer,
 	Stack,
 	SugarableRelativeSingleField,
+	Text,
 	useAccessorTreeState,
 	useDialog,
 	useEntity,
 	useField,
 } from '@contember/admin'
-import { CSSProperties, Fragment, useCallback, useMemo, useState } from 'react'
-
+import { ResponsiveStack } from '@contember/layout'
+import { useClassName, useElementSize } from '@contember/react-utils'
+import { px } from '@contember/utilities'
+import { CSSProperties, Fragment, useCallback, useMemo, useRef, useState } from 'react'
+import './FocalPoint.css'
 
 type PointConfig = {
 	xField: string | SugarableRelativeSingleField
@@ -33,6 +41,8 @@ type PreviewConfig = {
 
 interface FocalPointEditorProps {
 	urlField: string | SugarableRelativeSingleField
+	widthField: string | SugarableRelativeSingleField
+	heightField: string | SugarableRelativeSingleField
 	points: PointConfig[]
 	previews?: PreviewConfig[]
 }
@@ -45,45 +55,93 @@ const FocalPointMarker = ({ point, index }: {
 	const xField = useField<number>(point.xField).value
 	const yField = useField<number>(point.yField).value
 	const color = point.color ?? colors[index % colors.length]
+	const className = useClassName('focal-point-marker')
+
 	if (xField === null || yField === null) {
 		return null
 	}
 
 	return (
-		<div style={{
-			position: 'absolute',
-			background: color,
-			width: '8px',
-			height: '8px',
-			borderRadius: '50%',
-			transform: 'translate(-50%, -50%)',
-			left: (xField * 100) + '%',
-			top: (yField * 100) + '%',
-		}}>&nbsp;</div>
+		<div
+			className={className}
+			style={{
+				background: color,
+				left: (xField * 100) + '%',
+				top: (yField * 100) + '%',
+			}}
+		/>
 	)
 }
 
 const ImagePreview = ({ url, focalPoint, preview }: { url: string, focalPoint?: [number, number], preview: PreviewConfig }) => {
 
 	return (
-		<>
-			<h2>{preview.label}</h2>
-			{focalPoint ? <div style={{
-				backgroundImage: `url("${url}")`,
-				width: preview.width + 'px',
-				height: preview.height + 'px',
-				backgroundSize: 'cover',
-				backgroundPosition: `${(focalPoint?.[0] ?? 0) * 100}% ${(focalPoint?.[1] ?? 0) * 100}%`,
-			}} /> : <>No focal point</>}
-		</>
+		<Box border={false} padding={false} style={{ width: 'unset' }}>
+			<Heading depth={2} style={{ fontSize: '1rem' }}>{preview.label}</Heading>
+			<div className={useClassName('focal-point-photo-holder')}>
+				{focalPoint
+					? (
+						<div
+							style={{
+								backgroundImage: `url("${url}")`,
+								width: preview.width + 'px',
+								height: preview.height + 'px',
+								backgroundSize: 'cover',
+								backgroundPosition: `${(focalPoint?.[0] ?? 0) * 100}% ${(focalPoint?.[1] ?? 0) * 100}%`,
+							}}
+						/>
+					)
+					: (
+						<Box
+							background={false}
+							padding="gutter"
+							border={false}
+						>
+							<Description>No focal point</Description>
+						</Box>
+					)}
+			</div>
+		</Box>
 	)
 }
 
-const FocalPointEditor = Component<FocalPointEditorProps>(({ points, urlField, previews }) => {
+function getScaledSize(containerSize: { width: number | undefined, height: number | undefined }, imageSize: { width: number | undefined, height: number | undefined }) {
+	const containerWidth = containerSize.width ?? 0
+	const containerHeight = containerSize.height ?? 0
+
+	const imageWidth = imageSize.width ?? 0
+	const imageHeight = imageSize.height ?? 0
+
+	if (imageHeight < containerHeight && imageWidth < containerWidth) {
+		return {
+			width: imageWidth,
+			height: imageHeight,
+		}
+	}
+
+	const containerRatio = containerWidth / containerHeight
+	const imageRatio = imageWidth / imageHeight
+
+	if (containerRatio > imageRatio) {
+		return {
+			width: containerHeight * imageRatio,
+			height: containerHeight,
+		}
+	} else {
+		return {
+			width: containerWidth,
+			height: containerWidth / imageRatio,
+		}
+	}
+}
+
+const FocalPointEditor = Component<FocalPointEditorProps>(({ points, urlField, widthField, heightField, previews }) => {
 	const entity = useEntity()
 	const [activePoint, setActivePoint] = useState(0)
 	const urlFieldAccessor = useField<string>(urlField)
 	const url = urlFieldAccessor.value
+	const width = useField<number>(widthField).value ?? undefined
+	const height = useField<number>(heightField).value ?? undefined
 
 	const handleClick = useCallback((e: React.MouseEvent<HTMLImageElement>) => {
 		const point = points[activePoint]
@@ -104,26 +162,50 @@ const FocalPointEditor = Component<FocalPointEditorProps>(({ points, urlField, p
 		value: String(index),
 	}))
 
+	const containerRef = useRef<HTMLDivElement>(null)
+	const containerSize = useElementSize(containerRef)
+
 	if (!url) {
 		return null
 	}
 
+	const scaledSize = getScaledSize(containerSize, { width, height })
+
 	return <>
-		<Stack horizontal>
-			<Stack>
+		<ResponsiveStack
+			horizontal={width => width > 768 ? true : false}
+			className={useClassName('focal-point-editor')}
+		>
+			<Stack className={useClassName('focal-point-editor-body')}>
 				{points.length > 1 && (
 					<Radio
+						orientation="horizontal"
 						options={radioOptions}
 						value={String(activePoint)}
 						onChange={it => setActivePoint(parseInt(it, 10))}
 					/>
 				)}
-				<div style={{ position: 'relative' }}>
-					<img src={url} style={{ maxWidth: '100%', display: 'block' }} onClick={handleClick} />
-					{points.map((it, index) => <FocalPointMarker point={it} index={index} key={index} />)}
+				<div
+					ref={containerRef}
+					className={useClassName(['focal-point-editor-photo', 'focal-point-photo-holder'])}
+				>
+					<div
+						className={useClassName('focal-point-editor-photo-img-wrapper')}
+						style={{
+							'--width': px(scaledSize.width),
+							'--height': px(scaledSize.height),
+						} as CSSProperties}
+					>
+						<img src={url} onClick={handleClick} />
+						{points.map((it, index) => <FocalPointMarker point={it} index={index} key={index} />)}
+					</div>
 				</div>
 			</Stack>
-			<Stack>
+			<ResponsiveStack
+				horizontal={width => width > 768 ? false : true}
+				className={useClassName('focal-point-editor-previews')}
+				wrap={width => width > 768 ? false : true}
+			>
 				{previews?.map((it, index) => {
 					let resolvedPoint: [number, number] | undefined = undefined
 					for (const point of it.pointPriority ?? [0]) {
@@ -134,8 +216,8 @@ const FocalPointEditor = Component<FocalPointEditorProps>(({ points, urlField, p
 					}
 					return <ImagePreview key={index} url={url} preview={it} focalPoint={resolvedPoint} />
 				})}
-			</Stack>
-		</Stack>
+			</ResponsiveStack>
+		</ResponsiveStack>
 	</>
 }, props => {
 	return <>{props.points.map((it, i) => (<Fragment key={i}>
@@ -150,7 +232,7 @@ export const FocalPointDialogOpener = Component<FocalPointEditorProps>(props => 
 	const accessorTreeState = useAccessorTreeState()
 	const openDialog = useCallback(async () => {
 		await dialog.openDialog({
-			footer: ({ resolve }) => <Button onClick={() => resolve()}>Ok</Button>,
+			footer: ({ resolve }) => <><Spacer grow /><Button onClick={() => resolve()}>Done</Button></>,
 			content: () => {
 				return (
 					<AccessorTree state={accessorTreeState}>
@@ -161,5 +243,5 @@ export const FocalPointDialogOpener = Component<FocalPointEditorProps>(props => 
 		})
 	}, [accessorTreeState, dialog, entity, props])
 
-	return <Button onClick={openDialog}>Edit focal point</Button>
+	return <Button distinction="seamless" inset={false} onClick={openDialog}>Edit focal point</Button>
 }, props => <FocalPointEditor {...props} />)

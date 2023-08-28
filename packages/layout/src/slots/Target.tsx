@@ -40,13 +40,11 @@ export const Target = memo<SlotTargetProps>(
 		}
 
 		const [element, setElement] = useState<HTMLElement | null>(null)
-		const idRef = useRef(Math.random().toString(36).substring(2, 9))
+		const id = useId()
 		const { unregisterSlotTarget, registerSlotTarget } = useTargetsRegistryContext()
 		const activeSlotPortals = useActiveSlotPortalsContext()
 
 		useLayoutEffect(() => {
-			const id = idRef.current
-
 			if (element) {
 				registerSlotTarget(id, name, element)
 
@@ -54,13 +52,11 @@ export const Target = memo<SlotTargetProps>(
 					unregisterSlotTarget(id, name)
 				}
 			}
-		}, [element, name, registerSlotTarget, unregisterSlotTarget])
+		}, [element, id, name, registerSlotTarget, unregisterSlotTarget])
 
 		const registeredAliasesRef = useRef<Set<string>>(new Set())
 
 		useLayoutEffect(() => {
-			const id = idRef.current
-
 			if (element && aliases) {
 				const aliasesSet = new Set(aliases)
 
@@ -78,10 +74,9 @@ export const Target = memo<SlotTargetProps>(
 					}
 				})
 			}
-		}, [aliases, element, registerSlotTarget, unregisterSlotTarget])
+		}, [aliases, element, id, registerSlotTarget, unregisterSlotTarget])
 
 		useEffect(() => {
-			const id = idRef.current
 			const registeredAliases = registeredAliasesRef.current
 
 			return () => {
@@ -90,11 +85,10 @@ export const Target = memo<SlotTargetProps>(
 					registeredAliases.delete(name)
 				})
 			}
-		}, [unregisterSlotTarget])
+		}, [id, unregisterSlotTarget])
 
 		const Container = as ?? 'div'
 		const className = useClassName(componentClassName, classNameProp)
-		const key = useId()
 
 		const active = setHasOneOf(activeSlotPortals, [name, ...aliases ?? []])
 
@@ -102,11 +96,10 @@ export const Target = memo<SlotTargetProps>(
 			? (
 				<Container
 					ref={setElement}
-					key={key}
+					key={id}
 					{...rest}
-					data-key={key}
 					data-display={dataAttribute(display ?? (as === undefined ? true : undefined))}
-					data-id={idRef.current}
+					data-id={id}
 					data-fallback={dataAttribute(!!fallback)}
 					data-name={dataAttribute(snakeCase(name).replace(/_/g, '-'))}
 					className={className}

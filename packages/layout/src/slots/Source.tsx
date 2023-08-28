@@ -1,3 +1,4 @@
+import { useId } from '@contember/react-utils'
 import { memo, useLayoutEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { usePortalsRegistryContext } from './contexts'
@@ -9,7 +10,7 @@ import { SlotSourceProps } from './types'
 export const Source = memo<SlotSourceProps>(({ name, children }) => {
 	const { getTarget, registerSlotSource, unregisterSlotSource } = usePortalsRegistryContext()
 
-	const instanceId = useRef(Math.random().toString(36).substring(2, 9)).current
+	const instanceId = useId()
 	const instanceIdRef = useRef(instanceId)
 	instanceIdRef.current = instanceId
 

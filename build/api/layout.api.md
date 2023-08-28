@@ -865,7 +865,7 @@ type ProviderProps = {
 type RegisterLayoutPanel = (name: string, config: PanelConfig) => void;
 
 // @public (undocumented)
-type RegisterSlotTarget = (id: string, name: string, ref: RefObject<HTMLElement>) => void;
+type RegisterSlotTarget = (id: string, name: string, ref: HTMLElement) => void;
 
 // @public (undocumented)
 const RegistryContext: Context<RegistryContextType<Record<string, unknown>>>;
@@ -1102,7 +1102,7 @@ type SlotSourceProps<K extends string = string> = {
 };
 
 // @public (undocumented)
-type SlotsRefMap = Map<string, RefObject<HTMLElement>>;
+type SlotsRefMap = Map<string, HTMLElement>;
 
 // @public (undocumented)
 type SlotTargetComponentsRecord<K extends string> = Readonly<{

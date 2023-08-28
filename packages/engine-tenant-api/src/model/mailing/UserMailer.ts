@@ -11,11 +11,11 @@ export class UserMailer {
 	constructor(
 		private readonly mailer: Mailer,
 		private readonly templateRenderer: TemplateRenderer,
-	) {}
+	) { }
 
 	async sendNewUserInvitedMail(
 		dbContext: DatabaseContext,
-		mailArguments: { email: string; password: string | null; token: string | null; project: string },
+		mailArguments: { email: string; password: string | null; token: string | null; project: string; projectSlug: string },
 		customMailOptions: { projectId: string; variant: string },
 	): Promise<void> {
 		const template = (await this.getCustomTemplate(dbContext, { type: MailType.newUserInvited, ...customMailOptions })) || {
@@ -27,7 +27,7 @@ export class UserMailer {
 
 	async sendExistingUserInvitedEmail(
 		dbContext: DatabaseContext,
-		mailArguments: { email: string; project: string },
+		mailArguments: { email: string; project: string; projectSlug: string },
 		customMailOptions: { projectId: string; variant: string },
 	): Promise<void> {
 		const template = (await this.getCustomTemplate(dbContext, { type: MailType.existingUserInvited, ...customMailOptions })) || {
@@ -39,7 +39,7 @@ export class UserMailer {
 
 	async sendPasswordResetEmail(
 		dbContext: DatabaseContext,
-		mailArguments: { email: string; token: string; project?: string },
+		mailArguments: { email: string; token: string; project?: string; projectSlug?: string },
 		customMailOptions: { projectId?: string; variant: string },
 	): Promise<void> {
 		const template = (await this.getCustomTemplate(dbContext, { type: MailType.passwordReset, ...customMailOptions })) || {

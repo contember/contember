@@ -77,27 +77,15 @@ const ImagePreview = ({ url, focalPoint, preview }: { url: string, focalPoint?: 
 		<Box border={false} padding={false} style={{ width: 'unset' }}>
 			<Heading depth={2} style={{ fontSize: '1rem' }}>{preview.label}</Heading>
 			<div className={useClassName('focal-point-photo-holder')}>
-				{focalPoint
-					? (
-						<div
-							style={{
-								backgroundImage: `url("${url}")`,
-								width: preview.width + 'px',
-								height: preview.height + 'px',
-								backgroundSize: 'cover',
-								backgroundPosition: `${(focalPoint?.[0] ?? 0) * 100}% ${(focalPoint?.[1] ?? 0) * 100}%`,
-							}}
-						/>
-					)
-					: (
-						<Box
-							background={false}
-							padding="gutter"
-							border={false}
-						>
-							<Description>No focal point</Description>
-						</Box>
-					)}
+				<div
+					style={{
+						backgroundImage: `url("${url}")`,
+						width: preview.width + 'px',
+						height: preview.height + 'px',
+						backgroundSize: 'cover',
+						backgroundPosition: focalPoint ? `${(focalPoint?.[0] ?? 0) * 100}% ${(focalPoint?.[1] ?? 0) * 100}%` : '50% 50%',
+					}}
+				/>
 			</div>
 		</Box>
 	)

@@ -204,8 +204,6 @@ export default () => (
 		>
 			<FocalPointDialogOpener
 				urlField={'url'}
-				widthField={'width'}
-				heightField={'height'}
 				previews={[
 					{
 						label: 'test point 1',

@@ -41,8 +41,6 @@ type PreviewConfig = {
 
 interface FocalPointEditorProps {
 	urlField: string | SugarableRelativeSingleField
-	widthField: string | SugarableRelativeSingleField
-	heightField: string | SugarableRelativeSingleField
 	points: PointConfig[]
 	previews?: PreviewConfig[]
 }
@@ -105,43 +103,12 @@ const ImagePreview = ({ url, focalPoint, preview }: { url: string, focalPoint?: 
 	)
 }
 
-function getScaledSize(containerSize: { width: number | undefined, height: number | undefined }, imageSize: { width: number | undefined, height: number | undefined }) {
-	const containerWidth = containerSize.width ?? 0
-	const containerHeight = containerSize.height ?? 0
 
-	const imageWidth = imageSize.width ?? 0
-	const imageHeight = imageSize.height ?? 0
-
-	if (imageHeight < containerHeight && imageWidth < containerWidth) {
-		return {
-			width: imageWidth,
-			height: imageHeight,
-		}
-	}
-
-	const containerRatio = containerWidth / containerHeight
-	const imageRatio = imageWidth / imageHeight
-
-	if (containerRatio > imageRatio) {
-		return {
-			width: containerHeight * imageRatio,
-			height: containerHeight,
-		}
-	} else {
-		return {
-			width: containerWidth,
-			height: containerWidth / imageRatio,
-		}
-	}
-}
-
-const FocalPointEditor = Component<FocalPointEditorProps>(({ points, urlField, widthField, heightField, previews }) => {
+const FocalPointEditor = Component<FocalPointEditorProps>(({ points, urlField, previews }) => {
 	const entity = useEntity()
 	const [activePoint, setActivePoint] = useState(0)
 	const urlFieldAccessor = useField<string>(urlField)
 	const url = urlFieldAccessor.value
-	const width = useField<number>(widthField).value ?? undefined
-	const height = useField<number>(heightField).value ?? undefined
 
 	const handleClick = useCallback((e: React.MouseEvent<HTMLImageElement>) => {
 		const point = points[activePoint]
@@ -162,14 +129,10 @@ const FocalPointEditor = Component<FocalPointEditorProps>(({ points, urlField, w
 		value: String(index),
 	}))
 
-	const containerRef = useRef<HTMLDivElement>(null)
-	const containerSize = useElementSize(containerRef)
-
 	if (!url) {
 		return null
 	}
 
-	const scaledSize = getScaledSize(containerSize, { width, height })
 
 	return <>
 		<ResponsiveStack
@@ -185,17 +148,8 @@ const FocalPointEditor = Component<FocalPointEditorProps>(({ points, urlField, w
 						onChange={it => setActivePoint(parseInt(it, 10))}
 					/>
 				)}
-				<div
-					ref={containerRef}
-					className={useClassName(['focal-point-editor-photo', 'focal-point-photo-holder'])}
-				>
-					<div
-						className={useClassName('focal-point-editor-photo-img-wrapper')}
-						style={{
-							'--width': px(scaledSize.width),
-							'--height': px(scaledSize.height),
-						} as CSSProperties}
-					>
+				<div className={useClassName(['focal-point-editor-photo', 'focal-point-photo-holder'])}>
+					<div className={useClassName('focal-point-editor-photo-img-wrapper')}>
 						<img src={url} onClick={handleClick} />
 						{points.map((it, index) => <FocalPointMarker point={it} index={index} key={index} />)}
 					</div>

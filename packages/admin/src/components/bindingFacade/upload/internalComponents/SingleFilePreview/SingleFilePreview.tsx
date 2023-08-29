@@ -1,14 +1,14 @@
 import { BindingError, Entity } from '@contember/binding'
 import type { FileId, SingleFileUploadState } from '@contember/react-client'
 import { ActionableBox, Box, toEnumViewClass } from '@contember/ui'
-import { memo, ReactElement, useMemo } from 'react'
+import { ReactElement, memo, useMemo } from 'react'
 import type { MessageFormatter } from '../../../../../i18n'
+import { ResolvedFileEntity } from '../../fileHandler'
 import type { UploadDictionary } from '../../uploadDictionary'
 import { ErrorFilePreview } from './ErrorFilePreview'
 import { InitializedFilePreview } from './InitializedFilePreview'
 import { InitializingFilePreview } from './InitializingFilePreview'
 import { UploadedFilePreview } from './UploadedFilePreview'
-import { ResolvedFileEntity } from '../../fileHandler'
 
 export interface SingleFilePreviewProps {
 	resolvedEntity: ResolvedFileEntity
@@ -64,7 +64,7 @@ export const SingleFilePreview = memo(
 		} else {
 			return null
 		}
-		let editContents = resolvedEntity.fileKind && resolvedEntity.fileKind.children ? <Box>{resolvedEntity.fileKind.children}</Box> : undefined
+		let editContents = resolvedEntity.fileKind && resolvedEntity.fileKind.children ? resolvedEntity.fileKind.children : undefined
 		if (resolvedEntity.fileKind?.childrenOutsideBaseEntity) {
 			editContents = <Entity accessor={resolvedEntity.parentEntity}>{editContents}</Entity>
 		}

@@ -1,0 +1,114 @@
+{
+	"formatVersion": 3,
+	"modifications": [
+		{
+			"modification": "createColumn",
+			"entityName": "BasicImage",
+			"field": {
+				"name": "focalPointX",
+				"columnName": "focal_point_x",
+				"columnType": "double precision",
+				"nullable": true,
+				"type": "Double"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "BasicImage",
+			"field": {
+				"name": "focalPointY",
+				"columnName": "focal_point_y",
+				"columnType": "double precision",
+				"nullable": true,
+				"type": "Double"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "BasicImage",
+			"field": {
+				"name": "secondaryFocalPointX",
+				"columnName": "secondary_focal_point_x",
+				"columnType": "double precision",
+				"nullable": true,
+				"type": "Double"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "BasicImage",
+			"field": {
+				"name": "secondaryFocalPointY",
+				"columnName": "secondary_focal_point_y",
+				"columnType": "double precision",
+				"nullable": true,
+				"type": "Double"
+			}
+		},
+		{
+			"modification": "patchAclSchema",
+			"patch": [
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/BasicImage/operations/create/focalPointX",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/BasicImage/operations/create/focalPointY",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/BasicImage/operations/create/secondaryFocalPointX",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/BasicImage/operations/create/secondaryFocalPointY",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/BasicImage/operations/update/focalPointX",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/BasicImage/operations/update/focalPointY",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/BasicImage/operations/update/secondaryFocalPointX",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/BasicImage/operations/update/secondaryFocalPointY",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/BasicImage/operations/read/focalPointX",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/BasicImage/operations/read/focalPointY",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/BasicImage/operations/read/secondaryFocalPointX",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/BasicImage/operations/read/secondaryFocalPointY",
+					"value": true
+				}
+			]
+		}
+	]
+}

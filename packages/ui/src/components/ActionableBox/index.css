@@ -21,21 +21,20 @@
 	gap: var(--cui-gap);
 	margin: 0;
 	padding: 0;
-	transition-property: opacity, visibility, pointer-events, transform;
-	transition-duration: 0.1s;
+}
+
+:where(.cui-actionableBox-action) {
 	opacity: 0;
 	pointer-events: none;
+	transition-property: opacity, visibility, pointer-events, transform;
+	transition-duration: 0.1s;
 	transform: translateY(-0.625em);
 }
 
-:where(.cui-actionableBox),
-:where(.cui-actionableBox:hover > .cui-actionableBox-actions),
-:where(.cui-actionableBox:focus-within > .cui-actionableBox-actions) {
+:where(.cui-actionableBox-action:has(.cui-button[data-active])),
+:where(.cui-actionableBox:hover > .cui-actionableBox-actions > .cui-actionableBox-action),
+:where(.cui-actionableBox:focus-within > .cui-actionableBox-actions > .cui-actionableBox-action) {
 	opacity: 1;
 	pointer-events: all;
-}
-
-:where(.cui-actionableBox:hover > .cui-actionableBox-actions),
-:where(.cui-actionableBox:focus-within > .cui-actionableBox-actions) {
 	transform: translateY(0);
 }

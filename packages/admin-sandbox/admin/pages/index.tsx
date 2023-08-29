@@ -26,6 +26,7 @@ import {
 	VideoFiles,
 } from '@contember/admin'
 import { DataGridTile } from '../components/DataGridTile'
+import { FocalPointDialogOpener } from '../components/FocalPoint'
 import { SlotSources } from '../components/Slots'
 
 const GalleryItemTile = Component(({ onClick, selectedEntityIds }: {
@@ -140,7 +141,6 @@ const ImageSelectForm = Component((
 					<Field field={'type'} />
 					<Field field={'fileName'} />
 					<Field field={'alt'} />
-
 				</>}
 			</StaticRender>
 		</GenericCell>
@@ -154,6 +154,7 @@ const s3FileUploader = new S3FileUploader({
 		fileSize: file.size,
 	}),
 })
+
 
 export default () => (
 	<EditScope entity="UploadShowcase(unique = One)" setOnCreate="(unique = One)">
@@ -200,7 +201,48 @@ export default () => (
 			heightField="height"
 			fileSizeField="size"
 			fileTypeField="type"
-		/>
+		>
+			<FocalPointDialogOpener
+				urlField={'url'}
+				previews={[
+					{
+						label: 'test point 1',
+						height: 100,
+						width: 100,
+						pointPriority: [0, 1],
+					},
+					{
+						label: 'test point 2',
+						height: 100,
+						width: 100,
+						pointPriority: [1, 0],
+					},
+					{
+						label: 'test point 3',
+						height: 200,
+						width: 100,
+						pointPriority: [0, 1],
+					},
+					{
+						label: 'test point 4',
+						height: 100,
+						width: 200,
+						pointPriority: [0, 1],
+					},
+				]}
+				points={[
+					{
+						xField: 'focalPointX',
+						yField: 'focalPointY',
+						label: 'Primary',
+					},
+					{
+						xField: 'secondaryFocalPointX',
+						yField: 'secondaryFocalPointY',
+						label: 'Secondary',
+					},
+				]} />
+		</ImageUploadField>
 		<UploadField label="Discriminated has one" baseEntity="discriminatedAttachment" discriminationField="type">
 			<ImageFiles
 				discriminateBy="image"
@@ -244,7 +286,8 @@ export default () => (
 				test test
 			</VideoFiles>
 		</UploadField>
-		<FileRepeater field="fileList.items" boxLabel="Complex file list" label="Complex file list item" sortableBy="order" discriminationField="type">
+		<FileRepeater field="fileList.items" boxLabel="Complex file list" label="Complex file list item" sortableBy="order"
+			discriminationField="type">
 			<ImageFiles
 				discriminateBy="image"
 				baseEntity="image"

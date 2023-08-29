@@ -14,6 +14,12 @@ export class BasicImage {
 	height = d.intColumn()
 	size = d.intColumn()
 	type = d.stringColumn()
+
+	focalPointX = d.doubleColumn()
+	focalPointY = d.doubleColumn()
+
+	secondaryFocalPointX = d.doubleColumn()
+	secondaryFocalPointY = d.doubleColumn()
 }
 
 export class ComplexImage {

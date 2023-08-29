@@ -1,17 +1,3 @@
 :where(.cui-layout-content-panel) {
 	max-width: unset;
 }
-
-:where(
-	.cui-layout-panel-header:not([data-behavior="modal"]) > .cui-layout-panel-header-content,
-	.cui-layout-panel-body:not([data-behavior="modal"]) > .cui-layout-panel-body-content,
-	.cui-layout-panel-footer:not([data-behavior="modal"]) > .cui-layout-panel-footer-content,
-) {
-	margin: auto;
-	max-width: var(--panel-max-width);
-	min-width: min(
-		calc(100% - 2 * var(--cui-padding--panel-horizontal)),
-		var(--panel-min-width),
-	);
-	width: 100%;
-}

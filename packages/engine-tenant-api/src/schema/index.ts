@@ -275,9 +275,9 @@ export type CreateSessionTokenError = {
 }
 
 export type CreateSessionTokenErrorCode =
+  | 'PERSON_DISABLED'
   | 'UNKNOWN_EMAIL'
   | 'UNKNOWN_PERSON_ID'
-  | 'PERSON_DISABLED'
 
 export type CreateSessionTokenResponse = {
 	readonly __typename?: 'CreateSessionTokenResponse'
@@ -352,7 +352,7 @@ export type DisablePersonError = {
 }
 
 export type DisablePersonErrorCode =
-  'PERSON_ALREADY_DISABLED'
+  | 'PERSON_ALREADY_DISABLED'
   | 'PERSON_NOT_FOUND'
 
 export type DisablePersonResponse = {
@@ -852,8 +852,10 @@ export type ProjectIdentityRelation = {
 }
 
 export type ProjectMembersFilter = {
-	readonly email?: InputMaybe<Scalars['String']>
+	readonly email?: InputMaybe<ReadonlyArray<Scalars['String']>>
+	readonly identityId?: InputMaybe<ReadonlyArray<Scalars['String']>>
 	readonly memberType?: InputMaybe<MemberType>
+	readonly personId?: InputMaybe<ReadonlyArray<Scalars['String']>>
 }
 
 export type ProjectMembersInput = {
@@ -1031,8 +1033,8 @@ export type SignInErrorCode =
   | 'INVALID_PASSWORD'
   | 'NO_PASSWORD_SET'
   | 'OTP_REQUIRED'
-  | 'UNKNOWN_EMAIL'
   | 'PERSON_DISABLED'
+  | 'UNKNOWN_EMAIL'
 
 export type SignInIdpError = {
 	readonly __typename?: 'SignInIDPError'
@@ -1046,8 +1048,8 @@ export type SignInIdpErrorCode =
   | 'IDP_VALIDATION_FAILED'
   | 'INVALID_IDP_RESPONSE'
   | 'PERSON_ALREADY_EXISTS'
-  | 'PERSON_NOT_FOUND'
   | 'PERSON_DISABLED'
+  | 'PERSON_NOT_FOUND'
 
 export type SignInIdpResponse = {
 	readonly __typename?: 'SignInIDPResponse'

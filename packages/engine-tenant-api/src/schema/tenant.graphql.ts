@@ -684,7 +684,9 @@ const schema: DocumentNode = gql`
 
 	input ProjectMembersFilter {
 		memberType: MemberType
-		email: String
+		email: [String!]
+		identityId: [String!]
+		personId: [String!]
 	}
 
 	enum MemberType {

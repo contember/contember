@@ -23,22 +23,30 @@ export class ProjectMembersQuery extends DatabaseQuery<ProjectMembersQueryResult
 					.where({ project_id: this.projectId }),
 			))
 			.match(qb => {
-				const { email, memberType } = this.projectMemberInput.filter ?? {}
-				if (email && memberType === 'API_KEY') {
+				const identityId = this.projectMemberInput.filter?.identityId
+				return identityId ? qb.where(it => it.in(['identity', 'id'], identityId)) : qb
+			})
+			.match(qb => {
+				const { email, memberType, personId } = this.projectMemberInput.filter ?? {}
+				if ((email || personId) && memberType === 'API_KEY') {
 					throw new ImplementationException()
 				}
+
 				const personQuery = SelectBuilder.create()
 					.from('person')
 					.where(expr => expr.columnsEq(['person', 'identity_id'], ['identity', 'id']))
-				if (email) {
-					return qb.where(it => it.exists(personQuery.where({ email })))
+					.match(qb => email ? qb.where(it => it.in('email', email)) : qb)
+					.match(qb => personId ? qb.where(it => it.in(['person', 'id'], personId)) : qb)
+
+
+				if (email || personId || memberType === 'PERSON') {
+					return qb.where(it => it.exists(personQuery))
 				}
-				switch (memberType) {
-					case 'API_KEY':
-						return qb.where(it => it.not(it => it.exists(personQuery)))
-					case 'PERSON':
-						return qb.where(it => it.exists(personQuery))
+
+				if (memberType === 'API_KEY') {
+					return qb.where(it => it.not(it => it.exists(personQuery)))
 				}
+
 				return qb
 			})
 			.limit(this.projectMemberInput.limit ?? undefined, this.projectMemberInput.offset ?? undefined)

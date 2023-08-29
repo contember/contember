@@ -68,7 +68,7 @@ const aclSchemaForInviteOnly: Acl.Schema = {
 }
 
 
-test('admin can invite public. cannat manage public, cannot invite lorem', async () => {
+test('admin can invite public. cannot manage public, cannot invite lorem', async () => {
 	const node = new AclSchemaAccessNodeFactory().create(aclSchemaForInviteOnly, [{ role: 'admin', variables: [] }])
 
 	assert.ok(await node.isAllowed(aclEvaluator, PermissionActions.PERSON_INVITE([{ role: 'public', variables: [] }])))
@@ -76,4 +76,28 @@ test('admin can invite public. cannat manage public, cannot invite lorem', async
 	assert.notOk(await node.isAllowed(aclEvaluator, PermissionActions.PERSON_INVITE([{ role: 'lorem', variables: [] }])))
 
 	assert.notOk(await node.isAllowed(aclEvaluator, PermissionActions.PROJECT_REMOVE_MEMBER([{ role: 'public', variables: [] }])))
+})
+
+
+const aclSchemaForViewOnly: Acl.Schema = {
+	roles: {
+		admin: {
+			entities: {},
+			variables: {},
+			tenant: {
+				view: {
+					lorem: true,
+				},
+			},
+		},
+	},
+}
+
+
+test('admin can view lorem, but cannot manage it', async () => {
+	const node = new AclSchemaAccessNodeFactory().create(aclSchemaForViewOnly, [{ role: 'admin', variables: [] }])
+
+	assert.ok(await node.isAllowed(aclEvaluator, PermissionActions.PROJECT_VIEW_MEMBER([{ role: 'lorem', variables: [] }])))
+
+	assert.notOk(await node.isAllowed(aclEvaluator, PermissionActions.PROJECT_REMOVE_MEMBER([{ role: 'lorem', variables: [] }])))
 })

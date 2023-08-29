@@ -22,6 +22,7 @@ const tenantPermissionsSchema = Typesafe.partial({
 	invite: Typesafe.union(Typesafe.boolean, membershipMatchRuleSchema),
 	unmanagedInvite: Typesafe.union(Typesafe.boolean, membershipMatchRuleSchema),
 	manage: membershipMatchRuleSchema,
+	view: membershipMatchRuleSchema,
 })
 const tenantSchemaCheck: Typesafe.Equals<Acl.TenantPermissions, ReturnType<typeof tenantPermissionsSchema>> = true
 

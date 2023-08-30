@@ -12,10 +12,11 @@ import { InviteErrorCode, InviteMethod } from '../../schema'
 import { TenantRole } from '../authorization'
 import { UserMailer } from '../mailing'
 import { createAppendMembershipVariables } from './membershipUtils'
-import { Response, ResponseOk } from '../utils/Response'
+import { Response, ResponseError, ResponseOk } from '../utils/Response'
 import { DatabaseContext, TokenHash } from '../utils'
 import { NoPassword, PasswordPlain } from '../dtos'
 import { Acl } from '@contember/schema'
+import { validateEmail } from '../utils/email'
 
 export interface InviteData {
 	email: string
@@ -52,6 +53,10 @@ export class InviteManager {
 			passwordResetTokenHash,
 		}: InviteData,
 	): Promise<InviteResponse> {
+		if (!validateEmail(email.trim())) {
+			return new ResponseError('INVALID_EMAIL_FORMAT', 'E-mail address is not in a valid format')
+		}
+
 		return await dbContext.transaction(async trx => {
 			let person: Omit<PersonRow, 'roles'> | null = await trx.queryHandler.fetch(PersonQuery.byEmail(email))
 			const isNew = !person

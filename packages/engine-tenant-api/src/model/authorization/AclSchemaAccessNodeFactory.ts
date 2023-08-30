@@ -38,6 +38,12 @@ export class AclSchemaAccessNodeFactory {
 			node.allow(PermissionActions.PROJECT_UPDATE_MEMBER([]), verifier)
 			node.allow(PermissionActions.PROJECT_REMOVE_MEMBER([]), verifier)
 		}
+
+		if (membershipRoles.some(it => it.tenant?.view)) {
+			const verifier = createVerifier(it => it.view ?? {})
+			node.allow(PermissionActions.PROJECT_VIEW_MEMBER([]), verifier)
+		}
+
 		return node
 	}
 }

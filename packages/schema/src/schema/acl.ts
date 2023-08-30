@@ -103,6 +103,7 @@ export namespace Acl {
 	export type TenantPermissions = {
 		readonly invite?: boolean | MembershipMatchRule
 		readonly unmanagedInvite?: boolean | MembershipMatchRule
+		readonly view?: MembershipMatchRule
 		readonly manage?: MembershipMatchRule
 	}
 

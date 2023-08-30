@@ -146,10 +146,6 @@ export const BaseButton = memo(forwardRef<any, BaseButtonProps>(({
 		rest['tabIndex'] = -1
 	}
 
-	if (Component === 'button') {
-		(rest as HTMLButtonElementProps).type = type !== undefined ? type : 'button'
-	}
-
 	const themeIntent = !disabled ? intent : 'default'
 	const className = useClassNameFactory(componentClassName)
 	const colorScheme = useColorScheme()
@@ -181,7 +177,7 @@ export const BaseButton = memo(forwardRef<any, BaseButtonProps>(({
 			colorSchemeClassName(scheme),
 			classNameProp,
 		]),
-		type,
+		'type': type ?? (Component === 'button' ? 'button' : undefined),
 		ref,
 		...(disabled ? {
 			href: null,

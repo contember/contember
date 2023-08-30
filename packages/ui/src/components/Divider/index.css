@@ -6,13 +6,18 @@
 	margin-top: calc(var(--cui-divider-margin) - 0.5px);
 	min-height: 1px;
 	min-width: 1px;
+	margin-left: -0.5px;
+	margin-right: -0.5px;
+	position: relative;
+	z-index: 1;
 }
 
-:where(.view-horizontal .cui-divider) {
-	margin-bottom: unset;
+:where([data-direction="horizontal"] > .cui-divider),
+:where(.view-horizontal > .cui-divider) {
+	margin-bottom: -0.5px;
 	margin-left: calc(var(--cui-divider-margin) - 0.5px);
 	margin-right: calc(var(--cui-divider-margin) - 0.5px);
-	margin-top: unset;
+	margin-top: -0.5px;
 }
 
 :where(.cui-divider[data-gap]) { --cui-divider-margin: var(--cui-padding) }

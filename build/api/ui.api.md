@@ -158,7 +158,7 @@ export type BaseButtonProps = ButtonOwnProps & (ButtonBasedProps | AnchorBasedPr
 export type BlueprintIconName = IconName;
 
 // @public
-export const Box: MemoExoticComponent<ForwardRefExoticComponent<Omit<HTMLDivElementProps, "children" | "isActive" | "reverse" | "footer" | "header" | "label" | "align" | "evenly" | "horizontal" | "justify" | "wrap" | "border" | keyof ComponentClassNameProps | "actions" | "background" | "borderRadius" | "fit" | "focusRing" | "intent" | keyof DeprecatedBoxProps> & Omit<BoxOwnProps, keyof DeprecatedBoxProps> & DeprecatedBoxProps & RefAttributes<HTMLDivElement>>>;
+export const Box: MemoExoticComponent<ForwardRefExoticComponent<Omit<HTMLDivElementProps, "children" | "isActive" | "reverse" | "footer" | "header" | "label" | "align" | "evenly" | "grow" | "horizontal" | "justify" | "shrink" | "wrap" | "border" | keyof ComponentClassNameProps | "actions" | "background" | "borderRadius" | "fit" | "focusRing" | "intent" | keyof DeprecatedBoxProps> & Omit<BoxOwnProps, keyof DeprecatedBoxProps> & DeprecatedBoxProps & RefAttributes<HTMLDivElement>>>;
 
 // @public (undocumented)
 export type BoxDepth = 1 | 2 | 3 | 4 | 5 | 6;
@@ -178,7 +178,7 @@ export type BoxHeaderProps = {
 };
 
 // @public (undocumented)
-export type BoxOwnProps = ComponentClassNameProps & BoxHeaderProps & Pick<StackOwnProps, 'align' | 'evenly' | 'gap' | 'horizontal' | 'justify' | 'reverse' | 'wrap'> & {
+export type BoxOwnProps = ComponentClassNameProps & BoxHeaderProps & Pick<StackOwnProps, 'align' | 'evenly' | 'gap' | 'grow' | 'horizontal' | 'justify' | 'reverse' | 'shrink' | 'wrap'> & {
     background?: boolean;
     border?: boolean;
     borderRadius?: StackOwnProps['gap'];

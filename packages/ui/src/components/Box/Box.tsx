@@ -24,7 +24,7 @@ export type DeprecatedPaddingPropLiteral = Default | 'no-padding' | 'with-paddin
 export type BoxOwnProps =
 	& ComponentClassNameProps
 	& BoxHeaderProps
-	& Pick<StackOwnProps, 'align' | 'evenly' | 'gap' | 'horizontal' | 'justify' | 'reverse' | 'wrap'>
+	& Pick<StackOwnProps, 'align' | 'evenly' | 'gap' | 'grow' | 'horizontal' | 'justify' | 'reverse' | 'shrink' | 'wrap'>
 	& {
 		background?: boolean
 		border?: boolean

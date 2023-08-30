@@ -2863,7 +2863,6 @@ __metadata:
     lucide-react: ^0.268.0
     react: ^18
     react-dom: ^18
-    wait-for-element-transition: ^3.3.1
   peerDependencies:
     react: ^17 || ^18
     react-dom: ^17 || ^18
@@ -16620,13 +16619,6 @@ __metadata:
   dependencies:
     xml-name-validator: ^4.0.0
   checksum: eba070e78deb408ae8defa4d36b429f084b2b47a4741c4a9be3f27a0a3d1845e277e3072b04391a138f7e43776842627d1334e448ff13ff90ad9fb1214ee7091
-  languageName: node
-  linkType: hard
-
-"wait-for-element-transition@npm:^3.3.1":
-  version: 3.3.1
-  resolution: "wait-for-element-transition@npm:3.3.1"
-  checksum: fb179b820711a5fa665efbfa9366f8eb7d47163b0cf80a99a5db0e84274454cddf55262ab0ba5cd8f4aa76b57a2978f89e6e2eb04942ac5925478956260d4070
   languageName: node
   linkType: hard
 

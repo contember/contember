@@ -1,7 +1,6 @@
-import { useClassNameFactory, useComposeRef, useElementSize, useExpectSameValueReference, useReferentiallyStableCallback, useUpdatedRef } from '@contember/react-utils'
+import { useClassNameFactory, useComposeRef, useContainerWidth, useElementSize, usePreviousValue, useReferentiallyStableCallback } from '@contember/react-utils'
 import { assert, dataAttribute, isNotNullish, px } from '@contember/utilities'
-import { CSSProperties, forwardRef, memo, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
-import waitForTransition from 'wait-for-element-transition'
+import { CSSProperties, forwardRef, memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef } from 'react'
 import { FocusScope } from '../focus-scope'
 import { ContainerInsetsContext, InsetsConsumer, useElementInsets, useSafeAreaInsetsContext } from '../insets'
 import { LayoutPanelContext, PanelWidthContext, useGetLayoutPanelsStateContext, useSetLayoutPanelsStateContext } from './Contexts'
@@ -30,6 +29,8 @@ export const Panel: PanelComponentType = memo(forwardRef(
 			onBehaviorChange,
 			onVisibilityChange,
 			onKeyPress,
+			onKeyDown,
+			onTransitionEnd,
 			priority,
 			trapFocusInModal = true,
 			visibility,
@@ -39,6 +40,7 @@ export const Panel: PanelComponentType = memo(forwardRef(
 		const elementRef = useRef<HTMLElement>(null)
 		const composedRef = useComposeRef(forwardedRef, elementRef)
 		const { height, width } = useElementSize(elementRef)
+		const containerWidth = useContainerWidth()
 
 		const { registerLayoutPanel, unregisterLayoutPanel, update } = useSetLayoutPanelsStateContext()
 
@@ -59,89 +61,85 @@ export const Panel: PanelComponentType = memo(forwardRef(
 		}, [basis, behavior, defaultBehavior, defaultVisibility, maxWidth, minWidth, name, priority, registerLayoutPanel, unregisterLayoutPanel, visibility])
 
 		const panelState = useGetLayoutPanelsStateContext().panels.get(name)
-		const isPanelStateReady = !!panelState
-		useExpectSameValueReference(panelState)
 		const contextBehavior = panelState?.behavior ?? behavior ?? defaultBehavior
 		const contextVisibility = panelState?.visibility ?? visibility ?? defaultVisibility
 
 		assert('context visibility is not nullish', contextVisibility, isNotNullish)
 		assert('context behavior is not nullish', contextBehavior, isNotNullish)
 
-		const [currentVisibility, setCurrentVisibility] = useState<typeof contextVisibility | 'will-become-visible' | 'will-become-hidden' | null>(contextBehavior === 'static' ? 'visible' : 'hidden')
-		const currentVisibilityRef = useUpdatedRef(currentVisibility)
+		const previousBehavior = usePreviousValue(contextBehavior)
+		const previousVisibility = usePreviousValue(contextVisibility)
 
-		const [currentBehavior, setCurrentBehavior] = useState<typeof contextBehavior>(contextBehavior)
-		const currentBehaviorRef = useUpdatedRef(currentBehavior)
+		useEffect(() => {
+			const element = elementRef.current
 
-		useLayoutEffect(() => {
-			if (isPanelStateReady && elementRef.current) {
-				const element = elementRef.current
-				const currentBehavior = currentBehaviorRef.current
-				const currentVisibility = currentVisibilityRef.current
+			if (element) {
 
-				let isMounted = true
-
-				const panelContextState = {
-					behavior: contextBehavior,
-					panel: name,
-					visibility: contextVisibility,
-				}
-
-				if (currentBehavior === contextBehavior) {
-					if (currentVisibility !== contextVisibility) {
-						update(name, onVisibilityChange?.(panelContextState))
-						// When behaviors are the same, we can transition between visibilities.
-						setCurrentVisibility(`will-become-${contextVisibility}`)
-
-						// We wait for possible transitions set on panel to finish:
-						waitForTransition(element).then(() => {
-							if (isMounted) {
-								setCurrentVisibility(contextVisibility)
-							}
-						})
-					}
-				} else {
-					// We can apply behavior immediately
-					setCurrentBehavior(contextBehavior)
-					update(name, onBehaviorChange?.(panelContextState))
-
-					if (currentVisibility !== contextVisibility) {
-						setCurrentVisibility(contextVisibility)
-						update(name, onVisibilityChange?.(panelContextState))
-					}
-				}
-
-				return () => {
-					isMounted = false
-				}
 			}
-		}, [contextVisibility, contextBehavior, isPanelStateReady, name, onBehaviorChange, onVisibilityChange, update, currentBehaviorRef, currentVisibilityRef])
+		}, [containerWidth, visibility])
 
-		const handleKeyPress = useReferentiallyStableCallback((event: KeyboardEvent) => {
-			if (currentBehavior && currentVisibility === 'visible' || currentVisibility === 'hidden') {
-				update(name, onKeyPress?.(event, { panel: name, behavior: currentBehavior, visibility: currentVisibility }))
+
+		const handleTransitionEndCleanup = useReferentiallyStableCallback((...rest: any[]) => {
+			const element = elementRef.current
+
+			if (element) {
+				element.style.setProperty('--transitioning-width', '')
+				element.style.setProperty('--transitioning-height', '')
+				delete element.dataset.transitioning
 			}
 		})
 
-		useEffect(() => {
-			if (elementRef.current) {
-				const element = elementRef.current
-				element.addEventListener('keydown', handleKeyPress)
+		const handleVisibilityChange = useReferentiallyStableCallback((visibility: typeof contextVisibility) => {
+			const element = elementRef.current
 
-				return () => element.removeEventListener('keydown', handleKeyPress)
+			if (element) {
+				if (contextBehavior === previousBehavior && previousVisibility !== contextVisibility) {
+					element.dataset.visibility = 'visible'
+					element.style.setProperty('--transitioning-width', px(element.offsetWidth))
+					element.style.setProperty('--transitioning-height', px(element.offsetHeight))
+					element.dataset.visibility = previousVisibility
+
+					requestAnimationFrame(() => {
+						element.dataset.transitioning = 'true'
+						element.dataset.visibility = contextVisibility
+					})
+				}
 			}
-		}, [handleKeyPress])
+
+			update(name, onVisibilityChange?.({
+				behavior: contextBehavior,
+				panel: name,
+				visibility,
+			}))
+		})
+
+		useLayoutEffect(() => {
+			handleVisibilityChange(contextVisibility)
+		}, [contextVisibility, handleVisibilityChange])
+
+		const handleBehaviorChange = useReferentiallyStableCallback((behavior: typeof contextBehavior) => {
+			update(name, onBehaviorChange?.({
+				behavior,
+				panel: name,
+				visibility: contextVisibility,
+			}))
+		})
+
+		useLayoutEffect(() => {
+			handleBehaviorChange(contextBehavior)
+		}, [contextBehavior, handleBehaviorChange])
+
+		const handleKeyPress = useReferentiallyStableCallback((event: KeyboardEvent) => {
+			update(name, onKeyPress?.(event, { panel: name, behavior: contextBehavior, visibility: contextVisibility }))
+		})
 
 		const elementInsets = useElementInsets(elementRef)
-
 		const safeAreaInsets = useSafeAreaInsetsContext()
-
-		const shouldTrapFocus = trapFocusInModal && currentVisibility === 'visible' && currentBehavior === 'modal'
-
 		const containerInsets = contextBehavior === 'modal' ? safeAreaInsets : elementInsets
-		const className = useClassNameFactory(componentClassName)
 
 		const id = getLayoutPanelId(name)
+		const className = useClassNameFactory(componentClassName)
+		const shouldTrapFocus = trapFocusInModal && contextVisibility === 'visible' && contextBehavior === 'modal'
 
 		return (
 			<LayoutPanelContext.Provider
@@ -157,24 +155,30 @@ export const Panel: PanelComponentType = memo(forwardRef(
 					ref={composedRef}
 					className={className(null, classNameProp)}
 					data-name={dataAttribute(name)}
-					data-behavior={dataAttribute(currentBehavior)}
-					role={currentBehavior === 'modal' ? 'dialog' : undefined}
-					aria-hidden={currentVisibility === 'hidden' ? true : undefined}
-					aria-expanded={currentVisibility === 'visible' ? 'true' : 'false'}
-					data-visibility={dataAttribute(currentVisibility ?? 'hidden')}
+					data-behavior={dataAttribute(contextBehavior)}
+					role={contextBehavior === 'modal' ? 'dialog' : undefined}
+					aria-hidden={contextVisibility === 'hidden' ? true : undefined}
+					aria-expanded={contextVisibility === 'visible' ? 'true' : 'false'}
+					data-visibility={dataAttribute(contextVisibility)}
 					data-max-width={dataAttribute(maxWidth)}
 					data-min-width={dataAttribute(minWidth)}
 					data-priority={dataAttribute(priority)}
 					data-basis={dataAttribute(basis)}
-					tabIndex={currentVisibility !== 'hidden' ? 0 : -1}
-					style={{
+					tabIndex={contextVisibility !== 'hidden' ? 0 : -1}
+					onKeyDown={useCallback((event: KeyboardEvent) => {
+						handleKeyPress(event)
+						onKeyDown?.(event)
+					}, [handleKeyPress, onKeyDown])}
+					onTransitionEnd={useReferentiallyStableCallback((event: TransitionEvent) => {
+						handleTransitionEndCleanup(event)
+						onTransitionEnd?.(event)
+					})}
+					style={useMemo(() => ({
 						'--panel-basis': `var(--panel-${name}-basis)`,
-						'--panel-height': px(height),
 						'--panel-min-width': `var(--panel-${name}-min-width)`,
 						'--panel-max-width': `var(--panel-${name}-max-width)`,
-						'--panel-width': px(width),
 						...style,
-					} as CSSProperties}
+					} as CSSProperties), [name, style])}
 					{...rest}
 				>
 					<ContainerInsetsContext.Provider value={containerInsets}>

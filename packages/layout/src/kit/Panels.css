@@ -1,3 +1,17 @@
 :where(.cui-layout-content-panel) {
 	max-width: unset;
 }
+
+:where(
+	.cui-layout-panel[data-transitioning][data-name="sidebar-left"]:not([data-behavior="modal"])
+	> .cui-layout-panel-content
+) {
+	left: auto;
+}
+
+:where(
+	.cui-layout-panel[data-transitioning][data-name="sidebar-right"]:not([data-behavior="modal"])
+	> .cui-layout-panel-content
+) {
+	right: auto;
+}

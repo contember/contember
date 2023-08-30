@@ -461,6 +461,7 @@ export type InviteError = {
 
 export type InviteErrorCode =
   | 'ALREADY_MEMBER'
+  | 'INVALID_EMAIL_FORMAT'
   | 'INVALID_MEMBERSHIP'
   | 'PROJECT_NOT_FOUND'
   | 'ROLE_NOT_FOUND'
@@ -1111,6 +1112,7 @@ export type SignUpError = {
 
 export type SignUpErrorCode =
   | 'EMAIL_ALREADY_EXISTS'
+  | 'INVALID_EMAIL_FORMAT'
   | 'TOO_WEAK'
 
 export type SignUpResponse = {

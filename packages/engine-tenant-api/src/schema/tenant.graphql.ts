@@ -116,6 +116,7 @@ const schema: DocumentNode = gql`
 
 	enum SignUpErrorCode {
 		EMAIL_ALREADY_EXISTS
+		INVALID_EMAIL_FORMAT
 		TOO_WEAK
 	}
 
@@ -393,6 +394,7 @@ const schema: DocumentNode = gql`
 		PROJECT_NOT_FOUND
 		ALREADY_MEMBER
 		INVALID_MEMBERSHIP
+		INVALID_EMAIL_FORMAT
 
 		ROLE_NOT_FOUND @deprecated
 		VARIABLE_NOT_FOUND @deprecated

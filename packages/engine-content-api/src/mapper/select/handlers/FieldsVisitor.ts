@@ -3,14 +3,11 @@ import { Mapper } from '../../Mapper'
 import { RelationFetcher } from '../RelationFetcher'
 import { SelectExecutionHandlerContext } from '../SelectExecutionHandler'
 import { PredicateFactory } from '../../../acl'
-import { WhereBuilder } from '../WhereBuilder'
 
 export class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.ColumnVisitor<void> {
 	constructor(
-		private readonly schema: Model.Schema,
 		private readonly relationFetcher: RelationFetcher,
 		private readonly predicateFactory: PredicateFactory,
-		private readonly whereBuilder: WhereBuilder,
 		private readonly mapper: Mapper,
 		private readonly executionContext: SelectExecutionHandlerContext,
 		private readonly relationPath: Model.AnyRelationContext[],

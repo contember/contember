@@ -120,7 +120,7 @@ export class ExecutionContainerFactory {
 			.addService('relationFetcher', ({ whereBuilder, orderByBuilder, predicatesInjector, pathFactory }) =>
 				new RelationFetcher(whereBuilder, orderByBuilder, predicatesInjector, pathFactory))
 			.addService('fieldsVisitorFactory', ({ relationFetcher, predicateFactory, whereBuilder, schema }) =>
-				new FieldsVisitorFactory(schema.model, relationFetcher, predicateFactory, whereBuilder))
+				new FieldsVisitorFactory(relationFetcher, predicateFactory))
 			.addService('metaHandler', ({ whereBuilder, predicateFactory }) =>
 				new MetaHandler(whereBuilder, predicateFactory))
 			.addService('uniqueWhereExpander', ({ schema }) =>

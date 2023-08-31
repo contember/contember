@@ -35,7 +35,7 @@ export type ComposedRefCallback<T> = RefCallback<T> & {
 };
 
 // @public (undocumented)
-export const ContainerWidthContext: Context<number | null>;
+export const ContainerWidthContext: Context<number | null | undefined>;
 
 // @public (undocumented)
 export type ContainerWidthContextType = number;

@@ -25,15 +25,24 @@
 :where(.cui-layout-page-content) {
 	--cui-page-content-width: calc(var(--cui-page-width, 100vw) - var(--cui-layout-page--padding-left, 0px) - var(--cui-layout-page--padding-right, 0px));
 	--cui-page-content-height: calc(var(--cui-page-height, 100vh) - var(--cui-layout-page--padding-bottom, 0px) - var(--cui-layout-page--padding-top, 0px));
+	--cui-page-content-padding-top: var(--cui-layout-page--padding-top);
+	--cui-page-content-padding-left: var(--cui-layout-page--padding-left);
+	--cui-page-content-padding-right: var(--cui-layout-page--padding-right);
+	--cui-page-content-padding-bottom: var(--cui-layout-page--padding-bottom);
+
 	display: flex;
 	flex-direction: row;
 	flex: 1;
-	padding-top: var(--cui-layout-page--padding-top);
-	padding-left: var(--cui-layout-page--padding-left);
-	padding-right: var(--cui-layout-page--padding-right);
-	padding-bottom: var(--cui-layout-page--padding-bottom);
+	padding-top: var(--cui-page-content-padding-top);
+	padding-left: var(--cui-page-content-padding-left);
+	padding-right: var(--cui-page-content-padding-right);
+	padding-bottom: var(--cui-page-content-padding-bottom);
 	transition: border-color var(--cui-transition-duration);
 	max-width: 100%;
+}
+:where(.cui-layout-page-content .cui-table-container) {
+	--cui-table-container--overflow-padding-left: var(--cui-page-content-padding-left);
+	--cui-table-container--overflow-padding-right: var(--cui-page-content-padding-right);
 }
 
 :where(.cui-layout-page-content-container) {

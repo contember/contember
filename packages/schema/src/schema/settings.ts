@@ -3,8 +3,17 @@ export namespace Settings {
 		readonly inviteExpirationMinutes?: number
 	}
 
-	export type Schema = {
+	export type ContentSettings = {
 		readonly useExistsInHasManyFilter?: boolean
+	}
+
+	export type Schema = {
 		readonly tenant?: TenantSettings
+		readonly content?: ContentSettings
+
+		/**
+		 * @deprecated
+		 */
+		readonly useExistsInHasManyFilter?: boolean
 	}
 }

@@ -107,7 +107,14 @@ export class ExecutionContainerFactory {
 			.addService('whereOptimized', ({ schema }) =>
 				new WhereOptimizer(schema.model, new ConditionOptimizer()))
 			.addService('whereBuilder', ({ joinBuilder, conditionBuilder, pathFactory, whereOptimized, schema }) =>
-				new WhereBuilder(schema.model, joinBuilder, conditionBuilder, pathFactory, whereOptimized, schema.settings.useExistsInHasManyFilter === true))
+				new WhereBuilder(
+					schema.model,
+					joinBuilder,
+					conditionBuilder,
+					pathFactory,
+					whereOptimized,
+					(schema.settings.content?.useExistsInHasManyFilter ?? schema.settings.useExistsInHasManyFilter) === true,
+				))
 			.addService('orderByBuilder', ({ joinBuilder, schema }) =>
 				new OrderByBuilder(schema.model, joinBuilder))
 			.addService('relationFetcher', ({ whereBuilder, orderByBuilder, predicatesInjector, pathFactory }) =>

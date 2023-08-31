@@ -3,8 +3,12 @@ import { Settings } from '@contember/schema'
 
 export const settingsSchema = Typesafe.partial({
 	useExistsInHasManyFilter: Typesafe.boolean,
+
 	tenant: Typesafe.partial({
 		inviteExpirationMinutes: Typesafe.integer,
+	}),
+	content: Typesafe.partial({
+		useExistsInHasManyFilter: Typesafe.boolean,
 	}),
 })
 

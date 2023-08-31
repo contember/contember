@@ -3,11 +3,13 @@ import { RelationFetcher } from '../RelationFetcher'
 import { Mapper } from '../../Mapper'
 import { SelectExecutionHandlerContext } from '../SelectExecutionHandler'
 import { PredicateFactory } from '../../../acl'
+import { Settings } from '@contember/schema'
 
 export class FieldsVisitorFactory {
 	constructor(
 		private readonly relationFetcher: RelationFetcher,
 		private readonly predicateFactory: PredicateFactory,
+		private readonly settings: Settings.ContentSettings,
 	) {}
 
 	create(mapper: Mapper, context: SelectExecutionHandlerContext): FieldsVisitor {
@@ -17,6 +19,7 @@ export class FieldsVisitorFactory {
 			mapper,
 			context,
 			context.relationPath,
+			this.settings,
 		)
 	}
 }

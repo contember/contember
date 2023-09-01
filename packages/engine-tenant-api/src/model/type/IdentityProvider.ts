@@ -8,4 +8,5 @@ export interface IdentityProviderData {
 export interface IdentityProviderOptions {
 	autoSignUp: boolean
 	exclusive: boolean
+	initReturnsConfig: boolean
 }

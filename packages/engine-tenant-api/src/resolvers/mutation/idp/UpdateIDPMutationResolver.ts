@@ -19,6 +19,7 @@ export class UpdateIDPMutationResolver implements MutationResolvers {
 			options: {
 				autoSignUp: args.options?.autoSignUp ?? undefined,
 				exclusive: args.options?.exclusive ?? undefined,
+				initReturnsConfig: args.options?.initReturnsConfig ?? undefined,
 			},
 		}, args.mergeConfiguration ?? false)
 		if (!result.ok) {

@@ -41,6 +41,7 @@ test('signs in idp with existing identity', async () => {
 							externalIdentifier: externalIdentifier,
 						},
 						disabledAt: null,
+						initReturnsConfig: false,
 						slug: 'mock',
 						type: 'mock',
 					},
@@ -108,6 +109,7 @@ test('signs in exclusive idp', async () => {
 						id: idpId,
 						autoSignUp: true,
 						exclusive: true,
+						initReturnsConfig: false,
 						configuration: {
 							externalIdentifier: externalIdentifier,
 							email,

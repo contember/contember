@@ -10,11 +10,12 @@ export const createBaseIdpQuery = () =>
 		.select('disabled_at', 'disabledAt')
 		.select('auto_sign_up', 'autoSignUp')
 		.select('exclusive')
+		.select('init_returns_config', 'initReturnsConfig')
 		.from('identity_provider')
 
-export const createIdpDto = ({ exclusive, autoSignUp, ...row }: IdentityProviderRow): IdentityProviderDto => {
+export const createIdpDto = ({ exclusive, autoSignUp, initReturnsConfig, ...row }: IdentityProviderRow): IdentityProviderDto => {
 	return {
 		...row,
-		options: { autoSignUp, exclusive },
+		options: { autoSignUp, exclusive, initReturnsConfig },
 	}
 }

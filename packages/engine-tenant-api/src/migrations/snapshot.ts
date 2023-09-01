@@ -54,7 +54,8 @@ CREATE TABLE "identity_provider" (
     "configuration" "jsonb" NOT NULL,
     "disabled_at" timestamp with time zone,
     "auto_sign_up" boolean DEFAULT false NOT NULL,
-    "exclusive" boolean DEFAULT false
+    "exclusive" boolean DEFAULT false,
+    "init_returns_config" boolean DEFAULT false NOT NULL
 );
 CREATE TABLE "mail_template" (
     "id" "uuid" NOT NULL,

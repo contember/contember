@@ -2,7 +2,7 @@ import { ApiKeyManager } from './apiKey'
 import { IdentityProviderBySlugQuery, PersonByIdPQuery, PersonQuery, PersonRow } from '../queries'
 import { IDPClaim, IDPHandlerRegistry, IDPResponseError, IDPValidationError } from './idp'
 import { Response, ResponseError, ResponseOk } from '../utils/Response'
-import { InitSignInIdpErrorCode, SignInIdpErrorCode } from '../../schema'
+import { InitSignInIdpErrorCode, InitSignInIdpResult, SignInIdpErrorCode } from '../../schema'
 import { DatabaseContext } from '../utils'
 import { CreateIdentityCommand, CreatePersonCommand, CreatePersonIdentityProviderIdentifierCommand } from '../commands'
 import { TenantRole } from '../authorization'
@@ -67,7 +67,15 @@ class IDPSignInManager {
 		const validatedConfig = providerService.validateConfiguration(provider.configuration)
 		try {
 			const initResponse = await providerService.initAuth(validatedConfig, data)
-			return new ResponseOk(initResponse)
+
+			const publicConfig = providerService.getPublicConfiguration
+				? providerService.getPublicConfiguration(validatedConfig)
+				: validatedConfig
+
+			return new ResponseOk({
+				...initResponse,
+				idpConfiguration: provider.initReturnsConfig ? publicConfig : null,
+			})
 		} catch (e) {
 			if (e instanceof IDPValidationError) {
 				return new ResponseError('IDP_VALIDATION_FAILED', e.message)
@@ -123,12 +131,7 @@ class IDPSignInManager {
 }
 
 namespace IDPSignInManager {
-	export interface InitSignInIDPResult {
-		readonly authUrl: string
-		readonly sessionData: any
-	}
-
-	export type InitSignInIDPResponse = Response<InitSignInIDPResult, InitSignInIdpErrorCode>
+	export type InitSignInIDPResponse = Response<InitSignInIdpResult, InitSignInIdpErrorCode>
 
 	interface SignInIDPResult {
 		readonly person: PersonRow

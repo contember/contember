@@ -270,6 +270,7 @@ const schema: DocumentNode = gql`
 	type InitSignInIDPResult {
 		authUrl: String!
 		sessionData: Json!
+		idpConfiguration: Json
 	}
 
 	type InitSignInIDPError {
@@ -385,11 +386,13 @@ const schema: DocumentNode = gql`
 	type IDPOptionsOutput {
 		autoSignUp: Boolean!
 		exclusive: Boolean!
+		initReturnsConfig: Boolean!
 	}
 
 	input IDPOptions {
 		autoSignUp: Boolean
 		exclusive: Boolean
+		initReturnsConfig: Boolean
 	}
 
 

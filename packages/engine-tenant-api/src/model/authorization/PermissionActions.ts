@@ -57,6 +57,7 @@ namespace PermissionActions {
 	export const IDP_UPDATE = Authorizator.createAction(Resources.idp, 'update')
 	export const IDP_DISABLE = Authorizator.createAction(Resources.idp, 'disable')
 	export const IDP_ENABLE = Authorizator.createAction(Resources.idp, 'enable')
+	export const IDP_LIST = Authorizator.createAction(Resources.idp, 'list')
 }
 
 export { PermissionActions }

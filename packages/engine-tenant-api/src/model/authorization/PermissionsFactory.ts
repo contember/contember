@@ -57,6 +57,7 @@ class PermissionsFactory {
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.IDP_UPDATE)
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.IDP_DISABLE)
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.IDP_ENABLE)
+		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.IDP_LIST)
 
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.ENTRYPOINT_DEPLOY)
 

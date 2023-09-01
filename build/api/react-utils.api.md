@@ -230,6 +230,9 @@ export function useOnElementMutation(refOrElement: RefObjectOrElement<HTMLElemen
 // @public (undocumented)
 export function useOnElementResize(refOrElement: RefObjectOrElement<HTMLElement | null> | null, callback: (entries: ResizeObserverEntry) => void, options?: ResizeObserverOptions, timeout?: number): void;
 
+// @public
+export function useOnScrollWithin(refOrElement: RefObjectOrElement<HTMLElement | null> | null, callback: (event: Event) => void, interval?: number): void;
+
 // @public (undocumented)
 export function useOnWindowResize(callback: (event: Event) => void, interval?: number): void;
 

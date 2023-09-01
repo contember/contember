@@ -60,9 +60,9 @@ export function useOnScrollWithin(
 						element.removeEventListener('scroll', debouncedHandler)
 					}
 				}
+			} else {
+				throw new Error('Exhaustive error: Expecting element to be instance of HTMLElement')
 			}
-		} else {
-			throw new Error('Exhaustive error: Expecting element to be instance of HTMLElement')
 		}
 	}, [interval, refOrElement, scopedConsoleRef])
 }

@@ -1,14 +1,15 @@
-import { ColorSchemeProvider, useClassNameFactory, useElementTopOffset } from '@contember/react-utils'
+import { ColorSchemeProvider, ContainerWidthContext, useClassNameFactory, useElementSize } from '@contember/react-utils'
 import { colorSchemeClassName, contentThemeClassName, controlsThemeClassName } from '@contember/utilities'
-import { CSSProperties, ReactNode, memo, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
-import { DialogProvider, NavigationContext } from '../..'
+import { ReactNode, memo, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
+import { NavigationContext } from '../../Navigation'
+import { DialogProvider, Divider, Spacer } from '../../components'
 import { Button } from '../../components/Forms'
 import { Icon } from '../../components/Icon'
 import { PortalProvider } from '../../components/Portal'
 import { PreventCloseContext } from '../../components/PreventCloseContext'
 import { Stack } from '../../components/Stack'
 import { Intent, Scheme } from '../../types'
-import { toStateClass, toViewClass } from '../../utils'
+import { toViewClass } from '../../utils'
 import { ThemeSchemeContext, TitleThemeSchemeContext } from './ThemeSchemeContext'
 import { ThemeScheme } from './Types'
 export interface LayoutChromeProps extends ThemeScheme {
@@ -53,7 +54,8 @@ export const LayoutChrome = memo(({
 	titleThemeControls,
 }: LayoutChromeProps) => {
 	const [collapsed, setCollapsed] = useState(true)
-	const [isScrolled, setIsScrolled] = useState(false)
+	const [isScrolledTop, setIsScrolledTop] = useState(false)
+	const [isScrolledBottom, setIsScrolledBottom] = useState(false)
 	const navigationContext = useContext(NavigationContext)
 	const preventedAt = useRef<Date | null>(null)
 
@@ -81,11 +83,10 @@ export const LayoutChrome = memo(({
 		const contentRefCopy = contentRef.current
 		const listener = () => {
 			const scrollTop = Math.floor(contentRefCopy?.scrollTop ?? 0)
-			const nextIsScrolled = scrollTop > 1
+			const scrollBottom = Math.floor(contentRefCopy?.scrollHeight ?? 0) - Math.floor(contentRefCopy?.clientHeight ?? 0) - scrollTop
 
-			if (isScrolled !== nextIsScrolled) {
-				setIsScrolled(nextIsScrolled)
-			}
+			setIsScrolledTop(scrollTop > 1)
+			setIsScrolledBottom(scrollBottom > 1)
 		}
 
 		contentRefCopy?.addEventListener('scroll', listener)
@@ -93,7 +94,7 @@ export const LayoutChrome = memo(({
 		return () => {
 			contentRefCopy?.removeEventListener('scroll', listener)
 		}
-	}, [contentRef, isScrolled])
+	}, [contentRef, isScrolledTop])
 
 	const themeScheme = useMemo<ThemeScheme>(() => ({
 		scheme: pageScheme ?? scheme,
@@ -155,6 +156,9 @@ export const LayoutChrome = memo(({
 	})
 
 	const componentClassName = useClassNameFactory('layout-chrome')
+
+	const barElementRef = useRef<HTMLDivElement>(null)
+	const barElementSize = useElementSize(barElementRef)
 	const componentBarClassName = useClassNameFactory('layout-chrome-bar')
 	const hasBar: boolean = !!(sidebarHeader || switchers || navigation || sidebarFooter)
 
@@ -174,24 +178,37 @@ export const LayoutChrome = memo(({
 					<PortalProvider>
 						<DialogProvider>
 							<PreventCloseContext.Provider value={preventMenuClose}>
-								<div className={componentBarClassName()}>
-									<div className={componentBarClassName('header')}>
-										{sidebarHeader && <div className={componentBarClassName('header-inner')}>{sidebarHeader}</div>}
-										<Button id="cui-menu-button" distinction="seamless" className={componentClassName('navigation-button')} onClick={toggleCollapsed}>
-											<span className={componentClassName('menu-button-label')}>Menu</span>
-											<Icon blueprintIcon={collapsed ? 'menu' : 'cross'} />
-										</Button>
-									</div>
-									{switchers && <div className={componentBarClassName('switchers')}>{switchers}</div>}
-									{navigation && <div ref={contentRef} className={componentBarClassName('body')}>
-										<span className={componentBarClassName('body-scrolled-indicator', [
-											toStateClass('scrolled', isScrolled),
-										])} />
-										<Stack>{navigation}</Stack>
-									</div>}
-									{sidebarFooter && <div className={componentBarClassName('footer')}>
-										{sidebarFooter}
-									</div>}
+								<div ref={barElementRef} className={componentBarClassName()}>
+									<ContainerWidthContext.Provider value={barElementSize.width}>
+										<div className={componentBarClassName('header')}>
+											<div className={componentBarClassName('header-inner')}>
+												{sidebarHeader}
+												<Spacer grow />
+												<Button id="cui-menu-button" distinction="seamless" className={componentClassName('navigation-button')} onClick={toggleCollapsed}>
+													<span className={componentClassName('menu-button-label')}>Menu</span>
+													<Icon blueprintIcon={collapsed ? 'menu' : 'cross'} />
+												</Button>
+											</div>
+										</div>
+										{switchers && (
+											<>
+												<Divider gap={false} />
+												<div className={componentBarClassName('switchers')}>{switchers}</div>
+											</>
+										)}
+										<Divider gap={false} style={isScrolledTop ? undefined : zeroOpacityStyle} />
+										<div ref={contentRef} className={componentBarClassName('body')}>
+											{navigation && <Stack>{navigation}</Stack>}
+										</div>
+										{sidebarFooter && (
+											<>
+												<Divider gap={false} style={isScrolledBottom ? undefined : zeroOpacityStyle} />
+												<div className={componentBarClassName('footer')}>
+													{sidebarFooter}
+												</div>
+											</>
+										)}
+									</ContainerWidthContext.Provider>
 								</div>
 							</PreventCloseContext.Provider>
 						</DialogProvider>
@@ -219,3 +236,5 @@ export const LayoutChrome = memo(({
 })
 
 LayoutChrome.displayName = 'LayoutChrome'
+
+const zeroOpacityStyle = { opacity: 0 }

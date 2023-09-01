@@ -16,4 +16,6 @@ export interface IdentityProviderHandler<Configuration extends {}> {
 	processResponse: (configuration: Configuration, responseData: unknown) =>  Promise<IDPClaim>
 
 	validateConfiguration: (config: unknown) => Configuration
+
+	getPublicConfiguration?: (config: Configuration) => Partial<Configuration>
 }

@@ -8,6 +8,10 @@ export class IDPHandlerRegistry {
 		this.providers[type] = provider
 	}
 
+	public getHandlerOrNull(type: string): IdentityProviderHandler<{}> | null {
+		return this.providers[type] ?? null
+	}
+
 	public getHandler(type: string): IdentityProviderHandler<{}> {
 		const provider = this.providers[type]
 		if (!provider) {

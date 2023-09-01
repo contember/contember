@@ -1,6 +1,6 @@
 import * as Typesafe from '@contember/typesafe'
 import { IdentityProviderHandler, IDPClaim, InitIDPAuthResult } from '../IdentityProviderHandler'
-import { OIDCConfigurationOptions, OIDCInitData, OIDCResponseData, OIDCSessionData } from './OIDCTypes'
+import { OIDCConfiguration, OIDCConfigurationOptions, OIDCInitData, OIDCResponseData, OIDCSessionData } from './OIDCTypes'
 import { catchTypesafe } from './helpers'
 import { IDPValidationError } from '../IDPValidationError'
 import { InvalidIDPConfigurationError } from '../InvalidIDPConfigurationError'
@@ -42,6 +42,9 @@ export class AppleProvider implements IdentityProviderHandler<AppleConfiguration
 		return await handleOIDCResponse(client, responseData)
 	}
 
+	getPublicConfiguration({ privateKey, ...config }: AppleConfiguration): Partial<AppleConfiguration> {
+		return config
+	}
 
 	private async createOIDCClient(configuration: AppleConfiguration): Promise<Client> {
 		this.issuer ??= await Issuer.discover(APPLE_OIDC_CONFIGURATION_ENDPOINT)

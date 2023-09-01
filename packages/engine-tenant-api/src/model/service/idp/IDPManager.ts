@@ -2,7 +2,7 @@ import { Response, ResponseError, ResponseOk } from '../../utils/Response'
 import { AddIdpErrorCode, DisableIdpErrorCode, EnableIdpErrorCode, UpdateIdpErrorCode } from '../../../schema'
 import { DatabaseContext } from '../../utils'
 import { IdentityProviderData } from '../../type'
-import { IdentityProviderBySlugQuery } from '../../queries'
+import { IdentityProviderBySlugQuery, IdentityProvidersQuery } from '../../queries'
 import { CreateIdpCommand } from '../../commands/idp/CreateIdpCommand'
 import { IDPHandlerRegistry } from './IDPHandlerRegistry'
 import { IdentityProviderNotFoundError } from './IdentityProviderNotFoundError'
@@ -10,6 +10,7 @@ import { InvalidIDPConfigurationError } from './InvalidIDPConfigurationError'
 import { DisableIdpCommand } from '../../commands/idp/DisableIdpCommand'
 import { EnableIdpCommand } from '../../commands/idp/EnableIdpCommand'
 import { UpdateIdpCommand, UpdateIdpData } from '../../commands/idp/UpdateIdpCommand'
+import { IdentityProviderDto } from '../../queries/idp/types'
 
 export class IDPManager {
 	constructor(
@@ -89,6 +90,18 @@ export class IDPManager {
 			}
 			await db.commandBus.execute(new UpdateIdpCommand(existing.id, data))
 			return new ResponseOk(null)
+		})
+	}
+
+	public async listIDP(db: DatabaseContext): Promise<IdentityProviderDto[]> {
+		const result = await db.queryHandler.fetch(new IdentityProvidersQuery())
+		return result.map(it => {
+			const providerService = this.idpRegistry.getHandlerOrNull(it.type)
+			const configuration = providerService?.getPublicConfiguration
+				? providerService.getPublicConfiguration(it.configuration)
+				: it.configuration
+
+			return { ...it, configuration }
 		})
 	}
 }

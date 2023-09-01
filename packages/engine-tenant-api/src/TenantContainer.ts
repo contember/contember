@@ -208,8 +208,8 @@ export class TenantContainerFactory {
 				new SignInResponseFactory(permissionContextFactory, identityTypeResolver))
 			.addService('meQueryResolver', () =>
 				new MeQueryResolver())
-			.addService('idpQueryResolver', () =>
-				new IDPQueryResolver())
+			.addService('idpQueryResolver', ({ idpManager }) =>
+				new IDPQueryResolver(idpManager))
 			.addService('projectQueryResolver', ({ projectManager }) =>
 				new ProjectQueryResolver(projectManager))
 			.addService('projectMembersQueryResolver', ({ projectManager, projectMemberManager }) =>

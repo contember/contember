@@ -74,7 +74,7 @@ export const EditorTableElement = memo(function EditorTableElement({
 									}}
 									styledContent={false}
 								>
-									<ButtonGroup>
+									<ButtonGroup display="block">
 										{columnNumber === 0 && (
 											<Button square borderRadius="full" size="small" onClick={() => toggleColumnHeaderScope(columnNumber, 'row')}>
 												<Icon blueprintIcon="header" size="small" />

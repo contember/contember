@@ -107,7 +107,7 @@ export function DimensionsRenderer(props: DimensionsRendererProps) {
 		})
 
 		if (canSelectJustOne) {
-			return <ButtonGroup direction="vertical">{renderedDimensions}</ButtonGroup>
+			return <ButtonGroup direction="vertical" display="block">{renderedDimensions}</ButtonGroup>
 		}
 
 		return (

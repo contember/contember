@@ -222,7 +222,7 @@ export type ButtonElevation = Default | 'none';
 export type ButtonFlow = Default | 'circular' | 'squarish' | 'generous' | 'block' | 'generousBlock';
 
 // @public (undocumented)
-export const ButtonGroup: MemoExoticComponent<({ borderRadius, children, className, componentClassName, display, focusRing, flow, isTopToolbar, orientation, direction, size, }: ButtonGroupProps) => JSX.Element>;
+export const ButtonGroup: MemoExoticComponent<({ borderRadius, children, className, componentClassName, display, focusRing, flow, inset, isTopToolbar, orientation, direction, size, }: ButtonGroupProps) => JSX.Element>;
 
 // @public @deprecated (undocumented)
 export type ButtonGroupFlow = Default | 'block';
@@ -242,6 +242,8 @@ export interface ButtonGroupProps extends ComponentClassNameProps, DeprecatedBut
     display?: 'block' | 'inline';
     // (undocumented)
     focusRing?: boolean;
+    // (undocumented)
+    inset?: Exclude<StackOwnProps['gap'], boolean | 'large' | 'larger'> | 'border';
     // @deprecated (undocumented)
     orientation?: 'horizontal' | 'vertical' | DeprecatedButtonDefault;
     // (undocumented)
@@ -249,7 +251,7 @@ export interface ButtonGroupProps extends ComponentClassNameProps, DeprecatedBut
 }
 
 // @public (undocumented)
-export const ButtonList: MemoExoticComponent<({ children, className, componentClassName, display, flow, gap, orientation, direction, size, }: ButtonListProps) => JSX.Element>;
+export const ButtonList: MemoExoticComponent<({ children, className, componentClassName, display, flow, gap, inset, orientation, direction, size, }: ButtonListProps) => JSX.Element>;
 
 // @public @deprecated (undocumented)
 export type ButtonListFlow = Default | 'inline' | 'block';
@@ -264,6 +266,8 @@ export interface ButtonListProps extends ComponentClassNameProps, DeprecatedButt
     display?: 'block' | 'inline';
     // (undocumented)
     gap?: StackOwnProps['gap'];
+    // (undocumented)
+    inset?: Exclude<StackOwnProps['gap'], boolean | 'large' | 'larger'> | 'border';
     // @deprecated (undocumented)
     orientation?: 'horizontal' | 'vertical' | DeprecatedButtonDefault;
     // (undocumented)

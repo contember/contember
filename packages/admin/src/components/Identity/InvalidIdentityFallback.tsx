@@ -6,7 +6,7 @@ export const InvalidIdentityFallback = () => {
 	return (
 		<MiscPageLayout>
 			<Message intent="danger" size="large" padding="large" display="block">Failed to fetch an identity</Message>
-			<ButtonGroup orientation={'vertical'}>
+			<ButtonGroup direction="vertical">
 				<AnchorButton href={window.location.href}>Reload</AnchorButton>
 				<LogoutLink Component={Button}>Login again</LogoutLink>
 			</ButtonGroup>

@@ -115,7 +115,7 @@ export function DataGridFullFilters({
 					{!!remainingColumns.length && (
 						<Dropdown buttonProps={filterButtonProps}>
 							{({ requestClose }) => (
-								<ButtonGroup orientation="vertical">
+								<ButtonGroup direction="vertical" display="block" inset="border">
 									{remainingColumns.map(([key, column]) => (
 										<Button
 											key={key}

@@ -16,7 +16,7 @@ export interface AddNewBlockButtonInnerProps extends DropdownRenderProps, Create
 export const AddNewBlockButtonInner = memo<AddNewBlockButtonInnerProps>(props => {
 	const desugaredDiscriminationField = useDesugaredRelativeSingleField(props.discriminationField)
 	return (
-		<ButtonGroup orientation="vertical">
+		<ButtonGroup direction="vertical">
 			{Array.from(props.normalizedBlocks.values(), ({ discriminateBy, datum: blockProps }, i) => (
 				<Button
 					key={i}

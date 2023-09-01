@@ -286,9 +286,11 @@
 
 :where(.cui-button-list),
 :where(.cui-button-group) {
+	--cui-view--inset: 0px;
 	align-items: center;
 	display: inline-flex;
 	flex-wrap: wrap;
+	margin: calc(-1 * var(--cui-view--inset, 0px));
 	position: relative;
 }
 
@@ -382,6 +384,17 @@
 :where(.cui-button-group[data-border-radius="double"]) { border-radius: calc(var(--cui-double-gap)) }
 :where(.cui-button-group[data-border-radius="gutter"]) { border-radius: calc(var(--cui-gutter)) }
 :where(.cui-button-group[data-border-radius="padding"]) { border-radius: calc(var(--cui-padding)) }
+
+:where(.cui-button-group[data-inset="border"]),
+:where(.cui-button-list[data-inset="border"]) { --cui-view--inset: var(--cui-border-width) }
+:where(.cui-button-group[data-inset="gap"]),
+:where(.cui-button-list[data-inset="gap"]) { --cui-view--inset: var(--cui-gap) }
+:where(.cui-button-group[data-inset="double"]),
+:where(.cui-button-list[data-inset="double"]) { --cui-view--inset: var(--cui-double-gap) }
+:where(.cui-button-group[data-inset="gutter"]),
+:where(.cui-button-list[data-inset="gutter"]) { --cui-view--inset: var(--cui-gutter) }
+:where(.cui-button-group[data-inset="padding"]),
+:where(.cui-button-list[data-inset="padding"]) { --cui-view--inset: var(--cui-padding) }
 
 :where(.cui-button-group[data-focus-ring]:focus-within) {
 	box-shadow: var(--cui-box-shadow--controls-focus-ring);

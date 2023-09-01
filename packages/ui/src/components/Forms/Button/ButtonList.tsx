@@ -13,6 +13,7 @@ export const ButtonList = memo(({
 	display = 'inline',
 	flow,
 	gap = true,
+	inset,
 	orientation,
 	direction = 'horizontal',
 	size = 'medium',
@@ -33,6 +34,7 @@ export const ButtonList = memo(({
 			data-direction={dataAttribute(direction)}
 			data-display={dataAttribute(display)}
 			data-gap={dataAttribute(gap)}
+			data-inset={dataAttribute(inset)}
 			data-size={dataAttribute(size)}
 			role="group"
 		>

@@ -38,36 +38,36 @@ export function DimensionsRenderer(props: DimensionsRendererProps) {
 		const canSelectLess = selectedDimensionsCount > props.minItems
 		const getRequestChangeCallback =
 			(dimension: StatefulDimensionDatum): RequestChange =>
-			reqState => {
-				if (reqState === null) {
-					throw 'Cannot switch dimension of unmatched request'
-				}
+				reqState => {
+					if (reqState === null) {
+						throw 'Cannot switch dimension of unmatched request'
+					}
 
-				let updatedDimensions: StatefulDimensionDatum[]
+					let updatedDimensions: StatefulDimensionDatum[]
 
-				if (!dimension.isSelected && !canSelectAnother) {
-					// We're about to select another dimension but we have no more slots for it se we need to bump one off.
-					updatedDimensions = [...selectedDimensions.slice(1), dimension] // isSelected is technically wrong here but it doesn't matter
-				} else if (dimension.isSelected && !canSelectLess) {
-					// We're trying to unselect a dimension but our 'minItems' prop disallows it. Do nothing then.
-					updatedDimensions = selectedDimensions
-				} else {
-					updatedDimensions = dimensionData.filter(item => {
-						if (item.slug === dimension.slug) {
-							return !item.isSelected
-						}
-						return item.isSelected
-					})
-				}
+					if (!dimension.isSelected && !canSelectAnother) {
+						// We're about to select another dimension but we have no more slots for it se we need to bump one off.
+						updatedDimensions = [...selectedDimensions.slice(1), dimension] // isSelected is technically wrong here but it doesn't matter
+					} else if (dimension.isSelected && !canSelectLess) {
+						// We're trying to unselect a dimension but our 'minItems' prop disallows it. Do nothing then.
+						updatedDimensions = selectedDimensions
+					} else {
+						updatedDimensions = dimensionData.filter(item => {
+							if (item.slug === dimension.slug) {
+								return !item.isSelected
+							}
+							return item.isSelected
+						})
+					}
 
-				return {
-					...reqState,
-					dimensions: {
-						...(reqState.dimensions || {}),
-						[props.dimension]: getUniqueDimensions(updatedDimensions.map(item => item.slug).slice(0, props.maxItems)),
-					},
+					return {
+						...reqState,
+						dimensions: {
+							...(reqState.dimensions || {}),
+							[props.dimension]: getUniqueDimensions(updatedDimensions.map(item => item.slug).slice(0, props.maxItems)),
+						},
+					}
 				}
-			}
 
 		const renderedDimensions = dimensionData.map(dimension => {
 			if (canSelectJustOne) {
@@ -107,7 +107,7 @@ export function DimensionsRenderer(props: DimensionsRendererProps) {
 		})
 
 		if (canSelectJustOne) {
-			return <ButtonGroup orientation="vertical">{renderedDimensions}</ButtonGroup>
+			return <ButtonGroup direction="vertical">{renderedDimensions}</ButtonGroup>
 		}
 
 		return (
@@ -148,9 +148,9 @@ export function DimensionsRenderer(props: DimensionsRendererProps) {
 
 	const selectedDimensions = normalizedData
 		? uniqueDimensions
-				.filter(slug => normalizedData.find(item => item.slug === slug) !== undefined)
-				.map(dimension => normalizedData.find(item => item.slug === dimension))
-				.filter((item): item is StatefulDimensionDatum<true> => !!item && item.isSelected)
+			.filter(slug => normalizedData.find(item => item.slug === slug) !== undefined)
+			.map(dimension => normalizedData.find(item => item.slug === dimension))
+			.filter((item): item is StatefulDimensionDatum<true> => !!item && item.isSelected)
 		: emptyArray
 
 	useEffect(() => {

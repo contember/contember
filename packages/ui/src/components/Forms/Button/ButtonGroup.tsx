@@ -15,6 +15,7 @@ export const ButtonGroup = memo(({
 	display = 'inline',
 	focusRing = false,
 	flow,
+	inset,
 	isTopToolbar,
 	orientation,
 	direction = 'horizontal',
@@ -43,6 +44,7 @@ export const ButtonGroup = memo(({
 			data-direction={dataAttribute(direction)}
 			data-display={dataAttribute(display)}
 			data-focus-ring={dataAttribute(focusRing)}
+			data-inset={dataAttribute(inset)}
 			data-size={dataAttribute(size)}
 			role="group"
 		>

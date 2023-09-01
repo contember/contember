@@ -47,6 +47,7 @@ export interface ButtonListProps extends ComponentClassNameProps, DeprecatedButt
 	direction?: 'horizontal' | 'vertical'
 	display?: 'block' | 'inline'
 	gap?: StackOwnProps['gap']
+	inset?: Exclude<StackOwnProps['gap'], boolean | 'large' | 'larger'> | 'border'
 	/**
 	 * @deprecated Use `direction` instead
 	 */
@@ -60,9 +61,10 @@ export interface ButtonGroupProps extends ComponentClassNameProps, DeprecatedBut
 	direction?: 'horizontal' | 'vertical'
 	display?: 'block' | 'inline'
 	focusRing?: boolean
+	inset?: Exclude<StackOwnProps['gap'], boolean | 'large' | 'larger'> | 'border'
 	/**
 	 * @deprecated Use `direction` instead
-	 */
+	*/
 	orientation?: 'horizontal' | 'vertical' | DeprecatedButtonDefault
 	size?: 'small' | 'medium' | 'large' | DeprecatedButtonDefault
 }

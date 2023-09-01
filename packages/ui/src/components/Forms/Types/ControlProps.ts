@@ -38,7 +38,7 @@ export interface ControlDisplayProps {
 
 export type ControlValueProps<V, NN extends boolean = boolean> = {
 	defaultValue?: NN extends true ? Exclude<V, null> : V | null
-	onChange?: (value: NN extends true ? Exclude<V, null> : V | V | null) => void
+	onChange?: (value: NN extends true ? Exclude<V, null> : V | null) => void
 	value?: NN extends true ? Exclude<V, null> : V | null
 	notNull?: NN
 }

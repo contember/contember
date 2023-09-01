@@ -9,7 +9,7 @@ export class UpdateIdpCommand implements Command<void> {
 	) {
 	}
 
-	async execute({ db, providers }: Command.Args): Promise<void> {
+	async execute({ db }: Command.Args): Promise<void> {
 		const { configuration, options: { autoSignUp, exclusive } = {} } = this.data
 		await UpdateBuilder.create()
 			.table('identity_provider')

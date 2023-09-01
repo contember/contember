@@ -69,18 +69,38 @@ export class IDPManager {
 		})
 	}
 
-	public async updateIDP(db: DatabaseContext, slug: string, data: UpdateIdpData): Promise<UpdateIDPResponse> {
+	public async updateIDP(db: DatabaseContext, slug: string, data: UpdateIdpData, mergeConfiguration: boolean): Promise<UpdateIDPResponse> {
 		return await db.transaction(async db => {
 			const existing = await db.queryHandler.fetch(new IdentityProviderBySlugQuery(slug))
 			if (!existing) {
 				return new ResponseError('NOT_FOUND', `IDP ${slug} not found`)
 			}
+
+			const newConfiguration = (() => {
+				if (!data.configuration) {
+					return existing.configuration
+				}
+				if (!mergeConfiguration) {
+					return data.configuration
+				}
+
+				const newConfiguration = { ...existing.configuration }
+				for (const [key, value] of Object.entries(data.configuration)) {
+					if (value === null) {
+						delete newConfiguration[key]
+					} else {
+						newConfiguration[key] = value
+					}
+				}
+
+				return newConfiguration
+			})()
+
 			try {
 				const type = data.type ?? existing.type
-				const configuration = data.configuration ?? existing.configuration
 				const providerService = this.idpRegistry.getHandler(type)
 				if (data.configuration !== undefined || type !== existing.type) {
-					providerService.validateConfiguration(configuration)
+					providerService.validateConfiguration(newConfiguration)
 				}
 			} catch (e) {
 				if (e instanceof InvalidIDPConfigurationError) {
@@ -88,7 +108,12 @@ export class IDPManager {
 				}
 				throw e
 			}
-			await db.commandBus.execute(new UpdateIdpCommand(existing.id, data))
+
+			await db.commandBus.execute(new UpdateIdpCommand(existing.id, {
+				...data,
+				configuration: data.configuration ? newConfiguration : undefined,
+			}))
+
 			return new ResponseOk(null)
 		})
 	}

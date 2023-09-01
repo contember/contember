@@ -814,6 +814,7 @@ export type MutationUnmanagedInviteArgs = {
 export type MutationUpdateIdpArgs = {
 	configuration?: InputMaybe<Scalars['Json']>
 	identityProvider: Scalars['String']
+	mergeConfiguration?: InputMaybe<Scalars['Boolean']>
 	options?: InputMaybe<IdpOptions>
 	type?: InputMaybe<Scalars['String']>
 }

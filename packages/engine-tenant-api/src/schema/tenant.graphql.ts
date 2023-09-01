@@ -45,7 +45,7 @@ const schema: DocumentNode = gql`
 
 		# IDP management
 		addIDP(identityProvider: String!, type: String!, configuration: Json!, options: IDPOptions): AddIDPResponse
-		updateIDP(identityProvider: String!, type: String, configuration: Json, options: IDPOptions): UpdateIDPResponse
+		updateIDP(identityProvider: String!, type: String, configuration: Json, options: IDPOptions, mergeConfiguration: Boolean): UpdateIDPResponse
 		disableIDP(identityProvider: String!): DisableIDPResponse
 		enableIDP(identityProvider: String!): EnableIDPResponse
 

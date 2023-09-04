@@ -68,7 +68,7 @@ export const CreateApiKeyForm: FC<CreateApiKeyFormProps> = ({ project, rolesConf
 
 				<EditMembership {...editUserMembershipProps} />
 
-				<Button distinction="primary" size="large" type="submit" disabled={isSubmitting}>
+				<Button display="block" distinction="primary" type="submit" disabled={isSubmitting}>
 					Create API key
 				</Button>
 			</Stack>

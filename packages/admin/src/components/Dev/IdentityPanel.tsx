@@ -132,7 +132,7 @@ const LoginAsRole: FC = ({ }) => {
 			<Stack gap="large">
 				<EditMembership {...editUserMembershipProps} />
 
-				<Button distinction="primary" size="large" type="submit" disabled={isSubmitting}>
+				<Button display="block" distinction="primary" type="submit" disabled={isSubmitting}>
 					Login
 				</Button>
 			</Stack>

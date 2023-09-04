@@ -1,8 +1,8 @@
-import { EditIdentity, RolesConfig } from '../member'
-import { NavigateBackButton, RoutingLinkTarget } from '../../../routing'
 import { useProjectSlug } from '@contember/react-client'
+import { Heading, LayoutPage } from '@contember/ui'
 import { FC, memo } from 'react'
-import { LayoutPage } from '@contember/ui'
+import { NavigateBackButton, RoutingLinkTarget } from '../../../routing'
+import { EditIdentity, RolesConfig } from '../member'
 
 export type EditUserPageProps = {
 	identityId: string
@@ -21,7 +21,7 @@ export const EditUserPage: FC<EditUserPageProps> = memo(
 		}
 		return (
 			<LayoutPage
-				title="Edit user"
+				title={<Heading depth={1}>Edit user</Heading>}
 				navigation={<NavigateBackButton to={userListLink}>Back to list of users</NavigateBackButton>}
 			>
 				<EditIdentity project={project} rolesConfig={rolesConfig} identityId={identityId} userListLink={userListLink} />

@@ -1,8 +1,8 @@
-import { CreateProjectForm, LayoutPage, NavigateBackButton } from '@contember/admin'
+import { CreateProjectForm, Heading, LayoutPage, NavigateBackButton } from '@contember/admin'
 
 export default () => (
 	<LayoutPage
-		title="Create new project"
+		title={<Heading depth={1}>Create new project</Heading>}
 		navigation={<NavigateBackButton to={'projectList'}>Projects</NavigateBackButton>}
 		children={<CreateProjectForm projectListLink={'projectList'} />}
 	/>

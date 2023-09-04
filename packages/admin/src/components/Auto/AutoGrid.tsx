@@ -1,6 +1,7 @@
 import { Component, QueryLanguage, Schema } from '@contember/binding'
-import { DataGrid, DataGridContainerPublicProps, DataGridProps, DeleteEntityButton, GenericCell } from '../bindingFacade'
+import { Stack } from '@contember/ui'
 import { LinkButton, RoutingLinkTarget } from '../../routing'
+import { DataGrid, DataGridContainerPublicProps, DataGridProps, DeleteEntityButton, GenericCell } from '../bindingFacade'
 import { AutoCell } from './AutoCell'
 
 export type AutoGridProps =
@@ -39,12 +40,14 @@ const createDataGridColumns = (
 
 	const actionColumn = (
 		<GenericCell key="action" shrunk>
-			{createEditLinkTarget && (
-				<LinkButton to={createEditLinkTarget(entityName)} distinction="seamless">
-					edit
-				</LinkButton>
-			)}
-			<DeleteEntityButton />
+			<Stack horizontal>
+				{createEditLinkTarget && (
+					<LinkButton to={createEditLinkTarget(entityName)} distinction="seamless" size="small">
+						edit
+					</LinkButton>
+				)}
+				<DeleteEntityButton />
+			</Stack>
 		</GenericCell>
 	)
 

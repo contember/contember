@@ -20,15 +20,15 @@ const DeleteBlocks = () => {
 }
 
 export default (
-	<EditScope entity="Homepage(unique = One)" setOnCreate="(unique = One)">
+	<>
 		<SlotSources.Title>Home Page</SlotSources.Title>
-
-		<ContentField field="content" />
-		<AddContent field="content" />
-		<DeleteBlocks />
-
-		<SlotSources.Actions>
-			<PersistButton />
-		</SlotSources.Actions>
-	</EditScope>
+		<EditScope entity="Homepage(unique = One)" setOnCreate="(unique = One)">
+			<ContentField field="content" />
+			<AddContent field="content" />
+			<DeleteBlocks />
+			<SlotSources.Actions>
+				<PersistButton />
+			</SlotSources.Actions>
+		</EditScope>
+	</>
 )

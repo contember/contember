@@ -1,5 +1,5 @@
 import { BindingError, Environment, useEnvironment, VariableInputTransformer } from '@contember/binding'
-import { EditorToolbar, IconSourceSpecification, ToolbarGroup } from '@contember/ui'
+import { EditorToolbar, EditorToolbarProps, IconSourceSpecification, ToolbarGroup } from '@contember/ui'
 import { memo, MouseEvent as ReactMouseEvent, useMemo } from 'react'
 import { useSlateStatic } from 'slate-react'
 import { getDiscriminatedDatum, SugaredDiscriminateBy } from '../../discrimination'
@@ -15,8 +15,8 @@ export type BlockHoveringToolbarConfig =
 	}
 	& (
 		| {
-				discriminateBy: SugaredDiscriminateBy
-		  }
+			discriminateBy: SugaredDiscriminateBy
+		}
 		| ElementSpecificToolbarButton<any>
 	)
 
@@ -24,6 +24,7 @@ export interface BlockHoveringToolbarContentsProps {
 	editorReferenceBlocks: EditorReferenceBlocks
 	blockButtons?: BlockHoveringToolbarConfig[] | BlockHoveringToolbarConfig[][]
 	otherBlockButtons?: BlockHoveringToolbarConfig[]
+	showLabels?: EditorToolbarProps['showLabels']
 }
 
 function toToolbarGroups(
@@ -83,11 +84,19 @@ function toToolbarGroups(
 	})
 }
 
-export const BlockHoveringToolbarContents = memo((props: BlockHoveringToolbarContentsProps) => {
+export const BlockHoveringToolbarContents = memo(({
+	editorReferenceBlocks,
+	blockButtons,
+	otherBlockButtons,
+	showLabels,
+	...props
+}: BlockHoveringToolbarContentsProps) => {
+	if (import.meta.env.DEV) {
+		const __exhaustiveCheck: Record<string, never> = props
+	}
+
 	const editor = useSlateStatic() as EditorWithBlocks
 	const environment = useEnvironment()
-
-	const { editorReferenceBlocks, blockButtons, otherBlockButtons } = props
 
 	const groups = useMemo<ToolbarGroup[]>(() => {
 		return toToolbarGroups(editorReferenceBlocks, blockButtons, environment, editor)
@@ -99,10 +108,16 @@ export const BlockHoveringToolbarContents = memo((props: BlockHoveringToolbarCon
 			: undefined
 	}, [otherBlockButtons, editorReferenceBlocks, environment, editor])
 
-	if (!props.blockButtons || !props.blockButtons.length) {
+	if (!blockButtons || !blockButtons.length) {
 		return null
 	}
 
-	return <EditorToolbar isActive groups={groups} restGroups={restGroups} />
+	return (
+		<EditorToolbar
+			isActive groups={groups}
+			restGroups={restGroups}
+			showLabels={showLabels}
+		/>
+	)
 })
 BlockHoveringToolbarContents.displayName = 'BlockHoveringToolbarContents'

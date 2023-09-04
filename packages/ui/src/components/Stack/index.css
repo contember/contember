@@ -17,6 +17,23 @@
 :where(.cui-stack[data-direction="horizontal"]) { flex-direction: row }
 :where(.cui-stack[data-direction="horizontal"][data-reverse]) { flex-direction: row-reverse }
 
+:where(
+	.cui-stack > h1,
+	.cui-stack > h2,
+	.cui-stack > h3,
+	.cui-stack > h4,
+	.cui-stack > h5,
+	.cui-stack > h6,
+	.cui-stack > p,
+	.cui-stack > figure,
+	.cui-stack > blockquote,
+	.cui-stack > dl,
+	.cui-stack > dd
+) {
+	margin-top: 0;
+	margin-bottom: 0;
+}
+
 :where(.cui-stack[data-gap]) { --cui-stack-gap: var(--cui-padding) }
 :where(.cui-stack[data-gap="gap"]) { --cui-stack-gap: var(--cui-gap) }
 :where(.cui-stack[data-gap="double"]) { --cui-stack-gap: var(--cui-double-gap) }

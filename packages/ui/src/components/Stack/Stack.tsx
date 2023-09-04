@@ -88,7 +88,7 @@ export const Stack = memo(forwardRef<HTMLDivElement, StackProps>(({
 	reverse = fallback(reverse, direction === 'horizontal-reverse' || direction === 'vertical-reverse', true)
 
 	// NOTE: When finally removing the direction prop, keep local variable `direction` for `data-direction` attribute
-	direction = fallback(direction, isDefined(horizontal), horizontal ? 'horizontal' : 'vertical')
+	direction = fallback(direction ?? 'vertical', isDefined(horizontal), horizontal ? 'horizontal' : 'vertical')
 	direction = fallback(direction, direction === 'horizontal-reverse', 'horizontal')
 	direction = fallback(direction, direction === 'vertical-reverse', 'vertical')
 

@@ -36,6 +36,7 @@ import { Editor as Editor_2 } from 'slate';
 import { EditorCanvasDistinction } from '@contember/ui';
 import { EditorCanvasSize } from '@contember/ui';
 import { EditorInterface } from 'slate';
+import { EditorToolbarProps } from '@contember/ui';
 import { Transforms as EditorTransforms } from 'slate';
 import { Element as Element_2 } from 'slate';
 import { ElementType } from 'react';
@@ -520,6 +521,8 @@ export interface BlockEditorProps extends SugaredRelativeEntityList, CreateEdito
     // (undocumented)
     referencesField?: SugaredRelativeEntityList | string;
     // (undocumented)
+    showToolbarLabels?: BlockHoveringToolbarContentsProps['showLabels'];
+    // (undocumented)
     size?: EditorCanvasSize;
     // (undocumented)
     sortableBy: SugaredFieldProps['field'];
@@ -555,6 +558,8 @@ export interface BlockHoveringToolbarContentsProps {
     editorReferenceBlocks: EditorReferenceBlocks;
     // (undocumented)
     otherBlockButtons?: BlockHoveringToolbarConfig[];
+    // (undocumented)
+    showLabels?: EditorToolbarProps['showLabels'];
 }
 
 // @public (undocumented)
@@ -2479,10 +2484,12 @@ export const horizontalRuleToolbarButton: ElementToolbarButton<HorizontalRuleEle
 export interface HoveringToolbarContentsProps {
     // (undocumented)
     buttons: ToolbarButtonSpec[] | ToolbarButtonSpec[][];
+    // (undocumented)
+    showLabels?: EditorToolbarProps['showLabels'];
 }
 
 // @public (undocumented)
-export const HoveringToolbars: React.MemoExoticComponent<(props: HoveringToolbarsProps) => JSX.Element>;
+export const HoveringToolbars: React.MemoExoticComponent<({ blockButtons, inlineButtons, shouldDisplayInlineToolbar: shouldDisplayInlineToolbarProp, showLabels, toolbarScheme, ...props }: HoveringToolbarsProps) => JSX.Element>;
 
 // @public (undocumented)
 export interface HoveringToolbarsProps {
@@ -2492,6 +2499,8 @@ export interface HoveringToolbarsProps {
     inlineButtons?: HoveringToolbarContentsProps['buttons'];
     // (undocumented)
     shouldDisplayInlineToolbar?: () => boolean;
+    // (undocumented)
+    showLabels?: HoveringToolbarContentsProps['showLabels'];
     // (undocumented)
     toolbarScheme?: Scheme;
 }

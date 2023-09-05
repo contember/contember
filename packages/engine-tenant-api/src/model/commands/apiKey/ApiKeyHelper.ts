@@ -4,7 +4,7 @@ import { plusMinutes } from '../../utils/time'
 
 const DEFAULT_EXPIRATION = 30
 export class ApiKeyHelper {
-	public static getExpiration(providers: Providers, type: ApiKey.Type, expiration?: number): Date | null {
+	public static getExpiration(providers: Providers, type: ApiKey.Type, expiration?: number | null): Date | null {
 		switch (type) {
 			case ApiKey.Type.PERMANENT:
 				return null

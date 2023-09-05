@@ -42,7 +42,12 @@ export class ApiKeyManager {
 
 		setImmediate(async () => {
 			await dbContext.commandBus.execute(
-				new ProlongApiKeyCommand(apiKeyRow.id, apiKeyRow.type, apiKeyRow.expiration || undefined),
+				new ProlongApiKeyCommand(
+					apiKeyRow.id,
+					apiKeyRow.type,
+					apiKeyRow.expiration,
+					apiKeyRow.expires_at,
+				),
 			)
 		})
 

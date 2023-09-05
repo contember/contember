@@ -91,6 +91,7 @@ export const executeTenantTest = async (test: Test) => {
 			projectInitializer,
 			projectSchemaResolver,
 			connection,
+			readConnection: connection,
 			cryptoProviders: providers,
 		})
 		.replaceService('mailer', () => mailer)

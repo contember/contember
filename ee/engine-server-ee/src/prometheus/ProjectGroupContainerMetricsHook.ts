@@ -38,15 +38,34 @@ export class ProjectGroupContainerMetricsHook {
 				}
 				return () => unregister.forEach(it => it())
 			})
-			return registrar({
-				connection: groupContainer.tenantContainer.connection,
+
+
+			const primaryConnection = groupContainer.tenantContainer.connection
+			const readConnection = groupContainer.tenantContainer.readConnection
+			const hasDifferentReadConnection = primaryConnection !== readConnection
+			const unregister: (() => void)[] = []
+			unregister.push(registrar({
+				connection: primaryConnection,
 				labels: {
 					contember_module: 'tenant',
 					contember_project_group: slug ?? 'unknown',
 					contember_project: 'unknown',
-					database_instance: 'single',
+					database_instance: hasDifferentReadConnection ? 'primary' : 'single',
 				},
-			})
+			}))
+			if (hasDifferentReadConnection) {
+				unregister.push(registrar({
+					connection: readConnection,
+					labels: {
+						contember_module: 'tenant',
+						contember_project_group: slug ?? 'unknown',
+						contember_project: 'unknown',
+						database_instance: 'replica',
+					},
+				}))
+			}
+
+			return () => unregister.forEach(it => it())
 		})
 	}
 }

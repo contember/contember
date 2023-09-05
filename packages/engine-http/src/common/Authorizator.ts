@@ -14,6 +14,7 @@ export class Authenticator {
 
 	constructor(
 		private readonly tenantDatabase: DatabaseContext,
+		private readonly tenantReadDatabase: DatabaseContext,
 		private readonly apiKeyManager: ApiKeyManager,
 	) {
 	}
@@ -31,7 +32,7 @@ export class Authenticator {
 			throw this.createAuthError(`invalid Authorization header format`)
 		}
 		const [, token] = match
-		const authResult = await timer('Auth', () => this.apiKeyManager.verifyAndProlong(this.tenantDatabase, token))
+		const authResult = await timer('Auth', () => this.apiKeyManager.verifyAndProlong(this.tenantDatabase, this.tenantReadDatabase, token))
 		if (!authResult.ok) {
 			throw this.createAuthError(authResult.errorMessage)
 		}

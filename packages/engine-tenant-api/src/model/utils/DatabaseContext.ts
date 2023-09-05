@@ -3,6 +3,7 @@ import { Providers } from '../providers'
 import { CommandBus } from '../commands'
 import { BatchLoaderArgs, initBatchLoader, ItemLoader } from '../../utils/batchQuery'
 
+
 export class DatabaseContext<Conn extends Connection.ConnectionLike = Connection.ConnectionLike> {
 	private loaders = new Map<BatchLoaderArgs<any, any, any>, ItemLoader<any, any>>()
 
@@ -41,17 +42,5 @@ export class DatabaseContext<Conn extends Connection.ConnectionLike = Connection
 		const newLoader = initBatchLoader(loaderArgs, this)
 		this.loaders.set(loaderArgs, newLoader)
 		return newLoader(arg)
-	}
-}
-
-export class DatabaseContextFactory {
-	constructor(
-		private readonly connection: Connection.ClientFactory,
-		private readonly providers: Providers,
-	) {
-	}
-
-	public create(): DatabaseContext {
-		return new DatabaseContext(this.connection.createClient('tenant', { module: 'tenant' }), this.providers)
 	}
 }

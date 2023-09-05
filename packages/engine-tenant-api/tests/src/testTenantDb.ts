@@ -129,6 +129,7 @@ export const createTenantTester = async (): Promise<TenantTester> => {
 			projectSchemaResolver,
 			projectInitializer,
 			connection,
+			readConnection: connection,
 			cryptoProviders: providers,
 		})
 		.replaceService('mailer', () => mailer)

@@ -72,7 +72,7 @@ export const EditIdentity: FC<EditIdentityProps> = ({ project, rolesConfig, iden
 			<Stack gap="large">
 				<EditMembership {...editUserMembershipProps} />
 
-				<Button distinction="primary" size="large" type="submit" disabled={isSubmitting}>
+				<Button display="block" distinction="primary" type="submit" disabled={isSubmitting}>
 					Save
 				</Button>
 			</Stack>

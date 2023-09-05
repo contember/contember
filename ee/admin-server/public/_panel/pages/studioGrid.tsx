@@ -3,6 +3,7 @@ import {
 	DataBindingProvider,
 	EntityId,
 	FeedbackRenderer,
+	Heading,
 	LayoutRenderer,
 	LinkButton,
 	PersistButton,
@@ -35,7 +36,7 @@ export default function StudioGrid() {
 
 	return (
 		<DataBindingProvider stateComponent={FeedbackRenderer}>
-			<LayoutRenderer title={`List ${entity}`} actions={actions} pageContentLayout="start">
+			<LayoutRenderer title={<Heading depth={1}>List {entity}</Heading>} actions={actions} pageContentLayout="stretch">
 				<AutoGrid entities={entities} createViewLinkTarget={createViewLinkTarget} createEditLinkTarget={createEditLinkTarget} />
 			</LayoutRenderer>
 		</DataBindingProvider>

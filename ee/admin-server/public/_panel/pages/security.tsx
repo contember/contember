@@ -1,8 +1,8 @@
 import { Box, ChangePassword, Divider, Heading, LayoutPage, OtpManagement, Stack } from '@contember/admin'
 
 export default () => (
-	<LayoutPage title="Profile security">
-		<Stack gap="xlarge">
+	<LayoutPage title={<Heading depth={1}>Profile security</Heading>}>
+		<Stack gap="large">
 			<ChangePassword />
 
 			<Divider />

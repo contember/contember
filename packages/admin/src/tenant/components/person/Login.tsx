@@ -73,10 +73,10 @@ export const Login = ({ onLogin, resetLink }: LoginProps) => {
 					/>
 				</FieldContainer>}
 				<Stack horizontal align="center" justify="space-between">
-					<Button type="submit" distinction="primary" disabled={isSubmitting}>
+					{resetLink && <Link to={resetLink}>Forgot your password?</Link>}
+					<Button type="submit" distinction="primary" display="block" disabled={isSubmitting}>
 						Submit
 					</Button>
-					{resetLink && <Link to={resetLink}>Forgot your password?</Link>}
 				</Stack>
 			</Stack>
 		</form>

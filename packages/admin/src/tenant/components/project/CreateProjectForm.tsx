@@ -77,7 +77,7 @@ export const CreateProjectForm: FC<CreateProjectFormProps> = ({ projectListLink 
 	}
 	return (
 		<form onSubmit={onSubmit}>
-			<Stack gap="xlarge">
+			<Stack gap="large">
 				<Heading depth={3}>New project</Heading>
 
 				<FieldContainer label={'Project slug'}>
@@ -89,8 +89,10 @@ export const CreateProjectForm: FC<CreateProjectFormProps> = ({ projectListLink 
 
 				<Divider />
 
-				<Heading depth={3}>Database credentials</Heading>
-				<p>You can leave some of this fields empty to use default values.</p>
+				<Stack gap="gap">
+					<Heading depth={3}>Database credentials</Heading>
+					<p>You can leave some of this fields empty to use default values.</p>
+				</Stack>
 
 				<FieldContainer label={'Host'}>
 					<TextInput {...register('dbHost')} />

@@ -1,4 +1,4 @@
-import { ApiKeyList, LayoutPage, LinkButton, NavigateBackButton, Section, useCurrentRequest, UsersList } from '@contember/admin'
+import { ApiKeyList, Heading, LayoutPage, LinkButton, NavigateBackButton, Section, useCurrentRequest, UsersList } from '@contember/admin'
 
 export default () => {
 	const request = useCurrentRequest()!
@@ -6,7 +6,7 @@ export default () => {
 
 	return (
 		<LayoutPage
-			title={`Project ${project}`}
+			title={<Heading depth={1}>Project {project}</Heading>}
 			navigation={<NavigateBackButton to={'projectList'}>Projects</NavigateBackButton>}
 		>
 			<Section

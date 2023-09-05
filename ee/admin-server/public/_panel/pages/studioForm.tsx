@@ -3,6 +3,7 @@ import {
 	DataBindingProvider,
 	EntityId,
 	FeedbackRenderer,
+	Heading,
 	LayoutRenderer,
 	LinkButton,
 	PersistButton,
@@ -31,7 +32,7 @@ export default function StudioForm() {
 
 	return (
 		<DataBindingProvider stateComponent={FeedbackRenderer}>
-			<LayoutRenderer title={title} actions={actions}>
+			<LayoutRenderer title={<Heading depth={1}>{title}</Heading>} actions={actions}>
 				<AutoForm entity={entity} id={id} onCreateSuccess={onCreateSuccess} createEditLink={createEditLink} />
 			</LayoutRenderer>
 		</DataBindingProvider>

@@ -19,7 +19,7 @@ export class ActionsApiMiddlewareFactory {
 			const { timer, logger, koa } = ctx
 			const { projectContainer, identity } = await this.actionsContextResolver.resolve(ctx)
 
-			const systemDatabase = projectContainer.systemDatabaseContextFactory.create()
+			const systemDatabase = projectContainer.systemDatabaseContext
 
 			logger.debug('Actions query processing started')
 			const graphqlContext: ActionsContext = {

@@ -1,6 +1,6 @@
 import { ProjectConfig } from '../types'
 import { StageCreator } from './stages'
-import { DatabaseContext, DatabaseContextFactory } from './database'
+import { DatabaseContext } from './database'
 import { Connection, retryTransaction } from '@contember/database'
 import { FingerCrossedLoggerHandler, Logger } from '@contember/logger'
 import { SystemMigrationsRunner } from '../migrations'
@@ -9,7 +9,7 @@ export class ProjectInitializer {
 	constructor(
 		private readonly stageCreator: StageCreator,
 		private readonly migrationsRunner: SystemMigrationsRunner,
-		private readonly databaseContextFactory: DatabaseContextFactory,
+		private readonly databaseContext: DatabaseContext,
 		private readonly project: ProjectConfig,
 	) {}
 
@@ -17,7 +17,7 @@ export class ProjectInitializer {
 		return await logger.scope(async initLogger => {
 			initLogger.debug('Executing system schema migrations')
 			await this.migrationsRunner.run(initLogger)
-			const dbContext = this.databaseContextFactory.create()
+			const dbContext = this.databaseContext
 			await retryTransaction(
 				() => dbContext.transaction(async trx => {
 					await this.initStages(trx, logger)

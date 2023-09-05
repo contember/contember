@@ -19,9 +19,8 @@ export class SystemGraphQLContextFactory {
 			authResult.identityId,
 			memberships.map(it => it.role),
 		)
-		const dbContextFactory = projectContainer.systemDatabaseContextFactory
 
-		const dbContext = dbContextFactory.create()
+		const dbContext = projectContainer.systemDatabaseContext
 		const schema = await projectContainer.contentSchemaResolver.getSchema(dbContext)
 		const systemContext = await systemContainer.resolverContextFactory.create(
 			schema,

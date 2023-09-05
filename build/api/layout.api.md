@@ -542,7 +542,7 @@ const isOneOfPanelBehaviors: (value: unknown) => value is "static" | "collapsibl
 const isOneOfPanelVisibilities: (value: unknown) => value is "visible" | "hidden";
 
 // @public @deprecated (undocumented)
-const LayoutContainerWidthContext: Context<number | null>;
+const LayoutContainerWidthContext: Context<number | null | undefined>;
 
 // @public @deprecated (undocumented)
 type LayoutContainerWidthContextType = ContainerWidthContextType;

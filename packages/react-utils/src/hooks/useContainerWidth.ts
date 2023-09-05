@@ -2,7 +2,7 @@ import { createContext, useContext } from 'react'
 import { useWindowSize } from './useWindowSize'
 
 export type ContainerWidthContextType = number
-export const ContainerWidthContext = createContext<ContainerWidthContextType | null>(null)
+export const ContainerWidthContext = createContext<ContainerWidthContextType | null | undefined>(undefined)
 ContainerWidthContext.displayName = 'ContainerWidthContext'
 
 export function useContainerWidth(): number {

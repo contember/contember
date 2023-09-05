@@ -25,6 +25,10 @@ export class OneHasOneDefinitionImpl extends FieldDefinition<OneHasOneDefinition
 		return this.withOption('joiningColumn', { ...this.options.joiningColumn, onDelete: Model.OnDelete.setNull })
 	}
 
+	restrictOnDelete(): Interface<OneHasOneDefinition> {
+		return this.withOption('joiningColumn', { ...this.options.joiningColumn, onDelete: Model.OnDelete.restrict })
+	}
+
 	notNull(): Interface<OneHasOneDefinition> {
 		return this.withOption('nullable', false)
 	}
@@ -33,9 +37,12 @@ export class OneHasOneDefinitionImpl extends FieldDefinition<OneHasOneDefinition
 		return this.withOption('orphanRemoval', true)
 	}
 
-	createField({ name, conventions, entityRegistry }: CreateFieldContext): Model.AnyField {
+	createField({ name, conventions, entityRegistry, strictDefinitionValidator, entityName }: CreateFieldContext): Model.AnyField {
 		const options = this.options
 		const joiningColumn: Partial<Model.JoiningColumn> = options.joiningColumn || {}
+
+		strictDefinitionValidator.validateInverseSide(entityName, name, options)
+		strictDefinitionValidator.validateOnCascade(entityName, name, joiningColumn)
 
 		return {
 			name: name,

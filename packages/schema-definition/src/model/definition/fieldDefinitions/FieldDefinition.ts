@@ -1,6 +1,5 @@
 import { Model } from '@contember/schema'
-import { NamingConventions } from '@contember/schema-utils'
-import { EntityRegistry, EnumRegistry } from '../internal'
+import { CommonContext } from '../context'
 
 export abstract class FieldDefinition<O> {
 	constructor(public readonly options: O) {}
@@ -12,11 +11,11 @@ export abstract class FieldDefinition<O> {
 	abstract createField(context: CreateFieldContext): Model.AnyField
 }
 
-export interface CreateFieldContext {
-	name: string
-	entityName: string
-	conventions: NamingConventions
-	enumRegistry: EnumRegistry
-	entityRegistry: EntityRegistry
-}
+export type CreateFieldContext =
+	&  {
+		name: string
+		entityName: string
+	}
+	& CommonContext
+
 export type Map = { [name: string]: FieldDefinition<any> }

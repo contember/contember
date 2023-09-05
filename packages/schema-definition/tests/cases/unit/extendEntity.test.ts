@@ -10,16 +10,14 @@ namespace ExtendedModel {
 	}
 
 	const addField = (name: string, field: FieldDefinition<any>): DecoratorFunction<any> => {
-		return extendEntity(({ entity, conventions, entityRegistry, enumRegistry }) => ({
+		return extendEntity(({ entity, ...context }) => ({
 			...entity,
 			fields: {
 				...entity.fields,
 				[name]: field.createField({
 					name,
-					enumRegistry,
-					entityRegistry,
-					conventions,
 					entityName: entity.name,
+					...context,
 				}),
 			},
 		}))

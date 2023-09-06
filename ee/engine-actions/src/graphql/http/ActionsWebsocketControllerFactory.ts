@@ -66,7 +66,7 @@ export class ActionsWebsocketControllerFactory {
 				ws.send(JSON.stringify(message))
 			}
 
-			let workers: { id: string; running: Running }[] = []
+			let workers: { id: string; running: Promise<Running> }[] = []
 			const abortListener = async () => {
 				send({ type: 'message', message: 'shutting down' })
 				await stopAll()
@@ -76,10 +76,13 @@ export class ActionsWebsocketControllerFactory {
 			ctx.abortSignal.addEventListener('abort', abortListener)
 
 			const stopAll = async () => {
-				const currentWorkers = workers.map(it => it.running.end().then(() => send({
-					type: 'workedStopped',
-					workerId: it.id,
-				})))
+				const currentWorkers = workers.map(async it => {
+					await (await it.running).end()
+					send({
+						type: 'workedStopped',
+						workerId: it.id,
+					})
+				})
 				workers = []
 				await Promise.all(currentWorkers)
 			}
@@ -110,10 +113,11 @@ export class ActionsWebsocketControllerFactory {
 						const workerId = Math.random().toString().substring(2)
 						const dispatchSupervisor = this.dispatchWorkerSupervisorFactory.create(projectGroup)
 						try {
-							const running  = await dispatchSupervisor.run({ logger, onError: () => {
+							const running  = dispatchSupervisor.run({ logger, onError: () => {
 								send({ type: 'workerCrashed', workerId })
 							} })
 							workers.push({ id: workerId, running })
+							await running
 							send({ type: 'workerStarted', workerId })
 						} catch (e) {
 							logger.error(e, { message: 'Worker failed to start' })

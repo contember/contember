@@ -3,6 +3,7 @@ import {
 	AfterCommitEvent,
 	BeforeCommitEvent,
 	ConstraintType,
+	convertError,
 	getInsertPrimary,
 	InputErrorKind,
 	Mapper,
@@ -495,20 +496,31 @@ export class MutationResolver {
 	): Promise<R> {
 		return await retryTransaction(
 			async () => {
-				const [result, mapper] = await this.mapperFactory.transaction(async mapper => {
+				return await this.mapperFactory.transaction(async mapper => {
 					logger.debug('MutationResolver: Starting mutation transaction')
 					const result = await cb(mapper)
 					if (!result.ok) {
 						logger.debug('MutationResolver: Transaction failed, rolling back', { result })
 						await mapper.db.connection.rollback()
 					} else {
+						await mapper.eventManager.fire(new BeforeCommitEvent())
+
 						logger.debug('MutationResolver: Transaction ok, committing')
+						try {
+							await mapper.db.connection.commit()
+						} catch (e) {
+							const err = convertError(this.schema, this.schemaDatabaseMetadata, e)
+							const errorResponse = this.createErrorResponse([err])
+							if (!errorResponse) {
+								throw new ImplementationException()
+							}
+							return { ...result, ...errorResponse }
+						}
+
+						await mapper.eventManager.fire(new AfterCommitEvent())
 					}
-					await mapper.eventManager.fire(new BeforeCommitEvent())
-					return [result, mapper]
+					return result
 				})
-				await mapper.eventManager.fire(new AfterCommitEvent())
-				return result
 			},
 			message => logger.warn(message),
 			{
@@ -517,6 +529,7 @@ export class MutationResolver {
 				maxTimeout: 1000,
 			},
 		)
+
 	}
 
 	private createErrorResponse(result: MutationResultList) {

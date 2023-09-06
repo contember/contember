@@ -27,7 +27,10 @@ import { SchemaDatabaseMetadata } from '@contember/schema-utils'
 
 type WithoutNode<T extends { node: any }> = Pick<T, Exclude<keyof T, 'node'>>
 
-type TransactionOptions = { deferForeignKeyConstraints?: boolean }
+type TransactionOptions = {
+	deferForeignKeyConstraints?: boolean
+	deferUniqueConstraints?: boolean
+}
 
 export class MutationResolver {
 	constructor(
@@ -66,6 +69,10 @@ export class MutationResolver {
 			if (options?.deferForeignKeyConstraints) {
 				logger.debug('MutationResolver: deferring foreign constraints')
 				await mapper.constraintHelper.setConstraintsDeferred('foreignKey')
+			}
+			if (options?.deferUniqueConstraints) {
+				logger.debug('MutationResolver: deferring unique constraints')
+				await mapper.constraintHelper.setConstraintsDeferred('unique')
 			}
 			const validationResult: Record<string, Result.MutationFieldResult> = {}
 			const validationErrors: Result.ValidationError[] = []
@@ -196,6 +203,7 @@ export class MutationResolver {
 				}
 				trxResult[field.alias] = result
 			}
+
 			if (options?.deferForeignKeyConstraints) {
 				logger.debug('MutationResolver: validating fk constraints')
 				const constraintsResult = await tryMutation(this.schema, this.schemaDatabaseMetadata, async () => {
@@ -205,6 +213,19 @@ export class MutationResolver {
 				const errorResponse = this.createErrorResponse(constraintsResult)
 				if (errorResponse) {
 					logger.debug('MutationResolver: deferred fk validation failed', { errorResponse })
+					return { ...errorResponse, ...validationResult }
+				}
+			}
+
+			if (options?.deferUniqueConstraints) {
+				logger.debug('MutationResolver: validating unique constraints')
+				const constraintsResult = await tryMutation(this.schema, this.schemaDatabaseMetadata, async () => {
+					await mapper.constraintHelper.setConstraintsImmediate('unique')
+					return []
+				})
+				const errorResponse = this.createErrorResponse(constraintsResult)
+				if (errorResponse) {
+					logger.debug('MutationResolver: deferred unique validation failed', { errorResponse })
 					return { ...errorResponse, ...validationResult }
 				}
 			}

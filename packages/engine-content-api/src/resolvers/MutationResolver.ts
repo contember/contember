@@ -65,7 +65,7 @@ export class MutationResolver {
 		return this.transaction(async mapper => {
 			if (options?.deferForeignKeyConstraints) {
 				logger.debug('MutationResolver: deferring foreign constraints')
-				await mapper.constraintHelper.setFkConstraintsDeferred()
+				await mapper.constraintHelper.setConstraintsDeferred('foreignKey')
 			}
 			const validationResult: Record<string, Result.MutationFieldResult> = {}
 			const validationErrors: Result.ValidationError[] = []
@@ -199,7 +199,7 @@ export class MutationResolver {
 			if (options?.deferForeignKeyConstraints) {
 				logger.debug('MutationResolver: validating fk constraints')
 				const constraintsResult = await tryMutation(this.schema, this.schemaDatabaseMetadata, async () => {
-					await mapper.constraintHelper.setFkConstraintsImmediate()
+					await mapper.constraintHelper.setConstraintsImmediate('foreignKey')
 					return []
 				})
 				const errorResponse = this.createErrorResponse(constraintsResult)

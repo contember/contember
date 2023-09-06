@@ -205,32 +205,6 @@ export class MutationResolver {
 				trxResult[field.alias] = result
 			}
 
-			if (options?.deferForeignKeyConstraints) {
-				logger.debug('MutationResolver: validating fk constraints')
-				const constraintsResult = await tryMutation(this.schema, this.schemaDatabaseMetadata, async () => {
-					await mapper.constraintHelper.setConstraintsImmediate('foreignKey')
-					return []
-				})
-				const errorResponse = this.createErrorResponse(constraintsResult)
-				if (errorResponse) {
-					logger.debug('MutationResolver: deferred fk validation failed', { errorResponse })
-					return { ...errorResponse, ...validationResult }
-				}
-			}
-
-			if (options?.deferUniqueConstraints) {
-				logger.debug('MutationResolver: validating unique constraints')
-				const constraintsResult = await tryMutation(this.schema, this.schemaDatabaseMetadata, async () => {
-					await mapper.constraintHelper.setConstraintsImmediate('unique')
-					return []
-				})
-				const errorResponse = this.createErrorResponse(constraintsResult)
-				if (errorResponse) {
-					logger.debug('MutationResolver: deferred unique validation failed', { errorResponse })
-					return { ...errorResponse, ...validationResult }
-				}
-			}
-
 			return {
 				__typename: 'MutationTransaction',
 				ok: true,

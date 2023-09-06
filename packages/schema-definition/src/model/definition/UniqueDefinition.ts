@@ -1,17 +1,23 @@
 import { extendEntity } from './extensions'
 import { DecoratorFunction } from '../../utils'
+import { Model } from '@contember/schema'
 
-export type UniqueOptions<T> = { fields: (keyof T)[] }
+export type UniqueOptions<T> = {
+	fields: (keyof T & string)[]
+	timing?: Model.ConstraintTiming
+}
 export function Unique<T>(options: UniqueOptions<T>): DecoratorFunction<T>
-export function Unique<T>(...fields: (keyof T)[]): DecoratorFunction<T>
-export function Unique<T>(options: UniqueOptions<T> | keyof T, ...args: (keyof T)[]): DecoratorFunction<T> {
+export function Unique<T>(...fields: (keyof T & string)[]): DecoratorFunction<T>
+export function Unique<T>(options: UniqueOptions<T> | keyof T & string, ...args: (keyof T & string)[]): DecoratorFunction<T> {
 	return extendEntity(({ entity }) => {
-		const fields = (typeof options !== 'object' ? [options, ...args] : options.fields) as string[]
+		const unique = typeof options !== 'object'
+			? { fields: [options, ...args] }
+			: options
 		return {
 			...entity,
 			unique: [
 				...entity.unique,
-				{  fields },
+				unique,
 			],
 		}
 	})

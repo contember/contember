@@ -30,7 +30,14 @@ export class CreateUniqueConstraintModificationHandler implements ModificationHa
 		const tableNameId = wrapIdentifier(entity.tableName)
 		const columnNameIds = columns.map(wrapIdentifier)
 
-		builder.sql(`ALTER TABLE ${tableNameId} ADD UNIQUE (${columnNameIds.join(', ')})`)
+		let checkModifier = ''
+		if (this.data.unique.timing === 'deferred') {
+			checkModifier = ' INITIALLY DEFERRED'
+		} else if (this.data.unique.timing === 'deferrable') {
+			checkModifier = ' DEFERRABLE'
+		}
+
+		builder.sql(`ALTER TABLE ${tableNameId} ADD UNIQUE (${columnNameIds.join(', ')})${checkModifier}`)
 
 		invalidateDatabaseMetadata()
 	}

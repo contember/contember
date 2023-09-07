@@ -1,8 +1,6 @@
 import { MigrationFilesManager } from './MigrationFilesManager'
 import { Schema } from '@contember/schema'
-import { SchemaDiffer } from './SchemaDiffer'
-import { VERSION_LATEST } from './modifications/ModificationVersions'
-import { Migration } from './Migration'
+import { Migration, SchemaDiffer, VERSION_LATEST } from '@contember/schema-migrations'
 import { MigrationVersionHelper } from '@contember/engine-common'
 
 export class MigrationCreator {

@@ -1,6 +1,6 @@
 import { Schema } from '@contember/schema'
 import { emptySchema } from '@contember/schema-utils'
-import { SchemaMigrator } from './SchemaMigrator'
+import { SchemaMigrator } from '@contember/schema-migrations'
 import { MigrationsResolver } from './MigrationsResolver'
 
 export class SchemaVersionBuilder {

@@ -1,14 +1,14 @@
 import { Command, CommandConfiguration, Input, Workspace } from '@contember/cli-common'
 import { printValidationErrors } from '../../utils/schema'
 import { InvalidSchemaException } from '@contember/schema-migrations'
-import { executeCreateMigrationCommand } from './MigrationCreateHelper'
+import { executeCreateMigrationCommand } from '../../utils/migrations/MigrationCreateHelper'
 import {
 	createMigrationStatusTable,
 	getLatestMigration,
 	getMigrationByName,
 	printMigrationDescription,
-} from '../../utils/migrations'
-import { resolveMigrationStatus } from './MigrationExecuteHelper'
+} from '../../utils/migrations/migrations'
+import { resolveMigrationStatus } from '../../utils/migrations/MigrationExecuteHelper'
 import { resolveSystemApiClient } from './SystemApiClientResolver'
 import prompts from 'prompts'
 import { emptySchema } from '@contember/schema-utils'

@@ -1,6 +1,6 @@
 import { GraphQLClient } from 'graphql-request'
 import { Migration } from '@contember/schema-migrations'
-import { ExecutedMigration, ExecutedMigrationInfo } from '../migrations'
+import { ExecutedMigration, ExecutedMigrationInfo } from '../migrations/migrations'
 
 export type MigrateError = {
 	readonly code: MigrateErrorCode

@@ -1,4 +1,4 @@
-export { SchemaMigrator, MigrationsResolver } from '@contember/schema-migrations'
+export { SchemaMigrator } from '@contember/schema-migrations'
 
 export { typeDefs, devTypeDefs, Schema } from './schema'
 

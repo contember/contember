@@ -3,14 +3,14 @@ import {
 	Migration,
 	MigrationDescriber,
 	MigrationInfo,
-	MigrationsResolver,
 	MigrationVersionHelper,
 } from '@contember/schema-migrations'
 import chalk from 'chalk'
 import { Schema } from '@contember/schema'
 import chalkTable from 'chalk-table'
-import { assertNever } from './assertNever'
+import { assertNever } from '../assertNever'
 import { emptyDatabaseMetadata } from '@contember/database'
+import { MigrationsResolver } from './MigrationsResolver'
 
 export const getLatestMigration = async (migrationsResolver: MigrationsResolver): Promise<Migration | null> => {
 	const migrations = await migrationsResolver.getMigrations()

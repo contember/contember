@@ -2,7 +2,7 @@
 	--cui-title-bar--padding-top: var(--cui-layout-page--padding-top);
 	--cui-title-bar--padding-left: var(--cui-layout-page--padding-left);
 	--cui-title-bar--padding-right: var(--cui-layout-page--padding-right);
-	--cui-title-bar--gap: calc(var(--cui-layout-section-gap) / 2);
+	--cui-title-bar--gap: var(--cui-gutter);
 	align-items: stretch;
 	background-color: rgb(var(--cui-background-color--rgb-50));
 	display: flex;
@@ -38,13 +38,20 @@
 	justify-content: space-between;
 }
 
+:where(.cui-titleBar-navigation) {
+	display: flex;
+}
 :where(.cui-titleBar-navigation + .cui-titleBar-in) {
 	margin-top: 0;
 }
 
 :where(.cui-titleBar-heading) {
+	display: flex;
 	flex: 1;
 	padding-right: 0.5em;
+}
+:where(.cui-titleBar-actions) {
+	display: flex;
 }
 
 @media (max-width: 767.98px) {

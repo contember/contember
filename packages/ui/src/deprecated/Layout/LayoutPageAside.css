@@ -4,6 +4,7 @@
 	border-top: 1px solid rgba(var(--cui-color--rgb-50), var(--cui-opacity--lower));
 	display: flex;
 	flex-direction: column;
+	min-width: 0px;
 	margin-top: calc(-1 * var(--cui-border-width, 1px));
 }
 
@@ -24,6 +25,7 @@
 		border-left: 1px solid transparent;
 		border-top: unset;
 		bottom: 0;
+		flex: 1 1 256px;
 		height: calc(100vh - var(--cui-content-offset-top, 0px));
 		margin-top: unset;
 		max-width: 50%;

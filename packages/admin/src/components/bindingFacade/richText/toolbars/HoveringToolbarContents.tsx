@@ -1,5 +1,5 @@
 import { Entity, useEnvironment, VariableInputTransformer } from '@contember/binding'
-import { EditorToolbar, ToolbarGroup, useDialog } from '@contember/ui'
+import { EditorToolbar, EditorToolbarProps, ToolbarGroup, useDialog } from '@contember/ui'
 import { memo, MouseEvent as ReactMouseEvent } from 'react'
 import { Transforms } from 'slate'
 import { useSlate } from 'slate-react'
@@ -10,9 +10,10 @@ import type { ToolbarButtonSpec } from './ToolbarButtonSpec'
 
 export interface HoveringToolbarContentsProps {
 	buttons: ToolbarButtonSpec[] | ToolbarButtonSpec[][]
+	showLabels?: EditorToolbarProps['showLabels']
 }
 
-export const HoveringToolbarContents = memo(({ buttons: rawButtons }: HoveringToolbarContentsProps) => {
+export const HoveringToolbarContents = memo(({ buttons: rawButtons, showLabels }: HoveringToolbarContentsProps) => {
 	const editor = useSlate() as EditorWithBlocks
 	const { openDialog } = useDialog<true>()
 	const environment = useEnvironment()
@@ -131,5 +132,11 @@ export const HoveringToolbarContents = memo(({ buttons: rawButtons }: HoveringTo
 		)
 		.filter(item => item.buttons.length)
 
-	return <EditorToolbar groups={groups} scope="contextual" />
+	return (
+		<EditorToolbar
+			groups={groups}
+			scope="contextual"
+			showLabels={showLabels}
+		/>
+	)
 })

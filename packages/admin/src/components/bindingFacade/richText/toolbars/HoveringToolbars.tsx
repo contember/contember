@@ -1,34 +1,46 @@
-import { DialogProvider, HoveringToolbar as UIToolbar, Portal, Scheme } from '@contember/ui'
-import { memo, ReactElement } from 'react'
+import { DialogProvider, Portal, Scheme, HoveringToolbar as UIToolbar } from '@contember/ui'
+import { ReactElement, memo } from 'react'
 import { useToolbarState } from '../editorSelection'
 import { HoveringToolbarContents, HoveringToolbarContentsProps } from './HoveringToolbarContents'
 
 export interface HoveringToolbarsProps {
 	shouldDisplayInlineToolbar?: () => boolean
 	inlineButtons?: HoveringToolbarContentsProps['buttons']
+	showLabels?: HoveringToolbarContentsProps['showLabels']
 	blockButtons?: HoveringToolbarContentsProps['buttons'] | ReactElement // TODO this is NASTY
 	toolbarScheme?: Scheme
 }
 
-export const HoveringToolbars = memo((props: HoveringToolbarsProps) => {
+export const HoveringToolbars = memo(({
+	blockButtons,
+	inlineButtons,
+	shouldDisplayInlineToolbar: shouldDisplayInlineToolbarProp,
+	showLabels,
+	toolbarScheme,
+	...props
+}: HoveringToolbarsProps) => {
+	if (import.meta.env.DEV) {
+		const __exhaustiveCheck: Record<string, never> = props
+	}
+
 	const { inlineToolbarRef, blockToolbarActive, inlineToolbarActive } = useToolbarState()
 
 	const shouldDisplayInlineToolbar =
-		inlineToolbarActive && (props.shouldDisplayInlineToolbar === undefined || props.shouldDisplayInlineToolbar())
+		inlineToolbarActive && (shouldDisplayInlineToolbarProp === undefined || shouldDisplayInlineToolbarProp())
 
 	return (
 		<DialogProvider>
 			<Portal>
-				{props.inlineButtons && (
-					<UIToolbar scheme={props.toolbarScheme} isActive={shouldDisplayInlineToolbar} ref={inlineToolbarRef} scope="contextual">
-						<HoveringToolbarContents buttons={props.inlineButtons} />
+				{inlineButtons && (
+					<UIToolbar scheme={toolbarScheme} isActive={shouldDisplayInlineToolbar} ref={inlineToolbarRef} scope="contextual">
+						<HoveringToolbarContents buttons={inlineButtons} showLabels={showLabels} />
 					</UIToolbar>
 				)}
 			</Portal>
-			{props.blockButtons && (
-				<UIToolbar scheme={props.toolbarScheme} isActive={blockToolbarActive}>
-					{Array.isArray(props.blockButtons) && <HoveringToolbarContents buttons={props.blockButtons} />}
-					{Array.isArray(props.blockButtons) || props.blockButtons}
+			{blockButtons && (
+				<UIToolbar scheme={toolbarScheme} isActive={blockToolbarActive}>
+					{Array.isArray(blockButtons) && <HoveringToolbarContents buttons={blockButtons} showLabels={showLabels} />}
+					{Array.isArray(blockButtons) || blockButtons}
 				</UIToolbar>
 			)}
 		</DialogProvider>

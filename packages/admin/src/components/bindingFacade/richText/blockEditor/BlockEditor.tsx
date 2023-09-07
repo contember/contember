@@ -65,6 +65,7 @@ export interface BlockEditorProps extends SugaredRelativeEntityList, CreateEdito
 	embedContentDiscriminationField?: SugaredFieldProps['field']
 	embedHandlers?: Iterable<EmbedHandler>
 
+	showToolbarLabels?: BlockHoveringToolbarContentsProps['showLabels']
 	toolbarScheme?: Scheme
 
 	// TODO
@@ -103,6 +104,7 @@ const BlockEditorComponent: FunctionComponent<BlockEditorProps> = Component(
 			inlineButtons = defaultInlineButtons,
 			blockButtons,
 			otherBlockButtons,
+			showToolbarLabels,
 
 			plugins,
 			augmentEditor,
@@ -244,16 +246,18 @@ const BlockEditorComponent: FunctionComponent<BlockEditorProps> = Component(
 												toolbarScheme={toolbarScheme}
 												shouldDisplayInlineToolbar={shouldDisplayInlineToolbar}
 												inlineButtons={inlineButtons}
+												showLabels={showToolbarLabels}
 												blockButtons={
 													<BlockHoveringToolbarContents
 														editorReferenceBlocks={editorReferenceBlocks}
 														blockButtons={blockButtons}
 														otherBlockButtons={otherBlockButtons}
+														showLabels={showToolbarLabels}
 													/>
 												}
 											/>
 										),
-										[blockButtons, editorReferenceBlocks, inlineButtons, otherBlockButtons, shouldDisplayInlineToolbar, toolbarScheme],
+										[blockButtons, editorReferenceBlocks, inlineButtons, otherBlockButtons, shouldDisplayInlineToolbar, showToolbarLabels, toolbarScheme],
 									)}
 								</EditorCanvas>
 							</Slate>

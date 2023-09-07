@@ -72,11 +72,12 @@ function ButtonOrDropdown(props: ToolbarButtonOrDropdown & WithPopupProps) {
 }
 
 export const EditorToolbar = memo(forwardRef<HTMLDivElement, EditorToolbarProps>(({
+	groups,
 	isActive,
-	scope, groups,
-	showLabels,
-	restGroups,
 	layout,
+	restGroups,
+	scope,
+	showLabels,
 }, ref) => {
 	layout = layout ?? 'bar'
 	const buttonLayout = layout === 'list' ? 'list' : 'grid'

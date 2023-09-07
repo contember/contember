@@ -12,6 +12,7 @@
 		{ "path": "../../config-loader/src" },
 		{ "path": "../../database/src" },
 		{ "path": "../../dic/src" },
+		{ "path": "../../engine-common/src" },
 		{ "path": "../../engine-content-api/src" },
 		{ "path": "../../schema/src" },
 		{ "path": "../../schema-migrations/src" },

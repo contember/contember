@@ -1,6 +1,6 @@
 import { Command, CommandConfiguration, Input, Workspace } from '@contember/cli-common'
-import { MigrationsContainerFactory } from '../../MigrationsContainer'
-import { getLatestMigration, getMigrationByName, printMigrationDescription } from '../../utils/migrations'
+import { MigrationsContainerFactory } from '../../utils/migrations/MigrationsContainer'
+import { getLatestMigration, getMigrationByName, printMigrationDescription } from '../../utils/migrations/migrations'
 
 type Args = {
 	project?: string

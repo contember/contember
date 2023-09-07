@@ -1,8 +1,10 @@
 import { CommandConfiguration } from '@contember/cli-common'
-import { SystemClient } from '../../utils/system'
-import { getMigrationsStatus, MigrationToExecuteOkStatus, printMigrationDescription } from '../../utils/migrations'
-import { MigrationDescriber, MigrationsResolver, SchemaVersionBuilder } from '@contember/schema-migrations'
+import { SystemClient } from '../system'
+import { getMigrationsStatus, MigrationToExecuteOkStatus, printMigrationDescription } from './migrations'
+import { MigrationDescriber } from '@contember/schema-migrations'
 import prompts from 'prompts'
+import { MigrationsResolver } from './MigrationsResolver'
+import { SchemaVersionBuilder } from './SchemaVersionBuilder'
 
 export type ExecuteMigrationOptions = {
 	instance?: string

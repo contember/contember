@@ -1,5 +1,5 @@
 import { Command, CommandConfiguration, Input, validateProjectName, Workspace } from '@contember/cli-common'
-import { MigrationsContainerFactory } from '../../MigrationsContainer'
+import { MigrationsContainerFactory } from '../../utils/migrations/MigrationsContainer'
 import { validateSchemaAndPrintErrors } from '../../utils/schema'
 import { emptySchema } from '@contember/schema-utils'
 import { validateMigrations } from '../migrations/MigrationValidationHelper'

@@ -1,7 +1,6 @@
 import { MigrationFilesManager } from './MigrationFilesManager'
-import { VERSION_INITIAL } from './modifications/ModificationVersions'
+import { Migration, VERSION_INITIAL } from '@contember/schema-migrations'
 import { MigrationVersionHelper } from '@contember/engine-common'
-import { Migration } from './Migration'
 
 export class MigrationsResolver {
 	constructor(private readonly migrationFilesManager: MigrationFilesManager) {}

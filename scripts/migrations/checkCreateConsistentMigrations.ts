@@ -1,13 +1,10 @@
 import { relative } from 'node:path'
-import {
-	MigrationFilesManager,
-	MigrationsResolver,
-	ModificationHandlerFactory,
-	SchemaDiffer,
-	SchemaMigrator,
-} from '../../src'
-import { emptySchema, schemaType } from '@contember/schema-utils'
-;(async () => {
+import { ModificationHandlerFactory, SchemaDiffer, SchemaMigrator, } from '../../packages/schema-migrations/src'
+import { emptySchema, schemaType } from '@contember/schema-utils';
+import { MigrationsResolver } from "../../packages/cli/src/utils/migrations/MigrationsResolver";
+import { MigrationFilesManager } from "../../packages/cli/src/utils/migrations/MigrationFilesManager";
+
+(async () => {
 	// eslint-disable-next-line no-console
 	console.log(relative(process.cwd(), process.argv[2]))
 	const migrationsResolver = new MigrationsResolver(new MigrationFilesManager(relative(process.cwd(), process.argv[2])))

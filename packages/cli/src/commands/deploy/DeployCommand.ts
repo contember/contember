@@ -4,14 +4,14 @@ import {
 	ExecuteMigrationOptions,
 	executeMigrations,
 	resolveMigrationStatus,
-} from '../migrations/MigrationExecuteHelper'
+} from '../../utils/migrations/MigrationExecuteHelper'
 import { interactiveResolveApiToken, TenantClient } from '../../utils/tenant'
 import { interactiveResolveInstanceEnvironmentFromInput } from '../../utils/instance'
 import { SystemClient } from '../../utils/system'
-import { MigrationsContainerFactory } from '../../MigrationsContainer'
+import { MigrationsContainerFactory } from '../../utils/migrations/MigrationsContainer'
 import { AdminClient, readAdminFiles } from '../../utils/admin'
 import prompts from 'prompts'
-import { createMigrationStatusTable } from '../../utils/migrations'
+import { createMigrationStatusTable } from '../../utils/migrations/migrations'
 import { maskToken } from '../../utils/token'
 import { parseDsn } from '../../utils/dsn'
 

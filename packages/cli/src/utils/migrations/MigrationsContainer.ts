@@ -1,14 +1,14 @@
 import { Builder } from '@contember/dic'
 import {
-	MigrationCreator,
 	MigrationDescriber,
-	MigrationFilesManager,
-	MigrationsResolver,
 	ModificationHandlerFactory,
 	SchemaDiffer,
 	SchemaMigrator,
-	SchemaVersionBuilder,
 } from '@contember/schema-migrations'
+import { MigrationCreator } from './MigrationCreator'
+import { SchemaVersionBuilder } from './SchemaVersionBuilder'
+import { MigrationsResolver } from './MigrationsResolver'
+import { MigrationFilesManager } from './MigrationFilesManager'
 
 export interface MigrationsContainer {
 	migrationCreator: MigrationCreator

@@ -127,16 +127,40 @@ const schema: DocumentNode = gql`
 		version: String!
 		name: String!
 		executedAt: DateTime!
-		checksum: String!
-		formatVersion: Int!
-		modifications: [Json!]!
+		
+		checksum: String
+		formatVersion: Int
+		modifications: [Json!]
 	}
 
 	# === migrate ===
-
+	enum MigrationType {
+		SCHEMA
+		CONTENT
+	}
+	
 	input Migration {
 		version: String!
 		name: String!
+		
+		type: MigrationType
+		schemaMigration: SchemaMigration
+		contentMigration: [ContentMigration!]
+		
+		
+		formatVersion: Int @deprecated(reason: "Use schemaMigration with SCHEMA type")
+		modifications: [Json!]  @deprecated(reason: "Use schemaMigration with SCHEMA type")
+		skippedErrors: [MigrationSkippedError!]   @deprecated(reason: "Use schemaMigration with SCHEMA type")
+	}
+	
+	input ContentMigration {
+		query: String!
+		stage: String
+		variables: Json
+		checkMutationResult: Boolean
+	}
+	
+	input SchemaMigration {
 		formatVersion: Int!
 		modifications: [Json!]!
 		skippedErrors: [MigrationSkippedError!]
@@ -153,6 +177,8 @@ const schema: DocumentNode = gql`
 		INVALID_FORMAT
 		INVALID_SCHEMA
 		MIGRATION_FAILED
+		CONTENT_MIGRATION_FAILED
+		CONTENT_MIGRATION_NOT_SUCCESSFUL
 	}
 
 	type MigrateError {

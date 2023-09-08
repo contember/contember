@@ -33,7 +33,7 @@ export const resolveMigrationStatus = async (
 	force: boolean = false,
 ): Promise<ReturnType<typeof getMigrationsStatus>> => {
 	const executedMigrations = await client.listExecutedMigrations()
-	const localMigrations = await migrationsResolver.getMigrations()
+	const localMigrations = await migrationsResolver.getSchemaMigrations()
 	return getMigrationsStatus(executedMigrations, localMigrations, force)
 }
 

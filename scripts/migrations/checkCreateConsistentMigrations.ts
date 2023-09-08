@@ -12,7 +12,7 @@ import { MigrationFilesManager } from "../../packages/cli/src/utils/migrations/M
 	const differ = new SchemaDiffer(new SchemaMigrator(modificationHandlerFactory))
 	const migrator = new SchemaMigrator(modificationHandlerFactory)
 	let schema = emptySchema
-	for (const migration of await migrationsResolver.getMigrations()) {
+	for (const migration of await migrationsResolver.getSchemaMigrations()) {
 		const nextSchema = migrator.applyModifications(schema, migration.modifications, migration.formatVersion)
 		schemaType(nextSchema)
 		const nextSchemaWithoutMeta = nextSchema

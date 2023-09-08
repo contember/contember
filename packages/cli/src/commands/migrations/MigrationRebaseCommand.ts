@@ -1,7 +1,6 @@
 import { Command, CommandConfiguration, Input, Workspace } from '@contember/cli-common'
 import { MigrationVersionHelper } from '@contember/schema-migrations'
 import { executeCreateMigrationCommand } from '../../utils/migrations/MigrationCreateHelper'
-import { getMigrationByName } from '../../utils/migrations/migrations'
 import { resolveSystemApiClient } from './SystemApiClientResolver'
 import { emptySchema } from '@contember/schema-utils'
 import { validateMigrations } from './MigrationValidationHelper'
@@ -52,7 +51,7 @@ export class MigrationRebaseCommand extends Command<Args, Options> {
 				const migrationNames = input.getArgument('migration')
 				const migrations = []
 				for (const migrationName of migrationNames) {
-					const migration = await getMigrationByName(migrationsResolver, migrationName)
+					const migration = await migrationsResolver.findSchemaMigrationByVersion(migrationName)
 					if (!migration) {
 						throw `Migration ${migrationName} not found`
 					}

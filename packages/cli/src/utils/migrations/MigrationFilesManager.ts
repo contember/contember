@@ -1,22 +1,33 @@
 import { MigrationVersionHelper } from '@contember/engine-common'
 import * as fs from 'node:fs/promises'
-import * as path from 'node:path'
+import { MigrationFileLoader } from './MigrationFileLoader'
+import { MigrationContent, MigrationFile } from './MigrationFile'
+import { join } from 'node:path'
+import { Dirent } from 'node:fs'
 
-class MigrationFilesManager {
-	constructor(public readonly directory: string) {}
+export class MigrationFilesManager {
+	private migrations: null | Promise<MigrationFile[]> = null
+
+	constructor(
+		public readonly directory: string,
+		private readonly loaders: Record<string, MigrationFileLoader>,
+	) {}
 
 	public async createFile(content: string, name: string): Promise<string> {
+		this.migrations = null
 		const path = this.formatPath(name)
 		await fs.writeFile(path, content, { encoding: 'utf8' })
 		return await fs.realpath(path)
 	}
 
 	public async removeFile(name: string) {
+		this.migrations = null
 		const path = this.formatPath(name)
 		await fs.unlink(path)
 	}
 
 	public async moveFile(oldName: string, newName: string) {
+		this.migrations = null
 		await fs.rename(this.formatPath(oldName), this.formatPath(newName))
 	}
 
@@ -30,22 +41,36 @@ class MigrationFilesManager {
 		}
 	}
 
-	public async listFiles(): Promise<string[]> {
-		const files: string[] = await this.tryReadDir()
-
-		const filteredFiles: string[] = await Promise.all(
-			files
-				.filter(file => file.endsWith(`.json`))
-				.filter(async file => {
-					return (await fs.lstat(`${this.directory}/${file}`)).isFile()
-				}),
-		)
-		return filteredFiles.sort()
+	public async readFiles(): Promise<MigrationFile[]> {
+		return this.migrations ??= this.forceReadFiles()
 	}
 
-	private async tryReadDir(): Promise<string[]> {
+	public async forceReadFiles(): Promise<MigrationFile[]> {
+		const files = (await this.listFiles()).map(it => ({
+			filename: it,
+			version: MigrationVersionHelper.extractVersion(it),
+		}))
+
+		return files.map(({ version, filename }): MigrationFile => {
+			const ext = filename.substring(filename.lastIndexOf('.') + 1)
+			const path = join(this.directory, filename)
+			let content: Promise<MigrationContent> | null = null
+			const file: MigrationFile = {
+				path: path,
+				version: version,
+				name: MigrationVersionHelper.extractName(path.substring(path.lastIndexOf('/') + 1)),
+				getContent: () => {
+					content ??= this.loaders[ext].load(file)
+					return content
+				},
+			}
+			return file
+		})
+	}
+
+	private async tryReadDir(): Promise<Dirent[]> {
 		try {
-			return await fs.readdir(this.directory)
+			return await fs.readdir(this.directory, { withFileTypes: true })
 		} catch (e) {
 			if (e instanceof Error && 'code' in e && (e as any).code === 'ENOENT') {
 				return []
@@ -54,23 +79,19 @@ class MigrationFilesManager {
 		}
 	}
 
-	public async readFiles(predicate?: (version: string) => boolean): Promise<MigrationFilesManager.MigrationFile[]> {
-		let files = await this.listFiles()
-		if (predicate) {
-			files = files.filter(filename => predicate(MigrationVersionHelper.extractVersion(filename)))
-		}
-		const filesWithContent = files.map(async filename => ({
-			filename: filename,
-			path: `${this.directory}/${filename}`,
-			content: await fs.readFile(`${this.directory}/${filename}`, { encoding: 'utf8' }),
-		}))
+	private async listFiles(): Promise<string[]> {
+		const files = await this.tryReadDir()
 
-		return await Promise.all(filesWithContent)
-	}
+		const extensions = Object.keys(this.loaders).join('|')
+		const regex = new RegExp('^\\d{4}-\\d{2}-\\d{2}-\\d{6}-[\\w-]+\\.(' + extensions  + ')$')
+		const filteredFiles = await Promise.all(
+			files
+				.filter(it => it.isFile())
+				.map(it => it.name)
+				.filter(it => it.match(regex)),
+		)
 
-	public static createForProject(projectsDirectory: string, projectSlug: string): MigrationFilesManager {
-		const migrationsDir = path.join(projectsDirectory, projectSlug, 'migrations')
-		return new MigrationFilesManager(migrationsDir)
+		return filteredFiles.sort()
 	}
 
 	private formatPath(version: string) {
@@ -79,13 +100,3 @@ class MigrationFilesManager {
 		return path
 	}
 }
-
-namespace MigrationFilesManager {
-	export type MigrationFile = {
-		filename: string
-		path: string
-		content: string
-	}
-}
-
-export { MigrationFilesManager }

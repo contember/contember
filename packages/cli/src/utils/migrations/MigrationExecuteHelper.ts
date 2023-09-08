@@ -5,6 +5,8 @@ import { MigrationDescriber } from '@contember/schema-migrations'
 import prompts from 'prompts'
 import { MigrationsResolver } from './MigrationsResolver'
 import { SchemaVersionBuilder } from './SchemaVersionBuilder'
+import { isSchemaMigration, ResolvedMigrationContent } from './MigrationFile'
+import { assertNever } from '../assertNever'
 
 export type ExecuteMigrationOptions = {
 	instance?: string
@@ -33,7 +35,7 @@ export const resolveMigrationStatus = async (
 	force: boolean = false,
 ): Promise<ReturnType<typeof getMigrationsStatus>> => {
 	const executedMigrations = await client.listExecutedMigrations()
-	const localMigrations = await migrationsResolver.getSchemaMigrations()
+	const localMigrations = await migrationsResolver.getMigrationFiles()
 	return getMigrationsStatus(executedMigrations, localMigrations, force)
 }
 
@@ -75,7 +77,12 @@ export const executeMigrations = async ({
 			if (action === 'describe') {
 				const schema = await schemaVersionBuilder.buildSchemaUntil(migrations[0].version)
 				for (const migration of migrations) {
-					await printMigrationDescription(migrationDescriber, schema, migration.localMigration, {
+					const migrationContent = await migration.localMigration.getContent()
+					if (!isSchemaMigration(migrationContent)) {
+						continue
+					}
+
+					await printMigrationDescription(migrationDescriber, schema, migrationContent, {
 						noSql: true,
 					})
 				}
@@ -87,10 +94,58 @@ export const executeMigrations = async ({
 		} while (true)
 	}
 
-	await client.migrate(
-		migrations.map(it => it.localMigration),
-		force,
-	)
+	let migrationsToRun: ResolvedMigrationContent[] = []
+
+	const executeMigrations = async () => {
+		if (migrationsToRun.length === 0) {
+			return
+		}
+		await client.migrate(
+			migrationsToRun.map(it => {
+				if (it.type === 'schema') {
+					return {
+						version: it.version,
+						name: it.name,
+						type: 'SCHEMA',
+						schemaMigration: {
+							formatVersion: it.formatVersion,
+							modifications: it.modifications,
+							skippedErrors: it.skippedErrors,
+						},
+					}
+				}
+				if (it.type === 'content') {
+					return {
+						version: it.version,
+						name: it.name,
+						type: 'CONTENT',
+						contentMigration: it.queries,
+					}
+				}
+				return assertNever(it)
+			}),
+			force,
+		)
+		migrationsToRun.forEach(it => {
+			console.log(it.name)
+		})
+		migrationsToRun = []
+	}
+
+	console.log('Executing...')
+
+	for (const migration of migrations) {
+		const migrationContent = await migration.localMigration.getContent()
+		if (migrationContent.type === 'factory') {
+			await executeMigrations()
+			const result = await migrationContent.factory()
+			migrationsToRun.push(result)
+			await executeMigrations()
+		} else {
+			migrationsToRun.push(migrationContent)
+		}
+	}
+	await executeMigrations()
 	console.log('Migration executed')
 	return 0
 }

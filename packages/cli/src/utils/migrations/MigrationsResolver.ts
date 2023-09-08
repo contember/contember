@@ -1,6 +1,6 @@
 import { MigrationFilesManager } from './MigrationFilesManager'
 import { Migration } from '@contember/schema-migrations'
-import { MigrationFile } from './MigrationFile'
+import { isSchemaMigration, MigrationFile } from './MigrationFile'
 import { MigrationVersionHelper } from '@contember/engine-common'
 
 export class MigrationsResolver {
@@ -38,9 +38,7 @@ export class MigrationsResolver {
 	}
 
 	private async convertMigrationFileToSchemaMigration(file: MigrationFile): Promise<Migration | null> {
-
 		const result = await file.getContent()
-
-		return typeof result !== 'function' ? result : null
+		return isSchemaMigration(result) ? result : null
 	}
 }

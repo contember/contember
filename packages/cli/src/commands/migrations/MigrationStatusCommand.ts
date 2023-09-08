@@ -1,11 +1,11 @@
-import { Command, CommandConfiguration, Input } from '@contember/cli-common'
+import { Command, CommandConfiguration, Input, Workspace } from '@contember/cli-common'
 import { MigrationsContainerFactory } from '../../utils/migrations/MigrationsContainer'
 import { interactiveResolveInstanceEnvironmentFromInput } from '../../utils/instance'
 import { interactiveResolveApiToken } from '../../utils/tenant'
 import { SystemClient } from '../../utils/system'
-import { createMigrationStatusTable, getMigrationsStatus, MigrationState, sortMigrations } from '../../utils/migrations/migrations'
+import { createMigrationStatusTable, MigrationState, sortMigrations } from '../../utils/migrations/migrations'
 import chalk from 'chalk'
-import { Workspace } from '@contember/cli-common'
+import { resolveMigrationStatus } from '../../utils/migrations/MigrationExecuteHelper'
 
 type Args = {
 	project?: string
@@ -66,9 +66,7 @@ export class MigrationStatusCommand extends Command<Args, Options> {
 		const remoteProject = input.getOption('remote-project') || project.name
 		const client = SystemClient.create(instance.baseUrl, remoteProject, apiToken)
 
-		const executedMigrations = await client.listExecutedMigrations()
-		let localMigrations = await container.migrationsResolver.getSchemaMigrations()
-		let status = getMigrationsStatus(executedMigrations, localMigrations)
+		let status = await resolveMigrationStatus(client, container.migrationsResolver)
 		const restoreMissing = input.getOption('restore-missing')
 		if (restoreMissing) {
 			const missing = status.errorMigrations.filter(it => it.state === MigrationState.EXECUTED_MISSING)
@@ -87,8 +85,7 @@ export class MigrationStatusCommand extends Command<Args, Options> {
 					fullMigration.name,
 				)
 			}
-			localMigrations = await container.migrationsResolver.getSchemaMigrations()
-			status = getMigrationsStatus(executedMigrations, localMigrations)
+			status = await resolveMigrationStatus(client, container.migrationsResolver)
 		}
 
 		const onlyErrors = input.getOption('only-errors')

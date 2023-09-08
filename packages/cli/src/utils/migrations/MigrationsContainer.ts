@@ -1,14 +1,12 @@
 import { Builder } from '@contember/dic'
-import {
-	MigrationDescriber,
-	ModificationHandlerFactory,
-	SchemaDiffer,
-	SchemaMigrator,
-} from '@contember/schema-migrations'
+import { MigrationDescriber, ModificationHandlerFactory, SchemaDiffer, SchemaMigrator } from '@contember/schema-migrations'
 import { MigrationCreator } from './MigrationCreator'
 import { SchemaVersionBuilder } from './SchemaVersionBuilder'
 import { MigrationsResolver } from './MigrationsResolver'
 import { MigrationFilesManager } from './MigrationFilesManager'
+import { JsonLoader } from './JsonLoader'
+import { MigrationParser } from './MigrationParser'
+import { JsLoader } from './JsLoader'
 
 export interface MigrationsContainer {
 	migrationCreator: MigrationCreator
@@ -26,7 +24,11 @@ export class MigrationsContainerFactory {
 	public create(): MigrationsContainer {
 		return new Builder({})
 			.addService('migrationFilesManager', () =>
-				new MigrationFilesManager(this.directory))
+				new MigrationFilesManager(this.directory, {
+					json: new JsonLoader(new MigrationParser()),
+					ts: new JsLoader(new MigrationParser()),
+					js: new JsLoader(new MigrationParser()),
+				}))
 			.addService('modificationHandlerFactory', () =>
 				new ModificationHandlerFactory(ModificationHandlerFactory.defaultFactoryMap))
 			.addService('schemaMigrator', ({ modificationHandlerFactory }) =>

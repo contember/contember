@@ -22,7 +22,7 @@ export class SchemaVersionBuilder {
 	}
 
 	public async buildSchemaAdvanced(initialSchema: Schema, condition: (version: string) => boolean): Promise<Schema> {
-		return (await this.migrationsResolver.getMigrations())
+		return (await this.migrationsResolver.getSchemaMigrations())
 			.filter(({ version }) => condition(version))
 			.reduce<Schema>(
 				(schema, { modifications, formatVersion }) =>

@@ -67,7 +67,7 @@ export class MigrationStatusCommand extends Command<Args, Options> {
 		const client = SystemClient.create(instance.baseUrl, remoteProject, apiToken)
 
 		const executedMigrations = await client.listExecutedMigrations()
-		let localMigrations = await container.migrationsResolver.getMigrations()
+		let localMigrations = await container.migrationsResolver.getSchemaMigrations()
 		let status = getMigrationsStatus(executedMigrations, localMigrations)
 		const restoreMissing = input.getOption('restore-missing')
 		if (restoreMissing) {
@@ -87,7 +87,7 @@ export class MigrationStatusCommand extends Command<Args, Options> {
 					fullMigration.name,
 				)
 			}
-			localMigrations = await container.migrationsResolver.getMigrations()
+			localMigrations = await container.migrationsResolver.getSchemaMigrations()
 			status = getMigrationsStatus(executedMigrations, localMigrations)
 		}
 

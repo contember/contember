@@ -1,33 +1,9 @@
-import {
-	calculateMigrationChecksum,
-	Migration,
-	MigrationDescriber,
-	MigrationInfo,
-	MigrationVersionHelper,
-} from '@contember/schema-migrations'
+import { calculateMigrationChecksum, Migration, MigrationDescriber, MigrationInfo } from '@contember/schema-migrations'
 import chalk from 'chalk'
 import { Schema } from '@contember/schema'
 import chalkTable from 'chalk-table'
 import { assertNever } from '../assertNever'
 import { emptyDatabaseMetadata } from '@contember/database'
-import { MigrationsResolver } from './MigrationsResolver'
-
-export const getLatestMigration = async (migrationsResolver: MigrationsResolver): Promise<Migration | null> => {
-	const migrations = await migrationsResolver.getMigrations()
-	return migrations.length > 0 ? migrations[migrations.length - 1] : null
-}
-export const getMigrationByName = async (
-	migrationsResolver: MigrationsResolver,
-	version: string,
-): Promise<Migration | null> => {
-	const migrations = await migrationsResolver.getMigrations()
-	return findMigration(migrations, version)
-}
-
-export const findMigration = <M extends { version: string }>(migrations: M[], version: string): M | null =>
-	migrations.find(
-		it => MigrationVersionHelper.extractVersion(it.version) === MigrationVersionHelper.extractVersion(version),
-	) || null
 
 export const printMigrationDescription = function (
 	migrationsDescriber: MigrationDescriber,
